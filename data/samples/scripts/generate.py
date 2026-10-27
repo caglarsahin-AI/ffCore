@@ -15,7 +15,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from gen import agents, contracts, openapi, schema  # noqa: E402
+from gen import agents, contracts, openapi, pii, schema  # noqa: E402
 from gen import eval as eval_set  # noqa: E402
 
 MODULES = {
@@ -24,6 +24,7 @@ MODULES = {
     "schema": schema.generate,
     "agents": agents.generate,
     "openapi": openapi.generate,
+    "pii": pii.generate,
 }
 DEFAULT_SEED = 13
 DEFAULT_OUT = Path(__file__).resolve().parents[1]

@@ -20,7 +20,7 @@ sys.path.insert(0, str(SCRIPTS))
 import generate  # noqa: E402
 import random  # noqa: E402
 
-from gen import contracts, pdf, schema  # noqa: E402
+from gen import contracts, pdf, pii, schema  # noqa: E402
 from gen import eval as eval_gen  # noqa: E402
 from gen.words import CONTRACTS  # noqa: E402
 
@@ -215,6 +215,58 @@ class Test13aEval(unittest.TestCase):
             self.assertGreater(q["compute"](rows), 0, q["id"])  # a zero would not discriminate
 
 
+class Test13aPii(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        with tempfile.TemporaryDirectory() as tmp:
+            _generate(Path(tmp), "pii")
+            text = (Path(tmp) / "pii/pii-100.jsonl").read_text(encoding="utf-8")
+        cls.records = [json.loads(line) for line in text.splitlines()]
+
+    def test_13a_5_validators_match_known_examples(self):
+        # Independent anchors so the generator's validators are not checked against themselves.
+        self.assertTrue(pii.tc_valid("10000000146"))
+        self.assertFalse(pii.tc_valid("10000000147"))
+        self.assertTrue(pii.iban_valid("TR33 0006 1005 1978 6457 8413 26"))
+        self.assertFalse(pii.iban_valid("TR34 0006 1005 1978 6457 8413 26"))
+        self.assertTrue(pii.luhn_valid("4111 1111 1111 1111"))
+        self.assertFalse(pii.luhn_valid("4111 1111 1111 1112"))
+
+    def test_13a_5_pii_labeled(self):
+        name_free = [r for r in self.records if not any(e["category"] == "KISI_ADI" for e in r["entities"])]
+        self.assertEqual(len(name_free), pii.TOTAL - pii.NAME_SLOTS)
+        self.assertEqual(len({r["id"] for r in self.records}), len(self.records))
+        seen: dict[str, int] = {}
+        for r in self.records:
+            self.assertEqual(set(r), {"id", "text", "entities"})
+            last_end = 0
+            for e in r["entities"]:
+                self.assertIn(e["category"], pii.CATEGORIES, r["id"])
+                self.assertGreaterEqual(e["start"], last_end, r["id"])  # sorted, no overlap
+                value = r["text"][e["start"]:e["end"]]
+                self.assertTrue(value and value == value.strip(), (r["id"], value))
+                last_end = e["end"]
+                seen[e["category"]] = seen.get(e["category"], 0) + 1
+                checks = {"TC_KIMLIK": pii.tc_valid, "TR_IBAN": pii.iban_valid, "KART": pii.luhn_valid,
+                          "VKN": lambda v: v[9] == pii.vkn_check(v[:9])}
+                if e["category"] in checks:
+                    self.assertTrue(checks[e["category"]](value), (r["id"], e["category"], value))
+        for code, (_, default_on) in pii.CATEGORIES.items():
+            if code == "KISI_ADI":
+                continue  # DECISION-24
+            self.assertGreaterEqual(seen.get(code, 0), 2, code)
+        negatives = [r for r in self.records if not r["entities"]]
+        self.assertGreaterEqual(len(negatives), 8)
+        for r in negatives:  # look-alike 11-digit numbers must fail the TC checksum
+            for run in re.findall(r"\b\d{11}\b", r["text"]):
+                self.assertFalse(pii.tc_valid(run), (r["id"], run))
+
+    def test_13a_5b_pii_total_100(self):
+        if not pii.NAME_SENTENCES:
+            self.skipTest("NOT_RUN: KISI_ADI sentences wait for DECISION-24")
+        self.assertEqual(len(self.records), pii.TOTAL)
+
+
 class Test13aSchema(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -333,8 +385,8 @@ class Test13aOpenapi(unittest.TestCase):
 
 
 class Test13aDeterminism(unittest.TestCase):
-    ONLY = "contracts,schema,agents,eval,openapi"
-    DIRS = ("contracts", "schema", "agents", "eval", "openapi")
+    ONLY = "contracts,schema,agents,eval,openapi,pii"
+    DIRS = ("contracts", "schema", "agents", "eval", "openapi", "pii")
 
     def test_13a_8_deterministic(self):
         with tempfile.TemporaryDirectory() as a, tempfile.TemporaryDirectory() as b:
