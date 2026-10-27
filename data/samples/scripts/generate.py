@@ -15,9 +15,10 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from gen import agents, openapi, schema  # noqa: E402
+from gen import agents, contracts, openapi, schema  # noqa: E402
 
 MODULES = {
+    "contracts": contracts.generate,
     "schema": schema.generate,
     "agents": agents.generate,
     "openapi": openapi.generate,

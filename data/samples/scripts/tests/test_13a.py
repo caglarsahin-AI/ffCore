@@ -18,6 +18,13 @@ SAMPLES = SCRIPTS.parent
 sys.path.insert(0, str(SCRIPTS))
 
 import generate  # noqa: E402
+import random  # noqa: E402
+
+from gen import contracts, pdf  # noqa: E402
+from gen.words import CONTRACTS  # noqa: E402
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import readback  # noqa: E402
 
 SEED = 13
 
@@ -61,6 +68,64 @@ def _schema_columns(schema_sql: str) -> dict[str, list[str]]:
                 cols.append(word)
         tables[name] = cols
     return tables
+
+
+class Test13aContracts(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.tmp = tempfile.TemporaryDirectory()
+        cls.out = Path(cls.tmp.name) / "contracts"
+        _generate(Path(cls.tmp.name), "contracts")
+        cls.manifest = json.loads((cls.out / "manifest.json").read_text(encoding="utf-8"))
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.tmp.cleanup()
+
+    def test_13a_1_contracts_count_and_formats(self):
+        self.assertGreaterEqual(len(self.manifest), 5)
+        files = sorted(p.name for p in self.out.iterdir() if p.name != "manifest.json")
+        self.assertEqual(files, sorted(m["file_name"] for m in self.manifest))
+        formats = {m["format"] for m in self.manifest}
+        self.assertEqual(formats, {"pdf", "docx"})
+        for m in self.manifest:
+            data = (self.out / m["file_name"]).read_bytes()
+            self.assertTrue(data.startswith(b"%PDF-" if m["format"] == "pdf" else b"PK\x03\x04"), m)
+            if m["format"] == "pdf":
+                self.assertEqual(len(readback.pdf_info(data)["pages"]), m["pages"], m["file_name"])
+        acls = [m["acl_roles"] for m in self.manifest]
+        self.assertIn(["admin"], acls)      # 04 ACL test: admin-only document
+        self.assertIn([], acls)             # C15: empty ACL = all project members
+        self.assertIn(10, [m["pages"] for m in self.manifest])  # 04: 10-page ingest timing
+
+    def test_13a_1b_contracts_structure(self):
+        for c in CONTRACTS:
+            path = self.out / c["file_name"]
+            text = " ".join(readback.text_of(path).split())  # PDF lines wrap mid-phrase
+            self.assertIn("Madde 10 - Fesih", text, path.name)
+            self.assertIn(f"en az {c['notice_days']} gün önceden", text, path.name)
+            self.assertIn(c["vendor"], text)
+            # Turkish letters survive the round trip: ş ğ ı İ ü ö ç Ş all occur in fixed clause text
+            for phrase in ("Kişisel Verilerin Korunması Kanunu", "Doğal afet", "kalkıncaya",
+                           "İdarenin bulunduğu yer", "çözümü", "Yüklenicinin yükümlülükleri", "Ş"):
+                self.assertIn(phrase, text, (path.name, phrase))
+            data = path.read_bytes()
+            if c["format"] == "pdf":
+                info = readback.pdf_info(data)
+                self.assertTrue(info["flate"])
+                self.assertIn(b"/ToUnicode", info["font"])
+                self.assertIn(b"/Differences", data)
+                # Clause text must come back exactly; the trailing annex rows (header + 8)
+                # are seeded and the page footers are not body text.
+                expected = [line for _, line in pdf.layout(contracts.blocks(c, random.Random(0))) if line]
+                got = [line for page in info["pages"] for line in page if not line.startswith("Sayfa ")]
+                body = len(expected) - 9
+                self.assertEqual(got[:body], expected[:body])
+            else:
+                info = readback.docx_info(data)
+                styles = {s for s, _ in info["paragraphs"]}
+                self.assertTrue({"Heading1", "Heading2"} <= styles)
+                self.assertGreaterEqual(info["tables"], 2)
 
 
 class Test13aSchema(unittest.TestCase):
@@ -181,8 +246,8 @@ class Test13aOpenapi(unittest.TestCase):
 
 
 class Test13aDeterminism(unittest.TestCase):
-    ONLY = "schema,agents,openapi"
-    DIRS = ("schema", "agents", "openapi")
+    ONLY = "contracts,schema,agents,openapi"
+    DIRS = ("contracts", "schema", "agents", "openapi")
 
     def test_13a_8_deterministic(self):
         with tempfile.TemporaryDirectory() as a, tempfile.TemporaryDirectory() as b:

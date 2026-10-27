@@ -1,0 +1,50 @@
+[
+  {
+    "file_name": "SZL-2024-011_cihaz-bakim.pdf",
+    "code": "SZL-2024-011",
+    "title": "Tıbbi Cihaz Bakım ve Onarım Hizmet Sözleşmesi",
+    "format": "pdf",
+    "pages": 10,
+    "acl_roles": [
+      "analyst"
+    ]
+  },
+  {
+    "file_name": "SZL-2025-003_temizlik-hizmet.docx",
+    "code": "SZL-2025-003",
+    "title": "Temizlik Hizmet Alımı Sözleşmesi",
+    "format": "docx",
+    "pages": null,
+    "acl_roles": [
+      "analyst"
+    ]
+  },
+  {
+    "file_name": "SZL-2025-007_laboratuvar-kiti.docx",
+    "code": "SZL-2025-007",
+    "title": "Laboratuvar Kiti Tedarik Sözleşmesi",
+    "format": "docx",
+    "pages": null,
+    "acl_roles": []
+  },
+  {
+    "file_name": "SZL-2023-019_yazilim-lisans.pdf",
+    "code": "SZL-2023-019",
+    "title": "Hastane Bilgi Yönetim Yazılımı Lisans ve Destek Sözleşmesi",
+    "format": "pdf",
+    "pages": 4,
+    "acl_roles": [
+      "analyst"
+    ]
+  },
+  {
+    "file_name": "SZL-2025-012_yonetim-danismanlik.docx",
+    "code": "SZL-2025-012",
+    "title": "Yönetim Danışmanlığı ve Gizlilik Sözleşmesi",
+    "format": "docx",
+    "pages": null,
+    "acl_roles": [
+      "admin"
+    ]
+  }
+]
