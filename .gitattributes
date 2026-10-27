@@ -1,0 +1,6 @@
+# Satir sonlari depoda LF; Windows checkout'unda da LF (CRLF gurultusu olmasin)
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.pdf binary
+*.docx binary

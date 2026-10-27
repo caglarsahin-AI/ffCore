@@ -14,7 +14,7 @@ Monorepo iskeletini, geliştirme ortamını ve altyapı servislerini (Postgres+p
 4. `deploy/docker-compose.yml`: servisler `postgres` (pgvector imajı), `redis`, `ollama`, `litellm`, `langfuse` (+ kendi Postgres ve ClickHouse'u, resmi compose'dan), `backend`, `frontend`. Sağlık kontrolleri, kalıcı volume'lar, tek `.env.example`.
 5. `deploy/ollama/models.txt` profil bazlı (`models.llmaas.txt`: yalnızca embedding `bge-m3`; `models.airgap.txt`: Qwen 3.5 35B + `bge-m3`) ve `pull.sh` `DEPLOY_PROFILE`'a göre doğru listeyi çeker. Sunucuda modeller zaten varsa `OLLAMA_MODELS` volume'u mevcut dizine bağlanır.
 6. `Makefile`: `make up`, `make down`, `make logs`, `make smoke` (tüm `/healthz`'leri, Ollama `/api/tags`'i ve `OLLAMA_CONTEXT_LENGTH` doğrulamasını kontrol eder; `/readyz` 04a ile gelir), `make lint`, `make test`.
-7. `.gitignore`, `.editorconfig`, `ruff.toml`, `.pre-commit-config.yaml`.
+7. `.gitignore`, `.editorconfig`, `ruff.toml`, `.pre-commit-config.yaml`. `.gitattributes` (`* text=auto eol=lf`, ikili dosyalar `binary`) main'de zaten var; değiştirme, `.editorconfig` `end_of_line = lf` ile uyumlu olsun.
 7b. `.env.example` varsayılanı `DEPLOY_PROFILE=llmaas` (PLAN.md 2b); `airgap` için ayrı örnek blok yorum satırlarında.
 8. `docs/gelistirme-ortami.md`: Windows'ta Docker Desktop ile çalıştırma, iç registry kullanımı için `REGISTRY_PREFIX` değişkeni (tüm imaj adları `${REGISTRY_PREFIX}` ile başlar; boşsa Docker Hub).
 
