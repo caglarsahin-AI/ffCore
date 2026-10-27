@@ -1,0 +1,66 @@
+{
+  "key": "veri-soru-cevap",
+  "name": "Veri Soru-Cevap",
+  "description": "Hastane işletme verisi (bölüm, yatak, yatış özeti, cihaz, arıza) hakkındaki soruları SQL ile cevaplar.",
+  "definition": {
+    "model": "chat-default",
+    "system_prompt": "Sen {{hospital_name}} için veri asistanısın. Önce get_schema ile ilgili tabloları öğren, sonra tek bir run_sql çağrısıyla soruyu cevapla. Sonuçları tablo olarak yaz ve hangi sorguyu çalıştırdığını belirt. Soru belirsizse kullanıcıya sor.",
+    "variables": [
+      {
+        "key": "hospital_name",
+        "label": "Hastane adı",
+        "default": "Örnek Şehir Hastanesi"
+      }
+    ],
+    "knowledge": [],
+    "tools": [
+      {
+        "tool_key": "mcp-sql",
+        "actions": [
+          "get_schema",
+          "run_sql"
+        ]
+      }
+    ],
+    "approval": {
+      "actions": [
+        "mcp-sql.run_sql"
+      ],
+      "assign_to": "analyst"
+    },
+    "ask_user": true,
+    "guardrail_policy_key": "default",
+    "structured_output": null,
+    "limits": {
+      "max_tool_calls": 1,
+      "max_turns": 10,
+      "run_timeout_s": null,
+      "context_tokens": 16000,
+      "output_tokens": 800
+    },
+    "context_policy": {
+      "history_turns": 6,
+      "history_summarize": true,
+      "history_max_tokens": 3000,
+      "memory_max_tokens": 300,
+      "rag_max_tokens": 4000,
+      "tools_schema_max_tokens": 1500,
+      "output_reserve_tokens": 800,
+      "trim_order": [
+        "history",
+        "rag",
+        "memory"
+      ]
+    },
+    "answer_rules": {
+      "cite_sources": false,
+      "unknown_reply": "Bu soruyu mevcut veriyle cevaplayamıyorum.",
+      "confidence_formula": "cited",
+      "confidence_threshold": null,
+      "show_confidence": false,
+      "verify": false,
+      "max_answer_tokens": 400
+    },
+    "reasoning": "none"
+  }
+}

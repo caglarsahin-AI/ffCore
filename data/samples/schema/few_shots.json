@@ -1,0 +1,82 @@
+[
+  {
+    "question": "Kardiyoloji bölümünün yatak kapasitesi nedir?",
+    "sql": "SELECT bed_capacity FROM departments WHERE code = 'KARD'"
+  },
+  {
+    "question": "Hangi bölümün yatak kapasitesi en yüksek?",
+    "sql": "SELECT name_tr, bed_capacity FROM departments ORDER BY bed_capacity DESC LIMIT 1"
+  },
+  {
+    "question": "Hizmet dışı kaç yatak var?",
+    "sql": "SELECT COUNT(*) AS hizmet_disi FROM beds WHERE is_active = FALSE"
+  },
+  {
+    "question": "Yatak türlerine göre yatak sayıları nedir?",
+    "sql": "SELECT bed_type, COUNT(*) AS adet FROM beds GROUP BY bed_type ORDER BY adet DESC"
+  },
+  {
+    "question": "2025 yılında toplam kaç yatış yapıldı?",
+    "sql": "SELECT SUM(admitted_count) AS toplam_yatis FROM admissions WHERE day BETWEEN '2025-01-01' AND '2025-12-31'"
+  },
+  {
+    "question": "Mart 2025'te en çok yatış alan üç bölüm hangileri?",
+    "sql": "SELECT d.name_tr, SUM(a.admitted_count) AS yatis FROM admissions a JOIN departments d ON d.id = a.department_id WHERE a.day BETWEEN '2025-03-01' AND '2025-03-31' GROUP BY d.name_tr ORDER BY yatis DESC LIMIT 3"
+  },
+  {
+    "question": "Nöroloji bölümünün 2025 ortalama doluluk oranı nedir?",
+    "sql": "SELECT ROUND(AVG(a.occupied_beds::numeric / d.bed_capacity), 3) AS doluluk FROM admissions a JOIN departments d ON d.id = a.department_id WHERE d.code = 'NORO'"
+  },
+  {
+    "question": "Aylık toplam taburcu sayıları nedir?",
+    "sql": "SELECT date_trunc('month', day)::date AS ay, SUM(discharged_count) AS taburcu FROM admissions GROUP BY ay ORDER BY ay"
+  },
+  {
+    "question": "Hafta sonları ortalama günlük yatış kaçtır?",
+    "sql": "SELECT ROUND(AVG(gunluk), 1) AS ortalama FROM (SELECT day, SUM(admitted_count) AS gunluk FROM admissions WHERE EXTRACT(ISODOW FROM day) IN (6, 7) GROUP BY day) t"
+  },
+  {
+    "question": "Kaç ventilatör aktif durumda?",
+    "sql": "SELECT COUNT(*) AS adet FROM devices WHERE device_type = 'ventilator' AND status = 'aktif'"
+  },
+  {
+    "question": "Cihaz türlerine göre envanter dağılımı nedir?",
+    "sql": "SELECT device_type, COUNT(*) AS adet FROM devices GROUP BY device_type ORDER BY adet DESC"
+  },
+  {
+    "question": "Hangi üreticinin cihazı en çok arıza verdi?",
+    "sql": "SELECT v.vendor, COUNT(*) AS ariza FROM device_faults f JOIN devices v ON v.id = f.device_id GROUP BY v.vendor ORDER BY ariza DESC LIMIT 1"
+  },
+  {
+    "question": "Şu an çözülmemiş kaç arıza var?",
+    "sql": "SELECT COUNT(*) AS acik_ariza FROM device_faults WHERE resolved_on IS NULL"
+  },
+  {
+    "question": "Kritik önemdeki arızaların toplam kesinti süresi kaç saat?",
+    "sql": "SELECT SUM(downtime_hours) AS kesinti_saat FROM device_faults WHERE severity = 'kritik'"
+  },
+  {
+    "question": "Yoğun bakımdaki cihazların arıza sayısı nedir?",
+    "sql": "SELECT COUNT(*) AS ariza FROM device_faults f JOIN devices v ON v.id = f.device_id JOIN departments d ON d.id = v.department_id WHERE d.code = 'YBAK'"
+  },
+  {
+    "question": "Arızaların ortalama çözüm süresi kaç gün?",
+    "sql": "SELECT ROUND(AVG(resolved_on - reported_on), 1) AS ortalama_gun FROM device_faults WHERE resolved_on IS NOT NULL"
+  },
+  {
+    "question": "Arıza türlerine göre ortalama kesinti süresi nedir?",
+    "sql": "SELECT fault_type, ROUND(AVG(downtime_hours), 1) AS ortalama_saat FROM device_faults GROUP BY fault_type ORDER BY ortalama_saat DESC"
+  },
+  {
+    "question": "Yıllık bedeli en yüksek sözleşme hangisi?",
+    "sql": "SELECT contract_code, title, annual_value_try FROM contracts_meta ORDER BY annual_value_try DESC LIMIT 1"
+  },
+  {
+    "question": "2026 yılında sona erecek sözleşmeler hangileri?",
+    "sql": "SELECT contract_code, title, end_date FROM contracts_meta WHERE end_date BETWEEN '2026-01-01' AND '2026-12-31' ORDER BY end_date"
+  },
+  {
+    "question": "Sözleşmelerin toplam yıllık bedeli ne kadar?",
+    "sql": "SELECT SUM(annual_value_try) AS toplam_bedel FROM contracts_meta"
+  }
+]

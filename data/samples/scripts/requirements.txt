@@ -1,0 +1,2 @@
+# No third-party dependencies: generators and tests use only the Python 3.12 stdlib
+# (coordinator approval K-13a-0002, T-13a-0004/1).

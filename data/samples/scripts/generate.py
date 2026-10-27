@@ -1,0 +1,53 @@
+"""Generate FFCore synthetic sample data (package 13a).
+
+Usage:
+    py -3.12 data/samples/scripts/generate.py [--seed 13] [--out data/samples] [--only schema,agents]
+
+Stdlib only. Every module gets its own random.Random seeded with "<seed>:<module>",
+so regenerating one module never changes another and the output is byte-identical
+for the same seed.
+"""
+
+import argparse
+import random
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+from gen import agents, openapi, schema  # noqa: E402
+
+MODULES = {
+    "schema": schema.generate,
+    "agents": agents.generate,
+    "openapi": openapi.generate,
+}
+DEFAULT_SEED = 13
+DEFAULT_OUT = Path(__file__).resolve().parents[1]
+
+
+def module_rng(seed: int, name: str) -> random.Random:
+    return random.Random(f"{seed}:{name}")
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    parser.add_argument("--seed", type=int, default=DEFAULT_SEED)
+    parser.add_argument("--out", type=Path, default=DEFAULT_OUT)
+    parser.add_argument("--only", default=",".join(MODULES),
+                        help=f"comma separated subset of: {', '.join(MODULES)}")
+    args = parser.parse_args(argv)
+
+    selected = [m.strip() for m in args.only.split(",") if m.strip()]
+    unknown = [m for m in selected if m not in MODULES]
+    if unknown:
+        parser.error(f"unknown module(s): {', '.join(unknown)}")
+
+    for name in selected:
+        MODULES[name](module_rng(args.seed, name), args.out, args.seed)
+        print(f"generated {name} -> {args.out / name}")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
