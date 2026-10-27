@@ -1,4 +1,4 @@
-"""35-item evaluation set (plan/13 item 4, plan/09 "Soru seti kuralları", R8.1).
+"""33-item evaluation set (plan/13 item 4, plan/09 "Soru seti kuralları", R8.1; total 33 per K-13a-0003, DRIFT-28).
 
 Item shape follows plan/09's Langfuse mapping: input {message, variables},
 expected_output {answer, must_contain, must_cite, sql_result}, metadata
@@ -156,9 +156,9 @@ def items(seed: int) -> list[dict]:
 
 
 SUITE = {
-    "key": "sozlesme-35",
-    "name": "Sözleşme ve veri sınavı (35 soru)",
-    "langfuse_dataset_name": "sozlesme-35",
+    "key": "sozlesme-33",
+    "name": "Sözleşme ve veri sınavı (33 soru)",
+    "langfuse_dataset_name": "sozlesme-33",
     "scorers": ["contains", "cites_source", "sql_result", "llm_judge"],
     "pass_threshold": 0.8,
     "repeat": 1,
@@ -167,5 +167,5 @@ SUITE = {
 
 def generate(rng: random.Random, out: Path, seed: int) -> None:
     base = out / "eval"
-    write_text(base / "sozlesme-35.json", json.dumps(items(seed), ensure_ascii=False, indent=2) + "\n")
+    write_text(base / "sozlesme-33.json", json.dumps(items(seed), ensure_ascii=False, indent=2) + "\n")
     write_text(base / "suite.json", json.dumps(SUITE, ensure_ascii=False, indent=2) + "\n")

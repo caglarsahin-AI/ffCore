@@ -139,7 +139,7 @@ class Test13aEval(unittest.TestCase):
         cls.tmp = tempfile.TemporaryDirectory()
         out = Path(cls.tmp.name)
         _generate(out, "contracts,eval")
-        cls.items = json.loads((out / "eval/sozlesme-35.json").read_text(encoding="utf-8"))
+        cls.items = json.loads((out / "eval/sozlesme-33.json").read_text(encoding="utf-8"))
         cls.suite = json.loads((out / "eval/suite.json").read_text(encoding="utf-8"))
         manifest = json.loads((out / "contracts/manifest.json").read_text(encoding="utf-8"))
         cls.acl = {m["file_name"]: m["acl_roles"] for m in manifest}
@@ -150,10 +150,9 @@ class Test13aEval(unittest.TestCase):
         cls.tmp.cleanup()
 
     def test_13a_4_eval_distribution(self):
-        # plan/09 R8.1 and plan/13 call this a 35-item set, but the mandated split
-        # 12+8+5+3+5 sums to 33 (and 13's acceptance table scores 20/8/5). The total is
-        # an open decision (T-13a-0007); this test pins the distribution and that the
-        # total equals it, not the "35" label.
+        # The briefs' "35" label was an arithmetic slip: the mandated split 12+8+5+3+5
+        # is 33 (K-13a-0003, DRIFT-28).
+        self.assertEqual(len(self.items), 33)
         self.assertEqual(len(self.items), 12 + 8 + 5 + 3 + 5)
         self.assertEqual(len({i["id"] for i in self.items}), len(self.items))
         sql = [i for i in self.items if "sql" in i["metadata"]["tags"]]
@@ -165,7 +164,7 @@ class Test13aEval(unittest.TestCase):
         self.assertEqual(styles, {"dogrudan": 12, "dolayli": 8, "alan_ici_cevapsiz": 5, "alan_disi_cevapsiz": 3})
         self.assertEqual(self.suite["scorers"], ["contains", "cites_source", "sql_result", "llm_judge"])
         self.assertEqual(self.suite["pass_threshold"], 0.8)
-        self.assertEqual(self.suite["langfuse_dataset_name"], "sozlesme-35")
+        self.assertEqual(self.suite["langfuse_dataset_name"], "sozlesme-33")
 
     def test_13a_4b_eval_required_metadata(self):
         styles = {"dogrudan", "dolayli", "alan_ici_cevapsiz", "alan_disi_cevapsiz"}

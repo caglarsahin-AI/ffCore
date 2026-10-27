@@ -67,7 +67,7 @@ class Test13aPostgres(unittest.TestCase):
     def test_13a_4d_sql_expected_results_in_postgres(self):
         import json
         from gen import eval as eval_gen
-        items = {i["id"]: i for i in json.loads((SAMPLES / "eval" / "sozlesme-35.json").read_text(encoding="utf-8"))}
+        items = {i["id"]: i for i in json.loads((SAMPLES / "eval" / "sozlesme-33.json").read_text(encoding="utf-8"))}
         for q in eval_gen.SQL_QUESTIONS:
             got = _psql(f"BEGIN; SET ROLE agent_readonly; {q['sql']}; ROLLBACK;").stdout.split()
             self.assertEqual([[int(got[0])]], items[q["id"]]["expected_output"]["sql_result"], q["id"])

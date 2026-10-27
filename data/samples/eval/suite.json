@@ -1,7 +1,7 @@
 {
-  "key": "sozlesme-35",
-  "name": "Sözleşme ve veri sınavı (35 soru)",
-  "langfuse_dataset_name": "sozlesme-35",
+  "key": "sozlesme-33",
+  "name": "Sözleşme ve veri sınavı (33 soru)",
+  "langfuse_dataset_name": "sozlesme-33",
   "scorers": [
     "contains",
     "cites_source",
