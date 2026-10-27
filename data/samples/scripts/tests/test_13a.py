@@ -20,7 +20,7 @@ sys.path.insert(0, str(SCRIPTS))
 import generate  # noqa: E402
 import random  # noqa: E402
 
-from gen import contracts, pdf, pii, schema  # noqa: E402
+from gen import contracts, memory, pdf, pii, schema  # noqa: E402
 from gen import eval as eval_gen  # noqa: E402
 from gen.words import CONTRACTS  # noqa: E402
 
@@ -267,6 +267,63 @@ class Test13aPii(unittest.TestCase):
         self.assertEqual(len(self.records), pii.TOTAL)
 
 
+class Test13aMemory(unittest.TestCase):
+    KINDS = {"profile", "preference", "fact", "decision"}
+
+    @classmethod
+    def setUpClass(cls):
+        with tempfile.TemporaryDirectory() as tmp:
+            _generate(Path(tmp), "memory")
+            text = (Path(tmp) / "memory/memory-40.jsonl").read_text(encoding="utf-8")
+        cls.records = [json.loads(line) for line in text.splitlines()]
+
+    @staticmethod
+    def _has_pii(text: str) -> bool:
+        if any(pii.tc_valid(m) for m in re.findall(r"\b\d{11}\b", text)):
+            return True
+        if any(pii.iban_valid(m) for m in re.findall(r"TR\d{2}(?: ?\d{4}){5} ?\d{2}", text)):
+            return True
+        return bool(re.search(r"[\w.+-]+@[\w-]+\.[\w.]+", text)
+                    or re.search(r"(\+90 ?|\b0)?5\d{2}[ )-]*\d{3}[ -]?\d{2} ?\d{2}\b", text)
+                    or re.search(r"\b\d{2}\.\d{2}\.(19|20)\d{2}\b", text))
+
+    def test_13a_6_memory_conversations(self):
+        self.assertEqual(len(self.records), memory.TOTAL - memory.NAME_SLOTS)
+        self.assertEqual(len({r["id"] for r in self.records}), len(self.records))
+        positives = negatives = 0
+        for r in self.records:
+            self.assertEqual(set(r), {"id", "scenario", "turns", "existing_memories", "expected",
+                                      "expect_none", "reason"}, r["id"])
+            self.assertEqual(r["turns"][0]["role"], "user")
+            user_text = _fold(" ".join(t["content"] for t in r["turns"] if t["role"] == "user"))
+            self.assertEqual(r["expect_none"], not r["expected"], r["id"])
+            existing = {m["id"] for m in r["existing_memories"]}
+            for e in r["expected"]:
+                self.assertIn(e["kind"], self.KINDS, r["id"])
+                self.assertTrue(e["must_contain"], r["id"])
+                for phrase in e["must_contain"]:
+                    self.assertIn(_fold(phrase), user_text, (r["id"], phrase))
+                if "supersedes" in e:
+                    self.assertIn(e["supersedes"], existing, r["id"])
+            if r["expect_none"]:
+                negatives += 1
+                self.assertTrue(r["reason"], r["id"])
+            else:
+                positives += 1
+            # plan/14: anything carrying personal data must yield no memory (0 leaks)
+            if self._has_pii(user_text) or r["scenario"] in {"pii", "health"}:
+                self.assertTrue(r["expect_none"], r["id"])
+        self.assertGreaterEqual(positives, 15)
+        self.assertGreaterEqual(negatives, 12)
+        explicit_pii = [r for r in self.records if r["scenario"] == "pii" and "hatırla" in _fold(r["turns"][0]["content"])]
+        self.assertTrue(explicit_pii)  # C19: the "bunu hatırla" path is covered too
+
+    def test_13a_6b_memory_total_40(self):
+        if not memory.NAME_SLOTS or len(self.records) < memory.TOTAL:
+            self.skipTest("NOT_RUN: name-bearing conversations wait for DECISION-24")
+        self.assertEqual(len(self.records), memory.TOTAL)
+
+
 class Test13aSchema(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -385,8 +442,8 @@ class Test13aOpenapi(unittest.TestCase):
 
 
 class Test13aDeterminism(unittest.TestCase):
-    ONLY = "contracts,schema,agents,eval,openapi,pii"
-    DIRS = ("contracts", "schema", "agents", "eval", "openapi", "pii")
+    ONLY = "contracts,schema,agents,eval,openapi,pii,memory"
+    DIRS = ("contracts", "schema", "agents", "eval", "openapi", "pii", "memory")
 
     def test_13a_8_deterministic(self):
         with tempfile.TemporaryDirectory() as a, tempfile.TemporaryDirectory() as b:
