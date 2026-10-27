@@ -2,3 +2,20 @@
 .env
 .env.*.local
 
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+
+# Node / Next.js
+node_modules/
+.next/
+out/
+*.tsbuildinfo
+next-env.d.ts
+
+# Çalışma verisi (raw/silver katmanı, yerel modeller)
+data/storage/
+data/models/

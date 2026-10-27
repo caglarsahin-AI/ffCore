@@ -1,0 +1,3 @@
+# airgap profili (INFERENCE_BACKEND=ollama, COMPOSE_PROFILES=ollama): çekilecek Ollama modelleri.
+qwen3.5:35b
+bge-m3
