@@ -1,0 +1,816 @@
+[
+  {
+    "id": "q01",
+    "input": {
+      "message": "Tıbbi cihaz bakım sözleşmesinde fesih bildirim süresi kaç gündür?",
+      "variables": {}
+    },
+    "expected_output": {
+      "answer": "Fesih bildirim süresi en az 90 gündür (Madde 10.1).",
+      "must_contain": [
+        "90 gün"
+      ],
+      "must_cite": [
+        "SZL-2024-011_cihaz-bakim.pdf"
+      ]
+    },
+    "metadata": {
+      "tags": [
+        "belge",
+        "bakim"
+      ],
+      "answerable": true,
+      "style": "dogrudan",
+      "expected_docs": [
+        "SZL-2024-011_cihaz-bakim.pdf"
+      ]
+    }
+  },
+  {
+    "id": "q02",
+    "input": {
+      "message": "Cihaz bakım sözleşmesine göre kritik arızalarda müdahale süresi nedir?",
+      "variables": {}
+    },
+    "expected_output": {
+      "answer": "Kritik arızalarda müdahale süresi 4 saattir (Madde 5.2).",
+      "must_contain": [
+        "4 saattir"
+      ],
+      "must_cite": [
+        "SZL-2024-011_cihaz-bakim.pdf"
+      ]
+    },
+    "metadata": {
+      "tags": [
+        "belge",
+        "bakim"
+      ],
+      "answerable": true,
+      "style": "dogrudan",
+      "expected_docs": [
+        "SZL-2024-011_cihaz-bakim.pdf"
+      ]
+    }
+  },
+  {
+    "id": "q03",
+    "input": {
+      "message": "Cihaz bakım sözleşmesinde her cihaz için yılda kaç periyodik bakım yapılır?",
+      "variables": {}
+    },
+    "expected_output": {
+      "answer": "Her cihaz için yılda 2 periyodik bakım yapılır (Madde 5.1).",
+      "must_contain": [
+        "yılda 2"
+      ],
+      "must_cite": [
+        "SZL-2024-011_cihaz-bakim.pdf"
+      ]
+    },
+    "metadata": {
+      "tags": [
+        "belge",
+        "bakim"
+      ],
+      "answerable": true,
+      "style": "dogrudan",
+      "expected_docs": [
+        "SZL-2024-011_cihaz-bakim.pdf"
+      ]
+    }
+  },
+  {
+    "id": "q04",
+    "input": {
+      "message": "Temizlik hizmet alımı sözleşmesinin yıllık bedeli nedir?",
+      "variables": {}
+    },
+    "expected_output": {
+      "answer": "Yıllık bedel KDV hariç 12.600.000 TL'dir (Madde 4.1).",
+      "must_contain": [
+        "12.600.000 TL"
+      ],
+      "must_cite": [
+        "SZL-2025-003_temizlik-hizmet.docx"
+      ]
+    },
+    "metadata": {
+      "tags": [
+        "belge",
+        "hizmet"
+      ],
+      "answerable": true,
+      "style": "dogrudan",
+      "expected_docs": [
+        "SZL-2025-003_temizlik-hizmet.docx"
+      ]
+    }
+  },
+  {
+    "id": "q05",
+    "input": {
+      "message": "Temizlik sözleşmesine göre ameliyathane temizliği ne kadar sürede tamamlanmalıdır?",
+      "variables": {}
+    },
+    "expected_output": {
+      "answer": "Her operasyon sonrasında 30 dakika içinde tamamlanır (Madde 5.3).",
+      "must_contain": [
+        "30 dakika"
+      ],
+      "must_cite": [
+        "SZL-2025-003_temizlik-hizmet.docx"
+      ]
+    },
+    "metadata": {
+      "tags": [
+        "belge",
+        "hizmet"
+      ],
+      "answerable": true,
+      "style": "dogrudan",
+      "expected_docs": [
+        "SZL-2025-003_temizlik-hizmet.docx"
+      ]
+    }
+  },
+  {
+    "id": "q06",
+    "input": {
+      "message": "Temizlik hizmet alımı sözleşmesi hangi tarihte sona erer?",
+      "variables": {}
+    },
+    "expected_output": {
+      "answer": "31.12.2026 tarihinde sona erer (Madde 3.1).",
+      "must_contain": [
+        "31.12.2026"
+      ],
+      "must_cite": [
+        "SZL-2025-003_temizlik-hizmet.docx"
+      ]
+    },
+    "metadata": {
+      "tags": [
+        "belge",
+        "hizmet"
+      ],
+      "answerable": true,
+      "style": "dogrudan",
+      "expected_docs": [
+        "SZL-2025-003_temizlik-hizmet.docx"
+      ]
+    }
+  },
+  {
+    "id": "q07",
+    "input": {
+      "message": "Laboratuvar kiti tedarik sözleşmesinde teslim süresi kaç iş günüdür?",
+      "variables": {}
+    },
+    "expected_output": {
+      "answer": "Kitler siparişten itibaren en geç 5 iş günü içinde teslim edilir (Madde 5.1).",
+      "must_contain": [
+        "5 iş günü"
+      ],
+      "must_cite": [
+        "SZL-2025-007_laboratuvar-kiti.docx"
+      ]
+    },
+    "metadata": {
+      "tags": [
+        "belge",
+        "tedarik"
+      ],
+      "answerable": true,
+      "style": "dogrudan",
+      "expected_docs": [
+        "SZL-2025-007_laboratuvar-kiti.docx"
+      ]
+    }
+  },
+  {
+    "id": "q08",
+    "input": {
+      "message": "Laboratuvar kitleri hangi sıcaklık aralığında taşınmalı ve saklanmalıdır?",
+      "variables": {}
+    },
+    "expected_output": {
+      "answer": "2 ile 8 °C arasında, soğuk zincir korunarak (Madde 5.3).",
+      "must_contain": [
+        "2 ile 8 °C"
+      ],
+      "must_cite": [
+        "SZL-2025-007_laboratuvar-kiti.docx"
+      ]
+    },
+    "metadata": {
+      "tags": [
+        "belge",
+        "tedarik"
+      ],
+      "answerable": true,
+      "style": "dogrudan",
+      "expected_docs": [
+        "SZL-2025-007_laboratuvar-kiti.docx"
+      ]
+    }
+  },
+  {
+    "id": "q09",
+    "input": {
+      "message": "Hastane bilgi yönetim yazılımı lisansı en fazla kaç eşzamanlı kullanıcıyı kapsar?",
+      "variables": {}
+    },
+    "expected_output": {
+      "answer": "En fazla 850 eşzamanlı kullanıcıyı kapsar (Madde 5.1).",
+      "must_contain": [
+        "850"
+      ],
+      "must_cite": [
+        "SZL-2023-019_yazilim-lisans.pdf"
+      ]
+    },
+    "metadata": {
+      "tags": [
+        "belge",
+        "lisans"
+      ],
+      "answerable": true,
+      "style": "dogrudan",
+      "expected_docs": [
+        "SZL-2023-019_yazilim-lisans.pdf"
+      ]
+    }
+  },
+  {
+    "id": "q10",
+    "input": {
+      "message": "Yazılım lisans sözleşmesinde aylık erişilebilirlik taahhüdü yüzde kaçtır?",
+      "variables": {}
+    },
+    "expected_output": {
+      "answer": "Aylık erişilebilirlik taahhüdü %99,5'tir (Madde 6.1).",
+      "must_contain": [
+        "%99,5"
+      ],
+      "must_cite": [
+        "SZL-2023-019_yazilim-lisans.pdf"
+      ]
+    },
+    "metadata": {
+      "tags": [
+        "belge",
+        "lisans"
+      ],
+      "answerable": true,
+      "style": "dogrudan",
+      "expected_docs": [
+        "SZL-2023-019_yazilim-lisans.pdf"
+      ]
+    }
+  },
+  {
+    "id": "q11",
+    "input": {
+      "message": "Yazılım lisans sözleşmesinde kritik destek taleplerine yanıt süresi nedir?",
+      "variables": {}
+    },
+    "expected_output": {
+      "answer": "Kritik destek taleplerine yanıt süresi 2 saattir (Madde 5.2).",
+      "must_contain": [
+        "2 saattir"
+      ],
+      "must_cite": [
+        "SZL-2023-019_yazilim-lisans.pdf"
+      ]
+    },
+    "metadata": {
+      "tags": [
+        "belge",
+        "lisans"
+      ],
+      "answerable": true,
+      "style": "dogrudan",
+      "expected_docs": [
+        "SZL-2023-019_yazilim-lisans.pdf"
+      ]
+    }
+  },
+  {
+    "id": "q12",
+    "input": {
+      "message": "Laboratuvar kiti tedarik sözleşmesinde faturalar kaç gün içinde ödenir?",
+      "variables": {}
+    },
+    "expected_output": {
+      "answer": "Faturanın tesliminden itibaren 60 gün içinde ödenir (Madde 4.2).",
+      "must_contain": [
+        "60 gün"
+      ],
+      "must_cite": [
+        "SZL-2025-007_laboratuvar-kiti.docx"
+      ]
+    },
+    "metadata": {
+      "tags": [
+        "belge",
+        "tedarik"
+      ],
+      "answerable": true,
+      "style": "dogrudan",
+      "expected_docs": [
+        "SZL-2025-007_laboratuvar-kiti.docx"
+      ]
+    }
+  },
+  {
+    "id": "q13",
+    "input": {
+      "message": "Cihaz bakım firmasıyla çalışmayı bırakmak istersek ne kadar önceden haber vermemiz gerekir?",
+      "variables": {}
+    },
+    "expected_output": {
+      "answer": "En az 90 gün önceden yazılı bildirim gerekir (Madde 10.1).",
+      "must_contain": [
+        "90 gün"
+      ],
+      "must_cite": [
+        "SZL-2024-011_cihaz-bakim.pdf"
+      ]
+    },
+    "metadata": {
+      "tags": [
+        "belge",
+        "bakim"
+      ],
+      "answerable": true,
+      "style": "dolayli",
+      "expected_docs": [
+        "SZL-2024-011_cihaz-bakim.pdf"
+      ]
+    }
+  },
+  {
+    "id": "q14",
+    "input": {
+      "message": "Bir ventilatör tamamen durursa bakım firmasının en geç ne kadar sürede gelmesi gerekir?",
+      "variables": {}
+    },
+    "expected_output": {
+      "answer": "Cihazın tamamen hizmet dışı kaldığı kritik arızalarda 4 saat (Madde 5.2).",
+      "must_contain": [
+        "4 saattir"
+      ],
+      "must_cite": [
+        "SZL-2024-011_cihaz-bakim.pdf"
+      ]
+    },
+    "metadata": {
+      "tags": [
+        "belge",
+        "bakim"
+      ],
+      "answerable": true,
+      "style": "dolayli",
+      "expected_docs": [
+        "SZL-2024-011_cihaz-bakim.pdf"
+      ]
+    }
+  },
+  {
+    "id": "q15",
+    "input": {
+      "message": "Temizlik şirketi denetimde eksik çıkarsa ne kadar kesinti yapılır?",
+      "variables": {}
+    },
+    "expected_output": {
+      "answer": "Her eksiklik için aylık hizmet bedelinin %1'i (Madde 7.1).",
+      "must_contain": [
+        "%1"
+      ],
+      "must_cite": [
+        "SZL-2025-003_temizlik-hizmet.docx"
+      ]
+    },
+    "metadata": {
+      "tags": [
+        "belge",
+        "hizmet"
+      ],
+      "answerable": true,
+      "style": "dolayli",
+      "expected_docs": [
+        "SZL-2025-003_temizlik-hizmet.docx"
+      ]
+    }
+  },
+  {
+    "id": "q16",
+    "input": {
+      "message": "Gelen test kitlerinin son kullanma tarihine en az ne kadar süre kalmış olmalı?",
+      "variables": {}
+    },
+    "expected_output": {
+      "answer": "Teslim tarihinde en az 12 ay (Madde 5.2).",
+      "must_contain": [
+        "12 ay"
+      ],
+      "must_cite": [
+        "SZL-2025-007_laboratuvar-kiti.docx"
+      ]
+    },
+    "metadata": {
+      "tags": [
+        "belge",
+        "tedarik"
+      ],
+      "answerable": true,
+      "style": "dolayli",
+      "expected_docs": [
+        "SZL-2025-007_laboratuvar-kiti.docx"
+      ]
+    }
+  },
+  {
+    "id": "q17",
+    "input": {
+      "message": "Hatalı çıkan bir kit partisini kaç gün içinde geri gönderebiliriz?",
+      "variables": {}
+    },
+    "expected_output": {
+      "answer": "Teslimden itibaren 15 gün içinde (Madde 6.1).",
+      "must_contain": [
+        "15 gün"
+      ],
+      "must_cite": [
+        "SZL-2025-007_laboratuvar-kiti.docx"
+      ]
+    },
+    "metadata": {
+      "tags": [
+        "belge",
+        "tedarik"
+      ],
+      "answerable": true,
+      "style": "dolayli",
+      "expected_docs": [
+        "SZL-2025-007_laboratuvar-kiti.docx"
+      ]
+    }
+  },
+  {
+    "id": "q18",
+    "input": {
+      "message": "Yazılım firması kapanırsa programın kodlarına nasıl ulaşırız?",
+      "variables": {}
+    },
+    "expected_output": {
+      "answer": "Kaynak kod bağımsız bir kaynak kod emaneti kuruluşunda saklanır ve İdareye teslim edilir (Madde 5.5).",
+      "must_contain": [
+        "kaynak kod emaneti"
+      ],
+      "must_cite": [
+        "SZL-2023-019_yazilim-lisans.pdf"
+      ]
+    },
+    "metadata": {
+      "tags": [
+        "belge",
+        "lisans"
+      ],
+      "answerable": true,
+      "style": "dolayli",
+      "expected_docs": [
+        "SZL-2023-019_yazilim-lisans.pdf"
+      ]
+    }
+  },
+  {
+    "id": "q19",
+    "input": {
+      "message": "Temizlik firması gece ve hafta sonları da çalışıyor mu?",
+      "variables": {}
+    },
+    "expected_output": {
+      "answer": "Evet, haftanın 7 günü 24 saat hizmet verilir (Madde 5.1).",
+      "must_contain": [
+        "7 günü 24 saat"
+      ],
+      "must_cite": [
+        "SZL-2025-003_temizlik-hizmet.docx"
+      ]
+    },
+    "metadata": {
+      "tags": [
+        "belge",
+        "hizmet"
+      ],
+      "answerable": true,
+      "style": "dolayli",
+      "expected_docs": [
+        "SZL-2025-003_temizlik-hizmet.docx"
+      ]
+    }
+  },
+  {
+    "id": "q20",
+    "input": {
+      "message": "Bakım firması bozulan cihazın parçasını en geç ne zaman getirmeli?",
+      "variables": {}
+    },
+    "expected_output": {
+      "answer": "En geç 10 iş günü içinde (Madde 5.3).",
+      "must_contain": [
+        "10 iş günü"
+      ],
+      "must_cite": [
+        "SZL-2024-011_cihaz-bakim.pdf"
+      ]
+    },
+    "metadata": {
+      "tags": [
+        "belge",
+        "bakim"
+      ],
+      "answerable": true,
+      "style": "dolayli",
+      "expected_docs": [
+        "SZL-2024-011_cihaz-bakim.pdf"
+      ]
+    }
+  },
+  {
+    "id": "q21",
+    "input": {
+      "message": "Temizlik sözleşmesinde personele verilecek yemek ücreti ne kadardır?",
+      "variables": {}
+    },
+    "expected_output": {
+      "answer": "Bu bilgi belgelerde yok."
+    },
+    "metadata": {
+      "tags": [
+        "cevapsiz"
+      ],
+      "answerable": false,
+      "style": "alan_ici_cevapsiz",
+      "expected_docs": []
+    }
+  },
+  {
+    "id": "q22",
+    "input": {
+      "message": "Cihaz bakım sözleşmesinde firmanın sigorta poliçesi tutarı nedir?",
+      "variables": {}
+    },
+    "expected_output": {
+      "answer": "Bu bilgi belgelerde yok."
+    },
+    "metadata": {
+      "tags": [
+        "cevapsiz"
+      ],
+      "answerable": false,
+      "style": "alan_ici_cevapsiz",
+      "expected_docs": []
+    }
+  },
+  {
+    "id": "q23",
+    "input": {
+      "message": "Laboratuvar kiti sözleşmesinde hangi kargo firması kullanılacak?",
+      "variables": {}
+    },
+    "expected_output": {
+      "answer": "Bu bilgi belgelerde yok."
+    },
+    "metadata": {
+      "tags": [
+        "cevapsiz"
+      ],
+      "answerable": false,
+      "style": "alan_ici_cevapsiz",
+      "expected_docs": []
+    }
+  },
+  {
+    "id": "q24",
+    "input": {
+      "message": "Yazılım lisans sözleşmesinde kullanıcı eğitimi için kaç saat ayrılmıştır?",
+      "variables": {}
+    },
+    "expected_output": {
+      "answer": "Bu bilgi belgelerde yok."
+    },
+    "metadata": {
+      "tags": [
+        "cevapsiz"
+      ],
+      "answerable": false,
+      "style": "alan_ici_cevapsiz",
+      "expected_docs": []
+    }
+  },
+  {
+    "id": "q25",
+    "input": {
+      "message": "Temizlik sözleşmesinde kullanılacak deterjanların markası nedir?",
+      "variables": {}
+    },
+    "expected_output": {
+      "answer": "Bu bilgi belgelerde yok."
+    },
+    "metadata": {
+      "tags": [
+        "cevapsiz"
+      ],
+      "answerable": false,
+      "style": "alan_ici_cevapsiz",
+      "expected_docs": []
+    }
+  },
+  {
+    "id": "q26",
+    "input": {
+      "message": "Hastanede kripto para ile ödeme yapılabilir mi?",
+      "variables": {}
+    },
+    "expected_output": {
+      "answer": "Bu bilgi belgelerde yok."
+    },
+    "metadata": {
+      "tags": [
+        "cevapsiz"
+      ],
+      "answerable": false,
+      "style": "alan_disi_cevapsiz",
+      "expected_docs": []
+    }
+  },
+  {
+    "id": "q27",
+    "input": {
+      "message": "Yarın Ankara'da hava durumu nasıl olacak?",
+      "variables": {}
+    },
+    "expected_output": {
+      "answer": "Bu bilgi belgelerde yok."
+    },
+    "metadata": {
+      "tags": [
+        "cevapsiz"
+      ],
+      "answerable": false,
+      "style": "alan_disi_cevapsiz",
+      "expected_docs": []
+    }
+  },
+  {
+    "id": "q28",
+    "input": {
+      "message": "Bugün bir euro kaç TL?",
+      "variables": {}
+    },
+    "expected_output": {
+      "answer": "Bu bilgi belgelerde yok."
+    },
+    "metadata": {
+      "tags": [
+        "cevapsiz"
+      ],
+      "answerable": false,
+      "style": "alan_disi_cevapsiz",
+      "expected_docs": []
+    }
+  },
+  {
+    "id": "q29",
+    "input": {
+      "message": "Göğüs Hastalıkları bölümünde kaç yatak var?",
+      "variables": {}
+    },
+    "expected_output": {
+      "answer": "18",
+      "must_contain": [
+        "18"
+      ],
+      "sql_result": [
+        [
+          18
+        ]
+      ]
+    },
+    "metadata": {
+      "tags": [
+        "sql"
+      ],
+      "answerable": true,
+      "style": "dogrudan",
+      "expected_docs": []
+    }
+  },
+  {
+    "id": "q30",
+    "input": {
+      "message": "Ortopedi bölümünde 2025 yılında toplam kaç hasta taburcu edildi?",
+      "variables": {}
+    },
+    "expected_output": {
+      "answer": "1475",
+      "must_contain": [
+        "1475"
+      ],
+      "sql_result": [
+        [
+          1475
+        ]
+      ]
+    },
+    "metadata": {
+      "tags": [
+        "sql"
+      ],
+      "answerable": true,
+      "style": "dogrudan",
+      "expected_docs": []
+    }
+  },
+  {
+    "id": "q31",
+    "input": {
+      "message": "Hurda durumundaki cihaz sayısı kaçtır?",
+      "variables": {}
+    },
+    "expected_output": {
+      "answer": "25",
+      "must_contain": [
+        "25"
+      ],
+      "sql_result": [
+        [
+          25
+        ]
+      ]
+    },
+    "metadata": {
+      "tags": [
+        "sql"
+      ],
+      "answerable": true,
+      "style": "dogrudan",
+      "expected_docs": []
+    }
+  },
+  {
+    "id": "q32",
+    "input": {
+      "message": "Yazılım kaynaklı kaç arıza kaydı var?",
+      "variables": {}
+    },
+    "expected_output": {
+      "answer": "260",
+      "must_contain": [
+        "260"
+      ],
+      "sql_result": [
+        [
+          260
+        ]
+      ]
+    },
+    "metadata": {
+      "tags": [
+        "sql"
+      ],
+      "answerable": true,
+      "style": "dogrudan",
+      "expected_docs": []
+    }
+  },
+  {
+    "id": "q33",
+    "input": {
+      "message": "Yüksek önemdeki arızalardan kaçı hâlâ çözülmedi?",
+      "variables": {}
+    },
+    "expected_output": {
+      "answer": "27",
+      "must_contain": [
+        "27"
+      ],
+      "sql_result": [
+        [
+          27
+        ]
+      ]
+    },
+    "metadata": {
+      "tags": [
+        "sql"
+      ],
+      "answerable": true,
+      "style": "dogrudan",
+      "expected_docs": []
+    }
+  }
+]

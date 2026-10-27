@@ -20,7 +20,8 @@ sys.path.insert(0, str(SCRIPTS))
 import generate  # noqa: E402
 import random  # noqa: E402
 
-from gen import contracts, pdf  # noqa: E402
+from gen import contracts, pdf, schema  # noqa: E402
+from gen import eval as eval_gen  # noqa: E402
 from gen.words import CONTRACTS  # noqa: E402
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -126,6 +127,93 @@ class Test13aContracts(unittest.TestCase):
                 styles = {s for s, _ in info["paragraphs"]}
                 self.assertTrue({"Heading1", "Heading2"} <= styles)
                 self.assertGreaterEqual(info["tables"], 2)
+
+
+def _fold(s: str) -> str:
+    return " ".join(s.replace("İ", "i").replace("I", "ı").lower().split())
+
+
+class Test13aEval(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.tmp = tempfile.TemporaryDirectory()
+        out = Path(cls.tmp.name)
+        _generate(out, "contracts,eval")
+        cls.items = json.loads((out / "eval/sozlesme-35.json").read_text(encoding="utf-8"))
+        cls.suite = json.loads((out / "eval/suite.json").read_text(encoding="utf-8"))
+        manifest = json.loads((out / "contracts/manifest.json").read_text(encoding="utf-8"))
+        cls.acl = {m["file_name"]: m["acl_roles"] for m in manifest}
+        cls.texts = {m["file_name"]: _fold(readback.text_of(out / "contracts" / m["file_name"])) for m in manifest}
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.tmp.cleanup()
+
+    def test_13a_4_eval_distribution(self):
+        # plan/09 R8.1 and plan/13 call this a 35-item set, but the mandated split
+        # 12+8+5+3+5 sums to 33 (and 13's acceptance table scores 20/8/5). The total is
+        # an open decision (T-13a-0007); this test pins the distribution and that the
+        # total equals it, not the "35" label.
+        self.assertEqual(len(self.items), 12 + 8 + 5 + 3 + 5)
+        self.assertEqual(len({i["id"] for i in self.items}), len(self.items))
+        sql = [i for i in self.items if "sql" in i["metadata"]["tags"]]
+        self.assertEqual(len(sql), 5)
+        styles = {}
+        for i in self.items:
+            if i not in sql:
+                styles[i["metadata"]["style"]] = styles.get(i["metadata"]["style"], 0) + 1
+        self.assertEqual(styles, {"dogrudan": 12, "dolayli": 8, "alan_ici_cevapsiz": 5, "alan_disi_cevapsiz": 3})
+        self.assertEqual(self.suite["scorers"], ["contains", "cites_source", "sql_result", "llm_judge"])
+        self.assertEqual(self.suite["pass_threshold"], 0.8)
+        self.assertEqual(self.suite["langfuse_dataset_name"], "sozlesme-35")
+
+    def test_13a_4b_eval_required_metadata(self):
+        styles = {"dogrudan", "dolayli", "alan_ici_cevapsiz", "alan_disi_cevapsiz"}
+        for i in self.items:
+            self.assertEqual(set(i), {"id", "input", "expected_output", "metadata"}, i["id"])
+            self.assertEqual(set(i["input"]), {"message", "variables"})
+            md = i["metadata"]
+            self.assertEqual(set(md), {"tags", "answerable", "style", "expected_docs"}, i["id"])
+            self.assertIn(md["style"], styles)
+            eo = i["expected_output"]
+            self.assertLessEqual(set(eo), {"answer", "must_contain", "must_cite", "sql_result", "json"})
+            if "sql" in md["tags"]:
+                self.assertTrue(md["answerable"])
+                self.assertEqual(md["expected_docs"], [])
+                self.assertIsInstance(eo["sql_result"], list)
+            elif md["style"].endswith("cevapsiz"):
+                self.assertFalse(md["answerable"], i["id"])
+                self.assertEqual(md["expected_docs"], [])
+                self.assertNotIn("must_cite", eo)
+            else:
+                self.assertTrue(md["answerable"])
+                self.assertTrue(md["expected_docs"])
+                self.assertEqual(eo["must_cite"], md["expected_docs"])
+                for doc in md["expected_docs"]:
+                    self.assertIn(doc, self.acl)
+                    self.assertNotEqual(self.acl[doc], ["admin"], (i["id"], "eval runs as analyst"))
+                    for phrase in eo["must_contain"]:
+                        self.assertIn(_fold(phrase), self.texts[doc], (i["id"], phrase))
+
+    def test_13a_4c_eval_answerability_checks(self):
+        by_id = {i["id"]: i for i in self.items}
+        for q in eval_gen.QUESTIONS:
+            item = by_id[q["id"]]
+            if q["style"].endswith("cevapsiz"):
+                for term in q["absent_terms"]:   # 0 hits in the whole KB
+                    for doc, text in self.texts.items():
+                        self.assertNotIn(_fold(term), text, (q["id"], term, doc))
+            if q["style"] == "dolayli":
+                term = _fold(q["avoided_term"])  # in the document, not in the question
+                self.assertNotIn(term, _fold(item["input"]["message"]), q["id"])
+                self.assertIn(term, self.texts[q["doc"]], q["id"])
+
+    def test_13a_4d_sql_expected_results(self):
+        rows = schema.build(random.Random(f"{SEED}:schema"))
+        by_id = {i["id"]: i for i in self.items}
+        for q in eval_gen.SQL_QUESTIONS:
+            self.assertEqual(by_id[q["id"]]["expected_output"]["sql_result"], [[q["compute"](rows)]], q["id"])
+            self.assertGreater(q["compute"](rows), 0, q["id"])  # a zero would not discriminate
 
 
 class Test13aSchema(unittest.TestCase):
@@ -246,8 +334,8 @@ class Test13aOpenapi(unittest.TestCase):
 
 
 class Test13aDeterminism(unittest.TestCase):
-    ONLY = "contracts,schema,agents,openapi"
-    DIRS = ("contracts", "schema", "agents", "openapi")
+    ONLY = "contracts,schema,agents,eval,openapi"
+    DIRS = ("contracts", "schema", "agents", "eval", "openapi")
 
     def test_13a_8_deterministic(self):
         with tempfile.TemporaryDirectory() as a, tempfile.TemporaryDirectory() as b:
