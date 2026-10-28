@@ -77,13 +77,56 @@ class LiteLLMError(RuntimeError):
         self.path = path
 
 
-_TOKEN = re.compile(r"[^a-z0-9_.-]")
-_CALL_ID = re.compile(r"^[0-9a-fA-F-]{8,64}$")
+# Values taken from an untrusted error body only if they are, exactly and as strings, one of
+# these; anything else is "unknown" as a whole: no lower-casing, stripping or cutting (r2
+# MAJOR-1). A pattern alone is not enough: a lower-case key such as sk-proj-<hex> fits one.
+ERROR_TYPES = frozenset(
+    {
+        "invalid_request_error",
+        "authentication_error",
+        "permission_error",
+        "not_found_error",
+        "rate_limit_error",
+        "api_error",
+        "server_error",
+        "internal_server_error",
+        "service_unavailable_error",
+        "timeout",
+        "timeout_error",
+        "api_connection_error",
+        "bad_request_error",
+        "unprocessable_entity_error",
+        "context_window_exceeded_error",
+        "content_policy_violation_error",
+        "budget_exceeded",
+        "auth_error",
+    }
+)
+ERROR_CODES = frozenset(
+    {
+        "rate_limit_exceeded",
+        "context_length_exceeded",
+        "invalid_api_key",
+        "model_not_found",
+        "insufficient_quota",
+    }
+)
+_HTTP_CODE = re.compile(r"\A[0-9]{3}\Z")
+_UUID = re.compile(r"\A[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\Z")
 
 
-def _token(value: Any) -> str:
-    """A short enum-like value from an untrusted body: lower case, [a-z0-9_.-] only."""
-    return _TOKEN.sub("", str(value).lower())[:40] or "unknown"
+def _error_type(value: Any) -> str:
+    return value if isinstance(value, str) and value in ERROR_TYPES else "unknown"
+
+
+def _error_code(value: Any) -> str:
+    if isinstance(value, str) and (value in ERROR_CODES or _HTTP_CODE.match(value)):
+        return value
+    return "unknown"
+
+
+def _uuid(value: Any) -> str | None:
+    return value if isinstance(value, str) and _UUID.match(value) else None
 
 
 def safe_error(response: httpx2.Response) -> str:
@@ -96,9 +139,8 @@ def safe_error(response: httpx2.Response) -> str:
     except (ValueError, AttributeError):
         error = None
     if isinstance(error, dict):
-        kind, code = _token(error.get("type")), _token(error.get("code"))
-    call_id = response.headers.get("x-litellm-call-id", "")
-    call_id = call_id if _CALL_ID.match(call_id) else "unknown"
+        kind, code = _error_type(error.get("type")), _error_code(error.get("code"))
+    call_id = _uuid(response.headers.get("x-litellm-call-id")) or "unknown"
     return (
         f"upstream_status={response.status_code} error_type={kind} error_code={code}"
         f" call_id={call_id}"
@@ -419,5 +461,5 @@ def _fallback(target: ModelTarget, response: httpx2.Response) -> FallbackObserve
         assert target.fallback_name
         return FallbackObserved(target.name, target.fallback_name, "primary_failed")
     # No header, or a deployment we did not ask for: the answer cannot be attributed.
-    shown = answered if answered and _CALL_ID.match(answered) else "missing-or-invalid"
+    shown = _uuid(answered) or "missing-or-invalid"
     raise _unavailable(target, f"unexpected deployment {shown}")

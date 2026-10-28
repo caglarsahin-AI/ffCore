@@ -282,3 +282,78 @@ def test_01_r1_3_non_stream_error_body_is_upstream_error(settings, stand, caplog
         _chat(settings)
     assert err.value.code == "upstream_error"
     assert SENTINEL not in caplog.text
+
+
+# --- r2 MAJOR-1: error.type / error.code / call id are taken only from closed lists ---
+# Scope: FFCore's own loggers and exceptions. httpcore2 logs response header values at DEBUG;
+# that is the central log configuration's concern (FOLLOWUP, package 02), not this client's.
+
+TC_LIKE = "10000000146"
+BAD_FIELDS = [
+    ("api_key=" + SENTINEL, "500"),
+    ("server_error", "person: " + TC_LIKE),
+    ("sk-proj-0123456789abcdef0123", "500"),  # fits [a-z0-9_.-]{1,40}: still not a known type
+    ("x" * 41, "500"),
+    (123, None),
+    (None, ""),
+    ("server_error\n" + SENTINEL, ["500"]),
+]
+LEAKS = (SENTINEL, TC_LIKE, "sk-proj-0123456789abcdef0123", "x" * 41)
+
+
+def _bad_body(kind, code):
+    return {"error": {"message": "fixed", "type": kind, "code": code}}
+
+
+def _expected(kind, code):
+    kind = kind if kind == "server_error" else "unknown"
+    code = code if code == "500" else "unknown"
+    return f"error_type={kind} error_code={code}"
+
+
+@pytest.mark.parametrize(("kind", "code"), BAD_FIELDS)
+def test_01_r2_1_model_log_unknown_tokens(settings, stand, caplog, kind, code):
+    stand.script["/v1/chat/completions"] = _json(
+        503, _bad_body(kind, code), {"x-litellm-call-id": "not-a-uuid " + SENTINEL}
+    )
+    with caplog.at_level(logging.DEBUG, logger="ffcore"), pytest.raises(ModelUnavailable) as err:
+        _chat(settings)
+    text = caplog.text + str(err.value)
+    assert not any(leak in text for leak in LEAKS)
+    assert f"{_expected(kind, code)} call_id=unknown" in caplog.text
+
+
+@pytest.mark.parametrize(("kind", "code"), BAD_FIELDS)
+def test_01_r2_1_management_and_scheduler_unknown_tokens(settings, stand, caplog, kind, code):
+    stand.script["/model/info"] = _json(503, _bad_body(kind, code))
+
+    async def admin_call():
+        async with LiteLLMAdmin(litellm_settings(settings), settings) as admin:
+            await admin.model_info()
+
+    with pytest.raises(LiteLLMError) as err:
+        anyio.run(admin_call)
+    assert not any(leak in str(err.value) for leak in LEAKS)
+    assert _expected(kind, code) in str(err.value)
+
+    async def go():
+        scheduler = ReconcileScheduler(admin_call, retries=1, base_delay=0.01)
+        scheduler.on_change()
+        await scheduler.wait_idle()
+
+    with caplog.at_level(logging.DEBUG, logger="ffcore"):
+        asyncio.run(go())
+    assert "litellm_reconcile_failed" in caplog.text
+    assert not any(leak in caplog.text for leak in LEAKS)
+
+
+def test_01_r2_1_valid_tokens_kept(settings, stand, caplog):
+    call_id = "c0ffee00-0000-4000-8000-000000000002"
+    stand.script["/v1/chat/completions"] = _json(
+        503,
+        {"error": {"message": "x", "type": "server_error", "code": "500"}},
+        {"x-litellm-call-id": call_id},
+    )
+    with caplog.at_level(logging.DEBUG, logger="ffcore"), pytest.raises(ModelUnavailable):
+        _chat(settings)
+    assert f"error_type=server_error error_code=500 call_id={call_id}" in caplog.text
