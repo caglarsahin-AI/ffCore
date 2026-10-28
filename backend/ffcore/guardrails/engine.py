@@ -8,6 +8,7 @@ and applies nothing. A rule that fails follows `on_error` (default `block`, fail
 The engine stores nothing: the caller persists `Decision.events` (service.record_events).
 """
 
+import asyncio
 import re
 import time
 import uuid
@@ -150,26 +151,60 @@ def _rule_findings(
     raise GuardrailConfigError("rule_type_unsupported", f"Rule type '{rule.type}' is unsupported.")
 
 
-def _preview(text: str, findings: list[Finding], seen: list[Finding]) -> str:
+# The preview reads only the start of the text: PREVIEW_WINDOW characters are scanned and at most
+# PREVIEW_WINDOW - PREVIEW_MARGIN are shown, so a value cut by the window edge is never emitted
+# (review r2: bounded cost; nothing raw, nothing skipped in the findings themselves).
+PREVIEW_WINDOW = 4096
+PREVIEW_MARGIN = 256
+
+
+def _preview(text: str, own: list[Finding], values: dict[str, str]) -> str:
     """First characters with every regex PII, every secret, this rule's findings and every value
     any rule of the chain found redacted. Monitor, warn and log leave the text as it was, so a
     rule's input can hold what another rule finds (before or after it): the preview never does
-    (review r1)."""
-    hits = [*regex_recognizers.recognize(text), *find_secrets(text), *findings]
-    for earlier in seen:
-        start = text.find(earlier.value)
-        while earlier.value and start != -1:
-            hits.append(
-                Finding(earlier.category, start, start + len(earlier.value), 2.0, "", earlier.value)
-            )
-            start = text.find(earlier.value, start + 1)
-    out, cursor = [], 0
-    for f in resolve_overlaps(hits):
-        out.append(text[cursor : f.start])
-        out.append(redact_label(f.category))
-        cursor = f.end
-    out.append(text[cursor:])
+    (review r1). Cost is bounded by the window and the number of distinct values (review r2)."""
+    window = text[:PREVIEW_WINDOW]
+    limit = len(text) if len(text) <= PREVIEW_WINDOW else PREVIEW_WINDOW - PREVIEW_MARGIN
+    spans = [
+        (f.start, f.end, f.category)
+        for f in (*regex_recognizers.recognize(window), *find_secrets(window))
+    ]
+    spans.extend((f.start, f.end, f.category) for f in own if f.start < limit)
+    for value, category in values.items():
+        # Look slightly past the window so a value straddling its edge is still found.
+        haystack = text[: PREVIEW_WINDOW + len(value)]
+        start = haystack.find(value)
+        while start != -1 and start < limit:
+            spans.append((start, start + len(value), category))
+            start = haystack.find(value, start + 1)
+    # Union of overlapping spans (sorted, one pass): an overlap is widened, never shown.
+    merged: list[list] = []
+    for start, end, category in sorted(spans):
+        if merged and start < merged[-1][1]:
+            merged[-1][1] = max(merged[-1][1], end)
+        else:
+            merged.append([start, end, category])
+    out: list[str] = []
+    size, cursor = 0, 0
+    for start, end, category in merged:
+        if start >= limit or size >= PREVIEW_CHARS:
+            break
+        out.append(text[cursor:start])
+        out.append(redact_label(category))
+        size += start - cursor + len(out[-1])
+        cursor = max(cursor, end)
+    if size < PREVIEW_CHARS and cursor < limit:
+        out.append(text[cursor:limit])
     return "".join(out)[:PREVIEW_CHARS]
+
+
+def _previews(pending: list[tuple["GuardrailEvent", str, list[Finding]]], seen: dict) -> list:
+    timings = []
+    for event, rule_input, own in pending:
+        started = time.perf_counter()
+        event.input_preview = _preview(rule_input, own, seen)
+        timings.append((event, (time.perf_counter() - started) * 1000))
+    return timings
 
 
 def _strongest(actions) -> str:
@@ -197,7 +232,7 @@ async def evaluate(
     current, events, applied, blocked = text, [], [], False
     # Previews are built after the chain: every value any rule found is redacted in every
     # event, whatever the mode and the rule order (review r1).
-    seen: list[Finding] = []
+    seen: dict[str, str] = {}  # distinct values found by the chain -> category
     pending: list[tuple[GuardrailEvent, str, list[Finding]]] = []
     for index, rule in enumerate(spec.rules):
         if stage not in rule.stages:
@@ -217,10 +252,13 @@ async def evaluate(
             run_id=ctx.run_id,
         )
         try:
-            hits = _rule_findings(current, stage, rule, policy, ctx)
+            # CPU-bound scanning runs off the event loop (00i pattern).
+            hits = await asyncio.to_thread(_rule_findings, current, stage, rule, policy, ctx)
             action = _strongest(a for _, a, _ in hits)
             pending.append((event, current, [f for f, _, _ in hits]))
-            seen.extend(f for f, _, _ in hits)
+            for f, _, _ in hits:
+                if f.value:
+                    seen.setdefault(f.value, f.category)
             event.findings = [
                 {
                     "category": f.category,
@@ -270,8 +308,8 @@ async def evaluate(
         event.latency_ms = round((time.perf_counter() - started) * 1000, 3)
         events.append(event)
 
-    for event, rule_input, own in pending:
-        event.input_preview = _preview(rule_input, own, seen)
+    for event, preview_ms in await asyncio.to_thread(_previews, pending, seen):
+        event.latency_ms = round(event.latency_ms + preview_ms, 3)
 
     if spec.mode == "monitor":
         return Decision("allow", text, events)

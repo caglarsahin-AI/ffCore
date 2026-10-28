@@ -4,6 +4,7 @@ Numbers with a check digit are accepted only when the check passes (TC algorithm
 A context word in the 30 characters before a hit raises its score (`context_boost`).
 """
 
+import bisect
 import re
 from collections.abc import Callable, Iterable
 from dataclasses import dataclass
@@ -129,12 +130,24 @@ def _context_word(text: str, start: int, words: tuple[str, ...]) -> str | None:
 
 
 def resolve_overlaps(findings: Iterable[Finding]) -> list[Finding]:
-    """Keep the strongest of overlapping hits (score, then length); return them by position."""
+    """Keep the strongest of overlapping hits (score, then length); return them by position.
+
+    O(n log n): kept hits stay sorted by start, so a candidate only meets its two neighbours
+    (review r2: the old pairwise scan was quadratic on repeated values).
+    """
+    starts: list[int] = []
+    ends: list[int] = []
     kept: list[Finding] = []
     for finding in sorted(findings, key=lambda f: (-f.score, -(f.end - f.start), f.start)):
-        if not any(finding.overlaps(k) for k in kept):
-            kept.append(finding)
-    return sorted(kept, key=lambda f: f.start)
+        i = bisect.bisect_left(starts, finding.start)
+        if i > 0 and ends[i - 1] > finding.start:
+            continue
+        if i < len(starts) and starts[i] < finding.end:
+            continue
+        starts.insert(i, finding.start)
+        ends.insert(i, finding.end)
+        kept.insert(i, finding)
+    return kept
 
 
 def recognize(

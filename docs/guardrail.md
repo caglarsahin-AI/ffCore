@@ -176,6 +176,21 @@ Regex path (all five recognizers), 1,000 characters, 200 runs in the tools conta
 **P95 0.61 ms** (`python -m ffcore.guardrails.quality`). The brief budget of P95 < 300 ms covers
 local rules, NER and the injection model together; NER and injection are measured with 08 full.
 
+Whole evaluation on the real path (built-in policy, `input.pre`: `secrets` + `pii` rules, event
+previews included), one CPU and 512 MB (`docker run --cpus=1 --memory=512m`), single runs:
+
+| Input | Characters | Time |
+|---|---|---|
+| the same e-mail repeated 640 times | 10,240 | 0.036 s |
+| the same e-mail repeated 10,000 times | 160,000 | 0.418 s |
+| mixed text with all five regex categories (the 200,000 limit) | 200,000 | 0.198 s |
+
+`test_08_cost.py` keeps upper bounds on these (0.5 s, 1 s, 1 s); a run over the bound fails.
+Rule scanning and previews run in a worker thread (`asyncio.to_thread`), so they do not hold the
+event loop, and each event's `latency_ms` includes its preview. Previews read only the first
+4,096 characters (and show at most the first 3,840), search each distinct value once and merge
+overlaps in one sorted pass; the findings themselves always cover the whole text.
+
 ## PII quality report (regex recognizers)
 
 Measured on the synthetic 13a set `data/samples/pii/pii-100.jsonl` (100 sentences, 10 negatives).
