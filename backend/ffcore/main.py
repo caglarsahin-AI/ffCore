@@ -3,11 +3,12 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
-from ffcore.api import api_router
+from ffcore.api import api_router, internal
 from ffcore.core.audit import ensure_audit_partitions
 from ffcore.core.auth import register_credential_resolver
 from ffcore.core.config import get_settings
 from ffcore.core.errors import install_error_handlers
+from ffcore.core.readiness import router as readiness_router
 from ffcore.core.session import session_resolver
 from ffcore.services import catalog_events
 from ffcore.services.litellm_reconcile import background_scheduler
@@ -45,6 +46,8 @@ async def lifespan(app: FastAPI):
 app = FastAPI(title="FFCore", lifespan=lifespan)
 install_error_handlers(app)
 app.include_router(api_router)
+app.include_router(internal.router)
+app.include_router(readiness_router)
 
 
 @app.get("/healthz")

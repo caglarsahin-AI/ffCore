@@ -1,0 +1,1734 @@
+openapi: 3.1.0
+info:
+  title: FFCore API
+  description: Knowledge bases, documents, search, internal embedding and readiness (package 04a).
+  version: 0.4a
+paths:
+  /api/v1/projects/{project_id}/knowledge-bases:
+    get:
+      tags:
+      - knowledge-bases
+      summary: List Knowledge Bases
+      operationId: list_knowledge_bases_api_v1_projects__project_id__knowledge_bases_get
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KnowledgeBaseList'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+    post:
+      tags:
+      - knowledge-bases
+      summary: Create Knowledge Base
+      operationId: create_knowledge_base_api_v1_projects__project_id__knowledge_bases_post
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/KnowledgeBaseCreate'
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KnowledgeBaseOut'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+  /api/v1/projects/{project_id}/knowledge-bases/{kb_id}:
+    get:
+      tags:
+      - knowledge-bases
+      summary: Get Knowledge Base
+      operationId: get_knowledge_base_api_v1_projects__project_id__knowledge_bases__kb_id__get
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      - name: kb_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Kb Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KnowledgeBaseOut'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+    patch:
+      tags:
+      - knowledge-bases
+      summary: Update Knowledge Base
+      operationId: update_knowledge_base_api_v1_projects__project_id__knowledge_bases__kb_id__patch
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      - name: kb_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Kb Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/KnowledgeBaseUpdate'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KnowledgeBaseOut'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+    delete:
+      tags:
+      - knowledge-bases
+      summary: Delete Knowledge Base
+      operationId: delete_knowledge_base_api_v1_projects__project_id__knowledge_bases__kb_id__delete
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      - name: kb_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Kb Id
+      responses:
+        '204':
+          description: Successful Response
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+  /api/v1/projects/{project_id}/knowledge-bases/{kb_id}/documents:
+    get:
+      tags:
+      - knowledge-bases
+      summary: List Documents
+      operationId: list_documents_api_v1_projects__project_id__knowledge_bases__kb_id__documents_get
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      - name: kb_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Kb Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentList'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+    post:
+      tags:
+      - knowledge-bases
+      summary: Upload Documents
+      operationId: upload_documents_api_v1_projects__project_id__knowledge_bases__kb_id__documents_post
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      - name: kb_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Kb Id
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Body_upload_documents_api_v1_projects__project_id__knowledge_bases__kb_id__documents_post'
+      responses:
+        '202':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UploadResult'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+  /api/v1/projects/{project_id}/knowledge-bases/{kb_id}/documents/{document_id}:
+    get:
+      tags:
+      - knowledge-bases
+      summary: Get Document
+      operationId: get_document_api_v1_projects__project_id__knowledge_bases__kb_id__documents__document_id__get
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      - name: kb_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Kb Id
+      - name: document_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Document Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentOut'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+    delete:
+      tags:
+      - knowledge-bases
+      summary: Delete Document
+      operationId: delete_document_api_v1_projects__project_id__knowledge_bases__kb_id__documents__document_id__delete
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      - name: kb_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Kb Id
+      - name: document_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Document Id
+      responses:
+        '204':
+          description: Successful Response
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+  /api/v1/projects/{project_id}/knowledge-bases/{kb_id}/reindex:
+    post:
+      tags:
+      - knowledge-bases
+      summary: Reindex Knowledge Base
+      operationId: reindex_knowledge_base_api_v1_projects__project_id__knowledge_bases__kb_id__reindex_post
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      - name: kb_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Kb Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReindexRequest'
+      responses:
+        '202':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReindexAccepted'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+  /api/v1/projects/{project_id}/knowledge-bases/{kb_id}/search:
+    post:
+      tags:
+      - knowledge-bases
+      summary: Search Knowledge Base
+      description: 'Hybrid search with ACL applied in the query for the caller (or, through
+
+        X-On-Behalf-Of, the end user).'
+      operationId: search_knowledge_base_api_v1_projects__project_id__knowledge_bases__kb_id__search_post
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      - name: kb_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Kb Id
+      - name: X-Run-Id
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          description: Run this search belongs to; stored in kb_queries (C12).
+          title: X-Run-Id
+        description: Run this search belongs to; stored in kb_queries (C12).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchResponse'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+  /api/v1/projects/{project_id}/knowledge-bases/{kb_id}/test-query:
+    post:
+      tags:
+      - knowledge-bases
+      summary: Test Query
+      description: 'Playground: same search, logged with source=playground.'
+      operationId: test_query_api_v1_projects__project_id__knowledge_bases__kb_id__test_query_post
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      - name: kb_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Kb Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchResponse'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+  /internal/embed:
+    post:
+      tags:
+      - internal
+      summary: Internal Embed
+      operationId: internal_embed_internal_embed_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmbedRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmbedResponse'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+  /readyz:
+    get:
+      tags:
+      - readiness
+      summary: Readyz
+      description: '200 when every check is ok or skipped; 503 with the same body otherwise
+
+        (codes: warming, context_configuration_invalid, embed_dim_mismatch, ...).'
+      operationId: readyz_readyz_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReadyzOut'
+        '503':
+          description: Service Unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReadyzOut'
+components:
+  schemas:
+    Body_upload_documents_api_v1_projects__project_id__knowledge_bases__kb_id__documents_post:
+      properties:
+        files:
+          items:
+            type: string
+            contentMediaType: application/octet-stream
+          type: array
+          title: Files
+          description: One or more files.
+        acl_roles:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/Role'
+            type: array
+          - type: 'null'
+          title: Acl Roles
+          description: 'Roles that may read the files. Omitted: analyst (shown in the response). Send
+            none of acl_roles and acl_users only on purpose: an empty ACL opens the document to every
+            project member (C15).'
+        acl_users:
+          anyOf:
+          - items:
+              type: string
+              format: uuid
+            type: array
+          - type: 'null'
+          title: Acl Users
+          description: Users that may read.
+      type: object
+      required:
+      - files
+      title: Body_upload_documents_api_v1_projects__project_id__knowledge_bases__kb_id__documents_post
+    CheckStatus:
+      type: string
+      enum:
+      - ok
+      - failed
+      - skipped
+      title: CheckStatus
+    DocumentList:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/DocumentOut'
+          type: array
+          title: Items
+      type: object
+      required:
+      - items
+      title: DocumentList
+    DocumentOut:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+        kb_id:
+          type: string
+          format: uuid
+          title: Kb Id
+        filename:
+          type: string
+          title: Filename
+        mime_sniffed:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Mime Sniffed
+        size:
+          type: integer
+          title: Size
+        sha256:
+          type: string
+          title: Sha256
+        status:
+          $ref: '#/components/schemas/DocumentStatus'
+        error:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Error
+          description: Error code and message when failed or timeout.
+        page_count:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Page Count
+        acl_roles:
+          items:
+            $ref: '#/components/schemas/Role'
+          type: array
+          title: Acl Roles
+          description: 'Roles that may read the document. Both lists empty: every project member.'
+        acl_users:
+          items:
+            type: string
+            format: uuid
+          type: array
+          title: Acl Users
+        metadata:
+          additionalProperties: true
+          type: object
+          title: Metadata
+        version:
+          type: integer
+          title: Version
+        breadcrumb:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Breadcrumb
+        language:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Language
+        duplicate_of:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Duplicate Of
+        gate0:
+          $ref: '#/components/schemas/GateDecision'
+        gate1:
+          $ref: '#/components/schemas/GateDecision'
+        gate2:
+          $ref: '#/components/schemas/GateDecision'
+        convert_engine:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Convert Engine
+        convert_seconds:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Convert Seconds
+        chunk_count:
+          type: integer
+          title: Chunk Count
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+        updated_at:
+          type: string
+          format: date-time
+          title: Updated At
+      type: object
+      required:
+      - id
+      - kb_id
+      - filename
+      - mime_sniffed
+      - size
+      - sha256
+      - status
+      - error
+      - page_count
+      - acl_roles
+      - acl_users
+      - metadata
+      - version
+      - breadcrumb
+      - language
+      - duplicate_of
+      - gate0
+      - gate1
+      - gate2
+      - convert_engine
+      - convert_seconds
+      - chunk_count
+      - created_at
+      - updated_at
+      title: DocumentOut
+    DocumentStatus:
+      type: string
+      enum:
+      - pending
+      - converting
+      - gated
+      - chunking
+      - embedding
+      - indexed
+      - skipped
+      - failed
+      - timeout
+      title: DocumentStatus
+      description: Derived from the gate decisions; `skipped` always carries a gate reason (fail-loud).
+    EmbedRequest:
+      properties:
+        texts:
+          items:
+            type: string
+          type: array
+          maxItems: 64
+          minItems: 1
+          title: Texts
+      additionalProperties: false
+      type: object
+      required:
+      - texts
+      title: EmbedRequest
+    EmbedResponse:
+      properties:
+        model:
+          type: string
+          title: Model
+        dim:
+          type: integer
+          title: Dim
+        dense:
+          items:
+            items:
+              type: number
+            type: array
+          type: array
+          title: Dense
+        sparse:
+          items:
+            additionalProperties:
+              type: number
+            type: object
+          type: array
+          title: Sparse
+          description: Token id → lexical weight per text.
+        truncated:
+          items:
+            type: boolean
+          type: array
+          title: Truncated
+          description: True where the text exceeded the model limit.
+      type: object
+      required:
+      - model
+      - dim
+      - dense
+      - sparse
+      - truncated
+      title: EmbedResponse
+    ErrorBody:
+      properties:
+        error:
+          $ref: '#/components/schemas/ErrorDetail'
+      type: object
+      required:
+      - error
+      title: ErrorBody
+      description: OpenAI-shaped error body used by every 4xx response.
+    ErrorDetail:
+      properties:
+        message:
+          type: string
+          title: Message
+          description: English, actionable, never contains secrets.
+        type:
+          type: string
+          title: Type
+          description: authentication_error, permission_error, not_found_error, ...
+        code:
+          type: string
+          title: Code
+          description: Stable machine-readable code, e.g. read_only_access.
+      type: object
+      required:
+      - message
+      - type
+      - code
+      title: ErrorDetail
+    GateDecision:
+      properties:
+        status:
+          anyOf:
+          - $ref: '#/components/schemas/GateStatus'
+          - type: 'null'
+          description: Null until the gate has run.
+        reason:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Reason
+          description: e.g. boilerplate, data_dump:log, duplicate_of:<id>.
+      type: object
+      required:
+      - status
+      - reason
+      title: GateDecision
+    GateStatus:
+      type: string
+      enum:
+      - ok
+      - flagged
+      - skipped
+      title: GateStatus
+    KnowledgeBaseCreate:
+      properties:
+        key:
+          type: string
+          pattern: ^[a-z][a-z0-9-]{1,63}$
+          title: Key
+          description: Knowledge base key, unique within the project.
+        name:
+          type: string
+          maxLength: 200
+          minLength: 1
+          title: Name
+        description:
+          anyOf:
+          - type: string
+            maxLength: 2000
+          - type: 'null'
+          title: Description
+        embed_model:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Embed Model
+          description: Must equal the installation's EMBED_MODEL if given (one model per installation);
+            a different value is refused with 400 embed_dim_mismatch or embed_model_mismatch.
+        embed_dim:
+          anyOf:
+          - type: integer
+            exclusiveMinimum: 0.0
+          - type: 'null'
+          title: Embed Dim
+          description: Must equal EMBED_DIM if given.
+        chunk_size:
+          type: integer
+          maximum: 4000.0
+          minimum: 50.0
+          title: Chunk Size
+          description: 'Lower token target of a chunk (measured: 400).'
+          default: 400
+        chunk_overlap:
+          type: integer
+          maximum: 1000.0
+          minimum: 0.0
+          title: Chunk Overlap
+          description: Overlap in tokens.
+          default: 0
+        hybrid:
+          type: boolean
+          title: Hybrid
+          description: Vector plus lexical leg, fused with RRF.
+          default: true
+        rerank:
+          type: boolean
+          title: Rerank
+          description: Rerank candidates; see threshold_mode.
+          default: true
+        default_top_k:
+          type: integer
+          maximum: 50.0
+          minimum: 1.0
+          title: Default Top K
+          default: 5
+        default_min_score:
+          anyOf:
+          - type: number
+            maximum: 1.0
+            minimum: 0.0
+          - type: 'null'
+          title: Default Min Score
+          description: Embedding score floor; applies only while rerank is false (K2).
+        default_filter:
+          additionalProperties: true
+          type: object
+          title: Default Filter
+      additionalProperties: false
+      type: object
+      required:
+      - key
+      - name
+      title: KnowledgeBaseCreate
+    KnowledgeBaseList:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/KnowledgeBaseOut'
+          type: array
+          title: Items
+      type: object
+      required:
+      - items
+      title: KnowledgeBaseList
+    KnowledgeBaseOut:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+        project_id:
+          type: string
+          format: uuid
+          title: Project Id
+        key:
+          type: string
+          title: Key
+        name:
+          type: string
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        embed_model:
+          type: string
+          title: Embed Model
+        embed_dim:
+          type: integer
+          title: Embed Dim
+        chunk_strategy:
+          type: string
+          const: heading
+          title: Chunk Strategy
+        chunk_size:
+          type: integer
+          title: Chunk Size
+        chunk_overlap:
+          type: integer
+          title: Chunk Overlap
+        chunk_max_tokens:
+          type: integer
+          title: Chunk Max Tokens
+          description: Derived upper bound of a chunk in tokens.
+        hybrid:
+          type: boolean
+          title: Hybrid
+        rerank:
+          type: boolean
+          title: Rerank
+        rerank_model:
+          type: string
+          title: Rerank Model
+        default_top_k:
+          type: integer
+          title: Default Top K
+        default_min_score:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Default Min Score
+        default_filter:
+          additionalProperties: true
+          type: object
+          title: Default Filter
+        normalizer_config_id:
+          type: string
+          title: Normalizer Config Id
+        status:
+          $ref: '#/components/schemas/KnowledgeBaseStatus'
+        document_count:
+          type: integer
+          title: Document Count
+        chunk_count:
+          type: integer
+          title: Chunk Count
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+        updated_at:
+          type: string
+          format: date-time
+          title: Updated At
+      type: object
+      required:
+      - id
+      - project_id
+      - key
+      - name
+      - description
+      - embed_model
+      - embed_dim
+      - chunk_strategy
+      - chunk_size
+      - chunk_overlap
+      - chunk_max_tokens
+      - hybrid
+      - rerank
+      - rerank_model
+      - default_top_k
+      - default_min_score
+      - default_filter
+      - normalizer_config_id
+      - status
+      - document_count
+      - chunk_count
+      - created_at
+      - updated_at
+      title: KnowledgeBaseOut
+    KnowledgeBaseStatus:
+      type: string
+      enum:
+      - active
+      - reindexing
+      title: KnowledgeBaseStatus
+    KnowledgeBaseUpdate:
+      properties:
+        name:
+          type: string
+          maxLength: 200
+          minLength: 1
+          title: Name
+        description:
+          anyOf:
+          - type: string
+            maxLength: 2000
+          - type: 'null'
+          title: Description
+        chunk_size:
+          type: integer
+          maximum: 4000.0
+          minimum: 50.0
+          title: Chunk Size
+          description: Takes effect with a gold reindex.
+        chunk_overlap:
+          type: integer
+          maximum: 1000.0
+          minimum: 0.0
+          title: Chunk Overlap
+          description: Takes effect with a gold reindex.
+        hybrid:
+          type: boolean
+          title: Hybrid
+        rerank:
+          type: boolean
+          title: Rerank
+        default_top_k:
+          type: integer
+          maximum: 50.0
+          minimum: 1.0
+          title: Default Top K
+        default_min_score:
+          anyOf:
+          - type: number
+            maximum: 1.0
+            minimum: 0.0
+          - type: 'null'
+          title: Default Min Score
+        default_filter:
+          additionalProperties: true
+          type: object
+          title: Default Filter
+      additionalProperties: false
+      type: object
+      title: KnowledgeBaseUpdate
+    ReadinessCheck:
+      properties:
+        name:
+          type: string
+          title: Name
+        status:
+          $ref: '#/components/schemas/CheckStatus'
+        code:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Code
+          description: e.g. warming, context_configuration_invalid.
+        detail:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Detail
+      type: object
+      required:
+      - name
+      - status
+      - code
+      - detail
+      title: ReadinessCheck
+    ReadyzOut:
+      properties:
+        status:
+          type: string
+          enum:
+          - ready
+          - warming
+          - not_ready
+          title: Status
+        checks:
+          items:
+            $ref: '#/components/schemas/ReadinessCheck'
+          type: array
+          title: Checks
+      type: object
+      required:
+      - status
+      - checks
+      title: ReadyzOut
+    ReindexAccepted:
+      properties:
+        job_id:
+          type: string
+          title: Job Id
+        layer:
+          $ref: '#/components/schemas/ReindexLayer'
+        full:
+          type: boolean
+          title: Full
+        documents:
+          type: integer
+          title: Documents
+      type: object
+      required:
+      - job_id
+      - layer
+      - full
+      - documents
+      title: ReindexAccepted
+    ReindexLayer:
+      type: string
+      enum:
+      - silver
+      - gold
+      title: ReindexLayer
+    ReindexRequest:
+      properties:
+        layer:
+          $ref: '#/components/schemas/ReindexLayer'
+          description: 'silver: reconvert from raw; gold: rechunk and re-embed from silver. Neither goes
+            back to the source system.'
+        full:
+          type: boolean
+          title: Full
+          description: Every document, not only changed ones.
+          default: false
+      additionalProperties: false
+      type: object
+      required:
+      - layer
+      title: ReindexRequest
+    Role:
+      type: string
+      enum:
+      - user
+      - analyst
+      - developer
+      - admin
+      title: Role
+      description: 'Fixed roles, ordered user < analyst < developer < admin. `developer` and `user` are
+
+        reserved in the PoC and cannot be assigned yet.'
+    SearchFilters:
+      properties:
+        document_ids:
+          items:
+            type: string
+            format: uuid
+          type: array
+          title: Document Ids
+        metadata:
+          additionalProperties:
+            anyOf:
+            - type: string
+            - type: integer
+            - type: boolean
+          type: object
+          title: Metadata
+          description: Equality filters on document metadata.
+      additionalProperties: false
+      type: object
+      title: SearchFilters
+    SearchHit:
+      properties:
+        chunk_id:
+          type: string
+          format: uuid
+          title: Chunk Id
+        document_id:
+          type: string
+          format: uuid
+          title: Document Id
+        document_name:
+          type: string
+          title: Document Name
+        page:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Page
+        section_path:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Section Path
+        breadcrumb:
+          type: string
+          title: Breadcrumb
+        text:
+          type: string
+          title: Text
+          description: Chunk text as embedded, starting with the breadcrumb.
+        chunk_status:
+          type: string
+          enum:
+          - ok
+          - flagged
+          title: Chunk Status
+        updated_at_source:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Updated At Source
+        age_days:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Age Days
+        embed_score:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Embed Score
+        rerank_score:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Rerank Score
+      type: object
+      required:
+      - chunk_id
+      - document_id
+      - document_name
+      - page
+      - section_path
+      - breadcrumb
+      - text
+      - chunk_status
+      - updated_at_source
+      - age_days
+      - embed_score
+      - rerank_score
+      title: SearchHit
+    SearchRequest:
+      properties:
+        query:
+          type: string
+          maxLength: 2000
+          minLength: 1
+          title: Query
+        top_k:
+          anyOf:
+          - type: integer
+            maximum: 50.0
+            minimum: 1.0
+          - type: 'null'
+          title: Top K
+          description: 'Default: the KB''s.'
+        filters:
+          $ref: '#/components/schemas/SearchFilters'
+        hybrid:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Hybrid
+          description: 'Default: the KB''s.'
+      additionalProperties: false
+      type: object
+      required:
+      - query
+      title: SearchRequest
+    SearchResponse:
+      properties:
+        query_id:
+          type: string
+          format: uuid
+          title: Query Id
+          description: Row in kb_queries; candidates are logged there.
+        hits:
+          items:
+            $ref: '#/components/schemas/SearchHit'
+          type: array
+          title: Hits
+        threshold_mode:
+          $ref: '#/components/schemas/ThresholdMode'
+        filtered_by_rerank_floor:
+          type: integer
+          title: Filtered By Rerank Floor
+        filtered_by_min_score:
+          type: integer
+          title: Filtered By Min Score
+        normalizer_config_id:
+          type: string
+          title: Normalizer Config Id
+        latency_ms:
+          type: integer
+          title: Latency Ms
+      type: object
+      required:
+      - query_id
+      - hits
+      - threshold_mode
+      - filtered_by_rerank_floor
+      - filtered_by_min_score
+      - normalizer_config_id
+      - latency_ms
+      title: SearchResponse
+      description: Hits are ordered newest source first (recency is shown, not scored).
+    ThresholdMode:
+      type: string
+      enum:
+      - rerank_floor
+      - min_score
+      title: ThresholdMode
+      description: 'Single threshold rule (K2): with the reranker on only the rerank floor applies; with
+        it
+
+        off only `min_score` (embedding score) applies. Never both.'
+    UploadOutcome:
+      type: string
+      enum:
+      - created
+      - new_version
+      - unchanged
+      title: UploadOutcome
+    UploadResult:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/UploadedDocument'
+          type: array
+          title: Items
+      type: object
+      required:
+      - items
+      title: UploadResult
+    UploadedDocument:
+      properties:
+        outcome:
+          $ref: '#/components/schemas/UploadOutcome'
+          description: 'unchanged: same sha256 as the current version, nothing is queued.'
+        document:
+          $ref: '#/components/schemas/DocumentOut'
+      type: object
+      required:
+      - outcome
+      - document
+      title: UploadedDocument

@@ -13,6 +13,9 @@ WRITE_EXEMPT = {"login", "logout", "change_password"}
 # 08: the guardrail test panel is a POST dry run (nothing stored, open in read-only mode),
 # and the service-account-only internal evaluation endpoint (no user role applies there).
 WRITE_EXEMPT |= {"test_guardrails", "evaluate_guardrails"}
+# 04a: reads that are POST because the query travels in the body (open in read-only mode), and
+# the service-account-only internal embedding endpoint (no user role applies there).
+WRITE_EXEMPT |= {"search_knowledge_base", "test_query", "internal_embed"}
 
 
 def api_routes(routes):
