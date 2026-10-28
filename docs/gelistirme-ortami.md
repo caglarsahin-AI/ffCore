@@ -34,12 +34,22 @@ olduğunu yazarak durur.
 `tools` konteyneri depo kökünü `/work` olarak bağlar (compose: `.:/work`) ve servislere compose ağından servis adıyla gider.
 Docker soketi bağlanmaz; konteyner içinden `docker` komutu çalışmaz.
 
+## Tüketici olarak kurulum (`import ffcore`)
+
+Backend kurulabilir `ffcore` paketidir (`backend/pyproject.toml`, derleme arka ucu `uv_build` pinli).
+Tüketici depo (örneğin PayCore LLM) geliştirmede yol bağımlılığıyla kurar:
+`pip install -e ../ffcore/backend` (ya da `uv pip install -e ../ffcore/backend`), ardından `import ffcore`.
+`ffcore` tüketiciyi import etmez; `test_00_1_ffcore_never_imports_consumer` bunu korur.
+
 ## Profiller
 
 - `llmaas` (varsayılan): `COMPOSE_PROFILES` boş; Ollama servisi kalkmaz, `make smoke` Ollama adımını
   `skipped: ollama profile inactive` diye yazar.
-- `airgap` + `INFERENCE_BACKEND=ollama`: `.env`'de `COMPOSE_PROFILES=ollama`. `OLLAMA_CONTEXT_LENGTH` ve
-  `OLLAMA_MEM_LIMIT` zorunludur. Model listesi `deploy/ollama/models.airgap.txt` (yalnızca chat modeli; embedding süreç içi); `make pull` çeker.
+- `airgap` + `INFERENCE_BACKEND=ollama`: `.env`'de `COMPOSE_PATH_SEPARATOR=,`,
+  `COMPOSE_FILE=compose.yaml,deploy/docker-compose.ollama.yml` ve `COMPOSE_PROFILES=ollama`. Ollama servisi
+  ayrı dosyadadır, çünkü compose `${VAR:?}` kontrolünü profil elemesinden önce yapar; böylece llmaas
+  Ollama değerleri olmadan kalkar, Ollama eklendiğinde `OLLAMA_CONTEXT_LENGTH` ve `OLLAMA_MEM_LIMIT` boşsa
+  compose değişken adını yazarak durur. Model listesi `deploy/ollama/models.airgap.txt` (yalnızca chat modeli; embedding süreç içi); `make pull` çeker.
   Model çekilmemişse `make smoke` `model_not_pulled: <ad>; make pull` hatasıyla durur.
 
 ## İç registry (`REGISTRY_PREFIX`)

@@ -7,6 +7,7 @@ import yaml
 
 ROOT = Path(__file__).resolve().parents[3]
 COMPOSE = ROOT / "deploy" / "docker-compose.yml"
+COMPOSE_OLLAMA = ROOT / "deploy" / "docker-compose.ollama.yml"
 C12_NAMES = (
     "DEPLOY_PROFILE",
     "VECTOR_BACKEND",
@@ -17,8 +18,8 @@ C12_NAMES = (
 )
 
 
-def _compose() -> dict:
-    return yaml.safe_load(COMPOSE.read_text(encoding="utf-8"))
+def _compose(path: Path = COMPOSE) -> dict:
+    return yaml.safe_load(path.read_text(encoding="utf-8"))
 
 
 def _env_example() -> dict[str, str]:
@@ -42,7 +43,8 @@ def test_00_1_env_example_complete():
 
 
 def test_00_2_registry_prefix_all_images():
-    images = [service["image"] for service in _compose()["services"].values() if "image" in service]
+    services = {**_compose()["services"], **_compose(COMPOSE_OLLAMA)["services"]}
+    images = [service["image"] for service in services.values() if "image" in service]
     assert images
     for image in images:
         assert image.startswith("${REGISTRY_PREFIX}"), image
@@ -72,7 +74,7 @@ def test_00_4_litellm_config_has_no_model_list():
 
 
 def test_00_5_ollama_context_length_required():
-    ollama = _compose()["services"]["ollama"]
+    ollama = _compose(COMPOSE_OLLAMA)["services"]["ollama"]
     assert ollama["profiles"] == ["ollama"]
     env = ollama["environment"]
     assert env["OLLAMA_CONTEXT_LENGTH"].startswith("${OLLAMA_CONTEXT_LENGTH:?")
@@ -111,7 +113,9 @@ def test_00_1_env_test_fills_every_required_variable_with_marked_dummies():
         if line and not line.startswith("#") and "=" in line:
             key, value = line.split("=", 1)
             values[key.strip()] = value.strip()
-    compose_lines = COMPOSE.read_text(encoding="utf-8").splitlines()
+    compose_lines = [
+        line for path in (COMPOSE, COMPOSE_OLLAMA) for line in path.read_text("utf-8").splitlines()
+    ]
     code = "\n".join(line for line in compose_lines if not line.lstrip().startswith("#"))
     required = set(re.findall(r"\$\{([A-Z0-9_]+):\?", code))
     for name in sorted(required):
@@ -143,3 +147,18 @@ def test_00_1_http_services_have_healthchecks_for_up_wait():
     for name, path in (("litellm", "/health/liveliness"), ("langfuse-web", "/api/public/health")):
         test = services[name].get("healthcheck", {}).get("test", [])
         assert path in " ".join(test), name
+
+
+def test_00_5_ollama_lives_only_in_overlay_so_llmaas_needs_no_ollama_values():
+    # compose interpolates ${VAR:?} before profile filtering; a required Ollama variable in the
+    # base file would stop llmaas (review 00-r1 MAJOR-2). Real `docker compose config` evidence
+    # for both profiles and the empty-value negatives is in the PR description.
+    base = COMPOSE.read_text(encoding="utf-8")
+    assert "ollama" not in _compose()["services"]
+    assert not re.search(r"\$\{OLLAMA_[A-Z_]+:\?", base)
+    overlay = COMPOSE_OLLAMA.read_text(encoding="utf-8")
+    for name in ("OLLAMA_CONTEXT_LENGTH", "OLLAMA_MEM_LIMIT"):
+        assert f"${{{name}:?" in overlay, name
+    example = (ROOT / ".env.example").read_text(encoding="utf-8")
+    assert "# COMPOSE_FILE=compose.yaml,deploy/docker-compose.ollama.yml" in example
+    assert "# COMPOSE_PATH_SEPARATOR=," in example
