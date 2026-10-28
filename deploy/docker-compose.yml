@@ -39,7 +39,7 @@ x-langfuse-depends: &langfuse-depends
   langfuse-clickhouse:
     condition: service_healthy
   langfuse-minio:
-    condition: service_started
+    condition: service_healthy
   langfuse-redis:
     condition: service_healthy
 
@@ -163,14 +163,19 @@ services:
     # cgr.dev/chainguard/minio@sha256:e70b2b1e74d79457f808710483bd726ff364529ca30736eaa15a6ab547d3a5a7
     image: ${REGISTRY_PREFIX}cgr.dev/chainguard/minio@sha256:e70b2b1e74d79457f808710483bd726ff364529ca30736eaa15a6ab547d3a5a7
     restart: unless-stopped
-    # İmaj metadata'sı (çekmeden, imagetools): Entrypoint /usr/bin/minio, Cmd yok, User 65532.
-    # sh/mc varlığı, bucket oluşturma ve healthcheck imaj çekilince doğrulanacak (NOT_RUN).
-    command: ["server", "/data", "--address", ":9000", "--console-address", ":9001"]
+    # İmajda sh, mc ve minio var (doğrulandı); bucket resmi Langfuse compose'u gibi açılışta oluşturulur.
+    entrypoint: ["sh", "-c"]
+    command: ["mkdir -p /data/langfuse && exec minio server /data --address :9000 --console-address :9001"]
     environment:
       MINIO_ROOT_USER: ${LANGFUSE_MINIO_USER:-minio}
       MINIO_ROOT_PASSWORD: ${LANGFUSE_MINIO_PASSWORD:?LANGFUSE_MINIO_PASSWORD tanımlı değil}
     volumes:
       - langfuse_minio_data:/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
 
   langfuse-redis:
     image: ${REGISTRY_PREFIX}redis:7.4.6-alpine

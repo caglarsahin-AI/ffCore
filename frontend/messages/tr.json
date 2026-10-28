@@ -1,0 +1,12 @@
+{
+  "Home": {
+    "title": "FFCore",
+    "subtitle": "Kurumsal LLM platformu"
+  },
+  "Theme": {
+    "label": "Tema",
+    "system": "Sistem",
+    "light": "Açık",
+    "dark": "Koyu"
+  }
+}
