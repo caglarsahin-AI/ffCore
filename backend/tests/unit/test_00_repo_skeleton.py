@@ -107,7 +107,7 @@ def test_00_7_tools_service_has_no_docker_socket():
 def test_00_1_env_test_fills_every_required_variable_with_marked_dummies():
     env_test = ROOT / ".env.test"
     text = env_test.read_text(encoding="utf-8")
-    assert text.startswith("# YALNIZCA GELİŞTİRME/CI")
+    assert text.startswith("# DEVELOPMENT/CI ONLY")
     values = {}
     for line in text.splitlines():
         if line and not line.startswith("#") and "=" in line:
