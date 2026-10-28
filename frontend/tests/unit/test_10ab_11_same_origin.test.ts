@@ -40,7 +40,8 @@ describe("test_10ab_11_same_origin", () => {
   it("keeps absolute backend addresses out of browser code", () => {
     const offenders = ["app", "components", "lib"]
       .flatMap((dir) => sources(join(ROOT, dir)))
-      .filter((path) => /https?:\/\/(?!www\.w3\.org)/.test(readFileSync(path, "utf8")));
+      // .invalid is reserved (RFC 2606): lib/login-redirect.ts compares origins against it.
+      .filter((path) => /https?:\/\/(?!www\.w3\.org|console\.invalid)/.test(readFileSync(path, "utf8")));
     expect(offenders).toEqual([]);
   });
 });

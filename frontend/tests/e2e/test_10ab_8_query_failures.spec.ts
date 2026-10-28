@@ -34,7 +34,15 @@ test("test_10ab_8_query_failures: project list failure is shown in the selector"
   await expect(page.getByTestId("project-switcher")).toHaveCount(0);
 });
 
-test("test_10ab_8_query_failures: 401 on a list goes to sign-in and back", async ({ page, context, request }) => {
+// Review r2 MAJOR-1: a control character in "next" must not lead off the console origin.
+test("test_10ab_8_query_failures: sign-in never follows next to another origin", async ({ page, baseURL }) => {
+  await page.goto("/login?next=%2F%09%2Fbackend%3A8000%2Fhealthz");
+  await fillSignIn(page, fixture().analyst.email);
+  await page.waitForLoadState("networkidle");
+  expect(new URL(page.url()).origin).toBe(new URL(baseURL!).origin);
+});
+
+test("test_10ab_8_query_failures: 401 on a list goes to sign-in and back",async ({ page, context, request }) => {
   // A user of its own: signing out revokes every token of that user, other tests must not share it.
   const { expiring } = fixture();
   await signIn(page, expiring.email);

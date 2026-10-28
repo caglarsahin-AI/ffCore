@@ -22,8 +22,39 @@ describe("test_10ab_14_unauthenticated", () => {
 
   it("follows only a same-origin relative next", () => {
     expect(safeNext("/projects/p1/members")).toBe("/projects/p1/members");
-    for (const unsafe of [null, "", "//evil.example", "https://evil.example", "/\\evil.example", "projects"]) {
-      expect(safeNext(unsafe)).toBe("/");
+    expect(safeNext("/providers?tab=1#top")).toBe("/providers?tab=1#top");
+  });
+
+  // Review r2 MAJOR-1: the URL parser drops TAB/LF/CR, so "/\t/host" became "//host" (another origin).
+  it.each([
+    null,
+    "",
+    "//evil.example",
+    "https://evil.example",
+    "http:evil.example",
+    "javascript:alert(1)",
+    "/\\evil.example",
+    "\\/evil.example",
+    "projects",
+    " /projects",
+    "/\t/backend:8000/healthz",
+    "/\n/backend:8000/healthz",
+    "/\r/backend:8000/healthz",
+    "/\u0000/evil.example",
+    "/\u007f/evil.example",
+    "/%09/backend:8000/healthz",
+    "/%0A/backend:8000/healthz",
+    "/%0d/backend:8000/healthz",
+    "/..//evil.example",
+    "/%5C/evil.example",
+  ])("sends %j to the start page", (unsafe) => {
+    expect(safeNext(unsafe)).toBe("/");
+  });
+
+  it("never returns a value that resolves to another origin", () => {
+    const base = "http://localhost:3000";
+    for (const value of ["/a", "/\t/x", "//x", "/%2F/x", "/..//x", "/./%5C/x"]) {
+      expect(new URL(safeNext(value), base).origin).toBe(base);
     }
   });
 
