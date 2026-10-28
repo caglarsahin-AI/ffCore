@@ -33,6 +33,20 @@ def service_client(client_factory):
     return client_factory()
 
 
+@pytest.fixture
+def egress(monkeypatch):
+    """Set GUARDRAIL_EGRESS_ENABLED for one test whatever the profile run's environment says."""
+    from ffcore.guardrails.settings import get_guardrail_settings
+
+    def set_flag(enabled: bool) -> None:
+        monkeypatch.setenv("GUARDRAIL_EGRESS_ENABLED", "true" if enabled else "false")
+        get_guardrail_settings.cache_clear()
+
+    yield set_flag
+    monkeypatch.undo()
+    get_guardrail_settings.cache_clear()
+
+
 def _pii(client, project, key="strict", **extra):
     body = {
         "key": key,
@@ -105,14 +119,14 @@ def test_08_6_enforce_switch_audited(admin, project, pg):
 
 
 def test_08_14_pii_policy_reference(admin, project):
-    missing = _policy(admin, project, rules=[
-        {"type": "pii", "stages": ["input.pre"], "pii_policy_key": "nope"}
-    ])
+    missing = _policy(
+        admin, project, rules=[{"type": "pii", "stages": ["input.pre"], "pii_policy_key": "nope"}]
+    )
     assert (missing.status_code, missing.json()["error"]["code"]) == (422, "pii_policy_not_found")
     pii = _pii(admin, project).json()
-    used = _policy(admin, project, rules=[
-        {"type": "pii", "stages": ["input.pre"], "pii_policy_key": "strict"}
-    ])
+    used = _policy(
+        admin, project, rules=[{"type": "pii", "stages": ["input.pre"], "pii_policy_key": "strict"}]
+    )
     assert used.status_code == 201
     deleted = admin.delete(P.format(project) + f"/pii-policies/{pii['id']}")
     assert (deleted.status_code, deleted.json()["error"]["code"]) == (409, "pii_policy_in_use")
@@ -125,9 +139,9 @@ def test_08_15_unsupported_rejected_by_api(admin, project):
     assert person.json()["error"]["code"] == "category_unsupported"
     ner = _pii(admin, project, key="ner", engine="ner")
     assert ner.json()["error"]["code"] == "engine_unsupported"
-    later = _policy(admin, project, rules=[
-        {"type": "injection", "action": "block", "stages": ["input.pre"]}
-    ])
+    later = _policy(
+        admin, project, rules=[{"type": "injection", "action": "block", "stages": ["input.pre"]}]
+    )
     assert (later.status_code, later.json()["error"]["code"]) == (422, "rule_type_unsupported")
     patched = admin.patch(
         P.format(project) + f"/guardrail-policies/{_policy(admin, project).json()['id']}",
@@ -151,16 +165,19 @@ def test_08_16_test_panel_evidence(admin, client_factory, make_user, project, pg
     assert tc["evidence"].startswith("checksum valid") and "context word" in tc["evidence"]
     assert tc["value"] == "*******0146"
     assert all(f["evidence"] for f in body["findings"])
-    detect = panel.post(P.format(project) + "/guardrails/test", json={"text": TEXT,
-                                                                       "action": "detect"})
+    detect = panel.post(
+        P.format(project) + "/guardrails/test", json={"text": TEXT, "action": "detect"}
+    )
     assert detect.json()["text_out"] == TEXT and len(detect.json()["findings"]) == 2
-    tokenized = panel.post(P.format(project) + "/guardrails/test", json={"text": TEXT,
-                                                                          "action": "tokenize"})
+    tokenized = panel.post(
+        P.format(project) + "/guardrails/test", json={"text": TEXT, "action": "tokenize"}
+    )
     assert tokenized.json()["text_out"] == "TC kimlik <<PII_1>>, e-posta <<PII_2>>"
     # The built-in policy is monitor, but the panel shows what enforce would do.
     policy = panel.post(P.format(project) + "/guardrails/test", json={"text": SECRET})
     assert (policy.json()["action"], policy.json()["policy_mode"]) == ("block", "monitor")
-    assert pg.execute("SELECT count(*) FROM guardrail_events").fetchone()[0] == 0
+    count = "SELECT count(*) FROM guardrail_events WHERE project_id = %s"
+    assert pg.execute(count, (project,)).fetchone()[0] == 0
 
 
 def test_08_17_internal_service_only(admin, client_factory, service_client, project, pg):
@@ -197,7 +214,9 @@ def test_08_17_internal_service_only(admin, client_factory, service_client, proj
     # Built-in default is monitor: recorded, not applied.
     assert (decision["action"], decision["text_out"], decision["builtin"]) == ("allow", TEXT, True)
     rows = pg.execute(
-        "SELECT rule, mode, source, action_taken FROM guardrail_events ORDER BY rule"
+        "SELECT rule, mode, source, action_taken FROM guardrail_events"
+        " WHERE project_id = %s ORDER BY rule",
+        (project,),
     ).fetchall()
     assert rows == [("pii#1", "monitor", "chat", "redact"), ("secrets#0", "monitor", "chat", "log")]
     unknown = _evaluate(service_client, uuid.uuid4(), TEXT)
@@ -218,18 +237,23 @@ def test_08_4_block_decision_through_internal_endpoint(admin, service_client, pr
     decision = _evaluate(service_client, project, SECRET, locale="tr").json()
     assert decision["action"] == "block" and decision["text_out"] == ""
     assert decision["message"] == "Engellendi." and decision["reference_id"]
-    row = pg.execute("SELECT status, action_taken, reference_id FROM guardrail_events").fetchone()
+    row = pg.execute(
+        "SELECT status, action_taken, reference_id FROM guardrail_events WHERE project_id = %s",
+        (project,),
+    ).fetchone()
     assert row == ("failed", "block", decision["reference_id"])
 
 
 def test_08_20_events_masked_in_database(service_client, project, pg):
     _evaluate(service_client, project, TEXT + " " + SECRET)
-    dump = str(pg.execute("SELECT input_preview, findings, matches FROM guardrail_events").fetchall())
+    query = "SELECT input_preview, findings, matches FROM guardrail_events WHERE project_id = %s"
+    dump = str(pg.execute(query, (project,)).fetchall())
     assert TC not in dump and "ayse@ornek.com" not in dump and "REDACTEDREDACTED" not in dump
     assert "[TR_NATIONAL_ID]" in dump
 
 
-def test_08_3b_tokenize_redis_ttl(admin, service_client, project):
+def test_08_3b_tokenize_redis_ttl(admin, service_client, project, egress):
+    egress(True)
     _policy(
         admin,
         project,
@@ -242,8 +266,9 @@ def test_08_3b_tokenize_redis_ttl(admin, service_client, project):
     run_id = uuid.uuid4()
     decision = _evaluate(service_client, project, TEXT, stage="egress", run_id=str(run_id)).json()
     assert decision["text_out"] == "TC kimlik <<PII_1>>, e-posta <<PII_2>>"
-    again = _evaluate(service_client, project, f"tekrar {TC}", stage="egress",
-                      run_id=str(run_id)).json()
+    again = _evaluate(
+        service_client, project, f"tekrar {TC}", stage="egress", run_id=str(run_id)
+    ).json()
     assert again["text_out"] == "tekrar <<PII_1>>"  # same value, same placeholder in the run
 
     async def check():
@@ -266,20 +291,11 @@ def test_08_3b_tokenize_redis_ttl(admin, service_client, project):
     assert restored == TEXT and unresolved == []
 
 
-def test_08_18_egress_flag_from_environment(service_client, project, monkeypatch):
-    from ffcore.guardrails.settings import get_guardrail_settings
-
-    monkeypatch.setenv("GUARDRAIL_EGRESS_ENABLED", "false")
-    get_guardrail_settings.cache_clear()
-    try:
-        refused = _evaluate(service_client, project, TEXT, stage="egress")
-        assert (refused.status_code, refused.json()["error"]["code"]) == (
-            409,
-            "egress_stage_disabled",
-        )
-    finally:
-        monkeypatch.undo()
-        get_guardrail_settings.cache_clear()
+def test_08_18_egress_flag_from_environment(service_client, project, egress):
+    egress(False)  # airgap seed
+    refused = _evaluate(service_client, project, TEXT, stage="egress")
+    assert (refused.status_code, refused.json()["error"]["code"]) == (409, "egress_stage_disabled")
+    egress(True)  # llmaas seed
     assert _evaluate(service_client, project, TEXT, stage="egress").status_code == 200
 
 
@@ -302,3 +318,21 @@ def test_08_23_migration_roundtrip(database_url, pg):
     assert ours <= tables()
     heads = alembic("heads").stdout.decode()
     assert "08_0001" in heads
+
+
+def test_08_19b_read_mode_get_parity(admin, client_factory, make_user, project):
+    # Read access sees exactly what edit access sees on every 08 GET route.
+    pii = _pii(admin, project).json()
+    policy = _policy(admin, project).json()
+    _, editor = make_user(memberships={project: ("analyst", "edit")})
+    _, reader = make_user(memberships={project: ("analyst", "read")})
+    edit, read = client_factory(editor), client_factory(reader)
+    base = P.format(project)
+    for url in (
+        base + "/pii-policies",
+        base + f"/pii-policies/{pii['id']}",
+        base + "/guardrail-policies",
+        base + f"/guardrail-policies/{policy['id']}",
+    ):
+        assert edit.get(url).status_code == 200, url
+        assert read.get(url).content == edit.get(url).content, url
