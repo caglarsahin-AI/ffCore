@@ -1,7 +1,9 @@
 # PII kategori kodları
 
 `pii-100.jsonl` içindeki `category` kodlarının plan/08 kategori adlarıyla eşlemesi.
-`default_on`: 08'in varsayılan politikasında açık. Kişi adı (KISI_ADI) cümleleri DECISION-24 kararını bekliyor.
+`default_on`: 08'in varsayılan politikasında açık. Kişi adı (`PERSON`) yalnızca bu sette ve
+hafıza setinde geçer; adlar betikteki sabit uydurma havuzdandır (DECISION-24). plan/08'e göre kişi adı
+varsayılan politikada `egress`'te `tokenize` edilir; buradaki `hayır` yalnızca genel açık listeyi gösterir.
 
 | Kod | plan/08 adı | default_on |
 |---|---|---|
@@ -12,7 +14,7 @@
 | `PLAKA` | plaka | hayır |
 | `TR_PASAPORT` | TR pasaport | hayır |
 | `TR_ADRES` | TR adres | hayır |
-| `KISI_ADI` | kişi adı | hayır |
+| `PERSON` | kişi adı | hayır |
 | `KURUM_ADI` | kurum adı | hayır |
 | `KONUM` | konum | hayır |
 | `EPOSTA` | e-posta | evet |

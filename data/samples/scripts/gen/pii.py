@@ -5,8 +5,9 @@ All values are synthetic; numbers with a checksum (TC kimlik, VKN, IBAN, card) a
 generated valid so 08's checksum recognisers can be tested, and negatives include
 look-alike numbers with a wrong checksum. E-mail local parts are not names.
 
-Person names (KISI_ADI) wait for DECISION-24: NAME_SENTENCES is empty until then,
-and the 100-sentence total is reported NOT_RUN by the tests, not padded.
+Person names (PERSON, DECISION-24 = A) come only from the fixed fictional pool below:
+common first names combined with made-up surnames, so no combination is meant to
+match a real person. Names appear only in pii/ and memory/ (test_13a_9 proves it).
 """
 
 import json
@@ -16,15 +17,21 @@ from pathlib import Path
 from . import write_text
 
 TOTAL = 100
-NAME_SLOTS = 20  # filled only after DECISION-24
-NAME_SENTENCES: list[str] = []
+NAME_SLOTS = 20  # sentences with a PERSON span (DECISION-24)
+
+# Fictional name pool (DECISION-24). Surnames are invented compounds; first names
+# avoid words used elsewhere in the samples (streets, passwords).
+FIRST_NAMES = ["Elif", "Kerem", "Zeynep", "Burak", "Selin", "Emre", "Derya", "Oğuz",
+               "Melis", "Tolga", "Ceren", "Arda", "İpek", "Kaan", "Gizem", "Barış"]
+LAST_NAMES = ["Akçamdere", "Yelkentaş", "Gökçeoba", "Tuzlaçay", "Sedirtepe", "Kumbayır",
+              "Narlıkaya", "Ilgınçeşme", "Çınaroba", "Kestanelik", "Mavisuyu", "Defnedere"]
 
 # code -> plan/08 category name; "default_on" = enabled in 08's default policy
 CATEGORIES = {
     "TC_KIMLIK": ("TC kimlik", True), "TR_TELEFON": ("TR telefon", True),
     "TR_IBAN": ("TR IBAN", True), "VKN": ("VKN", False), "PLAKA": ("plaka", False),
     "TR_PASAPORT": ("TR pasaport", False), "TR_ADRES": ("TR adres", False),
-    "KISI_ADI": ("kişi adı", False), "KURUM_ADI": ("kurum adı", False), "KONUM": ("konum", False),
+    "PERSON": ("kişi adı", False), "KURUM_ADI": ("kurum adı", False), "KONUM": ("konum", False),
     "EPOSTA": ("e-posta", True), "KART": ("kart", True), "CVV": ("CVV", True), "PIN": ("PIN", True),
     "GPS": ("GPS", False), "MAC": ("MAC", False), "API_TOKEN": ("API token", False),
     "SIFRE": ("şifre", False), "DOGUM_TARIHI": ("doğum tarihi", False),
@@ -120,7 +127,31 @@ ORGS = ["Yıldızkent Lojistik A.Ş.", "Bereket Gıda Ltd. Şti.", "Mavikule Dan
         "Kırlangıç Yapı A.Ş.", "Tavlan Medikal Teknik A.Ş.", "Ekinsoy Tarım Kooperatifi"]
 
 
+def tr_upper(s: str) -> str:
+    return s.replace("i", "İ").replace("ı", "I").upper()
+
+
+def tr_lower(s: str) -> str:
+    return s.replace("İ", "i").replace("I", "ı").lower()
+
+
+def gen_person(rng: random.Random) -> str:
+    first, last = rng.choice(FIRST_NAMES), rng.choice(LAST_NAMES)
+    form = rng.choice(["plain", "plain", "plain", "two_first", "upper", "lower", "surname_first"])
+    if form == "two_first":
+        return f"{first} {rng.choice([n for n in FIRST_NAMES if n != first])} {last}"
+    if form == "upper":
+        return tr_upper(f"{first} {last}")
+    if form == "lower":
+        return tr_lower(f"{first} {last}")
+    if form == "surname_first":
+        return f"{tr_upper(last)} {first}"
+    return f"{first} {last}"
+
+
 def gen_value(code: str, rng: random.Random) -> str:
+    if code == "PERSON":
+        return gen_person(rng)
     if code == "TC_KIMLIK":
         return gen_tc(rng)
     if code == "TR_TELEFON":
@@ -226,6 +257,30 @@ MULTI = [
     "Sevkiyat {KONUM} deposundan {PLAKA} plakalı araçla çıktı.",
     "PIN {PIN} ve şifre {SIFRE} aynı not kâğıdında yazıyordu.",
 ]
+# PERSON sentences (DECISION-24); titles stay outside the span. No gendered honorifics
+# (Bey/Hanım) or suffixes after the name: the pool does not track gender or vowel harmony.
+NAME_SENTENCES = [
+    "Hasta {PERSON} 12 numaralı yatağa yatırıldı.",
+    "{PERSON} isimli danışanın randevusu perşembeye alındı.",
+    "Dr. {PERSON} bugün nöbetçi.",
+    "Raporu {PERSON} hazırladı, onay bekliyor.",
+    "Teslim alan: {PERSON}",
+    "{PERSON} ile görüşme saat 15.00'te.",
+    "hasta adı {PERSON} dosya no 4471",
+    "Başvuru sahibi {PERSON}, TC kimlik no {TC_KIMLIK}.",
+    "{PERSON} ve {PERSON} aynı vardiyada çalışıyor.",
+    "Refakatçi {PERSON} için kart çıkarılsın.",
+    "{PERSON} adlı hastanın tahlil sonuçları çıktı.",
+    "İmza: {PERSON}, Satın Alma Birimi",
+    "Faturadaki muhatap {PERSON} olarak düzeltilsin.",
+    "{PERSON} ile {EPOSTA} adresinden iletişime geçildi.",
+    "Taburcu listesinde {PERSON} adı da var.",
+    "Ameliyat onam formunu {PERSON} imzaladı.",
+    "Sayın {PERSON}, başvurunuz alınmıştır.",
+    "{PERSON} telefonla aradı: {TR_TELEFON}",
+    "nöbet değişimi {PERSON} -> {PERSON}",
+    "Ziyaretçi kaydı: {PERSON}, {DOGUM_TARIHI} doğumlu.",
+]
 # Negatives: look-alikes that must NOT be labelled (no entities)
 NEGATIVES = [
     "Sözleşmenin 10. maddesine göre fesih bildirim süresi 90 gündür.",
@@ -266,7 +321,9 @@ def records(rng: random.Random) -> list[dict]:
         rows.append({"text": text, "entities": entities})
     if len(rows) != TOTAL - NAME_SLOTS:
         raise ValueError(f"{len(rows)} name-free sentences, expected {TOTAL - NAME_SLOTS}")
-    for t in NAME_SENTENCES:  # DECISION-24
+    if len(NAME_SENTENCES) != NAME_SLOTS:
+        raise ValueError(f"{len(NAME_SENTENCES)} PERSON sentences, expected {NAME_SLOTS}")
+    for t in NAME_SENTENCES:  # appended last so the name-free rows keep their values
         text, entities = fill(t, rng)
         rows.append({"text": text, "entities": entities})
     return [{"id": f"pii-{n:03d}", **r} for n, r in enumerate(rows, start=1)]
@@ -275,7 +332,9 @@ def records(rng: random.Random) -> list[dict]:
 CATEGORIES_MD_HEADER = """# PII kategori kodları
 
 `pii-100.jsonl` içindeki `category` kodlarının plan/08 kategori adlarıyla eşlemesi.
-`default_on`: 08'in varsayılan politikasında açık. Kişi adı (KISI_ADI) cümleleri DECISION-24 kararını bekliyor.
+`default_on`: 08'in varsayılan politikasında açık. Kişi adı (`PERSON`) yalnızca bu sette ve
+hafıza setinde geçer; adlar betikteki sabit uydurma havuzdandır (DECISION-24). plan/08'e göre kişi adı
+varsayılan politikada `egress`'te `tokenize` edilir; buradaki `hayır` yalnızca genel açık listeyi gösterir.
 
 | Kod | plan/08 adı | default_on |
 |---|---|---|

@@ -8,8 +8,9 @@ plan/14 defines no file format; this one maps 1:1 to its extraction output.
 Negatives follow plan/14 "Kurallar": no one-off requests, document content,
 third-party information, or personal/health data, including the explicit
 "bunu hatırla" path (C19). PII values come from the PII generator, so they are
-checksum-valid like the real thing. Conversations that need a person or patient
-name wait for DECISION-24 (NAME_SLOTS).
+checksum-valid like the real thing. Conversations with a person or patient name
+(DECISION-24 = A) take names from the PII generator's fictional pool and are marked
+contains_person_name for 14's "0 leaks from patient names" acceptance.
 """
 
 import json
@@ -19,14 +20,14 @@ from pathlib import Path
 from . import pii, write_text
 
 TOTAL = 40
-NAME_SLOTS = 4  # filled only after DECISION-24
+NAME_SLOTS = 4  # conversations with a person name (DECISION-24)
 
 ACK = "Anladım."
 
 
-def _rec(scenario, user, expected=None, existing=None, reason=None):
+def _rec(scenario, user, expected=None, existing=None, reason=None, person=False):
     return {"scenario": scenario, "user": user, "expected": expected or [],
-            "existing": existing or [], "reason": reason}
+            "existing": existing or [], "reason": reason, "person": person}
 
 
 def _exp(kind, *must, supersedes=None):
@@ -97,10 +98,26 @@ def scenarios(rng: random.Random) -> list[dict]:
     ]
 
 
+def name_scenarios(rng: random.Random) -> list[dict]:
+    """Drawn after scenarios() so the name-free records keep their values."""
+    n = [pii.gen_person(rng) for _ in range(NAME_SLOTS)]
+    return [
+        _rec("person_name", f"Hasta {n[0]} 12 numaralı yatakta yatıyor, bunu hatırla.",
+             reason="hasta adı; açık komut da engellenir (C19)", person=True),
+        _rec("person_name", f"{n[1]} adlı hastanın diyabeti var, not al.",
+             reason="hasta adı ve sağlık verisi", person=True),
+        _rec("person_name", f"Benim adım {n[2]}, bundan sonra bana adımla hitap et.",
+             reason="kişisel veri (ad-soyad)", person=True),
+        _rec("person_name", f"Raporları {n[3]} ile de paylaşıyorum, bunu bil.",
+             reason="üçüncü kişinin adı", person=True),
+    ]
+
+
 def records(rng: random.Random) -> list[dict]:
     rows = scenarios(rng)
     if len(rows) != TOTAL - NAME_SLOTS:
         raise ValueError(f"{len(rows)} name-free conversations, expected {TOTAL - NAME_SLOTS}")
+    rows += name_scenarios(rng)
     out = []
     for n, r in enumerate(rows, start=1):
         out.append({
@@ -111,6 +128,7 @@ def records(rng: random.Random) -> list[dict]:
             "expected": r["expected"],
             "expect_none": not r["expected"],
             "reason": r["reason"],
+            "contains_person_name": r["person"],
         })
     return out
 

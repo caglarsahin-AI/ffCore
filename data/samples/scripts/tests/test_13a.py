@@ -233,8 +233,9 @@ class Test13aPii(unittest.TestCase):
         self.assertFalse(pii.luhn_valid("4111 1111 1111 1112"))
 
     def test_13a_5_pii_labeled(self):
-        name_free = [r for r in self.records if not any(e["category"] == "KISI_ADI" for e in r["entities"])]
+        name_free = [r for r in self.records if not any(e["category"] == "PERSON" for e in r["entities"])]
         self.assertEqual(len(name_free), pii.TOTAL - pii.NAME_SLOTS)
+        pool = {_fold(n) for n in pii.FIRST_NAMES + pii.LAST_NAMES}
         self.assertEqual(len({r["id"] for r in self.records}), len(self.records))
         seen: dict[str, int] = {}
         for r in self.records:
@@ -251,10 +252,11 @@ class Test13aPii(unittest.TestCase):
                           "VKN": lambda v: v[9] == pii.vkn_check(v[:9])}
                 if e["category"] in checks:
                     self.assertTrue(checks[e["category"]](value), (r["id"], e["category"], value))
-        for code, (_, default_on) in pii.CATEGORIES.items():
-            if code == "KISI_ADI":
-                continue  # DECISION-24
+                if e["category"] == "PERSON":  # whole name from the fictional pool, nothing more
+                    self.assertTrue(set(_fold(value).split()) <= pool, (r["id"], value))
+        for code in pii.CATEGORIES:
             self.assertGreaterEqual(seen.get(code, 0), 2, code)
+        self.assertGreaterEqual(seen["PERSON"], pii.NAME_SLOTS)
         negatives = [r for r in self.records if not r["entities"]]
         self.assertGreaterEqual(len(negatives), 8)
         for r in negatives:  # look-alike 11-digit numbers must fail the TC checksum
@@ -262,8 +264,6 @@ class Test13aPii(unittest.TestCase):
                 self.assertFalse(pii.tc_valid(run), (r["id"], run))
 
     def test_13a_5b_pii_total_100(self):
-        if not pii.NAME_SENTENCES:
-            self.skipTest("NOT_RUN: KISI_ADI sentences wait for DECISION-24")
         self.assertEqual(len(self.records), pii.TOTAL)
 
 
@@ -288,12 +288,15 @@ class Test13aMemory(unittest.TestCase):
                     or re.search(r"\b\d{2}\.\d{2}\.(19|20)\d{2}\b", text))
 
     def test_13a_6_memory_conversations(self):
-        self.assertEqual(len(self.records), memory.TOTAL - memory.NAME_SLOTS)
+        named = [r for r in self.records if r["contains_person_name"]]
+        self.assertEqual(len(self.records) - len(named), memory.TOTAL - memory.NAME_SLOTS)
+        self.assertEqual(len(named), memory.NAME_SLOTS)
         self.assertEqual(len({r["id"] for r in self.records}), len(self.records))
+        last_names = [_fold(n) for n in pii.LAST_NAMES]
         positives = negatives = 0
         for r in self.records:
             self.assertEqual(set(r), {"id", "scenario", "turns", "existing_memories", "expected",
-                                      "expect_none", "reason"}, r["id"])
+                                      "expect_none", "reason", "contains_person_name"}, r["id"])
             self.assertEqual(r["turns"][0]["role"], "user")
             user_text = _fold(" ".join(t["content"] for t in r["turns"] if t["role"] == "user"))
             self.assertEqual(r["expect_none"], not r["expected"], r["id"])
@@ -313,15 +316,46 @@ class Test13aMemory(unittest.TestCase):
             # plan/14: anything carrying personal data must yield no memory (0 leaks)
             if self._has_pii(user_text) or r["scenario"] in {"pii", "health"}:
                 self.assertTrue(r["expect_none"], r["id"])
+            # the marker is true exactly when a pool surname is in the conversation
+            has_name = any(re.search(rf"(?<!\w){re.escape(n)}(?!\w)", user_text) for n in last_names)
+            self.assertEqual(r["contains_person_name"], has_name, r["id"])
+            if has_name:
+                self.assertTrue(r["expect_none"], r["id"])  # plan/14: 0 leaks from names
         self.assertGreaterEqual(positives, 15)
         self.assertGreaterEqual(negatives, 12)
         explicit_pii = [r for r in self.records if r["scenario"] == "pii" and "hatırla" in _fold(r["turns"][0]["content"])]
         self.assertTrue(explicit_pii)  # C19: the "bunu hatırla" path is covered too
 
     def test_13a_6b_memory_total_40(self):
-        if not memory.NAME_SLOTS or len(self.records) < memory.TOTAL:
-            self.skipTest("NOT_RUN: name-bearing conversations wait for DECISION-24")
         self.assertEqual(len(self.records), memory.TOTAL)
+
+
+class Test13aPersonNames(unittest.TestCase):
+    """DECISION-24: pool names appear only in pii/ and memory/ (scripts/ holds the pool)."""
+    ALLOWED = ("pii", "memory", "scripts")
+
+    @staticmethod
+    def _text(path: Path) -> str:
+        if path.suffix in {".pdf", ".docx"}:
+            return readback.text_of(path)
+        return path.read_text(encoding="utf-8")
+
+    def test_13a_9_no_person_names_outside_pii_memory(self):
+        names = [_fold(n) for n in pii.FIRST_NAMES + pii.LAST_NAMES]
+        patterns = [re.compile(rf"(?<!\w){re.escape(n)}(?!\w)") for n in names]
+        scanned, hits_allowed = 0, set()
+        for path in sorted(p for p in SAMPLES.rglob("*") if p.is_file() and "__pycache__" not in p.parts):
+            top = path.relative_to(SAMPLES).parts[0]
+            text = _fold(self._text(path))
+            found = [n for n, pat in zip(names, patterns) if pat.search(text)]
+            if top in self.ALLOWED:
+                hits_allowed.update(found)
+                continue
+            scanned += 1
+            self.assertEqual(found, [], path.relative_to(SAMPLES).as_posix())
+        self.assertGreaterEqual(scanned, 15)  # contracts, schema, eval, agents, openapi, README
+        # control: the check is not vacuous, every surname really occurs in the allowed sets
+        self.assertTrue({_fold(n) for n in pii.LAST_NAMES} <= hits_allowed)
 
 
 class Test13aSchema(unittest.TestCase):

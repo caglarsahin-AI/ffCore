@@ -28,14 +28,17 @@ RUN_PG_TESTS=1 py -3.12 -m unittest data.samples.scripts.tests.test_13a_pg -v
 | `schema/` | demo sunum DB'si: şema, 10.000 satır seed, salt-okunur rol şablonu, `schema_descriptions`, 20 few-shot | 05a mcp-sql, 13b |
 | `agents/` | `sozlesme-asistani`, `veri-soru-cevap` (PLAN 2d: tek, onaylı `run_sql`), `karma-asistan` | 06a, 10b, 13b |
 | `eval/` | `sozlesme-33.json` (12 doğrudan, 8 dolaylı, 5+3 cevapsız, 5 SQL) ve `suite.json` | 09, 13b |
-| `pii/` | etiketli Türkçe PII cümleleri ve kategori kodları | 08 |
-| `memory/` | beklenen çıktılı hafıza konuşmaları | 14 |
+| `pii/` | 100 etiketli Türkçe PII cümlesi (19 kategori, 10 negatif) ve kategori kodları | 08 |
+| `memory/` | 40 beklenen çıktılı hafıza konuşması | 14 |
 | `openapi/` | Superset alt kümesi (6 işlem) | 05b |
 
 `openapi/superset.yaml` içinde onay bilgisi yoktur; onay `tool_actions.needs_approval` ayarıdır. 05b testi `createChart` ve `addChartToDashboard` aksiyonlarını onaylı işaretler.
 
+## Kişi adları (DECISION-24)
+
+Kişi adı yalnızca `pii/` (20 cümle, `PERSON` span'i) ve `memory/` (4 konuşma, `contains_person_name: true`) içinde geçer. Adlar `gen/pii.py` içindeki sabit havuzdandır: yaygın adlar ile uydurma soyadlarının birleşimi; gerçek bir kişiyle çakışmaması amaçlanır ama bu, dış kaynağa bakılmadan kanıtlanamaz. `test_13a_9_no_person_names_outside_pii_memory` havuzdaki hiçbir adın sözleşme, şema, sınav, agent ve OpenAPI dosyalarında geçmediğini kanıtlar.
+
 ## Açık noktalar
 
-- Kişi adı içeren PII cümleleri (20) ve hafıza konuşmaları (4) DECISION-24 kararını bekler; o zamana kadar `pii-100.jsonl` 80, `memory-40.jsonl` 36 kayıt içerir ve toplam testleri NOT_RUN döner.
 - Agent şablonlarının 06a Pydantic şemasıyla gerçek uyumu 06a/13b'de doğrulanır.
 - PDF metin katmanının Docling ile okunması 04a ingest testinde doğrulanır; burada standart kütüphaneyle yapısal geri okuma yapılır.

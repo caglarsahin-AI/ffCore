@@ -78,3 +78,23 @@
 {"id": "pii-078", "text": "Referans kodu 29037308622 ile başvuru takip edilebilir.", "entities": []}
 {"id": "pii-079", "text": "Kit lot numarası KIT-014, raf ömrü 12 ay.", "entities": []}
 {"id": "pii-080", "text": "Sistem erişilebilirliği geçen ay %99,7 oldu.", "entities": []}
+{"id": "pii-081", "text": "Hasta Kaan Kumbayır 12 numaralı yatağa yatırıldı.", "entities": [{"start": 6, "end": 19, "category": "PERSON"}]}
+{"id": "pii-082", "text": "tolga çınaroba isimli danışanın randevusu perşembeye alındı.", "entities": [{"start": 0, "end": 14, "category": "PERSON"}]}
+{"id": "pii-083", "text": "Dr. Oğuz Defnedere bugün nöbetçi.", "entities": [{"start": 4, "end": 18, "category": "PERSON"}]}
+{"id": "pii-084", "text": "Raporu oğuz tuzlaçay hazırladı, onay bekliyor.", "entities": [{"start": 7, "end": 20, "category": "PERSON"}]}
+{"id": "pii-085", "text": "Teslim alan: Barış Mavisuyu", "entities": [{"start": 13, "end": 27, "category": "PERSON"}]}
+{"id": "pii-086", "text": "DERYA GÖKÇEOBA ile görüşme saat 15.00'te.", "entities": [{"start": 0, "end": 14, "category": "PERSON"}]}
+{"id": "pii-087", "text": "hasta adı ELİF DEFNEDERE dosya no 4471", "entities": [{"start": 10, "end": 24, "category": "PERSON"}]}
+{"id": "pii-088", "text": "Başvuru sahibi NARLIKAYA Gizem, TC kimlik no 62761439840.", "entities": [{"start": 15, "end": 30, "category": "PERSON"}, {"start": 45, "end": 56, "category": "TC_KIMLIK"}]}
+{"id": "pii-089", "text": "Tolga Ilgınçeşme ve Emre Sedirtepe aynı vardiyada çalışıyor.", "entities": [{"start": 0, "end": 16, "category": "PERSON"}, {"start": 20, "end": 34, "category": "PERSON"}]}
+{"id": "pii-090", "text": "Refakatçi İpek Sedirtepe için kart çıkarılsın.", "entities": [{"start": 10, "end": 24, "category": "PERSON"}]}
+{"id": "pii-091", "text": "Melis Çınaroba adlı hastanın tahlil sonuçları çıktı.", "entities": [{"start": 0, "end": 14, "category": "PERSON"}]}
+{"id": "pii-092", "text": "İmza: ZEYNEP DEFNEDERE, Satın Alma Birimi", "entities": [{"start": 6, "end": 22, "category": "PERSON"}]}
+{"id": "pii-093", "text": "Faturadaki muhatap Melis Defnedere olarak düzeltilsin.", "entities": [{"start": 19, "end": 34, "category": "PERSON"}]}
+{"id": "pii-094", "text": "emre defnedere ile muhasebe7076@ornek.org adresinden iletişime geçildi.", "entities": [{"start": 0, "end": 14, "category": "PERSON"}, {"start": 19, "end": 41, "category": "EPOSTA"}]}
+{"id": "pii-095", "text": "Taburcu listesinde kaan çınaroba adı da var.", "entities": [{"start": 19, "end": 32, "category": "PERSON"}]}
+{"id": "pii-096", "text": "Ameliyat onam formunu Barış Zeynep Gökçeoba imzaladı.", "entities": [{"start": 22, "end": 43, "category": "PERSON"}]}
+{"id": "pii-097", "text": "Sayın ceren ılgınçeşme, başvurunuz alınmıştır.", "entities": [{"start": 6, "end": 22, "category": "PERSON"}]}
+{"id": "pii-098", "text": "gizem akçamdere telefonla aradı: (501) 138-1980", "entities": [{"start": 0, "end": 15, "category": "PERSON"}, {"start": 33, "end": 47, "category": "TR_TELEFON"}]}
+{"id": "pii-099", "text": "nöbet değişimi Gizem Ilgınçeşme -> Derya Zeynep Gökçeoba", "entities": [{"start": 15, "end": 31, "category": "PERSON"}, {"start": 35, "end": 56, "category": "PERSON"}]}
+{"id": "pii-100", "text": "Ziyaretçi kaydı: Barış Zeynep Kumbayır, 16.03.1975 doğumlu.", "entities": [{"start": 17, "end": 38, "category": "PERSON"}, {"start": 40, "end": 50, "category": "DOGUM_TARIHI"}]}
