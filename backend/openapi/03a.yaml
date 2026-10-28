@@ -489,6 +489,7 @@ paths:
       tags:
       - projects
       summary: List projects visible to the caller
+      description: Superadmins see every project; other users see the projects they are members of.
       operationId: list_projects_api_v1_projects_get
       responses:
         '200':
