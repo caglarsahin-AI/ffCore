@@ -20,8 +20,14 @@ SIZE = {"h1": 14, "h2": 11, "p": 10, "row": 9}
 WRAP = {"h1": 60, "h2": 80, "p": 92, "row": 100}
 
 # cp1254 positions WinAnsi assigns differently, with their standard glyph names
-DIFFERENCES = {0xD0: "Gbreve", 0xDD: "Idotaccent", 0xDE: "Scedilla",
-               0xF0: "gbreve", 0xFD: "dotlessi", 0xFE: "scedilla"}
+DIFFERENCES = {
+    0xD0: "Gbreve",
+    0xDD: "Idotaccent",
+    0xDE: "Scedilla",
+    0xF0: "gbreve",
+    0xFD: "dotlessi",
+    0xFE: "scedilla",
+}
 
 
 def encode(text: str) -> bytes:
@@ -48,12 +54,19 @@ def to_unicode_cmap() -> bytes:
         except UnicodeDecodeError:
             continue
         pairs.append(b"<%02X> <%04X>" % (code, ord(ch)))
-    body = [b"/CIDInit /ProcSet findresource begin", b"12 dict begin", b"begincmap",
-            b"/CIDSystemInfo << /Registry (Adobe) /Ordering (UCS) /Supplement 0 >> def",
-            b"/CMapName /FFCore-cp1254 def", b"/CMapType 2 def",
-            b"1 begincodespacerange", b"<00> <FF>", b"endcodespacerange"]
+    body = [
+        b"/CIDInit /ProcSet findresource begin",
+        b"12 dict begin",
+        b"begincmap",
+        b"/CIDSystemInfo << /Registry (Adobe) /Ordering (UCS) /Supplement 0 >> def",
+        b"/CMapName /FFCore-cp1254 def",
+        b"/CMapType 2 def",
+        b"1 begincodespacerange",
+        b"<00> <FF>",
+        b"endcodespacerange",
+    ]
     for start in range(0, len(pairs), 100):
-        chunk = pairs[start:start + 100]
+        chunk = pairs[start : start + 100]
         body.append(b"%d beginbfchar" % len(chunk))
         body.extend(chunk)
         body.append(b"endbfchar")
@@ -99,7 +112,10 @@ def _content(page: list[tuple[str, str]], number: int, total: int) -> bytes:
         if not text:
             continue
         font = b"/F2" if kind in ("h1", "h2") else b"/F1"
-        ops.append(b"BT %s %d Tf %d %d Td %s Tj ET" % (font, SIZE[kind], MARGIN, y, _pdf_string(encode(text))))
+        ops.append(
+            b"BT %s %d Tf %d %d Td %s Tj ET"
+            % (font, SIZE[kind], MARGIN, y, _pdf_string(encode(text)))
+        )
     footer = encode(f"Sayfa {number} / {total} - Sentetik örnek belge")
     ops.append(b"BT /F1 8 Tf %d %d Td %s Tj ET" % (MARGIN, MARGIN - 24, _pdf_string(footer)))
     return b"\n".join(ops) + b"\n"
@@ -107,12 +123,14 @@ def _content(page: list[tuple[str, str]], number: int, total: int) -> bytes:
 
 def _stream(data: bytes, extra: bytes = b"") -> bytes:
     packed = zlib.compress(data, 9)
-    return (b"<< /Length %d /Filter /FlateDecode%s >>\nstream\n" % (len(packed), extra)
-            + packed + b"\nendstream")
+    return (
+        b"<< /Length %d /Filter /FlateDecode%s >>\nstream\n" % (len(packed), extra)
+        + packed
+        + b"\nendstream"
+    )
 
 
-def render(blocks: list[tuple], title: str, pages_exact: int | None = None,
-           filler=None) -> bytes:
+def render(blocks: list[tuple], title: str, pages_exact: int | None = None, filler=None) -> bytes:
     """Render blocks; with pages_exact, call filler() for extra blocks until the page
     count is reached. Raises if content alone already exceeds pages_exact."""
     blocks = list(blocks)
@@ -129,7 +147,9 @@ def render(blocks: list[tuple], title: str, pages_exact: int | None = None,
         if len(pages) != pages_exact:
             raise ValueError(f"{title}: could not reach {pages_exact} pages ({len(pages)})")
 
-    diffs = b" ".join(b"%d /%s" % (code, name.encode()) for code, name in sorted(DIFFERENCES.items()))
+    diffs = b" ".join(
+        b"%d /%s" % (code, name.encode()) for code, name in sorted(DIFFERENCES.items())
+    )
     objects: list[bytes] = []
 
     def add(obj: bytes) -> int:
@@ -138,24 +158,37 @@ def render(blocks: list[tuple], title: str, pages_exact: int | None = None,
 
     catalog = add(b"")  # placeholders filled below
     pages_obj = add(b"")
-    encoding = add(b"<< /Type /Encoding /BaseEncoding /WinAnsiEncoding /Differences [%s] >>" % diffs)
+    encoding = add(
+        b"<< /Type /Encoding /BaseEncoding /WinAnsiEncoding /Differences [%s] >>" % diffs
+    )
     cmap = add(_stream(to_unicode_cmap()))
-    f1 = add(b"<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding %d 0 R /ToUnicode %d 0 R >>"
-             % (encoding, cmap))
-    f2 = add(b"<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding %d 0 R /ToUnicode %d 0 R >>"
-             % (encoding, cmap))
-    info = add(b"<< /Title %s /Producer (FFCore sample data generator) >>" % _pdf_string(encode(title)))
+    f1 = add(
+        b"<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding %d 0 R /ToUnicode %d 0 R >>"
+        % (encoding, cmap)
+    )
+    f2 = add(
+        b"<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding %d 0 R /ToUnicode %d "
+        b"0 R >>" % (encoding, cmap)
+    )
+    info = add(
+        b"<< /Title %s /Producer (FFCore sample data generator) >>" % _pdf_string(encode(title))
+    )
 
     kids = []
     for i, page in enumerate(pages, start=1):
         content = add(_stream(_content(page, i, len(pages))))
-        kids.append(add(
-            b"<< /Type /Page /Parent %d 0 R /MediaBox [0 0 %d %d] "
-            b"/Resources << /Font << /F1 %d 0 R /F2 %d 0 R >> >> /Contents %d 0 R >>"
-            % (pages_obj, PAGE_W, PAGE_H, f1, f2, content)))
+        kids.append(
+            add(
+                b"<< /Type /Page /Parent %d 0 R /MediaBox [0 0 %d %d] "
+                b"/Resources << /Font << /F1 %d 0 R /F2 %d 0 R >> >> /Contents %d 0 R >>"
+                % (pages_obj, PAGE_W, PAGE_H, f1, f2, content)
+            )
+        )
     objects[catalog - 1] = b"<< /Type /Catalog /Pages %d 0 R >>" % pages_obj
     objects[pages_obj - 1] = b"<< /Type /Pages /Kids [%s] /Count %d >>" % (
-        b" ".join(b"%d 0 R" % k for k in kids), len(kids))
+        b" ".join(b"%d 0 R" % k for k in kids),
+        len(kids),
+    )
 
     out = bytearray(b"%PDF-1.4\n%\xe2\xe3\xcf\xd3\n")
     offsets = []
@@ -167,5 +200,9 @@ def render(blocks: list[tuple], title: str, pages_exact: int | None = None,
     for off in offsets:
         out += b"%010d 00000 n \n" % off
     out += b"trailer\n<< /Size %d /Root %d 0 R /Info %d 0 R >>\nstartxref\n%d\n%%%%EOF\n" % (
-        len(objects) + 1, catalog, info, xref)
+        len(objects) + 1,
+        catalog,
+        info,
+        xref,
+    )
     return bytes(out)

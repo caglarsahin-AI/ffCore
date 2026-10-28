@@ -32,8 +32,10 @@ def _ref(body: bytes, key: bytes) -> int:
 
 
 def _cmap(text: bytes) -> dict[int, str]:
-    return {int(src, 16): chr(int(dst, 16))
-            for src, dst in re.findall(rb"<([0-9A-F]{2})> <([0-9A-F]{4})>", text)}
+    return {
+        int(src, 16): chr(int(dst, 16))
+        for src, dst in re.findall(rb"<([0-9A-F]{2})> <([0-9A-F]{4})>", text)
+    }
 
 
 def _pdf_strings(content: bytes) -> list[bytes]:
@@ -44,12 +46,12 @@ def _pdf_strings(content: bytes) -> list[bytes]:
         if start < 0:
             return out
         buf, j = bytearray(), start + 1
-        while content[j:j + 1] != b")":
-            c = content[j:j + 1]
+        while content[j : j + 1] != b")":
+            c = content[j : j + 1]
             if c == b"\\":
-                nxt = content[j + 1:j + 2]
+                nxt = content[j + 1 : j + 2]
                 if nxt.isdigit():
-                    buf.append(int(content[j + 1:j + 4], 8))
+                    buf.append(int(content[j + 1 : j + 4], 8))
                     j += 4
                     continue
                 buf += nxt
@@ -65,7 +67,9 @@ def pdf_info(data: bytes) -> dict:
     objs = _objects(data)
     root = _ref(data.rsplit(b"trailer", 1)[1], b"Root")
     pages = objs[_ref(objs[root], b"Pages")]
-    kids = [int(k) for k in re.findall(rb"(\d+) 0 R", re.search(rb"/Kids \[(.*?)\]", pages).group(1))]
+    kids = [
+        int(k) for k in re.findall(rb"(\d+) 0 R", re.search(rb"/Kids \[(.*?)\]", pages).group(1))
+    ]
     font = objs[_ref(objs[kids[0]], b"F1")]
     cmap = _cmap(_stream(objs[_ref(font, b"ToUnicode")]))
     page_texts = []
@@ -73,8 +77,11 @@ def pdf_info(data: bytes) -> dict:
         content = _stream(objs[_ref(objs[kid], b"Contents")])
         lines = ["".join(cmap[b] for b in s) for s in _pdf_strings(content)]
         page_texts.append(lines)
-    return {"pages": page_texts, "font": font,
-            "flate": all(b"/FlateDecode" in objs[_ref(objs[k], b"Contents")] for k in kids)}
+    return {
+        "pages": page_texts,
+        "font": font,
+        "flate": all(b"/FlateDecode" in objs[_ref(objs[k], b"Contents")] for k in kids),
+    }
 
 
 def docx_info(data: bytes) -> dict:
@@ -84,7 +91,12 @@ def docx_info(data: bytes) -> dict:
     for p in re.findall(r"<w:p>(.*?)</w:p>", xml, re.S):
         style = re.search(r'<w:pStyle w:val="(\w+)"/>', p)
         text = "".join(re.findall(r"<w:t[^>]*>(.*?)</w:t>", p, re.S))
-        text = text.replace("&lt;", "<").replace("&gt;", ">").replace("&quot;", '"').replace("&amp;", "&")
+        text = (
+            text.replace("&lt;", "<")
+            .replace("&gt;", ">")
+            .replace("&quot;", '"')
+            .replace("&amp;", "&")
+        )
         paragraphs.append((style.group(1) if style else None, text))
     return {"paragraphs": paragraphs, "tables": xml.count("<w:tbl>")}
 

@@ -1,7 +1,7 @@
 """Generate FFCore synthetic sample data (package 13a).
 
 Usage:
-    py -3.12 data/samples/scripts/generate.py [--seed 13] [--out data/samples] [--only schema,agents]
+    py -3.12 data/samples/scripts/generate.py [--seed 13] [--out data/samples] [--only eval,pii]
 
 Stdlib only. Every module gets its own random.Random seeded with "<seed>:<module>",
 so regenerating one module never changes another and the output is byte-identical
@@ -39,8 +39,9 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--seed", type=int, default=DEFAULT_SEED)
     parser.add_argument("--out", type=Path, default=DEFAULT_OUT)
-    parser.add_argument("--only", default=",".join(MODULES),
-                        help=f"comma separated subset of: {', '.join(MODULES)}")
+    parser.add_argument(
+        "--only", default=",".join(MODULES), help=f"comma separated subset of: {', '.join(MODULES)}"
+    )
     args = parser.parse_args(argv)
 
     selected = [m.strip() for m in args.only.split(",") if m.strip()]

@@ -25,24 +25,51 @@ CONTAINER = "ffcore-13a-pg"
 SEED = 13
 
 
-def _docker(*args: str, stdin: str | None = None, check: bool = True) -> subprocess.CompletedProcess:
-    return subprocess.run(["docker", *args], input=stdin, capture_output=True, text=True,
-                          encoding="utf-8", check=check)
+def _docker(
+    *args: str, stdin: str | None = None, check: bool = True
+) -> subprocess.CompletedProcess:
+    return subprocess.run(
+        ["docker", *args],
+        input=stdin,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        check=check,
+    )
 
 
 def _psql(sql: str, check: bool = True) -> subprocess.CompletedProcess:
-    return _docker("exec", "-i", CONTAINER, "psql", "-U", "postgres", "-v", "ON_ERROR_STOP=1",
-                   "-qAt", "-f", "-", stdin=sql, check=check)
+    return _docker(
+        "exec",
+        "-i",
+        CONTAINER,
+        "psql",
+        "-U",
+        "postgres",
+        "-v",
+        "ON_ERROR_STOP=1",
+        "-qAt",
+        "-f",
+        "-",
+        stdin=sql,
+        check=check,
+    )
 
 
-@unittest.skipUnless(os.environ.get("RUN_PG_TESTS") == "1", "NOT_RUN: set RUN_PG_TESTS=1 (needs Docker)")
+@unittest.skipUnless(
+    os.environ.get("RUN_PG_TESTS") == "1", "NOT_RUN: set RUN_PG_TESTS=1 (needs Docker)"
+)
 class Test13aPostgres(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         _docker("rm", "-f", CONTAINER, check=False)
-        _docker("run", "-d", "--rm", "--name", CONTAINER, "-e", "POSTGRES_HOST_AUTH_METHOD=trust", IMAGE)
+        _docker(
+            "run", "-d", "--rm", "--name", CONTAINER, "-e", "POSTGRES_HOST_AUTH_METHOD=trust", IMAGE
+        )
         deadline = time.monotonic() + 60
-        while _docker("exec", CONTAINER, "pg_isready", "-U", "postgres", check=False).returncode != 0:
+        while (
+            _docker("exec", CONTAINER, "pg_isready", "-U", "postgres", check=False).returncode != 0
+        ):
             if time.monotonic() > deadline:
                 raise RuntimeError("postgres did not become ready in 60 s")
             time.sleep(1)
@@ -66,19 +93,29 @@ class Test13aPostgres(unittest.TestCase):
 
     def test_13a_4d_sql_expected_results_in_postgres(self):
         import json
+
         from gen import eval as eval_gen
-        items = {i["id"]: i for i in json.loads((SAMPLES / "eval" / "sozlesme-33.json").read_text(encoding="utf-8"))}
+
+        items = {
+            i["id"]: i
+            for i in json.loads((SAMPLES / "eval" / "sozlesme-33.json").read_text(encoding="utf-8"))
+        }
         for q in eval_gen.SQL_QUESTIONS:
             got = _psql(f"BEGIN; SET ROLE agent_readonly; {q['sql']}; ROLLBACK;").stdout.split()
-            self.assertEqual([[int(got[0])]], items[q["id"]]["expected_output"]["sql_result"], q["id"])
+            self.assertEqual(
+                [[int(got[0])]], items[q["id"]]["expected_output"]["sql_result"], q["id"]
+            )
 
     def test_13a_2e_few_shots_run_as_readonly(self):
         import json
+
         shots = json.loads((SAMPLES / "schema" / "few_shots.json").read_text(encoding="utf-8"))
         for s in shots:
             result = _psql(f"BEGIN; SET ROLE agent_readonly; {s['sql']}; ROLLBACK;", check=False)
             self.assertEqual(result.returncode, 0, (s["question"], result.stderr))
-        denied = _psql("BEGIN; SET ROLE agent_readonly; DELETE FROM device_faults; ROLLBACK;", check=False)
+        denied = _psql(
+            "BEGIN; SET ROLE agent_readonly; DELETE FROM device_faults; ROLLBACK;", check=False
+        )
         self.assertNotEqual(denied.returncode, 0)
         self.assertIn("permission denied", denied.stderr)
 

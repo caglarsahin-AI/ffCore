@@ -41,7 +41,13 @@ def to_yaml(node, indent: int = 0) -> list[str]:
                 lines.append(f"{pad}{key}:")
                 lines.extend(to_yaml(v, indent + 2))
             else:
-                lines.append(f"{pad}{key}: {_scalar(v) if not isinstance(v, (dict, list)) else ('{}' if isinstance(v, dict) else '[]')}")
+                if isinstance(v, dict):
+                    value = "{}"
+                elif isinstance(v, list):
+                    value = "[]"
+                else:
+                    value = _scalar(v)
+                lines.append(f"{pad}{key}: {value}")
     elif isinstance(node, list):
         for item in node:
             if isinstance(item, (dict, list)) and item:
@@ -60,8 +66,12 @@ def _pk() -> dict:
 
 
 def _ok(description: str, ref: str) -> dict:
-    return {"200": {"description": description,
-                    "content": {"application/json": {"schema": {"$ref": f"#/components/schemas/{ref}"}}}}}
+    return {
+        "200": {
+            "description": description,
+            "content": {"application/json": {"schema": {"$ref": f"#/components/schemas/{ref}"}}},
+        }
+    }
 
 
 SPEC = {
@@ -69,7 +79,8 @@ SPEC = {
     "info": {
         "title": "Superset API (FFCore örnek alt kümesi)",
         "version": "1.0.0-sample",
-        "description": "Agent aracı olarak yayınlamak için seçilmiş 6 Superset işlemi. Sentetik örnek; gerçek Superset sürümüyle 05b'de doğrulanır.",
+        "description": "Agent aracı olarak yayınlamak için seçilmiş 6 Superset işlemi. Sentetik "
+        "örnek; gerçek Superset sürümüyle 05b'de doğrulanır.",
     },
     "servers": [{"url": "http://superset.ornek.local"}],
     "security": [{"bearerAuth": []}],
@@ -79,9 +90,16 @@ SPEC = {
                 "operationId": "searchDashboards",
                 "summary": "Dashboard ara",
                 "description": "Başlığa göre dashboard arar.",
-                "parameters": [{"name": "q", "in": "query", "required": False,
-                                "description": "Rison biçiminde filtre, ör. (filters:!((col:dashboard_title,opr:ct,value:yatak)))",
-                                "schema": {"type": "string"}}],
+                "parameters": [
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "required": False,
+                        "description": "Rison biçiminde filtre, ör. "
+                        "(filters:!((col:dashboard_title,opr:ct,value:yatak)))",
+                        "schema": {"type": "string"},
+                    }
+                ],
                 "responses": _ok("Dashboard listesi", "DashboardList"),
             },
         },
@@ -90,19 +108,37 @@ SPEC = {
                 "operationId": "listCharts",
                 "summary": "Chart listele",
                 "description": "Chart'ları ada ve dataset'e göre listeler.",
-                "parameters": [{"name": "q", "in": "query", "required": False,
-                                "description": "Rison biçiminde filtre ve sayfalama.",
-                                "schema": {"type": "string"}}],
+                "parameters": [
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "required": False,
+                        "description": "Rison biçiminde filtre ve sayfalama.",
+                        "schema": {"type": "string"},
+                    }
+                ],
                 "responses": _ok("Chart listesi", "ChartList"),
             },
             "post": {
                 "operationId": "createChart",
                 "summary": "Chart oluştur",
                 "description": "Bir dataset üzerinde yeni chart oluşturur.",
-                "requestBody": {"required": True, "content": {"application/json": {
-                    "schema": {"$ref": "#/components/schemas/ChartCreate"}}}},
-                "responses": {"201": {"description": "Oluşturulan chart", "content": {"application/json": {
-                    "schema": {"$ref": "#/components/schemas/ChartRef"}}}}},
+                "requestBody": {
+                    "required": True,
+                    "content": {
+                        "application/json": {"schema": {"$ref": "#/components/schemas/ChartCreate"}}
+                    },
+                },
+                "responses": {
+                    "201": {
+                        "description": "Oluşturulan chart",
+                        "content": {
+                            "application/json": {
+                                "schema": {"$ref": "#/components/schemas/ChartRef"}
+                            }
+                        },
+                    }
+                },
             },
         },
         "/api/v1/chart/{pk}": {
@@ -111,8 +147,14 @@ SPEC = {
                 "summary": "Chart'ı dashboard'a ekle",
                 "description": "Chart'ın bağlı olduğu dashboard listesini günceller.",
                 "parameters": [_pk()],
-                "requestBody": {"required": True, "content": {"application/json": {
-                    "schema": {"$ref": "#/components/schemas/ChartDashboards"}}}},
+                "requestBody": {
+                    "required": True,
+                    "content": {
+                        "application/json": {
+                            "schema": {"$ref": "#/components/schemas/ChartDashboards"}
+                        }
+                    },
+                },
                 "responses": _ok("Güncellenen chart", "ChartRef"),
             },
         },
@@ -138,36 +180,101 @@ SPEC = {
     "components": {
         "securitySchemes": {"bearerAuth": {"type": "http", "scheme": "bearer"}},
         "schemas": {
-            "DashboardList": {"type": "object", "properties": {
-                "count": {"type": "integer"},
-                "result": {"type": "array", "items": {"type": "object", "properties": {
-                    "id": {"type": "integer"}, "dashboard_title": {"type": "string"},
-                    "url": {"type": "string"}}}}}},
-            "ChartList": {"type": "object", "properties": {
-                "count": {"type": "integer"},
-                "result": {"type": "array", "items": {"$ref": "#/components/schemas/ChartRef"}}}},
-            "ChartRef": {"type": "object", "properties": {
-                "id": {"type": "integer"}, "slice_name": {"type": "string"},
-                "viz_type": {"type": "string"}}},
-            "ChartCreate": {"type": "object", "required": ["slice_name", "viz_type", "datasource_id", "datasource_type"],
+            "DashboardList": {
+                "type": "object",
+                "properties": {
+                    "count": {"type": "integer"},
+                    "result": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
                             "properties": {
-                                "slice_name": {"type": "string"}, "viz_type": {"type": "string"},
-                                "datasource_id": {"type": "integer"},
-                                "datasource_type": {"type": "string", "enum": ["table"]},
-                                "params": {"type": "string", "description": "JSON metni olarak chart ayarları"}}},
-            "ChartDashboards": {"type": "object", "required": ["dashboards"], "properties": {
-                "dashboards": {"type": "array", "items": {"type": "integer"}}}},
-            "ChartData": {"type": "object", "properties": {
-                "result": {"type": "array", "items": {"type": "object", "properties": {
-                    "rowcount": {"type": "integer"},
-                    "data": {"type": "array", "items": {"type": "object"}}}}}}},
-            "Dataset": {"type": "object", "properties": {"result": {"type": "object", "properties": {
-                "table_name": {"type": "string"},
-                "columns": {"type": "array", "items": {"type": "object", "properties": {
-                    "column_name": {"type": "string"}, "type": {"type": "string"}}}},
-                "metrics": {"type": "array", "items": {"type": "object", "properties": {
-                    "metric_name": {"type": "string"}, "expression": {"type": "string"},
-                    "description": {"type": "string"}}}}}}}},
+                                "id": {"type": "integer"},
+                                "dashboard_title": {"type": "string"},
+                                "url": {"type": "string"},
+                            },
+                        },
+                    },
+                },
+            },
+            "ChartList": {
+                "type": "object",
+                "properties": {
+                    "count": {"type": "integer"},
+                    "result": {"type": "array", "items": {"$ref": "#/components/schemas/ChartRef"}},
+                },
+            },
+            "ChartRef": {
+                "type": "object",
+                "properties": {
+                    "id": {"type": "integer"},
+                    "slice_name": {"type": "string"},
+                    "viz_type": {"type": "string"},
+                },
+            },
+            "ChartCreate": {
+                "type": "object",
+                "required": ["slice_name", "viz_type", "datasource_id", "datasource_type"],
+                "properties": {
+                    "slice_name": {"type": "string"},
+                    "viz_type": {"type": "string"},
+                    "datasource_id": {"type": "integer"},
+                    "datasource_type": {"type": "string", "enum": ["table"]},
+                    "params": {"type": "string", "description": "JSON metni olarak chart ayarları"},
+                },
+            },
+            "ChartDashboards": {
+                "type": "object",
+                "required": ["dashboards"],
+                "properties": {"dashboards": {"type": "array", "items": {"type": "integer"}}},
+            },
+            "ChartData": {
+                "type": "object",
+                "properties": {
+                    "result": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "rowcount": {"type": "integer"},
+                                "data": {"type": "array", "items": {"type": "object"}},
+                            },
+                        },
+                    }
+                },
+            },
+            "Dataset": {
+                "type": "object",
+                "properties": {
+                    "result": {
+                        "type": "object",
+                        "properties": {
+                            "table_name": {"type": "string"},
+                            "columns": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "column_name": {"type": "string"},
+                                        "type": {"type": "string"},
+                                    },
+                                },
+                            },
+                            "metrics": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "metric_name": {"type": "string"},
+                                        "expression": {"type": "string"},
+                                        "description": {"type": "string"},
+                                    },
+                                },
+                            },
+                        },
+                    }
+                },
+            },
         },
     },
 }
