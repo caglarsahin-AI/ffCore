@@ -279,30 +279,37 @@ class RoleRequirement:
 
     async def __call__(self, request: Request, actor: Annotated[Actor, Depends(resolve_actor)]):
         project_id = request.path_params.get("project_id") if self.scope == "project" else None
-        grant, code = await _grant(actor, project_id)
-        if grant is not None and code is None:
-            if ROLE_ORDER.index(grant.role) < ROLE_ORDER.index(self.min_role):
-                code = "insufficient_role"
-            elif self.write and grant.access != "edit":
-                code = "read_only_access"
-        if code == "project_not_found":
-            raise ApiError(404, "not_found_error", code, "Project not found.")
-        if code is not None:
-            await _audit_denied(request, actor, project_id, code, self)
-            message = (
-                "Your access mode is read-only."
-                if code == "read_only_access"
-                else "Your role does not allow this."
-            )
-            raise ApiError(403, "permission_error", code, message)
-        request.state.grant = grant
-        return Actor(
-            actor_type=actor.actor_type,
-            actor_id=actor.actor_id,
-            project_id=str(project_id) if project_id else actor.project_id,
-            via_service=actor.via_service,
-            scopes=actor.scopes,
+        return await authorize(request, actor, project_id, self)
+
+
+async def authorize(
+    request: Request, actor: Actor, project_id: str | None, need: RoleRequirement
+) -> Actor:
+    """The check behind RoleRequirement, for routes whose project comes from elsewhere (query)."""
+    grant, code = await _grant(actor, project_id)
+    if grant is not None and code is None:
+        if ROLE_ORDER.index(grant.role) < ROLE_ORDER.index(need.min_role):
+            code = "insufficient_role"
+        elif need.write and grant.access != "edit":
+            code = "read_only_access"
+    if code == "project_not_found":
+        raise ApiError(404, "not_found_error", code, "Project not found.")
+    if code is not None:
+        await _audit_denied(request, actor, project_id, code, need)
+        message = (
+            "Your access mode is read-only."
+            if code == "read_only_access"
+            else "Your role does not allow this."
         )
+        raise ApiError(403, "permission_error", code, message)
+    request.state.grant = grant
+    return Actor(
+        actor_type=actor.actor_type,
+        actor_id=actor.actor_id,
+        project_id=str(project_id) if project_id else actor.project_id,
+        via_service=actor.via_service,
+        scopes=actor.scopes,
+    )
 
 
 def require_role(min_role: str, *, write: bool = False) -> RoleRequirement:

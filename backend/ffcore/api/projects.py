@@ -4,7 +4,7 @@ from typing import Annotated
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Request
-from sqlalchemy import func, select
+from sqlalchemy import any_, func, literal, select
 
 from ffcore.api.auth import user_actor
 from ffcore.api.common import (
@@ -13,7 +13,6 @@ from ffcore.api.common import (
     conflict,
     invalid,
     not_found,
-    not_implemented,
     path_resource,
 )
 from ffcore.api.schemas import (
@@ -25,10 +24,12 @@ from ffcore.api.schemas import (
     ProjectList,
     ProjectOut,
     ProjectUpdate,
+    ReadinessCheck,
     ReadinessOut,
 )
 from ffcore.core.audit import audited
 from ffcore.core.auth import Actor, require_role, require_superadmin
+from ffcore.models.catalog import Provider, ProviderProject
 from ffcore.models.identity import ASSIGNABLE_ROLES, Project, ProjectMember, User
 
 router = APIRouter(prefix="/projects", tags=["projects"], responses=ERROR_RESPONSES)
@@ -156,9 +157,58 @@ async def delete_project(
 @router.get(
     "/{project_id}/readiness", response_model=ReadinessOut, summary="Project readiness checks"
 )
-async def get_readiness(project_id: UUID):
+async def get_readiness(project_id: UUID, actor: ProjectReader, session: SessionDep):
     """Model provider assigned, vector provider assigned, project admin present."""
-    raise not_implemented()
+    # 03c adds two checks here: at least one limit, at least one active alert rule.
+    await _project(session, project_id)
+
+    async def provider_with(domain: str) -> bool:
+        found = await session.scalar(
+            select(Provider.id)
+            .join(ProviderProject, ProviderProject.provider_id == Provider.id)
+            .where(
+                ProviderProject.project_id == project_id,
+                Provider.is_active,
+                literal(domain) == any_(Provider.domains),
+            )
+            .limit(1)
+        )
+        return found is not None
+
+    admin = await session.scalar(
+        select(ProjectMember.user_id)
+        .join(User, User.id == ProjectMember.user_id)
+        .where(
+            ProjectMember.project_id == project_id,
+            ProjectMember.role == "admin",
+            User.is_active,
+            User.deleted_at.is_(None),
+        )
+        .limit(1)
+    )
+    checks = [
+        ReadinessCheck(
+            key="model_provider",
+            ok=await provider_with("model"),
+            detail="An active provider serving models is assigned to the project.",
+        ),
+        ReadinessCheck(
+            key="vector_provider",
+            ok=await provider_with("vector"),
+            detail="An active vector store provider is assigned to the project.",
+        ),
+        ReadinessCheck(
+            key="project_admin",
+            ok=admin is not None,
+            detail="The project has at least one active member with the admin role.",
+        ),
+    ]
+    return ReadinessOut(
+        project_id=project_id,
+        passed=sum(c.ok for c in checks),
+        total=len(checks),
+        checks=checks,
+    )
 
 
 @router.get("/{project_id}/members", response_model=MemberList, summary="List members")
