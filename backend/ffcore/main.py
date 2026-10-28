@@ -2,6 +2,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
+from ffcore.api import api_router
 from ffcore.core.audit import ensure_audit_partitions
 from ffcore.core.errors import install_error_handlers
 
@@ -15,6 +16,7 @@ async def lifespan(_: FastAPI):
 
 app = FastAPI(title="FFCore", lifespan=lifespan)
 install_error_handlers(app)
+app.include_router(api_router)
 
 
 @app.get("/healthz")
