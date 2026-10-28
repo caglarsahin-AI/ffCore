@@ -16,11 +16,11 @@ FROM base AS runtime
 RUN uv sync --frozen --no-dev --no-install-project
 COPY alembic.ini ./
 COPY alembic ./alembic
-COPY app ./app
+COPY ffcore ./ffcore
 RUN useradd --system --uid 10001 ffcore
 USER ffcore
 EXPOSE 8000
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "ffcore.main:app", "--host", "0.0.0.0", "--port", "8000"]
 
 FROM base AS tools
 RUN apt-get update \

@@ -1,3 +1,3 @@
-# app/api
+# ffcore/api
 
 Router'lar; paket başına dosya.

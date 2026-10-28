@@ -1,3 +1,3 @@
-# app/models
+# ffcore/models
 
 SQLAlchemy modelleri; paket başına dosya, __init__ paylaşımlı.
