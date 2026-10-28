@@ -36,9 +36,15 @@ def probe():
     async def measure(config, model_id, settings):
         return dims[model_id]
 
+    # Since 04a the application registers the real probe at import; restore it afterwards
+    # instead of leaving the driver without one for the tests that follow.
+    previous = providers._probes.get("local_flagembedding")
     providers.register_embedding_probe("local_flagembedding", measure)
     yield
-    providers.unregister_embedding_probe("local_flagembedding")
+    if previous is None:
+        providers.unregister_embedding_probe("local_flagembedding")
+    else:
+        providers.register_embedding_probe("local_flagembedding", previous)
 
 
 def _provider(root, project_ids, driver="ollama", domains=("model",), config=None):
@@ -110,7 +116,17 @@ def test_03a_10_embed_dim_mismatch_400(root, make_project, probe, pg):
     assert pg.execute("SELECT count(*) FROM models WHERE key = 'embed-small'").fetchone()[0] == 0
 
 
-def test_03a_10_probe_unavailable_409(root, make_project):
+@pytest.fixture
+def no_probe():
+    """The state before 04a registered its probe: the dimension cannot be measured."""
+    previous = providers._probes.get("local_flagembedding")
+    providers.unregister_embedding_probe("local_flagembedding")
+    yield
+    if previous is not None:
+        providers.register_embedding_probe("local_flagembedding", previous)
+
+
+def test_03a_10_probe_unavailable_409(root, make_project, no_probe):
     project = make_project()
     provider = _provider(root, [project], "local_flagembedding", ("embedding",), {})
     body = _model(provider, key="embed", category="embedding", model_id="BAAI/bge-m3")

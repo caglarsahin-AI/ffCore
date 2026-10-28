@@ -126,7 +126,7 @@ class KnowledgeBaseOut(BaseModel):
 
 
 class KnowledgeBaseList(BaseModel):
-    items: list[KnowledgeBaseOut]
+    data: list[KnowledgeBaseOut]
 
 
 # --- Documents ---
@@ -167,7 +167,7 @@ class DocumentOut(BaseModel):
 
 
 class DocumentList(BaseModel):
-    items: list[DocumentOut]
+    data: list[DocumentOut]
 
 
 class UploadOutcome(StrEnum):
@@ -184,7 +184,7 @@ class UploadedDocument(BaseModel):
 
 
 class UploadResult(BaseModel):
-    items: list[UploadedDocument]
+    data: list[UploadedDocument]
 
 
 class ReindexLayer(StrEnum):

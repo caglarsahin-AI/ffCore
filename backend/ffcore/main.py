@@ -10,6 +10,8 @@ from ffcore.core.config import get_settings
 from ffcore.core.errors import install_error_handlers
 from ffcore.core.readiness import router as readiness_router
 from ffcore.core.session import session_resolver
+from ffcore.knowledge.embed import probe_dimension
+from ffcore.services.providers import register_embedding_probe
 from ffcore.services import catalog_events
 from ffcore.services.litellm_reconcile import background_scheduler
 
@@ -17,6 +19,8 @@ log = logging.getLogger("ffcore.main")
 
 # Console sessions (03a); resolve_actor stays the single verification point (C2).
 register_credential_resolver(session_resolver)
+# 04a: the in-process embedding model measures its own dimension for 03a's model registration.
+register_embedding_probe("local_flagembedding", probe_dimension)
 
 
 @asynccontextmanager

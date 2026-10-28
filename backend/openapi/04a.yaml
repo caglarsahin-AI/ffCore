@@ -930,14 +930,14 @@ components:
       title: CheckStatus
     DocumentList:
       properties:
-        items:
+        data:
           items:
             $ref: '#/components/schemas/DocumentOut'
           type: array
-          title: Items
+          title: Data
       type: object
       required:
-      - items
+      - data
       title: DocumentList
     DocumentOut:
       properties:
@@ -1266,14 +1266,14 @@ components:
       title: KnowledgeBaseCreate
     KnowledgeBaseList:
       properties:
-        items:
+        data:
           items:
             $ref: '#/components/schemas/KnowledgeBaseOut'
           type: array
-          title: Items
+          title: Data
       type: object
       required:
-      - items
+      - data
       title: KnowledgeBaseList
     KnowledgeBaseOut:
       properties:
@@ -1711,14 +1711,14 @@ components:
       title: UploadOutcome
     UploadResult:
       properties:
-        items:
+        data:
           items:
             $ref: '#/components/schemas/UploadedDocument'
           type: array
-          title: Items
+          title: Data
       type: object
       required:
-      - items
+      - data
       title: UploadResult
     UploadedDocument:
       properties:

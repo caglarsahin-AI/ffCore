@@ -60,7 +60,32 @@ class Settings(BaseSettings):
     # separate (06a run_timeout_s).
     llm_call_timeout_s: int = Field(default=60, gt=0)
 
-    @field_validator("egress_allowlist", "allowed_internal_hosts", mode="before")
+
+    # --- 04a knowledge base ---
+    # Defaults are PayCore's measured values (KARARLAR "04a kararları", K-04a-0002).
+    vector_backend: Literal["pgvector", "qdrant"] = "pgvector"
+    qdrant_url: str | None = None
+    qdrant_api_key: SecretStr | None = None
+    # The one embedding model of this installation (P5); in-process FlagEmbedding (C10).
+    embed_model: str = "BAAI/bge-m3"
+    embed_batch_size: int = Field(default=64, gt=0)
+    rerank_model: str = "BAAI/bge-reranker-v2-m3"
+    rerank_min_score: float = Field(default=0.1, ge=0, le=1)
+    # Hybrid candidates handed to the reranker (and logged in kb_queries.candidates, C12).
+    retrieval_candidates: int = Field(default=30, gt=0)
+    # Deterministic stand-in models for tests (FAKE_EMBED=1); never a silent fallback: the
+    # setting is explicit and /readyz reports it.
+    fake_embed: bool = False
+    allowed_languages: CommaList = ["tr", "en"]
+    knowledge_storage_dir: str = "/data/storage"
+    convert_timeout_seconds: int = Field(default=600, gt=0)
+    convert_parallelism: int = Field(default=4, gt=0)
+    # Where the ingest worker reaches POST /internal/embed (the API loads the model, C10).
+    internal_api_url: str = "http://backend:8000"
+
+    @field_validator(
+        "egress_allowlist", "allowed_internal_hosts", "allowed_languages", mode="before"
+    )
     @classmethod
     def _split_commas(cls, value: object) -> object:
         if isinstance(value, str):
