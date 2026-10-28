@@ -94,7 +94,10 @@ async def list_projects(actor: UserActor, session: SessionDep):
     """Superadmins see every project; other users see the projects they are members of."""
     user = await session.get(User, UUID(actor.actor_id))
     query = select(Project).where(Project.deleted_at.is_(None)).order_by(Project.key)
-    if user is None or not user.is_superadmin:
+    # On behalf of a user (OBO): only the token's project, membership required (K-03a-0007).
+    if actor.via_service:
+        query = query.where(Project.id == UUID(actor.project_id))
+    if user is None or not user.is_superadmin or actor.via_service:
         query = query.join(ProjectMember, ProjectMember.project_id == Project.id).where(
             ProjectMember.user_id == UUID(actor.actor_id)
         )
@@ -284,7 +287,7 @@ async def update_member(
     member = await session.get(ProjectMember, (project_id, user_id))
     if member is None:
         raise not_found("member")
-    for field, value in body.model_dump(exclude_unset=True, exclude_none=True).items():
+    for field, value in body.model_dump(exclude_unset=True).items():
         setattr(member, field, value)
     await session.flush()
     return await _member_out(session, project_id, user_id)

@@ -2589,13 +2589,9 @@ components:
     MemberUpdate:
       properties:
         role:
-          anyOf:
-          - $ref: '#/components/schemas/Role'
-          - type: 'null'
+          $ref: '#/components/schemas/Role'
         access:
-          anyOf:
-          - $ref: '#/components/schemas/AccessMode'
-          - type: 'null'
+          $ref: '#/components/schemas/AccessMode'
       additionalProperties: false
       type: object
       title: MemberUpdate
@@ -2914,42 +2910,28 @@ components:
     ModelUpdate:
       properties:
         display_name:
-          anyOf:
-          - type: string
-            maxLength: 200
-            minLength: 1
-          - type: 'null'
+          type: string
+          maxLength: 200
+          minLength: 1
           title: Display Name
         category:
-          anyOf:
-          - $ref: '#/components/schemas/ModelCategory'
-          - type: 'null'
+          $ref: '#/components/schemas/ModelCategory'
         model_id:
-          anyOf:
-          - type: string
-            maxLength: 300
-            minLength: 1
-          - type: 'null'
+          type: string
+          maxLength: 300
+          minLength: 1
           title: Model Id
         capabilities:
-          anyOf:
-          - $ref: '#/components/schemas/ModelCapabilities'
-          - type: 'null'
+          $ref: '#/components/schemas/ModelCapabilities'
         input_types:
-          anyOf:
-          - items:
-              $ref: '#/components/schemas/InputType'
-            type: array
-          - type: 'null'
+          items:
+            $ref: '#/components/schemas/InputType'
+          type: array
           title: Input Types
         pricing:
-          anyOf:
-          - $ref: '#/components/schemas/ModelPricing-Input'
-          - type: 'null'
+          $ref: '#/components/schemas/ModelPricing-Input'
         limits:
-          anyOf:
-          - $ref: '#/components/schemas/ModelLimits'
-          - type: 'null'
+          $ref: '#/components/schemas/ModelLimits'
         reasoning_default:
           anyOf:
           - type: string
@@ -2961,26 +2943,18 @@ components:
           - type: 'null'
           title: Reasoning Default
         return_reasoning:
-          anyOf:
-          - type: boolean
-          - type: 'null'
+          type: boolean
           title: Return Reasoning
         upstream_api:
-          anyOf:
-          - type: string
-            enum:
-            - chat
-            - responses
-          - type: 'null'
+          type: string
+          enum:
+          - chat
+          - responses
           title: Upstream Api
         request_policy:
-          anyOf:
-          - $ref: '#/components/schemas/RequestPolicy'
-          - type: 'null'
+          $ref: '#/components/schemas/RequestPolicy'
         is_active:
-          anyOf:
-          - type: boolean
-          - type: 'null'
+          type: boolean
           title: Is Active
       additionalProperties: false
       type: object
@@ -3079,11 +3053,9 @@ components:
     ProjectUpdate:
       properties:
         name:
-          anyOf:
-          - type: string
-            maxLength: 200
-            minLength: 1
-          - type: 'null'
+          type: string
+          maxLength: 200
+          minLength: 1
           title: Name
         description:
           anyOf:
@@ -3306,11 +3278,9 @@ components:
     ProviderUpdate:
       properties:
         label:
-          anyOf:
-          - type: string
-            maxLength: 200
-            minLength: 1
-          - type: 'null'
+          type: string
+          maxLength: 200
+          minLength: 1
           title: Label
         description:
           anyOf:
@@ -3319,25 +3289,20 @@ components:
           - type: 'null'
           title: Description
         domains:
-          anyOf:
-          - items:
-              $ref: '#/components/schemas/ProviderDomain'
-            type: array
-            minItems: 1
-          - type: 'null'
+          items:
+            $ref: '#/components/schemas/ProviderDomain'
+          type: array
+          minItems: 1
           title: Domains
         config:
-          anyOf:
-          - additionalProperties: true
-            type: object
-          - type: 'null'
+          additionalProperties: true
+          type: object
           title: Config
           description: A secret field sent as "***" keeps its stored value.
         is_active:
-          anyOf:
-          - type: boolean
-          - type: 'null'
+          type: boolean
           title: Is Active
+          description: false is refused (409 provider_in_use) while an active model uses it.
       additionalProperties: false
       type: object
       title: ProviderUpdate
@@ -3507,21 +3472,15 @@ components:
     UserUpdate:
       properties:
         full_name:
-          anyOf:
-          - type: string
-            maxLength: 200
-            minLength: 1
-          - type: 'null'
+          type: string
+          maxLength: 200
+          minLength: 1
           title: Full Name
         is_active:
-          anyOf:
-          - type: boolean
-          - type: 'null'
+          type: boolean
           title: Is Active
         is_superadmin:
-          anyOf:
-          - type: boolean
-          - type: 'null'
+          type: boolean
           title: Is Superadmin
         superadmin_access:
           anyOf:

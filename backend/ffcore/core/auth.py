@@ -296,11 +296,10 @@ async def authorize(
         raise ApiError(404, "not_found_error", code, "Project not found.")
     if code is not None:
         await _audit_denied(request, actor, project_id, code, need)
-        message = (
-            "Your access mode is read-only."
-            if code == "read_only_access"
-            else "Your role does not allow this."
-        )
+        message = {
+            "read_only_access": "Your access mode is read-only.",
+            "obo_project_scope": "A call on behalf of a user is limited to the token's project.",
+        }.get(code, "Your role does not allow this.")
         raise ApiError(403, "permission_error", code, message)
     request.state.grant = grant
     return Actor(
@@ -336,9 +335,10 @@ async def _grant(actor: Actor, project_id: str | None) -> tuple[Grant | None, st
         project_uuid = uuid.UUID(project_id) if project_id else None
     except ValueError:
         return None, "insufficient_role" if project_id is None else "project_not_found"
-    # A service acting for a user stays inside the project its token names.
-    if actor.via_service and project_uuid is not None and actor.project_id != str(project_uuid):
-        return None, "project_mismatch"
+    # The project in an X-On-Behalf-Of token bounds the whole call (K-03a-0007, decision A):
+    # no tenant administration and no other project, whatever the user may do in the console.
+    if actor.via_service and (project_uuid is None or actor.project_id != str(project_uuid)):
+        return None, "obo_project_scope"
 
     async with db.session_scope() as session:
         user = await session.scalar(
@@ -352,7 +352,8 @@ async def _grant(actor: Actor, project_id: str | None) -> tuple[Grant | None, st
             )
             if live is None:
                 return None, "project_not_found" if user.is_superadmin else "insufficient_role"
-        if user.is_superadmin:
+        # Superadmin rights belong to the console session; under OBO only membership counts.
+        if user.is_superadmin and not actor.via_service:
             return Grant("admin", user.superadmin_access or "read", True), None
         if project_uuid is None:
             return None, "insufficient_role"

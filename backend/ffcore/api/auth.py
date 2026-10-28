@@ -58,18 +58,24 @@ async def _load_user(session: AsyncSession, actor: Actor) -> User:
     return user
 
 
-async def me_payload(session: AsyncSession, user: User) -> MeResponse:
-    rows = await session.execute(
+async def me_payload(
+    session: AsyncSession, user: User, obo_project: str | None = None
+) -> MeResponse:
+    """`obo_project`: a call on behalf of the user sees only that project and no superadmin
+    rights (K-03a-0007)."""
+    query = (
         select(ProjectMember.project_id, Project.key, ProjectMember.role, ProjectMember.access)
         .join(Project, Project.id == ProjectMember.project_id)
         .where(ProjectMember.user_id == user.id, Project.deleted_at.is_(None))
         .order_by(Project.key)
     )
+    if obo_project is not None:
+        query = query.where(Project.id == uuid.UUID(obo_project))
     memberships = [
         Membership(project_id=pid, project_key=key, role=role, access=access)
-        for pid, key, role, access in rows
+        for pid, key, role, access in await session.execute(query)
     ]
-    if user.is_superadmin:
+    if user.is_superadmin and obo_project is None:
         role, access = "admin", user.superadmin_access
     elif memberships:
         top = max(memberships, key=lambda m: ROLE_ORDER.index(m.role))
@@ -155,7 +161,8 @@ async def logout(
 
 @router.get("/me", response_model=MeResponse, summary="Current user, role and access mode")
 async def me(actor: Annotated[Actor, Depends(user_actor)], session: SessionDep):
-    return await me_payload(session, await _load_user(session, actor))
+    obo_project = actor.project_id if actor.via_service else None
+    return await me_payload(session, await _load_user(session, actor), obo_project)
 
 
 @router.post("/password", status_code=204, summary="Change own password")

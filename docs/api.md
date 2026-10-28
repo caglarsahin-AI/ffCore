@@ -93,6 +93,11 @@ The contract is `backend/openapi/03a.yaml`, rendered from the code
 (`python -m ffcore.api.openapi_export > openapi/03a.yaml`; a contract test fails when it drifts).
 Lists are `{"data": [...]}`. Changes after the draft are additive only.
 
+PATCH bodies: an omitted field is left as it is. An explicit `null` is accepted only where the
+schema says so (`UserUpdate.superadmin_access`, `ProjectUpdate.description`,
+`ProviderUpdate.description`, `ModelUpdate.reasoning_default`) and clears the value; for every
+other field `null` is a 422 `validation_error`.
+
 ### Sign-in and session
 
 | Endpoint | Notes |
@@ -136,6 +141,12 @@ A superadmin (`users.is_superadmin`) acts as `admin` in every project with its o
 | Audit with `project_id` | that project's `admin` |
 | Model catalog | any signed-in user |
 
+A service calling on behalf of a user (`X-On-Behalf-Of`) is bounded by the token's project for
+the whole call: the project list, memberships and `GET /auth/me` show only that project, only the
+user's membership there counts (superadmin rights do not apply), and tenant administration
+(users, providers, provider drivers, project create/delete, unscoped audit) or another project
+gives 403 `obo_project_scope`.
+
 Every mutation route depends on a role check with `write=True`, so `read` access gets 403
 `read_only_access`; a missing role gives 403 `insufficient_role`. Both denials are written to the
 audit trail before the response. A CI test fails if a mutation route lacks the `write` check
@@ -169,8 +180,9 @@ test never blocks saving. `bedrock` (needs SigV4 signing), `pgvector`, `local_fs
 `local_flagembedding` have no test and answer `supported: false`,
 `code: connection_test_unsupported`.
 
-A provider used by a live model cannot be deactivated or removed from that model's project
-(409 `provider_in_use`).
+A provider used by an active model cannot be deactivated, neither by `DELETE` nor by
+`PATCH {"is_active": false}` (409 `provider_in_use`; deactivate or delete the models first), and it
+cannot be removed from a project whose models use it.
 
 ### Models
 

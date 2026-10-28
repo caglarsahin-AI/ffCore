@@ -27,3 +27,20 @@ def test_03a_16_app_serves_every_draft_path():
 def test_03a_16_draft_text_is_english():
     # Application surface is English (K-INIT-0007): no Turkish letters in the contract.
     assert not re.search("[çğıöşüÇĞİÖŞÜ]", render())
+
+
+def test_03a_16_patch_bodies_advertise_null_only_where_accepted():
+    # Review r1 MAJOR-2: the contract must not offer null for fields that refuse it.
+    schemas = app.openapi()["components"]["schemas"]
+    advertised = set()
+    for name in ("UserUpdate", "ProjectUpdate", "MemberUpdate", "ProviderUpdate", "ModelUpdate"):
+        for field, spec in schemas[name]["properties"].items():
+            if {"type": "null"} in spec.get("anyOf", []):
+                advertised.add(f"{name}.{field}")
+            assert "default" not in spec, f"{name}.{field}: omitted is not the same as a default"
+    assert advertised == {
+        "UserUpdate.superadmin_access",
+        "ProjectUpdate.description",
+        "ProviderUpdate.description",
+        "ModelUpdate.reasoning_default",
+    }

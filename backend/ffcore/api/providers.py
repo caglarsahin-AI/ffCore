@@ -80,6 +80,20 @@ async def _before(session, provider_id: UUID, settings: Settings, **_) -> Provid
     return await provider_out(session, await _get(session, provider_id), settings)
 
 
+async def _ensure_unused(session, provider_id: UUID) -> None:
+    """Deactivation (DELETE or PATCH is_active=false) waits until no active model uses the
+    provider: otherwise those models would break silently at call time (ARCH-06)."""
+    used = await session.scalar(
+        select(Model.id).where(
+            Model.provider_id == provider_id, Model.deleted_at.is_(None), Model.is_active
+        )
+    )
+    if used is not None:
+        raise conflict(
+            "provider_in_use", "An active model uses this provider; deactivate the model first."
+        )
+
+
 async def _assign(session, provider_id: UUID, project_ids: list[UUID]) -> None:
     wanted = set(project_ids)
     live = set(
@@ -190,6 +204,8 @@ async def update_provider(
         stored = decrypt_json(provider.config_encrypted, settings)
         merged = drivers.merge_config(provider.driver, stored, changes.pop("config"))
         provider.config_encrypted = encrypt_json(merged, settings)
+    if changes.get("is_active") is False and provider.is_active:
+        await _ensure_unused(session, provider_id)  # same rule as DELETE (review r1 MAJOR-3)
     for field, value in changes.items():
         setattr(provider, field, value)
     await session.flush()
@@ -210,11 +226,7 @@ async def delete_provider(
 ) -> None:
     """409 `provider_in_use` while a model uses it."""
     provider = await _get(session, provider_id)
-    used = await session.scalar(
-        select(Model.id).where(Model.provider_id == provider_id, Model.deleted_at.is_(None))
-    )
-    if used is not None:
-        raise conflict("provider_in_use", "A model still uses this provider.")
+    await _ensure_unused(session, provider_id)
     provider.is_active = False
     publish_on_commit(session, CatalogChanged("provider", "deleted", str(provider.id)))
 

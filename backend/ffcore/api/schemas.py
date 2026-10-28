@@ -47,6 +47,22 @@ class Strict(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
 
+def _omitted_is_not_a_default(schema: dict[str, Any]) -> None:
+    for prop in schema.get("properties", {}).values():
+        prop.pop("default", None)
+
+
+class Patch(Strict):
+    """PATCH body: every field may be omitted and is then left as it is. Only fields typed
+    `T | None` accept an explicit null (it clears the value); for the others null fails the type
+    check with a 422, never a database error. Endpoints apply `model_dump(exclude_unset=True)`.
+
+    Fields are declared `name: T = Field(default=None)`: the None default only marks omission
+    (Pydantic does not validate defaults) and is removed from the JSON schema."""
+
+    model_config = ConfigDict(extra="forbid", json_schema_extra=_omitted_is_not_a_default)
+
+
 class ErrorDetail(BaseModel):
     message: str = Field(description="English, actionable, never contains secrets.")
     type: str = Field(description="authentication_error, permission_error, not_found_error, ...")
@@ -120,11 +136,11 @@ class UserCreate(Strict):
     )
 
 
-class UserUpdate(Strict):
-    full_name: str | None = Field(default=None, min_length=1, max_length=200)
-    is_active: bool | None = None
-    is_superadmin: bool | None = None
-    superadmin_access: AccessMode | None = None
+class UserUpdate(Patch):
+    full_name: str = Field(default=None, min_length=1, max_length=200)
+    is_active: bool = Field(default=None)
+    is_superadmin: bool = Field(default=None)
+    superadmin_access: AccessMode | None = Field(default=None)
 
 
 class UserList(BaseModel):
@@ -150,10 +166,10 @@ class ProjectCreate(Strict):
     description: str | None = Field(default=None, max_length=2000)
 
 
-class ProjectUpdate(Strict):
+class ProjectUpdate(Patch):
     """The project key cannot be changed (it is part of every model name)."""
 
-    name: str | None = Field(default=None, min_length=1, max_length=200)
+    name: str = Field(default=None, min_length=1, max_length=200)
     description: str | None = Field(default=None, max_length=2000)
 
 
@@ -176,9 +192,9 @@ class MemberCreate(Strict):
     access: AccessMode = AccessMode.edit
 
 
-class MemberUpdate(Strict):
-    role: Role | None = None
-    access: AccessMode | None = None
+class MemberUpdate(Patch):
+    role: Role = Field(default=None)
+    access: AccessMode = Field(default=None)
 
 
 class MemberList(BaseModel):
@@ -269,14 +285,17 @@ class ProviderCreate(Strict):
     is_active: bool = True
 
 
-class ProviderUpdate(Strict):
-    label: str | None = Field(default=None, min_length=1, max_length=200)
+class ProviderUpdate(Patch):
+    label: str = Field(default=None, min_length=1, max_length=200)
     description: str | None = Field(default=None, max_length=2000)
-    domains: list[ProviderDomain] | None = Field(default=None, min_length=1)
-    config: dict[str, Any] | None = Field(
+    domains: list[ProviderDomain] = Field(default=None, min_length=1)
+    config: dict[str, Any] = Field(
         default=None, description='A secret field sent as "***" keeps its stored value.'
     )
-    is_active: bool | None = None
+    is_active: bool = Field(
+        default=None,
+        description="false is refused (409 provider_in_use) while an active model uses it.",
+    )
 
 
 class ProviderProjectsUpdate(Strict):
@@ -414,19 +433,19 @@ class ModelCreate(Strict):
     is_active: bool = True
 
 
-class ModelUpdate(Strict):
-    display_name: str | None = Field(default=None, min_length=1, max_length=200)
-    category: ModelCategory | None = None
-    model_id: str | None = Field(default=None, min_length=1, max_length=300)
-    capabilities: ModelCapabilities | None = None
-    input_types: list[InputType] | None = None
-    pricing: ModelPricing | None = None
-    limits: ModelLimits | None = None
-    reasoning_default: Literal["none", "low", "medium", "high"] | None = None
-    return_reasoning: bool | None = None
-    upstream_api: Literal["chat", "responses"] | None = None
-    request_policy: RequestPolicy | None = None
-    is_active: bool | None = None
+class ModelUpdate(Patch):
+    display_name: str = Field(default=None, min_length=1, max_length=200)
+    category: ModelCategory = Field(default=None)
+    model_id: str = Field(default=None, min_length=1, max_length=300)
+    capabilities: ModelCapabilities = Field(default=None)
+    input_types: list[InputType] = Field(default=None)
+    pricing: ModelPricing = Field(default=None)
+    limits: ModelLimits = Field(default=None)
+    reasoning_default: Literal["none", "low", "medium", "high"] | None = Field(default=None)
+    return_reasoning: bool = Field(default=None)
+    upstream_api: Literal["chat", "responses"] = Field(default=None)
+    request_policy: RequestPolicy = Field(default=None)
+    is_active: bool = Field(default=None)
 
 
 class ModelList(BaseModel):
