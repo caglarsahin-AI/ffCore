@@ -1,8 +1,9 @@
 import { expect, test } from "@playwright/test";
 
+import { fixture } from "./fixtures";
 import { signIn } from "./support";
 
-test.beforeEach(async ({ context, baseURL }) => signIn(context, baseURL!));
+test.beforeEach(async ({ page }) => signIn(page, fixture().superadmin.email));
 
 test("test_10a_1_theme_switch: system, light, dark; kept after reload; no flash", async ({ page }) => {
   // Record the html class at the first animation frame, i.e. before the first paint.
