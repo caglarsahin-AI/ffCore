@@ -6,7 +6,9 @@ import psycopg
 import pytest
 from fastapi import Depends, FastAPI, Request
 from fastapi.testclient import TestClient
+from sqlalchemy import Column, MetaData, String, Table
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import registry
 
 from ffcore.core import db
 from ffcore.core.audit import audited, ensure_audit_partitions
@@ -246,3 +248,81 @@ def test_03b_1_valid_obo_actor_is_user_in_audit(pg):
     assert response.status_code == 200
     rows = _rows(pg, "thing.obo")
     assert [(row[0], row[1], row[2]) for row in rows] == [("user", USER, PROJECT)]
+
+
+# --- review r1 MAJOR-3: failures anywhere in the managed transaction are audited -------------
+
+_probe_metadata = MetaData()
+_unique_probe = Table(
+    "t03b_unique_probe", _probe_metadata, Column("code", String, primary_key=True)
+)
+
+
+class _UniqueProbe:
+    def __init__(self, code: str) -> None:
+        self.code = code
+
+
+registry().map_imperatively(_UniqueProbe, _unique_probe)
+
+
+def _failure_app() -> TestClient:
+    app = FastAPI()
+    install_error_handlers(app)
+
+    @app.post("/duplicate")
+    @audited("probe.duplicate", "probe")
+    async def duplicate(
+        request: Request,
+        actor: Annotated[Actor, Depends(user_actor)],
+        session: Annotated[AsyncSession, Depends(db.get_session)],
+    ):
+        # Pending ORM object; the constraint fails only when the decorator flushes.
+        session.add(_UniqueProbe("dup"))
+        return {"id": "dup", "api_key": "dummy-not-secret-probe"}
+
+    async def broken_before(**_):
+        raise RuntimeError("cannot load before state")
+
+    @app.post("/before-fails")
+    @audited("probe.before", "probe", load_before=broken_before)
+    async def before_fails(
+        request: Request,
+        actor: Annotated[Actor, Depends(user_actor)],
+        session: Annotated[AsyncSession, Depends(db.get_session)],
+    ):
+        return {"id": "never"}
+
+    return TestClient(app, raise_server_exceptions=False)
+
+
+def test_03b_5_flush_failure_audited_and_rolled_back(pg):
+    pg.execute("CREATE TABLE IF NOT EXISTS t03b_unique_probe (code text PRIMARY KEY)")
+    pg.execute("INSERT INTO t03b_unique_probe VALUES ('dup') ON CONFLICT DO NOTHING")
+    response = _failure_app().post("/duplicate")
+    assert response.status_code == 500
+    rows = _rows(pg, "probe.duplicate")
+    assert [row[4] for row in rows] == ["error"]
+    assert rows[0][6] is None  # no content for a failed mutation
+    assert "dummy-not-secret" not in response.text
+    assert pg.execute("SELECT count(*) FROM t03b_unique_probe").fetchone()[0] == 1
+
+
+def test_03b_5_load_before_failure_audited(pg):
+    response = _failure_app().post("/before-fails")
+    assert response.status_code == 500
+    assert [row[4] for row in _rows(pg, "probe.before")] == ["error"]
+
+
+def test_03b_5_audit_write_failure_is_loud(pg, monkeypatch):
+    import ffcore.core.audit as audit_module
+
+    async def unavailable(entry):
+        raise ConnectionError("audit store unavailable")
+
+    monkeypatch.setattr(audit_module, "write_event_detached", unavailable)
+    client = _failure_app()
+    with pytest.raises(audit_module.AuditWriteError) as exc:
+        TestClient(client.app).post("/before-fails")
+    assert isinstance(exc.value.__cause__, ConnectionError)
+    assert exc.value.__notes__ == ["original failure: RuntimeError"]

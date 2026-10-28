@@ -55,7 +55,9 @@ resource_id, outcome (success|denied|error), before, after, request_id, ip`.
 - Keys containing `password`, `key`, `token` or `secret` (any depth, any case) and the listed
   `redact_fields` are stored as `***`. `audit_payload=False` stores the event without content.
 - Success is written in the mutation's transaction; denied and error outcomes are written in their
-  own transaction, so they survive the rollback.
+  own transaction, so they survive the rollback. This covers failures anywhere in the managed
+  transaction (before-state load, endpoint, flush, commit). If the audit event itself cannot be
+  written, the request fails with `AuditWriteError`; it is never swallowed.
 - The table is append-only: UPDATE, DELETE and TRUNCATE fail for every database role. Rows live in
   monthly partitions (`audit_events_YYYY_MM`, UTC); the backend creates this and next month's
   partition on startup. Retention (03c) removes whole months by dropping partitions.
@@ -75,4 +77,10 @@ All outbound HTTP (webhooks, tool endpoints, MCP upstreams, channels, sources) g
 Loopback, private (RFC 1918, CGNAT, unique-local), link-local and other non-public addresses are
 refused (`egress_private_address`). The check runs on the address that is dialed, at connect time,
 so DNS rebinding cannot bypass it. Redirects are followed one hop at a time and checked again
-(at most 5). Environment proxy variables are ignored. Errors name only scheme and host.
+(at most 5). A redirect to another origin (scheme, host or port differs, including https to http)
+drops `Authorization`, `Proxy-Authorization`, `Cookie`, `X-Api-Key`, `X-On-Behalf-Of` and any
+`*-token`, `*-key`, `*-secret` header, and logs a `redirect_cross_origin` event with the target
+origin and the dropped header names (never values); same-origin redirects keep them.
+`request()` takes only `method, url, headers, params, content, json`: redirect handling, transport,
+proxy, TLS verification and timeouts cannot be changed per call (`TypeError`). The host rules run
+again at connect time. Environment proxy variables are ignored. Errors name only scheme and host.

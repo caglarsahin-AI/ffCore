@@ -4,7 +4,8 @@
 `request: Request`, `actor` (from `resolve_actor` or a role dependency) and `session`
 (`db.get_session`). On success the decorator writes the event in the endpoint's transaction and
 commits both together, so endpoints under `@audited` do not commit themselves. A denial (401/403)
-or an error rolls the endpoint's work back and records the outcome in a separate transaction, so
+or an error anywhere in that managed transaction (before-state load, endpoint, flush, commit)
+rolls the endpoint's work back and records the outcome in a separate transaction, so
 the record survives the rollback.
 """
 
@@ -31,6 +32,10 @@ MASK = "***"
 # A key containing any of these (case-insensitive) is masked, at any depth.
 SECRET_KEY_MARKERS = ("password", "key", "token", "secret")
 _REQUIRED_PARAMS = ("request", "actor", "session")
+
+
+class AuditWriteError(RuntimeError):
+    """The audit event itself could not be stored; never swallowed (fail-loud)."""
 
 
 @dataclass(frozen=True)
@@ -190,18 +195,29 @@ def audited(
                     ip=ip,
                 )
 
-            before = _jsonable(await load_before(**kwargs)) if load_before else None
+            before = None
             try:
+                # Everything the decorator manages is inside this boundary: a failure while
+                # loading the before state, in the endpoint, while serialising, at flush (a
+                # pending constraint violation) or at commit is recorded the same way.
+                if load_before is not None:
+                    before = _jsonable(await load_before(**kwargs))
                 result = await endpoint(*args, **kwargs)
+                after = _jsonable(result)
+                await write_event(session, entry("success", before=before, after=after))
+                await session.commit()
             except Exception as exc:
                 await session.rollback()
                 status = _status_of(exc)
                 outcome = "denied" if status in (401, 403) else "error"
-                await write_event_detached(entry(outcome, before=before))
+                try:
+                    await write_event_detached(entry(outcome, before=before))
+                except Exception as audit_exc:
+                    error = AuditWriteError(f"audit event for {action} could not be written")
+                    # Type only: the original message may carry SQL parameters or other secrets.
+                    error.add_note(f"original failure: {type(exc).__name__}")
+                    raise error from audit_exc
                 raise
-            after = _jsonable(result)
-            await write_event(session, entry("success", before=before, after=after))
-            await session.commit()
             return result
 
         return wrapper
