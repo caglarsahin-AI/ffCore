@@ -31,6 +31,8 @@ from ffcore.services.litellm_reconcile import (
 )
 
 SENTINEL = "dummy-not-secret-SENTINEL-4242"
+# Synthetic personal data a provider might echo back from the prompt (never a real person).
+PERSON = "Deneme Kisi 10000000146"
 INTERNAL = "sk-dummy-not-secret-internal-key"
 MASTER = "sk-dummy-not-secret-master-key"
 TARGET = ModelTarget("p.chat-default", "11111111-1111-1111-1111-111111111111")
@@ -101,7 +103,10 @@ def _sse(*events, status=200):
 
 LEAKY_ERROR = {
     "error": {
-        "message": f"upstream said Authorization: Bearer {SENTINEL} api_key='{SENTINEL}'",
+        "message": (
+            f"upstream said Authorization: Bearer {SENTINEL} api_key='{SENTINEL}'"
+            f" while answering: {PERSON}"
+        ),
         "type": "server_error",
         "code": "500",
     }
@@ -154,6 +159,8 @@ def test_01_r1_2_model_error_text_not_logged(settings, stand, caplog, status):
     with caplog.at_level(logging.DEBUG), pytest.raises(ModelUnavailable) as err:
         _chat(settings)
     assert SENTINEL not in caplog.text and SENTINEL not in str(err.value)
+    assert PERSON not in caplog.text and PERSON not in str(err.value)
+    assert "upstream_status=" in caplog.text and "error_type=server_error" in caplog.text
     assert "c0ffee00-0000-4000-8000-000000000001" in caplog.text  # reference for LiteLLM's own log
 
 
@@ -162,6 +169,7 @@ def test_01_r1_2_client_4xx_error_text_not_in_exception(settings, stand, caplog)
     with caplog.at_level(logging.DEBUG), pytest.raises(LiteLLMError) as err:
         _chat(settings)
     assert SENTINEL not in str(err.value) and SENTINEL not in caplog.text
+    assert PERSON not in str(err.value) and PERSON not in caplog.text
     assert err.value.status == 400
 
 
@@ -174,7 +182,8 @@ def test_01_r1_2_management_error_text_not_in_exception(settings, stand):
 
     with pytest.raises(LiteLLMError) as err:
         anyio.run(go)
-    assert SENTINEL not in str(err.value) and "500" in str(err.value)
+    assert SENTINEL not in str(err.value) and PERSON not in str(err.value)
+    assert "upstream_status=500" in str(err.value)
 
 
 def test_01_r1_2_scheduler_logs_no_exception_text(caplog):

@@ -83,14 +83,14 @@ _CALL_ID = re.compile(r"^[0-9a-fA-F-]{8,64}$")
 
 def _token(value: Any) -> str:
     """A short enum-like value from an untrusted body: lower case, [a-z0-9_.-] only."""
-    return _TOKEN.sub("", str(value).lower())[:40] or "-"
+    return _TOKEN.sub("", str(value).lower())[:40] or "unknown"
 
 
 def safe_error(response: httpx2.Response) -> str:
     """What may be logged about an error answer: status, the error's type and code as short
     tokens, and LiteLLM's call id (the full text is in LiteLLM's own, internal log). The message
     is never used: providers echo requests, keys and user text into it (r1 MAJOR-2)."""
-    kind = code = "-"
+    kind = code = "unknown"
     try:
         error = response.json().get("error")
     except (ValueError, AttributeError):
@@ -98,7 +98,7 @@ def safe_error(response: httpx2.Response) -> str:
     if isinstance(error, dict):
         kind, code = _token(error.get("type")), _token(error.get("code"))
     call_id = response.headers.get("x-litellm-call-id", "")
-    call_id = call_id if _CALL_ID.match(call_id) else "-"
+    call_id = call_id if _CALL_ID.match(call_id) else "unknown"
     return (
         f"upstream_status={response.status_code} error_type={kind} error_code={code}"
         f" call_id={call_id}"
@@ -112,6 +112,17 @@ class ModelUnavailable(ApiError):
     def __init__(self, reason: str) -> None:
         super().__init__(
             503, "api_error", "model_unavailable", "The model is not available right now."
+        )
+        self.reason = reason
+
+
+class ModelNotFound(ApiError):
+    """No active model with this key in the project, or the project is deleted (permanent: 404,
+    not a retry signal; r1 MINOR-1, K-01-0012)."""
+
+    def __init__(self, model_key: str, reason: str) -> None:
+        super().__init__(
+            404, "not_found_error", "model_not_found", f"No active model {model_key} in project."
         )
         self.reason = reason
 
@@ -198,14 +209,11 @@ async def resolve_target(session: AsyncSession, project_id: Any, model_key: str)
     found = {}
     for model_id, key, project_key, project_deleted in rows:
         if project_deleted is not None:
-            # Its models leave LiteLLM at the next reconcile; until then nothing calls them
-            # (r1 MINOR-1, K-01-0010: model_unavailable).
-            raise ModelUnavailable("project_deleted")
+            # Its models leave LiteLLM at the next reconcile; until then nothing calls them.
+            raise ModelNotFound(model_key, "project_deleted")
         found[key] = (str(model_id), project_key)
     if model_key not in found:
-        raise ApiError(
-            404, "not_found_error", "model_not_found", f"No active model {model_key} in project."
-        )
+        raise ModelNotFound(model_key, "no_active_model")
     model_id, project_key = found[model_key]
     if model_key == DEFAULT_KEY and FALLBACK_KEY in found:
         fallback_id, _ = found[FALLBACK_KEY]

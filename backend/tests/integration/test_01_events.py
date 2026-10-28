@@ -111,7 +111,8 @@ def test_01_r1_deleted_project_leaves_litellm(
 
     with pytest.raises(ApiError) as err:
         asyncio.run(resolve())
-    assert err.value.code == "model_unavailable" and err.value.reason == "project_deleted"
+    assert err.value.status_code == 404 and err.value.code == "model_not_found"
+    assert err.value.reason == "project_deleted"
     report = run_reconcile(database_url, llm_settings)
     assert name in report.deleted
     assert name not in litellm_models(llm_settings)
