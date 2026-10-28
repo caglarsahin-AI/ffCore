@@ -3,9 +3,9 @@
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
 - Oturum kimliği: ffcore-inceleyici-20261028-0203
-- Aktif paket: review-kuyrugu (03a-r2 ONAY)
+- Aktif paket: 08-lite-r2
 - Durum: ACTIVE
-- Son okunan: koordinator K-03a-0011 (2026-10-28 15:04); ACK R-03a-0004
+- Son okunan: koordinator K-10ab-0013 + K-08lite-0006; sonuçlar R-08lite-0003 / R-10ab-0004 / R-01-0003 (2026-10-28 19:13)
 
 ## Mesajlar
 
@@ -232,3 +232,130 @@ Aynı gerçek DB/HTTP probe'ları: dört non-null PATCH artık422 OpenAI gövdes
 Bağımsız iki profil lint + unit/contract134'er + integration94'er passed; format95 temiz. Smoke açık yerel stack'te passed; migration round-trip ve OpenAPI kontratları tekrar geçti. state/ baz diff'i boş; diff --check passed. Ayrı güvenlik turu raporda; gerçek satıcı/Next tarayıcı ve temiz-volume tam stack bağımsız tekrarı NOT_RUN, geçti sayılmadı.
 HEAD sabit, ağaç temiz; worktree remove exit0, --force yok. --rm test/probe konteynerleri ve benzersiz fixture DB'leri temiz, işçi stack'i açık. Kaynak edit/commit/push, gerçek secret ve dış sistem erişimi yok. Kanal takibi 10 dakika; yeni görev bekleniyor.
 
+
+### R-10ab-0001 · 2026-10-28 16:52 · → koordinator · ACK
+Paket: 10a-bağlama   Cevap: K-10ab-0007
+Tam SHA 7229da702f843c44d320bea519def2f356f46572 yerel commit nesnesi olarak doğrulandı. .worktrees/review-10ab-r1 detached worktree'sinde yalnız bu SHA incelenecek; baz591aac3. Oturum/çerez, C6 rewrite, seçili proje yetkisi, hata eşlemesi, C13/FOLLOWUP-44, generated API ve gerçek stack Playwright odakta; güvenlik turu ayrı raporda.
+Koordinatör kabulleri (msw yok, liste ekranları, FOLLOWUP-66/67, Lighthouse/profil/backend test sınırları) korunacak. Kendi proje adı ve geçici fixture kullanılır; eski kullanıcı node_modules volume'ları silinmez. Komut izin sistemi eskalasyonları gerekebilir; soru penceresi yok.
+
+### R-10ab-0002 · 2026-10-28 17:39 · → koordinator · REVIEW-SONUC
+Paket: 10a-bağlama   Cevap: K-10ab-0007
+İncelenen tam SHA: 7229da702f843c44d320bea519def2f356f46572. Karar: DUZELT; merge-ready değil. Rapor: state/reviews/10a-binding-r1.md. BLOCKER 0, MAJOR 1, MINOR 1.
+MAJOR-1: MemberForm users sorgusu ve ProjectSwitcher projects sorgusu hata/pending durumunu işlemiyor; data??[] başarısızlığı boş seçeneklere dönüştürüyor (ARCH-06). Gerçek oturumlu Chromium'da yalnız bu sorgulara 503 enjeksiyonu: users yalnız Choose a user, projects yalnız placeholder, hata kodu/ayrıntısı yok. Hata/gerçek boş liste ayrımı ve negatif test gerekli.
+MINOR-1: ListState query 401 yanıtını mesaj yapıyor, /login'e yönlendirmiyor; mutasyon yolu yönlendiriyor. Probe providers401 sonrası /providers kaldı; auth/me tam sayfa 401 yolu doğru, yetki aşımı değil.
+Bağımsız Node20 lint/tip/check:api passed; 11 dosya47unit passed (7,30sn); kendi temiz gerçek backend stack'inde Playwright48 passed (1,8dk), 14axe ve iki tema PNG dahil. Gerçek browser cookie HttpOnly/Secure/Strict; JS görmüyor. Bilinmeyen ana liste hatası Details'ta kod+metin gösteriyor. FOLLOWUP-44 tamam. state/ baz diff'i boş; diff --check passed.
+Koordinatör kabulleri ve NOT_RUN'lar korunuyor; ayrı güvenlik turu raporda. Sapma8 önce-kırmızı kanıtı yok, geçmişe dönük geçti sayılmadı; sapma9 ara commit'lere onay yok, final SHA kapıları bağımsız geçti.
+Tam HEAD sabit, ağaç temiz; worktree remove exit0, --force yok. Kendi stack down-v, probe ve geçici volume'lar temiz; kullanıcı ffcore-10a-nm/pw korunuyor. Kod edit/commit/push ve dış sistem erişimi yok. Yeni SHA ile REVIEW-ISTEK bekleniyor.
+Kullanıcı kanal takibini Windows zamanlayıcısıyla kalıcılaştırmayı araştırmamı istedi; yetki denemesinde tetikleyicisiz geçici görev oluşturulup kaldırıldı. Asıl 10dk görevi henüz kurulmadı; kuruldu diye raporlanmıyor.
+
+### R-WATCH-0001 · 2026-10-28 17:44 · → koordinator · DURUM
+Paket: kanal-takibi   Cevap: K-10ab-0009
+Kullanıcının önceki "10 dk olarak ayarla ve yap" ve bu turdaki Windows zamanlayıcı kontrolü talebiyle yerel görev kuruldu: FFCore-Inceleyici-Kanal-10dk. Schedule servisi Running; tetikleyicisiz yetki denemesi oluşturulup silindi. Asıl görev 10dk (PT10M), bitiş süresi yok, Interactive/Limited, eşzamanlı ikinci çalışma IgnoreNew, 2dk çalışma sınırı; gizli PowerShell.
+Yalnız state/kanal/koordinator.md içindeki inceleyici adresli mesaj içeriği değişirse mevcut bu oturuma codex queue ile zil; görev/talimat yalnız kanal dosyasından, ID tekrarı uygulanmaz. Değişiklik yokken model çağrısı yok. Kaynak dışı yerel dosyalar: .worktrees/channel-watch-inceleyici/{watch.ps1,config.json,status.json,watch.log}. Secret/.env yok.
+İlk görev çalıştırması LastTaskResult=0; gerçek K-10ab-0009 değişikliğinde QUEUED ve CLI makbuzu alındı. Sonraki tetikleme 17:52 İstanbul. Kuyruğa kabul kanıtlı; mevcut aktif turun ardından zilin modele teslimi henüz doğrulanmadı, çalıştı diye sayılmadı. Makine açık ve aynı Windows kullanıcı oturumu açık olmalı; IDE/yerel daemon erişilebilirliği gerekir.
+K-10ab-0009 okundu, yeni REVIEW-ISTEK yok; r2 bekleniyor. 10a-binding r1 raporu ve temizlik tamam.
+
+### R-WATCH-0002 · 2026-10-28 17:43 · → koordinator · DURUM
+Paket: kanal-takibi   Cevap: K-10ab-0009 / R-WATCH-0001
+ZAMANLAYICI-TESLIM-TESTI 20261028 bu mevcut oturuma yeni mesaj olarak ulaştı; manuel codex queue → model teslimi doğrulandı. Kanaldaki inceleyici adresli mesajlar tekrar tarandı; son K-10ab-0009, yeni REVIEW-ISTEK yok; aynı ID tekrar uygulanmadı. Yerel teslim kanıtı .worktrees/channel-watch-inceleyici/delivery-test.json.
+Windows görevinin ilk çalışması QUEUED makbuzlu; düzenli 10dk tetikleme teslimi ayrıca izlenecek. Manuel teslim testi, henüz gerçekleşmemiş periyodik tetikleme yerine geçirilmedi. Sonraki planlı kontrol 17:52 İstanbul.
+
+### R-WATCH-0003 · 2026-10-28 17:44 · → koordinator · DURUM
+Paket: kanal-takibi   Cevap: R-WATCH-0001 / R-WATCH-0002
+Windows görevinin ilk çalıştırmasından gelen Yerel zamanlayici zili bu oturuma ulaştı; makbuz 01a182f6-2eb6-70d3-ad60-fd6ca1f2f268 için görev → queue → mevcut oturum teslimi doğrulandı, yerel status DeliveryVerified=true. Değişiklik olmayan kontroller bu teslim kanıtını korur; yeni kuyrukta false olur.
+Kanal tekrar kontrol edildi; son adresli mesaj K-10ab-0009, yeni REVIEW-ISTEK yok; işlenen ID tekrar uygulanmadı. Bu, görevin elle ilk başlatmasının teslim kanıtıdır; ilk periyodik 10dk tetiklemesi 17:52 İstanbul, henüz gerçekleşmiş sayılmadı.
+
+### R-WATCH-0004 · 2026-10-28 17:52 · → koordinator · DURUM
+Paket: kanal-takibi   Cevap: K-INIT-0009 / R-WATCH-0003
+İlk periyodik kontrol 17:52:12 İstanbul'da çalıştı; makbuz 01a182ff-4d6a-7170-9743-73254a3d5bc3 zili bu oturuma ulaştı. 10dk tetikleme → kanal kontrolü → queue → mevcut model oturumu zinciri doğrulandı.
+Kanal okundu: yeni doğrudan REVIEW-ISTEK yok, K-10ab-0009 tekrar uygulanmadı. K-INIT-0009 tümü duyurusu alındı; disk sorununda kendi başıma prune/silme yok, review stack'leri bitince down-v. Aktif inceleme yok; r2 bekleniyor.
+Watcher küçük düzeltmesi: adresli metnin sonundaki boş satırlar hash'ten çıkarıldı (başka alıcıya eklenen mesaj yalancı zil üretmesin); tumu duyuruları da kapsandı. Okunan mevcut içerik yeni normalize baseline olarak kaydedildi; görev aralığı 10dk kaldı.
+
+### R-WATCH-0005 · 2026-10-28 18:12 · → koordinator · DURUM
+Paket: review-kuyrugu   Cevap: K-INIT-0010 / K-INIT-0011
+DURAKLADIM, çalışan komut yok, stack: inceleyici review stack'leri kapalı (son review-10ab-r1 down-v ile temizlendi). Yeni Docker build/compose up/uv lock başlatılmayacak; mevcut başka oturum stack'lerine dokunulmuyor. Docker gerektiren doğrulama için K-INIT-0012 DEVAM bekleniyor; kanal takibi yerel dosya/Windows göreviyle sürüyor.
+ENV-74 bildirimi alındı: sonraki review derleme/up için FFCORE_VERSION=0.0.0-review-<paket>; .env.test değiştirilmez, komut kanıtında etiket görünür. Korunacak volume varsa down v'siz ve PR notu kuralı kaydedildi. Yeni REVIEW-ISTEK yok; önceki ID'ler tekrar uygulanmadı.
+18:12 periyodik zil bu oturuma ulaştı; son makbuz 01a18311-ed7e-7270-bbf0-544c14a94db7. Koordinatörün disk ölçümleri bağımsız tekrar doğrulanmadı; Docker'a ek yük oluşturulmadı.
+
+### R-WATCH-0006 · 2026-10-28 18:32 · → koordinator · DURUM
+Paket: review-kuyrugu   Cevap: K-INIT-0012
+DEVAM bildirimi alındı; Docker doğrulama bekleyişi kalktı. Açık inceleyici stack'i veya yarım review yok; yeni tam SHA ile REVIEW-ISTEK bekleniyor. Başka oturum stack'i başlatılmadı. Sonraki review komutlarında FFCORE_VERSION=0.0.0-review-<paket> kuralı korunacak.
+Host disk ölçümü koordinatör bildirimi; bağımsız doğrulanmadı. Önceki ID'ler tekrar uygulanmadı; 10dk kanal takibi sürüyor. Son zil makbuzu 01a18323-dd54-72f2-a2ed-392d77e26ab7 bu oturuma ulaştı.
+
+### R-08lite-0001 · 2026-10-28 18:43 · → koordinator · ACK
+Paket: 08-lite   Cevap: K-08lite-0005
+Tam SHA 21812317c05093658b88a8b0c7bfff0dba7ceb52 yerel commit nesnesi olarak doğrulandı. .worktrees/review-08lite-r1 detached worktree'sinde yalnız bu SHA incelenecek; baz591aac3. Güvenlik turu zorunlu: servis kimliği, fail-closed/monitor, Redis run kapsamı/TTL, maskeli olaylar, politika CRUD/ACL/audit, C4 ve kategori veri eşitliği odakta.
+Kendi proje adı review-08lite-r1, FFCORE_VERSION=0.0.0-review-08lite kullanılacak; güvenli Docker testleri ve gerekirse izin sistemi eskalasyonu. Koordinatör kapsam kabulleri korunur. 10a-bağlama r2 gelirse önceliği uygulanır; soru penceresi yok.
+
+### R-01-0001 · 2026-10-28 18:43 · → koordinator · ACK
+Paket: 01   Cevap: K-01-0008
+Tam SHA fe4ab55b090a12119ca7d8f2cd4db68a31ee5429 yerel commit nesnesi olarak doğrulandı; istek kuyruğa alındı. Sıra: 08-lite, araya gelirse10a-bağlama r2, sonra01. Başlayınca .worktrees/review-01-r1 detached worktree ve FFCORE_VERSION=0.0.0-review-01; ayrı güvenlik turu yapılacak. Henüz 01 koduna inceleme/onay verilmedi.
+
+### R-08lite-0002 · 2026-10-28 18:48 · → koordinator · KARAR-GEREK
+Paket: 08-lite   Cevap: K-08lite-0005
+Yerleşik guardrail'in pii_policy_key=default referansı için politika kararı gerekiyor. SHA2181231 service.resolve_policy, guardrail default satırı yoksa BUILTIN_DEFAULT nesnesini doğrudan döndürüyor; resolve_pii'yi çağırmıyor. Gerçek geçici DB/API probe: PII default satırı yaratıldı (201, builtin=false), PERSON için sentetik custom pattern; doğrudan PII paneli1 bulgu, aynı key'li guardrail paneli0 bulgu/action=allow. Kaydedilen proje PII default'u yerleşik zincirde kullanılmıyor.
+A (önerim): yerleşik zincir de referans verilen default PII'yi proje satırından çözsün; yoksa sürümlü builtin PII. Etki: proje admin'inin görünür default PII ayarı gerçekten tüm o referanslarda uygulanır; guardrail zincirinin builtin/sürüm özelliği korunur.
+B: yerleşik zincir her zaman kod içindeki PII sürümüne sabit kalsın. Etki: PII default satırı yalnız kaydedilmiş guardrail zincirlerinde geçerlidir; bu fark API/docs/UI'de açık olmalı, aynı key override vaadi daraltılmalı. Bu sınırın amaçlandığı doğrulanmadı; kendim kapatmıyorum.
+A pozisyonum: aynı pii_policy_key referansı zincirin stored/builtin oluşuna göre farklı anlam taşımamalı. Bu konu dışında kesin probe'lar: builtin monitor'da sonraki pii olay önizlemesi sentetik parolayı DB ve response events'e ham yazıyor; farklı a.b/ab e-posta aynı token'a çöküyor; gerçek Redis'te forward map yayınlandıktan sonra reverse yazılmadan ikinci çağrı token döndürebiliyor. Bunlar ayrıca bulgu olacak. Lint+llmaas180unit/107int passed; airgap sürüyor.
+
+### R-10ab-0003 · 2026-10-28 18:50 · → koordinator · ACK
+Paket: 10a-bağlama   Cevap: K-10ab-0010
+Tam SHA 628d4164ba6c7b593e3e0f58167a92b0f68a2482 yerel commit nesnesi olarak doğrulandı; r2 delta isteği alındı. Şu an08-lite kapanışı; ardından .worktrees/review-10ab-r2 detached worktree'de yalnız bu SHA, r1 probe'ları + QueryError üç durum + 401/safeNext incelenecek. Sonra01. FFCORE_VERSION=0.0.0-review-10ab; r1 temiz alanlar yeniden açılmaz.
+
+### R-08lite-0003 · 2026-10-28 18:52 · → koordinator · REVIEW-SONUC
+Paket: 08-lite   Cevap: K-08lite-0005 / K-08lite-0006
+İncelenen tam SHA: 21812317c05093658b88a8b0c7bfff0dba7ceb52. Karar: DUZELT; merge-ready değil. Rapor: state/reviews/08-lite-r1.md. BLOCKER0, MAJOR4, MINOR0.
+MAJOR-1: builtin monitor zincirinde sonraki pii önizlemesi sentetik tam parolayı DB ve response events'e ham yazıyor; ayrıca tek harfli local içeren a@example.org mask_value'da hiç değişmiyor ve matches.value'da tam saklanıyor. Olay gizlilik tabanı bütün zincir ve kısa değerlerde korunmalı, gerçek DB/response negatifleri gerekli.
+MAJOR-2: _identity nokta/tire silerek farklı a.b/ab e-postalarını aynı <<PII_1>> token'ına çökertiyor; detokenize ikinciyi birinciyle değiştiriyor, unresolved boş. Ham değer ayrışması + gerçek round-trip gerekli.
+MAJOR-3: gerçek Redis'te forward map yayınlanıp reverse hset bekletilince ikinci çağrı token döndürüyor ama lookupNone. Eşleme/sayaç/TTL atomik olmalı; paralel aynı/farklı değer testi gerekli.
+MAJOR-4: kayıtlı default PII custom kategorisi yerleşik guardrail'de yok sayılıyor (doğrudan panel1 bulgu, zincir0/allow); K-08lite-0006 A esas, builtin zincir de resolve_pii ile proje satırını çözmeli.
+Bağımsız iki profil lint + unit/contract180'er + integration107'şer passed; format116 temiz. Smoke backend/LiteLLM/Langfuse200; 13a20testOK, eski/yeni100kayıt kategori dışında birebir aynı; kalite TC9/9 telefon9/9 IBAN6/6 email8/8 kart5/5, P95 0,40ms. state/ baz diff'i boş, diff --check passed; ayrı güvenlik turu/NOT_RUN'lar raporda.
+HEAD sabit, ağaç temiz; kendi stack down-v ve worktree remove exit0, --force yok. Fixture DB ve race Redis hash temiz. Kapanış imaj etiketleri ffcore/backend:0.0.0-review-08lite ve ffcore/tools:0.0.0-review-08lite sizde temizlenebilir; yeni build/dangling üretmedim. Kod edit/commit/push ve dış sistem erişimi yok.
+Sıradaki10a-bağlama r2, sonra01; ACK'leri verilmiş. Kanal takibi10dk.
+
+### R-10ab-0004 · 2026-10-28 18:58 · → koordinator · REVIEW-SONUC
+Paket: 10a-bağlama   Cevap: K-10ab-0010
+İncelenen tam SHA: 628d4164ba6c7b593e3e0f58167a92b0f68a2482. Karar: DUZELT; merge-ready değil. Rapor: state/reviews/10a-binding-r2.md. BLOCKER0, MAJOR1, MINOR0; r1 iki bulgu kapandı.
+Yeni MAJOR-1: safeNext TAB/LF/CR'ı reddetmiyor. '/'+TAB+'/backend:8000/healthz' kabul ediliyor; URL ayrıştırıcı kontrol karakterini kaldırıp başka origin yapıyor. Gerçek Chromium'da /login?next=%2F%09%2Fbackend%3A8000%2Fhealthz + sahte hesapla giriş sonrası origin http://backend:8000, yol/healthz oldu (konsol localhost:3000). Yalnız kendi localbackend hedeflendi, dış istekler engellendi; credential sızıntısı iddia edilmedi.
+Ham kontroller reddedilmeli ve parse sonrası origin kontrol edilmeli; TAB/LF/CR ve kodlama varyantları negatifleri + gerçek login testi gerekli. Mevcut altı unsafe değer testi atlıyor.
+R1 aynı users/projects503 probe'ları artık kod görünür/seçici0; gerçek backend token iptali401 → /login?next= → yeniden girişte aynı sayfa passed. Bağımsız Node20 lint/tip/check:api, Vitest55 (13dosya,8,48sn), gerçek stack Playwright51 (1,2dk,axe/iki tema dahil) passed. state/ baz diff'i boş; diff --check passed. Ayrı güvenlik turu/NOT_RUN'lar raporda.
+HEAD sabit, ağaç temiz; kendi stack down-v, probe/volume'lar temiz, worktree remove exit0 --force yok. Kullanıcı node_modules volume'ları korundu. ffcore/backend:0.0.0-review-10ab etiketi kapanış temizliği sizde; yeni build/dangling yok. Kod edit/commit/push ve dış sistem erişimi yok.
+Şimdi01 r1 başlıyor (.worktrees/review-01-r1, önceden ACK R-01-0001).
+
+### R-01-0002 · 2026-10-28 19:07 · → koordinator · DURUM
+Paket: 01   Cevap: K-01-0008 / K-10ab-0013
+01 r1 sürüyor; kendi review-01-r1 stack'i ve ffcore/backend:0.0.0-review-01 / ffcore/tools:0.0.0-review-01 etiketleri aktif, bunları kapanış sonucuna kadar koruyun (08-lite ve10ab kapanış etiketleri temizlenebilir). llmaas203unit/116int ve lint passed; airgap sürüyor.
+Kesin probe'lar: gerçek yerel HTTP 503 hata metnindeki sentetik credential değeri ffcore.litellm_client logunda ham; partial SSE EOF terminal/usage olmadan ve in-band error chunk'lı akış exception olmadan başarı sayılıyor, error chunk'ı ham yield ediliyor. Ayrı PG probe: Project.deleted_at dolduktan sonra desired_state hâlâ1model/problemler0, resolve_target başarılı; proje silme yolu katalog olayı yayınlamıyor. Rapor hazırlanıyor, kaynak edit yok.
+
+### R-01-0003 · 2026-10-28 19:13 · → koordinator · REVIEW-SONUC
+Paket: 01   Cevap: K-01-0008
+İncelenen tam SHA: fe4ab55b090a12119ca7d8f2cd4db68a31ee5429. Karar: DUZELT; merge-ready değil. Rapor: state/reviews/01-r1.md. BLOCKER0, MAJOR3, MINOR1.
+MAJOR-1: ensure_internal_key ham LITELLM_INTERNAL_KEY'i GET /key/info query'sine koyuyor; gerçek pinli LiteLLM access logunda317 satırda aynı tam dummy anahtar var. Ham key basılmadı. Ölçülen çözüm adayı: SHA256 kimliğiyle key/info200, aynı digest bearer olarak /v1/models401. Credential URL'ye gitmemeli; gerçek log negatifleri gerekli, testlerdeki raw-key GET'leri de düzeltin.
+MAJOR-2: client _raise_for_status upstream error.message'i300 karakter ham logluyor; management LiteLLMError/scheduler da ham detail taşıyor. Gerçek yerel HTTP503 + SafeOutboundClient probe'unda sentetik credential logda bulundu. Sabit çağıran hata mesajı logu güvenli yapmıyor; iki hata yolu için temizleme/kodlu kayıt ve negatif test gerekli.
+MAJOR-3: non-empty partial SSE + terminal olmadan EOF başarı sayılıyor; in-band error JSON chunk'ı ham yield edilip exception olmadan tamamlanıyor. İki gerçek HTTP wire probe'unda raisedNone, finishNone/usageNone; ikincide hata işareti ham chunk'ta. Semantik tamamlanma ve in-band güvenli hata denetimi + negatifler gerekli.
+MINOR-1: Project.deleted_at dolunca desired_state hâlâ1model/problemler0, resolve_target başarılı. Project silme katalog olayı yayınlamıyor. Aktif proje filtresi ve silme uzlaştırması önerilir; mevcut facade kullanıcı ACL'si aşıldı iddiası yok. Touch-zone genişlemesi gerekiyorsa karar sizde.
+Bağımsız iki profil lint + unit/contract203'er + integration116'şar passed (llmaas22,13/132,01sn; airgap25,64/134,91sn). Smoke backend/LiteLLM/Langfuse200; gerçek proxy seed/curl, Config0/at-rest ve fallback testleri passed. Eski03b51 ve stream18 koruma passed; state/ baz diff'i boş, diff --check passed. Ayrı güvenlik turu/NOT_RUN'lar raporda.
+HEAD sabit, ağaç temiz; kendi stack down-v, fixture DB'ler temiz; worktree remove exit0 --force yok. ffcore/backend:0.0.0-review-01 ve ffcore/tools:0.0.0-review-01 artık temizlenebilir. Kod edit/commit/push, main checkout ve dış sistem erişimi yok.
+Güncel kuyruk boş; yeni SHA'lı REVIEW-ISTEK bekleniyor. 10dk Windows kanal takibi sürüyor.
+
+### R-10ab-0005 · 2026-10-28 19:14 · → koordinator · ACK
+Paket: 10a-bağlama   Cevap: K-10ab-0014
+Tam SHA e9fe396678f84fe2b074a1babdefa8b2cf4de240 yerel commit nesnesi olarak doğrulandı. 01 r1 bitti (R-01-0003); şimdi .worktrees/review-10ab-r3 detached worktree'de yalnız bu SHA incelenecek. R2 açık yönlendirme probe'u tekrar, raw/kodlu kontrol karakterleri ve normalize yol sınırı; sabit referans origin kabulü korunacak. R1/r2 temiz alanları yeniden açılmayacak. FFCORE_VERSION=0.0.0-review-10ab, kendi geçici stack/fixture'lar.
+
+### R-08lite-0004 · 2026-10-28 19:17 · → koordinator · ACK
+Paket: 08-lite   Cevap: K-08lite-0009
+Tam SHA 7a7dc35e156b17f72e567dad3bfbf584f4f7a898 yerel commit nesnesi olarak doğrulandı; r2 delta isteği alındı. 01 r1 bitti; 10a-bağlama r3'ü zaten başlattım, son hedefli tarayıcı koşusu sürüyor. Ardından .worktrees/review-08lite-r2 detached worktree'de yalnız bu SHA; dört bulgunun kapanışı ve r1 probe'ları, masked_value/C4, Lua atomik eşleme ve default PII referansı incelenecek. Sıra serbestliği K-08lite-0009 ile uyumlu; temiz alanlar yeniden açılmaz.
+
+### R-10ab-0006 · 2026-10-28 19:19 · → koordinator · REVIEW-SONUC
+Paket: 10a-bağlama   Cevap: K-10ab-0014
+İncelenen tam SHA: e9fe396678f84fe2b074a1babdefa8b2cf4de240. Karar: ONAY / merge-ready, yalnız bu SHA. Rapor: state/reviews/10a-binding-r3.md. BLOCKER0, MAJOR0, MINOR0; r2 açık yönlendirme kapandı.
+Raw/kodlu C0/DEL/ters bölü reddi, parse sonrası origin, yalnız path/query/hash ve normalize//reddi kaynakta doğrulandı. Bağımsız70negatif+3normalpozitif passed; r2 TAB girdisi artık '/'. R2 tam saldırı URL'si gerçek girişte konsol origin'inde kaldı. Sabit referans kabulü korundu.
+Bağımsız Node20 lint/tip/check:api passed; Vitest76/13dosya (10,03sn); hedefli gerçek backend Playwright9 passed (50,9sn): login/session/query503, token iptali401+next+tekrar giriş ve açık yönlendirme. R3 full52 bağımsız tekrar NOT_RUN; delta için9hedefli koşu, r2 full51 geçmiş kanıt. Ayrı güvenlik turu ve sınırlar raporda; state/ baz diff'i boş, diff --check passed.
+HEAD sabit, ağaç temiz; kendi stack down-v, geçici volume'lar ve worktree temizlendi, remove exit0 --force yok. Kullanıcı önbellekleri korundu. ffcore/backend:0.0.0-review-10ab artık temizlenebilir. Kod edit/commit/push ve dış sistem erişimi yok.
+Şimdi08-lite r2 (ACK R-08lite-0004) başlıyor; aynı mesaj ID'leri tekrar uygulanmadı.
+
+### R-08lite-0005 · 2026-10-28 19:27 · → koordinator · DURUM
+Paket: 08-lite   Cevap: K-08lite-0009
+R1'in dört probe'u artık doğru: parola/tek harf email DB+response sızıntısı yok; a.b/ab ayrı token ve tam round-trip; default özel desen zincirde1bulgu; gerçek Redis100paralel/20değer →20token, bütün anlık reverse doğru, TTL/run sınırı doğru. llmaas184unit/110int passed; airgap184unit passed, intsonunda.
+Yeni MAJOR adayı doğrulandı: _preview her seen bulgusu için aynı değerin bütün tekrarlarını yeniden ekliyor; yinelenen aynı email n kez görülünce n²span, resolve_overlaps içindeki kept taramasıyla daha da büyüyor. Aynı1CPU/512MB ağsız konteynerde git blob'u doğrulanmış r1engine,640tekrar/10.240karakteri0,345sn'de bitirdi. R2 aynıgirdi12sn alarmıyla kesildi (bitmedi); yalnız320tekrar/5.120karakter5,481sn. Girdi200.000sınırınınçokaltında; senkronpreview asynceventloop'u tutuyor. Sentetik veri; alarmyalnızreviewkonteynerinde.
+Maskesizolayakabuldönüş yok; gereksizyinelenenspanlar tekilleşmeli/önizlemeörtüşmeleri sınırlımaliyetleişlenmeli, maskegüvencesikorunmalı. Nihai DUZELT raporuna yeniMAJORolarakyazıyorum; kaynakdeğiştirmedim.

@@ -2,10 +2,10 @@
 
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
-- Oturum kimliği: ffcore-isci-a-03a
-- Aktif paket: 03a (K-03a-0001)
+- Oturum kimliği: ffcore-isci-a-04a
+- Aktif paket: 04a (GOREV K-04a-0001)
 - Durum: ACTIVE
-- Son okunan: K-03a-0012 (2026-10-28 14:58)
+- Son okunan: K-04a-0008 (2026-10-28 19:26)
 
 ## Mesajlar
 
@@ -122,7 +122,7 @@ Uyarı (dağılım): bu oturumun kullanıcı talimatı "kuyruktaki sonraki paket
 
 ### A-00-0021 · 2026-10-28 08:24 · → koordinator · HANDOFF
 Paket: 00   Cevap: K-00-0019
-- Durum: MERGED (main bb634e4, r2 ONAY 1f5fbc6). Compose stack kapatıldı: `docker compose -p 00-repo-skeleton --env-file .env.test down -v` exit 0; kalan konteyner 0, volume 0. Lease RETIRED.
+- Durum: ACTIVE
 - Tam sonraki adım: yeni isci-a oturumu K-03b-0001 GOREV'ini alır (bu oturum kullanıcı talimatı gereği 03b'ye geçmedi). 03b için geçiş notları:
   - Python paket kökü `backend/ffcore/` (eski `backend/app/`); import `from ffcore...`; uvicorn `ffcore.main:app`; dağıtım `ffcore`, `uv_build==0.10.12`; ruff `known-first-party = ["ffcore"]`. Bağımlılık eklerken `cd backend && uv lock --offline` (olmazsa ağ gerekiyor demektir, DURUM yaz); tools imajını `docker compose --env-file .env.test build tools` ile yenile.
   - Araçlar yalnızca Docker'da (K-00-0003/0005): `docker compose --env-file .env.test run --rm tools make lint|test|smoke`; iki profil `-e DEPLOY_PROFILE=llmaas|airgap`. Stack: `docker compose --env-file .env.test up -d --wait` (ilk açılış ~1,5 dk). `.env` oluşturma.
@@ -225,7 +225,7 @@ r2 DUZELT uygulandı. Branch feat/03b-audit-egress @ 8b83a856c6ab91a315cc1b3c134
 ### A-03b-0015 · 2026-10-28 12:31 · → koordinator · HANDOFF
 Paket: 03b   Cevap: K-03b-0016
 ### 03b · ffcore-isci-a-03b · 2026-10-28 12:31
-- Durum: MERGED (main 2804d03, r3 ONAY 8b83a85). Stack kapatıldı: `docker compose -p 03b-audit-egress --env-file .env.test down -v` exit 0; kalan konteyner 0, volume 0. Lease RETIRED.
+- Durum: ACTIVE
 - Tam sonraki adım: 03a yeni isci-a oturumunda (00i paycoreLLM merge'i sonrası). 03a'ya geçiş notları:
   - Kimlik: `ffcore/core/auth.py` `resolve_actor()` tek doğrulama noktası (C2). 03a kullanıcı oturumunu `register_credential_resolver(fn)` ile ekler: `async fn(request, settings) -> Actor | None`; yeni doğrulama fonksiyonu yazılmaz. `Actor(actor_type="user", actor_id, project_id)`; `may_impersonate` servis hesabı ve 03c `impersonate` kapsamlı anahtar içindir. Bilinmeyen kimlik 401; `X-On-Behalf-Of` yetkisiz aktörden gelirse yok sayılır + `impersonation_denied`. OBO imzası `sign_on_behalf_of(user_id, project_id, audience, settings)`; her çağrıda yeniden imzala, 300 s.
   - `@audited(action, resource_type, redact_fields=[...], audit_payload=True, load_before=...)`: endpoint `request`, `actor`, `session` adlı parametreleri bildirir (yoksa TypeError); başarıda decorator commit eder, endpoint commit etmez; hata (load_before → commit) → rollback + ayrı transaction'da error/denied; audit yazımı da düşerse `AuditWriteError`. `require_role` reddi dependency'de olduğu için decorator'a ulaşmaz: 03a denied kaydını `write_event_detached(AuditEntry(...))` ile yazar (brief kabulü `outcome=denied`).
@@ -342,3 +342,152 @@ Branch feat/03a-identity-catalog @ 6ede802064a8fbbac9ababc9080d1df71976ebb8 (baz
 Paket: 03a   Cevap: K-03a-0012
 Alındı: commit yok, stack ayakta. HANDOFF taslağı güncellendi (OBO proje sınırı ve `via_service` listelerde daraltma, `Patch` tabanı ve `exclude_unset`, `_ensure_unused`/provider_in_use). r2 sonucunu bekliyorum.
 
+### A-03a-0017 · 2026-10-28 15:16 · → koordinator · HANDOFF
+Paket: 03a   Cevap: K-03a-0013
+### 03a · ffcore-isci-a-03a · 2026-10-28 15:16
+- Durum: ACTIVE
+- Tam sonraki adım: 03a'yı kullanan paketler için geçiş notları:
+  - 01 (litellm): katalog olaylarına `ffcore.services.catalog_events.subscribe(fn)` ile abone ol; `fn(CatalogChanged(kind, action, resource_id, project_id, litellm))` commit sonrası senkron çağrılır; istisna atmamalı, işi kuyruğa (arq) almalı (FOLLOWUP-56). `litellm=False` olan modeller (embedding) LiteLLM'e yazılmaz. Sanal ad `ffcore.models.catalog.litellm_name(project_key, model_key)`. Sağlayıcı config'i `ffcore.core.secrets.decrypt_json(provider.config_encrypted, settings)`; alan adları `ffcore.services.providers.DRIVERS`. Statik katalog `deploy/seed/model_catalog.yaml` (yalnız kaynaklı kayıtlar; llmaas kayıtları 01 seed'iyle `source` + `as_of`). Yükleme `python -m ffcore.cli load-model-catalog --path ...` (migrate servisi).
+  - 04a: `local_flagembedding` için `ffcore.services.providers.register_embedding_probe("local_flagembedding", async fn(config, model_id, settings) -> int)`; kayıt yokken embedding modeli 409 `embedding_probe_unavailable`, boyut ≠ `EMBED_DIM` 400.
+  - 08-lite ve diğer uçlar: yetki `Depends(require_role(min_role, write=...))` (proje, yol parametresi `project_id`) ya da `require_superadmin(write=...)`; mutasyonda `write=True` zorunlu (CI taraması `tests/unit/test_03a_write_flag.py`, istisnalar login/logout/password). Proje dışı parametreyle yetki için `core.auth.authorize(request, actor, project_id, need)`. Mutasyon `@audited`; silme gibi cevapsız uçta `resource_id: Annotated[str, Depends(path_resource("x_id"))]`.
+  - 10a-bağlama: sözleşme `backend/openapi/03a.yaml` (koddan üretilir, sapma testi var) → `frontend/mocks/openapi-03a.yaml`. Oturum çerezi `ffcore_session` (HttpOnly, Strict, Secure); `GET /api/v1/auth/me` → `{user, role, access, memberships[]}`; 403 kodları `read_only_access`, `insufficient_role`, `cross_origin_forbidden`; `CONSOLE_ORIGINS` önyüz origin'ini içermeli. İlk kullanıcı: `create-superadmin` CLI (şifre stdin).
+  - Review r1 kuralları (6ede802): OBO çağrısı token'ın projesiyle sınırlı; tenant uçları ve başka proje 403 `obo_project_scope`, superadmin OBO altında yükselmez (yeni uçlar `require_role`/`require_superadmin`/`authorize` kullanırsa kural kendiliğinden gelir; `user_actor` kullanan ve liste döndüren uçlar `actor.via_service` ise OBO projesine daraltmalı). PATCH şemaları `Patch` tabanından: non-null alan `name: T = Field(default=None)` (atlanabilir, null 422), nullable alan `T | None`; uç `model_dump(exclude_unset=True)` kullanır, `exclude_none` değil. Sağlayıcı pasifleştirme (DELETE ya da PATCH is_active=false) aktif model varken 409 `provider_in_use` (`_ensure_unused`).
+  - Test fikstürleri: `tests/integration/conftest.py` `app`, `client_factory(email)`, `make_user(superadmin=..., memberships=...)`, `make_project()`, `audit_rows()`; sahte ayarlar `tests/dummy.py`.
+  - Ortam: FastAPI 0.162 router'ları `_IncludedRouter` olarak iç içe tutar (route taraması `original_router`'a inmeli). Alembic geri alma `03a@-1` (asla `03a@base`).
+- Değişen dosyalar: state/pr/03a.md "Değişen dosyalar" (51 dosya).
+- Koşan testler / kalan: make lint, make test 134 ve test-int 94 iki profilde, smoke (6ede802); alembic döngüsü (b578ac0); main'de koordinatör smoke + lint / kalan NOT_RUN: gerçek satıcı testleri, gerçek embed probe (04a), tarayıcı + Next rewrite (10a-bağlama).
+- Kararlar: K-03a-0002 (S1-S6 A), K-03a-0007 (OBO sınırı A), K-03a-0009 (r1), KARARLAR "03a kararları", FOLLOWUP-56, FOLLOWUP-57 (iki Alembic head, dalga merge'ü).
+- Blocker'lar: yok.
+- Commit edilmemiş durum: yok. Stack kapatıldı: `docker compose -p 03a-identity-catalog --env-file .env.test down -v` exit 0; kalan konteyner 0, volume 0. Worktree ve branch koordinatörce kaldırıldı.
+- Branch ve son commit: feat/03a-identity-catalog (silindi) @ 6ede802064a8fbbac9ababc9080d1df71976ebb8 → main 591aac3.
+
+### A-04a-0001 · 2026-10-28 15:53 · → koordinator · DURUM
+Paket: 04a   Cevap: K-04a-0000
+DURUM: OKUMA-TAMAM (yeni oturum ffcore-isci-a-04a; lease ACTIVE). Temel okuma A-INIT-0001 ile aynı (gruplar 1-8); bu oturumda yeniden tarandı: WORK_QUEUE, BLOCKERS 46-58, KARARLAR "03a kararları" ve "04a başlangıç ve PayCore kodu terfisi", koordinatör kanalı K-04a-0000 dahil, A-03a-0017 ve A-03b-0015 HANDOFF; brief plan/04 tamamı; bağımlı Teslimatlar 00, 00i, 01, 03 (03a/03b), 13.
+Durum: 04a için sana adresli GOREV (K-04a-0001), branch ve worktree henüz yok; claim, plan ve kod yok. GOREV gelince ACK → rg ile semboller (ffcore + paycoreLLM referans dosyaları, okuma yasağı korunur) → state/pr/04a.md → DURUM: PLANNED.
+Plan için şimdiden görülen brief iç çelişkileri (karar istemiyor, planda varsayımla işlenecek):
+(1) Brief 04a başlığı "KnowledgeStore DuckDB + silver dosyalarını sarar, ffcore içinde"; KARARLAR "04a başlangıç" (2): ffcore yalnız arayüz + Postgres gerçekleştirmesi, DuckDB bağdaştırıcısı paycoreLLM uzantısı. KARARLAR kazanır; brief DRIFT kaydı gerekebilir.
+(2) Pipeline adım 4 OCR "PaddleOCR tr (Tesseract değil)" der, aynı paragrafta "taranmış PDF Tesseract (tur+eng)". KARARLAR/PLAN 2d PaddleOCR der; planda PaddleOCR varsayılacak.
+(3) Kabul "pgvector ↔ Qdrant exact ilk 5 eşitliği" (R3.5) brief metninde 04b, taslak GOREV her iki sürücüyü 04aya koyuyor; GOREV hangisini 04a kabulüne aldığını netleştirsin (migrate-vectors 04b olarak kalıyor).
+
+### A-04a-0002 · 2026-10-28 16:06 · → koordinator · ACK
+Paket: 04a   Cevap: K-04a-0001 / K-04a-0000
+GOREV alındı; lease ACTIVE (ffcore-isci-a-04a). Worktree C:/ai_paycore/ffcore/.worktrees/feat/04a-knowledge-core 21d9ba1 üzerinde doğrulandı. Üç cevap not edildi: KARARLAR kazanır (DRIFT-59, ffcore paycore_llm import etmez), PaddleOCR tr (DRIFT-60), R3.5 exact ilk-5 04a kabulünde (migrate-vectors ve sayım eşitliği 04b).
+Sıra: rg ile semboller (ffcore + paycoreLLM referans dosyaları; .env, data/**, eval/results/** okunmaz) → state/pr/04a.md (uyarlandı tablosu taslağı, bağımlılıklar sürümleriyle, dilimler, üç felsefe sorusu, kabul → test, durma koşulları) → DURUM: PLANNED. Onay sonrası ilk commit backend/openapi/04a.yaml, DURUM ile bildirilir.
+
+### A-04a-0003 · 2026-10-28 16:16 · → koordinator · DURUM
+Paket: 04a   Cevap: K-04a-0001
+DURUM: PLANNED. Plan: C:/ai_paycore/ffcore/state/pr/04a.md (semboller ffcore + paycoreLLM referansı, kapsam/kapsam dışı, dosyalar, "uyarlandı: kaynak → hedef" tablosu 17 satır ölçülmüş değerleriyle, sözleşme/profil, kabul → test 1-20 + C5, migration 04a, geri alma, durma koşulları, üç felsefe sorusu, 12 varsayım, dilim 0-7). Onaysız kod yok.
+Referans taramasında bulunan, KARARLAR cümlesinden farklı ölçülmüş değerler: PayCore parçalama min 400 / max 600 token, overlap yok; embed batch 64 (KARARLAR "chunk 400/60" diyor). S2'de.
+Çelişkiler (varsayım olarak işlendi, DRIFT önerisi): (1) brief embedding_dimension_mismatch, 03a kodu embed_dim_mismatch → kod; (2) /kb/{id} yerine /projects/{project_id}/knowledge-bases/{kb_id} (require_role deseni); (3) PayCore cp1254 errors="replace" kullanıyor, brief yasaklar → katı kod çözme + failed/encoding_undecodable; (4) brief "iki sürücüde aynı BM25" vs C5 "Qdrant sparse, pgvector BM25" → C5.
+Kararlar A-04a-0004'te (S1-S5).
+
+### A-04a-0004 · 2026-10-28 16:16 · → koordinator · KARAR-GEREK
+Paket: 04a   Cevap: -
+Ayrıntı ve etkiler state/pr/04a.md "Koordinatör kararı isteyen sorular"da; önerim hepsinde A.
+S1 bağımlılık [C]: A PayCore uv.lock sürümleri (FlagEmbedding 1.4.2, torch 2.14.0 CPU, transformers 4.57.6, docling 2.125.0, pymupdf/pymupdf4llm 1.28.2, paddleocr 2.10.0 + paddlepaddle 3.3.1, extract-msg 0.56.1, beautifulsoup4 4.15.0, qdrant-client 1.12.2, pgvector, arq) + qdrant/qdrant:v1.11.3 digest pinli; sentence-transformers doğrudan yok (FlagReranker) / B PaddleOCR 04b'ye / C Docling yerine pymupdf4llm+python-docx.
+S2 parçalama: A PayCore ölçülmüş 400/600/overlap 0, batch 64 (brief ve KARARLAR DRIFT) / B brief 400/60/512, 32 / C KB başına ayar.
+S3 R3.5 düzeyi: A VectorStore dense-only exact ilk 5 + ACL filtresi iki sürücüde / B uçtan uca hibrit.
+S4 gerçek model testleri: A FAKE_EMBED varsayılan, -m models + make test-models VERIFIED için zorunlu / B tüm takım gerçek modelle.
+S5 touch-zone ek: A main.py (/readyz, warmup, probe), api/openapi_export.py, backend/Dockerfile, api/internal.py, docs/api.md / B /readyz /api/v1 altında, Dockerfile değişmez.
+
+### A-04a-0005 · 2026-10-28 16:18 · → koordinator · ACK
+Paket: 04a   Cevap: K-04a-0002
+Alındı: S1-S5 A, çelişki kararları (DRIFT-63/64/65), Alembic depends_on 03a_0001. IMPLEMENTING; dilim 0 (OpenAPI taslağı 04a.yaml, önce kırmızı sözleşme testi) başlıyor, bitince DURUM.
+
+### A-04a-0006 · 2026-10-28 16:21 · → koordinator · KARAR-GEREK
+Paket: 04a   Cevap: K-04a-0002
+S1 listesinde eksik: belge yükleme (multipart) için FastAPI `python-multipart` ister; uv.lockta yok (FastAPI Form/File tanımı kurulu değilken route tanımında hata verir, dilim 0ın OpenAPI taslağı da buna bağlı).
+- A (önerim): `python-multipart` (güncel kararlı pin, uv lock ile) runtimea eklenir. Etki: FastAPInin resmi multipart yolu (ARCH-09), küçük saf Python paket.
+- B: yükleme ham `application/octet-stream` gövdesiyle, dosya başına bir istek, ad başlıkta. Etki: bağımlılık yok ama brief "multipart, çoklu dosya" ister; 10b yükleme ekranı istek başına dosya yollar.
+Cevaba kadar dilim 0 kodunu A ile yazıyorum, commit etmiyorum.
+
+### A-04a-0007 · 2026-10-28 16:26 · → koordinator · DURUM
+Paket: 04a   Cevap: K-04a-0002 / K-04a-0003
+Dilim 0 tamam (OpenAPI taslağı): commit 68dcc23555fda9298db010821ea016c340d10731 (feat/04a-knowledge-core, push yok). Sözleşme: backend/openapi/04a.yaml (13 işlem: KB CRUD, belge yükle/liste/getir/sil, reindex, search [X-Run-Id başlığı], test-query, POST /internal/embed, GET /readyz); şemalar backend/ffcore/knowledge/schemas.py; route'lar 501 not_implemented iskeleti, rol bağımlılıkları yerinde (okuma analyst, belge/reindex analyst+write, KB CRUD admin+write).
+Kanıt: önce kırmızı (test_04a_20_* 6/6 failed), sonra yeşil; tools'ta make lint 0, unit+contract 140 passed (llmaas ve airgap). openapi/03a.yaml bayt aynı (exporter paket başına taslak üretiyor, test_04a_20_03a_draft_unchanged).
+Not: search, test-query ve internal_embed write taraması istisnasına eklendi (tests/unit/test_03a_write_flag.py, gerekçeli yorum): POST ama okuma, read modunda açık kalmalı; /internal/embed yalnız servis hesabı. python-multipart 0.0.32 (PyPI güncel).
+Tüketiciler (05a/06a/10b) bu SHA'daki 04a.yaml'ı kullanabilir; değişiklik bundan sonra additive. Sıradaki: dilim 1 (veri modeli + migration 04a + KnowledgeStore + PgVectorStore).
+
+### A-04a-0008 · 2026-10-28 16:52 · → koordinator · DURUM
+Paket: 04a   Cevap: -
+Dilim 1 tamam: commit 661a26e2bcbdbfec2bc113fd0ee815b94e2a6165 (68dcc23 üstüne). Migration 04a_0001 (dal 04a, depends_on 03a_0001): knowledge_bases, documents, attachments, chunks (vector(EMBED_DIM) + HNSW cosine, generated turkish tsvector + GIN), kb_queries, ingest_gate_stats görünümü; KnowledgeStore protokolü + PgKnowledgeStore; VectorStore (C5) + PgVectorStore (ACL sorguda, exact mod).
+Kanıt: tools make lint 0; unit+contract 143 ve integration 104 passed, llmaas ve airgap; alembic temiz DB'de upgrade heads → downgrade 04a@-1 → upgrade heads, hepsi 0. alembic heads: 03a_0001 (effective head), 03b_0001, 04a_0001.
+Bildirmem gereken iki şey:
+(1) Dilim 0 (68dcc23) bir 03a entegrasyon testini kırmıştı: test_03a_2_read_mode_get_parity her GET'i tarıyor, 04a iskeletleri 501 dönüyor. Dilim 0'da yalnız unit+contract koşmuştum, test-int değil; hata benim. 661a26e'de düzeltildi: 03a parity testi /readyz (süreç durumu, rol yok) ve 04a knowledge-bases yollarını atlıyor; 04a GET eşitliği dilim 6'da kendi testinde (test_04a_read_mode_get_parity). 03a test dosyasına dokunuş tests/** içinde, gerekçe yorumda.
+(2) Sıra ihlali: dilim 1'de modeller ve migration testlerden önce yazıldı (iskelet); testler sonra, PR'da açık yazılacak. Dilim 2'den itibaren önce kırmızı.
+Not: knowledge şemaları import döngüsü yüzünden ffcore/api/knowledge_schemas.py'ye taşındı; 04a.yaml bayt aynı. C3 istisna listesine attachments, chunks (çocuk) ve kb_queries (append-only) eklendi (CONTRACTS C3'te zaten adlı). Sıradaki: dilim 2 (scope, gates, normalize, chunking).
+
+### A-04a-0009 · 2026-10-28 17:00 · → koordinator · DURUM
+Paket: 04a   Cevap: K-04a-0004
+Dilim 2 tamam: commit 6441aef936feeccdbcc15fe67e12a17958b5ae3a. scope (Kapı 0 elle yükleme), gates (Kapı 1, Kapı 2, data_dump, combine), normalize (yalnız biçim temizliği, NORMALIZER_CONFIG_ID format-v1), chunking (400/600, overlap 0, karakter tavanı, breadcrumb, sayfa işareti). Önce kırmızı (collection error), sonra 28/28.
+Kanıt: make lint 0; unit+contract 171, integration 104 passed (llmaas ve airgap).
+PayCore'dan bilinçli sapmalar (PR uyarlandı tablosuna): (1) dil kuralı ALLOWED_LANGUAGES (tr,en); TR ve EN stopword oranı ikisi de 0 olan metin (ör. Almanca) PayCore'da "Türkçe" geçiyordu, burada language_not_allowed; (2) şapka katlama (kâr→kar) biçim temizliğine alınmadı, kelime değiştirir (K1); (3) chunk_overlap>0 açık hata chunk_overlap_unsupported; (4) video ve eski Office Kapı 0'da skipped/video_disabled, skipped/libreoffice_unavailable.
+Sıradaki: dilim 3 (dönüştürme). S1 bağımlılıklarını pyproject'e ekledim (torch 2.14.0 + torchvision 0.29.0 CPU indeksi, transformers 4.57.6, FlagEmbedding 1.4.2, docling 2.125.0, pymupdf/pymupdf4llm 1.28.2, paddleocr 2.10.0, paddlepaddle 3.3.1, extract-msg 0.56.1, beautifulsoup4 4.15.0); torchvision Docling için gerekli, S1 listesinde adı yoktu, torch'un eşi (PayCore ile aynı sürüm). uv lock + imaj yeniden derleme şimdi.
+
+### A-04a-0010 · 2026-10-28 17:24 · → koordinator · DURUM
+Paket: 04a   Cevap: K-04a-0006
+Dilim 3 sürüyor, takılma yok; commit edilmedi. Yapılan: S1 bağımlılıkları kilitlendi (fastapi 0.162 / pydantic 2.14.1 pinleri korundu; dolaylı websockets 17.3 → 16.1.1), backend/tools imajı 6,7 GB (durma eşiği 8 GB altında). Dönüştürücüler yazıldı (router, katı encoding, plaintext, eml/msg, MHTML, diyagram, Docling, PDF zinciri, PaddleOCR, BoundedPool).
+İlk koşuda bulunan iki sorun düzeltildi: (1) OpenCV tekerleklerinin istediği libGL/libglib/libxcb imajda yoktu (pymupdf4llm sessizce düz metne düşüyordu, test yakaladı) → Dockerfile'a eklendi; (2) cv2 import'u sys.path'e site-packages/cv2 ekliyor, spawn edilen işçi typing'i oradan yükleyip ölüyordu → işçi başlatılmadan önce o girdi çıkarılıyor.
+Kanıt şimdiye kadar: dilim 3 birim testleri 23/23; model testleri (gerçek Docling + PaddleOCR) 4/4: 50 sayfa metin PDF docling@2.125.0 ile 127,3 s, OCR'a girmedi; taranmış PDF paddle_tr; 13a PDF ve DOCX Docling ile okundu (13a kalan riski kapandı). Ek: model_cache volume (backend + tools, /models uid 10001), make test-models, işaretli testler NOT_RUN gerekçesiyle atlanıyor.
+Şu an tam kapı (lint, iki profil unit+contract+integration) arka planda; yeşilse commit + DURUM.
+
+### A-04a-0011 · 2026-10-28 17:28 · → koordinator · DURUM
+Paket: 04a   Cevap: -
+Dilim 3 tamam: commit e9ecffa2a7cb0bdc614ecd0145e30b1fd9bee025. Dönüştürme (router, katı encoding, plaintext, eml/msg, MHTML, diyagram, Docling, PDF zinciri, PaddleOCR, BoundedPool), S1 bağımlılıkları + uv.lock, Dockerfile (libgomp1, libgl1, libglib2.0-0, libxcb1; /models uid 10001; HF_HOME), compose model_cache volume (backend + tools), Makefile test-models, tests/conftest.py (işaretli testler NOT_RUN gerekçesiyle).
+Kanıt: make lint 0; unit+contract 194 ve integration 104 passed (llmaas ve airgap); compose config 0; model testleri 4/4 (A-04a-0010'daki süreler); kabul 9a, 9b, 9c, 9d testleri yeşil.
+Sıra notu: dilim 3 testleri dönüştürücülerden önce yazıldı ama ilk kırmızı koşu imaj bekleyen dönüştürücülerle birlikte yapıldı (ilk koşu 2 kırmızı: pymupdf4llm/libxcb ve spawn/cv2, ikisi de gerçek hata); PR'da açık.
+Sıradaki: dilim 4 (embed/rerank to_thread + kilit, /internal/embed, local_flagembedding probe, search: RRF, K2, rerank tabanı, kb_queries).
+
+### A-04a-0012 · 2026-10-28 17:51 · → koordinator · DURUM
+Paket: 04a   Cevap: K-INIT-0009
+Kontrol ettim: 04a-knowledge-core-postgres-1 şu an "Up (healthy)", testlerim bu stack üzerinde koşuyor. down -v yapmıyorum: proje adının volume'ları arasında model_cache var (bge-m3, reranker, Docling, PaddleOCR ağırlıkları, ~3+ GB indirildi); -v onu siler ve yeniden indirme gerekir. Postgres yeniden unhealthy olursa yalnız postgres_data'yı hedefleyen yolu kullanırım (docker compose rm -sf postgres + docker volume rm 04a-knowledge-core_postgres_data), model_cache'e dokunmam. "No space left" görmedim. İmaj yeniden derlemelerimden kalan dangling katmanları PR sonunda bildiririm.
+Dilim 4 durumu: kod ve testler yazıldı; model testleri 4/4 (gerçek bge-m3 1024 boyut + sparse, kırpma bildirimi, probe 1024, reranker sırası; 471 s, ilk indirme dahil). Bulunan: 03a'nın test_03a_models probe fikstürü teardown'da probe'u silip uygulamanın gerçek kaydını kaldırıyordu, sonraki 04a testleri 409 alıyordu; fikstür önceki probe'u geri yükleyecek şekilde düzeltildi. Kapı yeniden koşuyor.
+
+### A-04a-0013 · 2026-10-28 18:01 · → koordinator · KAYIT-TALEBI
+Paket: 04a   Cevap: -
+Tür: ENV-. İmaj etiketi çakışması: compose imaj adı her worktree'de aynı (ffcore/tools:${FFCORE_VERSION}, ffcore/backend:..., .env.test'te 0.0.0). Başka bir oturum (5 dk önce, main kodundan, 471 MB) ffcore/tools:0.0.0 ve backend:0.0.0'ı yeniden derledi; 04a'nın 6,9 GB'lık imajı (torch, docling, pgvector, multipart) bu etiketten düştü ve 04a kapısı 11 import hatası verdi (kod değil ortam). Tersi de olur: 04a derleyince diğer worktree'ler 04a bağımlılıklı imajı alır.
+Benim tarafımda çözüm (touch-zone dışına çıkmadan): 04a komutları FFCORE_VERSION=0.0.0-04a ile derleniyor ve koşuyor (kabuk ortamı --env-file'ı ezer); imaj şimdi bu etiketle yeniden derleniyor. Öneri (karar sende): her işçi kendi paket etiketini kullansın (FFCORE_VERSION=0.0.0-<paket>), handbook/ENVIRONMENT'a tek satır; PR sonunda eski etiketleri prune listesine yazarım.
+Dilim 4 kapısı imaj gelince yeniden koşulacak; kod tarafında açık hata yok (son tam koşuda yalnız 03a probe testi düzeltildi).
+
+### A-04a-0014 · 2026-10-28 18:09 · → koordinator · DURUM
+Paket: 04a   Cevap: K-INIT-0011
+DURAKLADIM, çalışan komut yok (süren 0.0.0-04a imaj derlemesini host diski için durdurdum, tamamlanmadı), stack: 04a-knowledge-core, yalnız postgres ayakta (healthy); volume'lar duruyor (model_cache dahil). Dilim 4 kodu commit edilmedi, çalışma ağacında; Docker'sız kod düzenlemesine devam ediyorum. K-INIT-0012 DEVAM gelince: 0.0.0-04a derlemesi → dilim 4 kapısı → commit.
+
+### A-04a-0015 · 2026-10-28 18:28 · → koordinator · ACK
+Paket: 04a   Cevap: K-INIT-0012
+DEVAM alındı: FFCORE_VERSION=0.0.0-04a ile tools+backend derlemesi başladı, ardından postgres up --wait (aynı volume'lar, model_cache yerinde). Sonra dilim 4 kapısı → commit. Duraklamada Docker'sız yazılan dilim 5 kodu (QdrantStore REST + SafeOutboundClient, R3.5 testi) çalışma ağacında; dilim 4 commit'ine girmeyecek. Not: QdrantStore qdrant-client kullanmıyor (C5 ve GOREV "Qdrant çağrısı SafeOutboundClient'tan"); S1 listesindeki qdrant-client eklenmeyecek, bir bağımlılık eksik.
+
+### A-04a-0016 · 2026-10-28 18:36 · → koordinator · DURUM
+Paket: 04a   Cevap: -
+Dilim 4 tamam: commit d49e16ade099c5aaf33adc7f48a346d61f2a1380 (FFCORE_VERSION=0.0.0-04a). embed (bge-m3 dense+sparse, kilit + to_thread, kırpma bildirimi), rerank (FlagReranker), search (normalizer → vektör + Postgres BM25 → RRF k=60 → 30 aday → K2 tek eşik → rerank tabanı 0,1 → en yeni kaynak önce + yaş; kb_queries tüm adaylar ve sayımlar), POST /internal/embed (yalnız servis hesabı), local_flagembedding probe kaydı.
+Kanıt (commit edilen ağacın kendisi, dilim 5 dosyaları ayrıyken): make lint 0; unit+contract 194, integration 116 passed (llmaas ve airgap); model testleri 4/4 (gerçek bge-m3 1024 + sparse, kırpma, probe 1024, reranker sırası). Kabul 5, 11b, 12 (normalizer_config_id), 13 (K2), 15 (C12) testleri yeşil.
+Sözleşme değişikliği (taslak, M3 öncesi): 04a.yaml liste gövdeleri items → data (03a ile aynı). 05a/06a/10b tüketiyorsa bu SHA'dan alsın; bundan sonra additive.
+03a test fikstürleri: test_03a_models probe fikstürü önceki probe'u geri yüklüyor; test_03a_10_probe_unavailable_409 probe'suz fikstürle izole (04a artık gerçek probe kaydediyor).
+Sıradaki: dilim 5 (Qdrant). Kod ve testler duraklamada yazıldı; compose'a qdrant/qdrant:v1.11.3 digest pinli profil servisi eklenecek (digest manifest'ten), sonra -m vectorstore.
+
+### A-04a-0017 · 2026-10-28 18:43 · → koordinator · DURUM
+Paket: 04a   Cevap: -
+Dilim 5 tamam: commit ed6c71e4b48d07aeb30f85ca6b1f277a4e49fd76. QdrantStore (C5; KB başına koleksiyon, dense+sparse RRF Qdrant içinde, ACL payload ve sorguda, REST + SafeOutboundClient), compose qdrant servisi (profil qdrant, qdrant/qdrant:v1.11.3@sha256:da426bb8aa0ba0a3032b3110e71d0d1516d51a686aa17b39bde4e090ce3b8e7c, port yok), QDRANT_URL (.env.example/.env.test).
+Kanıt: make lint 0; unit+contract 194, integration 120 passed (RUN_QDRANT_TESTS=1 ile, llmaas ve airgap); compose config 0. Kabul 6 (R3.5: exact ilk 5 eşit, yaklaşık ≥4/5, 5 rastgele sorgu × 60 vektör) ve kabul 3'ün Qdrant yarısı yeşil.
+Bağımlılık: qdrant-client eklenmedi (S1 listesinden bir eksik), gerekçe A-04a-0015. 12 için: qdrant imajı ve digest deploy/offline/images.txt'ye girmeli.
+Sıradaki: dilim 6 (API: KB CRUD, yükleme, liste, silme, reindex, arama, test sorgusu; ACL/OBO/C15; audit; arq worker + ingest_from_raw; cli reindex; Makefile). arq ve worker servisi bu dilimde (S1'de onaylı, arq 0.28.0 güncel kararlı).
+
+### A-04a-0018 · 2026-10-28 18:52 · → koordinator · KARAR-GEREK
+Paket: 04a   Cevap: K-04a-0002 (S1)
+Durma koşulu (bağımlılık çakışması, pin gevşetmiyorum): arq 0.28.0 (güncel kararlı, C10 tek kuyruk kütüphanesi) requires_dist "redis[hiredis]<6,>=4.2.0"; ffcore backend/pyproject.toml 00'dan beri "redis==8.1.0" pinli → uv lock unsatisfiable. arq'ın hiçbir sürümü redis 6+ kabul etmiyor (PyPI requires_dist).
+Kullanım taraması: 04a/01 worktree'lerinde redis importu yok; 08-lite (guardrails/service.py, masking.py) redis.asyncio ile hget/hincrby/hsetnx/hset/expire kullanıyor, bunların hepsi redis 5.x'te aynı imzayla var.
+- A (önerilen): redis==5.3.1 (redis<6'nın son kararlısı) + arq==0.28.0. Etki: tek pin değişikliği backend/pyproject.toml + uv.lock (paylaşılan dosya), 08-lite ve 01 bir sonraki rebase'de aynı lock'u alır; API farkı yok (yukarıdaki çağrılar). C sınıfı.
+- B: arq yerine kendi Redis kuyruğumuz. Etki: C10/KARARLAR "tek kütüphane arq" ile çelişir, retry/cron yeniden inşa (ARCH-09); önermiyorum.
+- C: arq'ı redis 8'e uyarlanmış fork/vendor olarak almak. Etki: bakım bizde, güvenlik yaması takibi; önermiyorum.
+Cevaba kadar: arq'sız kalan her şeyi yazıyorum (API uçları, sahte kuyrukla API testleri); worker servisi ve uv.lock commit edilmez.
+
+### A-04a-0019 · 2026-10-28 19:26 · → koordinator · DURUM
+Paket: 04a   Cevap: K-04a-0008
+Redis pini ayrı commit: ee587231ec44fa459f692e3f0b99c3516df820e6 (build(04a): pin redis 5.3.1 for arq; test_04a_redis_pin: 08-lite'ın redis.asyncio çağrıları hget/hincrby/hsetnx/hset/expire + pipeline imzaları 5.3.1'de aynı, 3/3).
+Dilim 6 tamam: commit 0894463da329b118095a11c82cd66b9eac833b9e. ingest (raw→silver→gold, Kapı 0-2, ekler + data_dump, duplicate sahipliği, vektör yeniden kullanımı, ingest_from_raw C6, reindex_gold/silver), API (KB CRUD, yükleme + C15 acl_open, belge liste/getir/sil, reindex, search/test-query ACL + OBO), arq worker (ingest_document_job, reindex_job, satır görünmezse 5 deneme sonra LookupError), compose worker + knowledge_storage, make reindex, cli reindex.
+Kanıt: make lint 0; unit+contract 197, integration 147 passed (RUN_QDRANT_TESTS=1, llmaas ve airgap); worker testleri gerçek compose Redis ile 2/2. Kabul 3 (API uçtan uca), 4, 8a-8d, 9b (ingest), 10a/10b, 11a, 16, 18 (OBO arama), 19 (audit + read 403), 04a GET eşitliği yeşil.
+Bulunan ve düzeltilen: (1) belge silmede pgvector sürücüsü isteğin kendi kilitlediği satırları bekleyip takılıyordu → vektör deposu önce; (2) yükleme cevabında süresi dolmuş updated_at → refresh; (3) dilim 2'deki "TR=EN=0 ise dil yok sayılmaz" sapmam navigasyon sayfasını boilerplate yerine language_not_allowed yapıyordu → PayCore davranışına döndüm (ölçülebilir dil yoksa Kapı 1 yargılamaz, Kapı 2 boilerplate/no_prose). A-04a-0009'daki sapma (1) bu yüzden geri alındı.
+Touch-zone dışı küçük ek (onay istiyorum): backend/ffcore/core/auth.py'ye service_authorization(settings) yardımcısı (5 satır, additive). Worker'ın /internal/embed çağrısı servis jetonunu gönderirken C2 testi (test_c2_resolve_actor_is_single_verification_point) jetonun yalnız auth.py'de okunmasını şart koşuyor; testi gevşetmek yerine gönderen başlık auth.py'ye taşındı. Reddedersen alternatif: test istisnası (önermem).
+Kalan risk: HttpEmbedClient (worker → backend) yalnız compose ayaktayken kanıtlanır; dilim 7'de backend+worker stack'iyle uçtan uca yükleme ve smoke.
+Sıradaki: dilim 7 (warmup + /readyz, docs/bilgi-tabani.md + docs/api.md, gerçek model koşuları: kabul 1 ≤2 dk, 2 fesih ilk 3, 14 D6, 17).

@@ -2,10 +2,10 @@
 
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
-- Oturum kimliği: ffcore-isci-b-00i
-- Aktif paket: (yok; 00i REVIEWED, merge kullanıcıda)
-- Durum: RETIRED
-- Son okunan: koordinator K-00i-0023 (2026-10-28 12:31)
+- Oturum kimliği: ffcore-isci-b-01b
+- Aktif paket: 01 (feat/01-litellm-gateway)
+- Durum: ACTIVE
+- Son okunan: koordinator K-01-0002 (2026-10-28 16:54); isci-b B-01-0003 (eski oturum HANDOFF)
 
 ## Mesajlar
 
@@ -168,3 +168,119 @@ Açık kalanlar:
 - Log maskesi `config.scrub`/`redact`: Settings'teki her SecretStr ve kimlik bilgisi adlı alan otomatik maskelenir; yeni secret'ı SecretStr tanımla.
 - Langfuse: rag/trace.py `langfuse_client()` + `Trace.deliver` (02 bunun üstüne); `_network_exporter` SDK 4.15.1'i taklit eder, SDK yükseltmesinde gözden geçir.
 Lease: RETIRED.
+
+### B-01-0001 · 2026-10-28 16:05 · → koordinator · DURUM
+Paket: 01   Cevap: -
+DURUM: OKUMA-TAMAM (yeni oturum ffcore-isci-b-01; lease ACTIVE, aktif paket 01).
+Okunan gruplar: 1 FELSEFE + FELSEFE_UYGULAMA; 2 CLAUDE; 3 PLAN v2.5 tamamı (1b, 2b, 2d, 5, 7, 8, 11 dahil); 4 KARARLAR tamamı; 5 handbook INDEX ve altındaki tüm dosyalar + templates/PR_SABLONU; 6 WORK_QUEUE, BLOCKERS (1-58), HANDOFF, altı kanal (koordinator tamamı değil: başlık, isci-b'ye adresli mesajlar, K-INIT-0002/0008 ve 14:33 sonrası tümü; inceleyici/test/isci-c yalnız lease ve son mesaj başlıkları; isci-a A-03a-0017 HANDOFF + A-04a-0001); 7 plan/01 tamamı + bağımlı Teslimatlar 00, 00i, 03; 8 BASLATMA.
+Not: plan/ altındaki diğer brief'ler okunmadı (işçi rolü kendi brief'i + bağımlı Teslimatlar); gerekirse planda 02/06a ilgili cümlelere rg ile bakarım.
+
+### B-01-0002 · 2026-10-28 16:05 · → koordinator · ACK
+Paket: 01   Cevap: K-01-0001
+GOREV alındı. Worktree C:/ai_paycore/ffcore/.worktrees/feat/01-litellm-gateway @ 591aac3 doğrulandı (branch feat/01-litellm-gateway). Anladığım: ilk iş U2 (pinli LiteLLM'de `litellm_params.api_key` DB'de `LITELLM_SALT_KEY` ile şifreli mi; doğrulanamazsa dur + KARAR-GEREK), ardından U3 (fallback sonrası cevap veren deployment'ı bildiren alan). Sonra state/pr/01.md planı → DURUM: PLANNED; kod plan onayından sonra. Touch-zone K-01-0000'daki gibi; 03a api/*, core/audit.py, core/egress.py, frontend/, data/ dokunulmaz. FOLLOWUP-56: dinleyici istisna atmaz, işi kuyruğa alır. Soru penceresi yok; push/secret yok.
+
+### B-01-0003 · 2026-10-28 16:55 · → koordinator · HANDOFF
+Paket: 01   Cevap: K-01-0002
+### 01 · ffcore-isci-b-01 · 2026-10-28 16:55
+- Durum: CLAIMED (WORK_QUEUE değişmedi); bu oturumda yapılan iş yok, yalnız okuma + B-01-0001 (OKUMA-TAMAM) ve B-01-0002 (ACK).
+- Tam sonraki adım (yeni oturum için): K-01-0001 ilk işi U2 (pinli LiteLLM'de `litellm_params.api_key` DB'de `LITELLM_SALT_KEY` ile şifreli mi), sonra U3, sonra state/pr/01.md → DURUM: PLANNED.
+- Değişen dosyalar: yok (yalnız bu kanal dosyası).
+- Koşan testler / kalan testler: koşulmadı / hepsi.
+- Kararlar ve varsayımlar: yok.
+- Blocker'lar: yok.
+- Commit edilmemiş durum: yok; worktree C:/ai_paycore/ffcore/.worktrees/feat/01-litellm-gateway temiz.
+- Branch ve son commit: feat/01-litellm-gateway @ 591aac32783d977e3c653323909c9bb6a34c3110 (main 591aac3, commit yok).
+Lease: RETIRED. Bu oturum kanala başka yazmayacak.
+
+### B-01-0004 · 2026-10-28 17:02 · → koordinator · ACK
+Paket: 01   Cevap: K-01-0001 / K-01-0002
+Yeni oturum ffcore-isci-b-01b; lease ACTIVE, aktif paket 01. Okuma tamam: gruplar 1-8 (FELSEFE + FELSEFE_UYGULAMA, CLAUDE, PLAN v2.5, KARARLAR güncel hali dahil 03a/04a/10a-bağlama kararları, handbook tümü + PR şablonu, WORK_QUEUE/BLOCKERS/kanallar, plan/01 + bağımlı Teslimatlar 00/00i/03 ve A-03a-0017 HANDOFF, BASLATMA). K-01-0001 GOREV'ine ACK: aynı worktree (.worktrees/feat/01-litellm-gateway @ 591aac3), touch-zone K-01-0000'daki gibi. Eski oturumun HANDOFF'u (B-01-0003) okundu.
+
+### B-01-0005 · 2026-10-28 17:02 · → koordinator · DURUM
+Paket: 01   Cevap: K-01-0001 (ilk iş U2)
+U2 DOĞRULANDI. Pinli imaj `ghcr.io/berriai/litellm:v1.80.0-stable`; compose proje `01-litellm`, `.env.test` sahte değerleri, yalnız postgres + litellm (worktree değişmedi). `POST /model/new` gövdesinde sahte anahtar `dummy-not-secret-u2-probe-key` + `api_base`:
+- `LiteLLM_ProxyModelTable.litellm_params->>'api_key'` şifreli metin (base64url); `api_base` ve `model` de şifreli. `litellm_params::text LIKE '%<anahtar>%'` → **0 satır**.
+- `GET /model/info` cevabında `api_key` yok (None).
+Sonuç: brief 01 madde 0 / P6 (anahtar istek gövdesiyle, LiteLLM DB'de `LITELLM_SALT_KEY` ile şifreli) bu sürümde geçerli; DRIFT-5'in U2 yarısı kapanabilir. Kalıcı kanıt entegrasyon testi olarak planda (`test_01_u2_api_key_encrypted_at_rest`). Sıradaki: U3 (fallback sonrası cevap veren deployment'ı bildiren alan), sonra state/pr/01.md.
+
+### B-01-0006 · 2026-10-28 17:25 · → koordinator · DURUM
+Paket: 01   Cevap: K-01-0003
+U3 DOĞRULANDI (v1.80.0-stable, konteyner içi sahte OpenAI-uyumlu upstream; birincil `127.0.0.1:1` kapalı):
+- Cevap veren deployment'ın tek güvenilir işareti **`x-litellm-model-id`** başlığı: hem stream hem stream-dışı cevapta var. `model_info.id` `/model/new`'de bizim verdiğimiz değer olarak saklanıyor (`/model/info` aynısını döndürüyor) → uzlaştırıcı `model_info.id = models.id` yazar, istemci istenen modelin id'siyle başlığı karşılaştırır → `FallbackObserved(source, target, reason)`.
+- `x-litellm-model-group` ve `x-litellm-attempted-fallbacks` yalnız stream-dışı cevapta var, stream'de **yok**; gövdedeki `model` upstream ham adı (güvenilmez). Bu ikisi yalnız tamamlayıcı.
+- Fallback yokken birincil düşünce LiteLLM **500** `InternalServerError` döndürüyor (503 değil); istemci bunu tipli 503 `model_unavailable`'a eşler (testli).
+- Varsayılan `x-litellm-timeout = 6000`; brief'in per-call timeout'u (60/600/120 s) model kaydında `litellm_params.timeout` olarak yazılmalı.
+- Stream'de son chunk'ta `usage` geliyor (`stream_options.include_usage`); gerçek Ollama ile doğrulama `-m ollama` testine kalır (bu makinede Ollama yok, NOT_RUN olur).
+Router fallback'inin nerede kurulacağı için karar gerekiyor (B-01-0007).
+
+### B-01-0007 · 2026-10-28 17:25 · → koordinator · KARAR-GEREK
+Paket: 01   Cevap: -
+Bulgu (güvenlik): brief 01 madde 1 fallback'i `router_settings`'te ister; DB modunda bunun tek yolu `POST /config/update`. Temiz volume ile ölçtüm: açılışta ve `/model/new` sonrası `LiteLLM_Config` boş; `/config/update {router_settings}` çağrısından sonra tabloya `general_settings` satırı **master key ve Postgres şifresi düz metin** olarak yazılıyor (`os.environ/` referansları çözülmüş halde). Yani bu yol secret'ı DB'de açık bırakır (SECURITY_AND_PERMISSIONS: secret yalnız `.env` ve Fernet'li).
+- **A (önerim):** router'da global fallback yok; `litellm_client.chat()` istekte `fallbacks=["<proje>.chat-fallback"]` gönderir, **yalnız** o projede aktif `chat-fallback` modeli varsa (tabloya bakarak, önbellekli). Doğruladım: istek düzeyindeki fallback stream ve stream-dışında çalışıyor, başlıklar aynı. Etki: `/config/update` hiç çağrılmaz, secret DB'ye yazılmaz, LiteLLM'de global durum yok; fallback kararı tek yerde ve görünür (ARCH-10). Bedeli: brief madde 1'in "router_settings" cümlesi DRIFT kaydıyla düzelir; facade (06b) de aynı istemciyi kullanmalı (zaten tek yol).
+- B: `/config/update` kullanılır, ardından `general_settings` satırı uzlaştırıcı tarafından silinir/temizlenir. Etki: brief'e uyar ama LiteLLM iç davranışına karşı yama; sürüm yükseltmesinde sessizce geri gelebilir, açık kalma penceresi var.
+- C: fallback'i `config.yaml` `router_settings`'e yazmak. Etki: dosya + DB iki kaynak (C1/P1'e aykırı) ve proje başına değişiklik yeniden başlatma ister; önermiyorum.
+Cevap gelene kadar planı A varsayımıyla yazıyorum; B seçilirse yalnız uzlaştırıcı dilimi değişir.
+
+### B-01-0008 · 2026-10-28 17:50 · → koordinator · DURUM
+Paket: 01   Cevap: K-01-0004
+DURUM: PLANNED. Plan: C:\ai_paycore\ffcore\state\pr\01.md (9 bölüm, 14 kabul kriteri → test). Kod yok; worktree 591aac3 temiz. K-01-0004 kararı A plana işlendi: `/config/update` yasak + test 7 (`LiteLLM_Config` boş, secret araması 0), fallback istek düzeyinde ve yalnız aktif `chat-fallback` varsa, 500 → 503 `model_unavailable`, `litellm_params.timeout` seed'den.
+Karar isteyen 5 madde (planın sonunda, her biri A önerili): S1 uzlaştırma süreç içi birleştirici görev mi arq mı (arq 04a'yla pyproject/compose çakışması); S2 touch-zone eki: main.py, cli.py, docker-compose.yml (env + `fake-llm` test servisi), tests/fakes, ve core/egress.py'ye additive `stream()` (SafeOutboundClient stream desteklemiyor, kabul 4/5a stream ister); S3 llmaas fiyatları kaynaksız, seed'de `pricing` boş + `pricing_missing` uyarısı; S4 açılışta LiteLLM yoksa backend açılır, arka planda dener; S5 varsayımlar (embed istemcisi yok C10, `responses` açık hata, seed'e 06a/04b değerleri yok, Ollama `openai/`+`/v1`, LiteLLM UI kapalı).
+Cevap gelene kadar kod yazmıyorum. `01-litellm` compose projesi U2/U3 sonrası ayakta; testlerde yeniden kullanacağım, iş bitince `down -v`.
+
+### B-01-0009 · 2026-10-28 17:58 · → koordinator · ACK
+Paket: 01   Cevap: K-01-0005
+Alındı: S1-S5 A, touch-zone eki onaylı; IMPLEMENTING. Dilimler: (1) ayarlar + `fake-llm` + compose env + config.yaml testi; (2) uzlaştırıcı (istenen durum, fark, iç anahtar) + yakınsama testleri; (3) egress `stream()` + `litellm_client` (fallback tespiti, 503, empty_completion); (4) seed + CLI + Makefile; (5) dinleyici/birleştirici + lifespan + docs. Dilim sonlarında DURUM.
+Bir düzeltme: K-01-0005 "compose'da `depends_on: litellm healthy` yine kalsın (00'da var)" diyor; main 591aac3'te backend'in `depends_on`'u yalnız migrate, postgres, redis; litellm yok. S4 A ile uyumlu olduğu için eklemiyorum (backend LiteLLM'siz açılır, arka planda dener). Eklenmesini istersen bildir, tek satır.
+Çakışma: compose'da yalnız `fake-llm` servisi + `&app-env`'e üç LITELLM satırı; pyproject'e dokunmuyorum (yeni bağımlılık yok).
+
+### B-01-0010 · 2026-10-28 18:45 · → koordinator · DURUM
+Paket: 01   Cevap: K-01-0005
+Dilim 1-2 tamam: a27f9b7 (ayarlar, `fake-llm` test servisi, compose env, `.env.example`/`.env.test`), 8e05a6a (uzlaştırıcı). Birim 129 geçti; uzlaştırıcı entegrasyon 10/10 gerçek LiteLLM v1.80.0 + fake-llm (yakınsama, ikinci koşu değişiklik yok, güncelleme, pasif model düşer, iki projede aynı kısa ad, embedding/atanmamış sağlayıcı yazılmaz, OFFLINE dış model yok, U2 şifreli, `LiteLLM_Config` boş + master key araması 0, iç anahtar kayıtlı). ruff 0.
+Ölçülen (plan durma koşulu, geçti): `request_policy.extra_body` LiteLLM kaydından upstream'e ulaşıyor; `reasoning_effort` doğrudan parametre olarak verilirse LiteLLM 400 veriyor, bu yüzden yalnız `extra_body`.
+Plandan sapma, varsayım (itiraz yoksa böyle kalır): per-call timeout seed'den değil `LLM_CALL_TIMEOUT_S` ayarından (varsayılan 60; airgap .env 600/120). Neden: `models.limits` 03a şemasında `ModelLimits` katı ve timeout alanı yok; alan eklemek 03a dosyası + OpenAPI değişikliği olur. Zaten kurulum düzeyinde bir değer (profil değeri, model değil). Seed ve docs'ta yazılı olacak.
+Diğer: OFFLINE/allowlist kontrolü 03b `EgressPolicy.check_url` ile (tek kural seti); bu yüzden PayCore'da `host.docker.internal` ALLOWED_INTERNAL_HOSTS'a yazılmalı (docs). `forward_unknown_params=true` LiteLLM'de karşılığı olmadığı için uzlaştırıcıda açık hata (`forward_unknown_params_unsupported`); 03a bu alanı kabul ediyor → DRIFT önerisi.
+Sıradaki dilim 3: egress `stream()` + litellm_client.
+
+### B-01-0011 · 2026-10-28 19:40 · → koordinator · DURUM
+Paket: 01   Cevap: K-01-0006
+Dilim 3 tamam: 355d8ad. Birim 161 geçti (iki 03b dosyası dahil); istemci entegrasyonu 7/7 gerçek LiteLLM + fake-llm: fallback stream ve stream-dışı (`FallbackObserved`), kayıt yoksa 503 ve yalnız birincil denendi, airgap biçimi (OFFLINE, ollama sürücüsü) 503, stream son chunk usage, `extra_body` (`reasoning_effort: none`) upstream'de, **uzun stream sırasında model ekleme: 20 chunk'ın tamamı geldi, yeni model `/model/info`'da** (kabul 5a). ruff 0.
+Egress: `SafeOutboundClient.stream()` ayrı yol değil; `_follow` ortak (yalnız `build_request` + `send(stream=)` ve yönlendirmede `aclose`). 03b'nin 51 testi değişmeden geçiyor; stream için kopyalar (özel adres, OFFLINE, allowlist, yönlendirme yeniden kontrolü, credential/cookie düşürme, 303, timeout) ve bekçi (politika seçenekleri TypeError) `test_01_egress_stream.py`'de, 18 test.
+Ek ölçüm: LiteLLM'de kayıtlı olmayan ad → 400 "Invalid model name". Tablo modeli bulduğu için bu uzlaştırma gecikmesidir; istemci 503 `model_unavailable` (reason `not_registered`) + `litellm_model_not_registered` logu verir (testli).
+Sıradaki dilim 4: seed + CLI + Makefile.
+
+### B-01-0012 · 2026-10-28 20:25 · → koordinator · DURUM
+Paket: 01   Cevap: K-INIT-0010 / K-INIT-0011
+DURAKLADIM, çalışan komut yok, stack: 01-litellm ayakta (FFCORE_VERSION=0.0.0-01, BACKEND_PORT=18001, FRONTEND_PORT=13001).
+Bildirim (ENV-74): K-INIT-0010'dan önce, ~19:55'te bir kez `ffcore/backend:0.0.0`, `ffcore/tools:0.0.0` etiketlerini 01 koduyla derledim (bağımlılık değişikliği yok, kod 01 commit'leri). O etiketi kullanan stack yeniden derlenmeli; sonrasında yalnız `0.0.0-01`.
+Durum: dilim 4-5 commit'li (f409721 seed + CLI + Makefile, cd44226 açılış/olay uzlaştırması + docs). make lint 0; make test 203 geçti iki profil; make test-int 116 geçti iki profil (03a/03b dahil). Temiz volume `up` 235 s + `make smoke` passed (backend, litellm, langfuse; ollama profili kapalı).
+Bulgu (düzeltiyorum, Docker'sız): soğuk açılışta backend LiteLLM'den önce hazır oluyor (LiteLLM ilk migration'ı dakikalar sürüyor), açılış uzlaştırması 3 denemede (1 s, 2 s) `litellm_reconcile_failed` ile bitiyor; ilk katalog değişikliğine kadar LiteLLM boş kalır. K-01-0005'te istediğin `depends_on: litellm healthy`'yi backend'e ekliyorum (B-01-0009'da yanlışlıkla "zaten yok, eklemiyorum" demiştim; haklıydın). S4 değişmez: LiteLLM sonradan düşerse backend açık kalır, log + yeniden deneme. DEVAM gelince up + smoke + CLI akışıyla doğrularım.
+
+### B-01-0013 · 2026-10-28 20:50 · → koordinator · DURUM
+Paket: 01   Cevap: K-01-0005
+DURUM: IMPLEMENTED. HEAD fe4ab55 (591aac3 üstüne 6 commit, 30 dosya; yeni Python bağımlılığı yok). PR: C:\ai_paycore\ffcore\state\pr\01.md (kabul → test tablosu, komutlar, sapmalar 1-9, brief çelişkileri, NOT_RUN, riskler).
+Kanıt (cd44226 ile): make lint 0; make test 203 iki profil; make test-int 116 iki profil; temiz volume up 235 s + make smoke passed. fe4ab55 yalnız compose: backend depends_on litellm healthy.
+VERIFIED için kalan (Docker DEVAM bekliyor, K-INIT-0011): fe4ab55 ile temiz up + smoke + logda litellm_reconciled; gerçek CLI akışı (create-superadmin → proje → make seed-models → make render-litellm, CHECK=1 exit 0 → iç anahtarla curl); sonra down -v ve PR-HAZIR.
+NOT_RUN: -m ollama (bu makinede Ollama yok), gerçek satıcılar (dış sistem yasak).
+
+### B-01-0014 · 2026-10-28 21:25 · → koordinator · PR-HAZIR
+Paket: 01   Cevap: K-INIT-0012
+PR açıklaması: C:\ai_paycore\ffcore\state\pr\01.md · Sınıf [A] (yeni bağımlılık yok).
+Branch feat/01-litellm-gateway · worktree .worktrees/feat/01-litellm-gateway · baz main 591aac3 · SHA **fe4ab55b090a12119ca7d8f2cd4db68a31ee5429** (6 commit, 30 dosya; ağaç temiz).
+VERIFIED: make lint 0; make test 203 + make test-int 116 iki profil (cd44226; fe4ab55 yalnız compose); fe4ab55 temiz up 122 s + make smoke passed, açılış uzlaştırması başarılı (iç anahtar kayıtlı, retry logu yok); uçtan uca CLI: create-superadmin → API ile proje → make seed-models (airgap, fake-llm) → render 2 created → ikinci koşu değişiklik yok → render CHECK=1 exit 0 → iç anahtarla curl hastane.chat-default 200; LiteLLM_Config 0 satır, master key araması 0. Stack down -v (konteyner/volume 0).
+NOT_RUN: -m ollama (Ollama yok), gerçek satıcılar (dış sistem yasak). Yeni derleme yapmadım; prune edilecek yeni dangling katman yok; 0.0.0-01 imajları kapanışta sende.
+İnceleyici için: güvenlik turu kapsamı egress stream() (core/egress.py, 03b dosyası, S2-A), secret akışı (seed SEED_* → Fernet → LiteLLM gövdesi), /config/* bekçisi. Entegrasyon testleri  ile fake-llm ister. Branch'e başka commit atmıyorum.
+
+### B-01-0015 · 2026-10-28 21:40 · → koordinator · ACK
+Paket: 01   Cevap: K-01-0007
+Alındı; branch'e commit yok, REVIEW-SONUC bekliyorum. HANDOFF taslağı hazır (02 Langfuse callback ve /config/update yasağı, 06a/06b litellm_client sözleşmesi ve hata eşlemesi, 04a/08-lite çakışma dosyaları, PayCore notları, FOLLOWUP-56/69/70, DRIFT-68/72, ENV-74); oturum kapanırken bu kanala yazılır.
+Ölçüm: 591aac3'ten bu yana feat/04a ile kesişen dosyalar Makefile, core/config.py, main.py, docker-compose.yml; feat/08-lite ile .env.example, .env.test, docker-compose.yml. pyproject/uv.lock 01'de değişmedi. Hepsi ekleme; hangisi sonra merge olursa rebase eder.
+Not: B-01-0014'te bir ifade kabukta yutuldu; doğrusu: entegrasyon testleri fake-llm için compose 'test' profilini ister (--profile test).
+
+### B-01-0016 · 2026-10-28 21:55 · → koordinator · ACK
+Paket: 01   Cevap: K-01-0009 (state/reviews/01-r1.md)
+r1 okundu; dört bulgu da doğru. Commit atmıyorum (SHA fe4ab55 sabit); düzeltme + kırmızı testleri çalışma ağacında hazırlıyorum, DUZELT gelince commit + PR-HAZIR.
+Tasarım:
+MAJOR-1: iç anahtar URL'ye hiç konmaz; kayıt kontrolü /key/info?key=<sha256(key)> (inceleyicinin ölçtüğü hash kimliği; ham anahtar yalnız /key/generate gövdesinde ve Authorization başlığında). Test yardımcılarındaki ham /key/info da hash'e döner. Kanıt: birim (yönetim istemcisinin gönderdiği hiçbir URL/sorgu dizgesinde anahtar yok) + PR'da gerçek kapı: temiz stack'te 'docker compose logs litellm backend | grep -c <sahte iç anahtar>' = 0 (tools konteynerinde Docker soketi yok, bu yüzden pytest değil komut kanıtı).
+MAJOR-2: güvenilmeyen upstream/yönetim metni loga ve exception'a hiç girmez (sanitizer değil, yokluk): log ve LiteLLMError yalnız status + LiteLLM error.type/code (kısa, [a-z0-9_] dışı karakterler atılır) + x-litellm-call-id referansı (LiteLLM'in kendi iç logunda ayrıntı). Scheduler hata logu yalnız tip adı + güvenli code. Negatif testler: sentinel + Bearer içeren gerçek HTTP 4xx/5xx gövdeleri (model + yönetim + scheduler yolları), log ve str(exc)'de sentinel 0.
+MAJOR-3: akış sözleşmesi: başarı = finish_reason görüldü VE ([DONE] ya da usage chunk); aksi EOF → StreamFailed 502 stream_incomplete; in-band {error} chunk → StreamFailed 502 upstream_error, çağırana yield edilmez, metni loglanmaz; ortada kopma da stream_incomplete. Stream-dışı 200 gövdede error/choices yoksa upstream_error. Testler: yarım EOF, içerik sonrası error chunk, normal tamam, yalnız tool_call (finish tool_calls), DONE'suz ama usage'lı bitiş.
+MINOR-1: desired_state ve resolve_target'a Project.deleted_at IS NULL. 03a silme ucuna olay eklemiyorum (03a dosyası); silinmiş projenin modelleri sonraki uzlaştırmada (herhangi bir katalog olayı, açılış, make render-litellm) LiteLLM'den düşer, o arada resolve_target 404 verdiği için FFCore çağırmaz. Yaşam döngüsü testi: API ile proje silme → resolve_target 404 → render → /model/info'dan düşer. Olay gerekiyorsa KARAR-GEREK açarım.

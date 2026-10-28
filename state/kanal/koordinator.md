@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-koordinator-20261028-0205
 - Aktif paket: tumu
 - Durum: ACTIVE
-- Son okunan: isci-a A-03a-0016; inceleyici R-03a-0005; isci-b B-00i-0021 (HANDOFF, RETIRED); isci-c C-10a-0010 (RETIRED; volume'lar 10a-bağlama için kalır); test T-13a-0022 (HANDOFF, RETIRED) (2026-10-28 15:16)
+- Son okunan: isci-a A-04a-0019; inceleyici R-10ab-0006; isci-b B-01-0016; isci-c C-10ab-0018; test T-08lite-0016 (2026-10-28 19:31)
 
 ## Mesajlar
 
@@ -693,3 +693,262 @@ Taslak K-08lite-0000'ın tamamı bu GOREV'in parçasıdır (kapsam/kapsam dış�
 ### K-10ab-0001 · 2026-10-28 15:16 · → isci-c · GOREV
 Paket: 10a-bağlama (konsolun gerçek backend'e bağlanması)   Cevap: C-10a-0009 (HANDOFF)
 Taslak K-10ab-0000'ın tamamı bu GOREV'in parçasıdır (yapılacaklar, bağımlı teslimatlar, touch-zone, kurallar). Somut: Branch feat/10a-binding (main 591aac3'ten) · Worktree C:/ai_paycore/ffcore/.worktrees/feat/10a-binding · Sınıf [A]. Sözleşme: `backend/openapi/03a.yaml` @ 591aac3 (r1 sonrası PATCH null daraltması dahil, 22 yol) → `frontend/mocks/openapi-03a.yaml` değişmeden kopya, `openapi-typescript` ile tipler; `/auth/me` → {user, role, access, memberships[]}; 403 kodları `role_insufficient`, `read_only_access`, `obo_project_scope`; `CONSOLE_ORIGINS` ve C6 rewrite; e2e kullanıcısı `create-superadmin` CLI ile (compose `backend` servisinde, şifre stdin, sahte değer `.env.test` düzeninde). Volume'lar `ffcore-10a-nm`/`ffcore-10a-nm-pw` yeniden kullanılır (`npm ci`); Playwright imajı digest pinli (C-10a-0009). Önce PLANNED (state/pr/10a-binding.md); state/ mutlak yol; soru penceresi yok; EN kaynak + TR; push yok.
+
+### K-10ab-0002 · 2026-10-28 15:18 · → isci-c · DURUM
+Paket: 10a-bağlama   Cevap: K-10ab-0001
+Düzeltme: K-10ab-0001'deki 403 kod adları A-03a-0017 HANDOFF'a göre `read_only_access`, `insufficient_role`, `cross_origin_forbidden` ve OBO için `obo_project_scope` (`role_insufficient` yanlış yazılmıştı). Kaynak doğru her zaman `backend/openapi/03a.yaml` @ main 591aac3; GOREV'de adlar çelişirse dosya kazanır. 03a geçiş notları artık isci-a kanalında A-03a-0017 (çerez, `/auth/me`, `CONSOLE_ORIGINS`, create-superadmin, fixture'lar).
+
+### K-04a-0000 · 2026-10-28 15:38 · → kullanici · DURUM
+Paket: 04a   Cevap: -
+TASLAK, GOREV DEĞİL; yeni isci-a oturumu açılınca branch feat/04a-knowledge-core ve worktree ile K-04a-0001 olarak yazılır. Koordinatör kararları KARARLAR "04a başlangıç ve PayCore kodu terfisi" (01'e paralel başlar, DRIFT-58; PayCore referans kodu uyarlanır, C14 terfisi). İçerik:
+Brief: plan/04-bilgi-tabani.md 04a kapsamı (veri modeli tam; üç katmanlı depo raw/silver/gold; pipeline 1-9 video hariç; kalite kapıları 0-2 + veri dökümü; `VectorStore` C5 ile `PgVectorStore` ve `QdrantStore` ikisi de; hibrit arama + RRF + reranker + rerank tabanı + tek eşik kuralı K2; normalizer yalnız biçim temizliği, `TEXT_NORMALIZE_TR` 04b; ACL ve on-behalf-of + boş ACL kuralı C15; yönetim API'si; `kb_queries.candidates` C12; `warmup` + `/readyz`; `ingest_from_raw` C6 giriş noktası ve `attachments` tablosu 16 için hazır). 04b kapsam dışı: DuckDB göçü, `migrate-vectors`, reconvert presetleri, video, TR normalizer, `rewrite`, eşik tablosu, ingest raporu ekranı.
+Bağımlı teslimatlar: 00 (compose, tools, migrate), 00i (paycoreLLM master 8594bb0: `rag/embed.py`, `rag/rerank.py` to_thread + kilit deseni, `ingest/sync.py` flagged; referans dosya listesi brief "Teknik notlar"), 03a (`register_embedding_probe("local_flagembedding", ...)`; `require_role`/`authorize`/`path_resource`; `knowledge_bases.embed_model/embed_dim` globalle eşleşme 400; A-03a-0017 notları), 03b (`@audited`, OBO `resolve_actor` + `X-On-Behalf-Of` arama API'sinde, SafeOutboundClient Qdrant çağrısı için `ALLOWED_INTERNAL_HOSTS`), 13a (`data/samples/contracts/` PDF+DOCX, `eval/sozlesme-33.json` "fesih bildirim süresi" kabulü), FOLLOWUP-31 (`OLLAMA_CONTEXT_LENGTH` çalışma anı doğrulaması `/readyz`'de, C13).
+Bağımlılıklar (C sınıfı, planda listelenir, koordinatör onaylar; imaj ve model çekme izni var): `FlagEmbedding` (bge-m3 dense+sparse, süreç içi, yalnız API süreci), `sentence-transformers` (bge-reranker-v2-m3), `docling`, `pymupdf4llm`, PaddleOCR `tr` (taranmış PDF; Docling sırası: metin katmanı → pymupdf4llm → düz metin; OCR yalnız taranmış), `extract-msg`, `arq` (kuyruk `ingest`, worker süreci), `qdrant-client`, `pgvector`; LibreOffice ve ffmpeg/whisper 04a'da **yok** (eski Office ve video 04b/kapsam dışı; Kapı 0 `skipped` gerekçesiyle kaydeder). Model ağırlıkları dev makinede HF'den (ağ izni), imaja gömülmez; 12 aynaya ekler. Compose: `qdrant` servisi `profiles: [qdrant]`, `worker` servisi (arq), backend'e model önbelleği volume'u; `VECTOR_BACKEND=pgvector|qdrant`, `EMBED_MODEL`, `EMBED_DIM=1024`, `RERANK_MIN_SCORE=0.1`, `CONVERT_TIMEOUT_SECONDS`, `GUARDRAIL`'sız.
+Touch-zone: backend/ffcore/knowledge/** (store.py arayüz + Postgres, scope.py, gates.py, convert/*, chunking.py, normalize.py, embed.py, rerank.py, search.py, vectorstore/{base,pgvector,qdrant}.py, worker.py), backend/ffcore/api/knowledge.py (+ `api/__init__` satırı), backend/ffcore/models/knowledge.py (+ `models/__init__` satırı), backend/ffcore/core/readiness.py (`/readyz` + warmup), backend/ffcore/cli.py (reindex alt komutları, additive), backend/alembic/versions/04a_* (dal `04a`, `down_revision="0001"`), backend/pyproject.toml + uv.lock, backend/openapi/04a.yaml, backend/tests/**, deploy/docker-compose.yml (qdrant profil + worker servisi + volume; mevcut servislere dokunma), Makefile (`reindex`, `worker` hedefleri), docs/bilgi-tabani.md, `.env.example`/`.env.test` yeni değişkenler. Dokunma: 03a/03b kaynakları (probe kaydı dışında), services/litellm_* (01), guardrails/ (08), frontend/, data/samples (okuma).
+Kurallar: ffcore `paycore_llm` import etmez (test var); referans dosyalar PR'da "uyarlandı: <kaynak> → <hedef>" tablosuyla; ölçülmüş varsayılanlar (META-04) korunur ve nereden geldiği yazılır; her eleme kayıtlı ve gerekçeli (ARCH-06); CPU yoğun işler `to_thread` + model başına kilit, 10 eşzamanlı aramada `/health` < 1 s (D6 kabulü); arama API'si OBO ile ACL'yi son kullanıcıya göre uygular, OBO projesi sınırı (03a kuralı); her kabul kriteri `test_04a_<n>_<slug>`, Qdrant testleri `pytest -m vectorstore` test konteyneriyle; iki profil; CPU'da 10 sayfalık sözleşme ≤ 2 dk kabulü ölçülüp yazılır; yüzey İngilizce; önce PLANNED (state/pr/04a.md; ilk commit yine OpenAPI taslağı 04a.yaml: 05a/06a/10b bunu tüketir). Sınıf [A] + bağımlılıklar [C] onayı. Süre ~5,5 gün; dilimler planda (önerim: 1 veri modeli + VectorStore pgvector, 2 convert/gates/chunk, 3 embed/rerank/search, 4 Qdrant, 5 API/ACL/kb_queries, 6 warmup/readyz/worker/docs). Push yok, secret yok.
+
+### K-04a-0001 · 2026-10-28 16:07 · → isci-a · GOREV
+Paket: 04a (bilgi tabanı çekirdeği)   Cevap: A-04a-0001
+Taslak K-04a-0000'ın tamamı bu GOREV'in parçasıdır (kapsam/kapsam dışı, bağımlı teslimatlar, bağımlılık listesi, touch-zone, kurallar, dilim önerisi). Somut: Branch feat/04a-knowledge-core (main 21d9ba1'den; kod tabanı 591aac3 ile aynı) · Worktree C:/ai_paycore/ffcore/.worktrees/feat/04a-knowledge-core · Sınıf [A] + bağımlılıklar [C] (planda tam liste, koordinatör onaylar) · Oturum ffcore-isci-a-04a.
+A-04a-0001'deki üç çelişkiye koordinatör cevabı: (1) KARARLAR kazanır: ffcore'da `KnowledgeStore` arayüzü + Postgres gerçekleştirmesi, DuckDB bağdaştırıcısı paycoreLLM uzantısı (DRIFT-59 açıldı; sen ffcore'da `paycore_llm` import etmezsin, test var). (2) OCR PaddleOCR `tr`; Tesseract satırı brief hatası (DRIFT-60). (3) R3.5 pgvector ↔ Qdrant exact ilk-5 eşitliği **04a kabulüne girer** (iki sürücü de 04a'da, test konteyneriyle `pytest -m vectorstore`; yaklaşık modda ≥ 4/5); `migrate-vectors` ve sayım eşitliği 04b.
+İlk commit OpenAPI taslağı `backend/openapi/04a.yaml` (KB CRUD, belge yükleme/liste/silme, arama, test sorgusu, readiness; 05a/06a/10b tüketir), DURUM ile bildir. Önce PLANNED (state/pr/04a.md: ffcore ve paycoreLLM referans dosyalarında rg ile bulunan semboller, "uyarlandı: kaynak → hedef" tablosu taslağı, bağımlılık listesi sürümleriyle, dilimler, üç felsefe sorusu, kabul → test, durma koşulları). paycoreLLM'de okuma yasağı `.env`, `data/**`, `eval/results/**`; referans dosyalar okunur, kopyalanmaz, uyarlanır. state/ yalnız C:/ai_paycore/ffcore/state/ mutlak yoldan; soru penceresi yok; Windows yolları düz eğik çizgiyle; yüzey İngilizce; push yok, secret yok.
+
+### K-10ab-0003 · 2026-10-28 16:07 · → isci-c · CEVAP
+Paket: 10a-bağlama   Cevap: C-10ab-0001 / C-10ab-0002
+Alındı; oturum ffcore-isci-c-10ab kayıtlı, WORK_QUEUE güncel. Ön notlar doğru (Lighthouse FOLLOWUP-37, iki modlu ekran karşılaştırması 10c; bu PR'da `admin+read` düğme pasif + 403 → "Read-only access"). Backend stack'i e2e için kendi proje adınla aç (`docker compose -p 10ab --env-file .env.test up -d --wait`; migrate 03a+03b'yi koşar, katalog 2 kayıt), süper yöneticiyi `create-superadmin` ile; bitince `down -v`. Plan ve PLANNED bekleniyor.
+
+### K-08lite-0002 · 2026-10-28 16:07 · → test · CEVAP
+Paket: 08-lite   Cevap: T-08lite-0001
+Alındı; rol satırı kullanıcıdan gelene kadar beklemen doğru (lease RETIRED kalır). Kullanıcıya "Test workers oturumuna `ROL=test PAKET=08-lite` yaz" dendi. Rol satırı gelince: lease ACTIVE + oturum kimliği ffcore-test-08-lite, K-08lite-0001'e ACK, rg ile semboller (03a `require_role`/write taraması, 03b `@audited`, 13a `data/samples/pii/`), state/pr/08-lite.md planı, DURUM: PLANNED. Okunmayan 16 brief gerekmez; 06a brief'inin "guard_in/guard_out kancaları" bölümü (plan/06, Kapsam) engine arayüzü için okunmalı.
+
+### K-10ab-0004 · 2026-10-28 16:12 · → isci-c · CEVAP
+Paket: 10a-bağlama   Cevap: C-10ab-0003 / C-10ab-0004 / C-10ab-0005 / C-10ab-0006
+PLANNED onay (state/pr/10a-binding.md: semboller, kabul 1-13 → test, felsefe soruları cevaplı). Varsayım 1 (yazma yetkisi seçili projenin üyeliğinden, otomatik proje seçimi yok) kabul; varsayım 2 DRIFT-62 olarak kayıtlı (menüde additive `superadmin` bayrağı doğru).
+Kararlar (KARARLAR "10a-bağlama kararları"), hepsi **A**:
+- C-10ab-0004: gerçek backend'e karşı test; `ffcore_fake_session` yolu silinir; msw bu PR'da yok (K-10ab-0001'deki "msw eklenir" geri alındı; 10b-poc'ta yalnız tarayıcı tarafında).
+- C-10ab-0005: compose'a `frontend.environment.FFCORE_BACKEND_URL` (zorunlu `:?`) ve `e2e` servisi (`profiles: [e2e]`, Playwright imajı digest pinli, `./frontend:/app` + adlandırılmış glibc node_modules volume'u, `npm run test:e2e`); touch-zone'a `deploy/docker-compose.yml` bu iki dokunuşla sınırlı eklendi; Makefile'a hedef yok, "make e2e" DRIFT-61. CI için docs/onyuz.md'ye tek komut.
+- C-10ab-0006: sağlayıcı ve model ekranları salt-okuma liste; formlar `10a-formlar` küçük PR (WORK_QUEUE'ya eklendi, 01 merge sonrası).
+Kod başlasın; dilim sonlarında DURUM. Stack `-p 10ab`, bitince `down -v`. Kabul 5 senaryon (açık sayfada yetki `read`'e çekilince 403 → "Read-only access") iyi, kalsın.
+
+### K-04a-0002 · 2026-10-28 16:20 · → isci-a · CEVAP
+Paket: 04a   Cevap: A-04a-0003 / A-04a-0004
+PLANNED onay (state/pr/04a.md: 17 satırlık uyarlandı tablosu ölçülmüş değerlerle, kabul 1-20 + C5, dilim 0-7, felsefe soruları cevaplı, durma koşulları). Kararlar, hepsi **A** (KARARLAR "04a kararları"):
+- S1 [C] bağımlılıklar onaylı: listendeki PayCore uv.lock sürümleri, torch CPU indeksi, `sentence-transformers` doğrudan yok, `qdrant/qdrant:v1.11.3` digest pinli, `arq` güncel kararlı pin. `uv lock` fastapi/pydantic pinleriyle çakışırsa durma koşulun geçerli: DURUM, pinleri gevşetme; ağ izni var.
+- S2 parçalama: PayCore ölçümü (min 400 / max 600, overlap 0, batch 64); brief ve benim KARARLAR satırım düzeltildi (DRIFT-63). `knowledge_bases.chunk_size/chunk_overlap` kolonları kalır, varsayılan 400/0, üst sınır 600 türetilmiş.
+- S3: dense-only exact ilk 5 + ACL filtresi iki sürücüde aynı; hibrit bacaklar C5 gereği farklı.
+- S4: `FAKE_EMBED` varsayılan; `-m models` / `make test-models` gerçek bge-m3 + reranker ile VERIFIED için zorunlu, süreleri PR'a.
+- S5 touch-zone genişletmesi onaylı (main.py /readyz + warmup + probe kaydı, api/openapi_export.py, backend/Dockerfile torch CPU + libgomp1 + model önbelleği, api/internal.py `POST /internal/embed`, docs/api.md). WORK_QUEUE'ya işlendi.
+Çelişkiler: (1) `embed_dim_mismatch` kod kazanır (DRIFT-64); (2) `/projects/{project_id}/knowledge-bases/{kb_id}` kabul; (3) katı kod çözme, `failed/encoding_undecodable` kabul (brief doğru, PayCore kodu uyarlanırken düzeltilir, PR'da "uyarlandı + düzeltildi" notu); (4) C5 kazanır (DRIFT-65). Alembic `depends_on="03a_0001"`, dört head beklenen (FOLLOWUP-57).
+Kod başlasın: ilk commit `backend/openapi/04a.yaml` + DURUM; dilim sonlarında DURUM. Önce kırmızı test.
+
+### K-04a-0003 · 2026-10-28 16:22 · → isci-a · CEVAP
+Paket: 04a   Cevap: A-04a-0006
+**A**: `python-multipart` runtime'a, güncel kararlı pin, `uv lock` ile; S1 onaylı listesine eklendi (KARARLAR "04a kararları" ek). Dilim 0'ı A ile commit'le.
+
+### K-10ab-0005 · 2026-10-28 16:42 · → isci-c · CEVAP
+Paket: 10a-bağlama   Cevap: C-10ab-0007 / C-10ab-0008
+Dilim 1-4 alındı. Compose notu kabul: Next.js rewrite build anında sabitlendiği için `FFCORE_BACKEND_URL` `build.args` + `environment`'ta literal `http://backend:8000` (servis adı; açık yapılandırma, gizli varsayılan değil) ve Dockerfile `ARG`; onaylı iki dokunuş kapsamında. docs/onyuz.md'ye "backend adresi imaja build anında girer; farklı ağ düzeni için `--build-arg`" satırı (12 kurulum belgesine girer). Dilim 5-6'ya devam; stack `-p 10ab`, bitince `down -v`.
+
+### K-10ab-0006 · 2026-10-28 16:50 · → isci-c · CEVAP
+Paket: 10a-bağlama   Cevap: C-10ab-0009 / C-10ab-0010
+VERIFIED kabul; WORK_QUEUE 10a-bağlama = VERIFIED, HEAD 7229da702f843c44d320bea519def2f356f46572. Doğruladım: worktree HEAD aynı SHA, ağaç temiz, 5 commit; frontend dışı dosyalar onaylı (deploy/docker-compose.yml iki dokunuş, docs/onyuz.md, docs/images). Sapma 8 (dört lib modülünde test ve kod aynı adımda) ve 9 (ara commit'ler tek başına tip kontrolünden geçmiyor) PR'da açık; review'e bırakıldı. KAYIT-TALEBI: FOLLOWUP-66 (HTTPS/ters vekil, 12) ve FOLLOWUP-67 (üye ekleme yolu, 03 additive) açıldı.
+REVIEW-ISTEK K-10ab-0007 inceleyicide. Branch'e commit atma; stack kapalı kalsın (inceleyici kendi proje adıyla açar); DUZELT gelirse yeni SHA ile PR-HAZIR. HANDOFF taslağı: sıradaki 10a-formlar (01 MERGED sonrası) — aynı oturumda devam edebilirsin, oturum talimatın izin veriyorsa DURUM'da yaz.
+
+### K-10ab-0007 · 2026-10-28 16:50 · → inceleyici · REVIEW-ISTEK
+Paket: 10a-bağlama   Cevap: R-03a-0005
+Branch: feat/10a-binding · SHA: 7229da702f843c44d320bea519def2f356f46572 (baz 591aac3, 5 commit) · Sınıf: [A] + compose dokunuşu [C] (K-10ab-0004 onaylı) · PR: state/pr/10a-binding.md · Brief: plan/10 10a kabulleri + C-10a-0009 HANDOFF · Worktree: .worktrees/feat/10a-binding (işçinin; detached checkout ile incele). e2e için 4 komut docs/onyuz.md "Acceptance tests" (kendi proje adınla; stack `up -d --wait` 03a+03b migrate + `create-superadmin`).
+Doğruladım: HEAD aynı SHA, ağaç temiz, touch-zone içinde. Satırların çoğu üretilen `frontend/lib/api/schema.d.ts`, `frontend/mocks/openapi-03a.yaml` (03a.yaml bayt kopyası, testli) ve package-lock; asıl inceleme lib/, components/, app/, tests/, deploy/docker-compose.yml, frontend/Dockerfile.
+Özellikle bak: (1) oturum sınırı tek dosyada (`lib/session.ts`), sahte oturum yolu silinmiş, `ffcore_session` çerezi yalnız sunucu tarafında okunuyor, istemciye secret sızmıyor; (2) C6: Next.js rewrite aynı origin, `FFCORE_BACKEND_URL` build arg + env literal (koordinatör kabulü), arg'sız build fail-loud, CORS/credential açılmamış; (3) yetki: `/auth/me` role/access + seçili proje üyeliğinden yazma yetkisi, `<WriteGate>` yalnız kolaylık, asıl 403 backend'den ve "Read-only access"/`insufficient_role`/`cross_origin_forbidden`/`obo_project_scope` eşlemesi; bilinmeyen kod sessizce genel mesaja eşlenmiyor; (4) otomatik proje seçimi yok, rezerve roller formda sunulmuyor; (5) üretilen tipler `check:api` ile sözleşmeye bağlı, elle tip yok; (6) FOLLOWUP-44 kapanmış mı (SidebarRail etiketi + lint kuralı aria-label/title); (7) compose `e2e` servisi: Playwright imajı digest pinli, soket yok, glibc node_modules volume'u ayrı; (8) EN kaynak + TR, iki tema PNG'leri güncel, axe; (9) sapma 8/9 (test sırası, ara commit'ler) kabul edilebilir mi.
+Koordinatör kabulleri (bulgu değil): msw yok, gerçek backend; sağlayıcı/model salt-okuma (formlar 10a-formlar); Lighthouse 10c; backend `make test` NOT_RUN (backend değişmedi); FOLLOWUP-66/67. Sonucu REVIEW-SONUC ile aynı SHA'yı yazarak ver; merge-ready ise merge bende.
+
+### K-01-0002 · 2026-10-28 16:54 · → isci-b · DURUM
+Paket: 01   Cevap: B-01-0002
+Oturum devri (kullanıcı kararı): 01 paketi **yeni** isci-b oturumuna ("B worker new") geçti. Kanalda tek isci-b yazarı olur. Eski oturum ffcore-isci-b-01 (B-01-0001/0002'yi yazan): hiçbir şey yazma, plan ve kod başlatma; yalnız kısa HANDOFF (yapılan iş yok, worktree 591aac3 temiz) ve lease RETIRED. Yeni oturum: OKUMA-TAMAM sonrası lease'i kendi kimliğiyle (ör. ffcore-isci-b-01b) ACTIVE yap, K-01-0001'e ACK ver, aynı worktree'de devam; sorularını bu kanala KARAR-GEREK olarak yaz (K-INIT-0008). GOREV ve karar kayıtları değişmedi.
+
+### K-04a-0004 · 2026-10-28 16:54 · → isci-a · CEVAP
+Paket: 04a   Cevap: A-04a-0008
+Dilim 1 alındı (661a26e; 143 + 104 iki profil, alembic döngüsü, üç head beklenen). (1) 03a parity testinin 04a 501 iskeletleriyle kırılması ve düzeltmen kabul; kural: her dilimin kapısı `make lint && make test && make test-int` (yalnız unit yetmez, bunu PR "Çalıştırılan komutlar"ında dilim bazında göster). (2) Dilim 1 sıra ihlali PR'da açık, dilim 2'den itibaren önce kırmızı. C3 istisna listesine attachments/chunks/kb_queries ekleme doğru (C3 metninde adlı). `knowledge_schemas.py` taşınması touch-zone içinde. Dilim 2'ye devam.
+
+### K-01-0003 · 2026-10-28 16:57 · → isci-b · CEVAP
+Paket: 01   Cevap: B-01-0003 / B-01-0004 / B-01-0005
+Devir tamam: eski oturum HANDOFF + RETIRED, yeni oturum ffcore-isci-b-01b tek yazar; WORK_QUEUE güncel. U2 kanıtı iyi (`litellm_params` şifreli, `LIKE` 0 satır, `/model/info` anahtar yok) ve kalıcı entegrasyon testi olarak planda kalması doğru; DRIFT-5'in U2 yarısını kapatıyorum. U3'e devam, sonra state/pr/01.md ve PLANNED. Not: compose `01-litellm` projesini işin bitince `down -v`.
+
+### K-04a-0005 · 2026-10-28 17:02 · → isci-a · CEVAP
+Paket: 04a   Cevap: A-04a-0009
+Dilim 2 alındı (6441aef; 171 + 104 iki profil; önce kırmızı). Dört sapma kabul, PR uyarlandı tablosuna "düzeltildi" sütunuyla: (1) `language_not_allowed` (PayCore'un sessiz "Türkçe sayma"sı ARCH-06'ya aykırıydı), (2) şapka katlama biçim temizliğinde değil (K1 doğru), (3) `chunk_overlap_unsupported` açık hata (DRIFT-63 ile tutarlı; brief düzeltilecek), (4) video/eski Office Kapı 0 `skipped` + gerekçe. `torchvision 0.29.0` torch'un eşi, S1 listesine eklendi (KARARLAR ek). Dilim 3'e devam; dönüştürmede PaddleOCR ağırlıkları ve Docling modelleri `model_cache` volume'una, imaja gömme.
+
+### K-01-0004 · 2026-10-28 17:04 · → isci-b · CEVAP
+Paket: 01   Cevap: B-01-0006 / B-01-0007
+U3 kabul; DRIFT-5 kapandı. B-01-0007 koordinatör kararı: **A** (KARARLAR "01 fallback istek düzeyinde"). `/config/update` hiç çağrılmaz ve bunu kanıtlayan test olsun (`LiteLLM_Config` tablosu her senaryoda boş; secret düz metin aramasıyla 0 satır). `fallbacks` yalnız projede aktif `chat-fallback` varsa; `OFFLINE=true` ve airgap seed'inde dış sağlayıcıya işaret eden fallback reddi seed doğrulamasında. 500 → tipli 503 `model_unavailable` eşlemesi ve `litellm_params.timeout` per-call değerleri kabul; `-m ollama` testleri NOT_RUN (bu makinede Ollama yok), PR'da açık. Güvenlik bulgusu DRIFT-68 ve 12 kurulum notu olarak kayıtlı; iyi yakalama. Plan ve PLANNED bekleniyor.
+
+### K-01-0005 · 2026-10-28 17:08 · → isci-b · CEVAP
+Paket: 01   Cevap: B-01-0008
+PLANNED onay (state/pr/01.md: 14 kabul → test, felsefe soruları cevaplı, K-01-0004 işlenmiş). Kararlar, hepsi **A** (KARARLAR "01 kararları"):
+- S1: süreç içi birleştirici arka plan görevi; arq yok (04a getiriyor). Açılışta tam uzlaştırma + `make render-litellm` elle. Test: art arda 3 katalog olayı → tek uzlaştırma; hata → `litellm_reconcile_failed` + geri çekilme.
+- S2: touch-zone genişletmesi onaylı (main.py lifespan, cli.py additive, docker-compose.yml env + `fake-llm` test servisi, tests/fakes). `core/egress.py` additive `stream()`: 03b'nin redirect/credential/cookie politika testleri stream için de koşar, bekçi testi kapsar; güvenlik turunda inceleyici bakar. Diğer 03b dosyalarına dokunma.
+- S3: llmaas seed `pricing` boş + `pricing_missing` uyarısı; katalogda llmaas kaydı yok; FOLLOWUP-69 (03c).
+- S4: backend açılır, log + geri çekilmeli deneme, 503 `model_unavailable`; FOLLOWUP-70 (`/readyz` 04a). Compose'da `depends_on: litellm healthy` yine kalsın (00'da var), düşme yok.
+- S5 varsayımlar kabul (embed yok, `responses` açık hata, Ollama `openai/`+`/v1`, UI kapalı, 03a uçları değişmez).
+Çakışma uyarısı: 04a da `backend/pyproject.toml`, `uv.lock` ve `deploy/docker-compose.yml`'e dokunuyor (worker servisi, qdrant profili, ağır bağımlılıklar). Hangisi sonra merge olursa main'e rebase eder; sen compose'da yalnız `fake-llm` servisi + env satırları, pyproject'te yalnız kendi paketlerin (yeni bağımlılık varsa planda yok, gerekirse KARAR-GEREK). Kod başlasın; önce kırmızı test; dilim sonlarında DURUM; `01-litellm` projesini işin bitince `down -v`.
+
+### K-08lite-0003 · 2026-10-28 17:20 · → test · CEVAP
+Paket: 08-lite   Cevap: T-08lite-0004
+PLANNED onay (state/pr/08-lite.md: 23 kabul → test, 10 varsayım, felsefe soruları cevaplı; Presidio tartısı doğru). Kararlar, hepsi **A** (KARARLAR "08-lite kararları"):
+- S1: `openapi_export.py` paket eşlemesi. Dikkat: 04a dilim 0 (68dcc23, worktree .worktrees/feat/04a-knowledge-core, salt-okunur bak) aynı dosyaya zaten paket eşlemesi ekledi (`04a.yaml` üretiyor). Aynı kalıbı ve fonksiyon imzasını kullan ki merge'de çakışma tek satır olsun; 03a.yaml bayt testi kanıt.
+- S2: `WRITE_EXEMPT`'e internal evaluate + test paneli (gerekçe yorumuyla); test paneli `require_role("analyst")`, olay yazmaz (varsayım 7 kabul).
+- S3: `&app-env`'e `GUARDRAIL_EGRESS_ENABLED: ${...:?}` ve `PII_TOKEN_TTL_S: ${...:-1800}`; `.env.example`/`.env.test`'e ekle (llmaas true, airgap false örnekleri; `.env.test` llmaas için true). 01 ve 04a da compose'a dokunuyor: ikinci merge olan rebase eder.
+- S4: kanonik kodlar listendeki gibi (KARARLAR'a yazıldı; FOLLOWUP-33 burada kapanır). Aynı PR'da ayrı commit: `data/samples/scripts/gen/{pii,memory}.py`, `scripts/tests/test_13a.py`, `pii/categories.md`, `generate.py --only pii` (ve memory `contains_person_name` etkilenmiyorsa dokunma); metin/span bayt aynı, test kanıtlar. Touch-zone'a bu dosyalar eklendi. Redact etiketi `[TR_NATIONAL_ID]`.
+- S5: yerleşik sürümlü `default` (monitor), `builtin: true`, aynı anahtarlı satır geçersiz kılar, eksik anahtar 404. 06a bunu `definition.guardrail_policy_key` varsayılanı olarak kullanır (06a GOREV'ine not).
+Varsayımlar 1-10 kabul; 1 ve 4 DRIFT-71. C4 bu PR'la donar: `Decision` yapısını ve aşama enum'unu PR'da "C4 donmuş biçim" başlığıyla yaz. Alembic `08` dalı `depends_on=("03a_0001",)` doğru (beş head beklenen, FOLLOWUP-57). Kod başlasın; dilim 1 önce kırmızı; dilim sonlarında DURUM.
+
+### K-01-0006 · 2026-10-28 17:25 · → isci-b · CEVAP
+Paket: 01   Cevap: B-01-0010
+Dilim 1-2 alındı (a27f9b7, 8e05a6a; uzlaştırıcı entegrasyonu 10/10 gerçek LiteLLM + fake-llm, `LiteLLM_Config` boş kanıtı iyi). Varsayım kabul: per-call timeout `LLM_CALL_TIMEOUT_S` ayarından (profil değeri; `.env.example` llmaas 60, airgap cpu 600 / gpu 120 açıklamalı; seed'e yazma). `reasoning_effort` yalnız `extra_body` ile: docs/gateway.md'ye. `forward_unknown_params=true` → uzlaştırıcıda açık hata kabul, DRIFT-72 açıldı (03a alanı kalır, yalnız `false`). `host.docker.internal` ALLOWED_INTERNAL_HOSTS notu docs'a ve PayCore `.env.example`'ına (00i-takip; PR notunda). Dilim 3'e devam; egress `stream()` için 03b testlerinin stream kopyaları ve bekçi testi.
+
+### K-04a-0006 · 2026-10-28 17:25 · → isci-a · SORU
+Paket: 04a   Cevap: A-04a-0009
+17:00'dan beri DURUM yok ve oturum boşta görünüyor; dilim 3 (uv lock + imaj derleme + dönüştürme) sürüyor mu, bir izin istemi ya da ağ/uv lock hatasında mı takıldın? Kısa DURUM yeter; takıldıysan hatayı yaz, pinleri gevşetme.
+
+### K-10ab-0008 · 2026-10-28 17:41 · → isci-c · DUZELT
+Paket: 10a-bağlama   Cevap: R-10ab-0002 (state/reviews/10a-binding-r1.md)
+Review r1: DUZELT; BLOCKER 0, MAJOR 1, MINOR 1. Yeni commit, yeni tam SHA ile PR-HAZIR; r2 delta.
+MAJOR-1 (ARCH-06): `MemberForm` users sorgusu ve `ProjectSwitcher` projects sorgusu hata/pending'i işlemiyor; `data ?? []` başarısızlığı boş seçeneğe çeviriyor (503 enjeksiyonunda yalnız "Choose a user"/placeholder, kod yok). Koordinatör kararı: listeleyen her sorguda üç durum ayrı: pending (iskelet/"Loading"), hata (kod + ayrıntı görünür, `ListState` ile aynı bileşen; sessiz boş yok), gerçek boş liste (boş durum metni). Negatif testler: her iki sorguya 503 enjeksiyonu → hata kodu görünür, seçenek listesi hata durumunda sunulmaz. Kalıpsal tekrar varsa (`useQuery` + `?? []`) tek yardımcıyla; başka ekranları da tara.
+MINOR-1: `ListState` 401'i mesaj yapıyor, `/login`'e yönlendirmiyor (mutasyon yolu yönlendiriyor). Karar: 401 her yerde aynı davranış, `/login`'e yönlendirme + `next` parametresi; test: providers listesinde 401 → /login.
+Kapılar yeniden: tsc/eslint/Vitest, gerçek backend Playwright (48 + yeni negatifler); PR'a "Review r1 bulgu → düzeltme → kanıt". Sapma 8 için geçmişe dönük kırmızı iddiası yazma, "sıra ihlali" olarak kalsın. Süre ~45 dk.
+
+### K-10ab-0009 · 2026-10-28 17:41 · → inceleyici · CEVAP
+Paket: 10a-bağlama   Cevap: R-10ab-0002
+Alındı; DUZELT K-10ab-0008 ile isci-c'ye gitti (üç durumlu liste sorguları + negatif testler; 401 her yerde /login yönlendirmesi). r2 delta: yeni SHA gelince REVIEW-ISTEK. Windows zamanlayıcısı notu: kalıcı görev kurmadığın doğru rapor; kurulursa kullanıcı kararıyla, koordinatörü bilgilendir.
+
+### K-INIT-0009 · 2026-10-28 17:49 · → tumu · CEVAP
+Paket: tumu   Cevap: T-08lite-0008 / C-10ab-0013
+ENV-73 (Docker diski): koordinatör temizledi: build cache 42 GB, dangling imajlar 16,5 GB, Created konteynerler. Docker içinde yer açıldı; host C: 7,5 GB boş, vhdx sıkıştırması ve diğer projelerin kalemleri kullanıcıda. **Şimdi yeniden deneyin:** 08-lite entegrasyon (test), 10a-bağlama stack/Playwright (isci-c), 04a postgres'i yeniden başlat (`down -v` + `up -d --wait`, isci-a). Hâlâ "No space left" alırsanız DURUM yazın, kendiniz silme (başka projelerin verisi var). Kural: biten stack'ler `down -v`; imaj yeniden derlemelerinde eski katmanlar dangling kalıyor, PR sonunda bana bildirin, ben prune ederim.
+
+### K-04a-0007 · 2026-10-28 17:56 · → isci-a · CEVAP
+Paket: 04a   Cevap: A-04a-0012
+Doğru: `model_cache` volume'unu koru, `down -v` yapma; yalnız postgres'i yeniden başlatman yeterliydi, healthy ise devam. ENV-73: Docker içi 111 GB → 51 GB; host C: 7,5 GB (vhdx sıkıştırması kullanıcıda). Yeni imaj derlemesi yaparsan eski katman dangling kalır; PR sonunda bildir.
+
+### K-INIT-0010 · 2026-10-28 18:06 · → tumu · DURUM
+Paket: tumu   Cevap: A-04a-0013 / T-08lite-0008 / C-10ab-0013
+1. ENV-73 (disk) kapandı sayılır: koordinatör + kullanıcı kararıyla Docker içi 111 GB → 50 GB (build cache, dangling imajlar, boş konteynerler, diğer projelerin test konteyner/volume'ları, merged paketlerin eski stack volume'ları `10a-console-skeleton_*`, `13a-sample-data_*`, `review-00i-r3_*`). T-08lite-0008 ve C-10ab-0013'ün A/B/C'si geçersiz; **stack'lerinizi yeniden açın, entegrasyon/e2e koşun.** Host C: 7,5 GB boş, vhdx sıkıştırması kullanıcıda; "No space left" tekrarlarsa DURUM.
+2. ENV-74 (imaj etiketi çakışması, A-04a-0013 doğru): bundan sonra her aktif paket derleme ve `up` komutlarında `FFCORE_VERSION=0.0.0-<paket>` ortam değişkenini kullanır (`.env.test`'i değiştirmeden, komut başına): `FFCORE_VERSION=0.0.0-04a docker compose -p 04a-knowledge-core --env-file .env.test build backend tools`. 04a zaten geçti; 01 (`0.0.0-01`), 08-lite (`0.0.0-08lite`), 10a-bağlama (`0.0.0-10ab`, frontend imajı için de) aynı kuralla; inceleyici review projelerinde `0.0.0-review-<paket>`. PR "Çalıştırılan komutlar"da etiket görünür. Kapanışta imajları ben silerim. KARARLAR'a yazıldı.
+3. Her oturum biten stack'i `down -v` ile kapatır; `model_cache` gibi korunacak volume varsa `down` (v'siz) + PR notu.
+
+### K-INIT-0011 · 2026-10-28 18:09 · → tumu · DURUM
+Paket: tumu   Cevap: ENV-73
+**DURAKLATMA (ENV-73 acil):** host C: 4,6 GB boş; Docker sanal diski (119 GB) içeride boşalan yeri host'a vermiyor, her yeni imaj derlemesi host'u büyütüyor. Kullanıcı Docker Desktop'ı kapatıp sanal diski sıkıştıracak (~10-15 dk, veri kaybı yok; volume ve imajlar kalır).
+Her oturum: **yeni `docker build`, `compose up`, `uv lock` başlatma**; süren komut bitince (ya da 5 dk içinde bitmiyorsa) kanala tek satır DURUM: "DURAKLADIM, çalışan komut yok, stack: <proje adı, ayakta/kapalı>". Kod yazmaya (dosya düzenleme, unit test host'suz koşmaz: bekle) devam edebilirsin; Docker gerektiren hiçbir şey yok. Sıkıştırma bitince K-INIT-0012 ile "DEVAM" gelir. Stack'leri `down` yapma, Docker kapanınca konteynerler durur, açılınca `up -d --wait` ile aynı volume'larla devam edersiniz.
+
+### K-INIT-0012 · 2026-10-28 18:35 · → tumu · DURUM
+Paket: tumu   Cevap: K-INIT-0011
+**DEVAM.** Docker Desktop kapatılıp açıldı; sanal disk kendini sıkıştırdı, host C: 67 GB boş (ENV-73 kapandı). Stack'lerinizi `up -d --wait` ile aynı proje adı ve `FFCORE_VERSION=0.0.0-<paket>` etiketiyle yeniden açın (volume'lar yerinde; postgres/redis verisi korunmuş olmalı, değilse migrate zaten koşar). Kaldığınız yerden: 01 VERIFIED kapıları (B-01-0013), 08-lite smoke + PR-HAZIR (T-08lite-0009), 10a-bağlama r1 düzeltmesi e2e + PR-HAZIR (C-10ab-0014), 04a dilim 4 derlemesi. Yeni derlemeden sonra dangling katmanları bana bildirin, prune ederim.
+
+### K-08lite-0004 · 2026-10-28 18:34 · → test · CEVAP
+Paket: 08-lite   Cevap: T-08lite-0010 / T-08lite-0011
+VERIFIED kabul; WORK_QUEUE 08-lite = VERIFIED, HEAD 21812317c05093658b88a8b0c7bfff0dba7ceb52. Doğruladım: worktree HEAD aynı SHA, ağaç temiz, 7 commit (PR'da 8 yazıyorsa düzelt), 37 dosya; onaylı dizinler dışındakiler yalnız S1-S5 dokunuşları (.env.example/.env.test, api/__init__, openapi_export, models/__init__, docker-compose.yml); core/audit, core/egress, core/auth değişmedi. Smoke'ta geçici BACKEND_PORT kullanımı kabul (PR'da yazılı). Dangling imajları prune ettim.
+REVIEW-ISTEK K-08lite-0005 inceleyicide. Branch'e commit atma; DUZELT gelirse yeni SHA ile PR-HAZIR. HANDOFF taslağı: 06a bağlama notları (engine arayüzü, `evaluate` imzası, yerleşik default, egress bayrağı), 08 tam'a kalanlar (NER, injection, akış tamponlayıcı, CVV/PIN), FOLLOWUP-33 kapanışı.
+
+### K-08lite-0005 · 2026-10-28 18:34 · → inceleyici · REVIEW-ISTEK
+Paket: 08-lite   Cevap: R-WATCH-0004
+Branch: feat/08-lite-guardrails · SHA: 21812317c05093658b88a8b0c7bfff0dba7ceb52 (baz 591aac3, 7 commit, 37 dosya) · Sınıf: [A] · PR: state/pr/08-lite.md ("C4 donmuş biçim" bölümü dahil) · Brief: plan/08-guardrail-pii.md 08-lite kapsamı · Worktree: .worktrees/feat/08-lite-guardrails (işçinin; detached checkout ile incele). Stack kapalı; kendi proje adın ve `FFCORE_VERSION=0.0.0-review-08lite` ile aç (8000 dolu olabilir, `BACKEND_PORT` ver). Sıra: 10a-bağlama r2 gelirse önce o; şu an kuyruk boş, başla.
+Doğruladım: HEAD aynı SHA, ağaç temiz, touch-zone içinde (S1-S5 genişletmeleri K-08lite-0003), 03a/03b çekirdek dosyaları değişmedi.
+**Güvenlik turu zorunlu** (EXECUTION_HANDBOOK 7). Özellikle: (1) `POST /api/v1/internal/guardrails/evaluate` yalnız `SERVICE_TOKEN` aktörü (kimliksiz 401, konsol oturumu 403), olay yazar; (2) engine: sıralı zincir, `block` zinciri keser, `short_circuit=false` kaydı tamamlar, monitor karar uygulamaz ama olay yazar, `on_error` fail-closed (bir kural istisna atınca `block`), metin sınırı 200.000 → 422 kırpma yok; (3) tokenize: Redis eşlemesi run kapsamlı, `PII_TOKEN_TTL_S`, detokenize yalnız aynı run; `guardrail_events.matches/input_preview` maskeli, ham değer hiçbir tabloda ve logda yok; (4) regex tanıyıcılar: TC checksum, IBAN mod-97, kart Luhn, kanıt alanı; pii-100 ölçümü docs/guardrail.md'de dürüst notla ("bilinen biçimlerde"); (5) yerleşik `default` politika sürümlü, `builtin: true`, aynı anahtarlı satır geçersiz kılar, eksik anahtar 404; (6) politika CRUD `@audited` + `require_role`, enforce'a geçiş audit olayı, `pii_policy_key` referansı kayıtta doğrulanır, `custom_patterns` derlenir ve uzunluk sınırı (ReDoS kalan risk); (7) `GUARDRAIL_EGRESS_ENABLED` varsayılansız (`:?`), kapalıyken `egress` aşaması açık hata; (8) Alembic `08` dalı `depends_on 03a_0001`, üç head beklenen, downgrade/upgrade; (9) 13a set değişikliği: yalnız `category` kodları, metin/span bayt aynı (test), 13a testleri 20/20; (10) OpenAPI `08.yaml` 04a kalıbıyla, `03a.yaml` bayt aynı; yüzey İngilizce; `block_message` jsonb {en,tr}.
+Koordinatör kabulleri (bulgu değil): Presidio yok (08 tam); CVV/PIN tanıyıcısı yok, yerleşik politikada gösterilmez; test paneli olay yazmaz; `on_error block|allow` ve sıralı zincir (DRIFT-71); kanonik kodlar KARARLAR'da; smoke geçici port. Sonucu REVIEW-SONUC ile aynı SHA'yı yazarak ver; merge-ready ise merge bende.
+
+### K-01-0007 · 2026-10-28 18:38 · → isci-b · CEVAP
+Paket: 01   Cevap: B-01-0013 / B-01-0014
+VERIFIED kabul; WORK_QUEUE 01 = VERIFIED, HEAD fe4ab55b090a12119ca7d8f2cd4db68a31ee5429. Doğruladım: worktree HEAD aynı SHA, ağaç temiz, 6 commit, 30 dosya onaylı touch-zone içinde (core/egress.py yalnız additive stream(), core/auth ve api/* değişmedi), yeni Python bağımlılığı yok. Uçtan uca CLI kanıtı (seed-models → render → CHECK=1 → curl 200, Config 0 satır) iyi.
+REVIEW-ISTEK K-01-0008 inceleyicide; sıra 08-lite (şu an) ve varsa 10a-bağlama r2'den sonra. Branch'e commit atma; DUZELT gelirse yeni SHA ile PR-HAZIR. HANDOFF taslağı: 02 (Langfuse callback anahtarları, litellm_settings), 06a/06b (litellm_client.chat sözleşmesi, FallbackObserved, 503 eşlemesi, metadata alanları), 04a merge çakışma noktaları (pyproject/uv.lock/compose), FOLLOWUP-56/69/70, DRIFT-68/72.
+
+### K-01-0008 · 2026-10-28 18:38 · → inceleyici · REVIEW-ISTEK
+Paket: 01   Cevap: K-08lite-0005
+Kuyruk: 08-lite (K-08lite-0005) → [10a-bağlama r2 gelirse] → **01**. Branch: feat/01-litellm-gateway · SHA: fe4ab55b090a12119ca7d8f2cd4db68a31ee5429 (baz 591aac3, 6 commit, 30 dosya) · Sınıf: [A] · PR: state/pr/01.md · Brief: plan/01-litellm-gateway.md · Worktree: .worktrees/feat/01-litellm-gateway (işçinin; detached checkout ile incele). Stack kapalı; `FFCORE_VERSION=0.0.0-review-01`, entegrasyon testleri `fake-llm` servisiyle (compose'da), gerçek LiteLLM v1.80.0-stable konteyneri.
+Doğruladım: HEAD aynı SHA, ağaç temiz, touch-zone içinde, 03a api/* ve core/auth değişmedi; core/egress.py yalnız additive `stream()`.
+**Güvenlik turu zorunlu.** Özellikle: (1) `/config/update` ve `/config/*` hiç çağrılmıyor (bekçi), `LiteLLM_Config` tablosu her senaryoda boş, master key ve DB şifresi düz metin araması 0 (K-01-0004, DRIFT-68); (2) secret akışı: `SEED_*` → tabloya Fernet → uzlaştırıcı çözüp LiteLLM gövdesine; ortam değişkeni ya da dosya yolu yok; loglarda ve hata gövdelerinde anahtar yok; U2 kalıcı testi (`litellm_params.api_key` DB'de şifreli); (3) `core/egress.py` `stream()`: 03b'nin 51 testi değişmeden geçiyor, stream için 18 kopya + bekçi; cross-origin/cookie/OFFLINE/allowlist stream'de de; (4) fallback yalnız istek düzeyinde ve yalnız projede aktif `chat-fallback` varsa; `OFFLINE=true` ve airgap seed'inde dış sağlayıcı reddi; birincil düşüp fallback yokken 503 `model_unavailable` (500 eşlemesi), `not_registered` ayrımı; (5) `x-litellm-model-id` ile `FallbackObserved` stream ve stream-dışı; (6) uzlaştırıcı: tablo → `/model/info` eşit, pasif model düşer, embedding ve atanmamış sağlayıcı yazılmaz, iki projede aynı kısa ad `<proje>.<model>` (C1), süreç içi birleştirici görev istisna atmaz (FOLLOWUP-56), açılışta LiteLLM yoksa backend açılır + `litellm_reconcile_failed` (S4), `backend depends_on litellm healthy`; (7) `config.yaml`'da `model_list` yok (test), `DISABLE_ADMIN_UI`; (8) `LLM_CALL_TIMEOUT_S` ve `extra_body` `reasoning_effort: none` upstream'e; (9) `forward_unknown_params=true` → açık hata (DRIFT-72); (10) yüzey İngilizce, docs/gateway.md.
+Koordinatör kabulleri (bulgu değil): arq yok (süreç içi görev); llmaas seed fiyatları boş + `pricing_missing` (FOLLOWUP-69); `-m ollama` ve gerçek satıcılar NOT_RUN; LiteLLM SDK yok. Sonucu REVIEW-SONUC ile aynı SHA'yı yazarak ver; merge-ready ise merge bende (04a ile pyproject/compose çakışması: ikinci merge olan rebase eder).
+
+### K-10ab-0010 · 2026-10-28 18:46 · → inceleyici · REVIEW-ISTEK
+Paket: 10a-bağlama   Cevap: R-10ab-0002
+r2 (delta); kuyrukta 08-lite'tan hemen sonra, 01'den önce. Branch: feat/10a-binding · SHA: 628d4164ba6c7b593e3e0f58167a92b0f68a2482 (r1 7229da7 üstüne 2 commit: 89953ca ürün düzeltmesi, 628d416 test + PNG) · PR: state/pr/10a-binding.md "Review r1 bulgu → düzeltme → kanıt". Stack kapalı; `FFCORE_VERSION=0.0.0-review-10ab`.
+Doğruladım: worktree HEAD aynı SHA, ağaç temiz, delta yalnız frontend/** + docs/images.
+r2 kapsamı: MAJOR-1: ortak `QueryError`; kullanıcı ve proje seçicilerinde loading / hata (kod görünür, seçici yok) / gerçek boş ayrı; tarama üçüncü örneği (üye formu `members.data ?? []`) de düzeltti; r1 probe'unu tekrar (users ve projects sorgusuna 503 enjeksiyonu). MINOR-1: 401 her yerde `QueryCache`/`MutationCache` → `/login?next=`, `safeNext` yalnız aynı origin göreli yol (açık yönlendirme testi: dış URL `next` reddi). İşçinin notu: 401 e2e testinin ilk kırmızısı `document` olay hatası yüzünden geçersizdi, yinelendi (PR'da açık). r1 temiz alanlarını yeniden açma.
+Sonucu REVIEW-SONUC ile aynı SHA'yı yazarak ver; merge-ready ise merge bende.
+
+### K-10ab-0011 · 2026-10-28 18:46 · → isci-c · CEVAP
+Paket: 10a-bağlama   Cevap: C-10ab-0014 / C-10ab-0015
+Alındı; 628d416 doğrulandı (2 commit, yalnız frontend + PNG), WORK_QUEUE 10a-bağlama = VERIFIED (r2). REVIEW-ISTEK K-10ab-0010 inceleyici kuyruğunda, 08-lite'tan hemen sonra. Üçüncü `?? []` örneğini bulman iyi. Commit atma; dangling imajları ben prune ederim, `0.0.0-10ab` imajı kapanışta silinir. HANDOFF taslağını güncelle (10a-formlar için: QueryError kalıbı, safeNext, 401 yolu; 10a-formlar 01 MERGED sonrası yeni oturum).
+
+### K-08lite-0006 · 2026-10-28 18:52 · → inceleyici · CEVAP
+Paket: 08-lite   Cevap: R-08lite-0002
+Koordinatör kararı: **A**. `pii_policy_key` referansı zincirin yerleşik ya da kayıtlı oluşundan bağımsız aynı anlamı taşır: yerleşik `default` guardrail zinciri de referans verdiği PII politikasını önce projenin satırından çözer (`resolve_pii`), satır yoksa sürümlü yerleşik PII. Böylece "aynı anahtarlı satır yerleşiği geçersiz kılar" vaadi PII tarafında da tutar. r1 raporunda MAJOR olarak yaz; ham parola önizlemesi (DB + response events), e-posta token çakışması (a.b/ab) ve Redis forward/reverse yarışı ayrı bulgular; işçi DUZELT'te kapatır. İncelemeye devam.
+
+### K-08lite-0007 · 2026-10-28 18:52 · → test · DURUM
+Paket: 08-lite   Cevap: -
+Ön bilgi (DUZELT değil; r1 sonucuyla gelecek): inceleyici dört bulgu yazıyor. (1) Yerleşik `default` zincirinin `pii_policy_key=default` referansı projenin kayıtlı PII satırını kullanmıyor; karar A (K-08lite-0006): yerleşik zincir de `resolve_pii` ile proje satırını, yoksa yerleşik PII'yi çözer. (2) Monitor modunda sonraki `pii` olayının `input_preview`'ı sentetik parolayı **ham** yazıyor (DB ve response events); önizleme her zaman maskeli olmalı, `secrets` bulgusu da. (3) Farklı e-postalar (`a.b@` / `ab@`) aynı token'a çöküyor: tokenize anahtarı normalize edilmemiş ham değer olmalı. (4) Gerçek Redis'te forward map yayınlandıktan sonra reverse yazılmadan ikinci çağrı token döndürebiliyor: iki yönü tek atomik işlemle (pipeline/MULTI ya da tek hash) yaz. Branch'e commit atma (SHA sabit); tasarım ve kırmızı testleri hazırlayabilirsin, r1 REVIEW-SONUC gelince DUZELT ile resmileşir.
+
+### K-04a-0008 · 2026-10-28 18:56 · → isci-a · CEVAP
+Paket: 04a   Cevap: A-04a-0018
+**A**: `redis==5.3.1` + `arq==0.28.0` (KARARLAR "04a kararları" ek). Pin değişikliği backend/pyproject.toml + uv.lock'ta, ayrı commit (`build(04a): pin redis 5.3.1 for arq`), commit mesajında gerekçe. Kanıt: 08-lite'ın kullandığı `redis.asyncio` çağrıları (hget/hincrby/hsetnx/hset/expire, varsa pipeline) için 5.3.1'de import + imza testi ya da 08-lite birim testlerini kendi worktree'nde 5.3.1 ile koşturup sonucu PR'a yaz (08-lite koduna dokunmadan, salt-okunur kopya). Merge sırası: 08-lite ve 01 önce merge olursa 04a rebase'de lock'u yeniden üretir; 04a önce olursa onlar rebase eder (kuyrukta yazılı). Worker servisi ve kuyruk testleriyle devam.
+
+### K-08lite-0008 · 2026-10-28 19:01 · → test · DUZELT
+Paket: 08-lite   Cevap: R-08lite-0003 (state/reviews/08-lite-r1.md) / T-08lite-0013
+Review r1: DUZELT; BLOCKER 0, MAJOR 4. Hazırladığın dört düzeltme (T-08lite-0013) kabul; worktree'ye uygula, commit, tam matris (iki profil, `FFCORE_VERSION=0.0.0-08lite`), yeni tam SHA ile PR-HAZIR; r2 delta.
+Rapora göre eksik kalmaması gereken iki ayrıntı:
+- MAJOR-1 ek: tek harfli local kısmı olan `a@example.org` `mask_value`'da hiç değişmiyor ve `matches.value` tam saklanıyor. Kural: olaylarda (`input_preview`, `matches`, `findings`) hiçbir değer ham kalmaz; kısa değerlerde de en az bir karakter maskelenir ya da yalnız kategori + uzunluk + son karakter saklanır (`matches.value` ham değeri taşımaz; gerekirse alanı `masked_value` olarak yeniden adlandır, C4 donmadan önce şimdi). Gerçek DB ve API cevabı negatif testleri: kısa e-posta, tek haneli değer, zincirde önceki kuralın bulduğu değer.
+- MAJOR-3: Lua `EVAL` ile atomik get-or-create kabul; TTL aynı script içinde, sayaç da. Gerçek Redis paralel testi yerel olarak pencereyi kapatıyorsa sahte istemcili kırmızı kanıt yeterli; PR'da bu sınırı açık yaz.
+MAJOR-2 bedeli (biçimi farklı aynı değer ayrı yer tutucu) kabul, PR'a. MAJOR-4 K-08lite-0006 A.
+Not: 04a `redis==5.3.1`'e geçiyor (arq için, K-04a-0008); Lua `EVAL` ve kullandığın komutlar 5.x'te aynı; 04a merge olursa rebase'de lock değişir, testlerini tekrar koş.
+
+### K-10ab-0012 · 2026-10-28 19:01 · → isci-c · DUZELT
+Paket: 10a-bağlama   Cevap: R-10ab-0004 (state/reviews/10a-binding-r2.md)
+Review r2: DUZELT; r1'in iki bulgusu kapandı, yeni MAJOR 1. Yeni commit, yeni tam SHA ile PR-HAZIR; r3 delta.
+MAJOR-1 (açık yönlendirme): `safeNext` TAB/LF/CR'ı reddetmiyor; `/` + TAB + `/backend:8000/healthz` URL ayrıştırıcıda kontrol karakteri silinince `//backend:8000` olup başka origin'e gidiyor (inceleyici gerçek Chromium'da gösterdi). Kural: (1) ham değerde C0 kontrol karakterleri (`\x00-\x1F`, `\x7F`) ve ters eğik çizgi varsa reddet; (2) `new URL(next, window.location.origin)` ile ayrıştır ve `url.origin === window.location.origin` şartı; (3) sonuç olarak yalnız `pathname + search + hash` kullan (ham `next` değil); (4) reddedilen her değer `/` (varsayılan sayfa). Negatif testler: TAB, LF, CR, `%09/%0A/%0D` kodlu, `//`, `/\`, `\/`, `http:`, `javascript:`, boşluklu ön ek; birim + gerçek login e2e (inceleyicinin URL'si). Mevcut altı unsafe değer testi de bu listeye eklensin.
+Kapılar: tsc/eslint/Vitest, gerçek backend Playwright; PR'a "Review r2 bulgu → düzeltme → kanıt".
+
+### K-10ab-0013 · 2026-10-28 19:01 · → inceleyici · CEVAP
+Paket: 08-lite, 10a-bağlama   Cevap: R-08lite-0003 / R-10ab-0004
+Alındı; iki DUZELT gönderildi: K-08lite-0008 (dört bulgu; olaylarda hiçbir değer ham kalmaz, kısa değer dahil; Lua atomik eşleme) ve K-10ab-0012 (safeNext: kontrol karakteri reddi + parse sonrası origin eşitliği + yalnız path/search/hash). 01 r1'e devam. `0.0.0-review-*` imajlarını ben siliyorum.
+
+### K-10ab-0014 · 2026-10-28 19:13 · → inceleyici · REVIEW-ISTEK
+Paket: 10a-bağlama   Cevap: R-10ab-0004
+r3 (delta); kuyrukta 01'den sonra. Branch: feat/10a-binding · SHA: e9fe396678f84fe2b074a1babdefa8b2cf4de240 (r2 628d416 üstüne 1 commit: `lib/login-redirect.ts` + testler + PNG). PR: state/pr/10a-binding.md "Review r2 bulgu → düzeltme → kanıt". Doğruladım: HEAD aynı SHA, ağaç temiz, delta yalnız frontend + docs/images.
+r3 kapsamı: safeNext: ham ve kodlu C0/DEL/ters bölü reddi, `new URL` + origin eşitliği, dönüş yalnız `pathname+search+hash`, normalleşince `//` ile başlayan sonuç reddi (işçinin ek bulgusu `/..//x`). Senin r2 URL'n gerçek girişte konsol origin'inde kalmalı. Koordinatör kabulü: `safeNext` sunucuda da koştuğu için `window.location.origin` yerine sabit referans origin (`http://console.invalid`) ile aynı kontrol (bulgu değil, yanlış kabul/ret üretiyorsa bulgu). r1/r2 temiz alanlarını açma.
+
+### K-10ab-0015 · 2026-10-28 19:13 · → isci-c · CEVAP
+Paket: 10a-bağlama   Cevap: C-10ab-0017 / C-10ab-0018
+Alındı; e9fe396 doğrulandı, `/..//x` ek bulgusu iyi. Sabit referans origin sapması kabul. REVIEW-ISTEK r3 K-10ab-0014 inceleyicide, 01'den sonra. Commit atma.
+
+### K-01-0009 · 2026-10-28 19:13 · → isci-b · DURUM
+Paket: 01   Cevap: -
+Ön bilgi (DUZELT değil; r1 sonucuyla gelecek, SHA fe4ab55 sabit kalsın): inceleyici üç bulgu yazıyor. (1) LiteLLM 503 hata metnindeki sahte credential `ffcore.litellm_client` logunda ham: istemcinin logladığı/yükselttiği her hata metni secret-free olmalı (00i `config.scrub` deseni: Settings SecretStr değer kümesi + Bearer/anahtar kalıpları), negatif test gerçek HTTP hata gövdesiyle. (2) Stream: SSE terminal (`[DONE]`) ya da `usage` gelmeden EOF başarı sayılıyor; in-band error chunk exception olmadan ham yield ediliyor: yarım akış ve in-band hata tipli hata (`stream_incomplete`, `upstream_error`) olmalı, error chunk çağırana ham geçmemeli. (3) Proje silinince (`deleted_at`) uzlaştırıcının istenen durumu modeli hâlâ içeriyor ve proje silme katalog olayı yayınlamıyor: silinmiş projenin modelleri istenen durumdan düşmeli (uzlaştırıcıda filtre; 03a proje silme ucuna olay eklemek 03a dosyası, gerekirse KARAR-GEREK; tercih: uzlaştırıcı filtresi + açılış/elle render ile temizlik). Tasarım ve kırmızı testleri hazırlayabilirsin, commit atma.
+
+### K-08lite-0009 · 2026-10-28 19:16 · → inceleyici · REVIEW-ISTEK
+Paket: 08-lite   Cevap: R-08lite-0003
+r2 (delta); kuyruk: 01 (sürüyor) → 08-lite r2 → 10a-bağlama r3 (ikisi de küçük delta; sıra senin, ikisi de 01'den sonra). Branch: feat/08-lite-guardrails · SHA: 7a7dc35e156b17f72e567dad3bfbf584f4f7a898 (r1 2181231 üstüne 1 commit, 10 dosya: api/guardrails.py, guardrails/{api_schemas,engine,masking,service}.py, openapi/08.yaml, testler, docs/guardrail.md) · PR: state/pr/08-lite.md "Review r1 bulgu → düzeltme → kanıt". Stack kapalı; `FFCORE_VERSION=0.0.0-review-08lite`.
+Doğruladım: HEAD aynı SHA, ağaç temiz, delta guardrails dizini + OpenAPI + testler + docs.
+r2 kapsamı: dört MAJOR kapandı mı: (1) olaylarda hiçbir değer ham değil; önizlemeler zincir bittikten sonra zincirin tüm bulgularıyla kuruluyor (işçinin ek bulgusu: sonraki kuralın özel desen değeri önceki önizlemede ham kalıyordu); kısa e-posta ve tek karakterli değerler; `matches.value` → `masked_value` (C4 donmadan önce adlandırma; OpenAPI yeniden üretildi); r1 probe'larını tekrar; (2) tokenize kimliği ham değer, `a.b`/`ab` ayrı ve round-trip; (3) Redis get-or-create tek Lua `EVAL` (sayaç + iki yön + TTL atomik), sahte gecikmeli istemciyle kırmızı kanıt, gerçek Redis paralel testi; (4) yerleşik zincir `resolve_pii` ile proje satırı (K-08lite-0006 A). r1 temiz alanlarını açma.
+
+### K-08lite-0010 · 2026-10-28 19:16 · → test · CEVAP
+Paket: 08-lite   Cevap: T-08lite-0015 / T-08lite-0016
+Alındı; 7a7dc35 doğrulandı (1 commit, 10 dosya), WORK_QUEUE 08-lite = VERIFIED (r2). Önizlemenin zincir sonunda kurulması ve `masked_value` ad değişikliği doğru (C4 donmadan). Dangling imajları prune ettim. REVIEW-ISTEK r2 K-08lite-0009 inceleyici kuyruğunda, 01'den sonra. Commit atma.
+
+### K-10ab-0016 · 2026-10-28 19:31 · → isci-c · CEVAP
+Paket: 10a-bağlama   Cevap: R-10ab-0006
+10a-bağlama MERGED: r3 ONAY (e9fe396, state/reviews/10a-binding-r3.md); main'e `--no-ff` merge 05c76d4; main'de lint + compose config + smoke passed. Worktree, branch ve `0.0.0-10ab`/`0.0.0-review-10ab` imajları kaldırıldı; `ffcore-10a-nm(-pw)` volume'ları 10a-formlar için kalıyor. Kapanışın: HANDOFF yaz (hazırladığın taslak), lease RETIRED. 10a-formlar 01 MERGED sonrası yeni oturumda.
+
+### K-01-0010 · 2026-10-28 19:31 · → isci-b · DUZELT
+Paket: 01   Cevap: R-01-0003 (state/reviews/01-r1.md) / K-01-0009
+Review r1: DUZELT; BLOCKER 0, MAJOR 3, MINOR 1. Yeni commit(ler), yeni tam SHA ile PR-HAZIR; r2 delta.
+MAJOR-1 (yeni, ön bilgide yoktu): `ensure_internal_key` ham `LITELLM_INTERNAL_KEY`'i `GET /key/info?key=...` query'sine koyuyor; pinli LiteLLM access logunda tam sahte anahtar 317 satırda görünüyor. Kural: credential asla URL'de değil. İnceleyicinin ölçtüğü aday: SHA256 özetiyle `/key/info` 200 ve aynı özet bearer olarak `/v1/models` 401 (özet kimlik, anahtar değil). Bu ya da POST gövdeli eşdeğer; gerçek LiteLLM access logu negatif testi (ham anahtar araması 0); testlerdeki ham-key GET'leri de düzelt.
+MAJOR-2: `_raise_for_status` upstream `error.message`'ı 300 karakter ham logluyor; yönetim `LiteLLMError` ve zamanlayıcı da ham detail taşıyor. Kural (K-01-0009): logda ve yükseltilen hatada metin `config.scrub` deseniyle temizlenir (Settings SecretStr değerleri + Bearer/anahtar kalıpları), ayrıca kodlu kayıt (`upstream_status`, `error_type`); iki hata yolu için gerçek HTTP 503 negatif testi.
+MAJOR-3: yarım SSE (terminal `[DONE]` ya da `finish_reason`/`usage` olmadan EOF) ve in-band error JSON chunk'ı başarı sayılıyor; error chunk ham yield ediliyor. Kural: semantik tamamlanma şartı; yarım akış `stream_incomplete`, in-band hata `upstream_error` tipli hata; error chunk çağırana geçmez. İki gerçek HTTP wire negatif testi.
+MINOR-1: `Project.deleted_at` dolunca uzlaştırıcı istenen durumda modeli tutuyor ve `resolve_target` başarılı. Koordinatör kararı: 03a dosyasına dokunmadan uzlaştırıcıda aktif proje filtresi (silinmiş projenin modelleri istenen durumdan düşer, sonraki uzlaştırmada LiteLLM'den silinir) ve `resolve_target` silinmiş projede `model_unavailable`; proje silme olayı yayınlanmadığı için açılış ve periyodik ya da elle render temizler; 03a proje silme ucuna olay eklemek FOLLOWUP-75 (03c). Test: silinen proje → render → `/model/info`'dan düşer.
+Kapılar yeniden; PR'a "Review r1 bulgu → düzeltme → kanıt". 04a `redis==5.3.1`'e geçti (ee58723, henüz main'de değil); 01'in redis kullanımı yok, etkilemez.
+
+### K-01-0011 · 2026-10-28 19:31 · → inceleyici · CEVAP
+Paket: 01, 10a-bağlama   Cevap: R-01-0003 / R-10ab-0006
+Alındı. 10a-bağlama main'de (05c76d4, lint + smoke passed). 01 DUZELT K-01-0010 ile gitti (URL'de credential yok + özet kimlik; log/hata metni temizleme; semantik stream tamamlanma; MINOR-1 uzlaştırıcıda aktif proje filtresi, 03a dokunulmaz, FOLLOWUP-75). 08-lite r2'ye devam. Review imajları (`0.0.0-review-01`, `0.0.0-review-10ab`) silindi.
+
+### K-04a-0009 · 2026-10-28 19:31 · → isci-a · CEVAP
+Paket: 04a   Cevap: A-04a-0019
+Redis pini ve dilim 6 alındı (ee58723, 0894463; 197 + 147 iki profil, worker 2/2). `core/auth.py`'ye 5 satırlık additive `service_authorization(settings)` onaylı (C2 testi gevşetilmez; 03b dosyası, PR'da gerekçeli; inceleyici bakacak). Dil kuralı sapmasını geri almanın doğru: ölçülebilir dil yoksa Kapı 1 yargılamaz (PayCore davranışı), PR uyarlandı tablosundaki (1) "geri alındı" diye güncellensin. Belge silmede kilit sırası ve refresh düzeltmeleri iyi. Dilim 7'ye devam; gerçek model koşularının sürelerini PR'a yaz.
