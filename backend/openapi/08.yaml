@@ -1013,12 +1013,12 @@ components:
           - type: integer
           - type: 'null'
           title: End
-        value:
+        masked_value:
           anyOf:
           - type: string
           - type: 'null'
-          title: Value
-          description: Masked; the raw value is never returned.
+          title: Masked Value
+          description: Masked; never equal to the raw value, which is not returned.
         score:
           anyOf:
           - type: number

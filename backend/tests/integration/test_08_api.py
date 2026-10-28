@@ -1,6 +1,7 @@
 """08-lite API on the compose Postgres and Redis: policies, audit, test panel, internal evaluate."""
 
 import asyncio
+import json
 import os
 import subprocess
 import uuid
@@ -163,7 +164,7 @@ def test_08_16_test_panel_evidence(admin, client_factory, make_user, project, pg
     tc = body["findings"][0]
     assert tc["category"] == "TR_NATIONAL_ID" and (tc["start"], tc["end"]) == (10, 21)
     assert tc["evidence"].startswith("checksum valid") and "context word" in tc["evidence"]
-    assert tc["value"] == "*******0146"
+    assert tc["masked_value"] == "*******0146"
     assert all(f["evidence"] for f in body["findings"])
     detect = panel.post(
         P.format(project) + "/guardrails/test", json={"text": TEXT, "action": "detect"}
@@ -336,3 +337,71 @@ def test_08_19b_read_mode_get_parity(admin, client_factory, make_user, project):
     ):
         assert edit.get(url).status_code == 200, url
         assert read.get(url).content == edit.get(url).content, url
+
+
+def test_08_s5_builtin_chain_uses_the_projects_stored_pii_default(admin, service_client, project):
+    # Review r1 (K-08lite-0006, A): a stored PII policy keyed `default` replaces the built-in PII
+    # policy also inside the built-in guardrail chain.
+    assert _pii(admin, project, key="default", categories={"EMAIL_ADDRESS": {}}).status_code == 201
+    decision = _evaluate(service_client, project, TEXT).json()
+    assert decision["builtin"] is True
+    [pii_event] = [e for e in decision["events"] if e["rule"].startswith("pii")]
+    assert {f["category"] for f in pii_event["findings"]} == {"EMAIL_ADDRESS"}
+
+
+def test_08_3b_concurrent_tokenize_resolves_every_token(admin, service_client, project, egress):
+    egress(True)
+    run_id = str(uuid.uuid4())
+
+    async def burst():
+        from redis.asyncio import Redis
+
+        from ffcore.guardrails.masking import RedisTokenStore
+
+        client = Redis.from_url(os.environ["REDIS_URL"])
+        store = RedisTokenStore(client, 60)
+        try:
+            tokens = await asyncio.gather(
+                *(store.token_for(run_id, "TR_NATIONAL_ID:x", TC) for _ in range(50))
+            )
+            values = [await store.lookup(run_id, t) for t in tokens]
+            return set(tokens), values
+        finally:
+            await client.aclose()
+
+    tokens, values = asyncio.run(burst())
+    assert tokens == {"<<PII_1>>"}
+    assert values == [TC] * 50
+
+
+def test_08_20_short_and_chained_values_never_raw_in_db_or_response(
+    admin, service_client, project, pg
+):
+    # Review r1 MAJOR-1: real DB rows and the response events, built-in chain in monitor mode
+    # (nothing rewritten, so a later rule sees what an earlier one found).
+    _pii(
+        admin,
+        project,
+        key="default",
+        categories={"EMAIL_ADDRESS": {}, "PIN": {}},
+        custom_patterns=[{"name": "pin", "category": "PIN", "pattern": r"(?<=kod )\d(?!\d)"}],
+    )
+    raw = ["a@example.org", "Bahar6531!", "kod 7"]
+    text = "kod 7, mail a@example.org, şifre: Bahar6531!"
+    response = _evaluate(service_client, project, text)
+    assert response.status_code == 200, response.text
+    body = response.json()
+    assert len(body["events"]) == 2  # secrets#0, pii#1
+    rows = pg.execute(
+        "SELECT input_preview, findings::text, matches::text FROM guardrail_events"
+        " WHERE project_id = %s",
+        (project,),
+    ).fetchall()
+    assert len(rows) == 2
+    stored = " ".join(str(c) for row in rows for c in row) + " " + str(body["events"])
+    for value in raw:
+        assert value not in stored, value
+    masked = [m for row in rows for m in json.loads(row[2])]
+    assert {m["category"] for m in masked} >= {"EMAIL_ADDRESS", "PIN", "PASSWORD"}
+    assert all("value" not in m and m["masked_value"] for m in masked)
+    assert {m["masked_value"] for m in masked if m["category"] == "PIN"} == {"*"}

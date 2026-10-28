@@ -100,8 +100,8 @@ replaces the built-in one.
 | Action | Result |
 |---|---|
 | `redact` | `[TR_NATIONAL_ID]` (the category code) |
-| `mask` | last four characters visible: `*******0146`; e-mail keeps the first letter and the domain: `a***@ornek.com` |
-| `tokenize` | `<<PII_1>>`; the same value gets the same placeholder within a run. The mapping lives in Redis for the run (`PII_TOKEN_TTL_S`, renewed on use) and is reversed on output. A placeholder the run never issued is reported, not guessed |
+| `mask` | at most the last four characters and never more than half stay visible: `*******0146`, CVV `**8`, a one-digit value `*`; e-mail keeps the first letter (none if the local part has one letter) and the domain: `a***@ornek.com`, `*@example.org`. A masked value never equals the raw one |
+| `tokenize` | `<<PII_1>>`; exactly the same value gets the same placeholder within a run (no normalisation: `a.b@x` and `ab@x` are different; the same number written differently gets a separate placeholder, never a wrong one). The mapping lives in Redis for the run (`PII_TOKEN_TTL_S`, renewed on use) and is created in one atomic Redis script, so no caller sees a placeholder whose reverse entry is missing. It is reversed on output; a placeholder the run never issued is reported, not guessed |
 
 Tokenize needs a run id (`run_id` in the internal request); without one the rule fails and
 follows `on_error`.
@@ -140,8 +140,9 @@ word in the 30 characters before a hit raises its score by 0.1 (`context_boost`)
 `guardrail_events` gets one row per evaluated rule from the internal endpoint: policy, stage,
 rule (`<type>#<index>`), `action_taken`, `status` (`passed`, `redacted`, `failed`), mode,
 source, run, reference id, latency, severity, error type, findings (category, score, severity,
-evidence, action) and matches (offsets and the masked value). `input_preview` is the first 60
-characters with every finding redacted. Raw values are never stored. The test panel stores
+evidence, action) and matches (offsets and `masked_value`). `input_preview` is the first 60
+characters with every regex PII value, every secret and every value found by any rule of the
+chain redacted, whatever the mode and the rule order. Raw values are never stored. The test panel stores
 nothing.
 
 ## API

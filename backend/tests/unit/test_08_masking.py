@@ -85,3 +85,108 @@ def test_08_3_unknown_placeholder_is_reported_not_invented():
 def test_08_3_tokenize_without_scope_fails_loud():
     with pytest.raises(TokenScopeMissing):
         run(apply_action(TEXT, recognize(TEXT), "tokenize", store=MemoryTokenStore(), scope=None))
+
+
+def test_08_3_distinct_values_never_share_a_token():
+    # Review r1: "a.b@x" and "ab@x" are different addresses; normalising them merged the tokens.
+    store = MemoryTokenStore()
+    text = "a.b@ornek.com ve ab@ornek.com"
+    out = run(apply_action(text, recognize(text), "tokenize", store=store, scope="r"))
+    assert out == "<<PII_1>> ve <<PII_2>>"
+    restored, _ = run(detokenize(out, store=store, scope="r"))
+    assert restored == text
+
+
+class CooperativeRedis:
+    """Hash commands that yield to the event loop between calls, like a network round trip.
+    `eval` runs the store's script semantics in one step (Redis runs Lua atomically)."""
+
+    def __init__(self):
+        self.data: dict[str, dict[str, str]] = {}
+
+    async def _tick(self):
+        await asyncio.sleep(0)
+
+    async def hget(self, name, field):
+        await self._tick()
+        return self.data.get(name, {}).get(field)
+
+    async def hincrby(self, name, field, amount):
+        await self._tick()
+        h = self.data.setdefault(name, {})
+        h[field] = str(int(h.get(field, 0)) + amount)
+        return int(h[field])
+
+    async def hsetnx(self, name, field, value):
+        await self._tick()
+        h = self.data.setdefault(name, {})
+        if field in h:
+            return False
+        h[field] = value
+        return True
+
+    async def hset(self, name, field=None, value=None, mapping=None):
+        # A slower round trip: the window in which another caller sees only the forward entry.
+        for _ in range(5):
+            await self._tick()
+        h = self.data.setdefault(name, {})
+        if field is not None:
+            h[field] = value
+        h.update(mapping or {})
+
+    async def expire(self, name, ttl):
+        await self._tick()
+
+    async def eval(self, script, numkeys, name, key, value, ttl):
+        await self._tick()
+        h = self.data.setdefault(name, {})
+        if "k:" + key not in h:
+            n = int(h.get("n", 0)) + 1
+            h["n"] = str(n)
+            token = f"<<PII_{n}>>"
+            h["k:" + key] = token
+            h["t:" + token] = value
+        return h["k:" + key]
+
+
+def test_08_3_redis_store_publishes_both_directions_atomically():
+    # Review r1: a second caller could see the forward entry before the reverse one existed.
+    from ffcore.guardrails.masking import RedisTokenStore
+
+    async def scenario():
+        fake = CooperativeRedis()
+        store = RedisTokenStore(fake, ttl_s=60)
+        first = asyncio.create_task(store.token_for("r", "TR_NATIONAL_ID:1", "10000000146"))
+        # Wait until the forward entry is visible. With a non-atomic write the reverse entry is
+        # still missing at this point; an atomic write publishes both at once.
+        for _ in range(100):
+            if "k:TR_NATIONAL_ID:1" in fake.data.get("ffcore:pii:r", {}):
+                break
+            await asyncio.sleep(0)
+        token = await store.token_for("r", "TR_NATIONAL_ID:1", "10000000146")
+        resolved = await store.lookup("r", token)
+        await first
+        return token, resolved
+
+    token, resolved = run(scenario())
+    assert token == "<<PII_1>>"
+    assert resolved == "10000000146"
+
+
+def test_08_8_masked_value_is_never_the_raw_value():
+    # Review r1 MAJOR-1: a one-letter local part and short values were stored unchanged.
+    assert mask_value("EMAIL_ADDRESS", "a@example.org") == "*@example.org"
+    assert mask_value("PIN", "7") == "*"
+    assert mask_value("CVV", "738") == "**8"
+    assert mask_value("PIN", "1234") == "**34"
+    for category, value in [
+        ("EMAIL_ADDRESS", "ab@x.io"),
+        ("PIN", "0"),
+        ("TR_PLATE", "06 A 1"),
+        ("PASSWORD", "x"),
+        ("API_TOKEN", "--a--"),
+        ("PERSON", "..."),
+    ]:
+        masked = mask_value(category, value)
+        assert masked != value, (category, value)
+        assert len(masked) == len(value)

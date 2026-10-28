@@ -150,11 +150,21 @@ def _rule_findings(
     raise GuardrailConfigError("rule_type_unsupported", f"Rule type '{rule.type}' is unsupported.")
 
 
-def _preview(text: str, findings: list[Finding]) -> str:
-    """First characters with every regex PII and this rule's findings redacted (never raw)."""
-    hits = resolve_overlaps([*regex_recognizers.recognize(text), *findings])
+def _preview(text: str, findings: list[Finding], seen: list[Finding]) -> str:
+    """First characters with every regex PII, every secret, this rule's findings and every value
+    any rule of the chain found redacted. Monitor, warn and log leave the text as it was, so a
+    rule's input can hold what another rule finds (before or after it): the preview never does
+    (review r1)."""
+    hits = [*regex_recognizers.recognize(text), *find_secrets(text), *findings]
+    for earlier in seen:
+        start = text.find(earlier.value)
+        while earlier.value and start != -1:
+            hits.append(
+                Finding(earlier.category, start, start + len(earlier.value), 2.0, "", earlier.value)
+            )
+            start = text.find(earlier.value, start + 1)
     out, cursor = [], 0
-    for f in hits:
+    for f in resolve_overlaps(hits):
         out.append(text[cursor : f.start])
         out.append(redact_label(f.category))
         cursor = f.end
@@ -185,6 +195,10 @@ async def evaluate(
         return Decision("allow", text, [])
 
     current, events, applied, blocked = text, [], [], False
+    # Previews are built after the chain: every value any rule found is redacted in every
+    # event, whatever the mode and the rule order (review r1).
+    seen: list[Finding] = []
+    pending: list[tuple[GuardrailEvent, str, list[Finding]]] = []
     for index, rule in enumerate(spec.rules):
         if stage not in rule.stages:
             continue
@@ -205,7 +219,8 @@ async def evaluate(
         try:
             hits = _rule_findings(current, stage, rule, policy, ctx)
             action = _strongest(a for _, a, _ in hits)
-            event.input_preview = _preview(current, [f for f, _, _ in hits])
+            pending.append((event, current, [f for f, _, _ in hits]))
+            seen.extend(f for f, _, _ in hits)
             event.findings = [
                 {
                     "category": f.category,
@@ -221,7 +236,7 @@ async def evaluate(
                     "category": f.category,
                     "start": f.start,
                     "end": f.end,
-                    "value": mask_value(f.category, f.value),
+                    "masked_value": mask_value(f.category, f.value),
                 }
                 for f, _, _ in hits
             ]
@@ -245,6 +260,7 @@ async def evaluate(
             raise
         except Exception as exc:  # noqa: BLE001 - every rule failure follows on_error
             event.status = "failed"
+            pending.append((event, current, []))
             event.error = type(exc).__name__
             event.findings = [{"category": "rule_error", "evidence": type(exc).__name__}]
             event.action_taken = "block" if spec.on_error == "block" else "log"
@@ -253,6 +269,9 @@ async def evaluate(
                 applied.append("block")
         event.latency_ms = round((time.perf_counter() - started) * 1000, 3)
         events.append(event)
+
+    for event, rule_input, own in pending:
+        event.input_preview = _preview(rule_input, own, seen)
 
     if spec.mode == "monitor":
         return Decision("allow", text, events)

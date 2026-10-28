@@ -384,7 +384,7 @@ def _findings(decision: Decision) -> list[FindingOut]:
                     category=finding["category"],
                     start=match.get("start"),
                     end=match.get("end"),
-                    value=match.get("value"),
+                    masked_value=match.get("masked_value"),
                     score=finding.get("score"),
                     severity=finding.get("severity"),
                     evidence=finding["evidence"],

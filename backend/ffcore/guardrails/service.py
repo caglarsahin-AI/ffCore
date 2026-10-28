@@ -85,7 +85,15 @@ async def resolve_policy(session: AsyncSession, project_id, key: str) -> Resolve
     row = await stored_policy(session, project_id, key)
     if row is None:
         if key == BUILTIN_KEY:
-            return BUILTIN_DEFAULT
+            # K-08lite-0006 (A): the built-in chain's `pii_policy_key` means the same as in a stored
+            # chain: the project's stored PII policy first, the built-in one otherwise.
+            pii = {
+                ref: await resolve_pii(session, project_id, ref)
+                for ref in BUILTIN_DEFAULT.pii_policies
+            }
+            return ResolvedPolicy(
+                key=BUILTIN_KEY, spec=BUILTIN_DEFAULT.spec, pii_policies=pii, builtin=True
+            )
         raise ApiError(
             404, "not_found_error", "guardrail_policy_not_found", "Guardrail policy not found."
         )

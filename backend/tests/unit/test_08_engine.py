@@ -335,3 +335,16 @@ def test_08_15_stream_stage_and_rewriting_tool_args_rejected():
         with pytest.raises(GuardrailConfigError) as err:
             validate_policy(PolicySpec(rules=[rule]), set())
         assert err.value.code == code
+
+
+def test_08_20_preview_never_raw_across_the_chain():
+    # Review r1: in monitor (and with warn/log) the text is not rewritten, so a later rule's
+    # preview must still hide what an earlier rule found (here a password from `secrets`).
+    text = "Geçici şifre: Bahar6531! ve TC 10000000146"
+    for mode, action in (("monitor", "block"), ("enforce", "warn"), ("enforce", "log")):
+        decision = run(text, pol=policy(secrets_rule(action=action), pii_rule(), mode=mode))
+        assert len(decision.events) == 2, (mode, action)
+        for event in decision.events:
+            assert "Bahar6531" not in event.input_preview, (mode, action, event.rule)
+            assert "10000000146" not in event.input_preview, (mode, action, event.rule)
+            assert "Bahar6531" not in repr(event.matches) + repr(event.findings)

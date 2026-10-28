@@ -134,7 +134,9 @@ class FindingOut(BaseModel):
     category: str
     start: int | None = None
     end: int | None = None
-    value: str | None = Field(default=None, description="Masked; the raw value is never returned.")
+    masked_value: str | None = Field(
+        default=None, description="Masked; never equal to the raw value, which is not returned."
+    )
     score: float | None = None
     severity: str | None = None
     evidence: str = Field(description="Why it matched, e.g. 'checksum valid · context word'.")

@@ -25,8 +25,10 @@ class TokenStore(Protocol):
 
 
 def _identity(category: str, value: str) -> str:
-    # The same person/number gets the same placeholder however it was spaced or cased.
-    return category + ":" + re.sub(r"[\s.-]", "", value).casefold()
+    # Exactly the same value gets the same placeholder. No normalisation: "a.b@x" and "ab@x" are
+    # different addresses (review r1); a reformatted number gets a new placeholder, never a
+    # wrong one.
+    return category + ":" + value
 
 
 class MemoryTokenStore:
@@ -47,6 +49,19 @@ class MemoryTokenStore:
         return self._scopes.get(scope, {}).get("t:" + token)
 
 
+# Get-or-create in one Redis call: Lua runs atomically, so no caller ever sees the forward entry
+# (`k:`) without the reverse one (`t:`) (review r1).
+_TOKEN_FOR = """
+local token = redis.call('HGET', KEYS[1], 'k:' .. ARGV[1])
+if not token then
+  token = '<<PII_' .. redis.call('HINCRBY', KEYS[1], 'n', 1) .. '>>'
+  redis.call('HSET', KEYS[1], 'k:' .. ARGV[1], token, 't:' .. token, ARGV[2])
+end
+redis.call('EXPIRE', KEYS[1], ARGV[3])
+return token
+"""
+
+
 class RedisTokenStore:
     """One hash per scope: `k:<identity>` → token, `t:<token>` → value, `n` → counter.
 
@@ -59,20 +74,8 @@ class RedisTokenStore:
         self._prefix = prefix
 
     async def token_for(self, scope: str, key: str, value: str) -> str:
-        name = self._prefix + scope
-        existing = await self._redis.hget(name, "k:" + key)
-        if existing is not None:
-            await self._redis.expire(name, self._ttl)
-            return existing.decode() if isinstance(existing, bytes) else existing
-        token = f"<<PII_{await self._redis.hincrby(name, 'n', 1)}>>"
-        if not await self._redis.hsetnx(name, "k:" + key, token):
-            # Another call of the same run won the race; use its token.
-            token = await self._redis.hget(name, "k:" + key)
-            token = token.decode() if isinstance(token, bytes) else token
-        else:
-            await self._redis.hset(name, "t:" + token, value)
-        await self._redis.expire(name, self._ttl)
-        return token
+        token = await self._redis.eval(_TOKEN_FOR, 1, self._prefix + scope, key, value, self._ttl)
+        return token.decode() if isinstance(token, bytes) else token
 
     async def lookup(self, scope: str, token: str) -> str | None:
         value = await self._redis.hget(self._prefix + scope, "t:" + token)
@@ -84,18 +87,26 @@ def redact_label(category: str) -> str:
 
 
 def mask_value(category: str, value: str) -> str:
+    """A masked value never equals the raw one (review r1): at most the last four characters,
+    and never more than half of them, stay visible; a one-letter e-mail local part becomes "*"."""
     if category == "EMAIL_ADDRESS" and "@" in value:
         local, _, domain = value.partition("@")
-        return local[:1] + "*" * (len(local) - 1) + "@" + domain
+        head = local[:1] if len(local) > 1 else ""
+        return head + "*" * (len(local) - len(head)) + "@" + domain
     alnum = sum(1 for c in value if c.isalnum())
-    hide, out = alnum - KEEP_VISIBLE, []
+    visible = min(KEEP_VISIBLE, alnum // 2)
+    hide, out = alnum - visible, []
     for char in value:
         if char.isalnum() and hide > 0:
             out.append("*")
             hide -= 1
         else:
             out.append(char)
-    return "".join(out)
+    masked = "".join(out)
+    if masked == value:
+        # Nothing alphanumeric to hide ("...", "--"): mask every character instead.
+        masked = "*" * len(value)
+    return masked
 
 
 async def apply_action(
