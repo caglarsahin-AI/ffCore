@@ -46,6 +46,15 @@ class Settings(BaseSettings):
     # other origin are refused (C6). Empty: only requests without a foreign Origin pass.
     console_origins: CommaList = []
 
+    # --- 01 ---
+    # LiteLLM proxy on the internal network (e.g. http://litellm:4000); its host must be in
+    # ALLOWED_INTERNAL_HOSTS. Unset means no model calls: callers get an explicit error.
+    litellm_url: str | None = None
+    # Management key: only the reconciler uses it (/model/new|update|delete, /key/generate).
+    litellm_master_key: SecretStr | None = None
+    # The one key the backend sends model calls with (A4: no per-project team or virtual keys).
+    litellm_internal_key: SecretStr | None = None
+
     @field_validator("egress_allowlist", "allowed_internal_hosts", mode="before")
     @classmethod
     def _split_commas(cls, value: object) -> object:

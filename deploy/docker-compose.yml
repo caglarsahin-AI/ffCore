@@ -211,6 +211,9 @@ services:
       SESSION_TTL_S: ${SESSION_TTL_S:-28800}
       GUARDRAIL_EGRESS_ENABLED: ${GUARDRAIL_EGRESS_ENABLED:?GUARDRAIL_EGRESS_ENABLED is not set}
       PII_TOKEN_TTL_S: ${PII_TOKEN_TTL_S:-1800}
+      LITELLM_URL: ${LITELLM_URL:-}
+      LITELLM_MASTER_KEY: ${LITELLM_MASTER_KEY:?LITELLM_MASTER_KEY tanımlı değil}
+      LITELLM_INTERNAL_KEY: ${LITELLM_INTERNAL_KEY:?LITELLM_INTERNAL_KEY is not set}
     ports:
       - "${BACKEND_PORT:-8000}:8000"
     depends_on:
@@ -261,6 +264,16 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+
+  fake-llm:
+    # Test only (package 01): fake OpenAI-compatible provider LiteLLM calls in integration tests.
+    # Stdlib script from backend/tests/fakes; never part of an installation.
+    image: ${REGISTRY_PREFIX}ffcore/backend:${FFCORE_VERSION:?FFCORE_VERSION tanımlı değil}
+    profiles: ["test"]
+    command: ["python", "/fakes/fake_openai.py"]
+    volumes:
+      - ./backend/tests/fakes:/fakes:ro
+    restart: "no"
 
   tools:
     # Geliştirme araçları (make, ruff, pytest, curl). Host'a araç kurulmaz (K-00-0003, K-00-0005).
