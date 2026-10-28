@@ -131,7 +131,9 @@ Node runs only in containers (`docs/gelistirme-ortami.md`).
 From the repository root, on a throwaway stack (`-p 10af`; use any project name). The provider
 tests point at `http://fake-llm:11434`, so the stack allows that host on the command line (the
 shell value wins over `.env.test`; no file changes). `fake-llm` itself is not started: LiteLLM
-does not call a provider when a model is registered, and the connection test reports the failure.
+does not call a provider when a model is registered, and the connection test reports the failure. If
+another stack already uses host port 8000, add `BACKEND_PORT=<free port>` to the `export` line; the
+tests reach the backend inside the compose network.
 
 ```bash
 export ALLOWED_INTERNAL_HOSTS=litellm,fake-llm FFCORE_VERSION=0.0.0-10af
