@@ -63,6 +63,31 @@ async def create_superadmin(email: str, full_name: str, password: str, access: s
         return str(user.id)
 
 
+async def enqueue_reindex(project_key: str, kb_key: str, layer: str, full: bool) -> str:
+    """04a: `make reindex`. Enqueues the worker job; the API process embeds (C10)."""
+    from sqlalchemy import select
+
+    from ffcore.core import db
+    from ffcore.core.config import get_settings
+    from ffcore.knowledge.jobs import get_queue
+    from ffcore.models.identity import Project
+    from ffcore.models.knowledge import KnowledgeBase
+
+    async with db.session_scope() as session:
+        kb_id = await session.scalar(
+            select(KnowledgeBase.id)
+            .join(Project, Project.id == KnowledgeBase.project_id)
+            .where(
+                Project.key == project_key,
+                KnowledgeBase.key == kb_key,
+                KnowledgeBase.deleted_at.is_(None),
+            )
+        )
+    if kb_id is None:
+        raise CliError(f"knowledge base {project_key}/{kb_key} not found")
+    return await get_queue(get_settings()).enqueue("reindex_job", str(kb_id), layer, full)
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="python -m ffcore.cli")
     commands = parser.add_subparsers(dest="command", required=True)
@@ -86,6 +111,11 @@ def main(argv: list[str] | None = None) -> int:
     render.add_argument(
         "--check", action="store_true", help="only report the difference; exit 1 if any"
     )
+    reindex = commands.add_parser("reindex", help="re-run silver or gold for a knowledge base")
+    reindex.add_argument("--project", required=True, help="project key")
+    reindex.add_argument("--kb", required=True, help="knowledge base key")
+    reindex.add_argument("--layer", choices=("silver", "gold"), required=True)
+    reindex.add_argument("--full", action="store_true", help="every document, not only changed")
     args = parser.parse_args(argv)
 
     try:
@@ -115,6 +145,9 @@ def main(argv: list[str] | None = None) -> int:
                 print(f"not written: {problem['model']} ({problem['code']}: {problem['detail']})")
             if result.problems or (args.check and result.changed):
                 return 1
+        elif args.command == "reindex":
+            job = asyncio.run(enqueue_reindex(args.project, args.kb, args.layer, args.full))
+            print(f"reindex queued: job {job} (worker log shows reused=N embedded=M)")
     except (CliError, catalog_loader.CatalogFileError, seed_models.SeedError) as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 1

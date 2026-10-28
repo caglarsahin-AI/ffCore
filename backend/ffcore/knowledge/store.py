@@ -167,7 +167,7 @@ class PgKnowledgeStore:
             )
             .ext(distinct_on(Chunk.text_hash))
         )
-        return {h: list(vec) for h, vec in rows}
+        return {h: [float(x) for x in vec] for h, vec in rows}
 
     async def replace_chunks(
         self, document: Document, chunks: list[NewChunk], embedding_model: str

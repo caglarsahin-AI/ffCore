@@ -101,10 +101,10 @@ def test_04a_gate1_language_rule_allows_tr_and_en():
         "skipped",
         "language_not_allowed",
     )
-    assert gates.gate1(german, title="T", allowed_languages=("tr", "en")) == (
-        "skipped",
-        "language_not_allowed",
-    )
+    # Neither Turkish nor English function words: no measurable language, Kapı 1 passes it and
+    # Kapı 2 judges the prose (A-04a-0018; a navigation page must reach `boilerplate`).
+    assert gates.gate1(german, title="T", allowed_languages=("tr", "en")) == ("ok", None)
+    assert gates.text_quality(german, title="T")[1] == "no_prose"
 
 
 def test_04a_gate1_short_empty_template_duplicate():

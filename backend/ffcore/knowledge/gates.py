@@ -100,8 +100,12 @@ def language_allowed(
     if len(words(text)) < thresholds.language_min_words:
         return True
     tr, en = stopword_ratio(text, TR_STOPWORDS), stopword_ratio(text, EN_STOPWORDS)
-    # tr > 0 guards the tie at zero: a German page has neither Turkish nor English stopwords.
-    if tr >= thresholds.min_stopword_ratio or (tr > 0 and tr >= en):
+    if tr == 0 and en == 0:
+        # No function words of either language: no measurable language (a link list, a table,
+        # or a language without a list here). Kapı 1 does not judge it; Kapı 2 does
+        # (boilerplate, no_prose), as in PayCore.
+        return True
+    if tr >= en or tr >= thresholds.min_stopword_ratio:
         detected = "tr"
     elif en >= thresholds.min_stopword_ratio:
         detected = "en"

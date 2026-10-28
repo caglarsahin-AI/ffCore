@@ -3,7 +3,7 @@
 # Servisleri başlatma/durdurma doğrudan compose ile: docker compose up -d --wait | down | logs -f
 # Önyüz lint'i ayrı konteynerde: docker compose run --rm frontend npm run lint
 
-.PHONY: lint format test test-int test-models smoke pull seed-models render-litellm
+.PHONY: lint format test test-int test-models smoke pull seed-models render-litellm reindex
 
 lint:
 	ruff check backend scripts data/samples/scripts
@@ -26,6 +26,11 @@ test-models:
 
 smoke:
 	python scripts/smoke.py
+
+# 04a: make reindex PROJECT=<key> KB=<key> LAYER=silver|gold [FULL=1]. gold never reads raw or
+# the source (D3); the worker logs reused=N embedded=M.
+reindex:
+	cd backend && python -m ffcore.cli reindex --project $(PROJECT) --kb $(KB) --layer $(LAYER) $(if $(FULL),--full,)
 
 pull:
 	sh deploy/ollama/pull.sh

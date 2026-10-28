@@ -19,9 +19,9 @@ ENV UV_PROJECT_ENVIRONMENT=/opt/venv \
 RUN apt-get update \
     && apt-get install -y --no-install-recommends libgomp1 libgl1 libglib2.0-0 libxcb1 \
     && rm -rf /var/lib/apt/lists/*
-# /models belongs to uid 10001 in every image, so the shared volume is writable by the backend
-# whichever container mounts it first.
-RUN mkdir -p /models && chown 10001 /models
+# /models and /data/storage belong to uid 10001 in every image, so the shared volumes are
+# writable by backend and worker whichever container mounts them first.
+RUN mkdir -p /models /data/storage && chown 10001 /models /data/storage
 WORKDIR /app
 COPY pyproject.toml uv.lock ./
 

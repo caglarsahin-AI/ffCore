@@ -523,6 +523,7 @@ paths:
       tags:
       - knowledge-bases
       summary: Delete Document
+      description: 'Soft delete: the document leaves search at once (chunks removed); raw stays (D3).'
       operationId: delete_document_api_v1_projects__project_id__knowledge_bases__kb_id__documents__document_id__delete
       parameters:
       - name: project_id
@@ -905,9 +906,8 @@ components:
             type: array
           - type: 'null'
           title: Acl Roles
-          description: 'Roles that may read the files. Omitted: analyst (shown in the response). Send
-            none of acl_roles and acl_users only on purpose: an empty ACL opens the document to every
-            project member (C15).'
+          description: 'Roles that may read the files. Omitted: analyst (shown in the response). An empty
+            ACL is only set with acl_open=true (C15).'
         acl_users:
           anyOf:
           - items:
@@ -917,6 +917,11 @@ components:
           - type: 'null'
           title: Acl Users
           description: Users that may read.
+        acl_open:
+          type: boolean
+          title: Acl Open
+          description: Open the files to every project member (empty ACL), on purpose.
+          default: false
       type: object
       required:
       - files

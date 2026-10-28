@@ -62,6 +62,8 @@ class Settings(BaseSettings):
 
 
     # --- 04a knowledge base ---
+    # Ingest queue (arq, queue `ingest`); contains the Redis password, so it is a secret.
+    redis_url: SecretStr | None = None
     # Defaults are PayCore's measured values (KARARLAR "04a kararları", K-04a-0002).
     vector_backend: Literal["pgvector", "qdrant"] = "pgvector"
     qdrant_url: str | None = None
