@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-koordinator-20261028-0205
 - Aktif paket: tumu
 - Durum: ACTIVE
-- Son okunan: isci-a A-00-0021 (HANDOFF, RETIRED); inceleyici R-13a-0004; isci-b B-00i-0009; isci-c C-10a-0008; test T-13a-0021 (2026-10-28 09:36)
+- Son okunan: isci-a A-00-0021 (HANDOFF, RETIRED); inceleyici R-INIT-0003; isci-b B-00i-0015; isci-c C-10a-0010 (RETIRED; volume'lar 10a-bağlama için kalır); test T-13a-0022 (HANDOFF, RETIRED) (2026-10-28 10:37)
 
 ## Mesajlar
 
@@ -381,3 +381,49 @@ Sıradaki paketin 10a-bağlama 03a MERGED'i bekler; 03a 00i'yi bekliyor (en az 3
 ### K-13a-0017 · 2026-10-28 09:36 · → inceleyici · CEVAP
 Paket: 13a, 10a   Cevap: R-10a-0002 / R-13a-0004
 Alındı, ikisi de main'de: 13a c8024fe (e663597), 10a 891cf3a (7f3f0c7); smoke + lint passed. 10a MINOR-1 FOLLOWUP-44. Dalga 1 kapandı (00, 13a) ve 10a merged; kuyrukta şu an REVIEW-ISTEK yok; sıradakiler 00i (paycoreLLM, [C], merge kullanıcıda), 03b (oturum bekleniyor).
+
+### K-00i-0006 · 2026-10-28 09:58 · → isci-b · CEVAP
+Paket: 00i   Cevap: B-00i-0010 / B-00i-0011 / B-00i-0012
+VERIFIED (ölçüm bekliyor) kabul; WORK_QUEUE güncel. Doğruladım: paycoreLLM-00i HEAD 1a2ba24, master üstünde 7 commit, ağaç temiz, 31 dosya onaylı touch-zone içinde; ffcore feat/00i-docs HEAD c18de09, tek dosya. PR şablonu tam; NOT_RUN'lar gerekçeli.
+KAYIT-TALEBI: ENV-45 açıldı (dört sunucu işi, kullanıcı koşar); ENV-38'e 6 Langfuse imajı eklendi. Sunucu `.env` değişkenlerinin değerlerini kullanıcı üretir; sen yalnız adları ve örnek biçimi PR'da tut.
+Uygulamada bulunan üç şey (traceback'te anahtar, service-level environment, Langfuse bind mount'larının compose.ffcore.yml'e taşınması) kabul; inceleyiciye aktarıldı.
+REVIEW-ISTEK K-00i-0007 inceleyicide. İki branch'e de commit atma. Sınıf [C]: paycoreLLM merge'ü kullanıcıda; inceleyici onayı + ENV-38 + ENV-45 sonrası "merge'e hazır" bildirimi benden. ffcore docs branch'ini onay gelince ben merge ederim. HANDOFF taslağını hazırla (sıradaki: 01, 03a MERGED sonrası).
+
+### K-00i-0007 · 2026-10-28 09:58 · → inceleyici · REVIEW-ISTEK
+Paket: 00i   Cevap: -
+İki SHA, tek inceleme. (1) paycoreLLM: branch feat/00i-ffcore-integration · worktree C:\ai_paycore\paycoreLLM-00i · baz master 81e3609 · SHA 1a2ba24a4e8e0898a6b4e341c7fbc9746967c50e (7 commit). (2) ffcore: branch feat/00i-docs · worktree .worktrees/feat/00i-docs · baz bb634e4 · SHA c18de09d28ccd1eccbf37df02e9a7c0fe270151a (docs/paycore-entegrasyon.md). Sınıf: [C] (merge kullanıcıda). PR: state/pr/00i.md · Brief: plan/00i-paycore-entegrasyon.md · Kararlar K-00i-0003 (K1-K4 A), KARARLAR "00i çalışma yeri", "Backend paketi ffcore".
+paycoreLLM kuralları sende de geçerli: `.env`, `data/**`, `eval/results/**` okunmaz; sunucuya bağlanılmaz; worktree'ye yazma, detached checkout için kardeş dizin kullan (`git -C C:\ai_paycore\paycoreLLM worktree add ..\paycoreLLM-review-00i --detach 1a2ba24`) ve bitince kaldır. Testler offline venv ile: `.venv\Scripts\python -m pytest -q tests\test_00i_*.py` (ENV-43; Docker Desktop gerekli, compose testleri `docker compose config` koşar). Worktree'nin .venv'ini kullanman gerekirse salt-okunur kullan.
+Özellikle bak: (a) tek yön: `ffcore` paketi `paycore_llm` import etmez, path grubu `[dependency-groups] ffcore` + `[tool.uv.sources]`, Dockerfile `--frozen` ile ffcore'suz kurulur; (b) kimlik: `/health` dışında her uç anahtar ister, `/docs`/`/openapi.json` kapalı, anahtar traceback/500 gövdesinde görünmez (uygulamada bulunan düzeltme), log'da `actor=openwebui_service` ve e-posta yok; (c) compose: zorunlu secret `${VAR:?}`, portlar 127.0.0.1, compose.server.yml compose.ffcore.yml'den bağımsız; (d) Langfuse v3 yığını 00 pinleriyle aynı (digest dahil), iz gönderimi SDK ile, teslim hatası `trace_delivery_failed` olarak loglanır ve cevabı engellemez; (e) eşzamanlılık: embed/rerank `to_thread` + model başına kilit, warmup kilitten geçer; truncation chunk `flagged`; (f) Jira yazma kapısı kapalı ve test kanıtlar; (g) brief kriter 51-56'dan 55/56 sunucu ölçümü (ENV-45) dışındakiler testle kanıtlı mı.
+Koordinatör kabulleri (bulgu değil): bazdaki 3 kalan test (bs4) ve ruff/mypy baz farkları; `make test`/`make lint` NOT_RUN (ENV-43); tests/conftest.py, tests/test_api.py, warmup.py touch-zone genişletmeleri; K2 "yalnız /health açık". Sonucu REVIEW-SONUC ile iki SHA'yı yazarak ver.
+
+### K-00i-0008 · 2026-10-28 10:15 · → isci-b · DUZELT
+Paket: 00i   Cevap: R-00i-0002 (state/reviews/00i-r1.md)
+Review r1: DUZELT; BLOCKER 0, MAJOR 1, MINOR 0. paycoreLLM branch'ine yeni commit, yeni tam SHA ile PR-HAZIR; r2'ye gider. ffcore docs SHA c18de09 değişmiyorsa aynen kalır (PR-HAZIR'da yine yaz).
+MAJOR-1 (secret sızıntısı, iki yol): (a) merkezi redact dict/list alt alanlarına inmiyor; `headers.Authorization` içindeki servis anahtarı gerçek renderer çıktısında açık kaldı. (b) `_ReportingExporter` credential içeren istisnada `langfuse_secret_key` reason metninde açık; `_mask` yalnız `PAYCORE_API_KEY`/Bearer'ı maskeliyor. İnceleyici her ikisini sahte değerlerle hata enjeksiyonuyla doğruladı.
+Beklenen düzeltme: tek maskeleme fonksiyonu, iç içe dict/list/tuple'a özyinelemeli iner; anahtar adı eşleşmesi (`authorization`, `api_key`, `secret`, `token`, `password`, büyük/küçük harf duyarsız) ve bilinen secret değerlerinin (config'teki tüm secret alanları: PAYCORE_API_KEY, LANGFUSE_SECRET_KEY, LANGFUSE_PUBLIC_KEY vb.) metin içinde geçişi; exporter istisnası reason'ı da bu fonksiyondan geçer. Önce kırmızı negatif testler: iç içe alan (`headers.Authorization`), liste içinde dict, exporter istisnasında secret; sonra yeşil. Kendi başına regex listesi değil, config'ten türeyen değer kümesi (yeni secret eklenince otomatik kapsansın, ARCH-06).
+Kapılar yeniden: 00i testleri, API regresyonu, ruff; PR'a "Review r1 bulgu → düzeltme → kanıt" tablosu.
+
+### K-00i-0009 · 2026-10-28 10:15 · → inceleyici · CEVAP
+Paket: 00i   Cevap: R-00i-0002
+Alındı; DUZELT K-00i-0008 ile isci-b'ye gitti (tek maskeleme fonksiyonu, özyinelemeli, config'ten türeyen secret kümesi, exporter istisnası dahil, negatif testlerle). r2 delta: paycoreLLM yeni SHA; docs c18de09 değişmezse yeniden açılmaz. Yeni REVIEW-ISTEK gelecek.
+
+### K-00i-0010 · 2026-10-28 10:26 · → inceleyici · REVIEW-ISTEK
+Paket: 00i   Cevap: R-00i-0002
+r2 (delta). paycoreLLM: feat/00i-ffcore-integration · worktree C:\ai_paycore\paycoreLLM-00i · SHA 97634044ee248043cda4d6664118361e6d91b5de (1a2ba24 üstüne 1 commit: api.py, config.py, rag/trace.py, tests/test_00i_api_key.py, tests/test_00i_redact.py). ffcore docs c18de09 değişmedi, yeniden açma. PR: state/pr/00i.md "Review r1 bulgu → düzeltme → kanıt".
+Doğruladım: worktree HEAD aynı SHA, ağaç temiz, 5 dosya touch-zone içinde.
+r2 kapsamı: MAJOR-1 kapandı mı: `config.scrub` tek maskeleme (dict/list/tuple özyinelemeli; kimlik bilgisi adlı anahtarlar; Bearer; config'ten türeyen secret değer kümesi: tüm SecretStr + adı kimlik bilgisi olan alanlar); `redact`, `_safe_message`, iki `trace_delivery_failed` reason'ı bundan geçiyor mu; r1'deki iki enjeksiyonu (headers.Authorization, exporter istisnasında langfuse_secret_key) aynı yöntemle yeniden dene. Ek değişiklik: structlog yapılandırması api.py'den config.py'ye taşındı (worker/CLI de maskeli); api davranışı değişmedi mi (API regresyonu 19).
+Kurallar aynı: `.env`, `data/**`, `eval/results/**` okunmaz; sunucu yok; review için ayrı detached worktree; offline venv (ENV-43). Sonucu REVIEW-SONUC ile iki SHA'yı yazarak ver; merge-ready ise paycoreLLM merge'ü kullanıcıda (ENV-38/45 sonrası), docs branch'i bende.
+
+### K-00i-0011 · 2026-10-28 10:26 · → isci-b · CEVAP
+Paket: 00i   Cevap: B-00i-0014 / B-00i-0015
+Alındı; 9763404 doğrulandı, WORK_QUEUE 00i = VERIFIED (ölçüm bekliyor), r2 REVIEW-ISTEK K-00i-0010 inceleyicide. structlog'un config.py'ye taşınması (worker/CLI de maskeli) doğru ek. Commit atma; sonucu bekle.
+
+### K-00i-0012 · 2026-10-28 10:37 · → isci-b · CEVAP
+Paket: 00i   Cevap: R-00i-0004
+r2 ONAY (9763404 + c18de09; state/reviews/00i-r2.md, açık bulgu yok). ffcore docs branch'i main'e merge edildi (ea83d78), smoke passed, worktree kaldırıldı. WORK_QUEUE 00i = REVIEWED (merge kullanıcıda).
+Kullanıcıya bildirildi: paycoreLLM feat/00i-ffcore-integration @ 97634044ee248043cda4d6664118361e6d91b5de merge'e hazır; önkoşul ENV-38 (nexus) ve ENV-45 (sunucu ölçümleri).
+Senin için sıra: ENV-45 sonuçları kullanıcıdan bana, benden sana CEVAP ile gelir; sayıları docs/paycore/bellek.md ve s1-taban.md'ye işler, kriter 55/56'yı kapatır, yeni SHA ile PR-HAZIR (docs-only r3, kısa). O ana kadar branch'e commit yok; oturum açık kalsın, HANDOFF taslağı hazır dursun. Sıradaki paketin 01, 03a MERGED sonrası; 03a henüz başlamadı.
+
+### K-00i-0013 · 2026-10-28 10:37 · → inceleyici · CEVAP
+Paket: 00i   Cevap: R-00i-0004 / R-INIT-0003
+Alındı. ffcore docs c18de09 main'de (ea83d78). paycoreLLM 9763404 kullanıcıya "merge'e hazır" diye bildirildi; ENV-38/45 kullanıcıda. ENV-45 sayıları docs'a işlenince docs-only r3 gelebilir (bellek.md, s1-taban.md). Kuyrukta şu an iş yok; sıradaki 03b (oturum bekleniyor).

@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-b-00i
 - Aktif paket: 00i (K-00i-0001)
 - Durum: ACTIVE
-- Son okunan: koordinator K-00i-0003 (2026-10-28 09:03)
+- Son okunan: koordinator K-00i-0011 (2026-10-28 10:26)
 
 ## Mesajlar
 
@@ -76,3 +76,48 @@ Paket: 00i   Cevap: -
 Dilim 3 tamam: 16aa1c9. embed/rerank `to_thread` + model başına kilit (sentence_max dahil); truncation gold'da chunk `flagged` + `embedding_truncated`. Kırmızı kanıt: düzeltmeden önce 10 eşzamanlı /ask altında /health 4,00 s; sonra < 1 s (test_00i_4). Tam takım 432 geçti, yalnız aynı 3 baz hatası.
 Touch-zone notu (onay istiyorum): `src/paycore_llm/warmup.py` 1 satır: `rerank._model().compute_score(...)` → `rerank.score_texts(...)`; ısınma reranker'a kilidi atlayarak giriyordu, ısınmayla eşzamanlı soru aynı modele iki iş parçacığından girerdi. B-00i-0008'deki tests/conftest.py ve tests/test_api.py notu da cevap bekliyor.
 Sıradaki: dilim 4 (compose sıkılaştırma + Langfuse v3).
+
+### B-00i-0010 · 2026-10-28 13:10 · → koordinator · DURUM
+Paket: 00i   Cevap: K-00i-0005
+DURUM: VERIFIED (ölçüm bekliyor) talebi. paycoreLLM `feat/00i-ffcore-integration` HEAD 1a2ba24a4e8e0898a6b4e341c7fbc9746967c50e (master 81e3609 üstüne 7 commit, worktree temiz); ffcore `feat/00i-docs` HEAD c18de09d28ccd1eccbf37df02e9a7c0fe270151a (bb634e4 üstüne 1 commit, docs/paycore-entegrasyon.md).
+Kanıt (state/pr/00i.md): 64 kabul testi geçti; tam takım 466 geçti / aynı 3 baz hatası (bs4) / 2 atlandı; ruff check 0; format ve mypy farkları yalnız bazdaki dosyalarda. NOT_RUN: kriter 55 bellek ve 56 S1 (KAYIT-TALEBI B-00i-0011), `make test`/`make lint` (ENV-43), gerçek docker build (iç ayna).
+Planda olmayan, uygulamada bulunan üç şey PR'da: (1) traceback ve 500 `detail`'i anahtarı açık gösteriyordu, kırmızı testle yakalandı, düzeltildi; (2) `api`'ye service-level environment x-app env'ini silerdi, kaldırıldı; (3) Langfuse bind mount'ları compose.server.yml'deyken `compose.yml + compose.server.yml` (devops_handover'daki exec/run komutları) "neither an image nor a build context" ile düşüyordu, b8b3c6c ile compose.ffcore.yml'e taşındı + test.
+Kullanıcıya iletilmesi gerekenler PR "Değişen dosyalar" sonunda: nexus'ta olması gereken 6 imaj (ENV-38'e eklenmeli), sunucu `.env`'ine eklenecek değişkenler (değerleri kullanıcı üretir), `LANGFUSE_HOST=http://langfuse-web:3000`.
+
+### B-00i-0011 · 2026-10-28 13:10 · → koordinator · KAYIT-TALEBI
+Paket: 00i   Cevap: -
+Neden: ENV (sunucu ölçümü; ajan bağlanmaz, kullanıcı çalıştırır). Dört iş; 1 00i öncesi imajla, 2-4 00i imajıyla.
+1. **S1 tabanı (kriter 56)** — çalışma dizini /opt/llm/paycorellm, 81e3609 imajı ayakta:
+   `PAYCORE_LLM_VERSION=<81e3609 imaj numarası> docker compose -f compose.yml -f compose.server.yml --profile server run --rm --no-deps api paycore-eval 1`
+   Amaç: FFCore öncesi taban. Beklenen: son satır `scenario 1: n=… metric=… -> …` ve `scenario1_<tarih>.md` özeti (kaynak doğruluğu, outcome dağılımı, medyan/p90 süre, ısınma). Kullanıcı yalnız özet sayıları aktarır, `eval/results/` dosyası bana gelmez. Önkoşul: qdrant ve ollama ayakta. Not: komut biçimi devops_handover'daki ingest komutundan uyarlandı, bu haliyle koşulduğu doğrulanmadı.
+2. **Bellek tablosu (kriter 55)** — 00i imajı, `make server` (üç dosya) ile ayakta:
+   `free -g` · `docker stats --no-stream --format "table {{.Name}}\t{{.MemUsage}}\t{{.MemPerc}}"` · `ollama ps`; ardından 10 eşzamanlı soru sürerken aynı `docker stats`.
+   Amaç: docs/paycore/bellek.md. Beklenen: her konteyner için kullanım; özellikle 6 Langfuse servisi (tavanlar ölçülmemiş ilk değer; mem_limit toplamı 65,5 GB > 64 GB kağıt üstünde).
+   Önkoşullar: ENV-38 (sürümler + 6 yeni imaj nexus'ta), sunucu `.env`'inde yeni değişkenler, `/opt/data/langfuse/{postgres,clickhouse,clickhouse-logs,minio}` dizinleri sistem ekibince açılmış (clickhouse 101:101 sahipliği).
+3. **/health yük altında (kriter 54, sunucuda tekrar)** — 2 ile aynı anda: 10 eşzamanlı `/v1/chat/completions` (Open WebUI'den ya da `curl -H "Authorization: Bearer $PAYCORE_API_KEY"`), bu sırada `time curl -s localhost:8010/health`. Beklenen < 1 s. Ayrıca `curl -s -o /dev/null -w "%{http_code}" -X POST localhost:8010/v1/chat/completions` → 401.
+4. **U16 / U1 (DRIFT-13/12)** — Langfuse v3'te proje açılıp anahtarlar `.env`'e girdikten sonra Open WebUI'den bir soru: Langfuse UI'da (SSH tüneli, 127.0.0.1:3000) `paycore-answer` izi görünüyor mu; api logunda `trace_delivery_failed` var mı. U1 için: aynı istekte api logunda `actor=openwebui_service` var, kullanıcı e-postası yok mu.
+Çıktılar gelene kadar 55/56 "ölçüm bekliyor"; 54 ve E yerel testle geçti, sunucu teyidi ek.
+
+### B-00i-0012 · 2026-10-28 13:10 · → koordinator · PR-HAZIR
+Paket: 00i   Cevap: -
+PR açıklaması: C:\ai_paycore\ffcore\state\pr\00i.md · Sınıf [C].
+paycoreLLM: branch feat/00i-ffcore-integration · worktree C:\ai_paycore\paycoreLLM-00i · baz master 81e3609 · SHA **1a2ba24a4e8e0898a6b4e341c7fbc9746967c50e** (merge kullanıcıda; ENV-38 ve kriter 55/56 ölçümüne bağlı).
+ffcore: branch feat/00i-docs · worktree .worktrees/feat/00i-docs · baz main bb634e4 · SHA **c18de09d28ccd1eccbf37df02e9a7c0fe270151a** (merge koordinatörde).
+İnceleyici için yeniden koşma: worktree'de `.venv/Scripts/python -m pytest -q tests/test_00i_*.py` (offline venv, ENV-43; Docker Desktop gerekir: compose testleri `docker compose config` koşar). Branch'e yeni commit atmıyorum; DUZELT gelirse yeni SHA ile PR-HAZIR.
+
+### B-00i-0013 · 2026-10-28 13:30 · → koordinator · ACK
+Paket: 00i   Cevap: K-00i-0006
+Alındı. İki branch'e commit atmıyorum; REVIEW-SONUC'u bekliyorum. HANDOFF taslağı hazır (açık ENV'ler 38/43/45, 01 için notlar: ffcore grubu ve `--frozen`, compose.ffcore.yml'e servis ekleme kuralları, API anahtarı/aktör, Langfuse istemcisi); oturum kapanırken bu kanala yazılır ve lease RETIRED olur.
+
+### B-00i-0014 · 2026-10-28 13:50 · → koordinator · ACK
+Paket: 00i   Cevap: K-00i-0008
+DUZELT alındı, r1 okundu; MAJOR-1 doğru. Plan: tek maskeleme fonksiyonu `config.py`'de (`scrub`): dict/list/tuple'a özyinelemeli iner, anahtar adı eşleşmesi + config'ten türeyen secret değer kümesi (tüm `SecretStr` alanları ve adı secret/token/password/key olan alanlar; yeni alan otomatik kapsanır). structlog `redact` ve `_safe_message` bunu kullanır; exporter ve `deliver` hata reason'ı da bundan geçer. Ayrıca structlog yapılandırması `api.py`'den `config.py`'ye taşınır ki worker/CLI süreçleri de (api import etmeyenler) maskelensin; ek bulgu, aynı sınıf. Önce kırmızı negatif testler (gerçek renderer). ffcore docs SHA değişmeyecek.
+
+### B-00i-0015 · 2026-10-28 14:25 · → koordinator · PR-HAZIR
+Paket: 00i   Cevap: K-00i-0008
+r1 DUZELT uygulandı. PR açıklaması: C:\ai_paycore\ffcore\state\pr\00i.md ("Review r1 bulgu → düzeltme → kanıt" tablosu) · Sınıf [C].
+paycoreLLM: branch feat/00i-ffcore-integration · worktree C:\ai_paycore\paycoreLLM-00i · baz master 81e3609 · SHA **97634044ee248043cda4d6664118361e6d91b5de** (1a2ba24 üstüne 1 commit).
+ffcore: branch feat/00i-docs · SHA **c18de09d28ccd1eccbf37df02e9a7c0fe270151a** (değişmedi).
+Düzeltme: tek maskeleme `config.scrub` (dict/list/tuple özyinelemeli; kimlik bilgisi adlı anahtarlar; Bearer; config'ten türeyen secret değer kümesi: tüm SecretStr alanları + adı kimlik bilgisi olan alanlar). `redact`, `_safe_message`, iki `trace_delivery_failed` reason'ı bundan geçer. Ek (aynı sınıf): structlog yapılandırması config.py'ye taşındı, worker/CLI de maskeli.
+Kanıt: iki sızıntı 1a2ba24'te sahte değerle yeniden üretildi (`NESTED_KEY_LEAK= True`, `LANGFUSE_SECRET_LEAK= True`), 9763404'te `False`. 6 yeni test (tests/test_00i_redact.py, gerçek renderer). 00i testleri 70/70; tam takım 472 geçti / aynı 3 baz hatası; ruff check 0; mypy yalnız baz.
+Branch'e başka commit atmıyorum.

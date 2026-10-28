@@ -3,9 +3,9 @@
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
 - Oturum kimliği: ffcore-isci-c-10a
-- Aktif paket: 10a (GOREV K-10a-0001, feat/10a-console-skeleton)
-- Durum: ACTIVE
-- Son okunan: koordinator K-10a-0004 (2026-10-28 09:20)
+- Aktif paket: - (10a MERGED 891cf3a)
+- Durum: RETIRED
+- Son okunan: koordinator K-10a-0006 (2026-10-28 09:36)
 
 ## Mesajlar
 
@@ -82,3 +82,19 @@ PR açıklaması: C:\ai_paycore\ffcore\state\pr\10a.md
 Branch: feat/10a-console-skeleton · Baz: bb634e4 · Son commit: 7f3f0c7f906b63901589d594d0557949e175dd42 (3 commit, push yok). Sınıf [A].
 İnceleyici için: `cd599a7` shadcn'in ham çıktısı; asıl inceleme `5c48ebc..7f3f0c7` aralığında.
 Bekliyorum: REVIEW-SONUC ya da DUZELT.
+
+### C-10a-0009 · 2026-10-28 09:38 · → koordinator · HANDOFF
+Paket: 10a   Cevap: K-10a-0006
+Durum: 10a sahte API aşaması MERGED (891cf3a, HEAD 7f3f0c7, r1 ONAY). Lease RETIRED. 10b-poc'a geçilmedi.
+10a-bağlama için (03a MERGED sonrası, yeni oturum, ayrı GOREV/PR):
+1. Sözleşme: 03a'nın OpenAPI dosyası `frontend/mocks/openapi-03a.yaml` olarak değişmeden kopyalanır, `openapi-typescript` ile `lib/api/schema.d.ts` üretilir (`npm run gen:api` eklenir). msw ve @tanstack/react-query o PR'da eklenir (onaylı; 10a'da ölü kod olmasın diye çıkarıldı). msw handler'ları aynı dosyadan, yalnız `FAKE_API=1`.
+2. Oturum: `lib/session.ts` tek sınır. Şu an FAKE_API=1 → `ffcore_fake_session` cookie, yoksa null → "Session unavailable". Burada `GET /auth/me` bağlanır. `lib/access.ts` Role/AccessMode üretilen enumdan türetilir.
+3. Mutasyonlar: `components/screen.tsx`, `nav-user.tsx` (çıkış) ve `login-form.tsx` şu an `notConnected()` çağırıyor; gerçek çağrıyla değişir. 403 → "Salt-okunur erişim" mesajı. Next.js rewrite (C6) aynı origin.
+4. Test: `tests/e2e/test_10a_7_login_project_flow.spec.ts` fixme'si kaldırılır; Playwright yeniden koşar, gerçek backend testi entegrasyon olarak ayrıca yazılır.
+5. FOLLOWUP-44: `components/ui/sidebar.tsx` SidebarRail'deki sabit "Toggle Sidebar" (aria-label/title prop'u, jsx-no-literals prop'ları yakalamıyor) → `t("toggleSidebar")`.
+Ortam: Playwright imajı `mcr.microsoft.com/playwright:v1.64.1-noble@sha256:47b510dd9230bf0b9bfc9b20102241e577ea7a99334ab4c3ca19f19770e9b8ea` (Node 24; npm engines uyarısı zararsız). node_modules alpine (musl) ve Playwright (glibc) için ayrı tutulmalı; bu oturumun adlandırılmış volume'ları `ffcore-10a-nm`, `ffcore-10a-nm-pw` yerelde duruyor, silinebilir (silmeyi kullanıcıya bıraktım).
+Açık: Lighthouse FOLLOWUP-37 (10c), DRIFT-41 (Kullanım = admin).
+
+### C-10a-0010 · 2026-10-28 09:40 · → koordinator · DURUM
+Paket: 10a   Cevap: C-10a-0009
+Kullanıcı kararı: `ffcore-10a-nm` (node:20-alpine) ve `ffcore-10a-nm-pw` (Playwright imajı) Docker volume'ları silinmiyor, 10a-bağlama'da yeniden kullanılacak. Yeni oturum `npm ci` ile güncellemeli (lock değişmiş olabilir); iki volume'un platformu farklı (musl / glibc), karıştırılmaz.

@@ -4,8 +4,8 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 
 - Oturum kimliği: ffcore-test-13a
 - Aktif paket: 13a
-- Durum: ACTIVE
-- Son okunan: koordinator K-13a-0015 (2026-10-28 09:22)
+- Durum: RETIRED
+- Son okunan: koordinator K-13a-0016 (2026-10-28 09:36)
 
 ## Mesajlar
 
@@ -151,3 +151,21 @@ state/pr/13a.md: "Review r1 bulgu → düzeltme → kanıt" tablosu eklendi, tes
 ### T-13a-0021 · 2026-10-28 09:20 · → koordinator · PR-HAZIR
 Paket: 13a   Cevap: K-13a-0012
 PR: state/pr/13a.md · Branch: feat/13a-sample-data · SHA: e663597d20bbda7046c3291e1a13f9c716bb4b45 · Sınıf: [A] · push yok · review r2 için.
+
+### T-13a-0022 · 2026-10-28 09:38 · → koordinator · HANDOFF
+Paket: 13a   Cevap: K-13a-0016
+### 13a · ffcore-test-13a · 2026-10-28 09:38
+- Durum: MERGED (main c8024fe, r2 ONAY e663597). Bu oturum kapanıyor; lease RETIRED.
+- Tam sonraki adım (08-lite, yeni oturum ffcore-test-08-lite, 03a MERGED sonrası, K-INIT-0005): 08'in PII tanıyıcı testleri `data/samples/pii/pii-100.jsonl`'ı okur; kendi setini yazmaz (C18). İlk iş: bu setle 08-lite `regex` tanıyıcılarının (TC, telefon, IBAN, e-posta, kart) recall/precision testini kurmak. `PERSON`, kurum ve konum NER'e kalır (08 tam).
+- 08-lite için set yapısı:
+  - `pii/pii-100.jsonl`: her satır `{id: pii-NNN, text, entities: [{start, end, category}]}`. Span'ler karakter offset'i (Python str, UTF-8 değil); sıralı ve örtüşmesiz. pii-001…080 adsız, 081…100 `PERSON` içerir; 10 negatif (`entities: []`), içlerinde checksum'ı geçersiz 11 haneli TC benzerleri var.
+  - TC, VKN, IBAN (mod-97) ve kart (Luhn, yalnız test BIN'leri) değerleri algoritmik olarak geçerli üretildi. Doğrulayıcılar `data/samples/scripts/gen/pii.py`'de; VKN'nin bağımsız çapası yok (doğrulanmadı).
+  - `pii/categories.md`: 19 kod ↔ plan/08 kategori adı ↔ `default_on`. Kodlar karışık dilli: `PERSON` + Türkçe kodlar (`TC_KIMLIK`, `TR_IBAN`…). Kanonik kod listesi 08'in işi (FOLLOWUP-33); değişirse yalnız `gen/pii.py` içindeki `CATEGORIES` ve şablon yer tutucuları değişir, sonra `generate.py --only pii`.
+  - Kişi adları `gen/pii.py` `FIRST_NAMES` × `LAST_NAMES` (16 × 12, uydurma soyadlar), biçimler: normal, iki ad, BÜYÜK, küçük, SOYAD Ad. `test_13a_9` adların `pii/` ve `memory/` dışına çıkmadığını kanıtlar.
+  - `memory/memory-40.jsonl` (paket 14 için): `{id, scenario, turns, existing_memories, expected[{kind, must_contain, supersedes?}], expect_none, reason, contains_person_name}`; 20 olumlu, 20 `expect_none` (5 PII, 3 sağlık, 4 kişi adı). 08'in `block` modu hafıza adayını burada atmalı (plan/14: 0 kaçak).
+- Değişen dosyalar: `data/samples/**` (38 yeni dosya) + `Makefile` `lint` hedefi; hepsi main'de. Ayrıntı state/pr/13a.md.
+- Koşan testler: `make lint`, `make test` (llmaas/airgap), 13a unittest 23 test (20 geçti, 3 Postgres opt-in ayrıca 3/3), hepsi e663597'de; merge sonrası main'de smoke + lint koordinatörce geçti. Kalan: gerçek LLM, 06a Pydantic doğrulaması, Docling ingest (04a), gerçek Superset (05b); bunlar bu pakette yok.
+- Kararlar ve varsayımlar: DECISION-24 = A (adlar yalnız pii/memory); sınav 33 item (DRIFT-28); stdlib üreticiler (K-13a-0002); ruff borcu B (K-13a-0009); `veri-soru-cevap` şemayı prompt'ta taşır, yalnız `run_sql`, `ask_user` false (FOLLOWUP-42: 06a sayaç kararı gelince tek alan). Tümü state/pr/13a.md "Varsayımlar"da.
+- Blocker'lar: yok. Not: FOLLOWUP-33 ve FOLLOWUP-42'yi state/BLOCKERS.md ve KARARLAR.md'de bulamadım; yalnız koordinatör kanalında (K-13a-0007, K-13a-0015) geçiyorlar. Kayıt koordinatörde.
+- Commit edilmemiş durum: yok. Worktree ve branch koordinatörce kaldırıldı; scratchpad'deki yardımcı betikler (reflow, patch) depo dışı ve atılabilir.
+- Branch ve son commit: feat/13a-sample-data (silindi), son commit e663597d20bbda7046c3291e1a13f9c716bb4b45; main merge c8024fe.

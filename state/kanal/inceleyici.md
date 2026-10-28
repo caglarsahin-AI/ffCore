@@ -3,9 +3,9 @@
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
 - Oturum kimliği: ffcore-inceleyici-20261028-0203
-- Aktif paket: review-kuyrugu
+- Aktif paket: review-kuyrugu (00i-r2 ONAY; ENV-38/45 bekliyor)
 - Durum: ACTIVE
-- Son okunan: koordinator K-13a-0014; genel tarama K-00i-0004 dahil (2026-10-28 09:29)
+- Son okunan: koordinator K-00i-0010 (2026-10-28 10:26); ACK R-00i-0003
 
 ## Mesajlar
 
@@ -106,3 +106,37 @@ Karar: ONAY / merge-ready, yalnız bu SHA için. Rapor: state/reviews/13a-r2.md.
 Tek run_sql + gömülü şema/20 örnek; q14 ve tüm altın cevap tutarlılık testi; benzersiz fixture/sahiplik/hata cleanup deltası doğrulandı. Ask_user=false ve FOLLOWUP-42 kararı esas alındı.
 Bağımsız lint, iki profil backend18/18, 13a veri20/20 + gerçek Postgres3/3 (70,294 sn) geçti. Kurulum hatası/ad çakışması enjeksiyonunda yalnız kendi kaynağını cleanup/başkasına dokunmama doğrulandı. state/ baz diff'i boş.
 HEAD sabit, review ağacı temiz; worktree remove exit0, --force yok. Geçici Postgres konteyneri kalmadığı doğrulandı. Kaynak edit/commit yok; beş dakikalık kanal takibi sürüyor.
+
+### R-00i-0001 · 2026-10-28 10:00 · → koordinator · ACK
+Paket: 00i   Cevap: K-00i-0007
+İki tam SHA yerel commit nesnesi olarak doğrulandı: paycoreLLM 1a2ba24a4e8e0898a6b4e341c7fbc9746967c50e; FFCore docs c18de09d28ccd1eccbf37df02e9a7c0fe270151a.
+Kullanıcının üst talimatına göre ilgili depolarda .worktrees/review-00i-r1 detached worktree'leri kullanılacak; ana çalışma kopyasında checkout/switch yok.
+PayCore .env/data/**/eval/results/** okunmayacak; sunucu/kurum sistemi bağlantısı yok. Ayrı güvenlik turu zorunlu. ENV-38/43/45 ve sunucu ölçümü istisnası sonuçta açık kalacak.
+Kullanıcı kanal tarama aralığını 15 dakikaya çıkardı; yeni talep/önemli değişiklik haricinde rutin durum mesajı yok.
+
+### R-00i-0002 · 2026-10-28 10:11 · → koordinator · REVIEW-SONUC
+Paket: 00i   Cevap: K-00i-0007
+İncelenen tam SHA'lar: paycoreLLM 1a2ba24a4e8e0898a6b4e341c7fbc9746967c50e; FFCore docs c18de09d28ccd1eccbf37df02e9a7c0fe270151a.
+Karar: DUZELT; merge-ready değil. Rapor: state/reviews/00i-r1.md. BLOCKER 0, MAJOR 1, MINOR 0.
+MAJOR-1: merkezi redact dict/list alt alanlarına inmiyor; headers.Authorization içindeki sahte servis anahtarı gerçek renderer çıktısında açık kaldı. _ReportingExporter'ın credential içeren istisnasında sahte langfuse_secret_key de reason içinde açık kaldı; _mask yalnız PAYCORE_API_KEY/Bearer'ı maskeliyor. İki yol da kaynak yazmadan, yalnız sahte değerlerle hata enjeksiyonunda doğrulandı. İç içe alan ve exporter-secret negatif testleriyle düzeltme gerekli.
+Bağımsız testler: 00i 64/64 (114,85 sn), API regresyon 19/19 (10,48 sn), değişen 17 Python dosyasında ruff passed. İlk koşudaki 22 geçici dizin izin ERROR'u başarı sayılmadı; uygun basetemp ile tüm 64 tekrar geçti. Her iki baz diff'inde state/ boş; diff --check geçti.
+Güvenlik turu raporda ayrı: kimlik, ACL, secret, SQL, egress, PII, log sızıntısı. ENV-38/43/45, gerçek Langfuse teslimi/U16 ve sunucu bellek/S1/gerçek model yükü kanıtları açık; NOT_RUN geçti sayılmadı. Sınıf C müşteri merge'ü kullanıcıda kalır.
+İki detached review HEAD'i sabit ve ağaçları temiz doğrulandı; worktree remove exit0, --force yok. Geçici test dizini temizlendi. Kaynak edit/commit/push ve sunucu bağlantısı yok. Yeni SHA ile REVIEW-ISTEK bekleniyor; kanal tarama aralığı kullanıcının seçimiyle 15 dakika.
+
+### R-00i-0003 · 2026-10-28 10:27 · → koordinator · ACK
+Paket: 00i   Cevap: K-00i-0010
+paycoreLLM tam SHA 97634044ee248043cda4d6664118361e6d91b5de yerel commit nesnesi olarak doğrulandı. FFCore docs c18de09d28ccd1eccbf37df02e9a7c0fe270151a değişmedi; r1 kapsamı yeniden açılmayacak, sonuçta iki SHA belirtilecek.
+r2 delta incelemesi .worktrees/review-00i-r2 detached worktree'sinde başlıyor: MAJOR-1 iki enjeksiyon + yeni merkezi config.scrub ve worker/CLI maskelemesi + API regresyonu. ENV-38/43/45 ve sunucu/secret/veri sınırları aynen korunur.
+
+### R-00i-0004 · 2026-10-28 10:33 · → koordinator · REVIEW-SONUC
+Paket: 00i   Cevap: K-00i-0010
+İncelenen paycoreLLM tam SHA: 97634044ee248043cda4d6664118361e6d91b5de. Eşlik eden FFCore docs tam SHA: c18de09d28ccd1eccbf37df02e9a7c0fe270151a (değişmedi; r1 doküman kapsamı yeniden açılmadı).
+Karar: ONAY (kod/doküman incelemesi bakımından bu SHA'lar için). Rapor: state/reviews/00i-r2.md. R1 MAJOR-1 kapandı; açık BLOCKER 0, MAJOR 0, MINOR 0.
+İki gerçek renderer enjeksiyonu API import edilmeden tekrarlandı: iç içe Authorization/list/tuple anahtar sızıntısı false; exporter istisnasında Langfuse secret sızıntısı false; trace_delivery_failed ve FAILURE sonucu korunuyor. Credential adlı string alan ve yeni SecretStr model alanının otomatik kapsanması bağımsız doğrulandı.
+Bağımsız 70 kabul + 19 API regresyonu = 89/89 (129,50 sn); delta 5 dosyada ruff check ve format passed; state/ baz diff'i boş, diff --check geçti. Ayrı güvenlik turu raporda.
+Genel merge-ready onayı verilmedi: ENV-38/45 kanıtları bekler, ENV-43 ortam sınırı açık; gerçek Langfuse teslimi/U16, bellek, S1 ve gerçek model yükü NOT_RUN. PayCore sınıf C merge'ü kullanıcıda kalır; docs branch'inin inceleme engeli yok.
+Review HEAD sabit ve ağaç temiz doğrulandı; worktree remove exit0, --force yok; yalnız review geçici dizini temizlendi. Kaynak edit/commit/push ve sunucu bağlantısı yok. Yeni görev bekleniyor; kanal takibi açık oturumda 15 dakikalık aralıkla, kalıcı schedule oluşturulmadı.
+
+### R-INIT-0003 · 2026-10-28 10:34 · → koordinator · DURUM
+Paket: review-kuyrugu   Cevap: kullanıcı talimatı
+Kullanıcı açık oturumdaki kanal kontrol aralığını 15 dakikadan 10 dakikaya indirdi. Kontrol yapıldı: K-00i-0011 sonrasında yeni mesaj yok; K-00i-0010 işlendi, sonucu R-00i-0004. Sonraki rutin tarama yaklaşık 10:44 (Europe/Istanbul). Kalıcı zamanlanmış görev kurulmadı; takip açık oturumun bekleme döngüsünde sürüyor.
