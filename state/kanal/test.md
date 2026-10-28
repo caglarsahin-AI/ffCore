@@ -4,8 +4,8 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 
 - Oturum kimliği: ffcore-test-08-lite
 - Aktif paket: 08-lite
-- Durum: ACTIVE
-- Son okunan: koordinator K-08lite-0002 (2026-10-28 17:10)
+- Durum: RETIRED
+- Son okunan: koordinator K-08lite-0018 (2026-10-28 20:10)
 
 ## Mesajlar
 
@@ -299,3 +299,25 @@ PR: state/pr/08-lite.md · Branch: feat/08-lite-guardrails · SHA: 199aeb46c8139
 ### T-08lite-0020 · 2026-10-28 19:49 · → koordinator · DURUM
 Paket: 08-lite   Cevap: K-08lite-0014
 Alındı; haklısın, ifade yanıltıcıydı. state/pr/08-lite.md r2 tablosu düzeltildi: tarama penceresi 4.096, gösterim sınırı 3.840 (girdi konumu; arada 256 karakter kenar payı), önizleme 60 karakter (input_preview uzunluğu, değişmedi). Branch'e dokunmadım (199aeb4). Aynı belirsiz ifade docs/guardrail.md gecikme bölümünde de var ("show at most the first 3,840"); commit yasağı nedeniyle düzeltilmedi, PR kalan risklerine yazıldı: r3'te DUZELT gelirse onunla, yoksa merge sonrası tek satırlık docs düzeltmesi. Hangisini istediğini sen seç.
+
+### T-08lite-0021 · 2026-10-28 20:07 · → koordinator · HANDOFF
+Paket: 08-lite   Cevap: K-08lite-0017
+### 08-lite · ffcore-test-08-lite · 2026-10-28 20:07
+- Durum: MERGED (main e651ff4; r3 ONAY 199aeb4). C4 dondu. Bu oturum kapanıyor; lease RETIRED.
+- Tam sonraki adım (bu rol için): test kuyruğunda 13b olumsuz senaryo payı (06a/07 MERGED sonrası, yeni oturum). 08 tam M4.
+- 06a bağlama notları (T-08lite-0012 taslağı geçerli, r1/r2 güncellemeleriyle):
+  - `await ffcore.guardrails.engine.evaluate(text, stage, policy, ctx=EvalContext(run_id, project_id, source, locale, tool, token_store, egress_enabled))` → `Decision(action, text_out, events, message, reference_id)`; politika `service.resolve_policy(session, project_id, definition.guardrail_policy_key or "default")` (yerleşik zincir de projenin PII `default` satırını çözer, K-08lite-0006 A); olaylar `service.record_events(...)`.
+  - Kancalar: `guard_in` → `input.pre` (+ egress bayrağı açıksa `egress`), `tools` → `tool.pre` (argüman JSON'u, `ctx.tool="<tool_key>.<action>"`) / `tool.post`, `guard_out` → `output.pre`, kullanıcı turunda `prompt.pre`. Egress kapalıyken çağrı `EgressStageDisabled`. `output.stream.delta` kuralı reddedilir (C17 08 tam).
+  - `block` → run `failed`, `error_code=guardrail_block`, `reference_id`, mesaj `decision.message` (en|tr).
+  - tokenize: `run_id` + `service.redis_token_store()`; kimlik ham değer (biçimi farklı aynı numara ayrı yer tutucu); Redis yazımı tek Lua EVAL; çıkışta `masking.detokenize` → `unresolved` boş değilse kayıt.
+  - Olaylarda ham değer yok: `matches[].masked_value` (r1'de `value`'dan yeniden adlandırıldı, C4'te), önizleme zincir sonunda kurulur. Kural taraması ve önizleme `asyncio.to_thread`; `latency_ms` önizleme dahil.
+  - Yerleşik `default` monitor: 06a bağlanınca hiçbir şey engellenmez; enforce admin PATCH'i (audit'li).
+- 08 tam'a kalanlar: Türkçe NER (`PERSON`, `ORGANIZATION`, `LOCATION`; recall ≥ 0,85 / llmaas 0,90) Presidio ile (`Finding` = `RecognizerResult` + kanıt); `injection` sınıflandırıcısı ve gecikme bütçesinin kalanı; akış tamponlayıcı C17; bağlamlı CVV/PIN; `egress` kalibrasyonu; PRSIM ingest guard'ı; `topic`, `output_format`, `banned_words`; `guardrail_events` saklama/partition (03c).
+- FOLLOWUP-76 (08 tam ya da 06a guardrail PR'ı): (a) `docs/guardrail.md` gecikme bölümündeki "show at most the first 3,840" ifadesi: doğru biçim "tarama penceresi 4.096, girdi konumu sınırı 3.840, önizleme 60 karakter"; (b) `recognizers/regex.py:resolve_overlaps` liste `insert` yüzünden en kötü durumda O(n²) (bellek kaydırma, C hızında; ölçülen bütçeler içinde) ve docstring'deki "O(n log n)" iddiası düzeltilmeli; gerekirse `sortedcontainers` yerine aralık ağacı ya da başlangıca göre sıralı tek geçiş. Davranış değişmez.
+- FOLLOWUP-33: kapandı (kanonik liste `guardrails/categories.py`, 13a seti aynı, `test_08_21_*`).
+- Merge sonrası 04a ile birleşecek noktalar (bilgi): `api/openapi_export.py` PACKAGES, `test_03a_write_flag.py` `WRITE_EXEMPT`, `test_03a_read_side.py` `PARITY_EXEMPT_PREFIXES`, compose `&app-env`; `service_actor` kopyası tek yardımcıya; `/internal` yol farkı (PR varsayım 15).
+- Koşan testler (son: 199aeb4, imaj 0.0.0-08lite): lint 0; make test 190 + make test-int 110, llmaas (egress true) ve airgap (egress false); tek CPU maliyet testleri; smoke 0. Main'de koordinatör lint + smoke geçti.
+- Kararlar: K-08lite-0003 (S1-S5 A), K-08lite-0006 (A), K-08lite-0008/0011 (DUZELT r1/r2), K-08lite-0016 (A), DRIFT-71, FOLLOWUP-76; PR varsayımları 1-16 (state/pr/08-lite.md).
+- Blocker'lar: yok.
+- Commit edilmemiş durum: yok. Worktree, branch ve 08lite imajları koordinatörce silindi; 08lite ve 08lite-r1 stack'leri `down -v`; scratch worktree kaldırıldı.
+- Branch ve son commit: feat/08-lite-guardrails (silindi) @ 199aeb46c813996517332d31ca2cd6f8a178d41a → main e651ff4.

@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-a-04a
 - Aktif paket: 04a (GOREV K-04a-0001)
 - Durum: ACTIVE
-- Son okunan: K-04a-0008 (2026-10-28 19:26)
+- Son okunan: K-04a-0011 (2026-10-28 20:55)
 
 ## Mesajlar
 
@@ -500,3 +500,14 @@ Dilim 7: gerçek modellerle canlı stack (FFCORE_VERSION=0.0.0-04a, backend+work
 (3) Kabul 14: tek arama boşta 71 s (12 aday × ~6-12 s/çift CPU rerank); 10 eşzamanlı arama kilitte sıraya girip istemci zaman aşımına düştü; /healthz ölçümü tamamlanmadı. Test tasarımım hatalı (D6 olay döngüsünün açık kalmasını ister, aramaların bitmesini değil).
 (4) Brief 04 madde 7 "madde numaraları (Madde 7, 7.1) parça başında tekrar edilir" planımda yoktu (PayCore chunking'de de yok); kaçırdım.
 Düzeltme planı (teknik, paket içi; itiraz yoksa uyguluyorum): (a) reranker max_length 1024 + çift token sayısı aşarsa candidates'ta rerank_truncated ve log (sessiz kırpma yok); (b) parçalamada Markdown başlığı yoksa satır başı "Madde N" sınırı başlık sayılır ve madde numarası parçanın breadcrumb/başına yazılır; (c) worker'da süreç boyu kalıcı BoundedPool (Docling bir kez yüklenir); (d) D6 testi: 10 arama sürerken /healthz < 1 s ölçülür, aramaların süresi değil, tamamlanmaları beklenir. Sonra yeniden ölçüm; kabul 1 hâlâ > 120 s olursa sayıyı ve sunucuda (32 vCPU) ölçüm önerisini yazarım, eşiği değiştirmem.
+
+### A-04a-0021 · 2026-10-28 20:55 · → koordinator · DURUM
+Paket: 04a   Cevap: K-04a-0011 / K-04a-0010
+Dilim 7 düzeltmeleri (a)-(d) + K-04a-0010 ekleri yazıldı, commit edilmedi. Gerçek modellerle yeniden ölçüm (canlı stack, 0.0.0-04a):
+- Kabul 1: 10 sayfa SZL-2024-011 68,8 s'de indexed (sınır 120 s; Docling 11,5 s, kalıcı dönüştürme süreci). İlk soğuk koşu 87,0 s. YEŞİL.
+- Kabul 2: "fesih bildirim süresi" 1. sırada (rerank 0,978; parça Madde 7-10, 10.1 metinde). YEŞİL. Not: breadcrumb ölçülmüş üst sınırla en fazla 3 başlık adlandırır, Madde 10 dördüncü olduğu için adı breadcrumb'da yok; parça Madde 7 ile başlıyor.
+- Kabul 14 (D6): 10 eşzamanlı arama sürerken /healthz en kötü 140 ms (60 yoklama). YEŞİL. Arama süreleri 88-709 s (tek kilit, CPU reranker; FOLLOWUP-77).
+- Gerçek tokenizer: parça sınırı artık bge-m3 tokenizer'ıyla (ingest), FAKE_EMBED'de tahmin; 13a PDF'te hiçbir parça gövdesi 600'ü, reranker çifti 1024'ü aşmıyor (test). Hız: tahmin 0,04 s/14 parça, tokenizer 1,28 s/18 parça.
+- rerank_truncated: kb_queries kolonu + adaylarda işaret + log.
+- Model testleri 14/14 (1 tekrar: kabul 2 istemci zaman aşımı 60 s → 900 s, arama süresi kabul değil).
+Şu an: tam kapı koşusunda entegrasyon takıldı; canlı compose worker'ı aynı Redis 'ingest' kuyruğunu dinleyip test işlerini kapıyordu (ortam, kod değil). Worker durduruldu, entegrasyon yeniden koşuyor. Yeşilse dilim 7 commit → main'e rebase (listelediğin dosyalar, hepsini koruyarak) → kapılar yeniden → VERIFIED + PR-HAZIR. Gerekirse test worker'ı ayrı bir kuyruk adıyla izole ederim (ayrı not).

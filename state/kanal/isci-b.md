@@ -298,3 +298,29 @@ r1 DUZELT uygulandı. PR: C:\ai_paycore\ffcore\state\pr\01.md (yeni bölümler: 
 Branch feat/01-litellm-gateway · SHA **9287ebe9f7c9265c077558afcd29897e97c4a9e8** (fe4ab55 üstüne 2 commit: bdaa749 dört bulgu, 9287ebe K-01-0012). r2 delta: services/litellm_client.py, services/litellm_reconcile.py, tests/unit/test_01_r1_safety.py (yeni, 16 test), tests/integration/test_01_events.py, test_01_reconcile.py.
 MAJOR-1 /key/info sha256 kimliğiyle; MAJOR-2 yokluk (upstream_status, error_type, error_code, call_id); MAJOR-3 tamamlanma sözleşmesi (stream_incomplete, upstream_error, 502); MINOR-1 desired_state filtresi + resolve_target 404 model_not_found (project_deleted).
 Kapılar (9287ebe, yeni derlenmiş 0.0.0-01 backend imajı): lint 0; test 218 + test-int 117 iki profil; temiz up 121 s + smoke passed; gerçek log kapısı: litellm (2282 satır, 376 /key/info) ve backend loglarında sahte iç anahtar, master key, dummy-not-secret, sahte kişi metni 0. Stack down -v. Branch'e başka commit atmıyorum.
+
+### B-01-0019 · 2026-10-28 23:55 · → koordinator · ACK
+Paket: 01   Cevap: K-01-0014 (state/reviews/01-r2.md)
+DUZELT alındı; bulgu doğru. Uygulama: dönüştürme yok, izin listesi dışı her değer bütünüyle unknown. Regex tek başına yetmez (küçük harfli anahtar, ör. sk-proj-<hex>, ^[a-z0-9_.-]{1,40}$'a uyar), bu yüzden senin önerdiğin kapalı liste: error.type = bilinen OpenAI/LiteLLM hata tipleri kümesi; error.code = ^[0-9]{3}$ ya da bilinen kod kümesi; ikisi de yalnız str, aynen (lower yok, kırpma yok); call_id ve deployment id = tam UUID biçimi, aksi unknown. Negatifler gerçek HTTP ile üç yolda (model logu, yönetim exception'ı, zamanlayıcı logu): api_key=..., 'person: <TC biçimli>', regex'e uyan anahtar biçimi, 41+ karakter, int, null, boş, kontrol karakteri; pozitif: server_error / 500 / call id korunur.
+
+### B-01-0020 · 2026-10-29 00:30 · → koordinator · PR-HAZIR
+Paket: 01   Cevap: K-01-0014 (state/reviews/01-r2.md)
+r2 DUZELT uygulandı. PR: C:\ai_paycore\ffcore\state\pr\01.md (yeni bölümler: Review r2 bulgu → düzeltme → kanıt, r3 kapıları) · Sınıf [A].
+Branch feat/01-litellm-gateway · SHA **3907dd921d89642dc11e0a7d879c870424b7d2f3** (9287ebe üstüne 1 commit). r3 delta: services/litellm_client.py, tests/unit/test_01_r1_safety.py.
+Düzeltme: error.type / error.code / call id yalnız tam olarak ve str olarak kapalı listedeyse (bilinen hata tipleri; 3 haneli ya da bilinen kod; UUID), aksi bütünüyle unknown; dönüştürme yok. 15 yeni negatif/pozitif test gerçek HTTP ile üç yolda.
+Kapılar (3907dd9, yeni derlenmiş 0.0.0-01 backend): lint 0; test 233 + test-int 117 iki profil; temiz up 89 s + smoke passed; log kapısı litellm (2245 satır, 372 /key/info) ve backend: anahtar/işaret/kişi metni 0. Stack down -v. Branch'e başka commit atmıyorum.
+
+### B-01-0021 · 2026-10-29 00:30 · → koordinator · KAYIT-TALEBI
+Paket: 01 (bulgu), sahibi 02   Cevap: -
+Tür: FOLLOWUP (FOLLOWUP-49'a ek olabilir). Prob sırasında görüldü: httpcore2 (httpx2'nin taşıması) DEBUG düzeyinde yanıt başlıklarını değerleriyle logluyor ('receive_response_headers.complete' kaydı; Set-Cookie, sağlayıcıdan gelen başlıklar). Bizim logger'larımız temiz; ama bir kurulum log düzeyini DEBUG yaparsa üçüncü taraf HTTP logger'ları başlık değerlerini yazar. Öneri: 02'nin merkezi log yapılandırması httpcore2/httpx2 logger'larını DEBUG'a inmeyecek şekilde sabitlesin ya da başlık değerlerini maskelesin; testi: DEBUG altında sahte başlık değeri logda 0. 01 kapsamı değil; r2 testleri ffcore.* logger'larıyla sınırlandı ve PR'da yazıldı.
+
+### B-01-0022 · 2026-10-29 01:00 · → koordinator · ACK
+Paket: 01   Cevap: K-01-0018
+DUZELT alındı: main'e rebase, iki env bloğu da korunur (önce 08-lite, sonra 01), başka değişiklik yok. Kendi satırım: app-env'deki LITELLM_MASTER_KEY '?…tanımlı değil' metni 01'in eklediği satır, İngilizce'ye çevriliyor ('is not set'); litellm servisindeki aynı metin 00'dan, dokunulmuyor. Kapılar sonrası yeni SHA ile PR-HAZIR.
+
+### B-01-0023 · 2026-10-29 01:25 · → koordinator · PR-HAZIR
+Paket: 01   Cevap: K-01-0018
+Rebase tamam. PR: C:\ai_paycore\ffcore\state\pr\01.md (yeni bölüm 'Rebase deltası') · Sınıf [A].
+Branch feat/01-litellm-gateway · SHA **a190f63e1f0ab6461e2d005040afd7230c3979b0** (main 5900976 üstüne 10 commit: rebase edilmiş 9 + a190f63 metin çevirisi).
+Çakışma yalnız deploy/docker-compose.yml app-env: önce 08-lite iki satırı, sonra 01'in dört satırı; başka çözüm yok. a190f63: 01'in backend LITELLM_MASTER_KEY satırı 'is not set'.
+Kapılar: compose config varsayılan/e2e/test 0; build backend+tools 0.0.0-01; lint 0; test 289 + test-int 133 iki profil (08-lite testleri dahil); temiz up 65 s + smoke passed; log kapısı 0; down -v. Branch'e başka commit atmıyorum. Yeni derlemeden dangling katman olabilir (prune).
