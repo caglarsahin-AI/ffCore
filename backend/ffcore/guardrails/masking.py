@@ -107,22 +107,35 @@ async def apply_action(
     scope: str | None = None,
 ) -> str:
     """Rewrite `text` for a transforming action; other actions return it unchanged."""
-    if action not in ("redact", "mask", "tokenize") or not findings:
-        return text
-    if action == "tokenize" and (store is None or not scope):
+    return await apply_findings(text, [(f, action) for f in findings], store=store, scope=scope)
+
+
+async def apply_findings(
+    text: str,
+    actions: Sequence[tuple[Finding, str]],
+    *,
+    store: TokenStore | None = None,
+    scope: str | None = None,
+) -> str:
+    """Rewrite each finding with its own action (a PII policy may mix redact, mask, tokenize).
+
+    Findings must not overlap (recognizers resolve overlaps). Non-transforming actions keep text.
+    """
+    ordered = sorted(
+        ((f, a) for f, a in actions if a in ("redact", "mask", "tokenize")),
+        key=lambda x: x[0].start,
+    )
+    if any(a == "tokenize" for _, a in ordered) and (store is None or not scope):
         raise TokenScopeMissing("tokenize needs a token store and a scope (run id)")
-    ordered = sorted(findings, key=lambda f: f.start)
-    replacements = []
-    for finding in ordered:
+    out, cursor = [], 0
+    for finding, action in ordered:
         if action == "redact":
-            replacements.append(redact_label(finding.category))
+            replacement = redact_label(finding.category)
         elif action == "mask":
-            replacements.append(mask_value(finding.category, finding.value))
+            replacement = mask_value(finding.category, finding.value)
         else:
             key = _identity(finding.category, finding.value)
-            replacements.append(await store.token_for(scope, key, finding.value))
-    out, cursor = [], 0
-    for finding, replacement in zip(ordered, replacements, strict=True):
+            replacement = await store.token_for(scope, key, finding.value)
         out.append(text[cursor : finding.start])
         out.append(replacement)
         cursor = finding.end
