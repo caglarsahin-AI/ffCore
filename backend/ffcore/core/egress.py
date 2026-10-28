@@ -16,7 +16,8 @@ import ipaddress
 import logging
 import math
 import socket
-from collections.abc import Awaitable, Callable, Mapping
+from collections.abc import AsyncIterator, Awaitable, Callable, Mapping
+from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from typing import Any
 from urllib.parse import urljoin
@@ -311,6 +312,37 @@ class SafeOutboundClient:
                 "egress_timeout", _origin(target), f"exceeded {self._timeout.total} s"
             ) from None
 
+    @asynccontextmanager
+    async def stream(
+        self,
+        method: str,
+        url: str,
+        *,
+        headers: Mapping[str, str] | None = None,
+        params: Mapping[str, str] | None = None,
+        content: bytes | str | None = None,
+        json: Any = None,
+    ) -> AsyncIterator[httpx2.Response]:
+        """Like request(), but the caller reads the body as it arrives (SSE). Same policy, same
+        redirect rules (one code path). The total timeout covers reaching the final response;
+        afterwards the read timeout applies to each chunk, and reading raises httpx2 errors
+        (TimeoutException, HTTPError) that the caller maps. The response is closed on exit."""
+        target = httpx2.URL(url)
+        body = {"content": content, "json": json}
+        try:
+            with anyio.fail_after(self._timeout.total):
+                response = await self._follow(
+                    method, target, dict(headers or {}), params, body, stream=True
+                )
+        except TimeoutError:
+            raise EgressTimeoutError(
+                "egress_timeout", _origin(target), f"exceeded {self._timeout.total} s"
+            ) from None
+        try:
+            yield response
+        finally:
+            await response.aclose()
+
     async def _follow(
         self,
         method: str,
@@ -318,13 +350,15 @@ class SafeOutboundClient:
         headers: dict[str, str],
         params: Mapping[str, str] | None,
         body: dict,
+        stream: bool = False,
     ) -> httpx2.Response:
         for _ in range(self._max_redirects + 1):
             self._policy.check_url(url)
             try:
-                response = await self._client.request(
+                request = self._client.build_request(
                     method, url, headers=headers, params=params, **body
                 )
+                response = await self._client.send(request, stream=stream)
             except httpx2.TimeoutException:
                 raise EgressTimeoutError(
                     "egress_timeout", _origin(url), "connect or read"
@@ -336,6 +370,8 @@ class SafeOutboundClient:
             location = response.headers.get("location")
             if response.status_code not in _REDIRECT_STATUSES or not location:
                 return response
+            if stream:
+                await response.aclose()
             target = httpx2.URL(urljoin(str(url), location))
             headers, dropped = headers_for_redirect(url, target, headers)
             if _origin_key(target) != _origin_key(url):
