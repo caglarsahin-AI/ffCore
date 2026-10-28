@@ -1,8 +1,9 @@
 """Minimal deterministic DOCX writer (stdlib only: zipfile + XML strings).
 
 Headings use the built-in Heading1/Heading2 style ids so Docling sees the heading
-hierarchy; tables are real w:tbl elements. Zip entries have a fixed timestamp and
-order, so output is byte-stable for a given zlib build.
+hierarchy; tables are real w:tbl elements. Zip entries have a fixed timestamp,
+order and creator system (Unix on every OS), so output is byte-stable for a given
+zlib build.
 
 Blocks: ("h1"|"h2"|"p", text) and ("table", [[cell, ...], ...]).
 """
@@ -98,6 +99,7 @@ def render(blocks: list[tuple], title: str) -> bytes:
         for name, text in parts:
             info = zipfile.ZipInfo(name, date_time=FIXED_TIME)
             info.compress_type = zipfile.ZIP_DEFLATED
+            info.create_system = 3  # ZipInfo defaults to 0 on Windows, 3 elsewhere
             info.external_attr = 0o644 << 16
             zf.writestr(info, text.encode("utf-8"), compresslevel=9)
     return buf.getvalue()
