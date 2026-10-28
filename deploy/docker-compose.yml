@@ -239,10 +239,17 @@ services:
 
   migrate:
     # One-shot schema step before the backend (K-03b-0005): its own exit code and log, idempotent
-    # on every `up`. Roll back: docker compose run --rm migrate alembic downgrade <revision>.
+    # on every `up`. Roll back: docker compose run --rm migrate alembic downgrade <revision>
+    # (one branch only: 03a@-1, not 03a@base, which also drops 03b through the shared root).
+    # Then the static model catalog is loaded from deploy/seed (03a, idempotent).
     image: ${REGISTRY_PREFIX}ffcore/backend:${FFCORE_VERSION:?FFCORE_VERSION tanımlı değil}
-    command: ["alembic", "upgrade", "heads"]
+    command:
+      - sh
+      - -c
+      - alembic upgrade heads && python -m ffcore.cli load-model-catalog --path /app/seed/model_catalog.yaml
     restart: "no"
+    volumes:
+      - ./deploy/seed:/app/seed:ro
     environment: *app-env
     depends_on:
       postgres:

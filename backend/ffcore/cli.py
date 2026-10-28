@@ -9,6 +9,7 @@ The password is read from stdin, never from the command line (shell history, pro
 import argparse
 import asyncio
 import sys
+from pathlib import Path
 
 from sqlalchemy import func, select
 
@@ -16,6 +17,7 @@ from ffcore.core import db
 from ffcore.core.audit import AuditEntry, write_event
 from ffcore.core.passwords import MIN_LENGTH, hash_password
 from ffcore.models.identity import User
+from ffcore.services import catalog_loader
 
 
 class CliError(Exception):
@@ -68,6 +70,8 @@ def main(argv: list[str] | None = None) -> int:
     admin.add_argument(
         "--password-stdin", action="store_true", required=True, help="read the password from stdin"
     )
+    catalog = commands.add_parser("load-model-catalog", help="load the static model catalog")
+    catalog.add_argument("--path", required=True, type=Path)
     args = parser.parse_args(argv)
 
     try:
@@ -77,7 +81,10 @@ def main(argv: list[str] | None = None) -> int:
                 create_superadmin(args.email, args.full_name, password, args.access)
             )
             print(f"superadmin created: {user_id}")
-    except CliError as exc:
+        elif args.command == "load-model-catalog":
+            result = asyncio.run(catalog_loader.load(args.path))
+            print(f"model catalog: {result.upserted} entries, {result.removed} removed")
+    except (CliError, catalog_loader.CatalogFileError) as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 1
     return 0

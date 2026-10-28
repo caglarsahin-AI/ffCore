@@ -4,7 +4,7 @@ safe listing call say so explicitly (KARARLAR "03a kararları", S4b).
 """
 
 import time
-from collections.abc import Callable
+from collections.abc import Awaitable, Callable
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -238,3 +238,44 @@ def _failed(code: str, message: str, latency: int | None = None) -> ProviderTest
     return ProviderTestResult(
         supported=True, ok=False, code=code, message=message, latency_ms=latency
     )
+
+
+# --- Embedding dimension probes (P5, R2.7) ---
+# A probe embeds a short text with the given model and returns the vector length. 04a registers
+# the in-process `local_flagembedding` probe; without a probe the dimension cannot be measured
+# and registration is refused (409), never guessed from the catalog.
+
+EmbeddingProbe = Callable[[dict[str, str], str, Settings], Awaitable[int]]
+_probes: dict[str, EmbeddingProbe] = {}
+
+
+def register_embedding_probe(driver_name: str, probe: EmbeddingProbe) -> None:
+    if driver_name not in DRIVERS or "embedding" not in DRIVERS[driver_name].domains:
+        raise ValueError(f"driver {driver_name!r} does not serve embeddings")
+    _probes[driver_name] = probe
+
+
+def unregister_embedding_probe(driver_name: str) -> None:
+    _probes.pop(driver_name, None)
+
+
+async def measure_embed_dim(
+    driver_name: str, config: dict[str, str], model_id: str, settings: Settings
+) -> int:
+    probe = _probes.get(driver_name)
+    if probe is None:
+        raise ApiError(
+            409,
+            "conflict_error",
+            "embedding_probe_unavailable",
+            f"The embedding dimension of {driver_name} models cannot be measured yet.",
+        )
+    measured = await probe(config, model_id, settings)
+    if measured != settings.embed_dim:
+        raise ApiError(
+            400,
+            "invalid_request_error",
+            "embed_dim_mismatch",
+            f"Measured dimension {measured} differs from EMBED_DIM {settings.embed_dim}.",
+        )
+    return measured
