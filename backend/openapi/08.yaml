@@ -1,0 +1,1620 @@
+openapi: 3.1.0
+info:
+  title: FFCore API
+  description: Guardrail and PII policies, test panel and internal evaluation (package 08-lite).
+  version: '0.8'
+paths:
+  /api/v1/projects/{project_id}/pii-policies:
+    get:
+      tags:
+      - guardrails
+      summary: List PII policies
+      operationId: list_pii_policies_api_v1_projects__project_id__pii_policies_get
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PiiPolicyList'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+    post:
+      tags:
+      - guardrails
+      summary: Create a PII policy
+      description: 'Enabled categories need a recognizer (built-in regex or a custom pattern): 422
+
+        `category_unsupported`; `engine=ner` is 422 `engine_unsupported` until 08 full.'
+      operationId: create_pii_policy_api_v1_projects__project_id__pii_policies_post
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PiiPolicyCreate'
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PiiPolicyOut'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+  /api/v1/projects/{project_id}/pii-policies/{policy_id}:
+    get:
+      tags:
+      - guardrails
+      summary: Get a PII policy
+      operationId: get_pii_policy_api_v1_projects__project_id__pii_policies__policy_id__get
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      - name: policy_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Policy Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PiiPolicyOut'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+    patch:
+      tags:
+      - guardrails
+      summary: Update a PII policy
+      operationId: update_pii_policy_api_v1_projects__project_id__pii_policies__policy_id__patch
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      - name: policy_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Policy Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PiiPolicyUpdate'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PiiPolicyOut'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+    delete:
+      tags:
+      - guardrails
+      summary: Delete a PII policy
+      operationId: delete_pii_policy_api_v1_projects__project_id__pii_policies__policy_id__delete
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      - name: policy_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Policy Id
+      responses:
+        '204':
+          description: Successful Response
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+  /api/v1/projects/{project_id}/guardrail-policies:
+    get:
+      tags:
+      - guardrails
+      summary: List guardrail policies
+      description: Includes the built-in `default` (monitor mode) unless a stored policy uses that key.
+      operationId: list_guardrail_policies_api_v1_projects__project_id__guardrail_policies_get
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GuardrailPolicyList'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+    post:
+      tags:
+      - guardrails
+      summary: Create a guardrail policy
+      description: 'Rules are checked on save: unsupported type or stage, missing action, unknown
+
+        `pii_policy_key` and invalid patterns are 422 with a specific code.'
+      operationId: create_guardrail_policy_api_v1_projects__project_id__guardrail_policies_post
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GuardrailPolicyCreate'
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GuardrailPolicyOut'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+  /api/v1/projects/{project_id}/guardrail-policies/{policy_id}:
+    get:
+      tags:
+      - guardrails
+      summary: Get a policy
+      operationId: get_guardrail_policy_api_v1_projects__project_id__guardrail_policies__policy_id__get
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      - name: policy_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Policy Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GuardrailPolicyOut'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+    patch:
+      tags:
+      - guardrails
+      summary: Update a guardrail policy
+      description: Switching `mode` to enforce is recorded in the audit trail with the before state.
+      operationId: update_guardrail_policy_api_v1_projects__project_id__guardrail_policies__policy_id__patch
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      - name: policy_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Policy Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GuardrailPolicyUpdate'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GuardrailPolicyOut'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+    delete:
+      tags:
+      - guardrails
+      summary: Delete a policy
+      operationId: delete_guardrail_policy_api_v1_projects__project_id__guardrail_policies__policy_id__delete
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      - name: policy_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Policy Id
+      responses:
+        '204':
+          description: Successful Response
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+  /api/v1/projects/{project_id}/guardrails/test:
+    post:
+      tags:
+      - guardrails
+      summary: Try a policy on a text (dry run)
+      description: 'Nothing is stored: no guardrail events, no tokenize mapping outside this call. Every
+
+        finding carries its evidence and offsets; values are masked.'
+      operationId: test_guardrails_api_v1_projects__project_id__guardrails_test_post
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GuardrailTestRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GuardrailTestResult'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+  /api/v1/internal/guardrails/evaluate:
+    post:
+      tags:
+      - guardrails
+      - guardrails-internal
+      summary: Evaluate a text at a stage (service account only)
+      description: 'CONTRACTS C4. Writes one guardrail event per evaluated rule. A `block` decision is
+        a
+
+        200 response with `action=block`; the caller fails the run (06a) or returns 400 (06b).'
+      operationId: evaluate_guardrails_api_v1_internal_guardrails_evaluate_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EvaluateRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DecisionOut'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+components:
+  schemas:
+    BlockMessage:
+      properties:
+        en:
+          type: string
+          minLength: 1
+          title: En
+          default: This request was blocked by a guardrail policy.
+        tr:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Tr
+      additionalProperties: false
+      type: object
+      title: BlockMessage
+    CustomPattern:
+      properties:
+        name:
+          type: string
+          maxLength: 64
+          minLength: 1
+          title: Name
+        category:
+          type: string
+          title: Category
+        pattern:
+          type: string
+          maxLength: 200
+          minLength: 1
+          title: Pattern
+        score:
+          type: number
+          maximum: 1.0
+          minimum: 0.0
+          title: Score
+          default: 0.8
+      additionalProperties: false
+      type: object
+      required:
+      - name
+      - category
+      - pattern
+      title: CustomPattern
+    DecisionOut:
+      properties:
+        action:
+          type: string
+          enum:
+          - allow
+          - block
+          - redact
+          - mask
+          - tokenize
+          - warn
+          - log
+          title: Action
+        text_out:
+          type: string
+          title: Text Out
+        message:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Message
+        reference_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Reference Id
+        policy_key:
+          type: string
+          title: Policy Key
+        builtin:
+          type: boolean
+          title: Builtin
+        events:
+          items:
+            $ref: '#/components/schemas/EventOut'
+          type: array
+          title: Events
+      type: object
+      required:
+      - action
+      - text_out
+      - message
+      - reference_id
+      - policy_key
+      - builtin
+      - events
+      title: DecisionOut
+      description: CONTRACTS C4 decision as returned to internal callers (06a, 06b).
+    ErrorBody:
+      properties:
+        error:
+          $ref: '#/components/schemas/ErrorDetail'
+      type: object
+      required:
+      - error
+      title: ErrorBody
+      description: OpenAI-shaped error body used by every 4xx response.
+    ErrorDetail:
+      properties:
+        message:
+          type: string
+          title: Message
+          description: English, actionable, never contains secrets.
+        type:
+          type: string
+          title: Type
+          description: authentication_error, permission_error, not_found_error, ...
+        code:
+          type: string
+          title: Code
+          description: Stable machine-readable code, e.g. read_only_access.
+      type: object
+      required:
+      - message
+      - type
+      - code
+      title: ErrorDetail
+    EvaluateRequest:
+      properties:
+        project_id:
+          type: string
+          format: uuid
+          title: Project Id
+        stage:
+          type: string
+          enum:
+          - prompt.pre
+          - input.pre
+          - output.pre
+          - output.stream.delta
+          - tool.pre
+          - tool.post
+          - egress
+          title: Stage
+        text:
+          type: string
+          title: Text
+        policy_key:
+          type: string
+          pattern: ^[a-z][a-z0-9-]{1,63}$
+          title: Policy Key
+          description: Unique within the project, immutable.
+          default: default
+        run_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Run Id
+          description: Required for tokenize.
+        source:
+          type: string
+          enum:
+          - agent-playground
+          - chat
+          - api
+          - channel
+          title: Source
+          default: api
+        tool:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Tool
+        locale:
+          type: string
+          enum:
+          - tr
+          - en
+          title: Locale
+          default: en
+      additionalProperties: false
+      type: object
+      required:
+      - project_id
+      - stage
+      - text
+      title: EvaluateRequest
+    EventOut:
+      properties:
+        rule:
+          type: string
+          title: Rule
+        stage:
+          type: string
+          title: Stage
+        action_taken:
+          type: string
+          title: Action Taken
+        status:
+          type: string
+          title: Status
+        mode:
+          type: string
+          title: Mode
+        input_preview:
+          type: string
+          title: Input Preview
+        findings:
+          items:
+            additionalProperties: true
+            type: object
+          type: array
+          title: Findings
+        severity:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Severity
+        latency_ms:
+          type: number
+          title: Latency Ms
+        error:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Error
+      type: object
+      required:
+      - rule
+      - stage
+      - action_taken
+      - status
+      - mode
+      - input_preview
+      - findings
+      - severity
+      - latency_ms
+      - error
+      title: EventOut
+    FindingOut:
+      properties:
+        rule:
+          type: string
+          title: Rule
+        category:
+          type: string
+          title: Category
+        start:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Start
+        end:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: End
+        value:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Value
+          description: Masked; the raw value is never returned.
+        score:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Score
+        severity:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Severity
+        evidence:
+          type: string
+          title: Evidence
+          description: Why it matched, e.g. 'checksum valid · context word'.
+        action:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Action
+      type: object
+      required:
+      - rule
+      - category
+      - evidence
+      title: FindingOut
+    GuardrailPolicyCreate:
+      properties:
+        key:
+          type: string
+          pattern: ^[a-z][a-z0-9-]{1,63}$
+          title: Key
+          description: Unique within the project, immutable.
+        name:
+          type: string
+          maxLength: 200
+          minLength: 1
+          title: Name
+        rules:
+          items:
+            $ref: '#/components/schemas/Rule'
+          type: array
+          title: Rules
+        mode:
+          type: string
+          enum:
+          - 'off'
+          - monitor
+          - enforce
+          title: Mode
+          description: A new policy starts in monitor.
+          default: monitor
+        short_circuit:
+          type: boolean
+          title: Short Circuit
+          description: 'False: rules after a block still run (for the record).'
+          default: true
+        on_error:
+          type: string
+          enum:
+          - block
+          - allow
+          title: On Error
+          description: Fail-closed by default.
+          default: block
+        block_message:
+          $ref: '#/components/schemas/BlockMessage'
+        is_default:
+          type: boolean
+          title: Is Default
+          default: false
+      additionalProperties: false
+      type: object
+      required:
+      - key
+      - name
+      title: GuardrailPolicyCreate
+    GuardrailPolicyList:
+      properties:
+        data:
+          items:
+            $ref: '#/components/schemas/GuardrailPolicyOut'
+          type: array
+          title: Data
+      type: object
+      required:
+      - data
+      title: GuardrailPolicyList
+    GuardrailPolicyOut:
+      properties:
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+          description: Null for the built-in policy.
+        project_id:
+          type: string
+          format: uuid
+          title: Project Id
+        key:
+          type: string
+          title: Key
+        name:
+          type: string
+          title: Name
+        rules:
+          items:
+            $ref: '#/components/schemas/Rule'
+          type: array
+          title: Rules
+        mode:
+          type: string
+          title: Mode
+        short_circuit:
+          type: boolean
+          title: Short Circuit
+        on_error:
+          type: string
+          title: On Error
+        block_message:
+          $ref: '#/components/schemas/BlockMessage'
+        is_default:
+          type: boolean
+          title: Is Default
+        builtin:
+          type: boolean
+          title: Builtin
+        builtin_version:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Builtin Version
+        created_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Created At
+        updated_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Updated At
+      type: object
+      required:
+      - id
+      - project_id
+      - key
+      - name
+      - rules
+      - mode
+      - short_circuit
+      - on_error
+      - block_message
+      - is_default
+      - builtin
+      - created_at
+      - updated_at
+      title: GuardrailPolicyOut
+    GuardrailPolicyUpdate:
+      properties:
+        name:
+          type: string
+          maxLength: 200
+          minLength: 1
+          title: Name
+        rules:
+          items:
+            $ref: '#/components/schemas/Rule'
+          type: array
+          title: Rules
+        mode:
+          type: string
+          enum:
+          - 'off'
+          - monitor
+          - enforce
+          title: Mode
+        short_circuit:
+          type: boolean
+          title: Short Circuit
+        on_error:
+          type: string
+          enum:
+          - block
+          - allow
+          title: On Error
+        block_message:
+          $ref: '#/components/schemas/BlockMessage'
+        is_default:
+          type: boolean
+          title: Is Default
+      additionalProperties: false
+      type: object
+      title: GuardrailPolicyUpdate
+    GuardrailTestRequest:
+      properties:
+        text:
+          type: string
+          minLength: 1
+          title: Text
+        stage:
+          type: string
+          enum:
+          - prompt.pre
+          - input.pre
+          - output.pre
+          - output.stream.delta
+          - tool.pre
+          - tool.post
+          - egress
+          title: Stage
+          default: input.pre
+        policy_key:
+          type: string
+          pattern: ^[a-z][a-z0-9-]{1,63}$
+          title: Policy Key
+          description: Unique within the project, immutable.
+          default: default
+        action:
+          anyOf:
+          - type: string
+            enum:
+            - detect
+            - redact
+            - mask
+            - tokenize
+          - type: 'null'
+          title: Action
+          description: 'Set: run the PII policy `policy_key` with this action (PII panel). Unset: run
+            the guardrail policy `policy_key` as if it were in enforce mode.'
+        tool:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Tool
+          description: '''<tool_key>.<action>'' for tool.pre.'
+        locale:
+          type: string
+          enum:
+          - tr
+          - en
+          title: Locale
+          default: en
+      additionalProperties: false
+      type: object
+      required:
+      - text
+      title: GuardrailTestRequest
+    GuardrailTestResult:
+      properties:
+        action:
+          type: string
+          enum:
+          - allow
+          - block
+          - redact
+          - mask
+          - tokenize
+          - warn
+          - log
+          title: Action
+        text_out:
+          type: string
+          title: Text Out
+        message:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Message
+        findings:
+          items:
+            $ref: '#/components/schemas/FindingOut'
+          type: array
+          title: Findings
+        policy_mode:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Policy Mode
+          description: The stored mode; the test always enforces.
+        builtin:
+          type: boolean
+          title: Builtin
+      type: object
+      required:
+      - action
+      - text_out
+      - message
+      - findings
+      - policy_mode
+      - builtin
+      title: GuardrailTestResult
+    PiiCategorySetting:
+      properties:
+        enabled:
+          type: boolean
+          title: Enabled
+          default: true
+        severity:
+          type: string
+          enum:
+          - low
+          - medium
+          - high
+          title: Severity
+          default: medium
+        action:
+          anyOf:
+          - type: string
+            enum:
+            - block
+            - redact
+            - mask
+            - tokenize
+            - warn
+            - log
+          - type: 'null'
+          title: Action
+        lang:
+          anyOf:
+          - items:
+              type: string
+              enum:
+              - tr
+              - en
+            type: array
+          - type: 'null'
+          title: Lang
+      additionalProperties: false
+      type: object
+      title: PiiCategorySetting
+    PiiPolicyCreate:
+      properties:
+        key:
+          type: string
+          pattern: ^[a-z][a-z0-9-]{1,63}$
+          title: Key
+          description: Unique within the project, immutable.
+        name:
+          type: string
+          maxLength: 200
+          minLength: 1
+          title: Name
+        engine:
+          type: string
+          enum:
+          - regex
+          - ner
+          title: Engine
+          description: '`ner` arrives with the full guardrail package (422 now).'
+          default: regex
+        default_action:
+          type: string
+          enum:
+          - block
+          - redact
+          - mask
+          - tokenize
+          - warn
+          - log
+          title: Default Action
+          default: redact
+        languages:
+          items:
+            type: string
+            enum:
+            - tr
+            - en
+          type: array
+          title: Languages
+        min_confidence:
+          type: number
+          maximum: 1.0
+          minimum: 0.0
+          title: Min Confidence
+          default: 0.5
+        context_boost:
+          type: boolean
+          title: Context Boost
+          default: true
+        categories:
+          additionalProperties:
+            $ref: '#/components/schemas/PiiCategorySetting'
+          type: object
+          title: Categories
+          description: Canonical category code -> setting.
+        custom_patterns:
+          items:
+            $ref: '#/components/schemas/CustomPattern'
+          type: array
+          title: Custom Patterns
+        is_default:
+          type: boolean
+          title: Is Default
+          default: false
+      additionalProperties: false
+      type: object
+      required:
+      - key
+      - name
+      title: PiiPolicyCreate
+    PiiPolicyList:
+      properties:
+        data:
+          items:
+            $ref: '#/components/schemas/PiiPolicyOut'
+          type: array
+          title: Data
+      type: object
+      required:
+      - data
+      title: PiiPolicyList
+    PiiPolicyOut:
+      properties:
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+          description: Null for the built-in policy.
+        project_id:
+          type: string
+          format: uuid
+          title: Project Id
+        key:
+          type: string
+          title: Key
+        name:
+          type: string
+          title: Name
+        engine:
+          type: string
+          title: Engine
+        default_action:
+          type: string
+          title: Default Action
+        languages:
+          items:
+            type: string
+          type: array
+          title: Languages
+        min_confidence:
+          type: number
+          title: Min Confidence
+        context_boost:
+          type: boolean
+          title: Context Boost
+        categories:
+          additionalProperties:
+            $ref: '#/components/schemas/PiiCategorySetting'
+          type: object
+          title: Categories
+        custom_patterns:
+          items:
+            $ref: '#/components/schemas/CustomPattern'
+          type: array
+          title: Custom Patterns
+        is_default:
+          type: boolean
+          title: Is Default
+        builtin:
+          type: boolean
+          title: Builtin
+          description: 'True: the built-in `default`, not stored.'
+        created_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Created At
+        updated_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Updated At
+      type: object
+      required:
+      - id
+      - project_id
+      - key
+      - name
+      - engine
+      - default_action
+      - languages
+      - min_confidence
+      - context_boost
+      - categories
+      - custom_patterns
+      - is_default
+      - builtin
+      - created_at
+      - updated_at
+      title: PiiPolicyOut
+    PiiPolicyUpdate:
+      properties:
+        name:
+          type: string
+          maxLength: 200
+          minLength: 1
+          title: Name
+        engine:
+          type: string
+          enum:
+          - regex
+          - ner
+          title: Engine
+        default_action:
+          type: string
+          enum:
+          - block
+          - redact
+          - mask
+          - tokenize
+          - warn
+          - log
+          title: Default Action
+        languages:
+          items:
+            type: string
+            enum:
+            - tr
+            - en
+          type: array
+          title: Languages
+        min_confidence:
+          type: number
+          maximum: 1.0
+          minimum: 0.0
+          title: Min Confidence
+        context_boost:
+          type: boolean
+          title: Context Boost
+        categories:
+          additionalProperties:
+            $ref: '#/components/schemas/PiiCategorySetting'
+          type: object
+          title: Categories
+        custom_patterns:
+          items:
+            $ref: '#/components/schemas/CustomPattern'
+          type: array
+          title: Custom Patterns
+        is_default:
+          type: boolean
+          title: Is Default
+      additionalProperties: false
+      type: object
+      title: PiiPolicyUpdate
+    Rule:
+      properties:
+        type:
+          type: string
+          title: Type
+        action:
+          anyOf:
+          - type: string
+            enum:
+            - block
+            - redact
+            - mask
+            - tokenize
+            - warn
+            - log
+          - type: 'null'
+          title: Action
+        stages:
+          items:
+            type: string
+            enum:
+            - prompt.pre
+            - input.pre
+            - output.pre
+            - output.stream.delta
+            - tool.pre
+            - tool.post
+            - egress
+          type: array
+          minItems: 1
+          title: Stages
+        params:
+          additionalProperties: true
+          type: object
+          title: Params
+        pii_policy_key:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Pii Policy Key
+      additionalProperties: false
+      type: object
+      required:
+      - type
+      - stages
+      title: Rule

@@ -19,6 +19,7 @@ C3_EXCEPTIONS = {
     "provider_projects": "link",
     # append-only event tables
     "audit_events": "append-only",
+    "guardrail_events": "append-only (08; named in CONTRACTS C3)",
 }
 
 
