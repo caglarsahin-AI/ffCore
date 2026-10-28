@@ -18,6 +18,9 @@ Gerçek kurulum: `cp .env.example .env`, ardından gizli değerleri kurulumu yap
 scriptler `.env` yazmaz). Boş bırakılan zorunlu değişken varsa `docker compose` hangi değişkenin eksik
 olduğunu yazarak durur.
 
+`migrate` servisi her `up`'ta backend'den önce `alembic upgrade heads` koşar (idempotent); başarısızsa backend
+başlamaz. Geri alma: `docker compose run --rm migrate alembic downgrade <revizyon>`.
+
 ## Günlük komutlar
 
 | İş | Komut |

@@ -207,6 +207,8 @@ services:
     ports:
       - "${BACKEND_PORT:-8000}:8000"
     depends_on:
+      migrate:
+        condition: service_completed_successfully
       postgres:
         condition: service_healthy
       redis:
@@ -228,6 +230,17 @@ services:
       - "${FRONTEND_PORT:-3000}:3000"
     depends_on:
       backend:
+        condition: service_healthy
+
+  migrate:
+    # One-shot schema step before the backend (K-03b-0005): its own exit code and log, idempotent
+    # on every `up`. Roll back: docker compose run --rm migrate alembic downgrade <revision>.
+    image: ${REGISTRY_PREFIX}ffcore/backend:${FFCORE_VERSION:?FFCORE_VERSION tanımlı değil}
+    command: ["alembic", "upgrade", "heads"]
+    restart: "no"
+    environment: *app-env
+    depends_on:
+      postgres:
         condition: service_healthy
 
   tools:
