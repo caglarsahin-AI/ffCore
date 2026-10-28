@@ -10,7 +10,7 @@ import json
 import random
 from pathlib import Path
 
-from . import write_text
+from . import schema, write_text
 from .words import HOSPITAL_NAME
 
 # Shared blocks copied from the plan/06 example; seed-specific values (top_k,
@@ -80,6 +80,26 @@ def _definition(
 
 
 SQL_TOOL = {"tool_key": "mcp-sql", "actions": ["get_schema", "run_sql"]}
+# PoC SQL assistant (PLAN 2d): one approved run_sql call, so the schema is in the prompt
+SQL_RUN_ONLY = {"tool_key": "mcp-sql", "actions": ["run_sql"]}
+
+
+def sql_schema_prompt() -> str:
+    """Schema descriptions and few-shots of the demo DB, embedded in the system prompt."""
+    lines = ["Veritabanı şeması (PostgreSQL, salt okunur):"]
+    for table, cols in schema.TABLES:
+        lines.append(f"- {table}: {schema.TABLE_DESCRIPTIONS[table]}")
+        for col, _ in cols:
+            desc, formula = schema.COLUMN_DESCRIPTIONS[(table, col)]
+            metric = f" Ölçü: {formula}." if formula else ""
+            lines.append(f"  - {col}: {desc}{metric}")
+    lines.append("Örnek sorular ve SQL karşılıkları:")
+    for question, sql in schema.FEW_SHOTS:
+        lines.append(f"- Soru: {question}")
+        lines.append(f"  SQL: {sql}")
+    return "\n".join(lines)
+
+
 SQL_APPROVAL = {
     "actions": ["mcp-sql.run_sql"],
     "assign_to": "analyst",
@@ -110,13 +130,14 @@ TEMPLATES = [
         "description": "Hastane işletme verisi (bölüm, yatak, yatış özeti, cihaz, arıza) "
         "hakkındaki soruları SQL ile cevaplar.",
         "definition": _definition(
-            "Sen {{hospital_name}} için veri asistanısın. Önce get_schema ile ilgili tabloları "
-            "öğren, sonra tek bir run_sql çağrısıyla soruyu cevapla. Sonuçları tablo olarak yaz "
-            "ve hangi sorguyu çalıştırdığını belirt. Soru belirsizse kullanıcıya sor.",
+            "Sen {{hospital_name}} için veri asistanısın. Aşağıdaki şemayı ve örnekleri "
+            "kullanarak soruyu tek bir run_sql çağrısıyla cevapla; başka araç çağırma. Sonuçları "
+            "tablo olarak yaz ve hangi sorguyu çalıştırdığını belirt. Soru belirsizse araç "
+            "çağırmadan hangi bilginin eksik olduğunu yaz.\n\n" + sql_schema_prompt(),
             knowledge=[],
-            tools=[SQL_TOOL],
+            tools=[SQL_RUN_ONLY],
             approval=SQL_APPROVAL,
-            ask_user=True,
+            ask_user=False,  # plan/06: ask_user adds ask_user_question, a second tool call
             limits={**LIMITS, "max_tool_calls": 1},
             answer_rules=_answer_rules(False, "Bu soruyu mevcut veriyle cevaplayamıyorum."),
         ),

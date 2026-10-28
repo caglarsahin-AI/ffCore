@@ -251,6 +251,15 @@ class Test13aEval(unittest.TestCase):
             )
             self.assertGreater(q["compute"](rows), 0, q["id"])  # a zero would not discriminate
 
+    def test_13a_4f_gold_answer_passes_must_contain(self):
+        # Review r1 MAJOR-2: the reference answer must pass its own `contains` check
+        # (plan/09: normalised substring), or a model repeating it scores a false negative.
+        for item in self.items:
+            exp = item["expected_output"]
+            answer = _fold(exp["answer"])
+            for phrase in exp.get("must_contain") or []:
+                self.assertIn(_fold(phrase), answer, (item["id"], phrase))
+
 
 class Test13aPii(unittest.TestCase):
     @classmethod
@@ -533,14 +542,11 @@ class Test13aAgents(unittest.TestCase):
         self.assertFalse(s.get("tools"))
 
         # PLAN 2d decision 5 overrides brief 13 (K-13a-0002, DRIFT-25): the PoC SQL
-        # assistant makes a single, approved tool call.
+        # assistant makes a single, approved tool call (details in test_13a_3b).
         v = self.agents["veri-soru-cevap"]["definition"]
-        self.assertEqual(
-            v["tools"], [{"tool_key": "mcp-sql", "actions": ["get_schema", "run_sql"]}]
-        )
+        self.assertEqual(v["tools"], [{"tool_key": "mcp-sql", "actions": ["run_sql"]}])
         self.assertEqual(v["approval"]["actions"], ["mcp-sql.run_sql"])
         self.assertEqual(v["limits"]["max_tool_calls"], 1)
-        self.assertTrue(v["ask_user"])
         self.assertFalse(v.get("knowledge"))
 
         k = self.agents["karma-asistan"]["definition"]
@@ -549,6 +555,47 @@ class Test13aAgents(unittest.TestCase):
         )
         self.assertEqual(k["tools"][0]["tool_key"], "mcp-sql")
         self.assertIn("mcp-sql.run_sql", k["approval"]["actions"])
+
+    def test_13a_3b_sql_agent_single_call_consistent(self):
+        """Review r1 MAJOR-1: prompt, tool list and call budget describe one run_sql call.
+
+        The schema and few-shots are in the system prompt, so no get_schema call is
+        needed. ask_user is off: plan/06 adds ask_user_question as a tool, which would
+        spend the single call; an unclear question is answered in text instead.
+        """
+        v = self.agents["veri-soru-cevap"]["definition"]
+        prompt = v["system_prompt"]
+        self.assertEqual(v["limits"]["max_tool_calls"], 1)
+        self.assertNotIn("get_schema", prompt)
+        self.assertFalse(v["ask_user"])
+        self.assertEqual(self._mentioned_tools(prompt), {"run_sql"})
+        for table, cols in schema.TABLES:
+            self.assertIn(table, prompt)
+            for col, _ in cols:
+                self.assertIn(col, prompt, (table, col))
+        for question, sql in schema.FEW_SHOTS:
+            self.assertIn(question, prompt)
+            self.assertIn(sql, prompt)
+        # every template: tools named in the prompt are tools the agent actually has,
+        # and approval only names actions the agent can call
+        for key, a in self.agents.items():
+            d = a["definition"]
+            allowed = {act for t in d["tools"] for act in t["actions"]}
+            if any(k["mode"] == "tool" for k in d["knowledge"]):
+                allowed.add("search_documents")
+            if d["ask_user"]:
+                allowed.add("ask_user_question")
+            self.assertLessEqual(self._mentioned_tools(d["system_prompt"]), allowed, key)
+            for action in d.get("approval", {}).get("actions", []):
+                tool_key, _, name = action.partition(".")
+                self.assertIn(
+                    name, {x for t in d["tools"] if t["tool_key"] == tool_key for x in t["actions"]}
+                )
+
+    @staticmethod
+    def _mentioned_tools(prompt: str) -> set[str]:
+        names = {"get_schema", "run_sql", "search_documents", "ask_user_question"}
+        return {n for n in names if n in prompt}
 
 
 class Test13aOpenapi(unittest.TestCase):

@@ -359,7 +359,7 @@
     "expected_output": {
       "answer": "Cihazın tamamen hizmet dışı kaldığı kritik arızalarda 4 saat (Madde 5.2).",
       "must_contain": [
-        "4 saattir"
+        "4 saat"
       ],
       "must_cite": [
         "SZL-2024-011_cihaz-bakim.pdf"

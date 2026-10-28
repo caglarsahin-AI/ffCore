@@ -137,7 +137,7 @@ QUESTIONS = [
         "id": "q14",
         "style": "dolayli",
         "doc": DOC["bakim"],
-        "must": ["4 saattir"],
+        "must": ["4 saat"],
         "avoided_term": "müdahale",
         "q": "Bir ventilatör tamamen durursa bakım firmasının en geç ne kadar sürede gelmesi "
         "gerekir?",

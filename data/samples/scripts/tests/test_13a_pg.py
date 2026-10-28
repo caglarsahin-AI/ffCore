@@ -1,9 +1,11 @@
 """13a demo schema against a real, isolated Postgres (acceptance 2d, 4d groundwork).
 
 Opt-in: set RUN_PG_TESTS=1. Uses the image pinned by package 00
-(pgvector/pgvector:0.8.1-pg16), a throwaway container named ffcore-13a-pg with no
-published ports and trust auth inside the container only (no secret), removed after.
-Approved by the coordinator in K-13a-0002.
+(pgvector/pgvector:0.8.1-pg16), a throwaway container with no published ports and
+trust auth inside the container only (no secret). Approved by the coordinator in
+K-13a-0002. The container name is unique per run (ffcore-13a-pg-<pid>-<random>), the
+fixture only ever removes the container it created, a name clash fails loudly instead
+of deleting someone else's container, and setup failures still clean up (review r1).
 """
 
 import os
@@ -12,6 +14,7 @@ import subprocess
 import sys
 import time
 import unittest
+import uuid
 from pathlib import Path
 
 SCRIPTS = Path(__file__).resolve().parents[1]
@@ -21,7 +24,7 @@ sys.path.insert(0, str(SCRIPTS))
 from gen import schema  # noqa: E402
 
 IMAGE = "pgvector/pgvector:0.8.1-pg16"
-CONTAINER = "ffcore-13a-pg"
+CONTAINER = f"ffcore-13a-pg-{os.getpid()}-{uuid.uuid4().hex[:8]}"
 SEED = 13
 
 
@@ -62,10 +65,21 @@ def _psql(sql: str, check: bool = True) -> subprocess.CompletedProcess:
 class Test13aPostgres(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        _docker("rm", "-f", CONTAINER, check=False)
+        existing = _docker("ps", "-aq", "--filter", f"name=^{CONTAINER}$").stdout.strip()
+        if existing:
+            raise RuntimeError(f"container {CONTAINER} already exists; not touching it")
         _docker(
             "run", "-d", "--rm", "--name", CONTAINER, "-e", "POSTGRES_HOST_AUTH_METHOD=trust", IMAGE
         )
+        try:
+            cls._wait_and_load()
+        except BaseException:
+            # unittest skips tearDownClass when setUpClass fails; remove our container here
+            _docker("rm", "-f", CONTAINER, check=False)
+            raise
+
+    @classmethod
+    def _wait_and_load(cls):
         deadline = time.monotonic() + 60
         while (
             _docker("exec", CONTAINER, "pg_isready", "-U", "postgres", check=False).returncode != 0

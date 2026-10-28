@@ -26,7 +26,7 @@ RUN_PG_TESTS=1 py -3.12 -m unittest data.samples.scripts.tests.test_13a_pg -v
 |---|---|---|
 | `contracts/` | 5 sözleşme (2 PDF, 3 DOCX) ve `manifest.json` (ACL: analyst, admin, boş) | 04a ingest/arama/ACL, 06a, 13b |
 | `schema/` | demo sunum DB'si: şema, 10.000 satır seed, salt-okunur rol şablonu, `schema_descriptions`, 20 few-shot | 05a mcp-sql, 13b |
-| `agents/` | `sozlesme-asistani`, `veri-soru-cevap` (PLAN 2d: tek, onaylı `run_sql`), `karma-asistan` | 06a, 10b, 13b |
+| `agents/` | `sozlesme-asistani`, `veri-soru-cevap` (PLAN 2d: tek, onaylı `run_sql`; şema açıklaması ve few-shot'lar sistem prompt'unda, `get_schema` ve `ask_user` yok), `karma-asistan` | 06a, 10b, 13b |
 | `eval/` | `sozlesme-33.json` (12 doğrudan, 8 dolaylı, 5+3 cevapsız, 5 SQL) ve `suite.json` | 09, 13b |
 | `pii/` | 100 etiketli Türkçe PII cümlesi (19 kategori, 10 negatif) ve kategori kodları | 08 |
 | `memory/` | 40 beklenen çıktılı hafıza konuşması | 14 |
