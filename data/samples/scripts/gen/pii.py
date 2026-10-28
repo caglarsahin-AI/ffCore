@@ -337,7 +337,10 @@ TEMPLATES = {
     "CVV": ["Kartın arkasındaki CVV {CVV}.", "Güvenlik kodu (CVV): {CVV}"],
     "PIN": ["Kartın PIN kodu {PIN}, kimseyle paylaşmayın.", "Kasa için PIN: {PIN}"],
     "GPS": ["Ambulansın son konumu {GPS}.", "Saha ekibinin koordinatı: {GPS}"],
-    "MAC_ADDRESS": ["Cihazın MAC adresi {MAC_ADDRESS}.", "Ağa {MAC_ADDRESS} adresli bilinmeyen cihaz bağlandı."],
+    "MAC_ADDRESS": [
+        "Cihazın MAC adresi {MAC_ADDRESS}.",
+        "Ağa {MAC_ADDRESS} adresli bilinmeyen cihaz bağlandı.",
+    ],
     "API_TOKEN": [
         "Entegrasyon anahtarı {API_TOKEN} olarak tanımlandı.",
         "Authorization başlığında {API_TOKEN} gönderiliyor.",
@@ -439,7 +442,7 @@ CATEGORIES_MD_HEADER = "\n".join(
         "",
         "`pii-100.jsonl` içindeki `category` kodlarının plan/08 kategori adlarıyla eşlemesi.",
         "Kodlar kanonik listedir (İngilizce, Presidio uyumlu; FOLLOWUP-33, KARARLAR "
-        "\"08-lite kararları\");",
+        '"08-lite kararları");',
         "tek kaynak `backend/ffcore/guardrails/categories.py`, 08 testi iki listenin eşitliğini "
         "kanıtlar.",
         "`default_on`: 08'in varsayılan politikasında açık. "
