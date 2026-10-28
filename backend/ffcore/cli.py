@@ -18,6 +18,7 @@ from sqlalchemy import func, select
 from ffcore.core import db
 from ffcore.core.audit import AuditEntry, write_event
 from ffcore.core.config import get_settings
+from ffcore.core.logging import configure_logging
 from ffcore.core.passwords import MIN_LENGTH, hash_password
 from ffcore.models.identity import User
 from ffcore.services import catalog_loader, litellm_reconcile, seed_models
@@ -117,6 +118,7 @@ def main(argv: list[str] | None = None) -> int:
     reindex.add_argument("--layer", choices=("silver", "gold"), required=True)
     reindex.add_argument("--full", action="store_true", help="every document, not only changed")
     args = parser.parse_args(argv)
+    configure_logging(get_settings())
 
     try:
         if args.command == "create-superadmin":

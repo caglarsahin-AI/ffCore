@@ -10,6 +10,7 @@ from ffcore.core.audit import ensure_audit_partitions
 from ffcore.core.auth import register_credential_resolver
 from ffcore.core.config import get_settings
 from ffcore.core.errors import install_error_handlers
+from ffcore.core.logging import configure_logging
 from ffcore.core.readiness import router as readiness_router
 from ffcore.core.readiness import warmup
 from ffcore.core.session import session_resolver
@@ -28,14 +29,17 @@ register_embedding_probe("local_flagembedding", probe_dimension)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    def settings():
+        # The request dependency, so an override (tests) applies to the background run too.
+        return app.dependency_overrides.get(get_settings, get_settings)()
+
+    # 02: one log configuration, secrets scrubbed, third-party HTTP loggers quiet (FOLLOWUP-49).
+    configure_logging(settings())
     # The schema comes from the migrate service; this only adds missing monthly partitions.
     await ensure_audit_partitions(2)
 
     # 01: LiteLLM's models follow the tables. One reconcile at start and one after each catalog
     # change, in the background; a failure is logged and retried, start-up goes on (S4).
-    def settings():
-        # The request dependency, so an override (tests) applies to the background run too.
-        return app.dependency_overrides.get(get_settings, get_settings)()
 
     scheduler = None
     if settings().litellm_url:
