@@ -1,0 +1,33 @@
+# Static model catalog (package 03a), loaded by the migrate service:
+#   python -m ffcore.cli load-model-catalog --path /app/seed/model_catalog.yaml
+# The file is the source: entries missing here are removed from the model_catalog table.
+#
+# Only values that can be traced to a source go in (KARARLAR "03a kararları", S6). llmaas
+# entries (Anthropic, OpenAI, Azure OpenAI) come with package 01's seed, each with its source URL
+# and as_of date. Prices are USD per 1M tokens; airgap prices are virtual.
+version: 1
+entries:
+  - driver: ollama
+    model_id: qwen3.5:35b
+    category: llm
+    capabilities: {tool_calls: true, reasoning: true, structured_outputs: false}
+    input_types: [text]
+    # The configured OLLAMA_CONTEXT_LENGTH (PayCore measurement), not the model's maximum.
+    context_window: 32768
+    max_output: null
+    embed_dim: null
+    pricing: {input_per_1m: 0, output_per_1m: 0, cached_per_1m: 0}
+    source: "PLAN 2d and brief 01 technical notes (PayCore measurement); deploy/ollama/models.airgap.txt"
+    as_of: "2026-10-27"
+  - driver: local_flagembedding
+    model_id: BAAI/bge-m3
+    category: embedding
+    capabilities: {tool_calls: false, reasoning: false, structured_outputs: false}
+    input_types: [text]
+    # bge-m3's own token limit (PayCore rag/embed.py MAX_TOKENS).
+    context_window: 8192
+    max_output: null
+    embed_dim: 1024
+    pricing: {input_per_1m: 0, output_per_1m: 0, cached_per_1m: 0}
+    source: "PayCore src/paycore_llm/rag/embed.py and rag/retrieve.py (dim 1024); KARARLAR C10"
+    as_of: "2026-10-28"

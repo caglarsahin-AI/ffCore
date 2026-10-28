@@ -5,12 +5,14 @@ from pydantic import ValidationError
 
 from ffcore.core.config import Settings
 from ffcore.core.errors import ApiError, install_error_handlers
+from tests.dummy import SETTINGS_03A
 
 BASE = {
     "deploy_profile": "llmaas",
     "offline": False,
     "service_token": "dummy-not-secret-service-token-0123456789",
     "obo_jwt_secret": "dummy-not-secret-obo-jwt-secret-0123456789",
+    **SETTINGS_03A,
 }
 
 

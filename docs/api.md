@@ -61,7 +61,7 @@ resource_id, outcome (success|denied|error), before, after, request_id, ip`.
 - The table is append-only: UPDATE, DELETE and TRUNCATE fail for every database role. Rows live in
   monthly partitions (`audit_events_YYYY_MM`, UTC); the backend creates this and next month's
   partition on startup. Retention (03c) removes whole months by dropping partitions.
-- Reading the trail (`GET /audit`, CSV export) comes with 03a.
+- Reading the trail: `GET /api/v1/audit` and `GET /api/v1/audit.csv` (03a, below).
 
 ## Outbound calls (03b)
 
@@ -86,3 +86,132 @@ is the caller's own `Cookie` header, under the same origin rule.
 `request()` takes only `method, url, headers, params, content, json`: redirect handling, transport,
 proxy, TLS verification and timeouts cannot be changed per call (`TypeError`). The host rules run
 again at connect time. Environment proxy variables are ignored. Errors name only scheme and host.
+
+## Identity, projects, providers and models (03a)
+
+The contract is `backend/openapi/03a.yaml`, rendered from the code
+(`python -m ffcore.api.openapi_export > openapi/03a.yaml`; a contract test fails when it drifts).
+Lists are `{"data": [...]}`. Changes after the draft are additive only.
+
+PATCH bodies: an omitted field is left as it is. An explicit `null` is accepted only where the
+schema says so (`UserUpdate.superadmin_access`, `ProjectUpdate.description`,
+`ProviderUpdate.description`, `ModelUpdate.reasoning_default`) and clears the value; for every
+other field `null` is a 422 `validation_error`.
+
+### Sign-in and session
+
+| Endpoint | Notes |
+|---|---|
+| `POST /auth/login` | email + password (argon2id). Sets `ffcore_session`: HttpOnly, SameSite=Strict, Secure, Path=/. Wrong email and wrong password give the same 401 `invalid_credentials` |
+| `POST /auth/logout` | clears the cookie and revokes every session token of the user |
+| `GET /auth/me` | `{user, role, access, memberships[]}` |
+| `POST /auth/password` | own password; allowed in read-only access mode; revokes other sessions |
+
+The cookie holds an HS256 token signed with `SECRET_KEY` (not `OBO_JWT_SECRET`), lifetime
+`SESSION_TTL_S` (default 8 h). It carries the user's `token_version`; logout, password change,
+deactivation and deletion bump it, so older tokens stop working at once.
+`resolve_actor()` still decides who calls: the session is one registered credential resolver.
+
+Cross-origin rule (C6): a cookie-authenticated `POST/PUT/PATCH/DELETE` is refused with 403
+`cross_origin_forbidden` when `Sec-Fetch-Site` is `cross-site` or `same-site`, or when `Origin`
+is not listed in `CONSOLE_ORIGINS`. There is no CORS middleware and no CSRF token; the console
+reaches the backend from its own origin through the Next.js rewrite.
+
+First superadmin (nobody can sign in on an empty installation; run once, by hand):
+
+```bash
+docker compose run --rm -T backend python -m ffcore.cli create-superadmin --email admin@example.org --full-name "Admin" --password-stdin < password.txt
+```
+
+The password is read from stdin, never from the command line. The command fails if the email
+already exists. It writes a `user.create_superadmin` audit event with actor `system/cli`.
+
+### Roles and access mode
+
+Roles `user < analyst < developer < admin`; access mode `edit | read` per membership. In this
+release only `admin` and `analyst` can be assigned (422 `role_reserved` for the others).
+A superadmin (`users.is_superadmin`) acts as `admin` in every project with its own
+`superadmin_access`.
+
+| Scope | Who |
+|---|---|
+| Users, providers, provider drivers, project create/delete, unscoped audit | superadmin |
+| Project read, members list, models list, readiness | project `analyst` or higher |
+| Project update, members, models | project `admin` |
+| Audit with `project_id` | that project's `admin` |
+| Model catalog | any signed-in user |
+
+A service calling on behalf of a user (`X-On-Behalf-Of`) is bounded by the token's project for
+the whole call: the project list, memberships and `GET /auth/me` show only that project, only the
+user's membership there counts (superadmin rights do not apply), and tenant administration
+(users, providers, provider drivers, project create/delete, unscoped audit) or another project
+gives 403 `obo_project_scope`.
+
+Every mutation route depends on a role check with `write=True`, so `read` access gets 403
+`read_only_access`; a missing role gives 403 `insufficient_role`. Both denials are written to the
+audit trail before the response. A CI test fails if a mutation route lacks the `write` check
+(exceptions: login, logout, own password).
+
+### Projects
+
+`key` matches `^[a-z][a-z0-9-]{1,31}$`, is globally unique and can never change or be reused,
+even after the project is deleted: it is part of every LiteLLM model name
+`"<project_key>.<model_key>"` (CONTRACTS C1). Projects, users and models are soft deleted.
+
+`GET /projects/{id}/readiness` returns `{passed, total, checks[]}` with three checks: an active
+model provider is assigned, an active vector provider is assigned, the project has an active
+admin member. (03c adds limits and alert rules.)
+
+### Providers
+
+Providers are tenant level and always assigned to at least one project. Drivers and their fields
+(which are required and which are secret) are listed by `GET /provider-drivers`:
+`ollama, vllm, anthropic, openai, azure_openai, bedrock, openai_compatible, local_flagembedding,
+pgvector, qdrant, local_fs`.
+
+The configuration is stored encrypted with `FERNET_KEY`; a value that does not decrypt is an
+error, never an empty configuration. Secret fields are returned and audited as `"***"`; sending
+`"***"` back in a PATCH keeps the stored value.
+
+Connection test: `POST /providers/test` (unsaved configuration) and `POST /providers/{id}/test`
+(stored). One listing call through `SafeOutboundClient`, so `OFFLINE`, `EGRESS_ALLOWLIST` and the
+private-address rules apply. The result is `{supported, ok, code, message, latency_ms}`; a failed
+test never blocks saving. `bedrock` (needs SigV4 signing), `pgvector`, `local_fs` and
+`local_flagembedding` have no test and answer `supported: false`,
+`code: connection_test_unsupported`.
+
+A provider used by an active model cannot be deactivated, neither by `DELETE` nor by
+`PATCH {"is_active": false}` (409 `provider_in_use`; deactivate or delete the models first), and it
+cannot be removed from a project whose models use it.
+
+### Models
+
+Models belong to a project. The provider must be active, assigned to the project and serve the
+category's domain (`embedding` for embedding models, `model` for the others). `upstream_api`
+(`chat | responses`) is always chosen explicitly. The response carries `litellm_name`.
+
+Embedding models: `embed_dim` is measured at registration through the provider driver's probe and
+must equal `EMBED_DIM` (400 `embed_dim_mismatch`). Without a probe for that driver the model is
+refused with 409 `embedding_probe_unavailable` (the in-process `local_flagembedding` probe comes
+with 04a). Embedding models are not served through LiteLLM.
+
+`GET /model-catalog?driver=&model_id=` reads the static catalog loaded from
+`deploy/seed/model_catalog.yaml` by the `migrate` service. It lists only entries whose values can
+be traced to a source (`source`, `as_of`); an empty result means "not in the catalog".
+
+Catalog changes (providers, assignments, models) are delivered to registered listeners after the
+transaction commits; package 01's reconciler is such a listener. Without one, each change is
+logged as `catalog_change_unhandled`.
+
+### Audit trail (read)
+
+`GET /audit?project_id=&actor_id=&action=&resource_type=&outcome=&since=&until=&limit=&offset=`
+returns newest first. `GET /audit.csv` takes the same filters and exports at most 10,000 rows
+(400 `export_too_large` otherwise). Values are as stored (already masked); cells starting with
+`=`, `+`, `-` or `@` are prefixed with `'`.
+
+### Migrations
+
+03a lives on Alembic branch `03a` (`03a_0001`). To roll back only this package:
+`docker compose run --rm migrate alembic downgrade 03a@-1`. Do not use `03a@base`: it resolves to
+the shared root `0001` and also drops 03b.

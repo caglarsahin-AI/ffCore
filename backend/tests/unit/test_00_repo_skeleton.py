@@ -1,5 +1,6 @@
 """Package 00 acceptance checks that read repository files (no Docker needed)."""
 
+import base64
 import re
 from pathlib import Path
 
@@ -125,6 +126,10 @@ def test_00_1_env_test_fills_every_required_variable_with_marked_dummies():
     for name in secret_names:
         if name == "LANGFUSE_ENCRYPTION_KEY":
             assert values[name] == "0" * 64  # format: 64 hex characters
+            continue
+        if name == "FERNET_KEY":
+            # format: urlsafe base64 of 32 bytes; the marker is in the decoded bytes (03a)
+            assert b"dummy-not-secret" in base64.urlsafe_b64decode(values[name]), name
             continue
         assert "dummy-not-secret" in values[name], name
 
