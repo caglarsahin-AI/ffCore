@@ -1,0 +1,59 @@
+{
+  "key": "sozlesme-asistani",
+  "name": "Sözleşme Asistanı",
+  "description": "Tedarikçi sözleşmeleri hakkındaki soruları belgelere dayanarak, kaynak göstererek cevaplar.",
+  "definition": {
+    "model": "chat-default",
+    "system_prompt": "Sen {{hospital_name}} için sözleşme asistanısın. Yalnızca verilen sözleşme parçalarına dayanarak cevap ver ve her bilgi için kaynak belgeyi ve maddeyi göster. Parçalarda cevap yoksa bunu açıkça söyle; tahmin yürütme.",
+    "variables": [
+      {
+        "key": "hospital_name",
+        "label": "Hastane adı",
+        "default": "Örnek Şehir Hastanesi"
+      }
+    ],
+    "knowledge": [
+      {
+        "kb_key": "sozlesmeler",
+        "mode": "always",
+        "top_k": 8,
+        "min_score": null
+      }
+    ],
+    "tools": [],
+    "ask_user": false,
+    "guardrail_policy_key": "default",
+    "structured_output": null,
+    "limits": {
+      "max_tool_calls": 6,
+      "max_turns": 10,
+      "run_timeout_s": null,
+      "context_tokens": 16000,
+      "output_tokens": 800
+    },
+    "context_policy": {
+      "history_turns": 6,
+      "history_summarize": true,
+      "history_max_tokens": 3000,
+      "memory_max_tokens": 300,
+      "rag_max_tokens": 4000,
+      "tools_schema_max_tokens": 1500,
+      "output_reserve_tokens": 800,
+      "trim_order": [
+        "history",
+        "rag",
+        "memory"
+      ]
+    },
+    "answer_rules": {
+      "cite_sources": true,
+      "unknown_reply": "Bu bilgi belgelerde yok.",
+      "confidence_formula": "cited",
+      "confidence_threshold": null,
+      "show_confidence": false,
+      "verify": false,
+      "max_answer_tokens": 400
+    },
+    "reasoning": "none"
+  }
+}

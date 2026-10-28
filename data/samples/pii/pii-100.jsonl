@@ -1,0 +1,100 @@
+{"id": "pii-001", "text": "Başvuru formunda TC kimlik numarası 25588971252 olarak yazılmış.", "entities": [{"start": 36, "end": 47, "category": "TC_KIMLIK"}]}
+{"id": "pii-002", "text": "Kimlik no: 71709137960, lütfen sisteme girin.", "entities": [{"start": 11, "end": 22, "category": "TC_KIMLIK"}]}
+{"id": "pii-003", "text": "81789531732 numaralı kayıt için randevu oluşturuldu.", "entities": [{"start": 0, "end": 11, "category": "TC_KIMLIK"}]}
+{"id": "pii-004", "text": "T.C. 31621806894 kimlik numaralı hasta yakını bilgi istedi.", "entities": [{"start": 5, "end": 16, "category": "TC_KIMLIK"}]}
+{"id": "pii-005", "text": "tc kimlik no 73042766814", "entities": [{"start": 13, "end": 24, "category": "TC_KIMLIK"}]}
+{"id": "pii-006", "text": "Sigortalının kimlik numarasını (53985346182) kontrol eder misin?", "entities": [{"start": 32, "end": 43, "category": "TC_KIMLIK"}]}
+{"id": "pii-007", "text": "Bana 0505 090 60 23 numarasından ulaşabilirsiniz.", "entities": [{"start": 5, "end": 19, "category": "TR_TELEFON"}]}
+{"id": "pii-008", "text": "Geri arama için telefon: 0501 258 14 80", "entities": [{"start": 25, "end": 39, "category": "TR_TELEFON"}]}
+{"id": "pii-009", "text": "Acil durumda 0501 569 66 32 aranacak.", "entities": [{"start": 13, "end": 27, "category": "TR_TELEFON"}]}
+{"id": "pii-010", "text": "Cep numarası 0542 209 89 11, mesaj atılabilir.", "entities": [{"start": 13, "end": 27, "category": "TR_TELEFON"}]}
+{"id": "pii-011", "text": "tel 0505 731 63 71 whatsapp da var", "entities": [{"start": 4, "end": 18, "category": "TR_TELEFON"}]}
+{"id": "pii-012", "text": "Santral meşgulse doğrudan 0533 769 86 77 numarasını deneyin.", "entities": [{"start": 26, "end": 40, "category": "TR_TELEFON"}]}
+{"id": "pii-013", "text": "Ödemeyi TR60 9987 5070 0891 8096 0391 33 IBAN'ına yapın.", "entities": [{"start": 8, "end": 40, "category": "TR_IBAN"}]}
+{"id": "pii-014", "text": "Hesap bilgisi: TR27 9937 6094 4313 9886 5099 33", "entities": [{"start": 15, "end": 47, "category": "TR_IBAN"}]}
+{"id": "pii-015", "text": "iban TR28 9946 0096 9918 0800 9736 43 alıcı firma hesabı", "entities": [{"start": 5, "end": 37, "category": "TR_IBAN"}]}
+{"id": "pii-016", "text": "İade tutarı TR37 9987 2074 6955 9928 3897 94 numaralı hesaba aktarılacak.", "entities": [{"start": 12, "end": 44, "category": "TR_IBAN"}]}
+{"id": "pii-017", "text": "Fatura üzerindeki IBAN TR05 9934 9040 8349 4705 3647 72 doğru mu?", "entities": [{"start": 23, "end": 55, "category": "TR_IBAN"}]}
+{"id": "pii-018", "text": "Firmanın vergi kimlik numarası 6276150994.", "entities": [{"start": 31, "end": 41, "category": "VKN"}]}
+{"id": "pii-019", "text": "VKN: 0467932341 olan tedarikçi kaydı güncellendi.", "entities": [{"start": 5, "end": 15, "category": "VKN"}]}
+{"id": "pii-020", "text": "Faturada 2560304494 vergi numarası yazıyor.", "entities": [{"start": 9, "end": 19, "category": "VKN"}]}
+{"id": "pii-021", "text": "vergi no 9053261361 ile e-fatura kesildi", "entities": [{"start": 9, "end": 19, "category": "VKN"}]}
+{"id": "pii-022", "text": "Servis aracının plakası 31 F 5482.", "entities": [{"start": 24, "end": 33, "category": "PLAKA"}]}
+{"id": "pii-023", "text": "77 TY 7417 plakalı ambulans otoparka girdi.", "entities": [{"start": 0, "end": 10, "category": "PLAKA"}]}
+{"id": "pii-024", "text": "Otopark kaydında 48 EY 3588 görünüyor.", "entities": [{"start": 17, "end": 27, "category": "PLAKA"}]}
+{"id": "pii-025", "text": "Pasaport numarası U22522462 olan ziyaretçi kayıt yaptırdı.", "entities": [{"start": 18, "end": 27, "category": "TR_PASAPORT"}]}
+{"id": "pii-026", "text": "Yurt dışı başvurusu için pasaport: Z06042804", "entities": [{"start": 35, "end": 44, "category": "TR_PASAPORT"}]}
+{"id": "pii-027", "text": "pasaport no S39808462 vize formuna eklendi", "entities": [{"start": 12, "end": 21, "category": "TR_PASAPORT"}]}
+{"id": "pii-028", "text": "Teslimat adresi: Ihlamur Mah. Gül Sok. No: 62 D: 20 Keçiören/Ankara", "entities": [{"start": 17, "end": 67, "category": "TR_ADRES"}]}
+{"id": "pii-029", "text": "Fatura Menekşe Mah. Defne Sok. No: 44 D: 21 Kadıköy/İstanbul adresine gönderilsin.", "entities": [{"start": 7, "end": 60, "category": "TR_ADRES"}]}
+{"id": "pii-030", "text": "Ev adresim Defne Mah. Defne Sok. No: 55 D: 14 Tepebaşı/Eskişehir olarak güncellensin.", "entities": [{"start": 11, "end": 64, "category": "TR_ADRES"}]}
+{"id": "pii-031", "text": "Kargo yerine elden teslim: Akasya Mah. Menekşe Sok. No: 103 D: 3 Nilüfer/Bursa", "entities": [{"start": 27, "end": 78, "category": "TR_ADRES"}]}
+{"id": "pii-032", "text": "Bereket Gıda Ltd. Şti. ile yapılan görüşme ertelendi.", "entities": [{"start": 0, "end": 22, "category": "KURUM_ADI"}]}
+{"id": "pii-033", "text": "Teklif Kırlangıç Yapı A.Ş. tarafından gönderildi.", "entities": [{"start": 7, "end": 26, "category": "KURUM_ADI"}]}
+{"id": "pii-034", "text": "Sevkiyatı Ekinsoy Tarım Kooperatifi üstlenecek.", "entities": [{"start": 10, "end": 35, "category": "KURUM_ADI"}]}
+{"id": "pii-035", "text": "Toplantı Konyaaltı şubesinde yapılacak.", "entities": [{"start": 9, "end": 18, "category": "KONUM"}]}
+{"id": "pii-036", "text": "Numune İstanbul deposundan alınacak.", "entities": [{"start": 7, "end": 15, "category": "KONUM"}]}
+{"id": "pii-037", "text": "Ekip yarın Antalya bölgesinde olacak.", "entities": [{"start": 11, "end": 18, "category": "KONUM"}]}
+{"id": "pii-038", "text": "Raporu rapor6246@example.com adresine gönderin.", "entities": [{"start": 7, "end": 28, "category": "EPOSTA"}]}
+{"id": "pii-039", "text": "İletişim: muhasebe3559@example.com", "entities": [{"start": 10, "end": 34, "category": "EPOSTA"}]}
+{"id": "pii-040", "text": "Şifre sıfırlama bağlantısı rapor1110@example.com adresine gitti.", "entities": [{"start": 27, "end": 48, "category": "EPOSTA"}]}
+{"id": "pii-041", "text": "Toplantı daveti muhasebe9648@ornek.org hesabından geldi.", "entities": [{"start": 16, "end": 38, "category": "EPOSTA"}]}
+{"id": "pii-042", "text": "mail adresim satinalma879@example.com", "entities": [{"start": 13, "end": 37, "category": "EPOSTA"}]}
+{"id": "pii-043", "text": "Yanıtı muhasebe9069@example.com adresine CC'leyin.", "entities": [{"start": 7, "end": 31, "category": "EPOSTA"}]}
+{"id": "pii-044", "text": "Kart numarası 5555 5508 6238 4387 ile ödeme denendi.", "entities": [{"start": 14, "end": 33, "category": "KART"}]}
+{"id": "pii-045", "text": "Ödeme için 5555 5556 1733 9511 kartını kullanın.", "entities": [{"start": 11, "end": 30, "category": "KART"}]}
+{"id": "pii-046", "text": "kartım 4111 1157 4842 0282 limit doldu mu bakar mısın", "entities": [{"start": 7, "end": 26, "category": "KART"}]}
+{"id": "pii-047", "text": "Ekstrede 4000 0023 3379 8534 kartına ait harcama var.", "entities": [{"start": 9, "end": 28, "category": "KART"}]}
+{"id": "pii-048", "text": "Kartın arkasındaki CVV 738.", "entities": [{"start": 23, "end": 26, "category": "CVV"}]}
+{"id": "pii-049", "text": "Güvenlik kodu (CVV): 188", "entities": [{"start": 21, "end": 24, "category": "CVV"}]}
+{"id": "pii-050", "text": "Kartın PIN kodu 9335, kimseyle paylaşmayın.", "entities": [{"start": 16, "end": 20, "category": "PIN"}]}
+{"id": "pii-051", "text": "Kasa için PIN: 8358", "entities": [{"start": 15, "end": 19, "category": "PIN"}]}
+{"id": "pii-052", "text": "Ambulansın son konumu 36.4182, 31.7049.", "entities": [{"start": 22, "end": 38, "category": "GPS"}]}
+{"id": "pii-053", "text": "Saha ekibinin koordinatı: 39.7843, 30.4965", "entities": [{"start": 26, "end": 42, "category": "GPS"}]}
+{"id": "pii-054", "text": "Cihazın MAC adresi 40:E4:02:A4:F0:36.", "entities": [{"start": 19, "end": 36, "category": "MAC"}]}
+{"id": "pii-055", "text": "Ağa 22:42:C1:2E:F8:C9 adresli bilinmeyen cihaz bağlandı.", "entities": [{"start": 4, "end": 21, "category": "MAC"}]}
+{"id": "pii-056", "text": "Entegrasyon anahtarı tok_8c0aa059260cc557e9c5953580addee2 olarak tanımlandı.", "entities": [{"start": 21, "end": 57, "category": "API_TOKEN"}]}
+{"id": "pii-057", "text": "Authorization başlığında tok_d4acb9117947a316c76ad6e7a4f9b3ba gönderiliyor.", "entities": [{"start": 25, "end": 61, "category": "API_TOKEN"}]}
+{"id": "pii-058", "text": "Yeni şifrem Yonca6829!, unutmamak için yazıyorum.", "entities": [{"start": 12, "end": 22, "category": "SIFRE"}]}
+{"id": "pii-059", "text": "Geçici şifre: Bahar6531!", "entities": [{"start": 14, "end": 24, "category": "SIFRE"}]}
+{"id": "pii-060", "text": "Doğum tarihi 11.09.1995 olarak kayıtlı.", "entities": [{"start": 13, "end": 23, "category": "DOGUM_TARIHI"}]}
+{"id": "pii-061", "text": "Doğum tarihim 10.11.1963.", "entities": [{"start": 14, "end": 24, "category": "DOGUM_TARIHI"}]}
+{"id": "pii-062", "text": "d.t. 08.10.1984, yaş sınırı kontrol edilsin", "entities": [{"start": 5, "end": 15, "category": "DOGUM_TARIHI"}]}
+{"id": "pii-063", "text": "Kimlik no 38520467904, telefon 0532 256 60 38, e-posta bilgi3113@ornek.org.", "entities": [{"start": 10, "end": 21, "category": "TC_KIMLIK"}, {"start": 31, "end": 45, "category": "TR_TELEFON"}, {"start": 55, "end": 74, "category": "EPOSTA"}]}
+{"id": "pii-064", "text": "Ekinsoy Tarım Kooperatifi adına ödeme TR07 9952 9033 1868 2642 7258 14 hesabına, vergi no 5450747061.", "entities": [{"start": 0, "end": 25, "category": "KURUM_ADI"}, {"start": 38, "end": 70, "category": "TR_IBAN"}, {"start": 90, "end": 100, "category": "VKN"}]}
+{"id": "pii-065", "text": "Kart 5555 5512 9078 5260, CVV 825, son kullanma bilgisi formda.", "entities": [{"start": 5, "end": 24, "category": "KART"}, {"start": 30, "end": 33, "category": "CVV"}]}
+{"id": "pii-066", "text": "Teslimat Çınar Mah. Gül Sok. No: 74 D: 22 Bornova/İzmir, irtibat (501) 097-2538.", "entities": [{"start": 9, "end": 55, "category": "TR_ADRES"}, {"start": 65, "end": 79, "category": "TR_TELEFON"}]}
+{"id": "pii-067", "text": "Sunucu BF:8E:C0:15:26:06 cihazından tok_a472fe5647c94304e2e0dbf921f66b2c anahtarıyla bağlandı.", "entities": [{"start": 7, "end": 24, "category": "MAC"}, {"start": 36, "end": 72, "category": "API_TOKEN"}]}
+{"id": "pii-068", "text": "12.02.1977 doğumlu başvuru sahibinin kimlik no'su 30918909492.", "entities": [{"start": 0, "end": 10, "category": "DOGUM_TARIHI"}, {"start": 50, "end": 61, "category": "TC_KIMLIK"}]}
+{"id": "pii-069", "text": "Sevkiyat Ankara deposundan 27 EE 3452 plakalı araçla çıktı.", "entities": [{"start": 9, "end": 15, "category": "KONUM"}, {"start": 27, "end": 37, "category": "PLAKA"}]}
+{"id": "pii-070", "text": "PIN 3825 ve şifre Kartal7070. aynı not kâğıdında yazıyordu.", "entities": [{"start": 4, "end": 8, "category": "PIN"}, {"start": 18, "end": 29, "category": "SIFRE"}]}
+{"id": "pii-071", "text": "Sözleşmenin 10. maddesine göre fesih bildirim süresi 90 gündür.", "entities": []}
+{"id": "pii-072", "text": "Sipariş numarası 72066962973 olan kayıt kapatıldı.", "entities": []}
+{"id": "pii-073", "text": "Bu ay kardiyoloji bölümünde doluluk oranı yüzde 87 oldu.", "entities": []}
+{"id": "pii-074", "text": "Ventilatör CHZ-00412 envanter koduyla kayıtlı.", "entities": []}
+{"id": "pii-075", "text": "Toplantı 14.30'da başlayacak, gündem üç maddeden oluşuyor.", "entities": []}
+{"id": "pii-076", "text": "Fatura tutarı 1.212.500 TL, vadesi 45 gün.", "entities": []}
+{"id": "pii-077", "text": "Lütfen numaramı geri yaz dediğinde sistem hiçbir şey kaydetmedi.", "entities": []}
+{"id": "pii-078", "text": "Referans kodu 29037308622 ile başvuru takip edilebilir.", "entities": []}
+{"id": "pii-079", "text": "Kit lot numarası KIT-014, raf ömrü 12 ay.", "entities": []}
+{"id": "pii-080", "text": "Sistem erişilebilirliği geçen ay %99,7 oldu.", "entities": []}
+{"id": "pii-081", "text": "Hasta Kaan Kumbayır 12 numaralı yatağa yatırıldı.", "entities": [{"start": 6, "end": 19, "category": "PERSON"}]}
+{"id": "pii-082", "text": "tolga çınaroba isimli danışanın randevusu perşembeye alındı.", "entities": [{"start": 0, "end": 14, "category": "PERSON"}]}
+{"id": "pii-083", "text": "Dr. Oğuz Defnedere bugün nöbetçi.", "entities": [{"start": 4, "end": 18, "category": "PERSON"}]}
+{"id": "pii-084", "text": "Raporu oğuz tuzlaçay hazırladı, onay bekliyor.", "entities": [{"start": 7, "end": 20, "category": "PERSON"}]}
+{"id": "pii-085", "text": "Teslim alan: Barış Mavisuyu", "entities": [{"start": 13, "end": 27, "category": "PERSON"}]}
+{"id": "pii-086", "text": "DERYA GÖKÇEOBA ile görüşme saat 15.00'te.", "entities": [{"start": 0, "end": 14, "category": "PERSON"}]}
+{"id": "pii-087", "text": "hasta adı ELİF DEFNEDERE dosya no 4471", "entities": [{"start": 10, "end": 24, "category": "PERSON"}]}
+{"id": "pii-088", "text": "Başvuru sahibi NARLIKAYA Gizem, TC kimlik no 62761439840.", "entities": [{"start": 15, "end": 30, "category": "PERSON"}, {"start": 45, "end": 56, "category": "TC_KIMLIK"}]}
+{"id": "pii-089", "text": "Tolga Ilgınçeşme ve Emre Sedirtepe aynı vardiyada çalışıyor.", "entities": [{"start": 0, "end": 16, "category": "PERSON"}, {"start": 20, "end": 34, "category": "PERSON"}]}
+{"id": "pii-090", "text": "Refakatçi İpek Sedirtepe için kart çıkarılsın.", "entities": [{"start": 10, "end": 24, "category": "PERSON"}]}
+{"id": "pii-091", "text": "Melis Çınaroba adlı hastanın tahlil sonuçları çıktı.", "entities": [{"start": 0, "end": 14, "category": "PERSON"}]}
+{"id": "pii-092", "text": "İmza: ZEYNEP DEFNEDERE, Satın Alma Birimi", "entities": [{"start": 6, "end": 22, "category": "PERSON"}]}
+{"id": "pii-093", "text": "Faturadaki muhatap Melis Defnedere olarak düzeltilsin.", "entities": [{"start": 19, "end": 34, "category": "PERSON"}]}
+{"id": "pii-094", "text": "emre defnedere ile muhasebe7076@ornek.org adresinden iletişime geçildi.", "entities": [{"start": 0, "end": 14, "category": "PERSON"}, {"start": 19, "end": 41, "category": "EPOSTA"}]}
+{"id": "pii-095", "text": "Taburcu listesinde kaan çınaroba adı da var.", "entities": [{"start": 19, "end": 32, "category": "PERSON"}]}
+{"id": "pii-096", "text": "Ameliyat onam formunu Barış Zeynep Gökçeoba imzaladı.", "entities": [{"start": 22, "end": 43, "category": "PERSON"}]}
+{"id": "pii-097", "text": "Sayın ceren ılgınçeşme, başvurunuz alınmıştır.", "entities": [{"start": 6, "end": 22, "category": "PERSON"}]}
+{"id": "pii-098", "text": "gizem akçamdere telefonla aradı: (501) 138-1980", "entities": [{"start": 0, "end": 15, "category": "PERSON"}, {"start": 33, "end": 47, "category": "TR_TELEFON"}]}
+{"id": "pii-099", "text": "nöbet değişimi Gizem Ilgınçeşme -> Derya Zeynep Gökçeoba", "entities": [{"start": 15, "end": 31, "category": "PERSON"}, {"start": 35, "end": 56, "category": "PERSON"}]}
+{"id": "pii-100", "text": "Ziyaretçi kaydı: Barış Zeynep Kumbayır, 16.03.1975 doğumlu.", "entities": [{"start": 17, "end": 38, "category": "PERSON"}, {"start": 40, "end": 50, "category": "DOGUM_TARIHI"}]}

@@ -1,0 +1,13 @@
+{
+  "key": "sozlesme-33",
+  "name": "Sözleşme ve veri sınavı (33 soru)",
+  "langfuse_dataset_name": "sozlesme-33",
+  "scorers": [
+    "contains",
+    "cites_source",
+    "sql_result",
+    "llm_judge"
+  ],
+  "pass_threshold": 0.8,
+  "repeat": 1
+}

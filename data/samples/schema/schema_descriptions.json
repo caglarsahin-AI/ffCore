@@ -1,0 +1,529 @@
+[
+  {
+    "table_name": "departments",
+    "column_name": null,
+    "description_tr": "Hastane bölümleri (klinik birimler) ve yatak kapasiteleri.",
+    "sample_values": [],
+    "is_metric": false,
+    "formula": null
+  },
+  {
+    "table_name": "departments",
+    "column_name": "id",
+    "description_tr": "Bölüm kimliği.",
+    "sample_values": [
+      "1",
+      "2",
+      "3"
+    ],
+    "is_metric": false,
+    "formula": null
+  },
+  {
+    "table_name": "departments",
+    "column_name": "code",
+    "description_tr": "Bölümün kısa kodu (ör. KARD).",
+    "sample_values": [
+      "KARD",
+      "NORO",
+      "ORTO"
+    ],
+    "is_metric": false,
+    "formula": null
+  },
+  {
+    "table_name": "departments",
+    "column_name": "name_tr",
+    "description_tr": "Bölümün Türkçe adı.",
+    "sample_values": [
+      "Kardiyoloji",
+      "Nöroloji",
+      "Ortopedi"
+    ],
+    "is_metric": false,
+    "formula": null
+  },
+  {
+    "table_name": "departments",
+    "column_name": "floor",
+    "description_tr": "Bölümün bulunduğu kat.",
+    "sample_values": [
+      "1",
+      "2",
+      "3"
+    ],
+    "is_metric": false,
+    "formula": null
+  },
+  {
+    "table_name": "departments",
+    "column_name": "bed_capacity",
+    "description_tr": "Bölümün toplam yatak kapasitesi.",
+    "sample_values": [
+      "19",
+      "21",
+      "28"
+    ],
+    "is_metric": true,
+    "formula": "SUM(bed_capacity)"
+  },
+  {
+    "table_name": "beds",
+    "column_name": null,
+    "description_tr": "Bölümlere ait yataklar; tür ve kullanımda olup olmadığı.",
+    "sample_values": [],
+    "is_metric": false,
+    "formula": null
+  },
+  {
+    "table_name": "beds",
+    "column_name": "id",
+    "description_tr": "Yatak kimliği.",
+    "sample_values": [
+      "1",
+      "2",
+      "3"
+    ],
+    "is_metric": false,
+    "formula": null
+  },
+  {
+    "table_name": "beds",
+    "column_name": "department_id",
+    "description_tr": "Yatağın bağlı olduğu bölüm (departments.id).",
+    "sample_values": [
+      "1",
+      "2",
+      "3"
+    ],
+    "is_metric": false,
+    "formula": null
+  },
+  {
+    "table_name": "beds",
+    "column_name": "bed_code",
+    "description_tr": "Yatak kodu: bölüm kodu ve sıra numarası.",
+    "sample_values": [
+      "KARD-001",
+      "KARD-002",
+      "KARD-003"
+    ],
+    "is_metric": false,
+    "formula": null
+  },
+  {
+    "table_name": "beds",
+    "column_name": "bed_type",
+    "description_tr": "Yatak türü: standart, yogun_bakim, izolasyon.",
+    "sample_values": [
+      "standart",
+      "yogun_bakim",
+      "izolasyon"
+    ],
+    "is_metric": false,
+    "formula": null
+  },
+  {
+    "table_name": "beds",
+    "column_name": "is_active",
+    "description_tr": "Yatak kullanımda mı (FALSE = hizmet dışı).",
+    "sample_values": [
+      "True",
+      "False"
+    ],
+    "is_metric": false,
+    "formula": null
+  },
+  {
+    "table_name": "admissions",
+    "column_name": null,
+    "description_tr": "Bölüm başına günlük yatış özeti: yatış, taburcu ve dolu yatak sayıları (kişi düzeyi değil).",
+    "sample_values": [],
+    "is_metric": false,
+    "formula": null
+  },
+  {
+    "table_name": "admissions",
+    "column_name": "id",
+    "description_tr": "Kayıt kimliği.",
+    "sample_values": [
+      "1",
+      "2",
+      "3"
+    ],
+    "is_metric": false,
+    "formula": null
+  },
+  {
+    "table_name": "admissions",
+    "column_name": "department_id",
+    "description_tr": "Bölüm (departments.id).",
+    "sample_values": [
+      "1",
+      "2",
+      "3"
+    ],
+    "is_metric": false,
+    "formula": null
+  },
+  {
+    "table_name": "admissions",
+    "column_name": "day",
+    "description_tr": "Özetin ait olduğu gün.",
+    "sample_values": [
+      "2025-01-01",
+      "2025-01-02",
+      "2025-01-03"
+    ],
+    "is_metric": false,
+    "formula": null
+  },
+  {
+    "table_name": "admissions",
+    "column_name": "admitted_count",
+    "description_tr": "O gün bölüme yatırılan hasta sayısı.",
+    "sample_values": [
+      "5",
+      "1",
+      "2"
+    ],
+    "is_metric": true,
+    "formula": "SUM(admitted_count)"
+  },
+  {
+    "table_name": "admissions",
+    "column_name": "discharged_count",
+    "description_tr": "O gün bölümden taburcu edilen hasta sayısı.",
+    "sample_values": [
+      "2",
+      "3",
+      "1"
+    ],
+    "is_metric": true,
+    "formula": "SUM(discharged_count)"
+  },
+  {
+    "table_name": "admissions",
+    "column_name": "occupied_beds",
+    "description_tr": "Gün sonunda dolu yatak sayısı. Doluluk oranı = occupied_beds / departments.bed_capacity.",
+    "sample_values": [
+      "12",
+      "10",
+      "11"
+    ],
+    "is_metric": true,
+    "formula": "AVG(occupied_beds::numeric / departments.bed_capacity)"
+  },
+  {
+    "table_name": "devices",
+    "column_name": null,
+    "description_tr": "Tıbbi cihaz envanteri; bölüm, tür, üretici ve durum.",
+    "sample_values": [],
+    "is_metric": false,
+    "formula": null
+  },
+  {
+    "table_name": "devices",
+    "column_name": "id",
+    "description_tr": "Cihaz kimliği.",
+    "sample_values": [
+      "1",
+      "2",
+      "3"
+    ],
+    "is_metric": false,
+    "formula": null
+  },
+  {
+    "table_name": "devices",
+    "column_name": "department_id",
+    "description_tr": "Cihazın bulunduğu bölüm (departments.id).",
+    "sample_values": [
+      "19",
+      "11",
+      "10"
+    ],
+    "is_metric": false,
+    "formula": null
+  },
+  {
+    "table_name": "devices",
+    "column_name": "device_code",
+    "description_tr": "Cihaz envanter kodu (CHZ-xxxxx).",
+    "sample_values": [
+      "CHZ-00001",
+      "CHZ-00002",
+      "CHZ-00003"
+    ],
+    "is_metric": false,
+    "formula": null
+  },
+  {
+    "table_name": "devices",
+    "column_name": "device_type",
+    "description_tr": "Cihaz türü (ör. ventilator, infuzyon_pompasi).",
+    "sample_values": [
+      "ventilator",
+      "ultrason",
+      "defibrilator"
+    ],
+    "is_metric": false,
+    "formula": null
+  },
+  {
+    "table_name": "devices",
+    "column_name": "vendor",
+    "description_tr": "Cihazın üreticisi ya da tedarikçisi.",
+    "sample_values": [
+      "Arkada Tıp Cihazları A.Ş.",
+      "Tavlan Medikal Teknik A.Ş.",
+      "Selvi Elektromedikal Ltd. Şti."
+    ],
+    "is_metric": false,
+    "formula": null
+  },
+  {
+    "table_name": "devices",
+    "column_name": "installed_on",
+    "description_tr": "Kurulum tarihi.",
+    "sample_values": [
+      "2017-01-19",
+      "2022-03-28",
+      "2020-04-06"
+    ],
+    "is_metric": false,
+    "formula": null
+  },
+  {
+    "table_name": "devices",
+    "column_name": "status",
+    "description_tr": "Cihaz durumu: aktif, bakimda, hurda.",
+    "sample_values": [
+      "aktif",
+      "bakimda",
+      "hurda"
+    ],
+    "is_metric": false,
+    "formula": null
+  },
+  {
+    "table_name": "device_faults",
+    "column_name": null,
+    "description_tr": "Cihaz arıza kayıtları; arıza türü, önem, çözüm tarihi ve kesinti süresi.",
+    "sample_values": [],
+    "is_metric": false,
+    "formula": null
+  },
+  {
+    "table_name": "device_faults",
+    "column_name": "id",
+    "description_tr": "Arıza kaydı kimliği.",
+    "sample_values": [
+      "1",
+      "2",
+      "3"
+    ],
+    "is_metric": false,
+    "formula": null
+  },
+  {
+    "table_name": "device_faults",
+    "column_name": "device_id",
+    "description_tr": "Arızalanan cihaz (devices.id).",
+    "sample_values": [
+      "338",
+      "490",
+      "116"
+    ],
+    "is_metric": false,
+    "formula": null
+  },
+  {
+    "table_name": "device_faults",
+    "column_name": "reported_on",
+    "description_tr": "Arızanın bildirildiği gün.",
+    "sample_values": [
+      "2025-04-20",
+      "2025-01-08",
+      "2025-02-16"
+    ],
+    "is_metric": false,
+    "formula": null
+  },
+  {
+    "table_name": "device_faults",
+    "column_name": "fault_type",
+    "description_tr": "Arıza türü (elektriksel, mekanik, yazilim...).",
+    "sample_values": [
+      "mekanik",
+      "elektriksel",
+      "batarya"
+    ],
+    "is_metric": false,
+    "formula": null
+  },
+  {
+    "table_name": "device_faults",
+    "column_name": "severity",
+    "description_tr": "Önem: dusuk, orta, yuksek, kritik.",
+    "sample_values": [
+      "orta",
+      "dusuk",
+      "yuksek"
+    ],
+    "is_metric": false,
+    "formula": null
+  },
+  {
+    "table_name": "device_faults",
+    "column_name": "resolved_on",
+    "description_tr": "Çözüldüğü gün; NULL ise açık arıza.",
+    "sample_values": [
+      "2025-04-20",
+      "2025-01-18",
+      "2025-02-19"
+    ],
+    "is_metric": false,
+    "formula": null
+  },
+  {
+    "table_name": "device_faults",
+    "column_name": "downtime_hours",
+    "description_tr": "Arıza nedeniyle cihazın hizmet dışı kaldığı saat.",
+    "sample_values": [
+      "5.5",
+      "1.7",
+      "3.7"
+    ],
+    "is_metric": true,
+    "formula": "SUM(downtime_hours)"
+  },
+  {
+    "table_name": "contracts_meta",
+    "column_name": null,
+    "description_tr": "Tedarikçi sözleşmelerinin özet bilgileri; belge dosyası bilgi tabanındadır.",
+    "sample_values": [],
+    "is_metric": false,
+    "formula": null
+  },
+  {
+    "table_name": "contracts_meta",
+    "column_name": "id",
+    "description_tr": "Sözleşme kimliği.",
+    "sample_values": [
+      "1",
+      "2",
+      "3"
+    ],
+    "is_metric": false,
+    "formula": null
+  },
+  {
+    "table_name": "contracts_meta",
+    "column_name": "contract_code",
+    "description_tr": "Sözleşme numarası (SZL-yyyy-nnn).",
+    "sample_values": [
+      "SZL-2024-011",
+      "SZL-2025-003",
+      "SZL-2025-007"
+    ],
+    "is_metric": false,
+    "formula": null
+  },
+  {
+    "table_name": "contracts_meta",
+    "column_name": "title",
+    "description_tr": "Sözleşme başlığı.",
+    "sample_values": [
+      "Tıbbi Cihaz Bakım ve Onarım Hizmet Sözleşmesi",
+      "Temizlik Hizmet Alımı Sözleşmesi",
+      "Laboratuvar Kiti Tedarik Sözleşmesi"
+    ],
+    "is_metric": false,
+    "formula": null
+  },
+  {
+    "table_name": "contracts_meta",
+    "column_name": "vendor",
+    "description_tr": "Karşı taraf firma.",
+    "sample_values": [
+      "Tavlan Medikal Teknik A.Ş.",
+      "Parlak Ufuk Tesis Hizmetleri Ltd. Şti.",
+      "Kumsal Biyoteknoloji A.Ş."
+    ],
+    "is_metric": false,
+    "formula": null
+  },
+  {
+    "table_name": "contracts_meta",
+    "column_name": "contract_type",
+    "description_tr": "Tür: bakim, hizmet, tedarik, lisans, danismanlik.",
+    "sample_values": [
+      "bakim",
+      "hizmet",
+      "tedarik"
+    ],
+    "is_metric": false,
+    "formula": null
+  },
+  {
+    "table_name": "contracts_meta",
+    "column_name": "start_date",
+    "description_tr": "Başlangıç tarihi.",
+    "sample_values": [
+      "2024-03-01",
+      "2025-01-01",
+      "2025-04-15"
+    ],
+    "is_metric": false,
+    "formula": null
+  },
+  {
+    "table_name": "contracts_meta",
+    "column_name": "end_date",
+    "description_tr": "Bitiş tarihi.",
+    "sample_values": [
+      "2027-02-28",
+      "2026-12-31",
+      "2026-04-14"
+    ],
+    "is_metric": false,
+    "formula": null
+  },
+  {
+    "table_name": "contracts_meta",
+    "column_name": "annual_value_try",
+    "description_tr": "Yıllık sözleşme bedeli (TL, KDV hariç).",
+    "sample_values": [
+      "4850000",
+      "12600000",
+      "3275000"
+    ],
+    "is_metric": true,
+    "formula": "SUM(annual_value_try)"
+  },
+  {
+    "table_name": "contracts_meta",
+    "column_name": "notice_days",
+    "description_tr": "Fesih bildirim süresi (gün).",
+    "sample_values": [
+      "90",
+      "30",
+      "60"
+    ],
+    "is_metric": false,
+    "formula": null
+  },
+  {
+    "table_name": "contracts_meta",
+    "column_name": "file_name",
+    "description_tr": "Bilgi tabanındaki belge dosyasının adı.",
+    "sample_values": [
+      "SZL-2024-011_cihaz-bakim.pdf",
+      "SZL-2025-003_temizlik-hizmet.docx",
+      "SZL-2025-007_laboratuvar-kiti.docx"
+    ],
+    "is_metric": false,
+    "formula": null
+  }
+]

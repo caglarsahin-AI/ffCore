@@ -6,8 +6,8 @@
 .PHONY: lint format test test-int smoke pull
 
 lint:
-	ruff check backend scripts
-	ruff format --check backend scripts
+	ruff check backend scripts data/samples/scripts
+	ruff format --check backend scripts data/samples/scripts
 
 format:
 	ruff check --fix backend scripts

@@ -1,0 +1,73 @@
+{
+  "key": "karma-asistan",
+  "name": "Karma Asistan",
+  "description": "Sözleşme belgelerini araç olarak arar ve işletme verisini SQL ile sorgular; SQL çalıştırma onay ister.",
+  "definition": {
+    "model": "chat-default",
+    "system_prompt": "Sen {{hospital_name}} için sözleşme ve veri asistanısın. Sözleşme soruları için search_documents aracını, sayısal sorular için get_schema ve run_sql araçlarını kullan. Belgeden gelen bilgide kaynağı göster, veriden gelen sonucu tablo olarak yaz.",
+    "variables": [
+      {
+        "key": "hospital_name",
+        "label": "Hastane adı",
+        "default": "Örnek Şehir Hastanesi"
+      }
+    ],
+    "knowledge": [
+      {
+        "kb_key": "sozlesmeler",
+        "mode": "tool",
+        "top_k": 8,
+        "min_score": null
+      }
+    ],
+    "tools": [
+      {
+        "tool_key": "mcp-sql",
+        "actions": [
+          "get_schema",
+          "run_sql"
+        ]
+      }
+    ],
+    "approval": {
+      "actions": [
+        "mcp-sql.run_sql"
+      ],
+      "assign_to": "analyst"
+    },
+    "ask_user": true,
+    "guardrail_policy_key": "default",
+    "structured_output": null,
+    "limits": {
+      "max_tool_calls": 6,
+      "max_turns": 10,
+      "run_timeout_s": null,
+      "context_tokens": 16000,
+      "output_tokens": 800
+    },
+    "context_policy": {
+      "history_turns": 6,
+      "history_summarize": true,
+      "history_max_tokens": 3000,
+      "memory_max_tokens": 300,
+      "rag_max_tokens": 4000,
+      "tools_schema_max_tokens": 1500,
+      "output_reserve_tokens": 800,
+      "trim_order": [
+        "history",
+        "rag",
+        "memory"
+      ]
+    },
+    "answer_rules": {
+      "cite_sources": true,
+      "unknown_reply": "Bu bilgi belgelerde ya da veride yok.",
+      "confidence_formula": "cited",
+      "confidence_threshold": null,
+      "show_confidence": false,
+      "verify": false,
+      "max_answer_tokens": 400
+    },
+    "reasoning": "none"
+  }
+}

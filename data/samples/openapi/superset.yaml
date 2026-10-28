@@ -1,0 +1,237 @@
+openapi: "3.0.3"
+info:
+  title: "Superset API (FFCore örnek alt kümesi)"
+  version: "1.0.0-sample"
+  description: "Agent aracı olarak yayınlamak için seçilmiş 6 Superset işlemi. Sentetik örnek; gerçek Superset sürümüyle 05b'de doğrulanır."
+servers:
+  - url: "http://superset.ornek.local"
+security:
+  - bearerAuth: []
+paths:
+  /api/v1/dashboard/:
+    get:
+      operationId: searchDashboards
+      summary: "Dashboard ara"
+      description: "Başlığa göre dashboard arar."
+      parameters:
+        - name: q
+          in: query
+          required: false
+          description: "Rison biçiminde filtre, ör. (filters:!((col:dashboard_title,opr:ct,value:yatak)))"
+          schema:
+            type: string
+      responses:
+        "200":
+          description: "Dashboard listesi"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/DashboardList"
+  /api/v1/chart/:
+    get:
+      operationId: listCharts
+      summary: "Chart listele"
+      description: "Chart'ları ada ve dataset'e göre listeler."
+      parameters:
+        - name: q
+          in: query
+          required: false
+          description: "Rison biçiminde filtre ve sayfalama."
+          schema:
+            type: string
+      responses:
+        "200":
+          description: "Chart listesi"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ChartList"
+    post:
+      operationId: createChart
+      summary: "Chart oluştur"
+      description: "Bir dataset üzerinde yeni chart oluşturur."
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/ChartCreate"
+      responses:
+        "201":
+          description: "Oluşturulan chart"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ChartRef"
+  /api/v1/chart/{pk}:
+    put:
+      operationId: addChartToDashboard
+      summary: "Chart'ı dashboard'a ekle"
+      description: "Chart'ın bağlı olduğu dashboard listesini günceller."
+      parameters:
+        - name: pk
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/ChartDashboards"
+      responses:
+        "200":
+          description: "Güncellenen chart"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ChartRef"
+  /api/v1/chart/{pk}/data/:
+    get:
+      operationId: getChartData
+      summary: "Chart verisi"
+      description: "Chart'ın sorgu sonucunu döner."
+      parameters:
+        - name: pk
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: "Chart verisi"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ChartData"
+  /api/v1/dataset/{pk}:
+    get:
+      operationId: getDatasetMetrics
+      summary: "Dataset metrikleri"
+      description: "Dataset'in kolonlarını ve metrik tanımlarını döner."
+      parameters:
+        - name: pk
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: "Dataset ayrıntısı"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Dataset"
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+  schemas:
+    DashboardList:
+      type: object
+      properties:
+        count:
+          type: integer
+        result:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+              dashboard_title:
+                type: string
+              url:
+                type: string
+    ChartList:
+      type: object
+      properties:
+        count:
+          type: integer
+        result:
+          type: array
+          items:
+            "$ref": "#/components/schemas/ChartRef"
+    ChartRef:
+      type: object
+      properties:
+        id:
+          type: integer
+        slice_name:
+          type: string
+        viz_type:
+          type: string
+    ChartCreate:
+      type: object
+      required:
+        - slice_name
+        - viz_type
+        - datasource_id
+        - datasource_type
+      properties:
+        slice_name:
+          type: string
+        viz_type:
+          type: string
+        datasource_id:
+          type: integer
+        datasource_type:
+          type: string
+          enum:
+            - table
+        params:
+          type: string
+          description: "JSON metni olarak chart ayarları"
+    ChartDashboards:
+      type: object
+      required:
+        - dashboards
+      properties:
+        dashboards:
+          type: array
+          items:
+            type: integer
+    ChartData:
+      type: object
+      properties:
+        result:
+          type: array
+          items:
+            type: object
+            properties:
+              rowcount:
+                type: integer
+              data:
+                type: array
+                items:
+                  type: object
+    Dataset:
+      type: object
+      properties:
+        result:
+          type: object
+          properties:
+            table_name:
+              type: string
+            columns:
+              type: array
+              items:
+                type: object
+                properties:
+                  column_name:
+                    type: string
+                  type:
+                    type: string
+            metrics:
+              type: array
+              items:
+                type: object
+                properties:
+                  metric_name:
+                    type: string
+                  expression:
+                    type: string
+                  description:
+                    type: string
