@@ -8,5 +8,7 @@ export default defineConfig({
   test: {
     include: ["tests/unit/**/*.test.{ts,tsx}"],
     environment: "node",
+    // The colour and literal-text rules run real ESLint; its first load takes ~5 s in a container.
+    testTimeout: 30_000,
   },
 });

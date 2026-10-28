@@ -67,7 +67,7 @@ export default function ThemePreviewPage() {
         <p className="text-muted-foreground">{t("description")}</p>
       </div>
       <div className="grid gap-4 md:grid-cols-2">
-        <section className="light rounded-xl border" aria-label={t("light")}>
+        <section className="light rounded-xl border bg-background text-foreground" aria-label={t("light")}>
           <h2 className="px-4 pt-4 font-medium">{t("light")}</h2>
           <Gallery />
         </section>

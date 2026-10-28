@@ -3,7 +3,8 @@
 @import "shadcn/tailwind.css";
 @import "../styles/tokens.css";
 
-@custom-variant dark (&:is(.dark *));
+/* Nearest theme wins: a .light subtree inside .dark (/dev/theme preview) gets no dark: styles. */
+@custom-variant dark (&:is(.dark *):not(.dark .light *));
 
 @theme inline {
   --color-background: var(--background);
