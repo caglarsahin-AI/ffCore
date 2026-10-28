@@ -10,9 +10,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, File, Form, Header, Request, UploadFile, status
 
 from ffcore.api.common import ERROR_RESPONSES, SessionDep, not_implemented
-from ffcore.api.schemas import Role
-from ffcore.core.auth import Actor, require_role
-from ffcore.knowledge.schemas import (
+from ffcore.api.knowledge_schemas import (
     DocumentList,
     DocumentOut,
     KnowledgeBaseCreate,
@@ -25,6 +23,8 @@ from ffcore.knowledge.schemas import (
     SearchResponse,
     UploadResult,
 )
+from ffcore.api.schemas import Role
+from ffcore.core.auth import Actor, require_role
 
 router = APIRouter(
     prefix="/projects/{project_id}/knowledge-bases",

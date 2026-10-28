@@ -9,9 +9,9 @@ from typing import Annotated
 from fastapi import APIRouter, Depends
 
 from ffcore.api.common import ERROR_RESPONSES, not_implemented
+from ffcore.api.knowledge_schemas import EmbedRequest, EmbedResponse
 from ffcore.core.auth import Actor, resolve_actor
 from ffcore.core.errors import ApiError
-from ffcore.knowledge.schemas import EmbedRequest, EmbedResponse
 
 router = APIRouter(prefix="/internal", tags=["internal"], responses=ERROR_RESPONSES)
 

@@ -19,6 +19,7 @@ dependencies = [
     "cryptography==50.0.2",
     "pyyaml==6.0.3",
     "python-multipart==0.0.32",
+    "pgvector==0.5.1",
 ]
 
 [dependency-groups]

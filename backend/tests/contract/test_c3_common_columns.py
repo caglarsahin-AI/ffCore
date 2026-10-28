@@ -17,9 +17,13 @@ C3_EXCEPTIONS = {
     # link tables
     "project_members": "link",
     "provider_projects": "link",
+    # child tables: the project comes through the parent (04a)
+    "attachments": "child of documents",
+    "chunks": "child of documents",
     # append-only event tables
     "audit_events": "append-only",
     "guardrail_events": "append-only (08; named in CONTRACTS C3)",
+    "kb_queries": "append-only (04a)",
 }
 
 

@@ -7,7 +7,7 @@ consistent. Every failing check is named with a code; nothing is reported ready 
 from fastapi import APIRouter, status
 
 from ffcore.api.common import not_implemented
-from ffcore.knowledge.schemas import ReadyzOut
+from ffcore.api.knowledge_schemas import ReadyzOut
 
 router = APIRouter(tags=["readiness"])
 
