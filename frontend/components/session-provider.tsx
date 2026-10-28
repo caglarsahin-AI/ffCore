@@ -3,22 +3,31 @@
 import { createContext, useContext } from "react";
 
 import type { Session } from "@/lib/access";
+import { accessFor } from "@/lib/project";
+import type { SignedInMe } from "@/lib/project";
 
-const SessionContext = createContext<Session | null>(null);
+type ConsoleSession = { me: SignedInMe; projectId: string | null };
 
-export function SessionProvider({
-  session,
-  children,
-}: {
-  session: Session;
-  children: React.ReactNode;
-}) {
-  return <SessionContext.Provider value={session}>{children}</SessionContext.Provider>;
+const SessionContext = createContext<ConsoleSession | null>(null);
+
+export function SessionProvider({ value, children }: { value: ConsoleSession; children: React.ReactNode }) {
+  return <SessionContext.Provider value={value}>{children}</SessionContext.Provider>;
 }
 
-// Role and access mode of the signed-in user. Throws outside a session: no silent default role.
-export function useAccess(): Session & { canWrite: boolean } {
+// Signed-in user and the selected project (null: none selected).
+export function useSession(): ConsoleSession {
   const session = useContext(SessionContext);
-  if (!session) throw new Error("useAccess() used outside <SessionProvider>");
-  return { ...session, canWrite: session.access === "edit" };
+  if (!session) throw new Error("useSession() used outside <SessionProvider>");
+  return session;
+}
+
+// Role and access mode on a project: the one in the URL when the screen has one, otherwise the
+// selected project. Throws outside a session: no silent default role. `menuRole` is the highest
+// role (/auth/me) and drives the menu; `role`/`canWrite` the screen.
+export function useAccess(
+  projectId?: string,
+): Session & { canWrite: boolean; menuRole: Session["role"]; isSuperadmin: boolean } {
+  const { me, projectId: selected } = useSession();
+  const access = accessFor(me, projectId ?? selected);
+  return { ...access, canWrite: access.access === "edit", menuRole: me.role, isSuperadmin: me.user.is_superadmin };
 }

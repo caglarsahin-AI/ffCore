@@ -74,11 +74,14 @@
     "loading": "Loading…",
     "errorTitle": "Something went wrong",
     "details": "Details",
-    "notConnected": "Not connected to the backend yet. This action becomes available once the API is connected."
+    "notConnected": "Not connected to the backend yet. This action becomes available once the API is connected.",
+    "saved": "Saved."
   },
   "Session": {
-    "unavailableTitle": "Session unavailable",
-    "unavailableBody": "The console is not connected to the backend yet, so your role and access cannot be loaded."
+    "unavailableTitle": "Backend unavailable",
+    "unavailableBody": "The console could not reach the backend, so your session cannot be loaded. Try again shortly; if it continues, tell your administrator.",
+    "noMembershipTitle": "No project yet",
+    "noMembershipBody": "Your account is not a member of any project. Ask an administrator to add you."
   },
   "Login": {
     "title": "Sign in to FFCore",
@@ -94,32 +97,66 @@
     "description": "A project groups its members, knowledge bases, agents and usage. Create one per team or use case.",
     "create": "Create project",
     "emptyTitle": "No projects yet",
-    "emptyBody": "Create the first project, then add members and assign providers to it."
+    "emptyBody": "Create the first project, then add members and assign providers to it.",
+    "key": "Key",
+    "keyHint": "Lowercase letters, digits and hyphens; 2-32 characters. It cannot be changed later: it is part of every model name.",
+    "keyInvalid": "Use 2-32 lowercase letters, digits or hyphens, starting with a letter.",
+    "name": "Name",
+    "nameRequired": "Enter a name.",
+    "descriptionLabel": "Description",
+    "members": "Members",
+    "save": "Create",
+    "cancel": "Cancel"
   },
   "Members": {
     "title": "Project members",
     "description": "A member's role decides which screens they see; the access mode decides whether they can change things.",
     "add": "Add member",
     "emptyTitle": "No members yet",
-    "emptyBody": "Add people to this project and pick their role and access mode."
+    "emptyBody": "Add people to this project and pick their role and access mode.",
+    "user": "User",
+    "role": "Role",
+    "access": "Access",
+    "remove": "Remove member",
+    "pickUser": "Choose a user",
+    "pickRole": "Choose a role",
+    "addNeedsSuperadmin": "Adding members needs the user list, which only a superadmin can see. Ask a superadmin to add new members."
   },
   "Providers": {
     "title": "Providers",
     "description": "A provider is a model endpoint such as LLMaaS or a local runtime. Test the connection and assign it to projects.",
     "add": "Add provider",
     "emptyTitle": "No providers yet",
-    "emptyBody": "Add a provider first; models and agents need one."
+    "emptyBody": "No provider is registered yet. Provider forms arrive in the next console release.",
+    "key": "Key",
+    "label": "Name",
+    "driver": "Driver",
+    "domains": "Used for",
+    "projects": "Projects",
+    "status": "Status",
+    "active": "Active",
+    "inactive": "Inactive"
   },
   "Models": {
     "title": "Models",
     "description": "Models come from a provider and are grouped by category so agents can pick the right one.",
     "add": "Add model",
     "emptyTitle": "No models yet",
-    "emptyBody": "Add a provider first, then register its models here."
+    "emptyBody": "This project has no models yet. Model forms arrive in the next console release.",
+    "name": "Name",
+    "virtualName": "Virtual model name",
+    "category": "Category",
+    "providerModel": "Provider model",
+    "status": "Status",
+    "active": "Active",
+    "inactive": "Inactive"
   },
   "ProjectSwitcher": {
     "label": "Project",
-    "none": "No project selected"
+    "none": "No project selected",
+    "selectTitle": "Select a project",
+    "selectBody": "This screen belongs to a project. Choose one in the project selector at the top.",
+    "select": "Select project"
   },
   "UserMenu": {
     "open": "Open user menu",
@@ -148,5 +185,19 @@
     "warning": "Warning",
     "inputPlaceholder": "Type here",
     "chart": "Chart palette"
+  },
+  "Errors": {
+    "readOnlyAccess": "Read-only access: your access mode does not allow changes here.",
+    "insufficientRole": "Your role in this project does not allow this action.",
+    "crossOriginForbidden": "The request did not come from the console's own address, so it was refused.",
+    "oboProjectScope": "This request is limited to another project.",
+    "invalidCredentials": "Email or password is incorrect.",
+    "unauthenticated": "Your session has ended. Sign in again.",
+    "validationError": "Some fields are not valid. Check the form and try again.",
+    "projectKeyTaken": "This project key is already used. Keys are never reused.",
+    "memberExists": "This user is already a member of the project.",
+    "roleReserved": "This role cannot be assigned in this release.",
+    "notFound": "It no longer exists. Refresh the page.",
+    "unexpected": "The request failed."
   }
 }

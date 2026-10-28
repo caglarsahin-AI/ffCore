@@ -3,8 +3,8 @@
 import { BrainIcon, ChevronsUpDownIcon, LogOutIcon, UserCircleIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 
-import { notConnected } from "@/components/not-connected";
-import { useAccess } from "@/components/session-provider";
+import { useAccess, useSession } from "@/components/session-provider";
+import { useSignOut } from "@/components/sign-out-button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,13 +16,14 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/components/ui/sidebar";
 
-// User menu: role and access mode are always visible (brief 10). "My memory" is disabled
-// until its screen exists (11/17); sign-out needs the backend (10a-binding).
+// User menu: who is signed in, role and access mode on the selected project (brief 10).
+// "My memory" is disabled until its screen exists (14).
 export function NavUser() {
   const t = useTranslations("UserMenu");
   const tAccess = useTranslations("Access");
-  const tState = useTranslations("State");
   const { role, access } = useAccess();
+  const { me } = useSession();
+  const signOut = useSignOut();
   const { isMobile } = useSidebar();
 
   return (
@@ -41,6 +42,10 @@ export function NavUser() {
           </DropdownMenuTrigger>
           <DropdownMenuContent className="min-w-56" side={isMobile ? "bottom" : "right"} align="end" sideOffset={4}>
             <DropdownMenuGroup>
+              <DropdownMenuLabel className="flex flex-col" data-testid="user-email">
+                <span className="truncate">{me.user.full_name}</span>
+                <span className="truncate text-xs font-normal text-muted-foreground">{me.user.email}</span>
+              </DropdownMenuLabel>
               <DropdownMenuLabel className="flex justify-between gap-4">
                 <span className="text-muted-foreground">{tAccess("role")}</span>
                 <span>{tAccess(`roles.${role}`)}</span>
@@ -55,7 +60,7 @@ export function NavUser() {
               <BrainIcon />
               {t("memory")}
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => notConnected(tState("notConnected"))}>
+            <DropdownMenuItem onClick={signOut} data-testid="sign-out">
               <LogOutIcon />
               {t("logout")}
             </DropdownMenuItem>

@@ -75,7 +75,7 @@ const ICONS: Record<string, LucideIcon> = {
 export function AppSidebar() {
   const t = useTranslations("Nav");
   const tHome = useTranslations("Home");
-  const { role } = useAccess();
+  const { menuRole, isSuperadmin } = useAccess();
   const pathname = usePathname();
 
   return (
@@ -93,7 +93,7 @@ export function AppSidebar() {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        {visibleGroups(role).map((group) => (
+        {visibleGroups(menuRole, isSuperadmin).map((group) => (
           <SidebarGroup key={group.key} data-testid={`nav-group-${group.key}`}>
             <SidebarGroupLabel>{t(`groups.${group.key}` as "groups.build")}</SidebarGroupLabel>
             <SidebarMenu>

@@ -6,13 +6,20 @@ import { afterEach, describe, expect, it } from "vitest";
 import { SessionProvider } from "@/components/session-provider";
 import { WriteGate } from "@/components/write-gate";
 import { Button } from "@/components/ui/button";
-import type { Session } from "@/lib/access";
+import type { AccessMode } from "@/lib/access";
 import messages from "@/messages/en.json";
 
-function renderGate(session: Session) {
+// A project member with the given access mode on project p1 (10a-binding: access per project).
+function renderGate({ access }: { role: "admin"; access: AccessMode }) {
+  const me = {
+    user: { id: "u1", email: "a@example.org", full_name: "A", is_superadmin: false },
+    role: "admin" as const,
+    access,
+    memberships: [{ project_id: "p1", project_key: "alpha", role: "admin" as const, access }],
+  };
   return render(
     <NextIntlClientProvider locale="en" messages={messages}>
-      <SessionProvider session={session}>
+      <SessionProvider value={{ me, projectId: "p1" }}>
         <WriteGate>
           <Button>Create</Button>
         </WriteGate>

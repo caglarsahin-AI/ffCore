@@ -74,11 +74,14 @@
     "loading": "Yükleniyor…",
     "errorTitle": "Bir sorun oluştu",
     "details": "Ayrıntı",
-    "notConnected": "Henüz backend'e bağlı değil. Bu işlem API bağlandığında kullanılabilir olacak."
+    "notConnected": "Henüz backend'e bağlı değil. Bu işlem API bağlandığında kullanılabilir olacak.",
+    "saved": "Kaydedildi."
   },
   "Session": {
-    "unavailableTitle": "Oturum alınamadı",
-    "unavailableBody": "Konsol henüz backend'e bağlı değil; rolünüz ve erişiminiz yüklenemiyor."
+    "unavailableTitle": "Backend'e ulaşılamıyor",
+    "unavailableBody": "Konsol backend'e ulaşamadığı için oturumunuz yüklenemedi. Biraz sonra yeniden deneyin; sürerse yöneticinize bildirin.",
+    "noMembershipTitle": "Henüz proje yok",
+    "noMembershipBody": "Hesabınız hiçbir projenin üyesi değil. Bir yöneticiden sizi eklemesini isteyin."
   },
   "Login": {
     "title": "FFCore'a giriş",
@@ -94,32 +97,66 @@
     "description": "Proje; üyelerini, bilgi tabanlarını, agent'larını ve kullanımını bir arada tutar. Her ekip ya da kullanım senaryosu için bir proje oluşturun.",
     "create": "Proje oluştur",
     "emptyTitle": "Henüz proje yok",
-    "emptyBody": "İlk projeyi oluşturun, sonra üye ekleyip sağlayıcı atayın."
+    "emptyBody": "İlk projeyi oluşturun, sonra üye ekleyip sağlayıcı atayın.",
+    "key": "Anahtar",
+    "keyHint": "Küçük harf, rakam ve tire; 2-32 karakter. Sonradan değiştirilemez: her model adının parçasıdır.",
+    "keyInvalid": "Harfle başlayan, 2-32 küçük harf, rakam ya da tire kullanın.",
+    "name": "Ad",
+    "nameRequired": "Bir ad girin.",
+    "descriptionLabel": "Açıklama",
+    "members": "Üyeler",
+    "save": "Oluştur",
+    "cancel": "Vazgeç"
   },
   "Members": {
     "title": "Proje üyeleri",
     "description": "Üyenin rolü hangi ekranları göreceğini, erişim modu değişiklik yapıp yapamayacağını belirler.",
     "add": "Üye ekle",
     "emptyTitle": "Henüz üye yok",
-    "emptyBody": "Bu projeye kişi ekleyin; rolünü ve erişim modunu seçin."
+    "emptyBody": "Bu projeye kişi ekleyin; rolünü ve erişim modunu seçin.",
+    "user": "Kullanıcı",
+    "role": "Rol",
+    "access": "Erişim",
+    "remove": "Üyeyi çıkar",
+    "pickUser": "Kullanıcı seçin",
+    "pickRole": "Rol seçin",
+    "addNeedsSuperadmin": "Üye eklemek kullanıcı listesini gerektirir; bu listeyi yalnızca süper yönetici görür. Yeni üyeleri bir süper yöneticiye ekletin."
   },
   "Providers": {
     "title": "Sağlayıcılar",
     "description": "Sağlayıcı, LLMaaS ya da yerel çalıştırıcı gibi bir model uç noktasıdır. Bağlantıyı test edip projelere atayın.",
     "add": "Sağlayıcı ekle",
     "emptyTitle": "Henüz sağlayıcı yok",
-    "emptyBody": "Önce bir sağlayıcı ekleyin; modeller ve agent'lar buna ihtiyaç duyar."
+    "emptyBody": "Henüz kayıtlı sağlayıcı yok. Sağlayıcı formları konsolun bir sonraki sürümünde gelir.",
+    "key": "Anahtar",
+    "label": "Ad",
+    "driver": "Sürücü",
+    "domains": "Kullanım alanı",
+    "projects": "Projeler",
+    "status": "Durum",
+    "active": "Etkin",
+    "inactive": "Pasif"
   },
   "Models": {
     "title": "Modeller",
     "description": "Modeller bir sağlayıcıdan gelir ve agent'ların doğru modeli seçebilmesi için kategoriyle gruplanır.",
     "add": "Model ekle",
     "emptyTitle": "Henüz model yok",
-    "emptyBody": "Önce bir sağlayıcı ekleyin, sonra modellerini burada kaydedin."
+    "emptyBody": "Bu projede henüz model yok. Model formları konsolun bir sonraki sürümünde gelir.",
+    "name": "Ad",
+    "virtualName": "Sanal model adı",
+    "category": "Kategori",
+    "providerModel": "Sağlayıcıdaki model",
+    "status": "Durum",
+    "active": "Etkin",
+    "inactive": "Pasif"
   },
   "ProjectSwitcher": {
     "label": "Proje",
-    "none": "Proje seçilmedi"
+    "none": "Proje seçilmedi",
+    "selectTitle": "Proje seçin",
+    "selectBody": "Bu ekran bir projeye ait. Üstteki proje seçiciden birini seçin.",
+    "select": "Proje seç"
   },
   "UserMenu": {
     "open": "Kullanıcı menüsünü aç",
@@ -148,5 +185,19 @@
     "warning": "Uyarı",
     "inputPlaceholder": "Buraya yazın",
     "chart": "Grafik paleti"
+  },
+  "Errors": {
+    "readOnlyAccess": "Salt-okunur erişim: erişim modunuz burada değişiklik yapmaya izin vermiyor.",
+    "insufficientRole": "Bu projedeki rolünüz bu işleme izin vermiyor.",
+    "crossOriginForbidden": "İstek konsolun kendi adresinden gelmediği için reddedildi.",
+    "oboProjectScope": "Bu istek başka bir projeyle sınırlı.",
+    "invalidCredentials": "E-posta ya da şifre hatalı.",
+    "unauthenticated": "Oturumunuz sona erdi. Yeniden giriş yapın.",
+    "validationError": "Bazı alanlar geçerli değil. Formu kontrol edip yeniden deneyin.",
+    "projectKeyTaken": "Bu proje anahtarı zaten kullanılmış. Anahtarlar yeniden kullanılmaz.",
+    "memberExists": "Bu kullanıcı zaten projenin üyesi.",
+    "roleReserved": "Bu rol bu sürümde atanamaz.",
+    "notFound": "Bu kayıt artık yok. Sayfayı yenileyin.",
+    "unexpected": "İstek başarısız oldu."
   }
 }
