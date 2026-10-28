@@ -31,6 +31,11 @@ export async function openScreen(page: Page, context: BrowserContext, baseURL: s
 // Sign in through the real form (POST /auth/login via the console origin, C6).
 export async function signIn(page: Page, email: string) {
   await page.goto("/login");
+  await fillSignIn(page, email);
+}
+
+// Fill and submit the sign-in form on the current page (keeps ?next= when already on /login).
+export async function fillSignIn(page: Page, email: string) {
   await page.getByLabel("Email").or(page.getByLabel("E-posta")).fill(email);
   await page.locator("#password").fill(PASSWORD);
   await page.locator('form[data-testid="login-form"] button[type="submit"]').click();

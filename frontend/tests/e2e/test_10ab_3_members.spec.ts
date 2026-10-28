@@ -30,6 +30,8 @@ test("test_10ab_3_members: add an analyst, switch to read, remove", async ({ pag
 test("test_10ab_3_members: reserved roles are not offered", async ({ page }) => {
   await signIn(page, fixture().superadmin.email);
   await page.goto(`/projects/${fixture().alpha.id}/members`);
+  // The form appears once the member list has loaded (review r1); wait for it, then read.
+  await expect(page.locator("#member-role")).toBeVisible();
   const options = await page.locator("#member-role option").allTextContents();
   expect(options).toEqual([en.Members.pickRole, en.Access.roles.analyst, en.Access.roles.admin]);
 });

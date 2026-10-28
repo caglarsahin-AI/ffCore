@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 import { fixture } from "./fixtures";
-import { signIn } from "./support";
+import { fillSignIn, signIn } from "./support";
 
 // Review r1: failures of the helper queries are visible (MAJOR-1); a 401 on any list goes to
 // sign-in and back (MINOR-1). The failures are injected in the browser; the backend is real.
@@ -47,8 +47,12 @@ test("test_10ab_8_query_failures: 401 on a list goes to sign-in and back", async
   });
   expect(logout.status()).toBe(204);
   // Returning to the tab refetches the project list: a real 401 from the backend.
-  await page.evaluate(() => document.dispatchEvent(new Event("visibilitychange")));
+  // TanStack Query's focus manager listens on window; dispatch on both to stay version-neutral.
+  await page.evaluate(() => {
+    window.dispatchEvent(new Event("visibilitychange"));
+    document.dispatchEvent(new Event("visibilitychange"));
+  });
   await expect(page).toHaveURL(/\/login\?next=%2Fprojects$/);
-  await signIn(page, expiring.email);
+  await fillSignIn(page, expiring.email);
   await expect(page).toHaveURL(/\/projects$/);
 });
