@@ -60,7 +60,6 @@ class Settings(BaseSettings):
     # separate (06a run_timeout_s).
     llm_call_timeout_s: int = Field(default=60, gt=0)
 
-
     # --- 04a knowledge base ---
     # /readyz C13 check: the context Ollama is started with versus the models' context_tokens.
     inference_backend: Literal["ollama", "vllm"] | None = None

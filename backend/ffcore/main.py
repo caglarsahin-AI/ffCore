@@ -13,9 +13,9 @@ from ffcore.core.readiness import router as readiness_router
 from ffcore.core.readiness import warmup
 from ffcore.core.session import session_resolver
 from ffcore.knowledge.embed import probe_dimension
-from ffcore.services.providers import register_embedding_probe
 from ffcore.services import catalog_events
 from ffcore.services.litellm_reconcile import background_scheduler
+from ffcore.services.providers import register_embedding_probe
 
 log = logging.getLogger("ffcore.main")
 
