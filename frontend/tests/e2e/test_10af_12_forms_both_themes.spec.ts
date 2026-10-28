@@ -22,6 +22,8 @@ for (const theme of THEMES) {
     // Up to the backend's 15 s test budget: fake-llm does not resolve on this stack.
     await expect(form.getByTestId("provider-test-result")).toBeVisible({ timeout: 20_000 });
     await form.getByTestId("provider-save").click(); // shows the required-field errors as well
+    // Back to the top first: the fixed sidebar is captured where the page is scrolled to.
+    await page.evaluate(() => window.scrollTo(0, 0));
     await page.screenshot({ path: `../docs/images/10a-provider-form-${theme}.png`, fullPage: true });
     const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa"]).analyze();
     expect(results.violations.map((v) => `${v.id}: ${v.nodes.map((n) => n.target).join(" | ")}`)).toEqual([]);
@@ -42,6 +44,7 @@ for (const theme of THEMES) {
     await form.locator("#model-id").fill("qwen3.5:35b");
     await form.getByTestId("catalog-fill").click();
     await expect(form.getByTestId("catalog-note")).toBeVisible();
+    await page.evaluate(() => window.scrollTo(0, 0));
     await page.screenshot({ path: `../docs/images/10a-model-form-${theme}.png`, fullPage: true });
     const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa"]).analyze();
     expect(results.violations.map((v) => `${v.id}: ${v.nodes.map((n) => n.target).join(" | ")}`)).toEqual([]);
