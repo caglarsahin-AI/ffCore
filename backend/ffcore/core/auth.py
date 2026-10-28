@@ -10,7 +10,7 @@ import uuid
 from collections.abc import Awaitable, Callable
 from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta
-from typing import Literal
+from typing import Annotated, Literal
 
 import jwt
 from fastapi import Depends, Request
@@ -175,7 +175,9 @@ async def _audit_impersonation_denied(request: Request, actor: Actor | None) -> 
     await record_impersonation_denied(request, actor)
 
 
-async def resolve_actor(request: Request, settings: Settings = Depends(get_settings)) -> Actor:
+async def resolve_actor(
+    request: Request, settings: Annotated[Settings, Depends(get_settings)]
+) -> Actor:
     actor: Actor | None = None
     for resolver in list(_resolvers):
         actor = await resolver(request, settings)

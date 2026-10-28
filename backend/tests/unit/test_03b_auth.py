@@ -1,4 +1,5 @@
 from datetime import UTC, datetime, timedelta
+from typing import Annotated
 
 import jwt
 import pytest
@@ -136,7 +137,7 @@ def client(settings, monkeypatch):
     app.dependency_overrides[get_settings] = lambda: settings
 
     @app.get("/whoami")
-    async def whoami(actor: Actor = Depends(resolve_actor)):
+    async def whoami(actor: Annotated[Actor, Depends(resolve_actor)]):
         return {
             "type": actor.actor_type,
             "id": actor.actor_id,
