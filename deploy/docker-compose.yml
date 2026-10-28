@@ -75,6 +75,21 @@ services:
     environment:
       REDIS_PASSWORD: ${REDIS_PASSWORD:?REDIS_PASSWORD tanımlı değil}
 
+  qdrant:
+    # 04a: second vector driver (VECTOR_BACKEND=qdrant; PayCore's primary). Optional:
+    # COMPOSE_PROFILES=qdrant, or give QDRANT_URL of an existing server instead. Same version as
+    # PayCore's server (v1.11.3); pinned by index digest. No port is published (internal only).
+    image: ${REGISTRY_PREFIX}qdrant/qdrant:v1.11.3@sha256:da426bb8aa0ba0a3032b3110e71d0d1516d51a686aa17b39bde4e090ce3b8e7c
+    profiles: ["qdrant"]
+    restart: unless-stopped
+    volumes:
+      - qdrant_data:/qdrant/storage
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c ':> /dev/tcp/127.0.0.1/6333' || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
   litellm:
     image: ${REGISTRY_PREFIX}ghcr.io/berriai/litellm:v1.80.0-stable
     restart: unless-stopped
@@ -199,6 +214,7 @@ services:
       DEPLOY_PROFILE: ${DEPLOY_PROFILE:?DEPLOY_PROFILE tanımlı değil}
       INFERENCE_BACKEND: ${INFERENCE_BACKEND:?INFERENCE_BACKEND tanımlı değil}
       VECTOR_BACKEND: ${VECTOR_BACKEND:?VECTOR_BACKEND tanımlı değil}
+      QDRANT_URL: ${QDRANT_URL:-}
       OFFLINE: ${OFFLINE:?OFFLINE tanımlı değil}
       DATABASE_URL: postgresql+psycopg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
       REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379/0
@@ -348,3 +364,4 @@ volumes:
   langfuse_minio_data:
   # 04a: model weights shared by backend, worker and tools (same uid 10001 owns /models).
   model_cache:
+  qdrant_data:
