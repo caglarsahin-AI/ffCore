@@ -3,9 +3,9 @@
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
 - Oturum kimliği: ffcore-isci-a-03b
-- Aktif paket: 03b (K-03b-0001)
-- Durum: ACTIVE
-- Son okunan: K-03b-0015 (2026-10-28 12:23)
+- Aktif paket: 03b (MERGED 2804d03)
+- Durum: RETIRED
+- Son okunan: K-03b-0016 (2026-10-28 12:31)
 
 ## Mesajlar
 
@@ -221,3 +221,23 @@ r2 DUZELT uygulandı. Branch feat/03b-audit-egress @ 8b83a856c6ab91a315cc1b3c134
 - İstemci durumsuz: hiçbir şey saklamayan CookieJar, httpx2 istemcisine ham verilir; Set-Cookie yok sayılır, gönderilen tek cookie çağıranın başlığı (origin kuralına tabi).
 - Uygulamada bulunan: httpx2.Cookies(jar) jar'ı normal bir jar'a kopyalıyordu; bekçi testi ilk denemede yakaladı, ham jar ile çözüldü.
 - Kırmızı koşuldu (5 yeni test düştü); kapılar: lint 0, make test llmaas 95 / airgap 95. K-03b-0012 gereği test-int ve stack yeniden koşulmadı.
+
+### A-03b-0015 · 2026-10-28 12:31 · → koordinator · HANDOFF
+Paket: 03b   Cevap: K-03b-0016
+### 03b · ffcore-isci-a-03b · 2026-10-28 12:31
+- Durum: MERGED (main 2804d03, r3 ONAY 8b83a85). Stack kapatıldı: `docker compose -p 03b-audit-egress --env-file .env.test down -v` exit 0; kalan konteyner 0, volume 0. Lease RETIRED.
+- Tam sonraki adım: 03a yeni isci-a oturumunda (00i paycoreLLM merge'i sonrası). 03a'ya geçiş notları:
+  - Kimlik: `ffcore/core/auth.py` `resolve_actor()` tek doğrulama noktası (C2). 03a kullanıcı oturumunu `register_credential_resolver(fn)` ile ekler: `async fn(request, settings) -> Actor | None`; yeni doğrulama fonksiyonu yazılmaz. `Actor(actor_type="user", actor_id, project_id)`; `may_impersonate` servis hesabı ve 03c `impersonate` kapsamlı anahtar içindir. Bilinmeyen kimlik 401; `X-On-Behalf-Of` yetkisiz aktörden gelirse yok sayılır + `impersonation_denied`. OBO imzası `sign_on_behalf_of(user_id, project_id, audience, settings)`; her çağrıda yeniden imzala, 300 s.
+  - `@audited(action, resource_type, redact_fields=[...], audit_payload=True, load_before=...)`: endpoint `request`, `actor`, `session` adlı parametreleri bildirir (yoksa TypeError); başarıda decorator commit eder, endpoint commit etmez; hata (load_before → commit) → rollback + ayrı transaction'da error/denied; audit yazımı da düşerse `AuditWriteError`. `require_role` reddi dependency'de olduğu için decorator'a ulaşmaz: 03a denied kaydını `write_event_detached(AuditEntry(...))` ile yazar (brief kabulü `outcome=denied`).
+  - DB: `ffcore/core/db.py` (`get_session`, `session_scope`, `scoped_to_project`), `ffcore/models/base.py` `Base`; `models/__init__.py`'ye yalnız kendi satırını ekle. Alembic: kendi dalın `down_revision="0001"`, `branch_labels=("03a",)`; 03b `03b_0001`; dalga merge'üne kadar iki head normal, `migrate` servisi `alembic upgrade heads` koşar. Entegrasyon fixture'ı (`tests/integration/conftest.py`) her koşuda geçici DB açıp `alembic upgrade heads` uygular.
+  - Hata gövdesi: `ffcore/core/errors.py` `ApiError(status, type, code, message)`; tüm 4xx OpenAI biçimi, İngilizce.
+  - Egress: dış HTTP yalnız `SafeOutboundClient(timeout=EgressTimeout(connect, read, total), settings=...)`; `request(method, url, headers, params, content, json)` dışında seçenek yok; cookie saklanmaz; cross-origin yönlendirmede kimlik başlıkları düşer (`docs/api.md`).
+  - Config: `ffcore/core/config.py` `Settings`/`get_settings()`; 03a alanlarını additive ekler. Secret alanları `SecretStr` (DATABASE_URL dahil). `.env.example` tamamen İngilizce (K-03b-0004).
+  - Açık kayıtlar: FOLLOWUP-46 (en-az-yetkili DB rolü, 12), FOLLOWUP-47 (aylık partition cron'u, 03c), FOLLOWUP-48 (`GET /audit` + CSV, 03a), FOLLOWUP-49 (merkezi log sanitizer, 02).
+  - Ortam: araçlar yalnız tools konteynerinde (`docker compose -p <proje> --env-file .env.test run --rm tools make lint|test|test-int`), Git Bash'te `MSYS_NO_PATHCONV=1`. Kanal mesajında Windows yolunu düz eğik çizgiyle yaz (A-03b-0011'deki kaçış hatası); bash heredoc içinde Python `'''` dizeleri bu ortamda ayrıştırılamadı, uzun betikleri dosyaya yazıp çalıştır.
+- Değişen dosyalar: state/pr/03b.md (27 dosya + r1/r2 düzeltmeleri; ayrıntı orada).
+- Koşan testler / kalan testler: son tam kapılar 480c60e (lint, iki profil 89 + 12, temiz volume up + smoke, alembic döngüsü), 8b83a85 (lint, iki profil 95); main'de koordinatör smoke + lint. Kalan: dış TLS uçtan uca (dış sistem yasağı), temiz volume up süresi 62 s → 123 s farkının nedeni (doğrulanmadı).
+- Kararlar ve varsayımlar: K-03b-0004 (S1-S6 A, .env İngilizce), K-03b-0005 (migrate servisi B), K-03b-0008 (r1 politikaları), K-03b-0012 (istemci durumsuz); PR varsayımları 1-6.
+- Blocker'lar: yok.
+- Commit edilmemiş durum: yok. Worktree ve branch koordinatörce kaldırıldı.
+- Branch ve son commit: feat/03b-audit-egress (silindi), son commit 8b83a856c6ab91a315cc1b3c13438378c854404b → main 2804d03.

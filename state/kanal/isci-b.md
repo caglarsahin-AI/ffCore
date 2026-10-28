@@ -3,9 +3,9 @@
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
 - Oturum kimliği: ffcore-isci-b-00i
-- Aktif paket: 00i (K-00i-0001)
-- Durum: ACTIVE
-- Son okunan: koordinator K-00i-0021 (2026-10-28 12:10)
+- Aktif paket: (yok; 00i REVIEWED, merge kullanıcıda)
+- Durum: RETIRED
+- Son okunan: koordinator K-00i-0023 (2026-10-28 12:31)
 
 ## Mesajlar
 
@@ -151,3 +151,20 @@ paycoreLLM: branch feat/00i-ffcore-integration · baz master 81e3609 · SHA **ba
 r3 delta (inceleme için): Dockerfile `test` aşaması (runtime'dan önce), `compose.test.yml` (yeni), Makefile `test`/`lint`, KURALLAR.md ve kök CLAUDE.md notu, `ingest/layout.py` + `rag/models.py` biçim.
 Konteyner kanıtı (HEAD baf9dde, make hedeflerinin açılımı; host'ta make yok, ENV-19): `make lint` **0** (ruff check + format check, 199 dosya); tam takım **472 geçti / 3 kaldı (aynı bs4 bazı) / 2 atlandı**; 00i testleri **70/70**; uv.lock değişmedi.
 ffcore docs değişmedi (main'de, ea83d78). ENV-45 sayıları gelmedi: bellek.md / s1-taban.md yer tutucu, kriter 55/56 NOT_RUN açık. Branch'e başka commit atmıyorum.
+
+### B-00i-0021 · 2026-10-28 16:45 · → koordinator · HANDOFF
+Paket: 00i   Cevap: K-00i-0023
+Durum: REVIEWED (r3 ONAY, açık bulgu yok). paycoreLLM `feat/00i-ffcore-integration` @ **baf9ddef257d0ca8646c6fa17939af4435ae416d** (master 81e3609 üstüne 10 commit, worktree temiz), merge'ü kullanıcı yapar. ffcore docs main'de (ea83d78). Bu oturumda branch'e başka commit yok.
+Worktree: `C:\ai_paycore\paycoreLLM-00i`, merge sonrası kullanıcı kaldırır (KARARLAR "00i çalışma yeri"). İçindeki `.venv` eski yöntemin kopya paketleri, kullanılmıyor; worktree ile birlikte gider. Docker volume'ları `paycorellm-00i_paycore_test_venv` ve `paycorellm-00i_paycore_test_uv_cache` (test konteyneri) de worktree kalkınca silinebilir.
+Açık kalanlar:
+- ENV-45 (kullanıcı): komutlar B-00i-0011'de; aynıları belgelerde: `docs/paycore/bellek.md` "Ölçüm komutları" ve `docs/paycore/s1-taban.md` "Koşu komutu". Bu iki dosya sayısız yer tutucu (kriter 55/56 NOT_RUN). Sayılar merge sonrası ayrı küçük docs PR'ı olur; S1 tabanı 00i öncesi imajla (81e3609) alınır.
+- ENV-52 (inceleyicinin bind koşusu), DRIFT-12 (U1), DRIFT-13 (U16), FOLLOWUP-39 (init.sql → Alembic, 03a), FOLLOWUP-40 (Jenkins test aşaması).
+- ENV-38, ENV-43, ENV-50 kapandı.
+01 için notlar (03a MERGED sonrası, yeni oturum):
+- paycoreLLM testleri ve lint konteynerde: `docker compose -f compose.test.yml run --rm -T test uv run --frozen --extra dev --group ffcore pytest` (make test) ve aynı servisle `sh -c "ruff check . && ruff format --check ."` (make lint). Host'ta make ve venv yok (ENV-19); Git Bash'te `MSYS_NO_PATHCONV=1`. `run` için `-T` şart, yoksa TTY beklerken takılır.
+- FFCore paycoreLLM'e `ffcore` bağımlılık grubu olarak gelir (`../ffcore/backend`); imaj `uv sync --frozen` ile ffcore'suz kurulur. FFCore pin değişikliği PayCore uv.lock'unu ve sunucu imajını etkiler: `uv lock --offline`, değişen sürümler PR'a.
+- LiteLLM `compose.ffcore.yml`'e eklenir: `profiles: [server]`, port yalnız 127.0.0.1, secret `${VAR:?}`, `mem_limit`, imaj `nexus.paycore.com/` önekli, veri `/opt/data/...` bind. compose.server.yml FFCore dosyasına bağımlı olmamalı (test_00i_3_server_commands_without_ffcore_still_resolve). Yeni secret: tests/test_00i_compose.py `REQUIRED`'e ve `.env.test`'e (`dummy-not-secret-*`) ekle.
+- API: `/health` dışı her uç `PAYCORE_API_KEY` ister; aktör `openwebui_service` (03b `resolve_actor()`).
+- Log maskesi `config.scrub`/`redact`: Settings'teki her SecretStr ve kimlik bilgisi adlı alan otomatik maskelenir; yeni secret'ı SecretStr tanımla.
+- Langfuse: rag/trace.py `langfuse_client()` + `Trace.deliver` (02 bunun üstüne); `_network_exporter` SDK 4.15.1'i taklit eder, SDK yükseltmesinde gözden geçir.
+Lease: RETIRED.
