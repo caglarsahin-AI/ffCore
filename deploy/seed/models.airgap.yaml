@@ -1,0 +1,64 @@
+# First-install seed for DEPLOY_PROFILE=airgap (package 01): providers and models of one project.
+#   docker compose run --rm tools make seed-models PROJECT=<project_key>
+# Afterwards the console owns these rows; running the seed again leaves existing rows unchanged.
+#
+# No external provider and no chat-fallback (brief 01): a model failure is 503
+# model_unavailable, never a switch to a provider outside the network. With OFFLINE=true the
+# seed refuses any provider whose address is not in ALLOWED_INTERNAL_HOSTS.
+# The provider is chosen by INFERENCE_BACKEND (a configuration value, not a profile branch).
+# Per-call timeout: LLM_CALL_TIMEOUT_S, 600 on CPU (Ollama), 120 on GPU (vLLM).
+# Prices are virtual (0); enter others in the console if wanted.
+version: 1
+providers:
+  - key: ollama
+    label: Ollama (local)
+    driver: ollama
+    domains: [model]
+    inference_backend: ollama
+    config:
+      # PayCore runs Ollama on the host: http://host.docker.internal:11434 (that host must be
+      # in ALLOWED_INTERNAL_HOSTS).
+      base_url: ${SEED_OLLAMA_BASE_URL:-http://ollama:11434}
+  - key: vllm
+    label: vLLM (GPU)
+    driver: vllm
+    domains: [model]
+    inference_backend: vllm
+    config:
+      base_url: ${SEED_VLLM_BASE_URL:-http://vllm:8000}
+models:
+  - key: chat-default
+    display_name: Chat (default)
+    provider: ollama
+    model_id: qwen3.5:35b
+    capabilities: {tool_calls: true, reasoning: true, structured_outputs: false}
+    # OLLAMA_CONTEXT_LENGTH (PayCore measurement), not the model's maximum.
+    limits: {context_window: 32768}
+    # Qwen3.5 thinking off (D6): Ollama's OpenAI endpoint reads only reasoning_effort.
+    request_policy: {extra_body: {reasoning_effort: none}}
+    pricing: {input_per_1m: 0, output_per_1m: 0, cached_per_1m: 0}
+  - key: memory-extract
+    display_name: Memory extraction
+    provider: ollama
+    model_id: qwen3.5:35b
+    capabilities: {tool_calls: false, reasoning: true, structured_outputs: false}
+    limits: {context_window: 32768}
+    request_policy: {extra_body: {reasoning_effort: none}}
+    pricing: {input_per_1m: 0, output_per_1m: 0, cached_per_1m: 0}
+  - key: chat-default
+    display_name: Chat (default)
+    provider: vllm
+    # The served model name of the vLLM server (its --served-model-name).
+    model_id: ${SEED_VLLM_MODEL}
+    capabilities: {tool_calls: true, reasoning: true, structured_outputs: false}
+    limits: {}
+    request_policy: {extra_body: {reasoning_effort: none}}
+    pricing: {input_per_1m: 0, output_per_1m: 0, cached_per_1m: 0}
+  - key: memory-extract
+    display_name: Memory extraction
+    provider: vllm
+    model_id: ${SEED_VLLM_MODEL}
+    capabilities: {tool_calls: false, reasoning: true, structured_outputs: false}
+    limits: {}
+    request_policy: {extra_body: {reasoning_effort: none}}
+    pricing: {input_per_1m: 0, output_per_1m: 0, cached_per_1m: 0}

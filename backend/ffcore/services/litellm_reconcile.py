@@ -290,37 +290,45 @@ def _error_text(response: httpx2.Response) -> str:
     return str(error)[:300]
 
 
-async def apply(admin: LiteLLMAdmin, desired: list[DesiredModel]) -> ReconcileReport:
+async def apply(
+    admin: LiteLLMAdmin, desired: list[DesiredModel], dry_run: bool = False
+) -> ReconcileReport:
     """Makes /model/info equal to `desired`. Order: create and update first, delete last, so a
-    replaced model never leaves a gap."""
+    replaced model never leaves a gap. `dry_run` only reports the difference."""
     report = ReconcileReport()
     current = {m["model_info"]["id"]: m for m in await admin.model_info()}
     wanted = {d.id: d for d in desired}
     for model_id, d in wanted.items():
         existing = current.get(model_id)
         if existing is None:
-            await admin.model_new(d)
+            if not dry_run:
+                await admin.model_new(d)
             report.created.append(d.name)
         elif (
             existing["model_info"].get("ffcore_hash") != d.model_info["ffcore_hash"]
             or existing["model_name"] != d.name
         ):
-            await admin.model_update(d)
+            if not dry_run:
+                await admin.model_update(d)
             report.updated.append(d.name)
     for model_id, existing in current.items():
         if model_id not in wanted:
             if not existing["model_info"].get("ffcore_managed"):
                 log.warning("litellm_unmanaged_model_removed name=%s", existing["model_name"])
-            await admin.model_delete(model_id)
+            if not dry_run:
+                await admin.model_delete(model_id)
             report.deleted.append(existing["model_name"])
     return report
 
 
-async def reconcile(session: AsyncSession, settings: Settings, **client_options) -> ReconcileReport:
+async def reconcile(
+    session: AsyncSession, settings: Settings, dry_run: bool = False, **client_options
+) -> ReconcileReport:
     desired, problems = await desired_state(session, settings)
     async with LiteLLMAdmin(litellm_settings(settings), settings, **client_options) as admin:
-        await admin.ensure_internal_key()
-        report = await apply(admin, desired)
+        if not dry_run:
+            await admin.ensure_internal_key()
+        report = await apply(admin, desired, dry_run)
     report.problems = problems
     for problem in problems:
         log.error("litellm_model_not_written model=%s code=%s", problem["model"], problem["code"])

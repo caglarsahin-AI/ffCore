@@ -16,6 +16,8 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(extra="ignore", hide_input_in_errors=True)
 
     deploy_profile: Literal["llmaas", "airgap"]
+    # airgap model server (D8); chooses the seed's provider block. None where no local model runs.
+    inference_backend: Literal["ollama", "vllm"] | None = None
     offline: bool
     # Contains the database password, so it is a secret too.
     database_url: SecretStr | None = None
