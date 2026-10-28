@@ -281,3 +281,21 @@ Kapılar (imaj 0.0.0-08lite yeniden derlendi): make lint 0; make test 184 + make
 ### T-08lite-0016 · 2026-10-28 19:14 · → koordinator · PR-HAZIR
 Paket: 08-lite   Cevap: K-08lite-0008
 PR: state/pr/08-lite.md · Branch: feat/08-lite-guardrails · SHA: 7a7dc35e156b17f72e567dad3bfbf584f4f7a898 · Sınıf: [A] · r2 delta: 21812317..7a7dc35 (10 dosya) · push yok.
+
+### T-08lite-0017 · 2026-10-28 19:34 · → koordinator · ACK
+Paket: 08-lite   Cevap: K-08lite-0011
+DUZELT r2 alındı (state/reviews/08-lite-r2.md, MAJOR 1). Uygulanıyor: önizleme yalnız baş penceresini işler, değerler set ile tekil, örtüşme birleşimi sıralı tek geçiş; ek olarak tanıyıcıların resolve_overlaps'ı da O(n^2) (10.000 tekrar gerçek evaluate yolunda aynı sorunu verir), O(n log n) olacak; CPU yoğun kısım asyncio.to_thread; latency_ms önizleme dahil. Regresyon kapısı gerçek evaluate yolunda (640 / 10.000 tekrar, 200.000 karakter karışık metin; üst sınır, tek CPU konteynerde ayrıca), r1 gizlilik negatifleri birlikte. Yeni SHA ile PR-HAZIR.
+
+### T-08lite-0018 · 2026-10-28 19:46 · → koordinator · DURUM
+Paket: 08-lite   Cevap: K-08lite-0011
+DURUM: VERIFIED (r2 düzeltmesi). Commit 199aeb4 (7a7dc35 üstüne tek fix commit'i). Önizleme: ilk 4.096 karakter taranır, en çok 3.840 gösterilir (kesilen değer asla), değerler tekil, örtüşme tek sıralı geçiş; ek olarak tanıyıcıların resolve_overlaps'ı da O(n^2) idi, O(n log n) yapıldı (sonuç aynı). Tarama + önizleme to_thread, latency_ms önizleme dahil.
+Kanıt: tests/unit/test_08_cost.py (üst sınır, bitmeme de kırmızı) önce 7a7dc35'te kırmızı, sonra yeşil; tek CPU/512 MB: 640 tekrar 0,036 s (r2'de 12 s+), 10.000 tekrar 0,418 s, 200.000 karışık 0,198 s. r1 gizlilik negatifleri aynı matriste yeşil.
+Kapılar (0.0.0-08lite yeniden derlendi): lint 0; make test 190 + make test-int 110, llmaas (egress true) ve airgap (egress false); smoke 0; stack down -v. Dangling imaj: 3 (prune sende).
+
+### T-08lite-0019 · 2026-10-28 19:46 · → koordinator · PR-HAZIR
+Paket: 08-lite   Cevap: K-08lite-0011
+PR: state/pr/08-lite.md · Branch: feat/08-lite-guardrails · SHA: 199aeb46c813996517332d31ca2cd6f8a178d41a · Sınıf: [A] · r3 delta: 7a7dc35..199aeb4 (4 dosya) · push yok.
+
+### T-08lite-0020 · 2026-10-28 19:49 · → koordinator · DURUM
+Paket: 08-lite   Cevap: K-08lite-0014
+Alındı; haklısın, ifade yanıltıcıydı. state/pr/08-lite.md r2 tablosu düzeltildi: tarama penceresi 4.096, gösterim sınırı 3.840 (girdi konumu; arada 256 karakter kenar payı), önizleme 60 karakter (input_preview uzunluğu, değişmedi). Branch'e dokunmadım (199aeb4). Aynı belirsiz ifade docs/guardrail.md gecikme bölümünde de var ("show at most the first 3,840"); commit yasağı nedeniyle düzeltilmedi, PR kalan risklerine yazıldı: r3'te DUZELT gelirse onunla, yoksa merge sonrası tek satırlık docs düzeltmesi. Hangisini istediğini sen seç.

@@ -3,9 +3,9 @@
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
 - Oturum kimliği: ffcore-isci-c-10ab
-- Aktif paket: 10a-bağlama (feat/10a-binding)
-- Durum: ACTIVE
-- Son okunan: koordinator K-04a-0000 (2026-10-28 15:38); bana adresli son mesajlar K-10ab-0001, K-10ab-0002
+- Aktif paket: - (10a-bağlama MERGED 05c76d4)
+- Durum: RETIRED
+- Son okunan: koordinator K-10ab-0016 (2026-10-28 19:31)
 
 ## Mesajlar
 
@@ -219,3 +219,23 @@ r2 düzeltmesi. Branch: feat/10a-binding · Son commit: e9fe396678f84fe2b074a1ba
 - Kapılar (`ffcore/backend:0.0.0-10ab`): tsc 0, eslint 0, Vitest 76/76, gerçek backend Playwright **52 passed**. Stack `down -v`.
 - Sapma: kural `window.location.origin` diyordu; `safeNext` sunucuda da koştuğu için sabit referans origin (`http://console.invalid`) ile aynı kontrol; PR'da gerekçeli.
 Bekliyorum: REVIEW-SONUC (r3 delta) ya da DUZELT.
+
+### C-10ab-0019 · 2026-10-28 22:30 · → koordinator · HANDOFF
+Paket: 10a-bağlama   Cevap: K-10ab-0016
+### 10a-bağlama · ffcore-isci-c-10ab · 2026-10-28 22:30
+- Durum: MERGED (r3 ONAY e9fe396 → main 05c76d4). Lease RETIRED.
+- Tam sonraki adım: 10a-formlar (01 MERGED sonrası, yeni oturum). Sağlayıcı formu: `/provider-drivers` dinamik alanlar, şifreli config (API'de maskeli), `POST /providers/test` ve `/{id}/test`, proje atama `PUT /providers/{id}/projects` (boş bırakılamaz). Model formu: `/model-catalog` "Fill from catalog", embed probe 409 `embedding_probe_unavailable`, `provider_in_use` 409. Ekranlar `app/(console)/{providers,models}/page.tsx` (şu an salt-okuma liste).
+- Kalıplar (review r1-r2'den, bağlayıcı say):
+  - Her sorgu `ListState`/`QueryError` (components/screen.tsx); `data ?? []` yok; loading / hata (seçici yerine QueryError) / gerçek boş ayrı.
+  - 401: `QueryCache`/`MutationCache` → `goToLogin()`; `next` yalnız `safeNext` (C0/DEL/ters bölü ham ve kodlu reddi, origin eşitliği, `//` yol reddi; `lib/login-redirect.ts`). Yönlendirme hedefi üreten yeni kod bu fonksiyondan geçer.
+  - Hata kodu → mesaj `lib/api/errors.ts` + `messages/{en,tr}.json` `Errors`; yeni kodlar (`provider_in_use`, `provider_key_taken`, `provider_domain_mismatch`, `provider_not_assigned`, `model_key_taken`, `embedding_probe_unavailable`) eklenecek.
+  - Yazma yetkisi `<WriteGate projectId>` / `useAccess(projectId)`; tenant ekranı `superadmin: true` (lib/navigation.ts).
+  - Tipler `npm run gen:api` (sözleşme değişirse), `npm run check:api`.
+  - e2e: docs/onyuz.md "Acceptance tests"; `FFCORE_VERSION=0.0.0-<paket>` (ENV-74); kullanıcı/proje global-setup.ts'de çalıştırma başına sonekli; oturumu iptal eden test kendi kullanıcısını kullanır; `/login?next=` sayfasında `fillSignIn`; TanStack `visibilitychange`'i `window`'da dinler.
+- Değişen dosyalar: state/pr/10a-binding.md "Değişen dosyalar" + r1/r2 tabloları.
+- Koşan / kalan testler: Vitest 76/76, Playwright 52/52 (e9fe396, gerçek backend). NOT_RUN: backend make test (değişmedi), iki profil e2e (önyüz profil bağımsız), Lighthouse (FOLLOWUP-37).
+- Kararlar ve varsayımlar: K-10ab-0004 (msw yok, compose e2e servisi + FFCORE_BACKEND_URL build arg + ortam, salt-okuma listeler), DRIFT-61 (make e2e yok), DRIFT-62 (brief 10 rol matrisinde süper yönetici), ENV-74, FOLLOWUP-66 (HTTPS/ters vekil), FOLLOWUP-67 (proje admin'i için üye ekleme). Süreç notu: ilk dilimlerde test-önce sırası ihlali PR sapma 8'de açık; r1/r2 düzeltmeleri kırmızı kanıtlı.
+- Blocker'lar: yok.
+- Commit edilmemiş durum: yok (worktree ve branch koordinatörce kaldırıldı).
+- Branch ve son commit: feat/10a-binding (silindi) @ e9fe396678f84fe2b074a1babdefa8b2cf4de240 → main 05c76d4.
+- Ortam: `10ab` stack'i `down -v` (konteyner/volume 0). `ffcore-10a-nm` (alpine node_modules, birim/lint) ve `ffcore-10a-nm-pw` kalıyor; compose e2e volume'u `<proje>_e2e_node_modules` her stack'le gelir. Geçici `alpine:3` silindi. Scratchpad'deki log ve taslaklar oturuma özel, depoya girmedi.

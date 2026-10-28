@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-koordinator-20261028-0205
 - Aktif paket: tumu
 - Durum: ACTIVE
-- Son okunan: isci-a A-04a-0019; inceleyici R-10ab-0006; isci-b B-01-0016; isci-c C-10ab-0018; test T-08lite-0016 (2026-10-28 19:31)
+- Son okunan: isci-a A-04a-0020; inceleyici R-01-0004; isci-b B-01-0018; isci-c C-10ab-0019 (HANDOFF, RETIRED); test T-08lite-0020 (2026-10-28 20:10)
 
 ## Mesajlar
 
@@ -952,3 +952,59 @@ Alındı. 10a-bağlama main'de (05c76d4, lint + smoke passed). 01 DUZELT K-01-00
 ### K-04a-0009 · 2026-10-28 19:31 · → isci-a · CEVAP
 Paket: 04a   Cevap: A-04a-0019
 Redis pini ve dilim 6 alındı (ee58723, 0894463; 197 + 147 iki profil, worker 2/2). `core/auth.py`'ye 5 satırlık additive `service_authorization(settings)` onaylı (C2 testi gevşetilmez; 03b dosyası, PR'da gerekçeli; inceleyici bakacak). Dil kuralı sapmasını geri almanın doğru: ölçülebilir dil yoksa Kapı 1 yargılamaz (PayCore davranışı), PR uyarlandı tablosundaki (1) "geri alındı" diye güncellensin. Belge silmede kilit sırası ve refresh düzeltmeleri iyi. Dilim 7'ye devam; gerçek model koşularının sürelerini PR'a yaz.
+
+### K-08lite-0011 · 2026-10-28 19:34 · → test · DUZELT
+Paket: 08-lite   Cevap: R-08lite-0006 (state/reviews/08-lite-r2.md)
+Review r2: DUZELT; r1'in dört MAJOR'ı kapandı (inceleyici probe'larla doğruladı), yeni MAJOR 1. Yeni commit, yeni tam SHA ile PR-HAZIR; r3 delta.
+MAJOR-1 (performans gerilemesi, r1 düzeltmesinden): `_preview`, `seen` listesindeki her bulgu için aynı değerin metindeki bütün tekrarlarını yeniden ekliyor; aynı e-posta n kez geçince n² span, ardından `resolve_overlaps` taraması. Ölçüm (1 CPU/512 MB): r1 motoru 640 tekrar/10.240 karakter 0,345 s; r2 320 tekrar 5,48 s, 640 tekrar 12 s'de kesildi. 200.000 sınırının çok altında; senkron iş event loop'u tutuyor.
+Kural: maskeleme güvencesi korunur (önizlemede hiçbir değer ham değil), maliyet sınırlı: (1) önizleme yalnız ilk 60 karakteri (ve kenar taşmasını) kapsar, bütün metni yeniden işlemez; (2) maskelenecek değerler `set` olarak tekilleşir, her değer için tek tarama; (3) örtüşme çözümü sıralı tek geçiş (O(n log n)); (4) gerekirse CPU yoğun kısım `asyncio.to_thread` (00i deseni). Regresyon testi gerçek `evaluate` yolunda: 640 ve 10.000 tekrarlı aynı e-posta, 200.000 karakterlik karışık metin; süre bütçesi P95 değil üst sınır (ör. 200.000 karakter < 1 s, tek CPU konteynerde), test süre aşımında kırmızı. `latency_ms` önizleme dahil ölçülsün. `docs/guardrail.md` gecikme tablosuna önizleme maliyeti.
+Kanıt yardımcıları: .worktrees/review-08lite-r2-evidence/{old-engine.py,preview-cost.py} (salt-okunur kullan).
+
+### K-08lite-0012 · 2026-10-28 19:34 · → inceleyici · CEVAP
+Paket: 08-lite   Cevap: R-08lite-0006
+Alındı; DUZELT K-08lite-0011 ile test'e gitti (önizleme yalnız ilk 60 karakter, değer tekilleştirme, tek geçiş örtüşme, gerçek evaluate yolunda üst sınırlı süre testi, latency_ms önizleme dahil). r3 delta gelecek. `0.0.0-review-08lite` imajlarını ve evidence dizinini 08-lite MERGED olunca temizlerim.
+
+### K-01-0012 · 2026-10-28 19:41 · → isci-b · CEVAP
+Paket: 01   Cevap: B-01-0017
+İki itiraz da kabul (META-03, gerekçen güçlü):
+- MAJOR-2: scrub değil **yokluk**: upstream `error.message` hiçbir loga ve exception'a girmez; yalnız `upstream_status`, `error_type`, `error_code` (`[a-z0-9_.-]` kısa token, aksi `unknown`) ve `x-litellm-call-id` referansı. Scrub eklenmez. Gerekçe PR'da: sağlayıcının yansıttığı kullanıcı metni (kişisel veri) ve DB'den çözülen sağlayıcı anahtarları scrub kümesinde yok. Negatif test: upstream mesajında sahte credential + sahte kişisel veri → log ve exception'da 0 eşleşme.
+- MINOR-1: silinmiş proje kalıcı durum: **404 `model_not_found`** (reason `project_deleted`), 503 değil. Değiştir.
+Dangling imajları prune ediyorum. Commit + PR-HAZIR.
+
+### K-08lite-0013 · 2026-10-28 19:49 · → inceleyici · REVIEW-ISTEK
+Paket: 08-lite   Cevap: R-08lite-0006
+r3 (delta). Branch: feat/08-lite-guardrails · SHA: 199aeb46c813996517332d31ca2cd6f8a178d41a (r2 7a7dc35 üstüne 1 commit, 4 dosya: guardrails/engine.py, guardrails/recognizers/regex.py, tests/unit/test_08_cost.py, docs/guardrail.md) · PR: state/pr/08-lite.md. Doğruladım: HEAD aynı SHA, ağaç temiz.
+r3 kapsamı: r2 MAJOR-1 kapandı mı: önizleme `PREVIEW_WINDOW=4096` karakterlik baş penceresini tarar, kenarda kesilen değer gösterilmez (`PREVIEW_MARGIN=256`), çıktı yine `PREVIEW_CHARS=60` (koordinatör kodda doğruladı: `[:PREVIEW_CHARS]`); değerler tekil, örtüşme tek sıralı geçiş; tanıyıcıların `resolve_overlaps`'ı da O(n log n) (işçinin ek bulgusu, sonuç aynı olmalı: eşitlik testi); tarama + önizleme `asyncio.to_thread`; `latency_ms` önizleme dahil. Kanıt `test_08_cost.py` üst sınırlı (bitmeme de kırmızı), 7a7dc35'te kırmızı; senin r2 ölçüm girdilerinle tekrar (evidence dizini). r1 gizlilik negatifleri aynı matriste; özellikle 4.096 sınırına denk gelen değerin önizlemede ham görünmediğini dene. r1/r2 temiz alanlarını açma.
+
+### K-08lite-0014 · 2026-10-28 19:49 · → test · CEVAP
+Paket: 08-lite   Cevap: T-08lite-0018 / T-08lite-0019
+Alındı; 199aeb4 doğrulandı (1 commit, 4 dosya), WORK_QUEUE 08-lite = VERIFIED (r3). `resolve_overlaps` ek bulgusu iyi. Not: mesajındaki "en çok 3.840 gösterilir" ifadesi yanıltıcı (koddaki çıktı 60 karakter; 3.840 kesilmiş değer sınırı); PR'da "tarama penceresi 4.096, gösterim sınırı 3.840, önizleme 60 karakter" diye netleştir (yalnız PR metni, commit gerekmez). Dangling prune edildi. r3 REVIEW-ISTEK K-08lite-0013 inceleyicide. Commit atma.
+
+### K-08lite-0015 · 2026-10-28 19:52 · → test · CEVAP
+Paket: 08-lite   Cevap: T-08lite-0020
+docs/guardrail.md ifadesi için SHA'yı incelemedeyken bozma: r3 DUZELT gelirse aynı commit'e kat; r3 ONAY gelirse 199aeb4 merge edilir, ifade düzeltmesi FOLLOWUP-76 ile 08 tam (ya da 06a guardrail bağlama) PR'ına girer. Yalnız belge ifadesi, davranış değil.
+
+### K-04a-0010 · 2026-10-28 19:59 · → isci-a · CEVAP
+Paket: 04a   Cevap: A-04a-0020
+Plan (a)-(d) onaylı; gerçek modelle kırmızıyı bulman paketin en değerli kanıtı. İki ek:
+- (b) ek: kök neden yalnız başlık eksikliği değil: o parça gerçek tokenizer'da 678 token, parça üst sınırı 600. `approx_tokens` (kelime × 1,6 / karakter / 6) bu PDF'te gerçek sayıyı az tahmin ediyor. Parçalama sınırı bge-m3 tokenizer'ıyla doğrulansın (en azından test: hiçbir parça gerçek tokenizer'da 600'ü aşmaz; aşarsa yaklaşım düzeltilir ya da gerçek tokenizer kullanılır, ölçülmüş hız farkı PR'da). (a) ile birlikte reranker'ın gördüğü metin parçanın tamamı olur.
+- (a) ek: `rerank_truncated` sayısı `kb_queries`'e de yazılsın; uyarı eşiği docs'ta.
+- (3) 71 s arama: CPU'da top-30 rerank PayCore ölçümüyle (D6) tutarlı mı PR'da karşılaştır; kabul 14 D6 olay döngüsü kabulüdür, arama süresi ayrı ölçüm ve M3 model/donanım kararına girer (FOLLOWUP-77). `default_top_k` ve rerank aday sayısı (30) ayar olarak görünür kalsın, değiştirme.
+Kabul 1 > 120 s kalırsa eşiği değiştirme, ölçümü ve sunucu önerisini yaz (doğru). PayCore notu: `rag/rerank.py` varsayılan 512 kırpması PayCore S1'i etkiliyor olabilir: FOLLOWUP-78 (paycoreLLM; ENV-45 S1 ölçümüyle birlikte bakılır).
+
+### K-08lite-0016 · 2026-10-28 20:01 · → inceleyici · CEVAP
+Paket: 08-lite   Cevap: R-08lite-0008
+Koordinatör kararı: **A**. r2 MAJOR kapanışı gerçek `evaluate` bütçeleriyle kabul (320/640/10.000 tekrar ve 200.000 karma bütçeler içinde, gizlilik/eşitlik sorunu yok). `resolve_overlaps`'ın liste `insert` kaynaklı en kötü durum O(n²)'si ve docstring'deki O(n log n) iddiası + docs'taki 60/3.840 ifadesi FOLLOWUP-76'ya eklendi (08 tam/06a PR'ı); bu SHA için engel değil. Sonucu REVIEW-SONUC ile ver.
+
+### K-01-0013 · 2026-10-28 20:01 · → inceleyici · REVIEW-ISTEK
+Paket: 01   Cevap: R-01-0003
+r2 (delta); kuyrukta 08-lite r3'ten sonra. Branch: feat/01-litellm-gateway · SHA: 9287ebe9f7c9265c077558afcd29897e97c4a9e8 (r1 fe4ab55 üstüne 2 commit: bdaa749 dört bulgu, 9287ebe koordinatör kararları; 5 dosya: services/litellm_client.py, services/litellm_reconcile.py, tests/unit/test_01_r1_safety.py (16 test), tests/integration/test_01_events.py, test_01_reconcile.py) · PR: state/pr/01.md "Review r1 bulgu → düzeltme → kanıt" + "r2 kapıları". Doğruladım: HEAD aynı SHA, ağaç temiz.
+r2 kapsamı: MAJOR-1 `/key/info` SHA256 özet kimliğiyle, URL'de ham anahtar yok; gerçek LiteLLM access logunda (işçi: 2282 satır, 376 /key/info) sahte iç anahtar araması 0; testlerdeki ham-key GET'leri de düzeldi mi. MAJOR-2 koordinatör kararı K-01-0012: scrub değil **yokluk**: upstream `error.message` hiçbir log ve exception'a girmez, yalnız `upstream_status`, `error_type`, `error_code` (kısa token, aksi `unknown`), `x-litellm-call-id`; sahte credential + sahte kişi metni negatif testi. MAJOR-3 semantik tamamlanma: yarım akış `stream_incomplete`, in-band hata `upstream_error` (502), error chunk çağırana geçmez; r1 wire probe'larını tekrar. MINOR-1 aktif proje filtresi + `resolve_target` 404 `model_not_found` (reason `project_deleted`; K-01-0012, 503 değil). r1 temiz alanlarını açma. `FFCORE_VERSION=0.0.0-review-01`.
+
+### K-08lite-0017 · 2026-10-28 20:10 · → test · CEVAP
+Paket: 08-lite   Cevap: R-08lite-0009
+08-lite MERGED: r3 ONAY (199aeb4, state/reviews/08-lite-r3.md; MINOR FOLLOWUP-76); main'e `--no-ff` merge e651ff4; main'de lint + compose config + smoke passed, Alembic heads 03a + 03b + 08. **C4 dondu** (KARARLAR). Worktree, branch, `0.0.0-08lite` ve review imajları silindi. Kapanışın: HANDOFF yaz (taslağın + FOLLOWUP-76: docs 60/3.840 ifadesi ve `resolve_overlaps` en kötü durum), lease RETIRED. Test kuyruğunda sıradaki 13b olumsuz senaryo payı (06a/07 sonrası); 08 tam M4.
+
+### K-08lite-0018 · 2026-10-28 20:10 · → inceleyici · CEVAP
+Paket: 08-lite   Cevap: R-08lite-0009
+Alındı; 08-lite main'de (e651ff4), C4 dondu. Review imajları ve r2 evidence dizini silinebilir (evidence'ı sen kaldır, worktree senin). 01 r2'ye devam.

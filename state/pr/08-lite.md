@@ -1,6 +1,6 @@
 # PR: 08-lite guardrail engine, regex PII, policy API
 
-**Paket:** 08-lite · **Sınıf:** [A] (bağımlılık yok; paylaşılan dosya dokunuşları S1-S5'te soruldu) · **Branch:** feat/08-lite-guardrails · **Baz commit:** 591aac3 · **Oturum:** ffcore-test-08-lite · **Durum:** VERIFIED (r1 düzeltmesi) · **HEAD:** 7a7dc35e156b17f72e567dad3bfbf584f4f7a898 (r1 incelenen: 21812317)
+**Paket:** 08-lite · **Sınıf:** [A] (bağımlılık yok; paylaşılan dosya dokunuşları S1-S5'te soruldu) · **Branch:** feat/08-lite-guardrails · **Baz commit:** 591aac3 · **Oturum:** ffcore-test-08-lite · **Durum:** VERIFIED (r2 düzeltmesi) · **HEAD:** 199aeb46c813996517332d31ca2cd6f8a178d41a (r1 incelenen: 21812317, r2 incelenen: 7a7dc35)
 
 ## Plan (kodlamadan önce)
 
@@ -154,6 +154,14 @@ r1 düzeltmesi tek commit `7a7dc35` (21812317 üstüne). Kırmızı testler önc
 | MAJOR-3 Redis ileri/geri eşleme atomik değil | get-or-create tek Lua `EVAL`: HGET → HINCRBY → iki alanlı HSET → EXPIRE aynı script içinde (sayaç, iki yön, TTL atomik) | `test_08_3_redis_store_publishes_both_directions_atomically` (ağ gecikmeli sahte istemci; eski kodda ikinci çağrı ters kayıt yokken token döndürdü). **Sınır:** gerçek Redis'te 50 eşzamanlı çağrı (`test_08_3b_concurrent_tokenize_resolves_every_token`) eski kodda da geçiyor, yerel Redis pencereyi kapatıyor; kırmızı kanıt sahte istemcili unit testtir. Süreç kesilmesinde TTL'siz hash riski artık yok (tek komut); crash senaryosu ayrıca koşulmadı |
 | MAJOR-4 yerleşik zincir projenin `default` PII satırını kullanmıyor | K-08lite-0006 A: `service.resolve_policy` yerleşik zincirin `pii_policy_key` referanslarını `resolve_pii` ile çözer (proje satırı, yoksa sürümlü yerleşik) | `test_08_s5_builtin_chain_uses_the_projects_stored_pii_default` (21812317'de düştü); kısa değer testi aynı yolu özel desenle kullanır |
 
+## Review r2 bulgu → düzeltme → kanıt (state/reviews/08-lite-r2.md, DUZELT K-08lite-0011)
+
+r2 düzeltmesi tek commit `199aeb4` (7a7dc35 üstüne).
+
+| Bulgu | Düzeltme | Kanıt (önce kırmızı: 7a7dc35'te 320/640/10.000 tekrar ve 200.000 karakter bütçeyi aştı) |
+|---|---|---|
+| MAJOR-1 önizleme O(n²): aynı değer n kez → her önizlemeye n² span; 640 tekrar 12 s+ | (1) Önizleme için üç ayrı sınır: **tarama penceresi 4.096** karakter (yalnız bu kısım taranır), **gösterim sınırı 3.840** (girdinin bu konumundan sonrası hiçbir zaman önizlemeye alınmaz; aradaki 256 karakter pencere kenarında kesilmiş bir değerin açık görünmemesi içindir), **önizleme 60 karakter** (`input_preview`'ın gerçek uzunluğu, değişmedi). Zincirin bulduğu bir değer için pencere + değer boyu kadar bakılır, kenarı aşan değer de bulunur; (2) zincirin bulduğu değerler `dict` ile tekil, her değer tek tarama; (3) örtüşmeler tek sıralı geçişte birleştirilir (birleşim, kısaltma yok). Ek, inceleyicinin adlandırmadığı ikinci O(n²): tanıyıcıların `resolve_overlaps`'ı ikili taramaydı (10.000 bulguda aynı duvar); başlangıca göre sıralı listede komşu kontrolüyle O(n log n), sonuç aynı (en güçlü kazanır). (4) Kural taraması ve önizlemeler `asyncio.to_thread`; `latency_ms` önizlemeyi içerir. Bulgular her zaman tüm metni kapsar (atlama/kırpma yok) | `tests/unit/test_08_cost.py` gerçek `evaluate` yolunda üst sınır (P95 değil; süre aşımı ya da bitmeme kırmızı, daemon thread): 320/640 tekrar < 0,5 s, 10.000 tekrar < 1 s (bulgu sayısı = tekrar sayısı, önizlemede ham e-posta yok), 200.000 karakter karışık metin < 1 s (ham değer yok), `latency_ms` toplamı ≥ ölçülen sürenin yarısı, pencere kenarını aşan 6.000 karakterlik sır yalnız `[API_TOKEN]`. r1 gizlilik negatifleri (birim + gerçek DB/API) aynı matriste yeşil. **Tek CPU / 512 MB** (`docker run --cpus=1 --memory=512m`, tek koşu): 640 tekrar 0,036 s; 10.000 tekrar 0,418 s; 200.000 karışık 0,198 s (docs/guardrail.md gecikme tablosu) |
+
 ## C4 donmuş biçim (bu PR'la donar)
 
 - **Aşamalar ve sırası:** `prompt.pre, input.pre, output.pre, output.stream.delta, tool.pre, tool.post, egress` (`ffcore/guardrails/categories.py` `STAGES`; migration'da donmuş kopya; `test_c4_stage_and_action_lists`, `test_c4_decision_contract_in_draft`).
@@ -166,7 +174,7 @@ r1 düzeltmesi tek commit `7a7dc35` (21812317 üstüne). Kırmızı testler önc
 
 ## Değişen dosyalar
 
-Branch `feat/08-lite-guardrails` @ 7a7dc35 (baz 591aac3), 8 commit (r1 ilk 7 + düzeltme 1), 37 dosya.
+Branch `feat/08-lite-guardrails` @ 199aeb4 (baz 591aac3), 9 commit (r1 ilk 7 + r1 düzeltmesi + r2 düzeltmesi), 38 dosya (`tests/unit/test_08_cost.py` yeni).
 - **guardrails (yeni):** `backend/ffcore/guardrails/{categories,findings,recognizers/regex,masking,rules,schemas,engine,builtin,settings,service,quality,api_schemas}.py`
 - **API ve model:** `backend/ffcore/api/guardrails.py` (yeni), `api/__init__.py` (kendi satırı), `models/guardrails.py` (yeni), `models/__init__.py` (kendi satırı)
 - **Migration:** `backend/alembic/versions/08_0001_guardrails.py` (dal `08`, `depends_on=("03a_0001",)`)
@@ -206,6 +214,19 @@ Branch `feat/08-lite-guardrails` @ 7a7dc35 (baz 591aac3), 8 commit (r1 ilk 7 + d
 | S5 | Yerleşik default (monitor), API'de görünür, satır geçersiz kılar | `test_08_s5_builtin_default_is_monitor_and_valid`, `test_08_s5_builtin_default_listed_until_overridden` | geçti |
 
 ## Çalıştırılan komutlar
+
+**r3 (HEAD 199aeb4, imaj `0.0.0-08lite` yeniden derlendi):**
+
+| Komut | Ortam | Exit | Süre |
+|---|---|---|---|
+| `make lint` | | 0 | 1 s |
+| `make test` | `DEPLOY_PROFILE=llmaas GUARDRAIL_EGRESS_ENABLED=true` | 0 (190 passed) | 19 s |
+| `make test-int` | `DEPLOY_PROFILE=llmaas GUARDRAIL_EGRESS_ENABLED=true` | 0 (110 passed) | 113 s |
+| `make test` | `DEPLOY_PROFILE=airgap GUARDRAIL_EGRESS_ENABLED=false` | 0 (190 passed) | 19 s |
+| `make test-int` | `DEPLOY_PROFILE=airgap GUARDRAIL_EGRESS_ENABLED=false` | 0 (110 passed) | 94 s |
+| `docker run --rm --cpus=1 --memory=512m ffcore/tools:0.0.0-08lite pytest tests/unit/test_08_cost.py` + üç girdi ölçümü | tek CPU | 0 (6 passed) | 1,5 s |
+| `up -d --wait backend litellm langfuse-web langfuse-worker` (`BACKEND_PORT=18008`) + `make smoke` | | 0 | |
+| `down -v` | | 0 | |
 
 **r2 (HEAD 7a7dc35, imaj `0.0.0-08lite` yeniden derlendi):**
 
@@ -268,3 +289,4 @@ Not: duraklamadan önce paylaşılan `ffcore/tools:0.0.0` imajıyla aynı matris
 - `/internal` yol farkı 04a ile (varsayım 15) ve `service_actor` kopyası: merge sırasında tek yere iner.
 - `guardrail_events` büyür; saklama 03c'de (FOLLOWUP önerisi: retention sınıfı + partition).
 - Redis istemcisi istek başına açılıp kapanıyor (basit ve döngü güvenli); yük altında havuz gerekirse 06a bağlarken ölçülür.
+- `docs/guardrail.md` gecikme bölümündeki "show at most the first 3,840" ifadesi aynı belirsizliği taşıyor (önizleme yine 60 karakter; 3.840 girdi konumu sınırı). Branch'e commit yasağı nedeniyle düzeltilmedi; r3'te DUZELT gelirse ya da merge sonrası küçük docs düzeltmesi olarak alınır.
