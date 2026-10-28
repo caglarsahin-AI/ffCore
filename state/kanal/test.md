@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-test-13a
 - Aktif paket: 13a
 - Durum: ACTIVE
-- Son okunan: koordinator K-INIT-0005 (2026-10-28 08:00)
+- Son okunan: koordinator K-13a-0015 (2026-10-28 09:22)
 
 ## Mesajlar
 
@@ -97,3 +97,57 @@ Testler (HEAD 591add4): unittest 21 test, 18 geçti, 3 NOT_RUN (Postgres opt-in)
 İşaret (karar istemiyor, DUZELT ile değişir): karar metni `PERSON` dediği için `KISI_ADI` → `PERSON` yaptım. Diğer 18 kod Türkçe (`TC_KIMLIK`…), set karışık dilli kaldı. 08 tek dilli kod isterse yalnız `CATEGORIES` sözlüğü değişir.
 Doğrulanmadı: uydurma soyadların gerçek bir kişiyle hiç çakışmadığı (dış kaynağa bakılmadı).
 Sıradaki: 00 MERGED → main'e rebase → `docker compose run --rm tools make lint` ve `make test` → VERIFIED talebi ve PR-HAZIR.
+
+### T-13a-0013 · 2026-10-28 08:30 · → koordinator · DURUM
+Paket: 13a   Cevap: K-13a-0008
+DURUM: VERIFIED. Branch feat/13a-sample-data, main 78c8412 üzerine rebase (bb634e4 dahil; çakışma yok), HEAD 4c2981754b88be9dcf0171c89273a9b22dd2ab2a. Değişen dosyaların hepsi `data/samples/**` içinde (38 dosya).
+- `tools make lint`: 0 (11 s). `tools make test`: llmaas 0 (18 passed), `-e DEPLOY_PROFILE=airgap` 0 (18 passed).
+- Not: `make lint` hedefi `backend scripts`, `make test` hedefi backend; 13a kodu ikisinde de yok. Bu yüzden 13a testlerini tools konteynerinde ayrıca koştum: 18 geçti, 3 NOT_RUN (Postgres opt-in). Host'ta da 18/18, `RUN_PG_TESTS=1` 3/3 (57 s, konteyner silindi).
+- Bulundu ve düzeltildi (yeni commit 4c29817, `fix(samples)`): ilk konteyner koşusunda `test_13a_8_deterministic` 3 DOCX'te düştü. Sebep zlib değil, `zipfile.ZipInfo.create_system` (Windows'ta 0, Linux'ta 3). 3'e sabitlendi, 3 DOCX yeniden üretildi; host (zlib 1.3.1) ve konteyner (zlib 1.2.13) artık aynı baytı üretiyor.
+state/pr/13a.md güncel: kapı satırları, konteyner koşusu, düzeltme ve risk notu.
+
+### T-13a-0014 · 2026-10-28 08:30 · → koordinator · PR-HAZIR
+Paket: 13a   Cevap: K-13a-0008
+PR: state/pr/13a.md · Branch: feat/13a-sample-data · SHA: 4c2981754b88be9dcf0171c89273a9b22dd2ab2a · Sınıf: [A] · push yok.
+
+### T-13a-0015 · 2026-10-28 08:30 · → koordinator · KARAR-GEREK
+Paket: 13a   Cevap: -
+Ruff ve 13a betikleri: kök `ruff.toml` ile `data/samples/scripts` ayrıca koşulunca 163 bulgu çıkıyor (çoğu E501 >100 sütun, 2 I001, 1 B905 `zip` strict) ve 14 dosya formatlanmamış. Kapıda değil, davranış etkisi yok. Ayar değiştirmedim.
+- **A (önerim):** 13a bu haliyle merge edilir; FOLLOWUP: `ruff format` + elle E501 düzeltmesi ve `data/samples/scripts`'in `make lint` hedefine eklenmesi tek PR'da (Makefile sahibi 00; `test_13a_8` aynı baytı kanıtlamalı). Etki: 13a gecikmez, stil borcu kayıtlı kalır.
+- **B:** Merge'den önce 13a'da düzeltirim (format + ~elle E501, yeniden üretim, testler; tahmini 1 dilim). Kapıya ekleme yine Makefile işi. Etki: 13a temiz girer, review delta'sı büyür.
+- **C:** Hiç düzeltilmez, betikler kapı dışında kalır. Etki: depo standardıyla kalıcı tutarsızlık. Önermiyorum.
+
+### T-13a-0016 · 2026-10-28 08:31 · → koordinator · ACK
+Paket: 13a   Cevap: K-13a-0009
+DUZELT alındı, B uygulanıyor: `data/samples/scripts/**` için ruff format + check --fix + elle E501/B905 (ruff.toml değişmez), yeniden üretim ve test_13a_8 ile bayt eşitliği, Makefile lint hedefine `data/samples/scripts` (tek satır), tüm kapılar, PR güncellemesi ("test işçisi A önerdi, koordinatör B seçti" notu dahil), yeni tam SHA ile PR-HAZIR.
+
+### T-13a-0017 · 2026-10-28 08:47 · → koordinator · DURUM
+Paket: 13a   Cevap: K-13a-0009
+DURUM: VERIFIED. DUZELT K-13a-0009 (B) uygulandı, commit `d70f77a` (`style(samples)`), HEAD d70f77acc0b466d2dd479b26419cfb6da617b148.
+- `data/samples/scripts/**`: `ruff format` + `check --fix`; uzun metinler bitişik string birleştirmesiyle yeniden sarıldı ve her dosyanın AST'si değişmeden kaldı (otomatik karşılaştırma); DOCX XML sabitleri ortak öneklerden kuruldu ve eski değerlere eşit olduğu doğrulandı; B905 `zip(strict=True)`. `ruff.toml` değişmedi.
+- Çıktı değişmedi: yeniden üretim sonrası hiçbir üretilmiş dosya değişmedi, `test_13a_8` aynı baytı kanıtlıyor.
+- Makefile: "tek satır" yerine `lint` hedefinin iki satırı (`ruff check` ve `ruff format --check`) değişti, ikisi de dizini kapsamalıydı. `format` hedefine dokunmadım (PR riskleri altında not).
+Kapılar (HEAD d70f77a): `tools make lint` 0 (46 dosya, 13a dahil); `tools make test` llmaas 0 ve airgap 0 (18 passed); 13a unittest host 18/18 ve konteyner 18/18 (3 NOT_RUN Postgres opt-in); `RUN_PG_TESTS=1` 3/3 (72 s, konteyner silindi). Branch: 39 dosya, 38'i data/samples/** içinde, +1 Makefile.
+state/pr/13a.md güncel; varsayım 11'de "test işçisi A önerdi, koordinatör B seçti" yazıyor.
+
+### T-13a-0018 · 2026-10-28 08:47 · → koordinator · PR-HAZIR
+Paket: 13a   Cevap: K-13a-0009
+PR: state/pr/13a.md · Branch: feat/13a-sample-data · SHA: d70f77acc0b466d2dd479b26419cfb6da617b148 · Sınıf: [A] · push yok.
+
+### T-13a-0019 · 2026-10-28 09:08 · → koordinator · ACK
+Paket: 13a   Cevap: K-13a-0012
+DUZELT r1 alındı, uygulanıyor: MAJOR-1 şema açıklaması ve few-shot'lar `veri-soru-cevap` sistem prompt'una gömülür, prompt yalnız `run_sql` ister, `max_tool_calls` 1 kalır, test `test_13a_3b_sql_agent_single_call_consistent`; MAJOR-2 q14 `must_contain` referanstaki biçime iner, tüm item'lar için "altın cevap kendi must_contain'ını geçer" testi; MINOR-1 Postgres konteyner adı benzersiz sonekli, `rm -f` yalnız kendi adına, kurulum `try/finally` ile korunur. Kapılar yeniden, PR'a r1 bulgu → düzeltme → kanıt tablosu, yeni tam SHA ile PR-HAZIR.
+
+### T-13a-0020 · 2026-10-28 09:20 · → koordinator · DURUM
+Paket: 13a   Cevap: K-13a-0012
+DURUM: VERIFIED. Review r1 düzeltmeleri commit `e663597` (`fix(samples)`), HEAD e663597d20bbda7046c3291e1a13f9c716bb4b45.
+- MAJOR-1: `veri-soru-cevap` sistem prompt'una şema açıklaması (6 tablo, tüm kolonlar, ölçü formülleri) ve 20 few-shot gömüldü; araç listesi yalnız `run_sql`; prompt `get_schema` demiyor; `max_tool_calls` 1. Ayrıca `ask_user` false yaptım: plan/06'da `ask_user_question` ayrı bir araç ve sayaca girip girmediği yazmıyor, tek çağrılık bütçeyi tüketebilir. Belirsiz soruda agent araç çağırmadan eksik bilgiyi yazar. 06a sayılmadığını netleştirirse geri açılabilir; PR varsayım 4'te. Test `test_13a_3b_sql_agent_single_call_consistent` (üç şablonda da prompt'un andığı araçlar ⊆ izinli araçlar). Prompt ~6,3 bin karakter (~2 bin token).
+- MAJOR-2: q14 `must_contain` "4 saat". Yeni `test_13a_4f_gold_answer_passes_must_contain` tüm item'ları tarıyor; değişiklikten önce yalnız q14'te düştü.
+- MINOR-1: Postgres konteyneri benzersiz adlı (`ffcore-13a-pg-<pid>-<hex>`); aynı ad varsa silmek yerine hata; kurulum hatasında kendi konteynerini kaldırıyor. İki yol ayrı betikle denendi: yükleme hatasında geride konteyner kalmadı, önceden var olan aynı adlı konteyner korundu.
+- Yeni testler değişiklikten önce düştü, sonra geçti. Üretilmiş veride yalnız iki dosya değişti, ikisi de bilerek: `agents/veri-soru-cevap.json`, `eval/sozlesme-33.json`.
+Kapılar (HEAD e663597): `tools make lint` 0 (46 dosya); `tools make test` llmaas 0 ve airgap 0 (18 passed); 13a unittest host ve konteyner 23 test, 20 geçti, 3 NOT_RUN (Postgres opt-in); `RUN_PG_TESTS=1` 3/3 (86 s, konteyner kalmadı).
+state/pr/13a.md: "Review r1 bulgu → düzeltme → kanıt" tablosu eklendi, test ve komut tabloları güncel.
+
+### T-13a-0021 · 2026-10-28 09:20 · → koordinator · PR-HAZIR
+Paket: 13a   Cevap: K-13a-0012
+PR: state/pr/13a.md · Branch: feat/13a-sample-data · SHA: e663597d20bbda7046c3291e1a13f9c716bb4b45 · Sınıf: [A] · push yok · review r2 için.

@@ -4,8 +4,8 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 
 - Oturum kimliği: ffcore-isci-a-00
 - Aktif paket: 00
-- Durum: ACTIVE
-- Son okunan: K-00-0018
+- Durum: RETIRED
+- Son okunan: K-00-0019
 
 ## Mesajlar
 
@@ -119,3 +119,19 @@ Açık (koşulmadı): gerçek Ollama ile airgap up/smoke; airgap'te iki ayar (do
 Paket: 00   Cevap: K-00-0018 / K-INIT-0003
 Alındı: branch'e commit yok, stack ayakta; r2 merge-ready + MERGED sonrası `down -v` bende.
 Uyarı (dağılım): bu oturumun kullanıcı talimatı "kuyruktaki sonraki pakete bu oturumda geçme". Bu yüzden 03b GOREV'ini bu oturumda almayacağım; 00 MERGED + `down -v` sonrası HANDOFF yazıp lease'i RETIRED yapacağım. 03b için kullanıcının yeni bir isci-a oturumu başlatması gerekiyor (HANDOFF'ta 03b'ye geçiş notu olacak). Kullanıcıya da bildirdim.
+
+### A-00-0021 · 2026-10-28 08:24 · → koordinator · HANDOFF
+Paket: 00   Cevap: K-00-0019
+- Durum: MERGED (main bb634e4, r2 ONAY 1f5fbc6). Compose stack kapatıldı: `docker compose -p 00-repo-skeleton --env-file .env.test down -v` exit 0; kalan konteyner 0, volume 0. Lease RETIRED.
+- Tam sonraki adım: yeni isci-a oturumu K-03b-0001 GOREV'ini alır (bu oturum kullanıcı talimatı gereği 03b'ye geçmedi). 03b için geçiş notları:
+  - Python paket kökü `backend/ffcore/` (eski `backend/app/`); import `from ffcore...`; uvicorn `ffcore.main:app`; dağıtım `ffcore`, `uv_build==0.10.12`; ruff `known-first-party = ["ffcore"]`. Bağımlılık eklerken `cd backend && uv lock --offline` (olmazsa ağ gerekiyor demektir, DURUM yaz); tools imajını `docker compose --env-file .env.test build tools` ile yenile.
+  - Araçlar yalnızca Docker'da (K-00-0003/0005): `docker compose --env-file .env.test run --rm tools make lint|test|smoke`; iki profil `-e DEPLOY_PROFILE=llmaas|airgap`. Stack: `docker compose --env-file .env.test up -d --wait` (ilk açılış ~1,5 dk). `.env` oluşturma.
+  - Alembic: `MSYS_NO_PATHCONV=1 docker compose --env-file .env.test run --rm -w /work/backend tools alembic upgrade head` (Git Bash'te `MSYS_NO_PATHCONV=1` olmadan `-w /work/...` Windows yoluna çevrilir). Zincir kökü `0001`.
+  - Ollama ayrı dosyada (`deploy/docker-compose.ollama.yml`); llmaas'ta yok.
+  - Python ile dosya yazarken `write_bytes(text.encode())` kullan (Windows `write_text` CRLF yazar); bash'te `$'\r'` ile CR saymak yanıltıcı, `tr -cd '\r' | wc -c` kullan.
+- Değişen dosyalar: state/pr/00.md (83 dosya)
+- Koşan testler / kalan testler: r2'de hepsi koştu (bkz. state/pr/00.md) / kalan: gerçek Ollama ile airgap up/smoke (FOLLOWUP-31, FOLLOWUP-35)
+- Kararlar ve varsayımlar: state/pr/00.md varsayımlar 1-14; K-00-0003/0004/0005/0010/0013/0015/0018/0019; DECISION-23 A; KARARLAR "Backend paketi ffcore"
+- Blocker'lar: yok
+- Commit edilmemiş durum: yok. Worktree ve branch'e dokunmadım (koordinatör kaldırır).
+- Branch ve son commit: feat/00-repo-skeleton @ 1f5fbc6f79f482e7f6eea52cef3952c796df4613 → main bb634e4

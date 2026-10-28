@@ -1,6 +1,6 @@
 # FFCore: Kurumsal LLM Platformu Geliştirme Planı
 
-Sürüm 2.4, 27 Ekim 2026 (geçmiş bölüm 11). **PoC kapsamı** (M1-M3) bölüm 7'de işaretlidir ve **PayCore LLM'de `airgap` profiliyle canlı koşar** (bölüm 2d); PoC sonrası paketler brief'leriyle birlikte bağlayıcı kalır. Bu dosya mimariyi, kısıtları, depo düzenini ve iş paketlerinin sırasını tanımlar. Her iş paketi `plan/` klasöründe ayrı bir brief olarak durur ve tek başına bir geliştirici agent'a verilebilir. Bir agent'a brief verirken bu dosyayı da ekleyin; ortak kurallar burada.
+Sürüm 2.5, 28 Ekim 2026 (geçmiş bölüm 11). **PoC kapsamı** (M1-M3) bölüm 7'de işaretlidir ve **PayCore LLM'de `airgap` profiliyle canlı koşar** (bölüm 2d); PoC sonrası paketler brief'leriyle birlikte bağlayıcı kalır. Bu dosya mimariyi, kısıtları, depo düzenini ve iş paketlerinin sırasını tanımlar. Her iş paketi `plan/` klasöründe ayrı bir brief olarak durur ve tek başına bir geliştirici agent'a verilebilir. Bir agent'a brief verirken bu dosyayı da ekleyin; ortak kurallar burada.
 
 ## 1. Amaç
 
@@ -47,7 +47,7 @@ Paket 17 (son kullanıcı açılışı, AD/LDAP) FFCore Gateway'e girer. Alan ad
 | Son kullanıcı (P4) | Pilotta (M3-M5) son kullanıcı yok; sohbet analist ve bilgi işlemle test edilir. `user` rolü veri modelinde rezerve; son kullanıcı açılışı ve AD/LDAP girişi M6 sonrası paket 17 |
 | Kimlik: yerel kullanıcı + rol + erişim modu | E-posta/şifre ile giriş. Dört rol: admin, developer, analyst, user (rezerve, pilotta atanmaz); her rolün iki erişim modu: `edit` ve `read`. Salt-okunur kullanıcı rolünün gördüğü ekranların aynısını görür, hiçbir değişiklik yapamaz (önyüzde düğmeler pasif, API'de 403). AD/LDAP ileride |
 | Özel nitelikli kişisel veri RAG'e girmez | RAG'de sözleşme, prosedür, kurumsal doküman; yapısal veri için text-to-SQL yalnızca ayrı, salt-okunur bir agent sunum DB'sine (kişi düzeyi veri yükleme anında maskelenmiş). Hastane örneği: hasta verisi platformda yok, lakehouse'ta kalır |
-| Dil | Arayüz Türkçe; kod, API, veritabanı adları, commit mesajları İngilizce |
+| Dil | **Tersine karar (28 Ekim):** ürün global; arayüz, API hata metinleri, OpenAPI açıklamaları ve `docs/` İngilizce varsayılan, Türkçe yerel (`messages/en.json` kaynak, `tr.json` çeviri); kod, veritabanı adları, commit mesajları İngilizce; proje belgeleri Türkçe |
 
 ## 2b. Dağıtım profilleri
 
@@ -179,7 +179,7 @@ Bu bölüm kısa kuralları verir; geliştirme felsefesi `FELSEFE.md` ve FFCore'
 - **Kuyruk altyapısı (R10.8, C8):** tek kütüphane `arq` (zamanlı işler de `arq cron_jobs`; APScheduler yok); 04 worker, 06 scheduler ve 16 senkron aynı Redis'te ayrı kuyruk adlarıyla (`ingest`, `llm-interactive`, `llm-background`, `sync`). Run = arq işi; tekil model çağrıları `LLM_SLOTS` öncelikli eşzamanlılık yuvasından geçer (06). `BACKGROUND_WINDOW` profil seed değeridir: yalnızca `airgap` cpu'da dolu (A8).
 
 - Python 3.12, FastAPI, SQLAlchemy 2, Alembic, Pydantic v2, pytest. Ruff ile lint ve format.
-- Node 20, Next.js 15, TypeScript, Tailwind, shadcn/ui. Türkçe metinler `frontend/messages/tr.json` içinde; kodda sabit Türkçe metin yok.
+- Node 20, Next.js 15, TypeScript, Tailwind, shadcn/ui. UI metinleri `frontend/messages/en.json` (kaynak) ve `tr.json` (çeviri) içinde; kodda sabit metin yok.
 - Tüm web ekranları açık (light) ve koyu (dark) temada geliştirilir. Renkler yalnızca CSS değişkenleri (design token) üzerinden; bileşenlerde sabit renk yok. Varsayılan sistem tercihi (`prefers-color-scheme`), kullanıcı üstten değiştirir, seçim kalıcıdır. Her ekran ve grafik iki temada da test edilir (Playwright ekran görüntüsü karşılaştırması).
 - Proje sahipli kök tablolar: `id` (uuid), `project_id`, `created_at`, `updated_at`, `created_by`, `deleted_at` (silme yerine). İstisnalar adlandırılmış listededir (handbook/CONTRACTS.md C3): global (`users`), çocuk (`chunks`, `attachments`, `tool_actions`, `agent_versions`, `messages`, `few_shots`: projeyi FK zinciriyle alır) ve append-only olay tabloları (`run_events`, `audit_events`, `guardrail_events`, `usage_daily`, `kb_queries`, `mcp_server_calls`, `checkpoints`). Her tabloya körlemesine `project_id` eklenmez (B5).
 - Her mutasyon endpoint'i audit olayı üretir (`core/audit.py` decorator'ı).
@@ -264,6 +264,7 @@ Görsel akış tasarımcısı (Flow canvas), alt agent (sub-agent) devri, zamanl
 | 1.x | 24-26 Ekim | Dağıtım profilleri (2b), hafıza (14), kanallar (15), veri kaynakları (16), PayCore düzeltmeleri D1-D8, K1-K3, P1-P9 işlendi |
 | 2 | 26 Ekim 2026 | **Tersine karar:** ürün varsayılanı `llmaas`, Türkiye Hastanesi pilotu `llmaas`; `airgap` ikincil. Reviewer R maddeleri; 03 → 03a/03b; "Agent runtime referansı" bölümleri Kapsam'a eritildi; 04/05/06 → a/b; toplam 71 agent-günü, kritik yol ~20 gün |
 | 2.1 | 27 Ekim 2026 | Ürün adı FFCore ve modüller (1b); handbook/ ve state/ eklendi; PayCore'un müşteri olduğu netleşti |
+| 2.5 | 28 Ekim 2026 | **Tersine karar:** ürün dili İngilizce varsayılan + Türkçe yerel (bölüm 5 "Dil", 8); "Türkçe önyüz" ifadeleri DRIFT-36 ile düzeltilecek. Dağılım değişikliği (03b→A, 01/02→B, 08-lite→test, BASLATMA §4). Backend paketi `ffcore` (KARARLAR) |
 | 2.4 | 27 Ekim 2026 | İnceleme v9/v10 ve yedi kullanıcı kararı (`state/reviews/cevap-v9-v10.md`): canlı test yeri PayCore LLM (`airgap`), bölüm 2d; 00i paketi; FFCore ayrı depo + paycoreLLM tüketici, uzantı noktaları C14; Qdrant sparse PayCore'da birincil, embedding süreç içi (C10 tersine); DuckDB sarılır; Langfuse v3 kalır; 08-lite; 11 PoC dışı (Open WebUI); iki agent; S1 kabul; PoC ≈ 49 agent-günü |
 | 2.3 | 27 Ekim 2026 | İnceleme v4-v6 uygulandı (`state/reviews/cevap-v4-v6.md`): PoC kapsamı A1-A9 (03c ayrıldı, roller daraltıldı, LiteLLM team kaldırıldı, 09 Langfuse datasets, 10 ve 13 bölündü, `BACKGROUND_WINDOW` profil değeri, 17 Slack/Teams'ten önce); 7 blocker, 24 major, minörler; süreler ~101 agent-günü, PoC ≈51, kritik yol ~31 gün; kapı kuralı bağımlılık bazlı |
 | 2.2 | 27 Ekim 2026 | `FELSEFE.md` bağlandı: örtük Ollama→Anthropic fallback kaldırıldı (01), `run_events.fallback` olayı (06, C9), Postman içe aktarma reddedildi (05), KARARLAR üç durumlu ve "Reddedilenler" bölümü, dalga kapanışında tutarlılık denetimi |

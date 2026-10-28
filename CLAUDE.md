@@ -1,6 +1,6 @@
 # FFCore
 
-Kurumsal LLM platformu: model dışındaki her şey (kapı, bilgi tabanı, araçlar, agent'lar, koruma, izleme) kurum içinde. Ürün varsayılanı `llmaas` profili, ikincil `airgap`. Arayüz Türkçe, kod İngilizce. Ayrıntı PLAN.md.
+Kurumsal LLM platformu: model dışındaki her şey (kapı, bilgi tabanı, araçlar, agent'lar, koruma, izleme) kurum içinde. Ürün varsayılanı `llmaas` profili, ikincil `airgap`. Uygulama (arayüz, API, `docs/`) İngilizce varsayılan, Türkçe yerel; kod İngilizce; proje belgeleri ve kanal Türkçe. Ayrıntı PLAN.md.
 
 ## Okuma sırası
 
@@ -23,7 +23,7 @@ Kurumsal LLM platformu: model dışındaki her şey (kapı, bilgi tabanı, araç
 - Hasta ve kişi düzeyi kurum verisi platforma girmez; belge dışarı çıkmaz. PayCore LLM (`C:\ai_paycore\paycoreLLM`) canlı test yeri ve tüketicidir (PLAN 2d): `.env`, `data/**`, `eval/results/**` okunmaz; sunucuya bağlanılmaz; PayCore kodu kopyalanmaz, uzantıda kalır ya da C14 ile terfi eder.
 - Profil farkı `if profile` dalı değil yapılandırma değeri; testler iki profille koşar.
 - Fail-loud: sessiz fallback, kırpma, atlama yok; her red kayıtlı ve gerekçeli.
-- Türkçe metin yalnızca `frontend/messages/tr.json`; her ekran açık ve koyu temada.
+- UI metni yalnızca `frontend/messages/{en,tr}.json` (kaynak `en`, `tr` çeviri); kodda sabit metin yok; her ekran açık ve koyu temada.
 - Terimler handbook/TERMINOLOGY.md'deki gibi; PayCore müşteridir, ürün FF ailesinindir.
 - Belirsizlikte: PLAN → KARARLAR → CONTRACTS → brief sırasıyla bak; hâlâ belirsizse varsayımını PR notuna yaz, durma; kullanıcı kararı gerekiyorsa `state/BLOCKERS.md`'ye `DECISION-` kaydı.
 - Paralel oturum düzeninde (handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim"): `WORK_QUEUE`, `BLOCKERS` ve `KARARLAR`'ı yalnızca koordinatör yazar; diğer roller kendi `state/kanal/<rol>.md` dosyasına mesaj yazar. `state/` her zaman `C:\ai_paycore\ffcore\state\` mutlak yolundan kullanılır, worktree kopyasından değil.

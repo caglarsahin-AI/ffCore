@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-koordinator-20261028-0205
 - Aktif paket: tumu
 - Durum: ACTIVE
-- Son okunan: inceleyici R-00-0005; isci-a A-00-0020; isci-b B-00i-0002; isci-c C-10a-0001; test T-13a-0012 (2026-10-28 08:25)
+- Son okunan: isci-a A-00-0021 (HANDOFF, RETIRED); inceleyici R-13a-0004; isci-b B-00i-0009; isci-c C-10a-0008; test T-13a-0021 (2026-10-28 09:36)
 
 ## Mesajlar
 
@@ -260,3 +260,124 @@ Touch-zone: frontend/** (00'ın iskeleti üstüne: `app/`, `components/`, `style
 Bağımlı teslimatlar (00, MERGED): Next.js 15 + next-intl + next-themes + shadcn/ui iskeleti, `styles/tokens.css`, tema anahtarı, `messages/tr.json`, `frontend` compose servisi (`docker compose --env-file .env.test run --rm frontend npm ...`), iki tema görüntüsü örneği docs/images/00-tema-*.png. 03a henüz başlamadı: `frontend/mocks/openapi-03a.yaml` 03a'nın ilk commit'i (OpenAPI taslağı) gelince yazılır; o ana kadar şemayı tahmin etme (kendi kararın, K-10a-0000).
 Dilimler: (1) düzen: `sidebar-07` + `dashboard-01` blokları, gruplu sol menü (brief listesi), proje seçici, kullanıcı menüsü (rol, erişim modu, tema), "Kurumsal Mavi" preseti tokens.css'e; (2) `useAccess()` + `<WriteGate>` + rol bazlı menü görünürlüğü + "yetkiniz yok" sayfası (veri sahte, msw yalnız `FAKE_API=1`); (3) giriş, projeler, üyeler, sağlayıcılar, modeller ekran kabukları ve boş durumlar; (4) Vitest bileşen testleri, Playwright giriş + proje akışı sahte API ile, axe kontrastı, sabit renk grep/eslint kuralı, her ekran iki tema PNG'si; (5) `openapi-03a.yaml` bağlama ve tipler (03a taslağı gelince; gelmezse PR "sahte API" olarak kapanır, bağlama 10a-bağlama'da).
 Özel uyarılar: Node yalnızca konteynerde; `npm install` lock'u günceller, pinli sürümler PR'da; Türkçe metin yalnızca `messages/tr.json`; sabit renk yok; PR planı state/pr/10a.md ve DURUM: PLANNED önce; her kabul kriteri `test_10a_<n>_<slug>` ya da Playwright spec adı; push yok.
+
+### K-INIT-0007 · 2026-10-28 08:50 · → tumu · DURUM
+Paket: tumu   Cevap: -
+Kullanıcı kararı (KARARLAR "Ürün dili", PLAN 2.5, CLAUDE.md güncellendi): FFCore global ürün. Uygulamanın dışa dönük yüzeyi İngilizce varsayılan: arayüz (`messages/en.json` kaynak, `tr.json` çeviri), API hata metinleri, OpenAPI açıklamaları, `docs/`, README. Kod İngilizce (değişmedi). Proje belgeleri, brief'ler ve bu kanal Türkçe kalır. Brief'lerdeki "Türkçe arayüz / OpenAPI Türkçe açıklamalı" ifadeleri eskidir (DRIFT-36); GOREV'deki açık talimat geçerlidir. Örnek veri (13a) müşteri verisidir, Türkçe kalır.
+
+### K-03b-0002 · 2026-10-28 08:50 · → isci-a · DUZELT
+Paket: 03b   Cevap: K-03b-0001
+Uyarı (i) düzeltildi: OpenAPI açıklamaları ve API hata metinleri **İngilizce** (K-INIT-0007); hata kodları zaten İngilizce sabitler. Brief 03 "OpenAPI şeması Türkçe açıklamalı" eskidir. Gerisi aynı. Yeni oturum GOREV'i alırken bu mesajı da ACK'lar.
+
+### K-10a-0002 · 2026-10-28 08:50 · → isci-c · CEVAP
+Paket: 10a   Cevap: C-10a-0002 / C-10a-0003 / C-10a-0004 / C-10a-0005
+PLANNED onay, şu düzeltmelerle (plan state/pr/10a.md'ye işle, kod başlasın):
+1. Dil (K-INIT-0007, kullanıcı kararı): kaynak `messages/en.json`, `tr.json` çeviri; next-intl varsayılan locale `en`, `tr` ikinci; ekran metinleri İngilizce yazılır, Türkçe çevirisi aynı PR'da. Kabul: her anahtar iki dosyada var (test), bir ekran Playwright ile iki locale'de açılır. 00'ın tr.json anahtar düzeni korunur (C13 additive), en.json aynı anahtarlarla.
+2. C-10a-0002: A, yalnız boş durum + yükleme/hata kabuğu; veri şekli yok. Rol/erişim modu geliştirme fixture'ı (brief 03 adları) kabul.
+3. C-10a-0004: A. Kriter 7 (giriş + proje akışı) `test.fixme`, PR'da NOT_RUN ve "10a-bağlama'da açılır" notu. Giriş formu alanları PLAN 5'ten bellidir (e-posta, şifre); form kabuğu yapılır, gövde şeması yazılmaz.
+4. C-10a-0005: A. `mcr.microsoft.com/playwright:v<npm sürümü>-noble` digest pinli, `docker run --rm -v <frontend>:/app`; digest ve sürüm PR'da ve `deploy/offline/images.txt` varsa oraya (yoksa PR notu, 12 ekler). KARARLAR'a yazıldı. `@testing-library/react`, `jsdom`, `@axe-core/playwright` onaylı kapsamda, ayrı kayıt gerekmez.
+5. Lighthouse kapsam dışı kabul, FOLLOWUP-37 (10c). İki modlu ekran karşılaştırması 10c, gerçek backend 10a-bağlama: doğru.
+6. Kurumsal Mavi: token adları korunur, değerler değişir, `--chart-6..8` eklenir; iki temada WCAG AA axe ile kanıtlanır.
+Kod İngilizce, Türkçe metin kodda yok (eskisi gibi); sabit renk yok; push yok.
+
+### K-13a-0009 · 2026-10-28 09:00 · → test · DUZELT
+Paket: 13a   Cevap: T-13a-0013 / T-13a-0014 / T-13a-0015
+VERIFIED kabul: 4c29817 doğrulandı (main 78c8412 üstünde 10 commit, ağaç temiz, 38 dosya data/samples/** içinde, PR şablonu tam). DOCX `create_system` bulgusu iyi; PR'da kalsın.
+T-13a-0015 koordinatör kararı: **B**, A değil. Gerekçe: DOC-16 "sonra bakarız" borcu bırakmaz; ilk review temiz kodu görsün; Makefile artık serbest (00 MERGED, 03b/10a dokunmuyor). Öneriniz A görünür kalsın (PR varsayımlarına "test işçisi A önerdi, koordinatör B seçti" diye yaz).
+Yapılacak tek dilim: (1) `data/samples/scripts/**` için `ruff format` + `ruff check --fix` + elle kalan E501/B905; ayar (`ruff.toml`) değişmez. (2) Üreticileri yeniden koş; `test_13a_8_deterministic` aynı baytı kanıtlasın (format değişikliği çıktıyı değiştirmemeli; değişirse nedenini PR'a yaz). (3) Touch-zone genişletmesi: Makefile `lint` hedefine `data/samples/scripts` ekle (tek satır; başka değişiklik yok). (4) `tools make lint` 0, `tools make test` iki profil 0, 13a testleri 18/18 + Postgres 3/3. (5) state/pr/13a.md güncelle; yeni tam SHA ile PR-HAZIR. 4c29817 için REVIEW-ISTEK yazılmadı; yeni SHA ile yazılacak.
+Süre beklentisi ~1 saat.
+
+### K-13a-0010 · 2026-10-28 08:50 · → inceleyici · REVIEW-ISTEK
+Paket: 13a   Cevap: -
+Branch: feat/13a-sample-data · SHA: d70f77acc0b466d2dd479b26419cfb6da617b148 (baz main 78c8412, 11 commit) · Sınıf: [A] · PR açıklaması: state/pr/13a.md · Brief: plan/13-ornek-veri-demo.md (13a kısmı) · Worktree: .worktrees/feat/13a-sample-data (işçinin; detached checkout ile incele).
+Doğruladım: worktree HEAD aynı SHA, ağaç temiz; 39 dosya: 38'i data/samples/**, +1 Makefile (`lint` hedefine `data/samples/scripts`, koordinatör onaylı touch-zone genişletmesi K-13a-0009).
+İnceleme kapsamı: brief 13a kabul kriterleri ve PR "Kabul kriterleri → testler" tablosu (21 test; 3'ü Postgres opt-in `RUN_PG_TESTS=1`). Özellikle bak: (1) tamamen sentetik veri: gerçek kurum/kişi verisi, PayCore deposundan kopya yok; kişi adı yalnızca pii/ ve memory/ (DECISION-24 A, test_13a_9); (2) C18 PII etiket biçimi ve `categories.md` eşlemesi (karışık dil kodları koordinatör kabulü, FOLLOWUP-33); (3) sınav seti 33 madde dağılımı (DRIFT-28) ve `veri-soru-cevap` onaylı SQL (K-13a-0002); (4) deterministik üretim: seed, `test_13a_8` bayt eşitliği, DOCX `create_system` sabitlemesi (4c29817); (5) demo şemada kişi düzeyi veri olmaması; (6) stdlib-only (bağımlılık yok); (7) Superset OpenAPI örneğinin gerçek sunucuya bağlanmaması.
+Koordinatör kabulleri (bulgu değil): PDF geri okuma testi sınırı ve Docling okuması 04a'da; `make test` hedefi 13a testlerini kapsamıyor (backend'e özgü; 13a testleri ayrı unittest koşusuyla kanıtlı, PR'da); ruff borcu merge öncesi kapatıldı (karar B, test işçisi A önermişti).
+Yeniden koşmak istersen: `docker compose --env-file .env.test run --rm tools make lint`; `tools python -m unittest discover -s data/samples/scripts/tests`; Postgres testleri kendi geçici konteynerini açar ve siler. Sonucu REVIEW-SONUC ile aynı SHA'yı yazarak ver.
+
+### K-13a-0011 · 2026-10-28 08:50 · → test · CEVAP
+Paket: 13a   Cevap: T-13a-0017 / T-13a-0018
+Alındı; d70f77a doğrulandı (çıktı bayt aynı, Makefile lint 2 satır kabul, `format` hedefine dokunmaman doğru: PR riskine yazıldığı gibi 12/kapanışta hizalanır). REVIEW-ISTEK K-13a-0010 inceleyicide. Branch'e commit atma; DUZELT gelirse yeni SHA ile PR-HAZIR. Merge-ready gelince merge bende; ardından HANDOFF ve lease RETIRED, 08-lite yeni oturumda (K-INIT-0005).
+
+### K-00i-0002 · 2026-10-28 08:50 · → isci-b · CEVAP
+Paket: 00i   Cevap: B-00i-0003 / B-00i-0004
+KARAR-GEREK koordinatör kararı: **A**. Kardeş worktree `C:\ai_paycore\paycoreLLM-00i`, branch `feat/00i-ffcore-integration`, baz `master` 81e3609 (`git -C C:\ai_paycore\paycoreLLM worktree add ..\paycoreLLM-00i -b feat/00i-ffcore-integration master`). Ana kopyaya ve kullanıcının commit'lenmemiş dosyalarına dokunma. GOREV'in iki hatası düzeltildi: hedef branch `master` (main değil); çalışma yeri worktree, ana kopya değil. KARARLAR'a yazıldı ("00i çalışma yeri"); worktree'yi merge sonrası kullanıcı kaldırır.
+Dizin izni: oturumun paycoreLLM-00i'ye yazması için kullanıcı izni gerekecek; kullanıcıya bildirdim. İzin gelene kadar plan (state/pr/00i.md, ffcore'da) üzerinde çalış; PLANNED'i gönder.
+Hatırlatma: paycoreLLM'de okuma yasağı `.env`, `data/**`, `eval/results/**` worktree'de de geçerli; `.env` kopyalanmaz, `.env.test` sahte değerlerle.
+
+### K-10a-0003 · 2026-10-28 08:50 · → isci-c · CEVAP
+Paket: 10a   Cevap: C-10a-0006
+Alındı; locale için önek yok + `NEXT_LOCALE` cookie + kullanıcı menüsünde dil seçici kabul (varsayılan `en`). WORK_QUEUE 10a = IMPLEMENTING. Dilim sonlarında kısa DURUM yeter.
+
+### K-00i-0003 · 2026-10-28 09:03 · → isci-b · CEVAP
+Paket: 00i   Cevap: B-00i-0005 / B-00i-0006
+ID düzeltmesi: K-00i-0002 iki kez kullanıldı (koordinatör hatası); 08:50'deki karar A mesajı bundan sonra "K-00i-0002 (08:50)" diye anılır, numaralandırma buradan 0003 ile sürer.
+PLANNED onay (state/pr/00i.md: semboller doğrulanmış, felsefe soruları cevaplı, dilimler kararlara bağlı). Kararlar, hepsi koordinatör yetkisinde:
+- **K1: A.** `[dependency-groups] ffcore` + `[tool.uv.sources]` path editable; Dockerfile `--frozen`; Makefile `test` → `uv run --group ffcore pytest`. Sürüm yükseltmeleri (fastapi 0.162.0, pydantic 2.14.1, uvicorn, psycopg, pydantic-settings) PR'da tam liste; nexus aynasındaki varlığını **kullanıcı** merge'den önce doğrular: ENV-38 açıldı, KAYIT-TALEBI'ne gerek yok. Merge-ready bildirimi ENV-38'e bağlı olarak verilir.
+- **K2: A.** Yalnız `/health` açık; `/ask` ve `/v1/*` anahtar ister; `/docs`, `/redoc`, `/openapi.json` kapalı. Brief Kapsam B'nin ilk okuması eskimiş: kabul 52 esas (brief > sonraki düzeltme, DRIFT olarak dalga kapanışında brief 00i'ye işlerim). Test: anahtarsız `/v1/chat/completions` 401, `/health` 200, `/docs` 404.
+- **K3: A.** Touch-zone genişletmesi onaylı: rag/rerank.py, ingest/sync.py, config.py, rag/trace.py, Dockerfile, Makefile, .env.example, uv.lock, tests/test_00i_*.py. WORK_QUEUE'ya işlendi. Her dosya için PR "Değişen dosyalar"da neden.
+- **K4: A.** `compose.ffcore.yml` yalnız Langfuse v3 yığını (00 pinleri aynen, chainguard MinIO digest dahil), portlar 127.0.0.1; `langfuse:2` compose.yml'den çıkar. Yer tutucu servis yok.
+Varsayımlar 1-6 kabul. FOLLOWUP-39 (init.sql → Alembic, 03a) ve FOLLOWUP-40 (Jenkins test aşaması) açıldı; 4B router kapatma bu PR'da yok, doğru.
+Kod başlasın; dilim sonlarında DURUM. Sınıf [C] olduğu için merge'ü kullanıcı yapar; sen inceleyici onaylı SHA'ya kadar gelirsin.
+
+### K-13a-0012 · 2026-10-28 09:09 · → test · DUZELT
+Paket: 13a   Cevap: R-13a-0002 (state/reviews/13a-r1.md)
+Review r1: DUZELT; BLOCKER 0, MAJOR 2, MINOR 1. Yeni commit(ler) at, yeni tam SHA ile PR-HAZIR; r2'ye gider.
+MAJOR-1 (veri-soru-cevap: prompt önce `get_schema` sonra `run_sql` istiyor, `max_tool_calls` 1): koordinatör kararı, tek çağrı korunur (K-13a-0002, PLAN 2d onaylı SQL). Çözüm: şema açıklaması (`schema_descriptions`) ve few-shot'lar agent'ın sistem prompt'una gömülür, prompt yalnızca `run_sql` ister; `get_schema` araç listesinde kalmaz ya da prompt onu istemez. Test: prompt metninde `get_schema` geçmez, `max_tool_calls == 1`, izinli araç listesi tutarlı (`test_13a_<n>_sql_agent_single_call_consistent`). `max_tool_calls` 2'ye çıkarılmaz (06a'nın tek çağrı varsayımı ve onay kuyruğu buna göre).
+MAJOR-2 (q14 referans "4 saat", `must_contain` "4 saattir"): `must_contain` öğesini referans cevabın geçtiği biçime indir ("4 saat"); tüm item'lar için "altın cevap kendi `must_contain`'ını geçer" testi ekle (inceleyicinin yaptığı taramayı kalıcılaştır).
+MINOR-1 (Postgres fixture `setUpClass` başında sabit adlı konteyneri koşulsuz `rm -f`, kurulumda cleanup garantisi yok): konteyner adına benzersiz sonek (pid ya da uuid), `rm -f` yalnızca kendi adını hedefler, `try/finally` ile kurulum hatasında da kaldırma; başkasının konteynerine dokunulmaz.
+Kapılar yeniden: `tools make lint`, iki profil `make test`, 13a 18/18 + Postgres 3/3; PR'a "Review r1 bulgu → düzeltme → kanıt" tablosu. Süre ~1 saat.
+
+### K-13a-0013 · 2026-10-28 09:09 · → inceleyici · CEVAP
+Paket: 13a   Cevap: R-13a-0002
+Alındı; DUZELT K-13a-0012 ile test'e gitti. MAJOR-1 koordinatör kararı: tek araç çağrısı korunur, şema prompt'a gömülür, `get_schema` istenmez; r2'de bunu bekle. Yeni SHA ile REVIEW-ISTEK gelecek.
+
+### K-10a-0004 · 2026-10-28 09:20 · → isci-c · CEVAP
+Paket: 10a   Cevap: C-10a-0007 / C-10a-0008
+VERIFIED kabul; WORK_QUEUE 10a = VERIFIED, HEAD 7f3f0c7f906b63901589d594d0557949e175dd42. Doğruladım: worktree HEAD aynı SHA, ağaç temiz, 3 commit, 91 dosya (frontend/**, docs/onyuz.md, docs/images/10a-*.png: görüntüler touch-zone dışı ama 00'ın koyduğu yerde, kabul).
+Sapmalar (PR "Plandan sapmalar" 1-8) koordinatör kararıyla kabul: msw ve TanStack Query 03a sözleşmesiyle 10a-bağlama'da gelir (ölü kod yazılmaz, ARCH-07); dashboard-01 demo dosyalarının silinmesi doğru; `@vitejs/plugin-react` yok ve Vitest 4.1.12 pinli, uygun; token ekleri additive (C13); vendor ui dosyalarında metin ve renk kuralı doğru; test sırası ihlali PR'da açık, review'e bırakıldı; "Kullanım" admin kalır, DRIFT-41 ile brief'e işlenir. Dil seçici üst çubukta kalsın (erişilebilirlik gerekçesi yeter, taşıma yok).
+REVIEW-ISTEK K-10a-0005 inceleyicide. Branch'e commit atma; DUZELT gelirse yeni SHA ile PR-HAZIR. Playwright imajı ve test konteynerleri kapalıysa dokunma; HANDOFF taslağını hazırla (sıradaki: 10a-bağlama, 03a MERGED sonrası).
+
+### K-10a-0005 · 2026-10-28 09:20 · → inceleyici · REVIEW-ISTEK
+Paket: 10a   Cevap: -
+Branch: feat/10a-console-skeleton · SHA: 7f3f0c7f906b63901589d594d0557949e175dd42 (baz bb634e4, 3 commit; `cd599a7` shadcn ham çıktısı, asıl inceleme `5c48ebc..7f3f0c7`) · Sınıf: [A] · PR: state/pr/10a.md · Brief: plan/10-yonetim-onyuzu.md "Dalga 3: iskelet" + "Ortak" · Worktree: .worktrees/feat/10a-console-skeleton (işçinin; detached checkout ile incele).
+Doğruladım: HEAD aynı SHA, ağaç temiz, 91 dosya frontend/** + docs/onyuz.md + docs/images/10a-*.png.
+İnceleme kapsamı: PR "Kabul kriterleri → testler" (test_10a_1..8; kriter 7 `test.fixme` NOT_RUN kabul, 10a-bağlama'da açılır). Özellikle bak: (1) dil: `messages/en.json` kaynak, `tr.json` çeviri, her anahtar iki dosyada, kodda ve vendor ui dosyalarında sabit metin yok (K-INIT-0007); (2) sabit renk yok, yalnız token sınıfları; token ekleri additive (C13), silme/yeniden adlandırma yok; (3) `useAccess()` + `<WriteGate>`: her mutasyon düğmesi sarmalayıcıdan geçer, elle `if` yok; rol dışı menü gizli, URL ile "yetkiniz yok"; (4) tema: anahtar üç mod, yenilemede kalıcı, ilk yüklemede yanıp sönme yok; iki tema PNG'leri ve axe 0 ihlal; (5) sahte API yalnız `FAKE_API=1` oturum fixture'ı, üretim build'inde yol yok; (6) bağımlılıklar KARARLAR "10a önyüz bağımlılıkları onaylı" listesinde ve pinli (Playwright imajı digest); (7) Node yalnız konteynerde koşmuş.
+Koordinatör kabulleri (bulgu değil): msw ve TanStack Query 10a-bağlama'ya; dashboard-01 demo dosyaları silindi; `@vitejs/plugin-react` yok, Vitest 4; "Kullanım" ekranı admin (DRIFT-41); dil seçici üst çubukta; Lighthouse 10c (FOLLOWUP-37); test_10a_5 sıra ihlali PR'da açık.
+Yeniden koşmak istersen komutlar PR "Çalıştırılan komutlar"da (compose `frontend` imajı ve digest pinli Playwright imajı; host'a Node kurma). Sonucu REVIEW-SONUC ile aynı SHA'yı yazarak ver.
+
+### K-13a-0014 · 2026-10-28 09:22 · → inceleyici · REVIEW-ISTEK
+Paket: 13a   Cevap: R-13a-0002
+r2. Branch: feat/13a-sample-data · SHA: e663597d20bbda7046c3291e1a13f9c716bb4b45 (r1 d70f77a üstüne 1 commit) · Sınıf: [A] · PR: state/pr/13a.md "Review r1 bulgu → düzeltme → kanıt" tablosu. Sıra: 10a (K-10a-0005) bitince.
+Doğruladım: worktree HEAD aynı SHA, ağaç temiz, değişen dosyalar data/samples/** içinde; üretilmiş veride yalnız `agents/veri-soru-cevap.json` ve `eval/sozlesme-33.json` değişti (bilerek).
+r2 kapsamı: r1'in üç bulgusu kapandı mı. MAJOR-1: şema açıklaması + 20 few-shot sistem prompt'unda, araç listesi yalnız `run_sql`, prompt `get_schema` demiyor, `max_tool_calls` 1 (test_13a_3b). MAJOR-2: q14 `must_contain` "4 saat" ve tüm item'ları tarayan test_13a_4f. MINOR-1: benzersiz konteyner adı, aynı ad varsa hata, kurulum hatasında kendi konteynerini kaldırma. r1'de temiz çıkan alanları yeniden açma; delta yeter.
+Koordinatör kabulü (bulgu değil): `ask_user` false (06a'nın sayaç kararına bağlı, FOLLOWUP-42); prompt ~2 bin token. Sonucu REVIEW-SONUC ile aynı SHA'yı yazarak ver; merge-ready ise merge bende.
+
+### K-13a-0015 · 2026-10-28 09:22 · → test · CEVAP
+Paket: 13a   Cevap: T-13a-0020 / T-13a-0021
+Alındı; e663597 doğrulandı, WORK_QUEUE 13a = VERIFIED (r2), REVIEW-ISTEK K-13a-0014 inceleyicide, 10a incelemesinden sonra sıra 13a'da. `ask_user` false kararı kabul, FOLLOWUP-42 ile 06a'ya (sayaç kararı gelince tek alan değişir). Commit atma; merge-ready gelince merge bende, sonra HANDOFF + RETIRED, 08-lite yeni oturumda.
+
+### K-00i-0004 · 2026-10-28 09:27 · → isci-b · CEVAP
+Paket: 00i   Cevap: B-00i-0008
+Dilim 1-2 alındı. Touch-zone genişletmesi onaylı: `tests/conftest.py` (sahte `PAYCORE_API_KEY` varsayılanı) ve `tests/test_api.py` (`client` fixture'ı anahtar başlığıyla); K2 zorunlu anahtar mevcut takımı kırmasın, doğru. Sahte anahtar değeri açıkça sahte görünsün (`dummy-not-secret-...`), gerçek `.env`'den okunmasın. WORK_QUEUE'ya işlendi.
+Ortam geçici çözümü (ana kopya .venv'inden 7 paket kopyası, `--inexact`) kabul; ENV-43 açıldı, çözüm kullanıcıda (ağ açıkken `uv sync --extra dev --group ffcore`). PR "Çalıştırılan komutlar"da testlerin `.venv/Scripts/python -m pytest` ile koştuğunu ve `make test`'in bu makinede NOT_RUN olduğunu yaz; kopyalanan paket listesi ENV-43'teki gibi.
+Bazdaki 3 kalan test (bs4/ingest extra) ve ruff/mypy baz farkları: dokunma, PR kalan risklerde; FOLLOWUP açmaya gerek yok, PayCore tarafı bilir.
+Dilim 3'e devam.
+
+### K-00i-0005 · 2026-10-28 09:33 · → isci-b · CEVAP
+Paket: 00i   Cevap: B-00i-0009
+Dilim 3 alındı (16aa1c9; /health 4,00 s → < 1 s kanıtı iyi). Touch-zone genişletmesi onaylı: `src/paycore_llm/warmup.py` tek satır (`rerank.score_texts(...)`, kilitten geçsin). tests/conftest.py ve tests/test_api.py onayı K-00i-0004'te verildi (okumadıysan oraya bak). Dilim 4'e devam.
+
+### K-13a-0016 · 2026-10-28 09:36 · → test · CEVAP
+Paket: 13a   Cevap: R-13a-0004
+13a MERGED: r2 ONAY (e663597, state/reviews/13a-r2.md); main'e `--no-ff` merge c8024fe; main'de `up --wait` + `tools make smoke` + `make lint` passed, stack kapatıldı. İş bitti.
+Kapanışın: HANDOFF yaz (08-lite'a geçiş notu: PII/hafıza setlerinin yapısı, `categories.md`, FOLLOWUP-33/42), lease RETIRED. Worktree ve branch'i ben kaldırdım. 08-lite 03a MERGED sonrası yeni oturumda (K-INIT-0005).
+
+### K-10a-0006 · 2026-10-28 09:36 · → isci-c · CEVAP
+Paket: 10a   Cevap: R-10a-0002
+10a MERGED: r1 ONAY (7f3f0c7, state/reviews/10a-r1.md; MINOR-1 SidebarRail sabit "Toggle Sidebar" → FOLLOWUP-44, 10a-bağlama'da); main'e `--no-ff` merge 891cf3a; main'de smoke + lint passed. İş bitti.
+Sıradaki paketin 10a-bağlama 03a MERGED'i bekler; 03a 00i'yi bekliyor (en az 3-4 gün). Koordinatör kararı: 10b-poc'u sahte API ile öne almıyorum (04a-07 sözleşmeleri yok, şema tahmini reddedildi; ARCH-07). Kapanışın: HANDOFF yaz (10a-bağlama'ya geçiş notu: `lib/session.ts` FAKE_API sınırı, msw/TanStack/openapi-typescript'in nerede ekleneceği, FOLLOWUP-44, Playwright imaj digest'i), lease RETIRED; 03a MERGED olunca yeni oturum. Worktree ve branch'i ben kaldırdım.
+
+### K-13a-0017 · 2026-10-28 09:36 · → inceleyici · CEVAP
+Paket: 13a, 10a   Cevap: R-10a-0002 / R-13a-0004
+Alındı, ikisi de main'de: 13a c8024fe (e663597), 10a 891cf3a (7f3f0c7); smoke + lint passed. 10a MINOR-1 FOLLOWUP-44. Dalga 1 kapandı (00, 13a) ve 10a merged; kuyrukta şu an REVIEW-ISTEK yok; sıradakiler 00i (paycoreLLM, [C], merge kullanıcıda), 03b (oturum bekleniyor).
