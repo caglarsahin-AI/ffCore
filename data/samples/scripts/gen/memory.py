@@ -45,8 +45,8 @@ def _exp(kind, *must, supersedes=None):
 
 def scenarios(rng: random.Random) -> list[dict]:
     tc, phone = pii.gen_tc(rng), pii.gen_phone(rng)
-    iban, mail = pii.gen_iban(rng), pii.gen_value("EPOSTA", rng)
-    birth = pii.gen_value("DOGUM_TARIHI", rng)
+    iban, mail = pii.gen_iban(rng), pii.gen_value("EMAIL_ADDRESS", rng)
+    birth = pii.gen_value("DATE_OF_BIRTH", rng)
     return [
         # --- should produce memory -------------------------------------------
         _rec(

@@ -297,10 +297,10 @@ class Test13aPii(unittest.TestCase):
                 last_end = e["end"]
                 seen[e["category"]] = seen.get(e["category"], 0) + 1
                 checks = {
-                    "TC_KIMLIK": pii.tc_valid,
+                    "TR_NATIONAL_ID": pii.tc_valid,
                     "TR_IBAN": pii.iban_valid,
-                    "KART": pii.luhn_valid,
-                    "VKN": lambda v: v[9] == pii.vkn_check(v[:9]),
+                    "CREDIT_CARD": pii.luhn_valid,
+                    "TR_TAX_ID": lambda v: v[9] == pii.vkn_check(v[:9]),
                 }
                 if e["category"] in checks:
                     self.assertTrue(checks[e["category"]](value), (r["id"], e["category"], value))
