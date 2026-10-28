@@ -3,9 +3,9 @@
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
 - Oturum kimliği: ffcore-inceleyici-20261028-0203
-- Aktif paket: review-kuyrugu (00i-r2 ONAY; ENV-38/45 bekliyor)
+- Aktif paket: review-kuyrugu (03b-r3 ONAY; 00i-r3 ONAY)
 - Durum: ACTIVE
-- Son okunan: koordinator K-00i-0010 (2026-10-28 10:26); ACK R-00i-0003
+- Son okunan: koordinator K-03b-0014 (2026-10-28 12:25); ACK R-03b-0005; K-00i-0022 ENV-52 alındı
 
 ## Mesajlar
 
@@ -140,3 +140,60 @@ Review HEAD sabit ve ağaç temiz doğrulandı; worktree remove exit0, --force y
 ### R-INIT-0003 · 2026-10-28 10:34 · → koordinator · DURUM
 Paket: review-kuyrugu   Cevap: kullanıcı talimatı
 Kullanıcı açık oturumdaki kanal kontrol aralığını 15 dakikadan 10 dakikaya indirdi. Kontrol yapıldı: K-00i-0011 sonrasında yeni mesaj yok; K-00i-0010 işlendi, sonucu R-00i-0004. Sonraki rutin tarama yaklaşık 10:44 (Europe/Istanbul). Kalıcı zamanlanmış görev kurulmadı; takip açık oturumun bekleme döngüsünde sürüyor.
+
+### R-03b-0001 · 2026-10-28 11:39 · → koordinator · ACK
+Paket: 03b   Cevap: K-03b-0007
+Tam SHA de56c75c8301097fe70e622935f500101c7d3e58 yerel commit nesnesi olarak doğrulandı. Ayrı .worktrees/review-03b-r1 detached worktree oluşturulacak; baz 8ba004c, yalnız bu SHA incelenecek.
+Kimlik/OBO, audit append-only ve maskeleme, egress/DNS/redirect/timeout güvenlik turu, migrate zinciri ve bağımsız konteyner testleri kapsamda. Koordinatör kabulleri ve FOLLOWUP-46/47/48/49 açık sınırları korunur; state/ baz diff'i kontrol edilir.
+
+### R-03b-0002 · 2026-10-28 11:48 · → koordinator · REVIEW-SONUC
+Paket: 03b   Cevap: K-03b-0007
+İncelenen tam SHA: de56c75c8301097fe70e622935f500101c7d3e58. Karar: DUZELT; merge-ready değil. Rapor: state/reviews/03b-r1.md. BLOCKER 0, MAJOR 3, MINOR 0.
+MAJOR-1: SafeOutboundClient **kwargs içindeki follow_redirects=True'ı httpx2'ye iletiyor; kendi hop denetimi atlanıyor. Ağsız gerçek HTTP transport probe'unda izin listesi dışı public host'a ve OFFLINE internal→external hedefe 200/iki dial ile geçildi. Pinned backend yalnız IP'yi kontrol ettiği için bu politikaları kurtarmıyor.
+MAJOR-2: Normal wrapper redirect döngüsü farklı host'a aynı Authorization/X-Api-Key başlıklarını taşıyor. İki host da izinliyken, follow_redirects override olmadan ikinci HTTP wire'da iki sahte credential da görüldü. Origin değişiminde credential politikası + negatif testler gerekli.
+MAJOR-3: @audited try/except yalnız endpoint çağrısını kapsıyor; kendi flush/commit ve load_before dışarıda. Gerçek benzersiz fixture DB'de endpoint pending ORM duplicate ekleyip dönünce decorator flush'u IntegrityError verdi, iş mutasyonu rollback oldu ama action için audit satırı 0 kaldı. Rollback + detached error kaydı bütün yönetilen transaction hatalarını kapsamalı.
+Bağımsız iki profilde make test 70'er ve make test-int 9'ar passed; make lint passed (62 format temiz). Tek head 03b_0001; ayrı geçici DB downgrade0001/upgradeheads geçti, 2 partition ve trigger var; compose migrate komutu/condition doğru. state/ baz diff'i boş, diff --check passed. Güvenlik turu ayrı raporda; temiz volume tüm stack + smoke inceleyicide NOT_RUN (işçi stack'ine dokunulmadı), gerçek dış TLS NOT_RUN.
+Review HEAD sabit ve ağaç temiz doğrulandı; worktree remove exit0, --force yok. Test/probe --rm konteynerleri bitti; benzersiz fixture DB'leri temizlendi; işçinin stack'i açık bırakıldı. Kaynak edit/commit/push veya dış ağ bağlantısı yok. Yeni SHA ile REVIEW-ISTEK bekleniyor; açık oturumdaki kanal takibi 10 dakikalık aralıkta.
+
+### R-03b-0003 · 2026-10-28 12:07 · → koordinator · ACK
+Paket: 03b   Cevap: K-03b-0010
+Tam SHA 480c60e7318b891c6ad94a0db255f55ebe78a155 yerel commit nesnesi olarak doğrulandı. r2 delta review .worktrees/review-03b-r2 detached worktree'sinde; üç r1 bulgusunun kapanışı ve K-03b-0008 credential politikası esas alınacak, temiz alanlar yeniden açılmayacak.
+DURUM: worktree ekleme/kaldırma ve Docker koşuları önceki sandbox izin engelleri nedeniyle kendi komut izin sistemiyle require_escalated çalışabilir; kullanıcıya soru penceresi açılmayacak. Testler Docker'da, dış sistem/gerçek secret erişimi yok.
+
+### R-03b-0004 · 2026-10-28 12:12 · → koordinator · REVIEW-SONUC
+Paket: 03b   Cevap: K-03b-0010
+İncelenen tam SHA: 480c60e7318b891c6ad94a0db255f55ebe78a155. Karar: DUZELT; merge-ready değil. Rapor: state/reviews/03b-r2.md. BLOCKER 0, MAJOR 1, MINOR 0. R1 MAJOR-1/3 kapandı; MAJOR-2 açık.
+MAJOR-2: explicit Cookie header filtresi doğru ama httpx2 client cookie jar'ı atlanmış. İlk 302 Set-Cookie yanıtını client saklayıp sonraki _client.request'te Cookie'yi yeniden ekliyor (filtre sonrasında). Ağsız bellek içi gerçek HTTP transport probe'unda hem aynı host :80→:81 hem Domain=example.com cookie'siyle allowed.example.com→other.example.com için ikinci wire'da Cookie + sahte değer var; caller ilk istekte Cookie vermedi. Origin politikası jar kaynaklı Cookie'yi de kapsamalı; Set-Cookie/önceden birikmiş cookie + same-origin pozitif testleri gerekli.
+R1 aynı probe'ları: Authorization/X-Api-Key artık sızmıyor; follow_redirects=True TypeError (MAJOR-1 kapalı). Gerçek PG pending duplicate senaryosunda mutasyon rollback ve bu kez audit satırı 1 (MAJOR-3 kapalı); load_before/audit write failure testleri geçti.
+Bağımsız iki profil: make test 89'ar + make test-int 12'şer passed; make lint passed; state/ baz diff'i boş, diff --check passed. Güvenlik turu raporda; r1 temiz alanları yeniden açılmadı. Startup 62→123 sn farkı doğrulanmadı, kabul edilen risk olarak kaldı.
+Review HEAD sabit, ağaç temiz; worktree remove exit0, --force yok; --rm probe/test konteynerleri ve fixture DB'leri temiz. İşçi stack'ine dokunulmadı; kaynak edit/commit/push ve dış ağ yok. Yeni SHA ile REVIEW-ISTEK bekleniyor; kanal aralığı 10 dakika.
+
+### R-00i-0005 · 2026-10-28 12:12 · → koordinator · ACK
+Paket: 00i   Cevap: K-00i-0020
+Tam paycoreLLM SHA baf9ddef257d0ca8646c6fa17939af4435ae416d yerel commit nesnesi olarak doğrulandı. 03b r2 bitti (R-03b-0004); şimdi 00i r3 delta incelemesi .worktrees/review-00i-r3 detached worktree'sinde başlıyor.
+Kapsam: Docker test aşaması/üretim varsayılanı, compose.test mount/volume/soketsizlik ve frozen lock, Makefile test/lint, yalnız biçim AST karşılaştırması, kural notları. ENV-45 NOT_RUN ve kullanıcı merge yetkisi korunur; r1/r2 temiz alanları yeniden açılmayacak. Komut izin sistemi eskalasyonları gerekebilir; kullanıcıya soru penceresi açılmaz.
+
+### R-00i-0006 · 2026-10-28 12:18 · → koordinator · DURUM
+Paket: 00i   Cevap: K-00i-0020
+r3 kaynak/AST/lock incelemesi ilerledi: iki biçim dosyasında executable AST aynı, lock değişmedi, test aşaması runtime'dan ayrı. Ancak kendi C:\ai_paycore\paycoreLLM\.worktrees\review-00i-r3 yolumdan compose.test run 3+ dk çıktı vermeden bekliyor; review-00i-r3 projesinin ağı oluşturuldu, named dependency volume'ları salt-okunur worker cache'inden kendi volume'larıma kopyalandı, fakat docker ps -a'da review konteyneri henüz yok. FFCORE_BACKEND_DIR=C:/ai_paycore/ffcore/backend; UV_OFFLINE=true. Worker'ın volume'larına yazılmadı; .env/data/evalresults okunmadı.
+ENV-50 yalnız worker yolu için kapanmış olabilir (doğrulanmadı); benim nested review bind yolunda yeniden ortam sorunu olabilir (doğrulanmadı). Şimdilik test geçti sayılmıyor. Güvenli alternatif olarak yalnız izinli tracked kaynakları SHA'dan kendi geçici named-volume snapshot'ına alıp ağsız koşuyu deneyeceğim; bind/compose koşusu ayrı NOT_RUN kalırsa sonuçta açık yazılacak. Kullanıcıya soru penceresi yok.
+
+### R-00i-0007 · 2026-10-28 12:24 · → koordinator · REVIEW-SONUC
+Paket: 00i   Cevap: K-00i-0020
+İncelenen tam paycoreLLM SHA: baf9ddef257d0ca8646c6fa17939af4435ae416d. Karar: ONAY (r3 kod/düzen incelemesi); BLOCKER 0, MAJOR 0, MINOR 0. Rapor: state/reviews/00i-r3.md. FFCore docs c18de09 değişmedi, yeniden açılmadı.
+Dockerfile son aşama/CMD üretim olarak kalıyor, test aşamasından runtime'a kopya yok. Compose çözümlemesi tek secretsiz test servisi, test target, /ffcore/backend ro, iki named volume, soket yok. Makefile konteyner çağırıyor. İki biçim dosyasında executable AST aynı; uv.lock değişmedi; state/ baz diff'i boş; diff --check passed.
+Bağımsız yeni test imajında --network none + offline frozen sync ile 70 kabul + 19 API = 89/89 (22,14 sn); izinli snapshot lint/format passed (106 Python dosyası). Sınır: doğrudan kendi nested review bind yolundaki compose run dakikalarca konteyner oluşturmadan bekledi, Ctrl-C ile kesildi (R-00i-0006). Bu koşu geçti sayılmadı. Yerine tam SHA'dan yalnız izinli tracked kaynak snapshot'ı kendi named volume'uma alındı; .env/data/**/eval/results/** baştan dışlandı. Worker dependency/cache volume'ları salt okunur kaynak olarak kendi volume'larıma kopyalandı, worker'a yazılmadı. Snapshot sonucu tam repo 199 dosya make lint/tam takım ya da bind compose başarısı yerine geçirilmedi; NOT_RUN sınırları raporda.
+ENV-45 NOT_RUN/ölçüm bekliyor ve sınıf C kullanıcı merge yetkisi korunur (K-00i-0020/21 istisnası). Review bind beklemesinin ENV-50 ile ilişkisi doğrulanmadı; koordinatör kaydı gerekiyorsa sizde. Test imajı/default üretim build'i yeniden yapılmadı, yerel imaj sabit digest kullanıldı.
+HEAD sabit, ağaç temiz; worktree remove exit0, --force yok. Kendi source/venv/cache volume'ları, ağ, helper konteyneri ve tar arşivi temizlendi. Kaynak edit/commit/push ve dış bağlantı yok. Kanal takibi 10 dakika; 03b r3 yeni SHA isteği bekleniyor.
+
+### R-03b-0005 · 2026-10-28 12:25 · → koordinator · ACK
+Paket: 03b   Cevap: K-03b-0014
+Tam SHA 8b83a856c6ab91a315cc1b3c13438378c854404b yerel commit nesnesi olarak doğrulandı. 00i r3 sonucu R-00i-0007 ile verildi; şimdi 03b r3 delta review .worktrees/review-03b-r3 üzerinde başlayacak. R2 cookie probe'ları, durum tutmama/same-origin pozitifleri ve bekçi testi kapsamda; temiz alanlar/test-int/stack yeniden açılmayacak.
+K-00i-0022 alındı: ENV-52 ve snapshot yönteminin yeterli kabulü 00i-r3 raporuna işlenecek; own review konteyner/ağ/volume/arşiv temizliği zaten tamamlandı. Komut izin sistemi eskalasyonları gerekebilir; kullanıcıya soru penceresi yok.
+
+### R-03b-0006 · 2026-10-28 12:27 · → koordinator · REVIEW-SONUC
+Paket: 03b   Cevap: K-03b-0014
+İncelenen tam SHA: 8b83a856c6ab91a315cc1b3c13438378c854404b. Karar: ONAY / merge-ready, yalnız bu SHA için. Rapor: state/reviews/03b-r3.md. BLOCKER 0, MAJOR 0, MINOR 0; r2 MAJOR-2 cookie jar yolu kapandı.
+Ham _NoCookieJar ve bekçi testi incelendi; r2'nin aynı ağsız gerçek wire probe'larında hem port değişimi hem Domain cookie farklı host için Cookie/header/değer artık yok (False), yanıtlar 200. Gerçek iki yerel sunucu testleri Set-Cookie yok sayma, ardışık çağrıda birikmeme ve same-origin caller Cookie korumayı doğruluyor. Durumsuzluk docs/api.md'de açık.
+Bağımsız iki profilde make lint + make test passed: llmaas95 (8,61 sn), airgap95 (6,87 sn), format62 temiz. state/ baz diff'i boş; diff --check passed. Test-int/stack/migration delta dışı, K-03b-0014 gereği NOT_RUN; r1/r2 kapalı alanlar yeniden açılmadı. Ayrı güvenlik turu raporda.
+Review HEAD sabit, ağaç temiz; worktree remove exit0, --force yok. --rm test/probe konteynerleri bitti, yeni DB/volume yok; işçi stack'ine dokunulmadı. Kaynak edit/commit/push ve dış bağlantı yok. Kanal takibi 10 dakika; yeni görev bekleniyor.
