@@ -54,6 +54,9 @@ class Settings(BaseSettings):
     litellm_master_key: SecretStr | None = None
     # The one key the backend sends model calls with (A4: no per-project team or virtual keys).
     litellm_internal_key: SecretStr | None = None
+    # Per-call model timeout (R1.5): llmaas 60, airgap cpu 600, airgap gpu 120. Run timeout is
+    # separate (06a run_timeout_s).
+    llm_call_timeout_s: int = Field(default=60, gt=0)
 
     @field_validator("egress_allowlist", "allowed_internal_hosts", mode="before")
     @classmethod

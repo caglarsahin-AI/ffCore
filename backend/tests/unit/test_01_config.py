@@ -33,7 +33,9 @@ def test_01_3_config_has_no_model_list():
 
 def test_01_settings_missing_litellm_is_loud():
     with pytest.raises(LiteLLMNotConfigured, match="LITELLM_URL"):
-        litellm_settings(_settings())
+        litellm_settings(
+            _settings(litellm_url=None, litellm_master_key=None, litellm_internal_key=None)
+        )
 
 
 def test_01_settings_keys_are_secret():

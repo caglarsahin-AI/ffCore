@@ -45,3 +45,12 @@ def litellm_settings(settings: Settings) -> LiteLLMSettings:
         master_key=settings.litellm_master_key.get_secret_value(),
         internal_key=settings.litellm_internal_key.get_secret_value(),
     )
+
+
+class LiteLLMError(RuntimeError):
+    """LiteLLM answered an error to a management or model call (status, path, message)."""
+
+    def __init__(self, status: int, path: str, message: str) -> None:
+        super().__init__(f"LiteLLM {path} answered {status}: {message}")
+        self.status = status
+        self.path = path

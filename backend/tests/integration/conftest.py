@@ -12,6 +12,14 @@ import psycopg
 import pytest
 from sqlalchemy.engine import make_url
 
+# Package 01 fixtures (real LiteLLM container and fake provider).
+from tests.integration.litellm_support import (  # noqa: F401
+    catalog,
+    clean_litellm,
+    litellm_db,
+    llm_settings,
+)
+
 BACKEND = Path(__file__).resolve().parents[2]
 ALLOWED_DB_HOSTS = {"postgres", "localhost", "127.0.0.1"}
 
