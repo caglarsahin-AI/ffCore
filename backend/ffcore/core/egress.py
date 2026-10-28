@@ -8,8 +8,10 @@ address that is actually dialed, so a DNS answer cannot change between check and
 Redirects are followed here, one hop at a time, and every hop is checked again; a hop to another
 origin (scheme, host, port) drops credential headers. Callers cannot change redirect handling,
 transport, proxy, TLS verification or timeouts per request.
+The client keeps no cookies: the only cookie sent is the caller's own Cookie header.
 """
 
+import http.cookiejar
 import ipaddress
 import logging
 import math
@@ -222,6 +224,20 @@ class _PinnedBackend(httpcore2.AsyncNetworkBackend):
         await self._inner.sleep(seconds)
 
 
+class _NoCookieJar(http.cookiejar.CookieJar):
+    """Stores nothing: the client is stateless. A response's Set-Cookie is ignored, so the only
+    cookie ever sent is the caller's own Cookie header, which follows the origin rule."""
+
+    def set_cookie(self, cookie) -> None:
+        return None
+
+    def extract_cookies(self, response, request) -> None:
+        return None
+
+    def set_cookie_if_ok(self, cookie, request) -> None:
+        return None
+
+
 class _PinnedTransport(httpx2.AsyncHTTPTransport):
     def __init__(self, backend: _PinnedBackend) -> None:
         # trust_env=False: an environment proxy would dial the proxy, not the checked address.
@@ -260,6 +276,8 @@ class SafeOutboundClient:
             ),
             follow_redirects=False,
             trust_env=False,
+            # A raw CookieJar is used as is; httpx2.Cookies(...) would copy it into a normal jar.
+            cookies=_NoCookieJar(),
         )
 
     async def __aenter__(self) -> "SafeOutboundClient":

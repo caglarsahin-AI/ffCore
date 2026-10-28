@@ -81,6 +81,8 @@ so DNS rebinding cannot bypass it. Redirects are followed one hop at a time and 
 drops `Authorization`, `Proxy-Authorization`, `Cookie`, `X-Api-Key`, `X-On-Behalf-Of` and any
 `*-token`, `*-key`, `*-secret` header, and logs a `redirect_cross_origin` event with the target
 origin and the dropped header names (never values); same-origin redirects keep them.
+The client is stateless: it stores no cookies and ignores `Set-Cookie`, so the only cookie sent
+is the caller's own `Cookie` header, under the same origin rule.
 `request()` takes only `method, url, headers, params, content, json`: redirect handling, transport,
 proxy, TLS verification and timeouts cannot be changed per call (`TypeError`). The host rules run
 again at connect time. Environment proxy variables are ignored. Errors name only scheme and host.

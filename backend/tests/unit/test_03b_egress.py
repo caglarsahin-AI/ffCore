@@ -43,6 +43,18 @@ class _Handler(BaseHTTPRequestHandler):
             self._redirect(f"http://b.test:{port}/echo")
         elif self.path == "/to-other-port":
             self._redirect(f"http://a.test:{self.server.peer_port}/echo")
+        elif self.path == "/set-cookie-other-port":
+            self._redirect(
+                f"http://a.example.com:{self.server.peer_port}/echo",
+                cookie="session=dummy-not-secret-jar; Path=/",
+            )
+        elif self.path == "/set-cookie-other-host":
+            self._redirect(
+                f"http://b.example.com:{port}/echo",
+                cookie="session=dummy-not-secret-jar; Domain=example.com; Path=/",
+            )
+        elif self.path == "/set-cookie-same-origin":
+            self._redirect("/echo", cookie="session=dummy-not-secret-jar; Path=/")
         elif self.path == "/slow":
             time.sleep(2)
             self._reply(200, b"late")
@@ -66,9 +78,11 @@ class _Handler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
 
-    def _redirect(self, location):
+    def _redirect(self, location, cookie=None):
         self.send_response(302)
         self.send_header("Location", location)
+        if cookie:
+            self.send_header("Set-Cookie", cookie)
         self.send_header("Content-Length", "0")
         self.end_headers()
 
@@ -505,3 +519,56 @@ def test_03b_2_cross_origin_rule(current, target, dropped):
     assert ("Authorization" not in kept) is dropped
     assert removed == (["authorization"] if dropped else [])
     assert kept["Accept"] == "a"
+
+
+# --- review r2 MAJOR-2: the client keeps no cookies --------------------------------------------
+
+
+def _cookie_client(settings):
+    return _client(
+        settings,
+        _resolver({"a.example.com": ["127.0.0.1"], "b.example.com": ["127.0.0.1"]}),
+        allowed_internal_hosts=["a.example.com", "b.example.com"],
+    )
+
+
+@pytest.mark.parametrize("path", ["/set-cookie-other-port", "/set-cookie-other-host"])
+def test_03b_2_set_cookie_not_carried_cross_origin(settings, server_port, path):
+    client = _cookie_client(settings)
+    response = anyio.run(lambda: _get(client, f"http://a.example.com:{server_port}{path}"))
+    assert "cookie" not in _echo(response)
+
+
+def test_03b_2_set_cookie_ignored_same_origin(settings, server_port):
+    # Stateless: even on the same origin a response cookie is not stored and replayed.
+    client = _cookie_client(settings)
+    url = f"http://a.example.com:{server_port}/set-cookie-same-origin"
+    response = anyio.run(lambda: _get(client, url))
+    assert "cookie" not in _echo(response)
+
+
+def test_03b_2_caller_cookie_same_origin_kept(settings, server_port):
+    client = _cookie_client(settings)
+    url = f"http://a.example.com:{server_port}/to-same"
+    response = anyio.run(lambda: _get(client, url, headers={"Cookie": "caller=1"}))
+    assert _echo(response)["cookie"] == "caller=1"
+
+
+def test_03b_2_no_cookies_between_calls(settings, server_port):
+    client = _cookie_client(settings)
+
+    async def two_calls():
+        async with client:
+            await client.request(
+                "GET", f"http://a.example.com:{server_port}/set-cookie-same-origin"
+            )
+            return await client.request("GET", f"http://a.example.com:{server_port}/echo")
+
+    assert "cookie" not in _echo(anyio.run(two_calls))
+
+
+def test_03b_2_client_cookie_jar_stores_nothing(settings):
+    # Guard on httpx2 internals (pinned 2.16.0), together with the pool guard above.
+    client = _client(settings, _resolver({}))
+    jar = client._client.cookies.jar
+    assert isinstance(jar, egress._NoCookieJar)
