@@ -5,6 +5,10 @@ import { FAKE_PROVIDER_URL, createProvider, uniqueKey } from "./api";
 import { fixture } from "./fixtures";
 import { signIn } from "./support";
 
+// The backend's connection test may take up to its total budget (15 s, services/providers.py);
+// a host that does not resolve takes several seconds inside Docker before it fails.
+const TEST_BUDGET = { timeout: 20_000 };
+
 test("test_10af_3_provider_test: an unsaved configuration is tested, and a failed test does not block saving", async ({
   page,
 }) => {
@@ -23,7 +27,8 @@ test("test_10af_3_provider_test: an unsaved configuration is tested, and a faile
   expect((await call).postDataJSON()).toEqual({ driver: "ollama", config: { base_url: FAKE_PROVIDER_URL } });
   const result = form.getByTestId("provider-test-result");
   // fake-llm is not running on this stack: the backend reports the failure as a result.
-  await expect(result).toBeVisible();
+  await expect(result).toBeVisible(TEST_BUDGET);
+  await expect(result).toHaveAttribute("data-code", "connection_failed");
   await expect(result).not.toHaveAttribute("data-code", "ok");
   await expect(result).toContainText(en.ProviderTest.notBlocking);
 
@@ -52,5 +57,5 @@ test("test_10af_3_provider_test: the edit form tests the stored configuration", 
   const call = page.waitForRequest((r) => r.url().endsWith(`/api/v1/providers/${provider.id}/test`));
   await form.getByRole("button", { name: en.ProviderTest.runSaved }).click();
   await call;
-  await expect(form.getByTestId("provider-test-result")).toBeVisible();
+  await expect(form.getByTestId("provider-test-result")).toHaveAttribute("data-code", "connection_failed", TEST_BUDGET);
 });

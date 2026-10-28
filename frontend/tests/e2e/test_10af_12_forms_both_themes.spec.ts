@@ -19,7 +19,8 @@ for (const theme of THEMES) {
     await form.locator("#provider-driver").selectOption("ollama");
     await form.locator("#config-base_url").fill(FAKE_PROVIDER_URL);
     await form.getByRole("button", { name: en.ProviderTest.run }).click();
-    await expect(form.getByTestId("provider-test-result")).toBeVisible();
+    // Up to the backend's 15 s test budget: fake-llm does not resolve on this stack.
+    await expect(form.getByTestId("provider-test-result")).toBeVisible({ timeout: 20_000 });
     await form.getByTestId("provider-save").click(); // shows the required-field errors as well
     await page.screenshot({ path: `../docs/images/10a-provider-form-${theme}.png`, fullPage: true });
     const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa"]).analyze();
