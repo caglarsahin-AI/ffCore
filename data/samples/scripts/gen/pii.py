@@ -56,25 +56,25 @@ LAST_NAMES = [
 
 # code -> plan/08 category name; "default_on" = enabled in 08's default policy
 CATEGORIES = {
-    "TC_KIMLIK": ("TC kimlik", True),
-    "TR_TELEFON": ("TR telefon", True),
+    "TR_NATIONAL_ID": ("TC kimlik", True),
+    "TR_PHONE": ("TR telefon", True),
     "TR_IBAN": ("TR IBAN", True),
-    "VKN": ("VKN", False),
-    "PLAKA": ("plaka", False),
-    "TR_PASAPORT": ("TR pasaport", False),
-    "TR_ADRES": ("TR adres", False),
+    "TR_TAX_ID": ("VKN", False),
+    "TR_PLATE": ("plaka", False),
+    "TR_PASSPORT": ("TR pasaport", False),
+    "TR_ADDRESS": ("TR adres", False),
     "PERSON": ("kişi adı", False),
-    "KURUM_ADI": ("kurum adı", False),
-    "KONUM": ("konum", False),
-    "EPOSTA": ("e-posta", True),
-    "KART": ("kart", True),
+    "ORGANIZATION": ("kurum adı", False),
+    "LOCATION": ("konum", False),
+    "EMAIL_ADDRESS": ("e-posta", True),
+    "CREDIT_CARD": ("kart", True),
     "CVV": ("CVV", True),
     "PIN": ("PIN", True),
     "GPS": ("GPS", False),
-    "MAC": ("MAC", False),
+    "MAC_ADDRESS": ("MAC", False),
     "API_TOKEN": ("API token", False),
-    "SIFRE": ("şifre", False),
-    "DOGUM_TARIHI": ("doğum tarihi", False),
+    "PASSWORD": ("şifre", False),
+    "DATE_OF_BIRTH": ("doğum tarihi", False),
 }
 
 
@@ -211,35 +211,35 @@ def gen_person(rng: random.Random) -> str:
 def gen_value(code: str, rng: random.Random) -> str:
     if code == "PERSON":
         return gen_person(rng)
-    if code == "TC_KIMLIK":
+    if code == "TR_NATIONAL_ID":
         return gen_tc(rng)
-    if code == "TR_TELEFON":
+    if code == "TR_PHONE":
         return gen_phone(rng)
     if code == "TR_IBAN":
         return gen_iban(rng)
-    if code == "VKN":
+    if code == "TR_TAX_ID":
         return gen_vkn(rng)
-    if code == "PLAKA":
+    if code == "TR_PLATE":
         province = rng.randint(1, 81)  # draw order kept: province, letters, number
         letters = "".join(rng.choice(PLATE_LETTERS) for _ in range(rng.randint(1, 3)))
         return f"{province:02d} {letters} {rng.randint(10, 9999)}"
-    if code == "TR_PASAPORT":
+    if code == "TR_PASSPORT":
         return rng.choice("UZS") + "".join(str(rng.randint(0, 9)) for _ in range(8))
-    if code == "TR_ADRES":
+    if code == "TR_ADDRESS":
         district, city = rng.choice(DISTRICTS)
         return (
             f"{rng.choice(STREETS)} Mah. {rng.choice(STREETS)} Sok. No: {rng.randint(1, 120)} D: "
             f"{rng.randint(1, 30)} {district}/{city}"
         )
-    if code == "KURUM_ADI":
+    if code == "ORGANIZATION":
         return rng.choice(ORGS)
-    if code == "KONUM":
+    if code == "LOCATION":
         return rng.choice([d for pair in DISTRICTS for d in pair])
-    if code == "EPOSTA":
+    if code == "EMAIL_ADDRESS":
         local = rng.choice(["destek", "bilgi", "muhasebe", "satinalma", "kullanici", "rapor"])
         number = rng.randint(10, 9999)
         return f"{local}{number}@{rng.choice(['ornek.com.tr', 'example.com', 'ornek.org'])}"
-    if code == "KART":
+    if code == "CREDIT_CARD":
         return gen_card(rng)
     if code == "CVV":
         return f"{rng.randint(0, 999):03d}"
@@ -247,17 +247,17 @@ def gen_value(code: str, rng: random.Random) -> str:
         return f"{rng.randint(0, 9999):04d}"
     if code == "GPS":
         return f"{rng.uniform(36, 42):.4f}, {rng.uniform(26, 45):.4f}"
-    if code == "MAC":
+    if code == "MAC_ADDRESS":
         return ":".join(f"{rng.randint(0, 255):02X}" for _ in range(6))
     if code == "API_TOKEN":
         return "tok_" + "".join(rng.choice("0123456789abcdef") for _ in range(32))
-    if code == "SIFRE":
+    if code == "PASSWORD":
         return (
             rng.choice(["Bahar", "Deniz", "Kartal", "Yonca"])
             + str(rng.randint(1000, 9999))
             + rng.choice("!?.*")
         )
-    if code == "DOGUM_TARIHI":
+    if code == "DATE_OF_BIRTH":
         return f"{rng.randint(1, 28):02d}.{rng.randint(1, 12):02d}.{rng.randint(1950, 2005)}"
     raise ValueError(code)
 
@@ -265,21 +265,21 @@ def gen_value(code: str, rng: random.Random) -> str:
 # --- sentence templates: {CODE} placeholders become labelled spans ---------------
 
 TEMPLATES = {
-    "TC_KIMLIK": [
-        "Başvuru formunda TC kimlik numarası {TC_KIMLIK} olarak yazılmış.",
-        "Kimlik no: {TC_KIMLIK}, lütfen sisteme girin.",
-        "{TC_KIMLIK} numaralı kayıt için randevu oluşturuldu.",
-        "T.C. {TC_KIMLIK} kimlik numaralı hasta yakını bilgi istedi.",
-        "tc kimlik no {TC_KIMLIK}",
-        "Sigortalının kimlik numarasını ({TC_KIMLIK}) kontrol eder misin?",
+    "TR_NATIONAL_ID": [
+        "Başvuru formunda TC kimlik numarası {TR_NATIONAL_ID} olarak yazılmış.",
+        "Kimlik no: {TR_NATIONAL_ID}, lütfen sisteme girin.",
+        "{TR_NATIONAL_ID} numaralı kayıt için randevu oluşturuldu.",
+        "T.C. {TR_NATIONAL_ID} kimlik numaralı hasta yakını bilgi istedi.",
+        "tc kimlik no {TR_NATIONAL_ID}",
+        "Sigortalının kimlik numarasını ({TR_NATIONAL_ID}) kontrol eder misin?",
     ],
-    "TR_TELEFON": [
-        "Bana {TR_TELEFON} numarasından ulaşabilirsiniz.",
-        "Geri arama için telefon: {TR_TELEFON}",
-        "Acil durumda {TR_TELEFON} aranacak.",
-        "Cep numarası {TR_TELEFON}, mesaj atılabilir.",
-        "tel {TR_TELEFON} whatsapp da var",
-        "Santral meşgulse doğrudan {TR_TELEFON} numarasını deneyin.",
+    "TR_PHONE": [
+        "Bana {TR_PHONE} numarasından ulaşabilirsiniz.",
+        "Geri arama için telefon: {TR_PHONE}",
+        "Acil durumda {TR_PHONE} aranacak.",
+        "Cep numarası {TR_PHONE}, mesaj atılabilir.",
+        "tel {TR_PHONE} whatsapp da var",
+        "Santral meşgulse doğrudan {TR_PHONE} numarasını deneyin.",
     ],
     "TR_IBAN": [
         "Ödemeyi {TR_IBAN} IBAN'ına yapın.",
@@ -288,76 +288,79 @@ TEMPLATES = {
         "İade tutarı {TR_IBAN} numaralı hesaba aktarılacak.",
         "Fatura üzerindeki IBAN {TR_IBAN} doğru mu?",
     ],
-    "VKN": [
-        "Firmanın vergi kimlik numarası {VKN}.",
-        "VKN: {VKN} olan tedarikçi kaydı güncellendi.",
-        "Faturada {VKN} vergi numarası yazıyor.",
-        "vergi no {VKN} ile e-fatura kesildi",
+    "TR_TAX_ID": [
+        "Firmanın vergi kimlik numarası {TR_TAX_ID}.",
+        "VKN: {TR_TAX_ID} olan tedarikçi kaydı güncellendi.",
+        "Faturada {TR_TAX_ID} vergi numarası yazıyor.",
+        "vergi no {TR_TAX_ID} ile e-fatura kesildi",
     ],
-    "PLAKA": [
-        "Servis aracının plakası {PLAKA}.",
-        "{PLAKA} plakalı ambulans otoparka girdi.",
-        "Otopark kaydında {PLAKA} görünüyor.",
+    "TR_PLATE": [
+        "Servis aracının plakası {TR_PLATE}.",
+        "{TR_PLATE} plakalı ambulans otoparka girdi.",
+        "Otopark kaydında {TR_PLATE} görünüyor.",
     ],
-    "TR_PASAPORT": [
-        "Pasaport numarası {TR_PASAPORT} olan ziyaretçi kayıt yaptırdı.",
-        "Yurt dışı başvurusu için pasaport: {TR_PASAPORT}",
-        "pasaport no {TR_PASAPORT} vize formuna eklendi",
+    "TR_PASSPORT": [
+        "Pasaport numarası {TR_PASSPORT} olan ziyaretçi kayıt yaptırdı.",
+        "Yurt dışı başvurusu için pasaport: {TR_PASSPORT}",
+        "pasaport no {TR_PASSPORT} vize formuna eklendi",
     ],
-    "TR_ADRES": [
-        "Teslimat adresi: {TR_ADRES}",
-        "Fatura {TR_ADRES} adresine gönderilsin.",
-        "Ev adresim {TR_ADRES} olarak güncellensin.",
-        "Kargo yerine elden teslim: {TR_ADRES}",
+    "TR_ADDRESS": [
+        "Teslimat adresi: {TR_ADDRESS}",
+        "Fatura {TR_ADDRESS} adresine gönderilsin.",
+        "Ev adresim {TR_ADDRESS} olarak güncellensin.",
+        "Kargo yerine elden teslim: {TR_ADDRESS}",
     ],
-    "KURUM_ADI": [
-        "{KURUM_ADI} ile yapılan görüşme ertelendi.",
-        "Teklif {KURUM_ADI} tarafından gönderildi.",
-        "Sevkiyatı {KURUM_ADI} üstlenecek.",
+    "ORGANIZATION": [
+        "{ORGANIZATION} ile yapılan görüşme ertelendi.",
+        "Teklif {ORGANIZATION} tarafından gönderildi.",
+        "Sevkiyatı {ORGANIZATION} üstlenecek.",
     ],
-    "KONUM": [
-        "Toplantı {KONUM} şubesinde yapılacak.",
-        "Numune {KONUM} deposundan alınacak.",
-        "Ekip yarın {KONUM} bölgesinde olacak.",
+    "LOCATION": [
+        "Toplantı {LOCATION} şubesinde yapılacak.",
+        "Numune {LOCATION} deposundan alınacak.",
+        "Ekip yarın {LOCATION} bölgesinde olacak.",
     ],
-    "EPOSTA": [
-        "Raporu {EPOSTA} adresine gönderin.",
-        "İletişim: {EPOSTA}",
-        "Şifre sıfırlama bağlantısı {EPOSTA} adresine gitti.",
-        "Toplantı daveti {EPOSTA} hesabından geldi.",
-        "mail adresim {EPOSTA}",
-        "Yanıtı {EPOSTA} adresine CC'leyin.",
+    "EMAIL_ADDRESS": [
+        "Raporu {EMAIL_ADDRESS} adresine gönderin.",
+        "İletişim: {EMAIL_ADDRESS}",
+        "Şifre sıfırlama bağlantısı {EMAIL_ADDRESS} adresine gitti.",
+        "Toplantı daveti {EMAIL_ADDRESS} hesabından geldi.",
+        "mail adresim {EMAIL_ADDRESS}",
+        "Yanıtı {EMAIL_ADDRESS} adresine CC'leyin.",
     ],
-    "KART": [
-        "Kart numarası {KART} ile ödeme denendi.",
-        "Ödeme için {KART} kartını kullanın.",
-        "kartım {KART} limit doldu mu bakar mısın",
-        "Ekstrede {KART} kartına ait harcama var.",
+    "CREDIT_CARD": [
+        "Kart numarası {CREDIT_CARD} ile ödeme denendi.",
+        "Ödeme için {CREDIT_CARD} kartını kullanın.",
+        "kartım {CREDIT_CARD} limit doldu mu bakar mısın",
+        "Ekstrede {CREDIT_CARD} kartına ait harcama var.",
     ],
     "CVV": ["Kartın arkasındaki CVV {CVV}.", "Güvenlik kodu (CVV): {CVV}"],
     "PIN": ["Kartın PIN kodu {PIN}, kimseyle paylaşmayın.", "Kasa için PIN: {PIN}"],
     "GPS": ["Ambulansın son konumu {GPS}.", "Saha ekibinin koordinatı: {GPS}"],
-    "MAC": ["Cihazın MAC adresi {MAC}.", "Ağa {MAC} adresli bilinmeyen cihaz bağlandı."],
+    "MAC_ADDRESS": [
+        "Cihazın MAC adresi {MAC_ADDRESS}.",
+        "Ağa {MAC_ADDRESS} adresli bilinmeyen cihaz bağlandı.",
+    ],
     "API_TOKEN": [
         "Entegrasyon anahtarı {API_TOKEN} olarak tanımlandı.",
         "Authorization başlığında {API_TOKEN} gönderiliyor.",
     ],
-    "SIFRE": ["Yeni şifrem {SIFRE}, unutmamak için yazıyorum.", "Geçici şifre: {SIFRE}"],
-    "DOGUM_TARIHI": [
-        "Doğum tarihi {DOGUM_TARIHI} olarak kayıtlı.",
-        "Doğum tarihim {DOGUM_TARIHI}.",
-        "d.t. {DOGUM_TARIHI}, yaş sınırı kontrol edilsin",
+    "PASSWORD": ["Yeni şifrem {PASSWORD}, unutmamak için yazıyorum.", "Geçici şifre: {PASSWORD}"],
+    "DATE_OF_BIRTH": [
+        "Doğum tarihi {DATE_OF_BIRTH} olarak kayıtlı.",
+        "Doğum tarihim {DATE_OF_BIRTH}.",
+        "d.t. {DATE_OF_BIRTH}, yaş sınırı kontrol edilsin",
     ],
 }
 MULTI = [
-    "Kimlik no {TC_KIMLIK}, telefon {TR_TELEFON}, e-posta {EPOSTA}.",
-    "{KURUM_ADI} adına ödeme {TR_IBAN} hesabına, vergi no {VKN}.",
-    "Kart {KART}, CVV {CVV}, son kullanma bilgisi formda.",
-    "Teslimat {TR_ADRES}, irtibat {TR_TELEFON}.",
-    "Sunucu {MAC} cihazından {API_TOKEN} anahtarıyla bağlandı.",
-    "{DOGUM_TARIHI} doğumlu başvuru sahibinin kimlik no'su {TC_KIMLIK}.",
-    "Sevkiyat {KONUM} deposundan {PLAKA} plakalı araçla çıktı.",
-    "PIN {PIN} ve şifre {SIFRE} aynı not kâğıdında yazıyordu.",
+    "Kimlik no {TR_NATIONAL_ID}, telefon {TR_PHONE}, e-posta {EMAIL_ADDRESS}.",
+    "{ORGANIZATION} adına ödeme {TR_IBAN} hesabına, vergi no {TR_TAX_ID}.",
+    "Kart {CREDIT_CARD}, CVV {CVV}, son kullanma bilgisi formda.",
+    "Teslimat {TR_ADDRESS}, irtibat {TR_PHONE}.",
+    "Sunucu {MAC_ADDRESS} cihazından {API_TOKEN} anahtarıyla bağlandı.",
+    "{DATE_OF_BIRTH} doğumlu başvuru sahibinin kimlik no'su {TR_NATIONAL_ID}.",
+    "Sevkiyat {LOCATION} deposundan {TR_PLATE} plakalı araçla çıktı.",
+    "PIN {PIN} ve şifre {PASSWORD} aynı not kâğıdında yazıyordu.",
 ]
 # PERSON sentences (DECISION-24); titles stay outside the span. No gendered honorifics
 # (Bey/Hanım) or suffixes after the name: the pool does not track gender or vowel harmony.
@@ -369,19 +372,19 @@ NAME_SENTENCES = [
     "Teslim alan: {PERSON}",
     "{PERSON} ile görüşme saat 15.00'te.",
     "hasta adı {PERSON} dosya no 4471",
-    "Başvuru sahibi {PERSON}, TC kimlik no {TC_KIMLIK}.",
+    "Başvuru sahibi {PERSON}, TC kimlik no {TR_NATIONAL_ID}.",
     "{PERSON} ve {PERSON} aynı vardiyada çalışıyor.",
     "Refakatçi {PERSON} için kart çıkarılsın.",
     "{PERSON} adlı hastanın tahlil sonuçları çıktı.",
     "İmza: {PERSON}, Satın Alma Birimi",
     "Faturadaki muhatap {PERSON} olarak düzeltilsin.",
-    "{PERSON} ile {EPOSTA} adresinden iletişime geçildi.",
+    "{PERSON} ile {EMAIL_ADDRESS} adresinden iletişime geçildi.",
     "Taburcu listesinde {PERSON} adı da var.",
     "Ameliyat onam formunu {PERSON} imzaladı.",
     "Sayın {PERSON}, başvurunuz alınmıştır.",
-    "{PERSON} telefonla aradı: {TR_TELEFON}",
+    "{PERSON} telefonla aradı: {TR_PHONE}",
     "nöbet değişimi {PERSON} -> {PERSON}",
-    "Ziyaretçi kaydı: {PERSON}, {DOGUM_TARIHI} doğumlu.",
+    "Ziyaretçi kaydı: {PERSON}, {DATE_OF_BIRTH} doğumlu.",
 ]
 # Negatives: look-alikes that must NOT be labelled (no entities)
 NEGATIVES = [
@@ -438,6 +441,10 @@ CATEGORIES_MD_HEADER = "\n".join(
         "# PII kategori kodları",
         "",
         "`pii-100.jsonl` içindeki `category` kodlarının plan/08 kategori adlarıyla eşlemesi.",
+        "Kodlar kanonik listedir (İngilizce, Presidio uyumlu; FOLLOWUP-33, KARARLAR "
+        '"08-lite kararları");',
+        "tek kaynak `backend/ffcore/guardrails/categories.py`, 08 testi iki listenin eşitliğini "
+        "kanıtlar.",
         "`default_on`: 08'in varsayılan politikasında açık. "
         "Kişi adı (`PERSON`) yalnızca bu sette ve",
         "hafıza setinde geçer; adlar betikteki sabit uydurma havuzdandır "

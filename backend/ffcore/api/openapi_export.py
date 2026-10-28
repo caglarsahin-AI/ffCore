@@ -1,7 +1,8 @@
-"""Render the 03a OpenAPI draft (`backend/openapi/03a.yaml`) from the application routes.
+"""Render a package's OpenAPI draft (`backend/openapi/<package>.yaml`) from the application routes.
 
-Tools container: python -m ffcore.api.openapi_export > openapi/03a.yaml
-The contract test compares the committed file with this output, so the file never drifts.
+Tools container: python -m ffcore.api.openapi_export [03a|08] > openapi/<package>.yaml
+The contract tests compare each committed file with this output, so no draft ever drifts.
+Each draft holds only its package's routes: adding a package never changes an earlier draft.
 """
 
 import sys
@@ -11,16 +12,43 @@ from fastapi.openapi.utils import get_openapi
 
 from ffcore.api import api_router
 
+PACKAGES = {
+    "03a": {
+        "version": "0.3a",
+        "description": "Identity, projects, providers, models and audit (package 03a).",
+        "tags": {"auth", "users", "projects", "providers", "models", "audit"},
+    },
+    "08": {
+        "version": "0.8",
+        "description": "Guardrail and PII policies, test panel and internal evaluation "
+        "(package 08-lite).",
+        "tags": {"guardrails", "guardrails-internal"},
+    },
+}
 
-def render() -> str:
+
+def _routes_with_tags(tags: set[str]) -> list:
+    routes = list(api_router.routes)
+    selected = []
+    for route in routes:
+        own = getattr(getattr(route, "original_router", None), "tags", None) or getattr(
+            route, "tags", None
+        )
+        if own and set(own) & tags:
+            selected.append(route)
+    return selected
+
+
+def render(package: str = "03a") -> str:
+    info = PACKAGES[package]
     spec = get_openapi(
         title="FFCore API",
-        version="0.3a",
-        description="Identity, projects, providers, models and audit (package 03a).",
-        routes=api_router.routes,
+        version=info["version"],
+        description=info["description"],
+        routes=_routes_with_tags(info["tags"]),
     )
     return yaml.safe_dump(spec, sort_keys=False, allow_unicode=True, width=100)
 
 
 if __name__ == "__main__":
-    sys.stdout.write(render())
+    sys.stdout.write(render(sys.argv[1] if len(sys.argv) > 1 else "03a"))

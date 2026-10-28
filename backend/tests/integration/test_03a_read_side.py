@@ -63,12 +63,18 @@ def _get_paths(app):
 
 # /auth/me describes the caller, who differs between the two clients by design.
 PARITY_EXEMPT = {f"{API}/auth/me"}
+# 08: single-policy GETs need a stored policy in the world; their list routes stay checked here
+# and the items have test_08_19b_read_mode_get_parity.
+PARITY_EXEMPT_PREFIXES = (
+    f"{API}/projects/{{project_id}}/pii-policies/{{policy_id}}",
+    f"{API}/projects/{{project_id}}/guardrail-policies/{{policy_id}}",
+)
 
 
 def test_03a_2_read_mode_get_parity(app, world):
     checked = 0
     for path in _get_paths(app):
-        if path in PARITY_EXEMPT:
+        if path in PARITY_EXEMPT or path.startswith(PARITY_EXEMPT_PREFIXES):
             continue
         url = re.sub(r"\{(\w+)\}", lambda m: world[m.group(1)], path)
         edit, read = world["edit"].get(url), world["read"].get(url)
