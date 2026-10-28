@@ -4,13 +4,17 @@ The application runs with its lifespan (TestClient context), so the start-up rec
 catalog event listener are the real ones.
 """
 
+import asyncio
 import time
 
 import pytest
 
+from ffcore.core import db
 from ffcore.core.config import get_settings
+from ffcore.core.errors import ApiError
+from ffcore.services.litellm_client import resolve_target
 from tests.integration.conftest import CONSOLE_ORIGIN
-from tests.integration.litellm_support import FAKE, litellm_models, project_key
+from tests.integration.litellm_support import FAKE, litellm_models, project_key, run_reconcile
 
 pytestmark = pytest.mark.usefixtures("clean_litellm")
 
@@ -85,3 +89,29 @@ def test_01_14_rollback_not_reconciled(app, console, pg, catalog, llm_settings):
     assert refused.status_code == 409, refused.text
     time.sleep(1)
     assert scheduler.runs == before
+
+
+def test_01_r1_deleted_project_leaves_litellm(
+    app, console, database_url, pg, catalog, llm_settings
+):
+    """r1 MINOR-1: project deleted through the API -> no target, next reconcile removes it."""
+    project_id = catalog.project()
+    catalog.model(project_id, catalog.provider([project_id]))
+    name = f"{project_key(pg, project_id)}.chat-default"
+    run_reconcile(database_url, llm_settings)
+    db.configure(database_url, pooled=False)  # run_reconcile resets the app's binding
+    assert name in litellm_models(llm_settings)
+
+    deleted = console.delete(f"/api/v1/projects/{project_id}")
+    assert deleted.status_code == 204, deleted.text
+
+    async def resolve():
+        async with db.session_scope() as session:
+            return await resolve_target(session, project_id, "chat-default")
+
+    with pytest.raises(ApiError) as err:
+        asyncio.run(resolve())
+    assert err.value.code == "model_unavailable" and err.value.reason == "project_deleted"
+    report = run_reconcile(database_url, llm_settings)
+    assert name in report.deleted
+    assert name not in litellm_models(llm_settings)

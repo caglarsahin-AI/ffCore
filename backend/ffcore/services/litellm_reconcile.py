@@ -24,12 +24,24 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ffcore.core.config import Settings
-from ffcore.core.egress import EgressDenied, EgressPolicy, EgressTimeout, SafeOutboundClient
+from ffcore.core.egress import (
+    EgressDenied,
+    EgressError,
+    EgressPolicy,
+    EgressTimeout,
+    SafeOutboundClient,
+)
 from ffcore.core.secrets import decrypt_json
 from ffcore.models.catalog import Model, Provider, ProviderProject, litellm_name
 from ffcore.models.identity import Project
 from ffcore.services.catalog_events import CatalogChanged
-from ffcore.services.litellm_client import LiteLLMError, LiteLLMSettings, litellm_settings
+from ffcore.services.litellm_client import (
+    LiteLLMError,
+    LiteLLMNotConfigured,
+    LiteLLMSettings,
+    litellm_settings,
+    safe_error,
+)
 
 log = logging.getLogger("ffcore.litellm_reconcile")
 
@@ -191,6 +203,8 @@ async def desired_state(
             Model.is_active.is_(True),
             Model.category == "llm",
             Provider.is_active.is_(True),
+            # A deleted project's models leave LiteLLM at the next reconcile (r1 MINOR-1).
+            Project.deleted_at.is_(None),
         )
         .order_by(Project.key, Model.key)
     )
@@ -250,7 +264,7 @@ class LiteLLMAdmin:
             params=params,
         )
         if response.status_code >= 400:
-            raise LiteLLMError(response.status_code, path, _error_text(response))
+            raise LiteLLMError(response.status_code, path, safe_error(response))
         return response.json() if response.content else None
 
     async def model_info(self) -> list[dict[str, Any]]:
@@ -266,10 +280,12 @@ class LiteLLMAdmin:
         await self._call("POST", "/model/delete", {"id": model_id})
 
     async def ensure_internal_key(self) -> bool:
-        """Registers LITELLM_INTERNAL_KEY once (A4: the backend's only key). True if created."""
+        """Registers LITELLM_INTERNAL_KEY once (A4: the backend's only key). True if created.
+        The lookup sends the key's hash, never the key: LiteLLM's access log records URLs (r1
+        MAJOR-1). The key itself goes only in the /key/generate body."""
         key = self._conf.internal_key
         try:
-            await self._call("GET", "/key/info", params={"key": key})
+            await self._call("GET", "/key/info", params={"key": key_hash(key)})
             return False
         except LiteLLMError as exc:
             if exc.status not in (400, 404):
@@ -283,14 +299,19 @@ def _deployment(d: DesiredModel) -> dict[str, Any]:
     return {"model_name": d.name, "litellm_params": d.litellm_params, "model_info": d.model_info}
 
 
-def _error_text(response: httpx2.Response) -> str:
-    try:
-        error = response.json().get("error") or response.json().get("detail")
-    except ValueError:
-        return f"HTTP {response.status_code}"
-    if isinstance(error, dict):
-        return str(error.get("message", ""))[:300]
-    return str(error)[:300]
+def key_hash(key: str) -> str:
+    """LiteLLM's id of a virtual key: sha256 of the key (its `hash_token`); not a credential,
+    /v1/* refuses it (measured by the reviewer on v1.80.0)."""
+    return hashlib.sha256(key.encode("utf-8")).hexdigest()
+
+
+def _safe_exc(exc: BaseException) -> str:
+    """Exception text that may be logged: our own messages only (r1 MAJOR-2)."""
+    if isinstance(exc, LiteLLMError | LiteLLMNotConfigured):
+        return f"{type(exc).__name__}: {exc}"
+    if isinstance(exc, EgressError):
+        return f"{type(exc).__name__}: {exc.code}"
+    return type(exc).__name__
 
 
 async def apply(
@@ -393,9 +414,13 @@ class ReconcileScheduler:
                 except Exception as exc:
                     self.last_error = type(exc).__name__
                     if attempt == self._retries:
-                        log.error("litellm_reconcile_failed attempts=%d error=%s", attempt, exc)
+                        log.error(
+                            "litellm_reconcile_failed attempts=%d error=%s", attempt, _safe_exc(exc)
+                        )
                     else:
-                        log.warning("litellm_reconcile_retry attempt=%d error=%s", attempt, exc)
+                        log.warning(
+                            "litellm_reconcile_retry attempt=%d error=%s", attempt, _safe_exc(exc)
+                        )
                         await asyncio.sleep(self._base_delay * 2 ** (attempt - 1))
 
 

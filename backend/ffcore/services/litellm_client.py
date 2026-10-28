@@ -10,6 +10,7 @@ sets to our `models.id`; a different id than the requested model's is a `Fallbac
 
 import json
 import logging
+import re
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from dataclasses import dataclass, field
@@ -67,12 +68,41 @@ def litellm_settings(settings: Settings) -> LiteLLMSettings:
 
 
 class LiteLLMError(RuntimeError):
-    """LiteLLM answered an error to a management or model call (status, path, message)."""
+    """LiteLLM answered an error to a management or model call. The message carries only
+    `safe_error()` fields, never the upstream text (r1 MAJOR-2)."""
 
-    def __init__(self, status: int, path: str, message: str) -> None:
-        super().__init__(f"LiteLLM {path} answered {status}: {message}")
+    def __init__(self, status: int, path: str, summary: str) -> None:
+        super().__init__(f"LiteLLM {path} answered {summary}")
         self.status = status
         self.path = path
+
+
+_TOKEN = re.compile(r"[^a-z0-9_.-]")
+_CALL_ID = re.compile(r"^[0-9a-fA-F-]{8,64}$")
+
+
+def _token(value: Any) -> str:
+    """A short enum-like value from an untrusted body: lower case, [a-z0-9_.-] only."""
+    return _TOKEN.sub("", str(value).lower())[:40] or "-"
+
+
+def safe_error(response: httpx2.Response) -> str:
+    """What may be logged about an error answer: status, the error's type and code as short
+    tokens, and LiteLLM's call id (the full text is in LiteLLM's own, internal log). The message
+    is never used: providers echo requests, keys and user text into it (r1 MAJOR-2)."""
+    kind = code = "-"
+    try:
+        error = response.json().get("error")
+    except (ValueError, AttributeError):
+        error = None
+    if isinstance(error, dict):
+        kind, code = _token(error.get("type")), _token(error.get("code"))
+    call_id = response.headers.get("x-litellm-call-id", "")
+    call_id = call_id if _CALL_ID.match(call_id) else "-"
+    return (
+        f"upstream_status={response.status_code} error_type={kind} error_code={code}"
+        f" call_id={call_id}"
+    )
 
 
 class ModelUnavailable(ApiError):
@@ -84,6 +114,20 @@ class ModelUnavailable(ApiError):
             503, "api_error", "model_unavailable", "The model is not available right now."
         )
         self.reason = reason
+
+
+class ModelCallFailed(ApiError):
+    """The provider answered, but not with a usable result: `upstream_error` (an error inside a
+    200 answer or stream) or `stream_incomplete` (the stream ended before it completed). A
+    partial answer is never a success (ARCH-06, r1 MAJOR-3)."""
+
+    MESSAGES = {
+        "upstream_error": "The model provider reported an error.",
+        "stream_incomplete": "The model stream ended before the answer was complete.",
+    }
+
+    def __init__(self, code: str) -> None:
+        super().__init__(502, "api_error", code, self.MESSAGES[code])
 
 
 class EmptyCompletion(ApiError):
@@ -139,7 +183,7 @@ async def resolve_target(session: AsyncSession, project_id: Any, model_key: str)
     """Short name in a project -> LiteLLM target (C1). Only `chat-default` gets a fallback, and
     only when the project has an active `chat-fallback` record (karar A, K-01-0004)."""
     rows = await session.execute(
-        select(Model.id, Model.key, Project.key)
+        select(Model.id, Model.key, Project.key, Project.deleted_at)
         .join(Project, Project.id == Model.project_id)
         .join(Provider, Provider.id == Model.provider_id)
         .where(
@@ -151,7 +195,13 @@ async def resolve_target(session: AsyncSession, project_id: Any, model_key: str)
             Provider.is_active.is_(True),
         )
     )
-    found = {key: (str(model_id), project_key) for model_id, key, project_key in rows}
+    found = {}
+    for model_id, key, project_key, project_deleted in rows:
+        if project_deleted is not None:
+            # Its models leave LiteLLM at the next reconcile; until then nothing calls them
+            # (r1 MINOR-1, K-01-0010: model_unavailable).
+            raise ModelUnavailable("project_deleted")
+        found[key] = (str(model_id), project_key)
     if model_key not in found:
         raise ApiError(
             404, "not_found_error", "model_not_found", f"No active model {model_key} in project."
@@ -225,8 +275,12 @@ class LiteLLMClient:
             raise _unavailable(target, exc.code) from None
         _raise_for_status(target, response)
         fallback = _fallback(target, response)
-        data = response.json()
-        choice = data["choices"][0]
+        try:
+            data = response.json()
+            choice = data["choices"][0]
+        except (ValueError, KeyError, IndexError, TypeError):
+            # A 200 that is not a completion (e.g. {"error": ...}): its text is not trusted.
+            raise _failed(target, "upstream_error", safe_error(response)) from None
         message = choice.get("message") or {}
         content = message.get("content") or ""
         if not content.strip() and not message.get("tool_calls"):
@@ -269,19 +323,31 @@ class ChatStream:
         self.result = result
 
     async def __aiter__(self) -> AsyncIterator[dict[str, Any]]:
+        """Completion contract of the pinned proxy (v1.80.0, include_usage on): a finish_reason,
+        then a usage chunk, then `[DONE]`. A stream is complete when a finish_reason was seen and
+        then `[DONE]` or the usage chunk; anything else that ends is `stream_incomplete`. An
+        error object in the stream is `upstream_error` and is not handed to the caller."""
+        done = False
         try:
             async for line in self._response.aiter_lines():
                 if not line.startswith("data:"):
                     continue
                 payload = line[len("data:") :].strip()
                 if payload == "[DONE]":
+                    done = True
                     break
-                chunk = json.loads(payload)
+                try:
+                    chunk = json.loads(payload)
+                except ValueError:
+                    raise _failed(self._target, "upstream_error", "unparseable chunk") from None
+                if not isinstance(chunk, dict) or "error" in chunk:
+                    raise _failed(self._target, "upstream_error", "error in stream")
                 self._record(chunk)
                 yield chunk
         except httpx2.HTTPError as exc:
-            # A stream that breaks mid-way is not a short answer (ARCH-06).
-            raise _unavailable(self._target, type(exc).__name__) from None
+            raise _failed(self._target, "stream_incomplete", type(exc).__name__) from None
+        if not self.result.finish_reason or not (done or self.result.usage):
+            raise _failed(self._target, "stream_incomplete", "ended before completion")
         if not "".join(self.result.content).strip() and not self.result.tool_calls:
             raise _empty(self._target, self.result.finish_reason)
 
@@ -303,6 +369,12 @@ def _unavailable(target: ModelTarget, reason: str) -> ModelUnavailable:
     return ModelUnavailable(reason)
 
 
+def _failed(target: ModelTarget, code: str, detail: str) -> ModelCallFailed:
+    # `detail` is ours or safe_error(); never provider text.
+    log.warning("model_call_failed model=%s code=%s detail=%s", target.name, code, detail)
+    return ModelCallFailed(code)
+
+
 def _empty(target: ModelTarget, finish_reason: str | None) -> EmptyCompletion:
     log.error("empty_completion model=%s finish_reason=%s", target.name, finish_reason)
     return EmptyCompletion(target.name, finish_reason)
@@ -312,23 +384,23 @@ def _raise_for_status(target: ModelTarget, response: httpx2.Response) -> None:
     status = response.status_code
     if status < 400:
         return
+    summary = safe_error(response)
     try:
-        detail = str((response.json().get("error") or {}).get("message", ""))[:300]
-    except ValueError:
-        detail = ""
-    if status == 400 and "Invalid model name" in detail:
+        message = str((response.json().get("error") or {}).get("message", ""))
+    except (ValueError, AttributeError):
+        message = ""
+    # The message is only compared with a fixed phrase, never logged or raised.
+    if status == 400 and "Invalid model name" in message:
         # resolve_target found the row, so LiteLLM is behind the tables: a reconcile is pending
         # or failed (litellm_reconcile_failed in the log). Not the caller's mistake.
-        log.error("litellm_model_not_registered model=%s", target.name)
+        log.error("litellm_model_not_registered model=%s %s", target.name, summary)
         raise ModelUnavailable("not_registered")
     if status >= 500 or status in (404, 408, 429):
-        # LiteLLM answers 500 when the upstream (and any fallback) failed (U3); the provider's
-        # text goes to the log, not to the caller.
-        log.warning(
-            "litellm_upstream_error model=%s status=%s detail=%s", target.name, status, detail
-        )
+        # LiteLLM answers 500 when the upstream (and any fallback) failed (U3).
+        log.warning("litellm_upstream_error model=%s %s", target.name, summary)
         raise ModelUnavailable(f"http_{status}")
-    raise LiteLLMError(status, CHAT_PATH, detail)
+    log.warning("litellm_request_refused model=%s %s", target.name, summary)
+    raise LiteLLMError(status, CHAT_PATH, summary)
 
 
 def _fallback(target: ModelTarget, response: httpx2.Response) -> FallbackObserved | None:
@@ -339,4 +411,5 @@ def _fallback(target: ModelTarget, response: httpx2.Response) -> FallbackObserve
         assert target.fallback_name
         return FallbackObserved(target.name, target.fallback_name, "primary_failed")
     # No header, or a deployment we did not ask for: the answer cannot be attributed.
-    raise _unavailable(target, f"unexpected deployment {answered or 'missing'}")
+    shown = answered if answered and _CALL_ID.match(answered) else "missing-or-invalid"
+    raise _unavailable(target, f"unexpected deployment {shown}")

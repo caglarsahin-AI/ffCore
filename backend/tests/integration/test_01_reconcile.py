@@ -3,6 +3,7 @@
 import httpx2
 import pytest
 
+from ffcore.services.litellm_reconcile import key_hash
 from tests.integration.litellm_support import (
     SECRET_MARKER,
     litellm_models,
@@ -144,7 +145,8 @@ def test_01_7_litellm_config_table_stays_empty(database_url, pg, catalog, llm_se
 def test_01_internal_key_registered(database_url, pg, catalog, llm_settings):
     run_reconcile(database_url, llm_settings)
 
-    key = llm_settings.litellm_internal_key.get_secret_value()
+    # By hash: a raw key in a URL lands in LiteLLM's access log (r1 MAJOR-1).
+    key = key_hash(llm_settings.litellm_internal_key.get_secret_value())
     response = httpx2.get(
         f"{llm_settings.litellm_url}/key/info", params={"key": key}, headers=master(llm_settings)
     )
