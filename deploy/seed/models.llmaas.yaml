@@ -1,0 +1,54 @@
+# First-install seed for DEPLOY_PROFILE=llmaas (package 01): providers and models of one project.
+#   docker compose run --rm tools make seed-models PROJECT=<project_key>
+# Afterwards the console owns these rows; running the seed again leaves existing rows unchanged.
+#
+# Secret fields are never written here, only ${ENV_VAR} references read at seed time (the values
+# go to the providers table encrypted; remove them from .env afterwards). ${VAR:-default} gives a
+# non-secret default. A provider marked optional is skipped, and reported, when none of its
+# variables is set; if only some are set the seed fails.
+#
+# Prices are empty on purpose: no verified source for vendor prices is in the repository
+# (KARARLAR "03a kararları", 01 S3). Enter them in the console; until then costs read 0 and the
+# reconciler logs pricing_missing. The per-call timeout is LLM_CALL_TIMEOUT_S (60 here).
+version: 1
+providers:
+  - key: anthropic
+    label: Anthropic
+    driver: anthropic
+    domains: [model]
+    config:
+      api_key: ${SEED_ANTHROPIC_API_KEY}
+  # chat-fallback (brief 01): a second provider. Without it chat-default has no fallback and a
+  # provider failure is 503 model_unavailable.
+  - key: azure-openai
+    label: Azure OpenAI (EU)
+    driver: azure_openai
+    domains: [model]
+    optional: true
+    config:
+      api_key: ${SEED_AZURE_OPENAI_API_KEY}
+      api_base: ${SEED_AZURE_OPENAI_API_BASE}
+      api_version: ${SEED_AZURE_OPENAI_API_VERSION:-2024-10-21}
+models:
+  - key: chat-default
+    display_name: Chat (default)
+    provider: anthropic
+    model_id: claude-sonnet-5-5
+    capabilities: {tool_calls: true, reasoning: true, structured_outputs: true}
+    limits: {}
+    request_policy: {}
+  - key: chat-fallback
+    display_name: Chat (fallback)
+    provider: azure-openai
+    # Azure: the deployment name in the agreed EU resource.
+    model_id: ${SEED_AZURE_OPENAI_DEPLOYMENT}
+    capabilities: {tool_calls: true, reasoning: false, structured_outputs: true}
+    limits: {}
+    request_policy: {}
+  - key: memory-extract
+    display_name: Memory extraction (small)
+    provider: anthropic
+    model_id: claude-haiku-5-5
+    capabilities: {tool_calls: false, reasoning: false, structured_outputs: true}
+    limits: {}
+    request_policy: {}

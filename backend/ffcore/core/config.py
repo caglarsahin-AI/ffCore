@@ -16,6 +16,8 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(extra="ignore", hide_input_in_errors=True)
 
     deploy_profile: Literal["llmaas", "airgap"]
+    # airgap model server (D8); chooses the seed's provider block. None where no local model runs.
+    inference_backend: Literal["ollama", "vllm"] | None = None
     offline: bool
     # Contains the database password, so it is a secret too.
     database_url: SecretStr | None = None
@@ -45,6 +47,18 @@ class Settings(BaseSettings):
     # Origins the console is served from (scheme://host[:port]); cookie mutations from any
     # other origin are refused (C6). Empty: only requests without a foreign Origin pass.
     console_origins: CommaList = []
+
+    # --- 01 ---
+    # LiteLLM proxy on the internal network (e.g. http://litellm:4000); its host must be in
+    # ALLOWED_INTERNAL_HOSTS. Unset means no model calls: callers get an explicit error.
+    litellm_url: str | None = None
+    # Management key: only the reconciler uses it (/model/new|update|delete, /key/generate).
+    litellm_master_key: SecretStr | None = None
+    # The one key the backend sends model calls with (A4: no per-project team or virtual keys).
+    litellm_internal_key: SecretStr | None = None
+    # Per-call model timeout (R1.5): llmaas 60, airgap cpu 600, airgap gpu 120. Run timeout is
+    # separate (06a run_timeout_s).
+    llm_call_timeout_s: int = Field(default=60, gt=0)
 
     @field_validator("egress_allowlist", "allowed_internal_hosts", mode="before")
     @classmethod

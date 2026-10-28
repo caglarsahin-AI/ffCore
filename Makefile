@@ -3,7 +3,7 @@
 # Servisleri başlatma/durdurma doğrudan compose ile: docker compose up -d --wait | down | logs -f
 # Önyüz lint'i ayrı konteynerde: docker compose run --rm frontend npm run lint
 
-.PHONY: lint format test test-int smoke pull
+.PHONY: lint format test test-int smoke pull seed-models render-litellm
 
 lint:
 	ruff check backend scripts data/samples/scripts
@@ -25,3 +25,15 @@ smoke:
 
 pull:
 	sh deploy/ollama/pull.sh
+
+# 01: first-install providers and models of one project from deploy/seed/models.<profile>.yaml,
+# then reconcile LiteLLM. Existing rows are left as they are. Usage: make seed-models PROJECT=<key>
+seed-models:
+	@test -n "$(PROJECT)" || (echo "usage: make seed-models PROJECT=<project_key>" >&2; exit 2)
+	cd backend && python -m ffcore.cli seed-models --project "$(PROJECT)" --path ../deploy/seed/models.$${DEPLOY_PROFILE:?DEPLOY_PROFILE is not set}.yaml
+	cd backend && python -m ffcore.cli render-litellm
+
+# 01: make LiteLLM's model list equal to the providers/models tables (no restart, no config file).
+# CHECK=1 only reports the difference and exits 1 if there is one.
+render-litellm:
+	cd backend && python -m ffcore.cli render-litellm $(if $(CHECK),--check,)

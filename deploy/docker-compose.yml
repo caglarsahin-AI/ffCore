@@ -85,6 +85,8 @@ services:
       LITELLM_DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/litellm
       DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/litellm
       STORE_MODEL_IN_DB: "True"
+      # The admin UI stays off; models come from FFCore's tables only (01).
+      DISABLE_ADMIN_UI: "True"
     volumes:
       - ./deploy/litellm/config.yaml:/app/config.yaml:ro
     depends_on:
@@ -211,6 +213,10 @@ services:
       SESSION_TTL_S: ${SESSION_TTL_S:-28800}
       GUARDRAIL_EGRESS_ENABLED: ${GUARDRAIL_EGRESS_ENABLED:?GUARDRAIL_EGRESS_ENABLED is not set}
       PII_TOKEN_TTL_S: ${PII_TOKEN_TTL_S:-1800}
+      LITELLM_URL: ${LITELLM_URL:-}
+      LITELLM_MASTER_KEY: ${LITELLM_MASTER_KEY:?LITELLM_MASTER_KEY is not set}
+      LITELLM_INTERNAL_KEY: ${LITELLM_INTERNAL_KEY:?LITELLM_INTERNAL_KEY is not set}
+      LLM_CALL_TIMEOUT_S: ${LLM_CALL_TIMEOUT_S:-60}
     ports:
       - "${BACKEND_PORT:-8000}:8000"
     depends_on:
@@ -219,6 +225,10 @@ services:
       postgres:
         condition: service_healthy
       redis:
+        condition: service_healthy
+      # 01: the start-up reconcile needs LiteLLM; its first start migrates for minutes. If LiteLLM
+      # goes down later the backend stays up and retries (01 S4).
+      litellm:
         condition: service_healthy
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/healthz', timeout=3)"]
@@ -262,6 +272,16 @@ services:
       postgres:
         condition: service_healthy
 
+  fake-llm:
+    # Test only (package 01): fake OpenAI-compatible provider LiteLLM calls in integration tests.
+    # Stdlib script from backend/tests/fakes; never part of an installation.
+    image: ${REGISTRY_PREFIX}ffcore/backend:${FFCORE_VERSION:?FFCORE_VERSION tanımlı değil}
+    profiles: ["test"]
+    command: ["python", "/fakes/fake_openai.py"]
+    volumes:
+      - ./backend/tests/fakes:/fakes:ro
+    restart: "no"
+
   tools:
     # Geliştirme araçları (make, ruff, pytest, curl). Host'a araç kurulmaz (K-00-0003, K-00-0005).
     # Çağrı: docker compose run --rm tools make <hedef>. Docker soketi bağlanmaz.
@@ -279,6 +299,15 @@ services:
       <<: *app-env
       COMPOSE_PROFILES: ${COMPOSE_PROFILES:-}
       OLLAMA_CONTEXT_LENGTH: ${OLLAMA_CONTEXT_LENGTH:-}
+      # make seed-models (01) only; read once on first install, never given to the backend.
+      SEED_ANTHROPIC_API_KEY: ${SEED_ANTHROPIC_API_KEY:-}
+      SEED_AZURE_OPENAI_API_KEY: ${SEED_AZURE_OPENAI_API_KEY:-}
+      SEED_AZURE_OPENAI_API_BASE: ${SEED_AZURE_OPENAI_API_BASE:-}
+      SEED_AZURE_OPENAI_API_VERSION: ${SEED_AZURE_OPENAI_API_VERSION:-}
+      SEED_AZURE_OPENAI_DEPLOYMENT: ${SEED_AZURE_OPENAI_DEPLOYMENT:-}
+      SEED_OLLAMA_BASE_URL: ${SEED_OLLAMA_BASE_URL:-}
+      SEED_VLLM_BASE_URL: ${SEED_VLLM_BASE_URL:-}
+      SEED_VLLM_MODEL: ${SEED_VLLM_MODEL:-}
 
   e2e:
     # Console acceptance tests against this stack (10a-binding, K-10ab-0004). Builds and serves the
