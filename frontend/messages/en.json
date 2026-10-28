@@ -1,0 +1,152 @@
+{
+  "Home": {
+    "title": "FFCore",
+    "subtitle": "Enterprise LLM platform"
+  },
+  "Theme": {
+    "label": "Theme",
+    "system": "System",
+    "light": "Light",
+    "dark": "Dark"
+  },
+  "Locale": {
+    "label": "Language",
+    "en": "English",
+    "tr": "Türkçe"
+  },
+  "Nav": {
+    "groups": {
+      "overview": "Overview",
+      "build": "Build",
+      "operate": "Operate",
+      "admin": "Administration"
+    },
+    "items": {
+      "overview": "Overview",
+      "providers": "Providers",
+      "models": "Models",
+      "knowledgeBases": "Knowledge bases",
+      "dataSources": "Data sources",
+      "tools": "Tools",
+      "mcpServers": "MCP servers",
+      "agents": "Agents",
+      "runs": "Runs",
+      "approvals": "Approvals",
+      "evaluations": "Evaluations",
+      "guardrails": "Guardrails",
+      "channels": "Channels",
+      "usage": "Usage",
+      "systemStatus": "System status",
+      "projects": "Projects",
+      "users": "Users",
+      "apiKeys": "API keys",
+      "quotas": "Quotas",
+      "audit": "Audit",
+      "retention": "Data retention",
+      "settings": "Settings"
+    }
+  },
+  "Access": {
+    "role": "Role",
+    "mode": "Access",
+    "roles": {
+      "user": "User",
+      "analyst": "Analyst",
+      "developer": "Developer",
+      "admin": "Admin"
+    },
+    "modes": {
+      "edit": "Edit",
+      "read": "Read-only"
+    },
+    "readOnlyBadge": "Read-only",
+    "readOnlyHint": "Read-only access: you can view this but not change it."
+  },
+  "Forbidden": {
+    "title": "You do not have access",
+    "body": "Your role cannot open this screen. Ask an administrator if you need it."
+  },
+  "ComingSoon": {
+    "title": "{screen} is not available yet",
+    "body": "This screen arrives in a later release."
+  },
+  "State": {
+    "loading": "Loading…",
+    "errorTitle": "Something went wrong",
+    "details": "Details",
+    "notConnected": "Not connected to the backend yet. This action becomes available once the API is connected."
+  },
+  "Session": {
+    "unavailableTitle": "Session unavailable",
+    "unavailableBody": "The console is not connected to the backend yet, so your role and access cannot be loaded."
+  },
+  "Login": {
+    "title": "Sign in to FFCore",
+    "subtitle": "Use your work email and password.",
+    "email": "Email",
+    "password": "Password",
+    "submit": "Sign in",
+    "emailInvalid": "Enter a valid email address.",
+    "passwordRequired": "Enter your password."
+  },
+  "Projects": {
+    "title": "Projects",
+    "description": "A project groups its members, knowledge bases, agents and usage. Create one per team or use case.",
+    "create": "Create project",
+    "emptyTitle": "No projects yet",
+    "emptyBody": "Create the first project, then add members and assign providers to it."
+  },
+  "Members": {
+    "title": "Project members",
+    "description": "A member's role decides which screens they see; the access mode decides whether they can change things.",
+    "add": "Add member",
+    "emptyTitle": "No members yet",
+    "emptyBody": "Add people to this project and pick their role and access mode."
+  },
+  "Providers": {
+    "title": "Providers",
+    "description": "A provider is a model endpoint such as LLMaaS or a local runtime. Test the connection and assign it to projects.",
+    "add": "Add provider",
+    "emptyTitle": "No providers yet",
+    "emptyBody": "Add a provider first; models and agents need one."
+  },
+  "Models": {
+    "title": "Models",
+    "description": "Models come from a provider and are grouped by category so agents can pick the right one.",
+    "add": "Add model",
+    "emptyTitle": "No models yet",
+    "emptyBody": "Add a provider first, then register its models here."
+  },
+  "ProjectSwitcher": {
+    "label": "Project",
+    "none": "No project selected"
+  },
+  "UserMenu": {
+    "open": "Open user menu",
+    "memory": "My memory",
+    "logout": "Sign out"
+  },
+  "Ui": {
+    "toggleSidebar": "Toggle sidebar",
+    "close": "Close",
+    "more": "More",
+    "sidebarTitle": "Sidebar",
+    "sidebarDescription": "Displays the mobile sidebar."
+  },
+  "DevTheme": {
+    "title": "Theme preview",
+    "description": "Every component in the light and dark theme side by side.",
+    "light": "Light theme",
+    "dark": "Dark theme",
+    "sampleCard": "Sample card",
+    "sampleText": "Body text on a card surface.",
+    "primary": "Primary",
+    "secondary": "Secondary",
+    "outline": "Outline",
+    "destructive": "Delete",
+    "success": "Success",
+    "warning": "Warning",
+    "inputPlaceholder": "Type here",
+    "chart": "Chart palette"
+  }
+}

@@ -1,10 +1,10 @@
-"use client"
+"use client";
 
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@/components/ui/avatar"
+import { BrainIcon, ChevronsUpDownIcon, LogOutIcon, UserCircleIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
+
+import { notConnected } from "@/components/not-connected";
+import { useAccess } from "@/components/session-provider";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,95 +13,55 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import {
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  useSidebar,
-} from "@/components/ui/sidebar"
-import { EllipsisVerticalIcon, CircleUserRoundIcon, CreditCardIcon, BellIcon, LogOutIcon } from "lucide-react"
+} from "@/components/ui/dropdown-menu";
+import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/components/ui/sidebar";
 
-export function NavUser({
-  user,
-}: {
-  user: {
-    name: string
-    email: string
-    avatar: string
-  }
-}) {
-  const { isMobile } = useSidebar()
+// User menu: role and access mode are always visible (brief 10). "My memory" is disabled
+// until its screen exists (11/17); sign-out needs the backend (10a-binding).
+export function NavUser() {
+  const t = useTranslations("UserMenu");
+  const tAccess = useTranslations("Access");
+  const tState = useTranslations("State");
+  const { role, access } = useAccess();
+  const { isMobile } = useSidebar();
+
   return (
     <SidebarMenu>
       <SidebarMenuItem>
         <DropdownMenu>
           <DropdownMenuTrigger
-            render={
-              <SidebarMenuButton size="lg" className="aria-expanded:bg-muted" />
-            }
+            render={<SidebarMenuButton size="lg" aria-label={t("open")} data-testid="user-menu" />}
           >
-            <Avatar className="size-8 rounded-lg grayscale">
-              <AvatarImage src={user.avatar} alt={user.name} />
-              <AvatarFallback className="rounded-lg">CN</AvatarFallback>
-            </Avatar>
+            <UserCircleIcon className="size-8" />
             <div className="grid flex-1 text-left text-sm leading-tight">
-              <span className="truncate font-medium">{user.name}</span>
-              <span className="truncate text-xs text-foreground/70">
-                {user.email}
-              </span>
+              <span className="truncate font-medium">{tAccess(`roles.${role}`)}</span>
+              <span className="truncate text-xs text-muted-foreground">{tAccess(`modes.${access}`)}</span>
             </div>
-            <EllipsisVerticalIcon className="ml-auto size-4" />
+            <ChevronsUpDownIcon className="ml-auto size-4" />
           </DropdownMenuTrigger>
-          <DropdownMenuContent
-            className="min-w-56"
-            side={isMobile ? "bottom" : "right"}
-            align="end"
-            sideOffset={4}
-          >
+          <DropdownMenuContent className="min-w-56" side={isMobile ? "bottom" : "right"} align="end" sideOffset={4}>
             <DropdownMenuGroup>
-              <DropdownMenuLabel className="p-0 font-normal">
-                <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                  <Avatar className="size-8">
-                    <AvatarImage src={user.avatar} alt={user.name} />
-                    <AvatarFallback className="rounded-lg">CN</AvatarFallback>
-                  </Avatar>
-                  <div className="grid flex-1 text-left text-sm leading-tight">
-                    <span className="truncate font-medium">{user.name}</span>
-                    <span className="truncate text-xs text-muted-foreground">
-                      {user.email}
-                    </span>
-                  </div>
-                </div>
+              <DropdownMenuLabel className="flex justify-between gap-4">
+                <span className="text-muted-foreground">{tAccess("role")}</span>
+                <span>{tAccess(`roles.${role}`)}</span>
+              </DropdownMenuLabel>
+              <DropdownMenuLabel className="flex justify-between gap-4">
+                <span className="text-muted-foreground">{tAccess("mode")}</span>
+                <span>{tAccess(`modes.${access}`)}</span>
               </DropdownMenuLabel>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <CircleUserRoundIcon
-                />
-                Account
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <CreditCardIcon
-                />
-                Billing
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <BellIcon
-                />
-                Notifications
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <LogOutIcon
-              />
-              Log out
+            <DropdownMenuItem disabled>
+              <BrainIcon />
+              {t("memory")}
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => notConnected(tState("notConnected"))}>
+              <LogOutIcon />
+              {t("logout")}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>
     </SidebarMenu>
-  )
+  );
 }

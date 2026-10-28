@@ -8,5 +8,145 @@
     "system": "Sistem",
     "light": "Açık",
     "dark": "Koyu"
+  },
+  "Locale": {
+    "label": "Dil",
+    "en": "English",
+    "tr": "Türkçe"
+  },
+  "Nav": {
+    "groups": {
+      "overview": "Genel Bakış",
+      "build": "Yapı",
+      "operate": "İşletme",
+      "admin": "Yönetim"
+    },
+    "items": {
+      "overview": "Genel Bakış",
+      "providers": "Sağlayıcılar",
+      "models": "Modeller",
+      "knowledgeBases": "Bilgi Tabanları",
+      "dataSources": "Veri Kaynakları",
+      "tools": "Araçlar",
+      "mcpServers": "MCP Sunucuları",
+      "agents": "Agent'lar",
+      "runs": "Koşular",
+      "approvals": "Onaylar",
+      "evaluations": "Sınavlar",
+      "guardrails": "Guardrail",
+      "channels": "Kanallar",
+      "usage": "Kullanım",
+      "systemStatus": "Sistem Durumu",
+      "projects": "Projeler",
+      "users": "Kullanıcılar",
+      "apiKeys": "API Anahtarları",
+      "quotas": "Kotalar",
+      "audit": "Audit",
+      "retention": "Veri Saklama",
+      "settings": "Ayarlar"
+    }
+  },
+  "Access": {
+    "role": "Rol",
+    "mode": "Erişim",
+    "roles": {
+      "user": "Kullanıcı",
+      "analyst": "Analist",
+      "developer": "Geliştirici",
+      "admin": "Yönetici"
+    },
+    "modes": {
+      "edit": "Düzenleme",
+      "read": "Salt-okunur"
+    },
+    "readOnlyBadge": "Salt-okunur",
+    "readOnlyHint": "Salt-okunur erişim: görüntüleyebilirsiniz ama değiştiremezsiniz."
+  },
+  "Forbidden": {
+    "title": "Yetkiniz yok",
+    "body": "Rolünüz bu ekranı açamaz. Gerekiyorsa bir yöneticiye başvurun."
+  },
+  "ComingSoon": {
+    "title": "{screen} henüz kullanılamıyor",
+    "body": "Bu ekran sonraki bir sürümde gelecek."
+  },
+  "State": {
+    "loading": "Yükleniyor…",
+    "errorTitle": "Bir sorun oluştu",
+    "details": "Ayrıntı",
+    "notConnected": "Henüz backend'e bağlı değil. Bu işlem API bağlandığında kullanılabilir olacak."
+  },
+  "Session": {
+    "unavailableTitle": "Oturum alınamadı",
+    "unavailableBody": "Konsol henüz backend'e bağlı değil; rolünüz ve erişiminiz yüklenemiyor."
+  },
+  "Login": {
+    "title": "FFCore'a giriş",
+    "subtitle": "İş e-postanız ve şifrenizle girin.",
+    "email": "E-posta",
+    "password": "Şifre",
+    "submit": "Giriş yap",
+    "emailInvalid": "Geçerli bir e-posta adresi girin.",
+    "passwordRequired": "Şifrenizi girin."
+  },
+  "Projects": {
+    "title": "Projeler",
+    "description": "Proje; üyelerini, bilgi tabanlarını, agent'larını ve kullanımını bir arada tutar. Her ekip ya da kullanım senaryosu için bir proje oluşturun.",
+    "create": "Proje oluştur",
+    "emptyTitle": "Henüz proje yok",
+    "emptyBody": "İlk projeyi oluşturun, sonra üye ekleyip sağlayıcı atayın."
+  },
+  "Members": {
+    "title": "Proje üyeleri",
+    "description": "Üyenin rolü hangi ekranları göreceğini, erişim modu değişiklik yapıp yapamayacağını belirler.",
+    "add": "Üye ekle",
+    "emptyTitle": "Henüz üye yok",
+    "emptyBody": "Bu projeye kişi ekleyin; rolünü ve erişim modunu seçin."
+  },
+  "Providers": {
+    "title": "Sağlayıcılar",
+    "description": "Sağlayıcı, LLMaaS ya da yerel çalıştırıcı gibi bir model uç noktasıdır. Bağlantıyı test edip projelere atayın.",
+    "add": "Sağlayıcı ekle",
+    "emptyTitle": "Henüz sağlayıcı yok",
+    "emptyBody": "Önce bir sağlayıcı ekleyin; modeller ve agent'lar buna ihtiyaç duyar."
+  },
+  "Models": {
+    "title": "Modeller",
+    "description": "Modeller bir sağlayıcıdan gelir ve agent'ların doğru modeli seçebilmesi için kategoriyle gruplanır.",
+    "add": "Model ekle",
+    "emptyTitle": "Henüz model yok",
+    "emptyBody": "Önce bir sağlayıcı ekleyin, sonra modellerini burada kaydedin."
+  },
+  "ProjectSwitcher": {
+    "label": "Proje",
+    "none": "Proje seçilmedi"
+  },
+  "UserMenu": {
+    "open": "Kullanıcı menüsünü aç",
+    "memory": "Hafızam",
+    "logout": "Çıkış yap"
+  },
+  "Ui": {
+    "toggleSidebar": "Kenar çubuğunu aç/kapat",
+    "close": "Kapat",
+    "more": "Daha fazla",
+    "sidebarTitle": "Kenar çubuğu",
+    "sidebarDescription": "Mobil kenar çubuğunu gösterir."
+  },
+  "DevTheme": {
+    "title": "Tema önizleme",
+    "description": "Tüm bileşenler açık ve koyu temada yan yana.",
+    "light": "Açık tema",
+    "dark": "Koyu tema",
+    "sampleCard": "Örnek kart",
+    "sampleText": "Kart yüzeyinde gövde metni.",
+    "primary": "Birincil",
+    "secondary": "İkincil",
+    "outline": "Çerçeveli",
+    "destructive": "Sil",
+    "success": "Başarılı",
+    "warning": "Uyarı",
+    "inputPlaceholder": "Buraya yazın",
+    "chart": "Grafik paleti"
   }
 }
