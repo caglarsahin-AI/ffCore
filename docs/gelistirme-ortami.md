@@ -6,13 +6,17 @@ host'a kurulmaz (KARARLAR "Geliştirme araçları Docker'da", "make de Docker'da
 
 ## İlk kurulum
 
+Geliştirme ve CI (yalnızca açıkça sahte değerler; üretimde kullanılmaz):
+
 ```bash
-cp .env.example .env          # gizli değerleri siz doldurun; ajanlar .env yazmaz
+cp .env.test .env
 docker compose up -d          # depo kökünde; compose.yaml -> deploy/docker-compose.yml
 docker compose run --rm tools make smoke
 ```
 
-`.env`'de boş bırakılan zorunlu değişken varsa `docker compose` hangi değişkenin eksik olduğunu yazarak durur.
+Gerçek kurulum: `cp .env.example .env`, ardından gizli değerleri kurulumu yapan kişi doldurur (ajanlar ve
+scriptler `.env` yazmaz). Boş bırakılan zorunlu değişken varsa `docker compose` hangi değişkenin eksik
+olduğunu yazarak durur.
 
 ## Günlük komutlar
 
@@ -35,7 +39,7 @@ Docker soketi bağlanmaz; konteyner içinden `docker` komutu çalışmaz.
 - `llmaas` (varsayılan): `COMPOSE_PROFILES` boş; Ollama servisi kalkmaz, `make smoke` Ollama adımını
   `skipped: ollama profile inactive` diye yazar.
 - `airgap` + `INFERENCE_BACKEND=ollama`: `.env`'de `COMPOSE_PROFILES=ollama`. `OLLAMA_CONTEXT_LENGTH` ve
-  `OLLAMA_MEM_LIMIT` zorunludur. Model listesi `deploy/ollama/models.airgap.txt`; `make pull` çeker.
+  `OLLAMA_MEM_LIMIT` zorunludur. Model listesi `deploy/ollama/models.airgap.txt` (yalnızca chat modeli; embedding süreç içi); `make pull` çeker.
   Model çekilmemişse `make smoke` `model_not_pulled: <ad>; make pull` hatasıyla durur.
 
 ## İç registry (`REGISTRY_PREFIX`)

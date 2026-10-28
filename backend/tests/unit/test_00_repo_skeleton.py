@@ -100,3 +100,37 @@ def test_00_7_tools_service_has_no_docker_socket():
     tools = _compose()["services"]["tools"]
     assert tools["profiles"] == ["tools"]
     assert not any("docker.sock" in str(volume) for volume in tools.get("volumes", []))
+
+
+def test_00_1_env_test_fills_every_required_variable_with_marked_dummies():
+    env_test = ROOT / ".env.test"
+    text = env_test.read_text(encoding="utf-8")
+    assert text.startswith("# YALNIZCA GELİŞTİRME/CI")
+    values = {}
+    for line in text.splitlines():
+        if line and not line.startswith("#") and "=" in line:
+            key, value = line.split("=", 1)
+            values[key.strip()] = value.strip()
+    compose_lines = COMPOSE.read_text(encoding="utf-8").splitlines()
+    code = "\n".join(line for line in compose_lines if not line.lstrip().startswith("#"))
+    required = set(re.findall(r"\$\{([A-Z0-9_]+):\?", code))
+    for name in sorted(required):
+        assert values.get(name), name
+    secret_names = [n for n in values if re.search(r"PASSWORD|SECRET|SALT|KEY", n)]
+    assert secret_names
+    for name in secret_names:
+        if name == "LANGFUSE_ENCRYPTION_KEY":
+            assert values[name] == "0" * 64  # format: 64 hex characters
+            continue
+        assert "dummy-not-secret" in values[name], name
+
+
+def test_00_6_airgap_list_has_only_chat_model():
+    listed = [
+        line
+        for line in (ROOT / "deploy" / "ollama" / "models.airgap.txt")
+        .read_text(encoding="utf-8")
+        .splitlines()
+        if line and not line.startswith("#")
+    ]
+    assert listed == ["qwen3.5:35b"]
