@@ -16,7 +16,8 @@ type LoginRequest = components["schemas"]["LoginRequest"];
 
 // POST /auth/login (03a): the backend sets the HttpOnly session cookie; a wrong email or password
 // is one 401 invalid_credentials, shown on the form without saying which field was wrong.
-export function LoginForm() {
+// `next` is already checked by safeNext (same-origin path) on the server.
+export function LoginForm({ next }: { next: string }) {
   const t = useTranslations("Login");
   const tErrors = useTranslations("Errors");
   const router = useRouter();
@@ -42,7 +43,7 @@ export function LoginForm() {
     setPending(true);
     try {
       await api("POST", "/api/v1/auth/login", parsed.data satisfies LoginRequest);
-      router.replace("/");
+      router.replace(next);
       router.refresh();
     } catch (error) {
       setPending(false);

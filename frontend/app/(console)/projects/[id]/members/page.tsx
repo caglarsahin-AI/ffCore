@@ -26,9 +26,10 @@ export default function MembersPage() {
 
   return (
     <Screen title={t("title")} description={t("description")}>
-      {/* Picking a user needs GET /users, a tenant list (03a: superadmin only). */}
+      {/* Picking a user needs GET /users, a tenant list (03a: superadmin only). The form waits for
+          the member list: candidates are "users minus members", unknown while that list is not loaded. */}
       {isSuperadmin ? (
-        <MemberForm projectId={projectId} existing={members.data ?? []} />
+        members.isSuccess && <MemberForm projectId={projectId} existing={members.data} />
       ) : (
         <p className="text-sm text-muted-foreground" data-testid="member-add-hint">
           {t("addNeedsSuperadmin")}

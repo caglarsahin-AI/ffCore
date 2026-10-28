@@ -16,6 +16,7 @@ export type Fixture = {
   stale: Account; // admin+edit on alpha; set to read during a test (kabul 5)
   lonely: Account; // no membership
   memberCandidate: Account; // not a member anywhere, added in the members test
+  expiring: Account; // admin+edit on alpha; its session is revoked during a test (401 path)
   alpha: { id: string; key: string };
   beta: { id: string; key: string };
 };

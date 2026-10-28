@@ -21,10 +21,11 @@ const keys = {
   models: (projectId: string) => ["projects", projectId, "models"] as const,
 };
 
-export function useProjects() {
+export function useProjects(enabled = true) {
   return useQuery({
     queryKey: keys.projects,
     queryFn: () => api<S["ProjectList"]>("GET", "/api/v1/projects").then((r) => r.data),
+    enabled,
   });
 }
 

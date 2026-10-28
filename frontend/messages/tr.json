@@ -120,7 +120,8 @@
     "remove": "Üyeyi çıkar",
     "pickUser": "Kullanıcı seçin",
     "pickRole": "Rol seçin",
-    "addNeedsSuperadmin": "Üye eklemek kullanıcı listesini gerektirir; bu listeyi yalnızca süper yönetici görür. Yeni üyeleri bir süper yöneticiye ekletin."
+    "addNeedsSuperadmin": "Üye eklemek kullanıcı listesini gerektirir; bu listeyi yalnızca süper yönetici görür. Yeni üyeleri bir süper yöneticiye ekletin.",
+    "noCandidates": "Etkin kullanıcıların hepsi zaten bu projenin üyesi."
   },
   "Providers": {
     "title": "Sağlayıcılar",
@@ -156,7 +157,8 @@
     "none": "Proje seçilmedi",
     "selectTitle": "Proje seçin",
     "selectBody": "Bu ekran bir projeye ait. Üstteki proje seçiciden birini seçin.",
-    "select": "Proje seç"
+    "select": "Proje seç",
+    "noProjects": "Henüz proje yok"
   },
   "UserMenu": {
     "open": "Kullanıcı menüsünü aç",

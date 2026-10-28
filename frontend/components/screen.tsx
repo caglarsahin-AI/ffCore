@@ -7,6 +7,7 @@ import type { UseQueryResult } from "@tanstack/react-query";
 
 import { ApiError } from "@/lib/api/client";
 import { errorMessageKey } from "@/lib/api/errors";
+import { isUnauthenticated } from "@/lib/login-redirect";
 
 type ScreenProps = { title: string; description: string; action?: React.ReactNode; children: React.ReactNode };
 
@@ -41,8 +42,29 @@ export function EmptyState({ title, body }: { title: string; body: string }) {
   );
 }
 
+// A failed query, wherever its data would have been: mapped message, contract code and backend
+// text under "Details". Never replaced by an empty list or an empty picker (ARCH-06).
+export function QueryError({ error, compact = false }: { error: Error; compact?: boolean }) {
+  const tState = useTranslations("State");
+  const tErrors = useTranslations("Errors");
+  const code = error instanceof ApiError ? error.code : "unexpected_response";
+  return (
+    <section
+      className={compact ? "flex flex-col gap-1 text-sm" : "flex flex-col gap-2 rounded-xl border bg-card p-6"}
+      role="alert"
+      data-testid="query-error"
+    >
+      <p className="font-medium text-destructive">{tErrors(errorMessageKey(code))}</p>
+      <details className="text-muted-foreground">
+        <summary className="cursor-pointer">{tState("details")}</summary>
+        <pre className="mt-2 whitespace-pre-wrap">{`${code}: ${error.message}`}</pre>
+      </details>
+    </section>
+  );
+}
+
 // Loading, failed and empty states of a list query; the list itself only when there is data.
-// A failed load is shown with its error code, never as an empty list (ARCH-06).
+// A 401 is already on its way to sign-in (QueryProvider), so it keeps the loading text.
 export function ListState<T>({
   query,
   empty,
@@ -53,20 +75,10 @@ export function ListState<T>({
   children: (rows: T[]) => React.ReactNode;
 }) {
   const tState = useTranslations("State");
-  const tErrors = useTranslations("Errors");
-  if (query.isPending) return <p className="text-muted-foreground">{tState("loading")}</p>;
-  if (query.isError) {
-    const code = query.error instanceof ApiError ? query.error.code : "unexpected_response";
-    return (
-      <section className="flex flex-col gap-2 rounded-xl border bg-card p-6" role="alert" data-testid="list-error">
-        <p className="font-medium">{tErrors(errorMessageKey(code))}</p>
-        <details className="text-sm text-muted-foreground">
-          <summary className="cursor-pointer">{tState("details")}</summary>
-          <pre className="mt-2 whitespace-pre-wrap">{`${code}: ${query.error.message}`}</pre>
-        </details>
-      </section>
-    );
+  if (query.isPending || (query.isError && isUnauthenticated(query.error))) {
+    return <p className="text-muted-foreground">{tState("loading")}</p>;
   }
+  if (query.isError) return <QueryError error={query.error} />;
   if (query.data.length === 0) return <EmptyState {...empty} />;
   return children(query.data);
 }

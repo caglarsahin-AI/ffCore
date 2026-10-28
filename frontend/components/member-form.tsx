@@ -4,6 +4,7 @@ import { UserPlusIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 
+import { QueryError } from "@/components/screen";
 import { useReportError } from "@/components/use-report-error";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -12,6 +13,7 @@ import { ACCESS_MODES, ASSIGNABLE_ROLES } from "@/lib/access";
 import type { AccessMode, Role } from "@/lib/access";
 import { useAddMember, useUsers } from "@/lib/api/queries";
 import type { Member } from "@/lib/api/queries";
+import { isUnauthenticated } from "@/lib/login-redirect";
 
 const SELECT = "rounded-md border border-input bg-background px-2 py-1 text-foreground";
 
@@ -26,7 +28,7 @@ export function MemberForm({ projectId, existing }: { projectId: string; existin
   const [userId, setUserId] = useState("");
   const [role, setRole] = useState<Role | "">("");
   const [access, setAccess] = useState<AccessMode>("edit");
-  const candidates = (users.data ?? []).filter((u) => u.is_active && !existing.some((m) => m.user_id === u.id));
+  const tState = useTranslations("State");
 
   function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -43,6 +45,26 @@ export function MemberForm({ projectId, existing }: { projectId: string; existin
     );
   }
 
+  // Three states of the user list (review r1): loading, failed (no picker, the error instead),
+  // and a real list that may honestly be empty. A failure is never an empty picker.
+  if (users.isError && !isUnauthenticated(users.error)) {
+    return (
+      <div className="rounded-xl border bg-card p-4" data-testid="member-form">
+        <QueryError error={users.error} compact />
+      </div>
+    );
+  }
+  const candidates = users.isSuccess
+    ? users.data.filter((u) => u.is_active && !existing.some((m) => m.user_id === u.id))
+    : null;
+  if (candidates?.length === 0) {
+    return (
+      <p className="text-sm text-muted-foreground" data-testid="member-no-candidates">
+        {t("noCandidates")}
+      </p>
+    );
+  }
+
   return (
     <form
       className="flex flex-wrap items-end gap-3 rounded-xl border bg-card p-4"
@@ -51,11 +73,17 @@ export function MemberForm({ projectId, existing }: { projectId: string; existin
     >
       <div className="flex flex-col gap-2">
         <Label htmlFor="member-user">{t("user")}</Label>
-        <select id="member-user" className={SELECT} value={userId} onChange={(e) => setUserId(e.target.value)}>
+        <select
+          id="member-user"
+          className={SELECT}
+          value={userId}
+          onChange={(e) => setUserId(e.target.value)}
+          disabled={candidates === null}
+        >
           <option value="" disabled>
-            {t("pickUser")}
+            {candidates === null ? tState("loading") : t("pickUser")}
           </option>
-          {candidates.map((user) => (
+          {(candidates ?? []).map((user) => (
             <option key={user.id} value={user.id}>
               {user.email}
             </option>
