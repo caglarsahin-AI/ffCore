@@ -204,7 +204,14 @@ class _PinnedBackend(httpcore2.AsyncNetworkBackend):
         # Defence in depth: the same host rules as the URL check, at the layer that dials.
         self._policy.check_host(host, f"{host}:{port}")
         literal = _parse_ip(host)
-        addresses = [str(literal)] if literal is not None else await self._resolver(host, port)
+        try:
+            addresses = [str(literal)] if literal is not None else await self._resolver(host, port)
+        except OSError:
+            # Name lookup failed (socket.gaierror and friends): a failed call like any other
+            # connection failure, not an unhandled error. The system text is not carried along.
+            raise EgressRequestFailed(
+                "egress_dns_failed", f"{host}:{port}", "name does not resolve"
+            ) from None
         if not addresses:
             raise EgressDenied("egress_private_address", f"{host}:{port}", "no address")
         for address in addresses:

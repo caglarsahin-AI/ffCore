@@ -12,6 +12,7 @@ import pytest
 from ffcore.core import egress
 from ffcore.core.egress import (
     EgressDenied,
+    EgressRequestFailed,
     EgressTimeout,
     EgressTimeoutError,
     SafeOutboundClient,
@@ -278,6 +279,45 @@ def test_03b_2_internal_host_allowed_by_name_and_cidr(settings, server_port):
     by_cidr = _client(settings, _resolver({}), allowed_internal_hosts=["127.0.0.0/8"])
     response = anyio.run(_get, by_cidr, f"http://127.0.0.1:{server_port}/ok")
     assert response.status_code == 200
+
+
+# --- unresolvable host (10a-forms, K-10af-0003): a failed call, never an unhandled OSError ------
+
+UNRESOLVABLE = "no-such-provider.invalid"  # RFC 6761: never resolves
+
+
+def test_03b_2_unresolvable_host_is_request_failed(settings):
+    client = _client(settings, egress.system_resolver, allowed_internal_hosts=[UNRESOLVABLE])
+    with pytest.raises(EgressRequestFailed) as exc:
+        anyio.run(_get, client, f"http://{UNRESOLVABLE}:11434/api/tags")
+    assert exc.value.code == "egress_dns_failed"
+    assert UNRESOLVABLE in str(exc.value)
+    assert "/api/tags" not in str(exc.value)
+    assert exc.value.__cause__ is None  # the system text is not carried along
+
+
+def test_03b_2_resolver_os_error_is_request_failed(settings):
+    async def failing(host, port):
+        raise OSError("resolver exploded with system detail")
+
+    client = _client(settings, failing, allowed_internal_hosts=["svc.internal"])
+    with pytest.raises(EgressRequestFailed) as exc:
+        anyio.run(_get, client, "http://svc.internal/ok")
+    assert exc.value.code == "egress_dns_failed"
+    assert "system detail" not in str(exc.value)
+
+
+def test_03b_2_unresolvable_host_still_needs_the_policy(settings):
+    # The policy check comes first and stays the same: a host that is not allowed is denied
+    # before any name lookup.
+    calls = []
+
+    async def resolver(host, port):
+        calls.append(host)
+        raise OSError("not reached")
+
+    _denied(settings, f"http://{UNRESOLVABLE}/x", "egress_not_allowlisted", resolver)
+    assert calls == []
 
 
 def test_03b_2_redirect_to_private_rejected(settings, server_port):
