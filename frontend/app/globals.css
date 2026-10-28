@@ -3,7 +3,8 @@
 @import "shadcn/tailwind.css";
 @import "../styles/tokens.css";
 
-@custom-variant dark (&:is(.dark *));
+/* Nearest theme wins: a .light subtree inside .dark (/dev/theme preview) gets no dark: styles. */
+@custom-variant dark (&:is(.dark *):not(.dark .light *));
 
 @theme inline {
   --color-background: var(--background);
@@ -19,6 +20,10 @@
   --color-sidebar-primary: var(--sidebar-primary);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar: var(--sidebar);
+  --color-overlay: var(--overlay);
+  --color-chart-8: var(--chart-8);
+  --color-chart-7: var(--chart-7);
+  --color-chart-6: var(--chart-6);
   --color-chart-5: var(--chart-5);
   --color-chart-4: var(--chart-4);
   --color-chart-3: var(--chart-3);
