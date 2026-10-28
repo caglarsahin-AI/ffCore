@@ -50,6 +50,9 @@ def test_01_8_changed_row_is_updated(database_url, pg, catalog, llm_settings):
     assert len(report.updated) == 1 and not report.created and not report.deleted
     (model,) = litellm_models(llm_settings).values()
     assert model["model_info"]["id"] == str(model_id)
+    # The change is in LiteLLM, not only in the report (02: /model/update applied nothing).
+    assert model["litellm_params"]["model"] == "openai/other-model"
+    assert not run_reconcile(database_url, llm_settings).changed
 
 
 def test_01_3_inactive_model_removed(database_url, pg, catalog, llm_settings):
@@ -151,3 +154,28 @@ def test_01_internal_key_registered(database_url, pg, catalog, llm_settings):
         f"{llm_settings.litellm_url}/key/info", params={"key": key}, headers=master(llm_settings)
     )
     assert response.status_code == 200
+
+
+def test_01_6_api_key_encrypted_after_update(database_url, pg, catalog, llm_settings, litellm_db):
+    """U2 also on the update path (PATCH /model/{id}/update, 02)."""
+    from ffcore.core.secrets import encrypt_json
+
+    project = catalog.project()
+    provider = catalog.provider([project])
+    catalog.model(project, provider)
+    run_reconcile(database_url, llm_settings)
+    new_key = f"{SECRET_MARKER}-rotated-key"
+    pg.execute(
+        "UPDATE providers SET config_encrypted = %s WHERE id = %s",
+        (
+            encrypt_json({"base_url": "http://fake-llm:9999/v1", "api_key": new_key}, llm_settings),
+            provider,
+        ),
+    )
+
+    assert len(run_reconcile(database_url, llm_settings).updated) == 1
+
+    hits = litellm_db.execute(
+        'SELECT count(*) FROM "LiteLLM_ProxyModelTable" t WHERE t::text LIKE %s', (f"%{new_key}%",)
+    ).fetchone()[0]
+    assert hits == 0
