@@ -1,23 +1,19 @@
-// Role and access mode as UI state (brief 03: four fixed roles, `edit|read` per membership).
-// Temporary hand-written union: replaced by the type generated from the 03a OpenAPI enum
-// in 10a-binding. Not an API body type.
-export const ROLES = ["user", "analyst", "developer", "admin"] as const;
-export type Role = (typeof ROLES)[number];
+import type { components } from "@/lib/api/schema";
 
-export const ACCESS_MODES = ["edit", "read"] as const;
-export type AccessMode = (typeof ACCESS_MODES)[number];
+// Role and access mode as UI state. Types come from the 03a OpenAPI contract (generated);
+// the runtime lists below must match the contract enums (test_10ab_10_contract_copy).
+export type Role = components["schemas"]["Role"];
+export type AccessMode = components["schemas"]["AccessMode"];
+
+// Role order user < analyst < developer < admin (R2.4).
+export const ROLES = ["user", "analyst", "developer", "admin"] as const satisfies readonly Role[];
+export const ACCESS_MODES = ["edit", "read"] as const satisfies readonly AccessMode[];
+
+// Roles a project membership can be given in the PoC (contract: developer and user reserved, A3).
+export const ASSIGNABLE_ROLES = ["analyst", "admin"] as const satisfies readonly Role[];
 
 export type Session = { role: Role; access: AccessMode };
 
-// Role order user < analyst < developer < admin (R2.4).
 export function hasRole(actual: Role, required: Role): boolean {
   return ROLES.indexOf(actual) >= ROLES.indexOf(required);
-}
-
-export function parseSession(value: string | undefined): Session | null {
-  const [role, access] = (value ?? "").split(":");
-  if (!ROLES.includes(role as Role) || !ACCESS_MODES.includes(access as AccessMode)) {
-    return null;
-  }
-  return { role: role as Role, access: access as AccessMode };
 }
