@@ -85,6 +85,8 @@ services:
       LITELLM_DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/litellm
       DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/litellm
       STORE_MODEL_IN_DB: "True"
+      # The admin UI stays off; models come from FFCore's tables only (01).
+      DISABLE_ADMIN_UI: "True"
     volumes:
       - ./deploy/litellm/config.yaml:/app/config.yaml:ro
     depends_on:
@@ -293,6 +295,15 @@ services:
       <<: *app-env
       COMPOSE_PROFILES: ${COMPOSE_PROFILES:-}
       OLLAMA_CONTEXT_LENGTH: ${OLLAMA_CONTEXT_LENGTH:-}
+      # make seed-models (01) only; read once on first install, never given to the backend.
+      SEED_ANTHROPIC_API_KEY: ${SEED_ANTHROPIC_API_KEY:-}
+      SEED_AZURE_OPENAI_API_KEY: ${SEED_AZURE_OPENAI_API_KEY:-}
+      SEED_AZURE_OPENAI_API_BASE: ${SEED_AZURE_OPENAI_API_BASE:-}
+      SEED_AZURE_OPENAI_API_VERSION: ${SEED_AZURE_OPENAI_API_VERSION:-}
+      SEED_AZURE_OPENAI_DEPLOYMENT: ${SEED_AZURE_OPENAI_DEPLOYMENT:-}
+      SEED_OLLAMA_BASE_URL: ${SEED_OLLAMA_BASE_URL:-}
+      SEED_VLLM_BASE_URL: ${SEED_VLLM_BASE_URL:-}
+      SEED_VLLM_MODEL: ${SEED_VLLM_MODEL:-}
 
   e2e:
     # Console acceptance tests against this stack (10a-binding, K-10ab-0004). Builds and serves the

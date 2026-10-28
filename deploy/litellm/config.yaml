@@ -5,4 +5,7 @@ general_settings:
   database_url: os.environ/LITELLM_DATABASE_URL
   store_model_in_db: true
 
-litellm_settings: {}
+# Parameters a provider does not support are an error, not dropped silently; a model drops them
+# only when its request_policy says so (drop_unsupported_params, reject_params).
+litellm_settings:
+  drop_params: false

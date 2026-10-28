@@ -11,9 +11,11 @@ code and logged. LiteLLM's `/config/update` is never called; it stores the maste
 text (K-01-0004).
 """
 
+import asyncio
 import hashlib
 import json
 import logging
+from collections.abc import Awaitable, Callable
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -26,6 +28,7 @@ from ffcore.core.egress import EgressDenied, EgressPolicy, EgressTimeout, SafeOu
 from ffcore.core.secrets import decrypt_json
 from ffcore.models.catalog import Model, Provider, ProviderProject, litellm_name
 from ffcore.models.identity import Project
+from ffcore.services.catalog_events import CatalogChanged
 from ffcore.services.litellm_client import LiteLLMError, LiteLLMSettings, litellm_settings
 
 log = logging.getLogger("ffcore.litellm_reconcile")
@@ -340,3 +343,69 @@ async def reconcile(
         len(problems),
     )
     return report
+
+
+class ReconcileScheduler:
+    """Catalog events -> background reconcile (S1, FOLLOWUP-56). `on_change` is the catalog event
+    listener: it never raises and never calls LiteLLM itself; it marks the catalog dirty and
+    starts one task on the running loop. Events that arrive while a run is going on lead to one
+    more run, not one per event. A failed run is retried with exponential backoff; after the
+    last attempt it is logged as `litellm_reconcile_failed` and `last_error` is set (the next
+    event, a restart or `make render-litellm` tries again)."""
+
+    def __init__(
+        self,
+        run: Callable[[], Awaitable[ReconcileReport]],
+        retries: int = 3,
+        base_delay: float = 1.0,
+    ) -> None:
+        self._run = run
+        self._retries = retries
+        self._base_delay = base_delay
+        self._dirty = False
+        self._task: asyncio.Task | None = None
+        self.last_error: str | None = None
+        self.runs = 0
+
+    def on_change(self, change: CatalogChanged | None = None) -> None:
+        try:
+            self._dirty = True
+            if self._task is None or self._task.done():
+                self._task = asyncio.get_running_loop().create_task(self._worker())
+        except Exception as exc:  # the listener must not break the caller's commit
+            log.error("litellm_reconcile_not_scheduled error=%s", type(exc).__name__)
+
+    async def wait_idle(self) -> None:
+        while self._task is not None and not self._task.done():
+            await asyncio.shield(self._task)
+
+    async def _worker(self) -> None:
+        while self._dirty:
+            self._dirty = False
+            for attempt in range(1, self._retries + 1):
+                try:
+                    self.runs += 1
+                    await self._run()
+                    self.last_error = None
+                    break
+                except asyncio.CancelledError:
+                    raise
+                except Exception as exc:
+                    self.last_error = type(exc).__name__
+                    if attempt == self._retries:
+                        log.error("litellm_reconcile_failed attempts=%d error=%s", attempt, exc)
+                    else:
+                        log.warning("litellm_reconcile_retry attempt=%d error=%s", attempt, exc)
+                        await asyncio.sleep(self._base_delay * 2 ** (attempt - 1))
+
+
+def background_scheduler(settings: Callable[[], Settings]) -> ReconcileScheduler:
+    """The backend's scheduler: reconciles the configured database with the same settings the
+    requests use (`settings` is read at every run)."""
+    from ffcore.core import db
+
+    async def run() -> ReconcileReport:
+        async with db.session_scope() as session:
+            return await reconcile(session, settings())
+
+    return ReconcileScheduler(run)

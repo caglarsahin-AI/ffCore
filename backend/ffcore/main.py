@@ -1,3 +1,4 @@
+import logging
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -5,18 +6,40 @@ from fastapi import FastAPI
 from ffcore.api import api_router
 from ffcore.core.audit import ensure_audit_partitions
 from ffcore.core.auth import register_credential_resolver
+from ffcore.core.config import get_settings
 from ffcore.core.errors import install_error_handlers
 from ffcore.core.session import session_resolver
+from ffcore.services import catalog_events
+from ffcore.services.litellm_reconcile import background_scheduler
+
+log = logging.getLogger("ffcore.main")
 
 # Console sessions (03a); resolve_actor stays the single verification point (C2).
 register_credential_resolver(session_resolver)
 
 
 @asynccontextmanager
-async def lifespan(_: FastAPI):
+async def lifespan(app: FastAPI):
     # The schema comes from the migrate service; this only adds missing monthly partitions.
     await ensure_audit_partitions(2)
+
+    # 01: LiteLLM's models follow the tables. One reconcile at start and one after each catalog
+    # change, in the background; a failure is logged and retried, start-up goes on (S4).
+    def settings():
+        # The request dependency, so an override (tests) applies to the background run too.
+        return app.dependency_overrides.get(get_settings, get_settings)()
+
+    scheduler = None
+    if settings().litellm_url:
+        scheduler = background_scheduler(settings)
+        catalog_events.subscribe(scheduler.on_change)
+        scheduler.on_change()
+    else:
+        log.error("litellm_not_configured LITELLM_URL is not set; model calls will fail")
+    app.state.litellm_scheduler = scheduler
     yield
+    if scheduler is not None:
+        catalog_events.unsubscribe(scheduler.on_change)
 
 
 app = FastAPI(title="FFCore", lifespan=lifespan)
