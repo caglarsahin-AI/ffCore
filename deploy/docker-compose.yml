@@ -213,8 +213,18 @@ services:
     environment: &app-env
       DEPLOY_PROFILE: ${DEPLOY_PROFILE:?DEPLOY_PROFILE tanımlı değil}
       INFERENCE_BACKEND: ${INFERENCE_BACKEND:?INFERENCE_BACKEND tanımlı değil}
+      # 04a /readyz compares it with the Ollama models' context_tokens (C13).
+      OLLAMA_CONTEXT_LENGTH: ${OLLAMA_CONTEXT_LENGTH:-}
       VECTOR_BACKEND: ${VECTOR_BACKEND:?VECTOR_BACKEND tanımlı değil}
       QDRANT_URL: ${QDRANT_URL:-}
+      # 04a knowledge base (defaults = measured values, .env.example)
+      EMBED_MODEL: ${EMBED_MODEL:-BAAI/bge-m3}
+      RERANK_MODEL: ${RERANK_MODEL:-BAAI/bge-reranker-v2-m3}
+      RERANK_MIN_SCORE: ${RERANK_MIN_SCORE:-0.1}
+      CONVERT_TIMEOUT_SECONDS: ${CONVERT_TIMEOUT_SECONDS:-600}
+      OCR_PDF_MAX_PAGES: ${OCR_PDF_MAX_PAGES:-200}
+      ALLOWED_LANGUAGES: ${ALLOWED_LANGUAGES:-tr,en}
+      ARQ_QUEUE_INGEST: ${ARQ_QUEUE_INGEST:-ingest}
       OFFLINE: ${OFFLINE:?OFFLINE tanımlı değil}
       DATABASE_URL: postgresql+psycopg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
       REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379/0

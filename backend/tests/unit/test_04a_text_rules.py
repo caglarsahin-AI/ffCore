@@ -185,3 +185,22 @@ def test_04a_chunk_page_markers_set_page():
     chunks = chunk_markdown(body, breadcrumb="KB › Doc", settings=SETTINGS)
     assert chunks[0].page == 1
     assert "<!-- page" not in chunks[0].body
+
+
+def test_04a_chunks_start_at_article_boundaries_without_markdown_headings():
+    """Brief 04 step 7: article numbers start chunks. Docling gave plain paragraphs for the 13a
+    PDF (no `#`), so `Madde N` paragraphs are the section boundaries (A-04a-0020)."""
+    articles = "\n\n".join(f"Madde {i} - Başlık {i} {i}.1 " + PROSE * 3 for i in range(1, 12))
+    chunks = chunk_markdown(articles, breadcrumb="KB › Doc", settings=SETTINGS)
+    assert len(chunks) > 1
+    for chunk in chunks:
+        assert chunk.body.startswith("Madde "), chunk.body[:40]
+        assert "Madde" in chunk.breadcrumb
+    owner = next(c for c in chunks if "Madde 10 -" in c.body)
+    assert owner.body.startswith("Madde ") and approx_tokens(owner.body) <= SETTINGS.max_tokens
+
+
+def test_04a_markdown_headings_win_over_article_lines():
+    body = "# Bölüm A\n\nMadde 1 - X 1.1 " + PROSE * 2 + "\n\n# Bölüm B\n\n" + PROSE * 2
+    crumbs = {c.breadcrumb for c in chunk_markdown(body, breadcrumb="KB", settings=SETTINGS)}
+    assert all("Bölüm" in c for c in crumbs)

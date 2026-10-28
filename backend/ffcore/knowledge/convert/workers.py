@@ -166,3 +166,27 @@ class BoundedPool:
             ),
             None,
         )
+
+
+class PersistentPool(BoundedPool):
+    """One long-lived worker process for the ingest worker's jobs: Docling and PaddleOCR load
+    once per process, not once per document (PayCore's design; A-04a-0020 measured 66 s of a
+    131 s ingest in a freshly spawned process). A timeout or a crash replaces the process."""
+
+    def __init__(self, timeout: float, name: str, target: str):
+        super().__init__(size=1, timeout=timeout, name=name, target=target)
+        self._worker: _Worker | None = None
+        self._lock = threading.Lock()
+
+    def convert(self, path: Path) -> ConversionResult:
+        with self._lock:
+            if self._worker is None:
+                self._worker = _Worker(self.target, f"{self.name}-worker")
+            result, self._worker = self._one(self._worker, path, time.time())
+            return result
+
+    def close(self) -> None:
+        with self._lock:
+            if self._worker is not None:
+                self._worker.stop()
+                self._worker = None

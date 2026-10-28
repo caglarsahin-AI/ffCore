@@ -13,6 +13,12 @@ from typing import Any, Protocol
 
 from ffcore.core.config import Settings
 
+# Pair limit (query + chunk) in model tokens. FlagReranker's default is 512, which silently cut
+# the end of a full chunk (600 estimated tokens are ~700 real Turkish tokens; A-04a-0020: the
+# answer at token 552 scored 0.0009, read in full 0.90). 1024 covers the chunk ceiling; a pair
+# that still exceeds it is reported as truncated, never cut silently.
+MAX_LENGTH = 1024
+
 
 class Reranker(Protocol):
     model: str
@@ -37,12 +43,19 @@ class BgeReranker:
         with self._lock:
             self._load()
 
-    def score(self, query: str, texts: list[str]) -> list[float]:
+    def score_with_truncation(self, query: str, texts: list[str]) -> tuple[list[float], list[bool]]:
         if not texts:
-            return []
+            return [], []
+        pairs = [[query, t] for t in texts]
         with self._lock:
-            scores = self._load().compute_score([[query, t] for t in texts], normalize=True)
-        return [float(s) for s in (scores if isinstance(scores, list) else [scores])]
+            model = self._load()
+            truncated = [len(model.tokenizer(query, t)["input_ids"]) > MAX_LENGTH for t in texts]
+            scores = model.compute_score(pairs, normalize=True, max_length=MAX_LENGTH)
+        values = [float(s) for s in (scores if isinstance(scores, list) else [scores])]
+        return values, truncated
+
+    def score(self, query: str, texts: list[str]) -> list[float]:
+        return self.score_with_truncation(query, texts)[0]
 
 
 _WORD = re.compile(r"\w+", re.U)

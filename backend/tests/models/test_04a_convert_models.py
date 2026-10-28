@@ -70,3 +70,42 @@ def test_04a_13a_samples_convert_with_docling(name):
     assert result.status == CONVERTED, result.warnings
     assert result.method.startswith("docling@"), result.method
     assert "Madde" in result.text_md and "ş" in result.text_md
+
+
+def test_04a_chunks_fit_real_tokenizer_limits():
+    """K-04a-0010: no chunk body exceeds max_tokens in bge-m3's own tokens, and the reranker
+    pair (query + breadcrumb + body) fits its 1024-token limit. Prints the speed of both
+    counters for the PR."""
+    from ffcore.core.config import Settings
+    from ffcore.knowledge.chunking import ChunkSettings, approx_tokens, chunk_markdown
+    from ffcore.knowledge.embed import token_counter
+    from ffcore.knowledge.normalize import clean_markdown
+    from ffcore.knowledge.rerank import MAX_LENGTH
+    from tests.dummy import SETTINGS_03A
+
+    settings = Settings(
+        deploy_profile="airgap",
+        offline=False,
+        service_token="dummy-not-secret-service-token-0123456789",
+        obo_jwt_secret="dummy-not-secret-obo-jwt-secret-0123456789",
+        **SETTINGS_03A,
+    )
+    count = token_counter(settings)
+    text = clean_markdown(
+        pipeline.convert_one(SAMPLES / "SZL-2024-011_cihaz-bakim.pdf", time.time() + 600).text_md
+    )
+    timings = {}
+    for name, counter in (("estimate", approx_tokens), ("bge-m3 tokenizer", count)):
+        started = time.time()
+        chunks = chunk_markdown(
+            text,
+            breadcrumb="Sözleşmeler › SZL-2024-011",
+            settings=ChunkSettings.from_kb(400, 0, counter),
+        )
+        timings[name] = (time.time() - started, len(chunks))
+    print(f"\nchunking timings (s, chunks): {timings}")
+    for chunk in chunks:
+        assert count(chunk.body) <= 600, (count(chunk.body), chunk.body[:60])
+        assert count("fesih bildirim süresi " + chunk.text) + 4 <= MAX_LENGTH
+    fesih = [c for c in chunks if "10.1" in c.body]
+    assert fesih and fesih[0].body.startswith("Madde")

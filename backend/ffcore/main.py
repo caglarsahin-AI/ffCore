@@ -1,3 +1,4 @@
+import asyncio
 import logging
 from contextlib import asynccontextmanager
 
@@ -9,6 +10,7 @@ from ffcore.core.auth import register_credential_resolver
 from ffcore.core.config import get_settings
 from ffcore.core.errors import install_error_handlers
 from ffcore.core.readiness import router as readiness_router
+from ffcore.core.readiness import warmup
 from ffcore.core.session import session_resolver
 from ffcore.knowledge.embed import probe_dimension
 from ffcore.services.providers import register_embedding_probe
@@ -42,7 +44,10 @@ async def lifespan(app: FastAPI):
     else:
         log.error("litellm_not_configured LITELLM_URL is not set; model calls will fail")
     app.state.litellm_scheduler = scheduler
+    # 04a: models load in the background; /readyz answers 503 "warming" until they are in.
+    warming = asyncio.create_task(warmup(settings()))
     yield
+    warming.cancel()
     if scheduler is not None:
         catalog_events.unsubscribe(scheduler.on_change)
 

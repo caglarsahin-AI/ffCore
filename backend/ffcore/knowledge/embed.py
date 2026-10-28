@@ -136,3 +136,25 @@ async def probe_dimension(config: dict[str, str], model_id: str, settings: Setti
         )
     result = await embed(settings, ["dimension probe"])
     return len(result.dense[0])
+
+
+@lru_cache
+def _tokenizer(model: str) -> Any:
+    from transformers import AutoTokenizer
+
+    return AutoTokenizer.from_pretrained(model)
+
+
+def token_counter(settings: Settings):
+    """Chunk limits in the embedding model's own tokens (K-04a-0010). The tokenizer alone loads
+    in the worker (no model weights); FAKE_EMBED=1 uses the estimate, explicitly."""
+    from ffcore.knowledge.chunking import approx_tokens
+
+    if settings.fake_embed:
+        return approx_tokens
+    tokenizer = _tokenizer(settings.embed_model)
+
+    def count(text: str) -> int:
+        return len(tokenizer(text, add_special_tokens=False)["input_ids"])
+
+    return count

@@ -12,7 +12,8 @@ removed from the text.
 """
 
 import re
-from dataclasses import dataclass
+from collections.abc import Callable
+from dataclasses import dataclass, field
 
 TOKENS_PER_WORD = 1.6
 CHARS_PER_TOKEN = 6
@@ -24,6 +25,14 @@ BREADCRUMB_SEPARATOR = " › "
 _HEADING = re.compile(r"^(#{1,3})\s+(.*)$", re.M)
 _SENTENCE = re.compile(r"(?<=[.!?…])\s+")
 _PAGE = re.compile(r"<!--\s*page:\s*(\d+)\s*-->")
+# A paragraph that opens a contract article: "Madde 10 - Fesih 10.1 ...". Used as the section
+# boundary when the converter produced no Markdown headings (brief 04 step 7: article numbers
+# start chunks). The heading is "Madde 10 - Fesih", without the first sub-clause.
+_ARTICLE = re.compile(
+    r"^(?:<!--\s*page:\s*\d+\s*-->\s*)?(Madde\s+\d+(?:\s*[-–:]\s*[^\n]*?)?)"
+    r"(?=\s+\d+\.\d+|\s*\n|$)",
+    re.M,
+)
 
 
 def approx_tokens(text: str) -> int:
@@ -34,13 +43,21 @@ def approx_tokens(text: str) -> int:
 class ChunkSettings:
     min_tokens: int
     max_tokens: int
+    # Token counter for the limits. The ingest passes the embedding model's tokenizer (K-04a-0010:
+    # the estimate counted 593 where bge-m3 counts 678); the estimate stays for tests and as the
+    # documented fallback of nothing: the caller chooses explicitly.
+    count: Callable[[str], int] = field(default=approx_tokens, compare=False)
 
     @classmethod
-    def from_kb(cls, chunk_size: int, chunk_overlap: int = 0) -> "ChunkSettings":
+    def from_kb(
+        cls, chunk_size: int, chunk_overlap: int = 0, count: Callable[[str], int] = approx_tokens
+    ) -> "ChunkSettings":
         if chunk_overlap:
             # Not measured and not implemented: refused, never silently ignored (ARCH-06).
             raise ValueError("chunk_overlap_unsupported")
-        return cls(min_tokens=chunk_size, max_tokens=round(chunk_size * MAX_TO_MIN_RATIO))
+        return cls(
+            min_tokens=chunk_size, max_tokens=round(chunk_size * MAX_TO_MIN_RATIO), count=count
+        )
 
     @property
     def max_chars(self) -> int:
@@ -54,6 +71,7 @@ class TextChunk:
     body: str
     page: int | None
     section_path: str | None
+    tokens: int = 0
 
     @property
     def text(self) -> str:
@@ -61,10 +79,31 @@ class TextChunk:
 
     @property
     def token_count(self) -> int:
-        return approx_tokens(self.text)
+        return self.tokens or approx_tokens(self.text)
+
+
+def _article_sections(body: str) -> list[tuple[str, str]]:
+    out: list[tuple[str, str]] = []
+    starts = [m for m in _ARTICLE.finditer(body) if m.start() == 0 or body[m.start() - 1] == "\n"]
+    if not starts:
+        return []
+    head = body[: starts[0].start()].strip()
+    if head:
+        out.append(("", head))
+    for index, match in enumerate(starts):
+        end = starts[index + 1].start() if index + 1 < len(starts) else len(body)
+        text = body[match.start() : end].strip()
+        if text:
+            # The heading stays in the text too, so the chunk body starts with the article number.
+            out.append((match.group(1).strip()[:80], text))
+    return out
 
 
 def _sections(body: str) -> list[tuple[str, str]]:
+    if not _HEADING.search(body):
+        articles = _article_sections(body)
+        if articles:
+            return articles
     out: list[tuple[str, str]] = []
     last_end, heading = 0, ""
     for match in _HEADING.finditer(body):
@@ -78,15 +117,15 @@ def _sections(body: str) -> list[tuple[str, str]]:
     return out
 
 
-def _split_words(text: str, max_tokens: int) -> list[str]:
-    if approx_tokens(text) <= max_tokens:
+def _split_words(text: str, max_tokens: int, count=approx_tokens) -> list[str]:
+    if count(text) <= max_tokens:
         return [text]
     max_chars = max_tokens * CHARS_PER_TOKEN
     out: list[str] = []
     current: list[str] = []
     for word in text.split():
         for piece in (word[i : i + max_chars] for i in range(0, len(word), max_chars)):
-            if current and approx_tokens(" ".join([*current, piece])) > max_tokens:
+            if current and count(" ".join([*current, piece])) > max_tokens:
                 out.append(" ".join(current))
                 current = []
             current.append(piece)
@@ -95,34 +134,34 @@ def _split_words(text: str, max_tokens: int) -> list[str]:
     return out
 
 
-def _split_paragraph(text: str, max_tokens: int) -> list[str]:
+def _split_paragraph(text: str, max_tokens: int, count=approx_tokens) -> list[str]:
     out: list[str] = []
     current = ""
     for sentence in _SENTENCE.split(text):
         if not sentence:
             continue
-        if current and approx_tokens(current + " " + sentence) > max_tokens:
+        if current and count(current + " " + sentence) > max_tokens:
             out.append(current.strip())
             current = ""
         current += (" " if current else "") + sentence
     if current.strip():
         out.append(current.strip())
-    return [piece for s in (out or [text]) for piece in _split_words(s, max_tokens)]
+    return [piece for s in (out or [text]) for piece in _split_words(s, max_tokens, count)]
 
 
-def _split_long(text: str, max_tokens: int) -> list[str]:
+def _split_long(text: str, max_tokens: int, count=approx_tokens) -> list[str]:
     out: list[str] = []
     current = ""
     for para in text.split("\n\n"):
         if not para.strip():
             continue
-        if approx_tokens(para) > max_tokens:
+        if count(para) > max_tokens:
             if current.strip():
                 out.append(current.strip())
                 current = ""
-            out.extend(_split_paragraph(para, max_tokens))
+            out.extend(_split_paragraph(para, max_tokens, count))
             continue
-        if current and approx_tokens(current + "\n\n" + para) > max_tokens:
+        if current and count(current + "\n\n" + para) > max_tokens:
             out.append(current.strip())
             current = ""
         current += ("\n\n" if current else "") + para
@@ -149,18 +188,18 @@ def _pack(body: str, settings: ChunkSettings) -> list[tuple[list[str], str]]:
             headings.append(heading)
 
     for heading, text in _sections(body):
-        if approx_tokens(text) > settings.max_tokens:
+        if settings.count(text) > settings.max_tokens:
             flush()
-            for piece in _split_long(text, settings.max_tokens):
+            for piece in _split_long(text, settings.max_tokens, settings.count):
                 note(heading)
                 buffer = piece
                 flush()
             continue
-        if buffer and approx_tokens(buffer + "\n\n" + text) > settings.max_tokens:
+        if buffer and settings.count(buffer + "\n\n" + text) > settings.max_tokens:
             flush()
         note(heading)
         buffer += ("\n\n" if buffer else "") + text
-        if approx_tokens(buffer) >= settings.min_tokens:
+        if settings.count(buffer) >= settings.min_tokens:
             flush()
     flush()
     return pieces
@@ -188,6 +227,7 @@ def chunk_markdown(body: str, *, breadcrumb: str, settings: ChunkSettings) -> li
                 body=clean,
                 page=start_page,
                 section_path=section,
+                tokens=settings.count(crumb + "\n\n" + clean),
             )
         )
     return chunks

@@ -10,7 +10,7 @@ import pytest
 
 from ffcore.knowledge.convert import encoding, pipeline, router
 from ffcore.knowledge.convert.types import CONVERTED, ERROR, TIMEOUT
-from ffcore.knowledge.convert.workers import BoundedPool
+from ffcore.knowledge.convert.workers import BoundedPool, PersistentPool
 
 TURKISH = "Fesih bildirim süresi doksan gündür; şartname ığdır ve öçü harflerini korur."
 
@@ -203,3 +203,21 @@ def test_04a_9d_timeout_kills_worker_and_continues(tmp_path):
     assert results["slow.txt"].status == TIMEOUT
     assert results["fast.txt"].status == CONVERTED and results["fast.txt"].text_md == "fast"
     assert time.time() - started < 30
+
+
+def test_04a_persistent_pool_reuses_its_process_and_replaces_it_after_timeout(tmp_path):
+    slow, fast1, fast2 = (tmp_path / n for n in ("slow.txt", "fast1.txt", "fast2.txt"))
+    slow.write_text("sleep")
+    fast1.write_text("ok")
+    fast2.write_text("ok")
+    pool = PersistentPool(timeout=2, name="p", target="tests.unit._convert_targets:target")
+    try:
+        assert pool.convert(fast1).text_md == "fast1"
+        first = pool._worker.process.pid
+        assert pool.convert(fast2).text_md == "fast2"
+        assert pool._worker.process.pid == first  # same process, models loaded once
+        assert pool.convert(slow).status == TIMEOUT
+        assert pool._worker is None  # killed; the next file gets a fresh process
+        assert pool.convert(fast1).status == CONVERTED
+    finally:
+        pool.close()

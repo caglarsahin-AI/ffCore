@@ -243,6 +243,7 @@ class KbQuery(Base):
     threshold_mode: Mapped[str] = mapped_column(Text)
     filtered_by_rerank_floor: Mapped[int] = mapped_column(Integer)
     filtered_by_min_score: Mapped[int] = mapped_column(Integer)
+    rerank_truncated: Mapped[int] = mapped_column(Integer, server_default=sql_text("0"))
     latency_ms: Mapped[int] = mapped_column(Integer)
     user_id: Mapped[str | None] = mapped_column(Text)
     ts: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())

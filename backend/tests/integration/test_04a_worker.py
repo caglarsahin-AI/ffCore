@@ -31,6 +31,8 @@ def settings(tmp_path) -> Settings:
         obo_jwt_secret="dummy-not-secret-obo-jwt-secret-0123456789",
         fake_embed=True,
         redis_url=os.environ["REDIS_URL"],
+        # Its own queue: a live compose worker on `ingest` never takes these jobs (K-04a-0012).
+        arq_queue_ingest=f"ingest-test-{uuid.uuid4().hex[:8]}",
         knowledge_storage_dir=str(tmp_path / "storage"),
         **SETTINGS_03A,
     )
@@ -63,7 +65,7 @@ async def _drain(settings: Settings) -> None:
     redis = RedisSettings.from_dsn(settings.redis_url.get_secret_value())
     runner = Worker(
         functions=worker.WorkerSettings.functions,
-        queue_name=jobs.INGEST_QUEUE,
+        queue_name=settings.arq_queue_ingest,
         redis_settings=redis,
         burst=True,
         poll_delay=0.2,
@@ -94,7 +96,7 @@ def test_04a_upload_job_runs_in_worker(pg, make_project, settings):
         job_id = await jobs.get_queue(settings).enqueue("ingest_document_job", str(document.id))
         await _drain(settings)
         pool = await create_pool(RedisSettings.from_dsn(settings.redis_url.get_secret_value()))
-        result = await Job(job_id, pool, _queue_name=jobs.INGEST_QUEUE).result(timeout=5)
+        result = await Job(job_id, pool, _queue_name=settings.arq_queue_ingest).result(timeout=5)
         await pool.aclose()
         return document.id, result
 
@@ -110,7 +112,7 @@ def test_04a_job_for_missing_row_retries_then_fails_loud(settings):
         job_id = await jobs.get_queue(settings).enqueue("ingest_document_job", missing)
         await _drain(settings)
         pool = await create_pool(RedisSettings.from_dsn(settings.redis_url.get_secret_value()))
-        job = Job(job_id, pool, _queue_name=jobs.INGEST_QUEUE)
+        job = Job(job_id, pool, _queue_name=settings.arq_queue_ingest)
         info = await job.result_info()
         status = await job.status()
         await pool.aclose()

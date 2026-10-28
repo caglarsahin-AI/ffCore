@@ -62,8 +62,13 @@ class Settings(BaseSettings):
 
 
     # --- 04a knowledge base ---
-    # Ingest queue (arq, queue `ingest`); contains the Redis password, so it is a secret.
+    # /readyz C13 check: the context Ollama is started with versus the models' context_tokens.
+    inference_backend: Literal["ollama", "vllm"] | None = None
+    ollama_context_length: int | None = Field(default=None, gt=0)
+    # Ingest queue (arq); contains the Redis password, so it is a secret.
     redis_url: SecretStr | None = None
+    # Queue name (C10 name `ingest`); a setting so test runs can use their own (K-04a-0012).
+    arq_queue_ingest: str = "ingest"
     # Defaults are PayCore's measured values (KARARLAR "04a kararları", K-04a-0002).
     vector_backend: Literal["pgvector", "qdrant"] = "pgvector"
     qdrant_url: str | None = None
@@ -100,6 +105,14 @@ class Settings(BaseSettings):
         if isinstance(value, str):
             return [item.strip().lower().rstrip("/") for item in value.split(",") if item.strip()]
         return value
+
+    @field_validator(
+        "ollama_context_length", "inference_backend", "qdrant_url", "qdrant_api_key", mode="before"
+    )
+    @classmethod
+    def _empty_is_unset(cls, value: object) -> object:
+        # Compose passes unset optional variables as "" (${VAR:-}); that means "not set".
+        return None if value == "" else value
 
     @field_validator("fernet_key")
     @classmethod

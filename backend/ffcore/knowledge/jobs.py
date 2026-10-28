@@ -21,6 +21,7 @@ class ArqQueue:
         if settings.redis_url is None:
             raise RuntimeError("REDIS_URL is not set; the ingest queue needs Redis")
         self._dsn = settings.redis_url.get_secret_value()
+        self._queue_name = settings.arq_queue_ingest
         self._pool = None
 
     async def enqueue(self, function: str, *args) -> str:
@@ -29,7 +30,7 @@ class ArqQueue:
 
         if self._pool is None:
             self._pool = await create_pool(RedisSettings.from_dsn(self._dsn))
-        job = await self._pool.enqueue_job(function, *args, _queue_name=INGEST_QUEUE)
+        job = await self._pool.enqueue_job(function, *args, _queue_name=self._queue_name)
         if job is None:
             raise RuntimeError(f"job {function} was not enqueued")
         return job.job_id

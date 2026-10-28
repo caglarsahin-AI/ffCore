@@ -215,3 +215,35 @@ returns newest first. `GET /audit.csv` takes the same filters and exports at mos
 03a lives on Alembic branch `03a` (`03a_0001`). To roll back only this package:
 `docker compose run --rm migrate alembic downgrade 03a@-1`. Do not use `03a@base`: it resolves to
 the shared root `0001` and also drops 03b.
+
+## Knowledge bases (04a)
+
+The contract is `backend/openapi/04a.yaml` (`python -m ffcore.api.openapi_export 04a >
+openapi/04a.yaml`; contract test `test_04a_20_*`). Lists are `{"data": [...]}`. Prefix:
+`/api/v1/projects/{project_id}/knowledge-bases`.
+
+| Endpoint | Role | Notes |
+|---|---|---|
+| `GET ""`, `GET /{kb_id}` | analyst | counts of documents and chunks; `chunk_max_tokens` is derived (1.5 × `chunk_size`) |
+| `POST ""`, `PATCH /{kb_id}`, `DELETE /{kb_id}` | admin + edit | one embedding model per installation: `embed_model`/`embed_dim` other than `EMBED_MODEL`/`EMBED_DIM` is 400 `embed_model_mismatch` / `embed_dim_mismatch`; `chunk_overlap` other than 0 is 422 `chunk_overlap_unsupported` |
+| `POST /{kb_id}/documents` | analyst + edit | multipart, several `files`; 202 with `outcome` per file: `created`, `new_version` (same file name, new content), `unchanged` (same bytes: version + 1, nothing queued) |
+| `GET /{kb_id}/documents`, `GET …/{document_id}` | analyst | status, the three gate decisions with reasons, converter and seconds |
+| `DELETE …/{document_id}` | analyst + edit | the document leaves search at once; raw stays on disk |
+| `POST /{kb_id}/reindex` | analyst + edit | `{layer: silver or gold, full}`; gold never reads raw or the source |
+| `POST /{kb_id}/search` | analyst, also in read mode | `{query, top_k?, filters{document_ids, metadata}, hybrid?}`; header `X-Run-Id` is stored in `kb_queries.run_id` |
+| `POST /{kb_id}/test-query` | analyst, also in read mode | the same search, logged with `source=playground` |
+| `POST /internal/embed` | service account only | for the ingest worker; 403 `service_account_required` for anybody else |
+| `GET /readyz` | none | 200 ready; 503 `warming`, `warmup_failed`, `embed_dim_mismatch`, `context_configuration_invalid`, `vector_store_unavailable` |
+
+Document ACL: `acl_roles` and `acl_users`. A manual upload without either gets `["analyst"]`
+(shown in the response). An empty ACL (open to every member of the project, C15) is only set on
+purpose with `acl_open=true`. A search sees documents whose ACL is empty, or names the caller's
+role or a role below it, or names the caller; through `X-On-Behalf-Of` the caller is the end user
+and the call is limited to the token's project.
+
+Search response: hits newest source first with `age_days`, each with `embed_score` and
+`rerank_score`; `threshold_mode` says which single threshold applied (`rerank_floor` with the
+reranker on, `min_score` with it off) and `filtered_by_*` how many candidates it removed.
+
+04a lives on Alembic branch `04a` (`04a_0001`, depends on `03a_0001`); roll back with
+`alembic downgrade 04a@-1`. `chunks.embedding` is `vector(EMBED_DIM)` as read at migration time.

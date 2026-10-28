@@ -13,6 +13,7 @@ ACL and KB filters are in every query (C15), never applied after retrieval.
 """
 
 import asyncio
+import logging
 import time
 import uuid
 from dataclasses import dataclass, field
@@ -30,6 +31,7 @@ from ffcore.knowledge.vectorstore.pgvector import _literal
 from ffcore.models.knowledge import SEARCHABLE_CHUNK_STATUSES, TSV_CONFIG, KbQuery, KnowledgeBase
 
 RRF_K = 60
+log = logging.getLogger("ffcore.knowledge.search")
 
 
 @dataclass
@@ -190,10 +192,19 @@ async def search(
         threshold_mode = "rerank_floor"
         reranker = reranker or get_reranker(settings)
         texts = [details[chunk_id]["text"] for chunk_id, _ in fused]
-        scores = await asyncio.to_thread(reranker.score, normalized, texts)
-        for candidate, score in zip(candidates, scores, strict=True):
+        scoring = getattr(reranker, "score_with_truncation", None)
+        if scoring is not None:
+            scores, cut = await asyncio.to_thread(scoring, normalized, texts)
+        else:
+            scores = await asyncio.to_thread(reranker.score, normalized, texts)
+            cut = [False] * len(scores)
+        for candidate, score, truncated in zip(candidates, scores, cut, strict=True):
             candidate["rerank_score"] = score
             candidate["below_rerank_floor"] = score < settings.rerank_min_score
+            # Recorded with the candidate (C12), never cut silently (A-04a-0020).
+            candidate["rerank_truncated"] = truncated
+        if any(cut):
+            log.warning("rerank_truncated kb=%s pairs=%d", kb.id, sum(cut))
         kept = [c for c in candidates if not c["below_rerank_floor"]]
         filtered_floor = len(candidates) - len(kept)
         kept.sort(key=lambda c: -c["rerank_score"])
@@ -250,6 +261,7 @@ async def search(
         threshold_mode=threshold_mode,
         filtered_by_rerank_floor=filtered_floor,
         filtered_by_min_score=filtered_min,
+        rerank_truncated=sum(1 for c in candidates if c.get("rerank_truncated")),
         latency_ms=latency_ms,
         user_id=user_id,
     )

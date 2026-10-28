@@ -236,6 +236,8 @@ def upgrade() -> None:
         sa.Column("threshold_mode", sa.Text, nullable=False),
         sa.Column("filtered_by_rerank_floor", sa.Integer, nullable=False),
         sa.Column("filtered_by_min_score", sa.Integer, nullable=False),
+        # Reranker pairs over its token limit (A-04a-0020); reported, never cut silently.
+        sa.Column("rerank_truncated", sa.Integer, server_default=sa.text("0"), nullable=False),
         sa.Column("latency_ms", sa.Integer, nullable=False),
         sa.Column("user_id", sa.Text),
         sa.Column("ts", sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False),

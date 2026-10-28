@@ -10,6 +10,7 @@ The worker never loads the embedding model: it asks the API (`POST /internal/emb
 """
 
 import asyncio
+import atexit
 import hashlib
 import logging
 import re
@@ -29,8 +30,8 @@ from ffcore.knowledge import gates, scope
 from ffcore.knowledge.chunking import BREADCRUMB_SEPARATOR, ChunkSettings, chunk_markdown
 from ffcore.knowledge.convert import pipeline as convert_pipeline
 from ffcore.knowledge.convert.types import CONVERTED, TIMEOUT, ConversionResult
-from ffcore.knowledge.convert.workers import BoundedPool
-from ffcore.knowledge.embed import Embeddings, get_embedder
+from ffcore.knowledge.convert.workers import PersistentPool
+from ffcore.knowledge.embed import Embeddings, get_embedder, token_counter
 from ffcore.knowledge.normalize import NORMALIZER_CONFIG_ID, clean_markdown
 from ffcore.knowledge.store import NewChunk, PgKnowledgeStore, text_hash
 from ffcore.knowledge.vectorstore.base import VectorRecord, VectorStore
@@ -95,16 +96,29 @@ class HttpEmbedClient:
 Converter = Callable[[Path, str, Settings], ConversionResult]
 
 
+_pools: dict[int, PersistentPool] = {}
+
+
+def close_pools() -> None:
+    """Stop the long-lived converter processes (registered at exit: they are not daemons, so
+    an exiting interpreter would otherwise wait for them forever)."""
+    for pool in list(_pools.values()):
+        pool.close()
+    _pools.clear()
+
+
+atexit.register(close_pools)
+
+
 def convert_bounded(path: Path, filename: str, settings: Settings) -> ConversionResult:
-    results: list[ConversionResult] = []
-    pool = BoundedPool(
-        size=1,
-        timeout=settings.convert_timeout_seconds,
-        name="ingest",
-        target=convert_pipeline.CONVERT_TARGET,
-    )
-    pool.run([path], on_start=lambda p: None, on_result=lambda p, r, s: results.append(r))
-    return results[0]
+    """Convert in this process's long-lived worker (timeout kill, models loaded once)."""
+    timeout = settings.convert_timeout_seconds
+    pool = _pools.get(timeout)
+    if pool is None:
+        pool = _pools[timeout] = PersistentPool(
+            timeout=timeout, name="ingest", target=convert_pipeline.CONVERT_TARGET
+        )
+    return pool.convert(path)
 
 
 def convert_inline(path: Path, filename: str, settings: Settings) -> ConversionResult:
@@ -352,8 +366,8 @@ async def ingest_document(
     return await _gold(document_id, settings=settings, store=store, embed_client=embed_client)
 
 
-def _chunks_for(kb: KnowledgeBase, document: Document, silver_text: str) -> list[NewChunk]:
-    settings = ChunkSettings.from_kb(kb.chunk_size, kb.chunk_overlap)
+def _chunks_for(kb: KnowledgeBase, document: Document, silver_text: str, count) -> list[NewChunk]:
+    settings = ChunkSettings.from_kb(kb.chunk_size, kb.chunk_overlap, count)
     out, seen = [], set()
     pieces = silver_text.split("\n\n# Ek: ")
     sections = [(document.breadcrumb, pieces[0])]
@@ -391,7 +405,9 @@ async def _gold(
         document = await session.get(Document, document_id, with_for_update=True)
         kb = await session.get(KnowledgeBase, document.kb_id)
         document.status = "chunking"
-        new_chunks = _chunks_for(kb, document, read_silver(Path(document.silver_path)))
+        new_chunks = _chunks_for(
+            kb, document, read_silver(Path(document.silver_path)), token_counter(settings)
+        )
         store_ = PgKnowledgeStore(session)
         indexable = [c for c in new_chunks if c.chunk_status != "skipped"]
         reusable = await store_.reusable_vectors(

@@ -10,7 +10,7 @@ import uuid
 from ffcore.core import db
 from ffcore.core.config import get_settings
 from ffcore.knowledge import ingest
-from ffcore.knowledge.jobs import INGEST_QUEUE, get_vector_store
+from ffcore.knowledge.jobs import get_vector_store
 from ffcore.models.knowledge import Document
 
 MAX_ROW_WAIT_TRIES = 5
@@ -61,7 +61,7 @@ def _redis_settings():
 
 class WorkerSettings:
     functions = [ingest_document_job, reindex_job]
-    queue_name = INGEST_QUEUE
+    queue_name = get_settings().arq_queue_ingest
     # One document at a time per worker: conversion already runs in its own process pool.
     max_jobs = 1
     job_timeout = 3600
