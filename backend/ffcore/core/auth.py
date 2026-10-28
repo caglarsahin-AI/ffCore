@@ -169,6 +169,49 @@ def verify_on_behalf_of(
     )
 
 
+# --- Console session tokens (03a); the cookie and resolver are in core/session.py ---
+
+SESSION_AUDIENCE = "ffcore-session"
+
+
+@dataclass(frozen=True)
+class SessionClaims:
+    user_id: str
+    token_version: int
+
+
+def issue_session_token(
+    user_id: str, token_version: int, settings: Settings, now: datetime | None = None
+) -> str:
+    """HS256 with SECRET_KEY (not the OBO key); `tv` is the user's token_version."""
+    issued = now or datetime.now(UTC)
+    claims = {
+        "sub": user_id,
+        "tv": token_version,
+        "aud": SESSION_AUDIENCE,
+        "iat": int(issued.timestamp()),
+        "exp": int((issued + timedelta(seconds=settings.session_ttl_s)).timestamp()),
+    }
+    return jwt.encode(claims, settings.secret_key.get_secret_value(), algorithm=OBO_ALGORITHM)
+
+
+def verify_session_token(token: str, settings: Settings) -> SessionClaims | None:
+    """None for any invalid, expired or foreign token: the caller is then unauthenticated."""
+    try:
+        claims = jwt.decode(
+            token,
+            settings.secret_key.get_secret_value(),
+            algorithms=[OBO_ALGORITHM],
+            audience=SESSION_AUDIENCE,
+            options={"require": ["sub", "tv", "aud", "iat", "exp"]},
+        )
+    except jwt.PyJWTError:
+        return None
+    if not isinstance(claims["sub"], str) or not isinstance(claims["tv"], int):
+        return None
+    return SessionClaims(user_id=claims["sub"], token_version=claims["tv"])
+
+
 async def _audit_impersonation_denied(request: Request, actor: Actor | None) -> None:
     from ffcore.core.audit import record_impersonation_denied
 
@@ -204,3 +247,145 @@ async def resolve_actor(
         raise ApiError(401, "authentication_error", "unauthenticated", "Authentication required.")
     request.state.actor = actor
     return actor
+
+
+# --- Authorization (03a): role and access mode, checked after resolve_actor ---
+
+# Ascending: user < analyst < developer < admin (brief 03 R2.4).
+ROLE_ORDER = ("user", "analyst", "developer", "admin")
+
+
+@dataclass(frozen=True)
+class Grant:
+    role: str
+    access: str
+    is_superadmin: bool
+
+
+class RoleRequirement:
+    """FastAPI dependency: the caller holds at least `min_role`; with `write=True` also `edit`.
+
+    `scope="project"` reads `project_id` from the path; `scope="tenant"` needs a superadmin.
+    A denial is written to the audit trail (detached) before the 403. The `write` attribute is
+    what the CI scan looks for on every mutation route (brief 03 acceptance).
+    """
+
+    def __init__(self, min_role: str, *, write: bool, scope: Literal["project", "tenant"]):
+        if min_role not in ROLE_ORDER:
+            raise ValueError(f"unknown role {min_role!r}")
+        self.min_role = min_role
+        self.write = write
+        self.scope = scope
+
+    async def __call__(self, request: Request, actor: Annotated[Actor, Depends(resolve_actor)]):
+        project_id = request.path_params.get("project_id") if self.scope == "project" else None
+        grant, code = await _grant(actor, project_id)
+        if grant is not None and code is None:
+            if ROLE_ORDER.index(grant.role) < ROLE_ORDER.index(self.min_role):
+                code = "insufficient_role"
+            elif self.write and grant.access != "edit":
+                code = "read_only_access"
+        if code == "project_not_found":
+            raise ApiError(404, "not_found_error", code, "Project not found.")
+        if code is not None:
+            await _audit_denied(request, actor, project_id, code, self)
+            message = (
+                "Your access mode is read-only."
+                if code == "read_only_access"
+                else "Your role does not allow this."
+            )
+            raise ApiError(403, "permission_error", code, message)
+        request.state.grant = grant
+        return Actor(
+            actor_type=actor.actor_type,
+            actor_id=actor.actor_id,
+            project_id=str(project_id) if project_id else actor.project_id,
+            via_service=actor.via_service,
+            scopes=actor.scopes,
+        )
+
+
+def require_role(min_role: str, *, write: bool = False) -> RoleRequirement:
+    """Project-scoped check (brief: require_role(project_id, min_role, write))."""
+    return RoleRequirement(min_role, write=write, scope="project")
+
+
+def require_superadmin(*, write: bool = False) -> RoleRequirement:
+    """Tenant-level check (users, providers, catalog, unscoped audit)."""
+    return RoleRequirement("admin", write=write, scope="tenant")
+
+
+async def _grant(actor: Actor, project_id: str | None) -> tuple[Grant | None, str | None]:
+    """The caller's role and access for the project (or tenant). (grant, None) or (None, code)."""
+    from sqlalchemy import select
+
+    from ffcore.core import db
+    from ffcore.models.identity import Project, ProjectMember, User
+
+    if actor.actor_type != "user":
+        return None, "insufficient_role"
+    try:
+        user_id = uuid.UUID(actor.actor_id)
+        project_uuid = uuid.UUID(project_id) if project_id else None
+    except ValueError:
+        return None, "insufficient_role" if project_id is None else "project_not_found"
+    # A service acting for a user stays inside the project its token names.
+    if actor.via_service and project_uuid is not None and actor.project_id != str(project_uuid):
+        return None, "project_mismatch"
+
+    async with db.session_scope() as session:
+        user = await session.scalar(
+            select(User).where(User.id == user_id, User.deleted_at.is_(None), User.is_active)
+        )
+        if user is None:
+            return None, "insufficient_role"
+        if project_uuid is not None:
+            live = await session.scalar(
+                select(Project.id).where(Project.id == project_uuid, Project.deleted_at.is_(None))
+            )
+            if live is None:
+                return None, "project_not_found" if user.is_superadmin else "insufficient_role"
+        if user.is_superadmin:
+            return Grant("admin", user.superadmin_access or "read", True), None
+        if project_uuid is None:
+            return None, "insufficient_role"
+        member = await session.scalar(
+            select(ProjectMember).where(
+                ProjectMember.project_id == project_uuid, ProjectMember.user_id == user_id
+            )
+        )
+    if member is None:
+        return None, "insufficient_role"
+    return Grant(member.role, member.access, False), None
+
+
+async def _audit_denied(
+    request: Request, actor: Actor, project_id: str | None, code: str, need: RoleRequirement
+) -> None:
+    from ffcore.core.audit import AuditEntry, request_context, write_event_detached
+
+    route = request.scope.get("route")
+    request_id, ip = request_context(request)
+    try:
+        valid_project = str(uuid.UUID(project_id)) if project_id else None
+    except ValueError:
+        valid_project = None
+    await write_event_detached(
+        AuditEntry(
+            action=getattr(route, "name", request.url.path),
+            resource_type="route",
+            outcome="denied",
+            actor_type=actor.actor_type,
+            actor_id=actor.actor_id,
+            project_id=valid_project,
+            after={
+                "method": request.method,
+                "path": getattr(route, "path", request.url.path),
+                "code": code,
+                "min_role": need.min_role,
+                "write": need.write,
+            },
+            request_id=request_id,
+            ip=ip,
+        )
+    )

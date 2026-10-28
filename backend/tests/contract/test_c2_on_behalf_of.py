@@ -6,6 +6,7 @@ import jwt
 
 from ffcore.core import auth
 from ffcore.core.config import Settings
+from tests.dummy import SETTINGS_03A
 
 PACKAGE = Path(auth.__file__).resolve().parents[1]
 SETTINGS = Settings(
@@ -13,6 +14,7 @@ SETTINGS = Settings(
     offline=False,
     service_token="dummy-not-secret-service-token-0123456789",
     obo_jwt_secret="dummy-not-secret-obo-jwt-secret-0123456789",
+    **SETTINGS_03A,
 )
 
 

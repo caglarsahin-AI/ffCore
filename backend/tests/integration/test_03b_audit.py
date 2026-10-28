@@ -15,6 +15,7 @@ from ffcore.core.audit import audited, ensure_audit_partitions
 from ffcore.core.auth import Actor, resolve_actor, sign_on_behalf_of
 from ffcore.core.config import Settings, get_settings
 from ffcore.core.errors import ApiError, install_error_handlers
+from tests.dummy import SETTINGS_03A
 
 PROJECT = "1f2e3d4c-5b6a-4978-8695-a4b3c2d1e0f9"
 USER = "6d0e2f47-6f6a-4d2b-9a3e-1c2b3d4e5f60"
@@ -23,6 +24,7 @@ SETTINGS = Settings(
     offline=False,
     service_token="dummy-not-secret-service-token-0123456789",
     obo_jwt_secret="dummy-not-secret-obo-jwt-secret-0123456789",
+    **SETTINGS_03A,
 )
 
 

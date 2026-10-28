@@ -32,11 +32,44 @@ class Settings(BaseSettings):
     # Hosts or CIDRs that may resolve to private addresses (compose service names, internal APIs).
     allowed_internal_hosts: CommaList = []
 
+    # --- 03a ---
+    # HS256 key for console session tokens; separate from obo_jwt_secret.
+    secret_key: SecretStr = Field(min_length=32)
+    # Fernet key (urlsafe base64 of 32 bytes) for provider configurations at rest.
+    fernet_key: SecretStr
+    # The one embedding dimension of this installation; models must measure the same (P5).
+    embed_dim: int = Field(gt=0)
+    session_ttl_s: int = Field(default=28800, gt=0)
+    # Only for plain-http local debugging; browsers treat localhost as secure anyway.
+    session_cookie_secure: bool = True
+    # Origins the console is served from (scheme://host[:port]); cookie mutations from any
+    # other origin are refused (C6). Empty: only requests without a foreign Origin pass.
+    console_origins: CommaList = []
+
     @field_validator("egress_allowlist", "allowed_internal_hosts", mode="before")
     @classmethod
     def _split_commas(cls, value: object) -> object:
         if isinstance(value, str):
             return [item.strip().lower() for item in value.split(",") if item.strip()]
+        return value
+
+    @field_validator("console_origins", mode="before")
+    @classmethod
+    def _split_origins(cls, value: object) -> object:
+        if isinstance(value, str):
+            return [item.strip().lower().rstrip("/") for item in value.split(",") if item.strip()]
+        return value
+
+    @field_validator("fernet_key")
+    @classmethod
+    def _valid_fernet_key(cls, value: SecretStr) -> SecretStr:
+        from cryptography.fernet import Fernet
+
+        try:
+            Fernet(value.get_secret_value())
+        except (ValueError, TypeError):
+            # The message names the field only; the value never reaches logs.
+            raise ValueError("FERNET_KEY must be urlsafe base64 of 32 bytes") from None
         return value
 
 
