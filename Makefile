@@ -3,7 +3,7 @@
 # Servisleri başlatma/durdurma doğrudan compose ile: docker compose up -d --wait | down | logs -f
 # Önyüz lint'i ayrı konteynerde: docker compose run --rm frontend npm run lint
 
-.PHONY: lint format test test-int smoke pull seed-models render-litellm
+.PHONY: lint format test test-int test-models smoke pull seed-models render-litellm
 
 lint:
 	ruff check backend scripts data/samples/scripts
@@ -19,6 +19,10 @@ test:
 
 test-int:
 	cd backend && pytest tests/integration
+
+# 04a: real model weights (bge-m3, reranker, Docling, PaddleOCR); required for VERIFIED (S4).
+test-models:
+	cd backend && RUN_MODEL_TESTS=1 pytest -m models -s tests
 
 smoke:
 	python scripts/smoke.py

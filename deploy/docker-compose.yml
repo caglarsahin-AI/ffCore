@@ -219,6 +219,9 @@ services:
       LLM_CALL_TIMEOUT_S: ${LLM_CALL_TIMEOUT_S:-60}
     ports:
       - "${BACKEND_PORT:-8000}:8000"
+    volumes:
+      # 04a: model weights (bge-m3, reranker); downloaded once, never baked into the image.
+      - model_cache:/models
     depends_on:
       migrate:
         condition: service_completed_successfully
@@ -295,6 +298,7 @@ services:
     working_dir: /work
     volumes:
       - .:/work
+      - model_cache:/models
     environment:
       <<: *app-env
       COMPOSE_PROFILES: ${COMPOSE_PROFILES:-}
@@ -342,3 +346,5 @@ volumes:
   langfuse_clickhouse_data:
   langfuse_clickhouse_logs:
   langfuse_minio_data:
+  # 04a: model weights shared by backend, worker and tools (same uid 10001 owns /models).
+  model_cache:

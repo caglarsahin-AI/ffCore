@@ -4,11 +4,24 @@ FROM ${REGISTRY_PREFIX}ghcr.io/astral-sh/uv:0.10.12 AS uv
 
 FROM ${REGISTRY_PREFIX}python:3.12.10-slim-bookworm AS base
 COPY --from=uv /uv /usr/local/bin/uv
+# 04a: model weights (bge-m3, reranker, Docling layout, PaddleOCR) live in the model_cache volume
+# mounted at /models, never in the image; airgap gets them from the internal mirror (12).
 ENV UV_PROJECT_ENVIRONMENT=/opt/venv \
     UV_COMPILE_BYTECODE=1 \
     UV_LINK_MODE=copy \
     PATH=/opt/venv/bin:$PATH \
-    PYTHONUNBUFFERED=1
+    PYTHONUNBUFFERED=1 \
+    HF_HOME=/models/huggingface \
+    MODEL_CACHE_DIR=/models
+# 04a (K-04a-0002 S5): libgomp1 is the OpenMP runtime paddlepaddle and the torch CPU build load;
+# libgl1, libglib2.0-0 and libxcb1 are what the OpenCV wheels pulled in by PaddleOCR and
+# Docling's rapidocr link against (without them `import cv2` fails, and pymupdf4llm with it).
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends libgomp1 libgl1 libglib2.0-0 libxcb1 \
+    && rm -rf /var/lib/apt/lists/*
+# /models belongs to uid 10001 in every image, so the shared volume is writable by the backend
+# whichever container mounts it first.
+RUN mkdir -p /models && chown 10001 /models
 WORKDIR /app
 COPY pyproject.toml uv.lock ./
 
@@ -17,7 +30,8 @@ RUN uv sync --frozen --no-dev --no-install-project
 COPY alembic.ini ./
 COPY alembic ./alembic
 COPY ffcore ./ffcore
-RUN useradd --system --uid 10001 ffcore
+# Home in the model cache: PaddleOCR keeps its weights under ~/.paddleocr.
+RUN useradd --system --uid 10001 --home-dir /models ffcore
 USER ffcore
 EXPOSE 8000
 CMD ["uvicorn", "ffcore.main:app", "--host", "0.0.0.0", "--port", "8000"]
