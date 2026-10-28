@@ -5,14 +5,18 @@ only http/https; hosts in ALLOWED_INTERNAL_HOSTS (name or CIDR) are internal and
 private addresses; OFFLINE=true refuses every other host; otherwise the host must be in
 EGRESS_ALLOWLIST (empty list: no external host). The address check runs at connect time, on the
 address that is actually dialed, so a DNS answer cannot change between check and connect.
-Redirects are followed here, one hop at a time, and every hop is checked again.
+Redirects are followed here, one hop at a time, and every hop is checked again; a hop to another
+origin (scheme, host, port) drops credential headers. Callers cannot change redirect handling,
+transport, proxy, TLS verification or timeouts per request.
 """
 
 import ipaddress
+import logging
 import math
 import socket
-from collections.abc import Awaitable, Callable
+from collections.abc import Awaitable, Callable, Mapping
 from dataclasses import dataclass
+from typing import Any
 from urllib.parse import urljoin
 
 import anyio
@@ -24,8 +28,21 @@ from ffcore.core.config import Settings
 Resolver = Callable[[str, int], Awaitable[list[str]]]
 IPAddress = ipaddress.IPv4Address | ipaddress.IPv6Address
 
+logger = logging.getLogger("ffcore.egress")
+
 MAX_REDIRECTS = 5
 _REDIRECT_STATUSES = {301, 302, 303, 307, 308}
+_DEFAULT_PORTS = {"http": 80, "https": 443}
+# Dropped when a redirect leaves the origin; a host on the allowlist is not entitled to the
+# first host's credentials.
+_CREDENTIAL_HEADERS = {
+    "authorization",
+    "proxy-authorization",
+    "cookie",
+    "x-api-key",
+    "x-on-behalf-of",
+}
+_CREDENTIAL_SUFFIXES = ("-token", "-key", "-secret")
 
 
 @dataclass(frozen=True)
@@ -73,6 +90,29 @@ def _origin(url: httpx2.URL) -> str:
     return f"{url.scheme}://{url.host}{port}"
 
 
+def _origin_key(url: httpx2.URL) -> tuple[str, str, int | None]:
+    port = url.port or _DEFAULT_PORTS.get(url.scheme)
+    return url.scheme, (url.host or "").lower().rstrip("."), port
+
+
+def _is_credential_header(name: str) -> bool:
+    lowered = name.lower()
+    return lowered in _CREDENTIAL_HEADERS or lowered.endswith(_CREDENTIAL_SUFFIXES)
+
+
+def headers_for_redirect(
+    current: httpx2.URL, target: httpx2.URL, headers: Mapping[str, str]
+) -> tuple[dict[str, str], list[str]]:
+    """Headers for the next hop. Same origin (scheme, host, port): unchanged. Another origin,
+    including an https to http downgrade: credential headers are dropped. Returns the kept
+    headers and the dropped header names (never values)."""
+    if _origin_key(current) == _origin_key(target):
+        return dict(headers), []
+    kept = {name: value for name, value in headers.items() if not _is_credential_header(name)}
+    dropped = sorted(name.lower() for name in headers if _is_credential_header(name))
+    return kept, dropped
+
+
 def _parse_ip(host: str) -> IPAddress | None:
     try:
         ip = ipaddress.ip_address(host.strip("[]"))
@@ -117,8 +157,11 @@ class EgressPolicy:
     def check_url(self, url: httpx2.URL) -> None:
         if url.scheme not in ("http", "https") or not url.host:
             raise EgressDenied("egress_invalid_url", f"{url.scheme}://", "only http and https")
-        host = url.host.lower().rstrip(".")
-        origin = _origin(url)
+        self.check_host(url.host, _origin(url))
+
+    def check_host(self, host: str, origin: str) -> None:
+        """OFFLINE and allowlist rules for a host name; runs per URL and again per connection."""
+        host = host.lower().rstrip(".")
         if self.is_internal(host):
             return
         if self.offline:
@@ -155,6 +198,8 @@ class _PinnedBackend(httpcore2.AsyncNetworkBackend):
     async def connect_tcp(
         self, host, port, timeout=None, local_address=None, socket_options=None
     ) -> httpcore2.AsyncNetworkStream:
+        # Defence in depth: the same host rules as the URL check, at the layer that dials.
+        self._policy.check_host(host, f"{host}:{port}")
         literal = _parse_ip(host)
         addresses = [str(literal)] if literal is not None else await self._resolver(host, port)
         if not addresses:
@@ -226,21 +271,42 @@ class SafeOutboundClient:
     async def aclose(self) -> None:
         await self._client.aclose()
 
-    async def request(self, method: str, url: str, **kwargs) -> httpx2.Response:
+    async def request(
+        self,
+        method: str,
+        url: str,
+        *,
+        headers: Mapping[str, str] | None = None,
+        params: Mapping[str, str] | None = None,
+        content: bytes | str | None = None,
+        json: Any = None,
+    ) -> httpx2.Response:
+        """Send one request. Deliberately no **kwargs: redirect handling, transport, proxy, TLS
+        verification and timeouts are fixed by the client and cannot be changed per call."""
         target = httpx2.URL(url)
+        body = {"content": content, "json": json}
         try:
             with anyio.fail_after(self._timeout.total):
-                return await self._follow(method, target, kwargs)
+                return await self._follow(method, target, dict(headers or {}), params, body)
         except TimeoutError:
             raise EgressTimeoutError(
                 "egress_timeout", _origin(target), f"exceeded {self._timeout.total} s"
             ) from None
 
-    async def _follow(self, method: str, url: httpx2.URL, kwargs: dict) -> httpx2.Response:
+    async def _follow(
+        self,
+        method: str,
+        url: httpx2.URL,
+        headers: dict[str, str],
+        params: Mapping[str, str] | None,
+        body: dict,
+    ) -> httpx2.Response:
         for _ in range(self._max_redirects + 1):
             self._policy.check_url(url)
             try:
-                response = await self._client.request(method, url, **kwargs)
+                response = await self._client.request(
+                    method, url, headers=headers, params=params, **body
+                )
             except httpx2.TimeoutException:
                 raise EgressTimeoutError(
                     "egress_timeout", _origin(url), "connect or read"
@@ -252,11 +318,22 @@ class SafeOutboundClient:
             location = response.headers.get("location")
             if response.status_code not in _REDIRECT_STATUSES or not location:
                 return response
-            url = httpx2.URL(urljoin(str(url), location))
+            target = httpx2.URL(urljoin(str(url), location))
+            headers, dropped = headers_for_redirect(url, target, headers)
+            if _origin_key(target) != _origin_key(url):
+                logger.info(
+                    "redirect_cross_origin",
+                    extra={
+                        "event": "redirect_cross_origin",
+                        "target_origin": _origin(target),
+                        "dropped_headers": dropped,
+                    },
+                )
+            url, params = target, None
             if response.status_code == 303 or (
                 response.status_code in (301, 302) and method.upper() == "POST"
             ):
-                method, kwargs = "GET", {k: v for k, v in kwargs.items() if k == "headers"}
+                method, body = "GET", {"content": None, "json": None}
         raise EgressDenied(
             "egress_too_many_redirects", _origin(url), f"more than {self._max_redirects}"
         )

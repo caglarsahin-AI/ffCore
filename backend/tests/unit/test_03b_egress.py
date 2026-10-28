@@ -1,9 +1,12 @@
+import json
+import logging
 import threading
 import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 import anyio
 import httpcore2
+import httpx2
 import pytest
 
 from ffcore.core import egress
@@ -32,9 +35,28 @@ class _Handler(BaseHTTPRequestHandler):
             self._redirect("http://evil.example/ok")
         elif self.path == "/to-internal":
             self._redirect(f"http://internal.test:{port}/ok")
+        elif self.path == "/echo":
+            self._reply(200, json.dumps({k.lower(): v for k, v in self.headers.items()}).encode())
+        elif self.path == "/to-same":
+            self._redirect("/echo")
+        elif self.path == "/to-other-host":
+            self._redirect(f"http://b.test:{port}/echo")
+        elif self.path == "/to-other-port":
+            self._redirect(f"http://a.test:{self.server.peer_port}/echo")
         elif self.path == "/slow":
             time.sleep(2)
             self._reply(200, b"late")
+        else:
+            self._reply(404, b"no")
+
+    def do_POST(self):
+        length = int(self.headers.get("Content-Length") or 0)
+        self.rfile.read(length)
+        if self.path == "/post-to-other-host":
+            self.send_response(303)
+            self.send_header("Location", f"http://b.test:{self.server.server_address[1]}/echo")
+            self.send_header("Content-Length", "0")
+            self.end_headers()
         else:
             self._reply(404, b"no")
 
@@ -52,12 +74,21 @@ class _Handler(BaseHTTPRequestHandler):
 
 
 @pytest.fixture(scope="module")
-def server_port():
-    server = ThreadingHTTPServer(("127.0.0.1", 0), _Handler)
-    thread = threading.Thread(target=server.serve_forever, daemon=True)
-    thread.start()
-    yield server.server_address[1]
-    server.shutdown()
+def servers():
+    first = ThreadingHTTPServer(("127.0.0.1", 0), _Handler)
+    second = ThreadingHTTPServer(("127.0.0.1", 0), _Handler)
+    first.peer_port = second.server_address[1]
+    second.peer_port = first.server_address[1]
+    for server in (first, second):
+        threading.Thread(target=server.serve_forever, daemon=True).start()
+    yield first.server_address[1], second.server_address[1]
+    for server in (first, second):
+        server.shutdown()
+
+
+@pytest.fixture(scope="module")
+def server_port(servers):
+    return servers[0]
 
 
 def _resolver(table):
@@ -309,3 +340,168 @@ def test_03b_2_transport_pool_uses_pinned_backend(settings):
     pool = client._transport._pool
     assert isinstance(pool, httpcore2.AsyncConnectionPool)
     assert isinstance(pool._network_backend, egress._PinnedBackend)
+
+
+# --- review r1 MAJOR-1: callers cannot loosen the policy per request ---------------------------
+
+
+@pytest.mark.parametrize(
+    "option",
+    [
+        {"follow_redirects": True},
+        {"transport": object()},
+        {"trust_env": True},
+        {"proxy": "http://proxy.example:3128"},
+        {"verify": False},
+        {"mounts": {}},
+        {"timeout": None},
+        {"extensions": {"timeout": {}}},
+    ],
+)
+def test_03b_2_policy_options_rejected(settings, option):
+    client = _client(settings, _resolver({}), allowed_internal_hosts=["127.0.0.0/8"])
+
+    async def call():
+        async with client:
+            return await client.request("GET", "http://127.0.0.1:1/ok", **option)
+
+    with pytest.raises(TypeError):
+        anyio.run(call)
+
+
+def test_03b_2_redirect_chains_rechecked(settings, server_port):
+    resolver = _resolver({"a.test": ["127.0.0.1"]})
+    # Allowed internal start, redirect to a public host that is not allowlisted.
+    _denied(
+        settings,
+        f"http://a.test:{server_port}/to-not-allowlisted",
+        "egress_not_allowlisted",
+        resolver,
+        allowed_internal_hosts=["a.test"],
+    )
+    # OFFLINE: internal start, redirect to an external host.
+    _denied(
+        settings,
+        f"http://a.test:{server_port}/to-not-allowlisted",
+        "egress_offline",
+        resolver,
+        offline=True,
+        allowed_internal_hosts=["a.test"],
+        egress_allowlist=["evil.example"],
+    )
+
+
+def test_03b_2_connect_enforces_host_policy(settings):
+    # Defence in depth: the connection layer refuses hosts the URL check would refuse.
+    inner = _RecordingBackend()
+    configured = settings.model_copy(update={"egress_allowlist": ["allowed.example"]})
+    policy = egress.EgressPolicy(configured)
+    backend = egress._PinnedBackend(policy, _resolver({"other.example": [PUBLIC_IP]}), inner)
+    with pytest.raises(EgressDenied) as exc:
+        anyio.run(backend.connect_tcp, "other.example", 443)
+    assert exc.value.code == "egress_not_allowlisted"
+    offline = egress.EgressPolicy(configured.model_copy(update={"offline": True}))
+    backend = egress._PinnedBackend(offline, _resolver({"allowed.example": [PUBLIC_IP]}), inner)
+    with pytest.raises(EgressDenied) as exc:
+        anyio.run(backend.connect_tcp, "allowed.example", 443)
+    assert exc.value.code == "egress_offline"
+    assert inner.dialed == []
+
+
+# --- review r1 MAJOR-2: credentials do not follow a redirect to another origin -----------------
+
+CREDENTIALS = {
+    "Authorization": "Bearer dummy-not-secret-bearer",
+    "X-Api-Key": "dummy-not-secret-api-key",
+    "Cookie": "session=dummy-not-secret-cookie",
+    "Proxy-Authorization": "Basic dummy-not-secret-proxy",
+    "X-On-Behalf-Of": "dummy-not-secret-obo",
+    "X-Upstream-Token": "dummy-not-secret-upstream",
+    "X-Tenant-Secret": "dummy-not-secret-tenant",
+}
+
+
+def _credential_client(settings):
+    return _client(
+        settings,
+        _resolver({"a.test": ["127.0.0.1"], "b.test": ["127.0.0.1"]}),
+        allowed_internal_hosts=["a.test", "b.test"],
+    )
+
+
+def _echo(response):
+    assert response.status_code == 200, response.status_code
+    return json.loads(response.text)
+
+
+def test_03b_2_redirect_other_host_drops_credentials(settings, server_port, caplog):
+    headers = {**CREDENTIALS, "X-Request-ID": "req-1"}
+    client = _credential_client(settings)
+    with caplog.at_level(logging.INFO, logger="ffcore.egress"):
+        response = anyio.run(
+            lambda: _get(client, f"http://a.test:{server_port}/to-other-host", headers=headers)
+        )
+    seen = _echo(response)
+    for name in CREDENTIALS:
+        assert name.lower() not in seen
+    assert seen["x-request-id"] == "req-1"
+    events = [r for r in caplog.records if getattr(r, "event", None) == "redirect_cross_origin"]
+    assert len(events) == 1
+    assert events[0].target_origin == f"http://b.test:{server_port}"
+    assert sorted(events[0].dropped_headers) == sorted(n.lower() for n in CREDENTIALS)
+    assert "dummy-not-secret" not in caplog.text
+
+
+def test_03b_2_redirect_other_port_drops_credentials(settings, servers):
+    first, _ = servers
+    client = _credential_client(settings)
+    response = anyio.run(
+        lambda: _get(client, f"http://a.test:{first}/to-other-port", headers=CREDENTIALS)
+    )
+    seen = _echo(response)
+    assert "authorization" not in seen and "x-api-key" not in seen
+
+
+def test_03b_2_redirect_post_303_drops_credentials(settings, server_port):
+    client = _credential_client(settings)
+
+    async def call():
+        async with client:
+            return await client.request(
+                "POST",
+                f"http://a.test:{server_port}/post-to-other-host",
+                headers=CREDENTIALS,
+                json={"x": 1},
+            )
+
+    seen = _echo(anyio.run(call))
+    assert "authorization" not in seen and "x-api-key" not in seen
+
+
+def test_03b_2_redirect_same_origin_keeps_credentials(settings, server_port):
+    client = _credential_client(settings)
+    response = anyio.run(
+        lambda: _get(client, f"http://a.test:{server_port}/to-same", headers=CREDENTIALS)
+    )
+    seen = _echo(response)
+    assert seen["authorization"] == CREDENTIALS["Authorization"]
+    assert seen["x-api-key"] == CREDENTIALS["X-Api-Key"]
+
+
+@pytest.mark.parametrize(
+    ("current", "target", "dropped"),
+    [
+        ("https://a.example/", "http://a.example/x", True),  # TLS downgrade
+        ("https://a.example/", "https://a.example:8443/x", True),
+        ("https://a.example/", "https://b.example/x", True),
+        ("https://a.example/", "https://a.example:443/x", False),
+        ("http://a.example/", "http://A.EXAMPLE:80/x", False),
+    ],
+)
+def test_03b_2_cross_origin_rule(current, target, dropped):
+    kept, removed = egress.headers_for_redirect(
+        httpx2.URL(current), httpx2.URL(target), {"Authorization": "x", "Accept": "a"}
+    )
+    assert ("Authorization" not in kept) is dropped
+    assert removed == (["authorization"] if dropped else [])
+    assert kept["Accept"] == "a"
