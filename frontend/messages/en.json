@@ -168,7 +168,8 @@
     "close": "Close",
     "more": "More",
     "sidebarTitle": "Sidebar",
-    "sidebarDescription": "Displays the mobile sidebar."
+    "sidebarDescription": "Displays the mobile sidebar.",
+    "breadcrumb": "Breadcrumb"
   },
   "DevTheme": {
     "title": "Theme preview",

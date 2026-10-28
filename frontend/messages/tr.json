@@ -168,7 +168,8 @@
     "close": "Kapat",
     "more": "Daha fazla",
     "sidebarTitle": "Kenar çubuğu",
-    "sidebarDescription": "Mobil kenar çubuğunu gösterir."
+    "sidebarDescription": "Mobil kenar çubuğunu gösterir.",
+    "breadcrumb": "İçerik yolu"
   },
   "DevTheme": {
     "title": "Tema önizleme",

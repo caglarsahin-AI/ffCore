@@ -18,17 +18,22 @@ const PALETTE =
   "cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)-\\d{2,3})\\b";
 const COLOUR = `/(\\b${PALETTE})|((?<!=')#[0-9a-fA-F]{3,8}\\b)|(\\b(rgb|rgba|hsl|hsla)\\()/`;
 const COLOUR_MESSAGE = "Hard-coded colour: use a theme token class from styles/tokens.css.";
+const COLOUR_RULES = [
+  { selector: `Literal[value=${COLOUR}]`, message: COLOUR_MESSAGE },
+  { selector: `TemplateElement[value.raw=${COLOUR}]`, message: COLOUR_MESSAGE },
+];
+// jsx-no-literals ignores props, so text in accessibility attributes slipped through (FOLLOWUP-44).
+const ATTRIBUTE_TEXT = {
+  selector: "JSXAttribute[name.name=/^(aria-label|title|placeholder|alt)$/] > Literal[value=/[A-Za-z]/]",
+  message: "User-visible attribute text comes from messages/*.json (t(...)).",
+};
 
 const eslintConfig = [
   ...compat.extends("next/core-web-vitals", "next/typescript"),
   {
     files: ["**/*.{ts,tsx}"],
     rules: {
-      "no-restricted-syntax": [
-        "error",
-        { selector: `Literal[value=${COLOUR}]`, message: COLOUR_MESSAGE },
-        { selector: `TemplateElement[value.raw=${COLOUR}]`, message: COLOUR_MESSAGE },
-      ],
+      "no-restricted-syntax": ["error", ...COLOUR_RULES],
     },
   },
   {
@@ -36,6 +41,8 @@ const eslintConfig = [
     files: ["app/**/*.tsx", "components/**/*.tsx"],
     rules: {
       "react/jsx-no-literals": ["error", { noStrings: false, ignoreProps: true }],
+      // Flat config replaces a rule's options per block: repeat the colour rules here.
+      "no-restricted-syntax": ["error", ...COLOUR_RULES, ATTRIBUTE_TEXT],
     },
   },
   {
