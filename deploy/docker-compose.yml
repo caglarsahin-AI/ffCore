@@ -1,5 +1,6 @@
 # FFCore altyapı ve uygulama servisleri. Depo kökünden: docker compose up -d
 # Tüm imajlar ${REGISTRY_PREFIX} önekli ve sabit sürümlü (:latest yok).
+# Göreli yollar depo köküne göredir (compose.yaml include, project_directory: .).
 # Dışarıya yalnızca backend ve frontend port yayınlar (SECURITY_AND_PERMISSIONS).
 # Zorunlu değişkenler ${VAR:?...} ile tanımlı; eksikse compose açık hatayla durur.
 
@@ -53,7 +54,7 @@ services:
       POSTGRES_DB: ${POSTGRES_DB:?POSTGRES_DB tanımlı değil}
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./postgres/initdb:/docker-entrypoint-initdb.d:ro
+      - ./deploy/postgres/initdb:/docker-entrypoint-initdb.d:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U \"$$POSTGRES_USER\" -d \"$$POSTGRES_DB\""]
       interval: 5s
@@ -104,7 +105,7 @@ services:
       DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/litellm
       STORE_MODEL_IN_DB: "True"
     volumes:
-      - ./litellm/config.yaml:/app/config.yaml:ro
+      - ./deploy/litellm/config.yaml:/app/config.yaml:ro
     depends_on:
       postgres:
         condition: service_healthy
@@ -192,7 +193,7 @@ services:
   backend:
     image: ${REGISTRY_PREFIX}ffcore/backend:${FFCORE_VERSION:?FFCORE_VERSION tanımlı değil}
     build:
-      context: ../backend
+      context: ./backend
       target: runtime
       args:
         REGISTRY_PREFIX: ${REGISTRY_PREFIX:-}
@@ -220,7 +221,7 @@ services:
   frontend:
     image: ${REGISTRY_PREFIX}ffcore/frontend:${FFCORE_VERSION:?FFCORE_VERSION tanımlı değil}
     build:
-      context: ../frontend
+      context: ./frontend
       args:
         REGISTRY_PREFIX: ${REGISTRY_PREFIX:-}
     restart: unless-stopped
@@ -235,14 +236,14 @@ services:
     # Çağrı: docker compose run --rm tools make <hedef>. Docker soketi bağlanmaz.
     image: ${REGISTRY_PREFIX}ffcore/tools:${FFCORE_VERSION:?FFCORE_VERSION tanımlı değil}
     build:
-      context: ../backend
+      context: ./backend
       target: tools
       args:
         REGISTRY_PREFIX: ${REGISTRY_PREFIX:-}
     profiles: ["tools"]
     working_dir: /work
     volumes:
-      - ..:/work
+      - .:/work
     environment:
       <<: *app-env
       COMPOSE_PROFILES: ${COMPOSE_PROFILES:-}

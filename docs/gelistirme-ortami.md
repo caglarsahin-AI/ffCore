@@ -27,7 +27,7 @@ docker compose run --rm tools make smoke
 | Duman testi | `docker compose run --rm tools make smoke` |
 | Ollama modellerini çek | `docker compose run --rm tools make pull` |
 
-`tools` konteyneri depo kökünü `/work` olarak bağlar ve servislere compose ağından servis adıyla gider.
+`tools` konteyneri depo kökünü `/work` olarak bağlar (compose: `.:/work`) ve servislere compose ağından servis adıyla gider.
 Docker soketi bağlanmaz; konteyner içinden `docker` komutu çalışmaz.
 
 ## Profiller
