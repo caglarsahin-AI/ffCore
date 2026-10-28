@@ -6,16 +6,16 @@ Durumlar: READY · CLAIMED · PLANNED · IMPLEMENTING · IMPLEMENTED · VERIFIED
 
 | Paket | Durum | İşçi | Branch | Worktree | Touch-zone | Başlangıç | PR | Bağımlılık / not |
 |---|---|---|---|---|---|---|---|---|
-| 00 | READY | A | | | ffcore: kök, deploy/, Makefile | | | dalga 1 |
-| 00i | — | B | | | **paycoreLLM deposu**: pyproject, CLAUDE.md, docs/paycore, compose*, api.py kimlik, rag/retrieve+pipeline to_thread | | | 00; 03a/01/04a bunu bekler |
-| 13a | READY | test agent'ı | | | data/samples/ | | | dalga 1, 00'a paralel |
+| 00 | MERGED | A | feat/00-repo-skeleton | .worktrees/feat/00-repo-skeleton | kök, backend/ ve frontend/ iskelet, deploy/, Makefile, docs/gelistirme-ortami.md (data/samples hariç) | 2026-10-28 | | dalga 1; GOREV K-00-0001; plan state/pr/00.md onaylandı (K-00-0004); ENV-19/20/23 kapandı; cc4829a compose+tools; review r1 DUZELT → r2 ONAY (1f5fbc6, state/reviews/00-r2.md); main'e --no-ff merge bb634e4 2026-10-28 08:18, smoke passed |
+| 00i | CLAIMED | B | paycoreLLM: feat/00i-ffcore-integration; ffcore: feat/00i-docs | paycoreLLM (işçi açar); ffcore .worktrees/feat/00i-docs | **paycoreLLM deposu**: pyproject, CLAUDE.md, docs/paycore, compose*, api.py kimlik, rag/retrieve+pipeline to_thread; ffcore'da yalnızca docs/paycore-entegrasyon.md | | | 00; 03a/01/04a bunu bekler |
+| 13a | IMPLEMENTED | test | feat/13a-sample-data | .worktrees/feat/13a-sample-data | yalnızca data/samples/** | 2026-10-28 | | dalga 1, 00'a paralel; HEAD 591add4: IMPLEMENTED 07:25 (PII 100/100, hafıza 40/40, test_13a_9 geçti; unittest 18/18 + Postgres 3/3); 00 MERGED (bb634e4) → K-13a-0008: main'e rebase → tools make lint/test → VERIFIED → PR-HAZIR |
 | 03a | — | A | | | models/{identity,catalog}, core/auth, core/secrets | | | 00, 00i |
-| 03b | — | B | | | models/audit, core/audit, core/egress, OBO | | | 00 |
-| 08-lite | — | B | | | guardrails/ | | | 03a merge sonrası |
-| 10a | — | C | | | (console)/{auth,projects,providers,models}, frontend/mocks/ | | | 00 MERGED sonrası sahte API ile (openapi-03a.yaml, msw) |
+| 03b | CLAIMED | A | feat/03b-audit-egress | .worktrees/feat/03b-audit-egress | backend/ffcore/{models/audit.py, core/audit.py, core/egress.py, core/auth.py (resolve_actor OBO+servis yolu), core/db.py, core/config ek}, alembic 03b etiketi, tests, docs/api.md | 2026-10-28 | | 00 MERGED; dağılım değişikliği 2026-10-28: A; GOREV K-03b-0001; yeni isci-a oturumu gerekli (A-00-0020) |
+| 08-lite | — | test | | | guardrails/ | | | 03a merge sonrası; dağılım değişikliği 2026-10-28: test (yeni oturum ffcore-test-08-lite) |
+| 10a | CLAIMED | C | feat/10a-console-skeleton | .worktrees/feat/10a-console-skeleton | frontend/** (iskelet, (console)/{auth,projects,providers,models}, mocks/), docs/onyuz.md | 2026-10-28 | | 00 MERGED; GOREV K-10a-0001; sahte API 03a OpenAPI taslağına kadar iskelet |
 | 10a-bağlama | — | C | | | aynı; msw kapalı, gerçek backend | | | 03a MERGED sonrası küçük PR (ilk gerçek ekran ≈ 9-10. iş günü) |
-| 01 | — | A | | | services/litellm_*, deploy/litellm | | | 00, 03a |
-| 02 | — | A | | | core/tracing, Langfuse compose | | | 00, 01 |
+| 01 | — | B | | | services/litellm_*, deploy/litellm | | | 00, 03a; dağılım değişikliği 2026-10-28: B |
+| 02 | — | B | | | core/tracing, Langfuse compose | | | 00, 01; dağılım değişikliği 2026-10-28: B |
 | 04a | — | A | | | knowledge/ (+ KnowledgeStore bağdaştırıcısı, paycoreLLM rag/ingest sarılır) | | | 00i, 03a, 01, 13a |
 | 05a | — | B | | | services/mcp_*, services/mcp-sql, mcp-search | | | 03a, 03b, 04a, 08 |
 | 06a | — | A | | | runtime/, api/runs* | | | 03a, 03b, 01, 02, 04a, 05a, 08 |

@@ -93,11 +93,13 @@ Başla.
 
 ## 4. Dalga dağılımı (koordinatörün takvimi)
 
+Dağılım değişikliği (kullanıcı kararı, 28 Ekim 2026): 03b → A, 01 ve 02 → B, 08-lite → test. Gerekçe: kritik yol yükü A'da 22 agent-günü iken B 14,5, C 9; A 00i beklerken boş kalmasın. Bağımlılıklar değişmedi; WORK_QUEUE İşçi kolonu esastır.
+
 | Dalga | İşçi A (kritik zincir) | İşçi B (yan) | İşçi C (önyüz) | Test agent'ı |
 |---|---|---|---|---|
 | 1 | 00 | 00i taslağı; **00 MERGED sonrası başlar** | — | 13a (sentetik KB, SQL şeması, test setleri) |
-| 2 | 00i MERGED sonrası 03a | 03b; 03a merge olunca 08-lite | 00 MERGED sonrası **10a sahte API ile** (03a brief'indeki endpoint listesinden geçici `frontend/mocks/openapi-03a.yaml`, tipler `openapi-typescript` ile, `FAKE_API=1` msw) | — |
-| 3 | 01, 02, sonra 04a (PayCore ingest/RAG sarılır) | 08-lite devam; Alembic merge | 03a MERGED olunca **10a-bağlama** (küçük PR: msw kapalı, gerçek backend, Playwright giriş akışı); sonra **10b-poc sahte API ile** (04a, 05a, 06a, 07 brief'lerindeki endpoint'lerden `openapi-04-07.yaml`) | — |
+| 2 | 00 MERGED sonrası **03b**; 00i MERGED sonrası 03a | 00i | 00 MERGED sonrası **10a sahte API ile** (03a brief'indeki endpoint listesinden geçici `frontend/mocks/openapi-03a.yaml`, tipler `openapi-typescript` ile, `FAKE_API=1` msw) | 03a MERGED olunca **08-lite** (yeni oturum ffcore-test-08-lite) |
+| 3 | 03a sonrası 04a (PayCore ingest/RAG sarılır) | 03a MERGED sonrası **01**, sonra **02**; Alembic merge | 03a MERGED olunca **10a-bağlama** (küçük PR: msw kapalı, gerçek backend, Playwright giriş akışı); sonra **10b-poc sahte API ile** (04a, 05a, 06a, 07 brief'lerindeki endpoint'lerden `openapi-04-07.yaml`) | 08-lite devam |
 | 4 | 06a (05a bitince) | 05a (04a bitince), sonra 07 | 10b-poc devam (KB, araç, agent sihirbazı, run/onay, sistem durumu) | — |
 | 5 | 13b (M3 e2e, S1 ile `make eval`, Open WebUI demo) | 07 devam | 04a-07 MERGED olunca **10b-bağlama** (gerçek backend, Playwright akışları) | 13b'ye olumsuz senaryo testleri |
 | **M3 / PoC kapısı** | Qwen/CPU kalitesi, model ve donanım kararı, kapsam | — | — | — |
