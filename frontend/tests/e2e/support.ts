@@ -1,21 +1,49 @@
+import { expect } from "@playwright/test";
 import type { BrowserContext, Page } from "@playwright/test";
+
+import { PASSWORD, fixture } from "./fixtures";
 
 export const THEMES = ["light", "dark"] as const;
 export type Theme = (typeof THEMES)[number];
 
-// Main 10a screens; members uses a placeholder project id (no data in the fake API stage).
+// Main 10a screens. Paths that need run data (project id) are resolved inside the test, because
+// test files are listed before global-setup.ts has created the fixture.
 export const SCREENS = [
-  { name: "login", path: "/login" },
-  { name: "projects", path: "/projects" },
-  { name: "members", path: "/projects/demo/members" },
-  { name: "providers", path: "/providers" },
-  { name: "models", path: "/models" },
-  { name: "coming-soon", path: "/agents" },
-  { name: "theme-preview", path: "/dev/theme" },
+  { name: "login", signedIn: false, path: () => "/login" },
+  { name: "projects", signedIn: true, path: () => "/projects" },
+  { name: "members", signedIn: true, path: () => `/projects/${fixture().alpha.id}/members` },
+  { name: "providers", signedIn: true, path: () => "/providers" },
+  { name: "models", signedIn: true, path: () => "/models" },
+  { name: "coming-soon", signedIn: true, path: () => "/agents" },
+  { name: "theme-preview", signedIn: false, path: () => "/dev/theme" },
 ] as const;
 
-export async function signIn(context: BrowserContext, baseURL: string, session = "admin:edit") {
-  await context.addCookies([{ name: "ffcore_fake_session", value: session, url: baseURL }]);
+// Superadmin with project alpha selected: every 10a screen shows real data.
+export async function openScreen(page: Page, context: BrowserContext, baseURL: string, screen: (typeof SCREENS)[number]) {
+  if (screen.signedIn) {
+    await signIn(page, fixture().superadmin.email);
+    await selectProject(context, baseURL, fixture().alpha.id);
+  }
+  await page.goto(screen.path());
+  await page.waitForLoadState("networkidle");
+}
+
+// Sign in through the real form (POST /auth/login via the console origin, C6).
+export async function signIn(page: Page, email: string) {
+  await page.goto("/login");
+  await fillSignIn(page, email);
+}
+
+// Fill and submit the sign-in form on the current page (keeps ?next= when already on /login).
+export async function fillSignIn(page: Page, email: string) {
+  await page.getByLabel("Email").or(page.getByLabel("E-posta")).fill(email);
+  await page.locator("#password").fill(PASSWORD);
+  await page.locator('form[data-testid="login-form"] button[type="submit"]').click();
+  await expect(page).not.toHaveURL(/\/login$/);
+}
+
+export async function selectProject(context: BrowserContext, baseURL: string, projectId: string) {
+  await context.addCookies([{ name: "ffcore_project", value: projectId, url: baseURL }]);
 }
 
 export async function setLocale(context: BrowserContext, baseURL: string, locale: "en" | "tr") {

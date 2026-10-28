@@ -2,9 +2,10 @@ import { expect, test } from "@playwright/test";
 
 import en from "../../messages/en.json";
 import tr from "../../messages/tr.json";
+import { fixture } from "./fixtures";
 import { setLocale, signIn } from "./support";
 
-test.beforeEach(async ({ context, baseURL }) => signIn(context, baseURL!));
+test.beforeEach(async ({ page }) => signIn(page, fixture().superadmin.email));
 
 test("test_10a_8_locale_switch: English by default", async ({ page }) => {
   await page.goto("/projects");

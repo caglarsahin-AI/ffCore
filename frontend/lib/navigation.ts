@@ -3,8 +3,9 @@ import { hasRole } from "@/lib/access";
 
 // Console menu: groups, screens and the minimum role per screen (brief 10, R10.5).
 // Single source for menu visibility and route guarding. `ready: false` screens belong
-// to later packages (10b-poc, 10c) and render an explicit "coming soon" page.
-export type NavItem = { key: string; href: string; minRole: Role; ready: boolean };
+// to later packages (10b-poc, 10c) and render an explicit "coming soon" page. `superadmin: true`
+// marks tenant screens: the backend serves them only to superadmins (03a require_superadmin).
+export type NavItem = { key: string; href: string; minRole: Role; ready: boolean; superadmin?: true };
 export type NavGroup = { key: string; items: NavItem[] };
 
 export const NAV_GROUPS: NavGroup[] = [
@@ -15,7 +16,7 @@ export const NAV_GROUPS: NavGroup[] = [
   {
     key: "build",
     items: [
-      { key: "providers", href: "/providers", minRole: "admin", ready: true },
+      { key: "providers", href: "/providers", minRole: "admin", ready: true, superadmin: true },
       { key: "models", href: "/models", minRole: "admin", ready: true },
       { key: "knowledgeBases", href: "/knowledge-bases", minRole: "analyst", ready: false },
       { key: "dataSources", href: "/data-sources", minRole: "developer", ready: false },
@@ -40,20 +41,24 @@ export const NAV_GROUPS: NavGroup[] = [
     key: "admin",
     items: [
       { key: "projects", href: "/projects", minRole: "admin", ready: true },
-      { key: "users", href: "/users", minRole: "admin", ready: false },
+      { key: "users", href: "/users", minRole: "admin", ready: false, superadmin: true },
       { key: "apiKeys", href: "/api-keys", minRole: "admin", ready: false },
       { key: "quotas", href: "/quotas", minRole: "developer", ready: false },
-      { key: "audit", href: "/audit", minRole: "admin", ready: false },
+      { key: "audit", href: "/audit", minRole: "admin", ready: false, superadmin: true },
       { key: "retention", href: "/retention", minRole: "admin", ready: false },
       { key: "settings", href: "/settings", minRole: "admin", ready: false },
     ],
   },
 ];
 
-export function visibleGroups(role: Role): NavGroup[] {
+export function canOpen(item: NavItem, role: Role, superadmin: boolean): boolean {
+  return hasRole(role, item.minRole) && (!item.superadmin || superadmin);
+}
+
+export function visibleGroups(role: Role, superadmin: boolean): NavGroup[] {
   return NAV_GROUPS.map((group) => ({
     ...group,
-    items: group.items.filter((item) => hasRole(role, item.minRole)),
+    items: group.items.filter((item) => canOpen(item, role, superadmin)),
   })).filter((group) => group.items.length > 0);
 }
 

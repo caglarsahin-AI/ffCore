@@ -1,12 +1,14 @@
 import { defineConfig, devices } from "@playwright/test";
 
-// Acceptance tests against the fake API stage (FAKE_API=1): role and access mode come from a
-// fixture cookie, no backend. They do not prove backend integration (10a-binding does).
-// Runs in mcr.microsoft.com/playwright (digest pinned in docs/onyuz.md), never on the host.
-const PORT = 3100;
+// Acceptance tests against the real backend of a local compose stack (10a-binding). Runs in the
+// compose `e2e` service (Playwright image, digest pinned), never on the host:
+//   docker compose -p 10ab --env-file .env.test --profile e2e run --rm e2e
+// The console is built and served here on localhost:3000, the origin in CONSOLE_ORIGINS (C6).
+const PORT = 3000;
 
 export default defineConfig({
   testDir: "tests/e2e",
+  globalSetup: "./tests/e2e/global-setup.ts",
   fullyParallel: true,
   forbidOnly: true,
   retries: 0,
@@ -21,6 +23,6 @@ export default defineConfig({
     url: `http://localhost:${PORT}/login`,
     timeout: 300_000,
     reuseExistingServer: false,
-    env: { FAKE_API: "1", NEXT_TELEMETRY_DISABLED: "1" },
+    env: { FFCORE_BACKEND_URL: process.env.FFCORE_BACKEND_URL ?? "", NEXT_TELEMETRY_DISABLED: "1" },
   },
 });

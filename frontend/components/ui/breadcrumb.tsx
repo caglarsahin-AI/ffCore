@@ -6,9 +6,10 @@ import { useTranslations } from "next-intl"
 import { ChevronRightIcon, MoreHorizontalIcon } from "lucide-react"
 
 function Breadcrumb({ className, ...props }: React.ComponentProps<"nav">) {
+  const t = useTranslations("Ui")
   return (
     <nav
-      aria-label="breadcrumb"
+      aria-label={t("breadcrumb")}
       data-slot="breadcrumb"
       className={cn(className)}
       {...props}

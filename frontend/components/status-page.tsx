@@ -1,23 +1,23 @@
-import { CircleSlashIcon, ConstructionIcon, PlugZapIcon } from "lucide-react";
+import { CircleSlashIcon, ConstructionIcon, FolderSearchIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 type Props =
   | { kind: "forbidden" }
-  | { kind: "sessionUnavailable" }
+  | { kind: "selectProject" }
   | { kind: "comingSoon"; screen: string };
 
-// Full-page explanations: no access, screen not built yet, no session.
+// In-console explanations: no access, screen not built yet, no project selected.
 export function StatusPage(props: Props) {
   const tForbidden = useTranslations("Forbidden");
   const tSoon = useTranslations("ComingSoon");
-  const tSession = useTranslations("Session");
+  const tProject = useTranslations("ProjectSwitcher");
 
   const [Icon, title, body] =
     props.kind === "forbidden"
       ? [CircleSlashIcon, tForbidden("title"), tForbidden("body")]
       : props.kind === "comingSoon"
         ? [ConstructionIcon, tSoon("title", { screen: props.screen }), tSoon("body")]
-        : [PlugZapIcon, tSession("unavailableTitle"), tSession("unavailableBody")];
+        : [FolderSearchIcon, tProject("selectTitle"), tProject("selectBody")];
 
   return (
     <section

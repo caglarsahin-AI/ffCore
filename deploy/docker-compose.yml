@@ -230,7 +230,12 @@ services:
       context: ./frontend
       args:
         REGISTRY_PREFIX: ${REGISTRY_PREFIX:-}
+        # Same-origin API (C6): Next.js rewrites /api/v1/* here; rewrites are fixed at build time.
+        FFCORE_BACKEND_URL: http://backend:8000
     restart: unless-stopped
+    environment:
+      # Server components read the session (GET /auth/me) from the backend directly.
+      FFCORE_BACKEND_URL: http://backend:8000
     ports:
       - "${FRONTEND_PORT:-3000}:3000"
     depends_on:
@@ -273,7 +278,29 @@ services:
       COMPOSE_PROFILES: ${COMPOSE_PROFILES:-}
       OLLAMA_CONTEXT_LENGTH: ${OLLAMA_CONTEXT_LENGTH:-}
 
+  e2e:
+    # Console acceptance tests against this stack (10a-binding, K-10ab-0004). Builds and serves the
+    # console itself on localhost:3000 (= CONSOLE_ORIGINS) and drives Chromium; host needs no Node.
+    # Call: docker compose --profile e2e run --rm e2e   (docs/onyuz.md has the full sequence)
+    # Image = @playwright/test version in frontend/package.json; digest pinned, 12 mirrors it.
+    image: ${REGISTRY_PREFIX}mcr.microsoft.com/playwright@sha256:47b510dd9230bf0b9bfc9b20102241e577ea7a99334ab4c3ca19f19770e9b8ea
+    profiles: ["e2e"]
+    ipc: host
+    working_dir: /work/frontend
+    command: ["sh", "-c", "npm ci --no-audit --no-fund && npm run test:e2e"]
+    volumes:
+      - .:/work
+      # glibc node_modules, kept apart from the alpine (musl) ones of the frontend image.
+      - e2e_node_modules:/work/frontend/node_modules
+    environment:
+      FFCORE_BACKEND_URL: http://backend:8000
+      NEXT_TELEMETRY_DISABLED: "1"
+    depends_on:
+      backend:
+        condition: service_healthy
+
 volumes:
+  e2e_node_modules:
   postgres_data:
   redis_data:
   langfuse_postgres_data:

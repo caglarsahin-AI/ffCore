@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
 
-import { hasRole, parseSession } from "@/lib/access";
+import { hasRole } from "@/lib/access";
 import { itemForPath, visibleGroups } from "@/lib/navigation";
 
 const keys = (role: Parameters<typeof visibleGroups>[0]) =>
-  visibleGroups(role).flatMap((group) => group.items.map((item) => item.key));
+  visibleGroups(role, true).flatMap((group) => group.items.map((item) => item.key));
 
 describe("test_10a_5_role_menu_visibility", () => {
   it("orders roles user < analyst < developer < admin", () => {
@@ -34,18 +34,12 @@ describe("test_10a_5_role_menu_visibility", () => {
   it("shows every screen to admin and no group to user", () => {
     expect(keys("admin")).toContain("providers");
     expect(keys("admin")).toContain("projects");
-    expect(visibleGroups("user")).toEqual([]);
+    expect(visibleGroups("user", true)).toEqual([]);
   });
 
   it("maps nested paths to their owning item", () => {
     expect(itemForPath("/projects/42/members")?.key).toBe("projects");
     expect(itemForPath("/providers")?.minRole).toBe("admin");
     expect(itemForPath("/nope")).toBeNull();
-  });
-
-  it("rejects malformed fixture sessions instead of defaulting", () => {
-    expect(parseSession("admin:read")).toEqual({ role: "admin", access: "read" });
-    expect(parseSession("root:edit")).toBeNull();
-    expect(parseSession(undefined)).toBeNull();
   });
 });
