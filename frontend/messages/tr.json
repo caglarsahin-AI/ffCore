@@ -128,7 +128,7 @@
     "description": "Sağlayıcı, LLMaaS ya da yerel çalıştırıcı gibi bir model uç noktasıdır. Bağlantıyı test edip projelere atayın.",
     "add": "Sağlayıcı ekle",
     "emptyTitle": "Henüz sağlayıcı yok",
-    "emptyBody": "Henüz kayıtlı sağlayıcı yok. Sağlayıcı formları konsolun bir sonraki sürümünde gelir.",
+    "emptyBody": "İlk sağlayıcıyı ekleyin, bağlantısını test edin ve projelere atayın.",
     "key": "Anahtar",
     "label": "Ad",
     "driver": "Sürücü",
@@ -136,21 +136,141 @@
     "projects": "Projeler",
     "status": "Durum",
     "active": "Etkin",
-    "inactive": "Pasif"
+    "inactive": "Pasif",
+    "addTitle": "Sağlayıcı ekle",
+    "editTitle": "Sağlayıcıyı düzenle",
+    "edit": "Düzenle",
+    "save": "Kaydet",
+    "cancel": "Vazgeç",
+    "keyHint": "Küçük harf, rakam ve tire; 2-64 karakter. Sonradan değiştirilemez.",
+    "keyInvalid": "Harfle başlayan 2-64 küçük harf, rakam ya da tire kullanın.",
+    "labelRequired": "Bir ad girin.",
+    "descriptionLabel": "Açıklama",
+    "driverPlaceholder": "Bir sürücü seçin",
+    "driverRequired": "Bir sürücü seçin.",
+    "driverFixed": "Sürücü değiştirilemez; bunun yerine yeni bir sağlayıcı ekleyin.",
+    "domainsRequired": "En az bir kullanım seçin.",
+    "projectsHint": "Bir sağlayıcı her zaman en az bir projeye atanır.",
+    "projectsRequired": "En az bir proje atayın.",
+    "configTitle": "Yapılandırma",
+    "noFields": "Bu sürücü yapılandırma gerektirmez.",
+    "fieldRequired": "Bu alan zorunlu.",
+    "secretStored": "Kayıtlı. Korumak için boş bırakın.",
+    "deactivate": "Pasifleştir",
+    "activate": "Etkinleştir",
+    "actions": "İşlemler",
+    "deactivateConfirm": "{label} pasifleştirilsin mi? Modelleri artık sunulmaz.",
+    "domainNames": {
+      "model": "Modeller",
+      "embedding": "Embedding",
+      "vector": "Vektör deposu",
+      "file": "Dosya deposu"
+    }
   },
   "Models": {
     "title": "Modeller",
     "description": "Modeller bir sağlayıcıdan gelir ve agent'ların doğru modeli seçebilmesi için kategoriyle gruplanır.",
     "add": "Model ekle",
     "emptyTitle": "Henüz model yok",
-    "emptyBody": "Bu projede henüz model yok. Model formları konsolun bir sonraki sürümünde gelir.",
+    "emptyBody": "Bu projede henüz model yok. Projeye atanmış bir sağlayıcıdan model ekleyin.",
     "name": "Ad",
     "virtualName": "Sanal model adı",
     "category": "Kategori",
     "providerModel": "Sağlayıcıdaki model",
     "status": "Durum",
     "active": "Etkin",
-    "inactive": "Pasif"
+    "inactive": "Pasif",
+    "addTitle": "Model ekle",
+    "editTitle": "Modeli düzenle",
+    "edit": "Düzenle",
+    "delete": "Sil",
+    "save": "Kaydet",
+    "cancel": "Vazgeç",
+    "actions": "İşlemler",
+    "deleteConfirm": "{name} silinsin mi? Onu kullanan agent'lar çalışmaz.",
+    "addNeedsSuperadmin": "Sağlayıcılar proje bazında listelenene kadar model eklemek için süper yönetici gerekir.",
+    "key": "Anahtar",
+    "keyHint": "Küçük harf, rakam ve tire; 2-64 karakter. LiteLLM adının parçasıdır; sonradan değiştirilemez.",
+    "keyInvalid": "Harfle başlayan 2-64 küçük harf, rakam ya da tire kullanın.",
+    "displayName": "Ad",
+    "displayNameRequired": "Bir ad girin.",
+    "categoryPlaceholder": "Bir kategori seçin",
+    "categoryRequired": "Bir kategori seçin.",
+    "categoryFirst": "Önce kategoriyi seçin.",
+    "categories": {
+      "llm": "Dil modeli",
+      "embedding": "Embedding",
+      "stt": "Konuşmadan metne",
+      "tts": "Metinden konuşmaya",
+      "ocr": "OCR",
+      "moderation": "Moderasyon"
+    },
+    "provider": "Sağlayıcı",
+    "providerPlaceholder": "Bir sağlayıcı seçin",
+    "providerRequired": "Bir sağlayıcı seçin.",
+    "providerFixed": "Sağlayıcı değiştirilemez; bunun yerine yeni bir model ekleyin.",
+    "noProviders": "Bu projenin etkin sağlayıcılarından hiçbiri bu kategoriyi sunmuyor. Bir süper yönetici Sağlayıcılar ekranında ekler ya da atar.",
+    "modelId": "Sağlayıcıdaki model kimliği",
+    "modelIdHint": "Modelin sağlayıcıdaki adı, ör. qwen3.5:35b.",
+    "modelIdRequired": "Sağlayıcıdaki model kimliğini girin.",
+    "fillFromCatalog": "Katalogdan doldur",
+    "catalogFilled": "Katalogdan dolduruldu ({source}, {asOf} itibarıyla).",
+    "catalogMiss": "Katalogda yok; değerleri kendiniz girin.",
+    "catalogNeedsModel": "Önce sağlayıcıyı seçin ve model kimliğini girin.",
+    "capabilities": "Yetenekler",
+    "capability": {
+      "tool_calls": "Araç çağrısı",
+      "reasoning": "Akıl yürütme",
+      "structured_outputs": "Yapılandırılmış çıktı"
+    },
+    "inputTypes": "Girdi türleri",
+    "inputType": {
+      "text": "Metin",
+      "image": "Görsel",
+      "audio": "Ses",
+      "file": "Dosya"
+    },
+    "pricing": "Fiyatlar (1M token başına USD)",
+    "price": {
+      "input_per_1m": "Girdi",
+      "output_per_1m": "Çıktı",
+      "cached_per_1m": "Önbellekli girdi"
+    },
+    "limits": "Sınırlar",
+    "limit": {
+      "context_window": "Bağlam penceresi",
+      "max_output": "En fazla çıktı",
+      "temperature": "Sıcaklık",
+      "max_tokens": "En fazla token"
+    },
+    "numberInvalid": "Pozitif bir sayı girin.",
+    "temperatureInvalid": "0 ile 2 arasında bir sayı girin.",
+    "reasoningDefault": "Varsayılan akıl yürütme düzeyi",
+    "reasoningNotSet": "Belirtilmedi",
+    "reasoning": {
+      "none": "Yok",
+      "low": "Düşük",
+      "medium": "Orta",
+      "high": "Yüksek"
+    },
+    "returnReasoning": "Akıl yürütmeyi çağırana döndür",
+    "upstreamApi": "Üst API",
+    "upstream": {
+      "chat": "Chat completions",
+      "responses": "Responses"
+    },
+    "responsesUnavailable": "Henüz kullanılamaz: geçit Responses API'li modelleri reddediyor (upstream_api_unsupported).",
+    "requestPolicy": "İstek politikası",
+    "dropUnsupported": "Sağlayıcının desteklemediği parametreleri çıkar",
+    "rejectParams": "Çıkarılan parametreler",
+    "rejectParamsHint": "Virgülle ayrılmış, ör. top_k, seed.",
+    "extraBody": "Ek istek gövdesi (JSON)",
+    "extraBodyHint": "Her isteğe eklenir, ör. {\"reasoning_effort\": \"none\"}.",
+    "extraBodyInvalid": "Bir JSON nesnesi girin.",
+    "isActive": "Etkin",
+    "embedDim": "Embedding boyutu",
+    "notInGateway": "Geçitte değil",
+    "notInGatewayHint": "Geçit Responses API'li modelleri henüz sunmuyor (upstream_api_unsupported)."
   },
   "ProjectSwitcher": {
     "label": "Proje",
@@ -201,6 +321,71 @@
     "memberExists": "Bu kullanıcı zaten projenin üyesi.",
     "roleReserved": "Bu rol bu sürümde atanamaz.",
     "notFound": "Bu kayıt artık yok. Sayfayı yenileyin.",
-    "unexpected": "İstek başarısız oldu."
+    "unexpected": "İstek başarısız oldu.",
+    "providerKeyTaken": "Bu sağlayıcı anahtarı zaten kullanılıyor.",
+    "providerInUse": "Bu sağlayıcıyı hâlâ bir model kullanıyor. Önce o modelleri pasifleştirin ya da silin.",
+    "providerNotAssigned": "Sağlayıcı bu projede etkin değil. Önce projeye atayın.",
+    "providerDomainMismatch": "Bu sağlayıcı bu kategorideki modelleri sunmuyor.",
+    "modelKeyTaken": "Bu model anahtarı projede zaten kullanılıyor.",
+    "embeddingProbeUnavailable": "Bu sağlayıcıyla embedding boyutu henüz ölçülemiyor; model kaydedilemez.",
+    "embedDimMismatch": "Modelin embedding boyutu kurulumun EMBED_DIM değeriyle uyuşmuyor.",
+    "domainNotSupported": "Sürücü seçilen kullanımlardan birini sunmuyor.",
+    "unknownConfigField": "Yapılandırmada bu sürücünün tanımadığı bir alan var.",
+    "missingConfigField": "Zorunlu bir yapılandırma alanı boş.",
+    "invalidConfigField": "Bir yapılandırma alanı geçerli değil.",
+    "unknownProject": "Seçilen projelerden biri artık yok. Sayfayı yenileyin."
+  },
+  "ProviderTest": {
+    "title": "Bağlantı testi",
+    "run": "Bağlantıyı test et",
+    "runSaved": "Kayıtlı yapılandırmayı test et",
+    "running": "Test ediliyor…",
+    "ok": "Bağlantı çalışıyor ({latency} ms).",
+    "unsupported": "Bu sürücünün bağlantı testi yok.",
+    "authFailed": "Sağlayıcı kimlik bilgilerini reddetti.",
+    "connectionFailed": "Sağlayıcıya bağlanılamadı.",
+    "timeout": "Sağlayıcı zamanında yanıt vermedi.",
+    "egressDenied": "Dış bağlantı politikası bu adresi reddetti. OFFLINE, EGRESS_ALLOWLIST ve ALLOWED_INTERNAL_HOSTS değerlerini kontrol edin.",
+    "httpStatus": "Sağlayıcı hata ile yanıt verdi.",
+    "unexpected": "Bağlantı testi başarısız oldu.",
+    "notBlocking": "Başarısız test kaydetmeyi engellemez."
+  },
+  "ProviderFields": {
+    "base_url": {
+      "label": "Temel URL",
+      "hint": "Sunucunun adresi, ör. http://ollama:11434."
+    },
+    "api_key": {
+      "label": "API anahtarı",
+      "hint": "Şifreli saklanır ve bir daha gösterilmez."
+    },
+    "api_base": {
+      "label": "Uç nokta",
+      "hint": "Anlaşılan bölgedeki kaynak uç noktası."
+    },
+    "api_version": {
+      "label": "API sürümü",
+      "hint": "Örneğin 2024-10-21."
+    },
+    "aws_access_key_id": {
+      "label": "Erişim anahtarı kimliği",
+      "hint": "Şifreli saklanır ve bir daha gösterilmez."
+    },
+    "aws_secret_access_key": {
+      "label": "Gizli erişim anahtarı",
+      "hint": "Şifreli saklanır ve bir daha gösterilmez."
+    },
+    "region": {
+      "label": "Bölge",
+      "hint": "Anlaşılan alandaki AWS bölgesi, ör. eu-central-1."
+    },
+    "url": {
+      "label": "URL",
+      "hint": "Qdrant adresi, ör. http://qdrant:6333."
+    },
+    "path": {
+      "label": "Dizin",
+      "hint": "Backend konteyneri içindeki dizin."
+    }
   }
 }

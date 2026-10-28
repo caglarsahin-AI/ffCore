@@ -128,7 +128,7 @@
     "description": "A provider is a model endpoint such as LLMaaS or a local runtime. Test the connection and assign it to projects.",
     "add": "Add provider",
     "emptyTitle": "No providers yet",
-    "emptyBody": "No provider is registered yet. Provider forms arrive in the next console release.",
+    "emptyBody": "Add the first provider, test its connection and assign it to projects.",
     "key": "Key",
     "label": "Name",
     "driver": "Driver",
@@ -136,21 +136,141 @@
     "projects": "Projects",
     "status": "Status",
     "active": "Active",
-    "inactive": "Inactive"
+    "inactive": "Inactive",
+    "addTitle": "Add provider",
+    "editTitle": "Edit provider",
+    "edit": "Edit",
+    "save": "Save",
+    "cancel": "Cancel",
+    "keyHint": "Lowercase letters, digits and hyphens; 2-64 characters. It cannot be changed later.",
+    "keyInvalid": "Use 2-64 lowercase letters, digits or hyphens, starting with a letter.",
+    "labelRequired": "Enter a name.",
+    "descriptionLabel": "Description",
+    "driverPlaceholder": "Choose a driver",
+    "driverRequired": "Choose a driver.",
+    "driverFixed": "The driver cannot be changed; add a new provider instead.",
+    "domainsRequired": "Choose at least one use.",
+    "projectsHint": "A provider is always assigned to at least one project.",
+    "projectsRequired": "Assign at least one project.",
+    "configTitle": "Configuration",
+    "noFields": "This driver needs no configuration.",
+    "fieldRequired": "This field is required.",
+    "secretStored": "Stored. Leave empty to keep it.",
+    "deactivate": "Deactivate",
+    "activate": "Activate",
+    "actions": "Actions",
+    "deactivateConfirm": "Deactivate {label}? Its models stop being served.",
+    "domainNames": {
+      "model": "Models",
+      "embedding": "Embeddings",
+      "vector": "Vector store",
+      "file": "File store"
+    }
   },
   "Models": {
     "title": "Models",
     "description": "Models come from a provider and are grouped by category so agents can pick the right one.",
     "add": "Add model",
     "emptyTitle": "No models yet",
-    "emptyBody": "This project has no models yet. Model forms arrive in the next console release.",
+    "emptyBody": "This project has no models yet. Add one from a provider assigned to the project.",
     "name": "Name",
     "virtualName": "Virtual model name",
     "category": "Category",
     "providerModel": "Provider model",
     "status": "Status",
     "active": "Active",
-    "inactive": "Inactive"
+    "inactive": "Inactive",
+    "addTitle": "Add model",
+    "editTitle": "Edit model",
+    "edit": "Edit",
+    "delete": "Delete",
+    "save": "Save",
+    "cancel": "Cancel",
+    "actions": "Actions",
+    "deleteConfirm": "Delete {name}? Agents that use it stop working.",
+    "addNeedsSuperadmin": "Adding a model needs a superadmin until providers are listed per project.",
+    "key": "Key",
+    "keyHint": "Lowercase letters, digits and hyphens; 2-64 characters. Part of the LiteLLM name; it cannot be changed later.",
+    "keyInvalid": "Use 2-64 lowercase letters, digits or hyphens, starting with a letter.",
+    "displayName": "Name",
+    "displayNameRequired": "Enter a name.",
+    "categoryPlaceholder": "Choose a category",
+    "categoryRequired": "Choose a category.",
+    "categoryFirst": "Choose the category first.",
+    "categories": {
+      "llm": "Language model",
+      "embedding": "Embedding",
+      "stt": "Speech to text",
+      "tts": "Text to speech",
+      "ocr": "OCR",
+      "moderation": "Moderation"
+    },
+    "provider": "Provider",
+    "providerPlaceholder": "Choose a provider",
+    "providerRequired": "Choose a provider.",
+    "providerFixed": "The provider cannot be changed; add a new model instead.",
+    "noProviders": "No active provider of this project serves this category. A superadmin adds or assigns one on the Providers screen.",
+    "modelId": "Provider model ID",
+    "modelIdHint": "The model's name at the provider, e.g. qwen3.5:35b.",
+    "modelIdRequired": "Enter the provider model ID.",
+    "fillFromCatalog": "Fill from catalog",
+    "catalogFilled": "Filled from the catalog ({source}, as of {asOf}).",
+    "catalogMiss": "Not in the catalog; enter the values yourself.",
+    "catalogNeedsModel": "Choose a provider and enter the model ID first.",
+    "capabilities": "Capabilities",
+    "capability": {
+      "tool_calls": "Tool calls",
+      "reasoning": "Reasoning",
+      "structured_outputs": "Structured outputs"
+    },
+    "inputTypes": "Input types",
+    "inputType": {
+      "text": "Text",
+      "image": "Image",
+      "audio": "Audio",
+      "file": "File"
+    },
+    "pricing": "Prices (USD per 1M tokens)",
+    "price": {
+      "input_per_1m": "Input",
+      "output_per_1m": "Output",
+      "cached_per_1m": "Cached input"
+    },
+    "limits": "Limits",
+    "limit": {
+      "context_window": "Context window",
+      "max_output": "Max output",
+      "temperature": "Temperature",
+      "max_tokens": "Max tokens"
+    },
+    "numberInvalid": "Enter a positive number.",
+    "temperatureInvalid": "Enter a number from 0 to 2.",
+    "reasoningDefault": "Default reasoning effort",
+    "reasoningNotSet": "Not set",
+    "reasoning": {
+      "none": "None",
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High"
+    },
+    "returnReasoning": "Return reasoning to the caller",
+    "upstreamApi": "Upstream API",
+    "upstream": {
+      "chat": "Chat completions",
+      "responses": "Responses"
+    },
+    "responsesUnavailable": "Not available yet: the gateway refuses models with the Responses API (upstream_api_unsupported).",
+    "requestPolicy": "Request policy",
+    "dropUnsupported": "Drop parameters the provider does not support",
+    "rejectParams": "Removed parameters",
+    "rejectParamsHint": "Comma-separated, e.g. top_k, seed.",
+    "extraBody": "Extra request body (JSON)",
+    "extraBodyHint": "Merged into every request, e.g. {\"reasoning_effort\": \"none\"}.",
+    "extraBodyInvalid": "Enter a JSON object.",
+    "isActive": "Active",
+    "embedDim": "Embedding dimension",
+    "notInGateway": "Not in the gateway",
+    "notInGatewayHint": "The gateway does not serve models with the Responses API yet (upstream_api_unsupported)."
   },
   "ProjectSwitcher": {
     "label": "Project",
@@ -201,6 +321,71 @@
     "memberExists": "This user is already a member of the project.",
     "roleReserved": "This role cannot be assigned in this release.",
     "notFound": "It no longer exists. Refresh the page.",
-    "unexpected": "The request failed."
+    "unexpected": "The request failed.",
+    "providerKeyTaken": "This provider key is already used.",
+    "providerInUse": "A model still uses this provider. Deactivate or delete those models first.",
+    "providerNotAssigned": "The provider is not active in this project. Assign it to the project first.",
+    "providerDomainMismatch": "This provider does not serve models of this category.",
+    "modelKeyTaken": "This model key is already used in the project.",
+    "embeddingProbeUnavailable": "The embedding dimension cannot be measured with this provider yet, so the model cannot be registered.",
+    "embedDimMismatch": "The model's embedding dimension does not match the installation's EMBED_DIM.",
+    "domainNotSupported": "The driver does not serve one of the selected uses.",
+    "unknownConfigField": "The configuration has a field this driver does not know.",
+    "missingConfigField": "A required configuration field is empty.",
+    "invalidConfigField": "A configuration field is not valid.",
+    "unknownProject": "One of the selected projects no longer exists. Refresh the page."
+  },
+  "ProviderTest": {
+    "title": "Connection test",
+    "run": "Test connection",
+    "runSaved": "Test saved configuration",
+    "running": "Testing…",
+    "ok": "Connection works ({latency} ms).",
+    "unsupported": "This driver has no connection test.",
+    "authFailed": "The provider refused the credentials.",
+    "connectionFailed": "Could not connect to the provider.",
+    "timeout": "The provider did not answer in time.",
+    "egressDenied": "The outbound policy refused this address. Check OFFLINE, EGRESS_ALLOWLIST and ALLOWED_INTERNAL_HOSTS.",
+    "httpStatus": "The provider answered with an error.",
+    "unexpected": "The connection test failed.",
+    "notBlocking": "A failed test does not block saving."
+  },
+  "ProviderFields": {
+    "base_url": {
+      "label": "Base URL",
+      "hint": "Address of the server, e.g. http://ollama:11434."
+    },
+    "api_key": {
+      "label": "API key",
+      "hint": "Stored encrypted and never shown again."
+    },
+    "api_base": {
+      "label": "Endpoint",
+      "hint": "Resource endpoint in the agreed region."
+    },
+    "api_version": {
+      "label": "API version",
+      "hint": "For example 2024-10-21."
+    },
+    "aws_access_key_id": {
+      "label": "Access key ID",
+      "hint": "Stored encrypted and never shown again."
+    },
+    "aws_secret_access_key": {
+      "label": "Secret access key",
+      "hint": "Stored encrypted and never shown again."
+    },
+    "region": {
+      "label": "Region",
+      "hint": "AWS region in the agreed area, e.g. eu-central-1."
+    },
+    "url": {
+      "label": "URL",
+      "hint": "Qdrant address, e.g. http://qdrant:6333."
+    },
+    "path": {
+      "label": "Directory",
+      "hint": "Directory inside the backend container."
+    }
   }
 }
