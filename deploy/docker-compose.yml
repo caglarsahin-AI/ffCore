@@ -1,0 +1,253 @@
+# FFCore altyapı ve uygulama servisleri. Depo kökünden: docker compose up -d
+# Tüm imajlar ${REGISTRY_PREFIX} önekli ve sabit sürümlü (:latest yok).
+# Göreli yollar depo köküne göredir (compose.yaml include, project_directory: .).
+# Dışarıya yalnızca backend ve frontend port yayınlar (SECURITY_AND_PERMISSIONS).
+# Zorunlu değişkenler ${VAR:?...} ile tanımlı; eksikse compose açık hatayla durur.
+
+x-langfuse-env: &langfuse-env
+  NEXTAUTH_URL: ${LANGFUSE_URL:-http://localhost:3000}
+  DATABASE_URL: postgresql://${LANGFUSE_POSTGRES_USER:-langfuse}:${LANGFUSE_POSTGRES_PASSWORD:?LANGFUSE_POSTGRES_PASSWORD tanımlı değil}@langfuse-postgres:5432/${LANGFUSE_POSTGRES_DB:-langfuse}
+  SALT: ${LANGFUSE_SALT:?LANGFUSE_SALT tanımlı değil}
+  ENCRYPTION_KEY: ${LANGFUSE_ENCRYPTION_KEY:?LANGFUSE_ENCRYPTION_KEY tanımlı değil}
+  TELEMETRY_ENABLED: "false"
+  LANGFUSE_ENABLE_EXPERIMENTAL_FEATURES: "false"
+  CLICKHOUSE_MIGRATION_URL: clickhouse://langfuse-clickhouse:9000
+  CLICKHOUSE_URL: http://langfuse-clickhouse:8123
+  CLICKHOUSE_USER: ${LANGFUSE_CLICKHOUSE_USER:-clickhouse}
+  CLICKHOUSE_PASSWORD: ${LANGFUSE_CLICKHOUSE_PASSWORD:?LANGFUSE_CLICKHOUSE_PASSWORD tanımlı değil}
+  CLICKHOUSE_CLUSTER_ENABLED: "false"
+  LANGFUSE_S3_EVENT_UPLOAD_BUCKET: langfuse
+  LANGFUSE_S3_EVENT_UPLOAD_REGION: auto
+  LANGFUSE_S3_EVENT_UPLOAD_ACCESS_KEY_ID: ${LANGFUSE_MINIO_USER:-minio}
+  LANGFUSE_S3_EVENT_UPLOAD_SECRET_ACCESS_KEY: ${LANGFUSE_MINIO_PASSWORD:?LANGFUSE_MINIO_PASSWORD tanımlı değil}
+  LANGFUSE_S3_EVENT_UPLOAD_ENDPOINT: http://langfuse-minio:9000
+  LANGFUSE_S3_EVENT_UPLOAD_FORCE_PATH_STYLE: "true"
+  LANGFUSE_S3_EVENT_UPLOAD_PREFIX: events/
+  LANGFUSE_S3_MEDIA_UPLOAD_BUCKET: langfuse
+  LANGFUSE_S3_MEDIA_UPLOAD_REGION: auto
+  LANGFUSE_S3_MEDIA_UPLOAD_ACCESS_KEY_ID: ${LANGFUSE_MINIO_USER:-minio}
+  LANGFUSE_S3_MEDIA_UPLOAD_SECRET_ACCESS_KEY: ${LANGFUSE_MINIO_PASSWORD:?LANGFUSE_MINIO_PASSWORD tanımlı değil}
+  LANGFUSE_S3_MEDIA_UPLOAD_ENDPOINT: http://langfuse-minio:9000
+  LANGFUSE_S3_MEDIA_UPLOAD_FORCE_PATH_STYLE: "true"
+  LANGFUSE_S3_MEDIA_UPLOAD_PREFIX: media/
+  REDIS_HOST: langfuse-redis
+  REDIS_PORT: "6379"
+  REDIS_AUTH: ${LANGFUSE_REDIS_PASSWORD:?LANGFUSE_REDIS_PASSWORD tanımlı değil}
+
+x-langfuse-depends: &langfuse-depends
+  langfuse-postgres:
+    condition: service_healthy
+  langfuse-clickhouse:
+    condition: service_healthy
+  langfuse-minio:
+    condition: service_healthy
+  langfuse-redis:
+    condition: service_healthy
+
+services:
+  postgres:
+    image: ${REGISTRY_PREFIX}pgvector/pgvector:0.8.1-pg16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:?POSTGRES_USER tanımlı değil}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD tanımlı değil}
+      POSTGRES_DB: ${POSTGRES_DB:?POSTGRES_DB tanımlı değil}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./deploy/postgres/initdb:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$$POSTGRES_USER\" -d \"$$POSTGRES_DB\""]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  redis:
+    image: ${REGISTRY_PREFIX}redis:7.4.6-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--requirepass", "${REDIS_PASSWORD:?REDIS_PASSWORD tanımlı değil}", "--appendonly", "yes"]
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli -a \"$$REDIS_PASSWORD\" --no-auth-warning ping | grep -q PONG"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD:?REDIS_PASSWORD tanımlı değil}
+
+  litellm:
+    image: ${REGISTRY_PREFIX}ghcr.io/berriai/litellm:v1.80.0-stable
+    restart: unless-stopped
+    command: ["--config", "/app/config.yaml", "--port", "4000"]
+    environment:
+      LITELLM_MASTER_KEY: ${LITELLM_MASTER_KEY:?LITELLM_MASTER_KEY tanımlı değil}
+      LITELLM_SALT_KEY: ${LITELLM_SALT_KEY:?LITELLM_SALT_KEY tanımlı değil}
+      LITELLM_DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/litellm
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/litellm
+      STORE_MODEL_IN_DB: "True"
+    volumes:
+      - ./deploy/litellm/config.yaml:/app/config.yaml:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      # İlk açılışta DB migration'ı birkaç dakika sürer; `up --wait` bunu bekler.
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://localhost:4000/health/liveliness || exit 1"]
+      interval: 5s
+      timeout: 5s
+      start_period: 60s
+      retries: 60
+
+  langfuse-web:
+    image: ${REGISTRY_PREFIX}langfuse/langfuse:3.120.0
+    restart: unless-stopped
+    environment:
+      <<: *langfuse-env
+      NEXTAUTH_SECRET: ${LANGFUSE_NEXTAUTH_SECRET:?LANGFUSE_NEXTAUTH_SECRET tanımlı değil}
+    depends_on: *langfuse-depends
+    healthcheck:
+      # Langfuse localhost'a değil konteyner adına bağlanır (Next.js HOSTNAME).
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://$$(hostname):3000/api/public/health || exit 1"]
+      interval: 5s
+      timeout: 5s
+      start_period: 60s
+      retries: 60
+
+  langfuse-worker:
+    image: ${REGISTRY_PREFIX}langfuse/langfuse-worker:3.120.0
+    restart: unless-stopped
+    environment: *langfuse-env
+    depends_on: *langfuse-depends
+
+  langfuse-postgres:
+    image: ${REGISTRY_PREFIX}postgres:17.6-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${LANGFUSE_POSTGRES_USER:-langfuse}
+      POSTGRES_PASSWORD: ${LANGFUSE_POSTGRES_PASSWORD:?LANGFUSE_POSTGRES_PASSWORD tanımlı değil}
+      POSTGRES_DB: ${LANGFUSE_POSTGRES_DB:-langfuse}
+      TZ: UTC
+      PGTZ: UTC
+    volumes:
+      - langfuse_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$$POSTGRES_USER\""]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  langfuse-clickhouse:
+    image: ${REGISTRY_PREFIX}clickhouse/clickhouse-server:25.8.2.29
+    restart: unless-stopped
+    user: "101:101"
+    environment:
+      CLICKHOUSE_DB: default
+      CLICKHOUSE_USER: ${LANGFUSE_CLICKHOUSE_USER:-clickhouse}
+      CLICKHOUSE_PASSWORD: ${LANGFUSE_CLICKHOUSE_PASSWORD:?LANGFUSE_CLICKHOUSE_PASSWORD tanımlı değil}
+    volumes:
+      - langfuse_clickhouse_data:/var/lib/clickhouse
+      - langfuse_clickhouse_logs:/var/log/clickhouse-server
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8123/ping || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  langfuse-minio:
+    # DECISION-23 (A): resmi minio/minio Docker Hub'da erişilemez; chainguard MinIO digest ile pinli.
+    # Chainguard ücretsiz katmanı yalnızca latest yayınlar; digest güncellemesi elle (12 aynaya alır).
+    # cgr.dev/chainguard/minio@sha256:e70b2b1e74d79457f808710483bd726ff364529ca30736eaa15a6ab547d3a5a7
+    image: ${REGISTRY_PREFIX}cgr.dev/chainguard/minio@sha256:e70b2b1e74d79457f808710483bd726ff364529ca30736eaa15a6ab547d3a5a7
+    restart: unless-stopped
+    # İmajda sh, mc ve minio var (doğrulandı); bucket resmi Langfuse compose'u gibi açılışta oluşturulur.
+    entrypoint: ["sh", "-c"]
+    command: ["mkdir -p /data/langfuse && exec minio server /data --address :9000 --console-address :9001"]
+    environment:
+      MINIO_ROOT_USER: ${LANGFUSE_MINIO_USER:-minio}
+      MINIO_ROOT_PASSWORD: ${LANGFUSE_MINIO_PASSWORD:?LANGFUSE_MINIO_PASSWORD tanımlı değil}
+    volumes:
+      - langfuse_minio_data:/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  langfuse-redis:
+    image: ${REGISTRY_PREFIX}redis:7.4.6-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--requirepass", "${LANGFUSE_REDIS_PASSWORD:?LANGFUSE_REDIS_PASSWORD tanımlı değil}"]
+    environment:
+      REDIS_PASSWORD: ${LANGFUSE_REDIS_PASSWORD:?LANGFUSE_REDIS_PASSWORD tanımlı değil}
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli -a \"$$REDIS_PASSWORD\" --no-auth-warning ping | grep -q PONG"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  backend:
+    image: ${REGISTRY_PREFIX}ffcore/backend:${FFCORE_VERSION:?FFCORE_VERSION tanımlı değil}
+    build:
+      context: ./backend
+      target: runtime
+      args:
+        REGISTRY_PREFIX: ${REGISTRY_PREFIX:-}
+    restart: unless-stopped
+    environment: &app-env
+      DEPLOY_PROFILE: ${DEPLOY_PROFILE:?DEPLOY_PROFILE tanımlı değil}
+      INFERENCE_BACKEND: ${INFERENCE_BACKEND:?INFERENCE_BACKEND tanımlı değil}
+      VECTOR_BACKEND: ${VECTOR_BACKEND:?VECTOR_BACKEND tanımlı değil}
+      OFFLINE: ${OFFLINE:?OFFLINE tanımlı değil}
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379/0
+    ports:
+      - "${BACKEND_PORT:-8000}:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/healthz', timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  frontend:
+    image: ${REGISTRY_PREFIX}ffcore/frontend:${FFCORE_VERSION:?FFCORE_VERSION tanımlı değil}
+    build:
+      context: ./frontend
+      args:
+        REGISTRY_PREFIX: ${REGISTRY_PREFIX:-}
+    restart: unless-stopped
+    ports:
+      - "${FRONTEND_PORT:-3000}:3000"
+    depends_on:
+      backend:
+        condition: service_healthy
+
+  tools:
+    # Geliştirme araçları (make, ruff, pytest, curl). Host'a araç kurulmaz (K-00-0003, K-00-0005).
+    # Çağrı: docker compose run --rm tools make <hedef>. Docker soketi bağlanmaz.
+    image: ${REGISTRY_PREFIX}ffcore/tools:${FFCORE_VERSION:?FFCORE_VERSION tanımlı değil}
+    build:
+      context: ./backend
+      target: tools
+      args:
+        REGISTRY_PREFIX: ${REGISTRY_PREFIX:-}
+    profiles: ["tools"]
+    working_dir: /work
+    volumes:
+      - .:/work
+    environment:
+      <<: *app-env
+      COMPOSE_PROFILES: ${COMPOSE_PROFILES:-}
+      OLLAMA_CONTEXT_LENGTH: ${OLLAMA_CONTEXT_LENGTH:-}
+
+volumes:
+  postgres_data:
+  redis_data:
+  langfuse_postgres_data:
+  langfuse_clickhouse_data:
+  langfuse_clickhouse_logs:
+  langfuse_minio_data:

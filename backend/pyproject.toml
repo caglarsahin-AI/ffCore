@@ -1,0 +1,36 @@
+[project]
+name = "ffcore"
+version = "0.0.0"
+description = "FFCore enterprise LLM platform backend (import ffcore)"
+requires-python = "==3.12.*"
+dependencies = [
+    "fastapi==0.162.0",
+    "uvicorn[standard]==0.54.0",
+    "sqlalchemy==2.1.6",
+    "alembic==1.20.1",
+    "pydantic==2.14.1",
+    "pydantic-settings==2.16.1",
+    "psycopg[binary]==3.3.6",
+    "redis==8.1.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest==9.2.0",
+    "httpx2==2.16.0",
+    "ruff==0.17.3",
+    "pyyaml==6.0.3",
+]
+
+[build-system]
+# uv'nun pinli sürümüyle aynı: uv yerleşik derleme arka ucunu kullanır, ağ gerekmez.
+requires = ["uv_build==0.10.12"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-name = "ffcore"
+module-root = ""
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

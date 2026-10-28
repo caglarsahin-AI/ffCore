@@ -1,0 +1,5 @@
+# Depo kökünden `docker compose ...` komutlarının çalışması için giriş dosyası.
+# Asıl tanım deploy/docker-compose.yml; .env depo kökünde.
+include:
+  - path: deploy/docker-compose.yml
+    project_directory: .

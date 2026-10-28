@@ -1,0 +1,8 @@
+# Yalnızca genel ayarlar. Modeller LiteLLM veritabanında yaşar (store_model_in_db);
+# bu dosyada model_list yoktur (CONTRACTS C1, paket 01 uzlaştırıcısı).
+general_settings:
+  master_key: os.environ/LITELLM_MASTER_KEY
+  database_url: os.environ/LITELLM_DATABASE_URL
+  store_model_in_db: true
+
+litellm_settings: {}

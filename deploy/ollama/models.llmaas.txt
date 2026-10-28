@@ -1,0 +1,2 @@
+# llmaas profili: Ollama servisi kalkmaz (COMPOSE_PROFILES boş).
+# Embedding süreç içi bge-m3'tür (KARARLAR C10 tersine karar), bu yüzden liste boştur.
