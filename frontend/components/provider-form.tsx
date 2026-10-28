@@ -9,6 +9,7 @@ import { ProviderTestResult } from "@/components/provider-test-result";
 import { QueryError } from "@/components/screen";
 import { Button } from "@/components/ui/button";
 import { useReportError } from "@/components/use-report-error";
+import { WriteGate } from "@/components/write-gate";
 import { ApiError } from "@/lib/api/client";
 import {
   useCreateProvider,
@@ -284,9 +285,11 @@ function LoadedProviderForm({
         </div>
       )}
       <div className="flex gap-2">
-        <Button type="submit" disabled={pending} data-testid="provider-save">
-          {editing ? t("save") : t("add")}
-        </Button>
+        <WriteGate>
+          <Button type="submit" disabled={pending} data-testid="provider-save">
+            {editing ? t("save") : t("add")}
+          </Button>
+        </WriteGate>
         <Button type="button" variant="outline" onClick={onDone}>
           {t("cancel")}
         </Button>

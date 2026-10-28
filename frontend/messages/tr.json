@@ -265,7 +265,7 @@
     "rejectParams": "Çıkarılan parametreler",
     "rejectParamsHint": "Virgülle ayrılmış, ör. top_k, seed.",
     "extraBody": "Ek istek gövdesi (JSON)",
-    "extraBodyHint": "Her isteğe eklenir, ör. {\"reasoning_effort\": \"none\"}.",
+    "extraBodyHint": "Her isteğe eklenir, ör. '{\"reasoning_effort\": \"none\"}'.",
     "extraBodyInvalid": "Bir JSON nesnesi girin.",
     "isActive": "Etkin",
     "embedDim": "Embedding boyutu",

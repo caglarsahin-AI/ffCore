@@ -22,7 +22,8 @@ import { notInGateway } from "@/lib/model-form";
 export default function ModelsPage() {
   const { projectId } = useSession();
   if (!projectId) return <StatusPage kind="selectProject" />;
-  return <ModelList projectId={projectId} />;
+  // Keyed by project: switching projects drops an open form and its state (review r1 MINOR-1).
+  return <ModelList key={projectId} projectId={projectId} />;
 }
 
 function ModelList({ projectId }: { projectId: string }) {

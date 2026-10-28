@@ -265,7 +265,7 @@
     "rejectParams": "Removed parameters",
     "rejectParamsHint": "Comma-separated, e.g. top_k, seed.",
     "extraBody": "Extra request body (JSON)",
-    "extraBodyHint": "Merged into every request, e.g. {\"reasoning_effort\": \"none\"}.",
+    "extraBodyHint": "Merged into every request, e.g. '{\"reasoning_effort\": \"none\"}'.",
     "extraBodyInvalid": "Enter a JSON object.",
     "isActive": "Active",
     "embedDim": "Embedding dimension",

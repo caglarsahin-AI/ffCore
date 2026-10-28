@@ -9,6 +9,7 @@ import { QueryError } from "@/components/screen";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useReportError } from "@/components/use-report-error";
+import { WriteGate } from "@/components/write-gate";
 import { ApiError } from "@/lib/api/client";
 import { errorMessageKey } from "@/lib/api/errors";
 import { useCatalogLookup, useCreateModel, useProviders, useUpdateModel } from "@/lib/api/queries";
@@ -378,9 +379,12 @@ function LoadedModelForm({
         </div>
       )}
       <div className="flex gap-2">
-        <Button type="submit" disabled={pending || !ready} data-testid="model-save">
-          {t("save")}
-        </Button>
+        {/* Save follows the current access too, not only the buttons that open the form. */}
+        <WriteGate projectId={projectId}>
+          <Button type="submit" disabled={pending || !ready} data-testid="model-save">
+            {t("save")}
+          </Button>
+        </WriteGate>
         <Button type="button" variant="outline" onClick={onDone}>
           {t("cancel")}
         </Button>
