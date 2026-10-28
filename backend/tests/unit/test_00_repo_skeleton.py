@@ -134,3 +134,12 @@ def test_00_6_airgap_list_has_only_chat_model():
         if line and not line.startswith("#")
     ]
     assert listed == ["qwen3.5:35b"]
+
+
+def test_00_1_http_services_have_healthchecks_for_up_wait():
+    # `docker compose up -d --wait` returns only when every service with a healthcheck is
+    # healthy; without these, smoke right after `up` fails while LiteLLM/Langfuse start.
+    services = _compose()["services"]
+    for name, path in (("litellm", "/health/liveliness"), ("langfuse-web", "/api/public/health")):
+        test = services[name].get("healthcheck", {}).get("test", [])
+        assert path in " ".join(test), name

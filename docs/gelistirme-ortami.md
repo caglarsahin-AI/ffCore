@@ -10,7 +10,7 @@ Geliştirme ve CI (yalnızca açıkça sahte değerler; üretimde kullanılmaz):
 
 ```bash
 cp .env.test .env
-docker compose up -d          # depo kökünde; compose.yaml -> deploy/docker-compose.yml
+docker compose up -d --wait   # depo kökünde; tüm healthcheck'ler yeşil olunca döner (ilk açılış birkaç dk)
 docker compose run --rm tools make smoke
 ```
 
@@ -22,7 +22,7 @@ olduğunu yazarak durur.
 
 | İş | Komut |
 |---|---|
-| Servisleri başlat / durdur | `docker compose up -d` / `docker compose down` |
+| Servisleri başlat / durdur | `docker compose up -d --wait` / `docker compose down` |
 | Loglar | `docker compose logs -f [servis]` |
 | Python lint | `docker compose run --rm tools make lint` |
 | Önyüz lint | `docker compose run --rm frontend npm run lint` |

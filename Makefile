@@ -1,6 +1,6 @@
 # Hedefler tools konteynerinde koşar; host'a make/Node kurulmaz (K-00-0003, K-00-0005):
 #   docker compose run --rm tools make <hedef>
-# Servisleri başlatma/durdurma doğrudan compose ile: docker compose up -d | down | logs -f
+# Servisleri başlatma/durdurma doğrudan compose ile: docker compose up -d --wait | down | logs -f
 # Önyüz lint'i ayrı konteynerde: docker compose run --rm frontend npm run lint
 
 .PHONY: lint format test test-int smoke pull

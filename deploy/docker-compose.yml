@@ -109,6 +109,13 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    healthcheck:
+      # İlk açılışta DB migration'ı birkaç dakika sürer; `up --wait` bunu bekler.
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://localhost:4000/health/liveliness || exit 1"]
+      interval: 5s
+      timeout: 5s
+      start_period: 60s
+      retries: 60
 
   langfuse-web:
     image: ${REGISTRY_PREFIX}langfuse/langfuse:3.120.0
@@ -117,6 +124,13 @@ services:
       <<: *langfuse-env
       NEXTAUTH_SECRET: ${LANGFUSE_NEXTAUTH_SECRET:?LANGFUSE_NEXTAUTH_SECRET tanımlı değil}
     depends_on: *langfuse-depends
+    healthcheck:
+      # Langfuse localhost'a değil konteyner adına bağlanır (Next.js HOSTNAME).
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://$$(hostname):3000/api/public/health || exit 1"]
+      interval: 5s
+      timeout: 5s
+      start_period: 60s
+      retries: 60
 
   langfuse-worker:
     image: ${REGISTRY_PREFIX}langfuse/langfuse-worker:3.120.0
