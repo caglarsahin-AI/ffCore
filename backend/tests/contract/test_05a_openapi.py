@@ -22,6 +22,8 @@ EXPECTED = {
     P + "/{tool_id}/actions/{action_name}": {"patch"},
     P + "/{tool_id}/actions/{action_name}/invoke": {"post"},
     P + "/sql-context": {"post"},
+    # review r1 MAJOR-1: service account only (mcp-sql verifies callers' tokens).
+    "/api/v1/internal/obo/verify": {"post"},
 }
 
 

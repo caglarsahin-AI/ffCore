@@ -1,10 +1,11 @@
 """What get_schema returns (05a, K-05a-0002 S6): business descriptions of the demo tables,
 narrowed to the question, and the project's nearest approved question-SQL examples.
 
-The data lives in the backend database (schema_descriptions, few_shots); the embedding model
-is loaded only by the API process (PLAN: in-process bge-m3), so mcp-sql asks the backend
-(POST .../tools/sql-context, on behalf of the caller). Few-shot similarity is pgvector cosine
-on few_shots.embedding.
+The data lives in the backend database: schema_descriptions per project, few_shots per
+registered mcp-sql tool (a child of tools, C3). The embedding model is loaded only by the API
+process (PLAN: in-process bge-m3), so mcp-sql asks the backend (POST .../tools/sql-context
+with its tool key, on behalf of the caller). Few-shot similarity is pgvector cosine on
+few_shots.embedding.
 """
 
 import json
@@ -17,7 +18,7 @@ from sqlalchemy import delete, func, select
 
 from ffcore.core.config import Settings
 from ffcore.knowledge.embed import embed
-from ffcore.models.tools import FewShot, SchemaDescription
+from ffcore.models.tools import FewShot, SchemaDescription, Tool
 
 EXAMPLES = 5
 _WORD = re.compile(r"\w{3,}", re.UNICODE)
@@ -56,10 +57,11 @@ class Context:
 
 
 async def load(
-    session, project_id: uuid.UUID, directory: Path, settings: Settings, *, created_by: str
+    session, tool_id: uuid.UUID, directory: Path, settings: Settings, *, created_by: str
 ) -> tuple[int, int]:
-    """Replaces the project's descriptions and examples with 13a's JSON files (first install
-    or a reload). Returns (descriptions, examples)."""
+    """Replaces the descriptions of the tool's project and the tool's examples with 13a's JSON
+    files (first install or a reload). Returns (descriptions, examples)."""
+    project_id = (await session.get(Tool, tool_id)).project_id
     rows = json.loads((directory / "schema_descriptions.json").read_text(encoding="utf-8"))
     shots = json.loads((directory / "few_shots.json").read_text(encoding="utf-8"))
     await session.execute(
@@ -67,7 +69,7 @@ async def load(
         .where(SchemaDescription.project_id == project_id, SchemaDescription.deleted_at.is_(None))
         .values(deleted_at=func.now())
     )
-    await session.execute(delete(FewShot).where(FewShot.project_id == project_id))
+    await session.execute(delete(FewShot).where(FewShot.tool_id == tool_id))
     for row in rows:
         session.add(
             SchemaDescription(
@@ -85,7 +87,7 @@ async def load(
     for shot, vector in zip(shots, vectors, strict=True):
         session.add(
             FewShot(
-                project_id=project_id,
+                tool_id=tool_id,
                 question=shot["question"],
                 sql=shot["sql"],
                 embedding=vector,
@@ -119,9 +121,8 @@ def _hits(table: Table, words: set[str]) -> bool:
     return bool(words & _words(text.replace("_", " ")))
 
 
-async def context(
-    session, project_id: uuid.UUID, question: str | None, settings: Settings
-) -> Context:
+async def context(session, tool: Tool, question: str | None, settings: Settings) -> Context:
+    project_id = tool.project_id
     rows = list(
         await session.scalars(
             select(SchemaDescription)
@@ -141,7 +142,7 @@ async def context(
         vector = (await embed(settings, [question])).dense[0]
         shots = await session.scalars(
             select(FewShot)
-            .where(FewShot.project_id == project_id)
+            .where(FewShot.tool_id == tool.id)
             .order_by(FewShot.embedding.cosine_distance(vector))
             .limit(EXAMPLES)
         )

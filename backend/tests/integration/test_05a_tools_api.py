@@ -292,3 +292,95 @@ def test_05a_read_mode_get_parity(world, make_user, client_factory):
         assert edit_response.status_code == 200
         assert read_response.content == edit_response.content, url
     assert read.post(tools_url(world), json=_tool(key="other")).status_code == 403
+
+
+# --- review r1 MAJOR-2: endpoint_url is scheme + host + port + path only; credentials go into
+# auth (encrypted, masked). Nothing of a refused URL reaches the database or the audit log.
+
+URL_SECRET = "dummy-not-secret-url-secret-0123"
+
+
+@pytest.mark.parametrize(
+    "url",
+    [
+        f"http://user:{URL_SECRET}@mcp-search:8000/mcp",
+        f"http://{URL_SECRET}@mcp-search:8000/mcp",
+        f"http://mcp-search:8000/mcp?api_key={URL_SECRET}",
+        "http://mcp-search:8000/mcp?",
+        f"http://mcp-search:8000/mcp#{URL_SECRET}",
+    ],
+)
+def test_05a_endpoint_url_credentials_refused(world, pg, url):
+    response = world["admin"].post(tools_url(world), json=_tool(url=url))
+    assert response.status_code == 400, response.text
+    assert response.json()["error"]["code"] == "endpoint_url_not_allowed"
+    assert URL_SECRET not in response.text
+    stored = pg.execute(
+        "SELECT count(*) FROM tools WHERE project_id = %s", (world["project"],)
+    ).fetchone()[0]
+    assert stored == 0
+    assert all(URL_SECRET not in str(row) for row in audit_rows(pg, "create_tool"))
+
+
+def test_05a_endpoint_url_credentials_refused_on_update(world, pg):
+    tool = world["admin"].post(tools_url(world), json=_tool()).json()
+    for url in (
+        f"http://u:{URL_SECRET}@mcp-search:8000/mcp",
+        f"http://mcp-search:8000/mcp?token={URL_SECRET}",
+    ):
+        response = world["admin"].patch(tools_url(world, tool["id"]), json={"endpoint_url": url})
+        assert response.status_code == 400, response.text
+        assert response.json()["error"]["code"] == "endpoint_url_not_allowed"
+    stored = pg.execute("SELECT endpoint_url FROM tools WHERE id = %s", (tool["id"],)).fetchone()
+    assert stored[0] == MCP_SEARCH
+    assert all(URL_SECRET not in str(row) for row in audit_rows(pg, "update_tool"))
+
+
+# --- review r1 MAJOR-3: a custom auth header never names a transport header (closed list,
+# KARARLAR "05a review r1 kararları" item 4); the name is an RFC 7230 token.
+
+RESERVED = [
+    "Host",
+    "Content-Length",
+    "Connection",
+    "Transfer-Encoding",
+    "Upgrade",
+    "TE",
+    "Trailer",
+    "Keep-Alive",
+    "Proxy-Authorization",
+    "Proxy-Anything",
+    "Authorization",
+    "host",
+    "X Api Key",
+    "X-Api:Key",
+]
+
+
+@pytest.mark.parametrize("name", RESERVED)
+def test_05a_reserved_header_name_refused(world, pg, name):
+    auth = {"type": "header", "name": name, "value": TOKEN}
+    response = world["admin"].post(tools_url(world), json=_tool(auth=auth))
+    assert response.status_code == 400, response.text
+    assert response.json()["error"]["code"] == "header_name_not_allowed"
+    stored = pg.execute(
+        "SELECT count(*) FROM tools WHERE project_id = %s", (world["project"],)
+    ).fetchone()[0]
+    assert stored == 0
+
+
+def test_05a_reserved_header_name_refused_on_update(world):
+    tool = world["admin"].post(tools_url(world), json=_tool()).json()
+    response = world["admin"].patch(
+        tools_url(world, tool["id"]),
+        json={"auth": {"type": "header", "name": "Host", "value": TOKEN}},
+    )
+    assert response.status_code == 400, response.text
+    assert response.json()["error"]["code"] == "header_name_not_allowed"
+
+
+def test_05a_business_header_name_accepted(world):
+    auth = {"type": "header", "name": "X-Api-Key", "value": TOKEN}
+    response = world["admin"].post(tools_url(world), json=_tool(auth=auth))
+    assert response.status_code == 201, response.text
+    assert response.json()["auth"] == {"type": "header", "name": "X-Api-Key", "value": "***"}

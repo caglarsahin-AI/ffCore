@@ -7,6 +7,7 @@ import pytest
 
 from ffcore.services import mcp_sql
 from ffcore.services.mcp_sql import SqlRejected, validate
+from tests.sql_matrix import REJECTED
 
 TABLES = {"departments", "beds", "admissions", "devices", "device_faults", "contracts_meta"}
 
@@ -57,8 +58,6 @@ def test_05a_sql_single_statement_only():
         "SELECT * FROM pg_catalog.pg_tables",
         "SELECT * FROM pg_user",
         "SELECT * FROM information_schema.tables",
-        "SELECT pg_sleep(10) FROM beds",
-        "SELECT pg_read_file('/etc/passwd') FROM beds",
     ],
 )
 def test_05a_sql_system_catalogs_rejected(sql):
@@ -113,3 +112,40 @@ def test_05a_2_delete_rejected_before_db():
     )
     assert result.startswith("sql_rejected: sql_not_select")
     assert opened == []
+
+
+def _never_connect(opened):
+    async def connect():
+        opened.append(True)
+        raise AssertionError("the database must not be reached")
+
+    return connect
+
+
+@pytest.mark.parametrize(("sql", "code"), REJECTED)
+def test_05a_sql_matrix_rejected_before_db(sql, code):
+    """Review r1 MINOR-1: every row is refused by the validator, with no connection opened."""
+    opened = []
+    result = asyncio.run(mcp_sql.run_sql_text(sql, connect=_never_connect(opened), max_rows=500))
+    assert result.startswith(f"sql_rejected: {code} "), result
+    assert opened == []
+
+
+def test_05a_sql_set_operation_of_selects_passes():
+    sql = "SELECT code FROM departments UNION SELECT code FROM departments"
+    assert validate(sql, TABLES, max_rows=500).endswith("LIMIT 501")
+
+
+@pytest.mark.parametrize(
+    "sql",
+    [
+        # Comments never reach the database (KARARLAR r1 item 5). sqlglot already escapes a
+        # "*/" inside a comment it writes back; stripping removes the question altogether.
+        "SELECT 1 FROM beds -- */ ; DELETE FROM beds; /*",
+        "SELECT 1 FROM beds /* hidden */",
+        "SELECT /* a */ code -- b\nFROM departments",
+    ],
+)
+def test_05a_sql_comments_stripped_from_what_runs(sql):
+    out = validate(sql, TABLES, max_rows=500)
+    assert "/*" not in out and "--" not in out and "DELETE" not in out.upper(), out

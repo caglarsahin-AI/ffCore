@@ -59,3 +59,24 @@ def test_05a_live_run_sql_on_demo_database(settings):
     )
     assert not result.is_error, result.text
     assert result.text.splitlines()[0] == "code" and result.text.endswith("rows: 2")
+
+
+def test_05a_live_forged_token_refused_by_mcp_sql(settings):
+    # Review r1 MAJOR-1 in the real container: right audience, wrong signing key. The
+    # container asks the real backend (POST /api/v1/internal/obo/verify) and refuses.
+    from pydantic import SecretStr
+
+    forger = settings.model_copy(
+        update={"obo_jwt_secret": SecretStr("dummy-not-secret-forged-obo-key-0123456789abcdef")}
+    )
+    with pytest.raises(mcp_client.ToolCallError) as err:
+        asyncio.run(
+            mcp_client.call(
+                target("mcp-sql"),
+                "run_sql",
+                {"sql": "SELECT code FROM departments", "reason": "forged"},
+                forger,
+                caller=CALLER,
+            )
+        )
+    assert err.value.code == "tool_auth_failed"

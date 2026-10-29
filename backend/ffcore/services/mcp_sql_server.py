@@ -4,8 +4,11 @@ Runs as its own compose service from the backend image: `python -m ffcore.servic
 mcp_sql_server`. get_schema asks the backend (descriptions and few-shot examples, on behalf of
 the caller); run_sql validates the query (services/mcp_sql) and runs it on the demo database
 with a read-only login user (SQL_DEMO_DATABASE_URL). Request checks:
-services/mcp_server_common.CallerCheck. Every call is logged by the backend's MCP client;
-this service logs only the query outcome code, never the query or the rows.
+services/mcp_server_common.CallerCheck with an OboVerifier: the caller's token is verified by
+the backend before any request reaches a tool, and the tools ask the verifier again (one cached
+answer per token) for the project, so neither tool acts on a token the backend has not verified
+(review r1 MAJOR-1). Every call is logged by the backend's MCP client; this service logs only
+the query outcome code, never the query or the rows.
 """
 
 import logging
@@ -18,7 +21,7 @@ from pydantic import Field
 
 from ffcore.core.config import Settings
 from ffcore.services import mcp_server_common, mcp_sql
-from ffcore.services.mcp_server_common import Relay
+from ffcore.services.mcp_server_common import OboVerifier, Relay, VerifyRefused, obo_token
 
 log = logging.getLogger("ffcore.mcp_sql")
 
@@ -48,8 +51,14 @@ def format_context(body: dict) -> str:
     return "\n".join(lines)
 
 
-def build_server(settings: Settings) -> MCPServer:
+def build_server(settings: Settings, *, tool_key: str, verifier: OboVerifier) -> MCPServer:
     server = MCPServer("mcp-sql")
+
+    async def verified(ctx: Context) -> dict:
+        try:
+            return await verifier.claims(obo_token(ctx.headers))
+        except VerifyRefused as exc:
+            raise ToolError(exc.code) from None
 
     @server.tool()
     async def get_schema(
@@ -58,12 +67,13 @@ def build_server(settings: Settings) -> MCPServer:
     ) -> str:
         """Tables and columns of the database in business language, narrowed to the question,
         with example questions and their SQL. Call this before run_sql."""
-        relay = Relay(ctx.headers)
+        claims = await verified(ctx)
+        relay = Relay(ctx.headers, project_id=claims["project_id"])
         body = await relay.call(
             settings,
             "POST",
             f"/api/v1/projects/{relay.project_id}/tools/sql-context",
-            {"question": question},
+            {"tool_key": tool_key, "question": question},
         )
         return format_context(body)
 
@@ -75,7 +85,7 @@ def build_server(settings: Settings) -> MCPServer:
     ) -> str:
         """Run one read-only SELECT. Results come as CSV, at most SQL_MAX_ROWS rows; a longer
         result says it was cut. A refused or failed query returns its code."""
-        Relay(ctx.headers)  # the caller's identity is required here too
+        await verified(ctx)  # before any connection to the database
         url = settings.sql_demo_database_url
         if url is None:
             raise ToolError("sql_database_not_configured")
@@ -93,8 +103,13 @@ def build_server(settings: Settings) -> MCPServer:
 
 
 def build_app(settings: Settings, *, tool_key: str, allowed_hosts: list[str]):
+    verifier = OboVerifier(settings, tool_key)
     return mcp_server_common.build_app(
-        build_server(settings), settings, tool_key=tool_key, allowed_hosts=allowed_hosts
+        build_server(settings, tool_key=tool_key, verifier=verifier),
+        settings,
+        tool_key=tool_key,
+        allowed_hosts=allowed_hosts,
+        verifier=verifier,
     )
 
 

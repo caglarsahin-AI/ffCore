@@ -48,3 +48,26 @@ def test_05a_unverified_read_used_only_by_relaying_services():
         if "unverified_on_behalf_of_claims" in path.read_text(encoding="utf-8")
     )
     assert users == ["core/auth.py", "services/mcp_server_common.py"]
+
+
+def test_05a_routing_read_never_grants():
+    """Review r1 MAJOR-1: inside the relaying services the routing read appears in two places
+    only. CallerCheck._refusal can only refuse (it returns a refusal or None, and a None hands
+    the request on to the verifier in mcp-sql). Relay.__init__ builds mcp-search's backend URL;
+    the backend verifies that same token. mcp-sql takes its project from verified claims."""
+    import ast
+
+    source = (PACKAGE / "services" / "mcp_server_common.py").read_text(encoding="utf-8")
+    callers = set()
+    for cls in ast.walk(ast.parse(source)):
+        if not isinstance(cls, ast.ClassDef):
+            continue
+        for fn in cls.body:
+            if isinstance(fn, ast.FunctionDef | ast.AsyncFunctionDef) and any(
+                isinstance(n, ast.Call) and getattr(n.func, "id", "") == "token_claims"
+                for n in ast.walk(fn)
+            ):
+                callers.add(f"{cls.name}.{fn.name}")
+    assert callers == {"CallerCheck._refusal", "Relay.__init__"}
+    sql_server = (PACKAGE / "services" / "mcp_sql_server.py").read_text(encoding="utf-8")
+    assert "token_claims" not in sql_server and "unverified" not in sql_server

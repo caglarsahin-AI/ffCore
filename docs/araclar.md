@@ -16,6 +16,9 @@ approval settings, test calls, and the two built-in servers `mcp-search` and `mc
 ```
 
 - `key` is unique in the project (`^[a-z][a-z0-9-]{1,63}$`).
+- `endpoint_url` is scheme, host, port and path only. User info (`user:pass@`), a query
+  string or a fragment is refused with `400 endpoint_url_not_allowed`: credentials go into
+  `auth`, where they are encrypted and masked.
 - `endpoint_url` passes the outbound policy now and again at every call. Its host must be in
   `EGRESS_ALLOWLIST` (external) or `ALLOWED_INTERNAL_HOSTS` (internal). Loopback, private and
   metadata addresses are refused unless the host is internal. A refusal is `400 egress_*`.
@@ -29,9 +32,15 @@ Developers can read tools; only admins change them. Every change is audited.
 |---|---|---|
 | `none` | nothing | |
 | `bearer` | `Authorization: Bearer <token>` | |
-| `header` | `<name>: <value>` | the header name is not secret |
+| `header` | `<name>: <value>` | the header name is not secret; see below |
 | `basic` | `Authorization: Basic ...` | user name and password are both secret |
 | `forward_user` | `Authorization: Bearer <SERVICE_TOKEN>` and `X-On-Behalf-Of: <JWT>` | internal FFCore services only |
+
+A `header` name is an HTTP token and never a header the transport or FFCore sets: `Host`,
+`Content-Length`, `Connection`, `Transfer-Encoding`, `Upgrade`, `TE`, `Trailer`,
+`Keep-Alive`, any `Proxy-*`, `Authorization` (use `bearer` or `basic`), `X-On-Behalf-Of`,
+`X-Run-Id`. Such a name is refused with `400 header_name_not_allowed`, at registration and
+again at call time.
 
 Secret fields are stored encrypted (`FERNET_KEY`) and come back as `***`. To change other
 fields, send `***` back: the stored value is kept (same auth type only). Secrets never appear
@@ -47,6 +56,11 @@ in logs, the audit log or API answers.
   (`403 audience_mismatch`).
 - The backend behind the tool accepts `ffcore-backend` and applies the user's permissions.
 - The tool holds no signing key: it relays the token unchanged.
+- A tool that acts on the user's identity itself asks the backend to verify the token first:
+  `POST /api/v1/internal/obo/verify` (service account only) checks the signature, the tool's
+  own key in `aud` and the lifetime, and answers the verified claims (401 `invalid_token`,
+  `token_expired`; 403 `audience_mismatch`). `mcp-sql` does this for every request and keeps
+  one answer per token until it expires.
 
 Every call opens its own MCP session; sessions are never shared between calls or users.
 
@@ -104,10 +118,15 @@ Register it as tool key `mcp-search`, endpoint `http://mcp-search:8000/mcp`, aut
   - the result is CSV with at most `SQL_MAX_ROWS` (500) rows; a longer result says it was cut;
   - each query has `SQL_TIMEOUT_S` (20 s).
 
-The query is checked before it reaches the database:
-- exactly one statement, and it is a query;
-- no write or DDL anywhere, no `SELECT INTO`, no `FOR UPDATE`;
-- no `pg_*` tables or functions, no `information_schema`;
+Before the query reaches the database, the backend checks its caller's token (see Upstream
+identity) and the query itself:
+- exactly one statement, and it is a query; comments are removed and do not count;
+- `UNION`, `EXCEPT` and `INTERSECT` only when every branch is a `SELECT`; no `VALUES` lists;
+- no write or DDL anywhere, also not inside a `WITH`; no `SELECT INTO`, no `FOR UPDATE`;
+- no `pg_*` tables, no `information_schema`;
+- no function that changes state, waits or reaches outside the query: `setval`, `nextval`,
+  `lastval`, `currval`, `set_config`, `current_setting`, `pg_*`, `lo_*`, `dblink*`,
+  `txid_*` (`sql_function_not_allowed`);
 - subqueries at most 3 deep;
 - known tables only;
 - a `LIMIT` is added when missing.
@@ -124,9 +143,11 @@ Setup:
    - the synthetic schema and data from `data/samples/schema`;
    - a read-only login user `mcp_sql`, with a statement timeout.
    It is idempotent.
-3. `docker compose run --rm tools make seed-sql-context PROJECT=<key>` loads the table
-   descriptions and SQL examples for `get_schema` into a project. A reload replaces them.
-4. Register tool key `mcp-sql`, endpoint `http://mcp-sql:8000/mcp`, auth `forward_user`.
+3. Register tool key `mcp-sql`, endpoint `http://mcp-sql:8000/mcp`, auth `forward_user`.
+4. `docker compose run --rm tools make seed-sql-context PROJECT=<key>` loads the table
+   descriptions into the project and the SQL examples into its `mcp-sql` tool (another key:
+   `TOOL=<key>`). The tool must be registered first. A reload replaces them. Examples belong to
+   the tool: deleting the tool takes them out of `get_schema`.
 
 ## Add your own MCP server
 

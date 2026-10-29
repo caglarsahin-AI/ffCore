@@ -211,3 +211,71 @@ def test_05a_guard_hooks_called(mcp, cfg):
     )
     assert result.text == "GUARDED"
     assert seen == [("pre", "echo", {"text": "raw"}), ("post", "echo", "guarded")]
+
+
+# --- review r1 MAJOR-2/3: a stored row that slipped past registration is refused at call time
+# too, before any request reaches the server.
+
+# Closed list (KARARLAR "05a review r1 kararları" item 4); Proxy-* stands for every Proxy- name.
+RESERVED_HEADERS = [
+    "Host",
+    "host",
+    "Content-Length",
+    "Connection",
+    "Transfer-Encoding",
+    "Upgrade",
+    "TE",
+    "Trailer",
+    "Keep-Alive",
+    "Proxy-Authorization",
+    "Proxy-Connection",
+    "proxy-anything",
+    "Authorization",
+]
+
+
+@pytest.mark.parametrize("name", RESERVED_HEADERS)
+def test_05a_reserved_header_name_refused_before_request(mcp, cfg, name):
+    with pytest.raises(ToolCallError) as err:
+        run(
+            mcp_client.call(
+                target(mcp, "header", name=name, value="v-123456"),
+                "echo",
+                {"text": "x"},
+                cfg,
+                caller=ALICE,
+            )
+        )
+    assert err.value.code == "header_name_not_allowed"
+    assert mcp.seen == []
+
+
+@pytest.mark.parametrize("name", ["X Api Key", "X-Api:Key", "", "X-Api\r\nHost"])
+def test_05a_header_name_must_be_a_token(name):
+    assert mcp_client.header_name_refusal(name) == "header_name_not_allowed"
+
+
+@pytest.mark.parametrize("name", ["X-Api-Key", "x_api_key", "Api-Key", "X-Custom.Tenant"])
+def test_05a_business_header_names_allowed(name):
+    assert mcp_client.header_name_refusal(name) is None
+
+
+@pytest.mark.parametrize(
+    "path",
+    [
+        "http://u:p@{host}/mcp",
+        "http://u@{host}/mcp",
+        "http://{host}/mcp?token=x",
+        "http://{host}/mcp?",
+        "http://{host}/mcp#token=x",
+    ],
+)
+def test_05a_endpoint_with_userinfo_or_query_refused_before_request(mcp, cfg, path):
+    host = mcp.url.split("//", 1)[1].split("/", 1)[0]
+    bad = ToolTarget(
+        key="test-tool", endpoint_url=path.format(host=host), auth_type="none", auth={}
+    )
+    with pytest.raises(ToolCallError) as err:
+        run(mcp_client.call(bad, "echo", {"text": "x"}, cfg, caller=ALICE))
+    assert err.value.code == "endpoint_url_not_allowed"
+    assert mcp.seen == []

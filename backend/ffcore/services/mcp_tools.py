@@ -36,8 +36,14 @@ def _invalid(code: str, message: str) -> ApiError:
 
 
 def check_endpoint(url: str, auth_type: str, settings: Settings) -> None:
-    """Registration-time checks: egress policy for the URL (same codes as at call time) and the
-    forward_user internal-host rule."""
+    """Registration-time checks: scheme + host + port + path only (no user info, query or
+    fragment), egress policy for the URL (same codes as at call time) and the forward_user
+    internal-host rule. The URL never appears in a refusal: it may hold a credential."""
+    if mcp_client.endpoint_refusal(url) is not None:
+        raise _bad_request(
+            "endpoint_url_not_allowed",
+            "The endpoint URL takes scheme, host, port and path only; put credentials in auth.",
+        )
     target = httpx2.URL(url)
     policy = EgressPolicy(settings)
     try:
@@ -52,7 +58,13 @@ def check_endpoint(url: str, auth_type: str, settings: Settings) -> None:
 
 
 def auth_fields(auth: dict[str, Any]) -> dict[str, str]:
-    """The stored part of an auth body: everything but its type."""
+    """The stored part of an auth body: everything but its type. A custom header never names a
+    transport or identity header (review r1 MAJOR-3)."""
+    if auth["type"] == "header" and mcp_client.header_name_refusal(auth["name"]) is not None:
+        raise _bad_request(
+            "header_name_not_allowed",
+            "The header name is reserved or not a valid header name; use a business header.",
+        )
     return {k: v for k, v in auth.items() if k != "type"}
 
 

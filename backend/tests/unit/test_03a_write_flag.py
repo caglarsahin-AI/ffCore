@@ -16,8 +16,9 @@ WRITE_EXEMPT |= {"test_guardrails", "evaluate_guardrails"}
 # 04a: reads that are POST because the query travels in the body (open in read-only mode), and
 # the service-account-only internal embedding endpoint (no user role applies there).
 WRITE_EXEMPT |= {"search_knowledge_base", "test_query", "internal_embed"}
-# 05a: the SQL tool context is a read that is POST because the question travels in the body.
-WRITE_EXEMPT |= {"sql_context"}
+# 05a: the SQL tool context is a read that is POST because the question travels in the body,
+# and the service-account-only token verification (review r1 MAJOR-1; no user role applies).
+WRITE_EXEMPT |= {"sql_context", "verify_obo"}
 
 
 def api_routes(routes):

@@ -316,9 +316,17 @@ async def sql_context(
     settings: SettingsDep,
 ):
     """For mcp-sql's get_schema, on behalf of the user running the agent (any project role).
-    Descriptions narrowed to the question by keywords, and the project's five nearest
-    question-SQL examples (in-process embedding, pgvector cosine)."""
-    found = await mcp_sql_context.context(session, project_id, body.question, settings)
+    Descriptions narrowed to the question by keywords, and the five nearest question-SQL
+    examples of the named tool (in-process embedding, pgvector cosine). An unknown or deleted
+    tool is 404 tool_not_found."""
+    tool = await session.scalar(
+        select(Tool).where(
+            Tool.project_id == project_id, Tool.key == body.tool_key, Tool.deleted_at.is_(None)
+        )
+    )
+    if tool is None:
+        raise not_found("tool")
+    found = await mcp_sql_context.context(session, tool, body.question, settings)
     return SqlContext(
         tables=[
             SqlTable(

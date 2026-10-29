@@ -6,6 +6,9 @@ Rules:
   calls with one identity (U5, B-05a-0002). forward_user signs a fresh token for every call
   (C3), aud = [<tool_key>, obo_audience] (K-05a-0002 S3).
 - Every connection goes through the egress policy (core/egress.policy_http_client, C5).
+- The endpoint URL is scheme, host, port and path only, and a custom auth header never names
+  a transport header (KARARLAR "05a review r1 kararları" items 3-4): checked at registration
+  (services/mcp_tools) and again here, before any connection.
 - A result longer than TOOL_RESULT_MAX_CHARS is cut and ends in "[truncated: N/M chars]"
   (C13); the call log says truncated=true.
 - One structured log line per call: tool, action, status, latency_ms, truncated. Arguments
@@ -15,11 +18,13 @@ Rules:
 
 import base64
 import logging
+import re
 import time
 from collections.abc import AsyncIterator, Iterable
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from typing import Any, Protocol
+from urllib.parse import urlsplit
 
 import anyio
 import httpx2
@@ -36,12 +41,50 @@ log = logging.getLogger("ffcore.tools")
 FORWARD_USER_TTL_S = 60
 RUN_ID_HEADER = "X-Run-Id"
 CONNECT_TIMEOUT_S = 5
+# RFC 7230 token characters.
+_HEADER_NAME = re.compile(r"[!#$%&'*+.^_`|~0-9A-Za-z-]{1,64}")
+# Set by the transport, or by FFCore itself (identity); Proxy-* is refused as a prefix.
+RESERVED_HEADERS = frozenset(
+    {
+        "host",
+        "content-length",
+        "connection",
+        "transfer-encoding",
+        "upgrade",
+        "te",
+        "trailer",
+        "keep-alive",
+        "authorization",
+        OBO_HEADER.lower(),
+        RUN_ID_HEADER.lower(),
+    }
+)
+
+
+def header_name_refusal(name: str) -> str | None:
+    """header_name_not_allowed for a name that is no RFC token or names a reserved header."""
+    lowered = name.lower()
+    if (
+        not _HEADER_NAME.fullmatch(name)
+        or lowered in RESERVED_HEADERS
+        or lowered.startswith("proxy-")
+    ):
+        return "header_name_not_allowed"
+    return None
+
+
+def endpoint_refusal(url: str) -> str | None:
+    """endpoint_url_not_allowed for a URL with user info, a query or a fragment: credentials
+    belong in the encrypted auth fields, never in the stored and returned URL."""
+    if "?" in url or "#" in url or "@" in urlsplit(url).netloc:
+        return "endpoint_url_not_allowed"
+    return None
 
 
 class ToolCallError(Exception):
     """A call or discovery that did not produce a result. `code` is one of: egress_* (refused
-    by the outbound policy), tool_unreachable, tool_timeout, tool_auth_failed,
-    tool_protocol_error, tool_http_<status>."""
+    by the outbound policy), endpoint_url_not_allowed, header_name_not_allowed,
+    tool_unreachable, tool_timeout, tool_auth_failed, tool_protocol_error, tool_http_<status>."""
 
     def __init__(self, code: str) -> None:
         super().__init__(code)
@@ -156,6 +199,11 @@ async def _session(
     timeout_s: float,
     statuses: list[int],
 ) -> AsyncIterator[ClientSession]:
+    refusal = endpoint_refusal(target.endpoint_url)
+    if refusal is None and target.auth_type == "header":
+        refusal = header_name_refusal(target.auth["name"])
+    if refusal is not None:
+        raise ToolCallError(refusal)
     timeout = EgressTimeout(
         connect=min(CONNECT_TIMEOUT_S, timeout_s), read=timeout_s, total=timeout_s
     )

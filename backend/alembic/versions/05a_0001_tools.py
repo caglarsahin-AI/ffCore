@@ -6,7 +6,8 @@ Depends on: 03a_0001 (projects)
 Create Date: 2026-10-29
 
 `few_shots.embedding` is vector(EMBED_DIM) with EMBED_DIM read at migration time, as
-`chunks.embedding` (04a): one embedding model per installation.
+`chunks.embedding` (04a): one embedding model per installation. `few_shots` is a child of
+`tools` (C3; review r1 BLOCKER-1): the project comes through tool_id.
 """
 
 import os
@@ -125,7 +126,7 @@ def upgrade() -> None:
     op.create_table(
         "few_shots",
         sa.Column("id", UUID(as_uuid=True), primary_key=True),
-        sa.Column("project_id", UUID(as_uuid=True), sa.ForeignKey("projects.id"), nullable=False),
+        sa.Column("tool_id", UUID(as_uuid=True), sa.ForeignKey("tools.id"), nullable=False),
         sa.Column("question", sa.Text, nullable=False),
         sa.Column("sql", sa.Text, nullable=False),
         sa.Column("approved_by", sa.Text, nullable=False),
@@ -135,7 +136,7 @@ def upgrade() -> None:
     )
     # Raw DDL: the vector dimension is not a portable column type.
     op.execute(f"ALTER TABLE few_shots ADD COLUMN embedding vector({dim}) NOT NULL")
-    op.create_index("ix_few_shots_project", "few_shots", ["project_id"])
+    op.create_index("ix_few_shots_tool", "few_shots", ["tool_id"])
 
 
 def downgrade() -> None:

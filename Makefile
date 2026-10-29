@@ -82,5 +82,5 @@ seed-sql-demo:
 
 # 05a: table descriptions and SQL examples for get_schema, into one project (a reload replaces).
 seed-sql-context:
-	@test -n "$(PROJECT)" || (echo "usage: make seed-sql-context PROJECT=<project_key>" >&2; exit 2)
-	cd backend && python -m ffcore.cli seed-sql-context --project "$(PROJECT)" --path ../data/samples/schema
+	@test -n "$(PROJECT)" || (echo "usage: make seed-sql-context PROJECT=<project_key> [TOOL=mcp-sql]" >&2; exit 2)
+	cd backend && python -m ffcore.cli seed-sql-context --project "$(PROJECT)" --tool "$(or $(TOOL),mcp-sql)" --path ../data/samples/schema

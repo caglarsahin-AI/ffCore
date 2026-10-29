@@ -558,9 +558,11 @@ paths:
       summary: SQL tool context (mcp-sql)
       description: 'For mcp-sql''s get_schema, on behalf of the user running the agent (any project role).
 
-        Descriptions narrowed to the question by keywords, and the project''s five nearest
+        Descriptions narrowed to the question by keywords, and the five nearest question-SQL
 
-        question-SQL examples (in-process embedding, pgvector cosine).'
+        examples of the named tool (in-process embedding, pgvector cosine). An unknown or deleted
+
+        tool is 404 tool_not_found.'
       operationId: sql_context_api_v1_projects__project_id__tools_sql_context_post
       parameters:
       - name: project_id
@@ -583,6 +585,61 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SqlContext'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+  /api/v1/internal/obo/verify:
+    post:
+      tags:
+      - tools
+      summary: Verify an on-behalf-of token
+      operationId: verify_obo_api_v1_internal_obo_verify_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OboVerifyRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OboVerifyResult'
         '400':
           description: Invalid request.
           content:
@@ -684,9 +741,12 @@ components:
           title: Type
         name:
           type: string
-          pattern: ^[A-Za-z0-9-]{1,64}$
+          maxLength: 64
+          minLength: 1
           title: Name
-          description: Header name.
+          description: 'Header name: an RFC 7230 token, not a transport or identity header (Host, Content-Length,
+            Connection, Transfer-Encoding, Upgrade, TE, Trailer, Keep-Alive, Proxy-*, Authorization, X-On-Behalf-Of,
+            X-Run-Id); otherwise 400 header_name_not_allowed.'
         value:
           type: string
           maxLength: 4096
@@ -777,6 +837,47 @@ components:
       description: 'A direct test call. `text` is what a model would get: cut results end in
 
         "[truncated: N/M chars]" (C13); `is_error` is the tool''s own error flag.'
+    OboVerifyRequest:
+      properties:
+        token:
+          type: string
+          maxLength: 4096
+          minLength: 1
+          title: Token
+          description: X-On-Behalf-Of JWT
+        audience:
+          type: string
+          pattern: ^[a-z][a-z0-9-]{1,63}$
+          title: Audience
+          description: The asking service's own tool key.
+      additionalProperties: false
+      type: object
+      required:
+      - token
+      - audience
+      title: OboVerifyRequest
+    OboVerifyResult:
+      properties:
+        sub:
+          type: string
+          title: Sub
+        project_id:
+          type: string
+          title: Project Id
+        exp:
+          type: integer
+          title: Exp
+        jti:
+          type: string
+          title: Jti
+      additionalProperties: false
+      type: object
+      required:
+      - sub
+      - project_id
+      - exp
+      - jti
+      title: OboVerifyResult
     SqlColumn:
       properties:
         name:
@@ -833,6 +934,11 @@ components:
         false: none matched, all listed) and the nearest approved question-SQL examples.'
     SqlContextRequest:
       properties:
+        tool_key:
+          type: string
+          pattern: ^[a-z][a-z0-9-]{1,63}$
+          title: Tool Key
+          description: Key of the registered mcp-sql tool whose examples are wanted.
         question:
           anyOf:
           - type: string
@@ -841,6 +947,8 @@ components:
           title: Question
       additionalProperties: false
       type: object
+      required:
+      - tool_key
       title: SqlContextRequest
     SqlExample:
       properties:
@@ -983,6 +1091,8 @@ components:
           maxLength: 2048
           minLength: 1
           title: Endpoint Url
+          description: Scheme, host, port and path only; user info, a query or a fragment is 400 endpoint_url_not_allowed
+            (credentials go into auth).
         auth:
           oneOf:
           - $ref: '#/components/schemas/AuthNone'

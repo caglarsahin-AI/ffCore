@@ -5,7 +5,8 @@
     docker compose run --rm tools make seed-models PROJECT=hastane   (01, first install)
     docker compose run --rm tools make render-litellm                 (01, reconcile LiteLLM)
     docker compose run --rm tools make seed-sql-demo                  (05a, mcp-sql demo DB)
-    docker compose run --rm tools make seed-sql-context PROJECT=hastane (05a, get_schema data)
+    docker compose run --rm tools make seed-sql-context PROJECT=hastane (05a, get_schema data;
+        the project's mcp-sql tool is registered first)
 
 The password is read from stdin, never from the command line (shell history, process list).
 """
@@ -23,6 +24,7 @@ from ffcore.core.config import get_settings
 from ffcore.core.logging import configure_logging
 from ffcore.core.passwords import MIN_LENGTH, hash_password
 from ffcore.models.identity import Project, User
+from ffcore.models.tools import Tool
 from ffcore.services import (
     catalog_loader,
     litellm_reconcile,
@@ -137,6 +139,9 @@ def main(argv: list[str] | None = None) -> int:
         "seed-sql-context", help="load table descriptions and SQL examples into a project (05a)"
     )
     sql_context.add_argument("--project", required=True, help="existing project key")
+    sql_context.add_argument(
+        "--tool", default="mcp-sql", help="key of the project's registered mcp-sql tool"
+    )
     sql_context.add_argument("--path", required=True, type=Path, help="data/samples/schema")
     args = parser.parse_args(argv)
     configure_logging(get_settings())
@@ -184,7 +189,9 @@ def main(argv: list[str] | None = None) -> int:
             print(f"demo database ready: {database} (read-only login user {user})")
             print("SQL_DEMO_DATABASE_URL uses this user and AGENT_DEMO_DB_PASSWORD (.env)")
         elif args.command == "seed-sql-context":
-            descriptions, examples = asyncio.run(_seed_sql_context(args.project, args.path))
+            descriptions, examples = asyncio.run(
+                _seed_sql_context(args.project, args.tool, args.path)
+            )
             print(f"table descriptions loaded: {descriptions}; SQL examples loaded: {examples}")
     except (
         CliError,
@@ -230,7 +237,7 @@ def _seed_sql_demo(settings, path: Path) -> tuple[str, str]:
     return DEMO_DATABASE, DEMO_LOGIN_USER
 
 
-async def _seed_sql_context(project_key: str, path: Path) -> tuple[int, int]:
+async def _seed_sql_context(project_key: str, tool_key: str, path: Path) -> tuple[int, int]:
     settings = get_settings()
     async with db.session_scope() as session:
         project_id = await session.scalar(
@@ -238,7 +245,16 @@ async def _seed_sql_context(project_key: str, path: Path) -> tuple[int, int]:
         )
         if project_id is None:
             raise CliError(f"no project with key {project_key}")
-        report = await mcp_sql_context.load(session, project_id, path, settings, created_by="cli")
+        tool_id = await session.scalar(
+            select(Tool.id).where(
+                Tool.project_id == project_id, Tool.key == tool_key, Tool.deleted_at.is_(None)
+            )
+        )
+        if tool_id is None:
+            raise CliError(
+                f"no tool {tool_key} in project {project_key}; register the mcp-sql tool first"
+            )
+        report = await mcp_sql_context.load(session, tool_id, path, settings, created_by="cli")
         await session.commit()
     return report
 

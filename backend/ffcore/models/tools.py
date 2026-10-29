@@ -1,7 +1,8 @@
 """tools, tool_actions, schema_descriptions, few_shots (05a).
 
 `tools` and `schema_descriptions` are project-owned root tables with the C3 common columns;
-`tool_actions` (via tool_id) and `few_shots` are child tables (C3 exceptions).
+`tool_actions` and `few_shots` are child tables of `tools` (C3): they take the project through
+tool_id. few_shots belong to the project's registered mcp-sql tool (review r1 BLOCKER-1).
 """
 
 import uuid
@@ -121,10 +122,10 @@ class SchemaDescription(Timestamps, Base):
 
 class FewShot(Base):
     __tablename__ = "few_shots"
-    __table_args__ = (Index("ix_few_shots_project", "project_id"),)
+    __table_args__ = (Index("ix_few_shots_tool", "tool_id"),)
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    project_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("projects.id"))
+    tool_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("tools.id"))
     question: Mapped[str] = mapped_column(Text)
     sql: Mapped[str] = mapped_column(Text)
     # vector(EMBED_DIM), created by the migration with the installation's dimension (as chunks).

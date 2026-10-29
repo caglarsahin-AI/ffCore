@@ -30,7 +30,17 @@ class AuthBearer(Strict):
 
 class AuthHeader(Strict):
     type: Literal["header"]
-    name: Annotated[str, Field(pattern=r"^[A-Za-z0-9-]{1,64}$", description="Header name.")]
+    name: Annotated[
+        str,
+        Field(
+            min_length=1,
+            max_length=64,
+            description="Header name: an RFC 7230 token, not a transport or identity header "
+            "(Host, Content-Length, Connection, Transfer-Encoding, Upgrade, TE, Trailer, "
+            "Keep-Alive, Proxy-*, Authorization, X-On-Behalf-Of, X-Run-Id); otherwise 400 "
+            "header_name_not_allowed.",
+        ),
+    ]
     value: SecretText
 
 
@@ -57,7 +67,15 @@ class ToolCreate(Strict):
     key: ToolKey
     name: Annotated[str, Field(min_length=1, max_length=200)]
     kind: Literal["mcp", "openapi"] = "mcp"
-    endpoint_url: Annotated[str, Field(min_length=1, max_length=2048)]
+    endpoint_url: Annotated[
+        str,
+        Field(
+            min_length=1,
+            max_length=2048,
+            description="Scheme, host, port and path only; user info, a query or a fragment is "
+            "400 endpoint_url_not_allowed (credentials go into auth).",
+        ),
+    ]
     auth: ToolAuth
 
 
@@ -124,6 +142,10 @@ class InvokeResult(Strict):
 
 
 class SqlContextRequest(Strict):
+    tool_key: Annotated[
+        ToolKey,
+        Field(description="Key of the registered mcp-sql tool whose examples are wanted."),
+    ]
     question: Annotated[str, Field(max_length=2000)] | None = None
 
 

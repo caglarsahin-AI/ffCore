@@ -1,9 +1,14 @@
 """mcp-sql core (05a): the SQL validator and the read-only executor behind `run_sql`.
 
-Rules (brief 05 B), checked with sqlglot before any database connection:
-- exactly one statement, and it is a query (SELECT, set operations, WITH ... SELECT);
+Rules (brief 05 B; KARARLAR "05a review r1 kararları" item 5), checked with sqlglot before
+any database connection:
+- exactly one statement, and it is a query (SELECT, WITH ... SELECT, or a set operation
+  UNION / EXCEPT / INTERSECT whose every branch is a SELECT; no VALUES lists);
 - no write or DDL anywhere in it (also not inside a CTE), no SELECT INTO, no FOR UPDATE;
-- no system catalogs: pg_* tables and functions, information_schema;
+- no system catalogs: pg_* tables, information_schema;
+- no function from the closed list of functions that change state, wait or reach outside the
+  query (sequences, settings, pg_*, lo_*, dblink*, txid_*);
+- comments are stripped: what runs is sqlglot's rendering of the parsed query, without them;
 - subquery depth at most 3 (the outer SELECT counts as 1);
 - only tables of the target database (CTE names are not tables);
 - a LIMIT of SQL_MAX_ROWS + 1 is added when the query has none.
@@ -38,10 +43,21 @@ _FORBIDDEN = (
     exp.Command,
     exp.Into,
     exp.Lock,
+    exp.Values,
 )
 _SYSTEM_SCHEMAS = ("pg_catalog", "information_schema", "pg_toast")
-_SYSTEM_FUNCTION_PREFIXES = ("pg_", "lo_", "dblink")
-_SYSTEM_FUNCTIONS = ("set_config", "current_setting", "query_to_xml", "table_to_xml")
+_CLOSED_FUNCTION_PREFIXES = ("pg_", "lo_", "dblink", "txid_")
+_CLOSED_FUNCTIONS = (
+    "setval",
+    "nextval",
+    "lastval",
+    "currval",
+    "set_config",
+    "current_setting",
+    "query_to_xml",
+    "table_to_xml",
+    "copy",
+)
 
 TABLES_QUERY = (
     "SELECT table_name FROM information_schema.tables "
@@ -51,7 +67,8 @@ TABLES_QUERY = (
 
 class SqlRejected(Exception):
     """The validator refused the query; `code` is one of sql_parse_error, sql_multiple_statements,
-    sql_not_select, sql_system_catalog, sql_too_deep, sql_unknown_table."""
+    sql_not_select, sql_system_catalog, sql_function_not_allowed, sql_too_deep,
+    sql_unknown_table."""
 
     def __init__(self, code: str, detail: str) -> None:
         super().__init__(f"{code}: {detail}")
@@ -91,8 +108,12 @@ def check_structure(sql: str) -> exp.Expression:
             raise SqlRejected("sql_system_catalog", "system catalogs are not available")
     for func in root.find_all(exp.Func):
         name = (func.name if isinstance(func, exp.Anonymous) else func.sql_name()).lower()
-        if name.startswith(_SYSTEM_FUNCTION_PREFIXES) or name in _SYSTEM_FUNCTIONS:
-            raise SqlRejected("sql_system_catalog", f"function {name} is not available")
+        if name.startswith(_CLOSED_FUNCTION_PREFIXES) or name in _CLOSED_FUNCTIONS:
+            raise SqlRejected("sql_function_not_allowed", f"function {name} is not available")
+    for operation in root.find_all(exp.SetOperation):
+        for branch in (operation.left, operation.right):
+            if not isinstance(branch, exp.Select | exp.SetOperation | exp.Subquery):
+                raise SqlRejected("sql_not_select", "every branch of a set operation is a SELECT")
     if _select_depth(root) > MAX_DEPTH:
         raise SqlRejected("sql_too_deep", f"subqueries nest deeper than {MAX_DEPTH}")
     return root
@@ -110,7 +131,7 @@ def check_tables(root: exp.Expression, tables: Iterable[str]) -> None:
 def with_limit(root: exp.Expression, max_rows: int) -> str:
     if root.args.get("limit") is None:
         root = root.limit(max_rows + 1)
-    return root.sql(dialect=DIALECT)
+    return root.sql(dialect=DIALECT, comments=False)
 
 
 def validate(sql: str, tables: Iterable[str], *, max_rows: int) -> str:
