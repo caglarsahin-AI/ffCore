@@ -1,6 +1,6 @@
 # PR: 10b-poc-1 bilgi tabanı ve sistem durumu ekranları
 
-**Paket:** 10b-poc-1 · **Sınıf:** [A] (compose `&app-env`'e tek satır `FAKE_EMBED: ${FAKE_EMBED:-0}`, paylaşılan değişiklik, K-10bp-0002 D2) · **Branch:** feat/10b-poc-1 · **Baz commit:** fe0d434 · **HEAD:** db5c8fa38b53350f051094bc7efc106508f0d9f1 (7 commit, 53 dosya) · **Oturum:** ffcore-isci-c-10bp1 · **GOREV:** K-10bp-0001 (+ taslak K-10bp-0000, kararlar K-10bp-0002)
+**Paket:** 10b-poc-1 · **Sınıf:** [A] (compose `&app-env`'e tek satır `FAKE_EMBED: ${FAKE_EMBED:-0}`, paylaşılan değişiklik, K-10bp-0002 D2) · **Branch:** feat/10b-poc-1 · **Baz commit:** fe0d434 · **HEAD:** c0926f9cee3928706847011ec02065b2d0ed8052 (10 commit, 55 dosya; r1 öncesi 0ba0ac2) · **Oturum:** ffcore-isci-c-10bp1 · **GOREV:** K-10bp-0001 (+ taslak K-10bp-0000, kararlar K-10bp-0002)
 
 ## Plan (kodlamadan önce)
 
@@ -191,12 +191,22 @@ Yok.
 - **Testler:** `frontend/tests/unit/test_10bp1_{13,14,15,16,17}_*`, `frontend/tests/e2e/test_10bp1_{1..12}_*.spec.ts`, `frontend/tests/e2e/knowledge.ts`.
 - **Belgeler:** `docs/onyuz.md` (ekran haritası, "Knowledge bases (04a)", "System status", iki aşamalı e2e komutları, ekran görüntüleri), `docs/images/10bp1-*.png` (10 dosya).
 
-## Kabul kriterleri → testler (HEAD db5c8fa, temiz yığın)
+## Review r1 bulgu → düzeltme → kanıt (K-10bp-0006, state/reviews/10b-poc-1-r1.md)
+
+| Bulgu | Kırmızı (7cb56f7, düzeltmeden önce) | Düzeltme (c0926f9) | Yeşil |
+|---|---|---|---|
+| MINOR-1: belge `indexed` olunca KB özeti `chunk_count` 0 kalıyor (API 15) | `test_10bp1_18_kb_counts_follow_upload`: beklenen "15", gelen "0" | `lib/knowledge.ts` `documentsFinished(önceki, şimdiki)`: bir belge son poll'dan bu yana terminal duruma geçti mi (ya da terminal olarak geldi mi); ilk yükleme değişiklik sayılmaz. `useDocuments` bunu görünce KB ayrıntısını ve listesini tam anahtarla invalid eder. Ek zamanlayıcı ya da poll yok. Birim: `test_10bp1_16_polling` "finished documents" (önce kırmızı) | `test_10bp1_18` geçti: özet = API = liste |
+| MINOR-2: admin+read'de yükleme ve yeniden üretme formlarının 6 alanı etkin | `test_10bp1_19_read_only_fields`: beklenen 0 etkin alan, gelen 6 | `document-upload.tsx` ve `reindex-form.tsx`'te alanlar `<fieldset disabled={!canWrite}>` içinde (`useAccess(projectId)`); sürükle-bırak da read modda yok sayılır. Düğmeler WriteGate'te kalır, "Aramayı dene" açık | `test_10bp1_19` iki test geçti (read 0 etkin alan, edit'te hepsi etkin); `test_10bp1_8` geçti |
+
+- Testlerin bulduğu sayılar ile ekrandaki öğeleri eşlemek için yalnız test kimlikleri eklendi: `kb-chunk-count`, `kb-document-count`, `kb-row-chunks`. Ayrı commit, davranış değişmedi.
+- **10a formları kontrolü:** sapma yok. Sağlayıcı, model ve proje formları yalnız WriteGate'li düğmelerle açılıyor; üye satırındaki rol ve erişim seçimleri WriteGate'li (`test_10ab_4`). Read modda düzenlenebilir alana ulaşılamıyor.
+
+## Kabul kriterleri → testler (HEAD c0926f9, temiz yığın)
 
 | # | Kriter | Test | Durum |
 |---|---|---|---|
 | 1 | KB listesi, boş durum, oluşturma (anahtar deseni, `knowledge_base_key_taken`), düzenleme, tek eşik kuralı | `test_10bp1_1_kb_create_edit` | geçti |
-| 2 | 13a PDF yükleme, outcome, `indexed`'e kadar canlı liste, katman/kapılar/dönüştürücü/parça | `test_10bp1_2_upload_indexed` | geçti |
+| 2 | 13a PDF yükleme, outcome, `indexed`'e kadar canlı liste, katman/kapılar/dönüştürücü/parça; Türkçe dosya adı (`e2e-bakım-sözleşmesi-ÇĞİÖŞÜ-çğıöşü.pdf`) tarayıcıdan aynen indexed (K-10bp-0003) | `test_10bp1_2_upload_indexed` | geçti |
 | 3 | Aynı dosya `unchanged`; aynı metin başka adla Kapı 1 `duplicate_of` + asıl belgeye bağlantı | `test_10bp1_3_reupload_duplicate` | geçti |
 | 4 | Kapı 0 `binary` reddi gerekçesiyle; DOCX `failed` + `model_missing` açıklaması ve ayrıntı | `test_10bp1_4_gate_reject` | geçti |
 | 4b | 413 `request_too_large` açık mesaj | birim `test_10bp1_13_upload_client` | geçti (e2e NOT_RUN: sınır 516 MB) |
@@ -215,6 +225,8 @@ Yok.
 | 17 | Sunucu tarafı `/readyz` okuması: 200/503 sonuç, sözleşme dışı ve ağ hatası açık hata | `test_10bp1_17_readiness_read` | geçti |
 | 18 | Sabit renk ve sabit metin yok | `test_10a_3`, `test_10ab_12`, `npm run lint` | geçti |
 | 19 | `check:api` iki spec | `npm run check:api` | geçti |
+| 21 | (r1 MINOR-1) belge bitince KB özeti ve listesi API ile eşit, sayfa yenilemeden | `test_10bp1_18_kb_counts_follow_upload`, birim `test_10bp1_16` | geçti |
+| 22 | (r1 MINOR-2) admin+read'de yükleme ve yeniden üretme alanları pasif, edit'te etkin, arama açık | `test_10bp1_19_read_only_fields` (2 test) | geçti |
 | 20 | Brief: Lighthouse ≥ 90 | — | NOT_RUN (FOLLOWUP-37, axe yerine) |
 
 ## Çalıştırılan komutlar
@@ -225,14 +237,14 @@ Tümü konteynerde. Önyüz `node:20.19.5-alpine` + `ffcore-10a-nm` volume; e2e 
 |---|---|---|---|
 | `npm run lint` | node:20 | 0 | |
 | `npm run typecheck` | node:20 | 0 | |
-| `npx vitest run` | node:20 | 0 | 23 dosya, 113 test |
+| `npx vitest run` | node:20 | 0 | 23 dosya, 114 test |
 | `npm run check:api` | node:20 | 0 | iki spec güncel |
 | `docker compose --env-file .env.test config -q` | `FFCORE_VERSION=0.0.0-10bp1` | 0 | |
 | `docker compose ... run --rm tools sh -c "cd backend && python -m pytest tests/unit/test_00_repo_skeleton.py -q"` | tools 0.0.0-10bp1 | 0 | 11 passed (compose yapı testleri) |
-| `down -v` → `up -d --wait --build backend` → `create-superadmin` | `-p 10bp1`, `FAKE_EMBED` yok, ağırlık yok, `ALLOWED_INTERNAL_HOSTS=litellm,fake-llm`, `BACKEND_PORT=18110` | 0 | up 53 s |
-| e2e 1. aşama `npx playwright test --grep @model-missing --workers=1` | aynı yığın | 0 | 1/1, 97 s |
-| `FAKE_EMBED=1 up -d --wait backend worker` | | 0 | 25 s |
-| e2e 2. aşama `npx playwright test --grep-invert @model-missing --workers=1` | `FAKE_EMBED=1` | 0 | 95/95 (19'u 10bp1; 10a/10ab/10af 76 test aynı yığında yeşil), 389 s |
+| `down -v` → `up -d --wait --build backend` → `create-superadmin` | HEAD c0926f9, `-p 10bp1`, `FAKE_EMBED` yok, ağırlık yok, `ALLOWED_INTERNAL_HOSTS=litellm,fake-llm`, `BACKEND_PORT=18110` | 0 | up 45 s |
+| e2e 1. aşama `npx playwright test --grep @model-missing --workers=1` | aynı yığın | 0 | 1/1, 96 s |
+| `FAKE_EMBED=1 up -d --wait backend worker` | | 0 | 26 s |
+| e2e 2. aşama `npx playwright test --grep-invert @model-missing --workers=1` | `FAKE_EMBED=1` | 0 | 98/98 (22'si 10bp1; 10a/10ab/10af 76 test aynı yığında yeşil), 413 s. r1 öncesi 0ba0ac2 ve db5c8fa: 1/1, 95/95 |
 | `down -v` | | 0 | konteyner 0 |
 
 **NOT_RUN:**
@@ -268,7 +280,7 @@ Tümü konteynerde. Önyüz `node:20.19.5-alpine` + `ffcore-10a-nm` volume; e2e 
 - Rerank açıkken `default_min_score` gönderilmez; kayıtlı değer sessizce silinmez.
 - Kapı gerekçe kodları backend kaynağından alındı: `knowledge/scope.py` (5) ve `knowledge/gates.py` (`duplicate_of:<id>`, `data_dump:<kind>` dahil). Sözleşmede gerekçe enum'u yok; yeni kod ham gösterilir (birim testli).
 - Gözlem, bu PR'da değişmedi: konsolda bilinmeyen yollar (`/readyz` dahil) `[section]` sayfasının `notFound()`'u ile HTML not-found gövdesi döner ama HTTP durumu 200 (akışlı render). Güvenlik etkisi yok (gövde konsolun sayfası), test bunu gövdeyle doğrular. 10a'dan beri böyle; düzeltilecekse ayrı küçük iş.
-- Curl'den Türkçe JSON gövdesinin 400 alması kabuk kodlamasıymış: tarayıcıdan Türkçe sorgu test 5'te geçti.
+- Curl'den Türkçe JSON gövdesinin 400 alması kabuk kodlamasıymış: tarayıcıdan Türkçe sorgu (test 5) ve Türkçe dosya adı (test 2) geçti (K-10bp-0003).
 
 ## Süreç sapmaları (açık)
 

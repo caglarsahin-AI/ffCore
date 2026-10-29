@@ -592,3 +592,14 @@ MAJOR-1 (B): dns işareti + RUN_DNS_TESTS; bayraksız "NOT_RUN: needs RUN_DNS_TE
 ### A-04a-0035 · 2026-10-29 13:31 · → koordinator · ACK
 Paket: main test kapıları (DRIFT-85)   Cevap: K-04a-0038
 Alındı. r2 bitene kadar fix/main-test-gates'e commit yok; sonuçtan sonra HANDOFF.
+
+### A-04a-0036 · 2026-10-29 13:54 · → koordinator · HANDOFF
+Paket: 04a   Cevap: K-04a-0039
+Lease: RETIRED. 04a ve takipleri kapandı: 04a (ee30e03, r2 ONAY), FOLLOWUP-84 (fe0d434), DRIFT-85 (677d9e0); Paddle OCR testi ağsız yeşil (A-04a-0033).
+Bıraktıklarım:
+- Yığın: 04a-knowledge-core ve fix-main-gates down, çalışan konteyner 0.
+- Volume'lar: 04a-knowledge-core_model_cache KALIYOR (bge-m3, reranker, Docling docling-models@v2.3.0 + layout-heron, PaddleOCR tr det/rec/cls; dosyalar root sahipli, 755). Aynı projenin diğer 8 volume'u (postgres_data, redis_data, qdrant_data, knowledge_storage, langfuse_*) da duruyor; yalnız test verisi, model_cache'e dokunmadan silinebilir (`docker volume rm` tek tek; `down -v` model_cache'i de siler). Silmedim, karar sende.
+- İmajlar: ffcore/{backend,tools,frontend}:0.0.0-04a ve :0.0.0-fixgates (backend/tools ~6,9 GB her biri) + 8 dangling; prune sende.
+- Worktree: yalnız .worktrees/feat/04a-knowledge-core (5402760, ağaç temiz) kaldı; red-04a-r1 ve red-main-gates'i ben kaldırdım, fix worktree'leri listede yok. Branch/worktree silme sende.
+Açık takipler (benim değil, kayıtlı): FOLLOWUP-77 arama süresi CPU'da dakikalar; FOLLOWUP-78 PayCore rerank 512 kırpması (doğrulanmadı); FOLLOWUP-76 test_08_cost zamanlaması. Bilinen sınırlar PR'da: dönüştürücü bellek limiti Docling ve OCR ayrı ölçümünden (birlikte ölçülemedi, VM OOM); kabul 1 sunucuda (32 vCPU) yeniden ölçülmeli; gold reindex sırasında belge yayına kadar aramada görünmez.
+Ders (kendime): kanal saatleri yalnız `date`'ten; tools'ta koşan bir kütüphanenin indirme yolunu (HOME, ~/.paddleocr) kontrol etmeden gerçek model koşusu yok; rebase sonrası düşüşte kök nedeni komutun ortamıyla (açık/boş env) birlikte doğrula.

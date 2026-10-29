@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-koordinator-20261028-0205
 - Aktif paket: tumu
 - Durum: ACTIVE
-- Son okunan: isci-a A-04a-0035; inceleyici R-gates-0007; isci-b B-01-0025 (HANDOFF, RETIRED); isci-c C-10ab-0019 (HANDOFF, RETIRED); test T-08lite-0021 (HANDOFF, RETIRED) (2026-10-28 21:31)
+- Son okunan: isci-a A-04a-0036 (RETIRED); inceleyici R-02-0016; isci-b B-01-0025 (HANDOFF, RETIRED); isci-c C-10ab-0019 (HANDOFF, RETIRED); test T-08lite-0021 (HANDOFF, RETIRED) (2026-10-28 21:31)
 
 ## Mesajlar
 
@@ -1378,3 +1378,74 @@ Main değişti: DRIFT-85 düzeltmesi girdi (677d9e0): `backend/tests/integration
 ### K-04a-0040 · 2026-10-29 13:54 · → inceleyici · CEVAP
 Paket: main test kapıları   Cevap: R-gates-0007
 Alındı; main'de (677d9e0), main kapıları yeşil. Docker'ın otomatik registry denemesini açıkça yazman doğru; `--pull=never`'ı koşullarına ekle. Evidence dizinlerini kaldırabilirsin. Sırada 02 r3 (isci-b rebase + delta) ve 10b-poc-1 r1.
+
+### K-04a-0041 · 2026-10-29 13:56 · → isci-a · CEVAP
+Paket: 04a   Cevap: A-04a-0036
+HANDOFF alındı, lease RETIRED. Temizlik: 04a worktree'si ve branch'i silindi (5402760 main'de), `0.0.0-04a`/`0.0.0-fixgates` imajları ve 04a-knowledge-core'un model_cache dışındaki 8 volume'u kaldırıldı, dangling prune. `04a-knowledge-core_model_cache` korunuyor; sonraki paketler ağırlık için onu `external` bağlar (docs/bilgi-tabani.md). Teşekkürler; 06a için yeni oturum 02 ve 05a sonrası.
+
+### K-10bp-0004 · 2026-10-29 13:58 · → inceleyici · REVIEW-ISTEK
+Paket: 10b-poc-1 (bilgi tabanı ve sistem durumu ekranları)   Cevap: C-10bp1-0008
+PR: state/pr/10b-poc-1.md · Branch feat/10b-poc-1 · Baz main fe0d434 (677d9e0 yalnız backend testleri + docs/gelistirme-ortami.md değiştirdi; çakışma beklenmez, merge'de ben bakarım) · SHA 0ba0ac2e2b546d65990f4bd5ff63c6a259ac2f7d (koordinatör doğruladı: fe0d434 üstünde 8 commit, 53 dosya +4552/-45, ağaç temiz; frontend dışında yalnız compose'a `FAKE_EMBED: ${FAKE_EMBED:-0}` tek satır ve docs/onyuz.md). Sınıf [A]. Tur: r1.
+Öncelikli: (1) Sistem durumu sayfası (K-10bp-0002 D1 B): `/readyz` ayrıntısı (model adı, dosya yolu) yalnız girişli kullanıcıya, rol matrisine göre; önyüzde kimliksiz rewrite/route yok; `warming` durumunda yenileme. (2) Belge ACL/proje sınırı ekranda: başka projenin belgesi/KB'si listede, sayıda, aramada yok (04a 404'ü ekranda nasıl görünüyor). (3) Yükleme: ilerleme, kodlu retler (boyut, tür, Kapı 0 ikili) ekranda açık; `model_missing` ekranda kodlu hata + çözüm. (4) "Aramayı dene": skorlar, rerank tabanı altında elenenler ayrı, `rerank_truncated` görünür; Türkçe sorgu/dosya adı. (5) 10a kalıpları (ListState/QueryError, `data ?? []` yok, 401 → goToLogin/safeNext, errors.ts yeni kodlar, WriteGate projectId, liste proje key'li, en/tr json, ICU tırnak, iki tema PNG, sabit renk yok). (6) Tipler `backend/openapi/04a.yaml`'dan üretilmiş, elle tip yok; `check:api` 0. (7) e2e iki aşama (ağırlıksız `model_missing`, sonra `FAKE_EMBED=1`); işçi 95/95 + 1/1, Vitest 113/113 bildirdi; bağımsız tek worker.
+Ortam: `FFCORE_VERSION=0.0.0-review-10bp1`, volume'lar `ffcore-10a-nm(-pw)` (pw bayat, `npm ci`), `--pull=never`, boş `BACKEND_PORT`; model ağırlığı gerekmez (`04a-knowledge-core_model_cache`'e dokunma); dış ağ yok. Sıra: 02 r3 gelirse önce o (merge sırası 02 → 10b-poc-1 değil; ikisi bağımsız, hangisi önce ONAY alırsa).
+
+### K-10bp-0005 · 2026-10-29 13:58 · → isci-c · CEVAP
+Paket: 10b-poc-1   Cevap: C-10bp1-0008
+PR-HAZIR alındı; 0ba0ac2 doğrulandı (fe0d434 üstünde, temiz). REVIEW-ISTEK K-10bp-0004 inceleyiciye gitti. Main bu arada 677d9e0 oldu (yalnız backend testleri + docs/gelistirme-ortami.md); rebase gerekirse merge'de söylerim. Review bitene kadar yeni commit yok; `0.0.0-10bp1` imajları kalsın, yığını `down -v`.
+
+### K-02-0017 · 2026-10-29 14:20 · → inceleyici · REVIEW-ISTEK
+Paket: 02   Cevap: B-02-0014
+r3 delta. Branch feat/02-langfuse-trace · Baz main 38938ae (= 677d9e0 + state commit) · SHA f4716909429872f7c457a6bc2e3ab1bd3c336cc9 (koordinatör doğruladı: main üstünde 10 commit, ağaç temiz). Kapsam yalnız delta: (a) r2 MAJOR-1 c372f9d: `extra=` alanları her handler'dan önce maskeleniyor; senin `structured_probe.py` senaryon (önceden kurulmuş/sonradan eklenen handler, yapılandırılmış formatter, iç içe extra) tekrar; (b) f471690 04a Qdrant ACL fixture'ı `allowed_internal_hosts`'a qdrant ekliyor (ürün kontrolü gevşemedi mi; fixture yalnız test ayarı mı); (c) rebase 677d9e0/38938ae deltası (DRIFT-85 conftest + 02 birleşimi). İşçi belgelenen komutla Qdrant açık: `make test` 439, `make test-int` 213 + 3 NOT_RUN iki profil, canlı PII ve log kapısı 0 bildirdi. ONAY ise merge ederim; 10b-poc-1 r1 ile sıran: hangisi önce biterse.
+
+### K-02-0018 · 2026-10-29 14:20 · → isci-b · CEVAP
+Paket: 02   Cevap: B-02-0014
+PR-HAZIR r3 alındı; f471690 doğrulandı (38938ae üstünde, temiz). REVIEW-ISTEK K-02-0017 gitti. Review bitene kadar yeni commit yok. Sonraki paketin 05a: GOREV taslağını 02 merge'ünden sonra yazacağım; oturum talimatın izin veriyorsa aynı oturumda devam (01→02'deki gibi).
+
+### K-10bp-0006 · 2026-10-29 14:24 · → isci-c · DUZELT
+Paket: 10b-poc-1   Cevap: R-10bp1-0004 (state/reviews/10b-poc-1-r1.md)
+Review r1: ONAY, BLOCKER 0, MAJOR 0, MINOR 2. Koordinatör kararı (10a-formlar emsali): iki MINOR da merge'den önce bu PR'da kapanır; ikisi küçük, biri kabul kriteri. Yeni commit(ler), yeni tam SHA ile PR-HAZIR; r2 yalnız delta + 10bp1 e2e.
+- MINOR-1: belge satırı `indexed` olduğunda KB özeti (`chunk_count`) 0 kalıyor, API 15. Beklenen: belge terminal duruma (indexed/failed/skipped) geçince KB özeti ve KB listesi sorguları invalid edilir (polling'in gördüğü geçişte), sayfa yenilemeden özet API ile eşit. Önce kırmızı Playwright (inceleyicinin probe'u: evidence'daki `REVIEW_COUNTS` senaryosu).
+- MINOR-2: `admin + read` kullanıcıda yükleme ve yeniden indeksleme formlarının 6 alanı etkin; brief 10 "formlar okunur, düzenlenemez". Beklenen: alanlar `fieldset disabled`/`useAccess` ile pasif, yalnız işlem düğmeleri değil; "Aramayı dene" okuma olarak açık kalır. Önce kırmızı Playwright (beklenen 0 etkin alan / gerçek 6). Aynı deseni 10a formlarında da kontrol et; oradaki ekranlar bu PR'ın touch-zone'u dışında, sapma varsa yalnız not (FOLLOWUP açarım).
+Kapılar: lint/typecheck/check:api, Vitest, iki aşamalı e2e tek worker; PR'a "Review r1 bulgu → düzeltme → kanıt".
+
+### K-10bp-0007 · 2026-10-29 14:24 · → inceleyici · CEVAP
+Paket: 10b-poc-1   Cevap: R-10bp1-0004
+Alındı. İki MINOR merge öncesi düzeltilecek (DUZELT K-10bp-0006); r2 yalnız delta + 10bp1 e2e, senin iki probe'un tekrar. Review imajlarını ben siliyorum; evidence r2'ye kadar kalsın. 02 r3'e devam.
+
+### K-02-0019 · 2026-10-29 14:36 · → isci-b · DUZELT
+Paket: 02   Cevap: R-02-0013 (state/reviews/02-r3.md)
+Review r3: DUZELT; BLOCKER 0, MAJOR 1. r2'nin string düzeltmesi ve Qdrant fixture'ı geçti. Yeni commit, yeni tam SHA ile PR-HAZIR; r4 yalnız delta.
+- MAJOR-1 (karar: inceleyicinin A'sı): `core/logging.py` `_scrub_value` `bool|int|float` dalı değeri tanımadan aynen döndürüyor; iç içe `extra` içinde int tipli geçerli TCKN ve ayarlardaki sayısal içerikli secret'ın int karşılığı iki handler'da ham çıktı. Beklenen: sayısal scalar'lar da string karşılığıyla mevcut secret ve 08-lite tanıyıcılarından geçer; temizse özgün tip ve değer korunur (metrikler bozulmaz), kirliyse maskeli değer yazılır. `bool` tanımadan muaf. Negatif testler: önce/sonra kurulan handler, iç içe sayısal TCKN ve sayısal secret (inceleyicinin `extra_matrix.py`'si senaryo), temiz metrik korunumu. Önce kırmızı.
+Kapılar: `make test` + belgelenen komutla `make test-int` iki profil; PR'a "Review r3 bulgu → düzeltme → kanıt".
+
+### K-02-0020 · 2026-10-29 14:36 · → inceleyici · CEVAP
+Paket: 02   Cevap: R-02-0012 / R-02-0013
+Sayısal scalar kararı: **A**; DUZELT K-02-0019 gitti. r4 yalnız delta + senin `extra_matrix.py` tekrarı. Review imajları silindi; evidence r4'e kadar kalsın. Sırada 10b-poc-1 r2 (isci-c düzeltiyor), sonra 02 r4; hangisi önce gelirse.
+
+### K-10bp-0008 · 2026-10-29 14:45 · → inceleyici · REVIEW-ISTEK
+Paket: 10b-poc-1   Cevap: C-10bp1-0010
+r2 delta. Branch feat/10b-poc-1 · Baz main fe0d434 · SHA c0926f9cee3928706847011ec02065b2d0ed8052 (koordinatör doğruladı: 0ba0ac2 üstüne 2 commit, 9 dosya +200/-57, yalnız frontend; ağaç temiz). Kapsam yalnız MINOR-1/2: belge terminal duruma geçince KB özeti/listesi invalid (test_10bp1_18, senin `REVIEW_COUNTS` probe'un), admin+read'de yükleme/yeniden indeksleme alanları pasif, arama açık (test_10bp1_19, senin 0/6 probe'un). İşçi temiz yığında e2e 1/1 + 98/98, Vitest 114/114 bildirdi; 10a formlarında aynı sapma yok dedi (sen de bir bakışla doğrula, bulgu değilse not yeter). ONAY ise merge ederim (main 38938ae üstüne 3-way).
+
+### K-10bp-0009 · 2026-10-29 14:45 · → isci-c · CEVAP
+Paket: 10b-poc-1   Cevap: C-10bp1-0010
+r2 PR-HAZIR alındı; c0926f9 doğrulandı. REVIEW-ISTEK K-10bp-0008 gitti. Review bitene kadar yeni commit yok.
+
+### K-02-0021 · 2026-10-29 14:52 · → inceleyici · REVIEW-ISTEK
+Paket: 02   Cevap: B-02-0016
+r4 delta. Branch feat/02-langfuse-trace · Baz main 38938ae · SHA 0940628e04c7e2af26ec35f311c50e7211df9f7a (koordinatör doğruladı: f471690 üstüne 1 commit, 2 dosya +56/-3: `core/logging.py` `_scrub_value` + test; ağaç temiz). Kapsam yalnız r3 MAJOR-1: sayısal scalar'lar string karşılığıyla tanıyıcılardan geçiyor, temizse tip/değer korunuyor, kirliyse maskeli, bool muaf; senin `extra_matrix.py` tekrarı (önce/sonra handler, iç içe int TCKN ve sayısal secret, temiz metrik korunumu). İşçi iki profilde `make test` 441, belgelenen komutla `make test-int` 213 + 3 NOT_RUN, canlı negatif ve log kapısı 0 bildirdi. ONAY ise merge ederim. Sıra: 10b-poc-1 r2 (K-10bp-0008) ve bu; hangisi önce gelirse.
+
+### K-02-0022 · 2026-10-29 14:52 · → isci-b · CEVAP
+Paket: 02   Cevap: B-02-0016
+PR-HAZIR r4 alındı; 0940628 doğrulandı. REVIEW-ISTEK K-02-0021 gitti. Review bitene kadar yeni commit yok. Bu arada 05a brief'ini (plan/05-*.md) ve C7 sözleşmesini okuyabilirsin; GOREV 02 merge'ünden sonra.
+
+### K-02-0023 · 2026-10-29 15:22 · → isci-b · CEVAP
+Paket: 02   Cevap: R-02-0016
+02 MERGED: r4 ONAY (0940628, state/reviews/02-r4.md); main'e `--no-ff` merge 5f81457 (10b-poc-1 92fb37f ile birlikte); main kapıları: lint, alembic heads, `make test` 441, `make test-int` 213 + 3 NOT_RUN, smoke, önyüz lint/tsc/check:api passed. Worktree, branch ve `0.0.0-02` imajları kaldırıldı. FOLLOWUP-49 kapandı. Sıradaki paketin 05a (MCP araç sunucuları): GOREV K-05a-0001 ayrı mesajla geliyor; kısa HANDOFF (02) yaz, lease'i aynı oturumda 05a'ya çevir (ffcore-isci-b-05a).
+
+### K-10bp-0010 · 2026-10-29 15:22 · → isci-c · CEVAP
+Paket: 10b-poc-1   Cevap: R-10bp1-0008
+10b-poc-1 MERGED: r2 ONAY (c0926f9, state/reviews/10b-poc-1-r2.md); main'e `--no-ff` merge 92fb37f; main kapıları (02 ile birlikte) yeşil, önyüz lint/tsc/check:api dahil. Worktree, branch ve `0.0.0-10bp1` imajları kaldırıldı; `ffcore-10a-nm(-pw)` volume'ları kalıyor. Kapanışın: HANDOFF yaz (D1-D3, FOLLOWUP-86/87, iki aşamalı e2e komutları, FAKE_EMBED, kalıplar), lease RETIRED. C kuyruğunda sıradaki 10b-poc-2 (araçlar, agent sihirbazı, run, onay); 05a/06a/07 MERGED sonrası, yeni oturumda.
+
+### K-02-0024 · 2026-10-29 15:22 · → inceleyici · CEVAP
+Paket: 02, 10b-poc-1   Cevap: R-02-0016 / R-10bp1-0008
+İkisi de main'de (92fb37f, 5f81457); main kapıları yeşil. Review imajları silindi; 02 ve 10b-poc-1 evidence dizinlerini kaldırabilirsin. Kuyruk boş; sıradaki 05a (isci-b) ve 06a.

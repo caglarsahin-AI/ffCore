@@ -3,9 +3,9 @@
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
 - Oturum kimliği: ffcore-inceleyici-20261028-0203
-- Aktif paket: - (main-test-gates-r2 teslim edildi; yeni SHA bekleniyor)
+- Aktif paket: - (10b r2 ve 02 r4 teslim edildi; yeni istek bekleniyor)
 - Durum: WAITING
-- Son okunan: koordinator K-04a-0037; sonuç R-gates-0007 (2026-10-29 13:34)
+- Son okunan: koordinator K-10bp-0008 / K-02-0021; sonuç R-10bp1-0008 / R-02-0016 (2026-10-29 15:03)
 
 ## Mesajlar
 
@@ -680,3 +680,89 @@ Bayraksız gerçekpytest iki profilde gerekçeli NOT_RUN:needsRUN_DNS_TESTS=1; b
 YalnızMAJORdelta incelendi. YeniSHA için tam387unit/206int+3NOT_RUN bağımsız tekrar edilmedi; önceki tam385/207+2 sonuçları öncekiSHA'ya ait, raporda sınır açık. Yedi başlıklı güvenlik turu var; DB/Compose/model/PayCore/sunucu açılmadı.
 Yürütme notu: önceki review-gates imajetiketi temizlenmiş. İlk komutta --pull=never eksikti; Docker otomatik registry erişimi denedi,pullaccessdenied,testbaşlamadı/imajinmedi. Reviewer komut hatası; kullanıcıya açıklandı, dışerişimdenemesi0 diye yazılmadı. Sonraki başarılı çağrılar yalnız mevcut yerel fixgates45181f3a7331 imajında --pull=never,--networknone,--rm,kaynakro. Yeniindirme yok.
 HEADsabit/ağaçtemiz doğrulandı,worktreeremoveexit0/hedefyok,--forceyok. Yığın/volume oluşturulmadı;başkastack/cache/ana checkout'a dokunulmadı. R1/r2evidence kapanışa kadar kaldı. Ürünkodu/commit/push yok. Yeni tam SHA'lı istek bekleniyor; eski ID'ler tekrarlanmadı.
+
+### R-10bp1-0001 · 2026-10-29 14:02 · → koordinator · ACK
+Paket: 10b-poc-1   Cevap: K-10bp-0004 / K-04a-0040
+Tam SHA 0ba0ac2e2b546d65990f4bd5ff63c6a259ac2f7d yerel commit nesnesi olarak doğrulandı; r1 alındı. Ayrı detached review-10bp1-r1 worktree'sinde yalnız bu SHA incelenecek. Güvenlik/ACL/proje sınırı, yükleme/arama, tipler ve tek-worker iki aşamalı e2e doğrulanacak; 02 r3 gelirse öncelik ona. --pull=never tüm Docker run/up koşullarına eklendi. ffcore-10a-nm(-pw) ve işçi modelcache değiştirilmeyecek; cache/bağımlılık için yalnız kendi izole volume'u, dış ağ yok. main-test-gates kapanış talimatı alındı; önce evidence temizliği yapılacak.
+
+### R-gates-0008 · 2026-10-29 14:02 · → koordinator · DURUM
+Paket: main-test-gates   Cevap: K-04a-0040
+Kapanış alındı; onaylı4418a3f main atası saltokunur doğrulandı. İzin verdiğiniz r1/r2evidence dizinleri mutlak.worktrees sınırı/reparsepoint kontrolü sonrası kaldırıldı (4+2dosya), bulunmadıkları doğrulandı; raporlara kapanış eki yazıldı. --pull=never tüm run/up komutlarında koşul; korunan npm/modelcache ve02evidence değişmedi. K-10bp-0004 ACKR-10bp1-0001; bağımsızr1 sürüyor.
+
+### R-10bp1-0002 · 2026-10-29 14:11 · → koordinator · DURUM
+Paket: 10b-poc-1   Cevap: K-10bp-0004
+Lint/typecheck/check:api passed; Vitest113/113passed23dosya8,26sn. İki spec tek kaynaktan tip üretimi güncel. Bayat pwvolume kopyalanmadı; güncel normalnm saltokunur seed'den ownnmvolume'a kopyalandı, 31doğrudanbağımlılık package+lock sürümleriyle eşit doğrulandı; dış npmci/indirme yok. Kaynak gitarchiveexactSHA ownDockerworkvolume'unda; build/PNG/bağımsızproblar worktree'yi değiştirmiyor.
+Aşama1 gerçekPlaywright1/1passed43,1sn: boşcache/FAKE0 model_missing ve çözüm açık. Aşama2offline1/fake1 renderdoğrulandı; ownbackend/workerinternal ağda, tekworker95ürün+4bağımsızprobe başlıyor. /readyz sunucu rol kontrolü source'ta mevcut; countyenilenmesi/readformalanları/projedeğişimi/kimliksizRSC negatiflerini bağımsız ölçüyorum. Reranktruncated/elenenliste uçsuz maddeler FOLLOWUP86, yeniden açılmadı. 02r3 henüz yok.
+Harnessnotları: read-onlyparent içine eksiknode_modules mount edilemedi, kaynakdokunmadan ownarchivevolume'la çözüldü. Compose2.23 run --pull desteklemiyor, komut başlamadan reddetti; override pull_policy:never renderdoğrulandı, up --pullnever/runpullpolicynever. Hatalar test geçti sayılmadı; registrydenemesi yok.
+
+### R-10bp1-0003 · 2026-10-29 14:12 · → koordinator · DURUM
+Paket: 10b-poc-1   Cevap: K-10bp-0004
+Bağımsız gerçekPlaywright: uploadsonrasıbackendKBchunk_count15,belgesatırıindexed/15,KBözetUIchunk_count0 (REVIEW_COUNTS api15/ui0). useDocuments yalnızbelgelistesinipolluyor,useDocumentMutation KBözetini202anında invalid ediyor; workerbitimindeözet yenilenmiyor. Diğerprobe: admin+read sayfasında upload/reindex input/select6alan enabled; WriteGate yalnız işlem düğmelerinde. Brief "formlar okunur,düzenlenemez" karşılanmıyor. İkisi için mevcut pozisyonum MINOR: belge/indexleme/arama ve APIwritekoruması çalışıyor, sayaç yenilenmesi ve readform etkileşimi eksik; açıkbulgu olarak raporlanacak, kapanmışsayılmayacak.
+Bağımsızgüvenliknegatifleri passed: girişsiz+analyst RSC/systemstatusgövdesindeFAKE_EMBED/modelyolu0; adminA→B projegeçişindeAKBgizli/QueryError404. Aşama1 model_missing1passed43,1sn; aşama2 95ürün+4probe99testtekworker sürüyor (ikiownprobe yukarıdakikırmızılar). 87backendPython exactSHAhasheşit,modelcache0dosya. 02r3 hâlâbekleniyor.
+
+### R-10bp1-0004 · 2026-10-29 14:19 · → koordinator · REVIEW-SONUC
+Paket: 10b-poc-1   Cevap: K-10bp-0004
+İncelenen tam SHA: 0ba0ac2e2b546d65990f4bd5ff63c6a259ac2f7d; baz fe0d434. Karar ONAY; BLOCKER0,MAJOR0,MINOR2. Rapor state/reviews/10b-poc-1-r1.md. İki MINOR açık; takip/merge kararı sizde, kapanmış sayılmadı.
+MINOR1: workerupload bitincebelgesatırıindexed/15olsa da KBözetichunk_count0kalıyor; aynıanda gerçekAPI15. Belgelistesipolluyor ama terminalgeçişteKBözet/listesi invalid edilmiyor. Kaynak knowledge-queries.ts70-87/detailpage104-119. Negatif: sayfayenilemedenözet/API eşitliği; bağımsızPlaywrightkırmızı15/0.
+MINOR2: admin+read upload/reindex6input-selectenabled; WriteGateyalnızişlemdüğmelerinde. Brief10:20alanlarokunur/düzenlenemezdiyor; dosya/ACL/katman/full alanlarıdafieldset/useAccessilepasifolmalı,aramaokumaolarakaçıkkalmalı. Düğmelerpasif/API403geçerli;yetkiaşımı/verikaybı yok,bu yüzdenMINOR. Bağımsızprobe beklenen0/gerçek6kırmızı.
+Önyüzlint/typecheck/check:api passed; Vitest113passed23dosya8,26sn. GerçektekworkerPlaywright aşama1model_missing1passed43,1sn; aşama2ürün95/95passed (19yeni10bp1+76öncekiakış). Dörtownprobe: readinessRSCkimliksiz+analyst sızıntı0 ve projeA→B eskiKB404QueryError passed; ikiyukarıdakiMINORnegatifikırmızı. Birleşik99test97passed/2failed,exit1,5,0dk;99green değil. Sekizyeni tema/axe testi0ihlâl;10PNG üretildi. Türkçesorgu/dosyaadı,skorlar/eşik/elenensayısı,ACLbelge404,readonlyAPI403,ret/model_missing/yenidenüretme testlerigeçti. UçsuzFOLLOWUP86maddeleri yenidenaçılmadı.
+87backendPythonexactSHAhasheşit;31doğrudanbağımlılıkpackage+lockeşit;bayatpwseedkopyalanmadı,güncelnormalnmRO→ownvolume. ExactSHAgitarchiveDockerworkvolume;build/PNG/problarkaynakworktree'yideğiştirmedi. Bazstatediffboş/diffchecktemiz. Composefakevarsayılan0iki profilbackend/worker/toolsdoğrulandı. Offline1/fake0→1renderbaşlangıçtanönce/internal ağ. --pullnever/pullpolicynever,model/npmindirmesi yok.
+Yedibaşlıklıgüvenlikturu/NOT_RUNraporda. Own3servis161527baytlog/10sentetiksecret0. Modelcachebaşlangıç0;sonda4küçükONNXRuntimeyerelmetadata82252bayt/ağırlıkyok,içerikokunmadı. Fullbackend/model/Lighthouse/tamLangfusesmoke/gerçekwarming/516MBbrowser413/ikincie2eprofiliNOT_RUNgerekçeli;geçtisayılmadı.
+Ownstackdown-vexit0;ownexternalwork/nmvolume'larıdasilindi;sonowncontainer/volumefiltreleriboş. Sessioniçerebilenfailuretraceownvolumeiletêmizlendi,evidence'akopyalanmadı. Korunannm/nmpw/işçimodelcacheyerinde. HEADsabit/ağaçtemiz,worktreeremoveexit0/hedefyok,--forceyok. Güvenliprobe/result/10PNGevidencekapanışakadar;reviewbackend/toolsimajlarıtemizlenebilir. Ana checkout/switch/ürünkodu/commit/push/dışsistem yok. Yeni02r3isteği henüzyok;tamSHA'lıyeniistekbekleniyor.
+
+### R-02-0011 · 2026-10-29 14:20 · → koordinator · ACK
+Paket: 02   Cevap: K-02-0017
+Tam SHA f4716909429872f7c457a6bc2e3ab1bd3c336cc9 yerel commit nesnesi olarak doğrulandı; r3 PR bölümü okundu. R3 delta alındı, ayrı detached review-02-r3 içinde yalnız bu SHA incelenecek. Önceki structured probe; önce/sonra handler, nested extra ve hata yolları bağımsız tekrarlanacak. Qdrant fixture ve DRIFT85 rebase birleşimi denetlenecek. 10b r1 R-10bp1-0004 ile teslim/cleanup tamam; onun SHA'sı değişmedi. --pull=never/pull_policy never, dış ağ/model indirme yok.
+
+### R-02-0012 · 2026-10-29 14:24 · → koordinator · DURUM
+Paket: 02   Cevap: K-02-0017
+R3 string/nested extra düzeltmesi önce/sonra standard structured handler'da geçti: secret/email/TCKN0, msg/args korundu. Aynı normal logger.warning(extra=...) için yeni doğrulanmış residual: _scrub_value bool|int|float dalı değerleri tanımadan aynen döndürüyor. İç içe extra'da int(TCKN) ve Settings'teki sayısal içerikli sentetik OBO SecretStr'ın int karşılığı iki handler'da ham çıktı; yalnız bool ölçümü basıldı: tc_leaked=true,configured_numeric_secret_leaked=true. Ordinary metric12 korundu. Source logging.py _scrub_value; probe review-02-r3-evidence/extra_matrix.py.
+Pozisyonum kapsam içi MAJOR: K-02-0014 merkezi sınır standart dışı tüm alanların secret/PII maskesini istiyor; structured payload sayısal kimlik taşıyabilir, tip değişikliği güvenlik istisnası olmamalı. A (önerim): sayısal scalar'ı da mevcut secret/08-lite tanımadan geçir, temizse özgün sayı tipi/metrik kalsın, dirty ise maskeli değer; B: yalnız string extra maskesi diye kapsam daraltma (mevcut kararla çelişir); C: bu açıkça çözülene kadar merge'i beklet. Bulguyu rapora alarak diğer deltayı incelemeye devam ediyorum.
+Lint210passed; tam439unit llmaas başladı. Qdrant ACL fixture yalnız ortam listesini koruyup qdrant ekliyor; ürün host kontrolü değişmedi. Rebase DRIFT85 dns opt-in işareti/FLAGS ve 02 birlikte, lock değişimi yok. İlk iki harness denemesi PYTHONPATH/minimum sentetik OBO uzunluğu nedeniyle testten önce durdu; ayarlar düzeltildi, ürün bulgusu değil. --pullnever/networknone; dış sistem yok.
+
+### R-10bp1-0005 · 2026-10-29 14:25 · → koordinator · DURUM
+Paket: 10b-poc-1   Cevap: K-10bp-0007
+Alındı. İki MINOR'un merge öncesi düzeltileceği ve r2'nin yalnız delta+10bp1 e2e/iki bağımsız probe tekrarı olacağı kaydedildi; yeni tam SHA bekleniyor. Evidence/10PNG korundu, yeni10btest/stack açılmadı. 02r3 R-02-0011 ACK ile sürüyor; yeni sayısalextra negatif R-02-0012'de bildirildi.
+
+### R-02-0013 · 2026-10-29 14:28 · → koordinator · REVIEW-SONUC
+Paket: 02   Cevap: K-02-0017
+İncelenen tam SHA: f4716909429872f7c457a6bc2e3ab1bd3c336cc9; baz 38938ae. Karar DUZELT; BLOCKER 0, MAJOR 1, MINOR 0. Rapor state/reviews/02-r3.md. Merge-ready değil.
+MAJOR-1: logging.py:164-170 _scrub_value sayısal scalar'ları secret/PII tanımadan aynen döndürüyor. İç içe normal extra payload'unda int tipindeki geçerli sentetik TCKN ve Settings'e kayıtlı sayısal içerikli OBO SecretStr'ın int karşılığı, önce ve sonra kurulan iki handler'da ham yazıldı. İki profil bağımsız probe sonucu tc_leaked=true, configured_numeric_secret_leaked=true; ham değerler basılmadı. Ordinary metric12 değişmedi. K-02-0014 merkezi tüm alanlar sınırının tip bağımlı kalan açığı; R-02-0012 ile bildirildi. Beklenen: sayısal kimlik/secret da mevcut secret/08-lite tanımından geçsin; temiz metrik sayıları korunsun. Önce/sonra handler ve nested numeric negatifleri gerekli.
+String düzeltmesi geçti: eski structured_probe.py aynen tekrarlandı, secret/email sızıntısı0 ve mesaj korundu. Ek nested string matrisinde iki handler/iki profil secret/email/TCKN0. Yeni hata yolu unit testi de raw bırakmadan geçti. Logger subclass/factory override ile oluşturulmuş yapay bir bypass değil; normal logger.warning(extra=...) API'si kullanıldı.
+Lint210 passed; tam439 unit/contract iki profil geçti: llmaas87,84sn, airgap83,34sn. Bu testler yeni numeric negatifi kapsamıyor. Gerçek SDK/loopback süreç/deadline testleri439 içinde geçti. R3 delta dar tutuldu; tam213int+3NOT_RUN, canlı PII/log kapısı ve full smoke bağımsız tekrar edilmedi, işçi sonuçları bağımsız geçti sayılmadı.
+Qdrant fixture yalnız mevcut allowed_internal_hosts listesini koruyup qdrant ekliyor. Ağsız gerçek fixture helper+langfuse_config probu: eski host'lar korundu, qdrant eklendi, aktif config kabul edildi; liste yalnızqdrant yapılınca ürün hâlâ TracingConfigError ile reddetti. Ürün kontrolü gevşemedi. Bu gerçek DB/Qdrant8 test koşusu değil; o NOT_RUN sınırı raporda açık.
+Range-diff önceki8 patch eşit; yalnız extra düzeltmesi ve fixture patch'i yeni. DRIFT85 dns opt-in/FLAGS birleşimi korunmuş, lock/main/cli/Makefile/tracing önceki review'a göre aynı. Baz state diff boş, diffcheck/atasallık temiz. Ayrı yedi başlıklı güvenlik turu, komutlar ve tüm sınırlar raporda.
+Tüm çağrılar --pull=never/--network none/--rm, kaynak ro; yeni yığın/volume/cache yok. HEAD sabit/ağaç temiz doğrulandı, worktree remove exit0/hedef yok, force yok. R1/r2/r3 evidence kapanışa kadar korundu. Ana checkout/switch/ürün kodu/commit/push/dış sistem bağlantısı yok. Yeni tam SHA'lı inceleme isteği bekleniyor; eski ID'ler tekrar uygulanmadı.
+
+### R-02-0014 · 2026-10-29 14:42 · → koordinator · DURUM
+Paket: 02   Cevap: K-02-0020
+A kararı alındı: sayısal scalar da mevcut secret/08-lite sınırından geçecek, temiz metrikler korunacak. R4 yalnız delta ve bağımsız extra_matrix.py tekrarı olarak ele alınacak. R1/r2/r3 evidence korunuyor; yeni test/yığın açılmadı. Review imajlarının silindiği not edildi; sonraki çağrıda yerel imaj varlığı ve pull engeli yeniden doğrulanacak. 10b-poc-1 r2 veya02 r4 için yeni tam SHA'lı REVIEW-ISTEK bekleniyor; önceki ID'ler tekrar uygulanmadı.
+
+### R-10bp1-0006 · 2026-10-29 14:52 · → koordinator · ACK
+Paket: 10b-poc-1   Cevap: K-10bp-0008
+Tam SHA c0926f9cee3928706847011ec02065b2d0ed8052 yerel commit nesnesi olarak doğrulandı. Önce gelen r2 delta alındı; ayrı detached review-10bp1-r2 worktree'sinde yalnız bu SHA incelenecek. İki eski probe ve 10bp1 e2e tekrarı, sayaç invalidasyonu/read-only alanlar ve 10a formlarına kısa bakış kapsamı korunacak. Dış ağ/model indirme yok; korunan cache'ler değiştirilmeyecek.
+
+### R-02-0015 · 2026-10-29 14:52 · → koordinator · ACK
+Paket: 02   Cevap: K-02-0021
+Tam SHA 0940628e04c7e2af26ec35f311c50e7211df9f7a yerel commit nesnesi olarak doğrulandı. R4 yalnız sayısal scalar delta+extra_matrix.py tekrarı olarak alındı; 10b r2 tesliminden sonra kendi detached review-02-r4 worktree'sinde incelenecek. Bool/temiz sayılar tip/değer koruyacak; int/nested kimlik ve sayısal secret negatifleri tekrarlanacak. Eski ID'ler tekrar uygulanmadı.
+
+### R-10bp1-0007 · 2026-10-29 14:56 · → koordinator · DURUM
+Paket: 10b-poc-1   Cevap: K-10bp-0008
+R2 delta9dosya okundu; eski sayaç poll'u yeni timer eklemeden terminal geçişte KB one/list exact query'lerini invalid ediyor. Read-only fieldset/useAccess(projectId) ve drop guard eklenmiş. Backend/şema/dependency değişmedi;87backendPythonhash exactSHA eşit,31doğrudan bağımlılık lock/package eşit. Bazstate diffboş/diffcheck temiz.
+Lint/typecheck/check:api passed; Vitest114/114passed23dosya5,77sn. Korunan normalnm yalnız ro seed; bayatpw kullanılmadı. Own internal/offline1/fake1 render başlangıçtan önce doğrulandı. Tüm10bp1(fake1)+eski4bağımsızprobe+10afread-only2test tekworker başladı; model_missing aşama1 unchanged olduğundan bu delta turunda tekrar koşulmuyor. 10a kısa source kontrolünde normal read girişte form opener'ları WriteGate ile kapalı; aynı gap saptanmadı, iki eski tarayıcı testi ayrıca seçildi. 02r4 ACKR-02-0015 sırada.
+
+### R-10bp1-0008 · 2026-10-29 14:59 · → koordinator · REVIEW-SONUC
+Paket: 10b-poc-1   Cevap: K-10bp-0008
+İncelenen tam SHA c0926f9cee3928706847011ec02065b2d0ed8052; baz fe0d434/delta0ba0ac2. Karar ONAY; BLOCKER0, MAJOR0, MINOR0. R1 iki MINOR kapandı. Rapor state/reviews/10b-poc-1-r2.md.
+Eski bağımsız review-probes.spec.ts değiştirilmeden tekrarlandı: REVIEW_COUNTS API15/UI15, READ_ONLY_ENABLED_FIELDS0. Terminal geçişi KB one/list exact invalidasyonu yapıyor, ek timer yok. useAccess(projectId)/disabled fieldset ve drop pick guard read alanlarını kapatıyor, WriteGate ve arama açıklığı korunmuş. Yeni ürün test_10bp1_18 liste/özet/API eşitliğini, test_10bp1_19 read0/edithepsi etkin ve arama açık durumunu geçti.
+Lint/typecheck/check:api passed; Vitest114passed23dosya5,77sn. Gerçek tek-worker Playwright28passed2,1dk: tüm fake1 10bp1 ürün22 + eski4bağımsızprobe + eski10aform2test. RSC kimliksiz/analyst bilgi0 ve projeA→B KB404 negatifleri geçti. 10a normal read girişinde formlar açılmıyor, aynı erişim yolunda sapma saptanmadı; mevcut iki test passed. Fake0model_missing aşaması/98tamürüne2e bu delta turunda NOT_RUN, r1'in kanıtı yeniSHA'ya mal edilmedi.
+Dokuz dosya yalnız frontend delta; backend/Compose/şema/dependency değişmedi.87backendPython exactSHAhash eşit;31doğrudan paket lock/package eşit. Bazstate diff boş/diffcheck temiz. ExactSHAarchive ownDockerworkvolume; korunan normalnm ro seed, pw kopyalanmadı. Internal ağ/offline1/fake1/pullnever render başlangıçtan önce doğrulandı, dış npm/model indirme yok. Own3servis79892baytlog/10sentetiksecret0. Yedi başlıklı güvenlik turu ve tüm NOT_RUN raporda.
+Ownstackdown-vexit0; own externalwork/nm de kaldırıldı, sonowncontainer/volumefiltreleri boş. HEADsabit/ağaçtemiz,worktreeremoveexit0/hedefyok,forceyok. R1/r2helper/result/10PNGevidence kapanışa kadar; reviewimajları temizlenebilir. Ana checkout/switch/ürünedit/commit/push yok. Şimdi önceden ACK verilen K-02-0021 r4 deltasına geçiyorum.
+
+### R-02-0016 · 2026-10-29 15:03 · → koordinator · REVIEW-SONUC
+Paket: 02   Cevap: K-02-0021
+İncelenen tam SHA 0940628e04c7e2af26ec35f311c50e7211df9f7a; baz38938ae/deltaf471690. Karar ONAY; BLOCKER0, MAJOR0, MINOR0. R3 MAJOR-1 kapandı. Rapor state/reviews/02-r4.md.
+R3 extra_matrix.py değiştirilmeden iki profilde tekrarlandı. Önce/sonra kurulan stdlib structured handler'larda nested int TCKN ve kayıtlı sayısal OBO secret'ın int karşılığı artık ham değil: tc_leaked=false, configured_numeric_secret_leaked=false; ordinary_metric12 korunmuş. String secret/email/TCKN0 ve msg/args korundu. Ham değerler çıktılarına basılmadı. Ürün testleri int/float/bool temiz tip/değer korunumu ve üst düzey/nested numeric maskeyi ayrıca doğruladı.
+Lint210 passed. Tüm ilgili logging25test iki profil geçti: llmaas1,21sn/airgap1,26sn. Yeni iki dosyalık delta yalnız _scrub_value ve mevcut test dosyası; temiz sayıyı özgün tipte koruyor, kirliyi mevcut scrub sonucu metne çeviriyor, bool/None ayrı. Yeni tanıyıcı/ayar yok. Baz state diff boş/diffcheck/r3 atasallığı geçti; lock/main/cli/tracing/fixture/Compose değişmedi.
+Yalnız delta incelendi: tam441unit/213int+3NOT_RUN, canlı query/log kapısı ve full smoke bu tur bağımsız tekrar edilmedi; işçi sonuçları bağımsız geçti sayılmadı. Dar değişiklik eski gerçek kırmızı probe ve iki profil logging setiyle doğrudan doğrulandı. Ayrı yedi başlıklı güvenlik turu ve NOT_RUN sınırları raporda.
+Tüm Docker çağrıları --pull=never/--network none/--rm, kaynak ro; yığın/volume oluşturulmadı, başka cache/yığın değişmedi. HEADsabit/ağaçtemiz doğrulandı, worktree remove exit0/hedefyok, force yok. R1-r4 evidence kapanışa kadar korundu. Ana checkout/switch/ürünedit/commit/push yok. 10b-poc-1 r2 de R-10bp1-0008 ile ONAY teslim edildi; yeni tam SHA'lı istek veya kapanış talimatı bekleniyor.

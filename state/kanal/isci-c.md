@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-c-10bp1
 - Aktif paket: 10b-poc-1 (GOREV K-10bp-0001)
 - Durum: ACTIVE
-- Son okunan: koordinator K-10bp-0003 (2026-10-29 12:56); bana adresli son mesaj K-10bp-0003; son yazılan C-10bp1-0006
+- Son okunan: koordinator K-10bp-0009; bana adresli son mesaj K-10bp-0009; son yazılan C-10bp1-0010
 
 ## Mesajlar
 
@@ -363,3 +363,46 @@ Ek not, doğrulanmadı: Git Bash'ten curl ile Türkçe karakterli JSON gövdesi 
 ### C-10bp1-0006 · 2026-10-29 13:44 · → koordinator · ACK
 Paket: 10b-poc-1   Cevap: K-10bp-0003
 Alındı; FOLLOWUP-87 not edildi. Türkçe sorgu tarayıcı e2e'sinde (`test_10bp1_5`, "Cihaz bakım sözleşmesinin süresi nedir?") 200 ile sonuç döndü; 400 tarayıcıda yok, curl kabuk kodlamasıymış. Türkçe dosya adı `test_10bp1_2`'ye eklendi (`e2e-bakım-sözleşmesi-ÇĞİÖŞÜ-çğıöşü.pdf` → created, indexed; commit 0ba0ac2). Temiz yığında iki aşamalı kanıt koşusu son HEAD'de sürüyor; sonra PR-HAZIR.
+
+### C-10bp1-0007 · 2026-10-29 13:59 · → koordinator · DURUM
+Paket: 10b-poc-1   Cevap: -
+Gecikmeli kayıt: 13:5x'te yazdığım bu mesaj ve 0008 kabuk hatası yüzünden dosyaya düşmemiş. Zil ve state/pr/10b-poc-1.md ile ulaştı, K-10bp-0005 cevapladı. İçerik aynı.
+DURUM: VERIFIED. HEAD 0ba0ac2e2b546d65990f4bd5ff63c6a259ac2f7d; ağaç temiz, yığın `down -v`. C-10bp1-0006'daki Türkçe dosya adı sonucu bu koşuda doğrulandı.
+- Önyüz: lint 0, typecheck 0, Vitest 113/113 (23 dosya), check:api iki spec güncel.
+- Compose: `compose config` 0; tools'ta `test_00_repo_skeleton` 11/11.
+- e2e temiz yığında iki aşama: ağırlıksız `@model-missing` 1/1; `FAKE_EMBED=1` 95/95 (19'u 10bp1, 10a/10ab/10af testleri aynı yığında yeşil).
+NOT_RUN ve gerekçeleri state/pr/10b-poc-1.md'de: backend `make test` tamamı (backend kodu değişmedi; DRIFT-85), DOCX/MD başarılı dönüşüm (ağırlık gerekir), Lighthouse (FOLLOWUP-37), e2e'de 413 (sınır 516 MB; birim testinde var).
+
+### C-10bp1-0008 · 2026-10-29 13:59 · → koordinator · PR-HAZIR
+Paket: 10b-poc-1   Cevap: K-10bp-0001
+Gecikmeli kayıt (0007'deki not geçerli; K-10bp-0005 bunu cevapladı).
+PR: state/pr/10b-poc-1.md · Branch feat/10b-poc-1 · Baz fe0d434 · SHA 0ba0ac2e2b546d65990f4bd5ff63c6a259ac2f7d (8 commit, 53 dosya). Sınıf [A].
+Paylaşılan değişiklik: `deploy/docker-compose.yml` `&app-env`'e `FAKE_EMBED: ${FAKE_EMBED:-0}` (D2).
+Kapsam dışı dokunuşlar (gerekçe PR'da):
+- `components/ui/tabs.tsx`: açık temada kontrast için pasif sekme `/60` → `/80`.
+- `app/(console)/models/page.tsx`: `DisabledWithReason` ortak bileşene taşındı; davranış aynı.
+İnceleyici için:
+- Sistem durumu: girişli sunucu bileşeni, rol sunucuda denetleniyor (D1).
+- Rerank açıkken `min_score` gönderilmiyor.
+- Belge listesi yalnız işlenen belge varken yenileniyor (`documentsRefetchInterval`).
+- Süreç sapmaları açık yazıldı.
+Gözlem (değişmedi): bilinmeyen konsol yolları HTML not-found gövdesiyle 200 dönüyor (10a'dan beri).
+K-10bp-0005 alındı: review bitene kadar commit yok, `0.0.0-10bp1` imajları duruyor, yığın kapalı (konteyner 0).
+
+### C-10bp1-0009 · 2026-10-29 14:23 · → koordinator · ACK
+Paket: 10b-poc-1   Cevap: K-10bp-0006
+DUZELT alındı (bir kez uygulanır).
+- MINOR-1: belge terminal duruma geçince KB özeti ve KB listesi yenilenir. Bu, polling'in gördüğü geçişte invalidation ile yapılır; ek poll yok.
+- MINOR-2: admin+read'de yükleme ve yeniden üretme alanları `fieldset disabled` (useAccess projectId) ile pasif olur; "Aramayı dene" açık kalır.
+Sıra: önce inceleyici probe'larından türetilen iki kırmızı Playwright testi (`test_10bp1_18`, `test_10bp1_19`), sonra düzeltme, kapılar ve iki aşamalı e2e, en son yeni SHA ile PR-HAZIR. 10a formlarındaki deseni de kontrol edip PR'a not düşeceğim.
+
+### C-10bp1-0010 · 2026-10-29 14:43 · → koordinator · PR-HAZIR
+Paket: 10b-poc-1   Cevap: K-10bp-0006
+r1 düzeltmesi hazır.
+- PR: state/pr/10b-poc-1.md ("Review r1 bulgu → düzeltme → kanıt" bölümü).
+- Branch feat/10b-poc-1 · Baz fe0d434 · SHA c0926f9cee3928706847011ec02065b2d0ed8052 (10 commit, 55 dosya; r1 deltası 0ba0ac2..c0926f9: 2 commit). Sınıf [A].
+- Kırmızı → yeşil:
+  - MINOR-1, `test_10bp1_18`: "15" beklendi, "0" geldi. Düzeltme: terminal geçişte KB ayrıntısı ve listesi invalid edilir (`documentsFinished`, birimli).
+  - MINOR-2, `test_10bp1_19`: 0 etkin alan beklendi, 6 vardı. Düzeltme: alanlar `fieldset disabled={!canWrite}` içinde; edit modda etkin, arama açık.
+- Kapılar: lint 0, typecheck 0, Vitest 114/114. Temiz yığında e2e 1/1 + 98/98 (22'si 10bp1). Yığın `down -v`, imajlar duruyor.
+- 10a formları: sapma yok. Formlar yalnız WriteGate'li düğmelerle açılıyor; üye seçimleri WriteGate'li.

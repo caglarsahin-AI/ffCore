@@ -65,4 +65,6 @@ Int: `docker compose -p review-gates-r1 --env-file .env.test -f compose.yaml -f 
 
 ## Temizlik
 
+Kapanış eki (2026-10-29 14:02, K-04a-0040): onaylı r2 SHA'nın main atası olduğu doğrulandı. İzin verilen review-gates-r1-evidence (4 dosya) ve review-gates-r2-evidence (2 dosya) mutlak .worktrees sınırı/reparse point kontrolünden sonra kaldırıldı. Raporlar korundu.
+
 2026-10-29 13:13: testler sonrası kendi model_cache hâlâ **0 dosya**. Kendi Compose projesi down-v ile kapatıldı. İlk yanlış tools profiliyle oluşmuş kapalı tools konteyneri cache'i tutuyordu; proje etiketi ve stopped durumu doğrulanıp yalnız bu konteyner, ardından kendi boş cache volume'u kaldırıldı. Son own container/volume filtreleri boş. Başka oturumun `04a-knowledge-core_model_cache` volume'u korundu, bu incelemeye bağlanmadı. HEAD tam SHA/ağaç temiz doğrulandı; detached worktree `git worktree remove` ile kaldırıldı (exit0), yol artık yok; force kullanılmadı. Evidence paket kapanışına kadar kaldı; review etiketli imajlar temizlenebilir. Ana checkout/switch, ürün kodu değişikliği, commit/push yok.

@@ -45,4 +45,6 @@ Mevcut yerel **ffcore/tools:0.0.0-fixgates /45181f3a7331** kullanıldı; r1'deki
 
 ## Temizlik
 
+Kapanış eki (2026-10-29 14:02, K-04a-0040): onaylı r2 SHA'nın main atası olduğu doğrulandı. İzin verilen r1/r2 evidence dizinleri mutlak .worktrees sınırı ve reparse point kontrolünden sonra kaldırıldı (4+2 dosya). Kalıcı raporlar korundu; başka evidence/cache'e dokunulmadı.
+
 2026-10-29 13:34: tüm başarılı run'lar --rm ile bitti, Compose yığını/volume oluşturulmadı. Tam HEAD sabit ve worktree temiz doğrulandı; `git worktree remove` exit0, hedef artık yok; force kullanılmadı. Başka stack/cache ve ana checkout'a dokunulmadı. R1/r2 evidence paket kapanışına kadar korundu. Ürün kodu değişikliği/commit/push yok.

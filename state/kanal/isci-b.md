@@ -485,3 +485,45 @@ Testler (önce kırmızıydı; ham secret ve e-posta yazılıyordu):
 - test_02_r2_m1_extra_failure_leaves_no_raw_value.
 Kapılar: lint temiz; make test iki profilde 435 geçti, yalnız DRIFT-85'in bilinen 2 hatası.
 Fixture: notunuza göre bekliyorum. fix/main-test-gates main'e girince rebase edip Qdrant ACL fixture'ını uyumlu yapacağım (qdrant'ı ortamdaki listeye ekleme; ürün kontrolü aynı). Sonra Qdrant profili açık make test-int iki profil, sonra PR-HAZIR. Merge'ü bana haber verir misiniz?
+
+### B-02-0014 · 2026-10-29 14:18 · → koordinator · PR-HAZIR
+Paket: 02   Cevap: K-02-0016 / K-02-0015
+PR: state/pr/02.md ("Review r2 düzeltmeleri") · Branch feat/02-langfuse-trace · Baz main 677d9e0 · SHA f4716909429872f7c457a6bc2e3ab1bd3c336cc9 · [C] · ağaç temiz.
+r3 delta:
+- rebase: 677d9e0'a temiz geçti, çakışma yok; uv lock --check tutarlı, lock değişmedi.
+- extra alanları düzeltmesi: makeRecord sarmalayıcısı.
+- Qdrant ACL fixture: qdrant artık ortamdaki listeye ekleniyor; ürün kontrolü aynı.
+Testlerin hepsi önce kırmızıydı: extra testleri ham secret ve e-posta yazıyordu; ACL testi 4 setup ERROR veriyordu (TracingConfigError).
+Kapılar (belgelenen komutla, --profile test --profile qdrant, temiz volume):
+- make test: llmaas 439, airgap 439 geçti.
+- make test-int: llmaas ve airgap 213 geçti, 3 atlandı (RUN_DNS_TESTS + iki RUN_MODEL_TESTS; main'in NOT_RUN'ları).
+- smoke passed, lint temiz.
+- Canlı PII/secret negatifi beş serviste 0; log kapısı 0.
+Yığın down -v ile kapatılıyor.
+
+### B-02-0015 · 2026-10-29 14:19 · → koordinator · ACK
+Paket: 02   Cevap: K-02-0018
+Alındı. r3 bitene kadar yeni commit yok; yığın kapalı. 05a GOREV'ini 02 merge'ünden sonra bekliyorum.
+
+### B-02-0016 · 2026-10-29 14:50 · → koordinator · PR-HAZIR
+Paket: 02   Cevap: K-02-0019
+PR: state/pr/02.md ("Review r3 düzeltmesi") · Branch feat/02-langfuse-trace · Baz main 677d9e0 · SHA 0940628e04c7e2af26ec35f311c50e7211df9f7a · [C] · ağaç temiz.
+r4 delta tek commit (0940628), rebase yok.
+- Karar A uygulandı: extra'daki int/float değerler string karşılığıyla secret ve 08-lite tanıyıcılarından geçiyor; temizse tip ve değer korunuyor, kirliyse maskeli metin oluyor; bool muaf.
+- Testler önce kırmızıydı (int TCKN ve sayısal secret ham yazılıyordu): test_02_r3_m1_numeric_extra_values_scrubbed (önceden/sonradan kurulan handler, iç içe int/float/tuple; metric 12, ratio 0.5, flag True korunur) ve test_02_r3_m1_clean_numbers_keep_type.
+Kapılar (belgelenen komut, qdrant açık, temiz volume, yeniden kurulan imaj):
+- make test: llmaas ve airgap 441 geçti.
+- make test-int: llmaas ve airgap 213 geçti, 3 atlandı (main'in NOT_RUN'ları).
+- smoke passed, lint temiz.
+- Canlı PII/secret negatifi beş serviste 0; log kapısı 0.
+Yığın down -v ile kapatılıyor.
+
+### B-02-0017 · 2026-10-29 14:52 · → koordinator · ACK
+Paket: 02 / 05a   Cevap: K-02-0022
+Alındı; r4 bitene kadar yeni commit yok. 05a brief'ini ve C7'yi okudum; kod yok, claim yok. Plan için ön notlar (GOREV'den sonra ölçülecek, şimdilik doğrulanmadı):
+- 13a demo DB hazır: data/samples/schema/{schema,seed,readonly_role}.sql, schema_descriptions.json, few_shots.json. services/mcp-sql ve mcp-search yalnız README.
+- Yeni bağımlılıklar gerekecek: resmi mcp SDK (istemci + sunucu, streamable HTTP) ve sqlglot. İkisi de pyproject'te yok; C sınıfı, pinli sürüm ve U5 ölçümü (forward_user başlıkları oturum açılışında mı) planda olacak.
+- few_shots embedding süreç içi bge-m3 ister; ağırlıksız testlerde FAKE_EMBED yolu kullanılacak, gerçek ağırlık testi models işaretli.
+- Kabul kriterlerinden guardrail_mode/Superset/mcp_servers 05b'de (brief), 05a'da değil.
+- forward_user için 03b'nin X-On-Behalf-Of imzası ve 04a'nın /kb/{id}/search ACL'si kullanılacak; iki kullanıcının eşzamanlı run testi 05a kabulü.
+GOREV'i bekliyorum.
