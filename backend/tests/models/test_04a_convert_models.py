@@ -109,3 +109,36 @@ def test_04a_chunks_fit_real_tokenizer_limits():
         assert count("fesih bildirim süresi " + chunk.text) + 4 <= MAX_LENGTH
     fesih = [c for c in chunks if "10.1" in c.body]
     assert fesih and fesih[0].body.startswith("Madde")
+
+
+@pytest.mark.parametrize(
+    "body,breadcrumb",
+    [
+        ("the " * 600, "KB › " + " ".join(["Uzun-bölüm-başlığı"] * 40)),
+        ("中" * 1000, "KB › Belge"),
+        ("🙂" * 700 + " son", "KB › Belge"),
+    ],
+    ids=["long-breadcrumb", "cjk-word", "emoji"],
+)
+def test_04a_r1_4_embedded_text_fits_the_real_tokenizer(body, breadcrumb):
+    """Review r1 MAJOR-4 with bge-m3's own tokenizer: breadcrumb + body ≤ 600, nothing lost."""
+    from ffcore.core.config import Settings
+    from ffcore.knowledge.chunking import ChunkSettings, chunk_markdown
+    from ffcore.knowledge.embed import token_counter
+    from tests.dummy import SETTINGS_03A
+
+    settings = Settings(
+        deploy_profile="airgap",
+        offline=False,
+        service_token="dummy-not-secret-service-token-0123456789",
+        obo_jwt_secret="dummy-not-secret-obo-jwt-secret-0123456789",
+        **SETTINGS_03A,
+    )
+    count = token_counter(settings)
+    chunks = chunk_markdown(
+        body, breadcrumb=breadcrumb, settings=ChunkSettings.from_kb(400, 0, count)
+    )
+    worst = max(count(c.text) for c in chunks)
+    print(f"\nr1-4 {len(chunks)} chunks, worst {worst} tokens")
+    assert worst <= 600
+    assert "".join("".join(c.body.split()) for c in chunks) == "".join(body.split())

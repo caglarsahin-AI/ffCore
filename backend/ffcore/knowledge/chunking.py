@@ -4,9 +4,9 @@ Adapted from PayCore `ingest/chunking.py`, with its measured values (K-04a-0002 
 greedy packing between `min_tokens` 400 and `max_tokens` 600, no overlap; tokens estimated as
 max(words × 1,6, characters / 6) (Turkish tokenizes 30-40 % heavier; text without spaces is
 counted by length, PayCore 2026-10-08); over-long text is split by paragraph, then sentence,
-then word, and a word longer than the limit by length. So no chunk body exceeds
-max_tokens × 6 characters. The embedded text is "<breadcrumb>\\n\\n<body>"; the body alone is
-what duplicate detection hashes.
+then word, and a word longer than the limit by the counter itself. The limit holds for the
+embedded text "<breadcrumb>\\n\\n<body>", breadcrumb included (review r1 MAJOR-4); a breadcrumb
+that leaves no room fails loud. The body alone is what duplicate detection hashes.
 PDF converters mark pages with `<!-- page: N -->`; the marker sets the chunk's page and is
 removed from the text.
 """
@@ -21,6 +21,12 @@ CHARS_PER_TOKEN = 6
 MAX_TO_MIN_RATIO = 1.5
 MAX_MERGED_HEADINGS = 3
 BREADCRUMB_SEPARATOR = " › "
+# A breadcrumb may take at most half of max_tokens; a longer one is a document error, not a
+# reason to shrink every body to a few tokens.
+MAX_BREADCRUMB_SHARE = 0.5
+# Tokens can merge across the breadcrumb/body boundary, so a body is split to this many tokens
+# under the remaining budget; the final count is checked anyway.
+BOUNDARY_SLACK = 2
 
 _HEADING = re.compile(r"^(#{1,3})\s+(.*)$", re.M)
 _SENTENCE = re.compile(r"(?<=[.!?…])\s+")
@@ -33,6 +39,14 @@ _ARTICLE = re.compile(
     r"(?=\s+\d+\.\d+|\s*\n|$)",
     re.M,
 )
+
+
+class ChunkingError(ValueError):
+    """A text that cannot be chunked within the limits; the document fails with this code."""
+
+    def __init__(self, code: str, detail: str):
+        super().__init__(f"{code}: {detail}")
+        self.code = code
 
 
 def approx_tokens(text: str) -> int:
@@ -117,14 +131,34 @@ def _sections(body: str) -> list[tuple[str, str]]:
     return out
 
 
+def _split_word(word: str, max_tokens: int, count) -> list[str]:
+    """A word over the limit, cut at the longest prefix the counter accepts (binary search)."""
+    if count(word) <= max_tokens:
+        return [word]
+    pieces: list[str] = []
+    start = 0
+    while start < len(word):
+        low, high = start + 1, len(word)
+        if count(word[start:low]) > max_tokens:
+            raise ChunkingError("chunk_unsplittable", f"one character exceeds {max_tokens} tokens")
+        while low < high:
+            middle = (low + high + 1) // 2
+            if count(word[start:middle]) <= max_tokens:
+                low = middle
+            else:
+                high = middle - 1
+        pieces.append(word[start:low])
+        start = low
+    return pieces
+
+
 def _split_words(text: str, max_tokens: int, count=approx_tokens) -> list[str]:
     if count(text) <= max_tokens:
         return [text]
-    max_chars = max_tokens * CHARS_PER_TOKEN
     out: list[str] = []
     current: list[str] = []
     for word in text.split():
-        for piece in (word[i : i + max_chars] for i in range(0, len(word), max_chars)):
+        for piece in _split_word(word, max_tokens, count):
             if current and count(" ".join([*current, piece])) > max_tokens:
                 out.append(" ".join(current))
                 current = []
@@ -220,14 +254,32 @@ def chunk_markdown(body: str, *, breadcrumb: str, settings: ChunkSettings) -> li
             continue
         section = " · ".join(headings) if headings else None
         crumb = f"{breadcrumb}{BREADCRUMB_SEPARATOR}{section}" if section else breadcrumb
-        chunks.append(
-            TextChunk(
-                ordinal=len(chunks),
-                breadcrumb=crumb,
-                body=clean,
-                page=start_page,
-                section_path=section,
-                tokens=settings.count(crumb + "\n\n" + clean),
+        for body_piece in _fit(crumb, clean, settings):
+            tokens = settings.count(crumb + "\n\n" + body_piece)
+            if tokens > settings.max_tokens:
+                raise ChunkingError("chunk_over_limit", f"{tokens} > {settings.max_tokens} tokens")
+            chunks.append(
+                TextChunk(
+                    ordinal=len(chunks),
+                    breadcrumb=crumb,
+                    body=body_piece,
+                    page=start_page,
+                    section_path=section,
+                    tokens=tokens,
+                )
             )
-        )
     return chunks
+
+
+def _fit(crumb: str, body: str, settings: ChunkSettings) -> list[str]:
+    """The body as is, or split so that breadcrumb + body fits max_tokens (review r1 MAJOR-4)."""
+    count = settings.count
+    if count(crumb + "\n\n" + body) <= settings.max_tokens:
+        return [body]
+    prefix = count(crumb + "\n\n")
+    if prefix > settings.max_tokens * MAX_BREADCRUMB_SHARE:
+        raise ChunkingError(
+            "chunk_breadcrumb_too_long",
+            f"breadcrumb takes {prefix} of {settings.max_tokens} tokens",
+        )
+    return _split_long(body, settings.max_tokens - prefix - BOUNDARY_SLACK, count)
