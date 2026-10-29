@@ -16,8 +16,10 @@ from datetime import datetime, timedelta
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from ffcore.core.audit import AuditEntry, write_event, write_event_detached
 from ffcore.core.auth import ROLE_ORDER, Actor, Grant
 from ffcore.core.config import Settings
+from ffcore.core.errors import ApiError
 from ffcore.models.approvals import APPROVER_ROLES, Approval
 
 log = logging.getLogger("ffcore.approvals")
@@ -36,15 +38,131 @@ def tool_key(action: str) -> str | None:
     return key if sep and key else None
 
 
-def may_decide(actor: Actor, grant: Grant | None, assigned_role: str) -> bool:
-    """Approve or reject needs a person in a console session (K-07-0002 B3): never a service
-    account, an API key, or a user reached through X-On-Behalf-Of; `edit` access and a role at
-    least `assigned_role`."""
-    if actor.actor_type != "user" or actor.via_service or grant is None:
-        return False
+def denial(actor: Actor, grant: Grant | None, assigned_role: str) -> str | None:
+    """Why this caller may not approve or reject, as an error code; None when it may.
+
+    A decision needs a person in a console session (K-07-0002 B3): never a service account, an
+    API key, or a user reached through X-On-Behalf-Of. Then `edit` access and a role at least
+    `assigned_role` (brief 07: an analyst cannot decide an approval assigned to developer).
+    """
+    if actor.actor_type != "user" or actor.via_service:
+        return "approval_requires_user_session"
+    if grant is None:
+        return "insufficient_role"
     if grant.access != "edit":
-        return False
-    return ROLE_ORDER.index(grant.role) >= ROLE_ORDER.index(assigned_role)
+        return "read_only_access"
+    if ROLE_ORDER.index(grant.role) < ROLE_ORDER.index(assigned_role):
+        return "insufficient_role"
+    return None
+
+
+def may_decide(actor: Actor, grant: Grant | None, assigned_role: str) -> bool:
+    return denial(actor, grant, assigned_role) is None
+
+
+DENIAL_MESSAGES = {
+    "approval_requires_user_session": "Approvals are given by a signed-in user, not on "
+    "someone's behalf.",
+    "read_only_access": "Your access mode is read-only.",
+    "insufficient_role": "Your role does not allow deciding this approval.",
+}
+
+
+async def decide(
+    session: AsyncSession,
+    *,
+    project_id: uuid.UUID,
+    approval_id: uuid.UUID,
+    actor: Actor,
+    grant: Grant | None,
+    decision: str,
+    note: str | None,
+    now: datetime,
+    request_id: str,
+    ip: str | None = None,
+) -> Approval:
+    """Record an approve/reject on a pending approval, audited, in the caller's transaction.
+
+    The caller resumes the run in the same transaction (06a `runtime.resume.resume_run`
+    commits), so the approval and the run change together. Every refusal is coded and audited:
+    403 per `denial`, 404 for another project's or an unknown approval, 409
+    `approval_not_pending` once decided or expired, 409 `approval_expired` when the TTL passed
+    before the job marked it. The status change is conditional: two clicks decide once.
+    """
+    if decision not in ("approved", "rejected"):
+        raise ValueError(f"decision must be approved or rejected, got {decision!r}")
+    row = await session.scalar(
+        select(Approval).where(
+            Approval.id == approval_id,
+            Approval.project_id == project_id,
+            Approval.deleted_at.is_(None),
+        )
+    )
+    if row is None:
+        raise ApiError(404, "not_found_error", "approval_not_found", "Approval not found.")
+    code = denial(actor, grant, row.assigned_role)
+    if code is not None:
+        await write_event_detached(
+            _entry(row, actor, "denied", f"approval.{decision}", request_id, ip, {"code": code})
+        )
+        raise ApiError(403, "permission_error", code, DENIAL_MESSAGES[code])
+    if row.status != "pending":
+        raise ApiError(
+            409, "conflict_error", "approval_not_pending", f"The approval is {row.status}."
+        )
+    if row.expires_at <= now:
+        raise ApiError(
+            409, "conflict_error", "approval_expired", "The approval expired before a decision."
+        )
+    changed = await session.execute(
+        update(Approval)
+        .where(Approval.id == row.id, Approval.status == "pending")
+        .values(
+            status=decision,
+            resolved_at=now,
+            resolved_by=actor.actor_id,
+            resolution_note=note,
+            updated_at=now,
+        )
+    )
+    if changed.rowcount != 1:
+        raise ApiError(409, "conflict_error", "approval_not_pending", "The approval was decided.")
+    await session.refresh(row)
+    await write_event(
+        session,
+        _entry(
+            row,
+            actor,
+            "success",
+            f"approval.{decision}",
+            request_id,
+            ip,
+            {
+                "run_id": str(row.run_id),
+                "action": row.action,
+                "arguments": row.arguments,
+                "assigned_role": row.assigned_role,
+                "note": note,
+            },
+        ),
+    )
+    return row
+
+
+def _entry(row, actor, outcome, action, request_id, ip, after) -> AuditEntry:
+    return AuditEntry(
+        action=action,
+        resource_type="approval",
+        outcome=outcome,
+        actor_type=actor.actor_type,
+        actor_id=actor.actor_id,
+        project_id=str(row.project_id),
+        resource_id=str(row.id),
+        before={"status": "pending"} if outcome == "success" else None,
+        after=after,
+        request_id=request_id,
+        ip=ip,
+    )
 
 
 def args_hash(arguments: dict) -> str:
