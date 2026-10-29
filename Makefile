@@ -6,8 +6,8 @@
 .PHONY: lint format test test-samples test-int test-models models models-check smoke pull seed-models render-litellm reindex langfuse-init seed-prompts seed-sql-demo seed-sql-context
 
 lint:
-	ruff check backend scripts data/samples/scripts
-	ruff format --check backend scripts data/samples/scripts
+	ruff check backend scripts data/samples/scripts services
+	ruff format --check backend scripts data/samples/scripts services
 
 format:
 	ruff check --fix backend scripts
