@@ -121,3 +121,35 @@ class InvokeResult(Strict):
     total_chars: int
     is_error: bool
     latency_ms: int
+
+
+class SqlContextRequest(Strict):
+    question: Annotated[str, Field(max_length=2000)] | None = None
+
+
+class SqlColumn(Strict):
+    name: str
+    description: str
+    sample_values: list[Any]
+    is_metric: bool
+    formula: str | None
+
+
+class SqlTable(Strict):
+    name: str
+    description: str
+    columns: list[SqlColumn]
+
+
+class SqlExample(Strict):
+    question: str
+    sql: str
+
+
+class SqlContext(Strict):
+    """What mcp-sql's get_schema shows the model: tables narrowed to the question (`matched`
+    false: none matched, all listed) and the nearest approved question-SQL examples."""
+
+    tables: list[SqlTable]
+    matched: bool
+    examples: list[SqlExample]

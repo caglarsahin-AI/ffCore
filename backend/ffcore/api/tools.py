@@ -21,6 +21,11 @@ from ffcore.api.common import (
 from ffcore.api.tools_schemas import (
     InvokeRequest,
     InvokeResult,
+    SqlColumn,
+    SqlContext,
+    SqlContextRequest,
+    SqlExample,
+    SqlTable,
     ToolActionOut,
     ToolActionUpdate,
     ToolCreate,
@@ -33,10 +38,11 @@ from ffcore.core.auth import Actor, require_role
 from ffcore.core.config import Settings, get_settings
 from ffcore.core.errors import ApiError
 from ffcore.models.tools import Tool, ToolAction
-from ffcore.services import mcp_client, mcp_tools
+from ffcore.services import mcp_client, mcp_sql_context, mcp_tools
 
 router = APIRouter(prefix="/projects/{project_id}/tools", tags=["tools"], responses=ERROR_RESPONSES)
 
+AnyMember = Annotated[Actor, Depends(require_role("user"))]
 Reader = Annotated[Actor, Depends(require_role("developer"))]
 Admin = Annotated[Actor, Depends(require_role("admin", write=True))]
 SettingsDep = Annotated[Settings, Depends(get_settings)]
@@ -298,4 +304,30 @@ async def invoke_tool_action(
         total_chars=result.total_chars,
         is_error=result.is_error,
         latency_ms=result.latency_ms,
+    )
+
+
+@router.post("/sql-context", response_model=SqlContext, summary="SQL tool context (mcp-sql)")
+async def sql_context(
+    project_id: UUID,
+    body: SqlContextRequest,
+    actor: AnyMember,
+    session: SessionDep,
+    settings: SettingsDep,
+):
+    """For mcp-sql's get_schema, on behalf of the user running the agent (any project role).
+    Descriptions narrowed to the question by keywords, and the project's five nearest
+    question-SQL examples (in-process embedding, pgvector cosine)."""
+    found = await mcp_sql_context.context(session, project_id, body.question, settings)
+    return SqlContext(
+        tables=[
+            SqlTable(
+                name=t.name,
+                description=t.description,
+                columns=[SqlColumn(**vars(c)) for c in t.columns],
+            )
+            for t in found.tables
+        ],
+        matched=found.matched,
+        examples=[SqlExample(question=q, sql=s) for q, s in found.examples],
     )

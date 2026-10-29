@@ -4,6 +4,8 @@
         --email admin@example.org --full-name "Admin" --password-stdin < password.txt
     docker compose run --rm tools make seed-models PROJECT=hastane   (01, first install)
     docker compose run --rm tools make render-litellm                 (01, reconcile LiteLLM)
+    docker compose run --rm tools make seed-sql-demo                  (05a, mcp-sql demo DB)
+    docker compose run --rm tools make seed-sql-context PROJECT=hastane (05a, get_schema data)
 
 The password is read from stdin, never from the command line (shell history, process list).
 """
@@ -20,8 +22,14 @@ from ffcore.core.audit import AuditEntry, write_event
 from ffcore.core.config import get_settings
 from ffcore.core.logging import configure_logging
 from ffcore.core.passwords import MIN_LENGTH, hash_password
-from ffcore.models.identity import User
-from ffcore.services import catalog_loader, litellm_reconcile, seed_models
+from ffcore.models.identity import Project, User
+from ffcore.services import (
+    catalog_loader,
+    litellm_reconcile,
+    mcp_sql_context,
+    mcp_sql_demo,
+    seed_models,
+)
 
 
 class CliError(Exception):
@@ -121,6 +129,15 @@ def main(argv: list[str] | None = None) -> int:
         "seed-prompts", help="first-install prompts from backend/prompts into Langfuse (02)"
     )
     seed_prompts.add_argument("--path", required=True, type=Path)
+    sql_demo = commands.add_parser(
+        "seed-sql-demo", help="create or refresh mcp-sql's demo database and login user (05a)"
+    )
+    sql_demo.add_argument("--path", required=True, type=Path, help="data/samples/schema")
+    sql_context = commands.add_parser(
+        "seed-sql-context", help="load table descriptions and SQL examples into a project (05a)"
+    )
+    sql_context.add_argument("--project", required=True, help="existing project key")
+    sql_context.add_argument("--path", required=True, type=Path, help="data/samples/schema")
     args = parser.parse_args(argv)
     configure_logging(get_settings())
 
@@ -162,6 +179,13 @@ def main(argv: list[str] | None = None) -> int:
                 tracing.shutdown_tracing()
             print(f"prompts created: {report.created or '-'}")
             print(f"prompts already present: {report.existing or '-'}")
+        elif args.command == "seed-sql-demo":
+            database, user = _seed_sql_demo(get_settings(), args.path)
+            print(f"demo database ready: {database} (read-only login user {user})")
+            print("SQL_DEMO_DATABASE_URL uses this user and AGENT_DEMO_DB_PASSWORD (.env)")
+        elif args.command == "seed-sql-context":
+            descriptions, examples = asyncio.run(_seed_sql_context(args.project, args.path))
+            print(f"table descriptions loaded: {descriptions}; SQL examples loaded: {examples}")
     except (
         CliError,
         catalog_loader.CatalogFileError,
@@ -178,6 +202,43 @@ async def _seed(project: str, path: Path | None) -> seed_models.SeedReport:
     settings = get_settings()
     async with db.session_scope() as session:
         report = await seed_models.seed(session, project, settings, path)
+        await session.commit()
+    return report
+
+
+DEMO_DATABASE = "agent_demo"
+DEMO_LOGIN_USER = "mcp_sql"
+
+
+def _seed_sql_demo(settings, path: Path) -> tuple[str, str]:
+    """13a's demo database in the existing Postgres, with a read-only login user (05a S5)."""
+    if settings.agent_demo_db_password is None:
+        raise CliError("AGENT_DEMO_DB_PASSWORD is not set (.env)")
+    if settings.database_url is None:
+        raise CliError("DATABASE_URL is not set")
+    from sqlalchemy.engine import make_url
+
+    admin = make_url(settings.database_url.get_secret_value()).set(drivername="postgresql")
+    mcp_sql_demo.seed_demo(
+        admin.render_as_string(hide_password=False),
+        database=DEMO_DATABASE,
+        login_user=DEMO_LOGIN_USER,
+        password=settings.agent_demo_db_password.get_secret_value(),
+        schema_dir=path,
+        statement_timeout_s=settings.sql_timeout_s,
+    )
+    return DEMO_DATABASE, DEMO_LOGIN_USER
+
+
+async def _seed_sql_context(project_key: str, path: Path) -> tuple[int, int]:
+    settings = get_settings()
+    async with db.session_scope() as session:
+        project_id = await session.scalar(
+            select(Project.id).where(Project.key == project_key, Project.deleted_at.is_(None))
+        )
+        if project_id is None:
+            raise CliError(f"no project with key {project_key}")
+        report = await mcp_sql_context.load(session, project_id, path, settings, created_by="cli")
         await session.commit()
     return report
 

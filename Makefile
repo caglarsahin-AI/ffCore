@@ -3,7 +3,7 @@
 # Servisleri başlatma/durdurma doğrudan compose ile: docker compose up -d --wait | down | logs -f
 # Önyüz lint'i ayrı konteynerde: docker compose run --rm frontend npm run lint
 
-.PHONY: lint format test test-samples test-int test-models models models-check smoke pull seed-models render-litellm reindex langfuse-init seed-prompts
+.PHONY: lint format test test-samples test-int test-models models models-check smoke pull seed-models render-litellm reindex langfuse-init seed-prompts seed-sql-demo seed-sql-context
 
 lint:
 	ruff check backend scripts data/samples/scripts
@@ -74,3 +74,13 @@ langfuse-init:
 # 02: first-install prompts (backend/prompts/*.md) into Langfuse; existing prompts stay.
 seed-prompts:
 	cd backend && python -m ffcore.cli seed-prompts --path prompts
+
+# 05a: mcp-sql's demo database (13a, synthetic) with its read-only login user; idempotent.
+# Needs AGENT_DEMO_DB_PASSWORD in .env.
+seed-sql-demo:
+	cd backend && python -m ffcore.cli seed-sql-demo --path ../data/samples/schema
+
+# 05a: table descriptions and SQL examples for get_schema, into one project (a reload replaces).
+seed-sql-context:
+	@test -n "$(PROJECT)" || (echo "usage: make seed-sql-context PROJECT=<project_key>" >&2; exit 2)
+	cd backend && python -m ffcore.cli seed-sql-context --project "$(PROJECT)" --path ../data/samples/schema

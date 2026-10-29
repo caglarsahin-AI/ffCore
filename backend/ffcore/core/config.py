@@ -116,6 +116,10 @@ class Settings(BaseSettings):
     # mcp-sql: rows returned at most (the rest cut and said) and the statement timeout.
     sql_max_rows: int = Field(default=500, gt=0)
     sql_timeout_s: int = Field(default=20, gt=0)
+    # mcp-sql's demo database (13a, K-05a-0002 S5): the read-only login user's URL, and the
+    # password `make seed-sql-demo` gives that user (both in .env, written by the user).
+    sql_demo_database_url: SecretStr | None = None
+    agent_demo_db_password: SecretStr | None = None
 
     @field_validator(
         "egress_allowlist", "allowed_internal_hosts", "allowed_languages", mode="before"

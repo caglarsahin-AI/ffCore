@@ -133,6 +133,20 @@ def sign_on_behalf_of(
     return jwt.encode(claims, settings.obo_jwt_secret.get_secret_value(), algorithm=OBO_ALGORITHM)
 
 
+def unverified_on_behalf_of_claims(token: str) -> dict:
+    """The claims of an on-behalf-of token WITHOUT verifying it (05a, K-05a-0002 S3).
+
+    For FFCore's own MCP services, which hold no signing key and relay the token unchanged to
+    the backend: they read `aud`, `exp` and `project_id` to refuse a token cut for another tool
+    early and to build the backend URL. Never an authentication decision: the backend verifies
+    the same token in resolve_actor. Kept in this module so that all token handling is here (C2).
+    """
+    try:
+        return jwt.decode(token, options={"verify_signature": False})
+    except jwt.PyJWTError:
+        raise OnBehalfOfError(401, "invalid_token", "Token is invalid.") from None
+
+
 def verify_on_behalf_of(
     token: str, *, audience: str, settings: Settings, now: datetime | None = None
 ) -> OnBehalfOfClaims:
