@@ -36,6 +36,7 @@ dependencies = [
     "beautifulsoup4==4.15.0",
     # One queue library (C10); the ingest worker.
     "arq==0.28.0",
+    "langfuse==4.15.1",
 ]
 
 [dependency-groups]

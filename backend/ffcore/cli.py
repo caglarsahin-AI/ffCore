@@ -15,9 +15,10 @@ from pathlib import Path
 
 from sqlalchemy import func, select
 
-from ffcore.core import db
+from ffcore.core import db, prompts, tracing
 from ffcore.core.audit import AuditEntry, write_event
 from ffcore.core.config import get_settings
+from ffcore.core.logging import configure_logging
 from ffcore.core.passwords import MIN_LENGTH, hash_password
 from ffcore.models.identity import User
 from ffcore.services import catalog_loader, litellm_reconcile, seed_models
@@ -116,7 +117,12 @@ def main(argv: list[str] | None = None) -> int:
     reindex.add_argument("--kb", required=True, help="knowledge base key")
     reindex.add_argument("--layer", choices=("silver", "gold"), required=True)
     reindex.add_argument("--full", action="store_true", help="every document, not only changed")
+    seed_prompts = commands.add_parser(
+        "seed-prompts", help="first-install prompts from backend/prompts into Langfuse (02)"
+    )
+    seed_prompts.add_argument("--path", required=True, type=Path)
     args = parser.parse_args(argv)
+    configure_logging(get_settings())
 
     try:
         if args.command == "create-superadmin":
@@ -148,7 +154,21 @@ def main(argv: list[str] | None = None) -> int:
         elif args.command == "reindex":
             job = asyncio.run(enqueue_reindex(args.project, args.kb, args.layer, args.full))
             print(f"reindex queued: job {job} (worker log shows reused=N embedded=M)")
-    except (CliError, catalog_loader.CatalogFileError, seed_models.SeedError) as exc:
+        elif args.command == "seed-prompts":
+            client = tracing.init_tracing(get_settings())
+            try:
+                report = prompts.seed_prompts(client, args.path)
+            finally:
+                tracing.shutdown_tracing()
+            print(f"prompts created: {report.created or '-'}")
+            print(f"prompts already present: {report.existing or '-'}")
+    except (
+        CliError,
+        catalog_loader.CatalogFileError,
+        seed_models.SeedError,
+        tracing.TracingConfigError,
+        prompts.PromptUnavailable,
+    ) as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 1
     return 0

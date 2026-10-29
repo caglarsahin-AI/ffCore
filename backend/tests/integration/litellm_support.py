@@ -36,7 +36,7 @@ def llm_settings() -> Settings:
         offline=False,
         service_token=SERVICE_TOKEN,
         obo_jwt_secret=OBO_SECRET,
-        allowed_internal_hosts=["litellm", "fake-llm"],
+        allowed_internal_hosts=["litellm", "fake-llm", "langfuse-web"],  # 02: LANGFUSE_HOST
         egress_allowlist=[],
         litellm_url=_env("LITELLM_URL"),
         litellm_master_key=_env("LITELLM_MASTER_KEY"),

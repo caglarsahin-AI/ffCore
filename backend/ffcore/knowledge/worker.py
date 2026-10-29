@@ -10,6 +10,7 @@ import uuid
 
 from ffcore.core import db
 from ffcore.core.config import get_settings
+from ffcore.core.logging import configure_logging
 from ffcore.knowledge import ingest
 from ffcore.knowledge.jobs import get_vector_store
 from ffcore.models.knowledge import Document
@@ -25,6 +26,7 @@ async def startup(ctx) -> None:
     from ffcore.knowledge.models import hf_path, missing
 
     settings = get_settings()
+    configure_logging(settings)  # 02 r1: the same scrubbed logging as the API process
     if not settings.fake_embed:
         hf_path(settings.embed_model)
     for gap in missing(settings.embed_model, settings.rerank_model):

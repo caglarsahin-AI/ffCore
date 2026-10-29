@@ -9,3 +9,6 @@ general_settings:
 # only when its request_policy says so (drop_unsupported_params, reject_params).
 litellm_settings:
   drop_params: false
+  # Every model call is traced to Langfuse with user, session, tags, tokens and cost (02 S1;
+  # langfuse_otel loses the cost). Keys and host come from the service environment.
+  callbacks: ["langfuse"]

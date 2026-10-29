@@ -102,6 +102,10 @@ services:
       STORE_MODEL_IN_DB: "True"
       # The admin UI stays off; models come from FFCore's tables only (01).
       DISABLE_ADMIN_UI: "True"
+      # 02: Langfuse callback, same project keys as the backend (one source: LANGFUSE_INIT_*).
+      LANGFUSE_HOST: http://langfuse-web:3000
+      LANGFUSE_PUBLIC_KEY: ${LANGFUSE_INIT_PROJECT_PUBLIC_KEY:?LANGFUSE_INIT_PROJECT_PUBLIC_KEY is not set}
+      LANGFUSE_SECRET_KEY: ${LANGFUSE_INIT_PROJECT_SECRET_KEY:?LANGFUSE_INIT_PROJECT_SECRET_KEY is not set}
     volumes:
       - ./deploy/litellm/config.yaml:/app/config.yaml:ro
     depends_on:
@@ -121,6 +125,16 @@ services:
     environment:
       <<: *langfuse-env
       NEXTAUTH_SECRET: ${LANGFUSE_NEXTAUTH_SECRET:?LANGFUSE_NEXTAUTH_SECRET tanımlı değil}
+      # 02: headless first install (organisation, project, key pair, admin user); idempotent.
+      LANGFUSE_INIT_ORG_ID: ${LANGFUSE_INIT_ORG_ID:-ffcore}
+      LANGFUSE_INIT_ORG_NAME: ${LANGFUSE_INIT_ORG_NAME:-FFCore}
+      LANGFUSE_INIT_PROJECT_ID: ${LANGFUSE_INIT_PROJECT_ID:-ffcore}
+      LANGFUSE_INIT_PROJECT_NAME: ${LANGFUSE_INIT_PROJECT_NAME:-FFCore}
+      LANGFUSE_INIT_PROJECT_PUBLIC_KEY: ${LANGFUSE_INIT_PROJECT_PUBLIC_KEY:?LANGFUSE_INIT_PROJECT_PUBLIC_KEY is not set}
+      LANGFUSE_INIT_PROJECT_SECRET_KEY: ${LANGFUSE_INIT_PROJECT_SECRET_KEY:?LANGFUSE_INIT_PROJECT_SECRET_KEY is not set}
+      LANGFUSE_INIT_USER_EMAIL: ${LANGFUSE_INIT_USER_EMAIL:?LANGFUSE_INIT_USER_EMAIL is not set}
+      LANGFUSE_INIT_USER_NAME: ${LANGFUSE_INIT_USER_NAME:-FFCore admin}
+      LANGFUSE_INIT_USER_PASSWORD: ${LANGFUSE_INIT_USER_PASSWORD:?LANGFUSE_INIT_USER_PASSWORD is not set}
     depends_on: *langfuse-depends
     healthcheck:
       # Langfuse localhost'a değil konteyner adına bağlanır (Next.js HOSTNAME).
@@ -254,6 +268,10 @@ services:
       LITELLM_MASTER_KEY: ${LITELLM_MASTER_KEY:?LITELLM_MASTER_KEY is not set}
       LITELLM_INTERNAL_KEY: ${LITELLM_INTERNAL_KEY:?LITELLM_INTERNAL_KEY is not set}
       LLM_CALL_TIMEOUT_S: ${LLM_CALL_TIMEOUT_S:-60}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      LANGFUSE_HOST: http://langfuse-web:3000
+      LANGFUSE_PUBLIC_KEY: ${LANGFUSE_INIT_PROJECT_PUBLIC_KEY:?LANGFUSE_INIT_PROJECT_PUBLIC_KEY is not set}
+      LANGFUSE_SECRET_KEY: ${LANGFUSE_INIT_PROJECT_SECRET_KEY:?LANGFUSE_INIT_PROJECT_SECRET_KEY is not set}
     ports:
       - "${BACKEND_PORT:-8000}:8000"
     volumes:

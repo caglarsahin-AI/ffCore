@@ -166,8 +166,19 @@ def desired_model(project_key: str, model: Any, provider: Any, settings: Setting
         if limits.get(key) is not None:
             params[key] = limits[key]
 
-    caps = model.capabilities or {}
     pricing = model.pricing or {}
+    # LiteLLM computes the response cost only from these in litellm_params (measured, 02 M3);
+    # in model_info alone they were shown but never used, and every cost read 0.
+    for key, column in (
+        ("input_cost_per_token", "input_per_1m"),
+        ("output_cost_per_token", "output_per_1m"),
+        ("cache_read_input_token_cost", "cached_per_1m"),
+    ):
+        value = _per_token(pricing, column)
+        if value is not None:
+            params[key] = value
+
+    caps = model.capabilities or {}
     info: dict[str, Any] = {
         "id": str(model.id),
         "ffcore_managed": True,
@@ -274,7 +285,9 @@ class LiteLLMAdmin:
         await self._call("POST", "/model/new", _deployment(d))
 
     async def model_update(self, d: DesiredModel) -> None:
-        await self._call("POST", "/model/update", _deployment(d))
+        # PATCH /model/{id}/update applies litellm_params and model_info; POST /model/update
+        # answers 200 and changes nothing on v1.80.0 (measured, 02).
+        await self._call("PATCH", f"/model/{d.id}/update", _deployment(d))
 
     async def model_delete(self, model_id: str) -> None:
         await self._call("POST", "/model/delete", {"id": model_id})
