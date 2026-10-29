@@ -2,7 +2,8 @@
 
 Next.js 15 App Router, shadcn/ui (`sidebar-07`, `dashboard-01` blocks), next-intl, next-themes.
 This page covers packages 10a (console skeleton), 10a-binding (connected to the 03a backend:
-sign-in, projects, members) and 10a-forms (provider and model forms).
+sign-in, projects, members), 10a-forms (provider and model forms) and 10b-poc-1 (knowledge bases
+and system status).
 
 ## Screen map
 
@@ -13,7 +14,10 @@ sign-in, projects, members) and 10a-forms (provider and model forms).
 | `/projects/{id}/members` | Project members | admin | list; role, access, remove; add (superadmin: needs the user list) |
 | `/providers` | Providers | superadmin | list; add, edit, connection test, projects, deactivate / activate |
 | `/models` | Models of the selected project | admin | list; edit, delete; add (superadmin: needs the provider list) |
-| `/overview` and every other menu item | Later packages (10b-poc, 10c) | see role matrix | "not available yet" page |
+| `/knowledge-bases` | Knowledge bases of the selected project | analyst | list; create (admin) |
+| `/knowledge-bases/{id}` | One knowledge base: settings, documents, try search | analyst | edit, delete (admin); upload, delete document, rebuild a layer (analyst+edit); search (read too) |
+| `/system-status` | Readiness of the installation (`/readyz`) | admin | read only |
+| `/overview` and every other menu item | Later packages (10b-poc-2, 10c) | see role matrix | "not available yet" page |
 | `/dev/theme` | Components in both themes side by side | none | done |
 
 A path outside the user's role renders "You do not have access". This is a UI convenience;
@@ -83,6 +87,46 @@ read-only session returns 403 `read_only_access`, shown as "Read-only access".
   `obo_project_scope`, ...); an unknown code shows the generic message with the code and backend
   text under "Details". Queries do not retry silently.
 
+## Knowledge bases (04a)
+
+- **Contract.** Types come straight from `backend/openapi/04a.yaml` (`lib/api/schema-04a.d.ts`;
+  no frontend copy). `npm run gen:api` and `npm run check:api` cover both specs.
+- **Roles.** Reading is analyst; creating, changing and deleting a knowledge base is admin (the
+  button stays visible, disabled with the reason, for other roles); uploading, deleting a document
+  and rebuilding a layer are analyst with edit access. Read mode disables all of them through
+  `<WriteGate>`; "Try search" is reading and stays available.
+- **Settings.** Defaults are the measured ones (chunk size 400, overlap 0, 5 results). One
+  threshold: with the reranker on only the rerank floor applies, so the minimum score field is
+  disabled (and not sent, a stored value stays); the knowledge base page names the rule in force.
+- **Upload.** Drag and drop or choose files; one request with a progress bar (XHR upload progress,
+  same origin and error contract as the other calls). Who may read is an explicit choice: roles
+  (analyst pre-selected, the backend default) or every project member (`acl_open`); neither is
+  refused in the form. The result lists each file as new, new version or unchanged (identity is
+  the file name, the content its sha256).
+- **Documents.** Each row shows the status, the layer reached (raw, silver, gold), every gate's
+  decision with its reason (a known reason gets a sentence, an unknown one shows its code), a link
+  to the original for `duplicate_of`, converter and time, chunks, version and read access. A
+  failed document shows its coded explanation and the backend text under "Details". While a
+  document is in flight the list refreshes every 2 s and says so; it stops when all are final.
+- **Rebuild a layer.** Silver (text and gates) or gold (chunks and vectors), changed documents or
+  all; the backend answers how many documents it took.
+- **Try search** runs the playground endpoint (logged as `source=playground`) with the caller's
+  access: both scores per chunk, the threshold mode and how many chunks it left out, the latency.
+- **Not in this package** (no 04a endpoint yet, FOLLOWUP-86): editing a document's access after
+  upload, the ingest report, the list of chunks below the rerank floor, re-convert with a preset,
+  loaded models, memory and queue figures on the system status page, choosing users for access.
+
+## System status
+
+The page is rendered on the server behind the console sign-in and reads `/readyz` from the
+backend's internal address (`FFCORE_BACKEND_URL`); the browser has no route to `/readyz`, because
+its detail names model paths (K-10bp-0002). The role is checked on the server before the backend
+is read. It shows the overall state and every check with its code explained and the backend
+detail as it is. While the models warm up the page refreshes every 5 s. A response outside the
+contract is shown as an error, never as "ready". Without model weights the page says
+`model_missing` and that weights come only from `make models`, which the operator runs. With
+`FAKE_EMBED=1` (tests only) the models check says so.
+
 ## Provider and model forms
 
 - **Driver fields.** The provider form asks `GET /provider-drivers` which uses and configuration
@@ -128,19 +172,29 @@ Node runs only in containers (`docs/gelistirme-ortami.md`).
 
 ### Acceptance tests (Playwright, real backend)
 
-From the repository root, on a throwaway stack (`-p 10af`; use any project name). The provider
+From the repository root, on a throwaway stack (`-p 10bp1`; use any project name). The provider
 tests point at `http://fake-llm:11434`, so the stack allows that host on the command line (the
 shell value wins over `.env.test`; no file changes). `fake-llm` itself is not started: LiteLLM
 does not call a provider when a model is registered, and the connection test reports the failure. If
 another stack already uses host port 8000, add `BACKEND_PORT=<free port>` to the `export` line; the
 tests reach the backend inside the compose network.
 
+The knowledge base tests run in two stages on the same stack. Stage 1 has no model weights and
+`FAKE_EMBED` off, so `/readyz` reports `model_missing`; only the test tagged `@model-missing` runs.
+Stage 2 restarts the backend and the ingest worker with `FAKE_EMBED=1` (deterministic stand-in
+embedding and reranker, no weights) and runs everything else. Weightless formats (measured): PDFs
+with a text layer are indexed; DOCX and Markdown need Docling weights and fail with
+`model_missing`, which the tests use as the failed-document case. `--workers=1` keeps the waits
+stable on a shared machine.
+
 ```bash
-export ALLOWED_INTERNAL_HOSTS=litellm,fake-llm FFCORE_VERSION=0.0.0-10af
-docker compose -p 10af --env-file .env.test up -d --wait --build backend
-printf 'dummy-not-secret-e2e-pw' | docker compose -p 10af --env-file .env.test run --rm -T backend python -m ffcore.cli create-superadmin --email e2e-admin@example.org --full-name "E2E Admin" --password-stdin
-docker compose -p 10af --env-file .env.test --profile e2e run --rm e2e
-docker compose -p 10af --env-file .env.test --profile e2e down -v
+export ALLOWED_INTERNAL_HOSTS=litellm,fake-llm FFCORE_VERSION=0.0.0-10bp1
+docker compose -p 10bp1 --env-file .env.test up -d --wait --build backend
+printf 'dummy-not-secret-e2e-pw' | docker compose -p 10bp1 --env-file .env.test run --rm -T backend python -m ffcore.cli create-superadmin --email e2e-admin@example.org --full-name "E2E Admin" --password-stdin
+docker compose -p 10bp1 --env-file .env.test --profile e2e run --rm e2e sh -c "npm ci --no-audit --no-fund && npx playwright test --grep @model-missing --workers=1"
+FAKE_EMBED=1 docker compose -p 10bp1 --env-file .env.test up -d --wait backend worker
+docker compose -p 10bp1 --env-file .env.test --profile e2e run --rm e2e sh -c "npm ci --no-audit --no-fund && npx playwright test --grep-invert @model-missing --workers=1"
+docker compose -p 10bp1 --env-file .env.test --profile e2e down -v
 ```
 
 The superadmin is created once per stack; `tests/e2e/global-setup.ts` creates the other accounts
@@ -165,3 +219,8 @@ LiteLLM's `/model/info`; the key goes only in a header. CI runs the same command
 | Model form | ![](images/10a-model-form-light.png) | ![](images/10a-model-form-dark.png) |
 | Not available yet | ![](images/10a-coming-soon-light.png) | ![](images/10a-coming-soon-dark.png) |
 | Theme preview | ![](images/10a-theme-preview-light.png) | ![](images/10a-theme-preview-dark.png) |
+| Knowledge bases | ![](images/10bp1-knowledge-bases-light.png) | ![](images/10bp1-knowledge-bases-dark.png) |
+| Knowledge base: documents | ![](images/10bp1-kb-documents-light.png) | ![](images/10bp1-kb-documents-dark.png) |
+| Knowledge base: try search | ![](images/10bp1-kb-search-light.png) | ![](images/10bp1-kb-search-dark.png) |
+| System status | ![](images/10bp1-system-status-light.png) | ![](images/10bp1-system-status-dark.png) |
+| Knowledge base, edit and read mode | ![](images/10bp1-kb-detail-edit.png) | ![](images/10bp1-kb-detail-read.png) |
