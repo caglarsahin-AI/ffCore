@@ -40,6 +40,12 @@ testleri varsayılan yığına ek olarak `fake-llm` (profil `test`, 01) ve `qdra
 04a) ister; tablodaki komut ikisini de başlatır. Biri erişilemezse `make test-int` tek mesajla, bu
 komutu yazarak durur.
 
+`RUN_DNS_TESTS=1` (varsayılan kapalı) gerçek sistem resolver'ıyla bir `.invalid` adı sorgular; Docker bu
+sorguyu host'un, kurumda kurum DNS'inin resolver'ına iletir, yani yığın dışına bir DNS sorgusu gider.
+Bayrak yokken test `NOT_RUN: needs RUN_DNS_TESTS=1` diye görünür ve hiçbir sorgu yapılmaz. Bayrağı
+yalnız dış DNS'e sorgu gönderilmesi uygun olan ortamda verin:
+`docker compose run --rm -e RUN_DNS_TESTS=1 tools make test-int`.
+
 `tools` konteyneri depo kökünü `/work` olarak bağlar (compose: `.:/work`) ve servislere compose ağından servis adıyla gider.
 Docker soketi bağlanmaz; konteyner içinden `docker` komutu çalışmaz.
 

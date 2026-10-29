@@ -4,6 +4,10 @@ An RFC 6761 `.invalid` name never resolves, so the call is a failed request with
 `egress_dns_failed`. Docker's embedded DNS forwards unknown names to the host's resolver and may
 answer slowly; the budget is wide, and a lookup that still does not finish is reported as
 NOT_RUN with its reason, never as a pass (a timeout is not the expected result).
+
+The lookup leaves the stack (host or institution DNS), so the test runs only with
+RUN_DNS_TESTS=1 (review r1 MAJOR-1); without it the root conftest skips it as NOT_RUN before any
+fixture or lookup runs.
 """
 
 import anyio
@@ -11,6 +15,8 @@ import pytest
 
 from ffcore.core import egress
 from ffcore.core.egress import EgressRequestFailed, EgressTimeout, EgressTimeoutError
+
+pytestmark = pytest.mark.dns
 
 UNRESOLVABLE = "no-such-provider.invalid"
 LOOKUP_BUDGET_S = 30
