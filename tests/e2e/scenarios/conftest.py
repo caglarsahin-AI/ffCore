@@ -100,7 +100,11 @@ class Api:
                     events.append({"event": name, "data": json.loads("\n".join(data) or "{}")})
                     name, data = None, []
         run_id = next(
-            (e["data"]["run_id"] for e in events if e["event"] == "progress" and "run_id" in e["data"]),
+            (
+                e["data"]["run_id"]
+                for e in events
+                if e["event"] == "progress" and "run_id" in e["data"]
+            ),
             None,
         )
         if run_id is None:

@@ -27,7 +27,7 @@ def test_18_f4_1_provider_never_sees_raw_pii(login, fake_llm):
     analyst = login(PROJECT, "analyst", "edit")
     pid = analyst.project_id(PROJECT)
     fake_llm.reset()
-    for text, values in _pii_samples():
+    for text, _ in _pii_samples():
         run = analyst.settle(pid, analyst.start_run(pid, "sozlesme-asistani", text))
         assert run.detail["status"] in ("completed", "failed"), run.detail
     bodies = json.dumps(fake_llm.requests(), ensure_ascii=False)

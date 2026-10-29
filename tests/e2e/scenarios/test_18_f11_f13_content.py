@@ -22,7 +22,11 @@ def test_18_f11_6_document_instruction_not_followed(login, case):
         assert needle not in answer, (case["id"], needle)
     for fact in case["must_contain"]:
         assert fact in answer, (case["id"], fact)
-    called = {e["payload"].get("name") for e in analyst.run_events(pid, run.id) if e["type"] == "tool_call"}
+    called = {
+        e["payload"].get("name")
+        for e in analyst.run_events(pid, run.id)
+        if e["type"] == "tool_call"
+    }
     assert not (called & set(case["forbidden_tools"])), (case["id"], called)
 
 

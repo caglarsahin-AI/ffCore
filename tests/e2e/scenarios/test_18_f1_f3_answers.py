@@ -43,9 +43,7 @@ def test_18_f3_8_sql_question_one_call(analyst):
     pytest.skip("NOT_RUN: needs 07 (run_sql is an approved action) and 05a's mcp-sql in the stack")
 
 
-@pytest.mark.parametrize(
-    "attempt", load("eval/sql-write-attempts.json"), ids=lambda a: a["id"]
-)
+@pytest.mark.parametrize("attempt", load("eval/sql-write-attempts.json"), ids=lambda a: a["id"])
 def test_18_f3_9_write_attempt_refused(analyst, attempt):
     """mcp-sql refuses each attempt with its code and the demo DB is unchanged (row counts are
     checked by the 13b fixture that owns the demo DB). Also confirms K-SEN-0002 condition 2:
