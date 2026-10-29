@@ -213,7 +213,9 @@ tests reach the backend inside the compose network.
 The knowledge base tests run in two stages on the same stack. Stage 1 has no model weights and
 `FAKE_EMBED` off, so `/readyz` reports `model_missing`; only the test tagged `@model-missing` runs.
 Stage 2 restarts the backend and the ingest worker with `FAKE_EMBED=1` (deterministic stand-in
-embedding and reranker, no weights) and runs everything else. Weightless formats (measured): PDFs
+embedding and reranker, no weights) and runs everything else. Export it rather than prefixing one
+command: the `e2e` service depends on the backend, so `run` recreates the backend from the shell's
+values, and a prefix-only `FAKE_EMBED=1` is back to 0 by the time the tests start. Weightless formats (measured): PDFs
 with a text layer are indexed; DOCX and Markdown need Docling weights and fail with
 `model_missing`, which the tests use as the failed-document case. `--workers=1` keeps the waits
 stable on a shared machine.
@@ -223,8 +225,8 @@ export ALLOWED_INTERNAL_HOSTS=litellm,langfuse-web,fake-llm FFCORE_VERSION=0.0.0
 docker compose -p 10bp1 --env-file .env.test up -d --wait --build backend
 printf 'dummy-not-secret-e2e-pw' | docker compose -p 10bp1 --env-file .env.test run --rm -T backend python -m ffcore.cli create-superadmin --email e2e-admin@example.org --full-name "E2E Admin" --password-stdin
 docker compose -p 10bp1 --env-file .env.test --profile e2e run --rm e2e sh -c "npm ci --no-audit --no-fund && npx playwright test --grep @model-missing --workers=1"
-FAKE_EMBED=1 docker compose -p 10bp1 --env-file .env.test up -d --wait --force-recreate backend worker
-docker compose -p 10bp1 exec backend printenv FAKE_EMBED   # must print 1
+export FAKE_EMBED=1   # keep it set: `run e2e` recreates the backend from the shell's values
+docker compose -p 10bp1 --env-file .env.test up -d --wait backend worker
 docker compose -p 10bp1 --env-file .env.test --profile e2e run --rm e2e sh -c "npm ci --no-audit --no-fund && npx playwright test --grep-invert @model-missing --workers=1"
 docker compose -p 10bp1 --env-file .env.test --profile e2e down -v
 ```
