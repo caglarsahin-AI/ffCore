@@ -26,7 +26,6 @@ import httpx2
 import mcp_types as types
 from mcp.client.session import ClientSession
 from mcp.client.streamable_http import streamable_http_client
-from mcp.shared.exceptions import MCPError
 
 from ffcore.core.auth import OBO_HEADER, service_authorization, sign_on_behalf_of
 from ffcore.core.config import Settings
@@ -124,16 +123,23 @@ def _leaves(exc: BaseException) -> Iterable[BaseException]:
             yield from _leaves(exc.__cause__)
 
 
-def _code(exc: BaseException) -> str:
-    """Closed list; anything unknown is tool_protocol_error (never its text)."""
+def _status_code(status: int) -> str:
+    return "tool_auth_failed" if status in (401, 403) else f"tool_http_{status}"
+
+
+def _code(exc: BaseException, statuses: list[int]) -> str:
+    """Closed list; anything unknown is tool_protocol_error (never its text). The SDK turns an
+    HTTP error answer into a generic MCPError without its status, so the status recorded on
+    this call's own client decides first."""
+    if statuses:
+        return _status_code(statuses[-1])
     leaves = list(_leaves(exc))
     for leaf in leaves:
         if isinstance(leaf, EgressError):
             return leaf.code
     for leaf in leaves:
         if isinstance(leaf, httpx2.HTTPStatusError):
-            status = leaf.response.status_code
-            return "tool_auth_failed" if status in (401, 403) else f"tool_http_{status}"
+            return _status_code(leaf.response.status_code)
         if isinstance(leaf, httpx2.TimeoutException):
             return "tool_timeout"
         if isinstance(leaf, httpx2.TransportError | OSError):
@@ -143,13 +149,24 @@ def _code(exc: BaseException) -> str:
 
 @asynccontextmanager
 async def _session(
-    target: ToolTarget, settings: Settings, caller: Caller, run_id: str | None, timeout_s: float
+    target: ToolTarget,
+    settings: Settings,
+    caller: Caller,
+    run_id: str | None,
+    timeout_s: float,
+    statuses: list[int],
 ) -> AsyncIterator[ClientSession]:
     timeout = EgressTimeout(
         connect=min(CONNECT_TIMEOUT_S, timeout_s), read=timeout_s, total=timeout_s
     )
     headers = _headers(target, settings, caller, run_id)
+
+    async def note(response: httpx2.Response) -> None:
+        if response.status_code >= 400:
+            statuses.append(response.status_code)
+
     async with policy_http_client(timeout=timeout, settings=settings, headers=headers) as http:
+        http.event_hooks["response"] = [note]
         async with streamable_http_client(target.endpoint_url, http_client=http) as (read, write):
             async with ClientSession(read, write) as session:
                 await session.initialize()
@@ -162,9 +179,10 @@ async def discover(
     """MCP tools/list, every page."""
     limit = timeout_s or settings.mcp_call_timeout_s
     actions: list[DiscoveredAction] = []
+    statuses: list[int] = []
     try:
         with anyio.fail_after(limit):
-            async with _session(target, settings, caller, None, limit) as session:
+            async with _session(target, settings, caller, None, limit, statuses) as session:
                 cursor = None
                 while True:
                     params = types.PaginatedRequestParams(cursor=cursor) if cursor else None
@@ -181,7 +199,7 @@ async def discover(
     except ToolCallError:
         raise
     except Exception as exc:  # noqa: BLE001 - mapped to a closed code
-        raise ToolCallError(_code(exc)) from None
+        raise ToolCallError(_code(exc, statuses)) from None
     return actions
 
 
@@ -216,21 +234,20 @@ async def call(
     limit = timeout_s or settings.mcp_call_timeout_s
     started = time.monotonic()
     status, truncated = "ok", False
+    statuses: list[int] = []
     try:
         if guard is not None:
             arguments = await guard.pre(action, arguments)
         try:
             with anyio.fail_after(limit):
-                async with _session(target, settings, caller, run_id, limit) as session:
+                async with _session(target, settings, caller, run_id, limit, statuses) as session:
                     result = await session.call_tool(action, arguments)
         except TimeoutError:
             raise ToolCallError("tool_timeout") from None
-        except MCPError:
-            raise ToolCallError("tool_protocol_error") from None
         except ToolCallError:
             raise
-        except Exception as exc:  # noqa: BLE001 - mapped to a closed code
-            raise ToolCallError(_code(exc)) from None
+        except Exception as exc:  # noqa: BLE001 - mapped to a closed code (MCPError too)
+            raise ToolCallError(_code(exc, statuses)) from None
         text = _text(result)
         if guard is not None:
             text = await guard.post(action, text)
