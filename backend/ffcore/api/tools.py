@@ -10,13 +10,30 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, Request
 from sqlalchemy import func, select
 
-from ffcore.api.common import ERROR_RESPONSES, SessionDep, conflict, not_found, path_resource
-from ffcore.api.tools_schemas import ToolActionOut, ToolCreate, ToolList, ToolOut, ToolUpdate
+from ffcore.api.common import (
+    ERROR_RESPONSES,
+    SessionDep,
+    conflict,
+    not_found,
+    not_implemented,
+    path_resource,
+)
+from ffcore.api.tools_schemas import (
+    InvokeRequest,
+    InvokeResult,
+    ToolActionOut,
+    ToolActionUpdate,
+    ToolCreate,
+    ToolList,
+    ToolOut,
+    ToolUpdate,
+)
 from ffcore.core.audit import audited
 from ffcore.core.auth import Actor, require_role
 from ffcore.core.config import Settings, get_settings
+from ffcore.core.errors import ApiError
 from ffcore.models.tools import Tool, ToolAction
-from ffcore.services import mcp_tools
+from ffcore.services import mcp_client, mcp_tools
 
 router = APIRouter(prefix="/projects/{project_id}/tools", tags=["tools"], responses=ERROR_RESPONSES)
 
@@ -168,3 +185,117 @@ async def delete_tool(
     """Soft delete; the key can be used again."""
     tool = await _get(session, project_id, tool_id)
     tool.deleted_at = func.now()
+
+
+async def _action(session, tool: Tool, name: str) -> ToolAction:
+    action = await session.scalar(
+        select(ToolAction).where(ToolAction.tool_id == tool.id, ToolAction.name == name)
+    )
+    if action is None:
+        raise ApiError(404, "not_found_error", "action_not_found", "Action not found.")
+    return action
+
+
+@router.post("/{tool_id}/discover", response_model=ToolOut, summary="Discover the tool's actions")
+@audited("discover_tool", "tool")
+async def discover_tool(
+    project_id: UUID,
+    tool_id: UUID,
+    request: Request,
+    actor: Admin,
+    session: SessionDep,
+    settings: SettingsDep,
+):
+    """MCP tools/list with the tool's own identity. The outcome is the result: a failed
+    discovery answers 200 with status=error and last_error_code (the connection test shown on
+    screen). New actions start disabled and needing approval."""
+    tool = await _get(session, project_id, tool_id)
+    if tool.kind != "mcp":
+        raise not_implemented()
+    caller = mcp_client.Caller(user_id=actor.actor_id, project_id=str(project_id))
+    try:
+        found = await mcp_client.discover(
+            mcp_tools.target_of(tool, settings), settings, caller=caller
+        )
+    except mcp_client.ToolCallError as exc:
+        tool.status, tool.last_error_code = "error", exc.code
+    else:
+        await mcp_tools.apply_discovery(session, tool, found)
+        tool.status, tool.last_error_code, tool.discovered_at = "discovered", None, func.now()
+    await session.flush()
+    await session.refresh(tool)
+    return await tool_out(session, tool, settings)
+
+
+@router.patch(
+    "/{tool_id}/actions/{action_name}",
+    response_model=ToolActionOut,
+    summary="Change an action's settings",
+)
+@audited("update_tool_action", "tool")
+async def update_tool_action(
+    project_id: UUID,
+    tool_id: UUID,
+    action_name: str,
+    body: ToolActionUpdate,
+    request: Request,
+    actor: Admin,
+    session: SessionDep,
+    resource_id: ToolIdDep,
+):
+    """enabled, needs_approval, max_calls_per_run and timeout_s; discovery never changes them."""
+    tool = await _get(session, project_id, tool_id)
+    action = await _action(session, tool, action_name)
+    for field, value in body.model_dump(exclude_unset=True).items():
+        setattr(action, field, value)
+    await session.flush()
+    await session.refresh(action)
+    return ToolActionOut.model_validate(action, from_attributes=True)
+
+
+@router.post(
+    "/{tool_id}/actions/{action_name}/invoke",
+    response_model=InvokeResult,
+    summary="Call an action directly (test call)",
+)
+@audited("invoke_tool_action", "tool", audit_payload=False)
+async def invoke_tool_action(
+    project_id: UUID,
+    tool_id: UUID,
+    action_name: str,
+    body: InvokeRequest,
+    request: Request,
+    actor: Admin,
+    session: SessionDep,
+    settings: SettingsDep,
+    resource_id: ToolIdDep,
+):
+    """An admin's test call, with the tool's identity (forward_user: the admin's). It runs
+    whether the action is enabled or not and asks no approval: the admin calling it is the
+    decision, and the audit records it (arguments and result are not stored there). A missing
+    action is refused (409 action_missing); a failed call is 502 with its code."""
+    tool = await _get(session, project_id, tool_id)
+    action = await _action(session, tool, action_name)
+    if tool.kind != "mcp":
+        raise not_implemented()
+    if action.status == "missing":
+        raise conflict("action_missing", "The tool no longer lists this action.")
+    caller = mcp_client.Caller(user_id=actor.actor_id, project_id=str(project_id))
+    try:
+        result = await mcp_client.call(
+            mcp_tools.target_of(tool, settings),
+            action.name,
+            body.arguments,
+            settings,
+            caller=caller,
+            timeout_s=action.timeout_s,
+        )
+    except mcp_client.ToolCallError as exc:
+        raise ApiError(502, "api_error", exc.code, f"The tool call failed ({exc.code}).") from None
+    return InvokeResult(
+        text=result.text,
+        truncated=result.truncated,
+        total_chars=result.total_chars,
+        is_error=result.is_error,
+        latency_ms=result.latency_ms,
+    )

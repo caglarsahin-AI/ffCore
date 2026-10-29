@@ -7,11 +7,14 @@ call time (the pinned transport). forward_user goes only to internal FFCore serv
 from typing import Any
 
 import httpx2
+from sqlalchemy import select
 
 from ffcore.core.config import Settings
 from ffcore.core.egress import EgressDenied, EgressPolicy
 from ffcore.core.errors import ApiError
 from ffcore.core.secrets import decrypt_json, encrypt_json
+from ffcore.models.tools import ToolAction
+from ffcore.services import mcp_client
 
 MASK = "***"
 # Fields of each auth type that never leave the backend (the header name is not secret).
@@ -85,3 +88,45 @@ def encrypt_auth(fields: dict[str, str], settings: Settings) -> bytes:
 
 def decrypt_auth(token: bytes, settings: Settings) -> dict[str, str]:
     return decrypt_json(token, settings)
+
+
+def target_of(tool: Any, settings: Settings) -> mcp_client.ToolTarget:
+    return mcp_client.ToolTarget(
+        key=tool.key,
+        endpoint_url=tool.endpoint_url,
+        auth_type=tool.auth_type,
+        auth=decrypt_auth(tool.auth_config_encrypted, settings),
+    )
+
+
+async def apply_discovery(session: Any, tool: Any, found: list) -> None:
+    """New actions start disabled and needing approval (K-05a-0002 S8); existing ones keep
+    their settings; actions the server no longer lists become missing and disabled (kept)."""
+    current = {
+        a.name: a
+        for a in await session.scalars(select(ToolAction).where(ToolAction.tool_id == tool.id))
+    }
+    listed = set()
+    for action in found:
+        listed.add(action.name)
+        row = current.get(action.name)
+        if row is None:
+            session.add(
+                ToolAction(
+                    tool_id=tool.id,
+                    name=action.name,
+                    description=action.description,
+                    input_schema=action.input_schema,
+                    needs_approval=True,
+                    enabled=False,
+                    status="available",
+                )
+            )
+        else:
+            row.description = action.description
+            row.input_schema = action.input_schema
+            row.status = "available"
+    for name, row in current.items():
+        if name not in listed:
+            row.status = "missing"
+            row.enabled = False

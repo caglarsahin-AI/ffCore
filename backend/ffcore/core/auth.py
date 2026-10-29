@@ -7,7 +7,7 @@
 
 import hmac
 import uuid
-from collections.abc import Awaitable, Callable
+from collections.abc import Awaitable, Callable, Sequence
 from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta
 from typing import Annotated, Literal
@@ -102,16 +102,25 @@ def sign_on_behalf_of(
     *,
     user_id: str,
     project_id: str,
-    audience: str,
+    audience: str | Sequence[str],
     settings: Settings,
     now: datetime | None = None,
     ttl_s: int = OBO_MAX_LIFETIME_S,
 ) -> str:
-    """Sign a fresh token for one call; callers re-sign on every tool/service call (C3)."""
+    """Sign a fresh token for one call; callers re-sign on every tool/service call (C3).
+
+    `audience` may be a list (05a, K-05a-0002 S3): a forward_user tool call carries
+    [<tool_key>, obo_audience], so the tool it was cut for and the backend behind it accept
+    it, and any other tool refuses it (audience_mismatch)."""
     if not 0 < ttl_s <= OBO_MAX_LIFETIME_S:
         raise ValueError(f"on-behalf-of lifetime must be 1..{OBO_MAX_LIFETIME_S} s")
-    if not audience:
-        raise ValueError("on-behalf-of audience is required")
+    if isinstance(audience, str):
+        if not audience:
+            raise ValueError("on-behalf-of audience is required")
+    else:
+        audience = list(audience)
+        if not audience or not all(isinstance(a, str) and a for a in audience):
+            raise ValueError("on-behalf-of audience is required")
     issued = now or datetime.now(UTC)
     claims = {
         "sub": user_id,

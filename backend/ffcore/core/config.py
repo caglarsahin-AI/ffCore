@@ -107,6 +107,15 @@ class Settings(BaseSettings):
     upload_max_request_bytes: int = Field(default=516 * 1024 * 1024, gt=0)
     # Where the ingest worker reaches POST /internal/embed (the API loads the model, C10).
     internal_api_url: str = "http://backend:8000"
+    # --- 05a: tools ---
+    # A tool result longer than this reaches the model cut, ending in "[truncated: N/M chars]"
+    # (C13); the call log says truncated=true.
+    tool_result_max_chars: int = Field(default=20000, gt=0)
+    # Whole MCP call (connect, initialize, call); an action's own timeout_s wins.
+    mcp_call_timeout_s: int = Field(default=30, gt=0)
+    # mcp-sql: rows returned at most (the rest cut and said) and the statement timeout.
+    sql_max_rows: int = Field(default=500, gt=0)
+    sql_timeout_s: int = Field(default=20, gt=0)
 
     @field_validator(
         "egress_allowlist", "allowed_internal_hosts", "allowed_languages", mode="before"

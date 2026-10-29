@@ -99,3 +99,25 @@ class ToolOut(Strict):
 
 class ToolList(Strict):
     data: list[ToolOut]
+
+
+class ToolActionUpdate(Patch):
+    enabled: bool = Field(default=None)
+    needs_approval: bool = Field(default=None)
+    max_calls_per_run: Annotated[int, Field(gt=0, le=1000)] | None = Field(default=None)
+    timeout_s: Annotated[int, Field(ge=1, le=600)] | None = Field(default=None)
+
+
+class InvokeRequest(Strict):
+    arguments: dict[str, Any] = Field(default_factory=dict)
+
+
+class InvokeResult(Strict):
+    """A direct test call. `text` is what a model would get: cut results end in
+    "[truncated: N/M chars]" (C13); `is_error` is the tool's own error flag."""
+
+    text: str
+    truncated: bool
+    total_chars: int
+    is_error: bool
+    latency_ms: int

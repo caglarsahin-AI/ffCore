@@ -254,6 +254,38 @@ class _PinnedTransport(httpx2.AsyncHTTPTransport):
         self._pool = httpcore2.AsyncConnectionPool(ssl_context=ssl_context, network_backend=backend)
 
 
+def policy_http_client(
+    *,
+    timeout: EgressTimeout,
+    settings: Settings,
+    headers: Mapping[str, str] | None = None,
+    resolver: Resolver | None = None,
+    inner_backend: httpcore2.AsyncNetworkBackend | None = None,
+) -> httpx2.AsyncClient:
+    """An httpx2.AsyncClient for a library that sends its own requests (the MCP SDK, 05a,
+    K-05a-0002 S2), on the same pinned transport as SafeOutboundClient: the host rules and the
+    address check run at connect time for every connection the library opens. Redirects are not
+    followed by the client, no cookies are kept, no environment proxy is used. The client has
+    connect and read limits only; the caller bounds the whole call (anyio.fail_after)."""
+    if not isinstance(timeout, EgressTimeout):
+        raise TypeError("policy_http_client needs an EgressTimeout; calls without one are refused")
+    backend = _PinnedBackend(
+        EgressPolicy(settings),
+        resolver or system_resolver,
+        inner_backend or httpcore2.AnyIOBackend(),
+    )
+    return httpx2.AsyncClient(
+        transport=_PinnedTransport(backend),
+        headers=dict(headers or {}),
+        timeout=httpx2.Timeout(
+            connect=timeout.connect, read=timeout.read, write=timeout.read, pool=timeout.connect
+        ),
+        follow_redirects=False,
+        trust_env=False,
+        cookies=_NoCookieJar(),
+    )
+
+
 class SafeOutboundClient:
     """Async HTTP client with a mandatory timeout and the egress policy above."""
 
