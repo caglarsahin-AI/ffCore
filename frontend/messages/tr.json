@@ -445,7 +445,7 @@
     "uploadTitle": "Belge yükle",
     "dropHint": "Dosyaları buraya sürükleyin ya da seçin. Her dosya kalite kapılarından geçer; hiçbir şey sessizce atılmaz.",
     "choose": "Dosya seç",
-    "selected": "{count, plural, one {# dosya seçildi} other {# dosya seçildi}}",
+    "selected": "{count, plural, one {# dosya seçildi} other {# dosya seçildi}}: {names}",
     "upload": "Yükle",
     "uploading": "Yükleniyor… %{percent}",
     "aclLegend": "Bu belgeleri kimler okuyabilir",
@@ -524,7 +524,8 @@
     "reindexLayer": "Katman",
     "reindexFull": "Yalnızca değişenler değil, tüm belgeler",
     "reindex": "Yeniden üret",
-    "reindexStarted": "{count, plural, one {# belge yeniden üretiliyor.} other {# belge yeniden üretiliyor.}}"
+    "reindexStarted": "{count, plural, one {# belge yeniden üretiliyor.} other {# belge yeniden üretiliyor.}}",
+    "outcomeLine": "{file}: {outcome}"
   },
   "Search": {
     "title": "Aramayı dene",

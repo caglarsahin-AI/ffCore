@@ -2,9 +2,10 @@
 
 import { PlusIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { cloneElement, useId, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 
+import { DisabledWithReason } from "@/components/disabled-with-reason";
 import { ModelForm } from "@/components/model-form";
 import { ListState, Screen } from "@/components/screen";
 import { useAccess, useSession } from "@/components/session-provider";
@@ -52,7 +53,7 @@ function ModelList({ projectId }: { projectId: string }) {
   const action = isSuperadmin ? (
     <WriteGate projectId={projectId}>{addButton}</WriteGate>
   ) : (
-    <DisabledWithReason reason={t("addNeedsSuperadmin")}>{addButton}</DisabledWithReason>
+    <DisabledWithReason reason={t("addNeedsSuperadmin")} needs="superadmin">{addButton}</DisabledWithReason>
   );
 
   return (
@@ -122,23 +123,5 @@ function ModelList({ projectId }: { projectId: string }) {
         )}
       </ListState>
     </Screen>
-  );
-}
-
-function DisabledWithReason({
-  reason,
-  children,
-}: {
-  reason: string;
-  children: React.ReactElement<{ disabled?: boolean; "aria-describedby"?: string }>;
-}) {
-  const hintId = useId();
-  return (
-    <span className="inline-flex" title={reason} data-needs-superadmin="">
-      {cloneElement(children, { disabled: true, "aria-describedby": hintId })}
-      <span id={hintId} className="sr-only">
-        {reason}
-      </span>
-    </span>
   );
 }

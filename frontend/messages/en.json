@@ -445,7 +445,7 @@
     "uploadTitle": "Upload documents",
     "dropHint": "Drag files here or choose them. Each file goes through the quality gates; nothing is dropped silently.",
     "choose": "Choose files",
-    "selected": "{count, plural, one {# file selected} other {# files selected}}",
+    "selected": "{count, plural, one {# file selected} other {# files selected}}: {names}",
     "upload": "Upload",
     "uploading": "Uploading… {percent}%",
     "aclLegend": "Who may read these documents",
@@ -524,7 +524,8 @@
     "reindexLayer": "Layer",
     "reindexFull": "All documents, not only changed ones",
     "reindex": "Rebuild",
-    "reindexStarted": "{count, plural, one {Rebuilding # document.} other {Rebuilding # documents.}}"
+    "reindexStarted": "{count, plural, one {Rebuilding # document.} other {Rebuilding # documents.}}",
+    "outcomeLine": "{file}: {outcome}"
   },
   "Search": {
     "title": "Try search",
