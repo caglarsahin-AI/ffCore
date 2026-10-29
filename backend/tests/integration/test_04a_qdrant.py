@@ -85,6 +85,7 @@ def index_both(kb_id, docs):
                     acl_users=[],
                     created_by="test",
                 )
+                document.status = "indexed"  # search reads indexed only (r1 MAJOR-3)
                 (chunk,) = await store.replace_chunks(
                     document,
                     [

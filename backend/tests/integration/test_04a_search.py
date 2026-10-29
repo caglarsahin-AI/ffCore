@@ -103,6 +103,7 @@ def index(kb_id, docs):
                     acl_users=[],
                     created_by="test",
                 )
+                document.status = "indexed"  # search reads indexed only (r1 MAJOR-3)
                 document.updated_at_source = updated
                 (chunk,) = await store.replace_chunks(
                     document,

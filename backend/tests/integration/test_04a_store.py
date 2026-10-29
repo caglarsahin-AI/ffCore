@@ -65,6 +65,7 @@ async def add_document(kb_id, filename, sha, acl_roles=(), acl_users=(), chunks=
             acl_users=list(acl_users),
             created_by="test",
         )
+        document.status = "indexed"  # search reads indexed only (r1 MAJOR-3)
         rows = await store.replace_chunks(
             document,
             [NewChunk(ordinal=i, text=t, breadcrumb="KB › Doc", token_count=3) for i, t in chunks],

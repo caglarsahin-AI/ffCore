@@ -175,6 +175,23 @@ class QdrantStore(VectorStore):
             for point in result["result"]["points"]
         ]
 
+    async def update_acl(self, kb_id, document_id, acl_roles, acl_users) -> None:
+        """The payload copy of the ACL follows the database at once (review 04a r1 MAJOR-1)."""
+        roles, users = list(acl_roles), [str(u) for u in acl_users]
+        await self._call(
+            "POST",
+            f"/collections/{collection_name(kb_id)}/points/payload?wait=true",
+            {
+                "payload": {
+                    "acl_roles": roles,
+                    "acl_users": users,
+                    "acl_open": not roles and not users,
+                },
+                "filter": {"must": [{"key": "document_id", "match": {"value": str(document_id)}}]},
+            },
+            ok=(200, 404),
+        )
+
     async def delete_by_document(self, document_id: UUID) -> None:
         collections = await self._call("GET", "/collections")
         flt = {"must": [{"key": "document_id", "match": {"value": str(document_id)}}]}

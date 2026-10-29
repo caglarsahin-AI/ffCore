@@ -78,6 +78,8 @@ class PgVectorStore(VectorStore):
             "c.embedding IS NOT NULL",
             "c.chunk_status IN :searchable",
             "d.deleted_at IS NULL",
+            # Searchable only once the whole publication succeeded (review r1 MAJOR-3).
+            "d.status = 'indexed'",
         ]
         params: dict = {"kb_id": kb_id, "vec": _literal(query.dense), "top_k": top_k}
         binds = [bindparam("searchable", expanding=True)]
@@ -111,6 +113,10 @@ class PgVectorStore(VectorStore):
                 await session.execute(text("SET LOCAL enable_indexscan = off"))
             rows = (await session.execute(statement, params)).all()
         return [VectorHit(chunk_id=r[0], document_id=r[1], score=float(r[2])) for r in rows]
+
+    async def update_acl(self, kb_id, document_id, acl_roles, acl_users) -> None:
+        """Nothing to copy: this driver reads the ACL from `documents` in every query."""
+        return None
 
     async def delete_by_document(self, document_id: UUID) -> None:
         async with self._session() as session:

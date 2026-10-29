@@ -82,6 +82,7 @@ async def _lexical(
         "c.kb_id = :kb_id",
         "c.chunk_status IN :searchable",
         "d.deleted_at IS NULL",
+        "d.status = 'indexed'",
         _acl_sql(filters, params),
         "c.tsv @@ tsq.q",
     ]
@@ -121,19 +122,30 @@ def _rrf(legs: list[list[uuid.UUID]], limit: int) -> list[tuple[uuid.UUID, int]]
 
 
 async def _details(
-    session: AsyncSession, ids: list[uuid.UUID], dense: list[float]
+    session: AsyncSession,
+    kb_id: uuid.UUID,
+    ids: list[uuid.UUID],
+    dense: list[float],
+    filters: VectorFilters,
 ) -> dict[uuid.UUID, dict]:
+    """Candidate rows, re-checked against the database: the KB, live and indexed documents and
+    the current ACL. A vector store's payload copy can lag behind an ACL change; a candidate the
+    caller may no longer read is dropped here, before scoring and logging (review r1 MAJOR-1)."""
     if not ids:
         return {}
+    params: dict = {"ids": ids, "vec": _literal(dense), "kb_id": kb_id}
+    acl = _acl_sql(filters, params)
     rows = await session.execute(
         text(
             "SELECT c.id, c.document_id, d.filename, c.page, c.section_path, c.breadcrumb,"
             " c.text, c.chunk_status, d.updated_at_source,"
             " CASE WHEN c.embedding IS NULL THEN NULL"
             " ELSE 1 - (c.embedding <=> CAST(:vec AS vector)) END AS embed_score"
-            " FROM chunks c JOIN documents d ON d.id = c.document_id WHERE c.id IN :ids"
+            " FROM chunks c JOIN documents d ON d.id = c.document_id"
+            " WHERE c.id IN :ids AND c.kb_id = :kb_id AND d.deleted_at IS NULL"
+            f" AND d.status = 'indexed' AND {acl}"
         ).bindparams(bindparam("ids", expanding=True)),
-        {"ids": ids, "vec": _literal(dense)},
+        params,
     )
     return {row.id: row._asdict() for row in rows}
 
@@ -170,7 +182,9 @@ async def search(
     if hybrid and store.name == "pgvector":
         legs.append(await _lexical(session, kb.id, normalized, filters, limit))
     fused = _rrf(legs, limit)
-    details = await _details(session, [chunk_id for chunk_id, _ in fused], dense)
+    details = await _details(session, kb.id, [chunk_id for chunk_id, _ in fused], dense, filters)
+    # Only candidates the database still allows (see _details); the ranks stay as fused.
+    fused = [(chunk_id, rank) for chunk_id, rank in fused if chunk_id in details]
 
     candidates = []
     for chunk_id, rank in fused:

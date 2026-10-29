@@ -94,3 +94,12 @@ class VectorStore(ABC):
 
     @abstractmethod
     async def drop_collection(self, kb_id: UUID) -> None: ...
+
+
+async def _unsupported_update_acl(self, kb_id, document_id, acl_roles, acl_users) -> None:
+    raise VectorStoreError("unsupported", f"{self.name} cannot update a document's ACL")
+
+
+# Optional, additive to C5 (default: unsupported). An ACL change of an already indexed document
+# must reach the store before the change is answered (review 04a r1 MAJOR-1).
+VectorStore.update_acl = _unsupported_update_acl
