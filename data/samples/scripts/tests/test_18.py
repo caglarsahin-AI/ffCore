@@ -56,6 +56,7 @@ SQL_REJECT_CODES = {
     "sql_multiple_statements",
     "sql_not_select",
     "sql_system_catalog",
+    "sql_function_not_allowed",
     "sql_too_deep",
     "sql_unknown_table",
 }

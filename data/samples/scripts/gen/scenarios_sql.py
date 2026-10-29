@@ -208,8 +208,10 @@ NEW_QUESTIONS = [
     },
 ]
 
-# Statements mcp-sql must refuse; `expected_code` is 05a's SqlRejected code (a55ca54), to be
-# confirmed against the merged validator (K-SEN-0002). `class`: write = a plain write statement;
+# Statements mcp-sql must refuse; `expected_code` is the merged 05a validator's SqlRejected code
+# (checked by backend/tests/unit/test_18td_sql_write_attempts.py, K-SEN-0002; a closed-list
+# function is sql_function_not_allowed since 05a review r1).
+# `class`: write = a plain write statement;
 # hidden_write = a statement that would write, disguised (`patterns`: union, cte, comment,
 # function, second_statement, select_into; review r1 MAJOR-1: every one of them really tries to
 # write); catalog = reads the system catalog or calls a system function, no write.
@@ -252,7 +254,7 @@ WRITE_ATTEMPTS = [
     (
         "SELECT id FROM departments UNION ALL SELECT lo_create(0)::int",
         "hidden_write",
-        "sql_system_catalog",
+        "sql_function_not_allowed",
         ["union", "function"],
     ),
     (
@@ -269,7 +271,7 @@ WRITE_ATTEMPTS = [
         "sql_system_catalog",
         ["union"],
     ),
-    ("SELECT pg_sleep(30)", "catalog", "sql_system_catalog", []),
+    ("SELECT pg_sleep(30)", "catalog", "sql_function_not_allowed", []),
 ]
 
 SUITE = {
