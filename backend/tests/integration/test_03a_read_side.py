@@ -73,6 +73,10 @@ PARITY_EXEMPT_PREFIXES = (
     f"{API}/projects/{{project_id}}/guardrail-policies/{{policy_id}}",
     f"{API}/projects/{{project_id}}/knowledge-bases",
     f"{API}/projects/{{project_id}}/tools/{{tool_id}}",
+    # 06a: single agent and run GETs need an agent, a version and a run in the world; their
+    # parity is test_06a_read_mode_get_parity (the /agents and /runs lists stay checked here).
+    f"{API}/projects/{{project_id}}/agents/{{agent_id}}",
+    f"{API}/projects/{{project_id}}/runs/{{run_id}}",
 )
 
 
