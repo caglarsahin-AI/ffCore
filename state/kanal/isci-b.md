@@ -2,10 +2,10 @@
 
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
-- Oturum kimliği: ffcore-isci-b-05a (02 oturumundan devam)
-- Aktif paket: 05a (GOREV K-05a-0001 bekleniyor)
+- Oturum kimliği: ffcore-isci-b-07
+- Aktif paket: 07 (feat/07-approvals)
 - Durum: ACTIVE
-- Son okunan: koordinator K-02-0023 (2026-10-29 15:22)
+- Son okunan: koordinator K-07-0003 (2026-10-29 22:16)
 
 ## Mesajlar
 
@@ -742,3 +742,34 @@ Diğer 06a bulguları (isci-a için):
 ### B-07-0002 · 2026-10-29 22:11 · → koordinator · ACK
 Paket: 07   Cevap: K-07-0002
 Plan onayı alındı; kararlar state/pr/07.md'ye işlendi. Sıra: U1 (arq cron ölçümü, depo dışı), sonra dilim 1-5; her dilim önce kırmızı, kapı çıktıları tee ile dosyaya.
+
+### B-07-0003 · 2026-10-29 22:18 · → koordinator · HANDOFF
+Paket: 07   Cevap: K-07-0003
+Lease RETIRED (isci-b, bu oturum). 07 yeni oturumda devam eder; kod yazılmadı, commit yok.
+- **Worktree** `.worktrees/feat/07-approvals`, HEAD main ba48932, olduğu gibi kaldı. Tek takip edilmeyen dosya `backend/tests/integration/test_07_schema.py`: dilim 1'in kırmızı testi (tablo, kapalı `assigned_role` / `status`, `resolved_at` tutarlılığı, `(run_id, tool_call_id)` tekilliği, proje FK'sı). Koşulmadı; model ve migration yok.
+- **Plan ve kararlar:** state/pr/07.md (PLANNED + K-07-0002: S1-S5, S8 A; S6 06a'da; S7 `analyst`; B3 yalnız konsol oturumu).
+- **U1 (arq 0.28.0 cron, kaynaktan):** `cron(unique=True)` varsayılan; iş kimliği `<ad>:<sonraki çalışma ms>`, aynı tikte çok worker'da tek çalışma; `timeout` iş başına. Süresi dolan onayları kapatan güncelleme koşullu (`status='pending'`) yazılacağı için çift çalışma zararsız.
+- **Yığın (dikkat):** compose projesi `07-approvals` yarım ayakta.
+  - İlk `up` 8000 portu dolu olduğu için düştü; host'ta `marka-backend-1` 0.0.0.0:8000'i tutuyor.
+  - `BACKEND_PORT=18007 FRONTEND_PORT=13007` ile ikinci `up`'ı kullanıcı durdurdu, ama konteynerlerin bir kısmı kalktı (postgres, redis, backend, litellm, langfuse…). 9 volume var.
+  - Kullanıcı docker işlemini durdurduğu için `down -v` yapmadım. Kapatma kararı kullanıcıda ya da yeni oturumda: `docker compose -p 07-approvals --env-file .env.test --profile test --profile qdrant --profile tools down -v`.
+  - Yeni oturum yığını kaldırırken host portlarını ayırmalı (`BACKEND_PORT` / `FRONTEND_PORT`).
+- **Not:** `tools` imajı `ffcore/tools:0.0.0-07` kuruldu; backend imajı build adımında kuruldu, ilk up'tan önce.
+
+### B-07-0004 · 2026-10-29 22:23 · → koordinator · DURUM
+Paket: 07   Cevap: K-07-0003
+DURUM: OKUMA-TAMAM (yeni oturum ffcore-isci-b-07; lease ACTIVE, aktif paket 07).
+Okunan gruplar: 1 FELSEFE + FELSEFE_UYGULAMA; 2 CLAUDE (29 Ekim sürümü); 3 PLAN v2.6; 4 KARARLAR (29 Ekim eklemeleri dahil: 05a/06a kararları, C4/C7 dondu, paket başına oturum); 5 handbook tümü + PR şablonu (28 Ekim'den beri değişen yalnız TERMINOLOGY, okundu); 6 WORK_QUEUE, BLOCKERS, koordinatör kanalında K-07-0000..0003 ve K-06a-0016, isci-b kanalında B-07-0001..0003; 7 plan/07 tamamı, state/pr/07.md, bağımlı Teslimatlar 06, 03, 05, 08; 8 BASLATMA.
+Not (dürüstlük): bu oturum 28 Ekim'de 01 için açılmış oturumun devamıdır (eski ffcore-isci-b-01, RETIRED); temel okuma o gün yapıldı, bugün değişen dosyalar git diff ile yeniden okundu. Kullanıcı 07'yi bu oturumda açtı.
+
+### B-07-0005 · 2026-10-29 22:23 · → koordinator · ACK
+Paket: 07   Cevap: K-07-0001 / K-07-0002
+GOREV ve plan kararları alındı (S1-S5, S8 A; S6 06a'da; S7 `analyst`; onay yalnız konsol oturumu, aksi 403 `approval_requires_user_session`). Worktree `.worktrees/feat/07-approvals` @ ba48932; tek takip edilmeyen dosya `backend/tests/integration/test_07_schema.py` (önceki oturumun dilim 1 kırmızı testi, koşulmadı). main şu an 0ddefcd (ba48932 üstüne yalnız state commit'i). Yığın: `07-approvals` projesinde yalnız `qdrant` ve `fake-llm` ayakta, 1 volume (HANDOFF'taki postgres/backend vb. artık yok); dokunmadım. Sıradaki: dilim 1 (model + migration `07_0001`, kırmızı test önce), host portları ayrı (`BACKEND_PORT=18007 FRONTEND_PORT=13007`).
+
+### B-07-0004 · 2026-10-29 22:22 · → koordinator · ACK
+Paket: 07   Cevap: K-07-0004
+Alındı. Kod yok, dilim 1'e başlanmadı; worktree olduğu gibi duruyor. Bu oturum yeni pencere açılınca RETIRED. 07-approvals yığını hâlâ yarım ayakta (B-07-0003); kapatma kararı kullanıcıda ya da yeni oturumda.
+
+### B-07-0006 · 2026-10-29 22:27 · → koordinator · CEVAP
+Paket: 07   Cevap: K-07-0004
+Ne fork ne sıfırdan: bu pencere 28 Ekim'de açılan özgün oturumun kendisi (eski ffcore-isci-b-01, B-01-0003 ile RETIRED); kullanıcı `ROL=isci-b PAKET=07` mesajını aynı pencereye yazdı (o günün fork'u ayrı oturumdu, "B Workers (fork)"). Kod yazmadım, dilim 1'e başlamıyorum; karar gelene kadar bekliyorum.

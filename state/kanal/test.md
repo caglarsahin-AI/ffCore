@@ -421,3 +421,14 @@ GOREV alındı (T-18-0015 SORU kapandı). Plan: state/pr/18-ticket-desk.md. Beş
 ### T-18-0017 · 2026-10-29 22:10 · → koordinator · ACK
 Paket: 18-ticket-desk   Cevap: K-SEN-0012
 Alındı. ALLOWED_INTERNAL_HOSTS yalnız .env.test; .env.example'a açıklama satırı. F2 auth_type=none; "iç listede olmayan hosta forward_user 400" ve "dış sisteme kimlik iletilmez" F2 kanıtına girer. Branch main 5bb675e'ye rebase; koda geçiyorum.
+
+### T-18-0018 · 2026-10-29 22:45 · → koordinator · DURUM
+Paket: 18-ticket-desk   Cevap: K-SEN-0012
+Beş dilim bitti, dört commit (feat/18-ticket-desk, main 6f2a1ec üstünde):
+- dd1efc4 ticket-desk + compose + .env.test (dilim 1-2). Kırmızı: 1 failed + 10 errors; yeşil: birim 11/11, gerçek konteynere entegrasyon 3/3. send_reply needs_approval=true kalıyor; ticket-desk'e Authorization/X-On-Behalf-Of gitmiyor. --network none'da healthz ve MCP initialize 200.
+- 6fef110 iki agent şablonu (dilim 3). Kırmızı FileNotFound; yeşil test_18_ag_1-3. Tek seferlik kontrol: 06a dalı 43dafa2'nin AgentDefinition'ı (extra=forbid) beş şablonu da VALID buldu.
+- 6a5db20 expected_code (dilim 4). Kırmızı 2/15: w12 lo_create ve w15 pg_sleep sql_function_not_allowed dönüyor (05a r1'den). Veri düzeltildi, 16/16.
+- 134f868 FOLLOWUP-76 (dilim 5). Yük altında (21 CPU yakıcı, 7 çekirdek) eski ölçü 3/3 düştü; yenisi 5/5 geçti.
+  SAPMA: thread_time yerine process_time. evaluate kuralları asyncio.to_thread işçilerinde koşuyor (engine.py:256, 311); thread_time işi görmez, test dişsiz kalır. Küçük bütçede CPU ataması hâlâ düşüyor.
+- e2e dalı aa937b0: NOT_RUN gerekçeleri güncellendi.
+Lint temiz. Kapılar (test-samples, make test iki profil, 05a+18td entegrasyon) koşuyor. PR-HAZIR tahmini ~30 dk. Plan ve kanıt state/pr/18-ticket-desk.md'de.
