@@ -1,10 +1,11 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useRef } from "react";
 
 import { api, upload } from "@/lib/api/client";
 import type { components } from "@/lib/api/schema-04a";
-import { documentsRefetchInterval } from "@/lib/knowledge";
+import { documentsFinished, documentsRefetchInterval } from "@/lib/knowledge";
 
 // Knowledge base calls (04a contract, types generated from backend/openapi/04a.yaml).
 type S = components["schemas"];
@@ -66,13 +67,26 @@ export function useDeleteKnowledgeBase(projectId: string) {
   return useKbMutation(projectId, (id: string) => api<void>("DELETE", `${base(projectId)}/${id}`));
 }
 
-// Polls while a document is in flight and stops when all are final (lib/knowledge.ts).
+// Polls while a document is in flight and stops when all are final (lib/knowledge.ts). When a poll
+// shows a document reaching a final status, the knowledge base counts changed on the backend: the
+// knowledge base and the list are refreshed then, not on a timer (review r1 MINOR-1).
 export function useDocuments(projectId: string, kbId: string) {
-  return useQuery({
+  const client = useQueryClient();
+  const query = useQuery({
     queryKey: keys.documents(projectId, kbId),
     queryFn: () => api<S["DocumentList"]>("GET", `${base(projectId)}/${kbId}/documents`).then((r) => r.data),
     refetchInterval: (query) => documentsRefetchInterval(query.state.data),
   });
+  const previous = useRef<KbDocument[] | undefined>(undefined);
+  useEffect(() => {
+    if (!query.data) return;
+    if (documentsFinished(previous.current, query.data)) {
+      void client.invalidateQueries({ queryKey: keys.one(projectId, kbId), exact: true });
+      void client.invalidateQueries({ queryKey: keys.list(projectId), exact: true });
+    }
+    previous.current = query.data;
+  }, [query.data, client, projectId, kbId]);
+  return query;
 }
 
 // Document changes refresh the documents and the knowledge base (counts, reindexing status).

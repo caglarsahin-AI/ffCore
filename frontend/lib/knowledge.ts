@@ -103,6 +103,22 @@ export function documentsRefetchInterval(documents: { status: DocumentStatus }[]
   return documents?.some((document) => isActiveDocument(document.status)) ? DOCUMENTS_POLL_MS : false;
 }
 
+// A document reached a final status since the last poll (or arrived final): the knowledge base
+// counts changed, so its summary and list are refreshed (review r1 MINOR-1). The first load is not
+// a change.
+export function documentsFinished(
+  previous: { id: string; status: DocumentStatus }[] | undefined,
+  current: { id: string; status: DocumentStatus }[],
+): boolean {
+  if (!previous) return false;
+  const before = new Map(previous.map((document) => [document.id, document.status]));
+  return current.some((document) => {
+    if (isActiveDocument(document.status)) return false;
+    const was = before.get(document.id);
+    return was === undefined || isActiveDocument(was);
+  });
+}
+
 export function readinessNeedsRefresh(status: ReadinessState): boolean {
   return status === "warming";
 }

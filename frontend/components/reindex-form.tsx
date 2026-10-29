@@ -5,6 +5,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import { CheckField, FieldShell, SELECT } from "@/components/form-parts";
+import { useAccess } from "@/components/session-provider";
 import { Button } from "@/components/ui/button";
 import { useReportError } from "@/components/use-report-error";
 import { WriteGate } from "@/components/write-gate";
@@ -14,10 +15,12 @@ import type { ReindexRequest } from "@/lib/api/knowledge-queries";
 const LAYERS = ["silver", "gold"] as const satisfies readonly ReindexRequest["layer"][];
 
 // "Rebuild a layer" (D3): silver from raw or gold from silver, changed documents or all of them.
+// In read mode the fields are disabled too, not only the button (review r1 MINOR-2).
 export function ReindexForm({ projectId, kbId }: { projectId: string; kbId: string }) {
   const t = useTranslations("Documents");
   const tLayers = useTranslations("Documents.layers");
   const reindex = useReindex(projectId, kbId);
+  const { canWrite } = useAccess(projectId);
   const report = useReportError();
   const [layer, setLayer] = useState<ReindexRequest["layer"]>("gold");
   const [full, setFull] = useState(false);
@@ -36,7 +39,7 @@ export function ReindexForm({ projectId, kbId }: { projectId: string; kbId: stri
     <section className="flex flex-col gap-3 rounded-xl border bg-card p-6" data-testid="reindex-form">
       <h2 className="text-lg font-medium">{t("reindexTitle")}</h2>
       <p className="text-sm text-muted-foreground">{t("reindexHint")}</p>
-      <div className="flex flex-wrap items-end gap-4">
+      <fieldset disabled={!canWrite} className="flex min-w-0 flex-wrap items-end gap-4">
         <FieldShell id="reindex-layer" label={t("reindexLayer")}>
           {(a11y) => (
             <select {...a11y} className={SELECT} value={layer} onChange={(e) => setLayer(e.target.value as ReindexRequest["layer"])}>
@@ -54,7 +57,7 @@ export function ReindexForm({ projectId, kbId }: { projectId: string; kbId: stri
             {t("reindex")}
           </Button>
         </WriteGate>
-      </div>
+      </fieldset>
     </section>
   );
 }
