@@ -3,7 +3,7 @@
 # Servisleri başlatma/durdurma doğrudan compose ile: docker compose up -d --wait | down | logs -f
 # Önyüz lint'i ayrı konteynerde: docker compose run --rm frontend npm run lint
 
-.PHONY: lint format test test-int test-models models models-check smoke pull seed-models render-litellm reindex langfuse-init seed-prompts
+.PHONY: lint format test test-samples test-int test-models models models-check smoke pull seed-models render-litellm reindex langfuse-init seed-prompts
 
 lint:
 	ruff check backend scripts data/samples/scripts
@@ -16,6 +16,11 @@ format:
 # vitest 10a ile eklenecek; 00'da yalnızca pytest.
 test:
 	cd backend && pytest tests/unit tests/contract
+
+# Sample data generators and their acceptance tests (13a, 18-hazirlik): stdlib unittest, no
+# Docker socket, so the opt-in Postgres tests report NOT_RUN here (host: RUN_PG_TESTS=1).
+test-samples:
+	python -m unittest discover -s data/samples/scripts/tests -v
 
 # Qdrant tests need the qdrant profile up (docker compose --profile qdrant up -d qdrant); the
 # defaults are the Compose service, so every run uses the same values (review r1). `$(or)`, not
