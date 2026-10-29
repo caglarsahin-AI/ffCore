@@ -109,6 +109,24 @@ class RunCreate(Strict):
     )
 
 
+class FeedbackRequest(Strict):
+    """Expert review of a completed run (F9, K-06a-0005)."""
+
+    vote: Literal["correct", "partial", "wrong"]
+    note: str | None = Field(default=None, max_length=2000)
+
+
+class FeedbackOut(BaseModel):
+    run_id: UUID
+    vote: Literal["correct", "partial", "wrong"]
+    note: str | None
+    by: str
+    at: datetime
+    score_sent: bool = Field(
+        description="A Langfuse score was handed over (the run has a trace and tracing is on)."
+    )
+
+
 class RunOut(BaseModel):
     id: UUID
     project_id: UUID
@@ -140,6 +158,9 @@ class RunOut(BaseModel):
     queued_at: datetime
     started_at: datetime | None
     ended_at: datetime | None
+    feedback: dict[str, Any] | None = Field(
+        default=None, description="Expert feedback on the answer (F9), if given."
+    )
 
 
 class RunList(BaseModel):

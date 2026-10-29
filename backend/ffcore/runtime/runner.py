@@ -21,6 +21,7 @@ from langgraph.types import Command
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from ffcore.core import tracing
 from ffcore.core.config import Settings
 from ffcore.models.agents import AgentVersion
 from ffcore.models.runs import Message, Run
@@ -123,51 +124,66 @@ async def execute(attempt: Attempt, run_id: str, resume: dict[str, Any] | None =
             session=session, run=run, definition=definition, events=events, boundary=boundary
         )
         config = {"configurable": {"thread_id": str(run.id)}}
-        interrupted: dict[str, Any] | None = None
-        async with AsyncPostgresSaver.from_conn_string(
-            checkpointer_dsn(settings.database_url.get_secret_value())
-        ) as saver:
-            graph = build_graph().compile(checkpointer=saver)
-            snapshot = await graph.aget_state(config)
-            if resume is not None:
-                graph_input: Any = Command(resume=resume)
-            elif snapshot.next:
-                graph_input = None  # the worker died mid-way: continue from the checkpoint
-            else:
-                graph_input = {"question": run.input}
-            stop: StopRun | None = None
-            try:
-                async with asyncio.timeout(max(deadline - time.monotonic(), 0.001)):
-                    async for update in graph.astream(
-                        graph_input, config, stream_mode="updates", context=ctx
-                    ):
-                        if "__interrupt__" in update:
-                            interrupted = update["__interrupt__"][0].value
-            except TimeoutError:
-                stop = StopRun(
-                    RunStatus.failed, "limit_reached", LIMIT_MESSAGE, limit="run_timeout_s"
-                )
-            except StopRun as raised:
-                stop = raised
-            except Exception as exc:
-                code = getattr(exc, "code", None) or "run_error"
-                log.exception("run_failed run_id=%s code=%s", run.id, code)
-                stop = StopRun(RunStatus.failed, code, getattr(exc, "message", None))
-            # The last checkpoint: what the run had done when it stopped or finished.
-            final = (await graph.aget_state(config)).values
-        if stop is not None:
-            return await _stop(session, run.id, events, final, stop)
-
-        if interrupted is not None:
-            run.status = (
-                RunStatus.waiting_approval
-                if interrupted.get("kind") == "approval"
-                else RunStatus.waiting_user
+        with (
+            tracing.run_attributes(
+                str(run.id), ctx.user_id, str(run.project_id), tags=[run.channel, "agent"]
+            ),
+            tracing.span("agent-run", metadata={"run_id": str(run.id)}),
+        ):
+            client = tracing.get_client()
+            if client is not None and run.langfuse_trace_id is None:
+                # One trace per run (02); later attempts of the same run add to it.
+                run.langfuse_trace_id = client.get_current_trace_id()
+                await session.commit()
+            return await _attempt_graph(
+                session, run, events, ctx, config, settings, deadline, resume
             )
-            await session.commit()
-            return run.status
-        await _complete(session, run, events, final)
+
+
+async def _attempt_graph(session, run, events, ctx, config, settings, deadline, resume) -> str:
+    interrupted: dict[str, Any] | None = None
+    async with AsyncPostgresSaver.from_conn_string(
+        checkpointer_dsn(settings.database_url.get_secret_value())
+    ) as saver:
+        graph = build_graph().compile(checkpointer=saver)
+        snapshot = await graph.aget_state(config)
+        if resume is not None:
+            graph_input: Any = Command(resume=resume)
+        elif snapshot.next:
+            graph_input = None  # the worker died mid-way: continue from the checkpoint
+        else:
+            graph_input = {"question": run.input}
+        stop: StopRun | None = None
+        try:
+            async with asyncio.timeout(max(deadline - time.monotonic(), 0.001)):
+                async for update in graph.astream(
+                    graph_input, config, stream_mode="updates", context=ctx
+                ):
+                    if "__interrupt__" in update:
+                        interrupted = update["__interrupt__"][0].value
+        except TimeoutError:
+            stop = StopRun(RunStatus.failed, "limit_reached", LIMIT_MESSAGE, limit="run_timeout_s")
+        except StopRun as raised:
+            stop = raised
+        except Exception as exc:
+            code = getattr(exc, "code", None) or "run_error"
+            log.exception("run_failed run_id=%s code=%s", run.id, code)
+            stop = StopRun(RunStatus.failed, code, getattr(exc, "message", None))
+        # The last checkpoint: what the run had done when it stopped or finished.
+        final = (await graph.aget_state(config)).values
+    if stop is not None:
+        return await _stop(session, run.id, events, final, stop)
+
+    if interrupted is not None:
+        run.status = (
+            RunStatus.waiting_approval
+            if interrupted.get("kind") == "approval"
+            else RunStatus.waiting_user
+        )
+        await session.commit()
         return run.status
+    await _complete(session, run, events, final)
+    return run.status
 
 
 async def _complete(session: AsyncSession, run: Run, events: RunEventWriter, final: dict) -> None:

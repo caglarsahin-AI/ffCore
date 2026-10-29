@@ -27,6 +27,8 @@ EXPECTED = {
     P + "/runs/{run_id}/stream": {"get"},
     P + "/runs/{run_id}/resume": {"post"},
     P + "/runs/{run_id}/cancel": {"post"},
+    # F9 (K-06a-0005), additive
+    P + "/runs/{run_id}/feedback": {"post"},
 }
 
 

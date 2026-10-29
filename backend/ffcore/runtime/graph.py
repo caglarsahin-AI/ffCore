@@ -23,6 +23,7 @@ from langgraph.graph import END, START, StateGraph
 from langgraph.runtime import Runtime
 from langgraph.types import interrupt
 
+from ffcore.core import tracing
 from ffcore.runtime.contracts import RunEventType, RunStatus, SseEvent
 from ffcore.runtime.prompting import (
     DECLINE_PATTERN,
@@ -485,6 +486,19 @@ async def finalize(state: RunState, runtime: Runtime[RunContext]) -> dict:
     return {"answer": answer, "outcome": outcome, "confidence": confidence}
 
 
+def _traced(name: str, node):
+    """Each node is one Langfuse span under the run's trace (02 `span`); LiteLLM's generation
+    lands under it through `trace_context`. No LangChain callback: it needs the full `langchain`
+    package (V10)."""
+
+    async def run(state: RunState, runtime: Runtime[RunContext]) -> dict:
+        with tracing.span(f"agent.{name}"):
+            return await node(state, runtime)
+
+    run.__name__ = name
+    return run
+
+
 def build_graph() -> StateGraph:
     graph = StateGraph(RunState, context_schema=RunContext)
     for name, node in (
@@ -499,7 +513,7 @@ def build_graph() -> StateGraph:
         ("guard_out", guard_out),
         ("finalize", finalize),
     ):
-        graph.add_node(name, node)
+        graph.add_node(name, _traced(name, node))
     graph.add_edge(START, "prepare")
     graph.add_edge("prepare", "retrieve")
     graph.add_edge("retrieve", "guard_in")

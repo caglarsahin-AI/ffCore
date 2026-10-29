@@ -866,6 +866,19 @@ paths:
           - $ref: '#/components/schemas/RunStatus'
           - type: 'null'
           title: Status
+      - name: feedback
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - enum:
+            - pending
+            - given
+            type: string
+          - type: 'null'
+          description: 'pending: completed runs without expert feedback (F9); given: with.'
+          title: Feedback
+        description: 'pending: completed runs without expert feedback (F9); given: with.'
       - name: limit
         in: query
         required: false
@@ -946,6 +959,79 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RunOut'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+  /api/v1/projects/{project_id}/runs/{run_id}/feedback:
+    post:
+      tags:
+      - runs
+      summary: Give Feedback
+      description: 'Expert review of a completed run''s answer (F9): vote and note go to the answer message
+
+        and to Langfuse as a score. A new vote replaces the previous one (the audit keeps both).'
+      operationId: give_feedback_api_v1_projects__project_id__runs__run_id__feedback_post
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      - name: run_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Run Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FeedbackRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FeedbackOut'
         '400':
           description: Invalid request.
           content:
@@ -1636,6 +1722,65 @@ components:
       - type
       - code
       title: ErrorDetail
+    FeedbackOut:
+      properties:
+        run_id:
+          type: string
+          format: uuid
+          title: Run Id
+        vote:
+          type: string
+          enum:
+          - correct
+          - partial
+          - wrong
+          title: Vote
+        note:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Note
+        by:
+          type: string
+          title: By
+        at:
+          type: string
+          format: date-time
+          title: At
+        score_sent:
+          type: boolean
+          title: Score Sent
+          description: A Langfuse score was handed over (the run has a trace and tracing is on).
+      type: object
+      required:
+      - run_id
+      - vote
+      - note
+      - by
+      - at
+      - score_sent
+      title: FeedbackOut
+    FeedbackRequest:
+      properties:
+        vote:
+          type: string
+          enum:
+          - correct
+          - partial
+          - wrong
+          title: Vote
+        note:
+          anyOf:
+          - type: string
+            maxLength: 2000
+          - type: 'null'
+          title: Note
+      additionalProperties: false
+      type: object
+      required:
+      - vote
+      title: FeedbackRequest
+      description: Expert review of a completed run (F9, K-06a-0005).
     KnowledgeFilter:
       properties:
         scope:
@@ -2045,6 +2190,13 @@ components:
             format: date-time
           - type: 'null'
           title: Ended At
+        feedback:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Feedback
+          description: Expert feedback on the answer (F9), if given.
       type: object
       required:
       - id

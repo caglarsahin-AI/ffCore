@@ -11,9 +11,10 @@ checks the definition's `approval.assign_to` role and `edit` access in the handl
 the body decides which rule applies (write-flag scan exemption, with this reason).
 """
 
+import logging
 from collections.abc import AsyncIterator
 from datetime import UTC, datetime
-from typing import Annotated, Any
+from typing import Annotated, Any, Literal
 from uuid import UUID
 
 import redis.asyncio as aioredis
@@ -24,6 +25,8 @@ from sqlalchemy import select, update
 from ffcore.api.agents_schemas import (
     SSE_DESCRIPTION,
     AgentKey,
+    FeedbackOut,
+    FeedbackRequest,
     ResumeRequest,
     RunCreate,
     RunEventList,
@@ -32,8 +35,8 @@ from ffcore.api.agents_schemas import (
     RunOut,
 )
 from ffcore.api.common import ERROR_RESPONSES, SessionDep, conflict, invalid, not_found
-from ffcore.core import db
-from ffcore.core.audit import AuditEntry, request_context, write_event
+from ffcore.core import db, tracing
+from ffcore.core.audit import AuditEntry, audited, request_context, write_event
 from ffcore.core.auth import Actor, RoleRequirement, authorize, require_role
 from ffcore.core.config import Settings, get_settings
 from ffcore.core.errors import ApiError
@@ -53,8 +56,11 @@ from ffcore.runtime.definition import parse_definition
 from ffcore.runtime.queue import RunQueue, get_run_queue
 
 router = APIRouter(prefix="/projects/{project_id}", tags=["runs"], responses=ERROR_RESPONSES)
+log = logging.getLogger("ffcore.runtime.feedback")
 
 Reader = Annotated[Actor, Depends(require_role("analyst"))]
+# Feedback is a platform mutation (F9): members with edit access; read-only gets 403.
+Reviewer = Annotated[Actor, Depends(require_role("analyst", write=True))]
 SettingsDep = Annotated[Settings, Depends(get_settings)]
 LastEventId = Annotated[
     str | None,
@@ -89,8 +95,19 @@ def _redis(settings: Settings):
     return aioredis.from_url(settings.redis_url.get_secret_value())
 
 
-def run_out(run: Run) -> RunOut:
-    return RunOut.model_validate(run, from_attributes=True)
+def run_out(run: Run, feedback: dict | None = None) -> RunOut:
+    return RunOut.model_validate(run, from_attributes=True).model_copy(
+        update={"feedback": feedback}
+    )
+
+
+async def _feedback_of(session, run_ids) -> dict:
+    rows = await session.execute(
+        select(Message.run_id, Message.feedback).where(
+            Message.run_id.in_(list(run_ids)), Message.role == "assistant"
+        )
+    )
+    return {run_id: feedback for run_id, feedback in rows}
 
 
 async def _run(session, project_id: UUID, run_id: UUID) -> Run:
@@ -308,23 +325,98 @@ async def list_runs(
     agent_id: UUID | None = None,
     channel: Channel | None = None,
     status: RunStatus | None = None,
+    feedback: Annotated[
+        Literal["pending", "given"] | None,
+        Query(description="pending: completed runs without expert feedback (F9); given: with."),
+    ] = None,
     limit: Annotated[int, Query(ge=1, le=200)] = 50,
 ):
     """Newest first."""
     query = select(Run).where(Run.project_id == project_id, Run.deleted_at.is_(None))
+    if feedback is not None:
+        reviewed = select(Message.run_id).where(
+            Message.role == "assistant", Message.feedback.is_not(None), Message.run_id.is_not(None)
+        )
+        query = query.where(Run.status == RunStatus.completed)
+        query = query.where(
+            Run.id.not_in(reviewed) if feedback == "pending" else Run.id.in_(reviewed)
+        )
     if agent_id is not None:
         query = query.where(Run.agent_id == agent_id)
     if channel is not None:
         query = query.where(Run.channel == channel)
     if status is not None:
         query = query.where(Run.status == status)
-    rows = await session.scalars(query.order_by(Run.queued_at.desc()).limit(limit))
-    return RunList(items=[run_out(r) for r in rows.all()])
+    runs = (await session.scalars(query.order_by(Run.queued_at.desc()).limit(limit))).all()
+    feedbacks = await _feedback_of(session, [r.id for r in runs])
+    return RunList(items=[run_out(r, feedbacks.get(r.id)) for r in runs])
 
 
 @router.get("/runs/{run_id}", response_model=RunOut)
 async def get_run(project_id: UUID, run_id: UUID, actor: Reader, session: SessionDep):
-    return run_out(await _run(session, project_id, run_id))
+    run = await _run(session, project_id, run_id)
+    return run_out(run, (await _feedback_of(session, [run.id])).get(run.id))
+
+
+def _send_score(run: Run, body: FeedbackRequest) -> bool:
+    """A categorical Langfuse score on the run's trace (02 client). Delivery is the SDK's,
+    asynchronous; its failure is the 02 log line `trace_delivery_failed`. Never fails the
+    request: the feedback is stored first."""
+    client = tracing.get_client()
+    if client is None or run.langfuse_trace_id is None:
+        reason = "tracing_off" if client is None else "run_has_no_trace"
+        log.warning("trace_delivery_failed kind=score run_id=%s reason=%s", run.id, reason)
+        return False
+    try:
+        client.create_score(
+            name="expert_feedback",
+            value=body.vote,
+            trace_id=run.langfuse_trace_id,
+            data_type="CATEGORICAL",
+            comment=body.note,
+        )
+    except Exception as exc:  # noqa: BLE001 - the stored feedback stands either way
+        log.error("trace_delivery_failed kind=score run_id=%s error=%s", run.id, type(exc).__name__)
+        return False
+    return True
+
+
+@router.post("/runs/{run_id}/feedback", response_model=FeedbackOut)
+@audited("give_feedback", "run")
+async def give_feedback(
+    project_id: UUID,
+    run_id: UUID,
+    body: FeedbackRequest,
+    request: Request,
+    actor: Reviewer,
+    session: SessionDep,
+):
+    """Expert review of a completed run's answer (F9): vote and note go to the answer message
+    and to Langfuse as a score. A new vote replaces the previous one (the audit keeps both)."""
+    run = await _run(session, project_id, run_id)
+    if run.status != RunStatus.completed:
+        raise conflict("run_not_completed", f"The run is {run.status}; only answers are rated.")
+    message = await session.scalar(
+        select(Message).where(Message.run_id == run.id, Message.role == "assistant")
+    )
+    if message is None:
+        raise conflict("run_not_completed", "The run has no answer to rate.")
+    at = datetime.now(UTC)
+    message.feedback = {
+        "vote": body.vote,
+        "note": body.note,
+        "by": actor.actor_id,
+        "at": at.isoformat(),
+    }
+    await session.flush()
+    return FeedbackOut(
+        run_id=run.id,
+        vote=body.vote,
+        note=body.note,
+        by=actor.actor_id,
+        at=at,
+        score_sent=_send_score(run, body),
+    )
 
 
 @router.get("/runs/{run_id}/events", response_model=RunEventList)
