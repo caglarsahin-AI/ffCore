@@ -1,6 +1,6 @@
 """CONTRACTS C3: project-owned root tables carry the common columns; exceptions are named here.
 
-This list is the single place in code for the C3 exception list (KARARLAR "03a kararları",
+This list is the single place in code for the C3 exception list (KARARLAR "03a kararlarÄ±",
 DRIFT-53). Adding a table here is a class B change and goes into CONTRACTS.md as well.
 """
 
@@ -21,6 +21,7 @@ C3_EXCEPTIONS = {
     "audit_events": "append-only",
     "guardrail_events": "append-only (08; named in CONTRACTS C3)",
     "kb_queries": "append-only (04a)",
+    "run_events": "append-only (06a; named in CONTRACTS C3)",
 }
 
 # Child tables take the project through their parent (CONTRACTS C3): the column named here is a
@@ -31,6 +32,8 @@ CHILD_TABLES = {
     "chunks": "document_id",  # 04a
     "tool_actions": "tool_id",  # 05a
     "few_shots": "tool_id",  # 05a: examples of the project's registered mcp-sql tool
+    "agent_versions": "agent_id",  # 06a
+    "messages": "conversation_id",  # 06a
 }
 C3_EXCEPTIONS |= {name: f"child via {column}" for name, column in CHILD_TABLES.items()}
 
