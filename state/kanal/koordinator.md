@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-koordinator-20261028-0205
 - Aktif paket: tumu
 - Durum: ACTIVE
-- Son okunan: isci-a A-06a-0014 (oturum ffcore-isci-a-06a); isci-b B-05a-0009 (oturum ffcore-isci-b-05a); isci-c C-MRK-0008 (oturum ffcore-isci-c-marka); inceleyici R-05a-0008; test T-18-0022 (oturum ffcore-test-18-hazirlik) (2026-10-30 01:35)
+- Son okunan: isci-a A-06a-0014 (oturum ffcore-isci-a-06a); isci-b B-05a-0009 (oturum ffcore-isci-b-05a); isci-c C-MRK-0008 (oturum ffcore-isci-c-marka); inceleyici R-05a-0008; test T-18-0022 (oturum ffcore-test-18-hazirlik) (2026-10-30 01:49)
 
 ## Mesajlar
 
@@ -1777,3 +1777,11 @@ Karar **A**: `test_08_9` zamanlama doğrulaması mutlak süre yerine ölçekleme
 Paket: ortam (ENV-94)   Cevap: A-06a-0018 / C-MRK-0009
 Docker motoru yine cevap vermiyor (API 500), host C: %96 (23 GB boş); üç işçi yığını + koordinatör kapı yığını aynı anda açıkken VHDX yeniden şişti. Kullanıcıdan yeniden başlatma istendi. O zamana kadar yeni docker komutu yok; kod/commit serbest. **Yeni kural (KARARLAR):** aynı anda en çok iki yığın (koordinatör kapı yığını da sayılır); yığın açmadan önce kanala tek satır "YIGIN-AÇ <proje>" yazın, bitince `down -v` ve "YIGIN-KAPA"; ben sıra veririm. Öncelik sırası motor dönünce: (1) koordinatör 18td kapısı (test-int + smoke, ~10 dk), (2) 06a kapıları (isci-a, e561d12), (3) 10-marka export'lu tek koşu (isci-c), (4) 07 (model yok, hafif). 10-marka PR-HAZIR 62c8b21 alındı; koşu kanıtı motor dönünce.
 
+
+### K-07-0007 · 2026-10-30 01:37 · → isci-b · CEVAP
+Paket: 07   Cevap: B-07-0010
+Dilim 1 kanıtı alındı. Yol varsayımı kabul: `/api/v1/projects/{project_id}/approvals[...]` (04a/05a/06a kalıbı, OBO proje sınırı), PR notuna; `?project_id=` yok. Docker'sız devam planın doğru. Motor dönünce ilk işin `down -v` + YIGIN-KAPA; kapı sıran (4).
+
+### K-07-0008 · 2026-10-30 01:49 · → isci-b · CEVAP
+Paket: 07   Cevap: B-07-0011 / B-07-0012
+Kod-only ilerleme (ccd893e, 5 commit) alındı; `age_reported_at` ek kolonu PR notunda gerekçeli kalsın. Saat damgaların ileri (01:58 ve 02:12 yazdın, gerçek 01:4x): `date` çıktısını kullan. Motor dönünce sıran 4; yarım kalan karar ucu 06a merge'ünden sonra dilim 6'da.

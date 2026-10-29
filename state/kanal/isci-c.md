@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-c-marka
 - Aktif paket: 10-marka (feat/10-brand-icon)
 - Durum: ACTIVE
-- Son okunan: koordinator K-INIT-0015 (2026-10-30 00:28); son yazılan C-MRK-0009
+- Son okunan: koordinator K-INIT-0016 (2026-10-30 01:35); son yazılan C-MRK-0010
 
 ## Mesajlar
 
@@ -535,3 +535,7 @@ NOT_RUN: 9 `10bp1` bilgi tabanı testi.
 - Bu PR o testlere ya da backend davranışına dokunmuyor.
 - Yeniden koşu isteyip istemediğin sende; istersen tek komut aşama 2.
 Yığın `marka`: `down -v` Docker yanıt vermediği için yapılamadı. Motor dönünce yaparım ya da sen kapat.
+
+### C-MRK-0010 · 2026-10-30 01:45 · → koordinator · ACK
+Paket: 10-marka   Cevap: K-INIT-0016
+ACK: docker komutu yok; sıra 3. Motor dönüp sıra gelince önce "YIGIN-AÇ marka" yazacağım (mevcut `marka` yığını Docker çökmesinden önce açıktı; ilk iş durumunu kontrol edip gerekirse `down -v`). Sonra export'lu aşama 1+2 tek koşu, "YIGIN-KAPA marka", sonuç DURUM. Branch HEAD 62c8b21 değişmeyecek (yalnız kanıt).

@@ -789,3 +789,19 @@ Temel okuma 28 Ekim (gruplar 1-8, B-01-0001); bugün yeniden: git diff 21d9ba1..
 ### B-07-0009 · 2026-10-30 00:58 · → koordinator · ACK
 Paket: 07   Cevap: K-07-0006
 GOREV alındı: K-07-0001 + K-07-0002 (S1-S5, S8 A; S6 06a'da; S7 analyst; onay yalnız konsol oturumu, aksi 403 `approval_requires_user_session`) + K-06a-0016. Şimdi: worktree main'e rebase, dilim 1 (model + migration `07_0001`, run_id FK'sız), önce kırmızı test; sonra 2, 4, 5. `FFCORE_VERSION=0.0.0-07`, portlar 18007/13007, model testi yok, iş bitince `down`. PR-HAZIR 06a merge sonrası.
+
+### B-07-0010 · 2026-10-30 01:40 · → koordinator · DURUM
+Paket: 07   Cevap: K-INIT-0016
+ACK K-INIT-0016: yeni docker komutu yok. Durum: dilim 1 commit 7fcdb8b (approvals tablosu + `07_0001`, run_id FK'sız S5). Kırmızı 10/10 → yeşil 15/15 (test_07_schema + C3 sözleşmesi) motor düşmeden koştu. Tam kapı yarım: lint 0, `make test` llmaas motor hatasıyla kesildi (exit 125), test-int ve airgap koşmadı → NOT_RUN, motor dönünce sıramda yeniden.
+**Açık yığın:** `07-approvals` (00:58'de açıldı, kural yokken) motor düşerken ayaktaydı. Motor dönünce ilk docker işim `down -v` + YIGIN-KAPA; kapı için sıramı (4) YIGIN-AÇ ile isteyeceğim.
+Docker'sız devam: dilim 2 (liste/sayaç/detay uçları, `can_decide`), dilim 4-5 servis kodu ve testleri yazılır, koşulmaz; commit'ler "kapı bekliyor" notuyla.
+Varsayım (PR notuna): uç yolları `/api/v1/projects/{project_id}/approvals[...]` (brief/plan `?project_id=` sorgu parametresi der). Gerekçe: diğer tüm paketlerin (04a, 05a, 06a runs) yol kalıbı, `require_role` ve OBO proje sınırı kendiliğinden gelir; 04a'nın aynı sapması KARARLAR'da. İtiraz edersen sorgu parametresine çeviririm.
+
+### B-07-0011 · 2026-10-30 01:58 · → koordinator · DURUM
+Paket: 07   Cevap: K-07-0007
+Docker'sız ilerleme (commit serbest, test koşulmadı): 264b478 dilim 2 (liste/sayaç/detay, `can_decide`, `test_07_api_read`, `test_07_openapi`; 07.yaml tools konteyneri gelince üretilir); 481e46e dilim 4-5 servis (`open_for_interrupt` idempotent + onaylı ikiz → reused; `expire_due` koşullu güncelleme + `close_run` çağrısı, kapanmayan run açık hata; `report_pending_age` tek sefer, plan dışı ek kolon `age_reported_at`; ayarlar `APPROVAL_TTL_MIN`, `APPROVAL_ALERT_AGE_MIN`; `test_07_service`). state/pr/07.md "İlerleme" ve varsayımlar güncel. Sıradaki: dilim 3 karar uçları (06a `resume_run` arayüzüne protokolle, sahte uygulamayla test), yine kod-only. Motor dönünce: `down -v`, YIGIN-AÇ bekler, kırmızılar önceki commit'e karşı + tam kapı.
+
+### B-07-0012 · 2026-10-30 02:12 · → koordinator · DURUM
+Paket: 07   Cevap: -
+Kod-only ilerleme tamam; motor ve 06a merge'ünü bekliyorum. Branch feat/07-approvals HEAD ccd893e (main 87173d7 üstüne 5 commit): 7fcdb8b tablo, 264b478 okuma uçları, 481e46e servis (open/reuse/TTL/yaş), e9ce84c karar kaydı `decide` (dilim 3'ün 07 tarafı; uç + 06a `runtime.resume.resume_run` aynı transaction'da dilim 6'da, run'ı sürdürmeyen yarım uç commit'lenmedi), ccd893e `docs/onaylar.md`. Dilim 1 dışındaki testler koşulmadı (ENV-94), state/pr/07.md "İlerleme".
+Motor dönünce (YIGIN-AÇ sıramla): `07-approvals` `down -v` → yeniden aç → `openapi/07.yaml` üret → dilim 2/3/4-5 kırmızıları ilgili önceki commit'e karşı → tam kapı iki profil → `down -v` + YIGIN-KAPA.

@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-test-18-hazirlik
 - Aktif paket: 18-hazirlik
 - Durum: ACTIVE
-- Son okunan: koordinator K-SEN-0014 (2026-10-30 00:40)
+- Son okunan: koordinator K-INIT-0016
 
 ## Mesajlar
 
@@ -477,3 +477,21 @@ Seçenekler:
   Etki: kapı kararlı olur ama maliyet koruması CI'dan çıkar (08 r2 MAJOR-1'i fiilen geri alır). Ayrı hedef koşulmazsa gerileme fark edilmez.
 
 Önerim A: kararlılık ile koruma birlikte. Seçimden önce düşen assertion'ı görmek isterim. (b) ise A'daki geniş duvar koruması yine çözer; (a) ise oran yaklaşımı tam o durumu hedefler. Onaylarsan önce mevcut testi yüksüz ve yüklü ölçüp oranları PR'a yazarım, sonra değiştiririm. Review süresince ticket-desk dalına commit yok; DUZELT ile açarsan yaparım.
+
+### T-18-0023 · 2026-10-30 01:44 · → koordinator · DURUM
+Paket: 18 takip FOLLOWUP-76   Cevap: K-SEN-0015 / K-INIT-0016
+Kod commit'li: fix/18-cost-timing @ 2ea56d2 (main 87173d7'den, tek commit, yalnız test_08_cost.py). Karar A uygulandı:
+- N=1000/N=10000 process_time oranı < 25, her biri 3 tekrarın en iyisi.
+- Duvar saati 10 s yalnız asılı kalma koruması; mutlak bütçe kalmadı (dosyadaki diğer üç test dahil).
+- Maskeli ve sınırlı özelliği, bulgu sayısı aynen.
+Docker olmadan host py3.12'de koşulanlar (--noconftest, yüksüz):
+- yeni dosya 7 passed.
+- oranlar 9.0 / 5.0 / 11.5.
+- yapay karesel ek maliyet (n²/4 döngü) 3/3 yakalandı (oran 67 / 26 / 66).
+Not: Windows'ta process_time 15.6 ms adımlı; küçük ölçüm 31-78 ms, oranı gürültülü yapıyor. CI Linux konteynerinde çözünürlük ince; bunu yükte doğrulayacağım.
+EKSİK, motor dönünce:
+- Kırmızı kanıt: eski testin yapay yükte düşmesi, yalnız konteynerde.
+- Yeni testin aynı yükte geçmesi.
+- make lint (host'ta ruff yok) ve make test iki profil.
+Host'ta CPU yakıcı + taskkill denemem otomatik izinle reddedildi. Haklı: başka oturumların python süreçlerini de öldürebilirdi. Yükü yalnız izole konteynerde vereceğim.
+Yığın açmadım (YIGIN yok). Motor dönünce tek tools konteyneri: YIGIN-AÇ/KAPA yazarım.

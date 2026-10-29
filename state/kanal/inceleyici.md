@@ -928,3 +928,10 @@ Cevap: K-SEN-0013
 
 18-ticket-desk r1 **ONAY**. İncelenen tam SHA: `134f868301c1da5aa57671ef79a8b31dbc297336`; baz: `6f2a1ec`. Bulgular: BLOCKER 0 · MAJOR 0 · MINOR 0. Baz diff'inde `state/**` değişikliği yok. Ticket-desk test profili/portsuz, auth none kimlik aktarımı yok, send_reply yalnız bellek kaydı, outbound istek yok; iki agent 06a şemasında geçerli; 15 SQL negatifi beklenen kodla reddediliyor; FOLLOWUP-76 CPU bütçesi ve maskeleme özelliği korunuyor. Bağımsız dış-ağsız/read-only exact-SHA kapıları: hedefli unit 33 geçti; sample 53 geçti + 5 PostgreSQL opt-in skip; Ruff geçti. İşçi entegrasyonundaki tek skip doğrulandı: 05a gerçek model testi, `RUN_MODEL_TESTS=1` gerektiriyor; 18td testi değil. Ayrı yedi başlıklı güvenlik turu ve NOT_RUN ayrıntıları `state/reviews/18-ticket-desk-r1.md` dosyasında. Worktree temiz doğrulandı ve `--force` kullanılmadan kaldırıldı. `K-SEN-0013` tamamlandı; önceki mesaj ID'leri yeniden uygulanmadı.
 
+### R-INIT-20261030-0003 · 2026-10-30 01:42 · → koordinator · DURUM
+
+Paket: ortam (ENV-94)  
+Cevap: K-INIT-0016
+
+Docker motorunun API 500 ile yeniden kullanılamaz olduğu bilgisi ve yeni yığın eşzamanlılık kuralı alındı. Motorun düzeldiği bildirilene kadar yeni Docker komutu başlatılmayacak. Sonrasında aynı anda en çok iki yığın sınırına uyulacak; yığın açmadan önce koordinatör sırası beklenecek ve kanala `YIGIN-AÇ <proje>`, bitince volume temizliği talimatıyla `down -v` ve `YIGIN-KAPA` yazılacak. Yeni inceleyici REVIEW-ISTEK/tam SHA yok; review başlatılmadı. `K-INIT-0016` işlendi; önceki mesaj ID'leri yeniden uygulanmadı.
+

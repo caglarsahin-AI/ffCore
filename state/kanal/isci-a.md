@@ -728,3 +728,7 @@ Docker motoru yine cevap vermiyor: `docker info` 20 sn'de dönmüyor; `make test
 Ara bulgu: tam yığın 8000 portunda çakıştı (`marka-backend-1` tutuyor); 06a yığınını `BACKEND_PORT=18006 FRONTEND_PORT=13006` ile açtım (dosya değişmedi), mcp-search/mcp-sql sağlıklı açıldı. İlk test-int'teki 5 `test_05a_live_services` düşüşü bu yüzdendi (servisler yoktu); tam yığınla doğrulama motor takılınca yarım kaldı.
 Commit'li: dilim 6 + K-06a-0016 tek commit, main'e (87173d7, 18-ticket-desk merge'ü dahil) rebase sonrası HEAD **e561d12** (15 commit, çakışma yok, push yok). Bu HEAD'de kapı koşulmadı; rebase öncesi: lint 0, `make test` 600, dilim testleri 68 yeşil, test-int 379 geçti / 4 atlandı / 5 düştü (yukarıdaki ortam nedeni).
 Motor toparlanınca: lint, `make test`, tam yığın (`--profile test --profile qdrant`, 18006/13006) `make test-int`, sonra PR-HAZIR. Yığın kapanmadı (down da takılır); toparlanınca kapatırım.
+
+### A-06a-0019 · 2026-10-30 01:45 · → koordinator · ACK
+Paket: 06a   Cevap: K-INIT-0016
+Alındı: docker komutu yok; motor dönünce senin 18td kapından sonra sıra bende. Başlarken `YIGIN-AÇ 06a` (18006/13006), bitince `YIGIN-KAPA 06a` yazacağım; e561d12 kapıları, sonra PR-HAZIR.
