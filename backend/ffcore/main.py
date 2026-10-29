@@ -14,6 +14,7 @@ from ffcore.core.logging import configure_logging
 from ffcore.core.readiness import router as readiness_router
 from ffcore.core.readiness import warmup
 from ffcore.core.session import session_resolver
+from ffcore.core.tracing import init_tracing, shutdown_tracing
 from ffcore.knowledge.embed import probe_dimension
 from ffcore.services import catalog_events
 from ffcore.services.litellm_reconcile import background_scheduler
@@ -35,6 +36,8 @@ async def lifespan(app: FastAPI):
 
     # 02: one log configuration, secrets scrubbed, third-party HTTP loggers quiet (FOLLOWUP-49).
     configure_logging(settings())
+    # 02: Langfuse client; a half or non-internal configuration stops the start-up here.
+    app.state.langfuse = init_tracing(settings())
     # The schema comes from the migrate service; this only adds missing monthly partitions.
     await ensure_audit_partitions(2)
 
@@ -55,6 +58,7 @@ async def lifespan(app: FastAPI):
     warming.cancel()
     if scheduler is not None:
         catalog_events.unsubscribe(scheduler.on_change)
+    shutdown_tracing()  # flushes what is still buffered
 
 
 app = FastAPI(title="FFCore", lifespan=lifespan)

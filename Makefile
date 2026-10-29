@@ -3,7 +3,7 @@
 # Servisleri başlatma/durdurma doğrudan compose ile: docker compose up -d --wait | down | logs -f
 # Önyüz lint'i ayrı konteynerde: docker compose run --rm frontend npm run lint
 
-.PHONY: lint format test test-int test-models models models-check smoke pull seed-models render-litellm reindex
+.PHONY: lint format test test-int test-models models models-check smoke pull seed-models render-litellm reindex langfuse-init seed-prompts
 
 lint:
 	ruff check backend scripts data/samples/scripts
@@ -61,3 +61,11 @@ seed-models:
 # CHECK=1 only reports the difference and exits 1 if there is one.
 render-litellm:
 	cd backend && python -m ffcore.cli render-litellm $(if $(CHECK),--check,)
+
+# 02: print a new Langfuse key pair and admin password once (copy into .env; nothing is written).
+langfuse-init:
+	sh deploy/langfuse/init.sh
+
+# 02: first-install prompts (backend/prompts/*.md) into Langfuse; existing prompts stay.
+seed-prompts:
+	cd backend && python -m ffcore.cli seed-prompts --path prompts

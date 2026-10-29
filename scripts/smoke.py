@@ -6,6 +6,7 @@ Ollama checks run only when the ollama compose profile is active; otherwise the 
 says so explicitly (no silent skip).
 """
 
+import base64
 import json
 import os
 import sys
@@ -26,9 +27,13 @@ class SmokeError(Exception):
     pass
 
 
-def _request(url: str, payload: dict | None = None) -> tuple[int, bytes]:
+def _request(
+    url: str, payload: dict | None = None, headers: dict | None = None
+) -> tuple[int, bytes]:
     data = json.dumps(payload).encode() if payload is not None else None
-    request = urllib.request.Request(url, data=data, method="POST" if data else "GET")
+    request = urllib.request.Request(
+        url, data=data, method="POST" if data else "GET", headers=headers or {}
+    )
     if data:
         request.add_header("Content-Type", "application/json")
     try:
@@ -58,7 +63,16 @@ def check_langfuse() -> str:
     status, _ = _request(f"{LANGFUSE_URL}/api/public/health")
     if status != 200:
         raise SmokeError(f"langfuse /api/public/health returned {status}")
-    return "langfuse /api/public/health 200"
+    # 02: the project keys must exist and work (Langfuse init, LiteLLM callback, backend).
+    missing = [n for n in ("LANGFUSE_PUBLIC_KEY", "LANGFUSE_SECRET_KEY") if not os.environ.get(n)]
+    if missing:
+        raise SmokeError(f"not set: {', '.join(missing)} (make langfuse-init, then .env)")
+    token = f"{os.environ['LANGFUSE_PUBLIC_KEY']}:{os.environ['LANGFUSE_SECRET_KEY']}"
+    auth = {"Authorization": "Basic " + base64.b64encode(token.encode()).decode("ascii")}
+    status, _ = _request(f"{LANGFUSE_URL}/api/public/projects", headers=auth)
+    if status != 200:
+        raise SmokeError(f"langfuse /api/public/projects with the project keys returned {status}")
+    return "langfuse /api/public/health 200, /api/public/projects 200"
 
 
 def _ollama_profile_active() -> bool:

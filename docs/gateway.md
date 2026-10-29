@@ -9,7 +9,7 @@ happens when a provider fails.
 
 The `providers` and `models` tables (console, package 03a) are the only source of LiteLLM's
 models. `deploy/litellm/config.yaml` has no `model_list`. The reconciler compares the tables with
-LiteLLM's `/model/info` and applies the difference with `/model/new`, `/model/update` and
+LiteLLM's `/model/info` and applies the difference with `/model/new`, `PATCH /model/{id}/update` and
 `/model/delete`:
 
 - when the backend starts,

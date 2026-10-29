@@ -59,6 +59,12 @@ class Settings(BaseSettings):
     # --- 02 ---
     # Root log level; third-party HTTP and telemetry loggers stay at WARNING or above.
     log_level: Literal["DEBUG", "INFO", "WARNING", "ERROR"] = "INFO"
+    # Langfuse on the internal network (host in ALLOWED_INTERNAL_HOSTS). All three or none:
+    # none means tracing off (said once); some but not all stops the start-up.
+    langfuse_host: str | None = None
+    # Half of a key pair: kept out of reprs like the secret half.
+    langfuse_public_key: SecretStr | None = None
+    langfuse_secret_key: SecretStr | None = None
 
     # Per-call model timeout (R1.5): llmaas 60, airgap cpu 600, airgap gpu 120. Run timeout is
     # separate (06a run_timeout_s).
