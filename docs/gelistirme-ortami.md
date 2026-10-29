@@ -30,6 +30,7 @@ başlamaz. Geri alma: `docker compose run --rm migrate alembic downgrade <revizy
 | Python lint | `docker compose run --rm tools make lint` |
 | Önyüz lint | `docker compose run --rm frontend npm run lint` |
 | Unit + sözleşme testleri | `docker compose run --rm tools make test` |
+| Örnek veri testleri (13a, 18) | `docker compose run --rm tools make test-samples` (Postgres testleri host'ta: `RUN_PG_TESTS=1`, `data/samples/scripts/README.md`) |
 | Entegrasyon testleri | `docker compose --profile test --profile qdrant up -d --wait && docker compose run --rm tools make test-int` |
 | Duman testi | `docker compose run --rm tools make smoke` |
 | Ollama modellerini çek | `docker compose run --rm tools make pull` |

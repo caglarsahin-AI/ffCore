@@ -1,0 +1,610 @@
+[
+  {
+    "id": "sql-01",
+    "input": {
+      "message": "Göğüs Hastalıkları bölümünde kaç yatak var?",
+      "variables": {}
+    },
+    "expected_output": {
+      "answer": "18",
+      "must_contain": [
+        "18"
+      ],
+      "sql_result": [
+        [
+          18
+        ]
+      ]
+    },
+    "metadata": {
+      "tags": [
+        "sql"
+      ],
+      "answerable": true,
+      "style": "dogrudan",
+      "expected_docs": [],
+      "reference_sql": "SELECT bed_capacity FROM departments WHERE code = 'GOGU'",
+      "origin": "sozlesme-33/q29"
+    }
+  },
+  {
+    "id": "sql-02",
+    "input": {
+      "message": "Ortopedi bölümünde 2025 yılında toplam kaç hasta taburcu edildi?",
+      "variables": {}
+    },
+    "expected_output": {
+      "answer": "1475",
+      "must_contain": [
+        "1475"
+      ],
+      "sql_result": [
+        [
+          1475
+        ]
+      ]
+    },
+    "metadata": {
+      "tags": [
+        "sql",
+        "join",
+        "date"
+      ],
+      "answerable": true,
+      "style": "dogrudan",
+      "expected_docs": [],
+      "reference_sql": "SELECT SUM(a.discharged_count) FROM admissions a JOIN departments d ON d.id = a.department_id WHERE d.code = 'ORTO' AND a.day BETWEEN '2025-01-01' AND '2025-12-31'",
+      "origin": "sozlesme-33/q30"
+    }
+  },
+  {
+    "id": "sql-03",
+    "input": {
+      "message": "Hurda durumundaki cihaz sayısı kaçtır?",
+      "variables": {}
+    },
+    "expected_output": {
+      "answer": "25",
+      "must_contain": [
+        "25"
+      ],
+      "sql_result": [
+        [
+          25
+        ]
+      ]
+    },
+    "metadata": {
+      "tags": [
+        "sql"
+      ],
+      "answerable": true,
+      "style": "dogrudan",
+      "expected_docs": [],
+      "reference_sql": "SELECT COUNT(*) FROM devices WHERE status = 'hurda'",
+      "origin": "sozlesme-33/q31"
+    }
+  },
+  {
+    "id": "sql-04",
+    "input": {
+      "message": "Yazılım kaynaklı kaç arıza kaydı var?",
+      "variables": {}
+    },
+    "expected_output": {
+      "answer": "260",
+      "must_contain": [
+        "260"
+      ],
+      "sql_result": [
+        [
+          260
+        ]
+      ]
+    },
+    "metadata": {
+      "tags": [
+        "sql"
+      ],
+      "answerable": true,
+      "style": "dogrudan",
+      "expected_docs": [],
+      "reference_sql": "SELECT COUNT(*) FROM device_faults WHERE fault_type = 'yazilim'",
+      "origin": "sozlesme-33/q32"
+    }
+  },
+  {
+    "id": "sql-05",
+    "input": {
+      "message": "Yüksek önemdeki arızalardan kaçı hâlâ çözülmedi?",
+      "variables": {}
+    },
+    "expected_output": {
+      "answer": "27",
+      "must_contain": [
+        "27"
+      ],
+      "sql_result": [
+        [
+          27
+        ]
+      ]
+    },
+    "metadata": {
+      "tags": [
+        "sql",
+        "null"
+      ],
+      "answerable": true,
+      "style": "dogrudan",
+      "expected_docs": [],
+      "reference_sql": "SELECT COUNT(*) FROM device_faults WHERE severity = 'yuksek' AND resolved_on IS NULL",
+      "origin": "sozlesme-33/q33"
+    }
+  },
+  {
+    "id": "sql-06",
+    "input": {
+      "message": "Kardiyoloji bölümü kaçıncı katta?",
+      "variables": {}
+    },
+    "expected_output": {
+      "answer": "1",
+      "must_contain": [
+        "1"
+      ],
+      "sql_result": [
+        [
+          1
+        ]
+      ]
+    },
+    "metadata": {
+      "tags": [
+        "sql"
+      ],
+      "answerable": true,
+      "style": "dogrudan",
+      "expected_docs": [],
+      "reference_sql": "SELECT floor FROM departments WHERE code = 'KARD'"
+    }
+  },
+  {
+    "id": "sql-07",
+    "input": {
+      "message": "Dahiliye bölümünde kullanımda olan kaç yatak var?",
+      "variables": {}
+    },
+    "expected_output": {
+      "answer": "13",
+      "must_contain": [
+        "13"
+      ],
+      "sql_result": [
+        [
+          13
+        ]
+      ]
+    },
+    "metadata": {
+      "tags": [
+        "sql",
+        "join"
+      ],
+      "answerable": true,
+      "style": "dogrudan",
+      "expected_docs": [],
+      "reference_sql": "SELECT COUNT(*) FROM beds b JOIN departments d ON d.id = b.department_id WHERE d.code = 'DAHI' AND b.is_active = TRUE"
+    }
+  },
+  {
+    "id": "sql-08",
+    "input": {
+      "message": "Bakımda olan kaç ventilatör var?",
+      "variables": {}
+    },
+    "expected_output": {
+      "answer": "11",
+      "must_contain": [
+        "11"
+      ],
+      "sql_result": [
+        [
+          11
+        ]
+      ]
+    },
+    "metadata": {
+      "tags": [
+        "sql"
+      ],
+      "answerable": true,
+      "style": "dogrudan",
+      "expected_docs": [],
+      "reference_sql": "SELECT COUNT(*) FROM devices WHERE device_type = 'ventilator' AND status = 'bakimda'"
+    }
+  },
+  {
+    "id": "sql-09",
+    "input": {
+      "message": "En eski infüzyon pompası hangi tarihte kurulmuş?",
+      "variables": {}
+    },
+    "expected_output": {
+      "answer": "2016-01-18",
+      "must_contain": [
+        "2016-01-18"
+      ],
+      "sql_result": [
+        [
+          "2016-01-18"
+        ]
+      ]
+    },
+    "metadata": {
+      "tags": [
+        "sql",
+        "date"
+      ],
+      "answerable": true,
+      "style": "dogrudan",
+      "expected_docs": [],
+      "reference_sql": "SELECT MIN(installed_on) FROM devices WHERE device_type = 'infuzyon_pompasi'"
+    }
+  },
+  {
+    "id": "sql-10",
+    "input": {
+      "message": "Üreticilere göre aktif durumdaki cihaz sayıları nedir?",
+      "variables": {}
+    },
+    "expected_output": {
+      "answer": "Selvi Elektromedikal Ltd. Şti. - 179; Arkada Tıp Cihazları A.Ş. - 174; Tavlan Medikal Teknik A.Ş. - 171",
+      "must_contain": [
+        "Selvi Elektromedikal Ltd. Şti.",
+        "Arkada Tıp Cihazları A.Ş.",
+        "Tavlan Medikal Teknik A.Ş."
+      ],
+      "sql_result": [
+        [
+          "Selvi Elektromedikal Ltd. Şti.",
+          179
+        ],
+        [
+          "Arkada Tıp Cihazları A.Ş.",
+          174
+        ],
+        [
+          "Tavlan Medikal Teknik A.Ş.",
+          171
+        ]
+      ]
+    },
+    "metadata": {
+      "tags": [
+        "sql",
+        "group",
+        "multi_row"
+      ],
+      "answerable": true,
+      "style": "dogrudan",
+      "expected_docs": [],
+      "reference_sql": "SELECT vendor, COUNT(*) AS adet FROM devices WHERE status = 'aktif' GROUP BY vendor ORDER BY adet DESC, vendor"
+    }
+  },
+  {
+    "id": "sql-11",
+    "input": {
+      "message": "Kritik önemdeki arızalardan kaçı hâlâ açık?",
+      "variables": {}
+    },
+    "expected_output": {
+      "answer": "10",
+      "must_contain": [
+        "10"
+      ],
+      "sql_result": [
+        [
+          10
+        ]
+      ]
+    },
+    "metadata": {
+      "tags": [
+        "sql",
+        "null"
+      ],
+      "answerable": true,
+      "style": "dogrudan",
+      "expected_docs": [],
+      "reference_sql": "SELECT COUNT(*) FROM device_faults WHERE severity = 'kritik' AND resolved_on IS NULL"
+    }
+  },
+  {
+    "id": "sql-12",
+    "input": {
+      "message": "Haziran 2025'te kaç arıza bildirildi?",
+      "variables": {}
+    },
+    "expected_output": {
+      "answer": "148",
+      "must_contain": [
+        "148"
+      ],
+      "sql_result": [
+        [
+          148
+        ]
+      ]
+    },
+    "metadata": {
+      "tags": [
+        "sql",
+        "date"
+      ],
+      "answerable": true,
+      "style": "dogrudan",
+      "expected_docs": [],
+      "reference_sql": "SELECT COUNT(*) FROM device_faults WHERE reported_on BETWEEN '2025-06-01' AND '2025-06-30'"
+    }
+  },
+  {
+    "id": "sql-13",
+    "input": {
+      "message": "Yoğun Bakım bölümündeki cihazların toplam arıza kesintisi kaç saat?",
+      "variables": {}
+    },
+    "expected_output": {
+      "answer": "442.9",
+      "must_contain": [
+        "442.9"
+      ],
+      "sql_result": [
+        [
+          "442.9"
+        ]
+      ]
+    },
+    "metadata": {
+      "tags": [
+        "sql",
+        "join"
+      ],
+      "answerable": true,
+      "style": "dogrudan",
+      "expected_docs": [],
+      "reference_sql": "SELECT SUM(f.downtime_hours) FROM device_faults f JOIN devices v ON v.id = f.device_id JOIN departments d ON d.id = v.department_id WHERE d.code = 'YBAK'"
+    }
+  },
+  {
+    "id": "sql-14",
+    "input": {
+      "message": "Her arıza türünden kaç kayıt var?",
+      "variables": {}
+    },
+    "expected_output": {
+      "answer": "sensor - 298; elektriksel - 294; batarya - 284; kalibrasyon - 279; mekanik - 260; yazilim - 260",
+      "must_contain": [
+        "sensor",
+        "elektriksel",
+        "batarya",
+        "kalibrasyon",
+        "mekanik",
+        "yazilim"
+      ],
+      "sql_result": [
+        [
+          "sensor",
+          298
+        ],
+        [
+          "elektriksel",
+          294
+        ],
+        [
+          "batarya",
+          284
+        ],
+        [
+          "kalibrasyon",
+          279
+        ],
+        [
+          "mekanik",
+          260
+        ],
+        [
+          "yazilim",
+          260
+        ]
+      ]
+    },
+    "metadata": {
+      "tags": [
+        "sql",
+        "group",
+        "multi_row"
+      ],
+      "answerable": true,
+      "style": "dogrudan",
+      "expected_docs": [],
+      "reference_sql": "SELECT fault_type, COUNT(*) AS adet FROM device_faults GROUP BY fault_type ORDER BY adet DESC, fault_type"
+    }
+  },
+  {
+    "id": "sql-15",
+    "input": {
+      "message": "2026'nın ilk yarısında sona erecek kaç sözleşme var?",
+      "variables": {}
+    },
+    "expected_output": {
+      "answer": "3",
+      "must_contain": [
+        "3"
+      ],
+      "sql_result": [
+        [
+          3
+        ]
+      ]
+    },
+    "metadata": {
+      "tags": [
+        "sql",
+        "date"
+      ],
+      "answerable": true,
+      "style": "dogrudan",
+      "expected_docs": [],
+      "reference_sql": "SELECT COUNT(*) FROM contracts_meta WHERE end_date BETWEEN '2026-01-01' AND '2026-06-30'"
+    }
+  },
+  {
+    "id": "sql-16",
+    "input": {
+      "message": "Fesih bildirim süresi en az 60 gün olan sözleşmeler ve süreleri nedir?",
+      "variables": {}
+    },
+    "expected_output": {
+      "answer": "SZL-2024-011 - 90; SZL-2025-007 - 60",
+      "must_contain": [
+        "SZL-2024-011",
+        "SZL-2025-007"
+      ],
+      "sql_result": [
+        [
+          "SZL-2024-011",
+          90
+        ],
+        [
+          "SZL-2025-007",
+          60
+        ]
+      ]
+    },
+    "metadata": {
+      "tags": [
+        "sql",
+        "multi_row"
+      ],
+      "answerable": true,
+      "style": "dogrudan",
+      "expected_docs": [],
+      "reference_sql": "SELECT contract_code, notice_days FROM contracts_meta WHERE notice_days >= 60 ORDER BY notice_days DESC, contract_code"
+    }
+  },
+  {
+    "id": "sql-17",
+    "input": {
+      "message": "Bakım türündeki sözleşmelerin toplam yıllık bedeli ne kadar?",
+      "variables": {}
+    },
+    "expected_output": {
+      "answer": "4850000",
+      "must_contain": [
+        "4850000"
+      ],
+      "sql_result": [
+        [
+          "4850000"
+        ]
+      ]
+    },
+    "metadata": {
+      "tags": [
+        "sql"
+      ],
+      "answerable": true,
+      "style": "dogrudan",
+      "expected_docs": [],
+      "reference_sql": "SELECT SUM(annual_value_try) FROM contracts_meta WHERE contract_type = 'bakim'"
+    }
+  },
+  {
+    "id": "sql-18",
+    "input": {
+      "message": "2025 yılında cihaz arızaları nedeniyle en uzun kesinti yaşayan bölüm hangisi?",
+      "variables": {}
+    },
+    "expected_output": {
+      "answer": "Nöroloji - 724.9",
+      "must_contain": [
+        "Nöroloji",
+        "724.9"
+      ],
+      "sql_result": [
+        [
+          "Nöroloji",
+          "724.9"
+        ]
+      ]
+    },
+    "metadata": {
+      "tags": [
+        "sql",
+        "join",
+        "group",
+        "date"
+      ],
+      "answerable": true,
+      "style": "dogrudan",
+      "expected_docs": [],
+      "reference_sql": "SELECT d.name_tr, SUM(f.downtime_hours) AS kesinti FROM device_faults f JOIN devices v ON v.id = f.device_id JOIN departments d ON d.id = v.department_id WHERE f.reported_on BETWEEN '2025-01-01' AND '2025-12-31' GROUP BY d.name_tr ORDER BY kesinti DESC LIMIT 1"
+    }
+  },
+  {
+    "id": "sql-19",
+    "input": {
+      "message": "Pediatri bölümünde 2025'te bir günde en fazla kaç yatak dolu oldu?",
+      "variables": {}
+    },
+    "expected_output": {
+      "answer": "24",
+      "must_contain": [
+        "24"
+      ],
+      "sql_result": [
+        [
+          24
+        ]
+      ]
+    },
+    "metadata": {
+      "tags": [
+        "sql",
+        "join"
+      ],
+      "answerable": true,
+      "style": "dogrudan",
+      "expected_docs": [],
+      "reference_sql": "SELECT MAX(a.occupied_beds) FROM admissions a JOIN departments d ON d.id = a.department_id WHERE d.code = 'PEDI'"
+    }
+  },
+  {
+    "id": "sql-20",
+    "input": {
+      "message": "3. kattaki bölümlerin toplam yatak kapasitesi kaçtır?",
+      "variables": {}
+    },
+    "expected_output": {
+      "answer": "48",
+      "must_contain": [
+        "48"
+      ],
+      "sql_result": [
+        [
+          48
+        ]
+      ]
+    },
+    "metadata": {
+      "tags": [
+        "sql"
+      ],
+      "answerable": true,
+      "style": "dogrudan",
+      "expected_docs": [],
+      "reference_sql": "SELECT SUM(bed_capacity) FROM departments WHERE floor = 3"
+    }
+  }
+]

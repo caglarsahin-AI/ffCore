@@ -614,8 +614,22 @@ class Test13aOpenapi(unittest.TestCase):
 
 
 class Test13aDeterminism(unittest.TestCase):
-    ONLY = "contracts,schema,agents,eval,openapi,pii,memory"
-    DIRS = ("contracts", "schema", "agents", "eval", "openapi", "pii", "memory")
+    # every module, not only 13a's: eval/ is shared with 18-hazirlik (sql-20) and the tree
+    # comparison below must see all files a directory holds
+    ONLY = ",".join(generate.MODULES)
+    DIRS = (
+        "contracts",
+        "schema",
+        "agents",
+        "eval",
+        "openapi",
+        "pii",
+        "memory",
+        "tickets",
+        "poison",
+        "projects",
+        "versions",
+    )
 
     def test_13a_8_deterministic(self):
         with tempfile.TemporaryDirectory() as a, tempfile.TemporaryDirectory() as b:

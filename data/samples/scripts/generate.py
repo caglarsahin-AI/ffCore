@@ -15,7 +15,19 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from gen import agents, contracts, memory, openapi, pii, schema  # noqa: E402
+from gen import (  # noqa: E402
+    agents,
+    contracts,
+    memory,
+    openapi,
+    pii,
+    poison,
+    projects,
+    scenarios_sql,
+    schema,
+    tickets,
+    versions,
+)
 from gen import eval as eval_set  # noqa: E402
 
 MODULES = {
@@ -26,6 +38,12 @@ MODULES = {
     "openapi": openapi.generate,
     "pii": pii.generate,
     "memory": memory.generate,
+    # package 18-hazirlik (plan/18 F2, F3, F11, F10, F13)
+    "scenarios_sql": scenarios_sql.generate,
+    "tickets": tickets.generate,
+    "poison": poison.generate,
+    "projects": projects.generate,
+    "versions": versions.generate,
 }
 DEFAULT_SEED = 13
 DEFAULT_OUT = Path(__file__).resolve().parents[1]

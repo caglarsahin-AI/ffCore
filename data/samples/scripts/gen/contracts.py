@@ -283,10 +283,10 @@ def blocks(contract: dict, rng: random.Random) -> list[tuple]:
     return out
 
 
-def generate(rng: random.Random, out: Path, seed: int) -> None:
-    base = out / "contracts"
-    base.mkdir(parents=True, exist_ok=True)
-    manifest = []
+def render_all(rng: random.Random) -> list[tuple[dict, list[tuple], bytes]]:
+    """(contract, blocks, file bytes) for every contract, drawing from rng in a fixed order.
+    package 18 (F13 versions) replays this to rebuild a contract's blocks exactly."""
+    out = []
     for c in CONTRACTS:
         content = blocks(c, rng)
         if c["format"] == "pdf":
@@ -299,6 +299,15 @@ def generate(rng: random.Random, out: Path, seed: int) -> None:
             )
         else:
             data = docx.render(content, c["title"])
+        out.append((c, content, data))
+    return out
+
+
+def generate(rng: random.Random, out: Path, seed: int) -> None:
+    base = out / "contracts"
+    base.mkdir(parents=True, exist_ok=True)
+    manifest = []
+    for c, _, data in render_all(rng):
         (base / c["file_name"]).write_bytes(data)
         manifest.append(
             {
