@@ -50,6 +50,7 @@ Platformun boş değil, anlamlı ve **tamamen sentetik** veriyle teslim edilmesi
 - Sözleşme asistanı 20 belge sorusunun en az 16'sında doğru maddeyi kaynak gösterir.
 - Cevapsız 8 soruda uydurma yoktur: `llmaas` ve `gpu` 8/8, `cpu` ≥ 7/8 (tabloyla aynı; v4 C10).
 - SQL sorularının en az 4'ünde beklenen sonuç gelir.
+- **S1 karşılaştırması iki koşu (karar, 29 Ekim 2026):** 00i S1 tabanı (`docs/paycore/s1-taban.md`) PayCore'un kendi çok biçimli sorgusu açıkken (FR-RAG-01) alındı; FFCore `airgap` cpu seed'inde ise `rewrite=false` (04:77, R3.2). Adil karşılaştırma için S1 seti FFCore'da **iki kez** koşar: (1) `rewrite=false`, PoC varsayılanı; (2) `rewrite=true`. İki koşunun kaynak doğruluğu, medyan ve P95 cevap süresi ve soru başına ek LLM çağrısı sayısı tabanla birlikte `docs/demo.md`'de üç sütun olarak raporlanır. PoC kabulü (S1 ≥ %80) **koşu 1** ile ölçülür; koşu 2 yalnızca M3'teki "airgap'te `rewrite` açılsın mı" kararının verisidir (04:77). Koşu 1 eşiği geçmiyor ama koşu 2 geçiyorsa paket VERIFIED olur, karar DECISION- kaydıyla koordinatöre gider; kabul eşiği sessizce koşu 2'ye kaydırılmaz. Sunucuda kullanıcı koşturur; iki koşu arası KB ve indeks değişmez (aynı ingest).
 
 ## Teknik notlar
 
