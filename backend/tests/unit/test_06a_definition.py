@@ -73,3 +73,10 @@ def test_06a_15_inconsistent_definitions_are_coded(patch, code):
 def test_06a_15_user_role_never_approves():
     with pytest.raises(ValidationError):
         parse_definition({**MINIMAL, "approval": {"actions": [], "assign_to": "user"}})
+
+
+def test_06a_15_model_key_pattern_matches_the_api():
+    from ffcore.api.schemas import MODEL_KEY_PATTERN as API_PATTERN
+    from ffcore.runtime.definition import MODEL_KEY_PATTERN
+
+    assert MODEL_KEY_PATTERN == API_PATTERN

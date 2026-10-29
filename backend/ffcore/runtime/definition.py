@@ -15,9 +15,10 @@ from jsonschema import Draft202012Validator
 from jsonschema.exceptions import SchemaError
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
-from ffcore.api.schemas import MODEL_KEY_PATTERN
-
 SCHEMA_VERSION = 1
+# The runtime does not import the API package (it imports the runtime); test_06a_definition
+# checks this equals ffcore.api.schemas.MODEL_KEY_PATTERN.
+MODEL_KEY_PATTERN = r"^[a-z][a-z0-9-]{1,63}$"
 KEY_PATTERN = r"^[a-z][a-z0-9_-]{0,63}$"
 TOOL_KEY_PATTERN = r"^[a-z][a-z0-9-]{0,63}$"
 ACTION_PATTERN = r"^[A-Za-z_][A-Za-z0-9_.-]{0,127}$"
