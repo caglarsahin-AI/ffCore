@@ -8,7 +8,7 @@ from ffcore.main import app
 
 MUTATING = {"POST", "PUT", "PATCH", "DELETE"}
 # Own-data endpoints that stay open in read-only access mode (brief 03 "salt-okunur modun
-# istisnaları"): signing in and out, changing one's own password.
+# istisnalarÄ±"): signing in and out, changing one's own password.
 WRITE_EXEMPT = {"login", "logout", "change_password"}
 # 08: the guardrail test panel is a POST dry run (nothing stored, open in read-only mode),
 # and the service-account-only internal evaluation endpoint (no user role applies there).
@@ -19,6 +19,11 @@ WRITE_EXEMPT |= {"search_knowledge_base", "test_query", "internal_embed"}
 # 05a: the SQL tool context is a read that is POST because the question travels in the body,
 # and the service-account-only token verification (review r1 MAJOR-1; no user role applies).
 WRITE_EXEMPT |= {"sql_context", "verify_obo"}
+# 06a: starting a run and answering its question are chat (read-only exception, like 11), and
+# cancelling one's own run is own data; resume with an approval decision checks the agent's
+# `approval.assign_to` role with edit access in the handler, because the body decides the rule
+# (test_06a_3 covers the 403).
+WRITE_EXEMPT |= {"create_run", "resume_run", "cancel_run"}
 
 
 def api_routes(routes):

@@ -3,6 +3,7 @@
 from fastapi import APIRouter
 
 from ffcore.api import (
+    agents,
     audit,
     auth,
     guardrails,
@@ -10,6 +11,7 @@ from ffcore.api import (
     models,
     projects,
     providers,
+    runs,
     tools,
     tools_internal,
     users,
@@ -29,5 +31,7 @@ for _module in (
     knowledge,
     tools,
     tools_internal,
+    agents,
+    runs,
 ):
     api_router.include_router(_module.router)

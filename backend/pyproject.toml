@@ -40,6 +40,9 @@ dependencies = [
     # 05a (K-05a-0002 S1): MCP client and servers (streamable HTTP), SQL validation.
     "mcp==2.3.0",
     "sqlglot==30.23.0",
+    # 06a: structured_output schemas are checked at save time (C8); already locked via
+    # dependencies, now direct because ffcore imports it.
+    "jsonschema==4.26.0",
 ]
 
 [dependency-groups]
@@ -63,7 +66,7 @@ torch = [{ index = "pytorch-cpu" }]
 torchvision = [{ index = "pytorch-cpu" }]
 
 [build-system]
-# uv'nun pinli sürümüyle aynı: uv yerleşik derleme arka ucunu kullanır, ağ gerekmez.
+# uv'nun pinli sÃ¼rÃ¼mÃ¼yle aynÄ±: uv yerleÅŸik derleme arka ucunu kullanÄ±r, aÄŸ gerekmez.
 requires = ["uv_build==0.10.12"]
 build-backend = "uv_build"
 
