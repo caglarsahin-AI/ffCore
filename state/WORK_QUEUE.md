@@ -23,6 +23,7 @@ Durumlar: READY · CLAIMED · PLANNED · IMPLEMENTING · IMPLEMENTED · VERIFIED
 | 07 | — | B | | | api/approvals* | | | 06a, 03b |
 | 10b-poc-1 | MERGED | C | feat/10b-poc-1 (silindi) | (kaldırıldı 15:22) | frontend/app/(console)/{knowledge,status}, frontend/tests, docs/onyuz.md | 2026-10-29 | | 10a-formlar MERGED ✓; 04a OpenAPI (branch); e2e 04a MERGED sonrası; taslak GOREV K-10bp-0000; msw yok (KARARLAR 10b sıralaması); GOREV K-10bp-0001 (oturum ffcore-isci-c-10bp1); r1 ONAY + MINOR 2 (düzeltildi), r2 ONAY (R-10bp1-0008, state/reviews/10b-poc-1-r1..r2.md); main'e --no-ff merge 92fb37f 2026-10-29 15:07; FOLLOWUP-86/87 |
 | 10b-poc-2 | — | C | | | frontend/app/(console)/{tools,agents,runs,approvals}, tests | | | 05a, 06a, 07 MERGED (gerçek backend; eski 10b-bağlama bununla birleşti); 13b bunu bekler |
+| 18-hazirlik | IMPLEMENTING | test | feat/18-scenario-data | .worktrees/feat/18-scenario-data | data/samples/{eval,tickets}/**, data/samples/scripts/**, tests/e2e/scenarios/** (yeni), docs/demo.md taslağı | 2026-10-29 | | plan/18 Aşama 1; GOREV K-SEN-0001 (oturum ffcore-test-18-hazirlik); sql-20, tickets, ticket-desk tasarımı; PLANNED T-18-0003, onay K-SEN-0002 (S1 fake-llm /_requests, S2 compose test profili, S3 ticket-desk; make test-samples) |
 | 13b | — | A + test | | | A: tests/e2e (negative hariç), Makefile, docs/demo.md; test: tests/e2e/negative, data/samples | | | ayrı branch/worktree ve alt-claim; PoC paketleri, 10b-bağlama, 00i S1 tabanı; **M3 / PoC kapısı** |
 
 ## PoC sonrası

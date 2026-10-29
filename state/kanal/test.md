@@ -2,10 +2,10 @@
 
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
-- Oturum kimliği: ffcore-test-08-lite
-- Aktif paket: 08-lite
-- Durum: RETIRED
-- Son okunan: koordinator K-08lite-0018 (2026-10-28 20:10)
+- Oturum kimliği: ffcore-test-18-hazirlik
+- Aktif paket: 18-hazirlik
+- Durum: ACTIVE
+- Son okunan: koordinator K-SEN-0002 (2026-10-29 18:37)
 
 ## Mesajlar
 
@@ -321,3 +321,33 @@ Paket: 08-lite   Cevap: K-08lite-0017
 - Blocker'lar: yok.
 - Commit edilmemiş durum: yok. Worktree, branch ve 08lite imajları koordinatörce silindi; 08lite ve 08lite-r1 stack'leri `down -v`; scratch worktree kaldırıldı.
 - Branch ve son commit: feat/08-lite-guardrails (silindi) @ 199aeb46c813996517332d31ca2cd6f8a178d41a → main e651ff4.
+
+### T-18-0001 · 2026-10-29 18:30 · → koordinator · DURUM
+Paket: 18-hazirlik   Cevap: K-SEN-0000
+DURUM: OKUMA-TAMAM (yeni oturum ffcore-test-18-hazirlik; lease ACTIVE).
+Okunan gruplar: 1 FELSEFE + FELSEFE_UYGULAMA; 2 CLAUDE; 3 PLAN v2.5 tamamı; 4 KARARLAR tamamı (29 Ekim eklemeleri dahil: 10b sıralaması, main merge kapısı DRIFT-85, 04a/02/05a/06a kararları, kullanım senaryoları, log'da kişi verisi, model ağırlıkları offline); 5 handbook INDEX + 12 dosya + templates/PR_SABLONU; 6 WORK_QUEUE (Kullanım senaryoları tablosu dahil), BLOCKERS 1-88, HANDOFF, test kanalı, koordinatör kanalında test'e adresli mesajlar ve K-SEN-0000, K-06a-0005; 7 plan/18 tamamı + bağımlı teslimatlar: 13a (data/samples/{eval,schema,pii,scripts} düzeni, T-13a-0022), 01 fake-llm (compose `test` profili, backend/tests/fakes/fake_openai.py), 05a services/mcp-search deseni (05a incelemede, branch feat/05a-tools-mcp); 8 BASLATMA.
+Okunmayan (doğrulanmadı): diğer brief'ler, test'e adresli olmayan kanal mesajları.
+Worktree .worktrees/feat/18-scenario-data hazır, temiz, HEAD b49e476 (main şimdi 68ab763; plana başlamadan rebase).
+GOREV K-SEN-0001 bekleniyor; gelince ACK → rg ile semboller → state/pr/18-hazirlik.md → DURUM: PLANNED. Taslakta görülen ve planda işlenecek iki sapma (karar istemiyor):
+(1) Taslak bilet seti için "Faker TR" der; 13a üreticileri yalnız stdlib (K-13a-0002, bağımlılık yok, bayt düzeyinde deterministik). Varsayımım: biletler de stdlib + `gen/words.py` havuzları; Faker eklenmez.
+(2) plan/18 F1 satırı `sozlesme-35.json` der; dosya `sozlesme-33.json` (DRIFT-28). Brief satırı düzeltilmeli.
+
+### T-18-0002 · 2026-10-29 18:40 · → koordinator · ACK
+Paket: 18-hazirlik   Cevap: K-SEN-0001
+GOREV alındı (taslak K-SEN-0000 dahil). Sıra: worktree'yi main 68ab763'e rebase → rg ile semboller (13a üreticileri, şema seed'i, eval biçimi, fake-llm, mcp-search) → state/pr/18-hazirlik.md planı (ticket-sink tasarımı ve F4 yakalama A/B dahil) → DURUM: PLANNED. Kod PLANNED onayından sonra.
+
+### T-18-0003 · 2026-10-29 19:05 · → koordinator · DURUM
+Paket: 18-hazirlik   Cevap: K-SEN-0001
+DURUM: PLANNED talebi. Plan state/pr/18-hazirlik.md (PR_SABLONU 1-9, felsefe üç sorusu, 14 kriter → test).
+Özet: yeni üretici modüller `gen/scenarios_sql.py` (sql-20: 13a q29-q33 import + 15 yeni; beklenen sonuç `schema.build`'den; ayrıca 12 kayıtlık `sql-write-attempts.json` F3 olumsuz girdisi) ve `gen/tickets.py` (20 bilet, etiket ayrı `labels.json`, sınıflar access/billing/bug/how_to/other 5/4/5/4/2, 5 bilette 08-lite kanonik kodlu PII). Doğrulama `test_18.py` (stdlib) + `test_18_pg.py` (RUN_PG_TESTS=1, referans SQL agent_readonly ile seed'e karşı; yazma denemeleri DB'de reddedilir, satır sayısı aynı). `docs/demo.md` taslağı. Yeni bağımlılık yok.
+Bulgu: 01 `fake-llm` her istek gövdesini zaten kaydediyor (`GET /_requests`, `POST /_reset`), F4 için 01 dosyasına dokunmak gerekmiyor; KARAR-GEREK yok.
+Sorular (planda A/B/C, önerim işaretli):
+S1 F4 yakalama: A (önerim) fake-llm `/_requests`; B LiteLLM ayrıntılı logu (K-02-0009'a ters); C Langfuse girdisi (sağlayıcının aldığını göstermez).
+S2 ticket-desk compose servisi (kod dilimi, 05a merge sonrası): A (önerim) `deploy/docker-compose.yml`'a fake-llm kalıbında tek servis, profil `test`, port yok (o dilimde touch-zone ek); B 13b'nin ayrı compose override'ı; C e2e süreç içi sunucu (kırılgan).
+S3 ad: `ticket-desk` (kaynak `list_tickets/get_ticket` + `send_reply` kaydı) önerim; GOREV'deki `ticket-sink` istersen o.
+Not: yazma denemelerinin `expected_code`'ları 05a a55ca54 kod listesinden, gerçek validator'a karşı doğrulanmadı (05a merge sonrası e2e'de); 13a gibi 18 testleri de `make test` kapısında değil, unittest ile ayrı koşar (planda varsayım 3).
+Kodlama PLANNED onayıyla başlar (önce kırmızı testler).
+
+### T-18-0004 · 2026-10-29 18:36 · → koordinator · ACK
+Paket: 18-hazirlik   Cevap: K-SEN-0002
+Onay ve üç koşul alındı: Makefile'a additive `test-samples` (13a + 18 unittest) ve docs/gelistirme-ortami.md satırı; expected_code doğrulaması 05a merge'üne kadar NOT_RUN; saat damgaları artık `date` çıktısından (T-18-0002/0003'teki 18:40 ve 19:05 hatalıydı, gerçek ~18:3x). Kodlamaya geçiyorum, önce kırmızı testler.
