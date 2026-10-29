@@ -1,6 +1,6 @@
 # FFCore
 
-Kurumsal LLM platformu: model dışındaki her şey (kapı, bilgi tabanı, araçlar, agent'lar, koruma, izleme) kurum içinde. Ürün varsayılanı `llmaas` profili, ikincil `airgap`. Uygulama (arayüz, API, `docs/`) İngilizce varsayılan, Türkçe yerel; kod İngilizce; proje belgeleri ve kanal Türkçe. Ayrıntı PLAN.md.
+Kurumsal yapay zekâ platformu: model dışındaki her şey (kapı, bilgi tabanı, araçlar, agent'lar, koruma, izleme) kurum içinde. Ürün varsayılanı `llmaas` profili, ikincil `airgap`. Uygulama (arayüz, API, `docs/`) İngilizce varsayılan, Türkçe yerel; kod İngilizce; proje belgeleri ve kanal Türkçe. Ayrıntı PLAN.md.
 
 ## Okuma sırası
 

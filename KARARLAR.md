@@ -9,6 +9,8 @@ Brief'lerde yazmayan ama planı şekillendiren kararlar. Koordinatör oturumu bu
 - Lisans tamamen bizim; Cognipeer fork edilmedi (AGPL ve Next.js bağımlılığı). Ürün kodu müşteri deposunda yaşamaz (karar 1).
 - **Ürün adı FFCore** (27 Ekim 2026): modüller Gateway, Trace, Knowledge, Tools, Agents, Guard, Eval, Console, Channels, Platform (PLAN.md 1b). ffcore.com dolu; alan adı adayları ffcore.com.tr, ffcore.ai/io, en son ffcoretr.com; marka araması (Türk Patent, EUIPO) yapılacak.
 - Ürün FF ailesinin (FFEngine, FFGov) parçası, sahibi biziz. PayCore bir müşteridir; PayCore LLM projesi yalnızca ölçüm ve ders kaynağı olarak referans alınır, ürün adı ve alan adı PayCore'a bağlanmaz.
+- **Ürün alt başlığı** (29 Ekim 2026, kullanıcı kararı): TR "Kurumsal Yapay Zekâ Platformu", EN "Enterprise AI Agent Platform" (`Home.subtitle`, tek anahtar; metadata/giriş/manifest ondan okur). "LLM Agent Runtime" ürün sloganı değildir; "Agent Runtime" yalnız 06 paketinin modül adı. Türkçe ürün metninde "ajan" kullanılmaz (çağrışım), teknik ekranlarda "agent" kalır; "LLM" teknik belgede (gateway, izleme, model kataloğu) kalır, ürün kapısındaki yazıdan çıkar. Gerekçe: alıcının dili, "ajan" çağrışımı, rakip rafı. Aile adı (FastFlow / FF) açık: DRIFT-91.
+
 
 ## PayCore entegrasyonu (27 Ekim 2026; inceleme v9/v10, yedi kullanıcı kararı)
 

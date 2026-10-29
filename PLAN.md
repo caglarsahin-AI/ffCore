@@ -1,4 +1,4 @@
-# FFCore: Kurumsal LLM Platformu Geliştirme Planı
+# FFCore: Kurumsal Yapay Zekâ Platformu Geliştirme Planı
 
 Sürüm 2.5, 28 Ekim 2026 (geçmiş bölüm 11). **PoC kapsamı** (M1-M3) bölüm 7'de işaretlidir ve **PayCore LLM'de `airgap` profiliyle canlı koşar** (bölüm 2d); PoC sonrası paketler brief'leriyle birlikte bağlayıcı kalır. Bu dosya mimariyi, kısıtları, depo düzenini ve iş paketlerinin sırasını tanımlar. Her iş paketi `plan/` klasöründe ayrı bir brief olarak durur ve tek başına bir geliştirici agent'a verilebilir. Bir agent'a brief verirken bu dosyayı da ekleyin; ortak kurallar burada.
 
@@ -260,6 +260,7 @@ Görsel akış tasarımcısı (Flow canvas), alt agent (sub-agent) devri, zamanl
 
 | Sürüm | Tarih | Değişiklik |
 |---|---|---|
+| 2.6 | 29 Ekim 2026 | Ürün alt başlığı (kullanıcı kararı): TR "Kurumsal Yapay Zekâ Platformu", EN "Enterprise AI Agent Platform"; "LLM Agent Runtime" slogan değil, "Agent Runtime" yalnız 06 modülü; Türkçe metinde "ajan" yok; başlık buna göre (KARARLAR "Ürün ve pazar") |
 | 1 | 24 Ekim 2026 | İlk plan: 14 paket, airgap (Ollama CPU) varsayılan, Cognipeer benzeri 8 çekirdek özellik |
 | 1.x | 24-26 Ekim | Dağıtım profilleri (2b), hafıza (14), kanallar (15), veri kaynakları (16), PayCore düzeltmeleri D1-D8, K1-K3, P1-P9 işlendi |
 | 2 | 26 Ekim 2026 | **Tersine karar:** ürün varsayılanı `llmaas`, Türkiye Hastanesi pilotu `llmaas`; `airgap` ikincil. Reviewer R maddeleri; 03 → 03a/03b; "Agent runtime referansı" bölümleri Kapsam'a eritildi; 04/05/06 → a/b; toplam 71 agent-günü, kritik yol ~20 gün |

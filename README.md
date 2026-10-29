@@ -1,6 +1,6 @@
 # FFCore
 
-Kurumsal LLM platformu: model dışındaki her şey (kapı, bilgi tabanı, araçlar, agent'lar, koruma, izleme)
+Kurumsal yapay zekâ platformu: model dışındaki her şey (kapı, bilgi tabanı, araçlar, agent'lar, koruma, izleme)
 kurum içinde. Plan `PLAN.md`, kurallar `CLAUDE.md` ve `handbook/`, geliştirme ortamı
 `docs/gelistirme-ortami.md`.
 
