@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-koordinator-20261028-0205
 - Aktif paket: tumu
 - Durum: ACTIVE
-- Son okunan: isci-a A-06a-0009 (oturum ffcore-isci-a-06a); isci-b B-05a-0009 (oturum ffcore-isci-b-05a); isci-c C-10bp1-0011 (HANDOFF, RETIRED); inceleyici R-INIT-20261029-0005 (yeni oturum ffcore-inceleyici-20261029-01a187c0); test T-18-0003 (oturum ffcore-test-18-hazirlik) (2026-10-29 18:56)
+- Son okunan: isci-a A-06a-0013 (oturum ffcore-isci-a-06a); isci-b B-05a-0009 (oturum ffcore-isci-b-05a); isci-c C-10bp1-0011 (HANDOFF, RETIRED); inceleyici R-06a-0002; test T-18-0013 (oturum ffcore-test-18-hazirlik) (2026-10-29 20:18)
 
 ## Mesajlar
 
@@ -1545,3 +1545,80 @@ Dilim 5 ve F9 alındı; iki gerçek hata düzeltmesi (UUID JSON, guardrail kayna
 ### K-SEN-0003 · 2026-10-29 18:56 · → test · GOREV-EK
 Paket: 18-hazirlik   Cevap: -
 Kullanıcı dört senaryo daha onayladı (plan/18 F10-F13, Aşama 1 güncellendi). Senin veri hazırlığına ek: (1) `data/samples/poison/` 5 belge + 3 bilet, talimat enjeksiyonu kalıpları ("önceki kuralları unut", gizli araç çağrısı, veri sızdırma isteği), sentetik, kişi adı yok; beklenen davranış dosyası (`expected.json`: uygulanmaması gereken talimat, çağrılmaması gereken araç). (2) 13b seed için ikinci proje tanımı (`data/samples/projects/`: iki proje, her birinde admin_edit/admin_read/analyst_edit; F10 izolasyon testinin girdisi). (3) Sözleşme v1/v2 çiftleri: 13a sözleşmelerinden 2'sinin tarihli ikinci sürümü (bir madde değişir; `expected.json`'da hangi madde, hangi tarih). Planına üç dilim olarak ekle (PLANNED ek bölümü, onay gerekmez, kurallar aynı). Kesinti (F12) için veri yok; e2e'de servis durdurma, 06a sonrası.
+
+### K-SEN-0004 · 2026-10-29 19:15 · → inceleyici · REVIEW-ISTEK
+Paket: 18-hazirlik (kullanım senaryoları veri hazırlığı)   Cevap: T-18-0007
+PR: state/pr/18-hazirlik.md · Branch feat/18-scenario-data · Baz main 881fe3c · SHA df1e09f8fa617c60942537b322bbb59ad1b3bacf (koordinatör doğruladı: main üstünde 3 commit, ağaç temiz; ürün kodu değişmedi: yalnız data/samples/**, Makefile `test-samples` hedefi, docs/demo.md taslağı, docs/gelistirme-ortami.md satırı). Sınıf [A]. Tur: r1, kısa; **05a r1'den sonra**, onu bölme.
+Bakılacak: (1) veri sentetik mi: kişi adı 0 (DECISION-24), PII yalnız 08-lite kanonik biçimleri ve yalnız işaretli 5 bilet + poison setinde; gerçek kurum/kişi izi yok; (2) determinizm: üreticiler iki koşuda bayt aynı (`make test-samples`), 13a çıktıları değişmedi (v1 bayt aynı); (3) `sql-20.json` beklenen sonuçlar seed'den türetilmiş mi, elle yazılmış mı; `sql-write-attempts.json` denemeleri gerçekten yazma mı (CTE/UNION/yorum gizlemeleri); (4) poison seti enjeksiyon kalıpları ve `expected.json` tutarlı; (5) Makefile hedefi additive, belgelenen komutla çalışıyor; (6) `make test` iki profilde değişmedi (işçi 441 bildirdi). Dış ağ/model gerekmez.
+
+### K-SEN-0005 · 2026-10-29 19:15 · → test · CEVAP
+Paket: 18-hazirlik   Cevap: T-18-0007
+PR-HAZIR alındı; df1e09f doğrulandı (881fe3c üstünde, temiz, ürün kodu yok). REVIEW-ISTEK K-SEN-0004 gitti (05a'dan sonra sırada). Review bitene kadar yeni commit yok. `ticket-desk` ayrı PR, 05a merge sonrası; bekleme süresinde plan/18 Aşama 2 e2e senaryo testlerinin iskeletini (`tests/e2e/scenarios/test_18_*.py`, henüz koşmayan, 06a API'sine göre: `backend/openapi/06a.yaml` 06a worktree'sinde salt okunur) yazmaya başlayabilirsin, ayrı branch `feat/18-scenarios-e2e`.
+
+### K-06a-0007 · 2026-10-29 19:23 · → isci-a · GOREV-EK
+Paket: 06a   Cevap: T-18-0009
+Test işçisinin bulgusu (plan/18 F4/F10 iz zinciri): `llm_call` olay payload'ında LiteLLM call id yok; bağ yalnız `runs.langfuse_trace_id`. Additive ek: her `llm_call` olayına `litellm_call_id` (01 istemcisinin okuduğu `x-litellm-call-id`; 01 istemcisi değeri dışarı vermiyorsa `services/litellm_client.py`'ye additive bir dönüş alanı, 01 dosyası touch-zone eki, PR'da gerekçeli, 01 testleri değişmez). Yoksa `null`, sessiz değil (fake-llm başlık vermiyorsa test profilinde `null` beklenir, PR'da yaz). Test: `run_events` → `litellm_call_id` → LiteLLM `/spend/logs` ya da erişim logu eşleşmesi (canlı kanıtına bir satır). PR-HAZIR'dan önce.
+
+### K-SEN-0006 · 2026-10-29 19:23 · → test · CEVAP
+Paket: 18-hazirlik (e2e iskeleti)   Cevap: T-18-0008 / T-18-0009
+Alt claim işlendi (WORK_QUEUE: feat/18-scenarios-e2e, yalnız tests/e2e/scenarios/**, review yok, koşmuyor). KAYIT-TALEBİ FOLLOWUP değil 06a'ya ek oldu (K-06a-0007: `llm_call` olayına `litellm_call_id`); `test_18_f4_2b` 06a merge sonrası koşar. 13b seed beklentilerin WORK_QUEUE 13b satırına yazıldı (6 kullanıcı, iki yeni agent şablonu, KB'ler); iki yeni agent şablonu (`zehirli-belge-asistani`, `surum-asistani`) 13a verisi olduğundan senin `ticket-desk` PR'ına girsin (data/samples/agents/*.json, 06 şemasında; 06a OpenAPI'siyle doğrula), 05a merge sonrası. Data PR review'da değişirse e2e dalını rebase edersin.
+
+### K-05a-0008 · 2026-10-29 19:31 · → isci-b · DUZELT
+Paket: 05a   Cevap: R-05a-0002 (state/reviews/05a-r1.md)
+Review r1: DUZELT; BLOCKER 1, MAJOR 3, MINOR 1. Her bulgu için önce kırmızı test (inceleyicinin probe'ları senaryo), sonra düzeltme; yeni tam SHA ile PR-HAZIR; r2 delta + güvenlik tekrarı. Kararlar KARARLAR "05a review r1 kararları":
+- BLOCKER-1 (C3): `few_shots` doğrudan `project_id` taşımaz; ebeveyni `tools` (kayıtlı mcp-sql aracı), `tool_id` FK NOT NULL, proje zincirden. Migration 05a_0001'i düzelt (henüz main'de değil, yeni revizyon değil), sql-context ucu araç kimliğiyle sorgular. C3 sözleşme testindeki "child" istisnası tabloyu atlamaz: çocuk tabloda köke giden FK zincirini doğrular. BREAKING yok.
+- MAJOR-1: mcp-sql `run_sql` imzasız claims'i kapı olarak kullanamaz. Backend'e additive `POST /api/v1/internal/obo/verify` (servis jetonu zorunlu; imza + aud listesi + ömür doğrulanır; claims döner; 401 `invalid_token`/`token_expired`, 403 `audience_mismatch`); mcp-sql her `run_sql` ve `get_schema` öncesi çağırır, `jti` başına token ömrü boyunca önbellek. `unverified_on_behalf_of_claims` yalnız yönlendirme; PR'da bunu kullanan tek yer ve o yerin karar vermediği testle. Negatif: yanlış anahtarla imzalı doğru-aud token → 401, DB'ye sorgu gitmez.
+- MAJOR-2: `endpoint_url` yalnız şema + host + port + yol; userinfo ve query string 400 `endpoint_url_not_allowed`; mevcut kayıtlarda kalıntı için migration gerekmez (main'de yok). Negatif: `http://u:p@host/`, `http://host/?token=x`.
+- MAJOR-3: özel başlık adı RFC 7230 token + kapalı liste (`Host`, `Content-Length`, `Connection`, `Transfer-Encoding`, `Upgrade`, `TE`, `Trailer`, `Keep-Alive`, `Proxy-*`, `Authorization`) 400 `header_name_not_allowed`. Negatif testler her ad için.
+- MINOR-1: doğrulayıcı matrisi (KARARLAR 5. madde): tek ifade, yorum soyma, set işlemleri yalnız tüm dallar SELECT, fonksiyon kapalı listesi, CTE içinde yazma; her satır negatif test, DB'ye gitmediği gerçek DB istatistiğiyle.
+Kapılar: iki profil `make test` + belgelenen komutla `make test-int` + smoke + canlı zincir; PR'a "Review r1 bulgu → düzeltme → kanıt".
+
+### K-05a-0009 · 2026-10-29 19:31 · → inceleyici · CEVAP
+Paket: 05a   Cevap: R-05a-0002
+Alındı; DUZELT K-05a-0008 gitti. BLOCKER-1 kararı: C3'e uyum (`few_shots` → `tools` çocuğu), BREAKING yok. MAJOR-1: aktarıcı anahtar tutmaz, doğrulama backend'in `internal/obo/verify` ucuyla. r2'de kendi probe'larını tekrar et. 18-hazirlik r1'e devam.
+
+### K-SEN-0007 · 2026-10-29 19:41 · → test · DUZELT
+Paket: 18-hazirlik   Cevap: R-18-0002 (state/reviews/18-hazirlik-r1.md)
+Review r1: DUZELT; BLOCKER 0, MAJOR 1. Geri kalan doğrulandı (sentetiklik, determinizm, seed'den türeyen sql-20, Postgres eşitliği, CTE/yorum/ikinci ifade/SELECT INTO retleri, poison tutarlılığı, Makefile hedefi). Yeni commit, yeni tam SHA ile PR-HAZIR; r2 delta.
+MAJOR-1: `sql-write-attempts.json`'daki UNION kaydı yazma etkili değil (katalog okuması), `test_18_f3_6` UNION'ı zorunlu tutmuyor, gerçek Postgres testi katalog kaydını dışlıyor; F3'ün "UNION ile gizlenmiş yazma reddedilir" kabulü kanıtsız. Beklenen: (1) yazma etkili UNION negatifi (ör. `SELECT 1 UNION SELECT setval(...)` / `... UNION (INSERT ... RETURNING 1)` / CTE'li yazma dalı) `hidden_write` sınıfında; (2) kapsam testi: `hidden_write` kümesinde `union`, `cte`, `comment`, `function` kalıplarının her biri en az bir kayıtla var (eksik kalıp testi kırmızı yapar); (3) gerçek Postgres koşusu `hidden_write` kayıtlarının tamamını salt okunur rolde dener, satır sayısı ve sekans değerleri (`setval`/`nextval` için `last_value`) aynı kalır; katalog UNION kaydı ayrı `catalog` sınıfında kalabilir, ama kapı kanıtına sayılmaz. 05a doğrulayıcısına karşı `expected_code` kontrolü yine 05a merge sonrası NOT_RUN (koşul 2).
+
+### K-06a-0008 · 2026-10-29 19:54 · → inceleyici · REVIEW-ISTEK
+Paket: 06a (agent runtime çekirdeği)   Cevap: A-06a-0010
+r1, **erken tur** (dilim 6 MCP bağlama hariç; 05a merge'ünü bekliyor; dilim 6 + rebase sonrası r2 yalnız delta). Branch feat/06a-agent-runtime · Baz main 5c338ae · SHA c54a922d32cfd7d92fcffad49fa0213dfd1e3cb7 (koordinatör doğruladı: 5c338ae üstünde 13 commit, ağaç temiz). Sınıf [A] + bağımlılıklar [C] (LangGraph 1.2.15 ailesi, koordinatör onayı K-06a-0002). PR: state/pr/06a.md. **Güvenlik turu.**
+Öncelikli: (1) kimlik ve yetki: run başlatma/`resume`/`cancel`/`feedback` yetkileri (üyelik `write`, `read` 403, `user` yalnız kendi run'ı; üyeliksiz süper yönetici 403 `run_needs_membership`), onay rolü `definition.approval.assign_to`, `user` asla; OBO ile 04a aramasına giden kimlik. (2) C8/C9/C10 donmuş biçimler PR'da; `definition` şeması bilinmeyen alan 422, 13a şablonları geçer. (3) Checkpointer: `checkpoints` şeması proje izolasyonu (başka projenin thread'i resume edilemez), `Command(resume=)` yan etki tekrarı yok (`tool_guard` → `approval` → `tools`), bitmiş run'a resume 409. (4) Olay taşıma: `run_events` Postgres + Redis Stream; TTL sonrası DB'den tekrar oynatma, `Last-Event-ID`; SSE'de token ve `output_buffered` (enforce) davranışı; kopma iptal etmez, `RUN_ABANDON_GRACE_S` sonrası `abandoned`. (5) Guardrail süreç içi `engine.evaluate` + `record_events` (C4 biçimi, kaynak eşlemesi); engel kodlu hata gövdesi. (6) `LLM_SLOTS`/kuyruklar: `llm-interactive`/`llm-background`, `queued` durumu; worker ölümünde checkpoint'ten devam (kabul 4). (7) Kesinti kodları (F12): `model_unavailable` (airgap'te dış istek 0), `trace_delivery_failed`, arama hatası, `prompt_unavailable`. (8) Loglar/izler: PII ve secret 0 (02 kapısı), `llm_call` olayında `litellm_call_id` (01 istemcisine additive `call_id`), Langfuse iz ağacı iç içe. (9) Dış ağ: `langsmith` çağrısı yok (DNS tuzağı), `shutdown_on_exit=False` iz kaybı kodlu. (10) İki profil, belgelenen komutlarla boş cache (işçi 481 + 280/3 skip bildirdi).
+Ortam: `FFCORE_VERSION=0.0.0-review-06a`, `--pull=never`; fake-llm (`--profile test`) ve qdrant profili; model ağırlığı gerekmez (FAKE_EMBED); dış ağ yok; `04a-knowledge-core_model_cache`'e dokunma. Sıra: 05a r2 ve 18 r2 gelince önce onlar (kısa), bu uzun tur arada.
+
+### K-06a-0009 · 2026-10-29 19:54 · → isci-a · CEVAP
+Paket: 06a   Cevap: A-06a-0010
+Alındı; canlı kanıt (iz ağacı, worker yeniden başlatma, 4 canlı hata) iyi. Bekleme süresini kullanıyoruz: c54a922 erken r1 güvenlik turuna gitti (K-06a-0008, dilim 6 hariç). Review bitene kadar bu branch'e commit yok; dilim 6 için 05a merge'ünü beklemeye devam (05a r1 DUZELT'te). r1 bulguları gelince dilim 6 ile birlikte düzeltir, rebase eder, r2 delta olur.
+
+### K-06a-0010 · 2026-10-29 19:53 · → isci-a · CEVAP
+Paket: 06a   Cevap: A-06a-0011
+Yığını şimdi `down` et (volume'suz; `-v` değil): Docker VM belleği dar, inceleyici kendi yığınını kurar ve 8000/3000 serbest kalsın. Dilim 6'ya geçerken yeniden açarsın.
+
+### K-SEN-0008 · 2026-10-29 19:55 · → inceleyici · REVIEW-ISTEK
+Paket: 18-hazirlik   Cevap: T-18-0013
+r2 delta. Branch feat/18-scenario-data · Baz main 881fe3c · SHA e02eaa40191a282a35f8f402f752bb5ddbc5639b (koordinatör doğruladı: df1e09f üstüne 1 commit, 5 dosya +182/-54, ağaç temiz). Kapsam yalnız MAJOR-1: `hidden_write` 7 kayıt yazma etkili (UNION/CTE/yorum/fonksiyon), kalıp kapsam testi, gerçek Postgres'te tamamı salt okunur rolde reddediliyor, satır sayısı ve sekans değerleri aynı. Kısa tur; 06a r1'i böl, bu önce. ONAY ise merge ederim.
+
+### K-SEN-0009 · 2026-10-29 19:55 · → test · CEVAP
+Paket: 18-hazirlik   Cevap: T-18-0013
+r2 PR-HAZIR alındı; e02eaa4 doğrulandı. REVIEW-ISTEK K-SEN-0008 gitti (kısa, 06a'dan önce). Review bitene kadar bu branch'e commit yok. e2e dalının rebase'i kaydedildi.
+
+### K-06a-0011 · 2026-10-29 20:14 · → isci-a · DUZELT
+Paket: 06a   Cevap: R-06a-0002 (state/reviews/06a-r1.md)
+Erken r1: DUZELT; BLOCKER 0, MAJOR 1, MINOR 1. Dilim 6 ile birlikte (05a merge sonrası rebase'ten sonra) düzelt; yeni tam SHA ile PR-HAZIR; r2 delta + dilim 6.
+- MAJOR-1: run create/resume/cancel `require_role(analyst)` ve feedback `require_role(analyst, write)` bağımlılığı `user` rolünü daha dependency katmanında 403'e düşürüyor; kod içindeki "kendi run'ı" kontrollerine ulaşamıyor. Brief: `user` kendi sohbetini başlatır, `waiting_user` sorusunu yanıtlar, kendi run'ını iptal eder ve kendi run'ına geri bildirim verir; başkasının run'ında 403. Beklenen: dört uçta açık rol/erişim matrisi (PR'da tablo): `user` kendi run'ı pozitif, başka kullanıcının run'ı 403, `read` yalnız GET; onay (`resume` ile approve/reject) yine `definition.approval.assign_to` rolü, `user` asla. Testler: own-user pozitif + cross-user 403 dört uçta, önce kırmızı.
+- MINOR-1: `langsmith` dış çağrı yokluğu PR'da kanıtsız. K-06a-0002 S1 koşulu: ağsız/DNS tuzağı testi (çözümleme ve bağlantı girişimi 0; `LANGSMITH_TRACING` açıkken açılış hatası) PR kanıtına.
+Dilim 6 ve 05a rebase ile birlikte r2.
+
+### K-06a-0012 · 2026-10-29 20:14 · → inceleyici · CEVAP
+Paket: 06a, 18-hazirlik   Cevap: R-06a-0002 / R-18-0004
+Alındı. 06a erken r1 bulguları isci-a'ya DUZELT olarak gitti (dilim 6 + 05a rebase ile birlikte r2). 18-hazirlik main'e merge edildi (e02eaa4; main kapıları koşuyor, sonucu yazarım). Sırada 05a r2 (isci-b düzeltiyor). Review imajlarını ben siliyorum.
+
+### K-06a-0013 · 2026-10-29 20:17 · → isci-a · CEVAP
+Paket: 06a   Cevap: A-06a-0013
+Onay: MAJOR-1 ve MINOR-1'i şimdi düzelt ve commit'le (api/runs.py + testler; 05a ile ortak dosya yok), önce kırmızı. Rebase ve dilim 6 sonra, tek r2. Yığını yalnız test için aç, bitince kapat.
+
+### K-SEN-0010 · 2026-10-29 20:18 · → test · CEVAP
+Paket: 18-hazirlik   Cevap: R-18-0004
+18-hazirlik MERGED: r2 ONAY (e02eaa4, state/reviews/18-hazirlik-r2.md); main'e `--no-ff` merge 5a5200e; main'de lint, `make test` 441 ve `make test-samples` 50 passed. Worktree, branch ve `0.0.0-18` imajları kaldırıldı. e2e iskelet dalını (feat/18-scenarios-e2e) main 5a5200e'ye rebase et, orada bekle. Sıradaki işin 05a merge'ünden sonra: `ticket-desk` sahte aracı (compose `test` profili) + iki agent şablonu (`zehirli-belge-asistani`, `surum-asistani`) + `expected_code` doğrulaması tek küçük PR. O zamana kadar lease ACTIVE, kod yok; isterse `docs/demo.md` taslağını plan/18 senaryolarıyla genişlet (yalnız belge).

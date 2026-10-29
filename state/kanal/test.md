@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-test-18-hazirlik
 - Aktif paket: 18-hazirlik
 - Durum: ACTIVE
-- Son okunan: koordinator K-SEN-0002 (2026-10-29 18:37)
+- Son okunan: koordinator K-SEN-0009 (2026-10-29 19:55)
 
 ## Mesajlar
 
@@ -351,3 +351,49 @@ Kodlama PLANNED onayıyla başlar (önce kırmızı testler).
 ### T-18-0004 · 2026-10-29 18:36 · → koordinator · ACK
 Paket: 18-hazirlik   Cevap: K-SEN-0002
 Onay ve üç koşul alındı: Makefile'a additive `test-samples` (13a + 18 unittest) ve docs/gelistirme-ortami.md satırı; expected_code doğrulaması 05a merge'üne kadar NOT_RUN; saat damgaları artık `date` çıktısından (T-18-0002/0003'teki 18:40 ve 19:05 hatalıydı, gerçek ~18:3x). Kodlamaya geçiyorum, önce kırmızı testler.
+
+### T-18-0005 · 2026-10-29 18:57 · → koordinator · ACK
+Paket: 18-hazirlik   Cevap: K-SEN-0003
+GOREV-EK alındı; üç dilim plana ek bölüm olarak yazılıyor (state/pr/18-hazirlik.md "Ek: F10, F11, F13"). Touch-zone varsayımı: yeni dizinler `data/samples/{poison,projects,versions}/**` (v2 dosyaları 13a'nın `contracts/` dizinine değil `versions/`'a; 13a manifest ve sınavı değişmez). İlk dilim commit'li: 4dedf63 (F2/F3 veri + testler), 758bfe6 (make test-samples + belge satırı).
+
+### T-18-0006 · 2026-10-29 19:13 · → koordinator · DURUM
+Paket: 18-hazirlik   Cevap: K-SEN-0002 / K-SEN-0003
+DURUM: VERIFIED. HEAD df1e09f8fa617c60942537b322bbb59ad1b3bacf (main 881fe3c üstüne rebase; 3 commit: 070951d F2/F3, 943798e make test-samples, df1e09f F10/F11/F13), 31 dosya, yeni bağımlılık yok.
+Kapılar (aynı SHA): tools `make lint` 0; `make test-samples` 0 (49 test, 5 Postgres atlandı); `make test` llmaas 0 ve airgap 0 (441/441); host `RUN_PG_TESTS=1` 13a+18 5/5 (118 s, kalan konteyner 0); tam yeniden üretim git'te veri farkı 0.
+Kanıt notları: sql-20 beklenenleri seed'den, gerçek Postgres'te agent_readonly ile eşit; 10 yazma denemesi DB'de reddedildi, satır sayısı ve tablo listesi aynı; bilet PII'si 08-lite'ın kendi tanıyıcısıyla birebir, diğer biletlerde bulgu 0; v2 sözleşmeler 13a akışı yeniden oynatılarak (v1 bayt aynı), tek madde farkı.
+NOT_RUN: expected_code'ların 05a doğrulayıcısına karşı kontrolü (05a merge sonrası, koşul 2); make test-int/smoke (backend kodu değişmedi); e2e senaryo koşuları. ticket-desk kodu bu PR'da yok, 05a merge sonrası ayrı küçük PR (S2 A compose eki orada).
+Planla farklar state/pr/18-hazirlik.md "Varsayımlar" 3-11 (ör. sql-07 0 sonuçlu soru değiştirildi; contracts.render_all ayrıldı, çıktı bayt aynı; test_13a_8 tüm modülleri karşılaştırıyor).
+
+### T-18-0007 · 2026-10-29 19:13 · → koordinator · PR-HAZIR
+Paket: 18-hazirlik   Cevap: -
+PR: state/pr/18-hazirlik.md · Branch: feat/18-scenario-data · SHA: df1e09f8fa617c60942537b322bbb59ad1b3bacf · Sınıf: [A] · push yok.
+
+### T-18-0008 · 2026-10-29 19:15 · → koordinator · ACK
+Paket: 18-hazirlik (e2e iskeleti)   Cevap: K-SEN-0005
+Alındı. feat/18-scenario-data'ya commit yok. Ayrı branch feat/18-scenarios-e2e (main'den) ve worktree .worktrees/feat/18-scenarios-e2e açtım; touch-zone yalnız tests/e2e/scenarios/**. İçerik: koşmayan iskelet (RUN_E2E_SCENARIOS=1 olmadan atlanır), 06a OpenAPI'si salt okunur referans; WORK_QUEUE'ya bu alt claim'i sen işle.
+
+### T-18-0009 · 2026-10-29 19:20 · → koordinator · DURUM
+Paket: 18-hazirlik (e2e iskeleti)   Cevap: K-SEN-0005
+İskelet hazır, review istemiyor (koşmuyor): feat/18-scenarios-e2e @ 314d8abf5a3cfac0aed38eb3983c03c2f0b8376c, **feat/18-scenario-data df1e09f üstünde** (testler poison/ ve versions/ verisini okur; data PR review'da değişirse rebase ederim). Yalnız tests/e2e/scenarios/** (7 dosya). Bayrak yoksa 42 test NOT_RUN olarak atlanır; RUN_E2E_SCENARIOS=1 ile eksik yığın/seed açık hatadır (denendi). ruff check/format temiz (tools).
+Kapsam: F1 kaynak + declined, F4 sağlayıcıya ham PII 0 (fake-llm /_requests) + iz, F9 oy/bekleyenler/read 403, F10 doğrudan id 404 + listede sızıntı yok, F11 belge enjeksiyonu (expected.json), F13 v2 + tarih; F2, F3 yazma denemeleri, F12, kota, 09 açık NOT_RUN gerekçeli.
+13b seed'inden beklenenler (isci-a'ya iletilmeli): projects.json'daki 6 kullanıcı (şifre E2E_PASSWORD, .env.test düzeni; full_name kişi adı değil, ör. "hastane-a admin edit"), agent anahtarları sozlesme-asistani + iki yeni: `zehirli-belge-asistani` (KB `zehirli` ← poison/docs) ve `surum-asistani` (KB `surumler` ← versions/), modelleri fake-llm/test profilinde.
+KAYIT-TALEBI (FOLLOWUP önerisi, 06a): plan/18 F4/F10 "koşu → LiteLLM call id → Langfuse izi tek sorguyla" der; 06a graph.py `llm_call` olay payload'ında LiteLLM call id yok (model, usage, ms, request_messages var). Bağ yalnız run.langfuse_trace_id üzerinden kuruluyor. Öneri: 06a'ya additive `litellm_call_id` alanı (LiteLLM cevap başlığı/id'si), yoksa plan/18 ölçütü "trace id üzerinden" diye daraltılır. Testte `test_18_f4_2b` NOT_RUN bu kayda bağlı.
+
+### T-18-0010 · 2026-10-29 19:22 · → koordinator · ACK
+Paket: 18-hazirlik   Cevap: K-SEN-0006
+Alındı. `test_18_f4_2b` artık K-06a-0007 alanını bekliyor (her `llm_call` olayında `litellm_call_id` anahtarı; fake-llm'e karşı null olup olmadığı 06a merge sonrası netleşir): feat/18-scenarios-e2e @ 12d0571, 42 test hâlâ NOT_RUN, ruff temiz. İki yeni agent şablonu ticket-desk PR'ına (05a merge sonrası, 06 şeması + 06a OpenAPI ile doğrulanır). Sıradaki iş: data PR review sonucu ve 05a merge'ü; o zamana kadar bekliyorum.
+
+### T-18-0011 · 2026-10-29 19:40 · → koordinator · ACK
+Paket: 18-hazirlik   Cevap: K-SEN-0007
+DUZELT r1 alındı, MAJOR-1 doğru (UNION kaydı yazma değil katalog okuması; test UNION'ı zorunlu tutmuyordu). Uygulanıyor: hidden_write'a yazma etkili UNION/CTE ve fonksiyon negatifleri; kalıp kapsam testi (union/cte/comment/function her biri ≥1, önce kırmızı); Postgres testi tüm hidden_write kayıtlarını dener, satır sayısı + sekans durumu aynı. Yeni SHA ile PR-HAZIR.
+
+### T-18-0012 · 2026-10-29 19:54 · → koordinator · DURUM
+Paket: 18-hazirlik   Cevap: K-SEN-0007
+DURUM: VERIFIED (r1 düzeltmesi). Commit e02eaa4 (df1e09f üstüne 1 commit, 4 dosya: gen/scenarios_sql.py, eval/sql-write-attempts.json, tests/test_18.py, tests/test_18_pg.py + scripts/README.md).
+MAJOR-1: hidden_write 4 → 7 kayıt, hepsi gerçekten yazmayı dener; yeni: UPDATE CTE'si üstünde UNION, `UNION ALL SELECT lo_create(0)` (şemada sekans yok, fonksiyonla yazma büyük nesne), yorumla gizlenmiş ikinci INSERT. Katalog UNION `catalog` sınıfında kaldı, kapıya sayılmıyor. Yeni `test_18_f3_6b` (union/cte/comment/function/second_statement/select_into her biri ≥ 1) ve sıkılaşan `test_18_f3_6` önce kırmızıydı. Postgres testi oturumu mcp-sql gibi kurar (agent_readonly + default_transaction_read_only on), 13 yazma kaydı yetki/salt-okunur hatasıyla düştü (sözdizimi hatası kabul edilmez); satır sayıları, tablolar, pg_sequences, büyük nesne sayısı aynı.
+Kapılar e02eaa4: lint 0; test-samples 50 (5 Postgres atlandı); make test llmaas 441, airgap 441; host RUN_PG_TESTS 5/5 (141 s, konteyner 0). NOT_RUN: expected_code ↔ 05a doğrulayıcısı (koşul 2).
+e2e dalı yeni SHA'ya rebase edildi: feat/18-scenarios-e2e @ 5244b53.
+
+### T-18-0013 · 2026-10-29 19:54 · → koordinator · PR-HAZIR
+Paket: 18-hazirlik   Cevap: K-SEN-0007
+PR: state/pr/18-hazirlik.md ("Review r1 bulgu → düzeltme → kanıt") · Branch: feat/18-scenario-data · SHA: e02eaa40191a282a35f8f402f752bb5ddbc5639b · Sınıf: [A] · push yok · r2 delta.

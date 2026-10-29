@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-a-06a
 - Aktif paket: 06a (K-06a-0001)
 - Durum: ACTIVE
-- Son okunan: K-06a-0005 (2026-10-29 17:17)
+- Son okunan: K-06a-0011 (2026-10-29 17:17)
 
 ## Mesajlar
 
@@ -674,3 +674,27 @@ Uygulamada bulunan iki gerçek hata (adapter entegrasyon testleriyle): iz metada
 Yeni varsayım (V10, itiraz yoksa böyle): LangGraph için Langfuse `CallbackHandler` tam `langchain` paketini istiyor (ölçüldü: ModuleNotFoundError). Yeni ağır bağımlılık yerine 02'nin `span()`'i: run başına bir iz (`runs.langfuse_trace_id`), her düğüm bir span, LiteLLM üretimi `trace_context` ile düğümün altında. ARCH-09 korunur (iz yine Langfuse'ta).
 KAYIT-TALEBI (FOLLOWUP): `definition.knowledge[].filter.scope` (PayCore profilleri = filtreli agent, karar 6) 04a aramasında karşılıksız (yalnız metadata eşitliği); 06a kayıtta 422 `knowledge_filter_not_supported` ile reddediyor, sessiz yok sayma yok. 04a/04b'ye "metadata IN/scope filtresi" eki gerekir; PoC şablonları filtre kullanmıyor.
 Sıradaki: canlı yığın kanıtı (backend + agent-worker + ingest worker FAKE_EMBED + LiteLLM/fake-llm + Langfuse: kabul 1 gerçek arama, 4 worker konteyneri yeniden başlatma, 5b iz), readiness eki (LLM_SLOTS), docs/agentlar.md, PR açıklaması; dilim 6 (MCP) 05a merge'ünden sonra.
+
+### A-06a-0010 · 2026-10-29 19:51 · → koordinator · DURUM
+Paket: 06a   Cevap: K-06a-0006 / K-06a-0007
+K-06a-0006 (V10 kabul, FOLLOWUP-89, F12 hata kodları) ve K-06a-0007 (`litellm_call_id`) alındı ve uygulandı (cf27d5f: 01'e additive `call_id` dönüş alanı, gerekçe: başlık zaten doğrulanıyordu, dışarı verilmiyordu; yoksa olayda `null`).
+DURUM: dilim 6 hariç IMPLEMENTED. HEAD c54a922 (13 commit). Kapılar: `make lint` 0; `make test` 481 geçti; belgelenen `make test-int` 280 geçti / 3 atlandı (önceki paketlerin bayraklı testleri) / çıkış 0.
+Canlı yığın kanıtı (state/pr/06a.md "Canlı yığın kanıtı"): kabul 1 gerçek 04a aramasıyla; 5b Langfuse iz ağacı `agent-run` → 7 adım span'i → `GENERATION litellm` `agent.model` altında; kabul 4 `agent-worker` akış ortasında yeniden başlatıldı → arq `try=2` → checkpoint'ten `model` adımında devam, arama tekrarlanmadı, `completed`.
+Canlıda bulunan ve kapatılan 4 hata (6b62729, 98b7b31): worker durunca run `run_error` (akış kimliği çakışması) → yazıcı akışın tepesinden sürer + `progress resumed_after_worker_stop` + altyapı hatası denemeyi iptal eder, run'ı değil (3 denemeden sonra `worker_retries_exhausted`); OBO imza çağrısı; üyeliksiz süper yönetici run başlatamaz (403 `run_needs_membership`, OBO'da yalnız üyelik sayılır); kurulum hatası (`prompt_unavailable` vb.) kodlu son.
+Hata kodu listesi (F12) PR'da ve docs/agentlar.md'de.
+Kalan: dilim 6 (MCP araç bağlama, `needs_approval` aksiyondan, araç adları `<tool_key>__<action>`) 05a merge'ünden sonra rebase; ardından VERIFIED + PR-HAZIR. 05a merge'ünü bekliyorum; o zamana kadar commit yok.
+
+### A-06a-0011 · 2026-10-29 19:53 · → koordinator · ACK
+Paket: 06a   Cevap: K-06a-0009
+Alındı: c54a922 r1 erken güvenlik turunda; branch'e commit yok. 05a merge'ünü ve r1 bulgularını bekliyorum; ikisi gelince dilim 6 + r1 düzeltmeleri + rebase, r2 delta.
+Bilgi: benim 06a yığınım (`-p 06a`, `FFCORE_VERSION=0.0.0-06a`, test e2e verisiyle) ayakta; inceleyicinin `0.0.0-review-06a` yığınıyla çakışmaz (ayrı proje, ayrı imaj etiketi, portlar yayınlanıyor: backend 8000, frontend 3000). İnceleyici aynı host portlarını isterse benim yığını `down` ederim (volume'lar kalır); haber ver.
+Ek: port çakışması olmasın diye 06a yığınını  ettim (volume'lar duruyor,  yok); dilim 6'da yeniden açarım.
+
+### A-06a-0012 · 2026-10-29 19:54 · → koordinator · ACK
+Paket: 06a   Cevap: K-06a-0010
+Yapıldı: `docker compose -p 06a ... --profile test --profile qdrant down` (`-v` yok); 06a konteyneri 0, ağ kaldırıldı, volume'lar duruyor. 8000/3000 serbest. Dilim 6'da yeniden açarım.
+
+### A-06a-0013 · 2026-10-29 20:14 · → koordinator · ACK
+Paket: 06a   Cevap: K-06a-0011
+DUZELT alındı, r1 okundu; MAJOR-1 doğru. Plan (rol/erişim matrisi PR'a tablo olarak): run başlatma `user`+ (sohbet, salt-okunur istisnası; `channel=test` yalnız analyst+), `resume` cevabı yalnız run'ın kendi kullanıcısı, onay kararı `assign_to` rolü + edit (`user` asla), `cancel` kendi run'ı ya da proje admin'i (edit), `feedback` edit gerekir, `user` yalnız kendi run'ı; dört uçta own-user pozitif + cross-user 403, önce kırmızı. MINOR-1: ağsız/DNS tuzağı testi (soket çözümleme/bağlantı girişimi sayacı 0) + `LANGSMITH_TRACING=true` açılış reddi testi.
+Sıra notu: düzeltme yalnız `api/runs.py` ve testlere dokunuyor, 05a ile ortak dosya yok; bekleme süresini kullanmak için şimdi commit'liyorum, 05a merge'ünde rebase + dilim 6, tek r2. Sırayı korumamı istersen dur derim.

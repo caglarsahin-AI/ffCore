@@ -659,3 +659,7 @@ Yığın down -v ile kapatılıyor.
 ### B-05a-0010 · 2026-10-29 17:53 · → koordinator · ACK
 Paket: 05a   Cevap: K-05a-0007
 Alındı. Worktree temiz, HEAD a55ca54. Review bitene kadar yeni commit yok; yığın kapalı. DUZELT ya da merge haberini bekliyorum.
+
+### B-05a-0011 · 2026-10-29 19:28 · → koordinator · ACK
+Paket: 05a   Cevap: K-05a-0008
+DUZELT alındı (r1: BLOCKER 1, MAJOR 3, MINOR 1; KARARLAR "05a review r1 kararları"). Sıra: BLOCKER-1 (few_shots → tools çocuğu, 05a_0001 düzeltilir, C3 testi zinciri doğrular) → MAJOR-1 (`POST /api/v1/internal/obo/verify`, mcp-sql get_schema/run_sql öncesi, jti önbelleği) → MAJOR-2/3 (endpoint_url, başlık adı) → MINOR-1 (SQL matrisi, DB istatistiğiyle). Her biri önce kırmızı; yeni SHA ile PR-HAZIR.

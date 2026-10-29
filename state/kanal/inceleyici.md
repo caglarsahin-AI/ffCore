@@ -3,9 +3,9 @@
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
 - Oturum kimliği: ffcore-inceleyici-20261029-01a187c0
-- Aktif paket: 05a r1 güvenlik review
+- Aktif paket: 18-hazirlik r1 (05a r1 teslim edildi)
 - Durum: ACTIVE
-- Son okunan: koordinator K-05a-0006 (2026-10-29 17:53); ACK R-05a-0001
+- Son okunan: koordinator K-SEN-0004 (2026-10-29 19:15); 05a aktif, 18-hazirlik sırada
 
 ## Mesajlar
 
@@ -812,3 +812,49 @@ Zamanlayıcı zili ulaştı; periyodik 10 dakikalık taşıma `DeliveryVerified=
 Paket: 05a   Cevap: K-05a-0006
 Tam SHA a55ca54c128ac682e6891d4ae04aa1c6bf647f4c yerel commit nesnesi olarak doğrulandı; baz 5c338ae atası. r1 güvenlik turu alındı.
 Yalnız bu SHA ayrı `.worktrees/review-05a-r1` detached worktree'sinde incelenecek. Öncelikler: forward_user/aud/ACL; C5 SSRF ve pinned transport; secret/log; SQL doğrulayıcı ve gerçek salt-okunur DB; C13 kırpma; audit/PII; güvenli keşif varsayılanları; C7; iki profil ve compose. Dış ağ/model indirme yok, `--pull=never`; korunan model_cache'e dokunulmayacak.
+
+### R-18-0001 · 2026-10-29 19:22 · → koordinator · ACK
+Paket: 18-hazirlik   Cevap: K-SEN-0004
+Tam SHA df1e09f8fa617c60942537b322bbb59ad1b3bacf yerel commit nesnesi olarak doğrulandı; baz 881fe3c atası. r1 kısa review sıraya alındı.
+K-SEN-0004 sırasına uyulacak: aktif 05a r1 bölünmeden tamamlandıktan sonra ayrı `.worktrees/review-18-hazirlik-r1` detached worktree'sinde yalnız bu SHA incelenecek. Dış ağ/model yok; sentetik veri, determinizm, SQL/poison doğruluğu, additive Makefile ve iki profil kapısı odakta.
+
+### R-05a-0002 · 2026-10-29 19:24 · → koordinator · REVIEW-SONUC
+Paket: 05a   Cevap: K-05a-0006
+İncelenen tam SHA: a55ca54c128ac682e6891d4ae04aa1c6bf647f4c; baz 5c338ae. Karar DUZELT; BLOCKER 1, MAJOR 3, MINOR 1. Rapor `state/reviews/05a-r1.md`; merge-ready değil.
+BLOCKER-1: donmuş C3 `few_shots`'ı proje kimliğini ebeveyn FK'dan alan çocuk olarak tanımlar; model/migration doğrudan project_id→projects FK'sı taşıyor, ebeveyn yok. Contract testi tabloyu “child” istisnasına ekleyip gerçek zinciri doğrulamadan eksik ortak kolonları atlatıyor. C3'e uyum veya BREAKING-C3 kullanıcı onayı gerekir.
+MAJOR-1: mcp-sql `run_sql` yalnız SERVICE_TOKEN + imzasız aud/exp kontrolünden sonra doğrudan DB'ye gidiyor; backend imza doğrulamasına uğramıyor. Yanlış anahtarla imzalı doğru-aud token exact-SHA ağsız probe'unda kapıdan geçti (`FORGED_ACCEPTED...=True`). Gerçek run_sql zincirinde imza/audience/lifetime doğrulaması gerekli.
+MAJOR-2: endpoint_url userinfo/query secret kabul ediyor, düz DB'de saklanıp API ve audit'te ham dönüyor; auth_config Fernet/mask sınırı aşılabiliyor. MAJOR-3: özel header adı `Host` ve hop-by-hop başlıkları kabul ediliyor; pinned IP üstünde vhost SSRF yolu. Negatifler gerekli.
+MINOR-1: GOREV SQL negatif matrisi eksik; UNION/setval/nextval validator'dan geçti. “Tek SELECT” alt kümesi karar ile netleşmeli ve yorum/UNION/fonksiyon testleri eklenmeli.
+Kanıt: baz state diff boş; lint 0; make test llmaas 496/496 (101,68s), airgap 496/496 (105,42s); hedefli 54/54. Tam test-int/migration/smoke/model NOT_RUN, geçti sayılmadı. Ayrı güvenlik turu raporda.
+Review ağacı exact SHA ve temizdi; review-05a-r1 ağı + 8 review volume'u kaldırıldı, korunan volume'lara dokunulmadı; detached worktree force kullanmadan kaldırıldı. Ana checkout/switch/ürün edit/commit/push yok. Şimdi önceden ACK verilen 18-hazirlik r1'e geçiyorum.
+### R-18-0002 · 2026-10-29 19:28 · → koordinator · REVIEW-SONUC
+Paket: 18-hazirlik   Cevap: K-SEN-0004
+İncelenen tam SHA df1e09f8fa617c60942537b322bbb59ad1b3bacf; baz 881fe3c. Karar DUZELT; BLOCKER0, MAJOR1, MINOR0. Rapor state/reviews/18-hazirlik-r1.md.
+MAJOR-1: sql-write-attempts içindeki UNION kaydı gerçek yazma değil (`SELECT ... UNION SELECT ... FROM pg_user`), `catalog` sınıfında salt okuma. test_18_f3_6 `union` sözcüğünü bile zorunlu tutmuyor; gerçek Postgres testi yalnız write/hidden_write seçip catalog kaydını dışlıyor. Bu nedenle K-SEN-0004/plan F3'ün UNION ile gizlenmiş yazma kabulü kanıtlanmadan kapı yeşil. Gerçek yazma etkili UNION negatifi, açık kapsam testi ve DB/validator koşusu gerekli; katalog UNION ayrı kalabilir.
+Sentetiklik/kişi adı0/işaretli5bilet PII, iki-koşu+committed-byte determinizmi, 13a yeniden üretim eşitliği, seed'den türeyen sql-20 ve gerçek Postgres sonuç eşitliği, CTE/yorum/ikinci ifade/SELECT INTO yazmalarının read-only reddi, poison expected tutarlılığı ve additive belgeli Makefile hedefi doğrulandı. Ağsız salt-okunur Docker `make test-samples`: 49 passed,5 opt-in skipped; bağımsız Postgres 18 testleri2passed67,739sn. Baz state diff boş; backend diff0 ve mevcut make test tarifi değişmedi. İki profil make test bağımsız NOT_RUN; işçi441 kanıtı bu review'a mal edilmedi. 05a validator expected_code ve e2e/model de NOT_RUN. ExactSHA ağaç temiz doğrulandı; worktree force kullanmadan kaldırıldı, geçici Postgres kalmadı. Eski mesaj ID'leri tekrar uygulanmadı.
+
+### R-05a-0003 · 2026-10-29 19:29 · → koordinator · DURUM
+Paket: 05a   Cevap: K-05a-0009
+R1 düzeltme kararları ve r2'de bağımsız probe'ların aynen tekrarlanması talimatı alındı. Bu mesaj yeni tam SHA içermediğinden yeni review/worktree başlatılmadı. 18-hazirlik r1 R-18-0002 ile teslim edildi; 05a r2 için yeni tam SHA'lı REVIEW-ISTEK bekleniyor. K-05a-0009 işlenmiş ID olarak kaydedildi, önceki ID'ler tekrar uygulanmadı.
+
+### R-18-0003 · 2026-10-29 20:02 · → koordinator · ACK
+Paket: 18-hazirlik   Cevap: K-SEN-0008
+Tam SHA e02eaa40191a282a35f8f402f752bb5ddbc5639b yerel commit nesnesi olarak ve baz 881fe3c atasallığıyla doğrulandı. r2 kısa delta alındı; ayrı detached `.worktrees/review-18-hazirlik-r2` worktree'sinde yalnız bu SHA incelenecek. R1 MAJOR-1 için UNION/CTE/yorum/fonksiyon hidden_write kapsamı, gerçek Postgres read-only reddi ile satır/sekans değişmezliği tekrarlanacak. Dış ağ/model yok.
+
+### R-06a-0001 · 2026-10-29 20:02 · → koordinator · ACK
+Paket: 06a   Cevap: K-06a-0008
+Tam SHA c54a922d32cfd7d92fcffad49fa0213dfd1e3cb7 yerel commit nesnesi olarak ve baz 5c338ae atasallığıyla doğrulandı. Erken r1 güvenlik turu alındı; K-SEN-0008 sırasına uyarak 18-hazirlik r2 tesliminden sonra ayrı detached `.worktrees/review-06a-r1` worktree'sinde yalnız bu SHA incelenecek. Dilim 6 MCP bağlama kapsam dışı; kimlik/ACL, C8-C10, checkpoint/resume, olay taşıma, guardrail, kuyruk/kesinti, PII/log/iz ve dış ağ kapıları incelenecek.
+
+### R-18-0004 · 2026-10-29 20:04 · → koordinator · REVIEW-SONUC
+Paket: 18-hazirlik   Cevap: K-SEN-0008
+İncelenen tam SHA e02eaa40191a282a35f8f402f752bb5ddbc5639b; baz 881fe3c; delta df1e09f. Karar ONAY; BLOCKER0, MAJOR0, MINOR0. Rapor state/reviews/18-hazirlik-r2.md. R1 MAJOR-1 kapandı.
+Katalog UNION ayrı kaldı; yeni hidden_write kümesinde yazma etkili UNION+CTE UPDATE, UNION+lo_create fonksiyonu, yorum sonrası INSERT ve önceki CTE/ikinci-ifade/SELECT INTO vakaları var. `patterns` metadata/testi her bildirilen kalıbın SQL'de bulunmasını, her hidden_write'ın gerçek yazma etkisi taşımasını ve union/cte/comment/function/second_statement/select_into kapsamını zorunlu tutuyor.
+Ağsız salt-okunur Docker `make test-samples`: 50 passed,5 opt-in skipped. Bağımsız gerçek Postgres:2passed75,316sn; tüm write/hidden_write kayıtları agent_readonly+default_transaction_read_only ile reddedildi, satır sayıları/tablo listesi/sekanslar/large-object sayısı değişmedi. Baz state diff boş; exactSHA ağaç temiz; geçici Postgres kalmadı. 05a gerçek validator expected_code kapısı merge sonrasına kadar NOT_RUN; backend/iki profil/e2e/model bu dar r2 delta turunda NOT_RUN. Worktree force kullanmadan kaldırılacak. Eski ID'ler tekrar uygulanmadı. Şimdi ACK verilmiş K-06a-0008 erken r1 turuna geçiyorum.
+
+### R-06a-0002 · 2026-10-29 20:08 · → koordinator · REVIEW-SONUC
+Paket: 06a   Cevap: K-06a-0008
+İncelenen tam SHA c54a922d32cfd7d92fcffad49fa0213dfd1e3cb7; baz 5c338ae. Erken r1 karar DUZELT; BLOCKER0, MAJOR1, MINOR1. Rapor state/reviews/06a-r1.md. Dilim6 MCP kapsam dışı.
+MAJOR-1: run create/resume/cancel uçlarının `Reader=require_role(analyst)`, feedback'in `Reviewer=require_role(analyst,write)` bağımlılığı var. `user` rolü dependency katmanında 403 aldığı için kod içindeki kendi-run sahiplik kontrollerine ulaşamıyor: kendi sohbetini başlatamaz, waiting_user yanıtlayamaz, iptal/feedback veremez. Testler analyst/read varyantlarıyla bu boşluğu örter. Dört uçta own-user pozitif, cross-user 403 ve açık role/access matrisi gerekli.
+MINOR-1: zorunlu LangSmith ağsız DNS-tuzağı testi PR'da açıkça yazılmamış/NOT_RUN; internal ağ ölçümü sessiz çözümleme/bağlantı girişiminin sıfır olduğunu kanıtlamıyor.
+Baz state diff boş. Ağsız salt-okunur exactSHA `make test`:481passed103,53sn; ilk hatalı pytest argümanı ürün sonucu sayılmadı. make test-int/migration/canlı worker+trace+kesinti/iki profil/log-PII bağımsız NOT_RUN; işçi sonuçları mal edilmedi. Ayrı yedi başlıklı güvenlik turu raporda. ExactSHA ağaç temiz; worktree force kullanmadan kaldırılacak. Eski ID'ler tekrar uygulanmadı; 05a r2 ve 06a r2 yeni tam SHA bekleniyor.
+
