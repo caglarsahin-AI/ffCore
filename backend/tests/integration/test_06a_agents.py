@@ -180,3 +180,16 @@ def test_06a_15_unknown_definition_field_is_422(client_factory, make_user, proje
         json={"definition": {**TEMPLATE, "webhook_url": "http://example.test"}},
     )
     assert response.status_code == 422
+
+
+def test_06a_16_run_timeout_above_the_installation_limit_is_400(
+    client_factory, make_user, project, ollama_32k
+):
+    _, email = make_user(memberships={project: ("analyst", "edit")})
+    client = client_factory(email)
+    base = _base(project)
+    agent = client.post(base, json={"key": "t", "name": "T", "model": "chat-default"}).json()
+    slow = {**TEMPLATE, "limits": {"context_tokens": 16000, "run_timeout_s": 5000}}
+    response = client.put(f"{base}/{agent['id']}/versions/1", json={"definition": slow})
+    assert response.status_code == 400
+    assert response.json()["error"]["code"] == "run_timeout_too_long"

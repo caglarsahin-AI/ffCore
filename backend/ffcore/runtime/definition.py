@@ -152,6 +152,9 @@ def check_definition(d: AgentDefinition) -> None:
     kbs = [k.kb_key for k in d.knowledge]
     if len(kbs) != len(set(kbs)):
         _fail("knowledge_duplicate", "a knowledge base is listed once")
+    if any(k.filter and k.filter.scope for k in d.knowledge):
+        # 04a search filters by metadata equality only; a scope list would be ignored there.
+        _fail("knowledge_filter_not_supported", "knowledge[].filter.scope is not available yet")
     tools = [t.tool_key for t in d.tools]
     if len(tools) != len(set(tools)):
         _fail("tool_duplicate", "a tool is listed once")

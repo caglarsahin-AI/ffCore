@@ -74,6 +74,13 @@ async def prepare(state: RunState, runtime: Runtime[RunContext]) -> dict:
     ctx.budget = budget
     history = fit_history(budget, ctx.history, d.context_policy.history_turns)
     await ctx.events.record(RunEventType.budget, budget.event() | {"phase": "planned"})
+    if not ctx.stream_live:
+        # V8 (K-06a-0003): the client is told up front that the answer comes in one piece.
+        await ctx.events.record(
+            RunEventType.progress,
+            {"stage": "output_buffered", "reason": "guardrail_enforce"},
+            sse=SseEvent.progress,
+        )
     return {
         "messages": [{"role": "system", "content": system}, *history],
         "iteration": 0,

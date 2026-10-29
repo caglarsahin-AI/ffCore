@@ -46,6 +46,10 @@ def test_c8_removed_fields_stay_removed():
         ({"langfuse_prompt": {"name": "x"}}, "prompt_source"),
         ({"answer_rules": {"verify": True}}, "verify_not_supported"),
         (
+            {"knowledge": [{"kb_key": "k", "mode": "always", "filter": {"scope": ["jira:X"]}}]},
+            "knowledge_filter_not_supported",
+        ),
+        (
             {"answer_rules": {"confidence_formula": "sentence_max"}},
             "confidence_formula_not_supported",
         ),

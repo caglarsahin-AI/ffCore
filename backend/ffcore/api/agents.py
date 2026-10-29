@@ -136,6 +136,15 @@ async def check_context(
             f"No active chat model {definition.model} in this project.",
         )
     limits, driver = row
+    run_timeout = definition.limits.run_timeout_s
+    if run_timeout is not None and run_timeout > settings.run_timeout_s:
+        # The worker's job timeout follows RUN_TIMEOUT_S; a longer run would be cut by arq.
+        raise ApiError(
+            400,
+            "invalid_request_error",
+            "run_timeout_too_long",
+            f"limits.run_timeout_s {run_timeout} exceeds RUN_TIMEOUT_S={settings.run_timeout_s}.",
+        )
     tokens = definition.limits.context_tokens
     window = (limits or {}).get("context_window")
     if window is not None and tokens > window:

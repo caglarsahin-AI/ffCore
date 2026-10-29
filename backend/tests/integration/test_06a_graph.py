@@ -320,3 +320,18 @@ def test_06a_4_continues_from_checkpoint_after_worker_death(harness, pg, project
     assert harness.run(run_id, Ports(model, retriever)) == "completed"
     assert len(retriever.queries) == 1
     assert _types(pg, run_id).count("sources") == 1
+
+
+def test_06a_v8_buffered_answer_is_announced_and_shown_after_the_check(harness, pg, project):
+    run_id = seed_run(pg, project, definition())
+    ports = Ports(ScriptedModel(turn("Cevap burada [1].")), ScriptedRetriever([source()]))
+    ports.stream_live = False
+    assert harness.run(run_id, ports) == "completed"
+    live = stream(run_id)
+    assert (live[0][1], live[0][2]) == (
+        "progress",
+        {"stage": "output_buffered", "reason": "guardrail_enforce"},
+    )
+    tokens = [d["text"] for _, e, d in live if e == "token"]
+    assert tokens == ["Cevap burada [1]."]  # one piece, after output.pre
+    assert [e for _, e, _ in live].index("token") > [e for _, e, _ in live].index("sources")
