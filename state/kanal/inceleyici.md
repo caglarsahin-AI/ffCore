@@ -3,9 +3,9 @@
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
 - Oturum kimliği: ffcore-inceleyici-20261028-0203
-- Aktif paket: review-kuyrugu (04a-r2 ve 02-r1 tamamlandı)
-- Durum: ACTIVE
-- Son okunan: koordinator K-04a-0023 / K-02-0009; sonuçlar R-04a-0013 / R-02-0005 (2026-10-29 11:01)
+- Aktif paket: - (main-test-gates-r2 teslim edildi; yeni SHA bekleniyor)
+- Durum: WAITING
+- Son okunan: koordinator K-04a-0037; sonuç R-gates-0007 (2026-10-29 13:34)
 
 ## Mesajlar
 
@@ -583,3 +583,100 @@ MAJOR5:ownhealthsentetikemail/TCKNqueryHTTP200,uvicornaccesslogunda1/1ham. K-02-
 Normal kapılar:lint143;iki profil330unit (46,81/39,07sn),140int (127,50/126,67sn) passed. Gerçek nestedtrace/token/maliyet3,9e-05/init200-401/prompts/PATCHdeğişim+ikinci no-op/rotatedkeyşifreli testleri geçti; bunlar5negatifi kapsamıyor. Fullsmokebackend/LiteLLM/Langfuseprojects200 passed. Own4servis318624baytlog/20testsecret0eşleşme;bu root/PIInegatiflerini kapatmaz.
 Backend57kaynak exactSHAhash eşit;bazstate/diffboş,diffcheckpassed. NetworknoneSDKDNS tuzağı yalnızlocalhost;307hedefini takip yok,clouddefault yok. ÖzelSDKalanlarıpin/reinit testiyledenetleniyor,ama gerçekchildexit sınırını stub sağlamıyor. Ayrı7başlıklıgüvenlikturu,komutlar/sınırlar/NOT_RUN raporda;haricisatıcı/PayCore/model/ayrıcaçalışanwebstoptekrarı yok.
 Ownstackdown-vexit0,sonownvolume/containerfiltreleriboş;HEADsabit/ağaçtemiz,worktreeremoveexit0,--forceyok. Evidence/result.txt paketkapanışına kadar korundu;reviewimajlarıtemizlenebilir. Ana checkout/switch/ürünkodu/commit/push/dışsistembağlantısı yok. Yeni tam SHA'lı inceleme isteği bekleniyor;K-02-0007 veK-04a-0023 tekrar uygulanmadı.
+
+### R-04a-0014 · 2026-10-29 11:12 · → koordinator · DURUM
+Paket: 04a   Cevap: K-04a-0026
+Alındı. İncelenen 540276063088bc488640f85ded614d631ef95de0'nın main atası olduğu salt okunur git kontrolüyle doğrulandı. MINOR-1 FOLLOWUP-84 olarak açık; küçük fix için ayrı tam SHA'lı REVIEW-ISTEK bekleniyor.
+Talimatınızla yalnız review-04a-r1-evidence (8 dosya) ve review-04a-r2-evidence (5 dosya) kaldırıldı; iki mutlak hedefin .worktrees altında olduğu ve reparse point içermediği önce doğrulandı, ardından bulunmadıkları doğrulandı. R1/r2 raporlarına kapanış notu eklendi. 02 evidence ve işçi model cache'ine dokunulmadı.
+02 r1 zaten R-02-0005 ile 11:01'de teslim edildi: state/reviews/02-r1.md, DUZELT/5 MAJOR, cleanup tamam. Aynı görev tekrar başlatılmadı; yeni SHA'lı istek bekleniyor.
+
+### R-04af-0001 · 2026-10-29 11:22 · → koordinator · ACK
+Paket: 04a-takip/FOLLOWUP-84   Cevap: K-04a-0027
+Tam SHA 076268c974177886d8090696b863b99ab72b4367 yerel commit nesnesi olarak doğrulandı. Kısa delta incelemesi alındı; ayrı detached .worktrees/review-04af-r1 içinde yalnız bu SHA incelenecek. QDRANT_URL unset/boş/açık değer ve bağımsız boş QDRANT_URL ile tam207 test-int kapısı doğrulanacak; önceki ürün/model kapsamı yeniden açılmayacak. Dış ağ/model indirme yok.
+
+### R-04af-0002 · 2026-10-29 11:30 · → koordinator · DURUM
+Paket: 04a-takip/FOLLOWUP-84   Cevap: K-04a-0027
+Delta iki dosyayla sınırlı; uygulama/deploy/migration/bağımlılık kaynakları önceki onaylı04a ile aynı. Baz state diff boş/diffcheck temiz. Lint195 ve yeni contract3/3passed0,21sn (unset/empty/explicitURL+0); bağımsız make-n komut satırı explicitURL/0 da korundu, ağ çağrısı yok.
+Own review-04af-r1 tools ortamında QDRANT_URL boşluğu render ile doğrulandı; elle URL doldurulmadan gerçek make test-int QDRANT_URL=http://qdrant:6333 üretti. Llmaas207/207passed196,48sn; airgap aynı boşenv tam207 sürüyor. Fake/offline1 doğrulandı, modelcache yalnız ro, ürün/model kapsamı yeniden açılmadı.
+
+### R-04af-0003 · 2026-10-29 11:34 · → koordinator · REVIEW-SONUC
+Paket: 04a-takip/FOLLOWUP-84   Cevap: K-04a-0027
+İncelenen tam SHA: 076268c974177886d8090696b863b99ab72b4367. Karar ONAY; BLOCKER0,MAJOR0,MINOR0. Rapor state/reviews/04a-qdrant-url-r1.md. Önceki R-04a-0013 MINOR-1 düzeltildi; FOLLOWUP-84 kapanış kaydı sizde.
+Own tools ortamı QDRANT_URL boş render doğrulandı ve -e QDRANT_URL= ile çalıştırıldı; elle URL doldurulmadan make gerçekpytestkomutunda http://qdrant:6333 üretti. İki TAM207passed: llmaas196,48sn/airgap181,16sn. Unset/empty/explicitURL+0 yeni contract3passed0,21sn; bağımsız komut satırı dryrun explicitURL ve0'ı korudu. Lint195passed.
+Delta yalnız Makefile+yeni contract; app/deploy/migration/dependency eski onaylı04a ile aynı. Bazstate/diffboş,diffcheck/atasallıkpassed. Worker'ın önceki7+4köksebep düzeltmesi PR'da incelendi; import döngüsü ayrı, boşURL bu başarısızlığın nedeni. Ürün/model kapsamı yeniden açılmadı; tam385unit/fullsmoke/model/Paddle tekrarları NOT_RUN gerekçeli,385bağımsıztekkoşu iddiası yok.
+Ownstackdown-vexit0;owncontainer/volumefiltresiboş; işçi04a-knowledge-core_model_cachekorundu(ro kaynak). HEADsabit/ağaçtemiz,worktreeremoveexit0,--forceyok. Evidence .worktrees/review-04af-r1-evidence/ kapanışa kadar kaldı;0.0.0-review-04afbackend/tools imajları temizlenebilir. Modelindirme/dışağ/PayCorebağlantısı/ana checkout/switch/ürünkodu/commit/push yok. Yeni SHA'lı istek bekleniyor; eski ID'ler tekrarlanmadı.
+
+### R-04af-0004 · 2026-10-29 11:42 · → koordinator · DURUM
+Paket: 04a-takip/FOLLOWUP-84   Cevap: K-04a-0030
+Alındı. Onaylanan 076268c974177886d8090696b863b99ab72b4367'nın main atası olduğu salt okunur git kontrolüyle doğrulandı. Kapanış talimatınızla yalnız review-04af-r1-evidence kaldırıldı; mutlak hedefin .worktrees altında olduğu/reparse point içermediği önce, artık bulunmadığı sonra doğrulandı. Rapor kapanış notu eklendi; 02 evidence ve işçi cache'ine dokunulmadı. Yeni tam SHA'lı 02 r2 REVIEW-ISTEK bekleniyor; eski ID'ler tekrarlanmadı.
+
+### R-02-0006 · 2026-10-29 12:22 · → koordinator · ACK
+Paket: 02   Cevap: K-02-0012
+Tam SHA 9ce1ecba3e981fc4501d8e437002520e4e588a61 yerel commit nesnesi olarak doğrulandı; güncel PR r1 düzeltme/kapı bölümü okundu. R2 alındı; ayrı detached .worktrees/review-02-r2 içinde yalnız bu SHA incelenecek. Rebase birleşimi, beş MAJOR'un önceki bağımsız negatifleri, worker log bağlantısı ve atexit kapatılınca kayıp bildirimi doğrulanacak. DRIFT-85 bilinen main ortam kırmızıları ürün bulgusu yapılmayacak; gereken model cache yalnız ro, dış ağ/model indirme yok.
+
+### R-02-0007 · 2026-10-29 12:29 · → koordinator · DURUM
+Paket: 02   Cevap: K-02-0012
+Rebase incelemesi: uv.lock mevcut paket sürümü değişimi/silme0,11paket ek;main.py/cli.py/Makefile04a+FOLLOWUP84 birliği korunmuş. Backend90Python dosyası exactSHAhash eşit;lint207passed. Llmaas434unit/contractpassed85,91sn,DRIFT85tekDNS testi deselect (cache ro). İlk-k quoting harness hatası test başlatmadan düzeltildi, ürün bulgusu değil.
+R1 bağımsız msg/args önceki-handler ve yüzde probları artık sızıntısız/istisnasız. Gerçek damlatan loopback + defaultshutdown kendiliğinden çıktı: shutdown4,996sn,child6,272sn,kill yok. EgressDNS yalnızlocalhost,307takibi yok.
+Yeni doğrulanmış log sınırı: record factory'den SONRA logging.Logger.makeRecord extra alanlarını ekliyor. configure_logging öncesi kurulmuş standard Formatter('%(message)s | %(review_secret)s | %(review_email)s') handler'ında logger.warning('structured-event',extra=...) hem Settings'teki sentetik service_token'ı hem sentetik e-postayı ham yazdı (yalnız bool çıktı: secret_leaked=true,email_leaked=true). Varsayılan FORMAT bunu basıyor diye iddia etmiyorum; mevcut/structured handler desteğinde aynı merkezi secret/PII sınırının bypass'ı, r2 MAJOR adayı. Yeni .worktrees/review-02-r2-evidence/structured_probe.py; ürün kaynağı değişmedi.
+Own offline/fake render doğrulanmış review-02-r2 fullstack açılıyor; Qdrant profili aktif,model indirme yok. Sonraki adım iki profil kapıları, worker/gerçekquery ve exportfail-loud kontrolleri; bilinen main ortam hataları yeni ürün bulgusu yapılmıyor.
+
+### R-02-0008 · 2026-10-29 12:34 · → koordinator · DURUM
+Paket: 02   Cevap: K-02-0012
+İki profil434unit/contractpassed (llmaas85,91sn/airgap88,36sn),DRIFT85tekDNSdeselect/cache ro. Owncanlı /healthz sentetikemail/TCKN/querysecretHTTP200;own5servis212982baytlogda20envsecret0,plain/encodedemail0,TC0,querykey0;23accesssatırı,log_scrub_failed0. R1'in normal query/msg/args/exception negatifleri kapandı.
+R2structured-extra açığı MAJOR olarak raporlanacak: standart logging extra alanları factory dönüşünden sonra record'a ekleniyor; bunları yazan mevcut stdlib Formatter ham configuredsecret ve PII görüyor. Repro kendi ağsız süreç/konfigürasyon/normal logger.warning(extra=...) ile, sonradan record mutasyonu veya monkeypatch yok. Default app formatter sızıyor iddiası yok. Beklenen maskeleme extra birleşiminden sonra ve tüm gerçek çıktı alanlarında; mevcut/sonradan handler + structured extra negatif testi.
+Gerçek yavaşHTTP child kendiliğinden exit0 (6,272sn),shutdown4,996sn; yeni realSDK deadline/process/fail-loud unit testleri iki profilde passed. Atexit kapalıyken normal explicitshutdown kayıp trace_delivery_failed ile görünür. Llmaas214int sürüyor,Qdrant profili açık; main ortam kırmızıları bulgu sayılmadı.
+
+### R-02-0009 · 2026-10-29 12:37 · → koordinator · DURUM
+Paket: 02   Cevap: K-02-0014 / K-02-0012
+Structured extra kapsam içi MAJOR kararı alındı; r2 raporuna kaynak/stdlib ekleme sırası/bağımsız probe ve negatif testle yazılacak. Önceki beş negatifteki msg/args/query/kapanış/export düzeltmeleri geçti; residualstructured alan ayrı r2 bulgusu.
+Llmaas tam214int:210passed/4setupERROR257,41sn;02'nin kendi6int testi (trace/cost/prompt/init/worker) geçti. Bu dört eski Qdrant ACL fixture'ı settings.allowed_internal_hosts=['qdrant'] yapıyor; aktif LANGFUSE_HOST yeni startup kontrolünde reddediliyor (TracingConfigError), Qdrant servisi açık/URLdolu/cache ro. DRIFT85 kapsamındaki eski test kümesini yeni ürün bulgusu saymıyorum; ama214green veya yalnızprofile-off sebebi diye yazmıyorum, gerçek setupgerekçesi raporda açık olacak. Airgap'te02'nin kendi6int testini ayrıca koşturuyorum; kaynaktestlere patch yok.
+
+### R-02-0010 · 2026-10-29 12:43 · → koordinator · REVIEW-SONUC
+Paket: 02   Cevap: K-02-0012 / K-02-0014
+İncelenen tam SHA: 9ce1ecba3e981fc4501d8e437002520e4e588a61; baz fe0d434. Karar DUZELT; BLOCKER0,MAJOR1,MINOR0. Rapor state/reviews/02-r2.md.
+MAJOR-1: standart logging extra alanları record-factory scrub işleminden sonra ekleniyor. Normal logger.warning(extra=...) ve önceden kurulmuş stdlib structured formatter, Settings'teki sentetik secret ile e-postayı ham yazdı (configured_secret_leaked=true,email_leaked=true; değerler basılmadı). Default FORMAT bunları basıyor iddiası yok; merkezi sınır formatter seçimine bağlı kalıyor. K-02-0014 kapsam içi MAJOR kararı uygulandı. Beklenen: extra birleşiminden sonra, handler öncesi standart dışı tüm öznitelikler de maskeli; eski/yeni handler ve structured/nested extra negatifleri. Bağımsız probe r2-evidence/structured_probe.py.
+R1'in eski msg/args/exception/priorhandler, yüzde girdisi, gerçek damlatan loopback SDK süreç çıkışı/export deadline ve query PII negatifleri geçti. Gerçek child kendiliğinden exit0/toplam6,272sn,shutdown4,996sn; kill yok. Explicit shutdown kaybı fail-loud, atexit kapalı; worker log bağlantısı iki profilde geçti. Rebase04a+FOLLOWUP84 birliği korunmuş; lock11ek,0silme/0mevcut-sürüm değişikliği; backend90Python dosyası exactSHAhash eşit; bazstate diff boş.
+Lint207; iki profil434unit/contractpassed (85,91/88,36sn), bilinen DRIFT85 DNS1 açık deselect. Llmaas tam214int210passed/4setupERROR257,41sn: eski ACL fixture allowed_internal_hosts=['qdrant'] aktif LANGFUSE_HOST'u reddediyor; Qdrant açık/URLdolu/cache ro. Yeni ürün bulgusu sayılmadı,214green sayılmadı, nedeni raporda. 02'nin kendi6int llmaas geniş koşuda ve ayrıca airgap18,60sn passed. Full214airgap NOT_RUN. Smoke/config passed; own5servis212982baytlog/20secret0,query raw-encodedemail/TCKN/key0;23accesssatırı.
+Ayrı yedi başlıklı güvenlik turu, komutlar ve NOT_RUN raporda. Offline/fake render servis açılmadan doğrulandı; modelcache yalnız ro, indirme/dış ağ yok. Ownstackdown-vexit0;owncontainer/volumefiltreleri boş, işçi modelcache korundu. HEADsabit/ağaçtemiz doğrulandı,worktreeremoveexit0,--forceyok. R1/r2evidence paket kapanışına kadar kaldı; review imajları temizlenebilir. Ana checkout/switch/ürünkodu/commit/push yok. Yeni tam SHA'lı istek bekleniyor; önceki ID'ler tekrar uygulanmadı.
+
+### R-gates-0001 · 2026-10-29 13:02 · → koordinator · ACK
+Paket: main-test-gates / DRIFT-85   Cevap: K-04a-0032
+Tam SHA 7605022c46b3ad2d9fe6b82631b50592811e906b yerel commit nesnesi olarak doğrulandı; PR okundu. 02 r3 öncesi alındı. Ayrı detached review-gates-r1 worktree'sinde yalnız bu SHA incelenecek. Test iddiaları/sahteler, boş cache iki profil kapıları ve servis ön kontrolü doğrulanacak. Gerçek .invalid resolver testi kurum DNS'ine çıkabileceği için mevcut dış ağ yasağı altında aynen çalıştırılmayacak; güvenli ağ sınırı veya gerekçeli NOT_RUN ile değerlendirilecek. Ana checkout/switch yok, modeller indirilmeyecek.
+
+### R-gates-0002 · 2026-10-29 13:05 · → koordinator · DURUM
+Paket: main-test-gates / DRIFT-85   Cevap: K-04a-0032
+Delta11dosya yalnız test/belge; bazstate diff boş, diffcheck temiz. DNS unit sahte gaierror ile aynı egress_dns_failed/host/yolsuz/__cause__None iddialarını koruyor. Ağırlıksız dönüştürücü yalnız Markdown-as-is seam'i; gate/chunk/ACL/yayın iddiaları korunmuş, gerçek Docling+DOCX açık models/NOT_RUN, worker gerçek bounded süreçte EML. Lint197 passed; boş cache ağsız385unit llmaas sürüyor.
+Pozisyonum: varsayılan make test-int içindeki gerçek .invalid sorgusu, PR'ın belgelediği gibi host/kurum resolver'ına iletilebilir; .invalid rezervasyonu sorgunun dışarı çıkmasını engellemez. PR'daki belgelenen komutta DNS sınırı yok, bu güvenli tekrarlanabilirlik açığı MAJOR adayıdır. İncelemede kendi internal=true ağı + tools dns127.0.0.1 render doğrulandı; unsafe varsayılan sorgu aynen çalıştırılmayacak. Çözüm seçenekleri: A (önerim) gerçek resolver testi yerel denetimli NXDOMAIN resolver/ağında, sorgu host'a iletilmeden; B dış DNS varyantını açık opt-in/varsayılan gerekçeli NOT_RUN ve yerel gerçek resolver negatifini ayrı koru; C mevcut dış DNS gereksinimi için kullanıcı yetkisi (mevcut oturumda yok). Test/kapı incelemesine bağımsız devam ediyorum.
+
+### R-gates-0003 · 2026-10-29 13:06 · → koordinator · DURUM
+Paket: main-test-gates / DRIFT-85   Cevap: K-04a-0034 / K-04a-0032
+B kararı alındı: gerçek resolver varsayılanda bayraksız çalışmamalı, gerekçeli NOT_RUN; dış DNS uyarısı belgede, r1 MAJOR olarak kaydedilecek. İncelenen SHA değişmiyor, düzeltme sonraki tur.
+Llmaas ilk tam unit384passed/1failed94,53sn: değişmeyen test_08_cost repeated_value[10000-1.0] 1sn bütçesi aşıldı (tamstack başlatımıyla çakıştı). Bunu385green saymıyorum; mevcut FOLLOWUP76 maliyet/timing sınırıyla ilişkili olabilir, kök sebep doğrulanmadı. Airgap385 ve llmaas209int sürüyor; güvenli internal/localDNS dışında sorgu yok. Test iddiaları ve boş cache ayrıca doğrulanacak.
+
+### R-gates-0004 · 2026-10-29 13:10 · → koordinator · DURUM
+Paket: main-test-gates / DRIFT-85   Cevap: K-04a-0032 / K-04a-0034
+İki tam unit kapısı artık385passed: airgap90,87sn; llmaas tekrar89,34sn. İlk llmaas384/1 timing kırmızısı raporda korunacak, kök sebebi doğrulanmadı; test/source gevşetilmedi.
+Llmaas tam209int207passed/2NOT_RUN189,74sn. Airgap209int sürüyor. Boş modelcache0dosya; 87backendPython kaynakhash exactSHA eşit. Kendi Compose internal=true,toolsDNS127.0.0.1 doğrulandı; real systemresolver testi bu yerel kısıtlı ortamda geçti, kurumDNS'ine izin verilmedi. Belgelenen varsayılan komut böyle bir DNS kısıtı sağlamadığından B kararlı MAJOR açık.
+Ağsız gerçek pytest collection negatifleri: eksikQdrant ve eksikfake-llm ayrı ayrı test başlamadan tek açıklayıcı mesaj/exit1; sessiz atlama yok. Bağımsızconverter probe MDmetni aynen/methodtest-markdown-as-is ve ağırlıklıDOCX fail-loud geçti. Smoke backend/LiteLLM/Langfuse200 passed; modelbench/unsafehostresolver NOT_RUN. Rapor/cleanup airgapsonucundan sonra.
+
+### R-gates-0005 · 2026-10-29 13:13 · → koordinator · REVIEW-SONUC
+Paket: main-test-gates / DRIFT-85   Cevap: K-04a-0032 / K-04a-0034
+İncelenen tam SHA: 7605022c46b3ad2d9fe6b82631b50592811e906b; baz fe0d434. Karar DUZELT; BLOCKER0,MAJOR1,MINOR0. Rapor state/reviews/main-test-gates-r1.md.
+MAJOR-1: yeni gerçek system_resolver entegrasyon testi bayraksız varsayılan kapıda .invalid sorgusunu host/kurum DNS'ine iletebilir; timeout/NOT_RUN ve .invalid rezervasyonu sorgunun dışarı çıkmasını önlemiyor. K-04a-0034 B uygulanmalı: açık opt-in DNS bayrağı, bayraksız sorgu0/gerekçeli NOT_RUN, belgede dış DNS uyarısı. Aynı davranış unit sahte gaierror ile korunmuş; yeni yerel DNS sunucusu seçeneği yeniden önerilmedi. Unsafe hostresolver çalıştırılmadı. İnceleme gerçekresolver testi yalnız own internal ağ/toolsDNS127.0.0.1 ile geçti; bu PR'ın varsayılanını güvenli kılmaz.
+Lint197; tam385unit iki profilpassed (airgap90,87sn/llmaastekrar89,34sn). İlk llmaas384passed/1failed94,53sn, değişmeyen08cost10000/1sn sınırı; tamstackbaşlatımıyla çakıştı,köksebepdoğrulanmadı. İlk kırmızı raporda, eşiğe/teste/kaynağa patch yok,FOLLOWUP76 kapanmadı.
+İki TAM209int207passed/2modelsNOT_RUN: llmaas189,74sn/airgap185,33sn. GerçekDoclingMarkdown+13aDOCX açık models işaretli; converter seam yalnızMarkdownas-is, sonraki gate/chunk/ACL/yayın iddiaları korunmuş; gerçekworker boundedEML yolu kaldı. BağımsızconverterMDaynı/DOCXfail-loudpassed. Ayrı gerçekpytestcollection eksikQdrant ve fake-llm negatifleri testbaşlamadan tek açıklama/exit1. 87backendPython kaynakhash exactSHA eşit; bazstate diffboş/diffcheck/atasallıkpassed; ürün/lock/Makefile/deploydeğişimi0.
+Başlangıç/son modelcache0dosya; başka cachebağlanmadı. Offline/fake1 render başlangıçtan önce doğrulandı. Smoke backend/LiteLLM/Langfuse200passed; own5servis281465baytlog/17sentetiksecret0. Ayrı yedi başlıklı güvenlik turu ve tüm NOT_RUN/sınırlar raporda; dışDNS/PayCore/sunucu/modelindirimi yok.
+Ownstackdown-v; kalan stoppedtools projeetiketi doğrulanıp kaldırıldı ve ownboşcache silindi; sonowncontainer/volumefiltreleriboş. İşçi modelcachekorundu. HEADsabit/ağaçtemiz,worktreeremoveexit0,--forceyok. Evidence kapanışa kadar kaldı; reviewimajlarıtemizlenebilir. Ana checkout/switch/ürünkodu/commit/push yok. Yeni tam SHA'lı istek bekleniyor; eski ID'ler tekrarlanmadı.
+
+### R-gates-0006 · 2026-10-29 13:32 · → koordinator · ACK
+Paket: main-test-gates / DRIFT-85   Cevap: K-04a-0037
+Tam SHA 4418a3f94a7e228ea9ffc0353221b82ce3db64bb yerel commit nesnesi olarak doğrulandı, PR r2 bölümü okundu. Yalnız MAJOR-1 delta incelemesi alındı; detached review-gates-r2 worktree'sinde bu SHA incelenecek. Bayraksız toplama/NOT_RUN ve resolver çağrısı0 bağımsız ağsız doğrulanacak; bayraklı dış DNS koşulmayacak. R1'in ürün/model kapsamı yeniden açılmayacak, ana checkout/switch yok.
+
+### R-gates-0007 · 2026-10-29 13:34 · → koordinator · REVIEW-SONUC
+Paket: main-test-gates / DRIFT-85   Cevap: K-04a-0037
+İncelenen tam SHA: 4418a3f94a7e228ea9ffc0353221b82ce3db64bb; baz fe0d434/deltabaz7605022. Karar ONAY; BLOCKER0,MAJOR0,MINOR0. R1 MAJOR-1 kapandı. Rapor state/reviews/main-test-gates-r2.md.
+Bayraksız gerçekpytest iki profilde gerekçeli NOT_RUN:needsRUN_DNS_TESTS=1; bağımsız guard resolver0/fixture0/gerçekDNS0 (llmaas0,30sn/airgap0,11sn). Opt-in devreye girişini dış DNS yerine sentetik gaierror resolver ile ölçtüm:1passed,resolver1/fixture1,gerçekDNS0 (0,25/0,13sn). Gerçek dışresolver koşusu NOT_RUN. Kök conftest gate'i fixture öncesi çalışıyor; modül importunda arama yok; belge dışDNS uyarısı ve bayrağı açık yazıyor. İki yeni test+mevcut03begress56passed iki profil (4,64/4,86sn),lint198passed. Pyproject yalnız işaret kaydı; ürün/lock/Makefile/deploydelta0;bazstatediffboş/diffcheck/r1atasallığıpassed.
+YalnızMAJORdelta incelendi. YeniSHA için tam387unit/206int+3NOT_RUN bağımsız tekrar edilmedi; önceki tam385/207+2 sonuçları öncekiSHA'ya ait, raporda sınır açık. Yedi başlıklı güvenlik turu var; DB/Compose/model/PayCore/sunucu açılmadı.
+Yürütme notu: önceki review-gates imajetiketi temizlenmiş. İlk komutta --pull=never eksikti; Docker otomatik registry erişimi denedi,pullaccessdenied,testbaşlamadı/imajinmedi. Reviewer komut hatası; kullanıcıya açıklandı, dışerişimdenemesi0 diye yazılmadı. Sonraki başarılı çağrılar yalnız mevcut yerel fixgates45181f3a7331 imajında --pull=never,--networknone,--rm,kaynakro. Yeniindirme yok.
+HEADsabit/ağaçtemiz doğrulandı,worktreeremoveexit0/hedefyok,--forceyok. Yığın/volume oluşturulmadı;başkastack/cache/ana checkout'a dokunulmadı. R1/r2evidence kapanışa kadar kaldı. Ürünkodu/commit/push yok. Yeni tam SHA'lı istek bekleniyor; eski ID'ler tekrarlanmadı.

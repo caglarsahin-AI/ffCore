@@ -2,10 +2,10 @@
 
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
-- Oturum kimliği: ffcore-isci-c-10af
-- Aktif paket: - (10a-formlar MERGED 7457e82)
-- Durum: RETIRED
-- Son okunan: koordinator K-10af-0011 (2026-10-29 09:31); son yazılan C-10af-0008 (HANDOFF)
+- Oturum kimliği: ffcore-isci-c-10bp1
+- Aktif paket: 10b-poc-1 (GOREV K-10bp-0001)
+- Durum: ACTIVE
+- Son okunan: koordinator K-10bp-0003 (2026-10-29 12:56); bana adresli son mesaj K-10bp-0003; son yazılan C-10bp1-0006
 
 ## Mesajlar
 
@@ -315,3 +315,51 @@ Paket: 10a-formlar   Cevap: K-10af-0011
 - Commit edilmemiş durum: yok (worktree ve branch koordinatörce kaldırıldı).
 - Branch ve son commit: feat/10a-forms (silindi) @ 275d06d8224e40a02b0dfc1d2bfbcba0b014c98a → main 7457e82.
 - Ortam: `10af` stack'i `down -v` (konteyner/volume 0). Scratchpad'deki loglar oturuma özel, depoya girmedi.
+
+### C-10bp1-0001 · 2026-10-29 12:33 · → koordinator · DURUM
+Paket: 10b-poc-1   Cevap: K-10bp-0000
+DURUM: OKUMA-TAMAM. Kullanıcı talimatı: "yeni isci-c oturumu sensin, ROL=isci-c PAKET=10b-poc-1". Bu oturum, K-10af-0002'de sorduğun "C Main" oturumudur: dünkü turda rol almadı ve hiçbir dosyaya yazmadı. Kullanıcı bugün onu isci-c olarak atadı; önceki isci-c lease'i (ffcore-isci-c-10af) RETIRED olduğu için lease'i devraldım (ffcore-isci-c-10bp1).
+Okunan gruplar: 1 FELSEFE + FELSEFE_UYGULAMA; 2 CLAUDE; 3 PLAN v2.5; 4 KARARLAR (29 Ekim eklemeleri dahil: 10a-formlar, 10b sıralaması, merge kapısı, 04a merge, log, model ağırlıkları); 5 handbook tümü + PR_SABLONU; 6 WORK_QUEUE, BLOCKERS (12:33 öncesi sürüm), isci-c kanalının tamamı, koordinatör kanalının 10a/10af/10bp mesajları ve son mesajları, diğer kanallarda lease'ler ve son mesajlar (tamamen okunmadı); 7 brief 10'un tamamı, brief 04 Teslimatlar, `backend/openapi/04a.yaml` uç listesi, HANDOFF C-10ab-0019 ve C-10af-0008; 8 BASLATMA.
+Durum: koordinatör kanalında K-10bp-0001 GOREV yok. WORK_QUEUE'da 10b-poc-1 satırının branch ve worktree alanları boş. 04a main'de (ee30e03). Bu yüzden claim, branch, worktree ve kod yok. GOREV gelince ACK veririm, state/pr/10b-poc-1.md planını yazarım ve PLANNED bildiririm.
+
+### C-10bp1-0002 · 2026-10-29 12:37 · → koordinator · ACK
+Paket: 10b-poc-1   Cevap: K-10bp-0001
+GOREV alındı (bir kez uygulanır). Branch feat/10b-poc-1 @ fe0d434, worktree .worktrees/feat/10b-poc-1, sınıf [A], `FFCORE_VERSION=0.0.0-10bp1`. Touch-zone: frontend/app/(console)/{knowledge,status}/**, frontend/components (yeni paylaşılan parçalar), frontend/lib/api (üretilmiş tipler), frontend/messages/{en,tr}.json, frontend/tests/**, docs/onyuz.md. backend/** ve deploy/** dışarıda; gerekirse KARAR-GEREK yazarım.
+Bilinen main kırmızıları (DRIFT-85) benim bulgum sayılmaz. e2e fake yolla koşar (`FAKE_EMBED`, `HF_HUB_OFFLINE=1`); `model_missing` durumu sistem durumu ekranında gösterilip test edilecek.
+Not: zil "C Main isci-c değil" diyordu. Bu oturum o "C Main" oturumudur; kullanıcı onu isci-c olarak atadı ve GOREV de devri kabul ediyor. Tek isci-c oturumu bu (ffcore-isci-c-10bp1).
+Sıradaki adım: 04a OpenAPI ile mevcut ekran ve kalıplar okunacak, ardından state/pr/10b-poc-1.md planı yazılıp DURUM: PLANNED bildirilecek. Onaysız kod yok.
+
+### C-10bp1-0003 · 2026-10-29 12:41 · → koordinator · DURUM
+Paket: 10b-poc-1   Cevap: K-10bp-0001
+DURUM: PLANNED. Plan: state/pr/10b-poc-1.md (bulunan semboller, 18 kriter → test, kapsam dışı a-f, felsefe kontrolü).
+KARAR-GEREK (ayrıntı planda, öneri önce):
+- D1 `/readyz` kimliksiz ve `/api/v1` dışında; rewrite yok. A (öneri): `next.config.ts`'e `/readyz` rewrite (1 satır), ısınma canlı izlenir. B: sunucu bileşeni render anında çağırır, canlı yenileme yok. C: route handler (ikinci vekil kodu).
+- D2 `FAKE_EMBED` compose `&app-env`'de yok; ağırlıksız stack `model_missing` verir, indeksleme ve arama e2e'si koşamaz. A (öneri): compose'a `FAKE_EMBED: ${FAKE_EMBED:-0}` (paylaşılan satır). e2e iki aşama: önce varsayılan stack'te `model_missing` testi, sonra `FAKE_EMBED=1 up -d backend worker` ve geri kalan testler. B: önyüz testleri için ayrı compose override (ikinci yapılandırma kaynağı). C: arama e2e'siz kalır.
+- D3 Uçsuz brief maddeleri: belge ACL'ini sonradan düzenleme, Ingest Raporu, elenen parça listesi ve `rerank_truncated`, preset'li yeniden dönüştürme, sistem durumunda model/bellek/kuyruk alanları, `acl_users` seçimi. A (öneri): UI yazılmaz, koordinatör FOLLOWUP açar. B: Ingest Raporu belge listesinden istemcide türetilir (parça düzeyi eksik, ARCH-08).
+Varsayımlar: yollar nav href'leri (`/knowledge-bases`, `/system-status`). Touch-zone'a ek dosyalar: `next.config.ts` (D1), `package.json` scripts, `scripts/check-api.mjs`, `mocks/openapi-04a.yaml` (iki spec için tip üretimi, bağımlılık yok), `lib/navigation.ts`.
+Durma koşulu: ağırlıksız worker'da DOCX dönüşümünün çalıştığı doğrulanmadı. Çalışmazsa e2e fixture'ı için yeniden sorarım.
+Onaysız kod yok; yanıt bekliyorum.
+
+### C-10bp1-0004 · 2026-10-29 12:42 · → koordinator · ACK
+Paket: 10b-poc-1   Cevap: K-10bp-0002
+Kararlar alındı: D1 B (girişli sunucu bileşeni + warming'de `router.refresh()`, rewrite yok), D2 A (`FAKE_EMBED` `/readyz` ve ekranda görünür), D3 A (FOLLOWUP-86; yer tutucu ya da "yakında" yok), `mocks/openapi-04a.yaml` yok, tipler `backend/openapi/04a.yaml`'dan. Planı buna göre güncelliyorum. İlk iş ölçüm: ağırlıksız `FAKE_EMBED=1` yığında hangi biçimler indexed oluyor (md, txt, metin katmanlı PDF, DOCX). Sonuç DURUM ile gelecek.
+
+### C-10bp1-0005 · 2026-10-29 12:46 · → koordinator · DURUM
+Paket: 10b-poc-1   Cevap: K-10bp-0002
+Ölçüm tamam: ağırlıksız yığında hangi biçimler indexed oluyor. Yığın `-p 10bp1`, `FAKE_EMBED=1`, pgvector, compose satırı worktree'de; `/readyz` ready, models ayrıntısı "FAKE_EMBED=1: deterministic test models".
+- 13a `SZL-2024-011_cihaz-bakim.pdf` (metin katmanlı): **indexed**, `pymupdf4llm@1.28.2`, 3,4 s, 15 parça.
+- TXT kısa (≈90 sözcük): skipped (Kapı 2 `no_prose`). TXT uzun (1675 sözcük): **indexed**, `plaintext`, 6 parça, Kapı 2 flagged `no_prose`.
+- MD: **failed** `model_missing: docling-project/docling-models ... run make models`. Beklediğinden farklı: md de Docling'den geçiyor.
+- 13a DOCX: **failed**, aynı `model_missing`.
+- İkili dosya: Kapı 0 skipped `binary`. Aynı PDF'nin tekrar yüklenmesi: `unchanged`.
+- test-query: `rerank_floor`, 15 parça taban altında elendi, 3 sonuç, 31 ms.
+e2e fixture seçimi (PR'a yazılacak):
+- indexed, arama ve ACL testleri: 13a PDF'leri.
+- `failed` + hata mesajı satırı: 13a DOCX (ağırlıksız yığında model_missing; ekranda kodlu hata görünür).
+- Kapı 0 reddi: üretilen ikili dosya.
+DOCX ve MD dönüşümünün başarı yolu NOT_RUN (ağırlık gerekir). Sonuç planı değiştirmiyor; KARAR-GEREK yok, koda geçiyorum.
+Ek not, doğrulanmadı: Git Bash'ten curl ile Türkçe karakterli JSON gövdesi 400 `bad_request` aldı; büyük olasılıkla kabuk kodlaması, backend değil. e2e tarayıcıdan UTF-8 gönderir; Türkçe sorguyu orada test edeceğim.
+
+### C-10bp1-0006 · 2026-10-29 13:44 · → koordinator · ACK
+Paket: 10b-poc-1   Cevap: K-10bp-0003
+Alındı; FOLLOWUP-87 not edildi. Türkçe sorgu tarayıcı e2e'sinde (`test_10bp1_5`, "Cihaz bakım sözleşmesinin süresi nedir?") 200 ile sonuç döndü; 400 tarayıcıda yok, curl kabuk kodlamasıymış. Türkçe dosya adı `test_10bp1_2`'ye eklendi (`e2e-bakım-sözleşmesi-ÇĞİÖŞÜ-çğıöşü.pdf` → created, indexed; commit 0ba0ac2). Temiz yığında iki aşamalı kanıt koşusu son HEAD'de sürüyor; sonra PR-HAZIR.

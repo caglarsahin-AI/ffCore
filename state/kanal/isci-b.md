@@ -442,3 +442,46 @@ Kapılarda iki hata daha bulup düzelttim:
 ### B-02-0009 · 2026-10-29 10:08 · → koordinator · ACK
 Paket: 02   Cevap: K-02-0008
 Yığın 02-langfuse down -v ile kapatıldı (konteyner 0, volume 0). İmajlar 0.0.0-02 duruyor. Review bitene kadar yeni commit yok; 04a rebase'i ve DUZELT bekleniyor.
+
+### B-02-0010 · 2026-10-29 11:04 · → koordinator · ACK
+Paket: 02   Cevap: K-02-0010 / K-02-0009
+Alındı. Review'daki SHA'yı (1d2f31f) değiştirmemek için DUZELT gelene kadar rebase yapmıyorum. Ön kontrol (git merge-tree, dal değişmedi): main 132d383'e karşı beş dosyada çakışma var: Makefile, cli.py, main.py, pyproject.toml, uv.lock. uv.lock elle birleştirilmez; pyproject birleştirilip uv lock ile yeniden üretilir. DUZELT'te önce rebase, sonra:
+- merkezi log yapılandırması ffcore.knowledge.worker girişine bağlanacak;
+- K-02-0009 maddeleri yapılacak: erişim logunda query yok, ScrubFilter 08-lite tanıyıcıları + mask_value, tüm handler'lar filtreli, filtre istisna atmaz, süreç çıkışı sınırlı, export toplam bütçe.
+Her biri önce kırmızı testle.
+
+### B-02-0011 · 2026-10-29 12:08 · → koordinator · PR-HAZIR
+Paket: 02   Cevap: K-02-0011
+PR: state/pr/02.md ("Review r1 düzeltmeleri" bölümü) · Branch feat/02-langfuse-trace · Baz main fe0d434 · SHA 9ce1ecba3e981fc4501d8e437002520e4e588a61 · [C] · ağaç temiz.
+Rebase:
+- main fe0d434 üstüne alındı (132d383'ten sonra FOLLOWUP-84 de girdi).
+- uv.lock `uv lock` ile yeniden üretildi; yalnız ekleme var, mevcut sürümler değişmedi.
+- Çakışan dosyalarda iki tarafın değişikliği de korundu: main.py, cli.py, Makefile, pyproject.
+MAJOR 1-5 ve worker log bağlantısı tamam. Her biri için önce kırmızı test yazıldı; tablo PR dosyasında.
+- MAJOR-1/2: temizlik kayıt fabrikasında. Kurulum sırasından bağımsız; arq handler'ı da temiz kayıt görüyor. Hiçbir girdide istisna atmıyor; işlenemeyen kayıt log_scrub_failed sayacıyla geçiyor.
+- MAJOR-3: kök neden OTel TracerProvider'ın atexit kapanışıydı. shutdown_on_exit=False yapıldı. Çocuk süreç gerçek SDK ve damlatan loopback sunucuyla kendiliğinden 5,7 s'de çıkıyor (önce 15 s'de öldürülüyordu).
+- MAJOR-4: export daemon thread'de mutlak 5 s sınırla koşuyor (5,14 s'de FAILURE, reason=deadline). Takılı export varken yeni parti hemen düşüyor.
+- MAJOR-5: yeni AccessLogMiddleware yöntem + yol + durum + süre yazıyor, uvicorn erişim logu kapalı. scrub 08-lite recognize + mask_value kullanıyor. Canlı yığında ham e-posta, TCKN ve query secret'ı beş serviste 0.
+Kapılar (yeniden kurulmuş tools/backend/worker imajları):
+- smoke passed, lint temiz, 02 testlerinin hepsi iki profilde geçti, log kapısı 0.
+**Ortam bulgusu (main'de de var, 02 dışı):** make test 2 ve make test-int 21 başarısız + 4 hata. Aynı imaj ve komutla main fe0d434'te de birebir aynı küme (27 kimlik); 02 hiçbir kırmızı eklemiyor ya da gidermiyor.
+- Nedenler: 03b .invalid DNS'i 5 s'de zaman aşımı; 04a Qdrant egress_dns_failed (qdrant profili kapalı); model ağırlığı yok.
+- Main merge kapısında test-int yoktu. Sahibi 04a / 12; ayrı kayıt önerilir.
+Dürüst not: ilk kapı koşusunda tools imajı bayattı (build tools profilini kapsamıyordu). Yeniden kurup baştan koştum; raporlanan sonuçlar yenilerden.
+Yığın down -v ile kapatılıyor.
+
+### B-02-0012 · 2026-10-29 12:12 · → koordinator · ACK
+Paket: 02   Cevap: K-02-0013
+Alındı. r2 bitene kadar yeni commit yok; yığın kapalı, imajlar 0.0.0-02 duruyor. DUZELT ya da merge haberini bekliyorum.
+
+### B-02-0013 · 2026-10-29 13:00 · → koordinator · DURUM
+Paket: 02   Cevap: K-02-0015 / Not (fix/main-test-gates)
+r2 MAJOR-1 düzeltildi: commit 9cb9ddb, henüz PR-HAZIR değil.
+- Kök neden: Logger.makeRecord extra= alanlarını fabrikadan sonra ekliyor.
+- Düzeltme: makeRecord sarmalayıcısı, extra birleşiminden hemen sonra ve handler'dan önce standart dışı tüm öznitelikleri temizliyor: iç içe dict/list/tuple/set, anahtarlar dahil; 08-lite maskesi ve secret.
+- Hata yolunda tüm extra'lar log_scrub_failed olur ve sayaç artar; ham değer kalmaz.
+Testler (önce kırmızıydı; ham secret ve e-posta yazılıyordu):
+- test_02_r2_m1_extra_fields_scrubbed: inceleyicinin senaryosu; önceden kurulan root handler ve sonradan eklenen handler yapılandırılmış formatter'la; secret, e-posta ve TCKN iç içe extra'da 0; msg/args biçimi korunuyor.
+- test_02_r2_m1_extra_failure_leaves_no_raw_value.
+Kapılar: lint temiz; make test iki profilde 435 geçti, yalnız DRIFT-85'in bilinen 2 hatası.
+Fixture: notunuza göre bekliyorum. fix/main-test-gates main'e girince rebase edip Qdrant ACL fixture'ını uyumlu yapacağım (qdrant'ı ortamdaki listeye ekleme; ürün kontrolü aynı). Sonra Qdrant profili açık make test-int iki profil, sonra PR-HAZIR. Merge'ü bana haber verir misiniz?

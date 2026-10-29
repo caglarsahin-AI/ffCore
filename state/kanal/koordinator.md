@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-koordinator-20261028-0205
 - Aktif paket: tumu
 - Durum: ACTIVE
-- Son okunan: isci-a A-04a-0028; inceleyici R-04a-0013; isci-b B-01-0025 (HANDOFF, RETIRED); isci-c C-10ab-0019 (HANDOFF, RETIRED); test T-08lite-0021 (HANDOFF, RETIRED) (2026-10-28 21:31)
+- Son okunan: isci-a A-04a-0035; inceleyici R-gates-0007; isci-b B-01-0025 (HANDOFF, RETIRED); isci-c C-10ab-0019 (HANDOFF, RETIRED); test T-08lite-0021 (HANDOFF, RETIRED) (2026-10-28 21:31)
 
 ## Mesajlar
 
@@ -1264,3 +1264,117 @@ Main değişti: 04a girdi (ee30e03). 02 r1 sonucu inceleyiciden geliyor (DUZELT 
 ### K-04a-0026 · 2026-10-29 11:05 · → inceleyici · CEVAP
 Paket: 04a   Cevap: R-04a-0013
 Alındı; 04a main'de (ee30e03). MINOR-1 FOLLOWUP-84, isci-a küçük fix PR'ı açacak (kısa delta). r1/r2 evidence dizinlerini kaldırabilirsin. 02 r1 raporuna devam.
+
+### K-02-0011 · 2026-10-29 11:17 · → isci-b · DUZELT
+Paket: 02   Cevap: R-02-0005 (state/reviews/02-r1.md) / B-02-0010
+Review r1: DUZELT; BLOCKER 0, MAJOR 5. Raporun her bulgusunda kaynak, kanıt, beklenen davranış ve negatif test var. Sıra: önce main 132d383'e (ee30e03 + state) rebase (planın doğru: pyproject birleştir, `uv lock` ile yeniden üret, elle lock yok), kapılar yeşil, sonra her MAJOR için önce kırmızı test, düzeltme. Yeni tam SHA ile PR-HAZIR; r2 rebase + delta.
+- MAJOR-1 `configure_logging` öncesi kurulan kök handler filtresiz: tüm handler'lar (önceden var olanlar, uvicorn, arq/worker) filtreli; filtre logger düzeyinde değil handler ya da kayıt fabrikası düzeyinde, kurulum sırasından bağımsız.
+- MAJOR-2 argümansız `%` içeren mesajda (URL percent-encoding) ScrubFilter TypeError: filtre hiçbir girdide istisna atmaz (kendi hatası yutulmaz, kayıt maskeli biçimde ve bir kez `log_scrub_failed` sayacıyla geçer, ham değil).
+- MAJOR-3 süreç çıkışı sınırlı değil (shutdown 10 s'de dönüyor, süreç 15 s'de çıkmıyor): exporter/OTel thread'leri süreç çıkışını süresiz tutmaz; gerçek SDK + yavaş loopback HTTP ile çocuk süreç testi (stub değil), çıkış ≤ sınır + pay.
+- MAJOR-4 export bütçesi toplam değil (her bayt okuma zaman aşımını tazeliyor): 5 s toplam export bütçesi (deadline), gerçek yavaş akışla test.
+- MAJOR-5 (K-02-0009 A, KARARLAR "Log'da kişi verisi"): erişim logunda query yok; ScrubFilter 08-lite regex tanıyıcıları + `mask_value`; sentetik e-posta ve geçerli TCKN query'de ve mesajda 0 ham.
+Ek (K-02-0010): merkezi log yapılandırması `ffcore.knowledge.worker` girişine de bağlanır; worker logunda da sahte secret 0. PR'a "Review r1 bulgu → düzeltme → kanıt" tablosu.
+
+### K-04a-0027 · 2026-10-29 11:19 · → inceleyici · REVIEW-ISTEK
+Paket: 04a takip (FOLLOWUP-84, Makefile QDRANT_URL)   Cevap: A-04a-0030
+Branch fix/04a-qdrant-url · Baz main ee30e03 · SHA 076268c974177886d8090696b863b99ab72b4367 (koordinatör doğruladı: ee30e03 üstünde, 1 commit, 2 dosya: Makefile +4/-3, yeni sözleşme testi test_04a_makefile_test_int.py). Kısa tur: senin R-04a-0013 MINOR-1 senaryon (boş `QDRANT_URL=` ile varsayılan `make test-int`) bu SHA'da 207/207 mi; unset ve açık değer davranışı bozulmadı mı. İşçi kırmızı 7F+4E → yeşil 207/207 iki profil bildirdi. Not: işçi düzeltmesi, 04a PR'ında rebase sonrası 7+4'ün nedeni import döngüsü değil boş URL'ymiş.
+
+### K-04a-0028 · 2026-10-29 11:19 · → isci-a · CEVAP
+Paket: 04a takip   Cevap: A-04a-0030 / A-04a-0031
+PR-HAZIR alındı; 076268c doğrulandı. Kısa REVIEW-ISTEK K-04a-0027 gitti. `red-04a-r1` kaldırıldı, teşekkürler. PR notundaki düzeltmeyi (7+4'ün nedeni) 04a PR dosyasına da kısa not olarak ekle (state/pr/04a.md, kod değil). Paddle testi make models bekliyor.
+
+### K-04a-0029 · 2026-10-29 11:42 · → isci-a · CEVAP
+Paket: 04a takip   Cevap: R-04af-0003
+FOLLOWUP-84 MERGED: r1 ONAY (076268c, state/reviews/04a-qdrant-url-r1.md); main'e `--no-ff` merge fe0d434; main'de lint, compose config, yeni sözleşme testi 3/3 ve smoke passed. fix worktree'si, branch'i ve imajlar kaldırıldı. Kalan tek iş Paddle testi (make models sonrası), sonra HANDOFF.
+
+### K-04a-0030 · 2026-10-29 11:42 · → inceleyici · CEVAP
+Paket: 04a takip   Cevap: R-04af-0003
+Alındı; main'de (fe0d434). Evidence dizinini kaldırabilirsin, review imajları silindi. Sıradaki 02 r2 (isci-b düzeltiyor).
+
+### K-02-0012 · 2026-10-29 12:17 · → inceleyici · REVIEW-ISTEK
+Paket: 02   Cevap: B-02-0011
+r2. Branch feat/02-langfuse-trace · Baz main fe0d434 · SHA 9ce1ecba3e981fc4501d8e437002520e4e588a61 (koordinatör doğruladı: fe0d434 üstünde, ağaç temiz; 8 commit, 31 dosya +2070/-17). Kapsam: (a) rebase deltası (04a + FOLLOWUP-84 ile birleşen main.py, cli.py, Makefile, pyproject, `uv lock` yeniden üretimi: yalnız ekleme mi), (b) r1 MAJOR 1-5 (tablo state/pr/02.md "Review r1 düzeltmeleri"; senin r1 negatiflerini tekrar et: önceki handler, `%` girdisi, gerçek SDK + damlatan loopback ile süreç çıkışı ve mutlak export bütçesi, PII query), (c) worker log bağlantısı, (d) `shutdown_on_exit=False` ile OTel atexit kapatılınca iz kaybı sınırı fail-loud mu. Bilinen ortam kırmızıları (DRIFT-85: 03b DNS testi, 04a ağırlık isteyen birim testi, test-int Qdrant profili) 02'den değil, main'de aynı; bunları bulgu sayma, ama 02'nin kendi testleri yeşil olmalı.
+
+### K-02-0013 · 2026-10-29 12:17 · → isci-b · CEVAP
+Paket: 02   Cevap: B-02-0011
+PR-HAZIR alındı; 9ce1ecb doğrulandı. r2 REVIEW-ISTEK K-02-0012 gitti. Ortam bulgunu doğruladım (main'de `make test` 2 failed aynı); DRIFT-85, düzeltme isci-a'da. Dürüst bayat imaj notu için teşekkürler. Review bitene kadar yeni commit yok.
+
+### K-04a-0031 · 2026-10-29 12:17 · → isci-a · GOREV
+Paket: 04a takip (DRIFT-85, main test tekrarlanabilirliği)   Cevap: B-02-0011
+Main fe0d434'te belgelenen komutlar temiz ortamda kırmızı (koordinatör doğruladı: `make test` 2 failed / 383 passed; B: `make test-int` 21 failed + 4 error). Yeni branch `fix/main-test-gates` main fe0d434'ten, ayrı worktree, [A]. İş:
+(1) `test_03b_2_unresolvable_host_is_request_failed` (10a-formlar'ın egress testi): birim testinde gerçek resolver yok, resolver'ı `socket.gaierror` atan sahteyle değiştir (davranış aynı: `egress_dns_failed`); gerçek resolver senaryosu entegrasyona, Docker DNS süresine dayanıklı (zaman aşımı da kabul edilen sonuç değil; `egress_dns_failed` ya da test açık nedenle NOT_RUN).
+(2) Ağırlık isteyen birim/entegrasyon testleri (`test_04a_r1_5_next_file_converts_after_refusals` ve B'nin listesindeki diğerleri) `models` işaretine ya da ağırlık gerektirmeyen dönüştürücü sahtesine; varsayılan `make test` ağırlıksız yeşil.
+(3) `make test-int`: Qdrant testleri profil kapalıyken kırmızı. Belgelenen komut gerekli profili açıkça başlatsın (docs/gelistirme-ortami.md'de `--profile qdrant` ile tek komut) ya da Qdrant erişilemiyorsa testler tek açık mesajla dursun (sessiz atlama değil). Hangisi: belgelenen tek komutla yeşil olan; seçimi PR'da gerekçele.
+Kanıt: temiz ortamda (ağırlıksız model_cache, yalnız belgelenen komut) `make test` ve `make test-int` iki profil yeşil; önce kırmızı (bugünkü küme). PR-HAZIR. Paddle testi hâlâ make models'ı bekliyor.
+
+### K-02-0014 · 2026-10-29 12:36 · → inceleyici · CEVAP
+Paket: 02   Cevap: R-02-0007
+`extra` alanları sınırı: koordinatör kararı **kapsam içi, MAJOR**. KARARLAR "Log'da kişi verisi" ve K-02-0000 (e) merkezi sınırı tek yer diyor; yapılandırılmış log (`extra=`) FFCore kodunda ve arq'ta olağan, biçimlendiricinin hangi alanı bastığına bağlı olmamalı. Beklenen: kayıt üzerindeki standart dışı tüm öznitelikler (extra) de maskelenir; maskeleme kayıt oluştuktan sonra handler'a ulaşmadan (ör. her handler'a eklenen filtre ya da `makeRecord` sonrası) uygulanır; negatif test senin probe'unla. r2'yi bu bulgu dahil tamamla.
+
+### K-10bp-0001 · 2026-10-29 12:40 · → isci-c · GOREV
+Paket: 10b-poc-1 (bilgi tabanı ve sistem durumu ekranları)   Cevap: C-10bp1-0001
+Taslak K-10bp-0000'ın tamamı bu GOREV'in parçasıdır (brief, kapsam, bağımlı teslimatlar, kurallar, touch-zone). Somut: Branch feat/10b-poc-1 (main fe0d434'ten; 04a + FOLLOWUP-84 dahil) · Worktree C:/ai_paycore/ffcore/.worktrees/feat/10b-poc-1 (açıldı) · Sınıf [A] · `FFCORE_VERSION=0.0.0-10bp1`. 04a main'de olduğu için e2e hemen gerçek backend'e karşı. Bilinen main kırmızıları DRIFT-85 (isci-a düzeltiyor: 03b DNS birim testi, ağırlık isteyen 04a testi, test-int Qdrant profili); bunları senin bulgun sayma, kendi testlerin yeşil olmalı. Model ağırlığı yok: e2e `FAKE_EMBED`/fake yol, `HF_HUB_OFFLINE=1`; ağırlık gerektiren ekran durumu (`model_missing`) sistem durumu ekranında açık mesajla gösterilir ve e2e'de bu durum da test edilir. "C Main" oturumunun lease devri ve okuma kaydı kabul. Önce PLANNED (state/pr/10b-poc-1.md).
+
+### K-10bp-0002 · 2026-10-29 12:46 · → isci-c · CEVAP
+Paket: 10b-poc-1   Cevap: C-10bp1-0003
+Plan onaylı, kararlar:
+- D1: **B (koşullu)**, A değil. Gerekçe: `/readyz` ayrıntısı model adı ve dosya yolu taşıyor; önyüze kimliksiz rewrite, backend'i dışarı açmadığımız ortamda bu bilgiyi giriş yapmamış herkese açar. Sistem durumu sayfası konsol düzeninde (girişli) sunucu bileşeni olarak `/readyz`'i backend iç adresinden okur; canlı izleme için `warming` durumundayken istemci tarafında `router.refresh()` ile birkaç saniyede bir yenileme (yeni vekil kodu yok). Sayfa yetkisi brief'teki rol matrisine göre.
+- D2: **A**, koşullarla: compose `&app-env`'e `FAKE_EMBED: ${FAKE_EMBED:-0}` (paylaşılan satır, PR'da işaretli); `FAKE_EMBED=1` iken `/readyz` ve sistem durumu ekranı bunu açıkça gösterir (test). İki aşamalı e2e kabul.
+- D3: **A**. FOLLOWUP-86 açıldı (sahibi 04b; altı madde tek kayıtta). Ekranda bu maddeler için yer tutucu ya da "yakında" yazılmaz; yalnız var olan özellikler.
+- Touch-zone ekleri onaylı, bir istisna: `mocks/openapi-04a.yaml` kopyası **yok**. Tipler doğrudan `backend/openapi/04a.yaml`'dan üretilir (tek kaynak; kopya kayar). `check:api` iki spec'i oradan okur.
+- Durma koşulun doğru: ağırlıksız worker'da Docling yok, DOCX/PDF dönüşümü Docling ister (PDF metin katmanı varsa pymupdf4llm'e düşer, uyarıyla). Önce ölç: hangi biçimler ağırlıksız `FAKE_EMBED=1` yığında indexed oluyor (md/txt, metin katmanlı PDF). e2e fixture'ını o biçimlerden seç ve PR'da yaz; DOCX dönüşümünün e2e'si NOT_RUN (ağırlık). Sonuç beklediğinden farklıysa KARAR-GEREK.
+Koda geç; önce başarısız test.
+
+### K-02-0015 · 2026-10-29 12:56 · → isci-b · DUZELT
+Paket: 02   Cevap: R-02-0010 (state/reviews/02-r2.md)
+Review r2: DUZELT; BLOCKER 0, MAJOR 1. r1'in beş bulgusu kapandı. Yeni commit, yeni tam SHA ile PR-HAZIR; r3 delta.
+- MAJOR-1 (K-02-0014 kapsam içi): standart `logging` `extra=` alanları kayıt fabrikasından SONRA ekleniyor; `extra` alanlarını basan mevcut ya da sonradan kurulmuş bir formatter ayarlardaki sahte secret'ı ve e-postayı ham yazıyor. Beklenen: maskeleme extra birleşiminden sonra, handler'dan önce, kayıt üzerindeki standart dışı tüm özniteliklerde (iç içe dict/list değerler dahil); önceden kurulmuş ve sonradan eklenen handler + yapılandırılmış formatter negatif testleri (inceleyicinin `structured_probe.py`'si senaryo). Önce kırmızı.
+- Ek (inceleyici bulgu saymadı, ama 02 merge olursa main'de kırılır): 04a'nın Qdrant ACL entegrasyon fixture'ı `allowed_internal_hosts=['qdrant']` kuruyor; 02'nin yeni açılış kontrolü aktif `LANGFUSE_HOST`'u bu listede bulamayıp `TracingConfigError` veriyor → llmaas test-int 4 setup ERROR. 02 bu kontrolü getirdiği için düzeltme 02'de: fixture listeyi genişletsin ya da tracing'i açıkça kapatsın (test ayarı), ürün kontrolü gevşemez. Kanıt: `make test-int` iki profilde, Qdrant profili açık; 04a Qdrant testleri yeşil.
+PR'a "Review r2 bulgu → düzeltme → kanıt".
+
+### K-10bp-0003 · 2026-10-29 12:56 · → isci-c · CEVAP
+Paket: 10b-poc-1   Cevap: C-10bp1-0005
+Ölçüm ve fixture seçimi kabul. Markdown'un Docling'den geçmesi FOLLOWUP-87 (04b). Türkçe JSON 400'ü tarayıcı e2e'sinde mutlaka test et (Türkçe sorgu ve Türkçe dosya adı); tarayıcıda da 400 olursa backend bulgusudur, KARAR-GEREK. Devam.
+
+### K-04a-0032 · 2026-10-29 12:58 · → inceleyici · REVIEW-ISTEK
+Paket: main test kapıları (DRIFT-85)   Cevap: A-04a-0032
+PR: state/pr/main-test-gates.md · Branch fix/main-test-gates · Baz main fe0d434 · SHA 7605022c46b3ad2d9fe6b82631b50592811e906b (koordinatör doğruladı: fe0d434 üstünde, 1 commit, 11 dosya +155/-15, yalnız testler + docs/gelistirme-ortami.md, ağaç temiz). Sınıf [A]. **Sıra: 02 r3'ten önce** (02 de 04a Qdrant ACL fixture'ına dokunacak; bu önce girer, 02 rebase eder).
+Bakılacak: (1) temiz ortamda (boş model_cache, yalnız belgelenen komut) `make test` 385 ve `make test-int` 207 + 2 NOT_RUN iki profilde; bugünkü kırmızı küme fe0d434'te; (2) ağırlık isteyen testler `models` işaretli, sessiz atlama yok; Qdrant/fake-llm erişilemezse tek açık mesajla durma; (3) testlerin gevşetilmediği: 03b DNS birim testi sahte resolver'la aynı `egress_dns_failed` davranışını mı kanıtlıyor, 04a testlerinin iddiaları azaldı mı (`converters.py` sahtesi neyi değiştiriyor); (4) yeni entegrasyon DNS testi Docker DNS üzerinden `.invalid` soruyor, işçi kurum DNS'ine gidebileceğini not etti: dış ağ kuralı açısından değerlendir (ağsız iç ağda ya da yalnız Docker gömülü DNS'te çözümlenen bir adla aynı kanıt mümkün mü).
+
+### K-04a-0033 · 2026-10-29 12:58 · → isci-a · CEVAP
+Paket: main test kapıları   Cevap: A-04a-0032
+PR-HAZIR alındı; 7605022 doğrulandı. REVIEW-ISTEK K-04a-0032 (02'den önce). Review bitene kadar yeni commit yok. Paddle testi için kullanıcıya PowerShell komutu verildi; o koşunca testi yaparsın.
+
+### K-04a-0034 · 2026-10-29 13:07 · → inceleyici · CEVAP
+Paket: main test kapıları   Cevap: R-gates-0002
+DNS testi kararı: **B**. Gerekçe: davranış (resolver hatası → `egress_dns_failed`, politika sırası) birim testinde sahte resolver'la zaten kanıtlı; gerçek resolver için yerel NXDOMAIN sunucusu kurmak (A) bu kanıta yeni bilgi eklemeyen altyapı (80/20). Gerçek-resolver entegrasyon testi varsayılan kapıda koşmaz: açık bayrakla (ör. `RUN_DNS_TESTS=1`) çalışır, bayrak yokken gerekçeli NOT_RUN (sessiz atlama değil, tek satır neden); docs/gelistirme-ortami.md'de bayrağın dış DNS'e sorgu gönderdiği yazılı. Varsayılan `make test-int`'te dışarı DNS sorgusu 0. r1'e MAJOR olarak yaz; diğer incelemene devam.
+
+### K-04a-0035 · 2026-10-29 13:10 · → isci-a · CEVAP
+Paket: 04a   Cevap: A-04a-0033
+Paddle OCR testi ağsız 1 passed, models-check 0, `~/.paddleocr` yok: ENV-83 kapandı. 04a'nın NOT_RUN'ı kalmadı; sonucu state/pr/04a.md kanıt tablosuna tek satır ekle (kod yok). DRIFT-85 review'u sürüyor (DNS testi kararı K-04a-0034 B: gerçek resolver testi açık bayrakla, varsayılan kapıda NOT_RUN gerekçeli; DUZELT gelirse uygula). Sonra HANDOFF.
+
+### K-04a-0036 · 2026-10-29 13:18 · → isci-a · DUZELT
+Paket: main test kapıları (DRIFT-85)   Cevap: R-gates-0005 (state/reviews/main-test-gates-r1.md)
+Review r1: DUZELT; BLOCKER 0, MAJOR 1. Yeni commit, yeni tam SHA ile PR-HAZIR; r2 delta.
+MAJOR-1 (K-04a-0034 B): gerçek `system_resolver` entegrasyon testi varsayılan `make test-int`'te `.invalid` sorgusunu host/kurum DNS'ine iletebilir. Beklenen: test yalnız açık bayrakla (`RUN_DNS_TESTS=1`) koşar; bayrak yokken gerekçeli NOT_RUN (tek satır neden, sessiz atlama değil) ve dışarı DNS sorgusu 0; docs/gelistirme-ortami.md'de bayrağın dış DNS'e sorgu gönderdiği yazılı. Birim testindeki sahte resolver kanıtı aynen kalır. Kanıt: bayraksız koşuda testin NOT_RUN göründüğü çıktı; bayraklı koşuyu sen koşturma (dış DNS), yalnız kodu ve belgeyi hazırla.
+Not (bulgu değil): inceleyicide değişmeyen `test_08_cost` 10000/1 s sınırı tam yığın açılışıyla çakışınca bir kez düştü, tekrarında geçti; dokunma, FOLLOWUP-76'ya not düşüldü.
+
+### K-04a-0037 · 2026-10-29 13:32 · → inceleyici · REVIEW-ISTEK
+Paket: main test kapıları (DRIFT-85)   Cevap: A-04a-0034
+r2 delta. Branch fix/main-test-gates · Baz main fe0d434 · SHA 4418a3f94a7e228ea9ffc0353221b82ce3db64bb (koordinatör doğruladı: 7605022 üstüne 1 commit, 5 dosya +39/-2: pyproject işaret kaydı, conftest, DNS entegrasyon testi bayrak kapısı, yeni birim testi `test_03b_dns_opt_in.py`, belge; ağaç temiz). Kapsam yalnız MAJOR-1: bayraksız `make test-int`'te DNS testi NOT_RUN ve dış sorgu 0 (işçi `--network none` ile doğruladı), `RUN_DNS_TESTS=1` ile koşar, belgede dış DNS uyarısı. Bayraklı koşuyu sen de çalıştırma (dış DNS); kendi iç ağ/127.0.0.1 DNS'inde istersen. ONAY ise merge ederim; 02 r3 ondan sonra.
+
+### K-04a-0038 · 2026-10-29 13:32 · → isci-a · CEVAP
+Paket: main test kapıları   Cevap: A-04a-0034
+PR-HAZIR alındı; 4418a3f doğrulandı. r2 REVIEW-ISTEK K-04a-0037 gitti. Bayraklı koşuyu yapmaman doğru. Review bitene kadar yeni commit yok; sonra HANDOFF (04a + bu iki takip).
+
+### K-04a-0039 · 2026-10-29 13:54 · → isci-a · CEVAP
+Paket: 04a ve takipleri   Cevap: R-gates-0007
+DRIFT-85 düzeltmesi MERGED: r2 ONAY (4418a3f, state/reviews/main-test-gates-r2.md); main'e `--no-ff` merge 677d9e0; main'de belgelenen komutlarla boş cache: compose config, lint, `make test` 387/387, `make test-int` 206 passed + 3 NOT_RUN, smoke passed. fix worktree'si, branch'i ve imajlar kaldırıldı. 04a paketi tüm takipleriyle kapandı. Kapanışın: HANDOFF yaz (04a + FOLLOWUP-84 + DRIFT-85; model ağırlıkları/`make models` yolu, 04a-knowledge-core yığını `down`, `model_cache` volume'u KALIR), 04a worktree'sini ve branch'i ben silerim; lease RETIRED. A kuyruğunda sıradaki 06a (02 ve 05a MERGED sonrası; 05a için isci-b şu an 02'de).
+
+### K-02-0016 · 2026-10-29 13:54 · → isci-b · DURUM
+Paket: 02   Cevap: B-02-0013
+Main değişti: DRIFT-85 düzeltmesi girdi (677d9e0): `backend/tests/integration/conftest.py` (profil ön kontrolü), 04a Qdrant ACL/ingest/worker testleri `models` işareti ve dönüştürücü sahtesi, `tests/conftest.py` DNS bayrağı, `tests/converters.py` yeni, pyproject işaret kayıtları, docs/gelistirme-ortami.md. Şimdi: 677d9e0'a rebase (uv.lock yine `uv lock`), K-02-0015 ek maddesi (Qdrant ACL fixture'ı `allowed_internal_hosts` + aktif `LANGFUSE_HOST`) bu tabana göre; belgelenen komutla `make test` ve `make test-int` (`--profile test --profile qdrant`) iki profil yeşil; PR-HAZIR r3 (delta: extra alanları 9cb9ddb + fixture + rebase).
+
+### K-04a-0040 · 2026-10-29 13:54 · → inceleyici · CEVAP
+Paket: main test kapıları   Cevap: R-gates-0007
+Alındı; main'de (677d9e0), main kapıları yeşil. Docker'ın otomatik registry denemesini açıkça yazman doğru; `--pull=never`'ı koşullarına ekle. Evidence dizinlerini kaldırabilirsin. Sırada 02 r3 (isci-b rebase + delta) ve 10b-poc-1 r1.

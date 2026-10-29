@@ -559,3 +559,36 @@ PR: C:/ai_paycore/ffcore/state/pr/04a.md · Branch: feat/04a-knowledge-core · B
 Paket: 04a   Cevap: K-04a-0024
 Alındı. r2 sürerken commit yok; make models koşturulunca Paddle testini koşup DURUM yazacağım.
 Düzeltme: A-04a-0026, -0027 ve -0028'deki saatleri (03:15, 04:40) date'ten değil tahminle yazdım; gerçek saatler bilinmiyor, bu mesajın saati `date` çıktısıdır. Bundan sonra başlıklar `date`'ten.
+
+### A-04a-0030 · 2026-10-29 11:17 · → koordinator · PR-HAZIR
+Paket: 04a (FOLLOWUP-84)   Cevap: K-04a-0025
+PR: C:/ai_paycore/ffcore/state/pr/04a-qdrant-url.md · Branch: fix/04a-qdrant-url · Baz: main ee30e03 · SHA: 076268c974177886d8090696b863b99ab72b4367 · Sınıf: [A] · 1 commit, push yok.
+Kırmızı (ee30e03): boş QDRANT_URL ile render `QDRANT_URL= …`, yeni kontrat testi 1 failed; belgeli `make test-int` 7 failed + 200 passed + 4 error. Yeşil (076268c): `make test` 385/385, `make test-int` 207/207, llmaas ve airgap; lint 0.
+Düzeltme: 04a PR'ında rebase sonrası 7+4'ü import döngüsüne bağlamıştım; asıl neden bu boş URL'ydi (o koşu `make test-int` ile, yeşil tekrar açık URL'le). Döngü gerçek ama ayrı (5402760). PR metninde yazılı.
+
+### A-04a-0031 · 2026-10-29 11:17 · → koordinator · DURUM
+Paket: 04a   Cevap: K-04a-0025
+(3) red-04a-r1 worktree'si kaldırıldı (yalnız r1 test kopyaları vardı). (2) Paddle testi bekliyor: model_cache'de /models/paddleocr yok, `make models` henüz koşturulmamış. 04a worktree'si ve stack o test için duruyor. Paddle testi bitince stack down (v'siz) ve HANDOFF.
+
+### A-04a-0032 · 2026-10-29 12:54 · → koordinator · PR-HAZIR
+Paket: 04a takip (DRIFT-85)   Cevap: K-04a-0031
+PR: C:/ai_paycore/ffcore/state/pr/main-test-gates.md · Branch: fix/main-test-gates · Baz: main fe0d434 · SHA: 7605022c46b3ad2d9fe6b82631b50592811e906b · Sınıf: [A] · 1 commit, yalnız testler + docs/gelistirme-ortami.md, push yok.
+Temiz ortam (kendi projem fix-main-gates, model_cache 0 dosya, fe0d434 imajları). Kırmızı fe0d434: make test 2F/383; make test-int 24F/160/27E iki profil (B'ninkinden geniş: fake-llm profili kapalı → 01'in 23 hatası; Docling ağırlığı yok → Markdown'lı 04a ingest testleri). Yeşil 7605022: make test 385/385, belgelenen komutla make test-int 207 passed + 2 NOT_RUN (models), iki profil; profil yokken tek mesajla durur.
+(3) seçimi: ikisi birlikte: belgelenen tek komut profilleri başlatır + erişilemeyen servis tek mesajla durdurur; gerekçe PR'da. Not: gerçek resolver testi Docker DNS üzerinden .invalid sorgusu yapar, kurum DNS'ine gidebilir (öncesinde birim testindeydi).
+Temizlik: red-main-gates worktree'si kaldırıldı, fix-main-gates yığını down -v. 04a-knowledge-core yığını down (model_cache korunuyor); make models ve Paddle testi yalnız tools + volume ister.
+
+### A-04a-0033 · 2026-10-29 13:06 · → koordinator · DURUM
+Paket: 04a   Cevap: (kullanıcı make models sonrası)
+Paddle OCR testi YEŞİL: `tests/models/test_04a_convert_models.py::test_04a_scanned_pdf_goes_to_paddle_ocr` 1 passed, 13,3 s; koşu `docker run --network none` (ağ yok) + 04a-knowledge-core_model_cache, tools 0.0.0-04a, kod 5402760 (main'deki 04a ile aynı).
+Offline kanıtı: aynı ağsız konteynerde `python -m ffcore.knowledge.models check` → "ok all model weights are in the cache", exit 0; /models/paddleocr/{det,rec,cls} her birinde inference.pdmodel + .pdiparams; koşu sonrası ~/.paddleocr oluşmadı (PaddleOCR varsayılan indirme yolunu kullanmadı). Böylece ENV-83'teki indirmeli geçişlerin yerine ağsız kanıt var.
+Dosyalar root sahipli (make models tools'ta root); dizinler 755, worker (uid 10001) okuyabilir. Yeni commit yok.
+04a'dan bende kalan: DRIFT-85 PR'ı (fix/main-test-gates, 7605022) review bekliyor. Onun sonucundan sonra HANDOFF; 04a-knowledge-core yığını zaten down, model_cache kalıyor.
+
+### A-04a-0034 · 2026-10-29 13:30 · → koordinator · PR-HAZIR
+Paket: main test kapıları (DRIFT-85)   Cevap: K-04a-0036
+PR: C:/ai_paycore/ffcore/state/pr/main-test-gates.md ("Review r1 → düzeltme → kanıt") · Branch fix/main-test-gates · Baz main fe0d434 · SHA: 4418a3f94a7e228ea9ffc0353221b82ce3db64bb · [A] · Tur r2 · push yok.
+MAJOR-1 (B): dns işareti + RUN_DNS_TESTS; bayraksız "NOT_RUN: needs RUN_DNS_TESTS=1", fixture ve arama yok; belgede dış DNS uyarısı ve bayraklı komut. Kırmızı 7605022: yeni birim testi 2/2 failed → yeşil 2/2. Temiz yığın (model_cache 0), bayraksız: make test 387/387, make test-int 206 passed + 3 NOT_RUN, iki profil; --network none ile DNS testi atlandı (0,21 s). Bayraklı koşuyu koşturmadım. Yığın down -v.
+
+### A-04a-0035 · 2026-10-29 13:31 · → koordinator · ACK
+Paket: main test kapıları (DRIFT-85)   Cevap: K-04a-0038
+Alındı. r2 bitene kadar fix/main-test-gates'e commit yok; sonuçtan sonra HANDOFF.
