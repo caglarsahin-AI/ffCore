@@ -40,3 +40,37 @@ export async function api<T>(method: Method, path: string, body?: unknown, fetch
   }
   throw new ApiError(response.status, "unexpected_response", "api_error", `${method} ${path} returned ${response.status}`);
 }
+
+// Multipart upload with progress (fetch has no upload progress). Same origin and the same error
+// contract as api(); 401 reaches the MutationCache like any other call. `onProgress` gets 0..1
+// and is called only when the browser knows the total.
+export function upload<T>(
+  path: string,
+  form: FormData,
+  onProgress?: (fraction: number) => void,
+  createXhr: () => XMLHttpRequest = () => new XMLHttpRequest(),
+): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    const xhr = createXhr();
+    xhr.open("POST", path);
+    xhr.upload.onprogress = (event) => {
+      if (event.lengthComputable && event.total > 0) onProgress?.(event.loaded / event.total);
+    };
+    xhr.onload = () => {
+      let parsed: unknown;
+      try {
+        parsed = xhr.responseText ? JSON.parse(xhr.responseText) : undefined;
+      } catch {
+        parsed = undefined;
+      }
+      if (xhr.status >= 200 && xhr.status < 300) return resolve(parsed as T);
+      if (isErrorBody(parsed)) {
+        return reject(new ApiError(xhr.status, parsed.error.code, parsed.error.type, parsed.error.message));
+      }
+      reject(new ApiError(xhr.status, "unexpected_response", "api_error", `POST ${path} returned ${xhr.status}`));
+    };
+    xhr.onerror = () => reject(new ApiError(0, "network_error", "api_error", `POST ${path} did not complete`));
+    xhr.onabort = () => reject(new ApiError(0, "network_error", "api_error", `POST ${path} was aborted`));
+    xhr.send(form);
+  });
+}
