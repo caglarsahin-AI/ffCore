@@ -2,10 +2,10 @@
 
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
-- Oturum kimliği: ffcore-isci-a-04a
-- Aktif paket: 04a (DUZELT r1, K-04a-0018)
+- Oturum kimliği: ffcore-isci-a-06a
+- Aktif paket: 06a (K-06a-0001)
 - Durum: ACTIVE
-- Son okunan: K-04a-0018 (2026-10-28 23:47)
+- Son okunan: K-06a-0003 / K-06a-0002 (2026-10-29 17:17)
 
 ## Mesajlar
 
@@ -603,3 +603,65 @@ Bıraktıklarım:
 - Worktree: yalnız .worktrees/feat/04a-knowledge-core (5402760, ağaç temiz) kaldı; red-04a-r1 ve red-main-gates'i ben kaldırdım, fix worktree'leri listede yok. Branch/worktree silme sende.
 Açık takipler (benim değil, kayıtlı): FOLLOWUP-77 arama süresi CPU'da dakikalar; FOLLOWUP-78 PayCore rerank 512 kırpması (doğrulanmadı); FOLLOWUP-76 test_08_cost zamanlaması. Bilinen sınırlar PR'da: dönüştürücü bellek limiti Docling ve OCR ayrı ölçümünden (birlikte ölçülemedi, VM OOM); kabul 1 sunucuda (32 vCPU) yeniden ölçülmeli; gold reindex sırasında belge yayına kadar aramada görünmez.
 Ders (kendime): kanal saatleri yalnız `date`'ten; tools'ta koşan bir kütüphanenin indirme yolunu (HOME, ~/.paddleocr) kontrol etmeden gerçek model koşusu yok; rebase sonrası düşüşte kök nedeni komutun ortamıyla (açık/boş env) birlikte doğrula.
+
+### A-06a-0001 · 2026-10-29 16:57 · → koordinator · DURUM
+Paket: 06a   Cevap: K-06a-0000
+DURUM: OKUMA-TAMAM (yeni oturum ffcore-isci-a-06a; lease ACTIVE, 04a oturumu RETIRED A-04a-0036)
+Okunan gruplar: 1 FELSEFE + FELSEFE_UYGULAMA; 2 CLAUDE; 3 PLAN v2.5; 4 KARARLAR (29 Ekim eklemeleri dahil: 01 fallback istek düzeyinde, 02, 05a, 08-lite/C4, model ağırlıkları offline, main merge kapısı); 5 handbook tümü + PR şablonu; 6 WORK_QUEUE, BLOCKERS (1-87), kanallar (koordinator K-05a-0005'e kadar); 7 plan/06 tamamı + 01/02/04/05/08/13 Teslimatlar; 8 BASLATMA.
+K-06a-0001 GOREV'ini bekliyorum; gelince ACK, sonra U-ölçümleri (LangGraph pini, Postgres checkpointer interrupt/resume, SSE) ve state/pr/06a.md planı. GOREV'e kadar kod, branch, worktree yok.
+
+### A-06a-0002 · 2026-10-29 16:59 · → koordinator · ACK
+Paket: 06a   Cevap: K-06a-0001 / K-06a-0000
+GOREV alındı. Branch feat/06a-agent-runtime, worktree .worktrees/feat/06a-agent-runtime (5c338ae, doğrulandı), `FFCORE_VERSION=0.0.0-06a`, touch-zone K-06a-0000'daki gibi; 05a worktree'sine yalnız okuma. Sıra: (1) U-ölçümleri: LangGraph + checkpointer pini (paycoreLLM uv.lock referans; yoksa iki hafta kuralıyla seçim, gerekçe planda), Postgres checkpointer'da `interrupt`/`resume` (süreç yeniden başlatma dahil), SSE `token` akışı ve `approval_required` duraklatma; ölçüm kodu scratchpad'de, depoya girmez. (2) state/pr/06a.md planı (C8/C9/C10 donmuş biçim taslağı, felsefe üç sorusu) ve DURUM: PLANNED. Kod plan onayından sonra.
+
+### A-06a-0003 · 2026-10-29 17:14 · → koordinator · DURUM
+Paket: 06a   Cevap: K-06a-0001
+DURUM: PLANNED talebi. Plan: state/pr/06a.md (semboller, dilim 0-7, kabul 1-17 → test, migration 06a_0001, geri alma, felsefe üç sorusu).
+U-ölçümleri (bölüm 0, scratchpad, `--internal` ağ, temizlendi): (U1) AsyncPostgresSaver `checkpoints` şemasında (search_path) çalışıyor, `setup()` kendi göç tablosunu tutuyor; (U2) interrupt'ta duran run AYRI SÜREÇTE `Command(resume=)` ile tamamlandı, red yolu da; (U2-a) resume'da interrupt içeren düğüm baştan yeniden koşuyor → onay ayrı düğüm; (U2-b) bitmiş thread'e resume hata vermeden eski sonucu döndürüyor → API 409 `run_not_waiting`; (U3) `custom` stream ile token'lar düğüm bitmeden tek tek geliyor; (U4) Redis Stream ile SSE canlı ve geç bağlanana baştan tekrar oynatma çalışıyor.
+Kod onaydan sonra; ilk commit openapi/06a.yaml (10b-poc-2 tüketir). Kararlar A-06a-0004'te.
+
+### A-06a-0004 · 2026-10-29 17:14 · → koordinator · KARAR-GEREK
+Paket: 06a   Cevap: K-06a-0001
+Her birinde önerim A (gerekçe state/pr/06a.md). Koordinatör yetkisinde olduklarını düşünüyorum (bağımlılık, tasarım, touch-zone).
+S1 [C] bağımlılık: A (Önerilen) langgraph 1.2.15, langgraph-checkpoint 4.3.0, langgraph-checkpoint-postgres 3.1.3, langchain-core 1.6.10, langgraph-prebuilt 1.1.0, langgraph-sdk 0.4.7, psycopg-pool 3.3.3 (hepsi 12 Ekim veya önce, iki hafta kuralı; geçişliler langsmith 0.14.8, ormsgpack, orjson, xxhash, websockets, uuid-utils, langchain-protocol, jsonpatch, tenacity uv lock'ta `exclude-newer` ile); LANGSMITH_TRACING açıksa açılış hatası. B: en yeni 1.2.18 (26 Ekim, iki hafta kuralına aykırı). PayCore lock'unda LangGraph yok, referans pin bulunmadı.
+S2 olay taşıma: A Postgres `run_events` (kalıcı) + Redis Stream `run:<id>` (canlı + geç bağlanana tekrar, TTL). B brief'teki pub/sub (geç bağlanan/yeniden bağlanan olay kaçırır, U4).
+S3 onay düzeni: A düğümler `tool_guard`(tool.pre) → `approval`(yalnız interrupt) → `tools`(çağrı + tool.post); resume'da hiçbir yan etki tekrarlanmaz. B tek `tools` düğümü + idempotency anahtarları (karmaşık, U2-a).
+S4 KB araması: A worker backend arama API'sini HTTP ile çağırır (SERVICE_TOKEN + OBO + X-Run-Id; modeller yalnız API sürecinde, C10 kararı). B worker'da süreç içi arama (worker'a model yükler; reddedilmeli).
+S5 guardrail: A worker'da süreç içi `engine.evaluate` + `record_events` (model yok, aynı kod; C4 biçimi aynı). B `/internal/guardrails/evaluate` HTTP (ek döngü, aynı sonuç).
+S6 platform kuralları: A Langfuse prompt `platform_rules` (02 PromptStore, seed backend/prompts/platform_rules.md, İngilizce + "kullanıcının dilinde cevapla"); Langfuse yoksa run `prompt_unavailable` ile başlamaz. B kodda sabit dosya (02 kararıyla iki kaynak).
+S7 `ask_user_question` sayacı (FOLLOWUP-42): A `max_tool_calls`'a girmez, `max_turns`'e girer → 13a `veri-soru-cevap` `ask_user` true yapılabilir (13a/test işi). B girer, şablon böyle kalır.
+S8 SSE kopması `running` run'da: A iptal bayrağı, sonraki adım sınırında `abandoned`, yuva bırakılır (CPU boşa yanmaz). B run sürer, yalnız işaretlenir.
+S9 worker: A compose'a iki servis `agent-worker` (llm-interactive) ve `agent-worker-bg` (llm-background), aynı imaj; öncelik LLM_SLOTS'ta. B tek servis (arq tek kuyruk dinler; olmaz).
+S10 LLM_SLOTS yeri: A `runtime/scheduler.py` 01'in istemcisini sarar (01 dosyası değişmez; 06b aynı sarmalayıcıyı kullanır). B `litellm_client.py`'ye ekleme (01 touch-zone).
+S11 onay yetkisi 06a'da: A `POST /runs/<built-in function id>/resume` onayda `require_role(definition.approval.assign_to, write=True)`, `user` asla; onay tablosu/kuyruğu 07. B 06a'da yalnız admin, 07 genişletir.
+S12 checkpointer kurulumu: A Alembic 06a `checkpoints` şemasını açar/düşürür; tabloları `migrate` servisindeki `python -m ffcore.cli setup-checkpointer` (idempotent `setup()`) kurar. B Alembic içinde `setup()` çağrısı (async saver'ı Alembic'e sokar).
+S13 touch-zone ekleri: `core/config.py` (yeni env'ler), `cli.py` (additive komut), `main.py` (router), `api/openapi_export.py` (06a eşlemesi), `core/readiness.py` (LLM_SLOTS/kuyruk durumu, additive), `backend/prompts/platform_rules.md`, compose `migrate` komutu + iki worker servisi, `tests/unit/test_03a_write_flag.py` (gerekirse WRITE_EXEMPT). A hepsi onaylı. B readiness hariç (sistem durumu ekranı 10b-poc-2'de eksik kalır).
+Varsayımlar 1-7 state/pr/06a.md'de (özellikle 4: history_summarize özet çağrısı 06a'da yok, en eski turlar düşer ve `budget` olayında görünür → FOLLOWUP talebi).
+
+### A-06a-0005 · 2026-10-29 17:17 · → koordinator · ACK
+Paket: 06a   Cevap: K-06a-0002
+Alındı; IMPLEMENTING. S1-S7, S9-S13 A; S8 senin kuralınla: iptal yalnız `POST /runs/{id}/cancel` (run sahibi ya da proje admin'i), kopan istemci Redis Stream'den devam eder (akış süresi dolmuşsa `run_events`'ten), abonesiz `running` run `RUN_ABANDON_GRACE_S` (120, profil env) sonra adım sınırında `abandoned` + yuva serbest; üç negatif test planın kabul 17'sine yazılıyor. Ek: langsmith ağsız/DNS tuzağı testi (S1). 13a şablonlarına dokunmuyorum. state/pr/06a.md güncelleniyor; sıra: dilim 0 (openapi/06a.yaml) → 1 (veri modeli) → …, her dilimde önce kırmızı.
+
+### A-06a-0006 · 2026-10-29 17:43 · → koordinator · DURUM
+Paket: 06a   Cevap: K-06a-0002
+Dilim 0-1 tamam (feat/06a-agent-runtime): 3117f7d OpenAPI taslağı `backend/openapi/06a.yaml` (13 yol, SSE uçları `text/event-stream`; uçlar rol bağımlılıklı 501; 10b-poc-2 artık tüketebilir), C8 `definition` (13a üç şablonu geçer, bilinmeyen alan 422, `verify`/`sentence_max` kayıtta kodlu red), C9/C10 tek yerde; 3bca5ad veri modeli + `06a_0001` (checkpoints şeması dahil). Kırmızı → yeşil: migration'sız 9 şema testi düştü, sonra 9/9 + 03a round trip; tam `make test` 465 geçti, `make lint` 0. `jsonschema` geçişliden doğrudan bağımlılığa (aynı kilitli 4.26.0, uv.lock'ta yalnız 2 satır).
+Bulgu: `fromisoformat` "19-07"yi saat olarak kabul ediyordu; `BACKGROUND_WINDOW` biçimi regex ile katı (scheduler testleri 7/7, dilim 3 commit'inde).
+Sıradaki: dilim 2 agent API'si (iki aşamalı oluşturma, sürüm, yayın/geri alma, C13 context_tokens 400).
+
+### A-06a-0007 · 2026-10-29 18:15 · → koordinator · DURUM
+Paket: 06a   Cevap: -
+Dilim 2-4 tamam: 8156fb4 agent API (iki aşamalı oluşturma, taslak/yayın/geri alma, C13 400 kayıtta ve yayında; 7 entegrasyon testi kırmızı→yeşil); c6b9f64 bağımlılıklar (S1 pinleri + geçişliler `exclude-newer-package` 2026-10-15, mevcut pin değişmedi; langsmith izi açılırsa açılış hatası) + ayarlar + LLM_SLOTS yuvası (7 test); 96e7281 graf + runner + olaylar (19 entegrasyon testi: kabul 1, 2, 3 onay/red, 4 worker ölümü sonrası checkpoint'ten devam, 5a/5c/5d, 6b, 7, 9, 13, 16, 17b, 17c). make test 466+, lint 0.
+Bulgu ve düzeltme (dürüstlük notu): host'ta `python` 3.9 ve cp1254; ilk düzenlemelerimde Türkçe yorumlar mojibake oldu (pyproject, test_c3, test_03a_write_flag); kayıpsız geri çevrildi (de7fbbd, c6b9f64). Bundan sonra yalnız `py -3.12` + açık UTF-8.
+Koordinatör görüşü isteyen iki varsayım (itiraz yoksa böyle kalır, PR'da yazılı):
+(V8) Cevap akışı: politika `enforce` ve kuralında çıktı aşaması varsa token'lar `output.pre`'den SONRA tek parça gösterilir (guardrail görmeden metin çıkmaz); `monitor`/`off`'ta canlı akar. Kural politikanın açık modundan türetilir, gizli seçim yok; 08 tam'ın akış tamponlayıcısı gelince `output.stream.delta` ile canlı akar.
+(V9) Yalnız `mode: always` bilgi tabanlı ve aracı olmayan agent'ta arama hiç parça döndürmezse model çağrılmaz, `unknown_reply` döner (`declined`, `progress` olayında `skipped_model: no_sources`). Gerekçe: CPU'da 1,5-2 dk'lık çağrı yalnız uydurma riski üretir (brief kabul 2, PayCore).
+Sıradaki: dilim 5 (gerçek bağdaştırıcılar: LiteLLM + yuva, 04a arama HTTP + OBO + X-Run-Id, 08 engine; arq worker + compose servisleri, run API + SSE, `setup-checkpointer`, readiness).
+
+### A-06a-0008 · 2026-10-29 18:18 · → koordinator · KARAR-GEREK
+Paket: 06a   Cevap: K-06a-0003
+V8 kabul ve uygulanıyor (`progress` `{"stage":"output_buffered","reason":"guardrail_enforce"}` akış başında). Mojibake kanıtı PR'a girecek.
+V9 için itiraz (META-03). Run durumu bende zaten `completed`; ayrılık yalnız `runs.outcome_label`'da. `declined` C9 durumu değil, `outcome_label` değeri (`declined|below_threshold|answered`, brief 06 R5.1/C24) ve brief 06 satır 98 onu tam bu iş için tanımlıyor: "modelin kendi 'bulamadım' cevabı metniyle gösterilir, `declined` etiketlenir, 'cevaplandı' sayılmaz". Guardrail reddi ise `status=failed` + `error_code=guardrail_block`; etiketle karışmıyor. 09 ve 13b sınavı (alan dışı/cevapsız sorular) bu etikete dayanacak.
+A (Önerilen): `completed` + `outcome_label=declined` + cevap metni tanımdaki `unknown_reply` + `progress` `skipped_model: no_sources` + boş `sources` olayı. Etkisi: brief ve C24 ile tutarlı; modelin "bulamadım"ı ile modelsiz yol aynı etikette toplanır.
+B: `completed` + `outcome_label=answered` + aynı olaylar. Etkisi: sınav ve panolar bilinmeyen soruyu "cevaplandı" sayar (brief'e aykırı).
+C: yeni etiket `unknown_reply` (outcome_label enum'una additive). Etkisi: brief'te olmayan bir değer; 09/13b modelin "bulamadım"ı (`declined`) ile modelsiz yolu ayrı saymak zorunda kalır.
+Cevap gelene kadar A ile ilerliyorum (mevcut kod); testte `llm_call` olmadığı ve metnin tanımdan geldiği zaten kanıtlı.

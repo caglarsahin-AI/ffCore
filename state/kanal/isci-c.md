@@ -3,9 +3,9 @@
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
 - Oturum kimliği: ffcore-isci-c-10bp1
-- Aktif paket: 10b-poc-1 (GOREV K-10bp-0001)
-- Durum: ACTIVE
-- Son okunan: koordinator K-10bp-0009; bana adresli son mesaj K-10bp-0009; son yazılan C-10bp1-0010
+- Aktif paket: - (10b-poc-1 MERGED 92fb37f)
+- Durum: RETIRED
+- Son okunan: koordinator K-10bp-0010; son yazılan C-10bp1-0011 (HANDOFF)
 
 ## Mesajlar
 
@@ -406,3 +406,37 @@ r1 düzeltmesi hazır.
   - MINOR-2, `test_10bp1_19`: 0 etkin alan beklendi, 6 vardı. Düzeltme: alanlar `fieldset disabled={!canWrite}` içinde; edit modda etkin, arama açık.
 - Kapılar: lint 0, typecheck 0, Vitest 114/114. Temiz yığında e2e 1/1 + 98/98 (22'si 10bp1). Yığın `down -v`, imajlar duruyor.
 - 10a formları: sapma yok. Formlar yalnız WriteGate'li düğmelerle açılıyor; üye seçimleri WriteGate'li.
+
+### C-10bp1-0011 · 2026-10-29 15:22 · → koordinator · HANDOFF
+Paket: 10b-poc-1   Cevap: K-10bp-0010
+### 10b-poc-1 · ffcore-isci-c-10bp1 · 2026-10-29 15:22
+- **Durum:** MERGED (r2 ONAY c0926f9 → main 92fb37f). Lease RETIRED.
+- **Tam sonraki adım:** 10b-poc-2 (araçlar, agent sihirbazı + test paneli, run ve onay görünümü), 05a/06a/07 MERGED sonrası, yeni oturumda. Tipler o paketlerin `backend/openapi/*.yaml`'ından doğrudan üretilir (kopya yok); `gen:api`/`check:api` listesine eklenir (`scripts/check-api.mjs` `SPECS`).
+- **Kararlar (bağlayıcı):**
+  - K-10bp-0002 D1 B: sistem durumu girişli sunucu bileşeni. `/readyz` backend iç adresinden okunur, rol sunucuda denetlenir. Tarayıcıya `/readyz` rewrite'ı yok (ayrıntı model yolu taşır). `warming` iken `router.refresh()` 5 s'de bir.
+  - D2 A: compose `&app-env`'de `FAKE_EMBED: ${FAKE_EMBED:-0}`. Açıkken `/readyz` models ayrıntısı bunu söyler.
+  - D3 A: 04a'da ucu olmayan maddeler için ekran ve yer tutucu yok: ACL düzenleme, ingest raporu, elenen parça listesi, `rerank_truncated`, preset'li yeniden dönüştürme, sistem durumunda model/bellek/kuyruk, `acl_users` (FOLLOWUP-86). MD'nin Docling'den geçmesi FOLLOWUP-87.
+  - `mocks/openapi-04a.yaml` yok; 03a kopyası 10a'dan kalıyor.
+- **e2e (docs/onyuz.md "Acceptance tests"):** iki aşama, tek yığın.
+  - 1. aşama: ağırlıksız, `FAKE_EMBED` kapalı, `--grep @model-missing`.
+  - Sonra `FAKE_EMBED=1 up -d --wait backend worker`.
+  - 2. aşama: `--grep-invert @model-missing --workers=1`.
+  - Komutların başında `ALLOWED_INTERNAL_HOSTS=litellm,fake-llm`, `FFCORE_VERSION=0.0.0-<paket>`; 8000 doluysa `BACKEND_PORT=<boş port>`.
+  - Ağırlıksız biçimler (ölçüldü): metin katmanlı PDF indexed; uzun TXT indexed; DOCX/MD `failed model_missing`; ikili dosya Kapı 0 `binary`.
+  - Fixture'lar `tests/e2e/knowledge.ts`: 13a PDF/DOCX, ikili tampon, `createKb`/`uploadViaApi`/`waitFinal`. Playwright CJS yükler: `import.meta` değil `__dirname`.
+  - Belge kimliği dosya adıdır. Aynı bayt → `unchanged`; aynı metin başka adla → Kapı 1 `duplicate_of`.
+- **Kalıplar** (10a-bağlama ve 10a-formlar kalıplarına ek):
+  - `components/disabled-with-reason.tsx` ortak; `needs="superadmin"` (`data-needs-superadmin`) ya da `needs="admin"` (`data-needs-role`). Rol yetmeyen düğme görünür ve nedenli pasif.
+  - Read modda formun yalnız düğmeleri değil alanları da pasif: `<fieldset disabled={!canWrite}>` + `useAccess(projectId)` (r1 MINOR-2). Okuma işlemleri (arama) açık kalır.
+  - Sunucu değişince türetilmiş sayılar için geçişte invalidation; zamanlayıcıyla değil (`documentsFinished`, r1 MINOR-1).
+  - Yenileme açık ve görünür (`documents-refreshing`, `readiness-refreshing`); bilinmeyen kod ham gösterilir.
+  - Çok parçalı yükleme `lib/api/client.ts` `upload()` (XHR ilerleme, aynı hata sözleşmesi).
+  - `evaluateAll` beklemez: önce öğenin görünmesini bekle. Satır kapsamlı `getByRole` kullan (aynı adlı düğmeler).
+  - `components/ui/tabs.tsx` pasif sekme metni `/80` (açık temada AA).
+- **Koşan / kalan testler:** Vitest 114/114; temiz yığında e2e 1/1 + 98/98 (c0926f9). NOT_RUN: DOCX/MD başarılı dönüşüm (ağırlık), Lighthouse (FOLLOWUP-37), e2e 413 (birimde), backend `make test` (backend değişmedi; compose için `test_00` 11/11).
+- **Gözlem:** bilinmeyen konsol yolları HTML not-found gövdesiyle HTTP 200 dönüyor (10a'dan beri; `[section]` `notFound()` akışlı render). İstenirse ayrı küçük iş.
+- **Süreç dersi:** iki kanal mesajı (0007/0008) kabuk heredoc'u ile sessizce yazılmadı. Bundan sonra mesajlar dosyadan Python ile eklenip `grep` ile doğrulanıyor.
+- **Blocker'lar:** yok.
+- **Commit edilmemiş durum:** yok (worktree ve branch koordinatörce kaldırıldı).
+- **Branch ve son commit:** feat/10b-poc-1 (silindi) @ c0926f9cee3928706847011ec02065b2d0ed8052 → main 92fb37f.
+- **Ortam:** `10bp1` yığını `down -v` (konteyner 0). `ffcore-10a-nm(-pw)` duruyor. Scratchpad'deki log ve betikler oturuma özel, depoya girmedi.

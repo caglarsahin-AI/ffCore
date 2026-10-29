@@ -21,6 +21,7 @@ Platformun boş değil, anlamlı ve **tamamen sentetik** veriyle teslim edilmesi
 6. **(13b) `make e2e`:** seed sonrası: sözleşme sorusu kaynaklı cevap; belgede olmayan soru "yok" cevabı; SQL sorusu doğru sayı; onaylı araç akışı (karma asistan) onay verilince tamamlanır; PII içeren girdi maskelenir; sınav koşar ve özet üretir; audit'te bu adımlar görünür. Çıktı: geçti/kaldı tablosu.
 7. **(13b) `make eval`:** 35 soruluk seti 06a run API'siyle koşturan, `outcome` dağılımı ve kaynak doğruluğu özetini Markdown rapor olarak yazan script (M3 kararı için yeter; 09 tabloları beklenmez).
 8. **(13b) Demo senaryosu dokümanı** `docs/demo.md`: 15 dakikalık sunum akışı, hangi ekranda ne gösterilir.
+9. **(13b) Kullanım senaryoları kanıtı:** `plan/18-kullanim-senaryolari.md` haritasındaki PoC senaryoları (F1-F4, F9) `make e2e`/`make eval` çıktısında ayrı satırlarla görünür; veri setleri ve sahte dış uçlar orada tanımlı (29 Ekim 2026 eklemesi).
 
 ## Profil farkları (PLAN.md 2b)
 

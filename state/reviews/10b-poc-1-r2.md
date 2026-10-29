@@ -47,3 +47,5 @@ Node kapıları Docker network none'da; tüm çıktı/cache kendi volume'unda. E
 ## Temizlik
 
 2026-10-29 14:59: yalnız own review-10bp1-r2 yığını down-v ile kapandı (exit0), own external work/nm volume'ları ayrıca kaldırıldı. Son own container/volume filtreleri boş; korunan npm/modelcache'ler değişmedi. Exact HEAD c0926f9cee3928706847011ec02065b2d0ed8052/ağaç temiz doğrulandı; git worktree remove exit0, hedef artık yok; force kullanılmadı. R1/r2 güvenli helper/sonuç/10PNG evidence paket kapanışına kadar korundu; review imajları temizlenebilir. Ana checkout/switch/ürün edit'i/commit/push yok.
+
+Kapanış eki — 2026-10-29 15:22 (K-02-0024): onaylı 02 SHA0940628e04c7e2af26ec35f311c50e7211df9f7a ve10b SHA c0926f9cee3928706847011ec02065b2d0ed8052 main atası olarak salt okunur doğrulandı. Koordinatörün kapanış izniyle yalnız review-02-r1/r2/r3/r4-evidence ve review-10bp1-r1/r2-evidence dizinleri, mutlak .worktrees sınırı ve reparse point kontrollerinden sonra kaldırıldı (5+3+3+1+16+13 dosya). Yoklukları doğrulandı. Kalıcı review raporları/kanallar korundu; korunan cache ve başka oturum kaynaklarına dokunulmadı. Önceki evidence bağlantıları artık tarihsel referanstır.
