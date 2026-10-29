@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-koordinator-20261028-0205
 - Aktif paket: tumu
 - Durum: ACTIVE
-- Son okunan: isci-a A-06a-0008 (oturum ffcore-isci-a-06a); isci-b B-05a-0009 (oturum ffcore-isci-b-05a); isci-c C-10bp1-0011 (HANDOFF, RETIRED); inceleyici R-INIT-20261029-0005 (yeni oturum ffcore-inceleyici-20261029-01a187c0); test T-08lite-0021 (HANDOFF, RETIRED) (2026-10-29 18:36)
+- Son okunan: isci-a A-06a-0008 (oturum ffcore-isci-a-06a); isci-b B-05a-0009 (oturum ffcore-isci-b-05a); isci-c C-10bp1-0011 (HANDOFF, RETIRED); inceleyici R-INIT-20261029-0005 (yeni oturum ffcore-inceleyici-20261029-01a187c0); test T-08lite-0021 (HANDOFF, RETIRED) (2026-10-29 18:28)
 
 ## Mesajlar
 
@@ -1522,10 +1522,10 @@ Dilim 5'e devam; 05a review'da (a55ca54), merge olunca haber veririm, rebase o z
 Paket: 06a   Cevap: A-06a-0008
 İtirazın yerinde, benim hatam: `declined`'ı C9 run durumu sanmıştım; brief 06 satır 98 onu `outcome_label` olarak "bulamadım" için tanımlıyor ve guardrail reddi `failed` + `guardrail_block` ile ayrı. Karar **A**: `completed` + `outcome_label=declined` + tanımdaki `unknown_reply` metni + `progress` `{"skipped_model": "no_sources"}` + boş `sources`. 09/13b modelin "bulamadım"ı ile modelsiz yolu aynı etikette sayar; PR'da bu birleşimi bir cümleyle yaz. Mevcut kodun doğru, devam.
 
-### K-06a-0005 · 2026-10-29 18:36 · → isci-a · GOREV-EK
+### K-06a-0005 · 2026-10-29 18:28 · → isci-a · GOREV-EK
 Paket: 06a   Cevap: -
 Kullanıcı kullanım senaryoları listesi ekledi (plan/18-kullanim-senaryolari.md, F9). 06a'ya küçük additive ek: `POST /runs/{id}/feedback` `{vote: correct|partial|wrong, note?: str <= 2000}` → `messages.feedback` (son asistan mesajı; alan zaten veri modelinde) + Langfuse `score` (02 `tracing.py` ile; Langfuse kapalıysa `trace_delivery_failed`, istek yine 200) + audit. Yetki: proje üyesi `write` (`read` 403, `user` yalnız kendi run'ı); `GET /runs?feedback=pending` filtresi ("bekleyenler": feedback olmayan tamamlanmış run'lar). OpenAPI 06a.yaml'a; test `test_06a_<n>_feedback_*` (önce kırmızı). Rubrik ve dataset otomasyonu 09'da, burada yok. Dilim 5'ten sonra, PR-HAZIR'dan önce.
 
-### K-SEN-0000 · 2026-10-29 18:36 · → kullanici · DURUM
+### K-SEN-0000 · 2026-10-29 18:28 · → kullanici · DURUM
 Paket: 18 (kullanım senaryoları)   Cevap: -
 TASLAK; yeni test oturumu (`ROL=test PAKET=18-hazirlik`) OKUMA-TAMAM yazınca K-SEN-0001 GOREV olarak verilir. İçerik: plan/18-kullanim-senaryolari.md "Aşama 1" veri hazırlığı: (1) `data/samples/eval/sql-20.json` (13a'daki 5 SQL sorusu + 15 yeni; beklenen sonuçlar demo DB seed'inden deterministik, doğrulama testi seed'e karşı), (2) `data/samples/tickets/` 20 sentetik bilet/e-posta (Faker TR, kişi adı yok, DECISION-24; sınıf etiketleri; 5'inde sentetik PII), (3) sahte `ticket-sink` MCP aracı tasarımı (05a `services/mcp-search` deseniyle; "gönder" çağrısını kaydeder, dışarı gitmez) → PLANNED'da tasarım, kod 05a merge sonrası, (4) F4 için sahte sağlayıcı yakalama: 01 `fake-llm`'e "son istek gövdesi" ucu (01 touch-zone, isci-b ile; ya da LiteLLM erişim logu) kararı planda. Branch feat/18-scenario-data (main'den), `FFCORE_VERSION=0.0.0-18`, touch-zone: data/samples/{eval,tickets}/**, data/samples/scripts/**, tests/e2e/scenarios/** (yeni), docs/demo.md taslağı. Önce PLANNED (state/pr/18-hazirlik.md).
