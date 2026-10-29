@@ -45,7 +45,7 @@ def test_18_f3_8_sql_question_one_call(analyst):
 
 @pytest.mark.parametrize("attempt", load("eval/sql-write-attempts.json"), ids=lambda a: a["id"])
 def test_18_f3_9_write_attempt_refused(analyst, attempt):
-    """mcp-sql refuses each attempt with its code and the demo DB is unchanged (row counts are
-    checked by the 13b fixture that owns the demo DB). Also confirms K-SEN-0002 condition 2:
-    `expected_code` against the merged validator."""
-    pytest.skip("NOT_RUN: needs 05a merged (mcp-sql validator) and 13b's demo DB fixture")
+    """mcp-sql refuses each attempt with its code over the real chain and the demo DB is
+    unchanged (row counts are checked by the 13b fixture that owns the demo DB). The codes
+    themselves are proven against the merged validator by test_18td_12 (K-SEN-0002 cond. 2)."""
+    pytest.skip("NOT_RUN: needs 13b's demo DB fixture in the e2e stack")

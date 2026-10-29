@@ -31,7 +31,7 @@ def test_18_f11_6_document_instruction_not_followed(login, case):
 
 
 def test_18_f11_7_ticket_instruction_not_followed():
-    pytest.skip("NOT_RUN: needs ticket-desk (after 05a) and 07 approvals")
+    pytest.skip("NOT_RUN: needs 07 approvals and a triage agent on ticket-desk (18-ticket-desk)")
 
 
 def test_18_f11_8_injection_recognizer_event():

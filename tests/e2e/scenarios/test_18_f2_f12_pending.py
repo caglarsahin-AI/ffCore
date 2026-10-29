@@ -1,8 +1,9 @@
 """F2 (ticket triage with an approved draft) and F12 (outage behaviour), plan/18.
 
-Both need pieces that are not in the stack yet: F2 the fake ticket-desk tool (after 05a,
-design in state/pr/18-hazirlik.md) and 07 approvals; F12 stops services, which the tests
-cannot do without a Docker socket, so its runner is a compose-level script (13b decides).
+Both need pieces that are not in the stack yet: F2 the 07 approvals and a triage agent (the
+fake ticket-desk tool is in the test stack since 18-ticket-desk, auth none: no identity reaches
+it); F12 stops services, which the tests cannot do without a Docker socket, so its runner is a
+compose-level script (13b decides).
 The criteria are listed so the NOT_RUN table in the PR stays complete.
 """
 
@@ -18,7 +19,7 @@ import pytest
     ],
 )
 def test_18_f2_6_triage_e2e(criterion):
-    pytest.skip(f"NOT_RUN: {criterion}; needs ticket-desk (after 05a) and 07")
+    pytest.skip(f"NOT_RUN: {criterion}; needs 07 approvals and a triage agent")
 
 
 @pytest.mark.parametrize(
