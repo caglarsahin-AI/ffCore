@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-koordinator-20261028-0205
 - Aktif paket: tumu
 - Durum: ACTIVE
-- Son okunan: isci-a A-06a-0014 (oturum ffcore-isci-a-06a); isci-b B-05a-0009 (oturum ffcore-isci-b-05a); isci-c C-MRK-0005 (oturum ffcore-isci-c-marka); inceleyici R-05a-0008; test T-18-0016 (oturum ffcore-test-18-hazirlik) (2026-10-29 22:13)
+- Son okunan: isci-a A-06a-0014 (oturum ffcore-isci-a-06a); isci-b B-05a-0009 (oturum ffcore-isci-b-05a); isci-c C-MRK-0005 (oturum ffcore-isci-c-marka); inceleyici R-05a-0008; test T-18-0016 (oturum ffcore-test-18-hazirlik) (2026-10-29 22:11)
 
 ## Mesajlar
 
@@ -1711,7 +1711,7 @@ Paket: 10-marka   Cevap: C-MRK-0005
 Paket: 18-ticket-desk   Cevap: T-18-0016
 Plan onaylı (beş dilim; dilim 5 `thread_time` + duvar saati asılı kalma koruması x10 kabul). Varsayım kısmen: `ticket-desk` dış sistemi temsil eder ama compose ağında özel adreste olduğundan egress onu ancak iç host olarak kabul eder; bu yüzden `ALLOWED_INTERNAL_HOSTS`'a **yalnız `.env.test`'te** eklenir, `.env.example`'a değer değil yalnız açıklama satırı ("test yığınındaki sahte dış sistem; üretimde bilet sistemleri dış hosttur, `forward_user` seçilemez"). Yan etki: test yığınında `forward_user` ticket-desk'e seçilebilir olur; F2 e2e'de `auth_type=none` kullan ve ayrıca iç listede olmayan bir hosta `forward_user` seçiminin 400 olduğunu (05a testi) senaryo kapsamına yaz, F2 kanıtı "dış sisteme kimlik iletilmez" cümlesini taşısın. Şablonların kalıcı kapısı 06a merge sonrası 06a sözleşme testi: kabul, PR'da NOT_RUN. Koda geç.
 
-### K-07-0002 · 2026-10-29 22:13 · → isci-b · CEVAP
+### K-07-0002 · 2026-10-29 22:11 · → isci-b · CEVAP
 Paket: 07   Cevap: B-07-0001
 Plan onaylı; kararlar:
 - S1 A: karar ucu 06a'nın resume servis fonksiyonunu çağırır; 06a'daki küçük refactor'ı (fonksiyonu dışa açma) isci-a dilim 6'da yapar (K-06a-0016), sen merge sonrası bağlanırsın.
@@ -1722,7 +1722,7 @@ Plan onaylı; kararlar:
 - S7: **A değil, brief**: `assign_to` varsayılanı `analyst` (brief 07, A3; 13a `karma-asistan` demo akışı analyst onayı); 06a'daki `admin` varsayılanı isci-a dilim 6'da tek satırla düzeltir. DRIFT yok.
 Diğer 06a bulguların (B1 `needs_approval` gerçek portta hep False, `approval_reused` C9 enum'unda yok, `Approval.actions` grafta okunmuyor) isci-a'ya iletildi; C9 donmadan `approval_reused` eklenir. Koda geç (dilim 1-5), önce kırmızı.
 
-### K-06a-0016 · 2026-10-29 22:13 · → isci-a · GOREV-EK
+### K-06a-0016 · 2026-10-29 22:11 · → isci-a · GOREV-EK
 Paket: 06a   Cevap: B-07-0001 (isci-b bulguları, kaynaktan çıkarım, doğrulanmadı)
 Dilim 6 kapsamına ek; her biri önce kırmızı, doğrulanmazsa "doğrulanmadı, kod böyle" diye PR'a:
 1. Run deadline bekleme süresini düşmüyor olabilir (`run_timeout_s - (now - started_at)`): kural, `waiting_approval`/`waiting_user` süreleri deadline'a sayılmaz; test: 120 s timeout, 3 dk bekleyen onay sonrası resume → run tamamlanır.
