@@ -132,7 +132,9 @@ function DocumentRow({
           <span className="block text-muted-foreground">{t("seconds", { seconds: document.convert_seconds.toFixed(1) })}</span>
         )}
       </TableCell>
-      <TableCell className="text-right align-top font-mono">{document.chunk_count}</TableCell>
+      <TableCell className="text-right align-top font-mono" data-testid="document-chunks">
+        {document.chunk_count}
+      </TableCell>
       <TableCell className="text-right align-top font-mono">{document.version}</TableCell>
       <TableCell className="align-top text-sm" data-testid="document-access">
         {open ? t("accessOpen") : [...document.acl_roles.map((role) => tAccess(`roles.${role}`)), ...document.acl_users].join(", ")}
