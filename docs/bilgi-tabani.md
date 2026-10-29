@@ -37,6 +37,19 @@ Every file converts in a worker process with `CONVERT_TIMEOUT_SECONDS` (600); pa
 is killed, the document is `timeout` and the next file goes on. A `timeout` is not retried by a
 plain reindex.
 
+Limits, each a recorded refusal with a code (the file's content is never in the message):
+
+| Limit | Default | Code |
+|---|---|---|
+| One upload request, checked before the body is parsed | `UPLOAD_MAX_REQUEST_BYTES` (516 MiB) | HTTP 413 `request_too_large` |
+| One file (Kapı 0; streamed to disk, nothing stored past it) | 5 MB plain text, 500 MB others | `too_large` |
+| ZIP containers (docx, pptx, vsdx): members, expanded bytes, per-member ratio | 10 000, 512 MiB, 100x | `archive_too_many_members`, `archive_too_large`, `archive_ratio` |
+| draw.io diagram payload inflated | 64 MiB | `diagram_too_large` |
+| PDF pages, page size rendered at 150 dpi | 5 000, 40 M pixels | `pdf_too_many_pages`, `pdf_page_too_large` |
+| Converter process address space | `CONVERT_MEMORY_LIMIT_MB` (10240) | `convert_memory_limit` |
+| Converter CPU per file | `CONVERT_CPU_LIMIT_SECONDS` (3600) | `convert_cpu_limit` |
+| Worker container memory | `WORKER_MEM_LIMIT` (6g) | `worker_died` |
+
 ## Quality gates
 
 Each gate keeps its own status (`ok`, `flagged`, `skipped`) and reason; nothing is deleted, and
@@ -58,10 +71,12 @@ documents).
 ## Chunking
 
 Heading-aware, greedy packing from `chunk_size` (400 tokens) up to 1.5 × that (600), no
-overlap; tokens are estimated as max(words × 1.6, characters / 6) because Turkish tokenizes
-heavier and text without spaces must still be counted. Over-long text is split by paragraph,
-sentence and word, so no chunk exceeds 600 × 6 characters. The embedded text starts with the
-breadcrumb (`Knowledge base › file › section`); attachments get `Ek: <file>`. On reindex a chunk
+overlap, counted with the embedding model's own tokenizer (`FAKE_EMBED=1` uses the estimate
+max(words × 1.6, characters / 6)). The 600 covers the whole embedded text: the breadcrumb
+(`Knowledge base › file › section`; attachments get `Ek: <file>`) plus the body. Over-long text
+is split by paragraph, sentence and word, and a word longer than the limit by the tokenizer
+itself; nothing is cut. A breadcrumb taking more than half of the limit fails the document with
+`chunk_breadcrumb_too_long`. On reindex a chunk
 whose text and embedding model are unchanged takes its vector over; a new embedding model
 re-embeds everything.
 
@@ -83,9 +98,28 @@ re-embeds everything.
 - Model weights live in the `model_cache` volume, never in the image. Keep it when closing a
   stack (`docker compose down`, not `down -v`).
 
+## Model weights (offline)
+
+Both profiles run offline: images and Compose set `HF_HUB_OFFLINE=1` and
+`TRANSFORMERS_OFFLINE=1`, every loader reads a local path from the cache, and PaddleOCR gets
+explicit directories under `/models/paddleocr`. Nothing downloads at run time; a missing weight
+is `model_missing` with the model name and the path it was looked for in (in `/readyz`, in the
+worker log at start, on the file that needed it). The tokenizer is required for every document,
+so the worker does not start without it.
+
+Weights come from one separate step, run once per installation by an operator. It connects out
+(airgap: set `HF_ENDPOINT` to the internal mirror):
+
+```bash
+docker compose run --rm tools make models
+```
+
+`make models-check` lists every weight and where it is, offline; exit 1 when one is missing.
+
 ## Readiness
 
-`GET /readyz` is 503 `warming` until both models are loaded, then checks the `chunks.embedding`
+`GET /readyz` is 503 `warming` until both models are loaded (`model_missing` when a weight is
+not in the cache), then checks the `chunks.embedding`
 size against `EMBED_DIM`, the vector store, and (with `INFERENCE_BACKEND=ollama`) that
 `OLLAMA_CONTEXT_LENGTH` is set and not below any active Ollama model's `limits.context_tokens`
 (`context_configuration_invalid`). The context Ollama actually applies at run time is not

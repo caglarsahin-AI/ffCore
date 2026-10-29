@@ -226,7 +226,7 @@ openapi/04a.yaml`; contract test `test_04a_20_*`). Lists are `{"data": [...]}`. 
 |---|---|---|
 | `GET ""`, `GET /{kb_id}` | analyst | counts of documents and chunks; `chunk_max_tokens` is derived (1.5 × `chunk_size`) |
 | `POST ""`, `PATCH /{kb_id}`, `DELETE /{kb_id}` | admin + edit | one embedding model per installation: `embed_model`/`embed_dim` other than `EMBED_MODEL`/`EMBED_DIM` is 400 `embed_model_mismatch` / `embed_dim_mismatch`; `chunk_overlap` other than 0 is 422 `chunk_overlap_unsupported` |
-| `POST /{kb_id}/documents` | analyst + edit | multipart, several `files`; 202 with `outcome` per file: `created`, `new_version` (same file name, new content), `unchanged` (same bytes: version + 1, nothing queued) |
+| `POST /{kb_id}/documents` | analyst + edit | multipart, several `files`; 202 with `outcome` per file: `created`, `new_version` (same file name, new content), `unchanged` (same bytes: version + 1, nothing queued; an ACL change still reaches the vector store). A request over `UPLOAD_MAX_REQUEST_BYTES` is 413 `request_too_large` before the body is read |
 | `GET /{kb_id}/documents`, `GET …/{document_id}` | analyst | status, the three gate decisions with reasons, converter and seconds |
 | `DELETE …/{document_id}` | analyst + edit | the document leaves search at once; raw stays on disk |
 | `POST /{kb_id}/reindex` | analyst + edit | `{layer: silver or gold, full}`; gold never reads raw or the source |

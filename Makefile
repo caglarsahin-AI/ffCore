@@ -3,7 +3,7 @@
 # Servisleri başlatma/durdurma doğrudan compose ile: docker compose up -d --wait | down | logs -f
 # Önyüz lint'i ayrı konteynerde: docker compose run --rm frontend npm run lint
 
-.PHONY: lint format test test-int test-models smoke pull seed-models render-litellm reindex
+.PHONY: lint format test test-int test-models models models-check smoke pull seed-models render-litellm reindex
 
 lint:
 	ruff check backend scripts data/samples/scripts
@@ -17,12 +17,26 @@ format:
 test:
 	cd backend && pytest tests/unit tests/contract
 
+# Qdrant tests need the qdrant profile up (docker compose --profile qdrant up -d qdrant); the
+# defaults are the Compose service, so every run uses the same values (review r1).
+QDRANT_URL ?= http://qdrant:6333
+RUN_QDRANT_TESTS ?= 1
 test-int:
-	cd backend && pytest tests/integration
+	cd backend && QDRANT_URL=$(QDRANT_URL) RUN_QDRANT_TESTS=$(RUN_QDRANT_TESTS) pytest tests/integration
 
 # 04a: real model weights (bge-m3, reranker, Docling, PaddleOCR); required for VERIFIED (S4).
 test-models:
 	cd backend && RUN_MODEL_TESTS=1 pytest -m models -s tests
+
+# 04a: the one step that downloads model weights (bge-m3, reranker, Docling, PaddleOCR tr) into
+# the model_cache volume. It connects out (airgap: HF_ENDPOINT = the internal mirror) and is
+# run by the user, once per installation; everything else is offline (r1 MAJOR-6, K-04a-0020).
+models:
+	cd backend && HF_HUB_OFFLINE=0 TRANSFORMERS_OFFLINE=0 python -m ffcore.knowledge.models download
+
+# Every weight and where it is looked for; offline; exit 1 when one is missing.
+models-check:
+	cd backend && python -m ffcore.knowledge.models check
 
 smoke:
 	python scripts/smoke.py

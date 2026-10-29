@@ -223,6 +223,14 @@ services:
       RERANK_MIN_SCORE: ${RERANK_MIN_SCORE:-0.1}
       CONVERT_TIMEOUT_SECONDS: ${CONVERT_TIMEOUT_SECONDS:-600}
       OCR_PDF_MAX_PAGES: ${OCR_PDF_MAX_PAGES:-200}
+      # Converter process and upload limits (review r1 MAJOR-5; measured values in config.py).
+      # Offline by default in both profiles (review r1 MAJOR-6, K-04a-0020): weights come only
+      # from `make models`, never from a loader at run time.
+      HF_HUB_OFFLINE: ${HF_HUB_OFFLINE:-1}
+      TRANSFORMERS_OFFLINE: ${TRANSFORMERS_OFFLINE:-1}
+      CONVERT_MEMORY_LIMIT_MB: ${CONVERT_MEMORY_LIMIT_MB:-10240}
+      CONVERT_CPU_LIMIT_SECONDS: ${CONVERT_CPU_LIMIT_SECONDS:-3600}
+      UPLOAD_MAX_REQUEST_BYTES: ${UPLOAD_MAX_REQUEST_BYTES:-541065216}
       ALLOWED_LANGUAGES: ${ALLOWED_LANGUAGES:-tr,en}
       ARQ_QUEUE_INGEST: ${ARQ_QUEUE_INGEST:-ingest}
       OFFLINE: ${OFFLINE:?OFFLINE tanımlı değil}
@@ -273,6 +281,10 @@ services:
     image: ${REGISTRY_PREFIX}ffcore/backend:${FFCORE_VERSION:?FFCORE_VERSION tanımlı değil}
     command: ["arq", "ffcore.knowledge.worker.WorkerSettings"]
     restart: unless-stopped
+    # Container memory budget (review r1 MAJOR-5): the converter process peaked at 2.3 GB
+    # resident with Docling, 1.7 GB with PaddleOCR (2026-10-29), plus the arq process. Past it
+    # the kernel kills the converter, the file is `worker_died` and a fresh process goes on.
+    mem_limit: ${WORKER_MEM_LIMIT:-6g}
     environment:
       <<: *app-env
       INTERNAL_API_URL: http://backend:8000
