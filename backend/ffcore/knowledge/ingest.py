@@ -19,7 +19,7 @@ import uuid
 from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Protocol
+from typing import BinaryIO, Protocol
 
 import yaml
 from sqlalchemy import select
@@ -27,14 +27,19 @@ from sqlalchemy import select
 from ffcore.core import db
 from ffcore.core.config import Settings
 from ffcore.knowledge import gates, scope
-from ffcore.knowledge.chunking import BREADCRUMB_SEPARATOR, ChunkSettings, chunk_markdown
+from ffcore.knowledge.chunking import (
+    BREADCRUMB_SEPARATOR,
+    ChunkingError,
+    ChunkSettings,
+    chunk_markdown,
+)
 from ffcore.knowledge.convert import pipeline as convert_pipeline
 from ffcore.knowledge.convert.types import CONVERTED, TIMEOUT, ConversionResult
-from ffcore.knowledge.convert.workers import PersistentPool
+from ffcore.knowledge.convert.workers import Limits, PersistentPool
 from ffcore.knowledge.embed import Embeddings, get_embedder, token_counter
 from ffcore.knowledge.normalize import NORMALIZER_CONFIG_ID, clean_markdown
 from ffcore.knowledge.store import NewChunk, PgKnowledgeStore, text_hash
-from ffcore.knowledge.vectorstore.base import VectorRecord, VectorStore
+from ffcore.knowledge.vectorstore.base import VectorRecord, VectorStore, VectorStoreError
 from ffcore.models.knowledge import Attachment, Chunk, Document, KnowledgeBase
 
 log = logging.getLogger("ffcore.knowledge.ingest")
@@ -96,7 +101,7 @@ class HttpEmbedClient:
 Converter = Callable[[Path, str, Settings], ConversionResult]
 
 
-_pools: dict[int, PersistentPool] = {}
+_pools: dict[tuple[int, Limits], PersistentPool] = {}
 
 
 def close_pools() -> None:
@@ -113,10 +118,11 @@ atexit.register(close_pools)
 def convert_bounded(path: Path, filename: str, settings: Settings) -> ConversionResult:
     """Convert in this process's long-lived worker (timeout kill, models loaded once)."""
     timeout = settings.convert_timeout_seconds
-    pool = _pools.get(timeout)
+    limits = Limits(settings.convert_memory_limit_mb, settings.convert_cpu_limit_seconds)
+    pool = _pools.get((timeout, limits))
     if pool is None:
-        pool = _pools[timeout] = PersistentPool(
-            timeout=timeout, name="ingest", target=convert_pipeline.CONVERT_TARGET
+        pool = _pools[(timeout, limits)] = PersistentPool(
+            timeout=timeout, name="ingest", target=convert_pipeline.CONVERT_TARGET, limits=limits
         )
     return pool.convert(path)
 
@@ -170,39 +176,133 @@ class IngestReport:
     embedded: int = 0
 
 
+STAGE_CHUNK_BYTES = 1024 * 1024
+
+
+@dataclass(frozen=True)
+class StagedUpload:
+    """One uploaded file streamed to disk: hash and size of every byte; `path` is None when
+    the file passed Kapı 0's size limit (nothing of it is kept)."""
+
+    sha256: str
+    size: int
+    path: Path | None
+
+
+def stage_upload(source: BinaryIO, filename: str, settings: Settings) -> StagedUpload:
+    """Copy an upload in 1 MiB pieces (review r1 MAJOR-5): memory stays bounded and bytes
+    past the size limit are hashed and counted, never written."""
+    limit = scope.max_bytes(filename)
+    staging = Path(settings.knowledge_storage_dir) / "staging"
+    staging.mkdir(parents=True, exist_ok=True)
+    path = staging / uuid.uuid4().hex
+    digest, size = hashlib.sha256(), 0
+    with path.open("wb") as out:
+        while chunk := source.read(STAGE_CHUNK_BYTES):
+            digest.update(chunk)
+            size += len(chunk)
+            if size <= limit:
+                out.write(chunk)
+    if size > limit:
+        path.unlink()
+        return StagedUpload(digest.hexdigest(), size, None)
+    return StagedUpload(digest.hexdigest(), size, path)
+
+
 async def register_upload(
     session,
     kb_id: uuid.UUID,
     *,
     filename: str,
-    data: bytes,
+    data: bytes | None = None,
+    staged: StagedUpload | None = None,
     acl_roles: list[str],
     acl_users: list[uuid.UUID],
     created_by: str,
     settings: Settings,
+    vector_store: VectorStore | None = None,
 ):
-    """Pipeline step 1 for a manual upload: raw file, sha256, version, Kapı 0 (scope, size)."""
+    """Pipeline step 1 for a manual upload: sha256, version, Kapı 0 (scope, size), raw file.
+
+    The content is `data` (tests, small inputs) or a `staged` file (the API). Kapı 0 runs before
+    the raw write: a refused file is recorded with its reason and never stored (r1 MAJOR-5).
+
+    An ACL change of an existing document is pushed to `vector_store` before this returns,
+    also when the bytes are unchanged and nothing is re-indexed (review r1 MAJOR-1). A store
+    failure raises: the caller's transaction (and the ACL change) is rolled back, fail-loud.
+    """
+    try:
+        return await _register(
+            session,
+            kb_id,
+            filename,
+            data,
+            staged,
+            acl_roles,
+            acl_users,
+            created_by,
+            settings,
+            vector_store,
+        )
+    finally:
+        if staged is not None and staged.path is not None:
+            staged.path.unlink(missing_ok=True)
+
+
+async def _register(
+    session,
+    kb_id,
+    filename,
+    data,
+    staged,
+    acl_roles,
+    acl_users,
+    created_by,
+    settings,
+    vector_store,
+):
     kb = await session.get(KnowledgeBase, kb_id)
-    sha = hashlib.sha256(data).hexdigest()
+    if data is not None:
+        sha, size = hashlib.sha256(data).hexdigest(), len(data)
+    else:
+        sha, size = staged.sha256, staged.size
+    previous = (
+        await session.execute(
+            select(Document.id, Document.acl_roles, Document.acl_users).where(
+                Document.kb_id == kb_id,
+                Document.filename == filename,
+                Document.deleted_at.is_(None),
+            )
+        )
+    ).first()
     document, outcome = await PgKnowledgeStore(session).register_upload(
         kb,
         filename=filename,
         sha256=sha,
-        size=len(data),
+        size=size,
         raw_path="",
         acl_roles=acl_roles,
         acl_users=acl_users,
         created_by=created_by,
     )
     if outcome != "unchanged":
-        target = raw_dir(settings, document) / _raw_name(filename)
-        target.parent.mkdir(parents=True, exist_ok=True)
-        target.write_bytes(data)
-        document.raw_path = str(target)
-        status, reason = scope.gate0_upload(filename, len(data))
+        status, reason = scope.gate0_upload(filename, size)
         document.gate0_status, document.gate0_reason = status, reason
         document.status = "skipped" if status == "skipped" else "pending"
+        if status != "skipped":
+            target = raw_dir(settings, document) / _raw_name(filename)
+            target.parent.mkdir(parents=True, exist_ok=True)
+            if data is not None:
+                target.write_bytes(data)
+            else:
+                staged.path.replace(target)
+            document.raw_path = str(target)
     await session.flush()
+    if previous is not None and vector_store is not None:
+        before = (sorted(previous.acl_roles), sorted(map(str, previous.acl_users)))
+        after = (sorted(acl_roles), sorted(map(str, acl_users)))
+        if before != after:
+            await vector_store.update_acl(kb_id, document.id, acl_roles, acl_users)
     # Server-side timestamps expire on flush; load them now, not lazily in sync code later.
     await session.refresh(document)
     return document, outcome
@@ -301,7 +401,7 @@ async def ingest_document(
             await session.commit()
             return IngestReport(document_id, "skipped")
         raw = Path(document.raw_path)
-        document.status = "converting"
+        document.status, document.error = "converting", None
         started = time.monotonic()
         result = await asyncio.to_thread(convert, raw, document.filename, settings)
         document.convert_engine = result.method
@@ -357,8 +457,10 @@ async def ingest_document(
             (document.gate2_status, document.gate2_reason) if document.gate2_status else None,
         )
         if final[0] == "skipped":
-            await store_.replace_chunks(document, [], embed_client.model)
+            # Vector store first: the pgvector driver updates chunks in its own session and would
+            # wait forever on rows this transaction already deleted (review r1 MAJOR-2).
             await store.delete_by_document(document.id)
+            await store_.replace_chunks(document, [], embed_client.model)
             document.status = "skipped"
             await session.commit()
             return IngestReport(document_id, "skipped")
@@ -405,9 +507,16 @@ async def _gold(
         document = await session.get(Document, document_id, with_for_update=True)
         kb = await session.get(KnowledgeBase, document.kb_id)
         document.status = "chunking"
-        new_chunks = _chunks_for(
-            kb, document, read_silver(Path(document.silver_path)), token_counter(settings)
-        )
+        try:
+            new_chunks = _chunks_for(
+                kb, document, read_silver(Path(document.silver_path)), token_counter(settings)
+            )
+        except ChunkingError as exc:
+            # Fail loud (review r1 MAJOR-4): no chunk over the limit, no silent cut.
+            await session.rollback()
+            await _set_status(document_id, "failed", str(exc)[:1000])
+            log.error("gold document=%s chunking failed: %s", document_id, exc.code)
+            return IngestReport(document_id, "failed")
         store_ = PgKnowledgeStore(session)
         indexable = [c for c in new_chunks if c.chunk_status != "skipped"]
         reusable = await store_.reusable_vectors(
@@ -462,14 +571,29 @@ async def _gold(
                     records[i] = VectorRecord(**{**rec.__dict__, "sparse": sparse})
         await session.flush()
         reused = sum(1 for row in rows if row.chunk_status != "skipped" and row.id not in vectors)
-        document.status = "indexed"
+        # Not searchable yet: search reads only `indexed` documents (review r1 MAJOR-3).
+        document.status = "embedding"
         await session.commit()
-    await store.ensure_collection(kb.id, settings.embed_dim)
-    if store.name == "qdrant":
-        await store.delete_by_document(document_id)
-    await store.upsert(records)
+    try:
+        await store.ensure_collection(kb.id, settings.embed_dim)
+        if store.name == "qdrant":
+            await store.delete_by_document(document_id)
+        await store.upsert(records)
+    except VectorStoreError as exc:
+        # The rows stay (a retry re-publishes them idempotently); the status says what failed.
+        await _set_status(document_id, "failed", f"{exc.code}: vector publication failed")
+        log.error("gold document=%s publication failed: %s", document_id, exc.code)
+        return IngestReport(document_id, "failed", reused=reused, embedded=len(vectors))
+    await _set_status(document_id, "indexed", None)
     log.info("gold document=%s reused=%d embedded=%d", document_id, reused, len(vectors))
     return IngestReport(document_id, "indexed", reused=reused, embedded=len(vectors))
+
+
+async def _set_status(document_id: uuid.UUID, status: str, error: str | None) -> None:
+    async with db.session_scope() as session:
+        document = await session.get(Document, document_id, with_for_update=True)
+        document.status, document.error = status, error
+        await session.commit()
 
 
 async def ingest_from_raw(
@@ -540,7 +664,9 @@ async def reindex_gold(
             Document.kb_id == kb_id,
             Document.deleted_at.is_(None),
             Document.silver_path.is_not(None),
-            Document.status.in_(("indexed",) if not full else ("indexed", "embedding", "chunking")),
+            Document.status.in_(
+                ("indexed",) if not full else ("indexed", "embedding", "chunking", "failed")
+            ),
         )
         ids = list((await session.scalars(statement)).all())
     report = ReindexReport()

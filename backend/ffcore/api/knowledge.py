@@ -7,11 +7,13 @@ caller's role and every role below it, plus the caller's own id; a document with
 to the project's members (C15).
 """
 
+import asyncio
+import uuid
 from typing import Annotated
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, File, Form, Header, Request, UploadFile, status
-from sqlalchemy import func, select
+from sqlalchemy import and_, func, or_, select
 
 from ffcore.api.common import (
     ERROR_RESPONSES,
@@ -66,6 +68,10 @@ RunIdHeader = Annotated[
 ]
 # A manual upload without an ACL gets this, shown in the response (brief 04, C15).
 DEFAULT_UPLOAD_ROLES = ["analyst"]
+# Audit payloads of document mutations keep only safe fields (K-04a-0017): ids, version,
+# status, counts, hashes, gate decisions. These are masked: file names and free text may carry
+# personal data. test_04a_r1_7_document_fields_are_classified keeps the split complete.
+DOCUMENT_AUDIT_MASKED = ("filename", "metadata", "breadcrumb", "error", "mime_sniffed")
 
 
 def queue_dependency(settings: Annotated[Settings, Depends(get_settings)]) -> jobs.JobQueue:
@@ -88,17 +94,30 @@ async def _kb(session, project_id: UUID, kb_id: UUID) -> KnowledgeBase:
     return kb
 
 
-async def _kb_out(session, kb: KnowledgeBase) -> KnowledgeBaseOut:
+def visible(filters: VectorFilters):
+    """The document ACL as a SQL condition (C15): no ACL at all, a listed role or the caller.
+    Applied to search and to every metadata surface: get, list and counts (K-04a-0017)."""
+    conditions = [
+        and_(func.cardinality(Document.acl_roles) == 0, func.cardinality(Document.acl_users) == 0)
+    ]
+    if filters.acl_roles:
+        conditions.append(Document.acl_roles.overlap(list(filters.acl_roles)))
+    if filters.acl_users:
+        conditions.append(Document.acl_users.overlap([uuid.UUID(u) for u in filters.acl_users]))
+    return or_(*conditions)
+
+
+async def _kb_out(session, kb: KnowledgeBase, filters: VectorFilters) -> KnowledgeBaseOut:
     documents = await session.scalar(
         select(func.count())
         .select_from(Document)
-        .where(Document.kb_id == kb.id, Document.deleted_at.is_(None))
+        .where(Document.kb_id == kb.id, Document.deleted_at.is_(None), visible(filters))
     )
     chunks = await session.scalar(
         select(func.count())
         .select_from(Chunk)
         .join(Document, Document.id == Chunk.document_id)
-        .where(Chunk.kb_id == kb.id, Document.deleted_at.is_(None))
+        .where(Chunk.kb_id == kb.id, Document.deleted_at.is_(None), visible(filters))
     )
     data = {c.key: getattr(kb, c.key) for c in KnowledgeBase.__table__.columns}
     return KnowledgeBaseOut(
@@ -109,8 +128,11 @@ async def _kb_out(session, kb: KnowledgeBase) -> KnowledgeBaseOut:
     )
 
 
-async def _kb_before(session, project_id: UUID, kb_id: UUID, **_) -> KnowledgeBaseOut:
-    return await _kb_out(session, await _kb(session, project_id, kb_id))
+async def _kb_before(
+    session, project_id: UUID, kb_id: UUID, request: Request, actor: Actor, **_
+) -> KnowledgeBaseOut:
+    kb = await _kb(session, project_id, kb_id)
+    return await _kb_out(session, kb, acl_for(request, actor))
 
 
 def _document_out(document: Document, chunk_count: int) -> DocumentOut:
@@ -185,7 +207,9 @@ def _vector_error(exc: VectorStoreError) -> ApiError:
 
 
 @router.get("", response_model=KnowledgeBaseList)
-async def list_knowledge_bases(project_id: UUID, actor: Reader, session: SessionDep):
+async def list_knowledge_bases(
+    project_id: UUID, request: Request, actor: Reader, session: SessionDep
+):
     kbs = (
         await session.scalars(
             select(KnowledgeBase)
@@ -193,7 +217,8 @@ async def list_knowledge_bases(project_id: UUID, actor: Reader, session: Session
             .order_by(KnowledgeBase.key)
         )
     ).all()
-    return KnowledgeBaseList(data=[await _kb_out(session, kb) for kb in kbs])
+    acl = acl_for(request, actor)
+    return KnowledgeBaseList(data=[await _kb_out(session, kb, acl) for kb in kbs])
 
 
 @router.post("", response_model=KnowledgeBaseOut, status_code=status.HTTP_201_CREATED)
@@ -238,12 +263,15 @@ async def create_knowledge_base(
     session.add(kb)
     await session.flush()
     await session.refresh(kb)
-    return await _kb_out(session, kb)
+    return await _kb_out(session, kb, acl_for(request, actor))
 
 
 @router.get("/{kb_id}", response_model=KnowledgeBaseOut)
-async def get_knowledge_base(project_id: UUID, kb_id: UUID, actor: Reader, session: SessionDep):
-    return await _kb_out(session, await _kb(session, project_id, kb_id))
+async def get_knowledge_base(
+    project_id: UUID, kb_id: UUID, request: Request, actor: Reader, session: SessionDep
+):
+    kb = await _kb(session, project_id, kb_id)
+    return await _kb_out(session, kb, acl_for(request, actor))
 
 
 @router.patch("/{kb_id}", response_model=KnowledgeBaseOut)
@@ -263,7 +291,7 @@ async def update_knowledge_base(
         setattr(kb, field, value)
     await session.flush()
     await session.refresh(kb)
-    return await _kb_out(session, kb)
+    return await _kb_out(session, kb, acl_for(request, actor))
 
 
 @router.delete("/{kb_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -292,12 +320,18 @@ async def delete_knowledge_base(
 
 
 @router.get("/{kb_id}/documents", response_model=DocumentList)
-async def list_documents(project_id: UUID, kb_id: UUID, actor: Reader, session: SessionDep):
+async def list_documents(
+    project_id: UUID, kb_id: UUID, request: Request, actor: Reader, session: SessionDep
+):
     kb = await _kb(session, project_id, kb_id)
     documents = (
         await session.scalars(
             select(Document)
-            .where(Document.kb_id == kb.id, Document.deleted_at.is_(None))
+            .where(
+                Document.kb_id == kb.id,
+                Document.deleted_at.is_(None),
+                visible(acl_for(request, actor)),
+            )
             .order_by(Document.filename)
         )
     ).all()
@@ -308,7 +342,7 @@ async def list_documents(project_id: UUID, kb_id: UUID, actor: Reader, session: 
 @router.post(
     "/{kb_id}/documents", response_model=UploadResult, status_code=status.HTTP_202_ACCEPTED
 )
-@audited("upload_documents", "document")
+@audited("upload_documents", "document", redact_fields=DOCUMENT_AUDIT_MASKED)
 async def upload_documents(
     project_id: UUID,
     kb_id: UUID,
@@ -345,11 +379,14 @@ async def upload_documents(
             session,
             kb.id,
             filename=upload.filename or "upload",
-            data=await upload.read(),
+            staged=await asyncio.to_thread(
+                ingest.stage_upload, upload.file, upload.filename or "upload", settings
+            ),
             acl_roles=roles,
             acl_users=users,
             created_by=actor.actor_id,
             settings=settings,
+            vector_store=jobs.get_vector_store(settings),
         )
         uploaded.append((document, outcome))
     out = []
@@ -361,11 +398,17 @@ async def upload_documents(
     return UploadResult(data=out)
 
 
-async def _document(session, project_id: UUID, kb_id: UUID, document_id: UUID) -> Document:
+async def _document(
+    session, project_id: UUID, kb_id: UUID, document_id: UUID, filters: VectorFilters
+) -> Document:
+    """A document the caller may read; otherwise 404, the same as a missing one (K-04a-0017)."""
     kb = await _kb(session, project_id, kb_id)
     document = await session.scalar(
         select(Document).where(
-            Document.id == document_id, Document.kb_id == kb.id, Document.deleted_at.is_(None)
+            Document.id == document_id,
+            Document.kb_id == kb.id,
+            Document.deleted_at.is_(None),
+            visible(filters),
         )
     )
     if document is None:
@@ -375,9 +418,14 @@ async def _document(session, project_id: UUID, kb_id: UUID, document_id: UUID) -
 
 @router.get("/{kb_id}/documents/{document_id}", response_model=DocumentOut)
 async def get_document(
-    project_id: UUID, kb_id: UUID, document_id: UUID, actor: Reader, session: SessionDep
+    project_id: UUID,
+    kb_id: UUID,
+    document_id: UUID,
+    request: Request,
+    actor: Reader,
+    session: SessionDep,
 ):
-    document = await _document(session, project_id, kb_id, document_id)
+    document = await _document(session, project_id, kb_id, document_id, acl_for(request, actor))
     counts = await _chunk_counts(session, [document.id])
     return _document_out(document, counts.get(document.id, 0))
 
@@ -395,7 +443,7 @@ async def delete_document(
     resource_id: DocumentIdDep,
 ) -> None:
     """Soft delete: the document leaves search at once (chunks removed); raw stays (D3)."""
-    document = await _document(session, project_id, kb_id, document_id)
+    document = await _document(session, project_id, kb_id, document_id, acl_for(request, actor))
     # Vector store first: the pgvector driver writes chunks in its own session, which would wait
     # forever on rows this request already deleted (and Qdrant must not keep points of a
     # document that is gone). A store failure leaves the document as it was (503).
