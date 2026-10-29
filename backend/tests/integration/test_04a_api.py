@@ -14,6 +14,7 @@ from ffcore.api.knowledge import queue_dependency
 from ffcore.core.auth import sign_on_behalf_of
 from ffcore.knowledge import ingest
 from ffcore.knowledge.vectorstore.pgvector import PgVectorStore
+from tests.converters import convert_without_weights
 from tests.dummy import EMBED_DIM, SERVICE_TOKEN
 from tests.integration.conftest import audit_rows
 
@@ -97,7 +98,7 @@ def process_all(settings, queue):
                     settings=settings,
                     store=PgVectorStore(),
                     embed_client=ingest.LocalEmbedClient(settings),
-                    convert=ingest.convert_inline,
+                    convert=convert_without_weights,
                 )
         queue.jobs.clear()
 

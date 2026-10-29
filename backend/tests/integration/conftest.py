@@ -1,9 +1,11 @@
 """Integration fixtures: a throwaway database on the compose Postgres, migrated with Alembic.
 
-Run in the tools container: docker compose run --rm tools make test-int (postgres must be up).
+Run in the tools container: docker compose --profile test --profile qdrant up -d --wait, then
+docker compose run --rm tools make test-int (docs/gelistirme-ortami.md).
 """
 
 import os
+import socket
 import subprocess
 import uuid
 from pathlib import Path
@@ -22,6 +24,42 @@ from tests.integration.litellm_support import (  # noqa: F401
 
 BACKEND = Path(__file__).resolve().parents[2]
 ALLOWED_DB_HOSTS = {"postgres", "localhost", "127.0.0.1"}
+
+# Services some integration tests need beyond the default stack (DRIFT-85). The documented
+# command starts them (docs/gelistirme-ortami.md); when one is still unreachable the run stops
+# once with that command, instead of every dependent test failing on its own.
+UP = "docker compose --profile test --profile qdrant up -d --wait"
+LITELLM_FIXTURES = {"catalog", "clean_litellm", "litellm_db", "llm_settings"}
+
+
+def _reachable(url: str) -> bool:
+    from urllib.parse import urlsplit
+
+    parts = urlsplit(url)
+    try:
+        with socket.create_connection((parts.hostname, parts.port or 80), timeout=3):
+            return True
+    except OSError:
+        return False
+
+
+def pytest_collection_modifyitems(config, items):
+    needed = {}
+    if os.environ.get("RUN_QDRANT_TESTS") == "1" and any(
+        "vectorstore" in i.keywords for i in items
+    ):
+        url = os.environ.get("QDRANT_URL") or "http://qdrant:6333"
+        needed["qdrant (profile qdrant)"] = url
+    if any(LITELLM_FIXTURES & set(i.fixturenames) for i in items):
+        from tests.integration.litellm_support import FAKE
+
+        needed["fake-llm (profile test)"] = FAKE
+    missing = [f"{name} at {url}" for name, url in needed.items() if not _reachable(url)]
+    if missing:
+        pytest.exit(
+            f"integration services not reachable: {', '.join(missing)}. Start them: {UP}",
+            returncode=1,
+        )
 
 
 def _admin_url() -> str:

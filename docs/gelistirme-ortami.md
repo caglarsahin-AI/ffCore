@@ -30,9 +30,15 @@ başlamaz. Geri alma: `docker compose run --rm migrate alembic downgrade <revizy
 | Python lint | `docker compose run --rm tools make lint` |
 | Önyüz lint | `docker compose run --rm frontend npm run lint` |
 | Unit + sözleşme testleri | `docker compose run --rm tools make test` |
-| Entegrasyon testleri | `docker compose run --rm tools make test-int` |
+| Entegrasyon testleri | `docker compose --profile test --profile qdrant up -d --wait && docker compose run --rm tools make test-int` |
 | Duman testi | `docker compose run --rm tools make smoke` |
 | Ollama modellerini çek | `docker compose run --rm tools make pull` |
+
+Testler model ağırlığı istemez: `make test` ve `make test-int` boş `model_cache` ile geçer. Gerçek
+ağırlıkla koşan testler `models` işaretlidir (`make models` sonrası `make test-models`). Entegrasyon
+testleri varsayılan yığına ek olarak `fake-llm` (profil `test`, 01) ve `qdrant` (profil `qdrant`,
+04a) ister; tablodaki komut ikisini de başlatır. Biri erişilemezse `make test-int` tek mesajla, bu
+komutu yazarak durur.
 
 `tools` konteyneri depo kökünü `/work` olarak bağlar (compose: `.:/work`) ve servislere compose ağından servis adıyla gider.
 Docker soketi bağlanmaz; konteyner içinden `docker` komutu çalışmaz.

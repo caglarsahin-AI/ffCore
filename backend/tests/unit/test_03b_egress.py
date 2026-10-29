@@ -1,5 +1,6 @@
 import json
 import logging
+import socket
 import threading
 import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -286,8 +287,15 @@ def test_03b_2_internal_host_allowed_by_name_and_cidr(settings, server_port):
 UNRESOLVABLE = "no-such-provider.invalid"  # RFC 6761: never resolves
 
 
+async def _nxdomain(host, port):
+    # What the system resolver raises for a name that does not exist. The real lookup is in
+    # tests/integration/test_03b_egress_dns.py: a unit test does not depend on Docker's DNS
+    # (DRIFT-85: in a clean stack the lookup ran into the 5 s budget).
+    raise socket.gaierror(socket.EAI_NONAME, "Name or service not known")
+
+
 def test_03b_2_unresolvable_host_is_request_failed(settings):
-    client = _client(settings, egress.system_resolver, allowed_internal_hosts=[UNRESOLVABLE])
+    client = _client(settings, _nxdomain, allowed_internal_hosts=[UNRESOLVABLE])
     with pytest.raises(EgressRequestFailed) as exc:
         anyio.run(_get, client, f"http://{UNRESOLVABLE}:11434/api/tags")
     assert exc.value.code == "egress_dns_failed"

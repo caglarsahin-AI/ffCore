@@ -18,6 +18,10 @@ PROSE = (
     "Bu sözleşme kapsamında yüklenici bakım hizmetini aylık olarak verir ve her ziyaret için "
     "bir rapor düzenler. Fesih bildirim süresi doksan gündür. "
 )
+EML = (
+    "Subject: Bakim raporu\nFrom: bakim@example.test\nDate: Tue, 1 Oct 2024 10:00:00 +0300\n"
+    "Content-Type: text/plain; charset=utf-8\n\n" + PROSE * 8
+)
 
 
 @pytest.fixture
@@ -85,8 +89,10 @@ def test_04a_upload_job_runs_in_worker(pg, make_project, settings):
             document, _ = await ingest.register_upload(
                 session,
                 kb_id,
-                filename="a.md",
-                data=(PROSE * 8).encode(),
+                # E-mail converts with the standard library: the worker's real path (bounded
+                # converter process) without model weights (DRIFT-85).
+                filename="a.eml",
+                data=EML.encode(),
                 acl_roles=["analyst"],
                 acl_users=[],
                 created_by="test",

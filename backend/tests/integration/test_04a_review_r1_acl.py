@@ -10,6 +10,7 @@ import pytest
 
 from ffcore.api.knowledge import queue_dependency
 from ffcore.knowledge import ingest, jobs
+from tests.converters import convert_without_weights
 
 API = "/api/v1"
 PROSE = (
@@ -95,7 +96,7 @@ def drain(w):
                 settings=w["settings"],
                 store=jobs.get_vector_store(w["settings"]),
                 embed_client=ingest.LocalEmbedClient(w["settings"]),
-                convert=ingest.convert_inline,
+                convert=convert_without_weights,
             )
         w["queue"].jobs.clear()
 
