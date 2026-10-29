@@ -1,6 +1,6 @@
 # PR: 10-marka (ürün ikonu ve marka görseli)
 
-**Paket:** 10-marka · **Sınıf:** [A] · **Branch:** feat/10-brand-icon · **Baz commit:** b6fc3d8 · **HEAD:** 92cc9a35da5a4f5927124d182e35e652d79d46ae (IMPLEMENTED; VERIFIED değil, ENV-92) · **Oturum:** ffcore-isci-c-marka
+**Paket:** 10-marka · **Sınıf:** [A] · **Branch:** feat/10-brand-icon · **Baz commit:** b6fc3d8 · **HEAD:** 62c8b21cfa857a16f0300c9629ec4d06503a0b8f (2 commit: 92cc9a3 kod, 62c8b21 docs + ekran görüntüleri) · **Oturum:** ffcore-isci-c-marka
 
 ## Plan (kodlamadan önce)
 
@@ -79,32 +79,31 @@
 - **Docs:**
   - `docs/onyuz.md`: "Brand" bölümü; kabul komutunda `langfuse-web`; aşama 2'de `--force-recreate` + `printenv` kontrolü; ekran görüntüsü satırları.
   - `docs/images/10mrk-*.png` (4 yeni) ve `10a-*.png` (16, yeni kenar çubuğu/giriş markasıyla yeniden üretildi).
+  - 62c8b21: aşama 2'de `export FAKE_EMBED=1` (nedeni açıklamada); `--force-recreate` satırı kaldırıldı.
 
 ## Kabul kriterleri → testler
 | # | Kriter | Test | Durum |
 |---|---|---|---|
-| 1 | favicon, icon, apple-icon bağlı; 200, doğru tür ve boyut | `test_10mrk_1_favicon_icons` | kırmızı (link yok) → yeşil (21:5x, slogan öncesi); slogan sonrası NOT_RUN (ENV-92) |
-| 2 | manifest bağlı; ad/açıklama `Home.*`'dan; 192/512 ikonlar | `test_10mrk_2_manifest` | kırmızı → yeşil (statik manifest ile); `app/manifest.ts` + description beklentisiyle NOT_RUN (ENV-92) |
-| 3 | kenar çubuğunda logo, açık ve daraltılmış, en/tr alt | `test_10mrk_3_sidebar_logo` ×2 | kırmızı → yeşil; slogan sonrası NOT_RUN |
-| 4 | girişte rozet + ad + yeni alt başlık, başlık ve meta açıklama | `test_10mrk_4_login_brand` ×2 | kırmızı → yeşil (eski alt başlıkla); yeni slogan beklentileriyle NOT_RUN |
-| 5 | iki tema PNG + axe 0 ihlal (giriş, projeler) | `test_10mrk_5_both_themes` ×4 | kırmızı → yeşil; yeni slogan PNG'leri NOT_RUN (`10mrk-*.png` eski alt başlığı gösteriyor, yeniden üretilmeli) |
+| 1 | favicon, icon, apple-icon bağlı; 200, doğru tür ve boyut | `test_10mrk_1_favicon_icons` | kırmızı (link yok) → yeşil; son kodda (92cc9a3) yeşil |
+| 2 | manifest bağlı; ad/açıklama `Home.*`'dan; 192/512 ikonlar | `test_10mrk_2_manifest` | kırmızı → yeşil; `app/manifest.ts` ile 92cc9a3'te yeşil |
+| 3 | kenar çubuğunda logo, açık ve daraltılmış, en/tr alt | `test_10mrk_3_sidebar_logo` ×2 | kırmızı → yeşil (92cc9a3) |
+| 4 | girişte rozet + ad + yeni alt başlık (en/tr), sayfa başlığı ve meta açıklama | `test_10mrk_4_login_brand` ×2 | kırmızı → yeşil (92cc9a3, yeni slogan) |
+| 5 | iki tema PNG + axe 0 ihlal (giriş, projeler) | `test_10mrk_5_both_themes` ×4 | kırmızı → yeşil (92cc9a3); `docs/images/10mrk-*.png` yeni sloganla |
 | 6 | üretim deterministik | `make_web_brand.py --check` | geçti: 9 dosya güncel; iki koşu md5 aynı (Pillow 12.2.0) |
 | - | messages anahtarları eşit, sabit renk/metin yok | Vitest `test_10a_8`, `test_10a_3`, `test_10ab_12` | geçti (114/114) |
 
 ## Çalıştırılan komutlar
 | Komut | Ortam | Exit | Not |
 |---|---|---|---|
-| `make_web_brand.py --check` (önce) | host py 3.12, Pillow 12.2.0 | 1 | kırmızı: 9 dosya eksik |
-| `make_web_brand.py` ×2 + `--check` | aynı | 0 | deterministik |
-| `npx eslint` / `npx tsc --noEmit` / `npx vitest run` | node:20.19.5-alpine + `ffcore-10a-nm`, son HEAD | 0 / 0 / 0 | Vitest 114/114 |
-| Playwright `10mrk` (kırmızı) | `-p marka`, `FFCORE_VERSION=0.0.0-marka`, `ALLOWED_INTERNAL_HOSTS=litellm,langfuse-web,fake-llm` | 1 | 10 failed (doğru nedenler) |
-| Playwright `10mrk` (yeşil, slogan öncesi) | aynı | 0 | 10 passed |
-| Tam e2e koşu 1 | aynı | 1 | aşama 1: 1/1. Aşama 2: 92 passed, 9 failed. Hepsi bilgi tabanı testi. Neden: backend aşama 2'de yeniden yaratılmadı, `FAKE_EMBED=0` kaldı, `/internal/embed` 500 (ortam). |
-| Tam e2e koşu 2 (`--force-recreate`, backend ve worker `FAKE_EMBED=1` doğrulandı) | aynı | durduruldu | Aşama 1: 1/1. Aşama 2: 79 ✓, 6 ✘ (`10bp1_10/11/18/2` ve `10af_12 provider form dark`), sonra Docker motoru takıldı (ENV-92, K-INIT-0014), koşu iptal edildi. Hata ayrıntısı rapora yazılmadı; neden doğrulanmadı. 10mrk testleri bu koşuda sıraya gelmedi. |
+| `make_web_brand.py --check` (önce / sonra) | host py 3.12, Pillow 12.2.0 | 1 / 0 | kırmızı 9 eksik; sonra deterministik |
+| `npx eslint` / `npx tsc --noEmit` / `npx vitest run` | node:20.19.5-alpine + `ffcore-10a-nm`, 92cc9a3 | 0 / 0 / 0 | borusuz çıkış kodu; Vitest 114/114. İlk lint koşusu `manifest.ts` renk ihlalini yakaladı, gerekçeli tek satır disable |
+| Playwright `10mrk` kırmızı / yeşil | `-p marka`, `0.0.0-marka`, `ALLOWED_INTERNAL_HOSTS=litellm,langfuse-web,fake-llm` | 1 / 0 | 10 failed (doğru nedenler) / 10 passed |
+| **Tam e2e, 92cc9a3 (K-INIT-0015 tek koşu)** | aynı; aşama 1 `FAKE_EMBED=0`, aşama 2 önekle `FAKE_EMBED=1` | 0 / 1 | Aşama 1: 1/1. Aşama 2: **92 passed, 9 failed** (1918 s). 10mrk 10/10, 10a, 10ab, 10af tümü ✓. 9 ✘ hepsi `10bp1` bilgi tabanı. |
+| Kök neden kanıtı | `docker inspect`/`/readyz` | - | Aşama 2'de `run e2e` backend'i yeniden yarattı (log "marka-backend-1 Recreate"); container env `FAKE_EMBED=0`, worker 1. `/readyz` 503 `model_missing`. Testlerin kendisi değil ortam. Docs düzeltildi (62c8b21, `export FAKE_EMBED=1`). |
+| Aşama 2 tekrarı (export ile) | backend env `FAKE_EMBED=1` doğrulandı | 125 | Docker motoru "error waiting for container" verdi, webServer başlamadı. Test sonucu yok (ENV-92 tekrarı). |
 
 **NOT_RUN:**
-- Slogan ekinden sonra 10mrk e2e ve yeni PNG'ler (ENV-92).
-- Tam e2e regresyonu temiz geçmedi. 10bp1 bilgi tabanı ve 10af_12 düşüşlerinin marka değişikliğiyle ilgisi doğrulanmadı. Değişiklik bu ekranlara dokunmuyor, ama kanıt yok.
+- 9 `10bp1` bilgi tabanı testinin doğru ortamda (`FAKE_EMBED=1` export) yeşil koşusu. Neden Docker motoru. Bu testlere dokunan değişiklik yok; düşüş nedeni kanıtlı ortam hatası.
 - Backend `make test`: yalnız `pyproject` description değişti.
 - Lighthouse (FOLLOWUP-37).
 
@@ -116,4 +115,4 @@
 
 ## Kalan riskler
 - `public/brand/ffcore-brand-variant-b-512.png` eski slogan "LLM Agent Runtime"ı gömülü taşıyor. Konsolda kullanılmıyor ama `/brand/` altında herkese açık. Yeni slogan render'ı gelince yeniden üretilmeli ya da kaldırılmalı.
-- `docs/images/10mrk-*.png` eski alt başlığı gösteriyor. Docker dönünce `test_10mrk_5` ile yeniden üretilecek.
+- Belgelenen 10bp1 kabul prosedürü (aşama 2 önekli `FAKE_EMBED`) bu makinede yanlış ortamda koşuyordu. 10bp1'in önceki yeşil kanıtı nasıl alındı, doğrulanmadı (compose sürümü farkı olabilir).

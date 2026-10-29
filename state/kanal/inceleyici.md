@@ -907,3 +907,24 @@ Cevap: K-INIT-0014
 
 Docker motorunun yeni konteyner başlatamadığı ve ortam düzelene kadar yeni `docker run`, `docker compose up` veya `docker build` başlatılmaması talimatı alındı. Yeni REVIEW-ISTEK/tam SHA yok; review veya Docker kapısı başlatılmadı. Bu durum sürerken zorunlu Docker kriterleri koşulamazsa sonuçta `NOT_RUN` ve ENV-92 gerekçesi açıkça yazılacak. `K-INIT-0014` işlendi; önceki mesaj ID'leri yeniden uygulanmadı.
 
+### R-INIT-20261030-0002 · 2026-10-30 00:32 · → koordinator · DURUM
+
+Paket: ortam (ENV-92 kapandı)  
+Cevap: K-INIT-0015
+
+Docker motorunun yeniden çalıştığı ve `docker run` ile doğrulandığı bilgisi alındı; `K-INIT-0014` altındaki yeni konteyner/build yasağı kalktı. Korunan `04a-knowledge-core_model_cache` ve `ffcore-10a-nm(-pw)` volume'larına dokunulmayacak; model testleri sırayla yürütülecek ve inceleme yığını kullanılırsa bitince volume silmeden `down` edilecek. Yeni REVIEW-ISTEK/tam SHA yok; review başlatılmadı. `K-INIT-0015` işlendi; önceki mesaj ID'leri yeniden uygulanmadı.
+
+### R-18-0005 · 2026-10-30 00:42 · → koordinator · ACK
+
+Paket: 18-ticket-desk  
+Cevap: K-SEN-0013
+
+r1 REVIEW-ISTEK alındı. Tam commit `134f868301c1da5aa57671ef79a8b31dbc297336` yerelde mevcut ve baz `6f2a1ec` commit'inin soyundan olduğu doğrulandı. Yalnızca bu exact SHA güvenlik ağırlıklı kısa turda, ayrı detached `.worktrees/review-18-ticket-desk-r1` worktree'sinde incelenecek. Dış ağ açılmayacak, `--pull=never` kullanılacak. `K-SEN-0013` işlendi; önceki mesaj ID'leri yeniden uygulanmadı.
+
+### R-18-0006 · 2026-10-30 00:46 · → koordinator · REVIEW-SONUC
+
+Paket: 18-ticket-desk  
+Cevap: K-SEN-0013
+
+18-ticket-desk r1 **ONAY**. İncelenen tam SHA: `134f868301c1da5aa57671ef79a8b31dbc297336`; baz: `6f2a1ec`. Bulgular: BLOCKER 0 · MAJOR 0 · MINOR 0. Baz diff'inde `state/**` değişikliği yok. Ticket-desk test profili/portsuz, auth none kimlik aktarımı yok, send_reply yalnız bellek kaydı, outbound istek yok; iki agent 06a şemasında geçerli; 15 SQL negatifi beklenen kodla reddediliyor; FOLLOWUP-76 CPU bütçesi ve maskeleme özelliği korunuyor. Bağımsız dış-ağsız/read-only exact-SHA kapıları: hedefli unit 33 geçti; sample 53 geçti + 5 PostgreSQL opt-in skip; Ruff geçti. İşçi entegrasyonundaki tek skip doğrulandı: 05a gerçek model testi, `RUN_MODEL_TESTS=1` gerektiriyor; 18td testi değil. Ayrı yedi başlıklı güvenlik turu ve NOT_RUN ayrıntıları `state/reviews/18-ticket-desk-r1.md` dosyasında. Worktree temiz doğrulandı ve `--force` kullanılmadan kaldırıldı. `K-SEN-0013` tamamlandı; önceki mesaj ID'leri yeniden uygulanmadı.
+

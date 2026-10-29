@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-c-marka
 - Aktif paket: 10-marka (feat/10-brand-icon)
 - Durum: ACTIVE
-- Son okunan: koordinator K-INIT-0014 (2026-10-29 23:55); son yazılan C-MRK-0006
+- Son okunan: koordinator K-INIT-0015 (2026-10-30 00:28); son yazılan C-MRK-0009
 
 ## Mesajlar
 
@@ -499,3 +499,39 @@ NOT_RUN (ENV-92):
   - Koşu 1: 92 ✓ / 9 ✘, hepsi bilgi tabanı. Backend aşama 2'de `FAKE_EMBED=1` almadan kaldı; docs'a `--force-recreate` + `printenv` eklendi.
   - Koşu 2: env doğrulandı, 79 ✓ / 6 ✘ (`10bp1_10/11/18/2`, `10af_12 provider form dark`), sonra motor takıldı ve iptal ettim. Neden doğrulanmadı.
 Docker dönünce tek koşu (iki aşama) yapıp PR-HAZIR göndereceğim. Yığın `marka` ayakta bırakıldı (talimat).
+
+### C-MRK-0007 · 2026-10-30 00:54 · → koordinator · DURUM
+Paket: 10-marka   Cevap: K-INIT-0015
+DURUM: tek e2e koşusu sürüyor; izin istemi beklemiyorum. HEAD 92cc9a35da5a4f5927124d182e35e652d79d46ae, yığın `marka` (`0.0.0-marka`).
+- 00:30: backend ve worker `FAKE_EMBED=0` ile zorla yeniden yaratıldı (doğrulandı: 0). Aşama 1 `@model-missing` çıkış 0.
+- 00:34: `FAKE_EMBED=1` ile zorla yeniden yaratıldı (backend=1, worker=1 doğrulandı). Aşama 2 00:36'da başladı (~27 dk).
+Bitince sonuç ve PR-HAZIR, ardından `down -v`.
+
+### C-MRK-0008 · 2026-10-30 01:10 · → koordinator · DURUM
+Paket: 10-marka   Cevap: K-INIT-0015
+Ara sonuç (tek koşu):
+- Aşama 1: 1/1.
+- Aşama 2: 92 ✓ / 9 ✘. Marka testleri 10mrk 10/10 ✓ (yeni slogan dahil); 10af_12 de ✓.
+- 9 düşüşün hepsi 10bp1 bilgi tabanı testi. Kök neden bulundu, marka değil.
+Kök neden: e2e servisi `depends_on: backend`. `docker compose run e2e`, backend'i kabuğun o anki değerleriyle yeniden yaratıyor (log: "marka-backend-1 Recreate"). Önek olarak verilen `FAKE_EMBED=1` bu `run`'da yok; backend 0'a dönüyor, worker 1 kalıyor. `/readyz` `model_missing`.
+Belgelenen 10bp1 prosedürü (docs/onyuz.md "Acceptance tests") bu yüzden sessizce yanlış ortamda koşuyor. 10bp1 kanıtının nasıl yeşil olduğu doğrulanmadı; compose sürüm farkı olabilir.
+Düzeltme (bu PR, docs/onyuz.md): aşama 2'de `export FAKE_EMBED=1`, nedeni açıklamada. Önceki commit'teki `--force-recreate` satırı geri alındı (gereksiz).
+Şimdi aşama 2 export ile yeniden koşuyor. Bitince commit, PR-HAZIR, `down -v`.
+
+### C-MRK-0009 · 2026-10-30 01:40 · → koordinator · PR-HAZIR
+Paket: 10-marka   Cevap: K-INIT-0015
+PR-HAZIR: feat/10-brand-icon @ 62c8b21cfa857a16f0300c9629ec4d06503a0b8f, [A]. Commit'ler:
+- 92cc9a3: kod, varlıklar, testler, docs.
+- 62c8b21: docs `export FAKE_EMBED=1` + yeni sloganlı ekran görüntüleri.
+PR: state/pr/10-marka.md.
+Kanıt:
+- 10mrk kırmızı 10/10 → yeşil 10/10.
+- Tek tam koşu (92cc9a3): aşama 1 1/1, aşama 2 92 ✓ / 9 ✘.
+- 10mrk 10/10 yeni sloganla; 10a, 10ab, 10af hepsi ✓.
+- eslint 0, tsc 0, Vitest 114/114, `make_web_brand.py --check` 0.
+NOT_RUN: 9 `10bp1` bilgi tabanı testi.
+- Neden kanıtlı ve ortamsal: `run e2e` backend'i `FAKE_EMBED=0` ile yeniden yarattı, `/readyz` `model_missing`.
+- Export ile tekrar koşusu Docker motoru yüzünden başlamadı ("error waiting for container", çıkış 125; `docker ps` 2 dk yanıtsız). ENV-92 tekrarı olabilir.
+- Bu PR o testlere ya da backend davranışına dokunmuyor.
+- Yeniden koşu isteyip istemediğin sende; istersen tek komut aşama 2.
+Yığın `marka`: `down -v` Docker yanıt vermediği için yapılamadı. Motor dönünce yaparım ya da sen kapat.

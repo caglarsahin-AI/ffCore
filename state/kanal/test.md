@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-test-18-hazirlik
 - Aktif paket: 18-hazirlik
 - Durum: ACTIVE
-- Son okunan: koordinator K-SEN-0012 (2026-10-29 22:11)
+- Son okunan: koordinator K-SEN-0014 (2026-10-30 00:40)
 
 ## Mesajlar
 
@@ -442,3 +442,38 @@ Kapılar:
 - Entegrasyon (18td + 05a tools_api + 05a sql) NOT_RUN: 65 test geçmiş, hata yokken motor takıldı; görevi iptal ettim. Ayrı koşuda 18td entegrasyonu daha önce 3/3 geçmişti.
 - Konteyner ffcore-18td-tools-run-8a351a5fe958 durdurulamadı (daemon exit olayı almadı); motorla birlikte temizlenmeli. postgres, redis ve ticket-desk ayakta.
 Motor dönünce yalnız entegrasyonu tekrar koşup PR-HAZIR yazacağım. Plan, kanıt ve NOT_RUN satırı state/pr/18-ticket-desk.md'de.
+
+### T-18-0020 · 2026-10-30 00:38 · → koordinator · PR-HAZIR
+Paket: 18-ticket-desk   Cevap: K-INIT-0015
+Branch feat/18-ticket-desk @ 134f868 (main 6f2a1ec üstünde, 4 commit), sınıf [A]. Kapılar:
+- lint temiz.
+- make test iki profilde 583/583.
+- test-samples 53 OK (5 skip, RUN_PG_TESTS).
+- Entegrasyon (18td + 05a tools_api + 05a sql) 66 passed, 1 skipped. Skip 05a dosyalarından; gerekçesi -q çıktısında görünmüyor, doğrulanmadı.
+Yığın down edildi. Kanıt tablosu, kırmızı→yeşil ve sapma (FOLLOWUP-76: process_time) state/pr/18-ticket-desk.md'de. e2e dalı aa937b0 ayrı, merge'e girmez.
+REVIEW-ISTEK'e hazır.
+
+### T-18-0021 · 2026-10-30 00:40 · → koordinator · DURUM
+Paket: 18 (e2e dalı, yalnız belge)   Cevap: K-SEN-0014
+docs/demo.md genişletildi: feat/18-scenarios-e2e @ 001993f (aa937b0 üstünde, tek dosya, +9/-1).
+- Yeni adımlar: F10 izolasyon ve iz zinciri, F11 zehirli belge (zehirli-belge-asistani), F12 kesinti (NOT_RUN, compose düzeyi koşucu 13b), F13 güncellik (surum-asistani, 01.09.2025).
+- F2 satırı ticket-desk'i ve onay kuralını anıyor.
+- PoC sonrası F5-F8 için tek paragraf.
+feat/18-ticket-desk'e commit yok; review bekleniyor.
+
+### T-18-0022 · 2026-10-30 01:25 · → koordinator · ÖNERİ (karar sende)
+Paket: 18-ticket-desk (FOLLOWUP-76)   Cevap: koordinatör zili 08_9
+Kabul: 134f868 yetmedi. Kendi yük kanıtım yükü başka süreçlerden aldı. Kapıda düşüşün iki olası nedeni var, ikisi de doğrulanmadı; hangi assertion'ın düştüğü ayırır:
+- (a) CPU ataması: yük altında aynı iş daha çok CPU süresi yer (SMT paylaşımı, önbellek, frekans düşüşü). process_time ayrıca pytest sürecindeki başka iş parçacıklarını ve GC'yi sayar.
+- (b) duvar saati koruması (10 s): üç yığın açıkken iş parçacığı CPU bulamıyor.
+Asıl eksik: yüksüz makinede N=10000'in gerçek CPU maliyetini ölçmedim. 1 s bütçenin payı bilinmiyor, ben de bilmeden eşik seçtim.
+
+Seçenekler:
+- **A (öneri) Göreli ölçek testi.** Aynı süreçte N=1000 ve N=10000 CPU sürelerini ölç; oran < 25 olsun (doğrusal ≈10, karesel ≈100). Ek olarak geniş mutlak tavan (CPU 5 s) ve asılı kalma koruması (duvar 30 s); maskeli/sınırlı/bulgu sayısı aynen.
+  Etki: makine hızı ve yük iki ölçümü birlikte etkilediği için oran sabit kalır; karesel gerilemeyi (08 r2 MAJOR-1'in istediği) yine yakalar. Küçük N'de sabit ek yük oranı düşürür, yanlış alarm değil gevşeme yönünde. Dosya: yalnız test_08_cost.py.
+- **B N=10000 için gevşek mutlak sınır** (ör. CPU 3 s), diğerleri aynı.
+  Etki: en küçük değişiklik ama yine makineye bağlı eşik. Daha yavaş bir CI'da ya da daha ağır yükte tekrar düşebilir; karesel gerilemenin bir kısmını kaçırır.
+- **C Zamanlamayı ayrı işarete al** (perf; make test'ten çıkar). make test yalnız "sınırlı ve maskeli, hiçbir bulgu atlanmaz"ı test eder.
+  Etki: kapı kararlı olur ama maliyet koruması CI'dan çıkar (08 r2 MAJOR-1'i fiilen geri alır). Ayrı hedef koşulmazsa gerileme fark edilmez.
+
+Önerim A: kararlılık ile koruma birlikte. Seçimden önce düşen assertion'ı görmek isterim. (b) ise A'daki geniş duvar koruması yine çözer; (a) ise oran yaklaşımı tam o durumu hedefler. Onaylarsan önce mevcut testi yüksüz ve yüklü ölçüp oranları PR'a yazarım, sonra değiştiririm. Review süresince ticket-desk dalına commit yok; DUZELT ile açarsan yaparım.
