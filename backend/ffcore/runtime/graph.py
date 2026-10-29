@@ -25,6 +25,7 @@ from langgraph.types import interrupt
 
 from ffcore.core import tracing
 from ffcore.runtime.contracts import RunEventType, RunStatus, SseEvent
+from ffcore.runtime.definition import DEFAULT_APPROVER, approval_name
 from ffcore.runtime.prompting import (
     DECLINE_PATTERN,
     Source,
@@ -256,12 +257,25 @@ async def tool_guard(state: RunState, runtime: Runtime[RunContext]) -> dict:
         raise StopRun(
             RunStatus.failed, "limit_reached", partial=state.get("answer"), limit="max_tool_calls"
         )
+    counts = dict(state.get("tool_counts") or {})
+    action_limit = ctx.tools.max_calls(name)
+    if action_limit is not None and counts.get(name, 0) + 1 > action_limit:
+        raise StopRun(
+            RunStatus.failed,
+            "limit_reached",
+            partial=state.get("answer"),
+            limit="max_calls_per_run",
+            detail=name,
+        )
+    counts[name] = counts.get(name, 0) + 1
     checked = await ctx.guard.check(
         "tool.pre", json.dumps(arguments, ensure_ascii=False), tool=name
     )
     blocked = checked.action == "block"
     masked = arguments if blocked else json.loads(checked.text)
-    approval = ctx.tools.needs_approval(name) and not blocked
+    # The action's own needs_approval (05a tool_actions) joined with the agent's approval list.
+    listed = d.approval is not None and approval_name(name) in d.approval.actions
+    approval = (ctx.tools.needs_approval(name) or listed) and not blocked
     await ctx.events.record(
         RunEventType.tool_call,
         {"tool_call_id": call["id"], "name": name, "arguments": masked, "needs_approval": approval},
@@ -273,7 +287,7 @@ async def tool_guard(state: RunState, runtime: Runtime[RunContext]) -> dict:
         pending["kind"] = "blocked"
     elif approval:
         pending["kind"] = "approval"
-        assign_to = d.approval.assign_to if d.approval else "admin"
+        assign_to = d.approval.assign_to if d.approval else DEFAULT_APPROVER
         await ctx.events.record(
             RunEventType.approval_requested,
             {
@@ -286,7 +300,7 @@ async def tool_guard(state: RunState, runtime: Runtime[RunContext]) -> dict:
             sse_data={"action": name, "arguments": masked, "assign_to": assign_to},
             iteration=iteration,
         )
-    return {"pending_tool": pending, "tool_calls_used": used + 1}
+    return {"pending_tool": pending, "tool_calls_used": used + 1, "tool_counts": counts}
 
 
 def after_tool_guard(state: RunState) -> str:
@@ -375,7 +389,7 @@ async def tools(state: RunState, runtime: Runtime[RunContext]) -> dict:
     pending = state["pending_tool"]
     name, started = pending["name"], time.monotonic()
     new_sources: list[dict] = []
-    truncated, is_error = False, False
+    truncated, is_error, error_code = False, False, None
     if pending["kind"] == "blocked":
         text, is_error = BLOCKED_TOOL_TEXT, True
     elif name == SEARCH_TOOL:
@@ -383,6 +397,7 @@ async def tools(state: RunState, runtime: Runtime[RunContext]) -> dict:
     else:
         outcome = await ctx.tools.call(name, pending["arguments"])
         text, truncated, is_error = outcome.text, outcome.truncated, outcome.is_error
+        error_code = outcome.error_code
     if pending["kind"] != "blocked":
         checked = await ctx.guard.check("tool.post", text, tool=name)
         if checked.action == "block":
@@ -397,6 +412,7 @@ async def tools(state: RunState, runtime: Runtime[RunContext]) -> dict:
             "name": name,
             "truncated": truncated,
             "is_error": is_error,
+            "error_code": error_code,
             "chars": len(text),
             "ms": ms,
         },

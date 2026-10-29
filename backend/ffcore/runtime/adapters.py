@@ -6,14 +6,19 @@
   service account, the user's X-On-Behalf-Of token (ACL is the user's) and X-Run-Id (C12).
 - Guardrail (S5): the 08 engine in-process (no model involved); events are stored with the same
   `record_events` as the API, and each check is a `guardrail_hook` run event (C4 form).
-- Tools: `search_documents` (C7/C11) and `ask_user_question` are built in; MCP actions come with
-  05a's client. Until 05a is merged an agent with MCP tools fails at start with a coded error.
+- Tools: `search_documents` (C7/C11) and `ask_user_question` are built in. MCP actions come
+  from the project's 05a registry (`tools`, `tool_actions`) and are called with 05a's client
+  (C7), the run's user as caller (forward_user signs for them) and X-Run-Id. The model sees
+  `<tool_key>__<action>`; a tool or action that cannot be used stops the run at start with a
+  code, never a silently missing tool.
 """
 
 import json
+import re
 import time
 import uuid
 from collections.abc import Awaitable, Callable
+from dataclasses import dataclass
 from typing import Any
 
 from sqlalchemy import select
@@ -30,12 +35,18 @@ from ffcore.guardrails.service import record_events, resolve_policy
 from ffcore.guardrails.settings import get_guardrail_settings
 from ffcore.models.knowledge import KnowledgeBase
 from ffcore.models.runs import Message
+from ffcore.models.tools import Tool, ToolAction
 from ffcore.runtime.contracts import JobClass, RunEventType
-from ffcore.runtime.definition import AgentDefinition
+from ffcore.runtime.definition import (
+    MODEL_TOOL_NAME_PATTERN,
+    AgentDefinition,
+    model_tool_name,
+)
 from ffcore.runtime.events import RunEventWriter
 from ffcore.runtime.prompting import Source, render_variables, system_parts
 from ffcore.runtime.scheduler import LlmSlots
 from ffcore.runtime.state import GuardResult, ModelTurn, RunContext, ToolCall, ToolOutcome
+from ffcore.services import mcp_client, mcp_tools
 from ffcore.services.litellm_client import LiteLLMClient, resolve_target
 
 OUTPUT_STAGES = {"output.pre", "output.stream.delta"}
@@ -45,14 +56,11 @@ SEARCH_TOOL, ASK_TOOL = "search_documents", "ask_user_question"
 PLATFORM_RULES_PROMPT = "platform_rules"
 
 
-class ToolLayerUnavailable(ApiError):
-    def __init__(self) -> None:
-        super().__init__(
-            503,
-            "api_error",
-            "tool_layer_unavailable",
-            "This agent uses MCP tools; the tool layer is not installed yet.",
-        )
+class ToolSetupError(ApiError):
+    """An agent's tool the run cannot use; the run ends at start with this code."""
+
+    def __init__(self, code: str, message: str) -> None:
+        super().__init__(422, "invalid_request_error", code, message)
 
 
 class LiteLLMModel:
@@ -285,12 +293,30 @@ class EngineGuard:
         )
 
 
-class BuiltinTools:
-    """search_documents and ask_user_question; MCP actions after 05a (dilim 6)."""
+@dataclass(frozen=True)
+class McpBinding:
+    target: mcp_client.ToolTarget
+    action: str
+    needs_approval: bool
+    max_calls: int | None
+    timeout_s: int | None
 
-    def __init__(self, definition: AgentDefinition) -> None:
-        if definition.tools:
-            raise ToolLayerUnavailable()
+
+class AgentTools:
+    """The run's tools: the built-in ones and the agent's MCP actions (05a)."""
+
+    def __init__(
+        self,
+        definition: AgentDefinition,
+        mcp: dict[str, McpBinding] | None = None,
+        mcp_schemas: list[dict[str, Any]] | None = None,
+        *,
+        settings: Settings | None = None,
+        caller: mcp_client.Caller | None = None,
+        run_id: str | None = None,
+    ) -> None:
+        self._mcp = mcp or {}
+        self._settings, self._caller, self._run_id = settings, caller, run_id
         self._schemas: list[dict[str, Any]] = []
         tool_kbs = [k.kb_key for k in definition.knowledge if k.mode == "tool"]
         if tool_kbs:
@@ -315,15 +341,117 @@ class BuiltinTools:
                     ["question"],
                 )
             )
+        self._schemas += mcp_schemas or []
+
+    @classmethod
+    async def load(
+        cls, session: AsyncSession, settings: Settings, definition: AgentDefinition, run
+    ) -> "AgentTools":
+        """Every `tools[]` entry from the project's registry: the tool discovered, each action
+        listed, available and enabled; otherwise ToolSetupError with a code."""
+        bindings: dict[str, McpBinding] = {}
+        schemas: list[dict[str, Any]] = []
+        for ref in definition.tools:
+            tool = await session.scalar(
+                select(Tool).where(
+                    Tool.project_id == run.project_id,
+                    Tool.key == ref.tool_key,
+                    Tool.deleted_at.is_(None),
+                )
+            )
+            if tool is None:
+                raise ToolSetupError(
+                    "tool_not_found", f"Tool {ref.tool_key!r} is not registered in the project."
+                )
+            if tool.status != "discovered":
+                raise ToolSetupError(
+                    "tool_not_discovered",
+                    f"Tool {ref.tool_key!r} has no discovered actions (status {tool.status}).",
+                )
+            if tool.auth_type == "forward_user" and run.user_id is None:
+                raise ToolSetupError(
+                    "tool_needs_run_user",
+                    f"Tool {ref.tool_key!r} forwards the user; this run has no user.",
+                )
+            rows = await session.scalars(
+                select(ToolAction).where(
+                    ToolAction.tool_id == tool.id, ToolAction.name.in_(ref.actions)
+                )
+            )
+            actions = {a.name: a for a in rows.all()}
+            target = mcp_tools.target_of(tool, settings)
+            for name in ref.actions:
+                action = actions.get(name)
+                if action is None or action.status != "available" or not action.enabled:
+                    raise ToolSetupError(
+                        "tool_action_unavailable",
+                        f"Action {ref.tool_key}.{name} is missing, gone or disabled.",
+                    )
+                model_name = model_tool_name(ref.tool_key, name)
+                if not re.fullmatch(MODEL_TOOL_NAME_PATTERN, model_name):
+                    raise ToolSetupError(
+                        "tool_name_invalid",
+                        f"Action {ref.tool_key}.{name} has no valid function name for the model.",
+                    )
+                bindings[model_name] = McpBinding(
+                    target,
+                    name,
+                    action.needs_approval,
+                    action.max_calls_per_run,
+                    action.timeout_s,
+                )
+                schemas.append(
+                    {
+                        "type": "function",
+                        "function": {
+                            "name": model_name,
+                            "description": action.description or "",
+                            "parameters": action.input_schema or {"type": "object"},
+                        },
+                    }
+                )
+        caller = mcp_client.Caller(
+            user_id=str(run.user_id) if run.user_id else "", project_id=str(run.project_id)
+        )
+        return cls(
+            definition, bindings, schemas, settings=settings, caller=caller, run_id=str(run.id)
+        )
 
     def schemas(self):
         return self._schemas
 
     def needs_approval(self, name):
-        return False
+        binding = self._mcp.get(name)
+        return binding is not None and binding.needs_approval
+
+    def max_calls(self, name):
+        binding = self._mcp.get(name)
+        return binding.max_calls if binding else None
 
     async def call(self, name, arguments) -> ToolOutcome:
-        raise ToolLayerUnavailable()
+        binding = self._mcp.get(name)
+        if binding is None:
+            # A name the model made up: said to the model, recorded with a code.
+            return ToolOutcome(f"Unknown tool {name!r}.", False, 0, True, 0, "tool_unknown")
+        started = time.monotonic()
+        try:
+            # tool.pre / tool.post run in the graph (one place for every tool), so no guard here.
+            result = await mcp_client.call(
+                binding.target,
+                binding.action,
+                arguments,
+                self._settings,
+                caller=self._caller,
+                timeout_s=binding.timeout_s,
+                run_id=self._run_id,
+            )
+        except mcp_client.ToolCallError as exc:
+            ms = int((time.monotonic() - started) * 1000)
+            text = f"The tool call failed ({exc.code})."
+            return ToolOutcome(text, False, len(text), True, ms, exc.code)
+        return ToolOutcome(
+            result.text, result.truncated, result.total_chars, result.is_error, result.latency_ms
+        )
 
 
 def _function(name: str, description: str, properties: dict, required: list[str]) -> dict:
@@ -399,7 +527,7 @@ def context_factory(
             retriever=HttpRetriever(
                 settings, session, run_id=run.id, project_id=run.project_id, user_id=run.user_id
             ),
-            tools=BuiltinTools(definition),
+            tools=await AgentTools.load(session, settings, definition, run),
             guard=guard,
             boundary=boundary,
             system=system_parts(_platform_rules(prompts, definition), instructions),

@@ -84,3 +84,15 @@ def test_06a_15_model_key_pattern_matches_the_api():
     from ffcore.runtime.definition import MODEL_KEY_PATTERN
 
     assert MODEL_KEY_PATTERN == API_PATTERN
+
+
+def test_06a_approval_assign_to_defaults_to_analyst():
+    # Brief 07 (K-07-0002 S7): the default approver is analyst, never admin by default.
+    parsed = parse_definition(
+        {
+            **MINIMAL,
+            "tools": [{"tool_key": "mcp-sql", "actions": ["run_sql"]}],
+            "approval": {"actions": ["mcp-sql.run_sql"]},
+        }
+    )
+    assert parsed.approval.assign_to == "analyst"

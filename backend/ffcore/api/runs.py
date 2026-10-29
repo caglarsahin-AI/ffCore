@@ -14,13 +14,12 @@ the body decides which rule applies (write-flag scan exemption, with this reason
 import logging
 from collections.abc import AsyncIterator
 from datetime import UTC, datetime
-from typing import Annotated, Any, Literal
+from typing import Annotated, Literal
 from uuid import UUID
 
-import redis.asyncio as aioredis
 from fastapi import APIRouter, Depends, Header, Query, Request
 from fastapi.responses import StreamingResponse
-from sqlalchemy import select, update
+from sqlalchemy import select
 
 from ffcore.api.agents_schemas import (
     SSE_DESCRIPTION,
@@ -44,16 +43,16 @@ from ffcore.models.agents import Agent, AgentVersion
 from ffcore.models.identity import ProjectMember
 from ffcore.models.runs import Conversation, Message, Run, RunEvent
 from ffcore.runtime import events as run_events
+from ffcore.runtime import resume
 from ffcore.runtime.contracts import (
     FINISHED,
-    WAITING,
     Channel,
     RunEventType,
     RunStatus,
     SseEvent,
     TriggerType,
 )
-from ffcore.runtime.definition import parse_definition
+from ffcore.runtime.definition import DEFAULT_APPROVER, parse_definition
 from ffcore.runtime.queue import RunQueue, get_run_queue
 
 router = APIRouter(prefix="/projects/{project_id}", tags=["runs"], responses=ERROR_RESPONSES)
@@ -96,14 +95,6 @@ SSE_RESPONSE = {
         "content": {"text/event-stream": {"schema": {"type": "string"}}},
     }
 }
-
-
-def _redis(settings: Settings):
-    if settings.redis_url is None:
-        raise ApiError(
-            503, "api_error", "redis_unavailable", "The run event stream is not configured."
-        )
-    return aioredis.from_url(settings.redis_url.get_secret_value())
 
 
 def run_out(run: Run, feedback: dict | None = None) -> RunOut:
@@ -191,7 +182,7 @@ def _stream(
     settings: Settings, project_id: UUID, run_id: UUID, after: str | None
 ) -> EventStreamResponse:
     async def body() -> AsyncIterator[str]:
-        client = _redis(settings)
+        client = run_events.redis_client(settings)
         try:
             async for chunk in run_events.follow(
                 client,
@@ -212,7 +203,7 @@ def _stream(
 
 async def _queued_event(session, settings: Settings, run: Run) -> None:
     """The run's first event; its stream id is where the client's stream starts."""
-    client = _redis(settings)
+    client = run_events.redis_client(settings)
     try:
         writer = run_events.RunEventWriter(
             session, client, run.id, ttl_s=settings.run_event_stream_ttl_s
@@ -494,18 +485,6 @@ async def stream_run(
     return _stream(settings, project_id, run_id, last_event_id)
 
 
-async def _last_entry(settings: Settings, run_id) -> str | None:
-    client = _redis(settings)
-    try:
-        last = await client.xrevrange(run_events.stream_key(run_id), count=1)
-    finally:
-        await client.aclose()
-    if not last:
-        return None
-    entry_id = last[0][0]
-    return entry_id.decode() if isinstance(entry_id, bytes) else entry_id
-
-
 @router.post("/runs/{run_id}/resume", response_class=EventStreamResponse, responses=SSE_RESPONSE)
 async def resume_run(
     project_id: UUID,
@@ -518,55 +497,30 @@ async def resume_run(
     queue: QueueDep,
 ):
     """Continue a waiting run from its checkpoint: a decision for waiting_approval (role
-    `approval.assign_to` with edit access), an answer for waiting_user (the run's user). Any
-    other state is 409 `run_not_waiting`."""
+    `approval.assign_to` with edit access, signed-in user only), an answer for waiting_user (the
+    run's user). Any other state is 409 `run_not_waiting`. Rules shared with 07: runtime.resume."""
     run = await _run(session, project_id, run_id)
-    if run.status not in WAITING:
-        raise conflict("run_not_waiting", f"The run is {run.status}, not waiting.")
-    resume: dict[str, Any]
-    if run.status == RunStatus.waiting_approval:
-        if body.decision is None or body.answer is not None:
-            raise invalid("decision_required", "This run waits for an approval decision.")
+    if run.status == RunStatus.waiting_approval and body.decision is not None:
         version = await session.get(AgentVersion, run.agent_version_id)
         approval = parse_definition(version.definition).approval
-        role = approval.assign_to if approval else "admin"
+        role = approval.assign_to if approval else DEFAULT_APPROVER
         await authorize(
             request, actor, str(project_id), RoleRequirement(role, write=True, scope="project")
         )
-        resume = {"decision": body.decision, "comment": body.comment, "by": actor.actor_id}
-        action = "resolve_approval"
-    else:
-        if body.answer is None or body.decision is not None:
-            raise invalid("answer_required", "This run waits for the user's answer.")
-        if actor.actor_id != str(run.user_id):
-            raise not_run_user("Only the run's user answers.")
-        resume = {"answer": body.answer}
-        action = "answer_run_question"
-    # One resume per wait: the state change is the lock (a second click gets 409).
-    changed = await session.execute(
-        update(Run)
-        .where(Run.id == run.id, Run.status == run.status)
-        .values(status=RunStatus.queued)
-    )
-    if changed.rowcount != 1:
-        raise conflict("run_not_waiting", "The run was resumed already.")
-    await _audit(
+    request_id, ip = request_context(request)
+    after = await resume.resume_run(
         session,
-        request,
-        actor,
-        project_id,
-        action,
-        run.id,
-        after={"decision": body.decision} if body.decision else None,
+        queue,
+        settings,
+        project_id=project_id,
+        run_id=run.id,
+        actor=actor,
+        decision=body.decision,
+        answer=body.answer,
+        comment=body.comment,
+        request_id=request_id,
+        ip=ip,
     )
-    await session.commit()
-    after = await _last_entry(settings, run.id)
-    client = _redis(settings)
-    try:
-        await run_events.mark_listening(client, run.id, settings.run_abandon_grace_s)
-    finally:
-        await client.aclose()
-    await queue.enqueue(str(run.id), resume)
     return _stream(settings, project_id, run.id, after)
 
 
@@ -597,7 +551,7 @@ async def cancel_run(
     await _audit(session, request, actor, project_id, "cancel_run", run.id)
     await session.commit()
     if run.status == RunStatus.cancelled:
-        client = _redis(settings)
+        client = run_events.redis_client(settings)
         try:
             writer = run_events.RunEventWriter(
                 session, client, run.id, ttl_s=settings.run_event_stream_ttl_s

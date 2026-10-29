@@ -55,6 +55,9 @@ RUN_EVENT_TYPES = (
     "answer",
     "fallback",
     "error",
+    # 07 writes these (K-06a-0016): approval reused within its TTL, approval expired unanswered.
+    "approval_reused",
+    "approval_expired",
 )
 MESSAGE_ROLES = ("user", "assistant")
 CHECKPOINT_SCHEMA = "checkpoints"

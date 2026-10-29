@@ -42,6 +42,9 @@ class RunEventType(StrEnum):
     answer = "answer"
     fallback = "fallback"
     error = "error"
+    # Written by 07 (K-06a-0016): an approval reused within its TTL; one that expired unanswered.
+    approval_reused = "approval_reused"
+    approval_expired = "approval_expired"
 
 
 class SseEvent(StrEnum):

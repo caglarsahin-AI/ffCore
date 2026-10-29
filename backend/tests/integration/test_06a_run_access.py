@@ -10,9 +10,14 @@
 | feedback | own run, edit | any run in the project, edit | 403 |
 """
 
+import asyncio
+import uuid
+
 import pytest
 
+from ffcore.core.auth import sign_on_behalf_of
 from ffcore.runtime.state import ToolOutcome
+from tests.dummy import SERVICE_TOKEN
 from tests.integration.runs_fixtures import *  # noqa: F403 - fixtures
 from tests.integration.runs_fixtures import InlineQueue, parse_sse, post_run, publish
 from tests.integration.runtime_support import (
@@ -157,3 +162,73 @@ def test_06a_r1_feedback_user_own_run_with_edit(team, pg, harness, use_queue):
     assert (
         c["analyst"].post(f"{base}/{others}/feedback", json={"vote": "partial"}).status_code == 200
     )
+
+
+def _waiting_approval(c, project_id, pg, harness, use_queue):
+    publish(pg, project_id, APPROVAL)
+    tools = ScriptedTools(
+        schema=[{"type": "function", "function": {"name": SQL_TOOL, "parameters": {}}}],
+        approval={SQL_TOOL},
+        results={SQL_TOOL: ToolOutcome("rows: 1", False, 7, False, 5)},
+    )
+    model = ScriptedModel(turn(tools=[(SQL_TOOL, {"sql": "select 1"})]), turn("1."))
+    queue = use_queue(InlineQueue(harness, Ports(model, tools=tools)))
+    return post_run(c["owner"], project_id)[0][2]["run_id"], queue
+
+
+def test_06a_r2_approval_needs_a_user_session(
+    team, pg, harness, use_queue, make_user, client_factory, app_settings
+):
+    # K-06a-0016 item 2 (07 S2): a service account acting on behalf of an approver is 403,
+    # even when that user may approve with their own console session.
+    project_id, c = team
+    run_id, _ = _waiting_approval(c, project_id, pg, harness, use_queue)
+    approver, _ = make_user(memberships={project_id: ("admin", "edit")})
+    token = sign_on_behalf_of(
+        user_id=str(approver),
+        project_id=str(project_id),
+        audience=app_settings.obo_audience,
+        settings=app_settings,
+    )
+    service = client_factory()
+    service.headers.update({"Authorization": f"Bearer {SERVICE_TOKEN}", "X-On-Behalf-Of": token})
+    url = f"/api/v1/projects/{project_id}/runs/{run_id}/resume"
+    denied = service.post(url, json={"decision": "approved"})
+    assert denied.status_code == 403
+    assert denied.json()["error"]["code"] == "approval_requires_user_session"
+    assert run_row(pg, run_id)["status"] == "waiting_approval"
+
+
+def test_06a_r2_resume_service_function(team, pg, harness, use_queue):
+    # K-06a-0016 item 6: 07's approval endpoints call the same function as /resume.
+    from ffcore.core import db
+    from ffcore.core.auth import SERVICE_ACTOR, Actor
+    from ffcore.core.errors import ApiError
+    from ffcore.runtime.resume import resume_run
+
+    project_id, c = team
+    run_id, queue = _waiting_approval(c, project_id, pg, harness, use_queue)
+    approver = Actor(actor_type="user", actor_id=str(uuid.uuid4()), project_id=str(project_id))
+
+    async def call(actor):
+        async with db.session_scope() as session:
+            return await resume_run(
+                session,
+                queue,
+                harness.settings,
+                project_id=project_id,
+                run_id=uuid.UUID(run_id),
+                actor=actor,
+                decision="approved",
+                comment="ok",
+            )
+
+    with pytest.raises(ApiError) as refused:
+        asyncio.run(call(SERVICE_ACTOR))
+    assert refused.value.code == "approval_requires_user_session"
+    asyncio.run(call(approver))
+    assert run_row(pg, run_id)["status"] == "completed"
+    assert queue.jobs[-1][1]["decision"] == "approved"
+    with pytest.raises(ApiError) as again:
+        asyncio.run(call(approver))
+    assert again.value.code == "run_not_waiting"

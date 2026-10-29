@@ -37,6 +37,9 @@ FROZEN_EVENT_TYPES = {
     "answer",
     "fallback",
     "error",
+    # 07 (K-06a-0016): an approval reused within its TTL, and one that expired unanswered.
+    "approval_reused",
+    "approval_expired",
 }
 FROZEN_SSE = {
     "token",

@@ -1228,9 +1228,9 @@ paths:
       summary: Resume Run
       description: 'Continue a waiting run from its checkpoint: a decision for waiting_approval (role
 
-        `approval.assign_to` with edit access), an answer for waiting_user (the run''s user). Any
+        `approval.assign_to` with edit access, signed-in user only), an answer for waiting_user (the
 
-        other state is 409 `run_not_waiting`.'
+        run''s user). Any other state is 409 `run_not_waiting`. Rules shared with 07: runtime.resume.'
       operationId: resume_run_api_v1_projects__project_id__runs__run_id__resume_post
       parameters:
       - name: project_id
@@ -1630,7 +1630,7 @@ components:
           - developer
           - admin
           title: Assign To
-          default: admin
+          default: analyst
       additionalProperties: false
       type: object
       title: Approval
@@ -2038,6 +2038,8 @@ components:
       - answer
       - fallback
       - error
+      - approval_reused
+      - approval_expired
       title: RunEventType
     RunList:
       properties:

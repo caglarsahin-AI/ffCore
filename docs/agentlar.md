@@ -14,12 +14,12 @@ API contract: `backend/openapi/06a.yaml` (paths under `/api/v1/projects/{project
 | `system_prompt` / `langfuse_prompt` | Exactly one: inline instructions or a managed Langfuse prompt `{name, label}`. `${variable}` placeholders are filled from `variables`. |
 | `variables` | `[{key, label, default}]`; a run may override them; an unknown key is refused. |
 | `knowledge` | `[{kb_key, mode: always\|tool, top_k, min_score}]`. `always`: searched before the model call. `tool`: offered as the tool `search_documents(query, kb_key, top_k)` (C7/C11). |
-| `tools` | `[{tool_key, actions}]` MCP actions (package 05a). |
-| `approval` | `{actions: ["<tool>.<action>"], assign_to: analyst\|developer\|admin}`; joined with the action's `needs_approval`. The `user` role never approves. |
+| `tools` | `[{tool_key, actions}]` MCP actions registered and discovered in the project (package 05a). The model sees each as `<tool_key>__<action>`; the action's `enabled`, `needs_approval`, `max_calls_per_run` and `timeout_s` apply. |
+| `approval` | `{actions: ["<tool>.<action>"], assign_to: analyst\|developer\|admin}` (default `analyst`); an action needs approval when it is listed here or its own `needs_approval` is on. The `user` role never approves. |
 | `ask_user` | Adds `ask_user_question`; the run waits for the user's answer. Not counted in `max_tool_calls`, counted in `max_turns`. |
 | `guardrail_policy_key` | Guardrail policy (package 08), default `default`. |
 | `structured_output` | A JSON schema the final answer must match (checked at save and at the end of the run). |
-| `limits` | `max_tool_calls`, `max_turns`, `run_timeout_s` (≤ `RUN_TIMEOUT_S`), `context_tokens`, `output_tokens`. |
+| `limits` | `max_tool_calls`, `max_turns`, `run_timeout_s` (≤ `RUN_TIMEOUT_S`; time spent waiting for an approval or an answer does not count), `context_tokens`, `output_tokens`. |
 | `context_policy` | Shares of the context budget for history, RAG and memory, and the trim order. |
 | `answer_rules` | `cite_sources`, `unknown_reply`, `confidence_formula` (`cited` or `max`), `confidence_threshold`, `show_confidence`, `max_answer_tokens`. |
 | `reasoning` | `none` (default) or `model_default`. |
@@ -57,7 +57,9 @@ stream ends after `done`, `error`, `approval_required` or `question`.
   is replayed from `run_events`, announced by `progress {"replay": "run_events"}`.
 - **Approval:** a run waiting for an approval is `waiting_approval`. `POST /runs/{id}/resume
   {decision: approved|rejected, comment?}` needs the definition's `approval.assign_to` role with
-  edit access. The stream continues from the approval. A second resume is 409 `run_not_waiting`.
+  edit access, from a signed-in user: a service account acting on someone's behalf (or an API
+  key) gets 403 `approval_requires_user_session`. The stream continues from the approval. A
+  second resume is 409 `run_not_waiting`.
 - **Question:** `waiting_user`; the run's user answers with `POST /runs/{id}/resume {answer}`.
 - **Cancel:** `POST /runs/{id}/cancel` (the run's user or a project admin). A queued or waiting run
   ends at once; a running one at its next step.
@@ -108,6 +110,18 @@ aborted attempts the run fails with `worker_retries_exhausted`.
 `LANGSMITH_TRACING` or `LANGCHAIN_TRACING_V2` set to true stops every process at start: it would
 send prompts to LangSmith. Traces go to Langfuse only.
 
+### Tools
+
+An agent's MCP actions come from the project's tool registry (05a) when the run starts. A tool
+that is not registered, not discovered, or an action that is missing or disabled ends the run at
+start with a code (below); the model never sees a partial tool list. Calls go through 05a's MCP
+client with the run's user as caller (`forward_user` tools get a token for that user, audience
+the tool and the backend) and `X-Run-Id`. Each call is a `tool_call` and a `tool_result` event;
+a result longer than `TOOL_RESULT_MAX_CHARS` is cut with `[truncated: N/M chars]` and
+`truncated: true`. A call that fails is given to the model as an error and recorded with its
+code (`tool_result.error_code`, e.g. `tool_unreachable`, `tool_timeout`). An action's
+`max_calls_per_run` stops the run with `limit_reached` (`limit: max_calls_per_run`).
+
 ## Tracing
 
 Each run is one Langfuse trace (`runs.langfuse_trace_id`): a span `agent-run`, one span per graph
@@ -128,7 +142,7 @@ Every stop is a coded `error` event and the run's `error_code`; nothing ends sil
 | `upstream_error`, `stream_incomplete`, `empty_completion` | the provider answered without a usable result |
 | `prompt_unavailable` | Langfuse could not give `platform_rules` or the agent's managed prompt |
 | `knowledge_base_not_found`, `search_http_<status>` or the search API's own code | the knowledge search failed |
-| `tool_layer_unavailable` | an agent with MCP tools before the tool layer is installed |
+| `tool_not_found`, `tool_not_discovered`, `tool_action_unavailable`, `tool_name_invalid`, `tool_needs_run_user` | an agent's MCP tool or action cannot be used (05a registry); the run ends at start |
 | `structured_output_invalid` | the final answer does not match `structured_output` |
 | `cancelled`, `abandoned` | explicit cancel; nobody listening past the grace time |
 | `worker_retries_exhausted` | the worker was stopped three times during the run |

@@ -210,14 +210,17 @@ def test_06a_6b_limit_reached_partial(harness, pg, project):
 
 
 def test_06a_6b_max_tool_calls(harness, pg, project):
-    run_id = seed_run(pg, project, SQL_DEFINITION)
+    # No approval block: the definition's approval list now applies in the graph (K-06a-0016
+    # item 4), so the limit is shown on an action that runs without one.
+    doc = {k: v for k, v in SQL_DEFINITION.items() if k != "approval"}
+    run_id = seed_run(pg, project, doc)
     tools = ScriptedTools(
         schema=SQL_SCHEMA, results={SQL_TOOL: ToolOutcome("r", False, 1, False, 1)}
     )
     model = ScriptedModel(
         turn(tools=[(SQL_TOOL, {"sql": "a"})]), turn(tools=[(SQL_TOOL, {"sql": "b"})])
     )
-    harness.run(run_id, Ports(model, tools=tools))  # first call needs no approval here
+    harness.run(run_id, Ports(model, tools=tools))
     row = run_row(pg, run_id)
     assert (row["status"], row["error_code"]) == ("failed", "limit_reached")
 
@@ -407,7 +410,7 @@ def test_06a_4_tokens_after_a_restart_continue_the_stream(harness, pg, project):
 
 
 def test_06a_setup_failure_is_a_coded_end(harness, pg, project, monkeypatch):
-    """prompt_unavailable (Langfuse down), tool_layer_unavailable, a missing guardrail policy:
+    """prompt_unavailable (Langfuse down), a tool set-up refusal, a missing guardrail policy:
     the run fails with that code and an error event (F12 relies on these codes)."""
     import asyncio
 
@@ -433,3 +436,34 @@ def test_06a_setup_failure_is_a_coded_end(harness, pg, project, monkeypatch):
     row = run_row(pg, run_id)
     assert row["error_code"] == "prompt_unavailable"
     assert stream(run_id)[-1][1] == "error"
+
+
+def test_06a_waiting_time_is_not_run_time(harness, pg, project):
+    # K-06a-0016 / K-07-0002 S6: waiting_approval and waiting_user do not count toward
+    # run_timeout_s. The approver answers after three minutes; the run's own work took seconds.
+    doc = {**SQL_DEFINITION, "limits": {"max_tool_calls": 1, "run_timeout_s": 120}}
+    run_id = seed_run(pg, project, doc)
+    model = ScriptedModel(turn(tools=[(SQL_TOOL, {"sql": "select 1"})]), turn("1."))
+    ports = _sql_ports(model)
+    assert harness.run(run_id, ports) == "waiting_approval"
+    pg.execute(
+        "UPDATE runs SET started_at = started_at - interval '180 seconds' WHERE id = %s", (run_id,)
+    )
+    pg.execute(
+        "UPDATE run_events SET ts = ts - interval '180 seconds' WHERE run_id = %s", (run_id,)
+    )
+    assert harness.run(run_id, ports, {"decision": "approved", "comment": None}) == "completed"
+
+
+def test_06a_working_time_still_hits_run_timeout(harness, pg, project):
+    # The same three minutes spent before the approval request are run time: limit_reached.
+    doc = {**SQL_DEFINITION, "limits": {"max_tool_calls": 1, "run_timeout_s": 120}}
+    run_id = seed_run(pg, project, doc)
+    model = ScriptedModel(turn(tools=[(SQL_TOOL, {"sql": "select 1"})]), turn("1."))
+    ports = _sql_ports(model)
+    assert harness.run(run_id, ports) == "waiting_approval"
+    pg.execute(
+        "UPDATE runs SET started_at = started_at - interval '180 seconds' WHERE id = %s", (run_id,)
+    )
+    assert harness.run(run_id, ports, {"decision": "approved", "comment": None}) == "failed"
+    assert run_row(pg, run_id)["error_code"] == "limit_reached"

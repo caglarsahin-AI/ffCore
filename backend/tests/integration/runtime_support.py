@@ -53,10 +53,12 @@ class ScriptedModel:
     def __init__(self, *turns: ModelTurn, delay: float = 0) -> None:
         self.turns = list(turns)
         self.calls: list[list[dict]] = []
+        self.tools_seen: list[list[str]] = []
         self.delay = delay
 
     async def call(self, messages, *, tools, max_tokens, on_token):
         self.calls.append(json.loads(json.dumps(messages)))
+        self.tools_seen.append([t["function"]["name"] for t in tools or []])
         await asyncio.sleep(self.delay)
         result = self.turns.pop(0)
         if on_token and result.content:
@@ -81,12 +83,16 @@ class ScriptedTools:
     approval: set[str] = field(default_factory=set)
     results: dict[str, ToolOutcome] = field(default_factory=dict)
     called: list[tuple[str, dict]] = field(default_factory=list)
+    limits: dict[str, int] = field(default_factory=dict)
 
     def schemas(self):
         return self.schema
 
     def needs_approval(self, name):
         return name in self.approval
+
+    def max_calls(self, name):
+        return self.limits.get(name)
 
     async def call(self, name, arguments):
         self.called.append((name, arguments))
@@ -114,6 +120,8 @@ class Ports:
     tools: ScriptedTools = field(default_factory=ScriptedTools)
     guard: ScriptedGuard = field(default_factory=ScriptedGuard)
     stream_live: bool = True
+    # The real tool port (adapters.AgentTools.load) instead of `tools`, for MCP tests.
+    tools_factory: Any = None
 
 
 def definition(**overrides) -> dict[str, Any]:
@@ -163,15 +171,20 @@ class Harness:
                 await mark_listening(client, run_id, 600)
 
             async def context_factory(*, session, run, definition, events, boundary):
+                tools = ports.tools
+                if ports.tools_factory is not None:
+                    tools = await ports.tools_factory(
+                        session=session, run=run, definition=definition
+                    )
                 return RunContext(
                     run_id=str(run.id),
                     project_id=str(run.project_id),
-                    user_id=None,
+                    user_id=str(run.user_id) if run.user_id else None,
                     definition=definition,
                     events=events,
                     model=ports.model,
                     retriever=ports.retriever,
-                    tools=ports.tools,
+                    tools=tools,
                     guard=ports.guard,
                     boundary=boundary,
                     system={

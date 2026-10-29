@@ -22,6 +22,22 @@ MODEL_KEY_PATTERN = r"^[a-z][a-z0-9-]{1,63}$"
 KEY_PATTERN = r"^[a-z][a-z0-9_-]{0,63}$"
 TOOL_KEY_PATTERN = r"^[a-z][a-z0-9-]{0,63}$"
 ACTION_PATTERN = r"^[A-Za-z_][A-Za-z0-9_.-]{0,127}$"
+DEFAULT_APPROVER = "analyst"
+# The model sees an MCP action as `<tool_key>__<action>` (function names take no dot); approval
+# lists keep `<tool_key>.<action>`. A tool key has no underscore, so the split is unambiguous.
+TOOL_NAME_SEPARATOR = "__"
+MODEL_TOOL_NAME_PATTERN = r"^[A-Za-z0-9_-]{1,64}$"
+
+
+def model_tool_name(tool_key: str, action: str) -> str:
+    return f"{tool_key}{TOOL_NAME_SEPARATOR}{action}"
+
+
+def approval_name(model_name: str) -> str | None:
+    """`mcp-sql__run_sql` -> `mcp-sql.run_sql`; None for a built-in tool."""
+    tool_key, separator, action = model_name.partition(TOOL_NAME_SEPARATOR)
+    return f"{tool_key}.{action}" if separator else None
+
 
 Key = Annotated[str, Field(pattern=KEY_PATTERN)]
 
@@ -67,8 +83,8 @@ class Approval(_Strict):
     actions: list[str] = Field(
         default_factory=list, description="'<tool_key>.<action>'; joined with needs_approval."
     )
-    # The `user` role never approves (brief 06 R5.2).
-    assign_to: Literal["analyst", "developer", "admin"] = "admin"
+    # The `user` role never approves (brief 06 R5.2); the default approver is analyst (brief 07).
+    assign_to: Literal["analyst", "developer", "admin"] = DEFAULT_APPROVER
 
 
 class Limits(_Strict):

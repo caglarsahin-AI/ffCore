@@ -25,7 +25,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from ffcore.core import tracing
 from ffcore.core.config import Settings
 from ffcore.models.agents import AgentVersion
-from ffcore.models.runs import Message, Run
+from ffcore.models.runs import Message, Run, RunEvent
 from ffcore.runtime.contracts import FINISHED, WAITING, RunEventType, RunStatus, SseEvent
 from ffcore.runtime.definition import parse_definition
 from ffcore.runtime.events import RunEventWriter, is_listened
@@ -92,6 +92,31 @@ async def _boundary_factory(attempt: Attempt, session: AsyncSession, run: Run, d
     return boundary
 
 
+# A wait starts with the request and ends with its answer (K-07-0002 S6: waiting is not run time).
+WAIT_STARTS = {RunEventType.approval_requested.value, RunEventType.question.value}
+WAIT_ENDS = {RunEventType.approval_resolved.value, RunEventType.user_answer.value}
+
+
+async def _waited_s(session: AsyncSession, run_id, now: datetime) -> float:
+    """Seconds the run spent in waiting_approval / waiting_user, from its own events; a wait
+    still open is the one this attempt resumes, it ends now."""
+    rows = await session.execute(
+        select(RunEvent.type, RunEvent.ts)
+        .where(RunEvent.run_id == run_id, RunEvent.type.in_(WAIT_STARTS | WAIT_ENDS))
+        .order_by(RunEvent.seq)
+    )
+    waited, since = 0.0, None
+    for kind, ts in rows:
+        if kind in WAIT_STARTS:
+            since = ts
+        elif since is not None:
+            waited += (ts - since).total_seconds()
+            since = None
+    if since is not None:
+        waited += (now - since).total_seconds()
+    return waited
+
+
 def _timing_fields(run: Run, timing: dict[str, int]) -> None:
     total = int((run.ended_at - run.started_at).total_seconds() * 1000)
     parts = {k: timing.get(k, 0) for k in ("model", "tool", "retrieval")}
@@ -126,7 +151,9 @@ async def execute(attempt: Attempt, run_id: str, resume: dict[str, Any] | None =
         await session.commit()
 
         timeout_s = definition.limits.run_timeout_s or settings.run_timeout_s
-        deadline = time.monotonic() + max(timeout_s - (_now() - run.started_at).total_seconds(), 0)
+        now = _now()
+        worked_s = (now - run.started_at).total_seconds() - await _waited_s(session, run.id, now)
+        deadline = time.monotonic() + max(timeout_s - worked_s, 0)
         boundary = await _boundary_factory(attempt, session, run, deadline)
         try:
             ctx: RunContext = await attempt.context_factory(

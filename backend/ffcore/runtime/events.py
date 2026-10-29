@@ -19,9 +19,12 @@ from collections.abc import AsyncIterator
 from dataclasses import dataclass
 from typing import Any
 
+import redis.asyncio as aioredis
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from ffcore.core.config import Settings
+from ffcore.core.errors import ApiError
 from ffcore.models.runs import RunEvent
 from ffcore.runtime.contracts import TERMINAL_SSE, RunEventType, SseEvent
 
@@ -37,6 +40,14 @@ REPLAY_SSE = {
     RunEventType.answer: SseEvent.token,
     RunEventType.error: SseEvent.error,
 }
+
+
+def redis_client(settings: Settings):
+    if settings.redis_url is None:
+        raise ApiError(
+            503, "api_error", "redis_unavailable", "The run event stream is not configured."
+        )
+    return aioredis.from_url(settings.redis_url.get_secret_value())
 
 
 def stream_key(run_id) -> str:

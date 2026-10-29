@@ -21,6 +21,8 @@ class RunState(TypedDict, total=False):
     messages: list[dict[str, Any]]
     iteration: int
     tool_calls_used: int
+    # Calls per model-facing tool name, for an action's own max_calls_per_run (05a).
+    tool_counts: dict[str, int]
     sources: list[dict[str, Any]]
     pending_tool: dict[str, Any] | None
     answer: str
@@ -59,6 +61,8 @@ class ToolOutcome:
     total_chars: int
     is_error: bool
     latency_ms: int
+    # The closed code of a call that produced no result (05a ToolCallError), else None.
+    error_code: str | None = None
 
 
 @dataclass
@@ -91,6 +95,8 @@ class ToolRunner(Protocol):
     def schemas(self) -> list[dict[str, Any]]: ...
 
     def needs_approval(self, name: str) -> bool: ...
+
+    def max_calls(self, name: str) -> int | None: ...
 
     async def call(self, name: str, arguments: dict[str, Any]) -> ToolOutcome: ...
 
