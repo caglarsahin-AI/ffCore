@@ -404,3 +404,32 @@ def test_06a_4_tokens_after_a_restart_continue_the_stream(harness, pg, project):
     names = [e for _, e, _ in live]
     restart = names.index("progress", names.index("sources"))
     assert names[restart + 1 :] == ["token", "token", "done"]
+
+
+def test_06a_setup_failure_is_a_coded_end(harness, pg, project, monkeypatch):
+    """prompt_unavailable (Langfuse down), tool_layer_unavailable, a missing guardrail policy:
+    the run fails with that code and an error event (F12 relies on these codes)."""
+    import asyncio
+
+    import redis.asyncio as aioredis
+
+    from ffcore.core.prompts import PromptUnavailable
+    from ffcore.runtime.runner import Attempt, execute
+
+    run_id = seed_run(pg, project, definition())
+
+    async def broken(**kwargs):
+        raise PromptUnavailable("platform_rules", "ConnectError")
+
+    async def go():
+        client = aioredis.from_url(os.environ["REDIS_URL"])
+        try:
+            attempt = Attempt(harness.settings, client, harness.db.session_scope, broken)
+            return await execute(attempt, str(run_id))
+        finally:
+            await client.aclose()
+
+    assert asyncio.run(go()) == "failed"
+    row = run_row(pg, run_id)
+    assert row["error_code"] == "prompt_unavailable"
+    assert stream(run_id)[-1][1] == "error"

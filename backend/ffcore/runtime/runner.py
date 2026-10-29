@@ -128,9 +128,21 @@ async def execute(attempt: Attempt, run_id: str, resume: dict[str, Any] | None =
         timeout_s = definition.limits.run_timeout_s or settings.run_timeout_s
         deadline = time.monotonic() + max(timeout_s - (_now() - run.started_at).total_seconds(), 0)
         boundary = await _boundary_factory(attempt, session, run, deadline)
-        ctx: RunContext = await attempt.context_factory(
-            session=session, run=run, definition=definition, events=events, boundary=boundary
-        )
+        try:
+            ctx: RunContext = await attempt.context_factory(
+                session=session, run=run, definition=definition, events=events, boundary=boundary
+            )
+        except Exception as exc:
+            # Prompt, policy, tool layer or model set-up failed: a coded end, never stuck running.
+            code = getattr(exc, "code", None) or "run_error"
+            log.warning("run_setup_failed run_id=%s code=%s", run.id, code)
+            return await _stop(
+                session,
+                run.id,
+                events,
+                {},
+                StopRun(RunStatus.failed, code, getattr(exc, "message", None)),
+            )
         config = {"configurable": {"thread_id": str(run.id)}}
         with (
             tracing.run_attributes(
