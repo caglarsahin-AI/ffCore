@@ -115,8 +115,8 @@ function Loaded({ projectId, knowledgeBase }: { projectId: string; knowledgeBase
                   : t("thresholdMinScore", { score: knowledgeBase.default_min_score })
             }
           />
-          <Fact label={t("documents")} value={<span className="font-mono">{knowledgeBase.document_count}</span>} />
-          <Fact label={t("chunks")} value={<span className="font-mono">{knowledgeBase.chunk_count}</span>} />
+          <Fact label={t("documents")} value={<span className="font-mono" data-testid="kb-document-count">{knowledgeBase.document_count}</span>} />
+          <Fact label={t("chunks")} value={<span className="font-mono" data-testid="kb-chunk-count">{knowledgeBase.chunk_count}</span>} />
           <Fact label={t("chunkSize")} value={<span className="font-mono">{knowledgeBase.chunk_size}</span>} />
           <Fact label={t("rerankModel")} value={<span className="font-mono">{knowledgeBase.rerank ? knowledgeBase.rerank_model : t("thresholdNone")}</span>} />
         </dl>

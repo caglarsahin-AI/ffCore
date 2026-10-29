@@ -74,7 +74,9 @@ function KnowledgeBaseList({ projectId }: { projectId: string }) {
                     <Badge variant={kb.status === "active" ? "secondary" : "outline"}>{t(`statuses.${kb.status}`)}</Badge>
                   </TableCell>
                   <TableCell className="text-right font-mono">{kb.document_count}</TableCell>
-                  <TableCell className="text-right font-mono">{kb.chunk_count}</TableCell>
+                  <TableCell className="text-right font-mono" data-testid="kb-row-chunks">
+                    {kb.chunk_count}
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
