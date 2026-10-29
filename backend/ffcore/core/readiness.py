@@ -27,11 +27,11 @@ from ffcore.core.config import Settings, get_settings
 log = logging.getLogger("ffcore.readiness")
 router = APIRouter(tags=["readiness"])
 
-_state: dict = {"warm": False, "error": None}
+_state: dict = {"warm": False, "error": None, "code": None}
 
 
 def reset() -> None:
-    _state.update(warm=False, error=None)
+    _state.update(warm=False, error=None, code=None)
 
 
 def _load_models(settings: Settings) -> None:
@@ -50,7 +50,9 @@ async def warmup(settings: Settings) -> None:
         await asyncio.to_thread(_load_models, settings)
     except Exception as exc:  # noqa: BLE001 - reported as warmup_failed, never swallowed
         log.error("warmup failed: %s", type(exc).__name__)
-        _state.update(warm=False, error=f"{type(exc).__name__}: {str(exc)[:300]}")
+        # ModelMissing (r1 MAJOR-6) names the model and the path it was looked for in.
+        code = getattr(exc, "code", None) or "warmup_failed"
+        _state.update(warm=False, error=f"{type(exc).__name__}: {str(exc)[:300]}", code=code)
         return
     _state.update(warm=True, error=None)
 
@@ -135,11 +137,12 @@ async def _vector_store_check(settings: Settings) -> ReadinessCheck:
 )
 async def readyz(settings: Annotated[Settings, Depends(get_settings)]):
     """200 when every check is ok or skipped; 503 with the same body otherwise
-    (codes: warming, warmup_failed, context_configuration_invalid, embed_dim_mismatch, ...)."""
+    (codes: warming, warmup_failed, model_missing, context_configuration_invalid,
+    embed_dim_mismatch, ...)."""
     if _state["warm"]:
         warm = check("warmup", True)
     elif _state["error"]:
-        warm = check("warmup", False, "warmup_failed", _state["error"])
+        warm = check("warmup", False, _state["code"] or "warmup_failed", _state["error"])
     else:
         warm = check("warmup", False, "warming", "models are loading")
     models = ReadinessCheck(

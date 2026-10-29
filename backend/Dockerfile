@@ -6,13 +6,16 @@ FROM ${REGISTRY_PREFIX}python:3.12.10-slim-bookworm AS base
 COPY --from=uv /uv /usr/local/bin/uv
 # 04a: model weights (bge-m3, reranker, Docling layout, PaddleOCR) live in the model_cache volume
 # mounted at /models, never in the image; airgap gets them from the internal mirror (12).
+# Offline in every image (review r1 MAJOR-6): only `make models` downloads, on purpose.
 ENV UV_PROJECT_ENVIRONMENT=/opt/venv \
     UV_COMPILE_BYTECODE=1 \
     UV_LINK_MODE=copy \
     PATH=/opt/venv/bin:$PATH \
     PYTHONUNBUFFERED=1 \
     HF_HOME=/models/huggingface \
-    MODEL_CACHE_DIR=/models
+    MODEL_CACHE_DIR=/models \
+    HF_HUB_OFFLINE=1 \
+    TRANSFORMERS_OFFLINE=1
 # 04a (K-04a-0002 S5): libgomp1 is the OpenMP runtime paddlepaddle and the torch CPU build load;
 # libgl1, libglib2.0-0 and libxcb1 are what the OpenCV wheels pulled in by PaddleOCR and
 # Docling's rapidocr link against (without them `import cv2` fails, and pymupdf4llm with it).

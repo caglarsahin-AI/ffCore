@@ -36,7 +36,10 @@ class BgeReranker:
         if self._instance is None:
             from FlagEmbedding import FlagReranker
 
-            self._instance = FlagReranker(self.model, use_fp16=False)
+            from ffcore.knowledge.models import hf_path
+
+            # A local path, never a hub name: missing weights are ModelMissing (r1 MAJOR-6).
+            self._instance = FlagReranker(str(hf_path(self.model)), use_fp16=False)
         return self._instance
 
     def load(self) -> None:

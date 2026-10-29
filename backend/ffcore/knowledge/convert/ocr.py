@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import Any
 
 from ffcore.knowledge.convert.types import MIN_TEXT_CHARS, ConversionResult, empty, failed
+from ffcore.knowledge.models import ModelMissing
 
 DPI = 150
 LINE_BAND_PX = 12
@@ -29,10 +30,17 @@ def _paddle() -> Any:
     cached = getattr(_local, "paddle", None)
     if cached is not None:
         return cached
+    from ffcore.knowledge.models import paddle_dirs
+
+    # Explicit directories in the model cache: PaddleOCR's default (~/.paddleocr) downloads on
+    # first use. Missing ones are ModelMissing before PaddleOCR is constructed (r1 MAJOR-6).
+    dirs = paddle_dirs()
     from paddleocr import PaddleOCR
 
     with _load_lock:
-        engine = PaddleOCR(lang="tr", use_angle_cls=True, show_log=False, enable_mkldnn=True)
+        engine = PaddleOCR(
+            lang="tr", use_angle_cls=True, show_log=False, enable_mkldnn=True, **dirs
+        )
     _local.paddle = engine
     return engine
 
@@ -56,6 +64,8 @@ def ocr_pdf(path: Path) -> ConversionResult:
 
     try:
         engine = _paddle()
+    except ModelMissing as exc:
+        return failed(METHOD, exc.code, str(exc))
     except Exception as exc:  # noqa: BLE001 - e.g. weights missing offline: a recorded error
         return failed(METHOD, "ocr_unavailable", str(exc)[:500])
     limit = max_pages()

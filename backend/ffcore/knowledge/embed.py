@@ -47,7 +47,10 @@ class BgeM3Embedder:
         if self._instance is None:
             from FlagEmbedding import BGEM3FlagModel
 
-            self._instance = BGEM3FlagModel(self.model, use_fp16=False)
+            from ffcore.knowledge.models import hf_path
+
+            # A local path, never a hub name: missing weights are ModelMissing (r1 MAJOR-6).
+            self._instance = BGEM3FlagModel(str(hf_path(self.model)), use_fp16=False)
         return self._instance
 
     def load(self) -> None:
@@ -142,7 +145,9 @@ async def probe_dimension(config: dict[str, str], model_id: str, settings: Setti
 def _tokenizer(model: str) -> Any:
     from transformers import AutoTokenizer
 
-    return AutoTokenizer.from_pretrained(model)
+    from ffcore.knowledge.models import hf_path
+
+    return AutoTokenizer.from_pretrained(str(hf_path(model)))
 
 
 def token_counter(settings: Settings):

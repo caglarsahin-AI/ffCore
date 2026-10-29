@@ -5,6 +5,7 @@ Converts in its bounded process pool, gates and chunks, and asks the API for emb
 document row the API has not committed yet is retried a few times, then fails loudly.
 """
 
+import logging
 import uuid
 
 from ffcore.core import db
@@ -14,6 +15,20 @@ from ffcore.knowledge.jobs import get_vector_store
 from ffcore.models.knowledge import Document
 
 MAX_ROW_WAIT_TRIES = 5
+log = logging.getLogger("ffcore.knowledge.worker")
+
+
+async def startup(ctx) -> None:
+    """Model weights before the first job (review r1 MAJOR-6): the tokenizer is needed by every
+    document, so without it the worker does not start; a missing Docling or PaddleOCR weight is
+    logged with its name and path, and the files that need it fail with `model_missing`."""
+    from ffcore.knowledge.models import hf_path, missing
+
+    settings = get_settings()
+    if not settings.fake_embed:
+        hf_path(settings.embed_model)
+    for gap in missing(settings.embed_model, settings.rerank_model):
+        log.error("model_missing name=%s path=%s (run `make models`)", gap.name, gap.path)
 
 
 async def ingest_document_job(ctx, document_id: str) -> dict:
@@ -61,6 +76,7 @@ def _redis_settings():
 
 class WorkerSettings:
     functions = [ingest_document_job, reindex_job]
+    on_startup = startup
     queue_name = get_settings().arq_queue_ingest
     # One document at a time per worker: conversion already runs in its own process pool.
     max_jobs = 1

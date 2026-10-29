@@ -873,7 +873,9 @@ paths:
       summary: Readyz
       description: '200 when every check is ok or skipped; 503 with the same body otherwise
 
-        (codes: warming, warmup_failed, context_configuration_invalid, embed_dim_mismatch, ...).'
+        (codes: warming, warmup_failed, model_missing, context_configuration_invalid,
+
+        embed_dim_mismatch, ...).'
       operationId: readyz_readyz_get
       responses:
         '200':
