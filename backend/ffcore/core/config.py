@@ -6,7 +6,7 @@ Profile differences are configuration values, never `if profile` branches (PLAN 
 from functools import lru_cache
 from typing import Annotated, Literal
 
-from pydantic import Field, SecretStr, field_validator
+from pydantic import Field, SecretStr, field_validator, model_validator
 from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
 CommaList = Annotated[list[str], NoDecode]
@@ -121,6 +121,30 @@ class Settings(BaseSettings):
     sql_demo_database_url: SecretStr | None = None
     agent_demo_db_password: SecretStr | None = None
 
+    # --- 06a agent runtime (profile values, PLAN 2b; .env.example lists each profile) ---
+    # Concurrent model calls (C10): airgap cpu 1, gpu the server's parallelism, llmaas the
+    # provider's concurrency.
+    llm_slots: int = Field(default=4, gt=0)
+    # When background jobs (exams, judges) may take the slot: "HH:MM-HH:MM" or empty (always).
+    # airgap cpu "19:00-07:00" with weekends all day; gpu and llmaas empty (A8).
+    background_window: str = ""
+    background_window_weekends: bool = False
+    background_window_tz: str = "Europe/Istanbul"
+    # Run timeout when the agent sets none (C2): llmaas 120, airgap cpu 900, airgap gpu 300.
+    run_timeout_s: int = Field(default=120, gt=0)
+    # Run queues (C10 names); settings so test runs can use their own, like arq_queue_ingest.
+    arq_queue_interactive: str = "llm-interactive"
+    arq_queue_background: str = "llm-background"
+    sse_keepalive_s: float = Field(default=10, gt=0)
+    # Live event stream per run in Redis; past it a reconnecting client replays from run_events.
+    run_event_stream_ttl_s: int = Field(default=86400, gt=0)
+    # A running run nobody listens to stops at its next step after this long (K-06a-0002 S8).
+    run_abandon_grace_s: int = Field(default=120, gt=0)
+    # LangSmith is LangChain's cloud tracing: switching it on would send prompts outside. Read
+    # only to refuse it (K-06a-0002 S1); Langfuse is the trace store.
+    langsmith_tracing: bool = False
+    langchain_tracing_v2: bool = False
+
     @field_validator(
         "egress_allowlist", "allowed_internal_hosts", "allowed_languages", mode="before"
     )
@@ -144,6 +168,15 @@ class Settings(BaseSettings):
     def _empty_is_unset(cls, value: object) -> object:
         # Compose passes unset optional variables as "" (${VAR:-}); that means "not set".
         return None if value == "" else value
+
+    @model_validator(mode="after")
+    def _no_langsmith(self) -> "Settings":
+        if self.langsmith_tracing or self.langchain_tracing_v2:
+            raise ValueError(
+                "langsmith_tracing_forbidden: LANGSMITH_TRACING / LANGCHAIN_TRACING_V2 would "
+                "send prompts to LangSmith; FFCore traces to Langfuse only"
+            )
+        return self
 
     @field_validator("fernet_key")
     @classmethod
