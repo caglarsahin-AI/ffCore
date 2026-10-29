@@ -11,13 +11,31 @@ dependencies = [
     "pydantic==2.14.1",
     "pydantic-settings==2.16.1",
     "psycopg[binary]==3.3.6",
-    "redis==8.1.0",
+    "redis==5.3.1",
     "pyjwt==2.15.1",
     "greenlet==3.5.6",
     "httpx2==2.16.0",
     "argon2-cffi==25.1.0",
     "cryptography==50.0.2",
     "pyyaml==6.0.3",
+    "python-multipart==0.0.32",
+    "pgvector==0.5.1",
+    # 04a knowledge (K-04a-0002 S1): PayCore's measured, locked versions.
+    # torch/torchvision are direct so [tool.uv.sources] can pin them to the CPU index; otherwise
+    # they arrive transitively from PyPI as the CUDA build.
+    "torch==2.14.0",
+    "torchvision==0.29.0",
+    "transformers==4.57.6",
+    "FlagEmbedding==1.4.2",
+    "docling==2.125.0",
+    "pymupdf==1.28.2",
+    "pymupdf4llm==1.28.2",
+    "paddleocr==2.10.0",
+    "paddlepaddle==3.3.1",
+    "extract-msg==0.56.1",
+    "beautifulsoup4==4.15.0",
+    # One queue library (C10); the ingest worker.
+    "arq==0.28.0",
 ]
 
 [dependency-groups]
@@ -25,6 +43,16 @@ dev = [
     "pytest==9.2.0",
     "ruff==0.17.3",
 ]
+
+# A second package index: an internal mirror must proxy download.pytorch.org too (12).
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[tool.uv.sources]
+torch = [{ index = "pytorch-cpu" }]
+torchvision = [{ index = "pytorch-cpu" }]
 
 [build-system]
 # uv'nun pinli sürümüyle aynı: uv yerleşik derleme arka ucunu kullanır, ağ gerekmez.
@@ -38,3 +66,7 @@ module-root = ""
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["."]
+markers = [
+    "models: needs real model weights (RUN_MODEL_TESTS=1, make test-models)",
+    "vectorstore: needs a Qdrant container (RUN_QDRANT_TESTS=1)",
+]

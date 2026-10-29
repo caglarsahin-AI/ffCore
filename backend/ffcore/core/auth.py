@@ -92,6 +92,12 @@ def unregister_credential_resolver(resolver: CredentialResolver) -> None:
         _resolvers.remove(resolver)
 
 
+def service_authorization(settings: Settings) -> dict[str, str]:
+    """Header an internal service sends to authenticate as the service account (04a worker →
+    POST /internal/embed). Kept here so the token is read in this module only (C2)."""
+    return {"Authorization": f"Bearer {settings.service_token.get_secret_value()}"}
+
+
 def sign_on_behalf_of(
     *,
     user_id: str,

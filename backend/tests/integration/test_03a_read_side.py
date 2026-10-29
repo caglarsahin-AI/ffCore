@@ -61,13 +61,16 @@ def _get_paths(app):
             yield path
 
 
-# /auth/me describes the caller, who differs between the two clients by design.
-PARITY_EXEMPT = {f"{API}/auth/me"}
+# /auth/me describes the caller, who differs between the two clients by design. /readyz is
+# process state, not user data (no role applies; 04a).
+PARITY_EXEMPT = {f"{API}/auth/me", "/readyz"}
 # 08: single-policy GETs need a stored policy in the world; their list routes stay checked here
-# and the items have test_08_19b_read_mode_get_parity.
+# and the items have test_08_19b_read_mode_get_parity. 04a: knowledge-base GET routes need a KB
+# and a document in the world; their parity is test_04a_read_mode_get_parity.
 PARITY_EXEMPT_PREFIXES = (
     f"{API}/projects/{{project_id}}/pii-policies/{{policy_id}}",
     f"{API}/projects/{{project_id}}/guardrail-policies/{{policy_id}}",
+    f"{API}/projects/{{project_id}}/knowledge-bases",
 )
 
 

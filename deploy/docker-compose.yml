@@ -75,6 +75,21 @@ services:
     environment:
       REDIS_PASSWORD: ${REDIS_PASSWORD:?REDIS_PASSWORD tanımlı değil}
 
+  qdrant:
+    # 04a: second vector driver (VECTOR_BACKEND=qdrant; PayCore's primary). Optional:
+    # COMPOSE_PROFILES=qdrant, or give QDRANT_URL of an existing server instead. Same version as
+    # PayCore's server (v1.11.3); pinned by index digest. No port is published (internal only).
+    image: ${REGISTRY_PREFIX}qdrant/qdrant:v1.11.3@sha256:da426bb8aa0ba0a3032b3110e71d0d1516d51a686aa17b39bde4e090ce3b8e7c
+    profiles: ["qdrant"]
+    restart: unless-stopped
+    volumes:
+      - qdrant_data:/qdrant/storage
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c ':> /dev/tcp/127.0.0.1/6333' || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
   litellm:
     image: ${REGISTRY_PREFIX}ghcr.io/berriai/litellm:v1.80.0-stable
     restart: unless-stopped
@@ -198,7 +213,26 @@ services:
     environment: &app-env
       DEPLOY_PROFILE: ${DEPLOY_PROFILE:?DEPLOY_PROFILE tanımlı değil}
       INFERENCE_BACKEND: ${INFERENCE_BACKEND:?INFERENCE_BACKEND tanımlı değil}
+      # 04a /readyz compares it with the Ollama models' context_tokens (C13).
+      OLLAMA_CONTEXT_LENGTH: ${OLLAMA_CONTEXT_LENGTH:-}
       VECTOR_BACKEND: ${VECTOR_BACKEND:?VECTOR_BACKEND tanımlı değil}
+      QDRANT_URL: ${QDRANT_URL:-}
+      # 04a knowledge base (defaults = measured values, .env.example)
+      EMBED_MODEL: ${EMBED_MODEL:-BAAI/bge-m3}
+      RERANK_MODEL: ${RERANK_MODEL:-BAAI/bge-reranker-v2-m3}
+      RERANK_MIN_SCORE: ${RERANK_MIN_SCORE:-0.1}
+      CONVERT_TIMEOUT_SECONDS: ${CONVERT_TIMEOUT_SECONDS:-600}
+      OCR_PDF_MAX_PAGES: ${OCR_PDF_MAX_PAGES:-200}
+      # Converter process and upload limits (review r1 MAJOR-5; measured values in config.py).
+      # Offline by default in both profiles (review r1 MAJOR-6, K-04a-0020): weights come only
+      # from `make models`, never from a loader at run time.
+      HF_HUB_OFFLINE: ${HF_HUB_OFFLINE:-1}
+      TRANSFORMERS_OFFLINE: ${TRANSFORMERS_OFFLINE:-1}
+      CONVERT_MEMORY_LIMIT_MB: ${CONVERT_MEMORY_LIMIT_MB:-10240}
+      CONVERT_CPU_LIMIT_SECONDS: ${CONVERT_CPU_LIMIT_SECONDS:-3600}
+      UPLOAD_MAX_REQUEST_BYTES: ${UPLOAD_MAX_REQUEST_BYTES:-541065216}
+      ALLOWED_LANGUAGES: ${ALLOWED_LANGUAGES:-tr,en}
+      ARQ_QUEUE_INGEST: ${ARQ_QUEUE_INGEST:-ingest}
       OFFLINE: ${OFFLINE:?OFFLINE tanımlı değil}
       DATABASE_URL: postgresql+psycopg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
       REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379/0
@@ -219,6 +253,11 @@ services:
       LLM_CALL_TIMEOUT_S: ${LLM_CALL_TIMEOUT_S:-60}
     ports:
       - "${BACKEND_PORT:-8000}:8000"
+    volumes:
+      # 04a: model weights (bge-m3, reranker); downloaded once, never baked into the image.
+      - model_cache:/models
+      # 04a: raw and silver layers of the knowledge bases (gold is in Postgres).
+      - knowledge_storage:/data/storage
     depends_on:
       migrate:
         condition: service_completed_successfully
@@ -235,6 +274,28 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
+
+  worker:
+    # 04a ingest worker (arq, queue `ingest`): converts in a bounded process pool, gates,
+    # chunks and asks the backend for embeddings; it never loads the embedding model (C10).
+    image: ${REGISTRY_PREFIX}ffcore/backend:${FFCORE_VERSION:?FFCORE_VERSION tanımlı değil}
+    command: ["arq", "ffcore.knowledge.worker.WorkerSettings"]
+    restart: unless-stopped
+    # Container memory budget (review r1 MAJOR-5): the converter process peaked at 2.3 GB
+    # resident with Docling, 1.7 GB with PaddleOCR (2026-10-29), plus the arq process. Past it
+    # the kernel kills the converter, the file is `worker_died` and a fresh process goes on.
+    mem_limit: ${WORKER_MEM_LIMIT:-6g}
+    environment:
+      <<: *app-env
+      INTERNAL_API_URL: http://backend:8000
+      ALLOWED_INTERNAL_HOSTS: backend,${ALLOWED_INTERNAL_HOSTS:-}
+    volumes:
+      # Docling and PaddleOCR weights; raw/silver written here, read by the backend.
+      - model_cache:/models
+      - knowledge_storage:/data/storage
+    depends_on:
+      backend:
+        condition: service_healthy
 
   frontend:
     image: ${REGISTRY_PREFIX}ffcore/frontend:${FFCORE_VERSION:?FFCORE_VERSION tanımlı değil}
@@ -295,6 +356,7 @@ services:
     working_dir: /work
     volumes:
       - .:/work
+      - model_cache:/models
     environment:
       <<: *app-env
       COMPOSE_PROFILES: ${COMPOSE_PROFILES:-}
@@ -342,3 +404,7 @@ volumes:
   langfuse_clickhouse_data:
   langfuse_clickhouse_logs:
   langfuse_minio_data:
+  # 04a: model weights shared by backend, worker and tools (same uid 10001 owns /models).
+  model_cache:
+  qdrant_data:
+  knowledge_storage:
