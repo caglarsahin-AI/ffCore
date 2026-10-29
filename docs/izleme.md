@@ -107,7 +107,18 @@ lost. Prompts follow the rules above.
 
 ## Logs
 
-The backend log goes through one scrubbing filter (`ffcore.core.logging`): tokens, keys,
-`Authorization` values, URL passwords and every configured secret are replaced before a line is
-written. HTTP client and telemetry libraries log at `WARNING` or above even when
-`LOG_LEVEL=DEBUG`.
+The backend and the ingest worker share one log configuration (`ffcore.core.logging`). Every
+log record is scrubbed when it is created, so every output sees only the scrubbed record:
+
+- tokens, keys, `Authorization` values, URL passwords and every configured secret become `***`;
+- personal data (e-mail, TR national ID, phone, IBAN, card; the guardrail recognizers) is
+  masked as the guardrails mask it;
+- a record that cannot be scrubbed is written as `log_scrub_failed` with a counter, never raw.
+
+The access line is `access method=GET path=/api/... status=200 ms=12`: no query string, no
+headers, no client address. HTTP client and telemetry libraries log at `WARNING` or above even
+when `LOG_LEVEL=DEBUG`.
+
+Langfuse tracing never holds a request or the process: one export has a 5 s budget, shutdown
+waits at most 10 s (`trace_shutdown_timeout` after that), and what is not sent is reported as
+`trace_delivery_failed`.
