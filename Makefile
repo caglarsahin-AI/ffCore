@@ -18,9 +18,10 @@ test:
 	cd backend && pytest tests/unit tests/contract
 
 # Qdrant tests need the qdrant profile up (docker compose --profile qdrant up -d qdrant); the
-# defaults are the Compose service, so every run uses the same values (review r1).
-QDRANT_URL ?= http://qdrant:6333
-RUN_QDRANT_TESTS ?= 1
+# defaults are the Compose service, so every run uses the same values (review r1). `$(or)`, not
+# `?=`: Compose passes QDRANT_URL to tools as an empty value, which `?=` leaves empty (FOLLOWUP-84).
+QDRANT_URL := $(or $(QDRANT_URL),http://qdrant:6333)
+RUN_QDRANT_TESTS := $(or $(RUN_QDRANT_TESTS),1)
 test-int:
 	cd backend && QDRANT_URL=$(QDRANT_URL) RUN_QDRANT_TESTS=$(RUN_QDRANT_TESTS) pytest tests/integration
 
