@@ -10,7 +10,7 @@ from ffcore.core.audit import ensure_audit_partitions
 from ffcore.core.auth import register_credential_resolver
 from ffcore.core.config import get_settings
 from ffcore.core.errors import install_error_handlers
-from ffcore.core.logging import configure_logging
+from ffcore.core.logging import AccessLogMiddleware, configure_logging
 from ffcore.core.readiness import router as readiness_router
 from ffcore.core.readiness import warmup
 from ffcore.core.session import session_resolver
@@ -65,6 +65,8 @@ app = FastAPI(title="FFCore", lifespan=lifespan)
 install_error_handlers(app)
 # 04a: upload size checked before the multipart body is parsed (review r1 MAJOR-5).
 app.add_middleware(UploadSizeLimit)
+# 02 r1: the access line, outermost (method, path, status, duration; no query string).
+app.add_middleware(AccessLogMiddleware)
 app.include_router(api_router)
 app.include_router(internal.router)
 app.include_router(readiness_router)

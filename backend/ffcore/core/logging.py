@@ -1,24 +1,28 @@
-"""The one log configuration of FFCore processes (FOLLOWUP-49, 02 S4).
+"""The one log configuration of FFCore processes (FOLLOWUP-49, 02 S4, review r1).
 
-Standard library logging: every module logs through `logging.getLogger("ffcore.<area>")`. Here
-the root handler gets a ScrubFilter that removes secret values and credential patterns from the
-rendered message and from exception text, and the same filter goes on uvicorn's own handlers.
+Standard library logging: every module logs through `logging.getLogger("ffcore.<area>")`. Every
+record is scrubbed where it is made (the log record factory), so no handler ever sees a raw one,
+whenever and by whom it was installed: secret values, credential patterns and personal data
+(08-lite's recognizers and mask) go out of the message, its arguments, exception and stack text.
 Third-party HTTP and telemetry loggers are held at WARNING: at DEBUG httpcore logs response
-header values (B-01-0021).
+header values (B-01-0021). The access line has no query string (AccessLogMiddleware).
 
-The filter is a safety net, not the rule: code still never logs untrusted upstream text or a
+Scrubbing is a safety net, not the rule: code still never logs untrusted upstream text or a
 credential in the first place (01 r1/r2).
 """
 
 import logging
 import re
 import sys
-from collections.abc import Iterable
-from typing import IO
+import time
+from collections.abc import Callable, Iterable
+from typing import IO, Any
 
 from pydantic import SecretStr
 
 from ffcore.core.config import Settings
+from ffcore.guardrails.masking import mask_value
+from ffcore.guardrails.recognizers.regex import recognize
 
 MASK = "***"
 QUIET_LOGGERS = (
@@ -56,7 +60,20 @@ def scrub(text: str, secrets: Iterable[str]) -> str:
             text = text.replace(value, MASK)
     for pattern, replacement in _PATTERNS:
         text = pattern.sub(replacement, text)
-    return text
+    return _mask_personal(text)
+
+
+def _mask_personal(text: str) -> str:
+    """Personal data with 08-lite's built-in recognizers and its mask (no recognizer of our own;
+    KARARLAR "Log'da kişi verisi")."""
+    findings = recognize(text, context_boost=False)
+    if not findings:
+        return text
+    parts, last = [], 0
+    for finding in findings:
+        parts += [text[last : finding.start], mask_value(finding.category, finding.value)]
+        last = finding.end
+    return "".join(parts) + text[last:]
 
 
 def secret_values(settings: Settings) -> list[str]:
@@ -70,50 +87,82 @@ def secret_values(settings: Settings) -> list[str]:
 
 
 _PLAIN = (str, int, float, bool, type(None))
+_secrets: tuple[str, ...] = ()
+_base_factory: Callable[..., logging.LogRecord] | None = None
+scrub_failures = 0
+access_log = logging.getLogger("ffcore.access")
 
 
-class ScrubFilter(logging.Filter):
-    def __init__(self, secrets: Iterable[str]) -> None:
-        super().__init__()
-        self._secrets = tuple(secrets)
+def scrub_record(record: logging.LogRecord, secrets: Iterable[str]) -> None:
+    """Scrubs a record in place and never raises (review r1 MAJOR-2): a record the scrubber
+    cannot handle goes on as `log_scrub_failed` with a counter, never raw."""
+    global scrub_failures
+    secrets = tuple(secrets)
+    try:
+        _scrub(record, secrets)
+    except Exception as exc:  # noqa: BLE001 - replaced by a counted, content-free line
+        scrub_failures += 1
+        record.msg = (
+            f"log_scrub_failed logger={record.name} error={type(exc).__name__} "
+            f"failures={scrub_failures}"
+        )
+        record.args = None
+        record.exc_info = record.exc_text = record.stack_info = None
 
-    def filter(self, record: logging.LogRecord) -> bool:
-        # A clean record keeps msg and args: formatters such as uvicorn's AccessFormatter unpack
-        # record.args. A dirty one keeps its shape if scrubbing each string argument is enough;
-        # otherwise (secret split across msg and args, or inside an object) the rendered text
-        # is scrubbed and replaces both.
-        rendered = record.getMessage()
-        clean = scrub(rendered, self._secrets)
-        if clean != rendered:
-            args = record.args
-            shaped = None
-            if isinstance(args, tuple) and all(isinstance(a, _PLAIN) for a in args):
-                shaped = tuple(scrub(a, self._secrets) if isinstance(a, str) else a for a in args)
+
+def _scrub(record: logging.LogRecord, secrets: tuple[str, ...]) -> None:
+    # A clean record keeps msg and args: formatters such as uvicorn's AccessFormatter unpack
+    # record.args. A dirty one keeps its shape if scrubbing each string argument is enough;
+    # otherwise (value split across msg and args, inside an object, no args) the rendered text
+    # is scrubbed and replaces both.
+    rendered = record.getMessage()
+    clean = scrub(rendered, secrets)
+    if clean != rendered:
+        args = record.args
+        shaped = None
+        if args and isinstance(args, tuple) and all(isinstance(a, _PLAIN) for a in args):
+            shaped = tuple(scrub(a, secrets) if isinstance(a, str) else a for a in args)
+            try:
                 text = str(record.msg) % shaped
-                if scrub(text, self._secrets) != text:
-                    shaped = None
-            if shaped is None:
-                record.msg, record.args = clean, None
+            except (TypeError, ValueError):
+                shaped = None
             else:
-                record.args = shaped
-        if record.exc_info:
-            text = logging.Formatter().formatException(record.exc_info)
-            record.exc_text = scrub(text, self._secrets)
-            record.exc_info = None
-        if record.stack_info:
-            record.stack_info = scrub(record.stack_info, self._secrets)
-        return True
+                if scrub(text, secrets) != text:
+                    shaped = None
+        if shaped is None:
+            record.msg, record.args = clean, None
+        else:
+            record.args = shaped
+    if record.exc_info:
+        text = logging.Formatter().formatException(record.exc_info)
+        record.exc_text = scrub(text, secrets)
+        record.exc_info = None
+    if record.stack_info:
+        record.stack_info = scrub(record.stack_info, secrets)
+
+
+def _scrubbed_record(*args: Any, **kwargs: Any) -> logging.LogRecord:
+    record = _base_factory(*args, **kwargs)  # type: ignore[misc]
+    scrub_record(record, _secrets)
+    return record
 
 
 def configure_logging(
     settings: Settings, level: str | None = None, stream: IO[str] | None = None
 ) -> None:
-    """Idempotent: replaces the root handler, re-filters uvicorn's handlers."""
+    """Idempotent. Records are scrubbed where they are made (the log record factory), so every
+    handler sees only scrubbed records, whether it was installed before this call or after it
+    (arq's CLI, uvicorn; review r1 MAJOR-1). The root gets one FFCore handler. uvicorn's access
+    log is off: AccessLogMiddleware writes method, path, status and duration, no query string
+    (KARARLAR "Log'da kişi verisi")."""
+    global _secrets, _base_factory
     level = (level or settings.log_level).upper()
-    scrubber = ScrubFilter(secret_values(settings))
+    _secrets = tuple(secret_values(settings))
+    if _base_factory is None:
+        _base_factory = logging.getLogRecordFactory()
+        logging.setLogRecordFactory(_scrubbed_record)
     handler = logging.StreamHandler(stream or sys.stderr)
     handler.setFormatter(logging.Formatter(FORMAT))
-    handler.addFilter(scrubber)
     root = logging.getLogger()
     for old in list(root.handlers):
         if getattr(old, "_ffcore", False):
@@ -125,8 +174,35 @@ def configure_logging(
         logging.getLogger(name).setLevel(
             max(logging.WARNING, logging.getLevelNamesMapping()[level])
         )
-    for name in ("uvicorn", "uvicorn.error", "uvicorn.access"):
-        for uvicorn_handler in logging.getLogger(name).handlers:
-            for old in [f for f in uvicorn_handler.filters if isinstance(f, ScrubFilter)]:
-                uvicorn_handler.removeFilter(old)
-            uvicorn_handler.addFilter(scrubber)
+    logging.getLogger("uvicorn.access").disabled = True
+
+
+class AccessLogMiddleware:
+    """One access line per HTTP request: method, path, status, duration. No query string, no
+    headers, no client address (review r1 MAJOR-5)."""
+
+    def __init__(self, app: Any) -> None:
+        self.app = app
+
+    async def __call__(self, scope: dict, receive: Any, send: Any) -> None:
+        if scope["type"] != "http":
+            await self.app(scope, receive, send)
+            return
+        started = time.perf_counter()
+        status = [500]
+
+        async def send_status(message: dict) -> None:
+            if message["type"] == "http.response.start":
+                status[0] = message["status"]
+            await send(message)
+
+        try:
+            await self.app(scope, receive, send_status)
+        finally:
+            access_log.info(
+                "access method=%s path=%s status=%d ms=%d",
+                scope["method"],
+                scope["path"],
+                status[0],
+                (time.perf_counter() - started) * 1000,
+            )
