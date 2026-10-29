@@ -4,6 +4,7 @@ from ffcore.models.catalog import Model, ModelCatalogEntry, Provider, ProviderPr
 from ffcore.models.guardrails import GuardrailEventRow, GuardrailPolicy, PiiPolicy  # 08
 from ffcore.models.identity import Project, ProjectMember, User  # 03a
 from ffcore.models.knowledge import Attachment, Chunk, Document, KbQuery, KnowledgeBase  # 04a
+from ffcore.models.tools import FewShot, SchemaDescription, Tool, ToolAction  # 05a
 
 __all__ = [
     "Attachment",
@@ -11,6 +12,7 @@ __all__ = [
     "Base",
     "Chunk",
     "Document",
+    "FewShot",
     "GuardrailEventRow",
     "GuardrailPolicy",
     "KbQuery",
@@ -22,5 +24,8 @@ __all__ = [
     "ProjectMember",
     "Provider",
     "ProviderProject",
+    "SchemaDescription",
+    "Tool",
+    "ToolAction",
     "User",
 ]

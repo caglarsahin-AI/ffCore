@@ -21,6 +21,11 @@ BACKEND_URL = os.environ.get("SMOKE_BACKEND_URL", "http://backend:8000")
 LITELLM_URL = os.environ.get("SMOKE_LITELLM_URL", "http://litellm:4000")
 LANGFUSE_URL = os.environ.get("SMOKE_LANGFUSE_URL", "http://langfuse-web:3000")
 OLLAMA_URL = os.environ.get("SMOKE_OLLAMA_URL", "http://ollama:11434")
+# 05a: the built-in MCP tool servers (internal network only).
+MCP_URLS = {
+    "mcp-search": os.environ.get("SMOKE_MCP_SEARCH_URL", "http://mcp-search:8000"),
+    "mcp-sql": os.environ.get("SMOKE_MCP_SQL_URL", "http://mcp-sql:8000"),
+}
 
 
 class SmokeError(Exception):
@@ -120,9 +125,22 @@ def check_ollama() -> list[str]:
     return lines
 
 
+def check_mcp() -> list[str]:
+    lines = []
+    for name, base in MCP_URLS.items():
+        status, _ = _request(f"{base}/healthz")
+        if status != 200:
+            raise SmokeError(f"{name} /healthz returned {status}")
+        lines.append(f"{name} /healthz 200")
+    return lines
+
+
+CHECKS = (check_backend, check_litellm, check_langfuse, check_mcp, check_ollama)
+
+
 def main() -> int:
     failed = False
-    for check in (check_backend, check_litellm, check_langfuse, check_ollama):
+    for check in CHECKS:
         try:
             result = check()
             for line in result if isinstance(result, list) else [result]:

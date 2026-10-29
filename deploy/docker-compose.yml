@@ -318,6 +318,48 @@ services:
       backend:
         condition: service_healthy
 
+  mcp-search:
+    # 05a: MCP server search_documents (C7). Relays the caller's on-behalf-of token to the
+    # backend's knowledge search; no signing key, no database (K-05a-0002 S3): its environment
+    # is listed here, not the app-env anchor. Internal network only.
+    image: ${REGISTRY_PREFIX}ffcore/backend:${FFCORE_VERSION:?FFCORE_VERSION tanımlı değil}
+    command: ["python", "-m", "ffcore.services.mcp_search_server"]
+    restart: unless-stopped
+    mem_limit: ${MCP_MEM_LIMIT:-512m}
+    environment: &mcp-env
+      SERVICE_TOKEN: ${SERVICE_TOKEN:?SERVICE_TOKEN is not set}
+      OFFLINE: ${OFFLINE:?OFFLINE tanımlı değil}
+      ALLOWED_INTERNAL_HOSTS: backend
+      INTERNAL_API_URL: http://backend:8000
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+    healthcheck: &mcp-health
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/healthz')"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+    depends_on:
+      backend:
+        condition: service_healthy
+
+  mcp-sql:
+    # 05a: MCP server get_schema / run_sql (C7) on the demo database (13a), read-only login
+    # user (`make seed-sql-demo`, K-05a-0002 S5). Same rules as mcp-search.
+    image: ${REGISTRY_PREFIX}ffcore/backend:${FFCORE_VERSION:?FFCORE_VERSION tanımlı değil}
+    command: ["python", "-m", "ffcore.services.mcp_sql_server"]
+    restart: unless-stopped
+    mem_limit: ${MCP_MEM_LIMIT:-512m}
+    environment:
+      <<: *mcp-env
+      SQL_DEMO_DATABASE_URL: postgresql://mcp_sql:${AGENT_DEMO_DB_PASSWORD:?AGENT_DEMO_DB_PASSWORD is not set}@postgres:5432/agent_demo
+      SQL_MAX_ROWS: ${SQL_MAX_ROWS:-500}
+      SQL_TIMEOUT_S: ${SQL_TIMEOUT_S:-20}
+    healthcheck: *mcp-health
+    depends_on:
+      backend:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+
   frontend:
     image: ${REGISTRY_PREFIX}ffcore/frontend:${FFCORE_VERSION:?FFCORE_VERSION tanımlı değil}
     build:
@@ -391,6 +433,8 @@ services:
       SEED_OLLAMA_BASE_URL: ${SEED_OLLAMA_BASE_URL:-}
       SEED_VLLM_BASE_URL: ${SEED_VLLM_BASE_URL:-}
       SEED_VLLM_MODEL: ${SEED_VLLM_MODEL:-}
+      # 05a: `make seed-sql-demo` gives mcp-sql's login user this password (empty: loud error).
+      AGENT_DEMO_DB_PASSWORD: ${AGENT_DEMO_DB_PASSWORD:-}
 
   e2e:
     # Console acceptance tests against this stack (10a-binding, K-10ab-0004). Builds and serves the

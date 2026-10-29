@@ -37,6 +37,9 @@ dependencies = [
     # One queue library (C10); the ingest worker.
     "arq==0.28.0",
     "langfuse==4.15.1",
+    # 05a (K-05a-0002 S1): MCP client and servers (streamable HTTP), SQL validation.
+    "mcp==2.3.0",
+    "sqlglot==30.23.0",
 ]
 
 [dependency-groups]
@@ -50,6 +53,10 @@ dev = [
 name = "pytorch-cpu"
 url = "https://download.pytorch.org/whl/cpu"
 explicit = true
+
+[tool.uv]
+# 05a S1: sse-starlette (via mcp) pinned to 3.5.0; 3.5.1 and 3.6.0 were days old when 05a was planned.
+constraint-dependencies = ["sse-starlette==3.5.0"]
 
 [tool.uv.sources]
 torch = [{ index = "pytorch-cpu" }]
