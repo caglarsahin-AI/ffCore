@@ -37,7 +37,9 @@ def _settings(app_settings, tmp_path, backend):
         extra.update(
             vector_backend="qdrant",
             qdrant_url=os.environ.get("QDRANT_URL", "http://qdrant:6333"),
-            allowed_internal_hosts=["qdrant"],
+            # Added to the hosts the stack allows (litellm, langfuse-web), not instead of them:
+            # the app checks LANGFUSE_HOST against this list at start-up (02).
+            allowed_internal_hosts=[*app_settings.allowed_internal_hosts, "qdrant"],
         )
     return app_settings.model_copy(update=extra)
 
