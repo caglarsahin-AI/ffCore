@@ -1,6 +1,6 @@
 """Render a package's OpenAPI draft (`backend/openapi/<package>.yaml`) from the application routes.
 
-Tools container: python -m ffcore.api.openapi_export [03a|04a|08] > openapi/<package>.yaml
+Tools container: python -m ffcore.api.openapi_export [03a|04a|05a|08] > openapi/<package>.yaml
 The contract tests compare each committed file with this output, so no draft ever drifts.
 Each draft holds only its package's routes: adding a package never changes an earlier draft.
 """
@@ -24,6 +24,12 @@ PACKAGES = {
         "description": "Knowledge bases, documents, search, internal embedding and readiness "
         "(package 04a).",
         "tags": {"knowledge-bases", "internal", "readiness"},
+    },
+    "05a": {
+        "version": "0.5a",
+        "description": "Tool registry: MCP tools, actions, discovery, test calls and the SQL "
+        "tool context (package 05a).",
+        "tags": {"tools"},
     },
     "08": {
         "version": "0.8",

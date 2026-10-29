@@ -15,12 +15,14 @@ import hmac
 import os
 import time
 import uuid
-from typing import Any
+from typing import Annotated, Any, Literal
 
 import uvicorn
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
 from mcp.server.transport_security import TransportSecuritySettings
+from pydantic import Field, SecretStr, field_validator
+from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 from starlette.responses import JSONResponse
 
 from ffcore.core.auth import (
@@ -29,11 +31,38 @@ from ffcore.core.auth import (
     service_authorization,
     unverified_on_behalf_of_claims,
 )
-from ffcore.core.config import Settings, get_settings
+from ffcore.core.config import Settings
 from ffcore.core.egress import EgressError, EgressTimeout, SafeOutboundClient
 from ffcore.core.logging import configure_logging
 
 BACKEND_TIMEOUT = EgressTimeout(connect=5, read=30, total=60)
+
+
+class McpServiceSettings(BaseSettings):
+    """What mcp-search and mcp-sql read from their environment, and nothing more: no signing
+    key, no backend database, no encryption key (K-05a-0002 S3). The backend's Settings would
+    require all of them. Same names and meanings as core/config.Settings; the helpers that take
+    a Settings (egress, service_authorization, configure_logging) read only these fields."""
+
+    model_config = SettingsConfigDict(extra="ignore", hide_input_in_errors=True)
+
+    service_token: SecretStr = Field(min_length=32)
+    offline: bool
+    egress_allowlist: Annotated[list[str], NoDecode] = []
+    allowed_internal_hosts: Annotated[list[str], NoDecode] = []
+    internal_api_url: str = "http://backend:8000"
+    log_level: Literal["DEBUG", "INFO", "WARNING", "ERROR"] = "INFO"
+    # mcp-sql only.
+    sql_demo_database_url: SecretStr | None = None
+    sql_max_rows: int = Field(default=500, gt=0)
+    sql_timeout_s: int = Field(default=20, gt=0)
+
+    @field_validator("egress_allowlist", "allowed_internal_hosts", mode="before")
+    @classmethod
+    def _split_commas(cls, value: object) -> object:
+        if isinstance(value, str):
+            return [item.strip().lower() for item in value.split(",") if item.strip()]
+        return value
 
 
 def _error(status: int, code: str, message: str) -> JSONResponse:
@@ -136,7 +165,7 @@ def build_app(server: MCPServer, settings: Settings, *, tool_key: str, allowed_h
 
 def serve(build: Any, *, default_key: str, key_env: str) -> None:
     """Process entry: central logging (02), tool key and allowed Host values from the env."""
-    settings = get_settings()
+    settings = McpServiceSettings()
     configure_logging(settings)
     tool_key = os.environ.get(key_env, default_key)
     hosts = [h.strip() for h in os.environ.get("MCP_ALLOWED_HOSTS", f"{default_key}:*").split(",")]

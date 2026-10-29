@@ -1,0 +1,1136 @@
+openapi: 3.1.0
+info:
+  title: FFCore API
+  description: 'Tool registry: MCP tools, actions, discovery, test calls and the SQL tool context (package
+    05a).'
+  version: 0.5a
+paths:
+  /api/v1/projects/{project_id}/tools:
+    get:
+      tags:
+      - tools
+      summary: List the project's tools
+      operationId: list_tools_api_v1_projects__project_id__tools_get
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ToolList'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+    post:
+      tags:
+      - tools
+      summary: Register a tool
+      description: 'The endpoint passes the outbound policy now and again at every call (C5); forward_user
+
+        only to internal services (C3). Discover the actions next (POST .../discover).'
+      operationId: create_tool_api_v1_projects__project_id__tools_post
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ToolCreate'
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ToolOut'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+  /api/v1/projects/{project_id}/tools/{tool_id}:
+    get:
+      tags:
+      - tools
+      summary: Get a tool with its actions
+      operationId: get_tool_api_v1_projects__project_id__tools__tool_id__get
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      - name: tool_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Tool Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ToolOut'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+    patch:
+      tags:
+      - tools
+      summary: Update a tool
+      description: Secret auth fields sent back as *** keep their stored value (same auth type only).
+      operationId: update_tool_api_v1_projects__project_id__tools__tool_id__patch
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      - name: tool_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Tool Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ToolUpdate'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ToolOut'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+    delete:
+      tags:
+      - tools
+      summary: Delete a tool
+      description: Soft delete; the key can be used again.
+      operationId: delete_tool_api_v1_projects__project_id__tools__tool_id__delete
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      - name: tool_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Tool Id
+      responses:
+        '204':
+          description: Successful Response
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+  /api/v1/projects/{project_id}/tools/{tool_id}/discover:
+    post:
+      tags:
+      - tools
+      summary: Discover the tool's actions
+      description: 'MCP tools/list with the tool''s own identity. The outcome is the result: a failed
+
+        discovery answers 200 with status=error and last_error_code (the connection test shown on
+
+        screen). New actions start disabled and needing approval.'
+      operationId: discover_tool_api_v1_projects__project_id__tools__tool_id__discover_post
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      - name: tool_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Tool Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ToolOut'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+  /api/v1/projects/{project_id}/tools/{tool_id}/actions/{action_name}:
+    patch:
+      tags:
+      - tools
+      summary: Change an action's settings
+      description: enabled, needs_approval, max_calls_per_run and timeout_s; discovery never changes them.
+      operationId: update_tool_action_api_v1_projects__project_id__tools__tool_id__actions__action_name__patch
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      - name: tool_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Tool Id
+      - name: action_name
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Action Name
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ToolActionUpdate'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ToolActionOut'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+  /api/v1/projects/{project_id}/tools/{tool_id}/actions/{action_name}/invoke:
+    post:
+      tags:
+      - tools
+      summary: Call an action directly (test call)
+      description: 'An admin''s test call, with the tool''s identity (forward_user: the admin''s). It
+        runs
+
+        whether the action is enabled or not and asks no approval: the admin calling it is the
+
+        decision, and the audit records it (arguments and result are not stored there). A missing
+
+        action is refused (409 action_missing); a failed call is 502 with its code.'
+      operationId: invoke_tool_action_api_v1_projects__project_id__tools__tool_id__actions__action_name__invoke_post
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      - name: tool_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Tool Id
+      - name: action_name
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Action Name
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InvokeRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvokeResult'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+  /api/v1/projects/{project_id}/tools/sql-context:
+    post:
+      tags:
+      - tools
+      summary: SQL tool context (mcp-sql)
+      description: 'For mcp-sql''s get_schema, on behalf of the user running the agent (any project role).
+
+        Descriptions narrowed to the question by keywords, and the project''s five nearest
+
+        question-SQL examples (in-process embedding, pgvector cosine).'
+      operationId: sql_context_api_v1_projects__project_id__tools_sql_context_post
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SqlContextRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SqlContext'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+components:
+  schemas:
+    AuthBasic:
+      properties:
+        type:
+          type: string
+          const: basic
+          title: Type
+        username:
+          type: string
+          maxLength: 4096
+          minLength: 1
+          title: Username
+        password:
+          type: string
+          maxLength: 4096
+          minLength: 1
+          title: Password
+      additionalProperties: false
+      type: object
+      required:
+      - type
+      - username
+      - password
+      title: AuthBasic
+    AuthBearer:
+      properties:
+        type:
+          type: string
+          const: bearer
+          title: Type
+        token:
+          type: string
+          maxLength: 4096
+          minLength: 1
+          title: Token
+      additionalProperties: false
+      type: object
+      required:
+      - type
+      - token
+      title: AuthBearer
+    AuthForwardUser:
+      properties:
+        type:
+          type: string
+          const: forward_user
+          title: Type
+      additionalProperties: false
+      type: object
+      required:
+      - type
+      title: AuthForwardUser
+      description: 'The caller''s identity as an `X-On-Behalf-Of` JWT, signed for every call; internal
+        FFCore
+
+        services only (ALLOWED_INTERNAL_HOSTS, C3).'
+    AuthHeader:
+      properties:
+        type:
+          type: string
+          const: header
+          title: Type
+        name:
+          type: string
+          pattern: ^[A-Za-z0-9-]{1,64}$
+          title: Name
+          description: Header name.
+        value:
+          type: string
+          maxLength: 4096
+          minLength: 1
+          title: Value
+      additionalProperties: false
+      type: object
+      required:
+      - type
+      - name
+      - value
+      title: AuthHeader
+    AuthNone:
+      properties:
+        type:
+          type: string
+          const: none
+          title: Type
+      additionalProperties: false
+      type: object
+      required:
+      - type
+      title: AuthNone
+    ErrorBody:
+      properties:
+        error:
+          $ref: '#/components/schemas/ErrorDetail'
+      type: object
+      required:
+      - error
+      title: ErrorBody
+      description: OpenAI-shaped error body used by every 4xx response.
+    ErrorDetail:
+      properties:
+        message:
+          type: string
+          title: Message
+          description: English, actionable, never contains secrets.
+        type:
+          type: string
+          title: Type
+          description: authentication_error, permission_error, not_found_error, ...
+        code:
+          type: string
+          title: Code
+          description: Stable machine-readable code, e.g. read_only_access.
+      type: object
+      required:
+      - message
+      - type
+      - code
+      title: ErrorDetail
+    InvokeRequest:
+      properties:
+        arguments:
+          additionalProperties: true
+          type: object
+          title: Arguments
+      additionalProperties: false
+      type: object
+      title: InvokeRequest
+    InvokeResult:
+      properties:
+        text:
+          type: string
+          title: Text
+        truncated:
+          type: boolean
+          title: Truncated
+        total_chars:
+          type: integer
+          title: Total Chars
+        is_error:
+          type: boolean
+          title: Is Error
+        latency_ms:
+          type: integer
+          title: Latency Ms
+      additionalProperties: false
+      type: object
+      required:
+      - text
+      - truncated
+      - total_chars
+      - is_error
+      - latency_ms
+      title: InvokeResult
+      description: 'A direct test call. `text` is what a model would get: cut results end in
+
+        "[truncated: N/M chars]" (C13); `is_error` is the tool''s own error flag.'
+    SqlColumn:
+      properties:
+        name:
+          type: string
+          title: Name
+        description:
+          type: string
+          title: Description
+        sample_values:
+          items: {}
+          type: array
+          title: Sample Values
+        is_metric:
+          type: boolean
+          title: Is Metric
+        formula:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Formula
+      additionalProperties: false
+      type: object
+      required:
+      - name
+      - description
+      - sample_values
+      - is_metric
+      - formula
+      title: SqlColumn
+    SqlContext:
+      properties:
+        tables:
+          items:
+            $ref: '#/components/schemas/SqlTable'
+          type: array
+          title: Tables
+        matched:
+          type: boolean
+          title: Matched
+        examples:
+          items:
+            $ref: '#/components/schemas/SqlExample'
+          type: array
+          title: Examples
+      additionalProperties: false
+      type: object
+      required:
+      - tables
+      - matched
+      - examples
+      title: SqlContext
+      description: 'What mcp-sql''s get_schema shows the model: tables narrowed to the question (`matched`
+
+        false: none matched, all listed) and the nearest approved question-SQL examples.'
+    SqlContextRequest:
+      properties:
+        question:
+          anyOf:
+          - type: string
+            maxLength: 2000
+          - type: 'null'
+          title: Question
+      additionalProperties: false
+      type: object
+      title: SqlContextRequest
+    SqlExample:
+      properties:
+        question:
+          type: string
+          title: Question
+        sql:
+          type: string
+          title: Sql
+      additionalProperties: false
+      type: object
+      required:
+      - question
+      - sql
+      title: SqlExample
+    SqlTable:
+      properties:
+        name:
+          type: string
+          title: Name
+        description:
+          type: string
+          title: Description
+        columns:
+          items:
+            $ref: '#/components/schemas/SqlColumn'
+          type: array
+          title: Columns
+      additionalProperties: false
+      type: object
+      required:
+      - name
+      - description
+      - columns
+      title: SqlTable
+    ToolActionOut:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+        name:
+          type: string
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        input_schema:
+          additionalProperties: true
+          type: object
+          title: Input Schema
+        needs_approval:
+          type: boolean
+          title: Needs Approval
+        enabled:
+          type: boolean
+          title: Enabled
+        max_calls_per_run:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Max Calls Per Run
+        timeout_s:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Timeout S
+        status:
+          type: string
+          enum:
+          - available
+          - missing
+          title: Status
+        updated_at:
+          type: string
+          format: date-time
+          title: Updated At
+      additionalProperties: false
+      type: object
+      required:
+      - id
+      - name
+      - description
+      - input_schema
+      - needs_approval
+      - enabled
+      - max_calls_per_run
+      - timeout_s
+      - status
+      - updated_at
+      title: ToolActionOut
+    ToolActionUpdate:
+      properties:
+        enabled:
+          type: boolean
+          title: Enabled
+        needs_approval:
+          type: boolean
+          title: Needs Approval
+        max_calls_per_run:
+          anyOf:
+          - type: integer
+            maximum: 1000.0
+            exclusiveMinimum: 0.0
+          - type: 'null'
+          title: Max Calls Per Run
+        timeout_s:
+          anyOf:
+          - type: integer
+            maximum: 600.0
+            minimum: 1.0
+          - type: 'null'
+          title: Timeout S
+      additionalProperties: false
+      type: object
+      title: ToolActionUpdate
+    ToolCreate:
+      properties:
+        key:
+          type: string
+          pattern: ^[a-z][a-z0-9-]{1,63}$
+          title: Key
+          description: Tool key, unique within the project.
+        name:
+          type: string
+          maxLength: 200
+          minLength: 1
+          title: Name
+        kind:
+          type: string
+          enum:
+          - mcp
+          - openapi
+          title: Kind
+          default: mcp
+        endpoint_url:
+          type: string
+          maxLength: 2048
+          minLength: 1
+          title: Endpoint Url
+        auth:
+          oneOf:
+          - $ref: '#/components/schemas/AuthNone'
+          - $ref: '#/components/schemas/AuthBearer'
+          - $ref: '#/components/schemas/AuthHeader'
+          - $ref: '#/components/schemas/AuthBasic'
+          - $ref: '#/components/schemas/AuthForwardUser'
+          title: Auth
+          description: Upstream identity; secret fields come back as ***.
+          discriminator:
+            propertyName: type
+            mapping:
+              basic: '#/components/schemas/AuthBasic'
+              bearer: '#/components/schemas/AuthBearer'
+              forward_user: '#/components/schemas/AuthForwardUser'
+              header: '#/components/schemas/AuthHeader'
+              none: '#/components/schemas/AuthNone'
+      additionalProperties: false
+      type: object
+      required:
+      - key
+      - name
+      - endpoint_url
+      - auth
+      title: ToolCreate
+    ToolList:
+      properties:
+        data:
+          items:
+            $ref: '#/components/schemas/ToolOut'
+          type: array
+          title: Data
+      additionalProperties: false
+      type: object
+      required:
+      - data
+      title: ToolList
+    ToolOut:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+        project_id:
+          type: string
+          format: uuid
+          title: Project Id
+        key:
+          type: string
+          title: Key
+        name:
+          type: string
+          title: Name
+        kind:
+          type: string
+          enum:
+          - mcp
+          - openapi
+          title: Kind
+        endpoint_url:
+          type: string
+          title: Endpoint Url
+        auth:
+          additionalProperties:
+            type: string
+          type: object
+          title: Auth
+        status:
+          type: string
+          enum:
+          - registered
+          - discovered
+          - error
+          title: Status
+        discovered_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Discovered At
+        last_error_code:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Last Error Code
+        actions:
+          items:
+            $ref: '#/components/schemas/ToolActionOut'
+          type: array
+          title: Actions
+        created_by:
+          type: string
+          title: Created By
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+        updated_at:
+          type: string
+          format: date-time
+          title: Updated At
+      additionalProperties: false
+      type: object
+      required:
+      - id
+      - project_id
+      - key
+      - name
+      - kind
+      - endpoint_url
+      - auth
+      - status
+      - discovered_at
+      - last_error_code
+      - actions
+      - created_by
+      - created_at
+      - updated_at
+      title: ToolOut
+    ToolUpdate:
+      properties:
+        name:
+          type: string
+          maxLength: 200
+          minLength: 1
+          title: Name
+        endpoint_url:
+          type: string
+          maxLength: 2048
+          minLength: 1
+          title: Endpoint Url
+        auth:
+          oneOf:
+          - $ref: '#/components/schemas/AuthNone'
+          - $ref: '#/components/schemas/AuthBearer'
+          - $ref: '#/components/schemas/AuthHeader'
+          - $ref: '#/components/schemas/AuthBasic'
+          - $ref: '#/components/schemas/AuthForwardUser'
+          title: Auth
+          description: Upstream identity; secret fields come back as ***.
+          discriminator:
+            propertyName: type
+            mapping:
+              basic: '#/components/schemas/AuthBasic'
+              bearer: '#/components/schemas/AuthBearer'
+              forward_user: '#/components/schemas/AuthForwardUser'
+              header: '#/components/schemas/AuthHeader'
+              none: '#/components/schemas/AuthNone'
+      additionalProperties: false
+      type: object
+      title: ToolUpdate

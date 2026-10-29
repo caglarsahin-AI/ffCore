@@ -276,3 +276,19 @@ def test_05a_invoke_openapi_kind_not_implemented(world, mcp_server, loopback, pg
     url = tools_url(world, tool["id"]) + "/actions/op/invoke"
     response = world["admin"].post(url, json={"arguments": {}})
     assert response.status_code == 501
+
+
+def test_05a_read_mode_get_parity(world, make_user, client_factory):
+    """Read access sees exactly what edit access sees (03a rule), including masked secrets."""
+    project = world["project"]
+    import uuid as _uuid
+
+    _, reader = make_user(memberships={_uuid.UUID(project): ("admin", "read")})
+    read = client_factory(reader)
+    auth = {"type": "basic", "username": USERNAME, "password": PASSWORD}
+    tool = world["admin"].post(tools_url(world), json=_tool(auth=auth)).json()
+    for url in (tools_url(world), tools_url(world, tool["id"])):
+        edit_response, read_response = world["admin"].get(url), read.get(url)
+        assert edit_response.status_code == 200
+        assert read_response.content == edit_response.content, url
+    assert read.post(tools_url(world), json=_tool(key="other")).status_code == 403
