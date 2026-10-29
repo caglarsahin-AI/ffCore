@@ -47,10 +47,15 @@ def test_18_f4_2_trace_chain(login):
     assert calls and all(c["payload"].get("request_messages") for c in calls), calls
 
 
-def test_18_f4_2b_litellm_call_id_in_run_events():
-    """plan/18 F4/F10 ask for run → LiteLLM call id → Langfuse in one lookup; 06a's llm_call
-    payload (graph.py) has model, usage, ms, request_messages but no LiteLLM call id."""
-    pytest.skip("NOT_RUN: llm_call event carries no LiteLLM call id (reported, T-18-0009)")
+def test_18_f4_2b_litellm_call_id_in_run_events(login):
+    """run → LiteLLM call id (K-06a-0007: additive `litellm_call_id` on every llm_call event;
+    null only when LiteLLM gave none, never missing)."""
+    analyst = login(PROJECT, "analyst", "edit")
+    pid = analyst.project_id(PROJECT)
+    run = analyst.settle(pid, analyst.start_run(pid, "sozlesme-asistani", "Merhaba"))
+    calls = [e for e in analyst.run_events(pid, run.id) if e["type"] == "llm_call"]
+    assert calls and all("litellm_call_id" in c["payload"] for c in calls), calls
+    # TODO(06a merge): whether LiteLLM sets the id against fake-llm; if so, require non-null.
 
 
 def test_18_f4_3_quota_429():
