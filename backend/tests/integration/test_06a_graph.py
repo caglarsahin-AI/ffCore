@@ -320,6 +320,8 @@ def test_06a_4_continues_from_checkpoint_after_worker_death(harness, pg, project
     assert harness.run(run_id, Ports(model, retriever)) == "completed"
     assert len(retriever.queries) == 1
     assert _types(pg, run_id).count("sources") == 1
+    resumed = [p for _, t, p in events(pg, run_id) if t == "progress"]
+    assert resumed == [{"attempt": "resumed_after_worker_stop", "step": "model"}]
 
 
 def test_06a_v8_buffered_answer_is_announced_and_shown_after_the_check(harness, pg, project):
@@ -335,3 +337,67 @@ def test_06a_v8_buffered_answer_is_announced_and_shown_after_the_check(harness, 
     tokens = [d["text"] for _, e, d in live if e == "token"]
     assert tokens == ["Cevap burada [1]."]  # one piece, after output.pre
     assert [e for _, e, _ in live].index("token") > [e for _, e, _ in live].index("sources")
+
+
+class RedisDroppingRetriever(ScriptedRetriever):
+    async def search(self, *args):
+        from redis.exceptions import ConnectionError as RedisConnectionError
+
+        raise RedisConnectionError("Connection closed by server.")
+
+
+def test_06a_4_infrastructure_error_aborts_the_attempt_not_the_run(harness, pg, project):
+    from ffcore.runtime.runner import AttemptAborted
+
+    run_id = seed_run(pg, project, definition())
+    with pytest.raises(AttemptAborted):
+        harness.run(run_id, Ports(ScriptedModel(), RedisDroppingRetriever()))
+    assert run_row(pg, run_id)["status"] == "running"
+    assert "error" not in _types(pg, run_id)
+    model = ScriptedModel(turn("A [1]."))
+    assert harness.run(run_id, Ports(model, ScriptedRetriever([source()]))) == "completed"
+
+
+def test_06a_4_last_aborted_attempt_ends_the_run_with_a_code(harness, pg, project):
+    import asyncio
+
+    import redis.asyncio as aioredis
+
+    from ffcore.runtime.runner import Attempt, fail_after_retries
+
+    run_id = seed_run(pg, project, definition(), status="running")
+
+    async def go():
+        client = aioredis.from_url(os.environ["REDIS_URL"])
+        try:
+            attempt = Attempt(harness.settings, client, harness.db.session_scope, None)
+            await fail_after_retries(attempt, str(run_id), "ConnectionError")
+        finally:
+            await client.aclose()
+
+    asyncio.run(go())
+    row = run_row(pg, run_id)
+    assert (row["status"], row["error_code"]) == ("failed", "worker_retries_exhausted")
+
+
+class HalfStreamDyingModel(ScriptedModel):
+    """Streams part of an answer, then the worker stops (live: SIGTERM during the stream)."""
+
+    async def call(self, messages, *, tools, max_tokens, on_token):
+        for word in ("t1 ", "t2 ", "t3 "):
+            await on_token(word)
+        raise WorkerDied()
+
+
+def test_06a_4_tokens_after_a_restart_continue_the_stream(harness, pg, project):
+    run_id = seed_run(pg, project, definition())
+    retriever = ScriptedRetriever([source()])
+    with pytest.raises(WorkerDied):
+        harness.run(run_id, Ports(HalfStreamDyingModel(), retriever))
+    assert harness.run(run_id, Ports(ScriptedModel(turn("A [1].")), retriever)) == "completed"
+    live = stream(run_id)
+    ids = [tuple(map(int, i.split("-"))) for i, _, _ in live]
+    assert ids == sorted(ids) and len(set(ids)) == len(ids)
+    names = [e for _, e, _ in live]
+    restart = names.index("progress", names.index("sources"))
+    assert names[restart + 1 :] == ["token", "token", "done"]

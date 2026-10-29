@@ -18,6 +18,7 @@ from typing import Any
 
 from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
 from langgraph.types import Command
+from redis import exceptions as redis_errors
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -34,6 +35,13 @@ from ffcore.runtime.state import RunContext, StopRun
 log = logging.getLogger("ffcore.runtime")
 CHECKPOINT_SCHEMA = "checkpoints"
 LIMIT_MESSAGE = "The run stopped at a limit before it finished."
+# The worker's own infrastructure going away (shutdown, Redis connection): the attempt stops,
+# the run does not fail; it stays `running` and the next attempt continues from its checkpoint.
+INFRASTRUCTURE_ERRORS = (redis_errors.ConnectionError, redis_errors.TimeoutError)
+
+
+class AttemptAborted(Exception):
+    """This attempt could not finish for reasons outside the run; the job is tried again."""
 
 
 def checkpointer_dsn(database_url: str) -> str:
@@ -150,7 +158,13 @@ async def _attempt_graph(session, run, events, ctx, config, settings, deadline, 
         if resume is not None:
             graph_input: Any = Command(resume=resume)
         elif snapshot.next:
-            graph_input = None  # the worker died mid-way: continue from the checkpoint
+            graph_input = None  # the worker stopped mid-way: continue from the checkpoint
+            # Said to the client: tokens of the interrupted step come again from its start.
+            await events.record(
+                RunEventType.progress,
+                {"attempt": "resumed_after_worker_stop", "step": snapshot.next[0]},
+                sse=SseEvent.progress,
+            )
         else:
             graph_input = {"question": run.input}
         stop: StopRun | None = None
@@ -165,6 +179,9 @@ async def _attempt_graph(session, run, events, ctx, config, settings, deadline, 
             stop = StopRun(RunStatus.failed, "limit_reached", LIMIT_MESSAGE, limit="run_timeout_s")
         except StopRun as raised:
             stop = raised
+        except INFRASTRUCTURE_ERRORS as exc:
+            log.warning("run_attempt_aborted run_id=%s error=%s", run.id, type(exc).__name__)
+            raise AttemptAborted(type(exc).__name__) from exc
         except Exception as exc:
             code = getattr(exc, "code", None) or "run_error"
             log.exception("run_failed run_id=%s code=%s", run.id, code)
@@ -184,6 +201,25 @@ async def _attempt_graph(session, run, events, ctx, config, settings, deadline, 
         return run.status
     await _complete(session, run, events, final)
     return run.status
+
+
+async def fail_after_retries(attempt: Attempt, run_id: str, reason: str) -> None:
+    """The last attempt was aborted too: the run ends with a coded error, never stuck running."""
+    async with attempt.session_factory() as session:
+        run = await session.get(Run, uuid.UUID(run_id))
+        if run is None or run.status in FINISHED:
+            return
+        events = RunEventWriter(
+            session, attempt.redis, run.id, ttl_s=attempt.settings.run_event_stream_ttl_s
+        )
+        await events.start()
+        await _stop(
+            session,
+            run.id,
+            events,
+            {},
+            StopRun(RunStatus.failed, "worker_retries_exhausted", None, detail=reason),
+        )
 
 
 async def _complete(session: AsyncSession, run: Run, events: RunEventWriter, final: dict) -> None:

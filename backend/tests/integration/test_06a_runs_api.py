@@ -195,3 +195,19 @@ def test_06a_unpublished_agent_is_404(analyst, pg, use_queue, harness):
     use_queue(InlineQueue(harness, Ports(ScriptedModel())))
     response = client.post(f"/api/v1/projects/{project_id}/agents/draft/runs", json={"input": "q"})
     assert response.status_code == 404 and response.json()["error"]["code"] == "agent_not_published"
+
+
+def test_06a_superadmin_without_membership_cannot_start_a_run(
+    pg, make_project, make_user, client_factory, harness, use_queue
+):
+    project_id = make_project()
+    _, email = make_user(superadmin="edit")
+    client = client_factory(email)
+    publish(pg, project_id, definition())
+    queue = use_queue(InlineQueue(harness, Ports(ScriptedModel())))
+    response = client.post(
+        f"/api/v1/projects/{project_id}/agents/asistan/runs", json={"input": "q"}
+    )
+    assert response.status_code == 403
+    assert response.json()["error"]["code"] == "run_needs_membership"
+    assert queue.jobs == []

@@ -177,7 +177,12 @@ class HttpRetriever:
         headers = {
             **service_authorization(s),
             # Signed per call (C3): a long CPU run never sends an expired token.
-            OBO_HEADER: sign_on_behalf_of(self._user_id, self._project_id, s.obo_audience, s),
+            OBO_HEADER: sign_on_behalf_of(
+                user_id=self._user_id,
+                project_id=self._project_id,
+                audience=s.obo_audience,
+                settings=s,
+            ),
             "X-Run-Id": self._run_id,
         }
         body = {"query": query[:2000], "top_k": top_k}

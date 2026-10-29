@@ -74,6 +74,13 @@ class RunEventWriter:
         self._seq = await self._session.scalar(
             select(func.coalesce(func.max(RunEvent.seq), 0)).where(RunEvent.run_id == self._run_id)
         )
+        # An earlier attempt may have streamed tokens after the last row (`<seq>-<n>`): continue
+        # after them, the stream only accepts growing ids.
+        top = await self._redis.xrevrange(stream_key(self._run_id), count=1)
+        if top:
+            seq, token = (int(part) for part in _decode(top[0][0]).split("-"))
+            if seq == self._seq:
+                self._token = token
 
     @property
     def seq(self) -> int:

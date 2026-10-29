@@ -17,12 +17,13 @@ from ffcore.core.logging import configure_logging
 from ffcore.core.prompts import PromptStore
 from ffcore.runtime import adapters
 from ffcore.runtime.contracts import JobClass
-from ffcore.runtime.runner import Attempt, execute
+from ffcore.runtime.runner import Attempt, AttemptAborted, execute, fail_after_retries
 from ffcore.runtime.scheduler import BackgroundWindow, LlmSlots, SlotSettings
 
 log = logging.getLogger("ffcore.runtime.worker")
 # Longest run (cpu 900 s) plus the time to write its end; past it arq retries the job.
 JOB_MARGIN_S = 120
+MAX_TRIES = 3
 
 
 def _redis_settings():
@@ -66,7 +67,17 @@ async def shutdown(ctx) -> None:
 
 
 async def run_agent(ctx, run_id: str, resume: dict | None = None) -> str:
-    return await execute(ctx["attempt"], run_id, resume)
+    """One attempt. A shutdown cancels it (arq queues it again); an infrastructure error retries
+    it shortly; after MAX_TRIES the run ends with worker_retries_exhausted."""
+    from arq import Retry
+
+    try:
+        return await execute(ctx["attempt"], run_id, resume)
+    except AttemptAborted as exc:
+        if ctx.get("job_try", 1) >= MAX_TRIES:
+            await fail_after_retries(ctx["attempt"], run_id, str(exc))
+            return "failed"
+        raise Retry(defer=2) from exc
 
 
 def _settings_class(name: str, queue: str, job_class: JobClass) -> type:
@@ -83,7 +94,7 @@ def _settings_class(name: str, queue: str, job_class: JobClass) -> type:
             # is the real limit, so a worker may hold more runs waiting at the slot.
             "max_jobs": max(settings.llm_slots * 2, 2),
             "job_timeout": settings.run_timeout_s + JOB_MARGIN_S,
-            "max_tries": 3,
+            "max_tries": MAX_TRIES,
             "redis_settings": _redis_settings(),
         },
     )

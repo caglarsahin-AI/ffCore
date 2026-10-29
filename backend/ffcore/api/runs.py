@@ -41,6 +41,7 @@ from ffcore.core.auth import Actor, RoleRequirement, authorize, require_role
 from ffcore.core.config import Settings, get_settings
 from ffcore.core.errors import ApiError
 from ffcore.models.agents import Agent, AgentVersion
+from ffcore.models.identity import ProjectMember
 from ffcore.models.runs import Conversation, Message, Run, RunEvent
 from ffcore.runtime import events as run_events
 from ffcore.runtime.contracts import (
@@ -233,6 +234,22 @@ async def create_run(
     stream its events. The run id is the first event (`progress` with `run_id`)."""
     if actor.actor_type != "user":
         raise invalid("run_user_missing", "A run is started by a user (or for one, on behalf).")
+    if request.state.grant.is_superadmin:
+        # The worker searches and calls tools on behalf of this user, where only project
+        # membership counts (03a, K-03a-0007): refused here, not halfway through the run.
+        member = await session.scalar(
+            select(ProjectMember.user_id).where(
+                ProjectMember.project_id == project_id,
+                ProjectMember.user_id == UUID(actor.actor_id),
+            )
+        )
+        if member is None:
+            raise ApiError(
+                403,
+                "permission_error",
+                "run_needs_membership",
+                "Runs act on behalf of a project member; add yourself to the project first.",
+            )
     agent = await session.scalar(
         select(Agent).where(
             Agent.project_id == project_id, Agent.key == agent_key, Agent.deleted_at.is_(None)
