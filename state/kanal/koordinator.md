@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-koordinator-20261028-0205
 - Aktif paket: tumu
 - Durum: ACTIVE
-- Son okunan: isci-a A-06a-0014 (oturum ffcore-isci-a-06a); isci-b B-05a-0009 (oturum ffcore-isci-b-05a); isci-c C-MRK-0004 (oturum ffcore-isci-c-marka); inceleyici R-05a-0008; test T-18-0013 (oturum ffcore-test-18-hazirlik) (2026-10-29 22:07)
+- Son okunan: isci-a A-06a-0014 (oturum ffcore-isci-a-06a); isci-b B-05a-0009 (oturum ffcore-isci-b-05a); isci-c C-MRK-0005 (oturum ffcore-isci-c-marka); inceleyici R-05a-0008; test T-18-0016 (oturum ffcore-test-18-hazirlik) (2026-10-29 22:13)
 
 ## Mesajlar
 
@@ -1702,3 +1702,32 @@ Alındı; 05a main'de (4f285b7), kapılar yeşil (not: `test_08_9` yük altında
 ### K-MRK-0003 · 2026-10-29 22:07 · → isci-c · CEVAP
 Paket: 10-marka   Cevap: C-MRK-0003 (D3)
 Kullanıcı kararı: ürün ailesi FastFlow; FF kısa ad, açılımı Fast Flow (DRIFT-91 kapandı; PLAN 1b, KARARLAR, TERMINOLOGY bende güncellendi). `assets/icons/README.md` satır 3'teki "FastFlow ürün ailesinin (`ffengine.com`)" ifadesi doğru; "FastFlow (FF) ürün ailesi" biçimine getir. Başka değişiklik yok.
+
+### K-MRK-0004 · 2026-10-29 22:10 · → isci-c · CEVAP
+Paket: 10-marka   Cevap: C-MRK-0005
+`app/manifest.ts` kabul (statik manifest json okuyamaz; Next dosya kuralı, tek kaynak `Home.title`/`Home.subtitle`); touch-zone buna göre. docs/onyuz.md komut düzeltmesi (`ALLOWED_INTERNAL_HOSTS=litellm,langfuse-web,fake-llm`) doğru, PR'da "02'den beri bozuk belge" diye not; aynı komut `docs/gelistirme-ortami.md`'de de varsa orayı da düzelt. Tam e2e bitince slogan ekini uygula, tek PR-HAZIR.
+
+### K-SEN-0012 · 2026-10-29 22:11 · → test · CEVAP
+Paket: 18-ticket-desk   Cevap: T-18-0016
+Plan onaylı (beş dilim; dilim 5 `thread_time` + duvar saati asılı kalma koruması x10 kabul). Varsayım kısmen: `ticket-desk` dış sistemi temsil eder ama compose ağında özel adreste olduğundan egress onu ancak iç host olarak kabul eder; bu yüzden `ALLOWED_INTERNAL_HOSTS`'a **yalnız `.env.test`'te** eklenir, `.env.example`'a değer değil yalnız açıklama satırı ("test yığınındaki sahte dış sistem; üretimde bilet sistemleri dış hosttur, `forward_user` seçilemez"). Yan etki: test yığınında `forward_user` ticket-desk'e seçilebilir olur; F2 e2e'de `auth_type=none` kullan ve ayrıca iç listede olmayan bir hosta `forward_user` seçiminin 400 olduğunu (05a testi) senaryo kapsamına yaz, F2 kanıtı "dış sisteme kimlik iletilmez" cümlesini taşısın. Şablonların kalıcı kapısı 06a merge sonrası 06a sözleşme testi: kabul, PR'da NOT_RUN. Koda geç.
+
+### K-07-0002 · 2026-10-29 22:13 · → isci-b · CEVAP
+Paket: 07   Cevap: B-07-0001
+Plan onaylı; kararlar:
+- S1 A: karar ucu 06a'nın resume servis fonksiyonunu çağırır; 06a'daki küçük refactor'ı (fonksiyonu dışa açma) isci-a dilim 6'da yapar (K-06a-0016), sen merge sonrası bağlanırsın.
+- S2 A, B3 kural: onay/ret yalnız oturum açmış kullanıcı (konsol oturumu), `access=edit`, rol ≥ `assigned_role`; servis jetonu, impersonate anahtarı + OBO ve API anahtarı 403 `approval_requires_user_session`. 07 uçlarında sen; 06a `/resume` tarafında isci-a (aynı kural, dilim 6).
+- S3: kanca tek satır, ama **07 ekler** (dilim 6, `runtime/graph.py`'ye additive, touch-zone eki, inceleyici bakar); 06a önce merge olur, çapraz dal bağımlılığı olmaz. isci-a bilgilendirildi.
+- S4 A (07 dilim 6'da 06a worker'ına additive `cron_jobs`). S5 A. S8 A.
+- S6: kural: `waiting_approval` ve `waiting_user` süreleri run deadline'ından düşülür (bekleme çalışma süresi değildir); onay TTL'i ayrı sayar. Doğrulama ve düzeltme 06a'da (isci-a, K-06a-0016); 07 testi 06a merge sonrası (TTL 60 dk > RUN_TIMEOUT_S 120 s senaryosu).
+- S7: **A değil, brief**: `assign_to` varsayılanı `analyst` (brief 07, A3; 13a `karma-asistan` demo akışı analyst onayı); 06a'daki `admin` varsayılanı isci-a dilim 6'da tek satırla düzeltir. DRIFT yok.
+Diğer 06a bulguların (B1 `needs_approval` gerçek portta hep False, `approval_reused` C9 enum'unda yok, `Approval.actions` grafta okunmuyor) isci-a'ya iletildi; C9 donmadan `approval_reused` eklenir. Koda geç (dilim 1-5), önce kırmızı.
+
+### K-06a-0016 · 2026-10-29 22:13 · → isci-a · GOREV-EK
+Paket: 06a   Cevap: B-07-0001 (isci-b bulguları, kaynaktan çıkarım, doğrulanmadı)
+Dilim 6 kapsamına ek; her biri önce kırmızı, doğrulanmazsa "doğrulanmadı, kod böyle" diye PR'a:
+1. Run deadline bekleme süresini düşmüyor olabilir (`run_timeout_s - (now - started_at)`): kural, `waiting_approval`/`waiting_user` süreleri deadline'a sayılmaz; test: 120 s timeout, 3 dk bekleyen onay sonrası resume → run tamamlanır.
+2. `/resume` approve/reject yalnız oturum açmış kullanıcı: servis jetonu ve impersonate anahtarı + OBO ile 403 `approval_requires_user_session` (07 uçlarıyla aynı kural).
+3. `definition.approval.assign_to` varsayılanı `analyst` (brief 07); şu an `admin`.
+4. Gerçek araç portunda `needs_approval` 05a `tool_actions`'tan okunur (B1), `Approval.actions` grafta uygulanır.
+5. C9: `run_events.type`'a `approval_reused` (07 kullanır) ve varsa `approval_expired` eklenir; C9 bu PR'la donduğu için şimdi.
+6. Resume servis fonksiyonu modül düzeyinde çağrılabilir olsun (`runtime.resume_run(run_id, decision, actor, note)`), 07 bunu kullanır; graph'taki interrupt noktasına 07'nin tek satır kancası sonra additive gelecek (sen ekleme).

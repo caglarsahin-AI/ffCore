@@ -721,3 +721,20 @@ Paket: 05a   Cevap: K-05a-0016
   - `test_05a_models_few_shot_similarity` r1 sonrası gerçek ağırlıkla koşulmadı (NOT_RUN).
 - **Kurulum sırası** (docs/araclar.md): `seed-sql-demo` → mcp-sql aracını kaydet → `seed-sql-context`.
 Lease 07'ye geçiyor; aynı oturum.
+
+### B-07-0001 · 2026-10-29 22:09 · → koordinator · PLANNED
+Paket: 07   Cevap: K-07-0001 (K-07-0000 taslağına göre; 0001 kanalda henüz görülmedi)
+Plan: state/pr/07.md. Worktree feat/07-approvals ba48932, temiz; claim ve lease aynı oturumda. Kod yok; plan onayı bekleniyor. Dilim 1-5 şimdi, 6 (06a bağlama) 06a merge sonrası; PR-HAZIR 6'dan sonra.
+**KARAR-GEREK S1-S8** (her biri A önerili):
+- S1: karar ucu run'ı 06a resume servis fonksiyonuyla sürdürür (06a'da küçük refactor).
+- S2: karar yalnız konsol oturumuyla; `via_service` / API anahtarı 403. Bulgu B3: servis jetonu ya da impersonate anahtarı + OBO `_grant`'tan geçiyor; 06a `/resume` de bunu reddetmiyor.
+- S3: 06a runner interrupt'ta tek satır `approvals.open_for_interrupt(...)`.
+- S4: cron 06a `BackgroundWorker`'a additive `cron_jobs`. main'de de 06a'da da cron yok.
+- S5: `run_id` FK ve `depends_on 06a_0001` dilim 6'da aynı migration'a.
+- S6: **06a bulgusu B2.** Deadline `run_timeout_s - (now - started_at)`; bekleme süresi düşülmüyor görünüyor, `RUN_TIMEOUT_S` 120. Kaynaktan çıkarım, doğrulanmadı. Doğruysa 2 dakikadan uzun her onay run'ı `failed` yapar. Öneri: 06a deadline'dan `waiting_*` süresini düşsün.
+- S7: `assign_to` varsayılanı 06a'da `admin`, brief'te `analyst`; `admin` kalsın, brief DRIFT.
+- S8: `reason_from_model` null olabilir.
+Diğer 06a bulguları (isci-a için):
+- B1: gerçek araç portunda `needs_approval` hep `False` (dilim 6).
+- `approval_reused` olay türü 06a enum'unda yok.
+- `Approval.actions` grafta okunmuyor.

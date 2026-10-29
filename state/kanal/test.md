@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-test-18-hazirlik
 - Aktif paket: 18-hazirlik
 - Durum: ACTIVE
-- Son okunan: koordinator K-SEN-0010 (2026-10-29 20:18)
+- Son okunan: koordinator K-SEN-0012 (2026-10-29 22:11)
 
 ## Mesajlar
 
@@ -405,3 +405,19 @@ MERGED alındı. e2e dalı main 5a5200e'ye rebase edildi: feat/18-scenarios-e2e 
 ### T-18-0015 · 2026-10-29 22:04 · → koordinator · SORU
 Paket: 18-ticket-desk   Cevap: K-SEN-0011
 K-SEN-0011 zili geldi ama koordinator.md'de yok (son → test mesajı K-SEN-0010, dosya 21:59) ve `git worktree list`'te feat/18-ticket-desk yok. GOREV metni kanala yazılınca ve worktree açılınca PLANNED yazacağım; o zamana kadar kod yok.
+
+### T-18-0016 · 2026-10-29 22:08 · → koordinator · DURUM: PLANNED
+Paket: 18-ticket-desk   Cevap: K-SEN-0011
+GOREV alındı (T-18-0015 SORU kapandı). Plan: state/pr/18-ticket-desk.md. Beş dilim, her biri önce kırmızı:
+1. ticket-desk sunucusu: services/ticket-desk/ (resmi mcp SDK; fake-llm gibi backend imajına bağlanır). Bilet verisi 13a/18 örneklerinden salt-okunur. Muayene uçları /_calls, /_sent, /_reset. Compose test profili, port yok, smoke'a dokunulmaz.
+2. 05a API'si ile kayıt + keşif gerçek zincirde. Yeni eylemler kapalı ve onaylı başlar; send_reply needs_approval=true kalır.
+3. İki agent şablonu: 06a dalındaki backend/openapi/06a.yaml'a karşı tek seferlik doğrulama + stdlib yapısal test.
+4. expected_code: her kayıt için mcp_sql.validate → SqlRejected.code eşitliği.
+5. FOLLOWUP-76: bütçe thread_time() ile ölçülür; asılı kalma koruması duvar saatinde (bütçe × 10). Kırmızı kanıtı yapay yük altında eski ölçünün düşmesi.
+İtiraz yoksa varsayımlarla ilerlerim:
+- ticket-desk dış sistemi temsil eder: auth_type=none. Gerçek backend kaydı reddetmesin diye .env.test ve .env.example'daki ALLOWED_INTERNAL_HOSTS'a `ticket-desk` eklenir (secret değil, touch-zone eki).
+- 06a main'de olmadığından şablonların kalıcı kapısı 06a merge sonrası 06a sözleşme testi.
+
+### T-18-0017 · 2026-10-29 22:10 · → koordinator · ACK
+Paket: 18-ticket-desk   Cevap: K-SEN-0012
+Alındı. ALLOWED_INTERNAL_HOSTS yalnız .env.test; .env.example'a açıklama satırı. F2 auth_type=none; "iç listede olmayan hosta forward_user 400" ve "dış sisteme kimlik iletilmez" F2 kanıtına girer. Branch main 5bb675e'ye rebase; koda geçiyorum.
