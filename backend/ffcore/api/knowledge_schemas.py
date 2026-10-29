@@ -12,6 +12,7 @@ from uuid import UUID
 from pydantic import BaseModel, Field
 
 from ffcore.api.schemas import Patch, Role, Strict
+from ffcore.knowledge.store import UploadOutcome
 
 KB_KEY_PATTERN = r"^[a-z][a-z0-9-]{1,63}$"
 
@@ -168,12 +169,6 @@ class DocumentOut(BaseModel):
 
 class DocumentList(BaseModel):
     data: list[DocumentOut]
-
-
-class UploadOutcome(StrEnum):
-    created = "created"
-    new_version = "new_version"
-    unchanged = "unchanged"
 
 
 class UploadedDocument(BaseModel):

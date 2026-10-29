@@ -11,14 +11,23 @@ replaced inside one transaction, and ownership of a duplicate text never moves (
 import hashlib
 import uuid
 from dataclasses import dataclass
+from enum import StrEnum
 from typing import Protocol
 
 from sqlalchemy import delete, func, select, update
 from sqlalchemy.dialects.postgresql import distinct_on
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ffcore.api.knowledge_schemas import UploadOutcome
 from ffcore.models.knowledge import Chunk, Document, KnowledgeBase
+
+
+# Defined here, not in the API schemas: the knowledge core does not import the API package
+# (that import closed a cycle store → api → ingest → store). No docstring: it would become the
+# OpenAPI schema description.
+class UploadOutcome(StrEnum):
+    created = "created"
+    new_version = "new_version"
+    unchanged = "unchanged"
 
 
 @dataclass(frozen=True)
