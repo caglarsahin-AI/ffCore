@@ -69,14 +69,33 @@ def secret_values(settings: Settings) -> list[str]:
     return sorted(set(values), key=len, reverse=True)
 
 
+_PLAIN = (str, int, float, bool, type(None))
+
+
 class ScrubFilter(logging.Filter):
     def __init__(self, secrets: Iterable[str]) -> None:
         super().__init__()
         self._secrets = tuple(secrets)
 
     def filter(self, record: logging.LogRecord) -> bool:
-        record.msg = scrub(record.getMessage(), self._secrets)
-        record.args = None
+        # A clean record keeps msg and args: formatters such as uvicorn's AccessFormatter unpack
+        # record.args. A dirty one keeps its shape if scrubbing each string argument is enough;
+        # otherwise (secret split across msg and args, or inside an object) the rendered text
+        # is scrubbed and replaces both.
+        rendered = record.getMessage()
+        clean = scrub(rendered, self._secrets)
+        if clean != rendered:
+            args = record.args
+            shaped = None
+            if isinstance(args, tuple) and all(isinstance(a, _PLAIN) for a in args):
+                shaped = tuple(scrub(a, self._secrets) if isinstance(a, str) else a for a in args)
+                text = str(record.msg) % shaped
+                if scrub(text, self._secrets) != text:
+                    shaped = None
+            if shaped is None:
+                record.msg, record.args = clean, None
+            else:
+                record.args = shaped
         if record.exc_info:
             text = logging.Formatter().formatException(record.exc_info)
             record.exc_text = scrub(text, self._secrets)

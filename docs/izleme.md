@@ -101,7 +101,9 @@ After that, edit and version prompts in Langfuse.
 
 The backend and model calls keep working; traces of that time are lost. The backend logs
 `trace_delivery_failed spans=<n> reason=<type>` (the error type only, never its text). LiteLLM's
-callback failures are in LiteLLM's log. Prompts follow the rules above.
+callback logs only the Langfuse SDK's generic line `Unexpected error occurred. Please check your
+request and contact support` for each batch it could not send; it does not say which calls were
+lost. Prompts follow the rules above.
 
 ## Logs
 

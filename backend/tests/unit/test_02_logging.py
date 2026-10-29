@@ -14,7 +14,7 @@ import pytest
 from pydantic import SecretStr
 
 from ffcore.core.egress import EgressTimeout, SafeOutboundClient
-from ffcore.core.logging import QUIET_LOGGERS, configure_logging, scrub
+from ffcore.core.logging import QUIET_LOGGERS, ScrubFilter, configure_logging, scrub
 
 SECRET = "dummy-not-secret-02-SENTINEL"
 HEADER_VALUE = "dummy-not-secret-02-HEADER"
@@ -98,6 +98,56 @@ def test_02_9_uvicorn_handlers_filtered(settings, output):
         assert "dummy-not-secret-02-query" not in handler.stream.getvalue()
     finally:
         access.removeHandler(handler)
+
+
+def test_02_9_uvicorn_access_format_kept(settings, output):
+    # uvicorn's AccessFormatter unpacks record.args (client, method, path, version, status);
+    # the scrubber keeps that shape and scrubs inside it (measured on the stack: args=None broke
+    # every access line with "--- Logging error ---").
+    from uvicorn.logging import AccessFormatter
+
+    access = logging.getLogger("uvicorn.access")
+    handler = logging.StreamHandler(io.StringIO())
+    handler.setFormatter(AccessFormatter('%(client_addr)s "%(request_line)s" %(status_code)s'))
+    access.addHandler(handler)
+    try:
+        configure_logging(settings, level="DEBUG", stream=output)
+        access.info(
+            '%s - "%s %s HTTP/%s" %d',
+            "10.0.0.1:5000",
+            "GET",
+            f"/x?api_key={SECRET}",
+            "1.1",
+            200,
+        )
+        line = handler.stream.getvalue()
+        assert line.startswith('10.0.0.1:5000 "GET /x?api_key=') and line.rstrip().endswith(
+            "200 OK"
+        )
+        assert SECRET not in line
+    finally:
+        access.removeHandler(handler)
+
+
+class _Leaky:
+    def __init__(self, value):
+        self.value = value
+
+    def __str__(self):
+        return f"object holding {self.value}"
+
+
+def test_02_9_non_string_args_scrubbed(settings, output):
+    leaky = _Leaky(settings.service_token.get_secret_value())
+    logging.getLogger("ffcore.test02").info("got %s and %d", leaky, 3)
+    text = output.getvalue()
+    assert "object holding ***" in text and "and 3" in text and SECRET not in text
+
+
+def test_02_9_clean_record_untouched(settings, output):
+    record = logging.LogRecord("x", logging.INFO, __file__, 1, "%s-%d", ("a", 1), None)
+    ScrubFilter([SECRET]).filter(record)
+    assert record.msg == "%s-%d" and record.args == ("a", 1)
 
 
 @pytest.mark.parametrize(
