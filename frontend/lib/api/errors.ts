@@ -11,6 +11,18 @@ const KEYS = {
   project_key_taken: "projectKeyTaken",
   member_exists: "memberExists",
   role_reserved: "roleReserved",
+  provider_key_taken: "providerKeyTaken",
+  provider_in_use: "providerInUse",
+  provider_not_assigned: "providerNotAssigned",
+  provider_domain_mismatch: "providerDomainMismatch",
+  model_key_taken: "modelKeyTaken",
+  embedding_probe_unavailable: "embeddingProbeUnavailable",
+  embed_dim_mismatch: "embedDimMismatch",
+  domain_not_supported: "domainNotSupported",
+  unknown_config_field: "unknownConfigField",
+  missing_config_field: "missingConfigField",
+  invalid_config_field: "invalidConfigField",
+  unknown_project: "unknownProject",
 } as const;
 
 export type ErrorMessageKey = (typeof KEYS)[keyof typeof KEYS] | "notFound" | "unexpected";

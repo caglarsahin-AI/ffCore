@@ -1,8 +1,8 @@
 # FFCore Console (frontend)
 
 Next.js 15 App Router, shadcn/ui (`sidebar-07`, `dashboard-01` blocks), next-intl, next-themes.
-This page covers packages 10a (console skeleton) and 10a-binding (connected to the 03a backend:
-sign-in, projects, members, read-only provider and model lists).
+This page covers packages 10a (console skeleton), 10a-binding (connected to the 03a backend:
+sign-in, projects, members) and 10a-forms (provider and model forms).
 
 ## Screen map
 
@@ -11,8 +11,8 @@ sign-in, projects, members, read-only provider and model lists).
 | `/login` | Sign in (email, password) | none | `POST /auth/login`; wrong email or password: one message |
 | `/projects` | Projects | admin | list; create (superadmin only, 03a) |
 | `/projects/{id}/members` | Project members | admin | list; role, access, remove; add (superadmin: needs the user list) |
-| `/providers` | Providers | superadmin | read-only list; forms in "10a-forms" |
-| `/models` | Models of the selected project | admin | read-only list; forms in "10a-forms" |
+| `/providers` | Providers | superadmin | list; add, edit, connection test, projects, deactivate / activate |
+| `/models` | Models of the selected project | admin | list; edit, delete; add (superadmin: needs the provider list) |
 | `/overview` and every other menu item | Later packages (10b-poc, 10c) | see role matrix | "not available yet" page |
 | `/dev/theme` | Components in both themes side by side | none | done |
 
@@ -83,6 +83,38 @@ read-only session returns 403 `read_only_access`, shown as "Read-only access".
   `obo_project_scope`, ...); an unknown code shows the generic message with the code and backend
   text under "Details". Queries do not retry silently.
 
+## Provider and model forms
+
+- **Driver fields.** The provider form asks `GET /provider-drivers` which uses and configuration
+  fields a driver has. Labels and hints come from `messages/*.json` (`ProviderFields.<field>`);
+  the backend's own English descriptions are not shown. A field without a message shows its raw
+  name, and the acceptance test `test_10af_1` fails until it gets one.
+- **Secrets.** Secret fields are password inputs. The API returns them as `***` and the form never
+  prefills them: on edit an empty secret field keeps the stored value (the form sends `***`, which
+  the backend keeps). The form always sends the whole configuration, because an update replaces
+  it. A stored secret cannot be removed from the console yet (FOLLOWUP-80).
+- **Connection test.** On add, "Test connection" tests the unsaved values
+  (`POST /providers/test`); on edit, "Test saved configuration" tests the stored ones
+  (`POST /providers/{id}/test`). A failed test never blocks saving. Drivers without a test say so.
+- **Projects.** A provider is always assigned to at least one project; the form refuses an empty
+  choice before sending. Deactivating a provider a model still uses is refused
+  (`provider_in_use`).
+- **Models.** The category comes first and decides which providers are offered (active, assigned
+  to the project, serving models or embeddings). "Fill from catalog" looks the model up in
+  `GET /model-catalog` for the provider's driver and fills capabilities, input types, context
+  window, max output and prices, with the catalog's source and date; a model not in the catalog
+  is reported, nothing is guessed. The embedding dimension is measured by the backend; until a
+  driver has a probe, an embedding model is refused with `embedding_probe_unavailable`.
+- **Upstream API** is chosen explicitly, `chat` by default. `responses` is shown but cannot be
+  chosen for a new model: the gateway refuses it (`upstream_api_unsupported`, docs/gateway.md).
+  An existing `responses` model stays editable and the list marks it "Not in the gateway".
+  `forward_unknown_params` is always sent as `false` (LiteLLM has no per-model switch).
+- **Who adds models.** Adding needs the provider list, which only superadmins can read, so a
+  project admin sees the add button disabled with that reason and can edit and delete models
+  (FOLLOWUP-79: a per-project provider list lifts this).
+- A model saved in the console reaches LiteLLM through the 01 reconciler within seconds
+  (`<project_key>.<model_key>` in `/model/info`).
+
 ## Commands
 
 Node runs only in containers (`docs/gelistirme-ortami.md`).
@@ -96,19 +128,26 @@ Node runs only in containers (`docs/gelistirme-ortami.md`).
 
 ### Acceptance tests (Playwright, real backend)
 
-From the repository root, on a throwaway stack (`-p 10ab`; use any project name):
+From the repository root, on a throwaway stack (`-p 10af`; use any project name). The provider
+tests point at `http://fake-llm:11434`, so the stack allows that host on the command line (the
+shell value wins over `.env.test`; no file changes). `fake-llm` itself is not started: LiteLLM
+does not call a provider when a model is registered, and the connection test reports the failure. If
+another stack already uses host port 8000, add `BACKEND_PORT=<free port>` to the `export` line; the
+tests reach the backend inside the compose network.
 
 ```bash
-docker compose -p 10ab --env-file .env.test up -d --wait backend
-printf 'dummy-not-secret-e2e-pw' | docker compose -p 10ab --env-file .env.test run --rm -T backend python -m ffcore.cli create-superadmin --email e2e-admin@example.org --full-name "E2E Admin" --password-stdin
-docker compose -p 10ab --env-file .env.test --profile e2e run --rm e2e
-docker compose -p 10ab --env-file .env.test down -v
+export ALLOWED_INTERNAL_HOSTS=litellm,fake-llm FFCORE_VERSION=0.0.0-10af
+docker compose -p 10af --env-file .env.test up -d --wait --build backend
+printf 'dummy-not-secret-e2e-pw' | docker compose -p 10af --env-file .env.test run --rm -T backend python -m ffcore.cli create-superadmin --email e2e-admin@example.org --full-name "E2E Admin" --password-stdin
+docker compose -p 10af --env-file .env.test --profile e2e run --rm e2e
+docker compose -p 10af --env-file .env.test --profile e2e down -v
 ```
 
 The superadmin is created once per stack; `tests/e2e/global-setup.ts` creates the other accounts
 and projects through the API with a fresh suffix per run. The `e2e` service builds and serves the
 console on `localhost:3000` (the origin in `.env.test` `CONSOLE_ORIGINS`) and drives Chromium.
-CI runs the same three commands. Playwright image: `mcr.microsoft.com/playwright:v1.64.1-noble`
+It also gets `LITELLM_URL` and `LITELLM_MASTER_KEY` (the `.env.test` test value) to read
+LiteLLM's `/model/info`; the key goes only in a header. CI runs the same commands. Playwright image: `mcr.microsoft.com/playwright:v1.64.1-noble`
 (`sha256:47b510dd9230bf0b9bfc9b20102241e577ea7a99334ab4c3ca19f19770e9b8ea`), matching
 `@playwright/test` 1.64.1, pinned in `deploy/docker-compose.yml`. Screenshots are written to
 `docs/images/10a-<screen>-<theme>.png`.
@@ -122,5 +161,7 @@ CI runs the same three commands. Playwright image: `mcr.microsoft.com/playwright
 | Members | ![](images/10a-members-light.png) | ![](images/10a-members-dark.png) |
 | Providers | ![](images/10a-providers-light.png) | ![](images/10a-providers-dark.png) |
 | Models | ![](images/10a-models-light.png) | ![](images/10a-models-dark.png) |
+| Provider form | ![](images/10a-provider-form-light.png) | ![](images/10a-provider-form-dark.png) |
+| Model form | ![](images/10a-model-form-light.png) | ![](images/10a-model-form-dark.png) |
 | Not available yet | ![](images/10a-coming-soon-light.png) | ![](images/10a-coming-soon-dark.png) |
 | Theme preview | ![](images/10a-theme-preview-light.png) | ![](images/10a-theme-preview-dark.png) |

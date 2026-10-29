@@ -189,6 +189,30 @@ def test_03a_9_stored_config_test(root, internal_settings, make_project, fake_pr
     assert result["ok"] is True
 
 
+def test_03a_9_unresolvable_host_is_a_failed_test(root, app, app_settings, make_project):
+    # 10a-forms (K-10af-0003): a provider host that does not resolve is a failed test (200 +
+    # connection_failed), unsaved and stored, never a 500.
+    from ffcore.core.config import get_settings
+
+    host = "no-such-provider.invalid"
+    allowed = app_settings.model_copy(update={"allowed_internal_hosts": [host]})
+    app.dependency_overrides[get_settings] = lambda: allowed
+    body = {"driver": "ollama", "config": {"base_url": f"http://{host}:11434"}}
+    unsaved = root.post(f"{API}/providers/test", json=body)
+    assert unsaved.status_code == 200
+    assert (unsaved.json()["ok"], unsaved.json()["code"]) == (False, "connection_failed")
+
+    created = root.post(
+        f"{API}/providers",
+        json={**body, "key": "dns-down-1", "label": "DNS down", "domains": ["model"],
+              "project_ids": [str(make_project())]},
+    )  # fmt: skip
+    assert created.status_code == 201
+    stored = root.post(f"{API}/providers/{created.json()['id']}/test")
+    assert stored.status_code == 200
+    assert (stored.json()["ok"], stored.json()["code"]) == (False, "connection_failed")
+
+
 def test_03a_9_unsupported_driver_explicit(root):
     body = {"driver": "pgvector", "config": {}}
     result = root.post(f"{API}/providers/test", json=body).json()
