@@ -120,6 +120,11 @@ class Settings(BaseSettings):
     # password `make seed-sql-demo` gives that user (both in .env, written by the user).
     sql_demo_database_url: SecretStr | None = None
     agent_demo_db_password: SecretStr | None = None
+    # --- 07: approvals ---
+    # A pending approval expires after this many minutes and its run is closed (approval_expired).
+    approval_ttl_min: int = Field(default=60, gt=0)
+    # A pending approval older than this is reported (approval_pending_age); 03c alerts later.
+    approval_alert_age_min: int = Field(default=30, gt=0)
 
     # --- 06a agent runtime (profile values, PLAN 2b; .env.example lists each profile) ---
     # Concurrent model calls (C10): airgap cpu 1, gpu the server's parallelism, llmaas the

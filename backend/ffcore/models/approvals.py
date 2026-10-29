@@ -59,5 +59,7 @@ class Approval(Timestamps, Base):
     resolved_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     resolved_by: Mapped[str | None] = mapped_column(Text)
     resolution_note: Mapped[str | None] = mapped_column(Text)
+    # Set when the pending-age report (APPROVAL_ALERT_AGE_MIN) logged this row: reported once.
+    age_reported_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     created_by: Mapped[str] = mapped_column(Text)
     deleted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))

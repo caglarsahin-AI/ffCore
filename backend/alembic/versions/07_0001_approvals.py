@@ -48,6 +48,7 @@ def upgrade() -> None:
         sa.Column("resolved_at", sa.DateTime(timezone=True)),
         sa.Column("resolved_by", sa.Text),
         sa.Column("resolution_note", sa.Text),
+        sa.Column("age_reported_at", sa.DateTime(timezone=True)),
         sa.Column("created_by", sa.Text, nullable=False),
         sa.Column(
             "created_at", sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False
