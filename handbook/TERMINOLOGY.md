@@ -6,6 +6,7 @@ Ekranda Türkçe, kodda İngilizce. Soldaki ad ekran ve belgede, kod adı kolonu
 
 | Doğru | Kod adı | Anlam | Yasak |
 |---|---|---|---|
+| FastFlow ürün ailesi (FF) | - | FFCore, FFEngine ve FFGov'un ailesi; "FF" kısa ad, açılımı Fast Flow (kullanıcı kararı, 29 Ekim 2026) | "FF" tek başına belirsiz bağlamda; "FastFlow Engine" yerine ürün adı FFEngine |
 | FFCore | `ffcore` | ürünün adı; modüller Gateway, Trace, Knowledge, Tools, Agents, Guard, Eval, Console, Channels, Platform (PLAN 1b) | "PayCore ürünü", "platform" tek başına marka gibi |
 | Kurumsal Yapay Zekâ Platformu / Enterprise AI Agent Platform | `Home.subtitle` | ürün alt başlığı (kullanıcı kararı, 29 Ekim 2026); TR metinde "ajan" yok | "LLM Agent Runtime" slogan olarak; "Kurumsal LLM platformu" ürün kapısında |
 | Agent Runtime | paket 06 (`runtime/`) | agent çalışma zamanı modülünün adı; ürün sloganı değil | ürün adı ya da alt başlık gibi kullanmak |

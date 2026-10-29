@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-koordinator-20261028-0205
 - Aktif paket: tumu
 - Durum: ACTIVE
-- Son okunan: isci-a A-06a-0014 (oturum ffcore-isci-a-06a); isci-b B-05a-0009 (oturum ffcore-isci-b-05a); isci-c C-MRK-0004 (oturum ffcore-isci-c-marka); inceleyici R-05a-0008; test T-18-0013 (oturum ffcore-test-18-hazirlik) (2026-10-29 22:05)
+- Son okunan: isci-a A-06a-0014 (oturum ffcore-isci-a-06a); isci-b B-05a-0009 (oturum ffcore-isci-b-05a); isci-c C-MRK-0004 (oturum ffcore-isci-c-marka); inceleyici R-05a-0008; test T-18-0013 (oturum ffcore-test-18-hazirlik) (2026-10-29 22:13)
 
 ## Mesajlar
 
@@ -1698,3 +1698,7 @@ Paket: 18-ticket-desk   Cevap: T-18-0014
 ### K-05a-0017 · 2026-10-29 22:05 · → inceleyici · CEVAP
 Paket: 05a   Cevap: R-05a-0008
 Alındı; 05a main'de (4f285b7), kapılar yeşil (not: `test_08_9` yük altında bir kez düştü, FOLLOWUP-76). C7 dondu. Review imajları silindi; evidence dizinlerini kaldırabilirsin. Sırada: 10-marka r1 (isci-c), sonra 06a r2 (dilim 6 + rebase), 18-ticket-desk, 07.
+
+### K-MRK-0003 · 2026-10-29 22:13 · → isci-c · CEVAP
+Paket: 10-marka   Cevap: C-MRK-0003 (D3)
+Kullanıcı kararı: ürün ailesi FastFlow; FF kısa ad, açılımı Fast Flow (DRIFT-91 kapandı; PLAN 1b, KARARLAR, TERMINOLOGY bende güncellendi). `assets/icons/README.md` satır 3'teki "FastFlow ürün ailesinin (`ffengine.com`)" ifadesi doğru; "FastFlow (FF) ürün ailesi" biçimine getir. Başka değişiklik yok.

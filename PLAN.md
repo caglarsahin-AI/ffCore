@@ -16,7 +16,7 @@ Cognipeer Console'un yaptığı işin, bizim kısıtlarımıza göre sadeleştir
 
 ## 1b. Ürün adı ve modüller
 
-Ürün adı **FFCore**; FF ürün ailesinin (FFEngine, FFGov) parçasıdır. Ad tek bir özelliği değil, modelin dışındaki katmanın tamamını (kapı, bilgi, araç, agent, koruma, izleme) adlandırır. Modül adları pazarlama ve ekran başlıkları içindir; kod, tablo ve dizin adları İngilizce ve paket brief'lerindeki gibi kalır. Her brief'in başlığında köşeli parantez içinde ait olduğu modül yazar.
+Ürün adı **FFCore**; FastFlow ürün ailesinin (kısa adı FF; FFEngine, FFGov) parçasıdır. Ad tek bir özelliği değil, modelin dışındaki katmanın tamamını (kapı, bilgi, araç, agent, koruma, izleme) adlandırır. Modül adları pazarlama ve ekran başlıkları içindir; kod, tablo ve dizin adları İngilizce ve paket brief'lerindeki gibi kalır. Her brief'in başlığında köşeli parantez içinde ait olduğu modül yazar.
 
 | Modül | Ne yapar | Paketler |
 |---|---|---|
