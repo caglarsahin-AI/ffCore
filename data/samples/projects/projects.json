@@ -1,0 +1,77 @@
+{
+  "projects": [
+    {
+      "key": "hastane-a",
+      "name": "Örnek Şehir Hastanesi - Proje A",
+      "members": [
+        {
+          "email": "hastane-a-admin-edit@example.test",
+          "role": "admin",
+          "access": "edit"
+        },
+        {
+          "email": "hastane-a-admin-read@example.test",
+          "role": "admin",
+          "access": "read"
+        },
+        {
+          "email": "hastane-a-analyst-edit@example.test",
+          "role": "analyst",
+          "access": "edit"
+        }
+      ],
+      "knowledge_bases": [
+        {
+          "key": "sozlesmeler",
+          "source": "contracts/"
+        }
+      ],
+      "agents": [
+        "sozlesme-asistani",
+        "veri-soru-cevap"
+      ]
+    },
+    {
+      "key": "klinik-b",
+      "name": "Örnek Şehir Hastanesi - Proje B",
+      "members": [
+        {
+          "email": "klinik-b-admin-edit@example.test",
+          "role": "admin",
+          "access": "edit"
+        },
+        {
+          "email": "klinik-b-admin-read@example.test",
+          "role": "admin",
+          "access": "read"
+        },
+        {
+          "email": "klinik-b-analyst-edit@example.test",
+          "role": "analyst",
+          "access": "edit"
+        }
+      ],
+      "knowledge_bases": [
+        {
+          "key": "b-prosedurler",
+          "source": "projects/klinik-b/"
+        }
+      ],
+      "agents": [
+        "sozlesme-asistani"
+      ]
+    }
+  ],
+  "isolation": {
+    "viewer_project": "klinik-b",
+    "target_project": "hastane-a",
+    "resources": [
+      "knowledge_bases",
+      "documents",
+      "tools",
+      "agents",
+      "runs"
+    ],
+    "expected_status": 404
+  }
+}

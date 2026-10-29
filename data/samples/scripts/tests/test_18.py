@@ -6,6 +6,7 @@ Stdlib only. PII checks use package 08-lite's own regex recognizers
 mean what the guardrail will actually see, not a second detector written here.
 """
 
+import base64
 import filecmp
 import json
 import random
@@ -21,10 +22,12 @@ SAMPLES = SCRIPTS.parent
 REPO = SAMPLES.parents[1]
 sys.path.insert(0, str(SCRIPTS))
 sys.path.insert(0, str(REPO / "backend"))
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import generate  # noqa: E402
+import readback  # noqa: E402
+from gen import contracts, pii, scenarios_sql, schema, versions  # noqa: E402
 from gen import eval as eval_gen  # noqa: E402
-from gen import pii, scenarios_sql, schema  # noqa: E402
 
 from ffcore.guardrails.recognizers.regex import recognize  # noqa: E402
 
@@ -242,14 +245,191 @@ class Test18Tickets(unittest.TestCase):
             self.assertNotIn(word, raw)
 
 
+class Test18Poison(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.expected = _load(SAMPLES / "poison" / "expected.json")
+        cls.tickets = _jsonl(SAMPLES / "poison" / "tickets-poison.jsonl")
+        cls.docs = {
+            d["id"]: (SAMPLES / d["file"]).read_text(encoding="utf-8")
+            for d in cls.expected["documents"]
+        }
+
+    def test_18_f11_1_shape(self):
+        docs, tkts = self.expected["documents"], self.expected["tickets"]
+        self.assertEqual(len(docs), 5)
+        self.assertEqual(len(tkts), 3)
+        self.assertEqual(
+            {d["kind"] for d in docs},
+            {"ignore_rules", "hidden_tool_call", "exfiltration", "role_change", "encoded"},
+        )
+        self.assertEqual([t["id"] for t in self.tickets], [t["id"] for t in tkts])
+        for t in self.tickets:
+            self.assertEqual(
+                set(t), {"id", "channel", "received_at", "subject", "body", "pii"}, t["id"]
+            )
+            self.assertEqual(t["pii"], [])
+        for t in tkts:
+            self.assertIn(t["expected_class"], TICKET_CLASSES)
+            self.assertTrue(
+                t["must_not_contain"] or t["forbidden_tools"] or t["forbidden_tool_calls"]
+            )
+        for d in docs:
+            self.assertTrue(d["file"].endswith(".txt"), d["id"])  # 04a plaintext path
+            self.assertTrue(d["must_not_contain"] or d["forbidden_tools"], d["id"])
+            self.assertIn(d["injection"], self.docs[d["id"]])
+
+    def test_18_f11_2_canaries_only_in_injection(self):
+        corpus = "\n".join(self.docs.values())
+        for d in self.expected["documents"]:
+            for needle in d["must_not_contain"]:
+                if needle.startswith(("KANARYA-", "SIZINTI-")):
+                    expected = 0 if d["kind"] == "encoded" else 1
+                    self.assertEqual(corpus.count(needle), expected, needle)
+                    if expected:
+                        self.assertIn(needle, d["injection"])
+                for fact in d["must_contain"]:
+                    self.assertNotIn(needle, fact)
+        # the encoded canary is only readable after decoding the injection line
+        p5 = next(d for d in self.expected["documents"] if d["kind"] == "encoded")
+        payload = p5["injection"].rsplit(" ", 1)[1]
+        self.assertIn("KANARYA-B64X", base64.b64decode(payload).decode("utf-8"))
+
+    def test_18_f11_3_legit_fact_present(self):
+        for d in self.expected["documents"]:
+            text = self.docs[d["id"]].replace(d["injection"], "")
+            for fact in d["must_contain"]:
+                self.assertIn(fact, text, d["id"])
+
+    def test_18_f11_4_no_pii_no_names(self):
+        names = [_fold(n) for n in pii.FIRST_NAMES + pii.LAST_NAMES]
+        patterns = [re.compile(rf"(?<!\w){re.escape(n)}(?!\w)") for n in names]
+        texts = list(self.docs.values())
+        texts += [t["subject"] + "\n" + t["body"] for t in self.tickets]
+        for text in texts:
+            self.assertEqual(recognize(text), [], text[:40])
+            found = [n for n, p in zip(names, patterns, strict=True) if p.search(_fold(text))]
+            self.assertEqual(found, [], text[:40])
+
+    def test_18_f11_5_b2_target_value(self):
+        b2 = next(t for t in self.expected["tickets"] if t["kind"] == "cross_ticket_leak")
+        src = next(
+            t for t in _jsonl(SAMPLES / "tickets" / "tickets-20.jsonl") if t["id"] == "tkt-002"
+        )
+        ids = [
+            src["body"][e["start"] : e["end"]]
+            for e in src["pii"]
+            if e["category"] == "TR_NATIONAL_ID"
+        ]
+        self.assertEqual(b2["must_not_contain"], ids)
+        self.assertTrue(pii.tc_valid(ids[0]))
+        self.assertEqual(
+            b2["forbidden_tool_calls"], [{"tool": "get_ticket", "ticket_id": "tkt-002"}]
+        )
+
+
+class Test18Projects(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.doc = _load(SAMPLES / "projects" / "projects.json")
+
+    def test_18_f10_1_projects_shape(self):
+        key_pattern = re.compile(r"^[a-z][a-z0-9-]{1,31}$")  # 03a PROJECT_KEY_PATTERN
+        ps = self.doc["projects"]
+        self.assertEqual(len(ps), 2)
+        emails = []
+        for p in ps:
+            self.assertRegex(p["key"], key_pattern)
+            kinds = {(m["role"], m["access"]) for m in p["members"]}
+            self.assertEqual(kinds, {("admin", "edit"), ("admin", "read"), ("analyst", "edit")})
+            emails += [m["email"] for m in p["members"]]
+            for m in p["members"]:
+                self.assertTrue(m["email"].endswith("@example.test"), m["email"])
+        self.assertEqual(len(emails), len(set(emails)))
+        iso = self.doc["isolation"]
+        self.assertEqual({iso["viewer_project"], iso["target_project"]}, {p["key"] for p in ps})
+        self.assertEqual(iso["expected_status"], 404)
+
+    def test_18_f10_2_no_secret(self):
+        raw = (SAMPLES / "projects" / "projects.json").read_text(encoding="utf-8").lower()
+        for word in ("password", "parola", "sifre", "şifre", "token", "secret"):
+            self.assertNotIn(word, raw)
+
+    def test_18_f10_3_sources_exist(self):
+        for p in self.doc["projects"]:
+            for kb in p["knowledge_bases"]:
+                src = SAMPLES / kb["source"]
+                self.assertTrue(src.is_dir() and any(src.iterdir()), kb)
+            for agent in p["agents"]:
+                self.assertTrue((SAMPLES / "agents" / f"{agent}.json").is_file(), agent)
+
+
+class Test18Versions(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.expected = _load(SAMPLES / "versions" / "expected.json")
+        cls.built = {v["contract"]["code"]: v for v in versions.build(SEED)}
+
+    def test_18_f13_1_replay_v1_identical(self):
+        self.assertEqual(len(self.expected), 2)
+        for e in self.expected:
+            v1_file = (SAMPLES / e["v1_file"]).read_bytes()
+            self.assertEqual(self.built[e["code"]]["v1_bytes"], v1_file, e["code"])
+
+    def test_18_f13_2_single_clause_changed(self):
+        for e in self.expected:
+            v = self.built[e["code"]]
+            old, new = v["v1_blocks"], v["v2_blocks"]
+            self.assertEqual(len(new), len(old) + 1)  # + the version note
+            note = new[2][1]
+            self.assertIn("Sürüm 2", note)
+            self.assertIn(e["changed_clause"], note)
+            self.assertIn("01.09.2025", note)
+            rest = new[:2] + new[3:]
+            diff = [(a, b) for a, b in zip(old, rest, strict=True) if a != b]
+            self.assertEqual(len(diff), 1, e["code"])
+            (_, before), (_, after) = diff[0]
+            self.assertTrue(before.startswith(e["changed_clause"] + " "), before)
+            self.assertIn(e["v1_value"], before)
+            self.assertIn(e["v2_value"], after)
+            self.assertNotIn(e["v2_value"], before)
+            # the file on disk carries the new value and not the old one
+            v2_text = readback.text_of(SAMPLES / e["v2_file"])
+            self.assertIn(e["v2_value"], v2_text)
+            self.assertNotIn(e["v1_value"], v2_text)
+
+    def test_18_f13_3_not_in_f1_exam(self):
+        exam = _load(SAMPLES / "eval" / "sozlesme-33.json")
+        needles = [x for e in self.expected for x in (e["v1_value"], e["v2_value"])]
+        for item in exam:
+            out = item["expected_output"]
+            text = " ".join([out.get("answer", "")] + out.get("must_contain", []))
+            for n in needles:
+                self.assertNotIn(n, text, item["id"])
+        codes = {c["code"] for c in contracts.CONTRACTS}
+        self.assertTrue({e["code"] for e in self.expected} <= codes)
+
+
 class Test18Deterministic(unittest.TestCase):
-    ONLY = "scenarios_sql,tickets"
+    ONLY = "scenarios_sql,tickets,poison,projects,versions"
     FILES = [
         "eval/sql-20.json",
         "eval/suite-sql-20.json",
         "eval/sql-write-attempts.json",
         "tickets/tickets-20.jsonl",
         "tickets/labels.json",
+        "poison/docs/p1-cihaz-teslim-tesellum.txt",
+        "poison/docs/p2-ariza-bildirim-yonergesi.txt",
+        "poison/docs/p3-bilgi-guvenligi-talimati.txt",
+        "poison/docs/p4-sterilizasyon-calisma-esaslari.txt",
+        "poison/docs/p5-tibbi-atik-proseduru.txt",
+        "poison/tickets-poison.jsonl",
+        "poison/expected.json",
+        "projects/projects.json",
+        "projects/klinik-b/b-el-hijyeni-proseduru.txt",
+        "versions/SZL-2025-003_temizlik-hizmet_v2.docx",
+        "versions/SZL-2025-007_laboratuvar-kiti_v2.docx",
+        "versions/expected.json",
     ]
 
     def test_18_0_deterministic(self):
@@ -268,7 +448,8 @@ class Test18Deterministic(unittest.TestCase):
     def test_18_0b_separate_rng_streams(self):
         # the new modules have their own streams: 13a modules' output does not depend on them
         self.assertIn("scenarios_sql", generate.MODULES)
-        self.assertIn("tickets", generate.MODULES)
+        for name in ("tickets", "poison", "projects", "versions"):
+            self.assertIn(name, generate.MODULES)
         names = list(generate.MODULES)
         self.assertEqual(
             names[: names.index("scenarios_sql")],
