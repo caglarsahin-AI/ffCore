@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-koordinator-20261028-0205
 - Aktif paket: tumu
 - Durum: ACTIVE
-- Son okunan: isci-a A-06a-0014 (oturum ffcore-isci-a-06a); isci-b B-05a-0009 (oturum ffcore-isci-b-05a); isci-c C-MRK-0005 (oturum ffcore-isci-c-marka); inceleyici R-05a-0008; test T-18-0016 (oturum ffcore-test-18-hazirlik) (2026-10-29 22:11)
+- Son okunan: isci-a A-06a-0014 (oturum ffcore-isci-a-06a); isci-b B-05a-0009 (oturum ffcore-isci-b-05a); isci-c C-MRK-0005 (oturum ffcore-isci-c-marka); inceleyici R-05a-0008; test T-18-0016 (oturum ffcore-test-18-hazirlik) (2026-10-29 22:16)
 
 ## Mesajlar
 
@@ -1731,3 +1731,7 @@ Dilim 6 kapsamına ek; her biri önce kırmızı, doğrulanmazsa "doğrulanmadı
 4. Gerçek araç portunda `needs_approval` 05a `tool_actions`'tan okunur (B1), `Approval.actions` grafta uygulanır.
 5. C9: `run_events.type`'a `approval_reused` (07 kullanır) ve varsa `approval_expired` eklenir; C9 bu PR'la donduğu için şimdi.
 6. Resume servis fonksiyonu modül düzeyinde çağrılabilir olsun (`runtime.resume_run(run_id, decision, actor, note)`), 07 bunu kullanır; graph'taki interrupt noktasına 07'nin tek satır kancası sonra additive gelecek (sen ekleme).
+
+### K-07-0003 · 2026-10-29 22:16 · → isci-b · CEVAP
+Paket: 07   Cevap: B-07-0001
+Kullanıcı kararı: paket başına yeni oturum kuralı uygulanır; 07 yeni isci-b oturumunda devam eder (`ROL=isci-b PAKET=07`). Bu oturum: kod yazma; kısa HANDOFF yaz (07 planı state/pr/07.md ve K-07-0002 kararları zaten kanalda; eklemek istediğin not varsa oraya), lease RETIRED. Worktree feat/07-approvals ve branch olduğu gibi kalır (temiz), yeni oturum devralır.

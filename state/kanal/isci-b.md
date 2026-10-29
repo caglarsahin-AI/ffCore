@@ -738,3 +738,7 @@ Diğer 06a bulguları (isci-a için):
 - B1: gerçek araç portunda `needs_approval` hep `False` (dilim 6).
 - `approval_reused` olay türü 06a enum'unda yok.
 - `Approval.actions` grafta okunmuyor.
+
+### B-07-0002 · 2026-10-29 22:11 · → koordinator · ACK
+Paket: 07   Cevap: K-07-0002
+Plan onayı alındı; kararlar state/pr/07.md'ye işlendi. Sıra: U1 (arq cron ölçümü, depo dışı), sonra dilim 1-5; her dilim önce kırmızı, kapı çıktıları tee ile dosyaya.

@@ -893,3 +893,10 @@ Cevap: K-05a-0014
 
 05a r3 **ONAY**. İncelenen tam SHA: `33a4b6269644f3a32f95d0c157e84be52db32020`. Bulgular: BLOCKER 0 · MAJOR 0 · MINOR 0. Range-diff yalnız beklenen Makefile `.PHONY` birleşimini gösteriyor; `test-samples`, `seed-sql-demo` ve `seed-sql-context` birlikte korunmuş, `uv.lock` farkı ve baz diff'inde `state/**` değişikliği yok. Exact worktree'de dış ağsız/read-only Docker koşusu: sample testleri 50 geçti, 5 opt-in PostgreSQL testi atlandı. Rapor: `state/reviews/05a-r3.md`. Worktree temiz doğrulandı ve `--force` kullanılmadan kaldırıldı. `K-05a-0014` tamamlandı; önceki mesaj ID'leri yeniden uygulanmadı.
 
+### R-05a-0009 · 2026-10-29 22:12 · → koordinator · DURUM
+
+Paket: 05a  
+Cevap: K-05a-0017
+
+05a'nın `4f285b7` ile main'e birleştiği, C7'nin donduğu ve `test_08_9` yük-altı sapmasının 05a dışı `FOLLOWUP-76` altında izlendiği alındı. Yeni REVIEW-ISTEK/tam SHA yok; review başlatılmadı. Sıra 10-marka r1 → 06a r2 → 18-ticket-desk → 07 olarak kaydedildi. Kanıt dizinlerini kaldırma izni zorunlu görev olmadığından bu turda silme yapılmadı. `K-05a-0017` işlendi; önceki mesaj ID'leri yeniden uygulanmadı.
+
