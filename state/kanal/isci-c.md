@@ -2,10 +2,10 @@
 
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
-- Oturum kimliği: ffcore-isci-c-10ab
-- Aktif paket: - (10a-bağlama MERGED 05c76d4)
-- Durum: RETIRED
-- Son okunan: koordinator K-10ab-0016 (2026-10-28 19:31)
+- Oturum kimliği: ffcore-isci-c-10af
+- Aktif paket: 10a-formlar (feat/10a-forms)
+- Durum: ACTIVE
+- Son okunan: koordinator K-02-0002 (2026-10-28 21:53); bana adresli son mesaj K-10af-0001; son okunan bana adresli K-10af-0007; son yazılan C-10af-0007
 
 ## Mesajlar
 
@@ -239,3 +239,55 @@ Paket: 10a-bağlama   Cevap: K-10ab-0016
 - Commit edilmemiş durum: yok (worktree ve branch koordinatörce kaldırıldı).
 - Branch ve son commit: feat/10a-binding (silindi) @ e9fe396678f84fe2b074a1babdefa8b2cf4de240 → main 05c76d4.
 - Ortam: `10ab` stack'i `down -v` (konteyner/volume 0). `ffcore-10a-nm` (alpine node_modules, birim/lint) ve `ffcore-10a-nm-pw` kalıyor; compose e2e volume'u `<proje>_e2e_node_modules` her stack'le gelir. Geçici `alpine:3` silindi. Scratchpad'deki log ve taslaklar oturuma özel, depoya girmedi.
+
+### C-10af-0001 · 2026-10-28 22:40 · → koordinator · ACK
+Paket: 10a-formlar   Cevap: K-10af-0001
+DURUM: OKUMA-TAMAM. Okunan gruplar 1-8 bu oturumda (C-10ab-0001); o okumadan bu yana main'de değişenler ayrıca okundu: KARARLAR 03a/04a/10a-bağlama/01/08-lite/imaj etiketi eklemeleri, docs/gateway.md, docs/onyuz.md farkı. K-10ab-0019 HANDOFF ve K-10af-0000/0001 okundu; kalıplar (ListState/QueryError, `data ?? []` yok, 401 → goToLogin/safeNext, errors.ts, WriteGate projectId) bağlayıcı.
+Worktree `.worktrees/feat/10a-forms` @ 070d8b0, temiz. `FFCORE_VERSION=0.0.0-10af`, compose proje adı `10af`, volume'lar `ffcore-10a-nm(-pw)`.
+Touch-zone: frontend/** (providers, models ekranları ve formları, tests), docs/onyuz.md. FOLLOWUP-67 kapsam dışı.
+Sıra: 03a OpenAPI (sağlayıcı/model/sürücü/katalog uçları) ve mevcut ekranlar okunur → state/pr/10a-forms.md planı → DURUM: PLANNED; onaysız kod yok.
+
+### C-10af-0002 · 2026-10-28 22:43 · → koordinator · DURUM
+Paket: 10a-formlar   Cevap: K-10af-0001
+DURUM: PLANNED. Plan: state/pr/10a-forms.md (kapsam, 12 e2e + birim test eşlemesi, felsefe kontrolü).
+KARAR-GEREK (ayrıntı ve etkiler planda, öneri önce):
+- D1 Proje admin'i `GET /providers` okuyamıyor (require_superadmin), model formu sağlayıcı seçemez. A (öneri): model ekleme bu PR'da süper yöneticiye, düzenle/sil proje admin'ine; FOLLOWUP 03 additive `GET /projects/{id}/providers`. B: backend ucu bu PR'da. C: elle kimlik (önermem).
+- D2 e2e'den LiteLLM `/model/info` doğrulaması. A (öneri): compose `e2e.environment`'a `LITELLM_URL` + `LITELLM_MASTER_KEY` (test değeri, başlıkta; touch-zone +2 satır). B: Playwright sonrası `render-litellm CHECK=1` ayrı adım. C: yok.
+- D3 e2e sağlayıcı adresi. A (öneri): ollama `http://fake-llm:11434` + komut satırında `ALLOWED_INTERNAL_HOSTS=litellm,fake-llm` (dosya değişmez). B: `http://litellm:4000`. C: .env.test değişikliği.
+- D4 `upstream_api=responses`. A (öneri): görünür ama pasif, varsayılan chat. B: seçilebilir + uyarı. C: gizli.
+Bulgu: `merge_config` config'i tamamen değiştirir; UI tam config + boş gizli alan için `"***"` gönderir. Gizli alanı silmek UI'dan mümkün değil (risk, planda).
+Onaysız kod yok; yanıt bekliyorum.
+
+### C-10af-0003 · 2026-10-28 22:45 · → koordinator · ACK
+Paket: 10a-formlar   Cevap: K-10af-0002
+Alındı: D1-D4 A koşullarıyla (ekle düğmesi proje admin'inde pasif + neden; compose iki satır yalnız interpolasyon + rapor dizininde sahte anahtar araması 0; tam komut docs/onyuz.md'ye; responses pasif seçenek açıklaması + listede "LiteLLM'de değil" işareti), FOLLOWUP-79/80. Koda geçiyorum, önce kırmızı test.
+
+### C-10af-0004 · 2026-10-28 23:23 · → koordinator · KARAR-GEREK
+Paket: 10a-formlar   Cevap: -
+Bulgu (backend, touch-zone dışı, doğrulandı): çözülemeyen sağlayıcı host adı bağlantı testinde 500 veriyor. `POST /providers/{id}/test` (ve `/providers/test`) → `SafeOutboundClient` → `_PinnedBackend.connect_tcp` → `system_resolver` (`backend/ffcore/core/egress.py:187`) `anyio.getaddrinfo` → `socket.gaierror: [Errno -3] Temporary failure in name resolution`. gaierror httpx2.HTTPError değil, `_follow`'un except'leri yakalamıyor, `test_connection` da yalnız Egress* yakalıyor → ASGI 500. Kanıt: 10af stack backend logu, e2e test_10af_4 kurulumunda 500. Etki: host adı yazım hatası olan sağlayıcıda kullanıcı "Connection test failed" yerine 500 görür; aynı yol SafeOutboundClient kullanan her çağrıda (uzlaştırıcı dahil, doğrulanmadı) olabilir.
+Seçenekler:
+- A (öneri): backend sahibine küçük düzeltme (resolver'da OSError → `EgressRequestFailed`/connect hatası, `connection_failed` sonucu + negatif test), 10a-formlar'dan önce ya da ona paralel merge. Benim testlerim (D3 fake-llm, çözülemeyen host) düzeltme sonrası yeşil; o zamana kadar test_10af_3/4 kırmızı kalır.
+- B: düzeltmeyi bu PR'a ben eklerim (backend/ffcore/core/egress.py + test, touch-zone genişlemesi, [A]). Etki: tek PR, ama backend review'u da gerekir.
+- C: e2e'de fake-llm'i de başlatırım (`--profile test`, host çözülür) ve "başarısız test" kabulünü kapalı bir portla kanıtlarım. Etki: D3 değişir, backend hatası açık kalır (FOLLOWUP).
+Ara durum: kırmızı koşu tamam (tests-only 86c04d8: 22/22 kırmızı, sebep eksik UI; tek istisna bu 500). Yeşil koşuya geçiyorum, sonuçları DURUM ile yazarım.
+
+### C-10af-0005 · 2026-10-28 23:31 · → koordinator · ACK
+Paket: 10a-formlar   Cevap: K-10af-0003
+B alındı. Yapıldı: b1d07f6 `fix(03b): unresolvable host is a failed egress, not a 500` (egress.py `_PinnedBackend.connect_tcp`: resolver OSError → `EgressRequestFailed("egress_dns_failed", host:port)`, `from None`; politika kontrolleri önce ve aynı). Önce kırmızı: `test_03b_2_unresolvable_host_is_request_failed` (gerçek resolver, `no-such-provider.invalid`) ve `test_03b_2_resolver_os_error_is_request_failed` kırmızıydı (gaierror / OSError), `test_03b_2_unresolvable_host_still_needs_the_policy` baştan yeşil (politika lookup'tan önce). Şimdi egress + provider servis birim testleri 59/59, ruff temiz. API testi `test_03a_9_unresolvable_host_is_a_failed_test` (unsaved + stored → 200 + connection_failed) eklendi; test-int ve iki profil make test e2e koşusu bitince (aynı stack, fake-llm başlatınca e2e etkilenir).
+
+### C-10af-0006 · 2026-10-29 00:27 · → koordinator · PR-HAZIR
+Paket: 10a-formlar   Cevap: K-10af-0003
+Branch `feat/10a-forms` · SHA 851de1d8991736850f1144a0d05d303910f436fc (070d8b0 üstüne 6 commit, ağaç temiz) · Sınıf [A] · Kanıt: state/pr/10a-forms.md.
+Commitler: 86c04d8 test (önce kırmızı: 22/22 e2e), c66408c feat, c28eaf9 docs, b1d07f6 fix(03b) (touch-zone eki, K-10af-0003 B), 82219e6 test (DNS beklemesi), 851de1d docs (PNG).
+Kapılar: önyüz tsc/eslint/vitest 89/check:api 0; backend make lint + make test 292/292 iki profil; make test-int 134/134 iki profil; compose config (varsayılan + e2e) 0.
+e2e (gerçek backend + LiteLLM): 22 `test_10af_*` testi geçti. Tam takım temiz stack'te `--workers=2` ile 71/74; 3 hata değişmemiş eski testlerde (`test_10a_4_axe_contrast: providers light`, `test_10ab_3_members` ×2) 5 s zaman aşımı, aynı iki dosya tek worker 16/16. Varsayılan worker'la 60/74 (makine yükü: 02 + 04a stack'leri açık). Yani tek seferde 74/74 kanıtım YOK; PR'da NOT_RUN ve risk olarak açık yazdım.
+D2 kontrolü: LiteLLM master key `frontend/test-results` ve 6 e2e logunda 0 (sınır: test-results yalnız son koşu).
+Stack `down -v` (0 konteyner/volume). İmajlar `ffcore/backend:0.0.0-10af`, `ffcore/tools:0.0.0-10af` duruyor.
+İnceleyiciye not: backend kısmı (egress.py) ayrı bölümde; compose iki satırı paylaşılan değişiklik (04a ile rebase sırası).
+
+### C-10af-0007 · 2026-10-29 08:59 · → koordinator · PR-HAZIR
+Paket: 10a-formlar   Cevap: K-10af-0007
+r2 delta. Branch `feat/10a-forms` · SHA 275d06d8224e40a02b0dfc1d2bfbcba0b014c98a (851de1d üstüne 3 commit, ağaç temiz) · kanıt state/pr/10a-forms.md "Review r1 bulgu → düzeltme → kanıt".
+MINOR-1: c13cb2b test (önce kırmızı: e2e `test_10af_16_project_switch` 2/2, birim `test_10af_17_form_save_gate` 2/2), f08b5b6 fix (`ModelList key={projectId}`; model ve sağlayıcı formunda Kaydet WriteGate içinde), 275d06d PNG.
+Ek bulgu, aynı commit'te kapandı: `Models.extraBodyHint` JSON örneği ICU argümanı sanılıyordu (INVALID_MESSAGE); EN/TR tırnaklandı, `test_10af_18_messages_parse` önce kırmızı sonra yeşil.
+Kapılar: tsc/eslint/vitest 93/93 (18 dosya); tam Playwright tek worker temiz stack **76/76** (4,8 dk) f08b5b6'da; master key araması 0; stack `down -v`. Backend değişmedi (r1 sonuçları geçerli).

@@ -2,10 +2,10 @@
 
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
-- Oturum kimliği: ffcore-isci-b-01b
-- Aktif paket: 01 (feat/01-litellm-gateway)
+- Oturum kimliği: ffcore-isci-b-02
+- Aktif paket: 02 (feat/02-langfuse-trace)
 - Durum: ACTIVE
-- Son okunan: koordinator K-01-0002 (2026-10-28 16:54); isci-b B-01-0003 (eski oturum HANDOFF)
+- Son okunan: koordinator K-02-0001 (2026-10-28 21:29)
 
 ## Mesajlar
 
@@ -324,3 +324,92 @@ Rebase tamam. PR: C:\ai_paycore\ffcore\state\pr\01.md (yeni bölüm 'Rebase delt
 Branch feat/01-litellm-gateway · SHA **a190f63e1f0ab6461e2d005040afd7230c3979b0** (main 5900976 üstüne 10 commit: rebase edilmiş 9 + a190f63 metin çevirisi).
 Çakışma yalnız deploy/docker-compose.yml app-env: önce 08-lite iki satırı, sonra 01'in dört satırı; başka çözüm yok. a190f63: 01'in backend LITELLM_MASTER_KEY satırı 'is not set'.
 Kapılar: compose config varsayılan/e2e/test 0; build backend+tools 0.0.0-01; lint 0; test 289 + test-int 133 iki profil (08-lite testleri dahil); temiz up 65 s + smoke passed; log kapısı 0; down -v. Branch'e başka commit atmıyorum. Yeni derlemeden dangling katman olabilir (prune).
+
+### B-01-0024 · 2026-10-29 01:50 · → koordinator · HANDOFF
+Paket: 01   Cevap: K-01-0021
+### 01 · ffcore-isci-b-01b · 2026-10-29 01:50
+- Durum: MERGED (r4 ONAY, main --no-ff 070d8b0); SHA a190f63e1f0ab6461e2d005040afd7230c3979b0 (main 5900976 üstüne 10 commit, r4 rebase; r1 delta fe4ab55..9287ebe, r2 delta 9287ebe..3907dd9).
+- Tam sonraki adım (01'i kullanan paketler için geçiş notları):
+  - 02 (Langfuse, sıradaki paketim):
+    - `deploy/litellm/config.yaml` `litellm_settings` şu an yalnız `drop_params: false`. Callback (`callbacks: ["langfuse"]`) ve anahtarlar (LiteLLM env'inde `LANGFUSE_PUBLIC_KEY/SECRET_KEY/HOST`) 02'nin. `/config/update` YASAK (DRIFT-68: master key'i ve DB URL'sini `LiteLLM_Config`'e düz metin yazar); callback config dosyası + env ile gelir. `test_01_7_litellm_config_table_stays_empty` bunu bekler; `LiteLLMAdmin._call` `/config/*`'i reddeder.
+    - FOLLOWUP-49 (K-01-0017 ile genişledi, 02'de kapatılır): merkezi log yapılandırması + sanitizer; ek: httpcore2/httpx2 DEBUG'da yanıt başlıklarını değerleriyle logluyor (`receive_response_headers.complete`) → bu logger'lar DEBUG'a inmesin ya da başlık değerleri maskelensin; test: DEBUG altında sahte başlık değeri logda 0.
+    - Maliyet: uzlaştırıcı `models.pricing`'i `model_info.input/output_cost_per_token` (+ `cache_read_input_token_cost`) olarak yazar; fiyatsız model `pricing_missing` (FOLLOWUP-69). Langfuse maliyeti buradan okur.
+    - Log disiplini (r1/r2): upstream `error.message` hiçbir loga/exception'a girmez; yalnız `safe_error()` alanları `upstream_status`, `error_type`, `error_code`, `call_id` (kapalı liste, aksi `unknown`). 02'nin tracing'i de upstream metnini taşımamalı; `x-litellm-call-id` iz eşlemesi için referans.
+  - 06a / 06b: çağrı tek yol `ffcore.services.litellm_client`:
+    `target = await resolve_target(session, project_id, "chat-default")` → `ModelTarget(name, id, fallback_name, fallback_id)` (yalnız `chat-default` ve projede aktif `chat-fallback` varsa fallback dolu). `async with LiteLLMClient(settings) as c:` `await c.chat(target, messages, user=..., metadata={project_id, agent_key, run_id, channel, api_key_id}, tools=..., **params)` → `ChatResult(content, message, finish_reason, usage, fallback)`; stream: `async with c.chat_stream(...) as s: async for chunk in s` (OpenAI chunk dict), sonra `s.result` (`fallback` ilk chunk'tan önce belli; `usage`, `finish_reason`, `content`, `tool_calls` son chunk'tan sonra tam).
+    `FallbackObserved(source_model, target_model, reason="primary_failed")` → 06a `run_events.fallback` + Langfuse tag (06a kabulü).
+    Hatalar (hepsi `ApiError`, OpenAI biçimli gövde): `ModelNotFound` 404 `model_not_found` (`.reason`: `no_active_model` | `project_deleted`); `ModelUnavailable` 503 `model_unavailable` (`.reason`: `http_5xx`, `http_404/408/429`, `not_registered`, `egress_*`, `unexpected deployment ...`); `ModelCallFailed` 502 `upstream_error` (200 içinde hata, akışta `{error}` chunk'ı) | `stream_incomplete` (finish_reason ve ardından [DONE] ya da usage gelmeden biten ya da kopan akış; kısmi cevap başarı değildir, önceki chunk'lar tüketiciye gitmiş olabilir: 06a run'ı `failed` yapar); `EmptyCompletion` 502 `empty_completion`; `LiteLLMError` (diğer 4xx, istek hatası). `tools` verilince `parallel_tool_calls=false`, stream'de `stream_options.include_usage` otomatik.
+    `reasoning` isteyen agent: `extra_body` ile `reasoning_effort` geçir (doğrudan parametre LiteLLM'de 400). `models.reasoning_default` ve `return_reasoning` uzlaştırıcıda eşlenmedi, 06a'nın.
+    Zaman aşımı: per-call `LLM_CALL_TIMEOUT_S` (LiteLLM'e model başına); istemci bekleme bütçesi 6×timeout+30 s; stream'de toplam süre yalnız başlıklara kadar, sonrası parça başına okuma süresi. Run timeout 06a'nın.
+  - 04a ile merge çakışma noktaları (591aac3'ten kesişen dosyalar): `deploy/docker-compose.yml` (01: app-env'e LITELLM_URL/LITELLM_MASTER_KEY/LITELLM_INTERNAL_KEY/LLM_CALL_TIMEOUT_S; litellm `DISABLE_ADMIN_UI`; backend `depends_on: litellm healthy`; `fake-llm` servisi `profiles: [test]`; tools'a SEED_*), `backend/ffcore/core/config.py` (01 bloğu `# --- 01 ---` + `inference_backend` üstte), `backend/ffcore/main.py` (lifespan'de scheduler bloğu; 04a warmup'ı yanına), `Makefile` (`seed-models`, `render-litellm` + .PHONY). `pyproject.toml`/`uv.lock` 01'de değişmedi. 08-lite ile kesişen: `.env.example`, `.env.test`, `deploy/docker-compose.yml`. Hepsi ekleme; sonra merge olan rebase eder, iki tarafın satırları korunur.
+  - 10a-formlar / 10b: model eklenince LiteLLM'e birkaç saniyede gider (arka plan uzlaştırması); yazılamayan satır `litellm_model_not_written code=...` logunda. Konsolda görünmesi FOLLOWUP-70 (`/readyz`, 04a). Silinen proje: modelleri sonraki uzlaştırmada düşer; proje silme olayı FOLLOWUP-75 (03c).
+  - PayCore (00i-takip): Ollama host'ta → `host.docker.internal` `ALLOWED_INTERNAL_HOSTS`'a; `SEED_OLLAMA_BASE_URL=http://host.docker.internal:11434`; `LLM_CALL_TIMEOUT_S=600`; LiteLLM `compose.ffcore.yml`'e `profiles: [server]` (B-00i-0021 notları); `LITELLM_INTERNAL_KEY` sunucu `.env`'ine (kullanıcı üretir).
+  - Testler: entegrasyon testleri `--profile test` ile `fake-llm` ister ve `ALLOWED_INTERNAL_HOSTS=litellm,fake-llm` ile koşar. İç anahtar kontrolü `key_hash()` (sha256) ile; ham anahtar asla URL'de değil (r1 MAJOR-1). Log kapısı komutu PR'da ("r3 kapıları").
+- Değişen dosyalar: state/pr/01.md "Değişen dosyalar" (30 dosya) + r1/r2 delta (`services/litellm_client.py`, `services/litellm_reconcile.py`, `tests/unit/test_01_r1_safety.py`, `tests/integration/test_01_{events,reconcile}.py`).
+- Koşan testler / kalan: make lint 0; make test 289, make test-int 133 iki profil (08-lite dahil, rebase sonrası); temiz up + smoke; log kapısı (anahtar/işaret/kişi metni 0); uçtan uca CLI + curl (fe4ab55) / NOT_RUN: `-m ollama`, gerçek satıcılar.
+- Kararlar: K-01-0004 (fallback istek düzeyinde, /config/update yasak), K-01-0005 (S1-S5 A), K-01-0006 (timeout ayarı, forward_unknown_params açık hata), K-01-0012 (hata metni yokluk, silinmiş proje 404), K-01-0014/0017 (kapalı liste); KARARLAR "01 kararları".
+- Blocker'lar / kayıtlar: FOLLOWUP-49 (02, httpcore2 DEBUG eki), FOLLOWUP-56 (süreç içi birleştirici), FOLLOWUP-69 (llmaas fiyatları), FOLLOWUP-70 (`/readyz`), FOLLOWUP-75 (proje silme olayı, 03c), DRIFT-68 (/config/update secret), DRIFT-72 (forward_unknown_params), ENV-74 (imaj etiketi).
+- Commit edilmemiş durum: yok; stack 01-litellm `down -v`; worktree, branch ve 0.0.0-01 imajları koordinatörce kaldırıldı.
+- Branch ve son commit: feat/01-litellm-gateway @ a190f63e1f0ab6461e2d005040afd7230c3979b0.
+Lease: RETIRED.
+
+### B-01-0025 · 2026-10-29 01:50 · → koordinator · DURUM
+Paket: 01 → 02   Cevap: K-02-0001
+Bu oturumun kullanıcı talimatı ROL=isci-b PAKET=01; protokol gereği (paket başına yeni oturum) K-02-0001'e bu oturumda ACK vermiyorum. Kullanıcı 02 için yeni isci-b oturumu açmalı (ROL=isci-b PAKET=02). Lease RETIRED.
+Yeni oturum için 02 hazırlık notlarım (GOREV öncesi, kod yok):
+## İlk doğrulamalar (01'deki U2/U3 gibi; pinli imajlarda, sahte değerlerle)
+1. DRIFT-7: langfuse 3.120.0'da `LANGFUSE_INIT_ORG_ID/PROJECT_ID/PROJECT_PUBLIC_KEY/SECRET_KEY/USER_*` headless init gerçekten çalışıyor mu; init değerleri nereden gelir (agent .env yazmaz: init.sh anahtarı bir kez basar, B6).
+2. DRIFT-13 (U16): LiteLLM v1.80.0 `callbacks: ["langfuse"]` (v2 SDK yolu) mı `["langfuse_otel"]` mı v3 sunucuyla iz üretiyor; `GET /api/public/traces` ile 30 s içinde görünüyor mu, token ve maliyet dolu mu.
+3. Callback LiteLLM'e config.yaml `litellm_settings.callbacks` + litellm servis env'i (`LANGFUSE_PUBLIC_KEY`, `LANGFUSE_SECRET_KEY`, `LANGFUSE_HOST=http://langfuse-web:3000`) ile; `/config/update` YASAK (DRIFT-68), `test_01_7` boş Config tablosunu bekler.
+4. Maliyet = `models.pricing`: 01 uzlaştırıcısı `input/output_cost_per_token` yazıyor; kabul testi fiyatlı sahte model (fake-llm) ile, llmaas seed fiyatsız (FOLLOWUP-69).
+5. Langfuse kapalıyken backend çalışır (trace kaybı, hata yok) — bu ARCH-06 ile gerilimli: sessiz kayıp yerine sayılan/loglanan `trace_delivery_failed` olayı (00i PayCore deseni) önerilecek; brief "hata vermez" diyor, "sessiz" demiyor.
+
+## Bağımlılık / sınıf
+- Langfuse Python SDK (backend runtime) yeni bağımlılık → C sınıfı, planda; PayCore 00i `rag/trace.py` SDK 4.15.1 davranışını taklit eden exporter kullanıyor (sürüm referansı). LangGraph CallbackHandler 06a'ya kadar yalnız fabrika.
+- 04a pyproject/uv.lock'a ağır bağımlılık ekliyor: sıra/çakışma koordinatörle.
+
+## Brief notları (planda varsayım/DRIFT)
+- Yollar `backend/app/...` → `backend/ffcore/...` (DRIFT-34).
+- `prompts.py`: Langfuse erişilemezse son başarılı önbellek + `prompt_cache_stale` olayı; önbellek yoksa açık hata (C13). `make seed-prompts`.
+- `docs/izleme.md` İngilizce (DRIFT-36).
+- FOLLOWUP-49 bu pakette: merkezi log yapılandırması + sanitizer (00i `config.scrub` deseni) + httpcore2/httpx2 DEBUG başlık değeri sızıntısı (B-01-0021). 01'in kuralı: upstream hata metni loga/ize girmez; izde `x-litellm-call-id` referans.
+- PII: Langfuse'a giden içerik 08 maskelemesinden sonra (08-lite main'de); 02 yalnız gönderim yardımcısı, maskeleme bağlama 06a.
+- Touch-zone (MULTI_AGENT_PROTOCOL): `core/tracing.py`, Langfuse compose; ek olarak `core/prompts.py`, `deploy/langfuse/init.sh`, `deploy/litellm/config.yaml` (callbacks), compose litellm env, `.env.example`, docs, tests.
+
+### B-02-0001 · 2026-10-29 02:00 · → koordinator · ACK
+Paket: 02   Cevap: K-02-0001 / B-01-0025
+Kullanıcı bu oturumda devam talimatı verdi ("Burada devam et"); B-01-0025'teki "yeni oturum" notu geçersiz. Aynı oturum yeni kimlikle (ffcore-isci-b-02), lease ACTIVE. Okuma 01 başında tamamlandı (gruplar 1-8); ek olarak plan/02 tamamı, K-02-0000 taslağı (kurallar a-f, touch-zone), BLOCKERS 7/13/49 okundu.
+GOREV alındı: worktree .worktrees/feat/02-langfuse-trace @ 070d8b0 doğrulandı (ağaç temiz). İlk iş LANGFUSE_INIT_* headless init doğrulaması (DRIFT-7), ardından LiteLLM Langfuse callback'inin v3 ile uyumu (DRIFT-13, U16); sonra state/pr/02.md → DURUM: PLANNED. Kod plan onayından sonra. Tüm derleme/up komutları FFCORE_VERSION=0.0.0-02.
+
+### B-02-0002 · 2026-10-29 02:50 · → koordinator · DURUM
+Paket: 02   Cevap: K-02-0001
+DURUM: PLANNED. Plan: C:\ai_paycore\ffcore\state\pr\02.md (kabul 10 → test; ölçümler M1-M4; kod yok, worktree 070d8b0 temiz; deneme stack'i down -v).
+Ölçümler (pinli imajlar, sahte değerler): M1 DRIFT-7 kapanabilir: LANGFUSE_INIT_* 3.120.0'da çalışıyor (proje + anahtar, verilen çift 200, yanlış 401, yeniden başlatmada idempotent, secret DB'de hash'li, logda 0). M2 DRIFT-13 kapanabilir: LiteLLM imajındaki v2 SDK (2.59.7) 'langfuse' callback'i v3 sunucuda iz üretiyor (worker şart): user, session_id, tags, usage stream + stream-dışı. M4: 'langfuse_otel' maliyeti 0 taşıyor.
+**01 hatası (M3):** uzlaştırıcı fiyatı yalnız model_info'ya yazıyor; LiteLLM maliyeti yalnız litellm_params'taki input/output_cost_per_token'dan hesaplıyor. Bugün 01'le kurulan modellerde maliyet 0 (başlık yok, Langfuse costDetails {}). litellm_params'a konunca 3.9e-05 tam (Langfuse'ta da). 02 kabul 1 buna bağlı.
+Karar isteyen 5 madde (planın sonunda, hepsi A önerili): S1 callback 'langfuse'; S2 01 fiyat hatası bu PR'da düzeltilir (touch-zone eki services/litellm_reconcile.py) ya da ayrı fix PR; S3 backend'e langfuse==4.15.1 (C sınıfı; OTLP exporter SafeOutboundClient dışında, iç host zorunlu, açılışta kontrol); S4 merkezi log stdlib logging (structlog değil); S5 varsayımlar. Cevap gelene kadar kod yok.
+
+### B-02-0003 · 2026-10-28 22:52 · → koordinator · ACK
+Paket: 02   Cevap: K-02-0002 / K-02-0003
+Alındı: S1-S5 A, [C]; koşullar S2 (ayrı fix(01) commit'i, önce kırmızı, iki render kanıtı), S3 (1-5), S4 (DEBUG + exc_info testi) plana bağlı. Saat damgası düzeltildi: bundan sonra date çıktısı (önceki B-01-0013..B-02-0002 damgaları ileriydi). IMPLEMENTING. Dilim 1: langfuse==4.15.1 bağımlılığı + SDK 4.15.1 ↔ sunucu 3.120 ölçümü (backend'den iz + prompt API, OTel global provider, SDK dış çağrıları); uyumsuzsa dururum.
+
+### B-02-0004 · 2026-10-28 23:01 · → koordinator · DURUM
+Paket: 02   Cevap: K-02-0003 (S3 koşul 3-5)
+Dilim 1: bağımlılık commit'i (langfuse==4.15.1; geçişli opentelemetry-sdk/exporter-otlp-proto-http 1.45.1, httpx 0.28.1, httpcore 1.0.9, requests 2.34.2, urllib3 2.8.0, protobuf 7.36.2, backoff, wrapt, googleapis-common-protos). Ölçüm (pinli yığın, sahte değerler, tools konteyneri, depo değişmedi):
+- S3(3) backend SDK 4.15.1 ↔ sunucu 3.120.0 UYUMLU: iz (user_id, session_id, tags propagate_attributes ile), span + generation gözlemleri; prompt API create_prompt/get_prompt(label=production)/compile çalışıyor.
+- Durma koşulu 1 temiz: LiteLLM çağrısı metadata existing_trace_id + parent_observation_id ile SDK span'inin altında; LiteLLM generation parent = bizim span, maliyet 3.9e-05.
+- S3(4): SDK varsayılanda OTel global provider'ı kendi TracerProvider'ıyla değiştiriyor (önce Proxy, sonra TracerProvider). Langfuse(tracer_provider=<kendi>) verilince global değişmiyor (Proxy kalıyor) → tracing.py kendi provider'ını verir, test eder.
+- S3(5): socket.getaddrinfo izlemesi: SDK yalnız langfuse-web'e (ve probe'un çağırdığı litellm'e) bağlandı; telemetri/sürüm kontrolü yok. SDK'nın varsayılan base_url'i bulut; LANGFUSE_HOST zorunlu (S3(1)) testi tracing dilimine.
+Sıradaki: dilim 2 core/logging.py (FOLLOWUP-49), dilim 3 S2 fix(01), dilim 4 tracing/prompts/init/compose.
+
+### B-02-0005 · 2026-10-28 23:32 · → koordinator · DURUM
+Paket: 02   Cevap: K-02-0003 (S2)
+Dilim 2: 068877a core/logging.py (FOLLOWUP-49; stdlib, ScrubFilter kök + uvicorn handler'ları, üçüncü taraf HTTP/telemetri logger'ları WARNING; 9 test DEBUG altında gerçek HTTP ile: sahte secret, Bearer, başlık değeri, exc_info logda 0). Birim 298 geçti.
+Dilim 3: fix(01) commit'i — **iki 01 hatası** (aynı dosya, S2 kapsamı):
+1) Fiyat (M3, onaylı S2): input/output_cost_per_token artık litellm_params'ta.
+2) **YENİ:** POST /model/update v1.80.0'da 200 dönüp hiçbir şeyi değiştirmiyor (ölçüldü: hash, model, fiyat aynı kaldı). Yani 01'de değişen satır (model_id, fiyat, sağlayıcı anahtarı) LiteLLM'e hiç ulaşmıyordu ve her uzlaştırma aynı modeli 'updated' raporluyordu. 01'in test_01_8'i yalnız raporu kontrol ettiği için kaçtı (review'lar da). Düzeltme: PATCH /model/{id}/update (ölçüldü: litellm_params + model_info kalıcı uygulanıyor). Testler: test_01_8 artık LiteLLM'deki değeri ve ikinci koşu no-op'u kontrol ediyor (önce kırmızıydı); test_02_7 pre-fix dağıtım bir kez güncellenir, ikinci render değişiklik yok, gerçek çağrı maliyeti 3.9e-05 = models.pricing; test_01_6_api_key_encrypted_after_update (PATCH yolunda da anahtar şifreli). Entegrasyon 01+02: 22 geçti.
+Ortam bulgusu (KAYIT-TALEBI önerisi, sahibi 12/smoke): yavaş makinede LiteLLM'in ilk 'prisma migrate deploy' denemesi 60 s'de zaman aşımına uğruyor, advisory lock'u bırakmıyor, sonraki denemeler kilidi alamıyor ve LiteLLM **yarım şemayla healthy** açılıyor (/key/info 500, tablo/kolon yok). Restart düzeltiyor. Healthcheck (/health/liveliness) bunu yakalamıyor; smoke'a LiteLLM şema/DB kontrolü (ör. /health/readiness ya da master key ile /key/info hash 404/200) önerilir.
+Sıradaki: dilim 4 tracing.py, prompts.py, init.sh, compose, smoke.
+
+### B-02-0006 · 2026-10-29 08:58 · → koordinator · DURUM
+Paket: 02   Cevap: K-02-0004
+Dilim 4 yazıldı, commit'lenmedi (tracing.py, prompts.py, init.sh, compose/env örnekleri, smoke, cli seed-prompts, Makefile; birim testler yeşil). Entegrasyon: test_02_1 tek başına geçiyor (iz Langfuse'ta 10,5 s'de, maliyet ve iç içelik doğru). Takıldığım yer: dosyanın tamamı koşunca bir test asılı kaldı. Gece arka plan koşusu 9 saat bitmedi; konteyneri sildim. Şüphe test_02_3: erişilemeyen hosta giden kapanış flush'ı. Doğrulanmadı. Şimdi faulthandler ile hangi çağrıda beklediğini ölçüyorum. Bir istek dönüşünü bekletirse bu ürün hatasıdır (kural c) ve düzeltilecek. Yığın 02-langfuse açık.

@@ -3,9 +3,9 @@
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
 - Oturum kimliği: ffcore-isci-a-04a
-- Aktif paket: 04a (GOREV K-04a-0001)
+- Aktif paket: 04a (DUZELT r1, K-04a-0018)
 - Durum: ACTIVE
-- Son okunan: K-04a-0011 (2026-10-28 20:55)
+- Son okunan: K-04a-0018 (2026-10-28 23:47)
 
 ## Mesajlar
 
@@ -511,3 +511,25 @@ Dilim 7 düzeltmeleri (a)-(d) + K-04a-0010 ekleri yazıldı, commit edilmedi. Ge
 - rerank_truncated: kb_queries kolonu + adaylarda işaret + log.
 - Model testleri 14/14 (1 tekrar: kabul 2 istemci zaman aşımı 60 s → 900 s, arama süresi kabul değil).
 Şu an: tam kapı koşusunda entegrasyon takıldı; canlı compose worker'ı aynı Redis 'ingest' kuyruğunu dinleyip test işlerini kapıyordu (ortam, kod değil). Worker durduruldu, entegrasyon yeniden koşuyor. Yeşilse dilim 7 commit → main'e rebase (listelediğin dosyalar, hepsini koruyarak) → kapılar yeniden → VERIFIED + PR-HAZIR. Gerekirse test worker'ı ayrı bir kuyruk adıyla izole ederim (ayrı not).
+
+### A-04a-0022 · 2026-10-28 22:59 · → koordinator · DURUM
+Paket: 04a   Cevap: K-04a-0012 / K-04a-0013
+DURUM: VERIFIED. Branch feat/04a-knowledge-core, main 070d8b0 üzerine rebase (08-lite + 01 korunarak), HEAD f481f045c62e41f6246606c036b6481e7721bc88, 10 commit, ağaç temiz.
+Kanıt (ayrıntı state/pr/04a.md): make lint 0; unit+contract 355/355, integration 190/190 (llmaas ve airgap; RUN_QDRANT_TESTS=1, fake-llm ayakta, canlı worker açık); alembic heads 03a (effective), 03b, 04a, 08; openapi 03a/04a/08 bayt aynı; make smoke passed; model testleri rebase öncesi 14/14, rebase sonrası e2e stack 3/3: kabul 1 64,8 s, kabul 2 fesih 1. sıra (0,978), kabul 14 /healthz en kötü 136 ms.
+Rebase sonrası bulunanlar: (1) main.py birleşimi: warmup artık 01'in settings() yardımcısını kullanıyor (önceden get_settings(); test override'larını görmüyordu); (2) tüm model takımı tek tools sürecinde 11,7 GB'ta OOM (Killed) → e2e ayrıca koşuldu, PR'da yazılı; (3) kalıcı dönüştürücü havuzu atexit ile kapanıyor (kapanmazsa süreç çıkmıyordu; test koşusu takılmasının nedeni buydu, canlı worker değil).
+Kalan: FOLLOWUP-77 arama süresi (121-1283 s 10 eşzamanlıda), FOLLOWUP-78 PayCore 512. Dangling imaj: 5 (0.0.0-04a yeniden derlemeleri), prune sende. Stack 04a-knowledge-core ayakta (inceleyici kullanabilir); PR sonrası "down" (v'siz, model_cache korunur) bende.
+
+### A-04a-0023 · 2026-10-28 22:59 · → koordinator · PR-HAZIR
+Paket: 04a   Cevap: -
+PR: C:/ai_paycore/ffcore/state/pr/04a.md · Branch: feat/04a-knowledge-core · Baz: main 070d8b0 · SHA: f481f045c62e41f6246606c036b6481e7721bc88 · Sınıf: [A] + bağımlılıklar [C] (K-04a-0002/0003/0005/0008 onaylı) · push yok.
+İnceleyici için: model testleri canlı stack ister (FFCORE_VERSION=0.0.0-04a, proje 04a-knowledge-core, model_cache dolu; e2e için create-superadmin + E2E_EMAIL/E2E_PASSWORD sahte değer); entegrasyon fake-llm (profil test) ve qdrant (profil qdrant) ister. Tüm model takımını tek süreçte koşmak 11,7 GB'ta OOM; dosya dosya koşulmalı.
+
+### A-04a-0024 · 2026-10-28 23:47 · → koordinator · ACK
+Paket: 04a   Cevap: K-04a-0018
+DUZELT r1 alındı (MAJOR 1-7). Sıra: rapor tamamı → her MAJOR için önce kırmızı test (gerçek PG/Qdrant/tokenizer) → düzeltme; tools imajı 0.0.0-04a yeniden derlenir; test-int ortam değerleri Makefile/belgede tekrarlanabilir; model kabulü dosya dosya; PR'a "Review r1 bulgu → düzeltme → kanıt" tablosu; yeni tam SHA ile PR-HAZIR.
+
+### A-04a-0025 · 2026-10-29 00:55 · → koordinator · KAYIT-TALEBI
+Paket: 04a   Cevap: K-04a-0018
+ENV olayı (ENV-81 benzeri, benim kurulum sapmam): tools konteynerinde koşan PaddleOCR çalıştırmaları büyük olasılıkla ağırlıkları dışarıdan (paddleocr.bj.bcebos.com) indirdi. Kanıt (çıkarım; ağ trafiği gözlenmedi): (1) PaddleOCR ağırlıkları `~/.paddleocr` altında arar; tools imajında HOME=/root ve `--rm` konteyner, model_cache'de `.paddleocr` yok; imajda `*.pdiparams` yok (network none ile tarandı); (2) bugün 00:20-00:40 arası iki bellek ölçümü koşusunda taranmış PDF `paddle_tr converted` döndü, yani ağırlık bir yerden geldi. Rebase öncesi model takımındaki OCR testleri (13b vb.) de aynı yolla indirmiş olmalı (doğrulanmadı). İndirilen dosyalar her seferinde `--rm` ile silindi; kalıcı kopya yok. HF modelleri (bge-m3, reranker, Docling) model_cache'den geliyordu, ama HF_HUB_OFFLINE bazı koşularda verilmemişti; eksik dosya indirilmediği doğrulanmadı.
+Şimdi: OCR içeren koşuları durdurdum. MAJOR-6 düzeltmesi bu boşluğu kapatıyor: Compose ve tools'ta varsayılan HF_HUB_OFFLINE=1 / TRANSFORMERS_OFFLINE=1, PaddleOCR açık `*_model_dir` yolları (`/models/paddleocr/...`), dizin yoksa model adı ve yolla kodlu hata (indirme yok), indirme yalnız ayrı `make models` hazırlık adımında. Bu adımın kendisi dışarıya bağlanır; kullanıcı onayı olmadan koşturmayacağım (KARAR-GEREK ayrıca gelecek: Paddle ağırlıkları model_cache'e kim, nasıl koyacak).
+Ek: 3 saattir takılı kalan kendi entegrasyon koşum (04a-knowledge-core-tools-run-cf19…, 18:36Z, atexit düzeltmesi öncesi) durduruldu. Paylaşılan Docker VM (12,5 GB) global OOM ile ölçüm çocuğumu öldürdü (dmesg); ölçümler bu yüzden ayrı ayrı yapıldı.

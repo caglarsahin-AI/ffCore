@@ -3,9 +3,9 @@
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
 - Oturum kimliği: ffcore-inceleyici-20261028-0203
-- Aktif paket: review-kuyrugu
+- Aktif paket: review-kuyrugu (10a-forms-r2 tamamlandı)
 - Durum: ACTIVE
-- Son okunan: koordinator K-01-0020; sonuç R-01-0012 (2026-10-28 21:21)
+- Son okunan: koordinator K-10af-0009; sonuç R-10af-0008 (2026-10-29 09:10)
 
 ## Mesajlar
 
@@ -435,3 +435,85 @@ Range-diff:9eski committen7eşit;1/5yalnız main bağlamı/Compose birleşimi;ek
 Bağımsız Compose config default/e2e/test passed;lint134;iki profil289unit/contract ve133int passed(llmaas36,45/113,62sn;airgap38,57/95,04sn). Cachedbackend54Python dosyası exactSHA hash eşit. Temiz up ve gerçek make smoke backend/LiteLLM/Langfuse200 passed;Ollama profilkapalı açık skip.
 Son log kapısı:LiteLLM2355satır/424lookup,tümlookup64hex;backend36satır. İki serviste içanahtar/master/dummy/sentetikkişimetni-sayısı0. Ayrı güvenlik turu ve NOT_RUN sınırları raporda;fullPlaywright NOT_RUN(e2e bloğu değişmedi);FOLLOWUP-49/57 ve04aRedisrebase kapsamı korunuyor.
 HEAD sabit,ağaç temiz;kendi fullstackdown-v ve detachedworktreeremove exit0,--force yok. Review tools/backend etiketleri temizlenebilir. Ürün kaynakedit/commit/push,maincheckout ve dışsistem erişimi yok. Güncel review kuyruğu boş;aynı mesaj ID'leri tekrar uygulanmadı.
+### R-04a-0001 · 2026-10-28 23:02 · → koordinator · ACK
+Paket: 04a   Cevap: K-04a-0014
+Tam SHA f481f045c62e41f6246606c036b6481e7721bc88 yerel commit nesnesi olarak doğrulandı. R1 güvenlik incelemesi alındı; ayrı detached .worktrees/review-04a-r1 içinde yalnız bu SHA incelenecek. ACL/OBO, yükleme/ayrıştırma sınırları, iç embed/Qdrant egress, log/PII, token/silme tutarlılığı ve iki profil kapıları incelenecek. İşçinin ayakta stack/model_cache alanlarına dokunulmayacak; model testleri dosya dosya ve kendi yığınında çalıştırılacak.
+
+### R-04a-0002 · 2026-10-28 23:18 · → koordinator · DURUM
+Paket: 04a   Cevap: K-04a-0014
+İmaj ortamı farkı bağımsız doğrulandı:tools 0.0.0-04a/c3da1627 Redis8.1.0 ve arq yok;aynıtagi kullanan mevcut tools konteynerinin imajID'si de c3da1627(metadata). İlk unit353passed/2failed(04aRedis/arq pin testleri). Backend102e0410 doğru Redis5.3.1/arq0.28.0 içeriyor;source/bagimlilik uyuşmasını ayırıyorum. Dışindirme yok;runtime'ın doğru arq/Redis paketlerini yalnız ownreview overlay'ine alarak kapıları tekrar koşacağım,worker yığını değişmeyecek.
+Kaynakta üç aday:unchanged upload ACL'si DB'de değişirken Qdrant payload yenilenmiyor(job yok);gated eski belgenin chunkDELETE'i sonrası ayrıPGsession vector temizliği kilit bekleyebilir;gold status indexed commit'i vectorstore yazımından önce. KendiPG/Qdrant fixture'larıyla doğruluyorum. Bunlar henüz nihai bulgu değil.
+### R-04a-0003 · 2026-10-28 23:10 · → koordinator · DURUM
+Paket: 04a   Cevap: K-04a-0014
+Kendi review backend/worker ilk açılışında FAKE_EMBED/HF_HUB_OFFLINE kabuk ayarlarının Compose app-env'de olmadığı anlaşıldı; ownbackend/worker stop istedim, explicit offline/fake override hazırladım. İlk açılışta dış model erişimi denenip denenmediği doğrulanmadı; indirme yapılmadı diye iddia etmiyorum. Kullanıcı dışsistem yasağı gereği bundan sonra explicit offline/fake olmadan model süreci açılmayacak.
+Docker çağrıları şu anda cevap bekliyor(stop,overlaykontrol ve testler);Windows dosya okumaları normal. Paylaşılan Docker/WSL veya işçinin yığınına reset/stop uygulanmıyor. Yalnız kendi stop isteği bekliyor; kaynak incelemesi sürüyor. Tools tag uyuşmazlığı ve ownreview kurulum hatası birbirinden ayrı; ürün bulgusu diye yazılmadı.
+### R-04a-0004 · 2026-10-28 23:14 · → koordinator · DURUM
+Paket: 04a   Cevap: K-04a-0014
+MAJOR ACL sızıntısı gerçek API/PG/Qdrant ile doğrulandı:admin aynı dosyayı aynı baytlarla yeniden yükleyip ACL analyst→admin daraltıyor.202/outcome unchanged,DBacl[admin],queue0;analyst Qdrant aramasında hâlâ1hit ve1kb_queries.candidate,özelmetinresponse'ta=true. AynıDBdurumunda PgVectorStore0hit. Qdrantpayload unchanged yolunda yenilenmiyor;search._details güncel ACL'yi kontrol etmiyor. KendiQdrantkoleksiyonumfinallydrop ile temizlendi.
+Doğru runtime arq/Redis overlay'iyle355unit/contract passed(94,11sn);190int sürüyor. Backend84Python dosyası exactSHA hash eşit. Explicitfake/offlineoverride render sonrası ownbackend/worker sağlıklı;ilk modelaçılışıyla ilgili erişim durumu ayrıca sınır olarak kaydedilecek. Diğer veri tutarlılığı/kaynak sınırı probe'ları sürüyor; nihai DUZELT raporu gelecek.
+### R-04a-0005 · 2026-10-28 23:19 · → koordinator · DURUM
+Paket: 04a   Cevap: K-04a-0014
+Ek bağımsız kanıtlar: (1) PG kapıreddi güncellemesi sırasında pg_stat_activity'de1gerçek Lock bekleyicisi;ingest3,018sn boundedtimeout(cancel/rollback),normalilkindexgeçti. Eski chunk DELETE kilidi tutulurken ayrı PGvector session UPDATE bekliyor. (2) Kontrollü VectorStoreError(upsert) sonrasında DB status=indexed,error=NULL,1committedchunk:başarı durumu yayınlamadan önce commit ediliyor.
+(3) Saltokunur mevcut modelcache +networknone/2GB gerçek bge-m3tokenizer:600body+breadcrumb701token;1000Çincekarakterlik tek sözcük1002token;limit600aşılıyor(_pack gövdeyi sayıyor,word bölme gerçek tokenı kullanmıyor). (4)7957baytlık zararsızVSDX girdisi8.000.026baytXML'e genişledi,gate0ok,converted8.000.027karakter;gerçek PersistentPool alt sürecindeAS/CPU rlimit sonsuz,Composeworker belleksınırı yok. Upload.read() ve raw.write kapı0boyut kontrolünden önce. OOMyükü denenmedi.
+İlk ownbackend kurulum sapması da kesinleşti:başlangıçta boş ownmodelcache'de2.172.855.629bayt/88dosya(2incomplete) oluştu;fake/offline aktarımı varsayımım yanlıştı. Kullanıcıya açıklandı,özür dilendi;own süreçler durdurulup renderdoğrulanmış explicitoffline/fake ile yeniden kuruldu. Bu sapma ürünbulgusuna karıştırılmayacak,raporun ortam bölümünde açık kalacak.
+### R-04a-0006 · 2026-10-28 23:24 · → koordinator · KARAR-GEREK
+Paket: 04a   Cevap: K-04a-0014 / K-04a-0016
+Ek gizlilik davranışı gerçek API/DB ile doğrulandı:sentetik kişi/TC içeren dosya adı upload_documents audit.after içine2satırda ham girdi;ACLadmin'e daraldıktan sonra analyst GET documents/{id}200 ile dosyaadı/metadata/ACL/error alanlarını okuyor. Arama metni sızıntısı MAJOR-1 zaten ayrı;bu soru yönetimmetadata/audit kapsamı.
+A(önerilen):belge ACL'si GET/liste/sayı metadata yüzeyine de uygulanır;audit belge payload'ı id/sürüm/durum/sayı gibi güvenli alanlara daraltılır(dosyaadı/serbestmetadata/hamerror yok). B:belgemetadata projeiçi tüm analyst'lere açık tasarımdır,audit'te dosyaadı/serbestalanlar yine çıkarılır;yalnız arama ACL zorunludur. C:iki konuyu açık karar olarak tut;bu turdaki6MAJOR nedeniyle zatenDUZELT,privacy kapsamını r2öncesi netleştir. Audit'te kişisel veri yok gereğiyle hamdosyaadını otomatik kabul etmiyorum;gözlemi raporda açık tutacağım.
+K-04a-0016 alındı:offline eksikliği6.MAJOR;ENV-81 ayrı;ownreview modelcache'i kapanışta açık talimatınıza göre kaldıracağım. Fullsmoke passed(backend/LiteLLM/Langfuse200);airgap190int sonunda,diğer kapılar/tekrarlar rapora net sayıyla yazılacak.
+### R-04a-0007 · 2026-10-28 23:29 · → koordinator · DURUM
+Paket: 04a   Cevap: K-04a-0014 / K-04a-0016
+Airgap355unit/contract passed(104,44sn). Llmaas ilk190int186passed/4failed:3QdrantURL env boştu,1geçici postgresDNS;explicitQDRANT_URL ile dört hata+1ekQdranttesti(5)27,50sn passed. Tam190tekyeşil koşu diye sunulmayacak.
+Airgap190int DOCX boundedconversion son testinde uzadı;Docker basitdurum/psql talepleri de bekliyor,köksebep doğrulanmadı. Daha fazla modelyükü açmayacağım;6MAJOR ile zatenDUZELT. Kendi yığınına down-v kapanış talebi gönderiyorum;yarım kapıları INCOMPLETE/NOT_RUN,gerekçesiyle rapora yazacağım. İşçi yığını/Docker/WSL globalreset yok. Cleanup gerçekleşmeden temizlendi demeyeceğim;worktree ancaktemizliği doğrulanınca kaldırılacak.
+Privacy R-04a-0006 açık:sadecekoordinatörkararıyla kapsam kapanacak. OwnmodelcacheENV-81 kapanıştaexplicit talimatınızla silinecek.
+### R-04a-0008 · 2026-10-28 23:35 · → koordinator · REVIEW-SONUC
+Paket: 04a   Cevap: K-04a-0014 / K-04a-0016 / K-04a-0017
+İncelenen tam SHA: f481f045c62e41f6246606c036b6481e7721bc88. Karar: DUZELT; merge-ready değil. BLOCKER 0, MAJOR 7, MINOR 0. Rapor: state/reviews/04a-r1.md. Her bulguda kaynak,kanıt,beklenen davranış ve negatif test önerisi var.
+MAJOR1:unchanged ACL analyst→admin DB'de daralıyor,Qdrant payload yenilenmiyor;analyst1hit/1candidate/özelmetin true,PG0hit. MAJOR2:gated eski belgede DELETE kilidi altında ayrıPGvector UPDATE self-block;gerçekLock1,bounded3,018sn timeout. MAJOR3:vectorupsert kontrollü hatasında indexed/errorNULL/1chunk commitli.
+MAJOR4:gerçek bge-m3tokenizer600limitine karşı701/1002token parçalar. MAJOR5:7957baytVSDX→8MBXML/çıktı;childASsonsuz,workerbelleksınırı yok;uploadboyutkapısı tamread/rawwrite sonrası. MAJOR6:varsayılanmodelofflinegüvencesiyok(K-04a-0016),ENV-81reviewkurulumsapması ayrıca yazıldı. MAJOR7:metadataGET/list/countACL + auditPIIpayload,K-04a-0017 A;gerçekGET200/audit2hamkişiverisisatırı.
+Lint184;iki profil355unit/contract passed(runtimearq/Redisoverlay). Llmaas190int186passed/4envfailed,aynı4+1ekQdranttesti explicitURL ile5passed;tek190yeşil koşu denmedi. Airgap190int INCOMPLETE/kapanıştaiptal;tammodel kabul1/2/14 ve14modeltakımı bağımsız NOT_RUN,gerekçeleri raporda. Fullsmoke offline/fake yığında backend/LiteLLM/Langfuse200 passed.
+Backend84Python dosyası exactSHA hash eşit;bazstate/diff boş,diffcheck passed. Ayrı7başlıklıgüvenlikturu,sınırlar veENV-81şeffafkaydı raporda. Productsourceedit/commit/push,maincheckout,Jirayazımı/PayCorebağlantısı yok;ilkistemsizmodelindirmesi dışsistemerşimiyok diye gizlenmedi.
+Kendi fullstackdown-v --remove-orphans exit0;ownmodelcacheENV-81 veowndeps silindi,docker volume ls ownfiltreleri boş;işçi04a-knowledge-core_model_cache mevcut/korundu. HEADsabit/ağaçtemiz,worktreeremoveexit0,--force yok. Helperkanıtlar .worktrees/review-04a-r1-evidence/ kaldı;paketkapanışındatemizlenebilir. Reviewbackend/toolsetiketleritemizlenebilir. Güncelreviewkuyruğuboş;K-04a-0017 işlendiveekmodelyüküaçılmadı.
+### R-10af-0001 · 2026-10-29 00:32 · → koordinator · ACK
+Paket: 10a-formlar   Cevap: K-10af-0005
+Tam SHA 851de1d8991736850f1144a0d05d303910f436fc yerel commit nesnesi olarak doğrulandı. R1 alındı; ayrı detached .worktrees/review-10af-r1 içinde yalnız bu SHA incelenecek. Egress DNS hata deltası, secret/yetki/form davranışı ve bağımsız tek worker tam Playwright kapısı doğrulanacak; mevcut kullanıcı bağımlılık volume'ları değiştirilmeyecek.
+
+### R-10af-0002 · 2026-10-29 00:38 · → koordinator · DURUM
+Paket: 10a-formlar   Cevap: K-10af-0005
+Statik DNS deltası:check_host lookup'tan önce,check_address aynı yerde;OSError sabit egress_dns_failed/name does not resolve,ham sistemmetni fromNone. Bazstate/diffboş,diffcheckpassed. Node20lint/tip/checkAPI ve89unit/16dosya geçti;backendllmaaslint134/292unit40,79sn passed.
+Ownbackend18054temizuphealthy,fixtureadminoluşturuldu;bağımlılıklar uservolume'lardan readonlykopya. TekworkerfullPlaywright isteği verildi,henüz testçıktısı gelmedi. Llmaasintbaşlatma isteği DockerAPI500 ile düştü(containers/json/v1.24);backendimagehash vePlaywrightDockerçağrıları bekliyor. Bu testflake/ürünhatası diye sınıflanmadı,koşu başlamış kabul edilmiyor. Yalnız kendi yığını;globalDocker/WSLreset ve diğer yığınlara müdahale yok.
+### R-10af-0003 · 2026-10-29 00:44 · → koordinator · DURUM
+Paket: 10a-formlar   Cevap: K-10af-0005
+Docker yeniden yanıt verdi; bağımsız tek-worker tam Playwright 74/74 passed (5,2 dk), önceki üç timeout tekrarlanmadı; bunlara ürün hatası/kalıcı flake demiyorum. Backend imajı 54 kaynak dosyası exact SHA ile hash eşit. Airgap292unit/contract40,33sn passed;llmaas134int sürüyor.
+Rapor/log negatif kontrolü: mevcut2artifactte0anahtar,0tracezip(başarılıkoşu trace tutmuyor);ownbackend/LiteLLM197750bayt logda3sentetikanahtar0eşleşme(değerlerbasılmadı). Açıkmodel formunda alpha edit→beta read projegeçişi bağımsızprobe sürüyor;henüz bulgu değil. K-10af-0005 sonrası inceleyiciye yeniID yok.
+
+### R-10af-0004 · 2026-10-29 00:49 · → koordinator · REVIEW-SONUC
+Paket: 10a-formlar   Cevap: K-10af-0005
+İncelenen tam SHA: 851de1d8991736850f1144a0d05d303910f436fc. Karar ONAY; BLOCKER0,MAJOR0,MINOR1. Rapor: state/reviews/10a-forms-r1.md. MINOR1 açık bulgu;ertelendi/kabul edildi sayılmadı,merge/takip kararı sizde.
+MINOR1:alpha edit model formu açıkken gerçek üstçubukseçiciden beta admin+read'e geçişte formVisible=true/saveEnabled=true;PATCH beta-proje/alpha-model gidiyor,backend403 ile koruyor. UI saltokunur kriteri bugeçişte ihlal;yetkiaşımı/verideğişimi yok. ModelList projeilekeyli değil,formkey yalnızmodelid;güncelyetki savekapısında yok. Beklenen:projegeçişindeformreset+güncelyetkikapısı;negatiftest raporda. Sentetikprobe .worktrees/review-10af-r1-evidence/ içinde.
+Bağımsız tamPlaywright workers1/retries0:74/74passed5,2dk;önceki3timeout tekrarlanmadı,köksebebi doğrulanmadı. Node20lint/tip/checkAPI/89unitpassed;backend134lint/292unit herikiprofil passed;llmaas134int130,83sn/airgap134int117,91sn passed. Backend54kaynakdosyası exactSHAhash eşit;bazstate/diffboş,diffcheck/e2ecomposeconfigpassed.
+03bDNSdeltası politika sırası/allowlist/private/offline korunmuş;sabithatatipi,hamOSError yok;ikiAPI200connection_failed geçti. Ayrı7başlıklıgüvenlikturu raporda. 2testartifact/0tracezip ve197750bayt ownbackend/LiteLLMlogda3sentetikanahtar0eşleşme;olmayantraceiçeriği doğrulandıdenmedi. FOLLOWUP79/80,D1/D4 yenidenaçılmadı.
+NOT_RUN:Lighthouse37,ikinciE2Eprofilkopyası,dışsatıcı/model,networknpmci/imagebuild,tamLangfuse'lısmoke(ownstackLangfuseyok);geçtisayılmadı. İlkDockerAPI500 testbaşlatmaortamhatası,başarılıtekrardan ayrıraporlandı.
+Ownstackdown-v/ownwork+nmvolumeremovalexit0;ownvolumefiltresiboş,uservolumeffcore-10a-nm(-pw)korundu. HEADsabit/ağaçtemiz doğrulandı,worktreeremoveexit0,--forceyok. Reviewimajlarıtemizlenebilir. Ürünkodu/commit/push/maincheckout/dışsistembağlantısı yok. Kuyrukbekleniyor;K-10af-0005ikincikezuygulanmadı.
+
+### R-10af-0005 · 2026-10-29 01:02 · → koordinator · DURUM
+Paket: 10a-formlar   Cevap: K-10af-0008
+Alındı: MINOR-1 merge öncesi düzeltilecek; yeni tam SHA içeren REVIEW-ISTEK gelince r2 yalnız delta ve 10af e2e kapsamında incelenecek. Yeni review başlatılmadı; K-10af-0005 yeniden uygulanmadı.
+Evidence dizini ve project-transition.spec.ts/result.txt mevcut, r2 için korundu. K-10af-0007 işçiye adresli DUZELT olduğundan kod değişikliği yapılmadı. İnceleyiciye adresli başka yeni görev yok.
+
+### R-10af-0006 · 2026-10-29 09:02 · → koordinator · ACK
+Paket: 10a-formlar   Cevap: K-10af-0009
+Tam SHA 275d06d8224e40a02b0dfc1d2bfbcba0b014c98a yerel commit nesnesi olarak doğrulandı. R2 alındı; ayrı detached .worktrees/review-10af-r2 içinde yalnız bu SHA ve r1 üzerine delta incelenecek. MINOR-1 proje geçişi/güncel yetki kapısı, ICU metin düzeltmesi, yeni testler ve bağımsız 10af e2e/Vitest doğrulanacak.
+
+### R-10af-0007 · 2026-10-29 09:06 · → koordinator · DURUM
+Paket: 10a-formlar   Cevap: K-10af-0009
+R2 delta kaynak incelemesi tamamlandı: ModelList proje key'li; model Kaydet açık projectId ile, sağlayıcı Kaydet global süper yönetici erişimiyle WriteGate içinde. ICU JSON örneği EN/TR'de literal tırnaklı. Backend/deploy/bağımlılık dosyaları r1 ile aynı; baz state diff boş, diff-check temiz.
+Bağımsız Node20 ağsız lint/tsc/check:api exit0; Vitest 93/18 dosya passed (10,32 sn), yeni gate/ICU testleri dahil. Kendi review-10af-r2 yığını sağlıklı; 10af e2e + önceki bağımsız probe'un proje gidiş/dönüş hali tek worker sürüyor. Henüz tarayıcı sonucu iddia edilmiyor; kullanıcı bağımlılık volume'ları salt okunur kopyalandı.
+
+### R-10af-0008 · 2026-10-29 09:10 · → koordinator · REVIEW-SONUC
+Paket: 10a-formlar   Cevap: K-10af-0009
+İncelenen tam SHA: 275d06d8224e40a02b0dfc1d2bfbcba0b014c98a. R2 delta sonucu ONAY; BLOCKER 0, MAJOR 0, MINOR 0. Rapor: state/reviews/10a-forms-r2.md. R1 MINOR-1 kapandı.
+Bağımsız gerçek tarayıcı probu: alpha edit açık form/taslak → beta read: form=0, save=0; alpha'ya dönüşte form kapalı, yeniden açınca kayıtlı ad, eski taslak yok. Tüm gidiş/dönüş boyunca model yazma isteği=0. ModelList proje key'i ve iki formun güncel erişim WriteGate'i kaynakta doğrulandı; EN/TR ICU JSON ipucu düzeltmesi ve iki tema model PNG'si incelendi.
+Node20 ağsız eslint/tsc/check:api exit 0; Vitest 93/18 dosya passed (10,32 sn). Bağımsız tüm 24 adet 10af e2e +1 kendi probe tek worker/retries0: 25/25 passed (2,4 dk). Test 16'nın iki proje geçişi ve test 17/18 gate/ICU koşulları geçti. İşçinin 76/76 bildirimi bağımsız tam takım sonucu diye sunulmadı; r2 istek kapsamındaki kapılar tamamlandı.
+Baz state diff boş/diff-check/atasallık geçti. Backend/deploy/bağımlılık dosyaları r1 ile aynı; backend matris/tam76e2e/Lighthouse/tamLangfuse-smoke/dışsatıcı r2 NOT_RUN gerekçeleri raporda. Ayrı 7 başlıklı güvenlik delta turu var. 2 artifact/0 ZIP ve ownbackend/LiteLLM 77362 bayt logunda üç sentetik anahtarın her biri 0 eşleşme; değerler basılmadı.
+Ownstack down-v ve ownwork/nm volume kaldırma exit0; ownvolume filtresi boş, kullanıcı ffcore-10a-nm(-pw) korundu. HEAD sabit/ağaç temiz doğrulandı, worktree remove exit0; --force yok. R1/R2 probe kanıtları paket kapanışına kadar korundu; review imajları temizlenebilir. Ana checkout/switch, ürün kaynak değişikliği, commit/push ve dış sistem bağlantısı yok. Yeni görev bekleniyor.
