@@ -8,7 +8,7 @@ from ffcore.main import app
 
 MUTATING = {"POST", "PUT", "PATCH", "DELETE"}
 # Own-data endpoints that stay open in read-only access mode (brief 03 "salt-okunur modun
-# istisnalarÄ±"): signing in and out, changing one's own password.
+# istisnaları"): signing in and out, changing one's own password.
 WRITE_EXEMPT = {"login", "logout", "change_password"}
 # 08: the guardrail test panel is a POST dry run (nothing stored, open in read-only mode),
 # and the service-account-only internal evaluation endpoint (no user role applies there).

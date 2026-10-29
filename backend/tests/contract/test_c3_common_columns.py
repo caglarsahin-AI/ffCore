@@ -1,6 +1,6 @@
 """CONTRACTS C3: project-owned root tables carry the common columns; exceptions are named here.
 
-This list is the single place in code for the C3 exception list (KARARLAR "03a kararlarÄ±",
+This list is the single place in code for the C3 exception list (KARARLAR "03a kararları",
 DRIFT-53). Adding a table here is a class B change and goes into CONTRACTS.md as well.
 """
 
