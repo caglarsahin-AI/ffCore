@@ -1,0 +1,11 @@
+{
+  "key": "sql-20",
+  "name": "Salt okunur veri sorgusu sınavı (20 soru, F3)",
+  "langfuse_dataset_name": "sql-20",
+  "scorers": [
+    "sql_result",
+    "contains"
+  ],
+  "pass_threshold": 0.8,
+  "repeat": 1
+}

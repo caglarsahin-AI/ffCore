@@ -1,0 +1,91 @@
+{
+  "classes": [
+    "access",
+    "billing",
+    "bug",
+    "how_to",
+    "other"
+  ],
+  "labels": {
+    "tkt-001": {
+      "class": "access",
+      "rationale": "Yeni kullanıcı için hesap açılması isteniyor."
+    },
+    "tkt-002": {
+      "class": "access",
+      "rationale": "Hesaba giriş ve şifre sıfırlama sorunu."
+    },
+    "tkt-003": {
+      "class": "bug",
+      "rationale": "Sistem işlevi hata veriyor, kayıt oluşmuyor."
+    },
+    "tkt-004": {
+      "class": "billing",
+      "rationale": "Fatura tutarı ile sözleşme bedeli arasında fark."
+    },
+    "tkt-005": {
+      "class": "how_to",
+      "rationale": "Bir işlemin nasıl yapılacağı soruluyor; hata yok."
+    },
+    "tkt-006": {
+      "class": "access",
+      "rationale": "Dolaylı: giriş var ama yeni bölüm için yetki tanımlanmamış."
+    },
+    "tkt-007": {
+      "class": "billing",
+      "rationale": "Ödeme yapılacak hesap bilgisi değişikliği."
+    },
+    "tkt-008": {
+      "class": "bug",
+      "rationale": "Rapor yanlış sonuç veriyor."
+    },
+    "tkt-009": {
+      "class": "how_to",
+      "rationale": "Yeni kaydın nasıl girileceği soruluyor."
+    },
+    "tkt-010": {
+      "class": "other",
+      "rationale": "Bilgi işlem ve biyomedikal kapsamı dışında genel talep."
+    },
+    "tkt-011": {
+      "class": "bug",
+      "rationale": "Güncelleme sonrası işlev çalışmıyor."
+    },
+    "tkt-012": {
+      "class": "access",
+      "rationale": "Uzaktan erişim yetkisi talebi."
+    },
+    "tkt-013": {
+      "class": "billing",
+      "rationale": "Dolaylı: aynı lisans için mükerrer kesilen fatura."
+    },
+    "tkt-014": {
+      "class": "how_to",
+      "rationale": "Zamanlanmış rapor ayarının nasıl yapılacağı soruluyor."
+    },
+    "tkt-015": {
+      "class": "bug",
+      "rationale": "Güncelleme sonrası hatalı çıktı."
+    },
+    "tkt-016": {
+      "class": "access",
+      "rationale": "Kilitlenen hesabın açılması isteniyor."
+    },
+    "tkt-017": {
+      "class": "other",
+      "rationale": "Eğitim takvimi sorusu; destek talebi değil."
+    },
+    "tkt-018": {
+      "class": "bug",
+      "rationale": "Dolaylı: kayıtlar sistemden düşüyor (veri kaybı hatası)."
+    },
+    "tkt-019": {
+      "class": "billing",
+      "rationale": "Faturada vergi hesabı hatası."
+    },
+    "tkt-020": {
+      "class": "how_to",
+      "rationale": "Giriş çalışıyor; şifre değiştirme adımı soruluyor (erişim sorunu değil)."
+    }
+  }
+}
