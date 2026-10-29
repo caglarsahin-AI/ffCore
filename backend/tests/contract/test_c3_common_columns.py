@@ -20,6 +20,9 @@ C3_EXCEPTIONS = {
     # child tables: the project comes through the parent (04a)
     "attachments": "child of documents",
     "chunks": "child of documents",
+    # child tables (05a; named in CONTRACTS C3)
+    "tool_actions": "child of tools",
+    "few_shots": "child of the project's SQL tool data, append-only examples",
     # append-only event tables
     "audit_events": "append-only",
     "guardrail_events": "append-only (08; named in CONTRACTS C3)",
