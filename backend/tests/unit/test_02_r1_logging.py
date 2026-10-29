@@ -142,3 +142,61 @@ def test_02_r1_m5_access_log_without_query(lf_secret):
     assert "access method=GET path=/missing status=404 ms=" in text
     assert "?" not in text and EMAIL not in text and TCKN not in text
     assert logging.getLogger("uvicorn.access").disabled
+
+
+# --- review r2 MAJOR-1: extra= fields are merged after the record factory ---
+
+
+def _structured(target, fmt):
+    stream = io.StringIO()
+    handler = logging.StreamHandler(stream)
+    handler.setFormatter(logging.Formatter(fmt))
+    target.addHandler(handler)
+    return handler, stream
+
+
+def test_02_r2_m1_extra_fields_scrubbed(lf_secret):
+    root = logging.getLogger()
+    prior, prior_out = _structured(root, "%(message)s | %(review_secret)s | %(review_email)s")
+    try:
+        configure_logging(lf_secret, level="DEBUG", stream=io.StringIO())
+        log = logging.getLogger("ffcore.test02r2")
+        later, later_out = _structured(log, "%(message)s | %(nested)s | %(items)s")
+        try:
+            log.warning(
+                "structured-event %s",
+                "arg",
+                extra={
+                    "review_secret": SECRET,
+                    "review_email": EMAIL,
+                    "nested": {"tc": TCKN, "inner": {"token": SECRET}, EMAIL: "key holds data"},
+                    "items": [EMAIL, (TCKN, {"k": f"Bearer {SECRET}"})],
+                },
+            )
+        finally:
+            log.removeHandler(later)
+    finally:
+        root.removeHandler(prior)
+    for out in (prior_out.getvalue(), later_out.getvalue()):
+        assert "structured-event arg" in out
+        assert SECRET not in out and EMAIL not in out and TCKN not in out
+    assert "@example.test" in prior_out.getvalue()  # masked like 08-lite, not dropped
+
+
+class _BrokenExtra:
+    def __str__(self):
+        raise ValueError("cannot render")
+
+
+def test_02_r2_m1_extra_failure_leaves_no_raw_value(lf_secret):
+    root = logging.getLogger()
+    prior, prior_out = _structured(root, "%(message)s | %(raw)s | %(broken)s")
+    try:
+        configure_logging(lf_secret, level="DEBUG", stream=io.StringIO())
+        logging.getLogger("ffcore.test02r2").warning(
+            "event", extra={"raw": SECRET, "broken": _BrokenExtra()}
+        )
+    finally:
+        root.removeHandler(prior)
+    out = prior_out.getvalue()
+    assert "log_scrub_failed" in out and SECRET not in out
