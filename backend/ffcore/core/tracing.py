@@ -74,23 +74,47 @@ def langfuse_config(settings: Settings) -> LangfuseConfig | None:
 
 class ReportingExporter(SpanExporter):
     """The SDK exports in a background thread; a failure there reaches only the SDK's logger,
-    which stays at WARNING (core/logging.py). This says it in ours, without the error text."""
+    which stays at WARNING (core/logging.py). This says it in ours, without the error text.
 
-    def __init__(self, inner: SpanExporter) -> None:
+    One export has an absolute wall-clock budget (review r1 MAJOR-4): the HTTP client's timeout
+    is per socket read, so a server that keeps sending a byte now and then holds it forever. The
+    export runs in a daemon thread; past the deadline the batch is reported lost and the thread
+    is left behind (it never holds the process). While it is still stuck, later batches are
+    dropped at once instead of opening one stuck connection after another."""
+
+    def __init__(self, inner: SpanExporter, deadline_s: float = EXPORT_TIMEOUT_S) -> None:
         self._inner = inner
+        self._deadline_s = deadline_s
+        self._running: threading.Thread | None = None
         self.failures = 0
 
     def export(self, spans: Sequence[ReadableSpan]) -> SpanExportResult:
-        try:
-            result = self._inner.export(spans)
-        except Exception as exc:  # noqa: BLE001 - reported, then a normal failure result
-            result, reason = SpanExportResult.FAILURE, type(exc).__name__
-        else:
-            reason = result.name
+        if self._running is not None and self._running.is_alive():
+            return self._failed(spans, "previous_export_stuck")
+        outcome: dict[str, Any] = {}
+
+        def run() -> None:
+            try:
+                outcome["result"] = self._inner.export(spans)
+            except Exception as exc:  # noqa: BLE001 - reported, then a normal failure result
+                outcome["error"] = type(exc).__name__
+
+        self._running = threading.Thread(target=run, name="ffcore-trace-export", daemon=True)
+        self._running.start()
+        self._running.join(self._deadline_s)
+        if self._running.is_alive():
+            return self._failed(spans, "deadline")
+        if "error" in outcome:
+            return self._failed(spans, outcome["error"])
+        result = outcome["result"]
         if result is not SpanExportResult.SUCCESS:
-            self.failures += 1
-            log.error("trace_delivery_failed spans=%d reason=%s", len(spans), reason)
+            return self._failed(spans, result.name)
         return result
+
+    def _failed(self, spans: Sequence[ReadableSpan], reason: str) -> SpanExportResult:
+        self.failures += 1
+        log.error("trace_delivery_failed spans=%d reason=%s", len(spans), reason)
+        return SpanExportResult.FAILURE
 
     def shutdown(self) -> None:
         self._inner.shutdown()
@@ -126,7 +150,9 @@ def init_tracing(settings: Settings) -> Any:
         public_key=conf.public_key,
         secret_key=conf.secret_key,
         base_url=conf.host,
-        tracer_provider=TracerProvider(),
+        # shutdown_tracing owns the shutdown: OpenTelemetry's own atexit shutdown would join the
+        # export thread with no limit and hold the process at exit (review r1 MAJOR-3).
+        tracer_provider=TracerProvider(shutdown_on_exit=False),
         span_exporter=_exporter,
     )
     return _client
