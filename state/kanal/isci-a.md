@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-a-06a
 - Aktif paket: 06a (K-06a-0001)
 - Durum: ACTIVE
-- Son okunan: K-06a-0003 / K-06a-0002 (2026-10-29 17:17)
+- Son okunan: K-06a-0005 (2026-10-29 17:17)
 
 ## Mesajlar
 
@@ -665,3 +665,12 @@ A (Önerilen): `completed` + `outcome_label=declined` + cevap metni tanımdaki `
 B: `completed` + `outcome_label=answered` + aynı olaylar. Etkisi: sınav ve panolar bilinmeyen soruyu "cevaplandı" sayar (brief'e aykırı).
 C: yeni etiket `unknown_reply` (outcome_label enum'una additive). Etkisi: brief'te olmayan bir değer; 09/13b modelin "bulamadım"ı (`declined`) ile modelsiz yolu ayrı saymak zorunda kalır.
 Cevap gelene kadar A ile ilerliyorum (mevcut kod); testte `llm_call` olmadığı ve metnin tanımdan geldiği zaten kanıtlı.
+
+### A-06a-0009 · 2026-10-29 18:52 · → koordinator · DURUM
+Paket: 06a   Cevap: K-06a-0004 / K-06a-0005
+K-06a-0004 (V9 = A) alındı, kod zaten öyle. K-06a-0005 GOREV-EK alındı ve uygulandı.
+Commit'ler: 1cdc742 dilim 5 (run API + SSE + Last-Event-ID + DB'den tekrar oynatma, resume yetkisi/409, cancel; gerçek bağdaştırıcılar: LiteLLM + LLM_SLOTS + iz metadata, 04a arama HTTP + OBO + X-Run-Id, 08 motoru süreç içi; compose `agent-worker`, `agent-worker-bg`, migrate `setup-checkpointer`; V8 `output_buffered`); 80de141 iz + F9 geri bildirim (`POST /runs/{id}/feedback`, `GET /runs?feedback=pending|given`; 5 test önce kırmızı 5/5, sonra yeşil). Durum: birim 480, 06a entegrasyon 59, lint 0; OpenAPI 06a.yaml güncel (yalnız additive).
+Uygulamada bulunan iki gerçek hata (adapter entegrasyon testleriyle): iz metadata'sında UUID JSON'a gidiyordu; guardrail olay kaynağı 08'in kapalı listesinde olmayan `agent` idi → run kanalından eşleme (test→agent-playground, chat, api, diğerleri→channel).
+Yeni varsayım (V10, itiraz yoksa böyle): LangGraph için Langfuse `CallbackHandler` tam `langchain` paketini istiyor (ölçüldü: ModuleNotFoundError). Yeni ağır bağımlılık yerine 02'nin `span()`'i: run başına bir iz (`runs.langfuse_trace_id`), her düğüm bir span, LiteLLM üretimi `trace_context` ile düğümün altında. ARCH-09 korunur (iz yine Langfuse'ta).
+KAYIT-TALEBI (FOLLOWUP): `definition.knowledge[].filter.scope` (PayCore profilleri = filtreli agent, karar 6) 04a aramasında karşılıksız (yalnız metadata eşitliği); 06a kayıtta 422 `knowledge_filter_not_supported` ile reddediyor, sessiz yok sayma yok. 04a/04b'ye "metadata IN/scope filtresi" eki gerekir; PoC şablonları filtre kullanmıyor.
+Sıradaki: canlı yığın kanıtı (backend + agent-worker + ingest worker FAKE_EMBED + LiteLLM/fake-llm + Langfuse: kabul 1 gerçek arama, 4 worker konteyneri yeniden başlatma, 5b iz), readiness eki (LLM_SLOTS), docs/agentlar.md, PR açıklaması; dilim 6 (MCP) 05a merge'ünden sonra.

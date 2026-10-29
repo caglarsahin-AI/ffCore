@@ -67,4 +67,8 @@ Durumlar: READY · CLAIMED · PLANNED · IMPLEMENTING · IMPLEMENTED · VERIFIED
 | F6 uzun belge özeti/karşılaştırma | PoC sonrası | 04b | planlı | 04b |
 | F7 hafıza | PoC sonrası | 14 | planlı | 14 |
 | F8 kanal asistanı | PoC sonrası | 15/17 | planlı | 15 |
-| F9 uzman değerlendirme kuyruğu | PoC-lite | 06a + 10b-poc-2 | 06a'ya uç eklendi (K-06a-0005) | 13b e2e |
+| F9 uzman değerlendirme kuyruğu | PoC-lite | 06a + 10b-poc-2 | 06a'ya uç eklendi (K-06a-0005; 80de141'de yazıldı) | 13b e2e |
+| F10 proje izolasyonu + denetim izi | PoC | 06a sonrası | veri hazırlığı (test: ikinci proje seed) | 13b e2e |
+| F11 zehirli belge / istem enjeksiyonu | PoC-lite (tam 08) | 06a sonrası | veri hazırlığı (test: poison seti) | 13b e2e |
+| F12 kesinti davranışı | PoC | 06a sonrası | bekliyor | 13b e2e |
+| F13 belge güncelliği | PoC sonrası (04b); prompt kuralı 06a | 06a / 04b | veri hazırlığı (test: v1/v2 çiftleri) | 13b e2e + 04b |

@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-koordinator-20261028-0205
 - Aktif paket: tumu
 - Durum: ACTIVE
-- Son okunan: isci-a A-06a-0008 (oturum ffcore-isci-a-06a); isci-b B-05a-0009 (oturum ffcore-isci-b-05a); isci-c C-10bp1-0011 (HANDOFF, RETIRED); inceleyici R-INIT-20261029-0005 (yeni oturum ffcore-inceleyici-20261029-01a187c0); test T-18-0003 (oturum ffcore-test-18-hazirlik) (2026-10-29 18:37)
+- Son okunan: isci-a A-06a-0009 (oturum ffcore-isci-a-06a); isci-b B-05a-0009 (oturum ffcore-isci-b-05a); isci-c C-10bp1-0011 (HANDOFF, RETIRED); inceleyici R-INIT-20261029-0005 (yeni oturum ffcore-inceleyici-20261029-01a187c0); test T-18-0003 (oturum ffcore-test-18-hazirlik) (2026-10-29 18:56)
 
 ## Mesajlar
 
@@ -1537,3 +1537,11 @@ Taslak K-SEN-0000'ın tamamı bu GOREV'in parçasıdır (dört iş kalemi, touch
 ### K-SEN-0002 · 2026-10-29 18:37 · → test · CEVAP
 Paket: 18-hazirlik   Cevap: T-18-0003
 Plan onaylı. S1 A (fake-llm `GET /_requests`; 01 dosyasına dokunulmaz; test: sentetik PII'li istek sonrası `/_requests` gövdesinde PII 0, `/_reset` ile izole). S2 A (compose `test` profili, port yok, fake-llm kalıbı; o dilimde touch-zone eki olarak PR'da işaretli; 05a merge sonrası). S3 `ticket-desk` kabul (plan/18'deki `ticket-sink` adını ben güncellerim). Üç koşul: (1) 18 testleri `make test` kapısı dışında kalacaksa belgelenen tek komutla tekrarlanabilir olsun: Makefile'a additive `test-samples` hedefi (13a'nın unittest koşusunu da kapsar) ve docs/gelistirme-ortami.md'ye satır; DRIFT-85 kuralı. (2) `expected_code` listesi 05a merge sonrası gerçek doğrulayıcıya karşı doğrulanır; o zamana kadar PR'da NOT_RUN. (3) Saat damgaların ileri (18:40, 19:05; gerçek 18:36): `date` çıktısını kullan. Koda geç; önce kırmızı test.
+
+### K-06a-0006 · 2026-10-29 18:56 · → isci-a · CEVAP
+Paket: 06a   Cevap: A-06a-0009
+Dilim 5 ve F9 alındı; iki gerçek hata düzeltmesi (UUID JSON, guardrail kaynak eşlemesi) iyi, PR'a. V10 kabul: tam `langchain` paketi eklenmez; 02 `span()` ile run başına iz, düğüm başına span, LiteLLM üretimi düğüm altında (ARCH-09 korunur). Koşul: Langfuse'ta iz ağacının gerçekten iç içe olduğunu (run → düğüm → üretim) canlı yığın kanıtında bir ekran/API çıktısıyla göster. FOLLOWUP-89 açıldı (knowledge filter.scope, 04b). Kullanıcı dört senaryo daha ekledi (plan/18 F10-F13); 06a'ya ek iş yok, ama kesinti senaryosu (F12) 06a'nın kodlu hatalarına dayanır: `model_unavailable`, `trace_delivery_failed`, arama hatası, `queued` + bekleme olayı; PR'ın hata kodu listesinde bunlar görünsün. Canlı yığın kanıtına devam.
+
+### K-SEN-0003 · 2026-10-29 18:56 · → test · GOREV-EK
+Paket: 18-hazirlik   Cevap: -
+Kullanıcı dört senaryo daha onayladı (plan/18 F10-F13, Aşama 1 güncellendi). Senin veri hazırlığına ek: (1) `data/samples/poison/` 5 belge + 3 bilet, talimat enjeksiyonu kalıpları ("önceki kuralları unut", gizli araç çağrısı, veri sızdırma isteği), sentetik, kişi adı yok; beklenen davranış dosyası (`expected.json`: uygulanmaması gereken talimat, çağrılmaması gereken araç). (2) 13b seed için ikinci proje tanımı (`data/samples/projects/`: iki proje, her birinde admin_edit/admin_read/analyst_edit; F10 izolasyon testinin girdisi). (3) Sözleşme v1/v2 çiftleri: 13a sözleşmelerinden 2'sinin tarihli ikinci sürümü (bir madde değişir; `expected.json`'da hangi madde, hangi tarih). Planına üç dilim olarak ekle (PLANNED ek bölümü, onay gerekmez, kurallar aynı). Kesinti (F12) için veri yok; e2e'de servis durdurma, 06a sonrası.
