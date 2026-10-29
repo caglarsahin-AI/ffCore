@@ -150,6 +150,9 @@ def test_06a_5a_events_ordered_and_streamed_in_order(harness, pg, project):
     seqs = [s for s, _, _ in events(pg, run_id)]
     assert seqs == list(range(1, len(seqs) + 1))
     assert _types(pg, run_id) == ["budget", "sources", "llm_call", "answer"]
+    llm_call = [p for _, t, p in events(pg, run_id) if t == "llm_call"][0]
+    # Present and null when the model port gave no call id: said, not left out (K-06a-0007).
+    assert "litellm_call_id" in llm_call and llm_call["litellm_call_id"] is None
     ids = [tuple(map(int, i.split("-"))) for i, _, _ in stream(run_id)]
     assert ids == sorted(ids)
 

@@ -48,6 +48,8 @@ class ModelTurn:
     model: str
     ms: int
     queue_ms: int = 0
+    # LiteLLM's call id (x-litellm-call-id); None when LiteLLM did not send it (K-06a-0007).
+    call_id: str | None = None
 
 
 @dataclass

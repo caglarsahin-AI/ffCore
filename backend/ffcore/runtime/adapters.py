@@ -141,6 +141,7 @@ class LiteLLMModel:
             model=target.name,
             ms=ms,
             queue_ms=int(waited * 1000),
+            call_id=result.call_id,
         )
 
 

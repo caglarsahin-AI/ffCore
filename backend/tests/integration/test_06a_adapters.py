@@ -72,6 +72,7 @@ def test_06a_model_adapter_streams_through_litellm_with_a_slot(
         "reason": "primary_failed",
     }
     assert turn.finish_reason == "stop" and turn.usage
+    assert uuid.UUID(turn.call_id)  # x-litellm-call-id from the real proxy (K-06a-0007)
     assert status["in_use"] == 0  # the slot is given back
 
 

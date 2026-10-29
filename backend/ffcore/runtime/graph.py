@@ -185,6 +185,7 @@ async def model(state: RunState, runtime: Runtime[RunContext]) -> dict:
         RunEventType.llm_call,
         {
             "model": turn.model,
+            "litellm_call_id": turn.call_id,
             "finish_reason": turn.finish_reason,
             "usage": turn.usage,
             "ms": turn.ms,

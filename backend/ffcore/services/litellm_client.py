@@ -219,6 +219,9 @@ class ChatResult:
     finish_reason: str | None
     usage: dict[str, Any] | None
     fallback: FallbackObserved | None
+    # LiteLLM's id of this call (x-litellm-call-id, a uuid); None when the header is missing.
+    # Additive for 06a (K-06a-0007): run_events.llm_call links to LiteLLM's log and spend row.
+    call_id: str | None = None
 
 
 @dataclass
@@ -230,6 +233,7 @@ class StreamResult:
     finish_reason: str | None = None
     content: list[str] = field(default_factory=list)
     tool_calls: bool = False
+    call_id: str | None = None  # as in ChatResult (K-06a-0007)
 
 
 async def resolve_target(session: AsyncSession, project_id: Any, model_key: str) -> ModelTarget:
@@ -336,7 +340,12 @@ class LiteLLMClient:
         if not content.strip() and not message.get("tool_calls"):
             raise _empty(target, choice.get("finish_reason"))
         return ChatResult(
-            content, message, choice.get("finish_reason"), data.get("usage"), fallback
+            content,
+            message,
+            choice.get("finish_reason"),
+            data.get("usage"),
+            fallback,
+            call_id=_uuid(response.headers.get("x-litellm-call-id")),
         )
 
     @asynccontextmanager
@@ -360,7 +369,10 @@ class LiteLLMClient:
                 if response.status_code >= 400:
                     await response.aread()
                 _raise_for_status(target, response)
-                result = StreamResult(fallback=_fallback(target, response))
+                result = StreamResult(
+                    fallback=_fallback(target, response),
+                    call_id=_uuid(response.headers.get("x-litellm-call-id")),
+                )
                 yield ChatStream(target, response, result)
         except EgressError as exc:
             raise _unavailable(target, exc.code) from None
