@@ -1,0 +1,51 @@
+cd backend && QDRANT_URL=http://qdrant:6333 RUN_QDRANT_TESTS=1 pytest tests/integration
+============================= test session starts ==============================
+platform linux -- Python 3.12.10, pytest-9.2.0, pluggy-1.7.0
+rootdir: /work/backend
+configfile: pyproject.toml
+plugins: Faker-40.43.0, anyio-4.15.1
+collected 300 items
+
+tests/integration/test_01_client.py .......                              [  2%]
+tests/integration/test_01_events.py ...                                  [  3%]
+tests/integration/test_01_reconcile.py ...........                       [  7%]
+tests/integration/test_01_seed.py ...                                    [  8%]
+tests/integration/test_02_langfuse.py ....                               [  9%]
+tests/integration/test_02_pricing.py .                                   [  9%]
+tests/integration/test_02_r1_worker_logging.py .                         [ 10%]
+tests/integration/test_03a_access.py ............                        [ 14%]
+tests/integration/test_03a_auth.py ..............                        [ 18%]
+tests/integration/test_03a_models.py ...........                         [ 22%]
+tests/integration/test_03a_obo_scope.py ................                 [ 27%]
+tests/integration/test_03a_providers.py ................                 [ 33%]
+tests/integration/test_03a_read_side.py .......                          [ 35%]
+tests/integration/test_03a_schema.py .......                             [ 37%]
+tests/integration/test_03b_audit.py ............                         [ 41%]
+tests/integration/test_03b_egress_dns.py s                               [ 42%]
+tests/integration/test_04a_api.py .............                          [ 46%]
+tests/integration/test_04a_embed_api.py ....                             [ 47%]
+tests/integration/test_04a_ingest.py .s..........s                       [ 52%]
+tests/integration/test_04a_qdrant.py ....                                [ 53%]
+tests/integration/test_04a_readyz.py ....                                [ 54%]
+tests/integration/test_04a_review_r1_acl.py ........                     [ 57%]
+tests/integration/test_04a_review_r1_ingest.py ......                    [ 59%]
+tests/integration/test_04a_review_r1_upload.py ..                        [ 60%]
+tests/integration/test_04a_search.py ........                            [ 62%]
+tests/integration/test_04a_store.py ..........                           [ 66%]
+tests/integration/test_04a_worker.py ..                                  [ 66%]
+tests/integration/test_05a_live_services.py .....                        [ 68%]
+tests/integration/test_05a_obo_verify.py .......                         [ 70%]
+tests/integration/test_05a_search.py ........                            [ 73%]
+tests/integration/test_05a_sql.py ..............s.....                   [ 80%]
+tests/integration/test_05a_tools_api.py ................................ [ 90%]
+............                                                             [ 94%]
+tests/integration/test_08_api.py ................                        [100%]
+
+=============================== warnings summary ===============================
+tests/integration/test_04a_worker.py::test_04a_upload_job_runs_in_worker
+tests/integration/test_04a_worker.py::test_04a_job_for_missing_row_retries_then_fails_loud
+  /opt/venv/lib/python3.12/site-packages/arq/worker.py:877: DeprecationWarning: Call to deprecated close. (Use aclose() instead) -- Deprecated since version 5.0.1.
+    await self.pool.close(close_connection_pool=True)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+============ 296 passed, 4 skipped, 2 warnings in 333.10s (0:05:33) ============

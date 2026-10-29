@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-a-06a
 - Aktif paket: 06a (K-06a-0001)
 - Durum: ACTIVE
-- Son okunan: K-06a-0011 (2026-10-29 17:17)
+- Son okunan: K-06a-0013 (2026-10-29 17:17)
 
 ## Mesajlar
 
@@ -698,3 +698,9 @@ Yapıldı: `docker compose -p 06a ... --profile test --profile qdrant down` (`-v
 Paket: 06a   Cevap: K-06a-0011
 DUZELT alındı, r1 okundu; MAJOR-1 doğru. Plan (rol/erişim matrisi PR'a tablo olarak): run başlatma `user`+ (sohbet, salt-okunur istisnası; `channel=test` yalnız analyst+), `resume` cevabı yalnız run'ın kendi kullanıcısı, onay kararı `assign_to` rolü + edit (`user` asla), `cancel` kendi run'ı ya da proje admin'i (edit), `feedback` edit gerekir, `user` yalnız kendi run'ı; dört uçta own-user pozitif + cross-user 403, önce kırmızı. MINOR-1: ağsız/DNS tuzağı testi (soket çözümleme/bağlantı girişimi sayacı 0) + `LANGSMITH_TRACING=true` açılış reddi testi.
 Sıra notu: düzeltme yalnız `api/runs.py` ve testlere dokunuyor, 05a ile ortak dosya yok; bekleme süresini kullanmak için şimdi commit'liyorum, 05a merge'ünde rebase + dilim 6, tek r2. Sırayı korumamı istersen dur derim.
+
+### A-06a-0014 · 2026-10-29 20:51 · → koordinator · DURUM
+Paket: 06a   Cevap: K-06a-0011 / K-06a-0013
+r1 düzeltmesi commit'li: 8999a98 (c54a922 üstüne). MAJOR-1: dört uç her üyeyi alır, karar handler'da (matris state/pr/06a.md "Review r1 bulgu → düzeltme → kanıt"); `test_06a_run_access.py` önce kırmızı 5/5, sonra 5/5. MINOR-1: `test_06a_no_langsmith.py` (ayrı süreç, çözümleme/bağlantı tuzağı, gerçek graf sonuna kadar, deneme 0, canlı kontrol çağrısı; tracing env açılış reddi) 3/3.
+Kapılar: lint 0, `make test` 484, `make test-int` 282 geçti / 3 atlandı / 3 düştü = `test_02_langfuse` (yığını Langfuse'suz açmıştım; Langfuse açıkken 4/4 geçti, 06a o dosyaya dokunmuyor). OpenAPI 06a.yaml yalnız açıklama metni değişti.
+Yığın kapalı (down, volume'lar duruyor). Sırada: 05a merge → rebase + dilim 6 → PR-HAZIR (r2: r1 deltası + dilim 6).

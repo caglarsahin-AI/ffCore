@@ -1,0 +1,72 @@
+ pid  |  client_addr   |        state        | wait_event_type | wait_event |          xact_start           |     running     |                                query                                
+------+----------------+---------------------+-----------------+------------+-------------------------------+-----------------+---------------------------------------------------------------------
+ 1448 | 192.168.176.14 | idle in transaction | Client          | ClientRead | 2026-10-29 17:57:33.27589+00  | 00:15:23.317569 | SELECT provider_projects.provider_id, provider_projects.project_id +
+      |                |                     |                 |            |                               |                 | FROM provider_projects
+ 2246 | 192.168.176.14 | active              | Lock            | relation   | 2026-10-29 17:58:12.262781+00 | 00:14:44.273396 |                                                                    +
+      |                |                     |                 |            |                               |                 | DROP TABLE documents
+ 2237 | 192.168.176.14 | idle                | Client          | ClientRead |                               |                 | 
+ 1621 | 192.168.176.14 | idle                | Client          | ClientRead |                               |                 | 
+ 1638 | 192.168.176.14 | idle                | Client          | ClientRead |                               |                 | 
+ 1664 | 192.168.176.14 | idle                | Client          | ClientRead |                               |                 | 
+(6 rows)
+
+ pid  | locktype |             relation              |        mode         | granted 
+------+----------+-----------------------------------+---------------------+---------
+ 2246 | relation | 17822                             | AccessExclusiveLock | f
+ 1448 | relation | 17925                             | AccessShareLock     | t
+ 1448 | relation | 17866                             | AccessShareLock     | t
+ 1448 | relation | 17868                             | AccessShareLock     | t
+ 1448 | relation | 17830                             | AccessShareLock     | t
+ 1448 | relation | 17832                             | AccessShareLock     | t
+ 1448 | relation | 17870                             | AccessShareLock     | t
+ 1448 | relation | 17873                             | AccessShareLock     | t
+ 1448 | relation | 17885                             | AccessShareLock     | t
+ 1448 | relation | 17898                             | AccessShareLock     | t
+ 1448 | relation | 17855                             | AccessShareLock     | t
+ 1448 | relation | 17912                             | AccessShareLock     | t
+ 1448 | relation | 17924                             | AccessShareLock     | t
+ 1448 | relation | 17822                             | AccessShareLock     | t
+ 2246 | relation | 18498                             | AccessExclusiveLock | t
+ 2246 | relation | 18495                             | AccessExclusiveLock | t
+ 2246 | relation | 18453                             | AccessExclusiveLock | t
+ 2246 | relation | 18505                             | AccessExclusiveLock | t
+ 2246 | relation | 18442                             | AccessExclusiveLock | t
+ 2246 | relation | 18443                             | AccessExclusiveLock | t
+ 2246 | relation | 18444                             | AccessExclusiveLock | t
+ 2246 | relation | 18506                             | AccessExclusiveLock | t
+ 2246 | relation | 18445                             | AccessExclusiveLock | t
+ 2246 | relation | 18496                             | AccessExclusiveLock | t
+ 2246 | relation | 18425                             | AccessExclusiveLock | t
+ 2246 | relation | 18424                             | AccessExclusiveLock | t
+ 2246 | relation | 18466                             | AccessExclusiveLock | t
+ 2246 | relation | 18467                             | AccessExclusiveLock | t
+ 2246 | relation | 18491                             | AccessExclusiveLock | t
+ 2246 | relation | pg_class                          | AccessShareLock     | t
+ 2246 | relation | pg_namespace                      | AccessShareLock     | t
+ 2246 | relation | pg_class_oid_index                | AccessShareLock     | t
+ 2246 | relation | pg_class_relname_nsp_index        | AccessShareLock     | t
+ 2246 | relation | pg_class_tblspc_relfilenode_index | AccessShareLock     | t
+ 2246 | relation | pg_namespace_nspname_index        | AccessShareLock     | t
+ 2246 | relation | pg_namespace_oid_index            | AccessShareLock     | t
+ 2246 | relation | 17802                             | AccessShareLock     | t
+ 2246 | relation | 17805                             | AccessShareLock     | t
+ 2246 | relation | pg_depend                         | RowExclusiveLock    | t
+ 2246 | relation | pg_trigger                        | RowExclusiveLock    | t
+ 2246 | relation | pg_trigger_oid_index              | AccessShareLock     | t
+ 2246 | relation | pg_toast.pg_toast_2618            | RowExclusiveLock    | t
+ 2246 | relation | pg_toast.pg_toast_2618_index      | RowExclusiveLock    | t
+ 2246 | relation | 18492                             | AccessExclusiveLock | t
+ 2246 | relation | 18423                             | AccessExclusiveLock | t
+ 2246 | relation | 18516                             | AccessExclusiveLock | t
+ 2246 | relation | 18515                             | AccessExclusiveLock | t
+ 2246 | relation | 18475                             | AccessExclusiveLock | t
+ 2246 | relation | 18387                             | AccessExclusiveLock | t
+ 2246 | relation | 18454                             | AccessExclusiveLock | t
+ 2246 | relation | 18514                             | AccessExclusiveLock | t
+ 2246 | relation | 18409                             | AccessExclusiveLock | t
+ 2246 | relation | 18507                             | AccessExclusiveLock | t
+ 2246 | relation | 18452                             | AccessExclusiveLock | t
+ 2246 | relation | 18497                             | AccessExclusiveLock | t
+ 2246 | relation | 18494                             | AccessExclusiveLock | t
+(56 rows)
+

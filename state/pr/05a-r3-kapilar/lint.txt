@@ -1,0 +1,4 @@
+ruff check backend scripts data/samples/scripts
+All checks passed!
+ruff format --check backend scripts data/samples/scripts
+243 files already formatted

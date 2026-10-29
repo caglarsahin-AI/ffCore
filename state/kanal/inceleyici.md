@@ -858,3 +858,38 @@ MAJOR-1: run create/resume/cancel uçlarının `Reader=require_role(analyst)`, f
 MINOR-1: zorunlu LangSmith ağsız DNS-tuzağı testi PR'da açıkça yazılmamış/NOT_RUN; internal ağ ölçümü sessiz çözümleme/bağlantı girişiminin sıfır olduğunu kanıtlamıyor.
 Baz state diff boş. Ağsız salt-okunur exactSHA `make test`:481passed103,53sn; ilk hatalı pytest argümanı ürün sonucu sayılmadı. make test-int/migration/canlı worker+trace+kesinti/iki profil/log-PII bağımsız NOT_RUN; işçi sonuçları mal edilmedi. Ayrı yedi başlıklı güvenlik turu raporda. ExactSHA ağaç temiz; worktree force kullanmadan kaldırılacak. Eski ID'ler tekrar uygulanmadı; 05a r2 ve 06a r2 yeni tam SHA bekleniyor.
 
+### R-06a-0003 · 2026-10-29 20:22 · → koordinator · DURUM
+Paket: 06a, 18-hazirlik   Cevap: K-06a-0012
+06a erken r1 bulgularının isci-a'ya DUZELT olarak iletildiği ve 18-hazirlik e02eaa4'ün main'e merge edildiği bilgisi alındı. Mesaj yeni tam SHA/REVIEW-ISTEK içermediğinden review veya worktree başlatılmadı. 05a r2 öncelikli olmak üzere yeni tam SHA'lı istek bekleniyor. K-06a-0012 işlenmiş ID olarak kaydedildi; önceki ID'ler tekrar uygulanmadı.
+
+### R-05a-0004 · 2026-10-29 20:32 · → koordinator · ACK
+Paket: 05a   Cevap: K-05a-0010
+Tam SHA 6625b75d55fbc5fbd20e6b54bb516304a95883be yerel commit nesnesi olarak, baz 5c338ae ve r1 SHA a55ca54 atasallığıyla doğrulandı. r2 delta + güvenlik tekrarı alındı; ayrı detached `.worktrees/review-05a-r2` worktree'sinde yalnız bu SHA incelenecek. R1'in beş bulgusu ve bağımsız probe'lar tekrarlanacak; llmaas `make test` iki kez koşulacak, kırmızı olursa düşen test adı kaydedilecek. Dış ağ/model yok; korunan cache ve gerçek `.env` okunmayacak.
+
+### R-05a-0005 · 2026-10-29 20:36 · → koordinator · REVIEW-SONUC
+Paket: 05a   Cevap: K-05a-0010
+İncelenen tam SHA 6625b75d55fbc5fbd20e6b54bb516304a95883be; baz5c338ae; deltaa55ca54. Karar ONAY; BLOCKER0, MAJOR0, MINOR0. Rapor state/reviews/05a-r2.md. R1'in beş bulgusu kapandı.
+few_shots artık tool_id çocuğu ve project_id yok; C3 zincir testi var. mcp-sql her istekte backend internal/obo/verify kullanıyor, servis signing key taşımıyor, cache tam-token SHA256 özeti ve retler cachelenmiyor. URL userinfo/query/fragment reddediliyor. RFC+rezerve header listesi Host/hop-by-hop/proxy/Authorization/X-On-Behalf-Of/X-Run-Id'yi kapatıyor. SQL tek-query/set-dalları/comment/CTE/VALUES/catalog/yan-etkili fonksiyon matrisi genişlemiş.
+Llmaas make test iki bağımsız ağsız salt-okunur koşu:556passed109,72sn ve556passed101,52sn; kayıtsız Error1 yeniden oluşmadı. Baz state diff boş; exactSHA ağaç temiz; kalan review konteyneri yok. make test-int iki profil/migration/smoke/canlı MCP-DB sayaç/airgap bağımsız NOT_RUN; işçi sonuçları mal edilmedi. Ayrı yedi başlıklı güvenlik turu raporda. Worktree force kullanmadan kaldırılacak. Eski ID'ler tekrar uygulanmadı; ONAY sonrası 06a dilim6+r2 bekleniyor.
+
+### R-05a-0006 · 2026-10-29 20:52 · → koordinator · DURUM
+
+Paket: 05a  
+Cevap: K-05a-0013
+
+05a r2 ONAY sonrasında main birleştirmesindeki Makefile çatışmasının geri alındığı ve `e542947` üzerine rebase edilerek r3 hazırlanacağı bilgisi alındı. Yeni tam commit SHA henüz verilmediği için worktree oluşturulmadı ve review başlatılmadı. r3 için yeni exact SHA içeren REVIEW-ISTEK bekleniyor. `K-05a-0013` işlendi; önceki mesaj ID'leri yeniden uygulanmadı.
+
+### R-05a-0007 · 2026-10-29 21:32 · → koordinator · ACK
+
+Paket: 05a  
+Cevap: K-05a-0014
+
+r3 REVIEW-ISTEK alındı. Tam commit `33a4b6269644f3a32f95d0c157e84be52db32020` yerelde mevcut ve baz `e542947` commit'inin soyundan olduğu doğrulandı. Yalnızca bu SHA'nın rebase deltası incelenecek; ayrı detached worktree oluşturuluyor. `K-05a-0014` işlendi, önceki mesaj ID'leri yeniden uygulanmadı.
+
+### R-05a-0008 · 2026-10-29 21:35 · → koordinator · CEVAP
+
+Paket: 05a  
+Cevap: K-05a-0014
+
+05a r3 **ONAY**. İncelenen tam SHA: `33a4b6269644f3a32f95d0c157e84be52db32020`. Bulgular: BLOCKER 0 · MAJOR 0 · MINOR 0. Range-diff yalnız beklenen Makefile `.PHONY` birleşimini gösteriyor; `test-samples`, `seed-sql-demo` ve `seed-sql-context` birlikte korunmuş, `uv.lock` farkı ve baz diff'inde `state/**` değişikliği yok. Exact worktree'de dış ağsız/read-only Docker koşusu: sample testleri 50 geçti, 5 opt-in PostgreSQL testi atlandı. Rapor: `state/reviews/05a-r3.md`. Worktree temiz doğrulandı ve `--force` kullanılmadan kaldırıldı. `K-05a-0014` tamamlandı; önceki mesaj ID'leri yeniden uygulanmadı.
+

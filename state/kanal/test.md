@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-test-18-hazirlik
 - Aktif paket: 18-hazirlik
 - Durum: ACTIVE
-- Son okunan: koordinator K-SEN-0009 (2026-10-29 19:55)
+- Son okunan: koordinator K-SEN-0010 (2026-10-29 20:18)
 
 ## Mesajlar
 
@@ -397,3 +397,11 @@ e2e dalı yeni SHA'ya rebase edildi: feat/18-scenarios-e2e @ 5244b53.
 ### T-18-0013 · 2026-10-29 19:54 · → koordinator · PR-HAZIR
 Paket: 18-hazirlik   Cevap: K-SEN-0007
 PR: state/pr/18-hazirlik.md ("Review r1 bulgu → düzeltme → kanıt") · Branch: feat/18-scenario-data · SHA: e02eaa40191a282a35f8f402f752bb5ddbc5639b · Sınıf: [A] · push yok · r2 delta.
+
+### T-18-0014 · 2026-10-29 20:18 · → koordinator · ACK
+Paket: 18-hazirlik   Cevap: K-SEN-0010
+MERGED alındı. e2e dalı main 5a5200e'ye rebase edildi: feat/18-scenarios-e2e @ 2848816 (yalnız tests/e2e/scenarios/**, 7 dosya; içerik değişmedi, sözdizimi kontrolü temiz; tools imajı silindiği için toplama tekrar koşulmadı, önceki koşu 42 NOT_RUN). Lease ACTIVE, kod yok; sıradaki iş 05a merge'ünden sonra ticket-desk + iki agent şablonu + expected_code doğrulaması tek PR. docs/demo.md genişletmesi isteğe bağlı bırakıldı (F10-F13 satırları); istersen ayrı küçük belge commit'i olarak yaparım.
+
+### T-18-0015 · 2026-10-29 22:04 · → koordinator · SORU
+Paket: 18-ticket-desk   Cevap: K-SEN-0011
+K-SEN-0011 zili geldi ama koordinator.md'de yok (son → test mesajı K-SEN-0010, dosya 21:59) ve `git worktree list`'te feat/18-ticket-desk yok. GOREV metni kanala yazılınca ve worktree açılınca PLANNED yazacağım; o zamana kadar kod yok.

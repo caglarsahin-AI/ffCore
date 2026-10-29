@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-koordinator-20261028-0205
 - Aktif paket: tumu
 - Durum: ACTIVE
-- Son okunan: isci-a A-06a-0013 (oturum ffcore-isci-a-06a); isci-b B-05a-0009 (oturum ffcore-isci-b-05a); isci-c C-10bp1-0011 (HANDOFF, RETIRED); inceleyici R-06a-0002; test T-18-0013 (oturum ffcore-test-18-hazirlik) (2026-10-29 20:18)
+- Son okunan: isci-a A-06a-0014 (oturum ffcore-isci-a-06a); isci-b B-05a-0009 (oturum ffcore-isci-b-05a); isci-c C-MRK-0004 (oturum ffcore-isci-c-marka); inceleyici R-05a-0008; test T-18-0013 (oturum ffcore-test-18-hazirlik) (2026-10-29 22:05)
 
 ## Mesajlar
 
@@ -1622,3 +1622,79 @@ Onay: MAJOR-1 ve MINOR-1'i şimdi düzelt ve commit'le (api/runs.py + testler; 0
 ### K-SEN-0010 · 2026-10-29 20:18 · → test · CEVAP
 Paket: 18-hazirlik   Cevap: R-18-0004
 18-hazirlik MERGED: r2 ONAY (e02eaa4, state/reviews/18-hazirlik-r2.md); main'e `--no-ff` merge 5a5200e; main'de lint, `make test` 441 ve `make test-samples` 50 passed. Worktree, branch ve `0.0.0-18` imajları kaldırıldı. e2e iskelet dalını (feat/18-scenarios-e2e) main 5a5200e'ye rebase et, orada bekle. Sıradaki işin 05a merge'ünden sonra: `ticket-desk` sahte aracı (compose `test` profili) + iki agent şablonu (`zehirli-belge-asistani`, `surum-asistani`) + `expected_code` doğrulaması tek küçük PR. O zamana kadar lease ACTIVE, kod yok; isterse `docs/demo.md` taslağını plan/18 senaryolarıyla genişlet (yalnız belge).
+
+### K-05a-0010 · 2026-10-29 20:33 · → inceleyici · REVIEW-ISTEK
+Paket: 05a   Cevap: B-05a-0012
+r2 delta + güvenlik tekrarı. Branch feat/05a-tools-mcp · Baz main 5c338ae · SHA 6625b75d55fbc5fbd20e6b54bb516304a95883be (koordinatör doğruladı: a55ca54 üstüne 1 commit, 29 dosya +1254/-114, ağaç temiz). Kapsam: r1'in beş bulgusu, senin probe'ların aynen: (1) BLOCKER-1 `few_shots.tool_id` FK, `project_id` yok, C3 testi zinciri doğruluyor; (2) MAJOR-1 `POST /api/v1/internal/obo/verify` + mcp-sql her istekte doğrulama; önbellek anahtarı token'ın tamamının özeti (yalnız jti değil); sahte imzalı doğru-aud token 401 ve DB oturum sayacı değişmiyor; (3) MAJOR-2 userinfo/query/fragment 400; (4) MAJOR-3 RFC token + kapalı liste (işçi `X-On-Behalf-Of` ve `X-Run-Id`'yi de kapalı listeye aldı: kabul, rezerve başlıklar); (5) MINOR-1 26 satırlık matris, `VALUES` her yerde yasak (kabul). Ek: işçi llmaas `make test`'te bir kez nedeni kaydedilmemiş `Error 1` gördü, sonra 3× 556/556; llmaas `make test`'i iki kez koş, kırmızı çıkarsa düşen testi raporla (ürün bulgusu mu zamanlama mı). Belgelenen komutla `make test-int` iki profil (işçi 296 + 4 atlandı). Ortam: `0.0.0-review-05a`, `--pull=never`, demo DB `.env.test`, dış ağ yok, `models` NOT_RUN. ONAY ise merge ederim; sonra 06a dilim 6.
+
+### K-05a-0011 · 2026-10-29 20:33 · → isci-b · CEVAP
+Paket: 05a   Cevap: B-05a-0012
+PR-HAZIR alındı; 6625b75 doğrulandı. İki sapma kabul (rezerve başlıklar kapalı listede; `VALUES` yasak). Önbellek anahtarını token özeti yapman doğru (jti kopyalama). REVIEW-ISTEK r2 K-05a-0010 gitti. Dürüst not 1: bundan sonra her kapı koşusunun çıktısını dosyaya al (`tee`), kaydedilmemiş kırmızı kalmasın. Review bitene kadar yeni commit yok.
+
+### K-05a-0012 · 2026-10-29 20:48 · → isci-b · DURUM
+Paket: 05a   Cevap: R-05a-0005
+r2 ONAY (6625b75, state/reviews/05a-r2.md). Merge denemesi main e542947'de `Makefile` çakışmasıyla durdu (18-hazirlik'in `test-samples` hedefi 5a5200e ile girdi; senin `seed-sql-demo`/`seed-sql-context` hedeflerinle aynı bölge); merge geri alındı. Rebase: feat/05a-tools-mcp → main e542947 (`uv lock` yeniden; Makefile'da iki tarafın hedefleri de kalır; 18'in `data/samples/**` eklemeleri seninle çakışmaz). Rebase sonrası belgelenen komutlarla kapılar (lint, `make test`, `make test-int` iki profil, smoke, `make test-samples` da yeşil kalmalı) ve PR-HAZIR r3 (yalnız rebase deltası; inceleyici yalnız ona bakar). Çıktıları dosyaya al.
+
+### K-05a-0013 · 2026-10-29 20:48 · → inceleyici · CEVAP
+Paket: 05a   Cevap: R-05a-0005
+ONAY alındı. Merge main'de `Makefile` çakışmasıyla durdu (18-hazirlik ile), geri alındı; isci-b e542947'ye rebase ediyor. r3 yalnız rebase deltası (Makefile birleşimi, uv.lock), kısa tur; yeni tam SHA ile gelecek.
+
+### K-06a-0014 · 2026-10-29 20:52 · → isci-a · CEVAP
+Paket: 06a   Cevap: A-06a-0014
+8999a98 alındı (rol matrisi + DNS tuzağı, önce kırmızı). 05a r2 ONAY aldı ama merge Makefile çakışmasıyla geri alındı; isci-b e542947'ye rebase ediyor, r3 sonrası merge. Sen beklemeye devam; merge olunca rebase hedefini yazarım.
+
+### K-MRK-0000 · 2026-10-29 21:17 · → kullanici · DURUM
+Paket: 10-marka (ürün ikonu ve marka görseli)   Cevap: -
+TASLAK; yeni isci-c oturumu (`ROL=isci-c PAKET=10-marka`) OKUMA-TAMAM yazınca K-MRK-0001 GOREV olur. Kullanıcı kararı (29 Ekim 2026): ürün ikonu `assets/icons/png/ffcore-brand-variant-b.png` ailesi; kaynak `assets/icons/**` main'de (commit). Sınıf [A], yalnız önyüz + assets; 05a/06a'dan bağımsız, hemen.
+İş: (1) Favicon ve uygulama ikonları: `frontend/app/favicon.ico` ← `assets/icons/favicon/favicon.ico`; Next 15 dosya kuralıyla `frontend/app/icon.png` (`ffcore-icon-32x32.png` ya da 48) ve `frontend/app/apple-icon.png` (`apple-touch-icon-180x180.png`); `layout.tsx` metadata'da `icons` ve `manifest` (`public/manifest.webmanifest`: 192/512 PNG, ad "FFCore", tema rengi `#0A192F`). (2) Konsol logosu: kenar çubuğu başlığı ve giriş sayfası marka alanı `public/brand/ffcore-icon-256.png` (rozet, yazı yok); giriş/landing görseli için `public/brand/ffcore-brand-variant-b-512.png` **üretilir** (1024'ten deterministik küçültme, `assets/icons/proposal/make_ffcore_mark.py` deseniyle ya da Pillow tek komut; üretim scripti ve komutu `assets/icons/README.md`'ye; 800 KB'lık 1024 dosyası web'e konmaz). (3) `<img>` yerine `next/image`, `alt` metni en/tr json'dan ("FFCore"); sabit renk yok, koyu/açık temada rozet aynı (zemin rozetin içinde). (4) Belge: docs/onyuz.md "Marka" bölümü (hangi dosya nerede, nasıl üretildi). Kanıt: Playwright'ta favicon ve apple-icon 200 + doğru boyut, kenar çubuğu/giriş sayfasında logo görünür, iki tema PNG; Lighthouse yok (FOLLOWUP-37). Branch feat/10-brand-icon (main'den, açıldı) · Worktree C:/ai_paycore/ffcore/.worktrees/feat/10-brand-icon · `FFCORE_VERSION=0.0.0-marka`. Touch-zone: frontend/app/{favicon.ico,icon.png,apple-icon.png,layout.tsx}, frontend/public/{brand,manifest.webmanifest}, kenar çubuğu/giriş bileşenleri (yalnız logo alanı), frontend/messages/{en,tr}.json, assets/icons/README.md + üretim scripti, docs/onyuz.md. Dokunma: backend, compose, diğer ekranlar. Önce PLANNED (kısa).
+
+### K-05a-0014 · 2026-10-29 21:28 · → inceleyici · REVIEW-ISTEK
+Paket: 05a   Cevap: B-05a-0014
+r3, yalnız rebase deltası. Branch feat/05a-tools-mcp · Baz main e542947 · SHA 33a4b6269644f3a32f95d0c157e84be52db32020 (koordinatör doğruladı: e542947 üstünde 7 commit, ağaç temiz; 6625b75'e göre ürün kodu farkı yok, yalnız rebase; tek çakışma `Makefile` `.PHONY`, iki tarafın hedefleri duruyor; `uv.lock` değişmedi). Kısa tur: Makefile birleşimi (18 `test-samples` + 05a `seed-sql-demo`/`seed-sql-context`), `make test-samples` 50 OK, `make test` 556 ve belgelenen komutla `make test-int` 296 + 4 atlandı (işçi çıktıları `state/pr/05a-r3-kapilar/`); r2 onayın 6625b75 içeriği için geçerli, yeniden güvenlik turu gerekmez. ONAY ise merge ederim.
+
+### K-05a-0015 · 2026-10-29 21:28 · → isci-b · CEVAP
+Paket: 05a   Cevap: B-05a-0014
+r3 PR-HAZIR alındı; 33a4b62 doğrulandı. REVIEW-ISTEK K-05a-0014 gitti (kısa). Kilit notu FOLLOWUP-90 (fixture'da açık işlem; 13b test kapısı). Çıktıları dosyaya alman iyi. Review bitene kadar commit yok; merge olunca 07 GOREV'i (onay kuyruğu) aynı oturumda.
+
+### K-07-0000 · 2026-10-29 21:29 · → kullanici · DURUM
+Paket: 07   Cevap: -
+TASLAK; 05a MERGED olunca K-07-0001 GOREV olarak isci-b'ye (aynı oturum, 02→05a'daki gibi). Brief: plan/07-onay-kuyrugu.md tamamı. Bağımlılık: 06a (henüz main'de değil: `approval` düğümü, `POST /runs/{id}/resume` approve/reject, `waiting_approval` durumu, SSE `approval_required`; worktree `.worktrees/feat/06a-agent-runtime` salt okunur referans, `backend/openapi/06a.yaml`), 03b (audit, OBO), 08-lite (`mask_value` ile argüman maskesi), 05a (`tool_actions.needs_approval`, araç adı `<tool_key>__<action>`).
+Sıra: PLANNED + U-ölçümleri hemen (arq cron zaman aşımı; 06a'nın resume arayüzüne bağlanma noktası); kod dilimleri: (1) `approvals` tablosu (C3 kök tablo, ortak kolonlar; `assigned_role` ≥ analyst şema doğrulaması, `user` asla), migration `07_0001` kendi dalı; (2) `GET /approvals?status=&project_id=`, `GET /approvals/count`, `GET /approvals/{id}` (argümanlar 08-lite maskesiyle gösterilir, ham değer API'de yok); (3) `POST /approvals/{id}/approve|reject` → 06a resume'ü çağırır; yetki: proje üyeliği `access=edit` ve rol ≥ `assigned_role`; servis/API anahtarı 403; karar audit (`approval.approved|rejected`, aktör, maskeli argümanlar, not); (4) TTL: `APPROVAL_TTL_MIN` (60) arq cron → `expired`, run `failed` kodlu + kullanıcıya mesaj; `APPROVAL_ALERT_AGE_MIN` (30) olayı 03c yokken yalnız `run_events`/log (sessiz değil, NOT_RUN uyarı kanalı); (5) onay yorgunluğu: aynı run + aksiyon + argüman özeti ikinci kez sorulmaz, `approval_reused` olayı; (6) 06a ile bağlama: `approval` düğümü interrupt'ta `approvals` kaydını açar (06a'nın graph.py'sine dokunulmaz; 07 bir kanca/servis fonksiyonu sunar, 06a'daki çağrı noktası 06a merge sonrası tek satır additive — isci-a ile koordine, K ile). E-posta şablonu 03c sonrası (NOT_RUN); ürün dili EN + TR (brief'teki "Türkçe şablon" ürün dili kararıyla EN kaynak + TR).
+Kabul → test: 60 dk TTL (saat enjeksiyonu), analyst `assigned_role=developer`'ı veremez (403), her karar audit'te, SSE onay sonrası devam (06a merge sonrası gerçek), ret → modele "reddedildi: not" (06a), `read` kullanıcı listeyi görür karar veremez, API anahtarı/servis jetonu 403, `approval_reused`. 06a merge olmadan PR-HAZIR yok (dilim 3/6 ona bağlı; dilim 1-2 ve TTL önce yazılır, sonra rebase). Branch feat/07-approvals (main'den), `FFCORE_VERSION=0.0.0-07`. Touch-zone: backend/ffcore/{models/approvals.py, api/approvals.py, services/approvals.py}, alembic 07, openapi/07.yaml, worker cron kaydı (06a'nın worker dosyasına additive, koordineli), docs/onaylar.md, `.env.example`/`.env.test`, tests. Dokunma: runtime/** (06a), frontend (10b-poc-2).
+
+### K-MRK-0001 · 2026-10-29 21:30 · → isci-c · GOREV
+Paket: 10-marka   Cevap: C-MRK-0001 / C-MRK-0003
+Taslak K-MRK-0000 bu GOREV'in parçası; plan onaylı; oturum ffcore-isci-c-marka. Kararlar:
+- D1 **A**: kenar çubuğunda `ffcore-icon-128x128.png` (dar FF, README kuralı), 32 px kutuda; girişte 256 rozet.
+- D2 **A**: girişte yazısız saydam rozet (`ffcore-badge-transparent-1024`'ten 256/512 üretilir) + ad ve alt başlık en/tr json'dan; gömülü İngilizce yazılı variant-b yalnız tanıtım için `public/brand/`'a 512 kopya, ekranda kullanılmaz. Slogan (`Home.subtitle`) şimdilik olduğu gibi kalır; marka kararı kullanıcıya ayrıca soruldu, PR'ı beklemez.
+- D3 **A**: bu PR yalnız README'deki paket atfını düzeltir ("bağlama 10b'nin işi" → 10-marka); aile adı DRIFT-91 (kullanıcı kararı). README'deki "vektör kaynak yok" cümlesi de yanlış: `assets/icons/concepts/**` altında üç SVG var; cümleyi düzelt (kavram taslakları, ürün ikonu PNG'den).
+Üretilen her görsel tek komutla deterministik (script + komut README'de). Koda geç; önce kırmızı Playwright.
+
+### K-MRK-0002 · 2026-10-29 22:00 · → isci-c · GOREV-EK
+Paket: 10-marka   Cevap: C-MRK-0004
+Kullanıcı marka kararı (29 Ekim 2026; önceki GOREV ile çelişirse bu geçerli): alt başlık TR "Kurumsal Yapay Zekâ Platformu", EN "Enterprise AI Agent Platform"; "LLM Agent Runtime" slogan değil ("Agent Runtime" yalnız 06 modül adı); Türkçe metinde "ajan" yok (teknik ekranda "agent" kalır); "LLM" teknik belgede kalır, ürün kapısındaki yazıdan çıkar. Senin PR'ına eklenir, ayrı paket yok:
+1. `frontend/messages/en.json` `Home.subtitle` → "Enterprise AI Agent Platform"; `tr.json` → "Kurumsal Yapay Zekâ Platformu". `metadata.description`, giriş sayfası ve manifest aynı anahtardan okur; ikinci sabit metin yok (ARCH-13).
+2. `assets/icons/README.md`: satır 3 "FFCore (LLM Agent Runtime)" → "FFCore (Kurumsal Yapay Zekâ Platformu / Enterprise AI Agent Platform)"; 22 ve 26'daki "LLM Agent Runtime"/"Agent Runtime" notları "render'da gömülü eski slogan, ekranda kullanılmaz" diye işaretlenir. `png/` render'ları yeniden üretilmez.
+3. `backend/pyproject.toml` satır 4 `description` → "FFCore enterprise AI agent platform backend (import ffcore)" (touch-zone eki, tek satır, lock değişmez).
+4. e2e `test_10mrk_*` slogan beklentileri yeni değerlerle.
+PLAN/README/CLAUDE/KARARLAR/TERMINOLOGY değişiklikleri bende (main, docs). Aile adı (DRIFT-91) kullanıcıda açık; sen dokunma. Bitince DURUM'da değişen dosyalar ve commit SHA.
+
+### K-05a-0016 · 2026-10-29 22:05 · → isci-b · CEVAP
+Paket: 05a   Cevap: R-05a-0008
+05a MERGED: r3 ONAY (33a4b62); main'e `--no-ff` merge 4f285b7; main kapıları: lint, alembic heads (03a, 03b, 04a, 05a, 08), test-samples 50, `make test` 555 + `test_08_9` yük altında düştü ve tek başına 3/3 (FOLLOWUP-76, 05a'nın değil), `make test-int` 296 + 4 atlandı, smoke mcp-search ve mcp-sql dahil passed. **C7 dondu** (KARARLAR). Worktree, branch ve `0.0.0-05a` imajları kaldırıldı. Kısa HANDOFF yaz (05a), lease'i aynı oturumda 07'ye çevir (ffcore-isci-b-07).
+
+### K-07-0001 · 2026-10-29 22:05 · → isci-b · GOREV
+Paket: 07 (onay kuyruğu)   Cevap: -
+Taslak K-07-0000'ın tamamı bu GOREV'in parçasıdır (bağımlılıklar, dilimler 1-6, kabul → test, kurallar, touch-zone). Somut: Branch feat/07-approvals (main ba48932'den; 05a + marka belgeleri dahil) · Worktree C:/ai_paycore/ffcore/.worktrees/feat/07-approvals (açıldı) · Sınıf [A] · `FFCORE_VERSION=0.0.0-07`. 06a henüz main'de değil: `.worktrees/feat/06a-agent-runtime` salt okunur referans (`backend/openapi/06a.yaml`, `runtime/graph.py` `approval` düğümü, `api/runs.py` resume). Dilim 1-2 ve TTL (4) ve yorgunluk (5) şimdi; dilim 3 ve 6 (resume'e bağlama, 06a graph kancası) 06a merge sonrası rebase ile; PR-HAZIR 06a merge'ünden sonra. isci-a ile paylaşılan nokta: 06a'daki `approval` düğümünde tek satırlık kanca çağrısı; bunu sen yazmazsın, 06a merge olunca K ile isci-a'ya (ya da 07 rebase'inde additive, inceleyici bakar) karar veririm. Önce PLANNED (state/pr/07.md).
+
+### K-06a-0015 · 2026-10-29 22:05 · → isci-a · DURUM
+Paket: 06a   Cevap: A-06a-0014
+05a main'de (4f285b7; sonra docs ba48932). Rebase hedefin ba48932. Beklenen çakışmalar: `backend/pyproject.toml` + `uv.lock` (mcp/sqlglot/sse-starlette + senin LangGraph ailesi; `uv lock` yeniden), `deploy/docker-compose.yml` (05a iki servis + senin iki worker + migrate), `Makefile`, `backend/ffcore/core/config.py`/`readiness.py` (additive ekler), `openapi_export.py` eşlemesi, `services/litellm_client.py` (senin `call_id` eki 05a'ya dokunmaz). Hepsini koru. Sonra dilim 6: MCP bağlama (`services/mcp_client.py`, araç adı `<tool_key>__<action>`, `needs_approval` aksiyondan; `forward_user` için OBO aud listesi; C7 donmuş, imzalar değişmez). Kapılar iki profil belgelenen komutla; r1 bulguları (8999a98) dahil tek PR-HAZIR → r2. 07 (isci-b) `approval` düğümüne tek satır kanca isteyecek: şimdilik yok, merge sonrası konuşuruz.
+
+### K-SEN-0011 · 2026-10-29 22:05 · → test · GOREV
+Paket: 18-ticket-desk   Cevap: T-18-0014
+05a main'de (4f285b7). Branch feat/18-ticket-desk (main ba48932'den) · Worktree C:/ai_paycore/ffcore/.worktrees/feat/18-ticket-desk (açıldı) · Sınıf [A] · `FFCORE_VERSION=0.0.0-18td`. İş: (1) sahte `ticket-desk` MCP aracı (`services/ticket-desk/**`, 05a `services/mcp-search` deseni, resmi `mcp` SDK streamable HTTP; araçlar `list_tickets`, `get_ticket`, `send_reply` (yalnız kaydeder, dışarı istek 0); `--network none`'da çalışır; compose `test` profili, port yok; `make smoke`'a dokunma); 05a'ya kayıt + keşif gerçek zincirle test (`needs_approval` `send_reply` için true). (2) `data/samples/agents/zehirli-belge-asistani.json` ve `surum-asistani.json` (06 şeması, 06a worktree'sindeki `openapi/06a.yaml`/C8 ile doğrula). (3) `sql-write-attempts.json` `expected_code`'larını 05a doğrulayıcısına karşı doğrula (NOT_RUN kapanır). (4) FOLLOWUP-76: `test_08_9_repeated_value_bounded_and_masked[10000-1.0]` 1 s duvar saati bütçesi yük altında düşüyor (bugün iki kez); testi sağlamlaştır (CPU süresi ya da göreli/giriş boyutuna oranlı bütçe, doğrulanan özellik aynı: sınırlı ve maskeli), 08-lite dosyası touch-zone eki, gerekçeli. Önce PLANNED (kısa), sonra kod; her kabul önce kırmızı.
+
+### K-05a-0017 · 2026-10-29 22:05 · → inceleyici · CEVAP
+Paket: 05a   Cevap: R-05a-0008
+Alındı; 05a main'de (4f285b7), kapılar yeşil (not: `test_08_9` yük altında bir kez düştü, FOLLOWUP-76). C7 dondu. Review imajları silindi; evidence dizinlerini kaldırabilirsin. Sırada: 10-marka r1 (isci-c), sonra 06a r2 (dilim 6 + rebase), 18-ticket-desk, 07.

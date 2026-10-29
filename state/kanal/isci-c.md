@@ -2,10 +2,10 @@
 
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
-- Oturum kimliği: ffcore-isci-c-10bp1
-- Aktif paket: - (10b-poc-1 MERGED 92fb37f)
-- Durum: RETIRED
-- Son okunan: koordinator K-10bp-0010; son yazılan C-10bp1-0011 (HANDOFF)
+- Oturum kimliği: ffcore-isci-c-marka
+- Aktif paket: 10-marka (feat/10-brand-icon)
+- Durum: ACTIVE
+- Son okunan: koordinator K-MRK-0002 (2026-10-29 22:00); son yazılan C-MRK-0005
 
 ## Mesajlar
 
@@ -440,3 +440,46 @@ Paket: 10b-poc-1   Cevap: K-10bp-0010
 - **Commit edilmemiş durum:** yok (worktree ve branch koordinatörce kaldırıldı).
 - **Branch ve son commit:** feat/10b-poc-1 (silindi) @ c0926f9cee3928706847011ec02065b2d0ed8052 → main 92fb37f.
 - **Ortam:** `10bp1` yığını `down -v` (konteyner 0). `ffcore-10a-nm(-pw)` duruyor. Scratchpad'deki log ve betikler oturuma özel, depoya girmedi.
+
+### C-MRK-0001 · 2026-10-29 21:30 · → koordinator · DURUM
+Paket: 10-marka   Cevap: -
+DURUM: OKUMA-TAMAM. Okunan gruplar:
+- 1 FELSEFE + FELSEFE_UYGULAMA; 2 CLAUDE; 3 PLAN; 4 KARARLAR (29 Ekim eklemeleri dahil); 5 handbook tümü + PR şablonu; 8 BASLATMA.
+- 6 WORK_QUEUE, BLOCKERS, isci-c kanalı (C-10bp1-0011 HANDOFF dahil); koordinatör kanalı K-MRK-0000'a kadar; diğer kanallarda yalnız lease'ler.
+- 7 brief 10 (Kapsam, Ortak, Teslimatlar, Kabul); assets/icons/README ve varlıklar (boyut, alfa); docs/onyuz.md başlıkları.
+Lease: ffcore-isci-c-marka ACTIVE (önceki 10bp1 RETIRED). Kullanıcı talimatı: ROL=isci-c PAKET=10-marka.
+Not: bu oturum daha önce "C Main" adıyla rol almadan kapatılmıştı (kullanıcı kararı); şimdi kullanıcı isci-c olarak açtı. "C Main (fork)" oturumundan haberim yok; isci-c tek oturum bu.
+
+### C-MRK-0002 · 2026-10-29 21:30 · → koordinator · ACK
+Paket: 10-marka   Cevap: K-MRK-0000
+ACK: taslak, GOREV metni olarak alındı (K-MRK-0001 yazıldığında aynı içerikse ayrıca ACK verilmez). Worktree `.worktrees/feat/10-brand-icon` @ b6fc3d8, temiz. `FFCORE_VERSION=0.0.0-marka`, compose proje adı `marka`, node volume'ları `ffcore-10a-nm(-pw)`. Touch-zone GOREV'deki gibi; ek dosya: `tests/e2e/test_10mrk_*.spec.ts` (önyüz testleri).
+
+### C-MRK-0003 · 2026-10-29 21:31 · → koordinator · DURUM
+Paket: 10-marka   Cevap: K-MRK-0000
+DURUM: PLANNED. Plan: state/pr/10-marka.md (5 e2e + 1 birim, felsefe kontrolü). Onaysız kod yok.
+KARAR-GEREK (ayrıntı ve etkiler planda, öneri önce):
+- D1 Kenar çubuğu logosu. Kutu 32 px; README kuralı "128 px altı dar FF zorunlu".
+  - A (öneri): kenar çubuğunda icon-128 dar FF, girişte 256 rozet.
+  - B: GOREV'deki gibi 256 rozet 32 px'te.
+  - C: kutu 48 px'e büyür; sidebar-07 sapması.
+- D2 Giriş görseli. variant-b'de İngilizce "FFCore / LLM Agent Runtime" yazısı gömülü ve zemin opak lacivert.
+  - Çatışmalar: metin json'da değil; README "açık zeminde C"; slogan `Home.subtitle` "Enterprise LLM platform" ile ARCH-13 çelişkisi.
+  - A (öneri): girişte yazısız saydam rozet + json'dan ad ve alt başlık. variant-b-512 üretilir, `public/brand/`'a tanıtım için konur, ekranda kullanılmaz.
+  - B: GOREV'deki gibi variant-b-512 iki temada.
+  - C: temaya göre B ve C görseli.
+  - Slogan seçimi marka kararıdır, kullanıcıya gider; A PR'ı beklemez.
+- D3 assets/icons/README "FastFlow ürün ailesi (ffengine.com)" ve "bağlama 10b'nin işi" der; PLAN 1b "FF ürün ailesi" der.
+  - A (öneri): bu PR yalnız paket atfını düzeltir; aile adı için DRIFT kaydı.
+  - B: aile adını da "FF" yaparım.
+
+### C-MRK-0004 · 2026-10-29 21:40 · → koordinator · ACK
+Paket: 10-marka   Cevap: K-MRK-0001
+ACK: D1 A, D2 A, D3 A (README: paket atfı ve "vektör yok" cümlesi; concepts/ altında 3 kavram × 2 SVG, ürün ikonu PNG'den). DURUM: IMPLEMENTING. Sıra: kırmızı Playwright (test_10mrk_1-5) → üretim scripti (`--check` ile deterministiklik) → bağlama → docs.
+
+### C-MRK-0005 · 2026-10-29 22:05 · → koordinator · ACK
+Paket: 10-marka   Cevap: K-MRK-0002
+ACK: madde 1-4 bu PR'a eklenir; aile adına dokunulmaz.
+Madde 1 için uygulama notu: statik `public/manifest.webmanifest` json'u okuyamaz. Bu yüzden Next.js dosya kuralı `app/manifest.ts` (ARCH-09) kullanılır: name `Home.title`, description `Home.subtitle`, kaynak `en.json`. Adres yine `/manifest.webmanifest`; link'i Next ekler, `metadata.manifest` kalkar. Touch-zone'da `public/manifest.webmanifest` yerine `app/manifest.ts` olur.
+Ara durum: hedefli e2e 10/10 yeşil (kırmızı 10/10 doğru nedenle düştükten sonra). lint 0, tsc 0, Vitest 114/114. `make_web_brand.py --check` 9 dosya güncel ve deterministik.
+Bulgu: docs/onyuz.md'deki `ALLOWED_INTERNAL_HOSTS=litellm,fake-llm` komutu 02'den beri backend'i açmıyor (LANGFUSE_HOST izinli host değil). Komut `litellm,langfuse-web,fake-llm` olarak düzeltildi.
+Tam e2e regresyon koşusu (iki aşama) sürüyor. Slogan değişikliği koşu bitince uygulanacak.

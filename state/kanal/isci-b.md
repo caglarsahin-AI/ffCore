@@ -663,3 +663,61 @@ Alındı. Worktree temiz, HEAD a55ca54. Review bitene kadar yeni commit yok; yı
 ### B-05a-0011 · 2026-10-29 19:28 · → koordinator · ACK
 Paket: 05a   Cevap: K-05a-0008
 DUZELT alındı (r1: BLOCKER 1, MAJOR 3, MINOR 1; KARARLAR "05a review r1 kararları"). Sıra: BLOCKER-1 (few_shots → tools çocuğu, 05a_0001 düzeltilir, C3 testi zinciri doğrular) → MAJOR-1 (`POST /api/v1/internal/obo/verify`, mcp-sql get_schema/run_sql öncesi, jti önbelleği) → MAJOR-2/3 (endpoint_url, başlık adı) → MINOR-1 (SQL matrisi, DB istatistiğiyle). Her biri önce kırmızı; yeni SHA ile PR-HAZIR.
+
+### B-05a-0012 · 2026-10-29 20:31 · → koordinator · PR-HAZIR
+Paket: 05a   Cevap: K-05a-0008
+r1 düzeltmeleri hazır. SHA `6625b75d55fbc5fbd20e6b54bb516304a95883be` (a55ca54 üstünde 1 commit; 29 dosya +1254/-114; worktree temiz; baz 5c338ae). Ayrıntı ve bulgu→düzeltme→kanıt tablosu: state/pr/05a.md "Review r1 bulgu → düzeltme → kanıt".
+- **BLOCKER-1:** `few_shots.tool_id` NOT NULL FK → tools, `project_id` yok (05a_0001 yerinde). `sql-context` zorunlu `tool_key` alıyor, 404 `tool_not_found`. `seed-sql-context --tool` (varsayılan mcp-sql; araç önce kayıtlı olmalı). C3 testi çocuk tablolarda FK zincirini kök tabloya kadar doğruluyor.
+- **MAJOR-1:** `POST /api/v1/internal/obo/verify` eklendi. mcp-sql her istekte araçtan önce bu uçla doğruluyor; proje doğrulanmış iddiadan geliyor. Önbellek token ömrü boyunca, anahtar **token'ın tamamının özeti**: yalnız `jti` ile anahtarlansa, jti kopyalayan sahte token doğrulanmış cevabı alırdı.
+  - Negatif: yanlış anahtar + doğru aud → 401; demo DB oturum sayacı değişmiyor.
+  - Canlı konteynerde backend erişim logu sahte token için verify 401 gösteriyor.
+- **MAJOR-2:** userinfo, query ve fragment → 400 `endpoint_url_not_allowed`. Kayıtta ve çağrıda reddediliyor; DB, audit ve yanıtta secret yok.
+- **MAJOR-3:** RFC token + kapalı liste → 400 `header_name_not_allowed`. Kayıtta ve çağrıda reddediliyor; fixture sunucusuna istek 0.
+- **MINOR-1:** yorumlar soyuluyor; set işlemlerinde yalnız SELECT dalı, `VALUES` yok. Kapalı fonksiyon listesi yeni kod `sql_function_not_allowed` veriyor. 26 satırlık matris birimde (bağlantı yok) ve gerçek zincirde (`pg_stat_database.sessions`) kanıtlı.
+- **Kapılar:**
+  - lint temiz.
+  - `make test` airgap 556; llmaas 556 (aşağıdaki not).
+  - `make test-int` iki profilde 296 geçti / 4 atlandı.
+  - smoke passed; servis env yasak değişken 0; log kapısı 0; 05a migration turu temiz; `down -v`.
+- **Dürüst notlar:**
+  1. llmaas'ta ilk `make test` koşusu `Error 1` ile bitti. Düşen test kaydedilmedi; ardından üç koşu 556/556 geçti. Neden doğrulanmadı.
+  2. Entegrasyon kırmızısı a55ca54 kopyasında 30 failed / 13 error. Sahte token ve matris testleri orada fixture imzasında düştü, anlamsal kırmızı değil. MAJOR-1'in anlamsal kırmızısı inceleyicinin probe'u.
+  3. bge-m3 testi bu tur NOT_RUN.
+- **Sapmalar** (PR'da gerekçeli; gerekirse tek satır geri alınır): kapalı başlık listesine `X-On-Behalf-Of` ve `X-Run-Id` eklendi; `VALUES` her yerde yasak.
+
+### B-05a-0013 · 2026-10-29 20:32 · → koordinator · ACK
+Paket: 05a   Cevap: K-05a-0011
+Alındı: 6625b75 r2'de; review bitene kadar commit yok. Bundan sonra her kapı komutunun tam çıktısı `tee` ile dosyaya (oturum scratchpad'i), PR'da dosya yolu ve özet; yalnız son satırı tutan kapı koşusu yok.
+
+### B-05a-0014 · 2026-10-29 21:26 · → koordinator · PR-HAZIR
+Paket: 05a   Cevap: K-05a-0012
+r3 (yalnız rebase): SHA `33a4b6269644f3a32f95d0c157e84be52db32020`, baz main e542947, 7 commit, worktree temiz.
+- **Rebase:** tek çakışma `Makefile` `.PHONY` satırıydı; iki tarafın hedefleri (18 `test-samples` + 05a `seed-sql-demo` / `seed-sql-context`) duruyor. `uv.lock` main'de değişmemiş; `uv lock --check --offline` temiz, dosya değişmedi.
+- **Kapılar:** tam çıktılar `state/pr/05a-r3-kapilar/` altında, tee ile dosyaya alındı.
+  - lint temiz; `test-samples` 50 OK (5 opt-in atlandı).
+  - `make test` 556/556 iki profilde.
+  - `make test-int` 296 geçti / 4 atlandı iki profilde.
+  - smoke passed; `alembic heads` 05a dahil.
+- **Dürüst not:** llmaas `test-int` ilk koşuda `test_03a_schema` içinde takıldı. Migration turunun `DROP TABLE documents` adımı 13 dakika kilit bekledi; kilidi tutan, testlerin kendi bağlantısında açık kalmış bir işlemdi (`SELECT provider_projects`). O an hiçbir 05a testi koşmamıştı (alfabetik sıra). Kilit tablosu ve takılan koşunun çıktısı dosyada. Koşuyu durdurdum, ikinci koşu temiz. Neden doğrulanmadı; FOLLOWUP adayı (03a/03b/04a fixture'larından biri bağlantıyı işlem açıkken bırakıyor olabilir).
+- `down -v` yapıldı. Ayrıntı: state/pr/05a.md "r3".
+
+### B-05a-0015 · 2026-10-29 21:28 · → koordinator · ACK
+Paket: 05a   Cevap: K-05a-0015
+Alındı: 33a4b62 r3'te, kilit notu FOLLOWUP-90. Review bitene kadar commit yok. Merge sonrası HANDOFF, ardından 07 GOREV'i bu oturumda (OKUMA-TAMAM ile başlarım).
+
+### B-05a-0016 · 2026-10-29 22:03 · → koordinator · HANDOFF
+Paket: 05a   Cevap: K-05a-0016
+05a MERGED (main 4f285b7; dal ucu 33a4b62). Worktree `.worktrees/feat/05a-tools-mcp` temiz, yığın `down -v` ile kapalı; worktree ve dal silinmedi (silme koordinatörde).
+- **C7 dondu.** Biçim state/pr/05a.md "C7 donmuş biçim" ve r1 eklemeleri: `sql_function_not_allowed`, verify ucu kodları, `sql-context` gövdesinde `tool_key`.
+- **Tüketicilere:**
+  - 06a/07: araç adı `<tool_key>__<action>`; `tool_actions.needs_approval` / `enabled` / `max_calls_per_run` 05a'da yalnız saklanıyor, uygulaması 06a/07'de. `mcp_client.call(target, action, args, settings, caller=, run_id=, timeout_s=)`; kodlu `ToolCallError`.
+  - Guard çağrı noktaları `tool.pre` / `tool.post` hazır, zorlama 05b/06a'da.
+  - 18 ticket-desk: `mcp_server_common` (CallerCheck, Relay, OboVerifier) deseni.
+  - Kimliği kendisi kullanan servis `POST /api/v1/internal/obo/verify` ile doğrular.
+- **Açık:**
+  - FOLLOWUP-90: test fixture'ında açık işlem → `test_03a_schema` kilidi.
+  - llmaas `make test`'te bir kez görülen aralıklı `Error 1`: neden kayıtsız; bundan sonra tee ile yakalanır.
+  - `kind=openapi` çağrısı 501, 05b'de.
+  - `test_05a_models_few_shot_similarity` r1 sonrası gerçek ağırlıkla koşulmadı (NOT_RUN).
+- **Kurulum sırası** (docs/araclar.md): `seed-sql-demo` → mcp-sql aracını kaydet → `seed-sql-context`.
+Lease 07'ye geçiyor; aynı oturum.
