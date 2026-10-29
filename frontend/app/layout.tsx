@@ -9,6 +9,8 @@ import "./globals.css";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("Home");
+  // favicon.ico, icon.png, apple-icon.png and manifest.ts are linked by the Next.js file convention
+  // (app/); the images come from assets/icons/scripts/make_web_brand.py.
   return { title: t("title"), description: t("subtitle") };
 }
 
