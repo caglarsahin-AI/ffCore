@@ -23,6 +23,12 @@ const KEYS = {
   missing_config_field: "missingConfigField",
   invalid_config_field: "invalidConfigField",
   unknown_project: "unknownProject",
+  // 04a knowledge base
+  knowledge_base_key_taken: "knowledgeBaseKeyTaken",
+  acl_conflict: "aclConflict",
+  request_too_large: "requestTooLarge",
+  vector_store_unavailable: "vectorStoreUnavailable",
+  network_error: "networkError",
 } as const;
 
 export type ErrorMessageKey = (typeof KEYS)[keyof typeof KEYS] | "notFound" | "unexpected";
