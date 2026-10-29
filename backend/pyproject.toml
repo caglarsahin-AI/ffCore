@@ -69,4 +69,5 @@ pythonpath = ["."]
 markers = [
     "models: needs real model weights (RUN_MODEL_TESTS=1, make test-models)",
     "vectorstore: needs a Qdrant container (RUN_QDRANT_TESTS=1)",
+    "dns: sends a real DNS lookup through the host resolver (RUN_DNS_TESTS=1)",
 ]

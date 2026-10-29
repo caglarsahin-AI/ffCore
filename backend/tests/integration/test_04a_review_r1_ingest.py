@@ -11,6 +11,7 @@ from ffcore.core.config import Settings
 from ffcore.knowledge import ingest
 from ffcore.knowledge.vectorstore.base import VectorStoreError
 from ffcore.knowledge.vectorstore.pgvector import PgVectorStore
+from tests.converters import convert_without_weights
 from tests.dummy import EMBED_DIM, SETTINGS_03A
 
 PROSE = (
@@ -79,7 +80,7 @@ def process(settings, document_id, store=None):
                 settings=settings,
                 store=store or PgVectorStore(),
                 embed_client=ingest.LocalEmbedClient(settings),
-                convert=ingest.convert_inline,
+                convert=convert_without_weights,
             ),
             BOUND_S,
         )

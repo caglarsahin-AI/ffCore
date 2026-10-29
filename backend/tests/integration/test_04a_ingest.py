@@ -11,6 +11,7 @@ from ffcore.core.config import Settings
 from ffcore.knowledge import ingest
 from ffcore.knowledge.embed import FakeEmbedder
 from ffcore.knowledge.vectorstore.pgvector import PgVectorStore
+from tests.converters import convert_without_weights
 from tests.dummy import EMBED_DIM, SETTINGS_03A
 
 PROSE = (
@@ -86,7 +87,7 @@ def upload(settings, kb_id, filename, data: bytes, acl_roles=("analyst",)):
     return run(go())
 
 
-def process(settings, document_id, embedder=None, convert=ingest.convert_inline):
+def process(settings, document_id, embedder=None, convert=convert_without_weights):
     # Inline conversion keeps the suite fast; the bounded worker path has its own test below.
     return run(
         ingest.ingest_document(
@@ -120,14 +121,22 @@ def markdown(*sections):
     return "\n\n".join(f"## Madde {i}\n\n{PROSE * 6}" for i in sections).encode()
 
 
-def test_04a_ingest_markdown_end_to_end(pg, make_project, settings):
+@pytest.mark.parametrize(
+    "convert,engine",
+    [
+        pytest.param(convert_without_weights, "test-markdown-as-is", id="as-is"),
+        # The product path: Markdown through Docling (needs its weights, DRIFT-85).
+        pytest.param(ingest.convert_inline, "docling@", marks=pytest.mark.models, id="docling"),
+    ],
+)
+def test_04a_ingest_markdown_end_to_end(pg, make_project, settings, convert, engine):
     kb_id = make_kb(pg, make_project())
     doc_id, outcome = upload(settings, kb_id, "bakim.md", markdown(1, 2, 3))
     assert outcome == "created"
-    report = process(settings, doc_id)
+    report = process(settings, doc_id, convert=convert)
     row = doc_row(pg, doc_id)
     assert row[0] == "indexed" and row[1] == row[3] == row[5] == "ok"
-    assert row[8].startswith("docling@") and Path(row[9]).exists()
+    assert row[8].startswith(engine) and Path(row[9]).exists()
     assert row[12] == "format-v1"
     chunks = chunk_rows(pg, doc_id)
     assert chunks and all(c[4] for c in chunks)  # every chunk has a vector
@@ -191,7 +200,7 @@ def test_04a_8b_log_attachment_is_data_dump_document_indexed(pg, make_project, s
             settings=settings,
             store=PgVectorStore(),
             embed_client=ingest.LocalEmbedClient(settings),
-            convert=ingest.convert_inline,
+            convert=convert_without_weights,
         )
     )
     assert doc_row(pg, doc_id)[0] == "indexed"
@@ -267,6 +276,7 @@ def test_04a_10b_model_change_reembeds(pg, make_project, settings):
     assert report.reused == 0 and counter.texts == len(chunk_rows(pg, doc_id))
 
 
+@pytest.mark.models  # Docling weights (DRIFT-85)
 def test_04a_ingest_13a_contract_docx(pg, make_project, settings):
     kb_id = make_kb(pg, make_project())
     name = "SZL-2025-003_temizlik-hizmet.docx"

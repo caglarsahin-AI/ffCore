@@ -17,7 +17,6 @@ from ffcore.knowledge.convert.types import CONVERTED, ERROR, ConversionResult
 from ffcore.knowledge.convert.workers import Limits, PersistentPool
 
 ROOT = Path(__file__).resolve().parents[3]
-SAMPLE_DOCX = ROOT / "data" / "samples" / "contracts" / "SZL-2025-003_temizlik-hizmet.docx"
 TARGET = "tests.unit.test_04a_review_r1_limits:worker_target"
 
 
@@ -76,7 +75,10 @@ def test_04a_r1_5_huge_pdf_page_is_refused_before_rendering(tmp_path):
 
 def test_04a_r1_5_next_file_converts_after_refusals(tmp_path):
     assert convert(vsdx_bomb(tmp_path / "b.vsdx")).status == ERROR
-    assert convert(SAMPLE_DOCX).status == CONVERTED
+    # A plain text file: converts without model weights (DRIFT-85; Docling runs under `models`).
+    following = tmp_path / "notlar.txt"
+    following.write_text("Bakim ziyareti tamamlandi, rapor ekte. " * 4, encoding="utf-8")
+    assert convert(following).status == CONVERTED
 
 
 def test_04a_r1_5_zip_never_inflates_past_the_declared_size(tmp_path):
