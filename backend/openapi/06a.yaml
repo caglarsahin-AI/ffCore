@@ -1002,7 +1002,9 @@ paths:
       summary: Give Feedback
       description: 'Expert review of a completed run''s answer (F9): vote and note go to the answer message
 
-        and to Langfuse as a score. A new vote replaces the previous one (the audit keeps both).'
+        and to Langfuse as a score. A new vote replaces the previous one (the audit keeps both).
+
+        Edit access; a `user` member rates only their own runs, analysts and above any run.'
       operationId: give_feedback_api_v1_projects__project_id__runs__run_id__feedback_post
       parameters:
       - name: project_id

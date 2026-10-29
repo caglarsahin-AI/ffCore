@@ -60,8 +60,18 @@ router = APIRouter(prefix="/projects/{project_id}", tags=["runs"], responses=ERR
 log = logging.getLogger("ffcore.runtime.feedback")
 
 Reader = Annotated[Actor, Depends(require_role("analyst"))]
-# Feedback is a platform mutation (F9): members with edit access; read-only gets 403.
-Reviewer = Annotated[Actor, Depends(require_role("analyst", write=True))]
+# Any project member, `user` included (review r1 MAJOR-1): the handler then applies the run
+# rule, so a `user` acts on their own runs only. Matrix in tests/integration/test_06a_run_access.
+Member = Annotated[Actor, Depends(require_role("user"))]
+# Feedback is a platform mutation (F9): edit access; read-only gets 403.
+MemberWriter = Annotated[Actor, Depends(require_role("user", write=True))]
+OWN_RUN_ONLY = "user"
+
+
+def not_run_user(message: str) -> ApiError:
+    return ApiError(403, "permission_error", "not_run_user", message)
+
+
 SettingsDep = Annotated[Settings, Depends(get_settings)]
 LastEventId = Annotated[
     str | None,
@@ -225,7 +235,7 @@ async def create_run(
     agent_key: AgentKey,
     body: RunCreate,
     request: Request,
-    actor: Reader,
+    actor: Member,
     session: SessionDep,
     settings: SettingsDep,
     queue: QueueDep,
@@ -234,6 +244,14 @@ async def create_run(
     stream its events. The run id is the first event (`progress` with `run_id`)."""
     if actor.actor_type != "user":
         raise invalid("run_user_missing", "A run is started by a user (or for one, on behalf).")
+    if body.channel == Channel.test:
+        # The console's test panel is for agent builders; chat is open to every member.
+        await authorize(
+            request,
+            actor,
+            str(project_id),
+            RoleRequirement("analyst", write=False, scope="project"),
+        )
     if request.state.grant.is_superadmin:
         # The worker searches and calls tools on behalf of this user, where only project
         # membership counts (03a, K-03a-0007): refused here, not halfway through the run.
@@ -405,12 +423,15 @@ async def give_feedback(
     run_id: UUID,
     body: FeedbackRequest,
     request: Request,
-    actor: Reviewer,
+    actor: MemberWriter,
     session: SessionDep,
 ):
     """Expert review of a completed run's answer (F9): vote and note go to the answer message
-    and to Langfuse as a score. A new vote replaces the previous one (the audit keeps both)."""
+    and to Langfuse as a score. A new vote replaces the previous one (the audit keeps both).
+    Edit access; a `user` member rates only their own runs, analysts and above any run."""
     run = await _run(session, project_id, run_id)
+    if request.state.grant.role == OWN_RUN_ONLY and actor.actor_id != str(run.user_id):
+        raise not_run_user("A user rates only their own runs.")
     if run.status != RunStatus.completed:
         raise conflict("run_not_completed", f"The run is {run.status}; only answers are rated.")
     message = await session.scalar(
@@ -491,7 +512,7 @@ async def resume_run(
     run_id: UUID,
     body: ResumeRequest,
     request: Request,
-    actor: Reader,
+    actor: Member,
     session: SessionDep,
     settings: SettingsDep,
     queue: QueueDep,
@@ -518,7 +539,7 @@ async def resume_run(
         if body.answer is None or body.decision is not None:
             raise invalid("answer_required", "This run waits for the user's answer.")
         if actor.actor_id != str(run.user_id):
-            raise ApiError(403, "permission_error", "not_run_user", "Only the run's user answers.")
+            raise not_run_user("Only the run's user answers.")
         resume = {"answer": body.answer}
         action = "answer_run_question"
     # One resume per wait: the state change is the lock (a second click gets 409).
@@ -554,7 +575,7 @@ async def cancel_run(
     project_id: UUID,
     run_id: UUID,
     request: Request,
-    actor: Reader,
+    actor: Member,
     session: SessionDep,
     settings: SettingsDep,
 ):
