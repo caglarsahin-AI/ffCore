@@ -406,6 +406,20 @@ services:
       - ./backend/tests/fakes:/fakes:ro
     restart: "no"
 
+  ticket-desk:
+    # Test only (package 18): fake external ticket system for the F2/F11 scenarios, an MCP server
+    # with list_tickets / get_ticket / send_reply (records only, no outbound request). Tickets
+    # are the 13a/18 samples, read-only. Registered with auth none; never part of an installation.
+    image: ${REGISTRY_PREFIX}ffcore/backend:${FFCORE_VERSION:?FFCORE_VERSION tanımlı değil}
+    profiles: ["test"]
+    command: ["python", "/svc/ticket_desk_server.py"]
+    volumes:
+      - ./services/ticket-desk:/svc:ro
+      - ./data/samples/tickets:/data/tickets:ro
+      - ./data/samples/poison:/data/poison:ro
+    restart: "no"
+    healthcheck: *mcp-health
+
   tools:
     # Geliştirme araçları (make, ruff, pytest, curl). Host'a araç kurulmaz (K-00-0003, K-00-0005).
     # Çağrı: docker compose run --rm tools make <hedef>. Docker soketi bağlanmaz.

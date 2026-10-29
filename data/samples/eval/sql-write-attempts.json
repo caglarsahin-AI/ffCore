@@ -92,7 +92,7 @@
     "id": "w12",
     "sql": "SELECT id FROM departments UNION ALL SELECT lo_create(0)::int",
     "class": "hidden_write",
-    "expected_code": "sql_system_catalog",
+    "expected_code": "sql_function_not_allowed",
     "patterns": [
       "union",
       "function"
@@ -121,7 +121,7 @@
     "id": "w15",
     "sql": "SELECT pg_sleep(30)",
     "class": "catalog",
-    "expected_code": "sql_system_catalog",
+    "expected_code": "sql_function_not_allowed",
     "patterns": []
   }
 ]

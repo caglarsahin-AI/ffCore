@@ -1,8 +1,11 @@
 """08-lite: bounded cost on the real evaluate path (review r2 MAJOR-1).
 
-Budgets are upper bounds, not P95: a run over budget fails, and a run that never ends fails at the
-same bound (the evaluation runs in a daemon thread, so a quadratic regression cannot hang CI).
-The privacy guarantees of review r1 are checked on the same inputs.
+Budgets are upper bounds, not P95, on the CPU time this process spends evaluating
+(`time.process_time`: the event loop and the `asyncio.to_thread` workers the rules run in). Other
+processes on a loaded host do not count, so the budget no longer fails under parallel CI load
+(FOLLOWUP-76); a quadratic regression still costs CPU and still fails. A run that never ends
+fails at HANG_FACTOR x budget of wall-clock time (the evaluation runs in a daemon thread, so it
+cannot hang CI). The privacy guarantees of review r1 are checked on the same inputs.
 """
 
 import asyncio
@@ -16,23 +19,26 @@ from ffcore.guardrails.engine import EvalContext, evaluate
 from ffcore.guardrails.quality import latency_text
 
 EMAIL = "a.b@example.org"
+HANG_FACTOR = 10
 
 
 def timed_evaluate(text: str, budget_s: float):
+    """Decision and wall-clock seconds; fails over budget_s of process CPU time."""
     result: dict = {}
 
     def target():
-        started = time.perf_counter()
+        started, cpu = time.perf_counter(), time.process_time()
         result["decision"] = asyncio.run(
             evaluate(text, "input.pre", BUILTIN_DEFAULT, ctx=EvalContext(egress_enabled=True))
         )
+        result["cpu"] = time.process_time() - cpu
         result["seconds"] = time.perf_counter() - started
 
     worker = threading.Thread(target=target, daemon=True)
     worker.start()
-    worker.join(budget_s)
-    assert not worker.is_alive(), f"evaluate did not finish within {budget_s} s"
-    assert result["seconds"] < budget_s, result["seconds"]
+    worker.join(budget_s * HANG_FACTOR)
+    assert not worker.is_alive(), f"evaluate did not finish within {budget_s * HANG_FACTOR} s"
+    assert result["cpu"] < budget_s, result
     return result["decision"], result["seconds"]
 
 

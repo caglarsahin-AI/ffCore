@@ -37,7 +37,7 @@ başlamaz. Geri alma: `docker compose run --rm migrate alembic downgrade <revizy
 
 Testler model ağırlığı istemez: `make test` ve `make test-int` boş `model_cache` ile geçer. Gerçek
 ağırlıkla koşan testler `models` işaretlidir (`make models` sonrası `make test-models`). Entegrasyon
-testleri varsayılan yığına ek olarak `fake-llm` (profil `test`, 01) ve `qdrant` (profil `qdrant`,
+testleri varsayılan yığına ek olarak `fake-llm` ve `ticket-desk` (profil `test`; 01, 18) ve `qdrant` (profil `qdrant`,
 04a) ister; tablodaki komut ikisini de başlatır. Biri erişilemezse `make test-int` tek mesajla, bu
 komutu yazarak durur.
 
