@@ -1,8 +1,10 @@
+import { readFileSync } from "node:fs";
+
 import { expect, test } from "@playwright/test";
 
 import en from "../../messages/en.json";
 import { fixture } from "./fixtures";
-import { PDF, createKb, openKb } from "./knowledge";
+import { PDF, PDF_2, createKb, openKb } from "./knowledge";
 import { selectProject, signIn } from "./support";
 
 test("test_10bp1_2_upload_indexed: a 13a contract uploaded in the console reaches gold with every gate shown", async ({
@@ -35,4 +37,16 @@ test("test_10bp1_2_upload_indexed: a 13a contract uploaded in the console reache
   }
   await expect(row.getByTestId("document-access")).toContainText(en.Access.roles.analyst);
   await expect(row.getByTestId("document-chunks")).not.toHaveText("0");
+
+  // A Turkish file name goes through the browser upload as it is (K-10bp-0003): the second 13a
+  // contract under a name with every Turkish letter.
+  const turkish = "e2e-bakım-sözleşmesi-ÇĞİÖŞÜ-çğıöşü.pdf";
+  await page.getByTestId("file-input").setInputFiles({
+    name: turkish,
+    mimeType: "application/pdf",
+    buffer: readFileSync(PDF_2),
+  });
+  await page.getByTestId("upload-button").click();
+  await expect(result.locator('[data-outcome="created"]')).toContainText(turkish);
+  await expect(page.getByTestId(`document-${turkish}`)).toHaveAttribute("data-status", "indexed", { timeout: 120_000 });
 });
