@@ -39,6 +39,11 @@ def extension(filename: str) -> str:
     return PurePath(filename).suffix.lower().lstrip(".")
 
 
+def max_bytes(filename: str) -> int:
+    """Kapı 0's size limit for this file; uploads stream against it (review r1 MAJOR-5)."""
+    return PLAINTEXT_MAX_BYTES if extension(filename) in PLAINTEXT else MAX_BYTES
+
+
 def gate0_upload(filename: str, size: int) -> Verdict:
     """Kapı 0 for a manual upload: format scope and size. No date rule (an upload has no source
     date; that part of Kapı 0 belongs to the source connectors, 16)."""
@@ -51,7 +56,6 @@ def gate0_upload(filename: str, size: int) -> Verdict:
         return "skipped", "video_disabled"
     if ext in OLD_OFFICE:
         return "skipped", "libreoffice_unavailable"
-    limit = PLAINTEXT_MAX_BYTES if ext in PLAINTEXT else MAX_BYTES
-    if size > limit:
+    if size > max_bytes(filename):
         return "skipped", "too_large"
     return "ok", None

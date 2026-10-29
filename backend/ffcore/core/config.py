@@ -86,6 +86,15 @@ class Settings(BaseSettings):
     knowledge_storage_dir: str = "/data/storage"
     convert_timeout_seconds: int = Field(default=600, gt=0)
     convert_parallelism: int = Field(default=4, gt=0)
+    # Converter process limits (review r1 MAJOR-5). Address space: a worker with Docling and
+    # PaddleOCR loaded peaked at 6.6 GB virtual / 2.3 GB resident on the samples (2026-10-29);
+    # the limit leaves room for both models plus a large file. CPU per file: six busy cores for
+    # the whole default timeout; the wall-clock timeout stays the main stop.
+    convert_memory_limit_mb: int = Field(default=10240, gt=0)
+    convert_cpu_limit_seconds: int = Field(default=3600, gt=0)
+    # One POST /documents request (all its files), checked before the body is parsed: the
+    # largest single file Kapı 0 accepts (scope.MAX_BYTES, 500 MiB) plus form overhead.
+    upload_max_request_bytes: int = Field(default=516 * 1024 * 1024, gt=0)
     # Where the ingest worker reaches POST /internal/embed (the API loads the model, C10).
     internal_api_url: str = "http://backend:8000"
 

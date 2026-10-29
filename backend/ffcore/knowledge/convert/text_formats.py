@@ -17,6 +17,7 @@ from pathlib import Path
 from xml.etree import ElementTree
 
 from ffcore.knowledge.convert.encoding import FALLBACK, UndecodableText, decode_text
+from ffcore.knowledge.convert.limits import LimitExceeded, inflate_raw
 from ffcore.knowledge.convert.types import MIN_TEXT_CHARS, ConversionResult, empty, failed
 
 _HTML_START = re.compile(r"^\s*(?:<!DOCTYPE|<html|<head|<body|<div|<p[\s>]|<table)", re.I)
@@ -174,7 +175,7 @@ def _drawio(path: Path) -> str:
     for match in re.finditer(r"<diagram[^>]*>([^<]+)</diagram>", raw):
         payload = match.group(1).strip()
         try:
-            labels.extend(_mx_labels(zlib.decompress(base64.b64decode(payload), -15).decode()))
+            labels.extend(_mx_labels(inflate_raw(base64.b64decode(payload)).decode()))
         except (ValueError, zlib.error, UnicodeDecodeError):
             labels.extend(_mx_labels(payload))
     labels.extend(_mx_labels(raw))
@@ -194,7 +195,10 @@ def _vsdx(path: Path) -> str:
 
 def convert_diagram(path: Path) -> ConversionResult:
     method = "vsdx-stdlib" if path.suffix.lower() == ".vsdx" else "drawio-stdlib"
-    text = (_vsdx(path) if method == "vsdx-stdlib" else _drawio(path)).strip()
+    try:
+        text = (_vsdx(path) if method == "vsdx-stdlib" else _drawio(path)).strip()
+    except LimitExceeded as exc:
+        return failed(method, exc.code, str(exc))
     if len(text) < MIN_TEXT_CHARS:
         return empty(text, method)
     return ConversionResult(f"# Diagram: {path.name}\n\n{text}\n", method)

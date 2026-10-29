@@ -5,6 +5,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 
 from ffcore.api import api_router, internal
+from ffcore.api.upload_limit import UploadSizeLimit
 from ffcore.core.audit import ensure_audit_partitions
 from ffcore.core.auth import register_credential_resolver
 from ffcore.core.config import get_settings
@@ -54,6 +55,8 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="FFCore", lifespan=lifespan)
 install_error_handlers(app)
+# 04a: upload size checked before the multipart body is parsed (review r1 MAJOR-5).
+app.add_middleware(UploadSizeLimit)
 app.include_router(api_router)
 app.include_router(internal.router)
 app.include_router(readiness_router)
