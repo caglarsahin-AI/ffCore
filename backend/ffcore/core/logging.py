@@ -162,12 +162,18 @@ def _scrub_extras(record: logging.LogRecord, secrets: tuple[str, ...]) -> None:
 
 
 def _scrub_value(value: Any, secrets: tuple[str, ...], depth: int) -> Any:
-    """Strings scrubbed; dicts, lists, tuples and sets walked (keys too); numbers kept; any
-    other object, and anything deeper than _MAX_DEPTH, becomes its scrubbed text."""
+    """Strings scrubbed; numbers scanned as their text and kept as they are when clean, masked
+    text when not (a TC number or a numeric secret can be an int; review r3, K-02-0019 A); dicts,
+    lists, tuples and sets walked (keys too); any other object, and anything deeper than
+    _MAX_DEPTH, becomes its scrubbed text."""
     if isinstance(value, str):
         return scrub(value, secrets)
-    if value is None or isinstance(value, bool | int | float):
+    if value is None or isinstance(value, bool):
         return value
+    if isinstance(value, int | float):
+        text = str(value)
+        clean = scrub(text, secrets)
+        return value if clean == text else clean
     if depth < _MAX_DEPTH:
         if isinstance(value, dict):
             return {

@@ -200,3 +200,50 @@ def test_02_r2_m1_extra_failure_leaves_no_raw_value(lf_secret):
         root.removeHandler(prior)
     out = prior_out.getvalue()
     assert "log_scrub_failed" in out and SECRET not in out
+
+
+# --- review r3 MAJOR-1: numbers in extra= go through the same scan (K-02-0019 A) ---
+
+NUMERIC_SECRET = "918273645501"  # a configured secret that is all digits
+
+
+def test_02_r3_m1_numeric_extra_values_scrubbed(lf_secret):
+    lf_secret.obo_jwt_secret = SecretStr(NUMERIC_SECRET)
+    root = logging.getLogger()
+    prior, prior_out = _structured(root, "%(message)s | %(tc)s | %(payload)s")
+    try:
+        configure_logging(lf_secret, level="DEBUG", stream=io.StringIO())
+        log = logging.getLogger("ffcore.test02r3")
+        later, later_out = _structured(log, "%(message)s | %(tc)s | %(payload)s")
+        try:
+            log.warning(
+                "numeric-event",
+                extra={
+                    "tc": int(TCKN),
+                    "payload": {
+                        "secret": int(NUMERIC_SECRET),
+                        "tc_float": float(TCKN),
+                        "nested": [{"id": int(TCKN)}, (int(NUMERIC_SECRET),)],
+                        "metric": 12,
+                        "ratio": 0.5,
+                        "flag": True,
+                    },
+                },
+            )
+        finally:
+            log.removeHandler(later)
+    finally:
+        root.removeHandler(prior)
+    for out in (prior_out.getvalue(), later_out.getvalue()):
+        assert "numeric-event" in out
+        assert TCKN not in out and NUMERIC_SECRET not in out
+        assert "'metric': 12" in out and "'ratio': 0.5" in out and "'flag': True" in out
+
+
+def test_02_r3_m1_clean_numbers_keep_type():
+    from ffcore.core.logging import _scrub_value
+
+    value = {"metric": 12, "ratio": 0.5, "flag": True, "ids": [7, 1500]}
+    assert _scrub_value(value, (NUMERIC_SECRET,), 0) == value
+    assert type(_scrub_value(12, (), 0)) is int and type(_scrub_value(0.5, (), 0)) is float
+    assert _scrub_value(int(TCKN), (), 0) != int(TCKN)
