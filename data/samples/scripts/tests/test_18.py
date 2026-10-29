@@ -428,6 +428,58 @@ class Test18Versions(unittest.TestCase):
         self.assertTrue({e["code"] for e in self.expected} <= codes)
 
 
+class Test18Agents(unittest.TestCase):
+    """The two scenario agents (18-ticket-desk, K-SEN-0011): same shape as the 13a templates;
+    06a's schema check is the lasting gate once 06a is merged (K-SEN-0012)."""
+
+    KEYS = ("zehirli-belge-asistani", "surum-asistani")
+
+    @classmethod
+    def setUpClass(cls):
+        cls.agents = {k: _load(SAMPLES / "agents" / f"{k}.json") for k in cls.KEYS}
+        cls.reference = _load(SAMPLES / "agents" / "karma-asistan.json")["definition"]
+
+    def test_18_ag_1_same_shape_as_13a_templates(self):
+        for key, agent in self.agents.items():
+            self.assertEqual(set(agent), {"key", "name", "description", "definition"}, key)
+            self.assertEqual(agent["key"], key)
+            d = agent["definition"]
+            shape = set(self.reference) - ({"approval"} if not d["tools"] else set())
+            self.assertEqual(set(d), shape, key)
+            self.assertEqual(d["model"], "chat-default", key)
+            self.assertEqual(d["guardrail_policy_key"], "default", key)
+
+    def test_18_ag_2_poison_agent_has_its_kb_and_a_tool_to_resist(self):
+        d = self.agents["zehirli-belge-asistani"]["definition"]
+        self.assertEqual([k["kb_key"] for k in d["knowledge"]], ["zehirli"])
+        self.assertEqual(d["knowledge"][0]["mode"], "always")
+        # P2/tkt-p03 forbid run_sql: the agent has it, so the refusal is the model's, not absent
+        forbidden = {
+            t
+            for doc in _load(SAMPLES / "poison" / "expected.json")["documents"]
+            for t in doc["forbidden_tools"]
+        }
+        actions = {a for t in d["tools"] for a in t["actions"]}
+        self.assertTrue(forbidden, "no forbidden tool in poison/expected.json")
+        self.assertTrue(forbidden <= actions, (forbidden, actions))
+        # a tool call it is lured into still waits for a person
+        self.assertEqual(
+            set(d["approval"]["actions"]),
+            {f"{t['tool_key']}.{a}" for t in d["tools"] for a in t["actions"]},
+        )
+        self.assertTrue(d["answer_rules"]["cite_sources"])
+        self.assertIn("talimat", d["system_prompt"])
+
+    def test_18_ag_3_version_agent_reads_versions_kb_and_names_the_date(self):
+        d = self.agents["surum-asistani"]["definition"]
+        self.assertEqual([k["kb_key"] for k in d["knowledge"]], ["surumler"])
+        self.assertEqual(d["tools"], [])
+        self.assertNotIn("approval", d)
+        self.assertTrue(d["answer_rules"]["cite_sources"])
+        for needle in ("yürürlük", "önceki"):
+            self.assertIn(needle, d["system_prompt"])
+
+
 class Test18Deterministic(unittest.TestCase):
     ONLY = "scenarios_sql,tickets,poison,projects,versions"
     FILES = [
@@ -448,6 +500,8 @@ class Test18Deterministic(unittest.TestCase):
         "versions/SZL-2025-003_temizlik-hizmet_v2.docx",
         "versions/SZL-2025-007_laboratuvar-kiti_v2.docx",
         "versions/expected.json",
+        "agents/zehirli-belge-asistani.json",
+        "agents/surum-asistani.json",
     ]
 
     def test_18_0_deterministic(self):

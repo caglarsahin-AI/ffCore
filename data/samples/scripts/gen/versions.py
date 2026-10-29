@@ -11,7 +11,7 @@ import json
 import random
 from pathlib import Path
 
-from . import contracts, docx, write_text
+from . import agents, contracts, docx, write_text
 
 EFFECTIVE = "2025-09-01"
 
@@ -91,6 +91,28 @@ def build(seed: int) -> list[dict]:
     return out
 
 
+# F13 agent (18-ticket-desk): reads the versions KB, answers from the newest version and names
+# the date it took effect; an older value appears only as the previous one (PayCore D5).
+AGENT = {
+    "key": "surum-asistani",
+    "name": "Sürüm Asistanı",
+    "description": "Sözleşmelerin en güncel sürümünden, yürürlük tarihini belirterek cevap "
+    "verir (F13 sınaması).",
+    "definition": agents._definition(
+        "Sen {{hospital_name}} için sözleşme asistanısın. Bir sözleşmenin birden çok sürümü "
+        "varsa cevabı en güncel sürümden ver ve o sürümün yürürlük tarihini GG.AA.YYYY "
+        "biçiminde yaz. Eski sürümdeki değeri yalnızca önceki değer olarak an. Yalnızca verilen "
+        "parçalara dayan ve kaynağı göster; parçalarda cevap yoksa bunu açıkça söyle.",
+        knowledge=[{"kb_key": "surumler", "mode": "always", "top_k": 8, "min_score": None}],
+        tools=[],
+        approval=None,
+        ask_user=False,
+        limits=agents.LIMITS,
+        answer_rules=agents._answer_rules(True, "Bu bilgi belgelerde yok."),
+    ),
+}
+
+
 def generate(rng: random.Random, out: Path, seed: int) -> None:
     # rng is unused: v2 must replay 13a's own contracts stream (see module docstring).
     base = out / "versions"
@@ -116,3 +138,5 @@ def generate(rng: random.Random, out: Path, seed: int) -> None:
             }
         )
     write_text(base / "expected.json", json.dumps(expected, ensure_ascii=False, indent=2) + "\n")
+    agent = json.dumps(AGENT, ensure_ascii=False, indent=2) + "\n"
+    write_text(out / "agents" / f"{AGENT['key']}.json", agent)
