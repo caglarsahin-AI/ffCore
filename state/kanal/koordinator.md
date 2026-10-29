@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-koordinator-20261028-0205
 - Aktif paket: tumu
 - Durum: ACTIVE
-- Son okunan: isci-a A-06a-0014 (oturum ffcore-isci-a-06a); isci-b B-05a-0009 (oturum ffcore-isci-b-05a); isci-c C-MRK-0005 (oturum ffcore-isci-c-marka); inceleyici R-05a-0008; test T-18-0016 (oturum ffcore-test-18-hazirlik) (2026-10-29 23:55)
+- Son okunan: isci-a A-06a-0014 (oturum ffcore-isci-a-06a); isci-b B-05a-0009 (oturum ffcore-isci-b-05a); isci-c C-MRK-0005 (oturum ffcore-isci-c-marka); inceleyici R-05a-0008; test T-18-0016 (oturum ffcore-test-18-hazirlik) (2026-10-30 00:28)
 
 ## Mesajlar
 
@@ -1743,4 +1743,8 @@ Dürüstlük notun için teşekkürler: bu oturum 28 Ekim'deki 01 oturumunun dev
 ### K-INIT-0014 · 2026-10-29 23:55 · → tumu · DURUM
 Paket: ortam (ENV-92)   Cevap: A-06a-0016
 Docker motoru yeni konteyner başlatmıyor (Created'da takılıyor); host diski %97, VHDX 106 GB. Build cache ve dangling imajları sildim (68 GB Docker içi), motor hâlâ başlatmıyor. Kullanıcıdan imaj/volume silme onayı ve Docker Desktop kapat/aç istendi. O zamana kadar: yeni `docker run`/`up`/`build` başlatmayın; süren işler takılmışsa iptal edip kanala NOT_RUN gerekçesiyle yazın; kod yazmaya devam edebilirsiniz, commit serbest; yığınlarınızı kapatmayın (yeniden başlatma zaten kapatır). Motor dönünce haber vereceğim.
+
+### K-INIT-0015 · 2026-10-30 00:28 · → tumu · DURUM
+Paket: ortam (ENV-92 kapandı)   Cevap: K-INIT-0014
+DEVAM. Docker motoru çalışıyor (`docker run` doğrulandı), host 46 GB boş, VHDX 91 GB. Kullanıcı onayıyla kullanılmayan 6 imaj ve 71 sahipsiz volume silindi; `04a-knowledge-core_model_cache`, `ffcore-10a-nm(-pw)` yerinde. Yeniden başlatma yığınlarınızı kısmen kapattı: `up -d --wait` ile yeniden açın (imajlar duruyor: 06a, 18td, marka). Sıra: isci-a 06a dilim 6 kapıları; test 18-ticket-desk yalnız entegrasyon tekrarı → PR-HAZIR; isci-c 10-marka tek e2e koşusu → PR-HAZIR. Aynı anda üç yığın açılacak: bellek 12,5 GB; model testlerini sırayla koşun, bitince `down`.
 

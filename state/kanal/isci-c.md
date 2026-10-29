@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-c-marka
 - Aktif paket: 10-marka (feat/10-brand-icon)
 - Durum: ACTIVE
-- Son okunan: koordinator K-MRK-0002 (2026-10-29 22:00); son yazılan C-MRK-0005
+- Son okunan: koordinator K-INIT-0014 (2026-10-29 23:55); son yazılan C-MRK-0006
 
 ## Mesajlar
 
@@ -483,3 +483,19 @@ Madde 1 için uygulama notu: statik `public/manifest.webmanifest` json'u okuyama
 Ara durum: hedefli e2e 10/10 yeşil (kırmızı 10/10 doğru nedenle düştükten sonra). lint 0, tsc 0, Vitest 114/114. `make_web_brand.py --check` 9 dosya güncel ve deterministik.
 Bulgu: docs/onyuz.md'deki `ALLOWED_INTERNAL_HOSTS=litellm,fake-llm` komutu 02'den beri backend'i açmıyor (LANGFUSE_HOST izinli host değil). Komut `litellm,langfuse-web,fake-llm` olarak düzeltildi.
 Tam e2e regresyon koşusu (iki aşama) sürüyor. Slogan değişikliği koşu bitince uygulanacak.
+
+### C-MRK-0006 · 2026-10-30 00:05 · → koordinator · DURUM
+Paket: 10-marka   Cevap: K-MRK-0002 / K-MRK-0003 / K-MRK-0004 / K-INIT-0014
+DURUM: IMPLEMENTED (VERIFIED değil). HEAD 92cc9a35da5a4f5927124d182e35e652d79d46ae (feat/10-brand-icon, tek commit b6fc3d8 üstüne). Ayrıntı: state/pr/10-marka.md.
+Uygulanan: D1-D3 A; K-MRK-0002 md. 1-4 (alt başlık EN/TR, README satır 3/22/26, pyproject description, test beklentileri); K-MRK-0003 "FastFlow (FF) ürün ailesi"; K-MRK-0004 `app/manifest.ts` (lint için tek satırlık gerekçeli disable, renk tek sabitte).
+Kanıt:
+- Kırmızı 10/10 → yeşil 10/10 (slogan öncesi).
+- Son HEAD'de eslint 0, tsc 0, Vitest 114/114 (çıkış kodları borusuz).
+- `make_web_brand.py --check` 0, deterministik.
+- Not: önceki mesajdaki "lint 0" `tail`'in çıkış koduydu. Gerçek koşu `manifest.ts` renk ihlalini yakaladı, düzeltildi.
+NOT_RUN (ENV-92):
+- Slogan sonrası 10mrk e2e ve `10mrk-*.png`. Bu PNG'ler eski alt başlığı gösteriyor.
+- Tam e2e regresyonu.
+  - Koşu 1: 92 ✓ / 9 ✘, hepsi bilgi tabanı. Backend aşama 2'de `FAKE_EMBED=1` almadan kaldı; docs'a `--force-recreate` + `printenv` eklendi.
+  - Koşu 2: env doğrulandı, 79 ✓ / 6 ✘ (`10bp1_10/11/18/2`, `10af_12 provider form dark`), sonra motor takıldı ve iptal ettim. Neden doğrulanmadı.
+Docker dönünce tek koşu (iki aşama) yapıp PR-HAZIR göndereceğim. Yığın `marka` ayakta bırakıldı (talimat).

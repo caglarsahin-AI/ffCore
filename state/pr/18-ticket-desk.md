@@ -1,7 +1,7 @@
 # PR 18-ticket-desk
 
 **Paket:** 18-ticket-desk · **Sınıf:** [A] · **Branch:** feat/18-ticket-desk · **Baz commit:** main 6f2a1ec · `FFCORE_VERSION=0.0.0-18td`
-GOREV K-SEN-0011, plan onayı K-SEN-0012. Durum: GATES_RUNNING
+GOREV K-SEN-0011, plan onayı K-SEN-0012. Durum: KAPI EKSİK (entegrasyon koşusu Docker motoru takıldığı için yarıda; K-INIT-0014). Commit'ler: dd1efc4, 6fef110, 6a5db20, 134f868; e2e dalı aa937b0
 
 ## Plan
 
@@ -49,10 +49,10 @@ Ortak: `FFCORE_VERSION=0.0.0-18td MSYS_NO_PATHCONV=1 docker compose -p ffcore-18
 | Komut | Ortam | Exit | Sonuç |
 |---|---|---|---|
 | `make lint` | tools | 0 | All checks passed; 250 dosya biçimli |
-| `make test-samples` (+ `generate.py`, git status: yalnız beklenen iki dosya) | tools | GATES | |
-| `make test` | `DEPLOY_PROFILE=llmaas` | GATES | |
-| `make test` | `DEPLOY_PROFILE=airgap` | GATES | |
-| `pytest tests/integration/test_18td_tools_api.py test_05a_tools_api.py test_05a_sql.py` | postgres, redis, ticket-desk ayakta | GATES | |
+| `make test-samples` (+ `generate.py`; ek fark yok) | tools | 0 | 53 test, OK (skipped=5: RUN_PG_TESTS kapalı) |
+| `make test` | `DEPLOY_PROFILE=llmaas` | 0 | 583 passed (2:37) |
+| `make test` | `DEPLOY_PROFILE=airgap` | 0 | 583 passed (2:15) |
+| `pytest tests/integration/test_18td_tools_api.py test_05a_tools_api.py test_05a_sql.py` | postgres, redis, ticket-desk ayakta | NOT_RUN (yarıda) | 65 test geçti (1 skip), hata yok; sonra Docker motoru takıldı (disk %97, K-INIT-0014), görev iptal edildi. test_18td_tools_api daha önce ayrı koşuda 3/3 geçti. Motor dönünce tekrar |
 | 08 yük kanıtı: 21 CPU yakıcı (7 çekirdek) + `pytest test_08_cost.py::test_08_9_repeated…[10000-1.0]` ×3 | tools | 1 | eski ölçü: 3/3 `evaluate did not finish within 1.0 s` |
 | aynı yük + `pytest tests/unit/test_08_cost.py` ×5 | tools | 0 | yeni ölçü: 6 passed ×5; yüksüz 6 passed |
 | küçük bütçe (0.01 s, HANG_FACTOR 1000) | tools | — | CPU ataması düşüyor: bütçe hâlâ dişli |

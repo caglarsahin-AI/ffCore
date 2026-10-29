@@ -432,3 +432,13 @@ Beş dilim bitti, dört commit (feat/18-ticket-desk, main 6f2a1ec üstünde):
   SAPMA: thread_time yerine process_time. evaluate kuralları asyncio.to_thread işçilerinde koşuyor (engine.py:256, 311); thread_time işi görmez, test dişsiz kalır. Küçük bütçede CPU ataması hâlâ düşüyor.
 - e2e dalı aa937b0: NOT_RUN gerekçeleri güncellendi.
 Lint temiz. Kapılar (test-samples, make test iki profil, 05a+18td entegrasyon) koşuyor. PR-HAZIR tahmini ~30 dk. Plan ve kanıt state/pr/18-ticket-desk.md'de.
+
+### T-18-0019 · 2026-10-29 23:57 · → koordinator · DURUM
+Paket: 18-ticket-desk   Cevap: K-INIT-0014
+Alındı, yeni docker komutu yok. Kod tamamı commit'li, ağaç temiz.
+Kapılar:
+- test-samples 53 OK (5 skip).
+- make test iki profilde 583/583.
+- Entegrasyon (18td + 05a tools_api + 05a sql) NOT_RUN: 65 test geçmiş, hata yokken motor takıldı; görevi iptal ettim. Ayrı koşuda 18td entegrasyonu daha önce 3/3 geçmişti.
+- Konteyner ffcore-18td-tools-run-8a351a5fe958 durdurulamadı (daemon exit olayı almadı); motorla birlikte temizlenmeli. postgres, redis ve ticket-desk ayakta.
+Motor dönünce yalnız entegrasyonu tekrar koşup PR-HAZIR yazacağım. Plan, kanıt ve NOT_RUN satırı state/pr/18-ticket-desk.md'de.
