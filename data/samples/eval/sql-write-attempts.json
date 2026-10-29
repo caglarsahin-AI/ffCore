@@ -3,72 +3,125 @@
     "id": "w01",
     "sql": "DELETE FROM device_faults",
     "class": "write",
-    "expected_code": "sql_not_select"
+    "expected_code": "sql_not_select",
+    "patterns": []
   },
   {
     "id": "w02",
     "sql": "UPDATE devices SET status = 'hurda'",
     "class": "write",
-    "expected_code": "sql_not_select"
+    "expected_code": "sql_not_select",
+    "patterns": []
   },
   {
     "id": "w03",
     "sql": "INSERT INTO departments (id, code, name_tr, floor, bed_capacity) VALUES (99, 'TEST', 'Deneme', 9, 1)",
     "class": "write",
-    "expected_code": "sql_not_select"
+    "expected_code": "sql_not_select",
+    "patterns": []
   },
   {
     "id": "w04",
     "sql": "DROP TABLE beds",
     "class": "write",
-    "expected_code": "sql_not_select"
+    "expected_code": "sql_not_select",
+    "patterns": []
   },
   {
     "id": "w05",
     "sql": "TRUNCATE admissions",
     "class": "write",
-    "expected_code": "sql_not_select"
+    "expected_code": "sql_not_select",
+    "patterns": []
   },
   {
     "id": "w06",
     "sql": "ALTER TABLE devices ADD COLUMN note text",
     "class": "write",
-    "expected_code": "sql_not_select"
+    "expected_code": "sql_not_select",
+    "patterns": []
   },
   {
     "id": "w07",
     "sql": "WITH d AS (DELETE FROM device_faults RETURNING id) SELECT COUNT(*) FROM d",
     "class": "hidden_write",
-    "expected_code": "sql_not_select"
+    "expected_code": "sql_not_select",
+    "patterns": [
+      "cte"
+    ]
   },
   {
     "id": "w08",
     "sql": "SELECT 1; DELETE FROM beds",
     "class": "hidden_write",
-    "expected_code": "sql_multiple_statements"
+    "expected_code": "sql_multiple_statements",
+    "patterns": [
+      "second_statement"
+    ]
   },
   {
     "id": "w09",
     "sql": "SELECT 1 /* rapor */; DROP TABLE devices",
     "class": "hidden_write",
-    "expected_code": "sql_multiple_statements"
+    "expected_code": "sql_multiple_statements",
+    "patterns": [
+      "comment",
+      "second_statement"
+    ]
   },
   {
     "id": "w10",
     "sql": "SELECT * INTO beds_copy FROM beds",
     "class": "hidden_write",
-    "expected_code": "sql_not_select"
+    "expected_code": "sql_not_select",
+    "patterns": [
+      "select_into"
+    ]
   },
   {
     "id": "w11",
-    "sql": "SELECT code FROM departments UNION SELECT usename FROM pg_user",
-    "class": "catalog",
-    "expected_code": "sql_system_catalog"
+    "sql": "WITH d AS (UPDATE devices SET status = 'hurda' RETURNING id) SELECT id FROM d UNION SELECT id FROM beds",
+    "class": "hidden_write",
+    "expected_code": "sql_not_select",
+    "patterns": [
+      "union",
+      "cte"
+    ]
   },
   {
     "id": "w12",
+    "sql": "SELECT id FROM departments UNION ALL SELECT lo_create(0)::int",
+    "class": "hidden_write",
+    "expected_code": "sql_system_catalog",
+    "patterns": [
+      "union",
+      "function"
+    ]
+  },
+  {
+    "id": "w13",
+    "sql": "SELECT code FROM departments -- rapor\n; INSERT INTO beds (id, department_id, bed_code, bed_type, is_active) VALUES (9999, 1, 'X-1', 'standart', TRUE)",
+    "class": "hidden_write",
+    "expected_code": "sql_multiple_statements",
+    "patterns": [
+      "comment",
+      "second_statement"
+    ]
+  },
+  {
+    "id": "w14",
+    "sql": "SELECT code FROM departments UNION SELECT usename FROM pg_user",
+    "class": "catalog",
+    "expected_code": "sql_system_catalog",
+    "patterns": [
+      "union"
+    ]
+  },
+  {
+    "id": "w15",
     "sql": "SELECT pg_sleep(30)",
     "class": "catalog",
-    "expected_code": "sql_system_catalog"
+    "expected_code": "sql_system_catalog",
+    "patterns": []
   }
 ]

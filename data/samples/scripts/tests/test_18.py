@@ -38,6 +38,19 @@ CLASS_COUNTS = {"access": 5, "billing": 4, "bug": 5, "how_to": 4, "other": 2}
 REGEX_CATEGORIES = {"TR_NATIONAL_ID", "TR_PHONE", "TR_IBAN", "EMAIL_ADDRESS", "CREDIT_CARD"}
 # 05a SqlRejected codes (feat/05a-tools-mcp a55ca54). Checked against the real validator only
 # after 05a merges (K-SEN-0002 condition 2); until then this list is the reference.
+# How a write is hidden (sql-write-attempts.json `patterns`) and the text that proves it.
+WRITE_PATTERNS = {
+    "union": r"(?i)\bunion\b",
+    "cte": r"(?i)^\s*with\b",
+    "comment": r"/\*|--",
+    "function": r"(?i)\b(lo_create|lo_import|setval|nextval)\s*\(",
+    "second_statement": r";\s*\S",
+    "select_into": r"(?i)\bselect\b[^;]*\binto\b",
+}
+# A statement that would change data or schema if it ran.
+WRITE_EFFECT = (
+    r"(?i)\b(delete|update|insert|drop|truncate|alter|into|lo_create|lo_import|setval|nextval)\b"
+)
 SQL_REJECT_CODES = {
     "sql_parse_error",
     "sql_multiple_statements",
@@ -149,25 +162,30 @@ class Test18Sql(unittest.TestCase):
 
     def test_18_f3_6_write_attempts_cover_classes(self):
         attempts = _load(SAMPLES / "eval" / "sql-write-attempts.json")
-        self.assertEqual(len(attempts), 12)
-        self.assertEqual(len({a["id"] for a in attempts}), 12)
+        self.assertEqual(len({a["id"] for a in attempts}), len(attempts))
         for a in attempts:
-            self.assertEqual(set(a), {"id", "sql", "class", "expected_code"}, a["id"])
+            self.assertEqual(set(a), {"id", "sql", "class", "expected_code", "patterns"}, a["id"])
             self.assertIn(a["expected_code"], SQL_REJECT_CODES, a["id"])
             self.assertIn(a["class"], {"write", "hidden_write", "catalog"}, a["id"])
+            self.assertTrue(set(a["patterns"]) <= set(WRITE_PATTERNS), a["id"])
+            # every declared pattern is really in the statement
+            for pattern in a["patterns"]:
+                self.assertRegex(a["sql"], WRITE_PATTERNS[pattern], (a["id"], pattern))
+            # a hidden write must actually try to write (review r1 MAJOR-1)
+            if a["class"] == "hidden_write":
+                self.assertRegex(a["sql"], WRITE_EFFECT, a["id"])
         joined = " ".join(a["sql"].lower() for a in attempts)
-        for needle in (
-            "delete",
-            "update ",
-            "insert ",
-            "drop table",
-            "with ",
-            "/*",
-            " into ",
-            "pg_",
-        ):
+        for needle in ("delete", "update ", "insert ", "drop table", "truncate", "alter "):
             self.assertIn(needle, joined)
-        self.assertGreaterEqual(sum(a["class"] == "hidden_write" for a in attempts), 3)
+
+    def test_18_f3_6b_hidden_write_pattern_coverage(self):
+        """Each way of hiding a write has at least one hidden_write record (r1 MAJOR-1:
+        the UNION case had been a catalog read)."""
+        attempts = _load(SAMPLES / "eval" / "sql-write-attempts.json")
+        hidden = [a for a in attempts if a["class"] == "hidden_write"]
+        covered = {p for a in hidden for p in a["patterns"]}
+        for pattern in ("union", "cte", "comment", "function", "second_statement", "select_into"):
+            self.assertIn(pattern, covered, pattern)
 
 
 class Test18Tickets(unittest.TestCase):

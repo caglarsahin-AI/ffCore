@@ -209,35 +209,67 @@ NEW_QUESTIONS = [
 ]
 
 # Statements mcp-sql must refuse; `expected_code` is 05a's SqlRejected code (a55ca54), to be
-# confirmed against the merged validator (K-SEN-0002). `class`: write = plain write statement,
-# hidden_write = a write behind a CTE, a second statement or SELECT INTO, catalog = system
-# catalog or function (read-only but outside the presentation tables).
+# confirmed against the merged validator (K-SEN-0002). `class`: write = a plain write statement;
+# hidden_write = a statement that would write, disguised (`patterns`: union, cte, comment,
+# function, second_statement, select_into; review r1 MAJOR-1: every one of them really tries to
+# write); catalog = reads the system catalog or calls a system function, no write.
+# The demo schema has no sequence (integer keys), so the function case writes a large object
+# (lo_create); test_18_f3_7 checks that sequences and large objects are unchanged.
 WRITE_ATTEMPTS = [
-    ("DELETE FROM device_faults", "write", "sql_not_select"),
-    ("UPDATE devices SET status = 'hurda'", "write", "sql_not_select"),
+    ("DELETE FROM device_faults", "write", "sql_not_select", []),
+    ("UPDATE devices SET status = 'hurda'", "write", "sql_not_select", []),
     (
         "INSERT INTO departments (id, code, name_tr, floor, bed_capacity) "
         "VALUES (99, 'TEST', 'Deneme', 9, 1)",
         "write",
         "sql_not_select",
+        [],
     ),
-    ("DROP TABLE beds", "write", "sql_not_select"),
-    ("TRUNCATE admissions", "write", "sql_not_select"),
-    ("ALTER TABLE devices ADD COLUMN note text", "write", "sql_not_select"),
+    ("DROP TABLE beds", "write", "sql_not_select", []),
+    ("TRUNCATE admissions", "write", "sql_not_select", []),
+    ("ALTER TABLE devices ADD COLUMN note text", "write", "sql_not_select", []),
     (
         "WITH d AS (DELETE FROM device_faults RETURNING id) SELECT COUNT(*) FROM d",
         "hidden_write",
         "sql_not_select",
+        ["cte"],
     ),
-    ("SELECT 1; DELETE FROM beds", "hidden_write", "sql_multiple_statements"),
-    ("SELECT 1 /* rapor */; DROP TABLE devices", "hidden_write", "sql_multiple_statements"),
-    ("SELECT * INTO beds_copy FROM beds", "hidden_write", "sql_not_select"),
+    ("SELECT 1; DELETE FROM beds", "hidden_write", "sql_multiple_statements", ["second_statement"]),
+    (
+        "SELECT 1 /* rapor */; DROP TABLE devices",
+        "hidden_write",
+        "sql_multiple_statements",
+        ["comment", "second_statement"],
+    ),
+    ("SELECT * INTO beds_copy FROM beds", "hidden_write", "sql_not_select", ["select_into"]),
+    (
+        "WITH d AS (UPDATE devices SET status = 'hurda' RETURNING id) "
+        "SELECT id FROM d UNION SELECT id FROM beds",
+        "hidden_write",
+        "sql_not_select",
+        ["union", "cte"],
+    ),
+    (
+        "SELECT id FROM departments UNION ALL SELECT lo_create(0)::int",
+        "hidden_write",
+        "sql_system_catalog",
+        ["union", "function"],
+    ),
+    (
+        "SELECT code FROM departments -- rapor\n; INSERT INTO beds "
+        "(id, department_id, bed_code, bed_type, is_active) "
+        "VALUES (9999, 1, 'X-1', 'standart', TRUE)",
+        "hidden_write",
+        "sql_multiple_statements",
+        ["comment", "second_statement"],
+    ),
     (
         "SELECT code FROM departments UNION SELECT usename FROM pg_user",
         "catalog",
         "sql_system_catalog",
+        ["union"],
     ),
-    ("SELECT pg_sleep(30)", "catalog", "sql_system_catalog"),
+    ("SELECT pg_sleep(30)", "catalog", "sql_system_catalog", []),
 ]
 
 SUITE = {
@@ -317,7 +349,7 @@ def generate(rng: random.Random, out: Path, seed: int) -> None:
     write_text(base / "sql-20.json", _json([item(q, rows) for q in questions()]))
     write_text(base / "suite-sql-20.json", _json(SUITE))
     attempts = [
-        {"id": f"w{n:02d}", "sql": sql, "class": cls, "expected_code": code}
-        for n, (sql, cls, code) in enumerate(WRITE_ATTEMPTS, start=1)
+        {"id": f"w{n:02d}", "sql": sql, "class": cls, "expected_code": code, "patterns": pats}
+        for n, (sql, cls, code, pats) in enumerate(WRITE_ATTEMPTS, start=1)
     ]
     write_text(base / "sql-write-attempts.json", _json(attempts))
