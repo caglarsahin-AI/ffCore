@@ -74,3 +74,5 @@ K-10af-0002 D1/D4 ve FOLLOWUP-79/80 kabul edilmiş sınırlardır: proje admin'i
 Kendi `docker compose -p review-10af-r1 --env-file .env.test --profile test down -v --remove-orphans` exit 0; kendi çalışma/bağımlılık volume'ları `docker volume rm review-10af-r1-work review-10af-r1-nm` exit 0. Son `docker volume ls --filter name=review-10af-r1` çıktısı boş; korunan `ffcore-10a-nm` ve `ffcore-10a-nm-pw` mevcut. Yalnız kendi review kaynakları kaldırıldı.
 
 HEAD tam SHA eşit, `git status --porcelain --untracked-files=normal` boş olarak yeniden doğrulandı; `git worktree remove C:\ai_paycore\ffcore\.worktrees\review-10af-r1` exit 0; `--force` kullanılmadı. Ana çalışma kopyasında checkout/switch, ürün kaynak değişikliği, commit/push yapılmadı. Küçük sentetik probe/sonuç kanıtları `.worktrees/review-10af-r1-evidence/` altında paket kapanışına kadar kaldı; review imaj etiketlerini koordinatör temizleyebilir.
+
+Paket kapanışı (2026-10-29 09:33): K-10af-0012 uyarınca r1/r2 geçici evidence dizinleri, mutlak hedefler ve reparse-point yokluğu doğrulandıktan sonra kaldırıldı; ikisinin de bulunmadığı doğrulandı. Rapor ve kanaldaki sonuç kanıtı korunuyor.

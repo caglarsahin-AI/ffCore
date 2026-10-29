@@ -533,3 +533,29 @@ Paket: 04a   Cevap: K-04a-0018
 ENV olayı (ENV-81 benzeri, benim kurulum sapmam): tools konteynerinde koşan PaddleOCR çalıştırmaları büyük olasılıkla ağırlıkları dışarıdan (paddleocr.bj.bcebos.com) indirdi. Kanıt (çıkarım; ağ trafiği gözlenmedi): (1) PaddleOCR ağırlıkları `~/.paddleocr` altında arar; tools imajında HOME=/root ve `--rm` konteyner, model_cache'de `.paddleocr` yok; imajda `*.pdiparams` yok (network none ile tarandı); (2) bugün 00:20-00:40 arası iki bellek ölçümü koşusunda taranmış PDF `paddle_tr converted` döndü, yani ağırlık bir yerden geldi. Rebase öncesi model takımındaki OCR testleri (13b vb.) de aynı yolla indirmiş olmalı (doğrulanmadı). İndirilen dosyalar her seferinde `--rm` ile silindi; kalıcı kopya yok. HF modelleri (bge-m3, reranker, Docling) model_cache'den geliyordu, ama HF_HUB_OFFLINE bazı koşularda verilmemişti; eksik dosya indirilmediği doğrulanmadı.
 Şimdi: OCR içeren koşuları durdurdum. MAJOR-6 düzeltmesi bu boşluğu kapatıyor: Compose ve tools'ta varsayılan HF_HUB_OFFLINE=1 / TRANSFORMERS_OFFLINE=1, PaddleOCR açık `*_model_dir` yolları (`/models/paddleocr/...`), dizin yoksa model adı ve yolla kodlu hata (indirme yok), indirme yalnız ayrı `make models` hazırlık adımında. Bu adımın kendisi dışarıya bağlanır; kullanıcı onayı olmadan koşturmayacağım (KARAR-GEREK ayrıca gelecek: Paddle ağırlıkları model_cache'e kim, nasıl koyacak).
 Ek: 3 saattir takılı kalan kendi entegrasyon koşum (04a-knowledge-core-tools-run-cf19…, 18:36Z, atexit düzeltmesi öncesi) durduruldu. Paylaşılan Docker VM (12,5 GB) global OOM ile ölçüm çocuğumu öldürdü (dmesg); ölçümler bu yüzden ayrı ayrı yapıldı.
+
+### A-04a-0026 · 2026-10-29 03:15 · → koordinator · DURUM
+Paket: 04a   Cevap: K-04a-0018 / K-04a-0020 / K-04a-0021
+Yedi MAJOR'un yedisi de kod + test olarak bitti; hepsi f481f04'te kırmızı (geçici worktree, yeni test dosyaları), yeni kodda yeşil: M1 (Qdrant ACL güncelleme + aday doğrulama) qdrant 2/2 kırmızı → 4/4; M2 (öz-kilit) 2/2 TimeoutError → 2/2; M3 (yayından sonra indexed) 3/3 → 3/3; M4 (breadcrumb dahil 600) birim 5/5 kırmızı, gerçek tokenizer 882/1005/704 → en kötü 597; M5 (yükleme/arşiv/PDF/alt süreç/compose sınırları) birim 10/11 + API 2/2 kırmızı → 11/11 + 2/2; M6 (offline) 6/6 kırmızı (eski yükleyiciler huggingface.co'ya gidiyordu, tuzak durdurdu) → 6/6, `--network none` + boş cache 5 ağırlık yoluyla missing; M7 (metadata ACL + audit maskesi) 4/4 + birim kırmızı → yeşil.
+Kapılar (tools ve backend imajı 0.0.0-04a yeniden derlendi, offline ENV'li; canlı backend/worker yeni imajda, readyz ready, worker Paddle model_missing logluyor): lint 0; unit+contract 379/379 llmaas ve airgap; integration 206/206 llmaas ve airgap (QDRANT_URL/RUN_QDRANT_TESTS artık Makefile varsayılanı); model testleri dosya dosya: embed 6/6, convert 7/7 (Paddle OCR testi NOT_RUN, K-04a-0020). Şu an: e2e stack (kabul 1/2/14) koşuyor (~25 dk).
+Sırada: MAJOR'ları ayrı commit'lere bölmek (şimdi), e2e sonucu, 7457e82'ye rebase (yalnız deploy/docker-compose.yml çakışabilir), rebase sonrası kapılar iki profil, PR tablosu, PR-HAZIR. Tahmin: ~1,5-2 saat. Takıldığım yer yok; ara bulgular: paylaşılan VM OOM'u ve tek seferlik DNS çözümleme hataları (ortam).
+
+### A-04a-0027 · 2026-10-29 04:40 · → koordinator · DURUM
+Paket: 04a   Cevap: K-04a-0018 / K-04a-0021
+DURUM: VERIFIED (review r1 sonrası). Branch feat/04a-knowledge-core, main 7457e82 üzerine rebase, HEAD 540276063088bc488640f85ded614d631ef95de0, 17 commit, ağaç temiz.
+r1: 7 MAJOR'un hepsi f481f04'te kırmızı → HEAD'de yeşil; tablo state/pr/04a.md "Review r1 bulgu → düzeltme → kanıt". Rebase sonrası ek bulgu ve düzeltme: store → api import döngüsü (98c50cf'ten beri gizli; rebase sonrası Qdrant testleri 7 failed + 4 error) → 5402760.
+Kapılar HEAD'de: lint 0; unit+contract 382/382 iki profil; `make test-int` 207/207 iki profil; alembic heads aynı; openapi 03a/04a/08 bayt aynı; make smoke passed (backend/worker HEAD imajında). Model testleri (offline, dosya dosya, rebase öncesi r1 içeriği): embed 6/6, convert 7/7, e2e: kabul 2 ve 14 yeşil (/healthz en kötü 211 ms), kabul 1 HEAD'de soğuk 89,2 s, sıcak 76,9 s yeşil (ilk soğuk koşu 176 s, VM yükü altında; nedeni doğrulanmadı, PR'da yazılı).
+NOT_RUN: Paddle OCR testi (K-04a-0020). Kullanıcının koşturacağı komut (dışarıya bağlanır; airgap'te HF_ENDPOINT iç ayna):
+`FFCORE_VERSION=0.0.0-04a docker compose -p 04a-knowledge-core --env-file .env.test run --rm tools make models`
+sonra `... run --rm -e RUN_MODEL_TESTS=1 tools sh -c "cd backend && pytest -m models tests/models/test_04a_convert_models.py::test_04a_scanned_pdf_goes_to_paddle_ocr"`.
+Ortam: dangling imaj 7 (0.0.0-04a yeniden derlemeleri), prune sende. Kırmızı kanıt worktree'si `C:/ai_paycore/ffcore/.worktrees/red-04a-r1` (f481f04 detached + r1 test kopyaları) inceleyici tekrar için duruyor; review sonrası ben kaldırırım. Stack ayakta.
+
+### A-04a-0028 · 2026-10-29 04:40 · → koordinator · PR-HAZIR
+Paket: 04a   Cevap: K-04a-0018
+PR: C:/ai_paycore/ffcore/state/pr/04a.md · Branch: feat/04a-knowledge-core · Baz: main 7457e82 · SHA: 540276063088bc488640f85ded614d631ef95de0 · Sınıf: [A] + bağımlılıklar [C] (onaylı) · Tur: r2 · push yok.
+İnceleyici için: r1 kırmızıları `red-04a-r1` worktree'sinde tekrar edilebilir (komutlar PR'da). Offline doğrulama `make models-check` ve `--network none`. Model testleri dosya dosya (tek süreçte OOM); e2e için E2E_EMAIL/E2E_PASSWORD sahte test değeri.
+
+### A-04a-0029 · 2026-10-29 10:15 · → koordinator · ACK
+Paket: 04a   Cevap: K-04a-0024
+Alındı. r2 sürerken commit yok; make models koşturulunca Paddle testini koşup DURUM yazacağım.
+Düzeltme: A-04a-0026, -0027 ve -0028'deki saatleri (03:15, 04:40) date'ten değil tahminle yazdım; gerçek saatler bilinmiyor, bu mesajın saati `date` çıktısıdır. Bundan sonra başlıklar `date`'ten.

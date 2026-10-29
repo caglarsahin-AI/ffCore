@@ -413,3 +413,32 @@ Sıradaki: dilim 4 tracing.py, prompts.py, init.sh, compose, smoke.
 ### B-02-0006 · 2026-10-29 08:58 · → koordinator · DURUM
 Paket: 02   Cevap: K-02-0004
 Dilim 4 yazıldı, commit'lenmedi (tracing.py, prompts.py, init.sh, compose/env örnekleri, smoke, cli seed-prompts, Makefile; birim testler yeşil). Entegrasyon: test_02_1 tek başına geçiyor (iz Langfuse'ta 10,5 s'de, maliyet ve iç içelik doğru). Takıldığım yer: dosyanın tamamı koşunca bir test asılı kaldı. Gece arka plan koşusu 9 saat bitmedi; konteyneri sildim. Şüphe test_02_3: erişilemeyen hosta giden kapanış flush'ı. Doğrulanmadı. Şimdi faulthandler ile hangi çağrıda beklediğini ölçüyorum. Bir istek dönüşünü bekletirse bu ürün hatasıdır (kural c) ve düzeltilecek. Yığın 02-langfuse açık.
+
+### B-02-0007 · 2026-10-29 09:38 · → koordinator · DURUM
+Paket: 02   Cevap: K-02-0005
+Asılmanın nedeni ölçüldü ve düzeltildi. Kök neden SDK'da (langfuse 4.15.1): LangfuseResourceManager public key başına tekil tutuluyor ve shutdown sonrası kayıttan silinmiyor. Aynı anahtarla ikinci Langfuse() durmuş eski örneği alıyor; eski host ve exporter kalıyor, kuyrukların tüketicisi yok. Bu yüzden flush içindeki queue.join() süresiz bekliyor (faulthandler: test_02_6 teardown → client.shutdown → resource_manager.flush → queue.join). Aynı nedenle test_02_3 dosya içinde kırmızıydı: down host'u hiç kullanılmıyordu. Süreçte tek init olduğu için üretimde tetiklenmez, ama yeniden init sessizce eski yapılandırmayı kullanırdı.
+Düzeltme (tracing.py):
+(1) shutdown_tracing durmuş örneği SDK kaydından siler; init_tracing önce kapatır; test_02_8_reinit_after_shutdown_is_fresh önce kırmızıydı.
+(2) İstediğin açık sınırlar: OTLP export timeout=5 s; shutdown en çok SHUTDOWN_TIMEOUT_S=10 s bekler, aşarsa trace_shutdown_timeout ERROR. Testleri: test_02_3_shutdown_is_time_bounded (sonsuz bekleyen sahte shutdown 0,5 s'de döner) ve test_02_3_export_timeout_explicit. Not: bu iki test kodla aynı turda yazıldı, kodsuz kırmızı koşuları kaydedilmedi.
+(3) Entegrasyon test_02_3 süre sınırını doğruluyor: Langfuse yokken çağrılar + kapanış 8,4 s; tam dosya 4/4, 22 s.
+Ek bulgu: Langfuse açılışta zorunlu olunca 01 olay testlerinin app fixture'ı LANGFUSE_HOST yüzünden açılmıyordu (fail-loud doğru); test ayarlarına langfuse-web eklendi.
+Önceki koşu (rebase öncesi): lint temiz; birim 324/324 her iki profil; entegrasyon 139/139 her iki profil.
+Commit'ler main 17b0e75 üstüne rebase edildi: a0ad1ab, 34955aa, 73329e2, c166d43. Şimdi temiz yığında tam kapılar koşuyor: down -v, build, up, smoke, iki profil, log kapısı. Ardından Langfuse kapalıyken elle model çağrısı. 04a girince yeniden rebase ederim.
+
+### B-02-0008 · 2026-10-29 10:06 · → koordinator · PR-HAZIR
+Paket: 02   Cevap: K-02-0005
+PR: state/pr/02.md · Branch feat/02-langfuse-trace · Baz main 17b0e75 · SHA 1d2f31f0ae695669443f0ff1ff2f95ffb865c878 · Sınıf [C] · ağaç temiz, 5 commit, 27 dosya +1760/-17.
+DURUM: VERIFIED. Kabul 1-10 geçti. Temiz yığın (down -v, build, up): smoke passed; lint temiz; birim 330/330 iki profil; entegrasyon 140/140 iki profil (son SHA). Log kapısı: .env.test secret değerleri dört servisin logunda 0. Elle kontrol: langfuse-web kapalıyken model çağrıları 7/7 ve /healthz 200.
+Kapılarda iki hata daha bulup düzelttim:
+(1) Asılma: SDK'nın tekil kaynak yöneticisi yeniden kullanılıyordu. Şimdi kayıttan siliniyor; export 5 s, kapanış 10 s ile sınırlı.
+(2) Log filtresi canlı yığında her uvicorn erişim satırını "Logging error" ile bozuyordu (args=None). Şimdi biçim korunuyor; önce kırmızı test vardı.
+İnceleyici için öncelikli bakılacaklar:
+- tracing.py SDK özel alanları (_resources, _instances; sürüm pinli);
+- ScrubFilter yeni dalı;
+- 01 düzeltmesi 73329e2 (PATCH ucu);
+- Langfuse kapalıyken LiteLLM tarafında yalnız genel bir satır loglanıyor (FOLLOWUP önerisi PR dosyasında).
+04a girince rebase yapıp yeni SHA bildiririm. Yığın 02-langfuse açık; review için kalsın mı, yoksa down -v mi?
+
+### B-02-0009 · 2026-10-29 10:08 · → koordinator · ACK
+Paket: 02   Cevap: K-02-0008
+Yığın 02-langfuse down -v ile kapatıldı (konteyner 0, volume 0). İmajlar 0.0.0-02 duruyor. Review bitene kadar yeni commit yok; 04a rebase'i ve DUZELT bekleniyor.

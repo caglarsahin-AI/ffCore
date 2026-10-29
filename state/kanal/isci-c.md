@@ -3,9 +3,9 @@
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
 - Oturum kimliği: ffcore-isci-c-10af
-- Aktif paket: 10a-formlar (feat/10a-forms)
-- Durum: ACTIVE
-- Son okunan: koordinator K-02-0002 (2026-10-28 21:53); bana adresli son mesaj K-10af-0001; son okunan bana adresli K-10af-0007; son yazılan C-10af-0007
+- Aktif paket: - (10a-formlar MERGED 7457e82)
+- Durum: RETIRED
+- Son okunan: koordinator K-10af-0011 (2026-10-29 09:31); son yazılan C-10af-0008 (HANDOFF)
 
 ## Mesajlar
 
@@ -291,3 +291,27 @@ r2 delta. Branch `feat/10a-forms` · SHA 275d06d8224e40a02b0dfc1d2bfbcba0b014c98
 MINOR-1: c13cb2b test (önce kırmızı: e2e `test_10af_16_project_switch` 2/2, birim `test_10af_17_form_save_gate` 2/2), f08b5b6 fix (`ModelList key={projectId}`; model ve sağlayıcı formunda Kaydet WriteGate içinde), 275d06d PNG.
 Ek bulgu, aynı commit'te kapandı: `Models.extraBodyHint` JSON örneği ICU argümanı sanılıyordu (INVALID_MESSAGE); EN/TR tırnaklandı, `test_10af_18_messages_parse` önce kırmızı sonra yeşil.
 Kapılar: tsc/eslint/vitest 93/93 (18 dosya); tam Playwright tek worker temiz stack **76/76** (4,8 dk) f08b5b6'da; master key araması 0; stack `down -v`. Backend değişmedi (r1 sonuçları geçerli).
+
+### C-10af-0008 · 2026-10-29 09:31 · → koordinator · HANDOFF
+Paket: 10a-formlar   Cevap: K-10af-0011
+### 10a-formlar · ffcore-isci-c-10af · 2026-10-29 09:31
+- Durum: MERGED (r2 ONAY 275d06d → main 7457e82). Lease RETIRED.
+- Tam sonraki adım: 10b-poc, yeni oturumda (GOREV koordinatörden).
+- Kararlar (K-10af-0002/0003, hepsi bağlayıcı):
+  - D1 A: model ekleme yalnız süper yönetici (sağlayıcı listesi `require_superadmin`); proje admin'i düzenler/siler, ekle düğmesi nedenli pasif (`data-needs-superadmin`); düzenlemede `/providers` çağrısı yok. FOLLOWUP-79: 03 additive `GET /projects/{id}/providers` gelince kısıt kalkar (`app/(console)/models/page.tsx` `DisabledWithReason`, `components/model-form.tsx` `useProviders(!model)`).
+  - D2 A: compose `e2e.environment`'a `LITELLM_URL` + `LITELLM_MASTER_KEY` (yalnız interpolasyon, test tarafında başlıkta; `tests/e2e/api.ts` `expectInLiteLLM`).
+  - D3 A: e2e sağlayıcı adresi `http://fake-llm:11434`, stack komut satırında `ALLOWED_INTERNAL_HOSTS=litellm,fake-llm`; fake-llm başlatılmaz (başarısız test yolu). fake-llm `--profile test` ile açılırsa test_10af_3/12 beklentisi değişir: test-int'ten önce e2e, sonra `rm -sf fake-llm`.
+  - D4 A: `upstream_api=responses` yeni modelde pasif; mevcut model düzenlenebilir, listede "Not in the gateway" rozeti (`lib/model-form.ts notInGateway`). `forward_unknown_params` her zaman `false` gönderilir.
+  - FOLLOWUP-80: gizli alan UI'dan silinemez (boş = `***` = koru; `lib/provider-config.ts buildConfig`).
+  - K-10af-0003 B: `core/egress.py` resolver `OSError` → `EgressRequestFailed("egress_dns_failed")` (b1d07f6); bağlantı testi 200 + `connection_failed`.
+- Kalıplar (10a-bağlama'nınkilere ek):
+  - Form parçaları `components/form-parts.tsx` (`FieldShell`, `TextField`, `CheckGroup`, `CheckField`); yeni formlar bunları kullanır.
+  - Proje kapsamlı liste ekranı proje kimliğiyle key'li (`<ModelList key={projectId}>`); her Kaydet `WriteGate` içinde (açma düğmesi yetmez) — review r1 MINOR-1.
+  - Mesajda süslü parantezli örnek ICU tırnağı ister (`'{...}'`); `test_10af_18_messages_parse` her EN/TR mesajı denetler.
+  - Sürücü alanı etiketleri `ProviderFields.<alan>`; canlı `/provider-drivers`'ta mesajı olmayan alan `test_10af_1`'i kırmızı yapar.
+- e2e komutları (docs/onyuz.md "Acceptance tests"): `export ALLOWED_INTERNAL_HOSTS=litellm,fake-llm FFCORE_VERSION=0.0.0-<paket>` (+ `BACKEND_PORT=<boş port>` başka stack 8000'deyse); `up -d --wait --build backend` → `create-superadmin` (stdin) → `--profile e2e run --rm e2e` → `down -v`. Paylaşılan makinede `--workers=1` önerilir (varsayılan worker'da 5 s beklemeler yük altında düştü; tek worker temiz stack 76/76). Aynı stack'te tekrarlı koşu sağlayıcı biriktirir (4. koşuda 68), kanıt koşusu temiz stack'te. Docker içinde çözülemeyen ad 4-8 s'de düşer; bağlantı testi beklemeleri 20 s. e2e `npm ci` bazen ağ hatası verir, tekrar denenir; `ffcore-10a-nm-pw` volume'u 10a-bağlama öncesinden, `@tanstack/react-query` yok (kopyalamayın, `npm ci`).
+- Koşan / kalan testler: Vitest 93/93 (18 dosya), Playwright 76/76 tek worker (f08b5b6), backend make test 292/292 ve test-int 134/134 iki profil (b1d07f6/82219e6). NOT_RUN: Lighthouse (FOLLOWUP-37), iki profil e2e (önyüz profil bağımsız).
+- Blocker'lar: yok.
+- Commit edilmemiş durum: yok (worktree ve branch koordinatörce kaldırıldı).
+- Branch ve son commit: feat/10a-forms (silindi) @ 275d06d8224e40a02b0dfc1d2bfbcba0b014c98a → main 7457e82.
+- Ortam: `10af` stack'i `down -v` (konteyner/volume 0). Scratchpad'deki loglar oturuma özel, depoya girmedi.

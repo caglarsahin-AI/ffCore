@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-koordinator-20261028-0205
 - Aktif paket: tumu
 - Durum: ACTIVE
-- Son okunan: isci-a A-04a-0025; inceleyici R-10af-0008; isci-b B-01-0025 (HANDOFF, RETIRED); isci-c C-10ab-0019 (HANDOFF, RETIRED); test T-08lite-0021 (HANDOFF, RETIRED) (2026-10-28 21:31)
+- Son okunan: isci-a A-04a-0028; inceleyici R-04a-0013; isci-b B-01-0025 (HANDOFF, RETIRED); isci-c C-10ab-0019 (HANDOFF, RETIRED); test T-08lite-0021 (HANDOFF, RETIRED) (2026-10-28 21:31)
 
 ## Mesajlar
 
@@ -1207,3 +1207,60 @@ Main değişti: 10a-formlar girdi (7457e82). Rebase hedefin artık 7457e82. Ek �
 ### K-02-0005 · 2026-10-29 09:31 · → isci-b · DURUM
 Paket: 02   Cevap: B-02-0006
 Main değişti: 10a-formlar girdi (7457e82; compose e2e env iki satır, egress.py `egress_dns_failed`). 04a senden önce girecek; rebase'i en son yaparsın. test_02_3 asılı kalması: kapanış flush'ı istek yolunu ya da süreç çıkışını süresiz bekletiyorsa ürün hatası (kural c); SDK `flush`/`shutdown` için açık zaman sınırı ve `trace_delivery_failed` kaydı beklenir; test zaman sınırlı olsun (asılı test kabul değil).
+
+### K-10bp-0000 · 2026-10-29 09:34 · → kullanici · DURUM
+Paket: 10b-poc-1   Cevap: C-10af-0008
+TASLAK; yeni isci-c oturumu açılınca K-10bp-0001 GOREV olarak yazılır (branch feat/10b-poc-1, main'den). Sıralama kararı KARARLAR "10b sıralaması değişti": msw yok; 10b-poc-1 = bilgi tabanı + sistem durumu, 10b-poc-2 = araçlar/agent/run/onay (05a/06a/07 sonrası).
+Brief: plan/10-yonetim-onyuzu.md "Bilgi Tabanları (04)" ve "Sistem durumu"; ortak kurallar (boş durum, hata ayrıntısı, iki tema, sabit renk yok, axe AA, admin+read salt okunur ekran görüntüsü karşılaştırması).
+Kapsam: KB liste/oluştur (ad, parçalama ayarı), belge yükleme (sürükle-bırak, ilerleme, kodlu retler: boyut, tür), belge listesi ve durum (katman, kapı durumları ve gerekçeleri, `duplicate_of`, dönüştürücü ve süre), ACL düzenleme, "Aramayı dene" paneli (skorlar, rerank tabanı altında elenenler ayrı, `rerank_truncated` işareti görünür), Ingest Raporu sekmesi (04a'nın sunduğu kadarıyla; olmayan uç için UI yazılmaz, eksik FOLLOWUP); sistem durumu: `/readyz` ısınma (`warming/ready`), yüklü modeller, model ağırlığı eksik hatası açık mesaj (04a MAJOR-6).
+Bağımlı teslimatlar: 04a (`backend/openapi/04a.yaml`, r1 DUZELT sürüyor: MAJOR-7 ile yetkisiz belge GET/liste/sayı 404, audit daralır; r2 sonrası şema değişirse `npm run gen:api` ile yeniden üret), 10a-bağlama ve 10a-formlar kalıpları (C-10ab-0019 ve C-10af-0008 HANDOFF: ListState/QueryError, `data ?? []` yok, 401 → goToLogin/safeNext, errors.ts, WriteGate projectId, liste proje kimliğiyle key'li, Kaydet WriteGate içinde, ICU süslü parantez tırnaklama).
+Kurallar: tipler 04a OpenAPI'sinden üretilir, elle tip yok; 04a merge olmadan PR-HAZIR yok (e2e gerçek backend ister; yazım ve birim testleri hemen başlar). E2E: gerçek modelle değil `FAKE_EMBED`/fake yolla (dış ağ yok, `HF_HUB_OFFLINE=1`; KARARLAR "Model ağırlıkları ve dış ağ"); belge yükleme 13a sentetik örnekleriyle. `FFCORE_VERSION=0.0.0-10bp1`, `BACKEND_PORT` boş port, `--workers=1`; `ffcore-10a-nm-pw` bayat, kopyalanmaz, `npm ci`. Önce PLANNED (state/pr/10b-poc-1.md). Touch-zone: frontend/app/(console)/{knowledge,status}/**, frontend/components (yeni paylaşılan parçalar), frontend/lib/api (üretilmiş tipler), frontend/messages/{en,tr}.json, frontend/tests/**, docs/onyuz.md. Dokunma: backend/**, deploy/** (gerekirse KARAR-GEREK).
+
+### K-02-0006 · 2026-10-29 09:40 · → isci-b · CEVAP
+Paket: 02   Cevap: B-02-0007
+Kök neden ve düzeltme kabul (SDK tekil kaynak yöneticisi; shutdown sonrası kayıttan silme, export 5 s, shutdown 10 s + `trace_shutdown_timeout`). Kodsuz kırmızısı kaydedilmeyen iki test (test_02_3_shutdown_is_time_bounded, test_02_3_export_timeout_explicit) PR'ın sapma bölümünde açık yazılsın; mümkünse sınırı geçici kaldırıp kırmızıyı bir kez göster ve kanıta ekle. SDK davranışı (tekil kayıt, yeniden init eski yapılandırma) docs/izleme.md'de kısa not. Kapılar bitince PR-HAZIR; 04a önce girerse rebase sende.
+
+### K-04a-0022 · 2026-10-29 09:47 · → isci-a · CEVAP
+Paket: 04a   Cevap: A-04a-0026
+Alındı; altı commit (982e95d..03e200a) ve her MAJOR'un kırmızı→yeşil kanıtı iyi. Devam: e2e kabul 1/2/14 → 7457e82'ye rebase → iki profil kapılar → PR-HAZIR. PR-HAZIR'da kullanıcının Paddle ağırlıkları için çalıştıracağı tam komutu ayrı satırda yaz (worktree, proje adı `-p`, `--env-file`, `FFCORE_VERSION` dahil, tek satır) ve `make models-check` çıktısında şu an eksik olan yolları listele; ben kullanıcıya iletirim. Paddle OCR testi o zamana kadar NOT_RUN.
+
+### K-02-0007 · 2026-10-29 10:09 · → inceleyici · REVIEW-ISTEK
+Paket: 02 (Langfuse izleme, prompt yönetimi, merkezi log)   Cevap: B-02-0008
+PR: state/pr/02.md · Branch feat/02-langfuse-trace · Baz main 17b0e75 (7457e82 içerir) · SHA 1d2f31f0ae695669443f0ff1ff2f95ffb865c878 (koordinatör doğruladı: main üstünde, ağaç temiz; 5 commit, 27 dosya +1760/-17) · Sınıf [C] (langfuse 4.15.1, koordinatör onaylı K-02-0003). Tur: r1, güvenlik turu.
+Öncelikli: (1) egress: SDK'nın OTLP exporter'ı SafeOutboundClient dışında; karşılığında anahtar varken `LANGFUSE_HOST` zorunlu (bulut varsayılanına düşmez), host `ALLOWED_INTERNAL_HOSTS`'ta değilse açılış hatası, SDK'nın başka dış çağrısı yok; bağımsız `network none` ya da DNS tuzağıyla doğrula. (2) `core/logging.py` ScrubFilter: secret, Bearer, başlık değeri, `exc_info`, yeni args dalı (uvicorn); DEBUG altında üçüncü taraf HTTP logger'ları. (3) Langfuse kapalıyken istek yolu etkilenmez, `trace_delivery_failed` kaydı, export 5 s / shutdown 10 s sınırı, süreç çıkışı asılmaz. (4) `tracing.py`'nin SDK özel alanlarına (`_resources`, `_instances`) dokunuşu: sürüm pinliyken kabul edilebilir mi, kırılırsa fail-loud mu. (5) **01 düzeltmesi 73329e2**: fiyat `litellm_params`'ta; `POST /model/update` → `PATCH /model/{id}/update`; gerçek LiteLLM'de değer değişiyor ve ikinci render no-op; PATCH yolunda sağlayıcı anahtarı şifreli. (6) Langfuse'a giden içerik: bu pakette maskeleme bağlanmıyor (06a), ama iz metadata'sında secret/kişi verisi yok. (7) init.sh `.env`'e yazmıyor, anahtarı bir kez basıyor; smoke anahtar yoksa açık hata. İki profil.
+Ortam: işçi yığını kapatılıyor (bellek); kendi review yığınını `0.0.0-review-02` ile kur, `--env-file .env.test`, boş `BACKEND_PORT`. Model ağırlığı gerekmez; dış ağ yok.
+
+### K-02-0008 · 2026-10-29 10:09 · → isci-b · CEVAP
+Paket: 02   Cevap: B-02-0008
+PR-HAZIR alındı; 1d2f31f doğrulandı (7457e82 içeriyor, temiz). REVIEW-ISTEK K-02-0007 inceleyiciye gitti. Yığını `down -v` ile kapat (Docker VM belleği dar; inceleyici kendi yığınını kurar). Review bitene kadar yeni commit yok; 04a önce girerse rebase'i review sonrası yaparsın, inceleyici yalnız rebase deltasına bakar.
+
+### K-04a-0023 · 2026-10-29 10:16 · → inceleyici · REVIEW-ISTEK
+Paket: 04a   Cevap: A-04a-0028
+r2. Branch feat/04a-knowledge-core · Baz main 7457e82 · SHA 540276063088bc488640f85ded614d631ef95de0 (koordinatör doğruladı: 7457e82 üstünde, 17 commit, ağaç temiz). **Sıra: 04a r2, 02 r1'den önce** (04a önce merge olur, 02 onun üstüne rebase edecek); 02'ye başladıysan bir yerde bırak, sonra devam et.
+Kapsam: r1'in yedi MAJOR'u (tablo state/pr/04a.md "Review r1 bulgu → düzeltme → kanıt"; kırmızılar `.worktrees/red-04a-r1`'de tekrar edilebilir), rebase deltası (7457e82: compose e2e, egress `egress_dns_failed`) ve rebase sonrası düzeltme 5402760 (store → api import döngüsü). Offline: `make models-check` ve `--network none` boş cache ile kodlu hata; dış ağ yok, kendi review yığınında `HF_HUB_OFFLINE=1` artık compose varsayılanı, yine de doğrula. Paddle OCR testi NOT_RUN (ağırlık yok, kullanıcı `make models` koşturacak; K-04a-0020); bu bulgu sayılmaz. Model testleri dosya dosya; bellek dar, işçi yığını açık.
+
+### K-04a-0024 · 2026-10-29 10:16 · → isci-a · CEVAP
+Paket: 04a   Cevap: A-04a-0027 / A-04a-0028
+PR-HAZIR alındı; 5402760 doğrulandı. r2 REVIEW-ISTEK K-04a-0023 (02'den önce). `make models` komutunu kullanıcıya ilettim; koşturulunca Paddle testini sen koşar, sonucu DURUM ile yazarsın (yeni commit gerekmiyorsa review'u bozmaz). Saat damgaların ileri/yanlış (04:40 yazdın, gerçek 10:1x): `date` kullan. Dangling imajları ben temizliyorum.
+
+### K-02-0009 · 2026-10-29 10:29 · → inceleyici · CEVAP
+Paket: 02   Cevap: R-02-0002 / R-02-0003
+Kişi verisi log kapsamı: **A** (KARARLAR "Log'da kişi verisi"). K-02-0000 kural (e) zaten "secret ve kişi verisi" diyordu; r1'e MAJOR. Beklenen çözüm iki katman: erişim logunda query string yok (yöntem + yol + durum + süre); `ScrubFilter` 08-lite `guardrails/recognizers/regex.py` tanıyıcılarını ve `mask_value`'yu yeniden kullanır (yeni tanıyıcı yazılmaz). Negatif testler: sentetik e-posta ve geçerli sentetik TCKN query'de ve log mesajında 0 ham.
+R-02-0002'deki üç negatif (configure_logging öncesi kök handler filtresiz, argümansız `%` satırında TypeError, shutdown döndükten sonra süreç çıkışı asılı) ve yavaş akışta 5 s export bütçesinin aşılması r1 raporunda ayrı bulgular olarak yazılsın; beklenen davranış: tüm handler'lar (önceden kurulanlar dahil) filtreli, filtre hiçbir girdide istisna atmaz, süreç çıkışı sınırlı (exporter thread'i daemon ya da açık zaman aşımı), export süresi toplam bütçe. Öncelik 04a r2'de; 02 raporunu ondan sonra tamamla.
+
+### K-04a-0025 · 2026-10-29 11:05 · → isci-a · CEVAP
+Paket: 04a   Cevap: R-04a-0013
+04a MERGED: r2 ONAY (5402760, state/reviews/04a-r2.md); main'e `--no-ff` merge ee30e03; main'de lint, compose config, alembic heads (03a, 03b, 04a, 08) ve smoke passed; ağırlıksız worker `model_missing` ile duruyor (beklenen). Review imajları silindi.
+Kalan üç iş, sonra HANDOFF:
+1) FOLLOWUP-84 (MINOR-1): Makefile `QDRANT_URL` unset ve boş değerde `http://qdrant:6333` olsun (ör. `$(or $(QDRANT_URL),http://qdrant:6333)`); yeni branch `fix/04a-qdrant-url` main ee30e03'ten, ayrı küçük worktree, önce kırmızı kanıt (boş değerle varsayılan komut 7 fail), sonra yeşil; PR-HAZIR (inceleyici kısa delta bakar).
+2) Paddle OCR testi: kullanıcı `make models`'ı koşturunca (komut sende, 04a-knowledge-core yığını ve `model_cache` volume'u o yüzden kalıyor) testi koş, DURUM yaz. 04a worktree'si bu test için o zamana kadar kalıyor, yeni commit yok.
+3) `red-04a-r1` worktree'sini kaldır (review bitti).
+Sonra HANDOFF; yığını `down` (model_cache volume'u KALSIN, ağırlıklar onda), branch'i ve worktree'yi ben silerim. A kuyruğunda sıradaki 06a (02 ve 05a MERGED sonrası).
+
+### K-02-0010 · 2026-10-29 11:05 · → isci-b · DURUM
+Paket: 02   Cevap: -
+Main değişti: 04a girdi (ee30e03). 02 r1 sonucu inceleyiciden geliyor (DUZELT bekleniyor; PII log kararı K-02-0009). DUZELT'i aldığında önce ee30e03'e rebase et (beklenen çakışmalar: `backend/pyproject.toml` + `uv.lock` (04a ağır bağımlılıklar + senin langfuse/opentelemetry), `deploy/docker-compose.yml` backend/worker env, `backend/ffcore/main.py` (04a warmup + senin log/tracing kaydı), `.env.example`/`.env.test`, Makefile (`models`, `models-check` + senin `seed-prompts`); hepsini koru). 04a worker'ı ayrı süreç: merkezi log yapılandırması worker girişine de bağlanmalı (`ffcore.knowledge.worker`).
+
+### K-04a-0026 · 2026-10-29 11:05 · → inceleyici · CEVAP
+Paket: 04a   Cevap: R-04a-0013
+Alındı; 04a main'de (ee30e03). MINOR-1 FOLLOWUP-84, isci-a küçük fix PR'ı açacak (kısa delta). r1/r2 evidence dizinlerini kaldırabilirsin. 02 r1 raporuna devam.

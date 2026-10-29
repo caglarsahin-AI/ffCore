@@ -3,9 +3,9 @@
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
 - Oturum kimliği: ffcore-inceleyici-20261028-0203
-- Aktif paket: review-kuyrugu (10a-forms-r2 tamamlandı)
+- Aktif paket: review-kuyrugu (04a-r2 ve 02-r1 tamamlandı)
 - Durum: ACTIVE
-- Son okunan: koordinator K-10af-0009; sonuç R-10af-0008 (2026-10-29 09:10)
+- Son okunan: koordinator K-04a-0023 / K-02-0009; sonuçlar R-04a-0013 / R-02-0005 (2026-10-29 11:01)
 
 ## Mesajlar
 
@@ -517,3 +517,69 @@ Bağımsız gerçek tarayıcı probu: alpha edit açık form/taslak → beta rea
 Node20 ağsız eslint/tsc/check:api exit 0; Vitest 93/18 dosya passed (10,32 sn). Bağımsız tüm 24 adet 10af e2e +1 kendi probe tek worker/retries0: 25/25 passed (2,4 dk). Test 16'nın iki proje geçişi ve test 17/18 gate/ICU koşulları geçti. İşçinin 76/76 bildirimi bağımsız tam takım sonucu diye sunulmadı; r2 istek kapsamındaki kapılar tamamlandı.
 Baz state diff boş/diff-check/atasallık geçti. Backend/deploy/bağımlılık dosyaları r1 ile aynı; backend matris/tam76e2e/Lighthouse/tamLangfuse-smoke/dışsatıcı r2 NOT_RUN gerekçeleri raporda. Ayrı 7 başlıklı güvenlik delta turu var. 2 artifact/0 ZIP ve ownbackend/LiteLLM 77362 bayt logunda üç sentetik anahtarın her biri 0 eşleşme; değerler basılmadı.
 Ownstack down-v ve ownwork/nm volume kaldırma exit0; ownvolume filtresi boş, kullanıcı ffcore-10a-nm(-pw) korundu. HEAD sabit/ağaç temiz doğrulandı, worktree remove exit0; --force yok. R1/R2 probe kanıtları paket kapanışına kadar korundu; review imajları temizlenebilir. Ana checkout/switch, ürün kaynak değişikliği, commit/push ve dış sistem bağlantısı yok. Yeni görev bekleniyor.
+
+### R-10af-0009 · 2026-10-29 09:33 · → koordinator · DURUM
+Paket: 10a-formlar   Cevap: K-10af-0012
+Alındı. Onaylanan tam SHA 275d06d8224e40a02b0dfc1d2bfbcba0b014c98a'nın main atası olduğu salt okunur git kontrolüyle doğrulandı. Yeni review başlatılmadı.
+Kapanış talimatınızla yalnız .worktrees/review-10af-r1-evidence ve review-10af-r2-evidence kaldırıldı: iki mutlak hedefin amaçlanan .worktrees altında olduğu ve reparse point içermediği önce doğrulandı; kaldırma sonrası ikisi de yok. R1/r2 raporlarına kapanış notu eklendi. 04a evidence ve korunan kullanıcı volume'larına dokunulmadı. 04a r2 / 02 r1 için yeni tam SHA'lı REVIEW-ISTEK bekleniyor; eski ID'ler tekrar uygulanmadı.
+
+### R-02-0001 · 2026-10-29 10:12 · → koordinator · ACK
+Paket: 02   Cevap: K-02-0007
+Tam SHA 1d2f31f0ae695669443f0ff1ff2f95ffb865c878 yerel commit nesnesi olarak doğrulandı. Brief ve PR okundu; r1 güvenlik turu alındı. Ayrı detached .worktrees/review-02-r1 içinde yalnız bu SHA incelenecek. SDK egress/kapalı servis/zaman sınırı, log filtreleri, prompt önbelleği, init ve ayrı 01 fiyat/PATCH düzeltmesi bağımsız doğrulanacak; dış ağ ve model ağırlığı yok.
+
+### R-02-0002 · 2026-10-29 10:19 · → koordinator · DURUM
+Paket: 02   Cevap: K-02-0007
+Exact SHA backend57Python dosyası hash eşit; baz state diff boş/diff-check temiz. Lint143, llmaas330unit46,81sn ve airgap330unit39,07sn passed; llmaas140int127,50sn passed (gerçek Langfuse maliyet/altspan/prompts/PATCH dahil), airgap140int sürüyor. Kendi review-02-r1 fullstack sağlıklı, model süreci/dış ağ yok.
+Bağımsız negatifler: (1) configure_logging öncesi mevcut root StreamHandler sentetik Settings secret'ını ham yazıyor; yeni ffcore handler'ı maskeli, eski handler filtresiz kalıyor. (2) Secret içeren argümansız yüzde/URL-percent log satırı ScrubFilter içinde TypeError yükseltiyor (str(msg)%() dalı). (3) Gerçek pinli SDK + kontrollü bloke exporter: shutdown_tracing(timeout_s=0,2) 0,201sn'de dönüp SCRIPT_END yazdı, süreç 6sn'de hâlâ çıkmadı; yalnız kendi child kill edildi. Atexit/gerçek thread kapanışı birim stub'ıyla ölçülmüyor. Nihai raporda kaynak/etki/negatif testleriyle ayrılacak.
+Ağsız SDK DNS tuzağında init/span/shutdown yalnız izinli localhost'a DNS yaptı; 307 hedefi çağrılmadı, başka host yok. İlk lint salt okunur cache yolundan başlamadı; RUFF_CACHE_DIR=/tmp ile kaynak değiştirmeden düzeltildi, ürün hatası değil.
+
+### R-02-0003 · 2026-10-29 10:22 · → koordinator · KARAR-GEREK
+Paket: 02   Cevap: K-02-0007 / K-02-0000 kural e
+PII log kapsamı: K-02-0000(e) merkezi logda secret ve kişi verisi maskeleme diyor; uygulama yalnız secret kalıplarını maskeliyor. Gerçek ownbackend /healthz sorgusunda sentetik e-posta ve geçerli biçimli sentetik TC HTTP200 sonrası uvicorn access logunda birer ham eşleşme verdi. İçerik/trace maskelemesinin 06a'da bağlanacağını kabul ediyorum; bu farklı olarak otomatik erişim logu.
+A (önerilen): kişi verisi log maskelemesi 02'nin kapsamı; mevcut 08-lite tanıyıcı/maske yeteneğini kullanarak veya erişim logunda query'yi tümden kaldırarak bu yüzeyi kapat, r1'e ayrı MAJOR yaz. B: 02 yalnız secret; otomatik erişim logu PII'sini açık FOLLOWUP'a (sahibi 06a/12) kaydet, bu tur bulgu değil kabul edilmiş sınır. C: kapsam kararını açık bırak; şu anki diğer doğrulanmış güvenlik/kapanış bulguları nedeniyle zaten DUZELT, r2 öncesi netleştir.
+Gerçek SDK yönlendirme hedefini takip etmiyor (olumlu); ancak gerçek loopback HTTP cevabı 0,1sn'de1bayt akıtıldığında 5sn export bütçesi aşılabiliyor ve kapanış yardımcısı döndükten sonra süreç çıkışı takılıyor. Varsayılan10sn sınırının ayrıca ölçümü sürüyor; yalnız ownchild süreçleri bounded kill, dışa bağlantı yok.
+
+### R-04a-0009 · 2026-10-29 10:25 · → koordinator · ACK
+Paket: 04a   Cevap: K-04a-0023
+Tam SHA 540276063088bc488640f85ded614d631ef95de0 yerel commit olarak doğrulandı; güncel PR r1→r2 kanıt tablosu ve sonuçları okundu. R2 önceliği alındı. 02'de iki profil330/140 kapıları ve smoke tamamlandı; checkpoint state/reviews/02-r1.md (nihai değil), own02stack down-v talebi verildi. 04a için ayrı detached review-04a-r2 yalnız bu SHA'da; offline render/ağırlıksız negatifler ve yedi MAJOR deltası incelenecek. Paddle ağırlık testi talimatınıza göre NOT_RUN; make models çalıştırılmayacak.
+
+### R-02-0004 · 2026-10-29 10:33 · → koordinator · DURUM
+Paket: 02   Cevap: K-02-0009
+A kararı alındı: log PII'si r1'e MAJOR, query erişim logundan çıkarılacak; mevcut 08-lite regex/mask_value yeniden kullanılacak. Önceden kurulmuş handler, argümansız yüzde TypeError, gerçek süreç çıkışı ve toplam export süresi ayrı bulgular olarak raporlanacak. 02 checkpoint ve sentetik kanıtlar korundu; own02 down-v exit0. Öncelik talimatınıza göre 04a r2 sürüyor, 02 nihai raporu sonrasında tamamlanacak.
+
+### R-04a-0010 · 2026-10-29 10:37 · → koordinator · DURUM
+Paket: 04a   Cevap: K-04a-0023
+Backend87Python dosyası exact SHA hash eşit; lint194 passed. İki profil382unit/contract passed (llmaas66,56sn,airgap87,28sn) mevcut işçi modelcache yalnız ro bağlı. Boşcache ilk381passed/1Doclingfail; bu ağırlık bağımlılığı raporda ayrı olacak, yeşil sayılmadı.
+Önceki bağımsız ACL/kilit/yayın/privacy probları r2'de: unchanged daraltma sonrası Qdrant0hit/0candidate/özelmetinyok,PG0hit;gerçekLock0,kilit timeout yok1,004sn;upsert arızasında failed/error dolu;privateGET404,audit sentetikfilenamePII0. Gerçek bge tokenizer prefix/CJK en çok597/600token. Pipeline7957baytVSDX'i archive_ratio/0çıktı ile reddediyor;gerçek converterchild AS1GB/CPU4sn sonlu (injected test limits).
+Gerçek model embedding/rerank dosyası6/6passed41,97sn,networknone/rocache/5GB cap. Sonraki model dönüştürme dosyası tek başına sürüyor;Paddle açıkça hariç. Ownbackend/worker fake/offline config render ile doğrulandı; ilktoolsprofil config kapsamını atladığım kontrol hatası düzeltilmeden hiçbirservis açılmadı.
+Makefile QDRANT_URL ?= varsayılanı app-env'deki boş değerle çalışmıyor: ilk207int200passed/7Qdrantfail+4teardownerror;komut QDRANT_URL= boş gösterdi. Explicit http://qdrant:6333 ile tamllmaas tekrar sürüyor. Bu normal komut tekrar üretilebilirliği için MINOR adayı, tek yeşil koşu diye karıştırılmayacak. Airgapint ardından;model1/2/14 kendi gerçekyığını ayrıca kurulacak, workerstack'e dokunulmayacak.
+
+### R-04a-0011 · 2026-10-29 10:45 · → koordinator · DURUM
+Paket: 04a   Cevap: K-04a-0023
+Explicit QDRANT_URL ile iki tam207int passed (llmaas176,72sn/airgap170,38sn). Model dosyaları tek tek: embedding/rerank6/6passed41,97sn; Docling/tokenizer7/7passed106,66sn, Paddle1deselect (talimatlı NOT_RUN). Boşcache actualwarmup+worker model_missing,5ad/yol,0DNS/socket denemesi.
+Kendi gerçek offline backend3GB/worker4GB, modelcacheexternal/ro config render doğrulandı. Kabul1:10sayfa indexed93,1sn (<120),28chunk,Docling21,89sn. Kabul2: Fesih ilk3/skor0,978 passed. Kabul14 gerçek10eşzamanlıarama sürüyor; bitince sonuç teslim edilecek. İşçi stack/cache değişmedi; HF indirme/Paddle/test dış ağ yok. R2 raporu state/reviews/04a-r2.md tamamlanıyor; MINOR1 Makefile boşQDRANT_URL varsayılanı açık.
+
+### R-04a-0012 · 2026-10-29 10:53 · → koordinator · DURUM
+Paket: 04a   Cevap: K-04a-0023
+Kabul14 koşusu ilerliyor: ownDB tamamlanan8sorgu (önceki kabul2tek arama+yükte7/10), en uzun507787ms. Kalan3arama bekleniyor; arama süresi FOLLOWUP77, iptal edilmedi. Henüz health worst veya tam3/3 passed iddiası yok.
+Ownbackend/LiteLLM health200; ownbackend/worker/LiteLLM337764bayt logda17testsecret0eşleşme. Own04a'da Langfuse bellek için açılmadı, tam Langfuse'lısmoke NOT_RUN diye raporda açık (backend/LiteLLM altkontrolleri passed); işçi fullsmoke sonucu bağımsız kanıt diye aktarılmadı. 02 checkpoint K-02-0009 ile5ayrıMAJOR'a güncellendi;04a nihai sonucundan sonra02teslimi yapılacak.
+
+### R-04a-0013 · 2026-10-29 10:58 · → koordinator · REVIEW-SONUC
+Paket: 04a   Cevap: K-04a-0023
+İncelenen tam SHA: 540276063088bc488640f85ded614d631ef95de0. Karar ONAY; BLOCKER0,MAJOR0,MINOR1. Rapor state/reviews/04a-r2.md. R1'in yedi MAJOR'u bağımsız negatiflerle kapandı; MINOR1 açık bulgu, merge/takip kararı sizde.
+MINOR1: Makefile QDRANT_URL ?= app-env'nin boş değerini doldurmuyor. Varsayılan komut QDRANT_URL= ile200passed/7fail+4error verdi (183,76sn);explicit http://qdrant:6333 ile iki TAM207passed (llmaas176,72sn/airgap170,38sn). Beklenen unset ve boş değer için çalışan varsayılan; PR'ın varsayılan düzeldi iddiası bu ortamda geçmedi.
+Lint194;iki profil382unit passed (66,56/87,28sn),cache ro. Boşcache381/1Doclingfail ilk koşusu ayrı raporlandı. Model dosyaları ağsız/ro:embed-rerank6passed41,97sn;Docling-tokenizer7passed106,66sn,Paddle1deselect talimatlıNOT_RUN.
+Kendi gerçek backend/worker kabul1/2/14 TAM3passed878,88sn:10sayfa93,1sn,28chunk,Docling21,89sn;fesih ilk3/skor0,978;10arama200,60healthölçümünde worst149ms. Arama76..716sn FOLLOWUP77, kapatılmadı. Modelcache external/ro,HForiginaloffline1/fake0 render doğrulandı;make models yok/dış ağ yok.
+Bağımsız r1probları:Qdrant0hit/0candidate/özelmetinyok,PG0;lock0/no-timeout1,004sn;yayınarızasıfailed/error dolu;metadata404/auditPII0;gerçektokenizer597/600;pipelineVSDXarchive_ratio/0çıktı;gerçekchild AS/CPUsonlu. Boşcachewarmup/worker model_missing,5ad/yol,0DNS/socket denemesi.
+Bazstate/diffboş,diffcheck/atasallıkpassed;backend87kaynak exactSHAhash eşit. Rebase e2e env/DNSdeltası ve importdöngüsü düzeltmesi incelendi;7başlıklıgüvenlikturu raporda. Backend/LiteLLMsmoke200;own3servis337764baytlogda17testsecret0. FullLangfuse-smoke NOT_RUN(ownstackLangfuseaçılmadı);r1/Paddle/dışsistem/sunucu sınırları raporda.
+Ownstackdown-v exit0;kalankendi modelcache ayrıca silindi;owncontainer/volumefiltresi boş,işçi04a-knowledge-core_model_cachekorundu. HEADsabit/ağaçtemiz,worktreeremoveexit0,--forceyok. R1/R2evidence paketkapanışına kadar kaldı;reviewimajlarıtemizlenebilir. Ana checkout/switch/ürünkodu/commit/push yok. Şimdi öncelik talimatınızdaki02r1 nihai rapor/cleanup teslimine dönüyorum; yeni02test/stack açılması gerekmiyor.
+
+### R-02-0005 · 2026-10-29 11:01 · → koordinator · REVIEW-SONUC
+Paket: 02   Cevap: K-02-0007 / K-02-0009
+İncelenen tam SHA: 1d2f31f0ae695669443f0ff1ff2f95ffb865c878. Karar DUZELT; merge-ready değil. BLOCKER0,MAJOR5,MINOR0. Rapor state/reviews/02-r1.md. Öncelik talimatına uygun olarak04a r2 R-04a-0013 önce teslim edildi;02 aynı kontrol noktasından tamamlandı, başka SHA incelenmedi.
+MAJOR1:configure_logging öncesi root handler filtresiz; Settings sentetiksecret priorhandler'da ham,ffcorehandler'da maskeli. MAJOR2:kirli argümansız yüzde/URLpercent logunda ScrubFilter str(msg)%() TypeError çağrıdan yükseliyor.
+MAJOR3:gerçek SDK/OTel süreç kapanışı sınırlı değil; gerçek loopback yavaş HTTP'de defaultshutdown10,001sn dönüp SCRIPT_END yazdı,child15,007sn'de çıkmadı, yalnızownchild boundedkill. MAJOR4:aynı gerçek transport'ta0,1sn'de1bayt gövde socketreadtimeout'u tazeliyor,5sn TOPLAM export bütçesi aşılabiliyor;shutdown veexport ayrıbulgular.
+MAJOR5:ownhealthsentetikemail/TCKNqueryHTTP200,uvicornaccesslogunda1/1ham. K-02-0009 A uygulanacak:accessquery yok,08lite regex/mask_value yenidenkullanılır. Herbulguda kaynak/kanıt/beklenen/negatiftest var. Trace içerik maskesi06a kararı yeniden açılmadı.
+Normal kapılar:lint143;iki profil330unit (46,81/39,07sn),140int (127,50/126,67sn) passed. Gerçek nestedtrace/token/maliyet3,9e-05/init200-401/prompts/PATCHdeğişim+ikinci no-op/rotatedkeyşifreli testleri geçti; bunlar5negatifi kapsamıyor. Fullsmokebackend/LiteLLM/Langfuseprojects200 passed. Own4servis318624baytlog/20testsecret0eşleşme;bu root/PIInegatiflerini kapatmaz.
+Backend57kaynak exactSHAhash eşit;bazstate/diffboş,diffcheckpassed. NetworknoneSDKDNS tuzağı yalnızlocalhost;307hedefini takip yok,clouddefault yok. ÖzelSDKalanlarıpin/reinit testiyledenetleniyor,ama gerçekchildexit sınırını stub sağlamıyor. Ayrı7başlıklıgüvenlikturu,komutlar/sınırlar/NOT_RUN raporda;haricisatıcı/PayCore/model/ayrıcaçalışanwebstoptekrarı yok.
+Ownstackdown-vexit0,sonownvolume/containerfiltreleriboş;HEADsabit/ağaçtemiz,worktreeremoveexit0,--forceyok. Evidence/result.txt paketkapanışına kadar korundu;reviewimajlarıtemizlenebilir. Ana checkout/switch/ürünkodu/commit/push/dışsistembağlantısı yok. Yeni tam SHA'lı inceleme isteği bekleniyor;K-02-0007 veK-04a-0023 tekrar uygulanmadı.

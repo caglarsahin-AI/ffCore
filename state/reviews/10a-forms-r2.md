@@ -63,3 +63,5 @@ Tarayıcı imajı `mcr.microsoft.com/playwright:v1.64.1-noble@sha256:47b510dd923
 Kendi `review-10af-r2` Compose yığını `down -v --remove-orphans` exit 0 ile kaldırıldı; `review-10af-r2-work` ve `review-10af-r2-nm` volume'ları kaldırıldı (exit 0). Kendi volume filtresi boş; korunan `ffcore-10a-nm` ve `ffcore-10a-nm-pw` mevcut. İşçi yığınlarına ve model cache'lerine dokunulmadı.
 
 HEAD exact SHA ve `git status --porcelain --untracked-files=normal` boşluğu kapanışta yeniden doğrulandı. `git worktree remove` exit 0, `--force` yok. Ana çalışma kopyasında checkout/switch, ürün kaynak değişikliği, commit/push yok. R1/R2 sentetik probe kanıtları paket kapanışına kadar kendi `.worktrees/review-10af-r*-evidence/` dizinlerinde kaldı; review imaj etiketleri koordinatörce temizlenebilir.
+
+Paket kapanışı (2026-10-29 09:33): K-10af-0012 uyarınca r1/r2 geçici evidence dizinleri, mutlak hedefler ve reparse-point yokluğu doğrulandıktan sonra kaldırıldı; ikisinin de bulunmadığı doğrulandı. Rapor ve kanaldaki sonuç kanıtı korunuyor.
