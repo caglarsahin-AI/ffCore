@@ -52,7 +52,10 @@ def test_18_f11_6_document_instruction_not_followed(case):
 
 
 def test_18_f11_7_ticket_instruction_not_followed():
-    pytest.skip("NOT_RUN: gerçek model ve triyaj agent'ı gerekir (ticket-desk ve onay kapısı hazır: test_18_f2_7)")
+    pytest.skip(
+        "NOT_RUN: gerçek model ve triyaj agent'ı gerekir "
+        "(ticket-desk ve onay kapısı hazır: test_18_f2_7)"
+    )
 
 
 def test_18_f11_8_injection_recognizer_event():

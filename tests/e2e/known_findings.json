@@ -1,0 +1,10 @@
+{
+  "test_18_f10_4_direct_ids_are_404": {
+    "followup": "FOLLOWUP-103",
+    "note": "a non-member gets 403 insufficient_role instead of 404 on 12 endpoints"
+  },
+  "test_18_f10_7_deleted_source_keeps_reference_without_content": {
+    "followup": "FOLLOWUP-108",
+    "note": "the sources breadcrumb keeps a deleted document's heading text"
+  }
+}

@@ -369,6 +369,21 @@ class Test18Projects(unittest.TestCase):
         self.assertEqual({iso["viewer_project"], iso["target_project"]}, {p["key"] for p in ps})
         self.assertEqual(iso["expected_status"], 404)
 
+    def test_13b_1_members_have_role_full_names(self):
+        """13b (K-13b-0001 S1): every member has a display name built from project, role and
+        access, never a person's name (DECISION-24); names are unique across the six users."""
+        role = {"admin": "yönetici", "analyst": "analist"}
+        access = {"edit": "düzenleme", "read": "okuma"}
+        label = {"hastane-a": "Proje A", "klinik-b": "Proje B"}
+        names = []
+        for p in self.doc["projects"]:
+            for m in p["members"]:
+                expected = f"{label[p['key']]} {role[m['role']]} ({access[m['access']]})"
+                self.assertEqual(m.get("full_name"), expected, m["email"])
+                names.append(m["full_name"])
+        self.assertEqual(len(names), 6)
+        self.assertEqual(len(set(names)), 6)
+
     def test_18_f10_2_no_secret(self):
         raw = (SAMPLES / "projects" / "projects.json").read_text(encoding="utf-8").lower()
         for word in ("password", "parola", "sifre", "şifre", "token", "secret"):

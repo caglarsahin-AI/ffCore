@@ -103,7 +103,6 @@ class Client:
             raise LoginRefused(email, r.status_code, code)
         self.http.headers["cookie"] = f"ffcore_session={r.cookies['ffcore_session']}"
 
-
     def call(self, method: str, path: str, ok=(200, 201, 202, 204), **kw) -> httpx.Response:
         r = self.http.request(method, path, **kw)
         if r.status_code not in ok:
