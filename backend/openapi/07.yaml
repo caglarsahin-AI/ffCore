@@ -1,0 +1,609 @@
+openapi: 3.1.0
+info:
+  title: FFCore API
+  description: 'Approval queue: tool calls waiting for a person (package 07).'
+  version: '0.7'
+paths:
+  /api/v1/projects/{project_id}/approvals:
+    get:
+      tags:
+      - approvals
+      summary: List the project's approvals
+      operationId: list_approvals_api_v1_projects__project_id__approvals_get
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      - name: status
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - $ref: '#/components/schemas/ApprovalStatus'
+          - type: 'null'
+          title: Status
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApprovalList'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+  /api/v1/projects/{project_id}/approvals/count:
+    get:
+      tags:
+      - approvals
+      summary: Count approvals (console badge)
+      operationId: count_approvals_api_v1_projects__project_id__approvals_count_get
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      - name: status
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/ApprovalStatus'
+          default: pending
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApprovalCount'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+  /api/v1/projects/{project_id}/approvals/{approval_id}:
+    get:
+      tags:
+      - approvals
+      summary: Get an approval
+      operationId: get_approval_api_v1_projects__project_id__approvals__approval_id__get
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      - name: approval_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Approval Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApprovalOut'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+  /api/v1/projects/{project_id}/approvals/{approval_id}/approve:
+    post:
+      tags:
+      - approvals
+      summary: Approve and continue the run
+      operationId: approve_api_v1_projects__project_id__approvals__approval_id__approve_post
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      - name: approval_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Approval Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DecisionRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApprovalDecided'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+  /api/v1/projects/{project_id}/approvals/{approval_id}/reject:
+    post:
+      tags:
+      - approvals
+      summary: Reject; the model is told
+      operationId: reject_api_v1_projects__project_id__approvals__approval_id__reject_post
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      - name: approval_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Approval Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DecisionRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApprovalDecided'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+components:
+  schemas:
+    ApprovalCount:
+      properties:
+        status:
+          $ref: '#/components/schemas/ApprovalStatus'
+        count:
+          type: integer
+          title: Count
+      type: object
+      required:
+      - status
+      - count
+      title: ApprovalCount
+    ApprovalDecided:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+        project_id:
+          type: string
+          format: uuid
+          title: Project Id
+        run_id:
+          type: string
+          format: uuid
+          title: Run Id
+        tool_call_id:
+          type: string
+          title: Tool Call Id
+        action:
+          type: string
+          title: Action
+          description: Model-facing tool name `<tool_key>__<action>` (C7).
+        tool_key:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Tool Key
+          description: The tool part of `action`; null if it has none.
+        arguments:
+          additionalProperties: true
+          type: object
+          title: Arguments
+          description: Tool call arguments as masked by the guardrail before the run stopped; raw values
+            are never stored.
+        reason_from_model:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Reason From Model
+        status:
+          $ref: '#/components/schemas/ApprovalStatus'
+        assigned_role:
+          $ref: '#/components/schemas/ApproverRole'
+        requested_at:
+          type: string
+          format: date-time
+          title: Requested At
+        expires_at:
+          type: string
+          format: date-time
+          title: Expires At
+        resolved_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Resolved At
+        resolved_by:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Resolved By
+        resolution_note:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Resolution Note
+        can_decide:
+          type: boolean
+          title: Can Decide
+          description: 'Whether this caller may approve or reject: console session, `edit` access and
+            a role at least `assigned_role`. Shown for buttons; the decision route checks again.'
+        stream_after:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Stream After
+          description: 'Last event id of the run''s stream before it continued: follow the rest with GET
+            /runs/{run_id}/stream and `Last-Event-ID` set to this value (null: from the start).'
+      type: object
+      required:
+      - id
+      - project_id
+      - run_id
+      - tool_call_id
+      - action
+      - tool_key
+      - arguments
+      - reason_from_model
+      - status
+      - assigned_role
+      - requested_at
+      - expires_at
+      - resolved_at
+      - resolved_by
+      - resolution_note
+      - can_decide
+      - stream_after
+      title: ApprovalDecided
+    ApprovalList:
+      properties:
+        data:
+          items:
+            $ref: '#/components/schemas/ApprovalOut'
+          type: array
+          title: Data
+      type: object
+      required:
+      - data
+      title: ApprovalList
+    ApprovalOut:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+        project_id:
+          type: string
+          format: uuid
+          title: Project Id
+        run_id:
+          type: string
+          format: uuid
+          title: Run Id
+        tool_call_id:
+          type: string
+          title: Tool Call Id
+        action:
+          type: string
+          title: Action
+          description: Model-facing tool name `<tool_key>__<action>` (C7).
+        tool_key:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Tool Key
+          description: The tool part of `action`; null if it has none.
+        arguments:
+          additionalProperties: true
+          type: object
+          title: Arguments
+          description: Tool call arguments as masked by the guardrail before the run stopped; raw values
+            are never stored.
+        reason_from_model:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Reason From Model
+        status:
+          $ref: '#/components/schemas/ApprovalStatus'
+        assigned_role:
+          $ref: '#/components/schemas/ApproverRole'
+        requested_at:
+          type: string
+          format: date-time
+          title: Requested At
+        expires_at:
+          type: string
+          format: date-time
+          title: Expires At
+        resolved_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Resolved At
+        resolved_by:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Resolved By
+        resolution_note:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Resolution Note
+        can_decide:
+          type: boolean
+          title: Can Decide
+          description: 'Whether this caller may approve or reject: console session, `edit` access and
+            a role at least `assigned_role`. Shown for buttons; the decision route checks again.'
+      type: object
+      required:
+      - id
+      - project_id
+      - run_id
+      - tool_call_id
+      - action
+      - tool_key
+      - arguments
+      - reason_from_model
+      - status
+      - assigned_role
+      - requested_at
+      - expires_at
+      - resolved_at
+      - resolved_by
+      - resolution_note
+      - can_decide
+      title: ApprovalOut
+    ApprovalStatus:
+      type: string
+      enum:
+      - pending
+      - approved
+      - rejected
+      - expired
+      title: ApprovalStatus
+      description: '`expired`: no decision within APPROVAL_TTL_MIN; the run was closed (`approval_expired`).'
+    ApproverRole:
+      type: string
+      enum:
+      - analyst
+      - developer
+      - admin
+      title: ApproverRole
+      description: The least role that may decide; `user` never approves.
+    DecisionRequest:
+      properties:
+        note:
+          anyOf:
+          - type: string
+            maxLength: 2000
+          - type: 'null'
+          title: Note
+          description: Why; shown to the model on reject.
+      additionalProperties: false
+      type: object
+      title: DecisionRequest
+    ErrorBody:
+      properties:
+        error:
+          $ref: '#/components/schemas/ErrorDetail'
+      type: object
+      required:
+      - error
+      title: ErrorBody
+      description: OpenAI-shaped error body used by every 4xx response.
+    ErrorDetail:
+      properties:
+        message:
+          type: string
+          title: Message
+          description: English, actionable, never contains secrets.
+        type:
+          type: string
+          title: Type
+          description: authentication_error, permission_error, not_found_error, ...
+        code:
+          type: string
+          title: Code
+          description: Stable machine-readable code, e.g. read_only_access.
+      type: object
+      required:
+      - message
+      - type
+      - code
+      title: ErrorDetail

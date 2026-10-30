@@ -77,6 +77,9 @@ PARITY_EXEMPT_PREFIXES = (
     # parity is test_06a_read_mode_get_parity (the /agents and /runs lists stay checked here).
     f"{API}/projects/{{project_id}}/agents/{{agent_id}}",
     f"{API}/projects/{{project_id}}/runs/{{run_id}}",
+    # 07: the single approval GET needs an approval (and a run) in the world; its parity is
+    # test_07_read_mode_get_parity (the /approvals list and count stay checked here).
+    f"{API}/projects/{{project_id}}/approvals/{{approval_id}}",
 )
 
 

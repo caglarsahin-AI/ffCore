@@ -1,4 +1,5 @@
 from ffcore.models.agents import Agent, AgentVersion  # 06a
+from ffcore.models.approvals import Approval  # 07
 from ffcore.models.audit import AuditEvent  # 03b
 from ffcore.models.base import Base
 from ffcore.models.catalog import Model, ModelCatalogEntry, Provider, ProviderProject  # 03a
@@ -11,6 +12,7 @@ from ffcore.models.tools import FewShot, SchemaDescription, Tool, ToolAction  # 
 __all__ = [
     "Agent",
     "AgentVersion",
+    "Approval",
     "Attachment",
     "AuditEvent",
     "Base",
