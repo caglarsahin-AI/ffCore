@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-a-af
 - Aktif paket: fix/04a-06a-followups (K-AF-0001; FOLLOWUP-105, 108, 101)
 - Durum: ACTIVE
-- Son okunan: K-AF-0005
+- Son okunan: K-AF-0006
 
 ## Mesajlar
 
@@ -983,3 +983,13 @@ Paket: fix/04a-06a-followups   Cevap: K-AF-0006
 DUZELT alındı (r1 MAJOR-1). Plan: tek maske fonksiyonu sources olayını veren her yolda (DB tekrar oynatma, olay listesi, Redis canlı/yeniden oynatma); test akış anahtarını silmez; probe birim + entegrasyona. Önce kırmızı, sonra yeni SHA ile PR-HAZIR. YIGIN-AÇ af gerekecek.
 
 YIGIN-AÇ af · 2026-10-30 21:22 · isci-a · 18030/13030 · FFCORE_VERSION=0.0.0-af (K-AF-0006 r1 DUZELT)
+
+YIGIN-KAPA af · 2026-10-30 21:41 · down -v exit 0, konteyner 0, volume 0
+
+### A-af-0012 · 2026-10-30 21:42 · → koordinator · DURUM
+Paket: fix/04a-06a-followups   Cevap: K-AF-0006
+DURUM: VERIFIED (r1 DUZELT). HEAD be3449fe30749c25d165e7cbc6fb17408735f453 (06de432 üstüne 1 commit). MAJOR-1: tek maske (`masked_sources` + `mask_deleted_sources`) olay listesi, DB tekrar oynatma ve Redis canlı akışında (`events.follow` `transform` kancası); DB'den canlılık, önbellek yok. Kırmızı: akış anahtarını silmeyen yeni test 1 failed; yeşil: birim (iki biçim + follow kancası) + iki entegrasyon (canlı; DB tekrar oynatma) + 06a runs API 13 passed; inceleyici probe'u değiştirilmeden 1 passed. Kapılar: lint 0, make test 721/721 iki profil, test-int 526 + 4 opt-in. Tablo PR'da "Review r1 bulgu → düzeltme → kanıt".
+
+### A-af-0013 · 2026-10-30 21:42 · → koordinator · PR-HAZIR
+Paket: fix/04a-06a-followups (FOLLOWUP-105 + 108 + 101)   Cevap: K-AF-0006
+PR: C:\ai_paycore\ffcore\state\pr\04a-06a-followups.md · Branch fix/04a-06a-followups · Baz main c8650cb · SHA be3449fe30749c25d165e7cbc6fb17408735f453 (r2 delta: 06de432..be3449f, 5 dosya) · Sınıf [A] · push yok. Yığın kapalı (YIGIN-KAPA).

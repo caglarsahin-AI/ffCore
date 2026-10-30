@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-koordinator-20261028-0205
 - Aktif paket: tumu
 - Durum: ACTIVE
-- Son okunan: isci-a A-af-0010 (oturum ffcore-isci-a-af) (oturum ffcore-isci-a-04awr); isci-b B-07FU-0011 RETIRED (oturum ffcore-isci-b-07fu); isci-c C-10bp2-0019 RETIRED (oturum ffcore-isci-c-10bp2); inceleyici R-AF-0003; test T-18-0045 (oturum ffcore-test-18-hazirlik) (2026-10-30 11:05)
+- Son okunan: isci-a A-af-0013 (oturum ffcore-isci-a-af) (oturum ffcore-isci-a-04awr); isci-b B-07FU-0011 RETIRED (oturum ffcore-isci-b-07fu); isci-c C-10bp2-0019 RETIRED (oturum ffcore-isci-c-10bp2); inceleyici R-AF-0003; test T-18-0045 (oturum ffcore-test-18-hazirlik) (2026-10-30 11:05)
 
 ## Mesajlar
 
@@ -2414,3 +2414,11 @@ r1 DUZELT, MAJOR 1: silinen belgenin breadcrumb'ı canlı SSE akışında ham d�
 ### K-INC-0016 · 2026-10-30 21:21 · → inceleyici · CEVAP
 Paket: 04a-06a-followups   Cevap: R-AF-0002 / R-AF-0003
 DUZELT K-AF-0006 gitti (maske okuma anında tek fonksiyon, Redis yolu dahil; test akış anahtarını silmez). r2'de delta + aynı probe'un. `review-af-r1` kullanıcı temizlik listesinde. `schema-04a.d.ts` eşleşmesini ben main kapısında node konteyneriyle koşacağım (check:api). Teşekkürler; iyi yakalama.
+
+### K-AF-0007 · 2026-10-30 21:43 · → inceleyici · REVIEW-ISTEK
+Paket: fix/04a-06a-followups   Cevap: A-af-0013
+Tur r2 (delta). SHA be3449fe30749c25d165e7cbc6fb17408735f453 (koordinatör doğruladı: 06de432 + 1 commit `fix(06a): mask deleted sources on the live stream too`, 5 dosya +165/-43, ağaç temiz). Delta: tek maske fonksiyonu Redis canlı akışında da (follow dönüşüm kancası); `test_af_2b` akış anahtarını silmiyor, kırmızı→yeşil; senin probe'un 1 passed; lint 0, make test 721 iki profil, test-int 526. Yığınlı (`YIGIN-AÇ review-af`, 18040/13040; FF yığını kapalı): aynı probe (akış anahtarı varken `[deleted]`), reconnect + canlı iki yol, maske fonksiyonunun tek olduğu (iki kopya yok). Çıktı: state/reviews/04a-06a-followups-r2.md + REVIEW-SONUC.
+
+### K-AF-0008 · 2026-10-30 21:43 · → isci-a · CEVAP
+Paket: fix/04a-06a-followups   Cevap: A-af-0013
+be3449f doğrulandı; REVIEW-ISTEK r2 K-AF-0007 gitti. YIGIN-KAPA alındı. Branch'e commit yok; ONAY → merge + kapı (önyüz check:api dahil) → MERGED → 13b A GOREV'i (K-13b-0006). Bekleme işi: K-13b-0000 taslağını oku, 13b A tarafı için kısa PLANNED hazırla (worktree feat/13b-e2e-eval; madde 0 FOLLOWUP-115 `npm run gen:api`).

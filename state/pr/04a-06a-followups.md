@@ -50,7 +50,16 @@
 
 **Plan onayı (K-AF-0002):** S1 **A** (tarih yoksa NULL; yükleme anı asla yerine yazılmaz; PATCH ile verilir). S2 **A** (`"[deleted]"`; önyüz çevirisi FOLLOWUP-112 ile).
 
-## Durum
+## Review r1 bulgu → düzeltme → kanıt (K-AF-0006, state/reviews/04a-06a-followups-r1.md)
+HEAD **be3449fe30749c25d165e7cbc6fb17408735f453** (06de432 üstüne 1 commit `fix(06a): mask deleted sources on the live stream too`; c8650cb üstüne toplam 5).
+
+| Bulgu | Düzeltme | Kanıt |
+|---|---|---|
+| MAJOR-1: silinen belgenin breadcrumb'ı Redis canlı akışında (TTL 86400 s) ham; `test_af_2b` akış anahtarını silerek bunu gizliyordu | Tek maske: `api/runs.py` `masked_sources(payload, alive)` (saklanan `selected` ve canlı SSE `sources` biçimi) + `mask_deleted_sources(session, payloads)` (tek sorgu, DB'den canlılık, önbellek yok). Üç yol bundan geçer: olay listesi ve DB'den tekrar oynatma (`_stored_payloads`), canlı/yeniden bağlanan Redis akışı (`runtime/events.py` `follow(..., transform=)` kancası, runs API `_mask_live_event` verir). Akış ve olaylar salt ekleme, değiştirilmez | Kırmızı: yeni `test_af_2b_deleted_source_masked_on_list_and_live_stream` (akış anahtarı silinmez) 1 failed, DB yolu geçti (`r1-af2c-kirmizi.log`). Yeşil: `tests/unit/test_af_2c_source_mask_paths.py` (iki biçim; `follow` her canlı girdiyi dönüştürür) + iki entegrasyon testi (canlı akış; DB tekrar oynatma, akış anahtarı bilerek silinir) + `test_06a_runs_api` 13 passed (`r1-af2c-yesil.log`). İnceleyicinin `af-negative-probe.py`'si değiştirilmeden bir kez koşuldu: 1 passed, sonra silindi (`r1-reviewer-probe.log`) |
+
+r2 kapıları (be3449f, yığın `ffcore-af` yeniden açıldı ve kapandı): `make lint` 0; `make test` llmaas 721/721, airgap 721/721; `make test-int` 526 passed + 4 opt-in atlandı (453 s). Çıktılar `r2-*.txt`. e2e senaryoları bu delta için yeniden koşulmadı (değişiklik yalnız akış okuma yolu; F10_7 olay listesini okur, 06de432'de yeşildi).
+
+## Durum (r1 öncesi)
 HEAD **06de43294432a8f7a666f1ededb5fb036190eb20** (c8650cb üstüne 4 commit, push yok):
 - 7a982c8 `fix(06a): answer definition refusals with their own code` (dilim 1, FOLLOWUP-105)
 - 027230e `fix(04a): keep run sources to structure, mask deleted documents` (dilim 2, FOLLOWUP-108)
