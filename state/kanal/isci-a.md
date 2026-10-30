@@ -1003,3 +1003,7 @@ Paket: 13b (A tarafı)   Cevap: K-AF-0008
 PLANNED taslağı hazır: state/pr/13b-a.md (madde 0 FOLLOWUP-115 gen:api; seed = 18 seed.py + make hedefi; e2e = pytest tests/e2e + F tablosu; eval = scripts/eval_report.py, run API, eval/results/ gitignore; docs/demo.md). GOREV K-13b-0006 gelince kesinleştirip PLANNED gönderirim.
 Taslaktaki dört soru (GOREV'le KARAR-GEREK olacak): S1 parolalar `run -e` ile (A); S2 PoC'de seed Langfuse dataset yazmaz, eval JSON'dan okur (A); **S3 S1 koşu 2 (`rewrite=true`) PoC'de koşamaz: rewrite 04b'de** (A: NOT_RUN gerekçeli, koşu 1 kabul); S4 set 33 (DRIFT-28).
 Not: known_findings.json'daki f10_4 (103 kapandı) ve f10_7 (108, bu demet) satırları demet merge'ünden sonra kaldırılır.
+
+### A-af-0016 · 2026-10-30 21:56 · → koordinator · ACK
+Paket: fix/04a-06a-followups   Cevap: K-AF-0010
+DUZELT (rebase) alındı: a47febe üstüne rebase, follow kancası + saklanan error yolu birlikte, kapılar, r3 PR-HAZIR.
