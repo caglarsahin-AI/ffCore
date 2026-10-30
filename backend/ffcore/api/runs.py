@@ -158,43 +158,64 @@ async def _audit(
 
 
 # A source whose document was deleted keeps its reference (document id and name, for the audit
-# trail) but not its breadcrumb (FOLLOWUP-108). The stored event is append-only; the mask is
-# applied on every read path that serves stored events.
+# trail) but not its breadcrumb (FOLLOWUP-108). Stored events and the Redis stream are append-only,
+# so the mask is applied when a sources event is read, on every path that hands one to a client:
+# the events list, the replay from run_events and the live Redis stream (review r1 MAJOR-1).
 DELETED_BREADCRUMB = "[deleted]"
+# Stored `sources` payloads list sources under "selected", the live SSE data under "sources".
+_SOURCE_LISTS = ("selected", "sources")
 
 
-async def _mask_deleted_sources(session, rows: list[RunEvent]) -> dict[int, dict]:
-    """Payload per event seq, with the breadcrumb of every deleted document's source masked."""
-    sources = [r for r in rows if r.type == RunEventType.sources]
+def masked_sources(payload: dict, alive: set[str]) -> dict:
+    """The payload with the breadcrumb of every source outside `alive` (document ids) masked."""
+    out = dict(payload)
+    for key in _SOURCE_LISTS:
+        if isinstance(payload.get(key), list):
+            out[key] = [
+                s if s.get("document_id") in alive else {**s, "breadcrumb": DELETED_BREADCRUMB}
+                for s in payload[key]
+            ]
+    return out
+
+
+async def mask_deleted_sources(session, payloads: list[dict]) -> list[dict]:
+    """`sources` payloads, masked against the documents that are not deleted (one query)."""
     ids = {
-        s.get("document_id")
-        for r in sources
-        for s in (r.payload or {}).get("selected") or []
+        str(s["document_id"])
+        for payload in payloads
+        for key in _SOURCE_LISTS
+        for s in payload.get(key) or []
         if s.get("document_id")
     }
+    valid = []
+    for value in ids:
+        try:
+            valid.append(UUID(value))
+        except ValueError:
+            continue  # not a document id: never alive, so masked
     alive: set[str] = set()
-    if ids:
-        valid = []
-        for value in ids:
-            try:
-                valid.append(UUID(str(value)))
-            except ValueError:
-                continue
+    if valid:
         found = await session.scalars(
             select(Document.id).where(Document.id.in_(valid), Document.deleted_at.is_(None))
         )
         alive = {str(i) for i in found.all()}
-    out: dict[int, dict] = {}
-    for row in rows:
-        payload = row.payload
-        if row.type == RunEventType.sources and payload:
-            selected = [
-                s if s.get("document_id") in alive else {**s, "breadcrumb": DELETED_BREADCRUMB}
-                for s in payload.get("selected") or []
-            ]
-            payload = {**payload, "selected": selected}
-        out[row.seq] = payload
+    return [masked_sources(payload, alive) for payload in payloads]
+
+
+async def _stored_payloads(session, rows: list[RunEvent]) -> dict[int, dict]:
+    sources = [r for r in rows if r.type == RunEventType.sources and r.payload]
+    masked = await mask_deleted_sources(session, [r.payload for r in sources])
+    out = {r.seq: r.payload for r in rows}
+    out.update({r.seq: payload for r, payload in zip(sources, masked, strict=True)})
     return out
+
+
+async def _mask_live_event(event: str, data: dict) -> dict:
+    """The live stream's hook: a sources event read from Redis gets the same mask."""
+    if event != SseEvent.sources:
+        return data
+    async with db.session_scope() as session:
+        return (await mask_deleted_sources(session, [data]))[0]
 
 
 def _replay_rows(project_id: UUID, run_id: UUID):
@@ -209,7 +230,7 @@ def _replay_rows(project_id: UUID, run_id: UUID):
             )
             last_seq = after_seq
             rows_all = stored.all()
-            payloads = await _mask_deleted_sources(session, rows_all)
+            payloads = await _stored_payloads(session, rows_all)
             for row in rows_all:
                 last_seq = row.seq
                 sse = run_events.REPLAY_SSE.get(RunEventType(row.type))
@@ -261,6 +282,7 @@ def _stream(
                 grace_s=settings.run_abandon_grace_s,
                 replay_rows=_replay_rows(project_id, run_id),
                 finished=_finished(run_id),
+                transform=_mask_live_event,
             ):
                 yield chunk
         finally:
@@ -540,7 +562,7 @@ async def list_run_events(
         .order_by(RunEvent.seq)
     )
     events = rows.all()
-    payloads = await _mask_deleted_sources(session, events)
+    payloads = await _stored_payloads(session, events)
     return RunEventList(
         items=[
             RunEventOut(

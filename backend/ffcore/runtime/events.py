@@ -158,6 +158,7 @@ async def follow(
     grace_s: int,
     replay_rows,
     finished,
+    transform=None,
 ) -> AsyncIterator[str]:
     """SSE text for one client. `after`: the client's Last-Event-ID. `replay_rows(after_seq)`
     returns stored rows when the live stream is gone; it ends with the run's final SSE event.
@@ -165,7 +166,11 @@ async def follow(
     `finished()` says whether the run has ended in Postgres. A writer commits a row before it
     publishes the live entry, so a failed publish (Redis error) leaves an ended run whose last
     events are only stored: on an empty keepalive turn of an ended run, the stored rows after
-    the last entry seen are given and the stream stops (FOLLOWUP-104), never a silent wait."""
+    the last entry seen are given and the stream stops (FOLLOWUP-104), never a silent wait.
+
+    `transform(event, data)`, when given, returns the data to send for each live entry (the
+    caller's read-time masks, FOLLOWUP-108); stored rows, the replay and the stored-only ending
+    alike, get theirs in `replay_rows`."""
     key = stream_key(run_id)
     last = after or "0-0"
     ended_seen = False
@@ -196,6 +201,9 @@ async def follow(
                 last = _decode(entry_id)
                 event = _decode(fields[b"event"] if b"event" in fields else fields["event"])
                 raw = fields[b"data"] if b"data" in fields else fields["data"]
-                yield SseMessage(last, event, json.loads(_decode(raw))).render()
+                data = json.loads(_decode(raw))
+                if transform is not None:
+                    data = await transform(event, data)
+                yield SseMessage(last, event, data).render()
                 if event in TERMINAL_SSE:
                     return

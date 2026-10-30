@@ -43,7 +43,17 @@ def _selected(events) -> list[dict]:
     return [s for e in events if e["type"] == "sources" for s in e["payload"]["selected"]]
 
 
-def test_af_2b_deleted_source_breadcrumb(analyst, pg, harness, use_queue):
+def _stream_sources(client, project_id, run_id) -> list[dict]:
+    return [
+        s
+        for _, e, d in get_stream(client, project_id, run_id)
+        if e == "sources"
+        for s in d.get("selected") or d.get("sources") or []
+    ]
+
+
+def _deleted_run(analyst, pg, harness, use_queue):
+    """A completed run whose only source is then deleted; the live Redis stream still exists."""
     project_id, client = analyst
     doc_id = _document(pg, project_id)
     hit = replace(source(), document_id=doc_id, document_name="prosedur.txt", breadcrumb="KB › M")
@@ -51,13 +61,26 @@ def test_af_2b_deleted_source_breadcrumb(analyst, pg, harness, use_queue):
     use_queue(InlineQueue(harness, Ports(ScriptedModel(turn("A [1].")), ScriptedRetriever([hit]))))
     run_id = post_run(client, project_id)[0][2]["run_id"]
     url = f"/api/v1/projects/{project_id}/runs/{run_id}/events"
-
-    live = _selected(client.get(url).json()["items"])
-    assert [s["breadcrumb"] for s in live] == ["KB › M"]
-
+    before = _selected(client.get(url).json()["items"])
+    assert [s["breadcrumb"] for s in before] == ["KB › M"]
+    assert [s["breadcrumb"] for s in _stream_sources(client, project_id, run_id)] == ["KB › M"]
     pg.execute("UPDATE documents SET deleted_at = now() WHERE id = %s", (doc_id,))
+    return client, project_id, run_id, doc_id, url, before
+
+
+def test_af_2b_deleted_source_masked_on_list_and_live_stream(analyst, pg, harness, use_queue):
+    # Review r1 MAJOR-1: the Redis stream lives for RUN_EVENT_STREAM_TTL_S; it is not expired here.
+    client, project_id, run_id, doc_id, url, before = _deleted_run(analyst, pg, harness, use_queue)
     gone = _selected(client.get(url).json()["items"])
-    assert gone == [{**live[0], "breadcrumb": "[deleted]"}]  # reference kept, crumb masked
+    assert gone == [{**before[0], "breadcrumb": "[deleted]"}]  # reference kept, crumb masked
+    live = _stream_sources(client, project_id, run_id)
+    assert live and all(s["breadcrumb"] == "[deleted]" for s in live), live
+    assert {s["document_id"] for s in live} == {doc_id}
+
+
+def test_af_2b_deleted_source_masked_on_db_replay(analyst, pg, harness, use_queue):
+    # The other stream path: after the TTL the run is replayed from run_events.
+    client, project_id, run_id, doc_id, _, _ = _deleted_run(analyst, pg, harness, use_queue)
 
     async def expire():
         c = aioredis.from_url(os.environ["REDIS_URL"])
@@ -65,12 +88,7 @@ def test_af_2b_deleted_source_breadcrumb(analyst, pg, harness, use_queue):
         await c.aclose()
 
     asyncio.run(expire())
-    replayed = [
-        s
-        for _, e, d in get_stream(client, project_id, run_id)
-        if e == "sources"
-        for s in d.get("selected") or d.get("sources") or []
-    ]
+    replayed = _stream_sources(client, project_id, run_id)
     assert replayed and all(
         s["breadcrumb"] == "[deleted]" and s["document_id"] == doc_id for s in replayed
     ), replayed
