@@ -80,9 +80,7 @@ function Loaded({ projectId, agent, versions }: { projectId: string; agent: Agen
     <div className="flex flex-col gap-4">
       <BackLink label={t("back")} />
       <Screen title={agent.name} description={agent.description || t("description")} action={action}>
-        <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_28rem]">
-          <AgentWizard projectId={projectId} agent={agent} versions={versions} />
-        </div>
+        <AgentWizard projectId={projectId} agent={agent} versions={versions} />
       </Screen>
     </div>
   );

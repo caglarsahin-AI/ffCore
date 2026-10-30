@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
 
+import { AgentTestPanel } from "@/components/agent-test-panel";
 import { InstructionsTab } from "@/components/agent-wizard/instructions-tab";
 import { KnowledgeTab } from "@/components/agent-wizard/knowledge-tab";
 import { LimitsTab } from "@/components/agent-wizard/limits-tab";
@@ -83,7 +84,8 @@ function Wizard({
   }
 
   return (
-    <div className="flex flex-col gap-4" data-testid="agent-wizard">
+    <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_28rem]">
+    <div className="flex min-w-0 flex-col gap-4" data-testid="agent-wizard">
       <div className="flex flex-wrap items-center gap-3 text-sm" data-testid="wizard-version">
         <span>{t("editingVersion", { version: shown.version })}</span>
         {!editable && <span className="text-muted-foreground" data-testid="wizard-published-readonly">{t("publishedReadOnly")}</span>}
@@ -135,6 +137,8 @@ function Wizard({
           {dirty && <span className="text-sm text-muted-foreground" data-testid="wizard-dirty">{t("unsaved")}</span>}
         </div>
       )}
+    </div>
+    <AgentTestPanel projectId={projectId} agentKey={agent.key} version={shown.version} definition={shown.definition} dirty={dirty} />
     </div>
   );
 }
