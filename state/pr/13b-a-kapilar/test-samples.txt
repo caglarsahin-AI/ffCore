@@ -1,0 +1,106 @@
+python -m unittest discover -s data/samples/scripts/tests -v
+generated agents -> /tmp/tmp_iy1r3b_/agents
+test_13a_3_agent_templates_match_06_fields (test_13a.Test13aAgents.test_13a_3_agent_templates_match_06_fields) ... ok
+test_13a_3b_sql_agent_single_call_consistent (test_13a.Test13aAgents.test_13a_3b_sql_agent_single_call_consistent)
+Review r1 MAJOR-1: prompt, tool list and call budget describe one run_sql call. ... ok
+generated contracts -> /tmp/tmpof4dgsx5/contracts
+test_13a_1_contracts_count_and_formats (test_13a.Test13aContracts.test_13a_1_contracts_count_and_formats) ... ok
+test_13a_1b_contracts_structure (test_13a.Test13aContracts.test_13a_1b_contracts_structure) ... ok
+test_13a_8_deterministic (test_13a.Test13aDeterminism.test_13a_8_deterministic) ... generated contracts -> /tmp/tmp95fc655z/contracts
+generated eval -> /tmp/tmp95fc655z/eval
+generated schema -> /tmp/tmp95fc655z/schema
+generated agents -> /tmp/tmp95fc655z/agents
+generated openapi -> /tmp/tmp95fc655z/openapi
+generated pii -> /tmp/tmp95fc655z/pii
+generated memory -> /tmp/tmp95fc655z/memory
+generated scenarios_sql -> /tmp/tmp95fc655z/scenarios_sql
+generated tickets -> /tmp/tmp95fc655z/tickets
+generated poison -> /tmp/tmp95fc655z/poison
+generated projects -> /tmp/tmp95fc655z/projects
+generated versions -> /tmp/tmp95fc655z/versions
+generated contracts -> /tmp/tmp0pkliv0y/contracts
+generated eval -> /tmp/tmp0pkliv0y/eval
+generated schema -> /tmp/tmp0pkliv0y/schema
+generated agents -> /tmp/tmp0pkliv0y/agents
+generated openapi -> /tmp/tmp0pkliv0y/openapi
+generated pii -> /tmp/tmp0pkliv0y/pii
+generated memory -> /tmp/tmp0pkliv0y/memory
+generated scenarios_sql -> /tmp/tmp0pkliv0y/scenarios_sql
+generated tickets -> /tmp/tmp0pkliv0y/tickets
+generated poison -> /tmp/tmp0pkliv0y/poison
+generated projects -> /tmp/tmp0pkliv0y/projects
+generated versions -> /tmp/tmp0pkliv0y/versions
+ok
+generated contracts -> /tmp/tmp7viamkmt/contracts
+generated eval -> /tmp/tmp7viamkmt/eval
+test_13a_4_eval_distribution (test_13a.Test13aEval.test_13a_4_eval_distribution) ... ok
+test_13a_4b_eval_required_metadata (test_13a.Test13aEval.test_13a_4b_eval_required_metadata) ... ok
+test_13a_4c_eval_answerability_checks (test_13a.Test13aEval.test_13a_4c_eval_answerability_checks) ... ok
+test_13a_4d_sql_expected_results (test_13a.Test13aEval.test_13a_4d_sql_expected_results) ... ok
+test_13a_4f_gold_answer_passes_must_contain (test_13a.Test13aEval.test_13a_4f_gold_answer_passes_must_contain) ... ok
+generated memory -> /tmp/tmpku782bm_/memory
+test_13a_6_memory_conversations (test_13a.Test13aMemory.test_13a_6_memory_conversations) ... ok
+test_13a_6b_memory_total_40 (test_13a.Test13aMemory.test_13a_6b_memory_total_40) ... ok
+test_13a_7_openapi_superset_6_ops (test_13a.Test13aOpenapi.test_13a_7_openapi_superset_6_ops) ... generated openapi -> /tmp/tmpl0lsflzm/openapi
+ok
+test_13a_9_no_person_names_outside_pii_memory (test_13a.Test13aPersonNames.test_13a_9_no_person_names_outside_pii_memory) ... ok
+generated pii -> /tmp/tmpbph7b7pu/pii
+test_13a_5_pii_labeled (test_13a.Test13aPii.test_13a_5_pii_labeled) ... ok
+test_13a_5_validators_match_known_examples (test_13a.Test13aPii.test_13a_5_validators_match_known_examples) ... ok
+test_13a_5b_pii_total_100 (test_13a.Test13aPii.test_13a_5b_pii_total_100) ... ok
+generated schema -> /tmp/tmp4d9incpa/schema
+test_13a_2_schema_seed_10000_rows (test_13a.Test13aSchema.test_13a_2_schema_seed_10000_rows) ... ok
+test_13a_2b_schema_no_person_level_columns (test_13a.Test13aSchema.test_13a_2b_schema_no_person_level_columns) ... ok
+test_13a_2c_descriptions_and_20_few_shots (test_13a.Test13aSchema.test_13a_2c_descriptions_and_20_few_shots) ... ok
+test_13a_2d_postgres_load (test_13a_pg.Test13aPostgres.test_13a_2d_postgres_load) ... skipped 'NOT_RUN: set RUN_PG_TESTS=1 (needs Docker)'
+test_13a_2e_few_shots_run_as_readonly (test_13a_pg.Test13aPostgres.test_13a_2e_few_shots_run_as_readonly) ... skipped 'NOT_RUN: set RUN_PG_TESTS=1 (needs Docker)'
+test_13a_4d_sql_expected_results_in_postgres (test_13a_pg.Test13aPostgres.test_13a_4d_sql_expected_results_in_postgres) ... skipped 'NOT_RUN: set RUN_PG_TESTS=1 (needs Docker)'
+test_18_ag_1_same_shape_as_13a_templates (test_18.Test18Agents.test_18_ag_1_same_shape_as_13a_templates) ... ok
+test_18_ag_2_poison_agent_has_its_kb_and_a_tool_to_resist (test_18.Test18Agents.test_18_ag_2_poison_agent_has_its_kb_and_a_tool_to_resist) ... ok
+test_18_ag_3_version_agent_reads_versions_kb_and_names_the_date (test_18.Test18Agents.test_18_ag_3_version_agent_reads_versions_kb_and_names_the_date) ... ok
+test_18_0_deterministic (test_18.Test18Deterministic.test_18_0_deterministic) ... generated scenarios_sql -> /tmp/tmpq7_lqt0q/scenarios_sql
+generated tickets -> /tmp/tmpq7_lqt0q/tickets
+generated poison -> /tmp/tmpq7_lqt0q/poison
+generated projects -> /tmp/tmpq7_lqt0q/projects
+generated versions -> /tmp/tmpq7_lqt0q/versions
+generated scenarios_sql -> /tmp/tmp2hv7u6ol/scenarios_sql
+generated tickets -> /tmp/tmp2hv7u6ol/tickets
+generated poison -> /tmp/tmp2hv7u6ol/poison
+generated projects -> /tmp/tmp2hv7u6ol/projects
+generated versions -> /tmp/tmp2hv7u6ol/versions
+ok
+test_18_0b_separate_rng_streams (test_18.Test18Deterministic.test_18_0b_separate_rng_streams) ... ok
+test_18_f11_1_shape (test_18.Test18Poison.test_18_f11_1_shape) ... ok
+test_18_f11_2_canaries_only_in_injection (test_18.Test18Poison.test_18_f11_2_canaries_only_in_injection) ... ok
+test_18_f11_3_legit_fact_present (test_18.Test18Poison.test_18_f11_3_legit_fact_present) ... ok
+test_18_f11_4_no_pii_no_names (test_18.Test18Poison.test_18_f11_4_no_pii_no_names) ... ok
+test_18_f11_5_b2_target_value (test_18.Test18Poison.test_18_f11_5_b2_target_value) ... ok
+test_13b_1_members_have_role_full_names (test_18.Test18Projects.test_13b_1_members_have_role_full_names)
+13b (K-13b-0001 S1): every member has a display name built from project, role and ... ok
+test_18_f10_1_projects_shape (test_18.Test18Projects.test_18_f10_1_projects_shape) ... ok
+test_18_f10_2_no_secret (test_18.Test18Projects.test_18_f10_2_no_secret) ... ok
+test_18_f10_3_sources_exist (test_18.Test18Projects.test_18_f10_3_sources_exist) ... ok
+test_18_f3_1_sql20_shape (test_18.Test18Sql.test_18_f3_1_sql20_shape) ... ok
+test_18_f3_2_reuses_13a_sql_items (test_18.Test18Sql.test_18_f3_2_reuses_13a_sql_items) ... ok
+test_18_f3_3_expected_from_seed (test_18.Test18Sql.test_18_f3_3_expected_from_seed) ... ok
+test_18_f3_5_difficulty_mix (test_18.Test18Sql.test_18_f3_5_difficulty_mix) ... ok
+test_18_f3_5b_not_a_few_shot (test_18.Test18Sql.test_18_f3_5b_not_a_few_shot) ... ok
+test_18_f3_6_write_attempts_cover_classes (test_18.Test18Sql.test_18_f3_6_write_attempts_cover_classes) ... ok
+test_18_f3_6b_hidden_write_pattern_coverage (test_18.Test18Sql.test_18_f3_6b_hidden_write_pattern_coverage)
+Each way of hiding a write has at least one hidden_write record (r1 MAJOR-1: ... ok
+test_18_f2_1_tickets_shape_and_labels (test_18.Test18Tickets.test_18_f2_1_tickets_shape_and_labels) ... ok
+test_18_f2_2_pii_spans_valid (test_18.Test18Tickets.test_18_f2_2_pii_spans_valid) ... ok
+test_18_f2_3_no_stray_pii (test_18.Test18Tickets.test_18_f2_3_no_stray_pii) ... ok
+test_18_f2_4_no_person_names (test_18.Test18Tickets.test_18_f2_4_no_person_names) ... ok
+test_18_f2_5_labels_not_in_tickets (test_18.Test18Tickets.test_18_f2_5_labels_not_in_tickets) ... ok
+test_18_f13_1_replay_v1_identical (test_18.Test18Versions.test_18_f13_1_replay_v1_identical) ... ok
+test_18_f13_2_single_clause_changed (test_18.Test18Versions.test_18_f13_2_single_clause_changed) ... ok
+test_18_f13_3_not_in_f1_exam (test_18.Test18Versions.test_18_f13_3_not_in_f1_exam) ... ok
+test_18_f3_4_reference_sql_matches_postgres (test_18_pg.Test18Postgres.test_18_f3_4_reference_sql_matches_postgres) ... skipped 'NOT_RUN: set RUN_PG_TESTS=1 (needs Docker)'
+test_18_f3_7_write_attempts_fail_readonly (test_18_pg.Test18Postgres.test_18_f3_7_write_attempts_fail_readonly)
+Every write and hidden write fails in a session set up like mcp-sql's (05a ... skipped 'NOT_RUN: set RUN_PG_TESTS=1 (needs Docker)'
+
+----------------------------------------------------------------------
+Ran 54 tests in 3.614s
+
+OK (skipped=5)
