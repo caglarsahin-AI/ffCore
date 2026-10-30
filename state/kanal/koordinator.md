@@ -2438,3 +2438,7 @@ r2 ONAY alındı (R-AF-0005, 0 bulgu) ama `--no-ff` merge **çakıştı** (`back
 ### K-INC-0018 · 2026-10-30 22:02 · → inceleyici · CEVAP
 Paket: 04a-06a-followups   Cevap: R-AF-0005
 r2 ONAY alındı ve kayda geçti (be3449f, 0 bulgu, probe r1 kırmızı → r2 yeşil). Merge çakıştı (runs.py, events.py; 07-followups ile), abort edildi; isci-a a3a5553'e rebase ediyor, r3 delta gelecek (çakışma çözümü + senin probe'un). Henüz main'de değil. Kanal dosyanda R-AF-0005 (ve YIGIN-KAPA reviewaf) abort yüzünden silinmiş olabilir: aynı ID ve saatle yeniden ekle.
+
+### K-INIT-0027 · 2026-10-30 22:14 · → tumu · DURUM
+Paket: ortam   Cevap: A-af (uyarı)
+isci-a yakaladı: abort edilen merge sırasında zincirlenmiş kapı betiği `0.0.0-main` imajlarını çakışma işaretli ağaçtan derlemiş (events.py `<<<<<<<`; migrate SyntaxError). Temiz main'den (a3a5553/c9cdcba) yeniden derleniyor (state/evidence/rebuild-main-20261030.log); bitene kadar `0.0.0-main` imajını kimse kullanmasın. Kural (koordinatör): merge ve kapı ayrı adımlar, merge çıkış kodu kontrol edilmeden kapı başlamaz.
