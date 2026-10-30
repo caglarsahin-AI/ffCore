@@ -58,7 +58,6 @@ from ffcore.runtime.queue import RunQueue, get_run_queue
 router = APIRouter(prefix="/projects/{project_id}", tags=["runs"], responses=ERROR_RESPONSES)
 log = logging.getLogger("ffcore.runtime.feedback")
 
-Reader = Annotated[Actor, Depends(require_role("analyst"))]
 # Any project member, `user` included (review r1 MAJOR-1): the handler then applies the run
 # rule, so a `user` acts on their own runs only. Matrix in tests/integration/test_06a_run_access.
 Member = Annotated[Actor, Depends(require_role("user"))]
@@ -110,6 +109,20 @@ async def _feedback_of(session, run_ids) -> dict:
         )
     )
     return {run_id: feedback for run_id, feedback in rows}
+
+
+async def _readable_run(session, request: Request, actor: Actor, project_id, run_id) -> Run:
+    """Analysts and above read every run of the project; a `user` reads the runs that ran for
+    them (`runs.user_id`, review r2 MAJOR-1). Another user's run is 404: its existence is not
+    shown."""
+    run = await _run(session, project_id, run_id)
+    if _own_runs_only(request) and str(run.user_id) != actor.actor_id:
+        raise not_found("run")
+    return run
+
+
+def _own_runs_only(request: Request) -> bool:
+    return request.state.grant.role == OWN_RUN_ONLY
 
 
 async def _run(session, project_id: UUID, run_id: UUID) -> Run:
@@ -346,7 +359,8 @@ async def create_run(
 @router.get("/runs", response_model=RunList)
 async def list_runs(
     project_id: UUID,
-    actor: Reader,
+    request: Request,
+    actor: Member,
     session: SessionDep,
     agent_id: UUID | None = None,
     channel: Channel | None = None,
@@ -357,8 +371,10 @@ async def list_runs(
     ] = None,
     limit: Annotated[int, Query(ge=1, le=200)] = 50,
 ):
-    """Newest first."""
+    """Newest first. A `user` sees the runs that ran for them only."""
     query = select(Run).where(Run.project_id == project_id, Run.deleted_at.is_(None))
+    if _own_runs_only(request):
+        query = query.where(Run.user_id == UUID(actor.actor_id))
     if feedback is not None:
         reviewed = select(Message.run_id).where(
             Message.role == "assistant", Message.feedback.is_not(None), Message.run_id.is_not(None)
@@ -379,8 +395,10 @@ async def list_runs(
 
 
 @router.get("/runs/{run_id}", response_model=RunOut)
-async def get_run(project_id: UUID, run_id: UUID, actor: Reader, session: SessionDep):
-    run = await _run(session, project_id, run_id)
+async def get_run(
+    project_id: UUID, run_id: UUID, request: Request, actor: Member, session: SessionDep
+):
+    run = await _readable_run(session, request, actor, project_id, run_id)
     return run_out(run, (await _feedback_of(session, [run.id])).get(run.id))
 
 
@@ -452,12 +470,13 @@ async def give_feedback(
 async def list_run_events(
     project_id: UUID,
     run_id: UUID,
-    actor: Reader,
+    request: Request,
+    actor: Member,
     session: SessionDep,
     after_seq: Annotated[int, Query(ge=0)] = 0,
 ):
     """Every event of the run in order (from Postgres)."""
-    await _run(session, project_id, run_id)
+    await _readable_run(session, request, actor, project_id, run_id)
     rows = await session.scalars(
         select(RunEvent)
         .where(RunEvent.run_id == run_id, RunEvent.seq > after_seq)
@@ -475,13 +494,14 @@ async def list_run_events(
 async def stream_run(
     project_id: UUID,
     run_id: UUID,
-    actor: Reader,
+    request: Request,
+    actor: Member,
     session: SessionDep,
     settings: SettingsDep,
     last_event_id: LastEventId = None,
 ):
     """(Re)attach to a run's events: replay, then live until the run stops or waits."""
-    await _run(session, project_id, run_id)
+    await _readable_run(session, request, actor, project_id, run_id)
     return _stream(settings, project_id, run_id, last_event_id)
 
 

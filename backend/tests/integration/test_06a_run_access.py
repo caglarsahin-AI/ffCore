@@ -19,7 +19,13 @@ from ffcore.core.auth import sign_on_behalf_of
 from ffcore.runtime.state import ToolOutcome
 from tests.dummy import SERVICE_TOKEN
 from tests.integration.runs_fixtures import *  # noqa: F403 - fixtures
-from tests.integration.runs_fixtures import InlineQueue, parse_sse, post_run, publish
+from tests.integration.runs_fixtures import (
+    InlineQueue,
+    get_stream,
+    parse_sse,
+    post_run,
+    publish,
+)
 from tests.integration.runtime_support import (
     Ports,
     ScriptedModel,
@@ -232,3 +238,49 @@ def test_06a_r2_resume_service_function(team, pg, harness, use_queue):
     with pytest.raises(ApiError) as again:
         asyncio.run(call(approver))
     assert again.value.code == "run_not_waiting"
+
+
+def test_06a_r2_user_reads_own_run_and_reconnects(team, pg, harness, use_queue):
+    # review r2 MAJOR-1: GET run / events / stream (Last-Event-ID) for the run's own user.
+    project_id, c = team
+    publish(pg, project_id, definition())
+    use_queue(InlineQueue(harness, _answer_ports()))
+    first = post_run(c["owner"], project_id)
+    run_id = first[0][2]["run_id"]
+    base = f"/api/v1/projects/{project_id}/runs/{run_id}"
+    own = c["owner"].get(base)
+    assert own.status_code == 200 and own.json()["status"] == "completed"
+    stored = c["owner"].get(f"{base}/events")
+    assert stored.status_code == 200 and stored.json()["items"]
+    rest = get_stream(c["owner"], project_id, run_id, last=first[0][0])
+    assert rest and rest[-1][1] == "done" and rest[0][0] != first[0][0]
+    # Read access (viewer) reads its own run as well.
+    viewer_run = _start(c["viewer"], project_id)
+    viewer = c["viewer"].get(f"/api/v1/projects/{project_id}/runs/{viewer_run}")
+    assert viewer.status_code == 200
+
+
+def test_06a_r2_other_users_run_is_not_found(team, pg, harness, use_queue):
+    project_id, c = team
+    publish(pg, project_id, definition())
+    use_queue(InlineQueue(harness, _answer_ports()))
+    run_id = _start(c["owner"], project_id)
+    base = f"/api/v1/projects/{project_id}/runs/{run_id}"
+    for path in ("", "/events", "/stream"):
+        response = c["other"].get(base + path)
+        assert response.status_code == 404, path
+        assert response.json()["error"]["code"] == "run_not_found"
+    # Analysts and above read every run of the project.
+    assert c["analyst"].get(base).status_code == 200
+
+
+def test_06a_r2_user_lists_only_own_runs(team, pg, harness, use_queue):
+    project_id, c = team
+    publish(pg, project_id, definition())
+    use_queue(InlineQueue(harness, _answer_ports()))
+    own, others = _start(c["owner"], project_id), _start(c["other"], project_id)
+    url = f"/api/v1/projects/{project_id}/runs"
+    listed = {item["id"] for item in c["owner"].get(url).json()["items"]}
+    assert own in listed and others not in listed
+    everyone = {item["id"] for item in c["analyst"].get(url).json()["items"]}
+    assert {own, others} <= everyone

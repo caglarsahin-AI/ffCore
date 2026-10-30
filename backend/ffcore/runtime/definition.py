@@ -9,6 +9,7 @@ Options the runtime does not run yet fail at save time with a coded error, never
 `answer_rules.verify` (off on CPU, brief 06 PayCore note) and `sentence_max` confidence.
 """
 
+import re
 from typing import Annotated, Any, Literal
 
 from jsonschema import Draft202012Validator
@@ -27,6 +28,8 @@ DEFAULT_APPROVER = "analyst"
 # lists keep `<tool_key>.<action>`. A tool key has no underscore, so the split is unambiguous.
 TOOL_NAME_SEPARATOR = "__"
 MODEL_TOOL_NAME_PATTERN = r"^[A-Za-z0-9_-]{1,64}$"
+# Variables in instructions: `{{key}}`, the Langfuse prompt syntax (KARARLAR, K-06a-0021).
+PLACEHOLDER = re.compile(r"\{\{\s*([a-z][a-z0-9_-]{0,63})\s*\}\}")
 
 
 def model_tool_name(tool_key: str, action: str) -> str:
@@ -165,6 +168,10 @@ def check_definition(d: AgentDefinition) -> None:
     keys = [v.key for v in d.variables]
     if len(keys) != len(set(keys)):
         _fail("variable_duplicate", "variable keys must be unique")
+    if d.system_prompt is not None:
+        undefined = sorted(set(PLACEHOLDER.findall(d.system_prompt)) - set(keys))
+        if undefined:
+            _fail("variable_undefined", f"system_prompt uses variables not defined: {undefined}")
     kbs = [k.kb_key for k in d.knowledge]
     if len(kbs) != len(set(kbs)):
         _fail("knowledge_duplicate", "a knowledge base is listed once")

@@ -831,7 +831,7 @@ paths:
       tags:
       - runs
       summary: List Runs
-      description: Newest first.
+      description: Newest first. A `user` sees the runs that ran for them only.
       operationId: list_runs_api_v1_projects__project_id__runs_get
       parameters:
       - name: project_id

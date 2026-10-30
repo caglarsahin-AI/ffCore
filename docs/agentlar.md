@@ -11,7 +11,7 @@ API contract: `backend/openapi/06a.yaml` (paths under `/api/v1/projects/{project
 | Field | Meaning |
 |---|---|
 | `model` | Project model key (e.g. `chat-default`); resolved to `<project>.<model>` in LiteLLM (C1). |
-| `system_prompt` / `langfuse_prompt` | Exactly one: inline instructions or a managed Langfuse prompt `{name, label}`. `${variable}` placeholders are filled from `variables`. |
+| `system_prompt` / `langfuse_prompt` | Exactly one: inline instructions or a managed Langfuse prompt `{name, label}`. `{{variable}}` placeholders (the Langfuse prompt syntax) are filled from `variables`; a placeholder without a variable is refused at save (`variable_undefined`) and at run start (`variable_unresolved`). |
 | `variables` | `[{key, label, default}]`; a run may override them; an unknown key is refused. |
 | `knowledge` | `[{kb_key, mode: always\|tool, top_k, min_score}]`. `always`: searched before the model call. `tool`: offered as the tool `search_documents(query, kb_key, top_k)` (C7/C11). |
 | `tools` | `[{tool_key, actions}]` MCP actions registered and discovered in the project (package 05a). The model sees each as `<tool_key>__<action>`; the action's `enabled`, `needs_approval`, `max_calls_per_run` and `timeout_s` apply. |
@@ -23,6 +23,7 @@ API contract: `backend/openapi/06a.yaml` (paths under `/api/v1/projects/{project
 | `context_policy` | Shares of the context budget for history, RAG and memory, and the trim order. |
 | `answer_rules` | `cite_sources`, `unknown_reply`, `confidence_formula` (`cited` or `max`), `confidence_threshold`, `show_confidence`, `max_answer_tokens`. |
 | `reasoning` | `none` (default) or `model_default`. |
+| `runtime_profile` | Reserved; the first version has one value, `default`. Any other value is refused (422). |
 
 Unknown fields are refused (422). Options the runtime does not run yet are refused at save with a
 code, never ignored: `answer_rules.verify` (`verify_not_supported`), `confidence_formula:
@@ -66,12 +67,54 @@ stream ends after `done`, `error`, `approval_required` or `question`.
 - **Abandoned:** a running run nobody listens to for `RUN_ABANDON_GRACE_S` stops at its next step
   with status `abandoned` and frees its model slot.
 - **Read:** `GET /runs` (filters `agent_id`, `channel`, `status`, `feedback=pending|given`),
-  `GET /runs/{id}`, `GET /runs/{id}/events`.
+  `GET /runs/{id}`, `GET /runs/{id}/events`, `GET /runs/{id}/stream`. Analysts and above read
+  every run of the project; a `user` member reads the runs that ran for them (`user_id`) and
+  lists only those; another user's run is 404.
 - **Feedback (F9):** `POST /runs/{id}/feedback {vote: correct|partial|wrong, note?}` on a completed
   run, with edit access: stored on the answer and sent to Langfuse as the score `expert_feedback`.
 
 Superadmins run agents only in projects where they are members: the run searches and calls tools
 on behalf of its user, where only membership counts (403 `run_needs_membership`).
+
+### Resuming a run from another package (07 approvals)
+
+`POST /runs/{id}/resume` and 07's approval endpoints share one function:
+
+```python
+from ffcore.runtime.resume import resume_run
+
+after = await resume_run(
+    session,            # AsyncSession; committed inside
+    queue,              # RunQueue (ffcore.runtime.queue.get_run_queue(settings))
+    settings,           # Settings
+    project_id=...,     # UUID; the run must belong to this project (else 404 run_not_found)
+    run_id=...,         # UUID
+    actor=...,          # ffcore.core.auth.Actor of the caller
+    decision="approved",  # or "rejected"; for a run in waiting_approval
+    answer=None,        # the user's answer; for a run in waiting_user
+    comment=None,       # shown to the model with a rejection
+    request_id=None,    # audit; a new id when omitted
+    ip=None,            # audit
+)
+```
+
+It returns the id of the last live event (`<seq>-<n>`, or `None` before any), so the caller can
+follow the stream from there (`GET /runs/{id}/stream` with `Last-Event-ID`).
+
+What the function checks (the same for every caller):
+
+| Rule | Error |
+|---|---|
+| The run is `waiting_approval` or `waiting_user` | 409 `run_not_waiting` |
+| `waiting_approval` takes a decision and no answer; `waiting_user` an answer and no decision | 422 `decision_required` / `answer_required` |
+| A decision comes from a signed-in user: `actor_type == "user"` and not `via_service` | 403 `approval_requires_user_session` |
+| An answer comes from the run's own user | 403 `not_run_user` |
+| One resume per wait: the status change to `queued` is the lock | 409 `run_not_waiting` |
+
+What the caller checks: the role. `/resume` requires the definition's `approval.assign_to` (default
+`analyst`) with `edit` access; 07 applies the approval's assigned role. The function writes the
+audit event (`resolve_approval` or `answer_run_question`) in the same transaction, marks the run
+as listened and queues the next attempt; the worker continues from the checkpoint.
 
 ### What happens in a run
 
@@ -116,7 +159,9 @@ An agent's MCP actions come from the project's tool registry (05a) when the run 
 that is not registered, not discovered, or an action that is missing or disabled ends the run at
 start with a code (below); the model never sees a partial tool list. Calls go through 05a's MCP
 client with the run's user as caller (`forward_user` tools get a token for that user, audience
-the tool and the backend) and `X-Run-Id`. Each call is a `tool_call` and a `tool_result` event;
+the tool and the backend) and `X-Run-Id`. Each call is a `tool_call` and a `tool_result` event (arguments as the guardrail's
+`tool.pre` output: masked, or `{"redacted": true, "reason": "guardrail_block"}` when blocked; the
+raw arguments reach no event, approval record or later model request);
 a result longer than `TOOL_RESULT_MAX_CHARS` is cut with `[truncated: N/M chars]` and
 `truncated: true`. A call that fails is given to the model as an error and recorded with its
 code (`tool_result.error_code`, e.g. `tool_unreachable`, `tool_timeout`). An action's

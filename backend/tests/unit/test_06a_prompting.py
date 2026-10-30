@@ -1,13 +1,17 @@
 """06a prompt assembly and context budget (P8, D5, D6), pure functions."""
 
+import json
 import re
+from pathlib import Path
 
 import pytest
+from pydantic import ValidationError
 
 from ffcore.runtime.definition import parse_definition
 from ffcore.runtime.prompting import (
     DECLINE_PATTERN,
     Source,
+    VariableError,
     by_recency,
     fit_history,
     fit_sources,
@@ -17,6 +21,7 @@ from ffcore.runtime.prompting import (
 )
 
 DECLINED = re.compile(DECLINE_PATTERN, re.IGNORECASE)
+SAMPLES = Path(__file__).resolve().parents[3] / "data" / "samples" / "agents"
 
 
 def _source(n, day, text="x " * 50):
@@ -93,7 +98,40 @@ def test_06a_variables_rendered_unknown_refused():
             "variables": [{"key": "hospital_name", "label": "H", "default": "Örnek"}],
         }
     )
-    assert render_variables("Sen ${hospital_name} asistanısın.", d, {}) == "Sen Örnek asistanısın."
-    assert render_variables("${hospital_name}", d, {"hospital_name": "X"}) == "X"
-    with pytest.raises(ValueError, match="unknown variables"):
+    assert render_variables("Sen {{hospital_name}} asistanısın.", d, {}) == "Sen Örnek asistanısın."
+    assert render_variables("{{ hospital_name }}", d, {"hospital_name": "X"}) == "X"
+    with pytest.raises(VariableError) as unknown:
         render_variables("x", d, {"other": "y"})
+    assert unknown.value.code == "variable_unknown"
+
+
+@pytest.mark.parametrize("text", ["Sen {{kurum}} asistanısın.", "Sen {{ hospital name }}.", "{{"])
+def test_06a_unresolved_placeholder_is_an_error(text):
+    # KARARLAR (K-06a-0021 MINOR-2): `{{key}}` like Langfuse; nothing is left as written.
+    d = parse_definition(
+        {
+            "model": "chat-default",
+            "system_prompt": "S",
+            "variables": [{"key": "hospital_name", "label": "H", "default": "Örnek"}],
+        }
+    )
+    with pytest.raises(VariableError) as unresolved:
+        render_variables(text, d, {})
+    assert unresolved.value.code == "variable_unresolved"
+
+
+@pytest.mark.parametrize("path", sorted(SAMPLES.glob("*.json")), ids=lambda p: p.stem)
+def test_06a_sample_agents_render_default_and_override(path):
+    # The five 13a sample agents: the default and a run's value reach the rendered prompt.
+    d = parse_definition(json.loads(path.read_text(encoding="utf-8"))["definition"])
+    defaults = {v.key: v.default for v in d.variables}
+    rendered = render_variables(d.system_prompt, d, {})
+    assert "{{" not in rendered and all(value in rendered for value in defaults.values())
+    given = {key: f"Kurum-{key}" for key in defaults}
+    overridden = render_variables(d.system_prompt, d, given)
+    assert "{{" not in overridden and all(value in overridden for value in given.values())
+
+
+def test_06a_prompt_placeholder_must_be_a_variable():
+    with pytest.raises(ValidationError, match="variable_undefined"):
+        parse_definition({"model": "chat-default", "system_prompt": "Sen {{kurum}}."})

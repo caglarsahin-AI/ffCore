@@ -40,6 +40,7 @@ from ffcore.runtime.state import RunContext, RunState, StopRun
 SEARCH_TOOL = "search_documents"
 ASK_TOOL = "ask_user_question"
 BLOCKED_TOOL_TEXT = "The platform's guardrail blocked this tool call."
+REDACTED_BLOCK = {"redacted": True, "reason": "guardrail_block"}
 DECLINED = re.compile(DECLINE_PATTERN, re.IGNORECASE)
 
 
@@ -230,6 +231,23 @@ def _unanswered(state: RunState) -> list[dict[str, Any]]:
     return []
 
 
+def _with_arguments(messages: list[dict], call_id: str, arguments: dict) -> list[dict]:
+    """The conversation with one tool call's arguments replaced (masked or redacted)."""
+    out = list(messages)
+    for index in range(len(out) - 1, -1, -1):
+        calls = out[index].get("tool_calls") or []
+        if any(c["id"] == call_id for c in calls):
+            replaced = [
+                {**c, "function": {**c["function"], "arguments": json.dumps(arguments)}}
+                if c["id"] == call_id
+                else c
+                for c in calls
+            ]
+            out[index] = {**out[index], "tool_calls": replaced}
+            break
+    return out
+
+
 def after_model(state: RunState) -> str:
     return "tool_guard" if _unanswered(state) else "guard_out"
 
@@ -272,7 +290,9 @@ async def tool_guard(state: RunState, runtime: Runtime[RunContext]) -> dict:
         "tool.pre", json.dumps(arguments, ensure_ascii=False), tool=name
     )
     blocked = checked.action == "block"
-    masked = arguments if blocked else json.loads(checked.text)
+    # Events, the approval record and the model's later requests see the guardrail's output,
+    # never the raw arguments; a block has no output to show (review r2 MAJOR-2).
+    masked = REDACTED_BLOCK if blocked else json.loads(checked.text)
     # The action's own needs_approval (05a tool_actions) joined with the agent's approval list.
     listed = d.approval is not None and approval_name(name) in d.approval.actions
     approval = (ctx.tools.needs_approval(name) or listed) and not blocked
@@ -300,7 +320,12 @@ async def tool_guard(state: RunState, runtime: Runtime[RunContext]) -> dict:
             sse_data={"action": name, "arguments": masked, "assign_to": assign_to},
             iteration=iteration,
         )
-    return {"pending_tool": pending, "tool_calls_used": used + 1, "tool_counts": counts}
+    return {
+        "pending_tool": pending,
+        "tool_calls_used": used + 1,
+        "tool_counts": counts,
+        "messages": _with_arguments(state["messages"], call["id"], masked),
+    }
 
 
 def after_tool_guard(state: RunState) -> str:

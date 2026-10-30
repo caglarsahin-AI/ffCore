@@ -16,11 +16,10 @@ items. Everything dropped is listed in the `budget` and `sources` events (C13, n
 
 from dataclasses import dataclass, field
 from datetime import datetime
-from string import Template
 from typing import Any
 
 from ffcore.knowledge.chunking import approx_tokens
-from ffcore.runtime.definition import AgentDefinition
+from ffcore.runtime.definition import PLACEHOLDER, AgentDefinition
 
 
 @dataclass
@@ -70,15 +69,30 @@ class Budget:
         }
 
 
+class VariableError(ValueError):
+    """A run's variables do not fit its instructions; the run ends at start with this code."""
+
+    def __init__(self, code: str, message: str) -> None:
+        super().__init__(message)
+        self.code = code
+        self.message = message
+
+
 def render_variables(text: str, definition: AgentDefinition, given: dict[str, str]) -> str:
-    """`${key}` placeholders from the definition's variables; an unknown given key is an error,
-    a placeholder without a value stays as written (Template.safe_substitute is not used for
-    given values: an explicit error beats a silently ignored variable)."""
+    """`{{key}}` placeholders from the definition's variables (default, then the run's value).
+    An unknown given key is `variable_unknown`; a placeholder without a variable, or any `{{`
+    left over, is `variable_unresolved`: nothing reaches the model as written."""
     known = {v.key: v.default for v in definition.variables}
     unknown = sorted(set(given) - set(known))
     if unknown:
-        raise ValueError(f"unknown variables: {unknown}")
-    return Template(text).safe_substitute({**known, **given})
+        raise VariableError("variable_unknown", f"unknown variables: {unknown}")
+    values = {**known, **given}
+    missing = sorted({key for key in PLACEHOLDER.findall(text) if key not in values})
+    if missing or "{{" in PLACEHOLDER.sub("", text):
+        raise VariableError(
+            "variable_unresolved", f"placeholders without a variable: {missing or ['{{']}"
+        )
+    return PLACEHOLDER.sub(lambda m: values[m.group(1)], text)
 
 
 def system_parts(platform_rules: str, user_instructions: str) -> dict[str, str]:

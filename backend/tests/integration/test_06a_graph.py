@@ -1,5 +1,6 @@
 """06a acceptance on the real graph, runner, checkpointer and event stream, scripted ports."""
 
+import json
 import os
 from datetime import timedelta
 
@@ -467,3 +468,56 @@ def test_06a_working_time_still_hits_run_timeout(harness, pg, project):
     )
     assert harness.run(run_id, ports, {"decision": "approved", "comment": None}) == "failed"
     assert run_row(pg, run_id)["error_code"] == "limit_reached"
+
+
+SECRET = "sk-live-dummy-not-secret-0123456789"
+
+
+class MaskingGuard(ScriptedGuard):
+    """tool.pre masks the secret on allow, or blocks when the call names a blocked word."""
+
+    async def check(self, stage, text, *, tool=None):
+        if stage == "tool.pre" and "drop" in text:
+            return await super().check(stage, text, tool=tool)
+        if stage == "tool.pre":
+            from ffcore.runtime.state import GuardResult
+
+            return GuardResult("allow", text.replace(SECRET, "[MASKED]"), None, None, 1)
+        return await super().check(stage, text, tool=tool)
+
+
+def _leaks(pg, run_id) -> list[str]:
+    stored = [json.dumps(p, ensure_ascii=False) for _, _, p in events(pg, run_id)]
+    live = [json.dumps(d, ensure_ascii=False) for _, _, d in stream(run_id)]
+    return [s for s in stored + live if SECRET in s]
+
+
+def test_06a_r2_blocked_tool_arguments_never_reach_events(harness, pg, project):
+    # review r2 MAJOR-2: a tool.pre block writes {"redacted": true, ...}, never the arguments.
+    doc = {k: v for k, v in SQL_DEFINITION.items() if k != "approval"}
+    run_id = seed_run(pg, project, doc)
+    model = ScriptedModel(
+        turn(tools=[(SQL_TOOL, {"sql": f"drop table s -- {SECRET}"})]), turn("Engellendi.")
+    )
+    tools = ScriptedTools(schema=SQL_SCHEMA)
+    guard = MaskingGuard(block={"tool.pre": "drop"})
+    assert harness.run(run_id, Ports(model, tools=tools, guard=guard)) == "completed"
+    call = [p for _, t, p in events(pg, run_id) if t == "tool_call"][0]
+    assert call["arguments"] == {"redacted": True, "reason": "guardrail_block"}
+    assert tools.called == []
+    # The next model request (llm_call.request_messages) carries the redacted call too.
+    assert _leaks(pg, run_id) == []
+
+
+def test_06a_r2_approval_shows_masked_arguments(harness, pg, project):
+    # The approval record 07 reads holds the guardrail's masked arguments, not the raw ones.
+    run_id = seed_run(pg, project, SQL_DEFINITION)
+    model = ScriptedModel(turn(tools=[(SQL_TOOL, {"sql": f"select '{SECRET}'"})]), turn("1."))
+    ports = _sql_ports(model)
+    ports.guard = MaskingGuard()
+    assert harness.run(run_id, ports) == "waiting_approval"
+    requested = [p for _, t, p in events(pg, run_id) if t == "approval_requested"][0]
+    assert requested["arguments"] == {"sql": "select '[MASKED]'"}
+    assert harness.run(run_id, ports, {"decision": "approved", "comment": None}) == "completed"
+    assert ports.tools.called == [(SQL_TOOL, {"sql": "select '[MASKED]'"})]
+    assert _leaks(pg, run_id) == []

@@ -5,7 +5,10 @@ rename fails here, an addition needs this file and CONTRACTS.md updated in the s
 """
 
 import importlib.util
+import re
 from pathlib import Path
+
+import yaml
 
 from ffcore.models import Run, RunEvent
 from ffcore.runtime import contracts
@@ -107,3 +110,34 @@ def test_c9_facade_channels_present_from_the_start():
 
 def test_c10_queue_names_frozen():
     assert contracts.QUEUES == FROZEN_QUEUES
+
+
+REPO = Path(__file__).resolve().parents[3]
+
+
+def _listed(row: str, label: str) -> set[str]:
+    match = re.search(rf"`{re.escape(label)}`[^`]*`([^`]+)`", row)
+    assert match, f"CONTRACTS C9 does not list {label}"
+    return {value.strip() for value in match.group(1).split(",")}
+
+
+def test_c9_contracts_row_counts_the_frozen_values():
+    # review r2 MINOR-1: the normative text names every frozen value, not only the enum names.
+    row = next(
+        line
+        for line in (REPO / "handbook" / "CONTRACTS.md").read_text(encoding="utf-8").splitlines()
+        if line.startswith("| C9 |")
+    )
+    assert _listed(row, "runs.status") == FROZEN_STATUSES
+    assert _listed(row, "run_events.type") == FROZEN_EVENT_TYPES
+    assert _listed(row, "SSE") == FROZEN_SSE
+
+
+def test_c9_openapi_enums_equal_the_frozen_values():
+    draft = yaml.safe_load((REPO / "backend" / "openapi" / "06a.yaml").read_text(encoding="utf-8"))
+    enums = [
+        set(schema["enum"])
+        for schema in draft["components"]["schemas"].values()
+        if isinstance(schema, dict) and "enum" in schema
+    ]
+    assert FROZEN_STATUSES in enums and FROZEN_EVENT_TYPES in enums
