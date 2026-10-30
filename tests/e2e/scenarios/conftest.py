@@ -29,7 +29,7 @@ TERMINAL = {"completed", "failed", "cancelled", "abandoned"}
 WAITING = {"waiting_approval", "waiting_user"}
 RUN_TIMEOUT_S = float(os.environ.get("E2E_RUN_TIMEOUT_S", "900"))  # airgap cpu run limit (C2)
 # Modules that need no stack and always run (file checks only).
-STACKLESS = ("test_18_env_overlay",)
+STACKLESS = ("test_18_env_overlay", "test_18_seed_unit")
 
 
 def pytest_collection_modifyitems(config, items):

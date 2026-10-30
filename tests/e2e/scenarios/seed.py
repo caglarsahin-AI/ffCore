@@ -81,18 +81,12 @@ def cli(*args: str, stdin: str | None = None) -> subprocess.CompletedProcess:
     )
 
 
-def ensure_superadmin(email: str, password: str) -> None:
-    done = cli(
-        "create-superadmin",
-        "--email",
-        email,
-        "--full-name",
-        "E2E Admin",
-        "--password-stdin",
-        stdin=password + "\n",
-    )
-    if done.returncode != 0 and "already exists" not in done.stderr + done.stdout:
-        raise SeedError(f"create-superadmin: {done.stderr.strip() or done.stdout.strip()}")
+class LoginRefused(SeedError):
+    """POST /auth/login answered with an error; `code` is the API's error code."""
+
+    def __init__(self, email: str, status: int, code: str):
+        super().__init__(f"login {email}: {status} {code}")
+        self.status, self.code = status, code
 
 
 class Client:
@@ -102,8 +96,35 @@ class Client:
         self.http = httpx.Client(base_url=BACKEND_URL + API, timeout=60)
         r = self.http.post("/auth/login", json={"email": email, "password": password})
         if r.status_code != 200:
-            raise SeedError(f"login {email}: {r.status_code} {r.text[:200]}")
+            try:
+                code = r.json()["error"]["code"]
+            except (ValueError, KeyError, TypeError):
+                code = "unreadable_error_body"
+            raise LoginRefused(email, r.status_code, code)
         self.http.headers["cookie"] = f"ffcore_session={r.cookies['ffcore_session']}"
+
+
+def ensure_superadmin(email: str, password: str, *, login=Client, run=cli):
+    """The signed-in superadmin. Signs in first; only 401 `invalid_credentials` (no such user)
+    creates it with `create-superadmin`. Any other refusal, and any CLI failure (an existing
+    user with another password included), stops the seed: no text matching (review r1)."""
+    try:
+        return login(email, password)
+    except LoginRefused as exc:
+        if (exc.status, exc.code) != (401, "invalid_credentials"):
+            raise
+    done = run(
+        "create-superadmin",
+        "--email",
+        email,
+        "--full-name",
+        "E2E Admin",
+        "--password-stdin",
+        stdin=password + "\n",
+    )
+    if done.returncode != 0:
+        raise SeedError(f"create-superadmin: {done.stderr.strip() or done.stdout.strip()}")
+    return login(email, password)
 
     def call(self, method: str, path: str, ok=(200, 201, 202, 204), **kw) -> httpx.Response:
         r = self.http.request(method, path, **kw)
@@ -371,9 +392,8 @@ def main() -> int:
     email, admin_password = env("E2E_ADMIN_EMAIL"), env("E2E_ADMIN_PASSWORD")
     password = env("E2E_PASSWORD")
     projects = load("projects/projects.json")
-    ensure_superadmin(email, admin_password)
+    admin = ensure_superadmin(email, admin_password)
     seed_prompts()
-    admin = Client(email, admin_password)
     ids = seed_projects(admin, projects)
     seed_members(admin, projects, ids, password)
     me = admin.call("GET", "/auth/me").json()["user"]["id"]
