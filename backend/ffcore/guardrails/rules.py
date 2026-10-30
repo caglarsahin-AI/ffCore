@@ -49,37 +49,55 @@ _UUID = re.compile(r"[0-9a-fA-F]{8}-(?:[0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}")
 
 
 _SEGMENTS = re.compile(r"[-_]")
-_VOWELS = set("aeiouyAEIOUY")
-_CONSONANT_RUN = re.compile(r"[^aeiouyAEIOUY0-9]{4,}")
+_VOWELS = set("aeiouy")
+_CONSONANT_RUN = re.compile(r"[^aeiouy]{3,}")
+_TAG = re.compile(r"[a-z]{1,3}[0-9]*|[a-z]{1,3}[0-9]+[a-z]?")  # v2, q3, p4, kdv, b, el
+_CODE = re.compile(r"[A-Z]{2,6}")  # PRSIM, SZL, HBYS: plain only before a number segment
 # Words have about a third or more vowels (Turkish and English); random letters about a fifth.
 # Measured: words 0.36-0.57, random lowercase 0.00-0.17 (08 review r1). Entropy does not
-# separate them at this length (words 2.5-3.4 bits/char, random 2.5-3.4).
-WORD_MIN_VOWEL_SHARE = 0.25
-TAG_MAX_CHARS = 6  # upper-case codes: SZL, PRSIM, HBYS
+# separate them at these lengths (both 2.5-3.4 bits/char). Case is normalized first, so the
+# same test applies to upper-case segments, and a run of 3 consonants already ends a word
+# (08 review r2: random 2-segment exemption 2 % -> 0.1 %).
+WORD_MIN_VOWEL_SHARE = 0.3
+# Letters that passed only as a tag or a code are unverified; this many of them, in three or
+# more segments, make the value token-like whatever its shape (08 review r2, K-SEN-0043).
+MAX_UNVERIFIED_LETTERS = 15
 
 
-def _is_plain_segment(part: str) -> bool:
-    if part.isdigit() or len(part) <= 3:
-        return True
-    if not part.isalpha():
-        return False  # letters and digits mixed in a long segment: token-like
-    if part.isupper() and len(part) <= TAG_MAX_CHARS:
-        return True
-    if not (part.islower() or part.isupper()):
-        return False  # mixed case inside a segment: token-like
-    vowels = sum(ch in _VOWELS for ch in part) / len(part)
-    return vowels >= WORD_MIN_VOWEL_SHARE and not _CONSONANT_RUN.search(part)
+def _is_word(part: str) -> bool:
+    low = part.lower()
+    if not low.isalpha() or len(low) < 4 or not (part.islower() or part.isupper()):
+        return False
+    vowels = sum(ch in _VOWELS for ch in low) / len(low)
+    return vowels >= WORD_MIN_VOWEL_SHARE and not _CONSONANT_RUN.search(low)
 
 
 def is_plain_identifier(value: str) -> bool:
     """A name built from plain words and numbers (`SZL-2025-003_temizlik-hizmet`, a document
-    name in every SOURCES block): every `-`/`_` segment is digits, a tag of at most 3 characters
-    (`p4`, `v2`), an upper-case code of at most 6 letters (`PRSIM`), or a word: one case, at
-    least WORD_MIN_VOWEL_SHARE vowels and no run of 4 consonants. One segment that is none of
-    these (random letters, letters and digits mixed) keeps the whole value under the entropy
-    check (plan/18 F4 finding; 08 review r1: separated random lowercase stays a secret)."""
+    name in every SOURCES block). Every `-`/`_` segment must be digits, a word (case-normalized:
+    at least WORD_MIN_VOWEL_SHARE vowels, no run of 3 consonants), a short tag (`v2`, `q3`,
+    `kdv`), or an upper-case code of 2-6 letters directly before a number segment
+    (`PRSIM-1234`). With three or more segments, more than MAX_UNVERIFIED_LETTERS letters in
+    tags and codes also end the exemption. Anything else (random letters of either case,
+    letters and digits mixed) stays under the entropy check (plan/18 F4 finding; 08 review r1,
+    r2)."""
     parts = [p for p in _SEGMENTS.split(value) if p]
-    return len(parts) > 1 and all(_is_plain_segment(p) for p in parts)
+    if len(parts) < 2:
+        return False
+    unverified = 0
+    for index, part in enumerate(parts):
+        following = parts[index + 1] if index + 1 < len(parts) else ""
+        if part.isdigit() or _is_word(part):
+            continue
+        if _TAG.fullmatch(part.lower()) and (
+            part.islower() or part.isupper() or not part.isalpha()
+        ):
+            unverified += sum(ch.isalpha() for ch in part)
+        elif _CODE.fullmatch(part) and following.isdigit():
+            unverified += len(part)
+        else:
+            return False
+    return not (len(parts) >= 3 and unverified > MAX_UNVERIFIED_LETTERS)
 
 
 def shannon_bits(value: str) -> float:

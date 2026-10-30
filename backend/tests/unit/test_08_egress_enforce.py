@@ -74,6 +74,12 @@ def test_08e_4_rule_mode_overrides_policy_mode():
         "b-el-hijyeni-proseduru-klinik-b",
         "p4-sterilizasyon-calisma-esaslari",
         "PRSIM-1234-hastane-randevu-sistemi",  # ticket-style keys (K-SEN-0032)
+        # review r2 name list (08-entropy-probe.py) and abbreviations
+        "PRSIM-1234_kullanici-talebi",
+        "HBYS-2024_hasta-kayit-prosedur",
+        "yonetim-danismanlik-sozlesmesi",
+        "temizlik-hizmet-raporu-2025",
+        "sozlesme_v2_kdv_raporu_q3_2025",
     ],
 )
 def test_08e_5_word_and_number_identifiers_are_not_tokens(identifier):
@@ -96,6 +102,10 @@ def test_08e_5_word_and_number_identifiers_are_not_tokens(identifier):
         "xkqvbzrtwplm_hjgfdsnmcvbx",
         "QWRTPLKMNBVC-ZXCVBNMLKJHG-PLKMNBVCXZQW",
         "temizlik-kemubcrdlsbq-hizmet-gbcnnchc",  # one random segment among words
+        # review r2 MAJOR-1: random upper-case segments (exempt 100 % in 7dcaa98)
+        "QWXZKP-LMRTYB-ZXCVBN-PLMKJH",  # 4x6
+        "KQZXWPLMRTYB-HGFDSNMCVBXZ",  # 2x12
+        "QWX-KPL-TRV-BNM-ZXC-LKJ-QWE",  # 7x3: short segments add up (>= 16 unverified)
     ],
 )
 def test_08e_6_real_secret_shapes_are_still_caught(token):
