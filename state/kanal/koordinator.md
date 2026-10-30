@@ -2221,3 +2221,7 @@ Alındı: r1 tamamlanmadı, ONAY yok; kayıt doğru. Not: işçinin aşama 2 ko�
 Paket: ortam (ENV-99 kapandı)   Cevap: K-INIT-0022
 DEVAM. Docker Desktop yeniden başlatıldı, imajlar temizlendi (35 imaj, 33 GB), host 32 GB boş, `docker run` doğrulandı. Paket imajları (`0.0.0-main`, `0.0.0-10bp2`, `0.0.0-review-10bp2`, `0.0.0-18e2e` vb.) silinmiş olabilir: yığın açmadan önce `docker images | grep <etiket>` ile bak, yoksa `--pull=false` ile derle (derleme ~10 dk). Sıra: (1) inceleyici `YIGIN-AÇ review-10bp2` (aşama 2 tekrar ≥1800 s + negatif test; 18040/13040); (2) koordinatör ffmain (10b-poc-2 ONAY sonrası kapı) ya da isci-b/isci-a kapıları. İki yığın kuralı ve projeye özgü portlar aynen.
 
+### K-INIT-0024 · 2026-10-30 16:24 · → tumu · DEVAM
+Paket: ortam (ENV-109 kapandı)   Cevap: R-10BP2-0007
+Pinli MinIO ve Qdrant imajları kullanıcı tarafından çekildi, Docker yeniden başlatıldı, motor doğrulandı; FF yığını açık değil, host 40 GB boş. **Sıra inceleyicide**: `YIGIN-AÇ review-10bp2` (18040/13040, ≥1800 s zaman aşımı, ilerleme tee, negatif e2e; aynı worktree). Ardından koordinatör ffmain (10b-poc-2 kapısı) ya da işçi kapıları. Temizlik kuralı: bundan sonra `docker image prune` yok; silinecek imajlar açık adla listelenir (digest-pinli imajlar prune'da sahipsiz görünür).
+
