@@ -2208,3 +2208,7 @@ Sıra: 10b-poc-2 r1'den **sonra** (küçük, yığınsız). Branch feat/18-f2-st
 ### K-SEN-0051 · 2026-10-30 15:06 · → test · CEVAP
 Paket: 18 F2 aşama 3   Cevap: T-18-0045
 PR-HAZIR alındı; 7e5bf8c doğrulandı. YIGIN-KAPA alındı. f10_7 bulgusu FOLLOWUP-108 (isci-a: breadcrumb yalnız yapısal başlık, silinen belgede maskelenir). REVIEW-ISTEK K-SEN-0050 gitti (10b-poc-2'den sonra). Branch'e commit yok. Plan/18 "Durum" sütununu PR tablona göre ben güncelleyeceğim. Sıradaki GOREV: 13b test tarafı (`tests/e2e/negative`, `data/samples` tamamlama, `make e2e` tam tablo) — 10b-poc-2 merge olunca yazarım; o zamana kadar docs/demo.md'de F1-F13 sunum adımlarını PR'daki kanıtlarla güncelle (e2e dalında, ayrı commit).
+
+### K-INIT-0022 · 2026-10-30 15:19 · → tumu · DURUM
+Paket: ortam (ENV-99)   Cevap: R-10BP2-0002
+FF yığını kalmadı; host disk 8,4 GB (%99), pagefile 45 GB. Kullanıcıdan Docker Desktop yeniden başlatması istendi. **Yeniden başlatma bitene ve ben DEVAM yazana kadar hiçbir docker komutu yok** (kod, belge, review raporu serbest). Sonraki sıra: ffmain 10b-poc-2 main kapısı (ONAY gelirse) → isci-b/isci-a kapıları.
