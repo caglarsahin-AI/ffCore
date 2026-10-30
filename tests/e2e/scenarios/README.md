@@ -39,15 +39,18 @@ Public API and the documented CLI only; idempotent (a 409 is looked up by key). 
 over. It creates: the superadmin; the Langfuse prompts (`seed-prompts`, `platform_rules` is
 required by every run); the two projects and their members from `projects/projects.json`; the
 fake-llm provider with the models `chat-default` (answers "hello"), `chat-fail` (500) and
-`chat-slow` (slow stream); each project's knowledge bases from `projects.json` plus `zehirli`
+`chat-slow` (slow stream), `chat-tools` (upstream `tool-default`: calls the first tool once, then
+answers; fix/fake-llm-tool-mode); each project's knowledge bases from `projects.json` plus `zehirli`
 (F11) and `surumler` (F13) in `hastane-a`; the tools `mcp-sql` (forward_user) and `ticket-desk`
 (auth none) with reads open and writes needing approval, the demo database and its SQL context;
 every agent template in `hastane-a`, the agents `projects.json` names elsewhere, and the F12
-agents `e2e-yavas` / `e2e-hatali`.
+agents `e2e-yavas` / `e2e-hatali`, and `e2e-sql` (F3: one approved `run_sql`) and `e2e-bilet` (F2:
+`send_reply` waits for an analyst) on `chat-tools`.
 
 ## What fake-llm can and cannot prove
 
-fake-llm answers "hello" and never calls a tool. A criterion that depends on the model's answer
+fake-llm answers "hello"; its `tool-*` mode calls the first offered tool once with sample
+arguments, never one the user's text chose. A criterion that depends on the model's answer
 or on a tool call the model chooses is NOT_RUN with the reason "gerçek model" (PayCore S1 /
 llmaas), never passed on a fake answer: a "hello" without a canary proves nothing. Without
 `RUN_E2E_SCENARIOS=1` every stack test is skipped as NOT_RUN; `test_18_env_overlay` always runs.

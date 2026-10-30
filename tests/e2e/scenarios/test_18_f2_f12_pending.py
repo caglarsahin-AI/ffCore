@@ -1,27 +1,59 @@
 """F2 (ticket triage with an approved draft) and F12 (outage behaviour), plan/18 stage 2.
 
-F2 needs 07 approvals and a triage agent (the fake ticket-desk tool is in the test stack since
-18-ticket-desk, auth none: no identity reaches it). F12: what the API can show runs here (a
+F2: the approval gate on send_reply runs here with the fake-llm tool mode (agent `e2e-bilet`,
+06a resume); triage accuracy needs a real model and a triage agent. F12: what the API can show
+runs here (a
 dropped stream does not cancel the run and resumes after Last-Event-ID; a failing model ends
 the run with a code); stopping services needs a Docker socket, so those rows are NOT_RUN until
 13b's compose-level runner.
 """
 
+import os
+
+import httpx
 import pytest
 
 PROJECT = "hastane-a"
+TICKET_DESK_URL = os.environ.get("E2E_TICKET_DESK_URL", "http://ticket-desk:8000")
+
+
+def _desk(path: str, method: str = "GET"):
+    r = httpx.request(method, TICKET_DESK_URL + path, timeout=10)
+    assert r.status_code == 200, r.text
+    return r.json()
 
 
 @pytest.mark.parametrize(
     "criterion",
     [
         "triage class accuracy >= 80 % on tickets/tickets-20.jsonl (labels.json)",
-        "send_reply reaches ticket-desk only after approval (/_sent empty before)",
         "PII tickets reach the model masked (fake-llm /_requests)",
     ],
 )
 def test_18_f2_6_triage_e2e(criterion):
-    pytest.skip(f"NOT_RUN: {criterion}; needs 07 approvals and a triage agent")
+    pytest.skip(f"NOT_RUN: {criterion}; gerçek model ve triyaj agent'ı gerekir")
+
+
+@pytest.mark.parametrize("decision", ["approved", "rejected"])
+def test_18_f2_7_send_reply_only_after_approval(login, decision):
+    """The reply waits for the analyst: nothing reaches the desk before the decision; an
+    approved reply is recorded once, a rejected one never."""
+    analyst = login(PROJECT, "analyst", "edit")
+    pid = analyst.project_id(PROJECT)
+    _desk("/_reset", "POST")
+    run = analyst.start_run(pid, "e2e-bilet", "tkt-001 için yanıt gönder.")
+    assert run.events[-1]["event"] == "approval_required", run.names()
+    assert "send_reply" in run.events[-1]["data"]["action"], run.events[-1]
+    assert analyst.settle(pid, run).detail["status"] == "waiting_approval"
+    assert _desk("/_sent") == []
+    analyst.resume(pid, run.id, decision)
+    run = analyst.settle(pid, run)
+    assert run.detail["status"] == "completed", run.detail
+    sent = _desk("/_sent")
+    if decision == "approved":
+        assert [s["ticket_id"] for s in sent] == ["tkt-001"], sent
+    else:
+        assert sent == [], sent
 
 
 @pytest.mark.parametrize(

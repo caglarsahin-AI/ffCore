@@ -60,8 +60,28 @@ def test_18_f1_3_exam_80_percent():
     pytest.skip(REAL_MODEL + " (make eval sozlesme-33, 13b)")
 
 
-def test_18_f3_8_sql_question_one_call():
-    pytest.skip(REAL_MODEL + " (the model must call run_sql; sql-20 via make eval)")
+def test_18_f3_8_one_approved_run_sql_call(analyst):
+    """chat-tools (fake-llm tool-* mode) calls run_sql once: the run waits for the analyst's
+    approval, then the call goes over the real chain and its result reaches the answer."""
+    pid = analyst.project_id(PROJECT)
+    run = analyst.start_run(pid, "e2e-sql", "Kaç bölüm var?")
+    assert run.events[-1]["event"] == "approval_required", run.names()
+    assert "run_sql" in run.events[-1]["data"]["action"], run.events[-1]
+    assert analyst.settle(pid, run).detail["status"] == "waiting_approval"
+    analyst.resume(pid, run.id, "approved")
+    run = analyst.settle(pid, run)
+    assert run.detail["status"] == "completed", run.detail
+    events = analyst.run_events(pid, run.id)
+    calls = [e["payload"] for e in events if e["type"] == "tool_call"]
+    assert [c["name"] for c in calls] == ["run_sql"], calls
+    results = [e["payload"] for e in events if e["type"] == "tool_result"]
+    assert results and not results[0]["is_error"], results
+    assert run.detail["output"].startswith("hello "), run.detail["output"]
+    assert "sql_rejected" not in run.detail["output"]
+
+
+def test_18_f3_8b_exam_80_percent():
+    pytest.skip(REAL_MODEL + " (sql-20 ≥ 80 % via make eval, 13b)")
 
 
 @pytest.fixture(scope="module")

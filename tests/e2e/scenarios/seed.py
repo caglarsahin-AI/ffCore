@@ -30,9 +30,29 @@ INDEX_TERMINAL = {"indexed", "skipped", "failed", "timeout"}
 # fake-llm answers by upstream model id (backend/tests/fakes/fake_openai.py)
 PROVIDER_KEY = "fake-llm"
 FAKE_LLM_BASE = "http://fake-llm:9999/v1"
-MODELS = {"chat-default": "ok-model", "chat-fail": "fail-model", "chat-slow": "slow-model"}
-# Scenario-only agents (F12): the contract assistant's definition on another model, no KB.
-E2E_AGENTS = {"e2e-yavas": "chat-slow", "e2e-hatali": "chat-fail"}
+MODELS = {
+    "chat-default": "ok-model",
+    "chat-fail": "fail-model",
+    "chat-slow": "slow-model",
+    # tool-* mode: calls the first tool once, then answers (fix/fake-llm-tool-mode, K-SEN-0025)
+    "chat-tools": "tool-default",
+}
+TICKET_REPLY = {"tool_key": "ticket-desk", "actions": ["send_reply"]}
+# Scenario-only agents: (template, model, changes to its definition).
+E2E_AGENTS = {
+    "e2e-yavas": ("sozlesme-asistani", "chat-slow", {"knowledge": []}),  # F12 resume
+    "e2e-hatali": ("sozlesme-asistani", "chat-fail", {"knowledge": []}),  # F12 model down
+    "e2e-sql": ("veri-soru-cevap", "chat-tools", {}),  # F3: one approved run_sql call
+    "e2e-bilet": (  # F2: send_reply waits for an analyst's approval
+        "sozlesme-asistani",
+        "chat-tools",
+        {
+            "knowledge": [],
+            "tools": [TICKET_REPLY],
+            "approval": {"actions": ["ticket-desk.send_reply"], "assign_to": "analyst"},
+        },
+    ),
+}
 TARGET = "hastane-a"
 
 
@@ -253,7 +273,7 @@ def _publish(admin: Client, pid: str, key: str, name: str, description: str, def
 
 def seed_agents(admin: Client, projects: dict, ids: dict[str, str]) -> None:
     """Every template in the target project; in the other projects the agents projects.json
-    names, pointed at that project's own KB. Plus the F12 agents on chat-slow / chat-fail."""
+    names, pointed at that project's own KB. Plus the scenario-only E2E_AGENTS."""
     templates = {
         p.stem: json.loads(p.read_text(encoding="utf-8"))
         for p in (SAMPLES / "agents").glob("*.json")
@@ -269,10 +289,9 @@ def seed_agents(admin: Client, projects: dict, ids: dict[str, str]) -> None:
             knowledge = [{**k, "kb_key": own_kb} for k in t["definition"]["knowledge"]]
             definition = {**t["definition"], "knowledge": knowledge}
             _publish(admin, ids[project["key"]], key, t["name"], t["description"], definition)
-    base = templates["sozlesme-asistani"]["definition"]
-    for key, model in E2E_AGENTS.items():
-        definition = {**base, "model": model, "knowledge": []}
-        _publish(admin, ids[TARGET], key, key, "plan/18 F12 (test stack only)", definition)
+    for key, (template, model, changes) in E2E_AGENTS.items():
+        definition = {**templates[template]["definition"], "model": model, **changes}
+        _publish(admin, ids[TARGET], key, key, "plan/18 scenario (test stack only)", definition)
 
 
 def seed_prompts() -> None:

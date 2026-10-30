@@ -149,6 +149,15 @@ class Api:
         assert r.status_code == 200, r.text
         return r.json()["items"]
 
+    def resume(self, project_id: str, run_id: str, decision: str, comment: str = "e2e") -> list[dict]:
+        """POST /runs/{id}/resume with an approval decision; returns the SSE events."""
+        url = f"/api/v1/projects/{project_id}/runs/{run_id}/resume"
+        body = {"decision": decision, "comment": comment}
+        with self.http.stream("POST", url, json=body) as r:
+            if r.status_code != 200:
+                pytest.fail(f"resume {run_id}: {r.status_code} {r.read()[:200]!r}")
+            return read_sse(r.iter_lines())
+
     def stream(self, project_id: str, run_id: str, last_event_id: str | None) -> list[dict]:
         """GET /runs/{id}/stream, continuing after `last_event_id` (reconnect, 06a S8)."""
         headers = {"Last-Event-ID": last_event_id} if last_event_id else {}
