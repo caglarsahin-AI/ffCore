@@ -1,0 +1,98 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.10, pytest-9.2.0, pluggy-1.7.0 -- /opt/venv/bin/python
+cachedir: .pytest_cache
+rootdir: /work
+plugins: Faker-40.43.0, anyio-4.15.1, langsmith-0.14.8
+collecting ... collected 58 items
+
+tests/e2e/scenarios/test_18_env_overlay.py::test_18_env_1_overlay_hosts_are_env_test_plus_fake_llm PASSED [  1%]
+tests/e2e/scenarios/test_18_env_overlay.py::test_18_env_2_overlay_is_fake_embed_and_nothing_else PASSED [  3%]
+tests/e2e/scenarios/test_18_f10_isolation.py::test_18_f10_4_direct_ids_are_404 PASSED [  5%]
+tests/e2e/scenarios/test_18_f10_isolation.py::test_18_f10_5_listing_does_not_leak PASSED [  6%]
+tests/e2e/scenarios/test_18_f10_isolation.py::test_18_f10_6_trace_chain PASSED [  8%]
+tests/e2e/scenarios/test_18_f10_isolation.py::test_18_f10_7_deleted_source_keeps_reference_without_content PASSED [ 10%]
+tests/e2e/scenarios/test_18_f11_f13_content.py::test_18_f11_5_poison_arrives_as_data[P1] PASSED [ 12%]
+tests/e2e/scenarios/test_18_f11_f13_content.py::test_18_f11_5_poison_arrives_as_data[P2] PASSED [ 13%]
+tests/e2e/scenarios/test_18_f11_f13_content.py::test_18_f11_5_poison_arrives_as_data[P3] PASSED [ 15%]
+tests/e2e/scenarios/test_18_f11_f13_content.py::test_18_f11_5_poison_arrives_as_data[P4] PASSED [ 17%]
+tests/e2e/scenarios/test_18_f11_f13_content.py::test_18_f11_5_poison_arrives_as_data[P5] PASSED [ 18%]
+tests/e2e/scenarios/test_18_f11_f13_content.py::test_18_f11_6_document_instruction_not_followed[P1] SKIPPED [ 20%]
+tests/e2e/scenarios/test_18_f11_f13_content.py::test_18_f11_6_document_instruction_not_followed[P2] SKIPPED [ 22%]
+tests/e2e/scenarios/test_18_f11_f13_content.py::test_18_f11_6_document_instruction_not_followed[P3] SKIPPED [ 24%]
+tests/e2e/scenarios/test_18_f11_f13_content.py::test_18_f11_6_document_instruction_not_followed[P4] SKIPPED [ 25%]
+tests/e2e/scenarios/test_18_f11_f13_content.py::test_18_f11_6_document_instruction_not_followed[P5] SKIPPED [ 27%]
+tests/e2e/scenarios/test_18_f11_f13_content.py::test_18_f11_7_ticket_instruction_not_followed SKIPPED [ 29%]
+tests/e2e/scenarios/test_18_f11_f13_content.py::test_18_f11_8_injection_recognizer_event SKIPPED [ 31%]
+tests/e2e/scenarios/test_18_f11_f13_content.py::test_18_f13_3_newest_version_listed_first[SZL-2025-003] PASSED [ 32%]
+tests/e2e/scenarios/test_18_f11_f13_content.py::test_18_f13_3_newest_version_listed_first[SZL-2025-007] PASSED [ 34%]
+tests/e2e/scenarios/test_18_f11_f13_content.py::test_18_f13_4_answer_from_v2_with_date[SZL-2025-003] SKIPPED [ 36%]
+tests/e2e/scenarios/test_18_f11_f13_content.py::test_18_f13_4_answer_from_v2_with_date[SZL-2025-007] SKIPPED [ 37%]
+tests/e2e/scenarios/test_18_f1_f3_answers.py::test_18_f1_1_answer_run_has_sources PASSED [ 39%]
+tests/e2e/scenarios/test_18_f1_f3_answers.py::test_18_f1_1b_model_gets_the_sources_block PASSED [ 41%]
+tests/e2e/scenarios/test_18_f1_f3_answers.py::test_18_f1_2_unanswerable_is_declined SKIPPED [ 43%]
+tests/e2e/scenarios/test_18_f1_f3_answers.py::test_18_f1_3_exam_80_percent SKIPPED [ 44%]
+tests/e2e/scenarios/test_18_f1_f3_answers.py::test_18_f3_8_one_approved_run_sql_call PASSED [ 46%]
+tests/e2e/scenarios/test_18_f1_f3_answers.py::test_18_f3_8b_exam_80_percent SKIPPED [ 48%]
+tests/e2e/scenarios/test_18_f1_f3_answers.py::test_18_f3_9_write_attempts_refused_and_db_unchanged PASSED [ 50%]
+tests/e2e/scenarios/test_18_f2_approvals.py::test_18_f2_8_reply_waits_in_the_queue PASSED [ 51%]
+tests/e2e/scenarios/test_18_f2_approvals.py::test_18_f2_9_console_approval_sends_the_reply PASSED [ 53%]
+tests/e2e/scenarios/test_18_f2_approvals.py::test_18_f2_10_rejection_sends_nothing_and_tells_the_model PASSED [ 55%]
+tests/e2e/scenarios/test_18_f2_approvals.py::test_18_f2_10b_rejected_run_is_declined SKIPPED [ 56%]
+tests/e2e/scenarios/test_18_f2_f12_pending.py::test_18_f2_6_triage_e2e[triage class accuracy >= 80 % on tickets/tickets-20.jsonl (labels.json)] SKIPPED [ 58%]
+tests/e2e/scenarios/test_18_f2_f12_pending.py::test_18_f2_6_triage_e2e[PII tickets reach the model masked (fake-llm /_requests)] SKIPPED [ 60%]
+tests/e2e/scenarios/test_18_f2_f12_pending.py::test_18_f2_7_send_reply_only_after_approval[approved] PASSED [ 62%]
+tests/e2e/scenarios/test_18_f2_f12_pending.py::test_18_f2_7_send_reply_only_after_approval[rejected] PASSED [ 63%]
+tests/e2e/scenarios/test_18_f2_f12_pending.py::test_18_f12_1_outage[Langfuse stopped: run completes, trace_delivery_failed recorded] SKIPPED [ 65%]
+tests/e2e/scenarios/test_18_f2_f12_pending.py::test_18_f12_1_outage[Qdrant stopped: search returns a coded error, worker stays healthy] SKIPPED [ 67%]
+tests/e2e/scenarios/test_18_f2_f12_pending.py::test_18_f12_1_outage[LLM_SLOTS full: run queued, the wait is visible as an event] SKIPPED [ 68%]
+tests/e2e/scenarios/test_18_f2_f12_pending.py::test_18_f12_1_outage[airgap: provider down, no request to an external host] SKIPPED [ 70%]
+tests/e2e/scenarios/test_18_f2_f12_pending.py::test_18_f12_2_model_down_fails_with_code PASSED [ 72%]
+tests/e2e/scenarios/test_18_f2_f12_pending.py::test_18_f12_3_dropped_stream_does_not_cancel_and_resumes PASSED [ 74%]
+tests/e2e/scenarios/test_18_f4_f9_gateway_feedback.py::test_18_f4_1_provider_never_sees_raw_pii PASSED [ 75%]
+tests/e2e/scenarios/test_18_f4_f9_gateway_feedback.py::test_18_f4_1c_builtin_default_does_not_leak_raw_pii PASSED [ 77%]
+tests/e2e/scenarios/test_18_f4_f9_gateway_feedback.py::test_18_f4_2_trace_chain PASSED [ 79%]
+tests/e2e/scenarios/test_18_f4_f9_gateway_feedback.py::test_18_f4_2b_litellm_call_id_in_run_events PASSED [ 81%]
+tests/e2e/scenarios/test_18_f4_f9_gateway_feedback.py::test_18_f4_3_quota_429 SKIPPED [ 82%]
+tests/e2e/scenarios/test_18_f4_f9_gateway_feedback.py::test_18_f4_4_tool_arguments_masked SKIPPED [ 84%]
+tests/e2e/scenarios/test_18_f4_f9_gateway_feedback.py::test_18_f9_1_feedback_and_pending_view PASSED [ 86%]
+tests/e2e/scenarios/test_18_f4_f9_gateway_feedback.py::test_18_f9_2_read_only_cannot_review PASSED [ 87%]
+tests/e2e/scenarios/test_18_f4_f9_gateway_feedback.py::test_18_f9_3_dataset_automation SKIPPED [ 89%]
+tests/e2e/scenarios/test_18_seed_unit.py::test_18_seed_1_existing_admin_signs_in_without_cli PASSED [ 91%]
+tests/e2e/scenarios/test_18_seed_unit.py::test_18_seed_2_unknown_admin_is_created_then_signs_in PASSED [ 93%]
+tests/e2e/scenarios/test_18_seed_unit.py::test_18_seed_3_other_login_refusals_stop_the_seed[403-account_disabled] PASSED [ 94%]
+tests/e2e/scenarios/test_18_seed_unit.py::test_18_seed_3_other_login_refusals_stop_the_seed[500-api_error] PASSED [ 96%]
+tests/e2e/scenarios/test_18_seed_unit.py::test_18_seed_4_failing_cli_stops_the_seed_whatever_it_says PASSED [ 98%]
+tests/e2e/scenarios/test_18_seed_unit.py::test_18_seed_5_client_methods_against_a_fake_api PASSED [100%]
+
+============================== F table (plan/18) ===============================
+| Use case | Status | Passed | Failed | NOT_RUN | Failing tests | NOT_RUN reasons |
+|---|---|---|---|---|---|---|
+| F1 | passed | 2 | 0 | 2 |  | NOT_RUN: gerçek model gerekir (PayCore S1 / llmaas); fake-llm 'hello' der (declined = the model's unknown_reply); NOT_RUN: gerçek model gerekir (PayCore S1 / llmaas); fake-llm 'hello' der (make eval sozlesme-33, 13b) |
+| F2 | passed | 5 | 0 | 3 |  | NOT_RUN: gerçek model gerekir; outcome_label=declined the model's own reply after the rejection (fake-llm answers 'hello …', DECLINE_PATTERN does not match); NOT_RUN: triage class accuracy >= 80 % on tickets/tickets-20.jsonl (labels.json); gerçek model ve triyaj agent'ı gerekir; NOT_RUN: PII tickets reach the model masked (fake-llm /_requests); gerçek model ve triyaj agent'ı gerekir |
+| F3 | passed | 2 | 0 | 1 |  | NOT_RUN: gerçek model gerekir (PayCore S1 / llmaas); fake-llm 'hello' der (sql-20 ≥ 80 % via make eval, 13b) |
+| F4 | passed | 4 | 0 | 2 |  | NOT_RUN: quotas are package 03c (PoC sonrası); NOT_RUN: gerçek model gerekir (the model must call a tool with the value) |
+| F9 | passed | 2 | 0 | 1 |  | NOT_RUN: corrected answers into a dataset is package 09 (PoC sonrası) |
+| F10 | passed | 4 | 0 | 0 |  |  |
+| F11 | passed | 5 | 0 | 7 |  | NOT_RUN: gerçek model gerekir (PayCore S1 / llmaas); fake-llm 'hello' der (canary absent and fact present in a real answer); NOT_RUN: gerçek model ve triyaj agent'ı gerekir (ticket-desk ve onay kapısı hazır: test_18_f2_7); NOT_RUN: injection recognizer is 08 full (plan/18 F11) |
+| F12 | passed | 2 | 0 | 4 |  | NOT_RUN: Langfuse stopped: run completes, trace_delivery_failed recorded; service stop needs a compose-level runner (13b); NOT_RUN: Qdrant stopped: search returns a coded error, worker stays healthy; service stop needs a compose-level runner (13b); NOT_RUN: LLM_SLOTS full: run queued, the wait is visible as an event; service stop needs a compose-level runner (13b); NOT_RUN: airgap: provider down, no request to an external host; service stop needs a compose-level runner (13b) |
+| F13 | passed | 2 | 0 | 2 |  | NOT_RUN: gerçek model gerekir (PayCore S1 / llmaas); fake-llm 'hello' der (answer has the v2 value and 01.09.2025) |
+| Setup | passed | 8 | 0 | 0 |  |  |
+=========================== short test summary info ============================
+SKIPPED [5] tests/e2e/scenarios/test_18_f11_f13_content.py:51: NOT_RUN: gerçek model gerekir (PayCore S1 / llmaas); fake-llm 'hello' der (canary absent and fact present in a real answer)
+SKIPPED [1] tests/e2e/scenarios/test_18_f11_f13_content.py:55: NOT_RUN: gerçek model ve triyaj agent'ı gerekir (ticket-desk ve onay kapısı hazır: test_18_f2_7)
+SKIPPED [1] tests/e2e/scenarios/test_18_f11_f13_content.py:62: NOT_RUN: injection recognizer is 08 full (plan/18 F11)
+SKIPPED [2] tests/e2e/scenarios/test_18_f11_f13_content.py:84: NOT_RUN: gerçek model gerekir (PayCore S1 / llmaas); fake-llm 'hello' der (answer has the v2 value and 01.09.2025)
+SKIPPED [1] tests/e2e/scenarios/test_18_f1_f3_answers.py:61: NOT_RUN: gerçek model gerekir (PayCore S1 / llmaas); fake-llm 'hello' der (declined = the model's unknown_reply)
+SKIPPED [1] tests/e2e/scenarios/test_18_f1_f3_answers.py:65: NOT_RUN: gerçek model gerekir (PayCore S1 / llmaas); fake-llm 'hello' der (make eval sozlesme-33, 13b)
+SKIPPED [1] tests/e2e/scenarios/test_18_f1_f3_answers.py:89: NOT_RUN: gerçek model gerekir (PayCore S1 / llmaas); fake-llm 'hello' der (sql-20 ≥ 80 % via make eval, 13b)
+SKIPPED [1] tests/e2e/scenarios/test_18_f2_approvals.py:95: NOT_RUN: gerçek model gerekir; outcome_label=declined the model's own reply after the rejection (fake-llm answers 'hello …', DECLINE_PATTERN does not match)
+SKIPPED [1] tests/e2e/scenarios/test_18_f2_f12_pending.py:34: NOT_RUN: triage class accuracy >= 80 % on tickets/tickets-20.jsonl (labels.json); gerçek model ve triyaj agent'ı gerekir
+SKIPPED [1] tests/e2e/scenarios/test_18_f2_f12_pending.py:34: NOT_RUN: PII tickets reach the model masked (fake-llm /_requests); gerçek model ve triyaj agent'ı gerekir
+SKIPPED [1] tests/e2e/scenarios/test_18_f2_f12_pending.py:69: NOT_RUN: Langfuse stopped: run completes, trace_delivery_failed recorded; service stop needs a compose-level runner (13b)
+SKIPPED [1] tests/e2e/scenarios/test_18_f2_f12_pending.py:69: NOT_RUN: Qdrant stopped: search returns a coded error, worker stays healthy; service stop needs a compose-level runner (13b)
+SKIPPED [1] tests/e2e/scenarios/test_18_f2_f12_pending.py:69: NOT_RUN: LLM_SLOTS full: run queued, the wait is visible as an event; service stop needs a compose-level runner (13b)
+SKIPPED [1] tests/e2e/scenarios/test_18_f2_f12_pending.py:69: NOT_RUN: airgap: provider down, no request to an external host; service stop needs a compose-level runner (13b)
+SKIPPED [1] tests/e2e/scenarios/test_18_f4_f9_gateway_feedback.py:85: NOT_RUN: quotas are package 03c (PoC sonrası)
+SKIPPED [1] tests/e2e/scenarios/test_18_f4_f9_gateway_feedback.py:90: NOT_RUN: gerçek model gerekir (the model must call a tool with the value)
+SKIPPED [1] tests/e2e/scenarios/test_18_f4_f9_gateway_feedback.py:118: NOT_RUN: corrected answers into a dataset is package 09 (PoC sonrası)
+================== 36 passed, 22 skipped in 67.43s (0:01:07) ===================

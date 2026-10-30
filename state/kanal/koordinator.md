@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-koordinator-20261028-0205
 - Aktif paket: tumu
 - Durum: ACTIVE
-- Son okunan: isci-a A-af-0006 (oturum ffcore-isci-a-af) (oturum ffcore-isci-a-04awr); isci-b B-07FU-0010 (oturum ffcore-isci-b-07fu); isci-c C-10bp2-0019 RETIRED (oturum ffcore-isci-c-10bp2); inceleyici R-07F-0003; test T-18-0045 (oturum ffcore-test-18-hazirlik) (2026-10-30 11:05)
+- Son okunan: isci-a A-af-0009 (oturum ffcore-isci-a-af) (oturum ffcore-isci-a-04awr); isci-b B-07FU-0010 (oturum ffcore-isci-b-07fu); isci-c C-10bp2-0019 RETIRED (oturum ffcore-isci-c-10bp2); inceleyici R-07F-0003; test T-18-0045 (oturum ffcore-test-18-hazirlik) (2026-10-30 11:05)
 
 ## Mesajlar
 
@@ -2394,3 +2394,11 @@ r1 ONAY (MINOR-1: `test_07f_3` bayrak kapalı varsayıyor, `FFCORE_TEST_HOOKS=1`
 ### K-INC-0015 · 2026-10-30 21:01 · → inceleyici · CEVAP
 Paket: 07-followups   Cevap: R-07F-0002 / R-07F-0003
 ONAY alındı; MINOR-1 FOLLOWUP-114. Merge + kapı bende. `.worktrees/review-07f-r1` kullanıcı temizlik listesinde. Sırada: isci-a fix/04a-06a-followups PR-HAZIR verince r1 (yığınlı; 105 tanım hata kodları, 108 breadcrumb, 101 updated_at_source).
+
+### K-AF-0004 · 2026-10-30 21:11 · → inceleyici · REVIEW-ISTEK
+Paket: fix/04a-06a-followups (FOLLOWUP-105 + 108 + 101)   Cevap: A-af-0009
+PR: state/pr/04a-06a-followups.md (kapı logları state/pr/04a-06a-followups-kapilar/) · Branch fix/04a-06a-followups · Worktree C:/ai_paycore/ffcore/.worktrees/fix/04a-06a-followups · Baz main c8650cb · SHA 06de43294432a8f7a666f1ededb5fb036190eb20 (koordinatör doğruladı: 4 commit, 22 dosya +711/-26: `runtime/definition.py`, `core/errors.py`, `api/runs.py`, `knowledge/chunking.py`, `knowledge/ingest.py`, `api/knowledge*.py`, `openapi/04a.yaml` + `frontend/lib/api/schema-04a.d.ts`, docs ×3, testler; ağaç temiz). Sınıf [A]; C8 additive (hata kodları yanıtta), C4/04a şeması additive (`updated_at_source` PATCH). İşçi kanıtı: her dilim önce kırmızı; lint 0; make test 719/719 iki profil; test-int 525 + 4 atlandı; e2e F10 4/4 (f10_7 yeşil), F13_3 yeşil. **Yığınlı tur** (`YIGIN-AÇ review-af`, 18040/13040; ffmain benim 07f kapımla birlikte iki): (1) 105: tanım hataları `422 invalid_request_error` + kendi `code` (`variable_undefined`, `knowledge_duplicate`, `approval_action_unknown`, `verify_not_supported`), docs/agentlar.md ile birebir, `validation_error` yolu diğer alanlarda değişmedi; (2) 108: `sources` olayında breadcrumb yalnız yapısal başlık (≤ 60), düz metin satırı yok, silinen belgede `"[deleted]"`; geriye dönük kayıtlar?; (3) 101: `updated_at_source` form alanından, yoksa NULL ("unknown date", `by_recency` sona), PATCH ile; mtime yok; (4) openapi 04a + üretilmiş tip dosyası eşleşiyor mu (`check:api`); negatif probe'un. Çıktı: state/reviews/04a-06a-followups-r1.md + REVIEW-SONUC.
+
+### K-AF-0005 · 2026-10-30 21:11 · → isci-a · CEVAP
+Paket: fix/04a-06a-followups   Cevap: A-af-0007 / 0008 / 0009
+PR-HAZIR alındı; 06de432 doğrulandı (4 commit, 22 dosya). YIGIN-KAPA alındı. REVIEW-ISTEK K-AF-0004 gitti (yığınlı). KAYIT-TALEBI: (1) → **FOLLOWUP-115** (main `check:api` kırmızı, `schema-05a.d.ts` üretilmemiş; 05a kapısında önyüz `check:api` koşmadım, benim hatam): 13b A tarafı GOREV'inin 0. maddesi olacak (`npm run gen:api`, tek dosya, ayrı commit); (2) → **FOLLOWUP-116** (checkpoint'te kaynak metni; 06a sahibi, PoC sonrası). Branch'e commit yok; ONAY → merge + kapı → MERGED → aynı oturumda 13b A tarafı GOREV'i (K-13b-0006) gelir.

@@ -48,22 +48,80 @@
 - **B:** `"[silindi]"` aynen. Bedel: İngilizce API'de tek Türkçe değer.
 - **C:** breadcrumb `null` + `document_deleted: true` alanı (additive). Bedel: şema değişikliği, önyüz eşlemesi gerekir.
 
-Cevap gelene kadar dilim 1 (105) bu iki noktaya bağlı değil; onay gelirse oradan başlarım.
+**Plan onayı (K-AF-0002):** S1 **A** (tarih yoksa NULL; yükleme anı asla yerine yazılmaz; PATCH ile verilir). S2 **A** (`"[deleted]"`; önyüz çevirisi FOLLOWUP-112 ile).
+
+## Durum
+HEAD **06de43294432a8f7a666f1ededb5fb036190eb20** (c8650cb üstüne 4 commit, push yok):
+- 7a982c8 `fix(06a): answer definition refusals with their own code` (dilim 1, FOLLOWUP-105)
+- 027230e `fix(04a): keep run sources to structure, mask deleted documents` (dilim 2, FOLLOWUP-108)
+- 62818ff `fix(04a): take the source date from the upload or a PATCH` (dilim 3, FOLLOWUP-101)
+- 06de432 `test(04a): classify the source date and contract the document PATCH` (dilim 3'ün iki sınıflandırma kapısı)
 
 ## Değişen dosyalar
-(kodlama sonrası)
+- **Kod:** `backend/ffcore/runtime/definition.py` (`DefinitionError`), `backend/ffcore/core/errors.py` (`_coded`: kodlu ret → 422 `invalid_request_error` + kod), `backend/ffcore/knowledge/chunking.py` (`structural_heading`, `MAX_HEADING_CHARS = 60`), `backend/ffcore/api/runs.py` (`_mask_deleted_sources`, `DELETED_BREADCRUMB`; `list_run_events` ve `_replay_rows`), `backend/ffcore/api/knowledge.py` (yükleme `updated_at_source` form alanı; `PATCH …/documents/{document_id}` `update_document`; `DocumentOut.updated_at_source`), `backend/ffcore/api/knowledge_schemas.py` (`DocumentUpdate`, alan), `backend/ffcore/knowledge/ingest.py` (`ingest_from_raw` tarihi kolona yazar, `_source_date`).
+- **Sözleşme dışa aktarımı:** `backend/openapi/04a.yaml` (yeniden üretildi; additive: alan + PATCH); `frontend/lib/api/schema-04a.d.ts` (openapi-typescript çıktısı, elle düzenleme yok; önyüz `check:api` için). `06a.yaml` bayt aynı.
+- **Yeni testler:** `tests/unit/test_af_1_definition_error_codes.py`, `tests/unit/test_af_2_structural_breadcrumb.py`, `tests/integration/test_af_2b_deleted_source_breadcrumb.py`, `tests/integration/test_af_3_updated_at_source.py`.
+- **Uyarlanan testler (gevşetme yok):** `tests/integration/test_04a_review_r1_ingest.py` `test_04a_r1_4` (uzun başlık artık breadcrumb'a girmediği için `chunk_breadcrumb_too_long` koruması uzun KB adıyla tetikleniyor); `tests/integration/test_04a_api.py` üç audit sayımına `project=` filtresi (paylaşımlı DB'de yeni testlerin satırları da sayılıyordu; 03anm'deki aynı düzeltme); `tests/unit/test_04a_review_r1_audit_fields.py` (`updated_at_source` güvenli alan: tarih, içerik yok); `tests/contract/test_04a_openapi.py` (belge yoluna `patch`).
+- **e2e:** `tests/e2e/scenarios/seed.py` (`seed_kb` isteğe bağlı kaynak tarihi; v2'ye `v2_effective_date`, v1 tarihsiz), `tests/e2e/scenarios/test_18_f11_f13_content.py` (`test_18_f13_3` FOLLOWUP-101 skip'i kaldırıldı).
+- **Belgeler:** `docs/agentlar.md` (tanım hata kodları; `sources` olayı ve `[deleted]`), `docs/api.md` (422 kodlu ret; yükleme alanı; belge PATCH), `docs/bilgi-tabani.md` (breadcrumb yapısal kuralı; kaynak tarihi ve `by_recency`).
 
 ## Kabul kriterleri → testler
-(kodlama sonrası; tablo plan 5'te)
+| # | Kriter | Test | Kırmızı (önce) | Durum |
+|---|---|---|---|---|
+| 1 | Tanım hatası 422 `invalid_request_error` + kendi kodu, mesajda alan yolu (11 kod) | `test_af_1_definition_error_codes[*]` | 11 failed (`validation_error`), `af1-kirmizi.log` | geçti |
+| 1b | Tür ya da bilinmeyen alan hatası `validation_error` kalır | `test_af_1b_other_validation_unchanged` | kırmızıda da geçti (gerileme koruması) | geçti |
+| 2 | Düz metin madde satırı breadcrumb/section_path'e girmez; kural tablosu | `test_af_2_*` (9) | 9 failed, `af2-kirmizi.log` (kelime breadcrumb'da) | geçti |
+| 2b | Silinen belge: referans kalır, breadcrumb `[deleted]`; olay listesi ve DB'den tekrar oynatma | `test_af_2b_deleted_source_breadcrumb` | 1 failed, `af2b-kirmizi.log` (runs.py HEAD sürümüyle) | geçti |
+| 2c | e2e F10_7: silinen kaynağın metni koşu kaydında yok | `test_18_f10_7_deleted_source_keeps_reference_without_content` | bilinen kırmızı (T-18-0045) | geçti (yığında) |
+| 3 | Yükleme form alanı kolona yazılır; yoksa NULL; geçersiz tarih 422 | `test_af_3_upload_sets_updated_at_source` | failed (`KeyError`), `af3-kirmizi.log` | geçti |
+| 3b | PATCH değiştirir ve temizler; audit `update_document` güvenli alanlarla; `access=read` 403; proje dışı 404; bilinmeyen alan 422 | `test_af_3b_patch_updated_at_source` | failed (405) | geçti |
+| 3c | `ingest_from_raw` metadata tarihini kolona yazar | `test_af_3c_ingest_from_raw_writes_the_date` | failed (NULL) | geçti |
+| 3d | e2e F13: v2 v1'den önce | `test_18_f13_3_newest_version_listed_first[SZL-2025-003, SZL-2025-007]` | skip'liydi (FOLLOWUP-101) | geçti (yığında) |
+| 4 | OpenAPI dışa aktarımı commit'lenmiş dosyayla eşit | `test_04a_openapi`, `test_06a_openapi` | — | geçti |
+| — | Önyüz sihirbaz kaydında `variable_undefined` görünür | `test_10bp2_3_agent_wizard_lifecycle` (Playwright) | — | **NOT_RUN**: yığının e2e servisi boş `e2e_node_modules` volume'una `npm ci` ile ağdan indirir; yapmadım. Backend sözleşmesi (`error.code`) birim testiyle kanıtlı, önyüz eşlemesi `frontend/lib/api/errors.ts:48`'de hazır. İnceleyici yığınında ya da koordinatör kapısında koşulmalı |
 
 ## Çalıştırılan komutlar
-(kodlama sonrası)
+Hepsi `tools` konteynerinde, `MSYS_NO_PATHCONV=1 FFCORE_VERSION=0.0.0-af`; yığın `ffcore-af` (`--env-file .env.test`, `--profile test --profile qdrant`, 18030/13030, `up -d --wait --pull never` 94 s). İmajlar: `ffcore/{tools,frontend}:0.0.0-af` = `0.0.0-main` etiketi; e2e için `ffcore/backend:0.0.0-af` = `0.0.0-main` + `COPY backend/ffcore /app/ffcore` (`docker build --network none`; bağımlılık ve migration değişmedi). Çıktılar `state/pr/04a-06a-followups-kapilar/` (tee).
+
+| Komut | HEAD | Exit | Sonuç | Dosya |
+|---|---|---|---|---|
+| `make lint` | 06de432 | 0 | ruff check + format temiz (15 s) | `lint.txt` |
+| `make test` llmaas | 06de432 | 0 | 719 passed (142 s) | `test-llmaas.txt` |
+| `make test` airgap | 06de432 | 0 | 719 passed (137 s) | `test-airgap.txt` |
+| `make test` ilk | 62818ff | 2 | 717 passed, 2 failed: iki sınıflandırma kapısı (yeni alan, yeni PATCH) → 06de432 | özet burada (dosya üzerine yazıldı) |
+| `make test-int` | 06de432 | 0 | 525 passed, 4 skipped (opt-in), 482 s | `test-int.txt` |
+| seed (`python -m tests.e2e.scenarios.seed`, `e2e.env` örtüsü; parolalar kabukta üretildi, dosyaya yazılmadı) | 06de432 | 0 | 2 proje, 4 model, agent'lar | `e2e-seed.txt` |
+| `pytest tests/e2e/scenarios -v -rs` (`RUN_E2E_SCENARIOS=1`) | 06de432 | 0 | 36 passed, 22 skipped (NOT_RUN gerekçeli); F10 4/4, F13 2 geçti + 2 gerçek model | `e2e-scenarios.txt` |
+| `npx openapi-typescript ../backend/openapi/04a.yaml` + `npm run check:api` (`node:20.19.5-alpine`, `ffcore-10a-nm`, `--network none`) | 62818ff | 1 | 04a temiz; **05a sapması main'de** (kalan riskler) | — |
+| `down -v` | — | 0 | konteyner 0, volume 0 | kanal YIGIN-KAPA |
+
+## Çıktı özeti ve post-state
+Migration yok; yeni tablo ya da kolon yok. `backend/openapi/04a.yaml` +109 satır (alan + PATCH). Yığın kapalı. Yerelde `ffcore/{backend,tools,frontend}:0.0.0-af` etiketleri kaldı (silinebilir; backend olan yalnız küçük bir kod katmanı).
+
+## Kontrol listesi
+- [x] Felsefe ile çelişen nokta işaretlendi (S1 mtime, S2 dil; K-AF-0002 ile kapandı)
+- [x] Donmuş sözleşme kırılmadı: C8 additive (kodlar yanıta çıktı, alanlar aynı), C9 aynı (yeni olay tipi ya da alan yok), C5/C6 imzası aynı
+- [x] İki profil testi koştu
+- [x] Yeni mutasyon ucu audit üretiyor (`update_document`, güvenli alanlar); salt-okunur 403
+- [x] Log, API, audit, hata gövdesi secret-free; parolalar dosyaya yazılmadı
+- [ ] Önyüz: yalnız üretilmiş tip dosyası değişti; Playwright NOT_RUN (yukarıda)
+- [x] Docs güncel; `.env.example` değişmedi (yeni değişken yok)
+- [x] WORK_QUEUE durumu kanal üzerinden
 
 ## Varsayımlar ve brief'teki çelişkiler
-- FOLLOWUP-101 "dosya mtime" ifadesi HTTP yüklemesinde karşılıksız (S1).
-- FOLLOWUP-108 "`[silindi]`" ürün dili kararıyla çelişiyor (S2).
-- `ingest_from_raw`'ın `updated_at_source`'u kolona yazmaması aynı kusurun ikinci yolu; düzeltmeyi bu PR'a aldım (aynı FOLLOWUP, aynı kolon).
+- FOLLOWUP-101 "yoksa dosya mtime" HTTP yüklemesinde karşılıksız; K-AF-0002 S1 A: NULL.
+- FOLLOWUP-108 `[silindi]` → `[deleted]` (K-AF-0002 S2 A).
+- `ingest_from_raw` tarihi kolona yazmıyordu (aynı kusurun C6 yolu); düzeltildi, metadata kopyası da kalır. Geçersiz tarih `ValueError` ile durur, belge tahmini tarihle kaydedilmez.
+- Yükleme alanı istekteki tüm dosyalara uygulanır (dosya başına farklı tarih için ayrı istek ya da PATCH).
+- Aynı bayt (`unchanged`) yeniden yüklemede tarih verilirse belgeye yazılır (tarih düzeltmenin ikinci yolu).
+- Breadcrumb kuralı: madde başlığı ilk `:`'ya kadar; 60 karakteri aşarsa yalnız numara; numarasız uzun Markdown başlığı breadcrumb'a girmez (gövdede kalır). Birleşen en çok 3 başlığın her biri ayrı ayrı ≤ 60.
+- `[deleted]` maskesi yalnız okuma yollarında (olay listesi, DB'den tekrar oynatma); DB'deki append-only olay değişmez. Belge satırı hiç yoksa da silinmiş sayılır.
+- Kırmızı testler düzeltmeyle aynı commit'te; kırmızı kanıtlar `*-kirmizi.log` dosyalarında.
 
 ## Kalan riskler
-- LangGraph checkpoint'i kaynak parça metnini taşıyor (`graph.py` `_source_payload`); belge silinince orada kalır (FOLLOWUP önerisi).
-- Yeni breadcrumb kuralı yeniden indekslenen belgelerde parça sınırlarını değiştirmez ama gömülen metni değiştirir (vektörler yeniden hesaplanır).
+- **main'de önyüz `check:api` kırmızı (bu daldan önce):** `frontend/lib/api/schema-05a.d.ts`, `backend/openapi/05a.yaml`'ın openapi-typescript çıktısı değil; 05a.yaml a795d9d'de (fix/05a-tools-read-analyst) değişmiş, tipler yeniden üretilmemiş. Bu dalda dokunulmadı (KAYIT-TALEBI A-af-0007).
+- **isci-b fix/07-followups da `api/runs.py`'yi değiştiriyor** (K-07F-0005): ikinci merge edilen dal metin çakışması alabilir. Bu dalın değişikliği: yeni `_mask_deleted_sources` yardımcısı, `_replay_rows` döngüsü ve `list_run_events` gövdesi.
+- LangGraph checkpoint'i kaynak parça metnini taşıyor (`runtime/graph.py` `_source_payload` `text`); belge silinince checkpoint'te kalır (KAYIT-TALEBI A-af-0007).
+- Redis Stream'in TTL içindeki canlı tekrar oynatması maskelenmez (yeni breadcrumb yapısal olduğu için içerik taşımaz).
+- Eski indekslenmiş belgelerin breadcrumb'ları yeniden indekslemeye kadar eski kuralla kalır; yeniden indekslemede gömülen metin değişir, vektörler yeniden hesaplanır.
+- `test_10bp2_3` önyüz kanıtı NOT_RUN.

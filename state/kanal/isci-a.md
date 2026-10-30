@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-a-af
 - Aktif paket: fix/04a-06a-followups (K-AF-0001; FOLLOWUP-105, 108, 101)
 - Durum: ACTIVE
-- Son okunan: K-AF-0001 (2026-10-30 20:04)
+- Son okunan: K-AF-0005
 
 ## Mesajlar
 
@@ -954,3 +954,26 @@ Dilim 1 (105) commit 7a982c8: kırmızı 11 failed → yeşil (af1-kirmizi/yesil
 YIGIN-AÇ af talebi (sıra bekliyorum): `FFCORE_VERSION=0.0.0-af`, `BACKEND_PORT=18030 FRONTEND_PORT=13030`, `--profile test --profile qdrant`. Amaç: dilim 2 ve 3 entegrasyon kırmızı/yeşil, make test-int, F10_7/F13_3 e2e. Bu arada dilim 3 kodu yığınsız.
 
 YIGIN-AÇ af · 2026-10-30 20:21 · isci-a · 18030/13030 · FFCORE_VERSION=0.0.0-af (K-AF-0003)
+
+YIGIN-KAPA af · 2026-10-30 21:06 · down -v exit 0, konteyner 0, volume 0
+
+### A-af-0007 · 2026-10-30 21:08 · → koordinator · KAYIT-TALEBI
+Paket: fix/04a-06a-followups   Cevap: -
+İki FOLLOWUP- önerisi, ikisi de bu dalın dışında, dokunmadım:
+(1) main'de önyüz `check:api` kırmızı: `frontend/lib/api/schema-05a.d.ts` `backend/openapi/05a.yaml`'ın openapi-typescript çıktısı değil; 05a.yaml a795d9d'de (fix/05a-tools-read-analyst) değişmiş, tipler yeniden üretilmemiş. Bu daldan bağımsız (iki dosya c8650cb'den beri aynı). Düzeltme `npm run gen:api` (önyüz sahibi) ve 05a dalları için kapıya `check:api`.
+(2) LangGraph checkpoint'i kaynak parça metnini taşıyor (`runtime/graph.py` `_source_payload`: `public() | {"text": ...}`); belge silinince metin checkpoint'te kalır (FOLLOWUP-108'in silme/saklama vaadinin ikinci yeri). Öneri: checkpoint'e yalnız chunk_id, metin çalışma anında; ya da belge silinince ilgili checkpoint alanını temizleyen retention işi. 06a sahibi.
+
+### A-af-0008 · 2026-10-30 21:08 · → koordinator · DURUM
+Paket: fix/04a-06a-followups   Cevap: K-AF-0002 / K-AF-0003
+DURUM: VERIFIED. HEAD 06de43294432a8f7a666f1ededb5fb036190eb20 (c8650cb üstüne 4 commit: 7a982c8 105, 027230e 108, 62818ff 101, 06de432 sınıflandırma kapıları). Her dilim önce kırmızı (log'lar state/pr/04a-06a-followups-kapilar/).
+Kapılar 06de432: make lint 0; make test llmaas 719/719, airgap 719/719; make test-int 525 + 4 opt-in atlandı (482 s); e2e senaryoları (seed + RUN_E2E_SCENARIOS=1) 36 passed / 22 NOT_RUN gerekçeli: F10 4/4 (f10_7 yeşil), F13_3 iki sürümde yeşil. e2e için backend imajı = 0.0.0-main + kod katmanı (`--network none`, bağımlılık/migration yok).
+NOT_RUN: `test_10bp2_3` (Playwright e2e servisi boş volume'a npm ci ile ağdan indirir; yapmadım). Backend kodu birim testiyle kanıtlı.
+Not: isci-b fix/07-followups da `api/runs.py`'ye dokunuyor; ikinci merge metin çakışması alabilir (PR kalan riskler).
+
+### A-af-0009 · 2026-10-30 21:08 · → koordinator · PR-HAZIR
+Paket: fix/04a-06a-followups (FOLLOWUP-105 + 108 + 101)   Cevap: K-AF-0001
+PR: C:\ai_paycore\ffcore\state\pr\04a-06a-followups.md · Branch fix/04a-06a-followups · Worktree .worktrees/fix/04a-06a-followups · Baz main c8650cb · SHA 06de43294432a8f7a666f1ededb5fb036190eb20 · Sınıf [A] · push yok. Yığın kapalı (YIGIN-KAPA). Branch'e başka commit atmıyorum; DUZELT gelirse yeni SHA ile PR-HAZIR.
+
+### A-af-0010 · 2026-10-30 21:10 · → koordinator · ACK
+Paket: fix/04a-06a-followups   Cevap: K-AF-0005
+Alındı: FOLLOWUP-115 / 116 kayıtları, REVIEW-ISTEK K-AF-0004. Branch'e commit yok; REVIEW-SONUC ya da DUZELT bekliyorum. ONAY → MERGED sonrası 13b A GOREV'i (0. madde gen:api) bu oturumda.
