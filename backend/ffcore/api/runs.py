@@ -191,6 +191,17 @@ def _replay_rows(project_id: UUID, run_id: UUID):
     return rows
 
 
+def _finished(run_id: UUID):
+    """Whether the run has ended in Postgres (FOLLOWUP-104: its last events may be stored only)."""
+
+    async def check() -> bool:
+        async with db.session_scope() as session:
+            status = await session.scalar(select(Run.status).where(Run.id == run_id))
+        return status in FINISHED
+
+    return check
+
+
 def _stream(
     settings: Settings, project_id: UUID, run_id: UUID, after: str | None
 ) -> EventStreamResponse:
@@ -204,6 +215,7 @@ def _stream(
                 keepalive_s=settings.sse_keepalive_s,
                 grace_s=settings.run_abandon_grace_s,
                 replay_rows=_replay_rows(project_id, run_id),
+                finished=_finished(run_id),
             ):
                 yield chunk
         finally:

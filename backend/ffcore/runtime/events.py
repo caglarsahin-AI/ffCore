@@ -157,11 +157,18 @@ async def follow(
     keepalive_s: float,
     grace_s: int,
     replay_rows,
+    finished,
 ) -> AsyncIterator[str]:
     """SSE text for one client. `after`: the client's Last-Event-ID. `replay_rows(after_seq)`
-    returns stored rows when the live stream is gone; it ends with the run's final SSE event."""
+    returns stored rows when the live stream is gone; it ends with the run's final SSE event.
+
+    `finished()` says whether the run has ended in Postgres. A writer commits a row before it
+    publishes the live entry, so a failed publish (Redis error) leaves an ended run whose last
+    events are only stored: on an empty keepalive turn of an ended run, the stored rows after
+    the last entry seen are given and the stream stops (FOLLOWUP-104), never a silent wait."""
     key = stream_key(run_id)
     last = after or "0-0"
+    ended_seen = False
     if not await redis.exists(key):
         after_seq = int(last.split("-")[0])
         yield SseMessage(
@@ -175,6 +182,14 @@ async def follow(
         result = await redis.xread({key: last}, block=int(keepalive_s * 1000), count=100)
         if not result:
             yield ": keepalive\n\n"
+            if await finished():
+                if ended_seen:
+                    async for message in replay_rows(int(last.split("-")[0])):
+                        yield message.render()
+                    return
+                # The writer publishes right after its commit: give it one more turn, so a
+                # normal ending arrives live (tokens are not given twice by a replay).
+                ended_seen = True
             continue
         for _, entries in result:
             for entry_id, fields in entries:
