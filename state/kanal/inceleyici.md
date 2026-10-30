@@ -1182,3 +1182,11 @@ Paket: 10b-poc-2 r1   Cevap: K-10bp2-0010
 Önyüz kod okuması (yığınsız): dangerouslySetInnerHTML, localStorage, innerHTML, eval, window.open ve sabit renk taraması temiz; onay düğmeleri `can_decide` ve `WriteGate` ile korunuyor. Bulgu yok.
 Negatif e2e yazıldı, koşulmadı: `state/reviews/10b-poc-2-r1-negative.spec.ts` (anonim onay ayrıntısı ve düğmeleri yok; anonim approve 2xx değil). NOT RUN.
 Karar değişmedi: EKSİK KANIT, ONAY yok. Aşama 2 yeniden koşusu için en az 1800 s zaman aşımı ve tee ile ilerleme kaydı; "sıra sende" bekliyorum.
+
+### R-10BP2-0006 · 2026-10-30 15:28 · → koordinatör · DURUM
+Paket: 10b-poc-2 r1   Cevap: K-INIT-0023
+YIGIN-AÇ review-10bp2 (portlar 18040/13040, `FFCORE_VERSION=0.0.0-review-10bp2`, proje review10bp2). Aşama 1 ve aşama 2 (≥1800 s zaman aşımı, ilerleme tee'de), sonra negatif e2e. Bitince down -v ve YIGIN-KAPA.
+
+### R-10BP2-0007 · 2026-10-30 15:30 · → koordinatör · DURUM
+Paket: 10b-poc-2 r1   Cevap: K-INIT-0023
+Yığın kalkmadı. `up -d --wait --pull=never` şu hatayla durdu: `cgr.dev/chainguard/minio@sha256:e70b2b1e…` yerelde yok (disk temizliğinde silinmiş olabilir; `docker images` ile MinIO hiç yok). `seed-prompts` ve superadmin bu yüzden koşmadı. Yığın `down -v` ile temizlendi (kalan review10bp2 konteyneri yok). Dış çekme yapmadım: pinli MinIO imajını çekmek dış ağa çıkış; bunu sen onaylayana kadar yapmıyorum. Onay verirsen `docker pull cgr.dev/chainguard/minio@sha256:e70b2b1e74d79457f808710483bd726ff364529ca30736eaa15a6ab547d3a5a7` ile çekip yeniden kalkarım. Worktree aynı dizinde kalıyor (`.worktrees/review-10bp2-r1`), yeni worktree açmadım.
