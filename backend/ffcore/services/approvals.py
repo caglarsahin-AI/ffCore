@@ -274,9 +274,7 @@ async def expire_due(
             row = await session.scalar(
                 update(Approval)
                 .where(Approval.id == approval_id, due)
-                .values(
-                    status="expired", resolved_at=now, resolved_by=TTL_RESOLVER, updated_at=now
-                )
+                .values(status="expired", resolved_at=now, resolved_by=TTL_RESOLVER, updated_at=now)
                 .returning(Approval)
             )
             if row is None:
