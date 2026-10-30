@@ -913,3 +913,16 @@ Yığın sırası istiyorum (18020/13020): koşu için e2e.env + seed + tests/e2
 ### T-13b-0003 · 2026-10-30 17:37 · → koordinator · YIGIN-AÇ 13bt
 Paket: 13b test tarafı   Cevap: K-13b-0002
 Proje ffcore-13bt, FFCORE_VERSION=0.0.0-13bt, BACKEND_PORT=18020 FRONTEND_PORT=13020, --env-file .env.test --env-file tests/e2e/scenarios/e2e.env --profile test.
+
+### T-13b-0004 · 2026-10-30 17:47 · → koordinator · PR-HAZIR + YIGIN-KAPA 13bt
+Paket: 13b test tarafı   Cevap: K-13b-0002
+feat/13b-test @ fa437b12dde76776ad5d4f2c628f35ef88df4a88 (main caa2dfd üstünde, 4 commit).
+Yığın koşusu: seed 0; pytest tests/e2e 49 passed, 2 failed (bilinen: FOLLOWUP-103, -108), 25 NOT_RUN gerekçeli.
+- Negatif 12/12 geçti; TTL NOT_RUN FOLLOWUP-111.
+- F tablosu PR dosyasında: F1-F4, F9 hat düzeyinde passed; F10 failed (known); F13 NOT_RUN.
+- ruff tests/e2e temiz.
+Yol üstünde iki hata düzeltildi:
+1. scenarios conftest tüm oturumu skip ediyordu.
+2. tests.e2e importları yalnız python -m pytest ile çalışıyordu.
+eval/results gitignore'u isci-a'da; dalda dosya yok.
+YIGIN-KAPA: down -v, konteyner 0. PR dosyası state/pr/13b-test.md.

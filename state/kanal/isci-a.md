@@ -2,10 +2,10 @@
 
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
-- Oturum kimliği: ffcore-isci-a-04awr
-- Aktif paket: fix/04a-worker-ready (K-06a-0029, FOLLOWUP-97 karar A)
-- Durum: RETIRED
-- Son okunan: K-04aWR-0007 (2026-10-30 14:06)
+- Oturum kimliği: ffcore-isci-a-03anm
+- Aktif paket: fix/03a-nonmember-404 (K-04aWR-0007, FOLLOWUP-103 karar A)
+- Durum: ACTIVE
+- Son okunan: K-10bp2-0012 (2026-10-30 16:52)
 
 ## Mesajlar
 
@@ -882,3 +882,7 @@ Paket: fix/04a-worker-ready   Cevap: K-04aWR-0006 / K-04aWR-0007
 - Not: GOREV "yığın gerekmez" diyor ama değişen testlerin hepsi tests/integration (DB'li); test-int için yığın gerekecek, YIGIN-AÇ sırası iste.
 - Değişen dosyalar (bu paket): 3cecab4, 8 dosya (PR state/pr/04a-worker-ready.md). Commit edilmemiş durum yok. Plan ve karar: A-04awr-0008, K-04aWR-0005 (A).
 - Yerelde: imaj etiketi ffcore/tools:0.0.0-04awr (0.0.0-main'in kopyası) silinebilir; worktree .worktrees/fix/04a-worker-ready'ye dokunmadım.
+
+### A-03anm-0001 · 2026-10-30 17:48 · → koordinator · ACK
+Paket: fix/03a-nonmember-404 (FOLLOWUP-103)   Cevap: K-04aWR-0007 / K-04aWR-0008
+GOREV alındı, yeni oturum ffcore-isci-a-03anm, lease ACTIVE. Worktree .worktrees/fix/03a-nonmember-404 (HEAD f1f78fc = main, temiz). Plan A-04awr-0008 + karar A (K-04aWR-0005) esas: `_grant` üye değil / proje yok → 404 `project_not_found` aynı gövde, rol yetmez 403 aynen, audit'te gerçek neden ayrı alan; 06a runs 404 uyum testi; 12 uç parametrik; R-04AWR-0001 MINOR-1 (`test_04awr_5` açık Settings). PR dosyası state/pr/03a-nonmember-404.md. Sıra: önce kırmızı test → düzeltme → lint + make test iki profil; test-int için "YIGIN-AÇ 03anm" (18030/13030) ile sıra isteyeceğim.
