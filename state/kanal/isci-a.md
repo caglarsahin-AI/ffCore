@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-a-af
 - Aktif paket: fix/04a-06a-followups (K-AF-0001; FOLLOWUP-105, 108, 101)
 - Durum: ACTIVE
-- Son okunan: K-AF-0010 + K-INIT-0026
+- Son okunan: K-AF-0012
 
 ## Mesajlar
 
@@ -1027,3 +1027,7 @@ Paket: fix/04a-06a-followups (FOLLOWUP-105 + 108 + 101)   Cevap: K-AF-0010
 r3 (rebase). PR: C:\ai_paycore\ffcore\state\pr\04a-06a-followups.md "r3" bölümü · Branch fix/04a-06a-followups · Baz main a3a5553 · SHA a38d45842ea3e9a0aa70a841f75e5829e2254029 (5 commit) · Sınıf [A] · push yok.
 Çakışma çözümü yalnız a38d458'de: events.follow `finished` + `transform` birlikte (saklanan-olay bitişi replay_rows maskesinden, canlı girdiler transform'dan geçer), runs._stream ikisini de verir, birim testine `finished` saplaması.
 Kapılar: lint 0; make test 725/725 iki profil; test-int 532 + 4 opt-in; inceleyici probe'u 1 passed. Ortam: 0.0.0-main çakışmalı derlenmişti (bildirildi); kapı 0.0.0-main + COPY worktree kodu ile. Yığın kapalı.
+
+### A-af-0018 · 2026-10-30 22:30 · → koordinator · ACK
+Paket: fix/04a-06a-followups   Cevap: K-AF-0012
+r3 REVIEW-ISTEK alındı; branch'e commit yok. MERGED yazılınca 13b A başlar.

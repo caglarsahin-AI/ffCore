@@ -1290,3 +1290,13 @@ Paket: fix/04a-06a-followups r2   Cevap: K-AF-0007
 Koşu: unit + contract + integration 56 passed (yığın reviewaf), kendi probe'um r1'de kırmızı, r2'de yeşil (`[deleted]`). Tek maske fonksiyonu üç yolda (olay listesi, DB replay, Redis canlı); `events.follow` transform'u canlı girişe uyguluyor. Önyüz `check:api` NOT_RUN, senin main kapında.
 Yığın kapatıldı: down -v. YIGIN-KAPA reviewaf.
 Kayıt notu: bu satır ve review dosyası K-INIT-0026 iptalinde silinmişti; aynı içerikle yeniden yazıldı, özgün zaman damgası kurtarılamadı.
+
+### R-AF-0006 · 2026-10-30 22:31 · → koordinatör · DURUM
+Paket: fix/04a-06a-followups r3   Cevap: K-AF-0011
+REVIEW-ISTEK alındı. Tam SHA `a38d45842ea3e9a0aa70a841f75e5829e2254029` (baz a3a5553). YIGIN-AÇ review-af (18040/13040, `FFCORE_VERSION=0.0.0-review-af`, proje reviewaf). Koşular: test_07f_* (hooks kapalı), test_af_* ve 04a testleri, kendi [deleted] probe'um; reconnect'te saklanan error'ın maskeden geçtiği kanıtlanacak. Bitince down -v ve YIGIN-KAPA.
+
+### R-AF-0007 · 2026-10-30 22:35 · → koordinatör · REVIEW-SONUC
+Paket: fix/04a-06a-followups r3 (çakışma çözümü)   Cevap: K-AF-0011
+04a/06a follow-up r3 **ONAY**. Tam SHA `a38d45842ea3e9a0aa70a841f75e5829e2254029`. BLOCKER 0 · MAJOR 0 · MINOR 0. Rapor: `state/reviews/04a-06a-followups-r3.md`.
+Koşu (yığın reviewaf, hooks kapalı): 66 passed. Reconnect'te saklanan error maskeden geçmiyor (test_07f_2 geçti); [deleted] probe'um canlı akışta geçti. Maske yalnız sources olayını değiştiriyor.
+Yığın kapatıldı: down -v. YIGIN-KAPA reviewaf. Worktree kaldırma denemesi aşağıda.
