@@ -1,6 +1,6 @@
 # PR fix/08-default-egress-enforce
 
-**Paket:** 08 düzeltme (plan/18 F4 bulguları) · **Sınıf:** [B] · **Branch:** fix/08-default-egress-enforce · **Baz:** main 01639c5 · **SHA:** 7dcaa9823c178daf7a8e85c186f38b0274969654 (r1 delta; ilk a749023)
+**Paket:** 08 düzeltme (plan/18 F4 bulguları) · **Sınıf:** [B] · **Branch:** fix/08-default-egress-enforce · **Baz:** main 01639c5 · **SHA:** e7d850abcb240b6f91379593b36a87e7ad001100 (r2 delta; r1 7dcaa98; ilk a749023)
 GOREV K-SEN-0030; kararlar K-SEN-0029 A (FOLLOWUP-102), K-SEN-0032 (egress A, entropi kapsamı). Durum: PR-HAZIR.
 
 ## Değişiklik
@@ -58,3 +58,31 @@ Bu yüzden "sözlük kontrolü" kolu, sesli payı + ünsüz dizisiyle uygulandı
 Testler: `test_08e_6`'ya 4 yeni vaka (ayraçlı rastgele küçük harf, `_` ayraçlı, büyük harf rastgele, sözcükler arasında tek rastgele segment): önce 4 kırmızı, sonra yeşil. `test_08e_5` (belge adları, PRSIM-1234) yeşil kaldı. `data/samples` altındaki tüm dosya adları tarandı: hiçbiri bulgu vermiyor.
 
 Kapılar: lint 0; llmaas 667 passed; airgap ilk koşu FOLLOWUP-97'nin iki 04a testi, tekrar 667 passed.
+
+## Review r2 düzeltmesi (K-SEN-0043)
+
+MAJOR-1: rastgele büyük harf segmentleri muaftı (kod kuralı sözcük testini atlıyordu). Yeni kural (`is_plain_identifier`): her segment rakam, büyük-küçük normalize edilmiş sözcük (≥ %30 sesli, 3 ünsüzlük dizi yok), kısa etiket (`v2`, `q3`, `kdv`, `b`, `el`) ya da hemen ardından sayı segmenti gelen 2-6 harflik büyük harf kodu (`PRSIM-1234`, `SZL-2025`) olmalı; ≥ 3 segmentte etiket+kod harfleri 15'i aşarsa muafiyet yok. MINOR-1 (küçük harf artığı): ünsüz dizisi sınırı 4'ten 3'e; 2 segment muafiyeti %2,2 → %0,1.
+
+Ölçüm, inceleyicinin üreteci (`state/reviews/08-entropy-probe.py`, tohum 11, 4000) + kendi genişletmem (aynı tohum; ek biçimler):
+
+| Biçim (uzunluk) | 28d7a5f muaf / yakalanan | 7dcaa98 (r1) | e7d850a (r3) |
+|---|---|---|---|
+| küçük 2x12 (25) | 0 / 99,2 % | 2,2 / 97,0 % | 0,1 / 99,2 % |
+| küçük 3x12 (38) | 0 / 100 % | 0,3 / 99,7 % | 0 / 100 % |
+| BÜYÜK 2x12 (25) | 0 / 99,2 % | 2,6 / 96,6 % | 0,2 / 99,0 % |
+| BÜYÜK 3x12 (38) | 0 / 100 % | 0,3 / 99,7 % | 0 / 100 % |
+| BÜYÜK 4x6 (27) | 0 / 99,5 % | **100 / 0 %** | 0,2 / 99,2 % |
+| karışık 3x12 (38) | 0 / 100 % | 0 / 100 % | 0 / 100 % |
+| BÜYÜK 2x6 (13), 3x6 (20) | 0 / **0 %** | 100 / 0 % | 5,7 ve 1,1 / 0 % |
+| belge adları (inceleyici 9 + `sozlesme_v2_kdv_raporu_q3_2025`, `p4-…`, `b-el-…`) | hepsi yanlış pozitif | hepsi allow | hepsi allow |
+| `data/samples` tüm dosya adları | — | bulgu yok | bulgu yok |
+
+Hedefe göre: aday uzunluğundaki (≥ 24 karakter) tüm rastgele biçimler ≥ %99 yakalanıyor (taban 28d7a5f ile aynı düzey); belge adları %100 allow. Bilinen yanlış pozitif: `strengths-report-final-v2` (İngilizce "ngths" 5 ünsüz) yakalanıyor (r2'de de böyleydi).
+
+**Hedefin ulaşılamayan kısmı (karar gerekiyor):** BÜYÜK 2x6 (13 karakter) ve 3x6 (20 karakter) `ENTROPY_MIN_CHARS = 24` altında; entropi taraması bunları hiç aday yapmaz. Taban 28d7a5f'te de %0 yakalanıyordu; muafiyetle ilgisi yok. Seçenekler:
+- **A (öneri)** bu düzeltmenin kapsamı dışı, eşik 24 kalır (08-lite kararı); kısa ayraçlı tokenlar için ayrı FOLLOWUP (gerçek sırların çoğu ≥ 24; vendor kalıpları kısa olanları zaten yakalıyor). Etki: değişiklik yok.
+- **B** ayraçlı değerler için aday eşiği 12'ye. Etki: 13-20 karakterlik kodlar (ör. `ABC-DEFG-HIJK`) entropi eşiğini (3,5 bit) geçerse yakalanır; kısa kod/ürün anahtarlarında yanlış pozitif riski, ölçülmedi.
+
+Testler: `test_08e_6`'ya 3 yeni (BÜYÜK 4x6, 2x12, 7x3): önce 2 kırmızı (2x12 zaten yakalanıyordu), sonra yeşil; `test_08e_5`'e 5 belge adı (inceleyici listesi + kdv/q3), yeşil.
+
+Kapılar: lint 0; airgap 675 passed; llmaas iki koşuda yalnız FOLLOWUP-97'nin iki 04a testi düştü, aynı dosya tek başına 24/24 passed (zamanlama; bu dalın dokunmadığı kod).

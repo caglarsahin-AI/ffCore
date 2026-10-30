@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-test-18-hazirlik
 - Aktif paket: 18-hazirlik
 - Durum: ACTIVE
-- Son okunan: koordinator K-SEN-0042
+- Son okunan: koordinator K-SEN-0044
 
 ## Mesajlar
 
@@ -779,3 +779,28 @@ Kapılar: lint 0; llmaas 667; airgap ilk koşuda FOLLOWUP-97, tekrar 667.
 ### T-18-0042 · 2026-10-30 13:49 · → koordinator · ACK
 Paket: 18 / 08   Cevap: K-SEN-0042 / K-INIT-0020
 Alındı. 08 dalına commit yok. Sıram gelince ffcore-18e2e yığını BACKEND_PORT=18020 FRONTEND_PORT=13020 ile açılır (her compose komutunda + iki env-file). O zamana kadar docker yok.
+
+### T-08E-0004 · 2026-10-30 14:08 · → koordinator · PR-HAZIR (r3 delta) + KARAR-GEREK küçük
+Paket: fix/08-default-egress-enforce [B]   Cevap: K-SEN-0043
+@ e7d850abcb240b6f91379593b36a87e7ad001100 (7dcaa98 üstüne tek commit).
+Kural: her segment rakam / normalize sözcük (≥%30 sesli, 3 ünsüzlük dizi yok) / kısa etiket / sayıdan önce büyük harf kod; ≥3 segmentte etiket+kod harfleri 15'i aşarsa muafiyet yok.
+İnceleyicinin üreteciyle ölçüm (tablo PR dosyasında):
+- ≥24 karakterlik tüm rastgele biçimler %99-100 yakalanıyor (BÜYÜK 4x6: %0 → %99,2).
+- Belge adları %100 allow.
+- data/samples dosya adlarının hiçbiri bulgu vermiyor.
+Testler önce kırmızı (2), sonra yeşil.
+Kapılar:
+- lint 0.
+- airgap 675.
+- llmaas: iki koşuda yalnız FOLLOWUP-97'nin iki 04a testi düştü; dosya tek başına 24/24.
+
+KARAR-GEREK: BÜYÜK 2x6/3x6 (13 ve 20 karakter) ENTROPY_MIN_CHARS 24'ün altında, tabanda da %0. Muafiyetle ilgisi yok.
+- **A (öneri)** kapsam dışı, ayrı FOLLOWUP.
+- **B** ayraçlı değerler için aday eşiği 12. Kısa kodlarda yanlış pozitif riski, ölçülmedi.
+A ile bırakıyorum.
+
+Şimdi K-SEN-0044: 18e2e yığını.
+
+### T-18-0043 · 2026-10-30 14:08 · → koordinator · YIGIN-AÇ 18e2e
+Paket: 18 senaryolar (gerçek seed + F2 aşama 3)   Cevap: K-SEN-0044
+Proje ffcore-18e2e, FFCORE_VERSION=0.0.0-18e2e, BACKEND_PORT=18020 FRONTEND_PORT=13020, --env-file .env.test --env-file tests/e2e/scenarios/e2e.env --profile test.
