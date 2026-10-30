@@ -9,6 +9,7 @@ to the project's members (C15).
 
 import asyncio
 import uuid
+from datetime import datetime
 from typing import Annotated
 from uuid import UUID
 
@@ -26,6 +27,7 @@ from ffcore.api.common import (
 from ffcore.api.knowledge_schemas import (
     DocumentList,
     DocumentOut,
+    DocumentUpdate,
     GateDecision,
     KnowledgeBaseCreate,
     KnowledgeBaseList,
@@ -151,6 +153,7 @@ def _document_out(document: Document, chunk_count: int) -> DocumentOut:
         metadata=document.meta,
         version=document.version,
         breadcrumb=document.breadcrumb,
+        updated_at_source=document.updated_at_source,
         language=document.language,
         duplicate_of=document.duplicate_of,
         gate0=GateDecision(status=document.gate0_status, reason=document.gate0_reason),
@@ -365,6 +368,13 @@ async def upload_documents(
         bool,
         Form(description="Open the files to every project member (empty ACL), on purpose."),
     ] = False,
+    updated_at_source: Annotated[
+        datetime | None,
+        Form(
+            description="When the source last changed (ISO 8601), for every file of the request. "
+            "Omitted: unknown (null), listed after dated sources; set later with PATCH."
+        ),
+    ] = None,
 ):
     kb = await _kb(session, project_id, kb_id)
     roles = [r.value for r in acl_roles or []]
@@ -388,6 +398,8 @@ async def upload_documents(
             settings=settings,
             vector_store=jobs.get_vector_store(settings),
         )
+        if updated_at_source is not None:
+            document.updated_at_source = updated_at_source
         uploaded.append((document, outcome))
     out = []
     for document, outcome in uploaded:
@@ -426,6 +438,29 @@ async def get_document(
     session: SessionDep,
 ):
     document = await _document(session, project_id, kb_id, document_id, acl_for(request, actor))
+    counts = await _chunk_counts(session, [document.id])
+    return _document_out(document, counts.get(document.id, 0))
+
+
+@router.patch("/{kb_id}/documents/{document_id}", response_model=DocumentOut)
+@audited("update_document", "document", redact_fields=DOCUMENT_AUDIT_MASKED)
+async def update_document(
+    project_id: UUID,
+    kb_id: UUID,
+    document_id: UUID,
+    body: DocumentUpdate,
+    request: Request,
+    actor: Editor,
+    session: SessionDep,
+    resource_id: DocumentIdDep,
+):
+    """Document metadata the uploader may correct; the source date orders search results at
+    once (it is read from the document, no reindex)."""
+    document = await _document(session, project_id, kb_id, document_id, acl_for(request, actor))
+    for field, value in body.model_dump(exclude_unset=True).items():
+        setattr(document, field, value)
+    await session.flush()
+    await session.refresh(document)
     counts = await _chunk_counts(session, [document.id])
     return _document_out(document, counts.get(document.id, 0))
 

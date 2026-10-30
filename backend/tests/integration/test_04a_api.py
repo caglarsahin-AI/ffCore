@@ -123,7 +123,7 @@ def test_04a_kb_create_permissions_and_audit(world, pg):
         403,
         "read_only_access",
     )
-    assert len(audit_rows(pg, "create_knowledge_base", "success")) == 1
+    assert len(audit_rows(pg, "create_knowledge_base", "success", project=world["project"])) == 1
 
 
 def test_04a_kb_create_refuses_other_model_and_overlap(world):
@@ -251,7 +251,7 @@ def test_04a_delete_document_leaves_search(world, settings, queue, pg):
     assert world["analyst"].delete(doc_url).status_code == 204
     assert search(world["analyst"], world, kb["id"], "fesih").json()["hits"] == []
     assert world["analyst"].get(doc_url).status_code == 404
-    assert len(audit_rows(pg, "delete_document", "success")) == 1
+    assert len(audit_rows(pg, "delete_document", "success", project=world["project"])) == 1
 
 
 def test_04a_reindex_enqueues_job(world, queue, pg):
@@ -261,7 +261,7 @@ def test_04a_reindex_enqueues_job(world, queue, pg):
     )
     assert response.status_code == 202 and response.json()["documents"] == 0
     assert queue.jobs == [("reindex_job", kb["id"], "gold", True)]
-    assert len(audit_rows(pg, "reindex_knowledge_base", "success")) == 1
+    assert len(audit_rows(pg, "reindex_knowledge_base", "success", project=world["project"])) == 1
 
 
 def test_04a_read_mode_get_parity(world, settings, queue, app):

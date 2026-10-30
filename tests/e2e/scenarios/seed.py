@@ -247,13 +247,16 @@ def upload_form(path: Path) -> tuple[str, bytes]:
     return path.name, path.read_bytes()
 
 
-def seed_kb(admin: Client, pid: str, key: str, files: list[tuple[Path, list[str]]]) -> str:
-    """KB `key` with `files` [(path, acl_roles)]; [] = open to every member (13a words.py)."""
+def seed_kb(admin: Client, pid: str, key: str, files: list[tuple]) -> str:
+    """KB `key` with `files` [(path, acl_roles[, source_date])]; [] = open to every member (13a
+    words.py); a source date orders newest first (FOLLOWUP-101), none = unknown."""
     base = f"/projects/{pid}/knowledge-bases"
     kb = admin.create(base, {"key": key, "name": key}, lambda: admin.find(base, key))
     doc_ids = []
-    for path, roles in files:
+    for path, roles, *date in files:
         data = {"acl_open": "true"} if not roles else {"acl_roles": roles}
+        if date:
+            data["updated_at_source"] = date[0]
         r = admin.call(
             "POST", f"{base}/{kb['id']}/documents", files={"files": upload_form(path)}, data=data
         )
@@ -277,7 +280,11 @@ def seed_knowledge(admin: Client, projects: dict, ids: dict[str, str]) -> None:
     seed_kb(admin, ids[TARGET], "zehirli", [(p, []) for p in poison])
     versions = []
     for v in load("versions/expected.json"):
-        versions += [(SAMPLES / v["v1_file"], []), (SAMPLES / v["v2_file"], [])]
+        # v2 carries its effective date; v1 has none in the set and stays undated (unknown).
+        versions += [
+            (SAMPLES / v["v1_file"], []),
+            (SAMPLES / v["v2_file"], [], v["v2_effective_date"]),
+        ]
     seed_kb(admin, ids[TARGET], "surumler", versions)
 
 

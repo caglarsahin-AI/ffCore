@@ -155,6 +155,10 @@ class DocumentOut(BaseModel):
     metadata: dict[str, Any]
     version: int
     breadcrumb: str | None
+    updated_at_source: datetime | None = Field(
+        description="When the source last changed (upload field, PATCH or the connector); null:"
+        " unknown, listed after dated sources (FOLLOWUP-101)."
+    )
     language: str | None
     duplicate_of: UUID | None
     gate0: GateDecision
@@ -165,6 +169,13 @@ class DocumentOut(BaseModel):
     chunk_count: int
     created_at: datetime
     updated_at: datetime
+
+
+class DocumentUpdate(Patch):
+    updated_at_source: datetime | None = Field(
+        default=None,
+        description="When the source last changed; null clears it (unknown date).",
+    )
 
 
 class DocumentList(BaseModel):

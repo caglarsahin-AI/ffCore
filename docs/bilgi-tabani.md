@@ -103,6 +103,10 @@ re-embeds everything.
   pre-filters (single threshold rule); with it off, only `default_min_score` applies.
 - Every search writes one `kb_queries` row: the 30 candidates with both scores, what each
   threshold removed, latency and `run_id`.
+- Newest first (`by_recency`) orders by the document's source date, `updated_at_source`: an
+  upload form field, `PATCH …/documents/{id}`, or a connector's metadata (`ingest_from_raw`).
+  Without it the date is unknown (`null`), listed after dated sources and shown as "unknown
+  date" to the model; the upload time is never used in its place (FOLLOWUP-101).
 - Model weights live in the `model_cache` volume, never in the image. Keep it when closing a
   stack (`docker compose down`, not `down -v`).
 

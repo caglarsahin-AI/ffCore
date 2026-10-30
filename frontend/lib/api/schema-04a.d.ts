@@ -77,7 +77,12 @@ export interface paths {
         delete: operations["delete_document_api_v1_projects__project_id__knowledge_bases__kb_id__documents__document_id__delete"];
         options?: never;
         head?: never;
-        patch?: never;
+        /**
+         * Update Document
+         * @description Document metadata the uploader may correct; the source date orders search results at
+         *     once (it is read from the document, no reindex).
+         */
+        patch: operations["update_document_api_v1_projects__project_id__knowledge_bases__kb_id__documents__document_id__patch"];
         trace?: never;
     };
     "/api/v1/projects/{project_id}/knowledge-bases/{kb_id}/reindex": {
@@ -204,6 +209,11 @@ export interface components {
              * @default false
              */
             acl_open: boolean;
+            /**
+             * Updated At Source
+             * @description When the source last changed (ISO 8601), for every file of the request. Omitted: unknown (null), listed after dated sources; set later with PATCH.
+             */
+            updated_at_source?: string | null;
         };
         /**
          * CheckStatus
@@ -258,6 +268,11 @@ export interface components {
             version: number;
             /** Breadcrumb */
             breadcrumb: string | null;
+            /**
+             * Updated At Source
+             * @description When the source last changed (upload field, PATCH or the connector); null: unknown, listed after dated sources (FOLLOWUP-101).
+             */
+            updated_at_source: string | null;
             /** Language */
             language: string | null;
             /** Duplicate Of */
@@ -288,6 +303,14 @@ export interface components {
          * @enum {string}
          */
         DocumentStatus: "pending" | "converting" | "gated" | "chunking" | "embedding" | "indexed" | "skipped" | "failed" | "timeout";
+        /** DocumentUpdate */
+        DocumentUpdate: {
+            /**
+             * Updated At Source
+             * @description When the source last changed; null clears it (unknown date).
+             */
+            updated_at_source?: string | null;
+        };
         /** EmbedRequest */
         EmbedRequest: {
             /** Texts */
@@ -1343,6 +1366,88 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Invalid request. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description Not authenticated. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description Role or access mode not sufficient, or cross-origin request. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description Not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description Conflict with the current state. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description Request body or parameters failed validation. */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    update_document_api_v1_projects__project_id__knowledge_bases__kb_id__documents__document_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                kb_id: string;
+                document_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DocumentUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DocumentOut"];
+                };
             };
             /** @description Invalid request. */
             400: {
