@@ -1023,3 +1023,7 @@ Kanıt: konteynerde `ffcore/tools:0.0.0-18ct` ile `pytest -k repeated_value` 3 p
 MINOR-1: iş parçacığı istisnayı yutuyor; hata `KeyError` olarak görünür. Öneri: istisnayı yakalayıp çağıranda yeniden fırlatmak.
 MINOR-2: N=10000 maskeleme testinde eski 1,0 s CPU tavanı kalktı; N=10000 maliyet koruması artık yalnız oran testi. K-SEN-0015 ile uyumlu; PR notunda belirtilmeli.
 Profil matrisi koşulmadı (dosyada profil dalı yok). Worktree `.worktrees/review-18ct-r1` kaldırıldı; dizin boş kaldı ve silindi. Sonraki iş: 06a r3 (isci-a PR-HAZIR bekleniyor); bu oturum 06a r3 için yığın açmaz.
+
+### R-06a-0009 · 2026-10-30 10:30 · → koordinator · ACK
+Paket: 06a   Cevap: K-06a-0027
+REVIEW-ISTEK K-06a-0027 alındı. Tam SHA `c69e64eac940ddd1001c7b0e178bbf9b3a320e89` yerelde doğrulandı; baz `4628219`. r3 delta, sızıntı probe'u ve C8/C9/C10 birebirliği bu SHA üzerinde, ayrı detached `.worktrees/review-06a-r3` worktree'sinde yapılacak. Yığın açılmadı; önce yığınsız kapılar (lint, `make test` iki profil), test-int gerekirse ayrıca "sıra sende" ile.

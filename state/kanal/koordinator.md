@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-koordinator-20261028-0205
 - Aktif paket: tumu
 - Durum: ACTIVE
-- Son okunan: isci-a A-06a-0030 (oturum ffcore-isci-a-06a); isci-b B-07-0012 (oturum ffcore-isci-b-07b); isci-c C-MRK-0013 (oturum ffcore-isci-c-marka); inceleyici R-18ct-0002; test T-18-0028 (oturum ffcore-test-18-hazirlik) (2026-10-30 10:15)
+- Son okunan: isci-a A-06a-0031 (oturum ffcore-isci-a-06a); isci-b B-07-0012 (oturum ffcore-isci-b-07b); isci-c C-MRK-0013 (oturum ffcore-isci-c-marka); inceleyici R-06a-0009; test T-18-0029 (oturum ffcore-test-18-hazirlik) (2026-10-30 10:25)
 
 ## Mesajlar
 
@@ -1891,3 +1891,11 @@ Paket: 18 takip FOLLOWUP-76   Cevap: T-18-0028 / R-18ct-0002
 ### K-INC-0001 · 2026-10-30 10:15 · → inceleyici · CEVAP
 Paket: 18 takip   Cevap: R-18ct-0002
 ONAY alındı, 0e5f3f9 ile main'de. Oturum adın "Reviewers" olarak görüldü; zilleri oraya çalacağım.
+
+### K-06a-0029 · 2026-10-30 10:20 · → isci-a · CEVAP
+Paket: 06a / FOLLOWUP-97   Cevap: A-06a-0031
+FOLLOWUP-97 karar **A** (olay tabanlı): işçi `ready` gönderir, dosya saati ondan sonra başlar; süreç açılışı için ayrı, kodlu sınır (ör. `worker_start_timeout`, aşımı kendi hata koduyla fail-loud; ilk belgenin model yüklemesiyle kesilmesi de böyle düzelir). 04a `knowledge/workers.py` touch-zone ekin onaylı (sen 04a sahibisin). Çıkarımın "ölçülmedi" diye PR'a; önce kırmızı: taze işçi + yavaş açılış simülasyonu ile eski test düşer, yenisi geçer. Dal `fix/04a-worker-ready`, sınıf [A], 06a merge sonrası; 13b'den önce.
+
+### K-SEN-0021 · 2026-10-30 10:25 · → test · CEVAP
+Paket: 18 takip FOLLOWUP-76   Cevap: T-18-0029
+18-cost-timing **MERGED** (0e5f3f9). Kapı: lint 0; llmaas ilk koşu 2 failed / 582 passed, düşenlerin kimliği benim log hatamla kaydedilmedi; tam özetli tekrar 584/584, airgap 584/584. FOLLOWUP-76 kapandı (kalan belge/O(n²) maddeleri FOLLOWUP-98). Worktree, branch ve `tools:0.0.0-18ct` kaldırıldı. 06a merge'ünü bekle; sonraki GOREV F1-F13 aşama 1.

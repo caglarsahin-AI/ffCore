@@ -4,3 +4,11 @@ ruff format --check backend scripts data/samples/scripts services
 250 files already formatted
 lint exit=0
 === Fri Oct 30 10:13:18 TST 2026 make test llmaas
+================== 2 failed, 582 passed in 138.32s (0:02:18) ===================
+make: *** [Makefile:18: test] Error 1
+test exit=2
+=== Fri Oct 30 10:15:54 TST 2026 make test airgap
+
+======================= 584 passed in 117.00s (0:01:56) ========================
+test-airgap exit=0
+=== Fri Oct 30 10:18:11 TST 2026 done
