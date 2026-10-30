@@ -1,0 +1,205 @@
+ Container review10bp2-postgres-1  Running
+ Container review10bp2-redis-1  Running
+ Container review10bp2-litellm-1  Running
+ Container review10bp2-migrate-1  Created
+ Container review10bp2-backend-1  Running
+ Container review10bp2-postgres-1  Waiting
+ Container review10bp2-postgres-1  Waiting
+ Container review10bp2-postgres-1  Healthy
+ Container review10bp2-postgres-1  Healthy
+ Container review10bp2-migrate-1  Starting
+ Container review10bp2-migrate-1  Started
+ Container review10bp2-migrate-1  Waiting
+ Container review10bp2-postgres-1  Waiting
+ Container review10bp2-redis-1  Waiting
+ Container review10bp2-litellm-1  Waiting
+ Container review10bp2-postgres-1  Healthy
+ Container review10bp2-litellm-1  Healthy
+ Container review10bp2-redis-1  Healthy
+ Container review10bp2-migrate-1  Exited
+
+Running 137 tests using 1 worker
+
+  ✓    1 [chromium] › tests/e2e/test_10a_1_theme_switch.spec.ts:8:5 › test_10a_1_theme_switch: system, light, dark; kept after reload; no flash (2.6s)
+  ✓    2 [chromium] › tests/e2e/test_10a_2_screens_both_themes.spec.ts:8:9 › test_10a_2_screens_both_themes: login light (894ms)
+  ✓    3 [chromium] › tests/e2e/test_10a_2_screens_both_themes.spec.ts:8:9 › test_10a_2_screens_both_themes: login dark (1.0s)
+  ✓    4 [chromium] › tests/e2e/test_10a_2_screens_both_themes.spec.ts:8:9 › test_10a_2_screens_both_themes: projects light (2.5s)
+  ✓    5 [chromium] › tests/e2e/test_10a_2_screens_both_themes.spec.ts:8:9 › test_10a_2_screens_both_themes: projects dark (2.0s)
+  ✓    6 [chromium] › tests/e2e/test_10a_2_screens_both_themes.spec.ts:8:9 › test_10a_2_screens_both_themes: members light (2.1s)
+  ✓    7 [chromium] › tests/e2e/test_10a_2_screens_both_themes.spec.ts:8:9 › test_10a_2_screens_both_themes: members dark (1.8s)
+  ✓    8 [chromium] › tests/e2e/test_10a_2_screens_both_themes.spec.ts:8:9 › test_10a_2_screens_both_themes: providers light (2.0s)
+  ✓    9 [chromium] › tests/e2e/test_10a_2_screens_both_themes.spec.ts:8:9 › test_10a_2_screens_both_themes: providers dark (2.0s)
+  ✓   10 [chromium] › tests/e2e/test_10a_2_screens_both_themes.spec.ts:8:9 › test_10a_2_screens_both_themes: models light (1.9s)
+  ✓   11 [chromium] › tests/e2e/test_10a_2_screens_both_themes.spec.ts:8:9 › test_10a_2_screens_both_themes: models dark (2.0s)
+  ✓   12 [chromium] › tests/e2e/test_10a_2_screens_both_themes.spec.ts:8:9 › test_10a_2_screens_both_themes: coming-soon light (1.8s)
+  ✓   13 [chromium] › tests/e2e/test_10a_2_screens_both_themes.spec.ts:8:9 › test_10a_2_screens_both_themes: coming-soon dark (2.6s)
+  ✓   14 [chromium] › tests/e2e/test_10a_2_screens_both_themes.spec.ts:8:9 › test_10a_2_screens_both_themes: theme-preview light (916ms)
+  ✓   15 [chromium] › tests/e2e/test_10a_2_screens_both_themes.spec.ts:8:9 › test_10a_2_screens_both_themes: theme-preview dark (889ms)
+  ✓   16 [chromium] › tests/e2e/test_10a_4_axe_contrast.spec.ts:9:9 › test_10a_4_axe_contrast: login light (1.5s)
+  ✓   17 [chromium] › tests/e2e/test_10a_4_axe_contrast.spec.ts:9:9 › test_10a_4_axe_contrast: login dark (1.4s)
+  ✓   18 [chromium] › tests/e2e/test_10a_4_axe_contrast.spec.ts:9:9 › test_10a_4_axe_contrast: projects light (2.8s)
+  ✓   19 [chromium] › tests/e2e/test_10a_4_axe_contrast.spec.ts:9:9 › test_10a_4_axe_contrast: projects dark (3.6s)
+  ✓   20 [chromium] › tests/e2e/test_10a_4_axe_contrast.spec.ts:9:9 › test_10a_4_axe_contrast: members light (3.1s)
+  ✓   21 [chromium] › tests/e2e/test_10a_4_axe_contrast.spec.ts:9:9 › test_10a_4_axe_contrast: members dark (3.0s)
+  ✓   22 [chromium] › tests/e2e/test_10a_4_axe_contrast.spec.ts:9:9 › test_10a_4_axe_contrast: providers light (2.9s)
+  ✓   23 [chromium] › tests/e2e/test_10a_4_axe_contrast.spec.ts:9:9 › test_10a_4_axe_contrast: providers dark (3.0s)
+  ✓   24 [chromium] › tests/e2e/test_10a_4_axe_contrast.spec.ts:9:9 › test_10a_4_axe_contrast: models light (3.1s)
+  ✓   25 [chromium] › tests/e2e/test_10a_4_axe_contrast.spec.ts:9:9 › test_10a_4_axe_contrast: models dark (3.3s)
+  ✓   26 [chromium] › tests/e2e/test_10a_4_axe_contrast.spec.ts:9:9 › test_10a_4_axe_contrast: coming-soon light (2.7s)
+  ✓   27 [chromium] › tests/e2e/test_10a_4_axe_contrast.spec.ts:9:9 › test_10a_4_axe_contrast: coming-soon dark (2.8s)
+  ✓   28 [chromium] › tests/e2e/test_10a_4_axe_contrast.spec.ts:9:9 › test_10a_4_axe_contrast: theme-preview light (1.4s)
+  ✓   29 [chromium] › tests/e2e/test_10a_4_axe_contrast.spec.ts:9:9 › test_10a_4_axe_contrast: theme-preview dark (1.5s)
+  ✓   30 [chromium] › tests/e2e/test_10a_8_locale_switch.spec.ts:10:5 › test_10a_8_locale_switch: English by default (1.6s)
+  ✓   31 [chromium] › tests/e2e/test_10a_8_locale_switch.spec.ts:16:5 › test_10a_8_locale_switch: Turkish from the cookie (1.4s)
+  ✓   32 [chromium] › tests/e2e/test_10a_8_locale_switch.spec.ts:23:5 › test_10a_8_locale_switch: switcher changes the language and keeps it (2.3s)
+  ✓   33 [chromium] › tests/e2e/test_10ab_1_login.spec.ts:7:5 › test_10ab_1_login: real sign-in opens the console with role and access (1.6s)
+  ✓   34 [chromium] › tests/e2e/test_10ab_1_login.spec.ts:16:5 › test_10ab_1_login: wrong password shows invalid credentials and sets no session (936ms)
+  ✓   35 [chromium] › tests/e2e/test_10ab_2_project_create.spec.ts:7:5 › test_10ab_2_project_create: superadmin creates a project and sees it listed (2.3s)
+  ✓   36 [chromium] › tests/e2e/test_10ab_2_project_create.spec.ts:25:5 › test_10ab_2_project_create: a used key is refused by the backend (1.9s)
+  ✓   37 [chromium] › tests/e2e/test_10ab_2_project_create.spec.ts:36:5 › test_10ab_2_project_create: a project admin who is not a superadmin gets no create button (1.6s)
+  ✓   38 [chromium] › tests/e2e/test_10ab_3_members.spec.ts:7:5 › test_10ab_3_members: add an analyst, switch to read, remove (2.9s)
+  ✓   39 [chromium] › tests/e2e/test_10ab_3_members.spec.ts:30:5 › test_10ab_3_members: reserved roles are not offered (1.5s)
+  ✓   40 [chromium] › tests/e2e/test_10ab_4_read_only.spec.ts:8:5 › test_10ab_4_read_only: admin+read sees every 10a screen with no active change control (3.3s)
+  ✓   41 [chromium] › tests/e2e/test_10ab_4_read_only.spec.ts:29:5 › test_10ab_4_read_only: the API itself refuses a change from the read-only session (1.4s)
+  ✓   42 [chromium] › tests/e2e/test_10ab_4_read_only.spec.ts:43:5 › test_10ab_4_read_only: write access follows the project, not the highest membership (1.8s)
+  ✓   43 [chromium] › tests/e2e/test_10ab_5_forbidden_message.spec.ts:9:5 › test_10ab_5_forbidden_message: stale page shows the API's read-only refusal (2.3s)
+  ✓   44 [chromium] › tests/e2e/test_10ab_6_role_screens.spec.ts:6:5 › test_10ab_6_role_screens: analyst sees no admin menu and gets no-access by URL (2.3s)
+  ✓   45 [chromium] › tests/e2e/test_10ab_6_role_screens.spec.ts:19:5 › test_10ab_6_role_screens: a project admin does not see tenant screens (2.0s)
+  ✓   46 [chromium] › tests/e2e/test_10ab_7_session_boundary.spec.ts:8:5 › test_10ab_7_session_boundary: no cookie goes to sign-in (820ms)
+  ✓   47 [chromium] › tests/e2e/test_10ab_7_session_boundary.spec.ts:13:5 › test_10ab_7_session_boundary: a user without projects gets its own page (1.1s)
+  ✓   48 [chromium] › tests/e2e/test_10ab_7_session_boundary.spec.ts:20:5 › test_10ab_7_session_boundary: sign-out revokes the token on the backend (1.6s)
+  ✓   49 [chromium] › tests/e2e/test_10ab_8_query_failures.spec.ts:14:5 › test_10ab_8_query_failures: user list failure is shown, not an empty picker (1.9s)
+  ✓   50 [chromium] › tests/e2e/test_10ab_8_query_failures.spec.ts:26:5 › test_10ab_8_query_failures: project list failure is shown in the selector (1.6s)
+  ✓   51 [chromium] › tests/e2e/test_10ab_8_query_failures.spec.ts:38:5 › test_10ab_8_query_failures: sign-in never follows next to another origin (1.5s)
+  ✓   52 [chromium] › tests/e2e/test_10ab_8_query_failures.spec.ts:45:5 › test_10ab_8_query_failures: 401 on a list goes to sign-in and back (2.3s)
+  ✓   53 [chromium] › tests/e2e/test_10af_1_provider_driver_fields.spec.ts:11:5 › test_10af_1_provider_driver_fields: every live driver field has a label in both languages (140ms)
+  ✓   54 [chromium] › tests/e2e/test_10af_1_provider_driver_fields.spec.ts:18:5 › test_10af_1_provider_driver_fields: choosing a driver shows its fields, secrets as password inputs (2.6s)
+  ✓   55 [chromium] › tests/e2e/test_10af_10_model_edit_delete.spec.ts:8:5 › test_10af_10_model_edit_delete: a model is edited, then deleted from the console and from LiteLLM (4.1s)
+  ✓   56 [chromium] › tests/e2e/test_10af_10_model_edit_delete.spec.ts:36:5 › test_10af_10_model_edit_delete: a Responses API model is marked as not in the gateway and stays editable (2.6s)
+  ✓   57 [chromium] › tests/e2e/test_10af_11_forms_read_only.spec.ts:8:5 › test_10af_11_forms_read_only: a read-only superadmin cannot open any provider or model form (1.9s)
+  ✓   58 [chromium] › tests/e2e/test_10af_11_forms_read_only.spec.ts:26:5 › test_10af_11_forms_read_only: a project admin edits models but cannot add one (needs the provider list) (2.5s)
+  ✓   59 [chromium] › tests/e2e/test_10af_12_forms_both_themes.spec.ts:11:7 › test_10af_12_forms_both_themes: provider form light (3.4s)
+  ✓   60 [chromium] › tests/e2e/test_10af_12_forms_both_themes.spec.ts:32:7 › test_10af_12_forms_both_themes: model form light (4.0s)
+  ✓   61 [chromium] › tests/e2e/test_10af_12_forms_both_themes.spec.ts:11:7 › test_10af_12_forms_both_themes: provider form dark (3.9s)
+  ✓   62 [chromium] › tests/e2e/test_10af_12_forms_both_themes.spec.ts:32:7 › test_10af_12_forms_both_themes: model form dark (3.5s)
+  ✓   63 [chromium] › tests/e2e/test_10af_16_project_switch.spec.ts:25:5 › test_10af_16_project_switch: switching from an edit project to a read-only one closes the open form (2.6s)
+  ✓   64 [chromium] › tests/e2e/test_10af_16_project_switch.spec.ts:44:5 › test_10af_16_project_switch: switching between two edit projects also starts from a closed form (3.5s)
+  ✓   65 [chromium] › tests/e2e/test_10af_2_provider_create.spec.ts:11:5 › test_10af_2_provider_create: superadmin adds a provider with a key and assigns it to a project (3.3s)
+  ✓   66 [chromium] › tests/e2e/test_10af_2_provider_create.spec.ts:58:5 › test_10af_2_provider_create: a used key is refused on the key field (2.7s)
+  ✓   67 [chromium] › tests/e2e/test_10af_3_provider_test.spec.ts:12:5 › test_10af_3_provider_test: an unsaved configuration is tested, and a failed test does not block saving (3.3s)
+  ✓   68 [chromium] › tests/e2e/test_10af_3_provider_test.spec.ts:41:5 › test_10af_3_provider_test: a driver without a connection test says so instead of offering one (1.8s)
+  ✓   69 [chromium] › tests/e2e/test_10af_3_provider_test.spec.ts:51:5 › test_10af_3_provider_test: the edit form tests the stored configuration (1.8s)
+  ✓   70 [chromium] › tests/e2e/test_10af_4_provider_edit_keeps_secret.spec.ts:8:5 › test_10af_4_provider_edit_keeps_secret: an empty secret field keeps the stored key (3.2s)
+  ✓   71 [chromium] › tests/e2e/test_10af_5_provider_projects.spec.ts:8:5 › test_10af_5_provider_projects: projects cannot be left empty, and the assignment is replaced (2.3s)
+  ✓   72 [chromium] › tests/e2e/test_10af_6_provider_in_use.spec.ts:8:5 › test_10af_6_provider_in_use: deactivating a provider a model uses is refused with a clear message (2.0s)
+  ✓   73 [chromium] › tests/e2e/test_10af_6_provider_in_use.spec.ts:25:5 › test_10af_6_provider_in_use: an unused provider is deactivated and activated again (2.2s)
+  ✓   74 [chromium] › tests/e2e/test_10af_7_model_create_reconciled.spec.ts:8:5 › test_10af_7_model_create_reconciled: a model added in the console is served by LiteLLM (2.8s)
+  ✓   75 [chromium] › tests/e2e/test_10af_8_model_catalog_fill.spec.ts:16:5 › test_10af_8_model_catalog_fill: a catalog model fills the form, an unknown one says so (2.8s)
+  ✓   76 [chromium] › tests/e2e/test_10af_9_model_embedding_probe.spec.ts:8:5 › test_10af_9_model_embedding_probe: an embedding model that cannot be measured is refused with a clear message (2.8s)
+  ✓   77 [chromium] › tests/e2e/test_10bp1_1_kb_create_edit.spec.ts:8:5 › test_10bp1_1_kb_create_edit: an empty project guides the analyst, then an admin creates and edits a knowledge base (4.7s)
+  ✓   78 [chromium] › tests/e2e/test_10bp1_10_readiness.spec.ts:28:5 › test_10bp1_10_readiness: with stand-in models the page is ready and names FAKE_EMBED (1.7s)
+  ✓   79 [chromium] › tests/e2e/test_10bp1_11_screens_themes_axe.spec.ts:54:9 › test_10bp1_11_screens_themes_axe: knowledge-bases light (2.9s)
+  ✓   80 [chromium] › tests/e2e/test_10bp1_11_screens_themes_axe.spec.ts:54:9 › test_10bp1_11_screens_themes_axe: knowledge-bases dark (2.9s)
+  ✓   81 [chromium] › tests/e2e/test_10bp1_11_screens_themes_axe.spec.ts:54:9 › test_10bp1_11_screens_themes_axe: kb-documents light (3.6s)
+  ✓   82 [chromium] › tests/e2e/test_10bp1_11_screens_themes_axe.spec.ts:54:9 › test_10bp1_11_screens_themes_axe: kb-documents dark (3.5s)
+  ✓   83 [chromium] › tests/e2e/test_10bp1_11_screens_themes_axe.spec.ts:54:9 › test_10bp1_11_screens_themes_axe: kb-search light (4.3s)
+  ✓   84 [chromium] › tests/e2e/test_10bp1_11_screens_themes_axe.spec.ts:54:9 › test_10bp1_11_screens_themes_axe: kb-search dark (5.1s)
+  ✓   85 [chromium] › tests/e2e/test_10bp1_11_screens_themes_axe.spec.ts:54:9 › test_10bp1_11_screens_themes_axe: system-status light (5.3s)
+  ✓   86 [chromium] › tests/e2e/test_10bp1_11_screens_themes_axe.spec.ts:54:9 › test_10bp1_11_screens_themes_axe: system-status dark (3.1s)
+  ✓   87 [chromium] › tests/e2e/test_10bp1_12_query_failures.spec.ts:7:5 › test_10bp1_12_query_failures: a failed knowledge base read is an error, never an empty screen (2.0s)
+  ✓   88 [chromium] › tests/e2e/test_10bp1_18_kb_counts_follow_upload.spec.ts:10:5 › test_10bp1_18_kb_counts_follow_upload: the summary and the list show the chunks once a document is indexed (8.5s)
+  ✓   89 [chromium] › tests/e2e/test_10bp1_19_read_only_fields.spec.ts:14:5 › test_10bp1_19_read_only_fields: admin+read cannot change any upload or rebuild field (2.8s)
+  ✓   90 [chromium] › tests/e2e/test_10bp1_19_read_only_fields.spec.ts:33:5 › test_10bp1_19_read_only_fields: with edit access the same fields work (2.6s)
+  ✓   91 [chromium] › tests/e2e/test_10bp1_2_upload_indexed.spec.ts:10:5 › test_10bp1_2_upload_indexed: a 13a contract uploaded in the console reaches gold with every gate shown (12.1s)
+  ✓   92 [chromium] › tests/e2e/test_10bp1_3_reupload_duplicate.spec.ts:10:5 › test_10bp1_3_reupload_duplicate: same file again is unchanged; same text under another name links to the original (14.0s)
+  ✓   93 [chromium] › tests/e2e/test_10bp1_4_gate_reject.spec.ts:10:5 › test_10bp1_4_gate_reject: a rejected and a failed file stay in the list with their reason and code (6.6s)
+  ✓   94 [chromium] › tests/e2e/test_10bp1_5_search_panel.spec.ts:8:5 › test_10bp1_5_search_panel: try search shows both scores, the threshold in force and what it left out (7.8s)
+  ✓   95 [chromium] › tests/e2e/test_10bp1_6_acl_upload.spec.ts:8:5 › test_10bp1_6_acl_upload: a document uploaded for admins only is invisible to the analyst (11.5s)
+  ✓   96 [chromium] › tests/e2e/test_10bp1_7_delete_reindex.spec.ts:8:5 › test_10bp1_7_delete_reindex: deleting a document and rebuilding a layer (11.8s)
+  ✓   97 [chromium] › tests/e2e/test_10bp1_8_read_only.spec.ts:26:5 › test_10bp1_8_read_only: admin+read sees the same knowledge bases and documents with no active change control (9.0s)
+  ✓   98 [chromium] › tests/e2e/test_10bp1_9_roles.spec.ts:8:5 › test_10bp1_9_roles: the analyst uploads but cannot change knowledge bases, and has no system status (2.8s)
+  ✓   99 [chromium] › tests/e2e/test_10bp2_1_tool_crud_and_errors.spec.ts:8:5 › test_10bp2_1_tool_crud_and_errors: an admin registers, edits and deletes a tool; backend field errors land on their field (5.6s)
+  ✓  100 [chromium] › tests/e2e/test_10bp2_10_read_only.spec.ts:10:5 › test_10bp2_10_read_only: admin+read gets the four screens with every change control and field disabled (7.5s)
+  ✓  101 [chromium] › tests/e2e/test_10bp2_11_roles.spec.ts:8:5 › test_10bp2_11_roles: an analyst has agents, runs and approvals but no tools menu, and gets no-access by URL (1.8s)
+  ✓  102 [chromium] › tests/e2e/test_10bp2_11_roles.spec.ts:25:5 › test_10bp2_11_roles: a project admin sees the tools menu and can register (1.3s)
+  ✓  103 [chromium] › tests/e2e/test_10bp2_12_screens_themes_axe.spec.ts:56:9 › test_10bp2_12_screens_themes_axe: tools light (3.6s)
+  ✓  104 [chromium] › tests/e2e/test_10bp2_12_screens_themes_axe.spec.ts:56:9 › test_10bp2_12_screens_themes_axe: tools dark (3.7s)
+  ✓  105 [chromium] › tests/e2e/test_10bp2_12_screens_themes_axe.spec.ts:56:9 › test_10bp2_12_screens_themes_axe: tool-detail light (3.0s)
+  ✓  106 [chromium] › tests/e2e/test_10bp2_12_screens_themes_axe.spec.ts:56:9 › test_10bp2_12_screens_themes_axe: tool-detail dark (3.0s)
+  ✓  107 [chromium] › tests/e2e/test_10bp2_12_screens_themes_axe.spec.ts:56:9 › test_10bp2_12_screens_themes_axe: agents light (2.8s)
+  ✓  108 [chromium] › tests/e2e/test_10bp2_12_screens_themes_axe.spec.ts:56:9 › test_10bp2_12_screens_themes_axe: agents dark (3.3s)
+  ✓  109 [chromium] › tests/e2e/test_10bp2_12_screens_themes_axe.spec.ts:56:9 › test_10bp2_12_screens_themes_axe: agent-wizard-tools light (3.1s)
+  ✓  110 [chromium] › tests/e2e/test_10bp2_12_screens_themes_axe.spec.ts:56:9 › test_10bp2_12_screens_themes_axe: agent-wizard-tools dark (3.3s)
+  ✓  111 [chromium] › tests/e2e/test_10bp2_12_screens_themes_axe.spec.ts:56:9 › test_10bp2_12_screens_themes_axe: runs light (3.0s)
+  ✓  112 [chromium] › tests/e2e/test_10bp2_12_screens_themes_axe.spec.ts:56:9 › test_10bp2_12_screens_themes_axe: runs dark (3.0s)
+  ✓  113 [chromium] › tests/e2e/test_10bp2_12_screens_themes_axe.spec.ts:56:9 › test_10bp2_12_screens_themes_axe: run-detail light (3.5s)
+  ✓  114 [chromium] › tests/e2e/test_10bp2_12_screens_themes_axe.spec.ts:56:9 › test_10bp2_12_screens_themes_axe: run-detail dark (3.3s)
+  ✓  115 [chromium] › tests/e2e/test_10bp2_12_screens_themes_axe.spec.ts:56:9 › test_10bp2_12_screens_themes_axe: approvals light (3.1s)
+  ✓  116 [chromium] › tests/e2e/test_10bp2_12_screens_themes_axe.spec.ts:56:9 › test_10bp2_12_screens_themes_axe: approvals dark (2.8s)
+  ✓  117 [chromium] › tests/e2e/test_10bp2_12_screens_themes_axe.spec.ts:56:9 › test_10bp2_12_screens_themes_axe: approval-detail light (4.1s)
+  ✓  118 [chromium] › tests/e2e/test_10bp2_12_screens_themes_axe.spec.ts:56:9 › test_10bp2_12_screens_themes_axe: approval-detail dark (4.7s)
+  ✓  119 [chromium] › tests/e2e/test_10bp2_13_query_failures.spec.ts:9:5 › test_10bp2_13_query_failures: a missing record or a failed list is an error, never an empty screen (4.6s)
+  ✓  120 [chromium] › tests/e2e/test_10bp2_2_discover_actions_invoke.spec.ts:8:5 › test_10bp2_2_discover_actions_invoke: discovery lists the actions off and needing approval; an admin switches one on and tries it (7.1s)
+  ✘  121 [chromium] › tests/e2e/test_10bp2_3_agent_wizard_lifecycle.spec.ts:11:5 › test_10bp2_3_agent_wizard_lifecycle: create, a placeholder without a variable is refused, save, publish, new draft, roll back (21.0s)
+  ✓  122 [chromium] › tests/e2e/test_10bp2_4_contract_assistant_cited.spec.ts:16:5 › test_10bp2_4_contract_assistant_cited: an analyst builds the contract assistant and gets an answer with sources (7.1s)
+  ✓  123 [chromium] › tests/e2e/test_10bp2_5_inline_approval.spec.ts:18:5 › test_10bp2_5_inline_approval: approve continues the run and calls the tool; reject continues without it (5.7s)
+  ✓  124 [chromium] › tests/e2e/test_10bp2_7_runs_list_detail.spec.ts:8:5 › test_10bp2_7_runs_list_detail: a run is listed under its filters and its detail shows the stored events (3.7s)
+  ✓  125 [chromium] › tests/e2e/test_10bp2_8_run_feedback.spec.ts:8:5 › test_10bp2_8_run_feedback: an expert votes on a completed run; the run moves from pending to given feedback (3.6s)
+  ✓  126 [chromium] › tests/e2e/test_10bp2_9_approvals_queue.spec.ts:8:5 › test_10bp2_9_approvals_queue: the queue opens on waiting approvals and says so when there are none (1.9s)
+  ✓  127 [chromium] › tests/e2e/test_10bp2_9_approvals_queue.spec.ts:19:5 › test_10bp2_9_approvals_queue: a waiting approval is listed and counted, read access cannot decide, approve once, a second decision is 409 (6.3s)
+  ✓  128 [chromium] › tests/e2e/test_10mrk_1_favicon_icons.spec.ts:5:5 › test_10mrk_1_favicon_icons: favicon, icon and apple icon are linked and served at their size (945ms)
+  ✓  129 [chromium] › tests/e2e/test_10mrk_2_manifest.spec.ts:6:5 › test_10mrk_2_manifest: web manifest is linked, takes name and description from messages, serves 192 and 512 icons (629ms)
+  ✓  130 [chromium] › tests/e2e/test_10mrk_3_sidebar_logo.spec.ts:10:7 › test_10mrk_3_sidebar_logo: logo in the sidebar, open and collapsed (en) (2.0s)
+  ✓  131 [chromium] › tests/e2e/test_10mrk_3_sidebar_logo.spec.ts:10:7 › test_10mrk_3_sidebar_logo: logo in the sidebar, open and collapsed (tr) (2.0s)
+  ✓  132 [chromium] › tests/e2e/test_10mrk_4_login_brand.spec.ts:12:7 › test_10mrk_4_login_brand: badge, product name and subtitle on sign-in (en) (562ms)
+  ✓  133 [chromium] › tests/e2e/test_10mrk_4_login_brand.spec.ts:12:7 › test_10mrk_4_login_brand: badge, product name and subtitle on sign-in (tr) (819ms)
+  ✓  134 [chromium] › tests/e2e/test_10mrk_5_both_themes.spec.ts:12:9 › test_10mrk_5_both_themes: login light (1.8s)
+  ✓  135 [chromium] › tests/e2e/test_10mrk_5_both_themes.spec.ts:12:9 › test_10mrk_5_both_themes: login dark (1.6s)
+  ✓  136 [chromium] › tests/e2e/test_10mrk_5_both_themes.spec.ts:12:9 › test_10mrk_5_both_themes: projects light (3.1s)
+  ✓  137 [chromium] › tests/e2e/test_10mrk_5_both_themes.spec.ts:12:9 › test_10mrk_5_both_themes: projects dark (3.2s)
+
+
+  1) [chromium] › tests/e2e/test_10bp2_3_agent_wizard_lifecycle.spec.ts:11:5 › test_10bp2_3_agent_wizard_lifecycle: create, a placeholder without a variable is refused, save, publish, new draft, roll back 
+
+    Error: expect(locator).toContainText(expected) failed
+
+    Locator: getByTestId('wizard-save-error')
+    Expected substring: "variable_undefined"
+    Received string:    "Some fields are not valid. Check the form and try again. (code: validation_error)"
+    Timeout: 5000ms
+
+    Call log:
+      - Expect "soft toContainText" getByTestId('wizard-save-error') with timeout 5000ms
+      - waiting for getByTestId('wizard-save-error')
+        14 × locator resolved to <p role="alert" data-testid="wizard-save-error" class="text-sm text-destructive">Some fields are not valid. Check the form and try…</p>
+           - unexpected value "Some fields are not valid. Check the form and try again. (code: validation_error)"
+
+
+      43 |   await page.getByTestId("wizard-save").click();
+      44 |   await expect(page.getByTestId("wizard-save-error")).toBeVisible();
+    > 45 |   await expect.soft(page.getByTestId("wizard-save-error")).toContainText("variable_undefined");
+         |                                                            ^
+      46 |
+      47 |   await page.getByTestId("variable-add").click();
+      48 |   await page.locator("#variable-0-key").fill("tone");
+        at /work/frontend/tests/e2e/test_10bp2_3_agent_wizard_lifecycle.spec.ts:45:60
+
+    Error Context: test-results/test_10bp2_3_agent_wizard_-e8d33-publish-new-draft-roll-back-chromium/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/test_10bp2_3_agent_wizard_-e8d33-publish-new-draft-roll-back-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/test_10bp2_3_agent_wizard_-e8d33-publish-new-draft-roll-back-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [chromium] › tests/e2e/test_10bp2_3_agent_wizard_lifecycle.spec.ts:11:5 › test_10bp2_3_agent_wizard_lifecycle: create, a placeholder without a variable is refused, save, publish, new draft, roll back 
+  136 passed (10.2m)
+npm notice
+npm notice New major version of npm available! 11.19.1 -> 12.2.1
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.1
+npm notice To update run: npm install -g npm@12.2.1
+npm notice
+STAGE2_EXIT=1

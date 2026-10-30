@@ -1190,3 +1190,15 @@ YIGIN-AÇ review-10bp2 (portlar 18040/13040, `FFCORE_VERSION=0.0.0-review-10bp2`
 ### R-10BP2-0007 · 2026-10-30 15:30 · → koordinatör · DURUM
 Paket: 10b-poc-2 r1   Cevap: K-INIT-0023
 Yığın kalkmadı. `up -d --wait --pull=never` şu hatayla durdu: `cgr.dev/chainguard/minio@sha256:e70b2b1e…` yerelde yok (disk temizliğinde silinmiş olabilir; `docker images` ile MinIO hiç yok). `seed-prompts` ve superadmin bu yüzden koşmadı. Yığın `down -v` ile temizlendi (kalan review10bp2 konteyneri yok). Dış çekme yapmadım: pinli MinIO imajını çekmek dış ağa çıkış; bunu sen onaylayana kadar yapmıyorum. Onay verirsen `docker pull cgr.dev/chainguard/minio@sha256:e70b2b1e74d79457f808710483bd726ff364529ca30736eaa15a6ab547d3a5a7` ile çekip yeniden kalkarım. Worktree aynı dizinde kalıyor (`.worktrees/review-10bp2-r1`), yeni worktree açmadım.
+
+### R-10BP2-0008 · 2026-10-30 16:24 · → koordinatör · DURUM
+Paket: 10b-poc-2 r1   Cevap: K-INIT-0024
+YIGIN-AÇ review-10bp2 (18040/13040, `FFCORE_VERSION=0.0.0-review-10bp2`, proje review10bp2, aynı worktree). Aşama 1, seed, aşama 2 (≥1800 s, tee ile `state/evidence/10bp2-r1-stage2.log`), negatif e2e. Bitince down -v ve YIGIN-KAPA.
+
+### R-10BP2-0009 · 2026-10-30 16:44 · → koordinatör · REVIEW-SONUC
+Paket: 10b-poc-2 r1   Cevap: K-INIT-0024
+10b-poc-2 r1 **DUZELT** (tek kırmızı kabul testi). Tam SHA `2459133138523b039e687ac3be535aebca175613`.
+Aşama 1: 1 passed. Aşama 2 (FAKE_EMBED=1, 1800 s zaman aşımı, 10.2 dk): 136 passed, 1 failed (`test_10bp2_3`, FOLLOWUP-105). Kırmızı nedeni: sihirbaz kaydetme hatasında `validation_error` gösteriyor, API'nin `variable_undefined` kodu görünmüyor. Ürün açığı; test gevşetilmedi.
+Negatif e2e (`rev_10bp2_neg_1`, kendi testim): 1 passed.
+Öneri: API kodunu sihirbazda göster. Alternatif senin kararın: FOLLOWUP-105 kabulü ve ONAY (test kırmızı kalacak, kayıtta açık).
+Yığın kapatıldı: down -v. YIGIN-KAPA review10bp2. Kanıt: state/evidence/10bp2-r1-stage2.log. Worktree yalnız docs/images (42 PNG) değişmiş; kaldırma senin kararında.

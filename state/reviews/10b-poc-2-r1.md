@@ -39,3 +39,21 @@ Bulgu (önyüz): yok.
 ## Güncel karar
 
 Hâlâ **EKSİK KANIT, ONAY yok**: aşama 2 sonucu yok (1147 s koşu, tekrarında en az 1800 s zaman aşımı gerekli), negatif test koşulmadı, test_10bp2_3 (FOLLOWUP-105) doğrulanmadı.
+
+## Yığın koşusu (K-INIT-0024, 2026-10-30 16:44)
+
+Tam SHA 2459133138523b039e687ac3be535aebca175613; yığın `review10bp2` (18040/13040), aynı worktree, `--pull=never`; MinIO ve Qdrant pinli imajları kullanıcı tarafından çekildi.
+
+| Koşu | Sonuç |
+|---|---|
+| seed-prompts, superadmin | çıkış 0 |
+| Aşama 1: `--grep @model-missing` | 1 passed |
+| Aşama 2: `FAKE_EMBED=1`, `--grep-invert @model-missing`, 1800 s zaman aşımı | 136 passed, **1 failed** (10.2 dk, çıkış 1); log: `state/evidence/10bp2-r1-stage2.log` |
+| Negatif e2e: `rev_10bp2_neg_1` (`state/reviews/10b-poc-2-r1-negative.spec.ts`) | **1 passed** (anonim onay ayrıntısı ve düğmeleri yok, /login'e yönlenir, anonim approve 2xx değil) |
+
+**Kırmızı test:** `test_10bp2_3_agent_wizard_lifecycle` (FOLLOWUP-105). Beklenen: kaydetme hatası `variable_undefined` kodunu göstersin. Gerçek: `Some fields are not valid. Check the form and try again. (code: validation_error)`. Yani sihirbaz API'nin ayrıntılı kodunu göstermiyor; bu bir ürün açığı, test gevşetilmedi.
+
+**Karar:** DUZELT (tek kırmızı kabul testi). Öneri: sihirbazın kaydetme hatasında API kodunu (`variable_undefined`) göstermesi. Alternatif (koordinatör kararı): FOLLOWUP-105 olarak kabul edilip paket ONAY alır; bu durumda test'in kırmızı kalması ve kayıtta açık olması şart.
+
+**Güvenlik turu:** istenmedi; önyüz kod okumasında bulgu yok; negatif test geçti.
+**Worktree:** yalnız `docs/images` (42 PNG, e2e yeniden üretti). Başka değişiklik yok.
