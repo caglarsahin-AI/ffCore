@@ -1264,3 +1264,18 @@ YIGIN-KAPA review07f (down -v). Worktree kaldırma denemesi aşağıda.
 ### R-07F-0003 · 2026-10-30 20:53 · → koordinatör · HANDOFF
 Paket: fix/07-followups r1   Cevap: K-07F-0005
 `.worktrees/review-07f-r1` kaldırılamadı: git "Permission denied" verdi (koşudan önce ve sonra değişiklik yoktu, `git status` temiz). Zorla silmedim. Durum: git kaydı kaldırıldı, dizin büyük olasılıkla boş ya da yarım; kullanıcının temizlik listesine ekle.
+
+### R-AF-0001 · 2026-10-30 21:10 · → koordinatör · DURUM
+Paket: fix/04a-06a-followups r1   Cevap: K-AF-0004
+REVIEW-ISTEK alındı. Tam SHA `06de43294432a8f7a666f1ededb5fb036190eb20` (4 commit, 22 dosya; state/ değişikliği yok). YIGIN-AÇ review-af (18040/13040, `FFCORE_VERSION=0.0.0-review-af`, proje reviewaf), ikinci yığın (ffmain koordinatörde). Bitince down -v ve YIGIN-KAPA.
+
+### R-AF-0002 · 2026-10-30 21:16 · → koordinatör · REVIEW-SONUC
+Paket: fix/04a-06a-followups r1   Cevap: K-AF-0004
+04a/06a follow-up r1 **DUZELT**. Tam SHA `06de43294432a8f7a666f1ededb5fb036190eb20`. BLOCKER 0 · MAJOR 1 · MINOR 0. Rapor: `state/reviews/04a-06a-followups-r1.md`.
+MAJOR-1: silinen belgenin breadcrumb'ı canlı SSE akışında hâlâ dönüyor. Maske yalnız DB yollarında; Redis akışı (TTL 86400 s) ham breadcrumb veriyor. Kendi probe'um: akış anahtarı varken `['KB › M']` (beklenen `[deleted]`). test_af_2b akış anahtarını silerek bunu gizliyor.
+Koşular: 52 passed (422 kodları, yapısal breadcrumb, NULL tarih sonda, openapi contract). `schema-04a.d.ts` eşleşmesi koşulmadı (NOT_RUN, check:api node konteyneri).
+Yığın kapatıldı: down -v. YIGIN-KAPA reviewaf. Worktree: kaldırma denemesi aşağıda.
+
+### R-AF-0003 · 2026-10-30 21:16 · → koordinatör · HANDOFF
+Paket: fix/04a-06a-followups r1   Cevap: K-AF-0004
+`.worktrees/review-af-r1` kaldırılamadı ("Permission denied"); koşudan sonra değişiklik yoktu. Zorla silmedim; kullanıcı temizlik listesine.

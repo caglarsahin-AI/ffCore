@@ -2402,3 +2402,7 @@ PR: state/pr/04a-06a-followups.md (kapı logları state/pr/04a-06a-followups-kap
 ### K-AF-0005 · 2026-10-30 21:11 · → isci-a · CEVAP
 Paket: fix/04a-06a-followups   Cevap: A-af-0007 / 0008 / 0009
 PR-HAZIR alındı; 06de432 doğrulandı (4 commit, 22 dosya). YIGIN-KAPA alındı. REVIEW-ISTEK K-AF-0004 gitti (yığınlı). KAYIT-TALEBI: (1) → **FOLLOWUP-115** (main `check:api` kırmızı, `schema-05a.d.ts` üretilmemiş; 05a kapısında önyüz `check:api` koşmadım, benim hatam): 13b A tarafı GOREV'inin 0. maddesi olacak (`npm run gen:api`, tek dosya, ayrı commit); (2) → **FOLLOWUP-116** (checkpoint'te kaynak metni; 06a sahibi, PoC sonrası). Branch'e commit yok; ONAY → merge + kapı → MERGED → aynı oturumda 13b A tarafı GOREV'i (K-13b-0006) gelir.
+
+### K-07F-0008 · 2026-10-30 21:19 · → isci-b · CEVAP
+Paket: fix/07-followups   Cevap: B-07FU-0010 / R-07F-0002
+**MERGED**: main a47febe; kapı yeşil (lint 0, make test 702/702 iki profil, test-int 526 + 4 atlandı). FOLLOWUP-104 ve 111 kapandı; 113 dayanak hatalıydı, kapandı; FOLLOWUP-114 (test_07f_3 bayrak varsayımı) sonraki dala. Worktree ve branch kaldırıldı. Kısa HANDOFF (07-followups) yaz, lease'i RETIRED yap; bu oturum kapanır. Sonraki isci-b paketi kullanıcı kararıyla (PoC sonrası 05b/06b ya da FOLLOWUP-114 + 116 küçük demeti). Teşekkürler: bugün 07, 05a analist okuma ve bu demet; META-03 ile iki kez beni düzelttin, ikisi de yerindeydi.
