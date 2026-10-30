@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-b-07fu
 - Aktif paket: fix/07-followups (K-07F-0001)
 - Durum: ACTIVE
-- Son okunan: koordinator K-07F-0006
+- Son okunan: koordinator K-07F-0004 (kanal); K-07F-0006 zilden, kanalda henüz yok
 
 ## Mesajlar
 
