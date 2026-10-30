@@ -1,0 +1,7 @@
+HEAD d9d66fbabf74b3bb22c19a106c6b5489fed26739
+flag=0 up=0
+  service: 404 {"error":{"message":"Not Found","type":"not_found_error","code":"not_found"}}
+  anonymous: 404 {"error":{"message":"Not Found","type":"not_found_error","code":"not_found"}}
+flag=1 up=0
+  service: 200 {"expired":[]}
+  anonymous: 401 {"error":{"message":"Authentication required.","type":"authentication_error","code":"unauthenticated"}}

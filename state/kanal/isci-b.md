@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-b-07fu
 - Aktif paket: fix/07-followups (K-07F-0001)
 - Durum: ACTIVE
-- Son okunan: koordinator K-07F-0001 (2026-10-30 20:04)
+- Son okunan: koordinator K-07F-0006
 
 ## Mesajlar
 
@@ -1007,3 +1007,27 @@ Karar: kanca `FFCORE_TEST_HOOKS` ile açılıyor, ama compose backend servisi bu
 - B: compose satırını 13b PR'ı ekler. Etki: bu PR'ın kancası yığında denenmemiş kalır, 13b'ye iş kayar.
 - C: `:?` zorunlu değişken (varsayılansız). Etki: her kurulumun `.env`'ine yeni satır gerekir; bayrak için ağır.
 Cevaba göre ya küçük bir commit + PR-HAZIR, ya doğrudan PR-HAZIR.
+
+### B-07FU-0008 · 2026-10-30 20:33 · → koordinator · ACK
+Paket: fix/07-followups   Cevap: K-07F-0004
+A uygulandı, commit d9d66fb: backend env'ine `FFCORE_TEST_HOOKS: ${FFCORE_TEST_HOOKS:-0}` + `docs/onaylar.md` notu (`.env.test` kapalı, e2e.env'e =1 satırını 13b ekler) + `test_07f_compose.py`.
+Not: worker'lar backend'in env bloğunu YAML anchor'ı ile paylaşıyor, satır onlara kendiliğinden gidiyor. Ayrı satır eklemedim; worker bayrağı okumuyor, süpürmeyi kanca backend sürecinde koşuyor. `.env.example` satırı 3038435'te. compose config 0, lint 0. test-int sürüyor; bitince canlı backend kontrolü (bayrak 0 → 404, 1 → 200), sonra PR-HAZIR.
+
+### B-07FU-0009 · 2026-10-30 20:44 · → koordinator · DURUM
+Paket: fix/07-followups   Cevap: K-07F-0003
+**YIGIN-KAPA 07f**: `down -v` exit 0, konteyner 0, volume 0. Duran imajlar `ffcore/{backend,tools,...}:0.0.0-07f`; silme sende.
+
+### B-07FU-0010 · 2026-10-30 20:44 · → koordinator · PR-HAZIR
+Paket: fix/07-followups   Cevap: K-07F-0001
+PR: C:\ai_paycore\ffcore\state\pr\07-followups.md · Sınıf [A] · branch fix/07-followups · baz c8650cb · SHA **d9d66fbabf74b3bb22c19a106c6b5489fed26739** (4 commit: 9efdb26 104, 3038435 111, fce0b50 113, d9d66fb compose). Ağaç temiz.
+Kanıt (state/evidence/fix-07f-*-20261030.log):
+- Kırmızı: 104 baz kodla akış 20 s'de asılı; 111 bağlantı yokken 404.
+- `make lint` 0; `make test` llmaas 701 / airgap 701; `make test-int` 526 passed, 4 skipped (main ile aynı sayı).
+- d9d66fb için compose testi + repo skeleton 12 passed, `compose config` 0.
+- Canlı backend (HEAD imajı): bayrak 0 → 404 (servis ve anonim); 1 → servis 200, anonim 401.
+
+İnceleyiciye notlar:
+- `follow()` ikinci boş turda tekrar oynatır. Canlı `done` kaybolmuş run'da cevap metni bir kez daha `token` olarak gelebilir (PR varsayımlar).
+- Kanca `include_in_schema=False`, OpenAPI 07 değişmedi.
+- 113 kodsuz; sabitleme testi var.
+Branch'e başka commit atmıyorum.

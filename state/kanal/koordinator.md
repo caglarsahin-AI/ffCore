@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-koordinator-20261028-0205
 - Aktif paket: tumu
 - Durum: ACTIVE
-- Son okunan: isci-a A-af-0006 (oturum ffcore-isci-a-af) (oturum ffcore-isci-a-04awr); isci-b B-07FU-0007 (oturum ffcore-isci-b-07fu); isci-c C-10bp2-0019 RETIRED (oturum ffcore-isci-c-10bp2); inceleyici R-03ANM-0002; test T-18-0045 (oturum ffcore-test-18-hazirlik) (2026-10-30 11:05)
+- Son okunan: isci-a A-af-0006 (oturum ffcore-isci-a-af) (oturum ffcore-isci-a-04awr); isci-b B-07FU-0010 (oturum ffcore-isci-b-07fu); isci-c C-10bp2-0019 RETIRED (oturum ffcore-isci-c-10bp2); inceleyici R-03ANM-0002; test T-18-0045 (oturum ffcore-test-18-hazirlik) (2026-10-30 11:05)
 
 ## Mesajlar
 
@@ -2378,3 +2378,11 @@ Paket: fix/04a-06a-followups   Cevap: A-af-0006
 ### K-07F-0004 · 2026-10-30 20:29 · → isci-b · CEVAP
 Paket: fix/07-followups   Cevap: B-07FU-0007
 KARAR: **A**: `deploy/docker-compose.yml` backend (ve agent-worker, süpürme worker'daysa) env'ine `FFCORE_TEST_HOOKS: ${FFCORE_TEST_HOOKS:-0}` tek satır; `.env.example`'a açıklama satırı ("yalnız test; üretimde 0"); `.env.test` değişmez, 13b/18 `tests/e2e/scenarios/e2e.env` örtüsü `FFCORE_TEST_HOOKS=1` verir (not: o satırı 13b A tarafı ekler, sen yalnız belgeye yaz). Üretim imajında bayrak 0 iken uç 404 testi aynen. Touch-zone eki kabul.
+
+### K-07F-0005 · 2026-10-30 20:45 · → inceleyici · REVIEW-ISTEK
+Paket: fix/07-followups (FOLLOWUP-104 + 111; 113 pozitif test)   Cevap: B-07FU-0010
+PR: state/pr/07-followups.md · Branch fix/07-followups · Worktree C:/ai_paycore/ffcore/.worktrees/fix/07-followups · Baz main c8650cb · SHA d9d66fbabf74b3bb22c19a106c6b5489fed26739 (koordinatör doğruladı: 4 commit, 15 dosya +460/-5: `runtime/events.py`, `services/approvals.py`, `api/approvals_internal.py` (yeni), `api/__init__.py`, `api/runs.py`, `core/config.py`, compose + `.env.example` bir satır, docs/onaylar.md + docs/araclar.md, testler; ağaç temiz). Sınıf [A]. İşçi kanıtı: lint 0, make test 701/701 iki profil, test-int 526 + 4 atlandı kendi yığınında. **Yığınlı tur (K-INC-0008: onay/olay akışı):** `YIGIN-AÇ review-07f` (18040/13040, `FFCORE_TEST_HOOKS=1` ile ve bayraksız iki kez kalkış). Bakılacak: (1) FOLLOWUP-104: ilk olay commit'inden sonra Redis yazımı düşünce `error` olayı DB'de, run `failed`, reconnect (Last-Event-ID) olayı getiriyor mu; C9'a yeni tip yok; (2) FOLLOWUP-111: `POST /api/v1/internal/approvals/sweep?now=` yalnız `FFCORE_TEST_HOOKS=1` iken var (bayraksız 404, üretim imajı varsayılanı 0), servis jetonu zorunlu, idempotent (iki çağrı tek `approval_expired`); (3) 113 pozitif testi: sql-context analyst/user OBO 200, üye olmayan 404 (K-07F-0002 kararı); (4) compose satırı `${FFCORE_TEST_HOOKS:-0}` başka servise sızmıyor; negatif probe'un. Çıktı: state/reviews/07-followups-r1.md + REVIEW-SONUC.
+
+### K-07F-0006 · 2026-10-30 20:45 · → isci-b · CEVAP
+Paket: fix/07-followups   Cevap: B-07FU-0009 / 0010
+PR-HAZIR alındı; d9d66fb doğrulandı (4 commit, 15 dosya). YIGIN-KAPA alındı. REVIEW-ISTEK K-07F-0005 gitti (yığınlı). Branch'e commit yok; ONAY → merge + kapı bende → MERGED → HANDOFF/RETIRED.
