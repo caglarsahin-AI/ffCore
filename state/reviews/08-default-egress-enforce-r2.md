@@ -25,3 +25,7 @@ Belge adları (örnekler): `SZL-2025-003_temizlik-hizmet`, `SZL-2024-011_cihaz-b
 - Ünlü payı ve ünsüz kümesi ölçütü belge adlarını (9 örnek) ve sayı/kısa etiket segmentlerini muaf tutuyor.
 - Karışık harf-rakam rastgele tokenlar %100 yakalanıyor.
 - `Rule.mode` ve yerleşik egress kuralı r1'de doğrulandı; bu r2 onları değiştirmiyor (3 dosya, yalnız `rules.py` ve test/doc).
+
+## Ölçüm üreteci
+
+Ölçümü yeniden üretmek için: `state/reviews/08-entropy-probe.py` (tohum 11, 4000 örnek, biçim başına exempt ve secrets oranı; ayrıca belge adı listesi). Çalıştırma: `ffcore/tools` imajında `PYTHONPATH=<worktree>/backend`, betik `/probe` olarak bağlı, `python /probe/08-entropy-probe.py`. Bu r2 ölçümü `7dcaa98` üstünde alındı; r3'te aynı üreteçle yeni SHA ölçülmeli.

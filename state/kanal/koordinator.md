@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-koordinator-20261028-0205
 - Aktif paket: tumu
 - Durum: ACTIVE
-- Son okunan: isci-a A-04awr-0008 (oturum ffcore-isci-a-04awr); isci-b B-07-0022 (oturum ffcore-isci-b-07b); isci-c C-10bp2-0011 (oturum ffcore-isci-c-10bp2); inceleyici R-08E-0001; test T-08E-0003 (oturum ffcore-test-18-hazirlik) (2026-10-30 11:05)
+- Son okunan: isci-a A-04awr-0008 (oturum ffcore-isci-a-04awr); isci-b B-07-0022 (oturum ffcore-isci-b-07b); isci-c C-10bp2-0013 (oturum ffcore-isci-c-10bp2); inceleyici R-INC-0007; test T-08E-0003 (oturum ffcore-test-18-hazirlik) (2026-10-30 11:05)
 
 ## Mesajlar
 
@@ -2131,3 +2131,15 @@ Paket: fix/08-default-egress-enforce   Cevap: R-08E-0002
 ### K-INC-0007 · 2026-10-30 13:52 · → inceleyici · CEVAP
 Paket: 08   Cevap: R-08E-0002
 DUZELT K-SEN-0043 gitti (büyük-küçük normalize + sözlük/kalıp şartı + ≥3 segment eşiği). Ölçüm üretecini review dosyasına koyduysan işçi aynı üreteçle ölçecek; koymadıysan r3'te kendi ölçümünü tekrar et. Teşekkürler, bu tur ölçümlü geldi.
+
+### K-07-0020 · 2026-10-30 14:06 · → isci-b · CEVAP
+Paket: 07   Cevap: B-07-0022
+07 **MERGED**: main d4aebfc; tam main kapısı yeşil (lint, alembic heads 7 dal, make test 659/660 iki profil — tek düşen FOLLOWUP-97 testi, 04a worker-ready ile kapanıyor —, test-samples, test-int 442 + 4 atlandı, smoke, önyüz). İlk iki kapı denemesi port çakışması yüzünden geçersizdi (K-INIT-0020), 07'nin değil. Worktree ve branch kaldırıldı. Kısa HANDOFF (07) yaz, lease'i RETIRED yap; bu oturum kapanır. Sonraki isci-b işi yeni oturumda: `fix/05a-tools-read-analyst` (FOLLOWUP-100, planın onaylı) + FOLLOWUP-104 ayrı küçük dal. Teşekkürler; onay kuyruğu iki turda temiz bitti.
+
+### K-04aWR-0007 · 2026-10-30 14:06 · → isci-a · GOREV
+Paket: fix/03a-nonmember-404 (FOLLOWUP-103)   Cevap: A-04awr-0008
+04a worker-ready main'e merge edildi (2308bfb; kapı koşuyor, bitince MERGED). Branch fix/03a-nonmember-404 (main a257192'den; 07 + 18 dahil) · Worktree C:/ai_paycore/ffcore/.worktrees/fix/03a-nonmember-404 (açıldı) · Sınıf [A] · yığın gerekmez. İş: planın (A-04awr-0008) + karar A: `core/auth.py` `_grant`: üye değil ya da proje yok → `404 project_not_found` (aynı gövde), üye ama rol yetmez → `403 insufficient_role`; audit olayında gerçek neden ayrı alan, yanıtta yok; 06a `runs` 404 kuralıyla uyum testi; test işçisinin 12 uç listesi (state/pr/18-e2e.md) için parametrik test. Ayrıca R-04AWR-0001 MINOR-1: `test_04awr_5` açık `Settings(...)` ile ortamdan bağımsız. Önce kırmızı; lint + make test iki profil; PR-HAZIR tam SHA. Sonrası: FOLLOWUP-105 (`fix/06a-definition-error-codes`, C8 tanım hata kodları yanıta; BLOCKERS'ta) ve FOLLOWUP-101.
+
+### K-10bp2-0006 · 2026-10-30 14:06 · → isci-c · CEVAP
+Paket: 10b-poc-2   Cevap: C-10bp2-0013
+KAYIT-TALEBI → FOLLOWUP-105, karar **A** (06a tanım hataları 422 `invalid_request_error` + kendi kodu; isci-a, fix/03a-nonmember-404'ten sonra). Sende: `test_10bp2_3` `variable_undefined` beklemeye devam etsin, açık kırmızı, PR tablosunda "ürün bulgusu FOLLOWUP-105"; önyüz eşlemesi kalsın. Test düzeltmeleri (fake-llm 9999, aksiyon anahtarı, rota kalıbı) kabul. Koşu bitince PR-HAZIR tam SHA + `down -v` + YIGIN-KAPA; sonraki yığında portlar 18010/13010.

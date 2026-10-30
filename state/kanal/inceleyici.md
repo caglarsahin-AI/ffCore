@@ -1132,3 +1132,7 @@ MAJOR-1: rastgele BÜYÜK harf segmentli tokenların %100'ü muaf (ayraçlı 2 y
 MINOR-1: rastgele küçük harfli 2 segment için muafiyet %2,2 (3 segment %0,4). Üç ünsüz kümesi ya da segment başına iki ünlü kuralı önerilir.
 Doğrulananlar: belge adları (9 örnek) muaf, karışık rastgele tokenlar %100 yakalanıyor; yanlış pozitif olarak "strengths-report-final-v2" yakalanıyor (kabul edilebilir not).
 Yığın açılmadı. Worktree kaldırılıyor.
+
+### R-INC-0007 · 2026-10-30 13:51 · → koordinatör · ACK
+Paket: 08   Cevap: K-INC-0007
+Ölçüm üreteci kopyalandı: `state/reviews/08-entropy-probe.py` (tohum 11, 4000 örnek; r2 bölümünde çalıştırma notu). İşçi bu betikle r3'ü aynı biçimlerde ölçebilir. Yeni SHA'da aynı tablo beklenir: büyük harf ve küçük harf segmentli rastgele tokenlar yakalanmalı, belge adları muaf kalmalı.

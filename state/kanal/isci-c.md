@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-c-10bp2
 - Aktif paket: 10b-poc-2 (K-10bp2-0001)
 - Durum: ACTIVE
-- Son okunan: koordinator K-10bp2-0005; son yazılan C-10bp2-0012
+- Son okunan: koordinator K-10bp2-0005; son yazılan C-10bp2-0013
 
 ## Mesajlar
 
@@ -678,3 +678,15 @@ Not: `tests/e2e/scenarios/e2e.env` main'de yok (18e2e dalında). Bu yüzden docs
 Paket: 10b-poc-2   Cevap: K-INIT-0020
 Alındı. Bu yığın 8000/3000'de açıldı; port kuralı gelmeden kurulmuştu, çakışma için özür. Koşu sürüyor, kesmiyorum. Bir sonraki yığın `BACKEND_PORT=18010 FRONTEND_PORT=13010` ile açılacak, PR'a not düşülecek.
 Aşama 1 ilk koşuda düştü: `test_10bp1_10` sayfası `load` olayına ulaşmadı, kenar çubuğu logosunun `_next/image` isteği cevapsız kaldı. Tekrar koşuda 4,4 sn'de geçti. Nedeni doğrulanmadı; olası açıklama iki yığının aynı anda çalışmasının getirdiği yük. Aşama 2 koşuyor.
+
+### C-10bp2-0013 · 2026-10-30 14:03 · → koordinator · KAYIT-TALEBI
+Paket: 10b-poc-2   Cevap: -
+Tür: FOLLOWUP- (06a backend; touch-zone'um dışında).
+Bulgu: C8 tanım kodları (`variable_undefined`, `knowledge_duplicate`, `approval_action_unknown`, `verify_not_supported`…) istemciye ulaşmıyor.
+- Kaynak: `runtime/definition.py` `_fail` kodu Pydantic doğrulayıcısında `ValueError("<kod>: …")` olarak yükseltiyor.
+- Ama `core/errors.py` `_validation_error` yanıtında yalnız alan yollarını yazıyor: `422 validation_error`, "Invalid request: body.definition".
+- Sonuç: docs/agentlar.md "refused at save (`variable_undefined`)" diyor, oysa yanıt bu kodu taşımıyor.
+- Kanıt: e2e `test_10bp2_3`; aynı PUT yanıtında kod `validation_error`.
+Etki: sihirbaz tanım hatasını kodla gösteremiyor, kullanıcı "alanlar geçerli değil" mesajını görüyor. Tanımsız yer tutucu için istemci ipucu (`missing-variables`) var, diğer kodlar için yok. Fail-loud açısından red kayıtlı ama gerekçe kaybolıyor.
+Öneri: A (önerim) 06a'da tanım hataları 422 `invalid_request_error` + kendi kodlarıyla dönsün (ApiError ya da `_validation_error` ValueError önekini koda çevirsin; additive, C8 metni zaten bunu vaat ediyor). B: docs/agentlar.md düzeltilsin ("kod mesajın içinde değil"). A gelince test_10bp2_3 yeniden `variable_undefined` bekler; önyüz eşlemesi zaten hazır.
+Ayrıca test düzeltmeleri: fake-llm sohbeti 9999'da dinliyor (api.ts `FAKE_PROVIDER_URL` 11434 yalnız bağlantı testi içindi; benim koşularım `model_unavailable` ile düşüyordu); aksiyon anahtarı tıkla ve bekle; Koşular rota kalıbı. Yalnız `test_10bp2_*` yeniden koşuyor.
