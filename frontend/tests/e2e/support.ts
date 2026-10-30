@@ -14,7 +14,7 @@ export const SCREENS = [
   { name: "members", signedIn: true, path: () => `/projects/${fixture().alpha.id}/members` },
   { name: "providers", signedIn: true, path: () => "/providers" },
   { name: "models", signedIn: true, path: () => "/models" },
-  { name: "coming-soon", signedIn: true, path: () => "/agents" },
+  { name: "coming-soon", signedIn: true, path: () => "/evaluations" },
   { name: "theme-preview", signedIn: false, path: () => "/dev/theme" },
 ] as const;
 
