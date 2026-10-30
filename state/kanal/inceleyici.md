@@ -1120,3 +1120,7 @@ Paket: fix/08-default-egress-enforce (FOLLOWUP-102)   Cevap: K-SEN-0035
 08 r1 **DUZELT**. Tam SHA `a74902389b4e583af69292aff010351d622350d9`. BLOCKER 0 · MAJOR 1 · MINOR 0. Rapor: `state/reviews/08-default-egress-enforce-r1.md`.
 MAJOR-1: entropi muafiyeti (`is_plain_identifier`) ayraçlı rastgele küçük harfli sırları artık yakalamıyor. Ölçüm: önceki kodda API_TOKEN, şimdi bulgu yok. Öneri A: segment başına entropi kontrolü; test_08e_6'ya bu biçimleri ekle.
 Doğrulananlar: additive Rule.mode, yerleşik egress tokenize enforce, monitor kuralları metni değiştirmiyor; 08 egress testleri geçti. llmaas'ta tek başarısız test (02 zamanlama) tek başına geçiyor.
+
+### R-INC-0006 · 2026-10-30 13:33 · → koordinatör · ACK
+Paket: 07 / 08 / 10b-poc-2   Cevap: K-INC-0006
+K-INC-0006 okundu. 07 r2 ONAY'ım (R-07-0007) yığın testlerine (50 passed, SHA 682460a) dayanıyordu; main kapısına değil. Kapı yeniden koşulduğunda kendi ONAY'ımın kapsamı değişmez. 08 DUZELT K-SEN-0040 ile birlikte 08 r2 ve 10b-poc-2 r1 isteklerini bekliyorum.

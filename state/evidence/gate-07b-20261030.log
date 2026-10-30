@@ -1,2 +1,55 @@
 
 === 13:32:45 build backend frontend tools
+
+#37 [frontend] exporting to image
+#37 exporting layers done
+#37 writing image sha256:287fab739eea4ade2f2701b2328f70d45543ddd4b7eb3282994b0ef80a1955d0 done
+#37 naming to docker.io/ffcore/frontend:0.0.0-main done
+#37 DONE 0.0s
+build exit=0
+
+=== 13:33:15 compose config
+config exit=0
+
+=== 13:33:26 up
+ Container ffmain-langfuse-worker-1  Started
+ Container ffmain-langfuse-web-1  Started
+ Container ffmain-migrate-1  Exited
+ Container ffmain-litellm-1  Healthy
+ Container ffmain-backend-1  Starting
+Error response from daemon: driver failed programming external connectivity on endpoint ffmain-backend-1 (4d2b795f1c97a16895a816503c19261abeb37e0f16def75fa9f71f766c645db4): Bind for 0.0.0.0:8000 failed: port is already allocated
+up exit=1
+=== migrate logs
+migrate-1  | INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+migrate-1  | INFO  [alembic.runtime.migration] Will assume transactional DDL.
+migrate-1  | INFO  [alembic.runtime.migration] Running upgrade  -> 0001, initial empty revision (chain root)
+migrate-1  | INFO  [alembic.runtime.migration] Running upgrade 0001 -> 03a_0001, 03a: users, projects, project_members, providers, provider_projects, model_catalog, models
+migrate-1  | INFO  [alembic.runtime.migration] Running upgrade 0001 -> 08_0001, 08: pii_policies, guardrail_policies, guardrail_events
+migrate-1  | INFO  [alembic.runtime.migration] Running upgrade 0001 -> 06a_0001, 06a: agents, agent_versions, conversations, runs, messages, run_events; checkpoints schema
+migrate-1  | INFO  [alembic.runtime.migration] Running upgrade 0001 -> 07_0001, 07: approvals
+migrate-1  | INFO  [alembic.runtime.migration] Running upgrade 0001 -> 05a_0001, 05a: tools, tool_actions, schema_descriptions, few_shots
+migrate-1  | INFO  [alembic.runtime.migration] Running upgrade 0001 -> 04a_0001, 04a: knowledge_bases, documents, attachments, chunks, kb_queries, ingest_gate_stats
+migrate-1  | INFO  [alembic.runtime.migration] Running upgrade 0001 -> 03b_0001, 03b: audit_events (append-only, monthly partitions)
+migrate-1  | model catalog: 2 entries, 0 removed
+migrate-1  | checkpointer tables ready in schema checkpoints
+ffmain-mcp-search-1 Created
+ffmain-agent-worker-bg-1 Created
+ffmain-agent-worker-1 Created
+ffmain-worker-1 Created
+ffmain-frontend-1 Created
+ffmain-mcp-sql-1 Created
+ffmain-backend-1 Created
+ffmain-migrate-1 Exited (0) 59 seconds ago
+ffmain-langfuse-worker-1 Up About a minute
+ffmain-langfuse-web-1 Up About a minute (healthy)
+ffmain-litellm-1 Up About a minute (healthy)
+ffmain-fake-llm-1 Up About a minute
+ffmain-postgres-1 Up About a minute (healthy)
+ffmain-qdrant-1 Up About a minute (healthy)
+ffmain-ticket-desk-1 Up About a minute (healthy)
+ffmain-langfuse-redis-1 Up About a minute (healthy)
+ffmain-langfuse-minio-1 Up About a minute (healthy)
+ffmain-langfuse-clickhouse-1 Up About a minute (healthy)
+ffmain-langfuse-postgres-1 Up About a minute (healthy)
+ffmain-redis-1 Up About a minute (healthy)
+=== ABORT: up failed, stack left up for inspection

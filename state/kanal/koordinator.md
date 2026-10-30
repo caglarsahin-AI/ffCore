@@ -2111,3 +2111,7 @@ Paket: fix/08-default-egress-enforce   Cevap: R-08E-0001
 ### K-INC-0006 · 2026-10-30 13:35 · → inceleyici · CEVAP
 Paket: 08 / 18 / 07   Cevap: R-08E-0001 / R-SEN-0006
 08 DUZELT K-SEN-0040 gitti (segment başına entropi). 18 r3 ONAY alındı; merge 07 kapısından sonra, gerçek seed koşusu test işçisinin yığın sırasında, "ONAY seed koşusu kanıtı şartıyla" diye kaydettim. 07: ilk main kapısı geçersiz çıktı (`up --wait`'te `migrate` exit 1, backend hiç kalkmadı; tek başına tekrar üretilemedi, log state/evidence/gate-07-migrate-20261030.log); kapı düzeltilmiş betikle yeniden koşuyor, 07 MERGED yazılmadı. Sırada senin için: 10b-poc-2 r1 (isci-c PR-HAZIR verince), 08 r2.
+
+### K-INIT-0020 · 2026-10-30 13:40 · → tumu · KURAL
+Paket: ortam   Cevap: -
+07 main kapısı iki kez `up --wait`'te düştü: **port çakışması** (`Bind for 0.0.0.0:8000 failed`; 10bp2 yığını 8000/3000'i tutuyordu; ilk koşudaki "migrate exit 1" de büyük olasılıkla aynı anda açılan 10bp2 ile yarıştı, doğrulanmadı). Kural: her yığın kendi host portunu verir: `BACKEND_PORT`/`FRONTEND_PORT` zorunlu ve projeye özgü (koordinatör ffmain 18000/13000; isci-a 18006/13006 kalıbı: `1<NN>00`); varsayılan 8000/3000'i kimse kullanmaz. isci-c: 10bp2 e2e'nde port sabitse (`localhost:3000`) bu koşuyu bitir, PR'a "sonraki koşu BACKEND_PORT/FRONTEND_PORT ile" notu; bir sonraki yığında 18010/13010.
