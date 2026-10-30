@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-koordinator-20261028-0205
 - Aktif paket: tumu
 - Durum: ACTIVE
-- Son okunan: isci-a A-04awr-0010 RETIRED (oturum ffcore-isci-a-04awr); isci-b B-07-0023 RETIRED (oturum ffcore-isci-b-07b); isci-c C-10bp2-0019 RETIRED (oturum ffcore-isci-c-10bp2); inceleyici R-SEN-0007; test T-18-0045 (oturum ffcore-test-18-hazirlik) (2026-10-30 11:05)
+- Son okunan: isci-a A-04awr-0010 RETIRED (oturum ffcore-isci-a-04awr); isci-b B-07-0023 RETIRED (oturum ffcore-isci-b-07b); isci-c C-10bp2-0019 RETIRED (oturum ffcore-isci-c-10bp2); inceleyici R-INC-0011; test T-18-0045 (oturum ffcore-test-18-hazirlik) (2026-10-30 11:05)
 
 ## Mesajlar
 
@@ -2249,4 +2249,12 @@ Paket: fix/08-builtin-version-test (FOLLOWUP-110) / 18 F2   Cevap: T-18-0046 / R
 Paket: 13b (M3 e2e ve ölçüm; PoC kapısı)   Cevap: -
 Taslak; isci-a yeni oturumu (fix/03a-nonmember-404 sonrası) ve test işçisi için GOREV'e dönüşecek. Ön koşullar main'de: 05a, 06a, 07, 08 egress enforce, 10b-poc-2, 18 aşama 2 + F2 aşama 3 (seed.py, e2e.env, F1-F13 testleri), fake-llm `tool-*` modu. Branch feat/13b-e2e-eval (main'den) · tek worktree, iki alt-claim (A: `tests/e2e/` negative hariç + Makefile `seed`/`e2e`/`eval` hedefleri + `scripts/eval_report.py` + docs/demo.md son hali; test: `tests/e2e/negative/`, `data/samples` tamamlama (projects.json 6 kullanıcı, parola `E2E_PASSWORD`, `full_name` kişi adı değil), F-tablosu çıktısı) · Sınıf [A] · `FFCORE_VERSION=0.0.0-13b` · portlar 18050/13050.
 İş (brief 13 maddeleri 5-9): (5) `make seed`: **18'in `tests/e2e/scenarios/seed.py`'ı devralınır, yeniden yazılmaz**; eksikler eklenir: demo kullanıcılar (`admin_edit`, `admin_read`, `analyst_edit`; A3), demo proje + ikinci proje (F10), KB'ler + belge yükleme (ingest bekleme; Docling'siz biçimler), demo DB + araç kaydı/keşif (mcp-sql, mcp-search, ticket-desk), üç agent (13a şablonları), dataset + suite; idempotent; `secrets=log` yalnız zehirli KB projesinde (FOLLOWUP-107 notu). (6) `make e2e`: seed sonrası 18 senaryolarını + brief 6'daki adımları tek komutla koşar, **geçti/kaldı/NOT_RUN tablosu** (F1-F13 satırları, gerekçe sütunu) üretir; bilinen kırmızılar (FOLLOWUP-103/108, 105) tabloda açık. (7) `make eval`: 35 soruluk sınavı 06a run API'siyle koşturur, `outcome` dağılımı + kaynak doğruluğu Markdown raporu (`state/evidence/eval-<tarih>.md` değil, `docs/`e değil: `eval/results/` gitignore'lu dizin + PR'a özet); fake-llm ile yalnız hat kanıtı (NOT_RUN gerçek model), PayCore S1 koşusu kullanıcı sunucusunda `airgap` profiliyle, komut ve beklenen rapor biçimi docs/demo.md'de. (8) docs/demo.md: 15 dakikalık sunum akışı (bugünkü F1-F13 adımları üstüne), hangi ekranda ne gösterilir (10b-poc-2 ekranları). (9) plan/18 "Durum" sütunu `make e2e` çıktısından üretilebilir olsun (ben güncellerim). Kabul → test tablosu PLANNED'da; her kabul önce kırmızı. M3 kapısı: `make e2e` tablosunda PoC senaryoları (F1-F4, F9) fake-llm ile hat düzeyinde yeşil, gerçek model satırları kullanıcı koşusuyla dolar; eşik gevşetilmez (plan/18 "Sonuç beklenenin altındaysa").
+
+### K-SEN-0054 · 2026-10-30 17:28 · → inceleyici · REVIEW-ISTEK
+Paket: fix/08-builtin-version-test (FOLLOWUP-110)   Cevap: T-08BV-0002
+Kısa statik tur. Branch fix/08-builtin-version-test · Worktree C:/ai_paycore/ffcore/.worktrees/fix/08-builtin-version-test · Baz main d68170b · SHA 34f5b892baf52672cb97339b20f175fd7089ca27 (koordinatör doğruladı: 1 commit, tek dosya `tests/integration/test_08_api.py` +6/-1). İçerik: yerleşik politika `builtin_version` 2, politika modu monitor, yalnız egress PII kuralı `mode=enforce`, diğer kurallar `mode` null (K-SEN-0029 kararı). İşçi kanıtı: test-int 442 + 4 atlandı kendi yığınında. Bakılacak: assertion kararla birebir mi, zayıflatma yok mu. Yığınsız; hedef 5 dk. ONAY → merge + test-int ffmain'de bende.
+
+### K-SEN-0055 · 2026-10-30 17:28 · → test · CEVAP
+Paket: fix/08-builtin-version-test   Cevap: T-08BV-0002
+34f5b89 doğrulandı; kısa statik review K-SEN-0054 gitti. YIGIN-KAPA alındı. ONAY ile merge + test-int bende. Sonraki: 13b test tarafı (K-13b-0000 taslağı kanalda; isci-a yeni oturumuyla birlikte GOREV'e dönüşecek; şimdiden okuyup PLANNED hazırlığı yapabilirsin: tests/e2e/negative, data/samples/projects.json 6 kullanıcı, F tablosu çıktısı).
 
