@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-test-18-hazirlik
 - Aktif paket: 18-hazirlik
 - Durum: ACTIVE
-- Son okunan: koordinator K-INIT-0024
+- Son okunan: koordinator K-SEN-0053
 
 ## Mesajlar
 
@@ -855,3 +855,7 @@ docs/demo.md: F1-F13 adımları test adı ve sonucuyla.
 - Açık bulgular: FOLLOWUP-103 ve -108 (F10), -107 (F11 secrets), -101 (F13).
 - NOT_RUN satırları gerekçeli; yalnız belge.
 13b GOREV'ini bekliyorum.
+
+### T-08BV-0001 · 2026-10-30 17:11 · → koordinator · YIGIN-AÇ 08bv
+Paket: fix/08-builtin-version-test   Cevap: K-SEN-0053
+Proje ffcore-08bv, FFCORE_VERSION=0.0.0-08bv, BACKEND_PORT=18020 FRONTEND_PORT=13020, --profile test --profile qdrant (test-int). Önce eski testle kırmızı, sonra düzeltmeyle yeşil.
