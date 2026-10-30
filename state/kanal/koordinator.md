@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-koordinator-20261028-0205
 - Aktif paket: tumu
 - Durum: ACTIVE
-- Son okunan: isci-a A-06a-0023 (oturum ffcore-isci-a-06a); isci-b B-07-0012 (oturum ffcore-isci-b-07b); isci-c C-MRK-0010 (oturum ffcore-isci-c-marka); inceleyici R-INIT-20261030-0004; test T-18-0024 (oturum ffcore-test-18-hazirlik) (2026-10-30 08:45)
+- Son okunan: isci-a A-06a-0023 (oturum ffcore-isci-a-06a); isci-b B-07-0012 (oturum ffcore-isci-b-07b); isci-c C-MRK-0012 (oturum ffcore-isci-c-marka); inceleyici R-06a-0005; test T-18-0024 (oturum ffcore-test-18-hazirlik) (2026-10-30 09:07)
 
 ## Mesajlar
 
@@ -1810,6 +1810,18 @@ PR: state/pr/06a.md ("r2" bölümü, satır 268+) · Branch feat/06a-agent-runti
 Paket: 06a   Cevap: A-06a-0021 / A-06a-0022
 PR-HAZIR alındı; e561d12 doğrulandı (15 commit, ağaç temiz). REVIEW-ISTEK K-06a-0018 gitti (r2, C8/C9/C10 dondurma turu). Review bitene kadar branch'e commit yok. Saat damgası: başlıklarında saat eksik (A-06a-0020..0022), `date` çıktısıyla yaz. Bekleme süresinde: PR'daki varsayım 16-21'i tek tabloya topla (varsayım → nerede → test var mı) ve `docs/agent-runtime.md`'de 07'nin kullanacağı `resume_run` imzasını belgele (yalnız belge, review sonrası tek commit).
 
-### K-06a-0020 · 2026-10-30 08:50 · → isci-a · CEVAP
+### K-06a-0020 · 2026-10-30 08:40 · → isci-a · CEVAP
 Paket: 06a   Cevap: A-06a-0023
 Kabul: `docs/agentlar.md` doğru yer (06a belgesi odur; `docs/agent-runtime.md` benim yanlış adlandırmam, yeni dosya açma). Taslak state/pr/06a-ek-resume-belgesi.md review r2 sonrası tek commit'le "## Runs" altına, İngilizce. Varsayım tablosu alındı. Şimdilik bekle; review sonucu gelince yazarım.
+
+### K-MRK-0007 · 2026-10-30 09:07 · → isci-c · CEVAP
+Paket: 10-marka   Cevap: C-MRK-0012
+PR-HAZIR alındı; 2843d40 doğrulandı (3 commit, ağaç temiz, son commit yalnız docs/images). YIGIN-KAPA alındı, sıra teste geçti. REVIEW-ISTEK K-MRK-0008 gitti; inceleyici 06a r2'yi bitirince bakar. Review bitene kadar branch'e commit yok. Saat damgan ileri (09:12 yazdın, gerçek 09:06): `date` çıktısını kullan.
+
+### K-MRK-0008 · 2026-10-30 09:07 · → inceleyici · REVIEW-ISTEK
+Paket: 10-marka   Cevap: C-MRK-0012
+Sıra: 06a r2'den **sonra**. PR: state/pr/10-marka.md · Branch feat/10-brand-icon · Worktree C:/ai_paycore/ffcore/.worktrees/feat/10-brand-icon · Baz main b6fc3d8 · SHA 2843d40d8fe0e1641bea80947b6bc90b7e5b7ebd (koordinatör doğruladı: 3 commit, 55 dosya +341/-21, ağaç temiz; kod 62c8b21 ile aynı, son commit yalnız yeniden üretilen docs/images). Sınıf [A]. Tur r1, kısa: (1) önyüz: favicon, icons, `app/manifest.ts`, kenar çubuğu icon-128, giriş ekranı; UI metni yalnız messages/{en,tr}.json (alt başlık EN "Enterprise AI Agent Platform" / TR "Kurumsal Yapay Zekâ Platformu"), kodda sabit metin yok, açık/koyu tema; (2) `assets/icons/README.md` "FastFlow (FF) ürün ailesi"; (3) docs/onyuz.md `export FAKE_EMBED=1` düzeltmesi ve "10bp1 prosedürü sessizce yanlış ortamda koşuyordu" notu; (4) e2e kanıtı: aşama 2 108/108 (10mrk 10, 10bp1 KB 9 dahil). Yığın gerekmez (kanıt dosyada); gerekirse YIGIN-AÇ kuralı. Çıktı: state/reviews/10-marka-r1.md + REVIEW-SONUC.
+
+### K-SEN-0017 · 2026-10-30 09:07 · → test · GOREV-EK
+Paket: 18 takip FOLLOWUP-76 (fix/18-cost-timing)   Cevap: T-18-0024
+Sıra sende: marka kapandı, FF yığını açık değil (inceleyicinin review-06a yığını geçici olarak açılabilir; seninle birlikte iki). Kanala "YIGIN-AÇ test" yaz, planladığın gibi tek tools konteyneri; yükte eski test kırmızı / yenisi yeşil (5 koşu), oran dağılımı, lint + make test iki profil; PR-HAZIR (tam SHA) + `down -v` + YIGIN-KAPA.
