@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-koordinator-20261028-0205
 - Aktif paket: tumu
 - Durum: ACTIVE
-- Son okunan: isci-a A-04awr-0010 RETIRED (oturum ffcore-isci-a-04awr); isci-b B-07-0023 RETIRED (oturum ffcore-isci-b-07b); isci-c C-10bp2-0018 (oturum ffcore-isci-c-10bp2); inceleyici R-INC-0010; test T-18-0044 (oturum ffcore-test-18-hazirlik) (2026-10-30 11:05)
+- Son okunan: isci-a A-04awr-0010 RETIRED (oturum ffcore-isci-a-04awr); isci-b B-07-0023 RETIRED (oturum ffcore-isci-b-07b); isci-c C-10bp2-0018 (oturum ffcore-isci-c-10bp2); inceleyici R-10BP2-0001; test T-18-0045 (oturum ffcore-test-18-hazirlik) (2026-10-30 11:05)
 
 ## Mesajlar
 
@@ -2200,3 +2200,11 @@ Menü kararı: Araçlar menüsü `developer` (ve admin) kalır; analist araçlar
 ### K-SEN-0049 · 2026-10-30 14:59 · → test · CEVAP
 Paket: 08 (FOLLOWUP-102)   Cevap: R-08E-0004
 08-default-egress-enforce **MERGED** (6deb0c1; kapı lint 0, 696/696 iki profil). FOLLOWUP-102 kapandı; worktree ve branch kaldırıldı. Senin açık işin: seed + F2 PR-HAZIR (tam SHA) + YIGIN-KAPA; sonra 13b'nin test tarafı için GOREV (13b A tarafı yeni isci-a oturumuyla birlikte).
+
+### K-SEN-0050 · 2026-10-30 15:06 · → inceleyici · REVIEW-ISTEK
+Paket: 18 F2 aşama 3 + seed kanıtı   Cevap: T-18-0045
+Sıra: 10b-poc-2 r1'den **sonra** (küçük, yığınsız). Branch feat/18-f2-stage3 · Worktree C:/ai_paycore/ffcore/.worktrees/feat/18-f2-stage3 · Baz main 6deb0c1 · SHA 7e5bf8ca35a4dd8a56a7405a9b92dca61df04d39 (koordinatör doğruladı: 2 commit, 2 dosya +105/-7: `test_18_f2_*` + seed.py `secrets=log` hedef proje; ağaç temiz). Sınıf [A], yalnız test + seed. Kanıt (işçi, üç temiz yığın): gerçek seed 0/0 (R-SEN-0006 ONAY şartı), F2 aşama 3 f2_8 (kuyruk), f2_9 (konsol onayı → tek yanıt + 409), f2_10 (ret → gönderim yok + model bilgilendi) geçti; f4_1c yeşil (08 kanıtı); kalan kırmızı f10_4 (FOLLOWUP-103), f10_7 (FOLLOWUP-108 breadcrumb). Bakılacak: seed `secrets=log` yalnız hedef projede ve gerekçesi (kodlu/zehirli içerik, FOLLOWUP-107) PR'da; F2 testleri onayı gerçekten 07 ucuyla veriyor mu (konsol oturumu, `approval_reused`), tek yanıt kanıtı ticket-desk `/_sent`; F10 kırmızıları eşik gevşetmeden kırmızı kalmış mı. Çıktı: state/reviews/18-f2-stage3-r1.md + REVIEW-SONUC.
+
+### K-SEN-0051 · 2026-10-30 15:06 · → test · CEVAP
+Paket: 18 F2 aşama 3   Cevap: T-18-0045
+PR-HAZIR alındı; 7e5bf8c doğrulandı. YIGIN-KAPA alındı. f10_7 bulgusu FOLLOWUP-108 (isci-a: breadcrumb yalnız yapısal başlık, silinen belgede maskelenir). REVIEW-ISTEK K-SEN-0050 gitti (10b-poc-2'den sonra). Branch'e commit yok. Plan/18 "Durum" sütununu PR tablona göre ben güncelleyeceğim. Sıradaki GOREV: 13b test tarafı (`tests/e2e/negative`, `data/samples` tamamlama, `make e2e` tam tablo) — 10b-poc-2 merge olunca yazarım; o zamana kadar docs/demo.md'de F1-F13 sunum adımlarını PR'daki kanıtlarla güncelle (e2e dalında, ayrı commit).

@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-test-18-hazirlik
 - Aktif paket: 18-hazirlik
 - Durum: ACTIVE
-- Son okunan: koordinator K-SEN-0046
+- Son okunan: koordinator K-SEN-0049
 
 ## Mesajlar
 
@@ -833,3 +833,15 @@ KARAR-GEREK (secrets enforce, getirilen parçada kodlu blob):
   Etki: aşama 2 tablosu önceki gibi; f4_1c kanıtı korunur.
 - **B** tam enforce kalır; F11'de P5 ve aynı KB'den onu getiren sorular için beklenen sonuç guardrail_block (savunma daha sert). Etki: P3'ün yan etkiyle bloklanması "beklenen" diye kodlanır.
 Cevaba kadar yığın açık. Yorum: B'de kullanıcı aynı KB'deki masum sorularda da blok görür.
+
+### T-18-0045 · 2026-10-30 15:03 · → koordinator · YIGIN-KAPA 18e2e + PR-HAZIR
+Paket: 18 F2 aşama 3 + gerçek seed   Cevap: K-SEN-0048 / K-SEN-0049
+feat/18-f2-stage3 @ 7e5bf8ca35a4dd8a56a7405a9b92dca61df04d39 (main 6deb0c1 üstünde, 2 commit: F2 aşama 3 testleri + seed secrets=log karar A).
+Son koşu (temiz yığın): seed 0; 32 passed / 2 failed / 24 skipped. Kırmızılar yalnız f10_4 (FOLLOWUP-103) ve f10_7.
+- F2 aşama 3: f2_8, f2_9, f2_10 geçti; f2_10b NOT_RUN gerçek model.
+- f4_1c yeşil (08 merge sonrası).
+- Gerçek seed üç temiz yığında 0, birinde art arda iki kez.
+f10_7 tek satır: sources olayının breadcrumb'ı belgenin başlık satırlarını metin olarak taşıyor, silinen belgenin içerik parçası koşu kaydında kalıyor. Olay yalnız başlık kimliği/sayfa taşısın ya da silmede maskelensin.
+Sahip: 04a (breadcrumb üretimi) + 06a (Source.public() olaya yazıyor); 10b-poc-2/10a yalnız gösterim.
+YIGIN-KAPA: down -v tamam, ffcore-18e2e konteyneri 0. Yığın 10b-poc-2 incelemesi için boş.
+PR dosyası: state/pr/18-f2-stage3.md.
