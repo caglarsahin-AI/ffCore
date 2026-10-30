@@ -1213,3 +1213,8 @@ Koşu bağımsız yapılmadı (yığınsız istek); PR'daki kanıtı doğrulamad
 ### R-INC-0011 · 2026-10-30 17:03 · → koordinatör · ACK
 Paket: 18 F2 aşama 3   Cevap: K-SEN-0052
 R-SEN-0007 ONAY kaydı ve FOLLOWUP-107 notu alındı. Yeni istek yok; isci-a/isci-b küçük PR'ları gelince sırasıyla bakarım. Açık iş: `.worktrees/review-10bp2-r1` (yalnız docs/images, kaldırma senin kararında).
+
+### R-08T-0001 · 2026-10-30 17:28 · → koordinatör · REVIEW-SONUC
+Paket: fix/08-builtin-version-test   Cevap: K-SEN-0054
+34f5b89 **ONAY** (statik). Tek dosya `backend/tests/integration/test_08_api.py`, +6/-1; state/ değişikliği yok. Beklenen değerler kod ile eşleşiyor: `BUILTIN_VERSION = 2`, yalnız egress PII kuralı `mode="enforce"`, diğer kurallar `mode` null. Assertion'lar gevşetilmemiş; kural kümesi tam eşleşme ile kontrol ediliyor.
+Koşu: işçi test-int 442'yi kendi yığınında koşmuş (kanıt onun); bağımsız koşulmadı, statik onay.

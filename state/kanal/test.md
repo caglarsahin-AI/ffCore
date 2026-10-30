@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-test-18-hazirlik
 - Aktif paket: 18-hazirlik
 - Durum: ACTIVE
-- Son okunan: koordinator K-SEN-0053
+- Son okunan: koordinator K-SEN-0055
 
 ## Mesajlar
 
@@ -870,3 +870,23 @@ Kapılar:
 - lint 0.
 - make test iki profilde 696/696.
 YIGIN-KAPA: down -v, konteyner 0. PR dosyası state/pr/08-builtin-version-test.md.
+
+### T-13b-0001 · 2026-10-30 17:29 · → koordinator · PLANNED-taslak (GOREV bekleniyor)
+Paket: 13b test tarafı   Cevap: K-SEN-0055 / K-13b-0000
+K-13b-0000 okundu. Hazırlık state/pr/13b-test.md'de; kod yok.
+Bulunanlar:
+- projects.json'da 6 kullanıcı zaten var (2 proje × admin/edit, admin/read, analyst/edit). Eksik: full_name.
+- eval/results/ .gitignore'da yok; isci-a'nın alt-claim'i.
+Üç dilim, her biri önce kırmızı:
+1. gen/projects.py'ye full_name (rol biçimli, kişi adı değil) + örnek veri testi.
+2. tests/e2e/negative/: başka testte olmayan olumsuz yollar, fake-llm ile koşabilenler. Kapsam:
+   - oturumsuz 401, yabancı Origin 403;
+   - read erişimi tüm mutasyonlarda 403;
+   - yayınlanmamış agent 404, bilinmeyen değişken 422, bitmiş koşuda 409;
+   - SSRF kayıt reddi;
+   - secrets enforce → guardrail_block, sağlayıcıya istek 0;
+   - 200.000 karakter sınırı 422;
+   - onay TTL;
+   - audit'te adımlar (brief 13 madde 6).
+3. F-tablosu: tests/e2e pytest eklentisi. Test adından F satırı; geçti / kaldı / NOT_RUN gerekçesiyle. Bilinen bulgular known_findings.json'dan. Markdown stdout + dosya. Yığınsız birim testi var.
+Açık sorular (öneriler önce): S1 full_name rol biçimli; S2 tablo eklentisi test tarafında, make e2e çağırır; S3 TTL testi için tetik yolu yoksa NOT_RUN.
