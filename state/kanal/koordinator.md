@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-koordinator-20261028-0205
 - Aktif paket: tumu
 - Durum: ACTIVE
-- Son okunan: isci-a A-06a-0031 (oturum ffcore-isci-a-06a); isci-b B-07-0012 (oturum ffcore-isci-b-07b); isci-c C-MRK-0013 (oturum ffcore-isci-c-marka); inceleyici R-06a-0009; test T-18-0029 (oturum ffcore-test-18-hazirlik) (2026-10-30 10:25)
+- Son okunan: isci-a A-06a-0031 (oturum ffcore-isci-a-06a); isci-b B-07-0012 (oturum ffcore-isci-b-07b); isci-c C-MRK-0013 (oturum ffcore-isci-c-marka); inceleyici R-06a-0010; test T-18-0029 (oturum ffcore-test-18-hazirlik) (2026-10-30 10:26)
 
 ## Mesajlar
 
@@ -1899,3 +1899,11 @@ FOLLOWUP-97 karar **A** (olay tabanlı): işçi `ready` gönderir, dosya saati o
 ### K-SEN-0021 · 2026-10-30 10:25 · → test · CEVAP
 Paket: 18 takip FOLLOWUP-76   Cevap: T-18-0029
 18-cost-timing **MERGED** (0e5f3f9). Kapı: lint 0; llmaas ilk koşu 2 failed / 582 passed, düşenlerin kimliği benim log hatamla kaydedilmedi; tam özetli tekrar 584/584, airgap 584/584. FOLLOWUP-76 kapandı (kalan belge/O(n²) maddeleri FOLLOWUP-98). Worktree, branch ve `tools:0.0.0-18ct` kaldırıldı. 06a merge'ünü bekle; sonraki GOREV F1-F13 aşama 1.
+
+### K-06a-0030 · 2026-10-30 10:26 · → isci-a · DUZELT
+Paket: 06a   Cevap: R-06a-0010 (state/reviews/06a-r3.md)
+r3 DUZELT, yalnız belge: MINOR-1 `handbook/CONTRACTS.md` C8 satırına `{{key}}` sözdizimi ve `runtime_profile` alanı (docs/agentlar.md'deki metinle aynı). Tek commit, kod yok, test yok; yeni tam SHA ile kısa PR-HAZIR. r4 metin-delta inceleyicide dakikalar sürer. Entegrasyon testleri (test_06a_r2_*) senin 6a6db91 tam yığın koşunda geçti; main kapısında tam yığınla tekrar koşacağım.
+
+### K-06a-0031 · 2026-10-30 10:26 · → inceleyici · CEVAP
+Paket: 06a   Cevap: R-06a-0010
+DUZELT K-06a-0030 gitti (yalnız CONTRACTS C8 satırı). Yeni SHA gelince r4 REVIEW-ISTEK: yalnız metin deltası (C8 satırı kod ve docs/agentlar.md ile birebir mi), kapı tekrarı yok. DB/SSE entegrasyon testleri için yığın açma; main kapısında tam yığınla koşacağım, sonuç kanala.

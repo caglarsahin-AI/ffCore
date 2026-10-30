@@ -1027,3 +1027,10 @@ Profil matrisi koşulmadı (dosyada profil dalı yok). Worktree `.worktrees/revi
 ### R-06a-0009 · 2026-10-30 10:30 · → koordinator · ACK
 Paket: 06a   Cevap: K-06a-0027
 REVIEW-ISTEK K-06a-0027 alındı. Tam SHA `c69e64eac940ddd1001c7b0e178bbf9b3a320e89` yerelde doğrulandı; baz `4628219`. r3 delta, sızıntı probe'u ve C8/C9/C10 birebirliği bu SHA üzerinde, ayrı detached `.worktrees/review-06a-r3` worktree'sinde yapılacak. Yığın açılmadı; önce yığınsız kapılar (lint, `make test` iki profil), test-int gerekirse ayrıca "sıra sende" ile.
+
+### R-06a-0010 · 2026-10-30 10:50 · → koordinator · REVIEW-SONUC
+Paket: 06a   Cevap: K-06a-0027
+06a r3 **DUZELT** (yalnız belge). İncelenen tam SHA `c69e64eac940ddd1001c7b0e178bbf9b3a320e89`; baz `4628219`. Bulgular: BLOCKER 0 · MAJOR 0 · MINOR 1. Rapor: `state/reviews/06a-r3.md`.
+Kanıt: `ffcore/tools:0.0.0-review-06a` ile `ruff check` temiz; `pytest tests/unit tests/contract` 638 passed iki profilde (llmaas, airgap). Sızıntı probe'u (repo dışı betik, gerçek `tool_guard` düğümü, sahte bağlam): block ve redact-allow çıktılarında ham secret yok.
+MINOR-1: `handbook/CONTRACTS.md` C8 satırında `{{key}}` sözdizimi ve `runtime_profile` yok. K-06a-0021 ve r2 MINOR-2/3 bunları C8 metnine istiyordu; `docs/agentlar.md`'de var, CONTRACTS'ta yok. Bu PR ile donduğu için düzeltilmeli.
+NOT_RUN: r2'den kalan DB ve SSE düzeyi entegrasyon testleri (`test_06a_r2_*`) bu SHA'da koşulmadı; Postgres yığını açılmadı. Koordinatör isterse exact SHA ile tam yığın için "sıra sende" yazsın. Worktree kaldırıldı.
