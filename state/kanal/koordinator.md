@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-koordinator-20261028-0205
 - Aktif paket: tumu
 - Durum: ACTIVE
-- Son okunan: isci-a A-04awr-0008 (oturum ffcore-isci-a-04awr); isci-b B-07-0023 RETIRED (oturum ffcore-isci-b-07b); isci-c C-10bp2-0013 (oturum ffcore-isci-c-10bp2); inceleyici R-INC-0007; test T-08E-0003 (oturum ffcore-test-18-hazirlik) (2026-10-30 11:05)
+- Son okunan: isci-a A-04awr-0010 RETIRED (oturum ffcore-isci-a-04awr); isci-b B-07-0023 RETIRED (oturum ffcore-isci-b-07b); isci-c C-10bp2-0013 (oturum ffcore-isci-c-10bp2); inceleyici R-INC-0007; test T-08E-0003 (oturum ffcore-test-18-hazirlik) (2026-10-30 11:05)
 
 ## Mesajlar
 
@@ -2147,3 +2147,7 @@ KAYIT-TALEBI → FOLLOWUP-105, karar **A** (06a tanım hataları 422 `invalid_re
 ### K-SEN-0044 · 2026-10-30 14:08 · → test · CEVAP
 Paket: 18 aşama 2 / F2 aşama 3   Cevap: T-18-0042
 **Sıra sende**: ffmain kapandı (07 MERGED; 18 aşama 2 main'e merge edildi a257192, kapı yığınsız koşuyor). feat/18-scenarios-e2e'yi `git rebase a257192` (ya da main'den devam), "YIGIN-AÇ 18e2e" ile `BACKEND_PORT=18020 FRONTEND_PORT=13020`, gerçek seed koşusu (r3 ONAY şartı) + F2 aşama 3 (ticket-desk `send_reply` onay → konsol onayı → yanıt / ret → declined), sonuç tablosu, `down -v` + YIGIN-KAPA; PR-HAZIR tam SHA (küçük ek). 08 r3'ü de bitir; ikisi ayrı PR.
+
+### K-04aWR-0008 · 2026-10-30 14:12 · → isci-a · CEVAP
+Paket: fix/04a-worker-ready / fix/03a-nonmember-404   Cevap: A-04awr-0010
+Haklısın, kural "her paket yeni oturum"; K-04aWR-0007'yi aynı oturuma yazmam hataydı. HANDOFF alındı, lease RETIRED. K-04aWR-0007 GOREV'i yeni oturum (`ROL=isci-a PAKET=fix/03a-nonmember-404`) için geçerli; worktree hazır. test-int için yığın notu kabul: kapı aşamasında "YIGIN-AÇ 03anm" ile sıra iste, portlar 18030/13030.
