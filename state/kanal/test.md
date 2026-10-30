@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-test-18-hazirlik
 - Aktif paket: 18-hazirlik
 - Durum: ACTIVE
-- Son okunan: koordinator K-INIT-0016
+- Son okunan: koordinator K-SEN-0017
 
 ## Mesajlar
 
@@ -495,3 +495,45 @@ EKSİK, motor dönünce:
 - make lint (host'ta ruff yok) ve make test iki profil.
 Host'ta CPU yakıcı + taskkill denemem otomatik izinle reddedildi. Haklı: başka oturumların python süreçlerini de öldürebilirdi. Yükü yalnız izole konteynerde vereceğim.
 Yığın açmadım (YIGIN yok). Motor dönünce tek tools konteyneri: YIGIN-AÇ/KAPA yazarım.
+
+### T-18-0024 · 2026-10-30 08:19 · → koordinator · ACK
+Paket: 18 takip FOLLOWUP-76   Cevap: K-INIT-0017
+Alındı, sıra 4. "Sıra sende" gelene kadar docker komutu yok. Kod tarafı bitti (2ea56d2). Sıra gelince:
+- YIGIN-AÇ, tek tools konteyneri (postgres gerekmez).
+- Yükte eski test kırmızı, yenisi yeşil (5 koşu).
+- Yükte oran dağılımı.
+- make lint, make test iki profil.
+- PR-HAZIR + YIGIN-KAPA.
+
+### T-18-0025 · 2026-10-30 09:07 · → koordinator · YIGIN-AÇ test
+Paket: 18 takip FOLLOWUP-76   Cevap: K-SEN-0017
+Proje ffcore-18ct, yalnız tools konteyneri (--no-deps), imaj 0.0.0-18td.
+
+### T-18-0026 · 2026-10-30 09:36 · → koordinator · DURUM (PR-HAZIR değil: llmaas kapısı kırmızı, nedeni bu dalın dışında)
+Paket: 18 takip FOLLOWUP-76   Cevap: K-SEN-0017
+Dal fix/18-cost-timing @ 2ea56d213cb37bd7cb5871093413688cfc0b477c. Tek dosya: backend/tests/unit/test_08_cost.py.
+
+Yük kanıtı (tools 0.0.0-18ct, 7 CPU):
+- 28 CPU yakıcı (başka süreç): eski (main 87173d7) 5/5 geçti → bu yükle kırmızı ÇIKMADI. Yeni 5/5 geçti.
+- Oran dağılımı yük altında, 10 örnek: 6.43–8.43 (eşik 25).
+- Süreç içi yük (pytest sürecinde 2 meşgul iş parçacığı; yalnız kanıt, commit'te yok): eski 1/5 düştü, yeni 5/5 geçti.
+  Düşen assertion: CPU 1.0786 s > 1.0 s. process_time aynı süreçteki diğer iş parçacıklarının CPU'sunu da sayıyor.
+  Kapıdaki düşüşün nedeni büyük olasılıkla bu, doğrulanmadı; senin tek koşun gösterir.
+
+Kapılar:
+- lint 0.
+- make test airgap: 584 passed.
+- make test llmaas: iki koşuda da 1 failed, her seferinde farklı 04a testi:
+  - test_04a_persistent_pool_reuses_its_process_and_replaces_it_after_timeout ('' == 'fast1'); tek başına 3/3 geçti.
+  - test_04a_9d_timeout_kills_worker_and_continues.
+  İkisi de süreç havuzu, timeout=2 s duvar saati. Bu dala dokunmuyor; test_08_cost değişikliğiyle ilgisi yok.
+  Yeni KARARLAR kuralına göre aynı sınıf sorun: birim testinde mutlak duvar saati.
+
+Öneri (karar sende):
+- A (öneri) 2ea56d2 bu haliyle merge. 04a zamanlama testleri için ayrı FOLLOWUP (04a sahibine): oran ya da daha geniş timeout.
+- B 04a'yı da bu dala ekle. Touch-zone dışı, A/04a sahibinin alanı.
+
+Yığın down -v edildi. Kanıt logları scratchpad'de; istenirse PR dosyasına aktarırım.
+
+### T-18-0027 · 2026-10-30 09:36 · → koordinator · YIGIN-KAPA test
+Proje ffcore-18ct: down -v tamam; konteyner yok, volume'lar silindi. tools:0.0.0-18ct imajı duruyor.

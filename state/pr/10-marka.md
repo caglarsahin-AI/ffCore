@@ -1,6 +1,6 @@
 # PR: 10-marka (ürün ikonu ve marka görseli)
 
-**Paket:** 10-marka · **Sınıf:** [A] · **Branch:** feat/10-brand-icon · **Baz commit:** b6fc3d8 · **HEAD:** 62c8b21cfa857a16f0300c9629ec4d06503a0b8f (2 commit: 92cc9a3 kod, 62c8b21 docs + ekran görüntüleri) · **Oturum:** ffcore-isci-c-marka
+**Paket:** 10-marka · **Sınıf:** [A] · **Branch:** feat/10-brand-icon · **Baz commit:** b6fc3d8 · **HEAD:** 2843d40d8fe0e1641bea80947b6bc90b7e5b7ebd (3 commit: 92cc9a3 kod; 62c8b21 docs `export FAKE_EMBED`; 2843d40 yalnız ekran görüntüleri) · **Oturum:** ffcore-isci-c-marka
 
 ## Plan (kodlamadan önce)
 
@@ -101,9 +101,9 @@
 | **Tam e2e, 92cc9a3 (K-INIT-0015 tek koşu)** | aynı; aşama 1 `FAKE_EMBED=0`, aşama 2 önekle `FAKE_EMBED=1` | 0 / 1 | Aşama 1: 1/1. Aşama 2: **92 passed, 9 failed** (1918 s). 10mrk 10/10, 10a, 10ab, 10af tümü ✓. 9 ✘ hepsi `10bp1` bilgi tabanı. |
 | Kök neden kanıtı | `docker inspect`/`/readyz` | - | Aşama 2'de `run e2e` backend'i yeniden yarattı (log "marka-backend-1 Recreate"); container env `FAKE_EMBED=0`, worker 1. `/readyz` 503 `model_missing`. Testlerin kendisi değil ortam. Docs düzeltildi (62c8b21, `export FAKE_EMBED=1`). |
 | Aşama 2 tekrarı (export ile) | backend env `FAKE_EMBED=1` doğrulandı | 125 | Docker motoru "error waiting for container" verdi, webServer başlamadı. Test sonucu yok (ENV-92 tekrarı). |
+| **Tam e2e, export'lu tek koşu (K-MRK-0006), 62c8b21** | YIGIN-AÇ marka; aşama 1 `export FAKE_EMBED=0`, aşama 2 `export FAKE_EMBED=1`; backend env koşu öncesi ve sonrası 1 | 0 / 0 | **Aşama 1: 1/1. Aşama 2: 108/108** (10mrk 10/10, 10bp1 bilgi tabanı 9 test dahil). 1147 s. Çıktılar tee ile dosyada. Ardından `down -v`: konteyner 0, volume 0. Yeniden üretilen ekran görüntüleri 2843d40'ta. |
 
 **NOT_RUN:**
-- 9 `10bp1` bilgi tabanı testinin doğru ortamda (`FAKE_EMBED=1` export) yeşil koşusu. Neden Docker motoru. Bu testlere dokunan değişiklik yok; düşüş nedeni kanıtlı ortam hatası.
 - Backend `make test`: yalnız `pyproject` description değişti.
 - Lighthouse (FOLLOWUP-37).
 

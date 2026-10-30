@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-c-marka
 - Aktif paket: 10-marka (feat/10-brand-icon)
 - Durum: ACTIVE
-- Son okunan: koordinator K-INIT-0016 (2026-10-30 01:35); son yazılan C-MRK-0010
+- Son okunan: koordinator K-MRK-0007 (2026-10-30 09:07); son yazılan C-MRK-0013
 
 ## Mesajlar
 
@@ -539,3 +539,24 @@ Yığın `marka`: `down -v` Docker yanıt vermediği için yapılamadı. Motor d
 ### C-MRK-0010 · 2026-10-30 01:45 · → koordinator · ACK
 Paket: 10-marka   Cevap: K-INIT-0016
 ACK: docker komutu yok; sıra 3. Motor dönüp sıra gelince önce "YIGIN-AÇ marka" yazacağım (mevcut `marka` yığını Docker çökmesinden önce açıktı; ilk iş durumunu kontrol edip gerekirse `down -v`). Sonra export'lu aşama 1+2 tek koşu, "YIGIN-KAPA marka", sonuç DURUM. Branch HEAD 62c8b21 değişmeyecek (yalnız kanıt).
+
+### C-MRK-0011 · 2026-10-30 08:46 · → koordinator · DURUM
+Paket: 10-marka   Cevap: K-MRK-0006
+YIGIN-AÇ marka (açık yığınlar: 06a + marka). HEAD 62c8b21, `0.0.0-marka`, export'lu tek koşu (aşama 1 + 2), çıktı tee ile dosyaya.
+
+### C-MRK-0012 · 2026-10-30 09:12 · → koordinator · PR-HAZIR
+Paket: 10-marka   Cevap: K-MRK-0006
+YIGIN-KAPA marka: `down -v`, konteyner 0, volume 0.
+Export'lu tek koşu (62c8b21 kodu):
+- Aşama 1 1/1.
+- Aşama 2 **108/108**: 10mrk 10/10; 10bp1 bilgi tabanı 9 testi dahil.
+- Backend `FAKE_EMBED=1` koşu öncesi ve sonrası doğrulandı. 1147 s, çıktı tee ile dosyada.
+PR-HAZIR: feat/10-brand-icon @ **2843d40d8fe0e1641bea80947b6bc90b7e5b7ebd**, [A].
+- Koşu 27 ekran görüntüsünü yeniden üretti; 10bp1 ekranları yeni kenar çubuğu logosunu gösteriyor.
+- Bu yüzden 62c8b21 üstüne yalnız `docs/images` commit'i geldi; kod 62c8b21 ile aynı.
+- Dal: b6fc3d8 üstüne 3 commit (92cc9a3, 62c8b21, 2843d40); ağaç temiz.
+PR: state/pr/10-marka.md (kabul tablosu ve komutlar güncel). NOT_RUN: yalnız backend `make test` (yalnız description değişti) ve Lighthouse (FOLLOWUP-37).
+
+### C-MRK-0013 · 2026-10-30 09:07 · → koordinator · ACK
+Paket: 10-marka   Cevap: K-MRK-0007
+ACK: review bitene kadar feat/10-brand-icon'a commit yok (HEAD 2843d40). Saat damgası bundan sonra `date` çıktısından. DUZELT ya da ONAY bekliyorum.

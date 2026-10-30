@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-koordinator-20261028-0205
 - Aktif paket: tumu
 - Durum: ACTIVE
-- Son okunan: isci-a A-06a-0023 (oturum ffcore-isci-a-06a); isci-b B-07-0012 (oturum ffcore-isci-b-07b); isci-c C-MRK-0013 (oturum ffcore-isci-c-marka); inceleyici R-MRK-0002; test T-18-0025 (oturum ffcore-test-18-hazirlik) (2026-10-30 09:25)
+- Son okunan: isci-a A-06a-0025 (oturum ffcore-isci-a-06a); isci-b B-07-0012 (oturum ffcore-isci-b-07b); isci-c C-MRK-0013 (oturum ffcore-isci-c-marka); inceleyici R-MRK-0002; test T-18-0027 (oturum ffcore-test-18-hazirlik) (2026-10-30 09:40)
 
 ## Mesajlar
 
@@ -1847,3 +1847,15 @@ r1 ONAY (R-MRK-0002; MINOR-1 Pillow ortamı FOLLOWUP-96, senin işin değil). ma
 ### K-INIT-0018 · 2026-10-30 09:30 · → tumu · DURUM
 Paket: ortam   Cevap: -
 YIGIN-AÇ ffmain (koordinatör, 10-marka main kapısı; main 4628219). Açık yığınlar: test (ffcore-18ct) + ffmain = iki. isci-a 06a düzeltmelerini koddan sürdürür, yığın için "sıra sende" bekler.
+
+### K-06a-0023 · 2026-10-30 09:30 · → isci-a · CEVAP
+Paket: 06a   Cevap: A-06a-0024
+MAJOR-1 sahiplik ölçütü `runs.user_id == actor` kabul (r1 kurallarıyla tutarlı; OBO'da `created_by` servis olabilir); PR notuna gerekçe. Yığın: şu an test (tek tools konteyneri) + ffmain (marka kapısı, benim) açık. İstisna veriyorum: `YIGIN-AÇ 06a (kısmi: postgres redis)` şimdi serbest, model volume ve worker yok, port yayını yok; entegrasyon kırmızılarını onunla koş. Tam yığın (18006/13006) için ffmain kapanınca "sıra sende" yazarım (~15 dk). Kısmi yığını tam yığına çevirirken aynı projede `up -d --wait` yeter.
+
+### K-SEN-0018 · 2026-10-30 09:40 · → test · CEVAP
+Paket: 18 takip FOLLOWUP-76   Cevap: T-18-0026 / T-18-0027
+Karar **A**: 2ea56d2 bu haliyle PR-HAZIR sayıldı (doğrulandı: 1 commit, 1 dosya, ağaç temiz). 04a havuz testleri FOLLOWUP-97 (isci-a, 06a sonrası). Süreç içi yük bulgun ("process_time diğer iş parçacıklarını da sayıyor") FOLLOWUP-76 kapanış notuna girecek; "kapıdaki düşüşün nedeni doğrulanmadı" ifadesi aynen kalır. Kanıt loglarını kısa PR dosyasına aktar: state/pr/18-cost-timing.md (yük tablosu, oran dağılımı 10 örnek, kapılar, 04a düşüşleri "bu dalın dışında" notuyla); yalnız state, branch'e commit yok. YIGIN-KAPA alındı. Sonraki işin 18-e2e-iskelet (docs/demo.md senaryoları) ve F1-F13'ün 06a merge'ünden sonra başlayacak aşaması; review bitene kadar e2e dalında kal.
+
+### K-SEN-0019 · 2026-10-30 09:40 · → inceleyici · REVIEW-ISTEK
+Paket: 18 takip FOLLOWUP-76 (fix/18-cost-timing)   Cevap: T-18-0026
+Sıra: 06a r3'ten **önce** (küçük). Branch fix/18-cost-timing · Worktree C:/ai_paycore/ffcore/.worktrees/fix/18-cost-timing · Baz main 87173d7 · SHA 2ea56d213cb37bd7cb5871093413688cfc0b477c (koordinatör doğruladı: 1 commit, tek dosya backend/tests/unit/test_08_cost.py +32/-19, ağaç temiz). Sınıf [A], yalnız test. Karar K-SEN-0015 A: `test_08_9` N=1000 ve N=10000 için `process_time` (3 tekrarın en iyisi), oran < 25, geniş mutlak tavan yalnız asılı kalma koruması; "sınırlı ve maskeli" doğrulaması aynen. Bakılacak: doğrulanan özellik zayıflamadı mı (maske ve sınır assertion'ları duruyor mu), oran eşiği kare davranışı yakalar mı (kare ~100), tavan sessiz atlamaya dönüşmüyor mu, tekrar/ölçüm gürültü mantığı. Yığın gerekmez (`--no-deps` tools ile `pytest -k repeated_value`). Çıktı: state/reviews/18-cost-timing-r1.md + REVIEW-SONUC; tek tur hedef.

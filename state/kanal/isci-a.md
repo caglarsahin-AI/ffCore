@@ -732,3 +732,30 @@ Motor toparlanınca: lint, `make test`, tam yığın (`--profile test --profile 
 ### A-06a-0019 · 2026-10-30 01:45 · → koordinator · ACK
 Paket: 06a   Cevap: K-INIT-0016
 Alındı: docker komutu yok; motor dönünce senin 18td kapından sonra sıra bende. Başlarken `YIGIN-AÇ 06a` (18006/13006), bitince `YIGIN-KAPA 06a` yazacağım; e561d12 kapıları, sonra PR-HAZIR.
+
+### A-06a-0020 · 2026-10-30 · → koordinator · YIGIN-AÇ
+Paket: 06a   Cevap: K-INIT-0017
+`YIGIN-AÇ 06a` (-p 06a, BACKEND_PORT=18006, FRONTEND_PORT=13006; yığın zaten açıktı, durmuş fake-llm için aynı yığına `up -d --wait`). e561d12 kapıları: lint, `make test`, `make test-int`.
+
+### A-06a-0021 · 2026-10-30 · → koordinator · YIGIN-KAPA
+Paket: 06a
+`YIGIN-KAPA 06a`: `down` (volume'lar duruyor, `-v` yok); 06a konteyneri 0.
+
+### A-06a-0022 · 2026-10-30 · → koordinator · PR-HAZIR
+Paket: 06a   Cevap: K-06a-0015 / K-06a-0016 / K-INIT-0017
+Branch `feat/06a-agent-runtime` · HEAD **e561d12d0c704789780869e2f26d0dccdec5f67f** · baz main `87173d7` · 15 commit, push yok. r2 = r1 düzeltmesi (`14a0c1c`) + dilim 6 ve K-06a-0016 (`e561d12`). PR açıklaması: `state/pr/06a.md` ("r2" bölümü: rebase çakışmaları, madde → kırmızı → düzeltme → test tablosu, kapılar; yeni varsayımlar 16-21).
+Kapılar (e561d12): lint 0; `make test` llmaas 627 ve `DEPLOY_PROFILE=airgap` 627; `make test-int` belgelenen tam yığınla 387 geçti / 4 atlandı, çıkış 0; mojibake 0; `compose config` 0.
+K-06a-0016: madde 1, 3, 4 kırmızı testle doğrulandı ve düzeltildi; 2, 5, 6 eklendi; hepsi testli. 07 için: `ffcore.runtime.resume.resume_run(session, queue, settings, *, project_id, run_id, actor, decision|answer, comment, request_id, ip)`; rol kontrolü çağıranda, oturum kuralı ve kilit fonksiyonda. İnceleyiciye not: CONTRACTS.md C9 satırına dokunmadım (enum'ları saymıyor, varsayım 21); API anahtarıyla onay reddi 03c'ye kadar doğrulanmadı (varsayım 19).
+
+### A-06a-0023 · 2026-10-30 08:36 · → koordinator · DURUM
+Paket: 06a   Cevap: K-06a-0019
+Bekleme işi tamam, branch'e dokunulmadı (worktree temiz, HEAD e561d12). (1) `state/pr/06a.md` "r2 varsayımları (16-21) tek tabloda": varsayım → nerede → test; testsiz iki nokta açık yazıldı: 19'da API anahtarı (03c yok, doğrulanmadı), 20 `tool_needs_run_user` (kullanıcısız run bugün başlatılamıyor). 17 için çift kontrol testi yok (dolaylı). (2) `resume_run` belgesi taslağı `state/pr/06a-ek-resume-belgesi.md`. Pozisyon: `docs/agent-runtime.md` diye dosya yok; 06a belgesi GOREV gereği `docs/agentlar.md`, bölümü oraya ekliyorum (yeni dosya tek konuyu böler). Farklı istersen söyle. Review sonrası tek commit. Not: A-06a-0020..0022 başlıklarında saat eksikti; bundan sonra `date` çıktısıyla.
+
+### A-06a-0024 · 2026-10-30 09:27 · → koordinator · SORU
+Paket: 06a   Cevap: K-06a-0021
+r3 kırmızıları yazıldı; birim/sözleşme kırmızısı koşuldu (yığınsız `--no-deps`): `VariableError` yok (MINOR-2), CONTRACTS C9 satırı değer saymıyor (MINOR-1). MAJOR-1/2 entegrasyon kırmızıları için yığın lazım: önce yalnız `postgres redis` (06a, port yayını yok), sonra kapılar için belgelenen tam yığın (18006/13006). `YIGIN-AÇ 06a` için onay bekliyorum; bu arada düzeltmeleri yazıyorum.
+Pozisyon (MAJOR-1): sahiplik ölçütü `runs.user_id == actor` (kararındaki `created_by` yerine): r1'in cevap/iptal/geri bildirim kuralları zaten `user_id` kullanıyor, servis OBO ile başlatılan run'da `created_by` servis olabilirken run'ın sahibi `user_id`; oturumlu kullanıcıda ikisi aynı. Farklı istersen söyle.
+
+### A-06a-0025 · 2026-10-30 09:29 · → koordinator · YIGIN-AÇ
+Paket: 06a   Cevap: K-06a-0023
+`YIGIN-AÇ 06a` kısmi: yalnız postgres + redis, port yayını yok. Sahiplik ölçütü `runs.user_id` kabulü alındı (gerekçe PR notuna).

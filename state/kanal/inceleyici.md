@@ -935,3 +935,73 @@ Cevap: K-INIT-0016
 
 Docker motorunun API 500 ile yeniden kullanılamaz olduğu bilgisi ve yeni yığın eşzamanlılık kuralı alındı. Motorun düzeldiği bildirilene kadar yeni Docker komutu başlatılmayacak. Sonrasında aynı anda en çok iki yığın sınırına uyulacak; yığın açmadan önce koordinatör sırası beklenecek ve kanala `YIGIN-AÇ <proje>`, bitince volume temizliği talimatıyla `down -v` ve `YIGIN-KAPA` yazılacak. Yeni inceleyici REVIEW-ISTEK/tam SHA yok; review başlatılmadı. `K-INIT-0016` işlendi; önceki mesaj ID'leri yeniden uygulanmadı.
 
+### R-INIT-20261030-0004 · 2026-10-30 08:22 · → koordinator · DURUM
+
+Paket: ortam (ENV-94 kapandı)  
+Cevap: K-INIT-0017
+
+Docker motorunun döndüğü ve iki yığın sınırının yürürlükte olduğu bilgisi alındı. Şu anda ffmain ile 06a açık olduğundan inceleyici yeni Docker/yığın komutu başlatmayacak; yeni yığın yalnız koordinatör açıkça `sıra sende` dediğinde, önce `YIGIN-AÇ <proje>` kaydıyla açılacak ve bitince talimat edilen volume temizliğiyle `down -v` + `YIGIN-KAPA` yazılacak. Yeni inceleyici REVIEW-ISTEK/tam SHA yok; review başlatılmadı. `K-INIT-0017` işlendi; önceki mesaj ID'leri yeniden uygulanmadı.
+
+### R-06a-0004 · 2026-10-30 08:42 · → koordinator · ACK
+
+Paket: 06a  
+Cevap: K-06a-0018
+
+r2 REVIEW-ISTEK alındı. Tam commit `e561d12d0c704789780869e2f26d0dccdec5f67f` yerelde mevcut ve baz `87173d7` commit'inin soyundan olduğu doğrulandı. Yalnızca bu exact SHA; r1 düzeltme deltası, rebase çatışmaları, dilim 6, K-06a-0016 maddeleri ve C8/C9/C10 dondurma kapsamıyla ayrı detached `.worktrees/review-06a-r2` worktree'sinde incelenecek. Güvenlik turu uygulanacak. Docker gerekirse önce `YIGIN-AÇ review-06a` kaydı yazılacak; `--pull=never`, dış ağ yok, bitince talimat gereği `down -v` + `YIGIN-KAPA`. `K-06a-0018` işlendi; önceki mesaj ID'leri yeniden uygulanmadı.
+
+### R-06a-0005 · 2026-10-30 08:44 · → koordinator · YIGIN-AÇ
+
+Paket: 06a  
+Cevap: K-06a-0018
+
+YIGIN-AÇ review-06a. Exact SHA `e561d12d0c704789780869e2f26d0dccdec5f67f` için dış ağsız, `--pull=never`, `0.0.0-review-06a` etiketli bağımsız review yığını açılacak; bitince `down -v` ve YIGIN-KAPA yazılacak.
+
+### R-06a-0006 · 2026-10-30 09:07 · → koordinator · YIGIN-KAPA
+
+Paket: 06a  
+Cevap: K-06a-0018
+
+YIGIN-KAPA review-06a. `down -v` tamamlandı; review konteynerleri, ağı ve yalnız `review-06a` proje volume'ları kaldırıldı. Korunan dış volume'lara dokunulmadı.
+
+### R-06a-0007 · 2026-10-30 09:07 · → koordinator · REVIEW-SONUC
+
+Paket: 06a  
+Cevap: K-06a-0018
+
+06a r2 **DUZELT**. İncelenen tam SHA `e561d12d0c704789780869e2f26d0dccdec5f67f`; baz `87173d7`. Bulgular: BLOCKER 0 · MAJOR 2 · MINOR 3. Rapor: `state/reviews/06a-r2.md`.
+
+MAJOR-1: `user` kendi chat run'ını başlatabiliyor ancak GET run/events/stream hâlâ `Reader=require_role("analyst")`; bağlantı düşünce belgelenen Last-Event-ID reconnect yoluna ve kendi run durumuna erişemiyor. Own-user read/reconnect pozitif, cross-user negatifleri gerekli.
+
+MAJOR-2: `tool.pre` block durumunda kod `masked = arguments` seçip ham argümanları kalıcı `tool_call` olayına ve canlı SSE'ye yazıyor; onay yolu varsa `approval_requested` da aynı gövdeyi alıyor. Engellenen secret/PII/SQL araç çalışmasa bile gözlem yüzeyine sızıyor.
+
+MINOR-1 C9 donma metni 8 status/18 event değerini saymıyor; plan listesi yeni `approval_reused`/`approval_expired` olmadan eski 16 değerde. MINOR-2 beş örnek agent ve generator `${hospital_name}` yerine `{{hospital_name}}` kullanıyor; exact runtime probe'u literal bıraktı. MINOR-3 C8 alan tablosu `runtime_profile` alanını atlıyor.
+
+Bağımsız exact-SHA kapıları: lint geçti; `make test` 627/627; `make test-int` 387 geçti, 4 gerekçeli skip; Compose config geçti. Baz `state/**` diff boş. API-key gerçek HTTP reddi 03c resolver/grant yokluğunda NOT_RUN ve geçti sayılmadı; 03c kapısında kesin 403 `approval_requires_user_session` zorunlu. R1 mutasyon rol düzeltmeleri, LangSmith tuzağı, MCP bağlama, deadline bekleme indirimi, analyst varsayılanı, C9 kod/OpenAPI/migration ve `litellm_call_id` geçti. Exact worktree temiz; kaldırılacak. Önceki mesaj ID'leri tekrar uygulanmadı.
+
+Proses notu: `build --pull=false tools`, Dockerfile tools katmanındaki `apt-get update` nedeniyle istemsiz olarak deb.debian.org'dan yaklaşık 9.4 MB indeks indirdi; kurulum tamamlanmadan durduruldu, testler yerel mevcut 06a tools imajıyla koştu. Bu nedenle review için “dış ağ sıfır” iddiası yazılmadı.
+
+### R-06a-0008 · 2026-10-30 09:07 · → koordinator · DURUM
+
+Paket: 06a  
+Cevap: K-06a-0018
+
+Worktree temizliği uyarısı: exact ağaç önceden temiz doğrulandı. `git worktree remove .worktrees/review-06a-r2` çalışma dizinini kaldırdı fakat `.git/worktrees/review-06a-r2` metadata siliminde Windows `Invalid argument` verdi. `git worktree prune --verbose` aynı metadata hatasını verdi; `--force` ve elle silme kullanılmadı. Fiziksel `.worktrees/review-06a-r2` yolu yok, fakat `git worktree list` stale kaydı gösteriyor. Beklenmeyen temizlik durumu koordinatöre bildirildi.
+
+### R-MRK-0001 · 2026-10-30 09:12 · → koordinator · ACK
+
+Paket: 10-marka  
+Cevap: K-MRK-0008
+
+r1 REVIEW-ISTEK alındı. Tam commit `2843d40d8fe0e1641bea80947b6bc90b7e5b7ebd` yerelde mevcut ve baz `b6fc3d8` commit'inin soyundan olduğu doğrulandı. Baz diff'inde `state/**` değişikliği yok. Yalnız bu exact SHA; marka dosyaları, mesaj kaynağı, Next metadata/manifest, deterministik görsel üretimi ve kanıt belgesi kapsamında ayrı detached `.worktrees/review-10-marka-r1` worktree'sinde incelenecek. Yığın açılmayacak; `K-MRK-0008` işlendi, önceki mesaj ID'leri yeniden uygulanmadı.
+
+### R-MRK-0002 · 2026-10-30 09:15 · → koordinator · REVIEW-SONUC
+
+Paket: 10-marka  
+Cevap: K-MRK-0008
+
+10-marka r1 **ONAY**. İncelenen tam SHA `2843d40d8fe0e1641bea80947b6bc90b7e5b7ebd`; baz `b6fc3d8`. Bulgular: BLOCKER 0 · MAJOR 0 · MINOR 1. Rapor: `state/reviews/10-marka-r1.md`.
+
+MINOR-1: `make_web_brand.py` doğrudan Pillow gerektiriyor fakat asset üretimi için repo içinde doğrudan/pinli çalıştırma ortamı yok. Belgelenen host komutu bu makinedeki bildirimsiz Pillow 12.2.0 ile 9/9 geçiyor; standart yerel tools imajlarında `PIL` import edilemiyor, lock'taki transitif 12.3.0 çalıştırılabilir üretim sözleşmesi değil. Temiz CI/geliştirici ortamı ve byte-eşitlik kapısı tanımlanmalı.
+
+Next favicon/icon/apple-icon/manifest bağları, 192/512 PWA ikonları, mesaj kaynaklı EN/TR slogan, sidebar dar FF ve giriş rozeti doğru. Açık/koyu login/projects ile provider ekranları görsel incelendi; eski gömülü slogan konsolda görünmüyor, veriler sentetik ve görünür secret/PII yok. `git diff --check` geçti; baz `state/**` diff boş. Tam e2e yığını talimat gereği yeniden açılmadı; işçi kanıtındaki 1/1 + 108/108, test kaynakları ve yeniden üretilen görseller çapraz kontrol edildi fakat bağımsız geçiş sayılmadı. Exact ağaç temiz; worktree `--force` kullanılmadan kaldırılacak. Önceki mesaj ID'leri tekrar uygulanmadı.
+
