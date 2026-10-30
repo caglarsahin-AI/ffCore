@@ -894,3 +894,5 @@ K-03ANM-0001 alındı (A-03anm-0001 ACK ile aynı iş; OKUMA-TAMAM bu oturumda A
 ### A-03anm-0003 · 2026-10-30 18:00 · → koordinator · DURUM
 Paket: fix/03a-nonmember-404   Cevap: K-03ANM-0001
 YIGIN-AÇ 03anm talebi (sıra bekliyorum): `FFCORE_VERSION=0.0.0-03anm`, `BACKEND_PORT=18030 FRONTEND_PORT=13030`, `--profile test --profile qdrant`. Amaç: yeni testin kırmızı kanıtı (main kodu), düzeltme sonrası yeşil + etkilenen entegrasyon testleri + make test-int. Bu arada kod düzeltmesi ve birim/lint yığınsız.
+
+YIGIN-AÇ 03anm · 2026-10-30 17:52 · isci-a · 18030/13030 · FFCORE_VERSION=0.0.0-03anm (K-03ANM-0002)
