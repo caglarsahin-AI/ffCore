@@ -32,8 +32,12 @@ export async function enableAction(projectId: string, toolId: string, action: st
 
 // A chat model on the fake provider; returns its project model key. fake-llm answers "hello";
 // with model id `tool-default` it calls the first tool it is offered once (fake_openai.py).
+// fake-llm serves chat on port 9999 (fake_openai.py); FAKE_PROVIDER_URL (11434) is only the
+// connection-test address of the 10a-forms tests, where no call is answered.
+export const FAKE_CHAT_URL = "http://fake-llm:9999";
+
 export async function chatModel(name: string, modelId?: string): Promise<string> {
-  const provider = await createProvider(name);
+  const provider = await createProvider(name, { config: { base_url: FAKE_CHAT_URL } });
   const model = await createModel(provider.id, name, modelId ? { model_id: modelId } : {});
   return model.key;
 }

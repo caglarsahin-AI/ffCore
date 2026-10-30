@@ -187,7 +187,7 @@ export function AgentTestPanel({
             )}
             {tool.result?.truncated && <span className="text-muted-foreground">{t("toolTruncated", { chars: tool.result.chars ?? 0 })}</span>}
           </div>
-          <pre className="overflow-auto rounded bg-muted p-2 text-xs" data-testid="test-tool-arguments">
+          <pre tabIndex={0} className="overflow-auto rounded bg-muted p-2 text-xs" data-testid="test-tool-arguments">
             {JSON.stringify(tool.arguments, null, 2)}
           </pre>
         </div>
@@ -196,7 +196,7 @@ export function AgentTestPanel({
         <div className="flex flex-col gap-3 rounded-lg border border-primary p-3" role="group" aria-label={t("approvalTitle")} data-testid="test-approval">
           <p className="text-sm font-medium">{t("approvalTitle")}</p>
           <p className="font-mono text-sm">{view.approval.action}</p>
-          <pre className="overflow-auto rounded bg-muted p-2 text-xs">{JSON.stringify(view.approval.arguments, null, 2)}</pre>
+          <pre tabIndex={0} className="overflow-auto rounded bg-muted p-2 text-xs">{JSON.stringify(view.approval.arguments, null, 2)}</pre>
           {view.approval.assignTo && <p className="text-sm text-muted-foreground">{t("approvalRole", { role: view.approval.assignTo })}</p>}
           {view.approval.approvalId ? (
             <>

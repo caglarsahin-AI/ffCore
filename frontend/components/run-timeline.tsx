@@ -29,7 +29,7 @@ export function RunTimeline({ projectId, runId, live }: { projectId: string; run
                   {event.iteration !== null && <span className="text-muted-foreground">{t("iteration", { n: event.iteration })}</span>}
                 </div>
                 {Object.keys(event.payload).length > 0 && (
-                  <pre className="mt-2 max-h-64 overflow-auto rounded bg-muted p-2 text-xs" data-testid="run-event-payload">
+                  <pre tabIndex={0} className="mt-2 max-h-64 overflow-auto rounded bg-muted p-2 text-xs" data-testid="run-event-payload">
                     {JSON.stringify(event.payload, null, 2)}
                   </pre>
                 )}

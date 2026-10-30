@@ -94,7 +94,7 @@ function Loaded({ projectId, approval }: { projectId: string; approval: Approval
         </dl>
         <section className="flex flex-col gap-2">
           <h2 className="text-lg font-medium">{t("arguments")}</h2>
-          <pre className="overflow-auto rounded-md border-2 border-primary bg-muted p-3 text-sm" data-testid="approval-arguments">
+          <pre tabIndex={0} className="overflow-auto rounded-md border-2 border-primary bg-muted p-3 text-sm" data-testid="approval-arguments">
             {JSON.stringify(approval.arguments, null, 2)}
           </pre>
         </section>

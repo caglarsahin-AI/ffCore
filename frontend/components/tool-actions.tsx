@@ -158,7 +158,7 @@ function InvokeForm({ projectId, tool, action, onClose }: { projectId: string; t
         </div>
         <div className="flex flex-col gap-2">
           <span className="text-sm font-medium">{t("inputSchema")}</span>
-          <pre className="max-h-56 overflow-auto rounded-md bg-muted p-3 text-xs">{JSON.stringify(action.input_schema, null, 2)}</pre>
+          <pre tabIndex={0} className="max-h-56 overflow-auto rounded-md bg-muted p-3 text-xs">{JSON.stringify(action.input_schema, null, 2)}</pre>
         </div>
       </div>
       <div className="flex gap-2">
@@ -182,7 +182,7 @@ function InvokeForm({ projectId, tool, action, onClose }: { projectId: string; t
               </span>
             )}
           </div>
-          <pre className="max-h-80 overflow-auto rounded-md bg-muted p-3 text-xs whitespace-pre-wrap">{result.text}</pre>
+          <pre tabIndex={0} className="max-h-80 overflow-auto rounded-md bg-muted p-3 text-xs whitespace-pre-wrap">{result.text}</pre>
         </div>
       )}
     </form>

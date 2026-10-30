@@ -46,7 +46,8 @@ test("test_10bp2_4_contract_assistant_cited: an analyst builds the contract assi
   await expect(page.getByTestId("wizard-dirty")).toHaveCount(0);
 
   const panel = page.getByTestId("test-panel");
-  await panel.getByTestId("test-input").fill("What is the maintenance period?");
+  // The sample contract is Turkish; FAKE_EMBED's stand-in reranker scores shared words.
+  await panel.getByTestId("test-input").fill("Cihaz bakım sözleşmesinin süresi nedir?");
   await panel.getByTestId("test-send").click();
   await expect(panel.getByTestId("test-status")).toHaveAttribute("data-phase", "done", { timeout: 180_000 });
   await expect(panel.getByTestId("test-answer-text")).not.toBeEmpty();

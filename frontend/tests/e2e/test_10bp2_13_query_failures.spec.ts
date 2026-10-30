@@ -23,10 +23,9 @@ test("test_10bp2_13_query_failures: a missing record or a failed list is an erro
 
   // Lists failing (forced in the browser) show the error, not "nothing yet".
   for (const [route, path] of [
-    ["**/api/v1/projects/*/tools", "/tools"],
-    ["**/api/v1/projects/*/agents", "/agents"],
-    ["**/api/v1/projects/*/runs?*", "/runs"],
-    ["**/api/v1/projects/*/runs", "/runs"],
+    [/\/api\/v1\/projects\/[^/]+\/tools$/, "/tools"],
+    [/\/api\/v1\/projects\/[^/]+\/agents$/, "/agents"],
+    [/\/api\/v1\/projects\/[^/]+\/runs(\?.*)?$/, "/runs"],
   ] as const) {
     await page.route(route, (r) =>
       r.fulfill({ status: 503, contentType: "application/json", body: JSON.stringify({ error: { code: "backend_unreachable", type: "api_error", message: "down" } }) }),

@@ -26,8 +26,11 @@ test("test_10bp2_2_discover_actions_invoke: discovery lists the actions off and 
   await expect(list.getByTestId("action-needs-approval")).toBeChecked();
   await expect(reply.getByTestId("action-needs-approval")).toBeChecked();
 
-  await list.getByTestId("action-enabled").check();
-  await list.getByTestId("action-needs-approval").uncheck();
+  // The switches are the server's state: they change when the PATCH comes back, so click and wait.
+  await list.getByTestId("action-enabled").click();
+  await expect(list.getByTestId("action-enabled")).toBeChecked();
+  await list.getByTestId("action-needs-approval").click();
+  await expect(list.getByTestId("action-needs-approval")).not.toBeChecked();
   await page.reload();
   await expect(page.getByTestId("action-list_tickets").getByTestId("action-enabled")).toBeChecked();
   await expect(page.getByTestId("action-list_tickets").getByTestId("action-needs-approval")).not.toBeChecked();

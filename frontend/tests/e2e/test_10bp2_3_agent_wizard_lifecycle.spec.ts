@@ -37,8 +37,12 @@ test("test_10bp2_3_agent_wizard_lifecycle: create, a placeholder without a varia
   await page.getByTestId("wizard-tab-instructions").click();
   await page.locator("#agent-system-prompt").fill("Answer in a {{tone}} tone.");
   await expect(page.getByTestId("missing-variables")).toContainText("tone");
+  // Refused by the backend with its own code (C8, docs/agentlar.md). Open red until 06a returns
+  // the code instead of a bare validation_error: product finding FOLLOWUP-105 (K-10bp2-0006).
+  // Soft: the test stays red for it, and the publish lifecycle below still runs and is checked.
   await page.getByTestId("wizard-save").click();
-  await expect(page.getByTestId("wizard-save-error")).toContainText("variable_undefined");
+  await expect(page.getByTestId("wizard-save-error")).toBeVisible();
+  await expect.soft(page.getByTestId("wizard-save-error")).toContainText("variable_undefined");
 
   await page.getByTestId("variable-add").click();
   await page.locator("#variable-0-key").fill("tone");

@@ -33,7 +33,7 @@ test("test_10bp2_9_approvals_queue: a waiting approval is listed and counted, re
   await signIn(readPage, reader.email);
   await selectProject(other, baseURL!, alpha.id);
   await readPage.goto("/approvals");
-  const readRow = readPage.locator('[data-testid^="approval-"]').filter({ hasText: "send_reply" }).first();
+  const readRow = readPage.getByTestId("approval-table").locator("tbody tr").filter({ hasText: "send_reply" }).first();
   await readRow.getByRole("link").click();
   await expect(readPage.getByTestId("approval-cannot-decide")).toBeVisible();
   await expect(readPage.getByTestId("approval-approve")).toBeDisabled();
