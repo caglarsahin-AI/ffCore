@@ -233,6 +233,40 @@ def test_07_ttl_expires_and_fails_run(team, pg, harness, use_queue, settings):
     assert run_row(pg, run_id)["status"] == "failed"
 
 
+def test_07_ttl_close_retried_writes_one_expired_event(team, pg, harness, use_queue, settings):
+    # Review r1 MAJOR-1 with the real closer: a tick whose close fails changes nothing, the next
+    # one expires the approval and closes the run, and approval_expired is written once.
+    from ffcore.core import db
+    from ffcore.services import approvals
+
+    run_id, *_ = _waiting(team, pg, harness, use_queue)
+    later = datetime.now(UTC) + timedelta(minutes=settings.approval_ttl_min, seconds=1)
+    real = approvals.run_closer(settings)
+    calls = {"n": 0}
+
+    async def flaky(session, run, code):
+        # Other tests' leftovers share the database: only this run's first close fails.
+        if str(run) == run_id:
+            calls["n"] += 1
+            if calls["n"] == 1:
+                raise RuntimeError("redis unavailable")
+        return await real(session, run, code)
+
+    async def tick(close_run):
+        async with db.session_scope() as session:
+            return await approvals.expire_due(session, now=later, close_run=close_run)
+
+    with pytest.raises(RuntimeError):
+        asyncio.run(tick(flaky))
+    assert run_row(pg, run_id)["status"] == "waiting_approval"
+    assert _approvals(pg, run_id)[0][1] == "pending"
+    asyncio.run(tick(flaky))
+    asyncio.run(tick(real))
+    assert run_row(pg, run_id)["status"] == "failed"
+    assert _approvals(pg, run_id)[0][1] == "expired"
+    assert [t for _, t, _ in events(pg, run_id)].count("approval_expired") == 1
+
+
 def test_07_run_without_gate_fails_loud(team, pg, harness, use_queue):
     project_id, c = team
     publish(pg, project_id, APPROVAL)

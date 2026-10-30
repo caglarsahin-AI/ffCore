@@ -1,7 +1,8 @@
 """07 slices 4-5 on Postgres: opening an approval, not asking twice, TTL expiry, age report.
 
 The clock is injected (`now`), so the 60-minute TTL is tested without waiting. Closing the run
-is 06a's; here a recording fake stands in until slice 6 wires the real one.
+uses a closer that changes the runs row in the sweep's transaction (the real one, run_closer,
+also writes the events; test_07_flow covers it).
 """
 
 import asyncio
@@ -9,6 +10,7 @@ import logging
 from datetime import UTC, datetime, timedelta
 
 import pytest
+from sqlalchemy import text
 
 from ffcore.core import db
 from ffcore.services import approvals
@@ -112,9 +114,38 @@ def test_07_same_args_not_asked_twice(database_url, app_settings, make_project, 
     assert not other_run.reused  # never across runs
 
 
+def _closer(closed, fail_first=False):
+    """A run closer as run_closer behaves on the database: waiting run -> failed, else no-op.
+    `fail_first` raises once before touching anything (the review r1 retry case)."""
+    state = {"fail": fail_first}
+
+    async def close(session, run_id, code):
+        if state["fail"]:
+            state["fail"] = False
+            raise RuntimeError("runtime unavailable")
+        changed = await session.execute(
+            text(
+                "UPDATE runs SET status = 'failed', error_code = :code"
+                " WHERE id = :id AND status = 'waiting_approval'"
+            ),
+            {"id": run_id, "code": code},
+        )
+        if changed.rowcount == 1:
+            closed.append((run_id, code))
+        return changed.rowcount == 1
+
+    return close
+
+
+def _run_status(pg, run_id):
+    return pg.execute("SELECT status FROM runs WHERE id = %s", (run_id,)).fetchone()[0]
+
+
 def test_07_ttl_expires_and_closes_run(database_url, app_settings, make_project, pg, caplog):
     project = make_project()
-    due_run, fresh_run, decided_run = (seed_run(pg, project, definition()) for _ in range(3))
+    due_run, fresh_run, decided_run = (
+        seed_run(pg, project, definition(), status="waiting_approval") for _ in range(3)
+    )
 
     async def setup(session):
         rows = [
@@ -130,15 +161,11 @@ def test_07_ttl_expires_and_closes_run(database_url, app_settings, make_project,
         "UPDATE approvals SET status = 'rejected', resolved_at = now() WHERE id = %s", (decided,)
     )
     closed = []
-
-    async def close_run(run_id, code):
-        closed.append((run_id, code))
-
+    close_run = _closer(closed)
     ttl = timedelta(minutes=app_settings.approval_ttl_min)
-    # One second before the TTL nothing happens.
     ours = {due, fresh, decided}
     # The test database is shared by the session: other tests' pending rows expire too; only
-    # this test's rows are asserted.
+    # this test's rows are asserted. One second before the TTL nothing happens.
     early = _run(
         database_url,
         lambda s: approvals.expire_due(s, now=T0 + ttl - timedelta(seconds=1), close_run=close_run),
@@ -154,17 +181,21 @@ def test_07_ttl_expires_and_closes_run(database_url, app_settings, make_project,
     assert not {run for run, _ in closed} & {fresh_run, decided_run}
     assert _status(pg, due) == "expired" and _status(pg, fresh) == "pending"
     assert _status(pg, decided) == "rejected"  # a decision that landed first wins
+    assert _run_status(pg, due_run) == "failed"
     resolved_by = pg.execute("SELECT resolved_by FROM approvals WHERE id = %s", (due,)).fetchone()
     assert resolved_by == ("system:approval_ttl",)
     assert "approval_expired" in caplog.text
-    # A second tick finds nothing left to expire.
+    # A second tick finds nothing left to expire or close.
     again = _run(database_url, lambda s: approvals.expire_due(s, now=T0 + ttl, close_run=close_run))
     assert not {row.id for row in again} & ours
+    assert [run for run, _ in closed].count(due_run) == 1
 
 
-def test_07_ttl_run_close_failure_is_loud(database_url, app_settings, make_project, pg):
+def test_07_ttl_close_failure_retried_next_tick(database_url, app_settings, make_project, pg):
+    # Review r1 MAJOR-1: expiring the approval and closing its run are one transaction; a
+    # failed close leaves both as they were and the next tick does both.
     project = make_project()
-    run_id = seed_run(pg, project, definition())
+    run_id = seed_run(pg, project, definition(), status="waiting_approval")
 
     async def setup(session):
         opened = await _open(session, app_settings, project, run_id)
@@ -172,14 +203,48 @@ def test_07_ttl_run_close_failure_is_loud(database_url, app_settings, make_proje
         return opened.approval.id
 
     approval_id = _run(database_url, setup)
-
-    async def broken(run_id, code):
-        raise RuntimeError("runtime unavailable")
-
+    closed = []
+    close_run = _closer(closed, fail_first=True)
     ttl = timedelta(minutes=app_settings.approval_ttl_min)
     with pytest.raises(RuntimeError, match="could not be closed"):
-        _run(database_url, lambda s: approvals.expire_due(s, now=T0 + ttl, close_run=broken))
-    assert _status(pg, approval_id) == "expired"
+        _run(database_url, lambda s: approvals.expire_due(s, now=T0 + ttl, close_run=close_run))
+    assert _status(pg, approval_id) == "pending"
+    assert _run_status(pg, run_id) == "waiting_approval"
+    retried = _run(
+        database_url, lambda s: approvals.expire_due(s, now=T0 + ttl, close_run=close_run)
+    )
+    assert approval_id in {row.id for row in retried}
+    assert _status(pg, approval_id) == "expired" and _run_status(pg, run_id) == "failed"
+    assert closed == [(run_id, "approval_expired")]
+
+
+def test_07_ttl_closes_run_of_stranded_expired_approval(
+    database_url, app_settings, make_project, pg
+):
+    # An approval already expired while its run still waits (a close lost before this fix) is
+    # picked up again; the approval row itself is not rewritten.
+    project = make_project()
+    run_id = seed_run(pg, project, definition(), status="waiting_approval")
+
+    async def setup(session):
+        opened = await _open(session, app_settings, project, run_id)
+        await session.commit()
+        return opened.approval.id
+
+    approval_id = _run(database_url, setup)
+    pg.execute(
+        "UPDATE approvals SET status = 'expired', resolved_at = now(), resolved_by = 'old'"
+        " WHERE id = %s",
+        (approval_id,),
+    )
+    closed = []
+    swept = _run(database_url, lambda s: approvals.expire_due(s, now=T0, close_run=_closer(closed)))
+    assert approval_id in {row.id for row in swept}
+    assert closed == [(run_id, "approval_expired")] and _run_status(pg, run_id) == "failed"
+    resolved_by = pg.execute(
+        "SELECT resolved_by FROM approvals WHERE id = %s", (approval_id,)
+    ).fetchone()
+    assert resolved_by == ("old",)
 
 
 def test_07_pending_age_reported_once(database_url, app_settings, make_project, pg, caplog):
