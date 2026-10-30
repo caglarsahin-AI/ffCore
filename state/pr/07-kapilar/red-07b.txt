@@ -1,0 +1,429 @@
+FFFFFFFFF........F..                                                     [100%]
+==================================== ERRORS ====================================
+________________ ERROR collecting tests/unit/test_07_worker.py _________________
+ImportError while importing test module '/work/backend/tests/unit/test_07_worker.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/local/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/unit/test_07_worker.py:4: in <module>
+    from ffcore.runtime.worker import cron_jobs_for, expire_approvals
+E   ImportError: cannot import name 'cron_jobs_for' from 'ffcore.runtime.worker' (/work/backend/ffcore/runtime/worker.py)
+=================================== FAILURES ===================================
+__________ test_07_approval_opened_on_interrupt_with_masked_arguments __________
+
+team = (UUID('e9476ce9-3aa9-453c-91d5-64afa71714cc'), {'owner': <starlette.testclient.TestClient object at 0x7fec909b5a90>, '...ient.TestClient object at 0x7fec909b44d0>, 'analyst_read': <starlette.testclient.TestClient object at 0x7fec909b7230>})
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_99a61561dc63) at 0x7fec91565bb0>
+harness = <tests.integration.runtime_support.Harness object at 0x7fec3bfcdfd0>
+use_queue = <function use_queue.<locals>.install at 0x7fec3be151c0>
+
+    def test_07_approval_opened_on_interrupt_with_masked_arguments(team, pg, harness, use_queue):
+        run_id, streamed, ports, _ = _waiting(team, pg, harness, use_queue)
+        assert run_row(pg, run_id)["status"] == "waiting_approval" and ports.tools.called == []
+>       [(approval_id, status, arguments, _)] = _approvals(pg, run_id)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ValueError: not enough values to unpack (expected 1, got 0)
+
+tests/integration/test_07_flow.py:97: ValueError
+---------------------------- Captured stderr setup -----------------------------
+2026-10-30 08:05:52,539 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-30 08:05:52,754 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=1343
+2026-10-30 08:05:53,714 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-30 08:05:53,754 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=624
+2026-10-30 08:05:54,222 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-30 08:05:54,282 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=292
+------------------------------ Captured log setup ------------------------------
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=1343
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=624
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=292
+----------------------------- Captured stderr call -----------------------------
+2026-10-30 08:05:57,230 INFO ffcore.access access method=POST path=/api/v1/projects/e9476ce9-3aa9-453c-91d5-64afa71714cc/agents/asistan/runs status=200 ms=2639
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/e9476ce9-3aa9-453c-91d5-64afa71714cc/agents/asistan/runs status=200 ms=2639
+--------------------------- Captured stderr teardown ---------------------------
+2026-10-30 08:06:06,246 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-30 08:06:06,248 ERROR ffcore.readiness warmup failed: ModelMissing
+---------------------------- Captured log teardown -----------------------------
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+_____________________ test_07_sse_continues_after_approval _____________________
+
+team = (UUID('20ce5762-43e2-4bb0-bc23-8318a4d62419'), {'owner': <starlette.testclient.TestClient object at 0x7fec3bf64230>, '...ient.TestClient object at 0x7fec3e3f3110>, 'analyst_read': <starlette.testclient.TestClient object at 0x7febc809dd00>})
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_99a61561dc63) at 0x7fec3e3139b0>
+harness = <tests.integration.runtime_support.Harness object at 0x7febc809f860>
+use_queue = <function use_queue.<locals>.install at 0x7fec8cf5ce00>
+
+    def test_07_sse_continues_after_approval(team, pg, harness, use_queue):
+        project_id, c = team
+        run_id, streamed, ports, _ = _waiting(team, pg, harness, use_queue)
+>       [(approval_id, *_)] = _approvals(pg, run_id)
+        ^^^^^^^^^^^^^^^^^^^
+E       ValueError: not enough values to unpack (expected 1, got 0)
+
+tests/integration/test_07_flow.py:110: ValueError
+---------------------------- Captured stderr setup -----------------------------
+2026-10-30 08:06:06,526 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-30 08:06:06,689 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-30 08:06:06,700 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=157
+2026-10-30 08:06:06,788 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-30 08:06:06,941 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-30 08:06:06,957 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=164
+2026-10-30 08:06:07,045 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-30 08:06:07,311 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-30 08:06:07,329 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=281
+------------------------------ Captured log setup ------------------------------
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=157
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=164
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=281
+----------------------------- Captured stderr call -----------------------------
+2026-10-30 08:06:07,742 INFO ffcore.access access method=POST path=/api/v1/projects/20ce5762-43e2-4bb0-bc23-8318a4d62419/agents/asistan/runs status=200 ms=380
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/20ce5762-43e2-4bb0-bc23-8318a4d62419/agents/asistan/runs status=200 ms=380
+_________________________ test_07_reject_reaches_model _________________________
+
+team = (UUID('642bd9f9-125c-42f2-83ab-b9cfbf61fc57'), {'owner': <starlette.testclient.TestClient object at 0x7febc8013b60>, '...ient.TestClient object at 0x7febc81348c0>, 'analyst_read': <starlette.testclient.TestClient object at 0x7febc8136c60>})
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_99a61561dc63) at 0x7fec4159da30>
+harness = <tests.integration.runtime_support.Harness object at 0x7fec8cf50590>
+use_queue = <function use_queue.<locals>.install at 0x7fec8ce2cb80>
+
+    def test_07_reject_reaches_model(team, pg, harness, use_queue):
+        project_id, c = team
+        run_id, _, ports, _ = _waiting(
+            team, pg, harness, use_queue, turn(tools=[(SQL_TOOL, ARGS)]), turn("Reddedildi.")
+        )
+>       [(approval_id, *_)] = _approvals(pg, run_id)
+        ^^^^^^^^^^^^^^^^^^^
+E       ValueError: not enough values to unpack (expected 1, got 0)
+
+tests/integration/test_07_flow.py:129: ValueError
+---------------------------- Captured stderr setup -----------------------------
+2026-10-30 08:06:08,277 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-30 08:06:08,627 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-30 08:06:08,637 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=357
+2026-10-30 08:06:08,813 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-30 08:06:09,065 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-30 08:06:09,099 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=284
+2026-10-30 08:06:09,266 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-30 08:06:09,505 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-30 08:06:09,549 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=276
+------------------------------ Captured log setup ------------------------------
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=357
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=284
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=276
+----------------------------- Captured stderr call -----------------------------
+2026-10-30 08:06:10,323 INFO ffcore.access access method=POST path=/api/v1/projects/642bd9f9-125c-42f2-83ab-b9cfbf61fc57/agents/asistan/runs status=200 ms=700
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/642bd9f9-125c-42f2-83ab-b9cfbf61fc57/agents/asistan/runs status=200 ms=700
+__________________ test_07_same_args_not_asked_twice_in_a_run __________________
+
+team = (UUID('1f984fb1-de94-4ad4-9f63-cca31568750c'), {'owner': <starlette.testclient.TestClient object at 0x7fec8cfd1490>, '...ient.TestClient object at 0x7fec8cfd1eb0>, 'analyst_read': <starlette.testclient.TestClient object at 0x7fec8d007170>})
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_99a61561dc63) at 0x7fec3b5cdd30>
+harness = <tests.integration.runtime_support.Harness object at 0x7fec8ce84ec0>
+use_queue = <function use_queue.<locals>.install at 0x7fec8ce9fba0>
+
+    def test_07_same_args_not_asked_twice_in_a_run(team, pg, harness, use_queue):
+        project_id, c = team
+        run_id, _, ports, _ = _waiting(
+            team,
+            pg,
+            harness,
+            use_queue,
+            turn(tools=[(SQL_TOOL, ARGS)]),
+            turn(tools=[(SQL_TOOL, ARGS)]),
+            turn("2."),
+        )
+>       [(approval_id, *_)] = _approvals(pg, run_id)
+        ^^^^^^^^^^^^^^^^^^^
+E       ValueError: not enough values to unpack (expected 1, got 0)
+
+tests/integration/test_07_flow.py:151: ValueError
+---------------------------- Captured stderr setup -----------------------------
+2026-10-30 08:06:10,785 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-30 08:06:11,155 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-30 08:06:11,168 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=363
+2026-10-30 08:06:11,356 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-30 08:06:11,737 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-30 08:06:11,787 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=427
+2026-10-30 08:06:11,981 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-30 08:06:12,239 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-30 08:06:12,297 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=308
+------------------------------ Captured log setup ------------------------------
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=363
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=427
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=308
+----------------------------- Captured stderr call -----------------------------
+2026-10-30 08:06:13,309 INFO ffcore.access access method=POST path=/api/v1/projects/1f984fb1-de94-4ad4-9f63-cca31568750c/agents/asistan/runs status=200 ms=898
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/1f984fb1-de94-4ad4-9f63-cca31568750c/agents/asistan/runs status=200 ms=898
+_______________ test_07_decision_route_requires_console_session ________________
+
+team = (UUID('fceedcd7-e775-43ff-b5ef-f1f3ea43b738'), {'owner': <starlette.testclient.TestClient object at 0x7fec8d006480>, '...ient.TestClient object at 0x7fec8d0047d0>, 'analyst_read': <starlette.testclient.TestClient object at 0x7fec8cf517f0>})
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_99a61561dc63) at 0x7fec8d006990>
+harness = <tests.integration.runtime_support.Harness object at 0x7febc80cdf70>
+use_queue = <function use_queue.<locals>.install at 0x7fec8cd57060>
+client_factory = <function client_factory.<locals>.make at 0x7fec8cfee5c0>
+app_settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...ive_s=10.0, run_event_stream_ttl_s=86400, run_abandon_grace_s=120, langsmith_tracing=False, langchain_tracing_v2=False)
+
+    def test_07_decision_route_requires_console_session(
+        team, pg, harness, use_queue, client_factory, app_settings
+    ):
+        project_id, c = team
+        run_id, *_ = _waiting(team, pg, harness, use_queue)
+>       [(approval_id, *_)] = _approvals(pg, run_id)
+        ^^^^^^^^^^^^^^^^^^^
+E       ValueError: not enough values to unpack (expected 1, got 0)
+
+tests/integration/test_07_flow.py:167: ValueError
+---------------------------- Captured stderr setup -----------------------------
+2026-10-30 08:06:13,986 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-30 08:06:14,349 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-30 08:06:14,380 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=346
+2026-10-30 08:06:14,546 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-30 08:06:14,775 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-30 08:06:14,805 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=254
+2026-10-30 08:06:14,967 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-30 08:06:15,324 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-30 08:06:15,349 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=374
+------------------------------ Captured log setup ------------------------------
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=346
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=254
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=374
+----------------------------- Captured stderr call -----------------------------
+2026-10-30 08:06:16,183 INFO ffcore.access access method=POST path=/api/v1/projects/fceedcd7-e775-43ff-b5ef-f1f3ea43b738/agents/asistan/runs status=200 ms=761
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/fceedcd7-e775-43ff-b5ef-f1f3ea43b738/agents/asistan/runs status=200 ms=761
+___________________ test_07_decision_on_cancelled_run_is_409 ___________________
+
+team = (UUID('8925fe22-a0a5-4357-b7ee-91ffb4efdcde'), {'owner': <starlette.testclient.TestClient object at 0x7fec8ce10c20>, '...ient.TestClient object at 0x7fec8ce106e0>, 'analyst_read': <starlette.testclient.TestClient object at 0x7fec8cf50560>})
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_99a61561dc63) at 0x7fec8cf935c0>
+harness = <tests.integration.runtime_support.Harness object at 0x7fec8cdb3ad0>
+use_queue = <function use_queue.<locals>.install at 0x7fec8cc00680>
+
+    def test_07_decision_on_cancelled_run_is_409(team, pg, harness, use_queue):
+        project_id, c = team
+        run_id, *_ = _waiting(team, pg, harness, use_queue)
+>       [(approval_id, *_)] = _approvals(pg, run_id)
+        ^^^^^^^^^^^^^^^^^^^
+E       ValueError: not enough values to unpack (expected 1, got 0)
+
+tests/integration/test_07_flow.py:200: ValueError
+---------------------------- Captured stderr setup -----------------------------
+2026-10-30 08:06:16,973 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-30 08:06:17,280 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-30 08:06:17,317 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=334
+2026-10-30 08:06:17,475 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-30 08:06:17,843 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-30 08:06:17,876 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=398
+2026-10-30 08:06:17,992 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-30 08:06:18,230 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-30 08:06:18,259 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=258
+------------------------------ Captured log setup ------------------------------
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=334
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=398
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=258
+----------------------------- Captured stderr call -----------------------------
+2026-10-30 08:06:18,715 INFO ffcore.access access method=POST path=/api/v1/projects/8925fe22-a0a5-4357-b7ee-91ffb4efdcde/agents/asistan/runs status=200 ms=418
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/8925fe22-a0a5-4357-b7ee-91ffb4efdcde/agents/asistan/runs status=200 ms=418
+______________________ test_07_ttl_expires_and_fails_run _______________________
+
+team = (UUID('e2fce369-9f92-4c0e-beff-bb4367106e7a'), {'owner': <starlette.testclient.TestClient object at 0x7fec8cd26db0>, '...ient.TestClient object at 0x7fec8cd24ce0>, 'analyst_read': <starlette.testclient.TestClient object at 0x7fec8ced23f0>})
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_99a61561dc63) at 0x7fec8cd25f10>
+harness = <tests.integration.runtime_support.Harness object at 0x7fec8cbdc410>
+use_queue = <function use_queue.<locals>.install at 0x7fec8cc78540>
+settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...live_s=0.2, run_event_stream_ttl_s=86400, run_abandon_grace_s=120, langsmith_tracing=False, langchain_tracing_v2=False)
+
+    def test_07_ttl_expires_and_fails_run(team, pg, harness, use_queue, settings):
+        from ffcore.core import db
+        from ffcore.services import approvals
+    
+        run_id, *_ = _waiting(team, pg, harness, use_queue)
+        later = datetime.now(UTC) + timedelta(minutes=settings.approval_ttl_min, seconds=1)
+    
+        async def tick():
+            async with db.session_scope() as session:
+                return await approvals.expire_due(
+                    session, now=later, close_run=approvals.run_closer(settings)
+                )
+    
+>       expired = asyncio.run(tick())
+                  ^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_07_flow.py:222: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.12/asyncio/runners.py:195: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/base_events.py:691: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    async def tick():
+        async with db.session_scope() as session:
+            return await approvals.expire_due(
+>               session, now=later, close_run=approvals.run_closer(settings)
+                                              ^^^^^^^^^^^^^^^^^^^^
+            )
+E           AttributeError: module 'ffcore.services.approvals' has no attribute 'run_closer'
+
+tests/integration/test_07_flow.py:219: AttributeError
+---------------------------- Captured stderr setup -----------------------------
+2026-10-30 08:06:19,171 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-30 08:06:19,433 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-30 08:06:19,459 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=267
+2026-10-30 08:06:19,569 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-30 08:06:19,750 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-30 08:06:19,774 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=199
+2026-10-30 08:06:19,945 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-30 08:06:20,148 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-30 08:06:20,157 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=206
+------------------------------ Captured log setup ------------------------------
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=267
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=199
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=206
+----------------------------- Captured stderr call -----------------------------
+2026-10-30 08:06:20,676 INFO ffcore.access access method=POST path=/api/v1/projects/e2fce369-9f92-4c0e-beff-bb4367106e7a/agents/asistan/runs status=200 ms=443
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/e2fce369-9f92-4c0e-beff-bb4367106e7a/agents/asistan/runs status=200 ms=443
+_____________________ test_07_run_without_gate_fails_loud ______________________
+
+team = (UUID('ebba7667-3a05-49a5-a4ba-bbd704f98c76'), {'owner': <starlette.testclient.TestClient object at 0x7fec8cbdc770>, '...ient.TestClient object at 0x7fec8cbdd940>, 'analyst_read': <starlette.testclient.TestClient object at 0x7fec8cf752b0>})
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_99a61561dc63) at 0x7fec8cd50710>
+harness = <tests.integration.runtime_support.Harness object at 0x7fec8cac7860>
+use_queue = <function use_queue.<locals>.install at 0x7fec8caddf80>
+
+    def test_07_run_without_gate_fails_loud(team, pg, harness, use_queue):
+        project_id, c = team
+        publish(pg, project_id, APPROVAL)
+        model = ScriptedModel(turn(tools=[(SQL_TOOL, ARGS)]), turn("1."))
+>       ports = Ports(model, tools=_tools(), approval_gate=False)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: Ports.__init__() got an unexpected keyword argument 'approval_gate'
+
+tests/integration/test_07_flow.py:237: TypeError
+---------------------------- Captured stderr setup -----------------------------
+2026-10-30 08:06:21,320 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-30 08:06:21,641 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-30 08:06:21,663 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=337
+2026-10-30 08:06:21,861 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-30 08:06:22,340 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=475
+2026-10-30 08:06:22,345 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-30 08:06:22,562 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-30 08:06:22,899 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-30 08:06:22,939 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=374
+------------------------------ Captured log setup ------------------------------
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=337
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=475
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=374
+_________________________ test_07_unknown_approval_404 _________________________
+
+team = (UUID('74045992-3ea4-44ee-a2c0-1036f79f676b'), {'owner': <starlette.testclient.TestClient object at 0x7fec8cc71100>, '...ient.TestClient object at 0x7fec8cc6aa50>, 'analyst_read': <starlette.testclient.TestClient object at 0x7fec8cc6a690>})
+
+    def test_07_unknown_approval_404(team):
+        project_id, c = team
+        response = c["analyst"].post(_url(project_id, uuid.uuid4(), "approve"), json={})
+>       assert (response.status_code, response.json()["error"]["code"]) == (404, "approval_not_found")
+E       AssertionError: assert (404, 'not_found') == (404, 'approval_not_found')
+E         
+E         At index 1 diff: 'not_found' != 'approval_not_found'
+E         Use -v to get more diff
+
+tests/integration/test_07_flow.py:248: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+2026-10-30 08:06:23,264 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-30 08:06:23,429 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-30 08:06:23,451 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=186
+2026-10-30 08:06:23,551 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-30 08:06:23,729 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-30 08:06:23,759 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=205
+2026-10-30 08:06:23,873 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-30 08:06:24,065 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-30 08:06:24,089 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=211
+------------------------------ Captured log setup ------------------------------
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=186
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=205
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=211
+----------------------------- Captured stderr call -----------------------------
+2026-10-30 08:06:24,127 INFO ffcore.access access method=POST path=/api/v1/projects/74045992-3ea4-44ee-a2c0-1036f79f676b/approvals/ed58286a-c183-4e9e-b48d-9a536ce7431f/approve status=404 ms=31
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/74045992-3ea4-44ee-a2c0-1036f79f676b/approvals/ed58286a-c183-4e9e-b48d-9a536ce7431f/approve status=404 ms=31
+____________________________ test_07_run_must_exist ____________________________
+
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_99a61561dc63) at 0x7fec8cdb24b0>
+make_project = <function make_project.<locals>.make at 0x7fec8cb71800>
+
+    def test_07_run_must_exist(pg, make_project):
+>       with pytest.raises(psycopg.errors.ForeignKeyViolation):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ForeignKeyViolation
+
+tests/integration/test_07_schema.py:87: Failed
+=========================== short test summary info ============================
+FAILED tests/integration/test_07_flow.py::test_07_approval_opened_on_interrupt_with_masked_arguments
+FAILED tests/integration/test_07_flow.py::test_07_sse_continues_after_approval
+FAILED tests/integration/test_07_flow.py::test_07_reject_reaches_model - Valu...
+FAILED tests/integration/test_07_flow.py::test_07_same_args_not_asked_twice_in_a_run
+FAILED tests/integration/test_07_flow.py::test_07_decision_route_requires_console_session
+FAILED tests/integration/test_07_flow.py::test_07_decision_on_cancelled_run_is_409
+FAILED tests/integration/test_07_flow.py::test_07_ttl_expires_and_fails_run
+FAILED tests/integration/test_07_flow.py::test_07_run_without_gate_fails_loud
+FAILED tests/integration/test_07_flow.py::test_07_unknown_approval_404 - Asse...
+FAILED tests/integration/test_07_schema.py::test_07_run_must_exist - Failed: ...
+ERROR tests/unit/test_07_worker.py
+10 failed, 10 passed, 1 error in 63.72s (0:01:03)
