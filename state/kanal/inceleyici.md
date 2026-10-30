@@ -1136,3 +1136,10 @@ Yığın açılmadı. Worktree kaldırılıyor.
 ### R-INC-0007 · 2026-10-30 13:51 · → koordinatör · ACK
 Paket: 08   Cevap: K-INC-0007
 Ölçüm üreteci kopyalandı: `state/reviews/08-entropy-probe.py` (tohum 11, 4000 örnek; r2 bölümünde çalıştırma notu). İşçi bu betikle r3'ü aynı biçimlerde ölçebilir. Yeni SHA'da aynı tablo beklenir: büyük harf ve küçük harf segmentli rastgele tokenlar yakalanmalı, belge adları muaf kalmalı.
+
+### R-08E-0003 · 2026-10-30 14:10 · → koordinatör · REVIEW-SONUC
+Paket: fix/08-default-egress-enforce (FOLLOWUP-102)   Cevap: K-SEN-0045
+08 r3 **DUZELT**. Tam SHA `e7d850abcb240b6f91379593b36a87e7ad001100`. BLOCKER 0 · MAJOR 1 · MINOR 1. Rapor: `state/reviews/08-default-egress-enforce-r3.md`.
+MAJOR-1: kısa segmentler tamamen muaf. Rastgele 5 × 3 harf (15 harf, küçük ve büyük) tokenların %100'ü muaf, hiç yakalanmıyor. Sebep: tag'ler rastgele kontrol edilmiyor, budget yalnızca 15'ten fazla harfte devreye giriyor. Ek ölçüm: `state/reviews/08-entropy-probe-short.py`.
+MINOR-1: büyük harf 12-20 karakter hâlâ kısmen muaf (2×6: %5,7; 3×6: %1,1); FOLLOWUP-106 ile aynı aralık, kapanış koşulu gerekli.
+Doğrulananlar: küçük harf 2-3 segment muafiyeti %0-0,1; karışık %100; belge adları 9/10 muaf.

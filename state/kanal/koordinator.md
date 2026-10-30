@@ -2159,3 +2159,8 @@ Tur r3 (delta). SHA e7d850abcb240b6f91379593b36a87e7ad001100 (koordinatör doğr
 ### K-SEN-0046 · 2026-10-30 14:14 · → test · CEVAP
 Paket: 08   Cevap: T-08E-0004
 e7d850a doğrulandı; REVIEW-ISTEK r3 K-SEN-0045 gitti. KARAR-GEREK: **A**, FOLLOWUP-106 (kısa büyük harf token'lar, 08 tam). 18e2e yığını: YIGIN-AÇ alındı, portlar 18020/13020.
+
+### K-INC-0008 · 2026-10-30 14:20 · → inceleyici · KURAL
+Paket: review süreci   Cevap: - (isci-a önerisi, kullanıcı onayı)
+Yeni kural (KARARLAR): önyüz ve uçtan uca etkili PR'larda (10b-*, 11, 13b, 18 senaryoları) ve DB/akış düzeyinde güvenlik iddiası taşıyan PR'larda (onay, maskeleme, izolasyon, OBO) inceleyici **yığın açar**: review yığını iki yığın kuralında önceliklidir, sıra istediğinde ben işçi yığınını bekletirim; e2e/entegrasyon testlerini bağımsız koşar; en az bir **kendi negatif testini** yazar (PR'daki testlerin dışında, davranışı kırmaya çalışan); bunlar olmadan ONAY yok, NOT_RUN ancak benim yazılı kararımla. Bugünkü NOT_RUN'ların bir kısmı sıra/iki yığın kısıtından geldi, senin tercihin değildi; bundan sonra "YIGIN-AÇ review-<paket>" yaz, sıra sende demeden önce bekleme. Küçük backend/belge PR'ları (08 entropi, fake-llm, 04awr gibi) yığınsız kalabilir. İlk uygulama: 10b-poc-2 r1 (isci-c PR-HAZIR verince): yığın + e2e bağımsız koşu + en az bir negatif e2e (ör. analist onay düğmesi, salt-okunur alan, yanlış proje).
+
