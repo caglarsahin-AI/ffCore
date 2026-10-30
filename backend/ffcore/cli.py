@@ -25,6 +25,7 @@ from ffcore.core.logging import configure_logging
 from ffcore.core.passwords import MIN_LENGTH, hash_password
 from ffcore.models.identity import Project, User
 from ffcore.models.tools import Tool
+from ffcore.runtime.runner import setup_checkpointer
 from ffcore.services import (
     catalog_loader,
     litellm_reconcile,
@@ -143,6 +144,10 @@ def main(argv: list[str] | None = None) -> int:
         "--tool", default="mcp-sql", help="key of the project's registered mcp-sql tool"
     )
     sql_context.add_argument("--path", required=True, type=Path, help="data/samples/schema")
+    commands.add_parser(
+        "setup-checkpointer",
+        help="create the LangGraph checkpoint tables in the checkpoints schema (06a, idempotent)",
+    )
     args = parser.parse_args(argv)
     configure_logging(get_settings())
 
@@ -193,6 +198,12 @@ def main(argv: list[str] | None = None) -> int:
                 _seed_sql_context(args.project, args.tool, args.path)
             )
             print(f"table descriptions loaded: {descriptions}; SQL examples loaded: {examples}")
+        elif args.command == "setup-checkpointer":
+            settings = get_settings()
+            if settings.database_url is None:
+                raise CliError("DATABASE_URL is not set")
+            asyncio.run(setup_checkpointer(settings.database_url.get_secret_value()))
+            print("checkpointer tables ready in schema checkpoints")
     except (
         CliError,
         catalog_loader.CatalogFileError,

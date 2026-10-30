@@ -11,6 +11,10 @@ Checks:
                   reason, when there is no Ollama model. The runtime num_ctx Ollama applies is
                   not verified here (FOLLOWUP-31, needs the model loaded).
   vector_store    the configured driver answers (Qdrant reachable; pgvector column present)
+  llm_slots       (06a) the model slot pool: in use / LLM_SLOTS and waiting per class; skipped
+                  without REDIS_URL, failed when Redis does not answer (runs cannot start)
+06a extends ollama_context with published agents' limits.context_tokens on Ollama models: an
+install or seed change that would cut a published agent's budget is said here (C13).
 """
 
 import asyncio
@@ -100,6 +104,7 @@ async def _ollama_context_check(settings: Settings) -> ReadinessCheck:
             )
         ).all()
     needed = [int(lim["context_tokens"]) for lim in limits if lim.get("context_tokens")]
+    needed += await _published_agent_context(db, Model, Provider)
     if not needed:
         return ReadinessCheck(
             name="ollama_context",
@@ -114,6 +119,61 @@ async def _ollama_context_check(settings: Settings) -> ReadinessCheck:
         ok,
         "context_configuration_invalid",
         f"OLLAMA_CONTEXT_LENGTH={configured}, largest context_tokens={max(needed)}",
+    )
+
+
+async def _published_agent_context(db, model, provider) -> list[int]:
+    """context_tokens of every published agent version whose model runs on Ollama (06a)."""
+    from ffcore.models.agents import Agent, AgentVersion
+
+    async with db.session_scope() as session:
+        rows = await session.execute(
+            select(AgentVersion.definition)
+            .join(Agent, Agent.current_version_id == AgentVersion.id)
+            .join(
+                model,
+                (model.project_id == Agent.project_id)
+                & (model.key == AgentVersion.definition["model"].astext),
+            )
+            .join(provider, provider.id == model.provider_id)
+            .where(
+                Agent.deleted_at.is_(None),
+                Agent.status == "published",
+                provider.driver == "ollama",
+                model.deleted_at.is_(None),
+            )
+        )
+        return [int(d.get("limits", {}).get("context_tokens", 16000)) for (d,) in rows.all()]
+
+
+async def _llm_slots_check(settings: Settings) -> ReadinessCheck:
+    if settings.redis_url is None:
+        return ReadinessCheck(
+            name="llm_slots", status="skipped", code=None, detail="REDIS_URL is not set"
+        )
+    import redis.asyncio as aioredis
+
+    from ffcore.runtime.scheduler import BackgroundWindow, LlmSlots, SlotSettings
+
+    client = aioredis.from_url(settings.redis_url.get_secret_value())
+    try:
+        window = BackgroundWindow.parse(
+            settings.background_window,
+            weekends_all_day=settings.background_window_weekends,
+            zone=settings.background_window_tz,
+        )
+        state = await LlmSlots(client, SlotSettings(slots=settings.llm_slots), window).status()
+    except Exception as exc:  # noqa: BLE001 - reported with its type, never hidden
+        return check("llm_slots", False, "redis_unavailable", type(exc).__name__)
+    finally:
+        await client.aclose()
+    waiting = ", ".join(f"{k}={v}" for k, v in state["waiting"].items())
+    window_state = "open" if state["background_window_open"] else "closed"
+    return check(
+        "llm_slots",
+        True,
+        detail=f"in_use={state['in_use']}/{state['slots']} waiting: {waiting}; "
+        f"background window {window_state}",
     )
 
 
@@ -161,6 +221,7 @@ async def readyz(settings: Annotated[Settings, Depends(get_settings)]):
         await _embed_dim_check(settings),
         await _ollama_context_check(settings),
         await _vector_store_check(settings),
+        await _llm_slots_check(settings),
     ]
     failed = [c for c in checks if c.status == "failed"]
     if not failed:

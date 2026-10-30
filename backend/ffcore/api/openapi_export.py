@@ -1,6 +1,6 @@
 """Render a package's OpenAPI draft (`backend/openapi/<package>.yaml`) from the application routes.
 
-Tools container: python -m ffcore.api.openapi_export [03a|04a|05a|08] > openapi/<package>.yaml
+Tools container: python -m ffcore.api.openapi_export [03a|04a|05a|06a|08] > openapi/<package>.yaml
 The contract tests compare each committed file with this output, so no draft ever drifts.
 Each draft holds only its package's routes: adding a package never changes an earlier draft.
 """
@@ -36,6 +36,11 @@ PACKAGES = {
         "description": "Guardrail and PII policies, test panel and internal evaluation "
         "(package 08-lite).",
         "tags": {"guardrails", "guardrails-internal"},
+    },
+    "06a": {
+        "version": "0.6a",
+        "description": "Agents, versions, runs, run events and run streams (package 06a).",
+        "tags": {"agents", "runs"},
     },
 }
 

@@ -40,6 +40,17 @@ dependencies = [
     # 05a (K-05a-0002 S1): MCP client and servers (streamable HTTP), SQL validation.
     "mcp==2.3.0",
     "sqlglot==30.23.0",
+    # 06a: structured_output schemas are checked at save time (C8); already locked via
+    # dependencies, now direct because ffcore imports it.
+    "jsonschema==4.26.0",
+    # 06a agent runtime (K-06a-0002 S1): graph, interrupt/resume and the Postgres checkpointer.
+    # No PayCore reference pin exists; each release is at least two weeks old (2026-10-12).
+    # langchain-core arrives with LangGraph; its LangSmith tracing must stay off (startup check).
+    "langgraph==1.2.15",
+    "langgraph-checkpoint==4.3.0",
+    "langgraph-checkpoint-postgres==3.1.3",
+    "langchain-core==1.6.10",
+    "psycopg-pool==3.3.3",
 ]
 
 [dependency-groups]
@@ -47,6 +58,29 @@ dev = [
     "pytest==9.2.0",
     "ruff==0.17.3",
 ]
+
+# Two-week rule for the packages 06a adds and everything they pull in (K-06a-0002 S1): nothing
+# published after this date enters the lock through them.
+[tool.uv.exclude-newer-package]
+distro = "2026-10-15T00:00:00Z"
+jsonpatch = "2026-10-15T00:00:00Z"
+jsonpointer = "2026-10-15T00:00:00Z"
+langchain-core = "2026-10-15T00:00:00Z"
+langchain-protocol = "2026-10-15T00:00:00Z"
+langgraph = "2026-10-15T00:00:00Z"
+langgraph-checkpoint = "2026-10-15T00:00:00Z"
+langgraph-checkpoint-postgres = "2026-10-15T00:00:00Z"
+langgraph-prebuilt = "2026-10-15T00:00:00Z"
+langgraph-sdk = "2026-10-15T00:00:00Z"
+langsmith = "2026-10-15T00:00:00Z"
+orjson = "2026-10-15T00:00:00Z"
+ormsgpack = "2026-10-15T00:00:00Z"
+psycopg-pool = "2026-10-15T00:00:00Z"
+requests-toolbelt = "2026-10-15T00:00:00Z"
+sniffio = "2026-10-15T00:00:00Z"
+tenacity = "2026-10-15T00:00:00Z"
+uuid-utils = "2026-10-15T00:00:00Z"
+zstandard = "2026-10-15T00:00:00Z"
 
 # A second package index: an internal mirror must proxy download.pytorch.org too (12).
 [[tool.uv.index]]
