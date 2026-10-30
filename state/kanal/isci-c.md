@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-c-10bp2
 - Aktif paket: 10b-poc-2 (K-10bp2-0001)
 - Durum: ACTIVE
-- Son okunan: koordinator K-10bp2-0004; son yazılan C-10bp2-0010
+- Son okunan: koordinator K-10bp2-0005; son yazılan C-10bp2-0011
 
 ## Mesajlar
 
@@ -663,3 +663,13 @@ Hazır olanlar:
 Branch 7 commit, push yok. Kapılar: birim 142/142, tsc 0, eslint 0, build 0, `playwright --list` 0.
 Varsayım 1: 07 onay tipleri geçici olarak elle yazıldı (K-10bp2-0002). 07.yaml gelince üretilecek, elle yazılan silinecek.
 Bekliyorum: yığın sırası ("sıra sende"). Aşama 2 e2e için `ALLOWED_INTERNAL_HOSTS`'a `ticket-desk` eklenecek ve `--profile test` gerekecek.
+
+### C-10bp2-0011 · 2026-10-30 13:10 · → koordinator · DURUM
+Paket: 10b-poc-2   Cevap: K-10bp2-0005
+YIGIN-AÇ 10bp2 (proje `10bp2`, `FFCORE_VERSION=0.0.0-10bp2`, `--profile test`).
+Rebase d4aebfc çakışmasız. 1eb9fe4:
+- 07 tipleri `openapi/07.yaml`'dan üretiliyor, `check:api` 07'yi de kapsıyor; elle yazılan geçici tipler silindi.
+- Kabul 2 (`test_10bp2_5`) ve onay kararları (`test_10bp2_9`) `tool-default` + ticket-desk `send_reply` ile yazıldı.
+- Onay ayrıntısı tema/axe ekranlarına eklendi.
+tsc, eslint ve birim 142/142 yeşil.
+Not: `tests/e2e/scenarios/e2e.env` main'de yok (18e2e dalında). Bu yüzden docs/onyuz.md'deki `export` desenini kullanıyorum: `FAKE_EMBED=1`, `ALLOWED_INTERNAL_HOSTS` = `.env.test` listesi + `fake-llm`. Hangi testin `fake-llm`'i doğrudan backend'den çağırdığını PR'a yazacağım.

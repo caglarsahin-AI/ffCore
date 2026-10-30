@@ -62,4 +62,55 @@ heads exit=0
 test exit=0
 
 === 13:08:12 make test airgap
-.......................................................................
+........................................................................ [ 10%]
+........................................................................ [ 21%]
+........................................................................ [ 32%]
+........................................................................ [ 43%]
+...F.................................................................... [ 54%]
+........................................................................ [ 65%]
+........................................................................ [ 76%]
+........................................................................ [ 87%]
+........................................................................ [ 98%]
+............                                                             [100%]
+=================================== FAILURES ===================================
+__ test_04a_persistent_pool_reuses_its_process_and_replaces_it_after_timeout ___
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_04a_persistent_pool_reuse0')
+
+    def test_04a_persistent_pool_reuses_its_process_and_replaces_it_after_timeout(tmp_path):
+        slow, fast1, fast2 = (tmp_path / n for n in ("slow.txt", "fast1.txt", "fast2.txt"))
+        slow.write_text("sleep")
+        fast1.write_text("ok")
+        fast2.write_text("ok")
+        pool = PersistentPool(timeout=2, name="p", target="tests.unit._convert_targets:target")
+        try:
+            assert pool.convert(fast1).text_md == "fast1"
+            first = pool._worker.process.pid
+            assert pool.convert(fast2).text_md == "fast2"
+            assert pool._worker.process.pid == first  # same process, models loaded once
+            assert pool.convert(slow).status == TIMEOUT
+            assert pool._worker is None  # killed; the next file gets a fresh process
+>           assert pool.convert(fast1).status == CONVERTED
+E           AssertionError: assert 'timeout' == 'converted'
+E             
+E             - converted
+E             + timeout
+
+tests/unit/test_04a_convert.py:221: AssertionError
+------------------------------ Captured log call -------------------------------
+WARNING  ffcore.knowledge.convert:workers.py:212 convert_timeout path=/tmp/pytest-of-root/pytest-0/test_04a_persistent_pool_reuse0/slow.txt pool=p seconds=2
+WARNING  ffcore.knowledge.convert:workers.py:212 convert_timeout path=/tmp/pytest-of-root/pytest-0/test_04a_persistent_pool_reuse0/fast1.txt pool=p seconds=2
+=========================== short test summary info ============================
+FAILED tests/unit/test_04a_convert.py::test_04a_persistent_pool_reuses_its_process_and_replaces_it_after_timeout
+1 failed, 659 passed in 179.01s (0:02:59)
+test-airgap exit=1
+
+=== 13:11:54 test-samples
+
+----------------------------------------------------------------------
+Ran 53 tests in 9.047s
+
+OK (skipped=5)
+samples exit=0
+
+=== 13:12:28 test-int

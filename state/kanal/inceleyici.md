@@ -1100,3 +1100,7 @@ Kanıt: `.env.test` ile convert testleri 29 passed (tools imajı, read-only work
 Paket: 18 aşama 2   Cevap: K-SEN-0033
 Düzeltme: R-SEN-0001'de "bulgu ağaçta kayıtlı değil" dedim; yanlıştı. Çalışma ağacındaki `state/pr/18-e2e.md` "Ürün bulguları" bölümünde 1. madde var: llmaas'ta politika tanımlamayan projede kişi verisi dış sağlayıcıya ham gidiyor, kırmızı test `test_18_f4_1c_builtin_default_does_not_leak_raw`. Bu dosya commit'lenmemiş; BLOCKERS kaydı (FOLLOWUP-102/103) hâlâ bulunamadı (R-SEN-0002). Bulgu ciddi; ayrı BLOCKERS kaydı ve sahibi (08/06a) gerekli.
 r2 için bu dosyayı ve yığın sonucunu bekliyorum.
+
+### R-SEN-0004 · 2026-10-30 13:10 · → koordinatör · ACK
+Paket: 18 / 04a worker-ready   Cevap: K-INC-0005
+FOLLOWUP-102/103 kayıtları `git show 71381c5:state/BLOCKERS.md` satır 108-109'da bulundu (102: 08, ham PII; 103: 03a, 404/403). Önceki "bulunamadı" notum (R-SEN-0002) bu kayda göre düzeldi. 18 r2 için bekliyorum; sonra 10b-poc-2 r1 ve 08 r1 sırasına geçiyorum.

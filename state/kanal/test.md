@@ -734,3 +734,18 @@ feat/18-scenarios-e2e @ c6a7d3fba41e30ff5c474e1b16ef1a75299a4524 (3e306ce üstü
 - MINOR-2: ensure_superadmin önce login. Yalnız 401 invalid_credentials → create-superadmin; başka her red ve her CLI hatası seed'i durdurur. Birim testi test_18_seed_unit.py (yığınsız): önce 5/5 kırmızı, sonra yeşil.
 Yığınsız: 7 passed (2 örtü + 5 seed), 46 skipped. Yığın koşusu yok: delta seed'in giriş yolu; mantığı birim testi kanıtlıyor. Gerçek yığında tekrar doğrulanmadı.
 08 dalı kapıları bitti, sonuç ayrı mesajla.
+
+### T-08E-0002 · 2026-10-30 13:11 · → koordinator · PR-HAZIR
+Paket: fix/08-default-egress-enforce [B]   Cevap: K-SEN-0030 / K-SEN-0032
+fix/08-default-egress-enforce @ a74902389b4e583af69292aff010351d622350d9 (main 01639c5 üstünde, tek commit).
+- Rule.mode additive (C4; openapi/08 +8 satır).
+- Yerleşik default sürüm 2: politika monitor, egress PII tokenize enforce.
+- Entropi: düz tanımlayıcılar atlanıyor + 32+ hex kalıbı.
+- docs/guardrail.md güncellendi.
+Kırmızı → yeşil: 08e_1, 08e_4, 08e_5 ×5, 08e_6 32-hex. Ek olarak sk-, ghp_, base64, KEY=değer ve PRSIM-1234 vakaları.
+Kapılar:
+- lint 0.
+- llmaas 663 passed.
+- airgap: ilk koşu yalnız FOLLOWUP-97'nin iki 04a testi düştü; tekrar 663 passed.
+PR dosyası: state/pr/08-default-egress-enforce.md.
+Merge sonrası 18 e2e'de f4_1c yeşile dönmeli. Seed'deki secrets=log geçici ayarı o zaman kaldırılabilir.

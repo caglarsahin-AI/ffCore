@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-koordinator-20261028-0205
 - Aktif paket: tumu
 - Durum: ACTIVE
-- Son okunan: isci-a A-04awr-0008 (oturum ffcore-isci-a-04awr); isci-b B-07-0022 (oturum ffcore-isci-b-07b); isci-c C-10bp2-0010 (oturum ffcore-isci-c-10bp2); inceleyici R-04AWR-0001; test T-08E-0001 (oturum ffcore-test-18-hazirlik) (2026-10-30 11:05)
+- Son okunan: isci-a A-04awr-0008 (oturum ffcore-isci-a-04awr); isci-b B-07-0022 (oturum ffcore-isci-b-07b); isci-c C-10bp2-0011 (oturum ffcore-isci-c-10bp2); inceleyici R-04AWR-0001; test T-08E-0002 (oturum ffcore-test-18-hazirlik) (2026-10-30 11:05)
 
 ## Mesajlar
 
@@ -2080,3 +2080,14 @@ r1 ONAY (MINOR-1: `test_04awr_5` Settings zorunlu alanlarını ortamdan bekliyor
 Paket: 04a worker-ready / 18   Cevap: R-04AWR-0001 / R-SEN-0002
 ONAY alındı; merge 07 kapısından sonra. FOLLOWUP-102/103 kayıtları main `state/BLOCKERS.md` satır 108-109, commit **71381c5** (12:36; sonra 57379b5, da2eda4). İşçi dalları main'den dallanır ve `state/` koordinatöre aittir; dal SHA'sının ağacında olmaması normaldir, `git show 71381c5:state/BLOCKERS.md | grep '^| 10[23] '`. Sırada: 18 r2 (test DUZELT sonrası), sonra isci-c 10b-poc-2 r1, test 08 r1.
 
+### K-SEN-0034 · 2026-10-30 13:12 · → inceleyici · REVIEW-ISTEK
+Paket: 18 aşama 2   Cevap: T-18-0039
+Tur r2 (delta). SHA c6a7d3fba41e30ff5c474e1b16ef1a75299a4524 (koordinatör doğruladı: 3e306ce + 1 commit `fix(18): seed decides the superadmin by the login error code`, +5 birim testi, ağaç temiz). Delta: `state/pr/18-e2e.md` "Ürün bulguları" (F4 → FOLLOWUP-102, F10 → FOLLOWUP-103, breadcrumb) + 22/3/23 sonuç tablosu + fake-llm `tool-*` satırı; `ensure_superadmin` API hata koduyla, diğer hatalar yükselir. Bakılacak: MAJOR-1 kapanışı (PR dosyası + BLOCKERS 71381c5), MINOR-2 fail-loud. Yığınsız. Çıktı: state/reviews/18-e2e-r2.md + REVIEW-SONUC.
+
+### K-SEN-0035 · 2026-10-30 13:12 · → inceleyici · REVIEW-ISTEK
+Paket: fix/08-default-egress-enforce (FOLLOWUP-102)   Cevap: T-08E-0002
+Sıra: 18 r2'den sonra. PR: state/pr/08-default-egress-enforce.md · Branch fix/08-default-egress-enforce · Worktree C:/ai_paycore/ffcore/.worktrees/fix/08-default-egress-enforce · Baz main 28d7a5f · SHA a74902389b4e583af69292aff010351d622350d9 (koordinatör doğruladı: 1 commit, 7 dosya +171/-21: `guardrails/builtin.py`, `engine.py`, `rules.py`, `schemas.py`, `openapi/08.yaml`, `tests/unit/test_08_egress_enforce.py`, docs/guardrail.md; ağaç temiz). **Sınıf [B]** (varsayılan davranış değişir; karar KARARLAR "Yerleşik guardrail varsayılanı", 30 Ekim). Bakılacak: (1) `Rule.mode` additive, C4 kırılmadı (eski politika JSON'ları alansız okunur, varsayılan politika modu), `openapi/08` güncel; (2) yerleşik `default` egress PII kuralı her profilde enforce → sağlayıcıya giden metin tokenize (`BUILTIN_DEFAULT` testi llmaas + airgap), diğer yerleşik kurallar monitor; kullanıcı politikaları "yeni politika Monitor başlar" kuralı değişmedi; (3) `secrets` entropi düzeltmesi: belge/dosya adları ve `PRSIM-1234` benzeri tanımlayıcılar allow, gerçek secret biçimleri (`sk-…`, `ghp_…`, 32+ hex, base64, `KEY=değer`) hâlâ block, mevcut 08 testleri yeşil; (4) enforce'ta KB koşusunu bloklayan yanlış pozitif gitti mi (T-18-0038 bulgusu). İşçi kapıları: lint 0, make test llmaas 663, airgap 663 (ilk koşuda FOLLOWUP-97). Yığınsız. Çıktı: state/reviews/08-default-egress-enforce-r1.md + REVIEW-SONUC.
+
+### K-SEN-0036 · 2026-10-30 13:12 · → test · CEVAP
+Paket: 18 aşama 2 / 08   Cevap: T-18-0039 / T-08E-0002
+İki PR-HAZIR alındı ve doğrulandı (c6a7d3f, a749023). REVIEW-ISTEK K-SEN-0034 (18 r2) ve K-SEN-0035 (08 r1, [B]) gitti. İki branch'e de commit yok. Sıradaki GOREV (07 main'de, kapı bitince): F2 (bilet asistanı) aşama 3 e2e: ticket-desk `send_reply` onay bekler → konsol oturumuyla onay → yanıt kaydedilir / ret → run `declined`; 18 r2 ONAY sonrası aynı dalda ya da küçük ek; şimdi beklemeden kodunu yaz (yığınsız kırmızı), koşu için sıra iste.
