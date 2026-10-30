@@ -251,3 +251,77 @@ Sıra: birim testleri önce kırmızı (modül yok ya da eşleme yok), sonra ye�
 - Next.js rewrite'ın SSE'yi tamponlayıp tamponlamadığı yığında henüz görülmedi (durma koşulu 1). Tamponlarsa önerilen yol K-10bp2-0002'deki seçenek: doğrudan backend portu.
 - 07 incelemesinde onay sözleşmesi değişirse onay ekranı rebase edilir.
 - e2e'lerin hiçbiri henüz koşmadı. Spec'ler tip ve lint temiz, ama gerçek yığında düzeltme gerekebilir.
+
+## Son durum: PR-HAZIR (2026-10-30)
+
+**HEAD:** `2459133138523b039e687ac3be535aebca175613` · **Baz:** main `d4aebfc` (07 dahil; rebase çakışmasız) · 10 commit, 102 dosya. Dosyaların 41'i `docs/images/*.png`; bunların 16'sı yeni 10bp2 görüntüsü, 25'i eski görüntülerin yeniden üretimi (kenar çubuğunda bu paketin 4 ekranı açıldı). Push yok. Sınıf **[A]**. Backend, compose ve deploy dokunulmadı.
+
+Bu bölüm yukarıdaki "Uygulama (HEAD cc52c77)" durum tablosunun yerine geçer.
+
+### Kararlar (K-10bp2-0002..0006)
+
+- D1, D2, D3 **A**.
+- FOLLOWUP-100 (analist araç okuması, isci-b).
+- `fix/fake-llm-tool-mode` main'de; kabul 2 artık koşuyor.
+- FOLLOWUP-105 (06a tanım kodu 422'de kayboluyor, isci-a): `test_10bp2_3` bilerek kırmızı.
+- K-INIT-0020: her yığın kendi portunu verir.
+
+### Kabul kriteri → test (HEAD c836320'de tam koşu; 2459133 yalnız docs/görüntü ekler)
+
+| # | Test | Durum |
+|---|---|---|
+| 1 | `test_10bp2_1_tool_crud_and_errors` | geçti |
+| 2 | `test_10bp2_2_discover_actions_invoke` | geçti |
+| 3 | `test_10bp2_3_agent_wizard_lifecycle` | **açık kırmızı, ürün bulgusu FOLLOWUP-105**: kaydetme `variable_undefined` yerine `validation_error` dönüyor. Kod kontrolü `expect.soft`; oluşturma, eksik model, yer tutucu ipucu, kaydet, yayınla, salt okunur yayın, yeni taslak, geri alma adımları aynı koşuda geçti (tek hata o kontrol) |
+| 4 | `test_10bp2_4_contract_assistant_cited` (brief kabul 1) | geçti: analist, 13a PDF'i, test paneli, kaynak kartı |
+| 5 | `test_10bp2_5_inline_approval` (brief kabul 2) | geçti: onayla, ticket-desk `send_reply` 1 kayıt; reddet, koşu biter, kayıt artmaz. `approval_required` olayının `approval_id` taşıdığı bununla **doğrulandı** |
+| 6 | `test_10bp2_6_sse` (Vitest 8) | geçti. e2e kopma testi yok (plandan sapma, yukarıda) |
+| 7 | `test_10bp2_7_runs_list_detail` | geçti |
+| 8 | `test_10bp2_8_run_feedback` (F9) | geçti |
+| 9 | `test_10bp2_9_approvals_queue` (2 test) | geçti: boş kuyruk; liste, rozet, read `can_decide` false, onay, ikinci karar 409 `approval_not_pending` |
+| 10 | `test_10bp2_10_read_only` (brief kabul 4) | geçti |
+| 11 | `test_10bp2_11_roles` (2 test, brief kabul 5) | geçti. Developer görünümü NOT_RUN: fixture'da developer yok (A3). Analist araç seçimi NOT_RUN: FOLLOWUP-100 |
+| 12 | `test_10bp2_12_screens_themes_axe` (8 ekran × 2 tema) | geçti, axe 0 ihlal. Görüntüler `docs/images/10bp2-*` (16) |
+| 13 | `test_10bp2_13_query_failures` | geçti |
+| 14 | `test_10bp2_14`, `test_10bp2_17` (Vitest) | geçti |
+| 15 | `check:api` (03a/04a/05a/06a/07) + `test_10bp2_16/18/19` + i18n | geçti |
+| — | Brief kabul 3 (iki modlu ekran görüntüsü karşılaştırması) | kapsam dışı, 10c (A3). Lighthouse FOLLOWUP-37 |
+
+### Çalıştırılan komutlar
+
+Tam çıktılar oturum scratchpad'inde tee ile alındı, depoya girmedi.
+
+| Komut | Ortam | Exit | Sonuç |
+|---|---|---|---|
+| `npm run check:api`, `eslint .`, `tsc --noEmit`, `vitest run` | `node:20.19.5-alpine`, `--network none`, c836320 | 0 / 0 / 0 / 0 | 142/142 |
+| `next build` | aynı, 1fb0d20 | 0 | 23 rota |
+| `compose -p 10bp2 --profile test build` + `up -d --wait` | `FFCORE_VERSION=0.0.0-10bp2` | 0 / 0 | 18 servis healthy |
+| `tools make seed-prompts`, `create-superadmin` | | 0 / 0 | `platform_rules` oluştu |
+| e2e aşama 1 `--grep @model-missing` | `FAKE_EMBED=0` | 1, sonra 0 | 1. koşu `test_10bp1_10` `page.goto` 30 s zaman aşımı (kenar çubuğu logosu `_next/image` cevapsız; nedeni **doğrulanmadı**, iki yığın aynı anda açıktı); tekrar koşu 1/1, 4,4 s |
+| e2e aşama 2, ilk tam koşu | `FAKE_EMBED=1`, 1eb9fe4 | 1 | 126 geçti / 11 düştü (hepsi test_10bp2; nedenler aşağıda) |
+| e2e aşama 2, son tam koşu | `FAKE_EMBED=1`, c836320 | 1 | **136 geçti / 1 düştü** (`test_10bp2_3`, FOLLOWUP-105) |
+| `compose ... down -v` | | 0 | konteyner 0, volume 0 |
+
+İlk tam koşuda düşen 11 testin nedenleri, hepsi c836320'de düzeltildi:
+
+1. Testlerin sağlayıcısı fake-llm'i 11434'te arıyordu, fake-llm sohbeti 9999'da veriyor. 9 run `model_unavailable` ile düştü. Bu 4, 5, 7, 8, 9, 10 ve 12'deki onay ayrıntısını düşürdü.
+2. Aksiyon anahtarı sunucu durumunu izliyor; `check()` beklemiyordu, test tıklayıp bekliyor.
+3. Filtresiz `/runs` istek kalıbı tutmuyordu.
+4. Sözleşme sorusu İngilizceydi; FAKE_EMBED'in sahte reranker'ı kelime örtüşmesi sayıyor, `no_sources` oldu.
+5. Onay satırı seçicisi fazla genişti.
+6. **Ürün düzeltmesi:** kaydırılabilir `<pre>` blokları klavyeyle odaklanamıyordu (axe `scrollable-region-focusable`); altısına `tabIndex={0}` eklendi.
+
+### Varsayımlar (yukarıdakileri günceller)
+
+1. 07 tipleri artık `openapi/07.yaml`'dan üretiliyor. Elle yazılmış tip kalmadı.
+2. `approval_id` SSE verisinde var; `test_10bp2_5` ile doğrulandı.
+3. Langfuse iz kimliği metin olarak gösteriliyor, bağlantı yok (önyüzde Langfuse adresi yapılandırması yok).
+4. e2e.env örtüsü main'de yok (18e2e dalında). Belgelenen `export` deseni kullanıldı. `ALLOWED_INTERNAL_HOSTS` = `.env.test` listesi + `fake-llm`. `fake-llm`'i backend doğrudan yalnız sağlayıcı bağlantı testlerinde (10af) çağırıyor; agent koşuları LiteLLM üzerinden gidiyor.
+5. Yığın 8000/3000 ile açıldı, port kuralı (K-INIT-0020) koşu başladıktan sonra geldi. docs/onyuz.md komutları yeni kurala göre `BACKEND_PORT=18010 FRONTEND_PORT=13010` diyor; port dışında koşulanla aynı.
+6. Eski paketlerin 25 görüntüsü yeniden üretildi: kenar çubuğu bu paketle değişti. İçerik değişikliği istenmedi, yalnız menü.
+
+### Kalan riskler
+
+- FOLLOWUP-105 kapanana kadar sihirbaz tanım hatalarını kodla gösteremiyor. Tanımsız yer tutucu için istemci ipucu var, diğer tanım kodları için yok.
+- Next rewrite üzerinden SSE akışı uçtan uca çalışıyor (4 ve 5 geçti, onay sonrası `stream_after` ile devam). Olayların tamponlanmadan parça parça gelip gelmediği **ölçülmedi**: fake-llm cevabı kısa olduğu için tamponlama bu testlerde görünmez. Gerçek modelle uzun akışta kontrol edilmeli (13b ya da sunucu).
+- Aşama 1'in ilk koşusundaki zaman aşımının nedeni doğrulanmadı; tek seferlik, tekrar etmedi.

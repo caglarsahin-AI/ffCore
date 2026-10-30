@@ -813,3 +813,23 @@ Tohum 11, 4000 örnek, host py3.12, dal dokunulmadı:
 | küçük 5x3 (19) | 0 / 0 % | 100 / 0 % |
 | BÜYÜK 5x3 (19) | 0 / 0 % | 100 / 0 % |
 Sonuç: 19 karakter ENTROPY_MIN_CHARS 24'ün altında, tabanda da yakalanmıyor. Muafiyetin %100 olması sonucu değiştirmiyor (uzunluk eşiği zaten taramıyor). FOLLOWUP-106 kapsamında. 08 dalına dokunmadım; 18e2e koşusu sürüyor.
+
+### T-18-0044 · 2026-10-30 14:24 · → koordinator · DURUM + KARAR-GEREK (yığın açık)
+Paket: 18 senaryolar (gerçek seed + F2 aşama 3)   Cevap: K-SEN-0044 / K-SEN-0047
+Koşu 1 (0f7e3bf, 08 öncesi main a257192):
+- Gerçek seed iki kez 0.
+- 31 passed, 3 failed (bilinen: f10_4, f10_7, f4_1c), 24 skipped.
+- F2 aşama 3: f2_8, f2_9, f2_10 GEÇTİ (kuyruk, konsol onayı → tek yanıt + 409, ret → gönderim yok + model bilgilendi); f2_10b NOT_RUN gerçek model.
+Koşu 2 (6deb0c1'e rebase, temiz yığın, seed'deki secrets=log geçici ayarı kaldırıldı → hastane-a'da tüm yerleşik kurallar enforce):
+- 30 passed, 4 failed, 24 skipped.
+- **f4_1c YEŞİL** (yerleşik varsayılanla ham PII yok: 08 düzeltmesi uçtan uca kanıtlı).
+- F1 / F2 / F3 KB koşuları enforce secrets'la bloklanmadı (belge adı yanlış pozitifi gitti).
+- Kalan kırmızılar: f10_4 (FOLLOWUP-103), f10_7 (breadcrumb).
+- YENİ: f11_5[P3] ve [P5] → run failed guardrail_block. Kayıt: egress secrets#0 API_TOKEN "high entropy 5.2 bits/char".
+  Kaynak P5'in base64 kodlu talimatı: gerçek bir sır biçimi, kural doğru çalışıyor. P3 yan etki: zehirli KB'de 5 belge birlikte, P3 sorusunun kaynaklarına P5 parçası da giriyor.
+
+KARAR-GEREK (secrets enforce, getirilen parçada kodlu blob):
+- **A (öneri)** seed hedef projede secrets'i yine "log" yapar; gerekçe artık belge adı değil zehirli/kodlu içerik. F11 veri çerçevesini sınar. Bulgu FOLLOWUP: secrets enforce'ta tek bir kodlu blob tüm cevabı blokluyor; 08 tam için öneri kaynak başına maskeleme/eleme.
+  Etki: aşama 2 tablosu önceki gibi; f4_1c kanıtı korunur.
+- **B** tam enforce kalır; F11'de P5 ve aynı KB'den onu getiren sorular için beklenen sonuç guardrail_block (savunma daha sert). Etki: P3'ün yan etkiyle bloklanması "beklenen" diye kodlanır.
+Cevaba kadar yığın açık. Yorum: B'de kullanıcı aynı KB'deki masum sorularda da blok görür.

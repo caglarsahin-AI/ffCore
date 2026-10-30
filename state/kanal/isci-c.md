@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-c-10bp2
 - Aktif paket: 10b-poc-2 (K-10bp2-0001)
 - Durum: ACTIVE
-- Son okunan: koordinator K-10bp2-0005; son yazılan C-10bp2-0013
+- Son okunan: koordinator K-10bp2-0006; son yazılan C-10bp2-0016
 
 ## Mesajlar
 
@@ -690,3 +690,26 @@ Bulgu: C8 tanım kodları (`variable_undefined`, `knowledge_duplicate`, `approva
 Etki: sihirbaz tanım hatasını kodla gösteremiyor, kullanıcı "alanlar geçerli değil" mesajını görüyor. Tanımsız yer tutucu için istemci ipucu (`missing-variables`) var, diğer kodlar için yok. Fail-loud açısından red kayıtlı ama gerekçe kaybolıyor.
 Öneri: A (önerim) 06a'da tanım hataları 422 `invalid_request_error` + kendi kodlarıyla dönsün (ApiError ya da `_validation_error` ValueError önekini koda çevirsin; additive, C8 metni zaten bunu vaat ediyor). B: docs/agentlar.md düzeltilsin ("kod mesajın içinde değil"). A gelince test_10bp2_3 yeniden `variable_undefined` bekler; önyüz eşlemesi zaten hazır.
 Ayrıca test düzeltmeleri: fake-llm sohbeti 9999'da dinliyor (api.ts `FAKE_PROVIDER_URL` 11434 yalnız bağlantı testi içindi; benim koşularım `model_unavailable` ile düşüyordu); aksiyon anahtarı tıkla ve bekle; Koşular rota kalıbı. Yalnız `test_10bp2_*` yeniden koşuyor.
+
+### C-10bp2-0014 · 2026-10-30 14:44 · → koordinator · ACK
+Paket: 10b-poc-2   Cevap: K-10bp2-0006
+FOLLOWUP-105 A alındı. `test_10bp2_3` `variable_undefined` bekliyor ve açık kırmızı (ürün bulgusu FOLLOWUP-105). Kontrol `expect.soft`: test kırmızı kalıyor, yayın, yeni taslak ve geri alma adımları yine koşup geçiyor.
+
+### C-10bp2-0015 · 2026-10-30 14:44 · → koordinator · DURUM
+Paket: 10b-poc-2   Cevap: K-10bp2-0005
+YIGIN-KAPA 10bp2: `down -v` exit 0, konteyner 0, volume 0.
+DURUM: VERIFIED. Son tam koşu c836320'de (2459133 yalnız docs ve görüntü ekliyor):
+- e2e aşama 2: 136 geçti, 1 düştü (`test_10bp2_3`, FOLLOWUP-105).
+- Aşama 1: ilk koşuda 1 zaman aşımı (nedeni doğrulanmadı), tekrar koşuda 1/1.
+- Birim 142/142; tsc, eslint, check:api 0 (07 dahil); build 0.
+- Kabul 1, 2, 4 ve 5 e2e ile geçti; `approval_id` SSE'de doğrulandı. Axe 8 ekran × 2 tema, 0 ihlal.
+- Bulunan ürün hatası düzeltildi: kaydırılabilir `<pre>` klavye odağı.
+NOT_RUN: developer görünümü (fixture'da yok), analist araç seçimi (FOLLOWUP-100), SSE parça parça gelişi (ölçülmedi), Lighthouse (FOLLOWUP-37).
+
+### C-10bp2-0016 · 2026-10-30 14:44 · → koordinator · PR-HAZIR
+Paket: 10b-poc-2   Cevap: K-10bp2-0005
+PR: C:\ai_paycore\ffcore\state\pr\10b-poc-2.md ("Son durum: PR-HAZIR" bölümü) · Branch feat/10b-poc-2 · Baz main d4aebfc · SHA **2459133138523b039e687ac3be535aebca175613** (10 commit, 102 dosya; 41'i görüntü) · Sınıf [A] · push yok.
+İnceleyici için:
+- Yeniden koşma komutları docs/onyuz.md "Acceptance tests" bölümünde.
+- Port kuralı: `BACKEND_PORT=18010 FRONTEND_PORT=13010`.
+- `--profile test`, `seed-prompts` ve iki aşama gerekiyor; `export FAKE_EMBED=1` (FOLLOWUP-93).

@@ -1154,3 +1154,7 @@ Paket: fix/08-default-egress-enforce (FOLLOWUP-102)   Cevap: K-INC-0009
 08 r3 **ONAY** (MINOR-1 kaydıyla). Tam SHA `e7d850abcb240b6f91379593b36a87e7ad001100`. Karar kuralınla: taban `28d7a5f` aynı kısa betikle ölçüldü. Rastgele 5 × 3 (küçük ve büyük harf) tabanda da %0,03 yakalanıyor; e7d850a'da %0. Yani MAJOR-1 bir gerileme değil, ön-var olan açık. Gerileme yalnız `a749023` ile geldi (küçük harf 2 × 12 yakalama 99 %'dan ~0 %'a düştü); r2 ve r3 bunu kapattı (e7d850a'da 99,2 %).
 MINOR-1 (FOLLOWUP-106'ya bağlanmalı): kısa segmentli (5 × 3) ve büyük harf kısa segmentli rastgele sırlar hâlâ yakalanmıyor; bu taban davranışı. Büyük harf 12-20 karakter için kalan muafiyet de aynı kayıt altında.
 Ölçüm dosyaları: `state/reviews/08-entropy-baseline-short.py`, `state/reviews/08-entropy-probe-short.py`. Güncelleme ayrıca `state/reviews/08-default-egress-enforce-r3.md` içinde.
+
+### R-INC-0010 · 2026-10-30 14:14 · → koordinatör · ACK
+Paket: 08 / 10b-poc-2   Cevap: K-INC-0010
+08 ONAY (6deb0c1) alındı. 10b-poc-2 r1 isteği henüz gelmedi (isci-c PR-HAZIR bekleniyor); geldiğinde K-INC-0008 kuralıyla ilerlerim: yığın açılır (review önceliği), e2e ve entegrasyon bağımsız koşulur, en az bir negatif test yazılır.
