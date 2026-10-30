@@ -359,13 +359,13 @@ def seed_agents(admin: Client, projects: dict, ids: dict[str, str]) -> None:
 
 
 def seed_guardrails(admin: Client, ids: dict[str, str]) -> None:
-    """The target project's `default` policy: the built-in rules in enforce mode, so PII leaves
-    tokenized (F4). The built-in policy is monitor (08-lite): it records the tokenization but
-    sends the text as it is (K-SEN-0029: becomes enforce, fix/08-default-egress-enforce); the
-    other project keeps it, and test_18_f4_1c shows the leak until that fix.
-    The secrets rule only logs here: its entropy check flags document file names
-    (`SZL-2025-003_temizlik-hizmet.txt` → API_TOKEN) and would block every KB run in enforce
-    (finding T-18-0038). A same-key row overrides the built-in policy."""
+    """The target project's `default` policy: the built-in rules in enforce mode, the secrets
+    rule only logging. The poisoned documents (F11) carry an encoded instruction (P5, base64)
+    that the secrets rule rightly takes for a token; enforced, one such chunk blocks every
+    answer that retrieves it, P3's included (K-SEN-0048 A; whole-answer block → FOLLOWUP-107,
+    per-source masking in 08 full). Document names no longer trip it since the 08 fix. The
+    other project keeps the built-in policy, whose egress PII rule is enforced (test_18_f4_1c).
+    A same-key row overrides the built-in policy."""
     base = f"/projects/{ids[TARGET]}/guardrail-policies"
     current = admin.find(base, "default")
     if current is None:
