@@ -7,8 +7,7 @@ from pathlib import Path
 
 import httpx
 import pytest
-
-from tests.e2e.scenarios.conftest import FAKE_LLM_URL, Api, load
+from scenarios.conftest import FAKE_LLM_URL, Api, load
 
 HERE = Path(__file__).resolve().parent
 PROJECT = "hastane-a"

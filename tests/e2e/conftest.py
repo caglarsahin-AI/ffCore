@@ -7,7 +7,7 @@ call phase, or from setup when the test never got there (a skip or an error in a
 
 from pathlib import Path
 
-from tests.e2e import ftable
+import ftable  # tests/e2e is on sys.path (rootdir-based import, no __init__)
 
 _RESULTS: list[ftable.Result] = []
 

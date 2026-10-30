@@ -7,8 +7,7 @@ import uuid
 
 import httpx
 import pytest
-
-from tests.e2e.scenarios.conftest import BACKEND_URL, load
+from scenarios.conftest import BACKEND_URL, load
 
 from .conftest import PROJECT
 
@@ -56,7 +55,11 @@ def test_13b_neg_access_1_read_member_cannot_change_anything(login, answered_run
         a for a in owner.get(f"{base}/agents").json()["items"] if a["key"] == "sozlesme-asistani"
     )
     attempts = {
-        "create knowledge base": ("POST", f"{base}/knowledge-bases", {"json": {"key": "neg-kb", "name": "x"}}),
+        "create knowledge base": (
+            "POST",
+            f"{base}/knowledge-bases",
+            {"json": {"key": "neg-kb", "name": "x"}},
+        ),
         "upload document": (
             "POST",
             f"{base}/knowledge-bases/{kb}/documents",
@@ -175,7 +178,9 @@ def test_13b_neg_guard_1_enforced_secrets_rule_stops_the_run_before_the_model(lo
         json={"definition": definition},
     )
     assert put.status_code == 200, put.text
-    published = analyst.post(f"{API}/projects/{pid}/agents/{agent.json()['id']}/publish", json={"version": 1})
+    published = analyst.post(
+        f"{API}/projects/{pid}/agents/{agent.json()['id']}/publish", json={"version": 1}
+    )
     assert published.status_code == 200, published.text
     fake_llm.reset()
     run = analyst.settle(pid, analyst.start_run(pid, key, f"Bu anahtarı kontrol et: {SECRET}"))

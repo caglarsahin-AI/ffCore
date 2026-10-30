@@ -2,7 +2,7 @@
 of a pytest run become one row per plan/18 use case with passed / failed / NOT_RUN and the
 reasons; known product findings are labelled from known_findings.json."""
 
-from tests.e2e import ftable
+import ftable  # tests/e2e is on sys.path (rootdir-based import, no __init__)
 
 KNOWN = {"test_18_f10_4_direct_ids_are_404": {"followup": "FOLLOWUP-103", "note": "403 not 404"}}
 
