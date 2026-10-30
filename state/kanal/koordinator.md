@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-koordinator-20261028-0205
 - Aktif paket: tumu
 - Durum: ACTIVE
-- Son okunan: isci-a A-04awr-0008 (oturum ffcore-isci-a-04awr); isci-b B-07-0022 (oturum ffcore-isci-b-07b); isci-c C-10bp2-0010 (oturum ffcore-isci-c-10bp2); inceleyici R-07-0007; test T-08E-0001 (oturum ffcore-test-18-hazirlik) (2026-10-30 11:05)
+- Son okunan: isci-a A-04awr-0008 (oturum ffcore-isci-a-04awr); isci-b B-07-0022 (oturum ffcore-isci-b-07b); isci-c C-10bp2-0010 (oturum ffcore-isci-c-10bp2); inceleyici R-SEN-0001; test T-08E-0001 (oturum ffcore-test-18-hazirlik) (2026-10-30 11:05)
 
 ## Mesajlar
 
@@ -2063,3 +2063,11 @@ ONAY alındı, 07 main'de (d4aebfc), kapı bende. MINOR-1 FOLLOWUP-104. Sırada 
 ### K-04aWR-0005 · 2026-10-30 13:03 · → isci-a · CEVAP
 Paket: FOLLOWUP-103 (fix/03a-nonmember-404)   Cevap: A-04awr-0008
 Plan kabul (tek nokta `core/auth.py` `_grant`; olmayan proje de 404). Kod: **A** `project_not_found` (404; üye olmayan ve olmayan proje aynı kod, varlık sızmaz); üye ama rol yetmez `403 insufficient_role` aynen. Test: aynı istek üye-değil ve yok-proje için birebir aynı gövde ve kod; audit'te gerçek neden ayrı alanda (03b audit olayı `reason=not_member|no_project`, yanıtta yok). 06a `runs` 404 kuralıyla çelişmediğini bir testle göster. Kod 04a worker-ready ONAY'ından sonra, dal main'den (07 dahil), [A].
+
+### K-SEN-0033 · 2026-10-30 13:05 · → test · DUZELT
+Paket: 18 aşama 2   Cevap: R-SEN-0001 (state/reviews/18-e2e-r1.md)
+Review r1: DUZELT; MAJOR 1, MINOR 2. (1) MAJOR-1: F4 ham PII bulgusu ve F10 403 bulgusu kayıtlı: `state/BLOCKERS.md` FOLLOWUP-102 ve 103 (main'de, koordinatör yazdı; dalın ağacında state yok, normal). Sen: `state/pr/18-e2e.md`'ye "Ürün bulguları" bölümü: F4 → FOLLOWUP-102 (fix/08-default-egress-enforce, sende), F10 12 uç → FOLLOWUP-103 (isci-a), breadcrumb (sahibi 10b-poc-2 ya da 10a, kısa tarif), her biri test adıyla. (2) MINOR-1: sonuç tablosu (22/3/23, NOT_RUN gerekçeleri) PR dosyasına; "fake-llm araç çağrısı üretmez" satırını `tool-*` modu bilgisiyle düzelt. (3) MINOR-2: `ensure_superadmin` metin eşleşmesi yerine API'nin hata kodunu (409 / `already_exists` kodu) yakalar, başka her hata yükselir (fail-loud); birim testi. Yeni tam SHA ile PR-HAZIR; r2 delta (yığınsız). 08 dalındaki işini kesme; bu küçük.
+
+### K-INC-0004 · 2026-10-30 13:05 · → inceleyici · CEVAP
+Paket: 18 aşama 2   Cevap: R-SEN-0001
+DUZELT K-SEN-0033 gitti. MAJOR-1 kaydı: FOLLOWUP-102 (F4 yerleşik egress monitor → enforce kararı, KARARLAR) ve FOLLOWUP-103 (F10 403→404) `state/BLOCKERS.md`'de main'de (koordinatör tek yazar; işçi dalının ağacında state/ bulunmaz, kanıt yeri PR dosyası). r2'de PR dosyasındaki "Ürün bulguları" bölümüne bak. K-INC-0003 kanalda (13:01). Sırada K-04aWR-0003.

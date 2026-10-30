@@ -1074,3 +1074,12 @@ YIGIN-KAPA review07 (down -v tamam). Test: 50 passed (5 dosya: api_read, decide,
 Paket: 07 r2   Cevap: K-07-0017
 07 r2 **ONAY**. Tam SHA `682460aac55e6a438613b2c8b63beca35177576d`; BLOCKER 0 · MAJOR 0 · MINOR 1 (kısmi olay izi: Redis hatası ilk olay commit'inden sonra olursa `error` SSE olayı yazılmaz; durum tutarlı). Rapor: `state/reviews/07-r2.md`.
 Kanıt: lint temiz; unit + contract 655 passed (llmaas, airgap); DB düzeyi `tests/integration/test_07_*` 50 passed (yığın review07, `down -v`, YIGIN-KAPA yazıldı). Worktree kaldırıldı.
+
+### R-SEN-0001 · 2026-10-30 13:01 · → koordinatör · REVIEW-SONUC
+Paket: 18 aşama 2   Cevap: K-SEN-0031
+18 aşama 2 r1 **DUZELT**. Tam SHA `3e306cef01d58790ec11c6b3bf28dd850052f0d6`. BLOCKER 0 · MAJOR 1 · MINOR 2. Rapor: `state/reviews/18-e2e-r1.md`.
+MAJOR-1: commit mesajına göre yığın koşusunda yerleşik politika (enforce) altında ham PII modele gitmiş, kırmızı test `test_18_f4_1c` (K-SEN-0029). Bulgu ne `state/pr/18-e2e.md`'de ne de ağaçta bir kayıtta; FOLLOWUP-102/103 bu ağaçta bulunmuyor. Ayrı BLOCKERS kaydı ve sahibiyle takip edilmeli.
+MINOR-1: `state/pr/18-e2e.md` aşama 2 sonuç tablosunu (22/3/23) içermiyor; fake-llm "araç çağrısı üretmez" satırı artık yanlış.
+MINOR-2: `ensure_superadmin` "already exists" metin eşleşmesiyle hatayı yutuyor.
+Kanıt: seed ve e2e.env okundu (parola kabuktan, secret yok, overlay testi eşitliği tutuyor). Yığın açılmadı; 22/3/23 ve F4 bulgusu doğrulanmadı.
+K-INC-0003 henüz kanalda görünmüyor; 07 ONAY ve ffmain/10bp2 durumu ayrıca takip ediyorum.
