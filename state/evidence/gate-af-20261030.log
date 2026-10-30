@@ -98,4 +98,57 @@ samples exit=0
 ........................................................................ [ 13%]
 ........................................................................ [ 26%]
 ........................................................s............... [ 40%]
-...s..........s.............
+...s..........s......................................................... [ 53%]
+.....................s.................................................. [ 67%]
+........................................................................ [ 80%]
+........................................................................ [ 94%]
+................................                                         [100%]
+=============================== warnings summary ===============================
+tests/integration/test_04a_worker.py::test_04a_upload_job_runs_in_worker
+tests/integration/test_04a_worker.py::test_04a_job_for_missing_row_retries_then_fails_loud
+  /opt/venv/lib/python3.12/site-packages/arq/worker.py:877: DeprecationWarning: Call to deprecated close. (Use aclose() instead) -- Deprecated since version 5.0.1.
+    await self.pool.close(close_connection_pool=True)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+SKIPPED [1] tests/integration/test_03b_egress_dns.py: NOT_RUN: needs RUN_DNS_TESTS=1
+SKIPPED [1] tests/integration/test_04a_ingest.py:124: NOT_RUN: needs RUN_MODEL_TESTS=1
+SKIPPED [1] tests/integration/test_04a_ingest.py:279: NOT_RUN: needs RUN_MODEL_TESTS=1
+SKIPPED [1] tests/integration/test_05a_sql.py:288: NOT_RUN: needs RUN_MODEL_TESTS=1
+532 passed, 4 skipped, 2 warnings in 433.01s (0:07:13)
+test-int exit=0
+
+=== 22:57:10 smoke
+python scripts/smoke.py
+ok    backend /healthz 200
+ok    litellm /health/liveliness 200
+ok    langfuse /api/public/health 200, /api/public/projects 200
+ok    mcp-search /healthz 200
+ok    mcp-sql /healthz 200
+ok    skipped: ollama profile inactive
+smoke: passed
+smoke exit=0
+
+=== 22:57:21 frontend lint/typecheck/check:api (node, --network none, repo root)
+
+> ffcore-frontend@0.1.0 lint
+> eslint
+
+
+> ffcore-frontend@0.1.0 typecheck
+> tsc --noEmit
+
+
+> ffcore-frontend@0.1.0 check:api
+> node scripts/check-api.mjs
+
+API contract drift:
+- lib/api/schema-05a.d.ts is not the output of openapi-typescript for ../backend/openapi/05a.yaml
+Run: npm run gen:api
+frontend exit=1
+
+=== 22:57:59 down -v
+ Volume ffmain_postgres_data  Removed
+ Volume ffmain_langfuse_clickhouse_logs  Removed
+
+=== 22:58:22 done

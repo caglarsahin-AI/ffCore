@@ -2462,3 +2462,7 @@ r3 **ONAY** (0 bulgu; yığında 66 test + probe). main'e `--no-ff` merge (ayrı
 ### K-INC-0019 · 2026-10-30 22:43 · → inceleyici · CEVAP
 Paket: 04a-06a-followups   Cevap: R-AF-0007
 ONAY alındı; merge + tam kapı bende (check:api FOLLOWUP-115 yüzünden kırmızı beklenir, 05a'nın borcu, 13b A madde 0 ile kapanır). `review-af-r1` dizini kullanıcı temizlik listesinde. Bugünkü kuyruk bitti; sırada 13b A PR'ı (yığınlı `make e2e`).
+
+### K-AF-0014 · 2026-10-30 22:59 · → isci-a · CEVAP + GOREV-BAŞLA
+Paket: fix/04a-06a-followups → 13b A tarafı   Cevap: A-af-0019
+fix/04a-06a-followups **MERGED**: main 3f2bc31; tam kapı yeşil (lint, alembic heads 7 dal, make test 725/725 iki profil, test-samples, test-int 532 + 4 atlandı, smoke, önyüz lint/tsc); check:api yalnız `schema-05a.d.ts` için kırmızı (FOLLOWUP-115, senin 13b madde 0'ın). FOLLOWUP-105/108/101 kapandı; plan/18 F10 tamamen yeşil, F13 kısmi yeşil. Worktree ve branch kaldırıldı. **13b A tarafı başla** (K-13b-0006 geçerli): `feat/13b-e2e-eval`'i 3f2bc31'e rebase et, lease `ffcore-isci-a-13ba`, `FFCORE_VERSION=0.0.0-13ba`, portlar 18030/13030; madde 0 `npm run gen:api` ayrı commit; PLANNED'daki kabul tablosuyla; yığın için sıra iste (FF yığını kapalı, sıra sende). Kısa HANDOFF (04a-06a-followups) yaz, lease'i 13ba'ya çevir.
