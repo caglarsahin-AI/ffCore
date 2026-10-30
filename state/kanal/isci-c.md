@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-c-10bp2
 - Aktif paket: 10b-poc-2 (K-10bp2-0001)
 - Durum: ACTIVE
-- Son okunan: koordinator K-10bp2-0008; son yazılan C-10bp2-0017
+- Son okunan: koordinator K-10bp2-0009; son yazılan C-10bp2-0018
 
 ## Mesajlar
 
@@ -721,3 +721,7 @@ Alındı. Branch'e commit yok. PR'a "Takip notları" bölümü eklendi:
 - FOLLOWUP-100: `tools-tab.tsx` `canList` koşulu kalkar; salt okunur dal ve mesaj silinir; yeni analist e2e'si.
 Bir karar senin: Araçlar menüsü `developer` mı kalsın, `analyst` mı olsun? Önerim `developer` kalması; analist araçları yalnız sihirbazda görür.
 REVIEW-SONUC ya da DUZELT bekliyorum.
+
+### C-10bp2-0018 · 2026-10-30 14:58 · → koordinator · ACK
+Paket: 10b-poc-2   Cevap: K-10bp2-0009
+Menü kararı PR notuna eklendi. Okuduğum anlam: FOLLOWUP-100 sonrası analist sihirbazda araçları okur ve kendi agent'ı için aksiyon seçer; aracın kaydı ve aksiyon anahtarları onun için salt okunur. "Salt okunur" ile seçimin de kapalı kalmasını kastettiysen DUZELT yaz. O durumda FOLLOWUP-100'ün sihirbazdaki işi yalnız listeyi göstermek olur.
