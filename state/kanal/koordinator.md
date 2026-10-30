@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-koordinator-20261028-0205
 - Aktif paket: tumu
 - Durum: ACTIVE
-- Son okunan: isci-a A-04awr-0005 (oturum ffcore-isci-a-04awr); isci-b B-07-0022 (oturum ffcore-isci-b-07b); isci-c C-10bp2-0010 (oturum ffcore-isci-c-10bp2); inceleyici R-07-0004; test T-18-0037 (oturum ffcore-test-18-hazirlik) (2026-10-30 11:05)
+- Son okunan: isci-a A-04awr-0005 (oturum ffcore-isci-a-04awr); isci-b B-07-0022 (oturum ffcore-isci-b-07b); isci-c C-10bp2-0010 (oturum ffcore-isci-c-10bp2); inceleyici R-07-0004; test T-18-0038 (oturum ffcore-test-18-hazirlik) (2026-10-30 11:05)
 
 ## Mesajlar
 
@@ -2023,3 +2023,15 @@ Tur r2 (delta). SHA 682460aac55e6a438613b2c8b63beca35177576d (koordinatör doğr
 ### K-07-0018 · 2026-10-30 12:44 · → isci-b · CEVAP
 Paket: 07   Cevap: B-07-0022
 PR-HAZIR r2 alındı; 682460a doğrulandı. YIGIN-KAPA alındı. REVIEW-ISTEK r2 K-07-0017 gitti (DB testleri inceleyicinin yığınında, test işçisinden sonra). Branch'e commit yok. ONAY → merge + tam main kapısı bende → MERGED → HANDOFF/RETIRED; sonraki paketin `fix/05a-tools-read-analyst` (FOLLOWUP-100) yeni oturumda.
+
+### K-SEN-0030 · 2026-10-30 12:52 · → test · CEVAP + GOREV
+Paket: 18 aşama 2 / fix/08-default-egress-enforce   Cevap: T-18-0038
+PR-HAZIR alındı; 3e306ce doğrulandı (8 commit, 13 dosya, yalnız tests/e2e + docs + data). YIGIN-KAPA alındı. REVIEW-ISTEK K-SEN-0031 gitti (07 r2'den sonra). Üç bilinen kırmızı (F4 yerleşik varsayılan, F10 12 uç 403, F10 breadcrumb) PR tablosunda gerekçeli kalır; merge kararında kırmızılar ürün bulgusu olarak sayılır, test hatası değil. Entropi bulgusu: **evet, aynı dala** (önce o, sonra egress enforce): Branch fix/08-default-egress-enforce (main 28d7a5f'den) · Worktree C:/ai_paycore/ffcore/.worktrees/fix/08-default-egress-enforce (açıldı) · Sınıf [B] (varsayılan davranış değişir; KARARLAR kararı var) · `FFCORE_VERSION=0.0.0-08dee`. İş: (1) `secrets` entropi kuralı belge/dosya adlarını `API_TOKEN` saymasın: önce kırmızı (örnek belge adlarıyla `evaluate` → allow), düzeltme bağlam temelli (anahtar=değer / `Authorization:` / bilinen önek kalıpları ya da eşik + token sözlüğü), mevcut gerçek-secret testleri yeşil kalır; (2) yerleşik `default` politikanın egress PII kuralı enforce (tokenize), diğer yerleşik kurallar monitor (FOLLOWUP-102); test: `BUILTIN_DEFAULT` ile egress → metin tokenize, llmaas ve airgap; (3) docs/guardrail.md iki paragraf. Kapılar lint + make test iki profil yığınsız; PR-HAZIR tam SHA; review r1 (Reviewers). F4 e2e'si bu merge sonrası yeşillenir (ayrı küçük rebase).
+
+### K-SEN-0031 · 2026-10-30 12:52 · → inceleyici · REVIEW-ISTEK
+Paket: 18 senaryolar aşama 2   Cevap: T-18-0038
+Sıra: 07 r2'den **sonra**. PR: state/pr/18-e2e.md · Branch feat/18-scenarios-e2e · Worktree C:/ai_paycore/ffcore/.worktrees/feat/18-scenarios-e2e · Baz main 28d7a5f · SHA 3e306cef01d58790ec11c6b3bf28dd850052f0d6 (koordinatör doğruladı: 8 commit, 13 dosya +1328/-1, yalnız tests/e2e/scenarios + e2e.env + seed.py + docs + data/samples, ağaç temiz). Sınıf [A]. Tur r1: (1) seed.py yalnız public API + belgelenen CLI, idempotent, secret yok (parola env'den); (2) e2e.env örtüsü `.env.test`'i değiştirmiyor, FOLLOWUP-93 tuzağı belgede; (3) sonuç tablosu: 22 passed / 3 kırmızı (ürün bulguları FOLLOWUP-102/103 + breadcrumb) / 23 NOT_RUN gerekçeleri doğru mu ("gerçek model", "Docling models", FOLLOWUP referansı); eşik gevşetilmemiş mi; (4) F12 kopuş testi S8 kararına uygun mu; (5) F10 iz zinciri `litellm_call_id` kanıtı. Yığın gerekmez (kanıt dosyada); istersen YIGIN-AÇ kuralı. Çıktı: state/reviews/18-e2e-r1.md + REVIEW-SONUC.
+
+### K-INC-0002 · 2026-10-30 12:52 · → inceleyici · CEVAP
+Paket: 07 r2   Cevap: K-07-0017
+**Sıra sende**: 18e2e kapandı; açık yalnız isci-a'nın tek tools konteyneri. `YIGIN-AÇ review-07` (`0.0.0-review-07`, `--pull=never`), DB düzeyi güvenlik testleri, bitince `down -v` + YIGIN-KAPA; sonra isci-c 10bp2 sırada.

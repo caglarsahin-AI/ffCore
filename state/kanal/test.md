@@ -681,3 +681,30 @@ Ek gözlem: metin katmanlı PDF'ler Docling'siz indeksleniyor; yalnız .docx .tx
      - **A (öneri)** llmaas'ta yerleşik politikanın egress kuralı enforce: tokenize her zaman uygulanır; monitor yalnız gözlem kuralları için kalır. Etki: 08 değişikliği; güvenli varsayılan.
      - **B** monitor kalsın, kurulum belgesi ve readiness kontrolü enforce politika istesin. Etki: belge + 03a/readiness; yanlış kurulumda sızıntı riski sürer.
 2. **F10 üye olmayan proje kaynağı 403 insufficient_role** (en azından KB listesi), plan 404 bekliyor (varlık sızmaz). Test artık tüm yolları toplayıp listeliyor; tam liste temiz koşuda. Sahibi muhtemelen 03a (üyelik kontrolü). DUZELT önerisi tam listeyle gelecek.
+
+### T-18-0038 · 2026-10-30 12:50 · → koordinator · YIGIN-KAPA 18e2e + PR-HAZIR
+Paket: 18 senaryolar aşama 2   Cevap: K-SEN-0027 / K-SEN-0029
+feat/18-scenarios-e2e @ 3e306cef01d58790ec11c6b3bf28dd850052f0d6 (28d7a5f üstünde). Yığın down -v, konteyner 0.
+
+Son koşu: 22 passed, 3 failed (bilinen ürün kırmızıları), 23 skipped NOT_RUN gerekçeli. Seed iki kez 0 (idempotent). Lint temiz. Tablo state/pr/18-e2e.md'de.
+
+Geçenler:
+- F1 sources ve SOURCES bloğu.
+- F3 tek onaylı run_sql; 15/15 yazma reddi, satır sayıları aynı.
+- F2 send_reply onay kapısı (approved/rejected).
+- F4 enforce'ta ham PII yok, iz zinciri ve litellm_call_id dolu.
+- F9 oy, pending görünümü, read 403.
+- F10 liste sızıntısı yok, Langfuse iz zinciri.
+- F11 zehirli metin veri olarak gidiyor.
+- F12 model kapalı → model_unavailable; SSE kopuşu + Last-Event-ID.
+
+Kırmızılar:
+- f4_1c: yerleşik varsayılan ham PII gönderiyor. K-SEN-0029 A; düzeltme fix/08-default-egress-enforce.
+- f10_4: üye olmayana 12/12 uç 403 insufficient_role (tam liste PR'da). FOLLOWUP-103.
+- f10_7 (YENİ): silinen belgenin başlık satırları sources olayındaki breadcrumb'da kalıyor (içerik parçası). Öneri 04a/06a.
+
+YENİ bulgu (öncelikli): secrets entropi kuralı belge adlarını API_TOKEN sayıyor, örnek SZL-2025-003_temizlik-hizmet.txt, 3.9 bit/karakter. Enforce modda her KB koşusu egress'te guardrail_block oluyor.
+- fix/08-default-egress-enforce bunu çözmeden yerleşik politika enforce'a geçerse tüm RAG koşuları düşer.
+- Seed hedef projede secrets'i log yaptı (belgeli).
+- Öneri: 08 DUZELT, bulgu 1 düzeltmesinden önce ya da aynı dalda.
+Sıradaki iş fix/08-default-egress-enforce (sende kararlı); secrets yanlış pozitifini o dala katmamı ister misin?
