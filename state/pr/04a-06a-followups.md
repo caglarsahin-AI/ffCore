@@ -50,6 +50,17 @@
 
 **Plan onayı (K-AF-0002):** S1 **A** (tarih yoksa NULL; yükleme anı asla yerine yazılmaz; PATCH ile verilir). S2 **A** (`"[deleted]"`; önyüz çevirisi FOLLOWUP-112 ile).
 
+## r3: 07-followups ile rebase (K-AF-0010)
+HEAD **a38d45842ea3e9a0aa70a841f75e5829e2254029**, baz main **a3a5553** (a47febe = 07-followups dahil), 5 commit: 54af870 (105), 89d1ca0 (108), 2ad9800 (101), a671fb8 (sınıflandırma kapıları), a38d458 (r1 MAJOR-1 canlı akış maskesi). Önceki SHA'lar (7a982c8…be3449f) rebase ile değişti; içerik aynı, tek fark çakışma çözümü.
+
+**Çakışma çözümü** (yalnız a38d458'de, iki dosya):
+- `backend/ffcore/runtime/events.py` `follow(...)`: 07-followups'un `finished` parametresi ve benim `transform=None` kancam birlikte; docstring ikisini de anlatır. Saklanan-olay bitişi (FOLLOWUP-104: canlı girdi yazılamayınca `replay_rows` ile verilen olaylar) `replay_rows` → `_replay_rows` → `_stored_payloads` yolundan geçtiği için aynı maskeyi alır; canlı Redis girdileri `transform` ile. Yani follow'un verdiği her `sources` olayı maskeli.
+- `backend/ffcore/api/runs.py` `_stream`: `finished=_finished(run_id)` ve `transform=_mask_live_event` birlikte.
+- `backend/tests/unit/test_af_2c_source_mask_paths.py`: `follow` artık zorunlu `finished` ister; testte `_never_finished` saplaması.
+
+**r3 kapıları** (a38d458, yığın `ffcore-af`): `make lint` 0; `make test` llmaas 725/725, airgap 725/725; `make test-int` 532 passed + 4 opt-in atlandı (480 s); inceleyicinin `af-negative-probe.py`'si değiştirilmeden 1 passed (`r3-reviewer-probe.log`). Çıktılar `r3-*.txt`.
+**Ortam notu:** ilk r3 koşusunda `migrate` SyntaxError ile düştü (5 canlı servis testi kırmızı): `ffcore/backend:0.0.0-main` imajı koordinatörün abort edilen merge'ü sırasında çakışma işaretli ağaçtan derlenmişti (`/app/ffcore/runtime/events.py` `<<<<<<< HEAD`). Koordinatöre bildirildi, doğruladı, main imajını yeniden derliyor. r3 kapısı `0.0.0-af` = `0.0.0-main` + `COPY backend/ffcore` (worktree kodu, `--network none`) ile koşuldu; worktree'de çakışma işareti yok (grep).
+
 ## Review r1 bulgu → düzeltme → kanıt (K-AF-0006, state/reviews/04a-06a-followups-r1.md)
 HEAD **be3449fe30749c25d165e7cbc6fb17408735f453** (06de432 üstüne 1 commit `fix(06a): mask deleted sources on the live stream too`; c8650cb üstüne toplam 5).
 

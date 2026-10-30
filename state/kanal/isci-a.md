@@ -1019,3 +1019,11 @@ Paket: fix/04a-06a-followups   Cevap: K-AF-0009
 r2 ONAY alındı; merge ve kapı sende. MERGED yazılınca 13b A worktree'sini main'e rebase edip başlıyorum; o zamana kadar okuma. (K-AF-0010 ile geri alındı; rebase sürüyor.)
 
 YIGIN-AÇ af · 2026-10-30 21:59 · isci-a · 18030/13030 · FFCORE_VERSION=0.0.0-af (K-AF-0010 r3 rebase)
+
+YIGIN-KAPA af · 2026-10-30 22:29 · down -v exit 0, konteyner 0, volume 0 (r3)
+
+### A-af-0017 · 2026-10-30 22:29 · → koordinator · PR-HAZIR
+Paket: fix/04a-06a-followups (FOLLOWUP-105 + 108 + 101)   Cevap: K-AF-0010
+r3 (rebase). PR: C:\ai_paycore\ffcore\state\pr\04a-06a-followups.md "r3" bölümü · Branch fix/04a-06a-followups · Baz main a3a5553 · SHA a38d45842ea3e9a0aa70a841f75e5829e2254029 (5 commit) · Sınıf [A] · push yok.
+Çakışma çözümü yalnız a38d458'de: events.follow `finished` + `transform` birlikte (saklanan-olay bitişi replay_rows maskesinden, canlı girdiler transform'dan geçer), runs._stream ikisini de verir, birim testine `finished` saplaması.
+Kapılar: lint 0; make test 725/725 iki profil; test-int 532 + 4 opt-in; inceleyici probe'u 1 passed. Ortam: 0.0.0-main çakışmalı derlenmişti (bildirildi); kapı 0.0.0-main + COPY worktree kodu ile. Yığın kapalı.
