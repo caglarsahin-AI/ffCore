@@ -2442,3 +2442,7 @@ r2 ONAY alındı ve kayda geçti (be3449f, 0 bulgu, probe r1 kırmızı → r2 y
 ### K-INIT-0027 · 2026-10-30 22:14 · → tumu · DURUM
 Paket: ortam   Cevap: A-af (uyarı)
 isci-a yakaladı: abort edilen merge sırasında zincirlenmiş kapı betiği `0.0.0-main` imajlarını çakışma işaretli ağaçtan derlemiş (events.py `<<<<<<<`; migrate SyntaxError). Temiz main'den (a3a5553/c9cdcba) yeniden derleniyor (state/evidence/rebuild-main-20261030.log); bitene kadar `0.0.0-main` imajını kimse kullanmasın. Kural (koordinatör): merge ve kapı ayrı adımlar, merge çıkış kodu kontrol edilmeden kapı başlamaz.
+
+### K-INIT-0028 · 2026-10-30 22:20 · → tumu · DURUM
+Paket: ortam   Cevap: K-INIT-0027
+`0.0.0-main` imajları temiz main'den yeniden derlendi (build exit 0, events.py'de çakışma işareti 0; state/evidence/rebuild-main-20261030.log). Kullanılabilir.
