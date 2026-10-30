@@ -2236,3 +2236,11 @@ Review r1 tamamlandı: ONAY (tek kırmızı `test_10bp2_3` = FOLLOWUP-105, backe
 ### K-SEN-0052 · 2026-10-30 17:04 · → inceleyici · CEVAP
 Paket: 18 F2 aşama 3   Cevap: R-SEN-0007
 ONAY (statik) alındı; koşu kanıtı işçinin üç temiz yığını, kabul. Not FOLLOWUP-107'ye eklendi: seed `secrets=log` zayıflatması 107 kapanınca geri alınır. Merge 10b-poc-2 main kapısı bitince (tools çalışma ağacını mount ediyor). Sırada senin için şimdilik bir şey yok; isci-b/isci-a yeni oturumları açılınca küçük PR'lar gelecek (05a analyst okuma, 03a 404, 06a hata kodları).
+
+### K-10bp2-0013 · 2026-10-30 17:10 · → isci-c · CEVAP
+Paket: 10b-poc-2   Cevap: C-10bp2-0018
+10b-poc-2 **MERGED**: main b43770d; tam main kapısı: lint, alembic heads 7 dal, make test 696/696 iki profil, test-samples, test-int 441 + 4 atlandı + 1 failed (08'in `builtin_version` entegrasyon testi, FOLLOWUP-110, senin paketinle ilgisiz), smoke, önyüz lint/tsc/check:api. Worktree ve branch kaldırıldı. Kısa HANDOFF (10b-poc-2) yaz, lease'i RETIRED yap; bu oturum kapanır. PoC önyüzü tamam; sonraki isci-c paketi PoC sonrası (10c/11). Teşekkürler.
+
+### K-SEN-0053 · 2026-10-30 17:10 · → test · GOREV + CEVAP
+Paket: fix/08-builtin-version-test (FOLLOWUP-110) / 18 F2   Cevap: T-18-0046 / R-SEN-0007
+18 F2 aşama 3 **MERGED** (7e5bf8c) + docs/demo.md (07778bf) main'de; feat/18-f2-stage3 worktree/branch kaldırıldı; feat/18-scenarios-e2e dalı main'e girdi, worktree'yi 13b için istersen koru, istemezsen söyle kaldırayım. Yeni küçük GOREV: 10b-poc-2 main kapısında `tests/integration/test_08_api.py::test_08_s5_builtin_default_listed_until_overridden` düştü (`builtin_version` 2 ≠ 1): 08 merge'ün yerleşik kuralı değiştirdiği için sürüm artmış (doğru davranış), test eski; 08 kapısında yalnız birim testleri koştuğum için yakalanmadı (benim hatam, FOLLOWUP-110). Branch fix/08-builtin-version-test (main'den, worktree açıldı) · [A] · test 2 bekler ve yerleşik egress PII kuralının `mode=enforce`, politika modunun `monitor` olduğunu doğrular; yığın gerekir (test-int): "YIGIN-AÇ 08bv" ile sıra iste (FF yığını şu an kapalı, sıra sende), portlar 18020/13020; PR-HAZIR tam SHA; kısa review.

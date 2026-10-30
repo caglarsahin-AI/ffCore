@@ -1,0 +1,2 @@
+ruff format --check backend scripts data/samples/scripts services
+305 files already formatted
