@@ -2501,3 +2501,11 @@ Lease: bu oturumun kimliği bilinmiyor; başlık lease'i eski oturumda bırakıl
 ### K-INIT-0030 · 2026-10-31 00:11 · → koordinatör (yeni oturum) · CEVAP
 Paket: koordinasyon   Cevap: K-INIT-0029
 Doğru davranış: kapı bitmeden MERGED yok. Kapı şu an smoke + önyüz adımında (test-int 532 geçti); bitince **ben** (eski oturum) 13b A MERGED kaydını, FOLLOWUP-115 kapanışını, isci-a HANDOFF'unu ve kullanıcıya M3 komutlarını yazacağım, sonra K-HANDOFF-20261031'e "tamam" ekleyip çekileceğim. Lease: o noktadan sonra başlık lease'ini `ffcore-koordinator-20261031` olarak al. `ffmain-worker-1 Restarting` gözlemin doğru ve bilinen: FOLLOWUP-117 (model_cache dış volume bağı), kapıyı etkilemiyor. Okuma açıklarını (WORK_QUEUE/BLOCKERS'ın kalanı, brief'ler) ilk GOREV'den önce kapat; `Read` ile `offset`/`limit` kullanarak parça parça oku. Bugünkü kurallar K-HANDOFF'ta ve hafıza dosyalarında.
+
+### K-13b-0010 · 2026-10-31 00:12 · → isci-a · CEVAP
+Paket: 13b A tarafı   Cevap: A-13b-0007
+13b A **MERGED**: main 3571030; tam kapı yeşil (lint, alembic heads 7 dal, make test 725/725 iki profil, test-samples, test-int 532 + 4 atlandı, smoke, önyüz lint/tsc/check:api 0). FOLLOWUP-115 kapandı; 13b paketi MERGED (A + test); **PoC kod tarafı tamam**. Worktree ve branch kaldırıldı. Kısa HANDOFF (13b A) yaz, lease'i RETIRED yap; bu oturum kapanır. Teşekkürler: bugün 06a (4 tur), 04a worker-ready, 03a 404, 04a-06a demeti ve 13b A; sabah kodu yoktu, akşam PoC bitti.
+
+### K-HANDOFF-20261031-EK · 2026-10-31 00:12 · → koordinatör (yeni oturum) · HANDOFF-EK
+Paket: koordinasyon   Cevap: K-HANDOFF-20261031 / K-INIT-0029
+Kapı yeşil; 13b A MERGED işlendi, FOLLOWUP-115 kapandı, PLAN.md 2.7 satırı ve plan/18 notu eklendi, worktree'ler kaldırıldı. Koşan iş yok; FF yığını kapalı. Kullanıcıya M3 komutları ve yeni test oturumu isteği yazıldı. **Lease artık sende** (`ffcore-koordinator-20261031`); ilk işlerin: isci-a HANDOFF'unu kaydet (RETIRED), kullanıcının yeni test oturumunu (`ROL=test PAKET=13b-kosu`) GOREV'le (F tablosu koşusu `make e2e`, TTL negatif testi `FFCORE_TEST_HOOKS=1` ile, sonuçlar plan/18 Durum'a), PoC sonrası dalga 6 sırasını kullanıcıyla kararlaştır (03c, 06b+116, 11, 04b, 05b, 08 tam+106/107, 09, 10c+112, 12; FOLLOWUP-114 küçük). Eski oturum çekiliyor.

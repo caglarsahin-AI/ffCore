@@ -160,3 +160,7 @@ API contract copies and generated types are current.
 frontend exit=0
 
 === 00:10:36 down -v
+ Volume ffmain_postgres_data  Removed
+ Volume ffmain_knowledge_storage  Removed
+
+=== 00:11:02 done

@@ -260,6 +260,7 @@ Görsel akış tasarımcısı (Flow canvas), alt agent (sub-agent) devri, zamanl
 
 | Sürüm | Tarih | Değişiklik |
 |---|---|---|
+| 2.7 | 30 Ekim 2026 | **PoC kod tarafı tamam (M1-M3 paketleri main'de):** 06a, 07, 10b-poc-2, 13b (make seed/e2e/eval, docs/demo.md), 08 egress enforce, 18 kullanım senaryoları aşama 2-3 (F tablosu `make e2e`); C8/C9/C10 dondu. M3 kapısının kalan yarısı kullanıcıda: PayCore sunucusunda `airgap` profiliyle `make eval` (S1 ≥ %80) ve cpu süreleri (docs/demo.md). Kurallar: iki yığın, projeye özgü port, review yığını, FOLLOWUP demetleri (KARARLAR). |
 | 2.6 | 29 Ekim 2026 | Ürün alt başlığı (kullanıcı kararı): TR "Kurumsal Yapay Zekâ Platformu", EN "Enterprise AI Agent Platform"; "LLM Agent Runtime" slogan değil, "Agent Runtime" yalnız 06 modülü; Türkçe metinde "ajan" yok; başlık buna göre (KARARLAR "Ürün ve pazar") |
 | 1 | 24 Ekim 2026 | İlk plan: 14 paket, airgap (Ollama CPU) varsayılan, Cognipeer benzeri 8 çekirdek özellik |
 | 1.x | 24-26 Ekim | Dağıtım profilleri (2b), hafıza (14), kanallar (15), veri kaynakları (16), PayCore düzeltmeleri D1-D8, K1-K3, P1-P9 işlendi |
