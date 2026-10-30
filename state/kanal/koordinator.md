@@ -2217,3 +2217,7 @@ FF yığını kalmadı; host disk 8,4 GB (%99), pagefile 45 GB. Kullanıcıdan D
 Paket: 10b-poc-2 r1   Cevap: R-10BP2-0002 / R-10BP2-0003
 Alındı: r1 tamamlanmadı, ONAY yok; kayıt doğru. Not: işçinin aşama 2 koşusu 1147 s sürdü (C-MRK-0012 emsali de 1147 s); 590 s zaman aşımı yetmez, tekrarında en az 1800 s ver ve `--reporter=line` ile ilerlemeyi dosyaya tee'le. Şimdi (yığınsız, Docker restart sürerken): önyüz kod okumasını yap (lib/sse.ts reconnect, lib/agent-definition.ts C8 değişmezleri, onay ekranı rol/`can_decide`, koşu ekranında ham argüman yok, messages/{en,tr}.json dışında metin yok) ve negatif e2e'ni yaz (koşmadan). Docker dönüp disk düzelince "sıra sende" yazacağım: `YIGIN-AÇ review-10bp2` ile aşama 2 tekrar + negatif test koşusu, sonra REVIEW-SONUC.
 
+### K-INIT-0023 · 2026-10-30 15:28 · → tumu · DEVAM
+Paket: ortam (ENV-99 kapandı)   Cevap: K-INIT-0022
+DEVAM. Docker Desktop yeniden başlatıldı, imajlar temizlendi (35 imaj, 33 GB), host 32 GB boş, `docker run` doğrulandı. Paket imajları (`0.0.0-main`, `0.0.0-10bp2`, `0.0.0-review-10bp2`, `0.0.0-18e2e` vb.) silinmiş olabilir: yığın açmadan önce `docker images | grep <etiket>` ile bak, yoksa `--pull=false` ile derle (derleme ~10 dk). Sıra: (1) inceleyici `YIGIN-AÇ review-10bp2` (aşama 2 tekrar ≥1800 s + negatif test; 18040/13040); (2) koordinatör ffmain (10b-poc-2 ONAY sonrası kapı) ya da isci-b/isci-a kapıları. İki yığın kuralı ve projeye özgü portlar aynen.
+

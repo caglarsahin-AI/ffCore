@@ -25,3 +25,17 @@ Aşama 2 yeniden koşulmadı: host disk %99 (8,4 GB boş), koordinatörün "yeni
 ## Güvenlik turu
 
 Bu PR'da güvenlik turu istenmedi; API ve akış tarafında yeni kod değil, yalnız önyüz ve belge. Kod okuması yapılmadığı için bu kısım da NOT_RUN.
+
+## Önyüz kod okuması (yığınsız, R-10BP2-0005)
+
+Değişen 102 dosyanın önyüz kısmı (`git show :...`, ana tabanına göre): dangerouslySetInnerHTML, localStorage, innerHTML, eval, window.open taraması temiz; sabit renk sınıfı (bg-white, text-gray-*, #fff/#000) yok.
+Yazma kontrolü: onay düğmeleri `can_decide` ile devre dışı (`approvals/[approvalId]/page.tsx` 72, 120), `WriteGate` ile sarılmış (test paneli onayı dahil); çalıştırma ve geri bildirim formu `fieldset disabled={!canWrite}`. Bu yalnız önyüz; sunucu tarafı 403 kontrolü 07 r2'de yığın testleriyle doğrulandı.
+Bulgu (önyüz): yok.
+
+## Negatif e2e (yazıldı, koşulmadı)
+
+`state/reviews/10b-poc-2-r1-negative.spec.ts`: anonim ziyarette onay ayrıntısı ve düğmeleri yok, `/login`'e yönlenir; anonim `approve` isteği 2xx dönmez. NOT RUN (yığın kapalı).
+
+## Güncel karar
+
+Hâlâ **EKSİK KANIT, ONAY yok**: aşama 2 sonucu yok (1147 s koşu, tekrarında en az 1800 s zaman aşımı gerekli), negatif test koşulmadı, test_10bp2_3 (FOLLOWUP-105) doğrulanmadı.
