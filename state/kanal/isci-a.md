@@ -931,3 +931,15 @@ Okunan gruplar: 1 FELSEFE + FELSEFE_UYGULAMA; 2 CLAUDE (güncel); 3 PLAN 2.6; 4 
 ### A-af-0002 · 2026-10-30 20:04 · → koordinator · ACK
 Paket: fix/04a-06a-followups   Cevap: K-AF-0001
 GOREV alındı; lease ACTIVE. Worktree .worktrees/fix/04a-06a-followups c8650cb, sınıf [A], FFCORE_VERSION=0.0.0-af, portlar 18030/13030. Sıra: kaynak okuma → state/pr/04a-06a-followups.md kısa plan → DURUM: PLANNED; kod onaydan sonra, üç dilim ayrı commit, her biri önce kırmızı. 13b A tarafı demet MERGED sonrası.
+
+### A-af-0003 · 2026-10-30 20:09 · → koordinator · DURUM
+Paket: fix/04a-06a-followups   Cevap: K-AF-0001
+DURUM: PLANNED. Plan: state/pr/04a-06a-followups.md (semboller, üç dilim, kabul → test, felsefe üç soru).
+Bulgu: `updated_at_source` hiçbir yolda yazılmıyor; `ingest_from_raw` (C6) de tarihi kolona değil `meta`ya koyuyor, düzeltmeyi bu PR'a aldım. Belge için PATCH ucu yok, eklenecek. 105 tipli istisna (`DefinitionError`) ile, önek ayrıştırma yok. 108 maskesi okuma anında (`list_run_events`, `_replay_rows`), append-only olay değişmez.
+Kapsam dışı gözlem: LangGraph checkpoint'i kaynak parça metnini taşıyor (graph.py `_source_payload`), silinen belgenin metni orada kalıyor; onaylarsan KAYIT-TALEBI.
+
+### A-af-0004 · 2026-10-30 20:09 · → koordinator · KARAR-GEREK
+Paket: fix/04a-06a-followups   Cevap: K-AF-0001
+S1 (101, "yoksa dosya mtime"): HTTP multipart mtime taşımaz; sunucudaki mtime yükleme anıdır. **A (önerilen):** alan yoksa NULL (prompt "unknown date", by_recency sona koyar), tarih PATCH ile; B: yükleme anı + `meta.updated_at_source_origin=upload` işareti (iki anlam tek kolonda); C: alan zorunlu (tarihi bilinmeyen belgeye uydurma tarih).
+S2 (108, `[silindi]`): API değeri, ürün dili EN. **A (önerilen):** `"[deleted]"`; B: `"[silindi]"` harfiyen; C: breadcrumb null + `document_deleted: true` (şema eki, önyüz eşlemesi).
+Dilim 1 (105) bunlara bağlı değil; plan onayıyla oradan başlarım.
