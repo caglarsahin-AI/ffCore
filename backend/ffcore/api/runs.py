@@ -41,6 +41,7 @@ from ffcore.core.config import Settings, get_settings
 from ffcore.core.errors import ApiError
 from ffcore.models.agents import Agent, AgentVersion
 from ffcore.models.identity import ProjectMember
+from ffcore.models.knowledge import Document
 from ffcore.models.runs import Conversation, Message, Run, RunEvent
 from ffcore.runtime import events as run_events
 from ffcore.runtime import resume
@@ -156,6 +157,46 @@ async def _audit(
     )
 
 
+# A source whose document was deleted keeps its reference (document id and name, for the audit
+# trail) but not its breadcrumb (FOLLOWUP-108). The stored event is append-only; the mask is
+# applied on every read path that serves stored events.
+DELETED_BREADCRUMB = "[deleted]"
+
+
+async def _mask_deleted_sources(session, rows: list[RunEvent]) -> dict[int, dict]:
+    """Payload per event seq, with the breadcrumb of every deleted document's source masked."""
+    sources = [r for r in rows if r.type == RunEventType.sources]
+    ids = {
+        s.get("document_id")
+        for r in sources
+        for s in (r.payload or {}).get("selected") or []
+        if s.get("document_id")
+    }
+    alive: set[str] = set()
+    if ids:
+        valid = []
+        for value in ids:
+            try:
+                valid.append(UUID(str(value)))
+            except ValueError:
+                continue
+        found = await session.scalars(
+            select(Document.id).where(Document.id.in_(valid), Document.deleted_at.is_(None))
+        )
+        alive = {str(i) for i in found.all()}
+    out: dict[int, dict] = {}
+    for row in rows:
+        payload = row.payload
+        if row.type == RunEventType.sources and payload:
+            selected = [
+                s if s.get("document_id") in alive else {**s, "breadcrumb": DELETED_BREADCRUMB}
+                for s in payload.get("selected") or []
+            ]
+            payload = {**payload, "selected": selected}
+        out[row.seq] = payload
+    return out
+
+
 def _replay_rows(project_id: UUID, run_id: UUID):
     """Stored events as SSE, when the live stream has expired; ends with the run's outcome."""
 
@@ -167,13 +208,17 @@ def _replay_rows(project_id: UUID, run_id: UUID):
                 .order_by(RunEvent.seq)
             )
             last_seq = after_seq
-            for row in stored.all():
+            rows_all = stored.all()
+            payloads = await _mask_deleted_sources(session, rows_all)
+            for row in rows_all:
                 last_seq = row.seq
                 sse = run_events.REPLAY_SSE.get(RunEventType(row.type))
                 if sse is None:
                     continue
                 data = (
-                    {"text": row.payload.get("text", "")} if sse is SseEvent.token else row.payload
+                    {"text": row.payload.get("text", "")}
+                    if sse is SseEvent.token
+                    else payloads[row.seq]
                 )
                 yield run_events.SseMessage(f"{row.seq}-0", sse, data)
             run = await _run(session, project_id, run_id)
@@ -494,10 +539,14 @@ async def list_run_events(
         .where(RunEvent.run_id == run_id, RunEvent.seq > after_seq)
         .order_by(RunEvent.seq)
     )
+    events = rows.all()
+    payloads = await _mask_deleted_sources(session, events)
     return RunEventList(
         items=[
-            RunEventOut(seq=r.seq, ts=r.ts, type=r.type, iteration=r.iteration, payload=r.payload)
-            for r in rows.all()
+            RunEventOut(
+                seq=r.seq, ts=r.ts, type=r.type, iteration=r.iteration, payload=payloads[r.seq]
+            )
+            for r in events
         ]
     )
 

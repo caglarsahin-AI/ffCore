@@ -21,6 +21,8 @@ CHARS_PER_TOKEN = 6
 MAX_TO_MIN_RATIO = 1.5
 MAX_MERGED_HEADINGS = 3
 BREADCRUMB_SEPARATOR = " › "
+# A section heading in a breadcrumb: at most this long, structure only (FOLLOWUP-108).
+MAX_HEADING_CHARS = 60
 # A breadcrumb may take at most half of max_tokens; a longer one is a document error, not a
 # reason to shrink every body to a few tokens.
 MAX_BREADCRUMB_SHARE = 0.5
@@ -39,6 +41,8 @@ _ARTICLE = re.compile(
     r"(?=\s+\d+\.\d+|\s*\n|$)",
     re.M,
 )
+_ARTICLE_NUMBER = re.compile(r"Madde\s+\d+")
+_SECTION_NUMBER = re.compile(r"(\d+(?:\.\d+)*)\.?(?:\s|$)")
 
 
 class ChunkingError(ValueError):
@@ -94,6 +98,25 @@ class TextChunk:
     @property
     def token_count(self) -> int:
         return self.tokens or approx_tokens(self.text)
+
+
+def structural_heading(heading: str) -> str | None:
+    """The part of a heading a breadcrumb may carry (FOLLOWUP-108): structure, never body text.
+    An article keeps "Madde N - Title" up to the first colon (plain text writes "Madde 2 - Süre:
+    the clause..."); anything over MAX_HEADING_CHARS keeps only its number, and a long heading
+    without a number stays out of the breadcrumb (it is still in the chunk body)."""
+    heading = " ".join(heading.split())
+    article = _ARTICLE_NUMBER.match(heading)
+    if article:
+        heading = heading.split(":", 1)[0].rstrip(" -–")
+    if not heading:
+        return None
+    if len(heading) <= MAX_HEADING_CHARS:
+        return heading
+    if article:
+        return article.group(0)
+    number = _SECTION_NUMBER.match(heading)
+    return number.group(1) if number else None
 
 
 def _article_sections(body: str) -> list[tuple[str, str]]:
@@ -217,7 +240,8 @@ def _pack(body: str, settings: ChunkSettings) -> list[tuple[list[str], str]]:
             pieces.append((headings[:MAX_MERGED_HEADINGS], buffer))
         buffer, headings = "", []
 
-    def note(heading: str) -> None:
+    def note(raw: str) -> None:
+        heading = structural_heading(raw)
         if heading and heading not in headings:
             headings.append(heading)
 

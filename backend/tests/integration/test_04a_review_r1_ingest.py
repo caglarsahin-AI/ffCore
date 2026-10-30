@@ -179,8 +179,12 @@ def test_04a_r1_3_failed_publication_is_never_indexed(pg, make_project, settings
 
 def test_04a_r1_4_unchunkable_document_fails_with_a_code(pg, make_project, settings):
     kb_id = make_kb(pg, make_project())
-    heading = "# " + " ".join(["Başlık"] * 400)  # the heading joins the breadcrumb
-    doc_id = upload(settings, kb_id, "uzun.md", heading + "\n\n" + PROSE * 8)
+    # A heading no longer reaches the breadcrumb past 60 characters (FOLLOWUP-108); the KB name
+    # always does, so a name that leaves no room still fails loud.
+    pg.execute(
+        "UPDATE knowledge_bases SET name = %s WHERE id = %s", (" ".join(["Başlık"] * 400), kb_id)
+    )
+    doc_id = upload(settings, kb_id, "uzun.md", "# Kısa\n\n" + PROSE * 8)
     assert process(settings, doc_id).status == "failed"
     status, error, chunks, _ = row(pg, doc_id)
     assert status == "failed" and error.startswith("chunk_breadcrumb_too_long") and chunks == 0

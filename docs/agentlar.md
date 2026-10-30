@@ -58,6 +58,10 @@ answers with an event stream (`text/event-stream`). The first event is `progress
 Event names (C9): `token, tool_call, tool_result, approval_required, question, sources, progress,
 fallback, done, error`; a client ignores names it does not know. Each event has an `id`; the
 stream ends after `done`, `error`, `approval_required` or `question`.
+A `sources` event names each source (document id and name, page, breadcrumb, source date),
+never its text. When a document is deleted later, the stored event keeps the reference and every
+read (`GET /runs/{id}/events`, a replay from `run_events`) shows its breadcrumb as `[deleted]`
+(FOLLOWUP-108).
 
 - **Reconnect:** `GET /runs/{id}/stream` with `Last-Event-ID` continues after that event. Closing a
   stream never cancels a run. When the live stream has expired (`RUN_EVENT_STREAM_TTL_S`) the run
