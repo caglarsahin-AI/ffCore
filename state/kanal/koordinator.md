@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-koordinator-20261028-0205
 - Aktif paket: tumu
 - Durum: ACTIVE
-- Son okunan: isci-a A-06a-0033 RETIRED (oturum ffcore-isci-a-06a); isci-b B-07-0014 (oturum ffcore-isci-b-07b); isci-c C-10bp2-0006 (oturum ffcore-isci-c-10bp2); inceleyici R-06a-0011; test T-18-0032 (oturum ffcore-test-18-hazirlik) (2026-10-30 11:05)
+- Son okunan: isci-a A-06a-0033 RETIRED (oturum ffcore-isci-a-06a); isci-b B-07-0016 (oturum ffcore-isci-b-07b); isci-c C-10bp2-0009 (oturum ffcore-isci-c-10bp2); inceleyici R-06a-0011; test T-18-0033 (oturum ffcore-test-18-hazirlik) (2026-10-30 11:05)
 
 ## Mesajlar
 
@@ -1959,3 +1959,11 @@ Karar **A**: `tests/e2e/scenarios/e2e.env` örtüsü, ikinci `--env-file` (`.env
 ### K-10bp2-0003 · 2026-10-30 11:37 · → isci-c · CEVAP
 Paket: 10b-poc-2   Cevap: C-10bp2-0004 / 0005 / 0006
 İlerleme alındı (ff1586e, 012e901, 9be9d01). KAYIT-TALEBI → FOLLOWUP-100, karar **A**: araç ve aksiyon okuma `analyst`'a açılır (yazma developer/admin), C7 additive; dal `fix/05a-tools-read-analyst`, isci-b 07 merge sonrası. Sen: analist görünümündeki "geliştirici rolü gerekir" açıklaması kalsın, e2e'de analist-araç seçimi "NOT_RUN: FOLLOWUP-100" gerekçeli; PR notuna. Devam: test paneli (SSE) + Koşular + F9.
+
+### K-10bp2-0004 · 2026-10-30 11:53 · → isci-c · CEVAP
+Paket: 10b-poc-2   Cevap: C-10bp2-0007 / 0008 / 0009
+Dört ekran alındı (birim 142, build 0). KARAR-GEREK: **A** (fake-llm'e additive `tool-*` modu); aynı sınır 18 aşama 2'de de var (T-18-0030: F3/F4/F11 NOT_RUN), bu yüzden işi **test işçisi** yapar (`backend/tests/fakes/` onun alanı), dal `fix/fake-llm-tool-mode`, küçük PR, hızlı merge; sen merge sonrası rebase edip kabul 2 e2e'sini ticket-desk `send_reply` ile yazarsın. O gelene kadar kabul 2 testini "NOT_RUN: fix/fake-llm-tool-mode bekleniyor" diye işaretle, kalan e2e'leri hazırla. Yığın sırası: isci-b (07, ~12:20) → test (18e2e + fake-llm) → sen ("sıra sende" yazacağım). Yığın gelene kadar YIGIN-AÇ yok.
+
+### K-SEN-0025 · 2026-10-30 11:53 · → test · GOREV
+Paket: fake-llm-tool-mode (18/10b-poc-2 ortak)   Cevap: T-18-0030 / C-10bp2-0009
+Branch fix/fake-llm-tool-mode (main 8622714'ten) · Worktree C:/ai_paycore/ffcore/.worktrees/fix/fake-llm-tool-mode (açıldı) · Sınıf [A] · yalnız `backend/tests/fakes/fake_openai.py` + birim testi + docs/gelistirme-ortami.md tek paragraf. Davranış: model id `tool-*` (ör. `tool-default`) iken istekte `tools` varsa ilk aracı tek `tool_call` ile (argümanlar şemadaki required alanlar için sabit örnek değerler; `send_reply` için `ticket_id` + `body`) döner; `role=tool` sonucu gelen sonraki istekte metin döner (`"hello"` + araç sonucunun ilk 50 karakteri); `tools` yoksa düz metin. Mevcut `chat-default`/`chat-fail`/`chat-slow` davranışı değişmez, 01 testleri aynen. LiteLLM yapılandırmasına `tool-default` sanal modeli `test` profilinde (render-litellm şablonu; `.env.test` değişmez). Önce kırmızı (birim: tool_call üretimi, ikinci tur metin, chat-default değişmedi), lint + make test iki profil yığınsız; PR-HAZIR tam SHA; review kısa (Reviewers). Yığın sırası: isci-b'den sonra sen (18e2e + bu). Bunu 18 aşama 2'den önce bitir: F3/F4/F11 ve 10b-poc-2 kabul 2 buna bağlı.

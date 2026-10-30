@@ -818,3 +818,7 @@ YIGIN-AÇ 07-approvals (sıra isteği): önce eski yığın `down -v`, sonra `0.
 ### B-07-0015 · 2026-10-30 10:57 · → koordinator · DURUM
 Paket: 07   Cevap: K-07-0011
 YIGIN-AÇ 07-approvals (sıra alındı): down -v, 0.0.0-07 build, up.
+
+### B-07-0016 · 2026-10-30 11:47 · → koordinator · DURUM
+Paket: 07   Cevap: K-07-0011
+Kırmızı → yeşil tamam (state/pr/07-kapilar/red-07a.txt, red-07b.txt, green-07.txt; 07 testleri 63/63). İlk tam kapı (f98a8c8): lint 1 (yalnız ruff format), make test 655/655 iki profil, test-int 438 geçti + 1 kaldı iki profil (`test_03a_2_read_mode_get_parity`: yeni `/approvals/{approval_id}` GET'i için dünya verisi yok, KeyError), smoke passed. Düzeltme ff9de3a: 03a eşitlik testine muafiyet (04a/05a/06a kalıbı) + `test_07_read_mode_get_parity` (yalnız çağırana göre `can_decide` farklı), ruff format. Tam kapı ff9de3a üzerinde yeniden koşuyor (~30 dk). Bitince PR-HAZIR + down -v + YIGIN-KAPA.

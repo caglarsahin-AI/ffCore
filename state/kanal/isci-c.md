@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-c-10bp2
 - Aktif paket: 10b-poc-2 (K-10bp2-0001)
 - Durum: ACTIVE
-- Son okunan: koordinator K-10bp2-0002 (2026-10-30 11:08); son yazılan C-10bp2-0006
+- Son okunan: koordinator K-10bp2-0003; son yazılan C-10bp2-0009
 
 ## Mesajlar
 
@@ -633,3 +633,22 @@ Ne: `GET /projects/{p}/tools` `require_role("developer")` (api/tools.py:46). Age
 Etki: analist bilgi tabanlı agent'ı kurar (brief kabul 1). Araçlı agent'ta yalnız mevcut seçimi salt okunur görür ve araç ekleyemez; 13a "Veri Soru-Cevap" şablonunu analist sihirbazdan kuramaz.
 Şimdiki davranış: analistte Araçlar sekmesi seçilmiş aksiyonları ve "geliştirici rolü gerekir" açıklamasını gösterir; sessiz boş liste yok.
 Öneri: A (önerim) 05a'ya additive salt okunur uç ya da `GET /tools` için `analyst` okuma (gizli alanlar zaten `***`); B: brief/rol matrisi "araçlı agent'ı developer kurar" diye düzeltilir.
+
+### C-10bp2-0007 · 2026-10-30 11:50 · → koordinator · ACK
+Paket: 10b-poc-2   Cevap: K-10bp2-0003
+FOLLOWUP-100 A alındı: analistte "geliştirici rolü gerekir" açıklaması kalır, analist-araç e2e'si NOT_RUN (FOLLOWUP-100).
+
+### C-10bp2-0008 · 2026-10-30 11:50 · → koordinator · DURUM
+Paket: 10b-poc-2   Cevap: -
+Dört ekran yazıldı, hepsi gerçek uçlara bağlı:
+- f7d3df5: test paneli (SSE, araç/kaynak kartları, 07 ile satır içi onay, soru cevabı, iptal, yeniden bağlanma/`lost`), Koşular (filtreler, ayrıntı, zaman çizelgesi, F9 oy/not).
+- 1fb0d20: Onaylar (liste, ayrıntı, karar, kenar çubuğu rozeti).
+Onay tipleri 07 dalını birebir yansıtıyor; 07.yaml gelince üretilecek.
+Kapılar: birim 142/142, tsc 0, eslint 0, `next build` 0. Kalan: e2e, iki tema/axe görüntüleri, docs/onyuz.md.
+YIGIN-AÇ 10bp2: e2e için sıra istiyorum (isci-b ve test'ten sonra). Tek yığın; `test` profili (fake-llm, ticket-desk) gerekiyor.
+
+### C-10bp2-0009 · 2026-10-30 11:50 · → koordinator · KARAR-GEREK
+Paket: 10b-poc-2   Cevap: -
+Brief kabul 2 (satır içi onay sonrası akış sürer) e2e ile kanıtlanamıyor. fake-llm (`backend/tests/fakes/fake_openai.py`) yalnız metin döndürüyor ("hello"), araç çağrısı üretmiyor; model araç çağırmadan onay olayı oluşmuyor. Bu sınır kabul 1'i etkilemiyor: kaynaklar `always` aramadan geliyor, model cevabı "hello" olsa da kaynak kartları kanıtlanır.
+- **A (önerim):** fake-llm'e additive test modu: model id `tool-*` iken istekteki ilk aracı tek bir `tool_call` ile çağırır, araç sonucu gelince metin döner. Yalnız test profili, 01 testleri değişmez. Ticket-desk `send_reply` (onay gerekli) ile kabul 2 ve ret yolu uçtan uca koşar. Bedel: `backend/tests/fakes/` touch-zone'um dışında, ya bana ek ya test işçisine/isci-b'ye küçük iş; 13b de aynı modu kullanabilir.
+- **B:** kabul 2'nin e2e'si NOT_RUN. Kanıt `test_10bp2_18_run_view` (olay → onay durumu) ve elle akış olmaz. Bedel: PoC kapısının "SQL aracı onay bekler" adımı önyüzde kanıtsız kalır, 13b'ye kayar.
