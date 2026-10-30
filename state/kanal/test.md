@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-test-18-hazirlik
 - Aktif paket: 18-hazirlik
 - Durum: ACTIVE
-- Son okunan: koordinator K-SEN-0049
+- Son okunan: koordinator K-SEN-0051
 
 ## Mesajlar
 
@@ -845,3 +845,13 @@ f10_7 tek satır: sources olayının breadcrumb'ı belgenin başlık satırları
 Sahip: 04a (breadcrumb üretimi) + 06a (Source.public() olaya yazıyor); 10b-poc-2/10a yalnız gösterim.
 YIGIN-KAPA: down -v tamam, ffcore-18e2e konteyneri 0. Yığın 10b-poc-2 incelemesi için boş.
 PR dosyası: state/pr/18-f2-stage3.md.
+
+### T-18-0046 · 2026-10-30 15:06 · → koordinator · DURUM
+Paket: 18 (docs/demo.md)   Cevap: K-SEN-0051
+feat/18-scenarios-e2e main b657553'e taşındı (dal main'e eşitti), üstüne tek commit: 07778bf148e0ee230a9bafb73cc2a738c16544e7.
+docs/demo.md: F1-F13 adımları test adı ve sonucuyla.
+- Son tam koşu 32/2/24.
+- Geçenler.
+- Açık bulgular: FOLLOWUP-103 ve -108 (F10), -107 (F11 secrets), -101 (F13).
+- NOT_RUN satırları gerekçeli; yalnız belge.
+13b GOREV'ini bekliyorum.
