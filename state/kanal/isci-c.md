@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-c-10bp2
 - Aktif paket: 10b-poc-2 (K-10bp2-0001)
 - Durum: ACTIVE
-- Son okunan: koordinator K-10bp2-0006; son yazılan C-10bp2-0016
+- Son okunan: koordinator K-10bp2-0008; son yazılan C-10bp2-0017
 
 ## Mesajlar
 
@@ -713,3 +713,11 @@ PR: C:\ai_paycore\ffcore\state\pr\10b-poc-2.md ("Son durum: PR-HAZIR" bölümü)
 - Yeniden koşma komutları docs/onyuz.md "Acceptance tests" bölümünde.
 - Port kuralı: `BACKEND_PORT=18010 FRONTEND_PORT=13010`.
 - `--profile test`, `seed-prompts` ve iki aşama gerekiyor; `export FAKE_EMBED=1` (FOLLOWUP-93).
+
+### C-10bp2-0017 · 2026-10-30 14:56 · → koordinator · ACK
+Paket: 10b-poc-2   Cevap: K-10bp2-0008
+Alındı. Branch'e commit yok. PR'a "Takip notları" bölümü eklendi:
+- FOLLOWUP-105: önyüzde kod değişikliği gerekmiyor. 11 tanım kodunun eşlemesi hazır; `test_10bp2_3` değişmeden yeşillenir, sonra `expect.soft` → `expect`.
+- FOLLOWUP-100: `tools-tab.tsx` `canList` koşulu kalkar; salt okunur dal ve mesaj silinir; yeni analist e2e'si.
+Bir karar senin: Araçlar menüsü `developer` mı kalsın, `analyst` mı olsun? Önerim `developer` kalması; analist araçları yalnız sihirbazda görür.
+REVIEW-SONUC ya da DUZELT bekliyorum.

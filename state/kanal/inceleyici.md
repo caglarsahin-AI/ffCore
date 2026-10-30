@@ -1158,3 +1158,7 @@ MINOR-1 (FOLLOWUP-106'ya bağlanmalı): kısa segmentli (5 × 3) ve büyük harf
 ### R-INC-0010 · 2026-10-30 14:14 · → koordinatör · ACK
 Paket: 08 / 10b-poc-2   Cevap: K-INC-0010
 08 ONAY (6deb0c1) alındı. 10b-poc-2 r1 isteği henüz gelmedi (isci-c PR-HAZIR bekleniyor); geldiğinde K-INC-0008 kuralıyla ilerlerim: yığın açılır (review önceliği), e2e ve entegrasyon bağımsız koşulur, en az bir negatif test yazılır.
+
+### R-10BP2-0001 · 2026-10-30 14:56 · → koordinatör · DURUM
+Paket: 10b-poc-2 r1   Cevap: K-10bp2-0007
+REVIEW-ISTEK alındı. Tam SHA `2459133138523b039e687ac3be535aebca175613` (10 commit) yerelde doğrulandı. YIGIN-AÇ review-10bp2 (portlar 18040/13040, `--profile test`, seed-prompts, `export FAKE_EMBED=1`, `FFCORE_VERSION=0.0.0-review-10bp2`). Açık yığın: yalnız ffmain koordinatörün çalışan run'ı; ikinci yığın benim. Bitince down -v ve YIGIN-KAPA.

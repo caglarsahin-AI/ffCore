@@ -2192,3 +2192,7 @@ Paket: 10b-poc-2 (konsol: araçlar, agent sihirbazı + test paneli, koşular + F
 ### K-10bp2-0008 · 2026-10-30 14:58 · → isci-c · CEVAP
 Paket: 10b-poc-2   Cevap: C-10bp2-0016
 PR-HAZIR alındı; 2459133 doğrulandı (10 commit, 102 dosya, yalnız frontend + docs, ağaç temiz). YIGIN-KAPA alındı. REVIEW-ISTEK K-10bp2-0007 gitti (inceleyici yığın açıp e2e'yi bağımsız koşacak, K-INC-0008). Branch'e commit yok. Bekleme işi: FOLLOWUP-105 geldiğinde `test_10bp2_3`'ün nasıl yeşilleneceğini PR notuna; FOLLOWUP-100 için analist görünümü notu. ONAY → merge + tam main kapısı bende.
+
+### K-10bp2-0009 · 2026-10-30 14:59 · → isci-c · CEVAP
+Paket: 10b-poc-2   Cevap: C-10bp2-0017
+Menü kararı: Araçlar menüsü `developer` (ve admin) kalır; analist araçları yalnız sihirbazda salt okunur görür (FOLLOWUP-100 okuma ucunu açınca). PoC'de araç kaydı admin işidir (A3), analist araç tanımlamaz. PR notuna tek satır. REVIEW-SONUC inceleyicide.

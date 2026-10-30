@@ -325,3 +325,20 @@ Tam çıktılar oturum scratchpad'inde tee ile alındı, depoya girmedi.
 - FOLLOWUP-105 kapanana kadar sihirbaz tanım hatalarını kodla gösteremiyor. Tanımsız yer tutucu için istemci ipucu var, diğer tanım kodları için yok.
 - Next rewrite üzerinden SSE akışı uçtan uca çalışıyor (4 ve 5 geçti, onay sonrası `stream_after` ile devam). Olayların tamponlanmadan parça parça gelip gelmediği **ölçülmedi**: fake-llm cevabı kısa olduğu için tamponlama bu testlerde görünmez. Gerçek modelle uzun akışta kontrol edilmeli (13b ya da sunucu).
 - Aşama 1'in ilk koşusundaki zaman aşımının nedeni doğrulanmadı; tek seferlik, tekrar etmedi.
+
+### Takip notları (K-10bp2-0008)
+
+**FOLLOWUP-105 gelince (06a tanım hataları kendi koduyla 422):**
+
+1. Önyüzde kod değişikliği gerekmez. `agent-wizard.tsx` `onSave` hatayı `errorMessageKey(error.code)` ile eşliyor. Mesaj ve kod `wizard-save-error` satırında görünür: "…placeholder… (code: variable_undefined)". `lib/api/errors.ts`'te 11 tanım kodunun eşlemesi ve iki dilde mesajı hazır: `variable_undefined`, `variable_unknown`, `variable_duplicate`, `knowledge_duplicate`, `tool_duplicate`, `approval_action_unknown`, `structured_output_invalid`, `output_reserve_too_small`, `verify_not_supported`, `confidence_formula_not_supported`, `knowledge_filter_not_supported`. Bunlar `test_10bp2_16` ile kanıtlı.
+2. `test_10bp2_3` değişmeden yeşillenir. `expect.soft(...).toContainText("variable_undefined")` geçer; testte başka hata yok.
+3. Yeşillendikten sonra `expect.soft` tekrar `expect`'e çevrilir (tek satır) ve FOLLOWUP-105 yorumu silinir. Bu, FOLLOWUP-105 PR'ının ya da ayrı küçük önyüz PR'ının işi.
+4. Yeni bir 06a kodu gelirse (ör. `prompt_source`): `errors.ts` + `messages/{en,tr}.json` + `test_10bp2_16` listesi. Eşlenmemiş kod genel mesajla ve ham koduyla görünür, sessiz değil.
+5. İsteğe bağlı: 06a kodla birlikte alan yolu da dönerse (ör. `definition.system_prompt`), sihirbaz hatayı ilgili sekmeye bağlayabilir. Bu PR'da yok, ihtiyaç görülürse FOLLOWUP.
+
+**FOLLOWUP-100 gelince (araç/aksiyon okuma `analyst`'a açılır):**
+
+1. `components/agent-wizard/tools-tab.tsx` `canList = hasRole(role, "developer")` satırı `analyst` olur. Ya da daha iyisi, satır kaldırılır ve liste her role sorgulanır; 403 gelirse açık hata görünür. Böylece analist araç ve aksiyon seçer ve onay listesini düzenler. Salt okunur dal (`tools-need-developer` açıklaması) ve `toolsNeedDeveloper` mesajı silinir.
+2. `lib/navigation.ts` Araçlar menüsü `minRole: "developer"` kalır. Araç kaydı ve değiştirme admin işidir, menü erişimi ayrı bir karar. Analist araç ayrıntısını da görecekse `analyst` olur. Bu karar koordinatörde; önerim menünün `developer` kalması, analistin araçları yalnız sihirbazda görmesi.
+3. Testler: `test_10bp2_11_roles` analist için `nav-tools` beklentisi menü kararına göre kalır ya da değişir. Yeni e2e: analist sihirbazda ticket-desk `list_tickets`'i seçer, `send_reply`'ı onaylı işaretler, kaydeder; tanımda `tools` ve `approval.actions` doğru yazılır. Şu an NOT_RUN: FOLLOWUP-100.
+4. Docs: docs/onyuz.md "Analysts and tools" maddesi silinir; rol matrisinde Tools satırı karar neyse ona göre güncellenir.
