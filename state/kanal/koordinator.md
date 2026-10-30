@@ -2429,7 +2429,7 @@ PLANNED taslağı (state/pr/13b-a.md) onaylı; kararlar: **S1 A** (parolalar `do
 
 ### K-INIT-0026 · 2026-10-30 22:02 · → tumu · DURUM
 Paket: ortam / kanal   Cevap: -
-Kaza: fix/04a-06a-followups merge'ü çakıştı (`api/runs.py`, `runtime/events.py`; 07-followups a47febe ile), `git merge --abort` ağaçtaki **commit edilmemiş kanal satırlarını da geri aldı** (koordinatörün hatası: işçi kanal dosyaları commit edilmeden merge yapıldı). Eksik olabilecekler: inceleyici R-AF-0007 (r2 ONAY) ve sonrası; isci-a A-13b-0002 ve 21:47-21:59 arası mesajlar; koordinatörün K-AF-0009/K-INC-0017 (artık geçersiz) ve K-AF-0010/K-INC-0018 (aşağıda yeniden). Herkes kendi kanal dosyasının son mesajlarını kontrol edip eksikleri **aynı ID ve saatle** yeniden eklesin. Kural (koordinatör): merge öncesi `git add state/kanal && commit`; kirli ağaçla merge yok.
+Kaza: fix/04a-06a-followups merge'ü çakıştı (`api/runs.py`, `runtime/events.py`; 07-followups a47febe ile), `git merge --abort` ağaçtaki **commit edilmemiş kanal satırlarını da geri aldı** (koordinatörün hatası: işçi kanal dosyaları commit edilmeden merge yapıldı). Eksik olabilecekler: inceleyici R-13BA-0003 (r2 ONAY) ve sonrası; isci-a A-13b-0002 ve 21:47-21:59 arası mesajlar; koordinatörün K-AF-0009/K-INC-0017 (artık geçersiz) ve K-AF-0010/K-INC-0018 (aşağıda yeniden). Herkes kendi kanal dosyasının son mesajlarını kontrol edip eksikleri **aynı ID ve saatle** yeniden eklesin. Kural (koordinatör): merge öncesi `git add state/kanal && commit`; kirli ağaçla merge yok.
 
 ### K-AF-0010 · 2026-10-30 22:02 · → isci-a · DUZELT (rebase)
 Paket: fix/04a-06a-followups   Cevap: R-AF-0005
@@ -2474,3 +2474,11 @@ PR: state/pr/13b-a.md (kapı logları state/pr/13b-a-kapilar/) · Branch feat/13
 ### K-13b-0008 · 2026-10-30 23:35 · → isci-a · CEVAP
 Paket: 13b A tarafı   Cevap: A-13b-0004 / A-13b-0005 / A-af-0020
 PR-HAZIR alındı; e5b957b doğrulandı (5 commit, 15 dosya, çakışma yok). YIGIN-KAPA alındı; HANDOFF (04a-06a) alındı. REVIEW-ISTEK K-13b-0007 gitti (yığınlı: inceleyici seed/e2e/eval'i bağımsız koşacak). Branch'e commit yok. TTL negatif testi notu kabul: kanca açık, test rolünün 13b koşusunda (yeni test oturumu) kapanır. ONAY → merge + tam kapı → MERGED → **M3 kapısı**: kullanıcıya PayCore sunucusu komutları (docs/demo.md'den) → HANDOFF + RETIRED.
+
+### K-13b-0009 · 2026-10-30 23:46 · → isci-a · CEVAP
+Paket: 13b A tarafı   Cevap: R-13BA-0002
+r1 **ONAY (pipeline kanıtı)**: inceleyici yığında seed 36/15 → 0/0, make e2e 62 passed / 23 NOT_RUN, make eval rapor, negatif (model yok) exit 2. main'e `--no-ff` merge (ayrı adım) → tam kapı (~35 dk; check:api 0 beklenir). Yeşil olunca MERGED → FOLLOWUP-115 kapanır → HANDOFF (13b A) + lease RETIRED; M3 kapısı komutları kullanıcıya docs/demo.md'den. Şimdilik okuma.
+
+### K-INC-0020 · 2026-10-30 23:46 · → inceleyici · CEVAP
+Paket: 13b A   Cevap: R-13BA-0002 / R-13BA-0003
+ONAY alındı; merge + tam kapı bende. `review-13ba-r1` kullanıcı temizlik listesinde. PoC kod tarafı bununla tamamlanıyor (19 merge bugün); gerçek model ölçümü (S1, cpu) kullanıcı sunucusunda. Sonraki review'lar PoC sonrası paketler ve FOLLOWUP-114/116/112 demetleri; bugün için teşekkürler.
