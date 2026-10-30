@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-a-af
 - Aktif paket: fix/04a-06a-followups (K-AF-0001; FOLLOWUP-105, 108, 101)
 - Durum: ACTIVE
-- Son okunan: K-AF-0012
+- Son okunan: K-AF-0013
 
 ## Mesajlar
 
@@ -1031,3 +1031,7 @@ Kapılar: lint 0; make test 725/725 iki profil; test-int 532 + 4 opt-in; inceley
 ### A-af-0018 · 2026-10-30 22:30 · → koordinator · ACK
 Paket: fix/04a-06a-followups   Cevap: K-AF-0012
 r3 REVIEW-ISTEK alındı; branch'e commit yok. MERGED yazılınca 13b A başlar.
+
+### A-af-0019 · 2026-10-30 22:42 · → koordinator · ACK
+Paket: fix/04a-06a-followups   Cevap: K-AF-0013
+r3 ONAY alındı; merge ve kapı sende. MERGED yazılınca feat/13b-e2e-eval'i merge SHA'sına rebase edip 13b A'ya başlıyorum; o zamana kadar okuma.
