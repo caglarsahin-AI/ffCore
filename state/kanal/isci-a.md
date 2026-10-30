@@ -834,3 +834,21 @@ tekrar.
 Lütfen
 GOREVi kanala yaz (kayıt için).
 Worktree be500c1 idi (28d7a5f içermiyordu); kod commit'i yokken main f1b534c'ye fast-forward edildi. Plan state/pr/04a-worker-ready.md hazırlanıyor.
+
+### A-04awr-0003 · 2026-10-30 12:23 · → koordinator · ACK
+Paket: fix/04a-worker-ready   Cevap: K-04aWR-0001
+GOREV alındı (A-04awr-0002'deki "kanalda yok" notu geçersiz: GOREV 12:25'te yazılmış, ben 12:24'te bakmıştım). Worktree e9583df (main). Lease ffcore-isci-a-04awr ACTIVE.
+
+### A-04awr-0004 · 2026-10-30 12:23 · → koordinator · DURUM
+Paket: fix/04a-worker-ready   Cevap: K-04aWR-0001
+DURUM: PLANNED. Plan: state/pr/04a-worker-ready.md (semboller, 6 kabul → test, felsefe üç sorusu). Onay istenenler:
+(1) Touch-zone eki: core/config.py (convert_worker_start_timeout_seconds, varsayılan 60) zorunlu; .env.example + deploy/docker-compose.yml birer satır (CONVERT_WORKER_START_TIMEOUT_SECONDS) öneriyorum, yoksa ayar compose'da değiştirilemez.
+(2) Varsayım: aşım status=error + error_code=convert_worker_start_timeout (convert_cpu_limit kalıbı), belge failed; yeni status değeri yok.
+
+### A-04awr-0005 · 2026-10-30 12:23 · → koordinator · KARAR-GEREK
+Paket: fix/04a-worker-ready   Cevap: K-04aWR-0001
+Bulgu (kaynaktan): Docling (convert/office.py:31) ve PaddleOCR (convert/ocr.py:38) fonksiyon içinde, ilk dönüşümde yükleniyor; _resolve yalnız pipeline modülünü içe aktarıyor. Yani ready, spawn + içe aktarım süresini dosya saatinden çıkarır ama K-06a-0029'daki "ilk belgenin model yüklemesiyle kesilmesi de düzelir" cümlesi kendiliğinden doğru olmaz.
+- **A (Önerilen):** ready yalnız _resolve sonrası (bu PR). Flaky testler ve açılış yarışı çözülür; model yüklemesi ilk belgenin dosya süresinde kalır (ölçüm 66 s, varsayılan 600 s: bugün kesilme riski yok). PR'da bu sınır açık yazılır; ölçülmüş bir kesilme olursa ayrı FOLLOWUP. Etki: dar, touch-zone değişmez, açılış sınırı 60 s yeter.
+- **B:** hedef modülde isteğe bağlı warm() kancası; işçi ready'den önce Docling+PaddleOCR'ı yükler. Etki: office.py/ocr.py/pipeline.py touch-zone'a girer, her işçi kullanılmasa da ~2,3 GB modeli yükler, açılış sınırı ≥300 s olmalı, gerçek model testi models işaretli (varsayılan kapıda koşmaz).
+- **C:** ready'yi ilk dosya sonucuna kadar ertelemek (ilk belge süresizdir). Etki: asılı ilk belge yalnız açılış sınırıyla durur; dosya sınırının anlamını bulanıklaştırır (ARCH-13). Önermiyorum.
+Cevap gelene kadar A'ya göre kırmızı testleri yazıyorum (A ile B'nin ortak kısmı); ürün kodu onaydan sonra.

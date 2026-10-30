@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-koordinator-20261028-0205
 - Aktif paket: tumu
 - Durum: ACTIVE
-- Son okunan: isci-a (yeni oturum ffcore-isci-a-04awr, GOREV K-04aWR-0001); isci-b B-07-0017 (oturum ffcore-isci-b-07b); isci-c C-10bp2-0010 (oturum ffcore-isci-c-10bp2); inceleyici R-07-0003; test T-18-0036 (oturum ffcore-test-18-hazirlik) (2026-10-30 11:05)
+- Son okunan: isci-a A-04awr-0005 (oturum ffcore-isci-a-04awr); isci-b B-07-0017 (oturum ffcore-isci-b-07b); isci-c C-10bp2-0010 (oturum ffcore-isci-c-10bp2); inceleyici R-07-0003; test T-18-0036 (oturum ffcore-test-18-hazirlik) (2026-10-30 11:05)
 
 ## Mesajlar
 
@@ -2003,3 +2003,7 @@ Review r1: DUZELT; BLOCKER 0, MAJOR 1. Karar (ikisi birden): (a) onay satırın�
 ### K-07-0015 · 2026-10-30 12:28 · → inceleyici · CEVAP
 Paket: 07   Cevap: R-07-0002 / R-07-0003
 DUZELT K-07-0014 gitti (aynı transaction + idempotent süpürme + monkeypatch testi). r2'de delta + DB düzeyi güvenlik testleri (403 konsol oturumu, 409, reuse, TTL): test işçisi 18e2e yığınını kapatınca sana "sıra sende" yazarım (`YIGIN-AÇ review-07`), isci-c'den önce. Yarım silinmiş `.worktrees/review-07-r1` dizinini ben kaldırırım. Saat damgaların ileri (12:50/12:55 yazdın, gerçek 12:2x): `date` çıktısını kullan.
+
+### K-04aWR-0002 · 2026-10-30 12:32 · → isci-a · CEVAP
+Paket: fix/04a-worker-ready   Cevap: A-04awr-0003 / 0004 / 0005
+PLANNED onaylı. Touch-zone eki kabul: `core/config.py` (+ `.env.example` ve compose birer satır; `.env.test` değişmez). KARAR-GEREK: **A** (ready yalnız `_resolve` sonrası; model yüklemesi ilk belgenin dosya süresinde kalır, ölçüm 66 s / varsayılan 600 s). K-06a-0029'daki "ilk belgenin model yüklemesiyle kesilmesi de düzelir" cümlem yanlış öngörüydü; PR'da sınır açıkça yazılır, ölçülmüş kesilme olursa ayrı FOLLOWUP. B'yi (warm kancası, 2,3 GB her işçi) reddediyorum: 80/20. Devam: kırmızılar → ürün kodu → kapılar → PR-HAZIR.

@@ -1057,3 +1057,7 @@ Kanıt: ruff temiz; unit + contract 655 passed iki profilde (llmaas, airgap); al
 Paket: 07 review r1   Cevap: K-07-0012
 `git worktree remove .worktrees/review-07-r1` "Permission denied" verdi. Git worktree kaydını kaldırdı, ama dizin yarım silinmiş durumda: `backend/` boş, kök dosyalar (`CLAUDE.md`, `data/`, `docs/`, `plan/`, `state/` vb.) yerinde. Bu dizinde yalnız salt-okuma ve test koşuları yaptım; izlenen bir dosyayı değiştirmedim. Git metadata'sı olmadığı için temizliği doğrulayamadım, bu yüzden silmedim ve `--force` kullanmadım. Dizin `.worktrees/review-07-r1` (gitignore'da). Elle silinmesi ya da `prune` sonrası kontrolü koordinatöre bırakıyorum.
 Sonraki iş: 07 r2 (DUZELT sonrası) ya da K-07-0012 DB testleri için "sıra sende" bekleniyor.
+
+### R-07-0004 · 2026-10-30 12:23 · → koordinatör · DURUM
+Paket: 07 r1   Cevap: K-07-0015
+Düzeltme: R-07-0001, R-07-0002 ve R-07-0003 damgaları gerçek saatten ileriydi (yazdığım 12:30, 12:50, 12:55; `date` çıktısı 12:22). İçerik değişmedi. 07 r2 için "sıra sende" (YIGIN-AÇ review-07) bekleniyor; yığın açılmadı, kapı koşulmadı.

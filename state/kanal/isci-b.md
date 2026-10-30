@@ -840,3 +840,12 @@ ACK; 07 branch'ine commit yok. `fix/05a-tools-read-analyst` kısa planı (07 mer
   - Modül docstring'i "Reading needs the developer role" düzeltilir; `docs/araclar.md` rol satırı güncellenir.
   - `openapi/05a.yaml` yeniden üretilir; rol yalnız açıklamadaysa fark yok. C7 additive (yetki genişlemesi, imza aynı), sınıf [A].
 - **Kapı:** lint + test iki profil + 05a test-int (`-k 05a`) ve tam test-int; yığın için YIGIN-AÇ.
+
+### B-07-0019 · 2026-10-30 12:22 · → koordinator · ACK
+Paket: 07   Cevap: K-07-0014
+DUZELT alındı, r1 MAJOR-1 doğru. Plan:
+- Süpürme her onayı ayrı transaction'da işler: koşullu `pending → expired`, run'ı koşullu `waiting_approval → failed` ve `approval_expired` olay satırı aynı commit'te. Hata olursa rollback; onay `pending` kalır, sonraki tik yeniden dener.
+- Seçim ölçütü: `pending` + TTL geçmiş **ya da** `expired` + run hâlâ `waiting_approval` (eski sürümde takılı kalanlar için).
+- İkinci kapatma no-op: run beklemiyorsa güncelleme 0 satır, olay yazılmaz.
+- Kırmızı testler: bir kez hata veren kapatıcıdan sonra ikinci tik run'ı kapatır, `approval_expired` tek; `expired` + `waiting_approval` takılı satır kapanır.
+- Kırmızı/yeşil DB ister. `make test` yalnız unit; kod yazılınca kısa YIGIN-AÇ (yalnız postgres + redis + tools, ~5 dk) isteyeceğim.
