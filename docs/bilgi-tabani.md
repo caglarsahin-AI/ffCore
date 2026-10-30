@@ -77,7 +77,11 @@ documents).
 Heading-aware, greedy packing from `chunk_size` (400 tokens) up to 1.5 × that (600), no
 overlap, counted with the embedding model's own tokenizer (`FAKE_EMBED=1` uses the estimate
 max(words × 1.6, characters / 6)). The 600 covers the whole embedded text: the breadcrumb
-(`Knowledge base › file › section`; attachments get `Ek: <file>`) plus the body. Over-long text
+(`Knowledge base › file › section`; attachments get `Ek: <file>`) plus the body. The section
+part is structure only (FOLLOWUP-108): a Markdown heading of at most 60 characters, an article as
+`Madde N - Title` up to the first colon (plain text writes `Madde 2 - Süre: <clause>`); a longer
+heading keeps only its number (`Madde 5`, `3.2`) and one without a number stays out of the
+breadcrumb, still in the body. Over-long text
 is split by paragraph, sentence and word, and a word longer than the limit by the tokenizer
 itself; nothing is cut. A breadcrumb taking more than half of the limit fails the document with
 `chunk_breadcrumb_too_long`. On reindex a chunk
@@ -99,6 +103,10 @@ re-embeds everything.
   pre-filters (single threshold rule); with it off, only `default_min_score` applies.
 - Every search writes one `kb_queries` row: the 30 candidates with both scores, what each
   threshold removed, latency and `run_id`.
+- Newest first (`by_recency`) orders by the document's source date, `updated_at_source`: an
+  upload form field, `PATCH …/documents/{id}`, or a connector's metadata (`ingest_from_raw`).
+  Without it the date is unknown (`null`), listed after dated sources and shown as "unknown
+  date" to the model; the upload time is never used in its place (FOLLOWUP-101).
 - Model weights live in the `model_cache` volume, never in the image. Keep it when closing a
   stack (`docker compose down`, not `down -v`).
 

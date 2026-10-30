@@ -29,6 +29,12 @@ Unknown fields are refused (422). Options the runtime does not run yet are refus
 code, never ignored: `answer_rules.verify` (`verify_not_supported`), `confidence_formula:
 sentence_max` (`confidence_formula_not_supported`), `knowledge[].filter.scope`
 (`knowledge_filter_not_supported`, FOLLOWUP-89). A definition without `schema_version` is version 1.
+Every definition check answers 422 `invalid_request_error` with its own code in `error.code`
+(`prompt_source`, `variable_duplicate`, `variable_undefined`, `knowledge_duplicate`,
+`knowledge_filter_not_supported`, `tool_duplicate`, `approval_action_unknown`,
+`verify_not_supported`, `confidence_formula_not_supported`, `output_reserve_too_small`,
+`structured_output_invalid`) and the field path in the message; a wrong type or an unknown field
+is `validation_error` (FOLLOWUP-105).
 
 Saving or publishing checks the budget against the model (C13): `context_tokens` above the model's
 `context_window`, or above `OLLAMA_CONTEXT_LENGTH` on an Ollama model, is 400
@@ -52,6 +58,11 @@ answers with an event stream (`text/event-stream`). The first event is `progress
 Event names (C9): `token, tool_call, tool_result, approval_required, question, sources, progress,
 fallback, done, error`; a client ignores names it does not know. Each event has an `id`; the
 stream ends after `done`, `error`, `approval_required` or `question`.
+A `sources` event names each source (document id and name, page, breadcrumb, source date),
+never its text. When a document is deleted later, the stored event and the live stream keep the
+reference, and every read shows its breadcrumb as `[deleted]`: `GET /runs/{id}/events`, a
+reconnect to the live stream (Redis, within `RUN_EVENT_STREAM_TTL_S`) and a replay from
+`run_events` (FOLLOWUP-108).
 
 - **Reconnect:** `GET /runs/{id}/stream` with `Last-Event-ID` continues after that event. Closing a
   stream never cancels a run. When the live stream has expired (`RUN_EVENT_STREAM_TTL_S`) the run

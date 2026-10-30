@@ -18,6 +18,7 @@ import time
 import uuid
 from collections.abc import Callable
 from dataclasses import dataclass
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import BinaryIO, Protocol
 
@@ -602,6 +603,13 @@ async def _set_status(document_id: uuid.UUID, status: str, error: str | None) ->
         await session.commit()
 
 
+def _source_date(value: str | datetime) -> datetime:
+    """A connector's source date (ISO 8601; a bare date is midnight UTC). Not a date: ValueError,
+    the document is not registered with a guessed date."""
+    parsed = value if isinstance(value, datetime) else datetime.fromisoformat(str(value))
+    return parsed if parsed.tzinfo else parsed.replace(tzinfo=UTC)
+
+
 async def ingest_from_raw(
     raw_path: str,
     metadata: dict,
@@ -633,6 +641,9 @@ async def ingest_from_raw(
         document.meta = {
             k: v for k, v in metadata.items() if k not in {"kb_id", "attachments", "filename"}
         }
+        if metadata.get("updated_at_source") is not None:
+            # The column orders search results (FOLLOWUP-101); the metadata copy stays as given.
+            document.updated_at_source = _source_date(metadata["updated_at_source"])
         document.gate0_status, document.gate0_reason = scope.gate0_upload(
             document.filename, document.size
         )

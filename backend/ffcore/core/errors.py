@@ -47,7 +47,22 @@ async def _http_error(_: Request, exc: StarletteHTTPException) -> JSONResponse:
     return _response(exc.status_code, error_type, code, message, getattr(exc, "headers", None))
 
 
+def _coded(exc: RequestValidationError) -> tuple[str, str] | None:
+    """(code, message) of the first coded refusal among the errors, e.g. a C8 definition check."""
+    for error in exc.errors():
+        cause = (error.get("ctx") or {}).get("error")
+        code = getattr(cause, "code", None)
+        if isinstance(cause, ValueError) and isinstance(code, str):
+            message = getattr(cause, "message", str(cause))
+            where = ".".join(str(p) for p in error.get("loc", ()) if p != "body")
+            return code, f"{where}: {message}" if where else message
+    return None
+
+
 async def _validation_error(_: Request, exc: RequestValidationError) -> JSONResponse:
+    coded = _coded(exc)
+    if coded is not None:
+        return _response(422, "invalid_request_error", *coded)
     fields = sorted({".".join(str(p) for p in e.get("loc", ())) for e in exc.errors()})
     message = "Invalid request: " + ", ".join(fields) if fields else "Invalid request."
     return _response(422, "invalid_request_error", "validation_error", message)

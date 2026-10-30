@@ -17,6 +17,7 @@ SAFE = {
     "version",
     "language",
     "duplicate_of",
+    "updated_at_source",  # a source date, no content (FOLLOWUP-101)
     "gate0",
     "gate1",
     "gate2",

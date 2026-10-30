@@ -519,6 +519,86 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorBody'
+    patch:
+      tags:
+      - knowledge-bases
+      summary: Update Document
+      description: 'Document metadata the uploader may correct; the source date orders search results
+        at
+
+        once (it is read from the document, no reindex).'
+      operationId: update_document_api_v1_projects__project_id__knowledge_bases__kb_id__documents__document_id__patch
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      - name: kb_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Kb Id
+      - name: document_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Document Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DocumentUpdate'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentOut'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
     delete:
       tags:
       - knowledge-bases
@@ -924,6 +1004,14 @@ components:
           title: Acl Open
           description: Open the files to every project member (empty ACL), on purpose.
           default: false
+        updated_at_source:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Updated At Source
+          description: 'When the source last changed (ISO 8601), for every file of the request. Omitted:
+            unknown (null), listed after dated sources; set later with PATCH.'
       type: object
       required:
       - files
@@ -1007,6 +1095,14 @@ components:
           - type: string
           - type: 'null'
           title: Breadcrumb
+        updated_at_source:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Updated At Source
+          description: 'When the source last changed (upload field, PATCH or the connector); null: unknown,
+            listed after dated sources (FOLLOWUP-101).'
         language:
           anyOf:
           - type: string
@@ -1061,6 +1157,7 @@ components:
       - metadata
       - version
       - breadcrumb
+      - updated_at_source
       - language
       - duplicate_of
       - gate0
@@ -1086,6 +1183,18 @@ components:
       - timeout
       title: DocumentStatus
       description: Derived from the gate decisions; `skipped` always carries a gate reason (fail-loud).
+    DocumentUpdate:
+      properties:
+        updated_at_source:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Updated At Source
+          description: When the source last changed; null clears it (unknown date).
+      additionalProperties: false
+      type: object
+      title: DocumentUpdate
     EmbedRequest:
       properties:
         texts:

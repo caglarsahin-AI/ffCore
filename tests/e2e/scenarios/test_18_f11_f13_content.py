@@ -62,10 +62,6 @@ def test_18_f11_8_injection_recognizer_event():
     pytest.skip("NOT_RUN: injection recognizer is 08 full (plan/18 F11)")
 
 
-@pytest.mark.skip(
-    reason="NOT_RUN: FOLLOWUP-101 (uploads get no updated_at_source, so by_recency cannot order "
-    "v2 first; 04a, K-SEN-0028). The check stays for when the date is set."
-)
 @pytest.mark.parametrize("case", VERSIONS, ids=lambda v: v["code"])
 def test_18_f13_3_newest_version_listed_first(login, fake_llm, case):
     """Both versions are retrieved and v2 comes before v1 in SOURCES (newest first, D5)."""
