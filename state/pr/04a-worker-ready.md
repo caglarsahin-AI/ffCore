@@ -41,3 +41,53 @@
 ## Varsayımlar
 1. Açılış aşımı `status=error` + `error_code=convert_worker_start_timeout` (mevcut `convert_cpu_limit`/`worker_died` kalıbı); belge `failed`, `timeout` değil (dosyanın suçu değil). GOREV'deki "WORKER_START_TIMEOUT durum kodu" bu `error_code` olarak okundu; yeni `status` değeri eklenmez (belge durum kümesi değişmez).
 2. `on_result` süresi açılışı da içerir (gözlem; davranış değil).
+
+## Plan onayı
+K-04aWR-0002: PLANNED onaylı; touch-zone eki (core/config.py, .env.example, deploy/docker-compose.yml birer satır) kabul; KARAR-GEREK **A** (ready yalnız `_resolve` sonrası; B warm kancası reddedildi, 80/20). `.env.test` değişmedi.
+
+## Sonuç
+**HEAD:** `3cecab486a37e9c68b1827f159f8bec95f05109d` · baz `e9583df` (main) · 1 commit · push yok · ağaç temiz.
+
+## Değişen dosyalar
+- `backend/ffcore/knowledge/convert/workers.py`: `READY` mesajı (`_worker_main`, `_resolve` + bellek sınırı sonrası); `_Worker.wait_ready(timeout)`; `BoundedPool`/`PersistentPool` isteğe bağlı `start_timeout` (varsayılan `DEFAULT_START_TIMEOUT = 60`); `_one` önce hazır olmayı bekler, dosya deadline'ı `ready` sonrası hesaplanır; aşımda `_start_timeout` (log `convert_worker_start_timeout`, işçi öldürülür, `status=error`, `error_code=convert_worker_start_timeout`).
+- `backend/ffcore/knowledge/ingest.py`: havuz `start_timeout=settings.convert_worker_start_timeout_seconds`, havuz anahtarında.
+- `backend/ffcore/core/config.py`: `convert_worker_start_timeout_seconds = 60` (gt=0).
+- `.env.example`, `deploy/docker-compose.yml`: `CONVERT_WORKER_START_TIMEOUT_SECONDS` (60).
+- `backend/tests/unit/_convert_targets_slow_start.py` (yeni test hedefi: içe aktarımda `FFCORE_TEST_START_DELAY` kadar uyur), `backend/tests/unit/test_04a_convert.py` (yeni testler + iki mevcut teste olay açıklaması).
+- `docs/bilgi-tabani.md`: dönüşüm paragrafına açılış sınırı ve model yükleme sınırı.
+
+## Kabul kriterleri → testler
+| # | Kriter | Test | Durum |
+|---|---|---|---|
+| 1 | Açılış dosya süresine sayılmaz | `test_04awr_1_slow_start_not_counted_in_file_timeout[persistent\|bounded]` | geçti; **kırmızı kanıtı:** eski kodda aynı senaryo (`FFCORE_TEST_START_DELAY=3`, timeout 2) → `timeout convert_timeout` (`red-old-timeout.log`); testin kendisi eski kodda `start_timeout` parametresi yok diye düştü (`red.log`) |
+| 2 | Açılış sınırı aşımı kodlu, işçi öldürülür, sonraki dosya taze işçiyle | `test_04awr_2_worker_start_timeout_is_coded_and_replaced` | geçti (eski kodda düştü) |
+| 3 | `ready` öncesi ölen işçi `worker_died`, asılı kalmaz | `test_04awr_3_worker_dying_before_ready_is_worker_died` | geçti (eski kodda yalnız imza nedeniyle düştü; davranış eski kodda da `worker_died` idi, koruma testi) |
+| 4 | İki flaky test olaya dayalı | `test_04a_9d_timeout_kills_worker_and_continues`, `test_04a_persistent_pool_reuses_its_process_and_replaces_it_after_timeout` | geçti; test kodu değişmedi (yalnız açıklama): 2 s artık yalnız dosyayı ölçer, spawn `ready` ile ayrıldı |
+| 5 | Ayar ingest havuzuna geçer | `test_04awr_5_ingest_pool_uses_start_timeout_setting` | geçti (eski kodda düştü) |
+| 6 | Yük altında 10 tekrar | 1-4'ün 7 testi, 14 CPU yakıcı (nproc 7 × 2) altında 10 döngü | **10/10 yeşil** (`load-10c.log`) |
+
+## Çalıştırılan komutlar
+Tümü `MSYS_NO_PATHCONV=1 FFCORE_VERSION=0.0.0-04awr docker compose -p ffcore-04awr --env-file .env.test run --rm --no-deps tools ...` (imaj `ffcore/tools:0.0.0-main` yeniden etiketlendi; bağımlılık değişmedi, kod `/work` bağlamasından). Tam çıktılar `state/pr/04a-worker-ready-kapilar/`.
+| Komut | Ortam | Exit | Süre / sonuç |
+|---|---|---|---|
+| kırmızı: yeni testler eski kodda | | 1 | 5 failed, 2 passed (`red.log`) |
+| kırmızı: eski kod + 3 s açılış | | 0 | `OLD_CODE_RESULT timeout convert_timeout` |
+| `pytest test_04a_convert.py test_04a_review_r1_limits.py` | | 0 | 40 passed, 62 s |
+| `make lint` | | 0 | ruff check + format (291 dosya) (`gates.log`, son hali `lint2.log`) |
+| `make test` | `DEPLOY_PROFILE=llmaas` | 0 | 649 passed, 180 s |
+| `make test` | `DEPLOY_PROFILE=airgap` | 0 | 649 passed, 163 s |
+| yük 10 tekrar (ilk) | 14 CPU yakıcı | — | 9/10; düşen `test_04awr_2` (ikinci yarıda taze işçiye de 2 s açılış sınırı veriyordum, yükte spawn > 2 s; `load-10b.log`) → test düzeltildi: ikinci yarıda `pool.start_timeout = 120` |
+| yük 10 tekrar (düzeltme sonrası) | 14 CPU yakıcı | 0 | **10/10**, 7 passed her koşuda (`load-10c.log`) |
+| `docker compose --env-file .env.test config --quiet` | | 0 | yeni değişken 5 serviste |
+Not: `make test` iki profil, `test_04awr_2` düzeltmesinden **önce** koştu; düzeltme yalnız bu testin ikinci yarısındaki sınır (ürün kodu değişmedi); düzeltilmiş test yük döngüsünde 10 kez ve son lint'te geçti. Yığın açılmadı; test-int/smoke koşulmadı (ürün davranışı yalnız dönüşüm havuzu, birim testleri gerçek spawn ile).
+
+## Varsayımlar ve sınırlar
+1. (onaylı, K-04aWR-0002 A) `ready` yalnız `_resolve` + bellek sınırı sonrası; **Docling ve PaddleOCR ilk dönüşümde yüklenir, bu yükleme ilk belgenin dosya süresine sayılmaya devam eder** (ölçülen ~66 s, varsayılan 600 s). K-06a-0029'daki "ilk belgenin model yüklemesiyle kesilmesi de düzelir" cümlesi bu PR'la karşılanmaz; docs'ta açık yazılı.
+2. Açılış aşımı `status=error` + `error_code=convert_worker_start_timeout` → belge `failed` (yeni status değeri yok).
+3. Kök neden çıkarımı (A-06a-0031) artık ölçüldü: eski kodda 3 s açılış 2 s dosya süresini tüketip `timeout` üretiyor.
+4. `on_result` süresi (BoundedPool) açılışı da içerir; davranış değil, gözlem.
+5. Test hedefi `_convert_targets_slow_start.py` touch-zone'da adıyla yoktu; test yardımcısı olarak `tests/unit` altına eklendi.
+
+## Kalan riskler
+- Gerçek Docling/PaddleOCR'lı ilk belge süresi bu PR'da ölçülmedi (`-m models`, varsayılan kapıda yok).
+- `DEFAULT_START_TIMEOUT` 60 s: konteynerde spawn + ffcore içe aktarımı yük altında saniyeler (ölçülmedi, yalnız 14 yakıcı altında 120 s sınırla sorunsuz).

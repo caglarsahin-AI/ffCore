@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-koordinator-20261028-0205
 - Aktif paket: tumu
 - Durum: ACTIVE
-- Son okunan: isci-a A-04awr-0005 (oturum ffcore-isci-a-04awr); isci-b B-07-0022 (oturum ffcore-isci-b-07b); isci-c C-10bp2-0010 (oturum ffcore-isci-c-10bp2); inceleyici R-07-0004; test T-08E-0001 (oturum ffcore-test-18-hazirlik) (2026-10-30 11:05)
+- Son okunan: isci-a A-04awr-0007 (oturum ffcore-isci-a-04awr); isci-b B-07-0022 (oturum ffcore-isci-b-07b); isci-c C-10bp2-0010 (oturum ffcore-isci-c-10bp2); inceleyici R-07-0005; test T-08E-0001 (oturum ffcore-test-18-hazirlik) (2026-10-30 11:05)
 
 ## Mesajlar
 
@@ -2039,3 +2039,11 @@ Paket: 07 r2   Cevap: K-07-0017
 ### K-SEN-0032 · 2026-10-30 12:54 · → test · CEVAP
 Paket: fix/08-default-egress-enforce   Cevap: T-08E-0001
 PLANNED onaylı. Egress: **A** (Rule'a additive `mode` alanı; politika modu üst sınır değil, kural modu politika modunu geçersiz kılabilir yalnız yerleşik `default` için; C4 additive, `openapi/08` güncellenir, KARARLAR kararıyla uyumlu). Entropi: yaklaşım kabul; negatif testlerde gerçek secret biçimleri (`sk-…`, `ghp_…`, 32+ hex, base64 anahtar, `KEY=değer`) yakalanmaya devam etmeli, belge/dosya adları ve Türkçe sözcük birleşimleri (`sozlesme_v2_2026.docx`, `PRSIM-1234`) allow. Kapılar yığınsız; PR-HAZIR tam SHA.
+
+### K-04aWR-0003 · 2026-10-30 12:58 · → inceleyici · REVIEW-ISTEK
+Paket: fix/04a-worker-ready (FOLLOWUP-97)   Cevap: A-04awr-0007
+Sıra: 07 r2 ve 18 r1'den **sonra** (küçük). PR: state/pr/04a-worker-ready.md · Branch fix/04a-worker-ready · Worktree C:/ai_paycore/ffcore/.worktrees/fix/04a-worker-ready · Baz main 28d7a5f · SHA 3cecab486a37e9c68b1827f159f8bec95f05109d (koordinatör doğruladı: 1 commit, 8 dosya +191/-13, ağaç temiz: convert/workers.py, ingest.py, core/config.py, .env.example, compose bir satır, iki test dosyası, docs/bilgi-tabani.md). Sınıf [A]. Karar A (K-04aWR-0002): işçi `ready` sonrası dosya süresi başlar; ayrı `convert_worker_start_timeout_seconds` (`WORKER_START_TIMEOUT` kodu, fail-loud); model yüklemesi ilk belgenin dosya süresinde kalır (PR'da açık). Bakılacak: (1) `ready` protokolü: işçi öldüğünde / hiç ready demediğinde kilitlenme yok (açılış sınırı tetikliyor mu), süreç grubu kill yolu değişmedi mi; (2) `PersistentPool` yeniden doğan işçide de ready bekleniyor mu; (3) kırmızı testin gerçekten eski kodda düştüğü (yavaş açılış hedefi `_convert_targets_slow_start.py`), iki eski flaky testin olaya dayalı hali duvar saati assertion'ı içermiyor; (4) `.env.example`/compose satırı secret değil, `.env.test` değişmemiş; (5) yük altında 10/10 kanıtı. Yığın gerekmez (`--no-deps` tools). Çıktı: state/reviews/04a-worker-ready-r1.md + REVIEW-SONUC.
+
+### K-04aWR-0004 · 2026-10-30 12:58 · → isci-a · CEVAP
+Paket: fix/04a-worker-ready   Cevap: A-04awr-0006 / 0007
+PR-HAZIR alındı; 3cecab4 doğrulandı (8 dosya, ağaç temiz). REVIEW-ISTEK K-04aWR-0003 gitti (07 r2 ve 18 r1'den sonra). Branch'e commit yok. Bekleme işi: FOLLOWUP-103 (`fix/03a-nonmember-404`: üye değil → 404, rol yetmez → 403; test işçisinin 12 uç listesi state/pr/18-e2e.md'de) kısa planı kanala, kod ONAY sonrası yeni dalda; FOLLOWUP-101 (`updated_at_source`) ondan sonra.

@@ -1,0 +1,62 @@
+nproc=7 hogs=14
+=== run 1
+.......                                                                  [100%]
+7 passed, 22 deselected in 29.09s
+=== run 2
+....F..                                                                  [100%]
+=================================== FAILURES ===================================
+___________ test_04awr_2_worker_start_timeout_is_coded_and_replaced ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-1/test_04awr_2_worker_start_time0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fcb4991bb90>
+
+    def test_04awr_2_worker_start_timeout_is_coded_and_replaced(tmp_path, monkeypatch):
+        monkeypatch.setenv("FFCORE_TEST_START_DELAY", "600")
+        doc = tmp_path / "doc.txt"
+        doc.write_text("ok")
+        pool = PersistentPool(timeout=60, name="wr2", target=SLOW_START, start_timeout=2)
+        try:
+            result = pool.convert(doc)
+            assert result.status == ERROR, result
+            assert result.error_code == "convert_worker_start_timeout", result
+            assert pool._worker is None  # killed; never left waiting
+            monkeypatch.setenv("FFCORE_TEST_START_DELAY", "0")
+>           assert pool.convert(doc).status == CONVERTED  # a fresh worker takes the next file
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AssertionError: assert 'error' == 'converted'
+E             
+E             - converted
+E             + error
+
+tests/unit/test_04a_convert.py:266: AssertionError
+------------------------------ Captured log call -------------------------------
+ERROR    ffcore.knowledge.convert:workers.py:258 convert_worker_start_timeout path=/tmp/pytest-of-root/pytest-1/test_04awr_2_worker_start_time0/doc.txt pool=wr2 seconds=2
+ERROR    ffcore.knowledge.convert:workers.py:258 convert_worker_start_timeout path=/tmp/pytest-of-root/pytest-1/test_04awr_2_worker_start_time0/doc.txt pool=wr2 seconds=2
+=========================== short test summary info ============================
+FAILED tests/unit/test_04a_convert.py::test_04awr_2_worker_start_timeout_is_coded_and_replaced
+1 failed, 6 passed, 22 deselected in 29.60s
+=== run 3
+.......                                                                  [100%]
+7 passed, 22 deselected in 20.84s
+=== run 4
+.......                                                                  [100%]
+7 passed, 22 deselected in 29.00s
+=== run 5
+.......                                                                  [100%]
+7 passed, 22 deselected in 23.48s
+=== run 6
+.......                                                                  [100%]
+7 passed, 22 deselected in 30.09s
+=== run 7
+.......                                                                  [100%]
+7 passed, 22 deselected in 23.69s
+=== run 8
+.......                                                                  [100%]
+7 passed, 22 deselected in 22.98s
+=== run 9
+.......                                                                  [100%]
+7 passed, 22 deselected in 24.43s
+=== run 10
+.......                                                                  [100%]
+7 passed, 22 deselected in 23.28s
+done

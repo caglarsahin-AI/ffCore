@@ -1,0 +1,32 @@
+nproc=7 hogs=14
+=== run 1
+.......                                                                  [100%]
+7 passed, 22 deselected in 25.54s
+=== run 2
+.......                                                                  [100%]
+7 passed, 22 deselected in 18.71s
+=== run 3
+.......                                                                  [100%]
+7 passed, 22 deselected in 26.39s
+=== run 4
+.......                                                                  [100%]
+7 passed, 22 deselected in 25.59s
+=== run 5
+.......                                                                  [100%]
+7 passed, 22 deselected in 21.47s
+=== run 6
+.......                                                                  [100%]
+7 passed, 22 deselected in 26.73s
+=== run 7
+.......                                                                  [100%]
+7 passed, 22 deselected in 19.27s
+=== run 8
+.......                                                                  [100%]
+7 passed, 22 deselected in 25.68s
+=== run 9
+.......                                                                  [100%]
+7 passed, 22 deselected in 20.58s
+=== run 10
+.......                                                                  [100%]
+7 passed, 22 deselected in 19.56s
+done

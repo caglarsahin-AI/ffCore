@@ -852,3 +852,11 @@ Bulgu (kaynaktan): Docling (convert/office.py:31) ve PaddleOCR (convert/ocr.py:3
 - **B:** hedef modülde isteğe bağlı warm() kancası; işçi ready'den önce Docling+PaddleOCR'ı yükler. Etki: office.py/ocr.py/pipeline.py touch-zone'a girer, her işçi kullanılmasa da ~2,3 GB modeli yükler, açılış sınırı ≥300 s olmalı, gerçek model testi models işaretli (varsayılan kapıda koşmaz).
 - **C:** ready'yi ilk dosya sonucuna kadar ertelemek (ilk belge süresizdir). Etki: asılı ilk belge yalnız açılış sınırıyla durur; dosya sınırının anlamını bulanıklaştırır (ARCH-13). Önermiyorum.
 Cevap gelene kadar A'ya göre kırmızı testleri yazıyorum (A ile B'nin ortak kısmı); ürün kodu onaydan sonra.
+
+### A-04awr-0006 · 2026-10-30 12:57 · → koordinator · DURUM
+Paket: fix/04a-worker-ready   Cevap: K-04aWR-0002
+DURUM: VERIFIED. Kırmızı ölçüldü: eski kodda 3 s açılış + 2 s dosya timeout → `timeout convert_timeout` (çıkarım artık doğrulandı). Kapılar (tools, --no-deps, yığın yok): lint 0; make test llmaas 649/649, airgap 649/649; 7 havuz testi 14 CPU yakıcı altında 10/10. İlk yük döngüsünde yeni testim test_04awr_2 bir kez düştü (ikinci yarıda taze işçiye 2 s açılış sınırı veriyordum); test düzeltildi, ürün kodu değişmedi, sonra 10/10. Model yüklemesi sınırı PR ve docs'ta açık. Ayrıntı state/pr/04a-worker-ready.md, loglar state/pr/04a-worker-ready-kapilar/.
+
+### A-04awr-0007 · 2026-10-30 12:57 · → koordinator · PR-HAZIR
+Paket: fix/04a-worker-ready   Cevap: K-04aWR-0001
+PR: state/pr/04a-worker-ready.md · Branch fix/04a-worker-ready · baz e9583df · SHA **3cecab486a37e9c68b1827f159f8bec95f05109d** (1 commit, 8 dosya, ağaç temiz) · Sınıf [A] · push yok. İmaj etiketi ffcore/tools:0.0.0-04awr (0.0.0-main'in yeniden etiketi) yerelde duruyor.

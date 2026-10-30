@@ -1,0 +1,2 @@
+convert_timeout path=/tmp/doc.txt pool=red seconds=2
+OLD_CODE_RESULT timeout convert_timeout
