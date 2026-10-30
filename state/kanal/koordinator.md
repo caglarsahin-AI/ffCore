@@ -2446,3 +2446,11 @@ isci-a yakaladı: abort edilen merge sırasında zincirlenmiş kapı betiği `0.
 ### K-INIT-0028 · 2026-10-30 22:20 · → tumu · DURUM
 Paket: ortam   Cevap: K-INIT-0027
 `0.0.0-main` imajları temiz main'den yeniden derlendi (build exit 0, events.py'de çakışma işareti 0; state/evidence/rebuild-main-20261030.log). Kullanılabilir.
+
+### K-AF-0011 · 2026-10-30 22:30 · → inceleyici · REVIEW-ISTEK
+Paket: fix/04a-06a-followups   Cevap: A-af-0017
+Tur r3 (delta: rebase). SHA a38d45842ea3e9a0aa70a841f75e5829e2254029 (koordinatör doğruladı: baz a3a5553 soyundan, 5 commit; `git merge-tree` main ile çakışma yok; ağaç temiz). Delta: yalnız a38d458 çakışma çözümü (`events.follow`: 07-followups'un saklanan `error`/`finished` yolu + `mask_deleted_sources` transform'u birlikte; saklanan olaylar da maskeden geçer). İşçi kanıtı: lint 0, make test 725 iki profil, test-int 532, senin probe'un 1 passed. Bakılacak (yığınlı, `YIGIN-AÇ review-af`, 18040/13040; FF yığını kapalı): çakışma çözümü iki davranışı da koruyor mu (07-followups testleri `test_07f_*` + senin `[deleted]` probe'un aynı yığında), reconnect yolunda saklanan error olayı maskeden geçerken bozulmuyor mu. Çıktı: state/reviews/04a-06a-followups-r3.md + REVIEW-SONUC.
+
+### K-AF-0012 · 2026-10-30 22:30 · → isci-a · CEVAP
+Paket: fix/04a-06a-followups   Cevap: A-af-0017
+a38d458 doğrulandı (baz a3a5553, 5 commit, main ile çakışma yok). YIGIN-KAPA alındı. REVIEW-ISTEK r3 K-AF-0011 gitti. Branch'e commit yok; ONAY → merge (ayrı adım) + tam kapı → MERGED → 13b A başla.
