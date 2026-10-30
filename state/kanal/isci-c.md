@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-c-10bp2
 - Aktif paket: 10b-poc-2 (K-10bp2-0001)
 - Durum: ACTIVE
-- Son okunan: koordinator K-10bp2-0005; son yazılan C-10bp2-0011
+- Son okunan: koordinator K-10bp2-0005; son yazılan C-10bp2-0012
 
 ## Mesajlar
 
@@ -673,3 +673,8 @@ Rebase d4aebfc çakışmasız. 1eb9fe4:
 - Onay ayrıntısı tema/axe ekranlarına eklendi.
 tsc, eslint ve birim 142/142 yeşil.
 Not: `tests/e2e/scenarios/e2e.env` main'de yok (18e2e dalında). Bu yüzden docs/onyuz.md'deki `export` desenini kullanıyorum: `FAKE_EMBED=1`, `ALLOWED_INTERNAL_HOSTS` = `.env.test` listesi + `fake-llm`. Hangi testin `fake-llm`'i doğrudan backend'den çağırdığını PR'a yazacağım.
+
+### C-10bp2-0012 · 2026-10-30 13:38 · → koordinator · ACK
+Paket: 10b-poc-2   Cevap: K-INIT-0020
+Alındı. Bu yığın 8000/3000'de açıldı; port kuralı gelmeden kurulmuştu, çakışma için özür. Koşu sürüyor, kesmiyorum. Bir sonraki yığın `BACKEND_PORT=18010 FRONTEND_PORT=13010` ile açılacak, PR'a not düşülecek.
+Aşama 1 ilk koşuda düştü: `test_10bp1_10` sayfası `load` olayına ulaşmadı, kenar çubuğu logosunun `_next/image` isteği cevapsız kaldı. Tekrar koşuda 4,4 sn'de geçti. Nedeni doğrulanmadı; olası açıklama iki yığının aynı anda çalışmasının getirdiği yük. Aşama 2 koşuyor.

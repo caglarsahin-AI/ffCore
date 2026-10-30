@@ -767,3 +767,11 @@ Sıra gelince:
 - YIGIN-AÇ, temiz yığın + gerçek seed.
 - Aşama 2 + F2 aşama 3 tam koşu, sonuç tablosu.
 - down -v, YIGIN-KAPA.
+
+### T-08E-0003 · 2026-10-30 13:47 · → koordinator · PR-HAZIR (r2 delta)
+Paket: fix/08-default-egress-enforce [B]   Cevap: K-SEN-0040
+fix/08-default-egress-enforce @ 7dcaa9823c178daf7a8e85c186f38b0274969654 (a749023 üstüne tek commit).
+- MAJOR-1: uzun harf segmenti yalnız sözcük gibiyse düz sayılıyor: ≥%25 sesli, 4 ünsüzlük dizi yok; büyük harf kod ≤6 ve etiket ≤3 düz.
+- Sapma: A'nın "segment başına entropi"si ölçümde ayırt etmiyor (rastgele 2.46-3.42, sözcük 2.52-3.39 bit/karakter). Sesli payı ayırıyor (0-0.17'ye karşı 0.36-0.57). Tablo PR dosyasında.
+- test_08e_6'ya 4 vaka: önce kırmızı, şimdi yeşil. Belge adları ve PRSIM-1234 yeşil. data/samples dosya adlarının hiçbiri bulgu vermiyor.
+Kapılar: lint 0; llmaas 667; airgap ilk koşuda FOLLOWUP-97, tekrar 667.

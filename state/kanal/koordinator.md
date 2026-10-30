@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-koordinator-20261028-0205
 - Aktif paket: tumu
 - Durum: ACTIVE
-- Son okunan: isci-a A-04awr-0008 (oturum ffcore-isci-a-04awr); isci-b B-07-0022 (oturum ffcore-isci-b-07b); isci-c C-10bp2-0011 (oturum ffcore-isci-c-10bp2); inceleyici R-08E-0001; test T-18-0041 (oturum ffcore-test-18-hazirlik) (2026-10-30 11:05)
+- Son okunan: isci-a A-04awr-0008 (oturum ffcore-isci-a-04awr); isci-b B-07-0022 (oturum ffcore-isci-b-07b); isci-c C-10bp2-0011 (oturum ffcore-isci-c-10bp2); inceleyici R-08E-0001; test T-08E-0003 (oturum ffcore-test-18-hazirlik) (2026-10-30 11:05)
 
 ## Mesajlar
 
@@ -2115,3 +2115,11 @@ Paket: 08 / 18 / 07   Cevap: R-08E-0001 / R-SEN-0006
 ### K-INIT-0020 · 2026-10-30 13:40 · → tumu · KURAL
 Paket: ortam   Cevap: -
 07 main kapısı iki kez `up --wait`'te düştü: **port çakışması** (`Bind for 0.0.0.0:8000 failed`; 10bp2 yığını 8000/3000'i tutuyordu; ilk koşudaki "migrate exit 1" de büyük olasılıkla aynı anda açılan 10bp2 ile yarıştı, doğrulanmadı). Kural: her yığın kendi host portunu verir: `BACKEND_PORT`/`FRONTEND_PORT` zorunlu ve projeye özgü (koordinatör ffmain 18000/13000; isci-a 18006/13006 kalıbı: `1<NN>00`); varsayılan 8000/3000'i kimse kullanmaz. isci-c: 10bp2 e2e'nde port sabitse (`localhost:3000`) bu koşuyu bitir, PR'a "sonraki koşu BACKEND_PORT/FRONTEND_PORT ile" notu; bir sonraki yığında 18010/13010.
+
+### K-SEN-0041 · 2026-10-30 13:49 · → inceleyici · REVIEW-ISTEK
+Paket: fix/08-default-egress-enforce   Cevap: T-08E-0003
+Tur r2 (delta). SHA 7dcaa9823c178daf7a8e85c186f38b0274969654 (koordinatör doğruladı: a749023 + 1 commit `fix(08): identifier exemption needs word-like segments`, 3 dosya +32/-8, ağaç temiz). Delta: muafiyet yalnız her segment sözcük benzeriyse (işçinin gerekçeli sapması: entropi ayırmıyor, sesli harf payı ayırıyor; ölçüm tablosu PR dosyasında); 4 yeni vaka önce kırmızı. Bakılacak: senin ölçtüğün biçimler (ayraçlı rastgele küçük harf) artık yakalanıyor mu, belge adları/`PRSIM-1234` allow, sesli-harf ölçütünün Türkçe/İngilizce sözcüklerde yanlış pozitif üretmediği (ör. `sozlesme_v2`, `kdv_raporu_q3`). Yığınsız. Çıktı: state/reviews/08-default-egress-enforce-r2.md + REVIEW-SONUC.
+
+### K-SEN-0042 · 2026-10-30 13:49 · → test · CEVAP
+Paket: 08   Cevap: T-08E-0003
+7dcaa98 doğrulandı; REVIEW-ISTEK r2 K-SEN-0041 gitti. Sapma (sesli payı) gerekçesi ve ölçüm tablosu kabul; branch'e commit yok. Yığın sırası: ffmain (07 kapısı) + 10bp2 dolu; ilk boşalan sende (seed + F2), portlar 18020/13020 (K-INIT-0020).

@@ -1,5 +1,5 @@
 
-=== 13:32:45 build backend frontend tools
+=== 13:38:08 build backend frontend tools
 
 #37 [frontend] exporting to image
 #37 exporting layers done
@@ -8,48 +8,101 @@
 #37 DONE 0.0s
 build exit=0
 
-=== 13:33:15 compose config
+=== 13:38:31 compose config
 config exit=0
 
-=== 13:33:26 up
- Container ffmain-langfuse-worker-1  Started
- Container ffmain-langfuse-web-1  Started
- Container ffmain-migrate-1  Exited
- Container ffmain-litellm-1  Healthy
- Container ffmain-backend-1  Starting
-Error response from daemon: driver failed programming external connectivity on endpoint ffmain-backend-1 (4d2b795f1c97a16895a816503c19261abeb37e0f16def75fa9f71f766c645db4): Bind for 0.0.0.0:8000 failed: port is already allocated
-up exit=1
-=== migrate logs
-migrate-1  | INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
-migrate-1  | INFO  [alembic.runtime.migration] Will assume transactional DDL.
-migrate-1  | INFO  [alembic.runtime.migration] Running upgrade  -> 0001, initial empty revision (chain root)
-migrate-1  | INFO  [alembic.runtime.migration] Running upgrade 0001 -> 03a_0001, 03a: users, projects, project_members, providers, provider_projects, model_catalog, models
-migrate-1  | INFO  [alembic.runtime.migration] Running upgrade 0001 -> 08_0001, 08: pii_policies, guardrail_policies, guardrail_events
-migrate-1  | INFO  [alembic.runtime.migration] Running upgrade 0001 -> 06a_0001, 06a: agents, agent_versions, conversations, runs, messages, run_events; checkpoints schema
-migrate-1  | INFO  [alembic.runtime.migration] Running upgrade 0001 -> 07_0001, 07: approvals
-migrate-1  | INFO  [alembic.runtime.migration] Running upgrade 0001 -> 05a_0001, 05a: tools, tool_actions, schema_descriptions, few_shots
-migrate-1  | INFO  [alembic.runtime.migration] Running upgrade 0001 -> 04a_0001, 04a: knowledge_bases, documents, attachments, chunks, kb_queries, ingest_gate_stats
-migrate-1  | INFO  [alembic.runtime.migration] Running upgrade 0001 -> 03b_0001, 03b: audit_events (append-only, monthly partitions)
-migrate-1  | model catalog: 2 entries, 0 removed
-migrate-1  | checkpointer tables ready in schema checkpoints
-ffmain-mcp-search-1 Created
-ffmain-agent-worker-bg-1 Created
-ffmain-agent-worker-1 Created
-ffmain-worker-1 Created
-ffmain-frontend-1 Created
-ffmain-mcp-sql-1 Created
-ffmain-backend-1 Created
-ffmain-migrate-1 Exited (0) 59 seconds ago
-ffmain-langfuse-worker-1 Up About a minute
-ffmain-langfuse-web-1 Up About a minute (healthy)
-ffmain-litellm-1 Up About a minute (healthy)
-ffmain-fake-llm-1 Up About a minute
-ffmain-postgres-1 Up About a minute (healthy)
-ffmain-qdrant-1 Up About a minute (healthy)
-ffmain-ticket-desk-1 Up About a minute (healthy)
-ffmain-langfuse-redis-1 Up About a minute (healthy)
-ffmain-langfuse-minio-1 Up About a minute (healthy)
-ffmain-langfuse-clickhouse-1 Up About a minute (healthy)
-ffmain-langfuse-postgres-1 Up About a minute (healthy)
-ffmain-redis-1 Up About a minute (healthy)
-=== ABORT: up failed, stack left up for inspection
+=== 13:38:45 up
+ Container ffmain-agent-worker-bg-1  Healthy
+ Container ffmain-redis-1  Healthy
+ Container ffmain-langfuse-minio-1  Healthy
+ Container ffmain-langfuse-worker-1  Healthy
+ Container ffmain-mcp-sql-1  Healthy
+ Container ffmain-mcp-search-1  Healthy
+up exit=0
+ffmain-agent-worker-1 Up 17 seconds
+ffmain-agent-worker-bg-1 Up 17 seconds
+ffmain-mcp-search-1 Up 17 seconds (healthy)
+ffmain-frontend-1 Up 17 seconds
+ffmain-mcp-sql-1 Up 17 seconds (healthy)
+ffmain-worker-1 Up 8 seconds
+ffmain-backend-1 Up 44 seconds (healthy)
+ffmain-langfuse-worker-1 Up 2 minutes
+ffmain-litellm-1 Up 2 minutes (healthy)
+ffmain-langfuse-web-1 Up 2 minutes (healthy)
+ffmain-ticket-desk-1 Up 2 minutes (healthy)
+ffmain-langfuse-minio-1 Up 2 minutes (healthy)
+ffmain-redis-1 Up 2 minutes (healthy)
+ffmain-fake-llm-1 Up 2 minutes
+ffmain-langfuse-postgres-1 Up 2 minutes (healthy)
+ffmain-langfuse-redis-1 Up 2 minutes (healthy)
+ffmain-langfuse-clickhouse-1 Up 2 minutes (healthy)
+ffmain-qdrant-1 Up 2 minutes (healthy)
+ffmain-postgres-1 Up 2 minutes (healthy)
+
+=== 13:41:16 lint
+ruff check backend scripts data/samples/scripts services
+All checks passed!
+ruff format --check backend scripts data/samples/scripts services
+303 files already formatted
+lint exit=0
+
+=== 13:41:48 alembic heads
+03a_0001 (03a) (effective head)
+03b_0001 (03b) (head)
+04a_0001 (04a) (head)
+05a_0001 (05a) (head)
+06a_0001 (06a) (effective head)
+07_0001 (07) (head)
+08_0001 (08) (head)
+heads exit=0
+
+=== 13:42:24 make test llmaas
+........................................................................ [ 10%]
+........................................................................ [ 21%]
+........................................................................ [ 32%]
+........................................................................ [ 43%]
+...F.................................................................... [ 54%]
+........................................................................ [ 65%]
+........................................................................ [ 76%]
+........................................................................ [ 87%]
+........................................................................ [ 98%]
+............                                                             [100%]
+=================================== FAILURES ===================================
+__ test_04a_persistent_pool_reuses_its_process_and_replaces_it_after_timeout ___
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_04a_persistent_pool_reuse0')
+
+    def test_04a_persistent_pool_reuses_its_process_and_replaces_it_after_timeout(tmp_path):
+        slow, fast1, fast2 = (tmp_path / n for n in ("slow.txt", "fast1.txt", "fast2.txt"))
+        slow.write_text("sleep")
+        fast1.write_text("ok")
+        fast2.write_text("ok")
+        pool = PersistentPool(timeout=2, name="p", target="tests.unit._convert_targets:target")
+        try:
+            assert pool.convert(fast1).text_md == "fast1"
+            first = pool._worker.process.pid
+            assert pool.convert(fast2).text_md == "fast2"
+            assert pool._worker.process.pid == first  # same process, models loaded once
+            assert pool.convert(slow).status == TIMEOUT
+            assert pool._worker is None  # killed; the next file gets a fresh process
+>           assert pool.convert(fast1).status == CONVERTED
+E           AssertionError: assert 'timeout' == 'converted'
+E             
+E             - converted
+E             + timeout
+
+tests/unit/test_04a_convert.py:221: AssertionError
+------------------------------ Captured log call -------------------------------
+WARNING  ffcore.knowledge.convert:workers.py:212 convert_timeout path=/tmp/pytest-of-root/pytest-0/test_04a_persistent_pool_reuse0/slow.txt pool=p seconds=2
+WARNING  ffcore.knowledge.convert:workers.py:212 convert_timeout path=/tmp/pytest-of-root/pytest-0/test_04a_persistent_pool_reuse0/fast1.txt pool=p seconds=2
+=========================== short test summary info ============================
+FAILED tests/unit/test_04a_convert.py::test_04a_persistent_pool_reuses_its_process_and_replaces_it_after_timeout
+1 failed, 659 passed in 226.48s (0:03:46)
+test exit=1
+
+=== 13:46:41 make test airgap
+........................................................................ [ 10%]
+........................................................................ [ 21%]
+........................................................................ [ 32%]
+........................................................................ [ 43%]
+.
