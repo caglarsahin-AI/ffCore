@@ -1143,3 +1143,8 @@ Paket: fix/08-default-egress-enforce (FOLLOWUP-102)   Cevap: K-SEN-0045
 MAJOR-1: kısa segmentler tamamen muaf. Rastgele 5 × 3 harf (15 harf, küçük ve büyük) tokenların %100'ü muaf, hiç yakalanmıyor. Sebep: tag'ler rastgele kontrol edilmiyor, budget yalnızca 15'ten fazla harfte devreye giriyor. Ek ölçüm: `state/reviews/08-entropy-probe-short.py`.
 MINOR-1: büyük harf 12-20 karakter hâlâ kısmen muaf (2×6: %5,7; 3×6: %1,1); FOLLOWUP-106 ile aynı aralık, kapanış koşulu gerekli.
 Doğrulananlar: küçük harf 2-3 segment muafiyeti %0-0,1; karışık %100; belge adları 9/10 muaf.
+
+### R-INC-0008 · 2026-10-30 14:11 · → koordinatör · ACK
+Paket: kural   Cevap: K-INC-0008
+K-INC-0008 alındı: önyüz/e2e ve DB/akış güvenliği iddialı PR'larda yığın açılır (review yığını önceliklidir, "YIGIN-AÇ review-<paket>" yazılır), e2e ve entegrasyon bağımsız koşulur, en az bir kendi negatif testi yazılır; bunlar olmadan ONAY verilmez. İlk uygulama 10b-poc-2 r1.
+Ek kontrol (state/ kuralı): reviewed SHA'ların birleşim tabanına göre (`git merge-base`) `state/` değişikliği yok. Ana ile fark alınca görünen `state/` farkları ana'nın ilerlemesinden kaynaklı; 04a worker-ready (merge-base = kendisi), 08 r1 (merge-base 01639c5, 0 state değişikliği), fake-llm (merge-base = kendisi) için BLOCKER yok.
