@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-test-18-hazirlik
 - Aktif paket: 18-hazirlik
 - Durum: ACTIVE
-- Son okunan: koordinator K-SEN-0026 (2026-10-30 12:05)
+- Son okunan: koordinator K-SEN-0027
 
 ## Mesajlar
 
@@ -643,3 +643,23 @@ Review beklerken e2e dalına araç yolu eklendi: feat/18-scenarios-e2e @ efcb7fa
 - F2 test_18_f2_7 [approved | rejected]: onaydan önce /_sent boş; onayla tek kayıt tkt-001; retle boş. Triyaj doğruluğu ve PII maskesi NOT_RUN gerçek model.
 - F4 maskeli araç argümanı ve F11 hâlâ NOT_RUN. Fake örnek değerler kullanıyor, kullanıcının metnini araca taşımıyor; maske veya talimat uyumu kanıtlanamaz.
 Yığınsız: toplama 2 passed, 45 skipped. Yığın sırası bekliyorum.
+
+### T-18-0035 · 2026-10-30 12:09 · → koordinator · YIGIN-AÇ 18e2e
+Paket: 18 senaryolar aşama 2   Cevap: K-SEN-0027
+Proje ffcore-18e2e, FFCORE_VERSION=0.0.0-18e2e, --env-file .env.test --env-file tests/e2e/scenarios/e2e.env --profile test (her komutta).
+
+### T-18-0036 · 2026-10-30 12:17 · → koordinator · KARAR-GEREK (yığın açık, bekliyor)
+Paket: 18 senaryolar aşama 2   Cevap: K-SEN-0027
+Seed ilerledi: superadmin, prompt'lar, projeler, üyeler, modeller tamam.
+- Düzeltildi: upstream_api zorunlu (chat); capabilities.tool_calls.
+- Durdu: sozlesmeler KB'sinde SZL-2025-003.docx → failed, model_missing: docling-project/docling-models /models'ta yok, "run make models". Fail-loud doğru; test yığınında Docling ağırlığı yok.
+- Etkilenen: .docx/.pdf KB'leri (sozlesmeler, surumler) → F1, F4, F9, F10, F13. .txt KB'leri (zehirli, b-prosedurler) etkilenmez.
+
+İkinci bulgu (F13): updated_at_source yalnız bağlayıcı metadata'sından geliyor (ingest.py:611). Upload API'si bunu almıyor, yüklenen belgede tarih yok. "Newest first" (prompting.by_recency) yüklemelerde sıralamayı değiştirmez. Senaryo kurgusu ne olursa olsun F13 sıralama testi kırmızı kalır → 04a/06a DUZELT önerisi (upload'da tarih alanı ya da belgeden tarih).
+
+Seçenekler (Docling):
+- **A (öneri)** e2e seed'i .docx/.pdf'i 13a'nın stdlib okuyucusuyla (data/samples/scripts/tests/readback.text_of) .txt'ye çevirip yükler. Adı <ad>.txt; testler adı gövdeden karşılaştırır; README'de açıkça yazılı.
+  Etki: aşama 2 şimdi koşar. Dönüşüm hattı (Docling) e2e'de sınanmaz; zaten 04a'nın models işaretli kendi testi. Ağ yok.
+- **B** make models ile Docling ağırlıklarını indir (dış ağ, ~GB). Etki: gerçek dönüşüm; ama indirme dış sisteme bağlanma (kullanıcı onayı, ENV-83 yol kontrolü), yığın sırası uzar.
+- **C** docx/pdf KB'li senaryolar NOT_RUN ("Docling ağırlığı yok"). Etki: F1, F4, F9, F10, F13 koşmaz; yalnız F2, F3, F11, F12.
+Cevaba kadar yığın açık; A'yı hazırlıyorum (kod), onaysız koşmam.

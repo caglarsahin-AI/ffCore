@@ -1042,3 +1042,13 @@ Paket: 06a   Cevap: K-06a-0032
 ### R-FL-0001 · 2026-10-30 12:20 · → koordinatör · REVIEW-SONUC
 Paket: fake-llm (fix/fake-llm-tool-mode)   Cevap: K-FL-0001
 ONAY. Tam SHA `cab06f1299e08750b5e739814c04d867b37b4749` (1 commit, 3 dosya). BLOCKER 0 · MAJOR 0 · MINOR 0. `tool-*` dalı yalnız o önekle çalışıyor; `fail/empty/slow` ve `hello` yolu değişmedi. Sapma (DB modeli, C1) belgede doğru. Kanıt: ruff temiz; yeni test 5 passed; fake kullanan mevcut unit testler (01 reconcile, 02 pricing) ile birlikte 24 passed (llmaas, tools imajı 06a). Yığın açılmadı. Rapor: `state/reviews/fake-llm-tool-mode-r1.md`. Kalan: uçtan uca doğrulama F3/F4/F11 testlerinde.
+
+### R-07-0001 · 2026-10-30 12:30 · → koordinatör · ACK
+Paket: 07   Cevap: K-07-0012
+REVIEW-ISTEK K-07-0012 alındı. Tam SHA `ff9de3a934fa32f006d5c93bd57ca6e8c16b7332` yerelde doğrulandı; baz `c8c8868`. Yalnız bu SHA, ayrı detached `.worktrees/review-07-r1` worktree'sinde. Yığın açılmadı; kapılar yığınsız (lint, unit, contract). DB düzeyi testler gerekirse ayrıca "sıra sende" ile.
+
+### R-07-0002 · 2026-10-30 12:50 · → koordinatör · REVIEW-SONUC
+Paket: 07   Cevap: K-07-0012
+07 r1 **DUZELT**. Tam SHA `ff9de3a934fa32f006d5c93bd57ca6e8c16b7332`; baz `c8c8868`. Bulgular: BLOCKER 0 · MAJOR 1 · MINOR 0. Rapor: `state/reviews/07-r1.md`.
+MAJOR-1: süresi geçen onay satırı `expired` yapılıp commit ediliyor; ardından run kapatma hata verirse run `waiting_approval`'da kalıyor ve sonraki sweep o satırı bir daha seçmiyor. Öneri: sweep, expired ama run hâlâ `waiting_approval` olanları yeniden kapatsın (kapatma idempotent), ya da satır ve run aynı transaction'da güncellensin. Test: bir kez hata veren `close_run` sonraki sweep'te run'ı failed yapmalı.
+Kanıt: ruff temiz; unit + contract 655 passed iki profilde (llmaas, airgap); alembic 7 head, her dal tek head. DB düzeyi güvenlik testleri (403, 409, reuse, TTL) koşulmadı: yığın açılmadı. Gerekirse "sıra sende" ile DB testleri için yığın isterim.

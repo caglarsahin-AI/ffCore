@@ -1,1 +1,37 @@
 === Fri Oct 30 12:08:19 TST 2026 lint
+All checks passed!
+ruff format --check backend scripts data/samples/scripts services
+290 files already formatted
+lint exit=0
+=== Fri Oct 30 12:08:52 TST 2026 test llmaas
+........................................................................ [ 11%]
+........................................................................ [ 22%]
+........................................................................ [ 33%]
+........................................................................ [ 44%]
+........................................................................ [ 55%]
+........................................................................ [ 67%]
+........................................................................ [ 78%]
+........................................................................ [ 89%]
+....................................................................     [100%]
+644 passed in 179.14s (0:02:59)
+test exit=0
+=== Fri Oct 30 12:12:31 TST 2026 test airgap
+            assert pool._worker is None  # killed; the next file gets a fresh process
+>           assert pool.convert(fast1).status == CONVERTED
+E           AssertionError: assert 'timeout' == 'converted'
+E             
+E             - converted
+E             + timeout
+
+tests/unit/test_04a_convert.py:221: AssertionError
+------------------------------ Captured log call -------------------------------
+WARNING  ffcore.knowledge.convert:workers.py:212 convert_timeout path=/tmp/pytest-of-root/pytest-0/test_04a_persistent_pool_reuse0/slow.txt pool=p seconds=2
+WARNING  ffcore.knowledge.convert:workers.py:212 convert_timeout path=/tmp/pytest-of-root/pytest-0/test_04a_persistent_pool_reuse0/fast1.txt pool=p seconds=2
+=========================== short test summary info ============================
+FAILED tests/unit/test_04a_convert.py::test_04a_9d_timeout_kills_worker_and_continues
+FAILED tests/unit/test_04a_convert.py::test_04a_persistent_pool_reuses_its_process_and_replaces_it_after_timeout
+2 failed, 642 passed in 182.50s (0:03:02)
+test-airgap exit=1
+=== Fri Oct 30 12:16:09 TST 2026 done
+..                                                                       [100%]
+2 passed in 6.94s

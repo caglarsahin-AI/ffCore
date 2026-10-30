@@ -829,3 +829,14 @@ PR: state/pr/07.md ("PR-HAZIR" bölümü) · Sınıf [A] · Branch feat/07-appro
 Kapılar ff9de3a: lint 0; make test 655/655 llmaas + airgap; make test-int 440 geçti + 4 atlandı llmaas + airgap; smoke passed; alembic 7 dal. Kırmızılar red-07a/red-07b, yeşil 63/63. Çıktılar state/pr/07-kapilar/.
 06a dosyalarına additive dokunuş (inceleyici baksın): graph.py tool_guard onay dalı, state.py ApprovalGate, adapters.py, worker.py cron_jobs; testlerde runtime_support.py ve test_03a_read_side.py muafiyet satırı.
 YIGIN-KAPA 07-approvals: down -v, 0 konteyner, 0 volume; 0.0.0-07 imajları duruyor. Branch'e commit atmıyorum.
+
+### B-07-0018 · 2026-10-30 12:09 · → koordinator · DURUM
+Paket: 07 (bekleme işi FOLLOWUP-100)   Cevap: K-07-0013
+ACK; 07 branch'ine commit yok. `fix/05a-tools-read-analyst` kısa planı (07 merge sonrası, main'den; kod yok):
+- **Uçlar:** `backend/ffcore/api/tools.py` satır 46 `Reader = require_role("developer")` → `"analyst"`. Etkilenen yalnız iki GET: `GET /projects/{p}/tools` (liste, aksiyonlar içinde) ve `GET /projects/{p}/tools/{tool_id}` (aracın aksiyonları). Ayrı aksiyon liste ucu yok, aksiyonlar `ToolOut.actions` içinde. Yazma uçları (`POST`, `PATCH`, `DELETE`, `discover`, aksiyon `PATCH`, `invoke`) `Admin` kalır. `sql-context` zaten `AnyMember`.
+- **Gizli alanlar:** `ToolOut.auth` `masked_auth` ile `***` (değişmez). `endpoint_url` ve başlık adları analiste görünür hale gelir; KARARLAR K-10bp2-0003 A bunu kabul ediyor, PR'da yazarım.
+- **Testler (önce kırmızı):** `test_05a_tool_roles` güncellenir (analyst liste ve tekil GET 200; analyst POST, PATCH, discover, invoke 403; `user` rolü GET 403 kalır). Yeni test: analyst gizli alanı `***` görür. `test_05a_read_mode_get_parity` analyst+read çiftiyle de koşar.
+- **Belge ve sözleşme:**
+  - Modül docstring'i "Reading needs the developer role" düzeltilir; `docs/araclar.md` rol satırı güncellenir.
+  - `openapi/05a.yaml` yeniden üretilir; rol yalnız açıklamadaysa fark yok. C7 additive (yetki genişlemesi, imza aynı), sınıf [A].
+- **Kapı:** lint + test iki profil + 05a test-int (`-k 05a`) ve tam test-int; yığın için YIGIN-AÇ.

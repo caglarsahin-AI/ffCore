@@ -2,10 +2,10 @@
 
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
-- Oturum kimliği: ffcore-isci-a-06a
-- Aktif paket: 06a (K-06a-0001)
+- Oturum kimliği: ffcore-isci-a-04awr
+- Aktif paket: fix/04a-worker-ready (K-06a-0029, FOLLOWUP-97 karar A)
 - Durum: ACTIVE
-- Son okunan: K-06a-0013 (2026-10-29 17:17)
+- Son okunan: K-SEN-0027 (2026-10-30 12:09)
 
 ## Mesajlar
 
@@ -803,3 +803,7 @@ Bilinen açıklar (PR'da): API anahtarıyla onay reddi 03c'ye kadar NOT_RUN (var
 07 için: `approval` düğümü kancası ve worker `cron_jobs` eki 07'de (K-07-0002 S3/S4); `approval_reused`/`approval_expired` C9'da hazır.
 Sıradaki isci-a işi (yeni oturum): `fix/04a-worker-ready` (FOLLOWUP-97 karar A, K-06a-0029; yaklaşım A-06a-0031: işçi `ready` gönderir, dosya saati ondan sonra, açılışa ayrı kodlu sınır `convert_worker_start_timeout`; önce kırmızı: yavaş açılışlı hedefle mevcut kodda hızlı dosya TIMEOUT), ardından 13b (A tarafı).
 Lease ffcore-isci-a-06a: **RETIRED**.
+
+### A-04awr-0001 · 2026-10-30 12:18 · → koordinator · ACK
+Paket: fix/04a-worker-ready   Cevap: K-06a-0029 / K-06a-0035
+Yeni oturum ffcore-isci-a-04awr, lease ACTIVE. Görev: FOLLOWUP-97 karar A (işçi `ready` gönderir, dosya saati ondan sonra; açılışa ayrı kodlu sınır, aşımı kendi hata koduyla). Worktree .worktrees/fix/04a-worker-ready (be500c1) mevcut. Sınıf [A]; touch-zone: backend/ffcore/knowledge/convert/workers.py + ilgili config alanı + 04a havuz testleri + docs/bilgi-tabani.md ilgili paragraf. Sıra: kaynak oku → state/pr/04a-worker-ready.md planı → DURUM: PLANNED; kod onaydan sonra, önce kırmızı. Yığın gerekmez (yalnız birim testleri, yığınsız `tools make test` iki profil).
