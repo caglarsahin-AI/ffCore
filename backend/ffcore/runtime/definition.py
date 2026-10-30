@@ -157,9 +157,18 @@ class AgentDefinition(_Strict):
         return self
 
 
+class DefinitionError(ValueError):
+    """A coded definition refusal (C8). Raised inside a Pydantic validator; the 422 handler in
+    core/errors.py answers with this code instead of validation_error (FOLLOWUP-105)."""
+
+    def __init__(self, code: str, message: str) -> None:
+        super().__init__(f"{code}: {message}")
+        self.code = code
+        self.message = message
+
+
 def _fail(code: str, message: str) -> None:
-    # Raised inside a Pydantic validator, so the 422 carries the code in its message.
-    raise ValueError(f"{code}: {message}")
+    raise DefinitionError(code, message)
 
 
 def check_definition(d: AgentDefinition) -> None:

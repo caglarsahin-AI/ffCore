@@ -12,7 +12,9 @@ Every 4xx response uses the OpenAI error shape:
 
 `type` follows the status (`authentication_error` 401, `permission_error` 403, `not_found_error` 404,
 `invalid_request_error` 400/422, `rate_limit_error` 429). Messages are English and never contain
-secrets, tokens or request bodies.
+secrets, tokens or request bodies. A 422 from body validation is `validation_error` with the
+field paths, except a coded refusal raised by a model check (e.g. an agent definition, C8): then
+`code` is that refusal's code and the message names the field (FOLLOWUP-105).
 
 ## Identity (03b)
 
