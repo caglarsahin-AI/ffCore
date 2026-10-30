@@ -805,3 +805,16 @@ Docker'sız ilerleme (commit serbest, test koşulmadı): 264b478 dilim 2 (liste/
 Paket: 07   Cevap: -
 Kod-only ilerleme tamam; motor ve 06a merge'ünü bekliyorum. Branch feat/07-approvals HEAD ccd893e (main 87173d7 üstüne 5 commit): 7fcdb8b tablo, 264b478 okuma uçları, 481e46e servis (open/reuse/TTL/yaş), e9ce84c karar kaydı `decide` (dilim 3'ün 07 tarafı; uç + 06a `runtime.resume.resume_run` aynı transaction'da dilim 6'da, run'ı sürdürmeyen yarım uç commit'lenmedi), ccd893e `docs/onaylar.md`. Dilim 1 dışındaki testler koşulmadı (ENV-94), state/pr/07.md "İlerleme".
 Motor dönünce (YIGIN-AÇ sıramla): `07-approvals` `down -v` → yeniden aç → `openapi/07.yaml` üret → dilim 2/3/4-5 kırmızıları ilgili önceki commit'e karşı → tam kapı iki profil → `down -v` + YIGIN-KAPA.
+
+### B-07-0013 · 2026-10-30 10:44 · → koordinator · ACK
+Paket: 07   Cevap: K-07-0009 / K-INIT-0017
+GOREV-EK alındı. Sıra: rebase c8c8868 → PLANNED güncellemesi (state/pr/07.md, kısa) → dilim 3 karar ucu + `resume_run` (aynı transaction) → dilim 6 graph kancası + worker `cron_jobs` (C9 tipleri `approval_reused`/`approval_expired`, yeni tip yok) → MAJOR-2: onay kaydı maskeli ya da `redacted` argüman. Her kabul önce kırmızı; kırmızılar ve kapılar yığın ister: kod bitince "YIGIN-AÇ 07-approvals" ile sıra isteyeceğim, o zamana kadar yığın açmıyorum (07-approvals stop'ta, volume duruyor).
+
+### B-07-0014 · 2026-10-30 10:56 · → koordinator · DURUM
+Paket: 07   Cevap: K-07-0009 / K-07-0010
+Kod tamam, test koşulmadı. feat/07-approvals HEAD 4d39f7f (c8c8868 üstüne 7 commit): 59600a2 kırmızı testler (test_07_flow uçtan uca, worker cron unit, FK), 4d39f7f uygulama: karar uçları `decide` + `resume_run` tek transaction (cevapta `stream_after`), `RunContext.approvals` kapısı + `tool_guard` kancası (reuse → `approval_reused`; kapı yoksa `approval_gate_missing`; `approval_required`/`approval_requested`'a additive `approval_id`, `expires_at`), BackgroundWorker `cron_jobs` (dakikalık sweep, `approval_expired` + `error` olayı), `run_id` FK + `depends_on 06a_0001`. 06a dosyalarına dokunuş: graph.py, state.py, adapters.py, worker.py (additive), tests/integration/runtime_support.py (Harness kapıyı verir).
+YIGIN-AÇ 07-approvals (sıra isteği): önce eski yığın `down -v`, sonra `0.0.0-07` build + up; kırmızılar (b059514 / 59600a2'ye karşı), `openapi/07.yaml` üretimi, tam kapı iki profil (lint, test, test-int; 06a testleri dahil), çıktılar tee ile; bitince `down -v` + YIGIN-KAPA. Sıra gelene kadar beklerim.
+
+### B-07-0015 · 2026-10-30 10:57 · → koordinator · DURUM
+Paket: 07   Cevap: K-07-0011
+YIGIN-AÇ 07-approvals (sıra alındı): down -v, 0.0.0-07 build, up.

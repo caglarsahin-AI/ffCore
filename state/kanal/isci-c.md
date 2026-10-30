@@ -2,10 +2,10 @@
 
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
-- Oturum kimliği: ffcore-isci-c-marka
-- Aktif paket: - (10-marka MERGED 4628219)
-- Durum: RETIRED
-- Son okunan: koordinator K-MRK-0009 (2026-10-30 09:25; K-MRK-0010 zil ile alındı, kanalda henüz yok); son yazılan C-MRK-0014 (HANDOFF)
+- Oturum kimliği: ffcore-isci-c-10bp2
+- Aktif paket: 10b-poc-2 (GOREV bekleniyor)
+- Durum: ACTIVE
+- Son okunan: koordinator K-07-0011 (2026-10-30 10:57); son yazılan C-10bp2-0001
 
 ## Mesajlar
 
@@ -590,3 +590,13 @@ Paket: 10-marka   Cevap: K-MRK-0010 (zil; merge git'te doğrulandı: 2843d40 mai
 - **Commit edilmemiş durum:** yok. Worktree `.worktrees/feat/10-brand-icon` ve branch duruyor; kaldırma koordinatörde.
 - **Branch ve son commit:** feat/10-brand-icon @ 2843d40d8fe0e1641bea80947b6bc90b7e5b7ebd → main 4628219.
 - **Ortam:** `marka` yığını `down -v` (konteyner 0, volume 0). `ffcore/*:0.0.0-marka` imajları ve `ffcore-10a-nm(-pw)` duruyor; imaj silme koordinatörde. Scratchpad logları oturuma özel.
+
+### C-10bp2-0001 · 2026-10-30 10:58 · → koordinator · DURUM
+Paket: 10b-poc-2   Cevap: -
+DURUM: OKUMA-TAMAM (yeni oturum ffcore-isci-c-10bp2; ffcore-isci-c-marka RETIRED).
+Okunan gruplar: 1 FELSEFE + FELSEFE_UYGULAMA; 2 CLAUDE (30 Ekim sürümü); 3 PLAN v2.6; 4 KARARLAR (28-30 Ekim eklemeleri: 10b sıralaması, 05a/06a kararları, C4/C7, `{{key}}`, iki yığın sınırı, paket başına oturum); 5 handbook tümü + PR şablonu (CONTRACTS C8/C9 yeni metni); 6 WORK_QUEUE, BLOCKERS, isci-c kanalının tamamı (HANDOFF C-10bp1-0011 ve C-MRK-0014 dahil), koordinatör kanalı K-07-0011'e kadar; 7 brief 10'un tamamı; 8 BASLATMA (soru penceresi yok kuralı).
+Durum: isci-c'ye adresli 10b-poc-2 GOREV'i yok. Bağımlılıklar: 05a MERGED, 06a main'de (c8c8868), 07 IMPLEMENTING. Claim, branch, worktree ve kod yok.
+SORU (iş sırası, senin yetkin):
+- A (önerim): GOREV şimdi gelsin. Plan ve 05a/06a ekranları (araçlar, agent sihirbazı + test paneli, koşular, F9 oy/not) main üzerinde başlar. Onay ekranı 07'nin `openapi/07.yaml`'ı branch'te gelince yazılır. PR-HAZIR 07 MERGED sonrası. 10b-poc-1 emsali: yazım 04a merge'ünü beklemedi. Bedel: 07 sözleşmesi review'da değişirse onay ekranında küçük rebase.
+- B: 07 MERGED olunca GOREV gelir. Bedel: C şeridi boş bekler; 13b bu pakete bağlı.
+Yığın: kod yazarken yığın açmam; e2e için `YIGIN-AÇ 10bp2` ile sıra isterim.
