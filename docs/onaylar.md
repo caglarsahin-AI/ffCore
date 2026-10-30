@@ -67,7 +67,9 @@ with `GET /api/v1/projects/{project_id}/runs/{run_id}/stream` and `Last-Event-ID
 Waiting time does not count against the run timeout (`RUN_TIMEOUT_S`); the approval TTL is
 counted separately. The background agent worker (`agent-worker-bg`) runs the sweep every minute:
 it expires what is due, closes those runs (`failed`, `approval_expired`, events
-`approval_expired` and `error`) and reports old pending approvals.
+`approval_expired` and `error`) and reports old pending approvals. Expiring an approval and
+closing its run are one transaction: if closing fails, both stay as they were and the next minute
+tries again; an approval already expired while its run still waits is closed on the next run.
 
 ## Not yet
 

@@ -13,7 +13,7 @@ from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 
-from sqlalchemy import select, update
+from sqlalchemy import and_, or_, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ffcore.core.audit import AuditEntry, write_event, write_event_detached
@@ -29,7 +29,8 @@ TTL_RESOLVER = "system:approval_ttl"
 # Error code of a run closed because its approval expired.
 EXPIRED_RUN_CODE = "approval_expired"
 
-CloseRun = Callable[[uuid.UUID, str], Awaitable[None]]
+# (session, run_id, code) -> closed; runs inside the sweep's transaction for one approval.
+CloseRun = Callable[[AsyncSession, uuid.UUID, str], Awaitable[bool]]
 
 
 def tool_key(action: str) -> str | None:
@@ -242,38 +243,67 @@ async def open_for_interrupt(
 async def expire_due(
     session: AsyncSession, *, now: datetime, close_run: CloseRun
 ) -> list[Approval]:
-    """Mark pending approvals past `expires_at` as expired and close their runs.
+    """Expire approvals past `expires_at` and close their runs, one approval per transaction.
 
-    The update is conditional on `status = 'pending'`, so a decision that lands first wins and
-    two job runs in the same tick expire a row once (U1: arq cron is unique per tick anyway).
-    Each closed run gets EXPIRED_RUN_CODE; a failure to close one is logged and re-raised after
-    the others, never swallowed.
+    Picked: pending approvals past their TTL, and approvals already expired whose run still
+    waits for approval (a close lost earlier). For each, the conditional `pending -> expired`
+    change and `close_run` (run `waiting_approval -> failed`, the `approval_expired` event) are
+    committed together; on any error both are rolled back and the next tick tries again
+    (review r1 MAJOR-1). A decision that lands first wins (the change is conditional); a run
+    that no longer waits is left alone, so a second close is a no-op. Errors are logged per
+    approval and raised after the others, never swallowed.
     """
-    rows = list(
+    from ffcore.models.runs import Run
+    from ffcore.runtime.contracts import RunStatus
+
+    due = and_(Approval.status == "pending", Approval.expires_at <= now)
+    stranded = and_(Approval.status == "expired", Run.status == RunStatus.waiting_approval)
+    ids = list(
         await session.scalars(
-            update(Approval)
-            .where(Approval.status == "pending", Approval.expires_at <= now)
-            .values(status="expired", resolved_at=now, resolved_by=TTL_RESOLVER, updated_at=now)
-            .returning(Approval)
+            select(Approval.id)
+            .join(Run, Run.id == Approval.run_id)
+            .where(or_(due, stranded))
+            .order_by(Approval.expires_at)
         )
     )
-    await session.commit()
+    await session.rollback()  # end the read; each approval gets its own transaction
+    done: list[Approval] = []
     failures: list[Exception] = []
-    for row in rows:
+    for approval_id in ids:
+        try:
+            row = await session.scalar(
+                update(Approval)
+                .where(Approval.id == approval_id, due)
+                .values(
+                    status="expired", resolved_at=now, resolved_by=TTL_RESOLVER, updated_at=now
+                )
+                .returning(Approval)
+            )
+            if row is None:
+                # Already expired (stranded), or decided since it was picked.
+                row = await session.scalar(
+                    select(Approval).where(Approval.id == approval_id, Approval.status == "expired")
+                )
+                if row is None:
+                    await session.rollback()
+                    continue
+            await close_run(session, row.run_id, EXPIRED_RUN_CODE)
+            await session.commit()
+        except Exception as exc:  # each approval is tried; the job still fails loud below
+            await session.rollback()
+            log.error("approval_expiry_failed approval_id=%s error=%s", approval_id, exc)
+            failures.append(exc)
+            continue
         log.warning(
             "approval_expired approval_id=%s run_id=%s project_id=%s",
             row.id,
             row.run_id,
             row.project_id,
         )
-        try:
-            await close_run(row.run_id, EXPIRED_RUN_CODE)
-        except Exception as exc:  # each run is tried; the job still fails loud below
-            log.error("approval_expired_run_not_closed run_id=%s error=%s", row.run_id, exc)
-            failures.append(exc)
+        done.append(row)
     if failures:
         raise RuntimeError(f"{len(failures)} expired approval run(s) could not be closed")
-    return rows
+    return done
 
 
 async def report_pending_age(
@@ -340,44 +370,45 @@ class RunApprovalGate:
 
 
 def run_closer(settings: Settings) -> CloseRun:
-    """Close a run whose approval expired: failed with `code`, the `approval_expired` event and
-    the client's `error`. Only a run still waiting for approval is changed (a cancelled or
-    already failed run is left as it is)."""
-    from ffcore.core import db
+    """Close a run whose approval expired, in the caller's transaction: failed with `code`, the
+    `approval_expired` event and the client's `error`. Only a run still waiting for approval is
+    changed (a cancelled or already failed run is left as it is: False, nothing written).
+
+    The first event write commits the approval, the run and that event together (RunEventWriter
+    commits each row); a failure before it (Redis unreachable at `start`) rolls all back."""
     from ffcore.models.runs import Run
     from ffcore.runtime import events as run_events
     from ffcore.runtime.contracts import RunEventType, RunStatus, SseEvent
 
-    async def close(run_id: uuid.UUID, code: str) -> None:
-        async with db.session_scope() as session:
-            closed = await session.scalar(
-                update(Run)
-                .where(Run.id == run_id, Run.status == RunStatus.waiting_approval)
-                .values(status=RunStatus.failed, error_code=code, ended_at=datetime.now(UTC))
-                .returning(Run.id)
+    async def close(session: AsyncSession, run_id: uuid.UUID, code: str) -> bool:
+        closed = await session.scalar(
+            update(Run)
+            .where(Run.id == run_id, Run.status == RunStatus.waiting_approval)
+            .values(status=RunStatus.failed, error_code=code, ended_at=datetime.now(UTC))
+            .returning(Run.id)
+        )
+        if closed is None:
+            log.info("approval_expired_run_not_waiting run_id=%s", run_id)
+            return False
+        client = run_events.redis_client(settings)
+        try:
+            writer = run_events.RunEventWriter(
+                session, client, run_id, ttl_s=settings.run_event_stream_ttl_s
             )
-            await session.commit()
-            if closed is None:
-                log.info("approval_expired_run_not_waiting run_id=%s", run_id)
-                return
-            client = run_events.redis_client(settings)
-            try:
-                writer = run_events.RunEventWriter(
-                    session, client, run_id, ttl_s=settings.run_event_stream_ttl_s
-                )
-                await writer.start()
-                await writer.record(RunEventType.approval_expired, {"code": code})
-                await writer.record(
-                    RunEventType.error,
-                    {
-                        "code": code,
-                        "status": RunStatus.failed,
-                        "message": "The approval expired before anyone decided.",
-                    },
-                    sse=SseEvent.error,
-                )
-            finally:
-                await client.aclose()
+            await writer.start()
+            await writer.record(RunEventType.approval_expired, {"code": code})
+            await writer.record(
+                RunEventType.error,
+                {
+                    "code": code,
+                    "status": RunStatus.failed,
+                    "message": "The approval expired before anyone decided.",
+                },
+                sse=SseEvent.error,
+            )
+        finally:
+            await client.aclose()
+        return True
 
     return close
 
