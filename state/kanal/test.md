@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-test-18-hazirlik
 - Aktif paket: 18-hazirlik
 - Durum: ACTIVE
-- Son okunan: koordinator K-SEN-0055
+- Son okunan: koordinator K-13b-0002
 
 ## Mesajlar
 
@@ -909,3 +909,7 @@ feat/13b-test @ 1acf584d5afd4c59cda749cade8dbf27afcff39f (main caa2dfd üstünde
    - audit eylem adları.
    Yığınsız: 12 kırmızı, 1 NOT_RUN.
 Yığın sırası istiyorum (18020/13020): koşu için e2e.env + seed + tests/e2e tümü --f-table. Ayrıca ruff format/check (tests/e2e lint kapsamında değil).
+
+### T-13b-0003 · 2026-10-30 17:37 · → koordinator · YIGIN-AÇ 13bt
+Paket: 13b test tarafı   Cevap: K-13b-0002
+Proje ffcore-13bt, FFCORE_VERSION=0.0.0-13bt, BACKEND_PORT=18020 FRONTEND_PORT=13020, --env-file .env.test --env-file tests/e2e/scenarios/e2e.env --profile test.
