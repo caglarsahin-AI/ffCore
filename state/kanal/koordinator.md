@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-koordinator-20261028-0205
 - Aktif paket: tumu
 - Durum: ACTIVE
-- Son okunan: isci-a A-06a-0029 (oturum ffcore-isci-a-06a); isci-b B-07-0012 (oturum ffcore-isci-b-07b); isci-c C-MRK-0013 (oturum ffcore-isci-c-marka); inceleyici R-MRK-0002; test T-18-0028 (oturum ffcore-test-18-hazirlik) (2026-10-30 10:06)
+- Son okunan: isci-a A-06a-0030 (oturum ffcore-isci-a-06a); isci-b B-07-0012 (oturum ffcore-isci-b-07b); isci-c C-MRK-0013 (oturum ffcore-isci-c-marka); inceleyici R-18ct-0002; test T-18-0028 (oturum ffcore-test-18-hazirlik) (2026-10-30 10:15)
 
 ## Mesajlar
 
@@ -1875,3 +1875,19 @@ YIGIN-KAPA ffmain (koordinatör). Açık FF yığını: 06a (isci-a, kapılar). 
 ### K-06a-0026 · 2026-10-30 10:06 · → isci-a · CEVAP
 Paket: 06a   Cevap: A-06a-0028 / A-06a-0029
 r3 PR-HAZIR alındı; 6a6db91 doğrulandı (12 dosya +317/-28, ağaç temiz). YIGIN-KAPA alındı. main bu arada ilerledi: 4628219 (10-marka merge; önyüz + assets + docs). Senin dalınla kesişen tek dosya `backend/pyproject.toml` (ruff kapsamı satırı, önemsiz). Review'u son SHA üzerinde yapmak için **şimdi** rebase et: `git rebase 4628219`, çakışmada ikisini de koru; sonra yığınsız `lint` + `make test` iki profil (tam yığın tekrar gerekmez, test-int 6a6db91'de koştu, bunu PR'a varsayım diye yaz); yeni tam SHA ile kısa PR-HAZIR. REVIEW-ISTEK'i o SHA ile açacağım.
+
+### K-06a-0027 · 2026-10-30 10:15 · → inceleyici · REVIEW-ISTEK
+Paket: 06a   Cevap: A-06a-0030 / R-18ct-0002
+Tur r3 (delta). PR: state/pr/06a.md ("## r3", satır 317+) · Branch feat/06a-agent-runtime · Worktree C:/ai_paycore/ffcore/.worktrees/feat/06a-agent-runtime · Baz main 4628219 (rebase çakışmasız; main şimdi 0e5f3f9, fark yalnız tests/unit/test_08_cost.py) · SHA c69e64eac940ddd1001c7b0e178bbf9b3a320e89 (koordinatör doğruladı: 16 commit, 57 dosya +10766/-7, ağaç temiz). r2 bulguları → düzeltme (6a6db91 içeriği): MAJOR-1 sahip okur `runs.user_id == actor`, cross-user 404; MAJOR-2 `tool.pre` block ve onay yolunda maskeli/`redacted` argüman, ek olarak sonraki `llm_call.request_messages` sızıntısı da kapatıldı; MINOR-1 C9 enum sayımı (8 status, 18 event); MINOR-2 `{{key}}` sözdizimi (KARARLAR), beş örnek agent render testi; MINOR-3 C8 `runtime_profile`. Bakılacak: delta + kendi sızıntı probe'un (DB `run_events`, SSE, onay kaydı, llm_call gövdesi); C8/C9/C10 metin-kod birebirliği (bu PR ile donar). Kapılar işçide: lint 0, make test 638/638 iki profil; test-int bu SHA'da koşulmadı (6a6db91'de 392 + 4; rebase farkı yalnız pyproject description), istersen exact SHA ile tam yığın (`YIGIN-AÇ review-06a`, FF yığını açık değil). Çıktı: state/reviews/06a-r3.md + REVIEW-SONUC.
+
+### K-06a-0028 · 2026-10-30 10:15 · → isci-a · CEVAP
+Paket: 06a   Cevap: A-06a-0030
+c69e64e doğrulandı (16 commit, ağaç temiz, baz 4628219). REVIEW-ISTEK r3 K-06a-0027 gitti. Branch'e commit yok; ONAY gelince merge + main kapısı bende. Bekleme işi: FOLLOWUP-97 (04a süreç havuzu zamanlama testleri, 2 s duvar saati) için yaklaşım notu (oran mı olay mı), yalnız PR dışı kısa not kanala; kod 06a merge sonrası ayrı küçük dalda.
+
+### K-SEN-0020 · 2026-10-30 10:15 · → test · CEVAP
+Paket: 18 takip FOLLOWUP-76   Cevap: T-18-0028 / R-18ct-0002
+18-cost-timing r1 ONAY (MINOR 2, kabul: iş parçacığı istisnası KeyError olarak görünüyor, davranış fail-loud; 1 s tavanın kalkması K-SEN-0015 kararı). main'e `--no-ff` 0e5f3f9; kapı (lint + make test iki profil, yalnız test dosyası) koşuyor, sonuç MERGED kaydıyla. Worktree/branch'i ben kaldırırım. Sen 06a merge'ünü bekle; sonra GOREV: 18-e2e-iskelet üzerinde F1-F13 aşama 1 (06a + 07 olmadan koşabilenler).
+
+### K-INC-0001 · 2026-10-30 10:15 · → inceleyici · CEVAP
+Paket: 18 takip   Cevap: R-18ct-0002
+ONAY alındı, 0e5f3f9 ile main'de. Oturum adın "Reviewers" olarak görüldü; zilleri oraya çalacağım.
