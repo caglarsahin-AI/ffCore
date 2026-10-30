@@ -1,7 +1,8 @@
 """Tool registry (05a): MCP tools of a project, their actions, discovery and test calls.
 
-Reading needs the developer role, every change admin (endpoints and upstream credentials are
-security relevant). Secret auth fields are stored encrypted and returned as ***.
+Reading needs the analyst role (the agent wizard picks tools and actions; FOLLOWUP-100), every
+change admin with edit access (endpoints and upstream credentials are security relevant). Secret
+auth fields are stored encrypted and returned as *** to every reader.
 """
 
 from typing import Annotated
@@ -43,7 +44,7 @@ from ffcore.services import mcp_client, mcp_sql_context, mcp_tools
 router = APIRouter(prefix="/projects/{project_id}/tools", tags=["tools"], responses=ERROR_RESPONSES)
 
 AnyMember = Annotated[Actor, Depends(require_role("user"))]
-Reader = Annotated[Actor, Depends(require_role("developer"))]
+Reader = Annotated[Actor, Depends(require_role("analyst"))]
 Admin = Annotated[Actor, Depends(require_role("admin", write=True))]
 SettingsDep = Annotated[Settings, Depends(get_settings)]
 ToolIdDep = Annotated[str, Depends(path_resource("tool_id"))]
@@ -98,6 +99,7 @@ async def _key_taken(session, project_id: UUID, key: str) -> bool:
 
 @router.get("", response_model=ToolList, summary="List the project's tools")
 async def list_tools(project_id: UUID, actor: Reader, session: SessionDep, settings: SettingsDep):
+    """Analyst role or above; secret auth fields are returned as ***."""
     rows = await session.scalars(
         select(Tool)
         .where(Tool.project_id == project_id, Tool.deleted_at.is_(None))
@@ -144,6 +146,7 @@ async def create_tool(
 async def get_tool(
     project_id: UUID, tool_id: UUID, actor: Reader, session: SessionDep, settings: SettingsDep
 ):
+    """Analyst role or above; secret auth fields are returned as ***."""
     return await tool_out(session, await _get(session, project_id, tool_id), settings)
 
 

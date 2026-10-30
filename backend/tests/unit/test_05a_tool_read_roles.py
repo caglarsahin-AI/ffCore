@@ -1,4 +1,4 @@
-"""FOLLOWUP-100 (decision A, K-10bp2-0003): analysts read tools and actions, only admins change them.
+"""FOLLOWUP-100 (decision A, K-10bp2-0003): analysts read tools and actions, admins change them.
 
 Route-level scan of the role each tool route requires; the behaviour (403/200, masked secrets)
 is proven against the real app in tests/integration/test_05a_tools_api.py.
