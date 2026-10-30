@@ -6,16 +6,19 @@
       "members": [
         {
           "email": "hastane-a-admin-edit@example.test",
+          "full_name": "Proje A yönetici (düzenleme)",
           "role": "admin",
           "access": "edit"
         },
         {
           "email": "hastane-a-admin-read@example.test",
+          "full_name": "Proje A yönetici (okuma)",
           "role": "admin",
           "access": "read"
         },
         {
           "email": "hastane-a-analyst-edit@example.test",
+          "full_name": "Proje A analist (düzenleme)",
           "role": "analyst",
           "access": "edit"
         }
@@ -37,16 +40,19 @@
       "members": [
         {
           "email": "klinik-b-admin-edit@example.test",
+          "full_name": "Proje B yönetici (düzenleme)",
           "role": "admin",
           "access": "edit"
         },
         {
           "email": "klinik-b-admin-read@example.test",
+          "full_name": "Proje B yönetici (okuma)",
           "role": "admin",
           "access": "read"
         },
         {
           "email": "klinik-b-analyst-edit@example.test",
+          "full_name": "Proje B analist (düzenleme)",
           "role": "analyst",
           "access": "edit"
         }

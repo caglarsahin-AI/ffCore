@@ -14,16 +14,22 @@ from pathlib import Path
 from . import write_text
 
 MEMBERS = [("admin", "edit"), ("admin", "read"), ("analyst", "edit")]
+# Display names built from project, role and access: never a person's name (DECISION-24;
+# 13b, K-13b-0001 S1). The seed gives them to POST /users as full_name.
+ROLE_NAMES = {"admin": "yönetici", "analyst": "analist"}
+ACCESS_NAMES = {"edit": "düzenleme", "read": "okuma"}
 
 PROJECTS = [
     {
         "key": "hastane-a",
+        "label": "Proje A",
         "name": "Örnek Şehir Hastanesi - Proje A",
         "knowledge_bases": [{"key": "sozlesmeler", "source": "contracts/"}],
         "agents": ["sozlesme-asistani", "veri-soru-cevap"],
     },
     {
         "key": "klinik-b",
+        "label": "Proje B",
         "name": "Örnek Şehir Hastanesi - Proje B",
         "knowledge_bases": [{"key": "b-prosedurler", "source": "projects/klinik-b/"}],
         "agents": ["sozlesme-asistani"],
@@ -59,7 +65,12 @@ def document() -> dict:
                 "key": p["key"],
                 "name": p["name"],
                 "members": [
-                    {"email": _email(p["key"], role, access), "role": role, "access": access}
+                    {
+                        "email": _email(p["key"], role, access),
+                        "full_name": f"{p['label']} {ROLE_NAMES[role]} ({ACCESS_NAMES[access]})",
+                        "role": role,
+                        "access": access,
+                    }
                     for role, access in MEMBERS
                 ],
                 "knowledge_bases": p["knowledge_bases"],
