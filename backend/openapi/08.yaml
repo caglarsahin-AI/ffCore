@@ -1612,6 +1612,14 @@ components:
           - type: string
           - type: 'null'
           title: Pii Policy Key
+        mode:
+          anyOf:
+          - type: string
+            enum:
+            - monitor
+            - enforce
+          - type: 'null'
+          title: Mode
       additionalProperties: false
       type: object
       required:

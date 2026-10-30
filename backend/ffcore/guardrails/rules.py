@@ -25,6 +25,13 @@ _VENDOR = (
         "JSON web token",
     ),
     ("API_TOKEN", r"-----BEGIN (?:RSA |EC |OPENSSH |DSA )?PRIVATE KEY-----", "private key block"),
+    # 32+ hex with letters and digits: below the entropy floor (hex tops out near 4 bits/char),
+    # so it gets its own pattern (K-SEN-0032).
+    (
+        "API_TOKEN",
+        r"\b(?=[0-9a-fA-F]*[a-fA-F])(?=[0-9a-fA-F]*[0-9])[0-9a-fA-F]{32,}\b",
+        "hex secret (32+ characters)",
+    ),
     (
         "PASSWORD",
         r"\b(?:postgres(?:ql)?|mysql|mongodb(?:\+srv)?|redis|amqp)://[^\s:@/]+:[^\s@/]+@",
@@ -39,6 +46,58 @@ _ASSIGNMENT = re.compile(
 )
 _TOKEN = re.compile(r"[A-Za-z0-9_\-+/=]{" + str(ENTROPY_MIN_CHARS) + ",}")
 _UUID = re.compile(r"[0-9a-fA-F]{8}-(?:[0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}")
+
+
+_SEGMENTS = re.compile(r"[-_]")
+_VOWELS = set("aeiouy")
+_CONSONANT_RUN = re.compile(r"[^aeiouy]{3,}")
+_TAG = re.compile(r"[a-z]{1,3}[0-9]*|[a-z]{1,3}[0-9]+[a-z]?")  # v2, q3, p4, kdv, b, el
+_CODE = re.compile(r"[A-Z]{2,6}")  # PRSIM, SZL, HBYS: plain only before a number segment
+# Words have about a third or more vowels (Turkish and English); random letters about a fifth.
+# Measured: words 0.36-0.57, random lowercase 0.00-0.17 (08 review r1). Entropy does not
+# separate them at these lengths (both 2.5-3.4 bits/char). Case is normalized first, so the
+# same test applies to upper-case segments, and a run of 3 consonants already ends a word
+# (08 review r2: random 2-segment exemption 2 % -> 0.1 %).
+WORD_MIN_VOWEL_SHARE = 0.3
+# Letters that passed only as a tag or a code are unverified; this many of them, in three or
+# more segments, make the value token-like whatever its shape (08 review r2, K-SEN-0043).
+MAX_UNVERIFIED_LETTERS = 15
+
+
+def _is_word(part: str) -> bool:
+    low = part.lower()
+    if not low.isalpha() or len(low) < 4 or not (part.islower() or part.isupper()):
+        return False
+    vowels = sum(ch in _VOWELS for ch in low) / len(low)
+    return vowels >= WORD_MIN_VOWEL_SHARE and not _CONSONANT_RUN.search(low)
+
+
+def is_plain_identifier(value: str) -> bool:
+    """A name built from plain words and numbers (`SZL-2025-003_temizlik-hizmet`, a document
+    name in every SOURCES block). Every `-`/`_` segment must be digits, a word (case-normalized:
+    at least WORD_MIN_VOWEL_SHARE vowels, no run of 3 consonants), a short tag (`v2`, `q3`,
+    `kdv`), or an upper-case code of 2-6 letters directly before a number segment
+    (`PRSIM-1234`). With three or more segments, more than MAX_UNVERIFIED_LETTERS letters in
+    tags and codes also end the exemption. Anything else (random letters of either case,
+    letters and digits mixed) stays under the entropy check (plan/18 F4 finding; 08 review r1,
+    r2)."""
+    parts = [p for p in _SEGMENTS.split(value) if p]
+    if len(parts) < 2:
+        return False
+    unverified = 0
+    for index, part in enumerate(parts):
+        following = parts[index + 1] if index + 1 < len(parts) else ""
+        if part.isdigit() or _is_word(part):
+            continue
+        if _TAG.fullmatch(part.lower()) and (
+            part.islower() or part.isupper() or not part.isalpha()
+        ):
+            unverified += sum(ch.isalpha() for ch in part)
+        elif _CODE.fullmatch(part) and following.isdigit():
+            unverified += len(part)
+        else:
+            return False
+    return not (len(parts) >= 3 and unverified > MAX_UNVERIFIED_LETTERS)
 
 
 def shannon_bits(value: str) -> float:
@@ -56,7 +115,12 @@ def find_secrets(text: str) -> list[Finding]:
         hits.append(Finding("PASSWORD", start, end, 0.9, "password keyword", m.group("value")))
     for m in _TOKEN.finditer(text):
         value = m.group(0)
-        if _UUID.fullmatch(value) or value.isdigit() or value.isalpha():
+        if (
+            _UUID.fullmatch(value)
+            or value.isdigit()
+            or value.isalpha()
+            or is_plain_identifier(value)
+        ):
             continue
         bits = shannon_bits(value)
         if bits >= ENTROPY_MIN_BITS:
