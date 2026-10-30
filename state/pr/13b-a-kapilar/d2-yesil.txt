@@ -1,0 +1,9 @@
+All checks passed!
+19 files already formatted
+......                                                                   [100%]
+============================== F table (plan/18) ===============================
+| Use case | Status | Passed | Failed | NOT_RUN | Failing tests | NOT_RUN reasons |
+|---|---|---|---|---|---|---|
+| Setup | passed | 6 | 0 | 0 |  |  |
+6 passed in 0.44s
+RUN_E2E_SCENARIOS=1 pytest tests/e2e -rs --f-table eval/results/e2e-20261030-2009.md

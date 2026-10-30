@@ -1,0 +1,8 @@
+All checks passed!
+19 files already formatted
+................                                                         [100%]
+============================== F table (plan/18) ===============================
+| Use case | Status | Passed | Failed | NOT_RUN | Failing tests | NOT_RUN reasons |
+|---|---|---|---|---|---|---|
+| Setup | passed | 16 | 0 | 0 |  |  |
+16 passed in 0.56s

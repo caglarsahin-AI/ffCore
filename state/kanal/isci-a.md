@@ -2,10 +2,10 @@
 
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
-- Oturum kimliği: ffcore-isci-a-af
-- Aktif paket: fix/04a-06a-followups (K-AF-0001; FOLLOWUP-105, 108, 101)
+- Oturum kimliği: ffcore-isci-a-13ba (aynı oturum, kullanıcı istisnası; önceki lease ffcore-isci-a-af, fix/04a-06a-followups MERGED 3f2bc31)
+- Aktif paket: 13b A tarafı (K-13b-0006)
 - Durum: ACTIVE
-- Son okunan: K-AF-0013
+- Son okunan: koordinatör zili "04a-06a MERGED, 13b A başla" (K-AF-0014 kanalda henüz yok)
 
 ## Mesajlar
 
@@ -1035,3 +1035,13 @@ r3 REVIEW-ISTEK alındı; branch'e commit yok. MERGED yazılınca 13b A başlar.
 ### A-af-0019 · 2026-10-30 22:42 · → koordinator · ACK
 Paket: fix/04a-06a-followups   Cevap: K-AF-0013
 r3 ONAY alındı; merge ve kapı sende. MERGED yazılınca feat/13b-e2e-eval'i merge SHA'sına rebase edip 13b A'ya başlıyorum; o zamana kadar okuma.
+
+### A-af-0020 · 2026-10-30 23:00 · → koordinator · HANDOFF
+Paket: fix/04a-06a-followups (FOLLOWUP-105 + 108 + 101)   Cevap: K-AF-0013 / MERGED zili
+- Durum: MERGED (main 3f2bc31; r3 ONAY a38d458, 0 bulgu). Lease ffcore-isci-a-af kapandı; aynı oturum 13b A için ffcore-isci-a-13ba (kullanıcı istisnası).
+- Tam sonraki adım: bu dalda iş yok. 13b A: feat/13b-e2e-eval → 3f2bc31 rebase, madde 0 FOLLOWUP-115.
+- Değişen dosyalar: runtime/definition.py, core/errors.py, knowledge/chunking.py, api/runs.py, runtime/events.py, api/knowledge.py, api/knowledge_schemas.py, knowledge/ingest.py, openapi/04a.yaml, frontend/lib/api/schema-04a.d.ts, testler (af_1, af_2, af_2b, af_2c, af_3 + 4 uyarlanan), e2e seed + F13 skip, docs (agentlar, api, bilgi-tabani). Ayrıntı state/pr/04a-06a-followups.md.
+- Testler: r3'te lint 0, make test 725/725 iki profil, test-int 532 + 4 opt-in; e2e F10_7 ve F13_3 yeşil (06de432); test_10bp2_3 NOT_RUN (Playwright, ağ).
+- Kararlar: K-AF-0002 S1 A (tarih yoksa NULL), S2 A ([deleted]); r1 MAJOR-1 tek maske tüm okuma yollarında; r3 follow finished+transform.
+- Blocker: yok. Açık takip: FOLLOWUP-115 (13b A madde 0), FOLLOWUP-116 (checkpoint kaynak metni, 06b), FOLLOWUP-112 (önyüz [deleted]/project_not_found).
+- Commit edilmemiş durum: yok. Yerelde ffcore/{backend,tools,frontend}:0.0.0-af etiketleri silinebilir; worktree .worktrees/fix/04a-06a-followups'a dokunmadım.

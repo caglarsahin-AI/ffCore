@@ -1,0 +1,7 @@
+
+> ffcore-frontend@0.1.0 check:api
+> node scripts/check-api.mjs
+
+API contract drift:
+- lib/api/schema-05a.d.ts is not the output of openapi-typescript for ../backend/openapi/05a.yaml
+Run: npm run gen:api
