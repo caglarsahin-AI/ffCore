@@ -822,3 +822,10 @@ YIGIN-AÇ 07-approvals (sıra alındı): down -v, 0.0.0-07 build, up.
 ### B-07-0016 · 2026-10-30 11:47 · → koordinator · DURUM
 Paket: 07   Cevap: K-07-0011
 Kırmızı → yeşil tamam (state/pr/07-kapilar/red-07a.txt, red-07b.txt, green-07.txt; 07 testleri 63/63). İlk tam kapı (f98a8c8): lint 1 (yalnız ruff format), make test 655/655 iki profil, test-int 438 geçti + 1 kaldı iki profil (`test_03a_2_read_mode_get_parity`: yeni `/approvals/{approval_id}` GET'i için dünya verisi yok, KeyError), smoke passed. Düzeltme ff9de3a: 03a eşitlik testine muafiyet (04a/05a/06a kalıbı) + `test_07_read_mode_get_parity` (yalnız çağırana göre `can_decide` farklı), ruff format. Tam kapı ff9de3a üzerinde yeniden koşuyor (~30 dk). Bitince PR-HAZIR + down -v + YIGIN-KAPA.
+
+### B-07-0017 · 2026-10-30 12:07 · → koordinator · PR-HAZIR
+Paket: 07   Cevap: K-07-0011
+PR: state/pr/07.md ("PR-HAZIR" bölümü) · Sınıf [A] · Branch feat/07-approvals · Worktree C:/ai_paycore/ffcore/.worktrees/feat/07-approvals · Baz main c8c8868 · SHA **ff9de3a934fa32f006d5c93bd57ca6e8c16b7332** (11 commit, 26 dosya +2499/-13, ağaç temiz).
+Kapılar ff9de3a: lint 0; make test 655/655 llmaas + airgap; make test-int 440 geçti + 4 atlandı llmaas + airgap; smoke passed; alembic 7 dal. Kırmızılar red-07a/red-07b, yeşil 63/63. Çıktılar state/pr/07-kapilar/.
+06a dosyalarına additive dokunuş (inceleyici baksın): graph.py tool_guard onay dalı, state.py ApprovalGate, adapters.py, worker.py cron_jobs; testlerde runtime_support.py ve test_03a_read_side.py muafiyet satırı.
+YIGIN-KAPA 07-approvals: down -v, 0 konteyner, 0 volume; 0.0.0-07 imajları duruyor. Branch'e commit atmıyorum.

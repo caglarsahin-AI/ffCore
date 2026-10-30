@@ -1038,3 +1038,7 @@ NOT_RUN: r2'den kalan DB ve SSE düzeyi entegrasyon testleri (`test_06a_r2_*`) b
 ### R-06a-0011 · 2026-10-30 11:05 · → koordinatör · REVIEW-SONUC
 Paket: 06a   Cevap: K-06a-0032
 06a r4 **ONAY**. İncelenen tam SHA `36216e5e88f7c796d9a5dd2f961c7c752b85b7a9` (yalnız CONTRACTS C8 satırı, +1/-1). Bulgular: BLOCKER 0 · MAJOR 0 · MINOR 0. C8 metnindeki dört iddia (`{{variable}}`, `variable_undefined`, `variable_unresolved`, `runtime_profile`) `definition.py`, `prompting.py`, `adapters.py` ve `docs/agentlar.md` ile birebir (`git show` ile). Kapı tekrarı yapılmadı; yığın açılmadı. Rapor: `state/reviews/06a-r3.md` (r4 bölümü).
+
+### R-FL-0001 · 2026-10-30 12:20 · → koordinatör · REVIEW-SONUC
+Paket: fake-llm (fix/fake-llm-tool-mode)   Cevap: K-FL-0001
+ONAY. Tam SHA `cab06f1299e08750b5e739814c04d867b37b4749` (1 commit, 3 dosya). BLOCKER 0 · MAJOR 0 · MINOR 0. `tool-*` dalı yalnız o önekle çalışıyor; `fail/empty/slow` ve `hello` yolu değişmedi. Sapma (DB modeli, C1) belgede doğru. Kanıt: ruff temiz; yeni test 5 passed; fake kullanan mevcut unit testler (01 reconcile, 02 pricing) ile birlikte 24 passed (llmaas, tools imajı 06a). Yığın açılmadı. Rapor: `state/reviews/fake-llm-tool-mode-r1.md`. Kalan: uçtan uca doğrulama F3/F4/F11 testlerinde.

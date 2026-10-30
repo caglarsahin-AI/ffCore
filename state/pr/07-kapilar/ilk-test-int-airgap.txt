@@ -1,0 +1,328 @@
+cd backend && QDRANT_URL=http://qdrant:6333 RUN_QDRANT_TESTS=1 pytest tests/integration
+============================= test session starts ==============================
+platform linux -- Python 3.12.10, pytest-9.2.0, pluggy-1.7.0
+rootdir: /work/backend
+configfile: pyproject.toml
+plugins: Faker-40.43.0, anyio-4.15.1, langsmith-0.14.8
+collected 443 items
+
+tests/integration/test_01_client.py .......                              [  1%]
+tests/integration/test_01_events.py ...                                  [  2%]
+tests/integration/test_01_reconcile.py ...........                       [  4%]
+tests/integration/test_01_seed.py ...                                    [  5%]
+tests/integration/test_02_langfuse.py ....                               [  6%]
+tests/integration/test_02_pricing.py .                                   [  6%]
+tests/integration/test_02_r1_worker_logging.py .                         [  6%]
+tests/integration/test_03a_access.py ............                        [  9%]
+tests/integration/test_03a_auth.py ..............                        [ 12%]
+tests/integration/test_03a_models.py ...........                         [ 15%]
+tests/integration/test_03a_obo_scope.py ................                 [ 18%]
+tests/integration/test_03a_providers.py ................                 [ 22%]
+tests/integration/test_03a_read_side.py F......                          [ 23%]
+tests/integration/test_03a_schema.py .......                             [ 25%]
+tests/integration/test_03b_audit.py ............                         [ 28%]
+tests/integration/test_03b_egress_dns.py s                               [ 28%]
+tests/integration/test_04a_api.py .............                          [ 31%]
+tests/integration/test_04a_embed_api.py ....                             [ 32%]
+tests/integration/test_04a_ingest.py .s..........s                       [ 35%]
+tests/integration/test_04a_qdrant.py ....                                [ 36%]
+tests/integration/test_04a_readyz.py ....                                [ 37%]
+tests/integration/test_04a_review_r1_acl.py ........                     [ 38%]
+tests/integration/test_04a_review_r1_ingest.py ......                    [ 40%]
+tests/integration/test_04a_review_r1_upload.py ..                        [ 40%]
+tests/integration/test_04a_search.py ........                            [ 42%]
+tests/integration/test_04a_store.py ..........                           [ 44%]
+tests/integration/test_04a_worker.py ..                                  [ 45%]
+tests/integration/test_05a_live_services.py .....                        [ 46%]
+tests/integration/test_05a_obo_verify.py .......                         [ 47%]
+tests/integration/test_05a_search.py ........                            [ 49%]
+tests/integration/test_05a_sql.py ..............s.....                   [ 54%]
+tests/integration/test_05a_tools_api.py ................................ [ 61%]
+............                                                             [ 64%]
+tests/integration/test_06a_adapters.py ..                                [ 64%]
+tests/integration/test_06a_agents.py ........                            [ 66%]
+tests/integration/test_06a_feedback.py .....                             [ 67%]
+tests/integration/test_06a_graph.py ............................         [ 73%]
+tests/integration/test_06a_mcp_tools.py ............                     [ 76%]
+tests/integration/test_06a_read_side.py .                                [ 76%]
+tests/integration/test_06a_readyz.py ..                                  [ 77%]
+tests/integration/test_06a_run_access.py ..........                      [ 79%]
+tests/integration/test_06a_runs_api.py .........                         [ 81%]
+tests/integration/test_06a_scheduler.py .......                          [ 83%]
+tests/integration/test_06a_schema.py .........                           [ 85%]
+tests/integration/test_07_api_read.py ...........                        [ 87%]
+tests/integration/test_07_decide.py .........                            [ 89%]
+tests/integration/test_07_flow.py .........                              [ 91%]
+tests/integration/test_07_schema.py ...........                          [ 94%]
+tests/integration/test_07_service.py .......                             [ 95%]
+tests/integration/test_08_api.py ................                        [ 99%]
+tests/integration/test_18td_tools_api.py ...                             [100%]
+
+=================================== FAILURES ===================================
+_______________________ test_03a_2_read_mode_get_parity ________________________
+
+app = <fastapi.applications.FastAPI object at 0x7f1b23dd63c0>
+world = {'edit': <starlette.testclient.TestClient object at 0x7f1a84224830>, 'read': <starlette.testclient.TestClient object a...2a0>, 'project_id': '91e437d2-f1d2-4e06-91df-76c5ec2c3820', 'provider_id': 'c2366407-4ffe-4a31-8d4f-2ee2c7e68175', ...}
+
+    def test_03a_2_read_mode_get_parity(app, world):
+        checked = 0
+        for path in _get_paths(app):
+            if path in PARITY_EXEMPT or path.startswith(PARITY_EXEMPT_PREFIXES):
+                continue
+>           url = re.sub(r"\{(\w+)\}", lambda m: world[m.group(1)], path)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_03a_read_side.py:88: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.12/re/__init__.py:186: in sub
+    return _compile(pattern, flags).sub(repl, string, count)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+m = <re.Match object; span=(40, 53), match='{approval_id}'>
+
+>   url = re.sub(r"\{(\w+)\}", lambda m: world[m.group(1)], path)
+                                         ^^^^^^^^^^^^^^^^^
+E   KeyError: 'approval_id'
+
+tests/integration/test_03a_read_side.py:88: KeyError
+---------------------------- Captured stderr setup -----------------------------
+2026-10-30 08:31:08,221 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-30 08:31:08,350 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-1945be5dd2.chat-default code=egress_not_allowlisted
+2026-10-30 08:31:08,350 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-4447af3fcb.chat-default code=egress_not_allowlisted
+2026-10-30 08:31:08,350 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-4f488f1331.chat code=egress_not_allowlisted
+2026-10-30 08:31:08,350 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-5ed7975332.chat code=egress_not_allowlisted
+2026-10-30 08:31:08,350 ERROR ffcore.litellm_reconcile litellm_model_not_written model=pa32a8d8f.chat-default code=egress_not_allowlisted
+2026-10-30 08:31:08,350 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-bd5b7f195e.chat code=egress_not_allowlisted
+2026-10-30 08:31:08,351 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-eaae06fdfe.chat code=egress_not_allowlisted
+2026-10-30 08:31:08,351 ERROR ffcore.litellm_reconcile litellm_model_not_written model=proj-356cff.chat-default code=egress_not_allowlisted
+2026-10-30 08:31:08,351 ERROR ffcore.litellm_reconcile litellm_model_not_written model=proj-8acde0.chat-default code=egress_not_allowlisted
+2026-10-30 08:31:08,351 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=9
+2026-10-30 08:31:08,371 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=147
+2026-10-30 08:31:08,443 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-30 08:31:08,584 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-1945be5dd2.chat-default code=egress_not_allowlisted
+2026-10-30 08:31:08,585 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-4447af3fcb.chat-default code=egress_not_allowlisted
+2026-10-30 08:31:08,585 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-4f488f1331.chat code=egress_not_allowlisted
+2026-10-30 08:31:08,585 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-5ed7975332.chat code=egress_not_allowlisted
+2026-10-30 08:31:08,585 ERROR ffcore.litellm_reconcile litellm_model_not_written model=pa32a8d8f.chat-default code=egress_not_allowlisted
+2026-10-30 08:31:08,585 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-bd5b7f195e.chat code=egress_not_allowlisted
+2026-10-30 08:31:08,585 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-eaae06fdfe.chat code=egress_not_allowlisted
+2026-10-30 08:31:08,585 ERROR ffcore.litellm_reconcile litellm_model_not_written model=proj-356cff.chat-default code=egress_not_allowlisted
+2026-10-30 08:31:08,585 ERROR ffcore.litellm_reconcile litellm_model_not_written model=proj-8acde0.chat-default code=egress_not_allowlisted
+2026-10-30 08:31:08,585 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=9
+2026-10-30 08:31:08,593 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=146
+2026-10-30 08:31:08,667 INFO ffcore.access access method=POST path=/api/v1/providers status=201 ms=67
+2026-10-30 08:31:08,791 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-1945be5dd2.chat-default code=egress_not_allowlisted
+2026-10-30 08:31:08,792 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-4447af3fcb.chat-default code=egress_not_allowlisted
+2026-10-30 08:31:08,792 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-4f488f1331.chat code=egress_not_allowlisted
+2026-10-30 08:31:08,792 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-5ed7975332.chat code=egress_not_allowlisted
+2026-10-30 08:31:08,792 ERROR ffcore.litellm_reconcile litellm_model_not_written model=pa32a8d8f.chat-default code=egress_not_allowlisted
+2026-10-30 08:31:08,792 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-bd5b7f195e.chat code=egress_not_allowlisted
+2026-10-30 08:31:08,792 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-eaae06fdfe.chat code=egress_not_allowlisted
+2026-10-30 08:31:08,793 ERROR ffcore.litellm_reconcile litellm_model_not_written model=proj-356cff.chat-default code=egress_not_allowlisted
+2026-10-30 08:31:08,793 ERROR ffcore.litellm_reconcile litellm_model_not_written model=proj-8acde0.chat-default code=egress_not_allowlisted
+2026-10-30 08:31:08,793 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=9
+2026-10-30 08:31:08,796 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-1945be5dd2.chat-default code=egress_not_allowlisted
+2026-10-30 08:31:08,797 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-4447af3fcb.chat-default code=egress_not_allowlisted
+2026-10-30 08:31:08,797 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-4f488f1331.chat code=egress_not_allowlisted
+2026-10-30 08:31:08,797 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-5ed7975332.chat code=egress_not_allowlisted
+2026-10-30 08:31:08,797 ERROR ffcore.litellm_reconcile litellm_model_not_written model=pa32a8d8f.chat-default code=egress_not_allowlisted
+2026-10-30 08:31:08,797 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-bd5b7f195e.chat code=egress_not_allowlisted
+2026-10-30 08:31:08,797 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-eaae06fdfe.chat code=egress_not_allowlisted
+2026-10-30 08:31:08,797 ERROR ffcore.litellm_reconcile litellm_model_not_written model=proj-356cff.chat-default code=egress_not_allowlisted
+2026-10-30 08:31:08,797 ERROR ffcore.litellm_reconcile litellm_model_not_written model=proj-8acde0.chat-default code=egress_not_allowlisted
+2026-10-30 08:31:08,797 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=9
+2026-10-30 08:31:08,839 INFO ffcore.access access method=POST path=/api/v1/projects/91e437d2-f1d2-4e06-91df-76c5ec2c3820/models status=201 ms=168
+------------------------------ Captured log setup ------------------------------
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-1945be5dd2.chat-default code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-4447af3fcb.chat-default code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-4f488f1331.chat code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-5ed7975332.chat code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=pa32a8d8f.chat-default code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-bd5b7f195e.chat code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-eaae06fdfe.chat code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=proj-356cff.chat-default code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=proj-8acde0.chat-default code=egress_not_allowlisted
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=9
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=147
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-1945be5dd2.chat-default code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-4447af3fcb.chat-default code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-4f488f1331.chat code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-5ed7975332.chat code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=pa32a8d8f.chat-default code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-bd5b7f195e.chat code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-eaae06fdfe.chat code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=proj-356cff.chat-default code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=proj-8acde0.chat-default code=egress_not_allowlisted
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=9
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=146
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/providers status=201 ms=67
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-1945be5dd2.chat-default code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-4447af3fcb.chat-default code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-4f488f1331.chat code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-5ed7975332.chat code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=pa32a8d8f.chat-default code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-bd5b7f195e.chat code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-eaae06fdfe.chat code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=proj-356cff.chat-default code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=proj-8acde0.chat-default code=egress_not_allowlisted
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=9
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-1945be5dd2.chat-default code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-4447af3fcb.chat-default code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-4f488f1331.chat code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-5ed7975332.chat code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=pa32a8d8f.chat-default code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-bd5b7f195e.chat code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-eaae06fdfe.chat code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=proj-356cff.chat-default code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=proj-8acde0.chat-default code=egress_not_allowlisted
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=9
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/91e437d2-f1d2-4e06-91df-76c5ec2c3820/models status=201 ms=168
+----------------------------- Captured stderr call -----------------------------
+2026-10-30 08:31:09,240 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-1945be5dd2.chat-default code=egress_not_allowlisted
+2026-10-30 08:31:09,245 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-4447af3fcb.chat-default code=egress_not_allowlisted
+2026-10-30 08:31:09,251 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-4f488f1331.chat code=egress_not_allowlisted
+2026-10-30 08:31:09,251 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-5ed7975332.chat code=egress_not_allowlisted
+2026-10-30 08:31:09,257 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-91e437d2f1.chat-default code=egress_not_allowlisted
+2026-10-30 08:31:09,262 ERROR ffcore.litellm_reconcile litellm_model_not_written model=pa32a8d8f.chat-default code=egress_not_allowlisted
+2026-10-30 08:31:09,262 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-bd5b7f195e.chat code=egress_not_allowlisted
+2026-10-30 08:31:09,262 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-eaae06fdfe.chat code=egress_not_allowlisted
+2026-10-30 08:31:09,263 ERROR ffcore.litellm_reconcile litellm_model_not_written model=proj-356cff.chat-default code=egress_not_allowlisted
+2026-10-30 08:31:09,263 ERROR ffcore.litellm_reconcile litellm_model_not_written model=proj-8acde0.chat-default code=egress_not_allowlisted
+2026-10-30 08:31:09,263 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=10
+2026-10-30 08:31:09,281 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-1945be5dd2.chat-default code=egress_not_allowlisted
+2026-10-30 08:31:09,291 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-4447af3fcb.chat-default code=egress_not_allowlisted
+2026-10-30 08:31:09,297 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-4f488f1331.chat code=egress_not_allowlisted
+2026-10-30 08:31:09,302 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-5ed7975332.chat code=egress_not_allowlisted
+2026-10-30 08:31:09,309 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-91e437d2f1.chat-default code=egress_not_allowlisted
+2026-10-30 08:31:09,315 ERROR ffcore.litellm_reconcile litellm_model_not_written model=pa32a8d8f.chat-default code=egress_not_allowlisted
+2026-10-30 08:31:09,320 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-bd5b7f195e.chat code=egress_not_allowlisted
+2026-10-30 08:31:09,326 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-eaae06fdfe.chat code=egress_not_allowlisted
+2026-10-30 08:31:09,331 ERROR ffcore.litellm_reconcile litellm_model_not_written model=proj-356cff.chat-default code=egress_not_allowlisted
+2026-10-30 08:31:09,337 ERROR ffcore.litellm_reconcile litellm_model_not_written model=proj-8acde0.chat-default code=egress_not_allowlisted
+2026-10-30 08:31:09,342 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=10
+2026-10-30 08:31:09,768 INFO ffcore.access access method=GET path=/api/v1/users status=200 ms=47
+2026-10-30 08:31:09,829 INFO ffcore.access access method=GET path=/api/v1/users status=200 ms=54
+2026-10-30 08:31:09,877 INFO ffcore.access access method=GET path=/api/v1/users/bab0c326-1dbe-4ca8-9cac-a83db8c419bf status=200 ms=44
+2026-10-30 08:31:09,965 INFO ffcore.access access method=GET path=/api/v1/users/bab0c326-1dbe-4ca8-9cac-a83db8c419bf status=200 ms=85
+2026-10-30 08:31:10,016 INFO ffcore.access access method=GET path=/api/v1/projects status=200 ms=49
+2026-10-30 08:31:10,054 INFO ffcore.access access method=GET path=/api/v1/projects status=200 ms=34
+2026-10-30 08:31:10,102 INFO ffcore.access access method=GET path=/api/v1/projects/91e437d2-f1d2-4e06-91df-76c5ec2c3820 status=200 ms=44
+2026-10-30 08:31:10,146 INFO ffcore.access access method=GET path=/api/v1/projects/91e437d2-f1d2-4e06-91df-76c5ec2c3820 status=200 ms=41
+2026-10-30 08:31:10,204 INFO ffcore.access access method=GET path=/api/v1/projects/91e437d2-f1d2-4e06-91df-76c5ec2c3820/readiness status=200 ms=54
+2026-10-30 08:31:10,256 INFO ffcore.access access method=GET path=/api/v1/projects/91e437d2-f1d2-4e06-91df-76c5ec2c3820/readiness status=200 ms=50
+2026-10-30 08:31:10,304 INFO ffcore.access access method=GET path=/api/v1/projects/91e437d2-f1d2-4e06-91df-76c5ec2c3820/members status=200 ms=43
+2026-10-30 08:31:10,348 INFO ffcore.access access method=GET path=/api/v1/projects/91e437d2-f1d2-4e06-91df-76c5ec2c3820/members status=200 ms=40
+2026-10-30 08:31:10,384 INFO ffcore.access access method=GET path=/api/v1/provider-drivers status=200 ms=33
+2026-10-30 08:31:10,417 INFO ffcore.access access method=GET path=/api/v1/provider-drivers status=200 ms=29
+2026-10-30 08:31:10,498 INFO ffcore.access access method=GET path=/api/v1/providers status=200 ms=79
+2026-10-30 08:31:10,590 INFO ffcore.access access method=GET path=/api/v1/providers status=200 ms=88
+2026-10-30 08:31:10,644 INFO ffcore.access access method=GET path=/api/v1/providers/c2366407-4ffe-4a31-8d4f-2ee2c7e68175 status=200 ms=51
+2026-10-30 08:31:10,688 INFO ffcore.access access method=GET path=/api/v1/providers/c2366407-4ffe-4a31-8d4f-2ee2c7e68175 status=200 ms=42
+2026-10-30 08:31:10,719 INFO ffcore.access access method=GET path=/api/v1/model-catalog status=200 ms=26
+2026-10-30 08:31:10,752 INFO ffcore.access access method=GET path=/api/v1/model-catalog status=200 ms=29
+2026-10-30 08:31:10,798 INFO ffcore.access access method=GET path=/api/v1/projects/91e437d2-f1d2-4e06-91df-76c5ec2c3820/models status=200 ms=44
+2026-10-30 08:31:10,848 INFO ffcore.access access method=GET path=/api/v1/projects/91e437d2-f1d2-4e06-91df-76c5ec2c3820/models status=200 ms=47
+2026-10-30 08:31:10,896 INFO ffcore.access access method=GET path=/api/v1/projects/91e437d2-f1d2-4e06-91df-76c5ec2c3820/models/d4715f51-690d-42bf-b860-ea1749f09452 status=200 ms=44
+2026-10-30 08:31:10,950 INFO ffcore.access access method=GET path=/api/v1/projects/91e437d2-f1d2-4e06-91df-76c5ec2c3820/models/d4715f51-690d-42bf-b860-ea1749f09452 status=200 ms=51
+2026-10-30 08:31:11,044 INFO ffcore.access access method=GET path=/api/v1/audit status=200 ms=84
+2026-10-30 08:31:11,106 INFO ffcore.access access method=GET path=/api/v1/audit status=200 ms=59
+2026-10-30 08:31:11,205 INFO ffcore.access access method=GET path=/api/v1/audit.csv status=200 ms=94
+2026-10-30 08:31:11,333 INFO ffcore.access access method=GET path=/api/v1/audit.csv status=200 ms=123
+2026-10-30 08:31:11,418 INFO ffcore.access access method=GET path=/api/v1/projects/91e437d2-f1d2-4e06-91df-76c5ec2c3820/pii-policies status=200 ms=79
+2026-10-30 08:31:11,497 INFO ffcore.access access method=GET path=/api/v1/projects/91e437d2-f1d2-4e06-91df-76c5ec2c3820/pii-policies status=200 ms=74
+2026-10-30 08:31:11,614 INFO ffcore.access access method=GET path=/api/v1/projects/91e437d2-f1d2-4e06-91df-76c5ec2c3820/guardrail-policies status=200 ms=113
+2026-10-30 08:31:11,675 INFO ffcore.access access method=GET path=/api/v1/projects/91e437d2-f1d2-4e06-91df-76c5ec2c3820/guardrail-policies status=200 ms=57
+2026-10-30 08:31:11,751 INFO ffcore.access access method=GET path=/api/v1/projects/91e437d2-f1d2-4e06-91df-76c5ec2c3820/tools status=200 ms=71
+2026-10-30 08:31:11,816 INFO ffcore.access access method=GET path=/api/v1/projects/91e437d2-f1d2-4e06-91df-76c5ec2c3820/tools status=200 ms=60
+2026-10-30 08:31:11,882 INFO ffcore.access access method=GET path=/api/v1/projects/91e437d2-f1d2-4e06-91df-76c5ec2c3820/agents status=200 ms=63
+2026-10-30 08:31:11,943 INFO ffcore.access access method=GET path=/api/v1/projects/91e437d2-f1d2-4e06-91df-76c5ec2c3820/agents status=200 ms=58
+2026-10-30 08:31:12,049 INFO ffcore.access access method=GET path=/api/v1/projects/91e437d2-f1d2-4e06-91df-76c5ec2c3820/runs status=200 ms=102
+2026-10-30 08:31:12,114 INFO ffcore.access access method=GET path=/api/v1/projects/91e437d2-f1d2-4e06-91df-76c5ec2c3820/runs status=200 ms=62
+2026-10-30 08:31:12,192 INFO ffcore.access access method=GET path=/api/v1/projects/91e437d2-f1d2-4e06-91df-76c5ec2c3820/approvals status=200 ms=72
+2026-10-30 08:31:12,253 INFO ffcore.access access method=GET path=/api/v1/projects/91e437d2-f1d2-4e06-91df-76c5ec2c3820/approvals status=200 ms=57
+2026-10-30 08:31:12,330 INFO ffcore.access access method=GET path=/api/v1/projects/91e437d2-f1d2-4e06-91df-76c5ec2c3820/approvals/count status=200 ms=73
+2026-10-30 08:31:12,380 INFO ffcore.access access method=GET path=/api/v1/projects/91e437d2-f1d2-4e06-91df-76c5ec2c3820/approvals/count status=200 ms=47
+------------------------------ Captured log call -------------------------------
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-1945be5dd2.chat-default code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-4447af3fcb.chat-default code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-4f488f1331.chat code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-5ed7975332.chat code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-91e437d2f1.chat-default code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=pa32a8d8f.chat-default code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-bd5b7f195e.chat code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-eaae06fdfe.chat code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=proj-356cff.chat-default code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=proj-8acde0.chat-default code=egress_not_allowlisted
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=10
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-1945be5dd2.chat-default code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-4447af3fcb.chat-default code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-4f488f1331.chat code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-5ed7975332.chat code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-91e437d2f1.chat-default code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=pa32a8d8f.chat-default code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-bd5b7f195e.chat code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-eaae06fdfe.chat code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=proj-356cff.chat-default code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=proj-8acde0.chat-default code=egress_not_allowlisted
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=10
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/users status=200 ms=47
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/users status=200 ms=54
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/users/bab0c326-1dbe-4ca8-9cac-a83db8c419bf status=200 ms=44
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/users/bab0c326-1dbe-4ca8-9cac-a83db8c419bf status=200 ms=85
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects status=200 ms=49
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects status=200 ms=34
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/91e437d2-f1d2-4e06-91df-76c5ec2c3820 status=200 ms=44
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/91e437d2-f1d2-4e06-91df-76c5ec2c3820 status=200 ms=41
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/91e437d2-f1d2-4e06-91df-76c5ec2c3820/readiness status=200 ms=54
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/91e437d2-f1d2-4e06-91df-76c5ec2c3820/readiness status=200 ms=50
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/91e437d2-f1d2-4e06-91df-76c5ec2c3820/members status=200 ms=43
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/91e437d2-f1d2-4e06-91df-76c5ec2c3820/members status=200 ms=40
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/provider-drivers status=200 ms=33
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/provider-drivers status=200 ms=29
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/providers status=200 ms=79
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/providers status=200 ms=88
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/providers/c2366407-4ffe-4a31-8d4f-2ee2c7e68175 status=200 ms=51
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/providers/c2366407-4ffe-4a31-8d4f-2ee2c7e68175 status=200 ms=42
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/model-catalog status=200 ms=26
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/model-catalog status=200 ms=29
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/91e437d2-f1d2-4e06-91df-76c5ec2c3820/models status=200 ms=44
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/91e437d2-f1d2-4e06-91df-76c5ec2c3820/models status=200 ms=47
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/91e437d2-f1d2-4e06-91df-76c5ec2c3820/models/d4715f51-690d-42bf-b860-ea1749f09452 status=200 ms=44
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/91e437d2-f1d2-4e06-91df-76c5ec2c3820/models/d4715f51-690d-42bf-b860-ea1749f09452 status=200 ms=51
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/audit status=200 ms=84
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/audit status=200 ms=59
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/audit.csv status=200 ms=94
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/audit.csv status=200 ms=123
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/91e437d2-f1d2-4e06-91df-76c5ec2c3820/pii-policies status=200 ms=79
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/91e437d2-f1d2-4e06-91df-76c5ec2c3820/pii-policies status=200 ms=74
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/91e437d2-f1d2-4e06-91df-76c5ec2c3820/guardrail-policies status=200 ms=113
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/91e437d2-f1d2-4e06-91df-76c5ec2c3820/guardrail-policies status=200 ms=57
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/91e437d2-f1d2-4e06-91df-76c5ec2c3820/tools status=200 ms=71
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/91e437d2-f1d2-4e06-91df-76c5ec2c3820/tools status=200 ms=60
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/91e437d2-f1d2-4e06-91df-76c5ec2c3820/agents status=200 ms=63
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/91e437d2-f1d2-4e06-91df-76c5ec2c3820/agents status=200 ms=58
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/91e437d2-f1d2-4e06-91df-76c5ec2c3820/runs status=200 ms=102
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/91e437d2-f1d2-4e06-91df-76c5ec2c3820/runs status=200 ms=62
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/91e437d2-f1d2-4e06-91df-76c5ec2c3820/approvals status=200 ms=72
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/91e437d2-f1d2-4e06-91df-76c5ec2c3820/approvals status=200 ms=57
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/91e437d2-f1d2-4e06-91df-76c5ec2c3820/approvals/count status=200 ms=73
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/91e437d2-f1d2-4e06-91df-76c5ec2c3820/approvals/count status=200 ms=47
+=============================== warnings summary ===============================
+tests/integration/test_03a_obo_scope.py::test_03a_r1_obo_tenant_endpoints_refused[/audit]
+  /usr/local/lib/python3.12/weakref.py:590: SAWarning: The garbage collector is trying to clean up non-checked-in connection <AdaptedConnection <psycopg.AsyncConnection [INTRANS] (host=postgres user=ffcore database=ffcore_test_fcb476ada929) at 0x7f1a845aaea0>>, which will be dropped, as it cannot be safely terminated.  Please ensure that SQLAlchemy pooled connections are returned to the pool explicitly, either by calling ``close()`` or by using appropriate context managers to manage their lifecycle.
+    return info.func(*info.args, **(info.kwargs or {}))
+
+tests/integration/test_04a_worker.py::test_04a_upload_job_runs_in_worker
+tests/integration/test_04a_worker.py::test_04a_job_for_missing_row_retries_then_fails_loud
+  /opt/venv/lib/python3.12/site-packages/arq/worker.py:877: DeprecationWarning: Call to deprecated close. (Use aclose() instead) -- Deprecated since version 5.0.1.
+    await self.pool.close(close_connection_pool=True)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/integration/test_03a_read_side.py::test_03a_2_read_mode_get_parity
+======= 1 failed, 438 passed, 4 skipped, 3 warnings in 490.82s (0:08:10) =======
+make: *** [Makefile:31: test-int] Error 1
+rc=2 s=514

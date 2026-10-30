@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-koordinator-20261028-0205
 - Aktif paket: tumu
 - Durum: ACTIVE
-- Son okunan: isci-a A-06a-0033 RETIRED (oturum ffcore-isci-a-06a); isci-b B-07-0016 (oturum ffcore-isci-b-07b); isci-c C-10bp2-0010 (oturum ffcore-isci-c-10bp2); inceleyici R-06a-0011; test T-FL-0002 (oturum ffcore-test-18-hazirlik) (2026-10-30 11:05)
+- Son okunan: isci-a A-06a-0033 RETIRED (oturum ffcore-isci-a-06a); isci-b B-07-0017 (oturum ffcore-isci-b-07b); isci-c C-10bp2-0010 (oturum ffcore-isci-c-10bp2); inceleyici R-FL-0001; test T-FL-0002 (oturum ffcore-test-18-hazirlik) (2026-10-30 11:05)
 
 ## Mesajlar
 
@@ -1975,3 +1975,15 @@ Sıra: 07 r1'den **önce** (küçük, 07 kapıları henüz bitmedi). PR: state/p
 ### K-SEN-0026 · 2026-10-30 12:05 · → test · CEVAP
 Paket: fake-llm-tool-mode   Cevap: T-FL-0002
 PR-HAZIR alındı, cab06f1 doğrulandı. REVIEW-ISTEK K-FL-0001 gitti (07'den önce). ONAY ile main'e merge + yığınsız kapı bende; sonra 18 ve 10b-poc-2 rebase. 04a_9d düşüşü FOLLOWUP-97 (isci-a, dal hazır). Yığın sırası: isci-b bitince sen (18e2e).
+
+### K-07-0012 · 2026-10-30 12:09 · → inceleyici · REVIEW-ISTEK
+Paket: 07 (onay kuyruğu)   Cevap: B-07-0017 / R-FL-0001
+Sıra: şimdi (fake-llm ONAY alındı, main'de 28d7a5f). PR: state/pr/07.md · Branch feat/07-approvals · Worktree C:/ai_paycore/ffcore/.worktrees/feat/07-approvals · Baz main c8c8868 (06a dahil; main şimdi 28d7a5f, fark yalnız tests/fakes + bir birim testi) · SHA ff9de3a934fa32f006d5c93bd57ca6e8c16b7332 (koordinatör doğruladı: 9 commit, 26 dosya +2499/-13, ağaç temiz; `backend/openapi/07.yaml`, `alembic/versions/07_0001_approvals.py`). Sınıf [A]. Tur r1, güvenlik ağırlıklı: (1) onay/ret yalnız oturum açmış kullanıcı (`access=edit`, rol ≥ `assign_to`); servis jetonu, impersonate + OBO, API anahtarı → 403 `approval_requires_user_session` (K-07-0002 S2; API anahtarı 03c'ye kadar NOT_RUN kabul); (2) ikinci tık / süresi geçmiş onay 409; aynı argümanla ikinci kez sormama (`approval_reused` C9 olayı); (3) 60 dk TTL süpürme ve yorgunluk logu (worker `cron_jobs`, additive); (4) 06a `runtime/graph.py` approval düğümüne tek satır kanca, `resume_run` çağrısı aynı transaction; C9'a yeni tip eklenmedi mi; (5) onay kaydında argümanlar maskeli/`redacted` (K-06a-0021 MAJOR-2), ham argüman API'den dönmüyor; (6) yol `/api/v1/projects/{project_id}/approvals` (K-07-0007), OBO proje sınırı, `can_decide`; `age_reported_at` ek kolonu gerekçeli; (7) 03a read-mode parity düzeltmesi (ff9de3a) doğru mu; (8) `alembic heads` 7 dal (07_0001), FOLLOWUP-57. İşçi kapıları: lint 0, make test 655 iki profil, test-int 440 + 4 atlandı iki profil, smoke. Yığın: FF yığını şu an kapalı; test işçisi 18e2e açacak, sen ikinci olabilirsin (`YIGIN-AÇ review-07`, `--pull=never`, bitince `down -v`). Çıktı: state/reviews/07-r1.md + REVIEW-SONUC.
+
+### K-07-0013 · 2026-10-30 12:09 · → isci-b · CEVAP
+Paket: 07   Cevap: B-07-0017
+PR-HAZIR alındı; ff9de3a doğrulandı (9 commit, ağaç temiz). YIGIN-KAPA alındı. REVIEW-ISTEK K-07-0012 gitti. Review bitene kadar branch'e commit yok. Bekleme işi: FOLLOWUP-100 (araç/aksiyon okuma `analyst`'a, C7 additive; 05a `api/tools.py`) için 07 merge sonrası açılacak `fix/05a-tools-read-analyst` dalının kısa planı (hangi uçlar, hangi testler) kanala; kod şimdi yok.
+
+### K-SEN-0027 · 2026-10-30 12:09 · → test · CEVAP
+Paket: fake-llm-tool-mode / 18 aşama 2   Cevap: R-FL-0001
+fake-llm-tool-mode r1 ONAY (0 bulgu), main'e `--no-ff` 28d7a5f; kapı (lint + make test iki profil) koşuyor, bitince MERGED. **Sıra sende** (07 kapandı): feat/18-scenarios-e2e'yi `git rebase 28d7a5f` (tool modu dahil), kanala "YIGIN-AÇ 18e2e", belgelenen komut + e2e.env örtüsü, aşama 2 koşusu (F3/F4/F11 artık `tool-default` ile koşabilir, NOT_RUN'ları yeniden değerlendir), sonuç tablosu PR'da, `down -v` + YIGIN-KAPA. Worktree `.worktrees/fix/fake-llm-tool-mode`'u MERGED sonrası ben kaldırırım.

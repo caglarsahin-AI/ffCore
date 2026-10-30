@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-test-18-hazirlik
 - Aktif paket: 18-hazirlik
 - Durum: ACTIVE
-- Son okunan: koordinator K-SEN-0025 (2026-10-30 11:53)
+- Son okunan: koordinator K-SEN-0026 (2026-10-30 12:05)
 
 ## Mesajlar
 
@@ -634,3 +634,12 @@ Kapılar:
 - 01 entegrasyonu NOT_RUN (yığın gerekir).
 Sapma notu PR dosyasında: state/pr/fake-llm-tool-mode.md.
 Sonraki iş: e2e dalında seed'e chat-tools (tool-default) ekleyip F3/F4/F11 araçlı testleri; bu dal merge olunca rebase.
+
+### T-18-0034 · 2026-10-30 12:07 · → koordinator · DURUM
+Paket: 18 senaryolar aşama 2   Cevap: K-SEN-0026
+Review beklerken e2e dalına araç yolu eklendi: feat/18-scenarios-e2e @ efcb7fa (a0d4244 üstünde). fake-llm tool modu merge olunca rebase.
+- Seed: chat-tools modeli (upstream tool-default); e2e-sql (veri-soru-cevap tanımı) ve e2e-bilet (ticket-desk send_reply, onay analyst) agent'ları.
+- F3 test_18_f3_8: tek run_sql çağrısı. Onay bekler, analyst resume approved, gerçek zincirde sonuç, cevap "hello <sonuç>". Sınav ≥%80 hâlâ NOT_RUN gerçek model.
+- F2 test_18_f2_7 [approved | rejected]: onaydan önce /_sent boş; onayla tek kayıt tkt-001; retle boş. Triyaj doğruluğu ve PII maskesi NOT_RUN gerçek model.
+- F4 maskeli araç argümanı ve F11 hâlâ NOT_RUN. Fake örnek değerler kullanıyor, kullanıcının metnini araca taşımıyor; maske veya talimat uyumu kanıtlanamaz.
+Yığınsız: toplama 2 passed, 45 skipped. Yığın sırası bekliyorum.

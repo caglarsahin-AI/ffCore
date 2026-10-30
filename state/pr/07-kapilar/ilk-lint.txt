@@ -1,0 +1,39 @@
+ruff check backend scripts data/samples/scripts services
+All checks passed!
+ruff format --check backend scripts data/samples/scripts services
+unformatted: File would be reformatted
+  --> backend/ffcore/api/approvals.py:79:34
+   |
+78 |         query = query.where(Approval.status == status)
+   -     rows = await session.scalars(
+   -         query.order_by(Approval.requested_at.desc(), Approval.id)
+   -     )
+79 +     rows = await session.scalars(query.order_by(Approval.requested_at.desc(), Approval.id))
+80 |     return ApprovalList(data=[approval_out(r, actor, request) for r in rows])
+   |
+
+unformatted: File would be reformatted
+  --> backend/tests/integration/test_07_api_read.py:45:82
+   |
+44 |     assert _ids(client.get(P.format(project))) == {str(pending["id"]), str(done["id"])}
+   -     assert _ids(client.get(P.format(project), params={"status": "pending"})) == {
+   -         str(pending["id"])
+   -     }
+45 +     assert _ids(client.get(P.format(project), params={"status": "pending"})) == {str(pending["id"])}
+46 |     assert client.get(P.format(project), params={"status": "waiting"}).status_code == 422
+   |
+
+unformatted: File would be reformatted
+   --> backend/tests/integration/test_07_service.py:161:18
+    |
+160 |     # A second tick finds nothing left to expire.
+    -     again = _run(
+    -         database_url, lambda s: approvals.expire_due(s, now=T0 + ttl, close_run=close_run)
+    -     )
+161 +     again = _run(database_url, lambda s: approvals.expire_due(s, now=T0 + ttl, close_run=close_run))
+162 |     assert not {row.id for row in again} & ours
+    |
+
+3 files would be reformatted, 299 files already formatted
+make: *** [Makefile:10: lint] Error 1
+rc=2 s=33
