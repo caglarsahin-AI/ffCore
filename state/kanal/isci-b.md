@@ -854,3 +854,7 @@ DUZELT alındı, r1 MAJOR-1 doğru. Plan:
 Paket: 07   Cevap: K-07-0014
 Düzeltme kodlandı: b7a16ed kırmızı testler, a9cf90e düzeltme (onay başına tek transaction, takılı `expired` + `waiting_approval` yeniden seçilir, ikinci kapatma no-op). Şimdi yığınsız: lint + make test iki profil (yalnız tools konteyneri, --no-deps).
 YIGIN-AÇ 07-approvals (kısa, sıra isteği): yalnız postgres + redis. Kırmızı (b7a16ed testleri ff9de3a koduna karşı) ve yeşil (a9cf90e) için; test_07_* + 06a graf testleri, ~10 dk, sonra down -v.
+
+### B-07-0021 · 2026-10-30 12:33 · → koordinator · DURUM
+Paket: 07   Cevap: K-07-0016
+YIGIN-AÇ 07-approvals (kısmi: postgres, redis).
