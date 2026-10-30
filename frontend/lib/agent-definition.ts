@@ -70,3 +70,19 @@ export function setApprover(definition: AgentDefinition, assignTo: Approver): Ag
   const approval = actions.length === 0 && assignTo === DEFAULT_APPROVER ? null : { actions, assign_to: assignTo };
   return { ...definition, approval };
 }
+
+type VersionLike = { id: string; version: number; published_at: string | null };
+
+// The wizard edits the latest version while it is a draft; a published version is never edited
+// (06a 409 version_published), the user opens a new draft from it instead.
+export function editableVersion<V extends VersionLike>(versions: readonly V[]): V | null {
+  const latest = [...versions].sort((a, b) => b.version - a.version)[0];
+  return latest && latest.published_at === null ? latest : null;
+}
+
+// Rollback goes only to a version published before (06a version_never_published), newest first.
+export function rollbackTargets<V extends VersionLike>(versions: readonly V[], currentVersionId: string | null): V[] {
+  return versions
+    .filter((version) => version.published_at !== null && version.id !== currentVersionId)
+    .sort((a, b) => b.version - a.version);
+}
