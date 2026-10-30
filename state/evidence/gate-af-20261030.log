@@ -1,0 +1,101 @@
+
+=== 22:42:33 build backend frontend tools
+
+#37 [frontend] exporting to image
+#37 exporting layers done
+#37 writing image sha256:488fc02c5fe2492172b0fbdbb5ba1debf5996d97ad6804bc8f2307dd88c000d0 done
+#37 naming to docker.io/ffcore/frontend:0.0.0-main done
+#37 DONE 0.0s
+build exit=0
+
+=== 22:42:49 compose config
+config exit=0
+
+=== 22:42:57 up
+ Container ffmain-langfuse-redis-1  Healthy
+ Container ffmain-redis-1  Healthy
+ Container ffmain-langfuse-postgres-1  Healthy
+ Container ffmain-agent-worker-bg-1  Healthy
+ Container ffmain-mcp-sql-1  Healthy
+ Container ffmain-mcp-search-1  Healthy
+up exit=0
+ffmain-frontend-1 Up 14 seconds
+ffmain-worker-1 Up 1 second
+ffmain-agent-worker-bg-1 Up 14 seconds
+ffmain-mcp-sql-1 Up 14 seconds (healthy)
+ffmain-agent-worker-1 Up 14 seconds
+ffmain-mcp-search-1 Up 14 seconds (healthy)
+ffmain-backend-1 Up 26 seconds (healthy)
+ffmain-langfuse-web-1 Up About a minute (healthy)
+ffmain-langfuse-worker-1 Up About a minute
+ffmain-litellm-1 Up About a minute (healthy)
+ffmain-redis-1 Up About a minute (healthy)
+ffmain-fake-llm-1 Up About a minute
+ffmain-ticket-desk-1 Up About a minute (healthy)
+ffmain-langfuse-minio-1 Up About a minute (healthy)
+ffmain-langfuse-postgres-1 Up About a minute (healthy)
+ffmain-qdrant-1 Up About a minute (healthy)
+ffmain-postgres-1 Up About a minute (healthy)
+ffmain-langfuse-clickhouse-1 Up About a minute (healthy)
+ffmain-langfuse-redis-1 Up About a minute (healthy)
+
+=== 22:44:19 lint
+ruff check backend scripts data/samples/scripts services
+All checks passed!
+ruff format --check backend scripts data/samples/scripts services
+317 files already formatted
+lint exit=0
+
+=== 22:44:35 alembic heads
+03a_0001 (03a) (effective head)
+03b_0001 (03b) (head)
+04a_0001 (04a) (head)
+05a_0001 (05a) (head)
+06a_0001 (06a) (effective head)
+07_0001 (07) (head)
+08_0001 (08) (head)
+heads exit=0
+
+=== 22:44:49 make test llmaas
+........................................................................ [  9%]
+........................................................................ [ 19%]
+........................................................................ [ 29%]
+........................................................................ [ 39%]
+........................................................................ [ 49%]
+........................................................................ [ 59%]
+........................................................................ [ 69%]
+........................................................................ [ 79%]
+........................................................................ [ 89%]
+........................................................................ [ 99%]
+.....                                                                    [100%]
+725 passed in 115.32s (0:01:55)
+test exit=0
+
+=== 22:47:07 make test airgap
+........................................................................ [  9%]
+........................................................................ [ 19%]
+........................................................................ [ 29%]
+........................................................................ [ 39%]
+........................................................................ [ 49%]
+........................................................................ [ 59%]
+........................................................................ [ 69%]
+........................................................................ [ 79%]
+........................................................................ [ 89%]
+........................................................................ [ 99%]
+.....                                                                    [100%]
+725 passed in 116.48s (0:01:56)
+test-airgap exit=0
+
+=== 22:49:20 test-samples
+
+----------------------------------------------------------------------
+Ran 54 tests in 3.946s
+
+OK (skipped=5)
+samples exit=0
+
+=== 22:49:37 test-int
+........................................................................ [ 13%]
+........................................................................ [ 26%]
+........................................................s............... [ 40%]
+...s..........s.............
