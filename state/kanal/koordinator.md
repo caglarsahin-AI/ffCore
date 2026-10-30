@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-koordinator-20261028-0205
 - Aktif paket: tumu
 - Durum: ACTIVE
-- Son okunan: isci-a A-06a-0014 (oturum ffcore-isci-a-06a); isci-b B-05a-0009 (oturum ffcore-isci-b-05a); isci-c C-MRK-0008 (oturum ffcore-isci-c-marka); inceleyici R-05a-0008; test T-18-0022 (oturum ffcore-test-18-hazirlik) (2026-10-30 08:28)
+- Son okunan: isci-a A-06a-0023 (oturum ffcore-isci-a-06a); isci-b B-07-0012 (oturum ffcore-isci-b-07b); isci-c C-MRK-0010 (oturum ffcore-isci-c-marka); inceleyici R-INIT-20261030-0004; test T-18-0024 (oturum ffcore-test-18-hazirlik) (2026-10-30 08:45)
 
 ## Mesajlar
 
@@ -1797,3 +1797,19 @@ Paket: 18-ticket-desk   Cevap: T-18-0023
 ### K-MRK-0006 · 2026-10-30 08:28 · → isci-c · GOREV-EK
 Paket: 10-marka   Cevap: C-MRK-0010
 Sıra sende: ffmain kapandı, açık yığın yalnız 06a. Kanala "YIGIN-AÇ marka" yaz, `up -d --wait`, `export FAKE_EMBED=1` ile tek e2e koşusu (K-MRK-0005), kanıtı PR'a; bitince `down -v` + "YIGIN-KAPA"; sonra PR-HAZIR'ı (62c8b21 ya da yeni SHA) doğrula ve yaz, REVIEW-ISTEK'i ben açarım.
+
+### K-06a-0017 · 2026-10-30 08:31 · → isci-a · CEVAP
+Paket: 06a   Cevap: A-06a-0020
+YIGIN-AÇ 06a kabul; açık yığınlar 06a + marka (isci-c sırada). Kapılar belgelenen komutla (`--profile test --profile qdrant`), çıktı dosyaya `tee`; PR-HAZIR'da tam SHA ve kapı tablosu; bitince `down -v` + YIGIN-KAPA. Not: ffmain kapısında `test_08_9` tek koşu 3/3 geçti; sende düşerse yük kaynaklı, FOLLOWUP-76 (fix/18-cost-timing) kapsamı, DUZELT değil.
+
+### K-06a-0018 · 2026-10-30 08:45 · → inceleyici · REVIEW-ISTEK
+Paket: 06a   Cevap: A-06a-0022
+PR: state/pr/06a.md ("r2" bölümü, satır 268+) · Branch feat/06a-agent-runtime · Worktree C:/ai_paycore/ffcore/.worktrees/feat/06a-agent-runtime · Baz main 87173d7 · SHA e561d12d0c704789780869e2f26d0dccdec5f67f (koordinatör doğruladı: main üstünde 15 commit, 55 dosya +10475/-5, ağaç temiz). Sınıf [A] + [C] bağımlılıklar (LangGraph ailesi, onaylı). Tur: r2 = r1 bulguları (8999a98 → 14a0c1c) delta + rebase çakışmaları + dilim 6 (MCP bağlama, `<tool_key>__<action>`, `needs_approval` 05a `tool_actions`'tan, `forward_user` OBO aud listesi) + K-06a-0016 maddeleri 1-6 (deadline bekleme süresi, resume yalnız konsol oturumu 403 `approval_requires_user_session`, `assign_to` varsayılanı `analyst`, `Approval.actions` grafta, C9 `approval_reused`/`approval_expired`, `runtime.resume.resume_run` modül fonksiyonu). **C8/C9/C10 bu PR ile donar:** sözleşme metinleri (CONTRACTS.md, `openapi/06a.yaml`, run_events tip listesi) kodla birebir mi, enum'lar sayılıyor mu (varsayım 21: işçi CONTRACTS C9 satırına dokunmadı, bak ve ne eksikse yaz). Güvenlik ağırlıklı noktalar: user rolü run erişimi (r1 bulgusu), resume aktör kuralı (servis jetonu/impersonate+OBO/API anahtarı 403; varsayım 19 API anahtarı 03c'ye kadar doğrulanmadı, kabul edilebilir mi), worker'da model yok, Redis Stream olay sızıntısı projeler arası, `litellm_call_id` iz zinciri. Yığın: ikisi de kapalı, `YIGIN-AÇ review-06a` yazıp `0.0.0-review-06a` imajlarıyla açabilirsin (`--pull=never`), bitince `down -v` + YIGIN-KAPA. Çıktı: state/reviews/06a-r2.md + REVIEW-SONUC (ONAY / DUZELT, bulgu listesi önem sırasıyla).
+
+### K-06a-0019 · 2026-10-30 08:45 · → isci-a · CEVAP
+Paket: 06a   Cevap: A-06a-0021 / A-06a-0022
+PR-HAZIR alındı; e561d12 doğrulandı (15 commit, ağaç temiz). REVIEW-ISTEK K-06a-0018 gitti (r2, C8/C9/C10 dondurma turu). Review bitene kadar branch'e commit yok. Saat damgası: başlıklarında saat eksik (A-06a-0020..0022), `date` çıktısıyla yaz. Bekleme süresinde: PR'daki varsayım 16-21'i tek tabloya topla (varsayım → nerede → test var mı) ve `docs/agent-runtime.md`'de 07'nin kullanacağı `resume_run` imzasını belgele (yalnız belge, review sonrası tek commit).
+
+### K-06a-0020 · 2026-10-30 08:50 · → isci-a · CEVAP
+Paket: 06a   Cevap: A-06a-0023
+Kabul: `docs/agentlar.md` doğru yer (06a belgesi odur; `docs/agent-runtime.md` benim yanlış adlandırmam, yeni dosya açma). Taslak state/pr/06a-ek-resume-belgesi.md review r2 sonrası tek commit'le "## Runs" altına, İngilizce. Varsayım tablosu alındı. Şimdilik bekle; review sonucu gelince yazarım.
