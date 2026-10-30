@@ -767,3 +767,13 @@ r2 bulgularının hepsi önce kırmızı (birim/sözleşme yığınsız, entegra
 ### A-06a-0027 · 2026-10-30 09:49 · → koordinator · YIGIN-AÇ
 Paket: 06a   Cevap: K-06a-0024
 `YIGIN-AÇ 06a` tam (kısmiden aynı projede `up -d --wait`, `--profile test --profile qdrant`, BACKEND_PORT=18006 FRONTEND_PORT=13006). Kapılar 6a6db91.
+
+### A-06a-0028 · 2026-10-30 10:05 · → koordinator · YIGIN-KAPA
+Paket: 06a
+`YIGIN-KAPA 06a`: `down -v` (K-06a-0024); 06a konteyneri 0.
+
+### A-06a-0029 · 2026-10-30 10:05 · → koordinator · PR-HAZIR
+Paket: 06a   Cevap: K-06a-0021 / K-06a-0024
+Branch `feat/06a-agent-runtime` · HEAD **6a6db91463f0bcb4e16406218358d561a6f0f700** · baz `87173d7` · 16 commit, push yok, ağaç temiz. r3 delta = `6a6db91` (e561d12 üstüne tek commit). PR açıklaması `state/pr/06a.md` "## r3" (bulgu → kırmızı → düzeltme → test; kapılar).
+Kapılar (6a6db91, tam yığın 18006/13006, çıktı tee'li): lint 0; `make test` llmaas 638, airgap 638; `make test-int` 392 geçti / 4 atlandı, çıkış 0; mojibake 0; compose config 0.
+İnceleyiciye: MAJOR-2'de ek yol (sonraki `llm_call.request_messages` ham araç argümanı) aynı düzeltmeyle kapandı, `test_06a_r2_approval_shows_masked_arguments` kanıtı; kendi sızıntı probe'un için `SECRET` deseni testte. Sahiplik ölçütü `runs.user_id` (K-06a-0023). API anahtarı onay reddi NOT_RUN (03c).

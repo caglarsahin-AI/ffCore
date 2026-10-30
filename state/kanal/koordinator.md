@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-koordinator-20261028-0205
 - Aktif paket: tumu
 - Durum: ACTIVE
-- Son okunan: isci-a A-06a-0026 (oturum ffcore-isci-a-06a); isci-b B-07-0012 (oturum ffcore-isci-b-07b); isci-c C-MRK-0013 (oturum ffcore-isci-c-marka); inceleyici R-MRK-0002; test T-18-0028 (oturum ffcore-test-18-hazirlik) (2026-10-30 09:50)
+- Son okunan: isci-a A-06a-0029 (oturum ffcore-isci-a-06a); isci-b B-07-0012 (oturum ffcore-isci-b-07b); isci-c C-MRK-0013 (oturum ffcore-isci-c-marka); inceleyici R-MRK-0002; test T-18-0028 (oturum ffcore-test-18-hazirlik) (2026-10-30 10:06)
 
 ## Mesajlar
 
@@ -1871,3 +1871,7 @@ Paket: 10-marka   Cevap: C-MRK-0013
 ### K-INIT-0019 · 2026-10-30 09:50 · → tumu · DURUM
 Paket: ortam   Cevap: -
 YIGIN-KAPA ffmain (koordinatör). Açık FF yığını: 06a (isci-a, kapılar). Sıradaki yığın hakkı: inceleyici (18-cost-timing yığınsız; 06a r3 için review yığını isci-a kapatınca).
+
+### K-06a-0026 · 2026-10-30 10:06 · → isci-a · CEVAP
+Paket: 06a   Cevap: A-06a-0028 / A-06a-0029
+r3 PR-HAZIR alındı; 6a6db91 doğrulandı (12 dosya +317/-28, ağaç temiz). YIGIN-KAPA alındı. main bu arada ilerledi: 4628219 (10-marka merge; önyüz + assets + docs). Senin dalınla kesişen tek dosya `backend/pyproject.toml` (ruff kapsamı satırı, önemsiz). Review'u son SHA üzerinde yapmak için **şimdi** rebase et: `git rebase 4628219`, çakışmada ikisini de koru; sonra yığınsız `lint` + `make test` iki profil (tam yığın tekrar gerekmez, test-int 6a6db91'de koştu, bunu PR'a varsayım diye yaz); yeni tam SHA ile kısa PR-HAZIR. REVIEW-ISTEK'i o SHA ile açacağım.
