@@ -41,6 +41,13 @@ testleri varsayılan yığına ek olarak `fake-llm` ve `ticket-desk` (profil `te
 04a) ister; tablodaki komut ikisini de başlatır. Biri erişilemezse `make test-int` tek mesajla, bu
 komutu yazarak durur.
 
+`fake-llm` davranışı, LiteLLM'in ona gönderdiği upstream model kimliğine göre seçilir
+(`backend/tests/fakes/fake_openai.py`): `fail-*` 500, `empty-*` boş cevap, `slow-*` yavaş akış,
+`tool-*` araç modu (istekte `tools` varsa ilk aracı bir kez çağırır, zorunlu argümanlara örnek
+değer koyar; araç sonucundan sonra `"hello "` + sonucun ilk 50 karakteri), diğerleri `"hello"`.
+Bir projede araç çağıran sahte model, upstream kimliği `tool-default` olan bir model kaydıdır;
+LiteLLM yapılandırma dosyasında model listesi yoktur (C1), model kaydı uzlaştırıcıyla yazılır.
+
 `RUN_DNS_TESTS=1` (varsayılan kapalı) gerçek sistem resolver'ıyla bir `.invalid` adı sorgular; Docker bu
 sorguyu host'un, kurumda kurum DNS'inin resolver'ına iletir, yani yığın dışına bir DNS sorgusu gider.
 Bayrak yokken test `NOT_RUN: needs RUN_DNS_TESTS=1` diye görünür ve hiçbir sorgu yapılmaz. Bayrağı
