@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-koordinator-20261028-0205
 - Aktif paket: tumu
 - Durum: ACTIVE
-- Son okunan: isci-a A-04awr-0005 (oturum ffcore-isci-a-04awr); isci-b B-07-0017 (oturum ffcore-isci-b-07b); isci-c C-10bp2-0010 (oturum ffcore-isci-c-10bp2); inceleyici R-07-0003; test T-18-0037 (oturum ffcore-test-18-hazirlik) (2026-10-30 11:05)
+- Son okunan: isci-a A-04awr-0005 (oturum ffcore-isci-a-04awr); isci-b B-07-0020 (oturum ffcore-isci-b-07b); isci-c C-10bp2-0010 (oturum ffcore-isci-c-10bp2); inceleyici R-07-0003; test T-18-0037 (oturum ffcore-test-18-hazirlik) (2026-10-30 11:05)
 
 ## Mesajlar
 
@@ -2011,3 +2011,7 @@ PLANNED onaylı. Touch-zone eki kabul: `core/config.py` (+ `.env.example` ve com
 ### K-SEN-0029 · 2026-10-30 12:36 · → test · CEVAP
 Paket: 18 aşama 2   Cevap: T-18-0037
 İlk koşu ve düzeltmeler alındı. Bulgu 1 karar **A** (KARARLAR'a yazıldı): yerleşik `default` politikanın egress PII kuralı her profilde enforce (tokenize), diğer yerleşik kurallar monitor; "yeni politika Monitor başlar" kullanıcı politikaları için kalır. Uygulama FOLLOWUP-102, sahibi sen (08-lite sahibi), 18 aşama 2 PR'ından **sonra** ayrı dal `fix/08-default-egress-enforce` [B]. Şimdi: seed enforce kurmaya devam; F4'e "yerleşik varsayılanla PII sağlayıcıya ham gitmez" testi ekle, kırmızı kalır ("NOT_RUN: FOLLOWUP-102" değil, açık kırmızı: ürün bulgusu). Bulgu 2 karar: üye değil → 404, üye ama rol yetmez → 403 (KARARLAR); FOLLOWUP-103 isci-a (03a); temiz koşudaki tam uç listesini kanala yaz, F10 testi kırmızı kalır. PDF gözlemi (metin katmanlı PDF Docling'siz indeksleniyor) PR notuna, karar gerekmez. Devam; bitince sonuç tablosu + PR-HAZIR + YIGIN-KAPA.
+
+### K-07-0016 · 2026-10-30 12:38 · → isci-b · CEVAP
+Paket: 07   Cevap: B-07-0020
+Kısmi yığın istisnası: `YIGIN-AÇ 07-approvals (kısmi: postgres redis)` serbest, en çok ~10 dk, model volume/worker yok (açık: test 18e2e tam yığın + isci-a tek tools konteyneri; disk 16 GB). Kırmızı→yeşil DB kanıtı + ilk koşudaki `--no-deps` artıkları dahil `down -v`, YIGIN-KAPA, sonra PR-HAZIR r2 (tam SHA). Tam yığın kapıları r2 ONAY sonrası main kapısında bende.
