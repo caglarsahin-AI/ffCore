@@ -56,11 +56,11 @@ def test_03a_1_project_admin_read_cannot_add_member(make_user, make_project, cli
     assert row[0] == str(reader_id)
 
 
-def test_03a_1_non_member_gets_403_not_data(make_user, make_project, client_factory):
+def test_03a_1_non_member_gets_404_not_data(make_user, make_project, client_factory):
     project = make_project()
     _, outsider = make_user(memberships={make_project(): ("admin", "edit")})
     response = client_factory(outsider).get(f"{API}/projects/{project}")
-    assert response.status_code == 403
+    assert response.status_code == 404  # FOLLOWUP-103: same answer as a missing project
 
 
 @pytest.mark.parametrize("role", ["developer", "user"])
@@ -128,7 +128,7 @@ def test_03a_users_projects_members_flow(root, make_user, client_factory):
     )
 
     assert root.delete(f"{API}/projects/{pid}/members/{user_id}").status_code == 204
-    assert member.get(f"{API}/projects/{pid}").status_code == 403
+    assert member.get(f"{API}/projects/{pid}").status_code == 404  # removed: not a member
 
     assert root.patch(f"{API}/users/{user_id}", json={"is_active": False}).status_code == 200
     assert member.get(f"{API}/auth/me").status_code == 401

@@ -168,7 +168,7 @@ def test_04a_r1_7_document_metadata_follows_its_acl(world):
     assert in_list["document_count"] == 1
     # Hidden document: the analyst cannot delete it either (404, nothing leaks).
     assert world["analyst"].delete(f"{docs}/{hidden_id}").status_code == 404
-    assert world["stranger"].get(f"{docs}/{open_id}").status_code == 403
+    assert world["stranger"].get(f"{docs}/{open_id}").status_code == 404
 
 
 def test_04a_r1_7_audit_carries_no_file_names_or_free_text(world, pg):

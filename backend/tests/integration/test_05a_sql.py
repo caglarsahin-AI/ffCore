@@ -225,7 +225,7 @@ def test_05a_sql_context_roles(world, client_factory, make_user, make_project):
     _, stranger = make_user(memberships={other: ("admin", "edit")})
     url = f"/api/v1/projects/{world['project']}/tools/sql-context"
     body = {"tool_key": TOOL_KEY}
-    assert client_factory(stranger).post(url, json=body).status_code == 403
+    assert client_factory(stranger).post(url, json=body).status_code == 404
     assert world["admin"].post(url, json={**body, "question": "yatak"}).status_code == 200
 
 

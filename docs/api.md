@@ -148,8 +148,17 @@ user's membership there counts (superadmin rights do not apply), and tenant admi
 gives 403 `obo_project_scope`.
 
 Every mutation route depends on a role check with `write=True`, so `read` access gets 403
-`read_only_access`; a missing role gives 403 `insufficient_role`. Both denials are written to the
-audit trail before the response. A CI test fails if a mutation route lacks the `write` check
+`read_only_access`; a member whose role is too low gets 403 `insufficient_role`. Both denials are
+written to the audit trail before the response.
+
+A project the caller cannot see answers exactly like a missing one: a caller who is not a member
+(and is not a superadmin), a deleted project and an unknown id all get 404 `not_found_error`
+`project_not_found` with the same body, on every `/projects/{project_id}/...` route. A project id
+therefore confirms nothing to an outsider. The denial is still audited (`outcome=denied`,
+`after.code=project_not_found`); the real reason is in `after.reason` (`not_member` or
+`no_project`) and never in the response. Tenant-level routes (for example project delete) refuse
+non-superadmins with 403 `insufficient_role` before any project lookup, the same answer for an
+existing and a missing project. A CI test fails if a mutation route lacks the `write` check
 (exceptions: login, logout, own password).
 
 ### Projects

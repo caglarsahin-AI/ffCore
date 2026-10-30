@@ -286,8 +286,7 @@ def test_04awr_3_worker_dying_before_ready_is_worker_died(tmp_path):
         pool.close()
 
 
-def test_04awr_5_ingest_pool_uses_start_timeout_setting(tmp_path, monkeypatch):
-    from ffcore.core.config import Settings
+def test_04awr_5_ingest_pool_uses_start_timeout_setting(tmp_path, monkeypatch, settings):
     from ffcore.knowledge import ingest
 
     created = {}
@@ -301,7 +300,8 @@ def test_04awr_5_ingest_pool_uses_start_timeout_setting(tmp_path, monkeypatch):
 
     monkeypatch.setattr(ingest, "PersistentPool", FakePool)
     monkeypatch.setattr(ingest, "_pools", {})
-    settings = Settings(convert_worker_start_timeout_seconds=42)
+    # Explicit values (unit conftest), not the process environment (R-04AWR-0001 MINOR-1).
+    settings = settings.model_copy(update={"convert_worker_start_timeout_seconds": 42})
     assert ingest.convert_bounded(tmp_path / "x.txt", "x.txt", settings) == "converted"
     assert created["start_timeout"] == 42
     assert created["timeout"] == settings.convert_timeout_seconds

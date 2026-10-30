@@ -80,8 +80,8 @@ def test_08_19_policy_access_audit(admin, client_factory, make_user, make_projec
     assert created.status_code == 201, created.text
     assert created.json()["builtin"] is False
     assert _policy(admin, project, rules=[]).status_code == 201
-    assert [r[1] for r in audit_rows(pg, "create_pii_policy")] == ["success"]
-    assert [r[1] for r in audit_rows(pg, "create_guardrail_policy")] == ["success"]
+    assert [r[1] for r in audit_rows(pg, "create_pii_policy", project=project)] == ["success"]
+    assert [r[1] for r in audit_rows(pg, "create_guardrail_policy", project=project)] == ["success"]
 
     _, analyst = make_user(memberships={project: ("analyst", "edit")})
     _, reader = make_user(memberships={project: ("admin", "read")})
@@ -92,8 +92,8 @@ def test_08_19_policy_access_audit(admin, client_factory, make_user, make_projec
     assert (denied.status_code, denied.json()["error"]["code"]) == (403, "insufficient_role")
     read_only = _policy(as_reader, project, key="other")
     assert (read_only.status_code, read_only.json()["error"]["code"]) == (403, "read_only_access")
-    assert client_factory(stranger).get(P.format(project) + "/pii-policies").status_code == 403
-    assert len(audit_rows(pg, "create_guardrail_policy", "denied")) == 2
+    assert client_factory(stranger).get(P.format(project) + "/pii-policies").status_code == 404
+    assert len(audit_rows(pg, "create_guardrail_policy", "denied", project)) == 2
 
 
 def test_08_s5_builtin_default_listed_until_overridden(admin, project):
@@ -116,10 +116,12 @@ def test_08_6_enforce_switch_audited(admin, project, pg):
     url = P.format(project) + f"/guardrail-policies/{policy['id']}"
     switched = admin.patch(url, json={"mode": "enforce"})
     assert switched.status_code == 200, switched.text
-    [(_, outcome, after)] = audit_rows(pg, "update_guardrail_policy")
+    [(_, outcome, after)] = audit_rows(pg, "update_guardrail_policy", project=project)
     assert outcome == "success" and after["mode"] == "enforce"
     before = pg.execute(
         "SELECT before FROM audit_events WHERE action = 'update_guardrail_policy'"
+        " AND project_id = %s",
+        (project,),
     ).fetchone()[0]
     assert before["mode"] == "monitor"
 

@@ -78,7 +78,7 @@ def test_03a_r1_obo_superadmin_not_elevated(two_projects, make_user, obo):
     p1, _ = two_projects
     user_id, _ = make_user(superadmin="edit")  # not a member of p1
     client = obo(user_id, p1)
-    assert client.get(f"{API}/projects/{p1}").status_code == 403
+    assert client.get(f"{API}/projects/{p1}").status_code == 404  # not a member (FOLLOWUP-103)
     assert client.get(f"{API}/projects").json()["data"] == []
     me = client.get(f"{API}/auth/me").json()
     assert (me["role"], me["access"], me["memberships"]) == (None, None, [])
