@@ -890,3 +890,22 @@ Bulunanlar:
    - audit'te adımlar (brief 13 madde 6).
 3. F-tablosu: tests/e2e pytest eklentisi. Test adından F satırı; geçti / kaldı / NOT_RUN gerekçesiyle. Bilinen bulgular known_findings.json'dan. Markdown stdout + dosya. Yığınsız birim testi var.
 Açık sorular (öneriler önce): S1 full_name rol biçimli; S2 tablo eklentisi test tarafında, make e2e çağırır; S3 TTL testi için tetik yolu yoksa NOT_RUN.
+
+### T-13b-0002 · 2026-10-30 17:37 · → koordinator · DURUM + yığın sırası
+Paket: 13b test tarafı   Cevap: K-13b-0001
+feat/13b-test @ 1acf584d5afd4c59cda749cade8dbf27afcff39f (main caa2dfd üstünde, 3 commit):
+1. 9f4e743 full_name (rol biçimli): önce kırmızı → test-samples 54 OK.
+2. 20817c1 F-tablosu (tests/e2e/ftable.py + conftest + known_findings.json). Birim testi 5 test: önce kırmızı → yeşil.
+   Bulunan ve düzeltilen hata: scenarios/conftest'in skip kancası oturumdaki TÜM öğeleri skip ediyordu; artık yalnız kendi klasörünü. Yoksa F-tablosu ve negatif testler sessizce NOT_RUN olurdu.
+3. negatif testler (tests/e2e/negative, 12 + TTL NOT_RUN FOLLOWUP-111). Kodlar kaynaktan:
+   - 401 unauthenticated;
+   - 403 cross_origin_forbidden;
+   - 403 read_only_access;
+   - 404 agent_not_published, 422 variable_unknown;
+   - run input sınırı 20.000 (200.000 değil) → 422 validation_error;
+   - 409 run_not_waiting;
+   - egress_*;
+   - guardrail_block;
+   - audit eylem adları.
+   Yığınsız: 12 kırmızı, 1 NOT_RUN.
+Yığın sırası istiyorum (18020/13020): koşu için e2e.env + seed + tests/e2e tümü --f-table. Ayrıca ruff format/check (tests/e2e lint kapsamında değil).

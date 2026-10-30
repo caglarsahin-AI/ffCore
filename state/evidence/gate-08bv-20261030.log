@@ -1,0 +1,21 @@
+
+=== 17:31:41 main b02e39b lint
+All checks passed!
+ruff format --check backend scripts data/samples/scripts services
+305 files already formatted
+lint exit=0
+
+=== 17:32:02 up
+ Container ffmain-langfuse-web-1  Healthy
+ Container ffmain-langfuse-minio-1  Healthy
+ Container ffmain-langfuse-redis-1  Healthy
+ Container ffmain-backend-1  Healthy
+ Container ffmain-mcp-sql-1  Healthy
+ Container ffmain-mcp-search-1  Healthy
+up exit=0
+
+=== 17:33:20 test-int
+........................................................................ [ 16%]
+.....................................................s.................. [ 32%]
+s..........s............................................................ [ 48%]
+..................s...................
