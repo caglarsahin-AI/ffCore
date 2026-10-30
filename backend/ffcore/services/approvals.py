@@ -1,8 +1,8 @@
-"""Approval queue rules (07) shared by the routes, the TTL job and the run hook.
+"""Approval queue rules (07) shared by the routes, the sweep job and the run hook.
 
-The run side (opening an approval at the interrupt, closing an expired run, resuming after a
-decision) is 06a's; it reaches these functions through the hook added in slice 6. Until then a
-run is identified by its id only and closing it is a callable the caller passes in.
+The run side stays 06a's: the graph's `tool_guard` opens approvals through `RunApprovalGate`
+(RunContext.approvals), the decision routes resume through `runtime.resume.resume_run`, and an
+expired approval closes its waiting run through `run_closer` (status, error code, events).
 """
 
 import hashlib
@@ -11,7 +11,7 @@ import logging
 import uuid
 from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -306,3 +306,89 @@ async def report_pending_age(
             row.assigned_role,
         )
     return rows
+
+
+class RunApprovalGate:
+    """RunContext.approvals for one run attempt (06a `adapters.context_factory`)."""
+
+    def __init__(self, session: AsyncSession, settings: Settings, *, project_id, run_id) -> None:
+        self._session, self._settings = session, settings
+        self._project_id, self._run_id = project_id, run_id
+
+    async def open(self, *, tool_call_id: str, action: str, arguments: dict, assign_to: str):
+        from ffcore.runtime.state import ApprovalTicket
+
+        opened = await open_for_interrupt(
+            self._session,
+            project_id=self._project_id,
+            run_id=self._run_id,
+            tool_call_id=tool_call_id,
+            action=action,
+            arguments=arguments,
+            assign_to=assign_to,
+            created_by="system:runtime",
+            now=datetime.now(UTC),
+            settings=self._settings,
+        )
+        # Committed before the interrupt: the queue shows it while the run waits.
+        await self._session.commit()
+        return ApprovalTicket(
+            approval_id=str(opened.approval.id),
+            expires_at=opened.approval.expires_at.isoformat(),
+            reused=opened.reused,
+        )
+
+
+def run_closer(settings: Settings) -> CloseRun:
+    """Close a run whose approval expired: failed with `code`, the `approval_expired` event and
+    the client's `error`. Only a run still waiting for approval is changed (a cancelled or
+    already failed run is left as it is)."""
+    from ffcore.core import db
+    from ffcore.models.runs import Run
+    from ffcore.runtime import events as run_events
+    from ffcore.runtime.contracts import RunEventType, RunStatus, SseEvent
+
+    async def close(run_id: uuid.UUID, code: str) -> None:
+        async with db.session_scope() as session:
+            closed = await session.scalar(
+                update(Run)
+                .where(Run.id == run_id, Run.status == RunStatus.waiting_approval)
+                .values(status=RunStatus.failed, error_code=code, ended_at=datetime.now(UTC))
+                .returning(Run.id)
+            )
+            await session.commit()
+            if closed is None:
+                log.info("approval_expired_run_not_waiting run_id=%s", run_id)
+                return
+            client = run_events.redis_client(settings)
+            try:
+                writer = run_events.RunEventWriter(
+                    session, client, run_id, ttl_s=settings.run_event_stream_ttl_s
+                )
+                await writer.start()
+                await writer.record(RunEventType.approval_expired, {"code": code})
+                await writer.record(
+                    RunEventType.error,
+                    {
+                        "code": code,
+                        "status": RunStatus.failed,
+                        "message": "The approval expired before anyone decided.",
+                    },
+                    sse=SseEvent.error,
+                )
+            finally:
+                await client.aclose()
+
+    return close
+
+
+async def sweep(settings: Settings, *, now: datetime | None = None) -> None:
+    """The per-minute job (background agent worker, S4): expire what is due, then report
+    pending approvals past the alert age."""
+    from ffcore.core import db
+
+    now = now or datetime.now(UTC)
+    async with db.session_scope() as session:
+        await expire_due(session, now=now, close_run=run_closer(settings))
+    async with db.session_scope() as session:
+        await report_pending_age(session, now=now, settings=settings)

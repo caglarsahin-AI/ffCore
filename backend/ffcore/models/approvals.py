@@ -1,9 +1,8 @@
 """approvals (07): the human gate on tool calls that need approval.
 
 A project-owned root table with the C3 common columns. One row per interrupted tool call of a
-run (run_id, tool_call_id). `arguments` is the masked payload 06a already wrote on the
-`approval_requested` event (08-lite masks); raw arguments never reach this table. `run_id`
-gets its foreign key to runs when 06a is on main (plan S5).
+run (run_id, tool_call_id). `arguments` is the guardrail's masked output that 06a also writes
+on the `approval_requested` event (08-lite masks); raw arguments never reach this table.
 """
 
 import uuid
@@ -42,7 +41,7 @@ class Approval(Timestamps, Base):
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     project_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("projects.id"))
-    run_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True))
+    run_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("runs.id"))
     tool_call_id: Mapped[str] = mapped_column(Text)
     # Model-facing tool name `<tool_key>__<action>` (C7).
     action: Mapped[str] = mapped_column(Text)

@@ -7,6 +7,8 @@ from uuid import UUID
 
 from pydantic import BaseModel, Field
 
+from ffcore.api.schemas import Strict
+
 
 class ApprovalStatus(StrEnum):
     """`expired`: no decision within APPROVAL_TTL_MIN; the run was closed (`approval_expired`)."""
@@ -47,6 +49,19 @@ class ApprovalOut(BaseModel):
     can_decide: bool = Field(
         description="Whether this caller may approve or reject: console session, `edit` access "
         "and a role at least `assigned_role`. Shown for buttons; the decision route checks again."
+    )
+
+
+class DecisionRequest(Strict):
+    note: str | None = Field(
+        default=None, max_length=2000, description="Why; shown to the model on reject."
+    )
+
+
+class ApprovalDecided(ApprovalOut):
+    stream_after: str | None = Field(
+        description="Last event id of the run's stream before it continued: follow the rest with "
+        "GET /runs/{run_id}/stream and `Last-Event-ID` set to this value (null: from the start)."
     )
 
 

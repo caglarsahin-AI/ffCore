@@ -18,6 +18,7 @@ from ffcore.runtime.events import mark_listening
 from ffcore.runtime.prompting import Source
 from ffcore.runtime.runner import Attempt, execute, setup_checkpointer
 from ffcore.runtime.state import GuardResult, ModelTurn, RunContext, ToolCall, ToolOutcome
+from ffcore.services.approvals import RunApprovalGate
 
 PROMPT = "You answer from the documents."
 
@@ -122,6 +123,8 @@ class Ports:
     stream_live: bool = True
     # The real tool port (adapters.AgentTools.load) instead of `tools`, for MCP tests.
     tools_factory: Any = None
+    # 07's approval queue as the worker wires it; False runs without it (fail-loud test).
+    approval_gate: bool = True
 
 
 def definition(**overrides) -> dict[str, Any]:
@@ -193,6 +196,11 @@ class Harness:
                         "user_instructions": PROMPT,
                     },
                     stream_live=ports.stream_live,
+                    approvals=RunApprovalGate(
+                        session, self.settings, project_id=run.project_id, run_id=run.id
+                    )
+                    if ports.approval_gate
+                    else None,
                 )
 
             attempt = Attempt(self.settings, client, self.db.session_scope, context_factory)

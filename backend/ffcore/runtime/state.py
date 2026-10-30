@@ -105,6 +105,24 @@ class Guard(Protocol):
     async def check(self, stage: str, text: str, *, tool: str | None = None) -> GuardResult: ...
 
 
+@dataclass(frozen=True)
+class ApprovalTicket:
+    """07's answer for a tool call that needs approval: the approval to wait for, or (`reused`)
+    an approved twin in this run that answers without asking again."""
+
+    approval_id: str
+    expires_at: str
+    reused: bool
+
+
+class ApprovalGate(Protocol):
+    """07 (services.approvals.RunApprovalGate): opens the approval of one tool call."""
+
+    async def open(
+        self, *, tool_call_id: str, action: str, arguments: dict[str, Any], assign_to: str
+    ) -> ApprovalTicket: ...
+
+
 class StopRun(Exception):
     """Ends a run at a step boundary with a final status and code (never a silent stop)."""
 
@@ -135,3 +153,6 @@ class RunContext:
     # Tokens go to the client while the model writes, unless an enforce-mode policy checks
     # output first (then the answer is shown after output.pre).
     stream_live: bool = True
+    # 07's approval queue; a tool call that needs approval without it fails the run
+    # (`approval_gate_missing`), it never runs unapproved or waits unrecorded.
+    approvals: ApprovalGate | None = None

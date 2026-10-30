@@ -306,20 +306,36 @@ async def tool_guard(state: RunState, runtime: Runtime[RunContext]) -> dict:
     if blocked:
         pending["kind"] = "blocked"
     elif approval:
-        pending["kind"] = "approval"
         assign_to = d.approval.assign_to if d.approval else DEFAULT_APPROVER
-        await ctx.events.record(
-            RunEventType.approval_requested,
-            {
-                "tool_call_id": call["id"],
-                "action": name,
-                "arguments": masked,
-                "assign_to": assign_to,
-            },
-            sse=SseEvent.approval_required,
-            sse_data={"action": name, "arguments": masked, "assign_to": assign_to},
-            iteration=iteration,
+        if ctx.approvals is None:
+            raise StopRun(RunStatus.failed, "approval_gate_missing", detail=name)
+        # 07: the approval record (idempotent per tool call); an approved twin answers.
+        ticket = await ctx.approvals.open(
+            tool_call_id=call["id"], action=name, arguments=masked, assign_to=assign_to
         )
+        if ticket.reused:
+            pending["kind"] = "approved"
+            await ctx.events.record(
+                RunEventType.approval_reused,
+                {"tool_call_id": call["id"], "action": name, "approval_id": ticket.approval_id},
+                iteration=iteration,
+            )
+        else:
+            pending["kind"] = "approval"
+            ids = {"approval_id": ticket.approval_id, "expires_at": ticket.expires_at}
+            await ctx.events.record(
+                RunEventType.approval_requested,
+                {
+                    "tool_call_id": call["id"],
+                    "action": name,
+                    "arguments": masked,
+                    "assign_to": assign_to,
+                    **ids,
+                },
+                sse=SseEvent.approval_required,
+                sse_data={"action": name, "arguments": masked, "assign_to": assign_to, **ids},
+                iteration=iteration,
+            )
     return {
         "pending_tool": pending,
         "tool_calls_used": used + 1,

@@ -7,6 +7,9 @@ batch work). Same code; the queue decides the slot class. Two compose services r
 
 A job is one run attempt (`run_agent`). When a worker dies, arq hands the job to the next worker
 after its timeout and the run continues from its checkpoint (runner.execute is idempotent).
+
+The background worker also runs 07's approval sweep once a minute (`expire_approvals`, arq cron,
+unique per tick; K-07-0002 S4): expired approvals close their runs, old ones are reported.
 """
 
 import logging
@@ -66,6 +69,22 @@ async def shutdown(ctx) -> None:
     tracing.shutdown_tracing()
 
 
+async def expire_approvals(ctx) -> None:
+    """07 sweep: an error is logged by arq and the next tick tries again (nothing is lost:
+    expired rows stay expired, a run that could not be closed is logged by the sweep)."""
+    from ffcore.services import approvals
+
+    await approvals.sweep(get_settings())
+
+
+def cron_jobs_for(job_class: JobClass) -> list:
+    from arq import cron
+
+    if job_class is not JobClass.background:
+        return []
+    return [cron(expire_approvals, second=0, unique=True)]
+
+
 async def run_agent(ctx, run_id: str, resume: dict | None = None) -> str:
     """One attempt. A shutdown cancels it (arq queues it again); an infrastructure error retries
     it shortly; after MAX_TRIES the run ends with worker_retries_exhausted."""
@@ -87,6 +106,7 @@ def _settings_class(name: str, queue: str, job_class: JobClass) -> type:
         (),
         {
             "functions": [run_agent],
+            "cron_jobs": cron_jobs_for(job_class),
             "on_startup": _startup_for(job_class),
             "on_shutdown": shutdown,
             "queue_name": queue,

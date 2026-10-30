@@ -47,6 +47,7 @@ from ffcore.runtime.prompting import Source, render_variables, system_parts
 from ffcore.runtime.scheduler import LlmSlots
 from ffcore.runtime.state import GuardResult, ModelTurn, RunContext, ToolCall, ToolOutcome
 from ffcore.services import mcp_client, mcp_tools
+from ffcore.services.approvals import RunApprovalGate
 from ffcore.services.litellm_client import LiteLLMClient, resolve_target
 
 OUTPUT_STAGES = {"output.pre", "output.stream.delta"}
@@ -533,6 +534,7 @@ def context_factory(
             system=system_parts(_platform_rules(prompts, definition), instructions),
             history=await _history(session, run.conversation_id, run.id),
             stream_live=guard.streams_live,
+            approvals=RunApprovalGate(session, settings, project_id=run.project_id, run_id=run.id),
         )
 
     return build

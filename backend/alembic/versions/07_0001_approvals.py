@@ -2,12 +2,8 @@
 
 Revision ID: 07_0001
 Revises: 0001
-Depends on: 03a_0001 (projects)
+Depends on: 03a_0001 (projects), 06a_0001 (runs)
 Create Date: 2026-10-30
-
-`run_id` has no foreign key yet: runs is 06a's table and 06a is not on main. The key and the
-dependency on 06a are added to this same revision before 07 merges (plan S5), so no
-follow-up migration is needed.
 """
 
 import sqlalchemy as sa
@@ -17,7 +13,7 @@ from sqlalchemy.dialects.postgresql import JSONB, UUID
 revision = "07_0001"
 down_revision = "0001"
 branch_labels = ("07",)
-depends_on = ("03a_0001",)
+depends_on = ("03a_0001", "06a_0001")
 
 # Frozen copies of the value lists at this revision.
 APPROVAL_STATUSES = ("pending", "approved", "rejected", "expired")
@@ -33,7 +29,7 @@ def upgrade() -> None:
         "approvals",
         sa.Column("id", UUID(as_uuid=True), primary_key=True),
         sa.Column("project_id", UUID(as_uuid=True), sa.ForeignKey("projects.id"), nullable=False),
-        sa.Column("run_id", UUID(as_uuid=True), nullable=False),
+        sa.Column("run_id", UUID(as_uuid=True), sa.ForeignKey("runs.id"), nullable=False),
         sa.Column("tool_call_id", sa.Text, nullable=False),
         sa.Column("action", sa.Text, nullable=False),
         sa.Column("arguments", JSONB, nullable=False),
