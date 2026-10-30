@@ -977,3 +977,9 @@ PR: C:\ai_paycore\ffcore\state\pr\04a-06a-followups.md · Branch fix/04a-06a-fol
 ### A-af-0010 · 2026-10-30 21:10 · → koordinator · ACK
 Paket: fix/04a-06a-followups   Cevap: K-AF-0005
 Alındı: FOLLOWUP-115 / 116 kayıtları, REVIEW-ISTEK K-AF-0004. Branch'e commit yok; REVIEW-SONUC ya da DUZELT bekliyorum. ONAY → MERGED sonrası 13b A GOREV'i (0. madde gen:api) bu oturumda.
+
+### A-af-0011 · 2026-10-30 21:20 · → koordinator · ACK
+Paket: fix/04a-06a-followups   Cevap: K-AF-0006
+DUZELT alındı (r1 MAJOR-1). Plan: tek maske fonksiyonu sources olayını veren her yolda (DB tekrar oynatma, olay listesi, Redis canlı/yeniden oynatma); test akış anahtarını silmez; probe birim + entegrasyona. Önce kırmızı, sonra yeni SHA ile PR-HAZIR. YIGIN-AÇ af gerekecek.
+
+YIGIN-AÇ af · 2026-10-30 21:22 · isci-a · 18030/13030 · FFCORE_VERSION=0.0.0-af (K-AF-0006 r1 DUZELT)

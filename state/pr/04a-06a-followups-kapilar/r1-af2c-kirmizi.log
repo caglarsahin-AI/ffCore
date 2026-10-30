@@ -1,0 +1,58 @@
+
+==================================== ERRORS ====================================
+_________ ERROR collecting tests/unit/test_af_2c_source_mask_paths.py __________
+ImportError while importing test module '/work/backend/tests/unit/test_af_2c_source_mask_paths.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/local/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/unit/test_af_2c_source_mask_paths.py:8: in <module>
+    from ffcore.api.runs import DELETED_BREADCRUMB, masked_sources
+E   ImportError: cannot import name 'masked_sources' from 'ffcore.api.runs' (/work/backend/ffcore/api/runs.py)
+=========================== short test summary info ============================
+ERROR tests/unit/test_af_2c_source_mask_paths.py
+!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+1 error in 6.64s
+F.                                                                       [100%]
+=================================== FAILURES ===================================
+___________ test_af_2b_deleted_source_masked_on_list_and_live_stream ___________
+
+analyst = (UUID('fa013a9e-173c-4e0a-b544-be0d40b69a68'), <starlette.testclient.TestClient object at 0x7f5c79ada540>)
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_d8bd7051f69c) at 0x7f5c7b082db0>
+harness = <tests.integration.runtime_support.Harness object at 0x7f5c606419a0>
+use_queue = <function use_queue.<locals>.install at 0x7f5c40a658a0>
+
+    def test_af_2b_deleted_source_masked_on_list_and_live_stream(analyst, pg, harness, use_queue):
+        # Review r1 MAJOR-1: the Redis stream lives for RUN_EVENT_STREAM_TTL_S; it is not expired here.
+        client, project_id, run_id, doc_id, url, before = _deleted_run(analyst, pg, harness, use_queue)
+        gone = _selected(client.get(url).json()["items"])
+        assert gone == [{**before[0], "breadcrumb": "[deleted]"}]  # reference kept, crumb masked
+        live = _stream_sources(client, project_id, run_id)
+>       assert live and all(s["breadcrumb"] == "[deleted]" for s in live), live
+E       AssertionError: [{'n': 1, 'kb_key': 'sozlesmeler', 'chunk_id': '8383f0b7-11c9-4f00-958c-ab2b24f10cbb', 'document_id': '027c19dd-0af1-41e7-8bb1-aacda1e497c2', ...}]
+E       assert ([{'n': 1, 'kb_key': 'sozlesmeler', 'chunk_id': '8383f0b7-11c9-4f00-958c-ab2b24f10cbb', 'document_id': '027c19dd-0af1-41e7-8bb1-aacda1e497c2', ...}] and False)
+E        +  where False = all(<generator object test_af_2b_deleted_source_masked_on_list_and_live_stream.<locals>.<genexpr> at 0x7f5c26f66810>)
+
+tests/integration/test_af_2b_deleted_source_breadcrumb.py:77: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+2026-10-30 18:25:02,148 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-30 18:25:02,188 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=519
+------------------------------ Captured log setup ------------------------------
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=519
+----------------------------- Captured stderr call -----------------------------
+2026-10-30 18:25:03,397 INFO ffcore.access access method=POST path=/api/v1/projects/fa013a9e-173c-4e0a-b544-be0d40b69a68/agents/asistan/runs status=200 ms=960
+2026-10-30 18:25:03,524 INFO ffcore.access access method=GET path=/api/v1/projects/fa013a9e-173c-4e0a-b544-be0d40b69a68/runs/04031265-7472-472a-84df-dc1dcf9f1dd1/events status=200 ms=104
+2026-10-30 18:25:03,611 INFO ffcore.access access method=GET path=/api/v1/projects/fa013a9e-173c-4e0a-b544-be0d40b69a68/runs/04031265-7472-472a-84df-dc1dcf9f1dd1/stream status=200 ms=79
+2026-10-30 18:25:03,691 INFO ffcore.access access method=GET path=/api/v1/projects/fa013a9e-173c-4e0a-b544-be0d40b69a68/runs/04031265-7472-472a-84df-dc1dcf9f1dd1/events status=200 ms=69
+2026-10-30 18:25:03,770 INFO ffcore.access access method=GET path=/api/v1/projects/fa013a9e-173c-4e0a-b544-be0d40b69a68/runs/04031265-7472-472a-84df-dc1dcf9f1dd1/stream status=200 ms=73
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/fa013a9e-173c-4e0a-b544-be0d40b69a68/agents/asistan/runs status=200 ms=960
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/fa013a9e-173c-4e0a-b544-be0d40b69a68/runs/04031265-7472-472a-84df-dc1dcf9f1dd1/events status=200 ms=104
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/fa013a9e-173c-4e0a-b544-be0d40b69a68/runs/04031265-7472-472a-84df-dc1dcf9f1dd1/stream status=200 ms=79
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/fa013a9e-173c-4e0a-b544-be0d40b69a68/runs/04031265-7472-472a-84df-dc1dcf9f1dd1/events status=200 ms=69
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/fa013a9e-173c-4e0a-b544-be0d40b69a68/runs/04031265-7472-472a-84df-dc1dcf9f1dd1/stream status=200 ms=73
+=========================== short test summary info ============================
+FAILED tests/integration/test_af_2b_deleted_source_breadcrumb.py::test_af_2b_deleted_source_masked_on_list_and_live_stream
+1 failed, 1 passed in 21.45s
