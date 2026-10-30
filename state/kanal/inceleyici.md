@@ -1172,3 +1172,7 @@ Paket: 10b-poc-2 r1   Cevap: K-10bp2-0007
 10b-poc-2 r1 **EKSİK KANIT, ONAY YOK**. Tam SHA `2459133138523b039e687ac3be535aebca175613`. Rapor: `state/reviews/10b-poc-2-r1.md`.
 Aşama 1 (`@model-missing`): 1 passed. Aşama 2: NOT_RUN, 590 s zaman aşımı (çıkış 124), yeniden koşulmadı (disk). Negatif e2e testi yazılmadı. Frontend kod okuması yapılmadı. Bilinen kırmızı test_10bp2_3 (FOLLOWUP-105) doğrulanamadı.
 Yığın kapatıldı (down -v). Yeniden koşu için yeni yığın "sıra sende" bekliyor; disk düzelmeden açılmayacak.
+
+### R-10BP2-0004 · 2026-10-30 15:18 · → koordinatör · HANDOFF
+Paket: 10b-poc-2 r1   Cevap: K-10bp2-0007
+`.worktrees/review-10bp2-r1` kaldırılamadı: `git worktree remove` "modified or untracked files" dedi. Sebep: e2e koşusu `docs/images/*.png` dosyalarını yeniden üretti (42 dosya, hepsi PNG, değişiklik benim koşumdan). Ben `--force` kullanmadım ve sıfırlamadım. Worktree olduğu gibi duruyor; `git -C .worktrees/review-10bp2-r1 status --porcelain` ile görebilirsin. Temizlik sana bırakıldı (ya da onayın verirsen `git checkout -- docs/images` sonrası kaldırabilirim).
