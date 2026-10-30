@@ -22,8 +22,10 @@ def test_18_env_1_overlay_hosts_are_env_test_plus_fake_llm():
     assert overlay == [*base, "fake-llm"]
 
 
-def test_18_env_2_overlay_is_fake_embed_and_nothing_else():
+def test_18_env_2_overlay_is_fake_embed_hosts_and_test_hooks_only():
+    # FFCORE_TEST_HOOKS=1: the approval sweep hook (FOLLOWUP-111, K-13b-0006); off elsewhere.
     assert _values(HERE / "e2e.env") == {
         "FAKE_EMBED": "1",
         "ALLOWED_INTERNAL_HOSTS": _values(HERE / "e2e.env")["ALLOWED_INTERNAL_HOSTS"],
+        "FFCORE_TEST_HOOKS": "1",
     }

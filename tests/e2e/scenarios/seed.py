@@ -10,6 +10,7 @@ Environment (never written to a file): E2E_ADMIN_EMAIL, E2E_ADMIN_PASSWORD (the 
 seed creates with `create-superadmin --password-stdin`), E2E_PASSWORD (every seeded member).
 """
 
+import hashlib
 import json
 import os
 import subprocess
@@ -102,6 +103,9 @@ class Client:
                 code = "unreadable_error_body"
             raise LoginRefused(email, r.status_code, code)
         self.http.headers["cookie"] = f"ffcore_session={r.cookies['ffcore_session']}"
+        # What this seed changed (13b acceptance 5: a second seed reports 0 and 0).
+        self.created = 0
+        self.uploads = 0
 
     def call(self, method: str, path: str, ok=(200, 201, 202, 204), **kw) -> httpx.Response:
         r = self.http.request(method, path, **kw)
@@ -112,6 +116,8 @@ class Client:
     def create(self, path: str, body: dict, lookup) -> dict:
         """POST, or on 409 the existing resource found by `lookup()`."""
         r = self.call("POST", path, ok=(200, 201, 409), json=body)
+        if r.status_code in (200, 201):
+            self.created += 1
         if r.status_code == 409:
             found = lookup()
             if found is None:
@@ -247,19 +253,40 @@ def upload_form(path: Path) -> tuple[str, bytes]:
     return path.name, path.read_bytes()
 
 
+def existing_upload(documents: list[dict], name: str, data: bytes, date: str | None) -> str | None:
+    """The id of a live document that already holds this upload (same file name, same bytes and,
+    when given, the same source date), else None. A re-upload of the same bytes would still
+    bump the version (04a `unchanged`), so an idempotent seed skips it (13b acceptance 5)."""
+    sha = hashlib.sha256(data).hexdigest()
+    for doc in documents:
+        if doc["filename"] != name or doc["sha256"] != sha:
+            continue
+        if date is not None and not str(doc.get("updated_at_source") or "").startswith(date):
+            continue
+        return doc["id"]
+    return None
+
+
 def seed_kb(admin: Client, pid: str, key: str, files: list[tuple]) -> str:
     """KB `key` with `files` [(path, acl_roles[, source_date])]; [] = open to every member (13a
     words.py); a source date orders newest first (FOLLOWUP-101), none = unknown."""
     base = f"/projects/{pid}/knowledge-bases"
     kb = admin.create(base, {"key": key, "name": key}, lambda: admin.find(base, key))
     doc_ids = []
+    present = admin.call("GET", f"{base}/{kb['id']}/documents").json()["data"]
     for path, roles, *date in files:
+        name, content = upload_form(path)
+        found = existing_upload(present, name, content, date[0] if date else None)
+        if found is not None:
+            doc_ids.append(found)
+            continue
         data = {"acl_open": "true"} if not roles else {"acl_roles": roles}
         if date:
             data["updated_at_source"] = date[0]
         r = admin.call(
-            "POST", f"{base}/{kb['id']}/documents", files={"files": upload_form(path)}, data=data
+            "POST", f"{base}/{kb['id']}/documents", files={"files": (name, content)}, data=data
         )
+        admin.uploads += 1
         doc_ids += [row["document"]["id"] for row in r.json()["data"]]
     wait_indexed(admin, f"{base}/{kb['id']}", doc_ids)
     return kb["id"]
@@ -339,6 +366,7 @@ def _publish(
     version = agent["latest_version"]
     admin.call("PUT", f"{base}/{agent['id']}/versions/{version}", json={"definition": definition})
     admin.call("POST", f"{base}/{agent['id']}/publish", json={"version": version})
+    admin.created += 1
 
 
 def seed_agents(admin: Client, projects: dict, ids: dict[str, str]) -> None:
@@ -387,6 +415,7 @@ def seed_guardrails(admin: Client, ids: dict[str, str]) -> None:
         **{k: current[k] for k in ("short_circuit", "on_error", "block_message")},
     }
     admin.call("POST", base, json=body)
+    admin.created += 1
 
 
 def seed_prompts() -> None:
@@ -413,7 +442,10 @@ def main() -> int:
     seed_knowledge(admin, projects, ids)
     seed_tools(admin, ids[TARGET])
     seed_agents(admin, projects, ids)
-    print(f"seeded: projects {sorted(ids)}, models {sorted(MODELS)}, agents in {TARGET}")
+    print(
+        f"seeded: projects {sorted(ids)}, models {sorted(MODELS)}, agents in {TARGET}; "
+        f"created {admin.created}, uploaded {admin.uploads}"
+    )
     return 0
 
 

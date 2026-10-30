@@ -18,6 +18,9 @@ def test_13b_ftable_1_rows_from_test_names():
     assert ftable.row_of("tests/e2e/negative/test_n.py::test_13b_neg_auth_1_x") == "Negative"
     assert ftable.row_of("x.py::test_18_env_1_overlay") == "Setup"
     assert ftable.row_of("x.py::test_18_seed_5_client") == "Setup"
+    # 13b's own tooling tests (seed, eval report) are setup rows, never "Other"
+    assert ftable.row_of("x.py::test_13b_5_same_file_is_not_uploaded_again") == "Setup"
+    assert ftable.row_of("x.py::test_13b_7_report_shape") == "Setup"
 
 
 def test_13b_ftable_2_row_status():

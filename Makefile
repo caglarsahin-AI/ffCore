@@ -3,7 +3,7 @@
 # Servisleri başlatma/durdurma doğrudan compose ile: docker compose up -d --wait | down | logs -f
 # Önyüz lint'i ayrı konteynerde: docker compose run --rm frontend npm run lint
 
-.PHONY: lint format test test-samples test-int test-models models models-check smoke pull seed-models render-litellm reindex langfuse-init seed-prompts seed-sql-demo seed-sql-context
+.PHONY: lint format test test-samples test-int seed test-models models models-check smoke pull seed-models render-litellm reindex langfuse-init seed-prompts seed-sql-demo seed-sql-context
 
 lint:
 	ruff check backend scripts data/samples/scripts services
@@ -84,3 +84,9 @@ seed-sql-demo:
 seed-sql-context:
 	@test -n "$(PROJECT)" || (echo "usage: make seed-sql-context PROJECT=<project_key> [TOOL=mcp-sql]" >&2; exit 2)
 	cd backend && python -m ffcore.cli seed-sql-context --project "$(PROJECT)" --tool "$(or $(TOOL),mcp-sql)" --path ../data/samples/schema
+
+# 13b: the PoC demo and scenario data (plan/18 seed, tests/e2e/scenarios/seed.py), idempotent: a
+# second run reports "created 0, uploaded 0". Passwords come from the shell, never a file:
+#   docker compose --env-file .env.test --env-file tests/e2e/scenarios/e2e.env --profile test #     run --rm -e E2E_ADMIN_EMAIL -e E2E_ADMIN_PASSWORD -e E2E_PASSWORD tools make seed
+seed:
+	python -m tests.e2e.scenarios.seed
