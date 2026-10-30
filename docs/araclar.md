@@ -24,7 +24,8 @@ approval settings, test calls, and the two built-in servers `mcp-search` and `mc
   metadata addresses are refused unless the host is internal. A refusal is `400 egress_*`.
 - `kind: openapi` can be registered but not called yet (`501`); it arrives with 05b.
 
-Developers can read tools; only admins change them. Every change is audited.
+Analysts and above read tools and their actions (the agent wizard lists them); only admins with
+edit access change them. Secret `auth` fields are `***` for every reader. Every change is audited.
 
 ## Upstream identity
 

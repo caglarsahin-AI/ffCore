@@ -10,6 +10,7 @@ paths:
       tags:
       - tools
       summary: List the project's tools
+      description: Analyst role or above; secret auth fields are returned as ***.
       operationId: list_tools_api_v1_projects__project_id__tools_get
       parameters:
       - name: project_id
@@ -132,6 +133,7 @@ paths:
       tags:
       - tools
       summary: Get a tool with its actions
+      description: Analyst role or above; secret auth fields are returned as ***.
       operationId: get_tool_api_v1_projects__project_id__tools__tool_id__get
       parameters:
       - name: project_id

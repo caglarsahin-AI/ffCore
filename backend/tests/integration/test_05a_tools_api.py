@@ -145,10 +145,62 @@ def test_05a_forward_user_internal_accepted(world):
 
 
 def test_05a_tool_roles(world):
-    assert world["analyst"].get(tools_url(world)).status_code == 403
+    assert world["analyst"].get(tools_url(world)).status_code == 200
     assert world["developer"].get(tools_url(world)).status_code == 200
     assert world["developer"].post(tools_url(world), json=_tool()).status_code == 403
     assert world["admin"].post(tools_url(world), json=_tool()).status_code == 201
+
+
+# --- FOLLOWUP-100 (decision A, K-10bp2-0003): analysts read tools and actions (agent wizard),
+# only admins with edit access change them; secrets stay masked for every reader.
+
+
+def test_05a_tool_read_user_role_refused(world, make_user, client_factory):
+    import uuid as _uuid
+
+    _, member = make_user(memberships={_uuid.UUID(world["project"]): ("user", "edit")})
+    tool = world["admin"].post(tools_url(world), json=_tool()).json()
+    user = client_factory(member)
+    for url in (tools_url(world), tools_url(world, tool["id"])):
+        response = user.get(url)
+        assert response.status_code == 403, url
+        assert response.json()["error"]["code"] == "insufficient_role"
+
+
+def test_05a_tool_read_analyst_sees_masked_secret(world):
+    auth = {"type": "basic", "username": USERNAME, "password": PASSWORD}
+    tool = world["admin"].post(tools_url(world), json=_tool(auth=auth)).json()
+    for url in (tools_url(world), tools_url(world, tool["id"])):
+        response = world["analyst"].get(url)
+        assert response.status_code == 200, url
+        assert PASSWORD not in response.text and USERNAME not in response.text
+    listed = world["analyst"].get(tools_url(world)).json()["data"]
+    assert listed[0]["auth"]["password"] == "***"
+
+
+def test_05a_tool_analyst_cannot_change(world, mcp_server, loopback):
+    tool = _discover(world, _registered(world, mcp_server))
+    analyst, item = world["analyst"], tools_url(world, tool["id"])
+    assert analyst.post(tools_url(world), json=_tool(key="other")).status_code == 403
+    assert analyst.patch(item, json={"name": "x"}).status_code == 403
+    assert analyst.post(item + "/discover").status_code == 403
+    assert analyst.patch(item + "/actions/echo", json={"needs_approval": False}).status_code == 403
+    invoke = analyst.post(item + "/actions/echo/invoke", json={"arguments": {"text": "x"}})
+    assert invoke.status_code == 403
+    assert analyst.delete(item).status_code == 403
+
+
+def test_05a_tool_read_analyst_read_parity(world, make_user, client_factory):
+    import uuid as _uuid
+
+    _, reader = make_user(memberships={_uuid.UUID(world["project"]): ("analyst", "read")})
+    read = client_factory(reader)
+    auth = {"type": "basic", "username": USERNAME, "password": PASSWORD}
+    tool = world["admin"].post(tools_url(world), json=_tool(auth=auth)).json()
+    for url in (tools_url(world), tools_url(world, tool["id"])):
+        edit_response, read_response = world["analyst"].get(url), read.get(url)
+        assert edit_response.status_code == 200
+        assert read_response.content == edit_response.content, url
 
 
 def test_05a_tool_key_unique_and_soft_delete(world):
