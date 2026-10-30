@@ -42,9 +42,7 @@ def test_07_list_only_this_project_and_status(pg, member, project, make_project)
     _insert(pg, make_project())  # another project's approval never shows
     client = member("analyst")
     assert _ids(client.get(P.format(project))) == {str(pending["id"]), str(done["id"])}
-    assert _ids(client.get(P.format(project), params={"status": "pending"})) == {
-        str(pending["id"])
-    }
+    assert _ids(client.get(P.format(project), params={"status": "pending"})) == {str(pending["id"])}
     assert client.get(P.format(project), params={"status": "waiting"}).status_code == 422
 
 
@@ -110,3 +108,20 @@ def test_07_service_token_without_user_cannot_read(pg, project, client_factory):
     response = client_factory().get(P.format(project), headers=SERVICE)
     assert (response.status_code, response.json()["error"]["code"]) == (403, "insufficient_role")
     assert client_factory().get(P.format(project)).status_code == 401
+
+
+def test_07_read_mode_get_parity(pg, member, project):
+    # Same data for read and edit access on every 07 GET; only `can_decide` (about the caller,
+    # like /auth/me) differs: the read client sees the queue but its buttons are passive.
+    row = _insert(pg, project)
+    edit, read = member("admin", "edit"), member("admin", "read")
+    for path in ("", "/count", f"/{row['id']}"):
+        a, b = edit.get(P.format(project) + path), read.get(P.format(project) + path)
+        assert (a.status_code, b.status_code) == (200, 200), path
+        left, right = a.json(), b.json()
+        if path == f"/{row['id']}":
+            assert (left.pop("can_decide"), right.pop("can_decide")) == (True, False)
+        elif path == "":
+            for item_a, item_b in zip(left["data"], right["data"], strict=True):
+                assert (item_a.pop("can_decide"), item_b.pop("can_decide")) == (True, False)
+        assert left == right, path

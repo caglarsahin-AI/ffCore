@@ -76,9 +76,7 @@ async def list_approvals(
     query = select(Approval).where(*_live(project_id))
     if status is not None:
         query = query.where(Approval.status == status)
-    rows = await session.scalars(
-        query.order_by(Approval.requested_at.desc(), Approval.id)
-    )
+    rows = await session.scalars(query.order_by(Approval.requested_at.desc(), Approval.id))
     return ApprovalList(data=[approval_out(r, actor, request) for r in rows])
 
 

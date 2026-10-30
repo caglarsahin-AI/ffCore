@@ -158,9 +158,7 @@ def test_07_ttl_expires_and_closes_run(database_url, app_settings, make_project,
     assert resolved_by == ("system:approval_ttl",)
     assert "approval_expired" in caplog.text
     # A second tick finds nothing left to expire.
-    again = _run(
-        database_url, lambda s: approvals.expire_due(s, now=T0 + ttl, close_run=close_run)
-    )
+    again = _run(database_url, lambda s: approvals.expire_due(s, now=T0 + ttl, close_run=close_run))
     assert not {row.id for row in again} & ours
 
 
