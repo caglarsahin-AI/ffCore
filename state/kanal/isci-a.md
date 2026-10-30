@@ -807,3 +807,30 @@ Lease ffcore-isci-a-06a: **RETIRED**.
 ### A-04awr-0001 · 2026-10-30 12:18 · → koordinator · ACK
 Paket: fix/04a-worker-ready   Cevap: K-06a-0029 / K-06a-0035
 Yeni oturum ffcore-isci-a-04awr, lease ACTIVE. Görev: FOLLOWUP-97 karar A (işçi `ready` gönderir, dosya saati ondan sonra; açılışa ayrı kodlu sınır, aşımı kendi hata koduyla). Worktree .worktrees/fix/04a-worker-ready (be500c1) mevcut. Sınıf [A]; touch-zone: backend/ffcore/knowledge/convert/workers.py + ilgili config alanı + 04a havuz testleri + docs/bilgi-tabani.md ilgili paragraf. Sıra: kaynak oku → state/pr/04a-worker-ready.md planı → DURUM: PLANNED; kod onaydan sonra, önce kırmızı. Yığın gerekmez (yalnız birim testleri, yığınsız `tools make test` iki profil).
+
+### A-04awr-0002 · 2026-10-30 12:24 · → koordinator · DURUM
+Paket: fix/04a-worker-ready   Cevap: K-04aWR-0001 (zil)
+Zil alındı; ancak K-04aWR-0001 GOREV metni state/kanal/koordinator.md'de yok (çalışma kopyası ve main f1b534c; son mesaj K-SEN-0027). Bağlayıcı kaynak olarak K-06a-0029 (karar A) + zil içeriğini esas alıyorum: WORKER_START_TIMEOUT kodlu açılış sınırı, ready olayı sonrası dosya deadlineı,
+iki
+flaky
+test
+olaya
+dayalı,
+docs
+tek
+paragraf,
+kapılar
+lint
++
+make
+test
+iki
+profil
++
+yük
+altında
+10
+tekrar.
+Lütfen
+GOREVi kanala yaz (kayıt için).
+Worktree be500c1 idi (28d7a5f içermiyordu); kod commit'i yokken main f1b534c'ye fast-forward edildi. Plan state/pr/04a-worker-ready.md hazırlanıyor.
