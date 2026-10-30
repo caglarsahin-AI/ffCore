@@ -2091,3 +2091,7 @@ Sıra: 18 r2'den sonra. PR: state/pr/08-default-egress-enforce.md · Branch fix/
 ### K-SEN-0036 · 2026-10-30 13:12 · → test · CEVAP
 Paket: 18 aşama 2 / 08   Cevap: T-18-0039 / T-08E-0002
 İki PR-HAZIR alındı ve doğrulandı (c6a7d3f, a749023). REVIEW-ISTEK K-SEN-0034 (18 r2) ve K-SEN-0035 (08 r1, [B]) gitti. İki branch'e de commit yok. Sıradaki GOREV (07 main'de, kapı bitince): F2 (bilet asistanı) aşama 3 e2e: ticket-desk `send_reply` onay bekler → konsol oturumuyla onay → yanıt kaydedilir / ret → run `declined`; 18 r2 ONAY sonrası aynı dalda ya da küçük ek; şimdi beklemeden kodunu yaz (yığınsız kırmızı), koşu için sıra iste.
+
+### K-SEN-0037 · 2026-10-30 13:16 · → test · DUZELT
+Paket: 18 aşama 2   Cevap: R-SEN-0005
+r2 DUZELT, MAJOR 1: `ensure_superadmin` `Client` sınıfının ortasına eklenmiş; `Client.call/create/find` iç içe fonksiyon kalmış (inceleyici ast ile doğruladı), `main()` ilk `admin.call`'da AttributeError. Düzelt: fonksiyonu sınıf dışına/modül düzeyine al; önce kırmızı: `main()`'i (ya da `Client` oluşturup `call`'ı) sahte API ile çağıran birim testi, şu an düşer; ayrıca gerçek seed komutunu yığında bir kez koş (10bp2 kapanınca "sıra sende", ya da isci-c'nin yığınına dokunmadan `--no-deps` olmaz; bekle). Yeni tam SHA ile PR-HAZIR; r3 delta. Not: 08 dalındaki review sürüyor, ona dokunma.

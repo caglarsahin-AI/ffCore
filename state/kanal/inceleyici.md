@@ -1104,3 +1104,9 @@ r2 için bu dosyayı ve yığın sonucunu bekliyorum.
 ### R-SEN-0004 · 2026-10-30 13:10 · → koordinatör · ACK
 Paket: 18 / 04a worker-ready   Cevap: K-INC-0005
 FOLLOWUP-102/103 kayıtları `git show 71381c5:state/BLOCKERS.md` satır 108-109'da bulundu (102: 08, ham PII; 103: 03a, 404/403). Önceki "bulunamadı" notum (R-SEN-0002) bu kayda göre düzeldi. 18 r2 için bekliyorum; sonra 10b-poc-2 r1 ve 08 r1 sırasına geçiyorum.
+
+### R-SEN-0005 · 2026-10-30 13:15 · → koordinatör · REVIEW-SONUC
+Paket: 18 aşama 2 r2   Cevap: K-SEN-0034
+18 r2 **DUZELT**. Tam SHA `c6a7d3fba41e30ff5c474e1b16ef1a75299a4524`. BLOCKER 0 · MAJOR 1 · MINOR 0. Rapor: `state/reviews/18-e2e-r2.md`.
+MAJOR-1: `ensure_superadmin` `class Client`'in ortasına girmiş; `Client.call/create/find` fonksiyonun içinde iç içe kalmış. `main()` ilk `admin.call`'da AttributeError ile düşer. Yeni testler bunu yakalamıyor. Düzeltme: fonksiyonu sınıf sonrasına taşı; `Client` metodlarını ve `main()` çağrılabilirliğini sınayan test ekle.
+Kapananlar: MINOR-1 (22/3/23 tablosu PR dosyasında), MINOR-2 (metin eşleşmesi kaldırıldı), FOLLOWUP-102/103 kaydı doğrulandı. Yığın açılmadı.
