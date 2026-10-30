@@ -573,3 +573,18 @@ Seed A alındı.
 - 13b devralır.
 - Yığın sırası isci-b'den sonra; o zamana kadar yığınsız kod + bilinçli kırmızılar.
 API biçimlerini kaynaktan çıkarıyorum (seed: sağlayıcı/model, proje/üye, KB, araç, agent), sonra testler.
+
+### T-18-0032 · 2026-10-30 11:09 · → koordinator · KARAR-GEREK (e2e yığın ortamı)
+Paket: 18 senaryolar aşama 2   Cevap: K-SEN-0023
+Kaynaktan çıkan üç önkoşul; mevcut .env.test ile e2e yığını çalışmaz:
+1. **fake-llm iç host listesinde yok.** .env.test ALLOWED_INTERNAL_HOSTS = litellm, langfuse-web, mcp-search, mcp-sql, ticket-desk. LiteLLM uzlaştırması base_url'e egress kontrolü yapıyor (litellm_reconcile.py:149); fake-llm'li model LiteLLM'e yazılmaz. Entegrasyon testleri bunu kendi Settings'lerinde ekliyor (litellm_support.py:39).
+2. **FAKE_EMBED varsayılanı 0** (compose :240); .env.test bunu ayarlamıyor. KB indeksleme ve rerank gerçek bge-m3 / reranker ağırlıklarını ister; test yığınında yok.
+3. **platform_rules Langfuse prompt'u** yoksa her koşu prompt_unavailable ile düşer. seed-prompts CLI'si gerekli; seed.py bunu çağıracak. Bu karar istemiyor.
+
+Seçenekler (1 ve 2 için):
+- **A (öneri)** e2e örtüsü tests/e2e/scenarios/e2e.env: FAKE_EMBED=1 ve ALLOWED_INTERNAL_HOSTS=<.env.test listesi>,fake-llm. Yığın `--env-file .env.test --env-file tests/e2e/scenarios/e2e.env` ile açılır (sonraki dosya üstüne yazar). Secret yok.
+  Etki: .env.test ve diğer testler değişmez; touch-zone içinde; e2e ortamı açık ve tek yerde. Bedeli: liste .env.test ile elle eş tutulmalı. Bunu bir e2e testi kontrol eder: örtü listesi = .env.test listesi + fake-llm.
+- **B** .env.test'e FAKE_EMBED=1 ve fake-llm ekle. Etki: tek dosya; ama tüm test yığınının davranışı değişir (FAKE_EMBED entegrasyon testlerini etkileyebilir, doğrulanmadı); touch-zone dışı.
+Risk (doğrulanmadı): sözleşmeler .docx, Docling MsWord yolu. Ağırlık istemediğini yığında ilk koşuda göreceğim; isterse F1 .txt kopyasıyla değil NOT_RUN gerekçesiyle raporlarım.
+Parola anahtarları (dosyaya yazılmaz, PR'da listelenir): E2E_PASSWORD (üyeler), E2E_ADMIN_EMAIL / E2E_ADMIN_PASSWORD (superadmin; create-superadmin --password-stdin'e stdin'den).
+Cevabı beklerken A varsayımıyla yığınsız kod yazıyorum.

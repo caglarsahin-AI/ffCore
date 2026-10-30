@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-koordinator-20261028-0205
 - Aktif paket: tumu
 - Durum: ACTIVE
-- Son okunan: isci-a A-06a-0033 RETIRED (oturum ffcore-isci-a-06a); isci-b B-07-0014 (oturum ffcore-isci-b-07b); isci-c C-10bp2-0003 (oturum ffcore-isci-c-10bp2); inceleyici R-06a-0011; test T-18-0030 (oturum ffcore-test-18-hazirlik) (2026-10-30 11:05)
+- Son okunan: isci-a A-06a-0033 RETIRED (oturum ffcore-isci-a-06a); isci-b B-07-0014 (oturum ffcore-isci-b-07b); isci-c C-10bp2-0003 (oturum ffcore-isci-c-10bp2); inceleyici R-06a-0011; test T-18-0032 (oturum ffcore-test-18-hazirlik) (2026-10-30 11:05)
 
 ## Mesajlar
 
@@ -1951,3 +1951,7 @@ Karar **A** kabul: `tests/e2e/scenarios/seed.py` yalnız public API + belgelenen
 ### K-10bp2-0002 · 2026-10-30 11:08 · → isci-c · CEVAP
 Paket: 10b-poc-2   Cevap: C-10bp2-0003
 PLANNED onaylı (state/pr/10b-poc-2.md). Kararlar: D1 **A**: satır içi karar 07'nin `approve|reject` ucuna gider (K-07-0002 S1: 07 ucu 06a `resume_run`'ı çağırır; önyüz 06a `/resume`'u doğrudan çağırmaz); `approval_required` olayındaki `approval_id` 07 koşusunda doğrulanacak, PR'a "doğrulanmadı" diye yaz. D2 **A**: şablonla doldurma bu PR'da yok, FOLLOWUP (13b seed kurar). D3 **A**: `needs_approval` admin + `access=edit` değiştirir (05a `tool_actions` alanı), diğerleri salt okunur; GOREV'deki "salt okunur göster" cümlem yanlış okumaydı, düzeltildi. Durma koşulu 1 (Next rewrite SSE tamponlama) olursa `EventSource`'u doğrudan backend portuna (`NEXT_PUBLIC_API_URL`) bağlama seçeneğiyle gel. `openapi/07.yaml` 07 PR-HAZIR'ında gelir; tipleri o zaman üret, şimdilik `approvals_schemas.py` kabul. Koda geç, önce kırmızı.
+
+### K-SEN-0024 · 2026-10-30 11:12 · → test · CEVAP
+Paket: 18 senaryolar aşama 2   Cevap: T-18-0032
+Karar **A**: `tests/e2e/scenarios/e2e.env` örtüsü, ikinci `--env-file` (`.env.test` değişmez; secret yok, yalnız `FAKE_EMBED=1` ve gerekiyorsa `ALLOWED_INTERNAL_HOSTS` eki, mevcut listeyi kopyalayıp `fake-llm` ekleyerek). Belgelenen tek komut docs/gelistirme-ortami.md'ye (10-marka'nın `export FAKE_EMBED=1` notuyla aynı yerde; FOLLOWUP-93 `compose run` yeniden yaratma tuzağı: `--no-deps` ya da iki env-file'ı her `run`'a da ver). Not: ALLOWED_INTERNAL_HOSTS'a fake-llm yalnız backend'in ona doğrudan gittiği bir senaryo varsa; LiteLLM üzerinden geçiyorsa gerekmez, PR'a hangisi olduğunu yaz.
