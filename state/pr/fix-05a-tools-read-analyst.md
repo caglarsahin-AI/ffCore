@@ -24,10 +24,10 @@
 | # | Kriter (GOREV K-05ATR-0001) | Test | Durum |
 |---|---|---|---|
 | 1 | Araç ve aksiyon okuma (iki GET) `analyst`, yazma admin + edit | `tests/unit/test_05a_tool_read_roles.py::test_05a_tool_reads_need_analyst`, `::test_05a_tool_changes_stay_admin_with_edit` | geçti (kırmızı b8e2f15: `('developer', False) == ('analyst', False)`) |
-| 2 | `user` rolü 403 | `test_05a_tools_api.py::test_05a_tool_read_user_role_refused` | NOT_RUN (test-int, yığın sırası) |
-| 3 | `analyst` 200, gizli alan `***`, ham değer yok | `::test_05a_tool_read_analyst_sees_masked_secret`, `::test_05a_tool_roles` (analyst 403 → 200) | NOT_RUN (test-int) |
-| 4 | `analyst` POST/PATCH/DELETE/discover/aksiyon PATCH/invoke 403 | `::test_05a_tool_analyst_cannot_change` | NOT_RUN (test-int) |
-| 5 | `access=edit` kuralı aynen: analyst+read okumada eşit | `::test_05a_tool_read_analyst_read_parity` | NOT_RUN (test-int) |
+| 2 | `user` rolü 403 (`insufficient_role`) | `test_05a_tools_api.py::test_05a_tool_read_user_role_refused` | geçti |
+| 3 | `analyst` 200, gizli alan `***`, ham değer yok | `::test_05a_tool_read_analyst_sees_masked_secret`, `::test_05a_tool_roles` (analyst 403 → 200) | geçti |
+| 4 | `analyst` POST/PATCH/DELETE/discover/aksiyon PATCH/invoke 403 | `::test_05a_tool_analyst_cannot_change` | geçti |
+| 5 | `access=edit` kuralı aynen: analyst+read okumada eşit | `::test_05a_tool_read_analyst_read_parity` | geçti |
 | 6 | OpenAPI taslağı = uygulama | `tests/contract/test_05a_openapi.py` | geçti |
 
 ## Çalıştırılan komutlar
@@ -40,9 +40,14 @@ Hepsi `FFCORE_VERSION=0.0.0-05atr docker compose -p 05atr --env-file .env.test -
 | `make test` | `DEPLOY_PROFILE=llmaas` | 0 (698 passed) | 178 s |
 | `make test` | `DEPLOY_PROFILE=airgap` | 0 (698 passed) | 131 s |
 | `pytest tests/unit/test_05a_tool_read_roles.py tests/contract/test_05a_openapi.py` @ a795d9d | - | 0 (6 passed) | 7 s |
-| `make test-int` | - | NOT_RUN | yığın: "YIGIN-AÇ 05atr" sırası bekleniyor |
+| `up -d --wait` (`--profile test --profile qdrant`, yığın 05atr, 18060/13060, temiz volume) | `FFCORE_VERSION=0.0.0-05atr` | 0 | 106 s |
+| `make test-int` | aynı yığın | 0 (446 passed, 4 skipped) | 538 s |
+| `pytest -v -rs tests/integration/test_05a_tools_api.py` | aynı yığın | 0 (48 passed; yeni 4 + `test_05a_tool_roles` + `test_05a_read_mode_get_parity` PASSED) | 86 s |
+| `down -v` | - | 0 (konteyner 0, volume 0) | - |
 
 Not: `make test` 698'i docstring kısaltmasından (yalnız satır uzunluğu) önce koştu; sonrası lint + hedefli 6 test.
+
+Loglar (secret-free, `password|token` taraması 0): `state/evidence/fix-05atr-unit-20261030.log` (kırmızı, lint, iki profil test), `fix-05atr-test-int-20261030.log`, `fix-05atr-05a-v-20261030.log`. test-int'teki 4 skipped sayısı main kapısıyla aynı (442 + 4, K-07-0020); nedenleri bu koşuda `-rs` ile alınmadı.
 
 ## Kontrol listesi
 - [x] Felsefe ile çelişen nokta yok

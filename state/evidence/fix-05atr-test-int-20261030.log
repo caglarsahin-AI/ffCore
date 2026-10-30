@@ -1,0 +1,99 @@
+== build 18:04:05
+#29 [frontend] exporting to image
+#29 exporting layers done
+#29 writing image sha256:a49b3feebe67fa40c003c022c692e4a7561790c6500fc696436a1c2c156a3e6d done
+#29 naming to docker.io/ffcore/frontend:0.0.0-05atr 0.0s done
+#29 DONE 0.0s
+build exit=0
+== up 18:04:23
+ Container 05atr-frontend-1  Healthy
+ Container 05atr-langfuse-minio-1  Healthy
+ Container 05atr-agent-worker-1  Healthy
+ Container 05atr-langfuse-postgres-1  Healthy
+ Container 05atr-migrate-1  Exited
+ Container 05atr-agent-worker-bg-1  Healthy
+ Container 05atr-langfuse-web-1  Healthy
+ Container 05atr-qdrant-1  Healthy
+ Container 05atr-fake-llm-1  Healthy
+ Container 05atr-ticket-desk-1  Healthy
+ Container 05atr-langfuse-worker-1  Healthy
+ Container 05atr-redis-1  Healthy
+ Container 05atr-backend-1  Healthy
+ Container 05atr-mcp-sql-1  Healthy
+ Container 05atr-mcp-search-1  Healthy
+up exit=0
+== test-int 18:06:09
+cd backend && QDRANT_URL=http://qdrant:6333 RUN_QDRANT_TESTS=1 pytest tests/integration
+============================= test session starts ==============================
+platform linux -- Python 3.12.10, pytest-9.2.0, pluggy-1.7.0
+rootdir: /work/backend
+configfile: pyproject.toml
+plugins: Faker-40.43.0, anyio-4.15.1, langsmith-0.14.8
+collected 450 items
+
+tests/integration/test_01_client.py .......                              [  1%]
+tests/integration/test_01_events.py ...                                  [  2%]
+tests/integration/test_01_reconcile.py ...........                       [  4%]
+tests/integration/test_01_seed.py ...                                    [  5%]
+tests/integration/test_02_langfuse.py ....                               [  6%]
+tests/integration/test_02_pricing.py .                                   [  6%]
+tests/integration/test_02_r1_worker_logging.py .                         [  6%]
+tests/integration/test_03a_access.py ............                        [  9%]
+tests/integration/test_03a_auth.py ..............                        [ 12%]
+tests/integration/test_03a_models.py ...........                         [ 14%]
+tests/integration/test_03a_obo_scope.py ................                 [ 18%]
+tests/integration/test_03a_providers.py ................                 [ 22%]
+tests/integration/test_03a_read_side.py .......                          [ 23%]
+tests/integration/test_03a_schema.py .......                             [ 25%]
+tests/integration/test_03b_audit.py ............                         [ 27%]
+tests/integration/test_03b_egress_dns.py s                               [ 28%]
+tests/integration/test_04a_api.py .............                          [ 30%]
+tests/integration/test_04a_embed_api.py ....                             [ 31%]
+tests/integration/test_04a_ingest.py .s..........s                       [ 34%]
+tests/integration/test_04a_qdrant.py ....                                [ 35%]
+tests/integration/test_04a_readyz.py ....                                [ 36%]
+tests/integration/test_04a_review_r1_acl.py ........                     [ 38%]
+tests/integration/test_04a_review_r1_ingest.py ......                    [ 39%]
+tests/integration/test_04a_review_r1_upload.py ..                        [ 40%]
+tests/integration/test_04a_search.py ........                            [ 41%]
+tests/integration/test_04a_store.py ..........                           [ 44%]
+tests/integration/test_04a_worker.py ..                                  [ 44%]
+tests/integration/test_05a_live_services.py .....                        [ 45%]
+tests/integration/test_05a_obo_verify.py .......                         [ 47%]
+tests/integration/test_05a_search.py ........                            [ 48%]
+tests/integration/test_05a_sql.py ..............s.....                   [ 53%]
+tests/integration/test_05a_tools_api.py ................................ [ 60%]
+................                                                         [ 64%]
+tests/integration/test_06a_adapters.py ..                                [ 64%]
+tests/integration/test_06a_agents.py ........                            [ 66%]
+tests/integration/test_06a_feedback.py .....                             [ 67%]
+tests/integration/test_06a_graph.py ............................         [ 73%]
+tests/integration/test_06a_mcp_tools.py ............                     [ 76%]
+tests/integration/test_06a_read_side.py .                                [ 76%]
+tests/integration/test_06a_readyz.py ..                                  [ 76%]
+tests/integration/test_06a_run_access.py ..........                      [ 79%]
+tests/integration/test_06a_runs_api.py .........                         [ 81%]
+tests/integration/test_06a_scheduler.py .......                          [ 82%]
+tests/integration/test_06a_schema.py .........                           [ 84%]
+tests/integration/test_07_api_read.py ............                       [ 87%]
+tests/integration/test_07_decide.py .........                            [ 89%]
+tests/integration/test_07_flow.py ..........                             [ 91%]
+tests/integration/test_07_schema.py ...........                          [ 94%]
+tests/integration/test_07_service.py ........                            [ 95%]
+tests/integration/test_08_api.py ................                        [ 99%]
+tests/integration/test_18td_tools_api.py ...                             [100%]
+
+=============================== warnings summary ===============================
+tests/integration/test_03a_obo_scope.py::test_03a_r1_obo_tenant_mutation_refused
+  /usr/local/lib/python3.12/weakref.py:590: SAWarning: The garbage collector is trying to clean up non-checked-in connection <AdaptedConnection <psycopg.AsyncConnection [INTRANS] (host=postgres user=ffcore database=ffcore_test_142019decee0) at 0x7fa204f84d10>>, which will be dropped, as it cannot be safely terminated.  Please ensure that SQLAlchemy pooled connections are returned to the pool explicitly, either by calling ``close()`` or by using appropriate context managers to manage their lifecycle.
+    return info.func(*info.args, **(info.kwargs or {}))
+
+tests/integration/test_04a_worker.py::test_04a_upload_job_runs_in_worker
+tests/integration/test_04a_worker.py::test_04a_job_for_missing_row_retries_then_fails_loud
+  /opt/venv/lib/python3.12/site-packages/arq/worker.py:877: DeprecationWarning: Call to deprecated close. (Use aclose() instead) -- Deprecated since version 5.0.1.
+    await self.pool.close(close_connection_pool=True)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+============ 446 passed, 4 skipped, 3 warnings in 538.29s (0:08:58) ============
+test-int exit=0
+== end 18:15:36

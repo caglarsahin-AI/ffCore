@@ -1,0 +1,170 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.10, pytest-9.2.0, pluggy-1.7.0 -- /opt/venv/bin/python
+cachedir: .pytest_cache
+rootdir: /work/backend
+configfile: pyproject.toml
+plugins: Faker-40.43.0, anyio-4.15.1, langsmith-0.14.8
+collecting ... collected 48 items
+
+tests/integration/test_05a_tools_api.py::test_05a_6_basic_credentials_never_shown PASSED [  2%]
+tests/integration/test_05a_tools_api.py::test_05a_6_masked_value_keeps_stored_secret PASSED [  4%]
+tests/integration/test_05a_tools_api.py::test_05a_6_masked_value_on_create_refused PASSED [  6%]
+tests/integration/test_05a_tools_api.py::test_05a_8_ssrf_endpoints_refused_at_registration[http://127.0.0.1:8000/mcp] PASSED [  8%]
+tests/integration/test_05a_tools_api.py::test_05a_8_ssrf_endpoints_refused_at_registration[http://10.0.0.5/mcp] PASSED [ 10%]
+tests/integration/test_05a_tools_api.py::test_05a_8_ssrf_endpoints_refused_at_registration[http://169.254.169.254/latest] PASSED [ 12%]
+tests/integration/test_05a_tools_api.py::test_05a_8_ssrf_endpoints_refused_at_registration[https://not-allowed.example.org/mcp] PASSED [ 14%]
+tests/integration/test_05a_tools_api.py::test_05a_8_internal_mcp_search_accepted PASSED [ 16%]
+tests/integration/test_05a_tools_api.py::test_05a_8_ssrf_refused_on_update PASSED [ 18%]
+tests/integration/test_05a_tools_api.py::test_05a_forward_user_external_host_400 PASSED [ 20%]
+tests/integration/test_05a_tools_api.py::test_05a_forward_user_internal_accepted PASSED [ 22%]
+tests/integration/test_05a_tools_api.py::test_05a_tool_roles PASSED      [ 25%]
+tests/integration/test_05a_tools_api.py::test_05a_tool_read_user_role_refused PASSED [ 27%]
+tests/integration/test_05a_tools_api.py::test_05a_tool_read_analyst_sees_masked_secret PASSED [ 29%]
+tests/integration/test_05a_tools_api.py::test_05a_tool_analyst_cannot_change PASSED [ 31%]
+tests/integration/test_05a_tools_api.py::test_05a_tool_read_analyst_read_parity PASSED [ 33%]
+tests/integration/test_05a_tools_api.py::test_05a_tool_key_unique_and_soft_delete PASSED [ 35%]
+tests/integration/test_05a_tools_api.py::test_05a_openapi_kind_registered_but_not_callable_yet PASSED [ 37%]
+tests/integration/test_05a_tools_api.py::test_05a_discover_writes_actions_closed PASSED [ 39%]
+tests/integration/test_05a_tools_api.py::test_05a_rediscover_keeps_settings_and_marks_missing PASSED [ 41%]
+tests/integration/test_05a_tools_api.py::test_05a_discover_failure_is_recorded PASSED [ 43%]
+tests/integration/test_05a_tools_api.py::test_05a_action_settings PASSED [ 45%]
+tests/integration/test_05a_tools_api.py::test_05a_invoke_returns_result_and_is_audited PASSED [ 47%]
+tests/integration/test_05a_tools_api.py::test_05a_invoke_errors_are_coded PASSED [ 50%]
+tests/integration/test_05a_tools_api.py::test_05a_invoke_openapi_kind_not_implemented PASSED [ 52%]
+tests/integration/test_05a_tools_api.py::test_05a_read_mode_get_parity PASSED [ 54%]
+tests/integration/test_05a_tools_api.py::test_05a_endpoint_url_credentials_refused[http://user:dummy-not-secret-url-secret-0123@mcp-search:8000/mcp] PASSED [ 56%]
+tests/integration/test_05a_tools_api.py::test_05a_endpoint_url_credentials_refused[http://dummy-not-secret-url-secret-0123@mcp-search:8000/mcp] PASSED [ 58%]
+tests/integration/test_05a_tools_api.py::test_05a_endpoint_url_credentials_refused[http://mcp-search:8000/mcp?api_key=dummy-not-secret-url-secret-0123] PASSED [ 60%]
+tests/integration/test_05a_tools_api.py::test_05a_endpoint_url_credentials_refused[http://mcp-search:8000/mcp?] PASSED [ 62%]
+tests/integration/test_05a_tools_api.py::test_05a_endpoint_url_credentials_refused[http://mcp-search:8000/mcp#dummy-not-secret-url-secret-0123] PASSED [ 64%]
+tests/integration/test_05a_tools_api.py::test_05a_endpoint_url_credentials_refused_on_update PASSED [ 66%]
+tests/integration/test_05a_tools_api.py::test_05a_reserved_header_name_refused[Host] PASSED [ 68%]
+tests/integration/test_05a_tools_api.py::test_05a_reserved_header_name_refused[Content-Length] PASSED [ 70%]
+tests/integration/test_05a_tools_api.py::test_05a_reserved_header_name_refused[Connection] PASSED [ 72%]
+tests/integration/test_05a_tools_api.py::test_05a_reserved_header_name_refused[Transfer-Encoding] PASSED [ 75%]
+tests/integration/test_05a_tools_api.py::test_05a_reserved_header_name_refused[Upgrade] PASSED [ 77%]
+tests/integration/test_05a_tools_api.py::test_05a_reserved_header_name_refused[TE] PASSED [ 79%]
+tests/integration/test_05a_tools_api.py::test_05a_reserved_header_name_refused[Trailer] PASSED [ 81%]
+tests/integration/test_05a_tools_api.py::test_05a_reserved_header_name_refused[Keep-Alive] PASSED [ 83%]
+tests/integration/test_05a_tools_api.py::test_05a_reserved_header_name_refused[Proxy-Authorization] PASSED [ 85%]
+tests/integration/test_05a_tools_api.py::test_05a_reserved_header_name_refused[Proxy-Anything] PASSED [ 87%]
+tests/integration/test_05a_tools_api.py::test_05a_reserved_header_name_refused[Authorization] PASSED [ 89%]
+tests/integration/test_05a_tools_api.py::test_05a_reserved_header_name_refused[host] PASSED [ 91%]
+tests/integration/test_05a_tools_api.py::test_05a_reserved_header_name_refused[X Api Key] PASSED [ 93%]
+tests/integration/test_05a_tools_api.py::test_05a_reserved_header_name_refused[X-Api:Key] PASSED [ 95%]
+tests/integration/test_05a_tools_api.py::test_05a_reserved_header_name_refused_on_update PASSED [ 97%]
+tests/integration/test_05a_tools_api.py::test_05a_business_header_name_accepted PASSED [100%]
+
+======================== 48 passed in 85.99s (0:01:25) =========================
+--- Logging error ---
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/logging/__init__.py", line 1164, in emit
+    self.flush()
+  File "/usr/local/lib/python3.12/logging/__init__.py", line 1144, in flush
+    self.stream.flush()
+ValueError: I/O operation on closed file.
+Call stack:
+  File "/usr/local/lib/python3.12/threading.py", line 1032, in _bootstrap
+    self._bootstrap_inner()
+  File "/usr/local/lib/python3.12/threading.py", line 1075, in _bootstrap_inner
+    self.run()
+  File "/usr/local/lib/python3.12/threading.py", line 1012, in run
+    self._target(*self._args, **self._kwargs)
+  File "/opt/venv/lib/python3.12/site-packages/uvicorn/server.py", line 86, in run
+    return asyncio_run(self.serve(sockets=sockets), loop_factory=self.config.get_loop_factory())
+  File "/usr/local/lib/python3.12/asyncio/runners.py", line 195, in run
+    return runner.run(main)
+  File "/usr/local/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+  File "/opt/venv/lib/python3.12/site-packages/uvicorn/lifespan/on.py", line 86, in main
+    await app(scope, self.receive, self.send)
+  File "/opt/venv/lib/python3.12/site-packages/uvicorn/middleware/proxy_headers.py", line 30, in __call__
+    return await self.app(scope, receive, send)
+  File "/work/backend/tests/mcp_fixture.py", line 68, in app
+    await inner(scope, receive, send)
+  File "/opt/venv/lib/python3.12/site-packages/starlette/applications.py", line 96, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/opt/venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 151, in __call__
+    await self.app(scope, receive, send)
+  File "/opt/venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 49, in __call__
+    await self.app(scope, receive, send)
+  File "/opt/venv/lib/python3.12/site-packages/starlette/routing.py", line 683, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/opt/venv/lib/python3.12/site-packages/starlette/routing.py", line 692, in app
+    await self.lifespan(scope, receive, send)
+  File "/opt/venv/lib/python3.12/site-packages/starlette/routing.py", line 661, in lifespan
+    async with self.lifespan_context(app) as maybe_state:
+  File "/usr/local/lib/python3.12/contextlib.py", line 217, in __aexit__
+    await anext(self.gen)
+  File "/opt/venv/lib/python3.12/site-packages/mcp/server/streamable_http_manager.py", line 166, in run
+    logger.info("StreamableHTTP session manager shutting down")
+Message: 'StreamableHTTP session manager shutting down'
+Arguments: ()
+--- Logging error ---
+Traceback (most recent call last):
+  File "/opt/venv/lib/python3.12/site-packages/anyio/streams/memory.py", line 118, in receive
+    return self.receive_nowait()
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/anyio/streams/memory.py", line 113, in receive_nowait
+    raise WouldBlock
+anyio._core._exceptions.WouldBlock
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/opt/venv/lib/python3.12/site-packages/mcp/server/streamable_http_manager.py", line 357, in run_server
+    await serve_loop(
+  File "/opt/venv/lib/python3.12/site-packages/mcp/server/runner.py", line 499, in serve_loop
+    await serve_connection(
+  File "/opt/venv/lib/python3.12/site-packages/mcp/server/runner.py", line 465, in serve_connection
+    await dispatcher.run(runner.on_request, runner.on_notify, task_status=task_status)
+  File "/opt/venv/lib/python3.12/site-packages/mcp/shared/jsonrpc_dispatcher.py", line 510, in run
+    async with anyio.create_task_group() as tg:
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 851, in __aexit__
+    raise exc_val
+  File "/opt/venv/lib/python3.12/site-packages/mcp/shared/jsonrpc_dispatcher.py", line 517, in run
+    async for item in self._read_stream:
+  File "/opt/venv/lib/python3.12/site-packages/mcp/shared/_context_streams.py", line 89, in __anext__
+    return await self.receive()
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/mcp/shared/_context_streams.py", line 71, in receive
+    ctx, item = await self._inner.receive()
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/anyio/streams/memory.py", line 126, in receive
+    await receive_event.wait()
+  File "/opt/venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 1936, in wait
+    await self._event.wait()
+  File "/usr/local/lib/python3.12/asyncio/locks.py", line 212, in wait
+    await fut
+asyncio.exceptions.CancelledError: Cancelled via cancel scope 7f8f4f895f90 by <Task pending name='Task-431' coro=<LifespanOn.main() running at /opt/venv/lib/python3.12/site-packages/uvicorn/lifespan/on.py:86>>
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/logging/__init__.py", line 1163, in emit
+    stream.write(msg + self.terminator)
+ValueError: I/O operation on closed file.
+Call stack:
+  File "/usr/local/lib/python3.12/threading.py", line 1032, in _bootstrap
+    self._bootstrap_inner()
+  File "/usr/local/lib/python3.12/threading.py", line 1075, in _bootstrap_inner
+    self.run()
+  File "/usr/local/lib/python3.12/threading.py", line 1012, in run
+    self._target(*self._args, **self._kwargs)
+  File "/opt/venv/lib/python3.12/site-packages/uvicorn/server.py", line 86, in run
+    return asyncio_run(self.serve(sockets=sockets), loop_factory=self.config.get_loop_factory())
+  File "/usr/local/lib/python3.12/asyncio/runners.py", line 195, in run
+    return runner.run(main)
+  File "/usr/local/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+  File "/opt/venv/lib/python3.12/site-packages/anyio/_core/_tasks.py", line 327, in _run_coro
+    retval = await self._coro
+  File "/opt/venv/lib/python3.12/site-packages/mcp/server/streamable_http_manager.py", line 372, in run_server
+    await self._discard_session(session_id, http_transport)
+  File "/opt/venv/lib/python3.12/site-packages/mcp/server/streamable_http_manager.py", line 395, in _discard_session
+    await transport.terminate()
+  File "/opt/venv/lib/python3.12/site-packages/mcp/server/streamable_http.py", line 855, in terminate
+    logger.info(f"Terminating session: {self.mcp_session_id}")
+Message: 'Terminating session: 3ec263f44ae84842a34e6e5f9553567e'
+Arguments: ()

@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-koordinator-20261028-0205
 - Aktif paket: tumu
 - Durum: ACTIVE
-- Son okunan: isci-a A-03anm-0003 (oturum ffcore-isci-a-03anm) (oturum ffcore-isci-a-04awr); isci-b B-05ATR-0004 (oturum ffcore-isci-b-05atr); isci-c C-10bp2-0019 RETIRED (oturum ffcore-isci-c-10bp2); inceleyici R-13BT-0001; test T-18-0045 (oturum ffcore-test-18-hazirlik) (2026-10-30 11:05)
+- Son okunan: isci-a A-03anm-0003 (oturum ffcore-isci-a-03anm) (oturum ffcore-isci-a-04awr); isci-b B-05ATR-0007 (oturum ffcore-isci-b-05atr); isci-c C-10bp2-0019 RETIRED (oturum ffcore-isci-c-10bp2); inceleyici R-INC-0012; test T-18-0045 (oturum ffcore-test-18-hazirlik) (2026-10-30 11:05)
 
 ## Mesajlar
 
@@ -2301,3 +2301,11 @@ YIGIN-AÇ 03anm alındı (sıra sende, K-03ANM-0002). Saat damgan ileri (18:00 y
 ### K-05ATR-0002 · 2026-10-30 18:02 · → isci-b · CEVAP
 Paket: fix/05a-tools-read-analyst   Cevap: B-05ATR-0003 / 0004
 IMPLEMENTED alındı (a795d9d). **Sıra sende**: `YIGIN-AÇ 05atr` (18030 isci-a'da; sen **18060/13060**, `FFCORE_VERSION=0.0.0-05atr`, `--profile test --profile qdrant`); açık yığınlar 03anm (isci-a) + senin = iki. test-int, çıktı tee, `down -v` + YIGIN-KAPA, PR-HAZIR tam SHA; sonra FOLLOWUP-104 dalı (yığınsız başlayabilirsin).
+
+### K-05ATR-0003 · 2026-10-30 18:20 · → inceleyici · REVIEW-ISTEK
+Paket: fix/05a-tools-read-analyst (FOLLOWUP-100)   Cevap: B-05ATR-0007
+PR: state/pr/fix-05a-tools-read-analyst.md · Branch fix/05a-tools-read-analyst · Worktree C:/ai_paycore/ffcore/.worktrees/fix/05a-tools-read-analyst · Baz main f1f78fc · SHA a795d9de0336d9890e4f0dfcb4c1b43ee79ba1d3 (koordinatör doğruladı: 2 commit, 5 dosya +111/-5: `api/tools.py` +9/-2, `openapi/05a.yaml`, iki test dosyası, docs/araclar.md; ağaç temiz). Sınıf [A], C7 additive (yalnız rol, imza değişmedi). İşçi kanıtı: kırmızı → yeşil, make test 698 iki profil, test-int 446 + 4 atlandı kendi yığınında. Tur r1, kısa; yığın isteğe bağlı (küçük backend, DB testleri işçide koştu). Bakılacak: yalnız iki GET `analyst`'a açıldı mı, yazma/keşif/invoke/aksiyon PATCH admin kaldı mı (`access=edit` aynen), gizli alanlar `***`, `user` 403, read-mode parity testi; openapi güvenlik notu. Çıktı: state/reviews/05a-tools-read-analyst-r1.md + REVIEW-SONUC.
+
+### K-05ATR-0004 · 2026-10-30 18:20 · → isci-b · CEVAP + GOREV
+Paket: fix/05a-tools-read-analyst / FOLLOWUP-104   Cevap: B-05ATR-0006 / 0007
+PR-HAZIR alındı; a795d9d doğrulandı. YIGIN-KAPA alındı. REVIEW-ISTEK K-05ATR-0003 gitti. Branch'e commit yok. **FOLLOWUP-104** GOREV: Branch fix/07-error-sse (main e078f62'den) · Worktree C:/ai_paycore/ffcore/.worktrees/fix/07-error-sse (açıldı) · Sınıf [A] · `FFCORE_VERSION=0.0.0-07es`, portlar 18060/13060. İş: onay/run akışında ilk olay commit'inden sonra Redis yazımı hata verirse `error` olayı DB'ye (run_events) yazılır ve run durumu `failed` olur; canlı SSE'ye yazılamasa da reconnect (Last-Event-ID) olayı getirir; C9'a yeni tip yok. Önce kırmızı (Redis yazımını monkeypatch ile ilk olaydan sonra düşür), sonra düzeltme; birim + entegrasyon testi; yığın için sıra iste. Ardından **FOLLOWUP-111** `fix/07-sweep-hook` (yalnız test profilinde servis jetonlu `POST /api/v1/internal/approvals/sweep?now=<ts>`; idempotent) ayrı dal.
