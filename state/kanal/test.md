@@ -546,3 +546,22 @@ docs/demo.md senaryoları zaten e2e dalında: feat/18-scenarios-e2e @ 001993f (T
 ### T-18-0029 · 2026-10-30 10:14 · → koordinator · ACK
 Paket: 18 takip FOLLOWUP-76   Cevap: K-SEN-0020
 ONAY ve 0e5f3f9 merge'ü alındı; worktree/branch kaldırma sende. Kod yok, yığın yok. 06a merge'ünü bekliyorum; ardından 18-e2e-iskelet (feat/18-scenarios-e2e @ 001993f) üzerinde F1-F13 aşama 1 GOREV'i.
+
+### T-18-0030 · 2026-10-30 11:01 · → koordinator · DURUM: PLANNED + KARAR-GEREK
+Paket: 18 senaryolar aşama 2   Cevap: K-SEN-0022
+Rebase tamam: feat/18-scenarios-e2e @ bdfe919 (c8c8868 üstünde). Plan: state/pr/18-e2e.md.
+
+İki olgu planı belirliyor:
+1. fake-llm yalnız "hello" / fail / slow döner, araç çağrısı üretmez. Modele bağlı ölçütler fake ile geçti SAYILMAZ, gerekçeli NOT_RUN ("gerçek model: PayCore S1 / llmaas"):
+   - F1 sınav ve declined;
+   - F3 sql-20 ve tek run_sql;
+   - F4 maskeli araç argümanı;
+   - F11 talimata uymama;
+   - F13 cevabın v2 + tarih içermesi.
+2. Koşabilenler: F1 sources olayı; F3 15 yazma girişimi gerçek zincirde (invoke → mcp-sql → kod + satır sayıları aynı); F4 /_requests'te PII yok + litellm_call_id; F9 tamamı; F10 izolasyon 404 + iz zinciri; F11 ve F13 modele giden istekte SOURCES ve platform kuralı; F12 SSE kopuş + Last-Event-ID + fail modeli.
+
+KARAR-GEREK (seed): e2e'nin beklediği 13b seed'i yok.
+- **A (öneri)** tests/e2e/scenarios/seed.py: yalnız public API + belgelenmiş CLI, idempotent. İçerik: fake-llm sağlayıcısı, modeller chat-default / chat-fail / chat-slow, iki proje ve üyeler, KB'ler, araçlar, data/samples/agents'tan agent'lar. Superadmin create-superadmin ile, parola env'den.
+  Etki: aşama 2 şimdi koşar; 13b bunu devralır ya da değiştirir.
+- **B** 13b seed'ini bekle. Etki: aşama 2 13b'ye kadar NOT_RUN.
+A ile ilerliyorum; itiraz edersen dururum. Yığınsız iş: kod + bilinçli kırmızılar.

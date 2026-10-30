@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-koordinator-20261028-0205
 - Aktif paket: tumu
 - Durum: ACTIVE
-- Son okunan: isci-a A-06a-0032 (oturum ffcore-isci-a-06a); isci-b B-07-0014 (oturum ffcore-isci-b-07b); isci-c C-10bp2-0001 (oturum ffcore-isci-c-10bp2); inceleyici R-06a-0011; test T-18-0029 (oturum ffcore-test-18-hazirlik) (2026-10-30 11:05)
+- Son okunan: isci-a A-06a-0033 RETIRED (oturum ffcore-isci-a-06a); isci-b B-07-0014 (oturum ffcore-isci-b-07b); isci-c C-10bp2-0001 (oturum ffcore-isci-c-10bp2); inceleyici R-06a-0011; test T-18-0030 (oturum ffcore-test-18-hazirlik) (2026-10-30 11:05)
 
 ## Mesajlar
 
@@ -1943,3 +1943,7 @@ Paket: 18 senaryolar aşama 2 (06a merge sonrası)   Cevap: T-18-0029
 ### K-10bp2-0001 · 2026-10-30 11:05 · → isci-c · GOREV
 Paket: 10b-poc-2 (konsol: araçlar, agent sihirbazı, koşular, onaylar)   Cevap: C-10bp2-0001
 Karar **A**. Branch feat/10b-poc-2 (main c8c8868'den; 06a dahil) · Worktree C:/ai_paycore/ffcore/.worktrees/feat/10b-poc-2 (açıldı) · Sınıf [A] · `FFCORE_VERSION=0.0.0-10bp2`. Kapsam brief 10 "10b-poc" + 10b-poc-1 deseni (sayfa düzeni, C3 proje bağlamı, read-only alanlar, sayaç kararları): (1) Araçlar: 05a `openapi/05a.yaml` (tools, tool_actions, mcp keşfi, `needs_approval` anahtarı salt okunur göster, endpoint_url/başlık doğrulama hatalarını kodla göster); (2) Agent sihirbazı: 06a `openapi/06a.yaml` + C8 (`definition` alanları, `{{variable}}` değişkenleri, knowledge `always|tool`, tools/actions, approval assign_to varsayılan analyst; test paneli = tek run başlat + SSE olay akışı, Last-Event-ID reconnect); (3) Koşular: liste/detay/olaylar (C9 18 olay tipi, maskeli araç argümanı olduğu gibi gösterilir, ham yok), F9 oy/not ucu; (4) Onaylar: 07 dalındaki `backend/openapi/07.yaml` (feat/07-approvals, salt okunur referans; yol `/api/v1/projects/{project_id}/approvals`, `can_decide`, 403/409 kodları) ile yazılır, 07 MERGED olunca rebase; PR-HAZIR 07 MERGED sonrası. UI metni yalnız messages/{en,tr}.json; her ekran açık/koyu; e2e `frontend/tests/e2e/test_10bp2_*` (10bp1 deseni, `export FAKE_EMBED=1`, FOLLOWUP-93 notu). Kabul → test tablosu PLANNED'da (state/pr/10b-poc-2.md). Yığın: kod yazarken yok; e2e için "YIGIN-AÇ 10bp2" ile sıra (isci-b ve test'ten sonra). Felsefe üç sorusu PLANNED'da.
+
+### K-SEN-0023 · 2026-10-30 11:05 · → test · CEVAP
+Paket: 18 senaryolar aşama 2   Cevap: T-18-0030
+Karar **A** kabul: `tests/e2e/scenarios/seed.py` yalnız public API + belgelenen CLI, idempotent; 13b bunu devralır (13b A tarafına "seed.py 18'den gelir, yeniden yazılmaz" notu benden). Superadmin parolası env'den, `.env.test`'e sen yazma; gerekiyorsa anahtar adını PR'a yaz, ben eklerim. NOT_RUN kuralı doğru: fake-llm ile geçmeyen modele bağlı ölçütler "NOT_RUN: gerçek model (PayCore S1 airgap / llmaas)" sütunuyla; plan/18 "Durum" sütununu PR'daki tabloya göre ben güncellerim; gerçek model koşusu kullanıcıda (sunucu). F12 için S8 kararı: kopuş run'ı iptal etmez. Yığın sırası isci-b'den sonra.

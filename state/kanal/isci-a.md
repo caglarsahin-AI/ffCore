@@ -794,3 +794,12 @@ Seçenekler:
 ### A-06a-0032 · 2026-10-30 10:26 · → koordinator · PR-HAZIR
 Paket: 06a   Cevap: K-06a-0030
 r3 MINOR-1: `handbook/CONTRACTS.md` C8 satırına `{{variable}}` sözdizimi (Langfuse), kodlar `variable_undefined` (kayıt) / `variable_unresolved` (run başı) ve `runtime_profile` (rezerve, tek değer `default`, başka değer 422); `docs/agentlar.md` ve `definition.py`/`prompting.py` ile aynı içerik (CONTRACTS Türkçe, kodlar birebir). Tek commit, kod/test yok. HEAD **36216e5e88f7c796d9a5dd2f961c7c752b85b7a9** · baz `4628219` · 17 commit · push yok · ağaç temiz. Kapı koşulmadı (yalnız belge).
+
+### A-06a-0033 · 2026-10-30 11:01 · → koordinator · HANDOFF
+Paket: 06a   Cevap: K-06a-0035
+06a MERGED (main c8c8868; son PR SHA 36216e5, 17 commit, 4 tur). C8/C9/C10 dondu. Açık yığın, worktree veya commit'lenmemiş iş yok (06a konteyneri 0; worktree/branch/imaj/volume koordinatörce kaldırıldı).
+Teslim edilenler: agent tanımı (C8 schema_version 1, `{{key}}`), yaşam döngüsü API'si, LangGraph runtime + Postgres checkpointer, run API + SSE (Redis Streams, Last-Event-ID, DB'den replay), `LLM_SLOTS` + iki worker (C10), MCP araç bağlama (05a), onay/soru interrupt + `runtime.resume.resume_run` (07 için), guardrail kancaları (08), Langfuse izi + F9 geri bildirim, `/readyz` ekleri. Belge: `docs/agentlar.md`; PR: `state/pr/06a.md`.
+Bilinen açıklar (PR'da): API anahtarıyla onay reddi 03c'ye kadar NOT_RUN (varsayım 19); `tool_needs_run_user` testsiz (varsayım 20); `unaccounted_ms` bekleme süresini içerir (varsayım 18, ayrı `wait_ms` istenirse additive); geçmiş özeti yok (FOLLOWUP-88); `knowledge[].filter.scope` 422 (FOLLOWUP-89).
+07 için: `approval` düğümü kancası ve worker `cron_jobs` eki 07'de (K-07-0002 S3/S4); `approval_reused`/`approval_expired` C9'da hazır.
+Sıradaki isci-a işi (yeni oturum): `fix/04a-worker-ready` (FOLLOWUP-97 karar A, K-06a-0029; yaklaşım A-06a-0031: işçi `ready` gönderir, dosya saati ondan sonra, açılışa ayrı kodlu sınır `convert_worker_start_timeout`; önce kırmızı: yavaş açılışlı hedefle mevcut kodda hızlı dosya TIMEOUT), ardından 13b (A tarafı).
+Lease ffcore-isci-a-06a: **RETIRED**.
