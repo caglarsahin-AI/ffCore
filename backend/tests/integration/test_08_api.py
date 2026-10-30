@@ -99,7 +99,12 @@ def test_08_19_policy_access_audit(admin, client_factory, make_user, make_projec
 def test_08_s5_builtin_default_listed_until_overridden(admin, project):
     listed = admin.get(P.format(project) + "/guardrail-policies").json()["data"]
     assert [(p["key"], p["builtin"], p["mode"]) for p in listed] == [("default", True, "monitor")]
-    assert listed[0]["id"] is None and listed[0]["builtin_version"] == 1
+    # version 2 (fix/08-default-egress-enforce, K-SEN-0029): the policy stays monitor, only its
+    # egress PII rule carries mode=enforce; the other rules follow the policy (mode null)
+    assert listed[0]["id"] is None and listed[0]["builtin_version"] == 2
+    modes = {(r["type"], tuple(r["stages"]), r.get("mode")) for r in listed[0]["rules"]}
+    assert ("pii", ("egress",), "enforce") in modes, modes
+    assert all(mode is None for _, stages, mode in modes if stages != ("egress",)), modes
     assert _policy(admin, project, key="default", rules=[]).status_code == 201
     listed = admin.get(P.format(project) + "/guardrail-policies").json()["data"]
     assert [(p["key"], p["builtin"]) for p in listed] == [("default", False)]
