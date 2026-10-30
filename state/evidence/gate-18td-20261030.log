@@ -1,0 +1,96 @@
+=== Fri Oct 30 08:18:23 TST 2026 down
+ Container ffmain-langfuse-clickhouse-1  Removed
+ Network ffmain_default  Removing
+ Network ffmain_default  Removed
+=== Fri Oct 30 08:18:46 TST 2026 up
+ Container ffmain-langfuse-minio-1  Healthy
+ Container ffmain-migrate-1  Exited
+ Container ffmain-worker-1  Healthy
+ Container ffmain-mcp-search-1  Healthy
+ Container ffmain-mcp-sql-1  Healthy
+up exit=0
+ffmain-mcp-sql-1 Up 14 seconds (healthy)
+ffmain-worker-1 Up Less than a second
+ffmain-frontend-1 Up 14 seconds
+ffmain-mcp-search-1 Up 14 seconds (healthy)
+ffmain-backend-1 Up 25 seconds (healthy)
+ffmain-litellm-1 Up About a minute (healthy)
+ffmain-langfuse-worker-1 Up About a minute
+ffmain-langfuse-web-1 Up About a minute (healthy)
+ffmain-ticket-desk-1 Up About a minute (healthy)
+ffmain-fake-llm-1 Up About a minute
+ffmain-postgres-1 Up About a minute (healthy)
+ffmain-qdrant-1 Up About a minute (healthy)
+ffmain-langfuse-minio-1 Up About a minute (healthy)
+ffmain-redis-1 Up About a minute (healthy)
+ffmain-langfuse-redis-1 Up About a minute (healthy)
+ffmain-langfuse-postgres-1 Up About a minute (healthy)
+ffmain-langfuse-clickhouse-1 Up About a minute (healthy)
+=== Fri Oct 30 08:20:04 TST 2026 test-int
+tests/integration/test_02_langfuse.py ....                               [  9%]
+tests/integration/test_02_pricing.py .                                   [  9%]
+tests/integration/test_02_r1_worker_logging.py .                         [  9%]
+tests/integration/test_03a_access.py ............                        [ 13%]
+tests/integration/test_03a_auth.py ..............                        [ 18%]
+tests/integration/test_03a_models.py ...........                         [ 22%]
+tests/integration/test_03a_obo_scope.py ................                 [ 27%]
+tests/integration/test_03a_providers.py ................                 [ 32%]
+tests/integration/test_03a_read_side.py .......                          [ 34%]
+tests/integration/test_03a_schema.py .......                             [ 37%]
+tests/integration/test_03b_audit.py ............                         [ 41%]
+tests/integration/test_03b_egress_dns.py s                               [ 41%]
+tests/integration/test_04a_api.py .............                          [ 45%]
+tests/integration/test_04a_embed_api.py ....                             [ 47%]
+tests/integration/test_04a_ingest.py .s..........s                       [ 51%]
+tests/integration/test_04a_qdrant.py ....                                [ 52%]
+tests/integration/test_04a_readyz.py ....                                [ 54%]
+tests/integration/test_04a_review_r1_acl.py ........                     [ 56%]
+tests/integration/test_04a_review_r1_ingest.py ......                    [ 58%]
+tests/integration/test_04a_review_r1_upload.py ..                        [ 59%]
+tests/integration/test_04a_search.py ........                            [ 62%]
+tests/integration/test_04a_store.py ..........                           [ 65%]
+tests/integration/test_04a_worker.py ..                                  [ 66%]
+tests/integration/test_05a_live_services.py .....                        [ 67%]
+tests/integration/test_05a_obo_verify.py .......                         [ 69%]
+tests/integration/test_05a_search.py ........                            [ 72%]
+tests/integration/test_05a_sql.py ..............s.....                   [ 79%]
+tests/integration/test_05a_tools_api.py ................................ [ 89%]
+............                                                             [ 93%]
+tests/integration/test_08_api.py ................                        [ 99%]
+tests/integration/test_18td_tools_api.py ...                             [100%]
+
+=============================== warnings summary ===============================
+tests/integration/test_04a_worker.py::test_04a_upload_job_runs_in_worker
+tests/integration/test_04a_worker.py::test_04a_job_for_missing_row_retries_then_fails_loud
+  /opt/venv/lib/python3.12/site-packages/arq/worker.py:877: DeprecationWarning: Call to deprecated close. (Use aclose() instead) -- Deprecated since version 5.0.1.
+    await self.pool.close(close_connection_pool=True)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+============ 299 passed, 4 skipped, 2 warnings in 313.86s (0:05:13) ============
+test-int exit=0
+=== Fri Oct 30 08:25:39 TST 2026 smoke
+python scripts/smoke.py
+ok    backend /healthz 200
+ok    litellm /health/liveliness 200
+ok    langfuse /api/public/health 200, /api/public/projects 200
+ok    mcp-search /healthz 200
+ok    mcp-sql /healthz 200
+ok    skipped: ollama profile inactive
+smoke: passed
+smoke exit=0
+=== Fri Oct 30 08:25:49 TST 2026 test_08_9 single run
+============================= test session starts ==============================
+platform linux -- Python 3.12.10, pytest-9.2.0, pluggy-1.7.0 -- /opt/venv/bin/python
+cachedir: .pytest_cache
+rootdir: /work/backend
+configfile: pyproject.toml
+plugins: Faker-40.43.0, anyio-4.15.1
+collecting ... collected 6 items / 3 deselected / 3 selected
+
+tests/unit/test_08_cost.py::test_08_9_repeated_value_bounded_and_masked[320-0.5] PASSED [ 33%]
+tests/unit/test_08_cost.py::test_08_9_repeated_value_bounded_and_masked[640-0.5] PASSED [ 66%]
+tests/unit/test_08_cost.py::test_08_9_repeated_value_bounded_and_masked[10000-1.0] PASSED [100%]
+
+======================= 3 passed, 3 deselected in 1.09s ========================
+t089 exit=0
+=== Fri Oct 30 08:26:04 TST 2026 done
