@@ -4,7 +4,7 @@
 
 ## Amaç
 
-Platformun boş değil, anlamlı ve **tamamen sentetik** veriyle teslim edilmesi: örnek sözleşmeler, hastane benzeri demo şema, üç hazır agent şablonu, 35 soruluk sınav, PII ve hafıza test setleri (13a); tek komutla koşan uçtan uca test ve M3 ölçümü (13b).
+Platformun boş değil, anlamlı ve **tamamen sentetik** veriyle teslim edilmesi: örnek sözleşmeler, hastane benzeri demo şema, üç hazır agent şablonu, 33 soruluk sınav (`sozlesme-33`, DRIFT-28; brief önceden 35 diyordu), PII ve hafıza test setleri (13a); tek komutla koşan uçtan uca test ve M3 ölçümü (13b).
 
 ## Kapsam
 
@@ -19,7 +19,7 @@ Platformun boş değil, anlamlı ve **tamamen sentetik** veriyle teslim edilmesi
 4b. **(13a) PII test seti** `data/samples/pii/` (100 etiketli sentetik Türkçe cümle, çeşitli yazım biçimleri; 08 bunu tüketir, kendi setini yazmaz, C18) ve **hafıza test seti** `data/samples/memory/` (40 konuşma, beklenen hafıza çıktısıyla; 14 için). `data/samples/openapi/superset.yaml` (05b için) de burada.
 5. **(13b) `make seed`:** demo kullanıcılar (PoC'de `admin_edit, admin_read, analyst_edit`, A3; tam matris 10c ve 17 ile), demo proje, KB ve belge yükleme (ingest bekleme), demo DB, araç kaydı ve keşif, üç agent, dataset ve suite; idempotent.
 6. **(13b) `make e2e`:** seed sonrası: sözleşme sorusu kaynaklı cevap; belgede olmayan soru "yok" cevabı; SQL sorusu doğru sayı; onaylı araç akışı (karma asistan) onay verilince tamamlanır; PII içeren girdi maskelenir; sınav koşar ve özet üretir; audit'te bu adımlar görünür. Çıktı: geçti/kaldı tablosu.
-7. **(13b) `make eval`:** 35 soruluk seti 06a run API'siyle koşturan, `outcome` dağılımı ve kaynak doğruluğu özetini Markdown rapor olarak yazan script (M3 kararı için yeter; 09 tabloları beklenmez).
+7. **(13b) `make eval`:** 33 soruluk seti (`sozlesme-33`, DRIFT-28) 06a run API'siyle koşturan, `outcome` dağılımı ve kaynak doğruluğu özetini Markdown rapor olarak yazan script (M3 kararı için yeter; 09 tabloları beklenmez).
 8. **(13b) Demo senaryosu dokümanı** `docs/demo.md`: 15 dakikalık sunum akışı, hangi ekranda ne gösterilir.
 9. **(13b) Kullanım senaryoları kanıtı:** `plan/18-kullanim-senaryolari.md` haritasındaki PoC senaryoları (F1-F4, F9) `make e2e`/`make eval` çıktısında ayrı satırlarla görünür; veri setleri ve sahte dış uçlar orada tanımlı (29 Ekim 2026 eklemesi).
 
@@ -37,7 +37,7 @@ Platformun boş değil, anlamlı ve **tamamen sentetik** veriyle teslim edilmesi
 
 | Ölçüt | `llmaas` (sağlayıcı modeli) | `gpu` (vLLM, 96 GB sınıfı; **donanım varsa**, yoksa `NOT_RUN (PENDING_ENV)`, C22) | `cpu` (Ollama, 35B-A3B Q4, 32 vCPU) |
 |---|---|---|---|
-| `make seed && make e2e` toplam süre | ≤ 30 dk | ≤ 30 dk | ≤ 3 saat (ingest + 35 soruluk sınav dahil; ölçülüp yazılır) |
+| `make seed && make e2e` toplam süre | ≤ 30 dk | ≤ 30 dk | ≤ 3 saat (ingest + 33 soruluk sınav dahil; ölçülüp yazılır) |
 | Tek RAG cevabı (top_k 12 / 8000 token; cpu'da top_k 8 / 4000, R5.4) | ≤ 15 sn | ≤ 10 sn | ≤ 4 dk (LiteLLM per-call 600 s, R1.5) |
 | `mode: tool` karma asistan turu | ≤ 30 sn | ≤ 30 sn | süre kriteri yok, yalnızca doğruluk |
 | 10 eşzamanlı RAG sorusu P95 | ≤ 30 sn (sağlayıcı eşzamanlılığı) | ≤ 20 sn | ölçülür, kriter yok (sıraya girer) |
@@ -50,7 +50,7 @@ Platformun boş değil, anlamlı ve **tamamen sentetik** veriyle teslim edilmesi
 - Sözleşme asistanı 20 belge sorusunun en az 16'sında doğru maddeyi kaynak gösterir.
 - Cevapsız 8 soruda uydurma yoktur: `llmaas` ve `gpu` 8/8, `cpu` ≥ 7/8 (tabloyla aynı; v4 C10).
 - SQL sorularının en az 4'ünde beklenen sonuç gelir.
-- **S1 karşılaştırması iki koşu (karar, 29 Ekim 2026):** 00i S1 tabanı (`docs/paycore/s1-taban.md`) PayCore'un kendi çok biçimli sorgusu açıkken (FR-RAG-01) alındı; FFCore `airgap` cpu seed'inde ise `rewrite=false` (04:77, R3.2). Adil karşılaştırma için S1 seti FFCore'da **iki kez** koşar: (1) `rewrite=false`, PoC varsayılanı; (2) `rewrite=true`. İki koşunun kaynak doğruluğu, medyan ve P95 cevap süresi ve soru başına ek LLM çağrısı sayısı tabanla birlikte `docs/demo.md`'de üç sütun olarak raporlanır. PoC kabulü (S1 ≥ %80) **koşu 1** ile ölçülür; koşu 2 yalnızca M3'teki "airgap'te `rewrite` açılsın mı" kararının verisidir (04:77). Koşu 1 eşiği geçmiyor ama koşu 2 geçiyorsa paket VERIFIED olur, karar DECISION- kaydıyla koordinatöre gider; kabul eşiği sessizce koşu 2'ye kaydırılmaz. Sunucuda kullanıcı koşturur; iki koşu arası KB ve indeks değişmez (aynı ingest).
+- **S1 karşılaştırması iki koşu (karar, 29 Ekim 2026):** 00i S1 tabanı (`docs/paycore/s1-taban.md`) PayCore'un kendi çok biçimli sorgusu açıkken (FR-RAG-01) alındı; FFCore `airgap` cpu seed'inde ise `rewrite=false` (04:77, R3.2). Adil karşılaştırma için S1 seti FFCore'da **iki kez** koşar: (1) `rewrite=false`, PoC varsayılanı; (2) `rewrite=true`. İki koşunun kaynak doğruluğu, medyan ve P95 cevap süresi ve soru başına ek LLM çağrısı sayısı tabanla birlikte `docs/demo.md`'de üç sütun olarak raporlanır. PoC kabulü (S1 ≥ %80) **koşu 1** ile ölçülür; koşu 2 yalnızca M3'teki "airgap'te `rewrite` açılsın mı" kararının verisidir (04:77). Koşu 1 eşiği geçmiyor ama koşu 2 geçiyorsa paket VERIFIED olur, karar DECISION- kaydıyla koordinatöre gider; kabul eşiği sessizce koşu 2'ye kaydırılmaz. Sunucuda kullanıcı koşturur; iki koşu arası KB ve indeks değişmez (aynı ingest). **Ek (30 Ekim 2026, K-13b-0006 S3 A):** koşu 2 (`rewrite=true`) PoC'de koşamaz, `rewrite` 04b'dedir (DRIFT-58); 13b raporunda koşu 2 sütunu NOT_RUN gerekçeli, M3 kabulü koşu 1 ile.
 
 ## Teknik notlar
 
