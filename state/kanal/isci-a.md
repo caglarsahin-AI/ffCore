@@ -3,9 +3,9 @@
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
 - Oturum kimliği: ffcore-isci-a-13ba (aynı oturum, kullanıcı istisnası; önceki lease ffcore-isci-a-af, fix/04a-06a-followups MERGED 3f2bc31)
-- Aktif paket: 13b A tarafı (K-13b-0006)
-- Durum: ACTIVE
-- Son okunan: koordinatör zili "04a-06a MERGED, 13b A başla" (K-AF-0014 kanalda henüz yok)
+- Aktif paket: 13b A tarafı (K-13b-0006), MERGED 3571030
+- Durum: RETIRED
+- Son okunan: K-13b-0010 (koordinatör zili, 13b A MERGED)
 
 ## Mesajlar
 
@@ -1071,3 +1071,13 @@ REVIEW-ISTEK K-13b-0007 alındı; branch'e commit yok. REVIEW-SONUC ya da DUZELT
 ### A-13b-0007 · 2026-10-30 23:58 · → koordinator · ACK
 Paket: 13b A tarafı   Cevap: K-13b-0009
 r1 ONAY alındı; merge ve kapı sende. MERGED yazılınca HANDOFF + lease RETIRED; o zamana kadar okuma.
+
+### A-13b-0008 · 2026-10-31 00:12 · → koordinator · HANDOFF
+Paket: 13b A tarafı   Cevap: K-13b-0010
+- Durum: MERGED (main 3571030; r1 ONAY e5b957b). Lease ffcore-isci-a-13ba RETIRED; oturum kapanıyor.
+- Tam sonraki adım: kod işi yok. M3 kapısı kullanıcıda: PayCore sunucusunda `make eval MODEL="qwen3.5:35b cpu" APPROVE_SQL=1` (sozlesme-33) ve `DATASET=<S1 yolu>` ile S1 koşu 1; sonuçlar docs/demo.md "Real-model results" tablolarına. S1 koşu 2 NOT_RUN (04b).
+- Değişen dosyalar: frontend/lib/api/schema-05a.d.ts (üretilmiş), Makefile (seed/e2e/eval), scripts/eval_report.py, .gitignore, tests/e2e/{ftable.py, known_findings.json, test_13b_ftable.py, test_13b_eval_report.py}, tests/e2e/scenarios/{seed.py, e2e.env, conftest.py, README.md, test_13b_seed_unit.py, test_18_env_overlay.py}, docs/demo.md. Ayrıntı state/pr/13b-a.md.
+- Testler: yığında seed x2 (ikincisi created 0/uploaded 0), make e2e 62 passed / 0 failed / 23 NOT_RUN, make eval (fake-llm, hat kanıtı); lint 0; make test 725/725 iki profil; check:api 0.
+- Kararlar: K-13b-0006 S1-S4 A; seed aynı belgeyi yeniden yüklemez; known_findings boş; SQL onayı açık bayrak; llm_judge NOT_RUN.
+- Blocker: yok. Açık: test rolünün negative TTL testi (kanca açık, test skip'li); FOLLOWUP-116 (checkpoint metni, 06b); FOLLOWUP-112 (önyüz eşlemeleri).
+- Commit edilmemiş durum: yok. Yerelde imaj etiketleri ffcore/{backend,tools,frontend}:0.0.0-13ba ve 0.0.0-af silinebilir; worktree'lere dokunmadım. Yığınlar kapalı.
