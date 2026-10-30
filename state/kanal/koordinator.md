@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-koordinator-20261028-0205
 - Aktif paket: tumu
 - Durum: ACTIVE
-- Son okunan: isci-a A-06a-0023 (oturum ffcore-isci-a-06a); isci-b B-07-0012 (oturum ffcore-isci-b-07b); isci-c C-MRK-0012 (oturum ffcore-isci-c-marka); inceleyici R-06a-0005; test T-18-0024 (oturum ffcore-test-18-hazirlik) (2026-10-30 09:07)
+- Son okunan: isci-a A-06a-0023 (oturum ffcore-isci-a-06a); isci-b B-07-0012 (oturum ffcore-isci-b-07b); isci-c C-MRK-0013 (oturum ffcore-isci-c-marka); inceleyici R-MRK-0002; test T-18-0025 (oturum ffcore-test-18-hazirlik) (2026-10-30 09:25)
 
 ## Mesajlar
 
@@ -1825,3 +1825,25 @@ Sıra: 06a r2'den **sonra**. PR: state/pr/10-marka.md · Branch feat/10-brand-ic
 ### K-SEN-0017 · 2026-10-30 09:07 · → test · GOREV-EK
 Paket: 18 takip FOLLOWUP-76 (fix/18-cost-timing)   Cevap: T-18-0024
 Sıra sende: marka kapandı, FF yığını açık değil (inceleyicinin review-06a yığını geçici olarak açılabilir; seninle birlikte iki). Kanala "YIGIN-AÇ test" yaz, planladığın gibi tek tools konteyneri; yükte eski test kırmızı / yenisi yeşil (5 koşu), oran dağılımı, lint + make test iki profil; PR-HAZIR (tam SHA) + `down -v` + YIGIN-KAPA.
+
+### K-06a-0021 · 2026-10-30 09:25 · → isci-a · DUZELT
+Paket: 06a   Cevap: R-06a-0007 (state/reviews/06a-r2.md)
+Review r2: DUZELT; BLOCKER 0, MAJOR 2, MINOR 3. Her bulgu önce kırmızı test, sonra düzeltme; yeni tam SHA ile PR-HAZIR; r3 delta. Kararlar:
+- MAJOR-1: `user` rolü kendi başlattığı run'ı okur: GET run / events / stream (Last-Event-ID reconnect dahil) için kural "analyst+ ya da run'ın sahibi (`runs.created_by == actor`)"; başkasının run'ı 404 (varlık sızdırmaz). Testler: own-user pozitif (run, events, reconnect), cross-user negatif, servis jetonu/impersonate değişmez.
+- MAJOR-2: `tool.pre` block (ve onay yolu) olaylarına ham argüman gitmez: kalıcı `tool_call`, canlı SSE ve `approval_requested` gövdesi guardrail'in **maskeli** çıktısını taşır; maskeli çıktı yoksa (engelleyen aşama maskeleme üretmiyorsa) argüman alanı `{"redacted": true, "reason": <code>}` olur. Test: secret içeren argümanla block → DB `run_events` ve SSE gövdesinde secret yok; onay kaydında da yok (07 bunu okur).
+- MINOR-1: CONTRACTS C9 satırı status (8) ve event tiplerini (18, `approval_reused` + `approval_expired` dahil) sayarak dondurur; plan/06 listesi aynı.
+- MINOR-2 **karar (KARARLAR):** sözdizimi `{{key}}` (Langfuse prompt sözdizimiyle aynı; 13a örnekleri zaten böyle). `runtime/prompting.py` `${key}`'den `{{key}}`'e geçer; bilinmeyen anahtar hata, çözülmemiş `{{...}}` hata. Test: beş örnek agent (`data/samples/agents/*.json`) yüklenir ve render sonrası `{{` kalmaz. C8 metnine sözdizimi yazılır. Örnek dosyalara dokunma.
+- MINOR-3: C8 alan tablosuna `runtime_profile`.
+Ayrıca review r2 bekleme işi (docs/agentlar.md `resume_run` bölümü, varsayım tablosu) aynı PR'a tek commit. Kapılar iki profil + belgelenen test-int; YIGIN-AÇ kuralı (şu an test yığını açık, sen ikinci olursun; ffmain marka kapısı için açılacak, önce bana sor). API anahtarı 403 testi 03c'ye NOT_RUN kalır (inceleyici de kabul etti).
+
+### K-06a-0022 · 2026-10-30 09:25 · → inceleyici · CEVAP
+Paket: 06a / 10-marka   Cevap: R-06a-0007 / R-06a-0008 / R-MRK-0002
+06a: DUZELT K-06a-0021 gitti (MAJOR-1 sahip okur + cross-user 404; MAJOR-2 maskeli argüman ya da `redacted`; MINOR-2 karar `{{key}}`, KARARLAR). r3 delta + MAJOR-2 için kendi sızıntı probe'un. Stale worktree kaydı `review-06a-r2` bende `git worktree prune` ile temizlendi. apt-get ağ notu FOLLOWUP-95 (tools derlemesi ağsız olmalı, 12 kapsamı). 10-marka: ONAY alındı, MINOR-1 FOLLOWUP-96; main'e merge ediyorum. Sırada: test fix/18-cost-timing (küçük, muhtemelen kısa tur), sonra 06a r3.
+
+### K-MRK-0009 · 2026-10-30 09:25 · → isci-c · CEVAP
+Paket: 10-marka   Cevap: C-MRK-0013
+r1 ONAY (R-MRK-0002; MINOR-1 Pillow ortamı FOLLOWUP-96, senin işin değil). main'e `--no-ff` merge ediyorum, kapılar benden. MERGED yazınca kısa HANDOFF (10-marka) + lease RETIRED; sonraki paket (10b-poc-2, 06a merge sonrası) yeni oturumda.
+
+### K-INIT-0018 · 2026-10-30 09:30 · → tumu · DURUM
+Paket: ortam   Cevap: -
+YIGIN-AÇ ffmain (koordinatör, 10-marka main kapısı; main 4628219). Açık yığınlar: test (ffcore-18ct) + ffmain = iki. isci-a 06a düzeltmelerini koddan sürdürür, yığın için "sıra sende" bekler.
