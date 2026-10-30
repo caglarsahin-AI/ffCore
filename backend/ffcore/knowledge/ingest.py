@@ -101,7 +101,7 @@ class HttpEmbedClient:
 Converter = Callable[[Path, str, Settings], ConversionResult]
 
 
-_pools: dict[tuple[int, Limits], PersistentPool] = {}
+_pools: dict[tuple[int, int, Limits], PersistentPool] = {}
 
 
 def close_pools() -> None:
@@ -118,11 +118,17 @@ atexit.register(close_pools)
 def convert_bounded(path: Path, filename: str, settings: Settings) -> ConversionResult:
     """Convert in this process's long-lived worker (timeout kill, models loaded once)."""
     timeout = settings.convert_timeout_seconds
+    start_timeout = settings.convert_worker_start_timeout_seconds
     limits = Limits(settings.convert_memory_limit_mb, settings.convert_cpu_limit_seconds)
-    pool = _pools.get((timeout, limits))
+    key = (timeout, start_timeout, limits)
+    pool = _pools.get(key)
     if pool is None:
-        pool = _pools[(timeout, limits)] = PersistentPool(
-            timeout=timeout, name="ingest", target=convert_pipeline.CONVERT_TARGET, limits=limits
+        pool = _pools[key] = PersistentPool(
+            timeout=timeout,
+            name="ingest",
+            target=convert_pipeline.CONVERT_TARGET,
+            limits=limits,
+            start_timeout=start_timeout,
         )
     return pool.convert(path)
 

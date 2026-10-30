@@ -44,6 +44,13 @@ class Limits:
 
 NO_LIMITS = Limits()
 
+# The one message a worker sends before its first file (FOLLOWUP-97): a file's time starts only
+# after it, so spawning and importing never count against the file's timeout. Models load
+# lazily in the converters, so the first document's model load still counts (K-04aWR-0002 A).
+READY = "ready"
+# Spawn + imports, bounded on its own: the default is wide, a slow start is not a slow file.
+DEFAULT_START_TIMEOUT = 60.0
+
 
 def _apply_memory_limit(limits: Limits) -> None:
     if limits.memory_mb is None:
@@ -78,6 +85,7 @@ def _worker_main(target: str, conn: Connection, limits: Limits = NO_LIMITS) -> N
     fn = _resolve(target)
     # After the imports: the limit is for the files, measured on a worker with its models.
     _apply_memory_limit(limits)
+    conn.send(READY)
     while True:
         try:
             job = conn.recv()
@@ -119,6 +127,20 @@ class _Worker:
         self.process = ctx.Process(target=_worker_main, args=(target, child, limits), name=name)
         self.process.start()
         child.close()
+        self.ready = False
+
+    def wait_ready(self, timeout: float) -> bool:
+        """True once the worker said `ready`; False if it did not within `timeout`. A worker
+        that dies first raises EOFError (the caller records `worker_died`)."""
+        if self.ready:
+            return True
+        if not self.conn.poll(timeout):
+            return False
+        message = self.conn.recv()
+        if message != READY:
+            raise OSError(f"unexpected first message from worker: {message!r}")
+        self.ready = True
+        return True
 
     def kill(self) -> None:
         pid = self.process.pid
@@ -141,16 +163,24 @@ class _Worker:
 
 
 class BoundedPool:
-    """`size` worker processes; each file gets `timeout` seconds."""
+    """`size` worker processes; each file gets `timeout` seconds once its worker is ready, a
+    fresh worker gets `start_timeout` seconds to become ready."""
 
     def __init__(
-        self, size: int, timeout: float, name: str, target: str, limits: Limits = NO_LIMITS
+        self,
+        size: int,
+        timeout: float,
+        name: str,
+        target: str,
+        limits: Limits = NO_LIMITS,
+        start_timeout: float = DEFAULT_START_TIMEOUT,
     ):
         self.size = max(1, size)
         self.timeout = timeout
         self.name = name
         self.target = target
         self.limits = limits
+        self.start_timeout = start_timeout
 
     def run(self, paths: Iterable[Path], on_start: OnStart, on_result: OnResult) -> None:
         jobs: queue.Queue[Path] = queue.Queue()
@@ -179,15 +209,17 @@ class BoundedPool:
                     worker = _Worker(self.target, f"{self.name}-worker-{index}", self.limits)
                 on_start(path)
                 started = time.time()
-                result, worker = self._one(worker, path, started)
+                result, worker = self._one(worker, path)
                 on_result(path, result, time.time() - started)
         finally:
             if worker is not None:
                 worker.stop()
 
-    def _one(self, worker: _Worker, path: Path, started: float):
+    def _one(self, worker: _Worker, path: Path):
         try:
-            worker.conn.send((str(path), started + self.timeout))
+            if not worker.wait_ready(self.start_timeout):
+                return self._start_timeout(worker, path), None
+            worker.conn.send((str(path), time.time() + self.timeout))
             if worker.conn.poll(self.timeout):
                 return worker.conn.recv(), worker
         except (EOFError, OSError) as exc:
@@ -222,14 +254,44 @@ class BoundedPool:
             None,
         )
 
+    def _start_timeout(self, worker: _Worker, path: Path) -> ConversionResult:
+        log.error(
+            "convert_worker_start_timeout path=%s pool=%s seconds=%s",
+            path,
+            self.name,
+            self.start_timeout,
+        )
+        worker.kill()
+        return ConversionResult(
+            "",
+            "worker",
+            status=ERROR,
+            warnings=[f"worker not ready in {int(self.start_timeout)} s"],
+            error_code="convert_worker_start_timeout",
+        )
+
 
 class PersistentPool(BoundedPool):
     """One long-lived worker process for the ingest worker's jobs: Docling and PaddleOCR load
     once per process, not once per document (PayCore's design; A-04a-0020 measured 66 s of a
     131 s ingest in a freshly spawned process). A timeout or a crash replaces the process."""
 
-    def __init__(self, timeout: float, name: str, target: str, limits: Limits = NO_LIMITS):
-        super().__init__(size=1, timeout=timeout, name=name, target=target, limits=limits)
+    def __init__(
+        self,
+        timeout: float,
+        name: str,
+        target: str,
+        limits: Limits = NO_LIMITS,
+        start_timeout: float = DEFAULT_START_TIMEOUT,
+    ):
+        super().__init__(
+            size=1,
+            timeout=timeout,
+            name=name,
+            target=target,
+            limits=limits,
+            start_timeout=start_timeout,
+        )
         self._worker: _Worker | None = None
         self._lock = threading.Lock()
 
@@ -237,7 +299,7 @@ class PersistentPool(BoundedPool):
         with self._lock:
             if self._worker is None:
                 self._worker = _Worker(self.target, f"{self.name}-worker", self.limits)
-            result, self._worker = self._one(self._worker, path, time.time())
+            result, self._worker = self._one(self._worker, path)
             return result
 
     def close(self) -> None:

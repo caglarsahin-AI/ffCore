@@ -239,6 +239,7 @@ services:
       # (10b-poc-1, K-10bp-0002 D2). Off by default; /readyz names it when on.
       FAKE_EMBED: ${FAKE_EMBED:-0}
       CONVERT_TIMEOUT_SECONDS: ${CONVERT_TIMEOUT_SECONDS:-600}
+      CONVERT_WORKER_START_TIMEOUT_SECONDS: ${CONVERT_WORKER_START_TIMEOUT_SECONDS:-60}
       OCR_PDF_MAX_PAGES: ${OCR_PDF_MAX_PAGES:-200}
       # Converter process and upload limits (review r1 MAJOR-5; measured values in config.py).
       # Offline by default in both profiles (review r1 MAJOR-6, K-04a-0020): weights come only
