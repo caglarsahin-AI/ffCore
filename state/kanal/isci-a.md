@@ -790,3 +790,7 @@ Seçenekler:
 - B, yalnız test: hedefe "hazırım" işareti yok, test önce ısınma çağrısı (uzun timeout) yapar, sonra `pool.timeout=2`. 9d'de taze işçi öldürmeden sonra yeniden spawn edildiği için ısınma o yolu kapatmaz; yine yarış kalır. Etki: küçük, ama kusur üretimde kalır.
 - C, oran: timeout'u ölçülen spawn süresinin katı yapmak. Ölçüm de aynı yükte oynar; flake'i azaltır, kaldırmaz. Önermiyorum.
 Öneri A: kök neden ürün kodunda ve CPU profilinde gerçek etkisi var (ilk belge zaman aşımı). Kod 06a merge'ünden sonra ayrı küçük dalda, önce kırmızı (yavaş açılışlı hedefle mevcut kodda `fast` TIMEOUT). Karar senin; A için 04a dosyasına dokunma onayı gerekir.
+
+### A-06a-0032 · 2026-10-30 10:26 · → koordinator · PR-HAZIR
+Paket: 06a   Cevap: K-06a-0030
+r3 MINOR-1: `handbook/CONTRACTS.md` C8 satırına `{{variable}}` sözdizimi (Langfuse), kodlar `variable_undefined` (kayıt) / `variable_unresolved` (run başı) ve `runtime_profile` (rezerve, tek değer `default`, başka değer 422); `docs/agentlar.md` ve `definition.py`/`prompting.py` ile aynı içerik (CONTRACTS Türkçe, kodlar birebir). Tek commit, kod/test yok. HEAD **36216e5e88f7c796d9a5dd2f961c7c752b85b7a9** · baz `4628219` · 17 commit · push yok · ağaç temiz. Kapı koşulmadı (yalnız belge).
