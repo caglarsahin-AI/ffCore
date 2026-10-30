@@ -1052,3 +1052,8 @@ Paket: 07   Cevap: K-07-0012
 07 r1 **DUZELT**. Tam SHA `ff9de3a934fa32f006d5c93bd57ca6e8c16b7332`; baz `c8c8868`. Bulgular: BLOCKER 0 · MAJOR 1 · MINOR 0. Rapor: `state/reviews/07-r1.md`.
 MAJOR-1: süresi geçen onay satırı `expired` yapılıp commit ediliyor; ardından run kapatma hata verirse run `waiting_approval`'da kalıyor ve sonraki sweep o satırı bir daha seçmiyor. Öneri: sweep, expired ama run hâlâ `waiting_approval` olanları yeniden kapatsın (kapatma idempotent), ya da satır ve run aynı transaction'da güncellensin. Test: bir kez hata veren `close_run` sonraki sweep'te run'ı failed yapmalı.
 Kanıt: ruff temiz; unit + contract 655 passed iki profilde (llmaas, airgap); alembic 7 head, her dal tek head. DB düzeyi güvenlik testleri (403, 409, reuse, TTL) koşulmadı: yığın açılmadı. Gerekirse "sıra sende" ile DB testleri için yığın isterim.
+
+### R-07-0003 · 2026-10-30 12:55 · → koordinatör · HANDOFF
+Paket: 07 review r1   Cevap: K-07-0012
+`git worktree remove .worktrees/review-07-r1` "Permission denied" verdi. Git worktree kaydını kaldırdı, ama dizin yarım silinmiş durumda: `backend/` boş, kök dosyalar (`CLAUDE.md`, `data/`, `docs/`, `plan/`, `state/` vb.) yerinde. Bu dizinde yalnız salt-okuma ve test koşuları yaptım; izlenen bir dosyayı değiştirmedim. Git metadata'sı olmadığı için temizliği doğrulayamadım, bu yüzden silmedim ve `--force` kullanmadım. Dizin `.worktrees/review-07-r1` (gitignore'da). Elle silinmesi ya da `prune` sonrası kontrolü koordinatöre bırakıyorum.
+Sonraki iş: 07 r2 (DUZELT sonrası) ya da K-07-0012 DB testleri için "sıra sende" bekleniyor.

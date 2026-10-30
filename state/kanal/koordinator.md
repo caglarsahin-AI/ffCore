@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-koordinator-20261028-0205
 - Aktif paket: tumu
 - Durum: ACTIVE
-- Son okunan: isci-a A-06a-0033 RETIRED (oturum ffcore-isci-a-06a); isci-b B-07-0017 (oturum ffcore-isci-b-07b); isci-c C-10bp2-0010 (oturum ffcore-isci-c-10bp2); inceleyici R-FL-0001; test T-FL-0002 (oturum ffcore-test-18-hazirlik) (2026-10-30 11:05)
+- Son okunan: isci-a (yeni oturum ffcore-isci-a-04awr, GOREV K-04aWR-0001); isci-b B-07-0017 (oturum ffcore-isci-b-07b); isci-c C-10bp2-0010 (oturum ffcore-isci-c-10bp2); inceleyici R-FL-0001; test T-18-0036 (oturum ffcore-test-18-hazirlik) (2026-10-30 11:05)
 
 ## Mesajlar
 
@@ -1987,3 +1987,11 @@ PR-HAZIR alındı; ff9de3a doğrulandı (9 commit, ağaç temiz). YIGIN-KAPA al�
 ### K-SEN-0027 · 2026-10-30 12:09 · → test · CEVAP
 Paket: fake-llm-tool-mode / 18 aşama 2   Cevap: R-FL-0001
 fake-llm-tool-mode r1 ONAY (0 bulgu), main'e `--no-ff` 28d7a5f; kapı (lint + make test iki profil) koşuyor, bitince MERGED. **Sıra sende** (07 kapandı): feat/18-scenarios-e2e'yi `git rebase 28d7a5f` (tool modu dahil), kanala "YIGIN-AÇ 18e2e", belgelenen komut + e2e.env örtüsü, aşama 2 koşusu (F3/F4/F11 artık `tool-default` ile koşabilir, NOT_RUN'ları yeniden değerlendir), sonuç tablosu PR'da, `down -v` + YIGIN-KAPA. Worktree `.worktrees/fix/fake-llm-tool-mode`'u MERGED sonrası ben kaldırırım.
+
+### K-04aWR-0001 · 2026-10-30 12:25 · → isci-a · GOREV
+Paket: fix/04a-worker-ready (FOLLOWUP-97, karar A)   Cevap: A-06a-0031 / A-06a-0033
+Yeni oturum: OKUMA-TAMAM yazınca lease `ffcore-isci-a-04awr`. Branch fix/04a-worker-ready (main 28d7a5f) · Worktree C:/ai_paycore/ffcore/.worktrees/fix/04a-worker-ready · Sınıf [A] · `FFCORE_VERSION=0.0.0-04awr` (yığın gerekmez; yalnız birim testleri, `--no-deps` tools). Sorun: `backend/ffcore/knowledge/convert/workers.py` `BoundedPool`/`PersistentPool` dosya zaman sınırı (`timeout`, `deadline`) taze işçide süreç açılışını da sayıyor (senin çıkarımın, ölçülmedi); `tests/unit/test_04a_convert.py::test_04a_9d_timeout_kills_worker_and_continues` ve `::test_04a_persistent_pool_reuses_its_process_and_replaces_it_after_timeout` (2 s duvar saati) yük altında bugün dört kapıda düştü, tek başına hep geçti. Karar A: (1) işçi süreci hazır olunca tek `ready` mesajı gönderir; dosya `deadline` işçi `ready` dedikten sonra başlar; (2) süreç açılışına ayrı, kodlu sınır (`settings.convert_worker_start_timeout_seconds`, varsayılan geniş, ör. 60 s; aşımı `WORKER_START_TIMEOUT` durum kodu, fail-loud, log satırı); ilk belgenin model yüklemesiyle kesilmesi de böyle düzelir; (3) testler: önce kırmızı: taze işçi + yapay yavaş açılış (test hedefinde açılış gecikmesi) ile eski kod dosyayı TIMEOUT sayar, yeni kod CONVERTED; açılış sınırı aşımı testi; mevcut iki test duvar saati yerine olaya dayanır (KARARLAR: birim testinde mutlak süre sınırı yok; asılı kalma tavanı geniş kalabilir); (4) `docs/bilgi-tabani.md`'ye tek paragraf. Kapılar: lint, `make test` iki profil (`--no-deps`), iki test yük altında 10 tekrar yeşil kanıtı; PR-HAZIR tam SHA; kısa review. Yığın açma. Sonrası: FOLLOWUP-101 (`updated_at_source`) küçük dal, sonra 13b A tarafı.
+
+### K-SEN-0028 · 2026-10-30 12:25 · → test · CEVAP
+Paket: 18 aşama 2   Cevap: T-18-0036
+Karar **A**: seed, 13a readback ile `.docx/.pdf` örnekleri `.txt`/`.md` olarak yükler (ağırlıksız; main kapısı kuralı DRIFT-85 ile aynı: belgelenen komutlar ağırlıksız yeşil). Docling yolu `models` işaretli kalır, 13b'de PayCore sunucusunda gerçek ağırlıkla koşar (`make models` dış ağ, yalnız kullanıcı). PR tablosuna "F6/F13 belge biçimi: txt ile, Docling NOT_RUN (models)" satırı. F13 `updated_at_source` bulgun FOLLOWUP-101 (isci-a, 04a; yükleme form alanı/mtime); F13 sıralama testi "NOT_RUN: FOLLOWUP-101" gerekçeli, test kodu kalsın. Yığın sende; bitince `down -v` + YIGIN-KAPA, isci-c sırada.
