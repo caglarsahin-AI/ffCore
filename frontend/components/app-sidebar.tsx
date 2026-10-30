@@ -5,7 +5,6 @@ import {
   ArchiveIcon,
   BarChart3Icon,
   BotIcon,
-  BrainCircuitIcon,
   CableIcon,
   CheckCheckIcon,
   CpuIcon,
@@ -26,6 +25,7 @@ import {
   WrenchIcon,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
@@ -75,6 +75,7 @@ const ICONS: Record<string, LucideIcon> = {
 export function AppSidebar() {
   const t = useTranslations("Nav");
   const tHome = useTranslations("Home");
+  const tBrand = useTranslations("Brand");
   const { menuRole, isSuperadmin } = useAccess();
   const pathname = usePathname();
 
@@ -84,9 +85,16 @@ export function AppSidebar() {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" render={<Link href="/" />}>
-              <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                <BrainCircuitIcon className="size-4" />
-              </div>
+              {/* Narrow FF crop: the full badge is unreadable at 32 px (assets/icons/README.md). */}
+              <Image
+                src="/brand/ffcore-icon-128.png"
+                alt={tBrand("logoAlt")}
+                width={32}
+                height={32}
+                priority
+                className="size-8 shrink-0 rounded-lg"
+                data-testid="sidebar-logo"
+              />
               <span className="truncate font-semibold">{tHome("title")}</span>
             </SidebarMenuButton>
           </SidebarMenuItem>

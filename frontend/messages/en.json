@@ -1,7 +1,10 @@
 {
   "Home": {
     "title": "FFCore",
-    "subtitle": "Enterprise LLM platform"
+    "subtitle": "Enterprise AI Agent Platform"
+  },
+  "Brand": {
+    "logoAlt": "FFCore"
   },
   "Theme": {
     "label": "Theme",

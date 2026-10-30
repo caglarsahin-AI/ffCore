@@ -1,7 +1,7 @@
 [project]
 name = "ffcore"
 version = "0.0.0"
-description = "FFCore enterprise LLM platform backend (import ffcore)"
+description = "FFCore enterprise AI agent platform backend (import ffcore)"
 requires-python = "==3.12.*"
 dependencies = [
     "fastapi==0.162.0",

@@ -1,7 +1,10 @@
 {
   "Home": {
     "title": "FFCore",
-    "subtitle": "Kurumsal LLM platformu"
+    "subtitle": "Kurumsal Yapay Zekâ Platformu"
+  },
+  "Brand": {
+    "logoAlt": "FFCore"
   },
   "Theme": {
     "label": "Tema",
