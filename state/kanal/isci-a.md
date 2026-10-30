@@ -1052,3 +1052,18 @@ YIGIN-AÇ 13ba · 2026-10-30 23:13 · isci-a · 18030/13030 · FFCORE_VERSION=0.
 Paket: 13b A tarafı   Cevap: K-13b-0006
 IMPLEMENTING (feat/13b-e2e-eval, 3f2bc31'e rebase edildi; lease ffcore-isci-a-13ba). Commit'ler: ee1b4c0 madde 0 FOLLOWUP-115 (check:api 1 → 0, yalnız schema-05a.d.ts); 244184d make seed (seed.py devralındı; aynı ad + bayt + tarihli canlı belge yeniden yüklenmez, çünkü yeniden yükleme sürüm artırıyor; seed sonunda "created N, uploaded M"; e2e.env FFCORE_TEST_HOOKS=1); 263e087 make e2e (pytest tests/e2e + F tablosu eval/results/, .gitignore; known_findings boş: 103/108 kapandı); d223423 make eval (scripts/eval_report.py; MODEL zorunlu, SQL onayı yalnız APPROVE_SQL=1, llm_judge NOT_RUN). Her dilim önce kırmızı (state/pr/13b-a-kapilar/).
 YIGIN-AÇ 13ba açık: seed x2 + e2e + eval koşuyor. Sırada docs/demo.md (15 dk akış, sonuçlarla).
+
+YIGIN-KAPA 13ba · 2026-10-30 23:31 · down -v exit 0, konteyner 0, volume 0
+
+### A-13b-0004 · 2026-10-30 23:33 · → koordinator · DURUM
+Paket: 13b A tarafı   Cevap: K-13b-0006
+DURUM: VERIFIED. HEAD e5b957ba6695402df3383c9dccf768afe4153e29 (3f2bc31 üstüne 5 commit). Yığında: seed-1 created 36/uploaded 15 (60 s), seed-2 created 0/uploaded 0 (27 s); make e2e 62 passed / 0 failed / 23 NOT_RUN gerekçeli, F1-F13 + Negative + Setup satırları passed; make eval MODEL=fake-llm APPROVE_SQL=1 33 madde, rapor (hat kanıtı, ölçüm değil); lint 0; make test 725/725 iki profil; test-samples OK; check:api 0.
+Test tarafına not: negative TTL testi hâlâ FOLLOWUP-111 gerekçesiyle skip'li; kanca artık açık (e2e.env FFCORE_TEST_HOOKS=1), testi açmak test rolünde.
+
+### A-13b-0005 · 2026-10-30 23:33 · → koordinator · PR-HAZIR
+Paket: 13b A tarafı   Cevap: K-13b-0006
+PR: C:\ai_paycore\ffcore\state\pr\13b-a.md · Branch feat/13b-e2e-eval · Worktree .worktrees/feat/13b-e2e-eval · Baz main 3f2bc31 · SHA e5b957ba6695402df3383c9dccf768afe4153e29 · Sınıf [A] · push yok. Yığın kapalı. Review yığınlı (make e2e tam koşu; komutlar PR'da).
+
+### A-13b-0006 · 2026-10-30 23:36 · → koordinator · ACK
+Paket: 13b A tarafı   Cevap: K-13b-0008
+REVIEW-ISTEK K-13b-0007 alındı; branch'e commit yok. REVIEW-SONUC ya da DUZELT bekliyorum; ONAY → MERGED sonrası HANDOFF + RETIRED.
