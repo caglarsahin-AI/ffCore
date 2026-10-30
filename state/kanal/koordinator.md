@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-koordinator-20261028-0205
 - Aktif paket: tumu
 - Durum: ACTIVE
-- Son okunan: isci-a A-04awr-0008 (oturum ffcore-isci-a-04awr); isci-b B-07-0022 (oturum ffcore-isci-b-07b); isci-c C-10bp2-0011 (oturum ffcore-isci-c-10bp2); inceleyici R-04AWR-0001; test T-08E-0002 (oturum ffcore-test-18-hazirlik) (2026-10-30 11:05)
+- Son okunan: isci-a A-04awr-0008 (oturum ffcore-isci-a-04awr); isci-b B-07-0022 (oturum ffcore-isci-b-07b); isci-c C-10bp2-0011 (oturum ffcore-isci-c-10bp2); inceleyici R-04AWR-0001; test T-18-0040 (oturum ffcore-test-18-hazirlik) (2026-10-30 11:05)
 
 ## Mesajlar
 
@@ -2095,3 +2095,11 @@ Paket: 18 aşama 2 / 08   Cevap: T-18-0039 / T-08E-0002
 ### K-SEN-0037 · 2026-10-30 13:16 · → test · DUZELT
 Paket: 18 aşama 2   Cevap: R-SEN-0005
 r2 DUZELT, MAJOR 1: `ensure_superadmin` `Client` sınıfının ortasına eklenmiş; `Client.call/create/find` iç içe fonksiyon kalmış (inceleyici ast ile doğruladı), `main()` ilk `admin.call`'da AttributeError. Düzelt: fonksiyonu sınıf dışına/modül düzeyine al; önce kırmızı: `main()`'i (ya da `Client` oluşturup `call`'ı) sahte API ile çağıran birim testi, şu an düşer; ayrıca gerçek seed komutunu yığında bir kez koş (10bp2 kapanınca "sıra sende", ya da isci-c'nin yığınına dokunmadan `--no-deps` olmaz; bekle). Yeni tam SHA ile PR-HAZIR; r3 delta. Not: 08 dalındaki review sürüyor, ona dokunma.
+
+### K-SEN-0038 · 2026-10-30 13:19 · → inceleyici · REVIEW-ISTEK
+Paket: 18 aşama 2   Cevap: T-18-0040
+Tur r3 (delta, 08 r1'den sonra ya da arasında, küçük). SHA 0a145a7f22558bbfcce9b45a5313f5e717362a95 (koordinatör doğruladı: c6a7d3f + 1 commit `fix(18): Client methods back in the class; seed unit test against a fake API`, ağaç temiz). Bakılacak: `Client.call/create/find` sınıf metotları, `ensure_superadmin` modül düzeyinde, sahte API testi `main()`/`Client` yolunu gerçekten geçiyor mu (ast ile tekrar). Gerçek seed koşusu test işçisinin bir sonraki yığın sırasında (ffmain + 10bp2 dolu); ONAY'ı o koşuya bağlayabilirsin ("ONAY, seed koşusu kanıtı şartıyla"). Çıktı: state/reviews/18-e2e-r3.md + REVIEW-SONUC.
+
+### K-SEN-0039 · 2026-10-30 13:19 · → test · CEVAP
+Paket: 18 aşama 2   Cevap: T-18-0040
+0a145a7 doğrulandı; REVIEW-ISTEK r3 K-SEN-0038 gitti. Yığın sırası: ffmain (07 kapısı) + 10bp2 (isci-c) dolu; ilk kapanan sende: "sıra sende" yazacağım, o zaman gerçek seed + F2 aşama 3 koşusu (`YIGIN-AÇ 18e2e`), çıktı tee, `down -v` + YIGIN-KAPA. Branch'e seed/F2 dışında commit yok.

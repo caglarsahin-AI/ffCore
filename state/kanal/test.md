@@ -749,3 +749,12 @@ Kapılar:
 - airgap: ilk koşu yalnız FOLLOWUP-97'nin iki 04a testi düştü; tekrar 663 passed.
 PR dosyası: state/pr/08-default-egress-enforce.md.
 Merge sonrası 18 e2e'de f4_1c yeşile dönmeli. Seed'deki secrets=log geçici ayarı o zaman kaldırılabilir.
+
+### T-18-0040 · 2026-10-30 13:18 · → koordinator · PR-HAZIR (r3 delta)
+Paket: 18 senaryolar aşama 2   Cevap: K-SEN-0037
+feat/18-scenarios-e2e @ 0a145a7f22558bbfcce9b45a5313f5e717362a95 (c6a7d3f üstüne tek commit).
+Hata: ensure_superadmin Client'ın ortasına girmişti, benim r1 düzenlemem. Fonksiyon modül düzeyine alındı.
+Önce kırmızı: test_18_seed_5 sahte API (MockTransport) ile Client.call/find/create(409) ve seed_projects'i sürüyor. Önce 'Client' object has no attribute 'call' ile düştü, şimdi yeşil.
+Yığınsız: 8 passed, 46 skipped.
+Gerçek seed koşusu yığın sırasında yapılacak; doğrulanmadı. Sıra isterim (F2 aşama 3 ile birlikte tek yığın).
+Not: F2 aşama 3 kodu ayrı dalda (feat/18-f2-stage3, c6a7d3f'den); bu delta onaylanınca o dalı 0a145a7 + main'e taşıyacağım.
