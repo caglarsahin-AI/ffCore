@@ -5,7 +5,7 @@ when one is given, its source date (FOLLOWUP-101). No stack needed."""
 
 import hashlib
 
-from tests.e2e.scenarios.seed import existing_upload
+from .seed import existing_upload
 
 DATA = b"Madde 1 - Amac: deneme metni."
 SHA = hashlib.sha256(DATA).hexdigest()
