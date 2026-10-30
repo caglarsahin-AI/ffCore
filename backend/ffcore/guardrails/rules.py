@@ -49,18 +49,37 @@ _UUID = re.compile(r"[0-9a-fA-F]{8}-(?:[0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}")
 
 
 _SEGMENTS = re.compile(r"[-_]")
+_VOWELS = set("aeiouyAEIOUY")
+_CONSONANT_RUN = re.compile(r"[^aeiouyAEIOUY0-9]{4,}")
+# Words have about a third or more vowels (Turkish and English); random letters about a fifth.
+# Measured: words 0.36-0.57, random lowercase 0.00-0.17 (08 review r1). Entropy does not
+# separate them at this length (words 2.5-3.4 bits/char, random 2.5-3.4).
+WORD_MIN_VOWEL_SHARE = 0.25
+TAG_MAX_CHARS = 6  # upper-case codes: SZL, PRSIM, HBYS
+
+
+def _is_plain_segment(part: str) -> bool:
+    if part.isdigit() or len(part) <= 3:
+        return True
+    if not part.isalpha():
+        return False  # letters and digits mixed in a long segment: token-like
+    if part.isupper() and len(part) <= TAG_MAX_CHARS:
+        return True
+    if not (part.islower() or part.isupper()):
+        return False  # mixed case inside a segment: token-like
+    vowels = sum(ch in _VOWELS for ch in part) / len(part)
+    return vowels >= WORD_MIN_VOWEL_SHARE and not _CONSONANT_RUN.search(part)
 
 
 def is_plain_identifier(value: str) -> bool:
     """A name built from plain words and numbers (`SZL-2025-003_temizlik-hizmet`, a document
-    name in every SOURCES block): every `-`/`_` segment is digits, lowercase letters, uppercase
-    letters, or a short tag of at most 3 characters (`p4`, `v2`). A random token mixes letters
-    and digits inside long segments, so it is still checked (plan/18 F4 finding: document names
-    were taken for API tokens)."""
+    name in every SOURCES block): every `-`/`_` segment is digits, a tag of at most 3 characters
+    (`p4`, `v2`), an upper-case code of at most 6 letters (`PRSIM`), or a word: one case, at
+    least WORD_MIN_VOWEL_SHARE vowels and no run of 4 consonants. One segment that is none of
+    these (random letters, letters and digits mixed) keeps the whole value under the entropy
+    check (plan/18 F4 finding; 08 review r1: separated random lowercase stays a secret)."""
     parts = [p for p in _SEGMENTS.split(value) if p]
-    return len(parts) > 1 and all(
-        p.isdigit() or len(p) <= 3 or (p.isalpha() and (p.islower() or p.isupper())) for p in parts
-    )
+    return len(parts) > 1 and all(_is_plain_segment(p) for p in parts)
 
 
 def shannon_bits(value: str) -> float:

@@ -91,6 +91,11 @@ def test_08e_5_word_and_number_identifiers_are_not_tokens(identifier):
         "API_KEY=Zx9qT2mK7vB4nR8wL1pY6sD3",  # KEY=value
         "sk-ant-REDACTEDREDACTEDREDACTEDREDACTED00",  # vendor pattern
         "ghp_" + "A1b2C3d4E5f6G7h8I9j0K1l2M3n4O5p6Q7r8",  # vendor pattern
+        # review r1 MAJOR-1: separated random letters, one case (missed by a749023)
+        "kemubcrdlsbq-gbcnnchcrnbs-dhuusbssmbhb",
+        "xkqvbzrtwplm_hjgfdsnmcvbx",
+        "QWRTPLKMNBVC-ZXCVBNMLKJHG-PLKMNBVCXZQW",
+        "temizlik-kemubcrdlsbq-hizmet-gbcnnchc",  # one random segment among words
     ],
 )
 def test_08e_6_real_secret_shapes_are_still_caught(token):

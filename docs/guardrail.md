@@ -57,7 +57,7 @@ Two entities, both per project:
 | Type | Finds | Action |
 |---|---|---|
 | `pii` | categories enabled in the referenced PII policy (`pii_policy_key`) | the rule's action; without one, each category's action, else the PII policy's default action |
-| `secrets` | vendor keys (`sk-`, AWS, GitHub, Slack), JSON web tokens, private key blocks, connection strings with a password, values after a password keyword, high-entropy tokens (≥ 24 characters, ≥ 3.5 bits per character; UUIDs excluded, and names made of plain words and numbers such as `SZL-2025-003_temizlik-hizmet`: every `-`/`_` segment is digits, single-case letters or a tag of at most 3 characters), hex strings of 32+ characters with letters and digits | required |
+| `secrets` | vendor keys (`sk-`, AWS, GitHub, Slack), JSON web tokens, private key blocks, connection strings with a password, values after a password keyword, high-entropy tokens (≥ 24 characters, ≥ 3.5 bits per character; UUIDs excluded, and names made of plain words and numbers such as `SZL-2025-003_temizlik-hizmet`: every `-`/`_` segment is digits, a tag of at most 3 characters, an upper-case code of at most 6 letters, or a word (one case, at least 25 % vowels, no run of 4 consonants); one random segment keeps the value under the check), hex strings of 32+ characters with letters and digits | required |
 | `tool_args` | regex `patterns` in the arguments of `tools` (`<tool_key>.<action>`, wildcards allowed); `args` limits the search to named arguments of a JSON object | `block`, `warn` or `log`; only at `tool.pre` |
 
 `injection`, `topic`, `output_format` and `banned_words` are refused with
