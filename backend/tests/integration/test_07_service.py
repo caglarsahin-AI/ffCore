@@ -6,13 +6,13 @@ is 06a's; here a recording fake stands in until slice 6 wires the real one.
 
 import asyncio
 import logging
-import uuid
 from datetime import UTC, datetime, timedelta
 
 import pytest
 
 from ffcore.core import db
 from ffcore.services import approvals
+from tests.integration.runtime_support import definition, seed_run
 
 T0 = datetime(2026, 10, 30, 9, 0, tzinfo=UTC)
 ARGS = {"sql": "SELECT count(*) FROM invoices", "reason": "[EMAIL_ADDRESS] asked"}
@@ -56,7 +56,8 @@ def test_07_args_hash_is_canonical():
 
 
 def test_07_open_sets_ttl_and_is_idempotent(database_url, app_settings, make_project, pg):
-    project, run_id = make_project(), uuid.uuid4()
+    project = make_project()
+    run_id = seed_run(pg, project, definition())
 
     async def work(session):
         first = await _open(session, app_settings, project, run_id)
@@ -70,16 +71,20 @@ def test_07_open_sets_ttl_and_is_idempotent(database_url, app_settings, make_pro
     assert first.approval.args_hash == approvals.args_hash(ARGS)
 
 
-def test_07_assign_to_user_refused(database_url, app_settings, make_project):
+def test_07_assign_to_user_refused(database_url, app_settings, make_project, pg):
+    project = make_project()
+    run_id = seed_run(pg, project, definition())
+
     async def work(session):
-        await _open(session, app_settings, make_project(), uuid.uuid4(), assign_to="user")
+        await _open(session, app_settings, project, run_id, assign_to="user")
 
     with pytest.raises(ValueError):
         _run(database_url, work)
 
 
 def test_07_same_args_not_asked_twice(database_url, app_settings, make_project, pg):
-    project, run_id = make_project(), uuid.uuid4()
+    project = make_project()
+    run_id = seed_run(pg, project, definition())
 
     async def first(session):
         opened = await _open(session, app_settings, project, run_id)
@@ -102,13 +107,14 @@ def test_07_same_args_not_asked_twice(database_url, app_settings, make_project, 
         lambda s: _open(s, app_settings, project, run_id, call="call-4", args=other_args),
     )
     assert not fresh.reused
-    other_run = _run(database_url, lambda s: _open(s, app_settings, project, uuid.uuid4()))
+    another = seed_run(pg, project, definition())
+    other_run = _run(database_url, lambda s: _open(s, app_settings, project, another))
     assert not other_run.reused  # never across runs
 
 
 def test_07_ttl_expires_and_closes_run(database_url, app_settings, make_project, pg, caplog):
     project = make_project()
-    due_run, fresh_run, decided_run = uuid.uuid4(), uuid.uuid4(), uuid.uuid4()
+    due_run, fresh_run, decided_run = (seed_run(pg, project, definition()) for _ in range(3))
 
     async def setup(session):
         rows = [
@@ -154,9 +160,10 @@ def test_07_ttl_expires_and_closes_run(database_url, app_settings, make_project,
 
 def test_07_ttl_run_close_failure_is_loud(database_url, app_settings, make_project, pg):
     project = make_project()
+    run_id = seed_run(pg, project, definition())
 
     async def setup(session):
-        opened = await _open(session, app_settings, project, uuid.uuid4())
+        opened = await _open(session, app_settings, project, run_id)
         await session.commit()
         return opened.approval.id
 
@@ -171,12 +178,13 @@ def test_07_ttl_run_close_failure_is_loud(database_url, app_settings, make_proje
     assert _status(pg, approval_id) == "expired"
 
 
-def test_07_pending_age_reported_once(database_url, app_settings, make_project, caplog):
+def test_07_pending_age_reported_once(database_url, app_settings, make_project, pg, caplog):
     project = make_project()
+    old, young = (seed_run(pg, project, definition()) for _ in range(2))
 
     async def setup(session):
-        await _open(session, app_settings, project, uuid.uuid4())
-        await _open(session, app_settings, project, uuid.uuid4(), now=T0 + timedelta(minutes=20))
+        await _open(session, app_settings, project, old)
+        await _open(session, app_settings, project, young, now=T0 + timedelta(minutes=20))
         await session.commit()
 
     _run(database_url, setup)

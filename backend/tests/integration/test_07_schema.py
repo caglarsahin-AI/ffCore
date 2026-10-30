@@ -14,15 +14,18 @@ import psycopg
 import pytest
 
 from tests.integration.conftest import BACKEND
+from tests.integration.runtime_support import definition, seed_run
 
 ARGS = '{"sql": "SELECT 1"}'
 
 
 def _insert(pg, project, **extra):
+    # run_id references runs (06a): a real run of the project unless the test gives one.
+    if "run_id" not in extra:
+        extra["run_id"] = seed_run(pg, project, definition())
     row = {
         "id": uuid.uuid4(),
         "project_id": project,
-        "run_id": uuid.uuid4(),
         "tool_call_id": "call-1",
         "action": "mcp-sql__run_sql",
         "arguments": ARGS,
@@ -74,9 +77,15 @@ def test_07_one_approval_per_tool_call(pg, make_project):
     _insert(pg, project, run_id=first["run_id"], tool_call_id="call-2")
 
 
-def test_07_project_must_exist(pg):
+def test_07_project_must_exist(pg, make_project):
+    run_id = seed_run(pg, make_project(), definition())
     with pytest.raises(psycopg.errors.ForeignKeyViolation):
-        _insert(pg, uuid.uuid4())
+        _insert(pg, uuid.uuid4(), run_id=run_id)
+
+
+def test_07_run_must_exist(pg, make_project):
+    with pytest.raises(psycopg.errors.ForeignKeyViolation):
+        _insert(pg, make_project(), run_id=uuid.uuid4())
 
 
 def test_07_pending_expiry_index(pg):

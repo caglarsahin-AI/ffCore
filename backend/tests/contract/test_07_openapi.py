@@ -19,6 +19,8 @@ EXPECTED = {
     P: {"get"},
     P + "/count": {"get"},
     P + "/{approval_id}": {"get"},
+    P + "/{approval_id}/approve": {"post"},
+    P + "/{approval_id}/reject": {"post"},
 }
 
 
