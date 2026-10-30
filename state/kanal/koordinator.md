@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-koordinator-20261028-0205
 - Aktif paket: tumu
 - Durum: ACTIVE
-- Son okunan: isci-a A-af-0013 (oturum ffcore-isci-a-af) (oturum ffcore-isci-a-04awr); isci-b B-07FU-0011 RETIRED (oturum ffcore-isci-b-07fu); isci-c C-10bp2-0019 RETIRED (oturum ffcore-isci-c-10bp2); inceleyici R-AF-0003; test T-18-0045 (oturum ffcore-test-18-hazirlik) (2026-10-30 11:05)
+- Son okunan: isci-a A-13b-0001 (oturum ffcore-isci-a-af) (oturum ffcore-isci-a-04awr); isci-b B-07FU-0011 RETIRED (oturum ffcore-isci-b-07fu); isci-c C-10bp2-0019 RETIRED (oturum ffcore-isci-c-10bp2); inceleyici R-AF-0003; test T-18-0045 (oturum ffcore-test-18-hazirlik) (2026-10-30 11:05)
 
 ## Mesajlar
 
@@ -2422,3 +2422,7 @@ Tur r2 (delta). SHA be3449fe30749c25d165e7cbc6fb17408735f453 (koordinatör doğr
 ### K-AF-0008 · 2026-10-30 21:43 · → isci-a · CEVAP
 Paket: fix/04a-06a-followups   Cevap: A-af-0013
 be3449f doğrulandı; REVIEW-ISTEK r2 K-AF-0007 gitti. YIGIN-KAPA alındı. Branch'e commit yok; ONAY → merge + kapı (önyüz check:api dahil) → MERGED → 13b A GOREV'i (K-13b-0006). Bekleme işi: K-13b-0000 taslağını oku, 13b A tarafı için kısa PLANNED hazırla (worktree feat/13b-e2e-eval; madde 0 FOLLOWUP-115 `npm run gen:api`).
+
+### K-13b-0006 · 2026-10-30 21:47 · → isci-a · GOREV (13b A tarafı; başlangıç demet MERGED olunca)
+Paket: 13b A tarafı   Cevap: A-13b-0001
+PLANNED taslağı (state/pr/13b-a.md) onaylı; kararlar: **S1 A** (parolalar `docker compose run -e E2E_PASSWORD … tools make seed`; eksik değişkende açık hata; seed secret üretmez). **S2 A** (PoC'de seed Langfuse dataset yaratmaz; `make eval` JSON'u okur, rapor dosyaya; 09 gelince taşınır). **S3 A** (S1 koşu 2 `rewrite=true` NOT_RUN, 04b; docs/demo.md tablosunda boş sütun gerekçeli; brief 13 madde 7'deki "iki koşu" cümlesini ben DRIFT notuyla düzeltirim). **S4** `sozlesme-33` (DRIFT-28 kayıtlı; brief "35" yanlış, ben düzeltirim). GOREV = K-13b-0000 + bu kararlar + madde 0 FOLLOWUP-115 (`npm run gen:api` → `frontend/lib/api/schema-05a.d.ts`, ayrı commit, `check:api` exit 0 kapıda). Branch feat/13b-e2e-eval (worktree C:/ai_paycore/ffcore/.worktrees/feat/13b-e2e-eval; demet merge olunca main'e rebase) · Sınıf [A] · `FFCORE_VERSION=0.0.0-13ba`, portlar 18030/13030 · `e2e.env`'e `FFCORE_TEST_HOOKS=1` satırı (FOLLOWUP-111 kancası; TTL e2e'si test tarafının NOT_RUN'ını yeşillendirir). Kod **fix/04a-06a-followups MERGED yazılınca** başlar (aynı oturum, kullanıcı istisnası); o zamana kadar yalnız okuma. PR-HAZIR tam SHA; review yığınlı (make e2e tam koşu inceleyicide). Kabul: `make seed` idempotent, `make e2e` F tablosu (F1-F4, F9 satırları fake-llm ile hat yeşil, gerçek model satırları NOT_RUN), `make eval` rapor biçimi, docs/demo.md 15 dk akış; PayCore S1 koşusu kullanıcı sunucusunda komutla.

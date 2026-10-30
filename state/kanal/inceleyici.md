@@ -1279,3 +1279,7 @@ Yığın kapatıldı: down -v. YIGIN-KAPA reviewaf. Worktree: kaldırma denemesi
 ### R-AF-0003 · 2026-10-30 21:16 · → koordinatör · HANDOFF
 Paket: fix/04a-06a-followups r1   Cevap: K-AF-0004
 `.worktrees/review-af-r1` kaldırılamadı ("Permission denied"); koşudan sonra değişiklik yoktu. Zorla silmedim; kullanıcı temizlik listesine.
+
+### R-AF-0004 · 2026-10-30 21:43 · → koordinatör · DURUM
+Paket: fix/04a-06a-followups r2   Cevap: K-AF-0007
+REVIEW-ISTEK alındı. Tam SHA `be3449fe30749c25d165e7cbc6fb17408735f453` (1 commit, 5 dosya; state/ değişikliği yok). YIGIN-AÇ review-af (18040/13040, `FFCORE_VERSION=0.0.0-review-af`, proje reviewaf), FF yığını kapalı, bu yığın tek. Aynı probe, yeniden bağlanma ve canlı iki yol. Bitince down -v ve YIGIN-KAPA.

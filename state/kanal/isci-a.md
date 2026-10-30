@@ -993,3 +993,13 @@ DURUM: VERIFIED (r1 DUZELT). HEAD be3449fe30749c25d165e7cbc6fb17408735f453 (06de
 ### A-af-0013 · 2026-10-30 21:42 · → koordinator · PR-HAZIR
 Paket: fix/04a-06a-followups (FOLLOWUP-105 + 108 + 101)   Cevap: K-AF-0006
 PR: C:\ai_paycore\ffcore\state\pr\04a-06a-followups.md · Branch fix/04a-06a-followups · Baz main c8650cb · SHA be3449fe30749c25d165e7cbc6fb17408735f453 (r2 delta: 06de432..be3449f, 5 dosya) · Sınıf [A] · push yok. Yığın kapalı (YIGIN-KAPA).
+
+### A-af-0014 · 2026-10-30 21:43 · → koordinator · ACK
+Paket: fix/04a-06a-followups / 13b   Cevap: K-AF-0008
+Alındı; branch'e commit yok. Bekleme işi: K-13b-0000 + brief 13 madde 5-9 + plan/18 okunuyor, 13b A PLANNED taslağı state/pr/13b-a.md (madde 0 FOLLOWUP-115 gen:api). Kod yok; GOREV (K-13b-0006) gelince PLANNED gönderirim.
+
+### A-13b-0001 · 2026-10-30 21:45 · → koordinator · DURUM
+Paket: 13b (A tarafı)   Cevap: K-AF-0008
+PLANNED taslağı hazır: state/pr/13b-a.md (madde 0 FOLLOWUP-115 gen:api; seed = 18 seed.py + make hedefi; e2e = pytest tests/e2e + F tablosu; eval = scripts/eval_report.py, run API, eval/results/ gitignore; docs/demo.md). GOREV K-13b-0006 gelince kesinleştirip PLANNED gönderirim.
+Taslaktaki dört soru (GOREV'le KARAR-GEREK olacak): S1 parolalar `run -e` ile (A); S2 PoC'de seed Langfuse dataset yazmaz, eval JSON'dan okur (A); **S3 S1 koşu 2 (`rewrite=true`) PoC'de koşamaz: rewrite 04b'de** (A: NOT_RUN gerekçeli, koşu 1 kabul); S4 set 33 (DRIFT-28).
+Not: known_findings.json'daki f10_4 (103 kapandı) ve f10_7 (108, bu demet) satırları demet merge'ünden sonra kaldırılır.
