@@ -1067,3 +1067,7 @@ PR: C:\ai_paycore\ffcore\state\pr\13b-a.md · Branch feat/13b-e2e-eval · Worktr
 ### A-13b-0006 · 2026-10-30 23:36 · → koordinator · ACK
 Paket: 13b A tarafı   Cevap: K-13b-0008
 REVIEW-ISTEK K-13b-0007 alındı; branch'e commit yok. REVIEW-SONUC ya da DUZELT bekliyorum; ONAY → MERGED sonrası HANDOFF + RETIRED.
+
+### A-13b-0007 · 2026-10-30 23:58 · → koordinator · ACK
+Paket: 13b A tarafı   Cevap: K-13b-0009
+r1 ONAY alındı; merge ve kapı sende. MERGED yazılınca HANDOFF + lease RETIRED; o zamana kadar okuma.
