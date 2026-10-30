@@ -3,9 +3,9 @@
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
 - Oturum kimliği: ffcore-test-18-hazirlik
-- Aktif paket: 18-hazirlik
-- Durum: ACTIVE
-- Son okunan: koordinator K-13b-0004
+- Aktif paket: — (18 ve 13b-test MERGED)
+- Durum: RETIRED
+- Son okunan: koordinator K-13b-0005
 
 ## Mesajlar
 
@@ -930,3 +930,35 @@ YIGIN-KAPA: down -v, konteyner 0. PR dosyası state/pr/13b-test.md.
 ### T-13b-0005 · 2026-10-30 17:49 · → koordinator · CEVAP
 Paket: 18 / 13b   Cevap: K-13b-0004
 Evet, kaldırabilirsin. feat/18-scenarios-e2e (07778bf) main'in atası (git merge-base --is-ancestor), worktree temiz. feat/18-f2-stage3 zaten kaldırılmış. 13b dalına commit yok; review bekliyorum.
+
+### T-13b-0006 · 2026-10-30 17:57 · → koordinator · HANDOFF
+Paket: 18 + 13b-test   Cevap: K-13b-0005
+Lease RETIRED (ffcore-test-18-hazirlik). Açık iş yok, worktree yok, yığın yok (son: 13bt down -v, konteyner 0).
+
+Main'de olanlar (bu oturum):
+- **18 veri**: 18-hazirlik, ticket-desk, iki agent şablonu, expected_code, FOLLOWUP-76 ölçek-oran testi.
+- **fake-llm tool-\* modu**.
+- **18 aşama 2 + F2 aşama 3**, tests/e2e/scenarios:
+  - seed.py, idempotent; superadmin login-önce ve hata koduyla.
+  - e2e.env, ikinci env-file: FAKE_EMBED=1 + fake-llm host.
+  - F1-F13 testleri; NOT_RUN gerekçeli.
+- **08 düzeltmeleri**: yerleşik egress PII enforce, Rule.mode, entropi muafiyeti; builtin_version testi.
+- **docs/demo.md** F1-F13.
+- **13b test tarafı**:
+  - projects.json full_name.
+  - tests/e2e/ftable.py + conftest (--f-table) + known_findings.json.
+  - tests/e2e/negative (12 + TTL NOT_RUN).
+
+Açık bulgular (kayıtlı): FOLLOWUP-101 (upload'da tarih yok, F13), -103 (üye olmayana 403), -106 (kısa büyük harf token'lar), -107 (secrets enforce'ta kodlu parça tüm cevabı blokluyor), -108 (breadcrumb), -111 (07 TTL tetik). known_findings.json'da 103 ve 108 var; düzeldikçe oradan silinmeli, yoksa F tablosu "known" demeye devam eder.
+
+Sonraki oturum için:
+- **Yığın komutu**: docker compose -p <ad> --env-file .env.test --env-file tests/e2e/scenarios/e2e.env --profile test, BACKEND_PORT/FRONTEND_PORT projeye özgü.
+- **Parolalar**: E2E_ADMIN_EMAIL, E2E_ADMIN_PASSWORD, E2E_PASSWORD yalnız kabuktan.
+- **Koşu**: seed (python -m tests.e2e.scenarios.seed), sonra pytest tests/e2e --f-table <yol>.
+- **Tuzaklar**:
+  - Docling ağırlığı yok: seed .docx'i .txt yükler.
+  - Hedef projede secrets=log (FOLLOWUP-107).
+  - tests/e2e importları tests/e2e köküne göre; "tests.e2e." kullanma.
+  - scenarios conftest skip'i yalnız kendi klasörü.
+  - Windows host'ta process_time 15.6 ms adımlı; CPU oran ölçümü yalnız Linux konteynerinde.
+- **13b A tarafı** (make seed/e2e/eval, eval/results gitignore) isci-a'da; birlikte koşu orada.

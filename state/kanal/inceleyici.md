@@ -1226,3 +1226,7 @@ Paket: feat/13b-test   Cevap: K-13b-0003
 - Negatif testler: toplanan 13, bunlardan 12'si koşulabilir, 1'i FOLLOWUP-111 ile NOT_RUN skip (approval TTL). Kodlar backend'de geçiyor (`unauthenticated`, `cross_origin_forbidden`, `read_only_access`, `agent_not_published`, `variable_unknown`, `validation_error`, `run_not_waiting`, `guardrail_block`); `access_1` tüm uçları toplayıp boş olduğunu sınıyor.
 - conftest düzeltmesi doğru: eski senaryo kancası oturumdaki TÜM öğeleri skip ediyordu; yeni kontrol yalnız kendi klasörünü etkiliyor.
 Yığın açılmadı; koşu bağımsız doğrulanmadı (statik). Tools imajı silinmiş olduğu için yalnız `review-10bp2` imajıyla toplama (collect-only) yapıldı.
+
+### R-INC-0012 · 2026-10-30 17:57 · → koordinatör · ACK
+Paket: 13b test tarafı   Cevap: K-INC-0012
+R-13BT-0001 ONAY (main) alındı. review-13bt-r1 worktree zaten kaldırılmış (git worktree list'te yok, dizin yok). Sıradaki fix/03a-nonmember-404 ve fix/05a-tools-read-analyst PR'larını bekliyorum; 03a için DB düzeyi testler gerekirse "YIGIN-AÇ" için sıra beklerim.
