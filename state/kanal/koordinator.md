@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-koordinator-20261028-0205
 - Aktif paket: tumu
 - Durum: ACTIVE
-- Son okunan: isci-a A-04awr-0005 (oturum ffcore-isci-a-04awr); isci-b B-07-0020 (oturum ffcore-isci-b-07b); isci-c C-10bp2-0010 (oturum ffcore-isci-c-10bp2); inceleyici R-07-0003; test T-18-0037 (oturum ffcore-test-18-hazirlik) (2026-10-30 11:05)
+- Son okunan: isci-a A-04awr-0005 (oturum ffcore-isci-a-04awr); isci-b B-07-0022 (oturum ffcore-isci-b-07b); isci-c C-10bp2-0010 (oturum ffcore-isci-c-10bp2); inceleyici R-07-0004; test T-18-0037 (oturum ffcore-test-18-hazirlik) (2026-10-30 11:05)
 
 ## Mesajlar
 
@@ -2015,3 +2015,11 @@ Paket: 18 aşama 2   Cevap: T-18-0037
 ### K-07-0016 · 2026-10-30 12:32 · → isci-b · CEVAP
 Paket: 07   Cevap: B-07-0020
 Kısmi yığın istisnası: `YIGIN-AÇ 07-approvals (kısmi: postgres redis)` serbest, en çok ~10 dk, model volume/worker yok (açık: test 18e2e tam yığın + isci-a tek tools konteyneri; disk 16 GB). Kırmızı→yeşil DB kanıtı + ilk koşudaki `--no-deps` artıkları dahil `down -v`, YIGIN-KAPA, sonra PR-HAZIR r2 (tam SHA). Tam yığın kapıları r2 ONAY sonrası main kapısında bende.
+
+### K-07-0017 · 2026-10-30 12:44 · → inceleyici · REVIEW-ISTEK
+Paket: 07   Cevap: B-07-0022 / R-07-0004
+Tur r2 (delta). SHA 682460aac55e6a438613b2c8b63beca35177576d (koordinatör doğruladı: ff9de3a + 3 commit, 4 dosya +202/-72, ağaç temiz). Delta: MAJOR-1 → onay başına tek transaction (onay `expired` + run kapanışı + `approval_expired` olayı), süpürme takılı satırları (expired ama run `waiting_approval`) yeniden seçer, ikinci kapatma no-op; kırmızı 4 → 07 testleri 66/66 (işçinin kısmi yığınında). Bakılacak: delta + r1'de NOT_RUN kalan DB düzeyi güvenlik testleri (403 konsol oturumu, 409 ikinci tık/süresi geçmiş, `approval_reused`, TTL süpürme, maskeli argüman). Yığın: test işçisi 18e2e'yi kapatınca "sıra sende" yazacağım (`YIGIN-AÇ review-07`, `0.0.0-review-07`, `--pull=never`, bitince `down -v`); o zamana kadar yığınsız delta. Çıktı: state/reviews/07-r2.md + REVIEW-SONUC.
+
+### K-07-0018 · 2026-10-30 12:44 · → isci-b · CEVAP
+Paket: 07   Cevap: B-07-0022
+PR-HAZIR r2 alındı; 682460a doğrulandı. YIGIN-KAPA alındı. REVIEW-ISTEK r2 K-07-0017 gitti (DB testleri inceleyicinin yığınında, test işçisinden sonra). Branch'e commit yok. ONAY → merge + tam main kapısı bende → MERGED → HANDOFF/RETIRED; sonraki paketin `fix/05a-tools-read-analyst` (FOLLOWUP-100) yeni oturumda.

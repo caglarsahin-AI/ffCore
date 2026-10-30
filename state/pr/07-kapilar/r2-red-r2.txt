@@ -1,0 +1,252 @@
+....FFF........F..                                                       [100%]
+=================================== FAILURES ===================================
+______________________ test_07_ttl_expires_and_closes_run ______________________
+
+database_url = 'postgresql+psycopg://ffcore:dummy-not-secret-postgres@postgres:5432/ffcore_test_e17adff84fbc'
+app_settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...ive_s=10.0, run_event_stream_ttl_s=86400, run_abandon_grace_s=120, langsmith_tracing=False, langchain_tracing_v2=False)
+make_project = <function make_project.<locals>.make at 0x7fa87b423740>
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_e17adff84fbc) at 0x7fa87b67dcd0>
+caplog = <_pytest.logging.LogCaptureFixture object at 0x7fa87b67fa40>
+
+    def test_07_ttl_expires_and_closes_run(database_url, app_settings, make_project, pg, caplog):
+        project = make_project()
+        due_run, fresh_run, decided_run = (
+            seed_run(pg, project, definition(), status="waiting_approval") for _ in range(3)
+        )
+    
+        async def setup(session):
+            rows = [
+                await _open(session, app_settings, project, due_run),
+                await _open(session, app_settings, project, fresh_run, now=T0 + timedelta(minutes=30)),
+                await _open(session, app_settings, project, decided_run),
+            ]
+            await session.commit()
+            return [r.approval.id for r in rows]
+    
+        due, fresh, decided = _run(database_url, setup)
+        pg.execute(
+            "UPDATE approvals SET status = 'rejected', resolved_at = now() WHERE id = %s", (decided,)
+        )
+        closed = []
+        close_run = _closer(closed)
+        ttl = timedelta(minutes=app_settings.approval_ttl_min)
+        ours = {due, fresh, decided}
+        # The test database is shared by the session: other tests' pending rows expire too; only
+        # this test's rows are asserted. One second before the TTL nothing happens.
+        early = _run(
+            database_url,
+            lambda s: approvals.expire_due(s, now=T0 + ttl - timedelta(seconds=1), close_run=close_run),
+        )
+        assert not {row.id for row in early} & ours
+        assert not {run for run, _ in closed} & {due_run, fresh_run, decided_run}
+        with caplog.at_level(logging.WARNING, logger="ffcore.approvals"):
+>           expired = _run(
+                database_url, lambda s: approvals.expire_due(s, now=T0 + ttl, close_run=close_run)
+            )
+
+tests/integration/test_07_service.py:176: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/test_07_service.py:32: in _run
+    return asyncio.run(go())
+           ^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/runners.py:195: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/base_events.py:691: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/integration/test_07_service.py:28: in go
+    return await work(session)
+           ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+session = <sqlalchemy.ext.asyncio.session.AsyncSession object at 0x7fa87b687ef0>
+now = datetime.datetime(2026, 10, 30, 10, 0, tzinfo=datetime.timezone.utc)
+close_run = <function _closer.<locals>.close at 0x7fa87b473100>
+
+    async def expire_due(
+        session: AsyncSession, *, now: datetime, close_run: CloseRun
+    ) -> list[Approval]:
+        """Mark pending approvals past `expires_at` as expired and close their runs.
+    
+        The update is conditional on `status = 'pending'`, so a decision that lands first wins and
+        two job runs in the same tick expire a row once (U1: arq cron is unique per tick anyway).
+        Each closed run gets EXPIRED_RUN_CODE; a failure to close one is logged and re-raised after
+        the others, never swallowed.
+        """
+        rows = list(
+            await session.scalars(
+                update(Approval)
+                .where(Approval.status == "pending", Approval.expires_at <= now)
+                .values(status="expired", resolved_at=now, resolved_by=TTL_RESOLVER, updated_at=now)
+                .returning(Approval)
+            )
+        )
+        await session.commit()
+        failures: list[Exception] = []
+        for row in rows:
+            log.warning(
+                "approval_expired approval_id=%s run_id=%s project_id=%s",
+                row.id,
+                row.run_id,
+                row.project_id,
+            )
+            try:
+                await close_run(row.run_id, EXPIRED_RUN_CODE)
+            except Exception as exc:  # each run is tried; the job still fails loud below
+                log.error("approval_expired_run_not_closed run_id=%s error=%s", row.run_id, exc)
+                failures.append(exc)
+        if failures:
+>           raise RuntimeError(f"{len(failures)} expired approval run(s) could not be closed")
+E           RuntimeError: 2 expired approval run(s) could not be closed
+
+ffcore/services/approvals.py:275: RuntimeError
+------------------------------ Captured log call -------------------------------
+WARNING  ffcore.approvals:approvals.py:263 approval_expired approval_id=c98c163f-d775-4f48-ab88-3f675491879d run_id=36a5389a-48f8-46a5-867b-bb3b16866e47 project_id=b9c9586a-daad-4d86-8474-b2e822331626
+ERROR    ffcore.approvals:approvals.py:272 approval_expired_run_not_closed run_id=36a5389a-48f8-46a5-867b-bb3b16866e47 error=_closer.<locals>.close() missing 1 required positional argument: 'code'
+WARNING  ffcore.approvals:approvals.py:263 approval_expired approval_id=06a1231a-e178-4c62-bed0-a1ba5cbd4182 run_id=4f53d5ae-c4df-4429-892a-82162eea496f project_id=ddb3b99f-c1b0-4f26-8565-e980cbb9b2c5
+ERROR    ffcore.approvals:approvals.py:272 approval_expired_run_not_closed run_id=4f53d5ae-c4df-4429-892a-82162eea496f error=_closer.<locals>.close() missing 1 required positional argument: 'code'
+_________________ test_07_ttl_close_failure_retried_next_tick __________________
+
+database_url = 'postgresql+psycopg://ffcore:dummy-not-secret-postgres@postgres:5432/ffcore_test_e17adff84fbc'
+app_settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...ive_s=10.0, run_event_stream_ttl_s=86400, run_abandon_grace_s=120, langsmith_tracing=False, langchain_tracing_v2=False)
+make_project = <function make_project.<locals>.make at 0x7fa87b4a62a0>
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_e17adff84fbc) at 0x7fa87b6863f0>
+
+    def test_07_ttl_close_failure_retried_next_tick(database_url, app_settings, make_project, pg):
+        # Review r1 MAJOR-1: expiring the approval and closing its run are one transaction; a
+        # failed close leaves both as they were and the next tick does both.
+        project = make_project()
+        run_id = seed_run(pg, project, definition(), status="waiting_approval")
+    
+        async def setup(session):
+            opened = await _open(session, app_settings, project, run_id)
+            await session.commit()
+            return opened.approval.id
+    
+        approval_id = _run(database_url, setup)
+        closed = []
+        close_run = _closer(closed, fail_first=True)
+        ttl = timedelta(minutes=app_settings.approval_ttl_min)
+        with pytest.raises(RuntimeError, match="could not be closed"):
+            _run(database_url, lambda s: approvals.expire_due(s, now=T0 + ttl, close_run=close_run))
+>       assert _status(pg, approval_id) == "pending"
+E       AssertionError: assert 'expired' == 'pending'
+E         
+E         - pending
+E         + expired
+
+tests/integration/test_07_service.py:211: AssertionError
+------------------------------ Captured log call -------------------------------
+WARNING  ffcore.approvals:approvals.py:263 approval_expired approval_id=4d404c44-a054-41a0-a19c-5c60b05bc75e run_id=6fe60dab-d074-4908-8947-941f4ef3b458 project_id=7dc33a7b-0ff1-486e-9134-bbb3ff0b12b0
+ERROR    ffcore.approvals:approvals.py:272 approval_expired_run_not_closed run_id=6fe60dab-d074-4908-8947-941f4ef3b458 error=_closer.<locals>.close() missing 1 required positional argument: 'code'
+_____________ test_07_ttl_closes_run_of_stranded_expired_approval ______________
+
+database_url = 'postgresql+psycopg://ffcore:dummy-not-secret-postgres@postgres:5432/ffcore_test_e17adff84fbc'
+app_settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...ive_s=10.0, run_event_stream_ttl_s=86400, run_abandon_grace_s=120, langsmith_tracing=False, langchain_tracing_v2=False)
+make_project = <function make_project.<locals>.make at 0x7fa87b485620>
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_e17adff84fbc) at 0x7fa87b66a300>
+
+    def test_07_ttl_closes_run_of_stranded_expired_approval(
+        database_url, app_settings, make_project, pg
+    ):
+        # An approval already expired while its run still waits (a close lost before this fix) is
+        # picked up again; the approval row itself is not rewritten.
+        project = make_project()
+        run_id = seed_run(pg, project, definition(), status="waiting_approval")
+    
+        async def setup(session):
+            opened = await _open(session, app_settings, project, run_id)
+            await session.commit()
+            return opened.approval.id
+    
+        approval_id = _run(database_url, setup)
+        pg.execute(
+            "UPDATE approvals SET status = 'expired', resolved_at = now(), resolved_by = 'old'"
+            " WHERE id = %s",
+            (approval_id,),
+        )
+        closed = []
+        swept = _run(database_url, lambda s: approvals.expire_due(s, now=T0, close_run=_closer(closed)))
+>       assert approval_id in {row.id for row in swept}
+E       AssertionError: assert UUID('66366795-e601-4ff1-9fe9-12935a3f5988') in set()
+
+tests/integration/test_07_service.py:242: AssertionError
+______________ test_07_ttl_close_retried_writes_one_expired_event ______________
+
+team = (UUID('2d95411d-1818-4a6d-8bec-bbcea2bb1f09'), {'owner': <starlette.testclient.TestClient object at 0x7fa85887cd70>, '...ient.TestClient object at 0x7fa85887fda0>, 'analyst_read': <starlette.testclient.TestClient object at 0x7fa84113cbf0>})
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_e17adff84fbc) at 0x7fa8587c7110>
+harness = <tests.integration.runtime_support.Harness object at 0x7fa8587f5c70>
+use_queue = <function use_queue.<locals>.install at 0x7fa858852e80>
+settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...live_s=0.2, run_event_stream_ttl_s=86400, run_abandon_grace_s=120, langsmith_tracing=False, langchain_tracing_v2=False)
+
+    def test_07_ttl_close_retried_writes_one_expired_event(team, pg, harness, use_queue, settings):
+        # Review r1 MAJOR-1 with the real closer: a tick whose close fails changes nothing, the next
+        # one expires the approval and closes the run, and approval_expired is written once.
+        from ffcore.core import db
+        from ffcore.services import approvals
+    
+        run_id, *_ = _waiting(team, pg, harness, use_queue)
+        later = datetime.now(UTC) + timedelta(minutes=settings.approval_ttl_min, seconds=1)
+        real = approvals.run_closer(settings)
+        calls = {"n": 0}
+    
+        async def flaky(session, run, code):
+            # Other tests' leftovers share the database: only this run's first close fails.
+            if str(run) == run_id:
+                calls["n"] += 1
+                if calls["n"] == 1:
+                    raise RuntimeError("redis unavailable")
+            return await real(session, run, code)
+    
+        async def tick(close_run):
+            async with db.session_scope() as session:
+                return await approvals.expire_due(session, now=later, close_run=close_run)
+    
+        with pytest.raises(RuntimeError):
+            asyncio.run(tick(flaky))
+        assert run_row(pg, run_id)["status"] == "waiting_approval"
+>       assert _approvals(pg, run_id)[0][1] == "pending"
+E       AssertionError: assert 'expired' == 'pending'
+E         
+E         - pending
+E         + expired
+
+tests/integration/test_07_flow.py:262: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+2026-10-30 09:35:39,694 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-30 09:35:39,916 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=219
+2026-10-30 09:35:39,998 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-30 09:35:40,167 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=165
+2026-10-30 09:35:40,293 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-30 09:35:40,378 ERROR opentelemetry.exporter.otlp.proto.http.trace_exporter Failed to export spans batch due to timeout, max retries or shutdown.
+2026-10-30 09:35:40,801 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=504
+------------------------------ Captured log setup ------------------------------
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=219
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=165
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    opentelemetry.exporter.otlp.proto.http.trace_exporter:http.py:222 Failed to export spans batch due to timeout, max retries or shutdown.
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=504
+----------------------------- Captured stderr call -----------------------------
+2026-10-30 09:35:41,736 INFO ffcore.access access method=POST path=/api/v1/projects/2d95411d-1818-4a6d-8bec-bbcea2bb1f09/agents/asistan/runs status=200 ms=870
+2026-10-30 09:35:41,776 WARNING ffcore.approvals approval_expired approval_id=8c2396a0-20c9-436b-ac15-e9e9594edee7 run_id=eb250956-5efc-4feb-83be-ef53a9483d5e project_id=2d95411d-1818-4a6d-8bec-bbcea2bb1f09
+2026-10-30 09:35:41,776 ERROR ffcore.approvals approval_expired_run_not_closed run_id=eb250956-5efc-4feb-83be-ef53a9483d5e error=test_07_ttl_close_retried_writes_one_expired_event.<locals>.flaky() missing 1 required positional argument: 'code'
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/2d95411d-1818-4a6d-8bec-bbcea2bb1f09/agents/asistan/runs status=200 ms=870
+WARNING  ffcore.approvals:approvals.py:263 approval_expired approval_id=8c2396a0-20c9-436b-ac15-e9e9594edee7 run_id=eb250956-5efc-4feb-83be-ef53a9483d5e project_id=2d95411d-1818-4a6d-8bec-bbcea2bb1f09
+ERROR    ffcore.approvals:approvals.py:272 approval_expired_run_not_closed run_id=eb250956-5efc-4feb-83be-ef53a9483d5e error=test_07_ttl_close_retried_writes_one_expired_event.<locals>.flaky() missing 1 required positional argument: 'code'
+--------------------------- Captured stderr teardown ---------------------------
+2026-10-30 09:35:46,835 ERROR ffcore.tracing trace_delivery_failed spans=7 reason=deadline
+---------------------------- Captured log teardown -----------------------------
+ERROR    ffcore.tracing:tracing.py:116 trace_delivery_failed spans=7 reason=deadline
+=========================== short test summary info ============================
+FAILED tests/integration/test_07_service.py::test_07_ttl_expires_and_closes_run
+FAILED tests/integration/test_07_service.py::test_07_ttl_close_failure_retried_next_tick
+FAILED tests/integration/test_07_service.py::test_07_ttl_closes_run_of_stranded_expired_approval
+FAILED tests/integration/test_07_flow.py::test_07_ttl_close_retried_writes_one_expired_event
+4 failed, 14 passed in 125.26s (0:02:05)

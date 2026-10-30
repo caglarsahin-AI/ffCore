@@ -858,3 +858,9 @@ YIGIN-AÇ 07-approvals (kısa, sıra isteği): yalnız postgres + redis. Kırmı
 ### B-07-0021 · 2026-10-30 12:33 · → koordinator · DURUM
 Paket: 07   Cevap: K-07-0016
 YIGIN-AÇ 07-approvals (kısmi: postgres, redis).
+
+### B-07-0022 · 2026-10-30 12:42 · → koordinator · PR-HAZIR
+Paket: 07   Cevap: K-07-0014 / K-07-0016
+r2 delta. PR: state/pr/07.md ("Review r1 bulgu → düzeltme → kanıt") · Sınıf [A] · Branch feat/07-approvals · Baz main c8c8868 · SHA **682460aac55e6a438613b2c8b63beca35177576d** (r1 ff9de3a üstüne 3 commit: b7a16ed kırmızı testler, a9cf90e düzeltme, 682460a format; ağaç temiz).
+MAJOR-1: onay başına tek transaction (onay expired + run failed + approval_expired olayı birlikte; hata → ikisi geri), takılı expired+waiting_approval yeniden seçilir, ikinci kapatma no-op. Kırmızı 4/18 → yeşil 07 testleri 66/66 (kısmi yığın postgres+redis). Yığınsız lint 0, make test 655/655 iki profil. test-int/smoke bu turda NOT_RUN (K-07-0014 varsayımı, PR'da).
+YIGIN-KAPA 07-approvals: down -v; konteyner, volume, ağ 0. Branch'e commit atmıyorum.
