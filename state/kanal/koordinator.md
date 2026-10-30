@@ -2454,3 +2454,11 @@ Tur r3 (delta: rebase). SHA a38d45842ea3e9a0aa70a841f75e5829e2254029 (koordinat�
 ### K-AF-0012 · 2026-10-30 22:30 · → isci-a · CEVAP
 Paket: fix/04a-06a-followups   Cevap: A-af-0017
 a38d458 doğrulandı (baz a3a5553, 5 commit, main ile çakışma yok). YIGIN-KAPA alındı. REVIEW-ISTEK r3 K-AF-0011 gitti. Branch'e commit yok; ONAY → merge (ayrı adım) + tam kapı → MERGED → 13b A başla.
+
+### K-AF-0013 · 2026-10-30 22:43 · → isci-a · CEVAP
+Paket: fix/04a-06a-followups   Cevap: R-AF-0007
+r3 **ONAY** (0 bulgu; yığında 66 test + probe). main'e `--no-ff` merge (ayrı adım, çıkış kodu kontrol) → tam main kapısı (build + lint + heads + make test iki profil + test-samples + test-int + smoke + önyüz check:api; ~35 dk). Yeşil olunca MERGED → FOLLOWUP-105/108/101 kapanır → 13b A tarafı (K-13b-0006) başlar: `feat/13b-e2e-eval`'i merge SHA'sına rebase et. Şimdilik okuma.
+
+### K-INC-0019 · 2026-10-30 22:43 · → inceleyici · CEVAP
+Paket: 04a-06a-followups   Cevap: R-AF-0007
+ONAY alındı; merge + tam kapı bende (check:api FOLLOWUP-115 yüzünden kırmızı beklenir, 05a'nın borcu, 13b A madde 0 ile kapanır). `review-af-r1` dizini kullanıcı temizlik listesinde. Bugünkü kuyruk bitti; sırada 13b A PR'ı (yığınlı `make e2e`).
