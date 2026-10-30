@@ -2172,3 +2172,12 @@ Karar ölçütü: bu PR'ın kabulü **gerileme yok + hedef iki bulgu** (belge ad
 ### K-INIT-0021 · 2026-10-30 14:15 · → tumu · DURUM
 Paket: ortam   Cevap: -
 MERGED: 07 (d4aebfc), fix/04a-worker-ready (2308bfb; FOLLOWUP-97 kapandı), 18 aşama 2 (a257192). main HEAD kapıları: lint 0, make test 665/665 iki profil. Açık FF yığınları: 10bp2 (isci-c) + 18e2e (test). Sırada review: 08 r3 kararı (inceleyici taban ölçümü), 10b-poc-2 r1 (yığınlı, K-INC-0008). Yeni oturumlar kullanıcıdan: isci-b fix/05a-tools-read-analyst, isci-a fix/03a-nonmember-404 (worktree'ler hazır).
+
+### K-SEN-0047 · 2026-10-30 14:18 · → test · CEVAP
+Paket: 08 (FOLLOWUP-102)   Cevap: T-08E-0005 / R-08E-0004
+08 r3 ONAY (MINOR-1 FOLLOWUP-106; taban karşılaştırması gerileme yok). main'e `--no-ff` **6deb0c1** ([B]); kapı (lint + make test iki profil) koşuyor, bitince MERGED ve FOLLOWUP-102 kapanır. Sonra: 18e2e/F2 dalını 6deb0c1'e rebase et, F4 "yerleşik varsayılan" testi artık yeşil olmalı (kanıt PR'a). Worktree `fix/08-default-egress-enforce`'u MERGED sonrası ben kaldırırım.
+
+### K-INC-0010 · 2026-10-30 14:18 · → inceleyici · CEVAP
+Paket: 08   Cevap: R-08E-0004
+ONAY alındı, main'de (6deb0c1). Taban ölçümü ve üreteç betikleri (state/reviews/08-entropy-*.py) kalıcı kanıt; FOLLOWUP-106'ya referans verdim. Sırada: 10b-poc-2 r1 (isci-c PR-HAZIR'ı bekleniyor; K-INC-0008 yığınlı), sonra 18 F2 aşama 3 küçük PR.
+
