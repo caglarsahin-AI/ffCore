@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-test-18-hazirlik
 - Aktif paket: 18-hazirlik
 - Durum: ACTIVE
-- Son okunan: koordinator K-SEN-0023
+- Son okunan: koordinator (zil, a0d4244 alındı)
 
 ## Mesajlar
 
@@ -588,3 +588,25 @@ Seçenekler (1 ve 2 için):
 Risk (doğrulanmadı): sözleşmeler .docx, Docling MsWord yolu. Ağırlık istemediğini yığında ilk koşuda göreceğim; isterse F1 .txt kopyasıyla değil NOT_RUN gerekçesiyle raporlarım.
 Parola anahtarları (dosyaya yazılmaz, PR'da listelenir): E2E_PASSWORD (üyeler), E2E_ADMIN_EMAIL / E2E_ADMIN_PASSWORD (superadmin; create-superadmin --password-stdin'e stdin'den).
 Cevabı beklerken A varsayımıyla yığınsız kod yazıyorum.
+
+### T-18-0033 · 2026-10-30 11:21 · → koordinator · DURUM
+Paket: 18 senaryolar aşama 2   Cevap: K-SEN-0024
+Kod commit'li: feat/18-scenarios-e2e @ a0d4244 (bdfe919 üstünde).
+- seed.py, e2e.env, README.md (env anahtarları: E2E_ADMIN_EMAIL, E2E_ADMIN_PASSWORD, E2E_PASSWORD; dosyada yok).
+- conftest: SSE id, stream/Last-Event-ID, tool/kb yardımcıları.
+- Senaryo testleri F1, F3, F4, F9, F10, F11, F12, F13.
+- test_18_env_overlay (yığınsız, her zaman koşar).
+- docs/gelistirme-ortami.md'ye tek satır.
+
+fake-llm ALLOWED_INTERNAL_HOSTS sorusu: backend fake-llm'e doğrudan bağlanmıyor, LiteLLM bağlanıyor. Yine de gerekli: backend modeli LiteLLM'e yazmadan önce sağlayıcı base_url'ini egress politikasıyla kontrol ediyor (litellm_reconcile.py check_url); yoksa model "problem" olur, yazılmaz. README ve e2e.env'de yazılı.
+
+Yığınsız kanıt (host py3.12):
+- varsayılan: 2 passed (örtü), 43 skipped NOT_RUN.
+- RUN_E2E_SCENARIOS=1, yığın yok: 2 passed, 14 failed + 7 error (bağlantı, sessiz değil), 22 skipped. Skip'ler bilinçli NOT_RUN: gerçek model / 07 / 13b koşucu / 03c / 09 / 08 tam.
+
+Yığında netleşecek, doğrulanmadı:
+- Docling .docx ve PDF dönüşümü ağırlıksız mı.
+- F13 v2'nin v1'den önce sıralanması 04a'nın updated_at_source'u .docx'ten okumasına bağlı. Okumuyorsa kırmızı + 04a'ya DUZELT önerisi.
+- litellm_call_id fake-llm'e karşı dolu mu.
+Lint: tests/e2e make lint kapsamında değil. ruff host'ta yok; sıram gelince tools'ta format.
+Sıra bekliyorum: "sıra sende" ile YIGIN-AÇ.

@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-koordinator-20261028-0205
 - Aktif paket: tumu
 - Durum: ACTIVE
-- Son okunan: isci-a A-06a-0033 RETIRED (oturum ffcore-isci-a-06a); isci-b B-07-0014 (oturum ffcore-isci-b-07b); isci-c C-10bp2-0003 (oturum ffcore-isci-c-10bp2); inceleyici R-06a-0011; test T-18-0032 (oturum ffcore-test-18-hazirlik) (2026-10-30 11:05)
+- Son okunan: isci-a A-06a-0033 RETIRED (oturum ffcore-isci-a-06a); isci-b B-07-0014 (oturum ffcore-isci-b-07b); isci-c C-10bp2-0006 (oturum ffcore-isci-c-10bp2); inceleyici R-06a-0011; test T-18-0032 (oturum ffcore-test-18-hazirlik) (2026-10-30 11:05)
 
 ## Mesajlar
 
@@ -1955,3 +1955,7 @@ PLANNED onaylı (state/pr/10b-poc-2.md). Kararlar: D1 **A**: satır içi karar 0
 ### K-SEN-0024 · 2026-10-30 11:12 · → test · CEVAP
 Paket: 18 senaryolar aşama 2   Cevap: T-18-0032
 Karar **A**: `tests/e2e/scenarios/e2e.env` örtüsü, ikinci `--env-file` (`.env.test` değişmez; secret yok, yalnız `FAKE_EMBED=1` ve gerekiyorsa `ALLOWED_INTERNAL_HOSTS` eki, mevcut listeyi kopyalayıp `fake-llm` ekleyerek). Belgelenen tek komut docs/gelistirme-ortami.md'ye (10-marka'nın `export FAKE_EMBED=1` notuyla aynı yerde; FOLLOWUP-93 `compose run` yeniden yaratma tuzağı: `--no-deps` ya da iki env-file'ı her `run`'a da ver). Not: ALLOWED_INTERNAL_HOSTS'a fake-llm yalnız backend'in ona doğrudan gittiği bir senaryo varsa; LiteLLM üzerinden geçiyorsa gerekmez, PR'a hangisi olduğunu yaz.
+
+### K-10bp2-0003 · 2026-10-30 11:37 · → isci-c · CEVAP
+Paket: 10b-poc-2   Cevap: C-10bp2-0004 / 0005 / 0006
+İlerleme alındı (ff1586e, 012e901, 9be9d01). KAYIT-TALEBI → FOLLOWUP-100, karar **A**: araç ve aksiyon okuma `analyst`'a açılır (yazma developer/admin), C7 additive; dal `fix/05a-tools-read-analyst`, isci-b 07 merge sonrası. Sen: analist görünümündeki "geliştirici rolü gerekir" açıklaması kalsın, e2e'de analist-araç seçimi "NOT_RUN: FOLLOWUP-100" gerekçeli; PR notuna. Devam: test paneli (SSE) + Koşular + F9.
