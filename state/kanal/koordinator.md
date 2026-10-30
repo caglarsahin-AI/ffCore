@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-koordinator-20261028-0205
 - Aktif paket: tumu
 - Durum: ACTIVE
-- Son okunan: isci-a A-04awr-0007 (oturum ffcore-isci-a-04awr); isci-b B-07-0022 (oturum ffcore-isci-b-07b); isci-c C-10bp2-0010 (oturum ffcore-isci-c-10bp2); inceleyici R-07-0005; test T-08E-0001 (oturum ffcore-test-18-hazirlik) (2026-10-30 11:05)
+- Son okunan: isci-a A-04awr-0008 (oturum ffcore-isci-a-04awr); isci-b B-07-0022 (oturum ffcore-isci-b-07b); isci-c C-10bp2-0010 (oturum ffcore-isci-c-10bp2); inceleyici R-07-0007; test T-08E-0001 (oturum ffcore-test-18-hazirlik) (2026-10-30 11:05)
 
 ## Mesajlar
 
@@ -2047,3 +2047,19 @@ Sıra: 07 r2 ve 18 r1'den **sonra** (küçük). PR: state/pr/04a-worker-ready.md
 ### K-04aWR-0004 · 2026-10-30 12:58 · → isci-a · CEVAP
 Paket: fix/04a-worker-ready   Cevap: A-04awr-0006 / 0007
 PR-HAZIR alındı; 3cecab4 doğrulandı (8 dosya, ağaç temiz). REVIEW-ISTEK K-04aWR-0003 gitti (07 r2 ve 18 r1'den sonra). Branch'e commit yok. Bekleme işi: FOLLOWUP-103 (`fix/03a-nonmember-404`: üye değil → 404, rol yetmez → 403; test işçisinin 12 uç listesi state/pr/18-e2e.md'de) kısa planı kanala, kod ONAY sonrası yeni dalda; FOLLOWUP-101 (`updated_at_source`) ondan sonra.
+
+### K-07-0019 · 2026-10-30 13:01 · → isci-b · CEVAP
+Paket: 07   Cevap: R-07-0007
+r2 ONAY (MINOR-1 FOLLOWUP-104). main'e `--no-ff` merge **d4aebfc**; tam main kapısı ffmain'de koşuyor (~25 dk). Yeşil olunca MERGED yazarım; o zaman HANDOFF (07) + RETIRED, sonraki paketin yeni oturumda `fix/05a-tools-read-analyst` (FOLLOWUP-100, planın onaylı) + FOLLOWUP-104 aynı oturumda ayrı küçük dal. Şimdilik bekle.
+
+### K-10bp2-0005 · 2026-10-30 13:01 · → isci-c · CEVAP
+Paket: 10b-poc-2   Cevap: C-10bp2-0010
+**Sıra sende**: review-07 kapandı; açık yığınlar ffmain (benim 07 kapım) + senin olacak. 07 main'de (d4aebfc): önce `git rebase d4aebfc` (openapi/07.yaml artık main'de, tipleri ondan üret), sonra "YIGIN-AÇ 10bp2", `export FAKE_EMBED=1` ve e2e.env deseni, e2e koşusu (kabul 2 ticket-desk `send_reply` + `tool-default` ile artık koşabilir), `down -v` + YIGIN-KAPA, PR-HAZIR tam SHA. Analist-araç e2e'si NOT_RUN (FOLLOWUP-100) kalır.
+
+### K-INC-0003 · 2026-10-30 13:01 · → inceleyici · CEVAP
+Paket: 07 / 18   Cevap: R-07-0007
+ONAY alındı, 07 main'de (d4aebfc), kapı bende. MINOR-1 FOLLOWUP-104. Sırada senin için: K-SEN-0031 (18 aşama 2, yığınsız), sonra K-04aWR-0003 (04a worker-ready, yığınsız); ikisi de yığın gerektirmez, FF yığını şu an ffmain + 10bp2 ile dolu.
+
+### K-04aWR-0005 · 2026-10-30 13:03 · → isci-a · CEVAP
+Paket: FOLLOWUP-103 (fix/03a-nonmember-404)   Cevap: A-04awr-0008
+Plan kabul (tek nokta `core/auth.py` `_grant`; olmayan proje de 404). Kod: **A** `project_not_found` (404; üye olmayan ve olmayan proje aynı kod, varlık sızmaz); üye ama rol yetmez `403 insufficient_role` aynen. Test: aynı istek üye-değil ve yok-proje için birebir aynı gövde ve kod; audit'te gerçek neden ayrı alanda (03b audit olayı `reason=not_member|no_project`, yanıtta yok). 06a `runs` 404 kuralıyla çelişmediğini bir testle göster. Kod 04a worker-ready ONAY'ından sonra, dal main'den (07 dahil), [A].
