@@ -1,0 +1,238 @@
+ Network af_default  Creating
+ Network af_default  Created
+ Volume "af_langfuse_postgres_data"  Creating
+ Volume "af_langfuse_postgres_data"  Created
+ Volume "af_langfuse_minio_data"  Creating
+ Volume "af_langfuse_minio_data"  Created
+ Volume "af_model_cache"  Creating
+ Volume "af_model_cache"  Created
+ Volume "af_knowledge_storage"  Creating
+ Volume "af_knowledge_storage"  Created
+ Volume "af_langfuse_clickhouse_data"  Creating
+ Volume "af_langfuse_clickhouse_data"  Created
+ Volume "af_langfuse_clickhouse_logs"  Creating
+ Volume "af_langfuse_clickhouse_logs"  Created
+ Volume "af_redis_data"  Creating
+ Volume "af_redis_data"  Created
+ Volume "af_postgres_data"  Creating
+ Volume "af_postgres_data"  Created
+FFFFFFFFFFF.                                                             [100%]
+=================================== FAILURES ===================================
+_______________ test_af_1_definition_error_codes[prompt_source] ________________
+
+client = <starlette.testclient.TestClient object at 0x7fe4fc3a0ec0>
+patch = {'system_prompt': None}, code = 'prompt_source'
+
+    @pytest.mark.parametrize(("patch", "code"), CASES, ids=[c for _, c in CASES])
+    def test_af_1_definition_error_codes(client, patch, code):
+        response = client.put("/definition", json={"definition": {**MINIMAL, **patch}})
+        assert response.status_code == 422, response.text
+        error = response.json()["error"]
+        assert error["type"] == "invalid_request_error"
+>       assert error["code"] == code
+E       AssertionError: assert 'validation_error' == 'prompt_source'
+E         
+E         - prompt_source
+E         + validation_error
+
+tests/unit/test_af_1_definition_error_codes.py:59: AssertionError
+_____________ test_af_1_definition_error_codes[variable_duplicate] _____________
+
+client = <starlette.testclient.TestClient object at 0x7fe4fc3a0ec0>
+patch = {'variables': [{'key': 'a', 'label': 'A'}, {'key': 'a', 'label': 'B'}]}
+code = 'variable_duplicate'
+
+    @pytest.mark.parametrize(("patch", "code"), CASES, ids=[c for _, c in CASES])
+    def test_af_1_definition_error_codes(client, patch, code):
+        response = client.put("/definition", json={"definition": {**MINIMAL, **patch}})
+        assert response.status_code == 422, response.text
+        error = response.json()["error"]
+        assert error["type"] == "invalid_request_error"
+>       assert error["code"] == code
+E       AssertionError: assert 'validation_error' == 'variable_duplicate'
+E         
+E         - variable_duplicate
+E         + validation_error
+
+tests/unit/test_af_1_definition_error_codes.py:59: AssertionError
+_____________ test_af_1_definition_error_codes[variable_undefined] _____________
+
+client = <starlette.testclient.TestClient object at 0x7fe4fc3a0ec0>
+patch = {'system_prompt': 'Hello {{who}}'}, code = 'variable_undefined'
+
+    @pytest.mark.parametrize(("patch", "code"), CASES, ids=[c for _, c in CASES])
+    def test_af_1_definition_error_codes(client, patch, code):
+        response = client.put("/definition", json={"definition": {**MINIMAL, **patch}})
+        assert response.status_code == 422, response.text
+        error = response.json()["error"]
+        assert error["type"] == "invalid_request_error"
+>       assert error["code"] == code
+E       AssertionError: assert 'validation_error' == 'variable_undefined'
+E         
+E         - variable_undefined
+E         + validation_error
+
+tests/unit/test_af_1_definition_error_codes.py:59: AssertionError
+____________ test_af_1_definition_error_codes[knowledge_duplicate] _____________
+
+client = <starlette.testclient.TestClient object at 0x7fe4fc3a0ec0>
+patch = {'knowledge': [{'kb_key': 'k', 'mode': 'always'}, {'kb_key': 'k', 'mode': 'always'}]}
+code = 'knowledge_duplicate'
+
+    @pytest.mark.parametrize(("patch", "code"), CASES, ids=[c for _, c in CASES])
+    def test_af_1_definition_error_codes(client, patch, code):
+        response = client.put("/definition", json={"definition": {**MINIMAL, **patch}})
+        assert response.status_code == 422, response.text
+        error = response.json()["error"]
+        assert error["type"] == "invalid_request_error"
+>       assert error["code"] == code
+E       AssertionError: assert 'validation_error' == 'knowledge_duplicate'
+E         
+E         - knowledge_duplicate
+E         + validation_error
+
+tests/unit/test_af_1_definition_error_codes.py:59: AssertionError
+_______ test_af_1_definition_error_codes[knowledge_filter_not_supported] _______
+
+client = <starlette.testclient.TestClient object at 0x7fe4fc3a0ec0>
+patch = {'knowledge': [{'kb_key': 'k', 'mode': 'always', 'filter': {'scope': ['jira:X']}}]}
+code = 'knowledge_filter_not_supported'
+
+    @pytest.mark.parametrize(("patch", "code"), CASES, ids=[c for _, c in CASES])
+    def test_af_1_definition_error_codes(client, patch, code):
+        response = client.put("/definition", json={"definition": {**MINIMAL, **patch}})
+        assert response.status_code == 422, response.text
+        error = response.json()["error"]
+        assert error["type"] == "invalid_request_error"
+>       assert error["code"] == code
+E       AssertionError: assert 'validation_error' == 'knowledge_fi...not_supported'
+E         
+E         - knowledge_filter_not_supported
+E         + validation_error
+
+tests/unit/test_af_1_definition_error_codes.py:59: AssertionError
+_______________ test_af_1_definition_error_codes[tool_duplicate] _______________
+
+client = <starlette.testclient.TestClient object at 0x7fe4fc3a0ec0>
+patch = {'tools': [{'tool_key': 'mcp-sql', 'actions': ['run_sql']}, {'tool_key': 'mcp-sql', 'actions': ['run_sql']}]}
+code = 'tool_duplicate'
+
+    @pytest.mark.parametrize(("patch", "code"), CASES, ids=[c for _, c in CASES])
+    def test_af_1_definition_error_codes(client, patch, code):
+        response = client.put("/definition", json={"definition": {**MINIMAL, **patch}})
+        assert response.status_code == 422, response.text
+        error = response.json()["error"]
+        assert error["type"] == "invalid_request_error"
+>       assert error["code"] == code
+E       AssertionError: assert 'validation_error' == 'tool_duplicate'
+E         
+E         - tool_duplicate
+E         + validation_error
+
+tests/unit/test_af_1_definition_error_codes.py:59: AssertionError
+__________ test_af_1_definition_error_codes[approval_action_unknown] ___________
+
+client = <starlette.testclient.TestClient object at 0x7fe4fc3a0ec0>
+patch = {'tools': [{'tool_key': 'mcp-sql', 'actions': ['run_sql']}], 'approval': {'actions': ['mcp-sql.drop']}}
+code = 'approval_action_unknown'
+
+    @pytest.mark.parametrize(("patch", "code"), CASES, ids=[c for _, c in CASES])
+    def test_af_1_definition_error_codes(client, patch, code):
+        response = client.put("/definition", json={"definition": {**MINIMAL, **patch}})
+        assert response.status_code == 422, response.text
+        error = response.json()["error"]
+        assert error["type"] == "invalid_request_error"
+>       assert error["code"] == code
+E       AssertionError: assert 'validation_error' == 'approval_action_unknown'
+E         
+E         - approval_action_unknown
+E         + validation_error
+
+tests/unit/test_af_1_definition_error_codes.py:59: AssertionError
+____________ test_af_1_definition_error_codes[verify_not_supported] ____________
+
+client = <starlette.testclient.TestClient object at 0x7fe4fc3a0ec0>
+patch = {'answer_rules': {'verify': True}}, code = 'verify_not_supported'
+
+    @pytest.mark.parametrize(("patch", "code"), CASES, ids=[c for _, c in CASES])
+    def test_af_1_definition_error_codes(client, patch, code):
+        response = client.put("/definition", json={"definition": {**MINIMAL, **patch}})
+        assert response.status_code == 422, response.text
+        error = response.json()["error"]
+        assert error["type"] == "invalid_request_error"
+>       assert error["code"] == code
+E       AssertionError: assert 'validation_error' == 'verify_not_supported'
+E         
+E         - verify_not_supported
+E         + validation_error
+
+tests/unit/test_af_1_definition_error_codes.py:59: AssertionError
+______ test_af_1_definition_error_codes[confidence_formula_not_supported] ______
+
+client = <starlette.testclient.TestClient object at 0x7fe4fc3a0ec0>
+patch = {'answer_rules': {'confidence_formula': 'sentence_max'}}
+code = 'confidence_formula_not_supported'
+
+    @pytest.mark.parametrize(("patch", "code"), CASES, ids=[c for _, c in CASES])
+    def test_af_1_definition_error_codes(client, patch, code):
+        response = client.put("/definition", json={"definition": {**MINIMAL, **patch}})
+        assert response.status_code == 422, response.text
+        error = response.json()["error"]
+        assert error["type"] == "invalid_request_error"
+>       assert error["code"] == code
+E       AssertionError: assert 'validation_error' == 'confidence_f...not_supported'
+E         
+E         - confidence_formula_not_supported
+E         + validation_error
+
+tests/unit/test_af_1_definition_error_codes.py:59: AssertionError
+__________ test_af_1_definition_error_codes[output_reserve_too_small] __________
+
+client = <starlette.testclient.TestClient object at 0x7fe4fc3a0ec0>
+patch = {'limits': {'output_tokens': 900}}, code = 'output_reserve_too_small'
+
+    @pytest.mark.parametrize(("patch", "code"), CASES, ids=[c for _, c in CASES])
+    def test_af_1_definition_error_codes(client, patch, code):
+        response = client.put("/definition", json={"definition": {**MINIMAL, **patch}})
+        assert response.status_code == 422, response.text
+        error = response.json()["error"]
+        assert error["type"] == "invalid_request_error"
+>       assert error["code"] == code
+E       AssertionError: assert 'validation_error' == 'output_reserve_too_small'
+E         
+E         - output_reserve_too_small
+E         + validation_error
+
+tests/unit/test_af_1_definition_error_codes.py:59: AssertionError
+_________ test_af_1_definition_error_codes[structured_output_invalid] __________
+
+client = <starlette.testclient.TestClient object at 0x7fe4fc3a0ec0>
+patch = {'structured_output': {'type': 'nonsense'}}
+code = 'structured_output_invalid'
+
+    @pytest.mark.parametrize(("patch", "code"), CASES, ids=[c for _, c in CASES])
+    def test_af_1_definition_error_codes(client, patch, code):
+        response = client.put("/definition", json={"definition": {**MINIMAL, **patch}})
+        assert response.status_code == 422, response.text
+        error = response.json()["error"]
+        assert error["type"] == "invalid_request_error"
+>       assert error["code"] == code
+E       AssertionError: assert 'validation_error' == 'structured_output_invalid'
+E         
+E         - structured_output_invalid
+E         + validation_error
+
+tests/unit/test_af_1_definition_error_codes.py:59: AssertionError
+=========================== short test summary info ============================
+FAILED tests/unit/test_af_1_definition_error_codes.py::test_af_1_definition_error_codes[prompt_source]
+FAILED tests/unit/test_af_1_definition_error_codes.py::test_af_1_definition_error_codes[variable_duplicate]
+FAILED tests/unit/test_af_1_definition_error_codes.py::test_af_1_definition_error_codes[variable_undefined]
+FAILED tests/unit/test_af_1_definition_error_codes.py::test_af_1_definition_error_codes[knowledge_duplicate]
+FAILED tests/unit/test_af_1_definition_error_codes.py::test_af_1_definition_error_codes[knowledge_filter_not_supported]
+FAILED tests/unit/test_af_1_definition_error_codes.py::test_af_1_definition_error_codes[tool_duplicate]
+FAILED tests/unit/test_af_1_definition_error_codes.py::test_af_1_definition_error_codes[approval_action_unknown]
+FAILED tests/unit/test_af_1_definition_error_codes.py::test_af_1_definition_error_codes[verify_not_supported]
+FAILED tests/unit/test_af_1_definition_error_codes.py::test_af_1_definition_error_codes[confidence_formula_not_supported]
+FAILED tests/unit/test_af_1_definition_error_codes.py::test_af_1_definition_error_codes[output_reserve_too_small]
+FAILED tests/unit/test_af_1_definition_error_codes.py::test_af_1_definition_error_codes[structured_output_invalid]
+11 failed, 1 passed in 1.44s

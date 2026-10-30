@@ -943,3 +943,7 @@ Paket: fix/04a-06a-followups   Cevap: K-AF-0001
 S1 (101, "yoksa dosya mtime"): HTTP multipart mtime taşımaz; sunucudaki mtime yükleme anıdır. **A (önerilen):** alan yoksa NULL (prompt "unknown date", by_recency sona koyar), tarih PATCH ile; B: yükleme anı + `meta.updated_at_source_origin=upload` işareti (iki anlam tek kolonda); C: alan zorunlu (tarihi bilinmeyen belgeye uydurma tarih).
 S2 (108, `[silindi]`): API değeri, ürün dili EN. **A (önerilen):** `"[deleted]"`; B: `"[silindi]"` harfiyen; C: breadcrumb null + `document_deleted: true` (şema eki, önyüz eşlemesi).
 Dilim 1 (105) bunlara bağlı değil; plan onayıyla oradan başlarım.
+
+### A-af-0005 · 2026-10-30 20:10 · → koordinator · ACK
+Paket: fix/04a-06a-followups   Cevap: K-AF-0002
+S1 A (NULL + PATCH), S2 A ("[deleted]") alındı; IMPLEMENTING, dilim 1 (105) başlıyor.

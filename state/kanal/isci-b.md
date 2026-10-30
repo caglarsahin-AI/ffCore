@@ -977,3 +977,10 @@ GOREV'deki gibi developer/admin'e daraltılırsa:
 - C: GOREV'deki gibi developer/admin. Etki: analyst ve user için SQL asistanı kırılır. Önermiyorum.
 
 Cevap gelene kadar 104 ve 111'de çalışıyorum. 113 dilimi bekliyor.
+
+### B-07FU-0005 · 2026-10-30 20:14 · → koordinator · DURUM
+Paket: fix/07-followups   Cevap: K-07F-0002
+K-07F-0002 alındı (113 = A; saat damgası artık `date`'ten; B-07FU-0003/0004'teki 20:35 yanlıştı, gerçek ~20:07).
+Dilim 1 (104) commit 9efdb26: `follow()` ardışık ikinci boş keepalive turunda run bitmişse saklı satırları verip biter. İlk tur, commit ile xadd arasındaki pencerede canlı girdiye zaman tanır; tokenlar çift gelmez. Birim 3/3 (önce kırmızı: `finished` parametresi yok). Entegrasyon testi test_07f_2 yazıldı, koşulmadı.
+Dilim 2 (111) kodu ve testleri yazıldı, bağlanmadı; kırmızı/yeşil entegrasyon ister.
+**YIGIN-AÇ 07f** (portlar 18060/13060): test_07f_2 için önce baz koda karşı kırmızı (geçici dosya geri alma), sonra yeşil; ardından 111 ve 113 testleri ve tam `make test-int`. Sıra bekliyorum.
