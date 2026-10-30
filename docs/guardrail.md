@@ -57,7 +57,7 @@ Two entities, both per project:
 | Type | Finds | Action |
 |---|---|---|
 | `pii` | categories enabled in the referenced PII policy (`pii_policy_key`) | the rule's action; without one, each category's action, else the PII policy's default action |
-| `secrets` | vendor keys (`sk-`, AWS, GitHub, Slack), JSON web tokens, private key blocks, connection strings with a password, values after a password keyword, high-entropy tokens (≥ 24 characters, ≥ 3.5 bits per character; UUIDs excluded) | required |
+| `secrets` | vendor keys (`sk-`, AWS, GitHub, Slack), JSON web tokens, private key blocks, connection strings with a password, values after a password keyword, high-entropy tokens (≥ 24 characters, ≥ 3.5 bits per character; UUIDs excluded, and names made of plain words and numbers such as `SZL-2025-003_temizlik-hizmet`: every `-`/`_` segment is digits, single-case letters or a tag of at most 3 characters), hex strings of 32+ characters with letters and digits | required |
 | `tool_args` | regex `patterns` in the arguments of `tools` (`<tool_key>.<action>`, wildcards allowed); `args` limits the search to named arguments of a JSON object | `block`, `warn` or `log`; only at `tool.pre` |
 
 `injection`, `topic`, `output_format` and `banned_words` are refused with
@@ -73,23 +73,29 @@ category_unsupported`. Nothing that looks enabled is silently ignored.
   is complete; the decision stays `block`.
 - `mode`: `off` evaluates nothing; `monitor` evaluates and records everything and applies nothing
   (measure on real traffic first); `enforce` applies. A new policy starts in `monitor`; switching
-  to `enforce` is an audited update (before and after state).
+  to `enforce` is an audited update (before and after state). A rule may set its own `mode`
+  (`monitor` or `enforce`); without one it follows the policy. Only enforce-mode rules change
+  the text or block; a monitor-mode rule only records.
 - `on_error`: a rule that fails (`block`, the default, is fail-closed) blocks the text; `allow`
   lets it through and records the failure.
 - Text longer than 200,000 characters is refused (`422 text_too_long`), never cut.
 
 ### Built-in default policy
 
-A project without a stored policy keyed `default` uses the built-in one (version 1, shown in the
+A project without a stored policy keyed `default` uses the built-in one (version 2, shown in the
 API with `builtin: true`):
 
-| Rule | Stages | Action |
-|---|---|---|
-| `secrets` | all text stages and `egress` | `block` |
-| `pii` (built-in PII policy) | `prompt.pre`, `input.pre`, `output.pre`, `tool.pre`, `tool.post` | `redact` |
-| `pii` (built-in PII policy) | `egress` | `tokenize` |
+| Rule | Stages | Action | Mode |
+|---|---|---|---|
+| `secrets` | all text stages and `egress` | `block` | policy (`monitor`) |
+| `pii` (built-in PII policy) | `prompt.pre`, `input.pre`, `output.pre`, `tool.pre`, `tool.post` | `redact` | policy (`monitor`) |
+| `pii` (built-in PII policy) | `egress` | `tokenize` | `enforce` |
 
-Mode `monitor`, so merging this package blocks no traffic. The built-in PII policy enables the
+The policy is `monitor`: it blocks and redacts nothing until an administrator stores an
+enforce policy. The egress rule is enforced regardless: with `GUARDRAIL_EGRESS_ENABLED=true`
+(llmaas) identifiers leave for an external provider only as placeholders, also in a project
+that set no policy. Version 1 kept the egress rule in monitor, so the provider received raw
+identifiers (plan/18 F4). The built-in PII policy enables the
 five regex categories that are on by default in the brief: `TR_NATIONAL_ID`, `TR_PHONE`,
 `TR_IBAN`, `EMAIL_ADDRESS`, `CREDIT_CARD`. `CVV` and `PIN` are on by default in the brief but
 need context-aware recognition; they arrive with 08 full. Storing a policy with key `default`

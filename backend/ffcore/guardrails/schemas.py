@@ -75,6 +75,9 @@ class Rule(_Spec):
     stages: list[Stage] = Field(min_length=1)
     params: dict = Field(default_factory=dict)
     pii_policy_key: str | None = None
+    # Additive (fix/08-default-egress-enforce): this rule's own mode; None follows the policy.
+    # The built-in policy is monitor with its egress PII rule enforce (K-SEN-0029).
+    mode: Literal["monitor", "enforce"] | None = None
 
 
 class ToolArgsParams(_Spec):

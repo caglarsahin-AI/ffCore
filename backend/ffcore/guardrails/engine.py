@@ -240,13 +240,14 @@ async def evaluate(
         if blocked and spec.short_circuit:
             break
         started = time.perf_counter()
+        mode = rule.mode or spec.mode  # a rule may carry its own mode (built-in egress PII)
         event = GuardrailEvent(
             policy_key=policy.key,
             stage=stage,
             rule=f"{rule.type}#{index}",
             action_taken="log",
             status="passed",
-            mode=spec.mode,
+            mode=mode,
             input_preview="",
             source=ctx.source,
             run_id=ctx.run_id,
@@ -280,7 +281,7 @@ async def evaluate(
             ]
             event.severity = max((s for _, _, s in hits), key=_SEVERITY_RANK.get, default=None)
             event.action_taken = "log" if action == "allow" else action
-            if spec.mode == "enforce" and hits:
+            if mode == "enforce" and hits:
                 if action == "block":
                     event.status, blocked = "failed", True
                 else:
@@ -302,7 +303,7 @@ async def evaluate(
             event.error = type(exc).__name__
             event.findings = [{"category": "rule_error", "evidence": type(exc).__name__}]
             event.action_taken = "block" if spec.on_error == "block" else "log"
-            if spec.on_error == "block":
+            if spec.on_error == "block" and mode == "enforce":  # monitor only records
                 blocked = True
                 applied.append("block")
         event.latency_ms = round((time.perf_counter() - started) * 1000, 3)
@@ -311,8 +312,7 @@ async def evaluate(
     for event, preview_ms in await asyncio.to_thread(_previews, pending, seen):
         event.latency_ms = round(event.latency_ms + preview_ms, 3)
 
-    if spec.mode == "monitor":
-        return Decision("allow", text, events)
+    # Only enforce-mode rules change the text or block; a monitor rule only records.
     if blocked:
         message = getattr(spec.block_message, ctx.locale, None) or spec.block_message.en
         return Decision("block", "", events, message=message, reference_id=uuid.uuid4().hex)

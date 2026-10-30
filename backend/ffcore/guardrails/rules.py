@@ -25,6 +25,13 @@ _VENDOR = (
         "JSON web token",
     ),
     ("API_TOKEN", r"-----BEGIN (?:RSA |EC |OPENSSH |DSA )?PRIVATE KEY-----", "private key block"),
+    # 32+ hex with letters and digits: below the entropy floor (hex tops out near 4 bits/char),
+    # so it gets its own pattern (K-SEN-0032).
+    (
+        "API_TOKEN",
+        r"\b(?=[0-9a-fA-F]*[a-fA-F])(?=[0-9a-fA-F]*[0-9])[0-9a-fA-F]{32,}\b",
+        "hex secret (32+ characters)",
+    ),
     (
         "PASSWORD",
         r"\b(?:postgres(?:ql)?|mysql|mongodb(?:\+srv)?|redis|amqp)://[^\s:@/]+:[^\s@/]+@",
@@ -39,6 +46,21 @@ _ASSIGNMENT = re.compile(
 )
 _TOKEN = re.compile(r"[A-Za-z0-9_\-+/=]{" + str(ENTROPY_MIN_CHARS) + ",}")
 _UUID = re.compile(r"[0-9a-fA-F]{8}-(?:[0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}")
+
+
+_SEGMENTS = re.compile(r"[-_]")
+
+
+def is_plain_identifier(value: str) -> bool:
+    """A name built from plain words and numbers (`SZL-2025-003_temizlik-hizmet`, a document
+    name in every SOURCES block): every `-`/`_` segment is digits, lowercase letters, uppercase
+    letters, or a short tag of at most 3 characters (`p4`, `v2`). A random token mixes letters
+    and digits inside long segments, so it is still checked (plan/18 F4 finding: document names
+    were taken for API tokens)."""
+    parts = [p for p in _SEGMENTS.split(value) if p]
+    return len(parts) > 1 and all(
+        p.isdigit() or len(p) <= 3 or (p.isalpha() and (p.islower() or p.isupper())) for p in parts
+    )
 
 
 def shannon_bits(value: str) -> float:
@@ -56,7 +78,12 @@ def find_secrets(text: str) -> list[Finding]:
         hits.append(Finding("PASSWORD", start, end, 0.9, "password keyword", m.group("value")))
     for m in _TOKEN.finditer(text):
         value = m.group(0)
-        if _UUID.fullmatch(value) or value.isdigit() or value.isalpha():
+        if (
+            _UUID.fullmatch(value)
+            or value.isdigit()
+            or value.isalpha()
+            or is_plain_identifier(value)
+        ):
             continue
         bits = shannon_bits(value)
         if bits >= ENTROPY_MIN_BITS:
