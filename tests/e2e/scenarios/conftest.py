@@ -36,7 +36,11 @@ def pytest_collection_modifyitems(config, items):
     if os.environ.get("RUN_E2E_SCENARIOS") == "1":
         return
     skip = pytest.mark.skip(reason="NOT_RUN: set RUN_E2E_SCENARIOS=1 (stack + seed.py)")
+    here = Path(__file__).resolve().parent
     for item in items:
+        # the hook sees the whole session's items: only this folder's stack tests are skipped
+        if here not in Path(item.fspath).resolve().parents:
+            continue
         if item.module.__name__.endswith(STACKLESS):
             continue
         item.add_marker(skip)
