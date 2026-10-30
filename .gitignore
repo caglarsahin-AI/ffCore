@@ -19,3 +19,5 @@ next-env.d.ts
 # Çalışma verisi (raw/silver katmanı, yerel modeller)
 data/storage/
 data/models/
+# 13b run results (make e2e, make eval): reports, not sources
+eval/results/

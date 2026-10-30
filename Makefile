@@ -3,7 +3,7 @@
 # Servisleri başlatma/durdurma doğrudan compose ile: docker compose up -d --wait | down | logs -f
 # Önyüz lint'i ayrı konteynerde: docker compose run --rm frontend npm run lint
 
-.PHONY: lint format test test-samples test-int seed test-models models models-check smoke pull seed-models render-litellm reindex langfuse-init seed-prompts seed-sql-demo seed-sql-context
+.PHONY: lint format test test-samples test-int seed e2e test-models models models-check smoke pull seed-models render-litellm reindex langfuse-init seed-prompts seed-sql-demo seed-sql-context
 
 lint:
 	ruff check backend scripts data/samples/scripts services
@@ -87,6 +87,14 @@ seed-sql-context:
 
 # 13b: the PoC demo and scenario data (plan/18 seed, tests/e2e/scenarios/seed.py), idempotent: a
 # second run reports "created 0, uploaded 0". Passwords come from the shell, never a file:
-#   docker compose --env-file .env.test --env-file tests/e2e/scenarios/e2e.env --profile test #     run --rm -e E2E_ADMIN_EMAIL -e E2E_ADMIN_PASSWORD -e E2E_PASSWORD tools make seed
+#   docker compose --env-file .env.test --env-file tests/e2e/scenarios/e2e.env --profile test #     run --rm -e E2E_ADMIN_EMAIL -e E2E_ADMIN_PASSWORD -e E2E_PASSWORD tools make seed e2e
 seed:
 	python -m tests.e2e.scenarios.seed
+
+# 13b: every API e2e test (plan/18 scenarios + tests/e2e/negative) against the seeded scenario
+# stack, with the F table (F1-F13, NOT_RUN reasons) written to eval/results/ (git-ignored). The
+# console's Playwright e2e is its own compose service (docker compose --profile e2e run --rm e2e;
+# tools has no Docker socket). Same compose command as `seed`, with -e E2E_PASSWORD.
+E2E_STAMP := $(shell date -u +%Y%m%d-%H%M)
+e2e:
+	RUN_E2E_SCENARIOS=1 pytest tests/e2e -rs --f-table eval/results/e2e-$(E2E_STAMP).md
