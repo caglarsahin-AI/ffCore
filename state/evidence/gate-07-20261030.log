@@ -12,3 +12,54 @@ build exit=0
 config exit=0
 
 === 13:01:45 up
+ Container ffmain-langfuse-web-1  Started
+ Container ffmain-langfuse-worker-1  Started
+ Container ffmain-litellm-1  Healthy
+service "migrate" didn't complete successfully: exit 1
+up exit=1
+ffmain-langfuse-web-1 Up About a minute (healthy)
+ffmain-langfuse-worker-1 Up About a minute
+ffmain-litellm-1 Up About a minute (healthy)
+ffmain-ticket-desk-1 Up About a minute (healthy)
+ffmain-langfuse-clickhouse-1 Up About a minute (healthy)
+ffmain-qdrant-1 Up About a minute (healthy)
+ffmain-langfuse-postgres-1 Up About a minute (healthy)
+ffmain-postgres-1 Up About a minute (healthy)
+ffmain-langfuse-minio-1 Up About a minute (healthy)
+ffmain-langfuse-redis-1 Up About a minute (healthy)
+ffmain-fake-llm-1 Up About a minute
+ffmain-redis-1 Up About a minute (healthy)
+
+=== 13:03:26 lint
+ruff check backend scripts data/samples/scripts services
+All checks passed!
+ruff format --check backend scripts data/samples/scripts services
+303 files already formatted
+lint exit=0
+
+=== 13:03:52 alembic heads
+03a_0001 (03a) (effective head)
+03b_0001 (03b) (head)
+04a_0001 (04a) (head)
+05a_0001 (05a) (head)
+06a_0001 (06a) (effective head)
+07_0001 (07) (head)
+08_0001 (08) (head)
+heads exit=0
+
+=== 13:04:44 make test llmaas
+........................................................................ [ 10%]
+........................................................................ [ 21%]
+........................................................................ [ 32%]
+........................................................................ [ 43%]
+........................................................................ [ 54%]
+........................................................................ [ 65%]
+........................................................................ [ 76%]
+........................................................................ [ 87%]
+........................................................................ [ 98%]
+............                                                             [100%]
+660 passed in 178.28s (0:02:58)
+test exit=0
+
+=== 13:08:12 make test airgap
+.......................................................................

@@ -1083,3 +1083,20 @@ MINOR-1: `state/pr/18-e2e.md` aşama 2 sonuç tablosunu (22/3/23) içermiyor; fa
 MINOR-2: `ensure_superadmin` "already exists" metin eşleşmesiyle hatayı yutuyor.
 Kanıt: seed ve e2e.env okundu (parola kabuktan, secret yok, overlay testi eşitliği tutuyor). Yığın açılmadı; 22/3/23 ve F4 bulgusu doğrulanmadı.
 K-INC-0003 henüz kanalda görünmüyor; 07 ONAY ve ffmain/10bp2 durumu ayrıca takip ediyorum.
+
+### R-SEN-0002 · 2026-10-30 13:03 · → koordinatör · CEVAP
+Paket: 18 aşama 2   Cevap: K-SEN-0033
+Kayıt konusu: FOLLOWUP-102/103 için "main'deki state/BLOCKERS.md" dedin. Kontrol ettim: çalışma ağacındaki `state/BLOCKERS.md` (branch main), `main` ve `d4aebfc` commit'lerinde FOLLOWUP-102 veya 103 yok. Ya yazılmadı ya da yazılı ama commit'lenmedi. Bu yüzden r1 bulgusunu "kayıt yok" olarak bıraktım; kaydın yerini bilmiyorum, doğrulamadım. Lütfen kaydı commit'leyip yerini (commit SHA) yaz; ben tekrar bakarım.
+Not: R-SEN-0001 MAJOR-1'deki ham PII bulgusu (commit mesajı, test_18_f4_1c) yine açık; kayıt doğrulanınca kapanır.
+
+### R-04AWR-0001 · 2026-10-30 13:08 · → koordinatör · REVIEW-SONUC
+Paket: fix/04a-worker-ready (FOLLOWUP-97)   Cevap: K-04aWR-0003
+04a worker-ready r1 **ONAY**. Tam SHA `3cecab486a37e9c68b1827f159f8bec95f05109d`; BLOCKER 0 · MAJOR 0 · MINOR 1. Rapor: `state/reviews/04a-worker-ready-r1.md`.
+Beş kontrol: ready protokolü sınırlı ve kill yolu değişmemiş; yeniden doğan işçi ready bekliyor; kırmızı kanıtı (5 failed eski kodda) ve duvar saati assertion'ı yok; .env.example ve compose satırı secret değil; yük altında 10/10 loglu.
+MINOR-1: test_04awr_5 zorunlu Settings alanlarını ortamdan bekliyor; .env.test olmadan 1 failed. Testi izole etmeli.
+Kanıt: `.env.test` ile convert testleri 29 passed (tools imajı, read-only worktree, --no-deps). Worktree kaldırılıyor.
+
+### R-SEN-0003 · 2026-10-30 13:08 · → koordinatör · CEVAP
+Paket: 18 aşama 2   Cevap: K-SEN-0033
+Düzeltme: R-SEN-0001'de "bulgu ağaçta kayıtlı değil" dedim; yanlıştı. Çalışma ağacındaki `state/pr/18-e2e.md` "Ürün bulguları" bölümünde 1. madde var: llmaas'ta politika tanımlamayan projede kişi verisi dış sağlayıcıya ham gidiyor, kırmızı test `test_18_f4_1c_builtin_default_does_not_leak_raw`. Bu dosya commit'lenmemiş; BLOCKERS kaydı (FOLLOWUP-102/103) hâlâ bulunamadı (R-SEN-0002). Bulgu ciddi; ayrı BLOCKERS kaydı ve sahibi (08/06a) gerekli.
+r2 için bu dosyayı ve yığın sonucunu bekliyorum.

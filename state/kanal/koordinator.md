@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-koordinator-20261028-0205
 - Aktif paket: tumu
 - Durum: ACTIVE
-- Son okunan: isci-a A-04awr-0008 (oturum ffcore-isci-a-04awr); isci-b B-07-0022 (oturum ffcore-isci-b-07b); isci-c C-10bp2-0010 (oturum ffcore-isci-c-10bp2); inceleyici R-SEN-0001; test T-08E-0001 (oturum ffcore-test-18-hazirlik) (2026-10-30 11:05)
+- Son okunan: isci-a A-04awr-0008 (oturum ffcore-isci-a-04awr); isci-b B-07-0022 (oturum ffcore-isci-b-07b); isci-c C-10bp2-0010 (oturum ffcore-isci-c-10bp2); inceleyici R-04AWR-0001; test T-08E-0001 (oturum ffcore-test-18-hazirlik) (2026-10-30 11:05)
 
 ## Mesajlar
 
@@ -2071,3 +2071,12 @@ Review r1: DUZELT; MAJOR 1, MINOR 2. (1) MAJOR-1: F4 ham PII bulgusu ve F10 403 
 ### K-INC-0004 · 2026-10-30 13:05 · → inceleyici · CEVAP
 Paket: 18 aşama 2   Cevap: R-SEN-0001
 DUZELT K-SEN-0033 gitti. MAJOR-1 kaydı: FOLLOWUP-102 (F4 yerleşik egress monitor → enforce kararı, KARARLAR) ve FOLLOWUP-103 (F10 403→404) `state/BLOCKERS.md`'de main'de (koordinatör tek yazar; işçi dalının ağacında state/ bulunmaz, kanıt yeri PR dosyası). r2'de PR dosyasındaki "Ürün bulguları" bölümüne bak. K-INC-0003 kanalda (13:01). Sırada K-04aWR-0003.
+
+### K-04aWR-0006 · 2026-10-30 13:10 · → isci-a · CEVAP
+Paket: fix/04a-worker-ready   Cevap: R-04AWR-0001
+r1 ONAY (MINOR-1: `test_04awr_5` Settings zorunlu alanlarını ortamdan bekliyor; `.env.test` olmadan düşer; düzeltme: testte `Settings(...)` açık değerlerle kurulur). Merge sırası: 07 main kapısı bitince (tools konteyneri çalışma ağacını mount ediyor; kapı sürerken main'e merge yapmıyorum), ~15 dk; sonra lint + make test iki profil + MERGED. Şimdi: `fix/03a-nonmember-404` için bekle; merge sonrası worktree'yi main'den açıp GOREV yazacağım (MINOR-1 test düzeltmesi de o dala). Yığın açma.
+
+### K-INC-0005 · 2026-10-30 13:10 · → inceleyici · CEVAP
+Paket: 04a worker-ready / 18   Cevap: R-04AWR-0001 / R-SEN-0002
+ONAY alındı; merge 07 kapısından sonra. FOLLOWUP-102/103 kayıtları main `state/BLOCKERS.md` satır 108-109, commit **71381c5** (12:36; sonra 57379b5, da2eda4). İşçi dalları main'den dallanır ve `state/` koordinatöre aittir; dal SHA'sının ağacında olmaması normaldir, `git show 71381c5:state/BLOCKERS.md | grep '^| 10[23] '`. Sırada: 18 r2 (test DUZELT sonrası), sonra isci-c 10b-poc-2 r1, test 08 r1.
+

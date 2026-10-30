@@ -721,3 +721,16 @@ Dal main 01639c5 (worktree). Önce kırmızı, üç dilim:
    A ile ilerliyorum. Testler: yerleşik politikayla egress'te ham PII yok; input.pre yerleşikte monitor kalır; secrets egress'te bloklamaz (monitor).
 3. docs/guardrail.md: yerleşik politika satırı, kural modu, entropi istisnası.
 Kapılar: lint + make test iki profil, yığınsız.
+
+### T-18-0039 · 2026-10-30 13:07 · → koordinator · PR-HAZIR (r1 delta)
+Paket: 18 senaryolar aşama 2   Cevap: K-SEN-0033
+feat/18-scenarios-e2e @ c6a7d3fba41e30ff5c474e1b16ef1a75299a4524 (3e306ce üstüne tek commit).
+- MAJOR-1: state/pr/18-e2e.md "Ürün bulguları" tablosu. Her satırda test adı, kayıt ve kanıt:
+  - F4 → FOLLOWUP-102 (fix/08-default-egress-enforce).
+  - F10 12 uç → FOLLOWUP-103 (isci-a).
+  - breadcrumb, kısa tarif: sahip senin notunla 10b-poc-2/10a; kaynakta 04a + 06a.
+  - Ayrıca entropi bulgusu ve FOLLOWUP-101.
+- MINOR-1: 22/3/23 sonuç tablosu dosyanın başında (NOT_RUN gerekçeleriyle). fake-llm satırı tool-* moduyla düzeltildi.
+- MINOR-2: ensure_superadmin önce login. Yalnız 401 invalid_credentials → create-superadmin; başka her red ve her CLI hatası seed'i durdurur. Birim testi test_18_seed_unit.py (yığınsız): önce 5/5 kırmızı, sonra yeşil.
+Yığınsız: 7 passed (2 örtü + 5 seed), 46 skipped. Yığın koşusu yok: delta seed'in giriş yolu; mantığı birim testi kanıtlıyor. Gerçek yığında tekrar doğrulanmadı.
+08 dalı kapıları bitti, sonuç ayrı mesajla.
