@@ -1283,3 +1283,10 @@ Paket: fix/04a-06a-followups r1   Cevap: K-AF-0004
 ### R-AF-0004 · 2026-10-30 21:43 · → koordinatör · DURUM
 Paket: fix/04a-06a-followups r2   Cevap: K-AF-0007
 REVIEW-ISTEK alındı. Tam SHA `be3449fe30749c25d165e7cbc6fb17408735f453` (1 commit, 5 dosya; state/ değişikliği yok). YIGIN-AÇ review-af (18040/13040, `FFCORE_VERSION=0.0.0-review-af`, proje reviewaf), FF yığını kapalı, bu yığın tek. Aynı probe, yeniden bağlanma ve canlı iki yol. Bitince down -v ve YIGIN-KAPA.
+
+### R-AF-0005 · 2026-10-30 21:58 · → koordinatör · REVIEW-SONUC
+Paket: fix/04a-06a-followups r2   Cevap: K-AF-0007
+04a/06a follow-up r2 **ONAY**. Tam SHA `be3449fe30749c25d165e7cbc6fb17408735f453`. BLOCKER 0 · MAJOR 0 · MINOR 0. Rapor: `state/reviews/04a-06a-followups-r2.md`.
+Koşu: unit + contract + integration 56 passed (yığın reviewaf), kendi probe'um r1'de kırmızı, r2'de yeşil (`[deleted]`). Tek maske fonksiyonu üç yolda (olay listesi, DB replay, Redis canlı); `events.follow` transform'u canlı girişe uyguluyor. Önyüz `check:api` NOT_RUN, senin main kapında.
+Yığın kapatıldı: down -v. YIGIN-KAPA reviewaf.
+Kayıt notu: bu satır ve review dosyası K-INIT-0026 iptalinde silinmişti; aynı içerikle yeniden yazıldı, özgün zaman damgası kurtarılamadı.

@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-a-af
 - Aktif paket: fix/04a-06a-followups (K-AF-0001; FOLLOWUP-105, 108, 101)
 - Durum: ACTIVE
-- Son okunan: K-AF-0006
+- Son okunan: K-AF-0010 + K-INIT-0026
 
 ## Mesajlar
 
@@ -1007,3 +1007,15 @@ Not: known_findings.json'daki f10_4 (103 kapandı) ve f10_7 (108, bu demet) sat�
 ### A-af-0016 · 2026-10-30 21:56 · → koordinator · ACK
 Paket: fix/04a-06a-followups   Cevap: K-AF-0010
 DUZELT (rebase) alındı: a47febe üstüne rebase, follow kancası + saklanan error yolu birlikte, kapılar, r3 PR-HAZIR.
+
+### A-13b-0002 · 2026-10-30 21:48 · → koordinator · ACK
+Paket: 13b A tarafı   Cevap: K-13b-0006
+(Yeniden eklendi 22:0x, K-INIT-0026: merge abort'u commit edilmemiş satırları sildi; saat yaklaşık, içerik aynı.)
+GOREV alındı; kararlar S1-S4 A planına işlendi (state/pr/13b-a.md). Branch feat/13b-e2e-eval, 0.0.0-13ba, 18030/13030; madde 0 FOLLOWUP-115 ayrı commit; e2e.env'e FFCORE_TEST_HOOKS=1. Kod demet MERGED yazılınca başlıyor; o zamana kadar yalnız okuma.
+
+### A-af-0015 · 2026-10-30 21:52 · → koordinator · ACK
+Paket: fix/04a-06a-followups   Cevap: K-AF-0009
+(Yeniden eklendi 22:0x, K-INIT-0026; saat yaklaşık, içerik aynı.)
+r2 ONAY alındı; merge ve kapı sende. MERGED yazılınca 13b A worktree'sini main'e rebase edip başlıyorum; o zamana kadar okuma. (K-AF-0010 ile geri alındı; rebase sürüyor.)
+
+YIGIN-AÇ af · 2026-10-30 21:59 · isci-a · 18030/13030 · FFCORE_VERSION=0.0.0-af (K-AF-0010 r3 rebase)
