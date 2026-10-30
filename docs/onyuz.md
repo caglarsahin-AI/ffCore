@@ -121,8 +121,7 @@ no-hard-coded-colour rule covers components only.
   `lib/api/schema.d.ts` is generated from it. `npm run gen:api` refreshes both, `npm run
   check:api` fails on drift. No API type is written by hand. 04a, 05a and 06a types
   (`lib/api/schema-{04a,05a,06a}.d.ts`) are generated straight from `backend/openapi/*.yaml`.
-  The 07 approval types in `lib/api/approvals-queries.ts` mirror the 07 branch until
-  `backend/openapi/07.yaml` is merged; they are then generated like the others.
+  07 approval types (`lib/api/schema-07.d.ts`) likewise.
 - **Errors.** Every 4xx carries `{error: {message, type, code}}`. `lib/api/errors.ts` maps codes
   to messages (`read_only_access`, `insufficient_role`, `cross_origin_forbidden`,
   `obo_project_scope`, ...); an unknown code shows the generic message with the code and backend
@@ -319,3 +318,4 @@ LiteLLM's `/model/info`; the key goes only in a header. CI runs the same command
 | Runs | ![](images/10bp2-runs-light.png) | ![](images/10bp2-runs-dark.png) |
 | Run detail | ![](images/10bp2-run-detail-light.png) | ![](images/10bp2-run-detail-dark.png) |
 | Approvals | ![](images/10bp2-approvals-light.png) | ![](images/10bp2-approvals-dark.png) |
+| Approval detail | ![](images/10bp2-approval-detail-light.png) | ![](images/10bp2-approval-detail-dark.png) |

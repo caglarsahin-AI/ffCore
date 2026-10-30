@@ -2,15 +2,15 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 import type { Page } from "@playwright/test";
 
-import { chatModel, createAgent, enableAction, registerTicketDesk, runViaApi } from "./agents";
+import { approvalAgent, chatModel, createAgent, enableAction, registerTicketDesk, runViaApi } from "./agents";
 import type { Agent, Tool } from "./agents";
 import { fixture } from "./fixtures";
 import { THEMES, selectProject, signIn, useTheme } from "./support";
 
 // The 10b-poc-2 screens in both themes with real data: screenshots for the PR and docs/onyuz.md,
-// and WCAG 2 A/AA (contrast included) with axe. The approval detail needs a waiting approval and
-// joins this list after fix/fake-llm-tool-mode (K-10bp2-0004).
-type Data = { tool: Tool; agent: Agent; runId: string };
+// and WCAG 2 A/AA (contrast included) with axe. The approval detail uses a run of the tool model
+// that waits for its approval (fake-llm tool-default).
+type Data = { tool: Tool; agent: Agent; runId: string; approvalAgentKey: string };
 const SCREENS: { name: string; open: (page: Page, d: Data) => Promise<unknown> }[] = [
   { name: "tools", open: (page) => page.goto("/tools") },
   { name: "tool-detail", open: (page, d) => page.goto(`/tools/${d.tool.id}`) },
@@ -25,6 +25,14 @@ const SCREENS: { name: string; open: (page: Page, d: Data) => Promise<unknown> }
   { name: "runs", open: (page) => page.goto("/runs") },
   { name: "run-detail", open: (page, d) => page.goto(`/runs/${d.runId}`) },
   { name: "approvals", open: (page) => page.goto("/approvals") },
+  {
+    name: "approval-detail",
+    open: async (page) => {
+      await page.goto("/approvals");
+      await page.getByTestId("approval-table").locator("tbody tr").first().getByRole("link").click();
+      await expect(page.getByTestId("approval-arguments")).toBeVisible();
+    },
+  },
 ];
 
 let data: Data;
@@ -38,7 +46,9 @@ test.beforeAll(async () => {
     system_prompt: "Say hello.",
     tools: [{ tool_key: tool.key, actions: ["list_tickets"] }],
   });
-  data = { tool, agent, runId: await runViaApi(alpha.id, agent.key, "Hello?") };
+  const waiting = await approvalAgent(alpha.id);
+  await runViaApi(alpha.id, waiting.agent.key, "Please answer ticket tkt-001.");
+  data = { tool, agent, runId: await runViaApi(alpha.id, agent.key, "Hello?"), approvalAgentKey: waiting.agent.key };
 });
 
 for (const screen of SCREENS) {

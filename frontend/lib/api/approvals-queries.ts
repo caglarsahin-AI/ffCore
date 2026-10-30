@@ -4,31 +4,14 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { api } from "@/lib/api/client";
 
-// Approval queue calls (07). TEMPORARY TYPES: backend/openapi/07.yaml arrives with the 07 PR
-// (K-10bp2-0002); until then these mirror feat/07-approvals api/approvals_schemas.py field for
-// field. When the spec lands they are replaced by `components` from lib/api/schema-07.d.ts and
-// the spec joins check:api (PR note; no PR-HAZIR before that).
-export type ApprovalStatus = "pending" | "approved" | "rejected" | "expired";
-export type ApproverRole = "analyst" | "developer" | "admin";
-export type Approval = {
-  id: string;
-  project_id: string;
-  run_id: string;
-  tool_call_id: string;
-  action: string;
-  tool_key: string | null;
-  arguments: Record<string, unknown>;
-  reason_from_model: string | null;
-  status: ApprovalStatus;
-  assigned_role: ApproverRole;
-  requested_at: string;
-  expires_at: string;
-  resolved_at: string | null;
-  resolved_by: string | null;
-  resolution_note: string | null;
-  can_decide: boolean;
-};
-export type ApprovalDecided = Approval & { stream_after: string | null };
+import type { components } from "@/lib/api/schema-07";
+
+// Approval queue calls (07 contract, types generated from backend/openapi/07.yaml).
+type S = components["schemas"];
+export type ApprovalStatus = S["ApprovalStatus"];
+export type ApproverRole = S["ApproverRole"];
+export type Approval = S["ApprovalOut"];
+export type ApprovalDecided = S["ApprovalDecided"];
 export type Decision = "approve" | "reject";
 
 export const APPROVAL_STATUSES = ["pending", "approved", "rejected", "expired"] as const satisfies readonly ApprovalStatus[];
@@ -46,7 +29,7 @@ export const approvalKeys = {
 export function useApprovals(projectId: string, status: ApprovalStatus | null) {
   return useQuery({
     queryKey: approvalKeys.list(projectId, status),
-    queryFn: () => api<{ data: Approval[] }>("GET", `${base(projectId)}${status ? `?status=${status}` : ""}`).then((r) => r.data),
+    queryFn: () => api<S["ApprovalList"]>("GET", `${base(projectId)}${status ? `?status=${status}` : ""}`).then((r) => r.data),
     refetchInterval: status === "pending" ? APPROVALS_POLL_MS : false,
   });
 }
@@ -55,7 +38,7 @@ export function useApprovals(projectId: string, status: ApprovalStatus | null) {
 export function usePendingApprovalCount(projectId: string | null, enabled: boolean) {
   return useQuery({
     queryKey: approvalKeys.count(projectId ?? "none"),
-    queryFn: () => api<{ status: ApprovalStatus; count: number }>("GET", `${base(projectId!)}/count?status=pending`).then((r) => r.count),
+    queryFn: () => api<S["ApprovalCount"]>("GET", `${base(projectId!)}/count?status=pending`).then((r) => r.count),
     enabled: enabled && projectId !== null,
     refetchInterval: APPROVALS_POLL_MS,
   });

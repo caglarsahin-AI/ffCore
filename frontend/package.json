@@ -10,7 +10,7 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:e2e": "playwright test",
-    "gen:api": "cp ../backend/openapi/03a.yaml mocks/openapi-03a.yaml && openapi-typescript mocks/openapi-03a.yaml -o lib/api/schema.d.ts && openapi-typescript ../backend/openapi/04a.yaml -o lib/api/schema-04a.d.ts && openapi-typescript ../backend/openapi/05a.yaml -o lib/api/schema-05a.d.ts && openapi-typescript ../backend/openapi/06a.yaml -o lib/api/schema-06a.d.ts",
+    "gen:api": "cp ../backend/openapi/03a.yaml mocks/openapi-03a.yaml && openapi-typescript mocks/openapi-03a.yaml -o lib/api/schema.d.ts && openapi-typescript ../backend/openapi/04a.yaml -o lib/api/schema-04a.d.ts && openapi-typescript ../backend/openapi/05a.yaml -o lib/api/schema-05a.d.ts && openapi-typescript ../backend/openapi/06a.yaml -o lib/api/schema-06a.d.ts && openapi-typescript ../backend/openapi/07.yaml -o lib/api/schema-07.d.ts",
     "check:api": "node scripts/check-api.mjs"
   },
   "dependencies": {
