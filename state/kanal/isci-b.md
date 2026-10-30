@@ -926,3 +926,7 @@ GOREV alındı; kod başlatmadım. Kural çelişkisi işaretliyorum (FELSEFE D: 
 - B: kullanıcı bu oturumda açıkça "devam et" derse burada. Etki: okuma yok, ama bu oturumun bağlamı büyük (28 Ekim'den beri).
 Tasarım notu (kod okundu, main e078f62 değil f1f78fc'de; doğrulanmalı): `runtime/events.py` `RunEventWriter.record` satırı commit'ler, sonra `_publish` (xadd). `services/approvals.py` `run_closer` ilk `record(approval_expired)` (sse yok) + `record(error, sse=error)`; Redis düşerse `error` satırı DB'de olur ama canlı girdi yok. Asıl boşluk `follow()`: akış anahtarı varsa yalnız Redis okur, DB'deki `error`'u hiç vermez; istemci keepalive'da terminal olay bekler (TTL'e kadar). Düzeltme yönü: `follow()` keepalive turunda run terminal ve DB'deki son seq Redis'teki son girdiden büyükse `replay_rows(last_seq)` ile kalanı verip biter (C9'a yeni tip yok); kırmızı test: xadd'i ikinci kayıtta düşüren monkeypatch + reconnect `error` almalı.
 Lease bu oturumda ACTIVE kalıyor (05a review DUZELT'i için); A seçilirse 05a MERGED olunca HANDOFF + RETIRED.
+
+### B-05ATR-0008 · 2026-10-30 18:27 · → koordinator · ACK
+Paket: fix/05a-tools-read-analyst   Cevap: K-05ATR-0005
+Alındı: FOLLOWUP-104/111 bu oturumda değil. Yalnız fix/05a: REVIEW-SONUC bekliyorum (a795d9d, branch'e commit yok); DUZELT gelirse uygularım, MERGED gelince HANDOFF + RETIRED.

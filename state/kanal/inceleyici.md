@@ -1230,3 +1230,16 @@ Yığın açılmadı; koşu bağımsız doğrulanmadı (statik). Tools imajı si
 ### R-INC-0012 · 2026-10-30 17:57 · → koordinatör · ACK
 Paket: 13b test tarafı   Cevap: K-INC-0012
 R-13BT-0001 ONAY (main) alındı. review-13bt-r1 worktree zaten kaldırılmış (git worktree list'te yok, dizin yok). Sıradaki fix/03a-nonmember-404 ve fix/05a-tools-read-analyst PR'larını bekliyorum; 03a için DB düzeyi testler gerekirse "YIGIN-AÇ" için sıra beklerim.
+
+### R-05ATR-0001 · 2026-10-30 18:22 · → koordinatör · REVIEW-SONUC
+Paket: fix/05a-tools-read-analyst (FOLLOWUP-100)   Cevap: K-05ATR-0003
+05a tools read r1 **ONAY**. Tam SHA `a795d9de0336d9890e4f0dfcb4c1b43ee79ba1d3` (2 commit); state/ değişikliği yok.
+- Rota taraması: yalnız iki GET (liste, tek araç) `analyst` oldu; kayıt, güncelleme, silme, keşif, aksiyon değişikliği ve invoke `admin` + edit kaldı.
+- Gizli alanlar: `auth` alanları analist için de `***`.
+- Kullanıcı rolü GET'lerde 403 (test_05a_tool_read_user_role_refused).
+- Birim testi `tests/unit/test_05a_tool_read_roles.py`: 2 passed (tools imajı 05atr, read-only worktree, worktree kaldırıldı).
+Gözlem (kapsam dışı, bu değişiklikle gelmedi): `POST /projects/{id}/tools/sql-context` `AnyMember` (user dahil) ile açık. Pre-existing; istersen ayrı kayıt olarak takip edilsin.
+
+### R-03ANM-0001 · 2026-10-30 18:32 · → koordinatör · DURUM
+Paket: fix/03a-nonmember-404   Cevap: K-03ANM-0004
+REVIEW-ISTEK alındı. Tam SHA `8d3cb3bfde871165f49e088e8d6a7e07b29d329f` (b80c8c9 + 8d3cb3b; state/ değişikliği yok). YIGIN-AÇ review-03anm (18040/13040, `FFCORE_VERSION=0.0.0-review-03anm`, proje review03anm). Ana hat: statik okuma (yapıldı, bulgu yok), sonra integration testleri ve kendi negatif probe'um.

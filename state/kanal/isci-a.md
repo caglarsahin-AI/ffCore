@@ -896,3 +896,19 @@ Paket: fix/03a-nonmember-404   Cevap: K-03ANM-0001
 YIGIN-AÇ 03anm talebi (sıra bekliyorum): `FFCORE_VERSION=0.0.0-03anm`, `BACKEND_PORT=18030 FRONTEND_PORT=13030`, `--profile test --profile qdrant`. Amaç: yeni testin kırmızı kanıtı (main kodu), düzeltme sonrası yeşil + etkilenen entegrasyon testleri + make test-int. Bu arada kod düzeltmesi ve birim/lint yığınsız.
 
 YIGIN-AÇ 03anm · 2026-10-30 17:52 · isci-a · 18030/13030 · FFCORE_VERSION=0.0.0-03anm (K-03ANM-0002)
+YIGIN-KAPA 03anm · 2026-10-30 18:30 · down -v exit 0, konteyner 0, volume 0
+
+### A-03anm-0004 · 2026-10-30 18:30 · → koordinator · DURUM
+Paket: fix/03a-nonmember-404 (FOLLOWUP-103)   Cevap: K-03ANM-0002
+DURUM: VERIFIED. HEAD 8d3cb3bfde871165f49e088e8d6a7e07b29d329f (main f1f78fc üstüne 2 commit: b80c8c9 kırmızı test, 8d3cb3b düzeltme). Kırmızı (b80c8c9): 72 failed / 2 passed, parametrik 69/69 hepsi 403 insufficient_role. Kapılar: make lint 0; make test llmaas 696/696, airgap 696/696; make test-int 8d3cb3b 516 passed / 4 skipped (opt-in), exit 0. Çıktılar state/pr/03a-nonmember-404-kapilar/ (tee).
+Not 1: ilk test-int'te 4 düşüş: 03a OBO üye olmayan süper admin ve 07 outsider (beklenti 403 → 404, karar A); 08_19/08_6 paylaşımlı DB'de audit satırını yalnız eylem adıyla sayıyordu, yeni test artık audit'lenen 404 retleri ürettiği için sayım kayıyordu → conftest `audit_rows(..., project=None)` additive filtre, 08 testleri kendi projesine daraltıldı. Gevşetme yok.
+Not 2: tenant ucu DELETE /projects/{id} süper admin olmayana var/yok proje için birebir aynı 403 veriyor (sızıntı yok); testte açık istisna. OpenAPI değişmedi (404 zaten ERROR_RESPONSES'ta), yaml'lar bayt aynı.
+Not 3: A-03anm-0002/0003 saat damgaları 17:58/18:00 yazılmış, gerçek 17:49/17:50; içerik doğru.
+
+### A-03anm-0005 · 2026-10-30 18:30 · → koordinator · KAYIT-TALEBI
+Paket: fix/03a-nonmember-404   Cevap: -
+Tür: FOLLOWUP-. Önyüz `frontend/lib/api/errors.ts`'te `project_not_found` için mesaj anahtarı yok; bu kodu alan ekran genel hata + kod gösterir. Önceden yalnız süper admin/olmayan projede görülürdü, artık her üye olmayan çağıranda. Öneri: bir sonraki önyüz dalında `project_not_found` eşlemesi (en/tr) ve proje bağlamında "proje yok ya da erişiminiz yok" durumu. Touch-zone'um dışı, dokunmadım.
+
+### A-03anm-0006 · 2026-10-30 18:30 · → koordinator · PR-HAZIR
+Paket: fix/03a-nonmember-404 (FOLLOWUP-103)   Cevap: K-03ANM-0002
+PR: C:\ai_paycore\ffcore\state\pr\03a-nonmember-404.md · Branch fix/03a-nonmember-404 · Worktree .worktrees/fix/03a-nonmember-404 · Baz main f1f78fc · SHA 8d3cb3bfde871165f49e088e8d6a7e07b29d329f · Sınıf [A] · push yok. 12 dosya (1 kod, 10 test, docs/api.md). Yığın kapalı; review yığın isterse komutlar PR dosyasında. Branch'e başka commit atmıyorum.

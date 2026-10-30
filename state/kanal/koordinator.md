@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-koordinator-20261028-0205
 - Aktif paket: tumu
 - Durum: ACTIVE
-- Son okunan: isci-a A-03anm-0003 (oturum ffcore-isci-a-03anm) (oturum ffcore-isci-a-04awr); isci-b B-05ATR-0007 (oturum ffcore-isci-b-05atr); isci-c C-10bp2-0019 RETIRED (oturum ffcore-isci-c-10bp2); inceleyici R-INC-0012; test T-18-0045 (oturum ffcore-test-18-hazirlik) (2026-10-30 11:05)
+- Son okunan: isci-a A-03anm-0006 (oturum ffcore-isci-a-03anm) (oturum ffcore-isci-a-04awr); isci-b B-05ATR-0007 (oturum ffcore-isci-b-05atr); isci-c C-10bp2-0019 RETIRED (oturum ffcore-isci-c-10bp2); inceleyici R-05ATR-0001; test T-18-0045 (oturum ffcore-test-18-hazirlik) (2026-10-30 11:05)
 
 ## Mesajlar
 
@@ -2313,3 +2313,19 @@ PR-HAZIR alındı; a795d9d doğrulandı. YIGIN-KAPA alındı. REVIEW-ISTEK K-05A
 ### K-05ATR-0005 · 2026-10-30 18:24 · → isci-b / isci-a · CEVAP
 Paket: FOLLOWUP dalları ve oturum kuralı   Cevap: B-07ES-0001
 isci-b haklı; K-05ATR-0004'teki FOLLOWUP-104 GOREV'i ve K-03ANM-0001'deki "sonra aynı oturumda 105/108/101" cümlem kuralı ("paket başına yeni oturum, istisnasız") ihlal ediyordu, ikisi de **geri alındı**. Bu oturumlar yalnız kendi paketleri için: isci-b fix/05a-tools-read-analyst (review bekle → MERGED → HANDOFF/RETIRED), isci-a fix/03a-nonmember-404. Küçük FOLLOWUP dallarının (104, 111; 105, 108, 101) nasıl paketleneceği (her biri ayrı oturum mu, sahibine göre tek "followups" paketi mi) kullanıcı kararı; cevabı bekliyorum. isci-b'nin tasarım notu (B-07ES-0001) sonraki oturuma devredilir; `.worktrees/fix/07-error-sse` hazır kalır.
+
+### K-03ANM-0004 · 2026-10-30 18:32 · → inceleyici · REVIEW-ISTEK
+Paket: fix/03a-nonmember-404 (FOLLOWUP-103)   Cevap: A-03anm-0006
+PR: state/pr/03a-nonmember-404.md · Branch fix/03a-nonmember-404 · Worktree C:/ai_paycore/ffcore/.worktrees/fix/03a-nonmember-404 · Baz main f1f78fc · SHA 8d3cb3bfde871165f49e088e8d6a7e07b29d329f (koordinatör doğruladı: 2 commit, 12 dosya +231/-33: `core/auth.py` tek kod dosyası, 10 test dosyası, docs/api.md; ağaç temiz). Sınıf [A]; C2 imzası değişmedi, yalnız durum kodu (KARARLAR 30 Ekim: üye değil / proje yok → `404 project_not_found` aynı gövde; üye ama rol yetmez → `403 insufficient_role`). İşçi kanıtı: kırmızı 72 failed (hepsi 403) → yeşil; make test 696 iki profil; test-int 516 + 4 atlandı kendi yığınında. **Güvenlik PR'ı, K-INC-0008: yığınlı** (`YIGIN-AÇ review-03anm`, 18040/13040; FF yığını kapalı): (1) üye-değil ve yok-proje yanıtları byte-eşit mi (zamanlama dahil makul), varlık sızdırmıyor mu; (2) 12 uç listesi (state/pr/18-e2e.md) + 06a `runs` 404 kuralı tutarlı; (3) audit olayında gerçek neden (`not_member|no_project`) var, yanıtta yok; (4) süper admin / servis jetonu / impersonate yollarında davranış değişmedi; (5) 10 test dosyasındaki 403→404 değişimleri yalnız üye-dışı senaryolarda mı (rol yetersizliği 403 kaldı mı); negatif probe'un. Çıktı: state/reviews/03a-nonmember-404-r1.md + REVIEW-SONUC.
+
+### K-03ANM-0005 · 2026-10-30 18:32 · → isci-a · CEVAP
+Paket: fix/03a-nonmember-404   Cevap: A-03anm-0004 / 0005 / 0006
+PR-HAZIR alındı; 8d3cb3b doğrulandı. YIGIN-KAPA alındı. KAYIT-TALEBI → FOLLOWUP-112 (önyüz `project_not_found` eşlemesi, isci-c sonraki önyüz paketi). REVIEW-ISTEK K-03ANM-0004 gitti (yığınlı, güvenlik). Branch'e commit yok; ONAY → merge + tam kapı bende → MERGED → HANDOFF/RETIRED.
+
+### K-05ATR-0006 · 2026-10-30 18:34 · → isci-b · CEVAP
+Paket: fix/05a-tools-read-analyst   Cevap: R-05ATR-0001
+r1 ONAY. main'e `--no-ff` merge ediyorum; kapı (lint + make test iki profil + test-int ffmain) ~20 dk; yeşil olunca MERGED yazarım → HANDOFF (05a-tools-read-analyst) + lease RETIRED, oturum kapanır. İnceleyicinin kapsam dışı gözlemi FOLLOWUP-113 (sql-context POST `AnyMember`), senin sonraki paketine.
+
+### K-INC-0013 · 2026-10-30 18:34 · → inceleyici · CEVAP
+Paket: 05a tools read   Cevap: R-05ATR-0001
+ONAY alındı, merge + kapı bende. Gözlem → FOLLOWUP-113 (sql-context POST `AnyMember`, 05a sonraki paket), teşekkürler. Şimdi K-03ANM-0004 (yığınlı; ffmain benim kapımla birlikte iki yığın).
