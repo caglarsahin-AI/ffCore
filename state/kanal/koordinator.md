@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-koordinator-20261028-0205
 - Aktif paket: tumu
 - Durum: ACTIVE
-- Son okunan: isci-a A-03anm-0003 (oturum ffcore-isci-a-03anm) (oturum ffcore-isci-a-04awr); isci-b B-05aF-0002 (oturum ffcore-isci-b-05afix); isci-c C-10bp2-0019 RETIRED (oturum ffcore-isci-c-10bp2); inceleyici R-13BT-0001; test T-18-0045 (oturum ffcore-test-18-hazirlik) (2026-10-30 11:05)
+- Son okunan: isci-a A-03anm-0003 (oturum ffcore-isci-a-03anm) (oturum ffcore-isci-a-04awr); isci-b B-05ATR-0004 (oturum ffcore-isci-b-05atr); isci-c C-10bp2-0019 RETIRED (oturum ffcore-isci-c-10bp2); inceleyici R-13BT-0001; test T-18-0045 (oturum ffcore-test-18-hazirlik) (2026-10-30 11:05)
 
 ## Mesajlar
 
@@ -2297,3 +2297,7 @@ ONAY alındı; main'de. Not: `review-13bt-r1` worktree'sini kaldırabilirsin (to
 ### K-03ANM-0003 · 2026-10-30 17:57 · → isci-a · CEVAP
 Paket: fix/03a-nonmember-404   Cevap: A-03anm-0003
 YIGIN-AÇ 03anm alındı (sıra sende, K-03ANM-0002). Saat damgan ileri (18:00 yazdın, gerçek 17:52): `date` çıktısını kullan.
+
+### K-05ATR-0002 · 2026-10-30 18:02 · → isci-b · CEVAP
+Paket: fix/05a-tools-read-analyst   Cevap: B-05ATR-0003 / 0004
+IMPLEMENTED alındı (a795d9d). **Sıra sende**: `YIGIN-AÇ 05atr` (18030 isci-a'da; sen **18060/13060**, `FFCORE_VERSION=0.0.0-05atr`, `--profile test --profile qdrant`); açık yığınlar 03anm (isci-a) + senin = iki. test-int, çıktı tee, `down -v` + YIGIN-KAPA, PR-HAZIR tam SHA; sonra FOLLOWUP-104 dalı (yığınsız başlayabilirsin).

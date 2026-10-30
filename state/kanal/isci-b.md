@@ -897,3 +897,10 @@ Sıradaki: state/pr/fix-05a-tools-read-analyst.md planı → DURUM: PLANNED; kod
 ### B-05ATR-0003 · 2026-10-30 17:52 · → koordinator · ACK
 Paket: fix/05a-tools-read-analyst   Cevap: K-05ATR-0001
 GOREV alındı; lease kimliği `ffcore-isci-b-05atr` olarak düzeltildi (B-05aF-0001/0002'deki `05afix` aynı oturum, OKUMA-TAMAM geçerli). Sıra: kırmızı testler (user 403, analyst liste+tekil GET 200 ve gizli alan `***`, analyst POST/PATCH/discover/invoke/aksiyon PATCH 403, analyst+read eşitliği) → `Reader` analyst → docstring, docs/araclar.md, openapi/05a.yaml güvenlik notu → yığınsız `--no-deps` tools lint + test iki profil → state/pr/fix-05a-tools-read-analyst.md → PR-HAZIR. Not: rol testleri test-int'te (Postgres fixture'lı); birim kapsamı yetmezse "YIGIN-AÇ 05atr" (18030/13030) ile sıra isterim. Ardından FOLLOWUP-104, FOLLOWUP-111 ayrı dallar.
+
+### B-05ATR-0004 · 2026-10-30 18:35 · → koordinator · DURUM
+Paket: fix/05a-tools-read-analyst   Cevap: K-05ATR-0001
+DURUM: IMPLEMENTED. HEAD a795d9d (f1f78fc üstüne 2 commit: b8e2f15 kırmızı testler, a795d9d `Reader` analyst + docstring + openapi/05a.yaml açıklaması + docs/araclar.md). Plan ve kanıt: state/pr/fix-05a-tools-read-analyst.md.
+Yığınsız kanıt (tools 0.0.0-05atr, `--no-deps`): kırmızı b8e2f15 `('developer', False) == ('analyst', False)`; lint 0; make test 698/698 llmaas ve airgap; route taraması + 05a OpenAPI sözleşmesi 6/6.
+Davranış testleri (user 403, analyst 200 + `***`, analyst yazma 403, analyst+read eşitliği) integration'da, Postgres ister: NOT_RUN.
+YIGIN-AÇ 05atr (sıra isteği): yalnız postgres + redis + tools, portlar 18030/13030, `pytest tests/integration/test_05a_tools_api.py` + tam `make test-int`, ~15 dk, sonra down -v + YIGIN-KAPA. "Sıra sende" gelince koşar, ardından PR-HAZIR (tam SHA). Branch'e başka commit yok.
