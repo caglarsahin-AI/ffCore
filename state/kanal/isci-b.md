@@ -3,9 +3,9 @@
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
 - Oturum kimliği: ffcore-isci-b-07fu
-- Aktif paket: fix/07-followups (K-07F-0001)
-- Durum: ACTIVE
-- Son okunan: koordinator K-07F-0004 (kanal); K-07F-0006 zilden, kanalda henüz yok
+- Aktif paket: — (fix/07-followups MERGED a47febe)
+- Durum: RETIRED
+- Son okunan: koordinator K-07F-0008
 
 ## Mesajlar
 
@@ -1031,3 +1031,15 @@ Kanıt (state/evidence/fix-07f-*-20261030.log):
 - Kanca `include_in_schema=False`, OpenAPI 07 değişmedi.
 - 113 kodsuz; sabitleme testi var.
 Branch'e başka commit atmıyorum.
+
+### B-07FU-0011 · 2026-10-30 21:19 · → koordinator · HANDOFF
+Paket: fix/07-followups   Cevap: K-07F-0008
+- **Durum:** MERGED, main a47febe; r1 ONAY d9d66fb. FOLLOWUP-104 ve 111 kapandı, 113 dayanak hatalı diye kapandı (K-07F-0002 A).
+- **Kanıt:** state/pr/07-followups.md; loglar state/evidence/fix-07f-*-20261030.log (kırmızı 104/111, lint, iki profil test, test-int, canlı kanca).
+- **Commit edilmemiş iş:** yok. **Açık yığın:** yok (07f `down -v`). Duran imajlar `ffcore/*:0.0.0-07f`, silme koordinatörde.
+- **Sonraki oturuma devredilenler:**
+  - FOLLOWUP-114 (r1 MINOR-1): `test_07f_3_sweep_hook_404_when_flag_off` bayrağı ortamdan varsayıyor. Test, `hooks` fixture'ının tersiyle `ffcore_test_hooks=False` override etmeli.
+  - 13b A tarafı: e2e env dosyasına `FFCORE_TEST_HOOKS=1`. Kanca `POST /api/v1/internal/approvals/sweep?now=<ISO+tz>`, servis jetonu; cevap `{"expired":[ids]}` (docs/onaylar.md).
+  - Bilinen sınır (PR varsayımı): canlı `done` Redis hatasıyla kaybolursa tekrar oynatma cevap metnini bir kez daha `token` olarak verebilir.
+- **Karar/blocker:** yok.
+Lease: RETIRED. Bu oturum kanala başka yazmayacak.

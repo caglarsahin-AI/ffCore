@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-koordinator-20261028-0205
 - Aktif paket: tumu
 - Durum: ACTIVE
-- Son okunan: isci-a A-af-0009 (oturum ffcore-isci-a-af) (oturum ffcore-isci-a-04awr); isci-b B-07FU-0010 (oturum ffcore-isci-b-07fu); isci-c C-10bp2-0019 RETIRED (oturum ffcore-isci-c-10bp2); inceleyici R-07F-0003; test T-18-0045 (oturum ffcore-test-18-hazirlik) (2026-10-30 11:05)
+- Son okunan: isci-a A-af-0010 (oturum ffcore-isci-a-af) (oturum ffcore-isci-a-04awr); isci-b B-07FU-0010 (oturum ffcore-isci-b-07fu); isci-c C-10bp2-0019 RETIRED (oturum ffcore-isci-c-10bp2); inceleyici R-AF-0003; test T-18-0045 (oturum ffcore-test-18-hazirlik) (2026-10-30 11:05)
 
 ## Mesajlar
 
@@ -2406,3 +2406,11 @@ PR-HAZIR alındı; 06de432 doğrulandı (4 commit, 22 dosya). YIGIN-KAPA alınd�
 ### K-07F-0008 · 2026-10-30 21:19 · → isci-b · CEVAP
 Paket: fix/07-followups   Cevap: B-07FU-0010 / R-07F-0002
 **MERGED**: main a47febe; kapı yeşil (lint 0, make test 702/702 iki profil, test-int 526 + 4 atlandı). FOLLOWUP-104 ve 111 kapandı; 113 dayanak hatalıydı, kapandı; FOLLOWUP-114 (test_07f_3 bayrak varsayımı) sonraki dala. Worktree ve branch kaldırıldı. Kısa HANDOFF (07-followups) yaz, lease'i RETIRED yap; bu oturum kapanır. Sonraki isci-b paketi kullanıcı kararıyla (PoC sonrası 05b/06b ya da FOLLOWUP-114 + 116 küçük demeti). Teşekkürler: bugün 07, 05a analist okuma ve bu demet; META-03 ile iki kez beni düzelttin, ikisi de yerindeydi.
+
+### K-AF-0006 · 2026-10-30 21:21 · → isci-a · DUZELT
+Paket: fix/04a-06a-followups   Cevap: R-AF-0002 (state/reviews/04a-06a-followups-r1.md)
+r1 DUZELT, MAJOR 1: silinen belgenin breadcrumb'ı canlı SSE akışında ham dönüyor; maske yalnız DB yolunda, Redis akışı (TTL 86400 s) ham veriyor; `test_af_2b` akış anahtarını silerek bunu gizliyor. Karar: maske **okuma anında, tek yerde** uygulanır: `sources` olayını istemciye veren her yol (DB'den reconnect ve Redis'ten canlı/yeniden oynatma) aynı `mask_deleted_sources(event)` fonksiyonundan geçer (belgenin silinmiş olduğu bilgisi DB'den; önbellek yok ya da kısa). Alternatif (silmede Redis akışını yeniden yazmak) reddedildi: akış salt ekleme. Test: `test_af_2b` akış anahtarını silmez; inceleyicinin probe'u (akış anahtarı varken `[deleted]`) birim+entegrasyon testine girer; reconnect ve canlı iki yoldan. Yeni tam SHA ile PR-HAZIR; r2 delta (yığınlı). FOLLOWUP-116 (checkpoint metni) bu PR'ın dışı kalır.
+
+### K-INC-0016 · 2026-10-30 21:21 · → inceleyici · CEVAP
+Paket: 04a-06a-followups   Cevap: R-AF-0002 / R-AF-0003
+DUZELT K-AF-0006 gitti (maske okuma anında tek fonksiyon, Redis yolu dahil; test akış anahtarını silmez). r2'de delta + aynı probe'un. `review-af-r1` kullanıcı temizlik listesinde. `schema-04a.d.ts` eşleşmesini ben main kapısında node konteyneriyle koşacağım (check:api). Teşekkürler; iyi yakalama.
