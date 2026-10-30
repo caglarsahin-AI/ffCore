@@ -168,3 +168,86 @@ Yok (önyüz).
   - **A (önerim):** admin + edit değiştirir; diğerleri salt okunur görür.
   - **B:** herkese salt okunur; değişiklik yalnız API'den. GOREV cümlesini B diye okumak da mümkün; senin niyetin hangisi?
 - **Varsayım 4:** "Langfuse'ta aç" yalnız `RunOut` iz kimliği ve önyüzde yapılandırılmış Langfuse adresi varsa. İkisi de yoksa bağlantı yok ve FOLLOWUP; uydurma URL yok.
+
+## Plan onayı ve kararlar (K-10bp2-0002..0004)
+
+- PLANNED onaylı. D1 **A**: satır içi karar 07 `approve|reject` ucuna gider; önyüz 06a `/resume`'u yalnız `ask_user` cevabı için çağırır. D2 **A**: şablonla doldurma yok, FOLLOWUP (13b seed). D3 **A**: `needs_approval` ve `enabled` alanlarını admin + edit değiştirir, diğer roller salt okunur görür.
+- FOLLOWUP-100 (K-10bp2-0003, karar A): 05a araç okumayı `analyst`'a açar (isci-b, 07 sonrası). O gelene kadar analist sihirbazda seçilmiş aksiyonları ve nedenini salt okunur görür. Analist-araç e2e'si NOT_RUN: FOLLOWUP-100.
+- Kabul 2 (satır içi onay) ve onay kararları (K-10bp2-0004, karar A): fake-llm'e `tool-*` modunu test işçisi ekler (`fix/fake-llm-tool-mode`). O merge olana kadar `test_10bp2_5` ve `test_10bp2_9` karar testi `fixme`, yani NOT_RUN. Merge sonrası ticket-desk `send_reply` ile yazılır.
+
+## Uygulama (HEAD cc52c77; baz fcbcfc4)
+
+| Commit | Dilim |
+|---|---|
+| ff1586e | 05a/06a tipleri + `check:api`; `lib/sse.ts`; `lib/agent-definition.ts` |
+| 012e901 | Araçlar ekranları; 05a/06a/07 hata kodları |
+| 9be9d01 | Agent listesi ve sihirbaz |
+| f7d3df5 | Test paneli, Koşular, F9 |
+| 1fb0d20 | Onaylar ve kenar çubuğu rozeti |
+| 47cd313 | e2e spec'leri; `support.ts` "coming-soon" örneği `/agents` → `/evaluations` (`/agents` artık gerçek ekran) |
+| cc52c77 | docs/onyuz.md |
+
+### Değişen dosyalar (57; backend, compose, deploy dokunulmadı)
+
+- **Ekranlar:** `frontend/app/(console)/{tools,agents,runs,approvals}/**` (8 sayfa).
+- **Bileşenler:**
+  - Araçlar: `tool-form.tsx`, `tool-actions.tsx`.
+  - Agent: `agent-create-form.tsx`, `agent-wizard/*` (8 dosya), `agent-test-panel.tsx`.
+  - Koşular: `run-timeline.tsx`, `run-feedback.tsx`.
+  - Kenar çubuğu: `app-sidebar.tsx` (onay rozeti).
+- **Kitaplık:**
+  - Saf yardımcılar: `lib/sse.ts`, `lib/run-view.ts`, `lib/agent-definition.ts`.
+  - Sorgular: `lib/api/{tools,agents,runs,approvals}-queries.ts`.
+  - Diğer: `lib/api/errors.ts` (35 kod), `lib/navigation.ts` (4 kalem `ready: true`).
+- **Tipler:** `lib/api/schema-{05a,06a}.d.ts` (üretilmiş); `package.json` `gen:api`, `scripts/check-api.mjs` `SPECS`.
+- **Metin:** `messages/{en,tr}.json`: Tools, Agents (+wizard), TestPanel, Runs, Approvals, Errors ekleri.
+- **Testler:** `tests/unit/test_10bp2_{6,14,16,17,18,19}_*` (Vitest), `tests/e2e/test_10bp2_{1..5,7..13}_*`, `tests/e2e/agents.ts`, `tests/e2e/support.ts` (tek satır).
+- **Belge:** `docs/onyuz.md`.
+
+### Kabul kriteri → test (durum 2026-10-30, yığın açılmadan)
+
+| # | Test | Durum |
+|---|---|---|
+| 1 | `test_10bp2_1_tool_crud_and_errors` | yazıldı, NOT_RUN (yığın sırası) |
+| 2 | `test_10bp2_2_discover_actions_invoke` | yazıldı, NOT_RUN (yığın sırası) |
+| 3 | `test_10bp2_3_agent_wizard_lifecycle` | yazıldı, NOT_RUN (yığın sırası) |
+| 4 | `test_10bp2_4_contract_assistant_cited` | yazıldı, NOT_RUN (yığın sırası; aşama 2, `FAKE_EMBED=1`) |
+| 5 | `test_10bp2_5_inline_approval` | `fixme`, NOT_RUN: fix/fake-llm-tool-mode |
+| 6 | `test_10bp2_6_sse` (Vitest, 8) | **geçti**. e2e kopma testi yok: Playwright akışı yarıda kesemiyor; birim testi kopma ve yeniden bağlanmayı sahte gövdeyle kanıtlıyor (plandan sapma) |
+| 7 | `test_10bp2_7_runs_list_detail` | yazıldı, NOT_RUN (yığın sırası) |
+| 8 | `test_10bp2_8_run_feedback` | yazıldı, NOT_RUN (yığın sırası) |
+| 9 | `test_10bp2_9_approvals_queue` | boş kuyruk testi yazıldı, NOT_RUN (07 merge + yığın); karar testi `fixme` (fake-llm) |
+| 10 | `test_10bp2_10_read_only` | yazıldı, NOT_RUN (yığın sırası) |
+| 11 | `test_10bp2_11_roles` | yazıldı, NOT_RUN (yığın sırası). Developer görünümü NOT_RUN: fixture'da developer yok (A3) |
+| 12 | `test_10bp2_12_screens_themes_axe` (7 ekran × 2 tema) | yazıldı, NOT_RUN (yığın sırası). Onay ayrıntısı görüntüsü fake-llm sonrası |
+| 13 | `test_10bp2_13_query_failures` | yazıldı, NOT_RUN (yığın sırası) |
+| 14 | `test_10bp2_14_agent_definition` (8), `test_10bp2_17_agent_versions` (2) | **geçti** |
+| 15 | `check:api` + `test_10bp2_16_error_codes`, `test_10bp2_18_run_view` (7), `test_10bp2_19_run_contract` (2), i18n eşlik testleri | **geçti** |
+
+Sıra: birim testleri önce kırmızı (modül yok ya da eşleme yok), sonra yeşil. Ekran bileşenlerinde ve e2e spec'lerinde sıra tersine döndü: ekranlar önce yazıldı, çünkü e2e yığın sırası bekliyor. Bu sapma açıkça yazılı.
+
+### Çalıştırılan komutlar (ağsız `node:20.19.5-alpine` + `ffcore-10a-nm`, `--network none`)
+
+| Komut | Exit | Sonuç |
+|---|---|---|
+| `npm run check:api` | 0 | 03a/04a/05a/06a güncel (önce kırmızı: 05a/06a tipleri eksik) |
+| `npx vitest run` | 0 | 142/142 |
+| `npx tsc --noEmit -p .` | 0 | |
+| `npx eslint .` | 0 | |
+| `next build` (`FFCORE_BACKEND_URL=http://backend:8000`) | 0 | 23 rota, yeni 8 rota dahil |
+| `npx playwright test --list` | 0 | 27 test_10bp2 girdisi |
+| e2e (iki aşama) | NOT_RUN | yığın sırası (isci-b → test → isci-c, K-10bp2-0004) |
+
+### Varsayımlar
+
+1. **07 tipleri:** `lib/api/approvals-queries.ts` 07 dalının `api/approvals_schemas.py` dosyasını alan alan yansıtıyor ve elle yazılmış. Bu, "elle tip yazılmaz" kuralından bilinçli ve geçici bir sapma (K-10bp2-0002 "şimdilik approvals_schemas.py kabul"). `backend/openapi/07.yaml` gelince `schema-07.d.ts` üretilecek, `SPECS`'e eklenecek ve elle yazılan tip silinecek. PR-HAZIR bundan önce yok.
+2. **`approval_id`:** 07 dalında `approval_required` olayına `approval_id` ekleniyor (`graph.py` L310-325). SSE verisine ulaştığı **doğrulanmadı**; doğrulama 07 merge sonrası koşuda yapılacak. Olay kimlik taşımazsa panel kararı vermez; "Onaylar'ı aç" bağlantısıyla açık hata gösterir.
+3. **Langfuse bağlantısı:** önyüzde Langfuse adresi yapılandırması yok, bu yüzden iz kimliği metin olarak gösteriliyor, bağlantı yok (plan varsayım 4). Bağlantı gerekiyorsa FOLLOWUP.
+4. **Test paneli kaydedilmiş sürümü çalıştırır:** kaydedilmemiş değişiklik varsa panel bunu yazar. Taslağı önce kaydetmeyen gizli bir otomatik kayıt yok (ARCH-10).
+5. **e2e yığını:** `ALLOWED_INTERNAL_HOSTS` listesine `ticket-desk` eklenmeli ve `--profile test` ile `fake-llm` ile `ticket-desk` ayakta olmalı. Kesin komutlar yığın koşusundan sonra docs/onyuz.md "Acceptance tests" bölümüne yazılacak.
+
+### Kalan riskler
+
+- Next.js rewrite'ın SSE'yi tamponlayıp tamponlamadığı yığında henüz görülmedi (durma koşulu 1). Tamponlarsa önerilen yol K-10bp2-0002'deki seçenek: doğrudan backend portu.
+- 07 incelemesinde onay sözleşmesi değişirse onay ekranı rebase edilir.
+- e2e'lerin hiçbiri henüz koşmadı. Spec'ler tip ve lint temiz, ama gerçek yığında düzeltme gerekebilir.

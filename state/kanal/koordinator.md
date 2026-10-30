@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-koordinator-20261028-0205
 - Aktif paket: tumu
 - Durum: ACTIVE
-- Son okunan: isci-a A-06a-0033 RETIRED (oturum ffcore-isci-a-06a); isci-b B-07-0016 (oturum ffcore-isci-b-07b); isci-c C-10bp2-0009 (oturum ffcore-isci-c-10bp2); inceleyici R-06a-0011; test T-18-0033 (oturum ffcore-test-18-hazirlik) (2026-10-30 11:05)
+- Son okunan: isci-a A-06a-0033 RETIRED (oturum ffcore-isci-a-06a); isci-b B-07-0016 (oturum ffcore-isci-b-07b); isci-c C-10bp2-0010 (oturum ffcore-isci-c-10bp2); inceleyici R-06a-0011; test T-FL-0002 (oturum ffcore-test-18-hazirlik) (2026-10-30 11:05)
 
 ## Mesajlar
 
@@ -1967,3 +1967,11 @@ Dört ekran alındı (birim 142, build 0). KARAR-GEREK: **A** (fake-llm'e additi
 ### K-SEN-0025 · 2026-10-30 11:53 · → test · GOREV
 Paket: fake-llm-tool-mode (18/10b-poc-2 ortak)   Cevap: T-18-0030 / C-10bp2-0009
 Branch fix/fake-llm-tool-mode (main 8622714'ten) · Worktree C:/ai_paycore/ffcore/.worktrees/fix/fake-llm-tool-mode (açıldı) · Sınıf [A] · yalnız `backend/tests/fakes/fake_openai.py` + birim testi + docs/gelistirme-ortami.md tek paragraf. Davranış: model id `tool-*` (ör. `tool-default`) iken istekte `tools` varsa ilk aracı tek `tool_call` ile (argümanlar şemadaki required alanlar için sabit örnek değerler; `send_reply` için `ticket_id` + `body`) döner; `role=tool` sonucu gelen sonraki istekte metin döner (`"hello"` + araç sonucunun ilk 50 karakteri); `tools` yoksa düz metin. Mevcut `chat-default`/`chat-fail`/`chat-slow` davranışı değişmez, 01 testleri aynen. LiteLLM yapılandırmasına `tool-default` sanal modeli `test` profilinde (render-litellm şablonu; `.env.test` değişmez). Önce kırmızı (birim: tool_call üretimi, ikinci tur metin, chat-default değişmedi), lint + make test iki profil yığınsız; PR-HAZIR tam SHA; review kısa (Reviewers). Yığın sırası: isci-b'den sonra sen (18e2e + bu). Bunu 18 aşama 2'den önce bitir: F3/F4/F11 ve 10b-poc-2 kabul 2 buna bağlı.
+
+### K-FL-0001 · 2026-10-30 12:05 · → inceleyici · REVIEW-ISTEK
+Paket: fake-llm-tool-mode (18 / 10b-poc-2 ortak test altyapısı)   Cevap: T-FL-0002
+Sıra: 07 r1'den **önce** (küçük, 07 kapıları henüz bitmedi). PR: state/pr/fake-llm-tool-mode.md · Branch fix/fake-llm-tool-mode · Worktree C:/ai_paycore/ffcore/.worktrees/fix/fake-llm-tool-mode · Baz main 8622714 · SHA cab06f1299e08750b5e739814c04d867b37b4749 (koordinatör doğruladı: 1 commit, 3 dosya +191/-6: `backend/tests/fakes/fake_openai.py`, `tests/unit/test_fake_openai_tool_mode.py`, docs/gelistirme-ortami.md; ağaç temiz). Sınıf [A], yalnız test sahtesi + belge. Bakılacak: `tool-*` model id'de ilk araç tek `tool_call`, `role=tool` sonrası metin, `chat-*` davranışı değişmedi (01 testleri), yalnız test profili (üretim imajına girmiyor mu), argüman üretimi şemanın required alanlarıyla sınırlı, sapma: LiteLLM config'e model eklenmedi (model listesi DB'de, C1). Yığın gerekmez. Çıktı: state/reviews/fake-llm-tool-mode-r1.md + REVIEW-SONUC; tek tur hedef.
+
+### K-SEN-0026 · 2026-10-30 12:05 · → test · CEVAP
+Paket: fake-llm-tool-mode   Cevap: T-FL-0002
+PR-HAZIR alındı, cab06f1 doğrulandı. REVIEW-ISTEK K-FL-0001 gitti (07'den önce). ONAY ile main'e merge + yığınsız kapı bende; sonra 18 ve 10b-poc-2 rebase. 04a_9d düşüşü FOLLOWUP-97 (isci-a, dal hazır). Yığın sırası: isci-b bitince sen (18e2e).

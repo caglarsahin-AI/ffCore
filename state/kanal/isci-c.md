@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-c-10bp2
 - Aktif paket: 10b-poc-2 (K-10bp2-0001)
 - Durum: ACTIVE
-- Son okunan: koordinator K-10bp2-0003; son yazılan C-10bp2-0009
+- Son okunan: koordinator K-10bp2-0004; son yazılan C-10bp2-0010
 
 ## Mesajlar
 
@@ -652,3 +652,14 @@ Paket: 10b-poc-2   Cevap: -
 Brief kabul 2 (satır içi onay sonrası akış sürer) e2e ile kanıtlanamıyor. fake-llm (`backend/tests/fakes/fake_openai.py`) yalnız metin döndürüyor ("hello"), araç çağrısı üretmiyor; model araç çağırmadan onay olayı oluşmuyor. Bu sınır kabul 1'i etkilemiyor: kaynaklar `always` aramadan geliyor, model cevabı "hello" olsa da kaynak kartları kanıtlanır.
 - **A (önerim):** fake-llm'e additive test modu: model id `tool-*` iken istekteki ilk aracı tek bir `tool_call` ile çağırır, araç sonucu gelince metin döner. Yalnız test profili, 01 testleri değişmez. Ticket-desk `send_reply` (onay gerekli) ile kabul 2 ve ret yolu uçtan uca koşar. Bedel: `backend/tests/fakes/` touch-zone'um dışında, ya bana ek ya test işçisine/isci-b'ye küçük iş; 13b de aynı modu kullanabilir.
 - **B:** kabul 2'nin e2e'si NOT_RUN. Kanıt `test_10bp2_18_run_view` (olay → onay durumu) ve elle akış olmaz. Bedel: PoC kapısının "SQL aracı onay bekler" adımı önyüzde kanıtsız kalır, 13b'ye kayar.
+
+### C-10bp2-0010 · 2026-10-30 11:59 · → koordinator · ACK
+Paket: 10b-poc-2   Cevap: K-10bp2-0004
+Karar A alındı. `test_10bp2_5` ve `test_10bp2_9` karar testi `fixme`, gerekçeleri "NOT_RUN: fix/fake-llm-tool-mode (K-10bp2-0004)". Merge sonrası rebase edip ticket-desk `send_reply` ile yazacağım.
+Hazır olanlar:
+- 47cd313: 12 e2e spec, 27 girdi. `support.ts` "coming-soon" örneği artık `/evaluations` (`/agents` gerçek ekran).
+- cc52c77: docs/onyuz.md.
+- state/pr/10b-poc-2.md: uygulama, kabul → test, komutlar, varsayımlar, riskler.
+Branch 7 commit, push yok. Kapılar: birim 142/142, tsc 0, eslint 0, build 0, `playwright --list` 0.
+Varsayım 1: 07 onay tipleri geçici olarak elle yazıldı (K-10bp2-0002). 07.yaml gelince üretilecek, elle yazılan silinecek.
+Bekliyorum: yığın sırası ("sıra sende"). Aşama 2 e2e için `ALLOWED_INTERNAL_HOSTS`'a `ticket-desk` eklenecek ve `--profile test` gerekecek.
