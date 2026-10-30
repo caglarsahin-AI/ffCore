@@ -3,7 +3,7 @@
 # Servisleri başlatma/durdurma doğrudan compose ile: docker compose up -d --wait | down | logs -f
 # Önyüz lint'i ayrı konteynerde: docker compose run --rm frontend npm run lint
 
-.PHONY: lint format test test-samples test-int seed e2e test-models models models-check smoke pull seed-models render-litellm reindex langfuse-init seed-prompts seed-sql-demo seed-sql-context
+.PHONY: lint format test test-samples test-int seed e2e eval test-models models models-check smoke pull seed-models render-litellm reindex langfuse-init seed-prompts seed-sql-demo seed-sql-context
 
 lint:
 	ruff check backend scripts data/samples/scripts services
@@ -98,3 +98,12 @@ seed:
 E2E_STAMP := $(shell date -u +%Y%m%d-%H%M)
 e2e:
 	RUN_E2E_SCENARIOS=1 pytest tests/e2e -rs --f-table eval/results/e2e-$(E2E_STAMP).md
+
+# 13b: an exam set through the run API, report to eval/results/ (scripts/eval_report.py). MODEL
+# names what answered (no default: a fake-llm run is reported as a pipeline check, not a result).
+# Default set data/samples/eval/sozlesme-33.json; on the PayCore server DATASET=<S1 path>.
+# APPROVE_SQL=1 approves each run_sql call (an explicit choice; without it SQL items are NOT_RUN).
+#   make eval MODEL=fake-llm [DATASET=...] [PROJECT=hastane-a] [APPROVE_SQL=1]
+eval:
+	@test -n "$(MODEL)" || (echo "usage: make eval MODEL=<what answers> [DATASET=path] [APPROVE_SQL=1]" >&2; exit 2)
+	python scripts/eval_report.py --model "$(MODEL)" --project "$(or $(PROJECT),hastane-a)" $(if $(DATASET),--dataset "$(DATASET)",) $(if $(APPROVE_SQL),--approve-sql,)
