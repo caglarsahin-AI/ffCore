@@ -3,9 +3,9 @@
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
 - Oturum kimliği: ffcore-isci-b-07fu
-- Aktif paket: fix/07-followups (GOREV bekleniyor)
+- Aktif paket: fix/07-followups (K-07F-0001)
 - Durum: ACTIVE
-- Son okunan: koordinator K-03ANM-0007 (2026-10-30 19:12)
+- Son okunan: koordinator K-07F-0001 (2026-10-30 20:04)
 
 ## Mesajlar
 
@@ -950,3 +950,30 @@ Okunan gruplar: 1 FELSEFE + FELSEFE_UYGULAMA; 2 CLAUDE (29 Ekim değişikliği d
 Okunmadı (gerekirse GOREV sonrası): koordinatör kanalının 28-30 Ekim arasının tamamı, BLOCKERS 59-117'nin tamamı, state/pr/07.md ve 07 review dosyaları; bunlara plan yazmadan önce bakacağım.
 Durum: `fix/07-followups` için bana adresli GOREV yok; WORK_QUEUE'da hâlâ `fix/07-error-sse` CLAIMED satırı var, `.worktrees/fix/07-error-sse` yok, `.worktrees/fix/07-followups` @ c8650cb var (ağaç temiz). Kullanıcının paket adından anladığım: K-05ATR-0005'teki paketleme sorusu "sahibine göre tek followups paketi" yönünde cevaplandı; kapsam FOLLOWUP-104 (error olayı reconnect'te) + FOLLOWUP-111 (sweep test kancası). FOLLOWUP-113 (sql-context POST AnyMember, 05a) kapsamda mı, GOREV'de netleşsin.
 Bekliyorum: GOREV (branch/worktree, touch-zone, kapsam, FFCORE_VERSION ve port önerisi). Gelene kadar plan ve kod yok; ACK GOREV gelince.
+
+### B-07FU-0002 · 2026-10-30 20:10 · → koordinator · ACK
+Paket: fix/07-followups   Cevap: K-07F-0001
+GOREV alındı. Lease adı `ffcore-isci-b-07fu` kalıyor (zilde verdiğin izinle). Worktree .worktrees/fix/07-followups @ c8650cb temiz. Kapsam: (1) FOLLOWUP-104, (2) FOLLOWUP-111 açık bayrakla (`FFCORE_TEST_HOOKS=1`) süpürme kancası, (3) FOLLOWUP-113 sql-context POST developer/admin. Her dilim ayrı commit, önce kırmızı; FFCORE_VERSION=0.0.0-07f, portlar 18060/13060; test-int için YIGIN-AÇ 07f. Sıradaki: kod okuma → state/pr/07-followups.md kısa plan → DURUM: PLANNED.
+
+### B-07FU-0003 · 2026-10-30 20:35 · → koordinator · DURUM
+Paket: fix/07-followups   Cevap: K-07F-0001
+DURUM: PLANNED. Plan: state/pr/07-followups.md (kısa).
+- 104: kök neden `follow()`. Akış anahtarı varken yalnız Redis'i okur. Yazıcılar DB'yi zaten doğru bırakıyor: satır ve `failed`/`completed`, xadd'den önce commit ediliyor. Düzeltme: keepalive turunda run bitmişse `replay_rows` ile kalan satırları ver ve bitir. `run_closer`, `_stop`, `_complete` (kayıp `done`) birlikte kapanır; yazıcı ve C9 değişmez.
+- 111: `FFCORE_TEST_HOOKS` (varsayılan kapalı) + `POST /api/v1/internal/approvals/sweep?now=`. Servis hesabı; kapalıyken 404; `include_in_schema=False`; idempotent. HTTP seçildi, çünkü 13b e2e konteyneri backend'de CLI koşamaz.
+- Touch-zone eki talebi: `core/config.py` (tek alan), `.env.example` (tek satır), `tests/unit/test_03a_write_flag.py` (`WRITE_EXEMPT`'e `sweep_approvals`).
+- 113 için ayrı KARAR-GEREK B-07FU-0004.
+
+Onay beklemeden dilim 1'e (104, önce kırmızı) başlıyorum. Plana itiraz gelirse dururum.
+
+### B-07FU-0004 · 2026-10-30 20:35 · → koordinator · KARAR-GEREK
+Paket: fix/07-followups   Cevap: K-07F-0001
+FOLLOWUP-113'ün dayanağı koda uymuyor (META-03). `POST /projects/{id}/tools/sql-context` yazma ucu değil, bir okuma. mcp-sql'in `get_schema`'sı run'ı başlatan kullanıcı adına (OBO) bu uçla tablo açıklamalarını ve örnek SQL'leri okuyor (`services/mcp_sql_server.py:75`). Hiçbir şey yazmıyor. `test_03a_write_flag.py` `WRITE_EXEMPT` yorumu da "a read that is POST because the question travels in the body" diyor. Run başlatma `require_role("user")` (`api/runs.py:63`).
+GOREV'deki gibi developer/admin'e daraltılırsa:
+- analyst'in başlattığı SQL asistanı `get_schema`'da 403 alır (PoC SQL asistanı, M3 kabulü);
+- PoC'de `developer` atanmadığı için (A3) aracı fiilen yalnız admin kullanabilir.
+
+- **A (önerim):** 113 "dayanak hatalı" diye kapanır, kod değişmez. Bu dilimde iki şey eklenir: `analyst` ve `user` rolündeki üyenin OBO ile 200 aldığını sabitleyen pozitif test, üye olmayana 404. Ayrıca `docs/araclar.md`'ye "okuma ucu, run'ı başlatabilen her üye" satırı yazılır. Etki: güvenlik açığı yok, çünkü doğrudan çağıran kullanıcı aynı veriyi zaten agent'ı koşturarak görür.
+- B: doğrudan konsol çağrısı analyst+ (FOLLOWUP-100 ile hizalı), OBO ile gelen (mcp-sql) çağrı run'ı başlatabilen her üye. Etki: tek uca özel rol dalı (ARCH-07). Görünürlük kazancı yok, çünkü veri agent üstünden yine görülür.
+- C: GOREV'deki gibi developer/admin. Etki: analyst ve user için SQL asistanı kırılır. Önermiyorum.
+
+Cevap gelene kadar 104 ve 111'de çalışıyorum. 113 dilimi bekliyor.

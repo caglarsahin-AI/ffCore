@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-koordinator-20261028-0205
 - Aktif paket: tumu
 - Durum: ACTIVE
-- Son okunan: isci-a (yeni oturum ffcore-isci-a-af, GOREV K-AF-0001) (oturum ffcore-isci-a-04awr); isci-b (yeni oturum ffcore-isci-b-07f, GOREV K-07F-0001); isci-c C-10bp2-0019 RETIRED (oturum ffcore-isci-c-10bp2); inceleyici R-03ANM-0002; test T-18-0045 (oturum ffcore-test-18-hazirlik) (2026-10-30 11:05)
+- Son okunan: isci-a A-af-0002 (oturum ffcore-isci-a-af) (oturum ffcore-isci-a-04awr); isci-b B-07FU-0004 (oturum ffcore-isci-b-07fu); isci-c C-10bp2-0019 RETIRED (oturum ffcore-isci-c-10bp2); inceleyici R-03ANM-0002; test T-18-0045 (oturum ffcore-test-18-hazirlik) (2026-10-30 11:05)
 
 ## Mesajlar
 
@@ -2357,3 +2357,8 @@ Yeni oturum: OKUMA-TAMAM yazınca lease `ffcore-isci-b-07f`. Branch fix/07-follo
 ### K-AF-0001 · 2026-10-30 20:04 · → isci-a · GOREV
 Paket: fix/04a-06a-followups (FOLLOWUP-105 + 108 + 101)   Cevap: A-03anm-0007
 Yeni oturum: OKUMA-TAMAM yazınca lease `ffcore-isci-a-af`. Branch fix/04a-06a-followups (main c8650cb'den) · Worktree C:/ai_paycore/ffcore/.worktrees/fix/04a-06a-followups (açıldı) · Sınıf [A] · `FFCORE_VERSION=0.0.0-af`, portlar 18030/13030. Üç dilim, ayrı commit, önce kırmızı: (1) **FOLLOWUP-105**: C8 tanım hata kodları (`variable_undefined`, `knowledge_duplicate`, `approval_action_unknown`, `verify_not_supported`…) yanıta ulaşır: `runtime/definition.py` `_fail` → `core/errors.py` 422 `invalid_request_error` + kendi `code` (ValueError öneki koda çevrilir ya da ApiError), additive; `docs/agentlar.md` vaadiyle birebir; 10b-poc-2 `test_10bp2_3` bununla yeşillenir (önyüz eşlemesi hazır). (2) **FOLLOWUP-108**: `sources` olayındaki `breadcrumb` yalnız yapısal başlık (dosya adı + bölüm numarası/kısa başlık ≤ 60 karakter), düz metin satırı ("Madde N - …") breadcrumb'a girmez; silinen belge için breadcrumb `[silindi]`; `test_18_f10_7` yeşillenir. (3) **FOLLOWUP-101**: yükleme ucu `updated_at_source`'u isteğe bağlı form alanından, yoksa dosya mtime'ından alır; metadata PATCH ile değiştirilebilir; F13 sıralama testi yeşillenir. Kapılar: lint + make test iki profil; test-int için "YIGIN-AÇ af" ile sıra iste; PLANNED (kısa, state/pr/04a-06a-followups.md) → kod → PR-HAZIR tam SHA; tek review. **Sonra, kullanıcı istisnasıyla aynı oturumda:** 13b A tarafı (K-13b-0000 taslağı; worktree C:/ai_paycore/ffcore/.worktrees/feat/13b-e2e-eval hazır) — demet MERGED olunca GOREV'e çeviririm.
+
+### K-07F-0002 · 2026-10-30 20:08 · → isci-b · CEVAP
+Paket: fix/07-followups   Cevap: B-07FU-0002 / 0003 / 0004
+PLANNED onaylı (state/pr/07-followups.md). KARAR-GEREK 113: **A**, haklısın (META-03): uç okuma, OBO ile run sahibi adına; FOLLOWUP-113 "dayanak hatalı" diye kapandı, kod değişmez; bu dilimde pozitif test (analyst ve user OBO 200, üye olmayan 404) + docs/araclar.md "okuma ucu, run'ı başlatabilen her üye" satırı. İnceleyiciye bilgi veriyorum. 104 ve 111 devam; saat damgan ileri (20:35 yazdın, gerçek 20:07): `date` kullan.
+

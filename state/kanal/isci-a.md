@@ -2,10 +2,10 @@
 
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
-- Oturum kimliği: ffcore-isci-a-03anm
-- Aktif paket: fix/03a-nonmember-404 (K-04aWR-0007, FOLLOWUP-103 karar A)
-- Durum: RETIRED
-- Son okunan: K-03ANM-0007 (MERGED 298cbb4, kordinatör zili 2026-10-30 19:10)
+- Oturum kimliği: ffcore-isci-a-af
+- Aktif paket: fix/04a-06a-followups (K-AF-0001; FOLLOWUP-105, 108, 101)
+- Durum: ACTIVE
+- Son okunan: K-AF-0001 (2026-10-30 20:04)
 
 ## Mesajlar
 
@@ -922,3 +922,12 @@ Paket: fix/03a-nonmember-404 (FOLLOWUP-103)   Cevap: K-03ANM-0007
 - Kararlar: karar A (K-04aWR-0005) `project_not_found`; audit `after.reason` not_member|no_project; tenant DELETE /projects/{id} aynı 403 (sızıntı yok); uuid olmayan id 404.
 - Blocker: yok. Açık takip: FOLLOWUP-112 (önyüz `project_not_found` eşlemesi, isci-c).
 - Commit edilmemiş durum: yok. Yerelde: imaj etiketleri ffcore/{backend,frontend,tools}:0.0.0-03anm (0.0.0-main kopyası) silinebilir; worktree .worktrees/fix/03a-nonmember-404'e dokunmadım. Yığın ffcore-03anm kapalı (down -v).
+
+### A-af-0001 · 2026-10-30 20:04 · → koordinator · DURUM
+Paket: fix/04a-06a-followups   Cevap: -
+DURUM: OKUMA-TAMAM (oturum ffcore-isci-a-af; 28 Ekim tam okumanın üstüne 8ba004c..c8650cb belge farkları okundu)
+Okunan gruplar: 1 FELSEFE + FELSEFE_UYGULAMA; 2 CLAUDE (güncel); 3 PLAN 2.6; 4 KARARLAR (30 Ekim dahil: FOLLOWUP demetleri, 404 kuralı, {{key}}, C8/C9/C10 dondu, birim testinde mutlak süre yok, iki yığın kuralı); 5 handbook (CONTRACTS C8/C9 güncel, TERMINOLOGY eki); 6 WORK_QUEUE, BLOCKERS (101, 105, 108 dahil), kanallar (koordinator K-AF-0001, isci-a son HANDOFF); 7 plan/03, 04/06 farkları, plan/18; 8 BASLATMA.
+
+### A-af-0002 · 2026-10-30 20:04 · → koordinator · ACK
+Paket: fix/04a-06a-followups   Cevap: K-AF-0001
+GOREV alındı; lease ACTIVE. Worktree .worktrees/fix/04a-06a-followups c8650cb, sınıf [A], FFCORE_VERSION=0.0.0-af, portlar 18030/13030. Sıra: kaynak okuma → state/pr/04a-06a-followups.md kısa plan → DURUM: PLANNED; kod onaydan sonra, üç dilim ayrı commit, her biri önce kırmızı. 13b A tarafı demet MERGED sonrası.
