@@ -3,9 +3,9 @@
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
 - Oturum kimliği: ffcore-isci-c-marka
-- Aktif paket: 10-marka (feat/10-brand-icon)
-- Durum: ACTIVE
-- Son okunan: koordinator K-MRK-0007 (2026-10-30 09:07); son yazılan C-MRK-0013
+- Aktif paket: - (10-marka MERGED 4628219)
+- Durum: RETIRED
+- Son okunan: koordinator K-MRK-0009 (2026-10-30 09:25; K-MRK-0010 zil ile alındı, kanalda henüz yok); son yazılan C-MRK-0014 (HANDOFF)
 
 ## Mesajlar
 
@@ -560,3 +560,33 @@ PR: state/pr/10-marka.md (kabul tablosu ve komutlar güncel). NOT_RUN: yalnız b
 ### C-MRK-0013 · 2026-10-30 09:07 · → koordinator · ACK
 Paket: 10-marka   Cevap: K-MRK-0007
 ACK: review bitene kadar feat/10-brand-icon'a commit yok (HEAD 2843d40). Saat damgası bundan sonra `date` çıktısından. DUZELT ya da ONAY bekliyorum.
+
+### C-MRK-0014 · 2026-10-30 09:50 · → koordinator · HANDOFF
+Paket: 10-marka   Cevap: K-MRK-0010 (zil; merge git'te doğrulandı: 2843d40 main 4628219'un atası)
+### 10-marka · ffcore-isci-c-marka · 2026-10-30 09:50
+- **Durum:** MERGED (r1 ONAY 2843d40 → main 4628219). Lease RETIRED; bu oturum kapanır.
+- **Tam sonraki adım:** yok. isci-c sıradaki paket 10b-poc-2, yeni oturumda, 06a merge sonrası.
+- **Kararlar:**
+  - D1-D3 A.
+  - Slogan: `Home.subtitle` EN "Enterprise AI Agent Platform", TR "Kurumsal Yapay Zekâ Platformu". Tek anahtar; metadata, giriş ve manifest bundan okur.
+  - Aile adı: FastFlow (FF).
+  - Manifest `app/manifest.ts`'den üretiliyor; içindeki lacivert renk kodun tek sabit renk değeri, tek satırlık gerekçeli lint istisnası var.
+- **Kalıplar (sonraki önyüz işleri):**
+  - Marka dosyaları elle değil `py -3.12 assets/icons/scripts/make_web_brand.py` (`--check`) ile üretilir.
+  - Ekranda yazı gömülü görsel kullanılmaz.
+  - Kenar çubuğu logosu `data-testid="sidebar-logo"`, giriş rozeti `login-brand-logo`.
+  - e2e aşama 2'de `FAKE_EMBED=1` **export** edilir. `run e2e` backend'i kabuğun değerleriyle yeniden yaratır; önek olarak verilirse ayar 0'a döner.
+  - `ALLOWED_INTERNAL_HOSTS` listesi `langfuse-web`'i içermeli.
+- **Koşan / kalan testler:**
+  - Export'lu tek koşu: aşama 1 1/1, aşama 2 108/108.
+  - eslint 0, tsc 0, Vitest 114/114.
+  - NOT_RUN: backend `make test` (yalnız description değişti), Lighthouse (FOLLOWUP-37).
+- **Açık takip:** FOLLOWUP-96 (Pillow ortamı, review MINOR-1). `public/brand/ffcore-brand-variant-b-512.png` eski sloganı gömülü taşıyor; yeni render gelince yeniden üretilmeli ya da kaldırılmalı.
+- **Süreç dersleri:**
+  - Kapı çıkış kodu boru içinden alınmaz (`tail`'in kodu); `PIPESTATUS` ya da dosyaya yönlendirme kullanılır.
+  - Uzun koşu `&` ile değil arka plan aracıyla başlatılır.
+  - Saat damgası `date`'ten alınır.
+- **Blocker'lar:** yok.
+- **Commit edilmemiş durum:** yok. Worktree `.worktrees/feat/10-brand-icon` ve branch duruyor; kaldırma koordinatörde.
+- **Branch ve son commit:** feat/10-brand-icon @ 2843d40d8fe0e1641bea80947b6bc90b7e5b7ebd → main 4628219.
+- **Ortam:** `marka` yığını `down -v` (konteyner 0, volume 0). `ffcore/*:0.0.0-marka` imajları ve `ffcore-10a-nm(-pw)` duruyor; imaj silme koordinatörde. Scratchpad logları oturuma özel.

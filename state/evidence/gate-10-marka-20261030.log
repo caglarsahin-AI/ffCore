@@ -1,0 +1,84 @@
+=== Fri Oct 30 09:22:15 TST 2026 build frontend+tools
+#27 exporting layers 90.0s done
+#27 writing image sha256:b05ccf1450d243b72d06b42734f4de35f34ffcc31c3cb5836f4f813c3c096389 0.0s done
+#27 naming to docker.io/ffcore/tools:0.0.0-main 0.1s done
+#27 DONE 90.2s
+build exit=0
+=== Fri Oct 30 09:30:33 TST 2026 compose config
+config exit=0
+=== Fri Oct 30 09:30:53 TST 2026 up
+ Container ffmain-backend-1  Healthy
+ Container ffmain-mcp-sql-1  Healthy
+ Container ffmain-mcp-search-1  Healthy
+up exit=0
+=== Fri Oct 30 09:32:56 TST 2026 lint
+ruff check backend scripts data/samples/scripts services
+All checks passed!
+ruff format --check backend scripts data/samples/scripts services
+250 files already formatted
+lint exit=0
+=== Fri Oct 30 09:33:25 TST 2026 alembic heads
+03a_0001 (03a) (effective head)
+03b_0001 (03b) (head)
+04a_0001 (04a) (head)
+05a_0001 (05a) (head)
+08_0001 (08) (head)
+heads exit=0
+=== Fri Oct 30 09:33:46 TST 2026 make test llmaas
+tests/contract/test_c5_vectorstore.py ...                                [100%]
+
+======================= 583 passed in 156.55s (0:02:36) ========================
+test exit=0
+=== Fri Oct 30 09:37:02 TST 2026 make test airgap
+tests/contract/test_c5_vectorstore.py ...                                [100%]
+
+======================= 583 passed in 150.81s (0:02:30) ========================
+test-airgap exit=0
+=== Fri Oct 30 09:39:53 TST 2026 test-samples
+Ran 53 tests in 4.127s
+
+OK (skipped=5)
+samples exit=0
+=== Fri Oct 30 09:40:11 TST 2026 test-int
+    await self.pool.close(close_connection_pool=True)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+============ 299 passed, 4 skipped, 2 warnings in 368.64s (0:06:08) ============
+test-int exit=0
+=== Fri Oct 30 09:46:41 TST 2026 smoke
+python scripts/smoke.py
+ok    backend /healthz 200
+ok    litellm /health/liveliness 200
+ok    langfuse /api/public/health 200, /api/public/projects 200
+ok    mcp-search /healthz 200
+ok    mcp-sql /healthz 200
+ok    skipped: ollama profile inactive
+smoke: passed
+smoke exit=0
+=== Fri Oct 30 09:46:56 TST 2026 frontend lint/typecheck/check:api (node, --network none, ffcore-10a-nm)
+    at readFileSync (node:fs:453:35)
+    at file:///app/scripts/check-api.mjs:18:21
+    at ModuleJob.run (node:internal/modules/esm/module_job:325:25)
+    at async ModuleLoader.import (node:internal/modules/esm/loader:606:24)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '../backend/openapi/03a.yaml'
+}
+
+Node.js v20.19.5
+frontend exit=1
+=== Fri Oct 30 09:47:30 TST 2026 down -v
+ Volume ffmain_langfuse_clickhouse_logs  Removed
+ Volume ffmain_langfuse_postgres_data  Removed
+=== Fri Oct 30 09:47:53 TST 2026 done
+> ffcore-frontend@0.1.0 typecheck
+> tsc --noEmit
+
+
+> ffcore-frontend@0.1.0 check:api
+> node scripts/check-api.mjs
+
+API contract copies and generated types are current.
+check:api rerun exit=0

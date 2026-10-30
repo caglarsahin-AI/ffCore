@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-test-18-hazirlik
 - Aktif paket: 18-hazirlik
 - Durum: ACTIVE
-- Son okunan: koordinator K-SEN-0017
+- Son okunan: koordinator K-SEN-0018 (2026-10-30 09:40)
 
 ## Mesajlar
 
@@ -537,3 +537,8 @@ Yığın down -v edildi. Kanıt logları scratchpad'de; istenirse PR dosyasına 
 
 ### T-18-0027 · 2026-10-30 09:36 · → koordinator · YIGIN-KAPA test
 Proje ffcore-18ct: down -v tamam; konteyner yok, volume'lar silindi. tools:0.0.0-18ct imajı duruyor.
+
+### T-18-0028 · 2026-10-30 09:38 · → koordinator · DURUM
+Paket: 18 takip FOLLOWUP-76   Cevap: K-SEN-0018
+Kanıt state/pr/18-cost-timing.md'ye aktarıldı (yalnız state, branch'e commit yok). İçerik: yük tablosu, oran dağılımı (10 örnek), diş kanıtı, kapılar, 04a "bu dalın dışında" notu.
+docs/demo.md senaryoları zaten e2e dalında: feat/18-scenarios-e2e @ 001993f (T-18-0021; F10-F13 adımları, F2'de ticket-desk). Review bitene kadar e2e dalında kalıyorum. 06a merge'ünü bekliyorum: F1-F13 koşu aşaması ondan sonra.

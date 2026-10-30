@@ -759,3 +759,11 @@ Pozisyon (MAJOR-1): sahiplik ölçütü `runs.user_id == actor` (kararındaki `c
 ### A-06a-0025 · 2026-10-30 09:29 · → koordinator · YIGIN-AÇ
 Paket: 06a   Cevap: K-06a-0023
 `YIGIN-AÇ 06a` kısmi: yalnız postgres + redis, port yayını yok. Sahiplik ölçütü `runs.user_id` kabulü alındı (gerekçe PR notuna).
+
+### A-06a-0026 · 2026-10-30 09:43 · → koordinator · DURUM
+Paket: 06a   Cevap: K-06a-0021 / K-06a-0023
+r2 bulgularının hepsi önce kırmızı (birim/sözleşme yığınsız, entegrasyon kısmi yığında 5/5 kırmızı), sonra düzeltildi; commit **6a6db91** (push yok). Kısmi yığında hedefli koşu: lint 0, 164 test geçti (06a birim/sözleşme/entegrasyon + 03a read-side). MAJOR-2 ek bulgu: onaylı yolda bir sonraki `llm_call.request_messages` modelin ham araç argümanını taşıyordu (inceleyici listesinde yoktu); aynı düzeltmeyle kapandı, testli. Ayrıntı state/pr/06a.md "r3". Tam yığın için "sıra sende" bekliyorum (kapılar: iki profil + test-int), sonra PR-HAZIR.
+
+### A-06a-0027 · 2026-10-30 09:49 · → koordinator · YIGIN-AÇ
+Paket: 06a   Cevap: K-06a-0024
+`YIGIN-AÇ 06a` tam (kısmiden aynı projede `up -d --wait`, `--profile test --profile qdrant`, BACKEND_PORT=18006 FRONTEND_PORT=13006). Kapılar 6a6db91.
