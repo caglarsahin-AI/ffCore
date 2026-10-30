@@ -1,0 +1,99 @@
+
+=== 23:46:41 build backend frontend tools
+#37 [frontend] exporting to image
+#37 exporting layers
+#37 exporting layers 1.1s done
+#37 writing image sha256:6114d028958ed9adfb6ef9cc22fb419ebb7d7087674e75199241b46916fcbe75 done
+#37 naming to docker.io/ffcore/frontend:0.0.0-main 0.0s done
+#37 DONE 1.1s
+build exit=0
+
+=== 23:47:57 compose config
+config exit=0
+
+=== 23:48:07 up
+ Container ffmain-backend-1  Healthy
+ Container ffmain-ticket-desk-1  Healthy
+ Container ffmain-langfuse-worker-1  Healthy
+ Container ffmain-langfuse-web-1  Healthy
+ Container ffmain-mcp-search-1  Healthy
+ Container ffmain-mcp-sql-1  Healthy
+up exit=0
+ffmain-worker-1 Up 2 seconds
+ffmain-agent-worker-1 Up 16 seconds
+ffmain-mcp-search-1 Up 15 seconds (healthy)
+ffmain-frontend-1 Up 15 seconds
+ffmain-mcp-sql-1 Up 15 seconds (healthy)
+ffmain-agent-worker-bg-1 Up 15 seconds
+ffmain-backend-1 Up 28 seconds (healthy)
+ffmain-langfuse-web-1 Up About a minute (healthy)
+ffmain-langfuse-worker-1 Up About a minute
+ffmain-litellm-1 Up About a minute (healthy)
+ffmain-ticket-desk-1 Up About a minute (healthy)
+ffmain-qdrant-1 Up About a minute (healthy)
+ffmain-fake-llm-1 Up About a minute
+ffmain-postgres-1 Up About a minute (healthy)
+ffmain-langfuse-minio-1 Up About a minute (healthy)
+ffmain-langfuse-redis-1 Up About a minute (healthy)
+ffmain-redis-1 Up About a minute (healthy)
+ffmain-langfuse-clickhouse-1 Up About a minute (healthy)
+ffmain-langfuse-postgres-1 Up About a minute (healthy)
+
+=== 23:50:02 lint
+ruff check backend scripts data/samples/scripts services
+All checks passed!
+ruff format --check backend scripts data/samples/scripts services
+318 files already formatted
+lint exit=0
+
+=== 23:50:29 alembic heads
+03a_0001 (03a) (effective head)
+03b_0001 (03b) (head)
+04a_0001 (04a) (head)
+05a_0001 (05a) (head)
+06a_0001 (06a) (effective head)
+07_0001 (07) (head)
+08_0001 (08) (head)
+heads exit=0
+
+=== 23:50:51 make test llmaas
+........................................................................ [  9%]
+........................................................................ [ 19%]
+........................................................................ [ 29%]
+........................................................................ [ 39%]
+........................................................................ [ 49%]
+........................................................................ [ 59%]
+........................................................................ [ 69%]
+........................................................................ [ 79%]
+........................................................................ [ 89%]
+........................................................................ [ 99%]
+.....                                                                    [100%]
+725 passed in 135.33s (0:02:15)
+test exit=0
+
+=== 23:53:39 make test airgap
+........................................................................ [  9%]
+........................................................................ [ 19%]
+........................................................................ [ 29%]
+..................................Exception occurred during processing of request from ('127.0.0.1', 60440)
+.Traceback (most recent call last):
+..................................... [ 39%]
+........................................................................ [ 49%]
+........................................................................ [ 59%]
+........................................................................ [ 69%]
+........................................................................ [ 79%]
+........................................................................ [ 89%]
+........................................................................ [ 99%]
+.....                                                                    [100%]
+725 passed in 140.01s (0:02:20)
+test-airgap exit=0
+
+=== 23:56:20 test-samples
+
+----------------------------------------------------------------------
+Ran 54 tests in 10.028s
+
+OK (skipped=5)
+samples exit=0
+
+=== 23:56:47 test-int
