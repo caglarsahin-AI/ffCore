@@ -708,3 +708,16 @@ YENİ bulgu (öncelikli): secrets entropi kuralı belge adlarını API_TOKEN say
 - Seed hedef projede secrets'i log yaptı (belgeli).
 - Öneri: 08 DUZELT, bulgu 1 düzeltmesinden önce ya da aynı dalda.
 Sıradaki iş fix/08-default-egress-enforce (sende kararlı); secrets yanlış pozitifini o dala katmamı ister misin?
+
+### T-08E-0001 · 2026-10-30 12:53 · → koordinator · DURUM: PLANNED
+Paket: fix/08-default-egress-enforce [B]   Cevap: K-SEN-0030
+Dal main 01639c5 (worktree). Önce kırmızı, üç dilim:
+1. **secrets entropi**: rules.find_secrets'te _TOKEN adayı, [-_.] ile bölünen her parçası "tek tür" ise (yalnız harf ya da yalnız rakam) tanımlayıcı sayılır, atlanır. Örnekler: SZL-2025-003_temizlik-hizmet, hastane-a-admin-edit. Rastgele token'lar parça içinde harf+rakam karışık (tok_8c0aa0…, test_08_11 vakası) → yakalanmaya devam eder. Vendor kalıpları ve parola anahtar sözcüğü değişmez.
+   Testler: 13a sözleşme adları ve breadcrumb biçimi allow; karışık token'lar block (mevcut 08_11 aynen).
+2. **yerleşik default egress PII enforce** (K-SEN-0029 A, FOLLOWUP-102). Mod politika düzeyinde; monitor politika metni hiç değiştirmiyor (engine.py son satırlar). Seçenekler:
+   - **A (öneri)** Rule'a additive `mode: monitor|enforce|null` (null = politika modu). Yerleşik egress PII tokenize kuralı mode=enforce; politika monitor kalır. Etki: C4 additive alan + openapi/08.yaml güncellemesi; yalnız egress tokenize uygulanır; input/output redact ve secrets monitor kalır. Proje politikaları da kural düzeyinde kullanabilir.
+   - **B** Yerleşik politika tamamen enforce. Etki: kullanıcı girdisi modelden önce redact olur, secrets her aşamada bloklar; airgap'te de input redact devreye girer. Daha geniş davranış değişikliği.
+   - **C** Engine'de "egress tokenize her zaman uygulanır" özel durumu. Etki: gizli otomatik davranış (ARCH-10), önermiyorum.
+   A ile ilerliyorum. Testler: yerleşik politikayla egress'te ham PII yok; input.pre yerleşikte monitor kalır; secrets egress'te bloklamaz (monitor).
+3. docs/guardrail.md: yerleşik politika satırı, kural modu, entropi istisnası.
+Kapılar: lint + make test iki profil, yığınsız.
