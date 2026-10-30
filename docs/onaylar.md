@@ -83,7 +83,10 @@ a deployment) the backend has `POST /api/v1/internal/approvals/sweep?now=<ISO 86
 zone>`. It is for the service account only and runs the same sweep as the minute job with that
 `now`. The answer is `{"expired": [<approval ids>]}`. A second call with the same `now` expires
 nothing more. When the flag is off, the path answers 404 like an unknown path, before any
-identity check. The hook is not in the OpenAPI contract.
+identity check. The hook is not in the OpenAPI contract. Compose passes the flag in the
+backend's environment (`FFCORE_TEST_HOOKS: ${FFCORE_TEST_HOOKS:-0}`); the hook runs the sweep
+in the backend process. `.env.test` leaves it off; the end-to-end stack sets
+`FFCORE_TEST_HOOKS=1` in its own env file (13b).
 
 | Answer | When |
 |---|---|
