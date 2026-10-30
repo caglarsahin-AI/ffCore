@@ -100,7 +100,7 @@ def test_07_queue_needs_analyst_membership(pg, member, project, client_factory, 
     assert response.status_code == 403
     assert response.json()["error"]["code"] == "insufficient_role"
     _, outsider = make_user()
-    assert client_factory(outsider).get(P.format(project)).status_code == 403
+    assert client_factory(outsider).get(P.format(project)).status_code == 404  # FOLLOWUP-103
 
 
 def test_07_service_token_without_user_cannot_read(pg, project, client_factory):

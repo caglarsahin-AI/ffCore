@@ -197,9 +197,13 @@ def make_project(pg):
     return make
 
 
-def audit_rows(pg, action, outcome=None):
+def audit_rows(pg, action, outcome=None, project=None):
+    """Audit rows of one action; `project` narrows to one project (the database is shared)."""
     query = "SELECT actor_id, outcome, after FROM audit_events WHERE action = %s"
     params = [action]
+    if project is not None:
+        query += " AND project_id = %s"
+        params.append(project)
     if outcome:
         query += " AND outcome = %s"
         params.append(outcome)

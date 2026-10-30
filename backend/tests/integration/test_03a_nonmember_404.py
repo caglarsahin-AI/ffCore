@@ -43,9 +43,13 @@ ROUTES = sorted(set(_project_routes()))
 
 
 def _fill(path: str, project_id) -> str:
-    """The project id in its slot; any other path parameter gets a placeholder that exists nowhere."""
+    """The project id in its slot; other path parameters get a placeholder that exists nowhere."""
     path = path.replace("{project_id}", str(project_id))
-    return re.sub(r"\{[a-z_]+\}", lambda m: str(uuid.uuid4()) if m[0].endswith("_id}") else "x", path)
+
+    def placeholder(match):
+        return str(uuid.uuid4()) if match[0].endswith("_id}") else "x"
+
+    return re.sub(r"\{[a-z_]+\}", placeholder, path)
 
 
 def _call(client, method, url):
@@ -81,12 +85,22 @@ def test_03a_nonmember_route_list_covers_followup_103():
     assert f10 <= routes, sorted(f10 - routes)
 
 
+# Tenant-level routes (superadmin only) refuse every non-superadmin before any project lookup:
+# the same 403 for an existing and a missing project, so they leak nothing either.
+TENANT_ROUTES = {("delete", f"{API}/projects/{{project_id}}")}
+
+
 @pytest.mark.parametrize(("method", "path"), ROUTES, ids=[f"{m} {p}" for m, p in ROUTES])
 def test_03a_nonmember_gets_404_like_missing_project(method, path, stranger, make_project):
     _, client = stranger
     target = make_project()
     nonmember = _call(client, method, _fill(path, target))
     missing = _call(client, method, _fill(path, uuid.uuid4()))
+    if (method, path) in TENANT_ROUTES:
+        assert nonmember.status_code == 403
+        assert nonmember.json()["error"]["code"] == "insufficient_role"
+        assert nonmember.json() == missing.json() and missing.status_code == 403
+        return
     assert (nonmember.status_code, nonmember.json()) == (404, NOT_FOUND), nonmember.text
     assert (missing.status_code, missing.json()) == (404, NOT_FOUND), missing.text
 

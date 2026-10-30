@@ -321,8 +321,11 @@ async def authorize(
             code = "insufficient_role"
         elif need.write and grant.access != "edit":
             code = "read_only_access"
-    if code == "project_not_found":
-        raise ApiError(404, "not_found_error", code, "Project not found.")
+    if code in HIDDEN_PROJECT:
+        # A project the caller cannot see answers exactly like a missing one (FOLLOWUP-103,
+        # decision A): same status, same body. The real reason stays in the audit row.
+        await _audit_denied(request, actor, project_id, "project_not_found", need, reason=code)
+        raise ApiError(404, "not_found_error", "project_not_found", "Project not found.")
     if code is not None:
         await _audit_denied(request, actor, project_id, code, need)
         message = {
@@ -350,8 +353,15 @@ def require_superadmin(*, write: bool = False) -> RoleRequirement:
     return RoleRequirement("admin", write=write, scope="tenant")
 
 
+# Internal reasons for "this project does not exist for you"; both answer 404 project_not_found.
+HIDDEN_PROJECT = ("no_project", "not_member")
+
+
 async def _grant(actor: Actor, project_id: str | None) -> tuple[Grant | None, str | None]:
-    """The caller's role and access for the project (or tenant). (grant, None) or (None, code)."""
+    """The caller's role and access for the project (or tenant). (grant, None) or (None, code).
+
+    `no_project` and `not_member` are internal reasons, never sent to the caller (HIDDEN_PROJECT).
+    """
     from sqlalchemy import select
 
     from ffcore.core import db
@@ -363,7 +373,7 @@ async def _grant(actor: Actor, project_id: str | None) -> tuple[Grant | None, st
         user_id = uuid.UUID(actor.actor_id)
         project_uuid = uuid.UUID(project_id) if project_id else None
     except ValueError:
-        return None, "insufficient_role" if project_id is None else "project_not_found"
+        return None, "insufficient_role" if project_id is None else "no_project"
     # The project in an X-On-Behalf-Of token bounds the whole call (K-03a-0007, decision A):
     # no tenant administration and no other project, whatever the user may do in the console.
     if actor.via_service and (project_uuid is None or actor.project_id != str(project_uuid)):
@@ -380,7 +390,7 @@ async def _grant(actor: Actor, project_id: str | None) -> tuple[Grant | None, st
                 select(Project.id).where(Project.id == project_uuid, Project.deleted_at.is_(None))
             )
             if live is None:
-                return None, "project_not_found" if user.is_superadmin else "insufficient_role"
+                return None, "no_project"
         # Superadmin rights belong to the console session; under OBO only membership counts.
         if user.is_superadmin and not actor.via_service:
             return Grant("admin", user.superadmin_access or "read", True), None
@@ -392,12 +402,18 @@ async def _grant(actor: Actor, project_id: str | None) -> tuple[Grant | None, st
             )
         )
     if member is None:
-        return None, "insufficient_role"
+        return None, "not_member"
     return Grant(member.role, member.access, False), None
 
 
 async def _audit_denied(
-    request: Request, actor: Actor, project_id: str | None, code: str, need: RoleRequirement
+    request: Request,
+    actor: Actor,
+    project_id: str | None,
+    code: str,
+    need: RoleRequirement,
+    *,
+    reason: str | None = None,
 ) -> None:
     from ffcore.core.audit import AuditEntry, request_context, write_event_detached
 
@@ -407,6 +423,15 @@ async def _audit_denied(
         valid_project = str(uuid.UUID(project_id)) if project_id else None
     except ValueError:
         valid_project = None
+    after = {
+        "method": request.method,
+        "path": getattr(route, "path", request.url.path),
+        "code": code,
+        "min_role": need.min_role,
+        "write": need.write,
+    }
+    if reason is not None:
+        after["reason"] = reason
     await write_event_detached(
         AuditEntry(
             action=getattr(route, "name", request.url.path),
@@ -415,13 +440,7 @@ async def _audit_denied(
             actor_type=actor.actor_type,
             actor_id=actor.actor_id,
             project_id=valid_project,
-            after={
-                "method": request.method,
-                "path": getattr(route, "path", request.url.path),
-                "code": code,
-                "min_role": need.min_role,
-                "write": need.write,
-            },
+            after=after,
             request_id=request_id,
             ip=ip,
         )

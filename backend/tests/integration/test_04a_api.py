@@ -190,7 +190,7 @@ def test_04a_16_empty_acl_not_visible_to_another_project(world, settings, queue)
     upload(world, world["admin"], kb["id"], "acik.md", PROSE * 8, acl_open="true")
     process_all(settings, queue)
     response = search(world["stranger"], world, kb["id"], "fesih")
-    assert response.status_code == 403
+    assert response.status_code == 404  # not a member: the project does not exist for them
 
 
 def test_04a_18_search_on_behalf_of_user(world, settings, queue, app_settings):
