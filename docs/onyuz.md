@@ -17,7 +17,15 @@ and system status).
 | `/knowledge-bases` | Knowledge bases of the selected project | analyst | list; create (admin) |
 | `/knowledge-bases/{id}` | One knowledge base: settings, documents, try search | analyst | edit, delete (admin); upload, delete document, rebuild a layer (analyst+edit); search (read too) |
 | `/system-status` | Readiness of the installation (`/readyz`) | admin | read only |
-| `/overview` and every other menu item | Later packages (10b-poc-2, 10c) | see role matrix | "not available yet" page |
+| `/tools` | Tools (MCP and OpenAPI servers) of the selected project | developer | list; register (admin) |
+| `/tools/{id}` | One tool: settings, discovered actions, try an action | developer | edit, delete, discover, action switches, try (admin + edit) |
+| `/agents` | Agents of the selected project | analyst | list; create (analyst + edit) |
+| `/agents/{id}` | Agent wizard and test panel | analyst | edit the draft, publish, new draft, roll back, test run (analyst + edit) |
+| `/runs` | Runs of the selected project | analyst | list with filters |
+| `/runs/{id}` | One run: summary, answer, events, expert feedback | analyst | cancel (the run's user or an admin), feedback (edit) |
+| `/approvals` | Approval queue | analyst | list, pending by default |
+| `/approvals/{id}` | One approval | analyst | approve, reject (when `can_decide`) |
+| `/overview` and every other menu item | Later packages (10c and others) | see role matrix | "not available yet" page |
 | `/dev/theme` | Components in both themes side by side | none | done |
 
 A path outside the user's role renders "You do not have access". This is a UI convenience;
@@ -111,7 +119,9 @@ no-hard-coded-colour rule covers components only.
   automatically; project screens without a selection say "Select a project".
 - **Contract.** `frontend/mocks/openapi-03a.yaml` is a byte copy of `backend/openapi/03a.yaml`;
   `lib/api/schema.d.ts` is generated from it. `npm run gen:api` refreshes both, `npm run
-  check:api` fails on drift. No API type is written by hand.
+  check:api` fails on drift. No API type is written by hand. 04a, 05a and 06a types
+  (`lib/api/schema-{04a,05a,06a}.d.ts`) are generated straight from `backend/openapi/*.yaml`.
+  07 approval types (`lib/api/schema-07.d.ts`) likewise.
 - **Errors.** Every 4xx carries `{error: {message, type, code}}`. `lib/api/errors.ts` maps codes
   to messages (`read_only_access`, `insufficient_role`, `cross_origin_forbidden`,
   `obo_project_scope`, ...); an unknown code shows the generic message with the code and backend
@@ -156,6 +166,47 @@ detail as it is. While the models warm up the page refreshes every 5 s. A respon
 contract is shown as an error, never as "ready". Without model weights the page says
 `model_missing` and that weights come only from `make models`, which the operator runs. With
 `FAKE_EMBED=1` (tests only) the models check says so.
+
+## Tools, agents, runs and approvals (05a, 06a, 07)
+
+- **Tools.** Developers and above read tools; registering, editing, deleting, discovering, the
+  action switches and "Try" are admin + edit (05a). Five identity types (none, bearer, custom
+  header, basic, forward the user). Stored secrets come back as `***` and are kept unless the
+  identity is changed. Field errors from the backend land on their field: `tool_key_taken`
+  (key), `endpoint_url_not_allowed` and the egress codes (address), `header_name_not_allowed`
+  (identity). Discovered actions arrive switched off and needing approval; nothing is switched on
+  for the user. "Try" takes the arguments as JSON and shows the tool's answer with `truncated`,
+  `is_error` and the latency.
+- **Agents.** The wizard edits the latest draft's definition (C8) in place and saves it with one
+  `PUT`; a published latest version is read-only until "New draft" is used, because 06a never
+  edits a published version. Tabs: Identity (name and description are saved at once; the model
+  is part of the draft), Instructions (inline text or a Langfuse prompt, exactly one; variables;
+  placeholders without a variable are listed while typing, and the backend's
+  `variable_undefined` is the final word), Knowledge (`always` or `as a tool`; empty passages and
+  minimum score mean the knowledge base default; the minimum score is off where the reranker is
+  on), Tools (actions switched on for the tool; the approval list; the approver role, never
+  `user`), Safety and limits, Output (free text or a JSON schema) and Publish (versions, publish,
+  new draft, roll back to a version published before). Read access disables every field. Agent
+  templates (13a) are not offered in the wizard; 13b seeds them (D2).
+- **Analysts and tools.** 05a lists tools to developers only, so an analyst sees the actions
+  already chosen, read-only, with the reason (FOLLOWUP-100 opens tool reads to analysts).
+- **Test panel.** Starts a `channel=test` run of the saved version and follows its stream with
+  `fetch` (not `EventSource`: the start is a POST): tokens, tool cards with the masked arguments as
+  sent, source cards, fallback and progress notes. An event name the console does not know is
+  ignored (C9). A dropped stream reconnects with `Last-Event-ID` (`GET /runs/{id}/stream`) and
+  says "reconnecting"; one that cannot be resumed is reported as lost, because the run may still
+  be going. An approval is decided on the 07 endpoint (`/approvals/{id}/approve|reject`, D1) and
+  the stream continues from `stream_after`; an `ask_user` question is answered with `/resume`.
+- **Runs.** Explicit filters (agent, status, channel, feedback pending/given), nothing
+  preselected. The detail shows timings, the answer, and the stored events (18 C9 types; an
+  unknown type keeps its raw name) with their payloads as stored: tool arguments are already
+  masked by the guardrail, the console never fetches raw values. The Langfuse trace id is shown
+  as text: the console has no Langfuse address to link to. Expert feedback (F9): a vote and a
+  note on a completed run, with edit access.
+- **Approvals.** The queue opens on pending approvals; the sidebar badge counts them for the
+  selected project. The detail shows the masked arguments, the model's reason and a link to the
+  run; the buttons follow `can_decide` (signed-in user, edit access, role at least the assigned
+  one) and the backend's 403/409 codes become messages.
 
 ## Provider and model forms
 
@@ -202,33 +253,37 @@ Node runs only in containers (`docs/gelistirme-ortami.md`).
 
 ### Acceptance tests (Playwright, real backend)
 
-From the repository root, on a throwaway stack (`-p 10bp1`; use any project name). The provider
-tests point at `http://fake-llm:11434`, so the stack allows that host on the command line (the
-shell value wins over `.env.test`; no file changes). The list must keep `langfuse-web` from
-`.env.test`: since 02 the backend refuses to start when `LANGFUSE_HOST` is not an allowed host. `fake-llm` itself is not started: LiteLLM
-does not call a provider when a model is registered, and the connection test reports the failure. If
-another stack already uses host port 8000, add `BACKEND_PORT=<free port>` to the `export` line; the
-tests reach the backend inside the compose network.
+From the repository root, on a throwaway stack (`-p 10bp2`; use any project name). Each stack sets
+its own host ports (`BACKEND_PORT`, `FRONTEND_PORT`; K-INIT-0020: the defaults 8000/3000 are not
+used, so stacks never collide); the tests reach the backend inside the compose network. The
+`test` profile starts the two fakes the agent tests need: `fake-llm` (chat on port 9999; model id
+`tool-default` calls the first offered tool once) and `ticket-desk` (MCP server with
+`send_reply`, which needs approval). `ALLOWED_INTERNAL_HOSTS` is the `.env.test` list plus
+`fake-llm`: the provider connection tests make the backend call it directly (the agent runs reach
+it through LiteLLM, which needs no entry). The shell value wins over `.env.test`; no file changes.
+Runs need the `platform_rules` prompt in Langfuse, so `seed-prompts` runs once per stack.
 
 The knowledge base tests run in two stages on the same stack. Stage 1 has no model weights and
 `FAKE_EMBED` off, so `/readyz` reports `model_missing`; only the test tagged `@model-missing` runs.
 Stage 2 restarts the backend and the ingest worker with `FAKE_EMBED=1` (deterministic stand-in
 embedding and reranker, no weights) and runs everything else. Export it rather than prefixing one
 command: the `e2e` service depends on the backend, so `run` recreates the backend from the shell's
-values, and a prefix-only `FAKE_EMBED=1` is back to 0 by the time the tests start. Weightless formats (measured): PDFs
-with a text layer are indexed; DOCX and Markdown need Docling weights and fail with
-`model_missing`, which the tests use as the failed-document case. `--workers=1` keeps the waits
-stable on a shared machine.
+values, and a prefix-only `FAKE_EMBED=1` is back to 0 by the time the tests start (FOLLOWUP-93).
+Weightless formats (measured): PDFs with a text layer are indexed; DOCX and Markdown need Docling
+weights and fail with `model_missing`, which the tests use as the failed-document case. The
+stand-in reranker scores the share of query words found in a passage, so questions about the
+Turkish samples are asked in Turkish. `--workers=1` keeps the waits stable on a shared machine.
 
 ```bash
-export ALLOWED_INTERNAL_HOSTS=litellm,langfuse-web,fake-llm FFCORE_VERSION=0.0.0-10bp1
-docker compose -p 10bp1 --env-file .env.test up -d --wait --build backend
-printf 'dummy-not-secret-e2e-pw' | docker compose -p 10bp1 --env-file .env.test run --rm -T backend python -m ffcore.cli create-superadmin --email e2e-admin@example.org --full-name "E2E Admin" --password-stdin
-docker compose -p 10bp1 --env-file .env.test --profile e2e run --rm e2e sh -c "npm ci --no-audit --no-fund && npx playwright test --grep @model-missing --workers=1"
+export ALLOWED_INTERNAL_HOSTS=litellm,langfuse-web,mcp-search,mcp-sql,ticket-desk,fake-llm FFCORE_VERSION=0.0.0-10bp2 BACKEND_PORT=18010 FRONTEND_PORT=13010
+docker compose -p 10bp2 --env-file .env.test --profile test up -d --wait --build
+docker compose -p 10bp2 --env-file .env.test --profile tools run --rm --no-deps tools make seed-prompts
+printf 'dummy-not-secret-e2e-pw' | docker compose -p 10bp2 --env-file .env.test run --rm --no-deps -T backend python -m ffcore.cli create-superadmin --email e2e-admin@example.org --full-name "E2E Admin" --password-stdin
+docker compose -p 10bp2 --env-file .env.test --profile test --profile e2e run --rm e2e sh -c "npm ci --no-audit --no-fund && npx playwright test --grep @model-missing --workers=1"
 export FAKE_EMBED=1   # keep it set: `run e2e` recreates the backend from the shell's values
-docker compose -p 10bp1 --env-file .env.test up -d --wait backend worker
-docker compose -p 10bp1 --env-file .env.test --profile e2e run --rm e2e sh -c "npm ci --no-audit --no-fund && npx playwright test --grep-invert @model-missing --workers=1"
-docker compose -p 10bp1 --env-file .env.test --profile e2e down -v
+docker compose -p 10bp2 --env-file .env.test --profile test up -d --wait backend worker
+docker compose -p 10bp2 --env-file .env.test --profile test --profile e2e run --rm e2e sh -c "npm ci --no-audit --no-fund && npx playwright test --grep-invert @model-missing --workers=1"
+docker compose -p 10bp2 --env-file .env.test --profile test --profile e2e down -v
 ```
 
 The superadmin is created once per stack; `tests/e2e/global-setup.ts` creates the other accounts
@@ -238,7 +293,7 @@ It also gets `LITELLM_URL` and `LITELLM_MASTER_KEY` (the `.env.test` test value)
 LiteLLM's `/model/info`; the key goes only in a header. CI runs the same commands. Playwright image: `mcr.microsoft.com/playwright:v1.64.1-noble`
 (`sha256:47b510dd9230bf0b9bfc9b20102241e577ea7a99334ab4c3ca19f19770e9b8ea`), matching
 `@playwright/test` 1.64.1, pinned in `deploy/docker-compose.yml`. Screenshots are written to
-`docs/images/10a-<screen>-<theme>.png`.
+`docs/images/<package>-<screen>-<theme>.png` (10a, 10bp1, 10mrk, 10bp2).
 
 ## Screenshots
 
@@ -260,3 +315,11 @@ LiteLLM's `/model/info`; the key goes only in a header. CI runs the same command
 | Knowledge base, edit and read mode | ![](images/10bp1-kb-detail-edit.png) | ![](images/10bp1-kb-detail-read.png) |
 | Brand: sign in | ![](images/10mrk-login-light.png) | ![](images/10mrk-login-dark.png) |
 | Brand: sidebar | ![](images/10mrk-projects-light.png) | ![](images/10mrk-projects-dark.png) |
+| Tools | ![](images/10bp2-tools-light.png) | ![](images/10bp2-tools-dark.png) |
+| Tool: actions | ![](images/10bp2-tool-detail-light.png) | ![](images/10bp2-tool-detail-dark.png) |
+| Agents | ![](images/10bp2-agents-light.png) | ![](images/10bp2-agents-dark.png) |
+| Agent wizard: tools, test panel | ![](images/10bp2-agent-wizard-tools-light.png) | ![](images/10bp2-agent-wizard-tools-dark.png) |
+| Runs | ![](images/10bp2-runs-light.png) | ![](images/10bp2-runs-dark.png) |
+| Run detail | ![](images/10bp2-run-detail-light.png) | ![](images/10bp2-run-detail-dark.png) |
+| Approvals | ![](images/10bp2-approvals-light.png) | ![](images/10bp2-approvals-dark.png) |
+| Approval detail | ![](images/10bp2-approval-detail-light.png) | ![](images/10bp2-approval-detail-dark.png) |

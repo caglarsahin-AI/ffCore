@@ -1,7 +1,7 @@
 // Fails when the frontend contract copy or the generated types drift from the backend contract.
 //   npm run check:api   (CI and before every PR; `npm run gen:api` fixes both)
-// 03a keeps its copy in mocks/ (10a); 04a types come straight from the backend spec (K-10bp-0002:
-// one source, no copy to drift).
+// 03a keeps its copy in mocks/ (10a); 04a, 05a, 06a and 07 types come straight from the backend spec
+// (K-10bp-0002: one source, no copy to drift).
 import { execFileSync } from "node:child_process";
 import { mkdtempSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -10,6 +10,9 @@ import { join } from "node:path";
 const SPECS = [
   { backend: "../backend/openapi/03a.yaml", copy: "mocks/openapi-03a.yaml", types: "lib/api/schema.d.ts" },
   { backend: "../backend/openapi/04a.yaml", copy: null, types: "lib/api/schema-04a.d.ts" },
+  { backend: "../backend/openapi/05a.yaml", copy: null, types: "lib/api/schema-05a.d.ts" },
+  { backend: "../backend/openapi/06a.yaml", copy: null, types: "lib/api/schema-06a.d.ts" },
+  { backend: "../backend/openapi/07.yaml", copy: null, types: "lib/api/schema-07.d.ts" },
 ];
 
 const problems = [];
