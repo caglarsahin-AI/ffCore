@@ -3,9 +3,9 @@
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
 - Oturum kimliği: ffcore-isci-b-05atr
-- Aktif paket: fix/05a-tools-read-analyst (FOLLOWUP-100)
-- Durum: ACTIVE
-- Son okunan: koordinator K-13b-0004 (2026-10-30 17:50); bana adresli son mesaj K-05ATR-0001
+- Aktif paket: — (fix/05a-tools-read-analyst MERGED 96f1a5b)
+- Durum: RETIRED
+- Son okunan: koordinator K-05ATR-0007 (2026-10-30 18:46)
 
 ## Mesajlar
 
@@ -930,3 +930,15 @@ Lease bu oturumda ACTIVE kalıyor (05a review DUZELT'i için); A seçilirse 05a 
 ### B-05ATR-0008 · 2026-10-30 18:27 · → koordinator · ACK
 Paket: fix/05a-tools-read-analyst   Cevap: K-05ATR-0005
 Alındı: FOLLOWUP-104/111 bu oturumda değil. Yalnız fix/05a: REVIEW-SONUC bekliyorum (a795d9d, branch'e commit yok); DUZELT gelirse uygularım, MERGED gelince HANDOFF + RETIRED.
+
+### B-05ATR-0009 · 2026-10-30 18:48 · → koordinator · HANDOFF
+Paket: fix/05a-tools-read-analyst   Cevap: K-05ATR-0007
+- **Durum:** MERGED (main 96f1a5b; r1 ONAY a795d9d). FOLLOWUP-100 kapandı. Worktree ve branch koordinatörce kaldırıldı.
+- **Kanıt:** state/pr/fix-05a-tools-read-analyst.md; loglar state/evidence/fix-05atr-{unit,test-int,05a-v}-20261030.log.
+- **Commit edilmemiş iş:** yok. **Açık yığın:** yok (05atr `down -v`). Duran imajlar: ffcore/{backend,frontend,tools}:0.0.0-05atr (silinmesi koordinatörde, açık adla).
+- **Sonraki oturuma devredilenler:**
+  - FOLLOWUP-104: tasarım notu B-07ES-0001 (`follow()` akış anahtarı varken DB'deki terminal `error`'u vermiyor; keepalive turunda run terminal ise `replay_rows` ile tamamla; kırmızı: ikinci kayıtta xadd düşüren monkeypatch). Worktree `.worktrees/fix/07-error-sse` hazır.
+  - FOLLOWUP-111 (sweep test kancası), FOLLOWUP-113 (sql-context POST AnyMember, inceleyici gözlemi).
+  - docs/onyuz.md:20-21, :191 hâlâ "tools developer'a" (isci-c alanı).
+- **Karar/blocker:** yok; FOLLOWUP dallarının paketlenmesi kullanıcı kararı (K-05ATR-0005).
+Lease: RETIRED. Bu oturum kanala başka yazmayacak.
