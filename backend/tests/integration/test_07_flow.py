@@ -219,15 +219,18 @@ def test_07_ttl_expires_and_fails_run(team, pg, harness, use_queue, settings):
                 session, now=later, close_run=approvals.run_closer(settings)
             )
 
+    # The test database is shared: other tests' pending approvals expire too (their runs are
+    # closed only if still waiting); this run is asserted.
     expired = asyncio.run(tick())
-    assert [str(r.run_id) for r in expired] == [run_id]
+    assert run_id in {str(r.run_id) for r in expired}
     row = run_row(pg, run_id)
     assert (row["status"], row["error_code"]) == ("failed", "approval_expired")
     assert _approvals(pg, run_id)[0][1] == "expired"
     types = [t for _, t, _ in events(pg, run_id)]
     assert types[-2:] == ["approval_expired", "error"]
-    # A run that is not waiting any more is left alone by a later tick.
-    assert asyncio.run(tick()) == []
+    # A later tick finds nothing left for this run.
+    assert run_id not in {str(r.run_id) for r in asyncio.run(tick())}
+    assert run_row(pg, run_id)["status"] == "failed"
 
 
 def test_07_run_without_gate_fails_loud(team, pg, harness, use_queue):

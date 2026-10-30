@@ -136,26 +136,32 @@ def test_07_ttl_expires_and_closes_run(database_url, app_settings, make_project,
 
     ttl = timedelta(minutes=app_settings.approval_ttl_min)
     # One second before the TTL nothing happens.
+    ours = {due, fresh, decided}
+    # The test database is shared by the session: other tests' pending rows expire too; only
+    # this test's rows are asserted.
     early = _run(
         database_url,
         lambda s: approvals.expire_due(s, now=T0 + ttl - timedelta(seconds=1), close_run=close_run),
     )
-    assert early == [] and closed == []
+    assert not {row.id for row in early} & ours
+    assert not {run for run, _ in closed} & {due_run, fresh_run, decided_run}
     with caplog.at_level(logging.WARNING, logger="ffcore.approvals"):
         expired = _run(
             database_url, lambda s: approvals.expire_due(s, now=T0 + ttl, close_run=close_run)
         )
-    assert [row.id for row in expired] == [due]
-    assert closed == [(due_run, "approval_expired")]
+    assert {row.id for row in expired} & ours == {due}
+    assert (due_run, "approval_expired") in closed
+    assert not {run for run, _ in closed} & {fresh_run, decided_run}
     assert _status(pg, due) == "expired" and _status(pg, fresh) == "pending"
     assert _status(pg, decided) == "rejected"  # a decision that landed first wins
     resolved_by = pg.execute("SELECT resolved_by FROM approvals WHERE id = %s", (due,)).fetchone()
     assert resolved_by == ("system:approval_ttl",)
     assert "approval_expired" in caplog.text
     # A second tick finds nothing left to expire.
-    assert _run(
+    again = _run(
         database_url, lambda s: approvals.expire_due(s, now=T0 + ttl, close_run=close_run)
-    ) == []
+    )
+    assert not {row.id for row in again} & ours
 
 
 def test_07_ttl_run_close_failure_is_loud(database_url, app_settings, make_project, pg):
