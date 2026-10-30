@@ -253,33 +253,37 @@ Node runs only in containers (`docs/gelistirme-ortami.md`).
 
 ### Acceptance tests (Playwright, real backend)
 
-From the repository root, on a throwaway stack (`-p 10bp1`; use any project name). The provider
-tests point at `http://fake-llm:11434`, so the stack allows that host on the command line (the
-shell value wins over `.env.test`; no file changes). The list must keep `langfuse-web` from
-`.env.test`: since 02 the backend refuses to start when `LANGFUSE_HOST` is not an allowed host. `fake-llm` itself is not started: LiteLLM
-does not call a provider when a model is registered, and the connection test reports the failure. If
-another stack already uses host port 8000, add `BACKEND_PORT=<free port>` to the `export` line; the
-tests reach the backend inside the compose network.
+From the repository root, on a throwaway stack (`-p 10bp2`; use any project name). Each stack sets
+its own host ports (`BACKEND_PORT`, `FRONTEND_PORT`; K-INIT-0020: the defaults 8000/3000 are not
+used, so stacks never collide); the tests reach the backend inside the compose network. The
+`test` profile starts the two fakes the agent tests need: `fake-llm` (chat on port 9999; model id
+`tool-default` calls the first offered tool once) and `ticket-desk` (MCP server with
+`send_reply`, which needs approval). `ALLOWED_INTERNAL_HOSTS` is the `.env.test` list plus
+`fake-llm`: the provider connection tests make the backend call it directly (the agent runs reach
+it through LiteLLM, which needs no entry). The shell value wins over `.env.test`; no file changes.
+Runs need the `platform_rules` prompt in Langfuse, so `seed-prompts` runs once per stack.
 
 The knowledge base tests run in two stages on the same stack. Stage 1 has no model weights and
 `FAKE_EMBED` off, so `/readyz` reports `model_missing`; only the test tagged `@model-missing` runs.
 Stage 2 restarts the backend and the ingest worker with `FAKE_EMBED=1` (deterministic stand-in
 embedding and reranker, no weights) and runs everything else. Export it rather than prefixing one
 command: the `e2e` service depends on the backend, so `run` recreates the backend from the shell's
-values, and a prefix-only `FAKE_EMBED=1` is back to 0 by the time the tests start. Weightless formats (measured): PDFs
-with a text layer are indexed; DOCX and Markdown need Docling weights and fail with
-`model_missing`, which the tests use as the failed-document case. `--workers=1` keeps the waits
-stable on a shared machine.
+values, and a prefix-only `FAKE_EMBED=1` is back to 0 by the time the tests start (FOLLOWUP-93).
+Weightless formats (measured): PDFs with a text layer are indexed; DOCX and Markdown need Docling
+weights and fail with `model_missing`, which the tests use as the failed-document case. The
+stand-in reranker scores the share of query words found in a passage, so questions about the
+Turkish samples are asked in Turkish. `--workers=1` keeps the waits stable on a shared machine.
 
 ```bash
-export ALLOWED_INTERNAL_HOSTS=litellm,langfuse-web,fake-llm FFCORE_VERSION=0.0.0-10bp1
-docker compose -p 10bp1 --env-file .env.test up -d --wait --build backend
-printf 'dummy-not-secret-e2e-pw' | docker compose -p 10bp1 --env-file .env.test run --rm -T backend python -m ffcore.cli create-superadmin --email e2e-admin@example.org --full-name "E2E Admin" --password-stdin
-docker compose -p 10bp1 --env-file .env.test --profile e2e run --rm e2e sh -c "npm ci --no-audit --no-fund && npx playwright test --grep @model-missing --workers=1"
+export ALLOWED_INTERNAL_HOSTS=litellm,langfuse-web,mcp-search,mcp-sql,ticket-desk,fake-llm FFCORE_VERSION=0.0.0-10bp2 BACKEND_PORT=18010 FRONTEND_PORT=13010
+docker compose -p 10bp2 --env-file .env.test --profile test up -d --wait --build
+docker compose -p 10bp2 --env-file .env.test --profile tools run --rm --no-deps tools make seed-prompts
+printf 'dummy-not-secret-e2e-pw' | docker compose -p 10bp2 --env-file .env.test run --rm --no-deps -T backend python -m ffcore.cli create-superadmin --email e2e-admin@example.org --full-name "E2E Admin" --password-stdin
+docker compose -p 10bp2 --env-file .env.test --profile test --profile e2e run --rm e2e sh -c "npm ci --no-audit --no-fund && npx playwright test --grep @model-missing --workers=1"
 export FAKE_EMBED=1   # keep it set: `run e2e` recreates the backend from the shell's values
-docker compose -p 10bp1 --env-file .env.test up -d --wait backend worker
-docker compose -p 10bp1 --env-file .env.test --profile e2e run --rm e2e sh -c "npm ci --no-audit --no-fund && npx playwright test --grep-invert @model-missing --workers=1"
-docker compose -p 10bp1 --env-file .env.test --profile e2e down -v
+docker compose -p 10bp2 --env-file .env.test --profile test up -d --wait backend worker
+docker compose -p 10bp2 --env-file .env.test --profile test --profile e2e run --rm e2e sh -c "npm ci --no-audit --no-fund && npx playwright test --grep-invert @model-missing --workers=1"
+docker compose -p 10bp2 --env-file .env.test --profile test --profile e2e down -v
 ```
 
 The superadmin is created once per stack; `tests/e2e/global-setup.ts` creates the other accounts
@@ -289,7 +293,7 @@ It also gets `LITELLM_URL` and `LITELLM_MASTER_KEY` (the `.env.test` test value)
 LiteLLM's `/model/info`; the key goes only in a header. CI runs the same commands. Playwright image: `mcr.microsoft.com/playwright:v1.64.1-noble`
 (`sha256:47b510dd9230bf0b9bfc9b20102241e577ea7a99334ab4c3ca19f19770e9b8ea`), matching
 `@playwright/test` 1.64.1, pinned in `deploy/docker-compose.yml`. Screenshots are written to
-`docs/images/10a-<screen>-<theme>.png`.
+`docs/images/<package>-<screen>-<theme>.png` (10a, 10bp1, 10mrk, 10bp2).
 
 ## Screenshots
 
