@@ -11,7 +11,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** List the project's tools */
+        /**
+         * List the project's tools
+         * @description Analyst role or above; secret auth fields are returned as ***.
+         */
         get: operations["list_tools_api_v1_projects__project_id__tools_get"];
         put?: never;
         /**
@@ -33,7 +36,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get a tool with its actions */
+        /**
+         * Get a tool with its actions
+         * @description Analyst role or above; secret auth fields are returned as ***.
+         */
         get: operations["get_tool_api_v1_projects__project_id__tools__tool_id__get"];
         put?: never;
         post?: never;

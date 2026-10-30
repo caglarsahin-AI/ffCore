@@ -28,15 +28,18 @@ Passwords come from the shell, never a file:
 export FFCORE_VERSION=0.0.0-18e2e E2E_ADMIN_EMAIL=e2e-admin@example.test E2E_ADMIN_PASSWORD=... E2E_PASSWORD=...
 C="docker compose -p ffcore-18e2e --env-file .env.test --env-file tests/e2e/scenarios/e2e.env --profile test"
 $C up -d --wait
-$C run --rm --no-deps -e E2E_ADMIN_EMAIL -e E2E_ADMIN_PASSWORD -e E2E_PASSWORD tools python -m tests.e2e.scenarios.seed
+$C run --rm --no-deps -e E2E_ADMIN_EMAIL -e E2E_ADMIN_PASSWORD -e E2E_PASSWORD tools make seed
 $C run --rm --no-deps -e E2E_PASSWORD -e RUN_E2E_SCENARIOS=1 tools pytest tests/e2e/scenarios -v
 $C down -v
 ```
 
 ## Seed (`seed.py`)
 
-Public API and the documented CLI only; idempotent (a 409 is looked up by key). 13b takes it
-over. It creates: the superadmin; the Langfuse prompts (`seed-prompts`, `platform_rules` is
+Public API and the documented CLI only; idempotent (a 409 is looked up by key; a document
+with the same name, bytes and source date is not uploaded again, since a re-upload would bump its
+version). `make seed` runs it; its last line says what it changed (`created N, uploaded M`), and a
+second run says `created 0, uploaded 0`. Tool discovery runs every time (it re-reads the tool's
+list; actions keep their settings). It creates: the superadmin; the Langfuse prompts (`seed-prompts`, `platform_rules` is
 required by every run); the two projects and their members from `projects/projects.json`; the
 fake-llm provider with the models `chat-default` (answers "hello"), `chat-fail` (500) and
 `chat-slow` (slow stream), `chat-tools` (upstream `tool-default`: calls the first tool once, then

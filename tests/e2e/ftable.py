@@ -15,7 +15,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 KNOWN_FILE = HERE / "known_findings.json"
 _F_ROW = re.compile(r"::test_18_f(\d+)_")
-_SETUP = re.compile(r"::test_(?:18_env|18_seed|13b_ftable)_")
+_SETUP = re.compile(r"::test_(?:18_env|18_seed|13b_ftable|13b_\d+)_")
 _NEGATIVE = re.compile(r"::test_13b_neg_")
 _NAME = re.compile(r"::(test_[A-Za-z0-9_]+)")
 _TEST_DEF = re.compile(r"^def (test_[A-Za-z0-9_]+)\(", re.MULTILINE)

@@ -3,7 +3,7 @@
 # Servisleri başlatma/durdurma doğrudan compose ile: docker compose up -d --wait | down | logs -f
 # Önyüz lint'i ayrı konteynerde: docker compose run --rm frontend npm run lint
 
-.PHONY: lint format test test-samples test-int test-models models models-check smoke pull seed-models render-litellm reindex langfuse-init seed-prompts seed-sql-demo seed-sql-context
+.PHONY: lint format test test-samples test-int seed e2e eval test-models models models-check smoke pull seed-models render-litellm reindex langfuse-init seed-prompts seed-sql-demo seed-sql-context
 
 lint:
 	ruff check backend scripts data/samples/scripts services
@@ -84,3 +84,26 @@ seed-sql-demo:
 seed-sql-context:
 	@test -n "$(PROJECT)" || (echo "usage: make seed-sql-context PROJECT=<project_key> [TOOL=mcp-sql]" >&2; exit 2)
 	cd backend && python -m ffcore.cli seed-sql-context --project "$(PROJECT)" --tool "$(or $(TOOL),mcp-sql)" --path ../data/samples/schema
+
+# 13b: the PoC demo and scenario data (plan/18 seed, tests/e2e/scenarios/seed.py), idempotent: a
+# second run reports "created 0, uploaded 0". Passwords come from the shell, never a file:
+#   docker compose --env-file .env.test --env-file tests/e2e/scenarios/e2e.env --profile test #     run --rm -e E2E_ADMIN_EMAIL -e E2E_ADMIN_PASSWORD -e E2E_PASSWORD tools make seed e2e
+seed:
+	python -m tests.e2e.scenarios.seed
+
+# 13b: every API e2e test (plan/18 scenarios + tests/e2e/negative) against the seeded scenario
+# stack, with the F table (F1-F13, NOT_RUN reasons) written to eval/results/ (git-ignored). The
+# console's Playwright e2e is its own compose service (docker compose --profile e2e run --rm e2e;
+# tools has no Docker socket). Same compose command as `seed`, with -e E2E_PASSWORD.
+E2E_STAMP := $(shell date -u +%Y%m%d-%H%M)
+e2e:
+	RUN_E2E_SCENARIOS=1 pytest tests/e2e -rs --f-table eval/results/e2e-$(E2E_STAMP).md
+
+# 13b: an exam set through the run API, report to eval/results/ (scripts/eval_report.py). MODEL
+# names what answered (no default: a fake-llm run is reported as a pipeline check, not a result).
+# Default set data/samples/eval/sozlesme-33.json; on the PayCore server DATASET=<S1 path>.
+# APPROVE_SQL=1 approves each run_sql call (an explicit choice; without it SQL items are NOT_RUN).
+#   make eval MODEL=fake-llm [DATASET=...] [PROJECT=hastane-a] [APPROVE_SQL=1]
+eval:
+	@test -n "$(MODEL)" || (echo "usage: make eval MODEL=<what answers> [DATASET=path] [APPROVE_SQL=1]" >&2; exit 2)
+	python scripts/eval_report.py --model "$(MODEL)" --project "$(or $(PROJECT),hastane-a)" $(if $(DATASET),--dataset "$(DATASET)",) $(if $(APPROVE_SQL),--approve-sql,)
