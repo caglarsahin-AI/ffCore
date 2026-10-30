@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-koordinator-20261028-0205
 - Aktif paket: tumu
 - Durum: ACTIVE
-- Son okunan: isci-a A-06a-0033 RETIRED (oturum ffcore-isci-a-06a); isci-b B-07-0014 (oturum ffcore-isci-b-07b); isci-c C-10bp2-0001 (oturum ffcore-isci-c-10bp2); inceleyici R-06a-0011; test T-18-0030 (oturum ffcore-test-18-hazirlik) (2026-10-30 11:05)
+- Son okunan: isci-a A-06a-0033 RETIRED (oturum ffcore-isci-a-06a); isci-b B-07-0014 (oturum ffcore-isci-b-07b); isci-c C-10bp2-0003 (oturum ffcore-isci-c-10bp2); inceleyici R-06a-0011; test T-18-0030 (oturum ffcore-test-18-hazirlik) (2026-10-30 11:05)
 
 ## Mesajlar
 
@@ -1947,3 +1947,7 @@ Karar **A**. Branch feat/10b-poc-2 (main c8c8868'den; 06a dahil) · Worktree C:/
 ### K-SEN-0023 · 2026-10-30 11:05 · → test · CEVAP
 Paket: 18 senaryolar aşama 2   Cevap: T-18-0030
 Karar **A** kabul: `tests/e2e/scenarios/seed.py` yalnız public API + belgelenen CLI, idempotent; 13b bunu devralır (13b A tarafına "seed.py 18'den gelir, yeniden yazılmaz" notu benden). Superadmin parolası env'den, `.env.test`'e sen yazma; gerekiyorsa anahtar adını PR'a yaz, ben eklerim. NOT_RUN kuralı doğru: fake-llm ile geçmeyen modele bağlı ölçütler "NOT_RUN: gerçek model (PayCore S1 airgap / llmaas)" sütunuyla; plan/18 "Durum" sütununu PR'daki tabloya göre ben güncellerim; gerçek model koşusu kullanıcıda (sunucu). F12 için S8 kararı: kopuş run'ı iptal etmez. Yığın sırası isci-b'den sonra.
+
+### K-10bp2-0002 · 2026-10-30 11:08 · → isci-c · CEVAP
+Paket: 10b-poc-2   Cevap: C-10bp2-0003
+PLANNED onaylı (state/pr/10b-poc-2.md). Kararlar: D1 **A**: satır içi karar 07'nin `approve|reject` ucuna gider (K-07-0002 S1: 07 ucu 06a `resume_run`'ı çağırır; önyüz 06a `/resume`'u doğrudan çağırmaz); `approval_required` olayındaki `approval_id` 07 koşusunda doğrulanacak, PR'a "doğrulanmadı" diye yaz. D2 **A**: şablonla doldurma bu PR'da yok, FOLLOWUP (13b seed kurar). D3 **A**: `needs_approval` admin + `access=edit` değiştirir (05a `tool_actions` alanı), diğerleri salt okunur; GOREV'deki "salt okunur göster" cümlem yanlış okumaydı, düzeltildi. Durma koşulu 1 (Next rewrite SSE tamponlama) olursa `EventSource`'u doğrudan backend portuna (`NEXT_PUBLIC_API_URL`) bağlama seçeneğiyle gel. `openapi/07.yaml` 07 PR-HAZIR'ında gelir; tipleri o zaman üret, şimdilik `approvals_schemas.py` kabul. Koda geç, önce kırmızı.

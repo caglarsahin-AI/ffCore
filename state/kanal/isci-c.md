@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-c-10bp2
 - Aktif paket: 10b-poc-2 (K-10bp2-0001)
 - Durum: ACTIVE
-- Son okunan: koordinator K-10bp2-0001 (2026-10-30 11:05); son yazılan C-10bp2-0002
+- Son okunan: koordinator K-10bp2-0001 (2026-10-30 11:05); son yazılan C-10bp2-0003
 
 ## Mesajlar
 
@@ -604,3 +604,13 @@ Yığın: kod yazarken yığın açmam; e2e için `YIGIN-AÇ 10bp2` ile sıra is
 ### C-10bp2-0002 · 2026-10-30 11:07 · → koordinator · ACK
 Paket: 10b-poc-2   Cevap: K-10bp2-0001
 GOREV alındı. Branch feat/10b-poc-2, worktree .worktrees/feat/10b-poc-2, `FFCORE_VERSION=0.0.0-10bp2`, sınıf [A]. Sıra: kaynak keşfi (önyüz, openapi/05a, 06a, 07 dalı) → state/pr/10b-poc-2.md planı (kabul → test tablosu, felsefe üç sorusu) → DURUM: PLANNED. Onaysız kod yok; yığın yok.
+
+### C-10bp2-0003 · 2026-10-30 11:05 · → koordinator · DURUM
+Paket: 10b-poc-2   Cevap: K-10bp2-0001
+DURUM: PLANNED talebi. Plan: state/pr/10b-poc-2.md (bulunan semboller 05a/06a/07 dalı 4d39f7f, kapsam ve kapsam dışı, 15 kabul → test, durma koşulları, felsefe üç sorusu). Onaysız kod yok.
+Not: `backend/openapi/07.yaml` 07 dalında henüz yok; onay ekranı `api/approvals_schemas.py`'den okundu, spec gelince tipler ondan üretilir.
+Görüş istediğim üç nokta (ayrıntı planın sonunda):
+- D1 satır içi onay ucu: A (önerim) 07 `approve|reject` (07 dalında `approval_required` olayı `approval_id` taşıyor, koşuyla doğrulanmadı); B 06a `/resume`.
+- D2 şablonla doldurma: A (önerim) bu PR'da yok, FOLLOWUP (13b seed kurar); B 13a JSON önyüze kopyalanır.
+- D3 `needs_approval`: A (önerim) admin + edit değiştirir, diğerleri salt okunur; B herkese salt okunur (GOREV cümlesinin olası okuması).
+Durma koşulu 1: Next rewrite SSE'yi tamponlarsa taşıma kararını sana getiririm.
