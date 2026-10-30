@@ -55,11 +55,17 @@ def test_18_f4_2b_litellm_call_id_in_run_events(login):
     run = analyst.settle(pid, analyst.start_run(pid, "sozlesme-asistani", "Merhaba"))
     calls = [e for e in analyst.run_events(pid, run.id) if e["type"] == "llm_call"]
     assert calls and all("litellm_call_id" in c["payload"] for c in calls), calls
-    # TODO(06a merge): whether LiteLLM sets the id against fake-llm; if so, require non-null.
+    # Through LiteLLM to fake-llm the id is expected to be set; null is reported, not hidden.
+    assert all(c["payload"]["litellm_call_id"] for c in calls), [c["payload"] for c in calls]
 
 
 def test_18_f4_3_quota_429():
     pytest.skip("NOT_RUN: quotas are package 03c (PoC sonrası)")
+
+
+def test_18_f4_4_tool_arguments_masked():
+    """08-lite masks PII in tool arguments at tool.pre (06a review MAJOR-2)."""
+    pytest.skip("NOT_RUN: gerçek model gerekir (the model must call a tool with the value)")
 
 
 def test_18_f9_1_feedback_and_pending_view(login):

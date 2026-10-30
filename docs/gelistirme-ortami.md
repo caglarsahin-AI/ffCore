@@ -32,6 +32,7 @@ başlamaz. Geri alma: `docker compose run --rm migrate alembic downgrade <revizy
 | Unit + sözleşme testleri | `docker compose run --rm tools make test` |
 | Örnek veri testleri (13a, 18) | `docker compose run --rm tools make test-samples` (Postgres testleri host'ta: `RUN_PG_TESTS=1`, `data/samples/scripts/README.md`) |
 | Entegrasyon testleri | `docker compose --profile test --profile qdrant up -d --wait && docker compose run --rm tools make test-int` |
+| Kullanım senaryoları (plan/18) | `tests/e2e/scenarios/README.md`: yığın, seed ve koşu; her komut `--env-file .env.test --env-file tests/e2e/scenarios/e2e.env` ile |
 | Duman testi | `docker compose run --rm tools make smoke` |
 | Ollama modellerini çek | `docker compose run --rm tools make pull` |
 
