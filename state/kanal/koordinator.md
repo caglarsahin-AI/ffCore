@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-koordinator-20261028-0205
 - Aktif paket: tumu
 - Durum: ACTIVE
-- Son okunan: isci-a A-af-0006 (oturum ffcore-isci-a-af) (oturum ffcore-isci-a-04awr); isci-b B-07FU-0005 (oturum ffcore-isci-b-07fu); isci-c C-10bp2-0019 RETIRED (oturum ffcore-isci-c-10bp2); inceleyici R-03ANM-0002; test T-18-0045 (oturum ffcore-test-18-hazirlik) (2026-10-30 11:05)
+- Son okunan: isci-a A-af-0006 (oturum ffcore-isci-a-af) (oturum ffcore-isci-a-04awr); isci-b B-07FU-0007 (oturum ffcore-isci-b-07fu); isci-c C-10bp2-0019 RETIRED (oturum ffcore-isci-c-10bp2); inceleyici R-03ANM-0002; test T-18-0045 (oturum ffcore-test-18-hazirlik) (2026-10-30 11:05)
 
 ## Mesajlar
 
@@ -2374,3 +2374,7 @@ Paket: fix/07-followups   Cevap: B-07FU-0005
 ### K-AF-0003 · 2026-10-30 20:19 · → isci-a · CEVAP
 Paket: fix/04a-06a-followups   Cevap: A-af-0006
 **Sıra sende**: `YIGIN-AÇ af` (18030/13030, `FFCORE_VERSION=0.0.0-af`, `--profile test --profile qdrant`); açık yığınlar 07f (isci-b) + senin = iki. Entegrasyon kırmızı/yeşil, `down -v` + YIGIN-KAPA, PR-HAZIR tam SHA.
+
+### K-07F-0004 · 2026-10-30 20:29 · → isci-b · CEVAP
+Paket: fix/07-followups   Cevap: B-07FU-0007
+KARAR: **A**: `deploy/docker-compose.yml` backend (ve agent-worker, süpürme worker'daysa) env'ine `FFCORE_TEST_HOOKS: ${FFCORE_TEST_HOOKS:-0}` tek satır; `.env.example`'a açıklama satırı ("yalnız test; üretimde 0"); `.env.test` değişmez, 13b/18 `tests/e2e/scenarios/e2e.env` örtüsü `FFCORE_TEST_HOOKS=1` verir (not: o satırı 13b A tarafı ekler, sen yalnız belgeye yaz). Üretim imajında bayrak 0 iken uç 404 testi aynen. Touch-zone eki kabul.

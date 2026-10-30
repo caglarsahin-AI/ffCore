@@ -1,0 +1,150 @@
+FFF                                                                      [100%]
+=================================== FAILURES ===================================
+___________________ test_af_3_upload_sets_updated_at_source ____________________
+
+world = {'project': 'a57107b8-9752-48d7-a8c6-c7266cd7c79b', 'other': '5f26d7a2-44a0-47d8-bf70-c79ccc03723c', 'admin': <starlet...nt.TestClient object at 0x7f539699ab70>, 'admin_read': <starlette.testclient.TestClient object at 0x7f5396312900>, ...}
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_2040a78ca4cb) at 0x7f5396e16000>
+
+    def test_af_3_upload_sets_updated_at_source(world, pg):
+        kb = create_kb(world)
+        dated = upload(
+            world, world["admin"], kb["id"], "v2.md", PROSE, updated_at_source="2025-09-01"
+        )
+        assert dated.status_code == 202, dated.text
+        doc = dated.json()["data"][0]["document"]
+>       assert doc["updated_at_source"].startswith("2025-09-01")
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'updated_at_source'
+
+tests/integration/test_af_3_updated_at_source.py:36: KeyError
+---------------------------- Captured stderr setup -----------------------------
+2026-10-30 17:28:11,286 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-30 17:28:11,303 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=361
+2026-10-30 17:28:11,505 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-30 17:28:11,512 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=122
+2026-10-30 17:28:11,690 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-30 17:28:11,711 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=132
+2026-10-30 17:28:11,936 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-30 17:28:11,952 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=158
+------------------------------ Captured log setup ------------------------------
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=361
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=122
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=132
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=158
+----------------------------- Captured stderr call -----------------------------
+2026-10-30 17:28:12,182 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-30 17:28:12,250 INFO ffcore.access access method=POST path=/api/v1/projects/a57107b8-9752-48d7-a8c6-c7266cd7c79b/knowledge-bases status=201 ms=228
+2026-10-30 17:28:12,334 INFO ffcore.access access method=POST path=/api/v1/projects/a57107b8-9752-48d7-a8c6-c7266cd7c79b/knowledge-bases/099190ab-019c-4060-9f9f-c599e19c15f3/documents status=202 ms=80
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/a57107b8-9752-48d7-a8c6-c7266cd7c79b/knowledge-bases status=201 ms=228
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/a57107b8-9752-48d7-a8c6-c7266cd7c79b/knowledge-bases/099190ab-019c-4060-9f9f-c599e19c15f3/documents status=202 ms=80
+______________________ test_af_3b_patch_updated_at_source ______________________
+
+world = {'project': 'afe8714d-5cb6-47f3-980a-ed1997c68b1d', 'other': '7c3371a1-28fb-48f5-a406-cfa2874777b4', 'admin': <starlet...nt.TestClient object at 0x7f53902570e0>, 'admin_read': <starlette.testclient.TestClient object at 0x7f537c762ae0>, ...}
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_2040a78ca4cb) at 0x7f5390254b90>
+
+    def test_af_3b_patch_updated_at_source(world, pg):
+        kb = create_kb(world, key=f"kb-{uuid.uuid4().hex[:6]}")
+        doc = upload(world, world["admin"], kb["id"], "a.md", PROSE).json()["data"][0]["document"]
+        url = _document_url(world, kb["id"], doc["id"])
+    
+        changed = world["admin"].patch(url, json={"updated_at_source": "2025-01-15T00:00:00+00:00"})
+>       assert changed.status_code == 200, changed.text
+E       AssertionError: {"error":{"message":"Method Not Allowed","type":"invalid_request_error","code":"method_not_allowed"}}
+E       assert 405 == 200
+E        +  where 405 = <Response [405 Method Not Allowed]>.status_code
+
+tests/integration/test_af_3_updated_at_source.py:52: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+2026-10-30 17:28:12,761 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-30 17:28:12,777 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=145
+2026-10-30 17:28:12,988 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-30 17:28:13,007 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=158
+2026-10-30 17:28:13,305 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-30 17:28:13,333 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=191
+2026-10-30 17:28:13,559 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-30 17:28:13,586 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=174
+------------------------------ Captured log setup ------------------------------
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=145
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=158
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=191
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=174
+----------------------------- Captured stderr call -----------------------------
+2026-10-30 17:28:13,773 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-30 17:28:13,798 INFO ffcore.access access method=POST path=/api/v1/projects/afe8714d-5cb6-47f3-980a-ed1997c68b1d/knowledge-bases status=201 ms=76
+2026-10-30 17:28:13,856 INFO ffcore.access access method=POST path=/api/v1/projects/afe8714d-5cb6-47f3-980a-ed1997c68b1d/knowledge-bases/e39b5c09-e4b9-4db7-b62f-e66c2e8e12ca/documents status=202 ms=55
+2026-10-30 17:28:13,965 INFO ffcore.access access method=PATCH path=/api/v1/projects/afe8714d-5cb6-47f3-980a-ed1997c68b1d/knowledge-bases/e39b5c09-e4b9-4db7-b62f-e66c2e8e12ca/documents/b13ac06b-4ee8-45f1-aa43-349dea885e85 status=405 ms=106
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/afe8714d-5cb6-47f3-980a-ed1997c68b1d/knowledge-bases status=201 ms=76
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/afe8714d-5cb6-47f3-980a-ed1997c68b1d/knowledge-bases/e39b5c09-e4b9-4db7-b62f-e66c2e8e12ca/documents status=202 ms=55
+INFO     ffcore.access:logging.py:263 access method=PATCH path=/api/v1/projects/afe8714d-5cb6-47f3-980a-ed1997c68b1d/knowledge-bases/e39b5c09-e4b9-4db7-b62f-e66c2e8e12ca/documents/b13ac06b-4ee8-45f1-aa43-349dea885e85 status=405 ms=106
+__________________ test_af_3c_ingest_from_raw_writes_the_date __________________
+
+world = {'project': 'bff37089-220a-4a13-8df1-c9b4650bca7f', 'other': '3442d60f-3372-486d-bf80-e95730b59f9d', 'admin': <starlet...nt.TestClient object at 0x7f537c6c66c0>, 'admin_read': <starlette.testclient.TestClient object at 0x7f537c538680>, ...}
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_2040a78ca4cb) at 0x7f537c6c7e00>
+settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...ive_s=10.0, run_event_stream_ttl_s=86400, run_abandon_grace_s=120, langsmith_tracing=False, langchain_tracing_v2=False)
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_af_3c_ingest_from_raw_wri0')
+
+    def test_af_3c_ingest_from_raw_writes_the_date(world, pg, settings, tmp_path):
+        kb = create_kb(world, key=f"kb-{uuid.uuid4().hex[:6]}")
+        raw = tmp_path / "kaynak.md"
+        raw.write_bytes(PROSE.encode())
+    
+        async def go():
+            return await ingest.ingest_from_raw(
+                str(raw),
+                {"kb_id": kb["id"], "filename": "kaynak.md", "updated_at_source": "2025-03-04"},
+                {"roles": ["analyst"], "users": []},
+                settings=settings,
+                store=PgVectorStore(),
+                embed_client=ingest.LocalEmbedClient(settings),
+                convert=convert_without_weights,
+            )
+    
+        doc_id = asyncio.run(go())
+>       assert _stored(pg, doc_id).isoformat().startswith("2025-03-04")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'NoneType' object has no attribute 'isoformat'
+
+tests/integration/test_af_3_updated_at_source.py:88: AttributeError
+---------------------------- Captured stderr setup -----------------------------
+2026-10-30 17:28:14,354 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-30 17:28:14,370 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=161
+2026-10-30 17:28:14,568 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-30 17:28:14,585 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=140
+2026-10-30 17:28:14,785 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-30 17:28:14,802 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=140
+2026-10-30 17:28:14,988 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-30 17:28:15,005 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=138
+------------------------------ Captured log setup ------------------------------
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=161
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=140
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=140
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=138
+----------------------------- Captured stderr call -----------------------------
+2026-10-30 17:28:15,160 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-30 17:28:15,164 INFO ffcore.access access method=POST path=/api/v1/projects/bff37089-220a-4a13-8df1-c9b4650bca7f/knowledge-bases status=201 ms=79
+2026-10-30 17:28:15,297 INFO ffcore.knowledge.ingest gold document=6ea071b9-01b7-40a6-bede-c4aa642ecb0f reused=0 embedded=1
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/bff37089-220a-4a13-8df1-c9b4650bca7f/knowledge-bases status=201 ms=79
+INFO     ffcore.knowledge.ingest:ingest.py:594 gold document=6ea071b9-01b7-40a6-bede-c4aa642ecb0f reused=0 embedded=1
+=========================== short test summary info ============================
+FAILED tests/integration/test_af_3_updated_at_source.py::test_af_3_upload_sets_updated_at_source
+FAILED tests/integration/test_af_3_updated_at_source.py::test_af_3b_patch_updated_at_source
+FAILED tests/integration/test_af_3_updated_at_source.py::test_af_3c_ingest_from_raw_writes_the_date
+3 failed in 12.09s

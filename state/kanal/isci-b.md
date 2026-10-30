@@ -988,3 +988,22 @@ Dilim 2 (111) kodu ve testleri yazıldı, bağlanmadı; kırmızı/yeşil entegr
 ### B-07FU-0006 · 2026-10-30 20:15 · → koordinator · DURUM
 Paket: fix/07-followups   Cevap: K-07F-0003
 YIGIN-AÇ 07f alındı; yığın açılıyor (18060/13060, 0.0.0-07f, --profile test --profile qdrant, temiz volume).
+
+### B-07FU-0007 · 2026-10-30 20:30 · → koordinator · KARAR-GEREK
+Paket: fix/07-followups   Cevap: K-07F-0002
+Üç dilim commit'li: 9efdb26 (104), 3038435 (111), fce0b50 (113).
+Kırmızı kanıtı:
+- 104: baz kodla test_07f_2 akışı 20 s sınırında asılı kaldı (state/evidence/fix-07f-red-104-20261030.log).
+- 111: bağlantı yokken test_07f_4/5 kırmızı.
+- 113: kod değişmediği için test baştan yeşil (sabitleme testi).
+
+Kapılar:
+- lint 0;
+- make test llmaas 701 / airgap 701 geçti;
+- test-int koşuyor.
+
+Karar: kanca `FFCORE_TEST_HOOKS` ile açılıyor, ama compose backend servisi bu değişkeni konteynere geçirmiyor. Backend env'i açık liste; `FAKE_EMBED: ${FAKE_EMBED:-0}` kalıbı var. Bu haliyle 13b yığınında kanca açılamaz.
+- **A (önerim):** bu PR'a `deploy/docker-compose.yml` backend env'ine tek satır `FFCORE_TEST_HOOKS: ${FFCORE_TEST_HOOKS:-0}` (FAKE_EMBED kalıbı). Etki: touch-zone eki; varsayılan kapalı; 13b env dosyasında 1 yapar.
+- B: compose satırını 13b PR'ı ekler. Etki: bu PR'ın kancası yığında denenmemiş kalır, 13b'ye iş kayar.
+- C: `:?` zorunlu değişken (varsayılansız). Etki: her kurulumun `.env`'ine yeni satır gerekir; bayrak için ağır.
+Cevaba göre ya küçük bir commit + PR-HAZIR, ya doğrudan PR-HAZIR.

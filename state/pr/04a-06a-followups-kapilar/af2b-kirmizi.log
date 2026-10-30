@@ -1,0 +1,48 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_____________________ test_af_2b_deleted_source_breadcrumb _____________________
+
+analyst = (UUID('3dd5a6b1-50fb-46f0-be5e-577fc1e202f1'), <starlette.testclient.TestClient object at 0x7f4990c330e0>)
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_25f51e3be137) at 0x7f4992141490>
+harness = <tests.integration.runtime_support.Harness object at 0x7f4974459880>
+use_queue = <function use_queue.<locals>.install at 0x7f4941351ee0>
+
+    def test_af_2b_deleted_source_breadcrumb(analyst, pg, harness, use_queue):
+        project_id, client = analyst
+        doc_id = _document(pg, project_id)
+        hit = replace(source(), document_id=doc_id, document_name="prosedur.txt", breadcrumb="KB › M")
+        publish(pg, project_id, definition())
+        use_queue(InlineQueue(harness, Ports(ScriptedModel(turn("A [1].")), ScriptedRetriever([hit]))))
+        run_id = post_run(client, project_id)[0][2]["run_id"]
+        url = f"/api/v1/projects/{project_id}/runs/{run_id}/events"
+    
+        live = _selected(client.get(url).json()["items"])
+        assert [s["breadcrumb"] for s in live] == ["KB › M"]
+    
+        pg.execute("UPDATE documents SET deleted_at = now() WHERE id = %s", (doc_id,))
+        gone = _selected(client.get(url).json()["items"])
+>       assert gone == [{**live[0], "breadcrumb": "[deleted]"}]  # reference kept, crumb masked
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert [{'n': 1, 'pa...496680', ...}] == [{'n': 1, 'pa...496680', ...}]
+E         
+E         At index 0 diff: {'n': 1, 'page': 3, 'kb_key': 'sozlesmeler', 'chunk_id': '7b334172-d1b5-49ec-891e-261fbb496680', 'breadcrumb': 'KB › M', 'document_id': 'd5f44dc0-c24d-4f6c-ab24-543ad0e4b8d6', 'rerank_score': 0.8, 'document_name': 'prosedur.txt', 'updated_at_source': '2024-05-01T00:00:00+00:00'} != {'n': 1, 'page': 3, 'kb_key': 'sozlesmeler', 'chunk_id': '7b334172-d1b5-49ec-891e-261fbb496680', 'breadcrumb': '[deleted]', 'document_id': 'd5f44dc0-c24d-4f6c-ab24-543ad0e4b8d6', 'rerank_score': 0.8, 'document_name': 'prosedur.txt', 'updated_at_source': '2024-05-01T00:00:00+00:00'}
+E         Use -v to get more diff
+
+tests/integration/test_af_2b_deleted_source_breadcrumb.py:60: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+2026-10-30 17:24:03,151 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-30 17:24:03,218 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=1231
+------------------------------ Captured log setup ------------------------------
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=1231
+----------------------------- Captured stderr call -----------------------------
+2026-10-30 17:24:05,271 INFO ffcore.access access method=POST path=/api/v1/projects/3dd5a6b1-50fb-46f0-be5e-577fc1e202f1/agents/asistan/runs status=200 ms=1656
+2026-10-30 17:24:05,477 INFO ffcore.access access method=GET path=/api/v1/projects/3dd5a6b1-50fb-46f0-be5e-577fc1e202f1/runs/9a2a2524-d652-4d79-8ecf-3042f61c9101/events status=200 ms=201
+2026-10-30 17:24:05,680 INFO ffcore.access access method=GET path=/api/v1/projects/3dd5a6b1-50fb-46f0-be5e-577fc1e202f1/runs/9a2a2524-d652-4d79-8ecf-3042f61c9101/events status=200 ms=193
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/3dd5a6b1-50fb-46f0-be5e-577fc1e202f1/agents/asistan/runs status=200 ms=1656
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/3dd5a6b1-50fb-46f0-be5e-577fc1e202f1/runs/9a2a2524-d652-4d79-8ecf-3042f61c9101/events status=200 ms=201
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/3dd5a6b1-50fb-46f0-be5e-577fc1e202f1/runs/9a2a2524-d652-4d79-8ecf-3042f61c9101/events status=200 ms=193
+=========================== short test summary info ============================
+FAILED tests/integration/test_af_2b_deleted_source_breadcrumb.py::test_af_2b_deleted_source_breadcrumb
+1 failed in 29.44s
