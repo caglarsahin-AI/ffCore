@@ -2,10 +2,10 @@
 
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
-- Oturum kimliği: ffcore-isci-b-05atr
-- Aktif paket: — (fix/05a-tools-read-analyst MERGED 96f1a5b)
-- Durum: RETIRED
-- Son okunan: koordinator K-05ATR-0007 (2026-10-30 18:46)
+- Oturum kimliği: ffcore-isci-b-07fu
+- Aktif paket: fix/07-followups (GOREV bekleniyor)
+- Durum: ACTIVE
+- Son okunan: koordinator K-03ANM-0007 (2026-10-30 19:12)
 
 ## Mesajlar
 
@@ -942,3 +942,11 @@ Paket: fix/05a-tools-read-analyst   Cevap: K-05ATR-0007
   - docs/onyuz.md:20-21, :191 hâlâ "tools developer'a" (isci-c alanı).
 - **Karar/blocker:** yok; FOLLOWUP dallarının paketlenmesi kullanıcı kararı (K-05ATR-0005).
 Lease: RETIRED. Bu oturum kanala başka yazmayacak.
+
+### B-07FU-0001 · 2026-10-30 20:04 · → koordinator · DURUM
+Paket: fix/07-followups   Cevap: K-05ATR-0005
+DURUM: OKUMA-TAMAM (yeni oturum ffcore-isci-b-07fu; kullanıcı: `ROL=isci-b PAKET=fix/07-followups`; lease ACTIVE).
+Okunan gruplar: 1 FELSEFE + FELSEFE_UYGULAMA; 2 CLAUDE (29 Ekim değişikliği dahil); 3 PLAN 2.6; 4 KARARLAR (21d9ba1'den bugüne farkın tamamı: 01/02/04a/05a/06a/08-lite kararları, C4/C7/C8/C9/C10 dondu, iki yığın kuralı, inceleyici yığın kuralı, paket başına yeni oturum, proje dışı 404); 5 handbook (21d9ba1'den beri yalnız CONTRACTS C8/C9 ve TERMINOLOGY değişmiş, ikisi okundu) + PR şablonu; 6 WORK_QUEUE 07 ve fix/07-error-sse satırları, BLOCKERS 101-113 ilgili satırlar (104, 105, 111), isci-b kanalı (B-07ES-0001 tasarım notu, B-05ATR-0009 HANDOFF), koordinatör K-05ATR-0004/0005; 7 plan/07 tamamı; 8 BASLATMA.
+Okunmadı (gerekirse GOREV sonrası): koordinatör kanalının 28-30 Ekim arasının tamamı, BLOCKERS 59-117'nin tamamı, state/pr/07.md ve 07 review dosyaları; bunlara plan yazmadan önce bakacağım.
+Durum: `fix/07-followups` için bana adresli GOREV yok; WORK_QUEUE'da hâlâ `fix/07-error-sse` CLAIMED satırı var, `.worktrees/fix/07-error-sse` yok, `.worktrees/fix/07-followups` @ c8650cb var (ağaç temiz). Kullanıcının paket adından anladığım: K-05ATR-0005'teki paketleme sorusu "sahibine göre tek followups paketi" yönünde cevaplandı; kapsam FOLLOWUP-104 (error olayı reconnect'te) + FOLLOWUP-111 (sweep test kancası). FOLLOWUP-113 (sql-context POST AnyMember, 05a) kapsamda mı, GOREV'de netleşsin.
+Bekliyorum: GOREV (branch/worktree, touch-zone, kapsam, FFCORE_VERSION ve port önerisi). Gelene kadar plan ve kod yok; ACK GOREV gelince.
