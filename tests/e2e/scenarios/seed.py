@@ -104,6 +104,27 @@ class Client:
         self.http.headers["cookie"] = f"ffcore_session={r.cookies['ffcore_session']}"
 
 
+    def call(self, method: str, path: str, ok=(200, 201, 202, 204), **kw) -> httpx.Response:
+        r = self.http.request(method, path, **kw)
+        if r.status_code not in ok:
+            raise SeedError(f"{method} {path}: {r.status_code} {r.text[:300]}")
+        return r
+
+    def create(self, path: str, body: dict, lookup) -> dict:
+        """POST, or on 409 the existing resource found by `lookup()`."""
+        r = self.call("POST", path, ok=(200, 201, 409), json=body)
+        if r.status_code == 409:
+            found = lookup()
+            if found is None:
+                raise SeedError(f"POST {path}: 409 but not found by key: {r.text[:200]}")
+            return found
+        return r.json()
+
+    def find(self, path: str, key: str, field: str = "key", items: str = "data") -> dict | None:
+        rows = self.call("GET", path).json()[items]
+        return next((row for row in rows if row[field] == key), None)
+
+
 def ensure_superadmin(email: str, password: str, *, login=Client, run=cli):
     """The signed-in superadmin. Signs in first; only 401 `invalid_credentials` (no such user)
     creates it with `create-superadmin`. Any other refusal, and any CLI failure (an existing
@@ -125,26 +146,6 @@ def ensure_superadmin(email: str, password: str, *, login=Client, run=cli):
     if done.returncode != 0:
         raise SeedError(f"create-superadmin: {done.stderr.strip() or done.stdout.strip()}")
     return login(email, password)
-
-    def call(self, method: str, path: str, ok=(200, 201, 202, 204), **kw) -> httpx.Response:
-        r = self.http.request(method, path, **kw)
-        if r.status_code not in ok:
-            raise SeedError(f"{method} {path}: {r.status_code} {r.text[:300]}")
-        return r
-
-    def create(self, path: str, body: dict, lookup) -> dict:
-        """POST, or on 409 the existing resource found by `lookup()`."""
-        r = self.call("POST", path, ok=(200, 201, 409), json=body)
-        if r.status_code == 409:
-            found = lookup()
-            if found is None:
-                raise SeedError(f"POST {path}: 409 but not found by key: {r.text[:200]}")
-            return found
-        return r.json()
-
-    def find(self, path: str, key: str, field: str = "key", items: str = "data") -> dict | None:
-        rows = self.call("GET", path).json()[items]
-        return next((row for row in rows if row[field] == key), None)
 
 
 def seed_projects(admin: Client, projects: dict) -> dict[str, str]:
