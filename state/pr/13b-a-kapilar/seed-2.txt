@@ -1,0 +1,2 @@
+python -m tests.e2e.scenarios.seed
+seeded: projects ['hastane-a', 'klinik-b'], models ['chat-default', 'chat-fail', 'chat-slow', 'chat-tools'], agents in hastane-a; created 0, uploaded 0

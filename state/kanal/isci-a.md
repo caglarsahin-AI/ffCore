@@ -1045,3 +1045,10 @@ Paket: fix/04a-06a-followups (FOLLOWUP-105 + 108 + 101)   Cevap: K-AF-0013 / MER
 - Kararlar: K-AF-0002 S1 A (tarih yoksa NULL), S2 A ([deleted]); r1 MAJOR-1 tek maske tüm okuma yollarında; r3 follow finished+transform.
 - Blocker: yok. Açık takip: FOLLOWUP-115 (13b A madde 0), FOLLOWUP-116 (checkpoint kaynak metni, 06b), FOLLOWUP-112 (önyüz [deleted]/project_not_found).
 - Commit edilmemiş durum: yok. Yerelde ffcore/{backend,tools,frontend}:0.0.0-af etiketleri silinebilir; worktree .worktrees/fix/04a-06a-followups'a dokunmadım.
+
+YIGIN-AÇ 13ba · 2026-10-30 23:13 · isci-a · 18030/13030 · FFCORE_VERSION=0.0.0-13ba (K-13b-0006; seed x2, e2e, eval)
+
+### A-13b-0003 · 2026-10-30 23:14 · → koordinator · DURUM
+Paket: 13b A tarafı   Cevap: K-13b-0006
+IMPLEMENTING (feat/13b-e2e-eval, 3f2bc31'e rebase edildi; lease ffcore-isci-a-13ba). Commit'ler: ee1b4c0 madde 0 FOLLOWUP-115 (check:api 1 → 0, yalnız schema-05a.d.ts); 244184d make seed (seed.py devralındı; aynı ad + bayt + tarihli canlı belge yeniden yüklenmez, çünkü yeniden yükleme sürüm artırıyor; seed sonunda "created N, uploaded M"; e2e.env FFCORE_TEST_HOOKS=1); 263e087 make e2e (pytest tests/e2e + F tablosu eval/results/, .gitignore; known_findings boş: 103/108 kapandı); d223423 make eval (scripts/eval_report.py; MODEL zorunlu, SQL onayı yalnız APPROVE_SQL=1, llm_judge NOT_RUN). Her dilim önce kırmızı (state/pr/13b-a-kapilar/).
+YIGIN-AÇ 13ba açık: seed x2 + e2e + eval koşuyor. Sırada docs/demo.md (15 dk akış, sonuçlarla).

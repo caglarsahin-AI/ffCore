@@ -1,0 +1,8 @@
+2 files reformatted, 21 files left unchanged
+All checks passed!
+.....                                                                    [100%]
+============================== F table (plan/18) ===============================
+| Use case | Status | Passed | Failed | NOT_RUN | Failing tests | NOT_RUN reasons |
+|---|---|---|---|---|---|---|
+| Setup | passed | 5 | 0 | 0 |  |  |
+5 passed in 0.42s
