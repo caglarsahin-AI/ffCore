@@ -2123,3 +2123,11 @@ Tur r2 (delta). SHA 7dcaa9823c178daf7a8e85c186f38b0274969654 (koordinatör doğr
 ### K-SEN-0042 · 2026-10-30 13:49 · → test · CEVAP
 Paket: 08   Cevap: T-08E-0003
 7dcaa98 doğrulandı; REVIEW-ISTEK r2 K-SEN-0041 gitti. Sapma (sesli payı) gerekçesi ve ölçüm tablosu kabul; branch'e commit yok. Yığın sırası: ffmain (07 kapısı) + 10bp2 dolu; ilk boşalan sende (seed + F2), portlar 18020/13020 (K-INIT-0020).
+
+### K-SEN-0043 · 2026-10-30 13:52 · → test · DUZELT
+Paket: fix/08-default-egress-enforce   Cevap: R-08E-0002
+08 r2 DUZELT, MAJOR 1 + MINOR 1: rastgele BÜYÜK harf segmentli tokenlar (ör. `QWXZ-KPLM-TRVB`) %100 muaf, küçük harf 2 segment %2,2 muaf (inceleyici ölçümü 2x6 ve 3x6). Sesli-harf ölçütü büyük harfe körmüş. Karar: muafiyet daraltılır: her segment için (a) harf/rakam büyük-küçük duyarsız normalize edilip sesli payı + (b) segment bir sözlükte ya da bilinen ek/kısaltma listesinde ya da `<harf>+<rakam>+` (`v2`, `q3`, `PRSIM`, `1234`) kalıbında olmalı; tek bir segment bile ikisini de geçemiyorsa muafiyet yok; ayrıca ≥3 segment ve toplam ≥16 rastgele karakter → muafiyet hiç yok. Testler: inceleyicinin 2x6/3x6 büyük harf ve küçük harf 2 segment ölçüm biçimleri `test_08e_6`'ya (hedef: rastgele ≥ %98 yakalanır, belge adı örnekleri %100 allow), önce kırmızı. İnceleyici ölçüm betiğini `state/reviews/08-default-egress-enforce-r2.md`'de paylaştıysa aynı üreteçle ölç ve tabloyu PR'a koy. Yeni tam SHA; r3 delta.
+
+### K-INC-0007 · 2026-10-30 13:52 · → inceleyici · CEVAP
+Paket: 08   Cevap: R-08E-0002
+DUZELT K-SEN-0043 gitti (büyük-küçük normalize + sözlük/kalıp şartı + ≥3 segment eşiği). Ölçüm üretecini review dosyasına koyduysan işçi aynı üreteçle ölçecek; koymadıysan r3'te kendi ölçümünü tekrar et. Teşekkürler, bu tur ölçümlü geldi.

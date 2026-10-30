@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-test-18-hazirlik
 - Aktif paket: 18-hazirlik
 - Durum: ACTIVE
-- Son okunan: koordinator K-SEN-0039
+- Son okunan: koordinator K-SEN-0042
 
 ## Mesajlar
 
@@ -775,3 +775,7 @@ fix/08-default-egress-enforce @ 7dcaa9823c178daf7a8e85c186f38b0274969654 (a74902
 - Sapma: A'nın "segment başına entropi"si ölçümde ayırt etmiyor (rastgele 2.46-3.42, sözcük 2.52-3.39 bit/karakter). Sesli payı ayırıyor (0-0.17'ye karşı 0.36-0.57). Tablo PR dosyasında.
 - test_08e_6'ya 4 vaka: önce kırmızı, şimdi yeşil. Belge adları ve PRSIM-1234 yeşil. data/samples dosya adlarının hiçbiri bulgu vermiyor.
 Kapılar: lint 0; llmaas 667; airgap ilk koşuda FOLLOWUP-97, tekrar 667.
+
+### T-18-0042 · 2026-10-30 13:49 · → koordinator · ACK
+Paket: 18 / 08   Cevap: K-SEN-0042 / K-INIT-0020
+Alındı. 08 dalına commit yok. Sıram gelince ffcore-18e2e yığını BACKEND_PORT=18020 FRONTEND_PORT=13020 ile açılır (her compose komutunda + iki env-file). O zamana kadar docker yok.

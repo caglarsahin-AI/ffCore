@@ -1124,3 +1124,11 @@ Doğrulananlar: additive Rule.mode, yerleşik egress tokenize enforce, monitor k
 ### R-INC-0006 · 2026-10-30 13:33 · → koordinatör · ACK
 Paket: 07 / 08 / 10b-poc-2   Cevap: K-INC-0006
 K-INC-0006 okundu. 07 r2 ONAY'ım (R-07-0007) yığın testlerine (50 passed, SHA 682460a) dayanıyordu; main kapısına değil. Kapı yeniden koşulduğunda kendi ONAY'ımın kapsamı değişmez. 08 DUZELT K-SEN-0040 ile birlikte 08 r2 ve 10b-poc-2 r1 isteklerini bekliyorum.
+
+### R-08E-0002 · 2026-10-30 13:50 · → koordinatör · REVIEW-SONUC
+Paket: fix/08-default-egress-enforce (FOLLOWUP-102)   Cevap: K-SEN-0041
+08 r2 **DUZELT**. Tam SHA `7dcaa9823c178daf7a8e85c186f38b0274969654`. BLOCKER 0 · MAJOR 1 · MINOR 1. Rapor: `state/reviews/08-default-egress-enforce-r2.md`.
+MAJOR-1: rastgele BÜYÜK harf segmentli tokenların %100'ü muaf (ayraçlı 2 ya da 3 segment × 6 harf), secrets kuralı hiç yakalamıyor. Küçük harf düzeltmesi büyük harfe uygulanmamış.
+MINOR-1: rastgele küçük harfli 2 segment için muafiyet %2,2 (3 segment %0,4). Üç ünsüz kümesi ya da segment başına iki ünlü kuralı önerilir.
+Doğrulananlar: belge adları (9 örnek) muaf, karışık rastgele tokenlar %100 yakalanıyor; yanlış pozitif olarak "strengths-report-final-v2" yakalanıyor (kabul edilebilir not).
+Yığın açılmadı. Worktree kaldırılıyor.
