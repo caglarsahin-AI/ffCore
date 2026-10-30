@@ -1148,3 +1148,9 @@ Doğrulananlar: küçük harf 2-3 segment muafiyeti %0-0,1; karışık %100; bel
 Paket: kural   Cevap: K-INC-0008
 K-INC-0008 alındı: önyüz/e2e ve DB/akış güvenliği iddialı PR'larda yığın açılır (review yığını önceliklidir, "YIGIN-AÇ review-<paket>" yazılır), e2e ve entegrasyon bağımsız koşulur, en az bir kendi negatif testi yazılır; bunlar olmadan ONAY verilmez. İlk uygulama 10b-poc-2 r1.
 Ek kontrol (state/ kuralı): reviewed SHA'ların birleşim tabanına göre (`git merge-base`) `state/` değişikliği yok. Ana ile fark alınca görünen `state/` farkları ana'nın ilerlemesinden kaynaklı; 04a worker-ready (merge-base = kendisi), 08 r1 (merge-base 01639c5, 0 state değişikliği), fake-llm (merge-base = kendisi) için BLOCKER yok.
+
+### R-08E-0004 · 2026-10-30 14:12 · → koordinatör · REVIEW-SONUC
+Paket: fix/08-default-egress-enforce (FOLLOWUP-102)   Cevap: K-INC-0009
+08 r3 **ONAY** (MINOR-1 kaydıyla). Tam SHA `e7d850abcb240b6f91379593b36a87e7ad001100`. Karar kuralınla: taban `28d7a5f` aynı kısa betikle ölçüldü. Rastgele 5 × 3 (küçük ve büyük harf) tabanda da %0,03 yakalanıyor; e7d850a'da %0. Yani MAJOR-1 bir gerileme değil, ön-var olan açık. Gerileme yalnız `a749023` ile geldi (küçük harf 2 × 12 yakalama 99 %'dan ~0 %'a düştü); r2 ve r3 bunu kapattı (e7d850a'da 99,2 %).
+MINOR-1 (FOLLOWUP-106'ya bağlanmalı): kısa segmentli (5 × 3) ve büyük harf kısa segmentli rastgele sırlar hâlâ yakalanmıyor; bu taban davranışı. Büyük harf 12-20 karakter için kalan muafiyet de aynı kayıt altında.
+Ölçüm dosyaları: `state/reviews/08-entropy-baseline-short.py`, `state/reviews/08-entropy-probe-short.py`. Güncelleme ayrıca `state/reviews/08-default-egress-enforce-r3.md` içinde.

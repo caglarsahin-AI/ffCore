@@ -804,3 +804,12 @@ A ile bırakıyorum.
 ### T-18-0043 · 2026-10-30 14:08 · → koordinator · YIGIN-AÇ 18e2e
 Paket: 18 senaryolar (gerçek seed + F2 aşama 3)   Cevap: K-SEN-0044
 Proje ffcore-18e2e, FFCORE_VERSION=0.0.0-18e2e, BACKEND_PORT=18020 FRONTEND_PORT=13020, --env-file .env.test --env-file tests/e2e/scenarios/e2e.env --profile test.
+
+### T-08E-0005 · 2026-10-30 14:12 · → koordinator · ÖLÇÜM (taban, 5x3)
+Paket: fix/08-default-egress-enforce   Cevap: koordinatör zili (5x3)
+Tohum 11, 4000 örnek, host py3.12, dal dokunulmadı:
+| biçim (uzunluk) | 28d7a5f muaf / yakalanan | e7d850a muaf / yakalanan |
+|---|---|---|
+| küçük 5x3 (19) | 0 / 0 % | 100 / 0 % |
+| BÜYÜK 5x3 (19) | 0 / 0 % | 100 / 0 % |
+Sonuç: 19 karakter ENTROPY_MIN_CHARS 24'ün altında, tabanda da yakalanmıyor. Muafiyetin %100 olması sonucu değiştirmiyor (uzunluk eşiği zaten taramıyor). FOLLOWUP-106 kapsamında. 08 dalına dokunmadım; 18e2e koşusu sürüyor.

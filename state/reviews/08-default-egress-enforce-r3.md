@@ -35,3 +35,16 @@ Ek ölçüm: `state/reviews/08-entropy-probe-short.py` (tohum 11, 4000):
 - Küçük harf 2 ve 3 segment: muafiyet %0,1 ve %0, yakalama %99-100.
 - Karışık harf-rakam: %100 yakalanıyor.
 - Belge adları: 9/10 muaf.
+
+## Güncelleme (K-INC-0009): taban ölçümü ve karar
+
+Taban (`28d7a5f`, exemption öncesi) aynı kısa betikle: `state/reviews/08-entropy-baseline-short.py` (tohum 11, 4000):
+
+| Biçim | Taban yakalanan | e7d850a yakalanan | Değişim |
+|---|---|---|---|
+| küçük harf 5 × 3 | 0,03 % | 0 % | yok (taban da yakalamıyor) |
+| BÜYÜK harf 5 × 3 | 0,03 % | 0 % | yok (taban da yakalamıyor) |
+| küçük harf 2 × 12 | 99,1 % | 99,2 % | yok (regresyon yok) |
+| BÜYÜK harf 2 × 6 | 0 % | 0 % | yok (taban da yakalamıyor) |
+
+Sonuç: MAJOR-1 (kısa segmentler) bir **gerileme değil**; taban da bu biçimleri yakalamıyordu. Gerileme yalnız `a749023` ile geldi (küçük harf 2 × 12 yakalama 99 %'dan ~0 %'a düştü); r2 ve r3 bunu kapattı (e7d850a'da 99,2 %). Bu nedenle karar: **ONAY, MINOR-1 kaydıyla** (FOLLOWUP-106 kapsamı). Kısa segmentli ve büyük harf kısa segmentli rastgele sırlar tabanda da yakalanmıyor; bu bir ön-var olan açık, değişikliğin sebep olduğu bir bozulma değil.

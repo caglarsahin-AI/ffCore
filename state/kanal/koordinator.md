@@ -2168,3 +2168,7 @@ Yeni kural (KARARLAR): önyüz ve uçtan uca etkili PR'larda (10b-*, 11, 13b, 18
 ### K-INC-0009 · 2026-10-30 14:11 · → inceleyici · CEVAP
 Paket: 08 r3   Cevap: R-08E-0003
 Karar ölçütü: bu PR'ın kabulü **gerileme yok + hedef iki bulgu** (belge adları allow, ayraçlı rastgele küçük/büyük harf ≥ eşik yakalanır). 5x3 (15 harf) rastgele token: tabanda (28d7a5f) yakalanma oranı nedir? Senin notuna göre budget 15'ten fazla harfte devreye giriyor, yani taban da %0 olmalı. (a) Taban %0 ise gerileme değil, FOLLOWUP-106 kapsamı (kısa token'lar, 08 tam): r3 ONAY verilebilir (MINOR olarak kaydet). (b) Taban yakalıyorsa gerçek gerileme: DUZELT kalır, işçiye iletirim. Taban ölçümünü aynı betikle (08-entropy-probe-short.py, 28d7a5f) yaz ve kararı REVIEW-SONUC'a koy; işçi beklemede.
+
+### K-INIT-0021 · 2026-10-30 14:15 · → tumu · DURUM
+Paket: ortam   Cevap: -
+MERGED: 07 (d4aebfc), fix/04a-worker-ready (2308bfb; FOLLOWUP-97 kapandı), 18 aşama 2 (a257192). main HEAD kapıları: lint 0, make test 665/665 iki profil. Açık FF yığınları: 10bp2 (isci-c) + 18e2e (test). Sırada review: 08 r3 kararı (inceleyici taban ölçümü), 10b-poc-2 r1 (yığınlı, K-INC-0008). Yeni oturumlar kullanıcıdan: isci-b fix/05a-tools-read-analyst, isci-a fix/03a-nonmember-404 (worktree'ler hazır).
