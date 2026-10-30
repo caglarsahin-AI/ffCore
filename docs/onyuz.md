@@ -17,7 +17,15 @@ and system status).
 | `/knowledge-bases` | Knowledge bases of the selected project | analyst | list; create (admin) |
 | `/knowledge-bases/{id}` | One knowledge base: settings, documents, try search | analyst | edit, delete (admin); upload, delete document, rebuild a layer (analyst+edit); search (read too) |
 | `/system-status` | Readiness of the installation (`/readyz`) | admin | read only |
-| `/overview` and every other menu item | Later packages (10b-poc-2, 10c) | see role matrix | "not available yet" page |
+| `/tools` | Tools (MCP and OpenAPI servers) of the selected project | developer | list; register (admin) |
+| `/tools/{id}` | One tool: settings, discovered actions, try an action | developer | edit, delete, discover, action switches, try (admin + edit) |
+| `/agents` | Agents of the selected project | analyst | list; create (analyst + edit) |
+| `/agents/{id}` | Agent wizard and test panel | analyst | edit the draft, publish, new draft, roll back, test run (analyst + edit) |
+| `/runs` | Runs of the selected project | analyst | list with filters |
+| `/runs/{id}` | One run: summary, answer, events, expert feedback | analyst | cancel (the run's user or an admin), feedback (edit) |
+| `/approvals` | Approval queue | analyst | list, pending by default |
+| `/approvals/{id}` | One approval | analyst | approve, reject (when `can_decide`) |
+| `/overview` and every other menu item | Later packages (10c and others) | see role matrix | "not available yet" page |
 | `/dev/theme` | Components in both themes side by side | none | done |
 
 A path outside the user's role renders "You do not have access". This is a UI convenience;
@@ -111,7 +119,10 @@ no-hard-coded-colour rule covers components only.
   automatically; project screens without a selection say "Select a project".
 - **Contract.** `frontend/mocks/openapi-03a.yaml` is a byte copy of `backend/openapi/03a.yaml`;
   `lib/api/schema.d.ts` is generated from it. `npm run gen:api` refreshes both, `npm run
-  check:api` fails on drift. No API type is written by hand.
+  check:api` fails on drift. No API type is written by hand. 04a, 05a and 06a types
+  (`lib/api/schema-{04a,05a,06a}.d.ts`) are generated straight from `backend/openapi/*.yaml`.
+  The 07 approval types in `lib/api/approvals-queries.ts` mirror the 07 branch until
+  `backend/openapi/07.yaml` is merged; they are then generated like the others.
 - **Errors.** Every 4xx carries `{error: {message, type, code}}`. `lib/api/errors.ts` maps codes
   to messages (`read_only_access`, `insufficient_role`, `cross_origin_forbidden`,
   `obo_project_scope`, ...); an unknown code shows the generic message with the code and backend
@@ -156,6 +167,47 @@ detail as it is. While the models warm up the page refreshes every 5 s. A respon
 contract is shown as an error, never as "ready". Without model weights the page says
 `model_missing` and that weights come only from `make models`, which the operator runs. With
 `FAKE_EMBED=1` (tests only) the models check says so.
+
+## Tools, agents, runs and approvals (05a, 06a, 07)
+
+- **Tools.** Developers and above read tools; registering, editing, deleting, discovering, the
+  action switches and "Try" are admin + edit (05a). Five identity types (none, bearer, custom
+  header, basic, forward the user). Stored secrets come back as `***` and are kept unless the
+  identity is changed. Field errors from the backend land on their field: `tool_key_taken`
+  (key), `endpoint_url_not_allowed` and the egress codes (address), `header_name_not_allowed`
+  (identity). Discovered actions arrive switched off and needing approval; nothing is switched on
+  for the user. "Try" takes the arguments as JSON and shows the tool's answer with `truncated`,
+  `is_error` and the latency.
+- **Agents.** The wizard edits the latest draft's definition (C8) in place and saves it with one
+  `PUT`; a published latest version is read-only until "New draft" is used, because 06a never
+  edits a published version. Tabs: Identity (name and description are saved at once; the model
+  is part of the draft), Instructions (inline text or a Langfuse prompt, exactly one; variables;
+  placeholders without a variable are listed while typing, and the backend's
+  `variable_undefined` is the final word), Knowledge (`always` or `as a tool`; empty passages and
+  minimum score mean the knowledge base default; the minimum score is off where the reranker is
+  on), Tools (actions switched on for the tool; the approval list; the approver role, never
+  `user`), Safety and limits, Output (free text or a JSON schema) and Publish (versions, publish,
+  new draft, roll back to a version published before). Read access disables every field. Agent
+  templates (13a) are not offered in the wizard; 13b seeds them (D2).
+- **Analysts and tools.** 05a lists tools to developers only, so an analyst sees the actions
+  already chosen, read-only, with the reason (FOLLOWUP-100 opens tool reads to analysts).
+- **Test panel.** Starts a `channel=test` run of the saved version and follows its stream with
+  `fetch` (not `EventSource`: the start is a POST): tokens, tool cards with the masked arguments as
+  sent, source cards, fallback and progress notes. An event name the console does not know is
+  ignored (C9). A dropped stream reconnects with `Last-Event-ID` (`GET /runs/{id}/stream`) and
+  says "reconnecting"; one that cannot be resumed is reported as lost, because the run may still
+  be going. An approval is decided on the 07 endpoint (`/approvals/{id}/approve|reject`, D1) and
+  the stream continues from `stream_after`; an `ask_user` question is answered with `/resume`.
+- **Runs.** Explicit filters (agent, status, channel, feedback pending/given), nothing
+  preselected. The detail shows timings, the answer, and the stored events (18 C9 types; an
+  unknown type keeps its raw name) with their payloads as stored: tool arguments are already
+  masked by the guardrail, the console never fetches raw values. The Langfuse trace id is shown
+  as text: the console has no Langfuse address to link to. Expert feedback (F9): a vote and a
+  note on a completed run, with edit access.
+- **Approvals.** The queue opens on pending approvals; the sidebar badge counts them for the
+  selected project. The detail shows the masked arguments, the model's reason and a link to the
+  run; the buttons follow `can_decide` (signed-in user, edit access, role at least the assigned
+  one) and the backend's 403/409 codes become messages.
 
 ## Provider and model forms
 
@@ -260,3 +312,10 @@ LiteLLM's `/model/info`; the key goes only in a header. CI runs the same command
 | Knowledge base, edit and read mode | ![](images/10bp1-kb-detail-edit.png) | ![](images/10bp1-kb-detail-read.png) |
 | Brand: sign in | ![](images/10mrk-login-light.png) | ![](images/10mrk-login-dark.png) |
 | Brand: sidebar | ![](images/10mrk-projects-light.png) | ![](images/10mrk-projects-dark.png) |
+| Tools | ![](images/10bp2-tools-light.png) | ![](images/10bp2-tools-dark.png) |
+| Tool: actions | ![](images/10bp2-tool-detail-light.png) | ![](images/10bp2-tool-detail-dark.png) |
+| Agents | ![](images/10bp2-agents-light.png) | ![](images/10bp2-agents-dark.png) |
+| Agent wizard: tools, test panel | ![](images/10bp2-agent-wizard-tools-light.png) | ![](images/10bp2-agent-wizard-tools-dark.png) |
+| Runs | ![](images/10bp2-runs-light.png) | ![](images/10bp2-runs-dark.png) |
+| Run detail | ![](images/10bp2-run-detail-light.png) | ![](images/10bp2-run-detail-dark.png) |
+| Approvals | ![](images/10bp2-approvals-light.png) | ![](images/10bp2-approvals-dark.png) |
