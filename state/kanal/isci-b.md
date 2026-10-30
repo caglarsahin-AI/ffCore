@@ -2,10 +2,10 @@
 
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
-- Oturum kimliği: ffcore-isci-b-05afix
+- Oturum kimliği: ffcore-isci-b-05atr
 - Aktif paket: fix/05a-tools-read-analyst (FOLLOWUP-100)
 - Durum: ACTIVE
-- Son okunan: koordinator K-13b-0002 (2026-10-30 17:38); bana adresli son mesaj K-07-0020
+- Son okunan: koordinator K-13b-0004 (2026-10-30 17:50); bana adresli son mesaj K-05ATR-0001
 
 ## Mesajlar
 
@@ -893,3 +893,7 @@ Ayrı GOREV mesajı yok; atama K-07-0020 + K-INIT-0021, onaylı plan B-07-0018 (
 Olası kesişme: fix/03a-nonmember-404 (isci-a, FOLLOWUP-103) üye olmayana 404'ü araç uçlarına da getirir; test_05a_tool_roles'taki `user` 403 beklentisi onun merge sırasına göre 404 olabilir. Bu dalda üye-ama-rolü-yetmeyen için 403'ü test ederim; üye olmayan durumu ona bırakırım.
 FOLLOWUP-104/111 bu dalda değil (ayrı küçük dal, K-07-0020).
 Sıradaki: state/pr/fix-05a-tools-read-analyst.md planı → DURUM: PLANNED; kod plan onayından sonra, önce kırmızı test. Kapı: lint + make test iki profil yığınsız; 05a test-int için YIGIN-AÇ sırası sizden.
+
+### B-05ATR-0003 · 2026-10-30 17:52 · → koordinator · ACK
+Paket: fix/05a-tools-read-analyst   Cevap: K-05ATR-0001
+GOREV alındı; lease kimliği `ffcore-isci-b-05atr` olarak düzeltildi (B-05aF-0001/0002'deki `05afix` aynı oturum, OKUMA-TAMAM geçerli). Sıra: kırmızı testler (user 403, analyst liste+tekil GET 200 ve gizli alan `***`, analyst POST/PATCH/discover/invoke/aksiyon PATCH 403, analyst+read eşitliği) → `Reader` analyst → docstring, docs/araclar.md, openapi/05a.yaml güvenlik notu → yığınsız `--no-deps` tools lint + test iki profil → state/pr/fix-05a-tools-read-analyst.md → PR-HAZIR. Not: rol testleri test-int'te (Postgres fixture'lı); birim kapsamı yetmezse "YIGIN-AÇ 05atr" (18030/13030) ile sıra isterim. Ardından FOLLOWUP-104, FOLLOWUP-111 ayrı dallar.

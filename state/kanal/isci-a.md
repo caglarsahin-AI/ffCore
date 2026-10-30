@@ -886,3 +886,11 @@ Paket: fix/04a-worker-ready   Cevap: K-04aWR-0006 / K-04aWR-0007
 ### A-03anm-0001 · 2026-10-30 17:48 · → koordinator · ACK
 Paket: fix/03a-nonmember-404 (FOLLOWUP-103)   Cevap: K-04aWR-0007 / K-04aWR-0008
 GOREV alındı, yeni oturum ffcore-isci-a-03anm, lease ACTIVE. Worktree .worktrees/fix/03a-nonmember-404 (HEAD f1f78fc = main, temiz). Plan A-04awr-0008 + karar A (K-04aWR-0005) esas: `_grant` üye değil / proje yok → 404 `project_not_found` aynı gövde, rol yetmez 403 aynen, audit'te gerçek neden ayrı alan; 06a runs 404 uyum testi; 12 uç parametrik; R-04AWR-0001 MINOR-1 (`test_04awr_5` açık Settings). PR dosyası state/pr/03a-nonmember-404.md. Sıra: önce kırmızı test → düzeltme → lint + make test iki profil; test-int için "YIGIN-AÇ 03anm" (18030/13030) ile sıra isteyeceğim.
+
+### A-03anm-0002 · 2026-10-30 17:58 · → koordinator · DURUM
+Paket: fix/03a-nonmember-404 (FOLLOWUP-103)   Cevap: K-03ANM-0001
+K-03ANM-0001 alındı (A-03anm-0001 ACK ile aynı iş; OKUMA-TAMAM bu oturumda A-INIT-0001, kanallar 17:47 itibarıyla yeniden tarandı). DURUM: PLANNED. Plan state/pr/03a-nonmember-404.md (kabul 1-7, felsefe üç sorusu). Kırmızı test yazıldı: tests/integration/test_03a_nonmember_404.py (OpenAPI'deki tüm `{project_id}` uçları parametrik + F10 12 uç kapsama + düşük rol 403 + silinmiş proje + audit `reason` + 06a run uyumu). Varsayım: uuid olmayan project_id de 404, audit `no_project`. Onaylı plan üstünde ilerliyorum; DB testi için "YIGIN-AÇ 03anm" sırası isteyeceğim.
+
+### A-03anm-0003 · 2026-10-30 18:00 · → koordinator · DURUM
+Paket: fix/03a-nonmember-404   Cevap: K-03ANM-0001
+YIGIN-AÇ 03anm talebi (sıra bekliyorum): `FFCORE_VERSION=0.0.0-03anm`, `BACKEND_PORT=18030 FRONTEND_PORT=13030`, `--profile test --profile qdrant`. Amaç: yeni testin kırmızı kanıtı (main kodu), düzeltme sonrası yeşil + etkilenen entegrasyon testleri + make test-int. Bu arada kod düzeltmesi ve birim/lint yığınsız.

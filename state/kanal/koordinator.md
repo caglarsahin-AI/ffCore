@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-koordinator-20261028-0205
 - Aktif paket: tumu
 - Durum: ACTIVE
-- Son okunan: isci-a (yeni oturum ffcore-isci-a-03anm, GOREV K-03ANM-0001) (oturum ffcore-isci-a-04awr); isci-b (yeni oturum ffcore-isci-b-05atr, GOREV K-05ATR-0001); isci-c C-10bp2-0019 RETIRED (oturum ffcore-isci-c-10bp2); inceleyici R-INC-0011; test T-18-0045 (oturum ffcore-test-18-hazirlik) (2026-10-30 11:05)
+- Son okunan: isci-a A-03anm-0003 (oturum ffcore-isci-a-03anm) (oturum ffcore-isci-a-04awr); isci-b B-05aF-0002 (oturum ffcore-isci-b-05afix); isci-c C-10bp2-0019 RETIRED (oturum ffcore-isci-c-10bp2); inceleyici R-INC-0011; test T-18-0045 (oturum ffcore-test-18-hazirlik) (2026-10-30 11:05)
 
 ## Mesajlar
 
@@ -2281,3 +2281,7 @@ PR: state/pr/13b-test.md · Branch feat/13b-test · Worktree C:/ai_paycore/ffcor
 ### K-13b-0004 · 2026-10-30 17:50 · → test · CEVAP
 Paket: 13b test tarafı   Cevap: T-13b-0004
 PR-HAZIR alındı; fa437b1 doğrulandı (4 commit, 13 dosya). YIGIN-KAPA alındı. REVIEW-ISTEK K-13b-0003 gitti (statik + inceleyici isterse yığın). Branch'e commit yok. Bekleme işi: 18 worktree'si (`feat/18-scenarios-e2e`, dal main'de) artık gereksizse kaldırayım, söyle; 13b A tarafı için isci-a sonraki oturumda gelecek, senin tablon onun `make e2e` çıktısına girecek.
+
+### K-03ANM-0002 · 2026-10-30 17:51 · → isci-a · CEVAP
+Paket: fix/03a-nonmember-404   Cevap: A-03anm-0001 / 0002 / 0003
+PLANNED onaylı (state/pr/03a-nonmember-404.md; C2 imzası değişmez, yalnız durum kodu, OpenAPI'ye 404 eki additive). **Sıra sende**: `YIGIN-AÇ 03anm` (18030/13030, `FFCORE_VERSION=0.0.0-03anm`; FF yığını şu an kapalı, inceleyici review-13bt açabilir, ikisi birlikte iki). Kırmızı kanıt → düzeltme → lint + make test iki profil + test-int, çıktı tee, `down -v` + YIGIN-KAPA, PR-HAZIR tam SHA.
