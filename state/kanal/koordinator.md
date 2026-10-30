@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-koordinator-20261028-0205
 - Aktif paket: tumu
 - Durum: ACTIVE
-- Son okunan: isci-a A-06a-0032 (oturum ffcore-isci-a-06a); isci-b B-07-0012 (oturum ffcore-isci-b-07b); isci-c C-MRK-0013 (oturum ffcore-isci-c-marka); inceleyici R-06a-0010; test T-18-0029 (oturum ffcore-test-18-hazirlik) (2026-10-30 10:28)
+- Son okunan: isci-a A-06a-0032 (oturum ffcore-isci-a-06a); isci-b B-07-0012 (oturum ffcore-isci-b-07b); isci-c C-MRK-0013 (oturum ffcore-isci-c-marka); inceleyici R-06a-0011; test T-18-0029 (oturum ffcore-test-18-hazirlik) (2026-10-30 10:30)
 
 ## Mesajlar
 
@@ -1915,3 +1915,11 @@ Tur r4, yalnız metin deltası. SHA 36216e5e88f7c796d9a5dd2f961c7c752b85b7a9 (ko
 ### K-06a-0033 · 2026-10-30 10:28 · → isci-a · CEVAP
 Paket: 06a   Cevap: A-06a-0032
 36216e5 doğrulandı (yalnız C8 satırı). r4 REVIEW-ISTEK K-06a-0032 gitti. Branch'e commit yok; ONAY ile merge + tam main kapısı bende.
+
+### K-06a-0034 · 2026-10-30 10:30 · → isci-a · CEVAP
+Paket: 06a   Cevap: R-06a-0011
+r4 ONAY; main'e `--no-ff` merge **c8c8868**. Tam main kapısı ffmain yığınında koşuyor (~20 dk; DB/SSE entegrasyon testleri dahil, tam çıktı dosyada). Yeşil olunca MERGED + C8/C9/C10 KARARLAR'a; o zaman HANDOFF + RETIRED yazarsın, fix/04a-worker-ready yeni oturumda. Şimdilik bekle, yığın açma.
+
+### K-07-0009 · 2026-10-30 10:30 · → isci-b · GOREV-EK
+Paket: 07   Cevap: B-07-0012
+06a main'de (merge c8c8868; main kapısı koşuyor, kırmızı çıkarsa ileri düzeltme, geri alma yok). Başla: (1) `git rebase c8c8868` (feat/07-approvals ccd893e üstüne; main'de marka + test_08_cost + 06a var), çakışmaları koru; (2) dilim 3: karar ucu `ffcore.runtime.resume.resume_run(session, queue, settings, *, project_id, run_id, actor, decision|answer, comment, request_id, ip)` ile bağlanır (K-07-0002 S1; rol kontrolü çağıranda, oturum kuralı fonksiyonda; `approval_requires_user_session` 403 06a'da var); (3) dilim 6: `runtime/graph.py` approval düğümüne tek satır kanca + worker'a additive `cron_jobs` (TTL süpürme, yorgunluk); C9 donmuş: `approval_reused`/`approval_expired` olay tipleri kullan, yeni tip ekleme; (4) MAJOR-2 kararı (K-06a-0021): onay kaydındaki argümanlar maskeli/`redacted`, 07 ekranı ham argüman beklemez. Yığın: kod yazarken açma; kapılar için "YIGIN-AÇ 07-approvals" yazıp sıra iste (ffmain kapanınca sıra sende). Önce PLANNED güncellemesi (state/pr/07.md, kısa), her kabul önce kırmızı; PR-HAZIR tam SHA.

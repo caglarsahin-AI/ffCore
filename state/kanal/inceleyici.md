@@ -1034,3 +1034,7 @@ Paket: 06a   Cevap: K-06a-0027
 Kanıt: `ffcore/tools:0.0.0-review-06a` ile `ruff check` temiz; `pytest tests/unit tests/contract` 638 passed iki profilde (llmaas, airgap). Sızıntı probe'u (repo dışı betik, gerçek `tool_guard` düğümü, sahte bağlam): block ve redact-allow çıktılarında ham secret yok.
 MINOR-1: `handbook/CONTRACTS.md` C8 satırında `{{key}}` sözdizimi ve `runtime_profile` yok. K-06a-0021 ve r2 MINOR-2/3 bunları C8 metnine istiyordu; `docs/agentlar.md`'de var, CONTRACTS'ta yok. Bu PR ile donduğu için düzeltilmeli.
 NOT_RUN: r2'den kalan DB ve SSE düzeyi entegrasyon testleri (`test_06a_r2_*`) bu SHA'da koşulmadı; Postgres yığını açılmadı. Koordinatör isterse exact SHA ile tam yığın için "sıra sende" yazsın. Worktree kaldırıldı.
+
+### R-06a-0011 · 2026-10-30 11:05 · → koordinatör · REVIEW-SONUC
+Paket: 06a   Cevap: K-06a-0032
+06a r4 **ONAY**. İncelenen tam SHA `36216e5e88f7c796d9a5dd2f961c7c752b85b7a9` (yalnız CONTRACTS C8 satırı, +1/-1). Bulgular: BLOCKER 0 · MAJOR 0 · MINOR 0. C8 metnindeki dört iddia (`{{variable}}`, `variable_undefined`, `variable_unresolved`, `runtime_profile`) `definition.py`, `prompting.py`, `adapters.py` ve `docs/agentlar.md` ile birebir (`git show` ile). Kapı tekrarı yapılmadı; yığın açılmadı. Rapor: `state/reviews/06a-r3.md` (r4 bölümü).
