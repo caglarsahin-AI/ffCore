@@ -663,3 +663,21 @@ Seçenekler (Docling):
 - **B** make models ile Docling ağırlıklarını indir (dış ağ, ~GB). Etki: gerçek dönüşüm; ama indirme dış sisteme bağlanma (kullanıcı onayı, ENV-83 yol kontrolü), yığın sırası uzar.
 - **C** docx/pdf KB'li senaryolar NOT_RUN ("Docling ağırlığı yok"). Etki: F1, F4, F9, F10, F13 koşmaz; yalnız F2, F3, F11, F12.
 Cevaba kadar yığın açık; A'yı hazırlıyorum (kod), onaysız koşmam.
+
+### T-18-0037 · 2026-10-30 12:30 · → koordinator · DURUM + bulgular
+Paket: 18 senaryolar aşama 2   Cevap: K-SEN-0028
+Seed (A) tamam. İlk koşu: 16 passed / 8 failed / 23 skipped. Test hatalarını düzelttim; temiz yığında tekrar koşuyor:
+- sources payload anahtarı "selected";
+- araç adı mcp-sql__run_sql;
+- F4 izinde "Merhaba" kaynaksız kalıp model çağrısından önce bitiyor; cevaplanabilir soruya geçtim;
+- belge alanı filename;
+- kısa test belgesi kapıda skipped.
+Ek gözlem: metin katmanlı PDF'ler Docling'siz indeksleniyor; yalnız .docx .txt'ye çevriliyor.
+
+İki ürün bulgusu (karar sende):
+1. **F4 PII sağlayıcıya ham gidiyor (varsayılan ayarda).** Yerleşik "default" guardrail politikası mode=monitor (08-lite kararı). egress'te tokenize kaydı düşüyor (olay 2, action allow), ama metin değişmiyor. Kanıt: engine.evaluate(..., "egress", BUILTIN_DEFAULT) → "RAW LEFT", pii#2 tokenize/monitor. llmaas'ta bir proje politika tanımlamazsa kişi verisi dış sağlayıcıya ham gidiyor.
+   - Seed her projede "default"u yerleşik kurallarla enforce olarak kuruyor (F4 senaryosu böyle koşar).
+   - Ürün varsayılanı için seçenekler:
+     - **A (öneri)** llmaas'ta yerleşik politikanın egress kuralı enforce: tokenize her zaman uygulanır; monitor yalnız gözlem kuralları için kalır. Etki: 08 değişikliği; güvenli varsayılan.
+     - **B** monitor kalsın, kurulum belgesi ve readiness kontrolü enforce politika istesin. Etki: belge + 03a/readiness; yanlış kurulumda sızıntı riski sürer.
+2. **F10 üye olmayan proje kaynağı 403 insufficient_role** (en azından KB listesi), plan 404 bekliyor (varlık sızmaz). Test artık tüm yolları toplayıp listeliyor; tam liste temiz koşuda. Sahibi muhtemelen 03a (üyelik kontrolü). DUZELT önerisi tam listeyle gelecek.
