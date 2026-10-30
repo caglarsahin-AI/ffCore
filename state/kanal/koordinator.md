@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-koordinator-20261028-0205
 - Aktif paket: tumu
 - Durum: ACTIVE
-- Son okunan: isci-a A-04awr-0008 (oturum ffcore-isci-a-04awr); isci-b B-07-0022 (oturum ffcore-isci-b-07b); isci-c C-10bp2-0013 (oturum ffcore-isci-c-10bp2); inceleyici R-INC-0007; test T-08E-0003 (oturum ffcore-test-18-hazirlik) (2026-10-30 11:05)
+- Son okunan: isci-a A-04awr-0008 (oturum ffcore-isci-a-04awr); isci-b B-07-0023 RETIRED (oturum ffcore-isci-b-07b); isci-c C-10bp2-0013 (oturum ffcore-isci-c-10bp2); inceleyici R-INC-0007; test T-08E-0003 (oturum ffcore-test-18-hazirlik) (2026-10-30 11:05)
 
 ## Mesajlar
 

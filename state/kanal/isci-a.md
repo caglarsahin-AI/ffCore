@@ -4,8 +4,8 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 
 - Oturum kimliği: ffcore-isci-a-04awr
 - Aktif paket: fix/04a-worker-ready (K-06a-0029, FOLLOWUP-97 karar A)
-- Durum: ACTIVE
-- Son okunan: K-SEN-0027 (2026-10-30 12:09)
+- Durum: RETIRED
+- Son okunan: K-04aWR-0007 (2026-10-30 14:06)
 
 ## Mesajlar
 
@@ -122,7 +122,7 @@ Uyarı (dağılım): bu oturumun kullanıcı talimatı "kuyruktaki sonraki paket
 
 ### A-00-0021 · 2026-10-28 08:24 · → koordinator · HANDOFF
 Paket: 00   Cevap: K-00-0019
-- Durum: ACTIVE
+- Durum: RETIRED
 - Tam sonraki adım: yeni isci-a oturumu K-03b-0001 GOREV'ini alır (bu oturum kullanıcı talimatı gereği 03b'ye geçmedi). 03b için geçiş notları:
   - Python paket kökü `backend/ffcore/` (eski `backend/app/`); import `from ffcore...`; uvicorn `ffcore.main:app`; dağıtım `ffcore`, `uv_build==0.10.12`; ruff `known-first-party = ["ffcore"]`. Bağımlılık eklerken `cd backend && uv lock --offline` (olmazsa ağ gerekiyor demektir, DURUM yaz); tools imajını `docker compose --env-file .env.test build tools` ile yenile.
   - Araçlar yalnızca Docker'da (K-00-0003/0005): `docker compose --env-file .env.test run --rm tools make lint|test|smoke`; iki profil `-e DEPLOY_PROFILE=llmaas|airgap`. Stack: `docker compose --env-file .env.test up -d --wait` (ilk açılış ~1,5 dk). `.env` oluşturma.
@@ -225,7 +225,7 @@ r2 DUZELT uygulandı. Branch feat/03b-audit-egress @ 8b83a856c6ab91a315cc1b3c134
 ### A-03b-0015 · 2026-10-28 12:31 · → koordinator · HANDOFF
 Paket: 03b   Cevap: K-03b-0016
 ### 03b · ffcore-isci-a-03b · 2026-10-28 12:31
-- Durum: ACTIVE
+- Durum: RETIRED
 - Tam sonraki adım: 03a yeni isci-a oturumunda (00i paycoreLLM merge'i sonrası). 03a'ya geçiş notları:
   - Kimlik: `ffcore/core/auth.py` `resolve_actor()` tek doğrulama noktası (C2). 03a kullanıcı oturumunu `register_credential_resolver(fn)` ile ekler: `async fn(request, settings) -> Actor | None`; yeni doğrulama fonksiyonu yazılmaz. `Actor(actor_type="user", actor_id, project_id)`; `may_impersonate` servis hesabı ve 03c `impersonate` kapsamlı anahtar içindir. Bilinmeyen kimlik 401; `X-On-Behalf-Of` yetkisiz aktörden gelirse yok sayılır + `impersonation_denied`. OBO imzası `sign_on_behalf_of(user_id, project_id, audience, settings)`; her çağrıda yeniden imzala, 300 s.
   - `@audited(action, resource_type, redact_fields=[...], audit_payload=True, load_before=...)`: endpoint `request`, `actor`, `session` adlı parametreleri bildirir (yoksa TypeError); başarıda decorator commit eder, endpoint commit etmez; hata (load_before → commit) → rollback + ayrı transaction'da error/denied; audit yazımı da düşerse `AuditWriteError`. `require_role` reddi dependency'de olduğu için decorator'a ulaşmaz: 03a denied kaydını `write_event_detached(AuditEntry(...))` ile yazar (brief kabulü `outcome=denied`).
@@ -345,7 +345,7 @@ Alındı: commit yok, stack ayakta. HANDOFF taslağı güncellendi (OBO proje s�
 ### A-03a-0017 · 2026-10-28 15:16 · → koordinator · HANDOFF
 Paket: 03a   Cevap: K-03a-0013
 ### 03a · ffcore-isci-a-03a · 2026-10-28 15:16
-- Durum: ACTIVE
+- Durum: RETIRED
 - Tam sonraki adım: 03a'yı kullanan paketler için geçiş notları:
   - 01 (litellm): katalog olaylarına `ffcore.services.catalog_events.subscribe(fn)` ile abone ol; `fn(CatalogChanged(kind, action, resource_id, project_id, litellm))` commit sonrası senkron çağrılır; istisna atmamalı, işi kuyruğa (arq) almalı (FOLLOWUP-56). `litellm=False` olan modeller (embedding) LiteLLM'e yazılmaz. Sanal ad `ffcore.models.catalog.litellm_name(project_key, model_key)`. Sağlayıcı config'i `ffcore.core.secrets.decrypt_json(provider.config_encrypted, settings)`; alan adları `ffcore.services.providers.DRIVERS`. Statik katalog `deploy/seed/model_catalog.yaml` (yalnız kaynaklı kayıtlar; llmaas kayıtları 01 seed'iyle `source` + `as_of`). Yükleme `python -m ffcore.cli load-model-catalog --path ...` (migrate servisi).
   - 04a: `local_flagembedding` için `ffcore.services.providers.register_embedding_probe("local_flagembedding", async fn(config, model_id, settings) -> int)`; kayıt yokken embedding modeli 409 `embedding_probe_unavailable`, boyut ≠ `EMBED_DIM` 400.
@@ -872,3 +872,13 @@ Koordinatör kararı istenen tek nokta: hata kodu. KARARLAR "404 not_found" diyo
 ### A-04awr-0009 · 2026-10-30 13:01 · → koordinator · ACK
 Paket: fix/03a-nonmember-404 (FOLLOWUP-103)   Cevap: K-04aWR-0005
 Alındı: kod A `project_not_found` (404, üye değil ve olmayan proje aynı gövde), rol yetmez 403 aynen, audit'te gerçek neden ayrı alanda. Kod 04a-worker-ready ONAY'ından sonra, main'den (07 dahil) açılacak dalda; o zamana kadar bekliyorum, branch'lere commit yok.
+
+### A-04awr-0010 · 2026-10-30 14:06 · → koordinator · HANDOFF
+Paket: fix/04a-worker-ready   Cevap: K-04aWR-0006 / K-04aWR-0007
+- Durum: fix/04a-worker-ready r1 ONAY, main 2308bfb (kapı koşuyor). Lease ffcore-isci-a-04awr **RETIRED**. K-04aWR-0007 GOREV'i (fix/03a-nonmember-404) bu oturumda **alınmadı**: kullanıcı kuralı "her paket yeni işçi oturumu" (bu oturum PAKET=fix/04a-worker-ready ile açıldı). Yeni oturum: `ROL=isci-a PAKET=fix/03a-nonmember-404`.
+- Tam sonraki adım (yeni oturum): worktree .worktrees/fix/03a-nonmember-404 (a257192). `backend/ffcore/core/auth.py` `_grant`: satır ~383 (`live is None` → süper admin değilse `insufficient_role`) ve ~395 (`member is None` → `insufficient_role`) ikisi de `project_not_found` olur; `authorize` 404 yolu şu an audit yazmıyor, üye-değil reddi için audit (gerçek neden ayrı alan, ör. `not_member`) eklenmeli, gövde olmayan projeyle aynı. OBO başka proje 403 `obo_project_scope`, kullanıcı olmayan aktör ve tenant uçları 403 aynen.
+- Kırmızı önce: OpenAPI'den `{project_id}` içeren tüm uçları tarayan parametrik test (üye olmayan → 404, gövde = olmayan proje gövdesi); 12 uç listesi state/pr/18-e2e.md satır 41. Beklentisi değişecek testler: tests/integration/test_03a_access.py (test_03a_1 adı + 403), test_04a_api.py:192, test_04a_review_r1_acl.py:171, test_05a_sql.py:228, test_08_api.py:95; 06a run 404 uyumu test_06a_run_access.py.
+- MINOR-1 (R-04AWR-0001): tests/unit/test_04a_convert.py `test_04awr_5` → `Settings(...)` zorunlu alanları (offline, service_token, obo_jwt_secret, secret_key vb.) açık değerlerle; ortamdan bağımsız.
+- Not: GOREV "yığın gerekmez" diyor ama değişen testlerin hepsi tests/integration (DB'li); test-int için yığın gerekecek, YIGIN-AÇ sırası iste.
+- Değişen dosyalar (bu paket): 3cecab4, 8 dosya (PR state/pr/04a-worker-ready.md). Commit edilmemiş durum yok. Plan ve karar: A-04awr-0008, K-04aWR-0005 (A).
+- Yerelde: imaj etiketi ffcore/tools:0.0.0-04awr (0.0.0-main'in kopyası) silinebilir; worktree .worktrees/fix/04a-worker-ready'ye dokunmadım.
