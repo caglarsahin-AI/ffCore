@@ -974,5 +974,45 @@
       "partial": "Kısmen doğru",
       "wrong": "Yanlış"
     }
+  },
+  "Approvals": {
+    "title": "Onaylar",
+    "description": "Agent'ların çalıştırmak istediği ve bir kişiyi bekleyen aksiyonlar. Onaylarsanız koşu devam eder; reddederseniz modele nedeni söylenir.",
+    "detailDescription": "Agent bu aksiyondan önce durdu. Argümanları kontrol edin, sonra onaylayın ya da reddedin.",
+    "status": "Durum",
+    "all": "Tümü",
+    "emptyTitle": "Bekleyen yok",
+    "emptyBody": "Onay gerektiren aksiyonlar burada görünür.",
+    "requested": "İstenme",
+    "action": "Aksiyon",
+    "assignedRole": "Karar veren en düşük rol",
+    "expires": "Son süre",
+    "back": "Tüm onaylar",
+    "run": "Koşu",
+    "openRun": "Koşuyu aç",
+    "tool": "Araç",
+    "resolved": "Karar",
+    "resolvedBy": "Karar veren",
+    "none": "—",
+    "arguments": "Argümanlar (maskeli)",
+    "reason": "Modelin gerekçesi",
+    "resolutionNote": "Karar notu",
+    "note": "Not",
+    "noteHint": "İsteğe bağlı; ret durumunda modele söylenir.",
+    "approve": "Onayla",
+    "reject": "Reddet",
+    "cannotDecide": "Bu onayı görebilirsiniz ama karar veremezsiniz: oturum açmış, düzenleme yetkili {role} ya da üstü gerekir.",
+    "pendingCount": "{count, plural, one {# onay bekliyor} other {# onay bekliyor}}",
+    "statuses": {
+      "pending": "Bekliyor",
+      "approved": "Onaylandı",
+      "rejected": "Reddedildi",
+      "expired": "Süresi doldu"
+    },
+    "roles": {
+      "analyst": "Analist",
+      "developer": "Geliştirici",
+      "admin": "Yönetici"
+    }
   }
 }

@@ -29,7 +29,7 @@ export const NAV_GROUPS: NavGroup[] = [
     key: "operate",
     items: [
       { key: "runs", href: "/runs", minRole: "analyst", ready: true },
-      { key: "approvals", href: "/approvals", minRole: "analyst", ready: false },
+      { key: "approvals", href: "/approvals", minRole: "analyst", ready: true },
       { key: "evaluations", href: "/evaluations", minRole: "analyst", ready: false },
       { key: "guardrails", href: "/guardrails", minRole: "developer", ready: false },
       { key: "channels", href: "/channels", minRole: "developer", ready: false },

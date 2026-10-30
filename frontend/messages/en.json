@@ -974,5 +974,45 @@
       "partial": "Partly correct",
       "wrong": "Wrong"
     }
+  },
+  "Approvals": {
+    "title": "Approvals",
+    "description": "Actions agents asked to run that wait for a person. Approve to let the run continue; reject to tell the model why.",
+    "detailDescription": "The agent stopped before this action. Check the arguments, then approve or reject.",
+    "status": "Status",
+    "all": "All",
+    "emptyTitle": "Nothing waiting",
+    "emptyBody": "Actions that need an approval appear here.",
+    "requested": "Requested",
+    "action": "Action",
+    "assignedRole": "Least role to decide",
+    "expires": "Expires",
+    "back": "All approvals",
+    "run": "Run",
+    "openRun": "Open the run",
+    "tool": "Tool",
+    "resolved": "Decided",
+    "resolvedBy": "Decided by",
+    "none": "—",
+    "arguments": "Arguments (masked)",
+    "reason": "Why the model wants it",
+    "resolutionNote": "Decision note",
+    "note": "Note",
+    "noteHint": "Optional; on reject the model is told this.",
+    "approve": "Approve",
+    "reject": "Reject",
+    "cannotDecide": "You can see this approval but not decide it: it needs a signed-in {role} or above with edit access.",
+    "pendingCount": "{count, plural, one {# approval waiting} other {# approvals waiting}}",
+    "statuses": {
+      "pending": "Waiting",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "expired": "Expired"
+    },
+    "roles": {
+      "analyst": "Analyst",
+      "developer": "Developer",
+      "admin": "Admin"
+    }
   }
 }

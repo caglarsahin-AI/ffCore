@@ -31,7 +31,7 @@ import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 
 import { NavUser } from "@/components/nav-user";
-import { useAccess } from "@/components/session-provider";
+import { useAccess, useSession } from "@/components/session-provider";
 import {
   Sidebar,
   SidebarContent,
@@ -40,10 +40,13 @@ import {
   SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
+  SidebarMenuBadge,
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar";
+import { hasRole } from "@/lib/access";
+import { usePendingApprovalCount } from "@/lib/api/approvals-queries";
 import { visibleGroups } from "@/lib/navigation";
 
 const ICONS: Record<string, LucideIcon> = {
@@ -119,6 +122,7 @@ export function AppSidebar() {
                       <Icon />
                       <span>{label}</span>
                     </SidebarMenuButton>
+                    {item.key === "approvals" && <ApprovalBadge />}
                   </SidebarMenuItem>
                 );
               })}
@@ -131,5 +135,20 @@ export function AppSidebar() {
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
+  );
+}
+
+// Pending approvals of the selected project (07 /approvals/count); hidden at zero. Analysts and up
+// see the approvals menu, so the count is read only for them.
+function ApprovalBadge() {
+  const t = useTranslations("Approvals");
+  const { projectId } = useSession();
+  const { role } = useAccess();
+  const count = usePendingApprovalCount(projectId, hasRole(role, "analyst"));
+  if (!count.data) return null;
+  return (
+    <SidebarMenuBadge aria-label={t("pendingCount", { count: count.data })} data-testid="nav-approvals-badge">
+      {count.data}
+    </SidebarMenuBadge>
   );
 }
