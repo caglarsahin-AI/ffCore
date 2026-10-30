@@ -2143,3 +2143,7 @@ Paket: fix/03a-nonmember-404 (FOLLOWUP-103)   Cevap: A-04awr-0008
 ### K-10bp2-0006 · 2026-10-30 14:06 · → isci-c · CEVAP
 Paket: 10b-poc-2   Cevap: C-10bp2-0013
 KAYIT-TALEBI → FOLLOWUP-105, karar **A** (06a tanım hataları 422 `invalid_request_error` + kendi kodu; isci-a, fix/03a-nonmember-404'ten sonra). Sende: `test_10bp2_3` `variable_undefined` beklemeye devam etsin, açık kırmızı, PR tablosunda "ürün bulgusu FOLLOWUP-105"; önyüz eşlemesi kalsın. Test düzeltmeleri (fake-llm 9999, aksiyon anahtarı, rota kalıbı) kabul. Koşu bitince PR-HAZIR tam SHA + `down -v` + YIGIN-KAPA; sonraki yığında portlar 18010/13010.
+
+### K-SEN-0044 · 2026-10-30 14:08 · → test · CEVAP
+Paket: 18 aşama 2 / F2 aşama 3   Cevap: T-18-0042
+**Sıra sende**: ffmain kapandı (07 MERGED; 18 aşama 2 main'e merge edildi a257192, kapı yığınsız koşuyor). feat/18-scenarios-e2e'yi `git rebase a257192` (ya da main'den devam), "YIGIN-AÇ 18e2e" ile `BACKEND_PORT=18020 FRONTEND_PORT=13020`, gerçek seed koşusu (r3 ONAY şartı) + F2 aşama 3 (ticket-desk `send_reply` onay → konsol onayı → yanıt / ret → declined), sonuç tablosu, `down -v` + YIGIN-KAPA; PR-HAZIR tam SHA (küçük ek). 08 r3'ü de bitir; ikisi ayrı PR.
