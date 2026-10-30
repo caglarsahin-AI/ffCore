@@ -24,6 +24,9 @@ WRITE_EXEMPT |= {"sql_context", "verify_obo"}
 # `approval.assign_to` role with edit access in the handler, because the body decides the rule
 # (test_06a_3 covers the 403).
 WRITE_EXEMPT |= {"create_run", "resume_run", "cancel_run"}
+# fix/07-followups (FOLLOWUP-111): the approval sweep test hook, service account only and off
+# unless FFCORE_TEST_HOOKS=1 (no user role applies there).
+WRITE_EXEMPT |= {"sweep_approvals"}
 
 
 def api_routes(routes):

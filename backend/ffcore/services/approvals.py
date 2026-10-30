@@ -411,13 +411,15 @@ def run_closer(settings: Settings) -> CloseRun:
     return close
 
 
-async def sweep(settings: Settings, *, now: datetime | None = None) -> None:
+async def sweep(settings: Settings, *, now: datetime | None = None) -> list[Approval]:
     """The per-minute job (background agent worker, S4): expire what is due, then report
-    pending approvals past the alert age."""
+    pending approvals past the alert age. Returns the approvals it expired (the test hook's
+    answer, FOLLOWUP-111)."""
     from ffcore.core import db
 
     now = now or datetime.now(UTC)
     async with db.session_scope() as session:
-        await expire_due(session, now=now, close_run=run_closer(settings))
+        expired = await expire_due(session, now=now, close_run=run_closer(settings))
     async with db.session_scope() as session:
         await report_pending_age(session, now=now, settings=settings)
+    return expired

@@ -127,6 +127,9 @@ class Settings(BaseSettings):
     approval_ttl_min: int = Field(default=60, gt=0)
     # A pending approval older than this is reported (approval_pending_age); 03c alerts later.
     approval_alert_age_min: int = Field(default=30, gt=0)
+    # Test hooks for end-to-end tests (POST /api/v1/internal/approvals/sweep, FOLLOWUP-111): off
+    # by default and in every deployment; only a test stack sets FFCORE_TEST_HOOKS=1.
+    ffcore_test_hooks: bool = False
 
     # --- 06a agent runtime (profile values, PLAN 2b; .env.example lists each profile) ---
     # Concurrent model calls (C10): airgap cpu 1, gpu the server's parallelism, llmaas the
