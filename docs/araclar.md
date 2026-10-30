@@ -114,7 +114,12 @@ Register it as tool key `mcp-search`, endpoint `http://mcp-search:8000/mcp`, aut
 ## Built-in: mcp-sql
 
 - `get_schema(question?)` returns the tables and columns in business language, narrowed to the
-  question, and the project's five nearest question-SQL examples.
+  question, and the project's five nearest question-SQL examples. mcp-sql reads them from
+  `POST /api/v1/projects/{project_id}/tools/sql-context` on behalf of the user who runs the
+  agent. That endpoint is a read: it is a POST only because the question travels in the body.
+  Every project member who may start a run (role `user` and up) gets an answer; a non-member
+  gets 404. Narrowing it to admins would break the SQL assistant for the analysts who run it
+  (FOLLOWUP-113, closed).
 - `run_sql(sql, reason)` runs one read-only `SELECT` on the demo database:
   - the result is CSV with at most `SQL_MAX_ROWS` (500) rows; a longer result says it was cut;
   - each query has `SQL_TIMEOUT_S` (20 s).

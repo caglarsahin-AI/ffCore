@@ -71,6 +71,29 @@ it expires what is due, closes those runs (`failed`, `approval_expired`, events
 closing its run are one transaction: if closing fails, both stay as they were and the next minute
 tries again; an approval already expired while its run still waits is closed on the next run.
 
+Events are stored before they are sent live. If the live send fails after the close is stored
+(Redis error), the run is still `failed` with its `error` event in `run_events`, and the sweep
+logs the failure. A client that follows the run, or reconnects with `Last-Event-ID`, gets the
+stored `error` after two empty keepalive turns and the stream ends; it does not wait forever.
+
+### Test hook: run the sweep now
+
+End-to-end tests cannot wait the TTL. With `FFCORE_TEST_HOOKS=1` (default off; never set it in
+a deployment) the backend has `POST /api/v1/internal/approvals/sweep?now=<ISO 8601 with time
+zone>`. It is for the service account only and runs the same sweep as the minute job with that
+`now`. The answer is `{"expired": [<approval ids>]}`. A second call with the same `now` expires
+nothing more. When the flag is off, the path answers 404 like an unknown path, before any
+identity check. The hook is not in the OpenAPI contract. Compose passes the flag in the
+backend's environment (`FFCORE_TEST_HOOKS: ${FFCORE_TEST_HOOKS:-0}`); the hook runs the sweep
+in the backend process. `.env.test` leaves it off; the end-to-end stack sets
+`FFCORE_TEST_HOOKS=1` in its own env file (13b).
+
+| Answer | When |
+|---|---|
+| 404 `not_found` | `FFCORE_TEST_HOOKS` off |
+| 403 `service_account_required` | any caller but the service account |
+| 422 `now_without_timezone` | `now` without a time zone |
+
 ## Not yet
 
 - E-mail notification and the `approval_pending_age` alert come with 03c (notification
