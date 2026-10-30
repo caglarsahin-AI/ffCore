@@ -83,7 +83,12 @@ def cli(*args: str, stdin: str | None = None) -> subprocess.CompletedProcess:
 
 def ensure_superadmin(email: str, password: str) -> None:
     done = cli(
-        "create-superadmin", "--email", email, "--full-name", "E2E Admin", "--password-stdin",
+        "create-superadmin",
+        "--email",
+        email,
+        "--full-name",
+        "E2E Admin",
+        "--password-stdin",
         stdin=password + "\n",
     )
     if done.returncode != 0 and "already exists" not in done.stderr + done.stdout:
@@ -161,7 +166,9 @@ def seed_models(admin: Client, ids: dict[str, str]) -> None:
         },
         lambda: admin.find("/providers", PROVIDER_KEY),
     )
-    admin.call("PUT", f"/providers/{provider['id']}/projects", json={"project_ids": list(ids.values())})
+    admin.call(
+        "PUT", f"/providers/{provider['id']}/projects", json={"project_ids": list(ids.values())}
+    )
     for pid in ids.values():
         for key, upstream in MODELS.items():
             admin.call(
@@ -174,6 +181,9 @@ def seed_models(admin: Client, ids: dict[str, str]) -> None:
                     "provider_id": provider["id"],
                     "category": "llm",
                     "model_id": upstream,
+                    "upstream_api": "chat",  # chosen explicitly, never detected
+                    # agents with tools need a tool-calling model; fake-llm accepts tools on all
+                    "capabilities": {"tool_calls": True},
                     "request_policy": {"extra_body": {"reasoning_effort": "none"}},
                 },
             )
@@ -187,12 +197,33 @@ def wait_indexed(admin: Client, base: str, doc_ids: list[str]) -> None:
             doc = admin.call("GET", f"{base}/documents/{doc_id}").json()
             if doc["status"] in INDEX_TERMINAL:
                 if doc["status"] != "indexed":
-                    raise SeedError(f"{doc['name']}: {doc['status']} {doc.get('error')}")
+                    raise SeedError(f"{doc['filename']}: {doc['status']} {doc.get('error')}")
                 pending.discard(doc_id)
         if pending and time.monotonic() > deadline:
             raise SeedError(f"documents not indexed after {INDEX_TIMEOUT_S} s: {sorted(pending)}")
         if pending:
             time.sleep(3)
+
+
+def _readback():
+    """13a's stdlib reader (DOCX, PDF text layer), loaded by path: it is a test helper."""
+    import importlib.util
+
+    path = SAMPLES / "scripts" / "tests" / "readback.py"
+    spec = importlib.util.spec_from_file_location("readback", path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def upload_form(path: Path) -> tuple[str, bytes]:
+    """(name, bytes) to upload. The test stack has no Docling weights (model_missing), so DOCX
+    goes in as its text (<stem>.txt, 13a readback; K-SEN-0028 A). The text-layer PDFs index
+    without weights (seen on the stack), so they go in as they are. The Docling path is 04a's
+    own `models` test; these scenarios test retrieval and the runtime."""
+    if path.suffix == ".docx":
+        return f"{path.stem}.txt", _readback().text_of(path).encode("utf-8")
+    return path.name, path.read_bytes()
 
 
 def seed_kb(admin: Client, pid: str, key: str, files: list[tuple[Path, list[str]]]) -> str:
@@ -202,10 +233,9 @@ def seed_kb(admin: Client, pid: str, key: str, files: list[tuple[Path, list[str]
     doc_ids = []
     for path, roles in files:
         data = {"acl_open": "true"} if not roles else {"acl_roles": roles}
-        with path.open("rb") as fh:
-            r = admin.call(
-                "POST", f"{base}/{kb['id']}/documents", files={"files": (path.name, fh)}, data=data
-            )
+        r = admin.call(
+            "POST", f"{base}/{kb['id']}/documents", files={"files": upload_form(path)}, data=data
+        )
         doc_ids += [row["document"]["id"] for row in r.json()["data"]]
     wait_indexed(admin, f"{base}/{kb['id']}", doc_ids)
     return kb["id"]
@@ -219,7 +249,9 @@ def seed_knowledge(admin: Client, projects: dict, ids: dict[str, str]) -> None:
         for kb in project["knowledge_bases"]:
             folder = SAMPLES / kb["source"]
             files = sorted(p for p in folder.iterdir() if p.suffix in (".pdf", ".docx", ".txt"))
-            seed_kb(admin, ids[project["key"]], kb["key"], [(f, acl.get(f.name, [])) for f in files])
+            seed_kb(
+                admin, ids[project["key"]], kb["key"], [(f, acl.get(f.name, [])) for f in files]
+            )
     poison = sorted((SAMPLES / "poison" / "docs").glob("*.txt"))
     seed_kb(admin, ids[TARGET], "zehirli", [(p, []) for p in poison])
     versions = []
@@ -250,14 +282,24 @@ def seed_tools(admin: Client, pid: str) -> None:
             )
     for args in (
         ("seed-sql-demo", "--path", "../data/samples/schema"),
-        ("seed-sql-context", "--project", TARGET, "--tool", "mcp-sql", "--path", "../data/samples/schema"),
+        (
+            "seed-sql-context",
+            "--project",
+            TARGET,
+            "--tool",
+            "mcp-sql",
+            "--path",
+            "../data/samples/schema",
+        ),
     ):
         done = cli(*args)
         if done.returncode != 0:
             raise SeedError(f"{args[0]}: {done.stderr.strip() or done.stdout.strip()}")
 
 
-def _publish(admin: Client, pid: str, key: str, name: str, description: str, definition: dict) -> None:
+def _publish(
+    admin: Client, pid: str, key: str, name: str, description: str, definition: dict
+) -> None:
     base = f"/projects/{pid}/agents"
     agent = admin.create(
         base,
@@ -294,6 +336,31 @@ def seed_agents(admin: Client, projects: dict, ids: dict[str, str]) -> None:
         _publish(admin, ids[TARGET], key, key, "plan/18 scenario (test stack only)", definition)
 
 
+def seed_guardrails(admin: Client, ids: dict[str, str]) -> None:
+    """The target project's `default` policy: the built-in rules in enforce mode, so PII leaves
+    tokenized (F4). The built-in policy is monitor (08-lite): it records the tokenization but
+    sends the text as it is (K-SEN-0029: becomes enforce, fix/08-default-egress-enforce); the
+    other project keeps it, and test_18_f4_1c shows the leak until that fix.
+    The secrets rule only logs here: its entropy check flags document file names
+    (`SZL-2025-003_temizlik-hizmet.txt` → API_TOKEN) and would block every KB run in enforce
+    (finding T-18-0038). A same-key row overrides the built-in policy."""
+    base = f"/projects/{ids[TARGET]}/guardrail-policies"
+    current = admin.find(base, "default")
+    if current is None:
+        raise SeedError(f"{base}: no default policy")
+    if not current["builtin"]:
+        return  # idempotent: the seeded row is kept as it is
+    rules = [{**r, "action": "log"} if r["type"] == "secrets" else r for r in current["rules"]]
+    body = {
+        "key": "default",
+        "name": "Default (enforce, plan/18 F4)",
+        "mode": "enforce",
+        "rules": rules,
+        **{k: current[k] for k in ("short_circuit", "on_error", "block_message")},
+    }
+    admin.call("POST", base, json=body)
+
+
 def seed_prompts() -> None:
     done = cli("seed-prompts", "--path", "prompts")
     if done.returncode != 0:
@@ -311,8 +378,11 @@ def main() -> int:
     seed_members(admin, projects, ids, password)
     me = admin.call("GET", "/auth/me").json()["user"]["id"]
     for pid in ids.values():  # a superadmin must be a member to run agents (run_needs_membership)
-        admin.call("POST", f"/projects/{pid}/members", ok=(201, 409), json={"user_id": me, "role": "admin"})
+        admin.call(
+            "POST", f"/projects/{pid}/members", ok=(201, 409), json={"user_id": me, "role": "admin"}
+        )
     seed_models(admin, ids)
+    seed_guardrails(admin, ids)
     seed_knowledge(admin, projects, ids)
     seed_tools(admin, ids[TARGET])
     seed_agents(admin, projects, ids)

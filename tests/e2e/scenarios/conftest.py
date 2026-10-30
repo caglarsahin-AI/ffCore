@@ -149,7 +149,9 @@ class Api:
         assert r.status_code == 200, r.text
         return r.json()["items"]
 
-    def resume(self, project_id: str, run_id: str, decision: str, comment: str = "e2e") -> list[dict]:
+    def resume(
+        self, project_id: str, run_id: str, decision: str, comment: str = "e2e"
+    ) -> list[dict]:
         """POST /runs/{id}/resume with an approval decision; returns the SSE events."""
         url = f"/api/v1/projects/{project_id}/runs/{run_id}/resume"
         body = {"decision": decision, "comment": comment}

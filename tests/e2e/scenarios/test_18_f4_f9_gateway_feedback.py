@@ -8,6 +8,10 @@ import pytest
 from .conftest import load
 
 PROJECT = "hastane-a"
+# A question the contracts answer: with no source the run declines before any model call.
+ANSWERABLE = next(
+    i["input"]["message"] for i in load("eval/sozlesme-33.json") if i["metadata"]["answerable"]
+)
 
 
 def _pii_samples(n: int = 5) -> list[tuple[str, list[str]]]:
@@ -37,11 +41,29 @@ def test_18_f4_1_provider_never_sees_raw_pii(login, fake_llm):
             assert v not in bodies, f"raw PII reached the provider: {v[:4]}…"
 
 
+def test_18_f4_1c_builtin_default_does_not_leak_raw_pii(login, fake_llm):
+    """K-SEN-0029 decision A: with the built-in `default` policy (no project override; klinik-b
+    in the seed) PII still leaves tokenized. Red until fix/08-default-egress-enforce: the
+    built-in policy is monitor and sends the text as it is."""
+    analyst = login("klinik-b", "analyst", "edit")
+    pid = analyst.project_id("klinik-b")
+    text, values = _pii_samples(1)[0]
+    fake_llm.reset()
+    run = analyst.settle(
+        pid, analyst.start_run(pid, "sozlesme-asistani", f"El hijyeni prosedürü nedir? {text}")
+    )
+    assert run.detail["status"] == "completed", run.detail
+    bodies = json.dumps(fake_llm.requests(), ensure_ascii=False)
+    assert bodies != "[]", "no model call (did retrieval find the klinik-b procedure?)"
+    for v in values:
+        assert v not in bodies, f"raw PII reached the provider with the built-in policy: {v[:4]}…"
+
+
 def test_18_f4_2_trace_chain(login):
     """run → Langfuse trace, and the masked request the model got is on the llm_call event."""
     analyst = login(PROJECT, "analyst", "edit")
     pid = analyst.project_id(PROJECT)
-    run = analyst.settle(pid, analyst.start_run(pid, "sozlesme-asistani", "Merhaba"))
+    run = analyst.settle(pid, analyst.start_run(pid, "sozlesme-asistani", ANSWERABLE))
     assert run.detail.get("langfuse_trace_id"), run.detail
     calls = [e for e in analyst.run_events(pid, run.id) if e["type"] == "llm_call"]
     assert calls and all(c["payload"].get("request_messages") for c in calls), calls
@@ -52,7 +74,7 @@ def test_18_f4_2b_litellm_call_id_in_run_events(login):
     null only when LiteLLM gave none, never missing)."""
     analyst = login(PROJECT, "analyst", "edit")
     pid = analyst.project_id(PROJECT)
-    run = analyst.settle(pid, analyst.start_run(pid, "sozlesme-asistani", "Merhaba"))
+    run = analyst.settle(pid, analyst.start_run(pid, "sozlesme-asistani", ANSWERABLE))
     calls = [e for e in analyst.run_events(pid, run.id) if e["type"] == "llm_call"]
     assert calls and all("litellm_call_id" in c["payload"] for c in calls), calls
     # Through LiteLLM to fake-llm the id is expected to be set; null is reported, not hidden.

@@ -2,6 +2,7 @@
 project A's resources, by listing or by an id taken from A; and one run of A can be followed to
 its LiteLLM call and its Langfuse trace (data/samples/projects/projects.json)."""
 
+import json
 import os
 import time
 import uuid
@@ -15,6 +16,18 @@ TRACE_WAIT_S = 60
 INDEX_TERMINAL = ("indexed", "failed", "skipped", "timeout")
 
 
+def _procedure(word: str) -> str:
+    """A short procedure long enough for the ingest gates (a one-liner is skipped)."""
+    lines = [
+        f"{word} kayıt prosedürü",
+        f"Madde 1 - Amaç: Bu prosedür {word} kayıtlarının nasıl tutulacağını açıklar.",
+        f"Madde 2 - Süre: {word} kayıtları 30 gün boyunca saklanır, sonra arşive taşınır.",
+        "Madde 3 - Sorumluluk: Kayıtların doğruluğundan birim sorumlusu sorumludur.",
+        "Madde 4 - Erişim: Kayıtları yalnız yetkili personel görüntüleyebilir.",
+    ]
+    return "\n\n".join(lines * 3)
+
+
 @pytest.fixture(scope="module")
 def pair(seed, login):
     iso = seed["isolation"]
@@ -26,7 +39,11 @@ def pair(seed, login):
 @pytest.fixture(scope="module")
 def a_run(pair):
     _, owner, a_pid, _ = pair
-    return owner.settle(a_pid, owner.start_run(a_pid, "sozlesme-asistani", "Merhaba"))
+    # a question the contracts answer: without sources the run ends before any model call
+    item = next(i for i in load("eval/sozlesme-33.json") if i["metadata"]["answerable"])
+    return owner.settle(
+        a_pid, owner.start_run(a_pid, "sozlesme-asistani", item["input"]["message"])
+    )
 
 
 def test_18_f10_4_direct_ids_are_404(pair, a_run):
@@ -53,14 +70,19 @@ def test_18_f10_4_direct_ids_are_404(pair, a_run):
         (f"{base}/tools/{tool}/actions/run_sql/invoke", {"arguments": {"sql": "SELECT 1"}}),
         (f"{base}/agents/sozlesme-asistani/runs", {"input": "Merhaba"}),
     ]
+    wrong = []  # every path is checked; the report lists all that differ
     for path in reads:
         assert owner.get(path).status_code == 200, path  # control: A sees it
         r = outsider.get(path)
-        assert r.status_code == iso["expected_status"], (path, r.status_code, r.text[:200])
-        assert a_pid not in r.text and docs[0]["name"] not in r.text, path
+        if r.status_code != iso["expected_status"]:
+            wrong.append((path.replace(base, "A"), r.status_code, r.json()["error"]["code"]))
+        assert a_pid not in r.text and docs[0]["filename"] not in r.text, path
     for path, body in writes:
         r = outsider.post(path, json=body)
-        assert r.status_code == iso["expected_status"], (path, r.status_code, r.text[:200])
+        if r.status_code != iso["expected_status"]:
+            wrong.append((path.replace(base, "A"), r.status_code, r.json()["error"]["code"]))
+    print("F10 differing endpoints:", json.dumps(wrong))  # full list for the report (-s)
+    assert not wrong, wrong
 
 
 def test_18_f10_5_listing_does_not_leak(pair):
@@ -81,7 +103,7 @@ def test_18_f10_6_trace_chain(pair, a_run):
     read back through Langfuse's public API."""
     _, owner, a_pid, _ = pair
     events = owner.run_events(a_pid, a_run.id)
-    sources = [s for e in events if e["type"] == "sources" for s in e["payload"]["sources"]]
+    sources = [s for e in events if e["type"] == "sources" for s in e["payload"]["selected"]]
     assert sources and all(s["document_id"] for s in sources), sources
     calls = [e["payload"] for e in events if e["type"] == "llm_call"]
     assert calls and all(c.get("litellm_call_id") for c in calls), calls
@@ -111,7 +133,7 @@ def test_18_f10_7_deleted_source_keeps_reference_without_content(pair):
     word = f"silmesinamasi{tag}"
     up = owner.post(
         f"{base}/knowledge-bases/{kb_id}/documents",
-        files={"files": (f"silme-{tag}.txt", f"Prosedür {word}: kayıt 30 gün tutulur.".encode())},
+        files={"files": (f"silme-{tag}.txt", _procedure(word).encode())},
         data={"acl_open": "true"},
     )
     assert up.status_code == 202, up.text
@@ -140,7 +162,7 @@ def test_18_f10_7_deleted_source_keeps_reference_without_content(pair):
     deleted = owner.http.delete(doc_url)
     assert deleted.status_code == 204, deleted.text
     events = owner.run_events(a_pid, run.id)
-    refs = [s for e in events if e["type"] == "sources" for s in e["payload"]["sources"]]
+    refs = [s for e in events if e["type"] == "sources" for s in e["payload"]["selected"]]
     assert any(s["document_id"] == doc_id for s in refs), refs
     assert word not in str(refs)  # reference only, no passage text
     assert owner.get(doc_url).status_code == 404

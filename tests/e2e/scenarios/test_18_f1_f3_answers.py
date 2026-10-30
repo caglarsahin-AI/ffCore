@@ -7,6 +7,7 @@ and mcp-sql refuses every disguised write over the real chain.
 """
 
 import json
+from pathlib import Path
 
 import pytest
 
@@ -35,7 +36,11 @@ def test_18_f1_1_answer_run_has_sources(analyst):
     sources = [e["data"]["sources"] for e in run.events if e["event"] == "sources"]
     assert sources and sources[0], "no sources event, or an empty one (F1: no unsourced answer)"
     names = {s["document_name"] for s in sources[0]}
-    contracts = {c["file_name"] for c in load("contracts/manifest.json")}
+    # DOCX uploaded as text <stem>.txt, PDF as is (seed.upload_form; no Docling weights)
+    contracts = {
+        Path(c["file_name"]).stem + ".txt" if c["format"] == "docx" else c["file_name"]
+        for c in load("contracts/manifest.json")
+    }
     assert names <= contracts, names
 
 
@@ -73,7 +78,7 @@ def test_18_f3_8_one_approved_run_sql_call(analyst):
     assert run.detail["status"] == "completed", run.detail
     events = analyst.run_events(pid, run.id)
     calls = [e["payload"] for e in events if e["type"] == "tool_call"]
-    assert [c["name"] for c in calls] == ["run_sql"], calls
+    assert [c["name"] for c in calls] == ["mcp-sql__run_sql"], calls  # <tool_key>__<action>
     results = [e["payload"] for e in events if e["type"] == "tool_result"]
     assert results and not results[0]["is_error"], results
     assert run.detail["output"].startswith("hello "), run.detail["output"]
