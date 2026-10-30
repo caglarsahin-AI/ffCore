@@ -35,7 +35,11 @@ fails with `encoding_undecodable` instead of entering the index with broken lett
 
 Every file converts in a worker process with `CONVERT_TIMEOUT_SECONDS` (600); past it the process
 is killed, the document is `timeout` and the next file goes on. A `timeout` is not retried by a
-plain reindex.
+plain reindex. The file's time starts when its worker reports ready: a fresh worker's spawn and
+imports are bounded separately by `CONVERT_WORKER_START_TIMEOUT_SECONDS` (60); past it the worker
+is killed and the document fails with `convert_worker_start_timeout`. Docling and PaddleOCR load
+on the first file that needs them, so that load still counts against the file's timeout
+(about 66 s measured in a fresh process, well inside 600).
 
 Limits, each a recorded refusal with a code (the file's content is never in the message):
 

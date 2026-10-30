@@ -189,6 +189,8 @@ def test_04a_9c_text_pdf_fallback_chain_without_docling(tmp_path, monkeypatch):
 
 
 def test_04a_9d_timeout_kills_worker_and_continues(tmp_path):
+    # The 2 s bound measures the files only: each fresh worker (the first, and the one after the
+    # kill) starts under its own wide start timeout, so `fast` never races a spawn (FOLLOWUP-97).
     slow, fast = tmp_path / "slow.txt", tmp_path / "fast.txt"
     slow.write_text("sleep")
     fast.write_text("ok")
@@ -210,6 +212,7 @@ def test_04a_persistent_pool_reuses_its_process_and_replaces_it_after_timeout(tm
     slow.write_text("sleep")
     fast1.write_text("ok")
     fast2.write_text("ok")
+    # As in 9d: the 2 s bound starts after `ready`, spawning is not part of it (FOLLOWUP-97).
     pool = PersistentPool(timeout=2, name="p", target="tests.unit._convert_targets:target")
     try:
         assert pool.convert(fast1).text_md == "fast1"
@@ -221,3 +224,84 @@ def test_04a_persistent_pool_reuses_its_process_and_replaces_it_after_timeout(tm
         assert pool.convert(fast1).status == CONVERTED
     finally:
         pool.close()
+
+
+# --- worker readiness (FOLLOWUP-97): a file's time starts when its worker says `ready` ---
+
+SLOW_START = "tests.unit._convert_targets_slow_start:target"
+
+
+@pytest.mark.parametrize("kind", ["persistent", "bounded"])
+def test_04awr_1_slow_start_not_counted_in_file_timeout(tmp_path, monkeypatch, kind):
+    # A worker whose import takes longer than the file timeout: the file itself is instant.
+    monkeypatch.setenv("FFCORE_TEST_START_DELAY", "3")
+    doc = tmp_path / "doc.txt"
+    doc.write_text("ok")
+    if kind == "persistent":
+        pool = PersistentPool(timeout=2, name="wr1", target=SLOW_START, start_timeout=120)
+        try:
+            result = pool.convert(doc)
+        finally:
+            pool.close()
+    else:
+        results = {}
+        BoundedPool(size=1, timeout=2, name="wr1b", target=SLOW_START, start_timeout=120).run(
+            [doc], on_start=lambda p: None, on_result=lambda p, r, s: results.__setitem__(p, r)
+        )
+        result = results[doc]
+    assert result.status == CONVERTED and result.text_md == "doc", result
+
+
+def test_04awr_2_worker_start_timeout_is_coded_and_replaced(tmp_path, monkeypatch):
+    monkeypatch.setenv("FFCORE_TEST_START_DELAY", "600")
+    doc = tmp_path / "doc.txt"
+    doc.write_text("ok")
+    pool = PersistentPool(timeout=60, name="wr2", target=SLOW_START, start_timeout=2)
+    try:
+        result = pool.convert(doc)
+        assert result.status == ERROR, result
+        assert result.error_code == "convert_worker_start_timeout", result
+        assert pool._worker is None  # killed; never left waiting
+        monkeypatch.setenv("FFCORE_TEST_START_DELAY", "0")
+        # A wide bound again: under load a plain spawn can take more than 2 s; this half only
+        # shows that a fresh worker takes the next file.
+        pool.start_timeout = 120
+        assert pool.convert(doc).status == CONVERTED
+    finally:
+        pool.close()
+
+
+def test_04awr_3_worker_dying_before_ready_is_worker_died(tmp_path):
+    doc = tmp_path / "doc.txt"
+    doc.write_text("ok")
+    # The target name does not exist: the worker dies while resolving it, before `ready`.
+    pool = PersistentPool(
+        timeout=60, name="wr3", target="tests.unit._convert_targets:missing", start_timeout=120
+    )
+    try:
+        result = pool.convert(doc)
+        assert result.status == ERROR and result.error_code == "worker_died", result
+        assert pool._worker is None
+    finally:
+        pool.close()
+
+
+def test_04awr_5_ingest_pool_uses_start_timeout_setting(tmp_path, monkeypatch):
+    from ffcore.core.config import Settings
+    from ffcore.knowledge import ingest
+
+    created = {}
+
+    class FakePool:
+        def __init__(self, **kwargs):
+            created.update(kwargs)
+
+        def convert(self, path):
+            return "converted"
+
+    monkeypatch.setattr(ingest, "PersistentPool", FakePool)
+    monkeypatch.setattr(ingest, "_pools", {})
+    settings = Settings(convert_worker_start_timeout_seconds=42)
+    assert ingest.convert_bounded(tmp_path / "x.txt", "x.txt", settings) == "converted"
+    assert created["start_timeout"] == 42
+    assert created["timeout"] == settings.convert_timeout_seconds

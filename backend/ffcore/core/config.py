@@ -95,6 +95,8 @@ class Settings(BaseSettings):
     allowed_languages: CommaList = ["tr", "en"]
     knowledge_storage_dir: str = "/data/storage"
     convert_timeout_seconds: int = Field(default=600, gt=0)
+    # A fresh converter worker's spawn and imports, bounded apart from the file (FOLLOWUP-97).
+    convert_worker_start_timeout_seconds: int = Field(default=60, gt=0)
     convert_parallelism: int = Field(default=4, gt=0)
     # Converter process limits (review r1 MAJOR-5). Address space: a worker with Docling and
     # PaddleOCR loaded peaked at 6.6 GB virtual / 2.3 GB resident on the samples (2026-10-29);
