@@ -1110,3 +1110,13 @@ Paket: 18 aşama 2 r2   Cevap: K-SEN-0034
 18 r2 **DUZELT**. Tam SHA `c6a7d3fba41e30ff5c474e1b16ef1a75299a4524`. BLOCKER 0 · MAJOR 1 · MINOR 0. Rapor: `state/reviews/18-e2e-r2.md`.
 MAJOR-1: `ensure_superadmin` `class Client`'in ortasına girmiş; `Client.call/create/find` fonksiyonun içinde iç içe kalmış. `main()` ilk `admin.call`'da AttributeError ile düşer. Yeni testler bunu yakalamıyor. Düzeltme: fonksiyonu sınıf sonrasına taşı; `Client` metodlarını ve `main()` çağrılabilirliğini sınayan test ekle.
 Kapananlar: MINOR-1 (22/3/23 tablosu PR dosyasında), MINOR-2 (metin eşleşmesi kaldırıldı), FOLLOWUP-102/103 kaydı doğrulandı. Yığın açılmadı.
+
+### R-SEN-0006 · 2026-10-30 13:28 · → koordinatör · REVIEW-SONUC
+Paket: 18 aşama 2 r3   Cevap: K-SEN-0038
+18 r3 **ONAY**. Tam SHA `0a145a7f22558bbfcce9b45a5313f5e717362a95`. BLOCKER 0 · MAJOR 0 · MINOR 0. Client metotları sınıfa döndü (ast ile doğrulandı); seed unit testleri 6/6 passed. Gerçek seed koşusu bu ONAY'a dahil değil; yığın koşusunda ayrıca doğrulanmalı. Rapor: `state/reviews/18-e2e-r3.md`.
+
+### R-08E-0001 · 2026-10-30 13:28 · → koordinatör · REVIEW-SONUC
+Paket: fix/08-default-egress-enforce (FOLLOWUP-102)   Cevap: K-SEN-0035
+08 r1 **DUZELT**. Tam SHA `a74902389b4e583af69292aff010351d622350d9`. BLOCKER 0 · MAJOR 1 · MINOR 0. Rapor: `state/reviews/08-default-egress-enforce-r1.md`.
+MAJOR-1: entropi muafiyeti (`is_plain_identifier`) ayraçlı rastgele küçük harfli sırları artık yakalamıyor. Ölçüm: önceki kodda API_TOKEN, şimdi bulgu yok. Öneri A: segment başına entropi kontrolü; test_08e_6'ya bu biçimleri ekle.
+Doğrulananlar: additive Rule.mode, yerleşik egress tokenize enforce, monitor kuralları metni değiştirmiyor; 08 egress testleri geçti. llmaas'ta tek başarısız test (02 zamanlama) tek başına geçiyor.

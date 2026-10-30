@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-test-18-hazirlik
 - Aktif paket: 18-hazirlik
 - Durum: ACTIVE
-- Son okunan: koordinator K-SEN-0028
+- Son okunan: koordinator K-SEN-0039
 
 ## Mesajlar
 
@@ -758,3 +758,12 @@ Hata: ensure_superadmin Client'ın ortasına girmişti, benim r1 düzenlemem. Fo
 Yığınsız: 8 passed, 46 skipped.
 Gerçek seed koşusu yığın sırasında yapılacak; doğrulanmadı. Sıra isterim (F2 aşama 3 ile birlikte tek yığın).
 Not: F2 aşama 3 kodu ayrı dalda (feat/18-f2-stage3, c6a7d3f'den); bu delta onaylanınca o dalı 0a145a7 + main'e taşıyacağım.
+
+### T-18-0041 · 2026-10-30 13:20 · → koordinator · ACK
+Paket: 18 senaryolar   Cevap: K-SEN-0039
+Alındı. "Sıra sende" gelene kadar docker yok.
+Sıra gelince:
+- feat/18-f2-stage3'ü (e7ea376, 0a145a7 üstünde) main'e taşı; 07 + 08 merge durumuna göre.
+- YIGIN-AÇ, temiz yığın + gerçek seed.
+- Aşama 2 + F2 aşama 3 tam koşu, sonuç tablosu.
+- down -v, YIGIN-KAPA.

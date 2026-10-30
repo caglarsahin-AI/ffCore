@@ -116,4 +116,302 @@ samples exit=0
 === 13:12:28 test-int
 ........................................................................ [ 16%]
 .....................................................s.................. [ 32%]
-s.....
+s..........s............................................FFFFF........... [ 48%]
+..................s..................................................... [ 64%]
+........................................................................ [ 80%]
+........................................................................ [ 96%]
+..............                                                           [100%]
+=================================== FAILURES ===================================
+_________________ test_05a_live_discovery[mcp-search-actions0] _________________
+
+settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...ive_s=10.0, run_event_stream_ttl_s=86400, run_abandon_grace_s=120, langsmith_tracing=False, langchain_tracing_v2=False)
+key = 'mcp-search', actions = {'search_documents'}
+
+    @pytest.mark.parametrize(
+        ("key", "actions"),
+        [("mcp-search", {"search_documents"}), ("mcp-sql", {"get_schema", "run_sql"})],
+    )
+    def test_05a_live_discovery(settings, key, actions):
+>       found = asyncio.run(mcp_client.discover(target(key), settings, caller=CALLER))
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_05a_live_services.py:38: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.12/asyncio/runners.py:195: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/base_events.py:691: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+target = ToolTarget(key='mcp-search', endpoint_url='http://mcp-search:8000/mcp', auth_type='forward_user', auth={})
+settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...ive_s=10.0, run_event_stream_ttl_s=86400, run_abandon_grace_s=120, langsmith_tracing=False, langchain_tracing_v2=False)
+caller = Caller(user_id='live-test-user', project_id='00000000-0000-0000-0000-000000000000')
+timeout_s = None
+
+    async def discover(
+        target: ToolTarget, settings: Settings, *, caller: Caller, timeout_s: float | None = None
+    ) -> list[DiscoveredAction]:
+        """MCP tools/list, every page."""
+        limit = timeout_s or settings.mcp_call_timeout_s
+        actions: list[DiscoveredAction] = []
+        statuses: list[int] = []
+        try:
+            with anyio.fail_after(limit):
+                async with _session(target, settings, caller, None, limit, statuses) as session:
+                    cursor = None
+                    while True:
+                        params = types.PaginatedRequestParams(cursor=cursor) if cursor else None
+                        page = await session.list_tools(params=params)
+                        actions += [
+                            DiscoveredAction(t.name, t.description, dict(t.input_schema))
+                            for t in page.tools
+                        ]
+                        cursor = page.next_cursor
+                        if not cursor:
+                            break
+        except TimeoutError:
+            raise ToolCallError("tool_timeout") from None
+        except ToolCallError:
+            raise
+        except Exception as exc:  # noqa: BLE001 - mapped to a closed code
+>           raise ToolCallError(_code(exc, statuses)) from None
+E           ffcore.services.mcp_client.ToolCallError: egress_dns_failed
+
+ffcore/services/mcp_client.py:250: ToolCallError
+__________________ test_05a_live_discovery[mcp-sql-actions1] ___________________
+
+settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...ive_s=10.0, run_event_stream_ttl_s=86400, run_abandon_grace_s=120, langsmith_tracing=False, langchain_tracing_v2=False)
+key = 'mcp-sql', actions = {'get_schema', 'run_sql'}
+
+    @pytest.mark.parametrize(
+        ("key", "actions"),
+        [("mcp-search", {"search_documents"}), ("mcp-sql", {"get_schema", "run_sql"})],
+    )
+    def test_05a_live_discovery(settings, key, actions):
+>       found = asyncio.run(mcp_client.discover(target(key), settings, caller=CALLER))
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_05a_live_services.py:38: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.12/asyncio/runners.py:195: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/base_events.py:691: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+target = ToolTarget(key='mcp-sql', endpoint_url='http://mcp-sql:8000/mcp', auth_type='forward_user', auth={})
+settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...ive_s=10.0, run_event_stream_ttl_s=86400, run_abandon_grace_s=120, langsmith_tracing=False, langchain_tracing_v2=False)
+caller = Caller(user_id='live-test-user', project_id='00000000-0000-0000-0000-000000000000')
+timeout_s = None
+
+    async def discover(
+        target: ToolTarget, settings: Settings, *, caller: Caller, timeout_s: float | None = None
+    ) -> list[DiscoveredAction]:
+        """MCP tools/list, every page."""
+        limit = timeout_s or settings.mcp_call_timeout_s
+        actions: list[DiscoveredAction] = []
+        statuses: list[int] = []
+        try:
+            with anyio.fail_after(limit):
+                async with _session(target, settings, caller, None, limit, statuses) as session:
+                    cursor = None
+                    while True:
+                        params = types.PaginatedRequestParams(cursor=cursor) if cursor else None
+                        page = await session.list_tools(params=params)
+                        actions += [
+                            DiscoveredAction(t.name, t.description, dict(t.input_schema))
+                            for t in page.tools
+                        ]
+                        cursor = page.next_cursor
+                        if not cursor:
+                            break
+        except TimeoutError:
+            raise ToolCallError("tool_timeout") from None
+        except ToolCallError:
+            raise
+        except Exception as exc:  # noqa: BLE001 - mapped to a closed code
+>           raise ToolCallError(_code(exc, statuses)) from None
+E           ffcore.services.mcp_client.ToolCallError: egress_dns_failed
+
+ffcore/services/mcp_client.py:250: ToolCallError
+_________________ test_05a_live_token_for_another_tool_refused _________________
+
+settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...ive_s=10.0, run_event_stream_ttl_s=86400, run_abandon_grace_s=120, langsmith_tracing=False, langchain_tracing_v2=False)
+
+    def test_05a_live_token_for_another_tool_refused(settings):
+        # A token cut for mcp-search is refused by the mcp-sql container (aud list, S3).
+        wrong = ToolTarget(
+            key="mcp-search", endpoint_url=SERVICES["mcp-sql"], auth_type="forward_user", auth={}
+        )
+        with pytest.raises(mcp_client.ToolCallError) as err:
+            asyncio.run(mcp_client.discover(wrong, settings, caller=CALLER))
+>       assert err.value.code == "tool_auth_failed"
+E       AssertionError: assert 'egress_dns_failed' == 'tool_auth_failed'
+E         
+E         - tool_auth_failed
+E         + egress_dns_failed
+
+tests/integration/test_05a_live_services.py:49: AssertionError
+____________________ test_05a_live_run_sql_on_demo_database ____________________
+
+settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...ive_s=10.0, run_event_stream_ttl_s=86400, run_abandon_grace_s=120, langsmith_tracing=False, langchain_tracing_v2=False)
+
+    def test_05a_live_run_sql_on_demo_database(settings):
+        cli._seed_sql_demo(settings, SCHEMA_DIR)  # the documented operator step; idempotent
+        sql = "SELECT code FROM departments ORDER BY id LIMIT 2"
+>       result = asyncio.run(
+            mcp_client.call(
+                target("mcp-sql"), "run_sql", {"sql": sql, "reason": "live"}, settings, caller=CALLER
+            )
+        )
+
+tests/integration/test_05a_live_services.py:55: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.12/asyncio/runners.py:195: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/base_events.py:691: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+target = ToolTarget(key='mcp-sql', endpoint_url='http://mcp-sql:8000/mcp', auth_type='forward_user', auth={})
+action = 'run_sql'
+arguments = {'sql': 'SELECT code FROM departments ORDER BY id LIMIT 2', 'reason': 'live'}
+settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...ive_s=10.0, run_event_stream_ttl_s=86400, run_abandon_grace_s=120, langsmith_tracing=False, langchain_tracing_v2=False)
+caller = Caller(user_id='live-test-user', project_id='00000000-0000-0000-0000-000000000000')
+timeout_s = None, run_id = None, guard = None
+
+    async def call(
+        target: ToolTarget,
+        action: str,
+        arguments: dict[str, Any],
+        settings: Settings,
+        *,
+        caller: Caller,
+        timeout_s: float | None = None,
+        run_id: str | None = None,
+        guard: Guard | None = None,
+    ) -> CallResult:
+        limit = timeout_s or settings.mcp_call_timeout_s
+        started = time.monotonic()
+        status, truncated = "ok", False
+        statuses: list[int] = []
+        try:
+            if guard is not None:
+                arguments = await guard.pre(action, arguments)
+            try:
+                with anyio.fail_after(limit):
+                    async with _session(target, settings, caller, run_id, limit, statuses) as session:
+                        result = await session.call_tool(action, arguments)
+            except TimeoutError:
+                raise ToolCallError("tool_timeout") from None
+            except ToolCallError:
+                raise
+            except Exception as exc:  # noqa: BLE001 - mapped to a closed code (MCPError too)
+>               raise ToolCallError(_code(exc, statuses)) from None
+E               ffcore.services.mcp_client.ToolCallError: egress_dns_failed
+
+ffcore/services/mcp_client.py:298: ToolCallError
+----------------------------- Captured stderr call -----------------------------
+2026-10-30 10:21:44,167 INFO ffcore.tools tool_call tool=mcp-sql action=run_sql status=egress_dns_failed latency_ms=2783 truncated=False
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.tools:mcp_client.py:313 tool_call tool=mcp-sql action=run_sql status=egress_dns_failed latency_ms=2783 truncated=False
+________________ test_05a_live_forged_token_refused_by_mcp_sql _________________
+
+settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...ive_s=10.0, run_event_stream_ttl_s=86400, run_abandon_grace_s=120, langsmith_tracing=False, langchain_tracing_v2=False)
+
+    def test_05a_live_forged_token_refused_by_mcp_sql(settings):
+        # Review r1 MAJOR-1 in the real container: right audience, wrong signing key. The
+        # container asks the real backend (POST /api/v1/internal/obo/verify) and refuses.
+        from pydantic import SecretStr
+    
+        forger = settings.model_copy(
+            update={"obo_jwt_secret": SecretStr("dummy-not-secret-forged-obo-key-0123456789abcdef")}
+        )
+        with pytest.raises(mcp_client.ToolCallError) as err:
+            asyncio.run(
+                mcp_client.call(
+                    target("mcp-sql"),
+                    "run_sql",
+                    {"sql": "SELECT code FROM departments", "reason": "forged"},
+                    forger,
+                    caller=CALLER,
+                )
+            )
+>       assert err.value.code == "tool_auth_failed"
+E       AssertionError: assert 'egress_dns_failed' == 'tool_auth_failed'
+E         
+E         - tool_auth_failed
+E         + egress_dns_failed
+
+tests/integration/test_05a_live_services.py:82: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2026-10-30 10:21:52,371 INFO ffcore.tools tool_call tool=mcp-sql action=run_sql status=egress_dns_failed latency_ms=8065 truncated=False
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.tools:mcp_client.py:313 tool_call tool=mcp-sql action=run_sql status=egress_dns_failed latency_ms=8065 truncated=False
+=============================== warnings summary ===============================
+tests/integration/test_04a_worker.py::test_04a_upload_job_runs_in_worker
+tests/integration/test_04a_worker.py::test_04a_job_for_missing_row_retries_then_fails_loud
+  /opt/venv/lib/python3.12/site-packages/arq/worker.py:877: DeprecationWarning: Call to deprecated close. (Use aclose() instead) -- Deprecated since version 5.0.1.
+    await self.pool.close(close_connection_pool=True)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/integration/test_05a_live_services.py::test_05a_live_discovery[mcp-search-actions0]
+FAILED tests/integration/test_05a_live_services.py::test_05a_live_discovery[mcp-sql-actions1]
+FAILED tests/integration/test_05a_live_services.py::test_05a_live_token_for_another_tool_refused
+FAILED tests/integration/test_05a_live_services.py::test_05a_live_run_sql_on_demo_database
+FAILED tests/integration/test_05a_live_services.py::test_05a_live_forged_token_refused_by_mcp_sql
+SKIPPED [1] tests/integration/test_03b_egress_dns.py: NOT_RUN: needs RUN_DNS_TESTS=1
+SKIPPED [1] tests/integration/test_04a_ingest.py:124: NOT_RUN: needs RUN_MODEL_TESTS=1
+SKIPPED [1] tests/integration/test_04a_ingest.py:279: NOT_RUN: needs RUN_MODEL_TESTS=1
+SKIPPED [1] tests/integration/test_05a_sql.py:288: NOT_RUN: needs RUN_MODEL_TESTS=1
+5 failed, 437 passed, 4 skipped, 2 warnings in 932.65s (0:15:32)
+test-int exit=1
+
+=== 13:28:32 smoke
+python scripts/smoke.py
+FAIL  check_backend: unreachable: http://backend:8000/healthz (<urlopen error [Errno -2] Name or service not known>)
+ok    litellm /health/liveliness 200
+ok    langfuse /api/public/health 200, /api/public/projects 200
+FAIL  check_mcp: unreachable: http://mcp-search:8000/healthz (<urlopen error [Errno -3] Temporary failure in name resolution>)
+ok    skipped: ollama profile inactive
+smoke: FAILED
+make: *** [Makefile:48: smoke] Error 1
+smoke exit=2
+
+=== 13:29:09 frontend lint/typecheck/check:api (node, --network none, repo root)
+
+> ffcore-frontend@0.1.0 lint
+> eslint
+
+
+> ffcore-frontend@0.1.0 typecheck
+> tsc --noEmit
+
+
+> ffcore-frontend@0.1.0 check:api
+> node scripts/check-api.mjs
+
+API contract copies and generated types are current.
+frontend exit=0
+
+=== 13:30:02 down -v
+ Volume ffmain_postgres_data  Removed
+ Volume ffmain_qdrant_data  Removed
+
+=== 13:30:30 done

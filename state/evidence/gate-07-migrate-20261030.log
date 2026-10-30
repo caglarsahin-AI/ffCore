@@ -1,0 +1,14 @@
+ Container ffmain-postgres-1  Running
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 0001, initial empty revision (chain root)
+INFO  [alembic.runtime.migration] Running upgrade 0001 -> 03a_0001, 03a: users, projects, project_members, providers, provider_projects, model_catalog, models
+INFO  [alembic.runtime.migration] Running upgrade 0001 -> 08_0001, 08: pii_policies, guardrail_policies, guardrail_events
+INFO  [alembic.runtime.migration] Running upgrade 0001 -> 06a_0001, 06a: agents, agent_versions, conversations, runs, messages, run_events; checkpoints schema
+INFO  [alembic.runtime.migration] Running upgrade 0001 -> 07_0001, 07: approvals
+INFO  [alembic.runtime.migration] Running upgrade 0001 -> 05a_0001, 05a: tools, tool_actions, schema_descriptions, few_shots
+INFO  [alembic.runtime.migration] Running upgrade 0001 -> 04a_0001, 04a: knowledge_bases, documents, attachments, chunks, kb_queries, ingest_gate_stats
+INFO  [alembic.runtime.migration] Running upgrade 0001 -> 03b_0001, 03b: audit_events (append-only, monthly partitions)
+model catalog: 2 entries, 0 removed
+checkpointer tables ready in schema checkpoints
+migrate exit=0
