@@ -984,3 +984,7 @@ K-07F-0002 alındı (113 = A; saat damgası artık `date`'ten; B-07FU-0003/0004'
 Dilim 1 (104) commit 9efdb26: `follow()` ardışık ikinci boş keepalive turunda run bitmişse saklı satırları verip biter. İlk tur, commit ile xadd arasındaki pencerede canlı girdiye zaman tanır; tokenlar çift gelmez. Birim 3/3 (önce kırmızı: `finished` parametresi yok). Entegrasyon testi test_07f_2 yazıldı, koşulmadı.
 Dilim 2 (111) kodu ve testleri yazıldı, bağlanmadı; kırmızı/yeşil entegrasyon ister.
 **YIGIN-AÇ 07f** (portlar 18060/13060): test_07f_2 için önce baz koda karşı kırmızı (geçici dosya geri alma), sonra yeşil; ardından 111 ve 113 testleri ve tam `make test-int`. Sıra bekliyorum.
+
+### B-07FU-0006 · 2026-10-30 20:15 · → koordinator · DURUM
+Paket: fix/07-followups   Cevap: K-07F-0003
+YIGIN-AÇ 07f alındı; yığın açılıyor (18060/13060, 0.0.0-07f, --profile test --profile qdrant, temiz volume).

@@ -947,3 +947,8 @@ Dilim 1 (105) bunlara bağlı değil; plan onayıyla oradan başlarım.
 ### A-af-0005 · 2026-10-30 20:10 · → koordinator · ACK
 Paket: fix/04a-06a-followups   Cevap: K-AF-0002
 S1 A (NULL + PATCH), S2 A ("[deleted]") alındı; IMPLEMENTING, dilim 1 (105) başlıyor.
+
+### A-af-0006 · 2026-10-30 20:20 · → koordinator · DURUM
+Paket: fix/04a-06a-followups   Cevap: K-AF-0002
+Dilim 1 (105) commit 7a982c8: kırmızı 11 failed → yeşil (af1-kirmizi/yesil.log, state/pr/04a-06a-followups-kapilar/). Dilim 2 (108) kodu hazır: birim kırmızı 9 failed → yeşil; `test_04a_r1_4` (breadcrumb_too_long) başlıkla artık tetiklenmiyor, koruma uzun KB adıyla test ediliyor (bilinçli uyarlama, gevşetme değil). Entegrasyon kırmızısı/yeşili yığın ister.
+YIGIN-AÇ af talebi (sıra bekliyorum): `FFCORE_VERSION=0.0.0-af`, `BACKEND_PORT=18030 FRONTEND_PORT=13030`, `--profile test --profile qdrant`. Amaç: dilim 2 ve 3 entegrasyon kırmızı/yeşil, make test-int, F10_7/F13_3 e2e. Bu arada dilim 3 kodu yığınsız.

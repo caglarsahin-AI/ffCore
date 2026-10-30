@@ -1,0 +1,210 @@
+FFFFFFFFF                                                                [100%]
+=================================== FAILURES ===================================
+___________ test_af_2_article_line_text_stays_out_of_the_breadcrumb ____________
+
+    def test_af_2_article_line_text_stays_out_of_the_breadcrumb():
+        chunks = chunk_markdown(_procedure(WORD), breadcrumb="KB › silme.txt", settings=SETTINGS)
+        assert chunks
+        assert any(WORD in c.body for c in chunks)
+        for chunk in chunks:
+>           assert WORD not in chunk.breadcrumb, chunk.breadcrumb
+E           AssertionError: KB › silme.txt › Madde 1 - Amaç: Bu prosedür silmesinamasi1234 kayıtlarının nasıl tutulacağını aç · Madde 2 - Süre: silmesinamasi1234 kayıtları 30 gün boyunca saklanır, sonra arşiv · Madde 3 - Sorumluluk: Kayıtların doğruluğundan birim sorumlusu sorumludur.
+E           assert 'silmesinamasi1234' not in 'KB › silme.... sorumludur.'
+E             
+E             'silmesinamasi1234' is contained here:
+E             ?           ^^^^^^^^^^^^^^^^^^^
+E                prosedür silmesinamasi1234 kayıtlarının nasıl tutulacağını aç · Madde 2 - Süre: silmesinamasi1234 kayıtları 30 gün boyunca saklanır, sonra arşiv · Madde 3 - Sorumluluk: Kayıtların doğruluğundan birim sorumlusu sorumludur.
+E             ?           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/unit/test_af_2_structural_breadcrumb.py:29: AssertionError
+_____ test_af_2_structural_heading_rule[Madde 10 - Fesih-Madde 10 - Fesih] _____
+
+heading = 'Madde 10 - Fesih', expected = 'Madde 10 - Fesih'
+
+    @pytest.mark.parametrize(
+        ("heading", "expected"),
+        [
+            ("Madde 10 - Fesih", "Madde 10 - Fesih"),
+            ("Madde 2 - Süre: kayıtlar 30 gün saklanır", "Madde 2 - Süre"),
+            ("Madde 7", "Madde 7"),
+            ("Madde 5 - " + "uzun başlık " * 8, "Madde 5"),
+            ("3.2 Teslim koşulları", "3.2 Teslim koşulları"),
+            ("3.2 " + "çok uzun bir bölüm başlığı " * 4, "3.2"),
+            ("Giriş " + "ve kapsam " * 10, None),
+            ("", None),
+        ],
+    )
+    def test_af_2_structural_heading_rule(heading, expected):
+>       from ffcore.knowledge.chunking import MAX_HEADING_CHARS, structural_heading
+E       ImportError: cannot import name 'MAX_HEADING_CHARS' from 'ffcore.knowledge.chunking' (/work/backend/ffcore/knowledge/chunking.py)
+
+tests/unit/test_af_2_structural_breadcrumb.py:49: ImportError
+_ test_af_2_structural_heading_rule[Madde 2 - S\xfcre: kay\u0131tlar 30 g\xfcn saklan\u0131r-Madde 2 - S\xfcre] _
+
+heading = 'Madde 2 - Süre: kayıtlar 30 gün saklanır'
+expected = 'Madde 2 - Süre'
+
+    @pytest.mark.parametrize(
+        ("heading", "expected"),
+        [
+            ("Madde 10 - Fesih", "Madde 10 - Fesih"),
+            ("Madde 2 - Süre: kayıtlar 30 gün saklanır", "Madde 2 - Süre"),
+            ("Madde 7", "Madde 7"),
+            ("Madde 5 - " + "uzun başlık " * 8, "Madde 5"),
+            ("3.2 Teslim koşulları", "3.2 Teslim koşulları"),
+            ("3.2 " + "çok uzun bir bölüm başlığı " * 4, "3.2"),
+            ("Giriş " + "ve kapsam " * 10, None),
+            ("", None),
+        ],
+    )
+    def test_af_2_structural_heading_rule(heading, expected):
+>       from ffcore.knowledge.chunking import MAX_HEADING_CHARS, structural_heading
+E       ImportError: cannot import name 'MAX_HEADING_CHARS' from 'ffcore.knowledge.chunking' (/work/backend/ffcore/knowledge/chunking.py)
+
+tests/unit/test_af_2_structural_breadcrumb.py:49: ImportError
+______________ test_af_2_structural_heading_rule[Madde 7-Madde 7] ______________
+
+heading = 'Madde 7', expected = 'Madde 7'
+
+    @pytest.mark.parametrize(
+        ("heading", "expected"),
+        [
+            ("Madde 10 - Fesih", "Madde 10 - Fesih"),
+            ("Madde 2 - Süre: kayıtlar 30 gün saklanır", "Madde 2 - Süre"),
+            ("Madde 7", "Madde 7"),
+            ("Madde 5 - " + "uzun başlık " * 8, "Madde 5"),
+            ("3.2 Teslim koşulları", "3.2 Teslim koşulları"),
+            ("3.2 " + "çok uzun bir bölüm başlığı " * 4, "3.2"),
+            ("Giriş " + "ve kapsam " * 10, None),
+            ("", None),
+        ],
+    )
+    def test_af_2_structural_heading_rule(heading, expected):
+>       from ffcore.knowledge.chunking import MAX_HEADING_CHARS, structural_heading
+E       ImportError: cannot import name 'MAX_HEADING_CHARS' from 'ffcore.knowledge.chunking' (/work/backend/ffcore/knowledge/chunking.py)
+
+tests/unit/test_af_2_structural_breadcrumb.py:49: ImportError
+_____________ test_af_2_structural_heading_rule[heading3-Madde 5] ______________
+
+heading = 'Madde 5 - uzun başlık uzun başlık uzun başlık uzun başlık uzun başlık uzun başlık uzun başlık uzun başlık '
+expected = 'Madde 5'
+
+    @pytest.mark.parametrize(
+        ("heading", "expected"),
+        [
+            ("Madde 10 - Fesih", "Madde 10 - Fesih"),
+            ("Madde 2 - Süre: kayıtlar 30 gün saklanır", "Madde 2 - Süre"),
+            ("Madde 7", "Madde 7"),
+            ("Madde 5 - " + "uzun başlık " * 8, "Madde 5"),
+            ("3.2 Teslim koşulları", "3.2 Teslim koşulları"),
+            ("3.2 " + "çok uzun bir bölüm başlığı " * 4, "3.2"),
+            ("Giriş " + "ve kapsam " * 10, None),
+            ("", None),
+        ],
+    )
+    def test_af_2_structural_heading_rule(heading, expected):
+>       from ffcore.knowledge.chunking import MAX_HEADING_CHARS, structural_heading
+E       ImportError: cannot import name 'MAX_HEADING_CHARS' from 'ffcore.knowledge.chunking' (/work/backend/ffcore/knowledge/chunking.py)
+
+tests/unit/test_af_2_structural_breadcrumb.py:49: ImportError
+_ test_af_2_structural_heading_rule[3.2 Teslim ko\u015fullar\u0131-3.2 Teslim ko\u015fullar\u0131] _
+
+heading = '3.2 Teslim koşulları', expected = '3.2 Teslim koşulları'
+
+    @pytest.mark.parametrize(
+        ("heading", "expected"),
+        [
+            ("Madde 10 - Fesih", "Madde 10 - Fesih"),
+            ("Madde 2 - Süre: kayıtlar 30 gün saklanır", "Madde 2 - Süre"),
+            ("Madde 7", "Madde 7"),
+            ("Madde 5 - " + "uzun başlık " * 8, "Madde 5"),
+            ("3.2 Teslim koşulları", "3.2 Teslim koşulları"),
+            ("3.2 " + "çok uzun bir bölüm başlığı " * 4, "3.2"),
+            ("Giriş " + "ve kapsam " * 10, None),
+            ("", None),
+        ],
+    )
+    def test_af_2_structural_heading_rule(heading, expected):
+>       from ffcore.knowledge.chunking import MAX_HEADING_CHARS, structural_heading
+E       ImportError: cannot import name 'MAX_HEADING_CHARS' from 'ffcore.knowledge.chunking' (/work/backend/ffcore/knowledge/chunking.py)
+
+tests/unit/test_af_2_structural_breadcrumb.py:49: ImportError
+_______________ test_af_2_structural_heading_rule[heading5-3.2] ________________
+
+heading = '3.2 çok uzun bir bölüm başlığı çok uzun bir bölüm başlığı çok uzun bir bölüm başlığı çok uzun bir bölüm başlığı '
+expected = '3.2'
+
+    @pytest.mark.parametrize(
+        ("heading", "expected"),
+        [
+            ("Madde 10 - Fesih", "Madde 10 - Fesih"),
+            ("Madde 2 - Süre: kayıtlar 30 gün saklanır", "Madde 2 - Süre"),
+            ("Madde 7", "Madde 7"),
+            ("Madde 5 - " + "uzun başlık " * 8, "Madde 5"),
+            ("3.2 Teslim koşulları", "3.2 Teslim koşulları"),
+            ("3.2 " + "çok uzun bir bölüm başlığı " * 4, "3.2"),
+            ("Giriş " + "ve kapsam " * 10, None),
+            ("", None),
+        ],
+    )
+    def test_af_2_structural_heading_rule(heading, expected):
+>       from ffcore.knowledge.chunking import MAX_HEADING_CHARS, structural_heading
+E       ImportError: cannot import name 'MAX_HEADING_CHARS' from 'ffcore.knowledge.chunking' (/work/backend/ffcore/knowledge/chunking.py)
+
+tests/unit/test_af_2_structural_breadcrumb.py:49: ImportError
+_______________ test_af_2_structural_heading_rule[heading6-None] _______________
+
+heading = 'Giriş ve kapsam ve kapsam ve kapsam ve kapsam ve kapsam ve kapsam ve kapsam ve kapsam ve kapsam ve kapsam '
+expected = None
+
+    @pytest.mark.parametrize(
+        ("heading", "expected"),
+        [
+            ("Madde 10 - Fesih", "Madde 10 - Fesih"),
+            ("Madde 2 - Süre: kayıtlar 30 gün saklanır", "Madde 2 - Süre"),
+            ("Madde 7", "Madde 7"),
+            ("Madde 5 - " + "uzun başlık " * 8, "Madde 5"),
+            ("3.2 Teslim koşulları", "3.2 Teslim koşulları"),
+            ("3.2 " + "çok uzun bir bölüm başlığı " * 4, "3.2"),
+            ("Giriş " + "ve kapsam " * 10, None),
+            ("", None),
+        ],
+    )
+    def test_af_2_structural_heading_rule(heading, expected):
+>       from ffcore.knowledge.chunking import MAX_HEADING_CHARS, structural_heading
+E       ImportError: cannot import name 'MAX_HEADING_CHARS' from 'ffcore.knowledge.chunking' (/work/backend/ffcore/knowledge/chunking.py)
+
+tests/unit/test_af_2_structural_breadcrumb.py:49: ImportError
+___________________ test_af_2_structural_heading_rule[-None] ___________________
+
+heading = '', expected = None
+
+    @pytest.mark.parametrize(
+        ("heading", "expected"),
+        [
+            ("Madde 10 - Fesih", "Madde 10 - Fesih"),
+            ("Madde 2 - Süre: kayıtlar 30 gün saklanır", "Madde 2 - Süre"),
+            ("Madde 7", "Madde 7"),
+            ("Madde 5 - " + "uzun başlık " * 8, "Madde 5"),
+            ("3.2 Teslim koşulları", "3.2 Teslim koşulları"),
+            ("3.2 " + "çok uzun bir bölüm başlığı " * 4, "3.2"),
+            ("Giriş " + "ve kapsam " * 10, None),
+            ("", None),
+        ],
+    )
+    def test_af_2_structural_heading_rule(heading, expected):
+>       from ffcore.knowledge.chunking import MAX_HEADING_CHARS, structural_heading
+E       ImportError: cannot import name 'MAX_HEADING_CHARS' from 'ffcore.knowledge.chunking' (/work/backend/ffcore/knowledge/chunking.py)
+
+tests/unit/test_af_2_structural_breadcrumb.py:49: ImportError
+=========================== short test summary info ============================
+FAILED tests/unit/test_af_2_structural_breadcrumb.py::test_af_2_article_line_text_stays_out_of_the_breadcrumb
+FAILED tests/unit/test_af_2_structural_breadcrumb.py::test_af_2_structural_heading_rule[Madde 10 - Fesih-Madde 10 - Fesih]
+FAILED tests/unit/test_af_2_structural_breadcrumb.py::test_af_2_structural_heading_rule[Madde 2 - S\xfcre: kay\u0131tlar 30 g\xfcn saklan\u0131r-Madde 2 - S\xfcre]
+FAILED tests/unit/test_af_2_structural_breadcrumb.py::test_af_2_structural_heading_rule[Madde 7-Madde 7]
+FAILED tests/unit/test_af_2_structural_breadcrumb.py::test_af_2_structural_heading_rule[heading3-Madde 5]
+FAILED tests/unit/test_af_2_structural_breadcrumb.py::test_af_2_structural_heading_rule[3.2 Teslim ko\u015fullar\u0131-3.2 Teslim ko\u015fullar\u0131]
+FAILED tests/unit/test_af_2_structural_breadcrumb.py::test_af_2_structural_heading_rule[heading5-3.2]
+FAILED tests/unit/test_af_2_structural_breadcrumb.py::test_af_2_structural_heading_rule[heading6-None]
+FAILED tests/unit/test_af_2_structural_breadcrumb.py::test_af_2_structural_heading_rule[-None]
+9 failed in 0.69s

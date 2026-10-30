@@ -1,0 +1,101 @@
+..FF..                                                                   [100%]
+=================================== FAILURES ===================================
+_______________ test_07f_4_sweep_hook_expires_and_is_idempotent ________________
+
+team = (UUID('554b4083-e584-4cdd-ac76-399cf31800fd'), {'owner': <starlette.testclient.TestClient object at 0x7f8541c3e060>, '...ient.TestClient object at 0x7f85e415a4b0>, 'analyst_read': <starlette.testclient.TestClient object at 0x7f8542087710>})
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_a4e2752d54d9) at 0x7f858067e480>
+harness = <tests.integration.runtime_support.Harness object at 0x7f8541c3de80>
+use_queue = <function use_queue.<locals>.install at 0x7f853caa5da0>
+hooks = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...live_s=0.2, run_event_stream_ttl_s=86400, run_abandon_grace_s=120, langsmith_tracing=False, langchain_tracing_v2=False)
+client_factory = <function client_factory.<locals>.make at 0x7f8541bff600>
+
+    def test_07f_4_sweep_hook_expires_and_is_idempotent(  # noqa: F811
+        team, pg, harness, use_queue, hooks, client_factory
+    ):
+        run_id, *_ = _waiting(team, pg, harness, use_queue)
+        [(approval_id,)] = pg.execute(
+            "SELECT id FROM approvals WHERE run_id = %s", (run_id,)
+        ).fetchall()
+        service = _service(client_factory)
+        early = datetime.now(UTC).isoformat()
+        first = service.post(SWEEP, params={"now": early})
+>       assert first.status_code == 200, first.text
+E       AssertionError: {"error":{"message":"Not Found","type":"not_found_error","code":"not_found"}}
+E       assert 404 == 200
+E        +  where 404 = <Response [404 Not Found]>.status_code
+
+tests/integration/test_07f_followups.py:125: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+2026-10-30 17:20:43,511 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-30 17:20:43,675 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-30 17:20:43,696 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=181
+2026-10-30 17:20:43,841 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-30 17:20:44,043 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-30 17:20:44,067 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=197
+2026-10-30 17:20:44,153 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-30 17:20:44,436 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-30 17:20:44,468 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=305
+------------------------------ Captured log setup ------------------------------
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=181
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=197
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=305
+----------------------------- Captured stderr call -----------------------------
+2026-10-30 17:20:44,926 INFO ffcore.access access method=POST path=/api/v1/projects/554b4083-e584-4cdd-ac76-399cf31800fd/agents/asistan/runs status=200 ms=427
+2026-10-30 17:20:45,208 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-30 17:20:45,248 INFO ffcore.access access method=POST path=/api/v1/internal/approvals/sweep status=404 ms=32
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/554b4083-e584-4cdd-ac76-399cf31800fd/agents/asistan/runs status=200 ms=427
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/internal/approvals/sweep status=404 ms=32
+__________________ test_07f_5_sweep_hook_service_only_and_tz ___________________
+
+team = (UUID('fb8dc5a3-80be-4051-b04d-370fe0a9fa86'), {'owner': <starlette.testclient.TestClient object at 0x7f853cac57f0>, '...ient.TestClient object at 0x7f86006b2870>, 'analyst_read': <starlette.testclient.TestClient object at 0x7f853ca867b0>})
+hooks = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...live_s=0.2, run_event_stream_ttl_s=86400, run_abandon_grace_s=120, langsmith_tracing=False, langchain_tracing_v2=False)
+client_factory = <function client_factory.<locals>.make at 0x7f8541ba1e40>
+
+    def test_07f_5_sweep_hook_service_only_and_tz(team, hooks, client_factory):  # noqa: F811
+        console = team[1]["analyst"].post(SWEEP)
+>       assert (console.status_code, console.json()["error"]["code"]) == (
+            403,
+            "service_account_required",
+        )
+E       AssertionError: assert (404, 'not_found') == (403, 'servic...unt_required')
+E         
+E         At index 0 diff: 404 != 403
+E         Use -v to get more diff
+
+tests/integration/test_07f_followups.py:140: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+2026-10-30 17:20:45,571 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-30 17:20:45,768 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-30 17:20:45,802 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=228
+2026-10-30 17:20:45,991 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-30 17:20:46,374 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=375
+2026-10-30 17:20:46,377 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-30 17:20:46,531 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-30 17:20:46,813 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-30 17:20:46,845 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=306
+------------------------------ Captured log setup ------------------------------
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=228
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=375
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=306
+----------------------------- Captured stderr call -----------------------------
+2026-10-30 17:20:46,854 INFO ffcore.access access method=POST path=/api/v1/internal/approvals/sweep status=404 ms=3
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/internal/approvals/sweep status=404 ms=3
+=========================== short test summary info ============================
+FAILED tests/integration/test_07f_followups.py::test_07f_4_sweep_hook_expires_and_is_idempotent
+FAILED tests/integration/test_07f_followups.py::test_07f_5_sweep_hook_service_only_and_tz
+2 failed, 4 passed in 52.01s

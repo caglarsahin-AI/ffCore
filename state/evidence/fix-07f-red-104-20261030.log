@@ -1,0 +1,111 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+______ test_07f_2_expired_close_redis_publish_fails_reconnect_gets_error _______
+
+team = (UUID('47e8e023-9f56-4cc5-9e2a-6dc359a09ec5'), {'owner': <starlette.testclient.TestClient object at 0x7fbbbd2afe60>, '...ient.TestClient object at 0x7fbbbce14260>, 'analyst_read': <starlette.testclient.TestClient object at 0x7fbbb45abe90>})
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_3efa935e91d7) at 0x7fbbbe7caa50>
+harness = <tests.integration.runtime_support.Harness object at 0x7fbb6a638410>
+use_queue = <function use_queue.<locals>.install at 0x7fbb6a218220>
+settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...live_s=0.2, run_event_stream_ttl_s=86400, run_abandon_grace_s=120, langsmith_tracing=False, langchain_tracing_v2=False)
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fbb6a1825d0>
+
+    def test_07f_2_expired_close_redis_publish_fails_reconnect_gets_error(
+        team,  # noqa: F811 - the imported fixture
+        pg,
+        harness,
+        use_queue,
+        settings,
+        monkeypatch,
+    ):
+        from ffcore.core import db
+        from ffcore.services import approvals
+    
+        project_id, c = team
+        run_id, streamed, *_ = _waiting(team, pg, harness, use_queue)
+        last_id = streamed[-1][0]
+        assert streamed[-1][1] == "approval_required"
+    
+        publish = run_events.RunEventWriter._publish
+    
+        async def failing(self, entry_id, sse, data):
+            # The first event of the close (approval_expired, no live entry) is committed; the
+            # error's live entry is where Redis fails.
+            if sse is SseEvent.error:
+                raise redis_errors.ConnectionError("redis went away")
+            return await publish(self, entry_id, sse, data)
+    
+        monkeypatch.setattr(run_events.RunEventWriter, "_publish", failing)
+        later = datetime.now(UTC) + timedelta(minutes=settings.approval_ttl_min, seconds=1)
+    
+        async def tick():
+            async with db.session_scope() as session:
+                return await approvals.expire_due(
+                    session, now=later, close_run=approvals.run_closer(settings)
+                )
+    
+        with pytest.raises(RuntimeError):  # the sweep fails loud for the lost publish
+            asyncio.run(tick())
+        row = run_row(pg, run_id)
+        assert (row["status"], row["error_code"]) == ("failed", "approval_expired")
+        assert [t for _, t, _ in events(pg, run_id)][-2:] == ["approval_expired", "error"]
+    
+>       replayed = _stream_within(c["owner"], project_id, run_id, last_id)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_07f_followups.py:78: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+client = <starlette.testclient.TestClient object at 0x7fbbbd2afe60>
+project_id = UUID('47e8e023-9f56-4cc5-9e2a-6dc359a09ec5')
+run_id = '4f46fee0-5008-4cf6-8964-a8183d4557cc', last = '5-0'
+
+    def _stream_within(client, project_id, run_id, last):
+        """The reconnect, in a daemon thread: a stream that never ends fails the test, not hangs it."""
+        out: dict = {}
+    
+        def read():
+            out["events"] = get_stream(client, project_id, run_id, last)
+    
+        worker = threading.Thread(target=read, daemon=True)
+        worker.start()
+        worker.join(STREAM_LIMIT_S)
+>       assert not worker.is_alive(), "the stream did not end: the stored error never reached it"
+E       AssertionError: the stream did not end: the stored error never reached it
+E       assert not True
+E        +  where True = is_alive()
+E        +    where is_alive = <Thread(Thread-15 (read), started daemon 140442842822336)>.is_alive
+
+tests/integration/test_07f_followups.py:34: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+2026-10-30 17:18:58,908 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-30 17:18:58,975 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=994
+2026-10-30 17:18:59,329 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-30 17:18:59,359 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=216
+2026-10-30 17:18:59,828 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-30 17:18:59,858 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=207
+------------------------------ Captured log setup ------------------------------
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=994
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=216
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=207
+----------------------------- Captured stderr call -----------------------------
+2026-10-30 17:19:01,236 INFO ffcore.access access method=POST path=/api/v1/projects/47e8e023-9f56-4cc5-9e2a-6dc359a09ec5/agents/asistan/runs status=200 ms=936
+2026-10-30 17:19:01,370 ERROR ffcore.approvals approval_expiry_failed approval_id=2de2bf2d-d4dc-4643-9edc-2946ea7a8c62 error=redis went away
+2026-10-30 17:19:13,497 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-30 17:19:13,498 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-30 17:19:13,502 ERROR ffcore.readiness warmup failed: ModelMissing
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/47e8e023-9f56-4cc5-9e2a-6dc359a09ec5/agents/asistan/runs status=200 ms=936
+ERROR    ffcore.approvals:approvals.py:292 approval_expiry_failed approval_id=2de2bf2d-d4dc-4643-9edc-2946ea7a8c62 error=redis went away
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+--------------------------- Captured stderr teardown ---------------------------
+2026-10-30 17:19:21,406 INFO ffcore.access access method=GET path=/api/v1/projects/47e8e023-9f56-4cc5-9e2a-6dc359a09ec5/runs/4f46fee0-5008-4cf6-8964-a8183d4557cc/stream status=200 ms=20022
+---------------------------- Captured log teardown -----------------------------
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/47e8e023-9f56-4cc5-9e2a-6dc359a09ec5/runs/4f46fee0-5008-4cf6-8964-a8183d4557cc/stream status=200 ms=20022
+=========================== short test summary info ============================
+FAILED tests/integration/test_07f_followups.py::test_07f_2_expired_close_redis_publish_fails_reconnect_gets_error
+1 failed, 3 deselected in 47.53s

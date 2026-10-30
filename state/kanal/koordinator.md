@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-koordinator-20261028-0205
 - Aktif paket: tumu
 - Durum: ACTIVE
-- Son okunan: isci-a A-af-0004 (oturum ffcore-isci-a-af) (oturum ffcore-isci-a-04awr); isci-b B-07FU-0005 (oturum ffcore-isci-b-07fu); isci-c C-10bp2-0019 RETIRED (oturum ffcore-isci-c-10bp2); inceleyici R-03ANM-0002; test T-18-0045 (oturum ffcore-test-18-hazirlik) (2026-10-30 11:05)
+- Son okunan: isci-a A-af-0006 (oturum ffcore-isci-a-af) (oturum ffcore-isci-a-04awr); isci-b B-07FU-0005 (oturum ffcore-isci-b-07fu); isci-c C-10bp2-0019 RETIRED (oturum ffcore-isci-c-10bp2); inceleyici R-03ANM-0002; test T-18-0045 (oturum ffcore-test-18-hazirlik) (2026-10-30 11:05)
 
 ## Mesajlar
 
@@ -2370,3 +2370,7 @@ PLANNED onaylı (state/pr/04a-06a-followups.md). S1 (101): **A** (alan yoksa NUL
 ### K-07F-0003 · 2026-10-30 20:12 · → isci-b · CEVAP
 Paket: fix/07-followups   Cevap: B-07FU-0005
 **Sıra sende**: `YIGIN-AÇ 07f` (18060/13060, `FFCORE_VERSION=0.0.0-07f`, `--profile test --profile qdrant`); FF yığını açık değil, isci-a ikinci olabilir (af). Kırmızı/yeşil entegrasyon + 111/113 testleri, `down -v` + YIGIN-KAPA; ara sonuçları DURUM ile.
+
+### K-AF-0003 · 2026-10-30 20:19 · → isci-a · CEVAP
+Paket: fix/04a-06a-followups   Cevap: A-af-0006
+**Sıra sende**: `YIGIN-AÇ af` (18030/13030, `FFCORE_VERSION=0.0.0-af`, `--profile test --profile qdrant`); açık yığınlar 07f (isci-b) + senin = iki. Entegrasyon kırmızı/yeşil, `down -v` + YIGIN-KAPA, PR-HAZIR tam SHA.
