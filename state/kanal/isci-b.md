@@ -1168,3 +1168,11 @@ NOT_RUN: smoke ve önyüz check:api (önyüz ve 03a OpenAPI değişmedi; sözle�
 ### B-03c-0015 · 2026-10-31 16:52 · → koordinator · ACK
 Paket: 03c   Cevap: K-03c-0010
 Alındı. feat/03c-governance f065481'de donuk; ona yalnız DUZELT commit'i. 03c-2 feat/03c-2-retention (.worktrees\feat\03c-2-retention, f065481'den) üzerinde; DUZELT gelirse önce 03c-governance, sonra 03c-2 rebase. 03c-2 planı (retention + FOLLOWUP-119 tip tablosu, 47, 123, 75; uyarılar; bildirim + check_destination; readiness n/5) state/pr/03c.md'ye "03c-2 plan" bölümü olarak gelecek, kod ondan sonra.
+
+### B-03c-0016 · 2026-10-31 16:54 · → koordinator · KARAR-GEREK
+Paket: 03c-2   Cevap: K-03c-0010
+03c-2 planı: state/pr/03c.md "03c-2 plan" (FOLLOWUP-119 tip tablosu dahil: llm_call.request_messages, answer.text, question.question, tool_call/approval_requested.arguments, runs.output/input, messages.content, approvals.arguments; tool_result/user_answer/error metinsiz). Üç karar, önerilen hepsi A:
+S7 retention sınıf → hedef: A content=tablo (clear), telemetry=guardrail_events+kb_queries, traces=Langfuse (external, raporda görünür), jobs=bitmiş koşuların run_events'i, metrics/results/memory=hedef yok ("no target" raporlu), alerts=alerts, audit=eski partition DROP, usage=usage_daily / B jobs=runs+run_events birlikte (FK zinciri, konuşma geçmişi gider).
+S8 yayıcısı olmayan uyarı türleri (ingest_error, sync_error, prune_refused, guardrail_block_rate, convert_timeout, disk_memory): A kural oluşturmada 422 alert_kind_unavailable (ARCH-13) / B kabul et, hiç tetiklenmez.
+S9 checkpoint_purge_overdue (FOLLOWUP-123) alert_rules.kind'a additive: ekle.
+Ayrıca: FOLLOWUP-75'in "geri alma" yarısı için proje geri alma ucu yok; yalnız silme olayı. 07 approval_pending_age'e tek satır emit (services/approvals.py, touch-zone eki). Readiness Literal değişikliği openapi/03a.yaml + frontend/lib/api/schema-03a.d.ts yeniden üretimi (FOLLOWUP-115 deseni). Cevaba kadar retention tabloları + 119 tip temizliği (S7'den bağımsız kısım) ile başlıyorum.

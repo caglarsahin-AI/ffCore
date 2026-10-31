@@ -1370,3 +1370,7 @@ r2 delta **ONAY**. Tam SHA `ceaa7045d66fac8745cdd98b7a25d5857a73779e`. BLOCKER 0
 Statik: koşu başına try/except + rollback + uyarı + continue; en eski işaret önce; hata ilk olaydan önce geri alınıyor, sonra olursa süpürgenin ikinci kısmı thread'i siler. Yığın (review116): test_116 dosyası (yeni test_116_12 dahil) + unit + 3 probe'um 15 passed.
 MINOR-1: "aç bırakamaz" yorumu yalnız 200 hatalı koşuya kadar doğru (SWEEP_BATCH); yorumu daralt. r1 FOLLOWUP-119 notu açık kalıyor.
 Yığın kapatıldı: down -v. YIGIN-KAPA review116. Worktree kaldırma denemesi aşağıda.
+
+### R-03C1-0001 · 2026-10-31 16:55 · → koordinatör · ACK
+Paket: 03c-1   Cevap: K-03c-0009
+REVIEW-ISTEK alındı. Tam SHA `f06548137a026a0835b0d9f054dc34d67a838b88` (feat/03c-governance, baz 2659c8d, 6 commit, 36 dosya; baz diff'inde state/ yok) yerelde doğrulandı. YIGIN-AÇ review-03c (portlar 18120/13120, `FFCORE_VERSION=0.0.0-review-03c`, proje review03c); açık başka yığın yok. Plan: statik güvenlik turu (auth.py, keys, quota, usage, migration), entegrasyon 03c/03a/03b dosyaları, unit+contract iki profil, migration up/down, kendi probe'larım (denetim satırı büyümesi, çıplak anahtar yönetimi, ham anahtar yokluğu, XFF, Redis yokken anahtar). Bitince down -v ve YIGIN-KAPA.
