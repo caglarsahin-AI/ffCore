@@ -310,3 +310,36 @@ def test_116_11_running_run_stops_at_next_step_after_delete(world, pg):
     assert status == "failed" and run_row(pg, run_id)["error_code"] == "source_deleted"
     assert model.calls == []
     _no_rows(pg, run_id)
+
+
+def test_116_12_sweep_isolates_a_failing_close(world, pg, monkeypatch):
+    from ffcore.runtime import events as run_events
+
+    doc_id = _document(world)
+    first, _ = _waiting_approval(world, pg, doc_id)
+    second, _ = _waiting_approval(world, pg, doc_id)
+    _delete(world, doc_id)
+    # The older mark is closed first (order_by source_deleted_at): make it the failing one.
+    pg.execute(
+        "UPDATE runs SET source_deleted_at = source_deleted_at - interval '1 minute' WHERE id = %s",
+        (first,),
+    )
+    original = run_events.RunEventWriter.start
+
+    async def broken_for_first(self):
+        if str(self._run_id) == str(first):
+            raise ConnectionError("redis unreachable")
+        await original(self)
+
+    monkeypatch.setattr(run_events.RunEventWriter, "start", broken_for_first)
+    done = asyncio.run(checkpoints.sweep(world["settings"]))
+    # The database is shared by the module's tests: other marked runs may be closed too.
+    assert str(second) in done["source_deleted"] and str(first) not in done["source_deleted"]
+    assert run_row(pg, second)["status"] == "failed"
+    assert run_row(pg, first)["status"] == "waiting_approval"  # rolled back, left for next tick
+    _no_rows(pg, second)
+
+    monkeypatch.setattr(run_events.RunEventWriter, "start", original)
+    assert str(first) in asyncio.run(checkpoints.sweep(world["settings"]))["source_deleted"]
+    assert run_row(pg, first)["error_code"] == "source_deleted"
+    _no_rows(pg, first)

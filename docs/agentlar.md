@@ -189,7 +189,11 @@ runs that ended elsewhere (cancel, approval expiry) or whose deletion failed, an
 its knowledge base) marks the running and waiting runs that listed it as a source
 (`runs.source_deleted_at`): a running run stops at its next step, a resume stops before the graph
 runs, and the sweep closes waiting runs (a question has no time limit); each ends `failed` with
-`source_deleted` and its thread is deleted. In the run's events the source keeps its document
+`source_deleted` and its thread is deleted. Until then a waiting run's checkpoint still holds the
+deleted passages, for at most one sweep interval (60 s; the sweep runs every minute and has no
+setting). A run the sweep cannot close (for example Redis unreachable) is logged as
+`source_deleted_close_failed`, stays waiting and is tried again on the next sweep; the others in
+the same sweep are not held up. In the run's events the source keeps its document
 name and the breadcrumb reads `[deleted]`. Text the run wrote into its own events (`llm_call`
 request messages, the answer) follows the content retention class (03c).
 

@@ -144,10 +144,23 @@ async def sweep(settings: Settings, *, now: datetime | None = None) -> dict[str,
             waiting = await session.scalars(
                 select(Run.id)
                 .where(Run.status.in_(WAITING), Run.source_deleted_at.is_not(None))
+                # Oldest mark first: a run that keeps failing cannot starve the rest of a batch.
+                .order_by(Run.source_deleted_at)
                 .limit(SWEEP_BATCH)
             )
             for run_id in waiting.all():
-                if await _close_waiting(session, settings, redis, run_id):
+                try:
+                    closed = await _close_waiting(session, settings, redis, run_id)
+                except Exception as exc:  # noqa: BLE001 - one run's failure (Redis) is its own
+                    # The status change is rolled back: the run stays waiting for the next tick.
+                    await session.rollback()
+                    log.warning(
+                        "source_deleted_close_failed run_id=%s error=%s",
+                        run_id,
+                        type(exc).__name__,
+                    )
+                    continue
+                if closed:
                     done["source_deleted"].append(str(run_id))
                     if await purge(session, settings, run_id):
                         done["purged"].append(str(run_id))
