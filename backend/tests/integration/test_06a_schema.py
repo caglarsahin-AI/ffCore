@@ -95,6 +95,13 @@ def test_06a_schema_run_event_seq_unique_and_type_enforced(pg, make_project):
         pg.execute(insert, (run_id, 2, "tool_started"))
 
 
+def _run_columns(pg) -> set[str]:
+    rows = pg.execute(
+        "SELECT column_name FROM information_schema.columns WHERE table_name = 'runs'"
+    ).fetchall()
+    return {r[0] for r in rows}
+
+
 def test_06a_schema_migration_round_trip(database_url, pg):
     env = {**os.environ, "DATABASE_URL": database_url}
 
@@ -103,7 +110,12 @@ def test_06a_schema_migration_round_trip(database_url, pg):
             ["alembic", *args], cwd=BACKEND, env=env, check=True, capture_output=True, text=True
         ).stdout
 
-    assert "06a_0001" in alembic("heads")
+    assert "06a_0002" in alembic("heads")
+    # 06a_0002 (FOLLOWUP-116): the two checkpoint lifetime columns come and go on their own.
+    lifetime = {"checkpoint_deleted_at", "source_deleted_at"}
+    assert lifetime <= _run_columns(pg)
+    alembic("downgrade", "06a@-1")
+    assert TABLES <= _tables(pg) and not (lifetime & _run_columns(pg))
     alembic("downgrade", "06a@-1")
     assert not (TABLES & _tables(pg))
     assert "checkpoints" not in _schemas(pg)
@@ -111,3 +123,4 @@ def test_06a_schema_migration_round_trip(database_url, pg):
     alembic("upgrade", "heads")
     assert TABLES <= _tables(pg)
     assert "checkpoints" in _schemas(pg)
+    assert lifetime <= _run_columns(pg)

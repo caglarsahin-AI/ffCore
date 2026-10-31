@@ -77,12 +77,24 @@ async def expire_approvals(ctx) -> None:
     await approvals.sweep(get_settings())
 
 
+async def sweep_checkpoints(ctx) -> None:
+    """FOLLOWUP-116 sweep: waiting runs with a deleted source end source_deleted; finished runs'
+    checkpoint threads are deleted. An error is logged by arq and the next tick tries again
+    (`runs.checkpoint_deleted_at` stays NULL until a deletion succeeds)."""
+    from ffcore.runtime import checkpoints
+
+    await checkpoints.sweep(get_settings())
+
+
 def cron_jobs_for(job_class: JobClass) -> list:
     from arq import cron
 
     if job_class is not JobClass.background:
         return []
-    return [cron(expire_approvals, second=0, unique=True)]
+    return [
+        cron(expire_approvals, second=0, unique=True),
+        cron(sweep_checkpoints, second=30, unique=True),
+    ]
 
 
 async def run_agent(ctx, run_id: str, resume: dict | None = None) -> str:

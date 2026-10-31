@@ -61,7 +61,9 @@ def _tool_result_text(name: str, text: str) -> str:
 
 
 def _source_payload(sources: list[Source]) -> list[dict[str, Any]]:
-    return [s.public() | {"text": s.text} for s in sources]
+    """The sources the run state keeps: no chunk text (FOLLOWUP-116). The text reaches the model
+    only inside its messages; finalize needs `n` and `rerank_score`."""
+    return [s.public() for s in sources]
 
 
 def _sources(state: RunState) -> list[Source]:
@@ -123,7 +125,10 @@ async def retrieve(state: RunState, runtime: Runtime[RunContext]) -> dict:
         sse_data={"sources": payload["selected"]},
     )
     ms = _ms(started)
-    return {"sources": _source_payload(kept), "timing": _add_time(state, "retrieval", ms)}
+    # The text rides along to guard_in, the next step, which writes it into the user message and
+    # keeps the sources without it.
+    with_text = [s.public() | {"text": s.text} for s in kept]
+    return {"sources": with_text, "timing": _add_time(state, "retrieval", ms)}
 
 
 async def guard_in(state: RunState, runtime: Runtime[RunContext]) -> dict:
@@ -143,7 +148,10 @@ async def guard_in(state: RunState, runtime: Runtime[RunContext]) -> dict:
             outgoing.message,
             reference_id=outgoing.reference_id,
         )
-    return {"messages": [*state["messages"], {"role": "user", "content": outgoing.text}]}
+    return {
+        "messages": [*state["messages"], {"role": "user", "content": outgoing.text}],
+        "sources": _source_payload(_sources(state)),
+    }
 
 
 def _always_found_nothing(ctx: RunContext, state: RunState) -> bool:

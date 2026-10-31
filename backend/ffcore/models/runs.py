@@ -69,6 +69,11 @@ class Run(Timestamps, Base):
         ),
         Index("ix_runs_project_queued", "project_id", "queued_at"),
         Index("ix_runs_agent", "agent_id"),
+        Index(
+            "ix_runs_checkpoint_pending",
+            "ended_at",
+            postgresql_where=sql_text("checkpoint_deleted_at IS NULL"),
+        ),
     )
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
@@ -111,6 +116,10 @@ class Run(Timestamps, Base):
     ended_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     # POST .../cancel sets it; the worker stops at the next step boundary (K-06a-0002 S8).
     cancel_requested_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    # FOLLOWUP-116: the run's LangGraph thread was deleted (NULL on a finished run: the sweep
+    # tries again); a source document of the still-live run was deleted (it ends source_deleted).
+    checkpoint_deleted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    source_deleted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     created_by: Mapped[str] = mapped_column(Text)
     deleted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
