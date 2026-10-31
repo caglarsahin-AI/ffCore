@@ -1,0 +1,62 @@
+.2026-10-31 08:09:48,062 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=121
+2026-10-31 08:09:48,231 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=109
+2026-10-31 08:09:48,412 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=117
+2026-10-31 08:09:48,616 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=135
+2026-10-31 08:09:48,785 INFO ffcore.access access method=POST path=/api/v1/projects/5064d***-****-***5-833e-a989542c60de/knowledge-bases status=201 ms=68
+2026-10-31 08:09:48,846 INFO ffcore.access access method=POST path=/api/v1/projects/5064d***-****-***5-833e-a989542c60de/knowledge-bases/16b7afe3-bf93-48a1-823e-d3e9ce520380/reindex status=202 ms=57
+.2026-10-31 08:09:51,749 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=124
+2026-10-31 08:09:51,931 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=113
+2026-10-31 08:09:52,111 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=115
+2026-10-31 08:09:52,285 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=109
+2026-10-31 08:09:52,413 INFO ffcore.access access method=POST path=/api/v1/projects/63c3cfa8-1103-491e-a90e-c6ff11b044a7/knowledge-bases status=201 ms=60
+2026-10-31 08:09:52,474 INFO ffcore.access access method=POST path=/api/v1/projects/63c3cfa8-1103-491e-a90e-c6ff11b044a7/knowledge-bases/d6291992-c2a9-4fb4-8de2-4feace1a255d/documents status=202 ms=57
+2026-10-31 08:09:52,561 INFO ffcore.knowledge.ingest gold document=d7df9271-2c3d-41aa-baa5-e267ddd4c4cf reused=0 embedded=1
+2026-10-31 08:09:53,153 INFO ffcore.access access method=GET path=/api/v1/projects/63c3cfa8-1103-491e-a90e-c6ff11b044a7/knowledge-bases status=200 ms=47
+2026-10-31 08:09:53,205 INFO ffcore.access access method=GET path=/api/v1/projects/63c3cfa8-1103-491e-a90e-c6ff11b044a7/knowledge-bases status=200 ms=48
+2026-10-31 08:09:53,260 INFO ffcore.access access method=GET path=/api/v1/projects/63c3cfa8-1103-491e-a90e-c6ff11b044a7/knowledge-bases/d6291992-c2a9-4fb4-8de2-4feace1a255d status=200 ms=52
+2026-10-31 08:09:53,312 INFO ffcore.access access method=GET path=/api/v1/projects/63c3cfa8-1103-491e-a90e-c6ff11b044a7/knowledge-bases/d6291992-c2a9-4fb4-8de2-4feace1a255d status=200 ms=50
+2026-10-31 08:09:53,374 INFO ffcore.access access method=GET path=/api/v1/projects/63c3cfa8-1103-491e-a90e-c6ff11b044a7/knowledge-bases/d6291992-c2a9-4fb4-8de2-4feace1a255d/documents status=200 ms=60
+2026-10-31 08:09:53,439 INFO ffcore.access access method=GET path=/api/v1/projects/63c3cfa8-1103-491e-a90e-c6ff11b044a7/knowledge-bases/d6291992-c2a9-4fb4-8de2-4feace1a255d/documents status=200 ms=60
+2026-10-31 08:09:53,491 INFO ffcore.access access method=GET path=/api/v1/projects/63c3cfa8-1103-491e-a90e-c6ff11b044a7/knowledge-bases/d6291992-c2a9-4fb4-8de2-4feace1a255d/documents/d7df9271-2c3d-41aa-baa5-e267ddd4c4cf status=200 ms=48
+2026-10-31 08:09:53,539 INFO ffcore.access access method=GET path=/api/v1/projects/63c3cfa8-1103-491e-a90e-c6ff11b044a7/knowledge-bases/d6291992-c2a9-4fb4-8de2-4feace1a255d/documents/d7df9271-2c3d-41aa-baa5-e267ddd4c4cf status=200 ms=45
+.2026-10-31 08:09:56,340 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 08:09:56,496 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=139
+2026-10-31 08:09:56,800 INFO ffcore.access access method=POST path=/api/v1/projects/3c527823-e1ce-420d-b07c-4f8bc587c025/agents/asistan/runs status=200 ms=281
+2026-10-31 08:09:56,849 INFO ffcore.access access method=GET path=/api/v1/projects/3c527823-e1ce-420d-b07c-4f8bc587c025/runs/7ae19459-5c9f-4d05-8880-8055d2f9b43a/events status=200 ms=46
+2026-10-31 08:09:56,914 INFO ffcore.access access method=GET path=/api/v1/projects/3c527823-e1ce-420d-b07c-4f8bc587c025/runs/7ae19459-5c9f-4d05-8880-8055d2f9b43a/stream status=200 ms=62
+2026-10-31 08:09:56,959 INFO ffcore.access access method=GET path=/api/v1/projects/3c527823-e1ce-420d-b07c-4f8bc587c025/runs/7ae19459-5c9f-4d05-8880-8055d2f9b43a/events status=200 ms=40
+2026-10-31 08:09:57,020 INFO ffcore.access access method=GET path=/api/v1/projects/3c527823-e1ce-420d-b07c-4f8bc587c025/runs/7ae19459-5c9f-4d05-8880-8055d2f9b43a/stream status=200 ms=58
+.2026-10-31 08:10:02,024 ERROR ffcore.tracing trace_delivery_failed spans=7 reason=deadline
+2026-10-31 08:10:02,026 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+2026-10-31 08:10:02,205 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 08:10:02,317 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=110
+2026-10-31 08:10:02,613 INFO ffcore.access access method=POST path=/api/v1/projects/0b5dc24d-3e08-47a3-88a9-29067233af8a/agents/asistan/runs status=200 ms=275
+2026-10-31 08:10:02,664 INFO ffcore.access access method=GET path=/api/v1/projects/0b5dc24d-3e08-47a3-88a9-29067233af8a/runs/34371f50-3467-490b-98e0-63bd9ba56b7c/events status=200 ms=46
+2026-10-31 08:10:02,725 INFO ffcore.access access method=GET path=/api/v1/projects/0b5dc24d-3e08-47a3-88a9-29067233af8a/runs/34371f50-3467-490b-98e0-63bd9ba56b7c/stream status=200 ms=59
+2026-10-31 08:10:02,795 INFO ffcore.access access method=GET path=/api/v1/projects/0b5dc24d-3e08-47a3-88a9-29067233af8a/runs/34371f50-3467-490b-98e0-63bd9ba56b7c/stream status=200 ms=60
+.2026-10-31 08:10:05,027 ERROR opentelemetry.exporter.otlp.proto.http.trace_exporter Failed to export spans batch due to timeout, max retries or shutdown.
+2026-10-31 08:10:07,800 ERROR ffcore.tracing trace_delivery_failed spans=7 reason=deadline
+2026-10-31 08:10:07,803 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+2026-10-31 08:10:08,075 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=113
+2026-10-31 08:10:08,139 INFO ffcore.access access method=POST path=/api/v1/projects/15aa9409-e494-400a-a770-e8cde50f25f9/knowledge-bases status=201 ms=60
+2026-10-31 08:10:08,212 INFO ffcore.access access method=POST path=/api/v1/projects/15aa9409-e494-400a-a770-e8cde50f25f9/knowledge-bases/a02cda29-da08-4a39-9106-f9e76fff3a96/documents status=202 ms=68
+2026-10-31 08:10:08,511 INFO ffcore.access access method=POST path=/api/v1/projects/15aa9409-e494-400a-a770-e8cde50f25f9/knowledge-bases/a02cda29-da08-4a39-9106-f9e76fff3a96/documents status=202 ms=52
+2026-10-31 08:10:08,615 INFO ffcore.access access method=DELETE path=/api/v1/projects/15aa9409-e494-400a-a770-e8cde50f25f9/knowledge-bases/a02cda29-da08-4a39-9106-f9e76fff3a96/documents/ced74f16-19b1-4b10-8057-34bc218562ec status=204 ms=63
+.2026-10-31 08:10:10,803 ERROR opentelemetry.exporter.otlp.proto.http.trace_exporter Failed to export spans batch due to timeout, max retries or shutdown.
+2026-10-31 08:10:13,902 ERROR ffcore.tracing trace_delivery_failed spans=7 reason=deadline
+2026-10-31 08:10:13,905 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+2026-10-31 08:10:14,244 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=158
+2026-10-31 08:10:14,319 INFO ffcore.access access method=POST path=/api/v1/projects/7bca25fa-f54b-47ea-a3fc-9e82f73a1e3c/knowledge-bases status=201 ms=72
+.2026-10-31 08:10:16,905 ERROR opentelemetry.exporter.otlp.proto.http.trace_exporter Failed to export spans batch due to timeout, max retries or shutdown.
+2026-10-31 08:10:19,608 ERROR ffcore.tracing trace_delivery_failed spans=10 reason=deadline
+2026-10-31 08:10:19,610 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+2026-10-31 08:10:19,872 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=115
+2026-10-31 08:10:19,934 INFO ffcore.access access method=POST path=/api/v1/projects/415b3c31-14c3-4487-a211-4f734977405a/knowledge-bases status=201 ms=59
+EVENT_TYPES_HOLDING_CHUNK_TEXT: ['llm_call']
+.2026-10-31 08:10:22,612 ERROR opentelemetry.exporter.otlp.proto.http.trace_exporter Failed to export spans batch due to timeout, max retries or shutdown.
+2026-10-31 08:10:25,139 ERROR ffcore.tracing trace_delivery_failed spans=7 reason=deadline
+2026-10-31 08:10:25,141 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+
+92 passed in 422.64s (0:07:02)
+INT_EXIT=0
+copy_removed

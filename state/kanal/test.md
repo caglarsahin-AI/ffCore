@@ -4,8 +4,8 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 
 - Oturum kimliği: ffcore-test-13b-kosu
 - Aktif paket: 13b-kosu
-- Durum: ACTIVE
-- Son okunan: koordinator K-HANDOFF-20261031-EK (2026-10-31)
+- Durum: RETIRED
+- Son okunan: koordinator K-13BK-0004 (2026-10-31)
 
 ## Mesajlar
 
@@ -992,3 +992,15 @@ DURUM: VERIFIED. PR: state/pr/13b-kosu.md · Branch feat/13bk-ttl-negative · SH
 - FOLLOWUP-114 doğrulandı: `FFCORE_TEST_HOOKS=1` ile `test_07f_3` düşüyor (07f_2/4/5 geçti); isci-b dosyası, dokunmadım.
 - Olay (kendi hatam): 07f entegrasyon testini e2e yığınında koştum, LiteLLM'deki model kayıtları kayboldu (400 no healthy deployments); `make render-litellm` ile onarıldı, seed 0/0, e2e yeniden yeşil. Ayrıntı ve kök neden notu (doğrulanmadı) PR'da. Öneri: integration testleri e2e yığınında koşmasın (FOLLOWUP adayı: fikstür LiteLLM'e uzlaştırma yapıyorsa ayrı yığın şartı ya da açık hata).
 NOT_RUN: `make test` (üretim kodu değişmedi), airgap profili (sunucu koşusu kullanıcıda), `make eval` (GOREV dışı).
+
+### T-13bk-0006 · 2026-10-31 10:40 · → koordinator · HANDOFF
+Paket: 13b-kosu   Cevap: K-13BK-0004
+### 13b-kosu · ffcore-test-13b-kosu · 2026-10-31 10:40
+- Durum: MERGED (main ad3d95c, 8fd02bd). Lease RETIRED; bu oturum kapanıyor.
+- Tam sonraki adım: yok (test rolünde açık iş yok). Yeni test işi yeni oturumla.
+- Değişen dosyalar: tests/e2e/negative/test_13b_negative.py (TTL negatif 2 test; FOLLOWUP-111 NOT_RUN kalktı); state/pr/13b-kosu.md.
+- Koşan testler: make seed ×3 (36/15 → 0/0 → 0/0), make e2e 64 passed / 0 failed / 22 NOT_RUN (HEAD 8fd02bd), negatif 14/14, mutant kırmızı kanıtı, ruff + make lint 0. Kalan: make test (üretim kodu yok), airgap/gerçek model (kullanıcı sunucusu), make eval (GOREV dışı).
+- Kararlar ve bulgular: FOLLOWUP-114 doğrulandı (isci-b dalında); olay FOLLOWUP-118 (entegrasyon testi e2e yığınında koşmaz; LiteLLM `make render-litellm` ile onarıldı, kök neden doğrulanmadı); küçük not: `render-litellm --check` "litellm_reconciled created=N" log satırı yazıyor (yazmadan), 01 sahibine.
+- Blocker: yok.
+- Commit edilmemiş durum: yok (worktree ve branch koordinatörce kaldırıldı). Yığın ffcore-13bk kapalı (konteyner 0, volume 0); `ffcore/*:0.0.0-13bk` imajları temizlik listesinde. Scratchpad'deki test parolası dosyası depo dışı, oturumla atılır.
+- Branch ve son commit: feat/13bk-ttl-negative (kaldırıldı) @ 8fd02bd49b6e394a148cc4f8302c941c6ebde53a → main ad3d95c.

@@ -1052,3 +1052,11 @@ Not (açıklık): bu oturum kullanıcının 28 Ekim isci-b okuma oturumundan (ff
 ### B-114-0002 · 2026-10-31 10:20 · → koordinator · ACK
 Paket: fix/07-test-hooks-flag   Cevap: K-114-0001
 GOREV alındı. Worktree C:/ai_paycore/ffcore/.worktrees/fix/07-test-hooks-flag @ e5074ab temiz (branch fix/07-test-hooks-flag). Touch-zone yalnız backend/tests/integration/test_07f_followups.py; ürün kodu değişmez. Plan: test bayrağı açıkça kapatır (`hooks` fixture'ının tersi, `ffcore_test_hooks=False` override; B-07FU-0011 notu), önce bayraklı koşuda kırmızı, sonra yeşil; kanıt bayraklı 10/10 + bayraksız 10/10, iki profil. Entegrasyon testi e2e yığınında koşmaz (FOLLOWUP-118); kendi yığınım 18080/13080, açmadan önce YIGIN-AÇ yazıp sıra beklerim (inceleyici yığını öncelikli). Plan state/pr/07-test-hooks-flag.md'ye yazılınca DURUM: PLANNED.
+
+### B-114-0003 · 2026-10-31 13:58 · → koordinator · DURUM
+Paket: fix/07-test-hooks-flag   Cevap: K-114-0001
+DURUM: PLANNED. Plan: state/pr/07-test-hooks-flag.md. Özet: `hooks` fixture'ı bayrak değerini alan yardımcıya iner, yeni `hooks_off` aynı `dependency_overrides[get_settings]` yoluyla `ffcore_test_hooks=False` kurar; test_07f_3 ona bağlanır. Ürün kodu değişmez (kanca `Depends(get_settings)` okuyor, doğrulandı). Plan küçük olduğu için itiraz gelmezse kırmızı koşuyla devam ediyorum.
+
+### B-114-0004 · 2026-10-31 13:58 · → koordinator · DURUM
+Paket: fix/07-test-hooks-flag   Cevap: -
+YIGIN-AÇ 114 (-p 114, 18080/13080, FFCORE_VERSION=0.0.0-114, --profile test --profile qdrant, temiz volume). Senin onayınla (açık FF yığını yok).
