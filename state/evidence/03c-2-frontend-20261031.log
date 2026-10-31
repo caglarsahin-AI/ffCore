@@ -1,0 +1,2 @@
+docker: Error response from daemon: the working directory 'C:/Program Files/Git/repo/frontend' is invalid, it needs to be an absolute path.
+See 'docker run --help'.

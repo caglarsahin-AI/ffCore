@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-b-03c
 - Aktif paket: 03c (03c-1 review: feat/03c-governance f065481; 03c-2: feat/03c-2-retention)
 - Durum: ACTIVE
-- Son okunan: koordinator K-03c-0015
+- Son okunan: koordinator K-03c-0018 (2026-10-31 19:54)
 
 ## Mesajlar
 
@@ -1231,3 +1231,18 @@ YIGIN-AÇ 03c (03c-2 tam kapısı): proje `03c`, portlar 18110/13110, FFCORE_VER
 ### B-03c-0027 · 2026-10-31 19:28 · → koordinator · KAYIT-TALEBI
 Paket: 03c-2   Cevap: K-03c-0011 (şart 2)
 FOLLOWUP önerisi (07 sahibi): onay kararının audit satırı (`services/approvals.py` `approval.approved|rejected`, `after.arguments`) maskeli araç argümanını append-only `audit_events`'te 365 gün (audit sınıfı) tutuyor; retention `content` (30 gün) ve FOLLOWUP-119 belge silme temizliği bu kopyaya ulaşamaz (audit append-only). 03c-2'de yalnız `args_hash` additive eklendi (şart 2). Öneri: audit `after`'ından `arguments` çıkarılsın, `args_hash` + aksiyon adı yeter (davranış değişikliği [B], 07 testleri `after` alanını kontrol ediyorsa güncellenir). 03c-2 kapsamına almadım.
+
+### B-03c-0028 · 2026-10-31 19:55 · → koordinator · ACK
+Paket: 03c-1   Cevap: K-03c-0018
+r3 DUZELT alındı (state/reviews/03c-1-r2.md). 03c-2 kapısı koşuyor (03c-2 worktree'si; SHA b2bb1db sabit). r3 feat/03c-governance'ta, kapı bittikten sonra test edilecek: (1) MINOR-1 `_failure_key` saati enjekte edilebilir, rate-limit testi dakikayı sabitler (test-only davranış aynı); (2) MINOR-2 `stop()` dış iptali yeniden fırlatır (`asyncio.current_task().cancelling()`), yalnız iç görevin iptali yutulur; dış iptal testi. Sonra iki ardışık yeşil koşu, yeni SHA ile PR-HAZIR.
+
+### B-03c-0029 · 2026-10-31 20:00 · → koordinator · DURUM
+Paket: 03c   Cevap: K-03c-0018
+**03c-2 kapısı (b2bb1db) sonucu:** lint 0, make test 734 iki profil, migration upgrade → downgrade 03c@-1 ×2 → upgrade 0. make test-int llmaas 3 failed / 664, airgap 2 failed / 665: (1) `test_03c_6_auth_failures_rate_limited` = r2 MINOR-1 (r3'te düzeldi); (2) `test_03a_nonmember_404[delete /retention/policies/{data_class}/overrides/{project_id}]`: 03a taraması `{project_id}`'li her yolu proje yolu sayıyor, benim kurulum (superadmin) yolum → parametre `override_project_id`; (3) `test_01_r1_deleted_project_leaves_litellm`: FOLLOWUP-75 proje silme olayı uygulamanın uzlaştırmasını hemen tetikliyor, testin elle çağırdığı reconcile'a silinecek model kalmıyor → test son durumu (LiteLLM'de yok) doğrular. Önyüz adımı Git Bash yol dönüşümüyle koşmadı (exit 125), yeniden koşulacak. (2) ve (3) düzeltmeleri 03c-2'de hazır, commit'siz (kapı SHA'sı sabit kalsın diye).
+**03c-1 r3:** bbf10d2 (MINOR-1 `services/keys._clock` testte sabit; MINOR-2 `stop()` yalnız iç iptali yutar, çağıranınkini `cancelling()` ile yeniden fırlatır; yeni test kırmızı @3ae3808, log 03c-1-r3-red). Taze yığında iki ardışık tam test-int + airgap koşuyor. Sonra PR-HAZIR r3, ardından 03c-2 bbf10d2'ye rebase + iki düzeltme + kapı tekrar.
+
+### B-03c-0030 · 2026-10-31 20:32 · → koordinator · PR-HAZIR
+Paket: 03c-1 r3   Cevap: K-03c-0018
+Branch feat/03c-governance · SHA **bbf10d2e0b764928d8ed169aa22a028a4a3dfdd0** (3ae3808 üstüne 1 commit: MINOR-1 `services/keys._clock` + iki oran testinde sabit dakika; MINOR-2 `stop()` çağıranın iptalini yeniden fırlatır, yeni test kırmızı @3ae3808). Ağaç temiz. Sınıf [B].
+PR: state/pr/03c.md "03c-1 review r2 → r3". Kanıt taze yığın (state/evidence/03c-1-r3-*): lint 0, make test 734/734 iki profil, make test-int ardışık #1 ve #2 617 passed + 4 skipped, airgap 617 + 4. r3 statik delta: `git diff 3ae3808..bbf10d2` (5 dosya).
+Sıradaki: 03c-2 bbf10d2'ye rebase + iki düzeltme (override yolu parametresi, 01 testi FOLLOWUP-75'e uyum) + 03c-2 kapısı tekrar. Yığın açık kalıyor (03c-2 kapısı için, K-03c-0017 onayı).

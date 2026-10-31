@@ -1,0 +1,2 @@
+FAILED tests/integration/test_01_reconcile_shutdown.py::test_01_stop_reraises_the_callers_cancellation
+1 failed, 2 passed in 23.51s

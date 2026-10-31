@@ -4,3 +4,6 @@ lint exit=0
 test llmaas exit=0
 test airgap exit=0
 test-int exit=2
+test-int airgap exit=2
+migration exit=0
+frontend exit=125

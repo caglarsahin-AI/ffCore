@@ -1,0 +1,25 @@
+alembic upgrade heads exit 0  ments, attachments, chunks, kb_queries, ingest_gate_stats
+INFO  [alembic.runtime.migration] Running upgrade 0001 -> 03c_0001, 03c: API keys, quotas and daily usage
+INFO  [alembic.runtime.migration] Running upgrade 03c_0001 -> 03c_0002, 03c: retention policies and runs, alerts, notification settings
+
+alembic heads exit 0 03a_0001 (03a) (effective head)
+03b_0001 (03b) (effective head)
+03c_0002 (03c) (head)
+04a_0001 (04a) (head)
+05a_0001 (05a) (head)
+06a_0002 (06a) (effective head)
+07_0001 (07) (effective head)
+08_0001 (08) (head)
+ 
+alembic downgrade 03c@-1 exit 0  INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+INFO  [alembic.runtime.migration] Running downgrade 03c_0002 -> 03c_0001, 03c: retention policies and runs, alerts, notification settings
+
+alembic downgrade 03c@-1 exit 0  INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+INFO  [alembic.runtime.migration] Running downgrade 03c_0001 -> 0001, 03c: API keys, quotas and daily usage
+
+alembic upgrade heads exit 0  alembic.runtime.migration] Will assume transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade 0001 -> 03c_0001, 03c: API keys, quotas and daily usage
+INFO  [alembic.runtime.migration] Running upgrade 03c_0001 -> 03c_0002, 03c: retention policies and runs, alerts, notification settings
+
