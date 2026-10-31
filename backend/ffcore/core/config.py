@@ -166,6 +166,8 @@ class Settings(BaseSettings):
     retention_dry_run: bool = True
     retention_audit_drop_enabled: bool = False
     retention_batch: int = Field(default=5000, gt=0)
+    # service_down fires when /readyz has failed this long without a break (brief R9.1: 5 min).
+    alert_service_down_s: int = Field(default=300, gt=0)
 
     @field_validator(
         "egress_allowlist", "allowed_internal_hosts", "allowed_languages", mode="before"

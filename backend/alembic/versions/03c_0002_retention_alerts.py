@@ -30,6 +30,21 @@ RETENTION_CLASSES = {
 }
 RUN_TRIGGERS = ("dry_run", "schedule", "manual", "document_delete")
 RUN_STATUSES = ("ok", "partial", "failed")
+ALERT_KINDS = (
+    "budget_threshold",
+    "service_down",
+    "ingest_error",
+    "sync_error",
+    "prune_refused",
+    "approval_pending_age",
+    "guardrail_block_rate",
+    "quota_warn",
+    "convert_timeout",
+    "disk_memory",
+    "checkpoint_purge_overdue",
+)
+ALERT_CHANNELS = ("email", "webhook", "ui")
+SEVERITIES = ("info", "warning", "critical")
 
 
 def _in(column: str, values) -> str:
@@ -107,8 +122,69 @@ def upgrade() -> None:
     # FOLLOWUP-119: the run's text was cleared (a second pass is a no-op).
     op.add_column("runs", sa.Column("content_cleared_at", sa.DateTime(timezone=True)))
 
+    op.create_table(
+        "alert_rules",
+        sa.Column("id", UUID(as_uuid=True), primary_key=True),
+        sa.Column("project_id", UUID(as_uuid=True), sa.ForeignKey("projects.id")),
+        sa.Column("kind", sa.Text, nullable=False),
+        sa.Column("params", JSONB, server_default=sa.text("'{}'::jsonb"), nullable=False),
+        sa.Column("channel", sa.Text, nullable=False),
+        sa.Column("recipients", sa.ARRAY(sa.Text), server_default=sa.text("'{}'"), nullable=False),
+        sa.Column("is_active", sa.Boolean, server_default=sa.true(), nullable=False),
+        sa.Column("created_by", sa.Text, nullable=False),
+        sa.Column(
+            "created_at", sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False
+        ),
+        sa.Column(
+            "updated_at", sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False
+        ),
+        sa.Column("deleted_at", sa.DateTime(timezone=True)),
+        sa.CheckConstraint(_in("kind", ALERT_KINDS), name="kind"),
+        sa.CheckConstraint(_in("channel", ALERT_CHANNELS), name="channel"),
+    )
+    op.create_index("ix_alert_rules_kind_active", "alert_rules", ["kind", "is_active"])
+    op.create_table(
+        "alerts",
+        sa.Column("id", UUID(as_uuid=True), primary_key=True),
+        sa.Column("rule_id", UUID(as_uuid=True), sa.ForeignKey("alert_rules.id"), nullable=False),
+        sa.Column("project_id", UUID(as_uuid=True)),
+        sa.Column("kind", sa.Text, nullable=False),
+        sa.Column("dedupe_key", sa.Text, nullable=False),
+        sa.Column(
+            "fired_at", sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False
+        ),
+        sa.Column("payload", JSONB, server_default=sa.text("'{}'::jsonb"), nullable=False),
+        sa.Column("severity", sa.Text, server_default="warning", nullable=False),
+        sa.Column("acked_by", sa.Text),
+        sa.Column("acked_at", sa.DateTime(timezone=True)),
+        sa.Column("resolved_at", sa.DateTime(timezone=True)),
+        sa.CheckConstraint(_in("severity", SEVERITIES), name="severity"),
+    )
+    op.create_index("ix_alerts_rule_fired", "alerts", ["rule_id", "fired_at"])
+    op.create_index("ix_alerts_project_open", "alerts", ["project_id", "acked_at"])
+    op.create_index("uq_alerts_rule_dedupe", "alerts", ["rule_id", "dedupe_key"], unique=True)
+    op.create_table(
+        "notification_settings",
+        sa.Column("id", UUID(as_uuid=True), primary_key=True),
+        sa.Column("project_id", UUID(as_uuid=True), sa.ForeignKey("projects.id")),
+        sa.Column("smtp_encrypted", sa.LargeBinary),
+        sa.Column("default_webhook_url", sa.Text),
+        sa.Column("from_address", sa.Text),
+        sa.Column(
+            "updated_at", sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False
+        ),
+        sa.Column("updated_by", sa.Text, nullable=False),
+    )
+    op.execute(
+        "CREATE UNIQUE INDEX uq_notification_settings_project ON notification_settings"
+        " (coalesce(project_id, '00000000-0000-0000-0000-000000000000'::uuid))"
+    )
+
 
 def downgrade() -> None:
+    op.drop_table("notification_settings")
+    op.drop_table("alerts")
+    op.drop_table("alert_rules")
     op.drop_column("runs", "content_cleared_at")
     op.execute("DROP TABLE retention_runs")
     op.execute("DROP FUNCTION ffcore_retention_runs_append_only()")

@@ -110,12 +110,16 @@ def test_03a_2_project_member_read_mode_parity(world, make_user, client_factory)
         assert read.get(url).content == edit.get(url).content, url
 
 
+OWN = {"model_provider", "vector_provider", "project_admin"}
+
+
 def test_03a_11_readiness_three_checks(world, make_user, make_project, client_factory):
     edit = world["edit"]
     empty = make_project()
     body = edit.get(f"{API}/projects/{empty}/readiness").json()
-    assert (body["passed"], body["total"]) == (0, 3)
-    assert {c["key"]: c["ok"] for c in body["checks"]} == {
+    # 03c adds `limits` and `alert_rules` (n/5); their behaviour is test_03c_19.
+    assert body["total"] == 5
+    assert {c["key"]: c["ok"] for c in body["checks"] if c["key"] in OWN} == {
         "model_provider": False,
         "vector_provider": False,
         "project_admin": False,
@@ -127,9 +131,8 @@ def test_03a_11_readiness_three_checks(world, make_user, make_project, client_fa
     )  # fmt: skip
     make_user(memberships={empty: ("admin", "edit")})
     body = edit.get(f"{API}/projects/{empty}/readiness").json()
-    checks = {c["key"]: c["ok"] for c in body["checks"]}
+    checks = {c["key"]: c["ok"] for c in body["checks"] if c["key"] in OWN}
     assert checks == {"model_provider": False, "vector_provider": True, "project_admin": True}
-    assert body["passed"] == 2
 
 
 def test_03a_12_audit_list_filters(world, pg):

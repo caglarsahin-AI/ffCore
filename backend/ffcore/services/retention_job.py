@@ -168,6 +168,7 @@ async def execute(
 ) -> list[ClassResult]:
     """One pass over every class; raises RetentionBusy when another pass holds the lock."""
     from ffcore.core import db
+    from ffcore.services import alerts  # noqa: F401 - registers the `alerts` class executor
 
     now = now or datetime.now(UTC)
     results: list[ClassResult] = []

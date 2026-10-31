@@ -27,6 +27,8 @@ C3_EXCEPTIONS = {
     # one global row per class plus per-project overrides, edited in place (03c, K1)
     "retention_policies": "class list (03c; named in CONTRACTS C3)",
     "retention_runs": "append-only (03c; named in CONTRACTS C3)",
+    "alerts": "append-only (03c; named in CONTRACTS C3)",
+    "notification_settings": "settings row per project or global (03c)",
 }
 
 # Child tables take the project through their parent (CONTRACTS C3): the column named here is a

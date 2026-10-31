@@ -175,3 +175,17 @@ def test_03c_13_live_runs_left_to_116(pg, make_project, database_url):
 
     assert asyncio.run(sweep()) >= 1
     assert _payloads(pg, waiting)["answer"]["text"] == "[cleared]"
+
+
+def test_03c_13_approval_audit_keeps_args_hash(database_url, pg, make_project):
+    """K-03c-0011 (2): retention clears approvals.arguments; the decision's audit row keeps the
+    hash of what was approved."""
+    from tests.integration.test_07_decide import _audit, _decide
+    from tests.integration.test_07_schema import _insert
+
+    project = make_project()
+    row = _insert(pg, project)
+    _decide(database_url, project, row["id"])
+    [(_, outcome, after)] = _audit(pg, row["id"], "approval.approved")
+    stored = pg.execute("SELECT args_hash FROM approvals WHERE id = %s", (row["id"],)).fetchone()
+    assert outcome == "success" and after["args_hash"] == stored[0]

@@ -86,6 +86,46 @@ async def sweep_checkpoints(ctx) -> None:
     await checkpoints.sweep(get_settings())
 
 
+async def evaluate_alerts(ctx) -> None:
+    """03c: budget_threshold and service_down, once a minute."""
+    from ffcore.services import alerts
+
+    settings = get_settings()
+    await alerts.evaluate(
+        settings,
+        readiness=lambda: alerts.readyz_probe(settings),
+        redis=ctx["redis"],
+    )
+
+
+async def clear_source_deleted(ctx) -> None:
+    """03c FOLLOWUP-119: runs closed source_deleted by the 116 sweep lose their text."""
+    from ffcore.core import db as database
+    from ffcore.services import retention
+
+    async with database.session_scope() as session:
+        await retention.sweep_source_deleted(session)
+        await session.commit()
+
+
+async def run_retention(ctx) -> None:
+    """03c: the daily retention pass; counts only while RETENTION_DRY_RUN is true."""
+    from ffcore.services import retention_job
+
+    settings = get_settings()
+    dry = settings.retention_dry_run
+    await retention_job.execute(
+        settings, dry_run=dry, trigger="dry_run" if dry else "schedule", actor_id="system"
+    )
+
+
+async def audit_partitions(ctx) -> None:
+    """FOLLOWUP-47: this month's and next month's audit partition, every day (idempotent)."""
+    from ffcore.core.audit import ensure_audit_partitions
+
+    await ensure_audit_partitions(2)
+
+
 def cron_jobs_for(job_class: JobClass) -> list:
     from arq import cron
 
@@ -94,6 +134,11 @@ def cron_jobs_for(job_class: JobClass) -> list:
     return [
         cron(expire_approvals, second=0, unique=True),
         cron(sweep_checkpoints, second=30, unique=True),
+        # 03c (C9: arq cron, background worker only, unique per tick).
+        cron(evaluate_alerts, second=15, unique=True),
+        cron(clear_source_deleted, second=45, unique=True),
+        cron(audit_partitions, hour=2, minute=30, second=0, unique=True),
+        cron(run_retention, hour=3, minute=0, second=0, unique=True),
     ]
 
 

@@ -603,6 +603,7 @@ def context_factory(
                         user_id=str(run.user_id) if run.user_id else None,
                         api_key_id=str(run.api_key_id) if run.api_key_id else None,
                     ),
+                    settings=settings,
                 ),
             ),
             retriever=HttpRetriever(

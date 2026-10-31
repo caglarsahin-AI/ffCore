@@ -181,6 +181,14 @@ async def sweep(settings: Settings, *, now: datetime | None = None) -> dict[str,
             if await purge(session, settings, run_id):
                 done["purged"].append(str(run_id))
             elif ended_at is not None and now - ended_at > OVERDUE:
-                # FOLLOWUP: an alert rule (03c) instead of the log line.
                 log.error("checkpoint_purge_overdue run_id=%s ended_at=%s", run_id, ended_at)
+                # FOLLOWUP-123: visible as an alert too (once per run).
+                from ffcore.services import alerts
+
+                await alerts.emit(
+                    settings,
+                    "checkpoint_purge_overdue",
+                    {"run_id": str(run_id), "ended_at": ended_at.isoformat()},
+                    dedupe_key=str(run_id),
+                )
     return done

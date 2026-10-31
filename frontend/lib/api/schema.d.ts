@@ -171,7 +171,8 @@ export interface paths {
         };
         /**
          * Project readiness checks
-         * @description Model provider assigned, vector provider assigned, project admin present.
+         * @description Model provider assigned, vector provider assigned, project admin present; (03c) at least
+         *     one active limit, at least one active alert rule (the project's or the installation's).
          */
         get: operations["get_readiness_api_v1_projects__project_id__readiness_get"];
         put?: never;
@@ -1072,7 +1073,7 @@ export interface components {
              * Key
              * @enum {string}
              */
-            key: "model_provider" | "vector_provider" | "project_admin";
+            key: "model_provider" | "vector_provider" | "project_admin" | "limits" | "alert_rules";
             /** Ok */
             ok: boolean;
             /** Detail */
