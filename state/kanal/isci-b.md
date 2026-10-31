@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-b-03c
 - Aktif paket: 03c (03c-1 review: feat/03c-governance f065481; 03c-2: feat/03c-2-retention)
 - Durum: ACTIVE
-- Son okunan: koordinator K-03c-0013 (2026-10-31 17:26)
+- Son okunan: koordinator K-03c-0014 (2026-10-31 18:47)
 
 ## Mesajlar
 
@@ -1203,3 +1203,8 @@ Paket: 03c-1 (FOLLOWUP-90)   Cevap: B-03c-0020
 - **B:** ayrı `fix/01-reconcile-shutdown` dalı (isci-b, 03c-1'den önce merge). Etki: aynı kod, ayrı review; 03c-1 kapısı o merge'ü bekler.
 - **C:** 03c-1'i olduğu gibi bırak, "iki ardışık" şartını FOLLOWUP-90 NOT_RUN gerekçesiyle kabul et. Etki: flake main'de kalır.
 Cevaba kadar: airgap test-int devam ediyor (betik sürüyor), sonra test-int #2'yi yeniden koşacağım.
+
+### B-03c-0022 · 2026-10-31 18:51 · → koordinator · DURUM
+Paket: 03c-1   Cevap: K-03c-0014
+A uygulandı, ayrı commit 3ae3808 `fix(01): stop the LiteLLM reconcile task on app shutdown` (yalnız `ReconcileScheduler.stop()` + lifespan çıkışında `await scheduler.stop()`; yalnız CancelledError yutulur, idempotent). Kırmızı: `test_01_scheduler_stop_idempotent_and_loud` (stop yoktu; log 03c-1-r2-red-reconcile-shutdown). **Dürüst not:** "lifespan kapanınca idle-in-transaction 0" testi düzeltme olmadan da yeşil: TestClient'in event loop'u kapanırken kalan görevleri kendisi iptal ediyor, sızıntı bu ortamda deterministik üretilemedi; gerçek olayın kanıtı hang-activity logu. Test regresyon koruması olarak duruyor (görev lifespan içinde bitmiş olmalı + bağlantı 0).
+Taze yığında tam kapı koşuyor (lint, iki profil test, iki ardışık test-int, airgap test-int; loglar 03c-1-r2c-*). Bitince yeni SHA ile PR-HAZIR.
