@@ -73,3 +73,26 @@ def test_01_scheduler_stop_idempotent_and_loud():
         await failing.stop()  # the task logged and ended; stop only waits for it
 
     asyncio.run(go())
+
+
+def test_01_stop_reraises_the_callers_cancellation():
+    """r2 MINOR-2: only the reconcile task's own cancellation is swallowed."""
+
+    async def go():
+        async def slow_cleanup():
+            try:
+                await asyncio.sleep(60)
+            except asyncio.CancelledError:
+                await asyncio.sleep(0.2)  # cleanup takes a moment (session rollback)
+                raise
+
+        scheduler = litellm_reconcile.ReconcileScheduler(slow_cleanup)
+        scheduler.on_change()
+        await asyncio.sleep(0)
+        outer = asyncio.create_task(scheduler.stop())
+        await asyncio.sleep(0.05)  # stop() is waiting for the task's cleanup
+        outer.cancel()
+        with pytest.raises(asyncio.CancelledError):
+            await outer
+
+    asyncio.run(go())

@@ -412,7 +412,8 @@ class ReconcileScheduler:
     async def stop(self) -> None:
         """Cancel a running reconcile and wait for it (FOLLOWUP-90): its session rolls back
         while the loop still runs, instead of the task outliving the app with an open
-        transaction. Idempotent; only the cancellation itself is swallowed."""
+        transaction. Idempotent. Only the reconcile task's own cancellation is swallowed; a
+        cancellation of the caller is raised again (r2 MINOR-2)."""
         task, self._task = self._task, None
         self._dirty = False
         if task is None or task.done():
@@ -421,7 +422,9 @@ class ReconcileScheduler:
         try:
             await task
         except asyncio.CancelledError:
-            pass
+            current = asyncio.current_task()
+            if current is not None and current.cancelling():
+                raise
 
     async def wait_idle(self) -> None:
         while self._task is not None and not self._task.done():

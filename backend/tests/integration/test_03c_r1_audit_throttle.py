@@ -39,7 +39,12 @@ def _client(app, ip):
     return client
 
 
-def test_03c_6_blocked_requests_one_audit_row_per_window(app, owner, probe, app_settings, pg):
+def test_03c_6_blocked_requests_one_audit_row_per_window(
+    app, owner, probe, app_settings, pg, monkeypatch
+):
+    from ffcore.services import keys
+
+    monkeypatch.setattr(keys, "_clock", lambda: 1_800_000_060.0)  # one fixed minute (r2 MINOR-1)
     ip = _ip()
     client = _client(app, ip)
     try:

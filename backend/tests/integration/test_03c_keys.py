@@ -156,7 +156,11 @@ def test_03c_6_unknown_prefix_same_answer(app, owner, probe):
     assert a.json() == b.json()
 
 
-def test_03c_6_auth_failures_rate_limited(app, owner, probe, app_settings, pg):
+def test_03c_6_auth_failures_rate_limited(app, owner, probe, app_settings, pg, monkeypatch):
+    from ffcore.services import keys
+
+    # One fixed minute (r2 MINOR-1): 21 requests take ~20 s and could cross a minute boundary.
+    monkeypatch.setattr(keys, "_clock", lambda: 1_800_000_000.0)
     project, client = owner
     created = _create(client, project)
     # A fresh address per run (r1 MINOR-1): the per-address budget lives a minute in Redis.

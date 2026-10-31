@@ -93,8 +93,12 @@ def _redis(settings: Settings):
     return aioredis.from_url(settings.redis_url.get_secret_value())
 
 
+# The failure budget's clock; tests pin it so a run never straddles a minute (r2 MINOR-1).
+_clock = time.time
+
+
 def _failure_key(ip: str) -> str:
-    return f"ffcore:keys:authfail:{ip}:{int(time.time()) // _FAILURE_WINDOW_S}"
+    return f"ffcore:keys:authfail:{ip}:{int(_clock()) // _FAILURE_WINDOW_S}"
 
 
 async def _rate_limited(request: Request, settings: Settings, failures: int) -> ApiError:
