@@ -1,0 +1,6 @@
+Found 1 error (1 fixed, 0 remaining).
+1 file reformatted, 289 files left unchanged
+ruff check backend scripts data/samples/scripts services
+All checks passed!
+ruff format --check backend scripts data/samples/scripts services
+322 files already formatted

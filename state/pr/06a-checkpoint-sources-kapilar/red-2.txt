@@ -1,0 +1,307 @@
+FFFFFFFF                                                                 [100%]
+=================================== FAILURES ===================================
+_____________________ test_116_8_source_state_has_no_text ______________________
+
+    def test_116_8_source_state_has_no_text():
+        kept = graph._source_payload([_source(1, 0.9), _source(2, 0.4)])
+>       assert all("text" not in s for s in kept)
+E       assert False
+E        +  where False = all(<generator object test_116_8_source_state_has_no_text.<locals>.<genexpr> at 0x7f89c9d24860>)
+
+tests/unit/test_116_source_state.py:24: AssertionError
+_________________ test_116_1_finished_run_leaves_no_checkpoint _________________
+
+world = {'settings': Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('****...UUID('1b8b8f04-e3ca-4247-bc1a-1619bd1262b8'), 'admin': <starlette.testclient.TestClient object at 0x7f89c97c2810>, ...}
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_bc78a2c5de20) at 0x7f89c97e0bc0>
+
+    def test_116_1_finished_run_leaves_no_checkpoint(world, pg):
+        run_id = seed_run(pg, world["project"], definition())
+        model = ScriptedModel(turn("Fesih süresi 30 gündür [1]."))
+        hits = [source(text=CHUNK_TEXT)]
+        assert world["harness"].run(run_id, Ports(model, ScriptedRetriever(hits))) == "completed"
+        assert CHUNK_TEXT in model.calls[0][-1]["content"]  # the model still saw the passage
+>       _no_rows(pg, run_id)
+
+tests/integration/test_116_checkpoint_sources.py:170: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_bc78a2c5de20) at 0x7f89c97e0bc0>
+run_id = UUID('b5616810-6459-465b-99ca-61d0d38a990b')
+
+    def _no_rows(pg, run_id):
+>       assert _thread_rows(pg, run_id) == dict.fromkeys(TABLES, 0)
+E       AssertionError: assert {'checkpoints...t_writes': 26} == {'checkpoints...nt_writes': 0}
+E         
+E         Differing items:
+E         {'checkpoint_writes': 26} != {'checkpoint_writes': 0}
+E         {'checkpoints': 8} != {'checkpoints': 0}
+E         {'checkpoint_blobs': 11} != {'checkpoint_blobs': 0}
+E         Use -v to get more diff
+
+tests/integration/test_116_checkpoint_sources.py:129: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+2026-10-31 07:35:37,158 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-31 07:35:37,179 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=274
+2026-10-31 07:35:37,390 INFO ffcore.access access method=POST path=/api/v1/projects/1b8b8f04-e3ca-4247-bc1a-1619bd1262b8/knowledge-bases status=201 ms=208
+------------------------------ Captured log setup ------------------------------
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=274
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/1b8b8f04-e3ca-4247-bc1a-1619bd1262b8/knowledge-bases status=201 ms=208
+_____ test_116_2_tool_search_leaves_no_checkpoint_and_events_carry_no_text _____
+
+world = {'settings': Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('****...UUID('e74a579a-3256-4918-87c4-34382418e042'), 'admin': <starlette.testclient.TestClient object at 0x7f89ac74cb00>, ...}
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_bc78a2c5de20) at 0x7f89ac778b00>
+
+    def test_116_2_tool_search_leaves_no_checkpoint_and_events_carry_no_text(world, pg):
+        d = definition(knowledge=[{"kb_key": "sozlesmeler", "mode": "tool", "top_k": 4}])
+        run_id = seed_run(pg, world["project"], d)
+        model = ScriptedModel(
+            turn(tools=[("search_documents", {"query": "fesih", "kb_key": "sozlesmeler"})]),
+            turn("30 gün [1]."),
+        )
+        hits = [source(text=CHUNK_TEXT)]
+        assert world["harness"].run(run_id, Ports(model, ScriptedRetriever(hits))) == "completed"
+>       _no_rows(pg, run_id)
+
+tests/integration/test_116_checkpoint_sources.py:183: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_bc78a2c5de20) at 0x7f89ac778b00>
+run_id = UUID('c3534aa5-fbe0-45ad-a91d-d3d9724e5ed2')
+
+    def _no_rows(pg, run_id):
+>       assert _thread_rows(pg, run_id) == dict.fromkeys(TABLES, 0)
+E       AssertionError: assert {'checkpoints...t_writes': 40} == {'checkpoints...nt_writes': 0}
+E         
+E         Differing items:
+E         {'checkpoint_writes': 40} != {'checkpoint_writes': 0}
+E         {'checkpoints': 11} != {'checkpoints': 0}
+E         {'checkpoint_blobs': 18} != {'checkpoint_blobs': 0}
+E         Use -v to get more diff
+
+tests/integration/test_116_checkpoint_sources.py:129: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+2026-10-31 07:35:38,078 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-31 07:35:38,080 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=132
+2026-10-31 07:35:38,145 INFO ffcore.access access method=POST path=/api/v1/projects/e74a579a-3256-4918-87c4-34382418e042/knowledge-bases status=201 ms=62
+------------------------------ Captured log setup ------------------------------
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=132
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/e74a579a-3256-4918-87c4-34382418e042/knowledge-bases status=201 ms=62
+______________ test_116_3_resume_after_document_delete_fails_loud ______________
+
+world = {'settings': Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('****...UUID('eb034630-48bd-4096-9a65-654fd11a6036'), 'admin': <starlette.testclient.TestClient object at 0x7f89c97fd7f0>, ...}
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_bc78a2c5de20) at 0x7f89c41be420>
+
+    def test_116_3_resume_after_document_delete_fails_loud(world, pg):
+        doc_id = _document(world)
+        run_id, ports = _waiting_approval(world, pg, doc_id)
+        # While the run waits its checkpoint exists, but the sources it keeps have no text.
+        assert _thread_rows(pg, run_id)["checkpoints"] > 0
+        state = asyncio.run(checkpoints.latest_state(world["settings"], run_id))
+>       assert state["sources"] and all("text" not in s for s in state["sources"])
+E       AssertionError: assert ([{'n': 1, 'kb_key': 'sozlesmeler', 'chunk_id': 'ecab9ce9-f7f6-4a94-a9c6-a3bc0d6caa13', 'document_id': '8be27788-ad2e-4e01-95cc-2354b2ae471a', ...}] and False)
+E        +  where False = all(<generator object test_116_3_resume_after_document_delete_fails_loud.<locals>.<genexpr> at 0x7f89a8c12b50>)
+
+tests/integration/test_116_checkpoint_sources.py:198: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+2026-10-31 07:35:38,718 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-31 07:35:38,736 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=145
+2026-10-31 07:35:38,809 INFO ffcore.access access method=POST path=/api/v1/projects/eb034630-48bd-4096-9a65-654fd11a6036/knowledge-bases status=201 ms=69
+------------------------------ Captured log setup ------------------------------
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=145
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/eb034630-48bd-4096-9a65-654fd11a6036/knowledge-bases status=201 ms=69
+----------------------------- Captured stderr call -----------------------------
+2026-10-31 07:35:38,898 INFO ffcore.access access method=POST path=/api/v1/projects/eb034630-48bd-4096-9a65-654fd11a6036/knowledge-bases/21ed2698-5703-4f64-915f-4998745af1e7/documents status=202 ms=83
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/eb034630-48bd-4096-9a65-654fd11a6036/knowledge-bases/21ed2698-5703-4f64-915f-4998745af1e7/documents status=202 ms=83
+_________ test_116_4_sweep_closes_waiting_user_run_with_deleted_source _________
+
+world = {'settings': Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('****...UUID('7eb76033-07fd-4e4f-99d6-2037abab96e0'), 'admin': <starlette.testclient.TestClient object at 0x7f89a83cb590>, ...}
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_bc78a2c5de20) at 0x7f89a83c8830>
+
+    def test_116_4_sweep_closes_waiting_user_run_with_deleted_source(world, pg):
+        doc_id = _document(world)
+        d = definition(ask_user=True)
+        run_id = seed_run(pg, world["project"], d)
+        model = ScriptedModel(turn(tools=[("ask_user_question", {"question": "Hangi sözleşme?"})]))
+        ports = Ports(model, ScriptedRetriever([_hit(doc_id)]))
+        assert world["harness"].run(run_id, ports) == "waiting_user"
+        _delete(world, doc_id)
+    
+        closed = asyncio.run(checkpoints.sweep(world["settings"]))
+>       assert str(run_id) in closed["source_deleted"]
+E       AssertionError: assert '993f9dce-3772-46bd-99f7-c269c62d3c33' in []
+E        +  where '993f9dce-3772-46bd-99f7-c269c62d3c33' = str(UUID('993f9dce-3772-46bd-99f7-c269c62d3c33'))
+
+tests/integration/test_116_checkpoint_sources.py:227: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+2026-10-31 07:35:39,641 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-31 07:35:39,659 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=162
+2026-10-31 07:35:39,750 INFO ffcore.access access method=POST path=/api/v1/projects/7eb76033-07fd-4e4f-99d6-2037abab96e0/knowledge-bases status=201 ms=89
+------------------------------ Captured log setup ------------------------------
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=162
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/7eb76033-07fd-4e4f-99d6-2037abab96e0/knowledge-bases status=201 ms=89
+----------------------------- Captured stderr call -----------------------------
+2026-10-31 07:35:39,832 INFO ffcore.access access method=POST path=/api/v1/projects/7eb76033-07fd-4e4f-99d6-2037abab96e0/knowledge-bases/0eaf0d89-9349-4f70-bc85-5f642169f97e/documents status=202 ms=78
+2026-10-31 07:35:40,217 INFO ffcore.access access method=DELETE path=/api/v1/projects/7eb76033-07fd-4e4f-99d6-2037abab96e0/knowledge-bases/0eaf0d89-9349-4f70-bc85-5f642169f97e/documents/267cfc6b-91a9-4a29-9022-dd33ed4f9f24 status=204 ms=100
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/7eb76033-07fd-4e4f-99d6-2037abab96e0/knowledge-bases/0eaf0d89-9349-4f70-bc85-5f642169f97e/documents status=202 ms=78
+INFO     ffcore.access:logging.py:263 access method=DELETE path=/api/v1/projects/7eb76033-07fd-4e4f-99d6-2037abab96e0/knowledge-bases/0eaf0d89-9349-4f70-bc85-5f642169f97e/documents/267cfc6b-91a9-4a29-9022-dd33ed4f9f24 status=204 ms=100
+_______ test_116_5_sweep_purges_threads_of_runs_ended_outside_the_runner _______
+
+world = {'settings': Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('****...UUID('652e6f22-a801-4880-9859-7877a1f116f8'), 'admin': <starlette.testclient.TestClient object at 0x7f89a8a39b50>, ...}
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_bc78a2c5de20) at 0x7f89a8362ba0>
+
+    def test_116_5_sweep_purges_threads_of_runs_ended_outside_the_runner(world, pg):
+        doc_id = _document(world)
+        run_id, _ = _waiting_approval(world, pg, doc_id)
+        # The cancel API and the approval expiry end a waiting run without the runner.
+        pg.execute(
+            "UPDATE runs SET status = 'cancelled', error_code = 'cancelled', ended_at = now()"
+            " WHERE id = %s",
+            (run_id,),
+        )
+        assert _thread_rows(pg, run_id)["checkpoints"] > 0
+        first = asyncio.run(checkpoints.sweep(world["settings"]))
+>       assert str(run_id) in first["purged"]
+E       AssertionError: assert '6e2f60a1-de15-4129-b85e-a673aad542a3' in []
+E        +  where '6e2f60a1-de15-4129-b85e-a673aad542a3' = str(UUID('6e2f60a1-de15-4129-b85e-a673aad542a3'))
+
+tests/integration/test_116_checkpoint_sources.py:246: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+2026-10-31 07:35:40,588 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-31 07:35:40,592 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=145
+2026-10-31 07:35:40,658 INFO ffcore.access access method=POST path=/api/v1/projects/652e6f22-a801-4880-9859-7877a1f116f8/knowledge-bases status=201 ms=62
+------------------------------ Captured log setup ------------------------------
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=145
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/652e6f22-a801-4880-9859-7877a1f116f8/knowledge-bases status=201 ms=62
+----------------------------- Captured stderr call -----------------------------
+2026-10-31 07:35:40,732 INFO ffcore.access access method=POST path=/api/v1/projects/652e6f22-a801-4880-9859-7877a1f116f8/knowledge-bases/65c7c9f1-6a49-49e4-8c95-dcefdcd07673/documents status=202 ms=70
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/652e6f22-a801-4880-9859-7877a1f116f8/knowledge-bases/65c7c9f1-6a49-49e4-8c95-dcefdcd07673/documents status=202 ms=70
+_________________ test_116_6_resume_with_live_source_completes _________________
+
+world = {'settings': Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('****...UUID('a3b4f4f0-2798-4418-a164-c0e205da2e62'), 'admin': <starlette.testclient.TestClient object at 0x7f89a8a030b0>, ...}
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_bc78a2c5de20) at 0x7f89a8a03d40>
+
+    def test_116_6_resume_with_live_source_completes(world, pg):
+        doc_id = _document(world)
+        run_id, ports = _waiting_approval(world, pg, doc_id)
+        resumed = world["harness"].run(run_id, ports, {"decision": "approved", "comment": None})
+        assert resumed == "completed"
+        assert ports.tools.called and run_row(pg, run_id)["output"] == "Tamam [1]."
+        # The resumed model call still had the passage: it came from the checkpointed messages.
+        assert CHUNK_TEXT in json.dumps(ports.model.calls[-1], ensure_ascii=False)
+>       _no_rows(pg, run_id)
+
+tests/integration/test_116_checkpoint_sources.py:262: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_bc78a2c5de20) at 0x7f89a8a03d40>
+run_id = UUID('c79d0d8b-89e7-4fac-a625-5dd8dd16787d')
+
+    def _no_rows(pg, run_id):
+>       assert _thread_rows(pg, run_id) == dict.fromkeys(TABLES, 0)
+E       AssertionError: assert {'checkpoints...t_writes': 47} == {'checkpoints...nt_writes': 0}
+E         
+E         Differing items:
+E         {'checkpoint_writes': 47} != {'checkpoint_writes': 0}
+E         {'checkpoints': 12} != {'checkpoints': 0}
+E         {'checkpoint_blobs': 21} != {'checkpoint_blobs': 0}
+E         Use -v to get more diff
+
+tests/integration/test_116_checkpoint_sources.py:129: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+2026-10-31 07:35:41,522 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-31 07:35:41,537 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=138
+2026-10-31 07:35:41,599 INFO ffcore.access access method=POST path=/api/v1/projects/a3b4f4f0-2798-4418-a164-c0e205da2e62/knowledge-bases status=201 ms=59
+------------------------------ Captured log setup ------------------------------
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=138
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/a3b4f4f0-2798-4418-a164-c0e205da2e62/knowledge-bases status=201 ms=59
+----------------------------- Captured stderr call -----------------------------
+2026-10-31 07:35:41,677 INFO ffcore.access access method=POST path=/api/v1/projects/a3b4f4f0-2798-4418-a164-c0e205da2e62/knowledge-bases/d0d580ea-4ccd-42cf-a292-8e14251c3a89/documents status=202 ms=73
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/a3b4f4f0-2798-4418-a164-c0e205da2e62/knowledge-bases/d0d580ea-4ccd-42cf-a292-8e14251c3a89/documents status=202 ms=73
+________ test_116_7_failed_purge_leaves_run_finished_and_sweep_retries _________
+
+world = {'settings': Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('****...UUID('de685773-dcfe-49f8-b5ab-7cd69dc2ad40'), 'admin': <starlette.testclient.TestClient object at 0x7f89a8d46120>, ...}
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_bc78a2c5de20) at 0x7f89a8d45550>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f89a8c811f0>
+
+    def test_116_7_failed_purge_leaves_run_finished_and_sweep_retries(world, pg, monkeypatch):
+        run_id = seed_run(pg, world["project"], definition())
+    
+        async def broken(settings, run_id):
+            raise OSError("checkpoint store unreachable")
+    
+        original = checkpoints.delete_thread
+        monkeypatch.setattr(checkpoints, "delete_thread", broken)
+        model = ScriptedModel(turn("30 gün [1]."))
+        hits = [source(text=CHUNK_TEXT)]
+        assert world["harness"].run(run_id, Ports(model, ScriptedRetriever(hits))) == "completed"
+>       assert _deleted_at(pg, run_id)[0] is None
+               ^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_116_checkpoint_sources.py:276: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/test_116_checkpoint_sources.py:133: in _deleted_at
+    return pg.execute(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_bc78a2c5de20) at 0x7f89a8d45550>
+query = 'SELECT checkpoint_deleted_at, source_deleted_at FROM runs WHERE id = %s'
+params = (UUID('1927e08a-e521-4915-ae0a-d1cf0277a679'),), prepare = None
+binary = False
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool = False,
+    ) -> Cursor[Row]:
+        """Execute a query and return a cursor to read its results."""
+        try:
+            cur = self.cursor()
+            if binary:
+                cur.format = BINARY
+    
+            if isinstance(query, Template):
+                if params is not None:
+                    raise TypeError(
+                        "'execute()' with string template query doesn't support parameters"
+                    )
+                return cur.execute(query, prepare=prepare)
+            else:
+                return cur.execute(query, params, prepare=prepare)
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           psycopg.errors.UndefinedColumn: column "checkpoint_deleted_at" does not exist
+E           LINE 1: SELECT checkpoint_deleted_at, source_deleted_at FROM runs WH...
+E                          ^
+
+/opt/venv/lib/python3.12/site-packages/psycopg/connection.py:304: UndefinedColumn
+---------------------------- Captured stderr setup -----------------------------
+2026-10-31 07:35:42,608 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-31 07:35:42,612 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=211
+2026-10-31 07:35:42,693 INFO ffcore.access access method=POST path=/api/v1/projects/de685773-dcfe-49f8-b5ab-7cd69dc2ad40/knowledge-bases status=201 ms=77
+------------------------------ Captured log setup ------------------------------
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=211
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/de685773-dcfe-49f8-b5ab-7cd69dc2ad40/knowledge-bases status=201 ms=77
+=========================== short test summary info ============================
+FAILED tests/unit/test_116_source_state.py::test_116_8_source_state_has_no_text
+FAILED tests/integration/test_116_checkpoint_sources.py::test_116_1_finished_run_leaves_no_checkpoint
+FAILED tests/integration/test_116_checkpoint_sources.py::test_116_2_tool_search_leaves_no_checkpoint_and_events_carry_no_text
+FAILED tests/integration/test_116_checkpoint_sources.py::test_116_3_resume_after_document_delete_fails_loud
+FAILED tests/integration/test_116_checkpoint_sources.py::test_116_4_sweep_closes_waiting_user_run_with_deleted_source
+FAILED tests/integration/test_116_checkpoint_sources.py::test_116_5_sweep_purges_threads_of_runs_ended_outside_the_runner
+FAILED tests/integration/test_116_checkpoint_sources.py::test_116_6_resume_with_live_source_completes
+FAILED tests/integration/test_116_checkpoint_sources.py::test_116_7_failed_purge_leaves_run_finished_and_sweep_retries
+8 failed in 14.29s

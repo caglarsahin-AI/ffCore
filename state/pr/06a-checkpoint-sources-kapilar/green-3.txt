@@ -1,0 +1,23 @@
+.......................................................F                 [100%]
+=================================== FAILURES ===================================
+_____________________ test_06a_schema_migration_round_trip _____________________
+
+database_url = 'postgresql+psycopg://ffcore:dummy-not-secret-postgres@postgres:5432/ffcore_test_1b3036368651'
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_1b3036368651) at 0x7fb155f63e00>
+
+    def test_06a_schema_migration_round_trip(database_url, pg):
+        env = {**os.environ, "DATABASE_URL": database_url}
+    
+        def alembic(*args):
+            return subprocess.run(
+                ["alembic", *args], cwd=BACKEND, env=env, check=True, capture_output=True, text=True
+            ).stdout
+    
+>       assert "06a_0001" in alembic("heads")
+E       AssertionError: assert '06a_0001' in '03a_0001 (03a) (effective head)\n03b_0001 (03b) (head)\n04a_0001 (04a) (head)\n05a_0001 (05a) (head)\n06a_0002 (06a) (head)\n07_0001 (07) (head)\n08_0001 (08) (head)\n'
+E        +  where '03a_0001 (03a) (effective head)\n03b_0001 (03b) (head)\n04a_0001 (04a) (head)\n05a_0001 (05a) (head)\n06a_0002 (06a) (head)\n07_0001 (07) (head)\n08_0001 (08) (head)\n' = <function test_06a_schema_migration_round_trip.<locals>.alembic at 0x7fb1557e2ca0>('heads')
+
+tests/integration/test_06a_schema.py:106: AssertionError
+=========================== short test summary info ============================
+FAILED tests/integration/test_06a_schema.py::test_06a_schema_migration_round_trip
+1 failed, 55 passed in 42.81s

@@ -1,0 +1,60 @@
+......F...                                                               [100%]
+=================================== FAILURES ===================================
+_________ test_116_4_sweep_closes_waiting_user_run_with_deleted_source _________
+
+world = {'settings': Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('****...UUID('c4fddab6-84c5-4b06-9342-a9dd2b57d102'), 'admin': <starlette.testclient.TestClient object at 0x7f32285b8e30>, ...}
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_3bf2a863f03b) at 0x7f3228353da0>
+
+    def test_116_4_sweep_closes_waiting_user_run_with_deleted_source(world, pg):
+        doc_id = _document(world)
+        d = definition(ask_user=True)
+        run_id = seed_run(pg, world["project"], d)
+        model = ScriptedModel(turn(tools=[("ask_user_question", {"question": "Hangi sözleşme?"})]))
+        ports = Ports(model, ScriptedRetriever([_hit(doc_id)]))
+        assert world["harness"].run(run_id, ports) == "waiting_user"
+        _delete(world, doc_id)
+    
+        closed = asyncio.run(checkpoints.sweep(world["settings"]))
+        assert str(run_id) in closed["source_deleted"]
+        row = run_row(pg, run_id)
+        assert (row["status"], row["error_code"]) == ("failed", "source_deleted")
+        assert [p["code"] for _, t, p in events(pg, run_id) if t == "error"] == ["source_deleted"]
+        assert stream(run_id)[-1][1] == "error"
+>       _no_rows(pg, run_id)
+
+tests/integration/test_116_checkpoint_sources.py:232: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_3bf2a863f03b) at 0x7f3228353da0>
+run_id = UUID('8e646b82-4bd1-41ce-a0e1-59b0bfa4cac9')
+
+    def _no_rows(pg, run_id):
+>       assert _thread_rows(pg, run_id) == dict.fromkeys(TABLES, 0)
+E       AssertionError: assert {'checkpoints...t_writes': 25} == {'checkpoints...nt_writes': 0}
+E         
+E         Differing items:
+E         {'checkpoints': 7} != {'checkpoints': 0}
+E         {'checkpoint_writes': 25} != {'checkpoint_writes': 0}
+E         {'checkpoint_blobs': 13} != {'checkpoint_blobs': 0}
+E         Use -v to get more diff
+
+tests/integration/test_116_checkpoint_sources.py:129: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+2026-10-31 07:40:33,130 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-31 07:40:33,146 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=157
+2026-10-31 07:40:33,221 INFO ffcore.access access method=POST path=/api/v1/projects/c4fddab6-84c5-4b06-9342-a9dd2b57d102/knowledge-bases status=201 ms=71
+------------------------------ Captured log setup ------------------------------
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=157
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/c4fddab6-84c5-4b06-9342-a9dd2b57d102/knowledge-bases status=201 ms=71
+----------------------------- Captured stderr call -----------------------------
+2026-10-31 07:40:33,320 INFO ffcore.access access method=POST path=/api/v1/projects/c4fddab6-84c5-4b06-9342-a9dd2b57d102/knowledge-bases/19c4f6b8-7407-4fad-b9b9-3117f54cae24/documents status=202 ms=93
+2026-10-31 07:40:33,648 INFO ffcore.runtime runs_marked_source_deleted count=1
+2026-10-31 07:40:33,652 INFO ffcore.access access method=DELETE path=/api/v1/projects/c4fddab6-84c5-4b06-9342-a9dd2b57d102/knowledge-bases/19c4f6b8-7407-4fad-b9b9-3117f54cae24/documents/8901ae54-fb9d-4798-990b-4bc8f76b4731 status=204 ms=73
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/c4fddab6-84c5-4b06-9342-a9dd2b57d102/knowledge-bases/19c4f6b8-7407-4fad-b9b9-3117f54cae24/documents status=202 ms=93
+INFO     ffcore.runtime:checkpoints.py:105 runs_marked_source_deleted count=1
+INFO     ffcore.access:logging.py:263 access method=DELETE path=/api/v1/projects/c4fddab6-84c5-4b06-9342-a9dd2b57d102/knowledge-bases/19c4f6b8-7407-4fad-b9b9-3117f54cae24/documents/8901ae54-fb9d-4798-990b-4bc8f76b4731 status=204 ms=73
+=========================== short test summary info ============================
+FAILED tests/integration/test_116_checkpoint_sources.py::test_116_4_sweep_closes_waiting_user_run_with_deleted_source
+1 failed, 9 passed in 13.87s

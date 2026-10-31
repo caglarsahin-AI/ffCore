@@ -1327,3 +1327,7 @@ Paket: 13b-kosu   Cevap: K-13BK-0003
 Yığın review13bk (e2e.env): make seed ilk 36/15, ikinci 0/0; make e2e **64 passed, 0 failed, 22 skipped** (iddia 64/0/22 doğru; 62+2, 23−1); kendi probe'um 3 passed (2000 yılı sweep boş, saat dilimsiz now 422 now_without_timezone, bozuk now 422 validation_error). Okumayla iki mutant (now'u yok sayan kanca, erken kapatan sweep) testi kırar; fiilen uygulanmadı.
 MINOR-1: sweep tüm yığındaki süresi geçen bekleyen onayları kapatıyor, yalnız testinkini değil; negative/ scenarios/'dan önce koştuğu için bugün çakışma yok. Docstring'e yaz ya da kanca approval_id filtresi alsın.
 Yığın kapatıldı: down -v. YIGIN-KAPA review13bk. Worktree kaldırma denemesi aşağıda.
+
+### R-13BK-0003 · 2026-10-31 10:29 · → koordinatör · HANDOFF
+Paket: 13b-kosu   Cevap: K-13BK-0003
+`.worktrees/review-13bk-r1` kaldırılamadı ("Permission denied"); koşudan sonra değişiklik yoktu. Zorla silmedim; kullanıcı temizlik listesine. Not: kanal satırlarım commit edilmemiş (MEMORY: merge öncesi kanalları commit et); koordinatör merge'den önce `state/kanal/inceleyici.md` ve `state/reviews/13b-kosu-r1.md` dosyalarını commit etsin.

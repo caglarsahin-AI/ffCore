@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-a-116 (önceki lease ffcore-isci-a-13ba RETIRED)
 - Aktif paket: fix/06a-checkpoint-sources (FOLLOWUP-116, K-116-0001)
 - Durum: ACTIVE
-- Son okunan: K-116-0002 (CEVAP, A şartlı onay)
+- Son okunan: K-116-0003 (YIGIN-AÇ onayı)
 
 ## Mesajlar
 
@@ -1110,3 +1110,26 @@ Alındı; PLANNED onaylı, sınıf [B]. Uygulanacak: (1) `runs.checkpoint_delete
 ### A-116-0006 · 2026-10-31 11:20 · → koordinator · YIGIN-AÇ 116
 Paket: fix/06a-checkpoint-sources   Cevap: K-116-0002
 Proje ffcore-116, FFCORE_VERSION=0.0.0-116, BACKEND_PORT=18070 FRONTEND_PORT=13070, --env-file .env.test --profile test --profile qdrant; worktree .worktrees/fix/06a-checkpoint-sources. Amaç: kırmızı integration testleri + make test-int. Şu an açık: review13bk (inceleyici, 19 konteyner) ve kullanıcının ayrı projesi airflow_project_dev (5 konteyner, ffcore değil). Benimkiyle iki ffcore yığını olur; sıra verene kadar açmıyorum, kod ve unit testlerle ilerliyorum.
+
+### A-116-0007 · 2026-10-31 10:59 · → koordinator · YIGIN-KAPA 116
+Paket: fix/06a-checkpoint-sources   Cevap: K-116-0003
+`down -v` exit 0; ffcore-116 konteyner 0, volume 0. İmajlar `ffcore/{tools,backend,frontend}:0.0.0-116` = `0.0.0-main` etiketi kaldı (silme listende).
+
+### A-116-0008 · 2026-10-31 10:59 · → koordinator · DURUM
+Paket: fix/06a-checkpoint-sources   Cevap: K-116-0002
+DURUM: VERIFIED. HEAD 94f3e07843d3089221f94bd1401482af7c3cae2a (e5074ab üstüne 1 commit, 12 dosya, touch-zone + K-116-0002 genişletmesi içinde; state/ yok).
+Kapılar (tee, state/pr/06a-checkpoint-sources-kapilar/): make lint 0; make test llmaas 727/727, airgap 727/727; make test-int 541 passed + 4 opt-in atlandı (425 s). Kırmızı önce: red-1 (modül yok), red-2 (iskelet: 8 davranış hatası, thread satırları 26/40/47, sources'ta text).
+K-116-0002 şartları: (1) `runs.checkpoint_deleted_at` + idempotent süpürge (terminal AND NULL), başarısız silme NULL bırakır, 24 saatte `checkpoint_purge_overdue` log'u (test_116_5, _7); (2) belge ve KB silme canlı koşuları `runs.source_deleted_at` ile işaretler; boundary, resume ve süpürge `failed`/`source_deleted` + thread silme (test_116_3, _4, _10, _11); (3) `source_deleted` docs hata kodları tablosunda, C9 durum/olay değişmedi; (4) üç tabloda 0 satır, events.py sources/tool_result gövdesinde metin yok (DB + Redis), `GET /events` sources `[deleted]` (test_116_2, _3); `?now=` kancası gerekmedi, süpürge testte doğrudan `now` ile; (5) FOLLOWUP-119 NOT_RUN gerekçeli; (6) önyüz bulgusu aşağıda.
+Not: test_07_worker.py'de 07 cron testi tek cron varsayıyordu; adıyla seçecek şekilde değişti (davranış aynı).
+
+### A-116-0009 · 2026-10-31 10:59 · → koordinator · PR-HAZIR
+Paket: fix/06a-checkpoint-sources   Cevap: K-116-0002
+PR: state/pr/06a-checkpoint-sources.md · Branch: fix/06a-checkpoint-sources · SHA: 94f3e07843d3089221f94bd1401482af7c3cae2a · Baz: e5074ab · Sınıf: [B] · push yok. Migration 06a_0002 (06a etiketi, downgrade'li; round-trip gerçek Postgres'te test_06a_schema). Upgrade sonrası eski bitmiş koşuların thread'lerini ilk süpürgeler siler (bilinçli). Branch'e başka commit atmıyorum.
+
+### A-116-0010 · 2026-10-31 10:59 · → koordinator · KAYIT-TALEBI
+Paket: fix/06a-checkpoint-sources   Cevap: K-116-0002
+Üç FOLLOWUP- önerisi, hepsi bu dalın dışında, dokunmadım:
+(1) isci-c (K-116-0002 madde 6): koşu ekranı `frontend/components/run-timeline.tsx:31-33` `GET /runs/{id}/events` gövdelerini ham JSON gösteriyor; `llm_call.request_messages` parça metnini taşıdığından silinen belgenin metni ekranda görünür (FOLLOWUP-119'un ekran yüzü; 03c temizleyene kadar ekran `request_messages`'ı göstermemeli ya da kaynak bloklarını maskelemeli). Test paneli (`agent-test-panel.tsx`, `lib/run-view.ts:90`) SSE `sources`'tan okur: metin yok.
+(2) 07 (isci-b): `source_deleted` ile kapanan bekleyen koşunun onay kaydı `pending` kalır, onay kuyruğunda TTL dolana kadar görünür; sonra 07 süpürgesi `approval_expired_run_not_waiting` loglar. Öneri: kuyruk bitmiş koşunun pending onayını göstermesin ya da kapanışta `expired`/`cancelled` yapılsın (07 kararı).
+(3) 03c: `checkpoint_purge_overdue` yalnız log; 03c uyarı kuralı (`kind` listesine ya da mevcut `service_down` benzeri) ile görünür olsun.
+
