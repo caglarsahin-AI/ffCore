@@ -1,0 +1,10 @@
+E       AssertionError: assert ('Fesih: gizl...tuz gun [1].') == ('[cleared]',..., '[cleared]')
+E         
+E         At index 0 diff: 'Fesih: gizli-parca-116 fesih bildirimi otuz gun [1].' != '[cleared]'
+E         Use -v to get more diff
+E       AssertionError: assert 'Fesih: gizli...otuz gun [1].' == '[cleared]'
+E         
+E         - [cleared]
+E         + Fesih: gizli-parca-116 fesih bildirimi otuz gun [1].
+FAILED tests/integration/test_03c_retention_document_delete.py::test_03c_13_document_delete_clears_run_text
+FAILED tests/integration/test_03c_retention_document_delete.py::test_03c_13_knowledge_base_delete_clears_run_text

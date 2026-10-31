@@ -1,4 +1,52 @@
-no tests ran in 21.53s
-! _pytest.outcomes.Exit: integration services not reachable: fake-llm (profile test) at http://fake-llm:9999. Start them: docker compose --profile test --profile qdrant up -d --wait !
+INFO     ffcore.access:logging.py:263 access method=GET path=/__test03c/whoami status=401 ms=281
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=GET path=/__test03c/whoami status=401 ms=344
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=GET path=/__test03c/whoami status=401 ms=580
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=GET path=/__test03c/whoami status=401 ms=532
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=GET path=/__test03c/whoami status=401 ms=259
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=GET path=/__test03c/whoami status=401 ms=139
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+___________________ test_03c_12_spend_logs_store_no_prompts ____________________
+database_url = 'postgresql+psycopg://ffcore:dummy-not-secret-postgres@postgres:5432/ffcore_test_da77f2c43914'
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_da77f2c43914) at 0x7f761074e3c0>
+catalog = <tests.integration.litellm_support.catalog.<locals>.Catalog object at 0x7f761074dcd0>
+llm_settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...0, langsmith_tracing=False, langchain_tracing_v2=False, api_key_auth_failures_per_min=20, api_key_last_used_flush_s=60)
+litellm_db = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=litellm) at 0x7f761074f920>
+    def test_03c_12_spend_logs_store_no_prompts(database_url, pg, catalog, llm_settings, litellm_db):
+        """K-03c-0004 condition 4: LiteLLM's spend log never keeps prompt or answer text."""
+        from pathlib import Path
+    
+        import yaml
+    
+        config = Path(__file__).resolve().parents[3] / "deploy" / "litellm" / "config.yaml"
+        general = yaml.safe_load(config.read_text(encoding="utf-8"))["general_settings"]
+        assert general["store_prompts_in_spend_logs"] is False
+        project_id = catalog.project()
+        catalog.model(project_id, catalog.provider([project_id]), pricing=PRICED)
+        run_reconcile(database_url, llm_settings)
+        _run(database_url, llm_settings, project_id, uuid.uuid4())
+        rows = litellm_db.execute(
+            'SELECT messages::text, response::text FROM "LiteLLM_SpendLogs"'
+            ' ORDER BY "startTime" DESC LIMIT 5'
+        ).fetchall()
+>       assert rows and all(
+            m in ("{}", "[]", "null", None) and r in ("{}", "null", None) for m, r in rows
+        )
+E       assert ([])
+tests/integration/test_03c_run_quota.py:233: AssertionError
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=1 updated=0 deleted=0 problems=0
+=========================== short test summary info ============================
+FAILED tests/integration/test_rev_03c_probe.py::test_rev_03c_neg_1_blocked_requests_do_not_grow_the_audit_table_without_bound
+FAILED tests/integration/test_03c_keys.py::test_03c_6_auth_failures_rate_limited
+FAILED tests/integration/test_03c_run_quota.py::test_03c_12_spend_logs_store_no_prompts
+3 failed, 239 passed, 1 skipped in 278.24s (0:04:38)
 INT_EXIT=0
 copy_removed

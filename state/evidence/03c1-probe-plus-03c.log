@@ -1,0 +1,102 @@
+2026-10-31 14:09:25,840 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 14:09:25,935 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 14:09:26,136 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 14:09:26,353 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 14:09:26,608 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 14:09:26,875 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 14:09:27,108 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 14:09:27,292 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 14:09:27,581 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 14:09:27,800 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 14:09:27,948 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 14:09:28,080 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 14:09:28,245 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 14:09:28,405 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 14:09:28,562 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 14:09:28,728 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 14:09:28,912 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 14:09:29,089 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 14:09:29,288 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 14:09:29,487 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 14:09:29,674 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 14:09:29,868 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 14:09:30,052 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 14:09:30,317 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 14:09:30,551 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 14:09:30,815 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 14:09:30,975 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 14:09:31,171 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 14:09:31,330 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 14:09:31,515 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 14:09:31,645 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 14:09:31,772 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 14:09:31,903 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 14:09:32,054 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 14:09:32,197 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 14:09:32,342 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 14:09:32,473 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 14:09:32,604 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 14:09:32,734 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 14:09:32,884 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 14:09:33,062 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 14:09:33,221 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 14:09:33,469 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 14:09:33,628 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 14:09:33,758 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 14:09:33,910 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 14:09:34,105 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 14:09:34,253 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 14:09:34,410 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 14:09:34,636 ERROR ffcore.readiness warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+FAILED tests/integration/test_rev_03c_probe.py::test_rev_03c_neg_1_blocked_requests_do_not_grow_the_audit_table_without_bound
+1 failed, 60 passed in 65.16s (0:01:05)

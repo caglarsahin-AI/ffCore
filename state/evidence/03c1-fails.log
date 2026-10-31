@@ -1,0 +1,60 @@
+        print("AUDIT_ROWS_FOR_30_BLOCKED_REQUESTS:", after - before)
+>       assert after - before <= 3, f"{after - before} audit rows for 30 blocked requests"
+E       AssertionError: 30 audit rows for 30 blocked requests
+E       assert (30 - 0) <= 3
+tests/integration/test_rev_03c_probe.py:32: AssertionError
+------------------------------ Captured log setup ------------------------------
+------------------------------ Captured log call -------------------------------
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+=========================== short test summary info ============================
+FAILED tests/integration/test_rev_03c_probe.py::test_rev_03c_neg_1_blocked_requests_do_not_grow_the_audit_table_without_bound
+1 failed, 2 passed in 33.09s
