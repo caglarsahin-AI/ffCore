@@ -1,0 +1,38 @@
+.F..                                                                     [100%]
+=================================== FAILURES ===================================
+___________________ test_07f_3_sweep_hook_404_when_flag_off ____________________
+
+team = (UUID('60507e4e-d353-4713-a4dd-1025ed2a2a17'), {'owner': <starlette.testclient.TestClient object at 0x7f784305d460>, '...ient.TestClient object at 0x7f7896c5baa0>, 'analyst_read': <starlette.testclient.TestClient object at 0x7f7896dbcb90>})
+client_factory = <function client_factory.<locals>.make at 0x7f78977ebd80>
+settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...live_s=0.2, run_event_stream_ttl_s=86400, run_abandon_grace_s=120, langsmith_tracing=False, langchain_tracing_v2=False)
+
+    def test_07f_3_sweep_hook_404_when_flag_off(team, client_factory, settings):  # noqa: F811
+>       assert settings.ffcore_test_hooks is False  # the default: no hook in a normal deployment
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert True is False
+E        +  where True = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...live_s=0.2, run_event_stream_ttl_s=86400, run_abandon_grace_s=120, langsmith_tracing=False, langchain_tracing_v2=False).ffcore_test_hooks
+
+tests/integration/test_07f_followups.py:107: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+2026-10-31 11:02:36,084 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 11:02:36,508 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-31 11:02:36,513 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=416
+2026-10-31 11:02:36,636 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 11:02:36,850 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-31 11:02:36,877 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=239
+2026-10-31 11:02:37,009 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 11:02:37,347 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-31 11:02:37,403 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=391
+------------------------------ Captured log setup ------------------------------
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=416
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=239
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=391
+=========================== short test summary info ============================
+FAILED tests/integration/test_07f_followups.py::test_07f_3_sweep_hook_404_when_flag_off
+1 failed, 3 passed in 61.39s (0:01:01)

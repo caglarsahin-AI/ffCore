@@ -1,0 +1,77 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+__________________ test_116_12_sweep_isolates_a_failing_close __________________
+
+world = {'settings': Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('****...UUID('bfc902df-97f0-4471-8c6d-d88ce53f102b'), 'admin': <starlette.testclient.TestClient object at 0x7f7042ab34d0>, ...}
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_1150294afa0f) at 0x7f704293fb60>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f703c16fcb0>
+
+    def test_116_12_sweep_isolates_a_failing_close(world, pg, monkeypatch):
+        from ffcore.runtime import events as run_events
+    
+        doc_id = _document(world)
+        first, _ = _waiting_approval(world, pg, doc_id)
+        second, _ = _waiting_approval(world, pg, doc_id)
+        _delete(world, doc_id)
+        # The older mark is closed first (order_by source_deleted_at): make it the failing one.
+        pg.execute(
+            "UPDATE runs SET source_deleted_at = source_deleted_at - interval '1 minute'"
+            " WHERE id = %s",
+            (first,),
+        )
+        original = run_events.RunEventWriter.start
+    
+        async def broken_for_first(self):
+            if str(self._run_id) == str(first):
+                raise ConnectionError("redis unreachable")
+            await original(self)
+    
+        monkeypatch.setattr(run_events.RunEventWriter, "start", broken_for_first)
+>       done = asyncio.run(checkpoints.sweep(world["settings"]))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_116_checkpoint_sources.py:336: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.12/asyncio/runners.py:195: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/base_events.py:691: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+ffcore/runtime/checkpoints.py:150: in sweep
+    if await _close_waiting(session, settings, redis, run_id):
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ffcore/runtime/checkpoints.py:124: in _close_waiting
+    await writer.start()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ffcore.runtime.events.RunEventWriter object at 0x7f703c0a3590>
+
+    async def broken_for_first(self):
+        if str(self._run_id) == str(first):
+>           raise ConnectionError("redis unreachable")
+E           ConnectionError: redis unreachable
+
+tests/integration/test_116_checkpoint_sources.py:332: ConnectionError
+---------------------------- Captured stderr setup -----------------------------
+2026-10-31 11:03:04,749 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-31 11:03:04,800 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=619
+2026-10-31 11:03:05,474 INFO ffcore.access access method=POST path=/api/v1/projects/bfc902df-97f0-4471-8c6d-d88ce53f102b/knowledge-bases status=201 ms=669
+------------------------------ Captured log setup ------------------------------
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=619
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/bfc902df-97f0-4471-8c6d-d88ce53f102b/knowledge-bases status=201 ms=669
+----------------------------- Captured stderr call -----------------------------
+2026-10-31 11:03:05,780 INFO ffcore.access access method=POST path=/api/v1/projects/bfc902df-97f0-4471-8c6d-d88ce53f102b/knowledge-bases/943e845f-2002-4fd4-a924-7b4ae7acd594/documents status=202 ms=295
+2026-10-31 11:03:08,110 INFO ffcore.runtime runs_marked_source_deleted count=2
+2026-10-31 11:03:08,145 INFO ffcore.access access method=DELETE path=/api/v1/projects/bfc902df-97f0-4471-8c6d-d88ce53f102b/knowledge-bases/943e845f-2002-4fd4-a924-7b4ae7acd594/documents/49663a6e-f723-482c-88f5-54968f927fc9 status=204 ms=277
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/bfc902df-97f0-4471-8c6d-d88ce53f102b/knowledge-bases/943e845f-2002-4fd4-a924-7b4ae7acd594/documents status=202 ms=295
+INFO     ffcore.runtime:checkpoints.py:105 runs_marked_source_deleted count=2
+INFO     ffcore.access:logging.py:263 access method=DELETE path=/api/v1/projects/bfc902df-97f0-4471-8c6d-d88ce53f102b/knowledge-bases/943e845f-2002-4fd4-a924-7b4ae7acd594/documents/49663a6e-f723-482c-88f5-54968f927fc9 status=204 ms=277
+=========================== short test summary info ============================
+FAILED tests/integration/test_116_checkpoint_sources.py::test_116_12_sweep_isolates_a_failing_close
+1 failed, 9 deselected in 28.34s

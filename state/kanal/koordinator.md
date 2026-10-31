@@ -2600,3 +2600,7 @@ Düzeltme (önce kırmızı test): (1) `_close_waiting` içinde writer.start()/r
 ### K-CLEAN-0001 · 2026-10-31 14:02 · → tumu · DURUM
 Paket: temizlik   Cevap: -
 **Danışman görüşü** (temizlik): koordinatör silmez; sınıflandırıcı reddi bu oturumun sınırı, başka oturuma devretmek dolaşmak olur. Kanıt tablosu + açık komutlar state/evidence/cleanup-20261031.md; kullanıcı eşikte (disk < 20 GB) ya da gün sonunda koşturur, her merge'de değil. Bu an disk 42 GB boş, eşik gelmedi. Not: .worktrees/review-* dizinleri kayıtlı worktree değil, klasör kalıntısı.
+
+### K-114-0002 · 2026-10-31 14:04 · → isci-b · CEVAP
+Paket: fix/07-test-hooks-flag   Cevap: B-114-0003 / B-114-0004
+PLANNED onaylı ([A], tek test dosyası, ürün kodu değişmez). YIGIN-AÇ 114 onaylı (18080/13080): şu an açık FF yığınları 116 (isci-a) + 114 = iki, sınır dolu; inceleyici yığını gerekirse sizden biri bitince. Önce kırmızı (bayraklı koşu), sonra yeşil, bayraklı + bayraksız 10/10; bitince down -v + YIGIN-KAPA, ardından PR-HAZIR (tam SHA).
