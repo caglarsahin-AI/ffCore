@@ -2,7 +2,7 @@
 
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
-- Oturum kimliği: ffcore-koordinator-20261028-0205
+- Oturum kimliği: ffcore-koordinator-20261031
 - Aktif paket: tumu
 - Durum: ACTIVE
 - Son okunan: isci-a A-13b-0001 (oturum ffcore-isci-a-af) (oturum ffcore-isci-a-04awr); isci-b B-07FU-0011 RETIRED (oturum ffcore-isci-b-07fu); isci-c C-10bp2-0019 RETIRED (oturum ffcore-isci-c-10bp2); inceleyici R-AF-0003; test T-18-0045 (oturum ffcore-test-18-hazirlik) (2026-10-30 11:05)
@@ -2509,3 +2509,44 @@ Paket: 13b A tarafı   Cevap: A-13b-0007
 ### K-HANDOFF-20261031-EK · 2026-10-31 00:12 · → koordinatör (yeni oturum) · HANDOFF-EK
 Paket: koordinasyon   Cevap: K-HANDOFF-20261031 / K-INIT-0029
 Kapı yeşil; 13b A MERGED işlendi, FOLLOWUP-115 kapandı, PLAN.md 2.7 satırı ve plan/18 notu eklendi, worktree'ler kaldırıldı. Koşan iş yok; FF yığını kapalı. Kullanıcıya M3 komutları ve yeni test oturumu isteği yazıldı. **Lease artık sende** (`ffcore-koordinator-20261031`); ilk işlerin: isci-a HANDOFF'unu kaydet (RETIRED), kullanıcının yeni test oturumunu (`ROL=test PAKET=13b-kosu`) GOREV'le (F tablosu koşusu `make e2e`, TTL negatif testi `FFCORE_TEST_HOOKS=1` ile, sonuçlar plan/18 Durum'a), PoC sonrası dalga 6 sırasını kullanıcıyla kararlaştır (03c, 06b+116, 11, 04b, 05b, 08 tam+106/107, 09, 10c+112, 12; FOLLOWUP-114 küçük). Eski oturum çekiliyor.
+
+### K-INIT-0030 · 2026-10-31 00:30 · → tumu · DURUM
+Paket: koordinasyon   Cevap: K-INIT-0029
+DURUM: OKUMA-TAMAM (kalan açıklar aşağıda; dispatch öncesi ilgili paketin brief'i yeniden okunur)
+Okunan gruplar: 1 FELSEFE + FELSEFE_UYGULAMA; 2 CLAUDE; 3 PLAN; 4 KARARLAR; 5 handbook: INDEX, EXECUTION_HANDBOOK, CHANGE_CONTROL, MULTI_AGENT_PROTOCOL, SECURITY_AND_PERMISSIONS, CONTRACTS, TERMINOLOGY, TEST_STRATEGY, ENVIRONMENT_AND_COMMANDS, RELEASE_AND_ROLLBACK, CODE_MAP, templates/PR_SABLONU.md; 6 WORK_QUEUE tam (87 satır), BLOCKERS tam (123 satır; açık kayıtlar: 2, 3, 8, 10, 14, 17, 18, 32, 33, 36, 37, 46, 47, 56, 57, 60, 64, 66, 67, 69, 70, 71, 75, 79, 80, 82, 88-90, 93, 95, 97, 98, 100, 101, 102, 103, 105-108, 110-117 ilgili satırlar), koordinator.md son bölüm + K-HANDOFF-20261031, diğer dört kanalın başı ve son mesajları; 7 plan/ brief'leri 03, 04, 05, 06, 08, 09, 10, 11, 12, 14, 15, 16, 18 okundu; 00, 00i, 01, 02, 07, 13, 13a merge edilmiş paketlerdir, okunmadı; plan/17 dosyası yok (M6 sonrası yazılacak, PLAN 9/8 ile uyumlu); 8 BASLATMA tam.
+Okunmayanlar (kanal tam içerikleri): inceleyici, isci-a, isci-b, isci-c, test kanallarının orta bölümleri; koordinator.md'nin ilk ~2400 satırı (yalnız başlık ve son mesajlar okundu). Gerekirse ilgili ID'ler grep ile çekilir.
+Gözlem: ffmain-worker-1 `ModelMissing: BAAI/bge-m3` (BLOCKERS 117, ENV, açık). BLOCKERS 109: önceki prune pinli imajları (minio, qdrant) silmiş; kapı yığınlarında yeniden çekme gerekebilir.
+Açık ilk kararlar (koordinatör, kullanıcı onayı beklenecek): dalga 6 sırası (PLAN 7 ve KARARLAR "PoC sonrası" listesi); M3 sunucu koşusu kullanıcıda.
+
+### K-13BK-0001 · 2026-10-31 00:40 · → test · GOREV
+Paket: 13b-kosu (test rolü)   Cevap: T-13bk-0001
+Koşu: F tablosu (`make seed` iki kez, `make e2e` → eval/results/ altında F tablosu) ve TTL negatif testi (`FFCORE_TEST_HOOKS=1`, FOLLOWUP-111/114 notu: test_07f_3 bayrağı açık ortamda da geçmeli). Brief kaynağı: plan/18-kullanim-senaryolari.md ve docs/demo.md.
+Kanıt: 13b A tam kapı yeşil (state/evidence/gate-13ba-20261030.log: build, lint, heads, make test iki profil, test-samples, test-int, smoke, önyüz check:api hepsi exit 0; down -v 00:10). 13b A + test MERGED (WORK_QUEUE).
+Yığın: bir yığın (`YIGIN-AÇ 13bk`, portlar 18050/13050, `--profile test --profile qdrant`). Aynı anda en çok iki yığın; şu an boş. Yığını açmadan kanala YIGIN-AÇ yaz, bitince down -v + YIGIN-KAPA.
+Sınır: gerçek model yok; LLM sonuçları fake-llm ile hat kanıtıdır, `declined`/kaynak doğruluğu/judge NOT_RUN gerekçeli. PayCore sunucusu, .env, secret yok. Eşik gevşetilmez; kırmızı kalem olduğu gibi raporlanır (18 kurallar).
+Teslim: DURUM IMPLEMENTED/VERIFIED ve F tablosu sonuçları kanala; negatif test kanıtı; yığın kapanış kanıtı. Yazdığın test kodu kendi touch-zone'unda (tests/e2e/negative/**, data/samples/**).
+ACK bekleniyor.
+
+### K-INIT-0031 · 2026-10-31 · → tumu · DURUM
+Paket: koordinasyon   Cevap: K-HANDOFF-20261031-EK
+DURUM: OKUMA-KISMEN (görev dağıtılmadı; aşağıdaki açıklar kapanmadan GOREV/DUZELT/REVIEW-ISTEK yok)
+Okunan gruplar: 1 FELSEFE + FELSEFE_UYGULAMA tam; 2 CLAUDE tam; 3 PLAN tam (v2.7 geçmiş satırı dahil); 4 KARARLAR tam (157 satır); 5 handbook: INDEX, EXECUTION_HANDBOOK, CONTRACTS, CHANGE_CONTROL, MULTI_AGENT_PROTOCOL, SECURITY_AND_PERMISSIONS, TEST_STRATEGY, RELEASE_AND_ROLLBACK, TERMINOLOGY, ENVIRONMENT_AND_COMMANDS, CODE_MAP, templates/PR_SABLONU tam; 6 WORK_QUEUE tam (satır hücreleri 900 karaktere kırpılı okundu), BLOCKERS yalnız açık/başlık satırları (kayıtların tam metni değil), HANDOFF tam, kanallar: koordinator başı + son bölüm, test son bölüm, inceleyici son bölüm, diğerlerinin başlıkları; 8 BASLATMA tam.
+Okunmayanlar: 7 plan/ brief'lerinin tamamı bu oturumda okunmadı (önceki koordinatör 03-16, 18'i okuduğunu yazmıştı; ben doğrulamadım); kanalların orta bölümleri; BLOCKERS kayıt gövdeleri.
+Gözlem: test işçisi T-13bk-0005 PR-HAZIR verdi: feat/13bk-ttl-negative @ 8fd02bd49b6e394a148cc4f8302c941c6ebde53a (yalnız tests/e2e/negative/test_13b_negative.py, sınıf [A]); ACK/REVIEW-ISTEK henüz yok, SHA'yı ben doğrulamadım. Çalışma ağacında commit edilmemiş state/ değişikliği ve izlenmeyen state/pr/13b-kosu.md, assets/mimari-ffcore.html var.
+
+### K-INIT-0032 · 2026-10-31 · → tumu · DURUM
+Paket: koordinasyon   Cevap: K-INIT-0031
+DURUM: OKUMA-TAMAM (grup 6 için aşağıdaki sınırla)
+Okunan gruplar: 1, 2, 3, 4, 5, 7, 8 tam. 7: plan/00, 00i, 01, 02, 03, 04, 05, 06, 07, 08, 09, 10, 11, 12, 13, 14, 15, 16, 18 tam okundu (plan/17 yok: PLAN 7/8 ile uyumlu, M6 sonrası yazılacak). 6: WORK_QUEUE tam (hücreler 900 karaktere kırpık), HANDOFF tam; BLOCKERS yalnız satır başlıkları (gövdeler okunmadı); kanallar yalnız başlık + son bölümler (koordinator, test, inceleyici). Dispatch öncesi ilgili BLOCKERS kaydı ve kanal ID'si grep ile tam okunacak.
+Gözlem (brief ↔ KARARLAR, doğrulama gerekir): brief 10/11/14/15 hâlâ "Türkçe tek dil/Türkçe önyüz" diyor (ürün dili kararı ve DRIFT-36 ile geçersiz); brief 09/13 "35 soru" diyor, DRIFT-28 33; brief 04 parça/batch değerleri DRIFT-63; brief 06 pub/sub ifadesi K-06a-0002 ile değişti. Bunlar ilgili PoC sonrası paket dispatch edilmeden brief düzeltmesi gerektirir.
+
+### K-13BK-0002 · 2026-10-31 09:25 · → test · ACK
+Paket: 13b-kosu   Cevap: T-13bk-0005
+PR-HAZIR alındı. Doğrulandı: feat/13bk-ttl-negative = 8fd02bd49b6e394a148cc4f8302c941c6ebde53a, main 3fa8a60 üstünde tek commit, tek dosya (tests/e2e/negative/test_13b_negative.py, +80/-4), touch-zone içinde. REVIEW-ISTEK inceleyiciye gitti (yığınlı, K-INC-0008). Olayın (integration testi e2e yığınında) kaydı FOLLOWUP-118; kural: entegrasyon testi e2e yığınında koşmaz. İşçi kanıtları (64/0/22) sana ait iddia; ben koşmadım. Yığın kapalı, bekle; DUZELT gelirse uygula.
+
+### K-13BK-0003 · 2026-10-31 09:25 · → inceleyici · REVIEW-ISTEK
+Paket: 13b-kosu   Cevap: -
+Tam SHA: 8fd02bd49b6e394a148cc4f8302c941c6ebde53a (feat/13bk-ttl-negative, baz main 3fa8a60, 1 commit, 1 dosya). PR: state/pr/13b-kosu.md. Sınıf [A], yalnız test.
+Kapsam: onay TTL negatif testi (FOLLOWUP-111 kancası, FFCORE_TEST_HOOKS=1): test_13b_neg_approval_1 (expires_at∓1 s, expired + run failed approval_expired, geç onay 409, ticket-desk'e yanıt 0, idempotent), test_13b_neg_approval_2 (kimliksiz 401, üye 403 service_account_required).
+K-INC-0008 gereği yığınlı: YIGIN-AÇ review-13bk, portlar BACKEND_PORT=18060 FRONTEND_PORT=13060, FFCORE_VERSION=0.0.0-review-13bk, e2e.env örtüsü. Sıra: make seed ×2, make e2e (iddia 64/0/22), kendi negatif probe'un (ör. sweep süresi dolmamış onayı kapatmıyor; bayraksız kanca 404), kod okuması (mutant testin gerçekten kırılgan mı). Bitince down -v + YIGIN-KAPA. Kural: iki yığın sınırı, şu an açık yığın yok. Entegrasyon testlerini bu yığında koşma (FOLLOWUP-118).
+Kanıt dışı: gerçek model/airgap NOT_RUN kabul. Rapor: state/reviews/13b-kosu-r1.md.
