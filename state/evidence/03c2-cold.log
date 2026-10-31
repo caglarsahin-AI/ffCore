@@ -1,0 +1,39 @@
+..F..............................                                        [100%]
+=================================== FAILURES ===================================
+_ test_rev_03c2_neg_3_reconcile_stop_does_not_swallow_the_callers_cancellation _
+
+    def test_rev_03c2_neg_3_reconcile_stop_does_not_swallow_the_callers_cancellation():
+        from ffcore.services.litellm_reconcile import ReconcileScheduler
+    
+        async def main():
+            scheduler = ReconcileScheduler.__new__(ReconcileScheduler)
+            scheduler._dirty = True
+    
+            async def forever():
+                await asyncio.sleep(3600)
+    
+            scheduler._task = asyncio.create_task(forever())
+            outer = asyncio.create_task(scheduler.stop())
+            await asyncio.sleep(0)
+            await asyncio.sleep(0)
+            outer.cancel()
+            try:
+                await outer
+            except asyncio.CancelledError:
+                return "cancelled"
+            return "swallowed"
+    
+        result = asyncio.run(main())
+        print("STOP_CALLER_CANCEL:", result)
+>       assert result == "cancelled"
+E       AssertionError: assert 'swallowed' == 'cancelled'
+E         
+E         - cancelled
+E         + swallowed
+
+tests/integration/test_rev_03c2_probe.py:74: AssertionError
+----------------------------- Captured stdout call -----------------------------
+STOP_CALLER_CANCEL: swallowed
+=========================== short test summary info ============================
+FAILED tests/integration/test_rev_03c2_probe.py::test_rev_03c2_neg_3_reconcile_stop_does_not_swallow_the_callers_cancellation
+1 failed, 32 passed in 57.35s

@@ -1,0 +1,42 @@
+            outer.cancel()
+            try:
+                await outer
+            except asyncio.CancelledError:
+                return "cancelled"
+            return "swallowed"
+    
+        result = asyncio.run(main())
+        print("STOP_CALLER_CANCEL:", result)
+>       assert result == "cancelled"
+E       AssertionError: assert 'swallowed' == 'cancelled'
+E         
+E         - cancelled
+E         + swallowed
+tests/integration/test_rev_03c2_probe.py:74: AssertionError
+____________________ test_03c_6_auth_failures_rate_limited _____________________
+app = <fastapi.applications.FastAPI object at 0x7f8019cd7dd0>
+owner = (UUID('64033a84-5ba3-4490-8f93-d4f71f57973e'), <starlette.testclient.TestClient object at 0x7f7ffe775310>)
+probe = <function acl_role_of at 0x7f801a737380>
+app_settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...0, langsmith_tracing=False, langchain_tracing_v2=False, api_key_
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_0c6996953bb6) at 0x7f7ffe79a060>
+    def test_03c_6_auth_failures_rate_limited(app, owner, probe, app_settings, pg):
+        project, client = owner
+        created = _create(client, project)
+        # A fresh address per run (r1 MINOR-1): the per-address budget lives a minute in Redis.
+        ip = f"10.{uuid.uuid4().int % 250}.{uuid.uuid4().int % 250}.{uuid.uuid4().int % 250 + 1}"
+        limit = app_settings.api_key_auth_failures_per_min
+        for _ in range(limit):
+            assert _who(app, "ffk_deadbeef_" + "x" * 43, ip=ip).status_code == 401
+        blocked = _who(app, "ffk_deadbeef_" + "x" * 43, ip=ip)
+>       assert blocked.status_code == 429
+E       assert 401 == 429
+E        +  where 401 = <Response [401 Unauthorized]>.status_code
+tests/integration/test_03c_keys.py:168: AssertionError
+------------------------------ Captured log setup ------------------------------
+------------------------------ Captured log call -------------------------------
+=========================== short test summary info ============================
+FAILED tests/integration/test_rev_03c2_probe.py::test_rev_03c2_neg_3_reconcile_stop_does_not_swallow_the_callers_cancellation
+FAILED tests/integration/test_03c_keys.py::test_03c_6_auth_failures_rate_limited
+2 failed, 88 passed in 159.14s (0:02:39)
+INT_EXIT=0
+copy_removed

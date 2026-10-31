@@ -1,0 +1,334 @@
+cd backend && QDRANT_URL=http://qdrant:6333 RUN_QDRANT_TESTS=1 pytest tests/integration
+============================= test session starts ==============================
+platform linux -- Python 3.12.10, pytest-9.2.0, pluggy-1.7.0
+rootdir: /work/backend
+configfile: pyproject.toml
+plugins: Faker-40.43.0, anyio-4.15.1, langsmith-0.14.8
+collected 671 items
+
+tests/integration/test_01_client.py .......                              [  1%]
+tests/integration/test_01_events.py ..F                                  [  1%]
+tests/integration/test_01_reconcile.py ...........                       [  3%]
+tests/integration/test_01_reconcile_shutdown.py ..                       [  3%]
+tests/integration/test_01_seed.py ...                                    [  3%]
+tests/integration/test_02_langfuse.py ....                               [  4%]
+tests/integration/test_02_pricing.py .                                   [  4%]
+tests/integration/test_02_r1_worker_logging.py .                         [  4%]
+tests/integration/test_03a_access.py ............                        [  6%]
+tests/integration/test_03a_auth.py ..............                        [  8%]
+tests/integration/test_03a_models.py ...........                         [ 10%]
+tests/integration/test_03a_nonmember_404.py ............F............... [ 14%]
+.....................................................................    [ 24%]
+tests/integration/test_03a_obo_scope.py ................                 [ 27%]
+tests/integration/test_03a_providers.py ................                 [ 29%]
+tests/integration/test_03a_read_side.py .......                          [ 30%]
+tests/integration/test_03a_schema.py .......                             [ 31%]
+tests/integration/test_03b_audit.py ............                         [ 33%]
+tests/integration/test_03b_egress_dns.py s                               [ 33%]
+tests/integration/test_03c_alerts.py ................                    [ 35%]
+tests/integration/test_03c_keys.py .......F......................        [ 40%]
+tests/integration/test_03c_quota_engine.py ............                  [ 42%]
+tests/integration/test_03c_quotas_api.py .......                         [ 43%]
+tests/integration/test_03c_r1_audit_throttle.py .....                    [ 43%]
+tests/integration/test_03c_retention_content.py ...........              [ 45%]
+tests/integration/test_03c_retention_document_delete.py ..               [ 45%]
+tests/integration/test_03c_retention_job.py ...........                  [ 47%]
+tests/integration/test_03c_run_quota.py .......                          [ 48%]
+tests/integration/test_04a_api.py .............                          [ 50%]
+tests/integration/test_04a_embed_api.py ....                             [ 51%]
+tests/integration/test_04a_ingest.py .s..........s                       [ 53%]
+tests/integration/test_04a_qdrant.py ....                                [ 53%]
+tests/integration/test_04a_readyz.py ....                                [ 54%]
+tests/integration/test_04a_review_r1_acl.py ........                     [ 55%]
+tests/integration/test_04a_review_r1_ingest.py ......                    [ 56%]
+tests/integration/test_04a_review_r1_upload.py ..                        [ 56%]
+tests/integration/test_04a_search.py ........                            [ 57%]
+tests/integration/test_04a_store.py ..........                           [ 59%]
+tests/integration/test_04a_worker.py ..                                  [ 59%]
+tests/integration/test_05a_live_services.py .....                        [ 60%]
+tests/integration/test_05a_obo_verify.py .......                         [ 61%]
+tests/integration/test_05a_search.py ........                            [ 62%]
+tests/integration/test_05a_sql.py ..............s.....                   [ 65%]
+tests/integration/test_05a_tools_api.py ................................ [ 70%]
+................                                                         [ 72%]
+tests/integration/test_06a_adapters.py ..                                [ 73%]
+tests/integration/test_06a_agents.py ........                            [ 74%]
+tests/integration/test_06a_feedback.py .....                             [ 74%]
+tests/integration/test_06a_graph.py ............................         [ 79%]
+tests/integration/test_06a_mcp_tools.py ............                     [ 80%]
+tests/integration/test_06a_read_side.py .                                [ 81%]
+tests/integration/test_06a_readyz.py ..                                  [ 81%]
+tests/integration/test_06a_run_access.py ..........                      [ 82%]
+tests/integration/test_06a_runs_api.py .........                         [ 84%]
+tests/integration/test_06a_scheduler.py .......                          [ 85%]
+tests/integration/test_06a_schema.py .........                           [ 86%]
+tests/integration/test_07_api_read.py ............                       [ 88%]
+tests/integration/test_07_decide.py .........                            [ 89%]
+tests/integration/test_07_flow.py ..........                             [ 91%]
+tests/integration/test_07_schema.py ...........                          [ 92%]
+tests/integration/test_07_service.py ........                            [ 94%]
+tests/integration/test_07f_followups.py ....                             [ 94%]
+tests/integration/test_07f_sql_context_roles.py ..                       [ 94%]
+tests/integration/test_08_api.py ................                        [ 97%]
+tests/integration/test_116_checkpoint_sources.py ..........              [ 98%]
+tests/integration/test_18td_tools_api.py ...                             [ 99%]
+tests/integration/test_af_2b_deleted_source_breadcrumb.py ..             [ 99%]
+tests/integration/test_af_3_updated_at_source.py ...                     [100%]
+
+=================================== FAILURES ===================================
+__________________ test_01_r1_deleted_project_leaves_litellm ___________________
+
+app = <fastapi.applications.FastAPI object at 0x7f6eb1611dc0>
+console = <starlette.testclient.TestClient object at 0x7f6e2eca1a90>
+database_url = 'postgresql+psycopg://ffcore:dummy-not-secret-postgres@postgres:5432/ffcore_test_928b82cbdff8'
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_928b82cbdff8) at 0x7f6eac638cb0>
+catalog = <tests.integration.litellm_support.catalog.<locals>.Catalog object at 0x7f6e2dbe76b0>
+llm_settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+
+    def test_01_r1_deleted_project_leaves_litellm(
+        app, console, database_url, pg, catalog, llm_settings
+    ):
+        """r1 MINOR-1: project deleted through the API -> no target, next reconcile removes it."""
+        project_id = catalog.project()
+        catalog.model(project_id, catalog.provider([project_id]))
+        name = f"{project_key(pg, project_id)}.chat-default"
+        run_reconcile(database_url, llm_settings)
+        db.configure(database_url, pooled=False)  # run_reconcile resets the app's binding
+        assert name in litellm_models(llm_settings)
+    
+        deleted = console.delete(f"/api/v1/projects/{project_id}")
+        assert deleted.status_code == 204, deleted.text
+    
+        async def resolve():
+            async with db.session_scope() as session:
+                return await resolve_target(session, project_id, "chat-default")
+    
+        with pytest.raises(ApiError) as err:
+            asyncio.run(resolve())
+        assert err.value.status_code == 404 and err.value.code == "model_not_found"
+        assert err.value.reason == "project_deleted"
+        report = run_reconcile(database_url, llm_settings)
+>       assert name in report.deleted
+E       AssertionError: assert 'pe00b1c09.chat-default' in []
+E        +  where [] = ReconcileReport(created=[], updated=[], deleted=[], problems=[]).deleted
+
+tests/integration/test_01_events.py:117: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+2026-10-31 16:38:14,865 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 16:38:15,063 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=195
+------------------------------ Captured log setup ------------------------------
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=195
+----------------------------- Captured stderr call -----------------------------
+2026-10-31 16:38:15,127 INFO ffcore.litellm_reconcile litellm_reconciled created=1 updated=0 deleted=0 problems=0
+2026-10-31 16:38:15,275 INFO ffcore.litellm_reconcile litellm_reconciled created=1 updated=0 deleted=1 problems=0
+2026-10-31 16:38:15,390 INFO ffcore.access access method=DELETE path=/api/v1/projects/69851103-69e6-4344-851d-ddd98b9ba5db status=204 ms=70
+2026-10-31 16:38:15,492 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=1 problems=0
+2026-10-31 16:38:15,515 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=1 updated=0 deleted=0 problems=0
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=1 updated=0 deleted=1 problems=0
+INFO     ffcore.access:logging.py:263 access method=DELETE path=/api/v1/projects/69851103-69e6-4344-851d-ddd98b9ba5db status=204 ms=70
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=1 problems=0
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+_ test_03a_nonmember_gets_404_like_missing_project[delete /api/v1/retention/policies/{data_class}/overrides/{project_id}] _
+
+method = 'delete'
+path = '/api/v1/retention/policies/{data_class}/overrides/{project_id}'
+stranger = (UUID('6a39f7d1-49af-47f3-afd6-444aeed1ba87'), <starlette.testclient.TestClient object at 0x7f6e2ca8fef0>)
+make_project = <function make_project.<locals>.make at 0x7f6e28144400>
+
+    @pytest.mark.parametrize(("method", "path"), ROUTES, ids=[f"{m} {p}" for m, p in ROUTES])
+    def test_03a_nonmember_gets_404_like_missing_project(method, path, stranger, make_project):
+        _, client = stranger
+        target = make_project()
+        nonmember = _call(client, method, _fill(path, target))
+        missing = _call(client, method, _fill(path, uuid.uuid4()))
+        if (method, path) in TENANT_ROUTES:
+            assert nonmember.status_code == 403
+            assert nonmember.json()["error"]["code"] == "insufficient_role"
+            assert nonmember.json() == missing.json() and missing.status_code == 403
+            return
+>       assert (nonmember.status_code, nonmember.json()) == (404, NOT_FOUND), nonmember.text
+E       AssertionError: {"error":{"message":"Your role does not allow this.","type":"permission_error","code":"insufficient_role"}}
+E       assert (403, {'error...cient_role'}}) == (404, {'error..._not_found'}})
+E         
+E         At index 0 diff: 403 != 404
+E         Use -v to get more diff
+
+tests/integration/test_03a_nonmember_404.py:104: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+2026-10-31 16:39:08,609 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 16:39:08,827 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-3174573a9e.chat-default code=egress_not_allowlisted
+2026-10-31 16:39:08,828 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p93d77e0c.chat-default code=egress_not_allowlisted
+2026-10-31 16:39:08,828 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-d3235800d8.chat-default code=egress_not_allowlisted
+2026-10-31 16:39:08,828 ERROR ffcore.litellm_reconcile litellm_model_not_written model=proj-687291.chat-default code=egress_not_allowlisted
+2026-10-31 16:39:08,828 ERROR ffcore.litellm_reconcile litellm_model_not_written model=proj-cdb3a6.chat-default code=egress_not_allowlisted
+2026-10-31 16:39:08,828 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=5
+2026-10-31 16:39:08,834 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=223
+------------------------------ Captured log setup ------------------------------
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-3174573a9e.chat-default code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p93d77e0c.chat-default code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-d3235800d8.chat-default code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=proj-687291.chat-default code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=proj-cdb3a6.chat-default code=egress_not_allowlisted
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=5
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=223
+----------------------------- Captured stderr call -----------------------------
+2026-10-31 16:39:08,914 INFO ffcore.access access method=DELETE path=/api/v1/retention/policies/x/overrides/aa46aaee-3794-404d-a1dd-b6f53e13ebd4 status=403 ms=71
+2026-10-31 16:39:08,971 INFO ffcore.access access method=DELETE path=/api/v1/retention/policies/x/overrides/27656ab0-b6ba-4150-851c-daa44ef1d02d status=403 ms=53
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.access:logging.py:263 access method=DELETE path=/api/v1/retention/policies/x/overrides/aa46aaee-3794-404d-a1dd-b6f53e13ebd4 status=403 ms=71
+INFO     ffcore.access:logging.py:263 access method=DELETE path=/api/v1/retention/policies/x/overrides/27656ab0-b6ba-4150-851c-daa44ef1d02d status=403 ms=53
+____________________ test_03c_6_auth_failures_rate_limited _____________________
+
+app = <fastapi.applications.FastAPI object at 0x7f6eb1611dc0>
+owner = (UUID('8fcfca4f-c691-45be-a40a-89d49b4b72fd'), <starlette.testclient.TestClient object at 0x7f6e2cadbb00>)
+probe = <function acl_role_of at 0x7f6eb3127560>
+app_settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_928b82cbdff8) at 0x7f6dd818a2a0>
+
+    def test_03c_6_auth_failures_rate_limited(app, owner, probe, app_settings, pg):
+        project, client = owner
+        created = _create(client, project)
+        # A fresh address per run (r1 MINOR-1): the per-address budget lives a minute in Redis.
+        ip = f"10.{uuid.uuid4().int % 250}.{uuid.uuid4().int % 250}.{uuid.uuid4().int % 250 + 1}"
+        limit = app_settings.api_key_auth_failures_per_min
+        for _ in range(limit):
+            assert _who(app, "ffk_deadbeef_" + "x" * 43, ip=ip).status_code == 401
+        blocked = _who(app, "ffk_deadbeef_" + "x" * 43, ip=ip)
+>       assert blocked.status_code == 429
+E       assert 401 == 429
+E        +  where 401 = <Response [401 Unauthorized]>.status_code
+
+tests/integration/test_03c_keys.py:168: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+2026-10-31 16:40:57,082 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 16:40:57,362 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-31 16:40:57,382 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=297
+------------------------------ Captured log setup ------------------------------
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=297
+----------------------------- Captured stderr call -----------------------------
+2026-10-31 16:40:57,451 INFO ffcore.access access method=POST path=/api/v1/projects/8fcfca4f-c691-45be-a40a-89d49b4b72fd/api-keys status=201 ms=63
+2026-10-31 16:40:57,537 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 16:40:57,611 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-31 16:40:57,618 INFO ffcore.access access method=GET path=/__test03c/whoami status=401 ms=27
+2026-10-31 16:40:57,712 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 16:40:57,775 INFO ffcore.access access method=GET path=/__test03c/whoami status=401 ms=58
+2026-10-31 16:40:57,867 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 16:40:57,949 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-31 16:40:57,954 INFO ffcore.access access method=GET path=/__test03c/whoami status=401 ms=78
+2026-10-31 16:40:58,069 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 16:40:58,143 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-31 16:40:58,147 INFO ffcore.access access method=GET path=/__test03c/whoami status=401 ms=75
+2026-10-31 16:40:58,228 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 16:40:58,306 INFO ffcore.access access method=GET path=/__test03c/whoami status=401 ms=75
+2026-10-31 16:40:58,379 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 16:40:58,450 INFO ffcore.access access method=GET path=/__test03c/whoami status=401 ms=68
+2026-10-31 16:40:58,534 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 16:40:58,614 INFO ffcore.access access method=GET path=/__test03c/whoami status=401 ms=74
+2026-10-31 16:40:58,700 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 16:40:58,772 INFO ffcore.access access method=GET path=/__test03c/whoami status=401 ms=70
+2026-10-31 16:40:58,856 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 16:40:58,921 INFO ffcore.access access method=GET path=/__test03c/whoami status=401 ms=62
+2026-10-31 16:40:59,015 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 16:40:59,093 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-31 16:40:59,097 INFO ffcore.access access method=GET path=/__test03c/whoami status=401 ms=75
+2026-10-31 16:40:59,202 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 16:40:59,296 INFO ffcore.access access method=GET path=/__test03c/whoami status=401 ms=84
+2026-10-31 16:40:59,404 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 16:40:59,485 INFO ffcore.access access method=GET path=/__test03c/whoami status=401 ms=77
+2026-10-31 16:40:59,486 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-31 16:40:59,578 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 16:40:59,643 INFO ffcore.access access method=GET path=/__test03c/whoami status=401 ms=61
+2026-10-31 16:40:59,740 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 16:40:59,795 INFO ffcore.access access method=GET path=/__test03c/whoami status=401 ms=52
+2026-10-31 16:40:59,908 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 16:40:59,989 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-31 16:40:59,994 INFO ffcore.access access method=GET path=/__test03c/whoami status=401 ms=91
+2026-10-31 16:41:00,179 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 16:41:00,247 INFO ffcore.access access method=GET path=/__test03c/whoami status=401 ms=65
+2026-10-31 16:41:00,356 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 16:41:00,438 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-31 16:41:00,444 INFO ffcore.access access method=GET path=/__test03c/whoami status=401 ms=83
+2026-10-31 16:41:00,569 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 16:41:00,689 INFO ffcore.access access method=GET path=/__test03c/whoami status=401 ms=125
+2026-10-31 16:41:00,691 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-31 16:41:00,781 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 16:41:00,869 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-31 16:41:00,875 INFO ffcore.access access method=GET path=/__test03c/whoami status=401 ms=92
+2026-10-31 16:41:01,002 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 16:41:01,081 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-31 16:41:01,091 INFO ffcore.access access method=GET path=/__test03c/whoami status=401 ms=87
+2026-10-31 16:41:01,198 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 16:41:01,271 INFO ffcore.access access method=GET path=/__test03c/whoami status=401 ms=70
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/8fcfca4f-c691-45be-a40a-89d49b4b72fd/api-keys status=201 ms=63
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=GET path=/__test03c/whoami status=401 ms=27
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=GET path=/__test03c/whoami status=401 ms=58
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=GET path=/__test03c/whoami status=401 ms=78
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=GET path=/__test03c/whoami status=401 ms=75
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=GET path=/__test03c/whoami status=401 ms=75
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=GET path=/__test03c/whoami status=401 ms=68
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=GET path=/__test03c/whoami status=401 ms=74
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=GET path=/__test03c/whoami status=401 ms=70
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=GET path=/__test03c/whoami status=401 ms=62
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=GET path=/__test03c/whoami status=401 ms=75
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=GET path=/__test03c/whoami status=401 ms=84
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=GET path=/__test03c/whoami status=401 ms=77
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=GET path=/__test03c/whoami status=401 ms=61
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=GET path=/__test03c/whoami status=401 ms=52
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=GET path=/__test03c/whoami status=401 ms=91
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=GET path=/__test03c/whoami status=401 ms=65
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=GET path=/__test03c/whoami status=401 ms=83
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=GET path=/__test03c/whoami status=401 ms=125
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=GET path=/__test03c/whoami status=401 ms=92
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=GET path=/__test03c/whoami status=401 ms=87
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=GET path=/__test03c/whoami status=401 ms=70
+=============================== warnings summary ===============================
+tests/integration/test_04a_worker.py::test_04a_upload_job_runs_in_worker
+tests/integration/test_04a_worker.py::test_04a_job_for_missing_row_retries_then_fails_loud
+  /opt/venv/lib/python3.12/site-packages/arq/worker.py:877: DeprecationWarning: Call to deprecated close. (Use aclose() instead) -- Deprecated since version 5.0.1.
+    await self.pool.close(close_connection_pool=True)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/integration/test_01_events.py::test_01_r1_deleted_project_leaves_litellm
+FAILED tests/integration/test_03a_nonmember_404.py::test_03a_nonmember_gets_404_like_missing_project[delete /api/v1/retention/policies/{data_class}/overrides/{project_id}]
+FAILED tests/integration/test_03c_keys.py::test_03c_6_auth_failures_rate_limited
+======= 3 failed, 664 passed, 4 skipped, 2 warnings in 639.45s (0:10:39) =======
+make: *** [Makefile:31: test-int] Error 1

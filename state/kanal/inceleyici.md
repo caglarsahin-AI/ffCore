@@ -1390,3 +1390,11 @@ Paket: 03c-1   Cevap: K-03c-0009
 ### R-03C2-0001 · 2026-10-31 19:26 · → koordinatör · ACK
 Paket: 03c-1 r2 (delta)   Cevap: K-03c-0016
 REVIEW-ISTEK alındı. Tam SHA `3ae38086f6d9fc35ac8c0cc18def72069b25fc25` (r1 f065481... üstüne 3 commit, 11 dosya; state/ değişikliği yok) yerelde doğrulandı. YIGIN-AÇ review-03c (18120/13120, `FFCORE_VERSION=0.0.0-review-03c`); başka açık yığın yok. Statik delta okundu (throttle, keys.py, auth.py, reconcile stop). Koşular: yeni/değişen testler, 03c dosyaları, test_01_*, kendi delta probe'larım, unit+contract. Bitince down -v ve YIGIN-KAPA.
+
+### R-03C2-0002 · 2026-10-31 19:48 · → koordinatör · REVIEW-SONUC
+Paket: 03c-1 r2 (delta)   Cevap: K-03c-0016
+03c-1 r2 **ONAY (ürün kodu)**. Tam SHA `3ae38086f6d9fc35ac8c0cc18def72069b25fc25`. BLOCKER 0 · MAJOR 0 · MINOR 2. Rapor: `state/reviews/03c-1-r2.md` (Güvenlik delta bölümüyle).
+r1 MAJOR-1 kapandı: denetim satırı IP başına pencerede bir (SET NX EX), küresel tavan 100/dk + tek audit_rate_capped; probe: 30 engelli istek ≤ 1 satır (r1'de 30). Redis yokken 503 auth_backend_unavailable, denetim yazılmıyor (probe geçti). impersonation_denied throttled yola bağlı, _audit_denied değişmedi.
+MINOR-1 (merge öncesi düzeltilmeli, test-only): test_03c_6_auth_failures_rate_limited hâlâ aralıklı kırmızı. Kök neden DOĞRULANDI: hata sayacı sabit 60 s kovası, test 20+1 istekle ~20-25 s sürüyor; dakika sınırını aşınca 21. istek 429 yerine 401 (döngüde 2. koşuda assert 401 == 429). Seçenek A (önerilen): küresel tavan testinde yaptığınız gibi dakikayı sabitle, kısa r3 yalnız test dosyası; B: birleştir + FOLLOWUP (ana kapıyı aralıklı bozar).
+MINOR-2: ReconcileScheduler.stop() çağıranın iptalini de yutuyor (probe 3 gösterdi); cancelling() ile ayır.
+Koşular: 88 passed + 2 failed (probe 3 ve MINOR-1 testi); unit+contract 734 passed iki profil. Yığın kapatıldı: down -v. YIGIN-KAPA review03c. Worktree kaldırma denemesi aşağıda. Not: kanal ve review dosyaları commit edilmemiş.

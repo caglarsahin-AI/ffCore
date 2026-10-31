@@ -1,0 +1,31 @@
+run 1 exit 0 at 46
+run 2 exit 1 at 13
+F                                                                        [100%]
+=================================== FAILURES ===================================
+____________________ test_03c_6_auth_failures_rate_limited _____________________
+app = <fastapi.applications.FastAPI object at 0x7f673e412cf0>
+owner = (UUID('f23191b0-0a1b-4e88-b7b1-52496fe39f32'), <starlette.testclient.TestClient object at 0x7f673e0132f0>)
+probe = <function acl_role_of at 0x7f673f81f740>
+app_settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...0, langsmith_tracing=False, langchain_tracing_v2=False, api_key_auth_failures_per_mi
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_9480d1272511) at 0x7f673e013e90>
+    def test_03c_6_auth_failures_rate_limited(app, owner, probe, app_settings, pg):
+        project, client = owner
+        created = _create(client, project)
+        # A fresh address per run (r1 MINOR-1): the per-address budget lives a minute in Redis.
+        ip = f"10.{uuid.uuid4().int % 250}.{uuid.uuid4().int % 250}.{uuid.uuid4().int % 250 + 1}"
+        limit = app_settings.api_key_auth_failures_per_min
+        for _ in range(limit):
+            assert _who(app, "ffk_deadbeef_" + "x" * 43, ip=ip).status_code == 401
+        blocked = _who(app, "ffk_deadbeef_" + "x" * 43, ip=ip)
+>       assert blocked.status_code == 429
+E       assert 401 == 429
+E        +  where 401 = <Response [401 Unauthorized]>.status_code
+tests/integration/test_03c_keys.py:168: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+------------------------------ Captured log setup ------------------------------
+----------------------------- Captured stderr call -----------------------------
+------------------------------ Captured log call -------------------------------
+=========================== short test summary info ============================
+FAILED tests/integration/test_03c_keys.py::test_03c_6_auth_failures_rate_limited
+1 failed in 21.08s
+LOOP_DONE
