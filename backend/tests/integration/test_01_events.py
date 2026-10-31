@@ -113,6 +113,12 @@ def test_01_r1_deleted_project_leaves_litellm(
         asyncio.run(resolve())
     assert err.value.status_code == 404 and err.value.code == "model_not_found"
     assert err.value.reason == "project_deleted"
-    report = run_reconcile(database_url, llm_settings)
-    assert name in report.deleted
-    assert name not in litellm_models(llm_settings)
+    # FOLLOWUP-75 (03c): the delete publishes a catalog event and the app's own reconcile
+    # removes the model. No explicit reconcile here: two reconciles deleting the same model
+    # race (LiteLLM answers the second /model/delete with 400).
+    import time
+
+    deadline = time.monotonic() + 30
+    while name in litellm_models(llm_settings) and time.monotonic() < deadline:
+        time.sleep(0.5)
+    assert name not in litellm_models(llm_settings), "the delete did not reconcile within 30 s"

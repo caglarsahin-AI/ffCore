@@ -188,6 +188,33 @@ async def system_resolver(host: str, port: int) -> list[str]:
     return list(dict.fromkeys(str(info[4][0]) for info in infos))
 
 
+SMTP_PORTS = (25, 465, 587)
+
+
+async def check_destination(
+    settings: Settings, host: str, port: int, *, resolver: Resolver = system_resolver
+) -> str:
+    """(03c, additive) The same rules for a non-HTTP destination (SMTP): host name (OFFLINE,
+    allowlist), then every resolved address (no private address unless internal). Returns the
+    checked address to dial, so the connection never resolves the name a second time (DNS
+    rebinding); TLS keeps `host` as server_hostname. Only the SMTP ports are accepted."""
+    origin = f"{host}:{port}"
+    if port not in SMTP_PORTS:
+        raise EgressDenied("egress_port_not_allowed", origin, "only SMTP ports 25, 465, 587")
+    policy = EgressPolicy(settings)
+    policy.check_host(host, origin)
+    literal = _parse_ip(host)
+    try:
+        addresses = [str(literal)] if literal is not None else await resolver(host, port)
+    except OSError:
+        raise EgressRequestFailed("egress_dns_failed", origin, "name does not resolve") from None
+    if not addresses:
+        raise EgressDenied("egress_private_address", origin, "no address")
+    for address in addresses:
+        policy.check_address(host, address, port)
+    return addresses[0]
+
+
 class _PinnedBackend(httpcore2.AsyncNetworkBackend):
     """Resolves once per connection, checks every answer, dials the checked address."""
 

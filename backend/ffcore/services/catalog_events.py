@@ -21,7 +21,7 @@ _KEY = "ffcore_catalog_events"
 
 @dataclass(frozen=True)
 class CatalogChanged:
-    kind: str  # provider | provider_projects | model
+    kind: str  # provider | provider_projects | model | project (03c, FOLLOWUP-75)
     action: str  # created | updated | deleted
     resource_id: str
     project_id: str | None = None

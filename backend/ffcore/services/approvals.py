@@ -142,6 +142,9 @@ async def decide(
                 "run_id": str(row.run_id),
                 "action": row.action,
                 "arguments": row.arguments,
+                # 03c (K-03c-0011): what was approved stays provable after retention clears
+                # approvals.arguments.
+                "args_hash": row.args_hash,
                 "assigned_role": row.assigned_role,
                 "note": note,
             },
@@ -308,8 +311,7 @@ async def report_pending_age(
     session: AsyncSession, *, now: datetime, settings: Settings
 ) -> list[Approval]:
     """Pending approvals older than APPROVAL_ALERT_AGE_MIN, each logged once as
-    `approval_pending_age` (brief R6.2; `age_reported_at` marks it). The 03c alert system takes
-    these over when it exists; until then the log line is the signal, nothing is dropped."""
+    `approval_pending_age` (brief R6.2; `age_reported_at` marks it) and emitted as a 03c alert."""
     limit = now - timedelta(minutes=settings.approval_alert_age_min)
     rows = list(
         await session.scalars(
@@ -332,6 +334,16 @@ async def report_pending_age(
             row.project_id,
             age_min,
             row.assigned_role,
+        )
+        # 03c: the same signal as an alert, once per approval.
+        from ffcore.services import alerts
+
+        await alerts.emit(
+            settings,
+            "approval_pending_age",
+            {"approval_id": str(row.id), "age_min": age_min, "assigned_role": row.assigned_role},
+            project_id=row.project_id,
+            dedupe_key=str(row.id),
         )
     return rows
 

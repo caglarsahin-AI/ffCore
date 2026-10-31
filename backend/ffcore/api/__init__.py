@@ -4,6 +4,7 @@ from fastapi import APIRouter
 
 from ffcore.api import (
     agents,
+    alerts,
     approvals,
     approvals_internal,
     audit,
@@ -12,9 +13,11 @@ from ffcore.api import (
     keys,
     knowledge,
     models,
+    notifications,
     projects,
     providers,
     quotas,
+    retention,
     runs,
     tools,
     tools_internal,
@@ -43,5 +46,8 @@ for _module in (
     keys,
     quotas,
     usage,
+    alerts,
+    notifications,
+    retention,
 ):
     api_router.include_router(_module.router)

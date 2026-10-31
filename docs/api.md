@@ -300,10 +300,68 @@ model without a price; their cost is not in `cost_usd`. A row that could not be 
 Usage is reporting only: quotas never read it. LiteLLM is configured not to store prompt or answer
 text in its spend log.
 
+### Retention
+
+Superadmin: `GET /api/v1/retention/policies`, `PUT /retention/policies/{data_class}` (`keep_days`,
+optional `project_id` for a project override; outside the class's min/max: 422
+`retention_out_of_range`), `DELETE /retention/policies/{data_class}/overrides/{override_project_id}`,
+`POST /retention/dry-run` (counts), `POST /retention/run` (removes now), `GET /retention/runs`
+(the removal record, append-only). The daily job (03:00 UTC, background worker) only counts while
+`RETENTION_DRY_RUN=true` (the default). One pass at a time; per class the count is recorded, then
+rows are removed in batches (`RETENTION_BATCH`) and what was removed is recorded; a failing class
+is recorded `partial` and the other classes go on.
+
+| Class | Default (min-max) days | What expires |
+|---|---|---|
+| `content` | 30 (1-90) | prompt and answer text of finished runs: `llm_call.request_messages`, `answer.text`, `question`, tool call and approval arguments, `runs.input/output`, conversation messages, approval arguments (their `args_hash` and the decision's audit row stay). **Conversation contents are cleared after 30 days.** Metrics, timing, outcome and source references stay |
+| `jobs` | 90 (30-365) | every event of terminal runs (the run row stays; waiting runs never) |
+| `telemetry` | 90 (30-400) | `guardrail_events`, `kb_queries` |
+| `alerts` | 180 (90-730) | `alerts` |
+| `usage` | 760 (400-1095) | `usage_daily` |
+| `audit` | 365 (365-3650) | whole monthly `audit_events` partitions older than max(keep_days, 365) days, only when `RETENTION_AUDIT_DROP_ENABLED=true` too: detached, recorded (rows, first/last time, SHA-256), then dropped and audited (`audit_partition_dropped`). 365 days is a floor in code |
+| `traces` | 30 (7-180) | Langfuse keeps its own traces; reported `external:langfuse`. Set Langfuse's own retention in its project settings to match |
+| `metrics`, `results`, `memory` | | no table yet (09, 14); reported `none` |
+
+Deleting a document (or its knowledge base) clears at once the text of every finished run that
+showed it as a source (FOLLOWUP-119); runs still going end `source_deleted` (FOLLOWUP-116) and are
+cleared within a minute after.
+
+### Alerts and notifications
+
+Rules: `/api/v1/projects/{project_id}/alert-rules` (analyst reads, admin changes) and
+`/api/v1/alert-rules` for the installation (superadmin). `kind`, `channel` (`ui`, `email`,
+`webhook`), `recipients`, `params` (`thresholds` for budget_threshold, default 50/80/100;
+`webhook_url`). `GET /api/v1/alert-kinds` lists the kinds something emits today: budget_threshold,
+service_down, quota_warn, approval_pending_age, checkpoint_purge_overdue; any other kind is 422
+`alert_kind_unavailable`. Alerts: `GET .../alerts`, `GET .../alerts/count` (open), `POST
+.../alerts/{id}/ack`. An alert fires once per rule and condition (budget: per month and
+threshold; service_down: per outage; quota_warn: per quota, window and day). Delivery status is in
+`payload.delivery`; a failed delivery is logged `alert_delivery_failed`, never silent.
+
+The evaluator runs every minute in the background worker: `budget_threshold` compares the month's
+`usage_daily` cost with the project's `monthly_usd` quota; `service_down` fires when the API's
+`/readyz` has failed for `ALERT_SERVICE_DOWN_S` (300 s).
+
+Notification settings: `GET|PUT /api/v1/projects/{project_id}/notification-settings` (admin) and
+`/api/v1/notification-settings` (installation, superadmin): `smtp` (`host`, `port` 25/465/587,
+`username`, `password`, `starttls`), `default_webhook_url`, `from_address`. The SMTP password is
+stored encrypted and answered `"***"` (sending `"***"` keeps it). `POST .../notifications/test`
+sends a test mail or webhook (422 `notification_failed` with the delivery code). The mail server
+passes the same outbound rules as HTTP (OFFLINE, EGRESS_ALLOWLIST, no private address unless in
+ALLOWED_INTERNAL_HOSTS) and the connection dials the checked address; webhooks use the safe
+outbound client.
+
+### Readiness
+
+`GET /api/v1/projects/{project_id}/readiness` has five checks: model provider, vector provider,
+project admin, `limits` (an active quota), `alert_rules` (an active rule of the project or the
+installation).
+
 ### Migrations
 
 03c lives on Alembic branch `03c` (`03c_0001`: `api_keys`, `quotas`, `usage_daily`,
-`audit_events.via_key_id`). Roll back: `docker compose run --rm migrate alembic downgrade 03c@-1`.
+`audit_events.via_key_id`; `03c_0002`: `retention_policies`, `retention_runs`, `alert_rules`,
+`alerts`, `notification_settings`, `runs.content_cleared_at`). Roll back: `docker compose run --rm migrate alembic downgrade 03c@-1`.
 
 ## Knowledge bases (04a)
 

@@ -31,6 +31,7 @@ from ffcore.core.audit import audited
 from ffcore.core.auth import Actor, require_role, require_superadmin
 from ffcore.models.catalog import Provider, ProviderProject
 from ffcore.models.identity import ASSIGNABLE_ROLES, Project, ProjectMember, User
+from ffcore.services.catalog_events import CatalogChanged, publish_on_commit
 
 router = APIRouter(prefix="/projects", tags=["projects"], responses=ERROR_RESPONSES)
 
@@ -155,14 +156,21 @@ async def delete_project(
 ) -> None:
     project = await _project(session, project_id)
     project.deleted_at = func.now()
+    # FOLLOWUP-75: LiteLLM drops the project's models now, not at the next full reconcile.
+    publish_on_commit(
+        session, CatalogChanged("project", "deleted", str(project_id), str(project_id))
+    )
 
 
 @router.get(
     "/{project_id}/readiness", response_model=ReadinessOut, summary="Project readiness checks"
 )
 async def get_readiness(project_id: UUID, actor: ProjectReader, session: SessionDep):
-    """Model provider assigned, vector provider assigned, project admin present."""
-    # 03c adds two checks here: at least one limit, at least one active alert rule.
+    """Model provider assigned, vector provider assigned, project admin present; (03c) at least
+    one active limit, at least one active alert rule (the project's or the installation's)."""
+    from ffcore.models.alerts import AlertRule
+    from ffcore.models.quota import Quota
+
     await _project(session, project_id)
 
     async def provider_with(domain: str) -> bool:
@@ -204,6 +212,30 @@ async def get_readiness(project_id: UUID, actor: ProjectReader, session: Session
             key="project_admin",
             ok=admin is not None,
             detail="The project has at least one active member with the admin role.",
+        ),
+        ReadinessCheck(
+            key="limits",
+            ok=await session.scalar(
+                select(Quota.id)
+                .where(Quota.project_id == project_id, Quota.is_active, Quota.deleted_at.is_(None))
+                .limit(1)
+            )
+            is not None,
+            detail="The project has at least one active quota.",
+        ),
+        ReadinessCheck(
+            key="alert_rules",
+            ok=await session.scalar(
+                select(AlertRule.id)
+                .where(
+                    (AlertRule.project_id == project_id) | AlertRule.project_id.is_(None),
+                    AlertRule.is_active,
+                    AlertRule.deleted_at.is_(None),
+                )
+                .limit(1)
+            )
+            is not None,
+            detail="At least one active alert rule covers the project.",
         ),
     ]
     return ReadinessOut(

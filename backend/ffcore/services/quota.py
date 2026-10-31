@@ -396,11 +396,21 @@ class QuotaGate:
     """The quota around one model call of a run (06a adapters) or of the facade (06b):
     `check` before, `hold` for the call, `commit` after. Rules are read once per gate."""
 
-    def __init__(self, engine: QuotaEngine, redis, session: AsyncSession, subject: Subject):
+    def __init__(
+        self,
+        engine: QuotaEngine,
+        redis,
+        session: AsyncSession,
+        subject: Subject,
+        *,
+        settings: Settings | None = None,
+    ):
         self._engine = engine
         self._redis = redis
         self._session = session
         self.subject = subject
+        # (03c-2) For quota_warn alerts; without it a warn is only logged (unit tests).
+        self._settings = settings
         self._rules: list[Rule] | None = None
 
     async def rules(self) -> list[Rule]:
@@ -417,9 +427,29 @@ class QuotaGate:
 
     async def check(self, model_id, *, input_tokens: int) -> Decision:
         priced = not pricing_missing(await self._pricing(model_id))
-        return await self._engine.check(
+        decision = await self._engine.check(
             await self.rules(), self.subject, input_tokens=input_tokens, priced=priced
         )
+        if decision.warnings and self._settings is not None:
+            from ffcore.services import alerts
+
+            day = datetime.now(UTC).strftime("%Y-%m-%d")
+            for warning in decision.warnings:
+                # Once per quota, window and day: a busy key does not flood the channel.
+                await alerts.emit(
+                    self._settings,
+                    "quota_warn",
+                    {
+                        "quota_id": warning.quota_id,
+                        "scope_type": warning.scope_type,
+                        "window": warning.window,
+                        "limit": str(warning.limit),
+                        "used": str(warning.used),
+                    },
+                    project_id=self.subject.project_id,
+                    dedupe_key=f"{warning.quota_id}:{warning.window}:{day}",
+                )
+        return decision
 
     def hold(self):
         return self._engine.hold(self._rules or [], self.subject)

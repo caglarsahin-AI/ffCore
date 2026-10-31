@@ -282,6 +282,11 @@ services:
       # 03c API keys: failed attempts per client address per minute; last_used_at write buffer.
       API_KEY_AUTH_FAILURES_PER_MIN: ${API_KEY_AUTH_FAILURES_PER_MIN:-20}
       API_KEY_LAST_USED_FLUSH_S: ${API_KEY_LAST_USED_FLUSH_S:-60}
+      # 03c retention and alerts: dry run by default, audit partitions need the second flag.
+      RETENTION_DRY_RUN: ${RETENTION_DRY_RUN:-true}
+      RETENTION_AUDIT_DROP_ENABLED: ${RETENTION_AUDIT_DROP_ENABLED:-false}
+      RETENTION_BATCH: ${RETENTION_BATCH:-5000}
+      ALERT_SERVICE_DOWN_S: ${ALERT_SERVICE_DOWN_S:-300}
       RUN_EVENT_STREAM_TTL_S: ${RUN_EVENT_STREAM_TTL_S:-86400}
       ARQ_QUEUE_INTERACTIVE: ${ARQ_QUEUE_INTERACTIVE:-llm-interactive}
       ARQ_QUEUE_BACKGROUND: ${ARQ_QUEUE_BACKGROUND:-llm-background}

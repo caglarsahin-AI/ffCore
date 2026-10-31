@@ -202,7 +202,7 @@ class MemberList(BaseModel):
 
 
 class ReadinessCheck(BaseModel):
-    key: Literal["model_provider", "vector_provider", "project_admin"]
+    key: Literal["model_provider", "vector_provider", "project_admin", "limits", "alert_rules"]
     ok: bool
     detail: str
 
