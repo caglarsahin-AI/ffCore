@@ -392,6 +392,74 @@ class QuotaEngine:
                     await pipe.execute()
 
 
+class QuotaGate:
+    """The quota around one model call of a run (06a adapters) or of the facade (06b):
+    `check` before, `hold` for the call, `commit` after. Rules are read once per gate."""
+
+    def __init__(self, engine: QuotaEngine, redis, session: AsyncSession, subject: Subject):
+        self._engine = engine
+        self._redis = redis
+        self._session = session
+        self.subject = subject
+        self._rules: list[Rule] | None = None
+
+    async def rules(self) -> list[Rule]:
+        if self._rules is None:
+            self._rules = await load_rules(self._session, self.subject.project_id)
+        return self._rules
+
+    async def _pricing(self, model_id) -> dict | None:
+        from ffcore.models.catalog import Model
+
+        return await self._session.scalar(
+            select(Model.pricing).where(Model.id == uuid.UUID(str(model_id)))
+        )
+
+    async def check(self, model_id, *, input_tokens: int) -> Decision:
+        priced = not pricing_missing(await self._pricing(model_id))
+        return await self._engine.check(
+            await self.rules(), self.subject, input_tokens=input_tokens, priced=priced
+        )
+
+    def hold(self):
+        return self._engine.hold(self._rules or [], self.subject)
+
+    async def commit(self, *, call_id: str | None, model_id, model_name: str, usage: dict) -> None:
+        """Counted once per LiteLLM call id (a retried commit never counts twice), then the
+        usage_daily row. A call without a call id is counted and logged (no dedupe key)."""
+        from ffcore.services import usage as usage_rows
+
+        tokens_in = int((usage or {}).get("prompt_tokens") or 0)
+        tokens_out = int((usage or {}).get("completion_tokens") or 0)
+        cost = price(await self._pricing(model_id), tokens_in, tokens_out)
+        if call_id is None:
+            log.warning("quota_commit_without_call_id model=%s", model_name)
+        else:
+            try:
+                first = await self._redis.set(
+                    f"{PREFIX}:committed:{call_id}", "1", nx=True, ex=2 * 86400
+                )
+            except Exception as exc:  # noqa: BLE001
+                log.error("quota_unavailable error=%s", type(exc).__name__)
+                raise QuotaUnavailable() from None
+            if not first:
+                log.info("quota_commit_duplicate call_id=%s", call_id)
+                return
+        await self._engine.commit(
+            await self.rules(), self.subject, Usage(tokens_in, tokens_out, cost)
+        )
+        await usage_rows.record(
+            project_id=self.subject.project_id,
+            model=model_name,
+            api_key_id=self.subject.api_key_id,
+            user_id=self.subject.user_id,
+            input_tokens=tokens_in,
+            output_tokens=tokens_out,
+            cost_usd=cost,
+            redis=self._redis,
+        )
+
+
 def _min(a: int | None, b) -> int | None:
     if b is None:
         return a

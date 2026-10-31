@@ -222,6 +222,9 @@ Every stop is a coded `error` event and the run's `error_code`; nothing ends sil
 | `cancelled`, `abandoned` | explicit cancel; nobody listening past the grace time |
 | `worker_retries_exhausted` | the worker was stopped three times during the run |
 | `source_deleted` | a document the run showed as a source was deleted while the run was still going or waiting; the run does not continue with its text |
+| `quota_exceeded` | a blocking quota of the project, the run's API key or its user has no room for the model call (03c; `limit` names the window, `detail` the quota); the console run fails, the facade (06b) answers 429 |
+| `pricing_missing` | a USD budget applies but the model has no price, so the call could not be counted (03c, FOLLOWUP-69) |
+| `quota_unavailable` | the quota counters (Redis) could not be read or written; the call is not made unlimited |
 | `run_error` | anything else; the worker log has the exception |
 
 API errors at start: `agent_not_published` (404), `run_needs_membership` (403), `variable_unknown`

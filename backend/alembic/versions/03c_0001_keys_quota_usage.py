@@ -103,6 +103,8 @@ def upgrade() -> None:
         sa.Column("output_tokens", sa.BigInteger, server_default="0", nullable=False),
         sa.Column("cost_usd", sa.Numeric(18, 8), server_default="0", nullable=False),
         sa.Column("requests", sa.BigInteger, server_default="0", nullable=False),
+        # Calls on a model without a price: their cost is unknown, never shown as 0 (FOLLOWUP-69).
+        sa.Column("unpriced_requests", sa.BigInteger, server_default="0", nullable=False),
         sa.Column(
             "updated_at", sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False
         ),

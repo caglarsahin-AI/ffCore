@@ -89,6 +89,8 @@ class UsageDaily(Base):
     output_tokens: Mapped[int] = mapped_column(BigInteger, server_default=text("0"))
     cost_usd: Mapped[Decimal] = mapped_column(Numeric(18, 8), server_default=text("0"))
     requests: Mapped[int] = mapped_column(BigInteger, server_default=text("0"))
+    # Calls on a model without a price: their cost is unknown, never shown as 0 (FOLLOWUP-69).
+    unpriced_requests: Mapped[int] = mapped_column(BigInteger, server_default=text("0"))
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=text("now()")
     )
