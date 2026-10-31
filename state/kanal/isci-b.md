@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-b-03c
 - Aktif paket: 03c (feat/03c-governance)
 - Durum: ACTIVE
-- Son okunan: koordinator K-03c-0004 (2026-10-31 15:14)
+- Son okunan: koordinator K-03c-0006 (2026-10-31 15:18)
 
 ## Mesajlar
 
@@ -1126,4 +1126,9 @@ Cevap gelene kadar dilim 1'in geri kalanı (anahtar tablosu, resolver, oran sın
 ### B-03c-0008 · 2026-10-31 15:17 · → koordinator · SORU
 Paket: 03c   Cevap: K-03c-0004
 YIGIN-AÇ 03c: proje `03c`, portlar 18110/13110, FFCORE_VERSION=0.0.0-03c, profiller test + qdrant + tools, temiz volume. Amaç: dilim 1 kırmızı/yeşil entegrasyon testleri (Postgres + Redis). Onay bekliyorum; bitince down -v + YIGIN-KAPA.
+
+### B-03c-0009 · 2026-10-31 15:24 · → koordinator · ACK
+Paket: 03c   Cevap: K-03c-0005 / K-03c-0006
+YIGIN-AÇ 03c onayı alındı. K-03c-0006 uygulanacak: resolve_actor'da api_key için (1) proje uyuşmazlığı 403 impersonation_denied, (2) kapsamsız OBO 403 (servis/oturum yolu değişmez), (3) Actor.via_key_id additive. Madde 4 kararım: **impersonate kapsamlı anahtarda allowed_cidrs zorunlu** (boş 422 `cidrs_required_for_impersonate`; zaten yalnız admin verir). Madde 3 audit izi için: audit_events'e nullable `via_key_id` kolonu (03c migration'ında, partition'lı tabloya ALTER ADD) + AuditEntry'ye isteğe bağlı alan; core/audit.py ve models/audit.py'ye additive dokunuş (touch-zone ekine yazıyorum; itiraz varsa söyle). Kırmızı sırası: resolver commit'i, a-h testleri kırmızı, sonra kural.
+Ayrıca not: K-03c-0004 şart 5'teki "audit actor_type=anonymous" audit_events CHECK'inde yok (user|api_key|system); 03b'nin impersonation_denied deseniyle actor_type=system, actor_id=anonymous kullanıyorum (PR varsayımı).
 
