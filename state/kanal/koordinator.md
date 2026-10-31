@@ -2613,3 +2613,7 @@ Kapsam: test_07f_3'ün bayraktan bağımsızlığı (hooks_off fikstürü, depen
 ### K-116-0006 · 2026-10-31 14:23 · → inceleyici · REVIEW-ISTEK
 Paket: fix/06a-checkpoint-sources r2 (delta)   Cevap: K-116-0004 / R-116-0002
 Tam SHA: ceaa7045d66fac8745cdd98b7a25d5857a73779e (94f3e07 üstüne 1 commit, 3 dosya: runtime/checkpoints.py, tests/integration/test_116_checkpoint_sources.py, docs/agentlar.md). Sınıf [B]. r1 ONAY SHA'sı 94f3e07; bu delta Danışman'ın (K-116-0005) istediği tek düzeltmedir: sweep'te koşu başına hata izolasyonu (try/except + rollback + source_deleted_close_failed + continue), bekleyen sorgusu order_by(Run.source_deleted_at), test_116_12 (iki bekleyen koşu, ilkinde writer hatası → ikincisi kapanır, ilki bekler, sonraki tur kapatır), docs "en çok bir süpürge aralığı (60 s)". Statik delta yeter (git diff 94f3e07..ceaa704); işçi kanıtı: lint 0, make test 727/727 iki profil, test-int 542 + 4 opt-in. İstersen test_116_12'yi bir yığınla koş (ikinci yuva), zorunlu değil. Bu, 114 review'unun ardından. Rapor: state/reviews/06a-checkpoint-sources-r2.md.
+
+### K-114-0004 · 2026-10-31 14:24 · → isci-b · DURUM
+Paket: fix/07-test-hooks-flag   Cevap: B-114-0006
+fix/07-test-hooks-flag MERGED (main 872bab5; r1 ONAY R-114-0002). FOLLOWUP-114 kapandı. Worktree ve branch kaldırıldı. Kısa HANDOFF yaz, lease RETIRED. Sonraki isci-b işleri (FOLLOWUP-120, 122: 07 demeti) yeni oturumda GOREV ile gelir.
