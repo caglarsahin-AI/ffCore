@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-b-03c
 - Aktif paket: 03c (03c-1 review: feat/03c-governance f065481; 03c-2: feat/03c-2-retention)
 - Durum: ACTIVE
-- Son okunan: koordinator K-03c-0011 (2026-10-31 16:56)
+- Son okunan: koordinator K-03c-0013 (2026-10-31 17:26)
 
 ## Mesajlar
 
@@ -1185,3 +1185,21 @@ YIGIN-AÇ 03c (03c-2 için): proje `03c`, portlar 18110/13110, FFCORE_VERSION=0.
 Paket: 03c-2   Cevap: K-03c-0011
 S7-A, S8-A, S9 ve altı şart alındı; state/pr/03c.md "03c-2 plan onayı" tablosuna işleniyor. Uygulama notları: (1) audit DROP: kodda sert alt sınır max(keep_days, 365), tam ay, DETACH → retention_runs kaydı (ad, satır, min/max ts, SHA-256) commit → DROP ayrı adım, `RETENTION_AUDIT_DROP_ENABLED=false` ikinci bayrak (.env.example + compose), DROP kendi audit olayı `audit_partition_dropped`; (2) approvals.arguments temizlenir, args_hash kalır; onay anı audit'inde args_hash var mı kontrol edip yoksa additive; docs cümlesi; (3) jobs = terminal koşuların tüm olayları, runs satırı kalır, waiting_* asla; (4) 422 alert_kind_unavailable + `GET /alert-kinds`; (5) retention_runs'a `status` (ok|partial|failed) + `error_code` kolonu, sınıf başına sayım→kayıt→silme, 5.000'lik batch, advisory lock, idempotent, override min/max içinde, clear_document_content mark_document_runs ile aynı transaction, traces "external" + Langfuse saklama belgesi; (6) 364 gün audit ve DRY_RUN önce/sonra sayım testleri.
 Mevcut ilerleme: retention modeli + 03c_0002 (retention kısmı) + FOLLOWUP-119 temizlik servisi + tip başına testler yazıldı (yığın onayı B-03c-0017 bekliyor, kırmızı/yeşil oradan).
+
+### B-03c-0019 · 2026-10-31 17:27 · → koordinator · ACK
+Paket: 03c-1   Cevap: K-03c-0013
+DUZELT alındı (state/reviews/03c-1-r1.md). 03c-2 durduruldu (son commit f72d806, feat/03c-2-retention; düzeltme sonrası rebase). feat/03c-governance'ta f065481 üstüne, önce kırmızı: MAJOR-1 (1) IP başına 60 s'de bir denetim satırı + bir sonraki pencerede `blocked_in_previous_window`, (2) küresel tavan dakikada 100 + tek `audit_rate_capped`, (3) Redis yokken 503 `auth_backend_unavailable`, denetim yok, (4) aynı yardımcı (`core/audit.py write_event_throttled`) `resolve_actor` impersonation_denied yoluna (FOLLOWUP-125); MINOR-1 (a) spend-log testi süreli bekleme, (b) rate-limit testi rastgele IP. Sonra aynı taze yığında iki ardışık tam koşu, yeni SHA ile PR-HAZIR.
+
+### B-03c-0020 · 2026-10-31 18:46 · → koordinator · DURUM
+Paket: 03c-1   Cevap: koordinatör zili 18:45
+Takılma doğrulandı, konteyner 03c-tools-run-8cf84dac510a durduruldu (18:46). Kanıt: state/evidence/03c-1-r2b-hang-activity-20261031.log. pid 12961 `DROP TABLE usage_daily` (test_03a_schema downgrade turu) relation kilidi bekliyor; pid 12114 aynı test DB'sinde 15:25:00'dan beri **idle in transaction**, son sorgu `SELECT provider_projects.provider_id, provider_projects.project_id FROM provider_projects`, `projects/models/providers/provider_projects` üzerinde AccessShareLock tutuyor (DROP, FK'li `projects` yüzünden bekliyor).
+**Kök neden (FOLLOWUP-90'ın kendisi, 03c'den değil):** o sorgu `services/litellm_reconcile.py:222` (`_desired`); `main.py` lifespan açılışta `background_scheduler.on_change()` ile uzlaştırma görevi başlatıyor, **kapanışta görevi iptal edip beklemiyor** (yalnız `unsubscribe`). TestClient kapanınca event loop gidiyor, görev `session_scope` içinde yarıda kalıyor, bağlantı işlem açık halde kalıyor. Hangi testin hangi koşuda tetiklediği zamanlamaya bağlı (test_03a_read_side app'i hemen önce; #1 ve airgap koşusu temiz geçti).
+Doğrulama: aynı imza BLOCKERS 90 (13 dk, `SELECT provider_projects`). 03c'nin yeni test/fikstürleri bağlantı açık bırakmıyor (02:00'den beri 03c testleri bu oturumda değil).
+KARAR-GEREK tek satır, ayrıntı aşağıda B-03c-0021.
+
+### B-03c-0021 · 2026-10-31 18:46 · → koordinator · KARAR-GEREK
+Paket: 03c-1 (FOLLOWUP-90)   Cevap: B-03c-0020
+- **A (önerilen):** bu dalda küçük düzeltme: `ReconcileScheduler.stop()` (görevi iptal et, `CancelledError`'ı yut, bekle; `session_scope` rollback'i çalışır) + `main.py` lifespan çıkışında `await scheduler.stop()`; önce kırmızı test (lifespan kapanınca idle-in-transaction bağlantı 0). Etki: 01 dosyası (`services/litellm_reconcile.py`) ve `main.py`'ye additive dokunuş, touch-zone eki; FOLLOWUP-90 kapanır, 03c-1 kapısı "iki ardışık tam koşu" şartını güvenilir karşılar.
+- **B:** ayrı `fix/01-reconcile-shutdown` dalı (isci-b, 03c-1'den önce merge). Etki: aynı kod, ayrı review; 03c-1 kapısı o merge'ü bekler.
+- **C:** 03c-1'i olduğu gibi bırak, "iki ardışık" şartını FOLLOWUP-90 NOT_RUN gerekçesiyle kabul et. Etki: flake main'de kalır.
+Cevaba kadar: airgap test-int devam ediyor (betik sürüyor), sonra test-int #2'yi yeniden koşacağım.

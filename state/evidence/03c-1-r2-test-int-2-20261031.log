@@ -1,0 +1,180 @@
+cd backend && QDRANT_URL=http://qdrant:6333 RUN_QDRANT_TESTS=1 pytest tests/integration
+============================= test session starts ==============================
+platform linux -- Python 3.12.10, pytest-9.2.0, pluggy-1.7.0
+rootdir: /work/backend
+configfile: pyproject.toml
+plugins: Faker-40.43.0, anyio-4.15.1, langsmith-0.14.8
+collected 618 items
+
+tests/integration/test_01_client.py .......                              [  1%]
+tests/integration/test_01_events.py ...                                  [  1%]
+tests/integration/test_01_reconcile.py ...........                       [  3%]
+tests/integration/test_01_seed.py ...                                    [  3%]
+tests/integration/test_02_langfuse.py ....                               [  4%]
+tests/integration/test_02_pricing.py .                                   [  4%]
+tests/integration/test_02_r1_worker_logging.py .                         [  4%]
+tests/integration/test_03a_access.py ............                        [  6%]
+tests/integration/test_03a_auth.py ..............                        [  9%]
+tests/integration/test_03a_models.py ...........                         [ 10%]
+tests/integration/test_03a_nonmember_404.py ............................ [ 15%]
+..........................................................               [ 24%]
+tests/integration/test_03a_obo_scope.py ................                 [ 27%]
+tests/integration/test_03a_providers.py ................                 [ 29%]
+tests/integration/test_03a_read_side.py .......                          [ 31%]
+tests/integration/test_03a_schema.py .......                             [ 32%]
+tests/integration/test_03b_audit.py ............                         [ 34%]
+tests/integration/test_03b_egress_dns.py s                               [ 34%]
+tests/integration/test_03c_keys.py ..............................        [ 39%]
+tests/integration/test_03c_quota_engine.py ............                  [ 41%]
+tests/integration/test_03c_quotas_api.py .......                         [ 42%]
+tests/integration/test_03c_r1_audit_throttle.py ...F.                    [ 43%]
+tests/integration/test_03c_run_quota.py .......                          [ 44%]
+tests/integration/test_04a_api.py .............                          [ 46%]
+tests/integration/test_04a_embed_api.py ....                             [ 46%]
+tests/integration/test_04a_ingest.py .s..........s                       [ 49%]
+tests/integration/test_04a_qdrant.py ....                                [ 49%]
+tests/integration/test_04a_readyz.py ....                                [ 50%]
+tests/integration/test_04a_review_r1_acl.py ........                     [ 51%]
+tests/integration/test_04a_review_r1_ingest.py ......                    [ 52%]
+tests/integration/test_04a_review_r1_upload.py ..                        [ 52%]
+tests/integration/test_04a_search.py ........                            [ 54%]
+tests/integration/test_04a_store.py ..........                           [ 55%]
+tests/integration/test_04a_worker.py ..                                  [ 56%]
+tests/integration/test_05a_live_services.py .....                        [ 56%]
+tests/integration/test_05a_obo_verify.py .......                         [ 58%]
+tests/integration/test_05a_search.py ........                            [ 59%]
+tests/integration/test_05a_sql.py ..............s.....                   [ 62%]
+tests/integration/test_05a_tools_api.py ................................ [ 67%]
+................                                                         [ 70%]
+tests/integration/test_06a_adapters.py ..                                [ 70%]
+tests/integration/test_06a_agents.py ........                            [ 72%]
+tests/integration/test_06a_feedback.py .....                             [ 72%]
+tests/integration/test_06a_graph.py ............................         [ 77%]
+tests/integration/test_06a_mcp_tools.py ............                     [ 79%]
+tests/integration/test_06a_read_side.py .                                [ 79%]
+tests/integration/test_06a_readyz.py ..                                  [ 79%]
+tests/integration/test_06a_run_access.py ..........                      [ 81%]
+tests/integration/test_06a_runs_api.py .........                         [ 82%]
+tests/integration/test_06a_scheduler.py .......                          [ 83%]
+tests/integration/test_06a_schema.py .........                           [ 85%]
+tests/integration/test_07_api_read.py ............                       [ 87%]
+tests/integration/test_07_decide.py .........                            [ 88%]
+tests/integration/test_07_flow.py ..........                             [ 90%]
+tests/integration/test_07_schema.py ...........                          [ 92%]
+tests/integration/test_07_service.py ........                            [ 93%]
+tests/integration/test_07f_followups.py ....                             [ 94%]
+tests/integration/test_07f_sql_context_roles.py ..                       [ 94%]
+tests/integration/test_08_api.py ................                        [ 97%]
+tests/integration/test_116_checkpoint_sources.py ..........              [ 98%]
+tests/integration/test_18td_tools_api.py ...                             [ 99%]
+tests/integration/test_af_2b_deleted_source_breadcrumb.py ..             [ 99%]
+tests/integration/test_af_3_updated_at_source.py ...                     [100%]
+
+=================================== FAILURES ===================================
+_________________________ test_03c_6_global_audit_cap __________________________
+
+database_url = 'postgresql+psycopg://ffcore:dummy-not-secret-postgres@postgres:5432/ffcore_test_abe1eacdc7c8'
+app_settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...0, langsmith_tracing=False, langchain_tracing_v2=False, api_key_auth_failures_per_min=20, api_key_last_used_flush_s=60)
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_abe1eacdc7c8) at 0x7fe6ec24e1e0>
+
+    def test_03c_6_global_audit_cap(database_url, app_settings, pg):
+        scope = f"t03c:{uuid.uuid4().hex}"
+        ips = [_ip() for _ in range(200)]
+        calls = [
+            (_entry(ip, "probe_03c_cap"), {"key": ip, "scope": scope, "global_cap": 100}) for ip in ips
+        ]
+        written = _throttled(database_url, app_settings, calls)
+>       assert sum(written) == 100
+E       assert 162 == 100
+E        +  where 162 = sum([True, True, True, True, True, True, ...])
+
+tests/integration/test_03c_r1_audit_throttle.py:114: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2026-10-31 14:52:01,906 WARNING ffcore.audit audit_rate_capped scope=t03c:8f185da00e4f476eb4f1905c8e808ee5 action=probe_03c_cap
+2026-10-31 14:52:01,909 WARNING ffcore.audit audit_rate_capped scope=t03c:8f185da00e4f476eb4f1905c8e808ee5 action=probe_03c_cap
+2026-10-31 14:52:01,911 WARNING ffcore.audit audit_rate_capped scope=t03c:8f185da00e4f476eb4f1905c8e808ee5 action=probe_03c_cap
+2026-10-31 14:52:01,914 WARNING ffcore.audit audit_rate_capped scope=t03c:8f185da00e4f476eb4f1905c8e808ee5 action=probe_03c_cap
+2026-10-31 14:52:01,916 WARNING ffcore.audit audit_rate_capped scope=t03c:8f185da00e4f476eb4f1905c8e808ee5 action=probe_03c_cap
+2026-10-31 14:52:01,918 WARNING ffcore.audit audit_rate_capped scope=t03c:8f185da00e4f476eb4f1905c8e808ee5 action=probe_03c_cap
+2026-10-31 14:52:01,921 WARNING ffcore.audit audit_rate_capped scope=t03c:8f185da00e4f476eb4f1905c8e808ee5 action=probe_03c_cap
+2026-10-31 14:52:01,924 WARNING ffcore.audit audit_rate_capped scope=t03c:8f185da00e4f476eb4f1905c8e808ee5 action=probe_03c_cap
+2026-10-31 14:52:01,927 WARNING ffcore.audit audit_rate_capped scope=t03c:8f185da00e4f476eb4f1905c8e808ee5 action=probe_03c_cap
+2026-10-31 14:52:01,929 WARNING ffcore.audit audit_rate_capped scope=t03c:8f185da00e4f476eb4f1905c8e808ee5 action=probe_03c_cap
+2026-10-31 14:52:01,932 WARNING ffcore.audit audit_rate_capped scope=t03c:8f185da00e4f476eb4f1905c8e808ee5 action=probe_03c_cap
+2026-10-31 14:52:01,934 WARNING ffcore.audit audit_rate_capped scope=t03c:8f185da00e4f476eb4f1905c8e808ee5 action=probe_03c_cap
+2026-10-31 14:52:01,937 WARNING ffcore.audit audit_rate_capped scope=t03c:8f185da00e4f476eb4f1905c8e808ee5 action=probe_03c_cap
+2026-10-31 14:52:01,940 WARNING ffcore.audit audit_rate_capped scope=t03c:8f185da00e4f476eb4f1905c8e808ee5 action=probe_03c_cap
+2026-10-31 14:52:01,942 WARNING ffcore.audit audit_rate_capped scope=t03c:8f185da00e4f476eb4f1905c8e808ee5 action=probe_03c_cap
+2026-10-31 14:52:01,945 WARNING ffcore.audit audit_rate_capped scope=t03c:8f185da00e4f476eb4f1905c8e808ee5 action=probe_03c_cap
+2026-10-31 14:52:01,947 WARNING ffcore.audit audit_rate_capped scope=t03c:8f185da00e4f476eb4f1905c8e808ee5 action=probe_03c_cap
+2026-10-31 14:52:01,950 WARNING ffcore.audit audit_rate_capped scope=t03c:8f185da00e4f476eb4f1905c8e808ee5 action=probe_03c_cap
+2026-10-31 14:52:01,953 WARNING ffcore.audit audit_rate_capped scope=t03c:8f185da00e4f476eb4f1905c8e808ee5 action=probe_03c_cap
+2026-10-31 14:52:01,956 WARNING ffcore.audit audit_rate_capped scope=t03c:8f185da00e4f476eb4f1905c8e808ee5 action=probe_03c_cap
+2026-10-31 14:52:01,958 WARNING ffcore.audit audit_rate_capped scope=t03c:8f185da00e4f476eb4f1905c8e808ee5 action=probe_03c_cap
+2026-10-31 14:52:01,960 WARNING ffcore.audit audit_rate_capped scope=t03c:8f185da00e4f476eb4f1905c8e808ee5 action=probe_03c_cap
+2026-10-31 14:52:01,962 WARNING ffcore.audit audit_rate_capped scope=t03c:8f185da00e4f476eb4f1905c8e808ee5 action=probe_03c_cap
+2026-10-31 14:52:01,964 WARNING ffcore.audit audit_rate_capped scope=t03c:8f185da00e4f476eb4f1905c8e808ee5 action=probe_03c_cap
+2026-10-31 14:52:01,966 WARNING ffcore.audit audit_rate_capped scope=t03c:8f185da00e4f476eb4f1905c8e808ee5 action=probe_03c_cap
+2026-10-31 14:52:01,968 WARNING ffcore.audit audit_rate_capped scope=t03c:8f185da00e4f476eb4f1905c8e808ee5 action=probe_03c_cap
+2026-10-31 14:52:01,971 WARNING ffcore.audit audit_rate_capped scope=t03c:8f185da00e4f476eb4f1905c8e808ee5 action=probe_03c_cap
+2026-10-31 14:52:01,973 WARNING ffcore.audit audit_rate_capped scope=t03c:8f185da00e4f476eb4f1905c8e808ee5 action=probe_03c_cap
+2026-10-31 14:52:01,975 WARNING ffcore.audit audit_rate_capped scope=t03c:8f185da00e4f476eb4f1905c8e808ee5 action=probe_03c_cap
+2026-10-31 14:52:01,978 WARNING ffcore.audit audit_rate_capped scope=t03c:8f185da00e4f476eb4f1905c8e808ee5 action=probe_03c_cap
+2026-10-31 14:52:01,980 WARNING ffcore.audit audit_rate_capped scope=t03c:8f185da00e4f476eb4f1905c8e808ee5 action=probe_03c_cap
+2026-10-31 14:52:01,983 WARNING ffcore.audit audit_rate_capped scope=t03c:8f185da00e4f476eb4f1905c8e808ee5 action=probe_03c_cap
+2026-10-31 14:52:01,985 WARNING ffcore.audit audit_rate_capped scope=t03c:8f185da00e4f476eb4f1905c8e808ee5 action=probe_03c_cap
+2026-10-31 14:52:01,987 WARNING ffcore.audit audit_rate_capped scope=t03c:8f185da00e4f476eb4f1905c8e808ee5 action=probe_03c_cap
+2026-10-31 14:52:01,989 WARNING ffcore.audit audit_rate_capped scope=t03c:8f185da00e4f476eb4f1905c8e808ee5 action=probe_03c_cap
+2026-10-31 14:52:01,991 WARNING ffcore.audit audit_rate_capped scope=t03c:8f185da00e4f476eb4f1905c8e808ee5 action=probe_03c_cap
+2026-10-31 14:52:01,994 WARNING ffcore.audit audit_rate_capped scope=t03c:8f185da00e4f476eb4f1905c8e808ee5 action=probe_03c_cap
+2026-10-31 14:52:01,997 WARNING ffcore.audit audit_rate_capped scope=t03c:8f185da00e4f476eb4f1905c8e808ee5 action=probe_03c_cap
+------------------------------ Captured log call -------------------------------
+WARNING  ffcore.audit:audit.py:175 audit_rate_capped scope=t03c:8f185da00e4f476eb4f1905c8e808ee5 action=probe_03c_cap
+WARNING  ffcore.audit:audit.py:175 audit_rate_capped scope=t03c:8f185da00e4f476eb4f1905c8e808ee5 action=probe_03c_cap
+WARNING  ffcore.audit:audit.py:175 audit_rate_capped scope=t03c:8f185da00e4f476eb4f1905c8e808ee5 action=probe_03c_cap
+WARNING  ffcore.audit:audit.py:175 audit_rate_capped scope=t03c:8f185da00e4f476eb4f1905c8e808ee5 action=probe_03c_cap
+WARNING  ffcore.audit:audit.py:175 audit_rate_capped scope=t03c:8f185da00e4f476eb4f1905c8e808ee5 action=probe_03c_cap
+WARNING  ffcore.audit:audit.py:175 audit_rate_capped scope=t03c:8f185da00e4f476eb4f1905c8e808ee5 action=probe_03c_cap
+WARNING  ffcore.audit:audit.py:175 audit_rate_capped scope=t03c:8f185da00e4f476eb4f1905c8e808ee5 action=probe_03c_cap
+WARNING  ffcore.audit:audit.py:175 audit_rate_capped scope=t03c:8f185da00e4f476eb4f1905c8e808ee5 action=probe_03c_cap
+WARNING  ffcore.audit:audit.py:175 audit_rate_capped scope=t03c:8f185da00e4f476eb4f1905c8e808ee5 action=probe_03c_cap
+WARNING  ffcore.audit:audit.py:175 audit_rate_capped scope=t03c:8f185da00e4f476eb4f1905c8e808ee5 action=probe_03c_cap
+WARNING  ffcore.audit:audit.py:175 audit_rate_capped scope=t03c:8f185da00e4f476eb4f1905c8e808ee5 action=probe_03c_cap
+WARNING  ffcore.audit:audit.py:175 audit_rate_capped scope=t03c:8f185da00e4f476eb4f1905c8e808ee5 action=probe_03c_cap
+WARNING  ffcore.audit:audit.py:175 audit_rate_capped scope=t03c:8f185da00e4f476eb4f1905c8e808ee5 action=probe_03c_cap
+WARNING  ffcore.audit:audit.py:175 audit_rate_capped scope=t03c:8f185da00e4f476eb4f1905c8e808ee5 action=probe_03c_cap
+WARNING  ffcore.audit:audit.py:175 audit_rate_capped scope=t03c:8f185da00e4f476eb4f1905c8e808ee5 action=probe_03c_cap
+WARNING  ffcore.audit:audit.py:175 audit_rate_capped scope=t03c:8f185da00e4f476eb4f1905c8e808ee5 action=probe_03c_cap
+WARNING  ffcore.audit:audit.py:175 audit_rate_capped scope=t03c:8f185da00e4f476eb4f1905c8e808ee5 action=probe_03c_cap
+WARNING  ffcore.audit:audit.py:175 audit_rate_capped scope=t03c:8f185da00e4f476eb4f1905c8e808ee5 action=probe_03c_cap
+WARNING  ffcore.audit:audit.py:175 audit_rate_capped scope=t03c:8f185da00e4f476eb4f1905c8e808ee5 action=probe_03c_cap
+WARNING  ffcore.audit:audit.py:175 audit_rate_capped scope=t03c:8f185da00e4f476eb4f1905c8e808ee5 action=probe_03c_cap
+WARNING  ffcore.audit:audit.py:175 audit_rate_capped scope=t03c:8f185da00e4f476eb4f1905c8e808ee5 action=probe_03c_cap
+WARNING  ffcore.audit:audit.py:175 audit_rate_capped scope=t03c:8f185da00e4f476eb4f1905c8e808ee5 action=probe_03c_cap
+WARNING  ffcore.audit:audit.py:175 audit_rate_capped scope=t03c:8f185da00e4f476eb4f1905c8e808ee5 action=probe_03c_cap
+WARNING  ffcore.audit:audit.py:175 audit_rate_capped scope=t03c:8f185da00e4f476eb4f1905c8e808ee5 action=probe_03c_cap
+WARNING  ffcore.audit:audit.py:175 audit_rate_capped scope=t03c:8f185da00e4f476eb4f1905c8e808ee5 action=probe_03c_cap
+WARNING  ffcore.audit:audit.py:175 audit_rate_capped scope=t03c:8f185da00e4f476eb4f1905c8e808ee5 action=probe_03c_cap
+WARNING  ffcore.audit:audit.py:175 audit_rate_capped scope=t03c:8f185da00e4f476eb4f1905c8e808ee5 action=probe_03c_cap
+WARNING  ffcore.audit:audit.py:175 audit_rate_capped scope=t03c:8f185da00e4f476eb4f1905c8e808ee5 action=probe_03c_cap
+WARNING  ffcore.audit:audit.py:175 audit_rate_capped scope=t03c:8f185da00e4f476eb4f1905c8e808ee5 action=probe_03c_cap
+WARNING  ffcore.audit:audit.py:175 audit_rate_capped scope=t03c:8f185da00e4f476eb4f1905c8e808ee5 action=probe_03c_cap
+WARNING  ffcore.audit:audit.py:175 audit_rate_capped scope=t03c:8f185da00e4f476eb4f1905c8e808ee5 action=probe_03c_cap
+WARNING  ffcore.audit:audit.py:175 audit_rate_capped scope=t03c:8f185da00e4f476eb4f1905c8e808ee5 action=probe_03c_cap
+WARNING  ffcore.audit:audit.py:175 audit_rate_capped scope=t03c:8f185da00e4f476eb4f1905c8e808ee5 action=probe_03c_cap
+WARNING  ffcore.audit:audit.py:175 audit_rate_capped scope=t03c:8f185da00e4f476eb4f1905c8e808ee5 action=probe_03c_cap
+WARNING  ffcore.audit:audit.py:175 audit_rate_capped scope=t03c:8f185da00e4f476eb4f1905c8e808ee5 action=probe_03c_cap
+WARNING  ffcore.audit:audit.py:175 audit_rate_capped scope=t03c:8f185da00e4f476eb4f1905c8e808ee5 action=probe_03c_cap
+WARNING  ffcore.audit:audit.py:175 audit_rate_capped scope=t03c:8f185da00e4f476eb4f1905c8e808ee5 action=probe_03c_cap
+WARNING  ffcore.audit:audit.py:175 audit_rate_capped scope=t03c:8f185da00e4f476eb4f1905c8e808ee5 action=probe_03c_cap
+=============================== warnings summary ===============================
+tests/integration/test_04a_worker.py::test_04a_upload_job_runs_in_worker
+tests/integration/test_04a_worker.py::test_04a_job_for_missing_row_retries_then_fails_loud
+  /opt/venv/lib/python3.12/site-packages/arq/worker.py:877: DeprecationWarning: Call to deprecated close. (Use aclose() instead) -- Deprecated since version 5.0.1.
+    await self.pool.close(close_connection_pool=True)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/integration/test_03c_r1_audit_throttle.py::test_03c_6_global_audit_cap
+======= 1 failed, 613 passed, 4 skipped, 2 warnings in 499.45s (0:08:19) =======
+make: *** [Makefile:31: test-int] Error 1

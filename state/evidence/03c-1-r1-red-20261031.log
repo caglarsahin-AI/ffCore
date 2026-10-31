@@ -1,0 +1,20 @@
+E       AssertionError: assert 30 == 1
+E        +  where 30 = len([({'path': '/__test03c/whoami'},), ({'path': '/__test03c/whoami'},), ({'path': '/__test03c/whoami'},), ({'path': '/__test03c/whoami'},), ({'path': '/__test03c/whoami'},), ({'path': '/__test03c/whoami'},), ...])
+2026-10-31 14:29:02,548 ERROR ffcore.readiness warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+E       AssertionError: assert 30 == 1
+E        +  where 30 = len([({'path': '/__test03c/whoami', 'header': 'X-On-Behalf-Of'},), ({'path': '/__test03c/whoami', 'header': 'X-On-Behalf-O... '/__test03c/whoami', 'header': 'X-On-Behalf-Of'},), ({'path': '/__test03c/whoami', 'header': 'X-On-Behalf-Of'},), ...])
+E        +    where [({'path': '/__test03c/whoami', 'header': 'X-On-Behalf-Of'},), ({'path': '/__test03c/whoami', 'header': 'X-On-Behalf-O... '/__test03c/whoami', 'header': 'X-On-Behalf-Of'},), ({'path': '/__test03c/whoami', 'header': 'X-On-Behalf-Of'},), ...] = _rows(<psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_929c74e86e9b) at 0x7fe095e6e390>, 'impersonation_denied', '10.228.62.134')
+2026-10-31 14:29:02,686 ERROR ffcore.readiness warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+E           AttributeError: module 'ffcore.core.audit' has no attribute 'write_event_throttled'. Did you mean: 'write_event_detached'?
+E           AttributeError: module 'ffcore.core.audit' has no attribute 'write_event_throttled'. Did you mean: 'write_event_detached'?
+>               raise OSError(err, f'Connect call failed {address}')
+E               ConnectionRefusedError: [Errno 111] Connect call failed ('127.0.0.1', 1)
+E           redis.exceptions.ConnectionError: Error 111 connecting to 127.0.0.1:1. Connect call failed ('127.0.0.1', 1).
+2026-10-31 14:29:03,754 ERROR ffcore.readiness warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+2026-10-31 14:29:04,118 ERROR ffcore.readiness warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+FAILED tests/integration/test_03c_r1_audit_throttle.py::test_03c_6_blocked_requests_one_audit_row_per_window
+FAILED tests/integration/test_03c_r1_audit_throttle.py::test_03c_6_impersonation_denied_throttled

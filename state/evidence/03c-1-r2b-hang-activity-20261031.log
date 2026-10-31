@@ -1,0 +1,50 @@
+12114 | ffcore_test_b7bd1501cfba | idle in transaction | Client | ClientRead | 00:20:05.419614 | SELECT provider_projects.provider_id, provider_projects.project_id FROM provider_projects
+12961 | ffcore_test_b7bd1501cfba | active | Lock | relation | 00:19:36.801655 |  DROP TABLE usage_daily
+12960 | ffcore_test_b7bd1501cfba | idle | Client | ClientRead |  | 
+12312 | ffcore_test_b7bd1501cfba | idle | Client | ClientRead |  | 
+12329 | ffcore_test_b7bd1501cfba | idle | Client | ClientRead |  | 
+12354 | ffcore_test_b7bd1501cfba | idle | Client | ClientRead |  | 
+12961 | relation | AccessExclusiveLock | f | 
+12114 | virtualxid | ExclusiveLock | t | 
+12961 | relation | RowExclusiveLock | t | pg_depend
+12961 | virtualxid | ExclusiveLock | t | 
+12961 | object | AccessExclusiveLock | t | 
+12961 | object | AccessExclusiveLock | t | 
+12961 | object | AccessExclusiveLock | t | 
+12961 | object | AccessExclusiveLock | t | 
+12961 | object | AccessExclusiveLock | t | 
+12961 | object | AccessExclusiveLock | t | 
+12961 | object | AccessExclusiveLock | t | 
+12961 | relation | AccessExclusiveLock | t | 
+12961 | object | AccessExclusiveLock | t | 
+12961 | object | AccessExclusiveLock | t | 
+12961 | relation | AccessExclusiveLock | t | 
+12961 | relation | AccessExclusiveLock | t | 
+12961 | object | AccessExclusiveLock | t | 
+12961 | relation | AccessExclusiveLock | t | 
+12961 | transactionid | ExclusiveLock | t | 
+12961 | relation | AccessExclusiveLock | t | 
+12961 | object | AccessExclusiveLock | t | 
+12961 | object | AccessExclusiveLock | t | 
+12961 | relation | AccessExclusiveLock | t | 
+12961 | object | AccessExclusiveLock | t | 
+12961 | object | AccessExclusiveLock | t | 
+12961 | object | AccessExclusiveLock | t | 
+12961 | relation | RowExclusiveLock | t | pg_trigger
+14961 | virtualxid | ExclusiveLock | t | 
+12114 | AccessShareLock | t | ix_models_provider
+12114 | AccessShareLock | t | ix_provider_projects_project
+12114 | AccessShareLock | t | models
+12114 | AccessShareLock | t | pk_models
+12114 | AccessShareLock | t | pk_projects
+12114 | AccessShareLock | t | pk_provider_projects
+12114 | AccessShareLock | t | pk_providers
+12114 | AccessShareLock | t | projects
+12114 | AccessShareLock | t | provider_projects
+12114 | AccessShareLock | t | providers
+12114 | AccessShareLock | t | uq_models_project_key_live
+12114 | AccessShareLock | t | uq_projects_key
+12114 | AccessShareLock | t | uq_providers_key
+12114 | ExclusiveLock | t | 
+12114 |  | 192.168.16.20 | 2026-10-31 15:25:00.833826+00 | 2026-10-31 15:25:00.846178+00 | 2026-10-31 15:25:00.857149+00
+12961 |  | 192.168.16.20 | 2026-10-31 15:25:29.447183+00 | 2026-10-31 15:25:29.464137+00 | 2026-10-31 15:25:29.50623+00
