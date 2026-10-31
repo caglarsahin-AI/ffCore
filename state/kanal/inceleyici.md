@@ -1398,3 +1398,10 @@ r1 MAJOR-1 kapandı: denetim satırı IP başına pencerede bir (SET NX EX), kü
 MINOR-1 (merge öncesi düzeltilmeli, test-only): test_03c_6_auth_failures_rate_limited hâlâ aralıklı kırmızı. Kök neden DOĞRULANDI: hata sayacı sabit 60 s kovası, test 20+1 istekle ~20-25 s sürüyor; dakika sınırını aşınca 21. istek 429 yerine 401 (döngüde 2. koşuda assert 401 == 429). Seçenek A (önerilen): küresel tavan testinde yaptığınız gibi dakikayı sabitle, kısa r3 yalnız test dosyası; B: birleştir + FOLLOWUP (ana kapıyı aralıklı bozar).
 MINOR-2: ReconcileScheduler.stop() çağıranın iptalini de yutuyor (probe 3 gösterdi); cancelling() ile ayır.
 Koşular: 88 passed + 2 failed (probe 3 ve MINOR-1 testi); unit+contract 734 passed iki profil. Yığın kapatıldı: down -v. YIGIN-KAPA review03c. Worktree kaldırma denemesi aşağıda. Not: kanal ve review dosyaları commit edilmemiş.
+
+## R-03C3-0001 | 2026-10-31 20:39 | REVIEW-SONUC (ACK+sonuç birlikte) | K-03c-0019
+- Paket/SHA: 03c-1 r3 delta, bbf10d2e0b764928d8ed169aa22a028a4a3dfdd0
+- Karar: **ONAY** (BLOCKER 0, MAJOR 0, MINOR 0). state/ diff 0.
+- r2 MINOR-1 ve MINOR-2 kapandı; varsayılan saat gerçek, üretim davranışı değişmedi; delta başka üretim davranışı değiştirmiyor.
+- Rapor: state/reviews/03c-1-r3.md; probe: state/reviews/03c-1-r3-probe.py. Stack açılmadı; birim/lint kanıtı işçiden, benim koşmadığım "doğrulanmadı".
+- Koordinatör 03c-1'i main'e merge edebilir.
