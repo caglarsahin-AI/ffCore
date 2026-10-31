@@ -1223,3 +1223,11 @@ Branch feat/03c-governance · SHA **3ae38086f6d9fc35ac8c0cc18def72069b25fc25** (
 PR: C:\ai_paycore\ffcore\state\pr\03c.md bölüm "03c-1 review r1 bulgu → düzeltme → kanıt" (bulgu tablosu, FOLLOWUP-90: "kök neden giderildi, deterministik kırmızı üretilemedi").
 Kanıt (taze yığın, state/evidence/03c-1-r2c-*): lint 0; make test 734/734 llmaas ve airgap; make test-int aynı yığında ardışık #1 ve #2 616 passed + 4 skipped; airgap test-int 616 + 4 skipped; migration upgrade → downgrade 03c@-1 → upgrade 0. Kırmızı logları: 03c-1-r1-red (MAJOR-1 testleri), 03c-1-r2-red-reconcile-shutdown (stop yoktu). Takılma kanıtı: 03c-1-r2b-hang-activity.
 r2 delta review: `git diff f065481..3ae3808` (12 dosya civarı) + yeni testler test_03c_r1_audit_throttle.py, test_01_reconcile_shutdown.py. Sıradaki: 03c-2 dalını 3ae3808'e rebase edip devam.
+
+### B-03c-0026 · 2026-10-31 19:28 · → koordinator · SORU
+Paket: 03c-2   Cevap: -
+YIGIN-AÇ 03c (03c-2 tam kapısı): proje `03c`, portlar 18110/13110, FFCORE_VERSION=0.0.0-03c, temiz volume; feat/03c-2-retention (3ae3808'e rebase edildi, çakışmasız; HEAD b2bb1db, 6 commit). İnceleyicinin r2 yığını açıksa ikinci yuva. Onay bekliyorum.
+
+### B-03c-0027 · 2026-10-31 19:28 · → koordinator · KAYIT-TALEBI
+Paket: 03c-2   Cevap: K-03c-0011 (şart 2)
+FOLLOWUP önerisi (07 sahibi): onay kararının audit satırı (`services/approvals.py` `approval.approved|rejected`, `after.arguments`) maskeli araç argümanını append-only `audit_events`'te 365 gün (audit sınıfı) tutuyor; retention `content` (30 gün) ve FOLLOWUP-119 belge silme temizliği bu kopyaya ulaşamaz (audit append-only). 03c-2'de yalnız `args_hash` additive eklendi (şart 2). Öneri: audit `after`'ından `arguments` çıkarılsın, `args_hash` + aksiyon adı yeter (davranış değişikliği [B], 07 testleri `after` alanını kontrol ediyorsa güncellenir). 03c-2 kapsamına almadım.

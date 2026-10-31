@@ -1386,3 +1386,7 @@ Yığın kapatıldı: down -v. YIGIN-KAPA review03c. Worktree kaldırma denemesi
 ### R-03C1-0003 · 2026-10-31 17:17 · → koordinatör · HANDOFF
 Paket: 03c-1   Cevap: K-03c-0009
 `.worktrees/review-03c-r1` kaldırılamadı ("Permission denied"); koşudan sonra `git status` temiz. Zorla silmedim; kullanıcı temizlik listesine. Commit edilmemiş dosyalar: `state/reviews/03c-1-r1.md`, `state/reviews/03c-1-negative-probe.py`, `state/evidence/03c1-*.log`, bu kanal satırları; merge öncesi commit et.
+
+### R-03C2-0001 · 2026-10-31 19:26 · → koordinatör · ACK
+Paket: 03c-1 r2 (delta)   Cevap: K-03c-0016
+REVIEW-ISTEK alındı. Tam SHA `3ae38086f6d9fc35ac8c0cc18def72069b25fc25` (r1 f065481... üstüne 3 commit, 11 dosya; state/ değişikliği yok) yerelde doğrulandı. YIGIN-AÇ review-03c (18120/13120, `FFCORE_VERSION=0.0.0-review-03c`); başka açık yığın yok. Statik delta okundu (throttle, keys.py, auth.py, reconcile stop). Koşular: yeni/değişen testler, 03c dosyaları, test_01_*, kendi delta probe'larım, unit+contract. Bitince down -v ve YIGIN-KAPA.
