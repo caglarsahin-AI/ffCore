@@ -2617,3 +2617,19 @@ Tam SHA: ceaa7045d66fac8745cdd98b7a25d5857a73779e (94f3e07 üstüne 1 commit, 3 
 ### K-114-0004 · 2026-10-31 14:24 · → isci-b · DURUM
 Paket: fix/07-test-hooks-flag   Cevap: B-114-0006
 fix/07-test-hooks-flag MERGED (main 872bab5; r1 ONAY R-114-0002). FOLLOWUP-114 kapandı. Worktree ve branch kaldırıldı. Kısa HANDOFF yaz, lease RETIRED. Sonraki isci-b işleri (FOLLOWUP-120, 122: 07 demeti) yeni oturumda GOREV ile gelir.
+
+### K-116-0007 · 2026-10-31 14:55 · → isci-a · DURUM
+Paket: fix/06a-checkpoint-sources   Cevap: A-116-0014
+fix/06a-checkpoint-sources MERGED (main 1e12c4b); r1 ONAY R-116-0002, r2 delta ONAY R-116-0005; main kapısı yeşil (state/evidence/gate-116-20261031.log: make test 727/727 iki profil, test-int 542 + 4 atlandı, smoke, önyüz check:api). FOLLOWUP-116 kısmen kapandı (kalan 119, 03c). Worktree ve branch kaldırıldı. Kısa HANDOFF yaz, lease RETIRED. 06b yeni isci-a oturumunda 03c MERGED sonrası.
+
+### K-03c-0001 · 2026-10-31 14:55 · → isci-b · GOREV
+Paket: 03c (yönetişim: API key, kota, usage, retention, uyarılar, bildirim)   Cevap: -
+**Yeni isci-b oturumu gerekir** (ROL=isci-b PAKET=03c); bu mesaj o oturum içindir. Branch feat/03c-governance, worktree C:\ai_paycore\ffcore\.worktrees\feat\03c-governance (main 2659c8d). Sınıf: [B]; bağımlılık/SMTP istemcisi gibi yeni paket gerekirse [C] ve plan aşamasında koordinatöre KARAR-GEREK (A/B/C, önerili).
+Brief: plan/03-backend-cekirdek.md "03c" işaretli tüm maddeler (api_keys, quotas, usage_daily, retention_policies, alert_rules/alerts, notification_settings, kota motoru, API'leri) + kabul kriterleri; bağımlı teslimat: 03b (audit, resolve_actor/OBO, core/egress.py), 03a (_grant, require_role). Touch-zone WORK_QUEUE satırında; paylaşılan dosyalara (models/__init__, alembic/versions, compose, openapi_export) additive.
+**Zorunlu maddeler (danışman görüşü K-W6-0001 ve K-116-0002'den):**
+1. `resolve_actor()` imzası DEĞİŞMEZ; `actor_type=api_key` yolu bu tek noktadan eklenir (C2). 03a `_grant` 404 `project_not_found` kuralı aynı kalır (298cbb4). C2/C3 sözleşmesine dokunursan dur, KARAR-GEREK (danışman gerekir).
+2. `api_keys.scopes` enum'u ilk kez burada: chat_direct, agents, impersonate, kb_search, tools_invoke. `allowed_cidrs` ve `revoked_at` HER istekte denetlenir; ham anahtar yalnız oluşturma cevabında, DB'de key_hash; audit actor_type=api_key.
+3. Kota motoru: kota/bütçe kararı Redis sayacından (C20), `concurrent` penceresi dahil; usage_daily yalnız raporlama. Facade 429'u 06b'nin işi, bu pakette `quota_exceeded` kararı unit testle.
+4. **FOLLOWUP-119 (zorunlu):** retention `content` sınıfı `clear_content`; iki tetikleyici: süre (30 gün) ve belge silme olayı; silinen belgeye ait parça metni `run_events` `llm_call.request_messages` ve `answer.text` payload'ından boşaltılır (BLOCKERS 119). FOLLOWUP-123: `checkpoint_purge_overdue` uyarı kuralı. FOLLOWUP-47: audit aylık partition cron (`ensure_audit_partitions`). FOLLOWUP-69: pricing_missing davranışı. FOLLOWUP-75: proje silme/geri alma olayları catalog_events. FOLLOWUP-67 (proje admin'i üye ekleme) yalnız küçükse; değilse kayıt.
+5. 5 gün üstü sürerse planında iki PR'a böl (ör. 03c-1 keys+quota, 03c-2 retention+alerts+notifications) ve KARAR-GEREK ile sor.
+Süreç: plan state/pr/03c.md (felsefe üçlüsü), önce kırmızı test, tam SHA ile PR-HAZIR; güvenlik turu zorunlu (kimlik/anahtar/CIDR). Yığın: YIGIN-AÇ yaz, portlar 18110/13110. Alembic branch label `03c` (downgrade'li). Entegrasyon testlerini e2e yığınında koşma (FOLLOWUP-118).
