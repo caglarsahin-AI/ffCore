@@ -178,6 +178,25 @@ a result longer than `TOOL_RESULT_MAX_CHARS` is cut with `[truncated: N/M chars]
 code (`tool_result.error_code`, e.g. `tool_unreachable`, `tool_timeout`). An action's
 `max_calls_per_run` stops the run with `limit_reached` (`limit: max_calls_per_run`).
 
+### Checkpoints and deleted documents
+
+The checkpoint holds the run's model conversation, so also the text of the passages the model
+read; it lives only as long as the run can go on. The sources the run state keeps carry no text
+(document, page, breadcrumb, scores). When a run ends, its LangGraph thread is deleted
+(`runs.checkpoint_deleted_at`); a per-minute sweep on `agent-worker-bg` deletes the threads of
+runs that ended elsewhere (cancel, approval expiry) or whose deletion failed, and logs
+`checkpoint_purge_overdue` for a run still not cleaned after 24 hours. Deleting a document (or
+its knowledge base) marks the running and waiting runs that listed it as a source
+(`runs.source_deleted_at`): a running run stops at its next step, a resume stops before the graph
+runs, and the sweep closes waiting runs (a question has no time limit); each ends `failed` with
+`source_deleted` and its thread is deleted. Until then a waiting run's checkpoint still holds the
+deleted passages, for at most one sweep interval (60 s; the sweep runs every minute and has no
+setting). A run the sweep cannot close (for example Redis unreachable) is logged as
+`source_deleted_close_failed`, stays waiting and is tried again on the next sweep; the others in
+the same sweep are not held up. In the run's events the source keeps its document
+name and the breadcrumb reads `[deleted]`. Text the run wrote into its own events (`llm_call`
+request messages, the answer) follows the content retention class (03c).
+
 ## Tracing
 
 Each run is one Langfuse trace (`runs.langfuse_trace_id`): a span `agent-run`, one span per graph
@@ -202,6 +221,7 @@ Every stop is a coded `error` event and the run's `error_code`; nothing ends sil
 | `structured_output_invalid` | the final answer does not match `structured_output` |
 | `cancelled`, `abandoned` | explicit cancel; nobody listening past the grace time |
 | `worker_retries_exhausted` | the worker was stopped three times during the run |
+| `source_deleted` | a document the run showed as a source was deleted while the run was still going or waiting; the run does not continue with its text |
 | `run_error` | anything else; the worker log has the exception |
 
 API errors at start: `agent_not_published` (404), `run_needs_membership` (403), `variable_unknown`

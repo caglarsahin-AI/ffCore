@@ -51,6 +51,7 @@ from ffcore.knowledge.chunking import ChunkSettings
 from ffcore.knowledge.normalize import NORMALIZER_CONFIG_ID
 from ffcore.knowledge.vectorstore.base import VectorFilters, VectorStoreError
 from ffcore.models.knowledge import Chunk, Document, KnowledgeBase
+from ffcore.runtime import checkpoints
 
 router = APIRouter(
     prefix="/projects/{project_id}/knowledge-bases",
@@ -315,11 +316,14 @@ async def delete_knowledge_base(
     except VectorStoreError as exc:
         raise _vector_error(exc) from None
     kb.deleted_at = func.now()
-    await session.execute(
+    deleted = await session.scalars(
         Document.__table__.update()
         .where(Document.kb_id == kb.id, Document.deleted_at.is_(None))
         .values(deleted_at=func.now())
+        .returning(Document.id)
     )
+    # Live runs that showed these documents end source_deleted (FOLLOWUP-116).
+    await checkpoints.mark_document_runs(session, deleted.all())
 
 
 @router.get("/{kb_id}/documents", response_model=DocumentList)
@@ -488,6 +492,8 @@ async def delete_document(
         raise _vector_error(exc) from None
     document.deleted_at = func.now()
     await session.execute(Chunk.__table__.delete().where(Chunk.document_id == document.id))
+    # Live runs that showed this document end source_deleted (FOLLOWUP-116).
+    await checkpoints.mark_document_runs(session, [document.id])
 
 
 @router.post(

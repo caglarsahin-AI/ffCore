@@ -26,6 +26,7 @@ from ffcore.core import tracing
 from ffcore.core.config import Settings
 from ffcore.models.agents import AgentVersion
 from ffcore.models.runs import Message, Run, RunEvent
+from ffcore.runtime import checkpoints
 from ffcore.runtime.contracts import FINISHED, WAITING, RunEventType, RunStatus, SseEvent
 from ffcore.runtime.definition import parse_definition
 from ffcore.runtime.events import RunEventWriter, is_listened
@@ -74,13 +75,23 @@ def _now() -> datetime:
 
 async def _boundary_factory(attempt: Attempt, session: AsyncSession, run: Run, deadline: float):
     async def boundary(step: str) -> None:
-        cancelled = await session.scalar(
-            select(Run.cancel_requested_at)
-            .where(Run.id == run.id)
-            .execution_options(populate_existing=True)
-        )
+        cancelled, source_deleted = (
+            await session.execute(
+                select(Run.cancel_requested_at, Run.source_deleted_at)
+                .where(Run.id == run.id)
+                .execution_options(populate_existing=True)
+            )
+        ).one()
         if cancelled is not None:
             raise StopRun(RunStatus.cancelled, "cancelled", step=step)
+        if source_deleted is not None:
+            # A document this run showed was deleted: never go on with its text (FOLLOWUP-116).
+            raise StopRun(
+                RunStatus.failed,
+                checkpoints.SOURCE_DELETED,
+                checkpoints.SOURCE_DELETED_MESSAGE,
+                step=step,
+            )
         if not await is_listened(attempt.redis, run.id):
             # Nobody followed the run for RUN_ABANDON_GRACE_S (K-06a-0002 S8).
             raise StopRun(RunStatus.abandoned, "abandoned", step=step)
@@ -144,6 +155,21 @@ async def execute(attempt: Attempt, run_id: str, resume: dict[str, Any] | None =
             session, attempt.redis, run.id, ttl_s=settings.run_event_stream_ttl_s
         )
         await events.start()
+        if run.source_deleted_at is not None:
+            # A resume (or a crashed attempt) of a run whose source was deleted: it ends before
+            # the graph runs, so neither the model nor an approved tool sees the deleted text.
+            return await _stop(
+                session,
+                run.id,
+                events,
+                {},
+                StopRun(
+                    RunStatus.failed,
+                    checkpoints.SOURCE_DELETED,
+                    checkpoints.SOURCE_DELETED_MESSAGE,
+                ),
+                settings,
+            )
         if run.started_at is None:
             run.started_at = _now()
             run.queue_wait_ms = int((run.started_at - run.queued_at).total_seconds() * 1000)
@@ -169,6 +195,7 @@ async def execute(attempt: Attempt, run_id: str, resume: dict[str, Any] | None =
                 events,
                 {},
                 StopRun(RunStatus.failed, code, getattr(exc, "message", None)),
+                settings,
             )
         config = {"configurable": {"thread_id": str(run.id)}}
         with (
@@ -228,7 +255,7 @@ async def _attempt_graph(session, run, events, ctx, config, settings, deadline, 
         # The last checkpoint: what the run had done when it stopped or finished.
         final = (await graph.aget_state(config)).values
     if stop is not None:
-        return await _stop(session, run.id, events, final, stop)
+        return await _stop(session, run.id, events, final, stop, settings)
 
     if interrupted is not None:
         run.status = (
@@ -238,7 +265,7 @@ async def _attempt_graph(session, run, events, ctx, config, settings, deadline, 
         )
         await session.commit()
         return run.status
-    await _complete(session, run, events, final)
+    await _complete(session, run, events, final, settings)
     return run.status
 
 
@@ -258,10 +285,13 @@ async def fail_after_retries(attempt: Attempt, run_id: str, reason: str) -> None
             events,
             {},
             StopRun(RunStatus.failed, "worker_retries_exhausted", None, detail=reason),
+            attempt.settings,
         )
 
 
-async def _complete(session: AsyncSession, run: Run, events: RunEventWriter, final: dict) -> None:
+async def _complete(
+    session: AsyncSession, run: Run, events: RunEventWriter, final: dict, settings: Settings
+) -> None:
     run.status = RunStatus.completed
     run.output = final.get("answer")
     run.outcome_label = final.get("outcome")
@@ -292,10 +322,17 @@ async def _complete(session: AsyncSession, run: Run, events: RunEventWriter, fin
             "confidence": run.confidence,
         },
     )
+    # The run is over: its checkpoint (and the chunk text in it) goes (FOLLOWUP-116).
+    await checkpoints.purge(session, settings, run.id)
 
 
 async def _stop(
-    session: AsyncSession, run_id: uuid.UUID, events: RunEventWriter, final: dict, stop: StopRun
+    session: AsyncSession,
+    run_id: uuid.UUID,
+    events: RunEventWriter,
+    final: dict,
+    stop: StopRun,
+    settings: Settings,
 ) -> str:
     # The id is taken before: after the rollback every loaded object is expired.
     await session.rollback()
@@ -320,4 +357,5 @@ async def _stop(
         **{k: v for k, v in stop.extra.items() if k in ("limit", "step", "detail")},
     }
     await events.record(RunEventType.error, payload, sse=SseEvent.error)
+    await checkpoints.purge(session, settings, run_id)
     return stop.status
