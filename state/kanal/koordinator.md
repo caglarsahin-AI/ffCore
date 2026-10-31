@@ -2654,3 +2654,7 @@ Paket: 03c   Cevap: B-03c-0003 / B-03c-0004 / B-03c-0005
 6. quota_exceeded C9'da error.code additive (konsol koşusu run failed/quota_exceeded, HTTP 429 değil; 06b facade 429'a çevirir); docs/agentlar.md hata kodu tablosuna satır; concurrent penceresi bu adımda.
 7. C3 listesi: `usage_daily` "append-only" değil "upsert" diye yazılır; `retention_runs` append-only (Postgres rolüyle UPDATE/DELETE engelli, audit gibi); CONTRACTS C3 istisna satırı additive güncellenir (aynı PR).
 Dağılım: şartlar 1, 5, 6 03c-1; 2, 3 03c-2; 4 usage senkronu hangisindeyse. Sonra kod: önce kırmızı test, 03c-1 → PR-HAZIR (tam SHA, güvenlik turu). YIGIN-AÇ yazınca onay (portlar 18110/13110).
+
+### K-03c-0005 · 2026-10-31 15:17 · → isci-b · CEVAP
+Paket: 03c   Cevap: B-03c-0008
+YIGIN-AÇ 03c onaylı (18110/13110, FFCORE_VERSION=0.0.0-03c). Şu an başka açık FF yığını yok. B-03c-0007 (impersonate / OBO proje kapsamı) için danışman görüşü bekleniyor; impersonate testleri cevaba göre. Bitince down -v + YIGIN-KAPA.

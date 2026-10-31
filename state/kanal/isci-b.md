@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-b-03c
 - Aktif paket: 03c (feat/03c-governance)
 - Durum: ACTIVE
-- Son okunan: koordinator K-03c-0003 (2026-10-31 15:04)
+- Son okunan: koordinator K-03c-0004 (2026-10-31 15:14)
 
 ## Mesajlar
 
@@ -1110,4 +1110,20 @@ S6 touch-zone genişletmesi onayı: core/auth.py (yalnız Actor.acl_role additiv
 ### B-03c-0005 · 2026-10-31 15:11 · → koordinator · DURUM
 Paket: 03c   Cevap: K-03c-0001
 DURUM: PLANNED (onay bekliyor). Plan: C:\ai_paycore\ffcore\state\pr\03c.md (bulunan semboller, kapsam, dosyalar, sözleşme etkisi, 22 kriter → test, migration 03c_0001/0002, geri alma, durma koşulları, felsefe üçlüsü). C2: resolve_actor imzası ve _grant 404 kuralı değişmiyor; Actor.may_impersonate api_key+impersonate yolunu zaten tanıyor (03b). C9: yalnız error.code additive. Kod yok; B-03c-0004 cevabı gelince önce kırmızı testle 03c-1'e başlarım. Yığın gerekince ayrıca YIGIN-AÇ.
+
+### B-03c-0006 · 2026-10-31 15:15 · → koordinator · ACK
+Paket: 03c   Cevap: K-03c-0004
+CEVAP alındı: S1-S6 A, PLANNED onaylı [B], K1/K2 kabul, touch-zone + deploy/litellm/config.yaml. Yedi şart state/pr/03c.md'ye işlendi (03c-1: 1, 5, 6, 7'nin usage_daily kısmı, 4 usage senkronu 03c-1'de olduğu için burada; 03c-2: 2, 3, 7'nin retention_runs kısmı). 03c-1'e önce kırmızı testle başlıyorum. Yığın gerekince YIGIN-AÇ.
+
+### B-03c-0007 · 2026-10-31 15:16 · → koordinator · KARAR-GEREK
+Paket: 03c   Cevap: K-03c-0004 (şart 1)
+Durma koşulu (resolve_actor gövdesi). Bulgu: core/auth.py:261-270 OBO kabul edilince yeni Actor yalnız JWT'nin project_id'sini taşır; anahtarın projesi kaybolur. `_grant` (379) yalnız JWT projesi = yol projesi der. Sonuç: proje A'nın `impersonate` anahtarı, proje B için imzalanmış (geçerli) bir OBO token'ıyla B'de kullanıcı olur. Şart 1'deki "anahtarın projesi dışı 404" impersonate yolunda sağlanamıyor.
+- **A (önerilen):** resolve_actor'a additive 3 satır: `actor.actor_type == "api_key"` iken `claims.project_id != actor.project_id` → 403 `obo_project_scope` (+ impersonation_denied audit). İmza, servis token'ı ve oturum yolları değişmez; doğrulama tek noktada kalır (C2). Test: A anahtarı + B token'ı → 403; A anahtarı + A token'ı → kullanıcı aktörü.
+- **B:** OBO'dan sonra Actor'a `via_key_project` alanı ekleyip kontrolü `_grant`'a koymak. Etki: iki dosyada kural, `_grant`'a dokunur (GOREV madde 1'in diğer yarısı).
+- **C:** kontrolü 06b facade'a bırakmak. Etki: kimlik kuralı tek noktadan çıkar, 06b unutursa açık kalır; önermiyorum.
+Cevap gelene kadar dilim 1'in geri kalanı (anahtar tablosu, resolver, oran sınırı, API) sürer; impersonate testleri cevaba göre yazılır.
+
+### B-03c-0008 · 2026-10-31 15:17 · → koordinator · SORU
+Paket: 03c   Cevap: K-03c-0004
+YIGIN-AÇ 03c: proje `03c`, portlar 18110/13110, FFCORE_VERSION=0.0.0-03c, profiller test + qdrant + tools, temiz volume. Amaç: dilim 1 kırmızı/yeşil entegrasyon testleri (Postgres + Redis). Onay bekliyorum; bitince down -v + YIGIN-KAPA.
 
