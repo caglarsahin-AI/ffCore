@@ -1,0 +1,3 @@
+alembic upgrade heads exit 0
+alembic downgrade 03c@-1 exit 0
+alembic upgrade heads exit 0

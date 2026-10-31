@@ -1,0 +1,81 @@
+cd backend && QDRANT_URL=http://qdrant:6333 RUN_QDRANT_TESTS=1 pytest tests/integration
+============================= test session starts ==============================
+platform linux -- Python 3.12.10, pytest-9.2.0, pluggy-1.7.0
+rootdir: /work/backend
+configfile: pyproject.toml
+plugins: Faker-40.43.0, anyio-4.15.1, langsmith-0.14.8
+collected 620 items
+
+tests/integration/test_01_client.py .......                              [  1%]
+tests/integration/test_01_events.py ...                                  [  1%]
+tests/integration/test_01_reconcile.py ...........                       [  3%]
+tests/integration/test_01_reconcile_shutdown.py ..                       [  3%]
+tests/integration/test_01_seed.py ...                                    [  4%]
+tests/integration/test_02_langfuse.py ....                               [  4%]
+tests/integration/test_02_pricing.py .                                   [  5%]
+tests/integration/test_02_r1_worker_logging.py .                         [  5%]
+tests/integration/test_03a_access.py ............                        [  7%]
+tests/integration/test_03a_auth.py ..............                        [  9%]
+tests/integration/test_03a_models.py ...........                         [ 11%]
+tests/integration/test_03a_nonmember_404.py ............................ [ 15%]
+..........................................................               [ 25%]
+tests/integration/test_03a_obo_scope.py ................                 [ 27%]
+tests/integration/test_03a_providers.py ................                 [ 30%]
+tests/integration/test_03a_read_side.py .......                          [ 31%]
+tests/integration/test_03a_schema.py .......                             [ 32%]
+tests/integration/test_03b_audit.py ............                         [ 34%]
+tests/integration/test_03b_egress_dns.py s                               [ 34%]
+tests/integration/test_03c_keys.py ..............................        [ 39%]
+tests/integration/test_03c_quota_engine.py ............                  [ 41%]
+tests/integration/test_03c_quotas_api.py .......                         [ 42%]
+tests/integration/test_03c_r1_audit_throttle.py .....                    [ 43%]
+tests/integration/test_03c_run_quota.py .......                          [ 44%]
+tests/integration/test_04a_api.py .............                          [ 46%]
+tests/integration/test_04a_embed_api.py ....                             [ 47%]
+tests/integration/test_04a_ingest.py .s..........s                       [ 49%]
+tests/integration/test_04a_qdrant.py ....                                [ 49%]
+tests/integration/test_04a_readyz.py ....                                [ 50%]
+tests/integration/test_04a_review_r1_acl.py ........                     [ 51%]
+tests/integration/test_04a_review_r1_ingest.py ......                    [ 52%]
+tests/integration/test_04a_review_r1_upload.py ..                        [ 53%]
+tests/integration/test_04a_search.py ........                            [ 54%]
+tests/integration/test_04a_store.py ..........                           [ 55%]
+tests/integration/test_04a_worker.py ..                                  [ 56%]
+tests/integration/test_05a_live_services.py .....                        [ 57%]
+tests/integration/test_05a_obo_verify.py .......                         [ 58%]
+tests/integration/test_05a_search.py ........                            [ 59%]
+tests/integration/test_05a_sql.py ..............s.....                   [ 62%]
+tests/integration/test_05a_tools_api.py ................................ [ 67%]
+................                                                         [ 70%]
+tests/integration/test_06a_adapters.py ..                                [ 70%]
+tests/integration/test_06a_agents.py ........                            [ 72%]
+tests/integration/test_06a_feedback.py .....                             [ 72%]
+tests/integration/test_06a_graph.py ............................         [ 77%]
+tests/integration/test_06a_mcp_tools.py ............                     [ 79%]
+tests/integration/test_06a_read_side.py .                                [ 79%]
+tests/integration/test_06a_readyz.py ..                                  [ 79%]
+tests/integration/test_06a_run_access.py ..........                      [ 81%]
+tests/integration/test_06a_runs_api.py .........                         [ 82%]
+tests/integration/test_06a_scheduler.py .......                          [ 84%]
+tests/integration/test_06a_schema.py .........                           [ 85%]
+tests/integration/test_07_api_read.py ............                       [ 87%]
+tests/integration/test_07_decide.py .........                            [ 88%]
+tests/integration/test_07_flow.py ..........                             [ 90%]
+tests/integration/test_07_schema.py ...........                          [ 92%]
+tests/integration/test_07_service.py ........                            [ 93%]
+tests/integration/test_07f_followups.py ....                             [ 94%]
+tests/integration/test_07f_sql_context_roles.py ..                       [ 94%]
+tests/integration/test_08_api.py ................                        [ 97%]
+tests/integration/test_116_checkpoint_sources.py ..........              [ 98%]
+tests/integration/test_18td_tools_api.py ...                             [ 99%]
+tests/integration/test_af_2b_deleted_source_breadcrumb.py ..             [ 99%]
+tests/integration/test_af_3_updated_at_source.py ...                     [100%]
+
+=============================== warnings summary ===============================
+tests/integration/test_04a_worker.py::test_04a_upload_job_runs_in_worker
+tests/integration/test_04a_worker.py::test_04a_job_for_missing_row_retries_then_fails_loud
+  /opt/venv/lib/python3.12/site-packages/arq/worker.py:877: DeprecationWarning: Call to deprecated close. (Use aclose() instead) -- Deprecated since version 5.0.1.
+    await self.pool.close(close_connection_pool=True)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+============ 616 passed, 4 skipped, 2 warnings in 480.27s (0:08:00) ============

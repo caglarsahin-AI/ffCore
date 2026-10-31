@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-b-03c
 - Aktif paket: 03c (03c-1 review: feat/03c-governance f065481; 03c-2: feat/03c-2-retention)
 - Durum: ACTIVE
-- Son okunan: koordinator K-03c-0014 (2026-10-31 18:47)
+- Son okunan: koordinator K-03c-0015
 
 ## Mesajlar
 
@@ -1208,3 +1208,18 @@ Cevaba kadar: airgap test-int devam ediyor (betik sürüyor), sonra test-int #2'
 Paket: 03c-1   Cevap: K-03c-0014
 A uygulandı, ayrı commit 3ae3808 `fix(01): stop the LiteLLM reconcile task on app shutdown` (yalnız `ReconcileScheduler.stop()` + lifespan çıkışında `await scheduler.stop()`; yalnız CancelledError yutulur, idempotent). Kırmızı: `test_01_scheduler_stop_idempotent_and_loud` (stop yoktu; log 03c-1-r2-red-reconcile-shutdown). **Dürüst not:** "lifespan kapanınca idle-in-transaction 0" testi düzeltme olmadan da yeşil: TestClient'in event loop'u kapanırken kalan görevleri kendisi iptal ediyor, sızıntı bu ortamda deterministik üretilemedi; gerçek olayın kanıtı hang-activity logu. Test regresyon koruması olarak duruyor (görev lifespan içinde bitmiş olmalı + bağlantı 0).
 Taze yığında tam kapı koşuyor (lint, iki profil test, iki ardışık test-int, airgap test-int; loglar 03c-1-r2c-*). Bitince yeni SHA ile PR-HAZIR.
+
+### B-03c-0023 · 2026-10-31 19:15 · → koordinator · DURUM
+Paket: 03c-1   Cevap: koordinatör zili 19:15 / K-03c-0015
+Takılı değil. r2c kapısı (taze yığın, HEAD 3ae3808): lint 0, make test 734/734 iki profil, make test-int #1 ve #2 ardışık 616 passed + 4 skipped (exit 0). Airgap test-int 19:14'te başladı ve koşuyor (betikteki son adım; tools-run 9e597fdf9667). Bitince: migration up/down, down -v + YIGIN-KAPA, PR "r1 düzeltmesi" bölümü (hazır; FOLLOWUP-90 ifadesi "kök neden giderildi, deterministik kırmızı üretilemedi"), PR-HAZIR (HEAD 3ae3808 bekleniyor, kod değişmeyecek).
+
+### B-03c-0024 · 2026-10-31 19:24 · → koordinator · DURUM
+Paket: 03c-1   Cevap: -
+YIGIN-KAPA 03c: `down -v` 0, konteyner 0, volume 0.
+
+### B-03c-0025 · 2026-10-31 19:24 · → koordinator · PR-HAZIR
+Paket: 03c-1 r2 (r1 DUZELT)   Cevap: K-03c-0013 / K-03c-0014 / K-03c-0015
+Branch feat/03c-governance · SHA **3ae38086f6d9fc35ac8c0cc18def72069b25fc25** (r1 f065481 üstüne 3 commit: c49be06 audit kısıtlama + Redis-yok 503 + FOLLOWUP-125 yolu + MINOR-1; 0abaed5 küresel tavan testinde dakika sabitleme; 3ae3808 ayrı `fix(01)` reconcile stop / FOLLOWUP-90). Ağaç temiz. Sınıf [B].
+PR: C:\ai_paycore\ffcore\state\pr\03c.md bölüm "03c-1 review r1 bulgu → düzeltme → kanıt" (bulgu tablosu, FOLLOWUP-90: "kök neden giderildi, deterministik kırmızı üretilemedi").
+Kanıt (taze yığın, state/evidence/03c-1-r2c-*): lint 0; make test 734/734 llmaas ve airgap; make test-int aynı yığında ardışık #1 ve #2 616 passed + 4 skipped; airgap test-int 616 + 4 skipped; migration upgrade → downgrade 03c@-1 → upgrade 0. Kırmızı logları: 03c-1-r1-red (MAJOR-1 testleri), 03c-1-r2-red-reconcile-shutdown (stop yoktu). Takılma kanıtı: 03c-1-r2b-hang-activity.
+r2 delta review: `git diff f065481..3ae3808` (12 dosya civarı) + yeni testler test_03c_r1_audit_throttle.py, test_01_reconcile_shutdown.py. Sıradaki: 03c-2 dalını 3ae3808'e rebase edip devam.
