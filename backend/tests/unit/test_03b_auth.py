@@ -128,7 +128,7 @@ def test_03b_3_bad_signature_and_alg_none_401(settings):
 def client(settings, monkeypatch):
     denied: list[tuple[str, Actor | None]] = []
 
-    async def record(request, actor, detail=None):
+    async def record(request, actor, detail=None, **_):
         denied.append((request.url.path, actor))
 
     monkeypatch.setattr(auth, "_audit_impersonation_denied", record)

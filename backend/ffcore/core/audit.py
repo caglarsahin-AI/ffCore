@@ -114,6 +114,79 @@ async def write_event_detached(entry: AuditEntry) -> None:
         await session.commit()
 
 
+# (03c-1 r1, K-03c-0013) Rows a minute for all throttled callers together.
+AUDIT_GLOBAL_CAP = 100
+THROTTLE_SCOPE = "ffcore:audit:throttle"
+
+
+class AuditThrottleUnavailable(Exception):
+    """Redis is needed to throttle; the caller fails closed and writes nothing."""
+
+
+async def write_event_throttled(
+    entry: AuditEntry,
+    *,
+    key: str,
+    settings,
+    window_s: int = 60,
+    global_cap: int = AUDIT_GLOBAL_CAP,
+    scope: str = THROTTLE_SCOPE,
+) -> bool:
+    """Write `entry` at most once per `key` and `window_s`, and at most `global_cap` rows a
+    minute for all keys of `scope` (then one `audit_rate_capped` row). Held-back events are
+    counted; the next written row of that key carries `blocked_in_previous_window`. For
+    events an unauthenticated or refused caller can repeat at will (03c-1 r1 MAJOR-1). Returns
+    whether a row was written; raises AuditThrottleUnavailable without Redis."""
+    import time
+
+    import redis.asyncio as aioredis
+
+    if settings.redis_url is None:
+        raise AuditThrottleUnavailable()
+    redis = aioredis.from_url(settings.redis_url.get_secret_value())
+    count_key = f"{scope}:held:{key}"
+    try:
+        if not await redis.set(f"{scope}:once:{key}", "1", nx=True, ex=window_s):
+            async with redis.pipeline(transaction=True) as pipe:
+                await pipe.incr(count_key).expire(count_key, window_s * 2).execute()
+            return False
+        held = await redis.getdel(count_key)
+        minute = f"{scope}:global:{int(time.time()) // 60}"
+        async with redis.pipeline(transaction=True) as pipe:
+            total, _ = await pipe.incr(minute).expire(minute, 120).execute()
+    except Exception as exc:  # noqa: BLE001 - any Redis failure: fail closed, write nothing
+        raise AuditThrottleUnavailable() from exc
+    finally:
+        await redis.aclose()
+    if total > global_cap:
+        if total == global_cap + 1:
+            await write_event_detached(
+                AuditEntry(
+                    action="audit_rate_capped",
+                    resource_type="audit",
+                    outcome="denied",
+                    actor_type="system",
+                    actor_id="audit",
+                    after={"scope": scope, "cap_per_minute": global_cap},
+                )
+            )
+        import logging
+
+        logging.getLogger("ffcore.audit").warning(
+            "audit_rate_capped scope=%s action=%s", scope, entry.action
+        )
+        return False
+    if held:
+        entry = AuditEntry(
+            **{
+                **entry.__dict__,
+                "after": {**(entry.after or {}), "blocked_in_previous_window": int(held)},
+            }
+        )
+    await write_event_detached(entry)
+    return True
+
+
 def request_context(request: Request) -> tuple[str, str | None]:
     request_id = request.headers.get("x-request-id") or uuid.uuid4().hex
     ip = request.client.host if request.client else None
@@ -126,23 +199,39 @@ def request_context(request: Request) -> tuple[str, str | None]:
     return request_id, ip
 
 
-async def record_impersonation_denied(request: Request, actor, detail: dict | None = None) -> None:
+async def record_impersonation_denied(
+    request: Request, actor, detail: dict | None = None, *, settings=None
+) -> None:
     """`detail` (03c): why an API key's impersonation was refused (scope_missing,
-    obo_project_scope with the token's project)."""
+    obo_project_scope with the token's project). With `settings` the row is throttled per
+    caller and address (FOLLOWUP-125: anyone can send the header); without Redis it is
+    logged, not written."""
     request_id, ip = request_context(request)
-    await write_event_detached(
-        AuditEntry(
-            action="impersonation_denied",
-            resource_type="auth",
-            outcome="denied",
-            actor_type=actor.actor_type if actor else "system",
-            actor_id=actor.actor_id if actor else "anonymous",
-            project_id=actor.project_id if actor else None,
-            after={"path": request.url.path, "header": "X-On-Behalf-Of"} | (detail or {}),
-            request_id=request_id,
-            ip=ip,
-        )
+    entry = AuditEntry(
+        action="impersonation_denied",
+        resource_type="auth",
+        outcome="denied",
+        actor_type=actor.actor_type if actor else "system",
+        actor_id=actor.actor_id if actor else "anonymous",
+        project_id=actor.project_id if actor else None,
+        after={"path": request.url.path, "header": "X-On-Behalf-Of"} | (detail or {}),
+        request_id=request_id,
+        ip=ip,
     )
+    if settings is None:
+        await write_event_detached(entry)
+        return
+    try:
+        await write_event_throttled(
+            entry, key=f"impersonation:{entry.actor_id}:{ip}", settings=settings
+        )
+    except AuditThrottleUnavailable:
+        import logging
+
+        logging.getLogger("ffcore.audit").error(
+            "impersonation_denied_not_recorded reason=redis_unavailable actor_id=%s",
+            entry.actor_id,
+        )
 
 
 def _status_of(exc: Exception) -> int | None:

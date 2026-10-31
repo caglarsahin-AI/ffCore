@@ -247,11 +247,11 @@ def verify_session_token(token: str, settings: Settings) -> SessionClaims | None
 
 
 async def _audit_impersonation_denied(
-    request: Request, actor: Actor | None, detail: dict | None = None
+    request: Request, actor: Actor | None, detail: dict | None = None, *, settings=None
 ) -> None:
     from ffcore.core.audit import record_impersonation_denied
 
-    await record_impersonation_denied(request, actor, detail)
+    await record_impersonation_denied(request, actor, detail, settings=settings)
 
 
 def _impersonation_denied() -> ApiError:
@@ -276,7 +276,9 @@ async def resolve_actor(
         if key is not None and not key.may_impersonate:
             # (03c, K-03c-0006) An API key fails loud; the service and session paths below
             # keep "ignored + audited".
-            await _audit_impersonation_denied(request, key, {"reason": "scope_missing"})
+            await _audit_impersonation_denied(
+                request, key, {"reason": "scope_missing"}, settings=settings
+            )
             raise _impersonation_denied()
         if actor is not None and actor.may_impersonate:
             claims = verify_on_behalf_of(
@@ -288,6 +290,7 @@ async def resolve_actor(
                     request,
                     key,
                     {"reason": "obo_project_scope", "token_project_id": claims.project_id},
+                    settings=settings,
                 )
                 raise _impersonation_denied()
             actor = Actor(
@@ -298,8 +301,9 @@ async def resolve_actor(
                 via_key_id=key.actor_id if key is not None else None,
             )
         else:
-            # Ignored, not silently: every rejected impersonation is an audit event (R2.5).
-            await _audit_impersonation_denied(request, actor)
+            # Ignored, not silently: a rejected impersonation is an audit event (R2.5), at most
+            # one per caller, address and minute (FOLLOWUP-125).
+            await _audit_impersonation_denied(request, actor, settings=settings)
 
     if actor is None:
         raise ApiError(401, "authentication_error", "unauthenticated", "Authentication required.")

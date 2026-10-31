@@ -44,7 +44,8 @@ HS256 JWT signed by the backend with `OBO_JWT_SECRET`; signed fresh for every se
 Expired, malformed, unsigned or longer-lived tokens: 401 (`token_expired`, `invalid_token`,
 `token_lifetime_exceeded`). Valid token for another audience: 403 `audience_mismatch`.
 The header is accepted only from a caller that may impersonate. From the console session it is
-ignored and an `impersonation_denied` audit event is written. From an API key (03c) it fails
+ignored and an `impersonation_denied` audit event is written, at most one per caller, address and
+minute (anyone can send the header; the same throttle as rate-limited keys). From an API key (03c) it fails
 loud: a key without `impersonate`, or a key whose token names another project, gets 403
 `impersonation_denied` (audited with the reason; the body names no project).
 
@@ -248,7 +249,10 @@ user's own console session: a service or an impersonating key acting for the use
   outside `allowed_cidrs`: 403 `ip_not_allowed`.
 - More than `API_KEY_AUTH_FAILURES_PER_MIN` (20) wrong keys from one address in a minute: 429
   `too_many_auth_failures` for that address, valid keys included, until the minute ends. Audit
-  `api_key_auth_rate_limited` (actor `system` / `anonymous`).
+  `api_key_auth_rate_limited` (actor `system` / `anonymous`) at most once per address and minute;
+  the next minute's row says how many were held back (`blocked_in_previous_window`), and all
+  addresses together write at most 100 such rows a minute (then one `audit_rate_capped`). Without
+  Redis a key cannot be checked: 503 `auth_backend_unavailable`, nothing is written.
 - `scopes` (CONTRACTS C2): `chat_direct`, `agents`, `impersonate`, `kb_search`, `tools_invoke`.
   Only a project admin grants `impersonate`, and a key with it needs `allowed_cidrs` (422
   `cidrs_required_for_impersonate`). `acl_role` (default `analyst`) is the role the key's own

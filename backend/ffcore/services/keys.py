@@ -78,12 +78,18 @@ def _invalid() -> ApiError:
     return ApiError(401, "authentication_error", "invalid_api_key", "The API key is not valid.")
 
 
+def _backend_unavailable() -> ApiError:
+    # Fail closed: without the failure budget a key cannot be checked safely (r1 MAJOR-1 (3));
+    # nothing is written to the audit trail then (it would be unbounded again).
+    log.error("auth_backend_unavailable reason=redis")
+    return ApiError(503, "api_error", "auth_backend_unavailable", "API key checks are unavailable.")
+
+
 def _redis(settings: Settings):
     import redis.asyncio as aioredis
 
     if settings.redis_url is None:
-        # Fail closed: without the failure budget a key cannot be checked safely.
-        raise ApiError(503, "api_error", "redis_unavailable", "API key checks need Redis.")
+        raise _backend_unavailable()
     return aioredis.from_url(settings.redis_url.get_secret_value())
 
 
@@ -91,22 +97,31 @@ def _failure_key(ip: str) -> str:
     return f"ffcore:keys:authfail:{ip}:{int(time.time()) // _FAILURE_WINDOW_S}"
 
 
-async def _rate_limited(request: Request, ip: str) -> ApiError:
-    from ffcore.core.audit import AuditEntry, request_context, write_event_detached
+async def _rate_limited(request: Request, settings: Settings, failures: int) -> ApiError:
+    """At most one audit row per address and minute (r1 MAJOR-1); the next window's row
+    carries how many were held back, and all addresses together are capped."""
+    from ffcore.core.audit import (
+        AuditEntry,
+        AuditThrottleUnavailable,
+        request_context,
+        write_event_throttled,
+    )
 
     request_id, audit_ip = request_context(request)
-    await write_event_detached(
-        AuditEntry(
-            action="api_key_auth_rate_limited",
-            resource_type="auth",
-            outcome="denied",
-            actor_type="system",
-            actor_id="anonymous",
-            after={"path": request.url.path},
-            request_id=request_id,
-            ip=audit_ip,
-        )
+    entry = AuditEntry(
+        action="api_key_auth_rate_limited",
+        resource_type="auth",
+        outcome="denied",
+        actor_type="system",
+        actor_id="anonymous",
+        after={"path": request.url.path, "failures_at_block": failures},
+        request_id=request_id,
+        ip=audit_ip,
     )
+    try:
+        await write_event_throttled(entry, key=f"keys:{audit_ip}", settings=settings)
+    except AuditThrottleUnavailable:
+        raise _backend_unavailable() from None
     return ApiError(
         429, "rate_limit_error", "too_many_auth_failures", "Too many failed API key attempts."
     )
@@ -119,14 +134,21 @@ async def api_key_resolver(request: Request, settings: Settings) -> Actor | None
         return None
     ip = request.client.host if request.client else ""
     redis = _redis(settings)
+    failures = _failure_key(ip)
     try:
-        failures = _failure_key(ip)
-        if int(await redis.get(failures) or 0) >= settings.api_key_auth_failures_per_min:
-            raise await _rate_limited(request, ip)
+        try:
+            count = int(await redis.get(failures) or 0)
+        except Exception:  # noqa: BLE001 - Redis down: 503, never an unchecked key
+            raise _backend_unavailable() from None
+        if count >= settings.api_key_auth_failures_per_min:
+            raise await _rate_limited(request, settings, count)
         row = await _verify(token)
         if row is None:
-            async with redis.pipeline(transaction=True) as pipe:
-                await pipe.incr(failures).expire(failures, _FAILURE_WINDOW_S).execute()
+            try:
+                async with redis.pipeline(transaction=True) as pipe:
+                    await pipe.incr(failures).expire(failures, _FAILURE_WINDOW_S).execute()
+            except Exception:  # noqa: BLE001
+                raise _backend_unavailable() from None
             raise _invalid()
     finally:
         await redis.aclose()

@@ -226,10 +226,17 @@ def test_03c_12_spend_logs_store_no_prompts(database_url, pg, catalog, llm_setti
     catalog.model(project_id, catalog.provider([project_id]), pricing=PRICED)
     run_reconcile(database_url, llm_settings)
     _run(database_url, llm_settings, project_id, uuid.uuid4())
-    rows = litellm_db.execute(
-        'SELECT messages::text, response::text FROM "LiteLLM_SpendLogs"'
-        ' ORDER BY "startTime" DESC LIMIT 5'
-    ).fetchall()
-    assert rows and all(
-        m in ("{}", "[]", "null", None) and r in ("{}", "null", None) for m, r in rows
-    )
+    # LiteLLM writes spend rows in batches (r1 MINOR-1): wait for them, at most 30 s.
+    import time
+
+    deadline, rows = time.monotonic() + 30, []
+    while time.monotonic() < deadline:
+        rows = litellm_db.execute(
+            'SELECT messages::text, response::text FROM "LiteLLM_SpendLogs"'
+            ' ORDER BY "startTime" DESC LIMIT 5'
+        ).fetchall()
+        if rows:
+            break
+        time.sleep(0.5)
+    assert rows, "LiteLLM wrote no spend row within 30 s (batched spend writer)"
+    assert all(m in ("{}", "[]", "null", None) and r in ("{}", "null", None) for m, r in rows)

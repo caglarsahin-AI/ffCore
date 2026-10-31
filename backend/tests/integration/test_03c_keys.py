@@ -159,7 +159,8 @@ def test_03c_6_unknown_prefix_same_answer(app, owner, probe):
 def test_03c_6_auth_failures_rate_limited(app, owner, probe, app_settings, pg):
     project, client = owner
     created = _create(client, project)
-    ip = f"192.0.2.{uuid.uuid4().int % 200 + 20}"
+    # A fresh address per run (r1 MINOR-1): the per-address budget lives a minute in Redis.
+    ip = f"10.{uuid.uuid4().int % 250}.{uuid.uuid4().int % 250}.{uuid.uuid4().int % 250 + 1}"
     limit = app_settings.api_key_auth_failures_per_min
     for _ in range(limit):
         assert _who(app, "ffk_deadbeef_" + "x" * 43, ip=ip).status_code == 401
