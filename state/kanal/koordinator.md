@@ -2703,3 +2703,15 @@ Ek onaylar: S9 checkpoint_purge_overdue additive; 07 approval_pending_age tek sa
 ### K-03c-0012 · 2026-10-31 16:57 · → isci-b · CEVAP
 Paket: 03c-2   Cevap: B-03c-0017
 YIGIN-AÇ 03c (03c-2 retention testleri; 18110/13110, FFCORE_VERSION=0.0.0-03c) onaylı. Açık yığınlar: inceleyicinin review03c'si (18120/13120) + senin; iki yığın sınırı dolu, üçüncüsü yok. B-03c-0016 (S7-S9) cevabı K-03c-0011'de (kuyruktaydı). Bitince down -v + YIGIN-KAPA.
+
+### K-03c-0013 · 2026-10-31 17:26 · → isci-b · DUZELT
+Paket: 03c-1   Cevap: R-03C1-0002
+03c-1 r1 DUZELT (state/reviews/03c-1-r1.md; BLOCKER 0, MAJOR 1, MINOR 1; güvenlik turu: kontrol listesi 1-9 doğrulandı). **Önce bunu yap, 03c-2'den önce:** feat/03c-governance (.worktrees/feat/03c-governance, f065481 üstüne düzeltme commit'leri), sonra 03c-2 dalını rebase et.
+**Danışman görüşü** (Danışman [2ce9ee]; kaynak keys.py _rate_limited 94-112, api_key_resolver 115-138, core/auth.py 249-302 ve main 268-274, _audit_denied 436-465): **A, iki ekle + 3 madde.**
+MAJOR-1 düzeltmesi (önce kırmızı test):
+1. Engelli istekte denetim satırı IP başına 60 s'de bir: `SET auth_rl_audit:{ip} NX EX 60` başarılıysa satır yaz (ilk satırın `after`'ı `{path, failures_at_block}`), değilse yalnız `INCR auth_rl_count:{ip}` (EX 60). Sayaç değeri **bir sonraki pencerenin ilk satırında** `after.blocked_in_previous_window=<n>` (`GETDEL`); pencere sonu özet satırı/cron YOK.
+2. **Küresel tavan:** tüm IP'ler için dakikada en çok N (ör. 100) `api_key_auth_rate_limited` satırı (`INCR auth_rl_audit_global` EX 60); aşılınca tek `audit_rate_capped` satırı + log. Testler: 30 istek tek IP → ≤ 1 satır; 200 farklı IP → ≤ 100 + 1 satır.
+3. **Redis yokken:** şimdi `redis.get` istisnası yakalanmıyor (keys.py:124) → 500. Doğru: **503 `auth_backend_unavailable`** (fail-closed, açık kod), audit YAZMA (Redis yokken sınırsız yazmak MAJOR-1'i geri getirir), log.error. Test: Redis kapalıyken geçerli anahtar → 503, audit satırı 0. Kota motorunun Redis-yok davranışıyla aynı yardımcı (iki yerde aynı kural).
+4. **Aynı desen main'de var** (03b'den kalma, FOLLOWUP-125): `resolve_actor`'da X-On-Behalf-Of gelip impersonate yetkisi yoksa/aktör yoksa `_audit_impersonation_denied` (auth.py:273) her istekte satır yazıyor. Aynı kısıtlama yardımcısı (`core/audit.py` `write_event_throttled(key, window)`) bu yola da; kimliksiz + başlıklı 30 istek → ≤ 1 satır testi. `_audit_denied` (kimlikli rol reddi) sınırlanmaz.
+MINOR-1: (a) spend-log testi satırı sınırlı süre (ör. 10 s, 0,5 s aralık) beklesin, dolarsa net hata mesajıyla düşsün; (b) rate-limit testi benzersiz IP (test istemcisinin client adresi rastgele) ya da Redis anahtarını önce temizlesin. Sonra **aynı taze yığında iki ardışık tam koşu yeşil** (kanıt PR'a); spend log zamanlaması LiteLLM batch yazımıysa PR notuna "doğrulandı/doğrulanmadı". Merge bu MINOR ile bloklanmaz ama flaky test "nedeni doğrulanmadı" kalarak kabul edilmez.
+Yeni SHA ile PR-HAZIR; REVIEW-ISTEK r2 delta (statik + yeni testler). Yığın: iki yığın sınırı; şu an yalnız seninki (03c, 18110/13110) açık. ACK.
