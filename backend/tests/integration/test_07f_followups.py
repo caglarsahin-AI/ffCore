@@ -86,13 +86,23 @@ def test_07f_2_expired_close_redis_publish_fails_reconnect_gets_error(
 SWEEP = "/api/v1/internal/approvals/sweep"
 
 
-@pytest.fixture
-def hooks(app, settings):
+def _with_hooks(app, settings, enabled):
     from ffcore.core.config import get_settings
 
-    on = settings.model_copy(update={"ffcore_test_hooks": True})
-    app.dependency_overrides[get_settings] = lambda: on
-    return on
+    pinned = settings.model_copy(update={"ffcore_test_hooks": enabled})
+    app.dependency_overrides[get_settings] = lambda: pinned
+    return pinned
+
+
+@pytest.fixture
+def hooks(app, settings):
+    return _with_hooks(app, settings, True)
+
+
+@pytest.fixture
+def hooks_off(app, settings):
+    # Pinned explicitly so the test holds whatever FFCORE_TEST_HOOKS the stack runs with.
+    return _with_hooks(app, settings, False)
 
 
 def _service(client_factory):
@@ -103,8 +113,8 @@ def _service(client_factory):
     return client
 
 
-def test_07f_3_sweep_hook_404_when_flag_off(team, client_factory, settings):  # noqa: F811
-    assert settings.ffcore_test_hooks is False  # the default: no hook in a normal deployment
+def test_07f_3_sweep_hook_404_when_flag_off(team, client_factory, hooks_off):  # noqa: F811
+    assert hooks_off.ffcore_test_hooks is False  # a normal deployment: no hook
     unknown = _service(client_factory).post("/api/v1/internal/approvals/no-such-path")
     for client in (_service(client_factory), team[1]["analyst"]):
         response = client.post(SWEEP)
