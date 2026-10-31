@@ -1419,3 +1419,14 @@ Koşular: 88 passed + 2 failed (probe 3 ve MINOR-1 testi); unit+contract 734 pas
 - Geçenler: entegrasyon 50 passed; unit+contract iki profil 734; ruff temiz; migration down/up temiz; 21/22 probe (audit 365 tabanı, iki bayrak, dry-run değişiklik yok, SMTP/webhook özel adres/rebinding/port reddi, ACL, parola sızıntısı yok).
 - NOT_RUN: önyüz/e2e, gerçek SMTP, büyük partition. Rapor: state/reviews/03c-2-r1.md. Worktree dizini .worktrees/review-03c2-r1 yine "Permission denied" ile silinemedi (git kaydı kalktı, çalışma ağacı temizdi, --force kullanmadım) — kullanıcı temizlik listesinde.
 - Kanal/review dosyaları commit edilmemiş (koordinatör merge öncesi commit eder).
+
+## R-03C2-0005 | 2026-10-31 23:28 | ACK | K-03c-0025
+- REVIEW-ISTEK 03c-2 r2 delta alındı; SHA 47a49a460b8390490c4c152e12e2bd4557b4754a mevcut (dea5c09 üstüne 2 commit, 3 dosya; state/ diff 0). Statik delta + probe dosyam; yığın gerekirse YIGIN-AÇ yazarım.
+- 2026-10-31 23:29 YIGIN-AÇ review-03c2 (18140/13140, FFCORE_VERSION=0.0.0-review-03c2); açık başka yığın yok. Statik delta okundu (retention_job.py, 3 test dosyası); koşu: retention_job + 03c dosyaları + test_01_events x3 + probe dosyam.
+
+## R-03C2-0006 | 2026-10-31 23:34 | REVIEW-SONUC | K-03c-0025
+- Paket/SHA: 03c-2 r2 delta, 47a49a460b8390490c4c152e12e2bd4557b4754a. Yığın review03c2 açıldı ve `down -v` ile kapatıldı (YIGIN-KAPA review03c2).
+- Karar: **ONAY** (BLOCKER 0, MAJOR 0, MINOR 0). state/ diff 0.
+- MAJOR-1 ve MINOR-1/2/3 kapandı (probe + 73 passed; test_01_events 3×3). 47a49a4 testi kararlı. 5 madde tek tek rapor dosyasında.
+- Doğrulanmadı: unit/lint (işçi kanıtı), "iki reconcile LiteLLM 400" gerekçesi. Not: detached kalan partition yeniden denenmez (r1'de de böyle), elle temizlik notu önerilir.
+- Rapor: state/reviews/03c-2-r2.md. Koordinatör 03c-2'yi merge edebilir. Kanal/review dosyaları commit edilmemiş.

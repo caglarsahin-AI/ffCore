@@ -1,0 +1,291 @@
+.P2 pass completed content input after: [cleared]
+............P4 http://169.254.169.254/latest/meta-data egress_not_allowlisted
+.P4 http://127.0.0.1:8000/x egress_not_allowlisted
+.P4 http://[::1]/ egress_not_allowlisted
+.P4 http://10.1.2.3/ egress_not_allowlisted
+.P4 http://localhost/ egress_not_allowlisted
+.P4 file:///etc/passwd egress_invalid_url
+.P4 http://backend:8000/ egress_not_allowlisted
+.P4 http://postgres:5432/ egress_not_allowlisted
+.2026-10-31 20:31:29,558 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-31 20:31:29,935 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-31 20:31:30,212 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-31 20:31:30,497 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+P5 test email private host: 422 {"error":{"message":"egress_not_allowlisted","type":"invalid_request_error","code":"notification_failed"}}
+P5 test webhook private: 422 {"error":{"message":"egress_not_allowlisted","type":"invalid_request_error","code":"notification_failed"}}
+...........2026-10-31 20:31:42,365 ERROR ffcore.retention retention_class_failed class=audit error=RuntimeError
+2026-10-31 20:31:42,380 ERROR ffcore.retention retention_class_failed class=audit error=RuntimeError
+..audit partition 20001 rows summarised and dropped in 1.4 s
+.2026-10-31 20:31:44,925 ERROR ffcore.retention audit_partition_drop_failed partition=audit_events_2019_11
+.2026-10-31 20:31:45,019 INFO ffcore.retention content_cleared_for_deleted_document runs=1
+.2026-10-31 20:31:45,100 INFO ffcore.retention content_cleared_for_deleted_document runs=2
+.2026-10-31 20:31:45,175 INFO ffcore.retention content_cleared_for_deleted_document runs=3
+.2026-10-31 20:31:45,251 INFO ffcore.retention content_cleared_for_deleted_document runs=4
+.2026-10-31 20:31:45,343 INFO ffcore.retention content_cleared_for_deleted_document runs=5
+.2026-10-31 20:31:45,426 INFO ffcore.retention content_cleared_for_deleted_document runs=6
+.2026-10-31 20:31:45,517 INFO ffcore.retention content_cleared_for_deleted_document runs=7
+.2026-10-31 20:31:45,604 INFO ffcore.retention content_cleared_for_deleted_document runs=8
+.2026-10-31 20:31:45,680 INFO ffcore.retention content_cleared_for_deleted_document runs=9
+.2026-10-31 20:31:45,760 INFO ffcore.retention content_cleared_for_deleted_document runs=9
+..2026-10-31 20:31:46,308 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-31 20:31:46,858 INFO ffcore.retention content_cleared_for_deleted_document runs=1
+.2026-10-31 20:31:47,478 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-31 20:31:48,002 INFO ffcore.retention content_cleared_for_deleted_document runs=1
+2026-10-31 20:31:48,376 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-31 20:31:48,794 WARNING ffcore.alerts alert_fired kind=budget_threshold count=2 project_id=e28973ed-4733-44bc-b879-8e177099f217
+2026-10-31 20:31:48,883 WARNING ffcore.alerts alert_fired kind=budget_threshold count=2 project_id=e28973ed-4733-44bc-b879-8e177099f217
+2026-10-31 20:31:49,360 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-31 20:31:49,587 WARNING ffcore.alerts alert_fired kind=service_down count=1 project_id=None
+2026-10-31 20:31:50,058 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-31 20:31:50,199 WARNING ffcore.quota quota_warn quota_id=ca6e078a-1a58-429c-90c1-527cb1625e48 window=rpm used=2 limit=1
+2026-10-31 20:31:50,219 WARNING ffcore.alerts alert_fired kind=quota_warn count=1 project_id=b1cbc4bb-8160-44fd-b290-f7b9575b6835
+2026-10-31 20:31:50,220 WARNING ffcore.quota quota_warn quota_id=ca6e078a-1a58-429c-90c1-527cb1625e48 window=rpm used=3 limit=1
+2026-10-31 20:31:50,551 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-31 20:31:50,666 ERROR ffcore.runtime checkpoint_purge_overdue run_id=255e544f-8b5f-414a-937d-806445800f01 ended_at=2026-04-14 20:31:38.159416+00:00
+2026-10-31 20:31:50,685 WARNING ffcore.alerts alert_fired kind=checkpoint_purge_overdue count=1 project_id=None
+2026-10-31 20:31:50,685 ERROR ffcore.runtime checkpoint_purge_overdue run_id=5d780c62-dee1-4395-91d0-e78ae60b4796 ended_at=2026-07-03 20:31:38.366835+00:00
+2026-10-31 20:31:50,701 WARNING ffcore.alerts alert_fired kind=checkpoint_purge_overdue count=1 project_id=None
+2026-10-31 20:31:50,701 ERROR ffcore.runtime checkpoint_purge_overdue run_id=50434fe4-d7df-491a-bfc0-dbd0f4a6aee5 ended_at=2026-07-23 20:31:26.731071+00:00
+2026-10-31 20:31:50,717 WARNING ffcore.alerts alert_fired kind=checkpoint_purge_overdue count=1 project_id=None
+2026-10-31 20:31:50,717 ERROR ffcore.runtime checkpoint_purge_overdue run_id=3d8ad343-a29d-4b95-b7da-9b82cca6d846 ended_at=2026-07-23 20:31:41.934536+00:00
+2026-10-31 20:31:50,732 WARNING ffcore.alerts alert_fired kind=checkpoint_purge_overdue count=1 project_id=None
+2026-10-31 20:31:50,733 ERROR ffcore.runtime checkpoint_purge_overdue run_id=47080348-2aa8-445e-8d32-6fec41fe5983 ended_at=2026-09-21 20:31:40.834381+00:00
+2026-10-31 20:31:50,749 WARNING ffcore.alerts alert_fired kind=checkpoint_purge_overdue count=1 project_id=None
+2026-10-31 20:31:50,749 ERROR ffcore.runtime checkpoint_purge_overdue run_id=eff0b6f7-8a24-482f-b07e-de291f1f9742 ended_at=2026-09-30 20:31:37.780211+00:00
+2026-10-31 20:31:50,766 WARNING ffcore.alerts alert_fired kind=checkpoint_purge_overdue count=1 project_id=None
+2026-10-31 20:31:50,767 ERROR ffcore.runtime checkpoint_purge_overdue run_id=258d704e-a7ee-4718-a28e-7e0556a8a248 ended_at=2026-10-26 20:31:37.786389+00:00
+2026-10-31 20:31:50,782 WARNING ffcore.alerts alert_fired kind=checkpoint_purge_overdue count=1 project_id=None
+2026-10-31 20:31:50,783 ERROR ffcore.runtime checkpoint_purge_overdue run_id=0c4de611-8b8b-41fc-b801-f5e2e0affaf8 ended_at=2026-10-26 20:31:38.759910+00:00
+2026-10-31 20:31:50,798 WARNING ffcore.alerts alert_fired kind=checkpoint_purge_overdue count=1 project_id=None
+2026-10-31 20:31:50,798 ERROR ffcore.runtime checkpoint_purge_overdue run_id=6b932561-2b16-4c6e-9404-5fbeb4f9f6b7 ended_at=2026-10-26 20:31:38.765973+00:00
+2026-10-31 20:31:50,813 WARNING ffcore.alerts alert_fired kind=checkpoint_purge_overdue count=1 project_id=None
+2026-10-31 20:31:50,813 ERROR ffcore.runtime checkpoint_purge_overdue run_id=2be483d8-8a2c-4f9c-8c92-80b3cd1ce64f ended_at=2026-10-30 19:31:50.630163+00:00
+2026-10-31 20:31:50,828 WARNING ffcore.alerts alert_fired kind=checkpoint_purge_overdue count=1 project_id=None
+2026-10-31 20:31:51,326 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-31 20:31:52,076 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-31 20:31:52,205 ERROR ffcore.alerts alert_delivery_failed alert_id=4b838748-9782-4209-85c2-660a25dba287 channel=webhook code=egress_private_address
+2026-10-31 20:31:52,223 WARNING ffcore.alerts alert_fired kind=quota_warn count=1 project_id=cdf9abdf-71e8-48f2-95ee-829d837882ea
+2026-10-31 20:31:52,528 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-31 20:31:52,942 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-31 20:31:53,525 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-31 20:31:54,157 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-31 20:31:54,911 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-31 20:31:55,145 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-31 20:31:55,386 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-31 20:31:55,389 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-31 20:31:55,683 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-8735fa35fb.chat-default code=egress_not_allowlisted
+2026-10-31 20:31:55,688 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=1
+2026-10-31 20:31:55,711 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-8735fa35fb.chat-default code=egress_not_allowlisted
+2026-10-31 20:31:55,717 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=1
+2026-10-31 20:32:00,415 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-8735fa35fb.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:00,415 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=1
+2026-10-31 20:32:00,597 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-8735fa35fb.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:00,597 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=1
+2026-10-31 20:32:00,790 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-8735fa35fb.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:00,790 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=1
+2026-10-31 20:32:00,792 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-8735fa35fb.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:00,792 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=1
+2026-10-31 20:32:00,977 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-4d97a1eb71.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:00,977 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-8735fa35fb.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:00,978 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=2
+2026-10-31 20:32:00,982 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-4d97a1eb71.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:00,983 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-8735fa35fb.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:00,983 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=2
+2026-10-31 20:32:01,130 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-4d97a1eb71.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:01,130 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-8735fa35fb.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:01,131 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=2
+2026-10-31 20:32:01,350 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-4d97a1eb71.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:01,350 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-8735fa35fb.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:01,350 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=2
+2026-10-31 20:32:02,095 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-4d97a1eb71.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:02,095 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-8735fa35fb.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:02,095 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=2
+2026-10-31 20:32:02,373 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-4d97a1eb71.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:02,374 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-8735fa35fb.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:02,374 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=2
+2026-10-31 20:32:02,622 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-4d97a1eb71.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:02,622 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-8735fa35fb.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:02,623 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=2
+2026-10-31 20:32:02,641 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-4d97a1eb71.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:02,641 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-8735fa35fb.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:02,641 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=2
+2026-10-31 20:32:02,777 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-11a8765f54.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:02,777 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-4d97a1eb71.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:02,777 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-8735fa35fb.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:02,778 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=3
+2026-10-31 20:32:02,779 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-11a8765f54.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:02,779 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-4d97a1eb71.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:02,779 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-8735fa35fb.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:02,779 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=3
+2026-10-31 20:32:02,971 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-11a8765f54.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:02,971 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-4d97a1eb71.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:02,971 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-8735fa35fb.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:02,971 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=3
+2026-10-31 20:32:02,984 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-11a8765f54.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:02,984 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-4d97a1eb71.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:02,984 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-8735fa35fb.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:02,985 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=3
+2026-10-31 20:32:03,287 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-11a8765f54.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:03,287 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-4d97a1eb71.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:03,288 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-8735fa35fb.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:03,288 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=3
+2026-10-31 20:32:03,500 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-11a8765f54.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:03,500 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-4d97a1eb71.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:03,501 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-8735fa35fb.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:03,501 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=3
+2026-10-31 20:32:03,745 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-11a8765f54.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:03,745 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-4d97a1eb71.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:03,745 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-8735fa35fb.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:03,745 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=3
+2026-10-31 20:32:03,746 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-11a8765f54.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:03,747 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-4d97a1eb71.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:03,747 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-8735fa35fb.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:03,747 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=3
+2026-10-31 20:32:03,877 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-11a8765f54.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:03,877 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-4d97a1eb71.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:03,877 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-8735fa35fb.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:03,877 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-dc65625e01.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:03,878 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=4
+2026-10-31 20:32:03,879 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-11a8765f54.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:03,879 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-4d97a1eb71.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:03,879 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-8735fa35fb.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:03,880 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-dc65625e01.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:03,880 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=4
+2026-10-31 20:32:04,290 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-11a8765f54.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:04,290 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-4d97a1eb71.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:04,291 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-8735fa35fb.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:04,291 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-dc65625e01.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:04,291 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=4
+2026-10-31 20:32:04,502 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-11a8765f54.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:04,502 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-4d97a1eb71.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:04,502 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-8735fa35fb.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:04,502 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-dc65625e01.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:04,503 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=4
+2026-10-31 20:32:04,696 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-11a8765f54.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:04,696 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-4d97a1eb71.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:04,696 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-8735fa35fb.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:04,696 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-dc65625e01.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:04,696 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=4
+2026-10-31 20:32:04,699 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-11a8765f54.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:04,699 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-4d97a1eb71.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:04,699 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-8735fa35fb.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:04,699 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-dc65625e01.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:04,699 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=4
+2026-10-31 20:32:04,849 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-11a8765f54.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:04,849 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-4d97a1eb71.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:04,849 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-797f604681.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:04,849 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-8735fa35fb.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:04,849 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-dc65625e01.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:04,850 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=5
+2026-10-31 20:32:04,851 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-11a8765f54.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:04,851 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-4d97a1eb71.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:04,851 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-797f604681.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:04,852 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-8735fa35fb.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:04,852 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-dc65625e01.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:04,852 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=5
+2026-10-31 20:32:05,369 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-11a8765f54.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:05,370 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-4d97a1eb71.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:05,370 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-797f604681.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:05,370 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-8735fa35fb.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:05,370 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-dc65625e01.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:05,371 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=5
+2026-10-31 20:32:05,563 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-11a8765f54.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:05,563 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-4d97a1eb71.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:05,564 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-797f604681.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:05,564 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-8735fa35fb.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:05,564 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-dc65625e01.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:05,565 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=5
+2026-10-31 20:32:05,755 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-11a8765f54.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:05,756 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-4d97a1eb71.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:05,756 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-797f604681.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:05,756 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-8735fa35fb.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:05,756 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-dc65625e01.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:05,756 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=5
+2026-10-31 20:32:05,758 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-11a8765f54.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:05,758 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-4d97a1eb71.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:05,758 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-797f604681.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:05,759 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-8735fa35fb.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:05,759 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-dc65625e01.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:05,759 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=5
+2026-10-31 20:32:05,936 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-11a8765f54.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:05,936 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-4d97a1eb71.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:05,936 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-797f604681.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:05,936 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-8735fa35fb.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:05,937 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-afd148dcd8.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:05,937 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-dc65625e01.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:05,937 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=6
+2026-10-31 20:32:05,939 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-11a8765f54.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:05,939 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-4d97a1eb71.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:05,940 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-797f604681.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:05,940 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-8735fa35fb.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:05,940 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-afd148dcd8.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:05,940 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-dc65625e01.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:05,940 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=6
+2026-10-31 20:32:06,038 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-11a8765f54.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:06,038 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-4d97a1eb71.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:06,039 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-797f604681.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:06,039 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-8735fa35fb.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:06,039 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-afd148dcd8.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:06,039 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-dc65625e01.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:06,040 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=6
+2026-10-31 20:32:06,252 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-11a8765f54.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:06,252 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-4d97a1eb71.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:06,252 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-797f604681.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:06,253 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-8735fa35fb.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:06,253 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-afd148dcd8.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:06,254 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-dc65625e01.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:06,254 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=6
+2026-10-31 20:32:06,707 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-11a8765f54.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:06,707 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-4d97a1eb71.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:06,708 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-797f604681.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:06,708 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-8735fa35fb.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:06,708 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-afd148dcd8.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:06,708 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-dc65625e01.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:06,709 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=6
+2026-10-31 20:32:06,897 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-11a8765f54.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:06,897 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-4d97a1eb71.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:06,898 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-797f604681.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:06,898 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-8735fa35fb.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:06,898 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-afd148dcd8.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:06,899 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-dc65625e01.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:06,899 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=6
+2026-10-31 20:32:07,078 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-11a8765f54.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:07,078 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-4d97a1eb71.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:07,079 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-797f604681.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:07,079 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-8735fa35fb.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:07,079 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-afd148dcd8.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:07,080 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-dc65625e01.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:07,080 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=6
+2026-10-31 20:32:07,089 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-11a8765f54.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:07,089 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-4d97a1eb71.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:07,089 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-797f604681.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:07,089 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-8735fa35fb.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:07,090 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-afd148dcd8.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:07,090 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-dc65625e01.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:07,090 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=6
+2026-10-31 20:32:07,247 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-11a8765f54.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:07,247 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-4d97a1eb71.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:07,247 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-797f604681.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:07,248 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-8735fa35fb.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:07,248 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-a707b7ceef.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:07,248 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-afd148dcd8.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:07,248 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-dc65625e01.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:07,248 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=7
+2026-10-31 20:32:07,252 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-11a8765f54.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:07,252 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-4d97a1eb71.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:07,252 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-797f604681.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:07,252 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-8735fa35fb.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:07,252 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-a707b7ceef.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:07,253 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-afd148dcd8.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:07,253 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-dc65625e01.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:07,253 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=7
+2026-10-31 20:32:07,291 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-11a8765f54.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:07,291 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-4d97a1eb71.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:07,292 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-797f604681.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:07,292 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-8735fa35fb.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:07,293 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-a707b7ceef.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:07,293 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-afd148dcd8.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:07,294 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-dc65625e01.chat-default code=egress_not_allowlisted
+2026-10-31 20:32:07,295 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=7
+.
+73 passed in 53.31s
