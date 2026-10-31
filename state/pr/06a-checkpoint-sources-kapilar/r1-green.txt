@@ -1,1 +1,59 @@
-.....
+.........F..                                                             [100%]
+=================================== FAILURES ===================================
+__________________ test_116_12_sweep_isolates_a_failing_close __________________
+
+world = {'settings': Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('****...UUID('babe92fb-d8dd-4cca-aa77-503cb2bb1369'), 'admin': <starlette.testclient.TestClient object at 0x7fc27c2d8320>, ...}
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_76b5d48afcc9) at 0x7fc27c32bd40>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fc27c16d250>
+
+    def test_116_12_sweep_isolates_a_failing_close(world, pg, monkeypatch):
+        from ffcore.runtime import events as run_events
+    
+        doc_id = _document(world)
+        first, _ = _waiting_approval(world, pg, doc_id)
+        second, _ = _waiting_approval(world, pg, doc_id)
+        _delete(world, doc_id)
+        # The older mark is closed first (order_by source_deleted_at): make it the failing one.
+        pg.execute(
+            "UPDATE runs SET source_deleted_at = source_deleted_at - interval '1 minute'"
+            " WHERE id = %s",
+            (first,),
+        )
+        original = run_events.RunEventWriter.start
+    
+        async def broken_for_first(self):
+            if str(self._run_id) == str(first):
+                raise ConnectionError("redis unreachable")
+            await original(self)
+    
+        monkeypatch.setattr(run_events.RunEventWriter, "start", broken_for_first)
+        done = asyncio.run(checkpoints.sweep(world["settings"]))
+>       assert done["source_deleted"] == [str(second)]
+E       AssertionError: assert ['1d4dfa40-fc...7c1999f81de6'] == ['0dcb75e5-47...7c1999f81de6']
+E         
+E         At index 0 diff: '1d4dfa40-fcab-4340-bd4a-60d7723a5487' != '0dcb75e5-474e-46ec-a060-7c1999f81de6'
+E         Left contains one more item: '0dcb75e5-474e-46ec-a060-7c1999f81de6'
+E         Use -v to get more diff
+
+tests/integration/test_116_checkpoint_sources.py:337: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+2026-10-31 11:04:33,747 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-31 11:04:33,789 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=403
+2026-10-31 11:04:33,917 INFO ffcore.access access method=POST path=/api/v1/projects/babe92fb-d8dd-4cca-aa77-503cb2bb1369/knowledge-bases status=201 ms=125
+------------------------------ Captured log setup ------------------------------
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=403
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/babe92fb-d8dd-4cca-aa77-503cb2bb1369/knowledge-bases status=201 ms=125
+----------------------------- Captured stderr call -----------------------------
+2026-10-31 11:04:34,228 INFO ffcore.access access method=POST path=/api/v1/projects/babe92fb-d8dd-4cca-aa77-503cb2bb1369/knowledge-bases/28a23003-6940-46d9-a87d-1584872d2481/documents status=202 ms=297
+2026-10-31 11:04:35,558 INFO ffcore.runtime runs_marked_source_deleted count=2
+2026-10-31 11:04:35,574 INFO ffcore.access access method=DELETE path=/api/v1/projects/babe92fb-d8dd-4cca-aa77-503cb2bb1369/knowledge-bases/28a23003-6940-46d9-a87d-1584872d2481/documents/0787c382-dc38-40b5-a02d-1f84a0a4a918 status=204 ms=145
+2026-10-31 11:04:35,610 WARNING ffcore.runtime source_deleted_close_failed run_id=b3689d55-9d16-4ff1-a131-ed5a33a14354 error=ConnectionError
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/babe92fb-d8dd-4cca-aa77-503cb2bb1369/knowledge-bases/28a23003-6940-46d9-a87d-1584872d2481/documents status=202 ms=297
+INFO     ffcore.runtime:checkpoints.py:105 runs_marked_source_deleted count=2
+INFO     ffcore.access:logging.py:263 access method=DELETE path=/api/v1/projects/babe92fb-d8dd-4cca-aa77-503cb2bb1369/knowledge-bases/28a23003-6940-46d9-a87d-1584872d2481/documents/0787c382-dc38-40b5-a02d-1f84a0a4a918 status=204 ms=145
+WARNING  ffcore.runtime:checkpoints.py:157 source_deleted_close_failed run_id=b3689d55-9d16-4ff1-a131-ed5a33a14354 error=ConnectionError
+=========================== short test summary info ============================
+FAILED tests/integration/test_116_checkpoint_sources.py::test_116_12_sweep_isolates_a_failing_close
+1 failed, 11 passed in 36.26s
