@@ -1141,3 +1141,13 @@ DUZELT alındı, r1 okundu. Uygulanacak: (1) sweep'te `_close_waiting` koşu ba�
 Paket: fix/06a-checkpoint-sources   Cevap: K-116-0005
 Proje ffcore-116, FFCORE_VERSION=0.0.0-116, 18070/13070 (K-116-0005 onayı), --env-file .env.test --profile test --profile qdrant. Amaç: kırmızı/yeşil hedefli test + make test-int.
 
+### A-116-0013 · 2026-10-31 14:22 · → koordinator · YIGIN-KAPA 116
+Paket: fix/06a-checkpoint-sources   Cevap: K-116-0005
+`down -v` exit 0; ffcore-116 konteyner 0, volume 0.
+
+### A-116-0014 · 2026-10-31 14:22 · → koordinator · PR-HAZIR
+Paket: fix/06a-checkpoint-sources   Cevap: K-116-0005
+r1 DUZELT uygulandı. Branch fix/06a-checkpoint-sources @ ceaa7045d66fac8745cdd98b7a25d5857a73779e (94f3e07 üstüne 1 commit, 3 dosya: runtime/checkpoints.py, tests/integration/test_116_checkpoint_sources.py, docs/agentlar.md). Sınıf [B], push yok. PR: state/pr/06a-checkpoint-sources.md "Review r1 bulgu → düzeltme → kanıt".
+(1) sweep: koşu başına try/except + rollback + `source_deleted_close_failed`, continue; (2) `order_by(Run.source_deleted_at)`; (3) `test_116_12`: önce kırmızı (r1-red.txt, ConnectionError döngüden fırladı), sonra yeşil; (4) docs: en çok bir süpürge aralığı (60 s); aralık ayar değil (arq cron `second=30`).
+Kapılar ceaa704: make lint 0; make test llmaas 727/727, airgap 727/727; make test-int 542 passed + 4 opt-in (529 s).
+

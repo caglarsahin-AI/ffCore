@@ -1,0 +1,10 @@
+== flag unset
+....                                                                     [100%]
+4 passed in 51.79s
+== FFCORE_TEST_HOOKS=1
+....                                                                     [100%]
+4 passed in 43.78s
+== reverse order (hooks tests first, hooks_off last), flag 1
+...                                                                      [100%]
+3 passed in 41.49s
+RUNS_DONE

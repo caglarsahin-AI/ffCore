@@ -1,6 +1,6 @@
 # PR: fix/06a-checkpoint-sources (FOLLOWUP-116)
 
-**Paket:** fix/06a-checkpoint-sources · **Sınıf:** [B] (K-116-0002: additive kolon + additive hata kodu) · **Branch:** fix/06a-checkpoint-sources · **Baz commit:** e5074ab · **HEAD:** 94f3e07843d3089221f94bd1401482af7c3cae2a (e5074ab üstüne 1 commit)
+**Paket:** fix/06a-checkpoint-sources · **Sınıf:** [B] (K-116-0002: additive kolon + additive hata kodu) · **Branch:** fix/06a-checkpoint-sources · **Baz commit:** e5074ab · **HEAD:** ceaa7045d66fac8745cdd98b7a25d5857a73779e (e5074ab üstüne 2 commit; r1 ONAY 94f3e07, r1 düzeltmesi ceaa704)
 
 Başlık: `[B] fix(06a): delete finished runs' checkpoints, stop live runs whose source was deleted`
 
@@ -97,6 +97,12 @@ Hepsi `tools` konteynerinde, `MSYS_NO_PATHCONV=1 FFCORE_VERSION=0.0.0-116`, yı�
 | `make test` | `DEPLOY_PROFILE=llmaas` | 0 | 727 passed, 117 s | `test-llmaas.txt` |
 | `make test` | `DEPLOY_PROFILE=airgap` | 0 | 727 passed, 113 s | `test-airgap.txt` |
 | `make test-int` | llmaas | 0 | 541 passed, 4 skipped (opt-in), 2 uyarı (arq `close` deprecation, bu PR dışı), 425 s | `test-int.txt` |
+| r1: hedefli pytest `test_116_12` (düzeltme öncesi) | llmaas | 1 | ConnectionError döngüden fırladı | `r1-red.txt` |
+| r1: hedefli pytest (116 integration + unit) | llmaas | 0 | 12 passed | `r1-green.txt` |
+| r1: `make lint` | | 0 | | `r1-lint.txt` |
+| r1: `make test` | `DEPLOY_PROFILE=llmaas` | 0 | 727 passed, 150 s | `r1-test-llmaas.txt` |
+| r1: `make test` | `DEPLOY_PROFILE=airgap` | 0 | 727 passed, 135 s | `r1-test-airgap.txt` |
+| r1: `make test-int` | llmaas | 0 | 542 passed, 4 skipped (opt-in), 529 s | `r1-test-int.txt` |
 
 ## Kontrol listesi
 - [x] Felsefe ile çelişen nokta yok
