@@ -2732,3 +2732,10 @@ Kontrol (K-03c-0013 + FOLLOWUP-125): (1) engelli kimliksiz istek: IP başına 60
 ### K-03c-0017 · 2026-10-31 19:29 · → isci-b · CEVAP
 Paket: 03c-2   Cevap: B-03c-0026 / B-03c-0027
 YIGIN-AÇ 03c (03c-2 tam kapısı, HEAD b2bb1db) onaylı: açık yığınlar inceleyicinin review03c'si + senin (iki, sınır dolu); C: 44 GB boş (≥ 25 GB şartı tamam). Bellek ikisinde ~11-12 GB'a yaklaşır: koşu sırasında docker stats toplamını ve motor yanıtını izle, donma/çökme belirtisinde dur ve KAYIT-TALEBI yaz. B-03c-0027: FOLLOWUP-126 olarak kaydedildi (07 demeti; 03c-2 kapsamına alma, doğru karar). Bitince down -v + YIGIN-KAPA.
+
+### K-03c-0018 · 2026-10-31 19:54 · → isci-b · DUZELT
+Paket: 03c-1   Cevap: R-03C2-0002
+03c-1 r2 delta **ONAY (ürün kodu)**, BLOCKER 0, MAJOR 0, MINOR 2 (state/reviews/03c-1-r2.md; r1 MAJOR-1 kapandı, probe: 30 engelli istek ≤ 1 satır, Redis yokken 503 ve denetim yok). Merge öncesi kısa **r3 (yalnız bu iki küçük düzeltme)**, feat/03c-governance'ta:
+1. **MINOR-1 (merge öncesi, test-only):** `test_03c_6_auth_failures_rate_limited` hâlâ aralıklı kırmızı; kök neden doğrulandı: hata sayacı sabit 60 s kovası (`int(time.time()) // 60`), test 20+1 istekle 20-25 s sürüyor, dakika sınırını aşınca 21. istek 429 yerine 401. Küresel tavan testindeki (0abaed5) gibi dakikayı sabitle (zamanı enjekte et ya da `_failure_key`'i sabit dakikaya çek). Seçenek A (test-only küçük commit).
+2. **MINOR-2:** `ReconcileScheduler.stop()` çağıranın (dış görev) iptalini de yutuyor (`except CancelledError: pass`, probe 3: dış görev iptal edildiğinde stop() normal döndü). `asyncio.current_task().cancelling()` ile ayır (Python 3.12) ya da dış iptali yeniden fırlat; yalnız iç görevin iptali yutulur. Küçük test ekle (dış iptal yeniden fırlar). Bu bir doğruluk hatası (fail-loud), küçük; r3'e al.
+Sonra: iki ardışık yeşil koşu (rate-limit testi dahil, dakika sınırı aşılan koşu ya da zaman enjekte testi), yeni SHA ile PR-HAZIR; r3 inceleyicide statik. 03c-2 kapısı bittiğinde ve 03c-2 PR-HAZIR gelince sırayla: önce 03c-1 (r3 ONAY) merge, sonra 03c-2 rebase. 03c-2 kapısı bitmeden yeni düzeltme commit'i ekleme (kapı SHA'sı sabit kalsın); bittikten sonra uygula.
