@@ -13,6 +13,7 @@
   code, never a silently missing tool.
 """
 
+import contextlib
 import json
 import re
 import time
@@ -33,10 +34,11 @@ from ffcore.guardrails import engine
 from ffcore.guardrails.masking import RedisTokenStore
 from ffcore.guardrails.service import record_events, resolve_policy
 from ffcore.guardrails.settings import get_guardrail_settings
+from ffcore.knowledge.chunking import approx_tokens
 from ffcore.models.knowledge import KnowledgeBase
 from ffcore.models.runs import Message
 from ffcore.models.tools import Tool, ToolAction
-from ffcore.runtime.contracts import JobClass, RunEventType
+from ffcore.runtime.contracts import JobClass, RunEventType, RunStatus
 from ffcore.runtime.definition import (
     MODEL_TOOL_NAME_PATTERN,
     AgentDefinition,
@@ -45,10 +47,18 @@ from ffcore.runtime.definition import (
 from ffcore.runtime.events import RunEventWriter
 from ffcore.runtime.prompting import Source, render_variables, system_parts
 from ffcore.runtime.scheduler import LlmSlots
-from ffcore.runtime.state import GuardResult, ModelTurn, RunContext, ToolCall, ToolOutcome
+from ffcore.runtime.state import (
+    GuardResult,
+    ModelTurn,
+    RunContext,
+    StopRun,
+    ToolCall,
+    ToolOutcome,
+)
 from ffcore.services import mcp_client, mcp_tools
 from ffcore.services.approvals import RunApprovalGate
 from ffcore.services.litellm_client import LiteLLMClient, resolve_target
+from ffcore.services.quota import QuotaGate, QuotaUnavailable, Subject, engine_for
 
 OUTPUT_STAGES = {"output.pre", "output.stream.delta"}
 # guardrail_events.source is 08's closed list (C4); the run's channel decides it.
@@ -76,6 +86,7 @@ class LiteLLMModel:
         user_id,
         model_key: str,
         job_class: JobClass,
+        quota: QuotaGate | None = None,
     ) -> None:
         self._settings = settings
         self._session = session
@@ -84,12 +95,49 @@ class LiteLLMModel:
         self._user_id = str(user_id) if user_id is not None else None
         self._model_key = model_key
         self._job_class = job_class
+        # 03c: every call of a run passes the project's quotas (C20); None only in unit tests.
+        self._quota = quota
 
     async def call(self, messages, *, tools, max_tokens, on_token) -> ModelTurn:
         target = await resolve_target(self._session, self._project_id, self._model_key)
+        if self._quota is not None:
+            decision = await _quota_step(
+                self._quota.check(
+                    target.id, input_tokens=approx_tokens(json.dumps(messages, ensure_ascii=False))
+                )
+            )
+            _stop_if_blocked(decision)
+            if decision.max_output_tokens is not None:
+                max_tokens = min(max_tokens, decision.max_output_tokens)
         params: dict[str, Any] = {"max_tokens": max_tokens}
         if tools:
             params["tools"] = tools
+        held = self._quota.hold() if self._quota is not None else contextlib.nullcontext(None)
+        try:
+            async with held as lease:
+                if lease is not None:
+                    _stop_if_blocked(lease)
+                turn = await self._call(target, messages, params, on_token)
+        except QuotaUnavailable as exc:  # the lease could not be taken (Redis)
+            raise StopRun(RunStatus.failed, exc.code, exc.message) from None
+        if self._quota is not None:
+            # The fallback's own price and name when it answered (01 x-litellm-model-id).
+            answered = (
+                (target.fallback_id, turn.fallback["target_model"])
+                if turn.fallback is not None and target.fallback_id
+                else (target.id, turn.model)
+            )
+            await _quota_step(
+                self._quota.commit(
+                    call_id=turn.call_id,
+                    model_id=answered[0],
+                    model_name=answered[1],
+                    usage=turn.usage or {},
+                )
+            )
+        return turn
+
+    async def _call(self, target, messages, params, on_token) -> ModelTurn:
         content: list[str] = []
         calls: dict[int, dict[str, str]] = {}
         metadata = tracing.trace_context(run_id=self._run_id, user_id=self._user_id) | {
@@ -151,6 +199,28 @@ class LiteLLMModel:
             ms=ms,
             queue_ms=int(waited * 1000),
             call_id=result.call_id,
+        )
+
+
+async def _quota_step(step):
+    """A quota check or count that cannot run stops the run (fail-loud; never unlimited)."""
+    try:
+        return await step
+    except QuotaUnavailable as exc:
+        raise StopRun(RunStatus.failed, exc.code, exc.message) from None
+
+
+def _stop_if_blocked(decision) -> None:
+    if decision.blocked:
+        v = decision.violation
+        raise StopRun(
+            RunStatus.failed,
+            decision.code,
+            "A quota of this project does not allow this model call."
+            if decision.code == "quota_exceeded"
+            else "A USD budget applies but the model has no price.",
+            limit=v.window if v else None,
+            detail=f"{v.scope_type}:{v.quota_id}" if v else None,
         )
 
 
@@ -524,6 +594,16 @@ def context_factory(
                 user_id=run.user_id,
                 model_key=definition.model,
                 job_class=job_class,
+                quota=QuotaGate(
+                    engine_for(settings, redis),
+                    redis,
+                    session,
+                    Subject(
+                        project_id=str(run.project_id),
+                        user_id=str(run.user_id) if run.user_id else None,
+                        api_key_id=str(run.api_key_id) if run.api_key_id else None,
+                    ),
+                ),
             ),
             retriever=HttpRetriever(
                 settings, session, run_id=run.id, project_id=run.project_id, user_id=run.user_id

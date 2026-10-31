@@ -128,7 +128,7 @@ def test_03b_3_bad_signature_and_alg_none_401(settings):
 def client(settings, monkeypatch):
     denied: list[tuple[str, Actor | None]] = []
 
-    async def record(request, actor):
+    async def record(request, actor, detail=None, **_):
         denied.append((request.url.path, actor))
 
     monkeypatch.setattr(auth, "_audit_impersonation_denied", record)
@@ -196,7 +196,31 @@ def test_03b_1_obo_without_service_token_is_ignored_and_audited(client, settings
 
 
 def test_03b_1_obo_ignored_for_non_impersonating_credential(client, settings):
-    # Stand-in for a 03c API key without the `impersonate` scope (and for a 03a user session).
+    # Stand-in for a 03a user session: its X-On-Behalf-Of is ignored and audited.
+    async def session_resolver(request, _settings):
+        if request.headers.get("authorization") == "Bearer dummy-not-secret-session":
+            return Actor(actor_type="user", actor_id="user-9", project_id=PROJECT)
+        return None
+
+    auth.register_credential_resolver(session_resolver)
+    try:
+        response = client.get(
+            "/whoami",
+            headers={
+                "Authorization": "Bearer dummy-not-secret-session",
+                "X-On-Behalf-Of": _obo(settings),
+            },
+        )
+    finally:
+        auth.unregister_credential_resolver(session_resolver)
+    assert response.status_code == 200
+    assert response.json()["type"] == "user"
+    assert response.json()["id"] == "user-9"
+    assert len(client.denied) == 1 and client.denied[0][1].actor_id == "user-9"
+
+
+def test_03b_1_obo_from_key_without_impersonate_fails_loud(client, settings):
+    # 03c (K-03c-0006 item 2): an API key without `impersonate` is refused, not ignored.
     async def api_key_resolver(request, _settings):
         if request.headers.get("authorization") == "Bearer dummy-not-secret-api-key":
             return Actor(actor_type="api_key", actor_id="key-1", project_id=PROJECT)
@@ -213,9 +237,8 @@ def test_03b_1_obo_ignored_for_non_impersonating_credential(client, settings):
         )
     finally:
         auth.unregister_credential_resolver(api_key_resolver)
-    assert response.status_code == 200
-    assert response.json()["type"] == "api_key"
-    assert response.json()["id"] == "key-1"
+    assert response.status_code == 403
+    assert response.json()["error"]["code"] == "impersonation_denied"
     assert len(client.denied) == 1 and client.denied[0][1].actor_id == "key-1"
 
 

@@ -22,6 +22,8 @@ C3_EXCEPTIONS = {
     "guardrail_events": "append-only (08; named in CONTRACTS C3)",
     "kb_queries": "append-only (04a)",
     "run_events": "append-only (06a; named in CONTRACTS C3)",
+    # reporting rows upserted per call, not append-only (03c, K-03c-0004 condition 7)
+    "usage_daily": "upsert (03c; named in CONTRACTS C3)",
 }
 
 # Child tables take the project through their parent (CONTRACTS C3): the column named here is a

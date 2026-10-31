@@ -1,7 +1,7 @@
 """Render a package's OpenAPI draft (`backend/openapi/<package>.yaml`) from the application routes.
 
-Tools container: python -m ffcore.api.openapi_export <package> > openapi/<package>.yaml (03a, 04a,
-05a, 06a, 07, 08).
+Tools container: python -m ffcore.api.openapi_export <package> > openapi/<package>.yaml (03a, 03c,
+04a, 05a, 06a, 07, 08).
 The contract tests compare each committed file with this output, so no draft ever drifts.
 Each draft holds only its package's routes: adding a package never changes an earlier draft.
 """
@@ -19,6 +19,11 @@ PACKAGES = {
         "version": "0.3a",
         "description": "Identity, projects, providers, models and audit (package 03a).",
         "tags": {"auth", "users", "projects", "providers", "models", "audit"},
+    },
+    "03c": {
+        "version": "0.3c",
+        "description": "Governance: API keys, quotas and usage (package 03c).",
+        "tags": {"api-keys", "quotas", "usage"},
     },
     "04a": {
         "version": "0.4a",

@@ -4,6 +4,9 @@ general_settings:
   master_key: os.environ/LITELLM_MASTER_KEY
   database_url: os.environ/LITELLM_DATABASE_URL
   store_model_in_db: true
+  # Spend log rows keep numbers only, never prompt or answer text (03c, K-03c-0004 şart 4).
+  # Usage reporting is the backend's usage_daily; LiteLLM's spend log is not read (K-03c-0008).
+  store_prompts_in_spend_logs: false
 
 # Parameters a provider does not support are an error, not dropped silently; a model drops them
 # only when its request_policy says so (drop_unsupported_params, reject_params).
