@@ -2,10 +2,10 @@
 
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
-- Oturum kimliği: ffcore-isci-a-13ba (aynı oturum, kullanıcı istisnası; önceki lease ffcore-isci-a-af, fix/04a-06a-followups MERGED 3f2bc31)
-- Aktif paket: 13b A tarafı (K-13b-0006), MERGED 3571030
-- Durum: RETIRED
-- Son okunan: K-13b-0010 (koordinatör zili, 13b A MERGED)
+- Oturum kimliği: ffcore-isci-a-116 (önceki lease ffcore-isci-a-13ba RETIRED)
+- Aktif paket: fix/06a-checkpoint-sources (FOLLOWUP-116, K-116-0001)
+- Durum: ACTIVE
+- Son okunan: K-116-0001 (GOREV), K-114-0001, K-W6-0001
 
 ## Mesajlar
 
@@ -1081,3 +1081,24 @@ Paket: 13b A tarafı   Cevap: K-13b-0010
 - Kararlar: K-13b-0006 S1-S4 A; seed aynı belgeyi yeniden yüklemez; known_findings boş; SQL onayı açık bayrak; llm_judge NOT_RUN.
 - Blocker: yok. Açık: test rolünün negative TTL testi (kanca açık, test skip'li); FOLLOWUP-116 (checkpoint metni, 06b); FOLLOWUP-112 (önyüz eşlemeleri).
 - Commit edilmemiş durum: yok. Yerelde imaj etiketleri ffcore/{backend,tools,frontend}:0.0.0-13ba ve 0.0.0-af silinebilir; worktree'lere dokunmadım. Yığınlar kapalı.
+
+### A-116-0001 · 2026-10-31 10:40 · → koordinator · ACK
+Paket: fix/06a-checkpoint-sources   Cevap: K-116-0001
+GOREV alındı; lease ACTIVE (ffcore-isci-a-116). Worktree .worktrees/fix/06a-checkpoint-sources e5074ab, temiz. Touch-zone: runtime/graph.py (+ runner/state gerekirse), tests, docs/agentlar.md; sınıf [A]; C8/C9'a dokunursam dururum.
+İlk bulgu (koddan, plan bunu ele alacak): parça metni checkpoint'te iki yerde: (1) `state.sources[*].text` (graph.py:64), (2) `state.messages`: guard_in'in kullanıcı mesajı (`user_message(..., sources)`, graph.py:137) ve search_documents araç sonucu (graph.py:423, 471) metni içeriyor. Yalnız (1)'i kaldırmak hedefi karşılamaz. Ayrıca bitmiş koşunun checkpoint'i hiç silinmiyor (runner.py; `delete_thread` yok). Plan state/pr/06a-checkpoint-sources.md'ye, seçenekler KARAR-GEREK ile; yığın gerekirse önce YIGIN-AÇ.
+
+
+### A-116-0002 · 2026-10-31 11:05 · → koordinator · DURUM
+Paket: fix/06a-checkpoint-sources   Cevap: K-116-0001
+DURUM: PLANNED talebi (koşullu). Plan: state/pr/06a-checkpoint-sources.md (bulunan semboller, 7 kabul testi, felsefe üçlüsü). Kod yok; A-116-0003 kararına bağlı.
+
+### A-116-0003 · 2026-10-31 11:05 · → koordinator · KARAR-GEREK
+Paket: fix/06a-checkpoint-sources   Cevap: K-116-0001
+Sorun: GOREV hedefi "checkpoint'te yalnız chunk_id" ama metin üç yerde: `state.sources.text`, `state.messages` (guard_in kullanıcı mesajı + search_documents araç sonucu) ve LangGraph'ın her adım için ayrı tuttuğu checkpoint sürümleri. Son durumu temizlemek geçmiş sürümleri silmez. Bitmiş koşunun thread'i hiç silinmiyor; waiting_user'ın süresi yok.
+- **A (Önerilen):** sources metinsiz + koşu bitince `adelete_thread` (runner bitişlerinde hemen; iptal/onay süresi gibi runner dışı bitişler ve başarısız silmeler dakikalık arq cron süpürgesiyle) + bekleyen koşunun belgesi silinmişse resume'da ya da süpürgede `failed`/`source_deleted` (model silinmiş metni görmez). Etki: metin yalnız koşu canlıyken checkpoint'te, silinen belgeyle devam yok; C8/C9 değişmez (yeni durum/olay yok, yalnız hata kodu). Bedel: touch-zone'a `runtime/worker.py` (cron) + yeni `runtime/checkpoints.py`; api/runs.py ve services/approvals.py'ye dokunmaz.
+- B: GOREV'in harfi: state ve mesajlarda yalnız ref, metin her model çağrısında DB'den yeniden kurulur, egress maskesi her çağrıda yeniden. Etki: tam ref modeli; bedel: guardrail egress olayları çağrı başına çoğalır ya da yeni önbellek kuralı gerekir, graph'ın yarısı değişir; `run_events.llm_call.request_messages` metni yine taşıdığı için vaadi tek başına sağlamaz.
+- C: Yalnız `sources.text` kaldırılır. Etki: küçük; bedel: metin messages'da ve eski sürümlerde kalır, FOLLOWUP-116 kapanmış görünür ama kapanmaz (ARCH-13). Önermiyorum.
+
+### A-116-0004 · 2026-10-31 11:05 · → koordinator · KAYIT-TALEBI
+Paket: fix/06a-checkpoint-sources   Cevap: -
+Tür: FOLLOWUP- (bu dalın dışında, dokunmuyorum). `run_events` `llm_call.request_messages` (graph.py:197) ve `answer.text` modele giden maskeli mesajları, dolayısıyla kaynak parça metnini append-only saklar; belge silinince kalır. FOLLOWUP-108 vaadinin üçüncü yeri. Öneri: 03c retention `content` sınıfı (`clear_content`) bu alanları kapsasın; belge silinince ilgili `llm_call` payload'ında `request_messages` temizlensin ya da yalnız ref saklansın. 03c PLANNED'da açıkça istenmeli.

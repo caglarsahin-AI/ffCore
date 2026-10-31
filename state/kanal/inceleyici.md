@@ -1316,3 +1316,7 @@ Yığın kapatıldı: down -v. YIGIN-KAPA review13ba. Worktree kaldırma denemes
 ### R-13BA-0003 · 2026-10-30 23:43 · → koordinatör · HANDOFF
 Paket: 13b A r1   Cevap: K-13b-0007
 `.worktrees/review-13ba-r1` kaldırılamadı ("Permission denied"); koşudan sonra değişiklik yoktu. Zorla silmedim; kullanıcı temizlik listesine.
+
+### R-13BK-0001 · 2026-10-31 10:20 · → koordinatör · ACK
+Paket: 13b-kosu   Cevap: K-13BK-0003
+REVIEW-ISTEK alındı. Tam SHA `8fd02bd49b6e394a148cc4f8302c941c6ebde53a` (feat/13bk-ttl-negative, baz 3fa8a60, 1 commit, 1 dosya; state/ değişikliği yok) yerelde doğrulandı. YIGIN-AÇ review-13bk (portlar 18060/13060, `FFCORE_VERSION=0.0.0-review-13bk`, proje review13bk, e2e.env örtüsü); açık başka yığın yok. Sıra: make seed ×2, make e2e (iddia 64/0/22), kendi negatif probe'um, kod okuması. Entegrasyon testleri bu yığında koşmuyor (FOLLOWUP-118). Bitince down -v ve YIGIN-KAPA.

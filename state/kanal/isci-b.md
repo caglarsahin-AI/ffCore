@@ -2,10 +2,10 @@
 
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
-- Oturum kimliği: ffcore-isci-b-07fu
-- Aktif paket: — (fix/07-followups MERGED a47febe)
-- Durum: RETIRED
-- Son okunan: koordinator K-07F-0008
+- Oturum kimliği: ffcore-isci-b-114
+- Aktif paket: fix/07-test-hooks-flag (FOLLOWUP-114)
+- Durum: ACTIVE
+- Son okunan: koordinator K-114-0001 (2026-10-31 10:15)
 
 ## Mesajlar
 
@@ -1043,3 +1043,12 @@ Paket: fix/07-followups   Cevap: K-07F-0008
   - Bilinen sınır (PR varsayımı): canlı `done` Redis hatasıyla kaybolursa tekrar oynatma cevap metnini bir kez daha `token` olarak verebilir.
 - **Karar/blocker:** yok.
 Lease: RETIRED. Bu oturum kanala başka yazmayacak.
+
+### B-114-0001 · 2026-10-31 10:20 · → koordinator · DURUM
+Paket: fix/07-test-hooks-flag   Cevap: -
+DURUM: OKUMA-TAMAM (yeni oturum ffcore-isci-b-114; lease ACTIVE).
+Not (açıklık): bu oturum kullanıcının 28 Ekim isci-b okuma oturumundan (ffcore-isci-b-01, RETIRED) çatallandı. O gün okunan gruplar 1-8 bağlamda; bugün değişenler yeniden tarandı: 21d9ba1..HEAD diff'i CLAUDE.md, PLAN.md (2.6/2.7), KARARLAR.md (28-31 Ekim eklemeleri: iki yığın kuralı ve YIGIN-AÇ/KAPA, paket başına imaj etiketi, review yığını kuralı, paket başına yeni oturum, dalga 6 sırası), CONTRACTS (C8/C9), TERMINOLOGY; FELSEFE, FELSEFE_UYGULAMA, diğer handbook dosyaları, BASLATMA, plan/07 değişmemiş. BLOCKERS 114 ve 118, WORK_QUEUE satırı, K-114-0001 ve K-116-0001, önceki isci-b HANDOFF B-07FU-0011 okundu. plan/07 brief'i yeniden okunmadı (iş yalnız bir test dosyası).
+
+### B-114-0002 · 2026-10-31 10:20 · → koordinator · ACK
+Paket: fix/07-test-hooks-flag   Cevap: K-114-0001
+GOREV alındı. Worktree C:/ai_paycore/ffcore/.worktrees/fix/07-test-hooks-flag @ e5074ab temiz (branch fix/07-test-hooks-flag). Touch-zone yalnız backend/tests/integration/test_07f_followups.py; ürün kodu değişmez. Plan: test bayrağı açıkça kapatır (`hooks` fixture'ının tersi, `ffcore_test_hooks=False` override; B-07FU-0011 notu), önce bayraklı koşuda kırmızı, sonra yeşil; kanıt bayraklı 10/10 + bayraksız 10/10, iki profil. Entegrasyon testi e2e yığınında koşmaz (FOLLOWUP-118); kendi yığınım 18080/13080, açmadan önce YIGIN-AÇ yazıp sıra beklerim (inceleyici yığını öncelikli). Plan state/pr/07-test-hooks-flag.md'ye yazılınca DURUM: PLANNED.

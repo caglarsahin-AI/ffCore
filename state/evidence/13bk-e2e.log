@@ -1,0 +1,55 @@
+RUN_E2E_SCENARIOS=1 pytest tests/e2e -rs --f-table eval/results/e2e-20261031-0725.md
+============================= test session starts ==============================
+platform linux -- Python 3.12.10, pytest-9.2.0, pluggy-1.7.0
+rootdir: /work
+plugins: Faker-40.43.0, anyio-4.15.1, langsmith-0.14.8
+collected 86 items
+
+tests/e2e/negative/test_13b_negative.py ..............                   [ 16%]
+tests/e2e/scenarios/test_13b_seed_unit.py ...                            [ 19%]
+tests/e2e/scenarios/test_18_env_overlay.py ..                            [ 22%]
+tests/e2e/scenarios/test_18_f10_isolation.py ....                        [ 26%]
+tests/e2e/scenarios/test_18_f11_f13_content.py .....sssssss..ss          [ 45%]
+tests/e2e/scenarios/test_18_f1_f3_answers.py ..ss.s.                     [ 53%]
+tests/e2e/scenarios/test_18_f2_approvals.py ...s                         [ 58%]
+tests/e2e/scenarios/test_18_f2_f12_pending.py ss..ssss..                 [ 69%]
+tests/e2e/scenarios/test_18_f4_f9_gateway_feedback.py ....ss..s          [ 80%]
+tests/e2e/scenarios/test_18_seed_unit.py ......                          [ 87%]
+tests/e2e/test_13b_eval_report.py .....                                  [ 93%]
+tests/e2e/test_13b_ftable.py ......                                      [100%]
+
+============================== F table (plan/18) ===============================
+| Use case | Status | Passed | Failed | NOT_RUN | Failing tests | NOT_RUN reasons |
+|---|---|---|---|---|---|---|
+| F1 | passed | 2 | 0 | 2 |  | NOT_RUN: gerçek model gerekir (PayCore S1 / llmaas); fake-llm 'hello' der (declined = the model's unknown_reply); NOT_RUN: gerçek model gerekir (PayCore S1 / llmaas); fake-llm 'hello' der (make eval sozlesme-33, 13b) |
+| F2 | passed | 5 | 0 | 3 |  | NOT_RUN: gerçek model gerekir; outcome_label=declined the model's own reply after the rejection (fake-llm answers 'hello …', DECLINE_PATTERN does not match); NOT_RUN: triage class accuracy >= 80 % on tickets/tickets-20.jsonl (labels.json); gerçek model ve triyaj agent'ı gerekir; NOT_RUN: PII tickets reach the model masked (fake-llm /_requests); gerçek model ve triyaj agent'ı gerekir |
+| F3 | passed | 2 | 0 | 1 |  | NOT_RUN: gerçek model gerekir (PayCore S1 / llmaas); fake-llm 'hello' der (sql-20 ≥ 80 % via make eval, 13b) |
+| F4 | passed | 4 | 0 | 2 |  | NOT_RUN: quotas are package 03c (PoC sonrası); NOT_RUN: gerçek model gerekir (the model must call a tool with the value) |
+| F9 | passed | 2 | 0 | 1 |  | NOT_RUN: corrected answers into a dataset is package 09 (PoC sonrası) |
+| F10 | passed | 4 | 0 | 0 |  |  |
+| F11 | passed | 5 | 0 | 7 |  | NOT_RUN: gerçek model gerekir (PayCore S1 / llmaas); fake-llm 'hello' der (canary absent and fact present in a real answer); NOT_RUN: gerçek model ve triyaj agent'ı gerekir (ticket-desk ve onay kapısı hazır: test_18_f2_7); NOT_RUN: injection recognizer is 08 full (plan/18 F11) |
+| F12 | passed | 2 | 0 | 4 |  | NOT_RUN: Langfuse stopped: run completes, trace_delivery_failed recorded; service stop needs a compose-level runner (13b); NOT_RUN: Qdrant stopped: search returns a coded error, worker stays healthy; service stop needs a compose-level runner (13b); NOT_RUN: LLM_SLOTS full: run queued, the wait is visible as an event; service stop needs a compose-level runner (13b); NOT_RUN: airgap: provider down, no request to an external host; service stop needs a compose-level runner (13b) |
+| F13 | passed | 2 | 0 | 2 |  | NOT_RUN: gerçek model gerekir (PayCore S1 / llmaas); fake-llm 'hello' der (answer has the v2 value and 01.09.2025) |
+| Negative | passed | 14 | 0 | 0 |  |  |
+| Setup | passed | 22 | 0 | 0 |  |  |
+F table written to eval/results/e2e-20261031-0725.md
+=========================== short test summary info ============================
+SKIPPED [5] tests/e2e/scenarios/test_18_f11_f13_content.py:51: NOT_RUN: gerçek model gerekir (PayCore S1 / llmaas); fake-llm 'hello' der (canary absent and fact present in a real answer)
+SKIPPED [1] tests/e2e/scenarios/test_18_f11_f13_content.py:55: NOT_RUN: gerçek model ve triyaj agent'ı gerekir (ticket-desk ve onay kapısı hazır: test_18_f2_7)
+SKIPPED [1] tests/e2e/scenarios/test_18_f11_f13_content.py:62: NOT_RUN: injection recognizer is 08 full (plan/18 F11)
+SKIPPED [2] tests/e2e/scenarios/test_18_f11_f13_content.py:84: NOT_RUN: gerçek model gerekir (PayCore S1 / llmaas); fake-llm 'hello' der (answer has the v2 value and 01.09.2025)
+SKIPPED [1] tests/e2e/scenarios/test_18_f1_f3_answers.py:61: NOT_RUN: gerçek model gerekir (PayCore S1 / llmaas); fake-llm 'hello' der (declined = the model's unknown_reply)
+SKIPPED [1] tests/e2e/scenarios/test_18_f1_f3_answers.py:65: NOT_RUN: gerçek model gerekir (PayCore S1 / llmaas); fake-llm 'hello' der (make eval sozlesme-33, 13b)
+SKIPPED [1] tests/e2e/scenarios/test_18_f1_f3_answers.py:89: NOT_RUN: gerçek model gerekir (PayCore S1 / llmaas); fake-llm 'hello' der (sql-20 ≥ 80 % via make eval, 13b)
+SKIPPED [1] tests/e2e/scenarios/test_18_f2_approvals.py:95: NOT_RUN: gerçek model gerekir; outcome_label=declined the model's own reply after the rejection (fake-llm answers 'hello …', DECLINE_PATTERN does not match)
+SKIPPED [1] tests/e2e/scenarios/test_18_f2_f12_pending.py:34: NOT_RUN: triage class accuracy >= 80 % on tickets/tickets-20.jsonl (labels.json); gerçek model ve triyaj agent'ı gerekir
+SKIPPED [1] tests/e2e/scenarios/test_18_f2_f12_pending.py:34: NOT_RUN: PII tickets reach the model masked (fake-llm /_requests); gerçek model ve triyaj agent'ı gerekir
+SKIPPED [1] tests/e2e/scenarios/test_18_f2_f12_pending.py:69: NOT_RUN: Langfuse stopped: run completes, trace_delivery_failed recorded; service stop needs a compose-level runner (13b)
+SKIPPED [1] tests/e2e/scenarios/test_18_f2_f12_pending.py:69: NOT_RUN: Qdrant stopped: search returns a coded error, worker stays healthy; service stop needs a compose-level runner (13b)
+SKIPPED [1] tests/e2e/scenarios/test_18_f2_f12_pending.py:69: NOT_RUN: LLM_SLOTS full: run queued, the wait is visible as an event; service stop needs a compose-level runner (13b)
+SKIPPED [1] tests/e2e/scenarios/test_18_f2_f12_pending.py:69: NOT_RUN: airgap: provider down, no request to an external host; service stop needs a compose-level runner (13b)
+SKIPPED [1] tests/e2e/scenarios/test_18_f4_f9_gateway_feedback.py:85: NOT_RUN: quotas are package 03c (PoC sonrası)
+SKIPPED [1] tests/e2e/scenarios/test_18_f4_f9_gateway_feedback.py:90: NOT_RUN: gerçek model gerekir (the model must call a tool with the value)
+SKIPPED [1] tests/e2e/scenarios/test_18_f4_f9_gateway_feedback.py:118: NOT_RUN: corrected answers into a dataset is package 09 (PoC sonrası)
+================== 64 passed, 22 skipped in 66.86s (0:01:06) ===================
+E2E_EXIT=0
