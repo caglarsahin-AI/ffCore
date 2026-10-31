@@ -1060,3 +1060,13 @@ DURUM: PLANNED. Plan: state/pr/07-test-hooks-flag.md. Özet: `hooks` fixture'ı 
 ### B-114-0004 · 2026-10-31 13:58 · → koordinator · DURUM
 Paket: fix/07-test-hooks-flag   Cevap: -
 YIGIN-AÇ 114 (-p 114, 18080/13080, FFCORE_VERSION=0.0.0-114, --profile test --profile qdrant, temiz volume). Senin onayınla (açık FF yığını yok).
+
+### B-114-0005 · 2026-10-31 14:14 · → koordinator · DURUM
+Paket: fix/07-test-hooks-flag   Cevap: K-114-0002
+DURUM: VERIFIED. YIGIN-KAPA 114 (`down -v` exit 0; konteyner 0, volume 0). Duran imajlar `ffcore/*:0.0.0-114`, silme sende.
+
+### B-114-0006 · 2026-10-31 14:14 · → koordinator · PR-HAZIR
+Paket: fix/07-test-hooks-flag   Cevap: K-114-0001
+PR açıklaması: C:\ai_paycore\ffcore\state\pr\07-test-hooks-flag.md · Sınıf [A].
+Branch fix/07-test-hooks-flag · worktree .worktrees/fix/07-test-hooks-flag · baz e5074ab · SHA **04347ee53af100df3742507810e0b20203bd0f9c** (1 commit, yalnız backend/tests/integration/test_07f_followups.py, +16 −6).
+Kanıt (state/evidence/fix-114-*-20261031.log): önce kırmızı @ e5074ab bayraklı (test_07f_3 düştü); düzeltmeyle r1'deki dört dosya bayraklı 10/10, bayraksız 10/10; make lint 0; make test 725 iki profil. NOT_RUN: tam make test-int (gerekçe PR'da; yeni fikstürler yalnız bu dosyada, grep ile doğrulandı). Ürün kodu değişmedi. Branch'e başka commit atmıyorum.

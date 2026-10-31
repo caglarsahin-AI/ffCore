@@ -50,6 +50,7 @@ Başlık: `[B] fix(06a): delete finished runs' checkpoints, stop live runs whose
 | 10 | KB silme o KB'nin belgesini gösteren bekleyen koşuyu işaretler, başkasını işaretlemez | `test_116_10_knowledge_base_delete_marks_waiting_runs` | geçti |
 | 11 | Çalışan koşu belge silinince sonraki adımda durur, model çağrılmaz | `test_116_11_running_run_stops_at_next_step_after_delete` | geçti |
 | 12 | Migration upgrade → downgrade (`06a@-1` iki kez) → upgrade, gerçek Postgres | `test_06a_schema_migration_round_trip` | geçti |
+| 13 | Süpürgede bir koşunun kapanış hatası (Redis) aynı turdaki diğerlerini atlatmaz; hatalı koşu bekler, sonraki turda kapanır; en eski işaret önce | `test_116_12_sweep_isolates_a_failing_close` | geçti (r1 DUZELT) |
 
 Kırmızı kanıt: `red-1.txt` (modül yok), `red-2.txt` (iskelet modülle: 1, 2, 3, 4, 5, 6, 7, 8 davranış hatasıyla düştü: thread satırları 26/40/47, sources'ta `text`, süpürge boş).
 
@@ -66,6 +67,14 @@ Görülmedi (C8/C9'a dokunulmadı; api/runs.py ve services/approvals.py değişm
 - ARCH-07: her koşu ve her agent; kalıcı ekleme bir modül, bir cron, iki nullable kolon; yeni olay türü yok.
 - ARCH-09: silme LangGraph `adelete_thread`, zamanlama `arq cron`, kaynak eşleşmesi mevcut `sources` olayından (jsonb containment); kendi checkpoint deposu ya da metni yeniden kuran katman yok (B reddedildi).
 - ARCH-06/10: silinmiş kaynakla devam yok (`source_deleted`, kodlu `error` olayı); silme hatası `checkpoint_purge_failed` log'u + süpürge yeniden dener + 24 saatte `checkpoint_purge_overdue`; sessiz boş kaynak yok.
+
+## Review r1 bulgu → düzeltme → kanıt (K-116-0005, R-116-0002, r1 ONAY 94f3e07)
+
+| Bulgu | Düzeltme | Kanıt |
+|---|---|---|
+| NOT_RUN gözlemi: `_close_waiting` istisnası (Redis) `sweep` döngüsünden fırlıyor, kalan bekleyen koşular atlanıyor | `sweep`: koşu başına `try/except Exception` + `session.rollback()` + `source_deleted_close_failed` log'u + `continue`; bekleyen sorgusu `order_by(Run.source_deleted_at)` | kırmızı `r1-red.txt` (ConnectionError testten fırladı), yeşil `r1-green.txt` (12 passed), `test_116_12` |
+| MINOR-2: bekleyen koşuda pencere | docs/agentlar.md: "en çok bir süpürge aralığı (60 s; ayarı yok)" + kapanamayan koşu cümlesi. Süpürge aralığı yapılandırma değil: arq `cron(sweep_checkpoints, second=30)`, dakikada bir | docs diff |
+| MINOR-1: `llm_call` metni | bu dalda yok, FOLLOWUP-119 (03c) | NOT_RUN gerekçeli |
 
 ## Değişen dosyalar
 - backend/alembic/versions/06a_0002_checkpoint_lifetime.py (yeni)

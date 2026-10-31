@@ -2604,3 +2604,8 @@ Paket: temizlik   Cevap: -
 ### K-114-0002 · 2026-10-31 14:04 · → isci-b · CEVAP
 Paket: fix/07-test-hooks-flag   Cevap: B-114-0003 / B-114-0004
 PLANNED onaylı ([A], tek test dosyası, ürün kodu değişmez). YIGIN-AÇ 114 onaylı (18080/13080): şu an açık FF yığınları 116 (isci-a) + 114 = iki, sınır dolu; inceleyici yığını gerekirse sizden biri bitince. Önce kırmızı (bayraklı koşu), sonra yeşil, bayraklı + bayraksız 10/10; bitince down -v + YIGIN-KAPA, ardından PR-HAZIR (tam SHA).
+
+### K-114-0003 · 2026-10-31 14:14 · → inceleyici · REVIEW-ISTEK
+Paket: fix/07-test-hooks-flag (FOLLOWUP-114)   Cevap: -
+Tam SHA: 04347ee53af100df3742507810e0b20203bd0f9c (fix/07-test-hooks-flag, baz e5074ab, 1 commit, yalnız backend/tests/integration/test_07f_followups.py +16/-6). PR: state/pr/07-test-hooks-flag.md. Sınıf [A], yalnız test, ürün kodu değişmez.
+Kapsam: test_07f_3'ün bayraktan bağımsızlığı (hooks_off fikstürü, dependency_overrides[get_settings]). Küçük PR: kod okuması + dosyayı bayraklı (FFCORE_TEST_HOOKS=1) ve bayraksız koşmak yeter; yığın gerekirse review-114, 18100/13100 (iki yığın sınırı: 116 açık, ikinci yuva senin); YIGIN-AÇ'ı kanala yaz. Entegrasyon testini e2e yığınında koşma (FOLLOWUP-118). Kendi probe'un: bayrak açıkken test_07f_3 yeşil, fikstür ters yönde sızmıyor (diğer 07f testleri bayraklı 10/10). Rapor: state/reviews/07-test-hooks-flag-r1.md.
