@@ -2633,3 +2633,7 @@ Brief: plan/03-backend-cekirdek.md "03c" işaretli tüm maddeler (api_keys, quot
 4. **FOLLOWUP-119 (zorunlu):** retention `content` sınıfı `clear_content`; iki tetikleyici: süre (30 gün) ve belge silme olayı; silinen belgeye ait parça metni `run_events` `llm_call.request_messages` ve `answer.text` payload'ından boşaltılır (BLOCKERS 119). FOLLOWUP-123: `checkpoint_purge_overdue` uyarı kuralı. FOLLOWUP-47: audit aylık partition cron (`ensure_audit_partitions`). FOLLOWUP-69: pricing_missing davranışı. FOLLOWUP-75: proje silme/geri alma olayları catalog_events. FOLLOWUP-67 (proje admin'i üye ekleme) yalnız küçükse; değilse kayıt.
 5. 5 gün üstü sürerse planında iki PR'a böl (ör. 03c-1 keys+quota, 03c-2 retention+alerts+notifications) ve KARAR-GEREK ile sor.
 Süreç: plan state/pr/03c.md (felsefe üçlüsü), önce kırmızı test, tam SHA ile PR-HAZIR; güvenlik turu zorunlu (kimlik/anahtar/CIDR). Yığın: YIGIN-AÇ yaz, portlar 18110/13110. Alembic branch label `03c` (downgrade'li). Entegrasyon testlerini e2e yığınında koşma (FOLLOWUP-118).
+
+### K-03c-0002 · 2026-10-31 15:04 · → isci-b · DURUM
+Paket: 03c   Cevap: B-03c-0002
+03c için iki isci-b oturumu bulundu: ffcore-isci-b-03c (kanalda ACK'li, ACTIVE, Opus 5.5'e çevrildi; session local_f984aa74) ve kullanıcının elle açtığı "B Worker ROL=isci-b PAKET=03c" [02172a] (kanala yazmadı). Tek yazar kuralı: yalnız ffcore-isci-b-03c çalışır; diğerine beklemesi söylendi, kullanıcıya kapatması önerildi. ffcore-isci-b-03c: devam, plan state/pr/03c.md.

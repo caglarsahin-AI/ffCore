@@ -3,9 +3,9 @@
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
 - Oturum kimliği: ffcore-isci-a-116 (önceki lease ffcore-isci-a-13ba RETIRED)
-- Aktif paket: fix/06a-checkpoint-sources (FOLLOWUP-116, K-116-0001)
-- Durum: ACTIVE
-- Son okunan: K-116-0005 (DUZELT, r1 ONAY + sweep izolasyonu)
+- Aktif paket: fix/06a-checkpoint-sources (FOLLOWUP-116), MERGED 1e12c4b
+- Durum: RETIRED
+- Son okunan: K-116-0007 (MERGED, HANDOFF iste)
 
 ## Mesajlar
 
@@ -1150,4 +1150,14 @@ Paket: fix/06a-checkpoint-sources   Cevap: K-116-0005
 r1 DUZELT uygulandı. Branch fix/06a-checkpoint-sources @ ceaa7045d66fac8745cdd98b7a25d5857a73779e (94f3e07 üstüne 1 commit, 3 dosya: runtime/checkpoints.py, tests/integration/test_116_checkpoint_sources.py, docs/agentlar.md). Sınıf [B], push yok. PR: state/pr/06a-checkpoint-sources.md "Review r1 bulgu → düzeltme → kanıt".
 (1) sweep: koşu başına try/except + rollback + `source_deleted_close_failed`, continue; (2) `order_by(Run.source_deleted_at)`; (3) `test_116_12`: önce kırmızı (r1-red.txt, ConnectionError döngüden fırladı), sonra yeşil; (4) docs: en çok bir süpürge aralığı (60 s); aralık ayar değil (arq cron `second=30`).
 Kapılar ceaa704: make lint 0; make test llmaas 727/727, airgap 727/727; make test-int 542 passed + 4 opt-in (529 s).
+
+### A-116-0015 · 2026-10-31 14:55 · → koordinator · HANDOFF
+Paket: fix/06a-checkpoint-sources   Cevap: K-116-0007
+- Durum: MERGED (main 1e12c4b; r1 ONAY 94f3e07, r2 delta ONAY ceaa704). Lease ffcore-isci-a-116 RETIRED; oturum kapanıyor.
+- Tam sonraki adım: bu dalda iş yok. Kalan: FOLLOWUP-119 (03c, K-03c-0001 madde 4'te zorunlu: `run_events` llm_call.request_messages/answer.text temizliği; `mark_document_runs` ile aynı jsonb eşleşmesi `runtime/checkpoints.py` `_shows_document` yeniden kullanılabilir), FOLLOWUP-123 (`checkpoint_purge_overdue` uyarı kuralı, 03c). A-116-0010'daki önyüz (run-timeline ham `request_messages`) ve 07 (source_deleted ile kapanan koşunun pending onayı) önerileri koordinatörde.
+- Değişen dosyalar: backend/alembic/versions/06a_0002_checkpoint_lifetime.py, backend/ffcore/{models/runs.py, runtime/checkpoints.py, runtime/runner.py, runtime/graph.py, runtime/worker.py, api/knowledge.py}, backend/tests/{integration/test_116_checkpoint_sources.py, integration/test_06a_schema.py, unit/test_116_source_state.py, unit/test_07_worker.py}, docs/agentlar.md. Ayrıntı state/pr/06a-checkpoint-sources.md.
+- Testler: ceaa704'te make lint 0; make test 727/727 iki profil; make test-int 542 + 4 opt-in. NOT_RUN: eski sürüm uygulaması downgrade sonrası açılış (kabul), gerçek model/airgap.
+- Kararlar: K-116-0002 (A şartlı, [B]), K-116-0005 (sweep izolasyonu); varsayımlar PR "Varsayımlar" 1-6 (işaret kolonu `runs.source_deleted_at`, işaret running + waiting_*, retrieve→guard_in sürümü metni taşır ama thread sonunda silinir).
+- Blocker: yok.
+- Commit edilmemiş durum: yok (yalnız state/ kanal ve PR dosyası, koordinatör commit eder). Yığın kapalı; yerelde `ffcore/{tools,backend,frontend}:0.0.0-116` etiketleri silinebilir.
 
