@@ -1,7 +1,8 @@
 openapi: 3.1.0
 info:
   title: FFCore API
-  description: 'Governance: API keys, quotas and usage (package 03c).'
+  description: 'Governance: API keys, quotas, usage, retention, alerts and notification settings (package
+    03c).'
   version: 0.3c
 paths:
   /api/v1/projects/{project_id}/api-keys:
@@ -717,8 +718,1730 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorBody'
+  /api/v1/alert-kinds:
+    get:
+      tags:
+      - alerts
+      summary: Alert kinds a rule may use
+      operationId: alert_kinds_api_v1_alert_kinds_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AlertKinds'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+  /api/v1/projects/{project_id}/alert-rules:
+    get:
+      tags:
+      - alerts
+      summary: List alert rules
+      operationId: list_project_rules_api_v1_projects__project_id__alert_rules_get
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AlertRuleList'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+    post:
+      tags:
+      - alerts
+      summary: Create an alert rule
+      operationId: create_project_rule_api_v1_projects__project_id__alert_rules_post
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AlertRuleCreate'
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AlertRuleOut'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+  /api/v1/projects/{project_id}/alert-rules/{rule_id}:
+    patch:
+      tags:
+      - alerts
+      summary: Change an alert rule
+      operationId: update_project_rule_api_v1_projects__project_id__alert_rules__rule_id__patch
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      - name: rule_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Rule Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AlertRuleUpdate'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AlertRuleOut'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+    delete:
+      tags:
+      - alerts
+      summary: Delete an alert rule (soft delete)
+      operationId: delete_project_rule_api_v1_projects__project_id__alert_rules__rule_id__delete
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      - name: rule_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Rule Id
+      responses:
+        '204':
+          description: Successful Response
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+  /api/v1/projects/{project_id}/alerts:
+    get:
+      tags:
+      - alerts
+      summary: The project's alerts, newest first
+      operationId: list_project_alerts_api_v1_projects__project_id__alerts_get
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AlertList'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+  /api/v1/projects/{project_id}/alerts/count:
+    get:
+      tags:
+      - alerts
+      summary: Open alerts (badge)
+      operationId: count_project_alerts_api_v1_projects__project_id__alerts_count_get
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AlertCount'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+  /api/v1/projects/{project_id}/alerts/{alert_id}/ack:
+    post:
+      tags:
+      - alerts
+      summary: Acknowledge an alert
+      operationId: ack_project_alert_api_v1_projects__project_id__alerts__alert_id__ack_post
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      - name: alert_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Alert Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AlertOut'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+  /api/v1/alert-rules:
+    get:
+      tags:
+      - alerts
+      summary: Installation alert rules
+      operationId: list_rules_api_v1_alert_rules_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AlertRuleList'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+    post:
+      tags:
+      - alerts
+      summary: Create an installation alert rule
+      operationId: create_rule_api_v1_alert_rules_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AlertRuleCreate'
+        required: true
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AlertRuleOut'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+  /api/v1/alert-rules/{rule_id}:
+    patch:
+      tags:
+      - alerts
+      summary: Change an installation alert rule
+      operationId: update_rule_api_v1_alert_rules__rule_id__patch
+      parameters:
+      - name: rule_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Rule Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AlertRuleUpdate'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AlertRuleOut'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+    delete:
+      tags:
+      - alerts
+      summary: Delete an installation alert rule
+      operationId: delete_rule_api_v1_alert_rules__rule_id__delete
+      parameters:
+      - name: rule_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Rule Id
+      responses:
+        '204':
+          description: Successful Response
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+  /api/v1/alerts:
+    get:
+      tags:
+      - alerts
+      summary: Installation alerts
+      operationId: list_alerts_api_v1_alerts_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AlertList'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+  /api/v1/alerts/count:
+    get:
+      tags:
+      - alerts
+      summary: Open installation alerts
+      operationId: count_alerts_api_v1_alerts_count_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AlertCount'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+  /api/v1/alerts/{alert_id}/ack:
+    post:
+      tags:
+      - alerts
+      summary: Acknowledge an installation alert
+      operationId: ack_alert_api_v1_alerts__alert_id__ack_post
+      parameters:
+      - name: alert_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Alert Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AlertOut'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+  /api/v1/projects/{project_id}/notification-settings:
+    get:
+      tags:
+      - notifications
+      summary: The project's notification settings
+      operationId: get_project_settings_api_v1_projects__project_id__notification_settings_get
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationSettingsOut'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+    put:
+      tags:
+      - notifications
+      summary: Set the project's notification settings
+      operationId: put_project_settings_api_v1_projects__project_id__notification_settings_put
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NotificationSettingsIn'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationSettingsOut'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+  /api/v1/projects/{project_id}/notifications/test:
+    post:
+      tags:
+      - notifications
+      summary: Send a test e-mail or webhook
+      operationId: test_project_notification_api_v1_projects__project_id__notifications_test_post
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NotificationTest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationTestResult'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+  /api/v1/notification-settings:
+    get:
+      tags:
+      - notifications
+      summary: Installation notification settings
+      operationId: get_settings__api_v1_notification_settings_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationSettingsOut'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+    put:
+      tags:
+      - notifications
+      summary: Set the installation notification settings
+      operationId: put_settings_api_v1_notification_settings_put
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NotificationSettingsIn'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationSettingsOut'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+  /api/v1/notifications/test:
+    post:
+      tags:
+      - notifications
+      summary: Send a test with the installation settings
+      operationId: test_notification_api_v1_notifications_test_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NotificationTest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationTestResult'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+  /api/v1/retention/policies:
+    get:
+      tags:
+      - retention
+      summary: Retention classes and overrides
+      operationId: list_policies_api_v1_retention_policies_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PolicyList'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+  /api/v1/retention/policies/{data_class}:
+    put:
+      tags:
+      - retention
+      summary: Set a retention period
+      operationId: put_policy_api_v1_retention_policies__data_class__put
+      parameters:
+      - name: data_class
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/DataClass'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PolicyUpdate'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PolicyOut'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+  /api/v1/retention/policies/{data_class}/overrides/{project_id}:
+    delete:
+      tags:
+      - retention
+      summary: Remove a project override
+      operationId: delete_override_api_v1_retention_policies__data_class__overrides__project_id__delete
+      parameters:
+      - name: data_class
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/DataClass'
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      responses:
+        '204':
+          description: Successful Response
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+  /api/v1/retention/dry-run:
+    post:
+      tags:
+      - retention
+      summary: Count what a run would remove
+      operationId: dry_run_api_v1_retention_dry_run_post
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RunResults'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+  /api/v1/retention/run:
+    post:
+      tags:
+      - retention
+      summary: Remove expired data now
+      operationId: run_api_v1_retention_run_post
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RunResults'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+  /api/v1/retention/runs:
+    get:
+      tags:
+      - retention
+      summary: The removal record, newest first
+      operationId: list_runs_api_v1_retention_runs_get
+      parameters:
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 200
+          title: Limit
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RunRecords'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
 components:
   schemas:
+    AlertChannel:
+      type: string
+      enum:
+      - email
+      - webhook
+      - ui
+      title: AlertChannel
+    AlertCount:
+      properties:
+        open:
+          type: integer
+          title: Open
+          description: Alerts not acked yet (console badge).
+      type: object
+      required:
+      - open
+      title: AlertCount
+    AlertKind:
+      type: string
+      enum:
+      - budget_threshold
+      - service_down
+      - ingest_error
+      - sync_error
+      - prune_refused
+      - approval_pending_age
+      - guardrail_block_rate
+      - quota_warn
+      - convert_timeout
+      - disk_memory
+      - checkpoint_purge_overdue
+      title: AlertKind
+    AlertKinds:
+      properties:
+        kinds:
+          items:
+            $ref: '#/components/schemas/AlertKind'
+          type: array
+          title: Kinds
+          description: 'Kinds a rule may use: something emits them.'
+      type: object
+      required:
+      - kinds
+      title: AlertKinds
+    AlertList:
+      properties:
+        data:
+          items:
+            $ref: '#/components/schemas/AlertOut'
+          type: array
+          title: Data
+      type: object
+      required:
+      - data
+      title: AlertList
+    AlertOut:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+        rule_id:
+          type: string
+          format: uuid
+          title: Rule Id
+        project_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Project Id
+        kind:
+          $ref: '#/components/schemas/AlertKind'
+        fired_at:
+          type: string
+          format: date-time
+          title: Fired At
+        severity:
+          type: string
+          title: Severity
+        payload:
+          additionalProperties: true
+          type: object
+          title: Payload
+          description: Facts of the alert; `delivery` its channel status.
+        acked_by:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Acked By
+        acked_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Acked At
+      type: object
+      required:
+      - id
+      - rule_id
+      - project_id
+      - kind
+      - fired_at
+      - severity
+      - payload
+      - acked_by
+      - acked_at
+      title: AlertOut
+    AlertRuleCreate:
+      properties:
+        kind:
+          $ref: '#/components/schemas/AlertKind'
+        channel:
+          $ref: '#/components/schemas/AlertChannel'
+        params:
+          additionalProperties: true
+          type: object
+          title: Params
+          description: 'budget_threshold: thresholds (percent list, default 50/80/100); webhook: webhook_url
+            (else the notification settings'' default).'
+        recipients:
+          items:
+            type: string
+          type: array
+          title: Recipients
+          description: E-mail addresses.
+        is_active:
+          type: boolean
+          title: Is Active
+          default: true
+      additionalProperties: false
+      type: object
+      required:
+      - kind
+      - channel
+      title: AlertRuleCreate
+    AlertRuleList:
+      properties:
+        data:
+          items:
+            $ref: '#/components/schemas/AlertRuleOut'
+          type: array
+          title: Data
+      type: object
+      required:
+      - data
+      title: AlertRuleList
+    AlertRuleOut:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+        project_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Project Id
+        kind:
+          $ref: '#/components/schemas/AlertKind'
+        channel:
+          $ref: '#/components/schemas/AlertChannel'
+        params:
+          additionalProperties: true
+          type: object
+          title: Params
+        recipients:
+          items:
+            type: string
+          type: array
+          title: Recipients
+        is_active:
+          type: boolean
+          title: Is Active
+        created_by:
+          type: string
+          title: Created By
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+      type: object
+      required:
+      - id
+      - project_id
+      - kind
+      - channel
+      - params
+      - recipients
+      - is_active
+      - created_by
+      - created_at
+      title: AlertRuleOut
+    AlertRuleUpdate:
+      properties:
+        params:
+          additionalProperties: true
+          type: object
+          title: Params
+        recipients:
+          items:
+            type: string
+          type: array
+          title: Recipients
+        is_active:
+          type: boolean
+          title: Is Active
+      additionalProperties: false
+      type: object
+      title: AlertRuleUpdate
     ApiKeyAclRole:
       type: string
       enum:
@@ -967,6 +2690,20 @@ components:
       additionalProperties: false
       type: object
       title: ApiKeyUpdate
+    DataClass:
+      type: string
+      enum:
+      - content
+      - telemetry
+      - traces
+      - jobs
+      - metrics
+      - alerts
+      - audit
+      - usage
+      - results
+      - memory
+      title: DataClass
     ErrorBody:
       properties:
         error:
@@ -996,6 +2733,179 @@ components:
       - type
       - code
       title: ErrorDetail
+    NotificationSettingsIn:
+      properties:
+        smtp:
+          anyOf:
+          - $ref: '#/components/schemas/SmtpSettings'
+          - type: 'null'
+        default_webhook_url:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Default Webhook Url
+        from_address:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: From Address
+      additionalProperties: false
+      type: object
+      title: NotificationSettingsIn
+    NotificationSettingsOut:
+      properties:
+        project_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Project Id
+        smtp:
+          anyOf:
+          - $ref: '#/components/schemas/SmtpSettings'
+          - type: 'null'
+        default_webhook_url:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Default Webhook Url
+        from_address:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: From Address
+        updated_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Updated At
+        updated_by:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Updated By
+      type: object
+      required:
+      - project_id
+      - smtp
+      - default_webhook_url
+      - from_address
+      - updated_at
+      - updated_by
+      title: NotificationSettingsOut
+    NotificationTest:
+      properties:
+        channel:
+          $ref: '#/components/schemas/TestChannel'
+        recipient:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Recipient
+          description: E-mail address for the test mail.
+      additionalProperties: false
+      type: object
+      required:
+      - channel
+      title: NotificationTest
+    NotificationTestResult:
+      properties:
+        channel:
+          $ref: '#/components/schemas/TestChannel'
+        status:
+          type: string
+          title: Status
+          description: sent
+      type: object
+      required:
+      - channel
+      - status
+      title: NotificationTestResult
+    PolicyList:
+      properties:
+        dry_run_default:
+          type: boolean
+          title: Dry Run Default
+          description: 'RETENTION_DRY_RUN: the daily job only counts.'
+        audit_drop_enabled:
+          type: boolean
+          title: Audit Drop Enabled
+          description: RETENTION_AUDIT_DROP_ENABLED.
+        data:
+          items:
+            $ref: '#/components/schemas/PolicyOut'
+          type: array
+          title: Data
+      type: object
+      required:
+      - dry_run_default
+      - audit_drop_enabled
+      - data
+      title: PolicyList
+    PolicyOut:
+      properties:
+        data_class:
+          $ref: '#/components/schemas/DataClass'
+        project_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Project Id
+          description: 'Null: the installation value; set: an override.'
+        keep_days:
+          type: integer
+          title: Keep Days
+        min_days:
+          type: integer
+          title: Min Days
+        max_days:
+          type: integer
+          title: Max Days
+        expiry_behavior:
+          type: string
+          title: Expiry Behavior
+          description: 'delete, or clear_content (content: text only).'
+        source:
+          type: string
+          title: Source
+          description: default (the brief's value) or override.
+        updated_at:
+          type: string
+          format: date-time
+          title: Updated At
+        updated_by:
+          type: string
+          title: Updated By
+      type: object
+      required:
+      - data_class
+      - project_id
+      - keep_days
+      - min_days
+      - max_days
+      - expiry_behavior
+      - source
+      - updated_at
+      - updated_by
+      title: PolicyOut
+    PolicyUpdate:
+      properties:
+        keep_days:
+          type: integer
+          title: Keep Days
+        project_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Project Id
+      additionalProperties: false
+      type: object
+      required:
+      - keep_days
+      title: PolicyUpdate
     QuotaAction:
       type: string
       enum:
@@ -1291,6 +3201,166 @@ components:
       additionalProperties: false
       type: object
       title: QuotaWindows
+    RunRecord:
+      properties:
+        data_class:
+          $ref: '#/components/schemas/DataClass'
+        project_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Project Id
+        cutoff:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Cutoff
+        counts:
+          additionalProperties: true
+          type: object
+          title: Counts
+        status:
+          type: string
+          title: Status
+        error_code:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Error Code
+        id:
+          type: string
+          format: uuid
+          title: Id
+        ts:
+          type: string
+          format: date-time
+          title: Ts
+        trigger:
+          type: string
+          title: Trigger
+        dry_run:
+          type: boolean
+          title: Dry Run
+        actor_id:
+          type: string
+          title: Actor Id
+      type: object
+      required:
+      - data_class
+      - project_id
+      - cutoff
+      - counts
+      - status
+      - error_code
+      - id
+      - ts
+      - trigger
+      - dry_run
+      - actor_id
+      title: RunRecord
+    RunRecords:
+      properties:
+        data:
+          items:
+            $ref: '#/components/schemas/RunRecord'
+          type: array
+          title: Data
+      type: object
+      required:
+      - data
+      title: RunRecords
+    RunResult:
+      properties:
+        data_class:
+          $ref: '#/components/schemas/DataClass'
+        project_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Project Id
+        cutoff:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Cutoff
+        counts:
+          additionalProperties: true
+          type: object
+          title: Counts
+        status:
+          type: string
+          title: Status
+        error_code:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Error Code
+      type: object
+      required:
+      - data_class
+      - project_id
+      - cutoff
+      - counts
+      - status
+      - error_code
+      title: RunResult
+    RunResults:
+      properties:
+        dry_run:
+          type: boolean
+          title: Dry Run
+        data:
+          items:
+            $ref: '#/components/schemas/RunResult'
+          type: array
+          title: Data
+      type: object
+      required:
+      - dry_run
+      - data
+      title: RunResults
+    SmtpSettings:
+      properties:
+        host:
+          type: string
+          maxLength: 255
+          minLength: 1
+          title: Host
+        port:
+          type: integer
+          title: Port
+          description: 25, 465 (TLS) or 587 (STARTTLS).
+        username:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Username
+        password:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Password
+          description: Answered as "***".
+        starttls:
+          type: boolean
+          title: Starttls
+          default: true
+      additionalProperties: false
+      type: object
+      required:
+      - host
+      - port
+      title: SmtpSettings
+    TestChannel:
+      type: string
+      enum:
+      - email
+      - webhook
+      title: TestChannel
     UsageRow:
       properties:
         date:

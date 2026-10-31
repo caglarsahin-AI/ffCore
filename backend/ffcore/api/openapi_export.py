@@ -22,8 +22,9 @@ PACKAGES = {
     },
     "03c": {
         "version": "0.3c",
-        "description": "Governance: API keys, quotas and usage (package 03c).",
-        "tags": {"api-keys", "quotas", "usage"},
+        "description": "Governance: API keys, quotas, usage, retention, alerts and notification "
+        "settings (package 03c).",
+        "tags": {"api-keys", "quotas", "usage", "retention", "alerts", "notifications"},
     },
     "04a": {
         "version": "0.4a",

@@ -21,6 +21,28 @@ EXPECTED = {
     P + "/quotas": {"get", "post"},
     P + "/quotas/{quota_id}": {"get", "patch", "delete"},
     P + "/usage": {"get"},
+    # 03c-2
+    "/api/v1/retention/policies": {"get"},
+    "/api/v1/retention/policies/{data_class}": {"put"},
+    "/api/v1/retention/policies/{data_class}/overrides/{project_id}": {"delete"},
+    "/api/v1/retention/dry-run": {"post"},
+    "/api/v1/retention/run": {"post"},
+    "/api/v1/retention/runs": {"get"},
+    "/api/v1/alert-kinds": {"get"},
+    P + "/alert-rules": {"get", "post"},
+    P + "/alert-rules/{rule_id}": {"patch", "delete"},
+    P + "/alerts": {"get"},
+    P + "/alerts/count": {"get"},
+    P + "/alerts/{alert_id}/ack": {"post"},
+    "/api/v1/alert-rules": {"get", "post"},
+    "/api/v1/alert-rules/{rule_id}": {"patch", "delete"},
+    "/api/v1/alerts": {"get"},
+    "/api/v1/alerts/count": {"get"},
+    "/api/v1/alerts/{alert_id}/ack": {"post"},
+    P + "/notification-settings": {"get", "put"},
+    P + "/notifications/test": {"post"},
+    "/api/v1/notification-settings": {"get", "put"},
+    "/api/v1/notifications/test": {"post"},
 }
 
 
