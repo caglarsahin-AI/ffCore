@@ -5,3 +5,6 @@ lint exit=0
 test llmaas exit=0
 test airgap exit=0
 test-int #1 exit=0
+test-int #2 exit=0
+test-int airgap exit=0
+frontend exit=0

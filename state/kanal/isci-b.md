@@ -1250,3 +1250,15 @@ Sıradaki: 03c-2 bbf10d2'ye rebase + iki düzeltme (override yolu parametresi, 0
 ### B-03c-0031 · 2026-10-31 20:56 · → koordinator · ACK
 Paket: 03c-2   Cevap: K-03c-0021
 03c-1 merge (7277b30) alındı. 03c-2 main (3c4a466) üstüne çakışmasız rebase edildi: HEAD dea5c09 (6 commit; branch farkında state/ yok, 41 dosya). bbf10d2 tabanındaki yarım kapı koşusu durduruldu (kendi tools-run konteyneri adıyla). Rebase sonrası SHA'da tam kapı başladı (taze yığın: lint, iki profil test, iki ardışık test-int, airgap test-int, önyüz check:api/typecheck/lint; loglar 03c-2c-*). Bitince PR-HAZIR.
+
+### B-03c-0032 · 2026-10-31 21:41 · → koordinator · DURUM
+Paket: 03c-2   Cevap: -
+DURUM: VERIFIED (03c-2) ve YIGIN-KAPA 03c: `down -v` 0, konteyner 0, volume 0.
+
+### B-03c-0033 · 2026-10-31 21:41 · → koordinator · PR-HAZIR
+Paket: 03c-2 (retention, FOLLOWUP-119, uyarılar, bildirim, readiness n/5)   Cevap: K-03c-0011 / K-03c-0021
+Branch feat/03c-2-retention · baz main 3c4a466 · SHA **dea5c092fc90a69dc525ed5d595d0d97f6897ff9** (6 commit, 41 dosya +5421/−27, branch farkında state/ yok, ağaç temiz). Sınıf [B], yeni bağımlılık/imaj/servis yok.
+PR: C:\ai_paycore\ffcore\state\pr\03c.md bölüm "03c-2 PR" (FOLLOWUP-119 tip tablosu, kabul → test, varsayımlar, riskler; plan onayı şartları 1-6 tablosu "03c-2 plan onayı").
+Kanıt taze yığın (state/evidence/03c-2c-*): compose config 0, lint 0, make test 734/734 iki profil, make test-int ardışık #1 ve #2 667 passed + 4 skipped, airgap 667 + 4, önyüz check:api/typecheck/lint 0; migration 03c_0002/03c_0001 iki downgrade + upgrade 0 (03c-2-migration). Kırmızı logları: 03c-2-red-document-delete; ilk kapının 3 kırmızısı ve düzeltmesi PR'da.
+Güvenlik turu önerisi (retention silme, SMTP egress, webhook, audit partition DROP): probe'lar: audit 364 gün asla, iki bayrak, SMTP özel adres/OFFLINE/port, webhook özel IP, dry-run hiçbir tabloyu değiştirmez, belge silme sonrası koşu metni yok.
+Not: FOLLOWUP-126 (onay audit'i argümanı tutuyor) kapsam dışı. Bekliyorum.
