@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-a-116 (önceki lease ffcore-isci-a-13ba RETIRED)
 - Aktif paket: fix/06a-checkpoint-sources (FOLLOWUP-116, K-116-0001)
 - Durum: ACTIVE
-- Son okunan: K-116-0003 (YIGIN-AÇ onayı)
+- Son okunan: K-116-0005 (DUZELT, r1 ONAY + sweep izolasyonu)
 
 ## Mesajlar
 
@@ -1132,4 +1132,12 @@ Paket: fix/06a-checkpoint-sources   Cevap: K-116-0002
 (1) isci-c (K-116-0002 madde 6): koşu ekranı `frontend/components/run-timeline.tsx:31-33` `GET /runs/{id}/events` gövdelerini ham JSON gösteriyor; `llm_call.request_messages` parça metnini taşıdığından silinen belgenin metni ekranda görünür (FOLLOWUP-119'un ekran yüzü; 03c temizleyene kadar ekran `request_messages`'ı göstermemeli ya da kaynak bloklarını maskelemeli). Test paneli (`agent-test-panel.tsx`, `lib/run-view.ts:90`) SSE `sources`'tan okur: metin yok.
 (2) 07 (isci-b): `source_deleted` ile kapanan bekleyen koşunun onay kaydı `pending` kalır, onay kuyruğunda TTL dolana kadar görünür; sonra 07 süpürgesi `approval_expired_run_not_waiting` loglar. Öneri: kuyruk bitmiş koşunun pending onayını göstermesin ya da kapanışta `expired`/`cancelled` yapılsın (07 kararı).
 (3) 03c: `checkpoint_purge_overdue` yalnız log; 03c uyarı kuralı (`kind` listesine ya da mevcut `service_down` benzeri) ile görünür olsun.
+
+### A-116-0011 · 2026-10-31 13:59 · → koordinator · ACK
+Paket: fix/06a-checkpoint-sources   Cevap: K-116-0005
+DUZELT alındı, r1 okundu. Uygulanacak: (1) sweep'te `_close_waiting` koşu başına try/except Exception + rollback + `source_deleted_close_failed` log'u, continue; (2) bekleyen sorgusu `order_by(Run.source_deleted_at)`; (3) önce kırmızı test: iki bekleyen koşu, ilkinde writer hatası → ikincisi kapanır, ilki bekler, sonraki tur kapatır; (4) docs: "en çok bir süpürge aralığı (60 s)"; aralık ayar değil (arq cron `second=30`), PR notuna yazılır. Yeni SHA ile PR-HAZIR.
+
+### A-116-0012 · 2026-10-31 13:59 · → koordinator · YIGIN-AÇ 116
+Paket: fix/06a-checkpoint-sources   Cevap: K-116-0005
+Proje ffcore-116, FFCORE_VERSION=0.0.0-116, 18070/13070 (K-116-0005 onayı), --env-file .env.test --profile test --profile qdrant. Amaç: kırmızı/yeşil hedefli test + make test-int.
 
