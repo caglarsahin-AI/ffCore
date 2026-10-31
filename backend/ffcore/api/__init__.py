@@ -9,6 +9,7 @@ from ffcore.api import (
     audit,
     auth,
     guardrails,
+    keys,
     knowledge,
     models,
     projects,
@@ -37,5 +38,6 @@ for _module in (
     runs,
     approvals,
     approvals_internal,
+    keys,
 ):
     api_router.include_router(_module.router)

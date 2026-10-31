@@ -155,6 +155,12 @@ class Settings(BaseSettings):
     langsmith_tracing: bool = False
     langchain_tracing_v2: bool = False
 
+    # --- 03c governance ---
+    # Wrong API keys from one client address per minute before 429 too_many_auth_failures.
+    api_key_auth_failures_per_min: int = Field(default=20, gt=0)
+    # last_used_at is written at most once per this many seconds per key (write buffer).
+    api_key_last_used_flush_s: int = Field(default=60, ge=0)
+
     @field_validator(
         "egress_allowlist", "allowed_internal_hosts", "allowed_languages", mode="before"
     )

@@ -34,6 +34,9 @@ class Actor:
     # True when a service account acts for this user through X-On-Behalf-Of.
     via_service: bool = False
     scopes: frozenset[str] = field(default_factory=frozenset)
+    # (03c) The role an API key's own searches run under (B7). None for every other actor: a
+    # user (also one reached through impersonate) is checked by project membership.
+    acl_role: str | None = None
 
     @property
     def may_impersonate(self) -> bool:

@@ -17,6 +17,7 @@ from ffcore.core.session import session_resolver
 from ffcore.core.tracing import init_tracing, shutdown_tracing
 from ffcore.knowledge.embed import probe_dimension
 from ffcore.services import catalog_events
+from ffcore.services.keys import api_key_resolver
 from ffcore.services.litellm_reconcile import background_scheduler
 from ffcore.services.providers import register_embedding_probe
 
@@ -24,6 +25,8 @@ log = logging.getLogger("ffcore.main")
 
 # Console sessions (03a); resolve_actor stays the single verification point (C2).
 register_credential_resolver(session_resolver)
+# API keys (03c): `Bearer ffk_...`, after the service token and the session cookie.
+register_credential_resolver(api_key_resolver)
 # 04a: the in-process embedding model measures its own dimension for 03a's model registration.
 register_embedding_probe("local_flagembedding", probe_dimension)
 
