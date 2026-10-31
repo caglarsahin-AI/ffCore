@@ -184,12 +184,14 @@ async def execute(
                 # A real pass counts first and records the count, then removes and records
                 # what it removed: two append-only rows, so a pass cut short still shows what
                 # it was about to do (K-03c-0011 condition 5).
-                steps = [(c, True) for c in sorted(grouped)]
+                # audit last: the privacy classes (content first) never wait behind it (r1).
+                order = sorted(grouped, key=lambda c: (c == "audit", c))
+                steps = [(c, True) for c in order]
                 if not dry_run:
-                    steps = [(c, s) for c in sorted(grouped) for s in (True, False)]
+                    steps = [(c, s) for c in order for s in (True, False)]
                 for data_class, counting in steps:
                     for result in await _run_class(
-                        session, settings, data_class, grouped[data_class], counting, now
+                        session, settings, data_class, grouped[data_class], counting, now, trigger
                     ):
                         session.add(
                             RetentionRun(
@@ -214,13 +216,32 @@ async def execute(
     return results
 
 
-async def _run_class(session, settings, data_class, rows, dry_run, now) -> list[ClassResult]:
+async def _run_class(
+    session, settings, data_class, rows, dry_run, now, trigger="manual"
+) -> list[ClassResult]:
     base = next(r for r in rows if r.project_id is None)
     overrides = [r for r in rows if r.project_id is not None]
     if data_class in EXTERNAL or (data_class in NO_TARGET and data_class not in EXECUTORS):
         return [ClassResult(data_class, None, None, {"target": EXTERNAL.get(data_class, "none")})]
     if data_class == "audit":
-        return [await audit_partitions(settings, base.keep_days, dry_run=dry_run, now=now)]
+        try:
+            return [
+                await audit_partitions(
+                    settings, base.keep_days, dry_run=dry_run, now=now, trigger=trigger
+                )
+            ]
+        except Exception as exc:  # noqa: BLE001 - like every class: recorded, the rest go on
+            await session.rollback()
+            log.error("retention_class_failed class=audit error=%s", type(exc).__name__)
+            return [
+                ClassResult(
+                    "audit",
+                    None,
+                    now - timedelta(days=max(base.keep_days, AUDIT_FLOOR_DAYS)),
+                    status="failed" if dry_run else "partial",
+                    error_code=type(exc).__name__,
+                )
+            ]
     executor = EXECUTORS.get(data_class)
     if executor is None:
         return [ClassResult(data_class, None, None, {"target": "none"})]
@@ -244,15 +265,16 @@ async def _run_class(session, settings, data_class, rows, dry_run, now) -> list[
 
 
 async def audit_partitions(
-    settings, keep_days: int, *, dry_run: bool, now: datetime
+    settings, keep_days: int, *, dry_run: bool, now: datetime, trigger: str = "schedule"
 ) -> ClassResult:
     """Whole monthly partitions older than max(keep_days, 365) days. Dropping needs a real pass
     and RETENTION_AUDIT_DROP_ENABLED: DETACH, then a retention_runs record (rows, min/max ts,
     SHA-256 over the rows) committed, then DROP as its own step, then an
     `audit_partition_dropped` audit event. A failed DROP leaves the detached table, reported."""
     from ffcore.core import db
-    from ffcore.core.audit import AuditEntry, write_event_detached
+    from ffcore.core.audit import AuditEntry
 
+    write_event = _audit_write_event()
     cutoff = now - timedelta(days=max(keep_days, AUDIT_FLOOR_DAYS))
     result = ClassResult("audit", None, cutoff)
     async with db.session_scope() as session:
@@ -283,19 +305,14 @@ async def audit_partitions(
     for name in old:
         async with db.session_scope() as session:
             await session.execute(text(f'ALTER TABLE audit_events DETACH PARTITION "{name}"'))
-            rows, first, last, digest = (
-                await session.execute(
-                    text(
-                        "SELECT count(*), min(ts), max(ts), encode(sha256(convert_to("
-                        "coalesce(string_agg(t::text, chr(10) ORDER BY t.ts, t.id), ''),"
-                        f" 'UTF8')), 'hex') FROM \"{name}\" t"
-                    )
-                )
+            rows, first, last = (
+                await session.execute(text(f'SELECT count(*), min(ts), max(ts) FROM "{name}"'))
             ).one()
+            digest = await _partition_digest(session, name, settings.retention_batch)
             session.add(
                 RetentionRun(
                     data_class="audit",
-                    trigger="schedule",
+                    trigger=trigger,
                     dry_run=False,
                     cutoff=cutoff,
                     counts={
@@ -311,23 +328,62 @@ async def audit_partitions(
             )
             await session.commit()
         try:
+            # The event and the DROP are one transaction (r1 MINOR-3): no event, no drop.
             async with db.session_scope() as session:
+                await write_event(
+                    session,
+                    AuditEntry(
+                        action="audit_partition_dropped",
+                        resource_type="audit_partition",
+                        outcome="success",
+                        actor_type="system",
+                        actor_id="retention",
+                        resource_id=name,
+                        after={"rows": rows, "sha256": digest},
+                    ),
+                )
                 await session.execute(text(f'DROP TABLE "{name}"'))
                 await session.commit()
         except Exception as exc:  # noqa: BLE001 - the detached table stays and is reported
             result.status, result.error_code = "partial", f"drop_failed:{type(exc).__name__}"
             log.error("audit_partition_drop_failed partition=%s", name)
             continue
-        await write_event_detached(
-            AuditEntry(
-                action="audit_partition_dropped",
-                resource_type="audit_partition",
-                outcome="success",
-                actor_type="system",
-                actor_id="retention",
-                resource_id=name,
-                after={"rows": rows, "sha256": digest},
-            )
-        )
         result.counts["dropped"].append(name)
     return result
+
+
+def _audit_write_event():
+    """core.audit.write_event, looked up at call time (tests replace it to fail)."""
+    from ffcore.core import audit
+
+    return audit.write_event
+
+
+async def _partition_digest(session, name: str, batch: int) -> str:
+    """SHA-256 over the partition's rows (text form, ordered by ts, id, joined by newlines),
+    read in keyset batches so a month of millions of rows is never one value (r1 MINOR-2)."""
+    import hashlib
+
+    digest = hashlib.sha256()
+    after: tuple | None = None
+    first = True
+    while True:
+        where = "WHERE (t.ts, t.id) > (:ts, :id)" if after else ""
+        params = {"ts": after[0], "id": after[1]} if after else {}
+        rows = (
+            await session.execute(
+                text(
+                    f'SELECT t.ts, t.id, t::text FROM "{name}" t {where}'
+                    f" ORDER BY t.ts, t.id LIMIT {int(batch)}"
+                ),
+                params,
+            )
+        ).all()
+        if not rows:
+            return digest.hexdigest()
+        for _ts, _id, row_text in rows:
+            if not first:
+                digest.update(b"\n")
+            digest.update(row_text.encode())
+            first = False
+        after = (rows[-1][0], rows[-1][1])

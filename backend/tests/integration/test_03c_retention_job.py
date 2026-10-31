@@ -8,6 +8,7 @@ write rows of today), and each assertion looks at this test's rows only.
 
 import asyncio
 import json
+import time
 import uuid
 from datetime import UTC, datetime, timedelta
 
@@ -22,9 +23,9 @@ TEXT = "eski-icerik-03c"
 
 @pytest.fixture
 def run_job(database_url, app_settings):
-    def run(*, dry_run=False, audit_drop=False, now=None):
+    def run(*, dry_run=False, audit_drop=False, now=None, batch=2):
         settings = app_settings.model_copy(
-            update={"retention_audit_drop_enabled": audit_drop, "retention_batch": 2}
+            update={"retention_audit_drop_enabled": audit_drop, "retention_batch": batch}
         )
 
         async def go():
@@ -215,3 +216,82 @@ def test_03c_14_retention_runs_append_only(pg, run_job):
         pg.execute("UPDATE retention_runs SET actor_id = 'x'")
     with pytest.raises(Exception, match="append-only"):
         pg.execute("DELETE FROM retention_runs")
+
+
+# --- r1 (K-03c-0023) ---
+
+
+def test_03c_14_audit_error_does_not_stop_other_classes(pg, make_project, run_job, monkeypatch):
+    """MAJOR-1: an audit failure is that class's `partial`; content still clears."""
+    project = make_project()
+    old = _old_run(pg, project, days=100)
+
+    async def boom(*args, **kwargs):
+        raise RuntimeError("audit boom")
+
+    monkeypatch.setattr(retention_job, "audit_partitions", boom)
+    results = {r.data_class: r for r in run_job()}
+    # 100 days: jobs (90) removed its events too; the run row shows content was cleared.
+    assert pg.execute("SELECT input FROM runs WHERE id = %s", (old,)).fetchone() == ("[cleared]",)
+    assert (results["audit"].status, results["audit"].error_code) == ("partial", "RuntimeError")
+    row = pg.execute(
+        "SELECT status, error_code FROM retention_runs WHERE data_class = 'audit'"
+        " AND NOT dry_run ORDER BY ts DESC LIMIT 1"
+    ).fetchone()
+    assert row == ("partial", "RuntimeError")
+
+
+def test_03c_14_audit_drop_records_trigger(pg, run_job):
+    """MINOR-1: a manual pass is recorded as manual, not schedule."""
+    name = _audit_month(pg, "2019-07-01")
+    run_job(audit_drop=True)
+    trigger = pg.execute(
+        "SELECT trigger FROM retention_runs WHERE counts->>'partition' = %s", (name,)
+    ).fetchone()
+    assert trigger == ("manual",)
+
+
+def test_03c_14_audit_summary_incremental_matches(pg, run_job):
+    """MINOR-2: the SHA-256 over a partition is computed in keyset batches (500 here, 41
+    batches) and equals the digest over all rows in order; 20,001 rows."""
+    import hashlib
+
+    name = _audit_month(pg, "2019-09-01")
+    pg.execute(
+        "INSERT INTO audit_events (id, ts, actor_type, actor_id, action, resource_type, outcome)"
+        " SELECT gen_random_uuid(), date '2019-09-02' + make_interval(secs => g), 'system', 't',"
+        " 'probe_03c_scale', 'probe', 'success' FROM generate_series(1, 20000) g"
+    )
+    rows = pg.execute(f'SELECT t::text FROM "{name}" t ORDER BY t.ts, t.id').fetchall()
+    expected = hashlib.sha256("\n".join(r[0] for r in rows).encode()).hexdigest()
+    started = time.monotonic()
+    run_job(audit_drop=True, batch=500)
+    print(
+        f"audit partition 20001 rows summarised and dropped in {time.monotonic() - started:.1f} s"
+    )
+    record = pg.execute(
+        "SELECT counts FROM retention_runs WHERE counts->>'partition' = %s", (name,)
+    ).fetchone()[0]
+    assert record["rows"] == 20001 and record["sha256"] == expected
+
+
+def test_03c_14_audit_event_failure_keeps_partition(pg, run_job, monkeypatch):
+    """MINOR-3: the drop event and DROP are one step; no event, no drop."""
+    from ffcore.core import audit
+
+    name = _audit_month(pg, "2019-11-01")
+
+    async def broken(session, entry):
+        raise RuntimeError("audit write down")
+
+    monkeypatch.setattr(audit, "write_event", broken)
+    results = {r.data_class: r for r in run_job(audit_drop=True)}
+    assert _exists(pg, name)  # detached, recorded, not dropped
+    assert results["audit"].status == "partial"
+    assert results["audit"].error_code.startswith("drop_failed")
+    events = pg.execute(
+        "SELECT count(*) FROM audit_events WHERE action = 'audit_partition_dropped'"
+        " AND resource_id = %s",
+        (name,),
+    ).fetchone()
+    assert events == (0,)
