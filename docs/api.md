@@ -304,7 +304,7 @@ text in its spend log.
 
 Superadmin: `GET /api/v1/retention/policies`, `PUT /retention/policies/{data_class}` (`keep_days`,
 optional `project_id` for a project override; outside the class's min/max: 422
-`retention_out_of_range`), `DELETE /retention/policies/{data_class}/overrides/{project_id}`,
+`retention_out_of_range`), `DELETE /retention/policies/{data_class}/overrides/{override_project_id}`,
 `POST /retention/dry-run` (counts), `POST /retention/run` (removes now), `GET /retention/runs`
 (the removal record, append-only). The daily job (03:00 UTC, background worker) only counts while
 `RETENTION_DRY_RUN=true` (the default). One pass at a time; per class the count is recorded, then

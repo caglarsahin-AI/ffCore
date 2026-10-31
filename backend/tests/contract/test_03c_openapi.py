@@ -24,7 +24,7 @@ EXPECTED = {
     # 03c-2
     "/api/v1/retention/policies": {"get"},
     "/api/v1/retention/policies/{data_class}": {"put"},
-    "/api/v1/retention/policies/{data_class}/overrides/{project_id}": {"delete"},
+    "/api/v1/retention/policies/{data_class}/overrides/{override_project_id}": {"delete"},
     "/api/v1/retention/dry-run": {"post"},
     "/api/v1/retention/run": {"post"},
     "/api/v1/retention/runs": {"get"},

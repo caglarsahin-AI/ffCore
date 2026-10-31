@@ -150,19 +150,25 @@ async def put_policy(
     return policy_out(row)
 
 
+# `override_project_id`, not `project_id`: an installation route (superadmin), not a project
+# route; the project-scoped scans (03a 404 rule) key on the `project_id` path parameter.
 @router.delete(
-    "/policies/{data_class}/overrides/{project_id}",
+    "/policies/{data_class}/overrides/{override_project_id}",
     status_code=204,
     summary="Remove a project override",
 )
 @audited("delete_retention_override", "retention_policy")
 async def delete_override(
-    data_class: DataClass, project_id: UUID, request: Request, actor: Writer, session: SessionDep
+    data_class: DataClass,
+    override_project_id: UUID,
+    request: Request,
+    actor: Writer,
+    session: SessionDep,
 ) -> None:
     result = await session.execute(
         delete(RetentionPolicy).where(
             RetentionPolicy.data_class == data_class.value,
-            RetentionPolicy.project_id == project_id,
+            RetentionPolicy.project_id == override_project_id,
         )
     )
     if not result.rowcount:

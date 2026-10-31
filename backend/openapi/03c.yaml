@@ -2016,25 +2016,25 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorBody'
-  /api/v1/retention/policies/{data_class}/overrides/{project_id}:
+  /api/v1/retention/policies/{data_class}/overrides/{override_project_id}:
     delete:
       tags:
       - retention
       summary: Remove a project override
-      operationId: delete_override_api_v1_retention_policies__data_class__overrides__project_id__delete
+      operationId: delete_override_api_v1_retention_policies__data_class__overrides__override_project_id__delete
       parameters:
       - name: data_class
         in: path
         required: true
         schema:
           $ref: '#/components/schemas/DataClass'
-      - name: project_id
+      - name: override_project_id
         in: path
         required: true
         schema:
           type: string
           format: uuid
-          title: Project Id
+          title: Override Project Id
       responses:
         '204':
           description: Successful Response
