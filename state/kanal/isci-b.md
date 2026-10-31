@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-b-03c
 - Aktif paket: 03c (feat/03c-governance)
 - Durum: ACTIVE
-- Son okunan: koordinator K-03c-0006 (2026-10-31 15:18)
+- Son okunan: koordinator K-03c-0008 (2026-10-31 15:49)
 
 ## Mesajlar
 
@@ -1139,3 +1139,28 @@ Durma koşulu: U1 ve U2 ölçüldü (state/evidence/03c-u1-u2-probe-20261031.md)
 - **B:** S2-A'da kal, kısmi atıf: proje + kullanıcı spend log'dan, api_key_id yok. Etki: anahtar bütçesinin raporu ve uyarısı (03c-2 budget_threshold anahtar kapsamı) veri bulamaz.
 - **C:** commit() Redis hash'e yazar, saatlik arq cron usage_daily'ye boşaltır. Etki: Redis kaybında en çok 1 saat kullanım raporu kaybı; ikinci sayaç şeması.
 Cevap gelene kadar kota motoru (Redis, pricing'den maliyet) sürer; usage_daily yazımı cevaba göre.
+
+### B-03c-0011 · 2026-10-31 15:54 · → koordinator · ACK
+Paket: 03c   Cevap: K-03c-0007 / K-03c-0008
+İkisi de alındı. Durum: 3 commit (cb723ab resolver + API, 592b99d impersonate proje sınırı [kırmızı 6 → yeşil], 8f31d26 kota tablosu/API + Redis motoru). K-03c-0008 notları uygulanacak: (1) commit() LiteLLM call id ile tekil (Redis SET NX, çift sayım testi); (2) upsert hatası `usage_write_failed` log + sayaç, çağrıyı bozmaz; (3) fiyatsız model: `usage_daily.unpriced_requests` sayacı, maliyet 0 diye gösterilmez; (5) `store_prompts_in_spend_logs: false`; (6) docs/api.md'de brief cümlesi düzeltmesi + DRIFT-124 PR'da. K-03c-0007: via_key_id'nin yeni partition'lara mirası testle, CONTRACTS C3'e tek cümle.
+Not: readiness (limit + uyarı kuralı) ikisini birlikte 03c-2'ye aldım: ReadinessCheck.key Literal'ı 03a OpenAPI'sini ve önyüz şema dosyasını değiştiriyor; iki değişiklik yerine tek. Sıradaki: dilim 3 (runtime/adapters kota bağlama + usage_daily).
+
+### B-03c-0012 · 2026-10-31 16:05 · → koordinator · DURUM
+Paket: 03c   Cevap: koordinatör zili 16:05
+DURUM: IMPLEMENTED (03c-1), kapılar koşuyor, takılı değil. Branch HEAD 50bea5d (5 commit: cb723ab resolver+API, 592b99d impersonate proje sınırı, 8f31d26 kota motoru+API, fd4dd7c adapters kota kapısı+usage_daily, 50bea5d usage API+OpenAPI 03c.yaml+docs+CONTRACTS).
+Kapı sonuçları şimdiye kadar (state/evidence/03c-1-*-20261031.log): compose config 0, make lint 0, make test llmaas 0 (734 passed). Şu an make test airgap koşuyor (03c-tools-run konteyneri ayakta), ardından make test-int llmaas + airgap.
+Sıradaki: kapılar yeşilse migration upgrade/downgrade 03c@-1 denemesi, bir güvenlik sıkılaştırması (anahtar yönetimi uçları yalnız konsol oturumu: impersonate eden anahtar yeni anahtar basamasın; küçük, testli), state/pr/03c.md kanıt bölümleri, PR-HAZIR (tam SHA).
+
+### B-03c-0013 · 2026-10-31 16:51 · → koordinator · DURUM
+Paket: 03c   Cevap: -
+DURUM: VERIFIED (03c-1) ve YIGIN-KAPA 03c: `down -v` 0, konteyner 0, volume 0. Duran imajlar `ffcore/*:0.0.0-03c` (03c-2 için yeniden kullanılacak; silme sende). Geçici kırmızı kopya `.worktrees/red03c` silindi.
+
+### B-03c-0014 · 2026-10-31 16:51 · → koordinator · PR-HAZIR
+Paket: 03c-1 (API anahtarı, kota motoru, usage)   Cevap: K-03c-0004 / K-03c-0006 / K-03c-0008
+PR açıklaması: C:\ai_paycore\ffcore\state\pr\03c.md bölüm "03c-1 PR" · Sınıf [B] · yeni bağımlılık/imaj/servis yok.
+Branch feat/03c-governance · worktree .worktrees/feat/03c-governance · baz 2659c8d · SHA **f06548137a026a0835b0d9f054dc34d67a838b88** (6 commit, 36 dosya +4658/−26, ağaç temiz).
+Kanıt (state/evidence/03c-1-*-20261031.log): kırmızı @ cb723ab (impersonate 6 düştü, 7a proje açığı dahil) ve konsol oturumu kuralı; f065481'de make lint 0, make test 734/734 iki profil, make test-int 609 + 4 opt-in atlanan iki profil, migration upgrade → downgrade 03c@-1 → upgrade 0, compose config 0.
+Şartlar: K-03c-0004 1/5/6/7(usage_daily)/4, K-03c-0006 a-i + via_key_id + cidrs, K-03c-0007 partition mirası testi, K-03c-0008 tekil sayım/usage_write_failed/unpriced/spend log metinsiz. Ek sıkılaştırma: anahtar yönetimi yalnız konsol oturumu (403 requires_console_session; impersonate eden anahtar anahtar basamaz).
+Güvenlik turu zorunlu (kimlik, anahtar, CIDR, resolve_actor değişikliği). Önerilen probe'lar: başka projenin OBO'su; oran sınırı; ham anahtarın audit/DB/log'da yokluğu; Redis yokken kota reddi.
+NOT_RUN: smoke ve önyüz check:api (önyüz ve 03a OpenAPI değişmedi; sözleşme testleri geçti). 03c-2'ye kalan: kriter 1 (uyarı e-posta/UI, service_down), 5, 13-20, readiness n/5. DRIFT-124 ve brief çelişkileri PR'da.
+03c-2'ye (retention + 119 + uyarılar + bildirim) aynı branch'te devam ediyorum; review sırasında 03c-1 commit'lerine dokunmam, DUZELT gelirse önce o.

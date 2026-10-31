@@ -1,0 +1,6 @@
+2026-10-31 13:25:35,353 ERROR ffcore.readiness warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+2026-10-31 13:25:35,695 ERROR ffcore.readiness warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+FAILED tests/integration/test_03c_keys.py::test_03c_7_key_management_needs_console_session
+1 failed, 2 passed, 27 deselected in 15.74s
