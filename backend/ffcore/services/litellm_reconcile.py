@@ -409,6 +409,20 @@ class ReconcileScheduler:
         except Exception as exc:  # the listener must not break the caller's commit
             log.error("litellm_reconcile_not_scheduled error=%s", type(exc).__name__)
 
+    async def stop(self) -> None:
+        """Cancel a running reconcile and wait for it (FOLLOWUP-90): its session rolls back
+        while the loop still runs, instead of the task outliving the app with an open
+        transaction. Idempotent; only the cancellation itself is swallowed."""
+        task, self._task = self._task, None
+        self._dirty = False
+        if task is None or task.done():
+            return
+        task.cancel()
+        try:
+            await task
+        except asyncio.CancelledError:
+            pass
+
     async def wait_idle(self) -> None:
         while self._task is not None and not self._task.done():
             await asyncio.shield(self._task)

@@ -61,6 +61,8 @@ async def lifespan(app: FastAPI):
     warming.cancel()
     if scheduler is not None:
         catalog_events.unsubscribe(scheduler.on_change)
+        # FOLLOWUP-90: a reconcile cut short must not leave its transaction open.
+        await scheduler.stop()
     shutdown_tracing()  # flushes what is still buffered
 
 
