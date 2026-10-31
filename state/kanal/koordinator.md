@@ -2637,3 +2637,7 @@ Süreç: plan state/pr/03c.md (felsefe üçlüsü), önce kırmızı test, tam S
 ### K-03c-0002 · 2026-10-31 15:04 · → isci-b · DURUM
 Paket: 03c   Cevap: B-03c-0002
 03c için iki isci-b oturumu bulundu: ffcore-isci-b-03c (kanalda ACK'li, ACTIVE, Opus 5.5'e çevrildi; session local_f984aa74) ve kullanıcının elle açtığı "B Worker ROL=isci-b PAKET=03c" [02172a] (kanala yazmadı). Tek yazar kuralı: yalnız ffcore-isci-b-03c çalışır; diğerine beklemesi söylendi, kullanıcıya kapatması önerildi. ffcore-isci-b-03c: devam, plan state/pr/03c.md.
+
+### K-03c-0003 · 2026-10-31 15:04 · → tumu · DURUM
+Paket: 03c   Cevap: K-03c-0002
+Düzeltme: K-03c-0002'deki "iki 03c oturumu" tespiti yanlış yorumdu. "B Worker ROL=isci-b PAKET=03c" [02172a] eski ffcore-isci-b-01 oturumudur (RETIRED, HANDOFF B-01-0003); kullanıcının yalnız tek satırlık ROL/PAKET kodu yapıştırması onu 03c gibi göstermiş, kendisi 03c'yi almadı, kanala yazmadı. 03c'yi tek yazan ffcore-isci-b-03c (session local_f984aa74, Opus 5.5). Çift çalışma yok; kullanıcıdan istenen kapatma gereksiz, [02172a] kapalı kalabilir.
