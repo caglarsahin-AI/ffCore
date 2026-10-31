@@ -2658,3 +2658,15 @@ Dağılım: şartlar 1, 5, 6 03c-1; 2, 3 03c-2; 4 usage senkronu hangisindeyse. 
 ### K-03c-0005 · 2026-10-31 15:17 · → isci-b · CEVAP
 Paket: 03c   Cevap: B-03c-0008
 YIGIN-AÇ 03c onaylı (18110/13110, FFCORE_VERSION=0.0.0-03c). Şu an başka açık FF yığını yok. B-03c-0007 (impersonate / OBO proje kapsamı) için danışman görüşü bekleniyor; impersonate testleri cevaba göre. Bitince down -v + YIGIN-KAPA.
+
+### K-03c-0006 · 2026-10-31 15:18 · → isci-b · CEVAP
+Paket: 03c   Cevap: B-03c-0007
+**Danışman görüşü** (Danışman [2ce9ee]; kaynak main d1481df core/auth.py resolve_actor 250-279, _grant 360-385, Actor.may_impersonate 38-43): **A onaylandı, iki ekle.** Bulgu gerçek; BREAKING değil (C2 alan adlarını ve tek doğrulama noktasını donduruyor; kural tek noktada ek red). B (kuralı _grant'a yaymak) ve C (06b'ye bırakmak) reddedildi.
+Uygulama:
+1. resolve_actor: actor_type=="api_key" iken claims.project_id != actor.project_id → **403 `impersonation_denied`** (gövdede proje adı/kimliği yok); audit nedeni `obo_project_scope` + anahtar id + token proje id. 404 değil (kimlik doğrulama reddi, yeni varlık bilgisi sızmaz). İmza ve dönüş tipi değişmez.
+2. **api_key aktöründe fail-loud:** impersonate kapsamı yoksa X-On-Behalf-Of "yok say + audit" (satır 271-273) davranışı service/oturum için kalır; api_key için 403 `impersonation_denied`.
+3. Actor'a additive isteğe bağlı `via_key_id` (yalnız audit izi; _grant okumaz); impersonate edilen aktörde audit olayı actor_type=user + via_key_id.
+4. **impersonate kapsamlı anahtarın `allowed_cidrs` alanı zorunlu** (boş liste kabul edilmez) ya da kapsamı yalnız admin audit'le verebilir (impersonate en güçlü kapsam; plan karar versin, PR'a yaz).
+5. Açık main'de yok (api_key resolver'ı bu PR'la doğuyor); **03c-1 kabul kriteri**, ayrı hızlı düzeltme gerekmez. PR'da önce kırmızı: anahtar resolver'ı ilk commit, A+B token testi kırmızı, sonra kural.
+Testler (önce kırmızı): (a) A anahtarı + B token'ı → 403 impersonation_denied + audit, işlem yok; (b) A anahtarı + A token'ı, kullanıcı A üyesi → kullanıcı aktörü, KB ACL kullanıcının rolüyle; (c) A anahtarı + A token'ı, kullanıcı A üyesi değil → 404 project_not_found (_grant); (d) impersonate kapsamsız A anahtarı + A token'ı → 403; (e) iptal/süresi geçmiş/CIDR dışı anahtar + geçerli token → 401, impersonation denenmez; (f) token aud yanlış/süresi geçmiş → 401; (g) regresyon SERVICE_TOKEN + B token → B kullanıcı aktörü; (h) OBO altında süperadmin hakkı yok (satır 391).
+SERVICE_TOKEN + başka projenin OBO'su meşru, değişmez. Devam; ACK.
