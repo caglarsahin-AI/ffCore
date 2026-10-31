@@ -236,7 +236,9 @@ the shared root `0001` and also drops 03b.
 `/api/v1/projects/{project_id}/api-keys`: `POST` (create), `GET` (own keys; `?all=true` all keys,
 project admin), `GET /{key_id}`, `PATCH /{key_id}` (name, scopes, acl_role, allowed_cidrs,
 expires_at), `POST /{key_id}/revoke`. Members from analyst up manage their own keys; a project
-admin sees and revokes every key. A key is never deleted, only revoked.
+admin sees and revokes every key. A key is never deleted, only revoked. Creating, changing and revoking need the
+user's own console session: a service or an impersonating key acting for the user gets 403
+`requires_console_session`.
 
 - The raw key (`ffk_<8 hex>_<secret>`) is in the create response only, once. The database keeps
   its public prefix (`key_prefix`, shown in lists and audit) and its SHA-256.

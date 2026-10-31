@@ -30,7 +30,24 @@ router = APIRouter(
 )
 
 Reader = Annotated[Actor, Depends(require_role("analyst"))]
-Writer = Annotated[Actor, Depends(require_role("analyst", write=True))]
+_editor = require_role("analyst", write=True)
+
+
+async def _console_writer(actor: Annotated[Actor, Depends(_editor)]) -> Actor:
+    """Keys are minted, changed and revoked only from the user's own console session: never by a
+    service or an impersonating key acting for the user (07's approval_requires_user_session)."""
+    if actor.via_service:
+        raise ApiError(
+            403,
+            "permission_error",
+            "requires_console_session",
+            "API keys are managed from the console session only.",
+        )
+    return actor
+
+
+# The 03a mutation scan (test_03a_3) finds the write=True requirement inside _console_writer.
+Writer = Annotated[Actor, Depends(_console_writer)]
 
 
 def key_out(row: ApiKey) -> ApiKeyOut:

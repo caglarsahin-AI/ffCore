@@ -80,6 +80,10 @@ PARITY_EXEMPT_PREFIXES = (
     # 07: the single approval GET needs an approval (and a run) in the world; its parity is
     # test_07_read_mode_get_parity (the /approvals list and count stay checked here).
     f"{API}/projects/{{project_id}}/approvals/{{approval_id}}",
+    # 03c: the single key and quota GETs need a key and a quota in the world; their parity is
+    # test_03c_21_read_mode_get_parity (the lists and usage stay checked here).
+    f"{API}/projects/{{project_id}}/api-keys/{{key_id}}",
+    f"{API}/projects/{{project_id}}/quotas/{{quota_id}}",
 )
 
 

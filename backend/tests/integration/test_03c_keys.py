@@ -426,8 +426,8 @@ def test_03c_7_audit_impersonated_mutation_has_via_key(
     client = _client(app)
     try:
         response = client.post(
-            f"/api/v1/projects/{project}/api-keys",
-            json={"name": "child", "scopes": ["chat_direct"]},
+            f"/api/v1/projects/{project}/quotas",
+            json={"scope_type": "project", "label": "via key", "windows": {"rpm": 5}},
             headers={"Authorization": f"Bearer {key['key']}", "X-On-Behalf-Of": token},
         )
     finally:
@@ -435,10 +435,37 @@ def test_03c_7_audit_impersonated_mutation_has_via_key(
     assert response.status_code == 201, response.text
     row = pg.execute(
         "SELECT actor_type, actor_id, via_key_id FROM audit_events"
-        " WHERE action = 'create_api_key' AND resource_id = %s",
+        " WHERE action = 'create_quota' AND resource_id = %s",
         (response.json()["id"],),
     ).fetchone()
     assert row == ("user", str(user_id), uuid.UUID(key["id"]))
+
+
+def test_03c_7_key_management_needs_console_session(app, impersonator, make_user, app_settings, pg):
+    """An impersonating key (or a service) never mints, changes or revokes keys: only the
+    user's own console session does (same rule as 07's approval_requires_user_session)."""
+    project, key = impersonator
+    user_id, _ = make_user(memberships={project: ("admin", "edit")})
+    headers = {
+        "Authorization": f"Bearer {key['key']}",
+        "X-On-Behalf-Of": _token(app_settings, user_id, project),
+    }
+    base = f"/api/v1/projects/{project}/api-keys"
+    client = _client(app)
+    try:
+        created = client.post(base, json={"name": "x", "scopes": ["chat_direct"]}, headers=headers)
+        patched = client.patch(f"{base}/{key['id']}", json={"name": "y"}, headers=headers)
+        revoked = client.post(f"{base}/{key['id']}/revoke", headers=headers)
+        listed = client.get(base, headers=headers)
+    finally:
+        client.__exit__(None, None, None)
+    for response in (created, patched, revoked):
+        assert response.status_code == 403, response.text
+        assert response.json()["error"]["code"] == "requires_console_session"
+    assert listed.status_code == 200  # reading stays possible
+    assert pg.execute(
+        "SELECT count(*) FROM api_keys WHERE project_id = %s", (project,)
+    ).fetchone() == (1,)
 
 
 def test_03c_7_impersonate_needs_admin(make_project, make_user, client_factory):

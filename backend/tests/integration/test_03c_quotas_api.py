@@ -143,3 +143,27 @@ def test_03c_12_usage_summary(admin, pg, make_project):
     assert body["totals"]["input_tokens"] == 14 and float(body["totals"]["cost_usd"]) == 1.5
     bad = client.get(f"/api/v1/projects/{project}/usage?date_from=2026-10-31&date_to=2026-10-01")
     assert bad.status_code == 422 and bad.json()["error"]["code"] == "date_range_invalid"
+
+
+def test_03c_21_read_mode_get_parity(make_user, make_project, client_factory):
+    """Brief 03 acceptance 2 for 03c's GETs: admin+read sees what admin+edit sees."""
+    _, editor = make_user(superadmin="edit")
+    _, reader = make_user(superadmin="read")
+    edit, read = client_factory(editor), client_factory(reader)
+    project = make_project()
+    base = f"/api/v1/projects/{project}"
+    key = edit.post(f"{base}/api-keys", json={"name": "k", "scopes": ["agents"]}).json()["id"]
+    quota = edit.post(
+        f"{base}/quotas", json={"scope_type": "project", "label": "q", **LIMITS}
+    ).json()["id"]
+    urls = [
+        f"{base}/api-keys?all=true",
+        f"{base}/api-keys/{key}",
+        f"{base}/quotas",
+        f"{base}/quotas/{quota}",
+        f"{base}/usage?date_from=2026-10-01&date_to=2026-10-31",
+    ]
+    for url in urls:
+        a, b = edit.get(url), read.get(url)
+        assert a.status_code == 200, (url, a.text)
+        assert (b.status_code, b.content) == (a.status_code, a.content), url
