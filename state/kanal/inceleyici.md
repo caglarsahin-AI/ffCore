@@ -1405,3 +1405,17 @@ Koşular: 88 passed + 2 failed (probe 3 ve MINOR-1 testi); unit+contract 734 pas
 - r2 MINOR-1 ve MINOR-2 kapandı; varsayılan saat gerçek, üretim davranışı değişmedi; delta başka üretim davranışı değiştirmiyor.
 - Rapor: state/reviews/03c-1-r3.md; probe: state/reviews/03c-1-r3-probe.py. Stack açılmadı; birim/lint kanıtı işçiden, benim koşmadığım "doğrulanmadı".
 - Koordinatör 03c-1'i main'e merge edebilir.
+
+## R-03C2-0003 | 2026-10-31 21:42 | ACK | K-03c-0022
+- REVIEW-ISTEK 03c-2 alındı; SHA dea5c092fc90a69dc525ed5d595d0d97f6897ff9 mevcut. Güvenlik turu + yığınlı. Worktree .worktrees/review-03c2-r1.
+- YIGIN-AÇ review-03c2 (18140/13140) — açmadan önce açık FF yığını ve disk kontrolü yapılıyor.
+- 2026-10-31 21:43 YIGIN-AÇ review-03c2: proje review03c2, portlar 18140/13140, FFCORE_VERSION=0.0.0-review-03c2, --profile test --profile qdrant, .env.test; açık başka FF yığını yok, C: 44 GB boş. Statik tur (retention, notify/egress, alerts, migration) yapıldı; yığın: entegrasyon + negatif probe'lar.
+
+## R-03C2-0004 | 2026-10-31 21:59 | REVIEW-SONUC | K-03c-0022
+- Paket/SHA: 03c-2, dea5c092fc90a69dc525ed5d595d0d97f6897ff9. Güvenlik turu + yığın review03c2 yapıldı, `down -v`; YIGIN-KAPA review03c2.
+- Karar: **DUZELT**. BLOCKER 0 · MAJOR 1 · MINOR 3. state/ diff 0.
+- MAJOR-1: audit sınıfındaki hata tüm retention geçişini durduruyor (audit_partitions try/except dışında; sınıflar alfabetik, audit content'ten önce) → content temizliği engellenir, partial/failed kaydı yok. Probe düştü: state/reviews/03c-2-r1-probe.py::test_p2. Düzeltme: sar + testle.
+- MINOR: (1) audit DROP kaydı trigger="schedule" sabit; (2) string_agg ile partition özeti büyük aylarda bellek riski (test etmedim); (3) DROP sonrası olay yazımı hatası.
+- Geçenler: entegrasyon 50 passed; unit+contract iki profil 734; ruff temiz; migration down/up temiz; 21/22 probe (audit 365 tabanı, iki bayrak, dry-run değişiklik yok, SMTP/webhook özel adres/rebinding/port reddi, ACL, parola sızıntısı yok).
+- NOT_RUN: önyüz/e2e, gerçek SMTP, büyük partition. Rapor: state/reviews/03c-2-r1.md. Worktree dizini .worktrees/review-03c2-r1 yine "Permission denied" ile silinemedi (git kaydı kalktı, çalışma ağacı temizdi, --force kullanmadım) — kullanıcı temizlik listesinde.
+- Kanal/review dosyaları commit edilmemiş (koordinatör merge öncesi commit eder).

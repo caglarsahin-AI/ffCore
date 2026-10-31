@@ -1,0 +1,83 @@
+.P2 pass raised RuntimeError content input after: iso-probe
+F...........P4 http://169.254.169.254/latest/meta-data egress_not_allowlisted
+.P4 http://127.0.0.1:8000/x egress_not_allowlisted
+.P4 http://[::1]/ egress_not_allowlisted
+.P4 http://10.1.2.3/ egress_not_allowlisted
+.P4 http://localhost/ egress_not_allowlisted
+.P4 file:///etc/passwd egress_invalid_url
+.P4 http://backend:8000/ egress_not_allowlisted
+.P4 http://postgres:5432/ egress_not_allowlisted
+.2026-10-31 18:50:54,079 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-31 18:50:54,090 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=603
+2026-10-31 18:50:54,363 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-31 18:50:54,373 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=161
+2026-10-31 18:50:54,649 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-31 18:50:54,689 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=164
+2026-10-31 18:50:54,915 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-31 18:50:54,943 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=171
+2026-10-31 18:50:55,989 INFO ffcore.access access method=PUT path=/api/v1/retention/policies/audit status=422 ms=1040
+2026-10-31 18:50:56,114 INFO ffcore.access access method=PUT path=/api/v1/retention/policies/content status=403 ms=103
+2026-10-31 18:50:56,193 INFO ffcore.access access method=POST path=/api/v1/retention/run status=403 ms=69
+2026-10-31 18:50:56,369 INFO ffcore.access access method=GET path=/api/v1/retention/runs status=403 ms=157
+2026-10-31 18:50:56,499 INFO ffcore.access access method=POST path=/api/v1/alert-rules status=422 ms=122
+2026-10-31 18:50:56,589 INFO ffcore.access access method=POST path=/api/v1/projects/6bc8d0ba-281d-402d-a272-adfb4d578028/alert-rules status=201 ms=83
+2026-10-31 18:50:56,698 INFO ffcore.access access method=PATCH path=/api/v1/projects/09d5cc5d-e175-4318-9c48-7a009da946ff/alert-rules/b0377f4a-6c98-47d3-973f-6f05813317b3 status=404 ms=99
+2026-10-31 18:50:56,794 INFO ffcore.access access method=PATCH path=/api/v1/projects/6bc8d0ba-281d-402d-a272-adfb4d578028/alert-rules/b0377f4a-6c98-47d3-973f-6f05813317b3 status=404 ms=87
+2026-10-31 18:50:56,898 INFO ffcore.access access method=DELETE path=/api/v1/projects/09d5cc5d-e175-4318-9c48-7a009da946ff/alert-rules/b0377f4a-6c98-47d3-973f-6f05813317b3 status=404 ms=97
+2026-10-31 18:50:57,178 INFO ffcore.access access method=POST path=/api/v1/projects/6bc8d0ba-281d-402d-a272-adfb4d578028/alert-rules status=403 ms=273
+2026-10-31 18:50:57,283 INFO ffcore.access access method=PUT path=/api/v1/projects/6bc8d0ba-281d-402d-a272-adfb4d578028/notification-settings status=200 ms=97
+2026-10-31 18:50:57,404 INFO ffcore.access access method=GET path=/api/v1/projects/6bc8d0ba-281d-402d-a272-adfb4d578028/notification-settings status=200 ms=115
+2026-10-31 18:50:57,490 INFO ffcore.access access method=GET path=/api/v1/projects/6bc8d0ba-281d-402d-a272-adfb4d578028/notification-settings status=403 ms=79
+2026-10-31 18:50:57,749 INFO ffcore.access access method=GET path=/api/v1/projects/6bc8d0ba-281d-402d-a272-adfb4d578028/notification-settings status=404 ms=210
+2026-10-31 18:50:57,823 INFO ffcore.access access method=PUT path=/api/v1/projects/6bc8d0ba-281d-402d-a272-adfb4d578028/notification-settings status=422 ms=59
+2026-10-31 18:50:57,903 INFO ffcore.access access method=PUT path=/api/v1/projects/6bc8d0ba-281d-402d-a272-adfb4d578028/notification-settings status=200 ms=72
+2026-10-31 18:50:58,004 INFO ffcore.access access method=POST path=/api/v1/projects/6bc8d0ba-281d-402d-a272-adfb4d578028/notifications/test status=422 ms=94
+P5 test email private host: 422 {"error":{"message":"egress_not_allowlisted","type":"invalid_request_error","code":"notification_failed"}}
+2026-10-31 18:50:58,093 INFO ffcore.access access method=PUT path=/api/v1/projects/6bc8d0ba-281d-402d-a272-adfb4d578028/notification-settings status=200 ms=82
+2026-10-31 18:50:58,253 INFO ffcore.access access method=POST path=/api/v1/projects/6bc8d0ba-281d-402d-a272-adfb4d578028/notifications/test status=422 ms=142
+P5 test webhook private: 422 {"error":{"message":"egress_not_allowlisted","type":"invalid_request_error","code":"notification_failed"}}
+2026-10-31 18:50:58,348 INFO ffcore.access access method=POST path=/api/v1/projects/6bc8d0ba-281d-402d-a272-adfb4d578028/notifications/test status=403 ms=89
+2026-10-31 18:50:58,454 INFO ffcore.access access method=GET path=/api/v1/projects/6bc8d0ba-281d-402d-a272-adfb4d578028/alerts status=404 ms=95
+.2026-10-31 18:51:02,643 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 18:51:02,645 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 18:51:02,645 ERROR ffcore.readiness warmup failed: ModelMissing
+
+=================================== FAILURES ===================================
+________________________ test_p2_audit_error_isolation _________________________
+
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_741fe19cd139) at 0x7fb0e374e090>
+make_project = <function make_project.<locals>.make at 0x7fb0dcea5440>
+database_url = 'postgresql+psycopg://ffcore:dummy-not-secret-postgres@postgres:5432/ffcore_test_741fe19cd139'
+app_settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fb0dced1fa0>
+
+    def test_p2_audit_error_isolation(pg, make_project, database_url, app_settings, monkeypatch):
+        project = make_project()
+        rid = seed_run(pg, project, definition(), question="iso-probe", status="completed")
+        pg.execute(
+            "UPDATE runs SET output='iso-probe', ended_at=now()-interval '100 days' WHERE id=%s",
+            (rid,),
+        )
+    
+        async def boom(*a, **k):
+            raise RuntimeError("audit boom")
+    
+        monkeypatch.setattr(retention_job, "audit_partitions", boom)
+        try:
+            run_exec(database_url, app_settings, dry_run=False)
+            outcome = "pass completed"
+        except Exception as exc:  # noqa: BLE001
+            outcome = f"pass raised {type(exc).__name__}"
+        cleared = pg.execute("SELECT input FROM runs WHERE id=%s", (rid,)).fetchone()[0]
+        print("P2", outcome, "content input after:", cleared)
+>       assert cleared == "[cleared]", f"other classes did not run: {outcome}"
+E       AssertionError: other classes did not run: pass raised RuntimeError
+E       assert 'iso-probe' == '[cleared]'
+E         
+E         - [cleared]
+E         + iso-probe
+
+tests/integration/test_zz_rev_03c2_probe.py:102: AssertionError
+=========================== short test summary info ============================
+FAILED tests/integration/test_zz_rev_03c2_probe.py::test_p2_audit_error_isolation
+1 failed, 21 passed in 19.99s
