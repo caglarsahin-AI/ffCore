@@ -160,6 +160,12 @@ class Settings(BaseSettings):
     api_key_auth_failures_per_min: int = Field(default=20, gt=0)
     # last_used_at is written at most once per this many seconds per key (write buffer).
     api_key_last_used_flush_s: int = Field(default=60, ge=0)
+    # Retention (03c, R2.2): the daily job only counts while this is true (the "dry run"
+    # default); POST /retention/run removes regardless. Old audit partitions are dropped only
+    # when RETENTION_AUDIT_DROP_ENABLED is true as well (K-03c-0011, two flags).
+    retention_dry_run: bool = True
+    retention_audit_drop_enabled: bool = False
+    retention_batch: int = Field(default=5000, gt=0)
 
     @field_validator(
         "egress_allowlist", "allowed_internal_hosts", "allowed_languages", mode="before"
