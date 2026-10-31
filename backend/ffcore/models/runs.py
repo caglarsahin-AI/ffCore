@@ -120,6 +120,8 @@ class Run(Timestamps, Base):
     # tries again); a source document of the still-live run was deleted (it ends source_deleted).
     checkpoint_deleted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     source_deleted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    # 03c (FOLLOWUP-119): the run's prompt and answer text was cleared (retention `content`).
+    content_cleared_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     created_by: Mapped[str] = mapped_column(Text)
     deleted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 

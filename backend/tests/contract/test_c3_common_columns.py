@@ -24,6 +24,9 @@ C3_EXCEPTIONS = {
     "run_events": "append-only (06a; named in CONTRACTS C3)",
     # reporting rows upserted per call, not append-only (03c, K-03c-0004 condition 7)
     "usage_daily": "upsert (03c; named in CONTRACTS C3)",
+    # one global row per class plus per-project overrides, edited in place (03c, K1)
+    "retention_policies": "class list (03c; named in CONTRACTS C3)",
+    "retention_runs": "append-only (03c; named in CONTRACTS C3)",
 }
 
 # Child tables take the project through their parent (CONTRACTS C3): the column named here is a
