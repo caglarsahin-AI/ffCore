@@ -7,4 +7,18 @@ plugins: Faker-40.43.0, anyio-4.15.1, langsmith-0.14.8
 collected 671 items
 
 tests/integration/test_01_client.py .......                              [  1%]
-tests/integration/test_01_events.py .
+tests/integration/test_01_events.py ..F                                  [  1%]
+tests/integration/test_01_reconcile.py ...........                       [  3%]
+tests/integration/test_01_reconcile_shutdown.py ...                      [  3%]
+tests/integration/test_01_seed.py ...                                    [  4%]
+tests/integration/test_02_langfuse.py ....                               [  4%]
+tests/integration/test_02_pricing.py .                                   [  4%]
+tests/integration/test_02_r1_worker_logging.py .                         [  4%]
+tests/integration/test_03a_access.py ............                        [  6%]
+tests/integration/test_03a_auth.py ..............                        [  8%]
+tests/integration/test_03a_models.py ...........                         [ 10%]
+tests/integration/test_03a_nonmember_404.py ............................ [ 14%]
+....................................................................     [ 24%]
+tests/integration/test_03a_obo_scope.py ..............make: *** [Makefile:31: test-int] Terminated
+..                 [ 27%]
+tests/integration/test_03a_providers.py ............

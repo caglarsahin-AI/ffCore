@@ -1246,3 +1246,7 @@ Paket: 03c-1 r3   Cevap: K-03c-0018
 Branch feat/03c-governance · SHA **bbf10d2e0b764928d8ed169aa22a028a4a3dfdd0** (3ae3808 üstüne 1 commit: MINOR-1 `services/keys._clock` + iki oran testinde sabit dakika; MINOR-2 `stop()` çağıranın iptalini yeniden fırlatır, yeni test kırmızı @3ae3808). Ağaç temiz. Sınıf [B].
 PR: state/pr/03c.md "03c-1 review r2 → r3". Kanıt taze yığın (state/evidence/03c-1-r3-*): lint 0, make test 734/734 iki profil, make test-int ardışık #1 ve #2 617 passed + 4 skipped, airgap 617 + 4. r3 statik delta: `git diff 3ae3808..bbf10d2` (5 dosya).
 Sıradaki: 03c-2 bbf10d2'ye rebase + iki düzeltme (override yolu parametresi, 01 testi FOLLOWUP-75'e uyum) + 03c-2 kapısı tekrar. Yığın açık kalıyor (03c-2 kapısı için, K-03c-0017 onayı).
+
+### B-03c-0031 · 2026-10-31 20:56 · → koordinator · ACK
+Paket: 03c-2   Cevap: K-03c-0021
+03c-1 merge (7277b30) alındı. 03c-2 main (3c4a466) üstüne çakışmasız rebase edildi: HEAD dea5c09 (6 commit; branch farkında state/ yok, 41 dosya). bbf10d2 tabanındaki yarım kapı koşusu durduruldu (kendi tools-run konteyneri adıyla). Rebase sonrası SHA'da tam kapı başladı (taze yığın: lint, iki profil test, iki ardışık test-int, airgap test-int, önyüz check:api/typecheck/lint; loglar 03c-2c-*). Bitince PR-HAZIR.

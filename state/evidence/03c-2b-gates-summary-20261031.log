@@ -4,3 +4,4 @@ config exit=0
 lint exit=0
 test llmaas exit=0
 test airgap exit=0
+test-int #1 exit=0

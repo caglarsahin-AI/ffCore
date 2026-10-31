@@ -1,0 +1,37 @@
+cd backend && QDRANT_URL=http://qdrant:6333 RUN_QDRANT_TESTS=1 pytest tests/integration
+============================= test session starts ==============================
+platform linux -- Python 3.12.10, pytest-9.2.0, pluggy-1.7.0
+rootdir: /work/backend
+configfile: pyproject.toml
+plugins: Faker-40.43.0, anyio-4.15.1, langsmith-0.14.8
+collected 671 items
+
+tests/integration/test_01_client.py .......                              [  1%]
+tests/integration/test_01_events.py ...                                  [  1%]
+tests/integration/test_01_reconcile.py ...........                       [  3%]
+tests/integration/test_01_reconcile_shutdown.py ...                      [  3%]
+tests/integration/test_01_seed.py ...                                    [  4%]
+tests/integration/test_02_langfuse.py ....                               [  4%]
+tests/integration/test_02_pricing.py .                                   [  4%]
+tests/integration/test_02_r1_worker_logging.py .                         [  4%]
+tests/integration/test_03a_access.py ............                        [  6%]
+tests/integration/test_03a_auth.py ..............                        [  8%]
+tests/integration/test_03a_models.py ...........                         [ 10%]
+tests/integration/test_03a_nonmember_404.py ............................ [ 14%]
+....................................................................     [ 24%]
+tests/integration/test_03a_obo_scope.py ................                 [ 27%]
+tests/integration/test_03a_providers.py ................                 [ 29%]
+tests/integration/test_03a_read_side.py .......                          [ 30%]
+tests/integration/test_03a_schema.py .......                             [ 31%]
+tests/integration/test_03b_audit.py ............                         [ 33%]
+tests/integration/test_03b_egress_dns.py s                               [ 33%]
+tests/integration/test_03c_alerts.py ................                    [ 35%]
+tests/integration/test_03c_keys.py ..............................        [ 40%]
+tests/integration/test_03c_quota_engine.py ............                  [ 42%]
+tests/integration/test_03c_quotas_api.py .......                         [ 43%]
+tests/integration/test_03c_r1_audit_throttle.py .....                    [ 43%]
+tests/integration/test_03c_retention_content.py ...........              [ 45%]
+tests/integration/test_03c_retention_document_delete.py ..               [ 45%]
+tests/integration/test_03c_retention_job.py ...........                  [ 47%]
+tests/integration/test_03c_run_quota.py .......                          [ 48%]
+tests/integration/test_04a_api.py ............
