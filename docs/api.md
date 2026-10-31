@@ -25,7 +25,7 @@ field paths, except a coded refusal raised by a model check (e.g. an agent defin
 | Internal service account (mcp-search, workers) | `Authorization: Bearer <SERVICE_TOKEN>` | `system` / `service` |
 | Service acting for a user | service account + `X-On-Behalf-Of: <token>` | `user` / token `sub` |
 | User session | added by 03a | `user` |
-| API key | added by 03c (`impersonate` scope may send `X-On-Behalf-Of`) | `api_key` |
+| API key | `Authorization: Bearer ffk_...` (03c; `impersonate` scope may send `X-On-Behalf-Of`) | `api_key` |
 
 No recognised credential: 401 `unauthenticated`.
 
@@ -43,8 +43,10 @@ HS256 JWT signed by the backend with `OBO_JWT_SECRET`; signed fresh for every se
 
 Expired, malformed, unsigned or longer-lived tokens: 401 (`token_expired`, `invalid_token`,
 `token_lifetime_exceeded`). Valid token for another audience: 403 `audience_mismatch`.
-The header is accepted only from a caller that may impersonate. From any other caller it is
-ignored and an `impersonation_denied` audit event is written.
+The header is accepted only from a caller that may impersonate. From the console session it is
+ignored and an `impersonation_denied` audit event is written. From an API key (03c) it fails
+loud: a key without `impersonate`, or a key whose token names another project, gets 403
+`impersonation_denied` (audited with the reason; the body names no project).
 
 ## Audit (03b)
 
@@ -226,6 +228,76 @@ returns newest first. `GET /audit.csv` takes the same filters and exports at mos
 03a lives on Alembic branch `03a` (`03a_0001`). To roll back only this package:
 `docker compose run --rm migrate alembic downgrade 03a@-1`. Do not use `03a@base`: it resolves to
 the shared root `0001` and also drops 03b.
+
+## API keys, quotas and usage (03c)
+
+### API keys
+
+`/api/v1/projects/{project_id}/api-keys`: `POST` (create), `GET` (own keys; `?all=true` all keys,
+project admin), `GET /{key_id}`, `PATCH /{key_id}` (name, scopes, acl_role, allowed_cidrs,
+expires_at), `POST /{key_id}/revoke`. Members from analyst up manage their own keys; a project
+admin sees and revokes every key. A key is never deleted, only revoked.
+
+- The raw key (`ffk_<8 hex>_<secret>`) is in the create response only, once. The database keeps
+  its public prefix (`key_prefix`, shown in lists and audit) and its SHA-256.
+- Clients send `Authorization: Bearer ffk_...`. Every request checks the key, `revoked_at`,
+  `expires_at` and `allowed_cidrs` (empty: any address). A wrong, revoked or expired key, or a key
+  of a deleted project: 401 `invalid_api_key`, the same answer whatever the reason. An address
+  outside `allowed_cidrs`: 403 `ip_not_allowed`.
+- More than `API_KEY_AUTH_FAILURES_PER_MIN` (20) wrong keys from one address in a minute: 429
+  `too_many_auth_failures` for that address, valid keys included, until the minute ends. Audit
+  `api_key_auth_rate_limited` (actor `system` / `anonymous`).
+- `scopes` (CONTRACTS C2): `chat_direct`, `agents`, `impersonate`, `kb_search`, `tools_invoke`.
+  Only a project admin grants `impersonate`, and a key with it needs `allowed_cidrs` (422
+  `cidrs_required_for_impersonate`). `acl_role` (default `analyst`) is the role the key's own
+  searches run under and never exceeds its creator's role (403 `scope_not_allowed`).
+- With `impersonate`, the key sends `X-On-Behalf-Of` for a user of the key's own project; the user
+  is then the actor (membership and ACL are the user's) and audit rows carry `via_key_id`.
+- A key is not a console member: project routes answer it 403 `insufficient_role`. Keys are used
+  on the facade (06b).
+- `last_used_at` is written at most once per `API_KEY_LAST_USED_FLUSH_S` (60 s).
+
+### Quotas
+
+`/api/v1/projects/{project_id}/quotas`: `GET`, `POST`, `GET|PATCH|DELETE /{quota_id}`. Analyst
+reads, project admin changes. One form:
+
+| Field | Meaning |
+|---|---|
+| `scope_type`, `scope_id` | `project` (scope_id is the project), `api_key` (a key of the project) or `user` (a member). `group`, `model`, `provider` do not exist (no enforcer) |
+| `windows` | `rpm`, `rph`, `rpd`, `rpm_month` calls per UTC minute/hour/day/month; `concurrent` calls in flight |
+| `tokens` | `tpm`, `tpd`, `tpm_month` tokens per window; `max_input`, `max_output`, `max_total` per call |
+| `budget` | `daily_usd`, `monthly_usd` |
+| `action` | `block` refuses the call (`quota_exceeded`); `warn` lets it run and reports it |
+| `is_active`, `activate_at`, `priority` | a quota counts from `activate_at` on |
+
+Every applying quota is checked: the project's quota is a ceiling for each key and user in it.
+Decisions come from Redis counters at call time (C20): calls are counted as they start (a refused
+call counts nowhere), tokens and cost when they finish, so a budget is crossed by at most the call
+that crossed it. Cost is `models.pricing` x tokens, the formula LiteLLM applies. A USD budget is
+refused while an active model of the project has no price (422 `pricing_missing`, FOLLOWUP-69),
+and a call under a budget on an unpriced model is refused too: it would count 0. Without Redis
+the call is refused (`quota_unavailable`), never let through unlimited.
+
+A console run whose model call is refused fails with `quota_exceeded`, `pricing_missing` or
+`quota_unavailable` (docs/agentlar.md error codes). The facade answers 429 (06b).
+
+### Usage
+
+`GET /api/v1/projects/{project_id}/usage?date_from=&date_to=` (analyst; default the last 30 UTC
+days, at most 400): `usage_daily` rows (day, model, API key, user, tokens, cost, requests) and
+totals. A row is upserted when a model call finishes, once per LiteLLM call id (the brief's
+"hourly sync from LiteLLM spend data" was replaced: LiteLLM's spend log carries neither the API
+key nor a cost for streamed calls, K-03c-0008, DRIFT-124). `unpriced_requests` counts calls on a
+model without a price; their cost is not in `cost_usd`. A row that could not be written is logged
+`usage_write_failed` and counted in Redis (`ffcore:usage:write_failed`); the call is not affected.
+Usage is reporting only: quotas never read it. LiteLLM is configured not to store prompt or answer
+text in its spend log.
+
+### Migrations
+
+03c lives on Alembic branch `03c` (`03c_0001`: `api_keys`, `quotas`, `usage_daily`,
+`audit_events.via_key_id`). Roll back: `docker compose run --rm migrate alembic downgrade 03c@-1`.
 
 ## Knowledge bases (04a)
 

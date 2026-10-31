@@ -543,3 +543,25 @@ def test_03c_21_read_mode_403(make_project, make_user, client_factory):
     assert response.status_code == 403
     assert response.json()["error"]["code"] == "read_only_access"
     assert client.get(f"/api/v1/projects/{project}/api-keys").status_code == 200
+
+
+def test_03c_7_via_key_id_in_new_partitions(pg):
+    """K-03c-0007 (2): a partition made after 03c_0001 has the column too (PARTITION OF)."""
+    name = pg.execute("SELECT ffcore_audit_ensure_partition(date '2031-03-01')").fetchone()[0]
+    columns = pg.execute(
+        "SELECT column_name FROM information_schema.columns WHERE table_name = %s", (name,)
+    ).fetchall()
+    assert ("via_key_id",) in columns
+    key_id = uuid.uuid4()
+    pg.execute(
+        "INSERT INTO audit_events (id, ts, actor_type, actor_id, action, resource_type, outcome,"
+        " via_key_id) VALUES (%s, '2031-03-05', 'user', 'u', 'probe_03c', 'probe', 'success', %s)",
+        (uuid.uuid4(), key_id),
+    )
+    row = pg.execute(
+        "SELECT via_key_id FROM audit_events WHERE action = 'probe_03c' AND ts = '2031-03-05'"
+    ).fetchone()
+    assert row == (key_id,)
+    # Append-only stays as it was (03b trigger).
+    with pytest.raises(Exception, match="append-only"):
+        pg.execute("UPDATE audit_events SET via_key_id = NULL WHERE action = 'probe_03c'")

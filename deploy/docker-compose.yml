@@ -279,6 +279,9 @@ services:
       BACKGROUND_WINDOW_TZ: ${BACKGROUND_WINDOW_TZ:-Europe/Istanbul}
       RUN_TIMEOUT_S: ${RUN_TIMEOUT_S:-120}
       RUN_ABANDON_GRACE_S: ${RUN_ABANDON_GRACE_S:-120}
+      # 03c API keys: failed attempts per client address per minute; last_used_at write buffer.
+      API_KEY_AUTH_FAILURES_PER_MIN: ${API_KEY_AUTH_FAILURES_PER_MIN:-20}
+      API_KEY_LAST_USED_FLUSH_S: ${API_KEY_LAST_USED_FLUSH_S:-60}
       RUN_EVENT_STREAM_TTL_S: ${RUN_EVENT_STREAM_TTL_S:-86400}
       ARQ_QUEUE_INTERACTIVE: ${ARQ_QUEUE_INTERACTIVE:-llm-interactive}
       ARQ_QUEUE_BACKGROUND: ${ARQ_QUEUE_BACKGROUND:-llm-background}

@@ -123,3 +123,23 @@ def test_03c_21_quota_writes_need_admin_edit(make_project, make_user, client_fac
     assert a.post(base, json=body).json()["error"]["code"] == "insufficient_role"
     assert r.post(base, json=body).json()["error"]["code"] == "read_only_access"
     assert a.get(base).status_code == 200 and r.get(base).status_code == 200
+
+
+def test_03c_12_usage_summary(admin, pg, make_project):
+    project, user_id, client = admin
+    pg.execute(
+        "INSERT INTO usage_daily (project_id, date, model, user_id, input_tokens, output_tokens,"
+        " cost_usd, requests, unpriced_requests) VALUES"
+        " (%s, '2026-10-01', 'p.chat-default', %s, 10, 5, 1.5, 2, 0),"
+        " (%s, '2026-10-02', 'p.chat-default', %s, 4, 1, 0, 1, 1),"
+        " (%s, '2026-10-02', 'p.chat-default', %s, 99, 99, 99, 9, 0)",
+        (project, str(user_id), project, str(user_id), make_project(), str(user_id)),
+    )
+    body = client.get(
+        f"/api/v1/projects/{project}/usage?date_from=2026-10-01&date_to=2026-10-31"
+    ).json()
+    assert [r["date"] for r in body["data"]] == ["2026-10-01", "2026-10-02"]
+    assert body["totals"]["requests"] == 3 and body["totals"]["unpriced_requests"] == 1
+    assert body["totals"]["input_tokens"] == 14 and float(body["totals"]["cost_usd"]) == 1.5
+    bad = client.get(f"/api/v1/projects/{project}/usage?date_from=2026-10-31&date_to=2026-10-01")
+    assert bad.status_code == 422 and bad.json()["error"]["code"] == "date_range_invalid"

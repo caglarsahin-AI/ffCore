@@ -18,6 +18,7 @@ from ffcore.api import (
     runs,
     tools,
     tools_internal,
+    usage,
     users,
 )
 
@@ -41,5 +42,6 @@ for _module in (
     approvals_internal,
     keys,
     quotas,
+    usage,
 ):
     api_router.include_router(_module.router)

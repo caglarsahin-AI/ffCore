@@ -1,0 +1,1396 @@
+openapi: 3.1.0
+info:
+  title: FFCore API
+  description: 'Governance: API keys, quotas and usage (package 03c).'
+  version: 0.3c
+paths:
+  /api/v1/projects/{project_id}/api-keys:
+    post:
+      tags:
+      - api-keys
+      summary: Create an API key
+      operationId: create_api_key_api_v1_projects__project_id__api_keys_post
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApiKeyCreate'
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiKeyCreated'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+    get:
+      tags:
+      - api-keys
+      summary: List API keys (own; all for an admin)
+      operationId: list_api_keys_api_v1_projects__project_id__api_keys_get
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      - name: all
+        in: query
+        required: false
+        schema:
+          type: boolean
+          default: false
+          title: All
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiKeyList'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+  /api/v1/projects/{project_id}/api-keys/{key_id}:
+    get:
+      tags:
+      - api-keys
+      summary: Get an API key
+      operationId: get_api_key_api_v1_projects__project_id__api_keys__key_id__get
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      - name: key_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Key Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiKeyOut'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+    patch:
+      tags:
+      - api-keys
+      summary: Change an API key
+      operationId: update_api_key_api_v1_projects__project_id__api_keys__key_id__patch
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      - name: key_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Key Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApiKeyUpdate'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiKeyOut'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+  /api/v1/projects/{project_id}/api-keys/{key_id}/revoke:
+    post:
+      tags:
+      - api-keys
+      summary: Revoke an API key
+      operationId: revoke_api_key_api_v1_projects__project_id__api_keys__key_id__revoke_post
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      - name: key_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Key Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiKeyOut'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+  /api/v1/projects/{project_id}/quotas:
+    get:
+      tags:
+      - quotas
+      summary: List the project's quotas
+      operationId: list_quotas_api_v1_projects__project_id__quotas_get
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuotaList'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+    post:
+      tags:
+      - quotas
+      summary: Create a quota
+      operationId: create_quota_api_v1_projects__project_id__quotas_post
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QuotaCreate'
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuotaOut'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+  /api/v1/projects/{project_id}/quotas/{quota_id}:
+    get:
+      tags:
+      - quotas
+      summary: Get a quota
+      operationId: get_quota_api_v1_projects__project_id__quotas__quota_id__get
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      - name: quota_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Quota Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuotaOut'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+    patch:
+      tags:
+      - quotas
+      summary: Change a quota
+      operationId: update_quota_api_v1_projects__project_id__quotas__quota_id__patch
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      - name: quota_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Quota Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QuotaUpdate'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuotaOut'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+    delete:
+      tags:
+      - quotas
+      summary: Delete a quota (soft delete)
+      operationId: delete_quota_api_v1_projects__project_id__quotas__quota_id__delete
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      - name: quota_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Quota Id
+      responses:
+        '204':
+          description: Successful Response
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+  /api/v1/projects/{project_id}/usage:
+    get:
+      tags:
+      - usage
+      summary: Usage of the project over a date range
+      operationId: get_usage_api_v1_projects__project_id__usage_get
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      - name: date_from
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          description: First UTC day; default 30 days ago.
+          title: Date From
+        description: First UTC day; default 30 days ago.
+      - name: date_to
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          description: Last UTC day; default today.
+          title: Date To
+        description: Last UTC day; default today.
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsageSummary'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+components:
+  schemas:
+    ApiKeyAclRole:
+      type: string
+      enum:
+      - analyst
+      - developer
+      - admin
+      title: ApiKeyAclRole
+      description: The role the key's own knowledge searches run under; at most the creator's role.
+    ApiKeyCreate:
+      properties:
+        name:
+          type: string
+          maxLength: 120
+          minLength: 1
+          title: Name
+        scopes:
+          items:
+            $ref: '#/components/schemas/ApiKeyScope'
+          type: array
+          minItems: 1
+          title: Scopes
+        acl_role:
+          $ref: '#/components/schemas/ApiKeyAclRole'
+          default: analyst
+        allowed_cidrs:
+          items:
+            anyOf:
+            - type: string
+              format: ipv4network
+            - type: string
+              format: ipv6network
+          type: array
+          title: Allowed Cidrs
+          description: 'Client networks allowed to use the key; empty: any.'
+        expires_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Expires At
+      additionalProperties: false
+      type: object
+      required:
+      - name
+      - scopes
+      title: ApiKeyCreate
+    ApiKeyCreated:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+        project_id:
+          type: string
+          format: uuid
+          title: Project Id
+        name:
+          type: string
+          title: Name
+        key_prefix:
+          type: string
+          title: Key Prefix
+          description: Public part of the key, shown in lists and audit.
+        scopes:
+          items:
+            $ref: '#/components/schemas/ApiKeyScope'
+          type: array
+          title: Scopes
+        acl_role:
+          $ref: '#/components/schemas/ApiKeyAclRole'
+        allowed_cidrs:
+          items:
+            type: string
+          type: array
+          title: Allowed Cidrs
+        expires_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Expires At
+        last_used_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Last Used At
+          description: Updated at most once a minute.
+        revoked_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Revoked At
+        created_by:
+          type: string
+          title: Created By
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+        key:
+          type: string
+          title: Key
+          description: The raw key. Returned only here, once; it is never stored.
+      type: object
+      required:
+      - id
+      - project_id
+      - name
+      - key_prefix
+      - scopes
+      - acl_role
+      - allowed_cidrs
+      - expires_at
+      - last_used_at
+      - revoked_at
+      - created_by
+      - created_at
+      - key
+      title: ApiKeyCreated
+    ApiKeyList:
+      properties:
+        data:
+          items:
+            $ref: '#/components/schemas/ApiKeyOut'
+          type: array
+          title: Data
+      type: object
+      required:
+      - data
+      title: ApiKeyList
+    ApiKeyOut:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+        project_id:
+          type: string
+          format: uuid
+          title: Project Id
+        name:
+          type: string
+          title: Name
+        key_prefix:
+          type: string
+          title: Key Prefix
+          description: Public part of the key, shown in lists and audit.
+        scopes:
+          items:
+            $ref: '#/components/schemas/ApiKeyScope'
+          type: array
+          title: Scopes
+        acl_role:
+          $ref: '#/components/schemas/ApiKeyAclRole'
+        allowed_cidrs:
+          items:
+            type: string
+          type: array
+          title: Allowed Cidrs
+        expires_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Expires At
+        last_used_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Last Used At
+          description: Updated at most once a minute.
+        revoked_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Revoked At
+        created_by:
+          type: string
+          title: Created By
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+      type: object
+      required:
+      - id
+      - project_id
+      - name
+      - key_prefix
+      - scopes
+      - acl_role
+      - allowed_cidrs
+      - expires_at
+      - last_used_at
+      - revoked_at
+      - created_by
+      - created_at
+      title: ApiKeyOut
+    ApiKeyScope:
+      type: string
+      enum:
+      - chat_direct
+      - agents
+      - impersonate
+      - kb_search
+      - tools_invoke
+      title: ApiKeyScope
+      description: 'C2. `impersonate`: the key may send X-On-Behalf-Of (a user''s signed token); only
+        a project
+
+        admin grants it.'
+    ApiKeyUpdate:
+      properties:
+        name:
+          type: string
+          maxLength: 120
+          minLength: 1
+          title: Name
+        scopes:
+          items:
+            $ref: '#/components/schemas/ApiKeyScope'
+          type: array
+          minItems: 1
+          title: Scopes
+        acl_role:
+          $ref: '#/components/schemas/ApiKeyAclRole'
+        allowed_cidrs:
+          items:
+            anyOf:
+            - type: string
+              format: ipv4network
+            - type: string
+              format: ipv6network
+          type: array
+          title: Allowed Cidrs
+        expires_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Expires At
+      additionalProperties: false
+      type: object
+      title: ApiKeyUpdate
+    ErrorBody:
+      properties:
+        error:
+          $ref: '#/components/schemas/ErrorDetail'
+      type: object
+      required:
+      - error
+      title: ErrorBody
+      description: OpenAI-shaped error body used by every 4xx response.
+    ErrorDetail:
+      properties:
+        message:
+          type: string
+          title: Message
+          description: English, actionable, never contains secrets.
+        type:
+          type: string
+          title: Type
+          description: authentication_error, permission_error, not_found_error, ...
+        code:
+          type: string
+          title: Code
+          description: Stable machine-readable code, e.g. read_only_access.
+      type: object
+      required:
+      - message
+      - type
+      - code
+      title: ErrorDetail
+    QuotaAction:
+      type: string
+      enum:
+      - block
+      - warn
+      title: QuotaAction
+      description: 'block: the call is refused (quota_exceeded); warn: the call goes on and is reported.'
+    QuotaBudget-Input:
+      properties:
+        daily_usd:
+          anyOf:
+          - type: number
+            minimum: 0.0
+          - type: string
+          - type: 'null'
+          title: Daily Usd
+          description: USD per UTC day.
+        monthly_usd:
+          anyOf:
+          - type: number
+            minimum: 0.0
+          - type: string
+          - type: 'null'
+          title: Monthly Usd
+          description: USD per month.
+      additionalProperties: false
+      type: object
+      title: QuotaBudget
+    QuotaBudget-Output:
+      properties:
+        daily_usd:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Daily Usd
+          description: USD per UTC day.
+        monthly_usd:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Monthly Usd
+          description: USD per month.
+      additionalProperties: false
+      type: object
+      title: QuotaBudget
+    QuotaCreate:
+      properties:
+        scope_type:
+          $ref: '#/components/schemas/QuotaScope'
+        scope_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Scope Id
+          description: API key or user id; omitted (the project) for scope project.
+        label:
+          type: string
+          maxLength: 120
+          minLength: 1
+          title: Label
+        priority:
+          type: integer
+          title: Priority
+          default: 0
+        windows:
+          $ref: '#/components/schemas/QuotaWindows'
+        tokens:
+          $ref: '#/components/schemas/QuotaTokens'
+        budget:
+          $ref: '#/components/schemas/QuotaBudget-Input'
+        action:
+          $ref: '#/components/schemas/QuotaAction'
+          default: block
+        is_active:
+          type: boolean
+          title: Is Active
+          default: true
+        activate_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Activate At
+          description: 'The quota counts from this moment on; empty: at once.'
+      additionalProperties: false
+      type: object
+      required:
+      - scope_type
+      - label
+      title: QuotaCreate
+    QuotaList:
+      properties:
+        data:
+          items:
+            $ref: '#/components/schemas/QuotaOut'
+          type: array
+          title: Data
+      type: object
+      required:
+      - data
+      title: QuotaList
+    QuotaOut:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+        project_id:
+          type: string
+          format: uuid
+          title: Project Id
+        scope_type:
+          $ref: '#/components/schemas/QuotaScope'
+        scope_id:
+          type: string
+          format: uuid
+          title: Scope Id
+        label:
+          type: string
+          title: Label
+        priority:
+          type: integer
+          title: Priority
+        windows:
+          $ref: '#/components/schemas/QuotaWindows'
+        tokens:
+          $ref: '#/components/schemas/QuotaTokens'
+        budget:
+          $ref: '#/components/schemas/QuotaBudget-Output'
+        action:
+          $ref: '#/components/schemas/QuotaAction'
+        is_active:
+          type: boolean
+          title: Is Active
+        activate_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Activate At
+        created_by:
+          type: string
+          title: Created By
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+        updated_at:
+          type: string
+          format: date-time
+          title: Updated At
+      type: object
+      required:
+      - id
+      - project_id
+      - scope_type
+      - scope_id
+      - label
+      - priority
+      - windows
+      - tokens
+      - budget
+      - action
+      - is_active
+      - activate_at
+      - created_by
+      - created_at
+      - updated_at
+      title: QuotaOut
+    QuotaScope:
+      type: string
+      enum:
+      - project
+      - api_key
+      - user
+      title: QuotaScope
+      description: Whom the quota limits. The project's quota is a ceiling for every key and user in it.
+    QuotaTokens:
+      properties:
+        tpm:
+          anyOf:
+          - type: integer
+            exclusiveMinimum: 0.0
+          - type: 'null'
+          title: Tpm
+          description: Tokens per minute.
+        tpd:
+          anyOf:
+          - type: integer
+            exclusiveMinimum: 0.0
+          - type: 'null'
+          title: Tpd
+          description: Tokens per day.
+        tpm_month:
+          anyOf:
+          - type: integer
+            exclusiveMinimum: 0.0
+          - type: 'null'
+          title: Tpm Month
+          description: Tokens per calendar month.
+        max_input:
+          anyOf:
+          - type: integer
+            exclusiveMinimum: 0.0
+          - type: 'null'
+          title: Max Input
+          description: Input tokens of one call.
+        max_output:
+          anyOf:
+          - type: integer
+            exclusiveMinimum: 0.0
+          - type: 'null'
+          title: Max Output
+          description: Output tokens of one call.
+        max_total:
+          anyOf:
+          - type: integer
+            exclusiveMinimum: 0.0
+          - type: 'null'
+          title: Max Total
+          description: Input + output of one call.
+      additionalProperties: false
+      type: object
+      title: QuotaTokens
+    QuotaUpdate:
+      properties:
+        label:
+          type: string
+          maxLength: 120
+          minLength: 1
+          title: Label
+        priority:
+          type: integer
+          title: Priority
+        windows:
+          $ref: '#/components/schemas/QuotaWindows'
+        tokens:
+          $ref: '#/components/schemas/QuotaTokens'
+        budget:
+          $ref: '#/components/schemas/QuotaBudget-Input'
+        action:
+          $ref: '#/components/schemas/QuotaAction'
+        is_active:
+          type: boolean
+          title: Is Active
+        activate_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Activate At
+      additionalProperties: false
+      type: object
+      title: QuotaUpdate
+    QuotaWindows:
+      properties:
+        rpm:
+          anyOf:
+          - type: integer
+            exclusiveMinimum: 0.0
+          - type: 'null'
+          title: Rpm
+          description: Calls per minute (UTC).
+        rph:
+          anyOf:
+          - type: integer
+            exclusiveMinimum: 0.0
+          - type: 'null'
+          title: Rph
+          description: Calls per hour.
+        rpd:
+          anyOf:
+          - type: integer
+            exclusiveMinimum: 0.0
+          - type: 'null'
+          title: Rpd
+          description: Calls per day.
+        rpm_month:
+          anyOf:
+          - type: integer
+            exclusiveMinimum: 0.0
+          - type: 'null'
+          title: Rpm Month
+          description: Calls per calendar month.
+        concurrent:
+          anyOf:
+          - type: integer
+            exclusiveMinimum: 0.0
+          - type: 'null'
+          title: Concurrent
+          description: Calls in flight at once.
+      additionalProperties: false
+      type: object
+      title: QuotaWindows
+    UsageRow:
+      properties:
+        date:
+          type: string
+          format: date
+          title: Date
+        model:
+          type: string
+          title: Model
+          description: Virtual model name `<project_key>.<model_key>` (C1).
+        api_key_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Api Key Id
+        user_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: User Id
+        input_tokens:
+          type: integer
+          title: Input Tokens
+        output_tokens:
+          type: integer
+          title: Output Tokens
+        cost_usd:
+          type: string
+          title: Cost Usd
+        requests:
+          type: integer
+          title: Requests
+        unpriced_requests:
+          type: integer
+          title: Unpriced Requests
+          description: Calls on a model without a price.
+      type: object
+      required:
+      - date
+      - model
+      - api_key_id
+      - user_id
+      - input_tokens
+      - output_tokens
+      - cost_usd
+      - requests
+      - unpriced_requests
+      title: UsageRow
+    UsageSummary:
+      properties:
+        project_id:
+          type: string
+          format: uuid
+          title: Project Id
+        date_from:
+          type: string
+          format: date
+          title: Date From
+        date_to:
+          type: string
+          format: date
+          title: Date To
+        totals:
+          $ref: '#/components/schemas/UsageTotals'
+        data:
+          items:
+            $ref: '#/components/schemas/UsageRow'
+          type: array
+          title: Data
+      type: object
+      required:
+      - project_id
+      - date_from
+      - date_to
+      - totals
+      - data
+      title: UsageSummary
+    UsageTotals:
+      properties:
+        input_tokens:
+          type: integer
+          title: Input Tokens
+        output_tokens:
+          type: integer
+          title: Output Tokens
+        cost_usd:
+          type: string
+          title: Cost Usd
+        requests:
+          type: integer
+          title: Requests
+        unpriced_requests:
+          type: integer
+          title: Unpriced Requests
+      type: object
+      required:
+      - input_tokens
+      - output_tokens
+      - cost_usd
+      - requests
+      - unpriced_requests
+      title: UsageTotals
