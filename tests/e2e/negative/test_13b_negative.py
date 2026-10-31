@@ -3,7 +3,9 @@ test covers yet, each with its status and error code (codes read from the source
 They run on the scenario stack with fake-llm; every refusal must be visible and coded, never a
 silent success (plan/18 "Kurallar")."""
 
+import os
 import uuid
+from datetime import UTC, datetime, timedelta
 
 import httpx
 import pytest
@@ -191,11 +193,85 @@ def test_13b_neg_guard_1_enforced_secrets_rule_stops_the_run_before_the_model(lo
 # --- approvals ------------------------------------------------------------------------------
 
 
-def test_13b_neg_approval_1_expired_approval_closes_the_run():
-    pytest.skip(
-        "NOT_RUN: FOLLOWUP-111 (no way to trigger 07's TTL sweep from a test; APPROVAL_TTL_MIN "
-        "is 60 min on the stack)"
+SWEEP = f"{API}/internal/approvals/sweep"
+TICKET_DESK_URL = os.environ.get("E2E_TICKET_DESK_URL", "http://ticket-desk:8000")
+
+
+def _service() -> dict[str, str]:
+    token = os.environ.get("SERVICE_TOKEN")
+    assert token, "SERVICE_TOKEN is not set: run the tests in the stack's tools service"
+    return {"Authorization": f"Bearer {token}"}
+
+
+def _sweep(at: datetime) -> list[str]:
+    """07's TTL sweep through the test hook (FOLLOWUP-111, FFCORE_TEST_HOOKS=1 in e2e.env)."""
+    r = httpx.post(
+        BACKEND_URL + SWEEP, params={"now": at.isoformat()}, headers=_service(), timeout=60
     )
+    assert r.status_code == 200, r.text
+    return r.json()["expired"]
+
+
+def _desk(path: str, method: str = "GET"):
+    r = httpx.request(method, TICKET_DESK_URL + path, timeout=10)
+    assert r.status_code == 200, r.text
+    return r.json()
+
+
+@pytest.fixture
+def pending_reply(login):
+    """A run of e2e-bilet waiting for its send_reply approval (F2's agent), and that approval."""
+    analyst = login(PROJECT, "analyst", "edit")
+    pid = analyst.project_id(PROJECT)
+    _desk("/_reset", "POST")
+    run = analyst.start_run(pid, "e2e-bilet", "tkt-002 için yanıt gönder.")
+    assert run.events[-1]["event"] == "approval_required", run.names()
+    assert analyst.settle(pid, run).detail["status"] == "waiting_approval"
+    queue = analyst.get(f"{API}/projects/{pid}/approvals", params={"status": "pending"})
+    assert queue.status_code == 200, queue.text
+    mine = [a for a in queue.json()["data"] if a["run_id"] == run.id]
+    assert len(mine) == 1, queue.json()
+    return analyst, pid, run, mine[0]
+
+
+def test_13b_neg_approval_1_expired_approval_closes_the_run(pending_reply):
+    """07 TTL: an approval nobody decided expires; the run ends failed `approval_expired`, a
+    late decision is refused, nothing is sent, and a second sweep changes nothing more."""
+    analyst, pid, run, approval = pending_reply
+    expires_at = datetime.fromisoformat(approval["expires_at"])
+    one_second = timedelta(seconds=1)
+
+    # Not yet due: the sweep leaves it pending and the run waiting.
+    assert approval["id"] not in _sweep(expires_at - one_second)
+    detail = analyst.get(f"{API}/projects/{pid}/approvals/{approval['id']}").json()
+    assert detail["status"] == "pending", detail
+    assert analyst.settle(pid, run).detail["status"] == "waiting_approval"
+
+    # Due: expired, the run closed with its code and events.
+    assert approval["id"] in _sweep(expires_at + one_second)
+    detail = analyst.get(f"{API}/projects/{pid}/approvals/{approval['id']}").json()
+    assert detail["status"] == "expired" and detail["resolved_by"], detail
+    closed = analyst.settle(pid, run).detail
+    assert (closed["status"], closed["error_code"]) == ("failed", "approval_expired"), closed
+    types = [e["type"] for e in analyst.run_events(pid, run.id)]
+    assert "approval_expired" in types and types[-1] == "error", types
+
+    # A late decision is refused with a code; the fake ticket desk got no reply.
+    late = analyst.post(f"{API}/projects/{pid}/approvals/{approval['id']}/approve", json={})
+    assert code(late) == (409, "approval_not_pending")
+    assert _desk("/_sent") == []
+
+    # Idempotent: the same sweep again expires nothing of ours.
+    assert approval["id"] not in _sweep(expires_at + one_second)
+
+
+def test_13b_neg_approval_2_sweep_hook_is_for_the_service_account_only(login):
+    """The test hook is not a user door: no credentials 401, a member's session 403."""
+    analyst = login(PROJECT, "analyst", "edit")
+    now = {"now": datetime.now(UTC).isoformat()}
+    anonymous = httpx.post(BACKEND_URL + SWEEP, params=now, timeout=30)
+    assert code(anonymous) == (401, "unauthenticated")
+    assert code(analyst.post(SWEEP, params=now)) == (403, "service_account_required")
 
 
 # --- audit ----------------------------------------------------------------------------------
