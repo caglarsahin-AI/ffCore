@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-b-03c
 - Aktif paket: 03c (feat/03c-governance)
 - Durum: ACTIVE
-- Son okunan: koordinator K-03c-0001 (2026-10-31 14:55)
+- Son okunan: koordinator K-03c-0003 (2026-10-31 15:04)
 
 ## Mesajlar
 
@@ -1090,4 +1090,24 @@ Not (okurken görülen, brief iç tutarlılığı, plan aşamasında ayrıntıla
 ### B-03c-0002 · 2026-10-31 15:05 · → koordinator · ACK
 Paket: 03c   Cevap: K-03c-0001
 GOREV alındı ve işleme alındı. Zorunlu maddeler 1-5 anlaşıldı (resolve_actor imzası sabit; _grant 404; scopes enum; Redis kota kararı; FOLLOWUP-119/123/47/69/75; 5 gün üstüne iki PR + KARAR-GEREK). Yığın açmadan YIGIN-AÇ yazacağım (18110/13110).
+
+### B-03c-0003 · 2026-10-31 15:11 · → koordinator · KAYIT-TALEBI
+Paket: 03c   Cevap: -
+K1 (B sınıfı, CONTRACTS C3 istisna listesi): `retention_policies` (global sınıf satırı + nullable project_id istisnası, deleted_at yok) ve `retention_runs` (append-only imha kaydı). Ayrıca not: `usage_daily` listede append-only ama saatlik senkron aynı günün satırını upsert eder.
+K2: FOLLOWUP-67 (proje admin'i üye ekleme) 03c'de küçük değil (users okuma yetki modeli + yeni uç + 10a ekranı); kayıt olarak kalsın, 03c kapsamı dışı.
+Ayrıntı: state/pr/03c.md "Kayıt talebi".
+
+### B-03c-0004 · 2026-10-31 15:11 · → koordinator · KARAR-GEREK
+Paket: 03c   Cevap: K-03c-0001
+Altı karar, her biri A/B/C ve etkisiyle state/pr/03c.md "Koordinatör kararı isteyen sorular"da. Önerilerim hepsi A:
+S1 PR bölme: A iki PR (03c-1 anahtar+kota+usage ≈2,5 g, 06b'nin tek ön koşulu; 03c-2 retention+119+uyarı+bildirim ≈3 g). Toplam ~5,5 g > 5 (GOREV madde 5).
+S2 usage kaynağı: A LiteLLM spend logları (saatlik arq cron; U1 doğrulanacak) / B kendi run_events kayıtlarımız.
+S3 kota bağlama yeri: A 03c-1 motoru runtime/adapters.py model çağrısına bağlar (konsol koşuları da korunur; C9 additive error.code quota_exceeded) / B yalnız motor, bağlama 06b.
+S4 e-posta: A stdlib smtplib + core/egress.py additive check_destination (yeni bağımlılık yok) / B aiosmtplib [C].
+S5 FOLLOWUP-119 tanecik: A koşu düzeyi (o belgeyi kaynak göstermiş koşunun request_messages/answer.text/partial alanı "[cleared]") / B mesaj içinden parça ayıklama (kırılgan, ARCH-06).
+S6 touch-zone genişletmesi onayı: core/auth.py (yalnız Actor.acl_role additive; resolve_actor/_grant gövdesi değişmez), main.py, runtime/worker.py, runtime/adapters.py + services/litellm_client.py (S3-A), api/knowledge.py (tek satır), runtime/checkpoints.py (emit), api/projects.py, core/egress.py (S4-A), docs/agentlar.md, compose &app-env.
+
+### B-03c-0005 · 2026-10-31 15:11 · → koordinator · DURUM
+Paket: 03c   Cevap: K-03c-0001
+DURUM: PLANNED (onay bekliyor). Plan: C:\ai_paycore\ffcore\state\pr\03c.md (bulunan semboller, kapsam, dosyalar, sözleşme etkisi, 22 kriter → test, migration 03c_0001/0002, geri alma, durma koşulları, felsefe üçlüsü). C2: resolve_actor imzası ve _grant 404 kuralı değişmiyor; Actor.may_impersonate api_key+impersonate yolunu zaten tanıyor (03b). C9: yalnız error.code additive. Kod yok; B-03c-0004 cevabı gelince önce kırmızı testle 03c-1'e başlarım. Yığın gerekince ayrıca YIGIN-AÇ.
 
