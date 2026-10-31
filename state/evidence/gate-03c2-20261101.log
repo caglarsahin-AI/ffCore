@@ -1,0 +1,639 @@
+
+=== 23:46:30 git head
+2dc4a0c Merge feat/03c-2-retention: retention job, FOLLOWUP-119 content clearing, alerts, notifications, readiness n/5 (03c-2, 47a49a4)
+
+=== 23:46:32 build
+2026/10/31 23:46:39 http2: server: error reading preface from client //./pipe/docker_engine: file has already been closed
+#0 building with "default" instance using docker driver
+
+#1 [backend internal] load .dockerignore
+#1 transferring context: 2B done
+#1 DONE 0.0s
+
+#2 [tools internal] load .dockerignore
+#2 transferring context: 2B done
+#2 DONE 0.0s
+
+#3 [backend internal] load build definition from Dockerfile
+#3 transferring dockerfile: 2.13kB done
+#3 DONE 0.0s
+
+#4 [tools internal] load build definition from Dockerfile
+#4 transferring dockerfile: 2.13kB done
+#4 DONE 0.0s
+
+#5 [backend internal] load metadata for docker.io/library/python:3.12.10-slim-bookworm
+#5 DONE 2.4s
+
+#6 [backend internal] load metadata for ghcr.io/astral-sh/uv:0.10.12
+#6 DONE 2.6s
+
+#7 [tools uv 1/1] FROM ghcr.io/astral-sh/uv:0.10.12@sha256:72ab0aeb448090480ccabb99fb5f52b0dc3c71923bffb5e2e26517a1c27b7fec
+#7 DONE 0.0s
+
+#8 [tools base 1/6] FROM docker.io/library/python:3.12.10-slim-bookworm@sha256:fd95fa221297a88e1cf49c55ec1828edd7c5a428187e67b5d1805692d11588db
+#8 DONE 0.0s
+
+#9 [tools internal] load build context
+#9 transferring context: 444.04kB 0.0s done
+#9 DONE 0.1s
+
+#10 [tools tools 2/3] RUN uv sync --frozen --no-install-project
+#10 CACHED
+
+#11 [tools tools 1/3] RUN apt-get update     && apt-get install -y --no-install-recommends make curl     && rm -rf /var/lib/apt/lists/*
+#11 CACHED
+
+#12 [tools base 5/6] WORKDIR /app
+#12 CACHED
+
+#13 [tools base 6/6] COPY pyproject.toml uv.lock ./
+#13 CACHED
+
+#14 [tools base 3/6] RUN apt-get update     && apt-get install -y --no-install-recommends libgomp1 libgl1 libglib2.0-0 libxcb1     && rm -rf /var/lib/apt/lists/*
+#14 CACHED
+
+#15 [tools base 2/6] COPY --from=uv /uv /usr/local/bin/uv
+#15 CACHED
+
+#16 [tools base 4/6] RUN mkdir -p /models /data/storage && chown 10001 /models /data/storage
+#16 CACHED
+
+#17 [tools tools 3/3] WORKDIR /work
+#17 CACHED
+
+#18 [tools] exporting to image
+#18 exporting layers done
+#18 writing image sha256:ff88a83047370dfa4bd5b76a1f5a87f1100d1ca4022ef3b6667cf0c3a1b24913 done
+#18 naming to docker.io/ffcore/tools:0.0.0-main 0.0s done
+#18 DONE 0.0s
+
+#19 [backend internal] load build context
+#19 transferring context: 2.93MB 0.1s done
+#19 DONE 0.1s
+
+#20 [backend base 6/6] COPY pyproject.toml uv.lock ./
+#20 CACHED
+
+#12 [backend base 5/6] WORKDIR /app
+#12 CACHED
+
+#15 [backend base 2/6] COPY --from=uv /uv /usr/local/bin/uv
+#15 CACHED
+
+#16 [backend base 4/6] RUN mkdir -p /models /data/storage && chown 10001 /models /data/storage
+#16 CACHED
+
+#14 [backend base 3/6] RUN apt-get update     && apt-get install -y --no-install-recommends libgomp1 libgl1 libglib2.0-0 libxcb1     && rm -rf /var/lib/apt/lists/*
+#14 CACHED
+
+#21 [backend runtime 1/5] RUN uv sync --frozen --no-dev --no-install-project
+#21 CACHED
+
+#22 [backend runtime 2/5] COPY alembic.ini ./
+#22 CACHED
+
+#23 [backend runtime 3/5] COPY alembic ./alembic
+#23 DONE 0.1s
+
+#24 [backend runtime 4/5] COPY ffcore ./ffcore
+#24 DONE 0.1s
+
+#25 [backend runtime 5/5] RUN useradd --system --uid 10001 --home-dir /models ffcore
+#25 0.180 useradd warning: ffcore's uid 10001 is greater than SYS_UID_MAX 999
+#25 DONE 0.2s
+
+#26 [backend] exporting to image
+#26 exporting layers 0.1s done
+#26 writing image sha256:cd8520b294523fc8050adee136aff13849d5ba58a44a3a00904b8d6fb7428206 done
+#26 naming to docker.io/ffcore/backend:0.0.0-main done
+#26 DONE 0.1s
+
+#27 [frontend internal] load .dockerignore
+#27 transferring context: 115B done
+#27 DONE 0.0s
+
+#28 [frontend internal] load build definition from Dockerfile
+#28 transferring dockerfile: 665B done
+#28 DONE 0.0s
+
+#29 [frontend internal] load metadata for docker.io/library/node:20.19.5-alpine
+#29 DONE 0.0s
+
+#30 [frontend 1/6] FROM docker.io/library/node:20.19.5-alpine
+#30 DONE 0.0s
+
+#31 [frontend internal] load build context
+#31 transferring context: 2.98MB 0.2s done
+#31 DONE 0.2s
+
+#32 [frontend 3/6] COPY package.json package-lock.json ./
+#32 CACHED
+
+#33 [frontend 2/6] WORKDIR /app
+#33 CACHED
+
+#34 [frontend 4/6] RUN npm ci --no-audit --no-fund
+#34 CACHED
+
+#35 [frontend 5/6] COPY . .
+#35 DONE 0.1s
+
+#36 [frontend 6/6] RUN npm run build
+#36 0.311 
+#36 0.311 > ffcore-frontend@0.1.0 build
+#36 0.311 > next build
+#36 0.311 
+#36 1.531    ▲ Next.js 15.5.28
+#36 1.532 
+#36 1.583    Creating an optimized production build ...
+#36 24.14  ✓ Compiled successfully in 22.4s
+#36 24.15    Linting and checking validity of types ...
+#36 38.57    Collecting page data ...
+#36 41.78    Generating static pages (0/18) ...
+#36 42.49    Generating static pages (4/18) 
+#36 42.49    Generating static pages (8/18) 
+#36 42.74    Generating static pages (13/18) 
+#36 42.95  ✓ Generating static pages (18/18)
+#36 43.71    Finalizing page optimization ...
+#36 43.71    Collecting build traces ...
+#36 51.89 
+#36 51.89 Route (app)                                 Size  First Load JS
+#36 51.89 ┌ ƒ /                                    6.62 kB         145 kB
+#36 51.89 ├ ƒ /_not-found                             1 kB         103 kB
+#36 51.89 ├ ƒ /[section]                           1.56 kB         116 kB
+#36 51.89 ├ ƒ /agents                              5.15 kB         191 kB
+#36 51.89 ├ ƒ /agents/[agentId]                    14.4 kB         188 kB
+#36 51.89 ├ ○ /apple-icon.png                          0 B            0 B
+#36 51.89 ├ ƒ /approvals                           2.91 kB         152 kB
+#36 51.89 ├ ƒ /approvals/[approvalId]              5.21 kB         165 kB
+#36 51.89 ├ ƒ /dev/theme                           3.02 kB         122 kB
+#36 51.89 ├ ○ /icon.png                                0 B            0 B
+#36 51.89 ├ ƒ /knowledge-bases                     1.49 kB         192 kB
+#36 51.89 ├ ƒ /knowledge-bases/[kbId]              6.13 kB         207 kB
+#36 51.89 ├ ƒ /login                               6.43 kB         178 kB
+#36 51.89 ├ ○ /manifest.webmanifest                  128 B         103 kB
+#36 51.89 ├ ƒ /models                              8.85 kB         165 kB
+#36 51.89 ├ ƒ /projects                            6.48 kB         188 kB
+#36 51.89 ├ ƒ /projects/[id]/members               4.59 kB         158 kB
+#36 51.89 ├ ƒ /providers                           6.98 kB         163 kB
+#36 51.89 ├ ƒ /runs                                4.08 kB         153 kB
+#36 51.89 ├ ƒ /runs/[runId]                        6.37 kB         166 kB
+#36 51.89 ├ ƒ /system-status                       7.72 kB         135 kB
+#36 51.89 ├ ƒ /tools                               1.16 kB         192 kB
+#36 51.89 └ ƒ /tools/[toolId]                      3.31 kB         194 kB
+#36 51.89 + First Load JS shared by all             102 kB
+#36 51.89   ├ chunks/1255-60d8dc7c8c9309a1.js      46.3 kB
+#36 51.89   ├ chunks/4bd1b696-100b9d70ed4e49c1.js  54.2 kB
+#36 51.89   └ other shared chunks (total)          1.94 kB
+#36 51.89 
+#36 51.89 
+#36 51.89 ○  (Static)   prerendered as static content
+#36 51.89 ƒ  (Dynamic)  server-rendered on demand
+#36 51.89 
+#36 DONE 52.1s
+
+#37 [frontend] exporting to image
+#37 exporting layers
+#37 exporting layers 1.0s done
+#37 writing image sha256:526f36fea56422ab3858bdfec8ac0067ea5f203f9cedba95c723871e1bd9cee6 done
+#37 naming to docker.io/ffcore/frontend:0.0.0-main done
+#37 DONE 1.0s
+build exit=0
+
+=== 23:47:38 compose config
+config exit=0
+
+=== 23:47:47 retention defaults
+      RETENTION_AUDIT_DROP_ENABLED: "false"
+      RETENTION_DRY_RUN: "true"
+      RETENTION_AUDIT_DROP_ENABLED: "false"
+      RETENTION_DRY_RUN: "true"
+      RETENTION_AUDIT_DROP_ENABLED: "false"
+      RETENTION_DRY_RUN: "true"
+      RETENTION_AUDIT_DROP_ENABLED: "false"
+      RETENTION_DRY_RUN: "true"
+      RETENTION_AUDIT_DROP_ENABLED: "false"
+      RETENTION_DRY_RUN: "true"
+env.test retention vars (must be empty):
+defaults check done
+
+=== 23:47:58 up
+ Network ffmain_default  Creating
+ Network ffmain_default  Created
+ Volume "ffmain_model_cache"  Creating
+ Volume "ffmain_model_cache"  Created
+ Volume "ffmain_postgres_data"  Creating
+ Volume "ffmain_postgres_data"  Created
+ Volume "ffmain_qdrant_data"  Creating
+ Volume "ffmain_qdrant_data"  Created
+ Volume "ffmain_langfuse_clickhouse_data"  Creating
+ Volume "ffmain_langfuse_clickhouse_data"  Created
+ Volume "ffmain_langfuse_minio_data"  Creating
+ Volume "ffmain_langfuse_minio_data"  Created
+ Volume "ffmain_knowledge_storage"  Creating
+ Volume "ffmain_knowledge_storage"  Created
+ Volume "ffmain_langfuse_clickhouse_logs"  Creating
+ Volume "ffmain_langfuse_clickhouse_logs"  Created
+ Volume "ffmain_langfuse_postgres_data"  Creating
+ Volume "ffmain_langfuse_postgres_data"  Created
+ Volume "ffmain_redis_data"  Creating
+ Volume "ffmain_redis_data"  Created
+ Container ffmain-langfuse-postgres-1  Creating
+ Container ffmain-qdrant-1  Creating
+ Container ffmain-langfuse-clickhouse-1  Creating
+ Container ffmain-ticket-desk-1  Creating
+ Container ffmain-fake-llm-1  Creating
+ Container ffmain-redis-1  Creating
+ Container ffmain-postgres-1  Creating
+ Container ffmain-langfuse-minio-1  Creating
+ Container ffmain-langfuse-redis-1  Creating
+ Container ffmain-redis-1  Created
+ Container ffmain-qdrant-1  Created
+ Container ffmain-langfuse-clickhouse-1  Created
+ Container ffmain-postgres-1  Created
+ Container ffmain-migrate-1  Creating
+ Container ffmain-litellm-1  Creating
+ Container ffmain-langfuse-redis-1  Created
+ Container ffmain-fake-llm-1  Created
+ Container ffmain-langfuse-minio-1  Created
+ Container ffmain-langfuse-postgres-1  Created
+ Container ffmain-langfuse-web-1  Creating
+ Container ffmain-langfuse-worker-1  Creating
+ Container ffmain-ticket-desk-1  Created
+ Container ffmain-litellm-1  Created
+ Container ffmain-migrate-1  Created
+ Container ffmain-backend-1  Creating
+ Container ffmain-langfuse-worker-1  Created
+ Container ffmain-langfuse-web-1  Created
+ Container ffmain-backend-1  Created
+ Container ffmain-worker-1  Creating
+ Container ffmain-agent-worker-1  Creating
+ Container ffmain-mcp-search-1  Creating
+ Container ffmain-frontend-1  Creating
+ Container ffmain-agent-worker-bg-1  Creating
+ Container ffmain-mcp-sql-1  Creating
+ Container ffmain-mcp-search-1  Created
+ Container ffmain-agent-worker-1  Created
+ Container ffmain-worker-1  Created
+ Container ffmain-mcp-sql-1  Created
+ Container ffmain-agent-worker-bg-1  Created
+ Container ffmain-frontend-1  Created
+ Container ffmain-redis-1  Starting
+ Container ffmain-langfuse-redis-1  Starting
+ Container ffmain-ticket-desk-1  Starting
+ Container ffmain-langfuse-minio-1  Starting
+ Container ffmain-langfuse-clickhouse-1  Starting
+ Container ffmain-langfuse-postgres-1  Starting
+ Container ffmain-fake-llm-1  Starting
+ Container ffmain-postgres-1  Starting
+ Container ffmain-qdrant-1  Starting
+ Container ffmain-redis-1  Started
+ Container ffmain-langfuse-minio-1  Started
+ Container ffmain-fake-llm-1  Started
+ Container ffmain-langfuse-redis-1  Started
+ Container ffmain-ticket-desk-1  Started
+ Container ffmain-postgres-1  Started
+ Container ffmain-postgres-1  Waiting
+ Container ffmain-postgres-1  Waiting
+ Container ffmain-qdrant-1  Started
+ Container ffmain-langfuse-clickhouse-1  Started
+ Container ffmain-langfuse-postgres-1  Started
+ Container ffmain-langfuse-redis-1  Waiting
+ Container ffmain-langfuse-postgres-1  Waiting
+ Container ffmain-langfuse-clickhouse-1  Waiting
+ Container ffmain-langfuse-minio-1  Waiting
+ Container ffmain-langfuse-minio-1  Waiting
+ Container ffmain-langfuse-redis-1  Waiting
+ Container ffmain-langfuse-postgres-1  Waiting
+ Container ffmain-langfuse-clickhouse-1  Waiting
+ Container ffmain-langfuse-minio-1  Healthy
+ Container ffmain-langfuse-minio-1  Healthy
+ Container ffmain-langfuse-redis-1  Healthy
+ Container ffmain-langfuse-redis-1  Healthy
+ Container ffmain-postgres-1  Healthy
+ Container ffmain-migrate-1  Starting
+ Container ffmain-postgres-1  Healthy
+ Container ffmain-litellm-1  Starting
+ Container ffmain-migrate-1  Started
+ Container ffmain-litellm-1  Started
+ Container ffmain-migrate-1  Waiting
+ Container ffmain-postgres-1  Waiting
+ Container ffmain-redis-1  Waiting
+ Container ffmain-litellm-1  Waiting
+ Container ffmain-redis-1  Healthy
+ Container ffmain-postgres-1  Healthy
+ Container ffmain-langfuse-postgres-1  Healthy
+ Container ffmain-langfuse-postgres-1  Healthy
+ Container ffmain-langfuse-clickhouse-1  Healthy
+ Container ffmain-langfuse-worker-1  Starting
+ Container ffmain-langfuse-clickhouse-1  Healthy
+ Container ffmain-langfuse-web-1  Starting
+ Container ffmain-langfuse-worker-1  Started
+ Container ffmain-langfuse-web-1  Started
+ Container ffmain-migrate-1  Exited
+ Container ffmain-litellm-1  Healthy
+ Container ffmain-backend-1  Starting
+ Container ffmain-backend-1  Started
+ Container ffmain-backend-1  Waiting
+ Container ffmain-backend-1  Waiting
+ Container ffmain-backend-1  Waiting
+ Container ffmain-backend-1  Waiting
+ Container ffmain-backend-1  Waiting
+ Container ffmain-postgres-1  Waiting
+ Container ffmain-backend-1  Waiting
+ Container ffmain-postgres-1  Healthy
+ Container ffmain-backend-1  Healthy
+ Container ffmain-worker-1  Starting
+ Container ffmain-backend-1  Healthy
+ Container ffmain-frontend-1  Starting
+ Container ffmain-backend-1  Healthy
+ Container ffmain-mcp-sql-1  Starting
+ Container ffmain-backend-1  Healthy
+ Container ffmain-mcp-search-1  Starting
+ Container ffmain-backend-1  Healthy
+ Container ffmain-backend-1  Healthy
+ Container ffmain-agent-worker-1  Starting
+ Container ffmain-agent-worker-bg-1  Starting
+ Container ffmain-worker-1  Started
+ Container ffmain-mcp-sql-1  Started
+ Container ffmain-mcp-search-1  Started
+ Container ffmain-agent-worker-bg-1  Started
+ Container ffmain-frontend-1  Started
+ Container ffmain-agent-worker-1  Started
+ Container ffmain-frontend-1  Waiting
+ Container ffmain-migrate-1  Waiting
+ Container ffmain-langfuse-worker-1  Waiting
+ Container ffmain-mcp-sql-1  Waiting
+ Container ffmain-langfuse-postgres-1  Waiting
+ Container ffmain-langfuse-minio-1  Waiting
+ Container ffmain-litellm-1  Waiting
+ Container ffmain-agent-worker-1  Waiting
+ Container ffmain-langfuse-clickhouse-1  Waiting
+ Container ffmain-agent-worker-bg-1  Waiting
+ Container ffmain-langfuse-redis-1  Waiting
+ Container ffmain-worker-1  Waiting
+ Container ffmain-fake-llm-1  Waiting
+ Container ffmain-backend-1  Waiting
+ Container ffmain-mcp-search-1  Waiting
+ Container ffmain-ticket-desk-1  Waiting
+ Container ffmain-postgres-1  Waiting
+ Container ffmain-redis-1  Waiting
+ Container ffmain-qdrant-1  Waiting
+ Container ffmain-langfuse-web-1  Waiting
+ Container ffmain-frontend-1  Healthy
+ Container ffmain-ticket-desk-1  Healthy
+ Container ffmain-langfuse-clickhouse-1  Healthy
+ Container ffmain-agent-worker-1  Healthy
+ Container ffmain-redis-1  Healthy
+ Container ffmain-langfuse-worker-1  Healthy
+ Container ffmain-langfuse-minio-1  Healthy
+ Container ffmain-backend-1  Healthy
+ Container ffmain-migrate-1  Exited
+ Container ffmain-worker-1  Healthy
+ Container ffmain-langfuse-postgres-1  Healthy
+ Container ffmain-langfuse-redis-1  Healthy
+ Container ffmain-fake-llm-1  Healthy
+ Container ffmain-agent-worker-bg-1  Healthy
+ Container ffmain-postgres-1  Healthy
+ Container ffmain-qdrant-1  Healthy
+ Container ffmain-litellm-1  Healthy
+ Container ffmain-langfuse-web-1  Healthy
+ Container ffmain-mcp-sql-1  Healthy
+ Container ffmain-mcp-search-1  Healthy
+up exit=0
+ffmain-agent-worker-1 Up 21 seconds
+ffmain-agent-worker-bg-1 Up 22 seconds
+ffmain-backend-1 Up 35 seconds (healthy)
+ffmain-fake-llm-1 Up About a minute
+ffmain-frontend-1 Up 21 seconds
+ffmain-langfuse-clickhouse-1 Up About a minute (healthy)
+ffmain-langfuse-minio-1 Up About a minute (healthy)
+ffmain-langfuse-postgres-1 Up About a minute (healthy)
+ffmain-langfuse-redis-1 Up About a minute (healthy)
+ffmain-langfuse-web-1 Up About a minute (healthy)
+ffmain-langfuse-worker-1 Up About a minute
+ffmain-litellm-1 Up About a minute (healthy)
+ffmain-mcp-search-1 Up 22 seconds (healthy)
+ffmain-mcp-sql-1 Up 22 seconds (healthy)
+ffmain-postgres-1 Up About a minute (healthy)
+ffmain-qdrant-1 Up About a minute (healthy)
+ffmain-redis-1 Up About a minute (healthy)
+ffmain-ticket-desk-1 Up About a minute (healthy)
+ffmain-worker-1 Up 3 seconds
+
+=== 23:49:38 lint
+ruff check backend scripts data/samples/scripts services
+All checks passed!
+ruff format --check backend scripts data/samples/scripts services
+355 files already formatted
+lint exit=0
+
+=== 23:49:54 alembic heads
+03a_0001 (03a) (effective head)
+03b_0001 (03b) (effective head)
+03c_0002 (03c) (head)
+04a_0001 (04a) (head)
+05a_0001 (05a) (head)
+06a_0002 (06a) (effective head)
+07_0001 (07) (effective head)
+08_0001 (08) (head)
+heads exit=0
+
+=== 23:50:07 make test llmaas
+tests/contract/test_c1_namespace.py ...............                      [ 97%]
+tests/contract/test_c2_api_key_scopes.py ..                              [ 97%]
+tests/contract/test_c2_on_behalf_of.py ..                                [ 97%]
+tests/contract/test_c3_common_columns.py .....                           [ 98%]
+tests/contract/test_c5_vectorstore.py ...                                [ 99%]
+tests/contract/test_c9_runs.py .......                                   [100%]
+
+======================= 734 passed in 119.97s (0:01:59) ========================
+
+=== 23:52:24 make test airgap
+tests/contract/test_c1_namespace.py ...............                      [ 97%]
+tests/contract/test_c2_api_key_scopes.py ..                              [ 97%]
+tests/contract/test_c2_on_behalf_of.py ..                                [ 97%]
+tests/contract/test_c3_common_columns.py .....                           [ 98%]
+tests/contract/test_c5_vectorstore.py ...                                [ 99%]
+tests/contract/test_c9_runs.py .......                                   [100%]
+
+======================= 734 passed in 120.39s (0:02:00) ========================
+
+=== 23:54:43 test-samples
+
+----------------------------------------------------------------------
+Ran 54 tests in 3.488s
+
+OK (skipped=5)
+
+=== 23:54:59 test-int #1
+tests/integration/test_04a_worker.py::test_04a_job_for_missing_row_retries_then_fails_loud
+  /opt/venv/lib/python3.12/site-packages/arq/worker.py:877: DeprecationWarning: Call to deprecated close. (Use aclose() instead) -- Deprecated since version 5.0.1.
+    await self.pool.close(close_connection_pool=True)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+============ 671 passed, 4 skipped, 2 warnings in 531.10s (0:08:51) ============
+
+=== 00:04:12 test-int #2 (consecutive)
+tests/integration/test_04a_worker.py::test_04a_job_for_missing_row_retries_then_fails_loud
+  /opt/venv/lib/python3.12/site-packages/arq/worker.py:877: DeprecationWarning: Call to deprecated close. (Use aclose() instead) -- Deprecated since version 5.0.1.
+    await self.pool.close(close_connection_pool=True)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+============ 671 passed, 4 skipped, 2 warnings in 512.44s (0:08:32) ============
+
+=== 00:13:12 litellm log errors
+litellm-1  | [92m20:49:08 - LiteLLM Proxy:ERROR[0m: utils.py:3604 - Exception: 
+litellm-1  | future: <Task finished name='Task-61' coro=<KeyManagementEventHooks.async_key_generated_hook() done, defined at /usr/lib/python3.13/site-packages/litellm/proxy/hooks/key_management_event_hooks.py:28> exception=ValueError("Email alerting not setup on config.yaml. Please set `alerting=['email']. \nDocs: https://docs.litellm.ai/docs/proxy/email`")>
+litellm-1  |     raise ValueError(
+litellm-1  | ValueError: Email alerting not setup on config.yaml. Please set `alerting=['email']. 
+litellm-1  | [92m20:55:46 - LiteLLM Proxy:ERROR[0m: common_request_processing.py:721 - litellm.proxy.proxy_server._handle_llm_api_exception(): Exception occured - litellm.InternalServerError: InternalServerError: OpenAIException - fake provider is down. Received Model Group=p264151eb.chat-default
+litellm-1  |     raise self._make_status_error_from_response(err.response) from None
+litellm-1  | openai.InternalServerError: Error code: 500 - {'error': {'message': 'fake provider is down', 'type': 'server_error'}}
+litellm-1  |     raise OpenAIError(
+litellm-1  | litellm.llms.openai.common_utils.OpenAIError: Error code: 500 - {'error': {'message': 'fake provider is down', 'type': 'server_error'}}
+litellm-1  |     raise InternalServerError(
+litellm grep done
+
+=== 00:13:20 alembic heads after up
+03a_0001 (03a) (effective head)
+03b_0001 (03b) (effective head)
+03c_0002 (03c) (head)
+04a_0001 (04a) (head)
+05a_0001 (05a) (head)
+06a_0002 (06a) (effective head)
+07_0001 (07) (effective head)
+08_0001 (08) (head)
+
+=== 00:13:32 smoke
+python scripts/smoke.py
+ok    backend /healthz 200
+ok    litellm /health/liveliness 200
+ok    langfuse /api/public/health 200, /api/public/projects 200
+ok    mcp-search /healthz 200
+ok    mcp-sql /healthz 200
+ok    skipped: ollama profile inactive
+smoke: passed
+smoke exit=0
+
+=== 00:13:42 frontend lint/typecheck/check:api
+
+> ffcore-frontend@0.1.0 lint
+> eslint
+
+
+> ffcore-frontend@0.1.0 typecheck
+> tsc --noEmit
+
+
+> ffcore-frontend@0.1.0 check:api
+> node scripts/check-api.mjs
+
+API contract copies and generated types are current.
+frontend exit=0
+
+=== 00:14:21 down -v
+ Container ffmain-mcp-sql-1  Stopping
+ Container ffmain-fake-llm-1  Stopping
+ Container ffmain-agent-worker-1  Stopping
+ Container ffmain-worker-1  Stopping
+ Container ffmain-mcp-search-1  Stopping
+ Container ffmain-langfuse-web-1  Stopping
+ Container ffmain-agent-worker-bg-1  Stopping
+ Container ffmain-frontend-1  Stopping
+ Container ffmain-qdrant-1  Stopping
+ Container ffmain-langfuse-worker-1  Stopping
+ Container ffmain-ticket-desk-1  Stopping
+ Container ffmain-worker-1  Stopped
+ Container ffmain-worker-1  Removing
+ Container ffmain-worker-1  Removed
+ Container ffmain-qdrant-1  Stopped
+ Container ffmain-qdrant-1  Removing
+ Container ffmain-frontend-1  Stopped
+ Container ffmain-frontend-1  Removing
+ Container ffmain-qdrant-1  Removed
+ Container ffmain-frontend-1  Removed
+ Container ffmain-mcp-sql-1  Stopped
+ Container ffmain-mcp-sql-1  Removing
+ Container ffmain-mcp-search-1  Stopped
+ Container ffmain-mcp-search-1  Removing
+ Container ffmain-mcp-sql-1  Removed
+ Container ffmain-mcp-search-1  Removed
+ Container ffmain-ticket-desk-1  Stopped
+ Container ffmain-ticket-desk-1  Removing
+ Container ffmain-ticket-desk-1  Removed
+ Container ffmain-agent-worker-1  Stopped
+ Container ffmain-agent-worker-1  Removing
+ Container ffmain-agent-worker-1  Removed
+ Container ffmain-agent-worker-bg-1  Stopped
+ Container ffmain-agent-worker-bg-1  Removing
+ Container ffmain-agent-worker-bg-1  Removed
+ Container ffmain-backend-1  Stopping
+ Container ffmain-backend-1  Stopped
+ Container ffmain-backend-1  Removing
+ Container ffmain-backend-1  Removed
+ Container ffmain-migrate-1  Stopping
+ Container ffmain-redis-1  Stopping
+ Container ffmain-litellm-1  Stopping
+ Container ffmain-migrate-1  Stopped
+ Container ffmain-migrate-1  Removing
+ Container ffmain-migrate-1  Removed
+ Container ffmain-redis-1  Stopped
+ Container ffmain-redis-1  Removing
+ Container ffmain-redis-1  Removed
+ Container ffmain-litellm-1  Stopped
+ Container ffmain-litellm-1  Removing
+ Container ffmain-litellm-1  Removed
+ Container ffmain-postgres-1  Stopping
+ Container ffmain-postgres-1  Stopped
+ Container ffmain-postgres-1  Removing
+ Container ffmain-postgres-1  Removed
+ Container ffmain-fake-llm-1  Stopped
+ Container ffmain-fake-llm-1  Removing
+ Container ffmain-fake-llm-1  Removed
+ Container ffmain-langfuse-web-1  Stopped
+ Container ffmain-langfuse-web-1  Removing
+ Container ffmain-langfuse-web-1  Removed
+ Container ffmain-langfuse-worker-1  Stopped
+ Container ffmain-langfuse-worker-1  Removing
+ Container ffmain-langfuse-worker-1  Removed
+ Container ffmain-langfuse-postgres-1  Stopping
+ Container ffmain-langfuse-clickhouse-1  Stopping
+ Container ffmain-langfuse-minio-1  Stopping
+ Container ffmain-langfuse-redis-1  Stopping
+ Container ffmain-langfuse-minio-1  Stopped
+ Container ffmain-langfuse-minio-1  Removing
+ Container ffmain-langfuse-minio-1  Removed
+ Container ffmain-langfuse-postgres-1  Stopped
+ Container ffmain-langfuse-postgres-1  Removing
+ Container ffmain-langfuse-redis-1  Stopped
+ Container ffmain-langfuse-redis-1  Removing
+ Container ffmain-langfuse-postgres-1  Removed
+ Container ffmain-langfuse-redis-1  Removed
+ Container ffmain-langfuse-clickhouse-1  Stopped
+ Container ffmain-langfuse-clickhouse-1  Removing
+ Container ffmain-langfuse-clickhouse-1  Removed
+ Volume ffmain_langfuse_clickhouse_data  Removing
+ Volume ffmain_postgres_data  Removing
+ Volume ffmain_model_cache  Removing
+ Volume ffmain_langfuse_minio_data  Removing
+ Volume ffmain_knowledge_storage  Removing
+ Volume ffmain_langfuse_clickhouse_logs  Removing
+ Volume ffmain_redis_data  Removing
+ Volume ffmain_qdrant_data  Removing
+ Volume ffmain_langfuse_postgres_data  Removing
+ Network ffmain_default  Removing
+ Volume ffmain_model_cache  Removed
+ Network ffmain_default  Removed
+ Volume ffmain_langfuse_clickhouse_data  Removed
+ Volume ffmain_langfuse_minio_data  Removed
+ Volume ffmain_postgres_data  Removed
+ Volume ffmain_knowledge_storage  Removed
+ Volume ffmain_langfuse_clickhouse_logs  Removed
+ Volume ffmain_langfuse_postgres_data  Removed
+ Volume ffmain_qdrant_data  Removed
+ Volume ffmain_redis_data  Removed
+down exit=0
+
+=== 00:14:44 done
