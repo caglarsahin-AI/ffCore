@@ -108,7 +108,9 @@ def test_03c_6_global_audit_cap(database_url, app_settings, pg):
     scope = f"t03c:{uuid.uuid4().hex}"
     ips = [_ip() for _ in range(200)]
     calls = [
-        (_entry(ip, "probe_03c_cap"), {"key": ip, "scope": scope, "global_cap": 100}) for ip in ips
+        # One fixed minute (r2: 200 calls may straddle a minute boundary otherwise).
+        (_entry(ip, "probe_03c_cap"), {"key": ip, "scope": scope, "global_cap": 100, "now": 0.0})
+        for ip in ips
     ]
     written = _throttled(database_url, app_settings, calls)
     assert sum(written) == 100

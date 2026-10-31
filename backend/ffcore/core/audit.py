@@ -131,6 +131,7 @@ async def write_event_throttled(
     window_s: int = 60,
     global_cap: int = AUDIT_GLOBAL_CAP,
     scope: str = THROTTLE_SCOPE,
+    now: float | None = None,
 ) -> bool:
     """Write `entry` at most once per `key` and `window_s`, and at most `global_cap` rows a
     minute for all keys of `scope` (then one `audit_rate_capped` row). Held-back events are
@@ -151,7 +152,8 @@ async def write_event_throttled(
                 await pipe.incr(count_key).expire(count_key, window_s * 2).execute()
             return False
         held = await redis.getdel(count_key)
-        minute = f"{scope}:global:{int(time.time()) // 60}"
+        # `now` only for tests: a burst that straddles a minute is two minutes' budget.
+        minute = f"{scope}:global:{int(now if now is not None else time.time()) // 60}"
         async with redis.pipeline(transaction=True) as pipe:
             total, _ = await pipe.incr(minute).expire(minute, 120).execute()
     except Exception as exc:  # noqa: BLE001 - any Redis failure: fail closed, write nothing
