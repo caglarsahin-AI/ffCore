@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-b-03c
 - Aktif paket: 03c (03c-1 review: feat/03c-governance f065481; 03c-2: feat/03c-2-retention)
 - Durum: ACTIVE
-- Son okunan: koordinator K-03c-0010 (2026-10-31 16:52)
+- Son okunan: koordinator K-03c-0011 (2026-10-31 16:56)
 
 ## Mesajlar
 
@@ -1176,3 +1176,12 @@ S7 retention sınıf → hedef: A content=tablo (clear), telemetry=guardrail_eve
 S8 yayıcısı olmayan uyarı türleri (ingest_error, sync_error, prune_refused, guardrail_block_rate, convert_timeout, disk_memory): A kural oluşturmada 422 alert_kind_unavailable (ARCH-13) / B kabul et, hiç tetiklenmez.
 S9 checkpoint_purge_overdue (FOLLOWUP-123) alert_rules.kind'a additive: ekle.
 Ayrıca: FOLLOWUP-75'in "geri alma" yarısı için proje geri alma ucu yok; yalnız silme olayı. 07 approval_pending_age'e tek satır emit (services/approvals.py, touch-zone eki). Readiness Literal değişikliği openapi/03a.yaml + frontend/lib/api/schema-03a.d.ts yeniden üretimi (FOLLOWUP-115 deseni). Cevaba kadar retention tabloları + 119 tip temizliği (S7'den bağımsız kısım) ile başlıyorum.
+
+### B-03c-0017 · 2026-10-31 16:56 · → koordinator · SORU
+Paket: 03c-2   Cevap: -
+YIGIN-AÇ 03c (03c-2 için): proje `03c`, portlar 18110/13110, FFCORE_VERSION=0.0.0-03c (mevcut imajlar; feat/03c-2-retention worktree'sinden tools bağlanır), profiller test + qdrant + tools, temiz volume. Amaç: retention/FOLLOWUP-119 kırmızı/yeşil entegrasyon testleri. İnceleyicinin review-03c yığını açıksa ikinci yuva bende olur; onay bekliyorum.
+
+### B-03c-0018 · 2026-10-31 16:57 · → koordinator · ACK
+Paket: 03c-2   Cevap: K-03c-0011
+S7-A, S8-A, S9 ve altı şart alındı; state/pr/03c.md "03c-2 plan onayı" tablosuna işleniyor. Uygulama notları: (1) audit DROP: kodda sert alt sınır max(keep_days, 365), tam ay, DETACH → retention_runs kaydı (ad, satır, min/max ts, SHA-256) commit → DROP ayrı adım, `RETENTION_AUDIT_DROP_ENABLED=false` ikinci bayrak (.env.example + compose), DROP kendi audit olayı `audit_partition_dropped`; (2) approvals.arguments temizlenir, args_hash kalır; onay anı audit'inde args_hash var mı kontrol edip yoksa additive; docs cümlesi; (3) jobs = terminal koşuların tüm olayları, runs satırı kalır, waiting_* asla; (4) 422 alert_kind_unavailable + `GET /alert-kinds`; (5) retention_runs'a `status` (ok|partial|failed) + `error_code` kolonu, sınıf başına sayım→kayıt→silme, 5.000'lik batch, advisory lock, idempotent, override min/max içinde, clear_document_content mark_document_runs ile aynı transaction, traces "external" + Langfuse saklama belgesi; (6) 364 gün audit ve DRY_RUN önce/sonra sayım testleri.
+Mevcut ilerleme: retention modeli + 03c_0002 (retention kısmı) + FOLLOWUP-119 temizlik servisi + tip başına testler yazıldı (yığın onayı B-03c-0017 bekliyor, kırmızı/yeşil oradan).

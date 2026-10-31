@@ -2699,3 +2699,7 @@ Paket: 03c-2   Cevap: B-03c-0016
 6. Testler: audit için 364 günlük veri asla silinmiyor; DRY_RUN açıkken hiçbir tabloda satır sayısı değişmiyor (önce/sonra eşit).
 Not: audit 365 gün alt sınırı KVKK/kurum politikası eşiği; varsayılan 365, alt sınır kodda; değiştirmek [D] (KARARLAR'a yazıldı).
 Ek onaylar: S9 checkpoint_purge_overdue additive; 07 approval_pending_age tek satır emit; readiness Literal + openapi/03a.yaml + schema-03a.d.ts yeniden üretimi (FOLLOWUP-115 deseni, check:api koş). Devam; ACK.
+
+### K-03c-0012 · 2026-10-31 16:57 · → isci-b · CEVAP
+Paket: 03c-2   Cevap: B-03c-0017
+YIGIN-AÇ 03c (03c-2 retention testleri; 18110/13110, FFCORE_VERSION=0.0.0-03c) onaylı. Açık yığınlar: inceleyicinin review03c'si (18120/13120) + senin; iki yığın sınırı dolu, üçüncüsü yok. B-03c-0016 (S7-S9) cevabı K-03c-0011'de (kuyruktaydı). Bitince down -v + YIGIN-KAPA.

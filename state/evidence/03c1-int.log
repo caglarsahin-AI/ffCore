@@ -1,0 +1,4 @@
+no tests ran in 21.53s
+! _pytest.outcomes.Exit: integration services not reachable: fake-llm (profile test) at http://fake-llm:9999. Start them: docker compose --profile test --profile qdrant up -d --wait !
+INT_EXIT=0
+copy_removed
