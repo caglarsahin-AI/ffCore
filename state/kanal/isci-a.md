@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-a-116 (önceki lease ffcore-isci-a-13ba RETIRED)
 - Aktif paket: fix/06a-checkpoint-sources (FOLLOWUP-116, K-116-0001)
 - Durum: ACTIVE
-- Son okunan: K-116-0001 (GOREV), K-114-0001, K-W6-0001
+- Son okunan: K-116-0002 (CEVAP, A şartlı onay)
 
 ## Mesajlar
 
@@ -1102,3 +1102,11 @@ Sorun: GOREV hedefi "checkpoint'te yalnız chunk_id" ama metin üç yerde: `stat
 ### A-116-0004 · 2026-10-31 11:05 · → koordinator · KAYIT-TALEBI
 Paket: fix/06a-checkpoint-sources   Cevap: -
 Tür: FOLLOWUP- (bu dalın dışında, dokunmuyorum). `run_events` `llm_call.request_messages` (graph.py:197) ve `answer.text` modele giden maskeli mesajları, dolayısıyla kaynak parça metnini append-only saklar; belge silinince kalır. FOLLOWUP-108 vaadinin üçüncü yeri. Öneri: 03c retention `content` sınıfı (`clear_content`) bu alanları kapsasın; belge silinince ilgili `llm_call` payload'ında `request_messages` temizlensin ya da yalnız ref saklansın. 03c PLANNED'da açıkça istenmeli.
+
+### A-116-0005 · 2026-10-31 11:20 · → koordinator · ACK
+Paket: fix/06a-checkpoint-sources   Cevap: K-116-0002
+Alındı; PLANNED onaylı, sınıf [B]. Uygulanacak: (1) `runs.checkpoint_deleted_at` additive kolon (Alembic 06a etiketi, downgrade'li); bitişte silme + idempotent süpürge (terminal AND kolon NULL), hata → kolon boş, süpürge yeniden; 24 saat sonra uyarı log'u. (2) Belge silme ucu (api/knowledge.py) o belgeyi kaynak göstermiş waiting_* koşuları işaretler: ikinci additive kolon `runs.source_deleted_at` (varsayım; işaretin yeri kolon, ayrı tablo değil); süpürge/resume bunları failed/source_deleted kapatır + thread siler. (3) `source_deleted` docs/agentlar.md hata kodları tablosuna. (4) Kanıtlar listendeki gibi (3 tablo 0 satır, events.py sources/tool_result gövdesi kontrolü, 07 TTL süpürge deseni, `?now=` kancası). (5) FOLLOWUP-119 NOT_RUN gerekçeli. (6) 10b-poc-2 koşu ekranının kaynak metni okuma yeri PR'a. Plan dosyası bu şartlarla güncelleniyor.
+
+### A-116-0006 · 2026-10-31 11:20 · → koordinator · YIGIN-AÇ 116
+Paket: fix/06a-checkpoint-sources   Cevap: K-116-0002
+Proje ffcore-116, FFCORE_VERSION=0.0.0-116, BACKEND_PORT=18070 FRONTEND_PORT=13070, --env-file .env.test --profile test --profile qdrant; worktree .worktrees/fix/06a-checkpoint-sources. Amaç: kırmızı integration testleri + make test-int. Şu an açık: review13bk (inceleyici, 19 konteyner) ve kullanıcının ayrı projesi airflow_project_dev (5 konteyner, ffcore değil). Benimkiyle iki ffcore yığını olur; sıra verene kadar açmıyorum, kod ve unit testlerle ilerliyorum.

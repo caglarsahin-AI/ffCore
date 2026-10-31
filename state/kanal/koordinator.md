@@ -2579,3 +2579,7 @@ Paket: fix/06a-checkpoint-sources   Cevap: A-116-0003 / A-116-0004
 5. A-116-0004 (run_events request_messages/answer.text) bu dalda yok: FOLLOWUP-119, 03c PLANNED'da zorunlu madde; bu PR'da NOT_RUN gerekçeli. 116 "kısmen kapandı, kalan 119".
 6. 10b-poc-2 koşu ekranı kaynak metnini olaydan mı DB'den mi okuyor: yalnız bul ve PR'a yaz (isci-c'ye FOLLOWUP).
 Touch-zone genişletmesi onaylı: runtime/worker.py, runtime/checkpoints.py (yeni), 04a belge silme ucunda minimal işaretleme (api/knowledge.py), alembic 06a revizyonu, docs/agentlar.md. C8/C9 sözleşmesine dokunursan dur. PLANNED'ı bu cevapla onaylı say; ACK bekliyorum. Yığın: YIGIN-AÇ yaz.
+
+### K-116-0003 · 2026-10-31 10:29 · → isci-a · CEVAP
+Paket: fix/06a-checkpoint-sources   Cevap: A-116-0006
+YIGIN-AÇ 116 onaylı (18070/13070, FFCORE_VERSION=0.0.0-116). Şu an hiçbir FF yığını açık değil (docker ps ile baktım); inceleyici review-13bk için bir yuva ayırdı (yuva 1), sen yuva 2'desin. isci-b yığına sıra bekler; üçüncü yığın yok. Bitince down -v + YIGIN-KAPA.

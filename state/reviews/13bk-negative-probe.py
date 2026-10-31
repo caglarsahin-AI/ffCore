@@ -4,7 +4,9 @@ for one run on the scenario stack (RUN_E2E_SCENARIOS=1), then removed. The sweep
 
 import httpx
 
-from tests.e2e.negative.test_13b_negative import BACKEND_URL, SWEEP, _service
+from scenarios.conftest import BACKEND_URL
+
+from .test_13b_negative import SWEEP, _service
 
 
 def _post(**params):
