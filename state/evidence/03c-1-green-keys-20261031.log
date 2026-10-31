@@ -1,0 +1,3 @@
+All checks passed!
+FAILED tests/unit/test_03b_auth.py::test_03b_1_obo_ignored_for_non_impersonating_credential
+1 failed, 784 passed in 150.98s (0:02:30)

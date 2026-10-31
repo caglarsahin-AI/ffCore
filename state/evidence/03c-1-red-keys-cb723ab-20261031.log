@@ -1,0 +1,588 @@
+............FF.F..F.FF......                                             [100%]
+=================================== FAILURES ===================================
+_____________________ test_03c_7a_other_project_token_403 ______________________
+
+app = <fastapi.applications.FastAPI object at 0x7fbb57e7c8f0>
+impersonator = (UUID('5f678e41-2615-462e-a5ad-348726a39b4d'), {'id': 'f2db25e8-65d9-40e1-bd08-63911bd197a4', 'project_id': '5f678e41-2615-462e-a5ad-348726a39b4d', 'name': 'ci', 'key_prefix': 'ffk_da0739fd', ...})
+acl_probe = None
+make_project = <function make_project.<locals>.make at 0x7fbb251de020>
+make_user = <function make_user.<locals>.make at 0x7fbb251df380>
+app_settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...0, langsmith_tracing=False, langchain_tracing_v2=False, api_key_auth_failures_per_min=20, api_key_last_used_flush_s=60)
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_b74937b79ae0) at 0x7fbb251861e0>
+
+    def test_03c_7a_other_project_token_403(
+        app, impersonator, acl_probe, make_project, make_user, app_settings, pg
+    ):
+        """K-03c-0006 (a): project A's key with project B's token → 403, nothing runs as B's user."""
+        project_a, key = impersonator
+        project_b = make_project()
+        user_id, _ = make_user(memberships={project_b: ("admin", "edit")})
+        token = _token(app_settings, user_id, project_b)
+>       response = _as(app, key["key"], token, ACL_PROBE.format(project_id=project_b))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_03c_keys.py:288: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/test_03c_keys.py:266: in _as
+    return client.get(path, headers=headers)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:1112: in get
+    return self.request(
+/opt/venv/lib/python3.12/site-packages/starlette/testclient.py:518: in request
+    return super().request(
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:796: in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:993: in send
+    raise exc
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:987: in send
+    response.read()
+/opt/venv/lib/python3.12/site-packages/httpx2/_models.py:877: in read
+    self._content = b"".join(self.iter_bytes())
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_models.py:893: in iter_bytes
+    for raw_bytes in self.iter_raw():
+                     ^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_models.py:948: in iter_raw
+    for raw_stream_bytes in self.stream:
+                            ^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:143: in __iter__
+    yield from self._stream
+/opt/venv/lib/python3.12/site-packages/starlette/testclient.py:384: in iter_body
+    exit_stack.close()
+/usr/local/lib/python3.12/contextlib.py:618: in close
+    self.__exit__(None, None, None)
+/usr/local/lib/python3.12/contextlib.py:610: in __exit__
+    raise exc_details[1]
+/usr/local/lib/python3.12/contextlib.py:595: in __exit__
+    if cb(*exc_details):
+       ^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/starlette/testclient.py:399: in close_app
+    raise exception
+/opt/venv/lib/python3.12/site-packages/anyio/from_thread.py:265: in _call_func
+    retval = await retval_or_awaitable
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/starlette/testclient.py:366: in run_app
+    await self.app(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/applications.py:1194: in __call__
+    await super().__call__(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/applications.py:96: in __call__
+    await self.middleware_stack(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/middleware/errors.py:186: in __call__
+    raise exc
+/opt/venv/lib/python3.12/site-packages/starlette/middleware/errors.py:164: in __call__
+    await self.app(scope, receive, _send)
+/opt/venv/lib/python3.12/site-packages/fastapi/telemetry/_asgi.py:151: in __call__
+    await self.app(scope, receive, send)
+ffcore/core/logging.py:261: in __call__
+    await self.app(scope, receive, send_status)
+ffcore/api/upload_limit.py:44: in __call__
+    await self.app(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py:63: in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    raise exc
+/opt/venv/lib/python3.12/site-packages/starlette/_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+/opt/venv/lib/python3.12/site-packages/fastapi/middleware/asyncexitstack.py:18: in __call__
+    await self.app(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/routing.py:683: in __call__
+    await self.middleware_stack(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:2811: in app
+    await route.handle(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:1330: in handle
+    await super().handle(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/routing.py:289: in handle
+    await self.app(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:166: in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    raise exc
+/opt/venv/lib/python3.12/site-packages/starlette/_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:152: in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:745: in app
+    raw_response = await run_endpoint_function(
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:372: in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+project_id = '879551f4-dc0b-44d6-a84c-50eeafdfb577'
+request = <starlette.requests.Request object at 0x7fbb2505b650>
+actor = Actor(actor_type='user', actor_id='9c380273-bd5f-4a56-ade7-8bb7854cf771', project_id='879551f4-dc0b-44d6-a84c-50eeafdfb577', via_service=True, scopes=frozenset(), acl_role=None)
+
+    async def acl(
+        project_id: str,
+        request: Request,
+        actor: Annotated[Actor, Depends(require_role("analyst"))],
+    ):
+        return {
+            "actor_type": actor.actor_type,
+            "actor_id": actor.actor_id,
+>           "via_key_id": actor.via_key_id,
+                          ^^^^^^^^^^^^^^^^
+            "acl_role": acl_role_of(actor, request.state.grant),
+        }
+E       AttributeError: 'Actor' object has no attribute 'via_key_id'
+
+tests/integration/test_03c_keys.py:241: AttributeError
+---------------------------- Captured stderr setup -----------------------------
+2026-10-31 12:39:58,430 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 12:39:58,590 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-31 12:39:58,606 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=173
+2026-10-31 12:39:58,662 INFO ffcore.access access method=POST path=/api/v1/projects/5f678e41-2615-462e-a5ad-348726a39b4d/api-keys status=201 ms=51
+------------------------------ Captured log setup ------------------------------
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=173
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/5f678e41-2615-462e-a5ad-348726a39b4d/api-keys status=201 ms=51
+----------------------------- Captured stderr call -----------------------------
+2026-10-31 12:39:58,731 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 12:39:58,814 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-31 12:39:58,841 INFO ffcore.access access method=GET path=/__test03c/projects/879551f4-dc0b-44d6-a84c-50eeafdfb577/acl status=500 ms=106
+------------------------------ Captured log call -------------------------------
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=GET path=/__test03c/projects/879551f4-dc0b-44d6-a84c-50eeafdfb577/acl status=500 ms=106
+___________________ test_03c_7b_impersonate_uses_member_role ___________________
+
+app = <fastapi.applications.FastAPI object at 0x7fbb57e7c8f0>
+impersonator = (UUID('6f90a2ae-5239-4d64-af9d-745548486289'), {'id': '2b2ff576-0735-409c-b2b4-3f8aa0241481', 'project_id': '6f90a2ae-5239-4d64-af9d-745548486289', 'name': 'ci', 'key_prefix': 'ffk_dbe93fbe', ...})
+acl_probe = None
+make_user = <function make_user.<locals>.make at 0x7fbb250494e0>
+app_settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...0, langsmith_tracing=False, langchain_tracing_v2=False, api_key_auth_failures_per_min=20, api_key_last_used_flush_s=60)
+
+    def test_03c_7b_impersonate_uses_member_role(app, impersonator, acl_probe, make_user, app_settings):
+        """(b) Same project, the user is a member: the user acts, ACL is the user's role."""
+        project, key = impersonator
+        user_id, _ = make_user(memberships={project: ("analyst", "edit")})
+        token = _token(app_settings, user_id, project)
+>       body = _as(app, key["key"], token, ACL_PROBE.format(project_id=project)).json()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_03c_keys.py:307: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/test_03c_keys.py:266: in _as
+    return client.get(path, headers=headers)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:1112: in get
+    return self.request(
+/opt/venv/lib/python3.12/site-packages/starlette/testclient.py:518: in request
+    return super().request(
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:796: in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:993: in send
+    raise exc
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:987: in send
+    response.read()
+/opt/venv/lib/python3.12/site-packages/httpx2/_models.py:877: in read
+    self._content = b"".join(self.iter_bytes())
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_models.py:893: in iter_bytes
+    for raw_bytes in self.iter_raw():
+                     ^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_models.py:948: in iter_raw
+    for raw_stream_bytes in self.stream:
+                            ^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:143: in __iter__
+    yield from self._stream
+/opt/venv/lib/python3.12/site-packages/starlette/testclient.py:384: in iter_body
+    exit_stack.close()
+/usr/local/lib/python3.12/contextlib.py:618: in close
+    self.__exit__(None, None, None)
+/usr/local/lib/python3.12/contextlib.py:610: in __exit__
+    raise exc_details[1]
+/usr/local/lib/python3.12/contextlib.py:595: in __exit__
+    if cb(*exc_details):
+       ^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/starlette/testclient.py:399: in close_app
+    raise exception
+/opt/venv/lib/python3.12/site-packages/anyio/from_thread.py:265: in _call_func
+    retval = await retval_or_awaitable
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/starlette/testclient.py:366: in run_app
+    await self.app(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/applications.py:1194: in __call__
+    await super().__call__(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/applications.py:96: in __call__
+    await self.middleware_stack(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/middleware/errors.py:186: in __call__
+    raise exc
+/opt/venv/lib/python3.12/site-packages/starlette/middleware/errors.py:164: in __call__
+    await self.app(scope, receive, _send)
+/opt/venv/lib/python3.12/site-packages/fastapi/telemetry/_asgi.py:151: in __call__
+    await self.app(scope, receive, send)
+ffcore/core/logging.py:261: in __call__
+    await self.app(scope, receive, send_status)
+ffcore/api/upload_limit.py:44: in __call__
+    await self.app(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py:63: in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    raise exc
+/opt/venv/lib/python3.12/site-packages/starlette/_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+/opt/venv/lib/python3.12/site-packages/fastapi/middleware/asyncexitstack.py:18: in __call__
+    await self.app(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/routing.py:683: in __call__
+    await self.middleware_stack(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:2811: in app
+    await route.handle(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:1330: in handle
+    await super().handle(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/routing.py:289: in handle
+    await self.app(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:166: in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    raise exc
+/opt/venv/lib/python3.12/site-packages/starlette/_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:152: in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:745: in app
+    raw_response = await run_endpoint_function(
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:372: in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+project_id = '6f90a2ae-5239-4d64-af9d-745548486289'
+request = <starlette.requests.Request object at 0x7fbac87e5160>
+actor = Actor(actor_type='user', actor_id='d3733931-c686-4c6c-953a-3c4ef8507f18', project_id='6f90a2ae-5239-4d64-af9d-745548486289', via_service=True, scopes=frozenset(), acl_role=None)
+
+    async def acl(
+        project_id: str,
+        request: Request,
+        actor: Annotated[Actor, Depends(require_role("analyst"))],
+    ):
+        return {
+            "actor_type": actor.actor_type,
+            "actor_id": actor.actor_id,
+>           "via_key_id": actor.via_key_id,
+                          ^^^^^^^^^^^^^^^^
+            "acl_role": acl_role_of(actor, request.state.grant),
+        }
+E       AttributeError: 'Actor' object has no attribute 'via_key_id'
+
+tests/integration/test_03c_keys.py:241: AttributeError
+---------------------------- Captured stderr setup -----------------------------
+2026-10-31 12:39:59,265 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 12:39:59,386 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-31 12:39:59,402 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=132
+2026-10-31 12:39:59,468 INFO ffcore.access access method=POST path=/api/v1/projects/6f90a2ae-5239-4d64-af9d-745548486289/api-keys status=201 ms=63
+------------------------------ Captured log setup ------------------------------
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=132
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/6f90a2ae-5239-4d64-af9d-745548486289/api-keys status=201 ms=63
+----------------------------- Captured stderr call -----------------------------
+2026-10-31 12:39:59,563 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 12:39:59,655 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-31 12:39:59,675 INFO ffcore.access access method=GET path=/__test03c/projects/6f90a2ae-5239-4d64-af9d-745548486289/acl status=500 ms=107
+------------------------------ Captured log call -------------------------------
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=GET path=/__test03c/projects/6f90a2ae-5239-4d64-af9d-745548486289/acl status=500 ms=107
+____________________ test_03c_7d_no_scope_key_with_obo_403 _____________________
+
+app = <fastapi.applications.FastAPI object at 0x7fbb57e7c8f0>
+owner = (UUID('f52d6691-5b02-46a0-9c45-f6159066f984'), <starlette.testclient.TestClient object at 0x7fbb2507b830>)
+probe = <function acl_role_of at 0x7fbb5936ccc0>
+make_user = <function make_user.<locals>.make at 0x7fbb25546ca0>
+app_settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...0, langsmith_tracing=False, langchain_tracing_v2=False, api_key_auth_failures_per_min=20, api_key_last_used_flush_s=60)
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_b74937b79ae0) at 0x7fbb250580e0>
+
+    def test_03c_7d_no_scope_key_with_obo_403(app, owner, probe, make_user, app_settings, pg):
+        """(d) A key without impersonate that sends X-On-Behalf-Of fails loud (K-03c-0006 item 2)."""
+        project, client = owner
+        created = _create(client, project)
+        user_id, _ = make_user(memberships={project: ("analyst", "edit")})
+        response = _as(app, created["key"], _token(app_settings, user_id, project), PROBE)
+>       assert response.status_code == 403
+E       assert 200 == 403
+E        +  where 200 = <Response [200 OK]>.status_code
+
+tests/integration/test_03c_keys.py:329: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+2026-10-31 12:40:01,154 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 12:40:01,289 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-31 12:40:01,304 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=146
+------------------------------ Captured log setup ------------------------------
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=146
+----------------------------- Captured stderr call -----------------------------
+2026-10-31 12:40:01,360 INFO ffcore.access access method=POST path=/api/v1/projects/f52d6691-5b02-46a0-9c45-f6159066f984/api-keys status=201 ms=51
+2026-10-31 12:40:01,436 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 12:40:01,499 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-31 12:40:01,522 INFO ffcore.access access method=GET path=/__test03c/whoami status=200 ms=83
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/f52d6691-5b02-46a0-9c45-f6159066f984/api-keys status=201 ms=51
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=GET path=/__test03c/whoami status=200 ms=83
+_______________ test_03c_7g_service_token_any_project_unchanged ________________
+
+app = <fastapi.applications.FastAPI object at 0x7fbb57e7c8f0>, acl_probe = None
+make_project = <function make_project.<locals>.make at 0x7fbb253b8fe0>
+make_user = <function make_user.<locals>.make at 0x7fbb253b82c0>
+app_settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...0, langsmith_tracing=False, langchain_tracing_v2=False, api_key_auth_failures_per_min=20, api_key_last_used_flush_s=60)
+
+    def test_03c_7g_service_token_any_project_unchanged(
+        app, acl_probe, make_project, make_user, app_settings
+    ):
+        """(g) Regression: the service account may act for a user of any project."""
+        project_b = make_project()
+        user_id, _ = make_user(memberships={project_b: ("analyst", "edit")})
+        client = _client(app)
+        try:
+>           response = client.get(
+                ACL_PROBE.format(project_id=project_b),
+                headers={
+                    "Authorization": f"Bearer {app_settings.service_token.get_secret_value()}",
+                    "X-On-Behalf-Of": _token(app_settings, user_id, project_b),
+                },
+            )
+
+tests/integration/test_03c_keys.py:375: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:1112: in get
+    return self.request(
+/opt/venv/lib/python3.12/site-packages/starlette/testclient.py:518: in request
+    return super().request(
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:796: in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:993: in send
+    raise exc
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:987: in send
+    response.read()
+/opt/venv/lib/python3.12/site-packages/httpx2/_models.py:877: in read
+    self._content = b"".join(self.iter_bytes())
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_models.py:893: in iter_bytes
+    for raw_bytes in self.iter_raw():
+                     ^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_models.py:948: in iter_raw
+    for raw_stream_bytes in self.stream:
+                            ^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:143: in __iter__
+    yield from self._stream
+/opt/venv/lib/python3.12/site-packages/starlette/testclient.py:384: in iter_body
+    exit_stack.close()
+/usr/local/lib/python3.12/contextlib.py:618: in close
+    self.__exit__(None, None, None)
+/usr/local/lib/python3.12/contextlib.py:610: in __exit__
+    raise exc_details[1]
+/usr/local/lib/python3.12/contextlib.py:595: in __exit__
+    if cb(*exc_details):
+       ^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/starlette/testclient.py:399: in close_app
+    raise exception
+/opt/venv/lib/python3.12/site-packages/anyio/from_thread.py:265: in _call_func
+    retval = await retval_or_awaitable
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/starlette/testclient.py:366: in run_app
+    await self.app(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/applications.py:1194: in __call__
+    await super().__call__(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/applications.py:96: in __call__
+    await self.middleware_stack(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/middleware/errors.py:186: in __call__
+    raise exc
+/opt/venv/lib/python3.12/site-packages/starlette/middleware/errors.py:164: in __call__
+    await self.app(scope, receive, _send)
+/opt/venv/lib/python3.12/site-packages/fastapi/telemetry/_asgi.py:151: in __call__
+    await self.app(scope, receive, send)
+ffcore/core/logging.py:261: in __call__
+    await self.app(scope, receive, send_status)
+ffcore/api/upload_limit.py:44: in __call__
+    await self.app(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py:63: in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    raise exc
+/opt/venv/lib/python3.12/site-packages/starlette/_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+/opt/venv/lib/python3.12/site-packages/fastapi/middleware/asyncexitstack.py:18: in __call__
+    await self.app(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/routing.py:683: in __call__
+    await self.middleware_stack(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:2811: in app
+    await route.handle(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:1330: in handle
+    await super().handle(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/routing.py:289: in handle
+    await self.app(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:166: in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    raise exc
+/opt/venv/lib/python3.12/site-packages/starlette/_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:152: in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:745: in app
+    raw_response = await run_endpoint_function(
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:372: in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+project_id = '1f2706c2-49e7-4425-a5be-04eeb3f03502'
+request = <starlette.requests.Request object at 0x7fbb25621880>
+actor = Actor(actor_type='user', actor_id='84bcf263-c92f-4f36-a173-1b0b03d311b7', project_id='1f2706c2-49e7-4425-a5be-04eeb3f03502', via_service=True, scopes=frozenset(), acl_role=None)
+
+    async def acl(
+        project_id: str,
+        request: Request,
+        actor: Annotated[Actor, Depends(require_role("analyst"))],
+    ):
+        return {
+            "actor_type": actor.actor_type,
+            "actor_id": actor.actor_id,
+>           "via_key_id": actor.via_key_id,
+                          ^^^^^^^^^^^^^^^^
+            "acl_role": acl_role_of(actor, request.state.grant),
+        }
+E       AttributeError: 'Actor' object has no attribute 'via_key_id'
+
+tests/integration/test_03c_keys.py:241: AttributeError
+----------------------------- Captured stderr call -----------------------------
+2026-10-31 12:40:03,270 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 12:40:03,334 INFO ffcore.access access method=GET path=/__test03c/projects/1f2706c2-49e7-4425-a5be-04eeb3f03502/acl status=500 ms=61
+2026-10-31 12:40:03,340 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+------------------------------ Captured log call -------------------------------
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=GET path=/__test03c/projects/1f2706c2-49e7-4425-a5be-04eeb3f03502/acl status=500 ms=61
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+____________________ test_03c_7i_impersonate_requires_cidrs ____________________
+
+owner = (UUID('005cb4c5-e281-4ca3-97f5-f5baccf9bc8a'), <starlette.testclient.TestClient object at 0x7fbad4f775f0>)
+
+    def test_03c_7i_impersonate_requires_cidrs(owner):
+        """K-03c-0006 item 4: the strongest scope is never usable from anywhere."""
+        project, client = owner
+        response = client.post(
+            f"/api/v1/projects/{project}/api-keys",
+            json={"name": "x", "scopes": ["impersonate"]},
+        )
+>       assert response.status_code == 422
+E       assert 201 == 422
+E        +  where 201 = <Response [201 Created]>.status_code
+
+tests/integration/test_03c_keys.py:406: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+2026-10-31 12:40:04,216 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 12:40:04,332 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-31 12:40:04,348 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=129
+------------------------------ Captured log setup ------------------------------
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=129
+----------------------------- Captured stderr call -----------------------------
+2026-10-31 12:40:04,398 INFO ffcore.access access method=POST path=/api/v1/projects/005cb4c5-e281-4ca3-97f5-f5baccf9bc8a/api-keys status=201 ms=46
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/005cb4c5-e281-4ca3-97f5-f5baccf9bc8a/api-keys status=201 ms=46
+______________ test_03c_7_audit_impersonated_mutation_has_via_key ______________
+
+app = <fastapi.applications.FastAPI object at 0x7fbb57e7c8f0>
+impersonator = (UUID('537923d2-fc6e-49ee-84b3-18baf8d50353'), {'id': 'b3586188-561b-4c75-99b6-32e9b1ba4fa9', 'project_id': '537923d2-fc6e-49ee-84b3-18baf8d50353', 'name': 'ci', 'key_prefix': 'ffk_37544fb7', ...})
+make_user = <function make_user.<locals>.make at 0x7fbad4ec0ea0>
+app_settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...0, langsmith_tracing=False, langchain_tracing_v2=False, api_key_auth_failures_per_min=20, api_key_last_used_flush_s=60)
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_b74937b79ae0) at 0x7fbb25603380>
+
+    def test_03c_7_audit_impersonated_mutation_has_via_key(
+        app, impersonator, make_user, app_settings, pg
+    ):
+        """K-03c-0006 item 3: a mutation done through an impersonating key is the user's, with the
+        key's id beside it."""
+        project, key = impersonator
+        user_id, _ = make_user(memberships={project: ("admin", "edit")})
+        token = _token(app_settings, user_id, project)
+        client = _client(app)
+        try:
+            response = client.post(
+                f"/api/v1/projects/{project}/api-keys",
+                json={"name": "child", "scopes": ["chat_direct"]},
+                headers={"Authorization": f"Bearer {key['key']}", "X-On-Behalf-Of": token},
+            )
+        finally:
+            client.__exit__(None, None, None)
+        assert response.status_code == 201, response.text
+>       row = pg.execute(
+            "SELECT actor_type, actor_id, via_key_id FROM audit_events"
+            " WHERE action = 'create_api_key' AND resource_id = %s",
+            (response.json()["id"],),
+        ).fetchone()
+
+tests/integration/test_03c_keys.py:433: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_b74937b79ae0) at 0x7fbb25603380>
+query = "SELECT actor_type, actor_id, via_key_id FROM audit_events WHERE action = 'create_api_key' AND resource_id = %s"
+params = ('f37686c6-049a-4409-954e-4bff396518b4',), prepare = None
+binary = False
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool = False,
+    ) -> Cursor[Row]:
+        """Execute a query and return a cursor to read its results."""
+        try:
+            cur = self.cursor()
+            if binary:
+                cur.format = BINARY
+    
+            if isinstance(query, Template):
+                if params is not None:
+                    raise TypeError(
+                        "'execute()' with string template query doesn't support parameters"
+                    )
+                return cur.execute(query, prepare=prepare)
+            else:
+                return cur.execute(query, params, prepare=prepare)
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           psycopg.errors.UndefinedColumn: column "via_key_id" does not exist
+E           LINE 1: SELECT actor_type, actor_id, via_key_id FROM audit_events WH...
+E                                                ^
+
+/opt/venv/lib/python3.12/site-packages/psycopg/connection.py:304: UndefinedColumn
+---------------------------- Captured stderr setup -----------------------------
+2026-10-31 12:40:04,593 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 12:40:04,715 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-31 12:40:04,727 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=131
+2026-10-31 12:40:04,788 INFO ffcore.access access method=POST path=/api/v1/projects/537923d2-fc6e-49ee-84b3-18baf8d50353/api-keys status=201 ms=55
+------------------------------ Captured log setup ------------------------------
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=131
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/537923d2-fc6e-49ee-84b3-18baf8d50353/api-keys status=201 ms=55
+----------------------------- Captured stderr call -----------------------------
+2026-10-31 12:40:04,866 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 12:40:04,933 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-10-31 12:40:04,974 INFO ffcore.access access method=POST path=/api/v1/projects/537923d2-fc6e-49ee-84b3-18baf8d50353/api-keys status=201 ms=105
+------------------------------ Captured log call -------------------------------
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/537923d2-fc6e-49ee-84b3-18baf8d50353/api-keys status=201 ms=105
+=========================== short test summary info ============================
+FAILED tests/integration/test_03c_keys.py::test_03c_7a_other_project_token_403
+FAILED tests/integration/test_03c_keys.py::test_03c_7b_impersonate_uses_member_role
+FAILED tests/integration/test_03c_keys.py::test_03c_7d_no_scope_key_with_obo_403
+FAILED tests/integration/test_03c_keys.py::test_03c_7g_service_token_any_project_unchanged
+FAILED tests/integration/test_03c_keys.py::test_03c_7i_impersonate_requires_cidrs
+FAILED tests/integration/test_03c_keys.py::test_03c_7_audit_impersonated_mutation_has_via_key
+6 failed, 22 passed in 34.41s
