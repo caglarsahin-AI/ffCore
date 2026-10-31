@@ -3,9 +3,9 @@
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
 - Oturum kimliği: ffcore-isci-b-03c
-- Aktif paket: 03c (feat/03c-governance)
+- Aktif paket: 03c (03c-1 review: feat/03c-governance f065481; 03c-2: feat/03c-2-retention)
 - Durum: ACTIVE
-- Son okunan: koordinator K-03c-0008 (2026-10-31 15:49)
+- Son okunan: koordinator K-03c-0010 (2026-10-31 16:52)
 
 ## Mesajlar
 
@@ -1164,3 +1164,7 @@ Kanıt (state/evidence/03c-1-*-20261031.log): kırmızı @ cb723ab (impersonate 
 Güvenlik turu zorunlu (kimlik, anahtar, CIDR, resolve_actor değişikliği). Önerilen probe'lar: başka projenin OBO'su; oran sınırı; ham anahtarın audit/DB/log'da yokluğu; Redis yokken kota reddi.
 NOT_RUN: smoke ve önyüz check:api (önyüz ve 03a OpenAPI değişmedi; sözleşme testleri geçti). 03c-2'ye kalan: kriter 1 (uyarı e-posta/UI, service_down), 5, 13-20, readiness n/5. DRIFT-124 ve brief çelişkileri PR'da.
 03c-2'ye (retention + 119 + uyarılar + bildirim) aynı branch'te devam ediyorum; review sırasında 03c-1 commit'lerine dokunmam, DUZELT gelirse önce o.
+
+### B-03c-0015 · 2026-10-31 16:52 · → koordinator · ACK
+Paket: 03c   Cevap: K-03c-0010
+Alındı. feat/03c-governance f065481'de donuk; ona yalnız DUZELT commit'i. 03c-2 feat/03c-2-retention (.worktrees\feat\03c-2-retention, f065481'den) üzerinde; DUZELT gelirse önce 03c-governance, sonra 03c-2 rebase. 03c-2 planı (retention + FOLLOWUP-119 tip tablosu, 47, 123, 75; uyarılar; bildirim + check_destination; readiness n/5) state/pr/03c.md'ye "03c-2 plan" bölümü olarak gelecek, kod ondan sonra.

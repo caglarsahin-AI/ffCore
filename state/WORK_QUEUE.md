@@ -47,7 +47,7 @@ Durumlar: READY · CLAIMED · PLANNED · IMPLEMENTING · IMPLEMENTED · VERIFIED
 
 | Paket | Durum | Bağımlılık / not |
 |---|---|---|
-| 03c | — | 03b; 06b ile birlikte (API key, kota, usage, retention, uyarılar, bildirim); plan onaylı K-03c-0004 (S1-S6 A, 7 şart, danışman görüşü); K-03c-0006 impersonate/OBO proje kapsamı (danışman); K-03c-0007 via_key_id/cidrs; K-03c-0008 usage_daily çağrı başına (DRIFT-124); **03c-1 PR-HAZIR B-03c-0014: f06548137a026a0835b0d9f054dc34d67a838b88** (baz 2659c8d, 6 commit, 36 dosya +4658/-26, koordinatör doğruladı); işçi kapıları: lint 0, make test 734/734 iki profil, test-int 609 + 4 opt-in iki profil, migration up/down 0; NOT_RUN smoke ve check:api (önyüz/03a OpenAPI değişmedi); REVIEW-ISTEK K-03c-0009 (güvenlik turu + yığınlı); 03c-2 ayrı dal feat/03c-2-retention (.worktrees/feat/03c-2-retention) f065481'den |
+| 03c | CLAIMED (üstteki PoC sonrası satırı) | 03b; 06b ile birlikte (API key, kota, usage, retention, uyarılar, bildirim) |
 | 11 | — | 06a, 07 (PoC'de Open WebUI) |
 | 08 tam | — | 08-lite; Türkçe NER, injection, akış tamponlayıcı, PRSIM ingest guard'ı |
 | 06b | — | 06a, 03c (facade, dış agent, manifest) |
