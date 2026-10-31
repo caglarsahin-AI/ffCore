@@ -391,7 +391,10 @@ def test_03c_7h_no_superadmin_under_obo(app, impersonator, acl_probe, make_user,
     project, key = impersonator
     user_id, _ = make_user(superadmin="edit")
     response = _as(
-        app, key["key"], _token(app_settings, user_id, project), ACL_PROBE.format(project_id=project)
+        app,
+        key["key"],
+        _token(app_settings, user_id, project),
+        ACL_PROBE.format(project_id=project),
     )
     assert response.status_code == 404
 

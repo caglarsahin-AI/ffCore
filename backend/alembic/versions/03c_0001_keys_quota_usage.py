@@ -2,7 +2,7 @@
 
 Revision ID: 03c_0001
 Revises: 0001
-Depends on: 03a_0001 (projects)
+Depends on: 03a_0001 (projects), 03b_0001 (audit_events)
 Create Date: 2026-10-31
 """
 
@@ -13,7 +13,7 @@ from sqlalchemy.dialects.postgresql import ARRAY, CIDR, UUID
 revision = "03c_0001"
 down_revision = "0001"
 branch_labels = ("03c",)
-depends_on = ("03a_0001",)
+depends_on = ("03a_0001", "03b_0001")
 
 # Frozen copies of the value lists at this revision.
 API_KEY_SCOPES = ("chat_direct", "agents", "impersonate", "kb_search", "tools_invoke")
@@ -64,7 +64,11 @@ def upgrade() -> None:
     )
     op.create_index("uq_api_keys_key_prefix", "api_keys", ["key_prefix"], unique=True)
     op.create_index("ix_api_keys_project_created_by", "api_keys", ["project_id", "created_by"])
+    # K-03c-0006: the key that impersonated the acting user; nullable, no FK (append-only table,
+    # partitioned; a key row may be soft-deleted while its audit trail stays).
+    op.add_column("audit_events", sa.Column("via_key_id", UUID(as_uuid=True)))
 
 
 def downgrade() -> None:
+    op.drop_column("audit_events", "via_key_id")
     op.drop_table("api_keys")

@@ -8,7 +8,7 @@
 import hmac
 import uuid
 from collections.abc import Awaitable, Callable, Sequence
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from datetime import UTC, datetime, timedelta
 from typing import Annotated, Literal
 
@@ -37,6 +37,8 @@ class Actor:
     # (03c) The role an API key's own searches run under (B7). None for every other actor: a
     # user (also one reached through impersonate) is checked by project membership.
     acl_role: str | None = None
+    # (03c) The API key that impersonated this user; audit trail only, never an authority.
+    via_key_id: str | None = None
 
     @property
     def may_impersonate(self) -> bool:
@@ -244,10 +246,19 @@ def verify_session_token(token: str, settings: Settings) -> SessionClaims | None
     return SessionClaims(user_id=claims["sub"], token_version=claims["tv"])
 
 
-async def _audit_impersonation_denied(request: Request, actor: Actor | None) -> None:
+async def _audit_impersonation_denied(
+    request: Request, actor: Actor | None, detail: dict | None = None
+) -> None:
     from ffcore.core.audit import record_impersonation_denied
 
-    await record_impersonation_denied(request, actor)
+    await record_impersonation_denied(request, actor, detail)
+
+
+def _impersonation_denied() -> ApiError:
+    # No project name or id in the body (K-03c-0006); the reason is in the audit row.
+    return ApiError(
+        403, "permission_error", "impersonation_denied", "This credential may not act for a user."
+    )
 
 
 async def resolve_actor(
@@ -261,15 +272,30 @@ async def resolve_actor(
 
     obo_token = request.headers.get(OBO_HEADER)
     if obo_token:
+        key = actor if actor is not None and actor.actor_type == "api_key" else None
+        if key is not None and not key.may_impersonate:
+            # (03c, K-03c-0006) An API key fails loud; the service and session paths below
+            # keep "ignored + audited".
+            await _audit_impersonation_denied(request, key, {"reason": "scope_missing"})
+            raise _impersonation_denied()
         if actor is not None and actor.may_impersonate:
             claims = verify_on_behalf_of(
                 obo_token, audience=settings.obo_audience, settings=settings
             )
+            if key is not None and claims.project_id != key.project_id:
+                # A key acts only inside its own project; the service account is not bound.
+                await _audit_impersonation_denied(
+                    request,
+                    key,
+                    {"reason": "obo_project_scope", "token_project_id": claims.project_id},
+                )
+                raise _impersonation_denied()
             actor = Actor(
                 actor_type="user",
                 actor_id=claims.sub,
                 project_id=claims.project_id,
                 via_service=True,
+                via_key_id=key.actor_id if key is not None else None,
             )
         else:
             # Ignored, not silently: every rejected impersonation is an audit event (R2.5).
@@ -337,13 +363,8 @@ async def authorize(
         }.get(code, "Your role does not allow this.")
         raise ApiError(403, "permission_error", code, message)
     request.state.grant = grant
-    return Actor(
-        actor_type=actor.actor_type,
-        actor_id=actor.actor_id,
-        project_id=str(project_id) if project_id else actor.project_id,
-        via_service=actor.via_service,
-        scopes=actor.scopes,
-    )
+    # replace(): every other field (scopes, 03c acl_role and via_key_id) stays as resolved.
+    return replace(actor, project_id=str(project_id) if project_id else actor.project_id)
 
 
 def require_role(min_role: str, *, write: bool = False) -> RoleRequirement:
@@ -446,5 +467,6 @@ async def _audit_denied(
             after=after,
             request_id=request_id,
             ip=ip,
+            via_key_id=actor.via_key_id,
         )
     )

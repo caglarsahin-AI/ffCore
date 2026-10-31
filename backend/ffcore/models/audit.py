@@ -43,3 +43,5 @@ class AuditEvent(Base):
     after: Mapped[dict | None] = mapped_column(JSONB)
     request_id: Mapped[str | None] = mapped_column(Text)
     ip: Mapped[str | None] = mapped_column(INET)
+    # (03c, migration 03c_0001) The API key that impersonated the acting user (K-03c-0006).
+    via_key_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True))

@@ -11,7 +11,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, Request
 from sqlalchemy import func, select
 
-from ffcore.api.common import ERROR_RESPONSES, SessionDep, conflict, not_found
+from ffcore.api.common import ERROR_RESPONSES, SessionDep, conflict, invalid, not_found
 from ffcore.api.keys_schemas import (
     ApiKeyCreate,
     ApiKeyCreated,
@@ -67,6 +67,14 @@ def _check_grants(request: Request, scopes, acl_role) -> None:
         )
 
 
+def _check_cidrs(scopes, cidrs) -> None:
+    """The strongest scope is never usable from anywhere (K-03c-0006 item 4)."""
+    if "impersonate" in {str(s) for s in scopes} and not cidrs:
+        raise invalid(
+            "cidrs_required_for_impersonate", "A key with impersonate needs allowed_cidrs."
+        )
+
+
 async def _key(session, project_id: UUID, key_id: UUID, actor: Actor, request: Request) -> ApiKey:
     """A key the caller may see: their own, or any for a project admin; else 404 (no leak)."""
     query = select(ApiKey).where(
@@ -86,6 +94,7 @@ async def create_api_key(
     project_id: UUID, body: ApiKeyCreate, request: Request, actor: Writer, session: SessionDep
 ):
     _check_grants(request, body.scopes, body.acl_role)
+    _check_cidrs(body.scopes, body.allowed_cidrs)
     raw, prefix, digest = keys.new_key()
     row = ApiKey(
         project_id=project_id,
@@ -146,6 +155,7 @@ async def update_api_key(
         raise conflict("api_key_revoked", "A revoked key cannot be changed.")
     changes = body.model_dump(exclude_unset=True)
     _check_grants(request, changes.get("scopes"), changes.get("acl_role"))
+    _check_cidrs(changes.get("scopes", row.scopes), changes.get("allowed_cidrs", row.allowed_cidrs))
     for field, value in changes.items():
         if field == "scopes":
             value = sorted({str(s) for s in value})

@@ -51,6 +51,8 @@ class AuditEntry:
     after: Any = None
     request_id: str | None = None
     ip: str | None = None
+    # (03c) The API key that impersonated the acting user (K-03c-0006).
+    via_key_id: str | None = None
 
 
 def mask(value: Any, redact_fields: Iterable[str] = ()) -> Any:
@@ -95,6 +97,7 @@ def _event(entry: AuditEntry) -> AuditEvent:
         after=entry.after,
         request_id=entry.request_id,
         ip=entry.ip,
+        via_key_id=uuid.UUID(entry.via_key_id) if entry.via_key_id else None,
     )
 
 
@@ -123,7 +126,9 @@ def request_context(request: Request) -> tuple[str, str | None]:
     return request_id, ip
 
 
-async def record_impersonation_denied(request: Request, actor) -> None:
+async def record_impersonation_denied(request: Request, actor, detail: dict | None = None) -> None:
+    """`detail` (03c): why an API key's impersonation was refused (scope_missing,
+    obo_project_scope with the token's project)."""
     request_id, ip = request_context(request)
     await write_event_detached(
         AuditEntry(
@@ -133,7 +138,7 @@ async def record_impersonation_denied(request: Request, actor) -> None:
             actor_type=actor.actor_type if actor else "system",
             actor_id=actor.actor_id if actor else "anonymous",
             project_id=actor.project_id if actor else None,
-            after={"path": request.url.path, "header": "X-On-Behalf-Of"},
+            after={"path": request.url.path, "header": "X-On-Behalf-Of"} | (detail or {}),
             request_id=request_id,
             ip=ip,
         )
@@ -193,6 +198,7 @@ def audited(
                     after=mask(after, redact) if audit_payload else None,
                     request_id=request_id,
                     ip=ip,
+                    via_key_id=getattr(actor, "via_key_id", None),
                 )
 
             before = None
