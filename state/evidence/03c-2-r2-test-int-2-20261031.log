@@ -1,0 +1,186 @@
+cd backend && QDRANT_URL=http://qdrant:6333 RUN_QDRANT_TESTS=1 pytest tests/integration
+============================= test session starts ==============================
+platform linux -- Python 3.12.10, pytest-9.2.0, pluggy-1.7.0
+rootdir: /work/backend
+configfile: pyproject.toml
+plugins: Faker-40.43.0, anyio-4.15.1, langsmith-0.14.8
+collected 675 items
+
+tests/integration/test_01_client.py .......                              [  1%]
+tests/integration/test_01_events.py ..F                                  [  1%]
+tests/integration/test_01_reconcile.py ...........                       [  3%]
+tests/integration/test_01_reconcile_shutdown.py ...                      [  3%]
+tests/integration/test_01_seed.py ...                                    [  4%]
+tests/integration/test_02_langfuse.py ....                               [  4%]
+tests/integration/test_02_pricing.py .                                   [  4%]
+tests/integration/test_02_r1_worker_logging.py .                         [  4%]
+tests/integration/test_03a_access.py ............                        [  6%]
+tests/integration/test_03a_auth.py ..............                        [  8%]
+tests/integration/test_03a_models.py ...........                         [ 10%]
+tests/integration/test_03a_nonmember_404.py ............................ [ 14%]
+....................................................................     [ 24%]
+tests/integration/test_03a_obo_scope.py ................                 [ 26%]
+tests/integration/test_03a_providers.py ................                 [ 29%]
+tests/integration/test_03a_read_side.py .......                          [ 30%]
+tests/integration/test_03a_schema.py .......                             [ 31%]
+tests/integration/test_03b_audit.py ............                         [ 33%]
+tests/integration/test_03b_egress_dns.py s                               [ 33%]
+tests/integration/test_03c_alerts.py ................                    [ 35%]
+tests/integration/test_03c_keys.py ..............................        [ 40%]
+tests/integration/test_03c_quota_engine.py ............                  [ 41%]
+tests/integration/test_03c_quotas_api.py .......                         [ 42%]
+tests/integration/test_03c_r1_audit_throttle.py .....                    [ 43%]
+tests/integration/test_03c_retention_content.py ...........              [ 45%]
+tests/integration/test_03c_retention_document_delete.py ..               [ 45%]
+tests/integration/test_03c_retention_job.py ...............              [ 47%]
+tests/integration/test_03c_run_quota.py .......                          [ 48%]
+tests/integration/test_04a_api.py .............                          [ 50%]
+tests/integration/test_04a_embed_api.py ....                             [ 51%]
+tests/integration/test_04a_ingest.py .s..........s                       [ 53%]
+tests/integration/test_04a_qdrant.py ....                                [ 53%]
+tests/integration/test_04a_readyz.py ....                                [ 54%]
+tests/integration/test_04a_review_r1_acl.py ........                     [ 55%]
+tests/integration/test_04a_review_r1_ingest.py ......                    [ 56%]
+tests/integration/test_04a_review_r1_upload.py ..                        [ 56%]
+tests/integration/test_04a_search.py ........                            [ 58%]
+tests/integration/test_04a_store.py ..........                           [ 59%]
+tests/integration/test_04a_worker.py ..                                  [ 59%]
+tests/integration/test_05a_live_services.py .....                        [ 60%]
+tests/integration/test_05a_obo_verify.py .......                         [ 61%]
+tests/integration/test_05a_search.py ........                            [ 62%]
+tests/integration/test_05a_sql.py ..............s.....                   [ 65%]
+tests/integration/test_05a_tools_api.py ................................ [ 70%]
+................                                                         [ 72%]
+tests/integration/test_06a_adapters.py ..                                [ 73%]
+tests/integration/test_06a_agents.py ........                            [ 74%]
+tests/integration/test_06a_feedback.py .....                             [ 75%]
+tests/integration/test_06a_graph.py ............................         [ 79%]
+tests/integration/test_06a_mcp_tools.py ............                     [ 81%]
+tests/integration/test_06a_read_side.py .                                [ 81%]
+tests/integration/test_06a_readyz.py ..                                  [ 81%]
+tests/integration/test_06a_run_access.py ..........                      [ 82%]
+tests/integration/test_06a_runs_api.py .........                         [ 84%]
+tests/integration/test_06a_scheduler.py .......                          [ 85%]
+tests/integration/test_06a_schema.py .........                           [ 86%]
+tests/integration/test_07_api_read.py ............                       [ 88%]
+tests/integration/test_07_decide.py .........                            [ 89%]
+tests/integration/test_07_flow.py ..........                             [ 91%]
+tests/integration/test_07_schema.py ...........                          [ 92%]
+tests/integration/test_07_service.py ........                            [ 94%]
+tests/integration/test_07f_followups.py ....                             [ 94%]
+tests/integration/test_07f_sql_context_roles.py ..                       [ 94%]
+tests/integration/test_08_api.py ................                        [ 97%]
+tests/integration/test_116_checkpoint_sources.py ..........              [ 98%]
+tests/integration/test_18td_tools_api.py ...                             [ 99%]
+tests/integration/test_af_2b_deleted_source_breadcrumb.py ..             [ 99%]
+tests/integration/test_af_3_updated_at_source.py ...                     [100%]
+
+=================================== FAILURES ===================================
+__________________ test_01_r1_deleted_project_leaves_litellm ___________________
+
+app = <fastapi.applications.FastAPI object at 0x7f03ab6550a0>
+console = <starlette.testclient.TestClient object at 0x7f03a414c380>
+database_url = 'postgresql+psycopg://ffcore:dummy-not-secret-postgres@postgres:5432/ffcore_test_b13086be4520'
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_b13086be4520) at 0x7f03a414c470>
+catalog = <tests.integration.litellm_support.catalog.<locals>.Catalog object at 0x7f0327d307d0>
+llm_settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+
+    def test_01_r1_deleted_project_leaves_litellm(
+        app, console, database_url, pg, catalog, llm_settings
+    ):
+        """r1 MINOR-1: project deleted through the API -> no target, next reconcile removes it."""
+        project_id = catalog.project()
+        catalog.model(project_id, catalog.provider([project_id]))
+        name = f"{project_key(pg, project_id)}.chat-default"
+        run_reconcile(database_url, llm_settings)
+        db.configure(database_url, pooled=False)  # run_reconcile resets the app's binding
+        assert name in litellm_models(llm_settings)
+    
+        deleted = console.delete(f"/api/v1/projects/{project_id}")
+        assert deleted.status_code == 204, deleted.text
+    
+        async def resolve():
+            async with db.session_scope() as session:
+                return await resolve_target(session, project_id, "chat-default")
+    
+        with pytest.raises(ApiError) as err:
+            asyncio.run(resolve())
+        assert err.value.status_code == 404 and err.value.code == "model_not_found"
+        assert err.value.reason == "project_deleted"
+        # FOLLOWUP-75 (03c): the delete publishes a catalog event, so the app's own reconcile may
+        # already have removed the model; the explicit run removes it otherwise. Never left.
+>       run_reconcile(database_url, llm_settings)
+
+tests/integration/test_01_events.py:118: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/litellm_support.py:162: in run_reconcile
+    return asyncio.run(go())
+           ^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/runners.py:195: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/base_events.py:691: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/integration/litellm_support.py:158: in go
+    return await reconcile(session, settings)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ffcore/services/litellm_reconcile.py:368: in reconcile
+    report = await apply(admin, desired, dry_run)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ffcore/services/litellm_reconcile.py:356: in apply
+    await admin.model_delete(model_id)
+ffcore/services/litellm_reconcile.py:293: in model_delete
+    await self._call("POST", "/model/delete", {"id": model_id})
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ffcore.services.litellm_reconcile.LiteLLMAdmin object at 0x7f0327d9e660>
+method = 'POST', path = '/model/delete'
+body = {'id': '9a3a1f94-08a3-4810-a9d5-aedfbaf5949e'}, params = None
+
+    async def _call(self, method: str, path: str, body: Any = None, params=None) -> Any:
+        if path.startswith("/config/"):
+            # Stores general_settings (master key, database URL) in plain text (K-01-0004).
+            raise RuntimeError("LiteLLM /config/* is never called by FFCore")
+        response = await self._client.request(
+            method,
+            f"{self._conf.url}{path}",
+            headers={"Authorization": f"Bearer {self._conf.master_key}"},
+            json=body,
+            params=params,
+        )
+        if response.status_code >= 400:
+>           raise LiteLLMError(response.status_code, path, safe_error(response))
+E           ffcore.services.litellm_client.LiteLLMError: LiteLLM /model/delete answered upstream_status=400 error_type=auth_error error_code=400 call_id=unknown
+
+ffcore/services/litellm_reconcile.py:278: LiteLLMError
+---------------------------- Captured stderr setup -----------------------------
+2026-10-31 19:36:28,826 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-10-31 19:36:28,953 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=124
+------------------------------ Captured log setup ------------------------------
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=124
+----------------------------- Captured stderr call -----------------------------
+2026-10-31 19:36:29,004 INFO ffcore.litellm_reconcile litellm_reconciled created=1 updated=0 deleted=0 problems=0
+2026-10-31 19:36:29,117 INFO ffcore.litellm_reconcile litellm_reconciled created=1 updated=0 deleted=1 problems=0
+2026-10-31 19:36:29,214 INFO ffcore.access access method=DELETE path=/api/v1/projects/b23c249e-ed92-4dbb-91d3-4010aaecc936 status=204 ms=60
+2026-10-31 19:36:29,316 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=1 problems=0
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=1 updated=0 deleted=0 problems=0
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=1 updated=0 deleted=1 problems=0
+INFO     ffcore.access:logging.py:263 access method=DELETE path=/api/v1/projects/b23c249e-ed92-4dbb-91d3-4010aaecc936 status=204 ms=60
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=1 problems=0
+=============================== warnings summary ===============================
+tests/integration/test_04a_worker.py::test_04a_upload_job_runs_in_worker
+tests/integration/test_04a_worker.py::test_04a_job_for_missing_row_retries_then_fails_loud
+  /opt/venv/lib/python3.12/site-packages/arq/worker.py:877: DeprecationWarning: Call to deprecated close. (Use aclose() instead) -- Deprecated since version 5.0.1.
+    await self.pool.close(close_connection_pool=True)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/integration/test_01_events.py::test_01_r1_deleted_project_leaves_litellm
+======= 1 failed, 670 passed, 4 skipped, 2 warnings in 498.01s (0:08:18) =======
+make: *** [Makefile:31: test-int] Error 1

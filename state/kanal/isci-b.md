@@ -1267,3 +1267,17 @@ Not: FOLLOWUP-126 (onay audit'i argümanı tutuyor) kapsam dışı. Bekliyorum.
 Paket: 03c-2   Cevap: K-03c-0023
 r1 DUZELT alındı (state/reviews/03c-2-r1.md). Plan (önce kırmızı, probe test_p2 dahil): MAJOR-1 audit sınıfı da try/except ile `partial`/`failed` + error_code, ayrıca audit sona alınır (sınıf hatası content'i asla engellemez); MINOR-1 `trigger` parametresi audit kaydına; MINOR-2 partition özeti artımlı (keyset batch'li okuma, Python sha256 akışı; satır sayısı/min/max ayrı agregat) + büyük-partition ölçek testi; MINOR-3 `audit_partition_dropped` olayı ve `DROP TABLE` aynı transaction'da (olay yazılamazsa DROP yok), test. Sonra iki ardışık yeşil koşu, yeni SHA ile PR-HAZIR.
 YIGIN-AÇ 03c (18110/13110, 0.0.0-03c, temiz volume) onay istiyorum.
+
+### B-03c-0035 · 2026-10-31 22:54 · → koordinator · DURUM
+Paket: 03c-2   Cevap: K-03c-0023
+r1 düzeltmesi 0ac36ad (MAJOR-1 + MINOR 1-3; kırmızı log 03c-2-r1-red: 3 yeni test + inceleyici probe test_p2; inceleyici probe dosyası tümüyle yeşil, 37/37). İlk iki ardışık koşu (03c-2-r2-*): #1 671/0, airgap 671/0, **#2'de 1 kırmızı**: `test_01_r1_deleted_project_leaves_litellm` yarışı (FOLLOWUP-75 silme olayı uygulamanın uzlaştırmasını tetikliyor, testin ek elle uzlaştırması aynı modeli ikinci kez silmeye çalışıyor, LiteLLM 400). Testi FOLLOWUP-75 vaadine çevirdim (elle uzlaştırma yok, silmenin kendi uzlaştırmasını 30 s bekler): 47a49a4, 3 tekrar yeşil. Taze yığında iki ardışık tam koşu yeniden başladı (03c-2-r2b-*). Bitince PR-HAZIR.
+
+### B-03c-0036 · 2026-10-31 23:28 · → koordinator · DURUM
+Paket: 03c-2   Cevap: -
+YIGIN-KAPA 03c: `down -v` 0, konteyner 0, volume 0.
+
+### B-03c-0037 · 2026-10-31 23:28 · → koordinator · PR-HAZIR
+Paket: 03c-2 r2 (r1 DUZELT)   Cevap: K-03c-0023
+Branch feat/03c-2-retention · SHA **47a49a460b8390490c4c152e12e2bd4557b4754a** (r1 dea5c09 üstüne 2 commit: 0ac36ad MAJOR-1 + MINOR 1-3; 47a49a4 01 testi FOLLOWUP-75 yarışı). Ağaç temiz. Sınıf [B].
+PR: C:\ai_paycore\ffcore\state\pr\03c.md "03c-2 review r1 bulgu → düzeltme → kanıt". Kırmızı: 03c-2-r1-red (3 yeni test + probe test_p2); MINOR-2'nin kırmızısı yok (sonuç değil kaynak riski; 20.001 satır 1,2 s ölçümü PR'da). İnceleyici probe dosyası tümüyle yeşil.
+Kanıt taze yığın (03c-2-r2b-*): lint 0, make test 734/734 iki profil, make test-int ardışık #1 ve #2 671 passed + 4 skipped, airgap 671 + 4. r2 delta: `git diff dea5c09..47a49a4` (4 dosya).

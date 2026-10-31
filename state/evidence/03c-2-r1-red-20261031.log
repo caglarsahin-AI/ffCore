@@ -1,0 +1,5 @@
+FAILED tests/integration/test_03c_retention_job.py::test_03c_14_audit_error_does_not_stop_other_classes
+FAILED tests/integration/test_03c_retention_job.py::test_03c_14_audit_drop_records_trigger
+FAILED tests/integration/test_03c_retention_job.py::test_03c_14_audit_event_failure_keeps_partition
+FAILED tests/integration/test_zz_probe_03c2.py::test_p2_audit_error_isolation
+4 failed, 12 passed in 10.78s
