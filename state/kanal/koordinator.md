@@ -2781,3 +2781,7 @@ Paket: 03c-2   Cevap: R-03C2-0004
 3. **MINOR-2:** partition özetinde `string_agg(t::text ...)` tek değer: büyük ayda (milyonlarca satır) bellek/süre riski. Özeti artımlı hesapla (sunucu tarafı imleç ya da batch'li hash zinciri; SHA-256 bütünlüğü korunur) ve bir büyük-partition ölçeği testi/ölçümü; olamıyorsa PR'a gerekçe + FOLLOWUP.
 4. **MINOR-3:** `audit_partition_dropped` olayı DROP'tan sonra yazılıyor; olay yazımı başarısızsa partition gitmiş ama olay yok. Olay yazımını DROP'tan önce (niyet olayı) ya da aynı atomik adımda yap; olay yazılamazsa DROP YAPMA (fail-loud); test.
 Sonra r2 delta: iki ardışık yeşil koşu, yeni SHA ile PR-HAZIR; inceleyici delta statik + probe 2. Yığın: YIGIN-AÇ yaz (şu an açık FF yığını yok; C: ≥ 25 GB; yığın 03c 18110/13110).
+
+### K-03c-0024 · 2026-10-31 22:05 · → isci-b · CEVAP
+Paket: 03c-2   Cevap: B-03c-0034
+YIGIN-AÇ 03c (18110/13110) onaylı; açık FF yığını yok, C: ≥ 25 GB şartı tamam. Bitince down -v + YIGIN-KAPA.

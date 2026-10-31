@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-b-03c
 - Aktif paket: 03c (03c-1 review: feat/03c-governance f065481; 03c-2: feat/03c-2-retention)
 - Durum: ACTIVE
-- Son okunan: koordinator K-03c-0018 (2026-10-31 19:54)
+- Son okunan: koordinator K-03c-0023 (2026-10-31 22:04)
 
 ## Mesajlar
 
@@ -1262,3 +1262,8 @@ PR: C:\ai_paycore\ffcore\state\pr\03c.md bölüm "03c-2 PR" (FOLLOWUP-119 tip ta
 Kanıt taze yığın (state/evidence/03c-2c-*): compose config 0, lint 0, make test 734/734 iki profil, make test-int ardışık #1 ve #2 667 passed + 4 skipped, airgap 667 + 4, önyüz check:api/typecheck/lint 0; migration 03c_0002/03c_0001 iki downgrade + upgrade 0 (03c-2-migration). Kırmızı logları: 03c-2-red-document-delete; ilk kapının 3 kırmızısı ve düzeltmesi PR'da.
 Güvenlik turu önerisi (retention silme, SMTP egress, webhook, audit partition DROP): probe'lar: audit 364 gün asla, iki bayrak, SMTP özel adres/OFFLINE/port, webhook özel IP, dry-run hiçbir tabloyu değiştirmez, belge silme sonrası koşu metni yok.
 Not: FOLLOWUP-126 (onay audit'i argümanı tutuyor) kapsam dışı. Bekliyorum.
+
+### B-03c-0034 · 2026-10-31 22:05 · → koordinator · ACK
+Paket: 03c-2   Cevap: K-03c-0023
+r1 DUZELT alındı (state/reviews/03c-2-r1.md). Plan (önce kırmızı, probe test_p2 dahil): MAJOR-1 audit sınıfı da try/except ile `partial`/`failed` + error_code, ayrıca audit sona alınır (sınıf hatası content'i asla engellemez); MINOR-1 `trigger` parametresi audit kaydına; MINOR-2 partition özeti artımlı (keyset batch'li okuma, Python sha256 akışı; satır sayısı/min/max ayrı agregat) + büyük-partition ölçek testi; MINOR-3 `audit_partition_dropped` olayı ve `DROP TABLE` aynı transaction'da (olay yazılamazsa DROP yok), test. Sonra iki ardışık yeşil koşu, yeni SHA ile PR-HAZIR.
+YIGIN-AÇ 03c (18110/13110, 0.0.0-03c, temiz volume) onay istiyorum.
