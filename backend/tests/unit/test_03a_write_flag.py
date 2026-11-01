@@ -27,6 +27,9 @@ WRITE_EXEMPT |= {"create_run", "resume_run", "cancel_run"}
 # fix/07-followups (FOLLOWUP-111): the approval sweep test hook, service account only and off
 # unless FFCORE_TEST_HOOKS=1 (no user role applies there).
 WRITE_EXEMPT |= {"sweep_approvals"}
+# 06b: the facade's chat completion is an API key's call (no console role applies; a run it starts
+# is audited as create_run is), and the service-account-only search of a key's run.
+WRITE_EXEMPT |= {"chat_completions", "internal_key_search"}
 
 
 def api_routes(routes):
