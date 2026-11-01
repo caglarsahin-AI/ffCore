@@ -44,9 +44,30 @@ SECRETS = (
     "REDIS_PASSWORD",
     "AGENT_DEMO_DB_PASSWORD",
 )
-# On the PayCore server one .env serves both stacks: PayCore's own Postgres owns POSTGRES_*, so
-# FFCore's database user and password are FFCORE_POSTGRES_* there (paycoreLLM compose.ffcore.yml).
-STACK_RENAMES = {"paycore": {"POSTGRES_PASSWORD": "FFCORE_POSTGRES_PASSWORD"}}
+# On the PayCore server one .env serves both stacks: PayCore owns POSTGRES_*, so FFCore's database,
+# Redis and LiteLLM secrets are FFCORE_* there, plus the Langfuse project keys FFCore uses in
+# PayCore's Langfuse (paycoreLLM compose.ffcore.yml). The M3 flags compose.ffcore.yml fixes
+# itself may be absent from that .env; present, they must still hold the M3 value.
+STACK_RENAMES = {
+    "paycore": {
+        "POSTGRES_PASSWORD": "FFCORE_POSTGRES_PASSWORD",
+        "REDIS_PASSWORD": "FFCORE_REDIS_PASSWORD",
+        "LITELLM_MASTER_KEY": "FFCORE_LITELLM_MASTER_KEY",
+        "LITELLM_INTERNAL_KEY": "FFCORE_LITELLM_INTERNAL_KEY",
+        "LITELLM_SALT_KEY": "FFCORE_LITELLM_SALT_KEY",
+    }
+}
+STACK_SECRETS = {"paycore": ("FFCORE_LANGFUSE_PUBLIC_KEY", "FFCORE_LANGFUSE_SECRET_KEY")}
+STACK_FIXED = {
+    "paycore": {
+        "OFFLINE",
+        "EGRESS_ALLOWLIST",
+        "FFCORE_TEST_HOOKS",
+        "RETENTION_DRY_RUN",
+        "RETENTION_AUDIT_DROP_ENABLED",
+        "TRANSFORMERS_OFFLINE",
+    }
+}
 PLACEHOLDERS = ("change_me", "changeme", "dummy", "example", "placeholder", "secret", "xxx")
 
 
@@ -63,8 +84,10 @@ def read_env(path: Path) -> dict[str, str]:
 
 def check(env: dict[str, str], stack: str = "ffcore") -> list[tuple[str, bool, str]]:
     renames = STACK_RENAMES.get(stack, {})
+    fixed = STACK_FIXED.get(stack, set())
     out = []
     for key, (accepted, may_be_absent) in EXPECTED.items():
+        may_be_absent = may_be_absent or key in fixed
         if key not in env:
             out.append(
                 (key, may_be_absent, "absent, compose default" if may_be_absent else "missing")
@@ -74,7 +97,7 @@ def check(env: dict[str, str], stack: str = "ffcore") -> list[tuple[str, bool, s
             out.append((key, ok, "" if ok else "not the M3 value"))
     for key in PRESENT:
         out.append((key, bool(env.get(key)), "" if env.get(key) else "missing"))
-    for key in (renames.get(k, k) for k in SECRETS):
+    for key in [*(renames.get(k, k) for k in SECRETS), *STACK_SECRETS.get(stack, ())]:
         value = env.get(key, "")
         if not value:
             out.append((key, False, "missing"))

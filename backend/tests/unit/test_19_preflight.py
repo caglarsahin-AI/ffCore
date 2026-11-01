@@ -93,7 +93,23 @@ def test_19_s4_preflight_prints_no_values(tmp_path, capsys):
 
 def test_19_s4_preflight_paycore_stack_names(tmp_path):
     values = dict(SAFE)
-    values["FFCORE_POSTGRES_PASSWORD"] = values.pop("POSTGRES_PASSWORD")
+    for name in (
+        "POSTGRES_PASSWORD",
+        "REDIS_PASSWORD",
+        "LITELLM_MASTER_KEY",
+        "LITELLM_INTERNAL_KEY",
+        "LITELLM_SALT_KEY",
+    ):
+        values[f"FFCORE_{name}"] = values.pop(name)
+    for name in ("OFFLINE", "EGRESS_ALLOWLIST", "FFCORE_TEST_HOOKS"):  # fixed by the compose file
+        del values[name]
+    values["FFCORE_LANGFUSE_PUBLIC_KEY"] = "synthetic-value-90-0123456789abcdef"
+    values["FFCORE_LANGFUSE_SECRET_KEY"] = "synthetic-value-91-0123456789abcdef"
     verdicts = {k: ok for k, ok, _ in pf.check(pf.read_env(_write(tmp_path, values)), "paycore")}
-    assert verdicts["FFCORE_POSTGRES_PASSWORD"] is True and "POSTGRES_PASSWORD" not in verdicts
+    assert all(verdicts.values()), [k for k, ok in verdicts.items() if not ok]
+    assert "POSTGRES_PASSWORD" not in verdicts and verdicts["FFCORE_LANGFUSE_SECRET_KEY"]
     assert pf.main(["--env-file", str(_write(tmp_path, values)), "--stack", "paycore"]) == 0
+    unsafe = values | {"OFFLINE": "false"}  # absent is fine, a wrong value is not
+    assert pf.main(["--env-file", str(_write(tmp_path, unsafe)), "--stack", "paycore"]) == 1
+    del values["FFCORE_LANGFUSE_PUBLIC_KEY"]
+    assert pf.main(["--env-file", str(_write(tmp_path, values)), "--stack", "paycore"]) == 1
