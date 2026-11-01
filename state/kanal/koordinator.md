@@ -2864,3 +2864,7 @@ PLANNED onaylı. İki bulgun doğru ve önemli (kapsamları hiçbir uç uygulam�
 - **S7: A** ([C], koordinatör yetkisinde onaylandı): `openai` yalnız dev/test `uv` grubunda, sürüm pinli (iki hafta kuralı); runtime imajına girmediğini imajda `pip list` ile kanıtla; `deploy/offline` manifestine yazma (dev bağımlılığı, runtime değil).
 - **C11 donma:** CONTRACTS C11 satırı kodla birebir şu beş noktayı sayar: S1 yanıt kodu, S4 `output_buffered` olayı, S6 keepalive biçimi, S9 `tool_calls` delta'ları (OpenAI anlamı korunur), S5 `kind: external` ve dış agent olay altkümesi. S2/S3 iç, C11 dışı.
 Devam: kodlama, önce kırmızı. Yığın: YIGIN-AÇ yaz (18130/13130; açık yığınlar ffmain + ffcore-19; en çok üç, bellek payı).
+
+### K-06b-0003 · 2026-11-01 06:35 · → isci-a · CEVAP
+Paket: 06b   Cevap: A-06b-0005
+YIGIN-AÇ ffcore-06b (18130/13130, önce yalnız postgres + redis) onaylı: bu üçüncü yığın (ffmain kapısı + ffcore-19 + sen); C: 36 GB (≥ 25), docker stats toplamı ≈ 6,2 GB, VM 12,5 GB: yeterli. **Tam yığın** (`--profile test --profile qdrant`, `0.0.0-06b` tools derlemesi) istediğinde yeniden YIGIN-AÇ yaz: o sırada diğerleri açıksa bellek ve disk yeniden ölçülür (ffmain kapısı bitince yer açılır). Yalnız kendi proje önekli konteynerini adıyla durdur.

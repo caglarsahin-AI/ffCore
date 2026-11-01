@@ -1,0 +1,50 @@
+ Network ffcore-06b_default  Creating
+ Network ffcore-06b_default  Created
+ Volume "ffcore-06b_langfuse_minio_data"  Creating
+ Volume "ffcore-06b_langfuse_minio_data"  Created
+ Volume "ffcore-06b_postgres_data"  Creating
+ Volume "ffcore-06b_postgres_data"  Created
+ Volume "ffcore-06b_model_cache"  Creating
+ Volume "ffcore-06b_model_cache"  Created
+ Volume "ffcore-06b_knowledge_storage"  Creating
+ Volume "ffcore-06b_knowledge_storage"  Created
+ Volume "ffcore-06b_langfuse_clickhouse_data"  Creating
+ Volume "ffcore-06b_langfuse_clickhouse_data"  Created
+ Volume "ffcore-06b_langfuse_clickhouse_logs"  Creating
+ Volume "ffcore-06b_langfuse_clickhouse_logs"  Created
+ Volume "ffcore-06b_redis_data"  Creating
+ Volume "ffcore-06b_redis_data"  Created
+ Volume "ffcore-06b_langfuse_postgres_data"  Creating
+ Volume "ffcore-06b_langfuse_postgres_data"  Created
+..FF                                                                     [100%]
+=================================== FAILURES ===================================
+____________________________ test_c11_routes_exist _____________________________
+
+    def test_c11_routes_exist():
+        paths = {(m, r.path) for r in app.routes for m in getattr(r, "methods", ()) or ()}
+>       assert ("POST", "/v1/chat/completions") in paths
+E       AssertionError: assert ('POST', '/v1/chat/completions') in {('GET', '/docs'), ('GET', '/docs/oauth2-redirect'), ('GET', '/healthz'), ('GET', '/openapi.json'), ('GET', '/redoc'), ('HEAD', '/docs'), ...}
+
+tests/contract/test_c11_facade.py:60: AssertionError
+_________________ test_c11_contracts_row_names_the_five_points _________________
+
+    def test_c11_contracts_row_names_the_five_points():
+        row = next(line for line in CONTRACTS.read_text(encoding="utf-8").splitlines() if "| C11 |" in line)
+        for needle in (
+            "impersonation_denied",
+            "output_buffered",
+            ": keepalive",
+            "tool_calls",
+            "kind: external",
+            "x_platform",
+            "annotations[]",
+        ):
+>           assert needle in row, needle
+E           AssertionError: impersonation_denied
+E           assert 'impersonation_denied' in "| C11 | OpenAI-uyumlu facade: `POST /v1/chat/completions`, `GET /v1/models`, chunk şeması, `x_platform` ve `annotatio... 05b) | M4 | OpenAI alanlarının anlamı OpenAI ile aynı kalır; FFCore'a özgü her şey `x_platform` altında ve additive |"
+
+tests/contract/test_c11_facade.py:75: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_c11_facade.py::test_c11_routes_exist - AssertionEr...
+FAILED tests/contract/test_c11_facade.py::test_c11_contracts_row_names_the_five_points
+2 failed, 2 passed in 13.97s

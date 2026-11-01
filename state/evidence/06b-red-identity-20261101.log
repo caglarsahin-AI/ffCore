@@ -1,0 +1,15 @@
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/a9d7e8ee-8b4c-43fc-8a52-663aa3214a2e/api-keys status=201 ms=483
+INFO     ffcore.access:logging.py:263 access method=POST path=/v1/chat/completions status=404 ms=150
+--------------------------- Captured stderr teardown ---------------------------
+2026-11-01 03:33:17,226 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+2026-11-01 03:33:21,083 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=2 error=EgressRequestFailed: egress_dns_failed
+2026-11-01 03:33:22,836 ERROR ffcore.readiness warmup failed: ModelMissing
+---------------------------- Captured log teardown -----------------------------
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:451 litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:451 litellm_reconcile_retry attempt=2 error=EgressRequestFailed: egress_dns_failed
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+=========================== short test summary info ============================
+FAILED tests/integration/test_06b_identity.py::test_06b_17_scope_matrix_direct_model_needs_chat_direct
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+1 failed in 21.12s

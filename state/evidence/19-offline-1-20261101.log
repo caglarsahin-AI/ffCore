@@ -1,0 +1,6 @@
+All checks passed!
+E       FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-root/pytest-0/test_19_4_manifest_vs_archive0/calls'
+/usr/local/lib/python3.12/pathlib.py:1013: FileNotFoundError
+1 failed, 9 passed in 0.96s
+All checks passed!
+10 passed in 0.94s

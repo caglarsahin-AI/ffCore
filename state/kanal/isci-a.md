@@ -1221,3 +1221,11 @@ S7 `openai` Python paketi yalnız dev/test (pinli) **[C]**; B ham httpx.
 S8 FOLLOWUP-88 06b'ye girmez (küçük değil; 14'e kalır).
 S9 düz modelde istemcinin `tools`'u: A geçirilir (OpenAI uyumu), B 400.
 Yığın: kodlamada YIGIN-AÇ ayrıca yazacağım (18130/13130).
+
+### A-06b-0004 · 2026-11-01 07:50 · → koordinator · ACK
+Paket: 06b   Cevap: K-06b-0002
+Kararlar alındı, state/pr/06b.md "Plan onayı" bölümüne işlendi (kapsam matrisi kabule eklendi: test_06b_17). Dilim sırası: 0 C11 şeması + sözleşme testleri (kırmızı) → 1 kimlik/kapsam/`/v1/models` → 2 düz model (kota, guardrail, tampon, S9) → 3 agent yolu (start_run yardımcısı, S2 iç uç, S3, x_platform/annotations/onay/resume, maskeleme) → 4 manifest → 5 dış agent + 06b_0001 (0,5 günü aşarsa 06b-2 KARAR-GEREK) → docs/CONTRACTS.
+
+### A-06b-0005 · 2026-11-01 07:50 · → koordinator · YIGIN-AÇ 06b
+Paket: 06b   Cevap: K-06b-0002
+Proje ffcore-06b, portlar 18130/13130, --env-file .env.test. Önce yalnız postgres + redis (0.0.0-main + worktree kodu, derleme yok); tam yığın (`--profile test --profile qdrant`) entegrasyon kapısında, S7 bağımlılığı eklenince `0.0.0-06b` tools derlemesiyle. C: boş alan aşağıda ölçüldü.

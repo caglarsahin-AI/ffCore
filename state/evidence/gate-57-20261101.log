@@ -449,3 +449,20 @@ tests/contract/test_c9_runs.py .......                                   [100%]
 ======================= 737 passed in 172.44s (0:02:52) ========================
 
 === 06:26:04 make test airgap
+tests/contract/test_c1_namespace.py ...............                      [ 97%]
+tests/contract/test_c2_api_key_scopes.py ..                              [ 97%]
+tests/contract/test_c2_on_behalf_of.py ..                                [ 97%]
+tests/contract/test_c3_common_columns.py .....                           [ 98%]
+tests/contract/test_c5_vectorstore.py ...                                [ 99%]
+tests/contract/test_c9_runs.py .......                                   [100%]
+
+======================= 737 passed in 157.68s (0:02:37) ========================
+
+=== 06:29:13 test-samples
+
+----------------------------------------------------------------------
+Ran 54 tests in 4.560s
+
+OK (skipped=5)
+
+=== 06:29:30 test-int #1
