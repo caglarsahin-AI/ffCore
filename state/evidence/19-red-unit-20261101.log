@@ -36,3 +36,9 @@ E   FileNotFoundError: [Errno 2] No such file or directory: '/work/scripts/m3_ga
 ERROR tests/unit/test_19_eval_out.py - FileNotFoundError: [Errno 2] No such f...
 !!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
 1 error in 0.94s
+E       AttributeError: module 'eval_report' has no attribute 'select_items'
+E       AssertionError: assert 'Scored items: 1/50 (excluded by source: prsim 9)' in '# Exam report: s1\n\n- Agent: `a`; SQL agent: `-`\n- Model: qwen3.5:35b cpu; profile: -; run at - UTC\n\n## Outcome l...--|\n| s1-001 | dogrudan | completed | answered | yes | contains=ok, cites_source=ok, llm_judge=NOT_RUN | 100.0 |  |\n'
+2 failed, 8 passed in 1.96s
+ERROR tests/unit/test_19_preflight.py - FileNotFoundError: [Errno 2] No such ...
+!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+1 error in 0.82s
