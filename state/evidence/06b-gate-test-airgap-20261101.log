@@ -28,7 +28,7 @@ tests/unit/test_02_r1_tracing.py ...                                     [ 19%]
 tests/unit/test_02_tracing.py .......................                    [ 22%]
 tests/unit/test_03a_providers_service.py .....                           [ 23%]
 tests/unit/test_03a_session.py ........                                  [ 24%]
-tests/unit/test_03a_write_flag.py F...                                   [ 24%]
+tests/unit/test_03a_write_flag.py ....                                   [ 24%]
 tests/unit/test_03b_auth.py .................                            [ 27%]
 tests/unit/test_03b_config_errors.py ........                            [ 28%]
 tests/unit/test_03b_dns_opt_in.py ..                                     [ 28%]
@@ -89,18 +89,4 @@ tests/contract/test_c3_common_columns.py .....                           [ 98%]
 tests/contract/test_c5_vectorstore.py ...                                [ 99%]
 tests/contract/test_c9_runs.py .......                                   [100%]
 
-=================================== FAILURES ===================================
-___________________ test_03a_3_every_mutation_requires_write ___________________
-
-    def test_03a_3_every_mutation_requires_write():
->       assert unmarked_mutations(app) == []
-E       assert ["['POST'] /v...}/key-search"] == []
-E         
-E         Left contains 2 more items, first extra item: "['POST'] /v1/chat/completions"
-E         Use -v to get more diff
-
-tests/unit/test_03a_write_flag.py:59: AssertionError
-=========================== short test summary info ============================
-FAILED tests/unit/test_03a_write_flag.py::test_03a_3_every_mutation_requires_write
-================== 1 failed, 757 passed in 131.25s (0:02:11) ===================
-make: *** [Makefile:18: test] Error 1
+======================= 758 passed in 134.35s (0:02:14) ========================

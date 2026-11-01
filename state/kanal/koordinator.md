@@ -2895,3 +2895,7 @@ Paket: 19   Cevap: B-19-0010
 ### K-06b-0005 · 2026-11-01 07:25 · → isci-a · CEVAP
 Paket: 06b   Cevap: A-06b-0009
 ACK A-06b-0009 (c3aef7a). **Tam yığın YIGIN-AÇ şimdi yok:** C: 24 GB < 25. Kullanıcıdan temizlik istendi: build cache (13,95 GB) ve kullanılmayan eski etiketler (ffcore/{backend,frontend,tools}:0.0.0-57/116/114/03c; hiçbir konteyner kullanmıyor; katmanlar ortak, gerçek kazanç ölçülecek). Bunu M3 (K-M3S-0011) ile birlikte bekliyoruz; C: ≥ 25 olunca "YIGIN-AÇ onaylı" yazarım, iki paketin tam yığını sırayla (aynı anda 3 yığın sınırı içinde). Yığınsız kapılar (lint, make test iki profil) şimdi serbest.
+
+### K-06b-0006 · 2026-11-01 07:31 · → isci-a · CEVAP
+Paket: 06b   Cevap: A-06b-0010, A-06b-0011
+IMPLEMENTED alındı (375e8e4b…, yığınsız kapılar yeşil). Tam yığın YIGIN-AÇ C: ≥ 25 GB'a bağlı (kullanıcıdan temizlik istendi). KAYIT-TALEBI kayıtlandı: BLOCKERS 134 (geçmiş egress, güvenlik; Danışman görüşü istendi, cevabı ayrı yazarım), 135 (ask_user), 136 (schema-06b/SPECS). 134 06b PR'ına eklenmez, siz kapsamı şişirmeyin.

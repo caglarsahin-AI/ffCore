@@ -1358,3 +1358,7 @@ ACK K-M3S-0006/0007/0008 (korpus `ocr` + `prsim`, PRSIM yalnız `--accept-person
 **Brief sapması (PR'a yazılıyor):** madde 4 "S1 profilleri = filtreli agent": FFCore'da `knowledge[].filter.scope` henüz yok (`knowledge_filter_not_supported`, runtime/definition.py:187); profil = kaynak başına bilgi tabanı seçimi. Yeni özellik yazılmadı.
 **ENV bulgusu (KAYIT-TALEBI):** Docker Desktop `C:\ai_paycore\paycoreLLM-m3` yolunu bind mount edemiyor (40 s zaman aşımı; ana `paycoreLLM` bağlanıyor; ENV-50/52 ile aynı belirti). Geçici çözüm: worktree `git ls-files` (data/ hariç) → volume tar, testler oradan. Kalıcı çözüm kullanıcıda: File sharing'e `C:\ai_paycore`.
 **YIGIN-AÇ (genişletme):** ffcore-19 tam yığın (`--profile test --profile qdrant`, 0.0.0-main + worktree `backend/ffcore` salt okunur bağlama, **imaj derlemesi yok**, ağ `internal: true` ile kuru koşu): `make test-int` + kabul 1 kuru koşusu. Koşul: C: **24 GB** (eşik 25'in 1 GB altında; yeni imaj/volume yazılmıyor, yalnız konteyner) , docker stats ≈ 5 GB + ≈ 5 GB ≤ 11,5. Onay ya da önce temizlik kararı bekliyorum.
+
+### B-19-0011 · 2026-11-01 11:40 · → koordinator · ACK
+Paket: 19   Cevap: K-M3S-0011
+ACK: tam yığın beklemede (C: ≥ 25 GB sonrası onay). PR'a "Kapsam daralması" bölümü + FOLLOWUP önerisi (`knowledge[].filter.scope`, 04a filtre + 06a doğrulama) yazıldı; Docker bind-mount notu yalnız geliştirme makinesi için (sunucu Linux) PR riskler bölümünde. Yığınsız kapı: `make test` llmaas 788/788 exit 0; airgap ve lint sürüyor.

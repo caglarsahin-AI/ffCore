@@ -1252,3 +1252,15 @@ A varsayımıyla belge/OpenAPI/CONTRACTS ve kapılara geçiyorum; B dersen dilim
 Paket: 06b   Cevap: K-06b-0004
 ACK K-06b-0004 (A): EXTERNAL_X_PLATFORM_EVENTS kaldırıldı, C11 satırı yalnız "`kind: external` rezerve, 501 `external_agent_not_available`, `/v1/models`'te listelenmez" diyor; manifest içe aktarma 422 `external_agent_not_available` (native'e dönüşüm yok, test); konsoldan `kind: external` 422 (test); plan/06'ya 06b-2 satırı; 06b-2 şartları state/pr/06b.md'ye taşınacak. Commit c3aef7a.
 YIGIN-AÇ: açık `ffcore-06b` yığınına `--profile qdrant` eklemek ve `0.0.0-06b` tools ile tam `make test-int` (iki profil) koşmak istiyorum. **Dikkat: C: 24 GB** (25 eşiğinin altında; düşüş benim `ffcore/{backend,tools}:0.0.0-06b` derlemem). Yerelde kullanıcı temizlik listesine alınabilecek benim etiketlerim: `ffcore/backend:0.0.0-57` (7 GB, 57 merge'lü), `0.0.0-116`, `0.0.0-03c`/`0.0.0-114` (eski). Onay ya da temizlik sonrası koşarım; bu arada yığınsız kapıları (lint, make test iki profil) koşuyorum.
+
+### A-06b-0010 · 2026-11-01 11:40 · → koordinator · ACK + DURUM
+Paket: 06b   Cevap: K-06b-0005
+ACK: tam yığın bekliyor (C: 24 GB). DURUM: **IMPLEMENTED** talebi. feat/06b-facade @ 375e8e4b7218caa89ea23149bfcd84596b21a91a (baz 9e9b44a, 5 commit, 31 dosya +4584/−27, migration yok). PR açıklaması state/pr/06b.md "06b PR" (kabul → test tablosu, komutlar, varsayımlar, plandan sapma, kapsam daralması, 06b-2 şartları).
+Yığınsız kapılar yeşil: make lint 0; make test llmaas 758, airgap 758 (`0.0.0-06b` tools). Hedefli entegrasyon (mevcut `ffcore-06b` test profili): 06b testlerinin hepsi yeşil (identity + direct 26, agent + key_search 21, manifest + openai istemcisi 6). S7: runtime imajında `openai` yok (state/evidence/06b-s7-pip-list-20261101.log).
+VERIFIED için kalan: tam yığın (`--profile test --profile qdrant`, `0.0.0-06b`) `make test-int` iki profil + smoke; onay gelince koşar, sonra PR-HAZIR.
+
+### A-06b-0011 · 2026-11-01 11:40 · → koordinator · KAYIT-TALEBI
+Paket: 06b   Cevap: -
+1. **FOLLOWUP (06a sahibi, güvenlik bulgusu):** 06a grafının `egress`'i (`runtime/graph.py` `guard_in`) yalnız yeni soruyu denetler; `_history` ile modele giden önceki konuşma mesajları (`messages.content`, ham kullanıcı girdisi) `egress`'ten geçmez. llmaas'ta kalıcı konuşmanın önceki turlarındaki kişi verisi sağlayıcıya ham gider. Facade S3 geçmişi kendisi denetliyor; konsol/kalıcı konuşma yolu açık. Öneri: `guard_in` geçmiş mesajları da `egress`'ten geçirsin (aynı run token kapsamı).
+2. **FOLLOWUP (06b/11):** `ask_user` sorusunun facade'dan cevaplanması yok (`finish_reason: stop` + `x_platform.question`; cevap konsoldan).
+3. **FOLLOWUP (10c):** önyüz `schema-06b.d.ts` + `check-api` SPECS satırı (FOLLOWUP-127 kalıbı).

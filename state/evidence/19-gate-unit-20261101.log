@@ -1,1 +1,40 @@
 === make test DEPLOY_PROFILE=llmaas
+tests/contract/test_03c_openapi.py ....                                  [ 92%]
+tests/contract/test_04a_makefile_test_int.py ...                         [ 92%]
+tests/contract/test_04a_openapi.py ......                                [ 93%]
+tests/contract/test_05a_openapi.py ....                                  [ 93%]
+tests/contract/test_06a_openapi.py ....                                  [ 94%]
+tests/contract/test_07_openapi.py ....                                   [ 94%]
+tests/contract/test_08_openapi.py ......                                 [ 95%]
+tests/contract/test_c1_namespace.py ...............                      [ 97%]
+tests/contract/test_c2_api_key_scopes.py ..                              [ 97%]
+tests/contract/test_c2_on_behalf_of.py ..                                [ 98%]
+tests/contract/test_c3_common_columns.py .....                           [ 98%]
+tests/contract/test_c5_vectorstore.py ...                                [ 99%]
+tests/contract/test_c9_runs.py .......                                   [100%]
+
+======================= 788 passed in 177.91s (0:02:57) ========================
+exit 0
+=== make test DEPLOY_PROFILE=airgap
+tests/contract/test_03c_openapi.py ....                                  [ 92%]
+tests/contract/test_04a_makefile_test_int.py ...                         [ 92%]
+tests/contract/test_04a_openapi.py ......                                [ 93%]
+tests/contract/test_05a_openapi.py ....                                  [ 93%]
+tests/contract/test_06a_openapi.py ....                                  [ 94%]
+tests/contract/test_07_openapi.py ....                                   [ 94%]
+tests/contract/test_08_openapi.py ......                                 [ 95%]
+tests/contract/test_c1_namespace.py ...............                      [ 97%]
+tests/contract/test_c2_api_key_scopes.py ..                              [ 97%]
+tests/contract/test_c2_on_behalf_of.py ..                                [ 98%]
+tests/contract/test_c3_common_columns.py .....                           [ 98%]
+tests/contract/test_c5_vectorstore.py ...                                [ 99%]
+tests/contract/test_c9_runs.py .......                                   [100%]
+
+======================= 788 passed in 149.47s (0:02:29) ========================
+exit 0
+=== make lint
+ruff check backend scripts data/samples/scripts services
+All checks passed!
+ruff format --check backend scripts data/samples/scripts services
+365 files already formatted
+exit 0
