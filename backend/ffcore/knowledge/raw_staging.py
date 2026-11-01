@@ -167,6 +167,10 @@ def iter_staged(
             )
 
 
+def source_of(item: StagedItem) -> str:
+    return _norm(str(item.meta["source"]))
+
+
 def metadata_for(item: StagedItem, *, kb_id: str) -> dict:
     """C6 `metadata` for `ingest_from_raw`: the known fields only (unknown meta never passes)."""
     return {

@@ -163,7 +163,18 @@ def build_parser() -> argparse.ArgumentParser:
     raw.add_argument(
         "--sources", required=True, nargs="+", help="sources to ingest, e.g. confluence:OCR"
     )
-    raw.add_argument("--limit", type=int, default=None, help="first N accepted files only")
+    raw.add_argument(
+        "--limit",
+        type=int,
+        default=None,
+        help="first N accepted files only (stage 0: pipeline evidence, not an acceptance corpus)",
+    )
+    raw.add_argument(
+        "--manifest-out",
+        type=Path,
+        default=None,
+        help="write the corpus manifest JSON here (outside --raw-dir)",
+    )
     return parser
 
 
@@ -247,7 +258,18 @@ def main(argv: list[str] | None = None) -> int:
                 raise CliError(str(exc)) from None
             for line in report.lines():
                 print(line)
-            if report.statuses["failed"] or report.statuses["timeout"]:
+            manifest = report.manifest()
+            print(
+                f"manifest: documents {manifest['documents']}, chunks {manifest['chunks']}, "
+                f"raw_manifest_sha256 {manifest['raw_manifest_sha256']}"
+            )
+            if args.manifest_out is not None:
+                try:
+                    raw_ingest.write_manifest(report, args.manifest_out, raw_dir=args.raw_dir)
+                except raw_ingest.RawIngestError as exc:
+                    raise CliError(str(exc)) from None
+                print(f"manifest written to {args.manifest_out}")
+            if manifest["failed"] or manifest["timeout"]:
                 return 1
         elif args.command == "setup-checkpointer":
             settings = get_settings()

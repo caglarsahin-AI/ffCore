@@ -154,3 +154,49 @@ def test_19_s2_raw_dir_missing_and_kb_missing(world, pg, settings, tmp_path):
 def test_19_s2_tree_is_read_only(ro_tree):
     with pytest.raises(PermissionError):
         (ro_tree / "x").write_text("x")
+
+
+# --- corpus manifest (KARARLAR "M3 korpus kapsamı", K-M3S-0004) ---
+
+
+def test_19_1_manifest_full_run(world, pg, settings, ro_tree):
+    kb = create_kb(world, key="paycore-manifest")
+    key = _project_key(pg, world["project"])
+    report = _ingest(settings, key, kb["key"], ro_tree)
+    manifest = report.manifest()
+    assert manifest["stage"] == "full"
+    assert manifest["documents"] == 5 and manifest["failed"] == 0 and manifest["timeout"] == 0
+    assert manifest["sources"]["confluence:DEMO"]["documents"] == 4
+    assert manifest["sources"]["jira:DEMO"]["documents"] == 1
+    chunks = pg.execute(
+        "SELECT count(*) FROM chunks c JOIN documents d ON d.id = c.document_id "
+        "WHERE d.kb_id = %s AND c.chunk_status <> 'skipped'",
+        (kb["id"],),
+    ).fetchone()[0]
+    assert manifest["chunks"] == chunks > 0
+    assert manifest["rejected"] == {"prsim_requires_ner": 1}
+    assert manifest["text_filter"].startswith("pii_regex@")
+    assert len(manifest["raw_manifest_sha256"]) == 64
+    # Same tree, second run: the manifest describes the same corpus (fixed for the baseline).
+    again = _ingest(settings, key, kb["key"], ro_tree).manifest()
+    assert again["raw_manifest_sha256"] == manifest["raw_manifest_sha256"]
+    assert again["documents"] == 5 and again["chunks"] == manifest["chunks"]
+
+
+def test_19_1_manifest_limit_is_pipeline_evidence(world, pg, settings, ro_tree):
+    kb = create_kb(world, key="paycore-stage0")
+    report = _ingest(settings, _project_key(pg, world["project"]), kb["key"], ro_tree, limit=2)
+    manifest = report.manifest()
+    assert manifest["stage"] == "stage0-pipeline-evidence"
+    assert any("pipeline evidence" in line for line in report.lines())
+
+
+def test_19_1_manifest_written_outside_raw_dir_only(world, pg, settings, ro_tree, tmp_path):
+    kb = create_kb(world, key="paycore-mout")
+    report = _ingest(settings, _project_key(pg, world["project"]), kb["key"], ro_tree)
+    out = tmp_path / "out" / "manifest.json"
+    raw_ingest.write_manifest(report, out, raw_dir=ro_tree)
+    assert out.is_file()
+    with pytest.raises(raw_ingest.RawIngestError) as err:
+        raw_ingest.write_manifest(report, ro_tree / "manifest.json", raw_dir=ro_tree)
+    assert err.value.code == "manifest_inside_raw_dir"
