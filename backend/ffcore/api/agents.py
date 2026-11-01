@@ -6,10 +6,13 @@ PUT .../versions/{version}. Only a draft version can be edited; publishing point
 version, rollback points it back at an earlier published one.
 """
 
-from typing import Annotated
+import json
+from typing import Annotated, Literal
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Request, status
+import yaml
+from fastapi import APIRouter, Depends, Request, Response, status
+from pydantic import ValidationError
 from sqlalchemy import func, select
 
 from ffcore.api.agents_schemas import (
@@ -17,6 +20,9 @@ from ffcore.api.agents_schemas import (
     AgentList,
     AgentOut,
     AgentUpdate,
+    ImportResult,
+    Manifest,
+    ManifestAgent,
     PublishRequest,
     RollbackRequest,
     VersionCreate,
@@ -375,3 +381,149 @@ async def rollback_agent(
         raise conflict("version_never_published", "Rollback goes to a published version only.")
     await _point_at(session, agent, row)
     return await agent_out(session, agent)
+
+
+# --- 06b: manifest export and import (brief 06 "Manifest") ---
+
+
+def _manifest_invalid(message: str) -> ApiError:
+    return ApiError(422, "invalid_request_error", "manifest_invalid", message)
+
+
+@router.get(
+    "/{agent_id}/manifest",
+    response_model=Manifest,
+    responses={200: {"content": {"application/yaml": {}}}},
+)
+async def export_manifest(
+    project_id: UUID,
+    agent_id: UUID,
+    actor: Reader,
+    session: SessionDep,
+    version: int | None = None,
+    format: Literal["json", "yaml"] = "json",
+):
+    """The agent and one version's definition (default: the published one, else the latest).
+    Secrets are not in it: an external agent's endpoint and key stay in this installation."""
+    agent = await _agent(session, project_id, agent_id)
+    if version is None:
+        row = (
+            await session.get(AgentVersion, agent.current_version_id)
+            if agent.current_version_id
+            else await _version(session, agent, await _latest(session, agent.id))
+        )
+    else:
+        row = await _version(session, agent, version)
+    manifest = Manifest(
+        agent=ManifestAgent(
+            key=agent.key, name=agent.name, description=agent.description, kind=agent.kind
+        ),
+        version=row.version,
+        definition=parse_definition(row.definition).model_dump(mode="json"),
+    )
+    if format == "yaml":
+        text = yaml.safe_dump(manifest.model_dump(mode="json"), sort_keys=False, allow_unicode=True)
+        return Response(text, media_type="application/yaml")
+    return manifest
+
+
+async def _manifest_from(request: Request) -> Manifest:
+    raw = await request.body()
+    kind = (request.headers.get("content-type") or "").split(";")[0].strip().lower()
+    try:
+        if kind in ("application/yaml", "application/x-yaml", "text/yaml"):
+            data = yaml.safe_load(raw.decode("utf-8"))
+        elif kind == "application/json":
+            data = json.loads(raw)
+        else:
+            raise _manifest_invalid("A manifest is application/json or application/yaml.")
+        return Manifest.model_validate(data)
+    except (ValueError, yaml.YAMLError, ValidationError) as exc:
+        if isinstance(exc, ApiError):
+            raise
+        raise _manifest_invalid(f"The manifest does not parse: {type(exc).__name__}.") from None
+
+
+@router.post(
+    "/import",
+    response_model=ImportResult,
+    openapi_extra={
+        "requestBody": {
+            "required": True,
+            "content": {
+                "application/json": {"schema": {"$ref": "#/components/schemas/Manifest"}},
+                "application/yaml": {"schema": {"$ref": "#/components/schemas/Manifest"}},
+            },
+        }
+    },
+)
+@audited("import_agent", "agent")
+async def import_manifest(
+    project_id: UUID,
+    request: Request,
+    actor: Editor,
+    session: SessionDep,
+    settings: SettingsDep,
+    dry_run: bool = False,
+):
+    """A manifest becomes a new agent (draft version 1) or, when the key exists, its next
+    draft version; nothing is published. `dry_run=true` validates and writes nothing. An older
+    `schema_version` is read as such (C8)."""
+    manifest = await _manifest_from(request)
+    if manifest.agent.kind != "native":
+        raise _manifest_invalid(
+            "An external agent is registered in the console (its endpoint credentials are not "
+            "part of a manifest)."
+        )
+    try:
+        definition = parse_definition(manifest.definition)
+    except ValidationError as exc:
+        where = ".".join(str(p) for p in exc.errors()[0].get("loc", ()))
+        raise _manifest_invalid(f"definition.{where}: {exc.errors()[0].get('msg')}") from None
+    await check_context(session, project_id, definition, settings)
+    agent = await session.scalar(
+        select(Agent).where(
+            Agent.project_id == project_id,
+            Agent.key == manifest.agent.key,
+            Agent.deleted_at.is_(None),
+        )
+    )
+    action = "new_version" if agent is not None else "create"
+    version = await _latest(session, agent.id) + 1 if agent is not None else 1
+    if dry_run:
+        await session.rollback()
+        return ImportResult(
+            dry_run=True,
+            action=action,
+            agent_key=manifest.agent.key,
+            id=agent.id if agent is not None else None,
+            version=version,
+            definition=definition,
+        )
+    if agent is None:
+        agent = Agent(
+            project_id=project_id,
+            key=manifest.agent.key,
+            name=manifest.agent.name,
+            description=manifest.agent.description,
+            created_by=actor.actor_id,
+        )
+        session.add(agent)
+        await session.flush()
+    session.add(
+        AgentVersion(
+            agent_id=agent.id,
+            version=version,
+            definition=definition.model_dump(mode="json"),
+            created_by=actor.actor_id,
+        )
+    )
+    await session.flush()
+    return ImportResult(
+        dry_run=False,
+        action=action,
+        agent_key=agent.key,
+        id=agent.id,
+        version=version,
+        definition=definition,
+    )

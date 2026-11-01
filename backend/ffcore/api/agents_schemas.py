@@ -193,3 +193,34 @@ SSE_DESCRIPTION = (
     "Each event has an `id` (resume with Last-Event-ID). A comment line is sent every "
     "SSE_KEEPALIVE_S. The stream ends after done, error, approval_required or question."
 )
+
+
+# --- 06b: agent manifest (export / import) ---
+
+MANIFEST_VERSION = 1
+
+
+class ManifestAgent(Strict):
+    key: str = Field(pattern=KEY_PATTERN, max_length=64)
+    name: str = Field(min_length=1, max_length=200)
+    description: str | None = Field(default=None, max_length=2000)
+    kind: Literal["native", "external"] = "native"
+
+
+class Manifest(Strict):
+    """An agent and one version's definition (C8), portable between installations. Secrets are
+    never part of it (an external agent's endpoint credentials stay where they are)."""
+
+    manifest_version: Literal[1] = MANIFEST_VERSION
+    agent: ManifestAgent
+    version: int | None = Field(default=None, description="The exported version; informative.")
+    definition: dict[str, Any]
+
+
+class ImportResult(BaseModel):
+    dry_run: bool
+    action: Literal["create", "new_version"]
+    agent_key: str
+    id: UUID | None = Field(default=None, description="The agent's id (none for a dry run).")
+    version: int
+    definition: AgentDefinition
