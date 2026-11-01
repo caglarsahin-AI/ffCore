@@ -1,0 +1,37 @@
+ruff check backend scripts data/samples/scripts services
+All checks passed!
+ruff format --check backend scripts data/samples/scripts services
+375 files already formatted
+cd backend && pytest tests/unit tests/contract
+============================= test session starts ==============================
+platform linux -- Python 3.12.10, pytest-9.2.0, pluggy-1.7.0
+rootdir: /work/backend
+configfile: pyproject.toml
+plugins: Faker-40.43.0, anyio-4.15.1, langsmith-0.14.8
+collected 758 items
+
+tests/unit/test_00_1_healthz.py .                                        [  0%]
+tests/unit/test_00_package.py ..                                         [  0%]
+tests/unit/test_00_repo_skeleton.py ...........                          [  1%]
+tests/unit/test_00_smoke_script.py ....                                  [  2%]
+tests/unit/test_01_client.py ..............                              [  4%]
+tests/unit/test_01_config.py ...                                         [  4%]
+tests/unit/test_01_egress_stream.py ..................                   [  6%]
+tests/unit/test_01_r1_safety.py ..............................           [ 10%]
+tests/unit/test_01_reconcile_params.py ................                  [ 13%]
+tests/unit/test_01_scheduler.py .....                                    [ 13%]
+tests/unit/test_01_seed.py .............                                 [ 15%]
+tests/unit/test_02_logging.py ...........                                [ 16%]
+tests/unit/test_02_pricing.py ...                                        [ 17%]
+tests/unit/test_02_r1_logging.py ..............                          [ 19%]
+tests/unit/test_02_r1_tracing.py ...                                     [ 19%]
+tests/unit/test_02_tracing.py .......................                    [ 22%]
+tests/unit/test_03a_providers_service.py .....                           [ 23%]
+tests/unit/test_03a_session.py ........                                  [ 24%]
+tests/unit/test_03a_write_flag.py ....                                   [ 24%]
+tests/unit/test_03b_auth.py .................                            [ 27%]
+tests/unit/test_03b_config_errors.py ........                            [ 28%]
+tests/unit/test_03b_dns_opt_in.py ..                                     [ 28%]
+tests/unit/test_03b_egress.py .......................................... [ 33%]
+............                                                             [ 35%]
+tests/unit/test_04a_convert.py .....................

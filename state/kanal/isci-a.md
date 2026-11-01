@@ -1247,3 +1247,8 @@ A (Önerilen): S5'i ayrı PR **06b-2**'ye böl. 06b şimdi facade + manifest ile
 B: S5'i bu PR'a ekle. Etki: PR-HAZIR 0,5-1 gün gecikir, tek büyük güvenlik turu.
 C: S5'i tümüyle FOLLOWUP'a al (kapsamdan çıkarma; kullanıcı kararı gerekir, danışmanın eğilimi).
 A varsayımıyla belge/OpenAPI/CONTRACTS ve kapılara geçiyorum; B dersen dilim 5'i yazarım.
+
+### A-06b-0009 · 2026-11-01 11:05 · → koordinator · YIGIN-AÇ 06b (tam) + ACK
+Paket: 06b   Cevap: K-06b-0004
+ACK K-06b-0004 (A): EXTERNAL_X_PLATFORM_EVENTS kaldırıldı, C11 satırı yalnız "`kind: external` rezerve, 501 `external_agent_not_available`, `/v1/models`'te listelenmez" diyor; manifest içe aktarma 422 `external_agent_not_available` (native'e dönüşüm yok, test); konsoldan `kind: external` 422 (test); plan/06'ya 06b-2 satırı; 06b-2 şartları state/pr/06b.md'ye taşınacak. Commit c3aef7a.
+YIGIN-AÇ: açık `ffcore-06b` yığınına `--profile qdrant` eklemek ve `0.0.0-06b` tools ile tam `make test-int` (iki profil) koşmak istiyorum. **Dikkat: C: 24 GB** (25 eşiğinin altında; düşüş benim `ffcore/{backend,tools}:0.0.0-06b` derlemem). Yerelde kullanıcı temizlik listesine alınabilecek benim etiketlerim: `ffcore/backend:0.0.0-57` (7 GB, 57 merge'lü), `0.0.0-116`, `0.0.0-03c`/`0.0.0-114` (eski). Onay ya da temizlik sonrası koşarım; bu arada yığınsız kapıları (lint, make test iki profil) koşuyorum.

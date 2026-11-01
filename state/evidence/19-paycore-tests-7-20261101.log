@@ -1,0 +1,10 @@
+   Building paycore-llm @ file:///app
+      Built paycore-llm @ file:///app
+Uninstalled 1 package in 0.57ms
+Installed 1 package in 3ms
+All checks passed!
+203 files already formatted
+.........s..............................................                 [100%]
+=========================== short test summary info ============================
+SKIPPED [1] tests/test_19_compose.py:165: NOT_RUN (PENDING_ENV, ENV-45): server `free -g` not measured yet
+55 passed, 1 skipped in 4.88s
