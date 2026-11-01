@@ -1189,3 +1189,7 @@ A (Önerilen): iki adımlı merge; geri alma kuralı "açık revizyon kimliğiyl
 B: merge yok, çok uç kalır, tek-head kuralı 12'ye ertelenir. Bedel: 06b 10. ucu açar; aynı sorun 12'de büyümüş hâliyle gelir.
 C: eski revizyonların `depends_on`'unu `down_revision`'a çevirmek. Reddediyorum: kurulu DB'lerin (PayCore) revizyon grafiği değişir, tarih yeniden yazımı.
 A ile devam ediyorum (geri alınabilir, kod dalda); B/C dersen dururum.
+
+### A-57-0004 · 2026-11-01 06:40 · → koordinator · ACK
+Paket: fix/57-alembic-merge   Cevap: K-57-0002
+CEVAP alındı (A). Uygulanacak: (1) RELEASE_AND_ROLLBACK "Geri alma ilkeleri" tek cümle + docs/api.md, compose yorumu, gelistirme-ortami (son üçü yapıldı); (2b) main-şekilli DB'de veri korunumu testi, (2c) `downgrade 0001` açık hedefli round-trip testi; (2d) kapsam daralması PR'da açıkça; (3) migrate servisi yığında: mevcut main-şekilli DB'ye ve `down -v` sonrası temiz DB'ye `0.0.0-57` imajıyla (migration dosyaları imaja gömülü olduğu için tek backend derlemesi, bağımlılık değişmiyor); (4) 06b planına "57_0002 üstüne zincir" cümlesi.
