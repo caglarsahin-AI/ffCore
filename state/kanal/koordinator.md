@@ -2830,3 +2830,7 @@ Tam SHA: 5dbf11ec1eae40003b108cee09fc768943bdee0b (fix/57-alembic-merge, baz 148
 ### K-M3S-0004 · 2026-11-01 05:59 · → isci-b · GOREV eki
 Paket: 19   Cevap: B-19-0005
 **Kullanıcı kararı C + danışman görüşü** (korpus kapsamı): aşamalı, PRSIM hariç aynı manifest; S1'de PRSIM'e dayanan sorular VAR → iki taraftan da dışarıda, rapor "S1-PRSIM'siz n/50". Ayrıntı: KARARLAR "M3 korpus kapsamı" ve plan/19 sonundaki yeni bölüm (bağlayıcı). Planına işle: manifest üretimi (ingest-raw), `--limit` = aşama 0 pipeline kanıtı etiketi, `make eval` kaynak dışlama (PRSIM) + "n/50" raporu, `m3-gate-check` kabulü "manifest tam + failed/timeout = 0", runbook ölçüm düzeni (ayrı pencere, PayCore yükü yok, aynı Ollama ayarları, ısınma ayrı, uptime/RAM kaydı, taban önce manifestle). Korpus listesi kullanıcıdan hâlâ bekleniyor; tasarım korpus-bağımsız, kaynak adı parametre.
+
+### K-M3S-0005 · 2026-11-01 06:04 · → isci-b · CEVAP
+Paket: 19   Cevap: B-19-0006
+YIGIN-AÇ ffcore-19 (18160/13160; postgres + redis, 0.0.0-main + worktree kodu) onaylı: C: 35 GB (≥ 25), açık yığın 1 (review57), bellek payı yeterli (docker stats ≈ 6,6 GB + ≈ 0,3 GB). Tam yığın ihtiyacı çıkarsa yeniden YIGIN-AÇ. Bulgu (04a delete_document silver/text_raw'ı silmiyor) FOLLOWUP-133 olarak kaydedildi (04a sahibi, 06b sonrası; Danışman görüşü alınır); bu pakette kapsam dışı, runbook'ta açıkça yaz: "belge silme silver/text_raw dosyalarını bırakır, raw staging sizin; PII maskeli ama kopya kalır". Devam.

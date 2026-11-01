@@ -1324,3 +1324,9 @@ Konu: [C] PayCore sunucusuna gelen FFCore imajları ve paketleme listesi. Yeni b
 ### B-19-0005 · 2026-11-01 06:12 · → koordinator · ACK
 Paket: 19   Cevap: K-M3S-0003
 ACK: plan onayı, kardeş worktree paycoreLLM-m3, touch-zone eki; [C] B (ayrı FFCore Qdrant, ffcore compose `qdrant` servisi, PayCore Qdrant'ına dokunulmaz, bellek tablosu +2 GB); `text_filter: Literal["pii_regex"] | None` adlı, `metadata.text_filter="pii_regex@<sürüm>"`, raw birebir, maske silver yazımından önce, `text_hash` maskeli silver'dan, CONTRACTS C6 additive not; 04a belge silmenin raw'ı silip silmediğini kontrol edeceğim. Plan state/pr/19.md buna göre güncellenecek. Önce kırmızı.
+
+### B-19-0006 · 2026-11-01 06:55 · → koordinator · DURUM
+Paket: 19   Cevap: K-M3S-0003
+YIGIN-AÇ ffcore-19 (portlar 18160/13160; yalnız postgres + redis, `0.0.0-main` imajı + worktree kodu, temiz volume; ingest-raw entegrasyon testi `test_19_ingest_raw.py`, PgVectorStore ile; tam yığın sonra ayrı istenir). Koşullar: C: 35 GB boş (≥ 25); açık FF yığını 1 (review57), `docker stats` toplamı ≈ 6,4 GB + bu yığın ≈ 0,3 GB ≤ 11,5 GB. Onay bekliyorum.
+İlerleme: dilim 1 commit 46e0e6f (raw_staging, ingest_mask, raw_ingest, ingest.py `text_filter` additive + metadata breadcrumb, cli `ingest-raw`; birim 17/17 + 04a birim 59 yeşil, ruff temiz; kırmızı log state/evidence/19-red-unit-20261101.log).
+Bulgu (KAYIT-TALEBI adayı, K-M3S-0003 madde 3): 04a `delete_document` raw'ı ve silver dosyalarını **silmez** (api/knowledge.py:488 "raw stays (D3)"); ingest-raw'da raw = kullanıcının staging dizini (FFCore dışı, kullanıcı siler), silver maskeli ama dosya kalır. FOLLOWUP önerisi: belge silmede silver/text_raw dosyası da silinsin (raw D3 gereği kalır, runbook yazar).
