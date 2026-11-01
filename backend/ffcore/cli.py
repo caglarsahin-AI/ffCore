@@ -152,7 +152,8 @@ def build_parser() -> argparse.ArgumentParser:
         "ingest-raw",
         help="ingest a raw-staging tree (file + <file>.meta.json) into a knowledge base (19)",
         description="PII regex masking is always applied to silver and gold; raw is never "
-        "written. PRSIM is refused until 08 full (prsim_requires_ner).",
+        "written. PRSIM is refused until 08 full (prsim_requires_ner) unless "
+        "--accept-personnel-data (M3 measurement only, KARARLAR).",
     )
     raw.add_argument("--project", required=True, help="project key")
     raw.add_argument("--kb", required=True, help="knowledge base key")
@@ -168,6 +169,12 @@ def build_parser() -> argparse.ArgumentParser:
         type=int,
         default=None,
         help="first N accepted files only (stage 0: pipeline evidence, not an acceptance corpus)",
+    )
+    raw.add_argument(
+        "--accept-personnel-data",
+        action="store_true",
+        default=False,
+        help="M3 measurement only: accept PRSIM (staff data); stops on customer data",
     )
     raw.add_argument(
         "--manifest-out",
@@ -186,7 +193,9 @@ def main(argv: list[str] | None = None) -> int:
         from ffcore.knowledge import raw_staging
 
         try:
-            raw_staging.check_sources(args.sources)
+            raw_staging.check_sources(
+                args.sources, accept_personnel_data=args.accept_personnel_data
+            )
         except raw_staging.StagingError as exc:
             print(f"error: {exc}", file=sys.stderr)
             return 2
@@ -252,6 +261,7 @@ def main(argv: list[str] | None = None) -> int:
                         sources=args.sources,
                         limit=args.limit,
                         settings=get_settings(),
+                        accept_personnel_data=args.accept_personnel_data,
                     )
                 )
             except (raw_ingest.RawIngestError, raw_ingest.raw_staging.StagingError) as exc:

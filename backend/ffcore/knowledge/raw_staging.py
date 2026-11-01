@@ -9,8 +9,10 @@ ignored, never copied: a mapper that leaks an author field still does not reach 
 Boundary (plan/19 Güvenlik şartları 1-2): every path must resolve inside `--raw-dir` with no
 symlink on the way (`path_outside_base`); a file over Kapı 0's size limit is refused before it is
 read (`too_large`); PRSIM is refused until 08 full brings name recognition (`prsim_requires_ner`,
-KARARLAR karar 5). Nothing is written under the tree. Each refusal is a `Rejected` with a code
-and the relative path, never the content.
+KARARLAR karar 5), except with the explicit `accept_personnel_data` of the M3 measurement
+(KARARLAR "PRSIM M3 ölçümüne girer": PayCore server, airgap, staff data only). Nothing is
+written under the tree. Each refusal is a `Rejected` with a code and the relative path, never the
+content.
 """
 
 import json
@@ -38,6 +40,7 @@ class StagedItem:
     relpath: str
     meta: dict
     attachments: list[str] = field(default_factory=list)
+    personnel_data: bool = False  # PRSIM accepted with the M3 flag
 
 
 @dataclass(frozen=True)
@@ -54,13 +57,14 @@ def _is_prsim(source: str) -> bool:
     return "prsim" in _norm(source).lower().split(":")
 
 
-def check_sources(sources: Iterable[str]) -> list[str]:
-    """The explicit source list, PRSIM refused (KARARLAR karar 5; plan/19 şart 1)."""
+def check_sources(sources: Iterable[str], *, accept_personnel_data: bool = False) -> list[str]:
+    """The explicit source list; PRSIM refused unless `accept_personnel_data` (KARARLAR karar 5
+    and its M3 exception)."""
     chosen = [_norm(s) for s in sources if _norm(s)]
     if not chosen:
         raise StagingError("sources_required", "name the sources to ingest (--sources)")
     for source in chosen:
-        if _is_prsim(source):
+        if _is_prsim(source) and not accept_personnel_data:
             raise StagingError(
                 "prsim_requires_ner",
                 f"{source} carries person data; it is ingested once 08 full recognizes names",
@@ -98,11 +102,15 @@ def _meta(path: Path) -> dict | str:
 
 
 def iter_staged(
-    raw_dir: Path, sources: Iterable[str], *, limit: int | None = None
+    raw_dir: Path,
+    sources: Iterable[str],
+    *,
+    limit: int | None = None,
+    accept_personnel_data: bool = False,
 ) -> Iterator[StagedItem | Rejected]:
     """Documents under `raw_dir` in path order, with every refusal on the way. `limit` counts
     accepted documents only (the first small slice, plan/19 madde 3)."""
-    selected = set(check_sources(sources))
+    selected = set(check_sources(sources, accept_personnel_data=accept_personnel_data))
     base = Path(os.path.realpath(raw_dir))
     if not base.is_dir():
         raise StagingError("raw_dir_missing", f"{raw_dir} is not a directory")
@@ -137,7 +145,7 @@ def iter_staged(
                 yield Rejected(rel, meta)
                 continue
             source = _norm(str(meta["source"]))
-            if _is_prsim(source):
+            if _is_prsim(source) and not accept_personnel_data:
                 yield Rejected(rel, "prsim_requires_ner")
                 continue
             if source not in selected:
@@ -163,7 +171,11 @@ def iter_staged(
                 return
             accepted += 1
             yield StagedItem(
-                path=path, relpath=Path(rel).as_posix(), meta=meta, attachments=list(attachments)
+                path=path,
+                relpath=Path(rel).as_posix(),
+                meta=meta,
+                attachments=list(attachments),
+                personnel_data=_is_prsim(source),
             )
 
 

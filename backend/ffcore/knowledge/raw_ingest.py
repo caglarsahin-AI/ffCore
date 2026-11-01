@@ -12,6 +12,12 @@ The corpus manifest (KARARLAR "M3 korpus kapsamı") fixes what was measured: per
 and chunks, current statuses from the database (a re-run counts earlier failures too), the ingest
 time and `raw_manifest_sha256` over the sorted `<relpath> <sha256>` lines of the accepted files.
 A `--limit` run is `stage0-pipeline-evidence`, never an acceptance corpus.
+
+Personnel-data sources (PRSIM, only with `--accept-personnel-data`, KARARLAR "PRSIM M3 ölçümüne
+girer") hold staff data, never customer or card holder data. A card number, IBAN or national id
+found in one is taken as customer data: the ingest stops (`customer_data_suspected`, the path,
+never the value) and the decision goes back to the user. The staged text is checked before the
+document is registered; the masking counts after conversion cover its attachments.
 """
 
 import hashlib
@@ -33,6 +39,7 @@ from ffcore.models.identity import Project
 from ffcore.models.knowledge import Chunk, Document, KnowledgeBase
 
 TEXT_FILTER = "pii_regex"
+CUSTOMER_DATA = ("CREDIT_CARD", "TR_IBAN", "TR_NATIONAL_ID")
 log = logging.getLogger("ffcore.knowledge.raw_ingest")
 
 
@@ -55,6 +62,7 @@ class RawIngestReport:
     files: list[tuple[str, str, str]] = field(default_factory=list)
     current: dict[str, tuple[str, int]] = field(default_factory=dict)
     ingested_at: str = ""
+    personnel_data_sources: set[str] = field(default_factory=set)
 
     def manifest(self) -> dict:
         sources: dict[str, dict[str, int]] = {}
@@ -75,6 +83,7 @@ class RawIngestReport:
             "failed": statuses["failed"],
             "timeout": statuses["timeout"],
             "rejected": dict(sorted(self.rejected.items())),
+            "personnel_data_sources": sorted(self.personnel_data_sources),
             "raw_manifest_sha256": hashlib.sha256(listing.encode()).hexdigest(),
         }
 
@@ -156,6 +165,26 @@ async def _fill_current(report: RawIngestReport, kb_id) -> None:
         report.current = {name: (status, count) for name, status, count in rows}
 
 
+def _text_findings(path: Path) -> dict[str, int]:
+    """Regex PII counts of a staged text file (Markdown/plain); other formats are checked on
+    their converted text after ingest."""
+    if path.suffix.lower() not in (".md", ".txt"):
+        return {}
+    text = path.read_text(encoding="utf-8", errors="strict")
+    return dict(ingest_mask.resolve(TEXT_FILTER).apply(text)[1])
+
+
+def _stop_on_customer_data(relpath: str, counts: dict) -> None:
+    found = {k: counts[k] for k in CUSTOMER_DATA if counts.get(k)}
+    if found:
+        log.error("ingest-raw stopped path=%s customer_data=%s", relpath, sorted(found))
+        raise RawIngestError(
+            "customer_data_suspected",
+            f"{relpath}: {', '.join(f'{k} {v}' for k, v in sorted(found.items()))} in a "
+            "personnel-data source; ingest stopped, the decision goes back to the user",
+        )
+
+
 def _sha256(path: Path) -> str:
     digest = hashlib.sha256()
     with path.open("rb") as fh:
@@ -175,8 +204,10 @@ async def ingest_tree(
     settings: Settings,
     embed_client: ingest.EmbedClient | None = None,
     convert: ingest.Converter = ingest.convert_bounded,
+    accept_personnel_data: bool = False,
 ) -> RawIngestReport:
-    raw_staging.check_sources(sources)  # before any database or model work
+    # before any database or model work
+    raw_staging.check_sources(sources, accept_personnel_data=accept_personnel_data)
     if not acl_roles:
         raise RawIngestError("acl_required", "name the roles that may read these documents")
     kb = await _kb(project_key, kb_key)
@@ -186,11 +217,17 @@ async def ingest_tree(
         stage="full" if limit is None else "stage0-pipeline-evidence",
         ingested_at=datetime.now(UTC).isoformat(timespec="seconds"),
     )
-    for entry in raw_staging.iter_staged(raw_dir, sources, limit=limit):
+    entries = raw_staging.iter_staged(
+        raw_dir, sources, limit=limit, accept_personnel_data=accept_personnel_data
+    )
+    for entry in entries:
         if isinstance(entry, raw_staging.Rejected):
             report.rejected[entry.code] += 1
             log.warning("ingest-raw rejected path=%s code=%s", entry.relpath, entry.code)
             continue
+        if entry.personnel_data:
+            report.personnel_data_sources.add(raw_staging.source_of(entry))
+            _stop_on_customer_data(entry.relpath, _text_findings(entry.path))
         sha256 = _sha256(entry.path)
         report.files.append((entry.relpath, sha256, raw_staging.source_of(entry)))
         existed = await _current(kb.id, entry.relpath)
@@ -221,6 +258,9 @@ async def ingest_tree(
                     # The reason's code only: `duplicate_of:<id>` keeps no document id here.
                     reason = str(getattr(document, f"{gate}_reason")).split(":", 1)[0]
                     report.gates[f"{gate}:{reason}"] += 1
-            report.masked.update((document.meta or {}).get("text_filter_counts") or {})
+            counts = (document.meta or {}).get("text_filter_counts") or {}
+            report.masked.update(counts)
+        if entry.personnel_data:
+            _stop_on_customer_data(entry.relpath, counts)
     await _fill_current(report, kb.id)
     return report

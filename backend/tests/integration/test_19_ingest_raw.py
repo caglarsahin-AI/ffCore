@@ -6,9 +6,11 @@ write nothing under it. Raw bytes are unchanged; silver, text_raw and chunks are
 
 import asyncio
 import hashlib
+import json
 import os
 import shutil
 import stat
+import uuid
 from pathlib import Path
 
 import pytest
@@ -200,3 +202,67 @@ def test_19_1_manifest_written_outside_raw_dir_only(world, pg, settings, ro_tree
     with pytest.raises(raw_ingest.RawIngestError) as err:
         raw_ingest.write_manifest(report, ro_tree / "manifest.json", raw_dir=ro_tree)
     assert err.value.code == "manifest_inside_raw_dir"
+
+
+# --- PRSIM with --accept-personnel-data; customer data stops the ingest ---
+
+
+def _prsim_tree(tmp_path, body):
+    tree = tmp_path / "prsim"
+    path = tree / "jira" / "PRSIM" / "PRSIM-1" / "PRSIM-1.md"
+    path.parent.mkdir(parents=True)
+    path.write_text(body, encoding="utf-8")
+    meta = {"source": "jira:PRSIM", "source_item_id": "jira:PRSIM-1", "title": "PRSIM-1"}
+    Path(f"{path}.meta.json").write_text(json.dumps(meta), encoding="utf-8")
+    return tree
+
+
+PRSIM_BODY = (
+    "# PRSIM-1 Yetki talebi\n\nBu talep, personelin raporlama uygulamasına erişebilmesi için "
+    "açıldı ve bir gün içinde değerlendirildi. Yetki rolü tanımlandı, erişim test ortamında "
+    "doğrulandı ve sonuç talep kaydına yazıldı. İletişim destek@example.test adresinden yapıldı; "
+    "talep, kullanıcı onayından sonra kapatıldı ve ilgili ekip bilgilendirildi.\n"
+)
+
+
+def _ingest_prsim(settings, pg, world, kb_key, tree, accept):
+    return asyncio.run(
+        raw_ingest.ingest_tree(
+            project_key=_project_key(pg, world["project"]),
+            kb_key=kb_key,
+            raw_dir=tree,
+            acl_roles=["analyst"],
+            sources=["jira:PRSIM"],
+            limit=None,
+            settings=settings,
+            embed_client=ingest.LocalEmbedClient(settings),
+            convert=convert_without_weights,
+            accept_personnel_data=accept,
+        )
+    )
+
+
+def test_19_s1_prsim_ingest_with_flag_masks_and_records(world, pg, settings, tmp_path):
+    kb = create_kb(world, key="prsim")
+    tree = _prsim_tree(tmp_path, PRSIM_BODY)
+    with pytest.raises(raw_ingest.raw_staging.StagingError):
+        _ingest_prsim(settings, pg, world, kb["key"], tree, accept=False)
+    report = _ingest_prsim(settings, pg, world, kb["key"], tree, accept=True)
+    assert report.outcomes == {"created": 1} and report.masked == {"EMAIL_ADDRESS": 1}
+    assert report.manifest()["personnel_data_sources"] == ["jira:PRSIM"]
+    text = " ".join(
+        r[0] for r in pg.execute("SELECT text FROM chunks WHERE kb_id = %s", (kb["id"],))
+    )
+    assert "destek@example.test" not in text and "[EMAIL_ADDRESS]" in text
+
+
+@pytest.mark.parametrize(
+    "value", ["kart 4111 1111 1111 1111", "TC 10000000146", "IBAN TR33 0006 1005 1978 6457 8413 26"]
+)
+def test_19_s1_customer_data_in_personnel_source_stops(world, pg, settings, tmp_path, value):
+    kb = create_kb(world, key=f"prsim-{uuid.uuid4().hex[:6]}")
+    tree = _prsim_tree(tmp_path, PRSIM_BODY + f"\nNot: {value}\n")
+    with pytest.raises(raw_ingest.RawIngestError) as err:
+        _ingest_prsim(settings, pg, world, kb["key"], tree, accept=True)
+    assert err.value.code == "customer_data_suspected"
+    assert "PRSIM-1" in str(err.value) and "4111" not in str(err.value)

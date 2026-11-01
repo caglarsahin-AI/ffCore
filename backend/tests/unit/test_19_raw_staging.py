@@ -212,3 +212,27 @@ def test_19_s2_metadata_for_ingest(tmp_path):
         "attachments": [],
     }
     assert item.path == path.resolve()
+
+
+# --- PRSIM in M3 (KARARLAR "PRSIM M3 ölçümüne girer", K-M3S-0008): explicit flag only ---
+
+
+def test_19_s1_prsim_accepted_only_with_the_flag():
+    assert raw_staging.check_sources(["jira:PRSIM"], accept_personnel_data=True) == ["jira:PRSIM"]
+    with pytest.raises(StagingError):
+        raw_staging.check_sources(["jira:PRSIM"])
+
+
+def test_19_s1_prsim_meta_needs_the_flag_too(tmp_path):
+    _stage(tmp_path, "jira/PRSIM/PRSIM-1.md", source="jira:PRSIM")
+    flagged = list(raw_staging.iter_staged(tmp_path, ["jira:PRSIM"], accept_personnel_data=True))
+    assert [i.relpath for i in _items(flagged)] == ["jira/PRSIM/PRSIM-1.md"]
+    assert _items(flagged)[0].personnel_data is True
+    plain = list(raw_staging.iter_staged(tmp_path, ["confluence:DEMO"]))
+    assert _codes(plain) == {"prsim_requires_ner": 1}
+
+
+def test_19_s1_cli_flag_is_named_and_explicit():
+    sub = cli.build_parser()._subparsers._group_actions[0].choices["ingest-raw"]
+    flag = next(a for a in sub._actions if "--accept-personnel-data" in a.option_strings)
+    assert flag.default is False and flag.const is True
