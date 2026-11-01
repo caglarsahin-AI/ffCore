@@ -1,0 +1,28 @@
+== main-shaped DB, before
+03c_0002,04a_0001,05a_0001,08_0001
+38
+2
+== migrate service, image 0.0.0-57
+ Container ffcore-57-postgres-1  Running
+INFO  [alembic.runtime.migration] Running upgrade 03a_0001, 03b_0001, 06a_0002, 07_0001 -> 57_0001, join the heads that other branches depend on (FOLLOWUP-57/132, step 1 of 2)
+INFO  [alembic.runtime.migration] Running upgrade 57_0001, 03c_0002, 04a_0001, 05a_0001, 08_0001 -> 57_0002, merge the package branch heads into one head (FOLLOWUP-57/132, step 2 of 2)
+model catalog: 2 entries, 0 removed
+checkpointer tables ready in schema checkpoints
+migrate exit 0
+== after
+57_0002
+38
+Merge sentinel
+2
+== migrate again (idempotent)
+exit 0
+57_0002
+
+== down -v (whole ffcore-57 stack)
+ Volume ffcore-57_langfuse_clickhouse_logs  Removed
+ Container ffcore-57-postgres-1  Healthy
+== clean DB, migrate service, image 0.0.0-57
+13
+migrate exit 0
+57_0002
+38

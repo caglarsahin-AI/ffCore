@@ -72,4 +72,15 @@ tests/integration/test_07f_sql_context_roles.py ..                       [ 94%]
 tests/integration/test_08_api.py ................                        [ 96%]
 tests/integration/test_116_checkpoint_sources.py ..........              [ 97%]
 tests/integration/test_18td_tools_api.py ...                             [ 98%]
-tests/integration/test_57_alembic_merge.py .
+tests/integration/test_57_alembic_merge.py ......                        [ 99%]
+tests/integration/test_af_2b_deleted_source_breadcrumb.py ..             [ 99%]
+tests/integration/test_af_3_updated_at_source.py ...                     [100%]
+
+=============================== warnings summary ===============================
+tests/integration/test_04a_worker.py::test_04a_upload_job_runs_in_worker
+tests/integration/test_04a_worker.py::test_04a_job_for_missing_row_retries_then_fails_loud
+  /opt/venv/lib/python3.12/site-packages/arq/worker.py:877: DeprecationWarning: Call to deprecated close. (Use aclose() instead) -- Deprecated since version 5.0.1.
+    await self.pool.close(close_connection_pool=True)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+============ 677 passed, 4 skipped, 2 warnings in 660.05s (0:11:00) ============

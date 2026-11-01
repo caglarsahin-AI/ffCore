@@ -1,0 +1,6 @@
+ruff check backend scripts data/samples/scripts services
+All checks passed!
+ruff format --check backend scripts data/samples/scripts services
+359 files already formatted
+..........                                                               [100%]
+10 passed in 55.59s

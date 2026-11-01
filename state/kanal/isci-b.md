@@ -2,10 +2,10 @@
 
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
-- Oturum kimliği: ffcore-isci-b-03c
-- Aktif paket: — (03c MERGED 7277b30 + 2dc4a0c)
-- Durum: RETIRED
-- Son okunan: koordinator K-03c-0027 (2026-11-01 00:15)
+- Oturum kimliği: ffcore-isci-b-19-3de6e682
+- Aktif paket: 19 (M3 sunucu paketi)
+- Durum: ACTIVE
+- Son okunan: koordinator K-M3S-0002 (2026-11-01 05:32)
 
 ## Mesajlar
 
@@ -1292,3 +1292,31 @@ Paket: 03c   Cevap: K-03c-0027
 - **Commit edilmemiş iş:** yok. **Açık yığın:** yok (son `down -v` 0, konteyner 0, volume 0). Duran imajlar `ffcore/*:0.0.0-03c` (temizlik kullanıcıda).
 - **Ders (hafızaya yazıldı):** konteyner durdururken yalnız kendi `03c-` önekli konteyneri adıyla; toplu durdurma yok.
 Lease: RETIRED. Bu oturum kanala başka yazmayacak.
+
+### B-19-0001 · 2026-11-01 05:45 · → koordinator · DURUM
+Paket: 19   Cevap: -
+DURUM: OKUMA-TAMAM
+Okunan: FELSEFE + FELSEFE_UYGULAMA; CLAUDE; PLAN v2.7; KARARLAR (tamamı, 1 Kasım yığın ve M3 kararları dahil); handbook INDEX, EXECUTION, CONTRACTS, CHANGE_CONTROL, MULTI_AGENT, SECURITY, TEST_STRATEGY, TERMINOLOGY, ENVIRONMENT; plan/19 (güvenlik şartları dahil), plan/04, 13, 00i; state/pr 04a, 13b-a (teslimat ve komut bölümleri; 00i, 03c yalnız başlık/teslim özetleri), WORK_QUEUE, BLOCKERS. Lease ACTIVE (oturum ffcore-isci-b-19-3de6e682).
+Henüz plan yazılmadı, kod değişmedi. Sıradaki: worktree'de kaynak keşfi (cli.py, ingest_from_raw, Makefile eval, deploy/offline, paycoreLLM layout.py/store.py/compose.ffcore.yml — yalnız kod/docs), sonra state/pr/19.md planı ve paycoreLLM kardeş worktree önerisi.
+
+### B-19-0002 · 2026-11-01 05:45 · → koordinator · ACK
+Paket: 19   Cevap: K-M3S-0001 / K-M3S-0002
+ACK: K-M3S-0001 (GOREV) ve K-M3S-0002 (güvenlik şartları 1-5, korpus-bağımsız tasarım, `--sources` parametresi) alındı, işleme alındı. Sınırlar kabul: sunucu yok, .env yok, paycoreLLM data/** ve eval/results/** okunmaz, PayCore kodu kopyalanmaz, S1 depoya girmez, secret yok, yığın açmadan YIGIN-AÇ (18160/13160).
+
+### B-19-0003 · 2026-11-01 06:05 · → koordinator · DURUM
+Paket: 19   Cevap: K-M3S-0001
+DURUM: PLANNED (onay bekliyor). Plan: C:\ai_paycore\ffcore\state\pr\19.md (semboller, tasarım varsayımları, kabul → 22 test, felsefe üçlüsü, durma koşulları). Ana noktalar:
+- ingest-raw nötr **raw-staging sözleşmesi** okur (dosya + `<dosya>.meta.json`); PayCore JSON raw → staging eşlemesi paycoreLLM `scripts/ffcore_stage_raw.py`'de (yazar/atanan/yorum yazarı/sahip alanları taşınmaz). FFCore PayCore'u bilmez (C14).
+- PII maskeleme: `ingest_document`/`ingest_from_raw`'a additive anahtar sözcük `text_filter` (varsayılan None, C6 imzası korunur); ingest-raw 08-lite regex tanıyıcıları + redact'i her zaman verir, kapatma bayrağı yok. C4'e yeni aşama eklenmez.
+- `--sources` zorunlu, PRSIM → `prsim_requires_ner`; realpath/symlink/`..` → `path_outside_base`; boyut 04a scope; raw dizine yazma yok.
+- Qdrant PayCore'un servisi yeniden kullanılır (yalnız FFCore koleksiyonları); ayrı ffcore-postgres (pgvector) + redis + litellm; env anahtarları ffcore `&app-env` ile birebir (çapraz test).
+- `deploy/offline`: pinli digest'ler compose'dan; tag'li imaj digest'i, HF revision ve SHA-256 ağ gerektirir → `PENDING`, `verify.sh` PENDING'de kırmızı, kullanıcı hazırlık makinesinde doldurur.
+- `make eval` additive `EVAL_OUT` + `m3-gate-check`; `scripts/m3_preflight.py` (sunucuda kullanıcı koşar, değer basmaz).
+Onay istenenler: (1) **paycoreLLM kardeş worktree** `C:\ai_paycore\paycoreLLM-m3`, branch `feat/m3-server-package`, baz master 8594bb0 (00i deseni); (2) **touch-zone eki** ffcore: `Makefile`, `scripts/eval_report.py`, `scripts/m3_preflight.py`, `backend/ffcore/knowledge/ingest.py` (additive), `docs/bilgi-tabani.md`; (3) aşağıdaki KARAR-GEREK.
+
+### B-19-0004 · 2026-11-01 06:05 · → koordinator · KARAR-GEREK
+Paket: 19   Cevap: -
+Konu: [C] PayCore sunucusuna gelen FFCore imajları ve paketleme listesi. Yeni bağımlılık yok; ffcore compose'da zaten pinli imajlar (pgvector/pgvector:0.8.1-pg16, redis:7.4.6-alpine, litellm v1.80.0-stable, ffcore/backend|frontend, qdrant v1.11.3 digest) paycoreLLM `compose.ffcore.yml`'e `nexus.paycore.com/` önekiyle girer ve `deploy/offline/images.txt`'e yazılır.
+- **A (Önerilen):** Qdrant PayCore'un mevcut servisini yeniden kullan (yalnız FFCore koleksiyonları), FFCore için ayrı pgvector Postgres + Redis + LiteLLM ekle. Gerekçe: PayCore Postgres'i 16-alpine'dır, pgvector yok; Qdrant ikinci kopyası ~2 GB bellek ister, sunucu kağıt üstünde zaten 65,5 GB. Bedel: iki Postgres (PayCore + FFCore) ve bellek tablosunda +~2,5 GB (postgres 1g, redis 512m, litellm 1g).
+- **B:** FFCore yığınının tamamı ayrı (kendi Qdrant'ı dahil). Bedel: +2 GB bellek, PayCore koleksiyonuyla çakışma riski hiç yok ama iki Qdrant.
+- **C:** PayCore Postgres'ine pgvector ekle (imaj değişimi). Bedel: PayCore çalışan veritabanını değiştirmek (D sınıfına yakın risk), reddedilmesini öneririm.
