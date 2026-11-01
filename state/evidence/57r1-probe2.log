@@ -1,0 +1,8 @@
+0
+start (['57_0002'], ('approvals', 'knowledge_bases', 'retention_runs', 'api_keys'))
+TARGET 07_0001@-1 rc 255 ERROR [alembic.util.messaging] Ambiguous walk (['57_0002'], ('approvals', 'knowledge_bases', 'retention_runs', 'api_keys'))
+TARGET 07@-1 rc 255 ERROR [alembic.util.messaging] Ambiguous walk (['57_0002'], ('approvals', 'knowledge_bases', 'retention_runs', 'api_keys'))
+TARGET 57_0001,03c_0002,04a_0001,05a_0001,08_0001 rc 255 ERROR [alembic.util.messaging] Can't locate revision identified by '57_0001,03c_0002,04a_0001,05a_0001,08_0001' (['57_0002'], ('approvals', 'knowledge_bases', 'retention_runs', 'api_keys'))
+TARGET 03a_0001+0 rc 0 INFO  [alembic.runtime.migration] Running downgrade 57_0001 -> 03a_0001, 03b_0001, 06a_0002, 07_0001, join the heads that other branches dep (['03c_0002', '04a_0001', '05a_0001', '08_0001'], ('approvals', 'knowledge_bases', 'retention_runs', 'api_keys'))
+UP 0 (['57_0002'], ('approvals', 'knowledge_bases', 'retention_runs', 'api_keys'))
+TARGET 57_0002-1 rc 255 ERROR [alembic.util.messaging] Ambiguous walk (['57_0002'], ('approvals', 'knowledge_bases', 'retention_runs', 'api_keys'))

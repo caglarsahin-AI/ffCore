@@ -1,0 +1,36 @@
+PASS S1 empty upgrade head -> {'57_0002'}
+PASS S1 alembic heads one line: ['57_0002 (07, 05a, 03a, 06a, 08, 04a, 03b, 03c) (head)']
+PASS S1 idempotent upgrade heads x2
+PASS S1b empty upgrade heads == head, same schema
+PASS S2 pre-merge main rows: {'03c_0002', '08_0001', '04a_0001', '05a_0001'}
+PASS S2 main-shaped upgrade head -> {'57_0002'}
+PASS S2 data kept (projects)
+PASS S2 data kept (retention_runs)
+PASS S2 schema identical: main ('f46e7c7875243cc0', 493) new-empty ('f46e7c7875243cc0', 493) upgraded ('f46e7c7875243cc0', 493)
+PASS S2 migrate-service idempotent
+PASS S2b main-shaped upgrade heads -> 57_0002
+PASS S3 downgrade 57_0001 -> {'57_0001', '08_0001', '05a_0001', '04a_0001', '03c_0002'}
+PASS S3 downgrade 06a_0001 removed 06a_0002 column
+PASS S3 03c_0002 (dependant) rolled back too
+PASS S3 projects data kept
+S3 versions after 06a_0001: ['03c_0001', '04a_0001', '05a_0001', '07_0001', '08_0001']
+PASS S3 re-upgrade restores schema
+PASS S3 downgrade 0001
+PASS S3 round trip from 0001 restores schema
+PASS S4 downgrade -1 refused (rc=255) and nothing moved: ERROR [alembic.util.messaging] Ambiguous walk
+PASS S4 downgrade 06a@-1 refused (rc=255) and nothing moved: ERROR [alembic.util.messaging] Ambiguous walk
+PASS S4 downgrade 03a@-1 refused (rc=255) and nothing moved: ERROR [alembic.util.messaging] Ambiguous walk
+PASS S4 downgrade 03c@-1 refused (rc=255) and nothing moved: ERROR [alembic.util.messaging] Ambiguous walk
+PASS /tmp/newcopy alembic upgrade head exit 0
+PASS S5 new revision on single head: {'zz_0001'}
+PASS S5 still one head: ['zz_0001 (03a, 05a, 07, 03c, 08, 06a, zz, 03b, 04a) (head)']
+PASS /tmp/newcopy alembic downgrade -1 exit 0
+PASS S5 downgrade -1 on non-merge revision: {'57_0002'}
+PASS /tmp/newcopy alembic upgrade heads exit 0
+PASS /tmp/newcopy alembic downgrade zz@-1 exit 0
+PASS S5 downgrade zz@-1
+S6 versions before: ['04a_0001', '05a_0001']
+PASS S6 partial install -> head, same schema: {'57_0002'}
+PASS S7 57_0001_join_dependency_heads.py has no operations
+PASS S7 57_0002_merge_heads.py has no operations
+FAILS: []

@@ -1,0 +1,33 @@
+ Network ffcore-19_default  Creating
+ Network ffcore-19_default  Created
+ Volume "ffcore-19_langfuse_clickhouse_logs"  Creating
+ Volume "ffcore-19_langfuse_clickhouse_logs"  Created
+ Volume "ffcore-19_model_cache"  Creating
+ Volume "ffcore-19_model_cache"  Created
+ Volume "ffcore-19_knowledge_storage"  Creating
+ Volume "ffcore-19_knowledge_storage"  Created
+ Volume "ffcore-19_langfuse_postgres_data"  Creating
+ Volume "ffcore-19_langfuse_postgres_data"  Created
+ Volume "ffcore-19_langfuse_minio_data"  Creating
+ Volume "ffcore-19_langfuse_minio_data"  Created
+ Volume "ffcore-19_postgres_data"  Creating
+ Volume "ffcore-19_postgres_data"  Created
+ Volume "ffcore-19_redis_data"  Creating
+ Volume "ffcore-19_redis_data"  Created
+ Volume "ffcore-19_langfuse_clickhouse_data"  Creating
+ Volume "ffcore-19_langfuse_clickhouse_data"  Created
+==================================== ERRORS ====================================
+______________ ERROR collecting tests/unit/test_19_raw_staging.py ______________
+ImportError while importing test module '/work/backend/tests/unit/test_19_raw_staging.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/local/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/unit/test_19_raw_staging.py:14: in <module>
+    from ffcore.knowledge import ingest_mask, raw_staging
+E   ImportError: cannot import name 'ingest_mask' from 'ffcore.knowledge' (/work/backend/ffcore/knowledge/__init__.py)
+=========================== short test summary info ============================
+ERROR tests/unit/test_19_raw_staging.py
+!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+1 error in 10.76s

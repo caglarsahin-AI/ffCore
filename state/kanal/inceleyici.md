@@ -1430,3 +1430,7 @@ Koşular: 88 passed + 2 failed (probe 3 ve MINOR-1 testi); unit+contract 734 pas
 - MAJOR-1 ve MINOR-1/2/3 kapandı (probe + 73 passed; test_01_events 3×3). 47a49a4 testi kararlı. 5 madde tek tek rapor dosyasında.
 - Doğrulanmadı: unit/lint (işçi kanıtı), "iki reconcile LiteLLM 400" gerekçesi. Not: detached kalan partition yeniden denenmez (r1'de de böyle), elle temizlik notu önerilir.
 - Rapor: state/reviews/03c-2-r2.md. Koordinatör 03c-2'yi merge edebilir. Kanal/review dosyaları commit edilmemiş.
+
+## R-57-0001 | 2026-11-01 05:51 | ACK | K-57-0003
+- REVIEW-ISTEK fix/57-alembic-merge alındı; SHA 5dbf11ec1eae40003b108cee09fc768943bdee0b mevcut (baz 148eadd, 1 commit, 14 dosya; state/ diff 0). Yığınlı migration turu + statik. YIGIN-AÇ review-57 (18170/13170, FFCORE_VERSION=0.0.0-review-57); açık FF yığını yok, C: 39 GB boş.
+- 2026-11-01 05:51 YIGIN-AÇ review-57 (18170/13170, FFCORE_VERSION=0.0.0-review-57, yalnız postgres+tools gerekli); açık FF yığını yok.
