@@ -1238,3 +1238,12 @@ Hata bildirimi: düz model testleri için `--profile test` (LiteLLM, fake-llm, L
 Paket: 06b   Cevap: K-06b-0003
 Ölçüm (A-06b-0006): C: 36 GB; docker stats proje toplamı ffmain ≈ 4,6 GB, ffcore-* (06b test profili + 19) ≈ 3,0 GB, diğer ≈ 1,4 GB; VM 12,5 GB içinde. Tam yığını (qdrant + 0.0.0-06b derlemesi) entegrasyon kapısında ayrıca isteyeceğim.
 İlerleme: dilim 0-2 (C11 şeması, kimlik/kapsam/`/v1/models`, düz model yolu) feat/06b-facade'da commit'li; hedefli testler 26 passed (kapsam matrisi, S1 tek yanıt, input.pre/egress/output.pre, tampon, S9, 429). Bulgu: egress `tokenize` token kapsamı olarak run id ister (08 masking `TokenScopeMissing`); düz yolda run yok → istek başına kapsam (`facade-<uuid>`), olaylara run_id yazılmaz; 08 koduna dokunulmadı. Sıradaki: dilim 3 (agent yolu, S2 iç arama ucu).
+
+### A-06b-0008 · 2026-11-01 10:10 · → koordinator · KARAR-GEREK
+Paket: 06b   Cevap: K-06b-0002 (S5 "0,5 günü aşarsa 06b-2")
+Durum: dilim 0-4 commit'li (feat/06b-facade d77a19b): kimlik/kapsam, düz model, agent yolu + S2 iç arama ucu + S3, manifest, `openai` dev bağımlılığı (runtime imajında yok: state/evidence/06b-s7-pip-list-20261101.log). Hedefli 06b testleri yeşil (kimlik 14, düz 14, agent 15, anahtar arama 6, manifest 5).
+S5 dış agent için kalan iş: migration 06b_0001 (`agents.external_config`), kayıt/güncelleme ucu (konsol, Fernet, `***`, audit maskesi), dış çağrı yolu (SafeOutboundClient, her sıçramada yönlendirme denetimi, kimlik başlığı başka origine gitmez, zaman aşımı + yanıt boyutu sınırı, yalnız `content`, output.pre + egress), run kaydı ve olay altkümesi, testler. Tahminim 0,5-1 gün; senin eşiğini aşıyor.
+A (Önerilen): S5'i ayrı PR **06b-2**'ye böl. 06b şimdi facade + manifest ile PR-HAZIR'a gider; C11 donma satırı `kind: external` ve olay altkümesini (`EXTERNAL_X_PLATFORM_EVENTS = ("progress",)`) sözleşme olarak bugünden sayar, uygulama 06b-2'de gelir. O zamana kadar `kind: external` agent'a facade isteği açık hata verir (501 `external_agent_not_available`; sessiz düşüş yok). Etki: review küçük kalır, güvenlik turu facade'a odaklanır; 06b-2 ayrı güvenlik turu (egress/SSRF) ister.
+B: S5'i bu PR'a ekle. Etki: PR-HAZIR 0,5-1 gün gecikir, tek büyük güvenlik turu.
+C: S5'i tümüyle FOLLOWUP'a al (kapsamdan çıkarma; kullanıcı kararı gerekir, danışmanın eğilimi).
+A varsayımıyla belge/OpenAPI/CONTRACTS ve kapılara geçiyorum; B dersen dilim 5'i yazarım.

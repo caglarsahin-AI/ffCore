@@ -1,0 +1,4 @@
+== backend (runtime) image ffcore/backend:0.0.0-06b:
+{'openai': False, 'jiter': False, 'fastapi': True}
+== tools image ffcore/tools:0.0.0-06b:
+{'openai': True, 'jiter': True} 3.35.0

@@ -54,6 +54,7 @@ Durumlar: READY · CLAIMED · PLANNED · IMPLEMENTING · IMPLEMENTED · VERIFIED
 | 11 | — | 06a, 07 (PoC'de Open WebUI) |
 | 08 tam | — | 08-lite; Türkçe NER, injection, akış tamponlayıcı, PRSIM ingest guard'ı |
 | 06b | — | 06a, 03c (facade, dış agent, manifest) |
+| 06b-2 | — | 06b merge (dış agent: external_config, SafeOutboundClient, SSRF matrisi; KARARLAR "06b S5 ... 06b-2") |
 | 04b | — | 04a (DuckDB → Postgres göçü DEBT-1, migrate-vectors) |
 | 05b | — | 05a |
 | 09 | — | 06a, 02, 04a, 13a (Langfuse datasets) |

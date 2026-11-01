@@ -427,3 +427,518 @@
 
 #19 [tools tools 2/3] RUN uv sync --frozen --no-install-project
 #19 213.5 Installed 227 packages in 50.71s
+#19 ...
+
+#18 [backend runtime 1/5] RUN uv sync --frozen --no-dev --no-install-project
+#18 311.5 Bytecode compiled 22078 files in 1m 31s
+#18 311.5  + accelerate==1.15.0
+#18 311.5  + aiohappyeyeballs==2.7.1
+#18 311.5  + aiohttp==3.14.5
+#18 311.5  + aiosignal==1.4.0
+#18 311.5  + albucore==0.0.24
+#18 311.5  + albumentations==2.0.8
+#18 311.5  + alembic==1.20.1
+#18 311.5  + annotated-doc==0.0.5
+#18 311.5  + annotated-types==0.8.0
+#18 311.5  + anyio==4.15.1
+#18 311.5  + argon2-cffi==25.1.0
+#18 311.5  + argon2-cffi-bindings==26.1.0
+#18 311.5  + arq==0.28.0
+#18 311.5  + attrs==26.1.0
+#18 311.5  + backoff==2.2.1
+#18 311.5  + beautifulsoup4==4.15.0
+#18 311.5  + certifi==2026.10.23
+#18 311.5  + cffi==2.1.1
+#18 311.5  + charset-normalizer==3.5.2
+#18 311.5  + click==8.5.0
+#18 311.5  + cloudpickle==3.1.2
+#18 311.5  + colorclass==2.2.2
+#18 311.5  + colorlog==6.12.0
+#18 311.5  + compressed-rtf==1.0.7
+#18 311.5  + cryptography==50.0.2
+#18 311.5  + cython==3.3.0
+#18 311.5  + datasets==5.0.1
+#18 311.5  + defusedxml==0.7.1
+#18 311.5  + dill==0.4.1
+#18 311.5  + distro==1.9.0
+#18 311.5  + doclang==0.8.0
+#18 311.5  + docling==2.125.0
+#18 311.5  + docling-core==2.105.0
+#18 311.5  + docling-ibm-models==4.0.4
+#18 311.5  + docling-parse==7.24.0
+#18 311.5  + docling-slim==2.125.0
+#18 311.5  + easygui==0.98.3
+#18 311.5  + ebcdic==2.0.1
+#18 311.5  + et-xmlfile==2.0.0
+#18 311.5  + extract-msg==0.56.1
+#18 311.5  + faker==40.43.0
+#18 311.5  + fastapi==0.162.0
+#18 311.5  + filelock==4.2.4
+#18 311.5  + filetype==1.2.0
+#18 311.5  + fire==0.7.1
+#18 311.5  + flagembedding==1.4.2
+#18 311.5  + flatbuffers==25.12.19
+#18 311.5  + fonttools==4.68.0
+#18 311.5  + frozenlist==1.8.0
+#18 311.5  + fsspec==2026.6.0
+#18 311.5  + googleapis-common-protos==1.76.0
+#18 311.5  + greenlet==3.5.6
+#18 311.5  + h11==0.16.0
+#18 311.5  + hf-xet==1.7.0
+#18 311.5  + hiredis==3.5.0
+#18 311.5  + httpcore==1.0.9
+#18 311.5  + httpcore2==2.16.0
+#18 311.5  + httptools==0.9.0
+#18 311.5  + httpx==0.28.1
+#18 311.5  + httpx2==2.16.0
+#18 311.5  + huggingface-hub==0.36.2
+#18 311.5  + idna==3.20
+#18 311.5  + imageio==2.38.1
+#18 311.5  + ir-datasets==0.6.3
+#18 311.5  + jinja2==3.1.6
+#18 311.5  + joblib==1.6.0
+#18 311.5  + jsonpatch==1.35
+#18 311.5  + jsonpointer==3.2.1
+#18 311.5  + jsonref==1.1.0
+#18 311.5  + jsonschema==4.26.0
+#18 311.5  + jsonschema-specifications==2025.9.1
+#18 311.5  + langchain-core==1.6.10
+#18 311.5  + langchain-protocol==0.0.19
+#18 311.5  + langfuse==4.15.1
+#18 311.5  + langgraph==1.2.15
+#18 311.5  + langgraph-checkpoint==4.3.0
+#18 311.5  + langgraph-checkpoint-postgres==3.1.3
+#18 311.5  + langgraph-prebuilt==1.1.0
+#18 311.5  + langgraph-sdk==0.4.7
+#18 311.5  + langsmith==0.14.8
+#18 311.5  + lark==1.3.1
+#18 311.5  + latex2mathml==3.81.1
+#18 311.5  + lazy-loader==0.6
+#18 311.5  + lmdb==3.0.0
+#18 311.5  + lxml==6.1.3
+#18 311.5  + lz4==4.4.5
+#18 311.5  + mail-parser==4.9.0
+#18 311.5  + mako==1.4.3
+#18 311.5  + markdown-it-py==4.2.0
+#18 311.5  + marko==2.2.5
+#18 311.5  + markupsafe==3.0.4
+#18 311.5  + mcp==2.3.0
+#18 311.5  + mcp-types==2.3.0
+#18 311.5  + mdurl==0.1.2
+#18 311.5  + mpire==2.10.2
+#18 311.5  + mpmath==1.3.0
+#18 311.5  + msoffcrypto-tool==6.0.0
+#18 311.5  + multidict==7.2.1
+#18 311.5  + multiprocess==0.70.19
+#18 311.5  + narwhals==2.28.0
+#18 311.5  + networkx==3.7
+#18 311.5  + numpy==2.5.4
+#18 311.5  + olefile==0.47
+#18 311.5  + oletools==0.60.2
+#18 311.5  + omegaconf==2.4.0
+#18 311.5  + onnxruntime==1.31.1
+#18 311.5  + opencv-contrib-python==5.0.0.93
+#18 311.5  + opencv-python==5.0.0.93
+#18 311.5  + opencv-python-headless==5.0.0.93
+#18 311.5  + openpyxl==3.1.5
+#18 311.5  + opentelemetry-api==1.45.1
+#18 311.5  + opentelemetry-exporter-http-transport==0.66b1
+#18 311.5  + opentelemetry-exporter-otlp-common==0.66b1
+#18 311.5  + opentelemetry-exporter-otlp-proto-common==1.45.1
+#18 311.5  + opentelemetry-exporter-otlp-proto-http==1.45.1
+#18 311.5  + opentelemetry-proto==1.45.1
+#18 311.5  + opentelemetry-sdk==1.45.1
+#18 311.5  + opentelemetry-semantic-conventions==0.66b1
+#18 311.5  + opt-einsum==3.3.0
+#18 311.5  + orjson==3.13.0
+#18 311.5  + ormsgpack==1.12.2
+#18 311.5  + packaging==26.3
+#18 311.5  + paddleocr==2.10.0
+#18 311.5  + paddlepaddle==3.3.1
+#18 311.5  + pandas==3.1.0
+#18 311.5  + pcodedmp==1.2.6
+#18 311.5  + peft==0.21.2
+#18 311.5  + pgvector==0.5.1
+#18 311.5  + pillow==12.3.0
+#18 311.5  + pluggy==1.7.0
+#18 311.5  + polyfactory==3.5.0
+#18 311.5  + propcache==0.5.4
+#18 311.5  + protobuf==7.36.2
+#18 311.5  + psutil==7.2.2
+#18 311.5  + psycopg==3.3.6
+#18 311.5  + psycopg-binary==3.3.6
+#18 311.5  + psycopg-pool==3.3.3
+#18 311.5  + pyarrow==26.0.0
+#18 311.5  + pyclipper==1.4.0
+#18 311.5  + pycparser==3.12
+#18 311.5  + pydantic==2.14.1
+#18 311.5  + pydantic-core==2.50.1
+#18 311.5  + pydantic-settings==2.16.1
+#18 311.5  + pygments==2.21.0
+#18 311.5  + pyjwt==2.15.1
+#18 311.5  + pylatexenc==2.11
+#18 311.5  + pymupdf==1.28.2
+#18 311.5  + pymupdf-layout==1.28.2
+#18 311.5  + pymupdf4llm==1.28.2
+#18 311.5  + pyparsing==3.3.3
+#18 311.5  + pypdfium2==5.14.0
+#18 311.5  + python-dateutil==3.0.0
+#18 311.5  + python-docx==1.2.0
+#18 311.5  + python-dotenv==1.2.4
+#18 311.5  + python-multipart==0.0.32
+#18 311.5  + python-oxmsg==0.0.2
+#18 311.5  + python-pptx==1.0.2
+#18 311.5  + pyyaml==6.0.3
+#18 311.5  + rapidfuzz==3.14.6
+#18 311.5  + rapidocr==3.10.0
+#18 311.5  + red-black-tree-mod==1.22
+#18 311.5  + redis==5.3.1
+#18 311.5  + referencing==0.37.0
+#18 311.5  + regex==2026.9.29
+#18 311.5  + requests==2.34.2
+#18 311.5  + requests-toolbelt==1.0.0
+#18 311.5  + rich==15.0.0
+#18 311.5  + rpds-py==2026.9.1
+#18 311.5  + rtfde==0.1.2.2
+#18 311.5  + rtree==1.4.1
+#18 311.5  + safetensors==0.8.0
+#18 311.5  + scikit-image==0.26.0
+#18 311.5  + scikit-learn==1.9.1
+#18 311.5  + scipy==1.18.1
+#18 311.5  + semchunk==3.2.5
+#18 311.5  + sentence-transformers==5.7.0
+#18 311.5  + sentencepiece==0.2.2
+#18 311.5  + setuptools==84.2.1
+#18 311.5  + shapely==2.2.0
+#18 311.5  + shellingham==1.5.4
+#18 311.5  + simsimd==6.5.16
+#18 311.5  + six==1.17.0
+#18 311.5  + sniffio==1.3.1
+#18 311.5  + soupsieve==3.0.4
+#18 311.5  + sqlalchemy==2.1.6
+#18 311.5  + sqlglot==30.23.0
+#18 311.5  + sse-starlette==3.5.0
+#18 311.5  + starlette==1.10.0
+#18 311.5  + stringzilla==5.3.2
+#18 311.5  + sympy==1.14.0
+#18 311.5  + tabulate==0.10.0
+#18 311.5  + tenacity==9.2.1
+#18 311.5  + termcolor==3.3.0
+#18 311.5  + threadpoolctl==3.7.0
+#18 311.5  + tifffile==2026.10.15
+#18 311.5  + tokenizers==0.22.2
+#18 311.5  + torch==2.14.0+cpu
+#18 311.5  + torchvision==0.29.0+cpu
+#18 311.5  + tqdm==4.70.1
+#18 311.5  + transformers==4.57.6
+#18 311.5  + tree-sitter==0.26.0
+#18 311.5  + tree-sitter-c==0.24.2
+#18 311.5  + tree-sitter-javascript==0.25.0
+#18 311.5  + tree-sitter-python==0.25.0
+#18 311.5  + tree-sitter-typescript==0.23.2
+#18 311.5  + truststore==0.10.5
+#18 311.5  + typer==0.26.8
+#18 311.5  + typing-extensions==4.16.0
+#18 311.5  + typing-inspection==0.4.4
+#18 311.5  + tzdata==2026.5
+#18 311.5  + tzlocal==5.4.5
+#18 311.5  + urllib3==2.8.0
+#18 311.5  + uuid-utils==0.17.1
+#18 311.5  + uvicorn==0.54.0
+#18 311.5  + uvloop==0.23.0
+#18 311.5  + watchfiles==1.3.0
+#18 311.5  + websockets==16.1.1
+#18 311.5  + wrapt==2.5.1
+#18 311.5  + xlsxwriter==3.3.0
+#18 311.5  + xxhash==4.0.2
+#18 311.5  + yarl==1.25.1
+#18 311.5  + zstandard==0.25.0
+#18 DONE 312.4s
+
+#19 [tools tools 2/3] RUN uv sync --frozen --no-install-project
+#19 ...
+
+#20 [backend runtime 2/5] COPY alembic.ini ./
+#20 DONE 0.2s
+
+#19 [tools tools 2/3] RUN uv sync --frozen --no-install-project
+#19 ...
+
+#21 [backend runtime 3/5] COPY alembic ./alembic
+#21 DONE 0.2s
+
+#19 [tools tools 2/3] RUN uv sync --frozen --no-install-project
+#19 ...
+
+#22 [backend runtime 4/5] COPY ffcore ./ffcore
+#22 DONE 0.7s
+
+#19 [tools tools 2/3] RUN uv sync --frozen --no-install-project
+#19 ...
+
+#23 [backend runtime 5/5] RUN useradd --system --uid 10001 --home-dir /models ffcore
+#23 0.722 useradd warning: ffcore's uid 10001 is greater than SYS_UID_MAX 999
+#23 DONE 0.9s
+
+#19 [tools tools 2/3] RUN uv sync --frozen --no-install-project
+#19 ...
+
+#24 [backend] exporting to image
+#24 exporting layers
+#24 ...
+
+#19 [tools tools 2/3] RUN uv sync --frozen --no-install-project
+#19 305.8 Bytecode compiled 24150 files in 1m 32s
+#19 305.8  + accelerate==1.15.0
+#19 305.8  + aiohappyeyeballs==2.7.1
+#19 305.8  + aiohttp==3.14.5
+#19 305.8  + aiosignal==1.4.0
+#19 305.8  + albucore==0.0.24
+#19 305.8  + albumentations==2.0.8
+#19 305.8  + alembic==1.20.1
+#19 305.8  + annotated-doc==0.0.5
+#19 305.8  + annotated-types==0.8.0
+#19 305.8  + anyio==4.15.1
+#19 305.8  + argon2-cffi==25.1.0
+#19 305.8  + argon2-cffi-bindings==26.1.0
+#19 305.8  + arq==0.28.0
+#19 305.8  + attrs==26.1.0
+#19 305.8  + backoff==2.2.1
+#19 305.8  + beautifulsoup4==4.15.0
+#19 305.8  + certifi==2026.10.23
+#19 305.8  + cffi==2.1.1
+#19 305.8  + charset-normalizer==3.5.2
+#19 305.8  + click==8.5.0
+#19 305.8  + cloudpickle==3.1.2
+#19 305.8  + colorclass==2.2.2
+#19 305.8  + colorlog==6.12.0
+#19 305.8  + compressed-rtf==1.0.7
+#19 305.8  + cryptography==50.0.2
+#19 305.8  + cython==3.3.0
+#19 305.8  + datasets==5.0.1
+#19 305.8  + defusedxml==0.7.1
+#19 305.8  + dill==0.4.1
+#19 305.8  + distro==1.9.0
+#19 305.8  + doclang==0.8.0
+#19 305.8  + docling==2.125.0
+#19 305.8  + docling-core==2.105.0
+#19 305.8  + docling-ibm-models==4.0.4
+#19 305.8  + docling-parse==7.24.0
+#19 305.8  + docling-slim==2.125.0
+#19 305.8  + easygui==0.98.3
+#19 305.8  + ebcdic==2.0.1
+#19 305.8  + et-xmlfile==2.0.0
+#19 305.8  + extract-msg==0.56.1
+#19 305.8  + faker==40.43.0
+#19 305.8  + fastapi==0.162.0
+#19 305.8  + filelock==4.2.4
+#19 305.8  + filetype==1.2.0
+#19 305.8  + fire==0.7.1
+#19 305.8  + flagembedding==1.4.2
+#19 305.8  + flatbuffers==25.12.19
+#19 305.8  + fonttools==4.68.0
+#19 305.8  + frozenlist==1.8.0
+#19 305.8  + fsspec==2026.6.0
+#19 305.8  + googleapis-common-protos==1.76.0
+#19 305.8  + greenlet==3.5.6
+#19 305.8  + h11==0.16.0
+#19 305.8  + hf-xet==1.7.0
+#19 305.8  + hiredis==3.5.0
+#19 305.8  + httpcore==1.0.9
+#19 305.8  + httpcore2==2.16.0
+#19 305.8  + httptools==0.9.0
+#19 305.8  + httpx==0.28.1
+#19 305.8  + httpx2==2.16.0
+#19 305.8  + huggingface-hub==0.36.2
+#19 305.8  + idna==3.20
+#19 305.8  + imageio==2.38.1
+#19 305.8  + iniconfig==2.3.1
+#19 305.8  + ir-datasets==0.6.3
+#19 305.8  + jinja2==3.1.6
+#19 305.8  + jiter==0.17.0
+#19 305.8  + joblib==1.6.0
+#19 305.8  + jsonpatch==1.35
+#19 305.8  + jsonpointer==3.2.1
+#19 305.8  + jsonref==1.1.0
+#19 305.8  + jsonschema==4.26.0
+#19 305.8  + jsonschema-specifications==2025.9.1
+#19 305.8  + langchain-core==1.6.10
+#19 305.8  + langchain-protocol==0.0.19
+#19 305.8  + langfuse==4.15.1
+#19 305.8  + langgraph==1.2.15
+#19 305.8  + langgraph-checkpoint==4.3.0
+#19 305.8  + langgraph-checkpoint-postgres==3.1.3
+#19 305.8  + langgraph-prebuilt==1.1.0
+#19 305.8  + langgraph-sdk==0.4.7
+#19 305.8  + langsmith==0.14.8
+#19 305.8  + lark==1.3.1
+#19 305.8  + latex2mathml==3.81.1
+#19 305.8  + lazy-loader==0.6
+#19 305.8  + lmdb==3.0.0
+#19 305.8  + lxml==6.1.3
+#19 305.8  + lz4==4.4.5
+#19 305.8  + mail-parser==4.9.0
+#19 305.8  + mako==1.4.3
+#19 305.8  + markdown-it-py==4.2.0
+#19 305.8  + marko==2.2.5
+#19 305.8  + markupsafe==3.0.4
+#19 305.8  + mcp==2.3.0
+#19 305.8  + mcp-types==2.3.0
+#19 305.8  + mdurl==0.1.2
+#19 305.8  + mpire==2.10.2
+#19 305.8  + mpmath==1.3.0
+#19 305.8  + msoffcrypto-tool==6.0.0
+#19 305.8  + multidict==7.2.1
+#19 305.8  + multiprocess==0.70.19
+#19 305.8  + narwhals==2.28.0
+#19 305.8  + networkx==3.7
+#19 305.8  + numpy==2.5.4
+#19 305.8  + olefile==0.47
+#19 305.8  + oletools==0.60.2
+#19 305.8  + omegaconf==2.4.0
+#19 305.8  + onnxruntime==1.31.1
+#19 305.8  + openai==3.35.0
+#19 305.8  + opencv-contrib-python==5.0.0.93
+#19 305.8  + opencv-python==5.0.0.93
+#19 305.8  + opencv-python-headless==5.0.0.93
+#19 305.8  + openpyxl==3.1.5
+#19 305.8  + opentelemetry-api==1.45.1
+#19 305.8  + opentelemetry-exporter-http-transport==0.66b1
+#19 305.8  + opentelemetry-exporter-otlp-common==0.66b1
+#19 305.8  + opentelemetry-exporter-otlp-proto-common==1.45.1
+#19 305.8  + opentelemetry-exporter-otlp-proto-http==1.45.1
+#19 305.8  + opentelemetry-proto==1.45.1
+#19 305.8  + opentelemetry-sdk==1.45.1
+#19 305.8  + opentelemetry-semantic-conventions==0.66b1
+#19 305.8  + opt-einsum==3.3.0
+#19 305.8  + orjson==3.13.0
+#19 305.8  + ormsgpack==1.12.2
+#19 305.8  + packaging==26.3
+#19 305.8  + paddleocr==2.10.0
+#19 305.8  + paddlepaddle==3.3.1
+#19 305.8  + pandas==3.1.0
+#19 305.8  + pcodedmp==1.2.6
+#19 305.8  + peft==0.21.2
+#19 305.8  + pgvector==0.5.1
+#19 305.8  + pillow==12.3.0
+#19 305.8  + pluggy==1.7.0
+#19 305.8  + polyfactory==3.5.0
+#19 305.8  + propcache==0.5.4
+#19 305.8  + protobuf==7.36.2
+#19 305.8  + psutil==7.2.2
+#19 305.8  + psycopg==3.3.6
+#19 305.8  + psycopg-binary==3.3.6
+#19 305.8  + psycopg-pool==3.3.3
+#19 305.8  + pyarrow==26.0.0
+#19 305.8  + pyclipper==1.4.0
+#19 305.8  + pycparser==3.12
+#19 305.8  + pydantic==2.14.1
+#19 305.8  + pydantic-core==2.50.1
+#19 305.8  + pydantic-settings==2.16.1
+#19 305.8  + pygments==2.21.0
+#19 305.8  + pyjwt==2.15.1
+#19 305.8  + pylatexenc==2.11
+#19 305.8  + pymupdf==1.28.2
+#19 305.8  + pymupdf-layout==1.28.2
+#19 305.8  + pymupdf4llm==1.28.2
+#19 305.8  + pyparsing==3.3.3
+#19 305.8  + pypdfium2==5.14.0
+#19 305.8  + pytest==9.2.0
+#19 305.8  + python-dateutil==3.0.0
+#19 305.8  + python-docx==1.2.0
+#19 305.8  + python-dotenv==1.2.4
+#19 305.8  + python-multipart==0.0.32
+#19 305.8  + python-oxmsg==0.0.2
+#19 305.8  + python-pptx==1.0.2
+#19 305.8  + pyyaml==6.0.3
+#19 305.8  + rapidfuzz==3.14.6
+#19 305.8  + rapidocr==3.10.0
+#19 305.8  + red-black-tree-mod==1.22
+#19 305.8  + redis==5.3.1
+#19 305.8  + referencing==0.37.0
+#19 305.8  + regex==2026.9.29
+#19 305.8  + requests==2.34.2
+#19 305.8  + requests-toolbelt==1.0.0
+#19 305.8  + rich==15.0.0
+#19 305.8  + rpds-py==2026.9.1
+#19 305.8  + rtfde==0.1.2.2
+#19 305.8  + rtree==1.4.1
+#19 305.8  + ruff==0.17.3
+#19 305.8  + safetensors==0.8.0
+#19 305.8  + scikit-image==0.26.0
+#19 305.8  + scikit-learn==1.9.1
+#19 305.8  + scipy==1.18.1
+#19 305.8  + semchunk==3.2.5
+#19 305.8  + sentence-transformers==5.7.0
+#19 305.8  + sentencepiece==0.2.2
+#19 305.8  + setuptools==84.2.1
+#19 305.8  + shapely==2.2.0
+#19 305.8  + shellingham==1.5.4
+#19 305.8  + simsimd==6.5.16
+#19 305.8  + six==1.17.0
+#19 305.8  + sniffio==1.3.1
+#19 305.8  + soupsieve==3.0.4
+#19 305.8  + sqlalchemy==2.1.6
+#19 305.8  + sqlglot==30.23.0
+#19 305.8  + sse-starlette==3.5.0
+#19 305.8  + starlette==1.10.0
+#19 305.8  + stringzilla==5.3.2
+#19 305.8  + sympy==1.14.0
+#19 305.8  + tabulate==0.10.0
+#19 305.8  + tenacity==9.2.1
+#19 305.8  + termcolor==3.3.0
+#19 305.8  + threadpoolctl==3.7.0
+#19 305.8  + tifffile==2026.10.15
+#19 305.8  + tokenizers==0.22.2
+#19 305.8  + torch==2.14.0+cpu
+#19 305.8  + torchvision==0.29.0+cpu
+#19 305.8  + tqdm==4.70.1
+#19 305.8  + transformers==4.57.6
+#19 305.8  + tree-sitter==0.26.0
+#19 305.8  + tree-sitter-c==0.24.2
+#19 305.8  + tree-sitter-javascript==0.25.0
+#19 305.8  + tree-sitter-python==0.25.0
+#19 305.8  + tree-sitter-typescript==0.23.2
+#19 305.8  + truststore==0.10.5
+#19 305.8  + typer==0.26.8
+#19 305.8  + typing-extensions==4.16.0
+#19 305.8  + typing-inspection==0.4.4
+#19 305.8  + tzdata==2026.5
+#19 305.8  + tzlocal==5.4.5
+#19 305.8  + urllib3==2.8.0
+#19 305.8  + uuid-utils==0.17.1
+#19 305.8  + uvicorn==0.54.0
+#19 305.8  + uvloop==0.23.0
+#19 305.8  + watchfiles==1.3.0
+#19 305.8  + websockets==16.1.1
+#19 305.8  + wrapt==2.5.1
+#19 305.8  + xlsxwriter==3.3.0
+#19 305.8  + xxhash==4.0.2
+#19 305.8  + yarl==1.25.1
+#19 305.8  + zstandard==0.25.0
+#19 DONE 306.7s
+
+#24 [backend] exporting to image
+#24 ...
+
+#25 [tools tools 3/3] WORKDIR /work
+#25 DONE 0.2s
+
+#24 [backend] exporting to image
+#24 ...
+
+#26 [tools] exporting to image
+#26 exporting layers
+#26 ...
+
+#24 [backend] exporting to image
+#24 exporting layers 86.2s done
+#24 writing image sha256:ae331ea9b13f85c2a6da3329edeef23d7e9e262525706703139cb32733baa112 done
+#24 naming to docker.io/ffcore/backend:0.0.0-06b 0.0s done
+#24 DONE 86.2s
+
+#26 [tools] exporting to image
+#26 exporting layers 89.4s done
+#26 writing image sha256:d5929587e653d178df7831c5ca4626a9b68874c35fd61d5090bae2bc05ae147d done
+#26 naming to docker.io/ffcore/tools:0.0.0-06b 0.0s done
+#26 DONE 89.4s

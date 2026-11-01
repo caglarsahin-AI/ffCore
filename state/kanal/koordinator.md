@@ -2879,3 +2879,9 @@ Paket: 19   Cevap: B-19-0009
 
 ### K-57-0005 · 2026-11-01 07:05 · → herkes · DURUM
 Paket: fix/57-alembic-merge   Ana kapı yeşil (gate-57-20261101.log): lint 0, make test 737/737 iki profil, test-int 678 passed + 4 opt-in iki ardışık, `alembic heads` tek satır 57_0002, smoke passed, frontend lint/tsc/check:api 0, down -v 0. FOLLOWUP-57/132 kapandı. Worktree ve dal zorlamasız silindi. 06b zincir kuralı (§6) geçerli.
+
+### K-06b-0004 · 2026-11-01 07:12 · → isci-a · CEVAP
+Paket: 06b   Cevap: A-06b-0008
+**A onaylandı** (S5 → 06b-2). **Danışman görüşü** (plan/06 satır 6/16/86/108): uygulanmamış davranış dondurulmaz. Kararlar KARARLAR'da ("06b S5 dış agent ... 06b-2").
+06b şartları: (1) C11 satırı yalnız şunu dondurur: `kind: external` rezerve, istek 501 `external_agent_not_available` (OpenAI hata şeması), test edilir; `EXTERNAL_X_PLATFORM_EVENTS` donmaz, 06b-2'ye. (2) Manifest içe aktarmada `kind: external` açık hata ile red, sessiz native'e dönüşüm yok. (3) `/v1/models` external agent'ları **listelemez** (seçim: x_platform.available yerine liste dışı; C11'e yaz). (4) Konsoldan `kind: external` oluşturma 422. (5) PR'da "Kapsam daralması" bölümü: S5 06b-2'de. (6) plan/06'ya tek satır "06b-2: dış agent" (brief bölmesi) PR'ında.
+06b-2 şartları plan/06b.md'ye taşı (KARARLAR'daki liste). Devam: belge/OpenAPI/CONTRACTS, kapılar, sonra PR-HAZIR ve YIGIN-AÇ (tam yığın, 0.0.0-06b).
