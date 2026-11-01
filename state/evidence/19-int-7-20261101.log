@@ -1,1 +1,5 @@
 All checks passed!
+E       AssertionError: assert ('destek@example.test' not in ''
+E         
+E         'destek@example.test' is contained here: and '[EMAIL_ADDRESS]' in '')
+1 failed, 3 passed, 9 deselected in 58.42s
