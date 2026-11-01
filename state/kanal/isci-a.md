@@ -1205,3 +1205,19 @@ Branch fix/57-alembic-merge @ 5dbf11ec1eae40003b108cee09fc768943bdee0b (148eadd 
 K-57-0002 şartları: (2a) boş DB `upgrade head`/`heads` → 57_0002; (2b) main şekilli 4 satırlı DB veri korunarak 57_0002 (test + yığında migrate servisiyle sentinel satır); (2c) `downgrade 57_0001`, `06a_0001`, `0001` açık hedefli round-trip; (2d) kapsam daralması PR'da "Kapsam daralması" bölümü; (3) migrate servisi (`upgrade heads` değişmedi) `0.0.0-57` imajıyla main şekilli ve temiz DB'de exit 0, tek satır 57_0002, idempotent; (4) 06b planı §6'da zincir kuralı.
 Kapılar: make lint 0; make test llmaas 737 / airgap 737; make test-int llmaas 677 + 4 opt-in, airgap 678 + 4 opt-in; test_57 son hâl 10 passed. Loglar state/evidence/57-*-20261101.log.
 06b: plan state/pr/06b.md hazır (S1-S9 KARAR-GEREK orada); bu merge main'e girince 06b worktree'sini rebase edip PLANNED/KARAR-GEREK mesajını yazarım.
+
+### A-06b-0003 · 2026-11-01 07:35 · → koordinator · DURUM + KARAR-GEREK
+Paket: 06b   Cevap: K-57-0004
+DURUM: PLANNED talebi. feat/06b-facade main 9e9b44a'ya rebase edildi (kendi commit'i yoktu, ileri sarma); tek uç 57_0002, 06b migration'ı (yalnız S5-A'da) `down_revision="57_0002"`, `branch_labels=("06b",)`. Plan state/pr/06b.md (bulunan semboller, kapsam, dosyalar, C11 donma, kabul→test 16 satır + C11, felsefe üçlüsü). Kod S kararlarından sonra, önce kırmızı test.
+Kaynakta bulunan iki boşluk planı şekillendiriyor: (i) API anahtarı kapsamlarını (`chat_direct`, `agents`, …) bugün hiçbir uç uygulamıyor, 06b ilk tüketici; (ii) anahtar aktörlü run yapılamıyor: `create_run` ve worker `HttpRetriever` kullanıcı ister, arama ucu ACL'yi kullanıcı üyeliğinden kurar (brief "aktör anahtardır, ACL acl_role" der).
+KARAR-GEREK (ayrıntı ve etkiler planda "Koordinatör kararı isteyen seçimler"; hepsinde Önerilen A):
+S1 `user` alanı → aktör: A resolve_actor sonrası, yalnız impersonate anahtarla, OBO ile aynı Actor biçimi (resolve_actor/_grant değişmez), eşleşmezse 403 `user_not_mapped`; C (resolve_actor'a gövde okuma) reddedildi.
+S2 anahtar aktörlü KB araması: A yeni servis-yalnız iç uç `POST /api/v1/internal/knowledge-bases/{kb_id}/search` (`acl_role` gövdede, `_search` yeniden kullanılır) → **touch-zone eki: api/knowledge.py ya da api/internal.py + runtime/adapters.py HttpRetriever**; B agent yolu yalnız impersonate ile (brief'e aykırı).
+S3 tek seferlik `messages[]`: A yeni konuşma + önceki mesajlar `messages` satırı (06a `_history` değişmez).
+S4 düz model guardrail: A `input.pre` + `egress` (bayrakla) + `output.pre` (enforce+çıktı kuralında tampon, V8).
+S5 dış agent: A minimum (Fernet'li `agents.external_config`, SafeOutboundClient, olaylar sınırlı, migration 06b_0001); B secret'sız; C 06b dışına FOLLOWUP (kapsam çıkarma = kullanıcı kararı).
+S6 akış canlılığı: keepalive yorum + `x_platform.progress`; ayar yok.
+S7 `openai` Python paketi yalnız dev/test (pinli) **[C]**; B ham httpx.
+S8 FOLLOWUP-88 06b'ye girmez (küçük değil; 14'e kalır).
+S9 düz modelde istemcinin `tools`'u: A geçirilir (OpenAI uyumu), B 400.
+Yığın: kodlamada YIGIN-AÇ ayrıca yazacağım (18130/13130).

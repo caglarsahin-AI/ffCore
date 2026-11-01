@@ -439,3 +439,13 @@ lint exit=0
 heads exit=0
 
 === 06:22:50 make test llmaas
+tests/contract/test_c1_namespace.py ...............                      [ 97%]
+tests/contract/test_c2_api_key_scopes.py ..                              [ 97%]
+tests/contract/test_c2_on_behalf_of.py ..                                [ 97%]
+tests/contract/test_c3_common_columns.py .....                           [ 98%]
+tests/contract/test_c5_vectorstore.py ...                                [ 99%]
+tests/contract/test_c9_runs.py .......                                   [100%]
+
+======================= 737 passed in 172.44s (0:02:52) ========================
+
+=== 06:26:04 make test airgap
