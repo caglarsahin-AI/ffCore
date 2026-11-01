@@ -63,3 +63,51 @@ def test_19_s5_repo_gate_check():
 
 def test_19_s5_gitignore_covers_eval_results():
     assert "eval/results/" in (REPO / ".gitignore").read_text(encoding="utf-8").splitlines()
+
+
+# --- S1 without PRSIM (KARARLAR "M3 korpus kapsamı"): excluded on both sides, n/N in the report ---
+
+
+def _item(i, sources, answerable=True):
+    return {
+        "id": f"s1-{i:03d}",
+        "input": {"message": "-", "variables": {}},
+        "expected_output": {"must_contain": [], "must_cite": ["1001"]},
+        "metadata": {"answerable": answerable, "style": "dogrudan", "sources": sources},
+    }
+
+
+def test_19_s5_exclude_sources_drops_prsim_items():
+    items = [_item(1, ["confluence:OCR"]), _item(2, ["jira:PRSIM"]), _item(3, [])]
+    kept, excluded = er.select_items(items, ["prsim"])
+    assert [i["id"] for i in kept] == ["s1-001", "s1-003"]
+    assert excluded == {"prsim": 1}
+    assert er.select_items(items, []) == (items, {})
+
+
+def test_19_s5_report_states_n_of_total_and_warmup():
+    results = [
+        er.ItemResult(
+            "s1-001",
+            "dogrudan",
+            True,
+            False,
+            "answered",
+            "completed",
+            {"contains": True, "cites_source": True, "llm_judge": None},
+            100.0,
+            2,
+        ),
+    ]
+    meta = {
+        "dataset": "s1",
+        "agent": "a",
+        "model": "qwen3.5:35b cpu",
+        "total": 50,
+        "excluded": {"prsim": 9},
+        "warmup": [200.0, 150.0],
+    }
+    text = er.markdown(meta, results)
+    assert "Scored items: 1/50 (excluded by source: prsim 9)" in text
+    assert "Warmup runs (not scored, not in times): 2" in text
+    assert "Source accuracy: 1/1 (100.0%)" in text
