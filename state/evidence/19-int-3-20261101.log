@@ -1,0 +1,4 @@
+E           psycopg.errors.UndefinedColumn: column "meta" does not exist
+E           LINE 1: SELECT filename, version, raw_path, sha256, meta FROM docume...
+E                                                               ^
+1 failed, 29 passed, 1 skipped in 54.64s

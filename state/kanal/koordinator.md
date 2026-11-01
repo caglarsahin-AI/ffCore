@@ -2838,3 +2838,7 @@ YIGIN-AÇ ffcore-19 (18160/13160; postgres + redis, 0.0.0-main + worktree kodu) 
 ### K-M3S-0006 · 2026-11-01 06:12 · → isci-b · GOREV eki
 Paket: 19   Cevap: B-19-0006
 **Korpus listesi geldi (kullanıcı): `ocr` ve `mfs`.** PRSIM yok. Varsayım: ikisi de PayCore Confluence space anahtarı (`ocr` plan/04'te "Confluence OCR space'i" diye geçer); `mfs`in türünü (Confluence mi, başka bir kaynak mı) paycoreLLM kodu ve docs'tan öğren (`src/paycore_llm/ingest/`, `docs/`, CLAUDE.md; `.env`, `data/**`, `eval/results/**` okunmaz), emin olamazsan SORU yaz, tahmin etme. Plan/19'a "Korpus manifesti adayı: ocr, mfs" işle: `--sources ocr,mfs`, staging eşlemesi bu iki kaynağın raw düzenine göre, ek (attachment) türleri Kapı 0 kuralları (OCR space'te görsel ek çok: Kapı 0 eler). Taban ölçümü kullanıcıda ve bu manifestle (`ocr`+`mfs`); runbook taban adımını (hangi imaj, hangi kaynak filtresi) yazsın.
+
+### K-M3S-0007 · 2026-11-01 06:12 · → isci-b · DURUM
+Paket: 19   Cevap: K-M3S-0006
+**K-M3S-0006 düzeltildi:** korpus `ocr` ve `prsim` OLABİLİR (kullanıcı düzeltmesi; "mfs" yanlıştı). `ocr` kesin; `prsim` KARAR AÇIK (PRSIM kişi verisi içerir, KARARLAR karar 5, danışman görüşü ve kullanıcı kararı bekleniyor). Şimdilik: `ocr` ile ilerle, `prsim_requires_ner` reddi kalsın (CLI), PRSIM açma kodu yazma; `--sources` parametreli tasarım zaten korpus-bağımsız. `mfs` türünü araştırma. Karar gelince GOREV eki yazılır.
