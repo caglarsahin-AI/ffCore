@@ -1434,3 +1434,10 @@ Koşular: 88 passed + 2 failed (probe 3 ve MINOR-1 testi); unit+contract 734 pas
 ## R-57-0001 | 2026-11-01 05:51 | ACK | K-57-0003
 - REVIEW-ISTEK fix/57-alembic-merge alındı; SHA 5dbf11ec1eae40003b108cee09fc768943bdee0b mevcut (baz 148eadd, 1 commit, 14 dosya; state/ diff 0). Yığınlı migration turu + statik. YIGIN-AÇ review-57 (18170/13170, FFCORE_VERSION=0.0.0-review-57); açık FF yığını yok, C: 39 GB boş.
 - 2026-11-01 05:51 YIGIN-AÇ review-57 (18170/13170, FFCORE_VERSION=0.0.0-review-57, yalnız postgres+tools gerekli); açık FF yığını yok.
+
+## R-57-0002 | 2026-11-01 06:13 | REVIEW-SONUC | K-57-0003
+- Paket/SHA: fix/57-alembic-merge, 5dbf11ec1eae40003b108cee09fc768943bdee0b. Yığın review57 açıldı ve `down -v` ile kapatıldı (YIGIN-KAPA review57). state/ diff 0.
+- Karar: **ONAY** (BLOCKER 0, MAJOR 0, MINOR 1). Ana şekilli DB gerçek merge-öncesi kodla kuruldu: veri kayıpsız 57_0002'ye, şema özdeş; açık hedefli geri alma ve round-trip temiz; göreli geri alma "Ambiguous walk" ile reddediliyor, hiçbir şey oynamıyor; yeni paket revizyonu tek uçtan çalışıyor; scratch_db sızıntı yok. Tam entegrasyon 678 passed + 4 skipped.
+- NOT_RUN: unit/lint/airgap (işçi kanıtı); migrate'in ikinci çalıştırmasının çıkış kodunu doğrudan okumadım (probe'da idempotent exit 0 kanıtlı).
+- Rapor: state/reviews/57-alembic-merge-r1.md; probe'lar 57-r1-probe.py, 57-r1-probe2.py. Worktree .worktrees/review-57-* silme sonucu aşağıda. Kanal/review dosyaları commit edilmemiş.
+- Worktree'ler (.worktrees/review-57-r1, review-57-base) temiz doğrulandıktan sonra `git worktree remove` ile (--force yok) sorunsuz kaldırıldı.

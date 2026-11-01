@@ -1,0 +1,4 @@
+E       AttributeError: 'RawIngestReport' object has no attribute 'manifest'
+E       AttributeError: 'RawIngestReport' object has no attribute 'manifest'
+E       AttributeError: module 'ffcore.knowledge.raw_ingest' has no attribute 'write_manifest'
+3 failed, 6 deselected in 36.99s

@@ -89,7 +89,7 @@ FFCore'un canlı test ve ilk kullanım yeri PayCore LLM'dir (`C:\ai_paycore\payc
 4. **Yığın (PayCore seed'i):** Qdrant + bge-m3 sparse birincil, embedding süreç içi, DuckDB belge deposu PoC'de `KnowledgeStore` bağdaştırıcısıyla sarılır (Postgres göçü PoC sonrası, `DEBT-` kaydı), LiteLLM ve arq + Redis eklenir (Jira kuyruğu arq'a taşınır), Langfuse v3, PaddleOCR, güven formülü seed'de `max`, 4B router kapalı, Open WebUI PoC chat'i (11 ertelendi).
 5. **Agent kapsamı (CPU ölçümü):** PoC'de iki agent: `mode: always` doküman asistanı ve tek araç çağrılı onaylı SQL asistanı; `mode: tool` ve karma asistan GPU ya da `llmaas` ile ölçülür.
 6. **Kabul:** kalite PayCore S1 seti (50 soru, kaynak doğruluğu ≥ %80; iç dokümantasyon sorusu, müşteri verisi değil), akış 13a'nın küçük sentetik KB'si ve SQL şeması; S1 sunucuda kullanıcı eliyle koşar.
-7. **Veri sınırı:** PRSIM kayıtlarındaki personel adı/e-postası PayCore uzantı verisidir; ingest'e kişi verisi guard'ı 08 geldiğinde eklenir (ertelendi, koşullu). Hasta ve müşteri kişi verisi kuralı değişmez.
+7. **Veri sınırı:** PRSIM kayıtlarındaki personel adı/e-postası PayCore uzantı verisidir; ingest'e kişi verisi guard'ı 08 geldiğinde eklenir (ertelendi, koşullu). Hasta ve müşteri kişi verisi kuralı değişmez. **Kullanıcı kararı (1 Kasım 2026, D sınıfı veri sınırı):** PRSIM, yalnız personel verisi içerdiği kullanıcı tarafından teyit edildiği için, **yalnız M3 ölçümü, PayCore sunucusu, `airgap`** kapsamında 08 tam beklenmeden ingest edilebilir (yapısal kişi alanları ve @bahsetmeler temizlenir, regex PII maskesi zorunlu, gövdedeki personel adı maskelenmez: bilinen sınır, ölçüm sonrası PRSIM kopyaları silinir); süre: 08 tam ya da M3 sonrası temizliğe kadar (KARARLAR).
 8. **Bellek:** sunucu belleği artırılır (kullanıcı kararı); yine de modeller yalnızca API sürecinde yüklenir ve bütçe tablosu ölçülerek tutulur.
 
 ## 2c. Dış sistem bağlantı türleri
@@ -260,6 +260,7 @@ Görsel akış tasarımcısı (Flow canvas), alt agent (sub-agent) devri, zamanl
 
 | Sürüm | Tarih | Değişiklik |
 |---|---|---|
+| 2.8 | 1 Kasım 2026 | M3 sunucu paketi (plan/19) ve korpus kapsamı; yığın sınırı üç; PRSIM'in M3 ölçümü için koşullu ingest'i (2d.7, kullanıcı kararı); 03c, 06a/116, 114, Alembic merge (FOLLOWUP-57/132) işleri. |
 | 2.7 | 30 Ekim 2026 | **PoC kod tarafı tamam (M1-M3 paketleri main'de):** 06a, 07, 10b-poc-2, 13b (make seed/e2e/eval, docs/demo.md), 08 egress enforce, 18 kullanım senaryoları aşama 2-3 (F tablosu `make e2e`); C8/C9/C10 dondu. M3 kapısının kalan yarısı kullanıcıda: PayCore sunucusunda `airgap` profiliyle `make eval` (S1 ≥ %80) ve cpu süreleri (docs/demo.md). Kurallar: iki yığın, projeye özgü port, review yığını, FOLLOWUP demetleri (KARARLAR). |
 | 2.6 | 29 Ekim 2026 | Ürün alt başlığı (kullanıcı kararı): TR "Kurumsal Yapay Zekâ Platformu", EN "Enterprise AI Agent Platform"; "LLM Agent Runtime" slogan değil, "Agent Runtime" yalnız 06 modülü; Türkçe metinde "ajan" yok; başlık buna göre (KARARLAR "Ürün ve pazar") |
 | 1 | 24 Ekim 2026 | İlk plan: 14 paket, airgap (Ollama CPU) varsayılan, Cognipeer benzeri 8 çekirdek özellik |
