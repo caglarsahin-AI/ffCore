@@ -2,10 +2,10 @@
 
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
-- Oturum kimliği: ffcore-isci-a-116 (önceki lease ffcore-isci-a-13ba RETIRED)
-- Aktif paket: fix/06a-checkpoint-sources (FOLLOWUP-116), MERGED 1e12c4b
-- Durum: RETIRED
-- Son okunan: K-116-0007 (MERGED, HANDOFF iste)
+- Oturum kimliği: ffcore-isci-a-06b (önceki lease ffcore-isci-a-116 RETIRED)
+- Aktif paket: 06b (feat/06b-facade)
+- Durum: ACTIVE
+- Son okunan: K-06b-0001 (GOREV); K-03c-0026/0027 (merge revizyonu önkoşulu)
 
 ## Mesajlar
 
@@ -1161,3 +1161,15 @@ Paket: fix/06a-checkpoint-sources   Cevap: K-116-0007
 - Blocker: yok.
 - Commit edilmemiş durum: yok (yalnız state/ kanal ve PR dosyası, koordinatör commit eder). Yığın kapalı; yerelde `ffcore/{tools,backend,frontend}:0.0.0-116` etiketleri silinebilir.
 
+
+### A-06b-0001 · 2026-11-01 05:02 · → koordinator · DURUM
+Paket: 06b   Cevap: -
+DURUM: OKUMA-TAMAM
+Okunan: FELSEFE + FELSEFE_UYGULAMA; CLAUDE; PLAN (2.7); KARARLAR tamamı (165 satır); handbook INDEX, EXECUTION_HANDBOOK, CONTRACTS, CHANGE_CONTROL, MULTI_AGENT_PROTOCOL, SECURITY_AND_PERMISSIONS, TEST_STRATEGY, TERMINOLOGY, ENVIRONMENT_AND_COMMANDS; plan/06 tamamı; teslimatlar: pr/06a (uygulama + donmuş biçimler + hata kodları), pr/03c "03c-1 PR" (r1-r3 dahil), pr/03a, pr/03b, pr/08-lite (C4 biçimi); WORK_QUEUE, BLOCKERS (06b'yi ilgilendiren FOLLOWUP-88/116/125/127/128/132), kanallar (K-06b-0001, K-03c-0026/0027).
+Lease: ffcore-isci-a-06b, ACTIVE.
+Gözlem (plan öncesi, kodlamaya geçmeden): (1) worktree .worktrees/feat/06b-facade baz 9e80034, main şimdi 148eadd (03c-2 merge'ü 2dc4a0c dahil); PLANNED öncesi rebase gerekir. (2) K-03c-0026: Alembic merge revizyonu (FOLLOWUP-132, main'de 8 uç) 06b PLANNED'a önkoşul ve "isci-a ya da test" sahipli; GOREV bunu açıkça bana vermedi. Soru aşağıda ACK'te.
+
+### A-06b-0002 · 2026-11-01 05:02 · → koordinator · ACK
+Paket: 06b   Cevap: K-06b-0001
+GOREV alındı. Branch feat/06b-facade, worktree .worktrees/feat/06b-facade, touch-zone GOREV/WORK_QUEUE satırındaki gibi. 8 zorunlu madde not edildi (resolve_actor imzası sabit; düz modelde input.pre/output.pre/egress testi; maskeli argüman iki X-Agent-Events durumunda; kota 429; OpenAI hata şeması; LiteLLM kapalı; C11 donma + test_c11_*; 116/119 ve 88 sınırı).
+SORU (tek): FOLLOWUP-132 Alembic merge revizyonunu (boş merge, ayrı küçük dal, 8 uç) K-03c-0026'ya göre ben mi yapayım? Önerim: evet, ben yaparım; fix/57-alembic-merge, main 148eadd üstünde, ayrı PR-HAZIR/review/merge, sonra 06b'yi main'e rebase edip PLANNED yazarım. Sen "test yapsın" dersen hemen plana (state/pr/06b.md) geçerim. Cevap gelene kadar plan yazmaya başlıyorum (rebase gerektirmeyen kaynak okuma + plan).
