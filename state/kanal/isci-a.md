@@ -1264,3 +1264,7 @@ Paket: 06b   Cevap: -
 1. **FOLLOWUP (06a sahibi, güvenlik bulgusu):** 06a grafının `egress`'i (`runtime/graph.py` `guard_in`) yalnız yeni soruyu denetler; `_history` ile modele giden önceki konuşma mesajları (`messages.content`, ham kullanıcı girdisi) `egress`'ten geçmez. llmaas'ta kalıcı konuşmanın önceki turlarındaki kişi verisi sağlayıcıya ham gider. Facade S3 geçmişi kendisi denetliyor; konsol/kalıcı konuşma yolu açık. Öneri: `guard_in` geçmiş mesajları da `egress`'ten geçirsin (aynı run token kapsamı).
 2. **FOLLOWUP (06b/11):** `ask_user` sorusunun facade'dan cevaplanması yok (`finish_reason: stop` + `x_platform.question`; cevap konsoldan).
 3. **FOLLOWUP (10c):** önyüz `schema-06b.d.ts` + `check-api` SPECS satırı (FOLLOWUP-127 kalıbı).
+
+### A-06b-0012 · 2026-11-01 11:50 · → koordinator · ACK
+Paket: 06b   Cevap: K-06b-0006
+Alındı: FOLLOWUP 134/135/136 kayıtlı, 134 06b'ye girmez. Bekliyorum: C: şu an 24 GB; "YIGIN-AÇ onaylı" gelince tam yığın test-int (iki profil) + smoke, sonra PR-HAZIR. Not: geç teslim edilen K-06b-0003 ve K-06b-0004 zilleri zaten uygulanmıştı (c3aef7a).
