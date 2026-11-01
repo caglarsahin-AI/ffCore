@@ -16,6 +16,34 @@ over from the PayCore deployment); changing one is a decision, not a tuning knob
 `make reindex PROJECT=<key> KB=<key> LAYER=silver|gold [FULL=1]` (tools container) queues the
 job; the worker log shows `reused=N embedded=M`.
 
+## Ingest from a raw-staging tree (`ingest-raw`, package 19)
+
+A connector or a consumer that already has the content (PayCore's raw layer) writes a
+**raw-staging tree**: each document is a file with `<file>.meta.json` beside it
+(`source` as `<kind>:<space>`, `source_item_id`, optional `title`, `breadcrumb`, `source_url`,
+`updated_at_source`, `attachments` as file names in the same directory). Other meta fields are
+ignored. Then:
+
+```
+python -m ffcore.cli ingest-raw --project <p> --kb <kb> --raw-dir <tree, read-only>   --acl <role> --sources <kind:space> ... [--limit N] [--manifest-out <file>] [--accept-personnel-data]
+```
+
+- Every file goes through C6 `ingest_from_raw` with the named text filter `pii_regex`
+  (e-mail, phone, national id, IBAN, card; redacted to `[CODE]` before silver is written, so
+  silver, `.raw.md` and gold are masked; raw stays byte for byte; the document records
+  `metadata.text_filter = "pii_regex@<version>"`). There is no option to turn it off. Names
+  need NER (08 full) and are not masked.
+- The record key is the path inside the tree; an unchanged file (same sha256) is `unchanged`
+  and not processed again. The breadcrumb from the meta file is used when given.
+- Refused, counted, never silently skipped: `path_outside_base` (symlink, `..`, outside the
+  tree), `too_large` (Kapı 0 limits), `meta_missing`, `meta_invalid`, `source_not_selected`,
+  `prsim_requires_ner` (PRSIM without `--accept-personnel-data`). With the flag, a card number,
+  IBAN or national id in a personnel-data source stops the run (`customer_data_suspected`).
+- The output is counts only. The manifest (`--manifest-out`, never under the tree) holds stage
+  (`full` or `stage0-pipeline-evidence` with `--limit`), per-source documents and chunks, current
+  statuses, `failed`/`timeout`, refusals and `raw_manifest_sha256`.
+- Deleting a document keeps raw and silver files (FOLLOWUP-133).
+
 ## Conversion
 
 The first bytes decide, the extension only breaks ties: an MHTML web archive saved as `.doc` is
