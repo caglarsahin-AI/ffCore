@@ -1,13 +1,9 @@
 """03a migration: tables, constraints and the migration round trip on the compose Postgres."""
 
-import os
-import subprocess
 import uuid
 
 import psycopg
 import pytest
-
-from tests.integration.conftest import BACKEND
 
 TABLES = {
     "users",
@@ -91,19 +87,14 @@ def test_03a_6_member_role_enum(pg):
         )
 
 
-def test_03a_6_migration_round_trip(database_url, pg):
-    env = {**os.environ, "DATABASE_URL": database_url}
-
-    def alembic(*args):
-        return subprocess.run(
-            ["alembic", *args], cwd=BACKEND, env=env, check=True, capture_output=True, text=True
-        ).stdout
-
-    heads = alembic("heads")
-    assert "03a_0001" in heads and "03b_0001" in heads
-    # Only the 03a branch: "03a@base" would resolve to the shared root and drop 03b too.
-    alembic("downgrade", "03a@-1")
-    assert not (TABLES & _tables(pg))
-    assert "audit_events" in _tables(pg)  # 03b untouched
-    alembic("upgrade", "heads")
-    assert TABLES <= _tables(pg)
+def test_03a_6_migration_round_trip(scratch_db):
+    # Since the merge revisions (FOLLOWUP-57) "03a@-1" is ambiguous; go down to the shared root,
+    # bring 03b back alone and check that 03a's downgrade left nothing behind.
+    db = scratch_db
+    assert TABLES <= db.tables()
+    db.run("downgrade", "0001")
+    db.run("upgrade", "03b_0001")
+    assert not (TABLES & db.tables())
+    assert "audit_events" in db.tables()  # 03b stands on its own
+    db.run("upgrade", "head")
+    assert TABLES <= db.tables()

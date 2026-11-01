@@ -3,13 +3,12 @@
 import asyncio
 import json
 import os
-import subprocess
 import uuid
 
 import pytest
 
 from tests.dummy import OBO_SECRET, SERVICE_TOKEN
-from tests.integration.conftest import BACKEND, audit_rows
+from tests.integration.conftest import audit_rows
 
 P = "/api/v1/projects/{}"
 TC = "10000000146"
@@ -307,25 +306,18 @@ def test_08_18_egress_flag_from_environment(service_client, project, egress):
     assert _evaluate(service_client, project, TEXT, stage="egress").status_code == 200
 
 
-def test_08_23_migration_roundtrip(database_url, pg):
-    env = {**os.environ, "DATABASE_URL": database_url}
-
-    def alembic(*args):
-        return subprocess.run(["alembic", *args], cwd=BACKEND, env=env, capture_output=True)
-
-    def tables():
-        rows = pg.execute("SELECT tablename FROM pg_tables WHERE schemaname = 'public'")
-        return {r[0] for r in rows.fetchall()}
-
+def test_08_23_migration_roundtrip(scratch_db):
+    # Explicit revisions since the merge revisions (FOLLOWUP-57): "08@-1" is ambiguous.
+    db = scratch_db
     ours = {"pii_policies", "guardrail_policies", "guardrail_events"}
-    assert ours <= tables()
-    assert alembic("downgrade", "08@-1").returncode == 0
-    assert not ours & tables()
-    assert {"projects", "users", "audit_events"} <= tables()
-    assert alembic("upgrade", "heads").returncode == 0
-    assert ours <= tables()
-    heads = alembic("heads").stdout.decode()
-    assert "08_0001" in heads
+    assert ours <= db.tables()
+    db.run("downgrade", "0001")
+    for rev in ("03a_0001", "03b_0001"):
+        db.run("upgrade", rev)
+    assert not ours & db.tables()
+    assert {"projects", "users", "audit_events"} <= db.tables()
+    db.run("upgrade", "head")
+    assert ours <= db.tables()
 
 
 def test_08_19b_read_mode_get_parity(admin, client_factory, make_user, project):

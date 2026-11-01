@@ -226,9 +226,11 @@ returns newest first. `GET /audit.csv` takes the same filters and exports at mos
 
 ### Migrations
 
-03a lives on Alembic branch `03a` (`03a_0001`). To roll back only this package:
-`docker compose run --rm migrate alembic downgrade 03a@-1`. Do not use `03a@base`: it resolves to
-the shared root `0001` and also drops 03b.
+03a lives on Alembic branch `03a` (`03a_0001`). Since the package branches were merged into one
+head (`57_0002`, FOLLOWUP-57), `03a@-1` is refused ("Ambiguous walk"); roll back with an explicit
+revision: `docker compose run --rm migrate alembic downgrade <revision to keep>` removes everything
+above it. Every other package depends on `03a_0001`, so removing it means going down to the shared
+root `0001` (docs/gelistirme-ortami.md).
 
 ## API keys, quotas and usage (03c)
 
@@ -361,7 +363,7 @@ installation).
 
 03c lives on Alembic branch `03c` (`03c_0001`: `api_keys`, `quotas`, `usage_daily`,
 `audit_events.via_key_id`; `03c_0002`: `retention_policies`, `retention_runs`, `alert_rules`,
-`alerts`, `notification_settings`, `runs.content_cleared_at`). Roll back: `docker compose run --rm migrate alembic downgrade 03c@-1`.
+`alerts`, `notification_settings`, `runs.content_cleared_at`). Roll back `03c_0002` only: `docker compose run --rm migrate alembic downgrade 03c_0001` (an explicit revision; `03c@-1` is refused since the merge, FOLLOWUP-57).
 
 ## Knowledge bases (04a)
 
@@ -393,5 +395,6 @@ Search response: hits newest source first with `age_days`, each with `embed_scor
 `rerank_score`; `threshold_mode` says which single threshold applied (`rerank_floor` with the
 reranker on, `min_score` with it off) and `filtered_by_*` how many candidates it removed.
 
-04a lives on Alembic branch `04a` (`04a_0001`, depends on `03a_0001`); roll back with
-`alembic downgrade 04a@-1`. `chunks.embedding` is `vector(EMBED_DIM)` as read at migration time.
+04a lives on Alembic branch `04a` (`04a_0001`, depends on `03a_0001`); roll back with an explicit
+revision (`alembic downgrade <revision to keep>`; `04a@-1` is refused since the merge,
+FOLLOWUP-57, docs/gelistirme-ortami.md). `chunks.embedding` is `vector(EMBED_DIM)` as read at migration time.

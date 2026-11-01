@@ -19,6 +19,7 @@
 
 - Her yeni davranış `settings.features` bayrağı ya da additive yapılandırma ile kapatılabilir; eski varsayılan korunur.
 - Geri alma = önceki imaj tag'i + `alembic downgrade <önceki>`; veri migration'ı şema migration'ından ayrı dosyada ve tersine çevrilebilir.
+- Alembic geri alması açık revizyon kimliğiyle yapılır (`alembic downgrade <kalacak revizyon>`): paket dalları tek uçta birleştikten sonra (57_0002, FOLLOWUP-57) merge noktasından `downgrade -1` ve `<etiket>@-1` belirsizdir ("Ambiguous walk") ve reddedilir; ayrıntı `docs/gelistirme-ortami.md`.
 - Vektör yeniden indeksleme (embedding modeli ya da sürücü değişimi) yeni koleksiyona yazar; eski koleksiyon geçiş doğrulanana kadar silinmez (`migrate-vectors`, 04b).
 - Bilgi tabanı silme güvenli kurallara bağlı (04 safe prune): tombstone, sonra fiziksel silme; raw katmanı yeniden dönüşüm için kalır.
 - LiteLLM model kayıtları tablolardan üretilir (PLAN 5); geri alma `render-litellm` ile DB'den yeniden yazmaktır, elle config düzeltmesi yok.
