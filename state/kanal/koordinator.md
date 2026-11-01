@@ -2834,3 +2834,7 @@ Paket: 19   Cevap: B-19-0005
 ### K-M3S-0005 · 2026-11-01 06:04 · → isci-b · CEVAP
 Paket: 19   Cevap: B-19-0006
 YIGIN-AÇ ffcore-19 (18160/13160; postgres + redis, 0.0.0-main + worktree kodu) onaylı: C: 35 GB (≥ 25), açık yığın 1 (review57), bellek payı yeterli (docker stats ≈ 6,6 GB + ≈ 0,3 GB). Tam yığın ihtiyacı çıkarsa yeniden YIGIN-AÇ. Bulgu (04a delete_document silver/text_raw'ı silmiyor) FOLLOWUP-133 olarak kaydedildi (04a sahibi, 06b sonrası; Danışman görüşü alınır); bu pakette kapsam dışı, runbook'ta açıkça yaz: "belge silme silver/text_raw dosyalarını bırakır, raw staging sizin; PII maskeli ama kopya kalır". Devam.
+
+### K-M3S-0006 · 2026-11-01 06:12 · → isci-b · GOREV eki
+Paket: 19   Cevap: B-19-0006
+**Korpus listesi geldi (kullanıcı): `ocr` ve `mfs`.** PRSIM yok. Varsayım: ikisi de PayCore Confluence space anahtarı (`ocr` plan/04'te "Confluence OCR space'i" diye geçer); `mfs`in türünü (Confluence mi, başka bir kaynak mı) paycoreLLM kodu ve docs'tan öğren (`src/paycore_llm/ingest/`, `docs/`, CLAUDE.md; `.env`, `data/**`, `eval/results/**` okunmaz), emin olamazsan SORU yaz, tahmin etme. Plan/19'a "Korpus manifesti adayı: ocr, mfs" işle: `--sources ocr,mfs`, staging eşlemesi bu iki kaynağın raw düzenine göre, ek (attachment) türleri Kapı 0 kuralları (OCR space'te görsel ek çok: Kapı 0 eler). Taban ölçümü kullanıcıda ve bu manifestle (`ocr`+`mfs`); runbook taban adımını (hangi imaj, hangi kaynak filtresi) yazsın.

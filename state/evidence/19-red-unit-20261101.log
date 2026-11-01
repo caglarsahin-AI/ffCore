@@ -31,3 +31,8 @@ E   ImportError: cannot import name 'ingest_mask' from 'ffcore.knowledge' (/work
 ERROR tests/unit/test_19_raw_staging.py
 !!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
 1 error in 10.76s
+E   FileNotFoundError: [Errno 2] No such file or directory: '/work/scripts/m3_gate_check.py'
+=========================== short test summary info ============================
+ERROR tests/unit/test_19_eval_out.py - FileNotFoundError: [Errno 2] No such f...
+!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+1 error in 0.94s

@@ -1,0 +1,14 @@
+F2026-11-01 03:10:04,988 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+2026-11-01 03:10:05,355 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+2026-11-01 03:10:08,712 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+2026-11-01 03:10:09,077 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+.2026-11-01 03:10:29,749 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+E       AssertionError: ['created 5', 'new_version 0', 'unchanged 0', 'status: indexed 3, skipped 2', 'rejected: prsim_requires_ner 1', 'gates: gate2:boilerplate 1, gate2:no_prose 1', ...]
+E       assert Counter({'ind...'skipped': 2}) == {'indexed': 4, 'skipped': 1}
+E         
+E         Differing items:
+E         {'indexed': 3} != {'indexed': 4}
+E         {'skipped': 2} != {'skipped': 1}
+E         Use -v to get more diff
+tests/integration/test_19_ingest_raw.py:76: AssertionError
+1 failed, 4 passed, 1 skipped in 50.12s

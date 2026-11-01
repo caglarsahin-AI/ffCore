@@ -1,0 +1,40 @@
+        response = search(world["analyst"], world, kb["id"], "fesih bildirim süresi kaç gün")
+        assert response.status_code == 200, response.text
+        hits = response.json()["hits"]
+        assert hits, response.text
+        top = hits[0]
+>       assert top["breadcrumb"].endswith("Üye İşyeri Sözleşmesi Fesih Kuralları"), top
+E       AssertionError: {'chunk_id': '168b0da0-1dd8-473f-be25-41e36f6336e5', 'document_id': 'ea914134-7dd4-4c35-97fc-bf53bc0a8e95', 'document_name': 'confluence/DEMO/1001.md', 'page': None, ...}
+E       assert False
+E        +  where False = <built-in method endswith of str object at 0x7f55d0690a30>('Üye İşyeri Sözleşmesi Fesih Kuralları')
+E        +    where <built-in method endswith of str object at 0x7f55d0690a30> = 'Sözleşmeler › DEMO › Kurulum › Ödeme Geçidi Kurulum Rehberi › Ön koşullar · Destek · Doğrulama'.endswith
+
+tests/integration/test_19_ingest_raw.py:130: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+2026-11-01 03:08:47,925 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=217
+2026-11-01 03:08:48,274 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=250
+2026-11-01 03:08:48,944 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=276
+2026-11-01 03:08:49,349 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=273
+------------------------------ Captured log setup ------------------------------
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=217
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=250
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=276
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=273
+----------------------------- Captured stderr call -----------------------------
+2026-11-01 03:08:49,630 INFO ffcore.access access method=POST path=/api/v1/projects/e3cb4d14-6aaa-46a3-a99f-819c0978972a/knowledge-bases status=201 ms=87
+2026-11-01 03:08:49,823 INFO ffcore.knowledge.ingest gold document=ea914134-7dd4-4c35-97fc-bf53bc0a8e95 reused=0 embedded=1
+2026-11-01 03:08:49,989 INFO ffcore.knowledge.ingest gold document=8b4001d3-add7-4291-aa4c-6f76ad2907a9 reused=0 embedded=1
+2026-11-01 03:08:50,151 INFO ffcore.knowledge.ingest gold document=30cb6a43-577a-407b-b9c4-0986923bbc00 reused=0 embedded=2
+2026-11-01 03:08:50,395 WARNING ffcore.knowledge.raw_ingest ingest-raw rejected path=jira/PRSIM/PRSIM-1.txt code=prsim_requires_ner
+2026-11-01 03:08:50,481 INFO ffcore.access access method=POST path=/api/v1/projects/e3cb4d14-6aaa-46a3-a99f-819c0978972a/knowledge-bases/1ca6120b-f1e8-4cc4-a4e8-36b42d95886a/search status=200 ms=82
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/e3cb4d14-6aaa-46a3-a99f-819c0978972a/knowledge-bases status=201 ms=87
+INFO     ffcore.knowledge.ingest:ingest.py:637 gold document=ea914134-7dd4-4c35-97fc-bf53bc0a8e95 reused=0 embedded=1
+INFO     ffcore.knowledge.ingest:ingest.py:637 gold document=8b4001d3-add7-4291-aa4c-6f76ad2907a9 reused=0 embedded=1
+INFO     ffcore.knowledge.ingest:ingest.py:637 gold document=30cb6a43-577a-407b-b9c4-0986923bbc00 reused=0 embedded=2
+WARNING  ffcore.knowledge.raw_ingest:raw_ingest.py:118 ingest-raw rejected path=jira/PRSIM/PRSIM-1.txt code=prsim_requires_ner
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/e3cb4d14-6aaa-46a3-a99f-819c0978972a/knowledge-bases/1ca6120b-f1e8-4cc4-a4e8-36b42d95886a/search status=200 ms=82
+=========================== short test summary info ============================
+FAILED tests/integration/test_19_ingest_raw.py::test_19_1_ingest_raw_paycore_like_idempotent
+FAILED tests/integration/test_19_ingest_raw.py::test_19_1_search_returns_the_cited_source
+2 failed, 3 passed, 1 skipped in 51.00s
