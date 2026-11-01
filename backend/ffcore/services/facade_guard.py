@@ -1,0 +1,150 @@
+"""Guardrails on the facade's own paths (06b): the 08 engine called directly, as 06a's graph does
+(B3: there is no hook inside LiteLLM). The direct model path and the external agent have no
+graph, so their `input.pre`, `egress` and `output.pre` checks run here and their events go to
+`guardrail_events` with source `api` (and the run id when there is a run)."""
+
+import json
+import uuid
+from dataclasses import dataclass, field, replace
+from typing import Any
+
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from ffcore.core.errors import ApiError
+from ffcore.guardrails import engine
+from ffcore.guardrails.masking import RedisTokenStore
+from ffcore.guardrails.service import record_events, resolve_policy
+from ffcore.guardrails.settings import get_guardrail_settings
+
+OUTPUT_STAGES = frozenset({"output.pre", "output.stream.delta"})
+# The roles whose text comes from the client and is checked as input (S9: tool results too);
+# every message, the assistant's included, leaves through `egress`.
+INPUT_ROLES = frozenset({"system", "developer", "user", "tool"})
+
+
+class GuardrailBlocked(ApiError):
+    def __init__(self, message: str | None, reference_id: str | None) -> None:
+        text = message or "The request was blocked by a guardrail."
+        if reference_id:
+            text = f"{text} (reference {reference_id})"
+        super().__init__(400, "invalid_request_error", "guardrail_blocked", text)
+        self.reference_id = reference_id
+
+
+def content_not_supported() -> ApiError:
+    return ApiError(
+        400,
+        "invalid_request_error",
+        "content_type_not_supported",
+        "Only text content parts are accepted: guardrails cannot check other parts.",
+    )
+
+
+@dataclass
+class FacadeGuard:
+    session: AsyncSession
+    redis: Any
+    policy: Any
+    project_id: str
+    run_id: str | None = None
+    # The token scope of `tokenize` (08: tokens are reversible within one scope). A run's scope is
+    # its id; a direct call has no run, so one request is one scope. Pass the same scope to every
+    # guard of one request (input, egress and output must share their tokens).
+    scope: str = field(default_factory=lambda: f"facade-{uuid.uuid4().hex}")
+    events: int = field(default=0)
+
+    @classmethod
+    async def load(
+        cls, session, redis, project_id, *, policy_key="default", run_id=None, scope=None
+    ):
+        policy = await resolve_policy(session, project_id, policy_key)
+        guard = cls(session, redis, policy, str(project_id), run_id)
+        if scope is not None or run_id is not None:
+            guard.scope = scope or str(run_id)
+        return guard
+
+    @property
+    def egress_enabled(self) -> bool:
+        return get_guardrail_settings().guardrail_egress_enabled
+
+    @property
+    def streams_live(self) -> bool:
+        """06a V8: an enforce-mode policy that checks output shows nothing before the check."""
+        spec = self.policy.spec
+        checks_output = any(OUTPUT_STAGES & set(rule.stages) for rule in spec.rules)
+        return not (spec.mode == "enforce" and checks_output)
+
+    async def text(self, stage: str, text: str) -> str:
+        """The checked text (redacted, tokenized); a block raises GuardrailBlocked."""
+        if not text:
+            return text
+        if stage == "egress" and not self.egress_enabled:
+            # GUARDRAIL_EGRESS_ENABLED=false (airgap): the stage does not exist there (08 S3).
+            return text
+        guard = get_guardrail_settings()
+        ctx = engine.EvalContext(
+            # The engine's token scope is its run id (08 masking); see `scope` above.
+            run_id=self.scope,
+            project_id=self.project_id,
+            source="api",
+            token_store=RedisTokenStore(self.redis, guard.pii_token_ttl_s),
+            egress_enabled=self.egress_enabled,
+        )
+        decision = await engine.evaluate(text, stage, self.policy, ctx=ctx)
+        if decision.events:
+            # Events name the real run (or none), never the request's token scope.
+            events = [replace(e, run_id=self.run_id) for e in decision.events]
+            record_events(self.session, self.project_id, events, decision.reference_id)
+            await self.session.commit()
+            self.events += len(decision.events)
+        if decision.action == "block":
+            raise GuardrailBlocked(decision.message, decision.reference_id)
+        return decision.text_out
+
+    async def json_text(self, stage: str, value: Any) -> Any:
+        """A JSON value (tool definitions, tool call arguments) through a text stage; the result
+        must still parse, otherwise the call is refused (a broken argument is never sent)."""
+        raw = json.dumps(value, ensure_ascii=False)
+        checked = await self.text(stage, raw)
+        if checked == raw:
+            return value
+        try:
+            return json.loads(checked)
+        except ValueError:
+            raise ApiError(
+                400,
+                "invalid_request_error",
+                "guardrail_unparseable",
+                "A guardrail changed structured content so that it no longer parses.",
+            ) from None
+
+
+def message_text(message: dict) -> str:
+    """A message's text; list content is accepted only when every part is text."""
+    content = message.get("content")
+    if content is None or isinstance(content, str):
+        return content or ""
+    parts = []
+    for part in content:
+        if not isinstance(part, dict) or part.get("type") != "text":
+            raise content_not_supported()
+        parts.append(str(part.get("text") or ""))
+    return "".join(parts)
+
+
+async def guard_messages(guard: FacadeGuard, messages: list[dict]) -> list[dict]:
+    """`input.pre` on the client's own text, then `egress` on everything that leaves."""
+    out = []
+    for message in messages:
+        message = dict(message)
+        text = message_text(message)
+        if message["role"] in INPUT_ROLES:
+            text = await guard.text("input.pre", text)
+        text = await guard.text("egress", text)
+        if message.get("content") is not None:
+            message["content"] = text
+        if message.get("tool_calls"):
+            # An earlier assistant turn's calls go out again: egress, like any text.
+            message["tool_calls"] = await guard.json_text("egress", message["tool_calls"])
+        out.append(message)
+    return out
