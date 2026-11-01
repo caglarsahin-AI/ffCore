@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-b-19-3de6e682
 - Aktif paket: 19 (M3 sunucu paketi)
 - Durum: ACTIVE
-- Son okunan: koordinator K-M3S-0002 (2026-11-01 05:32)
+- Son okunan: koordinator K-M3S-0003 (2026-11-01 05:50)
 
 ## Mesajlar
 
@@ -1320,3 +1320,7 @@ Konu: [C] PayCore sunucusuna gelen FFCore imajları ve paketleme listesi. Yeni b
 - **A (Önerilen):** Qdrant PayCore'un mevcut servisini yeniden kullan (yalnız FFCore koleksiyonları), FFCore için ayrı pgvector Postgres + Redis + LiteLLM ekle. Gerekçe: PayCore Postgres'i 16-alpine'dır, pgvector yok; Qdrant ikinci kopyası ~2 GB bellek ister, sunucu kağıt üstünde zaten 65,5 GB. Bedel: iki Postgres (PayCore + FFCore) ve bellek tablosunda +~2,5 GB (postgres 1g, redis 512m, litellm 1g).
 - **B:** FFCore yığınının tamamı ayrı (kendi Qdrant'ı dahil). Bedel: +2 GB bellek, PayCore koleksiyonuyla çakışma riski hiç yok ama iki Qdrant.
 - **C:** PayCore Postgres'ine pgvector ekle (imaj değişimi). Bedel: PayCore çalışan veritabanını değiştirmek (D sınıfına yakın risk), reddedilmesini öneririm.
+
+### B-19-0005 · 2026-11-01 06:12 · → koordinator · ACK
+Paket: 19   Cevap: K-M3S-0003
+ACK: plan onayı, kardeş worktree paycoreLLM-m3, touch-zone eki; [C] B (ayrı FFCore Qdrant, ffcore compose `qdrant` servisi, PayCore Qdrant'ına dokunulmaz, bellek tablosu +2 GB); `text_filter: Literal["pii_regex"] | None` adlı, `metadata.text_filter="pii_regex@<sürüm>"`, raw birebir, maske silver yazımından önce, `text_hash` maskeli silver'dan, CONTRACTS C6 additive not; 04a belge silmenin raw'ı silip silmediğini kontrol edeceğim. Plan state/pr/19.md buna göre güncellenecek. Önce kırmızı.

@@ -1,6 +1,6 @@
 # PR fix/57-alembic-merge: tek migration ucu (FOLLOWUP-57/132)
 
-**Paket:** fix/57-alembic-merge · **Sınıf:** [B] · **Branch:** fix/57-alembic-merge · **Baz:** main 148eadd · **HEAD:** (commit sonrası) · GOREV K-57-0001 · yeni bağımlılık, imaj, compose servisi yok.
+**Paket:** fix/57-alembic-merge · **Sınıf:** [B] · **Branch:** fix/57-alembic-merge · **Baz:** main 148eadd · **HEAD:** 5dbf11ec1eae40003b108cee09fc768943bdee0b (1 commit, 14 dosya +370/−88) · GOREV K-57-0001 · yeni bağımlılık, imaj, compose servisi yok.
 
 ## Plan (kısa, < 1 gün)
 
@@ -19,7 +19,7 @@
 - Yeni: `backend/alembic/versions/57_0001_join_dependency_heads.py`, `57_0002_merge_heads.py` (ikisi de `upgrade/downgrade: pass`), `backend/tests/contract/test_57_alembic_single_head.py`, `backend/tests/integration/test_57_alembic_merge.py`.
 - Test altyapısı: `backend/tests/integration/conftest.py` (`scratch_db` fikstürü: tek uçta geçici DB, yıkıcı round-trip'ler paylaşılan oturum DB'sine dokunmasın).
 - Uyarlanan testler (başka paketlerin dosyaları, yalnız migration round-trip'leri): `test_03a_schema.py::test_03a_6_migration_round_trip`, `test_06a_schema.py::test_06a_schema_migration_round_trip`, `test_07_schema.py::test_07_migration_roundtrip`, `test_08_api.py::test_08_23_migration_roundtrip` (göreli `@-1` → açık hedef + `scratch_db`; aynı downgrade fonksiyonlarını sınar), `test_04a_store.py::test_04a_schema_alembic_heads_include_04a` (tek satır beklentisi). `ruff --fix` bu dosyalarda kullanılmayan `os/subprocess/BACKEND` importlarını kaldırdı.
-- Belgeler: `docs/gelistirme-ortami.md` (tek uç paragrafı), `docs/api.md` (üç geri alma cümlesi), `deploy/docker-compose.yml` (yalnız `migrate` yorumu).
+- Belgeler: `docs/gelistirme-ortami.md` (tek uç paragrafı), `docs/api.md` (üç geri alma cümlesi), `deploy/docker-compose.yml` (yalnız `migrate` yorumu), `handbook/RELEASE_AND_ROLLBACK.md` "Geri alma ilkeleri" tek cümle (K-57-0002 touch-zone eki).
 
 ## Kabul kriterleri → testler
 
@@ -28,7 +28,10 @@
 | 1 | `alembic heads` tek satır; tek uç her paket dalını kapsar; merge revizyonları şemasız | `test_57_1_single_head`, `_1_head_reaches_every_package_branch`, `_1_merge_revisions_are_empty` (contract, DB'siz), `test_57_1_alembic_heads_prints_one_line` (DB) | geçti |
 | 2 | Temiz DB'de `upgrade head` (tekil); merge'ü geri al ve yeniden çık; `upgrade heads` (migrate) geriye uyumlu | `test_57_2_empty_database_upgrade_head_and_back` | geçti |
 | 3 | Kurulu (merge öncesi, 4 satırlı) DB `upgrade head` ve `upgrade heads` ile tek uca çıkar | `test_57_3_pre_merge_database_upgrades_to_one_head`, `_3_pre_merge_database_upgrade_heads` | geçti |
-| 4 | Göreli geri alma açık hatayla reddedilir, hiçbir şey değişmez; açık revizyonla tek paket revizyonu geri alınır | `test_57_4_relative_downgrade_from_the_merge_fails_loudly`, `_4_explicit_revision_rolls_back_one_package_revision` | geçti |
+| 3b | Main şekilli DB'de veri korunur (K-57-0002 2b) | `test_57_3_pre_merge_database_upgrades_to_one_head` (proje satırı + tablo kümesi aynı) | geçti |
+| 4 | Göreli geri alma açık hatayla reddedilir, hiçbir şey değişmez; açık revizyonla tek paket revizyonu geri alınır (`downgrade 57_0001`, `downgrade 06a_0001`) | `test_57_4_relative_downgrade_from_the_merge_fails_loudly`, `_4_explicit_revision_rolls_back_one_package_revision`, `test_57_2_*` | geçti |
+| 4b | `downgrade 0001` (hepsi) ve geri | `test_57_5_downgrade_to_the_root_and_back` | geçti |
+| 6 | `migrate` servisi (komut `upgrade heads` değişmedi) main şekilli ve temiz DB'de tek uca çıkar (K-57-0002 madde 3) | yığında elle, `0.0.0-57` imajı: bkz. "migrate servisi kanıtı" | geçti |
 | 5 | Paket round-trip'leri (03a/06a/07/08) yeni kuralla yeşil | uyarlanan 4 test + 04a heads testi | geçti |
 
 Kırmızı: merge yokken contract 3/3 failed (`state/evidence/57-red-contract-20261101.log`). Tek adımlı merge ile `upgrade heads` KeyError (A-57-0003, yığın ölçümü).
@@ -44,8 +47,26 @@ Hepsi `MSYS_NO_PATHCONV=1 FFCORE_VERSION=0.0.0-main docker compose -p ffcore-57 
 | `docker compose config -q` | | 0 | |
 | `make lint test` | `DEPLOY_PROFILE=llmaas` | 0 | 737 passed (734 + 3) |
 | `make lint test` | `DEPLOY_PROFILE=airgap` | 0 | 737 passed |
-| `make test-int` | llmaas | (bekliyor) | |
-| `make test-int` | airgap | (bekliyor) | |
+| `make test-int` (yığın `--profile test --profile qdrant`, 0.0.0-main + worktree kodu) | llmaas | 0 | 677 passed, 4 skipped (683 s) |
+| `make test-int` | airgap | 0 | 678 passed, 4 skipped (609 s; koşu sırasında eklenen `test_57_5` dahil) |
+| `make lint` + `pytest test_57_*` (son hâl) | llmaas | 0 | 10 passed (`57-tests-final`) |
+| `docker compose build backend` (`FFCORE_VERSION=0.0.0-57`; migration dosyaları imaja gömülü) | | 0 | |
+| `docker compose run --rm migrate` main şekilli DB | | 0 | aşağıda |
+| `docker compose run --rm migrate` temiz DB (`down -v` sonrası) | | 0 | aşağıda |
+
+4 skipped: main'deki opt-in bayraklı testler (DNS/model ağırlığı), 03c kapılarındakiyle aynı.
+
+### migrate servisi kanıtı (`state/evidence/57-migrate-service-20261101.log`)
+
+- **Main şekilli DB:** yığın `0.0.0-main` ile açıldı, migrate servisi main'in grafını kurdu: `alembic_version` = `03c_0002,04a_0001,05a_0001,08_0001`, 38 tablo; sentinel proje satırı eklendi. `0.0.0-57` imajıyla `run --rm migrate`: `-> 57_0001`, `-> 57_0002` iki adım, exit 0; sonra `alembic_version` = `57_0002`, 38 tablo, sentinel satırı aynı, katalog 2 kayıt, checkpointer hazır. İkinci koşu exit 0, değişiklik yok (idempotent).
+- **Temiz DB:** `down -v`, yeni postgres, `run --rm migrate` (`0.0.0-57`): 13 upgrade adımı, exit 0, `alembic_version` = `57_0002`, 38 tablo.
+
+## Kapsam daralması (K-57-0002 madde 2d, açıkça)
+
+- **Kayıp:** bir paket dalının **ilk** revizyonunu tek başına geri almak (eski `03a@-1`, `07@-1`, `08@-1`; 06a'nın ikinci adımı) artık ifade edilemez. Merge revizyonu tüm dal etiketlerini miras alır ve alembic merge noktasından göreli inemez ("Ambiguous walk"); açık hedef `X` yalnız X'in üstündekileri kaldırır, dalın ilk revizyonunun altı ortak kök `0001`'dir.
+- **Kalan:** bir revizyonun üstünü açık hedefle geri almak (`downgrade 06a_0001`, `downgrade 03c_0001`, `downgrade 57_0001`) ve tamamını (`downgrade 0001`). Paket round-trip testleri bu yüzden `downgrade 0001` + seçili `upgrade` ile aynı downgrade fonksiyonunu sınar; "diğer paketler dokunulmadan kalır" iddiası "diğer paketler tek başına yeniden kurulur" iddiasına daraldı.
+- **Gerekçe:** alembic sınırı (1.20.1); alternatifler A-57-0003'te (B çok uç, C tarih yeniden yazımı) reddedildi.
+- **Yeni paketler** (06b dahil) `57_0002` üstüne zincirlenir; onların göreli `-1`'i zincir merge noktasının üstündeyken çalışır.
 
 ## Kontrol listesi
 
@@ -63,5 +84,6 @@ Hepsi `MSYS_NO_PATHCONV=1 FFCORE_VERSION=0.0.0-main docker compose -p ffcore-57 
 
 ## Kalan riskler
 
+- Yığında oluşturulan `ffcore/backend:0.0.0-57` imajı (7 GB) kullanıcı temizlik listesine (KARARLAR temizlik sınırı; ben silmedim).
 - Alembic sürüm yükseltmesi `merge_branch_idents` davranışını düzeltirse iki adım yine çalışır (test_57_2/3 bekçi).
 - `RELEASE_AND_ROLLBACK` "`alembic downgrade <önceki>`" diyor: uyumlu; ama paketlerin eski "`<etiket>@-1`" alışkanlığı belgelerde başka yerde kalmışsa (bulamadım: `git grep "@-1"` docs/deploy/handbook temiz) DRIFT.

@@ -1193,3 +1193,15 @@ A ile devam ediyorum (geri alınabilir, kod dalda); B/C dersen dururum.
 ### A-57-0004 · 2026-11-01 06:40 · → koordinator · ACK
 Paket: fix/57-alembic-merge   Cevap: K-57-0002
 CEVAP alındı (A). Uygulanacak: (1) RELEASE_AND_ROLLBACK "Geri alma ilkeleri" tek cümle + docs/api.md, compose yorumu, gelistirme-ortami (son üçü yapıldı); (2b) main-şekilli DB'de veri korunumu testi, (2c) `downgrade 0001` açık hedefli round-trip testi; (2d) kapsam daralması PR'da açıkça; (3) migrate servisi yığında: mevcut main-şekilli DB'ye ve `down -v` sonrası temiz DB'ye `0.0.0-57` imajıyla (migration dosyaları imaja gömülü olduğu için tek backend derlemesi, bağımlılık değişmiyor); (4) 06b planına "57_0002 üstüne zincir" cümlesi.
+
+### A-57-0005 · 2026-11-01 07:20 · → koordinator · YIGIN-KAPA 57
+Paket: fix/57-alembic-merge   Cevap: K-57-0002
+`down -v` exit 0; ffcore-57 konteyner 0, volume 0. Yerelde `ffcore/backend:0.0.0-57` (7 GB) kaldı: temizlik listesine.
+
+### A-57-0006 · 2026-11-01 07:20 · → koordinator · PR-HAZIR
+Paket: fix/57-alembic-merge   Cevap: K-57-0001, K-57-0002
+Branch fix/57-alembic-merge @ 5dbf11ec1eae40003b108cee09fc768943bdee0b (148eadd üstüne 1 commit, 14 dosya +370/−88). Sınıf [B], push yok, ağaç temiz. PR: state/pr/57-alembic-merge.md.
+İçerik: iki boş merge revizyonu (57_0001 satırsız 4 uç, 57_0002 satırlı 4 uç + 57_0001); `scratch_db` fikstürü; 03a/06a/07/08 round-trip ve 04a heads testleri açık hedeflere; docs/api.md, gelistirme-ortami, compose yorumu, RELEASE_AND_ROLLBACK.
+K-57-0002 şartları: (2a) boş DB `upgrade head`/`heads` → 57_0002; (2b) main şekilli 4 satırlı DB veri korunarak 57_0002 (test + yığında migrate servisiyle sentinel satır); (2c) `downgrade 57_0001`, `06a_0001`, `0001` açık hedefli round-trip; (2d) kapsam daralması PR'da "Kapsam daralması" bölümü; (3) migrate servisi (`upgrade heads` değişmedi) `0.0.0-57` imajıyla main şekilli ve temiz DB'de exit 0, tek satır 57_0002, idempotent; (4) 06b planı §6'da zincir kuralı.
+Kapılar: make lint 0; make test llmaas 737 / airgap 737; make test-int llmaas 677 + 4 opt-in, airgap 678 + 4 opt-in; test_57 son hâl 10 passed. Loglar state/evidence/57-*-20261101.log.
+06b: plan state/pr/06b.md hazır (S1-S9 KARAR-GEREK orada); bu merge main'e girince 06b worktree'sini rebase edip PLANNED/KARAR-GEREK mesajını yazarım.
