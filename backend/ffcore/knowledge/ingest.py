@@ -16,6 +16,7 @@ import logging
 import re
 import time
 import uuid
+from collections import Counter
 from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import UTC, datetime
@@ -27,7 +28,7 @@ from sqlalchemy import select
 
 from ffcore.core import db
 from ffcore.core.config import Settings
-from ffcore.knowledge import gates, scope
+from ffcore.knowledge import gates, ingest_mask, scope
 from ffcore.knowledge.chunking import (
     BREADCRUMB_SEPARATOR,
     ChunkingError,
@@ -348,7 +349,13 @@ def read_silver(path: Path) -> str:
 
 
 async def _attachment_texts(
-    session, document: Document, names: list[str], raw: Path, settings, convert: Converter
+    session,
+    document: Document,
+    names: list[str],
+    raw: Path,
+    settings,
+    convert: Converter,
+    text_filter: Callable[[str], str] | None = None,
 ) -> list[tuple[str, str]]:
     """Convert the document's attachments; data dumps and low quality are recorded, not used."""
     texts = []
@@ -373,6 +380,8 @@ async def _attachment_texts(
             attachment.gate2_status, attachment.gate2_reason = "skipped", result.status
             continue
         text = clean_markdown(result.text_md)
+        if text_filter is not None:
+            text = text_filter(text)
         dump = gates.data_dump(text)
         if dump:
             attachment.gate2_status, attachment.gate2_reason = "skipped", f"data_dump:{dump}"
@@ -383,6 +392,28 @@ async def _attachment_texts(
             texts.append((name, text))
     await session.flush()
     return texts
+
+
+class _CountingFilter:
+    """A named text filter with its per-category counts for this document (counts only)."""
+
+    def __init__(self, name: str) -> None:
+        self.filter = ingest_mask.resolve(name)
+        self.counts: Counter = Counter()
+
+    def __call__(self, text: str) -> str:
+        masked, found = self.filter.apply(text)
+        self.counts.update(found)
+        return masked
+
+
+def _text_filter(document: Document) -> _CountingFilter | None:
+    """The filter the document was registered with (`<name>@<version>`, 19); a reindex from raw
+    applies the same one. An unknown name fails the document loudly, never passes unmasked."""
+    label = (document.meta or {}).get("text_filter")
+    if label is None:
+        return None
+    return _CountingFilter(str(label).split("@", 1)[0])
 
 
 def _fail(document: Document, status: str, result: ConversionResult) -> None:
@@ -430,11 +461,22 @@ async def ingest_document(
             await session.commit()
             return IngestReport(document_id, "failed")
 
-        body = clean_markdown(result.text_md)
+        text_md, masking = result.text_md, _text_filter(document)
+        if masking is not None:
+            # 19: raw stays byte for byte; silver (and text_raw beside it) is masked before it
+            # is written, so gold and the model only ever see the masked text (K-M3S-0003).
+            text_md = masking(text_md)
+        body = clean_markdown(text_md)
+        if masking is not None:
+            body = masking(body)
         extra = await _attachment_texts(
-            session, document, attachments or [], raw.parent, settings, convert
+            session, document, attachments or [], raw.parent, settings, convert, masking
         )
-        breadcrumb = f"{kb.name}{BREADCRUMB_SEPARATOR}{document.filename}"
+        if masking is not None:
+            document.meta = {**document.meta, "text_filter_counts": dict(masking.counts)}
+        # A connector's breadcrumb (C6 metadata) wins over the file name (16, 19: D5).
+        breadcrumb = document.meta.get("breadcrumb") or document.filename
+        breadcrumb = f"{kb.name}{BREADCRUMB_SEPARATOR}{breadcrumb}"
         document.breadcrumb = breadcrumb
         document.normalizer_config_id = NORMALIZER_CONFIG_ID
         document.text_hash = text_hash(body)
@@ -456,7 +498,7 @@ async def ingest_document(
         full_text = body + "".join(f"\n\n# Ek: {name}\n\n{text}" for name, text in extra)
         silver = silver_path(settings, document)
         _write_silver(
-            silver, _frontmatter(document, kb, result.method, breadcrumb), full_text, result.text_md
+            silver, _frontmatter(document, kb, result.method, breadcrumb), full_text, text_md
         )
         document.silver_path = str(silver)
         final = gates.combine(
@@ -619,10 +661,13 @@ async def ingest_from_raw(
     store: VectorStore,
     embed_client: EmbedClient,
     convert: Converter = convert_bounded,
+    text_filter: ingest_mask.TextFilterName | None = None,
 ) -> uuid.UUID:
     """C6 entry point for source connectors (16): content already in raw is converted and
     indexed. metadata: kb_id, filename, optional source, source_item_id, attachments (names next
-    to raw_path), updated_at_source; acl: roles, users."""
+    to raw_path), updated_at_source, breadcrumb; acl: roles, users. `text_filter` (19, additive):
+    a named filter applied to silver and gold, never to raw; recorded as `<name>@<version>`."""
+    label = ingest_mask.resolve(text_filter).label if text_filter is not None else None
     path = Path(raw_path)
     async with db.session_scope() as session:
         kb = await session.get(KnowledgeBase, uuid.UUID(str(metadata["kb_id"])))
@@ -641,6 +686,8 @@ async def ingest_from_raw(
         document.meta = {
             k: v for k, v in metadata.items() if k not in {"kb_id", "attachments", "filename"}
         }
+        if label is not None:
+            document.meta["text_filter"] = label
         if metadata.get("updated_at_source") is not None:
             # The column orders search results (FOLLOWUP-101); the metadata copy stays as given.
             document.updated_at_source = _source_date(metadata["updated_at_source"])

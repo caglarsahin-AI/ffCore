@@ -100,7 +100,7 @@ async def enqueue_reindex(project_key: str, kb_key: str, layer: str, full: bool)
     return await get_queue(get_settings()).enqueue("reindex_job", str(kb_id), layer, full)
 
 
-def main(argv: list[str] | None = None) -> int:
+def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="python -m ffcore.cli")
     commands = parser.add_subparsers(dest="command", required=True)
     admin = commands.add_parser("create-superadmin", help="create the first superadmin")
@@ -148,7 +148,37 @@ def main(argv: list[str] | None = None) -> int:
         "setup-checkpointer",
         help="create the LangGraph checkpoint tables in the checkpoints schema (06a, idempotent)",
     )
+    raw = commands.add_parser(
+        "ingest-raw",
+        help="ingest a raw-staging tree (file + <file>.meta.json) into a knowledge base (19)",
+        description="PII regex masking is always applied to silver and gold; raw is never "
+        "written. PRSIM is refused until 08 full (prsim_requires_ner).",
+    )
+    raw.add_argument("--project", required=True, help="project key")
+    raw.add_argument("--kb", required=True, help="knowledge base key")
+    raw.add_argument("--raw-dir", required=True, type=Path, help="staging tree, mounted read-only")
+    raw.add_argument(
+        "--acl", required=True, action="append", help="role that may read (repeatable)"
+    )
+    raw.add_argument(
+        "--sources", required=True, nargs="+", help="sources to ingest, e.g. confluence:OCR"
+    )
+    raw.add_argument("--limit", type=int, default=None, help="first N accepted files only")
+    return parser
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = build_parser()
     args = parser.parse_args(argv)
+    if args.command == "ingest-raw":
+        # Before logging, database or models: a refused source list costs nothing (plan/19 S1).
+        from ffcore.knowledge import raw_staging
+
+        try:
+            raw_staging.check_sources(args.sources)
+        except raw_staging.StagingError as exc:
+            print(f"error: {exc}", file=sys.stderr)
+            return 2
     configure_logging(get_settings())
 
     try:
@@ -198,6 +228,27 @@ def main(argv: list[str] | None = None) -> int:
                 _seed_sql_context(args.project, args.tool, args.path)
             )
             print(f"table descriptions loaded: {descriptions}; SQL examples loaded: {examples}")
+        elif args.command == "ingest-raw":
+            from ffcore.knowledge import raw_ingest
+
+            try:
+                report = asyncio.run(
+                    raw_ingest.ingest_tree(
+                        project_key=args.project,
+                        kb_key=args.kb,
+                        raw_dir=args.raw_dir,
+                        acl_roles=args.acl,
+                        sources=args.sources,
+                        limit=args.limit,
+                        settings=get_settings(),
+                    )
+                )
+            except (raw_ingest.RawIngestError, raw_ingest.raw_staging.StagingError) as exc:
+                raise CliError(str(exc)) from None
+            for line in report.lines():
+                print(line)
+            if report.statuses["failed"] or report.statuses["timeout"]:
+                return 1
         elif args.command == "setup-checkpointer":
             settings = get_settings()
             if settings.database_url is None:
