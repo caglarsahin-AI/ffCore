@@ -23,9 +23,8 @@ X_PLATFORM_EVENTS = (
     "progress",
     "fallback",
 )
-# The subset an external agent (agents.kind = external) emits: it runs no tools and no
-# platform retrieval, so only progress (queued, output_buffered) and fallback are possible.
-EXTERNAL_X_PLATFORM_EVENTS = ("progress",)
+# An external agent (agents.kind = external) is reserved: a request answers 501
+# external_agent_not_available until 06b-2; its event subset is frozen when it exists (K-06b-0004).
 # x_platform.kind of a progress event the facade itself adds (S4): the answer is held back until
 # the output guardrail has checked it, so the first token comes later.
 PROGRESS_KINDS = ("queued", "output_buffered", "keepalive")
@@ -52,6 +51,7 @@ FACADE_ERROR_CODES = (
     "output_buffer_exceeded",
     "model_unavailable",
     "run_not_found",
+    "external_agent_not_available",
 )
 
 # The model name prefix of the agent path (C1: agent:<project_key>/<agent_key>).

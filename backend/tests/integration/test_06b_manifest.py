@@ -145,6 +145,8 @@ def test_06b_14_import_refuses_what_it_cannot_run(make_project, make_user, clien
         },
     )
     assert external.status_code == 422
+    assert external.json()["error"]["code"] == "external_agent_not_available"
+    assert _count(pg, a)[0] == 0  # nothing was turned into a native agent
     garbage = client.post(
         url, content=b"::: not yaml", headers={"Content-Type": "application/yaml"}
     )

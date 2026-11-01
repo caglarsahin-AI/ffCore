@@ -131,6 +131,8 @@ async def list_models(request: Request, actor: ActorDep, settings: SettingsDep):
                     Agent.project_id == caller.project_id,
                     Agent.status == "published",
                     Agent.deleted_at.is_(None),
+                    # External agents are reserved until 06b-2: not offered (K-06b-0004).
+                    Agent.kind == "native",
                 )
             )
             entries += [

@@ -29,6 +29,8 @@ from ffcore.models.keys import ApiKey
 from ffcore.models.runs import Run
 
 router = APIRouter(prefix="/internal", tags=["internal"], responses=ERROR_RESPONSES)
+# 06b: its own tag, so 04a's OpenAPI draft (and the console's types made from it) stays as is.
+facade_router = APIRouter(prefix="/internal", tags=["facade-internal"], responses=ERROR_RESPONSES)
 
 
 async def service_actor(actor: Annotated[Actor, Depends(resolve_actor)]) -> Actor:
@@ -77,7 +79,7 @@ def _key_refused() -> ApiError:
     )
 
 
-@router.post("/knowledge-bases/{kb_id}/key-search", response_model=SearchResponse)
+@facade_router.post("/knowledge-bases/{kb_id}/key-search", response_model=SearchResponse)
 async def internal_key_search(
     kb_id: UUID,
     body: KeySearchRequest,

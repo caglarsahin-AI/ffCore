@@ -76,6 +76,7 @@ app.include_router(api_router)
 app.include_router(internal.router)
 # 06b: the OpenAI-compatible facade at /v1 (C11), outside /api/v1 like OpenAI's own paths.
 app.include_router(facade.router)
+app.include_router(internal.facade_router)
 app.include_router(readiness_router)
 
 

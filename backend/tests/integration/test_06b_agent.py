@@ -395,3 +395,31 @@ def test_06b_3_no_scope_key_runs_as_key(owner, pg, settings, harness, use_queue,
         (response.headers["X-Run-Id"],),
     ).fetchone()
     assert audit == ("api_key",)
+
+
+def test_06b_15_external_agent_fails_loud_until_06b_2(agent, pg):
+    project, _, _, client, _ = agent
+    publish(pg, project, definition(), key="uzak")
+    pg.execute(
+        "UPDATE agents SET kind = 'external' WHERE project_id = %s AND key = 'uzak'", (project,)
+    )
+    response = client.chat(f"agent:{project_key(pg, project)}/uzak", "x")
+    assert response.status_code == 501
+    assert response.json()["error"] == {
+        "message": "External agents cannot be called through the facade yet.",
+        "type": "api_error",
+        "code": "external_agent_not_available",
+    }
+    # Not offered in the model list either (K-06b-0004).
+    listed = {m["id"] for m in client.models().json()["data"]}
+    assert f"agent:{project_key(pg, project)}/uzak" not in listed
+    assert f"agent:{project_key(pg, project)}/asistan" in listed
+
+
+def test_06b_15_console_cannot_create_external_agent(agent):
+    project, console, _, _, _ = agent
+    response = console.post(
+        f"/api/v1/projects/{project}/agents",
+        json={"key": "dis", "name": "Dış", "model": "chat-default", "kind": "external"},
+    )
+    assert response.status_code == 422

@@ -385,12 +385,17 @@ async def rollback_agent(
 
 # --- 06b: manifest export and import (brief 06 "Manifest") ---
 
+# Own tag: 06b's OpenAPI draft carries these routes, 06a's stays as it is.
+manifest_router = APIRouter(
+    prefix="/projects/{project_id}/agents", tags=["agent-manifest"], responses=ERROR_RESPONSES
+)
+
 
 def _manifest_invalid(message: str) -> ApiError:
     return ApiError(422, "invalid_request_error", "manifest_invalid", message)
 
 
-@router.get(
+@manifest_router.get(
     "/{agent_id}/manifest",
     response_model=Manifest,
     responses={200: {"content": {"application/yaml": {}}}},
@@ -444,7 +449,7 @@ async def _manifest_from(request: Request) -> Manifest:
         raise _manifest_invalid(f"The manifest does not parse: {type(exc).__name__}.") from None
 
 
-@router.post(
+@manifest_router.post(
     "/import",
     response_model=ImportResult,
     openapi_extra={
@@ -471,9 +476,12 @@ async def import_manifest(
     `schema_version` is read as such (C8)."""
     manifest = await _manifest_from(request)
     if manifest.agent.kind != "native":
-        raise _manifest_invalid(
-            "An external agent is registered in the console (its endpoint credentials are not "
-            "part of a manifest)."
+        # Reserved until 06b-2 (K-06b-0004): refused, never imported as a native agent.
+        raise ApiError(
+            422,
+            "invalid_request_error",
+            "external_agent_not_available",
+            "External agents cannot be imported yet.",
         )
     try:
         definition = parse_definition(manifest.definition)

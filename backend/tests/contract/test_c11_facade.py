@@ -21,7 +21,6 @@ FROZEN = {
         "progress",
         "fallback",
     ),
-    "EXTERNAL_X_PLATFORM_EVENTS": ("progress",),
     "PROGRESS_KINDS": ("queued", "output_buffered", "keepalive"),
     "KEEPALIVE": ": keepalive\n\n",
     "STREAM_END": "data: [DONE]\n\n",
@@ -51,6 +50,7 @@ def test_c11_error_codes_include_the_frozen_ones():
         "guardrail_blocked",
         "quota_exceeded",
         "output_buffer_exceeded",
+        "external_agent_not_available",
     }
     assert frozen <= set(c11.FACADE_ERROR_CODES)
 

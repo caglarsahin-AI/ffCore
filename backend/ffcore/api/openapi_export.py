@@ -1,7 +1,7 @@
 """Render a package's OpenAPI draft (`backend/openapi/<package>.yaml`) from the application routes.
 
 Tools container: python -m ffcore.api.openapi_export <package> > openapi/<package>.yaml (03a, 03c,
-04a, 05a, 06a, 07, 08).
+04a, 05a, 06a, 06b, 07, 08).
 The contract tests compare each committed file with this output, so no draft ever drifts.
 Each draft holds only its package's routes: adding a package never changes an earlier draft.
 """
@@ -11,7 +11,7 @@ import sys
 import yaml
 from fastapi.openapi.utils import get_openapi
 
-from ffcore.api import api_router, internal
+from ffcore.api import api_router, facade, internal
 from ffcore.core.readiness import router as readiness_router
 
 PACKAGES = {
@@ -54,12 +54,24 @@ PACKAGES = {
         "description": "Agents, versions, runs, run events and run streams (package 06a).",
         "tags": {"agents", "runs"},
     },
+    "06b": {
+        "version": "0.6b",
+        "description": "OpenAI-compatible facade (/v1, contract C11), agent manifest export and "
+        "import, and the internal search of runs started by an API key (package 06b).",
+        "tags": {"facade", "facade-internal", "agent-manifest"},
+    },
 }
 
 
 def _routes_with_tags(tags: set[str]) -> list:
     # 04a's /internal and /readyz live outside /api/v1; the other packages' routes do not.
-    routes = list(api_router.routes) + list(internal.router.routes) + list(readiness_router.routes)
+    routes = (
+        list(api_router.routes)
+        + list(internal.router.routes)
+        + list(readiness_router.routes)
+        + list(facade.router.routes)  # 06b: /v1, outside /api/v1
+        + list(internal.facade_router.routes)
+    )
     selected = []
     for route in routes:
         own = getattr(getattr(route, "original_router", None), "tags", None) or getattr(
