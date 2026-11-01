@@ -225,11 +225,24 @@ def _stop_if_blocked(decision) -> None:
 
 
 class HttpRetriever:
-    def __init__(self, settings: Settings, session: AsyncSession, *, run_id, project_id, user_id):
-        if user_id is None:
+    def __init__(
+        self,
+        settings: Settings,
+        session: AsyncSession,
+        *,
+        run_id,
+        project_id,
+        user_id,
+        api_key_id=None,
+    ):
+        # 06b: a run started by an API key without a user searches as the key (its acl_role,
+        # resolved by the backend from the key row); any other run needs its user.
+        if user_id is None and api_key_id is None:
             raise ApiError(400, "invalid_request_error", "run_user_missing", "A run needs a user.")
         self._settings, self._session = settings, session
-        self._run_id, self._project_id, self._user_id = str(run_id), str(project_id), str(user_id)
+        self._run_id, self._project_id = str(run_id), str(project_id)
+        self._user_id = str(user_id) if user_id is not None else None
+        self._api_key_id = str(api_key_id) if api_key_id is not None else None
         self._kb_ids: dict[str, str] = {}
 
     async def _kb_id(self, kb_key: str) -> str:
@@ -254,20 +267,30 @@ class HttpRetriever:
     async def search(self, kb_key, query, top_k, scope):
         kb_id = await self._kb_id(kb_key)
         s = self._settings
-        headers = {
-            **service_authorization(s),
-            # Signed per call (C3): a long CPU run never sends an expired token.
-            OBO_HEADER: sign_on_behalf_of(
-                user_id=self._user_id,
-                project_id=self._project_id,
-                audience=s.obo_audience,
-                settings=s,
-            ),
-            "X-Run-Id": self._run_id,
-        }
         body = {"query": query[:2000], "top_k": top_k}
-        project = f"{s.internal_api_url}/api/v1/projects/{self._project_id}"
-        url = f"{project}/knowledge-bases/{kb_id}/search"
+        if self._user_id is None:
+            # 06b S2: no user to act for; the backend reads the key's role from the key row.
+            headers = service_authorization(s)
+            body |= {
+                "api_key_id": self._api_key_id,
+                "project_id": self._project_id,
+                "run_id": self._run_id,
+            }
+            url = f"{s.internal_api_url}/internal/knowledge-bases/{kb_id}/key-search"
+        else:
+            headers = {
+                **service_authorization(s),
+                # Signed per call (C3): a long CPU run never sends an expired token.
+                OBO_HEADER: sign_on_behalf_of(
+                    user_id=self._user_id,
+                    project_id=self._project_id,
+                    audience=s.obo_audience,
+                    settings=s,
+                ),
+                "X-Run-Id": self._run_id,
+            }
+            project = f"{s.internal_api_url}/api/v1/projects/{self._project_id}"
+            url = f"{project}/knowledge-bases/{kb_id}/search"
         timeout = EgressTimeout(connect=5, read=s.llm_call_timeout_s, total=s.llm_call_timeout_s)
         async with SafeOutboundClient(timeout=timeout, settings=s) as client:
             response = await client.request("POST", url, headers=headers, json=body)
@@ -607,7 +630,12 @@ def context_factory(
                 ),
             ),
             retriever=HttpRetriever(
-                settings, session, run_id=run.id, project_id=run.project_id, user_id=run.user_id
+                settings,
+                session,
+                run_id=run.id,
+                project_id=run.project_id,
+                user_id=run.user_id,
+                api_key_id=run.api_key_id,
             ),
             tools=await AgentTools.load(session, settings, definition, run),
             guard=guard,
