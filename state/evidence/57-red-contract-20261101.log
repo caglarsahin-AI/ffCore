@@ -1,0 +1,53 @@
+ Network ffcore-57_default  Creating
+ Network ffcore-57_default  Created
+ Volume "ffcore-57_langfuse_postgres_data"  Creating
+ Volume "ffcore-57_langfuse_postgres_data"  Created
+ Volume "ffcore-57_redis_data"  Creating
+ Volume "ffcore-57_redis_data"  Created
+ Volume "ffcore-57_langfuse_clickhouse_data"  Creating
+ Volume "ffcore-57_langfuse_clickhouse_data"  Created
+ Volume "ffcore-57_langfuse_clickhouse_logs"  Creating
+ Volume "ffcore-57_langfuse_clickhouse_logs"  Created
+ Volume "ffcore-57_postgres_data"  Creating
+ Volume "ffcore-57_postgres_data"  Created
+ Volume "ffcore-57_model_cache"  Creating
+ Volume "ffcore-57_model_cache"  Created
+ Volume "ffcore-57_knowledge_storage"  Creating
+ Volume "ffcore-57_knowledge_storage"  Created
+ Volume "ffcore-57_langfuse_minio_data"  Creating
+ Volume "ffcore-57_langfuse_minio_data"  Created
+FFF                                                                      [100%]
+=================================== FAILURES ===================================
+____________________________ test_57_1_single_head _____________________________
+
+    def test_57_1_single_head():
+        heads = _script().get_heads()
+>       assert len(heads) == 1, f"alembic has {len(heads)} heads, expected one: {sorted(heads)}"
+E       AssertionError: alembic has 8 heads, expected one: ['03a_0001', '03b_0001', '03c_0002', '04a_0001', '05a_0001', '06a_0002', '07_0001', '08_0001']
+E       assert 8 == 1
+E        +  where 8 = len(['03a_0001', '03b_0001', '03c_0002', '04a_0001', '05a_0001', '06a_0002', ...])
+
+tests/contract/test_57_alembic_single_head.py:36: AssertionError
+_________________ test_57_1_head_reaches_every_package_branch __________________
+
+    def test_57_1_head_reaches_every_package_branch():
+        script = _script()
+>       (head,) = script.get_heads()
+        ^^^^^^^
+E       ValueError: too many values to unpack (expected 1)
+
+tests/contract/test_57_alembic_single_head.py:41: ValueError
+______________________ test_57_1_merge_revision_is_empty _______________________
+
+    def test_57_1_merge_revision_is_empty():
+        # A merge revision only joins heads; schema changes stay in package revisions.
+>       merge = next(r for r in _script().walk_revisions() if r.is_merge_point)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       StopIteration
+
+tests/contract/test_57_alembic_single_head.py:48: StopIteration
+=========================== short test summary info ============================
+FAILED tests/contract/test_57_alembic_single_head.py::test_57_1_single_head
+FAILED tests/contract/test_57_alembic_single_head.py::test_57_1_head_reaches_every_package_branch
+FAILED tests/contract/test_57_alembic_single_head.py::test_57_1_merge_revision_is_empty
+3 failed in 2.04s

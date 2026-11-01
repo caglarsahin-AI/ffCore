@@ -1,0 +1,1653 @@
+EEEEEEEEEEEEEEEEE                                                        [100%]
+==================================== ERRORS ====================================
+__________ ERROR at setup of test_57_1_alembic_heads_prints_one_line ___________
+
+    @pytest.fixture(scope="session")
+    def database_url() -> str:
+        admin = make_url(_admin_url())
+        name = f"ffcore_test_{uuid.uuid4().hex[:12]}"
+        plain = admin.set(drivername="postgresql").render_as_string(hide_password=False)
+        with psycopg.connect(plain, autocommit=True) as conn:
+            conn.execute(f'CREATE DATABASE "{name}"')
+        url = admin.set(database=name).render_as_string(hide_password=False)
+        try:
+>           subprocess.run(
+                ["alembic", "upgrade", "heads"],
+                cwd=BACKEND,
+                env={**os.environ, "DATABASE_URL": url},
+                check=True,
+                capture_output=True,
+            )
+
+tests/integration/conftest.py:84: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+input = None, capture_output = True, timeout = None, check = True
+popenargs = (['alembic', 'upgrade', 'heads'],)
+kwargs = {'cwd': PosixPath('/work/backend'), 'env': {'RETENTION_BATCH': '5000', 'DATABASE_URL': 'postgresql+psycopg://ffcore:du...test_4c819cbbe7c0', 'TRANSFORMERS_OFFLINE': '1', 'CONVERT_CPU_LIMIT_SECONDS': '3600', ...}, 'stdout': -1, 'stderr': -1}
+
+    def run(*popenargs,
+            input=None, capture_output=False, timeout=None, check=False, **kwargs):
+        """Run command with arguments and return a CompletedProcess instance.
+    
+        The returned instance will have attributes args, returncode, stdout and
+        stderr. By default, stdout and stderr are not captured, and those attributes
+        will be None. Pass stdout=PIPE and/or stderr=PIPE in order to capture them,
+        or pass capture_output=True to capture both.
+    
+        If check is True and the exit code was non-zero, it raises a
+        CalledProcessError. The CalledProcessError object will have the return code
+        in the returncode attribute, and output & stderr attributes if those streams
+        were captured.
+    
+        If timeout (seconds) is given and the process takes too long,
+         a TimeoutExpired exception will be raised.
+    
+        There is an optional argument "input", allowing you to
+        pass bytes or a string to the subprocess's stdin.  If you use this argument
+        you may not also use the Popen constructor's "stdin" argument, as
+        it will be used internally.
+    
+        By default, all communication is in bytes, and therefore any "input" should
+        be bytes, and the stdout and stderr will be bytes. If in text mode, any
+        "input" should be a string, and stdout and stderr will be strings decoded
+        according to locale encoding, or by "encoding" if set. Text mode is
+        triggered by setting any of text, encoding, errors or universal_newlines.
+    
+        The other arguments are the same as for the Popen constructor.
+        """
+        if input is not None:
+            if kwargs.get('stdin') is not None:
+                raise ValueError('stdin and input arguments may not both be used.')
+            kwargs['stdin'] = PIPE
+    
+        if capture_output:
+            if kwargs.get('stdout') is not None or kwargs.get('stderr') is not None:
+                raise ValueError('stdout and stderr arguments may not be used '
+                                 'with capture_output.')
+            kwargs['stdout'] = PIPE
+            kwargs['stderr'] = PIPE
+    
+        with Popen(*popenargs, **kwargs) as process:
+            try:
+                stdout, stderr = process.communicate(input, timeout=timeout)
+            except TimeoutExpired as exc:
+                process.kill()
+                if _mswindows:
+                    # Windows accumulates the output in a single blocking
+                    # read() call run on child threads, with the timeout
+                    # being done in a join() on those threads.  communicate()
+                    # _after_ kill() is required to collect that and add it
+                    # to the exception.
+                    exc.stdout, exc.stderr = process.communicate()
+                else:
+                    # POSIX _communicate already populated the output so
+                    # far into the TimeoutExpired exception.
+                    process.wait()
+                raise
+            except:  # Including KeyboardInterrupt, communicate handled that.
+                process.kill()
+                # We don't call process.wait() as .__exit__ does that for us.
+                raise
+            retcode = process.poll()
+            if check and retcode:
+>               raise CalledProcessError(retcode, process.args,
+                                         output=stdout, stderr=stderr)
+E               subprocess.CalledProcessError: Command '['alembic', 'upgrade', 'heads']' returned non-zero exit status 1.
+
+/usr/local/lib/python3.12/subprocess.py:571: CalledProcessError
+____________ ERROR at setup of test_57_2_empty_database_round_trip _____________
+
+    @pytest.fixture(scope="session")
+    def database_url() -> str:
+        admin = make_url(_admin_url())
+        name = f"ffcore_test_{uuid.uuid4().hex[:12]}"
+        plain = admin.set(drivername="postgresql").render_as_string(hide_password=False)
+        with psycopg.connect(plain, autocommit=True) as conn:
+            conn.execute(f'CREATE DATABASE "{name}"')
+        url = admin.set(database=name).render_as_string(hide_password=False)
+        try:
+>           subprocess.run(
+                ["alembic", "upgrade", "heads"],
+                cwd=BACKEND,
+                env={**os.environ, "DATABASE_URL": url},
+                check=True,
+                capture_output=True,
+            )
+
+tests/integration/conftest.py:84: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+input = None, capture_output = True, timeout = None, check = True
+popenargs = (['alembic', 'upgrade', 'heads'],)
+kwargs = {'cwd': PosixPath('/work/backend'), 'env': {'RETENTION_BATCH': '5000', 'DATABASE_URL': 'postgresql+psycopg://ffcore:du...test_4c819cbbe7c0', 'TRANSFORMERS_OFFLINE': '1', 'CONVERT_CPU_LIMIT_SECONDS': '3600', ...}, 'stdout': -1, 'stderr': -1}
+
+    def run(*popenargs,
+            input=None, capture_output=False, timeout=None, check=False, **kwargs):
+        """Run command with arguments and return a CompletedProcess instance.
+    
+        The returned instance will have attributes args, returncode, stdout and
+        stderr. By default, stdout and stderr are not captured, and those attributes
+        will be None. Pass stdout=PIPE and/or stderr=PIPE in order to capture them,
+        or pass capture_output=True to capture both.
+    
+        If check is True and the exit code was non-zero, it raises a
+        CalledProcessError. The CalledProcessError object will have the return code
+        in the returncode attribute, and output & stderr attributes if those streams
+        were captured.
+    
+        If timeout (seconds) is given and the process takes too long,
+         a TimeoutExpired exception will be raised.
+    
+        There is an optional argument "input", allowing you to
+        pass bytes or a string to the subprocess's stdin.  If you use this argument
+        you may not also use the Popen constructor's "stdin" argument, as
+        it will be used internally.
+    
+        By default, all communication is in bytes, and therefore any "input" should
+        be bytes, and the stdout and stderr will be bytes. If in text mode, any
+        "input" should be a string, and stdout and stderr will be strings decoded
+        according to locale encoding, or by "encoding" if set. Text mode is
+        triggered by setting any of text, encoding, errors or universal_newlines.
+    
+        The other arguments are the same as for the Popen constructor.
+        """
+        if input is not None:
+            if kwargs.get('stdin') is not None:
+                raise ValueError('stdin and input arguments may not both be used.')
+            kwargs['stdin'] = PIPE
+    
+        if capture_output:
+            if kwargs.get('stdout') is not None or kwargs.get('stderr') is not None:
+                raise ValueError('stdout and stderr arguments may not be used '
+                                 'with capture_output.')
+            kwargs['stdout'] = PIPE
+            kwargs['stderr'] = PIPE
+    
+        with Popen(*popenargs, **kwargs) as process:
+            try:
+                stdout, stderr = process.communicate(input, timeout=timeout)
+            except TimeoutExpired as exc:
+                process.kill()
+                if _mswindows:
+                    # Windows accumulates the output in a single blocking
+                    # read() call run on child threads, with the timeout
+                    # being done in a join() on those threads.  communicate()
+                    # _after_ kill() is required to collect that and add it
+                    # to the exception.
+                    exc.stdout, exc.stderr = process.communicate()
+                else:
+                    # POSIX _communicate already populated the output so
+                    # far into the TimeoutExpired exception.
+                    process.wait()
+                raise
+            except:  # Including KeyboardInterrupt, communicate handled that.
+                process.kill()
+                # We don't call process.wait() as .__exit__ does that for us.
+                raise
+            retcode = process.poll()
+            if check and retcode:
+>               raise CalledProcessError(retcode, process.args,
+                                         output=stdout, stderr=stderr)
+E               subprocess.CalledProcessError: Command '['alembic', 'upgrade', 'heads']' returned non-zero exit status 1.
+
+/usr/local/lib/python3.12/subprocess.py:571: CalledProcessError
+______________ ERROR at setup of test_03a_6_migration_round_trip _______________
+
+    @pytest.fixture(scope="session")
+    def database_url() -> str:
+        admin = make_url(_admin_url())
+        name = f"ffcore_test_{uuid.uuid4().hex[:12]}"
+        plain = admin.set(drivername="postgresql").render_as_string(hide_password=False)
+        with psycopg.connect(plain, autocommit=True) as conn:
+            conn.execute(f'CREATE DATABASE "{name}"')
+        url = admin.set(database=name).render_as_string(hide_password=False)
+        try:
+>           subprocess.run(
+                ["alembic", "upgrade", "heads"],
+                cwd=BACKEND,
+                env={**os.environ, "DATABASE_URL": url},
+                check=True,
+                capture_output=True,
+            )
+
+tests/integration/conftest.py:84: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+input = None, capture_output = True, timeout = None, check = True
+popenargs = (['alembic', 'upgrade', 'heads'],)
+kwargs = {'cwd': PosixPath('/work/backend'), 'env': {'RETENTION_BATCH': '5000', 'DATABASE_URL': 'postgresql+psycopg://ffcore:du...test_4c819cbbe7c0', 'TRANSFORMERS_OFFLINE': '1', 'CONVERT_CPU_LIMIT_SECONDS': '3600', ...}, 'stdout': -1, 'stderr': -1}
+
+    def run(*popenargs,
+            input=None, capture_output=False, timeout=None, check=False, **kwargs):
+        """Run command with arguments and return a CompletedProcess instance.
+    
+        The returned instance will have attributes args, returncode, stdout and
+        stderr. By default, stdout and stderr are not captured, and those attributes
+        will be None. Pass stdout=PIPE and/or stderr=PIPE in order to capture them,
+        or pass capture_output=True to capture both.
+    
+        If check is True and the exit code was non-zero, it raises a
+        CalledProcessError. The CalledProcessError object will have the return code
+        in the returncode attribute, and output & stderr attributes if those streams
+        were captured.
+    
+        If timeout (seconds) is given and the process takes too long,
+         a TimeoutExpired exception will be raised.
+    
+        There is an optional argument "input", allowing you to
+        pass bytes or a string to the subprocess's stdin.  If you use this argument
+        you may not also use the Popen constructor's "stdin" argument, as
+        it will be used internally.
+    
+        By default, all communication is in bytes, and therefore any "input" should
+        be bytes, and the stdout and stderr will be bytes. If in text mode, any
+        "input" should be a string, and stdout and stderr will be strings decoded
+        according to locale encoding, or by "encoding" if set. Text mode is
+        triggered by setting any of text, encoding, errors or universal_newlines.
+    
+        The other arguments are the same as for the Popen constructor.
+        """
+        if input is not None:
+            if kwargs.get('stdin') is not None:
+                raise ValueError('stdin and input arguments may not both be used.')
+            kwargs['stdin'] = PIPE
+    
+        if capture_output:
+            if kwargs.get('stdout') is not None or kwargs.get('stderr') is not None:
+                raise ValueError('stdout and stderr arguments may not be used '
+                                 'with capture_output.')
+            kwargs['stdout'] = PIPE
+            kwargs['stderr'] = PIPE
+    
+        with Popen(*popenargs, **kwargs) as process:
+            try:
+                stdout, stderr = process.communicate(input, timeout=timeout)
+            except TimeoutExpired as exc:
+                process.kill()
+                if _mswindows:
+                    # Windows accumulates the output in a single blocking
+                    # read() call run on child threads, with the timeout
+                    # being done in a join() on those threads.  communicate()
+                    # _after_ kill() is required to collect that and add it
+                    # to the exception.
+                    exc.stdout, exc.stderr = process.communicate()
+                else:
+                    # POSIX _communicate already populated the output so
+                    # far into the TimeoutExpired exception.
+                    process.wait()
+                raise
+            except:  # Including KeyboardInterrupt, communicate handled that.
+                process.kill()
+                # We don't call process.wait() as .__exit__ does that for us.
+                raise
+            retcode = process.poll()
+            if check and retcode:
+>               raise CalledProcessError(retcode, process.args,
+                                         output=stdout, stderr=stderr)
+E               subprocess.CalledProcessError: Command '['alembic', 'upgrade', 'heads']' returned non-zero exit status 1.
+
+/usr/local/lib/python3.12/subprocess.py:571: CalledProcessError
+____________ ERROR at setup of test_06a_schema_migration_round_trip ____________
+
+    @pytest.fixture(scope="session")
+    def database_url() -> str:
+        admin = make_url(_admin_url())
+        name = f"ffcore_test_{uuid.uuid4().hex[:12]}"
+        plain = admin.set(drivername="postgresql").render_as_string(hide_password=False)
+        with psycopg.connect(plain, autocommit=True) as conn:
+            conn.execute(f'CREATE DATABASE "{name}"')
+        url = admin.set(database=name).render_as_string(hide_password=False)
+        try:
+>           subprocess.run(
+                ["alembic", "upgrade", "heads"],
+                cwd=BACKEND,
+                env={**os.environ, "DATABASE_URL": url},
+                check=True,
+                capture_output=True,
+            )
+
+tests/integration/conftest.py:84: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+input = None, capture_output = True, timeout = None, check = True
+popenargs = (['alembic', 'upgrade', 'heads'],)
+kwargs = {'cwd': PosixPath('/work/backend'), 'env': {'RETENTION_BATCH': '5000', 'DATABASE_URL': 'postgresql+psycopg://ffcore:du...test_4c819cbbe7c0', 'TRANSFORMERS_OFFLINE': '1', 'CONVERT_CPU_LIMIT_SECONDS': '3600', ...}, 'stdout': -1, 'stderr': -1}
+
+    def run(*popenargs,
+            input=None, capture_output=False, timeout=None, check=False, **kwargs):
+        """Run command with arguments and return a CompletedProcess instance.
+    
+        The returned instance will have attributes args, returncode, stdout and
+        stderr. By default, stdout and stderr are not captured, and those attributes
+        will be None. Pass stdout=PIPE and/or stderr=PIPE in order to capture them,
+        or pass capture_output=True to capture both.
+    
+        If check is True and the exit code was non-zero, it raises a
+        CalledProcessError. The CalledProcessError object will have the return code
+        in the returncode attribute, and output & stderr attributes if those streams
+        were captured.
+    
+        If timeout (seconds) is given and the process takes too long,
+         a TimeoutExpired exception will be raised.
+    
+        There is an optional argument "input", allowing you to
+        pass bytes or a string to the subprocess's stdin.  If you use this argument
+        you may not also use the Popen constructor's "stdin" argument, as
+        it will be used internally.
+    
+        By default, all communication is in bytes, and therefore any "input" should
+        be bytes, and the stdout and stderr will be bytes. If in text mode, any
+        "input" should be a string, and stdout and stderr will be strings decoded
+        according to locale encoding, or by "encoding" if set. Text mode is
+        triggered by setting any of text, encoding, errors or universal_newlines.
+    
+        The other arguments are the same as for the Popen constructor.
+        """
+        if input is not None:
+            if kwargs.get('stdin') is not None:
+                raise ValueError('stdin and input arguments may not both be used.')
+            kwargs['stdin'] = PIPE
+    
+        if capture_output:
+            if kwargs.get('stdout') is not None or kwargs.get('stderr') is not None:
+                raise ValueError('stdout and stderr arguments may not be used '
+                                 'with capture_output.')
+            kwargs['stdout'] = PIPE
+            kwargs['stderr'] = PIPE
+    
+        with Popen(*popenargs, **kwargs) as process:
+            try:
+                stdout, stderr = process.communicate(input, timeout=timeout)
+            except TimeoutExpired as exc:
+                process.kill()
+                if _mswindows:
+                    # Windows accumulates the output in a single blocking
+                    # read() call run on child threads, with the timeout
+                    # being done in a join() on those threads.  communicate()
+                    # _after_ kill() is required to collect that and add it
+                    # to the exception.
+                    exc.stdout, exc.stderr = process.communicate()
+                else:
+                    # POSIX _communicate already populated the output so
+                    # far into the TimeoutExpired exception.
+                    process.wait()
+                raise
+            except:  # Including KeyboardInterrupt, communicate handled that.
+                process.kill()
+                # We don't call process.wait() as .__exit__ does that for us.
+                raise
+            retcode = process.poll()
+            if check and retcode:
+>               raise CalledProcessError(retcode, process.args,
+                                         output=stdout, stderr=stderr)
+E               subprocess.CalledProcessError: Command '['alembic', 'upgrade', 'heads']' returned non-zero exit status 1.
+
+/usr/local/lib/python3.12/subprocess.py:571: CalledProcessError
+____________ ERROR at setup of test_07_approvals_table_and_defaults ____________
+
+    @pytest.fixture(scope="session")
+    def database_url() -> str:
+        admin = make_url(_admin_url())
+        name = f"ffcore_test_{uuid.uuid4().hex[:12]}"
+        plain = admin.set(drivername="postgresql").render_as_string(hide_password=False)
+        with psycopg.connect(plain, autocommit=True) as conn:
+            conn.execute(f'CREATE DATABASE "{name}"')
+        url = admin.set(database=name).render_as_string(hide_password=False)
+        try:
+>           subprocess.run(
+                ["alembic", "upgrade", "heads"],
+                cwd=BACKEND,
+                env={**os.environ, "DATABASE_URL": url},
+                check=True,
+                capture_output=True,
+            )
+
+tests/integration/conftest.py:84: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+input = None, capture_output = True, timeout = None, check = True
+popenargs = (['alembic', 'upgrade', 'heads'],)
+kwargs = {'cwd': PosixPath('/work/backend'), 'env': {'RETENTION_BATCH': '5000', 'DATABASE_URL': 'postgresql+psycopg://ffcore:du...test_4c819cbbe7c0', 'TRANSFORMERS_OFFLINE': '1', 'CONVERT_CPU_LIMIT_SECONDS': '3600', ...}, 'stdout': -1, 'stderr': -1}
+
+    def run(*popenargs,
+            input=None, capture_output=False, timeout=None, check=False, **kwargs):
+        """Run command with arguments and return a CompletedProcess instance.
+    
+        The returned instance will have attributes args, returncode, stdout and
+        stderr. By default, stdout and stderr are not captured, and those attributes
+        will be None. Pass stdout=PIPE and/or stderr=PIPE in order to capture them,
+        or pass capture_output=True to capture both.
+    
+        If check is True and the exit code was non-zero, it raises a
+        CalledProcessError. The CalledProcessError object will have the return code
+        in the returncode attribute, and output & stderr attributes if those streams
+        were captured.
+    
+        If timeout (seconds) is given and the process takes too long,
+         a TimeoutExpired exception will be raised.
+    
+        There is an optional argument "input", allowing you to
+        pass bytes or a string to the subprocess's stdin.  If you use this argument
+        you may not also use the Popen constructor's "stdin" argument, as
+        it will be used internally.
+    
+        By default, all communication is in bytes, and therefore any "input" should
+        be bytes, and the stdout and stderr will be bytes. If in text mode, any
+        "input" should be a string, and stdout and stderr will be strings decoded
+        according to locale encoding, or by "encoding" if set. Text mode is
+        triggered by setting any of text, encoding, errors or universal_newlines.
+    
+        The other arguments are the same as for the Popen constructor.
+        """
+        if input is not None:
+            if kwargs.get('stdin') is not None:
+                raise ValueError('stdin and input arguments may not both be used.')
+            kwargs['stdin'] = PIPE
+    
+        if capture_output:
+            if kwargs.get('stdout') is not None or kwargs.get('stderr') is not None:
+                raise ValueError('stdout and stderr arguments may not be used '
+                                 'with capture_output.')
+            kwargs['stdout'] = PIPE
+            kwargs['stderr'] = PIPE
+    
+        with Popen(*popenargs, **kwargs) as process:
+            try:
+                stdout, stderr = process.communicate(input, timeout=timeout)
+            except TimeoutExpired as exc:
+                process.kill()
+                if _mswindows:
+                    # Windows accumulates the output in a single blocking
+                    # read() call run on child threads, with the timeout
+                    # being done in a join() on those threads.  communicate()
+                    # _after_ kill() is required to collect that and add it
+                    # to the exception.
+                    exc.stdout, exc.stderr = process.communicate()
+                else:
+                    # POSIX _communicate already populated the output so
+                    # far into the TimeoutExpired exception.
+                    process.wait()
+                raise
+            except:  # Including KeyboardInterrupt, communicate handled that.
+                process.kill()
+                # We don't call process.wait() as .__exit__ does that for us.
+                raise
+            retcode = process.poll()
+            if check and retcode:
+>               raise CalledProcessError(retcode, process.args,
+                                         output=stdout, stderr=stderr)
+E               subprocess.CalledProcessError: Command '['alembic', 'upgrade', 'heads']' returned non-zero exit status 1.
+
+/usr/local/lib/python3.12/subprocess.py:571: CalledProcessError
+__________ ERROR at setup of test_07_assigned_role_closed_list[user] ___________
+
+    @pytest.fixture(scope="session")
+    def database_url() -> str:
+        admin = make_url(_admin_url())
+        name = f"ffcore_test_{uuid.uuid4().hex[:12]}"
+        plain = admin.set(drivername="postgresql").render_as_string(hide_password=False)
+        with psycopg.connect(plain, autocommit=True) as conn:
+            conn.execute(f'CREATE DATABASE "{name}"')
+        url = admin.set(database=name).render_as_string(hide_password=False)
+        try:
+>           subprocess.run(
+                ["alembic", "upgrade", "heads"],
+                cwd=BACKEND,
+                env={**os.environ, "DATABASE_URL": url},
+                check=True,
+                capture_output=True,
+            )
+
+tests/integration/conftest.py:84: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+input = None, capture_output = True, timeout = None, check = True
+popenargs = (['alembic', 'upgrade', 'heads'],)
+kwargs = {'cwd': PosixPath('/work/backend'), 'env': {'RETENTION_BATCH': '5000', 'DATABASE_URL': 'postgresql+psycopg://ffcore:du...test_4c819cbbe7c0', 'TRANSFORMERS_OFFLINE': '1', 'CONVERT_CPU_LIMIT_SECONDS': '3600', ...}, 'stdout': -1, 'stderr': -1}
+
+    def run(*popenargs,
+            input=None, capture_output=False, timeout=None, check=False, **kwargs):
+        """Run command with arguments and return a CompletedProcess instance.
+    
+        The returned instance will have attributes args, returncode, stdout and
+        stderr. By default, stdout and stderr are not captured, and those attributes
+        will be None. Pass stdout=PIPE and/or stderr=PIPE in order to capture them,
+        or pass capture_output=True to capture both.
+    
+        If check is True and the exit code was non-zero, it raises a
+        CalledProcessError. The CalledProcessError object will have the return code
+        in the returncode attribute, and output & stderr attributes if those streams
+        were captured.
+    
+        If timeout (seconds) is given and the process takes too long,
+         a TimeoutExpired exception will be raised.
+    
+        There is an optional argument "input", allowing you to
+        pass bytes or a string to the subprocess's stdin.  If you use this argument
+        you may not also use the Popen constructor's "stdin" argument, as
+        it will be used internally.
+    
+        By default, all communication is in bytes, and therefore any "input" should
+        be bytes, and the stdout and stderr will be bytes. If in text mode, any
+        "input" should be a string, and stdout and stderr will be strings decoded
+        according to locale encoding, or by "encoding" if set. Text mode is
+        triggered by setting any of text, encoding, errors or universal_newlines.
+    
+        The other arguments are the same as for the Popen constructor.
+        """
+        if input is not None:
+            if kwargs.get('stdin') is not None:
+                raise ValueError('stdin and input arguments may not both be used.')
+            kwargs['stdin'] = PIPE
+    
+        if capture_output:
+            if kwargs.get('stdout') is not None or kwargs.get('stderr') is not None:
+                raise ValueError('stdout and stderr arguments may not be used '
+                                 'with capture_output.')
+            kwargs['stdout'] = PIPE
+            kwargs['stderr'] = PIPE
+    
+        with Popen(*popenargs, **kwargs) as process:
+            try:
+                stdout, stderr = process.communicate(input, timeout=timeout)
+            except TimeoutExpired as exc:
+                process.kill()
+                if _mswindows:
+                    # Windows accumulates the output in a single blocking
+                    # read() call run on child threads, with the timeout
+                    # being done in a join() on those threads.  communicate()
+                    # _after_ kill() is required to collect that and add it
+                    # to the exception.
+                    exc.stdout, exc.stderr = process.communicate()
+                else:
+                    # POSIX _communicate already populated the output so
+                    # far into the TimeoutExpired exception.
+                    process.wait()
+                raise
+            except:  # Including KeyboardInterrupt, communicate handled that.
+                process.kill()
+                # We don't call process.wait() as .__exit__ does that for us.
+                raise
+            retcode = process.poll()
+            if check and retcode:
+>               raise CalledProcessError(retcode, process.args,
+                                         output=stdout, stderr=stderr)
+E               subprocess.CalledProcessError: Command '['alembic', 'upgrade', 'heads']' returned non-zero exit status 1.
+
+/usr/local/lib/python3.12/subprocess.py:571: CalledProcessError
+_______ ERROR at setup of test_07_assigned_role_closed_list[superadmin] ________
+
+    @pytest.fixture(scope="session")
+    def database_url() -> str:
+        admin = make_url(_admin_url())
+        name = f"ffcore_test_{uuid.uuid4().hex[:12]}"
+        plain = admin.set(drivername="postgresql").render_as_string(hide_password=False)
+        with psycopg.connect(plain, autocommit=True) as conn:
+            conn.execute(f'CREATE DATABASE "{name}"')
+        url = admin.set(database=name).render_as_string(hide_password=False)
+        try:
+>           subprocess.run(
+                ["alembic", "upgrade", "heads"],
+                cwd=BACKEND,
+                env={**os.environ, "DATABASE_URL": url},
+                check=True,
+                capture_output=True,
+            )
+
+tests/integration/conftest.py:84: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+input = None, capture_output = True, timeout = None, check = True
+popenargs = (['alembic', 'upgrade', 'heads'],)
+kwargs = {'cwd': PosixPath('/work/backend'), 'env': {'RETENTION_BATCH': '5000', 'DATABASE_URL': 'postgresql+psycopg://ffcore:du...test_4c819cbbe7c0', 'TRANSFORMERS_OFFLINE': '1', 'CONVERT_CPU_LIMIT_SECONDS': '3600', ...}, 'stdout': -1, 'stderr': -1}
+
+    def run(*popenargs,
+            input=None, capture_output=False, timeout=None, check=False, **kwargs):
+        """Run command with arguments and return a CompletedProcess instance.
+    
+        The returned instance will have attributes args, returncode, stdout and
+        stderr. By default, stdout and stderr are not captured, and those attributes
+        will be None. Pass stdout=PIPE and/or stderr=PIPE in order to capture them,
+        or pass capture_output=True to capture both.
+    
+        If check is True and the exit code was non-zero, it raises a
+        CalledProcessError. The CalledProcessError object will have the return code
+        in the returncode attribute, and output & stderr attributes if those streams
+        were captured.
+    
+        If timeout (seconds) is given and the process takes too long,
+         a TimeoutExpired exception will be raised.
+    
+        There is an optional argument "input", allowing you to
+        pass bytes or a string to the subprocess's stdin.  If you use this argument
+        you may not also use the Popen constructor's "stdin" argument, as
+        it will be used internally.
+    
+        By default, all communication is in bytes, and therefore any "input" should
+        be bytes, and the stdout and stderr will be bytes. If in text mode, any
+        "input" should be a string, and stdout and stderr will be strings decoded
+        according to locale encoding, or by "encoding" if set. Text mode is
+        triggered by setting any of text, encoding, errors or universal_newlines.
+    
+        The other arguments are the same as for the Popen constructor.
+        """
+        if input is not None:
+            if kwargs.get('stdin') is not None:
+                raise ValueError('stdin and input arguments may not both be used.')
+            kwargs['stdin'] = PIPE
+    
+        if capture_output:
+            if kwargs.get('stdout') is not None or kwargs.get('stderr') is not None:
+                raise ValueError('stdout and stderr arguments may not be used '
+                                 'with capture_output.')
+            kwargs['stdout'] = PIPE
+            kwargs['stderr'] = PIPE
+    
+        with Popen(*popenargs, **kwargs) as process:
+            try:
+                stdout, stderr = process.communicate(input, timeout=timeout)
+            except TimeoutExpired as exc:
+                process.kill()
+                if _mswindows:
+                    # Windows accumulates the output in a single blocking
+                    # read() call run on child threads, with the timeout
+                    # being done in a join() on those threads.  communicate()
+                    # _after_ kill() is required to collect that and add it
+                    # to the exception.
+                    exc.stdout, exc.stderr = process.communicate()
+                else:
+                    # POSIX _communicate already populated the output so
+                    # far into the TimeoutExpired exception.
+                    process.wait()
+                raise
+            except:  # Including KeyboardInterrupt, communicate handled that.
+                process.kill()
+                # We don't call process.wait() as .__exit__ does that for us.
+                raise
+            retcode = process.poll()
+            if check and retcode:
+>               raise CalledProcessError(retcode, process.args,
+                                         output=stdout, stderr=stderr)
+E               subprocess.CalledProcessError: Command '['alembic', 'upgrade', 'heads']' returned non-zero exit status 1.
+
+/usr/local/lib/python3.12/subprocess.py:571: CalledProcessError
+____________ ERROR at setup of test_07_assigned_role_closed_list[] _____________
+
+    @pytest.fixture(scope="session")
+    def database_url() -> str:
+        admin = make_url(_admin_url())
+        name = f"ffcore_test_{uuid.uuid4().hex[:12]}"
+        plain = admin.set(drivername="postgresql").render_as_string(hide_password=False)
+        with psycopg.connect(plain, autocommit=True) as conn:
+            conn.execute(f'CREATE DATABASE "{name}"')
+        url = admin.set(database=name).render_as_string(hide_password=False)
+        try:
+>           subprocess.run(
+                ["alembic", "upgrade", "heads"],
+                cwd=BACKEND,
+                env={**os.environ, "DATABASE_URL": url},
+                check=True,
+                capture_output=True,
+            )
+
+tests/integration/conftest.py:84: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+input = None, capture_output = True, timeout = None, check = True
+popenargs = (['alembic', 'upgrade', 'heads'],)
+kwargs = {'cwd': PosixPath('/work/backend'), 'env': {'RETENTION_BATCH': '5000', 'DATABASE_URL': 'postgresql+psycopg://ffcore:du...test_4c819cbbe7c0', 'TRANSFORMERS_OFFLINE': '1', 'CONVERT_CPU_LIMIT_SECONDS': '3600', ...}, 'stdout': -1, 'stderr': -1}
+
+    def run(*popenargs,
+            input=None, capture_output=False, timeout=None, check=False, **kwargs):
+        """Run command with arguments and return a CompletedProcess instance.
+    
+        The returned instance will have attributes args, returncode, stdout and
+        stderr. By default, stdout and stderr are not captured, and those attributes
+        will be None. Pass stdout=PIPE and/or stderr=PIPE in order to capture them,
+        or pass capture_output=True to capture both.
+    
+        If check is True and the exit code was non-zero, it raises a
+        CalledProcessError. The CalledProcessError object will have the return code
+        in the returncode attribute, and output & stderr attributes if those streams
+        were captured.
+    
+        If timeout (seconds) is given and the process takes too long,
+         a TimeoutExpired exception will be raised.
+    
+        There is an optional argument "input", allowing you to
+        pass bytes or a string to the subprocess's stdin.  If you use this argument
+        you may not also use the Popen constructor's "stdin" argument, as
+        it will be used internally.
+    
+        By default, all communication is in bytes, and therefore any "input" should
+        be bytes, and the stdout and stderr will be bytes. If in text mode, any
+        "input" should be a string, and stdout and stderr will be strings decoded
+        according to locale encoding, or by "encoding" if set. Text mode is
+        triggered by setting any of text, encoding, errors or universal_newlines.
+    
+        The other arguments are the same as for the Popen constructor.
+        """
+        if input is not None:
+            if kwargs.get('stdin') is not None:
+                raise ValueError('stdin and input arguments may not both be used.')
+            kwargs['stdin'] = PIPE
+    
+        if capture_output:
+            if kwargs.get('stdout') is not None or kwargs.get('stderr') is not None:
+                raise ValueError('stdout and stderr arguments may not be used '
+                                 'with capture_output.')
+            kwargs['stdout'] = PIPE
+            kwargs['stderr'] = PIPE
+    
+        with Popen(*popenargs, **kwargs) as process:
+            try:
+                stdout, stderr = process.communicate(input, timeout=timeout)
+            except TimeoutExpired as exc:
+                process.kill()
+                if _mswindows:
+                    # Windows accumulates the output in a single blocking
+                    # read() call run on child threads, with the timeout
+                    # being done in a join() on those threads.  communicate()
+                    # _after_ kill() is required to collect that and add it
+                    # to the exception.
+                    exc.stdout, exc.stderr = process.communicate()
+                else:
+                    # POSIX _communicate already populated the output so
+                    # far into the TimeoutExpired exception.
+                    process.wait()
+                raise
+            except:  # Including KeyboardInterrupt, communicate handled that.
+                process.kill()
+                # We don't call process.wait() as .__exit__ does that for us.
+                raise
+            retcode = process.poll()
+            if check and retcode:
+>               raise CalledProcessError(retcode, process.args,
+                                         output=stdout, stderr=stderr)
+E               subprocess.CalledProcessError: Command '['alembic', 'upgrade', 'heads']' returned non-zero exit status 1.
+
+/usr/local/lib/python3.12/subprocess.py:571: CalledProcessError
+_________________ ERROR at setup of test_07_status_closed_list _________________
+
+    @pytest.fixture(scope="session")
+    def database_url() -> str:
+        admin = make_url(_admin_url())
+        name = f"ffcore_test_{uuid.uuid4().hex[:12]}"
+        plain = admin.set(drivername="postgresql").render_as_string(hide_password=False)
+        with psycopg.connect(plain, autocommit=True) as conn:
+            conn.execute(f'CREATE DATABASE "{name}"')
+        url = admin.set(database=name).render_as_string(hide_password=False)
+        try:
+>           subprocess.run(
+                ["alembic", "upgrade", "heads"],
+                cwd=BACKEND,
+                env={**os.environ, "DATABASE_URL": url},
+                check=True,
+                capture_output=True,
+            )
+
+tests/integration/conftest.py:84: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+input = None, capture_output = True, timeout = None, check = True
+popenargs = (['alembic', 'upgrade', 'heads'],)
+kwargs = {'cwd': PosixPath('/work/backend'), 'env': {'RETENTION_BATCH': '5000', 'DATABASE_URL': 'postgresql+psycopg://ffcore:du...test_4c819cbbe7c0', 'TRANSFORMERS_OFFLINE': '1', 'CONVERT_CPU_LIMIT_SECONDS': '3600', ...}, 'stdout': -1, 'stderr': -1}
+
+    def run(*popenargs,
+            input=None, capture_output=False, timeout=None, check=False, **kwargs):
+        """Run command with arguments and return a CompletedProcess instance.
+    
+        The returned instance will have attributes args, returncode, stdout and
+        stderr. By default, stdout and stderr are not captured, and those attributes
+        will be None. Pass stdout=PIPE and/or stderr=PIPE in order to capture them,
+        or pass capture_output=True to capture both.
+    
+        If check is True and the exit code was non-zero, it raises a
+        CalledProcessError. The CalledProcessError object will have the return code
+        in the returncode attribute, and output & stderr attributes if those streams
+        were captured.
+    
+        If timeout (seconds) is given and the process takes too long,
+         a TimeoutExpired exception will be raised.
+    
+        There is an optional argument "input", allowing you to
+        pass bytes or a string to the subprocess's stdin.  If you use this argument
+        you may not also use the Popen constructor's "stdin" argument, as
+        it will be used internally.
+    
+        By default, all communication is in bytes, and therefore any "input" should
+        be bytes, and the stdout and stderr will be bytes. If in text mode, any
+        "input" should be a string, and stdout and stderr will be strings decoded
+        according to locale encoding, or by "encoding" if set. Text mode is
+        triggered by setting any of text, encoding, errors or universal_newlines.
+    
+        The other arguments are the same as for the Popen constructor.
+        """
+        if input is not None:
+            if kwargs.get('stdin') is not None:
+                raise ValueError('stdin and input arguments may not both be used.')
+            kwargs['stdin'] = PIPE
+    
+        if capture_output:
+            if kwargs.get('stdout') is not None or kwargs.get('stderr') is not None:
+                raise ValueError('stdout and stderr arguments may not be used '
+                                 'with capture_output.')
+            kwargs['stdout'] = PIPE
+            kwargs['stderr'] = PIPE
+    
+        with Popen(*popenargs, **kwargs) as process:
+            try:
+                stdout, stderr = process.communicate(input, timeout=timeout)
+            except TimeoutExpired as exc:
+                process.kill()
+                if _mswindows:
+                    # Windows accumulates the output in a single blocking
+                    # read() call run on child threads, with the timeout
+                    # being done in a join() on those threads.  communicate()
+                    # _after_ kill() is required to collect that and add it
+                    # to the exception.
+                    exc.stdout, exc.stderr = process.communicate()
+                else:
+                    # POSIX _communicate already populated the output so
+                    # far into the TimeoutExpired exception.
+                    process.wait()
+                raise
+            except:  # Including KeyboardInterrupt, communicate handled that.
+                process.kill()
+                # We don't call process.wait() as .__exit__ does that for us.
+                raise
+            retcode = process.poll()
+            if check and retcode:
+>               raise CalledProcessError(retcode, process.args,
+                                         output=stdout, stderr=stderr)
+E               subprocess.CalledProcessError: Command '['alembic', 'upgrade', 'heads']' returned non-zero exit status 1.
+
+/usr/local/lib/python3.12/subprocess.py:571: CalledProcessError
+_____________ ERROR at setup of test_07_resolved_at_matches_status _____________
+
+    @pytest.fixture(scope="session")
+    def database_url() -> str:
+        admin = make_url(_admin_url())
+        name = f"ffcore_test_{uuid.uuid4().hex[:12]}"
+        plain = admin.set(drivername="postgresql").render_as_string(hide_password=False)
+        with psycopg.connect(plain, autocommit=True) as conn:
+            conn.execute(f'CREATE DATABASE "{name}"')
+        url = admin.set(database=name).render_as_string(hide_password=False)
+        try:
+>           subprocess.run(
+                ["alembic", "upgrade", "heads"],
+                cwd=BACKEND,
+                env={**os.environ, "DATABASE_URL": url},
+                check=True,
+                capture_output=True,
+            )
+
+tests/integration/conftest.py:84: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+input = None, capture_output = True, timeout = None, check = True
+popenargs = (['alembic', 'upgrade', 'heads'],)
+kwargs = {'cwd': PosixPath('/work/backend'), 'env': {'RETENTION_BATCH': '5000', 'DATABASE_URL': 'postgresql+psycopg://ffcore:du...test_4c819cbbe7c0', 'TRANSFORMERS_OFFLINE': '1', 'CONVERT_CPU_LIMIT_SECONDS': '3600', ...}, 'stdout': -1, 'stderr': -1}
+
+    def run(*popenargs,
+            input=None, capture_output=False, timeout=None, check=False, **kwargs):
+        """Run command with arguments and return a CompletedProcess instance.
+    
+        The returned instance will have attributes args, returncode, stdout and
+        stderr. By default, stdout and stderr are not captured, and those attributes
+        will be None. Pass stdout=PIPE and/or stderr=PIPE in order to capture them,
+        or pass capture_output=True to capture both.
+    
+        If check is True and the exit code was non-zero, it raises a
+        CalledProcessError. The CalledProcessError object will have the return code
+        in the returncode attribute, and output & stderr attributes if those streams
+        were captured.
+    
+        If timeout (seconds) is given and the process takes too long,
+         a TimeoutExpired exception will be raised.
+    
+        There is an optional argument "input", allowing you to
+        pass bytes or a string to the subprocess's stdin.  If you use this argument
+        you may not also use the Popen constructor's "stdin" argument, as
+        it will be used internally.
+    
+        By default, all communication is in bytes, and therefore any "input" should
+        be bytes, and the stdout and stderr will be bytes. If in text mode, any
+        "input" should be a string, and stdout and stderr will be strings decoded
+        according to locale encoding, or by "encoding" if set. Text mode is
+        triggered by setting any of text, encoding, errors or universal_newlines.
+    
+        The other arguments are the same as for the Popen constructor.
+        """
+        if input is not None:
+            if kwargs.get('stdin') is not None:
+                raise ValueError('stdin and input arguments may not both be used.')
+            kwargs['stdin'] = PIPE
+    
+        if capture_output:
+            if kwargs.get('stdout') is not None or kwargs.get('stderr') is not None:
+                raise ValueError('stdout and stderr arguments may not be used '
+                                 'with capture_output.')
+            kwargs['stdout'] = PIPE
+            kwargs['stderr'] = PIPE
+    
+        with Popen(*popenargs, **kwargs) as process:
+            try:
+                stdout, stderr = process.communicate(input, timeout=timeout)
+            except TimeoutExpired as exc:
+                process.kill()
+                if _mswindows:
+                    # Windows accumulates the output in a single blocking
+                    # read() call run on child threads, with the timeout
+                    # being done in a join() on those threads.  communicate()
+                    # _after_ kill() is required to collect that and add it
+                    # to the exception.
+                    exc.stdout, exc.stderr = process.communicate()
+                else:
+                    # POSIX _communicate already populated the output so
+                    # far into the TimeoutExpired exception.
+                    process.wait()
+                raise
+            except:  # Including KeyboardInterrupt, communicate handled that.
+                process.kill()
+                # We don't call process.wait() as .__exit__ does that for us.
+                raise
+            retcode = process.poll()
+            if check and retcode:
+>               raise CalledProcessError(retcode, process.args,
+                                         output=stdout, stderr=stderr)
+E               subprocess.CalledProcessError: Command '['alembic', 'upgrade', 'heads']' returned non-zero exit status 1.
+
+/usr/local/lib/python3.12/subprocess.py:571: CalledProcessError
+_____________ ERROR at setup of test_07_one_approval_per_tool_call _____________
+
+    @pytest.fixture(scope="session")
+    def database_url() -> str:
+        admin = make_url(_admin_url())
+        name = f"ffcore_test_{uuid.uuid4().hex[:12]}"
+        plain = admin.set(drivername="postgresql").render_as_string(hide_password=False)
+        with psycopg.connect(plain, autocommit=True) as conn:
+            conn.execute(f'CREATE DATABASE "{name}"')
+        url = admin.set(database=name).render_as_string(hide_password=False)
+        try:
+>           subprocess.run(
+                ["alembic", "upgrade", "heads"],
+                cwd=BACKEND,
+                env={**os.environ, "DATABASE_URL": url},
+                check=True,
+                capture_output=True,
+            )
+
+tests/integration/conftest.py:84: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+input = None, capture_output = True, timeout = None, check = True
+popenargs = (['alembic', 'upgrade', 'heads'],)
+kwargs = {'cwd': PosixPath('/work/backend'), 'env': {'RETENTION_BATCH': '5000', 'DATABASE_URL': 'postgresql+psycopg://ffcore:du...test_4c819cbbe7c0', 'TRANSFORMERS_OFFLINE': '1', 'CONVERT_CPU_LIMIT_SECONDS': '3600', ...}, 'stdout': -1, 'stderr': -1}
+
+    def run(*popenargs,
+            input=None, capture_output=False, timeout=None, check=False, **kwargs):
+        """Run command with arguments and return a CompletedProcess instance.
+    
+        The returned instance will have attributes args, returncode, stdout and
+        stderr. By default, stdout and stderr are not captured, and those attributes
+        will be None. Pass stdout=PIPE and/or stderr=PIPE in order to capture them,
+        or pass capture_output=True to capture both.
+    
+        If check is True and the exit code was non-zero, it raises a
+        CalledProcessError. The CalledProcessError object will have the return code
+        in the returncode attribute, and output & stderr attributes if those streams
+        were captured.
+    
+        If timeout (seconds) is given and the process takes too long,
+         a TimeoutExpired exception will be raised.
+    
+        There is an optional argument "input", allowing you to
+        pass bytes or a string to the subprocess's stdin.  If you use this argument
+        you may not also use the Popen constructor's "stdin" argument, as
+        it will be used internally.
+    
+        By default, all communication is in bytes, and therefore any "input" should
+        be bytes, and the stdout and stderr will be bytes. If in text mode, any
+        "input" should be a string, and stdout and stderr will be strings decoded
+        according to locale encoding, or by "encoding" if set. Text mode is
+        triggered by setting any of text, encoding, errors or universal_newlines.
+    
+        The other arguments are the same as for the Popen constructor.
+        """
+        if input is not None:
+            if kwargs.get('stdin') is not None:
+                raise ValueError('stdin and input arguments may not both be used.')
+            kwargs['stdin'] = PIPE
+    
+        if capture_output:
+            if kwargs.get('stdout') is not None or kwargs.get('stderr') is not None:
+                raise ValueError('stdout and stderr arguments may not be used '
+                                 'with capture_output.')
+            kwargs['stdout'] = PIPE
+            kwargs['stderr'] = PIPE
+    
+        with Popen(*popenargs, **kwargs) as process:
+            try:
+                stdout, stderr = process.communicate(input, timeout=timeout)
+            except TimeoutExpired as exc:
+                process.kill()
+                if _mswindows:
+                    # Windows accumulates the output in a single blocking
+                    # read() call run on child threads, with the timeout
+                    # being done in a join() on those threads.  communicate()
+                    # _after_ kill() is required to collect that and add it
+                    # to the exception.
+                    exc.stdout, exc.stderr = process.communicate()
+                else:
+                    # POSIX _communicate already populated the output so
+                    # far into the TimeoutExpired exception.
+                    process.wait()
+                raise
+            except:  # Including KeyboardInterrupt, communicate handled that.
+                process.kill()
+                # We don't call process.wait() as .__exit__ does that for us.
+                raise
+            retcode = process.poll()
+            if check and retcode:
+>               raise CalledProcessError(retcode, process.args,
+                                         output=stdout, stderr=stderr)
+E               subprocess.CalledProcessError: Command '['alembic', 'upgrade', 'heads']' returned non-zero exit status 1.
+
+/usr/local/lib/python3.12/subprocess.py:571: CalledProcessError
+_________________ ERROR at setup of test_07_project_must_exist _________________
+
+    @pytest.fixture(scope="session")
+    def database_url() -> str:
+        admin = make_url(_admin_url())
+        name = f"ffcore_test_{uuid.uuid4().hex[:12]}"
+        plain = admin.set(drivername="postgresql").render_as_string(hide_password=False)
+        with psycopg.connect(plain, autocommit=True) as conn:
+            conn.execute(f'CREATE DATABASE "{name}"')
+        url = admin.set(database=name).render_as_string(hide_password=False)
+        try:
+>           subprocess.run(
+                ["alembic", "upgrade", "heads"],
+                cwd=BACKEND,
+                env={**os.environ, "DATABASE_URL": url},
+                check=True,
+                capture_output=True,
+            )
+
+tests/integration/conftest.py:84: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+input = None, capture_output = True, timeout = None, check = True
+popenargs = (['alembic', 'upgrade', 'heads'],)
+kwargs = {'cwd': PosixPath('/work/backend'), 'env': {'RETENTION_BATCH': '5000', 'DATABASE_URL': 'postgresql+psycopg://ffcore:du...test_4c819cbbe7c0', 'TRANSFORMERS_OFFLINE': '1', 'CONVERT_CPU_LIMIT_SECONDS': '3600', ...}, 'stdout': -1, 'stderr': -1}
+
+    def run(*popenargs,
+            input=None, capture_output=False, timeout=None, check=False, **kwargs):
+        """Run command with arguments and return a CompletedProcess instance.
+    
+        The returned instance will have attributes args, returncode, stdout and
+        stderr. By default, stdout and stderr are not captured, and those attributes
+        will be None. Pass stdout=PIPE and/or stderr=PIPE in order to capture them,
+        or pass capture_output=True to capture both.
+    
+        If check is True and the exit code was non-zero, it raises a
+        CalledProcessError. The CalledProcessError object will have the return code
+        in the returncode attribute, and output & stderr attributes if those streams
+        were captured.
+    
+        If timeout (seconds) is given and the process takes too long,
+         a TimeoutExpired exception will be raised.
+    
+        There is an optional argument "input", allowing you to
+        pass bytes or a string to the subprocess's stdin.  If you use this argument
+        you may not also use the Popen constructor's "stdin" argument, as
+        it will be used internally.
+    
+        By default, all communication is in bytes, and therefore any "input" should
+        be bytes, and the stdout and stderr will be bytes. If in text mode, any
+        "input" should be a string, and stdout and stderr will be strings decoded
+        according to locale encoding, or by "encoding" if set. Text mode is
+        triggered by setting any of text, encoding, errors or universal_newlines.
+    
+        The other arguments are the same as for the Popen constructor.
+        """
+        if input is not None:
+            if kwargs.get('stdin') is not None:
+                raise ValueError('stdin and input arguments may not both be used.')
+            kwargs['stdin'] = PIPE
+    
+        if capture_output:
+            if kwargs.get('stdout') is not None or kwargs.get('stderr') is not None:
+                raise ValueError('stdout and stderr arguments may not be used '
+                                 'with capture_output.')
+            kwargs['stdout'] = PIPE
+            kwargs['stderr'] = PIPE
+    
+        with Popen(*popenargs, **kwargs) as process:
+            try:
+                stdout, stderr = process.communicate(input, timeout=timeout)
+            except TimeoutExpired as exc:
+                process.kill()
+                if _mswindows:
+                    # Windows accumulates the output in a single blocking
+                    # read() call run on child threads, with the timeout
+                    # being done in a join() on those threads.  communicate()
+                    # _after_ kill() is required to collect that and add it
+                    # to the exception.
+                    exc.stdout, exc.stderr = process.communicate()
+                else:
+                    # POSIX _communicate already populated the output so
+                    # far into the TimeoutExpired exception.
+                    process.wait()
+                raise
+            except:  # Including KeyboardInterrupt, communicate handled that.
+                process.kill()
+                # We don't call process.wait() as .__exit__ does that for us.
+                raise
+            retcode = process.poll()
+            if check and retcode:
+>               raise CalledProcessError(retcode, process.args,
+                                         output=stdout, stderr=stderr)
+E               subprocess.CalledProcessError: Command '['alembic', 'upgrade', 'heads']' returned non-zero exit status 1.
+
+/usr/local/lib/python3.12/subprocess.py:571: CalledProcessError
+___________________ ERROR at setup of test_07_run_must_exist ___________________
+
+    @pytest.fixture(scope="session")
+    def database_url() -> str:
+        admin = make_url(_admin_url())
+        name = f"ffcore_test_{uuid.uuid4().hex[:12]}"
+        plain = admin.set(drivername="postgresql").render_as_string(hide_password=False)
+        with psycopg.connect(plain, autocommit=True) as conn:
+            conn.execute(f'CREATE DATABASE "{name}"')
+        url = admin.set(database=name).render_as_string(hide_password=False)
+        try:
+>           subprocess.run(
+                ["alembic", "upgrade", "heads"],
+                cwd=BACKEND,
+                env={**os.environ, "DATABASE_URL": url},
+                check=True,
+                capture_output=True,
+            )
+
+tests/integration/conftest.py:84: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+input = None, capture_output = True, timeout = None, check = True
+popenargs = (['alembic', 'upgrade', 'heads'],)
+kwargs = {'cwd': PosixPath('/work/backend'), 'env': {'RETENTION_BATCH': '5000', 'DATABASE_URL': 'postgresql+psycopg://ffcore:du...test_4c819cbbe7c0', 'TRANSFORMERS_OFFLINE': '1', 'CONVERT_CPU_LIMIT_SECONDS': '3600', ...}, 'stdout': -1, 'stderr': -1}
+
+    def run(*popenargs,
+            input=None, capture_output=False, timeout=None, check=False, **kwargs):
+        """Run command with arguments and return a CompletedProcess instance.
+    
+        The returned instance will have attributes args, returncode, stdout and
+        stderr. By default, stdout and stderr are not captured, and those attributes
+        will be None. Pass stdout=PIPE and/or stderr=PIPE in order to capture them,
+        or pass capture_output=True to capture both.
+    
+        If check is True and the exit code was non-zero, it raises a
+        CalledProcessError. The CalledProcessError object will have the return code
+        in the returncode attribute, and output & stderr attributes if those streams
+        were captured.
+    
+        If timeout (seconds) is given and the process takes too long,
+         a TimeoutExpired exception will be raised.
+    
+        There is an optional argument "input", allowing you to
+        pass bytes or a string to the subprocess's stdin.  If you use this argument
+        you may not also use the Popen constructor's "stdin" argument, as
+        it will be used internally.
+    
+        By default, all communication is in bytes, and therefore any "input" should
+        be bytes, and the stdout and stderr will be bytes. If in text mode, any
+        "input" should be a string, and stdout and stderr will be strings decoded
+        according to locale encoding, or by "encoding" if set. Text mode is
+        triggered by setting any of text, encoding, errors or universal_newlines.
+    
+        The other arguments are the same as for the Popen constructor.
+        """
+        if input is not None:
+            if kwargs.get('stdin') is not None:
+                raise ValueError('stdin and input arguments may not both be used.')
+            kwargs['stdin'] = PIPE
+    
+        if capture_output:
+            if kwargs.get('stdout') is not None or kwargs.get('stderr') is not None:
+                raise ValueError('stdout and stderr arguments may not be used '
+                                 'with capture_output.')
+            kwargs['stdout'] = PIPE
+            kwargs['stderr'] = PIPE
+    
+        with Popen(*popenargs, **kwargs) as process:
+            try:
+                stdout, stderr = process.communicate(input, timeout=timeout)
+            except TimeoutExpired as exc:
+                process.kill()
+                if _mswindows:
+                    # Windows accumulates the output in a single blocking
+                    # read() call run on child threads, with the timeout
+                    # being done in a join() on those threads.  communicate()
+                    # _after_ kill() is required to collect that and add it
+                    # to the exception.
+                    exc.stdout, exc.stderr = process.communicate()
+                else:
+                    # POSIX _communicate already populated the output so
+                    # far into the TimeoutExpired exception.
+                    process.wait()
+                raise
+            except:  # Including KeyboardInterrupt, communicate handled that.
+                process.kill()
+                # We don't call process.wait() as .__exit__ does that for us.
+                raise
+            retcode = process.poll()
+            if check and retcode:
+>               raise CalledProcessError(retcode, process.args,
+                                         output=stdout, stderr=stderr)
+E               subprocess.CalledProcessError: Command '['alembic', 'upgrade', 'heads']' returned non-zero exit status 1.
+
+/usr/local/lib/python3.12/subprocess.py:571: CalledProcessError
+________________ ERROR at setup of test_07_pending_expiry_index ________________
+
+    @pytest.fixture(scope="session")
+    def database_url() -> str:
+        admin = make_url(_admin_url())
+        name = f"ffcore_test_{uuid.uuid4().hex[:12]}"
+        plain = admin.set(drivername="postgresql").render_as_string(hide_password=False)
+        with psycopg.connect(plain, autocommit=True) as conn:
+            conn.execute(f'CREATE DATABASE "{name}"')
+        url = admin.set(database=name).render_as_string(hide_password=False)
+        try:
+>           subprocess.run(
+                ["alembic", "upgrade", "heads"],
+                cwd=BACKEND,
+                env={**os.environ, "DATABASE_URL": url},
+                check=True,
+                capture_output=True,
+            )
+
+tests/integration/conftest.py:84: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+input = None, capture_output = True, timeout = None, check = True
+popenargs = (['alembic', 'upgrade', 'heads'],)
+kwargs = {'cwd': PosixPath('/work/backend'), 'env': {'RETENTION_BATCH': '5000', 'DATABASE_URL': 'postgresql+psycopg://ffcore:du...test_4c819cbbe7c0', 'TRANSFORMERS_OFFLINE': '1', 'CONVERT_CPU_LIMIT_SECONDS': '3600', ...}, 'stdout': -1, 'stderr': -1}
+
+    def run(*popenargs,
+            input=None, capture_output=False, timeout=None, check=False, **kwargs):
+        """Run command with arguments and return a CompletedProcess instance.
+    
+        The returned instance will have attributes args, returncode, stdout and
+        stderr. By default, stdout and stderr are not captured, and those attributes
+        will be None. Pass stdout=PIPE and/or stderr=PIPE in order to capture them,
+        or pass capture_output=True to capture both.
+    
+        If check is True and the exit code was non-zero, it raises a
+        CalledProcessError. The CalledProcessError object will have the return code
+        in the returncode attribute, and output & stderr attributes if those streams
+        were captured.
+    
+        If timeout (seconds) is given and the process takes too long,
+         a TimeoutExpired exception will be raised.
+    
+        There is an optional argument "input", allowing you to
+        pass bytes or a string to the subprocess's stdin.  If you use this argument
+        you may not also use the Popen constructor's "stdin" argument, as
+        it will be used internally.
+    
+        By default, all communication is in bytes, and therefore any "input" should
+        be bytes, and the stdout and stderr will be bytes. If in text mode, any
+        "input" should be a string, and stdout and stderr will be strings decoded
+        according to locale encoding, or by "encoding" if set. Text mode is
+        triggered by setting any of text, encoding, errors or universal_newlines.
+    
+        The other arguments are the same as for the Popen constructor.
+        """
+        if input is not None:
+            if kwargs.get('stdin') is not None:
+                raise ValueError('stdin and input arguments may not both be used.')
+            kwargs['stdin'] = PIPE
+    
+        if capture_output:
+            if kwargs.get('stdout') is not None or kwargs.get('stderr') is not None:
+                raise ValueError('stdout and stderr arguments may not be used '
+                                 'with capture_output.')
+            kwargs['stdout'] = PIPE
+            kwargs['stderr'] = PIPE
+    
+        with Popen(*popenargs, **kwargs) as process:
+            try:
+                stdout, stderr = process.communicate(input, timeout=timeout)
+            except TimeoutExpired as exc:
+                process.kill()
+                if _mswindows:
+                    # Windows accumulates the output in a single blocking
+                    # read() call run on child threads, with the timeout
+                    # being done in a join() on those threads.  communicate()
+                    # _after_ kill() is required to collect that and add it
+                    # to the exception.
+                    exc.stdout, exc.stderr = process.communicate()
+                else:
+                    # POSIX _communicate already populated the output so
+                    # far into the TimeoutExpired exception.
+                    process.wait()
+                raise
+            except:  # Including KeyboardInterrupt, communicate handled that.
+                process.kill()
+                # We don't call process.wait() as .__exit__ does that for us.
+                raise
+            retcode = process.poll()
+            if check and retcode:
+>               raise CalledProcessError(retcode, process.args,
+                                         output=stdout, stderr=stderr)
+E               subprocess.CalledProcessError: Command '['alembic', 'upgrade', 'heads']' returned non-zero exit status 1.
+
+/usr/local/lib/python3.12/subprocess.py:571: CalledProcessError
+________________ ERROR at setup of test_07_migration_roundtrip _________________
+
+    @pytest.fixture(scope="session")
+    def database_url() -> str:
+        admin = make_url(_admin_url())
+        name = f"ffcore_test_{uuid.uuid4().hex[:12]}"
+        plain = admin.set(drivername="postgresql").render_as_string(hide_password=False)
+        with psycopg.connect(plain, autocommit=True) as conn:
+            conn.execute(f'CREATE DATABASE "{name}"')
+        url = admin.set(database=name).render_as_string(hide_password=False)
+        try:
+>           subprocess.run(
+                ["alembic", "upgrade", "heads"],
+                cwd=BACKEND,
+                env={**os.environ, "DATABASE_URL": url},
+                check=True,
+                capture_output=True,
+            )
+
+tests/integration/conftest.py:84: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+input = None, capture_output = True, timeout = None, check = True
+popenargs = (['alembic', 'upgrade', 'heads'],)
+kwargs = {'cwd': PosixPath('/work/backend'), 'env': {'RETENTION_BATCH': '5000', 'DATABASE_URL': 'postgresql+psycopg://ffcore:du...test_4c819cbbe7c0', 'TRANSFORMERS_OFFLINE': '1', 'CONVERT_CPU_LIMIT_SECONDS': '3600', ...}, 'stdout': -1, 'stderr': -1}
+
+    def run(*popenargs,
+            input=None, capture_output=False, timeout=None, check=False, **kwargs):
+        """Run command with arguments and return a CompletedProcess instance.
+    
+        The returned instance will have attributes args, returncode, stdout and
+        stderr. By default, stdout and stderr are not captured, and those attributes
+        will be None. Pass stdout=PIPE and/or stderr=PIPE in order to capture them,
+        or pass capture_output=True to capture both.
+    
+        If check is True and the exit code was non-zero, it raises a
+        CalledProcessError. The CalledProcessError object will have the return code
+        in the returncode attribute, and output & stderr attributes if those streams
+        were captured.
+    
+        If timeout (seconds) is given and the process takes too long,
+         a TimeoutExpired exception will be raised.
+    
+        There is an optional argument "input", allowing you to
+        pass bytes or a string to the subprocess's stdin.  If you use this argument
+        you may not also use the Popen constructor's "stdin" argument, as
+        it will be used internally.
+    
+        By default, all communication is in bytes, and therefore any "input" should
+        be bytes, and the stdout and stderr will be bytes. If in text mode, any
+        "input" should be a string, and stdout and stderr will be strings decoded
+        according to locale encoding, or by "encoding" if set. Text mode is
+        triggered by setting any of text, encoding, errors or universal_newlines.
+    
+        The other arguments are the same as for the Popen constructor.
+        """
+        if input is not None:
+            if kwargs.get('stdin') is not None:
+                raise ValueError('stdin and input arguments may not both be used.')
+            kwargs['stdin'] = PIPE
+    
+        if capture_output:
+            if kwargs.get('stdout') is not None or kwargs.get('stderr') is not None:
+                raise ValueError('stdout and stderr arguments may not be used '
+                                 'with capture_output.')
+            kwargs['stdout'] = PIPE
+            kwargs['stderr'] = PIPE
+    
+        with Popen(*popenargs, **kwargs) as process:
+            try:
+                stdout, stderr = process.communicate(input, timeout=timeout)
+            except TimeoutExpired as exc:
+                process.kill()
+                if _mswindows:
+                    # Windows accumulates the output in a single blocking
+                    # read() call run on child threads, with the timeout
+                    # being done in a join() on those threads.  communicate()
+                    # _after_ kill() is required to collect that and add it
+                    # to the exception.
+                    exc.stdout, exc.stderr = process.communicate()
+                else:
+                    # POSIX _communicate already populated the output so
+                    # far into the TimeoutExpired exception.
+                    process.wait()
+                raise
+            except:  # Including KeyboardInterrupt, communicate handled that.
+                process.kill()
+                # We don't call process.wait() as .__exit__ does that for us.
+                raise
+            retcode = process.poll()
+            if check and retcode:
+>               raise CalledProcessError(retcode, process.args,
+                                         output=stdout, stderr=stderr)
+E               subprocess.CalledProcessError: Command '['alembic', 'upgrade', 'heads']' returned non-zero exit status 1.
+
+/usr/local/lib/python3.12/subprocess.py:571: CalledProcessError
+_______________ ERROR at setup of test_08_23_migration_roundtrip _______________
+
+    @pytest.fixture(scope="session")
+    def database_url() -> str:
+        admin = make_url(_admin_url())
+        name = f"ffcore_test_{uuid.uuid4().hex[:12]}"
+        plain = admin.set(drivername="postgresql").render_as_string(hide_password=False)
+        with psycopg.connect(plain, autocommit=True) as conn:
+            conn.execute(f'CREATE DATABASE "{name}"')
+        url = admin.set(database=name).render_as_string(hide_password=False)
+        try:
+>           subprocess.run(
+                ["alembic", "upgrade", "heads"],
+                cwd=BACKEND,
+                env={**os.environ, "DATABASE_URL": url},
+                check=True,
+                capture_output=True,
+            )
+
+tests/integration/conftest.py:84: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+input = None, capture_output = True, timeout = None, check = True
+popenargs = (['alembic', 'upgrade', 'heads'],)
+kwargs = {'cwd': PosixPath('/work/backend'), 'env': {'RETENTION_BATCH': '5000', 'DATABASE_URL': 'postgresql+psycopg://ffcore:du...test_4c819cbbe7c0', 'TRANSFORMERS_OFFLINE': '1', 'CONVERT_CPU_LIMIT_SECONDS': '3600', ...}, 'stdout': -1, 'stderr': -1}
+
+    def run(*popenargs,
+            input=None, capture_output=False, timeout=None, check=False, **kwargs):
+        """Run command with arguments and return a CompletedProcess instance.
+    
+        The returned instance will have attributes args, returncode, stdout and
+        stderr. By default, stdout and stderr are not captured, and those attributes
+        will be None. Pass stdout=PIPE and/or stderr=PIPE in order to capture them,
+        or pass capture_output=True to capture both.
+    
+        If check is True and the exit code was non-zero, it raises a
+        CalledProcessError. The CalledProcessError object will have the return code
+        in the returncode attribute, and output & stderr attributes if those streams
+        were captured.
+    
+        If timeout (seconds) is given and the process takes too long,
+         a TimeoutExpired exception will be raised.
+    
+        There is an optional argument "input", allowing you to
+        pass bytes or a string to the subprocess's stdin.  If you use this argument
+        you may not also use the Popen constructor's "stdin" argument, as
+        it will be used internally.
+    
+        By default, all communication is in bytes, and therefore any "input" should
+        be bytes, and the stdout and stderr will be bytes. If in text mode, any
+        "input" should be a string, and stdout and stderr will be strings decoded
+        according to locale encoding, or by "encoding" if set. Text mode is
+        triggered by setting any of text, encoding, errors or universal_newlines.
+    
+        The other arguments are the same as for the Popen constructor.
+        """
+        if input is not None:
+            if kwargs.get('stdin') is not None:
+                raise ValueError('stdin and input arguments may not both be used.')
+            kwargs['stdin'] = PIPE
+    
+        if capture_output:
+            if kwargs.get('stdout') is not None or kwargs.get('stderr') is not None:
+                raise ValueError('stdout and stderr arguments may not be used '
+                                 'with capture_output.')
+            kwargs['stdout'] = PIPE
+            kwargs['stderr'] = PIPE
+    
+        with Popen(*popenargs, **kwargs) as process:
+            try:
+                stdout, stderr = process.communicate(input, timeout=timeout)
+            except TimeoutExpired as exc:
+                process.kill()
+                if _mswindows:
+                    # Windows accumulates the output in a single blocking
+                    # read() call run on child threads, with the timeout
+                    # being done in a join() on those threads.  communicate()
+                    # _after_ kill() is required to collect that and add it
+                    # to the exception.
+                    exc.stdout, exc.stderr = process.communicate()
+                else:
+                    # POSIX _communicate already populated the output so
+                    # far into the TimeoutExpired exception.
+                    process.wait()
+                raise
+            except:  # Including KeyboardInterrupt, communicate handled that.
+                process.kill()
+                # We don't call process.wait() as .__exit__ does that for us.
+                raise
+            retcode = process.poll()
+            if check and retcode:
+>               raise CalledProcessError(retcode, process.args,
+                                         output=stdout, stderr=stderr)
+E               subprocess.CalledProcessError: Command '['alembic', 'upgrade', 'heads']' returned non-zero exit status 1.
+
+/usr/local/lib/python3.12/subprocess.py:571: CalledProcessError
+_________ ERROR at setup of test_04a_schema_alembic_heads_include_04a __________
+
+    @pytest.fixture(scope="session")
+    def database_url() -> str:
+        admin = make_url(_admin_url())
+        name = f"ffcore_test_{uuid.uuid4().hex[:12]}"
+        plain = admin.set(drivername="postgresql").render_as_string(hide_password=False)
+        with psycopg.connect(plain, autocommit=True) as conn:
+            conn.execute(f'CREATE DATABASE "{name}"')
+        url = admin.set(database=name).render_as_string(hide_password=False)
+        try:
+>           subprocess.run(
+                ["alembic", "upgrade", "heads"],
+                cwd=BACKEND,
+                env={**os.environ, "DATABASE_URL": url},
+                check=True,
+                capture_output=True,
+            )
+
+tests/integration/conftest.py:84: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+input = None, capture_output = True, timeout = None, check = True
+popenargs = (['alembic', 'upgrade', 'heads'],)
+kwargs = {'cwd': PosixPath('/work/backend'), 'env': {'RETENTION_BATCH': '5000', 'DATABASE_URL': 'postgresql+psycopg://ffcore:du...test_4c819cbbe7c0', 'TRANSFORMERS_OFFLINE': '1', 'CONVERT_CPU_LIMIT_SECONDS': '3600', ...}, 'stdout': -1, 'stderr': -1}
+
+    def run(*popenargs,
+            input=None, capture_output=False, timeout=None, check=False, **kwargs):
+        """Run command with arguments and return a CompletedProcess instance.
+    
+        The returned instance will have attributes args, returncode, stdout and
+        stderr. By default, stdout and stderr are not captured, and those attributes
+        will be None. Pass stdout=PIPE and/or stderr=PIPE in order to capture them,
+        or pass capture_output=True to capture both.
+    
+        If check is True and the exit code was non-zero, it raises a
+        CalledProcessError. The CalledProcessError object will have the return code
+        in the returncode attribute, and output & stderr attributes if those streams
+        were captured.
+    
+        If timeout (seconds) is given and the process takes too long,
+         a TimeoutExpired exception will be raised.
+    
+        There is an optional argument "input", allowing you to
+        pass bytes or a string to the subprocess's stdin.  If you use this argument
+        you may not also use the Popen constructor's "stdin" argument, as
+        it will be used internally.
+    
+        By default, all communication is in bytes, and therefore any "input" should
+        be bytes, and the stdout and stderr will be bytes. If in text mode, any
+        "input" should be a string, and stdout and stderr will be strings decoded
+        according to locale encoding, or by "encoding" if set. Text mode is
+        triggered by setting any of text, encoding, errors or universal_newlines.
+    
+        The other arguments are the same as for the Popen constructor.
+        """
+        if input is not None:
+            if kwargs.get('stdin') is not None:
+                raise ValueError('stdin and input arguments may not both be used.')
+            kwargs['stdin'] = PIPE
+    
+        if capture_output:
+            if kwargs.get('stdout') is not None or kwargs.get('stderr') is not None:
+                raise ValueError('stdout and stderr arguments may not be used '
+                                 'with capture_output.')
+            kwargs['stdout'] = PIPE
+            kwargs['stderr'] = PIPE
+    
+        with Popen(*popenargs, **kwargs) as process:
+            try:
+                stdout, stderr = process.communicate(input, timeout=timeout)
+            except TimeoutExpired as exc:
+                process.kill()
+                if _mswindows:
+                    # Windows accumulates the output in a single blocking
+                    # read() call run on child threads, with the timeout
+                    # being done in a join() on those threads.  communicate()
+                    # _after_ kill() is required to collect that and add it
+                    # to the exception.
+                    exc.stdout, exc.stderr = process.communicate()
+                else:
+                    # POSIX _communicate already populated the output so
+                    # far into the TimeoutExpired exception.
+                    process.wait()
+                raise
+            except:  # Including KeyboardInterrupt, communicate handled that.
+                process.kill()
+                # We don't call process.wait() as .__exit__ does that for us.
+                raise
+            retcode = process.poll()
+            if check and retcode:
+>               raise CalledProcessError(retcode, process.args,
+                                         output=stdout, stderr=stderr)
+E               subprocess.CalledProcessError: Command '['alembic', 'upgrade', 'heads']' returned non-zero exit status 1.
+
+/usr/local/lib/python3.12/subprocess.py:571: CalledProcessError
+=========================== short test summary info ============================
+ERROR tests/integration/test_57_alembic_merge.py::test_57_1_alembic_heads_prints_one_line
+ERROR tests/integration/test_57_alembic_merge.py::test_57_2_empty_database_round_trip
+ERROR tests/integration/test_03a_schema.py::test_03a_6_migration_round_trip
+ERROR tests/integration/test_06a_schema.py::test_06a_schema_migration_round_trip
+ERROR tests/integration/test_07_schema.py::test_07_approvals_table_and_defaults
+ERROR tests/integration/test_07_schema.py::test_07_assigned_role_closed_list[user]
+ERROR tests/integration/test_07_schema.py::test_07_assigned_role_closed_list[superadmin]
+ERROR tests/integration/test_07_schema.py::test_07_assigned_role_closed_list[]
+ERROR tests/integration/test_07_schema.py::test_07_status_closed_list - subpr...
+ERROR tests/integration/test_07_schema.py::test_07_resolved_at_matches_status
+ERROR tests/integration/test_07_schema.py::test_07_one_approval_per_tool_call
+ERROR tests/integration/test_07_schema.py::test_07_project_must_exist - subpr...
+ERROR tests/integration/test_07_schema.py::test_07_run_must_exist - subproces...
+ERROR tests/integration/test_07_schema.py::test_07_pending_expiry_index - sub...
+ERROR tests/integration/test_07_schema.py::test_07_migration_roundtrip - subp...
+ERROR tests/integration/test_08_api.py::test_08_23_migration_roundtrip - subp...
+ERROR tests/integration/test_04a_store.py::test_04a_schema_alembic_heads_include_04a
+17 errors in 11.64s
