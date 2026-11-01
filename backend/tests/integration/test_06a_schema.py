@@ -1,13 +1,9 @@
 """06a migration: tables, constraints, checkpoints schema and round trip (compose Postgres)."""
 
-import os
-import subprocess
 import uuid
 
 import psycopg
 import pytest
-
-from tests.integration.conftest import BACKEND
 
 TABLES = {"agents", "agent_versions", "conversations", "runs", "messages", "run_events"}
 
@@ -102,25 +98,23 @@ def _run_columns(pg) -> set[str]:
     return {r[0] for r in rows}
 
 
-def test_06a_schema_migration_round_trip(database_url, pg):
-    env = {**os.environ, "DATABASE_URL": database_url}
-
-    def alembic(*args):
-        return subprocess.run(
-            ["alembic", *args], cwd=BACKEND, env=env, check=True, capture_output=True, text=True
-        ).stdout
-
-    assert "06a_0002" in alembic("heads")
+def test_06a_schema_migration_round_trip(scratch_db):
+    # Explicit revisions since the merge revisions (FOLLOWUP-57): "06a@-1" is ambiguous.
+    db = scratch_db
+    pg = db.conn
     # 06a_0002 (FOLLOWUP-116): the two checkpoint lifetime columns come and go on their own.
     lifetime = {"checkpoint_deleted_at", "source_deleted_at"}
     assert lifetime <= _run_columns(pg)
-    alembic("downgrade", "06a@-1")
+    db.run("downgrade", "06a_0001")
     assert TABLES <= _tables(pg) and not (lifetime & _run_columns(pg))
-    alembic("downgrade", "06a@-1")
+    # 06a_0001 itself: down to the shared root, then the packages 06a does not need come back.
+    db.run("downgrade", "0001")
+    for rev in ("03b_0001", "04a_0001"):
+        db.run("upgrade", rev)
     assert not (TABLES & _tables(pg))
     assert "checkpoints" not in _schemas(pg)
-    assert {"projects", "knowledge_bases", "audit_events"} <= _tables(pg)  # others untouched
-    alembic("upgrade", "heads")
+    assert {"projects", "knowledge_bases", "audit_events"} <= _tables(pg)
+    db.run("upgrade", "head")
     assert TABLES <= _tables(pg)
     assert "checkpoints" in _schemas(pg)
     assert lifetime <= _run_columns(pg)

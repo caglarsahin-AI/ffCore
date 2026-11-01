@@ -21,6 +21,17 @@ olduğunu yazarak durur.
 `migrate` servisi her `up`'ta backend'den önce `alembic upgrade heads` koşar (idempotent); başarısızsa backend
 başlamaz. Geri alma: `docker compose run --rm migrate alembic downgrade <revizyon>`.
 
+Migration grafiğinin tek ucu vardır (FOLLOWUP-57): `alembic heads` tek satır yazar, `alembic upgrade head`
+de çalışır. Paket dalları (03a … 08) iki boş merge revizyonuyla birleşti: `57_0001` başka revizyonların
+`depends_on` ettiği, bu yüzden `alembic_version`'da kendi satırı olmayan uçları (03a_0001, 03b_0001,
+06a_0002, 07_0001) birleştirir; `57_0002` onu satırı olan uçlarla birleştirir. Tek adımlı merge Alembic
+1.20'de `KeyError` verir (merge adımı her ebeveynin satırını, var olup olmadığına bakmadan siler). Yeni
+paket revizyonu güncel tek uçtan başlar (`down_revision` = `alembic heads` çıktısı) ve kendi dal
+etiketini taşır. Merge noktasından göreli geri alma (`downgrade -1`, `03a@-1`) "Ambiguous walk" ile
+reddedilir; geri alma açık revizyonladır: `alembic downgrade <kalacak revizyon>` onun üstündeki her şeyi
+(ona bağımlı olanlar ve merge revizyonları dahil) kaldırır, örn. `alembic downgrade 06a_0001` yalnız
+`06a_0002`'yi ve ona bağımlı `03c_0002`'yi geri alır. Sonra `alembic upgrade head` hepsini geri getirir.
+
 ## Günlük komutlar
 
 | İş | Komut |

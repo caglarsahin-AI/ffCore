@@ -427,8 +427,9 @@ services:
 
   migrate:
     # One-shot schema step before the backend (K-03b-0005): its own exit code and log, idempotent
-    # on every `up`. Roll back: docker compose run --rm migrate alembic downgrade <revision>
-    # (one branch only: 03a@-1, not 03a@base, which also drops 03b through the shared root).
+    # on every `up`. Roll back: docker compose run --rm migrate alembic downgrade <revision to keep>
+    # (an explicit revision: since the merge 57_0002 the graph has one head and `<label>@-1` is
+    # refused as an ambiguous walk; docs/gelistirme-ortami.md).
     # Then the static model catalog is loaded from deploy/seed (03a, idempotent).
     image: ${REGISTRY_PREFIX}ffcore/backend:${FFCORE_VERSION:?FFCORE_VERSION tanımlı değil}
     command:

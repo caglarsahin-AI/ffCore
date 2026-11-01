@@ -92,10 +92,11 @@ def test_04a_schema_tsv_is_generated_turkish(pg, make_project):
 
 
 def test_04a_schema_alembic_heads_include_04a(pg):
-    # 04a depends on 03a (foreign keys to projects), so 03a_0001 is applied but is no longer a
-    # separate row in alembic_version; the 04a branch head is.
+    # Since the merge revisions (FOLLOWUP-57) alembic_version holds the single merged head; 04a
+    # (and 03a, whose projects table it references) is applied below it.
     versions = {row[0] for row in pg.execute("SELECT version_num FROM alembic_version")}
-    assert "04a_0001" in versions
+    assert len(versions) == 1, versions
+    assert pg.execute("SELECT to_regclass('knowledge_bases') IS NOT NULL").fetchone()[0]
     assert pg.execute("SELECT to_regclass('projects') IS NOT NULL").fetchone()[0]
 
 

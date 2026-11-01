@@ -101,6 +101,62 @@ def pg(database_url):
         yield conn
 
 
+class ScratchDatabase:
+    """A throwaway database at the single migration head, for destructive migration tests.
+
+    Since the merge revisions (57_0001/57_0002, FOLLOWUP-57) a merged branch cannot be rolled back
+    with `<label>@-1`, so round trips go down to an explicit revision (often `0001`) and back up;
+    that must not touch the session database other tests share.
+    """
+
+    def __init__(self, url: str, conn):
+        self.url = url
+        self.conn = conn
+
+    def alembic(self, *args: str) -> subprocess.CompletedProcess:
+        return subprocess.run(
+            ["alembic", *args],
+            cwd=BACKEND,
+            env={**os.environ, "DATABASE_URL": self.url},
+            capture_output=True,
+            text=True,
+        )
+
+    def run(self, *args: str) -> str:
+        done = self.alembic(*args)
+        assert done.returncode == 0, f"alembic {' '.join(args)} failed:\n{done.stderr}"
+        return done.stdout
+
+    def tables(self) -> set[str]:
+        rows = self.conn.execute(
+            "SELECT tablename FROM pg_tables WHERE schemaname = 'public'"
+        ).fetchall()
+        return {r[0] for r in rows}
+
+    def versions(self) -> set[str]:
+        rows = self.conn.execute("SELECT version_num FROM alembic_version").fetchall()
+        return {r[0] for r in rows}
+
+
+@pytest.fixture
+def scratch_db() -> ScratchDatabase:
+    admin = make_url(_admin_url())
+    name = f"ffcore_scratch_{uuid.uuid4().hex[:12]}"
+    plain = admin.set(drivername="postgresql").render_as_string(hide_password=False)
+    with psycopg.connect(plain, autocommit=True) as conn:
+        conn.execute(f'CREATE DATABASE "{name}"')
+    url = admin.set(database=name).render_as_string(hide_password=False)
+    db_plain = make_url(url).set(drivername="postgresql").render_as_string(hide_password=False)
+    try:
+        with psycopg.connect(db_plain, autocommit=True) as conn:
+            db = ScratchDatabase(url, conn)
+            db.run("upgrade", "head")
+            yield db
+    finally:
+        with psycopg.connect(plain, autocommit=True) as conn:
+            conn.execute(f'DROP DATABASE IF EXISTS "{name}" WITH (FORCE)')
+
+
 # --- 03a: the real application against the throwaway database ---
 
 CONSOLE_ORIGIN = "https://testserver"
