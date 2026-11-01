@@ -150,6 +150,8 @@ class RunContext:
     system: dict[str, str] = field(default_factory=dict)
     history: list[dict[str, str]] = field(default_factory=list)
     budget: Budget | None = None
+    # message text hash -> its egress-checked text, for this run execution (graph._egress_messages).
+    egress_cache: dict[str, str] = field(default_factory=dict)
     # Tokens go to the client while the model writes, unless an enforce-mode policy checks
     # output first (then the answer is shown after output.pre).
     stream_live: bool = True

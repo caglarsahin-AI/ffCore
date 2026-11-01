@@ -13,6 +13,7 @@ interrupt returns. `boundary()` runs first in every node: cancel, abandon and ru
 the run there (a model or tool call in progress is never cut).
 """
 
+import hashlib
 import json
 import re
 import time
@@ -160,6 +161,34 @@ def _always_found_nothing(ctx: RunContext, state: RunState) -> bool:
     return bool(only_always and not d.ask_user and not state.get("sources"))
 
 
+async def _egress_messages(ctx: RunContext, messages: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """The single checkpoint before the provider (BLOCKERS 134): every message of the list that
+    goes to the model (system prompt, history, user, assistant, tool results) passes `egress`
+    on every call. The run's token store makes it idempotent: an already tokenized text comes
+    back unchanged and issued placeholders are not matched again. A block fails the run
+    (`guardrail_block`); nothing is skipped or cut."""
+    out: list[dict[str, Any]] = []
+    for message in messages:
+        content = message.get("content")
+        if not isinstance(content, str) or not content:
+            out.append(message)
+            continue
+        key = hashlib.sha256(content.encode()).hexdigest()
+        masked = ctx.egress_cache.get(key)
+        if masked is None:
+            checked = await ctx.guard.check("egress", content)
+            if checked.action == "block":
+                raise StopRun(
+                    RunStatus.failed,
+                    "guardrail_block",
+                    checked.message,
+                    reference_id=checked.reference_id,
+                )
+            masked = ctx.egress_cache[key] = checked.text
+        out.append(message if masked == content else {**message, "content": masked})
+    return out
+
+
 async def model(state: RunState, runtime: Runtime[RunContext]) -> dict:
     ctx = runtime.context
     await ctx.boundary("model")
@@ -180,8 +209,9 @@ async def model(state: RunState, runtime: Runtime[RunContext]) -> dict:
     async def on_token(text: str) -> None:
         await ctx.events.live(SseEvent.token, {"text": text})
 
+    outgoing = await _egress_messages(ctx, state["messages"])
     turn = await ctx.model.call(
-        state["messages"],
+        outgoing,
         tools=ctx.tools.schemas(),
         max_tokens=min(d.limits.output_tokens, d.answer_rules.max_answer_tokens)
         if not ctx.tools.schemas()
@@ -202,7 +232,7 @@ async def model(state: RunState, runtime: Runtime[RunContext]) -> dict:
             "queue_ms": turn.queue_ms,
             "tool_calls": [c.name for c in turn.tool_calls],
             # The final, masked messages sent to the model (02/08 content rule).
-            "request_messages": state["messages"],
+            "request_messages": outgoing,
         },
         iteration=iteration,
     )
