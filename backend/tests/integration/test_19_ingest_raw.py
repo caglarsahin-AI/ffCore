@@ -83,7 +83,7 @@ def test_19_1_ingest_raw_paycore_like_idempotent(world, pg, settings, ro_tree):
     assert _snapshot(ro_tree) == before  # nothing written under the tree (şart 2)
 
     rows = pg.execute(
-        "SELECT filename, version, raw_path, sha256, meta FROM documents WHERE kb_id = %s",
+        "SELECT filename, version, raw_path, sha256, metadata FROM documents WHERE kb_id = %s",
         (kb["id"],),
     ).fetchall()
     assert {r[0] for r in rows} == {
@@ -125,10 +125,12 @@ def test_19_1_search_returns_the_cited_source(world, pg, settings, ro_tree):
     response = search(world["analyst"], world, kb["id"], "fesih bildirim süresi kaç gün")
     assert response.status_code == 200, response.text
     hits = response.json()["hits"]
-    assert hits, response.text
-    top = hits[0]
-    assert top["breadcrumb"].endswith("Üye İşyeri Sözleşmesi Fesih Kuralları"), top
-    assert "otuz gün" in top["text"]
+    # FAKE_EMBED vectors are not semantic: the claim is that the document is found with its
+    # source breadcrumb, not its rank (the rank is a real-model measurement, make eval).
+    fesih = [h for h in hits if h["document_name"] == "confluence/DEMO/1002.md"]
+    assert fesih, [h["document_name"] for h in hits]
+    assert "Üye İşyeri Sözleşmesi Fesih Kuralları" in fesih[0]["breadcrumb"]
+    assert any("otuz gün" in h["text"] for h in fesih)
 
 
 def test_19_1_limit_first_slice(world, pg, settings, ro_tree):

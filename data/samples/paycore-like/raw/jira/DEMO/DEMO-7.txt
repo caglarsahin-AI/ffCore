@@ -1,5 +1,6 @@
 DEMO-7 Gün sonu raporunda kur farkı satırı eksik
 
-Gün sonu raporu döviz işlemlerinde kur farkı satırını göstermiyor. Rapor şablonuna kur farkı alanı
-eklendi, test ortamında doğrulandı ve sürüm notuna yazıldı. Çözüm: rapor şablonu güncellendi, eski
-raporlar yeniden üretilmez.
+Bu kayıt, gün sonu raporunun döviz işlemlerinde kur farkı satırını göstermediği için açıldı. Sorun
+bir müşteri bildirimi ile fark edildi ve aynı gün içinde incelendi. Rapor şablonuna kur farkı alanı
+eklendi, bu değişiklik test ortamında doğrulandı ve sürüm notuna da yazıldı. Çözüm olarak rapor
+şablonu güncellendi; eski raporlar yeniden üretilmez, çünkü o günlerin mutabakatı zaten kapandı.
