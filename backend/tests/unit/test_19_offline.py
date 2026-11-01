@@ -8,6 +8,7 @@ import hashlib
 import os
 import re
 import subprocess
+import tarfile
 from pathlib import Path
 
 import pytest
@@ -146,26 +147,43 @@ def _archive(tmp_path, files: dict[str, bytes]) -> Path:
     for name, data in files.items():
         (out / name).parent.mkdir(parents=True, exist_ok=True)
         (out / name).write_bytes(data)
-    lines = "".join(
-        f"{hashlib.sha256(data).hexdigest()} *{name}\n" for name, data in sorted(files.items())
-    )
-    (out / "manifest.sha256").write_text(lines, encoding="utf-8")
+    _rehash(out)
     return out
 
 
+def _rehash(out: Path) -> None:
+    files = sorted(p for p in out.rglob("*") if p.is_file() and p.name != "manifest.sha256")
+    (out / "manifest.sha256").write_text(
+        "".join(
+            f"{hashlib.sha256(p.read_bytes()).hexdigest()} *{p.relative_to(out).as_posix()}\n"
+            for p in files
+        ),
+        encoding="utf-8",
+    )
+
+
+def _empty_tar(path: Path) -> None:
+    with tarfile.open(path, "w"):
+        pass
+
+
 def test_19_4_manifest_vs_archive(stub, tmp_path):
-    archive = _archive(tmp_path, {"images/redis.tar": b"r", "images/qdrant.tar": b"q"})
-    result = _run("load.sh", str(archive), "--dry-run", env=stub["env"])
+    archive = _archive(
+        tmp_path, {"images/redis.tar": b"r", "images/qdrant.tar": b"q", "models.tar": b"m"}
+    )
+    models = str(tmp_path / "models")
+    result = _run("load.sh", str(archive), "--models-dir", models, "--dry-run", env=stub["env"])
     assert result.returncode == 0, result.stderr
     assert result.stdout.count("docker load -i") == 2
+    assert f"verify.sh --images --models {models}" in result.stdout
 
     (archive / "images" / "extra.tar").write_bytes(b"x")  # not in the manifest
-    result = _run("load.sh", str(archive), "--dry-run", env=stub["env"])
+    result = _run("load.sh", str(archive), "--models-dir", models, "--dry-run", env=stub["env"])
     assert result.returncode == 1 and "differ" in result.stderr
 
     (archive / "images" / "extra.tar").unlink()
     (archive / "images" / "redis.tar").write_bytes(b"tampered")
-    result = _run("load.sh", str(archive), env=stub["env"])
+    result = _run("load.sh", str(archive), "--models-dir", models, env=stub["env"])
     assert result.returncode == 1
     calls = stub["calls"]
     assert not calls.exists() or "load -i" not in calls.read_text(encoding="utf-8")
@@ -174,9 +192,12 @@ def test_19_4_manifest_vs_archive(stub, tmp_path):
 def test_19_s3_load_verifies_against_the_repo_list(stub, tmp_path):
     # An images.txt shipped inside the archive is ignored: the repo's list decides.
     archive = _archive(
-        tmp_path, {"images/redis.tar": b"r", "images.txt": b"redis:7.4.6-alpine x sha256:1 y\n"}
+        tmp_path,
+        {"images/redis.tar": b"r", "images.txt": b"redis:7.4.6-alpine x sha256:1 y\n"},
     )
-    result = _run("load.sh", str(archive), env=stub["env"])
+    _empty_tar(archive / "models.tar")
+    _rehash(archive)
+    result = _run("load.sh", str(archive), "--models-dir", str(tmp_path / "m"), env=stub["env"])
     assert result.returncode == 1
     assert "PENDING" in result.stdout  # the repo's images.txt was the one checked
 

@@ -89,3 +89,11 @@ def test_19_s4_preflight_prints_no_values(tmp_path, capsys):
         if value and len(value) > 5:
             assert value not in printed, value
     assert "FAIL SECRET_KEY" in printed and "OK SERVICE_TOKEN" in printed
+
+
+def test_19_s4_preflight_paycore_stack_names(tmp_path):
+    values = dict(SAFE)
+    values["FFCORE_POSTGRES_PASSWORD"] = values.pop("POSTGRES_PASSWORD")
+    verdicts = {k: ok for k, ok, _ in pf.check(pf.read_env(_write(tmp_path, values)), "paycore")}
+    assert verdicts["FFCORE_POSTGRES_PASSWORD"] is True and "POSTGRES_PASSWORD" not in verdicts
+    assert pf.main(["--env-file", str(_write(tmp_path, values)), "--stack", "paycore"]) == 0

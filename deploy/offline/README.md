@@ -9,7 +9,7 @@ this git repository, not against anything inside the archive.
 | `images.txt` | (list) | every image: registry digest (checked after `docker pull`) and image id (checked after `docker load`) |
 | `models.txt` | (list) | every model weight file: Hugging Face revision, path, SHA-256, size |
 | `save.sh` | preparation machine | pull + provenance check, build ids printed for `images.txt`, `docker save`, `models.tar`, `manifest.sha256` |
-| `load.sh` | server | `sha256sum -c` (transport), `docker load`, models into a volume, then `verify.sh` |
+| `load.sh` | server | `sha256sum -c` (transport), `docker load`, `models.tar` into the host models directory, then `verify.sh` |
 | `verify.sh` | server | loaded image ids and model files against `images.txt` / `models.txt` |
 
 Why image ids on the server: `docker load` on the overlay2 image store does not keep
