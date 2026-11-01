@@ -1,0 +1,5 @@
+Gün sonu kontrol listesi
+
+Banka dosyasının geldiği ve boyutunun sıfırdan büyük olduğu doğrulanır. İşlem kayıtlarının toplam
+tutarı banka dosyasıyla karşılaştırılır. Farkı olan her kayıt için ters ibraz durumu kontrol edilir
+ve sonuç mutabakat notuna yazılır. Kontrol eden kişi listenin sonunu imzalar.

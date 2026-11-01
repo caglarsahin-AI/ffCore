@@ -1,0 +1,3 @@
+PRSIM-1 Sentetik kayıt örneği
+
+Bu kayıt yalnızca reddi göstermek için vardır: PRSIM kaynakları 08 tam gelene kadar içeri alınmaz.

@@ -208,6 +208,32 @@ class Runner:
             time.sleep(2)
 
 
+def _inside(path: Path, root: Path) -> bool:
+    try:
+        path.resolve().relative_to(root.resolve())
+    except ValueError:
+        return False
+    return True
+
+
+def resolve_out(dataset: Path, *, out: str | None, out_dir: str | None, now: datetime) -> Path:
+    """Where the report goes (19 şart 5). A set from outside the repository (S1 on the server)
+    needs an explicit place outside it: no default that could drop the report into a checkout
+    or into a container layer that disappears. Inside the repository only `eval/results/`."""
+    name = f"eval-{now:%Y%m%d-%H%M}.md"
+    target = Path(out) if out else Path(out_dir) / name if out_dir else None
+    if target is None:
+        if not _inside(dataset, REPO):
+            raise SystemExit(
+                "eval: eval_out_required: the dataset is outside the repository; "
+                "set EVAL_OUT to a directory outside it (e.g. /var/lib/ffcore/eval)"
+            )
+        return REPO / "eval" / "results" / name
+    if _inside(target, REPO) and not _inside(target, REPO / "eval" / "results"):
+        raise SystemExit(f"eval: eval_out_inside_repo: {target} (only eval/results/ is allowed)")
+    return target
+
+
 def main(argv=None) -> int:
     p = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     p.add_argument("--dataset", default=str(DEFAULT_SET))
@@ -217,11 +243,13 @@ def main(argv=None) -> int:
     p.add_argument("--approve-sql", action="store_true", help="approve each run_sql call")
     p.add_argument("--model", required=True, help="what answered, e.g. fake-llm, qwen3.5:35b cpu")
     p.add_argument("--user", default=None, help="default: <project>-analyst-edit@example.test")
-    p.add_argument("--out", default=None)
+    p.add_argument("--out", default=None, help="report file")
+    p.add_argument("--out-dir", default=None, help="report directory (make eval EVAL_OUT=...)")
     a = p.parse_args(argv)
     password = os.environ.get("E2E_PASSWORD")
     if not password:
         raise SystemExit("eval: E2E_PASSWORD is not set (the seeded members' password)")
+    out = resolve_out(Path(a.dataset), out=a.out, out_dir=a.out_dir, now=datetime.now(UTC))
     items = json.loads(Path(a.dataset).read_text(encoding="utf-8"))
     runner = Runner(
         os.environ.get("E2E_BACKEND_URL", "http://backend:8000"),
@@ -279,7 +307,6 @@ def main(argv=None) -> int:
         "profile": os.environ.get("DEPLOY_PROFILE", "-"),
         "at": now.strftime("%Y-%m-%d %H:%M"),
     }
-    out = Path(a.out or REPO / "eval" / "results" / f"eval-{now:%Y%m%d-%H%M}.md")
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(markdown(meta, results), encoding="utf-8")
     print(f"report written to {out}")

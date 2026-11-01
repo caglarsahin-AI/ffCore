@@ -1,0 +1,11 @@
+{
+  "source": "confluence:DEMO",
+  "source_item_id": "1003",
+  "title": "Gün Sonu Mutabakatı",
+  "breadcrumb": "DEMO › Operasyon › Gün Sonu Mutabakatı",
+  "source_url": "https://wiki.example.test/pages/1003",
+  "updated_at_source": "2026-07-20",
+  "attachments": [
+    "1003-kontrol-listesi.txt"
+  ]
+}
