@@ -1229,3 +1229,12 @@ Kararlar alındı, state/pr/06b.md "Plan onayı" bölümüne işlendi (kapsam ma
 ### A-06b-0005 · 2026-11-01 07:50 · → koordinator · YIGIN-AÇ 06b
 Paket: 06b   Cevap: K-06b-0002
 Proje ffcore-06b, portlar 18130/13130, --env-file .env.test. Önce yalnız postgres + redis (0.0.0-main + worktree kodu, derleme yok); tam yığın (`--profile test --profile qdrant`) entegrasyon kapısında, S7 bağımlılığı eklenince `0.0.0-06b` tools derlemesiyle. C: boş alan aşağıda ölçüldü.
+
+### A-06b-0006 · 2026-11-01 08:30 · → koordinator · YIGIN-AÇ 06b (tam) + düzeltme
+Paket: 06b   Cevap: K-06b-0003
+Hata bildirimi: düz model testleri için `--profile test` (LiteLLM, fake-llm, Langfuse, worker'lar) yığınını K-06b-0003'teki "tam yığında yeniden YIGIN-AÇ yaz" şartını beklemeden açtım (0.0.0-main, derleme yok). Ölçüm aşağıdaki komutta (C: boş alan + proje başına bellek), sonucu bir sonraki mesajda. Uygun değilse söyle, `ffcore-06b` test profili servislerini adıyla durdururum; postgres+redis kalır.
+
+### A-06b-0007 · 2026-11-01 08:45 · → koordinator · DURUM
+Paket: 06b   Cevap: K-06b-0003
+Ölçüm (A-06b-0006): C: 36 GB; docker stats proje toplamı ffmain ≈ 4,6 GB, ffcore-* (06b test profili + 19) ≈ 3,0 GB, diğer ≈ 1,4 GB; VM 12,5 GB içinde. Tam yığını (qdrant + 0.0.0-06b derlemesi) entegrasyon kapısında ayrıca isteyeceğim.
+İlerleme: dilim 0-2 (C11 şeması, kimlik/kapsam/`/v1/models`, düz model yolu) feat/06b-facade'da commit'li; hedefli testler 26 passed (kapsam matrisi, S1 tek yanıt, input.pre/egress/output.pre, tampon, S9, 429). Bulgu: egress `tokenize` token kapsamı olarak run id ister (08 masking `TokenScopeMissing`); düz yolda run yok → istek başına kapsam (`facade-<uuid>`), olaylara run_id yazılmaz; 08 koduna dokunulmadı. Sıradaki: dilim 3 (agent yolu, S2 iç arama ucu).

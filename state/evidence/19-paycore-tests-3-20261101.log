@@ -1,0 +1,701 @@
+   Building paycore-llm @ file:///app
+      Built paycore-llm @ file:///app
+Uninstalled 1 package in 1ms
+Installed 1 package in 1ms
+4 files reformatted, 1 file left unchanged
+ANN204 Missing return type annotation for special method `__init__`
+   --> scripts/ffcore_seed_paycore.py:103:9
+    |
+102 | class Api:
+103 |     def __init__(self, base_url: str, call: Callable | None = None):
+    |         ^^^^^^^^
+104 |         self.base = base_url.rstrip("/") + API
+105 |         self.cookie = ""
+    |
+help: Add return type annotation: `None`
+
+ANN202 Missing return type annotation for private function `_http`
+   --> scripts/ffcore_seed_paycore.py:109:9
+    |
+107 |         self._call = call or self._http
+108 |
+109 |     def _http(self, method: str, path: str, body: dict | None):
+    |         ^^^^^
+110 |         data = None if body is None else json.dumps(body).encode()
+111 |         request = urllib.request.Request(self.base + path, data=data, method=method)
+    |
+help: Add return type annotation
+
+ANN201 Missing return type annotation for public function `call`
+   --> scripts/ffcore_seed_paycore.py:124:9
+    |
+122 |             return exc.code, (json.loads(raw) if raw else {}), ""
+123 |
+124 |     def call(self, method: str, path: str, body: dict | None = None, ok=(200, 201, 202, 204)):
+    |         ^^^^
+125 |         status, payload, cookie = self._call(method, path, body)
+126 |         if cookie.startswith("ffcore_session="):
+    |
+help: Add return type annotation
+
+ANN001 Missing type annotation for function argument `ok`
+   --> scripts/ffcore_seed_paycore.py:124:70
+    |
+122 |             return exc.code, (json.loads(raw) if raw else {}), ""
+123 |
+124 |     def call(self, method: str, path: str, body: dict | None = None, ok=(200, 201, 202, 204)):
+    |                                                                      ^^
+125 |         status, payload, cookie = self._call(method, path, body)
+126 |         if cookie.startswith("ffcore_session="):
+    |
+
+ANN001 Missing type annotation for function argument `args`
+   --> scripts/ffcore_seed_paycore.py:171:15
+    |
+170 | def seed(
+171 |     api: Api, args, experts: dict[str, dict], templates: dict[str, dict], passwords, step: str
+    |               ^^^^
+172 | ) -> list[str]:
+173 |     """step `project`: the project and its analyst (seed-models needs the project, agents need
+    |
+
+ANN001 Missing type annotation for function argument `passwords`
+   --> scripts/ffcore_seed_paycore.py:171:75
+    |
+170 | def seed(
+171 |     api: Api, args, experts: dict[str, dict], templates: dict[str, dict], passwords, step: str
+    |                                                                           ^^^^^^^^^
+172 | ) -> list[str]:
+173 |     """step `project`: the project and its analyst (seed-models needs the project, agents need
+    |
+
+ANN001 Missing type annotation for function argument `args`
+   --> scripts/ffcore_seed_paycore.py:185:29
+    |
+185 | def _seed_members(api: Api, args, pid: str, analyst_password: str) -> list[str]:
+    |                             ^^^^
+186 |     analyst = api.ensure(
+187 |         "/users",
+    |
+
+ANN001 Missing type annotation for function argument `pid`
+   --> scripts/ffcore_seed_paycore.py:201:29
+    |
+201 | def _seed_content(api: Api, pid, kbs, agents, skipped, templates) -> list[str]:
+    |                             ^^^
+202 |     for kb in kbs:
+203 |         api.ensure(f"/projects/{pid}/knowledge-bases", {"key": kb, "name": kb}, "key", kb)
+    |
+
+ANN001 Missing type annotation for function argument `kbs`
+   --> scripts/ffcore_seed_paycore.py:201:34
+    |
+201 | def _seed_content(api: Api, pid, kbs, agents, skipped, templates) -> list[str]:
+    |                                  ^^^
+202 |     for kb in kbs:
+203 |         api.ensure(f"/projects/{pid}/knowledge-bases", {"key": kb, "name": kb}, "key", kb)
+    |
+
+ANN001 Missing type annotation for function argument `agents`
+   --> scripts/ffcore_seed_paycore.py:201:39
+    |
+201 | def _seed_content(api: Api, pid, kbs, agents, skipped, templates) -> list[str]:
+    |                                       ^^^^^^
+202 |     for kb in kbs:
+203 |         api.ensure(f"/projects/{pid}/knowledge-bases", {"key": kb, "name": kb}, "key", kb)
+    |
+
+ANN001 Missing type annotation for function argument `skipped`
+   --> scripts/ffcore_seed_paycore.py:201:47
+    |
+201 | def _seed_content(api: Api, pid, kbs, agents, skipped, templates) -> list[str]:
+    |                                               ^^^^^^^
+202 |     for kb in kbs:
+203 |         api.ensure(f"/projects/{pid}/knowledge-bases", {"key": kb, "name": kb}, "key", kb)
+    |
+
+ANN001 Missing type annotation for function argument `templates`
+   --> scripts/ffcore_seed_paycore.py:201:56
+    |
+201 | def _seed_content(api: Api, pid, kbs, agents, skipped, templates) -> list[str]:
+    |                                                        ^^^^^^^^^
+202 |     for kb in kbs:
+203 |         api.ensure(f"/projects/{pid}/knowledge-bases", {"key": kb, "name": kb}, "key", kb)
+    |
+
+ANN001 Missing type annotation for function argument `profiles`
+  --> tests/test_19_compose.py:47:29
+   |
+47 | def _config(tmp_path: Path, profiles=PROFILES) -> dict[str, Any]:
+   |                             ^^^^^^^^
+48 |     docker = shutil.which("docker")
+49 |     assert docker, "docker is not on PATH"
+   |
+
+ANN001 Missing type annotation for function argument `tmp_path_factory`
+  --> tests/test_19_compose.py:66:12
+   |
+65 | @pytest.fixture(scope="module")
+66 | def config(tmp_path_factory) -> dict[str, Any]:
+   |            ^^^^^^^^^^^^^^^^
+67 |     return _config(tmp_path_factory.mktemp("compose"))
+   |
+
+ANN001 Missing type annotation for function argument `value`
+  --> tests/test_19_compose.py:70:16
+   |
+70 | def _mem_bytes(value) -> int:
+   |                ^^^^^
+71 |     if isinstance(value, int):
+72 |         return value
+   |
+
+ANN201 Missing return type annotation for public function `test_19_3_compose_config_valid`
+  --> tests/test_19_compose.py:77:5
+   |
+77 | def test_19_3_compose_config_valid(config):
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+78 |     assert FFCORE_SERVICES <= set(config["services"])
+   |
+help: Add return type annotation: `None`
+
+ANN001 Missing type annotation for function argument `config`
+  --> tests/test_19_compose.py:77:36
+   |
+77 | def test_19_3_compose_config_valid(config):
+   |                                    ^^^^^^
+78 |     assert FFCORE_SERVICES <= set(config["services"])
+   |
+
+SIM300 [*] Yoda condition detected
+  --> tests/test_19_compose.py:78:12
+   |
+77 | def test_19_3_compose_config_valid(config):
+78 |     assert FFCORE_SERVICES <= set(config["services"])
+   |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+help: Rewrite as `set(config["services"]) >= FFCORE_SERVICES`
+   |
+77 | def test_19_3_compose_config_valid(config):
+   -     assert FFCORE_SERVICES <= set(config["services"])
+78 +     assert set(config["services"]) >= FFCORE_SERVICES
+79 |
+   |
+
+ANN201 Missing return type annotation for public function `test_19_3_ffcore_is_its_own_profile`
+  --> tests/test_19_compose.py:81:5
+   |
+81 | def test_19_3_ffcore_is_its_own_profile(tmp_path):
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+82 |     without = _config(tmp_path, ["server", "ollama", "ingest"])
+83 |     assert not FFCORE_SERVICES & set(without["services"])
+   |
+help: Add return type annotation: `None`
+
+ANN001 Missing type annotation for function argument `tmp_path`
+  --> tests/test_19_compose.py:81:41
+   |
+81 | def test_19_3_ffcore_is_its_own_profile(tmp_path):
+   |                                         ^^^^^^^^
+82 |     without = _config(tmp_path, ["server", "ollama", "ingest"])
+83 |     assert not FFCORE_SERVICES & set(without["services"])
+   |
+
+ANN201 Missing return type annotation for public function `test_19_3_ffcore_ports_loopback_only`
+  --> tests/test_19_compose.py:86:5
+   |
+86 | def test_19_3_ffcore_ports_loopback_only(config):
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+87 |     for name in FFCORE_SERVICES:
+88 |         for port in config["services"][name].get("ports", []):
+   |
+help: Add return type annotation: `None`
+
+ANN001 Missing type annotation for function argument `config`
+  --> tests/test_19_compose.py:86:42
+   |
+86 | def test_19_3_ffcore_ports_loopback_only(config):
+   |                                          ^^^^^^
+87 |     for name in FFCORE_SERVICES:
+88 |         for port in config["services"][name].get("ports", []):
+   |
+
+ANN201 Missing return type annotation for public function `test_19_3_ffcore_never_uses_paycore_databases`
+  --> tests/test_19_compose.py:92:5
+   |
+92 | def test_19_3_ffcore_never_uses_paycore_databases(config):
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+93 |     """K-M3S-0003 B: FFCore's own Qdrant and Postgres; PayCore's are not reachable by URL."""
+94 |     for name in FFCORE_SERVICES:
+   |
+help: Add return type annotation: `None`
+
+ANN001 Missing type annotation for function argument `config`
+  --> tests/test_19_compose.py:92:51
+   |
+92 | def test_19_3_ffcore_never_uses_paycore_databases(config):
+   |                                                   ^^^^^^
+93 |     """K-M3S-0003 B: FFCore's own Qdrant and Postgres; PayCore's are not reachable by URL."""
+94 |     for name in FFCORE_SERVICES:
+   |
+
+ANN201 Missing return type annotation for public function `test_19_3_app_env_keys_match_ffcore`
+   --> tests/test_19_compose.py:106:5
+    |
+106 | def test_19_3_app_env_keys_match_ffcore(config):
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+107 |     reference = yaml.safe_load((FFCORE_DEPLOY / "docker-compose.yml").read_text(encoding="utf-8"))
+108 |     want = set(reference["services"]["backend"]["environment"])
+    |
+help: Add return type annotation: `None`
+
+ANN001 Missing type annotation for function argument `config`
+   --> tests/test_19_compose.py:106:41
+    |
+106 | def test_19_3_app_env_keys_match_ffcore(config):
+    |                                         ^^^^^^
+107 |     reference = yaml.safe_load((FFCORE_DEPLOY / "docker-compose.yml").read_text(encoding="utf-8"))
+108 |     want = set(reference["services"]["backend"]["environment"])
+    |
+
+ANN201 Missing return type annotation for public function `test_19_s4_m3_values_fixed_in_compose`
+   --> tests/test_19_compose.py:113:5
+    |
+113 | def test_19_s4_m3_values_fixed_in_compose(config):
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+114 |     env = config["services"]["ffcore-backend"]["environment"]
+115 |     assert env["OFFLINE"] == "true" and env["EGRESS_ALLOWLIST"] == ""
+    |
+help: Add return type annotation: `None`
+
+ANN001 Missing type annotation for function argument `config`
+   --> tests/test_19_compose.py:113:43
+    |
+113 | def test_19_s4_m3_values_fixed_in_compose(config):
+    |                                           ^^^^^^
+114 |     env = config["services"]["ffcore-backend"]["environment"]
+115 |     assert env["OFFLINE"] == "true" and env["EGRESS_ALLOWLIST"] == ""
+    |
+
+ANN201 Missing return type annotation for public function `test_19_5_jira_write_gate_closed`
+   --> tests/test_19_compose.py:125:5
+    |
+125 | def test_19_5_jira_write_gate_closed(config):
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+126 |     for name in ("api", "worker", "ingest"):
+127 |         assert config["services"][name]["environment"]["JIRA_SUGGESTIONS_ENABLED"] == "false"
+    |
+help: Add return type annotation: `None`
+
+ANN001 Missing type annotation for function argument `config`
+   --> tests/test_19_compose.py:125:38
+    |
+125 | def test_19_5_jira_write_gate_closed(config):
+    |                                      ^^^^^^
+126 |     for name in ("api", "worker", "ingest"):
+127 |         assert config["services"][name]["environment"]["JIRA_SUGGESTIONS_ENABLED"] == "false"
+    |
+
+ANN201 Missing return type annotation for public function `test_19_5_models_mount_read_only`
+   --> tests/test_19_compose.py:130:5
+    |
+130 | def test_19_5_models_mount_read_only(config):
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+131 |     for name in ("ffcore-backend", "ffcore-worker"):
+132 |         mounts = {v["target"]: v for v in config["services"][name]["volumes"]}
+    |
+help: Add return type annotation: `None`
+
+ANN001 Missing type annotation for function argument `config`
+   --> tests/test_19_compose.py:130:38
+    |
+130 | def test_19_5_models_mount_read_only(config):
+    |                                      ^^^^^^
+131 |     for name in ("ffcore-backend", "ffcore-worker"):
+132 |         mounts = {v["target"]: v for v in config["services"][name]["volumes"]}
+    |
+
+ANN201 Missing return type annotation for public function `test_19_3_mem_table_matches_compose`
+   --> tests/test_19_compose.py:151:5
+    |
+151 | def test_19_3_mem_table_matches_compose(config):
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+152 |     table = _table_limits()
+153 |     for name, svc in config["services"].items():
+    |
+help: Add return type annotation: `None`
+
+ANN001 Missing type annotation for function argument `config`
+   --> tests/test_19_compose.py:151:41
+    |
+151 | def test_19_3_mem_table_matches_compose(config):
+    |                                         ^^^^^^
+152 |     table = _table_limits()
+153 |     for name, svc in config["services"].items():
+    |
+
+ANN201 Missing return type annotation for public function `test_19_3_mem_budget_within_limit`
+   --> tests/test_19_compose.py:160:5
+    |
+160 | def test_19_3_mem_budget_within_limit(config):
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+161 |     text = BELLEK.read_text(encoding="utf-8")
+162 |     physical = re.search(r"\| Fiziksel bellek[^|]*\| (\d+) GB", text)
+    |
+help: Add return type annotation: `None`
+
+ANN001 Missing type annotation for function argument `config`
+   --> tests/test_19_compose.py:160:39
+    |
+160 | def test_19_3_mem_budget_within_limit(config):
+    |                                       ^^^^^^
+161 |     text = BELLEK.read_text(encoding="utf-8")
+162 |     physical = re.search(r"\| Fiziksel bellek[^|]*\| (\d+) GB", text)
+    |
+
+ANN204 Missing return type annotation for special method `__init__`
+  --> tests/test_19_seed.py:38:9
+   |
+37 | class FakeApi:
+38 |     def __init__(self):
+   |         ^^^^^^^^
+39 |         self.rows: dict[str, list[dict]] = {}
+40 |         self.calls: list[tuple[str, str, dict | None]] = []
+   |
+help: Add return type annotation: `None`
+
+ANN204 Missing return type annotation for special method `__call__`
+  --> tests/test_19_seed.py:42:9
+   |
+40 |         self.calls: list[tuple[str, str, dict | None]] = []
+41 |
+42 |     def __call__(self, method, path, body):
+   |         ^^^^^^^^
+43 |         self.calls.append((method, path, body))
+44 |         if path == "/auth/login":
+   |
+help: Add return type annotation
+
+ANN001 Missing type annotation for function argument `method`
+  --> tests/test_19_seed.py:42:24
+   |
+40 |         self.calls: list[tuple[str, str, dict | None]] = []
+41 |
+42 |     def __call__(self, method, path, body):
+   |                        ^^^^^^
+43 |         self.calls.append((method, path, body))
+44 |         if path == "/auth/login":
+   |
+
+ANN001 Missing type annotation for function argument `path`
+  --> tests/test_19_seed.py:42:32
+   |
+40 |         self.calls: list[tuple[str, str, dict | None]] = []
+41 |
+42 |     def __call__(self, method, path, body):
+   |                                ^^^^
+43 |         self.calls.append((method, path, body))
+44 |         if path == "/auth/login":
+   |
+
+ANN001 Missing type annotation for function argument `body`
+  --> tests/test_19_seed.py:42:38
+   |
+40 |         self.calls: list[tuple[str, str, dict | None]] = []
+41 |
+42 |     def __call__(self, method, path, body):
+   |                                      ^^^^
+43 |         self.calls.append((method, path, body))
+44 |         if path == "/auth/login":
+   |
+
+ANN201 Missing return type annotation for public function `test_19_4_plan_profiles_as_knowledge_bases`
+  --> tests/test_19_seed.py:83:5
+   |
+83 | def test_19_4_plan_profiles_as_knowledge_bases():
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+84 |     kbs, agents, skipped = sd.plan(EXPERTS, ARGS.sources)
+85 |     assert kbs == ["confluence-ocr", "confluence-mfs"]
+   |
+help: Add return type annotation: `None`
+
+ANN201 Missing return type annotation for public function `test_19_4_plan_refuses_prsim_and_missing_sources`
+  --> tests/test_19_seed.py:92:5
+   |
+92 | def test_19_4_plan_refuses_prsim_and_missing_sources():
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+93 |     with pytest.raises(sd.SeedError, match="prsim_requires_ner"):
+94 |         sd.plan(EXPERTS, ["jira:PRSIM"])
+   |
+help: Add return type annotation: `None`
+
+ANN201 Missing return type annotation for public function `test_19_4_doc_definition_has_no_unresolved_variable`
+   --> tests/test_19_seed.py:99:5
+    |
+ 99 | def test_19_4_doc_definition_has_no_unresolved_variable():
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+100 |     definition = sd.doc_definition(TEMPLATE, ["confluence-ocr"])
+101 |     assert "{{" not in definition["system_prompt"] and definition["variables"] == []
+    |
+help: Add return type annotation: `None`
+
+ANN201 Missing return type annotation for public function `test_19_4_seed_idempotent_and_sql_only_on_the_demo_tool`
+   --> tests/test_19_seed.py:108:5
+    |
+108 | def test_19_4_seed_idempotent_and_sql_only_on_the_demo_tool():
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+109 |     fake = FakeApi()
+110 |     pw = ("a" * 12, "b" * 12)
+    |
+help: Add return type annotation: `None`
+
+ANN201 Missing return type annotation for public function `test_19_5_seed_never_prints_passwords`
+   --> tests/test_19_seed.py:131:5
+    |
+131 | def test_19_5_seed_never_prints_passwords(capsys, tmp_path, monkeypatch):
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+132 |     agents = tmp_path / "agents"
+133 |     agents.mkdir()
+    |
+help: Add return type annotation: `None`
+
+ANN001 Missing type annotation for function argument `capsys`
+   --> tests/test_19_seed.py:131:43
+    |
+131 | def test_19_5_seed_never_prints_passwords(capsys, tmp_path, monkeypatch):
+    |                                           ^^^^^^
+132 |     agents = tmp_path / "agents"
+133 |     agents.mkdir()
+    |
+
+ANN001 Missing type annotation for function argument `tmp_path`
+   --> tests/test_19_seed.py:131:51
+    |
+131 | def test_19_5_seed_never_prints_passwords(capsys, tmp_path, monkeypatch):
+    |                                                   ^^^^^^^^
+132 |     agents = tmp_path / "agents"
+133 |     agents.mkdir()
+    |
+
+ANN001 Missing type annotation for function argument `monkeypatch`
+   --> tests/test_19_seed.py:131:61
+    |
+131 | def test_19_5_seed_never_prints_passwords(capsys, tmp_path, monkeypatch):
+    |                                                             ^^^^^^^^^^^
+132 |     agents = tmp_path / "agents"
+133 |     agents.mkdir()
+    |
+
+I001 [*] Import block is un-sorted or un-formatted
+  --> tests/test_19_stage_raw.py:7:1
+   |
+ 5 |   """
+ 6 |
+ 7 | / import importlib.util
+ 8 | | import json
+ 9 | | from pathlib import Path
+10 | |
+11 | | import pytest
+12 | |
+13 | | from ffcore.knowledge import raw_staging
+   | |________________________________________^
+14 |
+15 |   ROOT = Path(__file__).resolve().parents[1]
+   |
+help: Organize imports
+   |
+11 | import pytest
+   -
+12 | from ffcore.knowledge import raw_staging
+   |
+
+ANN201 Missing return type annotation for public function `raw`
+  --> tests/test_19_stage_raw.py:62:5
+   |
+61 | @pytest.fixture
+62 | def raw(tmp_path):
+   |     ^^^
+63 |     root = tmp_path / "raw"
+64 |     for rel, payload in (
+   |
+help: Add return type annotation
+
+ANN001 Missing type annotation for function argument `tmp_path`
+  --> tests/test_19_stage_raw.py:62:9
+   |
+61 | @pytest.fixture
+62 | def raw(tmp_path):
+   |         ^^^^^^^^
+63 |     root = tmp_path / "raw"
+64 |     for rel, payload in (
+   |
+
+ANN201 Missing return type annotation for public function `test_19_s1_stage_drops_author_fields`
+  --> tests/test_19_stage_raw.py:83:5
+   |
+83 | def test_19_s1_stage_drops_author_fields(raw, tmp_path):
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+84 |     out = tmp_path / "staging"
+85 |     counts = st.stage(raw, out, ["confluence:DEMO", "jira:DEMO"], limit=None, attachments=False)
+   |
+help: Add return type annotation: `None`
+
+ANN001 Missing type annotation for function argument `raw`
+  --> tests/test_19_stage_raw.py:83:42
+   |
+83 | def test_19_s1_stage_drops_author_fields(raw, tmp_path):
+   |                                          ^^^
+84 |     out = tmp_path / "staging"
+85 |     counts = st.stage(raw, out, ["confluence:DEMO", "jira:DEMO"], limit=None, attachments=False)
+   |
+
+ANN001 Missing type annotation for function argument `tmp_path`
+  --> tests/test_19_stage_raw.py:83:47
+   |
+83 | def test_19_s1_stage_drops_author_fields(raw, tmp_path):
+   |                                               ^^^^^^^^
+84 |     out = tmp_path / "staging"
+85 |     counts = st.stage(raw, out, ["confluence:DEMO", "jira:DEMO"], limit=None, attachments=False)
+   |
+
+ANN201 Missing return type annotation for public function `test_19_s1_stage_refuses_prsim`
+   --> tests/test_19_stage_raw.py:103:5
+    |
+103 | def test_19_s1_stage_refuses_prsim(raw, tmp_path):
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+104 |     with pytest.raises(raw_staging.StagingError) as err:
+105 |         st.stage(raw, tmp_path / "s", ["jira:PRSIM"], limit=None, attachments=False)
+    |
+help: Add return type annotation: `None`
+
+ANN001 Missing type annotation for function argument `raw`
+   --> tests/test_19_stage_raw.py:103:36
+    |
+103 | def test_19_s1_stage_refuses_prsim(raw, tmp_path):
+    |                                    ^^^
+104 |     with pytest.raises(raw_staging.StagingError) as err:
+105 |         st.stage(raw, tmp_path / "s", ["jira:PRSIM"], limit=None, attachments=False)
+    |
+
+ANN001 Missing type annotation for function argument `tmp_path`
+   --> tests/test_19_stage_raw.py:103:41
+    |
+103 | def test_19_s1_stage_refuses_prsim(raw, tmp_path):
+    |                                         ^^^^^^^^
+104 |     with pytest.raises(raw_staging.StagingError) as err:
+105 |         st.stage(raw, tmp_path / "s", ["jira:PRSIM"], limit=None, attachments=False)
+    |
+
+ANN201 Missing return type annotation for public function `test_19_s2_stage_never_writes_raw`
+   --> tests/test_19_stage_raw.py:110:5
+    |
+110 | def test_19_s2_stage_never_writes_raw(raw, tmp_path):
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+111 |     before = _snapshot(raw)
+112 |     with pytest.raises(SystemExit):
+    |
+help: Add return type annotation: `None`
+
+ANN001 Missing type annotation for function argument `raw`
+   --> tests/test_19_stage_raw.py:110:39
+    |
+110 | def test_19_s2_stage_never_writes_raw(raw, tmp_path):
+    |                                       ^^^
+111 |     before = _snapshot(raw)
+112 |     with pytest.raises(SystemExit):
+    |
+
+ANN001 Missing type annotation for function argument `tmp_path`
+   --> tests/test_19_stage_raw.py:110:44
+    |
+110 | def test_19_s2_stage_never_writes_raw(raw, tmp_path):
+    |                                            ^^^^^^^^
+111 |     before = _snapshot(raw)
+112 |     with pytest.raises(SystemExit):
+    |
+
+ANN201 Missing return type annotation for public function `test_19_1_staged_tree_is_what_ingest_raw_reads`
+   --> tests/test_19_stage_raw.py:118:5
+    |
+118 | def test_19_1_staged_tree_is_what_ingest_raw_reads(raw, tmp_path):
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+119 |     out = tmp_path / "staging"
+120 |     st.stage(raw, out, ["confluence:DEMO", "jira:DEMO"], limit=None, attachments=True)
+    |
+help: Add return type annotation: `None`
+
+ANN001 Missing type annotation for function argument `raw`
+   --> tests/test_19_stage_raw.py:118:52
+    |
+118 | def test_19_1_staged_tree_is_what_ingest_raw_reads(raw, tmp_path):
+    |                                                    ^^^
+119 |     out = tmp_path / "staging"
+120 |     st.stage(raw, out, ["confluence:DEMO", "jira:DEMO"], limit=None, attachments=True)
+    |
+
+ANN001 Missing type annotation for function argument `tmp_path`
+   --> tests/test_19_stage_raw.py:118:57
+    |
+118 | def test_19_1_staged_tree_is_what_ingest_raw_reads(raw, tmp_path):
+    |                                                         ^^^^^^^^
+119 |     out = tmp_path / "staging"
+120 |     st.stage(raw, out, ["confluence:DEMO", "jira:DEMO"], limit=None, attachments=True)
+    |
+
+ANN201 Missing return type annotation for public function `test_19_1_stage_is_idempotent_and_limited`
+   --> tests/test_19_stage_raw.py:137:5
+    |
+137 | def test_19_1_stage_is_idempotent_and_limited(raw, tmp_path):
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+138 |     out = tmp_path / "staging"
+139 |     assert st.stage(raw, out, ["confluence:DEMO"], limit=None, attachments=False) == {"staged": 2}
+    |
+help: Add return type annotation: `None`
+
+ANN001 Missing type annotation for function argument `raw`
+   --> tests/test_19_stage_raw.py:137:47
+    |
+137 | def test_19_1_stage_is_idempotent_and_limited(raw, tmp_path):
+    |                                               ^^^
+138 |     out = tmp_path / "staging"
+139 |     assert st.stage(raw, out, ["confluence:DEMO"], limit=None, attachments=False) == {"staged": 2}
+    |
+
+ANN001 Missing type annotation for function argument `tmp_path`
+   --> tests/test_19_stage_raw.py:137:52
+    |
+137 | def test_19_1_stage_is_idempotent_and_limited(raw, tmp_path):
+    |                                                    ^^^^^^^^
+138 |     out = tmp_path / "staging"
+139 |     assert st.stage(raw, out, ["confluence:DEMO"], limit=None, attachments=False) == {"staged": 2}
+    |
+
+ANN201 Missing return type annotation for public function `test_19_1_stage_rejects_a_non_paycore_source`
+   --> tests/test_19_stage_raw.py:151:5
+    |
+151 | def test_19_1_stage_rejects_a_non_paycore_source(raw, tmp_path):
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+152 |     with pytest.raises(SystemExit):
+153 |         st.stage(raw, tmp_path / "s", ["sharepoint:X"], limit=None, attachments=False)
+    |
+help: Add return type annotation: `None`
+
+ANN001 Missing type annotation for function argument `raw`
+   --> tests/test_19_stage_raw.py:151:50
+    |
+151 | def test_19_1_stage_rejects_a_non_paycore_source(raw, tmp_path):
+    |                                                  ^^^
+152 |     with pytest.raises(SystemExit):
+153 |         st.stage(raw, tmp_path / "s", ["sharepoint:X"], limit=None, attachments=False)
+    |
+
+ANN001 Missing type annotation for function argument `tmp_path`
+   --> tests/test_19_stage_raw.py:151:55
+    |
+151 | def test_19_1_stage_rejects_a_non_paycore_source(raw, tmp_path):
+    |                                                       ^^^^^^^^
+152 |     with pytest.raises(SystemExit):
+153 |         st.stage(raw, tmp_path / "s", ["sharepoint:X"], limit=None, attachments=False)
+    |
+
+Found 70 errors.
+[*] 2 fixable with the `--fix` option (23 hidden fixes can be enabled with the `--unsafe-fixes` option).

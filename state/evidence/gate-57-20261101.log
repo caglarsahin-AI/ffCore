@@ -466,3 +466,165 @@ Ran 54 tests in 4.560s
 OK (skipped=5)
 
 === 06:29:30 test-int #1
+tests/integration/test_04a_worker.py::test_04a_job_for_missing_row_retries_then_fails_loud
+  /opt/venv/lib/python3.12/site-packages/arq/worker.py:877: DeprecationWarning: Call to deprecated close. (Use aclose() instead) -- Deprecated since version 5.0.1.
+    await self.pool.close(close_connection_pool=True)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+============ 678 passed, 4 skipped, 2 warnings in 708.88s (0:11:48) ============
+
+=== 06:41:47 test-int #2 (consecutive)
+tests/integration/test_04a_worker.py::test_04a_job_for_missing_row_retries_then_fails_loud
+  /opt/venv/lib/python3.12/site-packages/arq/worker.py:877: DeprecationWarning: Call to deprecated close. (Use aclose() instead) -- Deprecated since version 5.0.1.
+    await self.pool.close(close_connection_pool=True)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+============ 678 passed, 4 skipped, 2 warnings in 788.90s (0:13:08) ============
+
+=== 06:55:29 litellm log errors
+litellm-1  | [92m03:21:43 - LiteLLM Proxy:ERROR[0m: utils.py:3604 - Exception: 
+litellm-1  | future: <Task finished name='Task-65' coro=<KeyManagementEventHooks.async_key_generated_hook() done, defined at /usr/lib/python3.13/site-packages/litellm/proxy/hooks/key_management_event_hooks.py:28> exception=ValueError("Email alerting not setup on config.yaml. Please set `alerting=['email']. \nDocs: https://docs.litellm.ai/docs/proxy/email`")>
+litellm-1  |     raise ValueError(
+litellm-1  | ValueError: Email alerting not setup on config.yaml. Please set `alerting=['email']. 
+litellm-1  | [92m03:30:27 - LiteLLM Proxy:ERROR[0m: common_request_processing.py:721 - litellm.proxy.proxy_server._handle_llm_api_exception(): Exception occured - litellm.InternalServerError: InternalServerError: OpenAIException - fake provider is down. Received Model Group=p970c7d96.chat-default
+litellm-1  |     raise self._make_status_error_from_response(err.response) from None
+litellm-1  | openai.InternalServerError: Error code: 500 - {'error': {'message': 'fake provider is down', 'type': 'server_error'}}
+litellm-1  |     raise OpenAIError(
+litellm-1  | litellm.llms.openai.common_utils.OpenAIError: Error code: 500 - {'error': {'message': 'fake provider is down', 'type': 'server_error'}}
+litellm-1  |     raise InternalServerError(
+litellm grep done
+
+=== 06:55:38 alembic heads after up
+57_0002 (05a, 04a, 03a, 03c, 03b, 08, 07, 06a) (head)
+
+=== 06:55:53 smoke
+python scripts/smoke.py
+ok    backend /healthz 200
+ok    litellm /health/liveliness 200
+ok    langfuse /api/public/health 200, /api/public/projects 200
+ok    mcp-search /healthz 200
+ok    mcp-sql /healthz 200
+ok    skipped: ollama profile inactive
+smoke: passed
+smoke exit=0
+
+=== 06:56:09 frontend lint/typecheck/check:api
+
+> ffcore-frontend@0.1.0 lint
+> eslint
+
+
+> ffcore-frontend@0.1.0 typecheck
+> tsc --noEmit
+
+
+> ffcore-frontend@0.1.0 check:api
+> node scripts/check-api.mjs
+
+API contract copies and generated types are current.
+frontend exit=0
+
+=== 06:56:56 down -v
+ Container ffmain-mcp-sql-1  Stopping
+ Container ffmain-agent-worker-bg-1  Stopping
+ Container ffmain-agent-worker-1  Stopping
+ Container ffmain-langfuse-web-1  Stopping
+ Container ffmain-worker-1  Stopping
+ Container ffmain-frontend-1  Stopping
+ Container ffmain-mcp-search-1  Stopping
+ Container ffmain-fake-llm-1  Stopping
+ Container ffmain-langfuse-worker-1  Stopping
+ Container ffmain-ticket-desk-1  Stopping
+ Container ffmain-qdrant-1  Stopping
+ Container ffmain-worker-1  Stopped
+ Container ffmain-worker-1  Removing
+ Container ffmain-worker-1  Removed
+ Container ffmain-qdrant-1  Stopped
+ Container ffmain-qdrant-1  Removing
+ Container ffmain-qdrant-1  Removed
+ Container ffmain-frontend-1  Stopped
+ Container ffmain-frontend-1  Removing
+ Container ffmain-frontend-1  Removed
+ Container ffmain-ticket-desk-1  Stopped
+ Container ffmain-ticket-desk-1  Removing
+ Container ffmain-ticket-desk-1  Removed
+ Container ffmain-mcp-sql-1  Stopped
+ Container ffmain-mcp-sql-1  Removing
+ Container ffmain-mcp-sql-1  Removed
+ Container ffmain-mcp-search-1  Stopped
+ Container ffmain-mcp-search-1  Removing
+ Container ffmain-mcp-search-1  Removed
+ Container ffmain-agent-worker-bg-1  Stopped
+ Container ffmain-agent-worker-bg-1  Removing
+ Container ffmain-agent-worker-1  Stopped
+ Container ffmain-agent-worker-1  Removing
+ Container ffmain-agent-worker-bg-1  Removed
+ Container ffmain-agent-worker-1  Removed
+ Container ffmain-backend-1  Stopping
+ Container ffmain-backend-1  Stopped
+ Container ffmain-backend-1  Removing
+ Container ffmain-backend-1  Removed
+ Container ffmain-litellm-1  Stopping
+ Container ffmain-migrate-1  Stopping
+ Container ffmain-redis-1  Stopping
+ Container ffmain-migrate-1  Stopped
+ Container ffmain-migrate-1  Removing
+ Container ffmain-migrate-1  Removed
+ Container ffmain-redis-1  Stopped
+ Container ffmain-redis-1  Removing
+ Container ffmain-redis-1  Removed
+ Container ffmain-langfuse-web-1  Stopped
+ Container ffmain-langfuse-web-1  Removing
+ Container ffmain-langfuse-web-1  Removed
+ Container ffmain-langfuse-worker-1  Stopped
+ Container ffmain-langfuse-worker-1  Removing
+ Container ffmain-langfuse-worker-1  Removed
+ Container ffmain-langfuse-clickhouse-1  Stopping
+ Container ffmain-langfuse-redis-1  Stopping
+ Container ffmain-langfuse-postgres-1  Stopping
+ Container ffmain-langfuse-minio-1  Stopping
+ Container ffmain-fake-llm-1  Stopped
+ Container ffmain-fake-llm-1  Removing
+ Container ffmain-fake-llm-1  Removed
+ Container ffmain-langfuse-redis-1  Stopped
+ Container ffmain-langfuse-redis-1  Removing
+ Container ffmain-langfuse-postgres-1  Stopped
+ Container ffmain-langfuse-postgres-1  Removing
+ Container ffmain-langfuse-redis-1  Removed
+ Container ffmain-langfuse-minio-1  Stopped
+ Container ffmain-langfuse-minio-1  Removing
+ Container ffmain-langfuse-postgres-1  Removed
+ Container ffmain-langfuse-minio-1  Removed
+ Container ffmain-litellm-1  Stopped
+ Container ffmain-litellm-1  Removing
+ Container ffmain-litellm-1  Removed
+ Container ffmain-postgres-1  Stopping
+ Container ffmain-postgres-1  Stopped
+ Container ffmain-postgres-1  Removing
+ Container ffmain-postgres-1  Removed
+ Container ffmain-langfuse-clickhouse-1  Stopped
+ Container ffmain-langfuse-clickhouse-1  Removing
+ Container ffmain-langfuse-clickhouse-1  Removed
+ Volume ffmain_langfuse_clickhouse_data  Removing
+ Volume ffmain_postgres_data  Removing
+ Volume ffmain_knowledge_storage  Removing
+ Volume ffmain_model_cache  Removing
+ Volume ffmain_qdrant_data  Removing
+ Volume ffmain_langfuse_minio_data  Removing
+ Volume ffmain_langfuse_postgres_data  Removing
+ Volume ffmain_langfuse_clickhouse_logs  Removing
+ Volume ffmain_redis_data  Removing
+ Network ffmain_default  Removing
+ Volume ffmain_langfuse_clickhouse_data  Removed
+ Network ffmain_default  Removed
+ Volume ffmain_postgres_data  Removed
+ Volume ffmain_knowledge_storage  Removed
+ Volume ffmain_model_cache  Removed
+ Volume ffmain_redis_data  Removed
+ Volume ffmain_qdrant_data  Removed
+ Volume ffmain_langfuse_clickhouse_logs  Removed
+ Volume ffmain_langfuse_postgres_data  Removed
+ Volume ffmain_langfuse_minio_data  Removed
+down exit=0
+
+=== 06:57:26 done

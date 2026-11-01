@@ -1,0 +1,8 @@
+E       TypeError: check_sources() got an unexpected keyword argument 'accept_personnel_data'
+E       TypeError: iter_staged() got an unexpected keyword argument 'accept_personnel_data'
+E       TypeError: ingest_tree() got an unexpected keyword argument 'accept_personnel_data'
+E       TypeError: ingest_tree() got an unexpected keyword argument 'accept_personnel_data'
+E       TypeError: ingest_tree() got an unexpected keyword argument 'accept_personnel_data'
+2026-11-01 03:58:39,321 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+E       TypeError: ingest_tree() got an unexpected keyword argument 'accept_personnel_data'
+6 failed, 6 passed, 21 deselected in 43.65s

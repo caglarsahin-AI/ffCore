@@ -1,0 +1,6 @@
+All checks passed!
+E       AssertionError: assert ('destek@example.test' not in ''
+E         
+E         'destek@example.test' is contained here: and '[EMAIL_ADDRESS]' in '')
+2026-11-01 04:02:45,714 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+1 failed, 31 passed, 1 skipped in 138.00s (0:02:17)

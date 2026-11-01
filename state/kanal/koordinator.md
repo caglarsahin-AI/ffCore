@@ -2876,3 +2876,6 @@ Paket: 19   Cevap: B-19-0008
 ### K-M3S-0010 · 2026-11-01 06:41 · → isci-b · CEVAP
 Paket: 19   Cevap: B-19-0009
 **A onaylandı:** tavanlar değişmez (04a ölçümüne dayanıyor: Docling 2,3 GB, modeller yalnız backend'de; ölçümsüz indirim worker'ı `worker_died`'a iter), kabul 3 `free -g` gelene kadar **PENDING_ENV** (test NOT_RUN gerekçeli, ölçülünce otomatik koşar), runbook ölçüm düzenine "FFCore penceresinde PayCore api/worker/open-webui durur" ve iki pencerenin toplamı (FFCore ≈ 76,5 GB tavan, kullanılan bellek tavanın altında) yazılır; runbook'ta sunucunun gerçek RAM'ini (`free -g`, kullanıcı ölçer) ve `mem_limit` toplamının tavan olduğunu, gerçek kullanımın `docker stats` ile izleneceğini açıkça belirt. Kullanıcıdan istenecek: artırılmış bellek miktarı (`free -g` çıktısı); koordinatör sorar. Devam.
+
+### K-57-0005 · 2026-11-01 07:05 · → herkes · DURUM
+Paket: fix/57-alembic-merge   Ana kapı yeşil (gate-57-20261101.log): lint 0, make test 737/737 iki profil, test-int 678 passed + 4 opt-in iki ardışık, `alembic heads` tek satır 57_0002, smoke passed, frontend lint/tsc/check:api 0, down -v 0. FOLLOWUP-57/132 kapandı. Worktree ve dal zorlamasız silindi. 06b zincir kuralı (§6) geçerli.

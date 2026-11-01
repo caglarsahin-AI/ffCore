@@ -1,0 +1,166 @@
+Using CPython 3.12.16 interpreter at: /usr/local/bin/python3
+Creating virtual environment at: /opt/test-venv
+   Building ffcore @ file:///ffcore/backend
+   Building paycore-llm @ file:///app
+Downloading pygments (1.2MiB)
+Downloading ruff (9.8MiB)
+Downloading pydantic-core (2.1MiB)
+Downloading uvloop (4.2MiB)
+Downloading numpy (15.9MiB)
+Downloading grpcio (6.7MiB)
+Downloading ast-serialize (1.2MiB)
+Downloading mypy (14.6MiB)
+Downloading sqlalchemy (4.5MiB)
+Downloading grpcio-tools (2.6MiB)
+Downloading openai (1.7MiB)
+Downloading duckdb (20.5MiB)
+Downloading psycopg-binary (5.0MiB)
+      Built paycore-llm @ file:///app
+ Downloaded pygments
+ Downloaded ast-serialize
+ Downloaded openai
+      Built ffcore @ file:///ffcore/backend
+ Downloaded pydantic-core
+ Downloaded grpcio-tools
+ Downloaded uvloop
+ Downloaded sqlalchemy
+ Downloaded psycopg-binary
+ Downloaded grpcio
+ Downloaded ruff
+ Downloaded mypy
+ Downloaded numpy
+ Downloaded duckdb
+Installed 79 packages in 3.10s
+.........s.........FF.......................                             [100%]
+=================================== FAILURES ===================================
+___________ test_19_4_seed_idempotent_and_sql_only_on_the_demo_tool ____________
+
+    def test_19_4_seed_idempotent_and_sql_only_on_the_demo_tool():
+        fake = FakeApi()
+        pw = ("a" * 12, "b" * 12)
+        first = sd.seed(sd.Api("http://backend:8000", fake), ARGS, EXPERTS, TEMPLATES, pw, "project")
+        assert not any(p.endswith("/agents") for _, p, _ in fake.calls)  # models come in between
+        assert first[-1] == "created 2"  # project and analyst
+>       lines = sd.seed(sd.Api("http://backend:8000", fake), ARGS, EXPERTS, TEMPLATES, pw, "content")
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_19_seed.py:110: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+scripts/ffcore_seed_paycore.py:174: in seed
+    return _seed_content(api, pid, kbs, agents, skipped, templates)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+api = <ffcore_seed_paycore.Api object at 0x7f60675e8290>, pid = 'id-2'
+kbs = ['confluence-ocr', 'confluence-mfs']
+agents = {'paycore-doc-assistant': ['confluence-ocr', 'confluence-mfs'], 'paycore-profile-genel': ['confluence-ocr', 'confluence-mfs'], 'paycore-profile-ocean': ['confluence-ocr']}
+skipped = {'paycore-profile-prsim': 'prsim_requires_ner'}
+templates = {'sozlesme-asistani': {'definition': {'model': 'chat-default', 'system_prompt': 'Sen {{hospital_name}} için asistansın...]}}, 'veri-soru-cevap': {'definition': {'model': 'chat-default', 'knowledge': [], 'tools': [{'tool_key': 'mcp-sql'}]}}}
+
+    def _seed_content(api: Api, pid, kbs, agents, skipped, templates) -> list[str]:
+        for kb in kbs:
+            api.ensure(f"/projects/{pid}/knowledge-bases", {"key": kb, "name": kb}, "key", kb)
+        lines = [f"knowledge bases: {', '.join(kbs)}"]
+        for key, agent_kbs in agents.items():
+            state = publish(api, pid, key, key, doc_definition(templates["sozlesme-asistani"], agent_kbs))
+            lines.append(f"agent {key}: {state} ({', '.join(agent_kbs)})")
+        tool = api.ensure(
+            f"/projects/{pid}/tools",
+            {
+                "key": "mcp-sql",
+                "name": "mcp-sql",
+                "kind": "mcp",
+                "endpoint_url": "http://mcp-sql:8000/mcp",
+                "auth": {"type": "forward_user"},
+            },
+            "key",
+            "mcp-sql",
+        )
+        _, tool = api.call("POST", f"/projects/{pid}/tools/{tool['id']}/discover")
+        if tool.get("status") != "discovered":
+            raise SeedError(f"mcp-sql discover: {tool.get('status')} {tool.get('last_error_code')}")
+        for action in tool["actions"]:
+            api.call(
+                "PATCH",
+>               f"/projects/{pid}/tools/{tool['id']}/actions/{action['name']}",
+                                         ^^^^^^^^^^
+                {"enabled": True, "needs_approval": action["name"] == "run_sql"},
+            )
+E           KeyError: 'id'
+
+scripts/ffcore_seed_paycore.py:218: KeyError
+____________________ test_19_5_seed_never_prints_passwords _____________________
+
+capsys = <_pytest.capture.CaptureFixture object at 0x7f60675ea870>
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_19_5_seed_never_prints_pa0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f60675e8980>
+
+    def test_19_5_seed_never_prints_passwords(capsys, tmp_path, monkeypatch):
+        agents = tmp_path / "agents"
+        agents.mkdir()
+        for name, body in TEMPLATES.items():
+            (agents / f"{name}.json").write_text(json.dumps(body), encoding="utf-8")
+        experts = tmp_path / "experts"
+        experts.mkdir()
+        (experts / "genel.yaml").write_text("knowledge_filter: []\n", encoding="utf-8")
+        fake = FakeApi()
+        monkeypatch.setattr(sd.Api, "_http", lambda self, m, p, b: fake(m, p, b))
+        import io
+    
+        monkeypatch.setattr("sys.stdin", io.StringIO("admin-pass-zzz\nanalyst-pass-yyy\n"))
+>       code = sd.main(
+            ["--step", "content", "--backend-url", "http://backend:8000", "--admin-email", "a@example.test",
+             "--analyst-email", "b@example.test", "--sources", "confluence:OCR",
+             "--agents-dir", str(agents), "--experts-dir", str(experts)]
+        )
+
+tests/test_19_seed.py:136: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+scripts/ffcore_seed_paycore.py:249: in main
+    lines = seed(
+scripts/ffcore_seed_paycore.py:174: in seed
+    return _seed_content(api, pid, kbs, agents, skipped, templates)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+api = <ffcore_seed_paycore.Api object at 0x7f60675e4b90>, pid = 'id-2'
+kbs = ['confluence-ocr']
+agents = {'paycore-doc-assistant': ['confluence-ocr'], 'paycore-profile-genel': ['confluence-ocr']}
+skipped = {}
+templates = {'sozlesme-asistani': {'definition': {'model': 'chat-default', 'system_prompt': 'Sen {{hospital_name}} için asistansın...]}}, 'veri-soru-cevap': {'definition': {'model': 'chat-default', 'knowledge': [], 'tools': [{'tool_key': 'mcp-sql'}]}}}
+
+    def _seed_content(api: Api, pid, kbs, agents, skipped, templates) -> list[str]:
+        for kb in kbs:
+            api.ensure(f"/projects/{pid}/knowledge-bases", {"key": kb, "name": kb}, "key", kb)
+        lines = [f"knowledge bases: {', '.join(kbs)}"]
+        for key, agent_kbs in agents.items():
+            state = publish(api, pid, key, key, doc_definition(templates["sozlesme-asistani"], agent_kbs))
+            lines.append(f"agent {key}: {state} ({', '.join(agent_kbs)})")
+        tool = api.ensure(
+            f"/projects/{pid}/tools",
+            {
+                "key": "mcp-sql",
+                "name": "mcp-sql",
+                "kind": "mcp",
+                "endpoint_url": "http://mcp-sql:8000/mcp",
+                "auth": {"type": "forward_user"},
+            },
+            "key",
+            "mcp-sql",
+        )
+        _, tool = api.call("POST", f"/projects/{pid}/tools/{tool['id']}/discover")
+        if tool.get("status") != "discovered":
+            raise SeedError(f"mcp-sql discover: {tool.get('status')} {tool.get('last_error_code')}")
+        for action in tool["actions"]:
+            api.call(
+                "PATCH",
+>               f"/projects/{pid}/tools/{tool['id']}/actions/{action['name']}",
+                                         ^^^^^^^^^^
+                {"enabled": True, "needs_approval": action["name"] == "run_sql"},
+            )
+E           KeyError: 'id'
+
+scripts/ffcore_seed_paycore.py:218: KeyError
+=========================== short test summary info ============================
+SKIPPED [1] tests/test_19_compose.py:163: NOT_RUN (PENDING_ENV, ENV-45): server `free -g` not measured yet
+2 failed, 41 passed, 1 skipped in 7.10s
