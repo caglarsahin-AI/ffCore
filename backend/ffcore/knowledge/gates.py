@@ -68,6 +68,8 @@ _CODE_LINE = re.compile(
     r"at [\w.$]+\(|Caused by:|Exception|Traceback|\w+Error\b|\d{4}-\d{2}-\d{2}[ T]\d{2}:)",
     re.I,
 )
+# A Markdown heading: `#`…`######`, space, text. `#include`, `#!/bin/sh` and a bare `#` are not.
+_HEADING_LINE = re.compile(r"^\s*#{1,6}\s+\S")
 _LINK_LINE = re.compile(r"^\s*[-*|]?\s*(?:\[[^\]]*\]|https?://\S+|\|)")
 _TEMPLATE_TITLE = re.compile(r"^\s*(şablon|template|form örneği|örnek form)\b", re.I)
 
@@ -141,6 +143,25 @@ def gate1(
     return OK, None
 
 
+def _is_code_line(line: str, *, fenced: bool) -> bool:
+    """Outside a fence a Markdown heading is not code (Docling keeps headings as lines while it
+    joins paragraphs, FOLLOWUP-137), so an unfenced `# text` shell comment is not either. Inside
+    a ``` or ~~~ fence the pattern alone decides and `# text` is code."""
+    return bool(_CODE_LINE.match(line)) and (fenced or not _HEADING_LINE.match(line))
+
+
+def _code_lines(lines: list[str]) -> int:
+    """Fence lines are not code: the plain-text converter wraps every .txt in one fence. A fence
+    that never closes leaves the rest under the in-fence rule (K-137-0006 A′)."""
+    count, fenced = 0, False
+    for line in lines:
+        if _FENCE_LINE.match(line):
+            fenced = not fenced
+        elif _is_code_line(line, fenced=fenced):
+            count += 1
+    return count
+
+
 def text_quality(
     body: str,
     *,
@@ -163,7 +184,7 @@ def text_quality(
     lines = [line for line in body.splitlines() if line.strip()]
     if sum(bool(_LINK_LINE.match(ln)) for ln in lines) / len(lines) > thresholds.max_link_ratio:
         return SKIPPED, "boilerplate"
-    if sum(bool(_CODE_LINE.match(ln)) for ln in lines) / len(lines) > thresholds.max_code_ratio:
+    if _code_lines(lines) / len(lines) > thresholds.max_code_ratio:
         return SKIPPED, "code_heavy"
     # Prose-free content: a large definition table is reference material (flag, keep); a small
     # one is noise (PayCore calibration 2026-09-25).

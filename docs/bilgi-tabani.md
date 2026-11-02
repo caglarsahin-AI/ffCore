@@ -95,7 +95,12 @@ documents).
   keeps it), language not in `ALLOWED_LANGUAGES` (`tr,en`; a text with neither Turkish nor
   English function words is left to Kapı 2).
 - Kapı 2 (text quality, document and chunk): empty, title only, too short (20 tokens),
-  `boilerplate` (over 60 % link lines), `code_heavy` (over 50 % code lines), `no_prose`
+  `boilerplate` (over 60 % link lines), `code_heavy` (over 50 % code lines; outside a
+  ```` ``` ```` or `~~~` fence a Markdown heading line, `#` to `######` followed by a space and
+  text, is not a code line, so an unfenced `# text` shell comment is not one either, while
+  `#include`, `#!/bin/sh` and a bare `#` are; inside a fence `# text` is a code line; the fence
+  lines themselves are not, since plain text arrives wrapped in one fence; after a fence that
+  never closes the in-fence rule applies), `no_prose`
   (stopword ratio under 0.05: flagged from 2000 characters, skipped below).
 - Data dumps (attachments): `data_dump:encoded|log|stack_trace|structured|tabular`; the owning
   document is still indexed, the attachment is not.
