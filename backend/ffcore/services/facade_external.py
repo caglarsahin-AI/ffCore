@@ -187,14 +187,17 @@ def _failed(code: str, error_code: str, audit: dict[str, Any]) -> ExternalCallFa
     return ExternalCallFailed(502, code, "The external agent call failed.", audit)
 
 
-def _content(payload: Any) -> tuple[str, str, list[str]] | None:
-    """(text, finish_reason, ignored field names) or None when there is no text answer."""
+def _content(raw: bytes) -> tuple[str, str, list[str]] | None:
+    """(text, finish_reason, ignored field names) or None when the answer cannot be read. The one
+    place an answer is parsed (review r1 MAJOR-1): invalid JSON, nesting deeper than the parser
+    goes (RecursionError, not a ValueError), a wrong shape or no text content are all None."""
     try:
+        payload = json.loads(raw)
         choice = payload["choices"][0]
         message = choice["message"]
-    except (KeyError, IndexError, TypeError):
+    except (ValueError, RecursionError, KeyError, IndexError, TypeError):
         return None
-    if not isinstance(message, dict):
+    if not isinstance(choice, dict) or not isinstance(message, dict):
         return None
     content = message.get("content")
     if not isinstance(content, str) or not content:
@@ -264,10 +267,7 @@ async def call_upstream(
     audit["response_bytes"] = len(raw)
     if not 200 <= audit["upstream_status"] < 300:
         raise _failed("external_agent_failed", "upstream_status", audit)
-    try:
-        answer = _content(json.loads(raw))
-    except ValueError:
-        answer = None
+    answer = _content(bytes(raw))
     if answer is None:
         raise _failed("external_agent_failed", "invalid_answer", audit)
     content, finish, ignored = answer

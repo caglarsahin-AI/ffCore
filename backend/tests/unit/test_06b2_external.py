@@ -81,6 +81,17 @@ class _Agent(BaseHTTPRequestHandler):
             self._reply(500, b'{"error": "dummy-not-secret-upstream-detail"}')
         elif mode == "not-json":
             self._reply(200, b"<html>hello</html>")
+        elif mode == "deep":  # review r1 MAJOR-1: nesting the JSON parser cannot take
+            self._reply(200, b"[" * 30_000 + b"]" * 30_000)
+        elif mode == "deepdict":
+            self._reply(200, b'{"choices": ' + b"[" * 30_000 + b"]" * 30_000 + b"}")
+        elif mode == "no-content":
+            self._reply(200, b'{"choices": [{"message": {"role": "assistant"}}]}')
+        elif mode == "content-list":
+            body = {"choices": [{"message": {"content": [{"type": "text", "text": "x"}]}}]}
+            self._reply(200, json.dumps(body).encode())
+        elif mode == "choice-text":
+            self._reply(200, b'{"choices": ["x"]}')
         else:
             self._reply(404, b"no")
 
@@ -281,6 +292,20 @@ def test_06b2_failed_answer_not_echoed(local, agent_port, mode):
         _call(local, _config(f"http://agent.test:{port}/{mode}"), _local_resolver())
     assert exc.value.code == "external_agent_failed"
     assert "dummy-not-secret" not in exc.value.message and "html" not in exc.value.message
+
+
+@pytest.mark.parametrize(
+    "mode", ["deep", "deepdict", "not-json", "no-content", "content-list", "choice-text"]
+)
+def test_06b2_r1_unparsable_answer_is_a_coded_failure(local, agent_port, mode):
+    """Review r1 MAJOR-1: every answer that cannot be read (too deep for the parser, not JSON,
+    no text content) is one coded failure with its audit record, never an uncaught error."""
+    port = agent_port.server_address[1]
+    with pytest.raises(ExternalCallFailed) as exc:
+        _call(local, _config(f"http://agent.test:{port}/{mode}"), _local_resolver())
+    assert (exc.value.status_code, exc.value.code) == (502, "external_agent_failed")
+    assert exc.value.audit["error_code"] == "invalid_answer"
+    assert exc.value.audit["upstream_status"] == 200 and exc.value.audit["response_bytes"] > 0
 
 
 def test_06b2_12_only_registered_key_leaves(local, agent_port):

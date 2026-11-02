@@ -53,6 +53,8 @@ class _Agent(BaseHTTPRequestHandler):
         data = json.dumps(
             {"choices": [{"index": 0, "message": message, "finish_reason": "stop"}]}
         ).encode()
+        if mode == "deep":  # review r1 MAJOR-1: deeper than the JSON parser goes, under 64 KiB
+            data = b"[" * 30_000 + b"]" * 30_000
         self.send_response(200)
         self.send_header("Content-Type", "application/json")
         self.send_header("Content-Length", str(len(data)))
@@ -352,6 +354,21 @@ def test_06b2_14_stream_failure_is_an_error_event(ext):
     status, chunks, lines = client.stream(model, "x")
     assert status == 200 and lines[-1] == "data: [DONE]"
     assert chunks[-1]["error"]["code"] == "external_agent_response_too_large"
+
+
+def test_06b2_r1_unparsable_answer_502_audit_and_done(ext, pg):
+    """Review r1 MAJOR-1: an answer the parser cannot take is 502 `external_agent_failed` with
+    its audit record (not a 500 without one); streamed, an error event and `[DONE]`."""
+    _, _, client, register = ext
+    agent, model = register(key="derin", mode="deep")
+    response = client.chat(model, "x")
+    assert response.status_code == 502, response.text
+    assert response.json()["error"]["code"] == "external_agent_failed"
+    status, chunks, lines = client.stream(model, "x")
+    assert status == 200 and lines[-1] == "data: [DONE]"
+    assert chunks[-1]["error"]["code"] == "external_agent_failed"
+    rows = _audit(pg, "external_agent_call", agent["id"])
+    assert [(r[0], r[2]["error_code"]) for r in rows] == [("error", "invalid_answer")] * 2
 
 
 def test_06b2_19_refused_fields(ext, fake_agent):
