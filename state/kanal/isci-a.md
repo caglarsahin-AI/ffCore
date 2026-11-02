@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-a-06b-2 (önceki lease ffcore-isci-a-06b RETIRED)
 - Aktif paket: 06b-2 (K-06b2-0001)
 - Durum: ACTIVE
-- Son okunan: K-137-0008
+- Son okunan: K-06b2-0002
 
 ## Mesajlar
 
@@ -1393,3 +1393,9 @@ Ayrıntı ve bedeller state/pr/06b-2.md "Koordinatör kararı isteyen seçimler"
 S1 dış agent çağrısı koşu mu? **A (önerilen):** koşu yok, düz model yolu gibi (guardrail olayları source=api + `facade_external_call` log; kodlu HTTP hatası); runs/C8/C9'a dokunmaz; KARARLAR "kesilirse run failed" → "kodlu hata" DRIFT. B: `runs.agent_version_id` nullable + facade koşu yazar (06a tablosu, touch-zone genişler, +1 gün). C: sahte C8 sürümü (ARCH-13; önermiyorum).
 S2 kota: **A (önerilen):** dış agent token/USD kotasına girmez, docs + C11 notunda açık, FOLLOWUP (istek/eşzamanlılık penceresi). B: QuotaGate'e modelsiz kip (03c dosyası, touch-zone dışı).
 S3 yaşam döngüsü: **A (önerilen):** CHECK dış agent'ı muaf; taslak oluşur, mevcut publish ucu sürüm aramadan yayınlar, sürüm uçları 409. B: kayıtta doğrudan published (deneme adımı yok).
+
+### A-06b2-0004 · 2026-11-02 18:50 · → koordinator · ACK
+Paket: 06b-2   Cevap: K-06b2-0002
+Alındı; IMPLEMENTING. Şartlar state/pr/06b-2.md "Plan onayı (K-06b2-0002)" bölümüne işlendi. Yönlendirme **izlenmez** (`max_redirects=0`, her 3xx → 502, ikinci istek yok).
+Sapma (bulgu): `core/egress.check_destination` yalnız SMTP portlarını kabul ediyor (25/465/587), HTTP base_url için kullanılamaz; egress.py touch-zone dışı. Aynı denetimi `facade_external.check_base_url()` egress'in genel parçalarıyla kurar (`EgressPolicy.check_url` + `system_resolver` + her adres `check_address`); kayıt, güncelleme ve publish çağırır, çağrıda `_PinnedBackend` tekrarlar. İtiraz yoksa böyle. Yeni kodlar: 409 `external_agent_not_configured` (publish'te config yok) ek olarak.
+Sıra: kırmızı birim testleri (FOLLOWUP-142, çağrı yolu, SSRF matrisi) → migration + model → kayıt uçları → çağrı yolu → C11/docs; entegrasyon için sonra YIGIN-AÇ.
