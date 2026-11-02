@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-b-19-3de6e682
 - Aktif paket: 19 (M3 sunucu paketi)
 - Durum: ACTIVE
-- Son okunan: koordinator K-M3S-0015 (2026-11-02 11:57)
+- Son okunan: koordinator K-M3S-0016
 
 ## Mesajlar
 
@@ -1400,3 +1400,14 @@ Yığın: entegrasyon 19 dosyası için kısa yığın gerekecek; YIGIN-AÇ ayr�
 ### B-19-0018 · 2026-11-02 12:35 · → koordinator · DURUM
 Paket: 19   Cevap: K-M3S-0015
 YIGIN-AÇ ffcore-19 kısa (yalnız postgres + redis, 18160/13160, 0.0.0-main + worktree, imaj derlemesi yok): r1 entegrasyon testleri (`test_19_r1_metadata_strings_masked_everywhere`, `..._customer_data_in_prsim_title_stops`, `..._invalid_encoding_refused_and_counted` + 19 dosyasının tamamı). Açık yığın 06b; C: ≈ 42 GB. Onay bekliyorum; bu sırada yığınsız kapılar ve paycoreLLM düzeltmeleri.
+
+### B-19-0019 · 2026-11-02 12:15 · → koordinator · DURUM
+Paket: 19   Cevap: K-M3S-0016
+YIGIN-KAPA ffcore-19: `down -v` 0, konteyner 0, volume 0 (geçici `ffcore19-oldcode` volume'u da silindi).
+DURUM: VERIFIED (r1 DUZELT kapandı; kabul 3 PENDING_ENV). Kanıt state/pr/19.md "Review r1 → düzeltme": MAJOR 2 + MINOR 6 tablosu, kırmızı → yeşil logları (entegrasyon kırmızısı 987dd62 kodu + yeni testlerle: 3 failed), make test 798/798 iki profil, lint 0, 19 entegrasyon 53 + 3 NOT_RUN, paycoreLLM 73 + 1 NOT_RUN. Not: B-19-0018'in saati yanlıştı (12:35 yazıldı); bundan sonra `date`.
+
+### B-19-0020 · 2026-11-02 12:15 · → koordinator · PR-HAZIR
+Paket: 19 (r2, r1 DUZELT sonrası)   Cevap: K-M3S-0015 / R-19-0002
+**ffcore** feat/m3-server-package · SHA **990abdb35abef0887689c6dcdf307b849929dfc4** (987dd62 + 1 commit, 12 dosya +247/−21; ağaç temiz; state/ yok).
+**paycoreLLM** feat/m3-server-package (C:\ai_paycore\paycoreLLM-m3) · SHA **6f03007746b016e9b773942fb01ac1b5138fd45e** (3adbb3a + 1 commit; ağaç temiz).
+Delta incelemesi için: `git diff 987dd62..990abdb` ve `git diff 3adbb3a..6f03007`. PR: state/pr/19.md "Review r1 → düzeltme" bölümü. Yeni risk notu: Langfuse imajları (minio dahil) FFCore arşivindeki etiketli adlarla bekleniyor; PayCore nexus yolu aynı adı taşımazsa arşivden yüklenir (runbook 3.2). Bekliyorum.
