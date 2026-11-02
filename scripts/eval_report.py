@@ -87,6 +87,30 @@ def score(item: dict, run: dict, events: list[dict]) -> dict:
     return scores
 
 
+def _excluded_by(item: dict, exclude: list[str]) -> str | None:
+    """The first excluded source the item depends on (`metadata.sources`, `<kind>:<space>`)."""
+    for source in item["metadata"].get("sources") or []:
+        segments = [s.casefold() for s in str(source).split(":")]
+        for name in exclude:
+            if name.casefold() in segments:
+                return name
+    return None
+
+
+def select_items(items: list[dict], exclude: list[str]) -> tuple[list[dict], dict[str, int]]:
+    """19: questions that depend on an excluded source (S1's PRSIM questions) are left out of the
+    run and counted; the report says n/N, the threshold is computed on n (KARARLAR "M3 korpus
+    kapsamı"). Not a NOT_RUN: the item is outside the measured corpus on both sides."""
+    kept, excluded = [], {}
+    for item in items:
+        name = _excluded_by(item, exclude) if exclude else None
+        if name is None:
+            kept.append(item)
+        else:
+            excluded[name] = excluded.get(name, 0) + 1
+    return kept, excluded
+
+
 def passed(scores: dict) -> bool:
     return all(v for v in scores.values() if v is not None)
 
@@ -108,6 +132,17 @@ def markdown(meta: dict, results: list[ItemResult]) -> str:
         lines.append(
             "- **fake model: this run proves the pipeline only, it is not a measurement.**"
         )
+    if "total" in meta:
+        excluded = meta.get("excluded") or {}
+        shown = ", ".join(f"{k} {v}" for k, v in sorted(excluded.items())) or "none"
+        lines.append(
+            f"- Scored items: {len(results)}/{meta['total']} (excluded by source: {shown})"
+        )
+    if meta.get("warmup"):
+        lines.append(
+            f"- Warmup runs (not scored, not in times): {len(meta['warmup'])}, "
+            + ", ".join(f"{s:.1f} s" for s in meta["warmup"])
+        )
     lines += ["", "## Outcome labels", "", "| outcome_label | n |", "|---|---|"]
     labels: dict[str, int] = {}
     for r in results:
@@ -125,6 +160,9 @@ def markdown(meta: dict, results: list[ItemResult]) -> str:
         "## Summary",
         "",
         f"- Document questions with the right source: {doc[0]}/{doc[1]}",
+        f"- Source accuracy: {doc[0]}/{doc[1]} ({100 * doc[0] / doc[1]:.1f}%)"
+        if doc[1]
+        else "- Source accuracy: no document question",
         f"- Unanswerable questions held: {held[0]}/{held[1]}",
         f"- SQL questions: {sql[0]}/{sql[1]}"
         + (f" ({sql_skipped} NOT_RUN: --approve-sql not given)" if sql_skipped else ""),
@@ -208,6 +246,32 @@ class Runner:
             time.sleep(2)
 
 
+def _inside(path: Path, root: Path) -> bool:
+    try:
+        path.resolve().relative_to(root.resolve())
+    except ValueError:
+        return False
+    return True
+
+
+def resolve_out(dataset: Path, *, out: str | None, out_dir: str | None, now: datetime) -> Path:
+    """Where the report goes (19 şart 5). A set from outside the repository (S1 on the server)
+    needs an explicit place outside it: no default that could drop the report into a checkout
+    or into a container layer that disappears. Inside the repository only `eval/results/`."""
+    name = f"eval-{now:%Y%m%d-%H%M}.md"
+    target = Path(out) if out else Path(out_dir) / name if out_dir else None
+    if target is None:
+        if not _inside(dataset, REPO):
+            raise SystemExit(
+                "eval: eval_out_required: the dataset is outside the repository; "
+                "set EVAL_OUT to a directory outside it (e.g. /var/lib/ffcore/eval)"
+            )
+        return REPO / "eval" / "results" / name
+    if _inside(target, REPO) and not _inside(target, REPO / "eval" / "results"):
+        raise SystemExit(f"eval: eval_out_inside_repo: {target} (only eval/results/ is allowed)")
+    return target
+
+
 def main(argv=None) -> int:
     p = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     p.add_argument("--dataset", default=str(DEFAULT_SET))
@@ -217,12 +281,27 @@ def main(argv=None) -> int:
     p.add_argument("--approve-sql", action="store_true", help="approve each run_sql call")
     p.add_argument("--model", required=True, help="what answered, e.g. fake-llm, qwen3.5:35b cpu")
     p.add_argument("--user", default=None, help="default: <project>-analyst-edit@example.test")
-    p.add_argument("--out", default=None)
+    p.add_argument("--out", default=None, help="report file")
+    p.add_argument("--out-dir", default=None, help="report directory (make eval EVAL_OUT=...)")
+    p.add_argument(
+        "--exclude-sources",
+        nargs="*",
+        default=[],
+        help="leave out questions that depend on these sources (19: S1 without PRSIM)",
+    )
+    p.add_argument(
+        "--warmup",
+        type=int,
+        default=0,
+        help="run the first N questions this many times first; reported apart, not scored",
+    )
     a = p.parse_args(argv)
     password = os.environ.get("E2E_PASSWORD")
     if not password:
         raise SystemExit("eval: E2E_PASSWORD is not set (the seeded members' password)")
-    items = json.loads(Path(a.dataset).read_text(encoding="utf-8"))
+    out = resolve_out(Path(a.dataset), out=a.out, out_dir=a.out_dir, now=datetime.now(UTC))
+    every = json.loads(Path(a.dataset).read_text(encoding="utf-8"))
+    items, excluded = select_items(every, a.exclude_sources)
     runner = Runner(
         os.environ.get("E2E_BACKEND_URL", "http://backend:8000"),
         a.user or f"{a.project}-analyst-edit@example.test",
@@ -230,6 +309,11 @@ def main(argv=None) -> int:
         float(os.environ.get("E2E_RUN_TIMEOUT_S", "900")),
     )
     pid = runner.project_id(a.project)
+    warmup = []
+    for item in [i for i in items if not _is_sql(i)][: a.warmup]:
+        _, _, secs = runner.run(pid, a.agent, item, False)
+        warmup.append(secs)
+        print(f"warmup {item['id']}: {secs:.1f} s", flush=True)
     results = []
     for item in items:
         meta = item["metadata"]
@@ -278,8 +362,10 @@ def main(argv=None) -> int:
         "model": a.model,
         "profile": os.environ.get("DEPLOY_PROFILE", "-"),
         "at": now.strftime("%Y-%m-%d %H:%M"),
+        "total": len(every),
+        "excluded": excluded,
+        "warmup": warmup,
     }
-    out = Path(a.out or REPO / "eval" / "results" / f"eval-{now:%Y%m%d-%H%M}.md")
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(markdown(meta, results), encoding="utf-8")
     print(f"report written to {out}")

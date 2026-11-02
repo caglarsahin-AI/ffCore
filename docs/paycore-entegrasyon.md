@@ -59,26 +59,45 @@ paketlerde gelir. Kayıt imzaları C14'te donar (M2).
 | `FFCORE_VERSION` | FFCore compose (`deploy/docker-compose.yml`) | FFCore imaj etiketi |
 | `PAYCORE_LLM_VERSION` | PayCore compose (`compose.yml`), Jenkins verir | PayCore imaj etiketi (`3.12.<n>-test`) |
 
-Bugün iki değişken birbirinden bağımsızdır: PayCore imajında FFCore yoktur, FFCore servisleri
-de PayCore yığınında çalışmaz (Langfuse v3 dışında). FFCore wheel'i sunucuya geldiğinde her
+İki değişken birbirinden bağımsızdır: PayCore imajında FFCore yoktur; 19'dan beri FFCore
+servisleri PayCore yığınında FFCore'un kendi imajlarıyla (`FFCORE_VERSION`, `deploy/offline`
+arşivi) çalışır. FFCore wheel'i sunucuya geldiğinde her
 PayCore sürümü hangi `FFCORE_VERSION`'la derlendiğini yazar. Eşleme tablosu o gün PayCore
 deposunda `docs/paycore/` altında tutulur.
 
 ## PayCore yığınında FFCore servisleri
 
-- `compose.ffcore.yml` (PayCore deposu) bugün yalnızca **Langfuse v3** yığınını taşır: web,
-  worker, Postgres, ClickHouse, MinIO, Redis. Pinler FFCore 00'dakilerle aynıdır, imajlar iç
-  aynadan çekilir, portlar `127.0.0.1`'e bağlıdır.
-- Sunucu yığını üç dosyayla kalkar:
+- `compose.ffcore.yml` (PayCore deposu) **Langfuse v3** yığınını (profil `server`, 00i) ve 19'dan
+  beri **FFCore yığınının tamamını** (profil `ffcore`) taşır: `ffcore-postgres` (pgvector),
+  `ffcore-redis`, `ffcore-qdrant`, `ffcore-litellm`, `ffcore-backend`, `ffcore-worker`,
+  `ffcore-mcp-search`, `ffcore-mcp-sql`, `ffcore-agent-worker`, `ffcore-agent-worker-bg`,
+  `ffcore-frontend`, `ffcore-migrate`. PayCore'un `postgres` ve `qdrant` servisleri ad olarak
+  çakıştığı için FFCore'unkiler `ffcore-*` adlıdır; diğerleri FFCore adını ağ takma adı olarak
+  taşır (`backend`, `litellm`, `redis`, `mcp-search`, `mcp-sql`). FFCore PayCore'un Qdrant'ını ve
+  Postgres'ini kullanmaz (K-M3S-0003). Portlar `127.0.0.1`'e bağlıdır.
+- Ortam anahtarları FFCore `deploy/docker-compose.yml` `&app-env` ile birebir aynıdır (paycoreLLM
+  `tests/test_19_compose.py` anahtar kümesini karşılaştırır); PayCore `POSTGRES_*`'a sahip
+  olduğu için FFCore'un veritabanı, Redis ve LiteLLM secret'ları `FFCORE_*` adlıdır.
+- Sunucu yığını:
 
   ```
-  docker compose -f compose.yml -f compose.ffcore.yml -f compose.server.yml --profile server up -d
+  docker compose -f compose.yml -f compose.ffcore.yml -f compose.server.yml --profile server --profile ffcore up -d --no-build
   ```
 
-  Kısayolu `make server`. `compose.server.yml` FFCore dosyasına bağımlı değildir; eski iki
-  dosyalı operasyon komutları çalışmaya devam eder.
-- Diğer FFCore servisleri kendi paketleriyle eklenir (01 LiteLLM, 04a arama, …). Yer tutucu
-  servis yazılmaz.
+  `compose.server.yml` FFCore dosyasına bağımlı değildir; eski iki dosyalı komutlar çalışır.
+- Kurulum, korpus girişi ve S1 ölçümü: paycoreLLM `docs/paycore/m3-sunucu.md` (19).
+
+## M3 sunucu paketi (19)
+
+| Parça | Yer | Ne yapar |
+|---|---|---|
+| `python -m ffcore.cli ingest-raw` | FFCore | nötr raw-staging ağacını (dosya + `<dosya>.meta.json`) C6 `ingest_from_raw` ile içeri alır; PII regex maskesi her zaman, PRSIM yalnız `--accept-personnel-data`; manifest (`--manifest-out`) |
+| `deploy/offline/` | FFCore | `images.txt` (registry digest + image id), `models.txt` (HF revision + SHA-256), `save.sh` / `load.sh` / `verify.sh` |
+| `scripts/m3_preflight.py`, `scripts/m3_gate_check.py` | FFCore | sağlık kontrol listesi (değer basmaz); izlenen S1/rapor dosyası kapısı |
+| `make eval EVAL_OUT=… EXCLUDE_SOURCES=… WARMUP=…` | FFCore | depo dışı rapor, kaynağa göre dışlama (n/N), ayrı ısınma |
+| `scripts/ffcore_stage_raw.py` | paycoreLLM (C14) | PayCore raw → staging; kişi alanları taşınmaz |
+| `scripts/ffcore_seed_paycore.py` | paycoreLLM | proje, ölçüm hesabı, kaynak başına bilgi tabanı, agent'lar |
+| `scripts/ffcore_s1_dataset.py` | paycoreLLM | S1 → `make eval` biçimi, depo dışına |
 
 ## 00i ile PayCore'da kapanan açıklar
 

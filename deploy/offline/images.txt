@@ -1,0 +1,23 @@
+# 19 şart 3: the images the PayCore server needs for FFCore, anchored in git (not in the archive).
+# image (as in compose, without REGISTRY_PREFIX)   registry_digest   image_id   platform
+#
+# registry_digest: the manifest digest pulled from the registry; save.sh checks it on the
+#   internet-connected preparation machine (provenance), right after `docker pull`.
+# image_id: the config digest (`docker image inspect --format '{{.Id}}'`); it survives
+#   `docker save` / `docker load`, RepoDigests does not on the overlay2 image store, so verify.sh
+#   checks this one on the server (integrity of what was loaded against what is in git).
+# `<FFCORE_VERSION>` is the release the user builds on the preparation machine; its image_id is
+#   PENDING until save.sh prints it and the user commits it here (verify.sh fails on PENDING).
+#
+# Recorded 2026-11-01 from locally pulled images (no network); pins match deploy/docker-compose.yml.
+pgvector/pgvector:0.8.1-pg16 sha256:33198da2828a14c30348d2ccb4750833d5ed9a44c88d840a0e523d7417120337 sha256:4c0c0efbd40e8ff42363074292654a7831cac506fc01a1c89627f1b1040ba341 linux/amd64
+redis:7.4.6-alpine sha256:3b73847e72874be07e6657b129a94761662b79bc0f679273757d4218573b2a98 sha256:5f703438f575677037751d8350dc8ca2b8a1075655247757048c8a86f0fb4f02 linux/amd64
+ghcr.io/berriai/litellm:v1.80.0-stable sha256:0924d5820ce51b3be5f08b1b74a8869dd87f7bbc271ec06c00a42d8d76123175 sha256:65f487512b8b095eb9551132edf0135928c3e0c1e2c2b5b7bdbf5000e1b3bcc8 linux/amd64
+qdrant/qdrant:v1.11.3 sha256:da426bb8aa0ba0a3032b3110e71d0d1516d51a686aa17b39bde4e090ce3b8e7c sha256:0bba6866194d3e149920ceae20c6f4ec67d8ead8994d4972aa95b986b593b20c linux/amd64
+langfuse/langfuse:3.120.0 sha256:7b8f7cb77fcbe25921c530f0f46a12c5fd5f911d9d5bf3f03b7b0fe00f1466ab sha256:76439eedf7a19ac5eb6bf5599ce445b7b9debd893eac99b4a0acd606a6533bfb linux/amd64
+langfuse/langfuse-worker:3.120.0 sha256:8550b6f720957039d43d3577cbc4b090b0ac08ddaf3bb53d1b2e68bc6d28aebf sha256:1939a0c9099938ef6950c3298dec265fd3622bdb3975c369774678105710cd15 linux/amd64
+postgres:17.6-alpine sha256:ef257d85f76e48da1c64832459b59fcaba1a4dac97bf5d7450c77753542eee94 sha256:d741b376874687de90374fd34f55c6b2760e8f7bd7e4ae5cd47f50757fc08cf8 linux/amd64
+clickhouse/clickhouse-server:25.8.2.29 sha256:74c213b4d4cb4854c2497694df0c2d153c041003eadbb0457ae62c28cb8d723f sha256:c343dfffd629bc749828ab992318ae90311a85b8ed7bc61eb648174b815aca2b linux/amd64
+cgr.dev/chainguard/minio:e70b2b1e sha256:e70b2b1e74d79457f808710483bd726ff364529ca30736eaa15a6ab547d3a5a7 sha256:58fa5eacd66c85704d92e2c2a7633c0f0d9b7a77814995b169d924176c973d98 linux/amd64
+ffcore/backend:<FFCORE_VERSION> local-build PENDING linux/amd64
+ffcore/frontend:<FFCORE_VERSION> local-build PENDING linux/amd64

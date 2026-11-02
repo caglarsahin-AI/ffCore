@@ -103,7 +103,11 @@ e2e:
 # names what answered (no default: a fake-llm run is reported as a pipeline check, not a result).
 # Default set data/samples/eval/sozlesme-33.json; on the PayCore server DATASET=<S1 path>.
 # APPROVE_SQL=1 approves each run_sql call (an explicit choice; without it SQL items are NOT_RUN).
-#   make eval MODEL=fake-llm [DATASET=...] [PROJECT=hastane-a] [APPROVE_SQL=1]
+# EVAL_OUT=<dir> writes the report there (19: required for a DATASET outside the repository,
+# so the S1 report never lands in a checkout; inside the repository only eval/results/).
+# EXCLUDE_SOURCES="prsim" leaves out questions whose metadata.sources name it (19: S1 without
+# PRSIM, counted n/N in the report); WARMUP=N runs N questions first, reported apart.
+#   make eval MODEL=fake-llm [DATASET=...] [PROJECT=hastane-a] [APPROVE_SQL=1] [EVAL_OUT=dir]
 eval:
 	@test -n "$(MODEL)" || (echo "usage: make eval MODEL=<what answers> [DATASET=path] [APPROVE_SQL=1]" >&2; exit 2)
-	python scripts/eval_report.py --model "$(MODEL)" --project "$(or $(PROJECT),hastane-a)" $(if $(DATASET),--dataset "$(DATASET)",) $(if $(APPROVE_SQL),--approve-sql,)
+	python scripts/eval_report.py --model "$(MODEL)" --project "$(or $(PROJECT),hastane-a)" $(if $(DATASET),--dataset "$(DATASET)",) $(if $(APPROVE_SQL),--approve-sql,) $(if $(EVAL_OUT),--out-dir "$(EVAL_OUT)",) $(if $(EXCLUDE_SOURCES),--exclude-sources $(EXCLUDE_SOURCES),) $(if $(WARMUP),--warmup $(WARMUP),)
