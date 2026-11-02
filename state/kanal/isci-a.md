@@ -1268,3 +1268,16 @@ Paket: 06b   Cevap: -
 ### A-06b-0012 · 2026-11-01 11:50 · → koordinator · ACK
 Paket: 06b   Cevap: K-06b-0006
 Alındı: FOLLOWUP 134/135/136 kayıtlı, 134 06b'ye girmez. Bekliyorum: C: şu an 24 GB; "YIGIN-AÇ onaylı" gelince tam yığın test-int (iki profil) + smoke, sonra PR-HAZIR. Not: geç teslim edilen K-06b-0003 ve K-06b-0004 zilleri zaten uygulanmıştı (c3aef7a).
+
+### A-134-0001 · 2026-11-01 · → koordinator · PLANNED
+Paket: fix/06a-egress-all-messages   Cevap: K-134-0001   [B]
+Worktree .worktrees/fix/06a-egress-all-messages (main 07dc421'den). **Model uyarısı:** oturum Sonnet 5.5 açıldı (Opus 5.5 beklenmişti); ayrıca bildirdim.
+Plan: tek kontrol noktası `graph._egress_messages` (model düğümünde, `ctx.model.call` öncesi): tüm mesajların `content`'i (system, geçmiş, user, assistant, tool) `guard.check("egress")`; run içi önbellek (`RunContext.egress_cache`, hash→maskeli metin, additive alan); aynı run token_store ile idempotent; block → StopRun failed/`guardrail_block` (sessiz atlama yok; araç sonucunda da aynı tek kural); `llm_call.request_messages` maskeli liste. Airgap'te egress aşaması zaten yok (EngineGuard allow döner) → yapılandırma farkı, `if profile` yok. assistant `tool_calls.arguments` tool_guard'da zaten maskeli, dokunmuyorum. Kırmızı test: tests/unit/test_134_egress_all_messages.py (eski kodda 2 düşüyor). Sonra entegrasyon testi (F4 deseni, fake-llm /_requests) için YIGIN-AÇ isteyeceğim.
+Felsefe: (1) sorunun kökü tek sınırda çözülüyor, her kanala yama yok; (2) sessiz düşüş yok; (3) platform (token_store) yeniden inşa edilmedi.
+
+### A-134-0002 · 2026-11-01 · → koordinator · PR-HAZIR (kısmi: yığınsız) + YIGIN-AÇ + HANDOFF
+Paket: fix/06a-egress-all-messages   Cevap: K-134-0001
+fix/06a-egress-all-messages @ b9eefe3b93bd1d6ca55b5a4a22c26db45111a20d (1 commit, 4 dosya, migration yok). PR açıklaması state/pr/06a-egress.md.
+Kırmızı→yeşil: 4 birim test (eski kodda 2 düşer). Host `tests/unit tests/contract`: 730 geçti, 8 düştü (hepsi Windows ortamı, dokunmadığım testler). Lint temiz. **Koşulmadı:** docker `make test` iki profil; iki entegrasyon testi (gerçek motor+Redis, `test_134_egress_real_engine.py`); (e) tam senaryo ve (f) F4 genişletmesi (fake-llm /_requests).
+YIGIN-AÇ talebi: bir yığın (Postgres+Redis+fake-llm, LiteLLM) ile (e)/(f)'yi yazıp koşmak ve `make test` iki profil; C: 24 GB uyarısı geçerli. Onay gelirse devam; yoksa PR yukarıdaki sınırla incelemeye gider. Model: oturum Sonnet 5.5 açıldı (Opus 5.5 değil).
+HANDOFF: durum yukarıda; kalan iş = (e)/(f) + docker kapıları. Worktree .worktrees/fix/06a-egress-all-messages temiz.

@@ -1,0 +1,9 @@
+   Building paycore-llm @ file:///app
+error: Failed to build `paycore-llm @ file:///app`
+  cause: Failed to resolve requirements from `build-system.requires`
+  cause: No solution found when resolving: `hatchling`
+  cause: Request failed after 3 retries in 9.2s
+  cause: Failed to fetch: https://pypi.org/simple/hatchling/
+  cause: error sending request for url (https://pypi.org/simple/hatchling/)
+  cause: client error (Connect)
+  cause: tls handshake eof
