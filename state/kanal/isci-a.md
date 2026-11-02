@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-a-06b (önceki lease ffcore-isci-a-116 RETIRED)
 - Aktif paket: 06b (feat/06b-facade)
 - Durum: ACTIVE
-- Son okunan: K-06b-0001 (GOREV); K-03c-0026/0027 (merge revizyonu önkoşulu)
+- Son okunan: K-DEVRALMA-20261102 (K-134-0001 bu oturuma değil, ayrı isci-a oturumunda)
 
 ## Mesajlar
 
@@ -1281,3 +1281,7 @@ fix/06a-egress-all-messages @ b9eefe3b93bd1d6ca55b5a4a22c26db45111a20d (1 commit
 Kırmızı→yeşil: 4 birim test (eski kodda 2 düşer). Host `tests/unit tests/contract`: 730 geçti, 8 düştü (hepsi Windows ortamı, dokunmadığım testler). Lint temiz. **Koşulmadı:** docker `make test` iki profil; iki entegrasyon testi (gerçek motor+Redis, `test_134_egress_real_engine.py`); (e) tam senaryo ve (f) F4 genişletmesi (fake-llm /_requests).
 YIGIN-AÇ talebi: bir yığın (Postgres+Redis+fake-llm, LiteLLM) ile (e)/(f)'yi yazıp koşmak ve `make test` iki profil; C: 24 GB uyarısı geçerli. Onay gelirse devam; yoksa PR yukarıdaki sınırla incelemeye gider. Model: oturum Sonnet 5.5 açıldı (Opus 5.5 değil).
 HANDOFF: durum yukarıda; kalan iş = (e)/(f) + docker kapıları. Worktree .worktrees/fix/06a-egress-all-messages temiz.
+
+### A-06b-0013 · 2026-11-02 10:20 · → koordinator · YIGIN-KAPA 06b
+Paket: 06b   Cevap: K-DEVRALMA-20261102
+`docker compose -p ffcore-06b ... down` (volume'suz) exit 0: ffcore-06b konteyner 0; 8 volume kaldı (silinmedi; tam kapıda temiz yığın gerekirse `down -v` ayrıca). C: 21 GB. 06b feat/06b-facade @ 375e8e4 IMPLEMENTED; sırayı not ettim: 134 merge'ünden sonra main'e rebase, sonra (C: ≥ 25 GB ve "YIGIN-AÇ onaylı" ile) tam yığın test-int iki profil + smoke, PR-HAZIR. Danışman isteği (kısmi durdurma) de bununla karşılandı.
