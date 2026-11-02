@@ -1444,3 +1444,10 @@ Koşular: 88 passed + 2 failed (probe 3 ve MINOR-1 testi); unit+contract 734 pas
 
 ## R-134-0001 | 2026-11-02 09:55 | ACK | K-134-0002
 - REVIEW-ISTEK fix/06a-egress-all-messages alındı; SHA b9eefe3b93bd1d6ca55b5a4a22c26db45111a20d mevcut (baz 07dc421, 1 commit, 4 dosya; state/ diff 0). Kod turu, yığınsız (disk 21 GB uyarısı: yığın açmıyorum). Güvenlik turu bölümü dahil.
+
+## R-134-0002 | 2026-11-02 10:01 | REVIEW-SONUC | K-134-0002
+- Paket/SHA: fix/06a-egress-all-messages, b9eefe3b93bd1d6ca55b5a4a22c26db45111a20d. Kod turu, yığınsız (yığın açılmadı).
+- Karar: **KOD-ONAY (ön)**, nihai ONAY yığınlı turdan sonra. BLOCKER 0 · MAJOR 0 · MINOR 3. state/ diff 0.
+- Kanıt: birim paketi 669 passed; gerçek motorla probe (state/reviews/134-r1-probe.py) 17 kontrol FAIL yok: system/geçmiş/assistant/tool tokenize, idempotent, önbellek bağlama özel, enforce'ta sır → guardrail_block.
+- MINOR-1: assistant tool_calls.arguments egress'e girmiyor; default politikada tool.pre PII'ı uygulamıyor (probe: ham e-posta kalıyor) → "zaten maskeli" cümlesi yanlış; etki küçük. MINOR-2: guard_in'in egress ettiği user mesajı model düğümünde ikinci kez denetleniyor (önbellek beslenmiyor) → monitor kurallarında çift olay riski (koddan çıkarım, DB'de gözlemlenmedi). MINOR-3: str olmayan content sessiz geçiyor; TextTooLong generic run_error.
+- NOT_RUN: iki entegrasyon testi, (e)/(f), make test iki profil, contract+ruff. Rapor: state/reviews/06a-egress-r1.md. Worktree temiz doğrulandı ve git worktree remove ile kaldırıldı. Dosyalar commit edilmemiş.

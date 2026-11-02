@@ -54,7 +54,7 @@ Durumlar: READY · CLAIMED · PLANNED · IMPLEMENTING · IMPLEMENTED · VERIFIED
 | 11 | — | 06a, 07 (PoC'de Open WebUI) |
 | 08 tam | — | 08-lite; Türkçe NER, injection, akış tamponlayıcı, PRSIM ingest guard'ı |
 | 06b | — | 06a, 03c (facade, dış agent, manifest) |
-| fix/06a-egress-all-messages | PLANNED-BEKLİYOR | A (yeni oturum) | fix/06a-egress-all-messages | .worktrees/fix/06a-egress-all-messages | backend/ffcore/runtime/graph.py (llm_call sınırı), guardrails çağrı yeri, tests/ | 2026-11-01 | | BLOCKERS 134; GOREV K-134-0001; 06b merge'ünden ÖNCE; danışman görüşü |
+| fix/06a-egress-all-messages | IMPLEMENTED (yığınsız) → DUZELT r1 | A (yeni oturum) | fix/06a-egress-all-messages | .worktrees/fix/06a-egress-all-messages | backend/ffcore/runtime/graph.py (llm_call sınırı), guardrails çağrı yeri, tests/ | 2026-11-01 | | BLOCKERS 134; GOREV K-134-0001; 06b merge'ünden ÖNCE; danışman görüşü; PR-HAZIR (kısmi) A-134-0002 b9eefe3; r1 kod turu R-134-0002 KOD-ONAY (ön), MINOR 3 (tool_calls.arguments egress dışı; guard_in çift denetim; str olmayan content sessiz, TextTooLong generic) → DUZELT K-134-0003; nihai ONAY yığınlı turda ((e)/(f), test-int iki profil) |
 | 06b-2 | — | 06b merge (dış agent: external_config, SafeOutboundClient, SSRF matrisi; KARARLAR "06b S5 ... 06b-2") |
 | 04b | — | 04a (DuckDB → Postgres göçü DEBT-1, migrate-vectors) |
 | 05b | — | 05a |
