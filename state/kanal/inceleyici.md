@@ -1493,3 +1493,11 @@ Koşular: 88 passed + 2 failed (probe 3 ve MINOR-1 testi); unit+contract 734 pas
 ## R-06B-0001 | 2026-11-02 12:37 | ACK | K-06b-0010
 - REVIEW-ISTEK 06b facade alindi. Tam SHA 45d901b5a9699bf871bddeb40445fd954b8df6ff (mesajdaki duzeltilmis hali; kanal ve git ile dogrulandi; feat/06b-facade, 6 commit, 33 dosya, baz 4532a54, state/ diff 0). Guvenlik turu + yigin review-06b (18210/13210). C: 42 GB, acik FF yigini yok.
 - 2026-11-02 12:40 YIGIN-AC review-06b (18210/13210, FFCORE_VERSION=0.0.0-review-06b, --profile test --profile qdrant); acik FF yigini yok, C: 42 GB. Statik tur (identity, guard, proxy, agent, internal, manifest, parity testleri) okundu.
+
+## R-06B-0002 | 2026-11-02 13:40 | REVIEW-SONUC | K-06b-0010
+- Paket/SHA: 06b facade, 45d901b5a9699bf871bddeb40445fd954b8df6ff (istek mesajındaki SHA'da yazım hatası vardı; kanal+git ile doğrulandı). Güvenlik turu + yığın review-06b (18210/13210), imajlar bu SHA'dan derlendi, down -v (YIGIN-KAPA review06b). state/ diff 0.
+- Karar: **DUZELT**. BLOCKER 0, MAJOR 2, MINOR 3.
+- MAJOR-1: direct yolda mesaj `name`/ekstra alanları, `stop`, `tool_choice`, `response_format` egress'ten geçmeden sağlayıcıya gidiyor (probe: ham e-posta sağlayıcı isteğinde). MAJOR-2: akış çıktı denetimi yalnız kuralın kendi modu enforce iken (politika monitor) atlanıyor: akışsız 400, akışlı sırrı istemciye sızdırıyor; aynı mantık 06a EngineGuard.streams_live'da da var.
+- MINOR: (1) tokenize yer tutucuları üretimde geri çevrilmiyor (`<<PII_1>>` istemciye gidiyor); 08 full/C17'ye ertelenmiş, docs'ta yok; ayrıca 134 r2 raporumdaki "detokenize geri açar" cümlem üretim yolunda yanlıştı (yalnız testlerde doğru) — düzeltme rapora yazıldı. (2) "LiteLLM dışa kapalı" için test yok (compose kanıtı var). (3) resume sahipliği notu.
+- Geçenler: tam entegrasyon 739 passed + 4 skipped; unit+contract 766 iki profilde; kimlik byte-eşit 403, audit ayrımı, kapsamsız anahtar etkisiz; S7 (runtime imajında openai/jiter yok, lock'ta dev grubunda pinli); S2 iç uç; manifest; parite muafiyetleri gerekçeli.
+- NOT_RUN: airgap entegrasyon, lint/smoke/önyüz, Redis-yok kota probe'u. Rapor: state/reviews/06b-r1.md; probe state/reviews/06b-r1-probe.py. Worktree .worktrees/review-06b-r1 temiz doğrulandı ama git worktree remove yine "Permission denied" verdi (--force yok); dizin temizlik listesinde. Dosyalar commit edilmemiş.
