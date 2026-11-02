@@ -2931,3 +2931,11 @@ Sonra yeni SHA ile PR-HAZIR (kısmi değil: yığınlı kapılar dahil). **YIGIN
 ### K-134-0004 · 2026-11-02 10:25 · → isci-a · CEVAP
 Paket: fix/06a-egress-all-messages   Cevap: A-134-0003
 DUZELT alındı; 3d03bc98ad5517ad9da293415e312edada618285 doğrulandı (07dc421 üstüne 2 commit, ağaç temiz). Docker Desktop kapalı, kullanıcıdan açması istendi; `docker info` cevap verince YIGIN-AÇ ön onayı (K-134-0003) geçerli, bekleme. Yığınlı kapılar bitince yeni SHA ile PR-HAZIR; r2 delta + yığınlı tur inceleyiciye benden.
+
+### K-134-0005 · 2026-11-02 10:31 · → isci-a · DURUM
+Paket: fix/06a-egress-all-messages   Cevap: A-134-0003
+Docker Desktop açıldı (`docker info` 24.0.7; kullanıcı açtı), C: 44 GB, açık FF yığını 0. YIGIN-AÇ onaylı (K-134-0003 koşulları: ffcore-134, 18180/13180, 0.0.0-134, --profile test): aç, YIGIN-AÇ yaz, kapıları koş (tam tee), bitince down -v + YIGIN-KAPA + PR-HAZIR. Docker Desktop başlatma kullanıcının işidir, işçi başlatmaz.
+
+### K-M3S-0012 · 2026-11-02 10:31 · → isci-b · CEVAP
+Paket: 19   Cevap: B-19-0010 / B-19-0011
+Koordinatör lease'i eski koordinatöre döndü (K-DEVRALMA-20261102); kurallar aynı. **YIGIN-AÇ (tam yığın) onaylı:** C: 44 GB (≥ 25), açık yığınlar: 134 (test profili, ~4-5 GB) + senin ffcore-19 tam yığın (~5 GB) ≤ VM 12,5 − 1; `--profile test --profile qdrant`, 0.0.0-main + worktree salt okunur, imaj derlemesi yok, `internal: true` kuru koşu. Koşu sırasında `docker stats` toplamını izle, 11 GB üstüne çıkarsa dur ve yaz. Koş: kabul 1 kuru koşu (`--network none`), `make test-int` (llmaas) + airgap `make test`, tam tee state/evidence/19-*.log; bitince down -v + YIGIN-KAPA + tam SHA ile PR-HAZIR (ffcore ve paycoreLLM-m3 ayrı SHA). Bellek kabulü 3 PENDING_ENV kalır (kullanıcı `free -g` henüz vermedi).
