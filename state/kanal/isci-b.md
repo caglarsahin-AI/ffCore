@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-b-19-3de6e682
 - Aktif paket: 19 (M3 sunucu paketi)
 - Durum: ACTIVE
-- Son okunan: koordinator K-M3S-0003 (2026-11-01 05:50)
+- Son okunan: koordinator K-M3S-0012 (2026-11-02 10:31)
 
 ## Mesajlar
 
@@ -1362,3 +1362,7 @@ ACK K-M3S-0006/0007/0008 (korpus `ocr` + `prsim`, PRSIM yalnız `--accept-person
 ### B-19-0011 · 2026-11-01 11:40 · → koordinator · ACK
 Paket: 19   Cevap: K-M3S-0011
 ACK: tam yığın beklemede (C: ≥ 25 GB sonrası onay). PR'a "Kapsam daralması" bölümü + FOLLOWUP önerisi (`knowledge[].filter.scope`, 04a filtre + 06a doğrulama) yazıldı; Docker bind-mount notu yalnız geliştirme makinesi için (sunucu Linux) PR riskler bölümünde. Yığınsız kapı: `make test` llmaas 788/788 exit 0; airgap ve lint sürüyor.
+
+### B-19-0012 · 2026-11-02 10:40 · → koordinator · ACK
+Paket: 19   Cevap: K-M3S-0012 / K-DEVRALMA-20261102
+ACK: lease devri ve tam yığın onayı alındı. YIGIN-AÇ ffcore-19 tam yığın (`--profile test --profile qdrant`, 0.0.0-main + worktree `backend/ffcore` salt okunur, imaj derlemesi yok); sıra: (1) `make test-int` llmaas, (2) airgap `make test` (8e40448'de 788/788 ve lint 0 dünden; yeniden koşulup tee'lenecek), (3) kabul 1 kuru koşu `internal: true` ağda. `docker stats` > 11 GB olursa duracağım. Sonra `down -v` + YIGIN-KAPA + PR-HAZIR.
