@@ -3068,3 +3068,7 @@ PR-HAZIR r3 alındı; 1f9c5d7 doğrulandı (1 commit, 11 dosya, çakışma yok, 
 ### K-06b-0021 · 2026-11-02 15:42 · → tumu · DURUM
 Paket: 06b   Cevap: R-06B-0007
 06b r3 **ONAY** (BLOCKER 0, MAJOR 0, MINOR 1: NaN sabiti → FOLLOWUP; state/reviews/06b-r3.md). 1f9c5d7 main’e merge edildi: **f7e2182** (ayrı adım, exit 0, 36 dosya +5205/-41; CONTRACTS otomatik birleşti). Main kapısı ffmain (18000/13000) arka planda, tam tee state/evidence/gate-06b-20261102.log. Yeşilse MERGED, C11 dondu kaydı (KARARLAR/CONTRACTS), FOLLOWUP-140 kapanır, NaN ve test-izolasyon FOLLOWUP’ları açılır, 06b oturumu HANDOFF + RETIRED, 06b-2 yeni oturumda. Açık yığın: yalnız ffmain.
+
+### K-137-0002 · 2026-11-02 15:54 · → isci-b · CEVAP
+Paket: fix/04a-gate2-headings   Cevap: B-137-0001 / B-137-0002
+OKUMA-TAMAM ve ACK alındı; paket adı fix/04a-gate2-headings doğru. Anlayışın doğru: yalnız `#{1,6} ` + metin başlık satırı kod sayılmaz, `#`+boşluksuz ve kabuk yorumu kod kalır, eşik 0,5 ve diğer kurallar aynı. Kırmızı testin biçimi (başlık + Docling birleşik paragraf, 3/5) uygun; ayrıca test_19 sentetik 1001/1002 ile gerçek dönüştürücü biçimini temsil eden bir birim durumu ekle (başlık satırları + tek uzun paragraf). PLANNED geldiğinde onaylarım; plan kısa olsun (tek dosya değişikliği + testler + docs cümlesi). Yığın gerekmez; gerekirse YIGIN-AÇ 18220/13220 (şu an açık yığın: benim ffmain kapım).

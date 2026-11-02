@@ -2,10 +2,10 @@
 
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
-- Oturum kimliği: ffcore-isci-b-19-3de6e682
-- Aktif paket: — (19 MERGED f25268e + paycoreLLM ca1b287)
-- Durum: RETIRED
-- Son okunan: koordinator K-M3S-0020 (2026-11-02 13:00)
+- Oturum kimliği: ffcore-isci-b-137-7e3079e2
+- Aktif paket: fix/04a-gate2-headings (FOLLOWUP-137)
+- Durum: ACTIVE
+- Son okunan: koordinator K-06b-0021 (2026-11-02 15:42); bana adresli son GOREV K-137-0001
 
 ## Mesajlar
 
@@ -1425,3 +1425,20 @@ Paket: 19 (M3 sunucu paketi)   Cevap: K-M3S-0020
 - **Commit edilmemiş iş:** yok. **Açık yığın:** yok (ffcore-19 `down -v` 0/0). Duran: `paycore-m3-test_paycore_test_{venv,uv_cache}` önbellek volume'ları (temizlik listesinde).
 - **Ders:** gerçek dönüştürücülü kuru koşu, ağırlıksız entegrasyon testinin göremediği iki şeyi yakaladı (model_missing, Kapı 2 başlık sayımı): sunucu paketi gibi uçtan uca işlerde kuru koşu zorunlu adım olarak kalsın.
 Lease: RETIRED. Bu oturum kanala başka yazmayacak.
+
+### B-137-0001 · 2026-11-02 15:50 · → koordinator · DURUM
+Paket: fix/04a-gate2-headings   Cevap: -
+DURUM: OKUMA-TAMAM (oturum ffcore-isci-b-137-7e3079e2; lease ACTIVE). Bu oturum 28 Ekim'deki tam okumanın (gruplar 1-8, B-01-0001) fork'u; 21d9ba1..d365811 farkı yeniden okundu: CLAUDE.md, PLAN (2d.7, 2.6-2.9), KARARLAR eklemelerinin tamamı, handbook CONTRACTS/RELEASE_AND_ROLLBACK/TERMINOLOGY farkları (FELSEFE, FELSEFE_UYGULAMA, diğer handbook dosyaları değişmemiş). State: WORK_QUEUE fix satırı, BLOCKERS 136-138, K-137-0001, K-06b-0021, B-19-0013. Kod: knowledge/gates.py tamamı, docs/bilgi-tabani.md Kapı 2, plan/04 Kapı 2 satırı, test_04a_text_rules.py, test_19_ingest_raw.py, data/samples/paycore-like 1001/1002.
+Not: kullanıcı PAKET=fix/04a-gate2-heading yazdı; GOREV ve WORK_QUEUE adı fix/04a-gate2-headings, onu kullanıyorum.
+
+### B-137-0002 · 2026-11-02 15:50 · → koordinator · ACK
+Paket: fix/04a-gate2-headings   Cevap: K-137-0001
+GOREV alındı. Anladığım: `#{1,6} ` + metin başlığı kod sayılmaz; `#include`, `#!/bin` gibi `#`+boşluksuz ve kabuk yorumu deseni kod kalır; eşik 0,5 ve diğer kurallar aynı. İlk gözlem: test_19 `convert_without_weights` ile başlıkları ayrı satırda tuttuğu için 1001/1002 orada geçiyor (yalnız 1004 boilerplate); sorun Docling'in paragraf birleştirmesinde. Kırmızı test bu biçimi (başlık + birleşik paragraf, 3/5) birim düzeyinde kurar. Sıradaki: worktree main d365811'den açıldı (.worktrees/fix/04a-gate2-headings), state/pr/04a-gate2-headings.md planı, DURUM: PLANNED. Yığın şimdilik gerekmiyor; entegrasyon kanıtı için gerekirse YIGIN-AÇ (18220/13220).
+
+### B-137-0003 · 2026-11-02 15:53 · → koordinator · DURUM
+Paket: fix/04a-gate2-headings   Cevap: K-137-0001
+DURUM: PLANNED. Plan: C:\ai_paycore\ffcore\state\pr\04a-gate2-headings.md. Worktree .worktrees/fix/04a-gate2-headings @ d365811, temiz; kod yok.
+Özet: tek değişiklik `gates.py:66` `#` dalı → `#(?!#{0,5}\s+\S)` (`#`…`######` + boşluk + metin başlık, kod değil; `#include`, `#!/bin`, `#define`, `#`, 7+ `#` kod kalır; regex host'ta doğrulandı). Eşik 0,5 aynı. Testler `tests/unit/test_137_gate2_headings.py` (6 kriter; önce 1. kırmızı), docs/bilgi-tabani.md Kapı 2 cümlesi. Regresyon: 04a birim + test_19/04a ingest entegrasyon.
+Onay istediğim varsayım (planda 1): `# metin` biçimindeki kabuk yorumu satır düzeyinde H1 başlıktan ayırt edilemez; varsayımım "her zaman başlık", kod bloğunu öteki satırlar taşır (test 4 kanıtlar). Fence içi bağlam takibi kapsam dışı (ARCH-07). Aksini istersen durup KARAR-GEREK yazarım.
+Gözlem (değişmiyor): `--` dalı `---` yatay çizgisine de uyuyor; ölçülmedi, kalan risk.
+Plan onayını bekliyorum; onaydan sonra kırmızı test → düzeltme → kapı (tam tee).
