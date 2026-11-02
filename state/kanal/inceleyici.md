@@ -1489,3 +1489,7 @@ Koşular: 88 passed + 2 failed (probe 3 ve MINOR-1 testi); unit+contract 734 pas
 - Kanıt: tam entegrasyon 693 passed + 5 skipped; hedefli 76 passed; paycoreLLM 50 passed; r1 probe'larının güncellenmiş hâli 8/8 (meta artık maskeli: breadcrumb/metadata/silver/chunk'ta ham değer yok; PRSIM meta'da IBAN → customer_data_suspected; geçersiz UTF-8 → invalid_encoding, koşu sürüyor; prsim* önek/yol kuralı); compose.ffcore.yml'de @sha256 = 0; kendi denememde docker load sonrası yalnız tag çalışıyor.
 - Doğrulanmadı: containerd/sunucu imaj deposu türü; save.sh/load.sh gerçek koşusu; PayCore yığınıyla up; kuru koşu tekrarı; lint/unit 798 (işçi kanıtı). Not: minio etiketi (e70b2b1e) yalnız arşivle anlamlı.
 - Rapor: state/reviews/19-r2.md. Koordinatör ffcore merge + main kapısı ve paycoreLLM-m3 -> master merge yapabilir. Worktree'ler temiz doğrulanıp kaldırıldı. Dosyalar commit edilmemiş.
+
+## R-06B-0001 | 2026-11-02 12:37 | ACK | K-06b-0010
+- REVIEW-ISTEK 06b facade alindi. Tam SHA 45d901b5a9699bf871bddeb40445fd954b8df6ff (mesajdaki duzeltilmis hali; kanal ve git ile dogrulandi; feat/06b-facade, 6 commit, 33 dosya, baz 4532a54, state/ diff 0). Guvenlik turu + yigin review-06b (18210/13210). C: 42 GB, acik FF yigini yok.
+- 2026-11-02 12:40 YIGIN-AC review-06b (18210/13210, FFCORE_VERSION=0.0.0-review-06b, --profile test --profile qdrant); acik FF yigini yok, C: 42 GB. Statik tur (identity, guard, proxy, agent, internal, manifest, parity testleri) okundu.
