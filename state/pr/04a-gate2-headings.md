@@ -1,6 +1,6 @@
 # [A] fix(04a): Markdown headings are not code lines in Kapı 2 (FOLLOWUP-137)
 
-**Paket:** fix/04a-gate2-headings · **Sınıf:** [A] · **Branch:** fix/04a-gate2-headings · **Baz commit:** d365811 · **HEAD:** 0eed4c868f0d993d6d5bb62555acc8a894d5b5b7 (2 commit) · Oturum ffcore-isci-b-137-7e3079e2 · GOREV K-137-0001 · Kararlar K-137-0003 (plan), K-137-0004 (A), K-137-0006 (A′)
+**Paket:** fix/04a-gate2-headings · **Sınıf:** [A] · **Branch:** fix/04a-gate2-headings · **Baz commit:** d365811 · **HEAD:** 6c0271846e26d7d2241827348c0b2fe697e73e7f (3 commit: d358bae A, 0eed4c8 A′, 6c02718 test docstring satır boyu) · Oturum ffcore-isci-b-137-7e3079e2 · GOREV K-137-0001 · Kararlar K-137-0003 (plan), K-137-0004 (A), K-137-0006 (A′)
 
 ## Plan (onaylı K-137-0003; uygulamada A′'ye evrildi)
 1. **Bulunan semboller:**
@@ -43,7 +43,7 @@
 | 7 | Fence'li düz metin (.txt dönüştürücü biçimi, DEMO-7) geçer (main gibi) | `test_137_7_fenced_plain_text_passes` | A'nın gerilemesi (137-test-int, 137-probe-samples); A′'de geçti |
 | 8 | Kapanmamış fence: kalan satırlar main kuralıyla (`# metin` kod) | `test_137_8_unclosed_fence_keeps_main_rule` | geçti |
 | 9 | Bilinen sınır: fence dışında düzyazı yorumlu kod geçer | `test_137_9_unfenced_prose_commented_code_known_limit` | geçti (sabitlendi) |
-| E | test_19 ve 04a ingest entegrasyonu; `indexed 4, skipped 1`, `gate2:boilerplate 1` main ile aynı | `test_19_1_ingest_raw_paycore_like_idempotent` + `tests/integration/test_04a_*.py` | A'da kırmızı (indexed 3 / skipped 2), A′: aşağıda |
+| E | test_19 ve 04a ingest entegrasyonu; `indexed 4, skipped 1`, `gate2:boilerplate 1` main ile aynı | `test_19_1_ingest_raw_paycore_like_idempotent` + `tests/integration/test_04a_*.py` | A'da kırmızı (indexed 3 / skipped 2); A′'de iki profil geçti (test değişmeden, main beklentisiyle) |
 
 ## Çalıştırılan komutlar
 Hepsi `FFCORE_VERSION=0.0.0-main docker compose -p fix137 --env-file .env.test run --rm -T tools …` ile koştu: imaj derlenmedi, worktree `/work` olarak bağlı. Entegrasyon yığını fix137 (yalnız postgres + redis). Tam çıktılar `C:\ai_paycore\ffcore\state\evidence\` altında.
@@ -56,10 +56,31 @@ Hepsi `FFCORE_VERSION=0.0.0-main docker compose -p fix137 --env-file .env.test r
 | `make lint`, `make test` | A (commit öncesi) | llmaas, airgap | 0, 0, 0 | lint 0, 878/878 iki profil | 137-gate2-20261102.log |
 | `pytest test_19_ingest_raw + test_04a_*` | d358bae (A) | llmaas, airgap | 1, 1 | 78 geçti / 1 kaldı (test_19: indexed 3, skipped 2) | 137-test-int-20261102.log |
 | örnek ağaç ölçümü (`convert_without_weights` + `_code_lines`) | d358bae | — | 0 | DEMO-7 7/7, 1003-kontrol 6/6, PRSIM-1 4/4 → `code_heavy` | 137-probe-samples-20261102.log |
-| `make lint`, `make test` ×2, entegrasyon ×2 | **0eed4c8 (A′)** | llmaas, airgap | (aşağıda) | | 137-gate3-20261102.log |
+| `make lint` | 0eed4c8 (A′) | — | 2 | E501 (test docstring 101 karakter) → 6c02718 | 137-gate3-20261102.log |
+| `make test` | 0eed4c8 (A′) | llmaas | 0 | 878 geçti | 137-gate3-20261102.log |
+| `make test` | 0eed4c8 (A′) | airgap | 0 | 878 geçti | 137-gate3-20261102.log |
+| `pytest test_19_ingest_raw + test_04a_*` | 0eed4c8 (A′), yığın fix137 | llmaas | 0 | 79 geçti, 11 NOT_RUN (bayraklı: model 2, Qdrant 8, tree_is_read_only 1) | 137-gate3-20261102.log |
+| aynı | 0eed4c8 (A′), yığın fix137 | airgap | 0 | 79 geçti, 11 NOT_RUN | 137-gate3-20261102.log |
+| `make lint` | **6c02718 (son HEAD)** | — | 0 | All checks passed, 390 dosya biçimli | 137-gate3-20261102.log (son bölüm) |
+| `pytest test_137 + test_04a_text_rules` | **6c02718** | — | 0 | 52 geçti | 137-gate3-20261102.log (son bölüm) |
+
+6c02718 ile 0eed4c8 arasındaki tek fark test dosyasında bir docstring satırı. Tam `make test` ve entegrasyon 0eed4c8'de koştu, son HEAD'de yeniden koşulmadı (NOT_RUN gerekçesi: davranış farkı yok).
 
 ## Çıktı özeti ve post-state
-(gate3 sonucu eklenecek.) Yığın kapanışı: `down -v` + YIGIN-KAPA.
+- test_19 iki profilde main beklentisiyle yeşil: `created 5`, `indexed 4, skipped 1`, `gates: gate2:boilerplate 1`, maske sayıları aynı. Yeni `code_heavy` yok.
+- Örnek ağaçta (main kodu / A′) 1001 ve 1002 `ok`. Fence'li .txt üçü (DEMO-7, 1003-kontrol, PRSIM-1) main'deki gibi 0 kod satırı.
+- Migration yok, veri değişikliği yok.
+- Yığın fix137 kapatıldı: `down -v` exit 0, kalan konteyner 0, volume 0. İmaj derlenmedi (`0.0.0-main` kullanıldı, temizlenecek paket etiketi yok).
+
+## Kontrol listesi
+- [x] Felsefe ile çelişen nokta işaretlendi (iki varsayım düzeltmesi kanalda, B-137-0004/0007)
+- [x] Donmuş sözleşme kırılmadı (C5/C6 dokunulmadı)
+- [x] İki profil testi koştu (make test + entegrasyon)
+- [x] Mutasyon ucu yok; audit/salt-okunur etkisi yok
+- [x] Log, API, audit, hata gövdesi değişmedi; secret yok
+- [x] Önyüz yok (tema/i18n konu dışı)
+- [x] Docs güncel (`docs/bilgi-tabani.md`); `.env.example` değişkeni yok
+- [x] WORK_QUEUE durumu kanaldan bildirildi (DURUM/PR-HAZIR)
 
 ## Ölçüm: Docling fence (K-137-0004 şart 3)
 Ağırlıksız, `--network none`, `ffcore/tools:0.0.0-main` içindeki docling. Docling HTML `<pre>` bloğunu (Confluence kod makrosuna benzeyen `<pre class="syntaxhighlighter-pre">` ve `<pre><code class="language-python">`) ve Markdown fence/girintili kodu **dil etiketsiz ```` ``` ````** ile veriyor. Gerçek Confluence dışa aktarımı ve PDF/DOCX yolu denenmedi.

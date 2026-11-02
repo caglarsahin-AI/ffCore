@@ -1474,3 +1474,19 @@ Seçenekler:
 - B: fence farkındalığını geri al, yalnız başlık kuralı (eski B). Etki: fence'li ve fence'siz düzyazı yorumlu kod geçer, kalan risk.
 - C: düz metin dönüştürücüsünün sarmalamasını kaldır. Touch-zone dışı (convert/), tüm düz metin silver'ı değişir, parçalama etkisi ölçülmedi; önermiyorum.
 Yığın fix137 açık (postgres + redis, ~0,3 GB); cevap gecikirse kapatırım. Cevabına göre testler güncellenir, birim + entegrasyon iki profil yeniden koşulur, PR-HAZIR.
+
+### B-137-0008 · 2026-11-02 18:02 · → koordinator · ACK
+Paket: fix/04a-gate2-headings   Cevap: K-137-0006
+Karar A′ alındı ve uygulandı: commit 0eed4c868f0d993d6d5bb62555acc8a894d5b5b7. `_CODE_LINE` main ile birebir aynı. `_HEADING_LINE` + `_is_code_line(fenced)`: fence dışında başlık kod değil, fence içinde main kuralı geçerli; fence çizgisi kod değil; kapanmamış fence'ten sonra fence içi kural. Testler A′'ye göre: 7 fence'li .txt (DEMO-7 biçimi) geçer, 8 kapanmamış fence = main, 4 fence'li yorumlu Python `code_heavy`; test_137 + test_04a_text_rules 52/52. docs cümlesi güncellendi. Tam kapı (lint, make test ×2, test_19 + 04a entegrasyon ×2) şu an koşuyor, tam tee state/evidence/137-gate3-20261102.log. Bitince down -v + YIGIN-KAPA + PR-HAZIR. PR taslağı state/pr/04a-gate2-headings.md.
+
+### B-137-0009 · 2026-11-02 18:05 · → koordinator · YIGIN-KAPA
+Paket: fix/04a-gate2-headings   Cevap: K-137-0005
+fix137 kapatıldı: `down -v` exit 0, kalan konteyner 0, volume 0. İmaj derlenmedi (0.0.0-main), temizlenecek paket etiketi yok.
+
+### B-137-0010 · 2026-11-02 18:05 · → koordinator · PR-HAZIR
+Paket: fix/04a-gate2-headings   Cevap: K-137-0006
+DURUM: VERIFIED. PR açıklaması C:\ai_paycore\ffcore\state\pr\04a-gate2-headings.md · Sınıf [A].
+Branch fix/04a-gate2-headings · worktree .worktrees/fix/04a-gate2-headings · baz main d365811 · SHA **6c0271846e26d7d2241827348c0b2fe697e73e7f** (3 commit: d358bae A, 0eed4c8 A′, 6c02718 docstring satır boyu). 3 dosya: knowledge/gates.py, tests/unit/test_137_gate2_headings.py (yeni), docs/bilgi-tabani.md; migration yok, state yok.
+Kanıt (tam tee state/evidence/137-gate3-20261102.log): 0eed4c8'de make test llmaas 878/878, airgap 878/878; test_19_ingest_raw + test_04a_* entegrasyon iki profil 79 geçti / 11 bayraklı NOT_RUN (main ile aynı; test_19 `indexed 4, skipped 1`, `gate2:boilerplate 1`). İlk lint E501 (test docstring) 6c02718'de düzeldi; son HEAD'de lint 0 + test_137/test_04a_text_rules 52/52. Kırmızı kanıtlar 137-red, 137-red2, A'nın entegrasyon gerilemesi 137-test-int ve 137-probe-samples.
+Kalan riskler PR'da: fence dışında düzyazı yorumlu kod geçer (test 9 sabitledi); Docling fence'i yalnız HTML/MD örneğinde ölçüldü (dil etiketsiz), Confluence dışa aktarımı denenmedi; `---` / `--` main davranışı, 19 ağacında 0 satır.
+Branch'e başka commit atmıyorum.
