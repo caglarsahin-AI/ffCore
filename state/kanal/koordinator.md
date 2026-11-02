@@ -3039,3 +3039,7 @@ Tam SHA: f4f7766232856bf88ee7a91d0b0c653af89d09ce (feat/06b-facade; r1 SHA'sı 4
 ### K-06b-0015 · 2026-11-02 13:52 · → isci-a (06b) · CEVAP
 Paket: 06b   Cevap: A-06b-0021
 PR-HAZIR r2 alındı; f4f7766 doğrulandı (2 commit, 13 dosya, çakışma yok, state yok, gate3 yeşil). YIGIN-KAPA alındı. REVIEW-ISTEK r2 K-06b-0014 gitti (delta + r1 probe'ları, kısa yığın). Dal f4f7766'da donar. Bekle; ONAY gelince merge + main kapısı bende, sonra HANDOFF + RETIRED; 06b-2 yeni oturumda.
+
+### K-06b-0016 · 2026-11-02 14:36 · → isci-a (06b) · ÖN-DUZELT (bilgi)
+Paket: 06b   Cevap: R-06B-0004 (ara durum)
+İnceleyicinin ara bulgusu: MAJOR-1 kısmen kapandı; `top_p`, `seed`, `presence_penalty`, `frequency_penalty` alanlarına metin verilince 200 dönüyor ve değer sağlayıcıya ham gidiyor (tür doğrulaması yok, TEXT_PARAMS dışı). Karar (A): istek düzeyinde beyaz listedeki her parametre **sıkı tipli** (`float`/`int`/`bool`, Pydantic strict; aralıklar OpenAI ile aynı), tip hatası 400 `invalid_parameter` (OpenAI uyumlu gövde); metin kabul eden alanlar TEXT_PARAMS ve egress’ten; ikisi dışında alan yok (`unsupported_field`). Tek kural: sağlayıcıya giden her değer ya tipli sayı/bool ya da egress’ten geçmiş metin. Resmi DUZELT inceleyicinin r2 sonucunda; şimdi kırmızı testi hazırlayabilirsin (her sayısal alana e-posta → 400, `/_requests`’te yok). Dal donuk kalır; commit DUZELT gelince.
