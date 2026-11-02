@@ -1353,3 +1353,13 @@ Uygulama notu (karar gerekmiyor, PR'a yazılacak): şu an `temperature`, `max_to
 ### A-06b-0024 · 2026-11-02 · → koordinator · ACK + YIGIN-AÇ (kısa)
 Paket: 06b   Cevap: K-06b-0017
 ACK DUZELT r2 (MAJOR sayısal parametreler, MINOR-A yankı alanları). Kod hazır, commit'siz; unit + contract 795 yeşil (llmaas). Kısa yığın: ffcore-06b 18130/13130, 0.0.0-06b, `--profile test` (qdrant yok): r2 entegrasyon testlerinin eski kodda (f4f7766, geçici ayrık checkout) kırmızı ve yeni kodda yeşil koşusu + 06b hedefli entegrasyon. Bitince down -v + YIGIN-KAPA.
+
+### A-06b-0025 · 2026-11-02 15:15 · → koordinator · PR-HAZIR + YIGIN-KAPA
+Paket: 06b   Cevap: K-06b-0017 / K-06b-0018   [B] + [C] (S7, onaylı)
+**PR-HAZIR (r2 DUZELT):** feat/06b-facade @ 1f9c5d79b047b6cd1bb33edeed268f8e7d5ca458 (baz main d274bc9, 9 commit, 36 dosya +5205/−41, migration yok, push yok). Delta f4f7766..1f9c5d7 tek commit: `NUMERIC_PARAMS` tablosu (iki yol, 400 `invalid_parameter` + `param`), bilinmeyen parametre `unsupported_field`, assistant yankı alanları (`annotations, refusal, audio`) kabul + sağlayıcıya gitmez + `dropped_fields` (agent: start_run audit, düz: log), `ApiError.param` (core/errors.py additive), C11 `invalid_parameter` additive, 06b.yaml aralıklar (additive, null korunur), docs. PR state/pr/06b.md "r2 DUZELT" (tablo, kanıt, sapma).
+Kanıt: kırmızı unit 15/15, entegrasyon eski kodda 14 düşen; yeşil hedefli entegrasyon 87 passed (06b + 06a adapters + 134 + parity), make test 795/795 iki profil, lint 0. Not: ilk kırmızı koşu agent testinde asıldı (kuyruksuz run), kendi tools konteynerim adıyla durduruldu, test satır içi kuyrukla düzeltildi. Tam test-int bu turda yok (kısa yığın kararı).
+**YIGIN-KAPA:** ffcore-06b `down -v` (konteyner 0, volume 0); geçici ayrık checkout (scratchpad) kaldırıldı. Dal 1f9c5d7'de donar.
+
+### A-06b-0026 · 2026-11-02 · → koordinator · ACK
+Paket: 06b   Cevap: K-06b-0020
+ACK. Dal 1f9c5d7'de donuk, yığın kapalı; DUZELT ya da ONAY/merge bekliyorum.
