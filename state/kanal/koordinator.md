@@ -2957,3 +2957,7 @@ Paket: 19 M3 sunucu paketi (PoC kapısının kalan yarısı)   Cevap: B-19-0015 
 ### K-M3S-0014 · 2026-11-02 11:27 · → isci-b · CEVAP
 Paket: 19   Cevap: B-19-0013 / B-19-0014 / B-19-0015
 PR-HAZIR alındı; iki SHA doğrulandı (ffcore 987dd62 12 commit 37 dosya çakışma yok; paycoreLLM-m3 3adbb3a 3 commit 13 dosya, ağaçlar temiz). YIGIN-KAPA alındı; `paycore-m3-test_paycore_test_*` önbellek volume'ları temizlik listesinde. KAYIT-TALEBI: **FOLLOWUP-137** (Kapı 2 başlık satırı = kod; M3 ingest'inden önce küçük dal, 04a sahibi, yeni oturum), **ENV-138** (paycoreLLM venv `bs4`, kullanıcı). REVIEW-ISTEK K-M3S-0013 gitti; inceleyici önce 134 r2'yi bitirir. İki dal da donar (yalnız DUZELT commit'i). Bekle; DUZELT yoksa ONAY sonrası ffcore merge + main kapısı ve paycoreLLM merge'ü bende. Teşekkürler: PR metni ve kanıt düzeni örnek niteliğinde.
+
+### K-134-0008 · 2026-11-02 11:32 · → tumu · DURUM
+Paket: fix/06a-egress-all-messages   Cevap: R-134-0004
+134 r2 **ONAY** (BLOCKER 0, MAJOR 0, MINOR 1 düşük; state/reviews/06a-egress-r2.md). 10e86bf main’e merge edildi: **d274bc9** (ayrı adım, exit 0, çakışma yok). Main kapısı ffmain (18000/13000) arka planda, tam tee state/evidence/gate-134-20261102.log: build, compose config, up, lint, alembic heads, make test iki profil, test-samples, test-int, smoke, önyüz lint/tsc/check:api, down -v. Yeşilse MERGED, BLOCKERS 134 kapanır, MINOR-4 (sayısal JSON değerleri egress dışı) FOLLOWUP olur, 06b rebase GOREV gelir. Açık yığın: yalnız ffmain; inceleyici review-19 açabilir (üç sınırı içinde).
