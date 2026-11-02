@@ -1463,3 +1463,14 @@ Karar A alındı ve uygulandı (geç ACK, özür; uzun make test koşusu sıras�
 ### B-137-0006 · 2026-11-02 17:27 · → koordinator · YIGIN-AÇ
 Paket: fix/04a-gate2-headings   Cevap: K-137-0004
 YIGIN-AÇ fix137 kısa (yalnız postgres + redis, 0.0.0-main + worktree kodu, imaj derlemesi yok, temiz volume): `test_19_ingest_raw.py` + `test_04a_ingest.py` + 04a entegrasyon gerilemesi, iki profil. Koşullar: C: 45 GB boş; açık FF yığını 0 (ffmain kapalı). Bitince `down -v` + YIGIN-KAPA.
+
+### B-137-0007 · 2026-11-02 17:44 · → koordinator · KARAR-GEREK
+Paket: fix/04a-gate2-headings   Cevap: K-137-0004
+**Karar A (fence = kod) entegrasyonda gerçek bir gerileme açtı; durdum.** Commit d358bae2624a2ad9b6c352941b8d222c4465d4d5 (Karar A, birim testler yeşil). Kısa yığın fix137'de `test_19_ingest_raw` iki profilde düştü (78 geçti / 1 kaldı; state/evidence/137-test-int-20261102.log): `indexed 3, skipped 2`, ek bir `gate2:code_heavy` var.
+Neden (ölçüm: state/evidence/137-probe-samples-20261102.log): `convert/text_formats.py:44` düz metin dönüştürücüsü **her .txt'yi tek ```` ``` ```` bloğuna sarıyor** (satır düzenini korumak için, PayCore mirası). Karar A ile her düz metin belgesi %100 kod sayılıyor. Örnekler: DEMO-7.txt 7/7, 1003-kontrol-listesi.txt 6/6, PRSIM-1.txt 4/4 → `code_heavy`. Main'de üçü de 0 kod. M3'te PayCore Jira/PRSIM raw'ı .txt olduğu için bu kabul edilemez.
+Ek ölçüm (ağırlıksız Docling HTML ve MD yolu, `--network none`): Docling `<pre>` ve fence'li Markdown kodunu **dil etiketsiz** ```` ``` ```` ile veriyor. Dolayısıyla "yalnız dil etiketli fence kod" ayrımı işe yaramaz. Bu kısa denemeyle Docling fence'i doğrulandı (yalnız HTML/MD; gerçek Confluence dışa aktarımı denenmedi).
+Seçenekler:
+- **A' (önerim): fence içinde main kuralı, dışında başlık kuralı.** Fence içinde `# metin` satırı yine kod sayılır (main davranışı). Öteki satırlar desene göre sayılır; fence çizgisi kod sayılmaz. Etki: düz metin belgeleri tam olarak main gibi davranır (gerileme yok). Fence'li düzyazı yorumlu Python main'deki gibi 6/8 → `code_heavy` (B vakası kapanır). Fence'li log yalnız deseni varsa kod sayılır (K-137-0004 şartı (1)'in "fence'li log kod" maddesi düşer). Kapanmamış fence'te kalan satırlar main kuralıyla sayılır (fail-safe = main). ~3 satır değişiklik.
+- B: fence farkındalığını geri al, yalnız başlık kuralı (eski B). Etki: fence'li ve fence'siz düzyazı yorumlu kod geçer, kalan risk.
+- C: düz metin dönüştürücüsünün sarmalamasını kaldır. Touch-zone dışı (convert/), tüm düz metin silver'ı değişir, parçalama etkisi ölçülmedi; önermiyorum.
+Yığın fix137 açık (postgres + redis, ~0,3 GB); cevap gecikirse kapatırım. Cevabına göre testler güncellenir, birim + entegrasyon iki profil yeniden koşulur, PR-HAZIR.
