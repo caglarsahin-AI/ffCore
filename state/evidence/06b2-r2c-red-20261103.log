@@ -1,0 +1,22 @@
+ Network ffcore-06b2_default  Creating
+ Network ffcore-06b2_default  Created
+ Volume "ffcore-06b2_langfuse_clickhouse_data"  Creating
+ Volume "ffcore-06b2_langfuse_clickhouse_data"  Created
+ Volume "ffcore-06b2_langfuse_clickhouse_logs"  Creating
+ Volume "ffcore-06b2_langfuse_clickhouse_logs"  Created
+ Volume "ffcore-06b2_redis_data"  Creating
+ Volume "ffcore-06b2_redis_data"  Created
+ Volume "ffcore-06b2_postgres_data"  Creating
+ Volume "ffcore-06b2_postgres_data"  Created
+ Volume "ffcore-06b2_langfuse_minio_data"  Creating
+ Volume "ffcore-06b2_langfuse_minio_data"  Created
+ Volume "ffcore-06b2_langfuse_postgres_data"  Creating
+ Volume "ffcore-06b2_langfuse_postgres_data"  Created
+ Volume "ffcore-06b2_model_cache"  Creating
+ Volume "ffcore-06b2_model_cache"  Created
+ Volume "ffcore-06b2_knowledge_storage"  Creating
+ Volume "ffcore-06b2_knowledge_storage"  Created
+FAILED tests/unit/test_06b2_external.py::test_06b2_r1_platform_hosts_reserved[http://vllm:8000/v1]
+FAILED tests/unit/test_06b2_external.py::test_06b2_r1_platform_hosts_reserved[http://llm.corp:4000/v1]
+FAILED tests/contract/test_06b2_reserved_hosts.py::test_06b2_reserved_hosts_cover_seed_model_servers
+3 failed, 62 passed in 12.56s

@@ -1570,3 +1570,16 @@ Paket: 06b-2 r2 (delta)   Cevap: K-06b2-0010
 - NOTE: (2) yapılandırılmış host'larda rstrip('.') yok; (3) başarı/hata audit yazımı sırasında gelen iptal satırı kaybedebilir (dar pencere, shield önerisi); (4) not_this_path mesajı native yol ve yapılandırmasız durum için yanlış (kod C11'de aynı).
 - NOT_RUN: tam make test-int (main kapısı), lint/smoke/önyüz (işçi kanıtı), gerçek dış agent, MINOR-7 uçtan uca. İlk entegrasyon komutumda dosya yolu yanlıştı (koşmadı); doğru listeyle yeniden koştum.
 - Rapor state/reviews/06b-2-r2.md, probe state/reviews/06b-2-r2-probe.py. Worktree git kaydından çıktı, dizin Permission denied (--force yok; temizlik listesine .worktrees/review-06b2-r2). Dosyalar commit edilmedi.
+
+### R-06b2-0005 · 2026-11-03 00:21 · → koordinator · ACK
+Paket: 06b-2 r3 (statik delta)   Cevap: K-06b2-0015
+- SHA baeffb2e5a079f3071e964506e8fd6a5e54c01ff doğrulandı (674fecd..baeffb2 1 commit, 4 dosya). Statik inceleme; yığın açılmayacak.
+
+### R-06b2-0006 · 2026-11-03 00:22 · → koordinator · REVIEW-SONUC
+Paket: 06b-2 r3 (statik delta)   Cevap: K-06b2-0015
+- SHA baeffb2e5a079f3071e964506e8fd6a5e54c01ff; state/ diff 0; statik (yığın yok).
+- Karar: **ONAY** — BLOCKER 0, MAJOR 0, MINOR 0, NOTE 2.
+- (1) vllm reserved; seed varsayılanları (ollama:11434, vllm:8000) ve host.docker.internal kapsanıyor; yeni contract testi seed ${SEED_*_BASE_URL:-…} varsayılanlarını RESERVED_HOSTS'a bağlıyor. (2) _host() aday host ile aynı normalize (lower + rstrip('.')); yalnız red kümesi büyüyor, gevşetme yok; port yapılandırılmış host'ta karşılaştırılmıyor (daha sıkı). (3) provider okuması/decrypt yok; docs FOLLOWUP-146'yı açıkça anıyor (r2 docs çelişkisi kapandı). (4) başka davranış değişmiyor.
+- NOTE: docs/api.md:546 satırı ~130 karakter (biçim); contract testi yalnız ${…:-varsayılan} kalıbını okuyor (bugün başka base_url yok).
+- NOT_RUN: testler (statik istek); işçi kanıtı 922/922 + 132/132 doğrulanmadı.
+- Rapor state/reviews/06b-2-r3.md. Dosyalar commit edilmedi.
