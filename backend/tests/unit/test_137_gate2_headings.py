@@ -110,7 +110,7 @@ def test_137_7_fenced_plain_text_passes():
 
 
 def test_137_8_unclosed_fence_keeps_main_rule():
-    """After a fence that never closes, the main rule counts (fail-safe = main): `# text` is code."""
+    """After a fence that never closes the main rule counts (fail-safe = main): `# text` is code."""
     headings = "# Başlık bir\n# Başlık iki\n# Başlık üç\n" + PROSE
     assert gates.text_quality(headings, title="T") == ("ok", None)  # outside a fence: headings
     unclosed = "```\n" + headings
