@@ -60,8 +60,19 @@ Every mutation is audited.
   agent with draft version 1, or the next draft version of the agent with the same key. Nothing is
   published. The definition is validated as on save (C8; a definition without `schema_version` is
   version 1) and so is the model and context budget (C13). `dry_run=true` answers what would
-  happen and writes nothing. An external agent is refused (422 `external_agent_not_available`).
+  happen and writes nothing. An external agent is neither exported nor imported (422
+  `external_agent_not_available`): its endpoint and key stay in the installation.
   Edit access, audited (`import_agent`).
+
+### External agents (06b-2)
+
+An external agent (`kind: external`) is an OpenAI-compatible agent running elsewhere, put behind
+FFCore's single entry: a project administrator registers its base URL, remote model and API key
+(`POST .../agents/external`), then publishes it (`.../external/publish`). It has no definition and
+no versions; FFCore does not run it, it forwards the conversation and checks both directions with
+the project's `default` guardrail policy. Its answer is text only: tool calls it returns are never
+executed. Calls are not runs (they are in the audit log, not on the Runs screen) and are outside
+token and USD quotas. Details: docs/api.md, "External agent path".
 
 ### Through the OpenAI-compatible facade (06b)
 

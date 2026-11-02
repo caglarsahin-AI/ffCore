@@ -119,6 +119,13 @@ async def check_base_url(url: str, settings: Settings, *, resolver: Resolver | N
         target = httpx2.URL(url)
     except httpx2.InvalidURL:
         raise url_refused("egress_invalid_url") from None
+    if target.userinfo:
+        # Credentials in the URL would leave as Basic auth beside the registered key, and appear
+        # wherever the URL is shown; the key field is the only credential (K-06b2-0003).
+        raise url_refused("egress_userinfo")
+    if target.port is not None and not 0 < target.port < 65536:
+        # httpx2 parses any number as a port; the dial would fail later and less clearly.
+        raise url_refused("egress_invalid_port")
     policy = EgressPolicy(settings)
     try:
         policy.check_url(target)

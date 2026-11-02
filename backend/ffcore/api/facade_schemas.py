@@ -23,8 +23,9 @@ X_PLATFORM_EVENTS = (
     "progress",
     "fallback",
 )
-# An external agent (agents.kind = external) is reserved: a request answers 501
-# external_agent_not_available until 06b-2; its event subset is frozen when it exists (K-06b-0004).
+# x_platform.event values of an external agent (06b-2, frozen with it): its answer comes whole
+# from elsewhere, so only `progress` (output_buffered, keepalive); no tools, sources, approvals.
+EXTERNAL_X_PLATFORM_EVENTS = ("progress",)
 # x_platform.kind of a progress event the facade itself adds (S4): the answer is held back until
 # the output guardrail has checked it, so the first token comes later.
 PROGRESS_KINDS = ("queued", "output_buffered", "keepalive")
@@ -56,6 +57,11 @@ FACADE_ERROR_CODES = (
     "unsupported_field",
     # Review r2: a supported parameter with a wrong type or out of range (`param` names it).
     "invalid_parameter",
+    # 06b-2, external agent: 502 failed (egress refusal, upstream status, no text answer),
+    # 502 answer over 64 KiB, 504 timeout. The reason is in the audit event, never the body.
+    "external_agent_failed",
+    "external_agent_response_too_large",
+    "external_agent_timeout",
 )
 
 # The model name prefix of the agent path (C1: agent:<project_key>/<agent_key>).

@@ -28,6 +28,8 @@ FROZEN = {
     "CONVERSATION_HEADER": "X-Conversation-Id",
     "RESUME_HEADER": "X-Resume-Run-Id",
     "AGENT_PREFIX": "agent:",
+    # 06b-2: the external agent's event subset, frozen with it.
+    "EXTERNAL_X_PLATFORM_EVENTS": ("progress",),
 }
 
 
@@ -52,6 +54,11 @@ def test_c11_error_codes_include_the_frozen_ones():
         "output_buffer_exceeded",
         "external_agent_not_available",
         "unsupported_field",
+        "invalid_parameter",
+        # 06b-2
+        "external_agent_failed",
+        "external_agent_response_too_large",
+        "external_agent_timeout",
     }
     assert frozen <= set(c11.FACADE_ERROR_CODES)
 
@@ -75,5 +82,20 @@ def test_c11_contracts_row_names_the_five_points():
         "kind: external",
         "x_platform",
         "annotations[]",
+    ):
+        assert needle in row, needle
+
+
+def test_c11_external_subset():
+    """06b-2: an external agent sends only events of the native vocabulary, a subset."""
+    assert set(c11.EXTERNAL_X_PLATFORM_EVENTS) <= set(c11.X_PLATFORM_EVENTS)
+    row = next(
+        line for line in CONTRACTS.read_text(encoding="utf-8").splitlines() if "| C11 |" in line
+    )
+    for needle in (
+        "EXTERNAL_X_PLATFORM_EVENTS",
+        "external_agent_failed",
+        "external_agent_timeout",
+        "external_agent_response_too_large",
     ):
         assert needle in row, needle

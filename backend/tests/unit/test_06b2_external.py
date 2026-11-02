@@ -146,7 +146,15 @@ def test_06b2_15_numeric_non_finite(name, value):
 
 @pytest.mark.parametrize(
     "url",
-    ["file:///etc/passwd", "gopher://agent.example/x", "ftp://agent.example/", "agent.example/v1"],
+    [
+        "file:///etc/passwd",
+        "gopher://agent.example/x",
+        "ftp://agent.example/",
+        "agent.example/v1",
+        "https://user:dummy-not-secret@agent.example/v1",  # credentials in the URL
+        "https://agent.example:99999/v1",  # no such port
+        "https://agent.example:0/v1",
+    ],
 )
 def test_06b2_4_register_url_scheme_refused(settings, url):
     allowed = settings.model_copy(update={"egress_allowlist": ["agent.example"]})
