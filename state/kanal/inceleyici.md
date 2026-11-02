@@ -1508,3 +1508,11 @@ Koşular: 88 passed + 2 failed (probe 3 ve MINOR-1 testi); unit+contract 734 pas
 
 ## R-06B-0004 | 2026-11-02 14:35 | DURUM | K-06b-0014
 - 06b r2: yigin acik, calisiyor (oturum bosta degildi, tam entegrasyon kosusu suruyor). Probe sonucu: MAJOR-1 kismen kapandi, kalan acik bulgu var (top_p/seed/presence_penalty/frequency_penalty string degerleri saglayiciya ham gidiyor). Tam entegrasyon + unit tamamlaninca REVIEW-SONUC ve YIGIN-KAPA.
+
+## R-06B-0005 | 2026-11-02 14:35 | REVIEW-SONUC | K-06b-0014
+- Paket/SHA: 06b r2 delta, f4f7766232856bf88ee7a91d0b0c653af89d09ce (45d901b + 2 commit). Yığın review-06b (18210/13210) imajlar bu SHA'dan derlendi, down -v (YIGIN-KAPA review06b). state/ diff 0.
+- Karar: **DUZELT (dar)**. BLOCKER 0, MAJOR 1 (r1 MAJOR-1'in kalanı), MINOR 2. r1 MAJOR-2 ve MINOR 1-3 kapandı.
+- Kalan MAJOR: `top_p`, `seed`, `presence_penalty`, `frequency_penalty` metin değeriyle 200 dönüyor ve değer sağlayıcıya ham gidiyor (probe: e-posta fake-llm /_requests'te). Düzeltme: bu dört alanı sayı (bool hariç) olarak doğrula, değilse 400 parameter_not_supported; testi parametrik ekle.
+- MINOR: (1) facade'ın kendi agent cevabındaki `annotations` SDK yankısında 400 unsupported_field (çok turlu agent uyumluluğu; cevap-özel alanları kabul edip sağlayıcıya gönderme ya da docs notu). (2) state/pr/06a-egress.md (134 PR'ı) hâlâ "detokenize geri açar" diyor; 06b PR'ında düzeltilmiş ama 134'te düzeltme notu yok.
+- Kapananlar: name/stop(liste+string)/response_format/tool_choice/tools/tool_call_id ham e-posta sağlayıcıda yok; bilinmeyen mesaj alanı 400 unsupported_field (400 kabul); user etiketi gitmiyor; kural-enforce akış tamponlu hem facade hem 06a (enforced_at semantiği doğrulandı; varsayılan politika canlı kalıyor); litellm_not_published testi; C11 satırı additive; docs.
+- Koşular: tam entegrasyon 744 passed + 4 skipped; unit+contract 777 iki profilde; kendi probe'larım 14 geçti, 4 başarısız (kalan MAJOR). Egress kapalı facade yolu NOT_RUN: kabul edilebilir (gerekçe raporda). Rapor: state/reviews/06b-r2.md; probe 06b-r2-probe.py. .worktrees/review-06b-r1 klasörü hâlâ silinemiyor (önceki tur, Permission denied); r2 worktree'si git worktree remove ile kaldırıldı. Dosyalar commit edilmemiş.

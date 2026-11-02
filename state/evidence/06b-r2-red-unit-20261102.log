@@ -1,0 +1,38 @@
+ Network ffcore-06b_default  Creating
+ Network ffcore-06b_default  Created
+ Volume "ffcore-06b_langfuse_minio_data"  Creating
+ Volume "ffcore-06b_langfuse_minio_data"  Created
+ Volume "ffcore-06b_postgres_data"  Creating
+ Volume "ffcore-06b_postgres_data"  Created
+ Volume "ffcore-06b_knowledge_storage"  Creating
+ Volume "ffcore-06b_knowledge_storage"  Created
+ Volume "ffcore-06b_redis_data"  Creating
+ Volume "ffcore-06b_redis_data"  Created
+ Volume "ffcore-06b_langfuse_clickhouse_data"  Creating
+ Volume "ffcore-06b_langfuse_clickhouse_data"  Created
+ Volume "ffcore-06b_langfuse_clickhouse_logs"  Creating
+ Volume "ffcore-06b_langfuse_clickhouse_logs"  Created
+ Volume "ffcore-06b_model_cache"  Creating
+ Volume "ffcore-06b_model_cache"  Created
+ Volume "ffcore-06b_langfuse_postgres_data"  Creating
+ Volume "ffcore-06b_langfuse_postgres_data"  Created
+    return self.__pydantic_serializer__.to_python(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/unit/test_06b_facade.py::test_06b_7_numeric_parameter_with_text_400[temperature]
+FAILED tests/unit/test_06b_facade.py::test_06b_7_numeric_parameter_with_text_400[top_p]
+FAILED tests/unit/test_06b_facade.py::test_06b_7_numeric_parameter_with_text_400[max_tokens]
+FAILED tests/unit/test_06b_facade.py::test_06b_7_numeric_parameter_with_text_400[max_completion_tokens]
+FAILED tests/unit/test_06b_facade.py::test_06b_7_numeric_parameter_with_text_400[presence_penalty]
+FAILED tests/unit/test_06b_facade.py::test_06b_7_numeric_parameter_with_text_400[frequency_penalty]
+FAILED tests/unit/test_06b_facade.py::test_06b_7_numeric_parameter_with_text_400[seed]
+FAILED tests/unit/test_06b_facade.py::test_06b_7_numeric_parameter_with_text_400[n]
+FAILED tests/unit/test_06b_facade.py::test_06b_7_numeric_parameter_out_of_range_400[temperature-2.5]
+FAILED tests/unit/test_06b_facade.py::test_06b_7_numeric_parameter_out_of_range_400[top_p-1.5]
+FAILED tests/unit/test_06b_facade.py::test_06b_7_numeric_parameter_out_of_range_400[presence_penalty--2.5]
+FAILED tests/unit/test_06b_facade.py::test_06b_7_numeric_parameter_out_of_range_400[frequency_penalty-3]
+FAILED tests/unit/test_06b_facade.py::test_06b_7_numeric_parameter_out_of_range_400[max_tokens-0]
+FAILED tests/unit/test_06b_facade.py::test_06b_7_numeric_parameter_out_of_range_400[seed-1.5]
+FAILED tests/unit/test_06b_facade.py::test_06b_7_numeric_parameter_out_of_range_400[temperature-True]
+15 failed, 24 passed, 4 warnings in 7.47s

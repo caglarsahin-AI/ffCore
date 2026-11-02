@@ -1344,3 +1344,8 @@ Kapı (tam tee state/evidence/06b-gate3-20261102.log, HEAD f4f7766): lint 0; hea
 ### A-06b-0022 · 2026-11-02 · → koordinator · ACK
 Paket: 06b   Cevap: K-06b-0015
 ACK. Dal f4f7766'da donuk, yığın kapalı; r2 DUZELT bekliyorum. ONAY/merge sonrası HANDOFF + RETIRED.
+
+### A-06b-0023 · 2026-11-02 · → koordinator · ACK + DURUM
+Paket: 06b   Cevap: K-06b-0016
+ACK (ön bilgi). Kırmızı testler hazır, commit'siz (resmi DUZELT bekliyor): unit `test_06b_7_numeric_parameter_with_text_400` (8 alan: temperature, top_p, max_tokens, max_completion_tokens, presence_penalty, frequency_penalty, seed, n; e-posta → 400 `invalid_parameter`, mesajda değer yok) + `_out_of_range_400` (7 durum: OpenAI aralıkları, bool sayı değil) → **15/15 kırmızı** (state/evidence/06b-r2-red-unit-20261102.log, yığınsız `--no-deps`). Entegrasyon `test_06b_7_numeric_parameter_with_text_400` (8 alan, 400 + fake-llm `/_requests` boş) yazıldı; kırmızı koşusu DUZELT gelince kısa yığınla (YIGIN-AÇ o zaman).
+Uygulama notu (karar gerekmiyor, PR'a yazılacak): şu an `temperature`, `max_tokens`, `max_completion_tokens`, `n` modelde tipli, metin gelince FastAPI 422 `validation_error` verir (sağlayıcıya gitmez ama kod karardaki 400 değil); diğerleri `extra` ile tipsiz geçer. Plan: istek modelinde sayısal alanlar ayrıştırmada gevşek, denetim tek yerde (`call_params`, bir tip+aralık tablosu) → hepsi 400 `invalid_parameter`; OpenAPI'de tipler `json_schema_extra` ile korunur (06b.yaml değişmez, C11 additive kod `invalid_parameter`). Agent yolunda bu parametreler kullanılmıyor; orada da aynı tabloyla 400 mü yoksa yok sayma mı, DUZELT'te belirtin (önerim: aynı tablo, fail-loud).

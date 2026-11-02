@@ -1,0 +1,33 @@
+ Network ffcore-06b_default  Creating
+ Network ffcore-06b_default  Created
+ Volume "ffcore-06b_langfuse_postgres_data"  Creating
+ Volume "ffcore-06b_langfuse_postgres_data"  Created
+ Volume "ffcore-06b_model_cache"  Creating
+ Volume "ffcore-06b_model_cache"  Created
+ Volume "ffcore-06b_knowledge_storage"  Creating
+ Volume "ffcore-06b_knowledge_storage"  Created
+ Volume "ffcore-06b_langfuse_clickhouse_data"  Creating
+ Volume "ffcore-06b_langfuse_clickhouse_data"  Created
+ Volume "ffcore-06b_langfuse_clickhouse_logs"  Creating
+ Volume "ffcore-06b_langfuse_clickhouse_logs"  Created
+ Volume "ffcore-06b_postgres_data"  Creating
+ Volume "ffcore-06b_postgres_data"  Created
+ Volume "ffcore-06b_langfuse_minio_data"  Creating
+ Volume "ffcore-06b_langfuse_minio_data"  Created
+ Volume "ffcore-06b_redis_data"  Creating
+ Volume "ffcore-06b_redis_data"  Created
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'ffcore.services.facade_proxy' has no attribute 'litellm_user'
+
+tests/unit/test_06b_facade.py:225: AttributeError
+=========================== short test summary info ============================
+FAILED tests/unit/test_06b_facade.py::test_06b_4_effective_output_mode[monitor-enforce-stages0-True]
+FAILED tests/unit/test_06b_facade.py::test_06b_4_effective_output_mode[enforce-None-stages1-True]
+FAILED tests/unit/test_06b_facade.py::test_06b_4_effective_output_mode[monitor-None-stages2-False]
+FAILED tests/unit/test_06b_facade.py::test_06b_4_effective_output_mode[enforce-monitor-stages3-False]
+FAILED tests/unit/test_06b_facade.py::test_06b_4_effective_output_mode[off-enforce-stages4-False]
+FAILED tests/unit/test_06b_facade.py::test_06b_4_effective_output_mode[enforce-None-stages5-False]
+FAILED tests/unit/test_06b_facade.py::test_06b_7_unknown_message_field_refused
+FAILED tests/unit/test_06b_facade.py::test_06b_7_logit_bias_must_be_token_ids
+FAILED tests/unit/test_06b_facade.py::test_06b_7_user_label_never_leaves - At...
+9 failed, 15 passed in 5.81s

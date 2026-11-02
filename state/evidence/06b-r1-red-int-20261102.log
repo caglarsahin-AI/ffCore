@@ -1,0 +1,32 @@
+git head: 45d901b5a9699bf871bddeb40445fd954b8df6ff + uncommitted red tests
+#26 naming to docker.io/ffcore/backend:0.0.0-06b done
+#26 DONE 0.0s
+ Container ffcore-06b-mcp-search-1  Healthy
+ Container ffcore-06b-mcp-sql-1  Healthy
+2026-11-02 10:10:16,470 WARNING langfuse Context error: No active span in current context. Operations that depend on an active span will be skipped. Ensure spans are created with start_as_current_observation() or that you're operating within an active span context.
+2026-11-02 10:10:16,557 WARNING ffcore.facade facade_stream_error code=guardrail_blocked model=p3a26324e.tooly
+2026-11-02 10:10:16,561 INFO ffcore.access access method=POST path=/v1/chat/completions status=200 ms=206
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/4a87d548-1c46-455e-a9a5-5e2fad4ff7d6/guardrail-policies status=201 ms=88
+WARNING  langfuse:client.py:1399 Context error: No active span in current context. Operations that depend on an active span will be skipped. Ensure spans are created with start_as_current_observation() or that you're operating within an active span context.
+WARNING  langfuse:client.py:1399 Context error: No active span in current context. Operations that depend on an active span will be skipped. Ensure spans are created with start_as_current_observation() or that you're operating within an active span context.
+WARNING  ffcore.facade:facade_proxy.py:347 facade_stream_error code=guardrail_blocked model=p3a26324e.tooly
+INFO     ffcore.access:logging.py:263 access method=POST path=/v1/chat/completions status=200 ms=206
+=========================== short test summary info ============================
+FAILED tests/integration/test_06b_direct.py::test_06b_2_every_text_field_goes_through_egress
+FAILED tests/integration/test_06b_direct.py::test_06b_7_unknown_message_field_400
+FAILED tests/integration/test_06b_direct.py::test_06b_4_stream_holds_when_a_rule_enforces[monitor-enforce-True]
+3 failed, 3 passed, 14 deselected in 26.75s
+/work/backend/tests/integration/test_06b_direct.py:358: AssertionError: {"id":"chatcmpl-6cb3806dce42426fb4c3c38c6694ecd5","object":"chat.completion","created":1793614261,"model":"p5005a39d.chat-default","choices":[{"index":0,"message":{"role":"assistant","content":"hello"},"finish_reason":"stop"}],"usage":{"completion_tokens":2,"prompt_tokens":3,"total_tokens":5}}
+E   KeyError: 'x_platform'
+---------------------------- Captured stderr setup -----------------------------
+2026-11-02 10:11:02,343 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 10:11:02,624 ERROR ffcore.readiness warmup failed: ModelMissing
+----------------------------- Captured stderr call -----------------------------
+/work/backend/tests/integration/test_06b_direct.py:379: KeyError: 'x_platform'
+=========================== short test summary info ============================
+FAILED tests/integration/test_06b_direct.py::test_06b_2_every_text_field_goes_through_egress
+FAILED tests/integration/test_06b_direct.py::test_06b_7_unknown_message_field_400
+FAILED tests/integration/test_06b_direct.py::test_06b_4_stream_holds_when_a_rule_enforces[monitor-enforce-True]
+3 failed, 2 passed, 14 deselected in 20.77s

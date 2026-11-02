@@ -12,7 +12,7 @@
 - **(c) Tek kural:** `block` → `StopRun(failed, "guardrail_block")` (guard_in ile aynı); araç sonucu dahil tüm mesajlarda; sessiz atlama/kırpma yok. (`tool.post` bloğu BLOCKED_TOOL_TEXT ile modele giden metni zaten değiştirir; egress bloğu ise run'ı düşürür.)
 - **(d)** `llm_call.request_messages` = modele giden maskeli liste.
 - Airgap: `EngineGuard` egress'i kapalıyken `allow` döner → ek `if profile` yok; liste değişmeden gider.
-- Detokenize: davranış değişmedi; cevap `guard_out`/finalize yolunda eskisi gibi geri açılır. Entegrasyon testi, tokenize edilen e-posta/telefonun `detokenize` ile geri geldiğini kanıtlar.
+- Detokenize: davranış değişmedi; **üretim yolunda geri açma yok** (`detokenize` yalnız testlerde çağrılır; cevapta yer tutucular `<<PII_n>>` kalır; FOLLOWUP-141, 08 tam/C17). Entegrasyon testi yalnız `detokenize` yardımcısının çalıştığını kanıtlar, üretim akışını değil. (Koordinatör düzeltmesi 2 Kasım, R-06B-0005 MINOR.)
 - assistant `tool_calls[].function.arguments` da aynı sınırda: JSON çözülür, her string değer egress'ten geçer, yeniden `json.dumps` (yapı bozulmaz). (Default politikada `tool.pre` PII kuralı monitor; bu yüzden tool_guard'a güvenilmez.)
 - `guard_in` sonucu `egress_cache`e yazılır; model düğümü ilk kullanıcı mesajını ikinci kez denetlemez (monitor kuralında çift olay yok). Önbellek hem ham hem maskeli metnin hash'ini tutar.
 - Yeni kodlar (C9 additive, docs/agentlar.md): `unsupported_message_content` (content str değil / argüman JSON değil), `guardrail_text_too_long` (`TextTooLong`).
@@ -32,7 +32,7 @@ backend/ffcore/runtime/graph.py, backend/ffcore/runtime/state.py, docs/agentlar.
 | guard_in + model: mesaj başına 1 egress | unit `test_134_guard_in_result_is_not_checked_again_by_the_model_node` | geçti (kırmızı önce) |
 | str olmayan content / TextTooLong kodlu hata | unit `test_134_non_text_content_fails_loud`, `test_134_text_too_long_has_its_own_code` | geçti (kırmızı önce) |
 | Airgap: egress kapalı, değişmeden | unit `test_134_airgap_egress_off_sends_unchanged`; entegr. `test_134_airgap_has_no_egress_stage` | unit geçti; entegr. **koşulmadı** |
-| Gerçek motor/Redis: her mesaj tokenize, iki kez aynı, detokenize geri açar | entegr. `test_134_llmaas_every_message_tokenized_and_idempotent` | **koşulmadı** (yığın gerekir) |
+| Gerçek motor/Redis: her mesaj tokenize, iki kez aynı, detokenize yardımcısı test içinde geri açar (üretimde çağrılmaz, FOLLOWUP-141) | entegr. `test_134_llmaas_every_message_tokenized_and_idempotent` | **koşulmadı** (yığın gerekir) |
 
 ## Çalıştırılan komutlar (yığın `ffcore-134`, 18180/13180, `0.0.0-134`, `--profile test` + qdrant)
 `MSYS_NO_PATHCONV=1 FFCORE_VERSION=0.0.0-134 docker compose -p ffcore-134 --env-file .env.test --profile tools run --rm -T tools ...`. Loglar `state/evidence/134-*-20261102.log`.
@@ -45,7 +45,7 @@ backend/ffcore/runtime/graph.py, backend/ffcore/runtime/state.py, docs/agentlar.
 | `make test-int` (tam, qdrant ile) | llmaas yığını | 682 passed, 4 skipped (`134-test-int`) |
 | `down -v` | | konteyner 0, volume 0 (`134-down`) |
 
-(e)/(f): sağlayıcı isteğinde sistem prompt'u e-postası, geçmiş e-posta, araç sonucu telefonu ve araç argümanı yok; `detokenize` geri açar; airgap'te egress aşaması yok, metin olduğu gibi gider (profil farkı yapılandırma değeri). Tam kalıcı konuşma + gerçek `run_sql` run'ı yerine aynı `model` düğümü gerçek sağlayıcı yoluyla koşuldu: kapsam sınırı.
+(e)/(f): sağlayıcı isteğinde sistem prompt'u e-postası, geçmiş e-posta, araç sonucu telefonu ve araç argümanı yok; üretimde geri açma yok (yer tutucu kalır, FOLLOWUP-141); airgap'te egress aşaması yok, metin olduğu gibi gider (profil farkı yapılandırma değeri). Tam kalıcı konuşma + gerçek `run_sql` run'ı yerine aynı `model` düğümü gerçek sağlayıcı yoluyla koşuldu: kapsam sınırı.
 Not: `make test-int` yalnız llmaas yığınında koşuldu; airgap profili için test-int koşulmadı (egress kapalı davranışı birim ve yukarıdaki iki entegrasyon testiyle kanıtlı). Host Windows koşusundaki 8 ortam hatası docker kapılarında yok (745 passed).
 
 ## Felsefe (3 soru)

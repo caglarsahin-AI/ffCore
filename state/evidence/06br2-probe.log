@@ -1,0 +1,83 @@
+P1 message.name: status=200 code=- provider_saw_email=False
+.2026-11-02 10:53:09,890 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 10:53:10,438 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 10:53:10,805 ERROR ffcore.readiness warmup failed: ModelMissing
+P1 stop: status=200 code=- provider_saw_email=False
+2026-11-02 10:53:11,612 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 10:53:11,854 ERROR ffcore.readiness warmup failed: ModelMissing
+P1 stop_str: status=200 code=- provider_saw_email=False
+2026-11-02 10:53:12,698 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 10:53:12,981 ERROR ffcore.readiness warmup failed: ModelMissing
+P1 response_format: status=200 code=- provider_saw_email=False
+2026-11-02 10:53:13,962 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 10:53:14,264 ERROR ffcore.readiness warmup failed: ModelMissing
+P1 tool_choice: status=200 code=- provider_saw_email=False
+2026-11-02 10:53:15,188 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 10:53:15,581 ERROR ffcore.readiness warmup failed: ModelMissing
+P1 tools.description: status=200 code=- provider_saw_email=False
+2026-11-02 10:53:16,626 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 10:53:17,054 ERROR ffcore.readiness warmup failed: ModelMissing
+P1 tool_call_id: status=200 code=- provider_saw_email=False
+2026-11-02 10:53:18,022 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 10:53:18,316 ERROR ffcore.readiness warmup failed: ModelMissing
+P1 top_p: status=200 code=- provider_saw_email=True
+2026-11-02 10:53:19,158 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 10:53:19,449 ERROR ffcore.readiness warmup failed: ModelMissing
+P1 seed: status=200 code=- provider_saw_email=True
+2026-11-02 10:53:20,329 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 10:53:20,597 ERROR ffcore.readiness warmup failed: ModelMissing
+P1 presence_penalty: status=200 code=- provider_saw_email=True
+2026-11-02 10:53:21,421 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 10:53:21,708 ERROR ffcore.readiness warmup failed: ModelMissing
+P1 frequency_penalty: status=200 code=- provider_saw_email=True
+2026-11-02 10:53:22,578 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 10:53:22,862 ERROR ffcore.readiness warmup failed: ModelMissing
+P1 logit_bias: status=400 code=parameter_not_supported provider_saw_email=False
+2026-11-02 10:53:23,501 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 10:53:23,758 ERROR ffcore.readiness warmup failed: ModelMissing
+P2 unknown field: 400 unsupported_field Unsupported fields in messages[0]: ['x_secret']
+P2 echoed assistant field annotations=[]: 400
+P2 echoed assistant field refusal=None: 200
+P2 echoed assistant field audio=None: 200
+P2 echoed assistant field function_call=None: 200
+P2 echoed assistant field annotations=[{'type': 'url_citation'}]: 400
+2026-11-02 10:53:25,254 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 10:53:25,509 ERROR ffcore.readiness warmup failed: ModelMissing
+P3 user label at provider: False
+2026-11-02 10:53:26,432 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 10:53:26,804 ERROR ffcore.readiness warmup failed: ModelMissing
+P4 non-stream: 400 | stream: 200 secret in stream: False | first x_platform: {'event': 'progress', 'kind': 'output_buffered'}
+2026-11-02 10:53:27,835 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 10:53:28,172 ERROR ffcore.readiness warmup failed: ModelMissing
+P5 default policy first chunk x_platform: None
+P5 monitor policy + monitor rule: stream live -> True
+2026-11-02 10:53:29,643 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 10:53:29,944 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 10:53:30,206 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 10:53:30,439 ERROR ffcore.readiness warmup failed: ModelMissing
+P7 byte-equal 403 OK
+>       assert not leaked, f"{label} reached the provider unmasked"
+E       AssertionError: top_p reached the provider unmasked
+tests/integration/test_zz_rev06b_probe.py:64: AssertionError
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+>       assert not leaked, f"{label} reached the provider unmasked"
+E       AssertionError: seed reached the provider unmasked
+tests/integration/test_zz_rev06b_probe.py:64: AssertionError
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+>       assert not leaked, f"{label} reached the provider unmasked"
+E       AssertionError: presence_penalty reached the provider unmasked
+tests/integration/test_zz_rev06b_probe.py:64: AssertionError
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+>       assert not leaked, f"{label} reached the provider unmasked"
+E       AssertionError: frequency_penalty reached the provider unmasked
+tests/integration/test_zz_rev06b_probe.py:64: AssertionError
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+FAILED tests/integration/test_zz_rev06b_probe.py::test_p1_every_field_no_raw_email_at_the_provider[top_p-patch7]
+FAILED tests/integration/test_zz_rev06b_probe.py::test_p1_every_field_no_raw_email_at_the_provider[seed-patch8]
+FAILED tests/integration/test_zz_rev06b_probe.py::test_p1_every_field_no_raw_email_at_the_provider[presence_penalty-patch9]
+FAILED tests/integration/test_zz_rev06b_probe.py::test_p1_every_field_no_raw_email_at_the_provider[frequency_penalty-patch10]
+4 failed, 14 passed in 42.20s
