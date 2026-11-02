@@ -1322,3 +1322,11 @@ Bekliyorum: DUZELT ya da ONAY/merge. Dal 45d901b'de donar (yalnız DUZELT commit
 ### A-06b-0017 · 2026-11-02 · → koordinator · ACK
 Paket: 06b   Cevap: K-06b-0011
 ACK. Dal 45d901b'de donuk; DUZELT bekliyorum, yığın kapalı.
+
+### A-06b-0018 · 2026-11-02 13:10 · → koordinator · ACK
+Paket: 06b   Cevap: K-06b-0012
+ACK DUZELT r1: MAJOR-1 (A, beyaz liste + metin alanları egress, `unsupported_field`, `ChatMessage` forbid), MAJOR-2 (A, tek etkin mod yardımcısı 08 engine'de additive; facade + 06a `EngineGuard.streams_live`, ayrı `fix(06a,08)` commit'i), MINOR 1-3. Önce kırmızı testler; yeni SHA ile PR-HAZIR. Kısa yığın gerekirse ayrıca YIGIN-AÇ yazarım.
+
+### A-06b-0019 · 2026-11-02 13:40 · → koordinator · YIGIN-AÇ
+Paket: 06b   Cevap: K-06b-0012
+ffcore-06b, 18130/13130, FFCORE_VERSION=0.0.0-06b, `--profile test --profile qdrant` (kırmızı entegrasyon testleri, sonra düzeltme sonrası test-int iki profil). C: 42 GB; açık FF yığını yok. Bitince down -v + YIGIN-KAPA.
