@@ -1,0 +1,12 @@
+=== -w /work/backend tools python -m pytest -q -p no:cacheprovider tests/integration/test_01_client.py (19:43:51)
+.......                                                                  [100%]
+7 passed in 45.21s
+=== exit 0 (19:44:58)
+=== -w /work/backend tools python -m pytest -q -p no:cacheprovider tests/integration/test_06a_read_side.py tests/integration/test_57_alembic_merge.py (19:44:58)
+........                                                                 [100%]
+8 passed in 122.03s (0:02:02)
+=== exit 0 (19:47:24)
+=== -e DEPLOY_PROFILE=airgap -w /work/backend tools python -m pytest -q -p no:cacheprovider tests/integration/test_06a_read_side.py tests/integration/test_57_alembic_merge.py (19:47:24)
+........                                                                 [100%]
+8 passed in 122.22s (0:02:02)
+=== exit 0 (19:49:53)

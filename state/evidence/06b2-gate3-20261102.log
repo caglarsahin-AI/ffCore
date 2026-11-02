@@ -1,0 +1,14 @@
+=== tools make lint (20:40:24)
+ruff check backend scripts data/samples/scripts services
+All checks passed!
+ruff format --check backend scripts data/samples/scripts services
+393 files already formatted
+=== exit 0 (20:40:39)
+=== -w /work/backend tools python -m pytest -q -p no:cacheprovider tests/integration/test_06a_read_side.py (20:40:40)
+.                                                                        [100%]
+1 passed in 33.85s
+=== exit 0 (20:41:37)
+=== -e DEPLOY_PROFILE=airgap -w /work/backend tools python -m pytest -q -p no:cacheprovider tests/integration/test_06a_read_side.py (20:41:38)
+.                                                                        [100%]
+1 passed in 37.71s
+=== exit 0 (20:42:40)

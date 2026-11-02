@@ -237,3 +237,686 @@ generated tickets -> /tmp/tmp4_3_42jv/tickets
 generated poison -> /tmp/tmp4_3_42jv/poison
 generated projects -> /tmp/tmp4_3_42jv/projects
 generated versions -> /tmp/tmp4_3_42jv/versions
+ok
+generated contracts -> /tmp/tmp339v8n8q/contracts
+generated eval -> /tmp/tmp339v8n8q/eval
+test_13a_4_eval_distribution (test_13a.Test13aEval.test_13a_4_eval_distribution) ... ok
+test_13a_4b_eval_required_metadata (test_13a.Test13aEval.test_13a_4b_eval_required_metadata) ... ok
+test_13a_4c_eval_answerability_checks (test_13a.Test13aEval.test_13a_4c_eval_answerability_checks) ... ok
+test_13a_4d_sql_expected_results (test_13a.Test13aEval.test_13a_4d_sql_expected_results) ... ok
+test_13a_4f_gold_answer_passes_must_contain (test_13a.Test13aEval.test_13a_4f_gold_answer_passes_must_contain) ... ok
+generated memory -> /tmp/tmpgkt3y1pw/memory
+test_13a_6_memory_conversations (test_13a.Test13aMemory.test_13a_6_memory_conversations) ... ok
+test_13a_6b_memory_total_40 (test_13a.Test13aMemory.test_13a_6b_memory_total_40) ... ok
+test_13a_7_openapi_superset_6_ops (test_13a.Test13aOpenapi.test_13a_7_openapi_superset_6_ops) ... generated openapi -> /tmp/tmp17hi5oo0/openapi
+ok
+test_13a_9_no_person_names_outside_pii_memory (test_13a.Test13aPersonNames.test_13a_9_no_person_names_outside_pii_memory) ... ok
+generated pii -> /tmp/tmpf3a4c4a2/pii
+test_13a_5_pii_labeled (test_13a.Test13aPii.test_13a_5_pii_labeled) ... ok
+test_13a_5_validators_match_known_examples (test_13a.Test13aPii.test_13a_5_validators_match_known_examples) ... ok
+test_13a_5b_pii_total_100 (test_13a.Test13aPii.test_13a_5b_pii_total_100) ... ok
+generated schema -> /tmp/tmpi7yauztm/schema
+test_13a_2_schema_seed_10000_rows (test_13a.Test13aSchema.test_13a_2_schema_seed_10000_rows) ... ok
+test_13a_2b_schema_no_person_level_columns (test_13a.Test13aSchema.test_13a_2b_schema_no_person_level_columns) ... ok
+test_13a_2c_descriptions_and_20_few_shots (test_13a.Test13aSchema.test_13a_2c_descriptions_and_20_few_shots) ... ok
+test_13a_2d_postgres_load (test_13a_pg.Test13aPostgres.test_13a_2d_postgres_load) ... skipped 'NOT_RUN: set RUN_PG_TESTS=1 (needs Docker)'
+test_13a_2e_few_shots_run_as_readonly (test_13a_pg.Test13aPostgres.test_13a_2e_few_shots_run_as_readonly) ... skipped 'NOT_RUN: set RUN_PG_TESTS=1 (needs Docker)'
+test_13a_4d_sql_expected_results_in_postgres (test_13a_pg.Test13aPostgres.test_13a_4d_sql_expected_results_in_postgres) ... skipped 'NOT_RUN: set RUN_PG_TESTS=1 (needs Docker)'
+test_18_ag_1_same_shape_as_13a_templates (test_18.Test18Agents.test_18_ag_1_same_shape_as_13a_templates) ... ok
+test_18_ag_2_poison_agent_has_its_kb_and_a_tool_to_resist (test_18.Test18Agents.test_18_ag_2_poison_agent_has_its_kb_and_a_tool_to_resist) ... ok
+test_18_ag_3_version_agent_reads_versions_kb_and_names_the_date (test_18.Test18Agents.test_18_ag_3_version_agent_reads_versions_kb_and_names_the_date) ... ok
+test_18_0_deterministic (test_18.Test18Deterministic.test_18_0_deterministic) ... generated scenarios_sql -> /tmp/tmpduntxkri/scenarios_sql
+generated tickets -> /tmp/tmpduntxkri/tickets
+generated poison -> /tmp/tmpduntxkri/poison
+generated projects -> /tmp/tmpduntxkri/projects
+generated versions -> /tmp/tmpduntxkri/versions
+generated scenarios_sql -> /tmp/tmp7rt2o3t7/scenarios_sql
+generated tickets -> /tmp/tmp7rt2o3t7/tickets
+generated poison -> /tmp/tmp7rt2o3t7/poison
+generated projects -> /tmp/tmp7rt2o3t7/projects
+generated versions -> /tmp/tmp7rt2o3t7/versions
+ok
+test_18_0b_separate_rng_streams (test_18.Test18Deterministic.test_18_0b_separate_rng_streams) ... ok
+test_18_f11_1_shape (test_18.Test18Poison.test_18_f11_1_shape) ... ok
+test_18_f11_2_canaries_only_in_injection (test_18.Test18Poison.test_18_f11_2_canaries_only_in_injection) ... ok
+test_18_f11_3_legit_fact_present (test_18.Test18Poison.test_18_f11_3_legit_fact_present) ... ok
+test_18_f11_4_no_pii_no_names (test_18.Test18Poison.test_18_f11_4_no_pii_no_names) ... ok
+test_18_f11_5_b2_target_value (test_18.Test18Poison.test_18_f11_5_b2_target_value) ... ok
+test_13b_1_members_have_role_full_names (test_18.Test18Projects.test_13b_1_members_have_role_full_names)
+13b (K-13b-0001 S1): every member has a display name built from project, role and ... ok
+test_18_f10_1_projects_shape (test_18.Test18Projects.test_18_f10_1_projects_shape) ... ok
+test_18_f10_2_no_secret (test_18.Test18Projects.test_18_f10_2_no_secret) ... ok
+test_18_f10_3_sources_exist (test_18.Test18Projects.test_18_f10_3_sources_exist) ... ok
+test_18_f3_1_sql20_shape (test_18.Test18Sql.test_18_f3_1_sql20_shape) ... ok
+test_18_f3_2_reuses_13a_sql_items (test_18.Test18Sql.test_18_f3_2_reuses_13a_sql_items) ... ok
+test_18_f3_3_expected_from_seed (test_18.Test18Sql.test_18_f3_3_expected_from_seed) ... ok
+test_18_f3_5_difficulty_mix (test_18.Test18Sql.test_18_f3_5_difficulty_mix) ... ok
+test_18_f3_5b_not_a_few_shot (test_18.Test18Sql.test_18_f3_5b_not_a_few_shot) ... ok
+test_18_f3_6_write_attempts_cover_classes (test_18.Test18Sql.test_18_f3_6_write_attempts_cover_classes) ... ok
+test_18_f3_6b_hidden_write_pattern_coverage (test_18.Test18Sql.test_18_f3_6b_hidden_write_pattern_coverage)
+Each way of hiding a write has at least one hidden_write record (r1 MAJOR-1: ... ok
+test_18_f2_1_tickets_shape_and_labels (test_18.Test18Tickets.test_18_f2_1_tickets_shape_and_labels) ... ok
+test_18_f2_2_pii_spans_valid (test_18.Test18Tickets.test_18_f2_2_pii_spans_valid) ... ok
+test_18_f2_3_no_stray_pii (test_18.Test18Tickets.test_18_f2_3_no_stray_pii) ... ok
+test_18_f2_4_no_person_names (test_18.Test18Tickets.test_18_f2_4_no_person_names) ... ok
+test_18_f2_5_labels_not_in_tickets (test_18.Test18Tickets.test_18_f2_5_labels_not_in_tickets) ... ok
+test_18_f13_1_replay_v1_identical (test_18.Test18Versions.test_18_f13_1_replay_v1_identical) ... ok
+test_18_f13_2_single_clause_changed (test_18.Test18Versions.test_18_f13_2_single_clause_changed) ... ok
+test_18_f13_3_not_in_f1_exam (test_18.Test18Versions.test_18_f13_3_not_in_f1_exam) ... ok
+test_18_f3_4_reference_sql_matches_postgres (test_18_pg.Test18Postgres.test_18_f3_4_reference_sql_matches_postgres) ... skipped 'NOT_RUN: set RUN_PG_TESTS=1 (needs Docker)'
+test_18_f3_7_write_attempts_fail_readonly (test_18_pg.Test18Postgres.test_18_f3_7_write_attempts_fail_readonly)
+Every write and hidden write fails in a session set up like mcp-sql's (05a ... skipped 'NOT_RUN: set RUN_PG_TESTS=1 (needs Docker)'
+
+----------------------------------------------------------------------
+Ran 54 tests in 5.824s
+
+OK (skipped=5)
+=== exit 0 (18:56:04)
+=== tools make test-int (18:56:04)
+cd backend && QDRANT_URL=http://qdrant:6333 RUN_QDRANT_TESTS=1 pytest tests/integration
+============================= test session starts ==============================
+platform linux -- Python 3.12.10, pytest-9.2.0, pluggy-1.7.0
+rootdir: /work/backend
+configfile: pyproject.toml
+plugins: Faker-40.43.0, anyio-4.15.1, langsmith-0.14.8
+collected 802 items
+
+tests/integration/test_01_client.py .....F.                              [  0%]
+tests/integration/test_01_events.py ...                                  [  1%]
+tests/integration/test_01_reconcile.py ...........                       [  2%]
+tests/integration/test_01_reconcile_shutdown.py ...                      [  2%]
+tests/integration/test_01_seed.py ...                                    [  3%]
+tests/integration/test_02_langfuse.py ....                               [  3%]
+tests/integration/test_02_pricing.py .                                   [  3%]
+tests/integration/test_02_r1_worker_logging.py .                         [  4%]
+tests/integration/test_03a_access.py ............                        [  5%]
+tests/integration/test_03a_auth.py ..............                        [  7%]
+tests/integration/test_03a_models.py ...........                         [  8%]
+tests/integration/test_03a_nonmember_404.py ............................ [ 12%]
+........................................................................ [ 21%]
+..                                                                       [ 21%]
+tests/integration/test_03a_obo_scope.py ................                 [ 23%]
+tests/integration/test_03a_providers.py ................                 [ 25%]
+tests/integration/test_03a_read_side.py .......                          [ 26%]
+tests/integration/test_03a_schema.py .......                             [ 27%]
+tests/integration/test_03b_audit.py ............                         [ 28%]
+tests/integration/test_03b_egress_dns.py s                               [ 28%]
+tests/integration/test_03c_alerts.py ................                    [ 30%]
+tests/integration/test_03c_keys.py ..............................        [ 34%]
+tests/integration/test_03c_quota_engine.py ............                  [ 36%]
+tests/integration/test_03c_quotas_api.py .......                         [ 36%]
+tests/integration/test_03c_r1_audit_throttle.py .....                    [ 37%]
+tests/integration/test_03c_retention_content.py ...........              [ 38%]
+tests/integration/test_03c_retention_document_delete.py ..               [ 39%]
+tests/integration/test_03c_retention_job.py ...............              [ 41%]
+tests/integration/test_03c_run_quota.py .......                          [ 41%]
+tests/integration/test_04a_api.py .............                          [ 43%]
+tests/integration/test_04a_embed_api.py ....                             [ 44%]
+tests/integration/test_04a_ingest.py .s..........s                       [ 45%]
+tests/integration/test_04a_qdrant.py ....                                [ 46%]
+tests/integration/test_04a_readyz.py ....                                [ 46%]
+tests/integration/test_04a_review_r1_acl.py ........                     [ 47%]
+tests/integration/test_04a_review_r1_ingest.py ......                    [ 48%]
+tests/integration/test_04a_review_r1_upload.py ..                        [ 48%]
+tests/integration/test_04a_search.py ........                            [ 49%]
+tests/integration/test_04a_store.py ..........                           [ 50%]
+tests/integration/test_04a_worker.py ..                                  [ 51%]
+tests/integration/test_05a_live_services.py .....                        [ 51%]
+tests/integration/test_05a_obo_verify.py .......                         [ 52%]
+tests/integration/test_05a_search.py ........                            [ 53%]
+tests/integration/test_05a_sql.py ..............s.....                   [ 56%]
+tests/integration/test_05a_tools_api.py ................................ [ 60%]
+................                                                         [ 62%]
+tests/integration/test_06a_adapters.py ..                                [ 62%]
+tests/integration/test_06a_agents.py ........                            [ 63%]
+tests/integration/test_06a_feedback.py .....                             [ 63%]
+tests/integration/test_06a_graph.py ............................         [ 67%]
+tests/integration/test_06a_mcp_tools.py ............                     [ 68%]
+tests/integration/test_06a_read_side.py F                                [ 69%]
+tests/integration/test_06a_readyz.py ..                                  [ 69%]
+tests/integration/test_06a_run_access.py ..........                      [ 70%]
+tests/integration/test_06a_runs_api.py .........                         [ 71%]
+tests/integration/test_06a_scheduler.py .......                          [ 72%]
+tests/integration/test_06a_schema.py .........                           [ 73%]
+tests/integration/test_06b2_external_agent.py ...................        [ 76%]
+tests/integration/test_06b2_migration.py .                               [ 76%]
+tests/integration/test_06b_agent.py ......................               [ 78%]
+tests/integration/test_06b_direct.py .............................       [ 82%]
+tests/integration/test_06b_identity.py ............                      [ 84%]
+tests/integration/test_06b_key_search.py ......                          [ 84%]
+tests/integration/test_06b_manifest.py .....                             [ 85%]
+tests/integration/test_07_api_read.py ............                       [ 86%]
+tests/integration/test_07_decide.py .........                            [ 88%]
+tests/integration/test_07_flow.py ..........                             [ 89%]
+tests/integration/test_07_schema.py ...........                          [ 90%]
+tests/integration/test_07_service.py ........                            [ 91%]
+tests/integration/test_07f_followups.py ....                             [ 92%]
+tests/integration/test_07f_sql_context_roles.py ..                       [ 92%]
+tests/integration/test_08_api.py ................                        [ 94%]
+tests/integration/test_116_checkpoint_sources.py ..........              [ 95%]
+tests/integration/test_134_egress_real_engine.py ..                      [ 95%]
+tests/integration/test_134_provider_request.py ..                        [ 96%]
+tests/integration/test_18td_tools_api.py ...                             [ 96%]
+tests/integration/test_19_ingest_raw.py .....s..........                 [ 98%]
+tests/integration/test_57_alembic_merge.py .....F.                       [ 99%]
+tests/integration/test_af_2b_deleted_source_breadcrumb.py ..             [ 99%]
+tests/integration/test_af_3_updated_at_source.py ...                     [100%]
+
+=================================== FAILURES ===================================
+____________________ test_01_9_extra_body_reaches_upstream _____________________
+
+database_url = 'postgresql+psycopg://ffcore:dummy-not-secret-postgres@postgres:5432/ffcore_test_87a9fccfb423'
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_87a9fccfb423) at 0x7f7362d4c6e0>
+catalog = <tests.integration.litellm_support.catalog.<locals>.Catalog object at 0x7f7362d4efc0>
+project = (UUID('48fcb7d3-c902-472a-a5f6-1ad17aeafae0'), UUID('b7ce54f6-dd13-4c66-9835-6c97272b33e7'))
+llm_settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+
+    def test_01_9_extra_body_reaches_upstream(database_url, pg, catalog, project, llm_settings):
+        project_id, provider = project
+        catalog.model(project_id, provider)
+>       run_reconcile(database_url, llm_settings)
+
+tests/integration/test_01_client.py:130: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/litellm_support.py:162: in run_reconcile
+    return asyncio.run(go())
+           ^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/runners.py:195: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/base_events.py:691: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/integration/litellm_support.py:158: in go
+    return await reconcile(session, settings)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ffcore/services/litellm_reconcile.py:368: in reconcile
+    report = await apply(admin, desired, dry_run)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ffcore/services/litellm_reconcile.py:356: in apply
+    await admin.model_delete(model_id)
+ffcore/services/litellm_reconcile.py:293: in model_delete
+    await self._call("POST", "/model/delete", {"id": model_id})
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ffcore.services.litellm_reconcile.LiteLLMAdmin object at 0x7f7362d43bc0>
+method = 'POST', path = '/model/delete'
+body = {'id': 'ee2266dc-a91f-4706-913b-b1c13f52a85c'}, params = None
+
+    async def _call(self, method: str, path: str, body: Any = None, params=None) -> Any:
+        if path.startswith("/config/"):
+            # Stores general_settings (master key, database URL) in plain text (K-01-0004).
+            raise RuntimeError("LiteLLM /config/* is never called by FFCore")
+        response = await self._client.request(
+            method,
+            f"{self._conf.url}{path}",
+            headers={"Authorization": f"Bearer {self._conf.master_key}"},
+            json=body,
+            params=params,
+        )
+        if response.status_code >= 400:
+>           raise LiteLLMError(response.status_code, path, safe_error(response))
+E           ffcore.services.litellm_client.LiteLLMError: LiteLLM /model/delete answered upstream_status=400 error_type=auth_error error_code=400 call_id=unknown
+
+ffcore/services/litellm_reconcile.py:278: LiteLLMError
+________________________ test_06a_read_mode_get_parity _________________________
+
+app = <fastapi.applications.FastAPI object at 0x7f73648d5c40>
+database_url = 'postgresql+psycopg://ffcore:dummy-not-secret-postgres@postgres:5432/ffcore_test_87a9fccfb423'
+app_settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_87a9fccfb423) at 0x7f71fa51b1a0>
+make_project = <function make_project.<locals>.make at 0x7f71fa6db420>
+make_user = <function make_user.<locals>.make at 0x7f71fa7d67a0>
+client_factory = <function client_factory.<locals>.make at 0x7f71fa6d94e0>
+
+    def test_06a_read_mode_get_parity(
+        app, database_url, app_settings, pg, make_project, make_user, client_factory
+    ):
+        import os
+    
+        from pydantic import SecretStr
+    
+        project_id = make_project()
+        run_id = seed_run(pg, project_id, definition())
+        setup(database_url)
+        settings = app_settings.model_copy(
+            update={
+                "database_url": SecretStr(database_url),
+                "redis_url": SecretStr(os.environ["REDIS_URL"]),
+            }
+        )
+        Harness(database_url, settings).run(
+            run_id, Ports(ScriptedModel(turn("A [1].")), ScriptedRetriever([source()]))
+        )
+        agent_id = pg.execute("SELECT agent_id FROM runs WHERE id = %s", (run_id,)).fetchone()[0]
+        world = {
+            "project_id": str(project_id),
+            "agent_id": str(agent_id),
+            "run_id": str(run_id),
+            "version": "1",
+        }
+    
+        from ffcore.core.config import get_settings
+    
+        app.dependency_overrides[get_settings] = lambda: settings
+        _, editor = make_user(superadmin="edit")
+        _, reader = make_user(superadmin="read")
+        edit, read = client_factory(editor), client_factory(reader)
+        checked = 0
+        for path, ops in app.openapi()["paths"].items():
+            if "get" not in ops or not (
+                path.startswith(f"{API}/projects/{{project_id}}/agents/{{agent_id}}")
+                or path.startswith(f"{API}/projects/{{project_id}}/runs/{{run_id}}")
+            ):
+                continue
+            url = re.sub(r"\{(\w+)\}", lambda m: world[m.group(1)], path)
+            a, b = edit.get(url), read.get(url)
+>           assert a.status_code == 200, (url, a.text)
+E           AssertionError: ('/api/v1/projects/65cd67c4-5efb-41b7-83ac-063363a171ec/agents/d3b60685-839c-4ca5-8d46-f7c94d001414/external', '{"error":{"message":"This agent is not an external agent.","type":"conflict_error","code":"agent_not_external"}}')
+E           assert 409 == 200
+E            +  where 409 = <Response [409 Conflict]>.status_code
+
+tests/integration/test_06a_read_side.py:63: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+2026-11-02 16:09:32,730 INFO mcp.server.streamable_http_manager StreamableHTTP session manager shutting down
+------------------------------ Captured log setup ------------------------------
+INFO     mcp.server.streamable_http_manager:streamable_http_manager.py:166 StreamableHTTP session manager shutting down
+----------------------------- Captured stderr call -----------------------------
+2026-11-02 16:09:33,508 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 16:09:33,917 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-28c7ae2e56.chat-default code=provider_not_assigned
+2026-11-02 16:09:33,917 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-2f2241a0dc.chat-default code=provider_not_assigned
+2026-11-02 16:09:33,918 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-3e2f80e43e.chat-default code=provider_not_assigned
+2026-11-02 16:09:33,918 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p4f5a9eae.chat-default code=egress_not_allowlisted
+2026-11-02 16:09:33,918 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p4f5a9eae.chat-fallback code=egress_not_allowlisted
+2026-11-02 16:09:33,918 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-5784734696.chat-default code=provider_not_assigned
+2026-11-02 16:09:33,918 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-5ab63ef3e5.chat-default code=provider_not_assigned
+2026-11-02 16:09:33,918 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-97e054452a.chat-default code=provider_not_assigned
+2026-11-02 16:09:33,918 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-af7969e648.chat-default code=provider_not_assigned
+2026-11-02 16:09:33,918 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-c0b9b1229c.chat-default code=provider_not_assigned
+2026-11-02 16:09:33,919 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-d6d969ed8a.chat-default code=provider_not_assigned
+2026-11-02 16:09:33,919 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=11
+2026-11-02 16:09:33,934 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=422
+2026-11-02 16:09:34,138 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 16:09:34,481 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-28c7ae2e56.chat-default code=provider_not_assigned
+2026-11-02 16:09:34,483 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-2f2241a0dc.chat-default code=provider_not_assigned
+2026-11-02 16:09:34,483 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-3e2f80e43e.chat-default code=provider_not_assigned
+2026-11-02 16:09:34,484 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p4f5a9eae.chat-default code=egress_not_allowlisted
+2026-11-02 16:09:34,484 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p4f5a9eae.chat-fallback code=egress_not_allowlisted
+2026-11-02 16:09:34,484 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-5784734696.chat-default code=provider_not_assigned
+2026-11-02 16:09:34,484 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-5ab63ef3e5.chat-default code=provider_not_assigned
+2026-11-02 16:09:34,485 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-97e054452a.chat-default code=provider_not_assigned
+2026-11-02 16:09:34,485 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-af7969e648.chat-default code=provider_not_assigned
+2026-11-02 16:09:34,485 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-c0b9b1229c.chat-default code=provider_not_assigned
+2026-11-02 16:09:34,485 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-d6d969ed8a.chat-default code=provider_not_assigned
+2026-11-02 16:09:34,487 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=11
+2026-11-02 16:09:34,552 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=404
+2026-11-02 16:09:34,716 INFO ffcore.access access method=GET path=/api/v1/projects/65cd67c4-5efb-41b7-83ac-063363a171ec/agents/d3b60685-839c-4ca5-8d46-f7c94d001414 status=200 ms=160
+2026-11-02 16:09:34,855 INFO ffcore.access access method=GET path=/api/v1/projects/65cd67c4-5efb-41b7-83ac-063363a171ec/agents/d3b60685-839c-4ca5-8d46-f7c94d001414 status=200 ms=135
+2026-11-02 16:09:35,034 INFO ffcore.access access method=GET path=/api/v1/projects/65cd67c4-5efb-41b7-83ac-063363a171ec/agents/d3b60685-839c-4ca5-8d46-f7c94d001414/versions status=200 ms=154
+2026-11-02 16:09:35,165 INFO ffcore.access access method=GET path=/api/v1/projects/65cd67c4-5efb-41b7-83ac-063363a171ec/agents/d3b60685-839c-4ca5-8d46-f7c94d001414/versions status=200 ms=121
+2026-11-02 16:09:35,314 INFO ffcore.access access method=GET path=/api/v1/projects/65cd67c4-5efb-41b7-83ac-063363a171ec/agents/d3b60685-839c-4ca5-8d46-f7c94d001414/versions/1 status=200 ms=144
+2026-11-02 16:09:35,439 INFO ffcore.access access method=GET path=/api/v1/projects/65cd67c4-5efb-41b7-83ac-063363a171ec/agents/d3b60685-839c-4ca5-8d46-f7c94d001414/versions/1 status=200 ms=123
+2026-11-02 16:09:35,626 INFO ffcore.access access method=GET path=/api/v1/projects/65cd67c4-5efb-41b7-83ac-063363a171ec/runs/8d137987-211f-4413-becf-3c6b018b206e status=200 ms=178
+2026-11-02 16:09:35,781 INFO ffcore.access access method=GET path=/api/v1/projects/65cd67c4-5efb-41b7-83ac-063363a171ec/runs/8d137987-211f-4413-becf-3c6b018b206e status=200 ms=140
+2026-11-02 16:09:35,919 INFO ffcore.access access method=GET path=/api/v1/projects/65cd67c4-5efb-41b7-83ac-063363a171ec/runs/8d137987-211f-4413-becf-3c6b018b206e/events status=200 ms=131
+2026-11-02 16:09:36,025 INFO ffcore.access access method=GET path=/api/v1/projects/65cd67c4-5efb-41b7-83ac-063363a171ec/runs/8d137987-211f-4413-becf-3c6b018b206e/events status=200 ms=102
+2026-11-02 16:09:36,219 INFO ffcore.access access method=GET path=/api/v1/projects/65cd67c4-5efb-41b7-83ac-063363a171ec/runs/8d137987-211f-4413-becf-3c6b018b206e/stream status=200 ms=191
+2026-11-02 16:09:36,433 INFO ffcore.access access method=GET path=/api/v1/projects/65cd67c4-5efb-41b7-83ac-063363a171ec/runs/8d137987-211f-4413-becf-3c6b018b206e/stream status=200 ms=202
+2026-11-02 16:09:36,550 INFO ffcore.access access method=GET path=/api/v1/projects/65cd67c4-5efb-41b7-83ac-063363a171ec/agents/d3b60685-839c-4ca5-8d46-f7c94d001414/manifest status=200 ms=113
+2026-11-02 16:09:36,705 INFO ffcore.access access method=GET path=/api/v1/projects/65cd67c4-5efb-41b7-83ac-063363a171ec/agents/d3b60685-839c-4ca5-8d46-f7c94d001414/manifest status=200 ms=130
+2026-11-02 16:09:36,899 INFO ffcore.access access method=GET path=/api/v1/projects/65cd67c4-5efb-41b7-83ac-063363a171ec/agents/d3b60685-839c-4ca5-8d46-f7c94d001414/external status=409 ms=188
+2026-11-02 16:09:37,078 INFO ffcore.access access method=GET path=/api/v1/projects/65cd67c4-5efb-41b7-83ac-063363a171ec/agents/d3b60685-839c-4ca5-8d46-f7c94d001414/external status=409 ms=175
+------------------------------ Captured log call -------------------------------
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-28c7ae2e56.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-2f2241a0dc.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-3e2f80e43e.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p4f5a9eae.chat-default code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p4f5a9eae.chat-fallback code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-5784734696.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-5ab63ef3e5.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-97e054452a.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-af7969e648.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-c0b9b1229c.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-d6d969ed8a.chat-default code=provider_not_assigned
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=11
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=422
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-28c7ae2e56.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-2f2241a0dc.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-3e2f80e43e.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p4f5a9eae.chat-default code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p4f5a9eae.chat-fallback code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-5784734696.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-5ab63ef3e5.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-97e054452a.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-af7969e648.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-c0b9b1229c.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-d6d969ed8a.chat-default code=provider_not_assigned
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=11
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=404
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/65cd67c4-5efb-41b7-83ac-063363a171ec/agents/d3b60685-839c-4ca5-8d46-f7c94d001414 status=200 ms=160
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/65cd67c4-5efb-41b7-83ac-063363a171ec/agents/d3b60685-839c-4ca5-8d46-f7c94d001414 status=200 ms=135
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/65cd67c4-5efb-41b7-83ac-063363a171ec/agents/d3b60685-839c-4ca5-8d46-f7c94d001414/versions status=200 ms=154
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/65cd67c4-5efb-41b7-83ac-063363a171ec/agents/d3b60685-839c-4ca5-8d46-f7c94d001414/versions status=200 ms=121
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/65cd67c4-5efb-41b7-83ac-063363a171ec/agents/d3b60685-839c-4ca5-8d46-f7c94d001414/versions/1 status=200 ms=144
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/65cd67c4-5efb-41b7-83ac-063363a171ec/agents/d3b60685-839c-4ca5-8d46-f7c94d001414/versions/1 status=200 ms=123
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/65cd67c4-5efb-41b7-83ac-063363a171ec/runs/8d137987-211f-4413-becf-3c6b018b206e status=200 ms=178
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/65cd67c4-5efb-41b7-83ac-063363a171ec/runs/8d137987-211f-4413-becf-3c6b018b206e status=200 ms=140
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/65cd67c4-5efb-41b7-83ac-063363a171ec/runs/8d137987-211f-4413-becf-3c6b018b206e/events status=200 ms=131
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/65cd67c4-5efb-41b7-83ac-063363a171ec/runs/8d137987-211f-4413-becf-3c6b018b206e/events status=200 ms=102
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/65cd67c4-5efb-41b7-83ac-063363a171ec/runs/8d137987-211f-4413-becf-3c6b018b206e/stream status=200 ms=191
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/65cd67c4-5efb-41b7-83ac-063363a171ec/runs/8d137987-211f-4413-becf-3c6b018b206e/stream status=200 ms=202
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/65cd67c4-5efb-41b7-83ac-063363a171ec/agents/d3b60685-839c-4ca5-8d46-f7c94d001414/manifest status=200 ms=113
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/65cd67c4-5efb-41b7-83ac-063363a171ec/agents/d3b60685-839c-4ca5-8d46-f7c94d001414/manifest status=200 ms=130
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/65cd67c4-5efb-41b7-83ac-063363a171ec/agents/d3b60685-839c-4ca5-8d46-f7c94d001414/external status=409 ms=188
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/65cd67c4-5efb-41b7-83ac-063363a171ec/agents/d3b60685-839c-4ca5-8d46-f7c94d001414/external status=409 ms=175
+___________ test_57_4_relative_downgrade_from_the_merge_fails_loudly ___________
+
+scratch_db = <tests.integration.conftest.ScratchDatabase object at 0x7f71cf321c10>
+
+    def test_57_4_relative_downgrade_from_the_merge_fails_loudly(scratch_db):
+        db = scratch_db
+        schema = db.tables()
+        for target in ("-1", "06a@-1", "03a@-1"):
+            done = db.alembic("downgrade", target)
+>           assert done.returncode != 0, target
+E           AssertionError: -1
+E           assert 0 != 0
+E            +  where 0 = CompletedProcess(args=['alembic', 'downgrade', '-1'], returncode=0, stdout='', stderr='INFO  [alembic.runtime.migratio...wngrade 06b_0001 -> 57_0002, 06b-2: external agents (kind = external) keep their endpoint in agents.external_config\n').returncode
+
+tests/integration/test_57_alembic_merge.py:111: AssertionError
+=============================== warnings summary ===============================
+tests/integration/test_04a_worker.py::test_04a_upload_job_runs_in_worker
+tests/integration/test_04a_worker.py::test_04a_job_for_missing_row_retries_then_fails_loud
+  /opt/venv/lib/python3.12/site-packages/arq/worker.py:877: DeprecationWarning: Call to deprecated close. (Use aclose() instead) -- Deprecated since version 5.0.1.
+    await self.pool.close(close_connection_pool=True)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/integration/test_01_client.py::test_01_9_extra_body_reaches_upstream
+FAILED tests/integration/test_06a_read_side.py::test_06a_read_mode_get_parity
+FAILED tests/integration/test_57_alembic_merge.py::test_57_4_relative_downgrade_from_the_merge_fails_loudly
+====== 3 failed, 794 passed, 5 skipped, 2 warnings in 1378.98s (0:22:58) =======
+make: *** [Makefile:31: test-int] Error 1
+=== exit 2 (19:19:39)
+=== -e DEPLOY_PROFILE=airgap tools make test-int (19:19:39)
+cd backend && QDRANT_URL=http://qdrant:6333 RUN_QDRANT_TESTS=1 pytest tests/integration
+============================= test session starts ==============================
+platform linux -- Python 3.12.10, pytest-9.2.0, pluggy-1.7.0
+rootdir: /work/backend
+configfile: pyproject.toml
+plugins: Faker-40.43.0, anyio-4.15.1, langsmith-0.14.8
+collected 802 items
+
+tests/integration/test_01_client.py .......                              [  0%]
+tests/integration/test_01_events.py ...                                  [  1%]
+tests/integration/test_01_reconcile.py ...........                       [  2%]
+tests/integration/test_01_reconcile_shutdown.py ...                      [  2%]
+tests/integration/test_01_seed.py ...                                    [  3%]
+tests/integration/test_02_langfuse.py ....                               [  3%]
+tests/integration/test_02_pricing.py .                                   [  3%]
+tests/integration/test_02_r1_worker_logging.py .                         [  4%]
+tests/integration/test_03a_access.py ............                        [  5%]
+tests/integration/test_03a_auth.py ..............                        [  7%]
+tests/integration/test_03a_models.py ...........                         [  8%]
+tests/integration/test_03a_nonmember_404.py ............................ [ 12%]
+........................................................................ [ 21%]
+..                                                                       [ 21%]
+tests/integration/test_03a_obo_scope.py ................                 [ 23%]
+tests/integration/test_03a_providers.py ................                 [ 25%]
+tests/integration/test_03a_read_side.py .......                          [ 26%]
+tests/integration/test_03a_schema.py .......                             [ 27%]
+tests/integration/test_03b_audit.py ............                         [ 28%]
+tests/integration/test_03b_egress_dns.py s                               [ 28%]
+tests/integration/test_03c_alerts.py ................                    [ 30%]
+tests/integration/test_03c_keys.py ..............................        [ 34%]
+tests/integration/test_03c_quota_engine.py ............                  [ 36%]
+tests/integration/test_03c_quotas_api.py .......                         [ 36%]
+tests/integration/test_03c_r1_audit_throttle.py .....                    [ 37%]
+tests/integration/test_03c_retention_content.py ...........              [ 38%]
+tests/integration/test_03c_retention_document_delete.py ..               [ 39%]
+tests/integration/test_03c_retention_job.py ...............              [ 41%]
+tests/integration/test_03c_run_quota.py .......                          [ 41%]
+tests/integration/test_04a_api.py .............                          [ 43%]
+tests/integration/test_04a_embed_api.py ....                             [ 44%]
+tests/integration/test_04a_ingest.py .s..........s                       [ 45%]
+tests/integration/test_04a_qdrant.py ....                                [ 46%]
+tests/integration/test_04a_readyz.py ....                                [ 46%]
+tests/integration/test_04a_review_r1_acl.py ........                     [ 47%]
+tests/integration/test_04a_review_r1_ingest.py ......                    [ 48%]
+tests/integration/test_04a_review_r1_upload.py ..                        [ 48%]
+tests/integration/test_04a_search.py ........                            [ 49%]
+tests/integration/test_04a_store.py ..........                           [ 50%]
+tests/integration/test_04a_worker.py ..                                  [ 51%]
+tests/integration/test_05a_live_services.py .....                        [ 51%]
+tests/integration/test_05a_obo_verify.py .......                         [ 52%]
+tests/integration/test_05a_search.py ........                            [ 53%]
+tests/integration/test_05a_sql.py ..............s.....                   [ 56%]
+tests/integration/test_05a_tools_api.py ................................ [ 60%]
+................                                                         [ 62%]
+tests/integration/test_06a_adapters.py ..                                [ 62%]
+tests/integration/test_06a_agents.py ........                            [ 63%]
+tests/integration/test_06a_feedback.py .....                             [ 63%]
+tests/integration/test_06a_graph.py ............................         [ 67%]
+tests/integration/test_06a_mcp_tools.py ............                     [ 68%]
+tests/integration/test_06a_read_side.py F                                [ 69%]
+tests/integration/test_06a_readyz.py ..                                  [ 69%]
+tests/integration/test_06a_run_access.py ..........                      [ 70%]
+tests/integration/test_06a_runs_api.py .........                         [ 71%]
+tests/integration/test_06a_scheduler.py .......                          [ 72%]
+tests/integration/test_06a_schema.py .........                           [ 73%]
+tests/integration/test_06b2_external_agent.py ...................        [ 76%]
+tests/integration/test_06b2_migration.py .                               [ 76%]
+tests/integration/test_06b_agent.py ......................               [ 78%]
+tests/integration/test_06b_direct.py .............................       [ 82%]
+tests/integration/test_06b_identity.py ............                      [ 84%]
+tests/integration/test_06b_key_search.py ......                          [ 84%]
+tests/integration/test_06b_manifest.py .....                             [ 85%]
+tests/integration/test_07_api_read.py ............                       [ 86%]
+tests/integration/test_07_decide.py .........                            [ 88%]
+tests/integration/test_07_flow.py ..........                             [ 89%]
+tests/integration/test_07_schema.py ...........                          [ 90%]
+tests/integration/test_07_service.py ........                            [ 91%]
+tests/integration/test_07f_followups.py ....                             [ 92%]
+tests/integration/test_07f_sql_context_roles.py ..                       [ 92%]
+tests/integration/test_08_api.py ................                        [ 94%]
+tests/integration/test_116_checkpoint_sources.py ..........              [ 95%]
+tests/integration/test_134_egress_real_engine.py ..                      [ 95%]
+tests/integration/test_134_provider_request.py ..                        [ 96%]
+tests/integration/test_18td_tools_api.py ...                             [ 96%]
+tests/integration/test_19_ingest_raw.py .....s..........                 [ 98%]
+tests/integration/test_57_alembic_merge.py .....F.                       [ 99%]
+tests/integration/test_af_2b_deleted_source_breadcrumb.py ..             [ 99%]
+tests/integration/test_af_3_updated_at_source.py ...                     [100%]
+
+=================================== FAILURES ===================================
+________________________ test_06a_read_mode_get_parity _________________________
+
+app = <fastapi.applications.FastAPI object at 0x7f8fddc75370>
+database_url = 'postgresql+psycopg://ffcore:dummy-not-secret-postgres@postgres:5432/ffcore_test_5c8e5e019e39'
+app_settings = Settings(deploy_profile='airgap', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_5c8e5e019e39) at 0x7f8e6ffd86b0>
+make_project = <function make_project.<locals>.make at 0x7f8e6ff32e80>
+make_user = <function make_user.<locals>.make at 0x7f8e6ffe5760>
+client_factory = <function client_factory.<locals>.make at 0x7f8e6ffaaa20>
+
+    def test_06a_read_mode_get_parity(
+        app, database_url, app_settings, pg, make_project, make_user, client_factory
+    ):
+        import os
+    
+        from pydantic import SecretStr
+    
+        project_id = make_project()
+        run_id = seed_run(pg, project_id, definition())
+        setup(database_url)
+        settings = app_settings.model_copy(
+            update={
+                "database_url": SecretStr(database_url),
+                "redis_url": SecretStr(os.environ["REDIS_URL"]),
+            }
+        )
+        Harness(database_url, settings).run(
+            run_id, Ports(ScriptedModel(turn("A [1].")), ScriptedRetriever([source()]))
+        )
+        agent_id = pg.execute("SELECT agent_id FROM runs WHERE id = %s", (run_id,)).fetchone()[0]
+        world = {
+            "project_id": str(project_id),
+            "agent_id": str(agent_id),
+            "run_id": str(run_id),
+            "version": "1",
+        }
+        # 06b-2: GET .../agents/{agent_id}/external reads an external agent (a native one is 409
+        # `agent_not_external`), so that route gets an external agent of its own.
+        import uuid
+    
+        from ffcore.services.facade_external import ExternalConfig
+    
+        external_id = uuid.uuid4()
+        config = ExternalConfig(
+            base_url="https://agent.example/v1", model="m", api_key="dummy-not-secret-parity-key"
+        )
+        pg.execute(
+            "INSERT INTO agents (id, project_id, key, name, kind, external_config, created_by)"
+            " VALUES (%s, %s, 'dis-parite', 'Dış', 'external', %s, 'test')",
+            (external_id, project_id, config.encrypt(app_settings)),
+        )
+    
+>       from ffcore.core.config import get_settings
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: ('/api/v1/projects/068bdcf0-7ebe-4c21-a94a-d01448e74516/agents/40b67a2f-c51c-4151-bfa9-2dd2b6a34518/external', '{"error":{"message":"This agent is not an external agent.","type":"conflict_error","code":"agent_not_external"}}')
+E       assert 409 == 200
+E        +  where 409 = <Response [409 Conflict]>.status_code
+
+tests/integration/test_06a_read_side.py:63: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+2026-11-02 16:32:48,934 INFO mcp.server.streamable_http_manager StreamableHTTP session manager shutting down
+------------------------------ Captured log setup ------------------------------
+INFO     mcp.server.streamable_http_manager:streamable_http_manager.py:166 StreamableHTTP session manager shutting down
+----------------------------- Captured stderr call -----------------------------
+2026-11-02 16:32:49,988 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 16:32:50,214 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-1277e07c32.chat-default code=provider_not_assigned
+2026-11-02 16:32:50,214 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-64349ef74f.chat-default code=provider_not_assigned
+2026-11-02 16:32:50,215 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-75468bc44c.chat-default code=provider_not_assigned
+2026-11-02 16:32:50,215 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-8336515362.chat-default code=provider_not_assigned
+2026-11-02 16:32:50,215 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-838899f852.chat-default code=provider_not_assigned
+2026-11-02 16:32:50,215 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p8a2d9275.chat-default code=egress_not_allowlisted
+2026-11-02 16:32:50,216 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p8a2d9275.chat-fallback code=egress_not_allowlisted
+2026-11-02 16:32:50,217 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-91b541f34d.chat-default code=provider_not_assigned
+2026-11-02 16:32:50,217 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-d5249f8b26.chat-default code=provider_not_assigned
+2026-11-02 16:32:50,218 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-e369968421.chat-default code=provider_not_assigned
+2026-11-02 16:32:50,218 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-e43ac1f53e.chat-default code=provider_not_assigned
+2026-11-02 16:32:50,219 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=11
+2026-11-02 16:32:50,264 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=271
+2026-11-02 16:32:50,407 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 16:32:50,627 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-1277e07c32.chat-default code=provider_not_assigned
+2026-11-02 16:32:50,627 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-64349ef74f.chat-default code=provider_not_assigned
+2026-11-02 16:32:50,627 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-75468bc44c.chat-default code=provider_not_assigned
+2026-11-02 16:32:50,628 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-8336515362.chat-default code=provider_not_assigned
+2026-11-02 16:32:50,628 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-838899f852.chat-default code=provider_not_assigned
+2026-11-02 16:32:50,628 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p8a2d9275.chat-default code=egress_not_allowlisted
+2026-11-02 16:32:50,628 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p8a2d9275.chat-fallback code=egress_not_allowlisted
+2026-11-02 16:32:50,628 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-91b541f34d.chat-default code=provider_not_assigned
+2026-11-02 16:32:50,628 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-d5249f8b26.chat-default code=provider_not_assigned
+2026-11-02 16:32:50,628 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-e369968421.chat-default code=provider_not_assigned
+2026-11-02 16:32:50,628 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-e43ac1f53e.chat-default code=provider_not_assigned
+2026-11-02 16:32:50,629 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=11
+2026-11-02 16:32:50,656 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=238
+2026-11-02 16:32:50,766 INFO ffcore.access access method=GET path=/api/v1/projects/068bdcf0-7ebe-4c21-a94a-d01448e74516/agents/40b67a2f-c51c-4151-bfa9-2dd2b6a34518 status=200 ms=106
+2026-11-02 16:32:50,842 INFO ffcore.access access method=GET path=/api/v1/projects/068bdcf0-7ebe-4c21-a94a-d01448e74516/agents/40b67a2f-c51c-4151-bfa9-2dd2b6a34518 status=200 ms=72
+2026-11-02 16:32:50,933 INFO ffcore.access access method=GET path=/api/v1/projects/068bdcf0-7ebe-4c21-a94a-d01448e74516/agents/40b67a2f-c51c-4151-bfa9-2dd2b6a34518/versions status=200 ms=80
+2026-11-02 16:32:51,002 INFO ffcore.access access method=GET path=/api/v1/projects/068bdcf0-7ebe-4c21-a94a-d01448e74516/agents/40b67a2f-c51c-4151-bfa9-2dd2b6a34518/versions status=200 ms=65
+2026-11-02 16:32:51,087 INFO ffcore.access access method=GET path=/api/v1/projects/068bdcf0-7ebe-4c21-a94a-d01448e74516/agents/40b67a2f-c51c-4151-bfa9-2dd2b6a34518/versions/1 status=200 ms=81
+2026-11-02 16:32:51,204 INFO ffcore.access access method=GET path=/api/v1/projects/068bdcf0-7ebe-4c21-a94a-d01448e74516/agents/40b67a2f-c51c-4151-bfa9-2dd2b6a34518/versions/1 status=200 ms=106
+2026-11-02 16:32:51,302 INFO ffcore.access access method=GET path=/api/v1/projects/068bdcf0-7ebe-4c21-a94a-d01448e74516/runs/681c7fcc-143d-49c0-b9b3-448672654f4c status=200 ms=94
+2026-11-02 16:32:51,375 INFO ffcore.access access method=GET path=/api/v1/projects/068bdcf0-7ebe-4c21-a94a-d01448e74516/runs/681c7fcc-143d-49c0-b9b3-448672654f4c status=200 ms=70
+2026-11-02 16:32:51,494 INFO ffcore.access access method=GET path=/api/v1/projects/068bdcf0-7ebe-4c21-a94a-d01448e74516/runs/681c7fcc-143d-49c0-b9b3-448672654f4c/events status=200 ms=114
+2026-11-02 16:32:51,615 INFO ffcore.access access method=GET path=/api/v1/projects/068bdcf0-7ebe-4c21-a94a-d01448e74516/runs/681c7fcc-143d-49c0-b9b3-448672654f4c/events status=200 ms=115
+2026-11-02 16:32:51,721 INFO ffcore.access access method=GET path=/api/v1/projects/068bdcf0-7ebe-4c21-a94a-d01448e74516/runs/681c7fcc-143d-49c0-b9b3-448672654f4c/stream status=200 ms=102
+2026-11-02 16:32:51,915 INFO ffcore.access access method=GET path=/api/v1/projects/068bdcf0-7ebe-4c21-a94a-d01448e74516/runs/681c7fcc-143d-49c0-b9b3-448672654f4c/stream status=200 ms=186
+2026-11-02 16:32:51,991 INFO ffcore.access access method=GET path=/api/v1/projects/068bdcf0-7ebe-4c21-a94a-d01448e74516/agents/40b67a2f-c51c-4151-bfa9-2dd2b6a34518/manifest status=200 ms=71
+2026-11-02 16:32:52,054 INFO ffcore.access access method=GET path=/api/v1/projects/068bdcf0-7ebe-4c21-a94a-d01448e74516/agents/40b67a2f-c51c-4151-bfa9-2dd2b6a34518/manifest status=200 ms=59
+2026-11-02 16:32:52,136 INFO ffcore.access access method=GET path=/api/v1/projects/068bdcf0-7ebe-4c21-a94a-d01448e74516/agents/40b67a2f-c51c-4151-bfa9-2dd2b6a34518/external status=409 ms=78
+2026-11-02 16:32:52,212 INFO ffcore.access access method=GET path=/api/v1/projects/068bdcf0-7ebe-4c21-a94a-d01448e74516/agents/40b67a2f-c51c-4151-bfa9-2dd2b6a34518/external status=409 ms=71
+------------------------------ Captured log call -------------------------------
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-1277e07c32.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-64349ef74f.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-75468bc44c.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-8336515362.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-838899f852.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p8a2d9275.chat-default code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p8a2d9275.chat-fallback code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-91b541f34d.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-d5249f8b26.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-e369968421.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-e43ac1f53e.chat-default code=provider_not_assigned
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=11
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=271
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-1277e07c32.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-64349ef74f.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-75468bc44c.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-8336515362.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-838899f852.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p8a2d9275.chat-default code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p8a2d9275.chat-fallback code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-91b541f34d.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-d5249f8b26.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-e369968421.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-e43ac1f53e.chat-default code=provider_not_assigned
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=11
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=238
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/068bdcf0-7ebe-4c21-a94a-d01448e74516/agents/40b67a2f-c51c-4151-bfa9-2dd2b6a34518 status=200 ms=106
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/068bdcf0-7ebe-4c21-a94a-d01448e74516/agents/40b67a2f-c51c-4151-bfa9-2dd2b6a34518 status=200 ms=72
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/068bdcf0-7ebe-4c21-a94a-d01448e74516/agents/40b67a2f-c51c-4151-bfa9-2dd2b6a34518/versions status=200 ms=80
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/068bdcf0-7ebe-4c21-a94a-d01448e74516/agents/40b67a2f-c51c-4151-bfa9-2dd2b6a34518/versions status=200 ms=65
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/068bdcf0-7ebe-4c21-a94a-d01448e74516/agents/40b67a2f-c51c-4151-bfa9-2dd2b6a34518/versions/1 status=200 ms=81
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/068bdcf0-7ebe-4c21-a94a-d01448e74516/agents/40b67a2f-c51c-4151-bfa9-2dd2b6a34518/versions/1 status=200 ms=106
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/068bdcf0-7ebe-4c21-a94a-d01448e74516/runs/681c7fcc-143d-49c0-b9b3-448672654f4c status=200 ms=94
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/068bdcf0-7ebe-4c21-a94a-d01448e74516/runs/681c7fcc-143d-49c0-b9b3-448672654f4c status=200 ms=70
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/068bdcf0-7ebe-4c21-a94a-d01448e74516/runs/681c7fcc-143d-49c0-b9b3-448672654f4c/events status=200 ms=114
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/068bdcf0-7ebe-4c21-a94a-d01448e74516/runs/681c7fcc-143d-49c0-b9b3-448672654f4c/events status=200 ms=115
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/068bdcf0-7ebe-4c21-a94a-d01448e74516/runs/681c7fcc-143d-49c0-b9b3-448672654f4c/stream status=200 ms=102
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/068bdcf0-7ebe-4c21-a94a-d01448e74516/runs/681c7fcc-143d-49c0-b9b3-448672654f4c/stream status=200 ms=186
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/068bdcf0-7ebe-4c21-a94a-d01448e74516/agents/40b67a2f-c51c-4151-bfa9-2dd2b6a34518/manifest status=200 ms=71
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/068bdcf0-7ebe-4c21-a94a-d01448e74516/agents/40b67a2f-c51c-4151-bfa9-2dd2b6a34518/manifest status=200 ms=59
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/068bdcf0-7ebe-4c21-a94a-d01448e74516/agents/40b67a2f-c51c-4151-bfa9-2dd2b6a34518/external status=409 ms=78
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/068bdcf0-7ebe-4c21-a94a-d01448e74516/agents/40b67a2f-c51c-4151-bfa9-2dd2b6a34518/external status=409 ms=71
+___________ test_57_4_relative_downgrade_from_the_merge_fails_loudly ___________
+
+scratch_db = <tests.integration.conftest.ScratchDatabase object at 0x7f8e4ee5d460>
+
+>   ???
+E   AssertionError: -1
+E   assert 0 != 0
+E    +  where 0 = CompletedProcess(args=['alembic', 'downgrade', '-1'], returncode=0, stdout='', stderr='INFO  [alembic.runtime.migratio...wngrade 06b_0001 -> 57_0002, 06b-2: external agents (kind = external) keep their endpoint in agents.external_config\n').returncode
+
+tests/integration/test_57_alembic_merge.py:111: AssertionError
+=============================== warnings summary ===============================
+tests/integration/test_04a_worker.py::test_04a_upload_job_runs_in_worker
+tests/integration/test_04a_worker.py::test_04a_job_for_missing_row_retries_then_fails_loud
+  /opt/venv/lib/python3.12/site-packages/arq/worker.py:877: DeprecationWarning: Call to deprecated close. (Use aclose() instead) -- Deprecated since version 5.0.1.
+    await self.pool.close(close_connection_pool=True)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/integration/test_06a_read_side.py::test_06a_read_mode_get_parity
+FAILED tests/integration/test_57_alembic_merge.py::test_57_4_relative_downgrade_from_the_merge_fails_loudly
+====== 2 failed, 795 passed, 5 skipped, 2 warnings in 1371.51s (0:22:51) =======
+make: *** [Makefile:31: test-int] Error 1
+=== exit 2 (19:43:12)
+=== tools make smoke (19:43:12)
+python scripts/smoke.py
+ok    backend /healthz 200
+ok    litellm /health/liveliness 200
+ok    langfuse /api/public/health 200, /api/public/projects 200
+ok    mcp-search /healthz 200
+ok    mcp-sql /healthz 200
+ok    skipped: ollama profile inactive
+smoke: passed
+=== exit 0 (19:43:28)

@@ -1,0 +1,327 @@
+2026-11-02 18:40:10,608 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-02 18:40:10,651 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=831
+2026-11-02 18:40:11,617 INFO ffcore.access access method=POST path=/api/v1/projects/e36fd2da-12b1-43a9-ba77-5d5f517b6705/api-keys status=201 ms=957
+2026-11-02 18:40:12,023 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-02 18:40:12,500 INFO ffcore.access access method=POST path=/api/v1/projects/e36fd2da-12b1-43a9-ba77-5d5f517b6705/agents/external status=201 ms=560
+2026-11-02 18:40:12,794 INFO ffcore.access access method=POST path=/api/v1/projects/e36fd2da-12b1-43a9-ba77-5d5f517b6705/agents/5149354d-c696-41f9-bce8-73fd762398c0/external/publish status=200 ms=285
+2026-11-02 18:40:13,086 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=SecretDecryptError
+2026-11-02 18:40:13,290 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=239
+2026-11-02 18:40:13,600 INFO ffcore.access access method=POST path=/api/v1/projects/e36fd2da-12b1-43a9-ba77-5d5f517b6705/agents/import status=200 ms=299
+P11 analyst import onto external key: 200 {"dry_run":false,"action":"new_version","agent_key":"imp","id":"5149354d-c696-41f9-bce8-73fd762398c0","version":1,"definition":{"schema_version":1,"model":"chat-default","system_prompt":"x","langfuse_
+P11 versions under the external agent: (1,)
+2026-11-02 18:40:14,185 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=2 error=SecretDecryptError
+2026-11-02 18:40:14,462 INFO ffcore.access access method=GET path=/api/v1/projects/e36fd2da-12b1-43a9-ba77-5d5f517b6705/agents/5149354d-c696-41f9-bce8-73fd762398c0/external status=200 ms=391
+P11 external read after import: 200 1 external
+2026-11-02 18:40:15,186 INFO ffcore.access access method=POST path=/api/v1/projects/e36fd2da-12b1-43a9-ba77-5d5f517b6705/agents/imp/runs status=200 ms=670
+P11 test run on the external agent's imported version: 200 ['id: 1-0', 'event: progress']
+P11 runs rows for the external agent: (1,)
+2026-11-02 18:40:15,835 INFO ffcore.access access method=POST path=/v1/chat/completions status=200 ms=624
+P11 facade still external path: 200 {'role': 'assistant', 'content': 'echo: x'}
+.2026-11-02 18:40:16,271 ERROR ffcore.litellm_reconcile litellm_reconcile_failed attempts=3 error=SecretDecryptError
+2026-11-02 18:40:24,352 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 18:40:24,355 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 18:40:24,613 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 18:40:24,655 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=SecretDecryptError
+2026-11-02 18:40:24,776 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=156
+2026-11-02 18:40:24,855 INFO ffcore.access access method=POST path=/api/v1/projects/39f8e2ce-3caa-423b-acb1-427a7014ab2d/api-keys status=201 ms=74
+2026-11-02 18:40:24,995 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 18:40:25,026 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=SecretDecryptError
+2026-11-02 18:40:25,124 INFO ffcore.access access method=POST path=/api/v1/projects/39f8e2ce-3caa-423b-acb1-427a7014ab2d/agents/external status=201 ms=107
+2026-11-02 18:40:25,263 INFO ffcore.access access method=POST path=/api/v1/projects/39f8e2ce-3caa-423b-acb1-427a7014ab2d/agents/276cb3aa-8e4d-4ec8-ad4c-efff876df34e/external/publish status=200 ms=134
+2026-11-02 18:40:25,621 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 18:40:25,693 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=SecretDecryptError
+2026-11-02 18:40:25,813 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=2 error=SecretDecryptError
+2026-11-02 18:40:26,037 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=414
+2026-11-02 18:40:26,091 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=2 error=SecretDecryptError
+2026-11-02 18:40:26,248 INFO ffcore.access access method=PATCH path=/api/v1/projects/39f8e2ce-3caa-423b-acb1-427a7014ab2d/agents/276cb3aa-8e4d-4ec8-ad4c-efff876df34e status=200 ms=192
+P12 analyst rename external: 200
+2026-11-02 18:40:26,442 INFO ffcore.access access method=DELETE path=/api/v1/projects/39f8e2ce-3caa-423b-acb1-427a7014ab2d/agents/276cb3aa-8e4d-4ec8-ad4c-efff876df34e status=204 ms=190
+P12 analyst delete external: 204
+2026-11-02 18:40:26,558 INFO ffcore.access access method=POST path=/api/v1/projects/39f8e2ce-3caa-423b-acb1-427a7014ab2d/agents status=201 ms=112
+P12 analyst reuses key: 201
+2026-11-02 18:40:26,764 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=2 error=SecretDecryptError
+2026-11-02 18:40:26,775 INFO ffcore.access access method=POST path=/api/v1/projects/39f8e2ce-3caa-423b-acb1-427a7014ab2d/agents/cfcd1589-08b2-4205-a283-50d59827f897/publish status=200 ms=211
+P12 analyst publishes native under the same name: 200 {"id":"cfcd1589-08b2-4205-a283-50d59827f897","project_id":"39f8e2ce-3caa-423b-acb1-427a7014ab2d","key":"support","name":
+2026-11-02 18:40:27,189 INFO ffcore.access access method=POST path=/v1/chat/completions status=500 ms=397
+2026-11-02 18:40:27,901 ERROR ffcore.litellm_reconcile litellm_reconcile_failed attempts=3 error=SecretDecryptError
+2026-11-02 18:40:29,199 ERROR ffcore.litellm_reconcile litellm_reconcile_failed attempts=3 error=SecretDecryptError
+2026-11-02 18:40:29,234 ERROR ffcore.litellm_reconcile litellm_reconcile_failed attempts=3 error=SecretDecryptError
+F
+=================================== FAILURES ===================================
+__________________ test_p12_analyst_delete_and_take_over_key ___________________
+
+self = <redis.asyncio.connection.Connection(host=redis,port=6379,db=0)>
+disable_decoding = False, timeout = None, disconnect_on_error = True
+push_request = False
+
+    async def read_response(
+        self,
+        disable_decoding: bool = False,
+        timeout: Optional[float] = None,
+        *,
+        disconnect_on_error: bool = True,
+        push_request: Optional[bool] = False,
+    ):
+        """Read the response from a previously sent command"""
+        read_timeout = timeout if timeout is not None else self.socket_timeout
+        host_error = self._host_error()
+        try:
+            if (
+                read_timeout is not None
+                and self.protocol in ["3", 3]
+                and not HIREDIS_AVAILABLE
+            ):
+                async with async_timeout(read_timeout):
+                    response = await self._parser.read_response(
+                        disable_decoding=disable_decoding, push_request=push_request
+                    )
+            elif read_timeout is not None:
+                async with async_timeout(read_timeout):
+                    response = await self._parser.read_response(
+                        disable_decoding=disable_decoding
+                    )
+            elif self.protocol in ["3", 3] and not HIREDIS_AVAILABLE:
+                response = await self._parser.read_response(
+                    disable_decoding=disable_decoding, push_request=push_request
+                )
+            else:
+>               response = await self._parser.read_response(
+                    disable_decoding=disable_decoding
+                )
+
+/opt/venv/lib/python3.12/site-packages/redis/asyncio/connection.py:562: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/opt/venv/lib/python3.12/site-packages/redis/_parsers/hiredis.py:211: in read_response
+    await self.read_from_socket()
+/opt/venv/lib/python3.12/site-packages/redis/_parsers/hiredis.py:189: in read_from_socket
+    buffer = await self._stream.read(self._read_size)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/streams.py:713: in read
+    await self._wait_for_data('read')
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <StreamReader transport=<_SelectorSocketTransport closing fd=16>>
+func_name = 'read'
+
+    async def _wait_for_data(self, func_name):
+        """Wait until feed_data() or feed_eof() is called.
+    
+        If stream was paused, automatically resume it.
+        """
+        # StreamReader uses a future to link the protocol feed_data() method
+        # to a read coroutine. Running two read coroutines at the same time
+        # would have an unexpected behaviour. It would not possible to know
+        # which coroutine would get the next data.
+        if self._waiter is not None:
+            raise RuntimeError(
+                f'{func_name}() called while another coroutine is '
+                f'already waiting for incoming data')
+    
+        assert not self._eof, '_wait_for_data after EOF'
+    
+        # Waiting for data while paused will make deadlock, so prevent it.
+        # This is essential for readexactly(n) for case when n > self._limit.
+        if self._paused:
+            self._paused = False
+            self._transport.resume_reading()
+    
+        self._waiter = self._loop.create_future()
+        try:
+>           await self._waiter
+E           RuntimeError: Task <Task pending name='anyio.from_thread.BlockingPortal._call_func' coro=<TaskHandle._run_coro() running at /opt/venv/lib/python3.12/site-packages/anyio/_core/_tasks.py:327> cb=[TaskGroup._spawn.<locals>.task_done() at /opt/venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py:870]> got Future <Future pending> attached to a different loop
+
+/usr/local/lib/python3.12/asyncio/streams.py:545: RuntimeError
+
+During handling of the above exception, another exception occurred:
+
+px = (UUID('39f8e2ce-3caa-423b-acb1-427a7014ab2d'), <starlette.testclient.TestClient object at 0x7fce91128bf0>, <tests.integration.facade_support.Facade object at 0x7fce38d0d4f0>, <function px.<locals>.register at 0x7fce736d8fe0>, 43743)
+make_user = <function make_user.<locals>.make at 0x7fce38d12f20>
+client_factory = <function client_factory.<locals>.make at 0x7fce38d12a20>
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_2abf77a9225f) at 0x7fce9112b560>
+
+    def test_p12_analyst_delete_and_take_over_key(px, make_user, client_factory, pg):
+        from tests.integration.test_06b_manifest import _model
+        project, console, client, register, port = px
+        _model(pg, project)
+        agent, model = register("support")
+        _, email = make_user(memberships={project: ("analyst", "edit")})
+        analyst = client_factory(email)
+        p = analyst.patch(f"/api/v1/projects/{project}/agents/{agent['id']}", json={"name": "renamed by analyst"})
+        print("P12 analyst rename external:", p.status_code)
+        d = analyst.delete(f"/api/v1/projects/{project}/agents/{agent['id']}")
+        print("P12 analyst delete external:", d.status_code)
+        c = analyst.post(f"/api/v1/projects/{project}/agents", json={"key": "support", "name": "native", "model": "chat-default"})
+        print("P12 analyst reuses key:", c.status_code)
+        if c.status_code == 201:
+            pub = analyst.post(f"/api/v1/projects/{project}/agents/{c.json()['id']}/publish", json={"version": 1})
+            print("P12 analyst publishes native under the same name:", pub.status_code, pub.text[:120])
+>           m = client.chat(model, "x")
+                ^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_zz_06b2_r1_probe.py:442: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/facade_support.py:48: in chat
+    return self._client.post(
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:1203: in post
+    return self.request(
+/opt/venv/lib/python3.12/site-packages/starlette/testclient.py:518: in request
+    return super().request(
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:796: in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:993: in send
+    raise exc
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:987: in send
+    response.read()
+/opt/venv/lib/python3.12/site-packages/httpx2/_models.py:877: in read
+    self._content = b"".join(self.iter_bytes())
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_models.py:893: in iter_bytes
+    for raw_bytes in self.iter_raw():
+                     ^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_models.py:948: in iter_raw
+    for raw_stream_bytes in self.stream:
+                            ^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:143: in __iter__
+    yield from self._stream
+/opt/venv/lib/python3.12/site-packages/starlette/testclient.py:384: in iter_body
+    exit_stack.close()
+/usr/local/lib/python3.12/contextlib.py:618: in close
+    self.__exit__(None, None, None)
+/usr/local/lib/python3.12/contextlib.py:610: in __exit__
+    raise exc_details[1]
+/usr/local/lib/python3.12/contextlib.py:595: in __exit__
+    if cb(*exc_details):
+       ^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/starlette/testclient.py:399: in close_app
+    raise exception
+/opt/venv/lib/python3.12/site-packages/anyio/from_thread.py:265: in _call_func
+    retval = await retval_or_awaitable
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/starlette/testclient.py:366: in run_app
+    await self.app(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/applications.py:1194: in __call__
+    await super().__call__(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/applications.py:96: in __call__
+    await self.middleware_stack(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/middleware/errors.py:186: in __call__
+    raise exc
+/opt/venv/lib/python3.12/site-packages/starlette/middleware/errors.py:164: in __call__
+    await self.app(scope, receive, _send)
+/opt/venv/lib/python3.12/site-packages/fastapi/telemetry/_asgi.py:151: in __call__
+    await self.app(scope, receive, send)
+ffcore/core/logging.py:261: in __call__
+    await self.app(scope, receive, send_status)
+ffcore/api/upload_limit.py:44: in __call__
+    await self.app(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py:63: in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    raise exc
+/opt/venv/lib/python3.12/site-packages/starlette/_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+/opt/venv/lib/python3.12/site-packages/fastapi/middleware/asyncexitstack.py:18: in __call__
+    await self.app(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/routing.py:683: in __call__
+    await self.middleware_stack(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:2811: in app
+    await route.handle(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:1839: in handle
+    await self.original_router.handle(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:2894: in handle
+    await included_router._handle_selected(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:1865: in _handle_selected
+    await original_route.handle(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:1328: in handle
+    await effective_context.app(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:166: in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    raise exc
+/opt/venv/lib/python3.12/site-packages/starlette/_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:152: in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:745: in app
+    raw_response = await run_endpoint_function(
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:372: in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ffcore/api/facade.py:103: in chat_completions
+    return await facade_agent.complete(request, caller, target, body, settings, queue)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ffcore/services/facade_agent.py:479: in complete
+    run, after = await start(request, caller, target, body, settings, queue), None
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ffcore/services/facade_agent.py:260: in start
+    await queue.enqueue(str(run.id))
+ffcore/runtime/queue.py:28: in enqueue
+    job = await self._pool.enqueue_job(
+/opt/venv/lib/python3.12/site-packages/arq/connections.py:157: in enqueue_job
+    await pipe.watch(job_key)
+/opt/venv/lib/python3.12/site-packages/redis/asyncio/client.py:1591: in watch
+    return await self.execute_command("WATCH", *names)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/redis/asyncio/client.py:1374: in immediate_execute_command
+    return await conn.retry.call_with_retry(
+/opt/venv/lib/python3.12/site-packages/redis/asyncio/retry.py:59: in call_with_retry
+    return await do()
+           ^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/redis/asyncio/client.py:620: in _send_command_parse_response
+    return await self.parse_response(conn, command_name, **options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/redis/asyncio/client.py:1510: in parse_response
+    result = await super().parse_response(connection, command_name, **options)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/redis/asyncio/client.py:667: in parse_response
+    response = await connection.read_response()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/redis/asyncio/connection.py:582: in read_response
+    await self.disconnect(nowait=True)
+/opt/venv/lib/python3.12/site-packages/redis/asyncio/connection.py:438: in disconnect
+    self._writer.close()  # type: ignore[union-attr]
+    ^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/streams.py:358: in close
+    return self._transport.close()
+           ^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/selector_events.py:1213: in close
+    super().close()
+/usr/local/lib/python3.12/asyncio/selector_events.py:875: in close
+    self._loop.call_soon(self._call_connection_lost, None)
+/usr/local/lib/python3.12/asyncio/base_events.py:799: in call_soon
+    self._check_closed()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <_UnixSelectorEventLoop running=False closed=True debug=False>
+
+    def _check_closed(self):
+        if self._closed:
+>           raise RuntimeError('Event loop is closed')
+E           RuntimeError: Event loop is closed
+
+/usr/local/lib/python3.12/asyncio/base_events.py:545: RuntimeError
+------------------------------ Captured log setup ------------------------------
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:451 litellm_reconcile_retry attempt=1 error=SecretDecryptError
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=156
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/39f8e2ce-3caa-423b-acb1-427a7014ab2d/api-keys status=201 ms=74
+------------------------------ Captured log call -------------------------------
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:451 litellm_reconcile_retry attempt=1 error=SecretDecryptError
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/39f8e2ce-3caa-423b-acb1-427a7014ab2d/agents/external status=201 ms=107
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/39f8e2ce-3caa-423b-acb1-427a7014ab2d/agents/276cb3aa-8e4d-4ec8-ad4c-efff876df34e/external/publish status=200 ms=134
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:451 litellm_reconcile_retry attempt=1 error=SecretDecryptError
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:451 litellm_reconcile_retry attempt=2 error=SecretDecryptError
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=414
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:451 litellm_reconcile_retry attempt=2 error=SecretDecryptError
+INFO     ffcore.access:logging.py:263 access method=PATCH path=/api/v1/projects/39f8e2ce-3caa-423b-acb1-427a7014ab2d/agents/276cb3aa-8e4d-4ec8-ad4c-efff876df34e status=200 ms=192
+INFO     ffcore.access:logging.py:263 access method=DELETE path=/api/v1/projects/39f8e2ce-3caa-423b-acb1-427a7014ab2d/agents/276cb3aa-8e4d-4ec8-ad4c-efff876df34e status=204 ms=190
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/39f8e2ce-3caa-423b-acb1-427a7014ab2d/agents status=201 ms=112
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:451 litellm_reconcile_retry attempt=2 error=SecretDecryptError
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/39f8e2ce-3caa-423b-acb1-427a7014ab2d/agents/cfcd1589-08b2-4205-a283-50d59827f897/publish status=200 ms=211
+INFO     ffcore.access:logging.py:263 access method=POST path=/v1/chat/completions status=500 ms=397
+=========================== short test summary info ============================
+FAILED tests/integration/test_zz_06b2_r1_probe.py::test_p12_analyst_delete_and_take_over_key
+1 failed, 1 passed, 27 deselected in 36.73s
