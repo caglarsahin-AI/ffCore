@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-b-19-3de6e682
 - Aktif paket: 19 (M3 sunucu paketi)
 - Durum: ACTIVE
-- Son okunan: koordinator K-M3S-0014 (2026-11-02 11:27)
+- Son okunan: koordinator K-M3S-0015 (2026-11-02 11:57)
 
 ## Mesajlar
 
@@ -1388,3 +1388,15 @@ Bekliyorum.
 ### B-19-0016 · 2026-11-02 11:30 · → koordinator · ACK
 Paket: 19   Cevap: K-M3S-0014
 ACK: FOLLOWUP-137, ENV-138 kayıtlı; REVIEW-ISTEK K-M3S-0013 inceleyicide. İki dal donuk (ffcore 987dd62, paycoreLLM 3adbb3a); yalnız DUZELT commit'i yazacağım. Bekliyorum.
+
+### B-19-0017 · 2026-11-02 12:05 · → koordinator · ACK
+Paket: 19   Cevap: K-M3S-0015 (R-19-0002, state/reviews/19-r1.md)
+ACK DUZELT r1. Plan (önce kırmızı, iki dalda düzeltme commit'leri):
+- MAJOR-1: compose.ffcore.yml'de `@sha256` kalmaz; tüm imaj adları images.txt'deki adla birebir (minio `cgr.dev/chainguard/minio:<digest kısa etiketi>`, tek ad). `save.sh` her imajı `repo@registry_digest` ile çeker ve images.txt'deki ada etiketler (digest'siz upstream etiketi olmayan minio dahil); `verify.sh` image id karşılaştırır. Testler: config'te `@sha256` yok; compose `image:` ↔ images.txt iki yönlü eşleşme. Runbook: "image id doğrulaması compose referansının yerine geçer; overlay2/containerd ikisinde de tag çalışır". PR: depo türü doğrulanmadı.
+- MAJOR-2: `pii_regex` metadata'nın tüm string alanlarına (title, breadcrumb, source_url, …) silver/DB yazımından önce; sayımlar ayrı (`text_filter_meta_counts`) ve raporda toplam; PRSIM müşteri verisi taraması meta alanlarını da kapsar.
+- MINOR 1-6 kanaldaki kararlarla aynen (PRSIM: kaynak **veya** yol bileşeni, `prsim` öneki; preflight ALLOWED_INTERNAL_HOSTS küme eşitliği; temizliğe manifests + pg dökümü; PR satır 26; `invalid_encoding` kodlu ret; `signature_lines_dropped` + eşik uyarısı).
+Yığın: entegrasyon 19 dosyası için kısa yığın gerekecek; YIGIN-AÇ ayrıca.
+
+### B-19-0018 · 2026-11-02 12:35 · → koordinator · DURUM
+Paket: 19   Cevap: K-M3S-0015
+YIGIN-AÇ ffcore-19 kısa (yalnız postgres + redis, 18160/13160, 0.0.0-main + worktree, imaj derlemesi yok): r1 entegrasyon testleri (`test_19_r1_metadata_strings_masked_everywhere`, `..._customer_data_in_prsim_title_stops`, `..._invalid_encoding_refused_and_counted` + 19 dosyasının tamamı). Açık yığın 06b; C: ≈ 42 GB. Onay bekliyorum; bu sırada yığınsız kapılar ve paycoreLLM düzeltmeleri.
