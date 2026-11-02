@@ -1,0 +1,46 @@
+ Network ffcore-06b2_default  Creating
+ Network ffcore-06b2_default  Created
+ Volume "ffcore-06b2_model_cache"  Creating
+ Volume "ffcore-06b2_model_cache"  Created
+ Volume "ffcore-06b2_knowledge_storage"  Creating
+ Volume "ffcore-06b2_knowledge_storage"  Created
+ Volume "ffcore-06b2_postgres_data"  Creating
+ Volume "ffcore-06b2_postgres_data"  Created
+ Volume "ffcore-06b2_redis_data"  Creating
+ Volume "ffcore-06b2_redis_data"  Created
+ Volume "ffcore-06b2_langfuse_postgres_data"  Creating
+ Volume "ffcore-06b2_langfuse_postgres_data"  Created
+ Volume "ffcore-06b2_langfuse_minio_data"  Creating
+ Volume "ffcore-06b2_langfuse_minio_data"  Created
+ Volume "ffcore-06b2_langfuse_clickhouse_data"  Creating
+ Volume "ffcore-06b2_langfuse_clickhouse_data"  Created
+ Volume "ffcore-06b2_langfuse_clickhouse_logs"  Creating
+ Volume "ffcore-06b2_langfuse_clickhouse_logs"  Created
+FAILED tests/unit/test_06b2_external.py::test_06b2_4_register_url_scheme_refused[file:///etc/passwd]
+FAILED tests/unit/test_06b2_external.py::test_06b2_4_register_url_scheme_refused[gopher://agent.example/x]
+FAILED tests/unit/test_06b2_external.py::test_06b2_4_register_url_scheme_refused[ftp://agent.example/]
+FAILED tests/unit/test_06b2_external.py::test_06b2_4_register_url_scheme_refused[agent.example/v1]
+FAILED tests/unit/test_06b2_external.py::test_06b2_4_register_url_scheme_refused[https://user:dummy-not-secret@agent.example/v1]
+FAILED tests/unit/test_06b2_external.py::test_06b2_4_register_url_scheme_refused[https://agent.example:99999/v1]
+FAILED tests/unit/test_06b2_external.py::test_06b2_4_register_url_scheme_refused[https://agent.example:0/v1]
+FAILED tests/unit/test_06b2_external.py::test_06b2_4_register_url_policy - Ty...
+FAILED tests/unit/test_06b2_external.py::test_06b2_r1_platform_hosts_reserved[http://litellm:4000/v1]
+FAILED tests/unit/test_06b2_external.py::test_06b2_r1_platform_hosts_reserved[http://LiteLLM./v1]
+FAILED tests/unit/test_06b2_external.py::test_06b2_r1_platform_hosts_reserved[http://langfuse-web:3000/api/public]
+FAILED tests/unit/test_06b2_external.py::test_06b2_r1_platform_hosts_reserved[http://mcp-sql:8000/v1]
+FAILED tests/unit/test_06b2_external.py::test_06b2_r1_platform_hosts_reserved[http://ollama:11434/v1]
+FAILED tests/unit/test_06b2_external.py::test_06b2_r1_platform_hosts_reserved[http://host.docker.internal:11434/v1]
+FAILED tests/unit/test_06b2_external.py::test_06b2_r1_platform_hosts_reserved[http://backend:8000/v1]
+FAILED tests/unit/test_06b2_external.py::test_06b2_r1_platform_hosts_reserved[http://my-litellm:4000/v1]
+FAILED tests/unit/test_06b2_external.py::test_06b2_r1_platform_hosts_reserved[http://127.0.0.1:8000/v1]
+FAILED tests/unit/test_06b2_external.py::test_06b2_r1_platform_hosts_reserved[http://vllm:8000/v1]
+FAILED tests/unit/test_06b2_external.py::test_06b2_r1_platform_hosts_reserved[http://llm.corp:4000/v1]
+FAILED tests/unit/test_06b2_external.py::test_06b2_r1_platform_hosts_reserved[http://gpu01.corp:11434/v1]
+FAILED tests/unit/test_06b2_external.py::test_06b2_r1_other_internal_hosts_stay
+FAILED tests/unit/test_06b2_external.py::test_06b2_r1_base_url_query_refused[https://agent.example/v1?api-key=dummy-not-secret-qs]
+FAILED tests/unit/test_06b2_external.py::test_06b2_r1_base_url_query_refused[https://agent.example/v1?]
+FAILED tests/unit/test_06b2_external.py::test_06b2_r1_base_url_query_refused[https://agent.example/v1#frag]
+FAILED tests/unit/test_06b2_external.py::test_06b2_r1_base_url_query_refused[https://agent.example/v1/#]
+FAILED tests/unit/test_06b2_external.py::test_06b2_5_ssrf_dns_rebinding - Typ...
+FAILED tests/contract/test_06b2_reserved_hosts.py::test_06b2_reserved_hosts_cover_seed_model_servers
+27 failed, 39 passed in 18.86s

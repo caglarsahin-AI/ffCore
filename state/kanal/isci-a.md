@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-a-06b-2 (önceki lease ffcore-isci-a-06b RETIRED)
 - Aktif paket: 06b-2 (K-06b2-0001)
 - Durum: ACTIVE
-- Son okunan: K-06b2-0008 (K-06b2-0011 zili alındı)
+- Son okunan: K-06b2-0012
 
 ## Mesajlar
 
@@ -1454,3 +1454,17 @@ Branch feat/06b-2-external-agent @ **674fecde945c0a86223580cb5beaf329e03b8ba8** 
 r1 kalemleri: MAJOR-1 7b82abb · MAJOR-2 19d4a22 (+ runs.py 422 `external_agent_not_runnable`) · MINOR-1 A 12d7fa4 (`RESERVED_HOSTS` + compose contract testi, 422 `external_agent_host_reserved`) · MINOR-2 93131db · MINOR-3 958cad7 · MINOR-4 e9140dd (origin değişince anahtar silinir, audit `reset_external_agent_key`, publish 409, çağrı 501; 06b.yaml `api_key` `"***"|null`) · MINOR-5 0d6bab6 · MINOR-6 6779f6d (yeni `services/external_config.py`) · MINOR-7 3d5c83b · 674fecd test tohumu.
 Kapı: gate1 (3d5c83b) lint 0, heads tek `06b_0001`, make test **919/919 iki profil**, smoke passed; hedefli test-int 131/1 iki profil: `test_03a_2` sıra etkisi (sahte provider `config=00`, PR'da açıklandı) → 674fecd; gate2 (674fecd) lint 0, hedefli 12 dosya alfabetik **132/132 iki profil**. Tam test-int koşmadı (K-06b2-0008).
 Kayıt talepleri (PR'da): FOLLOWUP import dry-run 500 (var olan native anahtar, main'de de), FOLLOWUP test_06b_manifest `_model` çözülemeyen provider, FOLLOWUP MINOR-1 B (`EXTERNAL_AGENT_HOSTS`). Delta turu için hazır.
+
+### A-06b2-0016 · 2026-11-03 00:05 · → koordinator · ACK + YIGIN-AÇ 06b2
+Paket: 06b-2   Cevap: K-06b2-0012
+DUZELT (r2 N1, karar A) alındı: tek commit — `RESERVED_HOSTS` + `vllm`, aktif provider satırlarının uç host'ları (`base_url`/`api_base`) kayıt/güncelleme/yayında 422 `external_agent_host_reserved` (`check_base_url(..., providers=)` zorunlu parametre), NOTE-2 normalize aynı fonksiyonda; seed varsayılan host'ları contract testi. Birim + contract kırmızı → yeşil (06b2-r2-red1/green1). Entegrasyon testi için yığın: ffcore-06b2, 18230/13230, `FFCORE_VERSION=0.0.0-06b2`, `--profile test --profile qdrant`; bitince down -v + YIGIN-KAPA.
+
+### A-06b2-0017 · 2026-11-03 00:10 · → koordinator · KARAR-GEREK
+Paket: 06b-2   Cevap: K-06b2-0012
+N1 commit'i f5d98c7 (henüz PR-HAZIR değil). Kapı (06b2-r2-gate-20261103): lint 0, heads tek, make test **923/923 iki profil**, smoke passed; **hedefli test-int iki profil 109 passed / 24 failed**: 06b-2 entegrasyon testlerinin hepsi, tek neden `SecretDecryptError` (48 satır).
+Kök neden: karar A'nın "aktif provider host'ları" kısmı her kayıt/güncelleme/yayında aktif provider'ların yapılandırmasını decrypt eder (fail-loud: çözülemeyen satır hata). Beş test dosyası provider'a sahte yapılandırma yazıyor (`b"x"`: test_04a_readyz, test_06a_agents, test_06a_readyz; `00`: test_06b_identity, test_06b_manifest — r2 NOTE-1'in genişi). 04a/06a dosyaları alfabetik sırada 06b2'den önce koşar → **main kapısındaki tam test-int de kırılır**. Sürücüler ollama/openai_compatible; sürücüye göre atlamak çözmez. Ürün tarafında çözülemeyen provider zaten kurulum hatası (reconcile da düşer).
+Seçenekler:
+- **A (önerim):** Beş test yardımcısı gerçek Fernet'li yapılandırma yazsın (`encrypt_json({...}, settings)`; yalnız test, davranış aynı); NOTE-1/FOLLOWUP-143 parçası da kapanır. Etki: touch-zone eki (04a, 06a, 06b test dosyaları, 5 dosya × birkaç satır), ayrı test commit'i; fail-loud korunur. Hedefli + 04a/06a/06b test-int iki profil.
+- B: `provider_hosts` çözülemeyen satırı atlasın, `WARNING provider_config_unreadable` log'lasın. Etki: test dosyalarına dokunulmaz; ama sessiz atlama sayılır (FELSEFE fail-loud), çözülemeyen bir provider host'u o anda korunmaz.
+- C: N1'in provider-host kısmını geri al, yalnız `vllm` + NOTE-2 kalsın (inceleyicinin B seçeneği), provider host'ları FOLLOWUP (10c `EXTERNAL_AGENT_HOSTS`). Etki: küçük ve hemen yeşil; varsayılan dışı Ollama/vLLM host'u açık kalır (belgede yazılır).
+Yığın down -v ile kapatıldı (YIGIN-KAPA bu mesajla; konteyner 0). Karar gelince uygular, yığını yeniden açarım.

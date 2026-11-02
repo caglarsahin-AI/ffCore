@@ -1,0 +1,52 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_________________ test_06b2_r2_active_provider_hosts_reserved __________________
+
+ext = (UUID('1497d05a-8ef9-41d1-b340-449a574369e1'), <starlette.testclient.TestClient object at 0x7ff6b7c3e1b0>, <tests.integration.facade_support.Facade object at 0x7ff68830f6b0>, <function ext.<locals>.register at 0x7ff6b0264860>)
+ext_settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+fake_agent = <http.server.ThreadingHTTPServer object at 0x7ff6b8035460>
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_169309974c6c) at 0x7ff6b73ef500>
+
+    def test_06b2_r2_active_provider_hosts_reserved(ext, ext_settings, fake_agent, pg):
+        """Review r2 N1 (K-06b2-0012, A): the host of an active model provider (an Ollama or vLLM
+        server that is not a compose service) is the platform's own model server: never an external
+        agent's target (registration and update). An inactive provider's host is not reserved."""
+        project, console, _, register = ext
+        port = fake_agent.server_address[1]
+        _provider(pg, ext_settings, "http://GPU01.corp.:11434")
+        _provider(pg, ext_settings, f"http://127.0.0.1:{port}", active=False)
+        url = f"/api/v1/projects/{project}/agents/external"
+        body = {"key": "gpu", "name": "x", "model": "m", "api_key": KEY}
+        for base_url in ("http://gpu01.corp:11434/v1", "https://gpu01.corp/api"):
+            refused = console.post(url, json=body | {"base_url": base_url})
+            assert refused.status_code == 422, refused.text
+>           assert refused.json()["error"]["code"] == "external_agent_host_reserved"
+E           AssertionError: assert 'external_agent_url_refused' == 'external_agent_host_reserved'
+E             
+E             - external_agent_host_reserved
+E             ?                ^^^^     ---
+E             + external_agent_url_refused
+E             ?                ^^^   ++
+
+tests/integration/test_06b2_external_agent.py:411: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+2026-11-02 20:44:49,346 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-02 20:44:49,375 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=481
+2026-11-02 20:44:49,949 INFO ffcore.access access method=POST path=/api/v1/projects/1497d05a-8ef9-41d1-b340-449a574369e1/api-keys status=201 ms=559
+------------------------------ Captured log setup ------------------------------
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=481
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/1497d05a-8ef9-41d1-b340-449a574369e1/api-keys status=201 ms=559
+----------------------------- Captured stderr call -----------------------------
+2026-11-02 20:44:50,155 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-02 20:44:50,253 INFO ffcore.access access method=POST path=/api/v1/projects/1497d05a-8ef9-41d1-b340-449a574369e1/agents/external status=422 ms=196
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/1497d05a-8ef9-41d1-b340-449a574369e1/agents/external status=422 ms=196
+--------------------------- Captured stderr teardown ---------------------------
+2026-11-02 20:44:56,880 ERROR ffcore.readiness warmup failed: ModelMissing
+---------------------------- Captured log teardown -----------------------------
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+=========================== short test summary info ============================
+FAILED tests/integration/test_06b2_external_agent.py::test_06b2_r2_active_provider_hosts_reserved
+1 failed, 25 deselected in 17.54s
