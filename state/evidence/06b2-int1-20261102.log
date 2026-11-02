@@ -1,0 +1,31 @@
+All checks passed!
+ffcore/core/tracing.py:142: in init_tracing
+    conf = langfuse_config(settings)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+
+    def langfuse_config(settings: Settings) -> LangfuseConfig | None:
+        values = {name: getattr(settings, name) for name in _SETTINGS}
+        if not any(values.values()):
+            log.warning("langfuse_disabled LANGFUSE_HOST/_PUBLIC_KEY/_SECRET_KEY are not set")
+            return None
+        missing = [name.upper() for name, value in values.items() if not value]
+        if missing:
+            raise TracingConfigError(f"Langfuse is half configured; not set: {', '.join(missing)}")
+        host = settings.langfuse_host.rstrip("/")
+        hostname = urlsplit(host).hostname or ""
+        if urlsplit(host).scheme not in ("http", "https") or not EgressPolicy(settings).is_internal(
+            hostname
+        ):
+>           raise TracingConfigError(
+                "LANGFUSE_HOST must be an http(s) URL of a host in ALLOWED_INTERNAL_HOSTS"
+            )
+E           ffcore.core.tracing.TracingConfigError: LANGFUSE_HOST must be an http(s) URL of a host in ALLOWED_INTERNAL_HOSTS
+
+ffcore/core/tracing.py:65: TracingConfigError
+=========================== short test summary info ============================
+ERROR tests/integration/test_06b2_external_agent.py::test_06b2_2_register_requires_admin_edit[analyst-edit]
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+1 error in 18.57s

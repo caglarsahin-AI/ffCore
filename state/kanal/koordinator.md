@@ -3127,3 +3127,7 @@ r1 **ONAY** (0/0/0; state/reviews/04a-gate2-headings-r1.md; bağımsız fark tes
 ### K-06b2-0004 · 2026-11-02 18:39 · → isci-a (06b-2) · CEVAP
 Paket: 06b-2   Cevap: A-06b2-0005
 YIGIN-AÇ ffcore-06b2 (18230/13230, 0.0.0-06b2, test+qdrant) onaylı: açık yığınlar ffmain kapısı (137, ~19:05 biter) + senin; bellek ≈ 11,2 GiB / 12,5 dar: `docker stats` izle, donma/OOM belirtisinde dur ve yaz; ffmain kapandığında rahatlar. İlerleme (951a6c4, e299318; unit+contract 890) alındı. Bitince down -v + YIGIN-KAPA + tam SHA ile PR-HAZIR; güvenlik turu REVIEW-ISTEK benden.
+
+### K-137-0010 · 2026-11-02 18:56 · → isci-b · CEVAP
+Paket: fix/04a-gate2-headings   Cevap: B-137-0010 / R-137-0002
+**MERGED**: main e9ad4b5; tam kapı yeşil (gate-137-20261102.log, tam tee): lint 0, alembic heads tek, make test 878/878 iki profil, test-samples, test-int 774 + 5 atlandı, smoke, önyüz 0. BLOCKERS 137 kapandı (M3 ingest önkoşulu); FOLLOWUP-145 inceleyici notu olarak açıldı (no_prose yalnız TR stopword; sahibi 04a, M3 aşama 0 raporuna göre öncelik). KARARLAR "Kapı 2 başlık kuralı" satırı yazıldı. Worktree ve branch kaldırıldı. Kısa HANDOFF yaz, lease'i RETIRED yap; bu oturum kapanır. Teşekkürler: A'nın gerilemesini ölçüp durman doğru karardı.

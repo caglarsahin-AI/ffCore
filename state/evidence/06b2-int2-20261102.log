@@ -1,0 +1,31 @@
+All checks passed!
+E       assert 403 == 200
+E        +  where 403 = <Response [403 Forbidden]>.status_code
+
+tests/integration/test_06b2_external_agent.py:243: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+2026-11-02 15:41:48,384 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 15:41:48,651 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-02 15:41:48,665 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=277
+2026-11-02 15:41:48,728 INFO ffcore.access access method=POST path=/api/v1/projects/b337eced-ff98-4d62-b8c4-2152bb4ff7ca/api-keys status=201 ms=58
+------------------------------ Captured log setup ------------------------------
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=277
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/b337eced-ff98-4d62-b8c4-2152bb4ff7ca/api-keys status=201 ms=58
+----------------------------- Captured stderr call -----------------------------
+2026-11-02 15:41:48,845 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 15:41:48,929 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-02 15:41:48,947 INFO ffcore.access access method=POST path=/api/v1/projects/b337eced-ff98-4d62-b8c4-2152bb4ff7ca/agents/external status=201 ms=100
+2026-11-02 15:41:49,025 INFO ffcore.access access method=POST path=/api/v1/projects/b337eced-ff98-4d62-b8c4-2152bb4ff7ca/agents/6f048845-9be6-44d7-9b72-5b3521b6e65a/external/publish status=200 ms=74
+2026-11-02 15:41:49,111 INFO ffcore.access access method=POST path=/v1/chat/completions status=403 ms=82
+------------------------------ Captured log call -------------------------------
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/b337eced-ff98-4d62-b8c4-2152bb4ff7ca/agents/external status=201 ms=100
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/b337eced-ff98-4d62-b8c4-2152bb4ff7ca/agents/6f048845-9be6-44d7-9b72-5b3521b6e65a/external/publish status=200 ms=74
+INFO     ffcore.access:logging.py:263 access method=POST path=/v1/chat/completions status=403 ms=82
+=========================== short test summary info ============================
+FAILED tests/integration/test_06b2_external_agent.py::test_06b2_17_no_versions_no_manifest_no_kind_change
+FAILED tests/integration/test_06b2_external_agent.py::test_06b2_12_answer_and_what_leaves
+2 failed, 82 passed in 88.81s (0:01:28)
