@@ -1334,3 +1334,13 @@ ffcore-06b, 18130/13130, FFCORE_VERSION=0.0.0-06b, `--profile test --profile qdr
 ### A-06b-0020 · 2026-11-02 13:25 · → koordinator · DURUM
 Paket: 06b   Cevap: K-06b-0012
 Takılma yok; düzeltmeler commit'li, tam kapı koşuyor (açık yığın bu). feat/06b-facade @ f4f7766232856bf88ee7a91d0b0c653af89d09ce: b182db4 `fix(06a,08)` (`engine.enforced_at` + `rule_mode`, 06a `EngineGuard.streams_live`; FOLLOWUP-140), f4f7766 `fix(06b)` (MAJOR-1 beyaz liste + metin alanları egress + `unsupported_field` + `user` etiketi LiteLLM'e gitmez + `logit_bias` denetimi; MAJOR-2 facade; MINOR 1-3 docs + `test_06b_litellm_not_published`; C11'e additive `unsupported_field`). Kırmızı kanıt: 06b-r1-red-unit (9 düşen), 06b-r1-red-int (3 düşen); yeşil hedefli 69 + 24 (06b-r1-green-targeted). Tam kapı (state/evidence/06b-gate3-20261102.log): lint, heads, make test 777/777 iki profil, test-samples yeşil; test-int llmaas 13:23'te başladı, sonra airgap, smoke, önyüz (~13:50). Bitince down -v + YIGIN-KAPA + PR-HAZIR. Sapma notu (PR "r1 DUZELT"): `ChatMessage` `extra="forbid"` 422 `validation_error` verirdi; kararın istediği 400 `unsupported_field` için model allow kaldı, ret `client_messages`'ta, giden mesaj yalnız beyaz listeden kurulur.
+
+### A-06b-0021 · 2026-11-02 13:50 · → koordinator · PR-HAZIR + YIGIN-KAPA
+Paket: 06b   Cevap: K-06b-0012   [B] + [C] (S7, onaylı)
+**PR-HAZIR (r1 DUZELT):** feat/06b-facade @ f4f7766232856bf88ee7a91d0b0c653af89d09ce (baz main d274bc9, 8 commit, 35 dosya +4877/−35, migration yok, push yok). Delta 45d901b..f4f7766: b182db4 `fix(06a,08)` (engine.py `rule_mode` + `enforced_at`, adapters.py yalnız `streams_live`), f4f7766 `fix(06b)` (facade_guard/proxy/agent/schemas, C11 additive `unsupported_field`, docs, testler). PR state/pr/06b.md "r1 DUZELT" tablosu (bulgu → düzeltme → commit → test) + 3 varsayım/sapma (`extra="forbid"` yerine 400 `unsupported_field`; motor kural modu semantiği; `tool_call_id` egress).
+Kapı (tam tee state/evidence/06b-gate3-20261102.log, HEAD f4f7766): lint 0; heads 57_0002; make test 777/777 llmaas + airgap; test-samples OK; test-int (qdrant) 744 passed + 4 skipped iki profilde (atlananlar main ile aynı); smoke passed; önyüz lint/tsc/check:api 0; S7 openai/jiter yok. Kırmızı: 06b-r1-red-unit (9), 06b-r1-red-int (3). Sınır: airgap test-int yığının egress ayarıyla koşar (egress açık); egress kapalı facade yolu entegrasyonda NOT_RUN (main ile aynı düzen).
+**YIGIN-KAPA:** ffcore-06b `down -v` (konteyner 0, volume 0). Dal f4f7766'da donar.
+
+### A-06b-0022 · 2026-11-02 · → koordinator · ACK
+Paket: 06b   Cevap: K-06b-0015
+ACK. Dal f4f7766'da donuk, yığın kapalı; r2 DUZELT bekliyorum. ONAY/merge sonrası HANDOFF + RETIRED.
