@@ -1,0 +1,12 @@
+fatal: cannot change to '/c/ai_paycore/ffcore/.worktrees/feat/06b-facade': No such file or directory
+=== GREEN:  + uncommitted r2
+..........F....                                                          [100%]
+=========================== short test summary info ============================
+FAILED tests/integration/test_06b_agent.py::test_06b_13_previous_agent_answer_sent_back_200
+1 failed, 14 passed, 37 deselected in 34.62s
+
+=== GREEN rerun 15:12: second agent request gets its own scripted ports (test fix)
+379 files already formatted
+........................................................................ [ 82%]
+...............                                                          [100%]
+87 passed in 119.35s (0:01:59)

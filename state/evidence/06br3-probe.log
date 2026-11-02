@@ -1,0 +1,236 @@
+P1 message.name: status=200 code=- provider_saw_email=False
+.2026-11-02 12:22:27,116 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 12:22:28,056 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 12:22:28,450 ERROR ffcore.readiness warmup failed: ModelMissing
+P1 stop: status=200 code=- provider_saw_email=False
+2026-11-02 12:22:29,577 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 12:22:29,986 ERROR ffcore.readiness warmup failed: ModelMissing
+P1 stop_str: status=200 code=- provider_saw_email=False
+2026-11-02 12:22:31,330 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 12:22:31,663 ERROR ffcore.readiness warmup failed: ModelMissing
+P1 response_format: status=200 code=- provider_saw_email=False
+2026-11-02 12:22:32,622 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 12:22:33,091 ERROR ffcore.readiness warmup failed: ModelMissing
+P1 tool_choice: status=200 code=- provider_saw_email=False
+2026-11-02 12:22:34,334 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 12:22:34,637 ERROR ffcore.readiness warmup failed: ModelMissing
+P1 tools.description: status=200 code=- provider_saw_email=False
+2026-11-02 12:22:35,559 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 12:22:35,866 ERROR ffcore.readiness warmup failed: ModelMissing
+P1 tool_call_id: status=200 code=- provider_saw_email=False
+2026-11-02 12:22:36,950 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 12:22:37,325 ERROR ffcore.readiness warmup failed: ModelMissing
+P1 top_p: status=400 code=invalid_parameter provider_saw_email=False
+2026-11-02 12:22:38,041 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 12:22:38,330 ERROR ffcore.readiness warmup failed: ModelMissing
+P1 seed: status=400 code=invalid_parameter provider_saw_email=False
+2026-11-02 12:22:38,999 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 12:22:39,326 ERROR ffcore.readiness warmup failed: ModelMissing
+P1 presence_penalty: status=400 code=invalid_parameter provider_saw_email=False
+2026-11-02 12:22:40,140 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 12:22:40,428 ERROR ffcore.readiness warmup failed: ModelMissing
+P1 frequency_penalty: status=400 code=invalid_parameter provider_saw_email=False
+2026-11-02 12:22:41,245 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 12:22:41,596 ERROR ffcore.readiness warmup failed: ModelMissing
+P1 logit_bias: status=400 code=invalid_parameter provider_saw_email=False
+2026-11-02 12:22:42,596 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 12:22:43,058 ERROR ffcore.readiness warmup failed: ModelMissing
+P2 unknown field: 400 unsupported_field Unsupported fields in messages[0]: ['x_secret']
+P2 echoed assistant field annotations=[]: 200
+P2 echoed assistant field refusal=None: 200
+P2 echoed assistant field audio=None: 200
+P2 echoed assistant field function_call=None: 200
+P2 echoed assistant field annotations=[{'type': 'url_citation'}]: 200
+2026-11-02 12:22:46,071 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 12:22:46,636 ERROR ffcore.readiness warmup failed: ModelMissing
+P3 user label at provider: False
+2026-11-02 12:22:47,718 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 12:22:48,107 ERROR ffcore.readiness warmup failed: ModelMissing
+P4 non-stream: 400 | stream: 200 secret in stream: False | first x_platform: {'event': 'progress', 'kind': 'output_buffered'}
+2026-11-02 12:22:49,512 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 12:22:49,956 ERROR ffcore.readiness warmup failed: ModelMissing
+P5 default policy first chunk x_platform: None
+P5 monitor policy + monitor rule: stream live -> True
+2026-11-02 12:22:51,522 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 12:22:52,447 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 12:22:52,673 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 12:22:52,901 ERROR ffcore.readiness warmup failed: ModelMissing
+P7 byte-equal 403 OK
+2026-11-02 12:22:54,106 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 12:22:54,763 ERROR ffcore.readiness warmup failed: ModelMissing
+R3 temperature='ayse.yilmaz@': 400 invalid_parameter param=temperature echoed=False
+2026-11-02 12:22:56,616 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 12:22:57,289 ERROR ffcore.readiness warmup failed: ModelMissing
+R3 top_p='ayse.yilmaz@': 400 invalid_parameter param=top_p echoed=False
+2026-11-02 12:22:59,181 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 12:22:59,687 ERROR ffcore.readiness warmup failed: ModelMissing
+R3 presence_penalty='ayse.yilmaz@': 400 invalid_parameter param=presence_penalty echoed=False
+2026-11-02 12:23:00,749 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 12:23:01,087 ERROR ffcore.readiness warmup failed: ModelMissing
+R3 frequency_penalty='ayse.yilmaz@': 400 invalid_parameter param=frequency_penalty echoed=False
+2026-11-02 12:23:01,937 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 12:23:02,357 ERROR ffcore.readiness warmup failed: ModelMissing
+R3 seed='ayse.yilmaz@': 400 invalid_parameter param=seed echoed=False
+2026-11-02 12:23:03,297 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 12:23:03,621 ERROR ffcore.readiness warmup failed: ModelMissing
+R3 max_tokens='ayse.yilmaz@': 400 invalid_parameter param=max_tokens echoed=False
+2026-11-02 12:23:04,380 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 12:23:04,681 ERROR ffcore.readiness warmup failed: ModelMissing
+R3 max_completion_tokens='ayse.yilmaz@': 400 invalid_parameter param=max_completion_tokens echoed=False
+2026-11-02 12:23:05,532 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 12:23:05,818 ERROR ffcore.readiness warmup failed: ModelMissing
+R3 n='ayse.yilmaz@': 400 invalid_parameter param=n echoed=False
+2026-11-02 12:23:06,530 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 12:23:06,806 ERROR ffcore.readiness warmup failed: ModelMissing
+R3 temperature='True': 400 invalid_parameter param=temperature echoed=False
+2026-11-02 12:23:07,737 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 12:23:08,114 ERROR ffcore.readiness warmup failed: ModelMissing
+R3 top_p='True': 400 invalid_parameter param=top_p echoed=False
+2026-11-02 12:23:08,956 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 12:23:09,230 ERROR ffcore.readiness warmup failed: ModelMissing
+R3 presence_penalty='True': 400 invalid_parameter param=presence_penalty echoed=False
+2026-11-02 12:23:09,883 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 12:23:10,181 ERROR ffcore.readiness warmup failed: ModelMissing
+R3 frequency_penalty='True': 400 invalid_parameter param=frequency_penalty echoed=False
+2026-11-02 12:23:10,855 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 12:23:11,195 ERROR ffcore.readiness warmup failed: ModelMissing
+R3 seed='True': 400 invalid_parameter param=seed echoed=False
+2026-11-02 12:23:11,916 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 12:23:12,216 ERROR ffcore.readiness warmup failed: ModelMissing
+R3 max_tokens='True': 400 invalid_parameter param=max_tokens echoed=False
+2026-11-02 12:23:12,971 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 12:23:13,352 ERROR ffcore.readiness warmup failed: ModelMissing
+R3 max_completion_tokens='True': 400 invalid_parameter param=max_completion_tokens echoed=False
+2026-11-02 12:23:14,121 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 12:23:14,519 ERROR ffcore.readiness warmup failed: ModelMissing
+R3 n='True': 400 invalid_parameter param=n echoed=False
+2026-11-02 12:23:15,218 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 12:23:15,539 ERROR ffcore.readiness warmup failed: ModelMissing
+R3 temperature='[1]': 400 invalid_parameter param=temperature echoed=False
+2026-11-02 12:23:16,467 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 12:23:16,818 ERROR ffcore.readiness warmup failed: ModelMissing
+R3 top_p='[1]': 400 invalid_parameter param=top_p echoed=False
+2026-11-02 12:23:17,896 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 12:23:18,277 ERROR ffcore.readiness warmup failed: ModelMissing
+R3 presence_penalty='[1]': 400 invalid_parameter param=presence_penalty echoed=False
+2026-11-02 12:23:19,287 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 12:23:19,636 ERROR ffcore.readiness warmup failed: ModelMissing
+R3 frequency_penalty='[1]': 400 invalid_parameter param=frequency_penalty echoed=False
+2026-11-02 12:23:20,633 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 12:23:21,073 ERROR ffcore.readiness warmup failed: ModelMissing
+R3 seed='[1]': 400 invalid_parameter param=seed echoed=False
+2026-11-02 12:23:21,964 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 12:23:22,438 ERROR ffcore.readiness warmup failed: ModelMissing
+R3 max_tokens='[1]': 400 invalid_parameter param=max_tokens echoed=False
+2026-11-02 12:23:23,446 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 12:23:23,838 ERROR ffcore.readiness warmup failed: ModelMissing
+R3 max_completion_tokens='[1]': 400 invalid_parameter param=max_completion_tokens echoed=False
+2026-11-02 12:23:24,812 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 12:23:25,154 ERROR ffcore.readiness warmup failed: ModelMissing
+R3 n='[1]': 400 invalid_parameter param=n echoed=False
+2026-11-02 12:23:26,025 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 12:23:26,326 ERROR ffcore.readiness warmup failed: ModelMissing
+R3 temperature="{'a': 1}": 400 invalid_parameter param=temperature echoed=False
+2026-11-02 12:23:27,473 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 12:23:27,879 ERROR ffcore.readiness warmup failed: ModelMissing
+R3 top_p="{'a': 1}": 400 invalid_parameter param=top_p echoed=False
+2026-11-02 12:23:29,005 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 12:23:29,626 ERROR ffcore.readiness warmup failed: ModelMissing
+R3 presence_penalty="{'a': 1}": 400 invalid_parameter param=presence_penalty echoed=False
+2026-11-02 12:23:30,602 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 12:23:30,950 ERROR ffcore.readiness warmup failed: ModelMissing
+R3 frequency_penalty="{'a': 1}": 400 invalid_parameter param=frequency_penalty echoed=False
+2026-11-02 12:23:31,700 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 12:23:32,050 ERROR ffcore.readiness warmup failed: ModelMissing
+R3 seed="{'a': 1}": 400 invalid_parameter param=seed echoed=False
+2026-11-02 12:23:32,903 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 12:23:33,251 ERROR ffcore.readiness warmup failed: ModelMissing
+R3 max_tokens="{'a': 1}": 400 invalid_parameter param=max_tokens echoed=False
+2026-11-02 12:23:34,247 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 12:23:34,632 ERROR ffcore.readiness warmup failed: ModelMissing
+R3 max_completion_tokens="{'a': 1}": 400 invalid_parameter param=max_completion_tokens echoed=False
+2026-11-02 12:23:35,440 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 12:23:35,820 ERROR ffcore.readiness warmup failed: ModelMissing
+R3 n="{'a': 1}": 400 invalid_parameter param=n echoed=False
+2026-11-02 12:23:36,639 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 12:23:37,011 ERROR ffcore.readiness warmup failed: ModelMissing
+R3 range temperature=2.5: 400 invalid_parameter temperature
+2026-11-02 12:23:38,078 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 12:23:38,414 ERROR ffcore.readiness warmup failed: ModelMissing
+R3 range temperature=-0.1: 400 invalid_parameter temperature
+2026-11-02 12:23:39,147 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 12:23:39,411 ERROR ffcore.readiness warmup failed: ModelMissing
+R3 range top_p=1.5: 400 invalid_parameter top_p
+2026-11-02 12:23:40,041 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 12:23:40,315 ERROR ffcore.readiness warmup failed: ModelMissing
+R3 range presence_penalty=3: 400 invalid_parameter presence_penalty
+2026-11-02 12:23:40,966 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 12:23:41,238 ERROR ffcore.readiness warmup failed: ModelMissing
+R3 range frequency_penalty=-2.5: 400 invalid_parameter frequency_penalty
+2026-11-02 12:23:41,933 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 12:23:42,237 ERROR ffcore.readiness warmup failed: ModelMissing
+R3 range max_tokens=0: 400 invalid_parameter max_tokens
+2026-11-02 12:23:43,070 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 12:23:43,419 ERROR ffcore.readiness warmup failed: ModelMissing
+R3 range n=2: 400 invalid_parameter n
+2026-11-02 12:23:44,135 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 12:23:44,497 ERROR ffcore.readiness warmup failed: ModelMissing
+R3 range seed=1.5: 400 invalid_parameter seed
+2026-11-02 12:23:45,200 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 12:23:45,456 ERROR ffcore.readiness warmup failed: ModelMissing
+R3 range max_tokens=1.5: 400 invalid_parameter max_tokens
+2026-11-02 12:23:46,131 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 12:23:46,460 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 12:23:47,345 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 12:23:47,717 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 12:23:48,525 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 12:23:48,828 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 12:23:49,747 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 12:23:50,091 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 12:23:50,855 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 12:23:51,140 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 12:23:51,891 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 12:23:52,251 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 12:23:53,080 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 12:23:53,354 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 12:23:54,175 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 12:23:54,471 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 12:23:55,466 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 12:23:55,736 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 12:23:57,316 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 12:23:57,686 ERROR ffcore.readiness warmup failed: ModelMissing
+R3 "temperature": Infinity: status=400 code=invalid_parameter provider_calls=0
+2026-11-02 12:23:58,604 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 12:23:58,914 ERROR ffcore.readiness warmup failed: ModelMissing
+R3 "seed": -Infinity: status=400 code=invalid_parameter provider_calls=0
+2026-11-02 12:23:59,602 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 12:23:59,967 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 12:24:01,276 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 12:24:01,578 ERROR ffcore.readiness warmup failed: ModelMissing
+R3 stream bad param: 400 invalid_parameter
+2026-11-02 12:24:02,248 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 12:24:02,536 ERROR ffcore.readiness warmup failed: ModelMissing
+R3 unknown params: 400 unsupported_field
+2026-11-02 12:24:03,289 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 12:24:03,567 ERROR ffcore.readiness warmup failed: ModelMissing
+R3 echo: 200 | echo values at provider: False annotations key at provider: False
+R3 echo on user message: 400 unsupported_field
+.2026-11-02 12:24:04,351 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 12:24:05,221 ERROR ffcore.readiness warmup failed: ModelMissing
+R3 agent {'top_p': 'ayse.yilmaz@example.test'} 400 invalid_parameter top_p
+R3 agent {'temperature': 9} 400 invalid_parameter temperature
+R3 agent {'n': 3} 400 invalid_parameter n
+R3 agent {'metadata': {'a': 1}} 400 unsupported_field None
+                raise ValueError(
+E       ValueError: Out of range float values are not JSON compliant: nan
+/usr/local/lib/python3.12/json/encoder.py:258: ValueError
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+                raise ValueError(
+E       ValueError: Out of range float values are not JSON compliant: nan
+/usr/local/lib/python3.12/json/encoder.py:258: ValueError
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+FAILED tests/integration/test_zz_rev06b_probe.py::test_r3_nan_infinity_json_constants["top_p": NaN]
+FAILED tests/integration/test_zz_rev06b_probe.py::test_r3_nan_infinity_json_constants["presence_penalty": NaN]
+2 failed, 73 passed in 122.73s (0:02:02)

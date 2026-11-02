@@ -1,0 +1,18 @@
+=== RED: code f4f7766 (detached checkout) + r2 tests (rerun; first run hung on the agent test without an inline queue, container stopped)
+FFFFFFFF.FFFFFF                                                          [100%]
+=========================== short test summary info ============================
+FAILED tests/integration/test_06b_direct.py::test_06b_7_numeric_parameter_with_text_400[temperature]
+FAILED tests/integration/test_06b_direct.py::test_06b_7_numeric_parameter_with_text_400[top_p]
+FAILED tests/integration/test_06b_direct.py::test_06b_7_numeric_parameter_with_text_400[max_tokens]
+FAILED tests/integration/test_06b_direct.py::test_06b_7_numeric_parameter_with_text_400[max_completion_tokens]
+FAILED tests/integration/test_06b_direct.py::test_06b_7_numeric_parameter_with_text_400[presence_penalty]
+FAILED tests/integration/test_06b_direct.py::test_06b_7_numeric_parameter_with_text_400[frequency_penalty]
+FAILED tests/integration/test_06b_direct.py::test_06b_7_numeric_parameter_with_text_400[seed]
+FAILED tests/integration/test_06b_direct.py::test_06b_7_numeric_parameter_with_text_400[n]
+FAILED tests/integration/test_06b_direct.py::test_06b_7_previous_answer_sent_back_200
+FAILED tests/integration/test_06b_agent.py::test_06b_13_previous_agent_answer_sent_back_200
+FAILED tests/integration/test_06b_agent.py::test_06b_7_agent_numeric_parameter_with_text_400[temperature]
+FAILED tests/integration/test_06b_agent.py::test_06b_7_agent_numeric_parameter_with_text_400[top_p]
+FAILED tests/integration/test_06b_agent.py::test_06b_7_agent_numeric_parameter_with_text_400[seed]
+FAILED tests/integration/test_06b_agent.py::test_06b_7_agent_numeric_parameter_with_text_400[max_tokens]
+14 failed, 1 passed, 37 deselected in 35.57s

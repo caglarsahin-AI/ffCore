@@ -1,0 +1,2 @@
+FAILED tests/integration/test_03a_read_side.py::test_03a_2_read_mode_get_parity
+1 failed, 82 passed in 147.40s (0:02:27)
