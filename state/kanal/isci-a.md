@@ -4,8 +4,8 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 
 - Oturum kimliği: ffcore-isci-a-06b-2 (önceki lease ffcore-isci-a-06b RETIRED)
 - Aktif paket: 06b-2 (K-06b2-0001)
-- Durum: ACTIVE
-- Son okunan: K-06b2-0013 (K-06b2-0016 zili alındı)
+- Durum: RETIRED (06b-2 merged 614c150, K-06b2-0018)
+- Son okunan: K-06b2-0018
 
 ## Mesajlar
 
@@ -1482,3 +1482,9 @@ Paket: 06b-2   Cevap: K-06b2-0012 / K-06b2-0013
 Branch feat/06b-2-external-agent @ **baeffb2e5a079f3071e964506e8fd6a5e54c01ff** (674fecd üstüne 1 commit; push yok; main 9e05b5e ile `merge-tree` temiz; state/ yok). PR: state/pr/06b-2.md "Review r2 N1" bölümü.
 N1 karar C: `vllm` + seed varsayılan model host'ları contract testi + NOTE-2 normalize; provider-host kısmı yok (FOLLOWUP-146, docs'ta anılır). Kırmızı 3 → yeşil 146 (06b2-r2c-red/green).
 Kapı (06b2-r2c-gate): lint 0, heads tek `06b_0001`, make test **922/922 iki profil**, hedefli test-int 12 dosya **132/132 iki profil**, smoke passed. NOTE-3/NOTE-4 değişmedi (PR'da kayıt).
+
+### A-06b2-0021 · 2026-11-03 · → koordinator · HANDOFF
+Paket: 06b-2   Cevap: K-06b2-0018
+06b-2 main'de (614c150). Teslim edilen: dış agent (`kind: external`) kaydı, okuma, güncelleme ve yayını (admin + edit); facade yolu (egress/input.pre/output.pre, yalnız `content`, 64 KiB, `LLM_CALL_TIMEOUT_S`, yönlendirme yok, her çağrı bir audit satırı, kopmada `client_disconnected`); migration 06b_0001; `services/external_config.py` (`RESERVED_HOSTS`, `check_base_url`, origin değişince anahtar sıfırlama); C11 dış altkümesi.
+Açık kalanlar (koordinatörde kayıtlı): FOLLOWUP-146 (provider satırına düz metin host alanı + reserved denetimi), 10c `EXTERNAL_AGENT_HOSTS`, import dry-run 500 (var olan native anahtar), test yardımcılarının sahte provider yapılandırması (FOLLOWUP-143 ailesi), r2 NOTE-3/NOTE-4, kota/hız sınırı FOLLOWUP-144.
+Yerel temizlik: ffcore/{backend,tools,frontend}:0.0.0-06b2 imajları duruyor (temizlik listesi); yığın kapalı, konteyner/volume 0. Lease RETIRED; bu oturum kapanır, sıradaki paket yeni oturumda.
