@@ -1,45 +1,77 @@
 # [A] fix(04a): Markdown headings are not code lines in Kapı 2 (FOLLOWUP-137)
 
-**Paket:** fix/04a-gate2-headings · **Sınıf:** [A] · **Branch:** fix/04a-gate2-headings · **Baz commit:** d365811 · **HEAD:** (henüz commit yok) · Oturum ffcore-isci-b-137-7e3079e2 · GOREV K-137-0001
+**Paket:** fix/04a-gate2-headings · **Sınıf:** [A] · **Branch:** fix/04a-gate2-headings · **Baz commit:** d365811 · **HEAD:** 0eed4c868f0d993d6d5bb62555acc8a894d5b5b7 (2 commit) · Oturum ffcore-isci-b-137-7e3079e2 · GOREV K-137-0001 · Kararlar K-137-0003 (plan), K-137-0004 (A), K-137-0006 (A′)
 
-## Plan (onay bekliyor)
-1. **Bulunan semboller:** `backend/ffcore/knowledge/gates.py:66` `_CODE_LINE`: `^\s*(?:[{}\[\]();]|//|#|--|<\w|import |...)`, `re.I`. Buradaki `#` dalı her `#` ile başlayan satırı kod sayıyor, Markdown başlıkları da buna dahil. Tek kullanım yeri `gates.py:166`, `text_quality` içinde (`> max_code_ratio` 0,5 → `skipped, code_heavy`). `text_quality` üç yerden çağrılıyor: `knowledge/ingest.py:389` ek dosya, `:495` belge, `:533` parça (breadcrumb'sız gövde). Mevcut testler: `tests/unit/test_04a_text_rules.py` (boilerplate, no_prose; `code_heavy` testi **yok**) ve `tests/integration/test_19_ingest_raw.py:79` (`gates == {"gate2:boilerplate": 1}`). Bu test `convert_without_weights` ile koşuyor ve başlıkları ayrı satırda tutuyor, bu yüzden 1001/1002 orada geçiyor. Hata yalnız Docling'in satırları paragraflara birleştirdiği gerçek dönüşümde çıkıyor (B-19-0013: 3 başlık / 5 satır = 0,6).
-2. **Kapsam:** `_CODE_LINE`'daki `#` dalı yalnız başlık olmayan `#` satırlarına uyar. Kapsam dışı: eşik (0,5) ve öteki desenler. Gözlem (değiştirilmiyor): `--` dalı Markdown yatay çizgisine (`---`) de uyuyor. Docling çıktısında görülürse ayrı FOLLOWUP açılır; bu PR'da ölçülmedi.
-3. **Değişecek dosyalar:**
-   - `backend/ffcore/knowledge/gates.py`: `#` dalı `#(?!#{0,5}\s+\S)` olur. Başlık (`#`…`######` + boşluk + metin) kod sayılmaz. `#include`, `#!/bin/sh`, `#define`, `#pragma` gibi `#` + boşluksuz satırlar kod kalır.
+## Plan (onaylı K-137-0003; uygulamada A′'ye evrildi)
+1. **Bulunan semboller:**
+   - `backend/ffcore/knowledge/gates.py:66` `_CODE_LINE`: `#` dalı her `#` satırını kod sayıyor.
+   - Tek kullanım `text_quality` (`code_heavy`, eşik 0,5). Çağıranlar `knowledge/ingest.py:389` (ek dosya), `:495` (belge), `:533` (parça).
+   - `_FENCE_LINE` aynı dosyada, data_dump için zaten var.
+   - **Uygulamada bulunan:** `convert/text_formats.py:44` düz metin dönüştürücüsü her .txt'yi tek bir ```` ``` ```` bloğuna sarıyor.
+   - `tests/converters.py` `convert_without_weights` Markdown'u olduğu gibi okuyor. Bu yüzden test_19'da 1001/1002 başlıkları ayrı satırda kalıyor ve hata orada görünmüyordu. Hata yalnız Docling paragraf birleştirmesinde çıkıyor (B-19-0013).
+2. **Kapsam:** Kapı 2 kod oranında satırın kod sayılıp sayılmadığı. Eşik ve öteki kurallar (boilerplate, no_prose, data_dump) değişmedi. Kapsam dışı: dönüştürücüler (C reddi, K-137-0006), `--` / `---` (Kalan riskler).
+3. **Değişen dosyalar:**
+   - `backend/ffcore/knowledge/gates.py`: `_CODE_LINE` main ile birebir aynı. Yeni `_HEADING_LINE` (`^\s*#{1,6}\s+\S`), `_is_code_line(line, fenced)` ve `_code_lines(lines)`. Fence dışında başlık kod değil. Fence içinde main kuralı geçerli (`# metin` kod). Fence çizgisi kod değil. Kapanmamış fence'ten sonra fence içi kural uygulanır (fail-safe = main).
    - `backend/tests/unit/test_137_gate2_headings.py` (yeni).
-   - `docs/bilgi-tabani.md` Kapı 2 cümlesi: "Markdown heading lines are not code lines".
-4. **Sözleşme, yapılandırma, profil:** sözleşme yok (C5/C6 dokunulmuyor), yapılandırma yok, profil farkı yok. Davranış daralıyor: önceden `code_heavy` ile elenen bazı belgeler/parçalar artık indekslenecek. Var olan indeks yeniden işlenmez; yeni ingest'te geçerli olur. Bu, M3 ingest'inden önce kapanmasının gerekçesi.
-5. **Kabul kriteri → test** (`backend/tests/unit/test_137_gate2_headings.py`):
-   | # | Kriter | Test |
-   |---|---|---|
-   | 1 | 1001/1002 biçimindeki başlıklı kısa sayfa (Docling birleşik paragraf biçimi, 3 başlık / 5 satır) Kapı 2'den geçer | `test_137_1_short_headed_page_passes` (önce kırmızı: bugün `code_heavy`) |
-   | 2 | `#`…`######` + boşluk + metin kod sayılmaz; `#` yalnız ya da `#` + boşluk + boş satır başlık değildir | `test_137_2_heading_levels_not_code` (parametrik) |
-   | 3 | `#include`, `#!/bin/bash`, `#define`, `#pragma` kod kalır | `test_137_3_hash_without_space_is_code` |
-   | 4 | Gerçek kod bloğu hâlâ `code_heavy` (C ön işlemcili ve kabuk betiği) | `test_137_4_real_code_still_code_heavy` |
-   | 5 | Eşik değişmedi: tam 0,5 geçer, üstü elenir (başlıksız satırlarla) | `test_137_5_threshold_unchanged` |
-   | 6 | Parça düzeyi (breadcrumb'sız gövde, başlıkla başlayan parça) geçer | `test_137_6_chunk_with_heading_passes` |
-   - Entegrasyon: `test_19_ingest_raw.py` ve 04a ingest testleri aynen yeşil kalmalı (regresyon). Yığın gerekirse YIGIN-AÇ 18220/13220. Gerçek Docling dönüşümü ağırlık istiyor (`make models` kullanıcıda); onun yerine 1001/1002'nin Docling biçimi birim testte metin olarak kurulur. Gerçek Docling koşusu NOT_RUN (gerekçe: ağırlık).
+   - `docs/bilgi-tabani.md`: Kapı 2 cümlesi.
+4. **Sözleşme, yapılandırma, profil:** sözleşme yok (C5/C6 değişmedi), yapılandırma yok, profil farkı yok. Davranış değişikliği yalnız fence dışındaki Markdown başlık satırlarında. Önceden `code_heavy` ile elenen başlıklı kısa sayfa/parça artık indekslenir. Var olan indeks yeniden işlenmez; kural yeni ingest'te uygulanır (M3 ingest'inden önce).
+5. **Kabul → test:** aşağıdaki tablo.
 6. **Migration:** yok.
-7. **Geri alma:** tek regex satırını geri almak. Veri değişikliği yok. Bu sürümle indekslenen belgeler eski kurala dönülürse yeniden ingest'te elenir.
-8. **Durma koşulları:** başlık ile kabuk yorumu arasında satır düzeyinde ayrım yapılamıyor (aşağıdaki varsayım 1). Koordinatör kabuk yorumlarının `# ` biçiminde de kod sayılmasını isterse bu, satır düzeyi regex ile mümkün değil. Bağlam (fence içi) gerekir; o zaman durup KARAR-GEREK yazarım.
+7. **Geri alma:** `_code_lines` yerine eski tek satır (`sum(bool(_CODE_LINE.match(ln)) …)`) yazılır. `_CODE_LINE` zaten main ile aynı. Veri değişikliği yok.
+8. **Durma koşulları:** iki kez uygulandı.
+   - B-137-0004: onaylı varsayım 1 yanlış çıktı (düzyazı yorumlu Python geçiyordu) → karar A.
+   - B-137-0007: A entegrasyonda .txt belgelerini eledi → karar A′.
 9. **Felsefe kontrolü:**
-   - **ARCH-07:** Başlıklı her kısa sayfaya dokunuyor (Confluence/OCR korpusunun yaygın biçimi), tek regex, kalıcı karmaşıklık yok.
-   - **ARCH-09:** Platform bunu sunmuyor; Docling yalnız dönüştürüyor, kalite kapısı bizim. Yeni kütüphane yok.
-   - **ARCH-10/06:** Gizli davranış yok. Elenen belge yine `gate2_reason` ile raporda görünür. Sessiz geçiş riski şu: başlık gibi görünen kabuk yorumu artık kod sayılmıyor. Bunu test 4 sınırlıyor (gerçek kod bloğunda öteki satırlar oranı taşıyor).
-
-## Varsayımlar ve brief'teki çelişkiler
-1. **Kabuk yorumu ile H1 başlık aynı biçimde** (`# metin`). GOREV "yalnız `#` + boşluksuz ya da kabuk yorumu deseni kod kalır" diyor. Ama `# install deps` ile `# Kurulum` satır düzeyinde ayırt edilemez. Varsayımım: `#` + boşluk + metin her zaman başlık sayılır. Kabuk yorumları ancak `#` + boşluksuz (`#!`, `#comment`) biçimindeyse kod kalır. Gerekçe: Kapı 2 metin kalitesidir; kod bloğunda yorumdan başka satırlar (komutlar, `{`, `import` …) oranı zaten taşır (test 4). Fence içi bağlam takibi kapsamı ve karmaşıklığı büyütür (ARCH-07). Koordinatör aksini isterse durma koşulu 8.
-2. `#123` (boşluksuz numara, ör. talep no) bugün olduğu gibi kod sayılmaya devam eder. Kapsam dışı, davranış değişmez.
+   - **ARCH-07:** Confluence/OCR korpusundaki başlıklı her kısa sayfaya değer katıyor. Kalıcı ek: bir regex ve 8 satırlık sayaç; yeni mekanizma yok (`_FENCE_LINE` yeniden kullanıldı).
+   - **ARCH-09:** Docling dönüştürür, kalite kapısı bizde; platformda karşılığı yok.
+   - **ARCH-10/06:** Gizli seçim yok, kural belgede. Elenen belge yine `gate2_reason` ile raporda görünür. Fence içi ve kapanmamış fence main davranışında kalıyor, böylece daha gevşek bir sessiz geçiş açılmıyor. Fence dışındaki düzyazı yorumlu kod bilinen sınır olarak testle sabitlendi (test 9).
 
 ## Değişen dosyalar
-(kodlama sonrası)
+- backend/ffcore/knowledge/gates.py
+- backend/tests/unit/test_137_gate2_headings.py (yeni)
+- docs/bilgi-tabani.md
 
 ## Kabul kriterleri → testler
-(kodlama sonrası)
+| # | Kriter | Test | Durum |
+|---|---|---|---|
+| 1 | 1001/1002 Docling biçimi (3 başlık / 5 satır), fence dışı başlıklı kısa sayfa Kapı 2'den geçer | `test_137_1_short_headed_page_passes` | önce kırmızı (`code_heavy`, 137-red), geçti |
+| 2 | `#`…`######` + boşluk + metin fence dışında kod değil | `test_137_2_heading_levels_not_code[1-6]` | önce kırmızı, geçti |
+| 3 | `#include`, `#!/bin/bash`, `#define`, `#pragma`, `#`, `# `, 7× `#` kod | `test_137_3_hash_without_heading_text_is_code` | geçti (koruma) |
+| 4 | Gerçek kod `code_heavy` kalır: C; ```` ``` ```` ve `~~~` içinde düzyazı yorumlu Python (main gibi) | `test_137_4_real_code_still_code_heavy[c, fenced_python_with_prose_comments, tilde_fenced_python]` | A'da kırmızı → yeşil (137-red2); A′'de yeşil |
+| 5 | Eşik değişmedi (0,5 geçer, 0,6 elenir) | `test_137_5_threshold_unchanged` | geçti |
+| 6 | Breadcrumb'sız parça, başlıklarla başlıyor, geçer | `test_137_6_chunk_with_heading_passes` | önce kırmızı, geçti |
+| 7 | Fence'li düz metin (.txt dönüştürücü biçimi, DEMO-7) geçer (main gibi) | `test_137_7_fenced_plain_text_passes` | A'nın gerilemesi (137-test-int, 137-probe-samples); A′'de geçti |
+| 8 | Kapanmamış fence: kalan satırlar main kuralıyla (`# metin` kod) | `test_137_8_unclosed_fence_keeps_main_rule` | geçti |
+| 9 | Bilinen sınır: fence dışında düzyazı yorumlu kod geçer | `test_137_9_unfenced_prose_commented_code_known_limit` | geçti (sabitlendi) |
+| E | test_19 ve 04a ingest entegrasyonu; `indexed 4, skipped 1`, `gate2:boilerplate 1` main ile aynı | `test_19_1_ingest_raw_paycore_like_idempotent` + `tests/integration/test_04a_*.py` | A'da kırmızı (indexed 3 / skipped 2), A′: aşağıda |
 
 ## Çalıştırılan komutlar
-(kodlama sonrası; tam tee `state/evidence/137-gate-<tarih>.log`)
+Hepsi `FFCORE_VERSION=0.0.0-main docker compose -p fix137 --env-file .env.test run --rm -T tools …` ile koştu: imaj derlenmedi, worktree `/work` olarak bağlı. Entegrasyon yığını fix137 (yalnız postgres + redis). Tam çıktılar `C:\ai_paycore\ffcore\state\evidence\` altında.
+
+| Komut | Kod | Ortam | Exit | Sonuç | Log |
+|---|---|---|---|---|---|
+| `pytest tests/unit/test_137_gate2_headings.py` | d365811 + yeni test (düzeltme yok) | — | 1 | 8 kırmızı (`code_heavy` / `assert not True`), 10 geçti | 137-red-20261102.log |
+| `make lint` + `make test` | ilk regex (commit öncesi) | llmaas, airgap | 0 / 2 | 873 geçti, 1 kaldı (test_137_4 Python, B-137-0004) | 137-gate-20261102.log |
+| `pytest test_137` | A testleri, A kodu yok | — | 1 | 4 kırmızı (fence vakaları) | 137-red2-20261102.log |
+| `make lint`, `make test` | A (commit öncesi) | llmaas, airgap | 0, 0, 0 | lint 0, 878/878 iki profil | 137-gate2-20261102.log |
+| `pytest test_19_ingest_raw + test_04a_*` | d358bae (A) | llmaas, airgap | 1, 1 | 78 geçti / 1 kaldı (test_19: indexed 3, skipped 2) | 137-test-int-20261102.log |
+| örnek ağaç ölçümü (`convert_without_weights` + `_code_lines`) | d358bae | — | 0 | DEMO-7 7/7, 1003-kontrol 6/6, PRSIM-1 4/4 → `code_heavy` | 137-probe-samples-20261102.log |
+| `make lint`, `make test` ×2, entegrasyon ×2 | **0eed4c8 (A′)** | llmaas, airgap | (aşağıda) | | 137-gate3-20261102.log |
+
+## Çıktı özeti ve post-state
+(gate3 sonucu eklenecek.) Yığın kapanışı: `down -v` + YIGIN-KAPA.
+
+## Ölçüm: Docling fence (K-137-0004 şart 3)
+Ağırlıksız, `--network none`, `ffcore/tools:0.0.0-main` içindeki docling. Docling HTML `<pre>` bloğunu (Confluence kod makrosuna benzeyen `<pre class="syntaxhighlighter-pre">` ve `<pre><code class="language-python">`) ve Markdown fence/girintili kodu **dil etiketsiz ```` ``` ````** ile veriyor. Gerçek Confluence dışa aktarımı ve PDF/DOCX yolu denenmedi.
+
+## Varsayımlar ve brief'teki çelişkiler
+1. `# metin` satırı satır düzeyinde H1 ile kabuk yorumunu ayırt edemez. Fence dışında başlık, içinde kod sayılır (K-137-0003 + K-137-0006 A′).
+2. Düz metin dönüştürücüsünün her .txt'yi fence'e sarması `docs/bilgi-tabani.md`'de yazmıyordu. Kapı 2 cümlesi artık bunu söylüyor.
+3. Plan sürecindeki iki varsayım düzeltmesi (B-137-0004, B-137-0007) bu PR'ın kararlarıdır; brief çelişkisi değildir.
 
 ## Kalan riskler
-- `---` yatay çizgi `--` dalına uyuyor (madde 2 gözlemi); ölçülmedi.
+- **Fence dışında düzyazı yorumlu kod geçer** (test 9). Eski davranışta `code_heavy` idi. Docling kodu fence'lediği için (ölçüldü, HTML/MD) pratikte fence dışı kod az olmalı. Fence'siz yapıştırılmış kod (Confluence'ta düz paragraf) indekse girebilir: arama gürültüsü, güvenlik değil.
+- **Confluence dışa aktarımında Docling fence'i doğrulanmadı.** Yalnız HTML ve MD örnekleriyle ölçüldü.
+- **`---` yatay çizgi `--` dalına uyuyor** (main davranışı, değişmedi). 19 sentetik ağacında `---` satırı 0 (ölçüldü), etkisi ölçülemedi.
+- `#123` (boşluksuz numara) main'deki gibi kod sayılır.
+- Gerçek Docling ile uçtan uca ingest NOT_RUN: ağırlıklar `make models` ile kullanıcıda. Entegrasyonda `RUN_MODEL_TESTS` 2, Qdrant 8, `tree_is_read_only` 1 test bayraklı NOT_RUN (main ile aynı).
