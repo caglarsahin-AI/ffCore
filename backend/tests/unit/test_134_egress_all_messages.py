@@ -1,14 +1,16 @@
 """BLOCKERS 134: every message that goes to the model passes egress on every call."""
 
 import asyncio
+import json
 import re
 from types import SimpleNamespace
 
 import pytest
 
+from ffcore.guardrails.engine import TextTooLong
 from ffcore.runtime.contracts import RunStatus
 from ffcore.runtime.definition import parse_definition
-from ffcore.runtime.graph import model
+from ffcore.runtime.graph import guard_in, model
 from ffcore.runtime.state import GuardResult, ModelTurn, StopRun
 from tests.integration.runtime_support import ScriptedGuard, definition
 
@@ -127,3 +129,52 @@ def test_134_airgap_egress_off_sends_unchanged():
     ctx, rec = _ctx(MaskingGuard(egress=False))
     run(model(_state(MESSAGES), SimpleNamespace(context=ctx)))
     assert rec.sent[0] == MESSAGES
+
+
+def test_134_tool_call_arguments_masked_and_stay_json():
+    calls = [
+        {
+            "id": "c1",
+            "type": "function",
+            "function": {"name": "run_sql", "arguments": json.dumps({"q": ["ali@example.com", 3]})},
+        }
+    ]
+    ctx, rec = _ctx(MaskingGuard())
+    messages = [{"role": "assistant", "content": "", "tool_calls": calls}]
+    run(model(_state(messages), SimpleNamespace(context=ctx)))
+    sent = rec.sent[0][0]["tool_calls"][0]["function"]["arguments"]
+    assert json.loads(sent) == {"q": ["<<PII_1>>", 3]}
+
+
+def test_134_guard_in_result_is_not_checked_again_by_the_model_node():
+    guard = MaskingGuard()
+    ctx, rec = _ctx(guard)
+    state = _state([{"role": "system", "content": "sys"}]) | {"question": "mail ali@example.com"}
+    update = run(guard_in(state, SimpleNamespace(context=ctx)))
+    state["messages"] = update["messages"]
+    run(model(state, SimpleNamespace(context=ctx)))
+    egress = [t for s, t in guard.seen if s == "egress"]
+    user = update["messages"][-1]["content"]
+    assert "ali@example.com" not in user
+    assert len(egress) == len(set(egress)) == 2  # system once, the user message once (guard_in)
+
+
+def test_134_non_text_content_fails_loud():
+    ctx, rec = _ctx(MaskingGuard())
+    parts = [{"role": "user", "content": [{"type": "text", "text": "hi"}]}]
+    with pytest.raises(StopRun) as raised:
+        run(model(_state(parts), SimpleNamespace(context=ctx)))
+    assert raised.value.code == "unsupported_message_content" and rec.sent == []
+
+
+def test_134_text_too_long_has_its_own_code():
+    guard = MaskingGuard()
+
+    async def too_long(stage, text, *, tool=None):
+        raise TextTooLong("text has 200001 characters; the limit is 200000")
+
+    guard.check = too_long
+    ctx, rec = _ctx(guard)
+    with pytest.raises(StopRun) as raised:
+        run(model(_state(MESSAGES), SimpleNamespace(context=ctx)))
+    assert raised.value.code == "guardrail_text_too_long" and rec.sent == []
