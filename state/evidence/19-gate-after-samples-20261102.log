@@ -1,0 +1,10 @@
+=== test_19 integration + unit
+SKIPPED [1] tests/integration/test_19_ingest_raw.py:155: root ignores file modes; the mount test runs :ro
+32 passed, 1 skipped in 24.10s
+=== make test-samples
+----------------------------------------------------------------------
+Ran 54 tests in 3.119s
+
+OK (skipped=5)
+=== m3_gate_check (host git)
+m3 gate check: OK

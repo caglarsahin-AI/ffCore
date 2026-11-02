@@ -1,0 +1,26 @@
+F.                                                                       [100%]
+=================================== FAILURES ===================================
+_______________ test_134_llmaas_provider_sees_no_raw_identifier ________________
+
+database_url = 'postgresql+psycopg://ffcore:dummy-not-secret-postgres@postgres:5432/ffcore_test_8c62540e7f87'
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_8c62540e7f87) at 0x7f4db52aad80>
+catalog = <tests.integration.litellm_support.catalog.<locals>.Catalog object at 0x7f4db52a81a0>
+llm_settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+
+    @pytest.mark.usefixtures("clean_litellm")
+    def test_134_llmaas_provider_sees_no_raw_identifier(database_url, pg, catalog, llm_settings):
+        sent, back, unresolved = _send(database_url, catalog, llm_settings, pg, True)
+        for raw in (EMAIL, PHONE, SYSTEM_MAIL):
+>           assert raw not in sent  # history, tool result, tool call arguments, system prompt
+            ^^^^^^^^^^^^^^^^^^^^^^
+E           assert 'ali.veli@example.com' not in '[{"role": "...tell you?"}]'
+E             
+E             'ali.veli@example.com' is contained here:
+E             ?           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               e-mail is ali.veli@example.com"}, {"role": "assistant", "content": "", "tool_calls": [{"id": "c1", "type": "function", "function": {"name": "run_sql", "arguments": "{\"sql\": \"-- ali.veli@example.com\"}"}}]}, {"role": "tool", "tool_call_id": "c1", "content": "<tool_result>phone=+905321234567</tool_result>"}, {"role": "user", "content": "Turn 2: what did I tell you?"}]
+E             ?           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_134_provider_request.py:108: AssertionError
+=========================== short test summary info ============================
+FAILED tests/integration/test_134_provider_request.py::test_134_llmaas_provider_sees_no_raw_identifier
+1 failed, 1 passed in 6.11s

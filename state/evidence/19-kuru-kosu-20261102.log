@@ -1,0 +1,122 @@
+=== 10:45:45 kuru koşu HEAD dfe93564585aad708670f52990f1b36f8e52f27f
+networks {'default': True}
+ Network ffcore-19_default  Removed
+ Container ffcore-19-worker-1  Healthy
+ Container ffcore-19-mcp-sql-1  Healthy
+ Container ffcore-19-mcp-search-1  Healthy
+up exit 0
+=== egress (tools, iç ağ)
+no egress: https://pypi.org/simple/ URLError
+no egress: http://example.com/ URLError
+=== make seed
+python -m tests.e2e.scenarios.seed
+seeded: projects ['hastane-a', 'klinik-b'], models ['chat-default', 'chat-fail', 'chat-slow', 'chat-tools'], agents in hastane-a; created 36, uploaded 15
+seed exit 0
+=== kb
+kb 201
+=== ingest-raw #1 (worker, uid 10001, /raw:ro)
+created 5
+new_version 0
+unchanged 0
+status: failed 4, indexed 1
+rejected: prsim_requires_ner 1
+gates: -
+masked (pii_regex): -
+stage: full
+manifest: documents 5, chunks 1, raw_manifest_sha256 ad34d03f01151b7bebf525d4eecc594b6bf04b99d348e822719547becfd2a1ba
+manifest written to /data/storage/m3-kk/manifest-1.json
+ingest exit 1
+=== ingest-raw #2 (worker, uid 10001, /raw:ro)
+created 0
+new_version 0
+unchanged 5
+status: -
+rejected: prsim_requires_ner 1
+gates: -
+masked (pii_regex): -
+stage: full
+manifest: documents 5, chunks 1, raw_manifest_sha256 ad34d03f01151b7bebf525d4eecc594b6bf04b99d348e822719547becfd2a1ba
+manifest written to /data/storage/m3-kk/manifest-2.json
+ingest exit 1
+=== PRSIM bayraksız
+error: prsim_requires_ner: jira:PRSIM carries person data; it is ingested once 08 full recognizes names
+exit 2
+=== raw salt okunur
+touch: cannot touch '/raw/x': Read-only file system
+touch-exit 1
+=== agent
+agent paycore-like-asistan published
+=== eval (fake-llm)
+dataset items 2
+kk-1: completed fail
+kk-2: completed pass
+report written to /tmp/kk/out/eval-20261102-0751.md
+- Scored items: 2/2 (excluded by source: none)
+- Document questions with the right source: 0/1
+- Source accuracy: 0/1 (0.0%)
+- Unanswerable questions held: 1/1
+| kk-1 | dogrudan | completed | declined | no | contains=ok, cites_source=fail, llm_judge=NOT_RUN | 0.6 |  |
+| kk-2 | alan_disi_cevapsiz | completed | declined | yes | holds=ok, llm_judge=NOT_RUN | 0.4 |  |
+=== 10:52:16 worker + yerel ağırlıklar (04a volume, :ro), recreate
+ Container ffcore-19-backend-1  Healthy
+=== reindex silver (runbook 7.3 kurtarma yolu)
+reindex queued: job 13f73dcec99c4e52b43c1c3e4e978248 (worker log shows reused=N embedded=M)
+settled after ~15 s
+confluence/DEMO/1001.md|skipped|code_heavy|docling@2.125.0|pii_regex@1|{"TR_PHONE": 1, "EMAIL_ADDRESS": 1, "TR_NATIONAL_ID": 1}
+confluence/DEMO/1002.md|skipped|code_heavy|docling@2.125.0|pii_regex@1|{}
+confluence/DEMO/1003.md|indexed|-|docling@2.125.0|pii_regex@1|{}
+confluence/DEMO/1004.md|skipped|boilerplate|docling@2.125.0|pii_regex@1|{}
+jira/DEMO/DEMO-7.txt|indexed|-|plaintext|pii_regex@1|{}
+=== ingest-raw #3
+created 0
+new_version 0
+unchanged 5
+status: -
+rejected: prsim_requires_ner 1
+gates: -
+masked (pii_regex): -
+stage: full
+manifest: documents 5, chunks 2, raw_manifest_sha256 ad34d03f01151b7bebf525d4eecc594b6bf04b99d348e822719547becfd2a1ba
+manifest written to /data/storage/m3-kk/manifest-3.json
+ingest exit 0
+=== silver ve parçalarda PII
+0|0
+0
+2
+=== 10:54:32 örnek belgelere paragraf eklendi (gates.py _CODE_LINE bulgusu); ingest-raw #4
+created 0
+new_version 2
+unchanged 3
+status: indexed 2
+rejected: prsim_requires_ner 1
+gates: -
+masked (pii_regex): EMAIL_ADDRESS 1, TR_NATIONAL_ID 1, TR_PHONE 1
+stage: full
+manifest: documents 5, chunks 4, raw_manifest_sha256 56139353ac1759bf12407b6888d67a55aaba908e37275886eeaad99dcde1a506
+manifest written to /data/storage/m3-kk/manifest-4.json
+ingest exit 0
+confluence/DEMO/1001.md|2|indexed|-
+confluence/DEMO/1002.md|2|indexed|-
+confluence/DEMO/1003.md|1|indexed|-
+confluence/DEMO/1004.md|1|skipped|boilerplate
+jira/DEMO/DEMO-7.txt|1|indexed|-
+=== ingest-raw #5
+created 0
+unchanged 5
+status: -
+manifest: documents 5, chunks 4, raw_manifest_sha256 56139353ac1759bf12407b6888d67a55aaba908e37275886eeaad99dcde1a506
+ingest exit 0
+=== 10:55:44 test süper yöneticisi + analist (parolalar kabukta, yazılmadı)
+superadmin created: <id>
+analyst 201 member 201
+=== eval (fake-llm, depo dışı çıktı /tmp/kk/out)
+dataset items 2
+kk-1: completed pass
+kk-2: completed fail
+report written to /tmp/kk/out/eval-20261102-0756.md
+- Scored items: 2/2 (excluded by source: none)
+- Document questions with the right source: 1/1
+- Source accuracy: 1/1 (100.0%)
+- Unanswerable questions held: 0/1
+| kk-1 | dogrudan | completed | answered | yes | contains=ok, cites_source=ok, llm_judge=NOT_RUN | 0.9 |  |
+| kk-2 | alan_disi_cevapsiz | completed | answered | no | holds=fail, llm_judge=NOT_RUN | 0.5 |  |

@@ -1,0 +1,5 @@
+ Container ffcore-19-langfuse-postgres-1  Healthy
+ Container ffcore-19-langfuse-clickhouse-1  Healthy
+ Container ffcore-19-migrate-1  Exited
+ Container ffcore-19-mcp-sql-1  Healthy
+ Container ffcore-19-mcp-search-1  Healthy
