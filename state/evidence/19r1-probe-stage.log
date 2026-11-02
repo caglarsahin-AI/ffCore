@@ -1,0 +1,39 @@
+PASS without flag: prsim_requires_ner
+counts {'staged': 2}
+ok   confluence/DEMO/77/77.md []
+ok   confluence/DEMO/77/77.md.meta.json []
+LEAK jira/PRSIM/PRSIM-1/PRSIM-1.md ['ali.veli@example.org']
+ok   jira/PRSIM/PRSIM-1/PRSIM-1.md.meta.json []
+--- PRSIM-1.md ---
+# PRSIM-1 — Access request for the build server
+
+Type: Task
+Status: Done
+Resolution: Fixed
+
+## Description
+
+Please grant access.
+[USER] and [USER] are watching. Contact ali.veli@example.org.
+
+Then next paragraph stays.
+
+## Comments
+
+### Comment 1
+
+Done, [USER]
+
+--- meta ---
+{
+  "source": "jira:PRSIM",
+  "source_item_id": "jira:PRSIM-1",
+  "title": "PRSIM-1 Access request for the build server",
+  "breadcrumb": "PRSIM › PRSIM-1",
+  "source_url": "https://jira.example.test/browse/PRSIM-1",
+  "updated_at_source": "2026-01-02T03:04:05.000+0300",
+  "attachments": []
+}
+
+PASS out inside raw refused: stage: --out is inside --raw-dir; the raw tree is never written
+leaks: 1

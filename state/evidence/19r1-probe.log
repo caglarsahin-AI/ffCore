@@ -1,0 +1,22 @@
+P1 accepted: ['confluence/DEMO/ok.md']
+P1 rejected: [('confluence/DEMO/att0.md', 'path_outside_base'), ('confluence/DEMO/att1.md', 'path_outside_base'), ('confluence/DEMO/att2.md', 'path_outside_base'), ('confluence/DEMO/att3.md', 'path_outside_base'), ('confluence/DEMO/link.md', 'path_outside_base'), ('confluence/DEMO/metalink.md', 'meta_missing'), ('confluence/LINKDIR', 'path_outside_base')]
+2026-11-02 08:26:01,320 WARNING ffcore.knowledge.raw_ingest ingest-raw rejected path=confluence/LINKDIR code=path_outside_base
+2026-11-02 08:26:01,321 WARNING ffcore.knowledge.raw_ingest ingest-raw rejected path=confluence/DEMO/att0.md code=path_outside_base
+2026-11-02 08:26:01,322 WARNING ffcore.knowledge.raw_ingest ingest-raw rejected path=confluence/DEMO/att1.md code=path_outside_base
+2026-11-02 08:26:01,323 WARNING ffcore.knowledge.raw_ingest ingest-raw rejected path=confluence/DEMO/att2.md code=path_outside_base
+2026-11-02 08:26:01,323 WARNING ffcore.knowledge.raw_ingest ingest-raw rejected path=confluence/DEMO/att3.md code=path_outside_base
+2026-11-02 08:26:01,323 WARNING ffcore.knowledge.raw_ingest ingest-raw rejected path=confluence/DEMO/link.md code=path_outside_base
+2026-11-02 08:26:01,324 WARNING ffcore.knowledge.raw_ingest ingest-raw rejected path=confluence/DEMO/metalink.md code=meta_missing
+P1 report: ['created 1', 'new_version 0', 'unchanged 0', 'status: skipped 1', 'rejected: meta_missing 1, path_outside_base 6']
+.P2 {'exact': 'refused:prsim_requires_ner', 'lower': 'refused:prsim_requires_ner', 'spaces': 'refused:prsim_requires_ner', 'bare': 'refused:prsim_requires_ner', 'suffix': 'accepted', 'dash': 'accepted', 'path_vs_source': 'accepted', 'case_path': 'accepted'}
+P2 INFO suffix/dash/path_vs_source/case_path: accepted accepted accepted accepted
+P3 raw email/phone present in: {'document.breadcrumb': (True, True), 'document.metadata': (True, True), 'silver': (True, True), 'chunks': (False, False)}
+2026-11-02 08:26:04,077 ERROR ffcore.knowledge.raw_ingest ingest-raw stopped path=jira/PRSIM/PRSIM-9.txt customer_data=['CREDIT_CARD']
+P4 PRSIM-9 -> customer_data_suspected: jira/PRSIM/PRSIM-9.txt: CREDIT_CARD 1 in a personnel-data source; ingest stopped, the decision goes back to the user
+2026-11-02 08:26:04,095 ERROR ffcore.knowledge.raw_ingest ingest-raw stopped path=jira/PRSIM/PRSIM-8.txt customer_data=['TR_IBAN']
+P4 PRSIM-8 -> customer_data_suspected: jira/PRSIM/PRSIM-8.txt: TR_IBAN 1 in a personnel-data source; ingest stopped, the decision goes back to the user
+2026-11-02 08:26:04,112 ERROR ffcore.knowledge.raw_ingest ingest-raw stopped path=jira/PRSIM/PRSIM-7.txt customer_data=['TR_NATIONAL_ID']
+P4 PRSIM-7 -> customer_data_suspected: jira/PRSIM/PRSIM-7.txt: TR_NATIONAL_ID 1 in a personnel-data source; ingest stopped, the decision goes back to the user
+P4 documents rows for the card file: 0
+.
+6 passed in 20.99s

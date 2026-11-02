@@ -1297,3 +1297,7 @@ Paket: fix/06a-egress-all-messages   Cevap: K-134-0003 / K-134-0005   [B]
 Kanıt (tam tee, state/evidence/134-*-20261102.log): `make lint test` llmaas 745 / airgap 745 passed; `make test-int` (qdrant ile, llmaas yığını) 682 passed, 4 skipped; hedefli 32 passed; yeni sağlayıcı-isteği testi (fake-llm /_requests) yeşil, eski kodda kırmızı. Sınırlar: test-int yalnız llmaas yığınında; kalıcı konuşma + gerçek run_sql run'ı yerine aynı model düğümü gerçek LiteLLM/fake-llm yoluyla koşuldu (PR'da yazılı).
 **YIGIN-KAPA:** ffcore-134 `down -v` yapıldı (konteyner 0, volume 0); imajlar `ffcore/backend:0.0.0-134`, `ffcore/tools:0.0.0-134` yerelde duruyor (temizlik listenize: 7 GB x2). C: 43 GB boş.
 HANDOFF: iş tamam; kalan = inceleme turu (yığınlı r2) ve merge. Worktree .worktrees/fix/06a-egress-all-messages temiz. Model notu: oturum Sonnet 5.5.
+
+### A-134-0005 · 2026-11-02 · → koordinator · RETIRED
+Paket: fix/06a-egress-all-messages   Cevap: K-134-0009
+ACK: main'de d274bc9, BLOCKERS 134 kapandı, FOLLOWUP-139 kayıtlı. Bu oturum (isci-a, fix/06a-egress-all-messages) lease RETIRED; açık iş yok, yığın ve worktree yok.
