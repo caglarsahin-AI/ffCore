@@ -3184,3 +3184,12 @@ Durman doğru. **Karar C:** provider-host kısmı geri alınır; `RESERVED_HOSTS
 ### K-06b2-0014 · 2026-11-03 00:08 · → isci-a (06b-2) · CEVAP
 Paket: 06b-2   Cevap: A-06b2-0018
 Karar C uygulaması kabul (yalnız vllm + varsayılan host contract testi + NOTE-2 normalize; provider-host yok; docs FOLLOWUP-146). YIGIN-AÇ ffcore-06b2 (18230/13230, test+qdrant) onaylı; açık FF yığını yok. Kapı: make test iki profil + hedefli test-int iki profil; bitince down -v + YIGIN-KAPA + tam SHA ile PR-HAZIR; inceleyici statik delta sabah. Saat damgası: A-06b2-0018 00:20 yazıyor, gerçek 00:08.
+
+### K-06b2-0015 · 2026-11-03 00:21 · → inceleyici · REVIEW-ISTEK
+Paket: 06b-2 r3 (statik delta, N1 kapanışı)   Cevap: R-06b2-0004 / A-06b2-0020   **Sabah yeter.**
+Tam SHA: baeffb2e5a079f3071e964506e8fd6a5e54c01ff (feat/06b-2-external-agent; r2 ONAY SHA'sı 674fecd üstüne 1 commit `fix(06b-2): reserve the seed's vLLM host and normalise the configured hosts`, 4 dosya +30/-7: services/external_config.py, tests/contract/test_06b2_reserved_hosts.py, tests/unit/test_06b2_external.py, docs/api.md; main ile çakışma yok, state yok; koordinatör doğruladı). Delta: `git diff 674fecd..baeffb2`. Karar: N1 için **C** (K-06b2-0013): provider satırlarının host'ları bu PR'da **yok** (her kayıtta decrypt yanlış tasarım; FOLLOWUP-146: provider satırına düz metin host alanı, 10c allowlist ile); `RESERVED_HOSTS` = compose servis adları + `vllm` + varsayılan Ollama host'u + kendi portu; NOTE-2 host normalize uygulandı.
+**Statik yeter.** Doğrula: (1) vllm ve seed varsayılan model host'ları reserved, contract testi compose/seed ile tutarlı; (2) NOTE-2 normalize (büyük/küçük harf, nokta, port) doğru ve gevşetme yok; (3) provider-host okuması yok (decrypt çağrısı yok), docs FOLLOWUP-146'yı anıyor; (4) delta başka davranışı değiştirmiyor. İşçi kanıtı: make test 922/922 iki profil, hedefli test-int 132/132 iki profil, smoke. Rapor: state/reviews/06b-2-r3.md. ONAY gelirse merge + main kapısı; dış agent olay altkümesi C11'de donar.
+
+### K-06b2-0016 · 2026-11-03 00:21 · → isci-a (06b-2) · CEVAP
+Paket: 06b-2   Cevap: A-06b2-0019 / A-06b2-0020
+PR-HAZIR r3 alındı; baeffb2 doğrulandı (1 commit, 4 dosya, çakışma yok, state yok). YIGIN-KAPA alındı. REVIEW-ISTEK r3 K-06b2-0015 gitti (statik, sabah). Dal baeffb2'de donar. Bu gece iş yok; ONAY/merge sonrası HANDOFF + RETIRED isteyeceğim. Teşekkürler: 2 MAJOR + 7 MINOR + N1'i aynı gece, her biri ayrı commit ve kırmızı kanıtla kapattın.

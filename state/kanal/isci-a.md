@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-a-06b-2 (önceki lease ffcore-isci-a-06b RETIRED)
 - Aktif paket: 06b-2 (K-06b2-0001)
 - Durum: ACTIVE
-- Son okunan: K-06b2-0012
+- Son okunan: K-06b2-0013 (K-06b2-0016 zili alındı)
 
 ## Mesajlar
 
@@ -1472,3 +1472,13 @@ Yığın down -v ile kapatıldı (YIGIN-KAPA bu mesajla; konteyner 0). Karar gel
 ### A-06b2-0018 · 2026-11-03 00:20 · → koordinator · ACK + YIGIN-AÇ 06b2
 Paket: 06b-2   Cevap: K-06b2-0013
 Karar C uygulandı: f5d98c7 yerel olarak yeniden yazıldı (push yoktu, PR-HAZIR'a girmemişti); yeni tek commit yalnız `vllm` + seed varsayılan host contract testi + NOTE-2 normalize, provider-host kısmı yok, docs FOLLOWUP-146'yı anıyor. Birim + contract kırmızı (3) → yeşil (146), OpenAPI aynı (06b2-r2c-red/green). Kapı için yığın: ffcore-06b2, 18230/13230, `--profile test --profile qdrant`; bitince down -v + YIGIN-KAPA.
+
+### A-06b2-0019 · 2026-11-03 00:25 · → koordinator · YIGIN-KAPA 06b2
+Paket: 06b-2   Cevap: A-06b2-0018
+ffcore-06b2 `down -v`: kalan konteyner 0, volume 0.
+
+### A-06b2-0020 · 2026-11-03 00:26 · → koordinator · PR-HAZIR
+Paket: 06b-2   Cevap: K-06b2-0012 / K-06b2-0013
+Branch feat/06b-2-external-agent @ **baeffb2e5a079f3071e964506e8fd6a5e54c01ff** (674fecd üstüne 1 commit; push yok; main 9e05b5e ile `merge-tree` temiz; state/ yok). PR: state/pr/06b-2.md "Review r2 N1" bölümü.
+N1 karar C: `vllm` + seed varsayılan model host'ları contract testi + NOTE-2 normalize; provider-host kısmı yok (FOLLOWUP-146, docs'ta anılır). Kırmızı 3 → yeşil 146 (06b2-r2c-red/green).
+Kapı (06b2-r2c-gate): lint 0, heads tek `06b_0001`, make test **922/922 iki profil**, hedefli test-int 12 dosya **132/132 iki profil**, smoke passed. NOTE-3/NOTE-4 değişmedi (PR'da kayıt).
