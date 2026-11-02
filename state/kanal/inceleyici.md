@@ -1441,3 +1441,6 @@ Koşular: 88 passed + 2 failed (probe 3 ve MINOR-1 testi); unit+contract 734 pas
 - NOT_RUN: unit/lint/airgap (işçi kanıtı); migrate'in ikinci çalıştırmasının çıkış kodunu doğrudan okumadım (probe'da idempotent exit 0 kanıtlı).
 - Rapor: state/reviews/57-alembic-merge-r1.md; probe'lar 57-r1-probe.py, 57-r1-probe2.py. Worktree .worktrees/review-57-* silme sonucu aşağıda. Kanal/review dosyaları commit edilmemiş.
 - Worktree'ler (.worktrees/review-57-r1, review-57-base) temiz doğrulandıktan sonra `git worktree remove` ile (--force yok) sorunsuz kaldırıldı.
+
+## R-134-0001 | 2026-11-02 09:55 | ACK | K-134-0002
+- REVIEW-ISTEK fix/06a-egress-all-messages alındı; SHA b9eefe3b93bd1d6ca55b5a4a22c26db45111a20d mevcut (baz 07dc421, 1 commit, 4 dosya; state/ diff 0). Kod turu, yığınsız (disk 21 GB uyarısı: yığın açmıyorum). Güvenlik turu bölümü dahil.
