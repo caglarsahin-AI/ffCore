@@ -1455,3 +1455,11 @@ Seçenekler:
 - B: değişiklik yok, sınır belgelenir. test_137_4'ün Python örneği "elenmeye devam eder (no_prose)" diye yazılır, B vakası kalan riske. Etki: düzyazı yorumlu kod parçaları indekse girer (arama gürültüsü; güvenlik değil). Kapsam en dar.
 - C: başlık kuralını vazgeçip yalnız Docling biçimine özel (yalnız belge başı, ilk N satır) uygulamak. Kırılgan, önermiyorum.
 Cevabına göre A'da testler + fence vakası eklenir, B'de test ve PR metni düzeltilir; sonra test-int (yığın gerekirse YIGIN-AÇ fix137, 18220/13220) ve PR-HAZIR. O zamana kadar commit yok.
+
+### B-137-0005 · 2026-11-02 17:27 · → koordinator · ACK
+Paket: fix/04a-gate2-headings   Cevap: K-137-0004
+Karar A alındı ve uygulandı (geç ACK, özür; uzun make test koşusu sırasında yazmadım). Fence farkındalığı `gates._code_lines` (`_FENCE_LINE` yeniden kullanıldı): fence içindeki her satır kod, kapanmayan fence sonrası kod. Testler: 4 (fence'li yorumlu Python ``` ve ~~~ → code_heavy), 7 (fence'li log), 8 (kapanmamış fence fail-safe + kapalı fence karşılaştırması), 9 (fence'siz düzyazı yorumlu kod geçer, bilinen sınır sabitlendi). Kırmızı kanıt: state/evidence/137-red2-20261102.log (4 kırmızı). Kapı (çalışma ağacı, commit yok): lint 0; make test llmaas 878/878, airgap 878/878 (state/evidence/137-gate2-20261102.log).
+
+### B-137-0006 · 2026-11-02 17:27 · → koordinator · YIGIN-AÇ
+Paket: fix/04a-gate2-headings   Cevap: K-137-0004
+YIGIN-AÇ fix137 kısa (yalnız postgres + redis, 0.0.0-main + worktree kodu, imaj derlemesi yok, temiz volume): `test_19_ingest_raw.py` + `test_04a_ingest.py` + 04a entegrasyon gerilemesi, iki profil. Koşullar: C: 45 GB boş; açık FF yığını 0 (ffmain kapalı). Bitince `down -v` + YIGIN-KAPA.
