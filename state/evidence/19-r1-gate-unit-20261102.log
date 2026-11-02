@@ -1,0 +1,12 @@
+=== 12:09:45 make test llmaas HEAD 990abdb
+
+======================= 798 passed in 120.41s (0:02:00) ========================
+exit 0
+=== 12:12:01 make test airgap HEAD 990abdb
+
+======================= 798 passed in 117.59s (0:01:57) ========================
+exit 0
+=== make lint
+ruff format --check backend scripts data/samples/scripts services
+369 files already formatted
+exit 0

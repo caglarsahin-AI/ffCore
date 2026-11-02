@@ -1482,3 +1482,10 @@ Koşular: 88 passed + 2 failed (probe 3 ve MINOR-1 testi); unit+contract 734 pas
 ## R-19-0003 | 2026-11-02 12:17 | ACK | K-M3S-0017
 - REVIEW-ISTEK 19 r2 delta alindi. SHA ffcore 990abdb35abef0887689c6dcdf307b849929dfc4 (987dd62 + 1 commit, 12 dosya, state/ diff 0), paycoreLLM-m3 6f03007746b016e9b773942fb01ac1b5138fd45e (3adbb3a + 1 commit, 8 dosya) mevcut. Statik delta + r1 probe dosyalari; yigin gerekirse YIGIN-AC yazarim (C: 42 GB, acik FF yigini yok).
 - 2026-11-02 12:18 YIGIN-AC review-19 (18200/13200, FFCORE_VERSION=0.0.0-review-19, imajlar 0.0.0-main etiketli, kod worktree salt-okunur); kisa tur: r1 probe yeniden + meta kapanisi. Acik FF yigini yok.
+
+## R-19-0004 | 2026-11-02 13:05 | REVIEW-SONUC | K-M3S-0017
+- Paket/SHA: 19 r2 delta. ffcore 990abdb35abef0887689c6dcdf307b849929dfc4; paycoreLLM-m3 6f03007746b016e9b773942fb01ac1b5138fd45e. Yığın review-19 (18200/13200) açıldı ve down -v ile kapatıldı (YIGIN-KAPA review19). state/ diff 0.
+- Karar: **ONAY** (BLOCKER 0, MAJOR 0, MINOR 0). r1 MAJOR-1/2 ve MINOR-1..6 kapandı.
+- Kanıt: tam entegrasyon 693 passed + 5 skipped; hedefli 76 passed; paycoreLLM 50 passed; r1 probe'larının güncellenmiş hâli 8/8 (meta artık maskeli: breadcrumb/metadata/silver/chunk'ta ham değer yok; PRSIM meta'da IBAN → customer_data_suspected; geçersiz UTF-8 → invalid_encoding, koşu sürüyor; prsim* önek/yol kuralı); compose.ffcore.yml'de @sha256 = 0; kendi denememde docker load sonrası yalnız tag çalışıyor.
+- Doğrulanmadı: containerd/sunucu imaj deposu türü; save.sh/load.sh gerçek koşusu; PayCore yığınıyla up; kuru koşu tekrarı; lint/unit 798 (işçi kanıtı). Not: minio etiketi (e70b2b1e) yalnız arşivle anlamlı.
+- Rapor: state/reviews/19-r2.md. Koordinatör ffcore merge + main kapısı ve paycoreLLM-m3 -> master merge yapabilir. Worktree'ler temiz doğrulanıp kaldırıldı. Dosyalar commit edilmemiş.

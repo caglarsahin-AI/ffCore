@@ -1,0 +1,187 @@
+git head: 45d901b5a9699bf871bddeb40445fd954b8df6ff 2026-11-02 12:06:25
+
+=== 12:06:26 down -v (leftovers)
+Warning: No resource found to remove for project "ffcore-06b".
+
+=== 12:06:32 build backend frontend tools
+#37 [frontend] exporting to image
+#37 exporting layers
+#37 exporting layers 0.7s done
+#37 writing image sha256:b1f7e6015cbd232dcba461fa6b2c2a742d2a53fbd8c9797cac3f575900e5d701 done
+#37 naming to docker.io/ffcore/frontend:0.0.0-06b done
+#37 DONE 0.8s
+build exit=0
+
+=== 12:07:27 compose config
+config exit=0
+
+=== 12:07:33 up
+ Container ffcore-06b-langfuse-clickhouse-1  Healthy
+ Container ffcore-06b-worker-1  Healthy
+ Container ffcore-06b-agent-worker-bg-1  Healthy
+ Container ffcore-06b-redis-1  Healthy
+ Container ffcore-06b-mcp-sql-1  Healthy
+ Container ffcore-06b-mcp-search-1  Healthy
+up exit=0
+ffcore-06b-mcp-sql-1 Up 13 seconds (healthy)
+ffcore-06b-mcp-search-1 Up 13 seconds (healthy)
+ffcore-06b-agent-worker-1 Up 14 seconds
+ffcore-06b-worker-1 Up 2 seconds
+ffcore-06b-agent-worker-bg-1 Up 14 seconds
+ffcore-06b-frontend-1 Up 13 seconds
+ffcore-06b-backend-1 Up 25 seconds (healthy)
+ffcore-06b-litellm-1 Up About a minute (healthy)
+ffcore-06b-langfuse-worker-1 Up About a minute
+ffcore-06b-langfuse-web-1 Up About a minute (healthy)
+ffcore-06b-qdrant-1 Up About a minute (healthy)
+ffcore-06b-ticket-desk-1 Up About a minute (healthy)
+ffcore-06b-postgres-1 Up About a minute (healthy)
+ffcore-06b-redis-1 Up About a minute (healthy)
+ffcore-06b-langfuse-redis-1 Up About a minute (healthy)
+ffcore-06b-langfuse-clickhouse-1 Up About a minute (healthy)
+ffcore-06b-langfuse-minio-1 Up About a minute (healthy)
+ffcore-06b-fake-llm-1 Up About a minute
+ffcore-06b-langfuse-postgres-1 Up About a minute (healthy)
+
+=== 12:08:58 lint
+ruff check backend scripts data/samples/scripts services
+All checks passed!
+ruff format --check backend scripts data/samples/scripts services
+378 files already formatted
+lint exit=0
+
+=== 12:09:13 alembic heads
+57_0002 (03a, 03b, 04a, 07, 06a, 03c, 05a, 08) (head)
+heads exit=0
+
+=== 12:09:27 make test llmaas
+........................................................................ [  9%]
+........................................................................ [ 18%]
+........................................................................ [ 28%]
+........................................................................ [ 37%]
+........................................................................ [ 46%]
+........................................................................ [ 56%]
+........................................................................ [ 65%]
+........................................................................ [ 75%]
+........................................................................ [ 84%]
+........................................................................ [ 93%]
+..............................................                           [100%]
+766 passed in 109.86s (0:01:49)
+test exit=0
+
+=== 12:11:30 make test airgap
+........................................................................ [  9%]
+........................................................................ [ 18%]
+........................................................................ [ 28%]
+........................................................................ [ 37%]
+........................................................................ [ 46%]
+........................................................................ [ 56%]
+........................................................................ [ 65%]
+........................................................................ [ 75%]
+........................................................................ [ 84%]
+........................................................................ [ 93%]
+..............................................                           [100%]
+766 passed in 106.98s (0:01:46)
+test-airgap exit=0
+
+=== 12:13:30 test-samples
+
+----------------------------------------------------------------------
+Ran 54 tests in 2.982s
+
+OK (skipped=5)
+samples exit=0
+
+=== 12:13:41 test-int llmaas
+........................................................................ [  9%]
+........................................................................ [ 19%]
+........................................................................ [ 29%]
+..........s............................................................. [ 38%]
+..............................................................s......... [ 48%]
+.s...................................................................... [ 58%]
+........s............................................................... [ 67%]
+........................................................................ [ 77%]
+........................................................................ [ 87%]
+........................................................................ [ 96%]
+.......................                                                  [100%]
+=============================== warnings summary ===============================
+tests/integration/test_04a_worker.py::test_04a_upload_job_runs_in_worker
+tests/integration/test_04a_worker.py::test_04a_job_for_missing_row_retries_then_fails_loud
+  /opt/venv/lib/python3.12/site-packages/arq/worker.py:877: DeprecationWarning: Call to deprecated close. (Use aclose() instead) -- Deprecated since version 5.0.1.
+    await self.pool.close(close_connection_pool=True)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+SKIPPED [1] tests/integration/test_03b_egress_dns.py: NOT_RUN: needs RUN_DNS_TESTS=1
+SKIPPED [1] tests/integration/test_04a_ingest.py:124: NOT_RUN: needs RUN_MODEL_TESTS=1
+SKIPPED [1] tests/integration/test_04a_ingest.py:279: NOT_RUN: needs RUN_MODEL_TESTS=1
+SKIPPED [1] tests/integration/test_05a_sql.py:288: NOT_RUN: needs RUN_MODEL_TESTS=1
+739 passed, 4 skipped, 2 warnings in 559.21s (0:09:19)
+test-int exit=0
+
+=== 12:23:18 test-int airgap
+........................................................................ [  9%]
+........................................................................ [ 19%]
+........................................................................ [ 29%]
+..........s............................................................. [ 38%]
+..............................................................s......... [ 48%]
+.s...................................................................... [ 58%]
+........s............................................................... [ 67%]
+........................................................................ [ 77%]
+........................................................................ [ 87%]
+........................................................................ [ 96%]
+.......................                                                  [100%]
+=============================== warnings summary ===============================
+tests/integration/test_04a_worker.py::test_04a_upload_job_runs_in_worker
+tests/integration/test_04a_worker.py::test_04a_job_for_missing_row_retries_then_fails_loud
+  /opt/venv/lib/python3.12/site-packages/arq/worker.py:877: DeprecationWarning: Call to deprecated close. (Use aclose() instead) -- Deprecated since version 5.0.1.
+    await self.pool.close(close_connection_pool=True)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+SKIPPED [1] tests/integration/test_03b_egress_dns.py: NOT_RUN: needs RUN_DNS_TESTS=1
+SKIPPED [1] tests/integration/test_04a_ingest.py:124: NOT_RUN: needs RUN_MODEL_TESTS=1
+SKIPPED [1] tests/integration/test_04a_ingest.py:279: NOT_RUN: needs RUN_MODEL_TESTS=1
+SKIPPED [1] tests/integration/test_05a_sql.py:288: NOT_RUN: needs RUN_MODEL_TESTS=1
+739 passed, 4 skipped, 2 warnings in 607.33s (0:10:07)
+test-int-airgap exit=0
+
+=== 12:33:46 smoke
+python scripts/smoke.py
+ok    backend /healthz 200
+ok    litellm /health/liveliness 200
+ok    langfuse /api/public/health 200, /api/public/projects 200
+ok    mcp-search /healthz 200
+ok    mcp-sql /healthz 200
+ok    skipped: ollama profile inactive
+smoke: passed
+smoke exit=0
+
+=== 12:33:55 frontend lint/typecheck/check:api (node, --network none, worktree root)
+
+> ffcore-frontend@0.1.0 lint
+> eslint
+
+
+> ffcore-frontend@0.1.0 typecheck
+> tsc --noEmit
+
+
+> ffcore-frontend@0.1.0 check:api
+> node scripts/check-api.mjs
+
+API contract copies and generated types are current.
+frontend exit=0
+
+=== 12:34:23 S7 runtime image has no openai
+openai None
+jiter None
+s7 exit=0
+
+=== 12:34:27 down -v
+ Volume ffcore-06b_langfuse_postgres_data  Removed
+ Volume ffcore-06b_knowledge_storage  Removed
+0
+
+=== 12:34:55 done
+gate script exit 0

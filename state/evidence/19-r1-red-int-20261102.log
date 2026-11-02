@@ -1,0 +1,11 @@
+=== 12:08:03 r1 entegrasyon testleri, düzeltme ÖNCESİ kod (987dd62 backend/ffcore) + yeni testler
+E       AssertionError: ['created 1', 'new_version 0', 'unchanged 0', 'status: indexed 1', 'rejected: -', 'gates: -', ...]
+E       assert (1 >= 4)
+E       Failed: DID NOT RAISE RawIngestError
+E   UnicodeDecodeError: 'utf-8' codec can't decode byte 0xff in position 0: invalid start byte
+2026-11-02 09:09:04,985 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+2026-11-02 09:09:05,295 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+2026-11-02 09:09:06,956 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+2026-11-02 09:09:07,924 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+2026-11-02 09:09:09,100 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=2 error=EgressRequestFailed: egress_dns_failed
+3 failed, 13 deselected in 45.38s

@@ -1,0 +1,7 @@
+=== 12:04:38 up postgres redis
+ Container ffcore-19-postgres-1  Healthy
+=== r1 entegrasyon + 19 dosyası HEAD 987dd62721c346fd376a8861944ecd1ab6de2422 + çalışma ağacı
+SKIPPED [1] tests/integration/test_19_ingest_raw.py:155: root ignores file modes; the mount test runs :ro
+SKIPPED [1] tests/integration/test_04a_ingest.py:124: NOT_RUN: needs RUN_MODEL_TESTS=1
+SKIPPED [1] tests/integration/test_04a_ingest.py:279: NOT_RUN: needs RUN_MODEL_TESTS=1
+53 passed, 3 skipped in 144.17s (0:02:24)

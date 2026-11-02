@@ -1310,3 +1310,15 @@ ACK. Rebase tamam, çakışma yok: feat/06b-facade @ e870f3ae582789839da5fc785b4
 ### A-06b-0015 · 2026-11-02 12:17 · → koordinator · DURUM
 Paket: 06b   Cevap: K-06b-0008
 İkinci kapı koşuyor (açık yığın bu). İlk kapı (e870f3a, state/evidence/06b-gate-20261102.log): lint, heads, make test 766/766 iki profil, test-samples, smoke, önyüz lint/tsc/check:api, S7 yeşil; **test-int iki profilde 2 kırmızı**, ikisi de 06b kaynaklı test defteri: `test_03a_2_read_mode_get_parity` (`/v1/models` yalnız API anahtarı kabul eder → konsol oturumuna 401; muafiyet + gerekçe, kurallar test_06b_12/17'de) ve `test_06a_read_mode_get_parity` (yeni manifest GET'i de taranıyor, parity sağlıyor; sayı 6 → 7). Önceki hedefli koşularım yalnız 06b testleriydi, bu yüzden kaçmıştı. Düzeltme 45d901b5a9699bf871bddeb40445fd954b8df6ff (yalnız iki test dosyası). İkinci tam kapı bu SHA'da 12:06'dan beri (state/evidence/06b-gate2-20261102.log): build, up, lint, heads, make test 766/766 iki profil, test-samples yeşil; test-int llmaas 12:13'te başladı, airgap, smoke, önyüz ardından, ~12:35. Bitince down -v + YIGIN-KAPA + PR-HAZIR.
+
+### A-06b-0016 · 2026-11-02 12:38 · → koordinator · PR-HAZIR + YIGIN-KAPA
+Paket: 06b   Cevap: K-06b-0008   [B] + [C] (S7, onaylı)
+**PR-HAZIR:** feat/06b-facade @ 45d901b5a9699bf871bddeb40445fd954b8df6ff (baz main d274bc9, 6 commit, 33 dosya +4589/−29, migration yok, push yok). PR açıklaması state/pr/06b.md "06b PR" (K-06b-0001 şartları 1-8 → kabul tablosu; K-06b-0002 S kararları; K-06b-0004 06b-2 bölmesi "Kapsam daralması"; yeni: "134 ile ilişki" paragrafı; ayrı bölüm "06b-2 planı" yeni oturum için).
+Son tam kapı (tam tee state/evidence/06b-gate2-20261102.log, HEAD 45d901b, 0.0.0-06b imajları rebase'li ağaçtan): lint 0; alembic heads tek 57_0002; make test 766/766 llmaas + 766/766 airgap; test-samples OK; test-int (qdrant) llmaas 739 passed + 4 skipped, airgap 739 passed + 4 skipped (atlananlar main ile aynı: DNS, model testleri); smoke passed; önyüz lint/tsc/check:api 0 (06b.yaml SPECS'te yok → FOLLOWUP-136); S7 runtime imajında openai/jiter yok.
+İlk kapıdaki 2 kırmızı (A-06b-0015) 45d901b ile kapandı: yalnız iki test dosyası, gerekçeleri PR commit tablosunda.
+**YIGIN-KAPA:** ffcore-06b `down -v` yapıldı (konteyner 0, volume 0). İmajlar `ffcore/{backend,frontend,tools}:0.0.0-06b` yerelde (temizlik listesine). C: 42 GB.
+Bekliyorum: DUZELT ya da ONAY/merge. Dal 45d901b'de donar (yalnız DUZELT commit'i).
+
+### A-06b-0017 · 2026-11-02 · → koordinator · ACK
+Paket: 06b   Cevap: K-06b-0011
+ACK. Dal 45d901b'de donuk; DUZELT bekliyorum, yığın kapalı.

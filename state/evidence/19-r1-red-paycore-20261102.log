@@ -1,0 +1,12 @@
+E           AssertionError: ffcore-qdrant
+E           assert '@sha256' not in 'nexus.payco...e090ce3b8e7c'
+E             
+E             '@sha256' is contained here:
+E               nexus.paycore.com/qdrant/qdrant:v1.11.3@sha256:da426bb8aa0ba0a3032b3110e71d0d1516d51a686aa17b39bde4e090ce3b8e7c
+E             ?                                        +++++++
+E       AssertionError: assert {'chainguard/...3.120.0', ...} == {'cgr.dev/cha...3.120.0', ...}
+E         
+E         Extra items in the left set:
+E         'chainguard/minio@sha256:e70b2b1e74d79457f808710483bd726ff364529ca30736eaa15a6ab547d3a5a7'
+E         'qdrant/qdrant:v1.11.3@sha256:da426bb8aa0ba0a3032b3110e71d0d1516d51a686aa17b39bde4e090ce3b8e7c'
+E         Extra items in the right set:

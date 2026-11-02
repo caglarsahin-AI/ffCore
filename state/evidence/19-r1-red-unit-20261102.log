@@ -1,0 +1,30 @@
+ Network ffcore-19_default  Creating
+ Network ffcore-19_default  Created
+ Volume "ffcore-19_redis_data"  Creating
+ Volume "ffcore-19_redis_data"  Created
+ Volume "ffcore-19_langfuse_postgres_data"  Creating
+ Volume "ffcore-19_langfuse_postgres_data"  Created
+ Volume "ffcore-19_postgres_data"  Creating
+ Volume "ffcore-19_postgres_data"  Created
+ Volume "ffcore-19_model_cache"  Creating
+ Volume "ffcore-19_model_cache"  Created
+ Volume "ffcore-19_knowledge_storage"  Creating
+ Volume "ffcore-19_knowledge_storage"  Created
+ Volume "ffcore-19_langfuse_minio_data"  Creating
+ Volume "ffcore-19_langfuse_minio_data"  Created
+ Volume "ffcore-19_langfuse_clickhouse_data"  Creating
+ Volume "ffcore-19_langfuse_clickhouse_data"  Created
+ Volume "ffcore-19_langfuse_clickhouse_logs"  Creating
+ Volume "ffcore-19_langfuse_clickhouse_logs"  Created
+E           AssertionError: cgr.dev/chainguard/minio
+E           assert None
+E            +  where None = <function fullmatch at 0x7f165ef36660>('[\\w./-]+:[\\w.<>-]+', 'cgr.dev/chainguard/minio')
+E            +    where <function fullmatch at 0x7f165ef36660> = re.fullmatch
+E           AssertionError: pgvector/pgvector:0.8.1-pg16
+E           assert 'docker pull pgvector/pgvector@sha256:33198da2828a14c30348d2ccb4750833d5ed9a44c88d840a0e523d7417120337' in '+ mkdir -p /tmp/pytest-of-root/pytest-0/test_19_r1_save_pulls_by_diges0/out/images\n+ docker pull pgvector/pgvector:0...; commit images.txt if ids were printed, then carry /tmp/pytest-of-root/pytest-0/test_19_r1_save_pulls_by_diges0/out\n'
+E            +  where '+ mkdir -p /tmp/pytest-of-root/pytest-0/test_19_r1_save_pulls_by_diges0/out/images\n+ docker pull pgvector/pgvector:0...; commit images.txt if ids were printed, then carry /tmp/pytest-of-root/pytest-0/test_19_r1_save_pulls_by_diges0/out\n' = CompletedProcess(args=['bash', '/work/deploy/offline/save.sh', '/tmp/pytest-of-root/pytest-0/test_19_r1_save_pulls_by_...e/save.sh: line 64: cd: /tmp/pytest-of-root/pytest-0/test_19_r1_save_pulls_by_diges0/out: No such file or directory\n').stdout
+E       Failed: DID NOT RAISE StagingError
+E       Failed: DID NOT RAISE StagingError
+E       Failed: DID NOT RAISE StagingError
+E       AssertionError: assert {} == {'prsim_requires_ner': 1}
+E         

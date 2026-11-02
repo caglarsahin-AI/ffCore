@@ -1,0 +1,15 @@
+P1 accepted: ['confluence/DEMO/ok.md']
+P1 rejected: [('confluence/DEMO/att0.md', 'path_outside_base'), ('confluence/DEMO/att1.md', 'path_outside_base'), ('confluence/DEMO/att2.md', 'path_outside_base'), ('confluence/DEMO/att3.md', 'path_outside_base'), ('confluence/DEMO/link.md', 'path_outside_base'), ('confluence/DEMO/metalink.md', 'meta_missing'), ('confluence/LINKDIR', 'path_outside_base')]
+P1 report: ['created 1', 'new_version 0', 'unchanged 0', 'status: skipped 1', 'rejected: meta_missing 1, path_outside_base 6']
+.P2 {'exact': 'refused:prsim_requires_ner', 'lower': 'refused:prsim_requires_ner', 'spaces': 'refused:prsim_requires_ner', 'bare': 'refused:prsim_requires_ner', 'suffix': 'refused:prsim_requires_ner', 'dash': 'refused:prsim_requires_ner', 'path_vs_source': 'prsim_requires_ner', 'case_path': 'prsim_requires_ner'}
+P2 INFO suffix/dash/path_vs_source/case_path: refused:prsim_requires_ner refused:prsim_requires_ner prsim_requires_ner prsim_requires_ner
+P3 raw email/phone present in: {'document.breadcrumb': (False, False), 'document.metadata': (False, False), 'silver': (False, False), 'chunks': (False, False)}
+P4 PRSIM-9 -> customer_data_suspected: jira/PRSIM/PRSIM-9.txt: CREDIT_CARD 1 in a personnel-data source; ingest stopped, the decision goes back to the user
+P4 PRSIM-8 -> customer_data_suspected: jira/PRSIM/PRSIM-8.txt: TR_IBAN 1 in a personnel-data source; ingest stopped, the decision goes back to the user
+P4 PRSIM-7 -> customer_data_suspected: jira/PRSIM/PRSIM-7.txt: TR_NATIONAL_ID 1 in a personnel-data source; ingest stopped, the decision goes back to the user
+P4 documents rows for the card file: 0
+P7 invalid utf8 report: Counter({'invalid_encoding': 1}) Counter({'created': 1})
+P8 meta: {'title': 'Mail [EMAIL_ADDRESS]', 'source': 'confluence:DEMO', 'breadcrumb': 'DEMO > [EMAIL_ADDRESS]', 'source_url': 'https://x.test/?m=[EMAIL_ADDRESS]', 'text_filter': 'pii_regex@1', 'source_item_id': 'm1', 'text_filter_counts': {}, 'text_filter_meta_counts': {'EMAIL_ADDRESS': 3}}
+P8 breadcrumb: Sözleşmeler › DEMO > [EMAIL_ADDRESS]
+.
+8 passed in 22.79s

@@ -1,0 +1,5 @@
+PASS without flag: prsim_requires_ner
+counts {'staged': 2, 'signature_lines_dropped': 7}
+LEAK jira/PRSIM/PRSIM-1/PRSIM-1.md ['ali.veli@example.org']
+PASS out inside raw refused: stage: --out is inside --raw-dir; the raw tree is never written
+leaks: 1
