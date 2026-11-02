@@ -43,6 +43,9 @@ class _Agent(BaseHTTPRequestHandler):
             message["tool_calls"] = [
                 {"id": "c", "type": "function", "function": {"name": "rm", "arguments": "{}"}}
             ]
+        elif mode == "oddfield":  # field names are the upstream's text, not ours
+            message[f"x-{EMAIL}"] = "v"
+            message["tool_calls"] = [{"id": "c"}]
         elif mode == "placeholder":
             message["content"] = "Kayit <<PII_1>> bulundu"
         elif mode == "secret":
@@ -332,6 +335,18 @@ def test_06b2_r1_origin_change_resets_the_key(ext, fake_agent, pg):
     assert console.post(base + "/publish").status_code == 200
     assert client.chat(model, "x").status_code == 200
     assert fake_agent.seen[-1]["headers"]["authorization"] == f"Bearer {NEW_KEY}"
+
+
+def test_06b2_r1_ignored_field_names_not_logged(ext, caplog):
+    """Review r1 MINOR-5: the names of the answer's other fields are the upstream's text and do
+    not pass output.pre; the log has only how many were ignored."""
+    _, _, client, register = ext
+    _, model = register(key="tuhaf", mode="oddfield")
+    with caplog.at_level("INFO", logger="ffcore.facade"):
+        assert client.chat(model, "x").status_code == 200
+    lines = [r.getMessage() for r in caplog.records if r.name == "ffcore.facade"]
+    assert any("facade_external_ignored" in line and "fields=2" in line for line in lines), lines
+    assert not any("tool_calls" in line or "example.test" in line for line in lines), lines
 
 
 # --- the facade ---

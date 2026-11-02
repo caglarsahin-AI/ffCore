@@ -523,8 +523,12 @@ class _Work:
             raise
         await _audit(self.request, self.caller, self.agent, "success", answer.audit())
         if answer.ignored_fields:
+            # The count only (review r1 MINOR-5): the names are the upstream's text and never
+            # passed output.pre, so they stay out of the log.
             log.info(
-                "facade_external_ignored agent=%s fields=%s", self.agent.id, answer.ignored_fields
+                "facade_external_ignored agent=%s fields=%d",
+                self.agent.id,
+                len(answer.ignored_fields),
             )
         redis = redis_client(self.settings)
         try:

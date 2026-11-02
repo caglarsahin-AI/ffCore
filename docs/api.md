@@ -553,8 +553,8 @@ project administrator and called through the same `agent:<project_key>/<agent_ke
   `response_format`, `logit_bias` are refused (400). Messages pass `input.pre` (user) and
   `egress` (all) under the project's `default` policy.
 - The answer is untrusted text: only `choices[0].message.content` is taken; `tool_calls`,
-  `function_call` and any other field are never executed or turned into text (their names are
-  logged). The text passes `output.pre` (a block: 400 `guardrail_blocked`). A placeholder-like
+  `function_call` and any other field are never executed or turned into text (only their count is
+  logged; the names are the upstream's text). The text passes `output.pre` (a block: 400 `guardrail_blocked`). A placeholder-like
   string in it (`<<PII_n>>`) is not one of this request's tokens and stays as it is.
 - Limits: the whole call within `LLM_CALL_TIMEOUT_S` (504 `external_agent_timeout`), the answer
   at most 64 KiB (502 `external_agent_response_too_large`; nothing partial is sent); a refused
