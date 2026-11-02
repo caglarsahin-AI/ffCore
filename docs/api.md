@@ -540,7 +540,7 @@ project administrator and called through the same `agent:<project_key>/<agent_ke
   every other host, and every resolved address must be public unless the host is internal. The
   platform's own services are never a target, even when internal (422
   `external_agent_host_reserved`): every compose service name (`litellm`, `langfuse-*`, `mcp-*`,
-  `ollama`, `backend`, ...; `RESERVED_HOSTS` in `services/facade_external.py`),
+  `ollama`, `backend`, ...; `RESERVED_HOSTS` in `services/external_config.py`),
   `host.docker.internal`, the hosts of `LITELLM_URL` and `LANGFUSE_HOST`, and a loopback address
   on the backend's own port; other internal hosts stay valid targets. The same egress check runs
   again at every connection (a name that resolves to a private address at call time is refused at

@@ -43,7 +43,7 @@ from ffcore.models.agents import Agent, AgentVersion
 from ffcore.models.catalog import Model, Provider
 from ffcore.runtime.contracts import AgentStatus
 from ffcore.runtime.definition import AgentDefinition, parse_definition
-from ffcore.services.facade_external import ExternalConfig, check_base_url, origin
+from ffcore.services.external_config import ExternalConfig, check_base_url, origin
 
 router = APIRouter(
     prefix="/projects/{project_id}/agents", tags=["agents"], responses=ERROR_RESPONSES

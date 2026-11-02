@@ -68,7 +68,7 @@ class Agent(Timestamps, Base):
         ForeignKey("agent_versions.id", use_alter=True, name="fk_agents_current_version"),
     )
     # 06b-2: an external agent's base_url, remote model and api_key, one Fernet token
-    # (services/facade_external.ExternalConfig); set exactly when kind = external.
+    # (services/external_config.ExternalConfig); set exactly when kind = external.
     external_config: Mapped[bytes | None] = mapped_column(LargeBinary)
     created_by: Mapped[str] = mapped_column(Text)
     deleted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))

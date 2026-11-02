@@ -48,7 +48,7 @@ def test_06a_read_mode_get_parity(
     # `agent_not_external`), so that route gets an external agent of its own.
     import uuid
 
-    from ffcore.services.facade_external import ExternalConfig
+    from ffcore.services.external_config import ExternalConfig
 
     external_id = uuid.uuid4()
     config = ExternalConfig(

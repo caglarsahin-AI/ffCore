@@ -13,12 +13,9 @@ import pytest
 
 from ffcore.api.facade_schemas import ChatCompletionRequest
 from ffcore.core.errors import ApiError
-from ffcore.services import facade_external, facade_proxy
-from ffcore.services.facade_external import (
-    MAX_EXTERNAL_RESPONSE_BYTES,
-    ExternalCallFailed,
-    ExternalConfig,
-)
+from ffcore.services import external_config, facade_external, facade_proxy
+from ffcore.services.external_config import ExternalConfig
+from ffcore.services.facade_external import MAX_EXTERNAL_RESPONSE_BYTES, ExternalCallFailed
 from tests.unit.test_03b_egress import PUBLIC_IP, _RecordingBackend, _resolver
 
 KEY = "dummy-not-secret-external-agent-key"
@@ -171,7 +168,7 @@ def test_06b2_4_register_url_scheme_refused(settings, url):
     allowed = settings.model_copy(update={"egress_allowlist": ["agent.example"]})
     with pytest.raises(ApiError) as exc:
         anyio.run(
-            lambda: facade_external.check_base_url(
+            lambda: external_config.check_base_url(
                 url, allowed, resolver=_resolver({"agent.example": [PUBLIC_IP]})
             )
         )
@@ -182,7 +179,7 @@ def test_06b2_4_register_url_policy(settings):
     allowed = settings.model_copy(update={"egress_allowlist": ["agent.example"]})
 
     def check(s, url, table):
-        return anyio.run(lambda: facade_external.check_base_url(url, s, resolver=_resolver(table)))
+        return anyio.run(lambda: external_config.check_base_url(url, s, resolver=_resolver(table)))
 
     # allowlisted, public address: accepted
     check(allowed, "https://agent.example/v1", {"agent.example": [PUBLIC_IP]})
@@ -234,7 +231,7 @@ def test_06b2_r1_platform_hosts_reserved(settings, url):
         }
     )
     with pytest.raises(ApiError) as exc:
-        anyio.run(lambda: facade_external.check_base_url(url, internal, resolver=_any_private()))
+        anyio.run(lambda: external_config.check_base_url(url, internal, resolver=_any_private()))
     assert (exc.value.status_code, exc.value.code, exc.value.param) == (
         422,
         "external_agent_host_reserved",
@@ -247,7 +244,7 @@ def test_06b2_r1_other_internal_hosts_stay(settings):
     internal = settings.model_copy(update={"allowed_internal_hosts": ["agent.test", "127.0.0.1"]})
     for url in ("http://agent.test:8080/v1", "http://127.0.0.1:18080/v1"):
         anyio.run(
-            lambda url=url: facade_external.check_base_url(url, internal, resolver=_any_private())
+            lambda url=url: external_config.check_base_url(url, internal, resolver=_any_private())
         )
 
 
@@ -266,7 +263,7 @@ def test_06b2_r1_base_url_query_refused(settings, url):
     allowed = settings.model_copy(update={"egress_allowlist": ["agent.example"]})
     with pytest.raises(ApiError) as exc:
         anyio.run(
-            lambda: facade_external.check_base_url(
+            lambda: external_config.check_base_url(
                 url, allowed, resolver=_resolver({"agent.example": [PUBLIC_IP]})
             )
         )
@@ -310,7 +307,7 @@ def test_06b2_5_ssrf_dns_rebinding(settings):
     allowed = settings.model_copy(update={"egress_allowlist": ["agent.example"]})
     resolver = _resolver({"agent.example": [[PUBLIC_IP], ["10.0.0.5"]]})
     anyio.run(
-        lambda: facade_external.check_base_url(
+        lambda: external_config.check_base_url(
             "https://agent.example/v1", allowed, resolver=resolver
         )
     )
@@ -407,6 +404,21 @@ def test_06b2_12_only_registered_key_leaves(local, agent_port):
         "messages": [{"role": "user", "content": "Soru"}],
         "stream": False,
     }
+
+
+@pytest.mark.parametrize(
+    "module", ["ffcore.services.facade_external", "ffcore.services.external_config"]
+)
+def test_06b2_r1_module_imports_alone(module):
+    """Review r1 MINOR-6: each module is importable first, in a fresh interpreter (no cycle
+    through ffcore.api)."""
+    import subprocess
+    import sys
+
+    done = subprocess.run(
+        [sys.executable, "-c", f"import {module}"], capture_output=True, text=True, check=False
+    )
+    assert done.returncode == 0, done.stderr[-2000:]
 
 
 def test_06b2_3_config_secret_masked():

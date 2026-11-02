@@ -6,7 +6,7 @@ from pathlib import Path
 
 import yaml
 
-from ffcore.services.facade_external import BACKEND_CONTAINER_PORT, RESERVED_HOSTS
+from ffcore.services.external_config import BACKEND_CONTAINER_PORT, RESERVED_HOSTS
 
 ROOT = Path(__file__).resolve().parents[3]
 COMPOSE_FILES = sorted((ROOT / "deploy").glob("docker-compose*.yml"))

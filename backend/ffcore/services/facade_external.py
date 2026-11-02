@@ -30,7 +30,6 @@ import anyio
 import httpx2
 from fastapi import Request
 from fastapi.responses import JSONResponse, StreamingResponse
-from pydantic import BaseModel, ConfigDict, SecretStr
 from sqlalchemy import select
 
 from ffcore.api.facade_schemas import AGENT_EVENTS_HEADER, KEEPALIVE, NUMERIC_PARAMS, STREAM_END
@@ -39,19 +38,15 @@ from ffcore.core.audit import AuditEntry, request_context, write_event_detached
 from ffcore.core.auth import RoleRequirement, authorize
 from ffcore.core.config import Settings
 from ffcore.core.egress import (
-    EgressDenied,
     EgressError,
-    EgressPolicy,
     EgressTimeout,
     EgressTimeoutError,
     Resolver,
     SafeOutboundClient,
-    _parse_ip,
-    system_resolver,
 )
 from ffcore.core.errors import ApiError
-from ffcore.core.secrets import decrypt_json, encrypt_json
 from ffcore.models.agents import Agent
+from ffcore.services.external_config import ExternalConfig
 from ffcore.services.facade_guard import FacadeGuard, client_messages, message_text
 from ffcore.services.facade_identity import FacadeCaller
 from ffcore.services.facade_proxy import KEEPALIVE_S, _chunk, chunk_json, error_event
@@ -64,42 +59,6 @@ MAX_EXTERNAL_RESPONSE_BYTES = 65_536
 FINISH_REASONS = ("stop", "length")
 
 
-class ExternalConfig(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True)
-
-    base_url: str
-    model: str
-    # None after the base URL moved to another origin without a new key (review r1 MINOR-4):
-    # the agent cannot be published or called until a key is given again.
-    api_key: SecretStr | None
-
-    def public(self) -> dict[str, str | None]:
-        """What an API answer and an audit event may show."""
-        masked = "***" if self.api_key is not None else None
-        return {"base_url": self.base_url, "model": self.model, "api_key": masked}
-
-    def encrypt(self, settings: Settings) -> bytes:
-        return encrypt_json(
-            {
-                "base_url": self.base_url,
-                "model": self.model,
-                "api_key": self.api_key.get_secret_value() if self.api_key else None,
-            },
-            settings,
-        )
-
-    @classmethod
-    def decrypt(cls, token: bytes, settings: Settings) -> "ExternalConfig":
-        return cls.model_validate(decrypt_json(token, settings))
-
-
-def origin(url: str) -> str:
-    """scheme://host:port of a base URL (the default port written out)."""
-    target = httpx2.URL(url)
-    port = target.port or (443 if target.scheme == "https" else 80)
-    return f"{target.scheme}://{(target.host or '').lower().rstrip('.')}:{port}"
-
-
 def not_this_path() -> ApiError:
     """An external agent without a configuration or key (C11: the code stays frozen)."""
     return ApiError(
@@ -108,125 +67,6 @@ def not_this_path() -> ApiError:
         "external_agent_not_available",
         "The external agent has no endpoint key; an administrator must set it again.",
     )
-
-
-# Review r1 MINOR-1 (K-06b2-0008, decision A): the platform's own services are never an external
-# agent's target, even when ALLOWED_INTERNAL_HOSTS lets them be reached; wrapping LiteLLM or
-# Ollama as an "external agent" would take the platform's own model outside quota and tracing.
-# Every compose service is a host name on the platform network (tests/contract checks the list
-# against deploy/docker-compose*.yml); host.docker.internal is airgap Ollama on the host (seed).
-# Other internal hosts stay valid targets (KARARLAR:172).
-RESERVED_HOSTS = frozenset(
-    {
-        "agent-worker",
-        "agent-worker-bg",
-        "backend",
-        "e2e",
-        "fake-llm",
-        "frontend",
-        "langfuse-clickhouse",
-        "langfuse-minio",
-        "langfuse-postgres",
-        "langfuse-redis",
-        "langfuse-web",
-        "langfuse-worker",
-        "litellm",
-        "mcp-search",
-        "mcp-sql",
-        "migrate",
-        "ollama",
-        "postgres",
-        "qdrant",
-        "redis",
-        "ticket-desk",
-        "tools",
-        "worker",
-        "host.docker.internal",
-    }
-)
-# The port the backend listens on in its container (compose maps BACKEND_PORT to it): a loopback
-# address on it is the backend itself.
-BACKEND_CONTAINER_PORT = 8000
-
-
-def _reserved(host: str, port: int, settings: Settings) -> bool:
-    configured = {
-        (httpx2.URL(url).host or "").lower()
-        for url in (settings.litellm_url, settings.langfuse_host)
-        if url
-    }
-    if host in RESERVED_HOSTS or host in configured:
-        return True
-    literal = _parse_ip(host)
-    loopback = host == "localhost" or (literal is not None and literal.is_loopback)
-    return loopback and port == BACKEND_CONTAINER_PORT
-
-
-def url_refused(code: str) -> ApiError:
-    return ApiError(
-        422,
-        "invalid_request_error",
-        "external_agent_url_refused",
-        f"The base URL is refused by the egress policy ({code}).",
-        param="base_url",
-    )
-
-
-async def check_base_url(url: str, settings: Settings, *, resolver: Resolver | None = None) -> None:
-    """The egress rules for an HTTP base URL, as SafeOutboundClient applies them at connect
-    time: scheme, OFFLINE, allowlist or internal host, then every resolved address (no private
-    address unless the host is internal). core/egress.check_destination is SMTP-only, so the
-    same public parts are composed here (K-06b2-0002 S3a)."""
-    try:
-        target = httpx2.URL(url)
-    except httpx2.InvalidURL:
-        raise url_refused("egress_invalid_url") from None
-    if target.userinfo:
-        # Credentials in the URL would leave as Basic auth beside the registered key, and appear
-        # wherever the URL is shown; the key field is the only credential (K-06b2-0003).
-        raise url_refused("egress_userinfo")
-    if "?" in url or "#" in url:
-        # Review r1 MINOR-2: scheme, host, port and path only. A query would carry a credential
-        # (`?api-key=`) into every place the URL is shown and choose the upstream path.
-        raise ApiError(
-            422,
-            "invalid_request_error",
-            "base_url_query_not_allowed",
-            "The base URL takes scheme, host, port and path only (no query, no fragment).",
-            param="base_url",
-        )
-    if target.port is not None and not 0 < target.port < 65536:
-        # httpx2 parses any number as a port; the dial would fail later and less clearly.
-        raise url_refused("egress_invalid_port")
-    port = target.port or (443 if target.scheme == "https" else 80)
-    if _reserved((target.host or "").lower().rstrip("."), port, settings):
-        raise ApiError(
-            422,
-            "invalid_request_error",
-            "external_agent_host_reserved",
-            "The base URL names one of the platform's own services; it cannot be an external "
-            "agent.",
-            param="base_url",
-        )
-    policy = EgressPolicy(settings)
-    try:
-        policy.check_url(target)
-        host = target.host
-        literal = _parse_ip(host)
-        try:
-            addresses = (
-                [str(literal)]
-                if literal is not None
-                else await (resolver or system_resolver)(host, port)
-            )
-        except OSError:
-            raise url_refused("egress_dns_failed") from None
-        if not addresses:
-            raise url_refused("egress_private_address")
-        for address in addresses:
-            policy.check_address(host, address, port)
-    except EgressDenied as exc:
-        raise url_refused(exc.code) from None
 
 
 class ExternalCallFailed(ApiError):
