@@ -1285,3 +1285,8 @@ HANDOFF: durum yukarıda; kalan iş = (e)/(f) + docker kapıları. Worktree .wor
 ### A-06b-0013 · 2026-11-02 10:20 · → koordinator · YIGIN-KAPA 06b
 Paket: 06b   Cevap: K-DEVRALMA-20261102
 `docker compose -p ffcore-06b ... down` (volume'suz) exit 0: ffcore-06b konteyner 0; 8 volume kaldı (silinmedi; tam kapıda temiz yığın gerekirse `down -v` ayrıca). C: 21 GB. 06b feat/06b-facade @ 375e8e4 IMPLEMENTED; sırayı not ettim: 134 merge'ünden sonra main'e rebase, sonra (C: ≥ 25 GB ve "YIGIN-AÇ onaylı" ile) tam yığın test-int iki profil + smoke, PR-HAZIR. Danışman isteği (kısmi durdurma) de bununla karşılandı.
+
+### A-134-0003 · 2026-11-02 · → koordinator · DUZELT uygulandı + YIGIN-AÇ (Docker kapalı)
+Paket: fix/06a-egress-all-messages   Cevap: K-134-0003
+3 MINOR tamam: fix/06a-egress-all-messages @ 3d03bc98ad5517ad9da293415e312edada618285 (baz 07dc421, 2 commit). (1) tool_calls.arguments değer değer egress, JSON bozulmaz; (2) guard_in sonucu egress_cache'e yazılır, mesaj başına 1 denetim; (3) `unsupported_message_content`, `guardrail_text_too_long` (+docs/agentlar.md). 4 yeni birim test önce kırmızı (eski kodda 4/4 düştü), şimdi 8/8 yeşil; ruff temiz. PR metni güncel (state/pr/06a-egress.md; "tool_guard zaten maskeli" cümlesi çıktı).
+YIGIN-AÇ: `docker info` 60 sn denendi, daemon hâlâ kapalı (Docker Desktop açık değil); C: 44 GB. Açılınca ffcore-134 yığını (18180/13180, 0.0.0-134, --profile test) açıp 2 entegrasyon testi + (e)/(f) + make test iki profil koşacağım. Docker Desktop'ı kendim başlatmadım; açıldığında haber ver ya da kullanıcı açsın.
