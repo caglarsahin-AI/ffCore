@@ -301,6 +301,39 @@ def test_06b2_r1_rename_and_delete_external_need_admin(ext, make_user, client_fa
     assert console.delete(base).status_code == 204
 
 
+def test_06b2_r1_origin_change_resets_the_key(ext, fake_agent, pg):
+    """Review r1 MINOR-4: a stored key never follows the base URL to another origin. Changing
+    the path keeps it; changing scheme, host or port without a new `api_key` deletes it (audited
+    `reset_external_agent_key`): publish is 409 `external_agent_not_configured`, the published
+    agent answers 501 `external_agent_not_available` and nothing is sent until a key is given."""
+    project, console, client, register = ext
+    agent, model = register()
+    port = fake_agent.server_address[1]
+    base = f"/api/v1/projects/{project}/agents/{agent['id']}/external"
+    same = console.put(base, json={"base_url": f"http://127.0.0.1:{port}/tools"})
+    assert same.status_code == 200 and same.json()["external"]["api_key"] == "***"
+    moved = console.put(base, json={"base_url": "http://127.0.0.1:1/ok"})
+    assert moved.status_code == 200, moved.text
+    assert moved.json()["external"]["api_key"] is None
+    ((outcome, _, after),) = _audit(pg, "reset_external_agent_key", agent["id"])
+    assert outcome == "success" and after["reason"] == "origin_changed"
+    assert after["from_origin"] == f"http://127.0.0.1:{port}"
+    assert after["to_origin"] == "http://127.0.0.1:1" and KEY not in json.dumps(after)
+    before = len(fake_agent.seen)
+    refused = console.post(base + "/publish")
+    assert refused.status_code == 409
+    assert refused.json()["error"]["code"] == "external_agent_not_configured"
+    called = client.chat(model, "x")
+    assert called.status_code == 501
+    assert called.json()["error"]["code"] == "external_agent_not_available"
+    assert len(fake_agent.seen) == before
+    back = console.put(base, json={"base_url": f"http://127.0.0.1:{port}/ok", "api_key": NEW_KEY})
+    assert back.status_code == 200 and back.json()["external"]["api_key"] == "***"
+    assert console.post(base + "/publish").status_code == 200
+    assert client.chat(model, "x").status_code == 200
+    assert fake_agent.seen[-1]["headers"]["authorization"] == f"Bearer {NEW_KEY}"
+
+
 # --- the facade ---
 
 

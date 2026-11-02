@@ -35,7 +35,7 @@ from ffcore.api.agents_schemas import (
     VersionUpdate,
 )
 from ffcore.api.common import ERROR_RESPONSES, SessionDep, conflict, not_found, path_resource
-from ffcore.core.audit import audited
+from ffcore.core.audit import AuditEntry, audited, request_context, write_event
 from ffcore.core.auth import Actor, authorize, require_role
 from ffcore.core.config import Settings, get_settings
 from ffcore.core.errors import ApiError
@@ -43,7 +43,7 @@ from ffcore.models.agents import Agent, AgentVersion
 from ffcore.models.catalog import Model, Provider
 from ffcore.runtime.contracts import AgentStatus
 from ffcore.runtime.definition import AgentDefinition, parse_definition
-from ffcore.services.facade_external import ExternalConfig, check_base_url
+from ffcore.services.facade_external import ExternalConfig, check_base_url, origin
 
 router = APIRouter(
     prefix="/projects/{project_id}/agents", tags=["agents"], responses=ERROR_RESPONSES
@@ -666,14 +666,40 @@ async def update_external_agent(
     settings: SettingsDep,
 ):
     """Change the base URL, remote model or key (omitted fields stay); the kind never changes.
-    The resulting base URL is checked again."""
+    The resulting base URL is checked again. A stored key never follows the URL to another
+    origin: without a new `api_key` it is deleted, and the agent cannot be published or called
+    until one is given."""
+    # Review r1 MINOR-4: the key goes only to the origin it was given for.
     agent = await _external(session, project_id, agent_id)
     current = ExternalConfig.decrypt(agent.external_config, settings)
     config = current.model_copy(update=body.model_dump(exclude_unset=True))
-    config = ExternalConfig.model_validate(
-        {**config.model_dump(), "api_key": config.api_key.get_secret_value()}
-    )
+    secret = config.api_key.get_secret_value() if config.api_key else None
+    config = ExternalConfig.model_validate({**config.model_dump(), "api_key": secret})
     await check_base_url(config.base_url, settings)
+    moved = origin(config.base_url) != origin(current.base_url)
+    if moved and "api_key" not in body.model_fields_set and current.api_key is not None:
+        config = config.model_copy(update={"api_key": None})
+        request_id, ip = request_context(request)
+        await write_event(
+            session,
+            AuditEntry(
+                action="reset_external_agent_key",
+                resource_type="agent",
+                outcome="success",
+                actor_type=actor.actor_type,
+                actor_id=actor.actor_id,
+                project_id=str(project_id),
+                resource_id=str(agent.id),
+                after={
+                    "reason": "origin_changed",
+                    "from_origin": origin(current.base_url),
+                    "to_origin": origin(config.base_url),
+                },
+                request_id=request_id,
+                ip=ip,
+                via_key_id=getattr(actor, "via_key_id", None),
+            ),
+        )
     agent.external_config = config.encrypt(settings)
     await session.flush()
     await session.refresh(agent)
@@ -698,6 +724,11 @@ async def publish_external_agent(
             "external_agent_not_configured", "The external agent has no endpoint configured."
         )
     config = ExternalConfig.decrypt(agent.external_config, settings)
+    if config.api_key is None:
+        raise conflict(
+            "external_agent_not_configured",
+            "The external agent has no key (reset when its base URL moved to another origin).",
+        )
     await check_base_url(config.base_url, settings)
     agent.status = AgentStatus.published
     await session.flush()

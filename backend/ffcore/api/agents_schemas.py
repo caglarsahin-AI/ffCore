@@ -254,7 +254,10 @@ class ExternalAgentUpdate(Patch):
 class ExternalEndpoint(BaseModel):
     base_url: str
     model: str
-    api_key: Literal["***"] = Field(description="Never returned.")
+    api_key: Literal["***"] | None = Field(
+        description="Never returned; null when no key is set (it is deleted when the base URL "
+        "moves to another origin without a new key)."
+    )
 
 
 class ExternalAgentOut(AgentOut):

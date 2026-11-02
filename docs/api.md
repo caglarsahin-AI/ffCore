@@ -525,7 +525,11 @@ project administrator and called through the same `agent:<project_key>/<agent_ke
   changes the endpoint (omitted fields stay; `kind` never changes, 422);
   `POST .../agents/{agent_id}/external/publish` publishes it (no versions; 409
   `external_agent_not_configured` without an endpoint). The `api_key` is stored with Fernet and is
-  never returned (`***`), never in an audit row, never in a manifest. Version, rollback and
+  never returned (`***`), never in an audit row, never in a manifest. It goes only to the origin
+  it was given for: a `PUT` that moves `base_url` to another scheme, host or port without a new
+  `api_key` deletes it (`api_key: null`, audit `reset_external_agent_key` with both origins);
+  until a key is set again, publish is 409 `external_agent_not_configured` and a call is 501
+  `external_agent_not_available`. Version, rollback and
   manifest routes refuse an external agent (409 `external_agent_has_no_versions`, 422
   `external_agent_not_available`, an import onto its key included); the console's
   `POST .../agents` cannot create one (422). Renaming (`PATCH .../agents/{agent_id}`) and deleting

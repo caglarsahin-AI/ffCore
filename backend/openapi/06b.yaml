@@ -307,7 +307,11 @@ paths:
       summary: Update External Agent
       description: 'Change the base URL, remote model or key (omitted fields stay); the kind never changes.
 
-        The resulting base URL is checked again.'
+        The resulting base URL is checked again. A stored key never follows the URL to another
+
+        origin: without a new `api_key` it is deleted, and the agent cannot be published or called
+
+        until one is given.'
       operationId: update_external_agent_api_v1_projects__project_id__agents__agent_id__external_put
       parameters:
       - name: project_id
@@ -1131,10 +1135,13 @@ components:
           type: string
           title: Model
         api_key:
-          type: string
-          const: '***'
+          anyOf:
+          - type: string
+            const: '***'
+          - type: 'null'
           title: Api Key
-          description: Never returned.
+          description: Never returned; null when no key is set (it is deleted when the base URL moves
+            to another origin without a new key).
       type: object
       required:
       - base_url

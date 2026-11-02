@@ -69,18 +69,21 @@ class ExternalConfig(BaseModel):
 
     base_url: str
     model: str
-    api_key: SecretStr
+    # None after the base URL moved to another origin without a new key (review r1 MINOR-4):
+    # the agent cannot be published or called until a key is given again.
+    api_key: SecretStr | None
 
-    def public(self) -> dict[str, str]:
+    def public(self) -> dict[str, str | None]:
         """What an API answer and an audit event may show."""
-        return {"base_url": self.base_url, "model": self.model, "api_key": "***"}
+        masked = "***" if self.api_key is not None else None
+        return {"base_url": self.base_url, "model": self.model, "api_key": masked}
 
     def encrypt(self, settings: Settings) -> bytes:
         return encrypt_json(
             {
                 "base_url": self.base_url,
                 "model": self.model,
-                "api_key": self.api_key.get_secret_value(),
+                "api_key": self.api_key.get_secret_value() if self.api_key else None,
             },
             settings,
         )
@@ -90,13 +93,20 @@ class ExternalConfig(BaseModel):
         return cls.model_validate(decrypt_json(token, settings))
 
 
+def origin(url: str) -> str:
+    """scheme://host:port of a base URL (the default port written out)."""
+    target = httpx2.URL(url)
+    port = target.port or (443 if target.scheme == "https" else 80)
+    return f"{target.scheme}://{(target.host or '').lower().rstrip('.')}:{port}"
+
+
 def not_this_path() -> ApiError:
-    """An external agent without a configuration (kept for C11: the code stays frozen)."""
+    """An external agent without a configuration or key (C11: the code stays frozen)."""
     return ApiError(
         501,
         "api_error",
         "external_agent_not_available",
-        "External agents cannot be called through the facade yet.",
+        "The external agent has no endpoint key; an administrator must set it again.",
     )
 
 
@@ -436,6 +446,10 @@ async def complete(
         raise ApiError(404, "not_found_error", "agent_not_published", "The agent is not published.")
     if agent.external_config is None:
         raise not_this_path()
+    config = ExternalConfig.decrypt(agent.external_config, settings)
+    if config.api_key is None:
+        # Its key was reset when the base URL moved to another origin (review r1 MINOR-4).
+        raise not_this_path()
     if caller.user_id is not None:
         # The user a key acts for must be a member (as on the native agent path).
         await authorize(
@@ -446,7 +460,6 @@ async def complete(
         )
     stream_events = events_on(request)
     messages = _outgoing(body, params)
-    config = ExternalConfig.decrypt(agent.external_config, settings)
     redis = redis_client(settings)
     try:
         async with db.session_scope() as session:
