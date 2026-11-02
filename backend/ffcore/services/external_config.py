@@ -76,6 +76,7 @@ RESERVED_HOSTS = frozenset(
         "qdrant",
         "redis",
         "ticket-desk",
+        "vllm",
         "tools",
         "worker",
         "host.docker.internal",
@@ -86,12 +87,13 @@ RESERVED_HOSTS = frozenset(
 BACKEND_CONTAINER_PORT = 8000
 
 
+def _host(url: str) -> str:
+    """A host as compared here: lower case, without the root dot (r2 NOTE-2)."""
+    return (httpx2.URL(url).host or "").lower().rstrip(".")
+
+
 def _reserved(host: str, port: int, settings: Settings) -> bool:
-    configured = {
-        (httpx2.URL(url).host or "").lower()
-        for url in (settings.litellm_url, settings.langfuse_host)
-        if url
-    }
+    configured = {_host(url) for url in (settings.litellm_url, settings.langfuse_host) if url}
     if host in RESERVED_HOSTS or host in configured:
         return True
     literal = _parse_ip(host)

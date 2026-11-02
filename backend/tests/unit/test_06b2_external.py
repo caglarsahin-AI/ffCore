@@ -212,12 +212,15 @@ def test_06b2_4_register_url_policy(settings):
         "http://backend:8000/v1",
         "http://my-litellm:4000/v1",  # LITELLM_URL's host, whatever it is called
         "http://127.0.0.1:8000/v1",  # the backend itself, from inside its container
+        "http://vllm:8000/v1",  # review r2 N1: the seed's vLLM default
+        "http://llm.corp:4000/v1",  # LANGFUSE_HOST written with the root dot (r2 NOTE-2)
     ],
 )
 def test_06b2_r1_platform_hosts_reserved(settings, url):
     internal = settings.model_copy(
         update={
             "litellm_url": "http://my-litellm:4000",
+            "langfuse_host": "http://LLM.corp.:4000",
             "allowed_internal_hosts": [
                 "litellm",
                 "langfuse-web",

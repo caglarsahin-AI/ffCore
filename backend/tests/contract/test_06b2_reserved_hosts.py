@@ -2,6 +2,7 @@
 external agent's target. RESERVED_HOSTS names every compose service (each is a host name on the
 platform network), so a service added to compose without it fails here."""
 
+import re
 from pathlib import Path
 
 import yaml
@@ -27,3 +28,19 @@ def test_06b2_reserved_hosts_cover_compose():
 def test_06b2_backend_container_port_matches_compose():
     ports = _services(ROOT / "deploy" / "docker-compose.yml")["backend"]["ports"]
     assert any(str(p).endswith(f":{BACKEND_CONTAINER_PORT}") for p in ports), ports
+
+
+def test_06b2_reserved_hosts_cover_seed_model_servers():
+    """Review r2 N1 (K-06b2-0013, C): the seed's default model servers (Ollama, vLLM) are
+    reserved even when they are not compose services. A provider row's own host is
+    FOLLOWUP-146."""
+    seeds = sorted((ROOT / "deploy" / "seed").glob("models.*.yaml"))
+    assert seeds
+    defaults = {
+        m.group(1)
+        for path in seeds
+        for m in re.finditer(r"\$\{SEED_\w+_BASE_URL:-([^}]+)\}", path.read_text(encoding="utf-8"))
+    }
+    assert {"http://ollama:11434", "http://vllm:8000"} <= defaults
+    hosts = {re.match(r"\w+://([^:/]+)", url).group(1) for url in defaults}
+    assert hosts <= RESERVED_HOSTS, sorted(hosts - RESERVED_HOSTS)

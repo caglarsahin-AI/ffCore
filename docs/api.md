@@ -541,8 +541,9 @@ project administrator and called through the same `agent:<project_key>/<agent_ke
   platform's own services are never a target, even when internal (422
   `external_agent_host_reserved`): every compose service name (`litellm`, `langfuse-*`, `mcp-*`,
   `ollama`, `backend`, ...; `RESERVED_HOSTS` in `services/external_config.py`),
-  `host.docker.internal`, the hosts of `LITELLM_URL` and `LANGFUSE_HOST`, and a loopback address
-  on the backend's own port; other internal hosts stay valid targets. The same egress check runs
+  `host.docker.internal`, `vllm` (the seed's default model servers), the hosts of `LITELLM_URL` and
+  `LANGFUSE_HOST`, and a loopback address on the backend's own port; a model server under another
+  name (a provider row's own host) is not yet recognised (FOLLOWUP-146); other internal hosts stay valid targets. The same egress check runs
   again at every connection (a name that resolves to a private address at call time is refused at
   the dial). Redirects are not followed: a 3xx answer is a failure (audit reason
   `egress_too_many_redirects`).
