@@ -51,6 +51,30 @@ Saving or publishing checks the budget against the model (C13): `context_tokens`
 Analysts with edit access build and publish agents; read-only access gets 403 on every mutation.
 Every mutation is audited.
 
+### Manifest (06b)
+
+- `GET /agents/{id}/manifest?version=&format=json|yaml`: the agent (`key`, `name`, `description`,
+  `kind`) and one version's definition (default: the published one, else the latest), with
+  `manifest_version: 1`. No secrets are in it.
+- `POST /agents/import?dry_run=true|false` (body `application/json` or `application/yaml`): a new
+  agent with draft version 1, or the next draft version of the agent with the same key. Nothing is
+  published. The definition is validated as on save (C8; a definition without `schema_version` is
+  version 1) and so is the model and context budget (C13). `dry_run=true` answers what would
+  happen and writes nothing. An external agent is refused (422 `external_agent_not_available`).
+  Edit access, audited (`import_agent`).
+
+### Through the OpenAI-compatible facade (06b)
+
+`agent:<project_key>/<agent_key>` on `/v1/chat/completions` runs the published version as the API
+key, or as the user the key acts for (docs/api.md, facade). A run started by the key itself has no
+user: its searches use the key's `acl_role` (the backend reads it from the key row), tools that
+forward the user's identity cannot run (`tool_needs_run_user`), approvals are decided in the
+console only.
+
+Personal data tokenized at `egress` (llmaas) appears in answers as placeholders (`<<PII_n>>`), on
+the console and through the facade alike: turning them back into the values comes with 08's full
+release (C17, permission-bound).
+
 ## Runs
 
 `POST /agents/{agent_key}/runs {input, variables, conversation_id?, channel: chat|test, version?}`
@@ -137,7 +161,8 @@ outcome label, confidence).
 
 - A documents-only agent whose search found nothing answers its `unknown_reply` without a model
   call (`progress {"skipped_model": "no_sources"}`, outcome `declined`).
-- With an `enforce` policy that checks output, the stream starts with `progress {"stage":
+- When a rule that checks output is in enforce mode (its own mode, or the policy's when it has
+  none), the stream starts with `progress {"stage":
   "output_buffered", "reason": "guardrail_enforce"}` and the answer arrives in one piece after
   `output.pre`; otherwise tokens stream as they are written.
 - A model fallback happens only with an active `chat-fallback` model; it is a `fallback` event.

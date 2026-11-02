@@ -3,6 +3,7 @@
 **Bağımlılık:** 03a, 03b, 01, 02, 04a, 05a, 08 (hook adları). **Süre:** 10 gün, iki alt paket ve iki PR (06a 7, 06b 3; inceleme v4-v6). **Dalga:** 06a dalga 4, 06b PoC sonrası. **PoC:** 06a.
 
 **06a, çekirdek (≈6,5 gün, kritik yol, M3 öncesi zorunlu; PoC'de iki agent, PLAN 2d):** veri modeli (tam, facade alanları dahil), iz ve oturum alanları (02'den taşındı, B1), agent tanımı şeması, bağlam bütçesi, iş önceliği ve kuyruk (`LLM_SLOTS`, C8), graf üretimi, run API ve SSE, `resume`, tracing, `mode: tool` için `search_documents` aracı (C11), platform kuralları, guardrail kancalarının bağlanması (B3), guardrail engeli hata gövdesi, `run_events.fallback` ve `tool_call/tool_result` yazımı (B2, B3), iki aşamalı oluşturma API'si, yayın/geri alma. Kabul kriterleri: facade ve manifest dışındakiler.
+**06b-2 (brief bölmesi, K-06b-0004, KARARLAR "06b S5 dış agent"):** dış agent (`kind: external`) 06b'den ayrı PR'dır; 06b'de rezerve (501 `external_agent_not_available`), olay altkümesi 06b-2'de donar.
 **06b, dış yüz (≈3 gün, PoC sonrası; 03c ile birlikte):** OpenAI-uyumlu facade (`/v1/chat/completions`, `/v1/models`, kimlik eşleme yalnızca `impersonate` ile (B7), `x_platform` event'leri, `annotations[]`, onay akışı: istemci onay veremez, bekler (C4)), düz model proxy'si ve API anahtarı kota uygulaması (03c), dış agent (`kind: external`), manifest içe/dışa aktarma. Kabul kriterleri: facade ve manifest maddeleri.
 
 ## Amaç

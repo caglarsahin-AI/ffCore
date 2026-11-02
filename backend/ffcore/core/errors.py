@@ -20,25 +20,32 @@ _TYPE_BY_STATUS = {
 class ApiError(Exception):
     """Typed, actionable error; message is English and never carries secrets."""
 
-    def __init__(self, status_code: int, error_type: str, code: str, message: str) -> None:
+    def __init__(
+        self, status_code: int, error_type: str, code: str, message: str, param: str | None = None
+    ) -> None:
         super().__init__(message)
         self.status_code = status_code
         self.error_type = error_type
         self.code = code
         self.message = message
+        # OpenAI's `param`: the request field the error is about (06b review r2); additive.
+        self.param = param
 
 
-def error_body(error_type: str, code: str, message: str) -> dict:
-    return {"error": {"message": message, "type": error_type, "code": code}}
+def error_body(error_type: str, code: str, message: str, param: str | None = None) -> dict:
+    error = {"message": message, "type": error_type, "code": code}
+    if param is not None:
+        error["param"] = param
+    return {"error": error}
 
 
-def _response(status_code: int, error_type: str, code: str, message: str, headers=None):
-    return JSONResponse(error_body(error_type, code, message), status_code, headers=headers)
+def _response(status_code: int, error_type: str, code: str, message: str, headers=None, param=None):
+    return JSONResponse(error_body(error_type, code, message, param), status_code, headers=headers)
 
 
 async def _api_error(_: Request, exc: ApiError) -> JSONResponse:
     headers = {"WWW-Authenticate": "Bearer"} if exc.status_code == 401 else None
-    return _response(exc.status_code, exc.error_type, exc.code, exc.message, headers)
+    return _response(exc.status_code, exc.error_type, exc.code, exc.message, headers, exc.param)
 
 
 async def _http_error(_: Request, exc: StarletteHTTPException) -> JSONResponse:

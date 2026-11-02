@@ -262,7 +262,9 @@ user's own console session: a service or an impersonating key acting for the use
 - With `impersonate`, the key sends `X-On-Behalf-Of` for a user of the key's own project; the user
   is then the actor (membership and ACL are the user's) and audit rows carry `via_key_id`.
 - A key is not a console member: project routes answer it 403 `insufficient_role`. Keys are used
-  on the facade (06b).
+  on the facade (06b, below). Scopes in use there: `chat_direct` (direct model calls), `agents`
+  (agent runs), `impersonate` (the `user` field and `X-On-Behalf-Of`). `kb_search` and
+  `tools_invoke` have no consumer in 06b (05b's published MCP servers).
 - `last_used_at` is written at most once per `API_KEY_LAST_USED_FLUSH_S` (60 s).
 
 ### Quotas
@@ -398,3 +400,123 @@ reranker on, `min_score` with it off) and `filtered_by_*` how many candidates it
 04a lives on Alembic branch `04a` (`04a_0001`, depends on `03a_0001`); roll back with an explicit
 revision (`alembic downgrade <revision to keep>`; `04a@-1` is refused since the merge,
 FOLLOWUP-57, docs/gelistirme-ortami.md). `chunks.embedding` is `vector(EMBED_DIM)` as read at migration time.
+
+## OpenAI-compatible facade (06b, contract C11)
+
+The one public entry for model calls. An OpenAI client changes only its base URL
+(`https://<ffcore>/v1`) and API key (`Authorization: Bearer ffk_...`); LiteLLM stays on the
+internal network and is called with one internal key. Machine-readable draft:
+`backend/openapi/06b.yaml`.
+
+### Routes
+
+- `POST /v1/chat/completions`: OpenAI chat completions, `stream: true` for server-sent events
+  (OpenAI `chat.completion.chunk`, ending with `data: [DONE]`; `: keepalive` comment lines while a
+  run produces nothing).
+- `GET /v1/models`: the key's own project only: its active chat models as
+  `<project_key>.<model_key>` (scope `chat_direct`) and its published agents as
+  `agent:<project_key>/<agent_key>` (scope `agents`). External agents are not listed (reserved).
+
+### Choosing the target
+
+| `model` | Path | Scope |
+|---|---|---|
+| `<project_key>.<model_key>`, or the short `<model_key>` | direct model call through LiteLLM | `chat_direct` |
+| `agent:<project_key>/<agent_key>` | a run of the agent's published version | `agents` |
+
+The scope is checked before anything is looked up (403 `scope_missing`), so a key learns nothing
+about targets outside its scopes. Another project's model or agent, or a missing one: 404
+`model_not_found`. An agent that is not published: 404 `agent_not_published`. An external agent
+(`kind: external`): 501 `external_agent_not_available` until 06b-2.
+
+### Who acts
+
+- The key itself by default: runs carry `api_key_id` and no `user_id`; the key's `acl_role` (and
+  every role below it) decides which documents its runs find; audit rows show `actor_type=api_key`.
+- With the `impersonate` scope, the OpenAI `user` field (an e-mail) or `X-On-Behalf-Of` names a
+  member of the key's project: that user acts (membership role and ACL), rows carry `via_key_id`.
+  An unknown e-mail, an inactive user and a non-member all get the same `403
+  impersonation_denied`, byte for byte; the reason (`user_not_mapped`, `not_member`) is only in
+  the audit row. Without the scope the `user` field is a log label only and the refusal is
+  audited (`reason: scope_missing`, at most once per key, address and minute).
+- A console session or the service token is not a facade caller: 401 `api_key_required`.
+
+### Direct model path
+
+- Only these OpenAI parameters pass to LiteLLM: `temperature, top_p, max_tokens,
+  max_completion_tokens, stop, presence_penalty, frequency_penalty, seed, response_format, tools,
+  tool_choice, logit_bias` (plus `stream`, `user`, `n=1`). Anything else: 400
+  `unsupported_field` (LiteLLM reads provider settings from the body; nothing is passed or
+  dropped silently).
+- Numbers are strictly typed, in OpenAI's ranges: `temperature` 0-2, `top_p` 0-1,
+  `presence_penalty` and `frequency_penalty` -2 to 2 (numbers); `max_tokens` and
+  `max_completion_tokens` at least 1, `seed` (integers); `n` only 1; `true`/`false` is not a
+  number; `logit_bias` maps token ids to numbers. Otherwise 400 `invalid_parameter` with OpenAI's
+  `param` naming the field; the value is not echoed and never reaches the model.
+- Messages carry OpenAI's fields only: `role, content, name, tool_calls, tool_call_id`; any other
+  message field: 400 `unsupported_field`. An earlier answer sent back as an SDK returned it may
+  keep `annotations`, `refusal` and `audio` on its assistant message: they are left out of what
+  the model sees and recorded by name (`dropped_fields`: in the run's `start_run` audit row on the
+  agent path, in the backend log on the direct path). Content parts must be text (400 `content_type_not_supported`: a guardrail
+  cannot check images).
+- The `user` field is never passed on: LiteLLM (and the provider) see the acting user's id or
+  `api_key:<key id>`, not the client's label.
+- Guardrails (the project's `default` policy, 08): `input.pre` on system, developer, user and tool
+  messages; `egress` on every text field that leaves (llmaas; `GUARDRAIL_EGRESS_ENABLED`): message
+  content, `name`, `tool_call_id` and earlier `tool_calls`, and the `stop`, `tools`, `tool_choice`
+  and `response_format` parameters (strings inside them; their structure is kept); `output.pre` on
+  the answer and on returned `tool_calls` arguments. A block: 400 `guardrail_blocked` (reference in
+  the message). When a rule that checks output is in enforce mode (its own mode, or the policy's
+  when it has none), the answer is held until `output.pre` has seen it: the stream starts with
+  `x_platform: {"event": "progress", "kind": "output_buffered"}` and the checked answer comes in one
+  piece, so the first token is later; a held answer over 1 MB is cut off with
+  `output_buffer_exceeded`. A request's tokenized values share one token scope (`facade-<uuid>`).
+- Personal data tokenized at `egress` stays a placeholder (`<<PII_n>>`) in the answer: placeholders
+  are not turned back into the values until 08's full release (C17, permission-bound). This is the
+  safe side; the agent path behaves the same.
+- The client's own tools: definitions pass, the model's `tool_calls` come back with OpenAI's
+  meaning. The client runs them; they are not platform tools and do not go through the approval
+  queue (07).
+- Quota (03c): the project and key quotas apply per call; a blocking quota answers 429
+  `quota_exceeded`, a USD budget on an unpriced model 409 `pricing_missing`, no Redis 503
+  `quota_unavailable`. The call is counted once per LiteLLM call id in `usage_daily` with the key.
+- LiteLLM's configured `chat-fallback` may answer; the response then carries
+  `x_platform: {"event": "fallback", ...}`. No other fallback.
+
+### Agent path
+
+- A run of the published version with `channel=api`, `trigger_type=api`; the response headers
+  carry `X-Run-Id` and `X-Conversation-Id`.
+- The request parameters are checked as on the direct path (unknown field 400
+  `unsupported_field`, wrong type or range 400 `invalid_parameter`), before any run starts. Valid
+  values do not change the run: the agent's definition sets its model and settings.
+- Context: without `X-Conversation-Id` each request is a new conversation; earlier `user` and
+  `assistant` messages become its history after `input.pre` and `egress`, the last message must be
+  the user's question. With `X-Conversation-Id` (the caller's own conversation) send only the new
+  question (400 `conversation_history_conflict` otherwise). `system`, `developer` and `tool`
+  messages are refused (400 `role_not_supported`): the agent's own instructions govern.
+- Chunks: tokens as `delta.content`; each tool call, tool result, sources list, progress and
+  fallback as one chunk with `x_platform: {"event": ..., ...}` (tool arguments as `tool.pre` left
+  them, never raw); sources also as `annotations[]` (`url_citation`, URL
+  `ffcore://knowledge-bases/<kb>/documents/<id>#page=<n>`, one per `[n]` marker in the answer) on
+  the last chunk; the last chunk carries `usage`. `X-Agent-Events: none` sends text and
+  annotations only.
+- Approval: a run waiting for a person ends the stream with `finish_reason: "approval_required"` and
+  `x_platform: {"event": "approval_required", "run_id", "approval_id", "expires_at", ...}` (with
+  `X-Agent-Events: none` only these ids, never the action's arguments). The client cannot approve:
+  a person decides in the console. Then `X-Resume-Run-Id: <run id>` on the same route follows the
+  run from where it stopped (409 `run_still_waiting` before the decision; 404 `run_not_found` for
+  another caller's run). A run belongs to its actor: a key's own run to that key, a user's run
+  (through `impersonate`) to that user, so another key acting for the same user may follow it.
+- A question to the user (`ask_user`) ends with `finish_reason: "stop"` and
+  `x_platform: {"event": "question", ...}`; answering it is a console action for now.
+- Errors: non-streaming requests get the HTTP status (400 `guardrail_blocked`, 429
+  `quota_exceeded`, 502 with the run's code); once a stream has started, the error is an event
+  `data: {"error": {"message", "type", "code"}}` followed by `data: [DONE]`.
+
+### Internal
+
+`POST /internal/knowledge-bases/{kb_id}/key-search` (service token only): the worker's search for a
+run whose actor is a key. The body names the key, project and run; the role is read from the key
+row (revoked, expired, project and the run's own key checked again; 403 `api_key_not_valid`), any
+role in the body is ignored.

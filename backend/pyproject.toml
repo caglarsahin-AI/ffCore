@@ -55,6 +55,7 @@ dependencies = [
 
 [dependency-groups]
 dev = [
+    "openai==3.35.0",
     "pytest==9.2.0",
     "ruff==0.17.3",
 ]
@@ -81,6 +82,10 @@ sniffio = "2026-10-15T00:00:00Z"
 tenacity = "2026-10-15T00:00:00Z"
 uuid-utils = "2026-10-15T00:00:00Z"
 zstandard = "2026-10-15T00:00:00Z"
+# 06b S7 (K-06b-0002): the `openai` client, a dev/test dependency only (the facade's acceptance
+# test uses the real client); same rule for it and what it pulls in.
+openai = "2026-10-18T00:00:00Z"
+jiter = "2026-10-18T00:00:00Z"
 
 # A second package index: an internal mirror must proxy download.pytorch.org too (12).
 [[tool.uv.index]]

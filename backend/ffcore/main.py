@@ -4,7 +4,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
-from ffcore.api import api_router, internal
+from ffcore.api import api_router, facade, internal
 from ffcore.api.upload_limit import UploadSizeLimit
 from ffcore.core.audit import ensure_audit_partitions
 from ffcore.core.auth import register_credential_resolver
@@ -74,6 +74,9 @@ app.add_middleware(UploadSizeLimit)
 app.add_middleware(AccessLogMiddleware)
 app.include_router(api_router)
 app.include_router(internal.router)
+# 06b: the OpenAI-compatible facade at /v1 (C11), outside /api/v1 like OpenAI's own paths.
+app.include_router(facade.router)
+app.include_router(internal.facade_router)
 app.include_router(readiness_router)
 
 

@@ -1,0 +1,1140 @@
+openapi: 3.1.0
+info:
+  title: FFCore API
+  description: OpenAI-compatible facade (/v1, contract C11), agent manifest export and import, and the
+    internal search of runs started by an API key (package 06b).
+  version: 0.6b
+paths:
+  /api/v1/projects/{project_id}/agents/{agent_id}/manifest:
+    get:
+      tags:
+      - agent-manifest
+      summary: Export Manifest
+      description: 'The agent and one version''s definition (default: the published one, else the latest).
+
+        Secrets are not in it: an external agent''s endpoint and key stay in this installation.'
+      operationId: export_manifest_api_v1_projects__project_id__agents__agent_id__manifest_get
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      - name: agent_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Agent Id
+      - name: version
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Version
+      - name: format
+        in: query
+        required: false
+        schema:
+          enum:
+          - json
+          - yaml
+          type: string
+          default: json
+          title: Format
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Manifest'
+            application/yaml: {}
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+  /api/v1/projects/{project_id}/agents/import:
+    post:
+      tags:
+      - agent-manifest
+      summary: Import Manifest
+      description: 'A manifest becomes a new agent (draft version 1) or, when the key exists, its next
+
+        draft version; nothing is published. `dry_run=true` validates and writes nothing. An older
+
+        `schema_version` is read as such (C8).'
+      operationId: import_manifest_api_v1_projects__project_id__agents_import_post
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      - name: dry_run
+        in: query
+        required: false
+        schema:
+          type: boolean
+          default: false
+          title: Dry Run
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportResult'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Manifest'
+          application/yaml:
+            schema:
+              $ref: '#/components/schemas/Manifest'
+  /v1/chat/completions:
+    post:
+      tags:
+      - facade
+      summary: Chat Completions
+      description: 'OpenAI chat completions; `stream: true` answers with OpenAI chunks over SSE.'
+      operationId: chat_completions_v1_chat_completions_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChatCompletionRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+  /v1/models:
+    get:
+      tags:
+      - facade
+      summary: List Models
+      description: 'The key''s own project: its active models (scope `chat_direct`) and its published
+        agents
+
+        (scope `agents`). Nothing from another project.'
+      operationId: list_models_v1_models_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ModelList'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+  /internal/knowledge-bases/{kb_id}/key-search:
+    post:
+      tags:
+      - facade-internal
+      summary: Internal Key Search
+      description: 'The worker''s search for a run started by an API key without a user (06b, B7): ACL
+        is
+
+        the key''s `acl_role` and every role below it, read here from the key row. The key is checked
+
+        again (revoked, expired, its project, the run''s own key), not trusted from the caller.'
+      operationId: internal_key_search_internal_knowledge_bases__kb_id__key_search_post
+      parameters:
+      - name: kb_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Kb Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/KeySearchRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchResponse'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+components:
+  schemas:
+    AgentDefinition:
+      properties:
+        schema_version:
+          type: integer
+          const: 1
+          title: Schema Version
+          default: 1
+        model:
+          type: string
+          pattern: ^[a-z][a-z0-9-]{1,63}$
+          title: Model
+          description: Project model key.
+        system_prompt:
+          anyOf:
+          - type: string
+            maxLength: 20000
+          - type: 'null'
+          title: System Prompt
+        langfuse_prompt:
+          anyOf:
+          - $ref: '#/components/schemas/LangfusePromptRef'
+          - type: 'null'
+        variables:
+          items:
+            $ref: '#/components/schemas/Variable'
+          type: array
+          title: Variables
+        knowledge:
+          items:
+            $ref: '#/components/schemas/KnowledgeRef'
+          type: array
+          title: Knowledge
+        tools:
+          items:
+            $ref: '#/components/schemas/ToolRef'
+          type: array
+          title: Tools
+        approval:
+          anyOf:
+          - $ref: '#/components/schemas/Approval'
+          - type: 'null'
+        ask_user:
+          type: boolean
+          title: Ask User
+          default: false
+        guardrail_policy_key:
+          type: string
+          maxLength: 64
+          minLength: 1
+          title: Guardrail Policy Key
+          default: default
+        structured_output:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Structured Output
+        limits:
+          $ref: '#/components/schemas/Limits'
+        context_policy:
+          $ref: '#/components/schemas/ContextPolicy'
+        answer_rules:
+          $ref: '#/components/schemas/AnswerRules'
+        reasoning:
+          type: string
+          enum:
+          - none
+          - model_default
+          title: Reasoning
+          default: none
+        runtime_profile:
+          type: string
+          const: default
+          title: Runtime Profile
+          default: default
+      additionalProperties: false
+      type: object
+      required:
+      - model
+      title: AgentDefinition
+    AnswerRules:
+      properties:
+        cite_sources:
+          type: boolean
+          title: Cite Sources
+          default: true
+        unknown_reply:
+          type: string
+          minLength: 1
+          title: Unknown Reply
+          default: This information is not in the documents.
+        confidence_formula:
+          type: string
+          enum:
+          - cited
+          - max
+          - sentence_max
+          title: Confidence Formula
+          default: cited
+        confidence_threshold:
+          anyOf:
+          - type: number
+            maximum: 1.0
+            minimum: 0.0
+          - type: 'null'
+          title: Confidence Threshold
+        show_confidence:
+          type: boolean
+          title: Show Confidence
+          default: false
+        verify:
+          type: boolean
+          title: Verify
+          default: false
+        max_answer_tokens:
+          type: integer
+          minimum: 16.0
+          title: Max Answer Tokens
+          default: 400
+      additionalProperties: false
+      type: object
+      title: AnswerRules
+    Approval:
+      properties:
+        actions:
+          items:
+            type: string
+          type: array
+          title: Actions
+          description: '''<tool_key>.<action>''; joined with needs_approval.'
+        assign_to:
+          type: string
+          enum:
+          - analyst
+          - developer
+          - admin
+          title: Assign To
+          default: analyst
+      additionalProperties: false
+      type: object
+      title: Approval
+    ChatCompletionRequest:
+      properties:
+        model:
+          type: string
+          maxLength: 300
+          minLength: 1
+          title: Model
+        messages:
+          items:
+            $ref: '#/components/schemas/ChatMessage'
+          type: array
+          minItems: 1
+          title: Messages
+        stream:
+          type: boolean
+          title: Stream
+          default: false
+        user:
+          anyOf:
+          - type: string
+            maxLength: 320
+          - type: 'null'
+          title: User
+        max_tokens:
+          anyOf:
+          - type: integer
+            minimum: 1.0
+          - type: 'null'
+          title: Max Tokens
+        max_completion_tokens:
+          anyOf:
+          - type: integer
+            minimum: 1.0
+          - type: 'null'
+          title: Max Completion Tokens
+        temperature:
+          anyOf:
+          - type: number
+            maximum: 2.0
+            minimum: 0.0
+          - type: 'null'
+          title: Temperature
+        top_p:
+          anyOf:
+          - type: number
+            maximum: 1.0
+            minimum: 0.0
+          - type: 'null'
+          title: Top P
+        presence_penalty:
+          anyOf:
+          - type: number
+            maximum: 2.0
+            minimum: -2.0
+          - type: 'null'
+          title: Presence Penalty
+        frequency_penalty:
+          anyOf:
+          - type: number
+            maximum: 2.0
+            minimum: -2.0
+          - type: 'null'
+          title: Frequency Penalty
+        seed:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Seed
+        tools:
+          anyOf:
+          - items:
+              additionalProperties: true
+              type: object
+            type: array
+          - type: 'null'
+          title: Tools
+        tool_choice:
+          anyOf:
+          - type: string
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Tool Choice
+        n:
+          anyOf:
+          - type: integer
+            maximum: 1.0
+            minimum: 1.0
+          - type: 'null'
+          title: N
+      additionalProperties: true
+      type: object
+      required:
+      - model
+      - messages
+      title: ChatCompletionRequest
+    ChatMessage:
+      properties:
+        role:
+          type: string
+          enum:
+          - system
+          - developer
+          - user
+          - assistant
+          - tool
+          title: Role
+        content:
+          anyOf:
+          - type: string
+          - items:
+              additionalProperties: true
+              type: object
+            type: array
+          - type: 'null'
+          title: Content
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        tool_calls:
+          anyOf:
+          - items:
+              additionalProperties: true
+              type: object
+            type: array
+          - type: 'null'
+          title: Tool Calls
+        tool_call_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Tool Call Id
+      additionalProperties: true
+      type: object
+      required:
+      - role
+      title: ChatMessage
+    ContextPolicy:
+      properties:
+        history_turns:
+          type: integer
+          minimum: 0.0
+          title: History Turns
+          default: 6
+        history_summarize:
+          type: boolean
+          title: History Summarize
+          default: true
+        history_max_tokens:
+          type: integer
+          minimum: 0.0
+          title: History Max Tokens
+          default: 3000
+        memory_max_tokens:
+          type: integer
+          minimum: 0.0
+          title: Memory Max Tokens
+          default: 300
+        rag_max_tokens:
+          type: integer
+          minimum: 0.0
+          title: Rag Max Tokens
+          default: 4000
+        tools_schema_max_tokens:
+          type: integer
+          minimum: 0.0
+          title: Tools Schema Max Tokens
+          default: 1500
+        output_reserve_tokens:
+          type: integer
+          minimum: 0.0
+          title: Output Reserve Tokens
+          default: 800
+        trim_order:
+          items:
+            type: string
+            enum:
+            - history
+            - rag
+            - memory
+          type: array
+          maxItems: 3
+          minItems: 3
+          title: Trim Order
+      additionalProperties: false
+      type: object
+      title: ContextPolicy
+    ErrorBody:
+      properties:
+        error:
+          $ref: '#/components/schemas/ErrorDetail'
+      type: object
+      required:
+      - error
+      title: ErrorBody
+      description: OpenAI-shaped error body used by every 4xx response.
+    ErrorDetail:
+      properties:
+        message:
+          type: string
+          title: Message
+          description: English, actionable, never contains secrets.
+        type:
+          type: string
+          title: Type
+          description: authentication_error, permission_error, not_found_error, ...
+        code:
+          type: string
+          title: Code
+          description: Stable machine-readable code, e.g. read_only_access.
+      type: object
+      required:
+      - message
+      - type
+      - code
+      title: ErrorDetail
+    ImportResult:
+      properties:
+        dry_run:
+          type: boolean
+          title: Dry Run
+        action:
+          type: string
+          enum:
+          - create
+          - new_version
+          title: Action
+        agent_key:
+          type: string
+          title: Agent Key
+        id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Id
+          description: The agent's id (none for a dry run).
+        version:
+          type: integer
+          title: Version
+        definition:
+          $ref: '#/components/schemas/AgentDefinition'
+      type: object
+      required:
+      - dry_run
+      - action
+      - agent_key
+      - version
+      - definition
+      title: ImportResult
+    KeySearchRequest:
+      properties:
+        api_key_id:
+          type: string
+          format: uuid
+          title: Api Key Id
+        project_id:
+          type: string
+          format: uuid
+          title: Project Id
+        run_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Run Id
+        query:
+          type: string
+          maxLength: 2000
+          minLength: 1
+          title: Query
+        top_k:
+          anyOf:
+          - type: integer
+            maximum: 50.0
+            minimum: 1.0
+          - type: 'null'
+          title: Top K
+        hybrid:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Hybrid
+      type: object
+      required:
+      - api_key_id
+      - project_id
+      - query
+      title: KeySearchRequest
+    KnowledgeFilter:
+      properties:
+        scope:
+          items:
+            type: string
+          type: array
+          maxItems: 50
+          title: Scope
+      additionalProperties: false
+      type: object
+      title: KnowledgeFilter
+    KnowledgeRef:
+      properties:
+        kb_key:
+          type: string
+          pattern: ^[a-z][a-z0-9_-]{0,63}$
+          title: Kb Key
+        mode:
+          type: string
+          enum:
+          - always
+          - tool
+          title: Mode
+        top_k:
+          anyOf:
+          - type: integer
+            maximum: 50.0
+            minimum: 1.0
+          - type: 'null'
+          title: Top K
+          description: 'None: the KB default.'
+        min_score:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Min Score
+          description: Only with the reranker off (one threshold rule, K2).
+        filter:
+          anyOf:
+          - $ref: '#/components/schemas/KnowledgeFilter'
+          - type: 'null'
+      additionalProperties: false
+      type: object
+      required:
+      - kb_key
+      - mode
+      title: KnowledgeRef
+    LangfusePromptRef:
+      properties:
+        name:
+          type: string
+          maxLength: 200
+          minLength: 1
+          title: Name
+        label:
+          type: string
+          maxLength: 64
+          minLength: 1
+          title: Label
+          default: production
+      additionalProperties: false
+      type: object
+      required:
+      - name
+      title: LangfusePromptRef
+      description: A managed prompt in Langfuse (02) used instead of an inline system prompt.
+    Limits:
+      properties:
+        max_tool_calls:
+          type: integer
+          maximum: 50.0
+          minimum: 0.0
+          title: Max Tool Calls
+          default: 6
+        max_turns:
+          type: integer
+          maximum: 50.0
+          minimum: 1.0
+          title: Max Turns
+          default: 10
+        run_timeout_s:
+          anyOf:
+          - type: integer
+            exclusiveMinimum: 0.0
+          - type: 'null'
+          title: Run Timeout S
+          description: 'None: the installation''s RUN_TIMEOUT_S.'
+        context_tokens:
+          type: integer
+          minimum: 1000.0
+          title: Context Tokens
+          default: 16000
+        output_tokens:
+          type: integer
+          minimum: 16.0
+          title: Output Tokens
+          default: 800
+      additionalProperties: false
+      type: object
+      title: Limits
+    Manifest:
+      properties:
+        manifest_version:
+          type: integer
+          const: 1
+          title: Manifest Version
+          default: 1
+        agent:
+          $ref: '#/components/schemas/ManifestAgent'
+        version:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Version
+          description: The exported version; informative.
+        definition:
+          additionalProperties: true
+          type: object
+          title: Definition
+      additionalProperties: false
+      type: object
+      required:
+      - agent
+      - definition
+      title: Manifest
+      description: 'An agent and one version''s definition (C8), portable between installations. Secrets
+        are
+
+        never part of it (an external agent''s endpoint credentials stay where they are).'
+    ManifestAgent:
+      properties:
+        key:
+          type: string
+          maxLength: 64
+          pattern: ^[a-z][a-z0-9_-]{0,63}$
+          title: Key
+        name:
+          type: string
+          maxLength: 200
+          minLength: 1
+          title: Name
+        description:
+          anyOf:
+          - type: string
+            maxLength: 2000
+          - type: 'null'
+          title: Description
+        kind:
+          type: string
+          enum:
+          - native
+          - external
+          title: Kind
+          default: native
+      additionalProperties: false
+      type: object
+      required:
+      - key
+      - name
+      title: ManifestAgent
+    ModelEntry:
+      properties:
+        id:
+          type: string
+          title: Id
+        object:
+          type: string
+          const: model
+          title: Object
+          default: model
+        created:
+          type: integer
+          title: Created
+        owned_by:
+          type: string
+          title: Owned By
+      type: object
+      required:
+      - id
+      - created
+      - owned_by
+      title: ModelEntry
+    ModelList:
+      properties:
+        object:
+          type: string
+          const: list
+          title: Object
+          default: list
+        data:
+          items:
+            $ref: '#/components/schemas/ModelEntry'
+          type: array
+          title: Data
+      type: object
+      required:
+      - data
+      title: ModelList
+    SearchHit:
+      properties:
+        chunk_id:
+          type: string
+          format: uuid
+          title: Chunk Id
+        document_id:
+          type: string
+          format: uuid
+          title: Document Id
+        document_name:
+          type: string
+          title: Document Name
+        page:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Page
+        section_path:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Section Path
+        breadcrumb:
+          type: string
+          title: Breadcrumb
+        text:
+          type: string
+          title: Text
+          description: Chunk text as embedded, starting with the breadcrumb.
+        chunk_status:
+          type: string
+          enum:
+          - ok
+          - flagged
+          title: Chunk Status
+        updated_at_source:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Updated At Source
+        age_days:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Age Days
+        embed_score:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Embed Score
+        rerank_score:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Rerank Score
+      type: object
+      required:
+      - chunk_id
+      - document_id
+      - document_name
+      - page
+      - section_path
+      - breadcrumb
+      - text
+      - chunk_status
+      - updated_at_source
+      - age_days
+      - embed_score
+      - rerank_score
+      title: SearchHit
+    SearchResponse:
+      properties:
+        query_id:
+          type: string
+          format: uuid
+          title: Query Id
+          description: Row in kb_queries; candidates are logged there.
+        hits:
+          items:
+            $ref: '#/components/schemas/SearchHit'
+          type: array
+          title: Hits
+        threshold_mode:
+          $ref: '#/components/schemas/ThresholdMode'
+        filtered_by_rerank_floor:
+          type: integer
+          title: Filtered By Rerank Floor
+        filtered_by_min_score:
+          type: integer
+          title: Filtered By Min Score
+        normalizer_config_id:
+          type: string
+          title: Normalizer Config Id
+        latency_ms:
+          type: integer
+          title: Latency Ms
+      type: object
+      required:
+      - query_id
+      - hits
+      - threshold_mode
+      - filtered_by_rerank_floor
+      - filtered_by_min_score
+      - normalizer_config_id
+      - latency_ms
+      title: SearchResponse
+      description: Hits are ordered newest source first (recency is shown, not scored).
+    ThresholdMode:
+      type: string
+      enum:
+      - rerank_floor
+      - min_score
+      title: ThresholdMode
+      description: 'Single threshold rule (K2): with the reranker on only the rerank floor applies; with
+        it
+
+        off only `min_score` (embedding score) applies. Never both.'
+    ToolRef:
+      properties:
+        tool_key:
+          type: string
+          pattern: ^[a-z][a-z0-9-]{0,63}$
+          title: Tool Key
+        actions:
+          items:
+            type: string
+            pattern: ^[A-Za-z_][A-Za-z0-9_.-]{0,127}$
+          type: array
+          minItems: 1
+          title: Actions
+      additionalProperties: false
+      type: object
+      required:
+      - tool_key
+      - actions
+      title: ToolRef
+    Variable:
+      properties:
+        key:
+          type: string
+          pattern: ^[a-z][a-z0-9_-]{0,63}$
+          title: Key
+        label:
+          type: string
+          maxLength: 200
+          minLength: 1
+          title: Label
+        default:
+          type: string
+          maxLength: 2000
+          title: Default
+          default: ''
+      additionalProperties: false
+      type: object
+      required:
+      - key
+      - label
+      title: Variable

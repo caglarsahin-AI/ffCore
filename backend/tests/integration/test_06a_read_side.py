@@ -63,5 +63,5 @@ def test_06a_read_mode_get_parity(
         assert a.status_code == 200, (url, a.text)
         assert (b.status_code, b.content) == (a.status_code, a.content), url
         checked += 1
-    # agent, versions, version, run, events, stream
-    assert checked == 6
+    # agent, versions, version, manifest (06b), run, events, stream
+    assert checked == 7
