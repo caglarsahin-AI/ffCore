@@ -74,7 +74,7 @@ def test_06a_read_mode_get_parity(
         ):
             continue
         here = dict(world, agent_id=str(external_id)) if path.endswith("/external") else world
-        url = re.sub(r"\{(\w+)\}", lambda m: here[m.group(1)], path)
+        url = re.sub(r"\{(\w+)\}", lambda m, here=here: here[m.group(1)], path)
         a, b = edit.get(url), read.get(url)
         assert a.status_code == 200, (url, a.text)
         assert (b.status_code, b.content) == (a.status_code, a.content), url
