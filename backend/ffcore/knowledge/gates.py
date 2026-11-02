@@ -63,8 +63,12 @@ EN_STOPWORDS = frozenset(
 STOPWORDS = {"tr": TR_STOPWORDS, "en": EN_STOPWORDS}
 
 _LETTERS = re.compile(r"[^\W\d_]+")
+# A Markdown heading (`#`…`######`, space, text) is not code; `#include`, `#!/bin/sh`, a bare `#`
+# are (FOLLOWUP-137). Outside a fence a `# text` shell comment reads as a heading; inside one it
+# is code (`_code_lines`).
 _CODE_LINE = re.compile(
-    r"^\s*(?:[{}\[\]();]|//|#|--|<\w|import |from \w|def |class |select |insert |update |"
+    r"^\s*(?:[{}\[\]();]|//|#(?!#{0,5}\s+\S)|--|<\w|import |from \w|def |class |select |"
+    r"insert |update |"
     r"at [\w.$]+\(|Caused by:|Exception|Traceback|\w+Error\b|\d{4}-\d{2}-\d{2}[ T]\d{2}:)",
     re.I,
 )
@@ -141,6 +145,19 @@ def gate1(
     return OK, None
 
 
+def _code_lines(lines: list[str]) -> int:
+    """Lines that read as code. Inside a ``` or ~~~ fence every line is code, a `# text`
+    comment included; a fence that never closes makes the rest code (K-137-0004)."""
+    count, fenced = 0, False
+    for line in lines:
+        if _FENCE_LINE.match(line):
+            fenced = not fenced
+            count += 1
+        elif fenced or _CODE_LINE.match(line):
+            count += 1
+    return count
+
+
 def text_quality(
     body: str,
     *,
@@ -163,7 +180,7 @@ def text_quality(
     lines = [line for line in body.splitlines() if line.strip()]
     if sum(bool(_LINK_LINE.match(ln)) for ln in lines) / len(lines) > thresholds.max_link_ratio:
         return SKIPPED, "boilerplate"
-    if sum(bool(_CODE_LINE.match(ln)) for ln in lines) / len(lines) > thresholds.max_code_ratio:
+    if _code_lines(lines) / len(lines) > thresholds.max_code_ratio:
         return SKIPPED, "code_heavy"
     # Prose-free content: a large definition table is reference material (flag, keep); a small
     # one is noise (PayCore calibration 2026-09-25).
