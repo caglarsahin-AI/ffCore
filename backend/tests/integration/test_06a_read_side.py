@@ -44,6 +44,21 @@ def test_06a_read_mode_get_parity(
         "run_id": str(run_id),
         "version": "1",
     }
+    # 06b-2: GET .../agents/{agent_id}/external reads an external agent (a native one is 409
+    # `agent_not_external`), so that route gets an external agent of its own.
+    import uuid
+
+    from ffcore.services.facade_external import ExternalConfig
+
+    external_id = uuid.uuid4()
+    config = ExternalConfig(
+        base_url="https://agent.example/v1", model="m", api_key="dummy-not-secret-parity-key"
+    )
+    pg.execute(
+        "INSERT INTO agents (id, project_id, key, name, kind, external_config, created_by)"
+        " VALUES (%s, %s, 'dis-parite', 'Dış', 'external', %s, 'test')",
+        (external_id, project_id, config.encrypt(app_settings)),
+    )
 
     from ffcore.core.config import get_settings
 
@@ -58,10 +73,11 @@ def test_06a_read_mode_get_parity(
             or path.startswith(f"{API}/projects/{{project_id}}/runs/{{run_id}}")
         ):
             continue
-        url = re.sub(r"\{(\w+)\}", lambda m: world[m.group(1)], path)
+        here = dict(world, agent_id=str(external_id)) if path.endswith("/external") else world
+        url = re.sub(r"\{(\w+)\}", lambda m: here[m.group(1)], path)
         a, b = edit.get(url), read.get(url)
         assert a.status_code == 200, (url, a.text)
         assert (b.status_code, b.content) == (a.status_code, a.content), url
         checked += 1
-    # agent, versions, version, manifest (06b), run, events, stream
-    assert checked == 7
+    # agent, versions, version, manifest (06b), external agent (06b-2), run, events, stream
+    assert checked == 8
