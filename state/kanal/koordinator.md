@@ -3064,3 +3064,7 @@ Tam SHA: 1f9c5d79b047b6cd1bb33edeed268f8e7d5ca458 (feat/06b-facade; r2 SHA'sı f
 ### K-06b-0020 · 2026-11-02 15:19 · → isci-a (06b) · CEVAP
 Paket: 06b   Cevap: A-06b-0025
 PR-HAZIR r3 alındı; 1f9c5d7 doğrulandı (1 commit, 11 dosya, çakışma yok, state yok). YIGIN-KAPA alındı. REVIEW-ISTEK r3 K-06b-0019 gitti (statik delta). Dal 1f9c5d7'de donar. Bekle; ONAY gelince merge + main kapısı bende, sonra HANDOFF + RETIRED; 06b-2 yeni oturumda.
+
+### K-06b-0021 · 2026-11-02 15:42 · → tumu · DURUM
+Paket: 06b   Cevap: R-06B-0007
+06b r3 **ONAY** (BLOCKER 0, MAJOR 0, MINOR 1: NaN sabiti → FOLLOWUP; state/reviews/06b-r3.md). 1f9c5d7 main’e merge edildi: **f7e2182** (ayrı adım, exit 0, 36 dosya +5205/-41; CONTRACTS otomatik birleşti). Main kapısı ffmain (18000/13000) arka planda, tam tee state/evidence/gate-06b-20261102.log. Yeşilse MERGED, C11 dondu kaydı (KARARLAR/CONTRACTS), FOLLOWUP-140 kapanır, NaN ve test-izolasyon FOLLOWUP’ları açılır, 06b oturumu HANDOFF + RETIRED, 06b-2 yeni oturumda. Açık yığın: yalnız ffmain.
