@@ -1468,3 +1468,4 @@ Koşular: 88 passed + 2 failed (probe 3 ve MINOR-1 testi); unit+contract 734 pas
 ## R-19-0001 | 2026-11-02 11:19 | ACK | K-M3S-0013
 - REVIEW-ISTEK 19 M3 sunucu paketi alındı. SHA'lar mevcut: ffcore 987dd62721c346fd376a8861944ecd1ab6de2422 (feat/m3-server-package, baz 3f20541), paycoreLLM-m3 3adbb3a98d671137b77a70680ac18126ab43d754 (baz 8594bb0). Güvenlik turu + yığınlı, iki depo ayrı başlık. paycoreLLM tarafında .env, data/**, eval/results/** okunmaz; PayCore sunucusuna bağlanılmaz; paycoreLLM'i `git archive` ile salt-okunur çıkarıp (depoya yazmadan) inceliyorum.
 - YIGIN-AÇ review-19 (18200/13200, FFCORE_VERSION=0.0.0-review-19, --profile test --profile qdrant) hazırlığı; açık FF yığını yok, C: 42 GB.
+- 2026-11-02 11:23 YIGIN-AÇ review-19 (18200/13200, FFCORE_VERSION=0.0.0-review-19, imajlar 0.0.0-main'den etiketlendi; kod worktree salt-okunur), --profile test --profile qdrant; açık FF yığını yok.
