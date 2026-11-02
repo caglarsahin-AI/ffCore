@@ -8,7 +8,7 @@ from datetime import datetime
 from typing import Annotated, Any, Literal
 from uuid import UUID
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, SecretStr
 
 from ffcore.api.schemas import Patch, Strict
 from ffcore.runtime.contracts import (
@@ -224,3 +224,41 @@ class ImportResult(BaseModel):
     id: UUID | None = Field(default=None, description="The agent's id (none for a dry run).")
     version: int
     definition: AgentDefinition
+
+
+# --- 06b-2: external agent (kind: external) ---
+
+
+class ExternalAgentCreate(Strict):
+    """An OpenAI-compatible agent elsewhere. The key is written once and never read back."""
+
+    key: AgentKey
+    name: str = Field(min_length=1, max_length=200)
+    description: str = Field(default="", max_length=2000)
+    base_url: str = Field(
+        min_length=1,
+        max_length=2000,
+        description="OpenAI-compatible base URL; /chat/completions is appended. Must pass the "
+        "egress policy (EGRESS_ALLOWLIST, or ALLOWED_INTERNAL_HOSTS; no private address).",
+    )
+    model: str = Field(min_length=1, max_length=200, description="The model name at the agent.")
+    api_key: SecretStr = Field(min_length=1, max_length=4000, description="Write-only.")
+
+
+class ExternalAgentUpdate(Patch):
+    base_url: str = Field(default=None, min_length=1, max_length=2000)
+    model: str = Field(default=None, min_length=1, max_length=200)
+    api_key: SecretStr = Field(default=None, min_length=1, max_length=4000)
+
+
+class ExternalEndpoint(BaseModel):
+    base_url: str
+    model: str
+    api_key: Literal["***"] | None = Field(
+        description="Never returned; null when no key is set (it is deleted when the base URL "
+        "moves to another origin without a new key)."
+    )
+
+
+class ExternalAgentOut(AgentOut):
+    external: ExternalEndpoint

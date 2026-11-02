@@ -1,4 +1,4 @@
-"""agents, agent_versions (06a).
+"""agents, agent_versions (06a); agents.external_config (06b-2).
 
 `agents` is a project-owned root table (C3 common columns); `agent_versions` is its child (the
 project comes through `agent_id`). A version's `definition` is the C8 document; a published
@@ -8,7 +8,16 @@ version is never edited (a new draft is opened instead).
 import uuid
 from datetime import datetime
 
-from sqlalchemy import CheckConstraint, DateTime, ForeignKey, Index, Integer, Text, UniqueConstraint
+from sqlalchemy import (
+    CheckConstraint,
+    DateTime,
+    ForeignKey,
+    Index,
+    Integer,
+    LargeBinary,
+    Text,
+    UniqueConstraint,
+)
 from sqlalchemy import text as sql_text
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column
@@ -27,8 +36,15 @@ class Agent(Timestamps, Base):
         CheckConstraint(f"key ~ '{AGENT_KEY_REGEX}'", name="key_format"),
         CheckConstraint(f"status IN {AGENT_STATUSES}", name="status"),
         CheckConstraint(f"kind IN {AGENT_KINDS}", name="kind"),
+        # An external agent has no versions (06b-2): it is published without one.
         CheckConstraint(
-            "status <> 'published' OR current_version_id IS NOT NULL", name="published_has_version"
+            "kind = 'external' OR status <> 'published' OR current_version_id IS NOT NULL",
+            name="published_has_version",
+        ),
+        CheckConstraint(
+            "(kind = 'external' AND external_config IS NOT NULL)"
+            " OR (kind <> 'external' AND external_config IS NULL)",
+            name="external_config",
         ),
         Index(
             "uq_agents_project_key_live",
@@ -51,6 +67,9 @@ class Agent(Timestamps, Base):
         UUID(as_uuid=True),
         ForeignKey("agent_versions.id", use_alter=True, name="fk_agents_current_version"),
     )
+    # 06b-2: an external agent's base_url, remote model and api_key, one Fernet token
+    # (services/external_config.ExternalConfig); set exactly when kind = external.
+    external_config: Mapped[bytes | None] = mapped_column(LargeBinary)
     created_by: Mapped[str] = mapped_column(Text)
     deleted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 

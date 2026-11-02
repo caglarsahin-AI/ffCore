@@ -49,6 +49,7 @@ from ffcore.models.runs import Conversation, Message, Run, RunEvent
 from ffcore.runtime import events as run_events
 from ffcore.runtime.contracts import Channel, RunEventType, RunStatus, TriggerType
 from ffcore.runtime.definition import parse_definition
+from ffcore.services import facade_external
 from ffcore.services.facade_guard import FacadeGuard, client_messages, message_text
 from ffcore.services.facade_identity import FacadeCaller
 from ffcore.services.facade_proxy import call_params, chunk_json
@@ -166,8 +167,7 @@ async def start(request: Request, caller: FacadeCaller, target, body, settings, 
         async with db.session_scope() as session:
             agent, version = await _agent_version(session, caller, target)
             if agent.kind != "native":
-                from ffcore.services import facade_external
-
+                # complete() sends an external agent its own way first; it is never a run.
                 raise facade_external.not_this_path()
             definition = parse_definition(version.definition)
             run_id = uuid.uuid4()
@@ -463,9 +463,16 @@ def _headers(run: Run) -> dict[str, str]:
 async def complete(request: Request, caller: FacadeCaller, target, body, settings, queue):
     # The same parameter table as the direct path (K-06b-0018): a wrong value or an unknown
     # field is 400 here too. The agent's definition sets the model and its settings.
-    call_params(body)
+    params = call_params(body)
     events_on = events_mode(request)
     resume = request.headers.get(RESUME_HEADER)
+    if not resume:
+        # 06b-2: an external agent is not a run; it has its own path (facade_external).
+        external = await facade_external.find(caller, target)
+        if external is not None:
+            return await facade_external.complete(
+                request, caller, target, external, body, params, settings
+            )
     if resume:
         run, after = await resumable(caller, resume)
     else:

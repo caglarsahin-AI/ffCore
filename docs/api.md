@@ -415,7 +415,7 @@ internal network and is called with one internal key. Machine-readable draft:
   run produces nothing).
 - `GET /v1/models`: the key's own project only: its active chat models as
   `<project_key>.<model_key>` (scope `chat_direct`) and its published agents as
-  `agent:<project_key>/<agent_key>` (scope `agents`). External agents are not listed (reserved).
+  `agent:<project_key>/<agent_key>` (scope `agents`), external agents included once published.
 
 ### Choosing the target
 
@@ -427,7 +427,7 @@ internal network and is called with one internal key. Machine-readable draft:
 The scope is checked before anything is looked up (403 `scope_missing`), so a key learns nothing
 about targets outside its scopes. Another project's model or agent, or a missing one: 404
 `model_not_found`. An agent that is not published: 404 `agent_not_published`. An external agent
-(`kind: external`): 501 `external_agent_not_available` until 06b-2.
+(`kind: external`) has its own path (below).
 
 ### Who acts
 
@@ -513,6 +513,65 @@ about targets outside its scopes. Another project's model or agent, or a missing
 - Errors: non-streaming requests get the HTTP status (400 `guardrail_blocked`, 429
   `quota_exceeded`, 502 with the run's code); once a stream has started, the error is an event
   `data: {"error": {"message", "type", "code"}}` followed by `data: [DONE]`.
+
+### External agent path (06b-2)
+
+An external agent (`kind: external`) is an OpenAI-compatible agent elsewhere, registered by a
+project administrator and called through the same `agent:<project_key>/<agent_key>` name.
+
+- Registration (admin + edit, audited, routes in `backend/openapi/06b.yaml`, tag
+  `agent-external`): `POST /api/v1/projects/{id}/agents/external` (`key, name, description,
+  base_url, model, api_key`) creates a draft; `GET`/`PUT .../agents/{agent_id}/external` reads or
+  changes the endpoint (omitted fields stay; `kind` never changes, 422);
+  `POST .../agents/{agent_id}/external/publish` publishes it (no versions; 409
+  `external_agent_not_configured` without an endpoint). The `api_key` is stored with Fernet and is
+  never returned (`***`), never in an audit row, never in a manifest. It goes only to the origin
+  it was given for: a `PUT` that moves `base_url` to another scheme, host or port without a new
+  `api_key` deletes it (`api_key: null`, audit `reset_external_agent_key` with both origins);
+  until a key is set again, publish is 409 `external_agent_not_configured` and a call is 501
+  `external_agent_not_available`. Version, rollback and
+  manifest routes refuse an external agent (409 `external_agent_has_no_versions`, 422
+  `external_agent_not_available`, an import onto its key included); the console's
+  `POST .../agents` cannot create one (422). Renaming (`PATCH .../agents/{agent_id}`) and deleting
+  an external agent also need the project admin with edit access (403 otherwise).
+- The base URL passes the egress policy at registration, update and publish (422
+  `external_agent_url_refused` with the reason code): `http`/`https` only, no credentials in the URL,
+  no query or fragment (422 `base_url_query_not_allowed`), a valid port, host in `EGRESS_ALLOWLIST` (or `ALLOWED_INTERNAL_HOSTS`), `OFFLINE=true` refuses
+  every other host, and every resolved address must be public unless the host is internal. The
+  platform's own services are never a target, even when internal (422
+  `external_agent_host_reserved`): every compose service name (`litellm`, `langfuse-*`, `mcp-*`,
+  `ollama`, `backend`, ...; `RESERVED_HOSTS` in `services/external_config.py`),
+  `host.docker.internal`, `vllm` (the seed's default model servers), the hosts of `LITELLM_URL` and
+  `LANGFUSE_HOST`, and a loopback address on the backend's own port; a model server under another
+  name (a provider row's own host) is not yet recognised (FOLLOWUP-146); other internal hosts stay valid targets. The same egress check runs
+  again at every connection (a name that resolves to a private address at call time is refused at
+  the dial). Redirects are not followed: a 3xx answer is a failure (audit reason
+  `egress_too_many_redirects`).
+- The call is one non-streaming `POST <base_url>/chat/completions` with the registered `model`,
+  the client's `user`/`assistant` messages and its numeric parameters and `stop`; only the
+  registered key is sent (`Authorization: Bearer`): no user identity, no `X-On-Behalf-Of`, none of
+  the client's headers. `system`, `developer`, `tool` roles, `tool_calls`, `tools`, `tool_choice`,
+  `response_format`, `logit_bias` are refused (400). Messages pass `input.pre` (user) and
+  `egress` (all) under the project's `default` policy.
+- The answer is untrusted text: only `choices[0].message.content` is taken; `tool_calls`,
+  `function_call` and any other field are never executed or turned into text (only their count is
+  logged; the names are the upstream's text). The text passes `output.pre` (a block: 400 `guardrail_blocked`). A placeholder-like
+  string in it (`<<PII_n>>`) is not one of this request's tokens and stays as it is.
+- Limits: the whole call within `LLM_CALL_TIMEOUT_S` (504 `external_agent_timeout`), the answer
+  at most 64 KiB (502 `external_agent_response_too_large`; nothing partial is sent); a refused
+  address, an error status, a non-JSON or empty answer: 502 `external_agent_failed` (the reason is
+  in the audit row, the upstream body is never echoed).
+- Streaming: the answer comes whole, so the stream sends `x_platform: {"event": "progress",
+  "kind": "output_buffered"}`, `: keepalive` lines while waiting, the checked text in one chunk, a
+  finish chunk and `data: [DONE]`. The external agent's `x_platform` events are frozen as
+  `EXTERNAL_X_PLATFORM_EVENTS = ("progress",)`.
+- Record: the call is not a run (no `runs` row, no Langfuse trace: it does not go through
+  LiteLLM). Each call writes one audit row `external_agent_call` (actor, agent, host, upstream
+  status or error code, duration, answer bytes; never content; a client that disconnects
+  mid-stream cancels the call, recorded as `client_disconnected`) and the guardrail events (source
+  `api`). It is not counted in token or USD quotas (the cost is the other party's; request and
+  concurrency windows are FOLLOWUP-144); the key's `agents` scope, allowed CIDRs, the timeout and the
+  size limit bound it.
 
 ### Internal
 

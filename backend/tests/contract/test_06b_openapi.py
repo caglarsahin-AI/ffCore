@@ -17,6 +17,10 @@ EXPECTED = {
     P + "/agents/{agent_id}/manifest": {"get"},
     P + "/agents/import": {"post"},
     "/internal/knowledge-bases/{kb_id}/key-search": {"post"},
+    # 06b-2: external agents
+    P + "/agents/external": {"post"},
+    P + "/agents/{agent_id}/external": {"get", "put"},
+    P + "/agents/{agent_id}/external/publish": {"post"},
 }
 
 

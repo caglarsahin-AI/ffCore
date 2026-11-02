@@ -57,8 +57,9 @@ PACKAGES = {
     "06b": {
         "version": "0.6b",
         "description": "OpenAI-compatible facade (/v1, contract C11), agent manifest export and "
-        "import, and the internal search of runs started by an API key (package 06b).",
-        "tags": {"facade", "facade-internal", "agent-manifest"},
+        "import, external agents (06b-2), and the internal search of runs started by an API key "
+        "(package 06b).",
+        "tags": {"facade", "facade-internal", "agent-manifest", "agent-external"},
     },
 }
 

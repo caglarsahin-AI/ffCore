@@ -103,14 +103,21 @@ def test_57_3_pre_merge_database_upgrade_heads(scratch_db):
     assert db.versions() == {_head()}
 
 
+MERGE = "57_0002"
+
+
 def test_57_4_relative_downgrade_from_the_merge_fails_loudly(scratch_db):
     db = scratch_db
+    # Revisions above the merge (06b_0001, 06b-2) are a plain chain; go down to the merge point
+    # explicitly first: relative steps from there are what must fail loudly.
+    db.run("downgrade", MERGE)
+    assert db.versions() == {MERGE}
     schema = db.tables()
     for target in ("-1", "06a@-1", "03a@-1"):
         done = db.alembic("downgrade", target)
         assert done.returncode != 0, target
         assert "Ambiguous walk" in done.stdout + done.stderr, target
-        assert db.versions() == {_head()}  # nothing moved
+        assert db.versions() == {MERGE}  # nothing moved
     assert db.tables() == schema
 
 

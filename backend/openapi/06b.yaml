@@ -1,8 +1,8 @@
 openapi: 3.1.0
 info:
   title: FFCore API
-  description: OpenAI-compatible facade (/v1, contract C11), agent manifest export and import, and the
-    internal search of runs started by an API key (package 06b).
+  description: OpenAI-compatible facade (/v1, contract C11), agent manifest export and import, external
+    agents (06b-2), and the internal search of runs started by an API key (package 06b).
   version: 0.6b
 paths:
   /api/v1/projects/{project_id}/agents/{agent_id}/manifest:
@@ -169,6 +169,281 @@ paths:
           application/yaml:
             schema:
               $ref: '#/components/schemas/Manifest'
+  /api/v1/projects/{project_id}/agents/external:
+    post:
+      tags:
+      - agent-external
+      summary: Create External Agent
+      description: 'Register an external agent (a draft). Its base URL must pass the egress policy now
+        and
+
+        again when it is published and at every call.'
+      operationId: create_external_agent_api_v1_projects__project_id__agents_external_post
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExternalAgentCreate'
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExternalAgentOut'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+  /api/v1/projects/{project_id}/agents/{agent_id}/external:
+    get:
+      tags:
+      - agent-external
+      summary: Get External Agent
+      description: The agent and its endpoint; the key is never returned.
+      operationId: get_external_agent_api_v1_projects__project_id__agents__agent_id__external_get
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      - name: agent_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Agent Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExternalAgentOut'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+    put:
+      tags:
+      - agent-external
+      summary: Update External Agent
+      description: 'Change the base URL, remote model or key (omitted fields stay); the kind never changes.
+
+        The resulting base URL is checked again. A stored key never follows the URL to another
+
+        origin: without a new `api_key` it is deleted, and the agent cannot be published or called
+
+        until one is given.'
+      operationId: update_external_agent_api_v1_projects__project_id__agents__agent_id__external_put
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      - name: agent_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Agent Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExternalAgentUpdate'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExternalAgentOut'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+  /api/v1/projects/{project_id}/agents/{agent_id}/external/publish:
+    post:
+      tags:
+      - agent-external
+      summary: Publish External Agent
+      description: 'Publish an external agent (it has no versions): its configuration must exist and its
+
+        base URL passes the egress policy again (K-06b2-0002 S3a).'
+      operationId: publish_external_agent_api_v1_projects__project_id__agents__agent_id__external_publish_post
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      - name: agent_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Agent Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExternalAgentOut'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
   /v1/chat/completions:
     post:
       tags:
@@ -428,6 +703,19 @@ components:
       required:
       - model
       title: AgentDefinition
+    AgentKind:
+      type: string
+      enum:
+      - native
+      - external
+      title: AgentKind
+    AgentStatus:
+      type: string
+      enum:
+      - draft
+      - published
+      - inactive
+      title: AgentStatus
     AnswerRules:
       properties:
         cite_sources:
@@ -707,6 +995,159 @@ components:
       - type
       - code
       title: ErrorDetail
+    ExternalAgentCreate:
+      properties:
+        key:
+          type: string
+          pattern: ^[a-z][a-z0-9_-]{0,63}$
+          title: Key
+          description: Agent key, unique within the project (C1).
+        name:
+          type: string
+          maxLength: 200
+          minLength: 1
+          title: Name
+        description:
+          type: string
+          maxLength: 2000
+          title: Description
+          default: ''
+        base_url:
+          type: string
+          maxLength: 2000
+          minLength: 1
+          title: Base Url
+          description: OpenAI-compatible base URL; /chat/completions is appended. Must pass the egress
+            policy (EGRESS_ALLOWLIST, or ALLOWED_INTERNAL_HOSTS; no private address).
+        model:
+          type: string
+          maxLength: 200
+          minLength: 1
+          title: Model
+          description: The model name at the agent.
+        api_key:
+          type: string
+          maxLength: 4000
+          minLength: 1
+          format: password
+          title: Api Key
+          description: Write-only.
+          writeOnly: true
+      additionalProperties: false
+      type: object
+      required:
+      - key
+      - name
+      - base_url
+      - model
+      - api_key
+      title: ExternalAgentCreate
+      description: An OpenAI-compatible agent elsewhere. The key is written once and never read back.
+    ExternalAgentOut:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+        project_id:
+          type: string
+          format: uuid
+          title: Project Id
+        key:
+          type: string
+          pattern: ^[a-z][a-z0-9_-]{0,63}$
+          title: Key
+          description: Agent key, unique within the project (C1).
+        name:
+          type: string
+          title: Name
+        description:
+          type: string
+          title: Description
+        status:
+          $ref: '#/components/schemas/AgentStatus'
+        kind:
+          $ref: '#/components/schemas/AgentKind'
+        current_version_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Current Version Id
+          description: The published version, if any.
+        latest_version:
+          type: integer
+          title: Latest Version
+          description: Highest version number (draft or published).
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+        updated_at:
+          type: string
+          format: date-time
+          title: Updated At
+        external:
+          $ref: '#/components/schemas/ExternalEndpoint'
+      type: object
+      required:
+      - id
+      - project_id
+      - key
+      - name
+      - description
+      - status
+      - kind
+      - current_version_id
+      - latest_version
+      - created_at
+      - updated_at
+      - external
+      title: ExternalAgentOut
+    ExternalAgentUpdate:
+      properties:
+        base_url:
+          type: string
+          maxLength: 2000
+          minLength: 1
+          title: Base Url
+        model:
+          type: string
+          maxLength: 200
+          minLength: 1
+          title: Model
+        api_key:
+          type: string
+          maxLength: 4000
+          minLength: 1
+          format: password
+          title: Api Key
+          writeOnly: true
+      additionalProperties: false
+      type: object
+      title: ExternalAgentUpdate
+    ExternalEndpoint:
+      properties:
+        base_url:
+          type: string
+          title: Base Url
+        model:
+          type: string
+          title: Model
+        api_key:
+          anyOf:
+          - type: string
+            const: '***'
+          - type: 'null'
+          title: Api Key
+          description: Never returned; null when no key is set (it is deleted when the base URL moves
+            to another origin without a new key).
+      type: object
+      required:
+      - base_url
+      - model
+      - api_key
+      title: ExternalEndpoint
     ImportResult:
       properties:
         dry_run:

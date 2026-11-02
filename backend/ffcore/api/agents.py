@@ -20,6 +20,10 @@ from ffcore.api.agents_schemas import (
     AgentList,
     AgentOut,
     AgentUpdate,
+    ExternalAgentCreate,
+    ExternalAgentOut,
+    ExternalAgentUpdate,
+    ExternalEndpoint,
     ImportResult,
     Manifest,
     ManifestAgent,
@@ -31,14 +35,15 @@ from ffcore.api.agents_schemas import (
     VersionUpdate,
 )
 from ffcore.api.common import ERROR_RESPONSES, SessionDep, conflict, not_found, path_resource
-from ffcore.core.audit import audited
-from ffcore.core.auth import Actor, require_role
+from ffcore.core.audit import AuditEntry, audited, request_context, write_event
+from ffcore.core.auth import Actor, authorize, require_role
 from ffcore.core.config import Settings, get_settings
 from ffcore.core.errors import ApiError
 from ffcore.models.agents import Agent, AgentVersion
 from ffcore.models.catalog import Model, Provider
 from ffcore.runtime.contracts import AgentStatus
 from ffcore.runtime.definition import AgentDefinition, parse_definition
+from ffcore.services.external_config import ExternalConfig, check_base_url, origin
 
 router = APIRouter(
     prefix="/projects/{project_id}/agents", tags=["agents"], responses=ERROR_RESPONSES
@@ -65,6 +70,27 @@ async def _agent(session, project_id: UUID, agent_id: UUID) -> Agent:
     )
     if agent is None:
         raise not_found("agent")
+    return agent
+
+
+def no_versions() -> ApiError:
+    return conflict(
+        "external_agent_has_no_versions",
+        "An external agent has no versions; it is configured at .../external (06b-2).",
+    )
+
+
+async def _admin_if_external(request: Request, actor: Actor, project_id: UUID, agent: Agent):
+    """Review r1 MINOR-3: an external agent's lifecycle is the project admin's (edit), as its
+    registration is; the general rename and delete must not take it from an analyst."""
+    if agent.kind == "external":
+        await authorize(request, actor, str(project_id), require_role("admin", write=True))
+
+
+def _native(agent: Agent) -> Agent:
+    """Version and definition endpoints are for native agents only (06b-2)."""
+    if agent.kind == "external":
+        raise no_versions()
     return agent
 
 
@@ -237,6 +263,7 @@ async def update_agent(
 ):
     """Name and description; the definition changes through versions."""
     agent = await _agent(session, project_id, agent_id)
+    await _admin_if_external(request, actor, project_id, agent)
     for field, value in body.model_dump(exclude_unset=True).items():
         setattr(agent, field, value)
     await session.flush()
@@ -256,13 +283,14 @@ async def delete_agent(
 ) -> None:
     """Soft delete; runs and versions stay for audit and traces."""
     agent = await _agent(session, project_id, agent_id)
+    await _admin_if_external(request, actor, project_id, agent)
     agent.deleted_at = func.now()
     agent.status = AgentStatus.inactive
 
 
 @router.get("/{agent_id}/versions", response_model=VersionList)
 async def list_versions(project_id: UUID, agent_id: UUID, actor: Reader, session: SessionDep):
-    agent = await _agent(session, project_id, agent_id)
+    agent = _native(await _agent(session, project_id, agent_id))
     rows = await session.scalars(
         select(AgentVersion).where(AgentVersion.agent_id == agent.id).order_by(AgentVersion.version)
     )
@@ -280,7 +308,7 @@ async def create_version(
     session: SessionDep,
 ):
     """A new draft copied from an existing version (default: the latest)."""
-    agent = await _agent(session, project_id, agent_id)
+    agent = _native(await _agent(session, project_id, agent_id))
     latest = await _latest(session, agent.id)
     source = await _version(session, agent, body.from_version or latest)
     row = AgentVersion(
@@ -299,12 +327,12 @@ async def create_version(
 async def get_version(
     project_id: UUID, agent_id: UUID, version: int, actor: Reader, session: SessionDep
 ):
-    agent = await _agent(session, project_id, agent_id)
+    agent = _native(await _agent(session, project_id, agent_id))
     return version_out(await _version(session, agent, version))
 
 
 async def _version_before(session, project_id, agent_id, version, **_) -> VersionOut:
-    agent = await _agent(session, project_id, agent_id)
+    agent = _native(await _agent(session, project_id, agent_id))
     return version_out(await _version(session, agent, version))
 
 
@@ -323,7 +351,7 @@ async def update_version(
     """Replace a draft's definition. A published version is never edited (409). A definition
     whose context_tokens exceed the model's context window or OLLAMA_CONTEXT_LENGTH is 400
     `context_configuration_invalid` (C13)."""
-    agent = await _agent(session, project_id, agent_id)
+    agent = _native(await _agent(session, project_id, agent_id))
     row = await _version(session, agent, version)
     if row.published_at is not None:
         raise conflict("version_published", "A published version cannot be edited.")
@@ -356,7 +384,7 @@ async def publish_agent(
 ):
     """Publish a version: runs without an explicit version use it. The exam gate (09) is a flag
     until 09 lands."""
-    agent = await _agent(session, project_id, agent_id)
+    agent = _native(await _agent(session, project_id, agent_id))
     row = await _version(session, agent, body.version)
     # The model may have changed since the draft was saved: checked again (C13).
     await check_context(session, project_id, parse_definition(row.definition), settings)
@@ -375,7 +403,7 @@ async def rollback_agent(
     session: SessionDep,
 ):
     """Point the agent back at an earlier published version."""
-    agent = await _agent(session, project_id, agent_id)
+    agent = _native(await _agent(session, project_id, agent_id))
     row = await _version(session, agent, body.version)
     if row.published_at is None:
         raise conflict("version_never_published", "Rollback goes to a published version only.")
@@ -389,6 +417,18 @@ async def rollback_agent(
 manifest_router = APIRouter(
     prefix="/projects/{project_id}/agents", tags=["agent-manifest"], responses=ERROR_RESPONSES
 )
+
+
+def not_portable() -> ApiError:
+    # The code 06b gave the refused import (C11: manifest import of kind external is 422); the
+    # export of an external agent (06b-2) answers the same way.
+    return ApiError(
+        422,
+        "invalid_request_error",
+        "external_agent_not_available",
+        "An external agent is not exported or imported: its endpoint and key stay in this "
+        "installation. Register it at .../agents/external.",
+    )
 
 
 def _manifest_invalid(message: str) -> ApiError:
@@ -411,6 +451,8 @@ async def export_manifest(
     """The agent and one version's definition (default: the published one, else the latest).
     Secrets are not in it: an external agent's endpoint and key stay in this installation."""
     agent = await _agent(session, project_id, agent_id)
+    if agent.kind == "external":
+        raise not_portable()
     if version is None:
         row = (
             await session.get(AgentVersion, agent.current_version_id)
@@ -476,19 +518,14 @@ async def import_manifest(
     `schema_version` is read as such (C8)."""
     manifest = await _manifest_from(request)
     if manifest.agent.kind != "native":
-        # Reserved until 06b-2 (K-06b-0004): refused, never imported as a native agent.
-        raise ApiError(
-            422,
-            "invalid_request_error",
-            "external_agent_not_available",
-            "External agents cannot be imported yet.",
-        )
+        # Never imported as a native agent (K-06b-0004); an external agent is registered at
+        # .../agents/external with its endpoint, which a manifest does not carry (06b-2).
+        raise not_portable()
     try:
         definition = parse_definition(manifest.definition)
     except ValidationError as exc:
         where = ".".join(str(p) for p in exc.errors()[0].get("loc", ()))
         raise _manifest_invalid(f"definition.{where}: {exc.errors()[0].get('msg')}") from None
-    await check_context(session, project_id, definition, settings)
     agent = await session.scalar(
         select(Agent).where(
             Agent.project_id == project_id,
@@ -496,6 +533,11 @@ async def import_manifest(
             Agent.deleted_at.is_(None),
         )
     )
+    if agent is not None and agent.kind == "external":
+        # Review r1 MAJOR-2: the key is an external agent's; a native version under it would
+        # make it runnable as a native agent. Refused, dry run included; never converted.
+        raise not_portable()
+    await check_context(session, project_id, definition, settings)
     action = "new_version" if agent is not None else "create"
     version = await _latest(session, agent.id) + 1 if agent is not None else 1
     if dry_run:
@@ -535,3 +577,160 @@ async def import_manifest(
         version=version,
         definition=definition,
     )
+
+
+# --- 06b-2: external agents (kind: external) ---
+
+# Own tag: the routes belong to 06b's OpenAPI draft; 06a's draft stays as it is.
+external_router = APIRouter(
+    prefix="/projects/{project_id}/agents", tags=["agent-external"], responses=ERROR_RESPONSES
+)
+# Registering an endpoint outside the installation is an administrator's decision (K-06b2-0002).
+ExternalAdmin = Annotated[Actor, Depends(require_role("admin", write=True))]
+
+
+def not_external() -> ApiError:
+    return conflict("agent_not_external", "This agent is not an external agent.")
+
+
+async def external_out(session, agent: Agent, settings: Settings) -> ExternalAgentOut:
+    base = await agent_out(session, agent)
+    public = ExternalConfig.decrypt(agent.external_config, settings).public()
+    return ExternalAgentOut(**base.model_dump(), external=ExternalEndpoint(**public))
+
+
+async def _external(session, project_id: UUID, agent_id: UUID) -> Agent:
+    agent = await _agent(session, project_id, agent_id)
+    if agent.kind != "external":
+        raise not_external()
+    return agent
+
+
+async def _external_before(session, project_id: UUID, agent_id: UUID, settings, **_):
+    return await external_out(session, await _external(session, project_id, agent_id), settings)
+
+
+@external_router.post("/external", response_model=ExternalAgentOut, status_code=201)
+@audited("create_external_agent", "agent")
+async def create_external_agent(
+    project_id: UUID,
+    body: ExternalAgentCreate,
+    request: Request,
+    actor: ExternalAdmin,
+    session: SessionDep,
+    settings: SettingsDep,
+):
+    """Register an external agent (a draft). Its base URL must pass the egress policy now and
+    again when it is published and at every call."""
+    taken = await session.scalar(
+        select(Agent.id).where(
+            Agent.project_id == project_id, Agent.key == body.key, Agent.deleted_at.is_(None)
+        )
+    )
+    if taken is not None:
+        raise conflict("agent_key_taken", "This agent key is already used in the project.")
+    config = ExternalConfig(base_url=body.base_url, model=body.model, api_key=body.api_key)
+    await check_base_url(config.base_url, settings)
+    agent = Agent(
+        project_id=project_id,
+        key=body.key,
+        name=body.name,
+        description=body.description,
+        kind="external",
+        external_config=config.encrypt(settings),
+        created_by=actor.actor_id,
+    )
+    session.add(agent)
+    await session.flush()
+    await session.refresh(agent)
+    return await external_out(session, agent, settings)
+
+
+@external_router.get("/{agent_id}/external", response_model=ExternalAgentOut)
+async def get_external_agent(
+    project_id: UUID, agent_id: UUID, actor: Reader, session: SessionDep, settings: SettingsDep
+):
+    """The agent and its endpoint; the key is never returned."""
+    return await external_out(session, await _external(session, project_id, agent_id), settings)
+
+
+@external_router.put("/{agent_id}/external", response_model=ExternalAgentOut)
+@audited("update_external_agent", "agent", load_before=_external_before)
+async def update_external_agent(
+    project_id: UUID,
+    agent_id: UUID,
+    body: ExternalAgentUpdate,
+    request: Request,
+    actor: ExternalAdmin,
+    session: SessionDep,
+    settings: SettingsDep,
+):
+    """Change the base URL, remote model or key (omitted fields stay); the kind never changes.
+    The resulting base URL is checked again. A stored key never follows the URL to another
+    origin: without a new `api_key` it is deleted, and the agent cannot be published or called
+    until one is given."""
+    # Review r1 MINOR-4: the key goes only to the origin it was given for.
+    agent = await _external(session, project_id, agent_id)
+    current = ExternalConfig.decrypt(agent.external_config, settings)
+    config = current.model_copy(update=body.model_dump(exclude_unset=True))
+    secret = config.api_key.get_secret_value() if config.api_key else None
+    config = ExternalConfig.model_validate({**config.model_dump(), "api_key": secret})
+    await check_base_url(config.base_url, settings)
+    moved = origin(config.base_url) != origin(current.base_url)
+    if moved and "api_key" not in body.model_fields_set and current.api_key is not None:
+        config = config.model_copy(update={"api_key": None})
+        request_id, ip = request_context(request)
+        await write_event(
+            session,
+            AuditEntry(
+                action="reset_external_agent_key",
+                resource_type="agent",
+                outcome="success",
+                actor_type=actor.actor_type,
+                actor_id=actor.actor_id,
+                project_id=str(project_id),
+                resource_id=str(agent.id),
+                after={
+                    "reason": "origin_changed",
+                    "from_origin": origin(current.base_url),
+                    "to_origin": origin(config.base_url),
+                },
+                request_id=request_id,
+                ip=ip,
+                via_key_id=getattr(actor, "via_key_id", None),
+            ),
+        )
+    agent.external_config = config.encrypt(settings)
+    await session.flush()
+    await session.refresh(agent)
+    return await external_out(session, agent, settings)
+
+
+@external_router.post("/{agent_id}/external/publish", response_model=ExternalAgentOut)
+@audited("publish_external_agent", "agent", load_before=_external_before)
+async def publish_external_agent(
+    project_id: UUID,
+    agent_id: UUID,
+    request: Request,
+    actor: ExternalAdmin,
+    session: SessionDep,
+    settings: SettingsDep,
+):
+    """Publish an external agent (it has no versions): its configuration must exist and its
+    base URL passes the egress policy again (K-06b2-0002 S3a)."""
+    agent = await _external(session, project_id, agent_id)
+    if agent.external_config is None:
+        raise conflict(
+            "external_agent_not_configured", "The external agent has no endpoint configured."
+        )
+    config = ExternalConfig.decrypt(agent.external_config, settings)
+    if config.api_key is None:
+        raise conflict(
+            "external_agent_not_configured",
+            "The external agent has no key (reset when its base URL moved to another origin).",
+        )
+    await check_base_url(config.base_url, settings)
+    agent.status = AgentStatus.published
+    await session.flush()
+    await session.refresh(agent)
+    return await external_out(session, agent, settings)
