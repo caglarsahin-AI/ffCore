@@ -13,6 +13,7 @@ interrupt returns. `boundary()` runs first in every node: cancel, abandon and ru
 the run there (a model or tool call in progress is never cut).
 """
 
+import hashlib
 import json
 import re
 import time
@@ -24,6 +25,7 @@ from langgraph.runtime import Runtime
 from langgraph.types import interrupt
 
 from ffcore.core import tracing
+from ffcore.guardrails.engine import TextTooLong
 from ffcore.runtime.contracts import RunEventType, RunStatus, SseEvent
 from ffcore.runtime.definition import DEFAULT_APPROVER, approval_name
 from ffcore.runtime.prompting import (
@@ -140,16 +142,10 @@ async def guard_in(state: RunState, runtime: Runtime[RunContext]) -> dict:
             RunStatus.failed, "guardrail_block", checked.message, reference_id=checked.reference_id
         )
     content = user_message(checked.text, _sources(state))
-    outgoing = await ctx.guard.check("egress", content)
-    if outgoing.action == "block":
-        raise StopRun(
-            RunStatus.failed,
-            "guardrail_block",
-            outgoing.message,
-            reference_id=outgoing.reference_id,
-        )
+    # Cached, so the model node does not check this message a second time.
+    outgoing = await _egress_text(ctx, content)
     return {
-        "messages": [*state["messages"], {"role": "user", "content": outgoing.text}],
+        "messages": [*state["messages"], {"role": "user", "content": outgoing}],
         "sources": _source_payload(_sources(state)),
     }
 
@@ -158,6 +154,91 @@ def _always_found_nothing(ctx: RunContext, state: RunState) -> bool:
     d = ctx.definition
     only_always = d.knowledge and all(k.mode == "always" for k in d.knowledge) and not d.tools
     return bool(only_always and not d.ask_user and not state.get("sources"))
+
+
+def _digest(text: str) -> str:
+    return hashlib.sha256(text.encode()).hexdigest()
+
+
+async def _egress_text(ctx: RunContext, text: str) -> str:
+    """One text through `egress`, once per run execution: the result is cached under the hash of
+    the input and of itself (a masked text asks again for nothing). A block fails the run
+    (`guardrail_block`); a text over the engine's limit fails it with its own code."""
+    key = _digest(text)
+    masked = ctx.egress_cache.get(key)
+    if masked is None:
+        try:
+            checked = await ctx.guard.check("egress", text)
+        except TextTooLong as exc:
+            raise StopRun(RunStatus.failed, "guardrail_text_too_long", str(exc)) from exc
+        if checked.action == "block":
+            raise StopRun(
+                RunStatus.failed,
+                "guardrail_block",
+                checked.message,
+                reference_id=checked.reference_id,
+            )
+        masked = checked.text
+        ctx.egress_cache[key] = ctx.egress_cache[_digest(masked)] = masked
+    return masked
+
+
+async def _egress_json(ctx: RunContext, node: Any) -> Any:
+    if isinstance(node, str):
+        return await _egress_text(ctx, node) if node else node
+    if isinstance(node, list):
+        return [await _egress_json(ctx, item) for item in node]
+    if isinstance(node, dict):
+        return {key: await _egress_json(ctx, value) for key, value in node.items()}
+    return node
+
+
+async def _egress_call(ctx: RunContext, call: dict[str, Any]) -> dict[str, Any]:
+    """A tool call of an assistant message: its arguments (a JSON string) are checked value by
+    value, so the structure stays valid."""
+    raw = call.get("function", {}).get("arguments")
+    if not isinstance(raw, str) or not raw:
+        return call
+    try:
+        arguments = json.loads(raw)
+    except ValueError as exc:
+        raise StopRun(
+            RunStatus.failed, "unsupported_message_content", "Tool call arguments are not JSON."
+        ) from exc
+    masked = await _egress_json(ctx, arguments)
+    if masked == arguments:
+        return call
+    return {**call, "function": {**call["function"], "arguments": json.dumps(masked)}}
+
+
+async def _egress_messages(ctx: RunContext, messages: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """The single checkpoint before the provider (BLOCKERS 134): every text field of the list that
+    goes to the model (system prompt, history, user, assistant, tool results, tool call
+    arguments) passes `egress` on every call. The run's token store makes it idempotent: an
+    already tokenized text comes back unchanged and issued placeholders are not matched again.
+    Nothing is skipped or cut: a block, a too long text or a content that is not text fails the
+    run."""
+    out: list[dict[str, Any]] = []
+    for message in messages:
+        content = message.get("content")
+        if content is not None and not isinstance(content, str):
+            raise StopRun(
+                RunStatus.failed,
+                "unsupported_message_content",
+                f"A {message.get('role')} message has non-text content.",
+            )
+        changed: dict[str, Any] = {}
+        if content:
+            masked = await _egress_text(ctx, content)
+            if masked != content:
+                changed["content"] = masked
+        calls = message.get("tool_calls")
+        if calls:
+            checked_calls = [await _egress_call(ctx, c) for c in calls]
+            if checked_calls != calls:
+                changed["tool_calls"] = checked_calls
+        out.append({**message, **changed} if changed else message)
+    return out
 
 
 async def model(state: RunState, runtime: Runtime[RunContext]) -> dict:
@@ -180,8 +261,9 @@ async def model(state: RunState, runtime: Runtime[RunContext]) -> dict:
     async def on_token(text: str) -> None:
         await ctx.events.live(SseEvent.token, {"text": text})
 
+    outgoing = await _egress_messages(ctx, state["messages"])
     turn = await ctx.model.call(
-        state["messages"],
+        outgoing,
         tools=ctx.tools.schemas(),
         max_tokens=min(d.limits.output_tokens, d.answer_rules.max_answer_tokens)
         if not ctx.tools.schemas()
@@ -202,7 +284,7 @@ async def model(state: RunState, runtime: Runtime[RunContext]) -> dict:
             "queue_ms": turn.queue_ms,
             "tool_calls": [c.name for c in turn.tool_calls],
             # The final, masked messages sent to the model (02/08 content rule).
-            "request_messages": state["messages"],
+            "request_messages": outgoing,
         },
         iteration=iteration,
     )

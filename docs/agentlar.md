@@ -212,6 +212,8 @@ Every stop is a coded `error` event and the run's `error_code`; nothing ends sil
 |---|---|
 | `limit_reached` | `max_turns`, `max_tool_calls` or the run timeout; partial output kept with `partial=true` |
 | `guardrail_block` | a policy blocked input, output or egress; `reference_id` shown to the user |
+| `guardrail_text_too_long` | a single message to the model is over the guardrail engine's text limit (200,000 characters); nothing is cut |
+| `unsupported_message_content` | a message to the model has content that is not text (or tool call arguments that are not JSON); egress cannot check it, so the run stops |
 | `model_unavailable` | the model (and its configured fallback) could not answer; no implicit fallback |
 | `model_not_found` | the agent's model is not active in the project |
 | `upstream_error`, `stream_incomplete`, `empty_completion` | the provider answered without a usable result |
