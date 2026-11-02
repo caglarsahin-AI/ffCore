@@ -1,0 +1,125 @@
+..................................                                       [100%]
+34 passed in 8.37s
+E501 Line too long (105 > 100)
+  --> ffcore/services/facade_external.py:62:101
+   |
+60 |     def encrypt(self, settings: Settings) -> bytes:
+61 |         return encrypt_json(
+62 |             {"base_url": self.base_url, "model": self.model, "api_key": self.api_key.get_secret_value()},
+   |                                                                                                     ^^^^^
+63 |             settings,
+64 |         )
+   |
+
+E501 Line too long (106 > 100)
+   --> ffcore/services/facade_external.py:108:101
+    |
+106 |         try:
+107 |             addresses = (
+108 |                 [str(literal)] if literal is not None else await (resolver or system_resolver)(host, port)
+    |                                                                                                     ^^^^^^
+109 |             )
+110 |         except OSError:
+    |
+
+E501 Line too long (103 > 100)
+   --> ffcore/services/facade_external.py:213:101
+    |
+211 |                     audit["upstream_status"] = resp.status_code
+212 |                     declared = resp.headers.get("content-length")
+213 |                     if declared and declared.isdigit() and int(declared) > MAX_EXTERNAL_RESPONSE_BYTES:
+    |                                                                                                     ^^^
+214 |                         audit["response_bytes"] = int(declared)
+215 |                         raise _failed("external_agent_response_too_large", "too_large", audit)
+    |
+
+E501 Line too long (105 > 100)
+  --> tests/unit/test_06b2_external.py:42:101
+   |
+40 |         body = json.loads(self.rfile.read(length) or b"{}")
+41 |         self.server.seen.append(
+42 |             {"path": self.path, "headers": {k.lower(): v for k, v in self.headers.items()}, "body": body}
+   |                                                                                                     ^^^^^
+43 |         )
+44 |         mode = self.path.split("/")[1]
+   |
+
+E501 Line too long (101 > 100)
+  --> tests/unit/test_06b2_external.py:48:101
+   |
+46 |             self._reply(200, _answer())
+47 |         elif mode == "tools":
+48 |             calls = [{"id": "c1", "type": "function", "function": {"name": "rm", "arguments": "{}"}}]
+   |                                                                                                     ^
+49 |             self._reply(200, _answer("Tamam", tool_calls=calls, function_call={"name": "rm"}))
+50 |         elif mode == "tools-only":
+   |
+
+E501 Line too long (101 > 100)
+  --> tests/unit/test_06b2_external.py:51:101
+   |
+49 |             self._reply(200, _answer("Tamam", tool_calls=calls, function_call={"name": "rm"}))
+50 |         elif mode == "tools-only":
+51 |             calls = [{"id": "c1", "type": "function", "function": {"name": "rm", "arguments": "{}"}}]
+   |                                                                                                     ^
+52 |             self._reply(200, _answer(None, tool_calls=calls))
+53 |         elif mode == "big":
+   |
+
+Found 6 errors.
+unformatted: File would be reformatted
+   --> ffcore/services/facade_external.py:62:14
+    |
+61  |         return encrypt_json(
+    -             {"base_url": self.base_url, "model": self.model, "api_key": self.api_key.get_secret_value()},
+62  +             {
+63  +                 "base_url": self.base_url,
+64  +                 "model": self.model,
+65  +                 "api_key": self.api_key.get_secret_value(),
+66  +             },
+67  |             settings,
+--------------------------------------------------------------------------------
+111 |             addresses = (
+    -                 [str(literal)] if literal is not None else await (resolver or system_resolver)(host, port)
+112 +                 [str(literal)]
+113 +                 if literal is not None
+114 +                 else await (resolver or system_resolver)(host, port)
+115 |             )
+--------------------------------------------------------------------------------
+218 |                     declared = resp.headers.get("content-length")
+    -                     if declared and declared.isdigit() and int(declared) > MAX_EXTERNAL_RESPONSE_BYTES:
+219 +                     if (
+220 +                         declared
+221 +                         and declared.isdigit()
+222 +                         and int(declared) > MAX_EXTERNAL_RESPONSE_BYTES
+223 +                     ):
+224 |                         audit["response_bytes"] = int(declared)
+    |
+
+unformatted: File would be reformatted
+  --> tests/unit/test_06b2_external.py:42:14
+   |
+41 |         self.server.seen.append(
+   -             {"path": self.path, "headers": {k.lower(): v for k, v in self.headers.items()}, "body": body}
+42 +             {
+43 +                 "path": self.path,
+44 +                 "headers": {k.lower(): v for k, v in self.headers.items()},
+45 +                 "body": body,
+46 +             }
+47 |         )
+--------------------------------------------------------------------------------
+51 |         elif mode == "tools":
+   -             calls = [{"id": "c1", "type": "function", "function": {"name": "rm", "arguments": "{}"}}]
+52 +             calls = [
+53 +                 {"id": "c1", "type": "function", "function": {"name": "rm", "arguments": "{}"}}
+54 +             ]
+55 |             self._reply(200, _answer("Tamam", tool_calls=calls, function_call={"name": "rm"}))
+56 |         elif mode == "tools-only":
+   -             calls = [{"id": "c1", "type": "function", "function": {"name": "rm", "arguments": "{}"}}]
+57 +             calls = [
+58 +                 {"id": "c1", "type": "function", "function": {"name": "rm", "arguments": "{}"}}
+59 +             ]
+60 |             self._reply(200, _answer(None, tool_calls=calls))
+   |
+
+2 files would be reformatted, 28 files already formatted

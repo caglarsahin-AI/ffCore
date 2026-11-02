@@ -1,0 +1,4 @@
+SKIPPED [1] tests/integration/test_19_ingest_raw.py:155: root ignores file modes; the mount test runs :ro
+SKIPPED [1] tests/integration/test_04a_ingest.py:124: NOT_RUN: needs RUN_MODEL_TESTS=1
+SKIPPED [1] tests/integration/test_04a_ingest.py:279: NOT_RUN: needs RUN_MODEL_TESTS=1
+50 passed, 3 skipped in 130.42s (0:02:10)

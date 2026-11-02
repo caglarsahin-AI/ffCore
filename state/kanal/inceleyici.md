@@ -1532,3 +1532,11 @@ Koşular: 88 passed + 2 failed (probe 3 ve MINOR-1 testi); unit+contract 734 pas
 ## R-137-0001 | 2026-11-02 18:07 | ACK | K-137-0007
 - REVIEW-ISTEK fix/04a-gate2-headings alindi. SHA 6c0271846e26d7d2241827348c0b2fe697e73e7f (baz d365811, 3 commit, 3 dosya, state/ diff 0) mevcut. Statik + kisa yigin review-137 (18240/13240, postgres+redis). C: 112 GB, acik FF yigini yok.
 - 2026-11-02 18:08 YIGIN-AC review-137 (18240/13240, FFCORE_VERSION=0.0.0-review-137 = 0.0.0-main etiketi, kod worktree salt-okunur; yalniz postgres+redis); acik FF yigini yok, C: 112 GB.
+
+## R-137-0002 | 2026-11-02 18:55 | REVIEW-SONUC | K-137-0007
+- Paket/SHA: fix/04a-gate2-headings, 6c0271846e26d7d2241827348c0b2fe697e73e7f. Yığın review-137 (postgres+redis) açıldı ve down -v ile kapatıldı (YIGIN-KAPA review137). state/ diff 0.
+- Karar: **ONAY** (BLOCKER 0, MAJOR 0, MINOR 0). M3 ingest önkoşulu kapanabilir.
+- Kanıt: unit+contract 878 iki profil; test_19 + 04a entegrasyonu iki profilde 50 passed + 3 skipped (test_19 sayıları indexed 4 / skipped 1 / gate2:boilerplate 1 assert edildi). Bağımsız fark testi (59.831 gövde, main vs yeni): yeni sayı her zaman ≤ main, fark tam olarak fence dışı başlık sayısı, karar farkı yalnız code_heavy→ok/no_prose yönünde, başlıksız gövdede birebir aynı, fence çizgisi main'de de hiç kod değil. Fence'siz gerçek kod (6/8) hâlâ code_heavy. Kırmızı→yeşil kayıtları ve "Kalan riskler" dürüst; docs A′'yi anlatıyor.
+- Önemli not (kapsam dışı, ön-var olan): Kapı 2 düzyazı kontrolü yalnız TR_STOPWORDS kullanıyor; kısa İngilizce sayfa (başlıklı ya da başlıksız) main'de de yenide de `no_prose` ile eleniyor. Ayrı, öncelikli FOLLOWUP öneririm (04a sahibi); M3 aşama 0 raporunda gate2:no_prose sayısına bakılmalı.
+- Diğer notlar: fence takibi basit aç/kapa (karışık işaretler, tek satırlık ```…``` yalnız gevşek yönde/main'e eşit), `_HEADING_LINE` NBSP/girintiyi de başlık sayıyor (gevşek yön).
+- Rapor: state/reviews/04a-gate2-headings-r1.md. Worktree temiz doğrulanıp git worktree remove ile kaldırıldı. Dosyalar commit edilmemiş.
