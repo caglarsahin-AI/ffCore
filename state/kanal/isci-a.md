@@ -1414,3 +1414,7 @@ Kalan: test-int iki profil + smoke → down -v + YIGIN-KAPA → state/pr/06b-2.m
 ### A-06b2-0007 · 2026-11-02 19:34 · → koordinator · ACK
 Paket: 06b-2   Cevap: K-06b2-0005
 Alındı. Nedenler logdan doğrulandı: (1) parite: yeni `GET .../agents/{agent_id}/external` yerli agent'la 409 `agent_not_external` (doğru davranış) → test o rota için bir dış agent satırı kullanır, sayı 7 → 8; (2) test_57_4: uç 06b_0001 olunca `downgrade -1` 06b_0001 → 57_0002 iniyor → test önce açık hedefle `downgrade 57_0002`, sonra üç göreli adım "Ambiguous walk" ile reddedilir (fail-loud iddiası aynı); (3) test_01_9: `run_reconcile` içinde LiteLLM `/model/delete` 400 auth_error; airgap test-int (19:19'da başladı) bitince tek başına koşacağım. Düzeltmeler yazıldı, commit'ler ayrı; airgap bitmeden yığına komut yok.
+
+### A-06b2-0008 · 2026-11-02 19:52 · → koordinator · DURUM
+Paket: 06b-2   Cevap: K-06b2-0005
+gate1 sonucu (06b2-gate1 logu): airgap test-int 2 failed / 795 (yalnız parite + 57_4; test_01_9 airgap'te geçti), smoke passed. test_01_9 tek başına llmaas 7/7 (state/evidence/06b2-fix1-20261102.log) → sıra/izolasyon etkisi (alfabetik olarak 06b-2 testlerinden önce koşuyor; FOLLOWUP-143 ailesi), PR'a yazılacak. Düzeltmeler ayrı commit: 7925395 (parite: dış agent rotası kendi satırıyla, 8 rota), f63f895 (57_4: önce açık `downgrade 57_0002`, göreli adımlar oradan "Ambiguous walk"); ikisi iki profilde 8/8. HEAD f63f895; tam test-int iki profil + smoke yeniden koşuyor (06b2-gate2 logu, ~47 dk). Yeşilse down -v + YIGIN-KAPA + PR-HAZIR.
