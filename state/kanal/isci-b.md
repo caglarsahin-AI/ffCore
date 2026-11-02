@@ -1442,3 +1442,16 @@ DURUM: PLANNED. Plan: C:\ai_paycore\ffcore\state\pr\04a-gate2-headings.md. Workt
 Onay istediğim varsayım (planda 1): `# metin` biçimindeki kabuk yorumu satır düzeyinde H1 başlıktan ayırt edilemez; varsayımım "her zaman başlık", kod bloğunu öteki satırlar taşır (test 4 kanıtlar). Fence içi bağlam takibi kapsam dışı (ARCH-07). Aksini istersen durup KARAR-GEREK yazarım.
 Gözlem (değişmiyor): `--` dalı `---` yatay çizgisine de uyuyor; ölçülmedi, kalan risk.
 Plan onayını bekliyorum; onaydan sonra kırmızı test → düzeltme → kapı (tam tee).
+
+### B-137-0004 · 2026-11-02 16:09 · → koordinator · KARAR-GEREK
+Paket: fix/04a-gate2-headings   Cevap: K-137-0003
+Kırmızı → düzeltme yapıldı (commit yok): 137 testlerinden 8'i önce doğru nedenle kırmızıydı (`code_heavy`, state/evidence/137-red-20261102.log). Düzeltmeden sonra lint 0; make test iki profilde 873 geçti / **1 kaldı** (state/evidence/137-gate-20261102.log): `test_137_4[python_with_comments]` artık `code_heavy` değil, `no_prose` ile eleniyor.
+**Onaylattığım varsayım 1 kısmen yanlış çıktı** ("kod bloğunu öteki satırlar taşır"). Python'da girintili gövde satırları (`return …`, `pass`) zaten kod sayılmıyor. Yorum satırları da düşünce oran düşüyor. Ölçüm (sonra / önce):
+- A: yorumlu Python 4/8 kod, stopword 0,036 → `no_prose` ile elenir (önce `code_heavy`): elenme sürüyor, gerekçe değişiyor.
+- B: **Türkçe düzyazı yorumlu** Python 3/8, stopword 0,238 → **ok, indekslenir** (önce 6/8 `code_heavy`): gerçek gerileme.
+- C: yorumlu kabuk betiği 1/6 → ok (önce 3/6 = 0,5, o da geçiyordu): değişiklik yok.
+Seçenekler:
+- **A (önerim): fence farkındalığı.** `text_quality` içinde ```` ``` ```` ya da `~~~` arasındaki satırlar desen ne olursa olsun kod sayılır. Fence dışında başlık kuralı geçerli. ~5 satır. `_FENCE_LINE` zaten gates.py'de var. Etki: B, Docling'in kod makrosunu fence'li vermesi durumunda yine `code_heavy` olur. Docling'in Confluence kod makrosunu fence'lediği **doğrulanmadı** (ağırlıksız HTML yolu denenebilir, denemedim). Fence'siz yorumlu kod B gibi geçmeye devam eder. Fence'li ama kod olmayan içerik (log, yapılandırma örneği) kod sayılır, bu zaten amaç.
+- B: değişiklik yok, sınır belgelenir. test_137_4'ün Python örneği "elenmeye devam eder (no_prose)" diye yazılır, B vakası kalan riske. Etki: düzyazı yorumlu kod parçaları indekse girer (arama gürültüsü; güvenlik değil). Kapsam en dar.
+- C: başlık kuralını vazgeçip yalnız Docling biçimine özel (yalnız belge başı, ilk N satır) uygulamak. Kırılgan, önermiyorum.
+Cevabına göre A'da testler + fence vakası eklenir, B'de test ve PR metni düzeltilir; sonra test-int (yığın gerekirse YIGIN-AÇ fix137, 18220/13220) ve PR-HAZIR. O zamana kadar commit yok.
