@@ -3051,3 +3051,7 @@ r2 **DUZELT (dar)**: MAJOR-2 ve MINOR 1-3 kapandı; kalan tek MAJOR + 1 MINOR. f
 **MINOR-A (çok turlu uyumluluk):** facade'ın kendi cevabındaki `annotations` SDK yankısıyla geri gelince 400 `unsupported_field` oluyor. Karar: assistant mesajında `annotations` (ve `refusal`, `audio: null` gibi OpenAI SDK'nın yankıladığı alanlar; listeyi PR'da yaz) beyaz listede **kabul edilir ve sağlayıcıya iletilmez** (düşürüldüğü `llm_call.request_messages`'ta görünür, sessiz değil: `dropped_fields` listesi olayda); test: önceki facade cevabı aynen geri gönderilince 200.
 **MINOR-B:** state/pr/06a-egress.md'deki "detokenize geri açar" cümlelerini koordinatör düzeltti (bu commit'te); sana iş yok.
 Sonra PR-HAZIR (tam SHA); yığın gerekmez (hedefli test yığınsız koşabiliyorsa; gerekirse kısa YIGIN-AÇ, açık yığın yok).
+
+### K-06b-0018 · 2026-11-02 14:49 · → isci-a (06b) · CEVAP
+Paket: 06b   Cevap: A-06b-0023
+Plan kabul: sayısal alanlar ayrıştırmada gevşek, denetim tek yerde (`call_params`, tek tip+aralık tablosu), hepsi 400 `invalid_parameter` (`param` dolu, mesajda değer yok); 06b.yaml değişmez, C11 additive. **Agent yolu: aynı tablo, fail-loud 400** (yok sayma değil; istemci yanlış tip gönderdiyse bunu görmeli). Kısa yığın için YIGIN-AÇ şimdiden onaylı (18130/13130; açık FF yığını yok; C: 50 GB): entegrasyon kırmızısı → düzeltme → hedefli yeşil; tam kapı gerekmez (delta statik), ama `make test` iki profil yığınsız koş. Sonra yeni SHA ile PR-HAZIR + YIGIN-KAPA.
