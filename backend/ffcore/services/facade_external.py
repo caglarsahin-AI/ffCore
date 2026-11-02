@@ -350,8 +350,21 @@ class _Work:
 
     async def run(self) -> tuple[str, str]:
         """The call, its audit event, then `output.pre` on the answer's text."""
+        started = time.monotonic()
         try:
             answer = await call_upstream(self.config, self.messages, self.params, self.settings)
+        except asyncio.CancelledError:
+            # The client went away mid-stream (review r1 MINOR-7): the call is cancelled and
+            # still has its audit event; shielded, so the write itself is not cancelled.
+            audit = {
+                "host": httpx2.URL(self.config.base_url).host,
+                "upstream_status": None,
+                "error_code": "client_disconnected",
+                "duration_ms": int((time.monotonic() - started) * 1000),
+                "response_bytes": 0,
+            }
+            await asyncio.shield(_audit(self.request, self.caller, self.agent, "error", audit))
+            raise
         except ExternalCallFailed as exc:
             await _audit(self.request, self.caller, self.agent, "error", exc.audit)
             log.warning(
@@ -382,6 +395,10 @@ class _Work:
         return content, answer.finish_reason
 
 
+# Calls cancelled by a client disconnect, until their audit event is written.
+_CANCELLED: set[asyncio.Task] = set()
+
+
 async def _stream(work: _Work, public_name: str, stream_events: bool) -> AsyncIterator[str]:
     """The answer comes whole (upstream `stream: false`): keepalive while waiting, then the
     output-checked text as one chunk (S4, S6)."""
@@ -405,6 +422,10 @@ async def _stream(work: _Work, public_name: str, stream_events: bool) -> AsyncIt
                 yield KEEPALIVE
         finally:
             if not task.done():
+                # Kept referenced until it has written its audit event (the loop holds tasks
+                # weakly).
+                _CANCELLED.add(task)
+                task.add_done_callback(_CANCELLED.discard)
                 task.cancel()
         content, finish = task.result()
         delta = {"role": "assistant", "content": content}

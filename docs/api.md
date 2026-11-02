@@ -566,7 +566,8 @@ project administrator and called through the same `agent:<project_key>/<agent_ke
   `EXTERNAL_X_PLATFORM_EVENTS = ("progress",)`.
 - Record: the call is not a run (no `runs` row, no Langfuse trace: it does not go through
   LiteLLM). Each call writes one audit row `external_agent_call` (actor, agent, host, upstream
-  status or error code, duration, answer bytes; never content) and the guardrail events (source
+  status or error code, duration, answer bytes; never content; a client that disconnects
+  mid-stream cancels the call, recorded as `client_disconnected`) and the guardrail events (source
   `api`). It is not counted in token or USD quotas (the cost is the other party's; request and
   concurrency windows are FOLLOWUP-144); the key's `agents` scope, allowed CIDRs, the timeout and the
   size limit bound it.

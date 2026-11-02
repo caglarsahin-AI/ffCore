@@ -421,6 +421,58 @@ def test_06b2_r1_module_imports_alone(module):
     assert done.returncode == 0, done.stderr[-2000:]
 
 
+def test_06b2_r1_client_disconnect_is_audited(monkeypatch, settings):
+    """Review r1 MINOR-7: the client goes away while the external agent is still answering. The
+    call is cancelled and its audit event is still written, `client_disconnected`."""
+    from types import SimpleNamespace
+
+    recorded = []
+    started = anyio.Event()
+
+    async def hangs(*args, **kwargs):
+        started.set()
+        await anyio.sleep(60)
+
+    async def audit(request, caller, agent, outcome, after):
+        recorded.append((outcome, after))
+
+    monkeypatch.setattr(facade_external, "call_upstream", hangs)
+    monkeypatch.setattr(facade_external, "_audit", audit)
+    work = facade_external._Work(
+        request=None,
+        caller=None,
+        agent=SimpleNamespace(id="a"),
+        config=_config("https://agent.example/v1"),
+        messages=[],
+        params={},
+        settings=settings,
+        scope="s",
+    )
+
+    async def main():
+        stream = facade_external._stream(work, "agent:p/a", True)
+        first = await stream.__anext__()  # the progress chunk
+        assert "output_buffered" in first
+        pending = asyncio.ensure_future(stream.__anext__())
+        await started.wait()
+        pending.cancel()  # what the server does when the client disconnects
+        with pytest.raises(asyncio.CancelledError):
+            await pending
+        await stream.aclose()
+        for _ in range(50):
+            if recorded:
+                break
+            await asyncio.sleep(0.02)
+
+    import asyncio
+
+    asyncio.run(main())
+    assert len(recorded) == 1
+    outcome, after = recorded[0]
+    assert outcome == "error" and after["error_code"] == "client_disconnected"
+    assert after["host"] == "agent.example" and after["upstream_status"] is None
+
+
 def test_06b2_3_config_secret_masked():
     config = _config("https://agent.example/v1")
     assert KEY not in repr(config) and KEY not in str(config.public())
