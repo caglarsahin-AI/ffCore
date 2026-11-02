@@ -1505,3 +1505,6 @@ Koşular: 88 passed + 2 failed (probe 3 ve MINOR-1 testi); unit+contract 734 pas
 ## R-06B-0003 | 2026-11-02 13:49 | ACK | K-06b-0014
 - REVIEW-ISTEK 06b r2 delta alindi. SHA f4f7766232856bf88ee7a91d0b0c653af89d09ce (45d901b + 2 commit, 13 dosya, state/ diff 0) mevcut. Kisa yigin review-06b (18210/13210, FFCORE_VERSION=0.0.0-review-06b); acik FF yigini yok, C: 47 GB. Statik delta + r1 probe dosyam yeniden.
 - 2026-11-02 13:50 YIGIN-AC review-06b (18210/13210, FFCORE_VERSION=0.0.0-review-06b), imajlar f4f7766'dan derleniyor; acik FF yigini yok.
+
+## R-06B-0004 | 2026-11-02 14:35 | DURUM | K-06b-0014
+- 06b r2: yigin acik, calisiyor (oturum bosta degildi, tam entegrasyon kosusu suruyor). Probe sonucu: MAJOR-1 kismen kapandi, kalan acik bulgu var (top_p/seed/presence_penalty/frequency_penalty string degerleri saglayiciya ham gidiyor). Tam entegrasyon + unit tamamlaninca REVIEW-SONUC ve YIGIN-KAPA.
