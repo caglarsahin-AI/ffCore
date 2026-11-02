@@ -446,10 +446,18 @@ about targets outside its scopes. Another project's model or agent, or a missing
 - Only these OpenAI parameters pass to LiteLLM: `temperature, top_p, max_tokens,
   max_completion_tokens, stop, presence_penalty, frequency_penalty, seed, response_format, tools,
   tool_choice, logit_bias` (plus `stream`, `user`, `n=1`). Anything else: 400
-  `parameter_not_supported` (LiteLLM reads provider settings from the body; nothing is passed or
-  dropped silently). `logit_bias` maps token ids to numbers only. Messages carry OpenAI's fields
-  only: `role, content, name, tool_calls, tool_call_id`; any other message field: 400
-  `unsupported_field`. Content parts must be text (400 `content_type_not_supported`: a guardrail
+  `unsupported_field` (LiteLLM reads provider settings from the body; nothing is passed or
+  dropped silently).
+- Numbers are strictly typed, in OpenAI's ranges: `temperature` 0-2, `top_p` 0-1,
+  `presence_penalty` and `frequency_penalty` -2 to 2 (numbers); `max_tokens` and
+  `max_completion_tokens` at least 1, `seed` (integers); `n` only 1; `true`/`false` is not a
+  number; `logit_bias` maps token ids to numbers. Otherwise 400 `invalid_parameter` with OpenAI's
+  `param` naming the field; the value is not echoed and never reaches the model.
+- Messages carry OpenAI's fields only: `role, content, name, tool_calls, tool_call_id`; any other
+  message field: 400 `unsupported_field`. An earlier answer sent back as an SDK returned it may
+  keep `annotations`, `refusal` and `audio` on its assistant message: they are left out of what
+  the model sees and recorded by name (`dropped_fields`: in the run's `start_run` audit row on the
+  agent path, in the backend log on the direct path). Content parts must be text (400 `content_type_not_supported`: a guardrail
   cannot check images).
 - The `user` field is never passed on: LiteLLM (and the provider) see the acting user's id or
   `api_key:<key id>`, not the client's label.
@@ -479,6 +487,9 @@ about targets outside its scopes. Another project's model or agent, or a missing
 
 - A run of the published version with `channel=api`, `trigger_type=api`; the response headers
   carry `X-Run-Id` and `X-Conversation-Id`.
+- The request parameters are checked as on the direct path (unknown field 400
+  `unsupported_field`, wrong type or range 400 `invalid_parameter`), before any run starts. Valid
+  values do not change the run: the agent's definition sets its model and settings.
 - Context: without `X-Conversation-Id` each request is a new conversation; earlier `user` and
   `assistant` messages become its history after `input.pre` and `egress`, the last message must be
   the user's question. With `X-Conversation-Id` (the caller's own conversation) send only the new

@@ -22,7 +22,12 @@ from typing import Any
 from fastapi import Request
 from fastapi.responses import JSONResponse, StreamingResponse
 
-from ffcore.api.facade_schemas import KEEPALIVE, STREAM_END, ChatCompletionRequest
+from ffcore.api.facade_schemas import (
+    KEEPALIVE,
+    NUMERIC_PARAMS,
+    STREAM_END,
+    ChatCompletionRequest,
+)
 from ffcore.core import db, tracing
 from ffcore.core.config import Settings
 from ffcore.core.errors import ApiError, error_body
@@ -39,8 +44,8 @@ from ffcore.services.quota import (
 
 log = logging.getLogger("ffcore.facade")
 
-# OpenAI parameters passed on to LiteLLM unchanged. Anything else is refused (400), never
-# dropped or passed silently: LiteLLM reads provider settings from the body too.
+# OpenAI parameters passed on to LiteLLM. Anything else is refused (400 `unsupported_field`),
+# never dropped or passed silently: LiteLLM reads provider settings from the body too.
 PASSED_PARAMS = frozenset(
     {
         "temperature",
@@ -72,13 +77,31 @@ def _invalid(code: str, message: str) -> ApiError:
     return ApiError(400, "invalid_request_error", code, message)
 
 
+def _bad_value(param: str, message: str) -> ApiError:
+    # The value itself is never echoed: it may be what egress would have caught.
+    return ApiError(400, "invalid_request_error", "invalid_parameter", message, param=param)
+
+
+def _number(name: str, value: Any) -> None:
+    kind, low, high = NUMERIC_PARAMS[name]
+    allowed = int if kind == "integer" else int | float
+    if isinstance(value, bool) or not isinstance(value, allowed):
+        raise _bad_value(name, f"'{name}' must be an {kind}.")
+    if (low is not None and value < low) or (high is not None and value > high):
+        bounds = f"at least {low}" if high is None else f"between {low} and {high}"
+        raise _bad_value(name, f"'{name}' must be {bounds}.")
+
+
 def call_params(body: ChatCompletionRequest) -> dict[str, Any]:
+    """The parameters passed to LiteLLM. Numbers are strictly typed and in OpenAI's ranges; text
+    parameters go through egress (guard_params); anything else is refused (reviews r1, r2)."""
     given = body.model_dump(exclude_none=True)
     unknown = sorted(set(given) - PASSED_PARAMS - OWN_FIELDS)
     if unknown:
-        raise _invalid("parameter_not_supported", f"Unsupported parameters: {unknown}")
-    if body.n not in (None, 1):
-        raise _invalid("parameter_not_supported", "Only n=1 is supported.")
+        raise _invalid("unsupported_field", f"Unsupported parameters: {unknown}")
+    for name in NUMERIC_PARAMS:
+        if name in given:
+            _number(name, given[name])
     bias = given.get("logit_bias")
     if bias is not None and not (
         isinstance(bias, dict)
@@ -86,7 +109,7 @@ def call_params(body: ChatCompletionRequest) -> dict[str, Any]:
         and all(isinstance(v, int | float) and not isinstance(v, bool) for v in bias.values())
     ):
         # Token ids and numbers only: nothing in it is text for egress to check.
-        raise _invalid("parameter_not_supported", "logit_bias maps token ids to numbers.")
+        raise _bad_value("logit_bias", "'logit_bias' maps token ids to numbers.")
     return {k: v for k, v in given.items() if k in PASSED_PARAMS}
 
 
@@ -125,7 +148,7 @@ def chunk_json(data: dict) -> str:
 
 
 def error_event(exc: ApiError) -> str:
-    return chunk_json(error_body(exc.error_type, exc.code, exc.message))
+    return chunk_json(error_body(exc.error_type, exc.code, exc.message, exc.param))
 
 
 def _chunk(cid: str, created: int, model: str, delta: dict, finish=None, **extra) -> dict:
@@ -152,7 +175,10 @@ def _fallback_platform(result) -> dict | None:
 
 async def complete(request: Request, caller: FacadeCaller, target, body, settings: Settings):
     params = call_params(body)
-    raw_messages = client_messages(body)
+    raw_messages, dropped = client_messages(body)
+    if dropped:
+        # No run on this path: the log line is the record (field names only, no values).
+        log.info("facade_dropped_fields fields=%s project=%s", dropped, caller.project_id)
     stack = contextlib.AsyncExitStack()
     try:
         redis = redis_client(settings)

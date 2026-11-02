@@ -40,7 +40,7 @@ def _body(**extra):
 def test_06b_7_unknown_parameters_refused():
     with pytest.raises(ApiError) as exc:
         facade_proxy.call_params(_body(api_base="http://x", fallbacks=["y"]))
-    assert exc.value.code == "parameter_not_supported"
+    assert exc.value.code == "unsupported_field"  # r2 decision: one code for unknown fields
     assert "api_base" in exc.value.message and "fallbacks" in exc.value.message
     with pytest.raises(ApiError):
         facade_proxy.call_params(_body(n=2))
@@ -203,16 +203,41 @@ def test_06b_7_unknown_message_field_refused():
         {"role": "user", "content": "x", "name": "n"},
         {"role": "tool", "content": "r", "tool_call_id": "c1"},
     )
-    assert client_messages(known) == [
-        {"role": "user", "content": "x", "name": "n"},
-        {"role": "tool", "content": "r", "tool_call_id": "c1"},
-    ]
+    assert client_messages(known) == (
+        [
+            {"role": "user", "content": "x", "name": "n"},
+            {"role": "tool", "content": "r", "tool_call_id": "c1"},
+        ],
+        [],
+    )
+
+
+def test_06b_7_assistant_echo_fields_left_out_and_reported():
+    from ffcore.services.facade_guard import client_messages
+
+    echoed = _messages_body(
+        {"role": "user", "content": "q"},
+        {
+            "role": "assistant",
+            "content": "a [1]",
+            "annotations": [{"type": "url_citation", "url_citation": {"title": "d"}}],
+            "refusal": "",
+        },
+        {"role": "user", "content": "q2"},
+    )
+    messages, dropped = client_messages(echoed)
+    assert messages[1] == {"role": "assistant", "content": "a [1]"}
+    assert dropped == ["messages[1].annotations", "messages[1].refusal"]
+    # Only an answer echoes them: on a user message they are still refused.
+    with pytest.raises(ApiError) as exc:
+        client_messages(_messages_body({"role": "user", "content": "q", "annotations": []}))
+    assert exc.value.code == "unsupported_field"
 
 
 def test_06b_7_logit_bias_must_be_token_ids():
     with pytest.raises(ApiError) as exc:
         facade_proxy.call_params(_body(logit_bias={"a@b.example": 1}))
-    assert exc.value.code == "parameter_not_supported"
+    assert (exc.value.code, exc.value.param) == ("invalid_parameter", "logit_bias")
     assert facade_proxy.call_params(_body(logit_bias={"50256": -100})) == {
         "logit_bias": {"50256": -100}
     }
@@ -229,3 +254,70 @@ def test_06b_7_user_label_never_leaves():
         label="ayse@example.test",
     )
     assert facade_proxy.litellm_user(caller) == "api_key:k"
+
+
+# --- review r2 (K-06b-0016): every passed parameter is strictly typed ---
+
+NUMERIC_PARAMS = (
+    "temperature",
+    "top_p",
+    "max_tokens",
+    "max_completion_tokens",
+    "presence_penalty",
+    "frequency_penalty",
+    "seed",
+    "n",
+)
+
+
+@pytest.mark.parametrize("name", NUMERIC_PARAMS)
+def test_06b_7_numeric_parameter_with_text_400(name):
+    with pytest.raises(ApiError) as exc:
+        facade_proxy.call_params(
+            ChatCompletionRequest.model_construct(
+                model="chat-default", messages=[], **{name: "ayse@example.test"}
+            )
+        )
+    assert (exc.value.status_code, exc.value.code) == (400, "invalid_parameter")
+    assert exc.value.param == name
+    assert "ayse@example.test" not in exc.value.message
+
+
+@pytest.mark.parametrize(
+    ("name", "value"),
+    [
+        ("temperature", 2.5),
+        ("top_p", 1.5),
+        ("presence_penalty", -2.5),
+        ("frequency_penalty", 3),
+        ("max_tokens", 0),
+        ("seed", 1.5),
+        ("temperature", True),
+        ("n", 2),
+    ],
+)
+def test_06b_7_numeric_parameter_out_of_range_400(name, value):
+    with pytest.raises(ApiError) as exc:
+        facade_proxy.call_params(
+            ChatCompletionRequest.model_construct(
+                model="chat-default", messages=[], **{name: value}
+            )
+        )
+    assert (exc.value.status_code, exc.value.code) == (400, "invalid_parameter")
+
+
+def test_06b_7_numeric_parameters_in_range_pass():
+    given = {
+        "temperature": 0,
+        "top_p": 0.5,
+        "presence_penalty": -2,
+        "frequency_penalty": 1.5,
+        "max_tokens": 5,
+        "max_completion_tokens": 7,
+        "seed": -3,
+        "n": 1,
+    }
+    params = facade_proxy.call_params(
+        ChatCompletionRequest.model_construct(model="chat-default", messages=[], **given)
+    )
+    assert params == {k: v for k, v in given.items() if k != "n"}

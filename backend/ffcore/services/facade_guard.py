@@ -22,6 +22,9 @@ OUTPUT_STAGES = frozenset({"output.pre", "output.stream.delta"})
 INPUT_ROLES = frozenset({"system", "developer", "user", "tool"})
 # The message fields the facade accepts (OpenAI's); every one that carries text is checked.
 MESSAGE_FIELDS = frozenset({"role", "content", "name", "tool_calls", "tool_call_id"})
+# Fields of an earlier answer that OpenAI SDKs send back with it (review r2 MINOR-A): accepted on
+# assistant messages, never passed on, and reported (`dropped_fields`), not dropped silently.
+ECHO_FIELDS = frozenset({"annotations", "refusal", "audio"})
 
 
 class GuardrailBlocked(ApiError):
@@ -120,13 +123,16 @@ class FacadeGuard:
             ) from None
 
 
-def client_messages(body) -> list[dict]:
-    """The request's messages with OpenAI's known fields only (review r1 MAJOR-1): what is passed
-    on is what is checked. Any other message field is refused, never passed or dropped."""
-    out = []
+def client_messages(body) -> tuple[list[dict], list[str]]:
+    """(messages with OpenAI's known fields only, the echo fields left out as
+    `messages[i].<field>`). What is passed on is what is checked (review r1 MAJOR-1); an echo
+    field of an assistant message is left out and reported (r2 MINOR-A); any other field is
+    refused."""
+    out, dropped = [], []
     for i, message in enumerate(body.messages):
         given = message.model_dump(exclude_none=True)
-        unknown = sorted(set(given) - MESSAGE_FIELDS)
+        echoed = set(given) & ECHO_FIELDS if given["role"] == "assistant" else set()
+        unknown = sorted(set(given) - MESSAGE_FIELDS - echoed)
         if unknown:
             raise ApiError(
                 400,
@@ -134,8 +140,9 @@ def client_messages(body) -> list[dict]:
                 "unsupported_field",
                 f"Unsupported fields in messages[{i}]: {unknown}",
             )
-        out.append(given)
-    return out
+        dropped += [f"messages[{i}].{name}" for name in sorted(echoed)]
+        out.append({k: v for k, v in given.items() if k in MESSAGE_FIELDS})
+    return out, dropped
 
 
 def message_text(message: dict) -> str:

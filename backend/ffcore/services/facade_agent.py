@@ -51,7 +51,7 @@ from ffcore.runtime.contracts import Channel, RunEventType, RunStatus, TriggerTy
 from ffcore.runtime.definition import parse_definition
 from ffcore.services.facade_guard import FacadeGuard, client_messages, message_text
 from ffcore.services.facade_identity import FacadeCaller
-from ffcore.services.facade_proxy import chunk_json
+from ffcore.services.facade_proxy import call_params, chunk_json
 from ffcore.services.quota import redis_client
 
 RUN_ID_HEADER = "X-Run-Id"
@@ -85,10 +85,11 @@ def events_mode(request: Request) -> bool:
 # --- starting a run ---
 
 
-def _split(body) -> tuple[list[dict], str]:
-    """(earlier messages, the new user question). The agent's own instructions govern: system
-    and developer messages are refused, not merged; the last message must be the user's."""
-    messages = client_messages(body)
+def _split(body) -> tuple[list[dict], str, list[str]]:
+    """(earlier messages, the new user question, echo fields left out). The agent's own
+    instructions govern: system and developer messages are refused, not merged; the last
+    message must be the user's."""
+    messages, dropped = client_messages(body)
     for m in messages:
         if m["role"] not in ("user", "assistant"):
             raise _invalid(
@@ -100,7 +101,7 @@ def _split(body) -> tuple[list[dict], str]:
     question = message_text(messages[-1]).strip()
     if not question:
         raise _invalid("empty_question", "The user's question is empty.")
-    return messages[:-1], question
+    return messages[:-1], question, dropped
 
 
 async def _agent_version(session, caller: FacadeCaller, target) -> tuple[Agent, AgentVersion]:
@@ -143,7 +144,7 @@ async def _conversation(session, caller, agent, conversation_id: str) -> Convers
 
 
 async def start(request: Request, caller: FacadeCaller, target, body, settings, queue) -> Run:
-    earlier, question = _split(body)
+    earlier, question, dropped = _split(body)
     if caller.user_id is not None:
         # The user a key acts for must be a member (03a _grant; X-On-Behalf-Of reaches here
         # without a membership check, the `user` field was checked in facade_identity).
@@ -244,7 +245,13 @@ async def start(request: Request, caller: FacadeCaller, target, body, settings, 
                 agent.project_id,
                 "start_run",
                 run.id,
-                after={"agent_id": str(agent.id), "version": version.version, "channel": "api"},
+                after={
+                    "agent_id": str(agent.id),
+                    "version": version.version,
+                    "channel": "api",
+                    # r2 MINOR-A: SDK echo fields of earlier answers, left out (names only).
+                    **({"dropped_fields": dropped} if dropped else {}),
+                },
             )
             await session.commit()
             await _queued_event(session, settings, run)
@@ -454,6 +461,9 @@ def _headers(run: Run) -> dict[str, str]:
 
 
 async def complete(request: Request, caller: FacadeCaller, target, body, settings, queue):
+    # The same parameter table as the direct path (K-06b-0018): a wrong value or an unknown
+    # field is 400 here too. The agent's definition sets the model and its settings.
+    call_params(body)
     events_on = events_mode(request)
     resume = request.headers.get(RESUME_HEADER)
     if resume:

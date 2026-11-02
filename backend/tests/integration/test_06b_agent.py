@@ -423,3 +423,47 @@ def test_06b_15_console_cannot_create_external_agent(agent):
         json={"key": "dis", "name": "Dış", "model": "chat-default", "kind": "external"},
     )
     assert response.status_code == 422
+
+
+# --- review r2 MINOR-A: the SDK echo of an earlier answer ---
+
+
+def test_06b_13_previous_agent_answer_sent_back_200(agent, harness, use_queue, pg):
+    _, _, _, client, model = agent
+    use_queue(InlineQueue(harness, _answer_ports()))
+    first = client.chat(model, "Fesih süresi nedir?")
+    assert first.status_code == 200, first.text
+    answer = first.json()["choices"][0]["message"]
+    assert answer["annotations"]  # what an OpenAI SDK puts back into the history
+    use_queue(InlineQueue(harness, _answer_ports()))  # the scripted model answers once per run
+    response = client.chat(
+        model,
+        messages=[
+            {"role": "user", "content": "Fesih süresi nedir?"},
+            answer,
+            {"role": "user", "content": "Peki ihbar?"},
+        ],
+    )
+    assert response.status_code == 200, response.text
+    run_id = response.headers["X-Run-Id"]
+    after = pg.execute(
+        "SELECT after FROM audit_events WHERE action = 'start_run' AND resource_id = %s",
+        (run_id,),
+    ).fetchone()[0]
+    assert after["dropped_fields"] == ["messages[1].annotations"]
+
+
+@pytest.mark.parametrize("name", ["temperature", "top_p", "seed", "max_tokens"])
+def test_06b_7_agent_numeric_parameter_with_text_400(agent, harness, use_queue, pg, name):
+    """K-06b-0018: the agent path checks the same parameter table, fail-loud; no run starts."""
+    project, _, _, client, model = agent
+    use_queue(InlineQueue(harness, _answer_ports()))  # a run that did start would finish (200)
+    response = client.chat(model, "Fesih süresi nedir?", **{name: "ayse@example.test"})
+    assert response.status_code == 400, response.text
+    assert (response.json()["error"]["code"], response.json()["error"]["param"]) == (
+        "invalid_parameter",
+        name,
+    )
+    assert (
+        pg.execute("SELECT count(*) FROM runs WHERE project_id = %s", (project,)).fetchone()[0] == 0
+    )

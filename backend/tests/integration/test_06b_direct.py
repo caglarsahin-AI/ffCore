@@ -281,7 +281,7 @@ def test_06b_7_unknown_parameter_400(direct):
     _, _, _, client = direct
     response = client.chat("chat-default", api_base="http://elsewhere/v1")
     assert response.status_code == 400
-    assert response.json()["error"]["code"] == "parameter_not_supported"
+    assert response.json()["error"]["code"] == "unsupported_field"
     assert fake_requests() == []
 
 
@@ -385,3 +385,65 @@ def test_06b_4_stream_holds_when_a_rule_enforces(direct, pg, policy_mode, rule_m
         assert not [line for line in lines if line.startswith('data: {"error"')]
         assert ("block", "api") in _guard_events(pg, project, "output.pre")  # recorded only
     assert lines[-1] == "data: [DONE]"
+
+
+# --- review r2 (K-06b-0016): numeric parameters are strictly typed ---
+
+
+@pytest.mark.parametrize(
+    "name",
+    [
+        "temperature",
+        "top_p",
+        "max_tokens",
+        "max_completion_tokens",
+        "presence_penalty",
+        "frequency_penalty",
+        "seed",
+        "n",
+    ],
+)
+def test_06b_7_numeric_parameter_with_text_400(direct, name):
+    _, _, _, client = direct
+    response = client.chat("chat-default", **{name: EMAIL})
+    assert response.status_code == 400, response.text
+    error = response.json()["error"]
+    assert (error["code"], error["param"], error["type"]) == (
+        "invalid_parameter",
+        name,
+        "invalid_request_error",
+    )
+    assert EMAIL not in response.text
+    assert fake_requests() == []  # nothing reached the provider
+
+
+def test_06b_7_numeric_parameters_of_the_right_type_pass(direct):
+    _, _, _, client = direct
+    response = client.chat("chat-default", temperature=0.3, top_p=1, seed=7, max_tokens=20)
+    assert response.status_code == 200, response.text
+    sent = fake_requests()[-1]
+    assert (sent["temperature"], sent["top_p"], sent["seed"]) == (0.3, 1, 7)
+
+
+def test_06b_7_previous_answer_sent_back_200(direct):
+    """r2 MINOR-A: an SDK puts the earlier answer back as it came (annotations, refusal); the
+    request succeeds and those fields do not reach the provider."""
+    _, _, _, client = direct
+    first = client.chat("chat-default", "q1")
+    assert first.status_code == 200, first.text
+    answer = dict(first.json()["choices"][0]["message"], annotations=[], refusal=None)
+    answer["annotations"] = [{"type": "url_citation", "url_citation": {"title": "d", "url": "u"}}]
+    response = client._client.post(
+        "/v1/chat/completions",
+        json={
+            "model": "chat-default",
+            "messages": [
+                {"role": "user", "content": "q1"},
+                answer,
+                {"role": "user", "content": "q2"},
+            ],
+        },
+        headers=client.headers(),
+    )
+    assert response.status_code == 200, response.text
+    assert all("annotations" not in m for m in fake_requests()[-1]["messages"])

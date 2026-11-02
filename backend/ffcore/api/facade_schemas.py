@@ -54,6 +54,8 @@ FACADE_ERROR_CODES = (
     "external_agent_not_available",
     # Review r1 MAJOR-1: a message field outside OpenAI's known ones is refused, not passed.
     "unsupported_field",
+    # Review r2: a supported parameter with a wrong type or out of range (`param` names it).
+    "invalid_parameter",
 )
 
 # The model name prefix of the agent path (C1: agent:<project_key>/<agent_key>).
@@ -73,21 +75,52 @@ class ChatMessage(BaseModel):
     tool_call_id: str | None = None
 
 
+# The numeric request parameters and their OpenAI ranges (review r2): (type, minimum, maximum).
+# A wrong type (text, bool) or a value out of range is 400 `invalid_parameter` with `param` set;
+# the value never reaches LiteLLM. The model parses them loosely so that the facade, not the
+# app's 422 handler, answers (as for message fields); the schema below still shows the types.
+NUMERIC_PARAMS: dict[str, tuple[str, float | None, float | None]] = {
+    "temperature": ("number", 0, 2),
+    "top_p": ("number", 0, 1),
+    "presence_penalty": ("number", -2, 2),
+    "frequency_penalty": ("number", -2, 2),
+    "max_tokens": ("integer", 1, None),
+    "max_completion_tokens": ("integer", 1, None),
+    "seed": ("integer", None, None),
+    "n": ("integer", 1, 1),  # one choice only
+}
+
+
+def _numeric(name: str) -> Any:
+    kind, low, high = NUMERIC_PARAMS[name]
+    schema = {"type": kind}
+    if low is not None:
+        schema["minimum"] = low
+    if high is not None:
+        schema["maximum"] = high
+    return Field(default=None, json_schema_extra={"anyOf": [schema, {"type": "null"}]})
+
+
 class ChatCompletionRequest(BaseModel):
-    # OpenAI accepts many more fields; the ones FFCore does not use are kept and passed on to
-    # LiteLLM on the direct model path (OpenAI meaning), never silently reinterpreted.
+    # Other fields are parsed so the facade can refuse them the OpenAI way, 400
+    # `unsupported_field` (facade_proxy.call_params); nothing outside the documented parameters
+    # is passed on or dropped silently.
     model_config = ConfigDict(extra="allow")
 
     model: str = Field(min_length=1, max_length=300)
     messages: list[ChatMessage] = Field(min_length=1)
     stream: bool = False
     user: str | None = Field(default=None, max_length=320)
-    max_tokens: int | None = Field(default=None, ge=1)
-    max_completion_tokens: int | None = Field(default=None, ge=1)
-    temperature: float | None = None
+    max_tokens: Any = _numeric("max_tokens")
+    max_completion_tokens: Any = _numeric("max_completion_tokens")
+    temperature: Any = _numeric("temperature")
+    top_p: Any = _numeric("top_p")
+    presence_penalty: Any = _numeric("presence_penalty")
+    frequency_penalty: Any = _numeric("frequency_penalty")
+    seed: Any = _numeric("seed")
     tools: list[dict[str, Any]] | None = None
     tool_choice: str | dict[str, Any] | None = None
-    n: int | None = None
+    n: Any = _numeric("n")
 
 
 class ModelEntry(BaseModel):

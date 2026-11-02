@@ -527,8 +527,36 @@ components:
         temperature:
           anyOf:
           - type: number
+            maximum: 2.0
+            minimum: 0.0
           - type: 'null'
           title: Temperature
+        top_p:
+          anyOf:
+          - type: number
+            maximum: 1.0
+            minimum: 0.0
+          - type: 'null'
+          title: Top P
+        presence_penalty:
+          anyOf:
+          - type: number
+            maximum: 2.0
+            minimum: -2.0
+          - type: 'null'
+          title: Presence Penalty
+        frequency_penalty:
+          anyOf:
+          - type: number
+            maximum: 2.0
+            minimum: -2.0
+          - type: 'null'
+          title: Frequency Penalty
+        seed:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Seed
         tools:
           anyOf:
           - items:
@@ -547,6 +575,8 @@ components:
         n:
           anyOf:
           - type: integer
+            maximum: 1.0
+            minimum: 1.0
           - type: 'null'
           title: N
       additionalProperties: true
