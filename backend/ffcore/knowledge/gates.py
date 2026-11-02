@@ -63,15 +63,13 @@ EN_STOPWORDS = frozenset(
 STOPWORDS = {"tr": TR_STOPWORDS, "en": EN_STOPWORDS}
 
 _LETTERS = re.compile(r"[^\W\d_]+")
-# A Markdown heading (`#`…`######`, space, text) is not code; `#include`, `#!/bin/sh`, a bare `#`
-# are (FOLLOWUP-137). Outside a fence a `# text` shell comment reads as a heading; inside one it
-# is code (`_code_lines`).
 _CODE_LINE = re.compile(
-    r"^\s*(?:[{}\[\]();]|//|#(?!#{0,5}\s+\S)|--|<\w|import |from \w|def |class |select |"
-    r"insert |update |"
+    r"^\s*(?:[{}\[\]();]|//|#|--|<\w|import |from \w|def |class |select |insert |update |"
     r"at [\w.$]+\(|Caused by:|Exception|Traceback|\w+Error\b|\d{4}-\d{2}-\d{2}[ T]\d{2}:)",
     re.I,
 )
+# A Markdown heading: `#`…`######`, space, text. `#include`, `#!/bin/sh` and a bare `#` are not.
+_HEADING_LINE = re.compile(r"^\s*#{1,6}\s+\S")
 _LINK_LINE = re.compile(r"^\s*[-*|]?\s*(?:\[[^\]]*\]|https?://\S+|\|)")
 _TEMPLATE_TITLE = re.compile(r"^\s*(şablon|template|form örneği|örnek form)\b", re.I)
 
@@ -145,15 +143,21 @@ def gate1(
     return OK, None
 
 
+def _is_code_line(line: str, *, fenced: bool) -> bool:
+    """Outside a fence a Markdown heading is not code (Docling keeps headings as lines while it
+    joins paragraphs, FOLLOWUP-137), so an unfenced `# text` shell comment is not either. Inside
+    a ``` or ~~~ fence the pattern alone decides and `# text` is code."""
+    return bool(_CODE_LINE.match(line)) and (fenced or not _HEADING_LINE.match(line))
+
+
 def _code_lines(lines: list[str]) -> int:
-    """Lines that read as code. Inside a ``` or ~~~ fence every line is code, a `# text`
-    comment included; a fence that never closes makes the rest code (K-137-0004)."""
+    """Fence lines are not code: the plain-text converter wraps every .txt in one fence. A fence
+    that never closes leaves the rest under the in-fence rule (K-137-0006 A′)."""
     count, fenced = 0, False
     for line in lines:
         if _FENCE_LINE.match(line):
             fenced = not fenced
-            count += 1
-        elif fenced or _CODE_LINE.match(line):
+        elif _is_code_line(line, fenced=fenced):
             count += 1
     return count
 

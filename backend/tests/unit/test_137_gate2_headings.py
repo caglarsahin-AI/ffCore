@@ -4,7 +4,8 @@ Docling joins a page's lines into paragraphs, so a short Confluence page keeps i
 separate lines while each section's text becomes one line; with `#` counted as code, the
 paycore-like 1001/1002 shape (3 headings / 5 lines = 0.6) was skipped as `code_heavy` (B-19-0013).
 A `# text` shell comment cannot be told from an H1 heading on one line: outside a fence it counts
-as a heading; inside a fence every line is code (K-137-0004 A).
+as a heading; inside a fence the main rule stays, so it is code there (K-137-0006 A′). The fence
+line itself is not code: the plain-text converter wraps every .txt in one fence.
 """
 
 import pytest
@@ -40,7 +41,7 @@ PY_WITH_COMMENTS = (
 
 
 def _is_code(line: str) -> bool:
-    return bool(gates._CODE_LINE.match(line))
+    return gates._is_code_line(line, fenced=False)
 
 
 def test_137_1_short_headed_page_passes():
@@ -77,7 +78,7 @@ def test_137_3_hash_without_heading_text_is_code(line):
     ids=["c", "fenced_python_with_prose_comments", "tilde_fenced_python"],
 )
 def test_137_4_real_code_still_code_heavy(block):
-    """Inside a fence every line is code, a `# text` comment included (K-137-0004 A)."""
+    """Inside a fence a `# text` comment is code as on main (K-137-0006 A′)."""
     assert gates.text_quality(block, title="T", min_tokens=1) == ("skipped", "code_heavy")
 
 
@@ -94,19 +95,26 @@ def test_137_6_chunk_with_heading_passes():
     assert gates.text_quality(chunk, title=None) == ("ok", None)
 
 
-def test_137_7_fenced_log_counts_as_code():
-    """A fenced log or config sample is code by intent, prose-like words or not."""
-    log = "\n".join(f"servis {i} yeniden başlatıldı ve kuyruk boşaltıldı" for i in range(4))
-    text = f"## Günlük örneği\n{PROSE}\n```\n{log}\n```\n"
-    assert gates.text_quality(text, title="T") == ("skipped", "code_heavy")
+# DEMO-7.txt as the plain-text converter returns it (convert/text_formats.py): one fence around
+# the whole file.
+FENCED_TXT = (
+    "```\nDEMO-7 Gün sonu raporunda kur farkı satırı eksik\n\n"
+    "Bu kayıt, gün sonu raporunun döviz işlemlerinde kur farkı satırını göstermediği için açıldı.\n"
+    "Sorun bir müşteri bildirimi ile fark edildi ve aynı gün içinde incelendi.\n```"
+)
 
 
-def test_137_8_unclosed_fence_rest_is_code():
-    """A fence that never closes: every line after it is code (fail-safe, not prose)."""
-    unclosed = f"{PROSE}\n```\n{PROSE}\n{PROSE}"
-    assert gates.text_quality(unclosed, title="T") == ("skipped", "code_heavy")
-    closed = f"{PROSE}\n```\n{PROSE}\n```\n{PROSE}\n{PROSE}\n{PROSE}"
-    assert gates.text_quality(closed, title="T") == ("ok", None)  # 3 of 7 lines
+def test_137_7_fenced_plain_text_passes():
+    """The fence line is not code and fenced prose is counted by pattern, as on main."""
+    assert gates.text_quality(FENCED_TXT, title="DEMO-7") == ("ok", None)
+
+
+def test_137_8_unclosed_fence_keeps_main_rule():
+    """After a fence that never closes, the main rule counts (fail-safe = main): `# text` is code."""
+    headings = "# Başlık bir\n# Başlık iki\n# Başlık üç\n" + PROSE
+    assert gates.text_quality(headings, title="T") == ("ok", None)  # outside a fence: headings
+    unclosed = "```\n" + headings
+    assert gates.text_quality(unclosed, title="T") == ("skipped", "code_heavy")  # 3 of 5
 
 
 def test_137_9_unfenced_prose_commented_code_known_limit():
