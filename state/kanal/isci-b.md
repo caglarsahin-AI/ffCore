@@ -3,9 +3,9 @@
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
 - Oturum kimliği: ffcore-isci-b-19-3de6e682
-- Aktif paket: 19 (M3 sunucu paketi)
-- Durum: ACTIVE
-- Son okunan: koordinator K-M3S-0018
+- Aktif paket: — (19 MERGED f25268e + paycoreLLM ca1b287)
+- Durum: RETIRED
+- Son okunan: koordinator K-M3S-0020 (2026-11-02 13:00)
 
 ## Mesajlar
 
@@ -1415,3 +1415,13 @@ Delta incelemesi için: `git diff 987dd62..990abdb` ve `git diff 3adbb3a..6f0300
 ### B-19-0021 · 2026-11-02 12:17 · → koordinator · ACK
 Paket: 19   Cevap: K-M3S-0018
 ACK: r2 delta incelemesi inceleyicide; dallar donuk (ffcore 990abdb, paycoreLLM 6f03007). Bekliyorum.
+
+### B-19-0022 · 2026-11-02 12:58 · → koordinator · HANDOFF
+Paket: 19 (M3 sunucu paketi)   Cevap: K-M3S-0020
+- **Durum:** MERGED. ffcore main f25268e (990abdb; r1 987dd62 → r2 990abdb, R-19-0004 ONAY), paycoreLLM master ca1b287 (6f03007; r1 3adbb3a → r2 6f03007). Main kapısı yeşil (koordinatör, gate-19-20261102.log).
+- **Tam sonraki adım:** bu paketten kod yok. Sunucu işi kullanıcıda: paycoreLLM `docs/paycore/m3-sunucu.md` (hazırlık makinesinde `save.sh` → `images.txt` PENDING id'leri commit → taşıma → `load.sh`/`verify.sh` → `.env` + `m3_preflight --stack paycore` → seed → stage 0 → tam ingest + manifest → taban → S1 koşu 1 → özet aktarımı → temizlik). **M3 ingest'inden önce FOLLOWUP-137** (Kapı 2 başlık = kod) kapanmalı (K-137-0001, yeni oturum).
+- **Açık:** kabul 3 bellek bütçesi PENDING_ENV (ENV-45, `free -g`); ENV-138 (paycoreLLM venv bs4); FFCore imaj id'leri images.txt'de PENDING (kullanıcının sürüm derlemesi); sunucunun imaj deposu türü doğrulanmadı; FOLLOWUP-133 (belge silme silver bırakır); kapsam daralması (`knowledge[].filter.scope` FOLLOWUP önerisi, PR'da).
+- **Değişen dosyalar / kanıt:** state/pr/19.md (değişen dosyalar, kabul → test, r1 tablosu, komutlar, varsayımlar, riskler); state/evidence/19-*-2026110{1,2}.log.
+- **Commit edilmemiş iş:** yok. **Açık yığın:** yok (ffcore-19 `down -v` 0/0). Duran: `paycore-m3-test_paycore_test_{venv,uv_cache}` önbellek volume'ları (temizlik listesinde).
+- **Ders:** gerçek dönüştürücülü kuru koşu, ağırlıksız entegrasyon testinin göremediği iki şeyi yakaladı (model_missing, Kapı 2 başlık sayımı): sunucu paketi gibi uçtan uca işlerde kuru koşu zorunlu adım olarak kalsın.
+Lease: RETIRED. Bu oturum kanala başka yazmayacak.
