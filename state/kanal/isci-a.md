@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-a-06b-2 (önceki lease ffcore-isci-a-06b RETIRED)
 - Aktif paket: 06b-2 (K-06b2-0001)
 - Durum: ACTIVE
-- Son okunan: K-06b2-0005
+- Son okunan: K-06b2-0005 (K-06b2-0007 zili alındı, kanalda henüz yok)
 
 ## Mesajlar
 
@@ -1418,3 +1418,13 @@ Alındı. Nedenler logdan doğrulandı: (1) parite: yeni `GET .../agents/{agent_
 ### A-06b2-0008 · 2026-11-02 19:52 · → koordinator · DURUM
 Paket: 06b-2   Cevap: K-06b2-0005
 gate1 sonucu (06b2-gate1 logu): airgap test-int 2 failed / 795 (yalnız parite + 57_4; test_01_9 airgap'te geçti), smoke passed. test_01_9 tek başına llmaas 7/7 (state/evidence/06b2-fix1-20261102.log) → sıra/izolasyon etkisi (alfabetik olarak 06b-2 testlerinden önce koşuyor; FOLLOWUP-143 ailesi), PR'a yazılacak. Düzeltmeler ayrı commit: 7925395 (parite: dış agent rotası kendi satırıyla, 8 rota), f63f895 (57_4: önce açık `downgrade 57_0002`, göreli adımlar oradan "Ambiguous walk"); ikisi iki profilde 8/8. HEAD f63f895; tam test-int iki profil + smoke yeniden koşuyor (06b2-gate2 logu, ~47 dk). Yeşilse down -v + YIGIN-KAPA + PR-HAZIR.
+
+### A-06b2-0009 · 2026-11-02 20:44 · → koordinator · YIGIN-KAPA 06b2
+Paket: 06b-2   Cevap: K-06b2-0004
+`docker compose -p ffcore-06b2 ... --profile test --profile qdrant down -v` exit 0; kalan FF konteyneri yok, volume'lar silindi. İmajlar `ffcore/{backend,tools}:0.0.0-06b2` yerelde (temizlik listesine).
+
+### A-06b2-0010 · 2026-11-02 20:45 · → koordinator · PR-HAZIR
+Paket: 06b-2   Cevap: K-06b2-0001 / K-06b2-0005
+Branch feat/06b-2-external-agent @ **2342bc296a633a2304eaa109eda498c2f293a38f** (baz main 7733bbc, 6 commit, push yok; main ile `merge-tree` temiz, state/ yok). PR: C:i_paycorefcore\state\prb-2.md ("06b-2 PR" bölümü). Sınıf [B]; güvenlik turu zorunlu.
+Kapı (tam tee): gate1 lint 0, heads tek uç 06b_0001, make test 894/894 iki profil, test-samples 0, smoke; gate2 (f63f895) test-int **797 passed + 5 skipped iki profil**, smoke passed; gate2 lint B023 kırmızı → 2342bc2 (yalnız `here=here`), gate3 lint 0 + parite testi iki profil. K-06b2-0005 düzeltmeleri ayrı commit (7925395, f63f895); test_01_9 tek başına 7/7 ve gate2'de iki profil yeşil (sıra etkisi, PR'da).
+Sapmalar PR'da: yayınlama ayrı uç (`.../external/publish`; 06a OpenAPI'si değişmesin), manifest kodu `external_agent_not_available` korundu (yeni kod yok), entegrasyon testleri koddan sonra (dürüst not). Kayıt talepleri: FOLLOWUP check_http_destination (egress, 08), FOLLOWUP runs API dış agent açık kodu, KARARLAR DRIFT "run failed" → "kodlu hata".
