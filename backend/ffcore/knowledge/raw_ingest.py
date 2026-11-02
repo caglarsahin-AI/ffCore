@@ -165,13 +165,23 @@ async def _fill_current(report: RawIngestReport, kb_id) -> None:
         report.current = {name: (status, count) for name, status, count in rows}
 
 
-def _text_findings(path: Path) -> dict[str, int]:
-    """Regex PII counts of a staged text file (Markdown/plain); other formats are checked on
-    their converted text after ingest."""
-    if path.suffix.lower() not in (".md", ".txt"):
-        return {}
-    text = path.read_text(encoding="utf-8", errors="strict")
-    return dict(ingest_mask.resolve(TEXT_FILTER).apply(text)[1])
+class InvalidEncoding(ValueError):
+    pass
+
+
+def _text_findings(path: Path, metadata: dict) -> dict[str, int]:
+    """Regex PII counts of a staged text file (Markdown/plain) and of its metadata strings
+    (r1 MAJOR-2); other formats are checked on their converted text after ingest. Text that is
+    not UTF-8 is a coded refusal of that file (r1 MINOR-5), never a traceback for the run."""
+    f = ingest_mask.resolve(TEXT_FILTER)
+    counts = ingest_mask.mask_metadata(f, metadata)[1]
+    if path.suffix.lower() in (".md", ".txt"):
+        try:
+            text = path.read_text(encoding="utf-8", errors="strict")
+        except UnicodeDecodeError:
+            raise InvalidEncoding(str(path)) from None
+        counts.update(f.apply(text)[1])
+    return dict(counts)
 
 
 def _stop_on_customer_data(relpath: str, counts: dict) -> None:
@@ -227,7 +237,15 @@ async def ingest_tree(
             continue
         if entry.personnel_data:
             report.personnel_data_sources.add(raw_staging.source_of(entry))
-            _stop_on_customer_data(entry.relpath, _text_findings(entry.path))
+            try:
+                findings = _text_findings(
+                    entry.path, raw_staging.metadata_for(entry, kb_id=str(kb.id))
+                )
+            except InvalidEncoding:
+                report.rejected["invalid_encoding"] += 1
+                log.warning("ingest-raw rejected path=%s code=invalid_encoding", entry.relpath)
+                continue
+            _stop_on_customer_data(entry.relpath, findings)
         sha256 = _sha256(entry.path)
         report.files.append((entry.relpath, sha256, raw_staging.source_of(entry)))
         existed = await _current(kb.id, entry.relpath)
@@ -258,7 +276,9 @@ async def ingest_tree(
                     # The reason's code only: `duplicate_of:<id>` keeps no document id here.
                     reason = str(getattr(document, f"{gate}_reason")).split(":", 1)[0]
                     report.gates[f"{gate}:{reason}"] += 1
-            counts = (document.meta or {}).get("text_filter_counts") or {}
+            meta = document.meta or {}
+            counts = Counter(meta.get("text_filter_counts") or {})
+            counts.update(meta.get("text_filter_meta_counts") or {})
             report.masked.update(counts)
         if entry.personnel_data:
             _stop_on_customer_data(entry.relpath, counts)

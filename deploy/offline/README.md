@@ -16,6 +16,12 @@ Why image ids on the server: `docker load` on the overlay2 image store does not 
 `RepoDigests`, so a registry digest cannot be read back after transport. The id (config digest)
 survives save/load; the registry digest is checked where the registry is reachable.
 
+Compose files refer to every image by the **tag** listed in `images.txt` (never `tag@digest`:
+after `docker load` such a reference does not resolve and the service does not start). `save.sh`
+pulls `repo@registry_digest` and tags the result with that name; on the server `verify.sh`'s
+image id check takes the place of the digest in the reference. This works on both image
+stores (overlay2 and containerd); which one the PayCore server uses is not verified.
+
 `ffcore/backend` and `ffcore/frontend` are built from the release checkout; their ids are
 `PENDING` until `save.sh` prints them and they are committed. `verify.sh` fails on `PENDING`.
 

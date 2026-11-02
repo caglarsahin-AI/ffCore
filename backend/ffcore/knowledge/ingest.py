@@ -687,7 +687,13 @@ async def ingest_from_raw(
             k: v for k, v in metadata.items() if k not in {"kb_id", "attachments", "filename"}
         }
         if label is not None:
+            # Silver frontmatter, documents.breadcrumb and search results read these fields:
+            # masked before they are stored, like the body (r1 MAJOR-2).
+            document.meta, meta_counts = ingest_mask.mask_metadata(
+                ingest_mask.resolve(text_filter), document.meta
+            )
             document.meta["text_filter"] = label
+            document.meta["text_filter_meta_counts"] = dict(meta_counts)
         if metadata.get("updated_at_source") is not None:
             # The column orders search results (FOLLOWUP-101); the metadata copy stays as given.
             document.updated_at_source = _source_date(metadata["updated_at_source"])

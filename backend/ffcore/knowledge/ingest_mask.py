@@ -48,6 +48,26 @@ class PiiRegexFilter:
 
 _FILTERS = {"pii_regex": PiiRegexFilter()}
 
+# Metadata keys that are identifiers or bookkeeping, not text a person wrote: left as given.
+UNMASKED_KEYS = frozenset({"source", "source_item_id", "text_filter"})
+
+
+def mask_metadata(f: PiiRegexFilter, metadata: dict) -> tuple[dict, Counter]:
+    """Every string value (and string in a list) of a C6 metadata mapping through the filter,
+    except UNMASKED_KEYS (r1 MAJOR-2: titles, breadcrumbs and links carry e-mail addresses too)."""
+    counts: Counter = Counter()
+
+    def one(value):
+        if isinstance(value, str):
+            masked, found = f.apply(value)
+            counts.update(found)
+            return masked
+        if isinstance(value, list):
+            return [one(v) for v in value]
+        return value
+
+    return {k: (v if k in UNMASKED_KEYS else one(v)) for k, v in metadata.items()}, counts
+
 
 def resolve(name: str) -> PiiRegexFilter:
     """The filter registered under `name`; an unknown name is an error, never a pass-through."""

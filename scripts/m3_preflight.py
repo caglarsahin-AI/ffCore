@@ -82,6 +82,27 @@ def read_env(path: Path) -> dict[str, str]:
     return values
 
 
+# Hosts exempt from the OFFLINE and private-address egress checks (EgressPolicy.check_host): the
+# M3 list is fixed (r1 MINOR-2). FFCore's .env.example list; on the PayCore server
+# compose.ffcore.yml sets it itself. Absent means no exemption (safe); present, it must be the
+# same set, never a wider one.
+INTERNAL_HOSTS = {
+    "ffcore": {"litellm", "langfuse-web", "mcp-search", "mcp-sql"},
+    "paycore": {
+        "litellm",
+        "langfuse-web",
+        "mcp-search",
+        "mcp-sql",
+        "ffcore-qdrant",
+        "host.docker.internal",
+    },
+}
+
+
+def _hosts(value: str) -> set[str]:
+    return {h.strip() for h in value.split(",") if h.strip()}
+
+
 def check(env: dict[str, str], stack: str = "ffcore") -> list[tuple[str, bool, str]]:
     renames = STACK_RENAMES.get(stack, {})
     fixed = STACK_FIXED.get(stack, set())
@@ -95,6 +116,11 @@ def check(env: dict[str, str], stack: str = "ffcore") -> list[tuple[str, bool, s
         else:
             ok = env[key].strip().lower() in accepted
             out.append((key, ok, "" if ok else "not the M3 value"))
+    if "ALLOWED_INTERNAL_HOSTS" in env:
+        same = _hosts(env["ALLOWED_INTERNAL_HOSTS"]) == INTERNAL_HOSTS[stack]
+        out.append(("ALLOWED_INTERNAL_HOSTS", same, "" if same else "not the M3 value"))
+    else:
+        out.append(("ALLOWED_INTERNAL_HOSTS", True, "absent, no exemption"))
     for key in PRESENT:
         out.append((key, bool(env.get(key)), "" if env.get(key) else "missing"))
     for key in [*(renames.get(k, k) for k in SECRETS), *STACK_SECRETS.get(stack, ())]:

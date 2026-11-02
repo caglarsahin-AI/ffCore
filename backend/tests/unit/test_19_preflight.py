@@ -113,3 +113,18 @@ def test_19_s4_preflight_paycore_stack_names(tmp_path):
     assert pf.main(["--env-file", str(_write(tmp_path, unsafe)), "--stack", "paycore"]) == 1
     del values["FFCORE_LANGFUSE_PUBLIC_KEY"]
     assert pf.main(["--env-file", str(_write(tmp_path, values)), "--stack", "paycore"]) == 1
+
+
+def test_19_r1_preflight_internal_hosts_match_the_compose_constant(tmp_path):
+    ok = SAFE | {"ALLOWED_INTERNAL_HOSTS": "langfuse-web,litellm,mcp-sql,mcp-search"}
+    assert dict((k, v) for k, v, _ in pf.check(pf.read_env(_write(tmp_path, ok))))[
+        "ALLOWED_INTERNAL_HOSTS"
+    ]
+    wide = SAFE | {"ALLOWED_INTERNAL_HOSTS": "litellm,langfuse-web,mcp-search,mcp-sql,10.0.0.5"}
+    verdicts = {k: (v, why) for k, v, why in pf.check(pf.read_env(_write(tmp_path, wide)))}
+    assert verdicts["ALLOWED_INTERNAL_HOSTS"] == (False, "not the M3 value")
+    paycore = {k: v for k, v, _ in pf.check(pf.read_env(_write(tmp_path, SAFE)), "paycore")}
+    assert paycore["ALLOWED_INTERNAL_HOSTS"] is True  # fixed by compose.ffcore.yml there
+    other = SAFE | {"ALLOWED_INTERNAL_HOSTS": "litellm"}
+    paycore = {k: v for k, v, _ in pf.check(pf.read_env(_write(tmp_path, other)), "paycore")}
+    assert paycore["ALLOWED_INTERNAL_HOSTS"] is False

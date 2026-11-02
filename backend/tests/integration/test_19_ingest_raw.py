@@ -266,3 +266,85 @@ def test_19_s1_customer_data_in_personnel_source_stops(world, pg, settings, tmp_
         _ingest_prsim(settings, pg, world, kb["key"], tree, accept=True)
     assert err.value.code == "customer_data_suspected"
     assert "PRSIM-1" in str(err.value) and "4111" not in str(err.value)
+
+
+# --- r1 MAJOR-2: metadata strings are masked like the body; PRSIM scan covers them ---
+
+META_PII = "destek@example.test"
+
+
+def _one_doc_tree(tmp_path, source, meta_extra, body=PRSIM_BODY, name="DOC-1"):
+    kind, space = source.split(":")
+    tree = tmp_path / f"t-{uuid.uuid4().hex[:6]}"
+    path = tree / kind / space / name / f"{name}.md"
+    path.parent.mkdir(parents=True)
+    path.write_text(body, encoding="utf-8")
+    meta = {"source": source, "source_item_id": f"{kind}:{name}"} | meta_extra
+    Path(f"{path}.meta.json").write_text(json.dumps(meta), encoding="utf-8")
+    return tree
+
+
+def test_19_r1_metadata_strings_masked_everywhere(world, pg, settings, tmp_path):
+    kb = create_kb(world, key=f"meta-{uuid.uuid4().hex[:6]}")
+    tree = _one_doc_tree(
+        tmp_path,
+        "confluence:DEMO",
+        {
+            "title": f"Destek ({META_PII})",
+            "breadcrumb": f"DEMO › İletişim {META_PII} › 0532 256 60 38",
+            "source_url": f"https://wiki.example.test/x?mail={META_PII}",
+        },
+    )
+    report = asyncio.run(
+        raw_ingest.ingest_tree(
+            project_key=_project_key(pg, world["project"]),
+            kb_key=kb["key"],
+            raw_dir=tree,
+            acl_roles=["analyst"],
+            sources=["confluence:DEMO"],
+            limit=None,
+            settings=settings,
+            embed_client=ingest.LocalEmbedClient(settings),
+            convert=convert_without_weights,
+        )
+    )
+    assert report.masked["EMAIL_ADDRESS"] >= 4 and report.masked["TR_PHONE"] >= 1, report.lines()
+    row = pg.execute(
+        "SELECT breadcrumb, metadata::text, silver_path FROM documents WHERE kb_id = %s",
+        (kb["id"],),
+    ).fetchone()
+    silver = Path(row[2]).read_text(encoding="utf-8")
+    for text in (row[0], row[1], silver):
+        assert META_PII not in text and "0532 256 60 38" not in text
+    assert "[EMAIL_ADDRESS]" in row[0]
+    hits = search(world["analyst"], world, kb["id"], "personel yetki talebi").json()["hits"]
+    assert hits and all(META_PII not in h["breadcrumb"] for h in hits)
+
+
+def test_19_r1_customer_data_in_prsim_title_stops(world, pg, settings, tmp_path):
+    kb = create_kb(world, key=f"prsim-{uuid.uuid4().hex[:6]}")
+    tree = _one_doc_tree(
+        tmp_path, "jira:PRSIM", {"title": "PRSIM-9 kart 4111 1111 1111 1111"}, name="PRSIM-9"
+    )
+    with pytest.raises(raw_ingest.RawIngestError) as err:
+        _ingest_prsim(settings, pg, world, kb["key"], tree, accept=True)
+    assert err.value.code == "customer_data_suspected" and "4111" not in str(err.value)
+    rows = pg.execute("SELECT count(*) FROM documents WHERE kb_id = %s", (kb["id"],)).fetchone()
+    assert rows[0] == 0  # stopped before the document was registered
+
+
+# --- r1 MINOR-5: undecodable personnel text is a coded refusal, the run goes on ---
+
+
+def test_19_r1_invalid_encoding_refused_and_counted(world, pg, settings, tmp_path):
+    kb = create_kb(world, key=f"prsim-{uuid.uuid4().hex[:6]}")
+    tree = _one_doc_tree(tmp_path, "jira:PRSIM", {}, name="PRSIM-3")
+    bad = tree / "jira" / "PRSIM" / "PRSIM-4" / "PRSIM-4.md"
+    bad.parent.mkdir(parents=True)
+    bad.write_bytes(b"\xff\xfe gecersiz \xc3\x28")
+    Path(f"{bad}.meta.json").write_text(
+        json.dumps({"source": "jira:PRSIM", "source_item_id": "jira:PRSIM-4"}), encoding="utf-8"
+    )
+    report = _ingest_prsim(settings, pg, world, kb["key"], tree, accept=True)
+    assert report.rejected == {"invalid_encoding": 1}
+    assert report.outcomes == {"created": 1}

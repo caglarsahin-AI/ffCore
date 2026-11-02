@@ -54,7 +54,14 @@ def _norm(source: str) -> str:
 
 
 def _is_prsim(source: str) -> bool:
-    return "prsim" in _norm(source).lower().split(":")
+    """Any `prsim*` segment (`jira:PRSIM`, `jira:PRSIM2`, `confluence:PRSIM-DOCS`, `PRSIM`)."""
+    return any(seg.strip().lower().startswith("prsim") for seg in _norm(source).split(":"))
+
+
+def _prsim_path(rel: str) -> bool:
+    """Defence in depth (r1 MINOR-1): a `prsim*` directory on the way marks the file as PRSIM
+    whatever its meta says."""
+    return any(part.lower().startswith("prsim") for part in Path(rel).parts[:-1])
 
 
 def check_sources(sources: Iterable[str], *, accept_personnel_data: bool = False) -> list[str]:
@@ -145,7 +152,8 @@ def iter_staged(
                 yield Rejected(rel, meta)
                 continue
             source = _norm(str(meta["source"]))
-            if _is_prsim(source) and not accept_personnel_data:
+            personnel = _is_prsim(source) or _prsim_path(rel)
+            if personnel and not accept_personnel_data:
                 yield Rejected(rel, "prsim_requires_ner")
                 continue
             if source not in selected:
@@ -175,7 +183,7 @@ def iter_staged(
                 relpath=Path(rel).as_posix(),
                 meta=meta,
                 attachments=list(attachments),
-                personnel_data=_is_prsim(source),
+                personnel_data=personnel,
             )
 
 

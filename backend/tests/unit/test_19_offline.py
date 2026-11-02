@@ -215,3 +215,25 @@ def test_19_2_save_dry_run_lists_every_image(stub, tmp_path):
     assert result.stdout.count("docker pull") == len(third_party)
     assert result.stdout.count("docker save") == len(_lines("images.txt"))
     assert "models.tar" in result.stdout and "manifest.sha256" in result.stdout
+
+
+# --- r1 MAJOR-1: compose refers to images by tag only; the digest stays in images.txt ---
+
+
+def test_19_r1_images_txt_names_are_tags_not_digests():
+    for name, _digest, *_ in _lines("images.txt"):
+        assert "@" not in name, name
+        assert re.fullmatch(r"[\w./-]+:[\w.<>-]+", name), name  # always an explicit tag
+    minio = [r for r in _lines("images.txt") if "chainguard/minio" in r[0]]
+    assert len(minio) == 1 and minio[0][0].startswith("cgr.dev/chainguard/minio:")
+
+
+def test_19_r1_save_pulls_by_digest_and_tags_the_listed_name(stub, tmp_path):
+    result = _run("save.sh", str(tmp_path / "out"), "--dry-run", env=stub["env"])
+    assert result.returncode == 0, result.stderr
+    for name, digest, *_ in _lines("images.txt"):
+        if digest == "local-build":
+            continue
+        repo = name.rsplit(":", 1)[0]
+        assert f"docker pull {repo}@{digest}" in result.stdout, name
+        assert f"docker tag {repo}@{digest} {name}" in result.stdout, name

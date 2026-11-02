@@ -236,3 +236,20 @@ def test_19_s1_cli_flag_is_named_and_explicit():
     sub = cli.build_parser()._subparsers._group_actions[0].choices["ingest-raw"]
     flag = next(a for a in sub._actions if "--accept-personnel-data" in a.option_strings)
     assert flag.default is False and flag.const is True
+
+
+# --- r1 MINOR-1: PRSIM by source or by path, any `prsim*` segment ---
+
+
+@pytest.mark.parametrize("source", ["jira:PRSIM2", "confluence:PRSIM-DOCS", "prsim_x"])
+def test_19_r1_prsim_prefixed_sources_need_the_flag(source):
+    with pytest.raises(StagingError):
+        raw_staging.check_sources([source])
+
+
+def test_19_r1_prsim_path_needs_the_flag_whatever_the_meta_says(tmp_path):
+    _stage(tmp_path, "jira/PRSIM/PRSIM-1.md", source="jira:DEMO")
+    plain = list(raw_staging.iter_staged(tmp_path, ["jira:DEMO"]))
+    assert _codes(plain) == {"prsim_requires_ner": 1}
+    flagged = list(raw_staging.iter_staged(tmp_path, ["jira:DEMO"], accept_personnel_data=True))
+    assert _items(flagged)[0].personnel_data is True
