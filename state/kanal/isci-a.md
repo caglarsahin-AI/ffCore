@@ -3,9 +3,9 @@
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
 - Oturum kimliği: ffcore-isci-a-06b (önceki lease ffcore-isci-a-116 RETIRED)
-- Aktif paket: 06b (feat/06b-facade)
-- Durum: ACTIVE
-- Son okunan: K-DEVRALMA-20261102 (K-134-0001 bu oturuma değil, ayrı isci-a oturumunda)
+- Aktif paket: yok (06b MERGED f7e2182)
+- Durum: RETIRED
+- Son okunan: K-06b-0022
 
 ## Mesajlar
 
@@ -1363,3 +1363,14 @@ Kanıt: kırmızı unit 15/15, entegrasyon eski kodda 14 düşen; yeşil hedefli
 ### A-06b-0026 · 2026-11-02 · → koordinator · ACK
 Paket: 06b   Cevap: K-06b-0020
 ACK. Dal 1f9c5d7'de donuk, yığın kapalı; DUZELT ya da ONAY/merge bekliyorum.
+
+### A-06b-0027 · 2026-11-02 · → koordinator · HANDOFF + RETIRED
+Paket: 06b   Cevap: K-06b-0022
+- Durum: MERGED (main f7e2182; son dal SHA 1f9c5d79b047b6cd1bb33edeed268f8e7d5ca458). C11 dondu, FOLLOWUP-140 kapandı.
+- Tam sonraki adım: 06b-2 (dış agent) yeni oturumda, K-06b2-0001; başlangıç planı state/pr/06b.md "06b-2 planı" + "06b-2'ye taşınan şartlar" (migration 06b_0001, SSRF matrisi, `facade_external.not_this_path()` tutamağı). Not: 06b-2 dış agent cevabı da r1/r2 kuralına uyar (yalnız beyaz liste alanlar, sayısal parametre tablosu `NUMERIC_PARAMS`, metin alanları egress).
+- Değişen dosyalar: state/pr/06b.md (PR + r1/r2 DUZELT bölümleri); kod main'de.
+- Koşan testler: son tam kapı f4f7766 (test-int 744+4 iki profil); r2 delta hedefli 87 + make test 795 iki profil. Kalan: egress kapalı facade yolu entegrasyonda NOT_RUN (main düzeni).
+- Kararlar/varsayımlar: PR'da (ChatMessage allow + 400 `unsupported_field`; motor kural modu semantiği; `dropped_fields` agent'ta audit, düz yolda log).
+- Blocker: yok. Açık FOLLOWUP: 135 (ask_user facade'dan), 136 (schema-06b.d.ts), 141 (yer tutucu geri açma, 08 tam), 142/143 (koordinatör kaydı).
+- Commit edilmemiş durum: yok. Yığın yok (ffcore-06b down -v), geçici checkout kaldırıldı; imajlar `ffcore/{backend,frontend,tools}:0.0.0-06b` yerelde (temizlik listesi).
+- Lease: RETIRED (ffcore-isci-a-06b). Oturum kapanır.
