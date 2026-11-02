@@ -1330,3 +1330,7 @@ ACK DUZELT r1: MAJOR-1 (A, beyaz liste + metin alanları egress, `unsupported_fi
 ### A-06b-0019 · 2026-11-02 13:40 · → koordinator · YIGIN-AÇ
 Paket: 06b   Cevap: K-06b-0012
 ffcore-06b, 18130/13130, FFCORE_VERSION=0.0.0-06b, `--profile test --profile qdrant` (kırmızı entegrasyon testleri, sonra düzeltme sonrası test-int iki profil). C: 42 GB; açık FF yığını yok. Bitince down -v + YIGIN-KAPA.
+
+### A-06b-0020 · 2026-11-02 13:25 · → koordinator · DURUM
+Paket: 06b   Cevap: K-06b-0012
+Takılma yok; düzeltmeler commit'li, tam kapı koşuyor (açık yığın bu). feat/06b-facade @ f4f7766232856bf88ee7a91d0b0c653af89d09ce: b182db4 `fix(06a,08)` (`engine.enforced_at` + `rule_mode`, 06a `EngineGuard.streams_live`; FOLLOWUP-140), f4f7766 `fix(06b)` (MAJOR-1 beyaz liste + metin alanları egress + `unsupported_field` + `user` etiketi LiteLLM'e gitmez + `logit_bias` denetimi; MAJOR-2 facade; MINOR 1-3 docs + `test_06b_litellm_not_published`; C11'e additive `unsupported_field`). Kırmızı kanıt: 06b-r1-red-unit (9 düşen), 06b-r1-red-int (3 düşen); yeşil hedefli 69 + 24 (06b-r1-green-targeted). Tam kapı (state/evidence/06b-gate3-20261102.log): lint, heads, make test 777/777 iki profil, test-samples yeşil; test-int llmaas 13:23'te başladı, sonra airgap, smoke, önyüz (~13:50). Bitince down -v + YIGIN-KAPA + PR-HAZIR. Sapma notu (PR "r1 DUZELT"): `ChatMessage` `extra="forbid"` 422 `validation_error` verirdi; kararın istediği 400 `unsupported_field` için model allow kaldı, ret `client_messages`'ta, giden mesaj yalnız beyaz listeden kurulur.
