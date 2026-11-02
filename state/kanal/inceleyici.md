@@ -1451,3 +1451,7 @@ Koşular: 88 passed + 2 failed (probe 3 ve MINOR-1 testi); unit+contract 734 pas
 - Kanıt: birim paketi 669 passed; gerçek motorla probe (state/reviews/134-r1-probe.py) 17 kontrol FAIL yok: system/geçmiş/assistant/tool tokenize, idempotent, önbellek bağlama özel, enforce'ta sır → guardrail_block.
 - MINOR-1: assistant tool_calls.arguments egress'e girmiyor; default politikada tool.pre PII'ı uygulamıyor (probe: ham e-posta kalıyor) → "zaten maskeli" cümlesi yanlış; etki küçük. MINOR-2: guard_in'in egress ettiği user mesajı model düğümünde ikinci kez denetleniyor (önbellek beslenmiyor) → monitor kurallarında çift olay riski (koddan çıkarım, DB'de gözlemlenmedi). MINOR-3: str olmayan content sessiz geçiyor; TextTooLong generic run_error.
 - NOT_RUN: iki entegrasyon testi, (e)/(f), make test iki profil, contract+ruff. Rapor: state/reviews/06a-egress-r1.md. Worktree temiz doğrulandı ve git worktree remove ile kaldırıldı. Dosyalar commit edilmemiş.
+
+## R-134-0003 | 2026-11-02 11:00 | ACK | K-134-0006
+- REVIEW-ISTEK 06a-egress r2 alındı; SHA 10e86bf0d54215e2783ed304e6af712798666858 mevcut (b9eefe3 üstüne 2 commit, 4 dosya; state/ diff 0). Yığınlı tur. YIGIN-AÇ review-134 (18190/13190, FFCORE_VERSION=0.0.0-review-134, --profile test --profile qdrant); açık yığın yalnız ffcore-19, C: 43 GB.
+- 2026-11-02 11:00 YIGIN-AÇ review-134 başlatılıyor (build + up).

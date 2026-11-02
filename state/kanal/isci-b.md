@@ -1366,3 +1366,21 @@ ACK: tam yığın beklemede (C: ≥ 25 GB sonrası onay). PR'a "Kapsam daralmas�
 ### B-19-0012 · 2026-11-02 10:40 · → koordinator · ACK
 Paket: 19   Cevap: K-M3S-0012 / K-DEVRALMA-20261102
 ACK: lease devri ve tam yığın onayı alındı. YIGIN-AÇ ffcore-19 tam yığın (`--profile test --profile qdrant`, 0.0.0-main + worktree `backend/ffcore` salt okunur, imaj derlemesi yok); sıra: (1) `make test-int` llmaas, (2) airgap `make test` (8e40448'de 788/788 ve lint 0 dünden; yeniden koşulup tee'lenecek), (3) kabul 1 kuru koşu `internal: true` ağda. `docker stats` > 11 GB olursa duracağım. Sonra `down -v` + YIGIN-KAPA + PR-HAZIR.
+
+### B-19-0013 · 2026-11-02 11:20 · → koordinator · KAYIT-TALEBI
+Paket: 19   Cevap: -
+(1) **FOLLOWUP (04a, M3'ü etkileyebilir):** Kapı 2 `_CODE_LINE` (`backend/ffcore/knowledge/gates.py:66`) `#` ile başlayan satırı kod sayıyor; Markdown başlıkları da buna uyuyor. Docling dönüşümü satırları paragraflara birleştirince kısa, başlıklı sayfa `code_heavy` ile eleniyor (kuru koşuda sentetik 1001/1002: 3 başlık / 5 satır = 0,6 > 0,5). PayCore OCR space'inde kısa başlıklı sayfalar elenebilir; aşama 0 raporunda `gates: gate2:code_heavy` sayısı görünür. Öneri: `#{1,6} ` + metin başlık satırları kod sayılmasın (yalnız `#` + boşluksuz/kabuk yorumu kod), test 1001/1002 biçimiyle. 19'da kurala dokunulmadı.
+(2) **ENV (paycoreLLM test venv):** `bs4` yok; `test_data_dump::test_an_html_email…`, `test_mhtml::test_only_the_html_part…`, `test_reconvert::test_msg_html_body…` düşüyor; baz `master 8594bb0`'da da aynı (state/evidence/19-paycore-baseline-bs4-20261102.log). 19 ile ilgisiz.
+
+### B-19-0014 · 2026-11-02 11:21 · → koordinator · DURUM
+Paket: 19   Cevap: K-M3S-0012
+YIGIN-KAPA ffcore-19: `down -v` 0, konteyner 0, volume 0 (dış `04a-knowledge-core_model_cache` yalnız `:ro` okundu, dokunulmadı); geçici `paycore-m3-src` volume'u silindi; `paycore-m3-test_paycore_test_{venv,uv_cache}` önbellek volume'ları duruyor (inceleyici yeniden kullanabilir; temizlik listesine).
+DURUM: **VERIFIED** (kabul 3 bellek bütçesi PENDING_ENV, K-M3S-0010 A). Kanıt state/pr/19.md "Çalıştırılan komutlar" + "Kabul 1 kuru koşusu": test-int llmaas 690 + 5 NOT_RUN, airgap make test 791, lint 0, kuru koşu iç ağda uçtan uca (egress yok, uid 10001 + /raw:ro, idempotent, PRSIM reddi, fake-llm kaynaklı cevap 1002), paycoreLLM 64 + 1 NOT_RUN.
+
+### B-19-0015 · 2026-11-02 11:22 · → koordinator · PR-HAZIR
+Paket: 19 (M3 sunucu paketi)   Cevap: K-M3S-0001 / K-M3S-0012
+**ffcore** `feat/m3-server-package` · SHA **987dd62721c346fd376a8861944ecd1ab6de2422** · baz main 3f20541 (rebase; main sonrası yalnız state/ ilerledi) · 12 commit, 37 dosya +2395/−25, branch farkında state/ yok, ağaç temiz.
+**paycoreLLM** `feat/m3-server-package` (worktree C:\ai_paycore\paycoreLLM-m3) · SHA **3adbb3a98d671137b77a70680ac18126ab43d754** · baz master 8594bb0 · 3 commit, 13 dosya, ağaç temiz; ana kopyadaki kullanıcı dosyalarıyla kesişme yok.
+Sınıf [B] + onaylı [C] (ayrı Qdrant, imaj listesi) + D kararının uygulanması (PRSIM bayrağı). PR: C:\ai_paycore\ffcore\state\pr\19.md (kabul → test tablosu, komutlar/exit, kuru koşu, NOT_RUN'lar, 10 varsayım/sapma, kapsam daralması, riskler).
+Güvenlik turu önerisi (zorunlu): veri sınırı (PRSIM bayrağı, `customer_data_suspected`, kişi alanı taşımama, maskenin silver öncesi uygulanması ve kapatılamaması), yol sınırı (symlink/`..`/`:ro`/non-root), egress (preflight + compose sabitleri, `internal` kuru koşu), secret (seed/preflight değer basmaz, `.env.test` dummy), S1 depo dışı (`resolve_out`, `m3_gate_check`, s1_dataset `.git` reddi).
+Bekliyorum.
