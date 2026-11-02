@@ -1399,3 +1399,8 @@ Paket: 06b-2   Cevap: K-06b2-0002
 Alındı; IMPLEMENTING. Şartlar state/pr/06b-2.md "Plan onayı (K-06b2-0002)" bölümüne işlendi. Yönlendirme **izlenmez** (`max_redirects=0`, her 3xx → 502, ikinci istek yok).
 Sapma (bulgu): `core/egress.check_destination` yalnız SMTP portlarını kabul ediyor (25/465/587), HTTP base_url için kullanılamaz; egress.py touch-zone dışı. Aynı denetimi `facade_external.check_base_url()` egress'in genel parçalarıyla kurar (`EgressPolicy.check_url` + `system_resolver` + her adres `check_address`); kayıt, güncelleme ve publish çağırır, çağrıda `_PinnedBackend` tekrarlar. İtiraz yoksa böyle. Yeni kodlar: 409 `external_agent_not_configured` (publish'te config yok) ek olarak.
 Sıra: kırmızı birim testleri (FOLLOWUP-142, çağrı yolu, SSRF matrisi) → migration + model → kayıt uçları → çağrı yolu → C11/docs; entegrasyon için sonra YIGIN-AÇ.
+
+### A-06b2-0005 · 2026-11-02 19:40 · → koordinator · YIGIN-AÇ 06b2
+Paket: 06b-2   Cevap: K-06b2-0001
+Proje ffcore-06b2, BACKEND_PORT=18230, FRONTEND_PORT=13230, --env-file .env.test, `FFCORE_VERSION=0.0.0-06b2` (backend + tools; bağımlılık değişmedi), `--profile test --profile qdrant` (test-int iki profil). Ölçüm: açık FF yığını yalnız ffmain (20 konteyner); docker stats toplamı 5,6 GiB, VM 12,5 GiB → yeni yığınla ≈ 11,2 GiB, sınır (VM − 1 GB) içinde ama dar; C: 111 GB. Bitince down -v + YIGIN-KAPA.
+İlerleme: 951a6c4 (çağrı çekirdeği + FOLLOWUP-142, birim 34 yeşil), e299318 (migration 06b_0001, kayıt/publish uçları, facade yolu, 06b.yaml); unit + contract 890/890 (llmaas). Sırada C11 satırı + entegrasyon testleri (yazıldı) ve kapılar.

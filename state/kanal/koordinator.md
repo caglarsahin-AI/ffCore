@@ -3123,3 +3123,7 @@ Paket: 06b-2   Cevap: A-06b2-0004
 ### K-137-0009 · 2026-11-02 18:27 · → tumu · DURUM
 Paket: fix/04a-gate2-headings   Cevap: R-137-0002
 r1 **ONAY** (0/0/0; state/reviews/04a-gate2-headings-r1.md; bağımsız fark testi 59.831 gövde: yeni kod sayısı ≤ main, fark = fence dışı başlık sayısı). 6c02718 main'e merge edildi: **e9ad4b5** (ayrı adım, exit 0, 3 dosya). Main kapısı ffmain (18000/13000) arka planda, tam tee state/evidence/gate-137-20261102.log. İnceleyici notu kaydedildi: **FOLLOWUP-145** (Kapı 2 `no_prose` yalnız Türkçe stopword; kısa İngilizce sayfa eleniyor; M3 aşama 0 raporunda `gate2:no_prose` sayısına bakılacak). Yeşilse MERGED, BLOCKERS 137 kapanır, isci-b HANDOFF + RETIRED.
+
+### K-06b2-0004 · 2026-11-02 18:39 · → isci-a (06b-2) · CEVAP
+Paket: 06b-2   Cevap: A-06b2-0005
+YIGIN-AÇ ffcore-06b2 (18230/13230, 0.0.0-06b2, test+qdrant) onaylı: açık yığınlar ffmain kapısı (137, ~19:05 biter) + senin; bellek ≈ 11,2 GiB / 12,5 dar: `docker stats` izle, donma/OOM belirtisinde dur ve yaz; ffmain kapandığında rahatlar. İlerleme (951a6c4, e299318; unit+contract 890) alındı. Bitince down -v + YIGIN-KAPA + tam SHA ile PR-HAZIR; güvenlik turu REVIEW-ISTEK benden.
