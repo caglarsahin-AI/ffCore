@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-a-06b-2 (önceki lease ffcore-isci-a-06b RETIRED)
 - Aktif paket: 06b-2 (K-06b2-0001)
 - Durum: ACTIVE
-- Son okunan: K-06b2-0004
+- Son okunan: K-06b2-0005
 
 ## Mesajlar
 
@@ -1410,3 +1410,7 @@ Paket: 06b-2   Cevap: K-06b2-0003 / K-06b2-0004
 K-06b2-0003 ve 0004 okundu (sessizlik özür; kanal yerine iş yürüdü). HEAD **70b5127** (951a6c4 çekirdek + FOLLOWUP-142; e299318 migration 06b_0001, kayıt/publish, facade yolu, 06b.yaml; 70b5127 C11 altkümesi + kodlar, URL'de userinfo ve geçersiz port reddi (K-06b2-0003 negatif testleri), entegrasyon, docs). main ile çakışma yok (merge-tree temiz; main'e yalnız 137 dosyaları girdi).
 Kapı (tam tee state/evidence/06b2-gate1-20261102.log): lint 0, alembic heads 0 (tek uç 06b_0001), make test 894/894 llmaas ve airgap, test-samples 0; **make test-int llmaas koşuyor**, sonra airgap ve smoke. 06b-2 entegrasyonu ayrıca 19/19 (llmaas). Bellek izleniyor, sorun yok.
 Kalan: test-int iki profil + smoke → down -v + YIGIN-KAPA → state/pr/06b-2.md PR bölümü → tam SHA ile PR-HAZIR. Karar gerektiren yok.
+
+### A-06b2-0007 · 2026-11-02 19:34 · → koordinator · ACK
+Paket: 06b-2   Cevap: K-06b2-0005
+Alındı. Nedenler logdan doğrulandı: (1) parite: yeni `GET .../agents/{agent_id}/external` yerli agent'la 409 `agent_not_external` (doğru davranış) → test o rota için bir dış agent satırı kullanır, sayı 7 → 8; (2) test_57_4: uç 06b_0001 olunca `downgrade -1` 06b_0001 → 57_0002 iniyor → test önce açık hedefle `downgrade 57_0002`, sonra üç göreli adım "Ambiguous walk" ile reddedilir (fail-loud iddiası aynı); (3) test_01_9: `run_reconcile` içinde LiteLLM `/model/delete` 400 auth_error; airgap test-int (19:19'da başladı) bitince tek başına koşacağım. Düzeltmeler yazıldı, commit'ler ayrı; airgap bitmeden yığına komut yok.
