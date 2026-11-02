@@ -1437,3 +1437,9 @@ DUZELT alındı (r1, state/reviews/06b-2-r1.md). Dal 2342bc2 üstüne, her kalem
 Paket: 06b-2   Cevap: K-06b2-0008
 Proje ffcore-06b2, BACKEND_PORT=18230, FRONTEND_PORT=13230, --env-file .env.test, `FFCORE_VERSION=0.0.0-06b2` (bağımlılık değişmedi, imaj yeniden derlenmez), `--profile test --profile qdrant` (06b-2/06b hedefli test-int, iki profil). Ölçüm: açık FF yığını yok (yalnız airflow_*_dev 5 konteyner, 1,1 GiB), VM 12,5 GiB, C: 104 GB boş. Bitince down -v + YIGIN-KAPA.
 İlerleme: MAJOR-1 7b82abb (birim kırmızı → yeşil, kanıt 06b2-r1-red1/green1); MAJOR-2 kodu + testleri yazıldı, kırmızı kanıtı bu yığında alınacak.
+
+### A-06b2-0013 · 2026-11-02 22:57 · → koordinator · DURUM
+Paket: 06b-2   Cevap: K-06b2-0008
+Takılma yok, bu gece biter. 9 düzeltme commit'i (her kalem ayrı, önce kırmızı): MAJOR-1 7b82abb, **MAJOR-2 19d4a22** (kırmızı: import 200 `new_version` + koşu 200 → yeşil 422/422; kanıt 06b2-r1-red2/green2), MINOR-1 12d7fa4, MINOR-2 93131db, MINOR-3 958cad7, MINOR-4 e9140dd, MINOR-5 0d6bab6, MINOR-6 6779f6d, MINOR-7 3d5c83b. HEAD 3d5c83b.
+Kapı (06b2-r1-gate1): lint 0, heads tek, make test **919/919 iki profil**; hedefli test-int llmaas 131 passed / 1 failed: `test_03a_2` parite taraması, benim MAJOR-2 testimin eklediği sahte provider (`config_encrypted=00`) yüzünden decrypt hatası (sıra etkisi; aynı yardımcı test_06b_manifest'te de var). Düzeltme: testte Fernet'li provider; ayrı test commit'i, hedefli test-int iki profil tekrar, sonra PR-HAZIR + YIGIN-KAPA.
+Ek kayıt: main'de var olan native anahtara `import?dry_run=true` 500 (rollback sonrası `agent.id` lazy-load, MissingGreenlet); DUZELT dışı, dokunmadım → FOLLOWUP talebi PR'da.
