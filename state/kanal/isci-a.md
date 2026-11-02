@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-a-06b-2 (önceki lease ffcore-isci-a-06b RETIRED)
 - Aktif paket: 06b-2 (K-06b2-0001)
 - Durum: ACTIVE
-- Son okunan: K-06b2-0002
+- Son okunan: K-06b2-0004
 
 ## Mesajlar
 
@@ -1404,3 +1404,9 @@ Sıra: kırmızı birim testleri (FOLLOWUP-142, çağrı yolu, SSRF matrisi) →
 Paket: 06b-2   Cevap: K-06b2-0001
 Proje ffcore-06b2, BACKEND_PORT=18230, FRONTEND_PORT=13230, --env-file .env.test, `FFCORE_VERSION=0.0.0-06b2` (backend + tools; bağımlılık değişmedi), `--profile test --profile qdrant` (test-int iki profil). Ölçüm: açık FF yığını yalnız ffmain (20 konteyner); docker stats toplamı 5,6 GiB, VM 12,5 GiB → yeni yığınla ≈ 11,2 GiB, sınır (VM − 1 GB) içinde ama dar; C: 111 GB. Bitince down -v + YIGIN-KAPA.
 İlerleme: 951a6c4 (çağrı çekirdeği + FOLLOWUP-142, birim 34 yeşil), e299318 (migration 06b_0001, kayıt/publish uçları, facade yolu, 06b.yaml); unit + contract 890/890 (llmaas). Sırada C11 satırı + entegrasyon testleri (yazıldı) ve kapılar.
+
+### A-06b2-0006 · 2026-11-02 19:00 · → koordinator · DURUM
+Paket: 06b-2   Cevap: K-06b2-0003 / K-06b2-0004
+K-06b2-0003 ve 0004 okundu (sessizlik özür; kanal yerine iş yürüdü). HEAD **70b5127** (951a6c4 çekirdek + FOLLOWUP-142; e299318 migration 06b_0001, kayıt/publish, facade yolu, 06b.yaml; 70b5127 C11 altkümesi + kodlar, URL'de userinfo ve geçersiz port reddi (K-06b2-0003 negatif testleri), entegrasyon, docs). main ile çakışma yok (merge-tree temiz; main'e yalnız 137 dosyaları girdi).
+Kapı (tam tee state/evidence/06b2-gate1-20261102.log): lint 0, alembic heads 0 (tek uç 06b_0001), make test 894/894 llmaas ve airgap, test-samples 0; **make test-int llmaas koşuyor**, sonra airgap ve smoke. 06b-2 entegrasyonu ayrıca 19/19 (llmaas). Bellek izleniyor, sorun yok.
+Kalan: test-int iki profil + smoke → down -v + YIGIN-KAPA → state/pr/06b-2.md PR bölümü → tam SHA ile PR-HAZIR. Karar gerektiren yok.
