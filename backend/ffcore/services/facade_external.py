@@ -17,15 +17,26 @@ the facade (plan/06 "Connect Agent", minimum; K-06b-0002 S5, K-06b2-0002).
   Langfuse (it does not go through LiteLLM).
 """
 
+import asyncio
 import json
+import logging
 import time
+import uuid
+from collections.abc import AsyncIterator
 from dataclasses import dataclass, field
 from typing import Any
 
 import anyio
 import httpx2
+from fastapi import Request
+from fastapi.responses import JSONResponse, StreamingResponse
 from pydantic import BaseModel, ConfigDict, SecretStr
+from sqlalchemy import select
 
+from ffcore.api.facade_schemas import AGENT_EVENTS_HEADER, KEEPALIVE, NUMERIC_PARAMS, STREAM_END
+from ffcore.core import db
+from ffcore.core.audit import AuditEntry, request_context, write_event_detached
+from ffcore.core.auth import RoleRequirement, authorize
 from ffcore.core.config import Settings
 from ffcore.core.egress import (
     EgressDenied,
@@ -40,6 +51,13 @@ from ffcore.core.egress import (
 )
 from ffcore.core.errors import ApiError
 from ffcore.core.secrets import decrypt_json, encrypt_json
+from ffcore.models.agents import Agent
+from ffcore.services.facade_guard import FacadeGuard, client_messages, message_text
+from ffcore.services.facade_identity import FacadeCaller
+from ffcore.services.facade_proxy import KEEPALIVE_S, _chunk, chunk_json, error_event
+from ffcore.services.quota import redis_client
+
+log = logging.getLogger("ffcore.facade")
 
 MAX_EXTERNAL_RESPONSE_BYTES = 65_536
 # The answer's finish reasons passed on as given; any other is reported as `stop`.
@@ -255,3 +273,210 @@ async def call_upstream(
         duration_ms=audit["duration_ms"],
         ignored_fields=ignored,
     )
+
+
+# --- the facade path (agent:<project>/<external agent>) ---
+
+# What an external agent request may carry besides messages: the numeric parameters and `stop`
+# (text, through egress). Tool definitions and response formats mean nothing to a remote agent
+# whose tool calls are never executed here; they are refused, not dropped.
+EXTERNAL_PARAMS = (frozenset(NUMERIC_PARAMS) - {"n"}) | {"stop"}
+
+
+def _invalid(code: str, message: str) -> ApiError:
+    return ApiError(400, "invalid_request_error", code, message)
+
+
+def events_on(request: Request) -> bool:
+    value = (request.headers.get(AGENT_EVENTS_HEADER) or "all").strip().lower()
+    if value not in ("all", "none"):
+        raise _invalid("agent_events_invalid", f"{AGENT_EVENTS_HEADER} is 'all' or 'none'.")
+    return value == "all"
+
+
+async def find(caller: FacadeCaller, target) -> Agent | None:
+    """The caller's external agent of this name, or None (the native path goes on)."""
+    async with db.session_scope() as session:
+        return await session.scalar(
+            select(Agent).where(
+                Agent.project_id == uuid.UUID(caller.project_id),
+                Agent.key == target.key,
+                Agent.kind == "external",
+                Agent.deleted_at.is_(None),
+            )
+        )
+
+
+def _outgoing(body, params: dict[str, Any]) -> list[dict]:
+    """The client's messages; anything an external agent cannot take is refused."""
+    refused = sorted(set(params) - EXTERNAL_PARAMS)
+    if refused:
+        raise _invalid("unsupported_field", f"Not supported for an external agent: {refused}")
+    messages, dropped = client_messages(body)
+    if dropped:
+        log.info("facade_dropped_fields fields=%s", dropped)
+    for m in messages:
+        if m["role"] not in ("user", "assistant"):
+            raise _invalid(
+                "role_not_supported",
+                f"An agent takes user and assistant messages only, not '{m['role']}'.",
+            )
+        if m.get("tool_calls") or m.get("name") or m.get("tool_call_id"):
+            raise _invalid(
+                "unsupported_field", "An external agent takes message role and content only."
+            )
+    if messages[-1]["role"] != "user":
+        raise _invalid("last_message_not_user", "The last message must be the user's question.")
+    return messages
+
+
+async def _audit(request: Request, caller: FacadeCaller, agent: Agent, outcome: str, after):
+    request_id, ip = request_context(request)
+    await write_event_detached(
+        AuditEntry(
+            action="external_agent_call",
+            resource_type="agent",
+            outcome=outcome,
+            actor_type=caller.actor.actor_type,
+            actor_id=caller.actor.actor_id,
+            project_id=caller.project_id,
+            resource_id=str(agent.id),
+            after=after,
+            request_id=request_id,
+            ip=ip,
+            via_key_id=getattr(caller.actor, "via_key_id", None),
+        )
+    )
+
+
+async def complete(
+    request: Request, caller: FacadeCaller, target, agent: Agent, body, params, settings: Settings
+):
+    """One request to a published external agent. Not a run (K-06b2-0002 S1): guardrail events
+    (source api) and one audit event per call are its record."""
+    if agent.status != "published":
+        raise ApiError(404, "not_found_error", "agent_not_published", "The agent is not published.")
+    if agent.external_config is None:
+        raise not_this_path()
+    if caller.user_id is not None:
+        # The user a key acts for must be a member (as on the native agent path).
+        await authorize(
+            request,
+            caller.actor,
+            caller.project_id,
+            RoleRequirement("user", write=False, scope="project"),
+        )
+    stream_events = events_on(request)
+    messages = _outgoing(body, params)
+    config = ExternalConfig.decrypt(agent.external_config, settings)
+    redis = redis_client(settings)
+    try:
+        async with db.session_scope() as session:
+            # No definition, so no policy key of its own: the project's default policy.
+            guard = await FacadeGuard.load(session, redis, caller.project_id)
+            outgoing = []
+            for m in messages:
+                text = message_text(m)
+                if m["role"] == "user":
+                    text = await guard.text("input.pre", text)
+                outgoing.append({"role": m["role"], "content": await guard.text("egress", text)})
+            if params.get("stop") is not None:
+                params["stop"] = await guard.json_text("egress", params["stop"])
+    finally:
+        await redis.aclose()
+    work = _Work(request, caller, agent, config, outgoing, params, settings, guard.scope)
+    if body.stream:
+        return StreamingResponse(
+            _stream(work, target.name, stream_events),
+            media_type="text/event-stream",
+            headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+        )
+    content, finish = await work.run()
+    message = {"role": "assistant", "content": content}
+    return JSONResponse(
+        {
+            "id": work.cid,
+            "object": "chat.completion",
+            "created": work.created,
+            "model": target.name,
+            "choices": [{"index": 0, "message": message, "finish_reason": finish}],
+        }
+    )
+
+
+@dataclass
+class _Work:
+    request: Request
+    caller: FacadeCaller
+    agent: Agent
+    config: ExternalConfig
+    messages: list[dict]
+    params: dict[str, Any]
+    settings: Settings
+    scope: str
+    cid: str = field(default_factory=lambda: f"chatcmpl-{uuid.uuid4().hex}")
+    created: int = field(default_factory=lambda: int(time.time()))
+
+    async def run(self) -> tuple[str, str]:
+        """The call, its audit event, then `output.pre` on the answer's text."""
+        try:
+            answer = await call_upstream(self.config, self.messages, self.params, self.settings)
+        except ExternalCallFailed as exc:
+            await _audit(self.request, self.caller, self.agent, "error", exc.audit)
+            log.warning(
+                "facade_external_call agent=%s code=%s reason=%s",
+                self.agent.id,
+                exc.code,
+                exc.audit.get("error_code"),
+            )
+            raise
+        await _audit(self.request, self.caller, self.agent, "success", answer.audit())
+        if answer.ignored_fields:
+            log.info(
+                "facade_external_ignored agent=%s fields=%s", self.agent.id, answer.ignored_fields
+            )
+        redis = redis_client(self.settings)
+        try:
+            async with db.session_scope() as session:
+                guard = await FacadeGuard.load(
+                    session, redis, self.caller.project_id, scope=self.scope
+                )
+                content = await guard.text("output.pre", answer.content)
+        finally:
+            await redis.aclose()
+        return content, answer.finish_reason
+
+
+async def _stream(work: _Work, public_name: str, stream_events: bool) -> AsyncIterator[str]:
+    """The answer comes whole (upstream `stream: false`): keepalive while waiting, then the
+    output-checked text as one chunk (S4, S6)."""
+    try:
+        if stream_events:
+            yield chunk_json(
+                _chunk(
+                    work.cid,
+                    work.created,
+                    public_name,
+                    {},
+                    x_platform={"event": "progress", "kind": "output_buffered"},
+                )
+            )
+        task = asyncio.ensure_future(work.run())
+        try:
+            while True:
+                done, _ = await asyncio.wait({task}, timeout=KEEPALIVE_S)
+                if done:
+                    break
+                yield KEEPALIVE
+        finally:
+            if not task.done():
+                task.cancel()
+        content, finish = task.result()
+        delta = {"role": "assistant", "content": content}
+        yield chunk_json(_chunk(work.cid, work.created, public_name, delta))
+        yield chunk_json(_chunk(work.cid, work.created, public_name, {}, finish))
+        yield STREAM_END
+    except ApiError as exc:
+        log.warning("facade_stream_error code=%s model=%s", exc.code, public_name)
+        yield error_event(exc)
+        yield STREAM_END

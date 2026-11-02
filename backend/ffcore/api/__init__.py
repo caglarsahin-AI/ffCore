@@ -53,3 +53,4 @@ for _module in (
     api_router.include_router(_module.router)
 # 06b: the agent manifest routes (their own OpenAPI tag).
 api_router.include_router(agents.manifest_router)
+api_router.include_router(agents.external_router)
