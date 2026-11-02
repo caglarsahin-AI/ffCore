@@ -1,0 +1,30 @@
+1001.md test-markdown-as-is new ('ok', None) code_new 0 old_code 4 lines 17
+1002.md test-markdown-as-is new ('ok', None) code_new 0 old_code 3 lines 13
+1003-kontrol-listesi.txt plaintext new ('skipped', 'code_heavy') code_new 6 old_code 0 lines 6
+----
+```
+Gün sonu kontrol listesi
+
+Banka dosyasının geldiği ve boyutunun sıfırdan büyük olduğu doğrulanır. İşlem kayıtlarının toplam
+tutarı banka dosyasıyla karşılaştırılır. Farkı olan her kayıt için ters ibraz durumu kontrol edilir
+ve sonuç mutabakat notuna yazılır. Kontrol eden kişi listenin sonunu imzalar.
+```
+1003.md test-markdown-as-is new ('ok', None) code_new 0 old_code 1 lines 5
+1004.md test-markdown-as-is new ('skipped', 'boilerplate') code_new 0 old_code 1 lines 6
+DEMO-7.txt plaintext new ('skipped', 'code_heavy') code_new 7 old_code 0 lines 7
+----
+```
+DEMO-7 Gün sonu raporunda kur farkı satırı eksik
+
+Bu kayıt, gün sonu raporunun döviz işlemlerinde kur farkı satırını göstermediği için açıldı. Sorun
+bir müşteri bildirimi ile fark edildi ve aynı gün içinde incelendi. Rapor şablonuna kur farkı alanı
+eklendi, bu değişiklik test ortamında doğrulandı ve sürüm notuna da yazıldı. Çözüm olarak rapor
+şablonu güncellendi; eski raporlar yeniden üretilmez, çünkü o günlerin mutabakatı zaten kapandı.
+```
+PRSIM-1.txt plaintext new ('skipped', 'code_heavy') code_new 4 old_code 0 lines 4
+----
+```
+PRSIM-1 Sentetik kayıt örneği
+
+Bu kayıt yalnızca reddi göstermek için vardır: PRSIM kaynakları 08 tam gelene kadar içeri alınmaz.
+```

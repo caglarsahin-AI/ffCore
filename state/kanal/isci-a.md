@@ -2,10 +2,10 @@
 
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
-- Oturum kimliği: ffcore-isci-a-06b (önceki lease ffcore-isci-a-116 RETIRED)
-- Aktif paket: yok (06b MERGED f7e2182)
-- Durum: RETIRED
-- Son okunan: K-06b-0022
+- Oturum kimliği: ffcore-isci-a-06b-2 (önceki lease ffcore-isci-a-06b RETIRED)
+- Aktif paket: 06b-2 (K-06b2-0001)
+- Durum: ACTIVE
+- Son okunan: K-137-0008
 
 ## Mesajlar
 
@@ -1374,3 +1374,22 @@ Paket: 06b   Cevap: K-06b-0022
 - Blocker: yok. Açık FOLLOWUP: 135 (ask_user facade'dan), 136 (schema-06b.d.ts), 141 (yer tutucu geri açma, 08 tam), 142/143 (koordinatör kaydı).
 - Commit edilmemiş durum: yok. Yığın yok (ffcore-06b down -v), geçici checkout kaldırıldı; imajlar `ffcore/{backend,frontend,tools}:0.0.0-06b` yerelde (temizlik listesi).
 - Lease: RETIRED (ffcore-isci-a-06b). Oturum kapanır.
+
+### A-06b2-0001 · 2026-11-02 18:09 · → koordinator · ACK
+Paket: 06b-2   Cevap: K-06b2-0001
+GOREV alındı; lease ACTIVE (ffcore-isci-a-06b-2). Okundu: K-06b2-0001 şartları 1-7, state/pr/06b.md "06b-2'ye taşınan şartlar" + "06b-2 planı", KARARLAR "06b S5 dış agent" ve "C11 dondu", CONTRACTS C11, plan/06 satır 6/109, A-06b-0027 HANDOFF; 28 Ekim'den bu yana değişen kural belgeleri (PLAN 2.6-2.9, KARARLAR eklemeleri, CONTRACTS, TERMINOLOGY) tarandı.
+Sıra: worktree .worktrees/feat/06b-2-external-agent (main 7733bbc'den, ben açıyorum) → kod keşfi → state/pr/06b-2.md planı (felsefe üçlüsü) → DURUM: PLANNED. Onaysız kod yok. Yığın gerektiğinde ayrıca YIGIN-AÇ yazarım (18230/13230).
+
+### A-06b2-0002 · 2026-11-02 18:40 · → koordinator · DURUM
+Paket: 06b-2   Cevap: K-06b2-0001
+DURUM: PLANNED talebi. Plan: state/pr/06b-2.md (semboller worktree 7733bbc'de okundu, 19 kabul → test, felsefe üçlüsü, durma koşulları). Onaysız kod yok.
+Keşifte çıkan iki engel planı şekillendirdi: (1) `runs.agent_version_id` NOT NULL, dış agent'ın C8 sürümü yok (`definition.model` proje model anahtarı ister); (2) `agents` CHECK `published_has_version` dış agent'ı yayınlatmaz. Ayrıca `SafeOutboundClient.request()` gövdeyi sınırsız okur → boyut sınırı `stream()` + parça sayımıyla (egress'e dokunmadan).
+Çağrı yolu özeti: upstream `stream:false`, yalnız kayıtlı `Authorization`, zaman aşımı `llm_call_timeout_s` (profil seed), 64 KiB sınır, yalnız `content` → output.pre; hatalar 502 `external_agent_failed` / `external_agent_response_too_large`, 504 `external_agent_timeout`; olay altkümesi `("progress",)`.
+Üç karar A-06b2-0003'te; 7 varsayım planda. FOLLOWUP-142 (NaN/inf) `_number()`'a tek satır.
+
+### A-06b2-0003 · 2026-11-02 18:40 · → koordinator · KARAR-GEREK
+Paket: 06b-2   Cevap: K-06b2-0001
+Ayrıntı ve bedeller state/pr/06b-2.md "Koordinatör kararı isteyen seçimler".
+S1 dış agent çağrısı koşu mu? **A (önerilen):** koşu yok, düz model yolu gibi (guardrail olayları source=api + `facade_external_call` log; kodlu HTTP hatası); runs/C8/C9'a dokunmaz; KARARLAR "kesilirse run failed" → "kodlu hata" DRIFT. B: `runs.agent_version_id` nullable + facade koşu yazar (06a tablosu, touch-zone genişler, +1 gün). C: sahte C8 sürümü (ARCH-13; önermiyorum).
+S2 kota: **A (önerilen):** dış agent token/USD kotasına girmez, docs + C11 notunda açık, FOLLOWUP (istek/eşzamanlılık penceresi). B: QuotaGate'e modelsiz kip (03c dosyası, touch-zone dışı).
+S3 yaşam döngüsü: **A (önerilen):** CHECK dış agent'ı muaf; taslak oluşur, mevcut publish ucu sürüm aramadan yayınlar, sürüm uçları 409. B: kayıtta doğrudan published (deneme adımı yok).

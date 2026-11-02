@@ -1528,3 +1528,7 @@ Koşular: 88 passed + 2 failed (probe 3 ve MINOR-1 testi); unit+contract 734 pas
 - MINOR-1: `NaN` JSON sabiti aralık denetimini geçiyor (karşılaştırmalar False) ve yakalanmamış ValueError'a (gerçek sunucuda 500) yol açıyor; metin sızıntısı yok. Öneri: `math.isfinite` + birim test. Merge'ü engellemez.
 - Not: test_03a_2_read_mode_get_parity, 06b entegrasyon dosyalarından sonra koşunca SecretDecryptError (başka FERNET anahtarıyla şifrelenmiş sağlayıcılar, arka plan uzlaştırması) ile düşüyor; tek başına ve alfabetik sırada geçiyor; delta kaynaklı değil, test-izolasyon FOLLOWUP önerisi. Agent yolunda katı parametre tablosu uyumluluk etkisi docs'ta yazılı.
 - Koşular: unit+contract 795 iki profil; hedefli entegrasyon 82 passed + 1 (sıra etkisi); probe 73/75 (2 NaN). Tam entegrasyon bu turda yok (main kapısında). Rapor: state/reviews/06b-r3.md; probe 06b-r3-probe.py. .worktrees/review-06b-r3 ve -r1 dizinleri "Permission denied" ile silinemedi (temiz, --force yok). Dosyalar commit edilmemiş.
+
+## R-137-0001 | 2026-11-02 18:07 | ACK | K-137-0007
+- REVIEW-ISTEK fix/04a-gate2-headings alindi. SHA 6c0271846e26d7d2241827348c0b2fe697e73e7f (baz d365811, 3 commit, 3 dosya, state/ diff 0) mevcut. Statik + kisa yigin review-137 (18240/13240, postgres+redis). C: 112 GB, acik FF yigini yok.
+- 2026-11-02 18:08 YIGIN-AC review-137 (18240/13240, FFCORE_VERSION=0.0.0-review-137 = 0.0.0-main etiketi, kod worktree salt-okunur; yalniz postgres+redis); acik FF yigini yok, C: 112 GB.

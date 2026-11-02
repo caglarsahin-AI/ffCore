@@ -1,0 +1,133 @@
+HEAD d358bae2624a2ad9b6c352941b8d222c4465d4d5; stack fix137 postgres+redis
+=== DEPLOY_PROFILE=llmaas pytest test_19_ingest_raw test_04a_*
+F....s............................s..........sssss.....s.s.s.s.......... [ 80%]
+..................                                                       [100%]
+=================================== FAILURES ===================================
+_________________ test_19_1_ingest_raw_paycore_like_idempotent _________________
+
+world = {'project': '7e876f3e-9018-4206-81c5-44a3a37c79cb', 'other': '4f4abf33-5ceb-474c-a482-78a72f396359', 'admin': <starlet...nt.TestClient object at 0x7f54e936a2d0>, 'admin_read': <starlette.testclient.TestClient object at 0x7f54e67d50a0>, ...}
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_bdaa65ea778d) at 0x7f54e9344e00>
+settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+ro_tree = PosixPath('/tmp/pytest-of-root/pytest-0/test_19_1_ingest_raw_paycore_l0/raw')
+
+    def test_19_1_ingest_raw_paycore_like_idempotent(world, pg, settings, ro_tree):
+        kb = create_kb(world, key="paycore-like")
+        key = _project_key(pg, world["project"])
+        before = _snapshot(ro_tree)
+    
+        first = _ingest(settings, key, kb["key"], ro_tree)
+        assert first.outcomes == {"created": 5}, first.lines()
+        assert first.rejected == {"prsim_requires_ner": 1}
+>       assert first.statuses == {"indexed": 4, "skipped": 1}, first.lines()
+E       AssertionError: ['created 5', 'new_version 0', 'unchanged 0', 'status: indexed 3, skipped 2', 'rejected: prsim_requires_ner 1', 'gates: gate2:boilerplate 1, gate2:code_heavy 1', ...]
+E       assert Counter({'ind...'skipped': 2}) == {'indexed': 4, 'skipped': 1}
+E         
+E         Differing items:
+E         {'skipped': 2} != {'skipped': 1}
+E         {'indexed': 3} != {'indexed': 4}
+E         Use -v to get more diff
+
+tests/integration/test_19_ingest_raw.py:78: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+2026-11-02 14:28:57,765 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=303
+2026-11-02 14:28:57,941 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=114
+2026-11-02 14:28:58,116 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=115
+2026-11-02 14:28:58,309 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=115
+------------------------------ Captured log setup ------------------------------
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=303
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=114
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=115
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=115
+----------------------------- Captured stderr call -----------------------------
+2026-11-02 14:28:58,800 INFO ffcore.access access method=POST path=/api/v1/projects/7e876f3e-9018-4206-81c5-44a3a37c79cb/knowledge-bases status=201 ms=234
+2026-11-02 14:28:58,997 INFO ffcore.knowledge.ingest gold document=2e775156-9661-4273-a423-9b4274b4d4e6 reused=0 embedded=1
+2026-11-02 14:28:59,151 INFO ffcore.knowledge.ingest gold document=1a95f9ca-c0fa-45fe-81ed-011f4ab2d686 reused=0 embedded=1
+2026-11-02 14:28:59,289 INFO ffcore.knowledge.ingest gold document=7120f38b-ccfb-4b75-a862-f39d34f46420 reused=0 embedded=1
+2026-11-02 14:28:59,470 WARNING ffcore.knowledge.raw_ingest ingest-raw rejected path=jira/PRSIM/PRSIM-1.txt code=prsim_requires_ner
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/7e876f3e-9018-4206-81c5-44a3a37c79cb/knowledge-bases status=201 ms=234
+INFO     ffcore.knowledge.ingest:ingest.py:637 gold document=2e775156-9661-4273-a423-9b4274b4d4e6 reused=0 embedded=1
+INFO     ffcore.knowledge.ingest:ingest.py:637 gold document=1a95f9ca-c0fa-45fe-81ed-011f4ab2d686 reused=0 embedded=1
+INFO     ffcore.knowledge.ingest:ingest.py:637 gold document=7120f38b-ccfb-4b75-a862-f39d34f46420 reused=0 embedded=1
+WARNING  ffcore.knowledge.raw_ingest:raw_ingest.py:236 ingest-raw rejected path=jira/PRSIM/PRSIM-1.txt code=prsim_requires_ner
+=============================== warnings summary ===============================
+tests/integration/test_04a_worker.py::test_04a_upload_job_runs_in_worker
+tests/integration/test_04a_worker.py::test_04a_job_for_missing_row_retries_then_fails_loud
+  /opt/venv/lib/python3.12/site-packages/arq/worker.py:877: DeprecationWarning: Call to deprecated close. (Use aclose() instead) -- Deprecated since version 5.0.1.
+    await self.pool.close(close_connection_pool=True)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+SKIPPED [1] tests/integration/test_19_ingest_raw.py:155: root ignores file modes; the mount test runs :ro
+SKIPPED [1] tests/integration/test_04a_ingest.py:124: NOT_RUN: needs RUN_MODEL_TESTS=1
+SKIPPED [1] tests/integration/test_04a_ingest.py:279: NOT_RUN: needs RUN_MODEL_TESTS=1
+SKIPPED [4] tests/integration/test_04a_qdrant.py: NOT_RUN: needs RUN_QDRANT_TESTS=1
+SKIPPED [4] tests/integration/test_04a_review_r1_acl.py: NOT_RUN: needs RUN_QDRANT_TESTS=1
+1 failed, 78 passed, 11 skipped, 2 warnings in 305.91s (0:05:05)
+exit 1
+=== DEPLOY_PROFILE=airgap pytest test_19_ingest_raw test_04a_*
+F....s............................s..........sssss.....s.s.s.s.......... [ 80%]
+..................                                                       [100%]
+=================================== FAILURES ===================================
+_________________ test_19_1_ingest_raw_paycore_like_idempotent _________________
+
+world = {'project': '7cd3bcee-1e89-405f-abc5-22babc3524b8', 'other': '09f3f94f-9aab-4991-9fa1-454129c44110', 'admin': <starlet...nt.TestClient object at 0x7f553eb521e0>, 'admin_read': <starlette.testclient.TestClient object at 0x7f553ea37a10>, ...}
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_c35753fe60ce) at 0x7f553f091d30>
+settings = Settings(deploy_profile='airgap', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+ro_tree = PosixPath('/tmp/pytest-of-root/pytest-0/test_19_1_ingest_raw_paycore_l0/raw')
+
+    def test_19_1_ingest_raw_paycore_like_idempotent(world, pg, settings, ro_tree):
+        kb = create_kb(world, key="paycore-like")
+        key = _project_key(pg, world["project"])
+        before = _snapshot(ro_tree)
+    
+        first = _ingest(settings, key, kb["key"], ro_tree)
+        assert first.outcomes == {"created": 5}, first.lines()
+        assert first.rejected == {"prsim_requires_ner": 1}
+>       assert first.statuses == {"indexed": 4, "skipped": 1}, first.lines()
+E       AssertionError: ['created 5', 'new_version 0', 'unchanged 0', 'status: indexed 3, skipped 2', 'rejected: prsim_requires_ner 1', 'gates: gate2:boilerplate 1, gate2:code_heavy 1', ...]
+E       assert Counter({'ind...'skipped': 2}) == {'indexed': 4, 'skipped': 1}
+E         
+E         Differing items:
+E         {'indexed': 3} != {'indexed': 4}
+E         {'skipped': 2} != {'skipped': 1}
+E         Use -v to get more diff
+
+tests/integration/test_19_ingest_raw.py:78: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+2026-11-02 14:34:19,207 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=206
+2026-11-02 14:34:19,417 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=127
+2026-11-02 14:34:19,637 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=148
+2026-11-02 14:34:19,850 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=139
+------------------------------ Captured log setup ------------------------------
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=206
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=127
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=148
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=139
+----------------------------- Captured stderr call -----------------------------
+2026-11-02 14:34:20,383 INFO ffcore.access access method=POST path=/api/v1/projects/7cd3bcee-1e89-405f-abc5-22babc3524b8/knowledge-bases status=201 ms=236
+2026-11-02 14:34:20,546 INFO ffcore.knowledge.ingest gold document=df58fd60-9373-4ad6-b75b-29663ac0058d reused=0 embedded=1
+2026-11-02 14:34:20,697 INFO ffcore.knowledge.ingest gold document=37e5c330-25e6-4f3a-a91c-e4d180b96e8a reused=0 embedded=1
+2026-11-02 14:34:20,872 INFO ffcore.knowledge.ingest gold document=b9396dd5-32de-42d0-bc25-f0632d28dab2 reused=0 embedded=1
+2026-11-02 14:34:21,100 WARNING ffcore.knowledge.raw_ingest ingest-raw rejected path=jira/PRSIM/PRSIM-1.txt code=prsim_requires_ner
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/7cd3bcee-1e89-405f-abc5-22babc3524b8/knowledge-bases status=201 ms=236
+INFO     ffcore.knowledge.ingest:ingest.py:637 gold document=df58fd60-9373-4ad6-b75b-29663ac0058d reused=0 embedded=1
+INFO     ffcore.knowledge.ingest:ingest.py:637 gold document=37e5c330-25e6-4f3a-a91c-e4d180b96e8a reused=0 embedded=1
+INFO     ffcore.knowledge.ingest:ingest.py:637 gold document=b9396dd5-32de-42d0-bc25-f0632d28dab2 reused=0 embedded=1
+WARNING  ffcore.knowledge.raw_ingest:raw_ingest.py:236 ingest-raw rejected path=jira/PRSIM/PRSIM-1.txt code=prsim_requires_ner
+=============================== warnings summary ===============================
+tests/integration/test_04a_worker.py::test_04a_upload_job_runs_in_worker
+tests/integration/test_04a_worker.py::test_04a_job_for_missing_row_retries_then_fails_loud
+  /opt/venv/lib/python3.12/site-packages/arq/worker.py:877: DeprecationWarning: Call to deprecated close. (Use aclose() instead) -- Deprecated since version 5.0.1.
+    await self.pool.close(close_connection_pool=True)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+SKIPPED [1] tests/integration/test_19_ingest_raw.py:155: root ignores file modes; the mount test runs :ro
+SKIPPED [1] tests/integration/test_04a_ingest.py:124: NOT_RUN: needs RUN_MODEL_TESTS=1
+SKIPPED [1] tests/integration/test_04a_ingest.py:279: NOT_RUN: needs RUN_MODEL_TESTS=1
+SKIPPED [4] tests/integration/test_04a_qdrant.py: NOT_RUN: needs RUN_QDRANT_TESTS=1
+SKIPPED [4] tests/integration/test_04a_review_r1_acl.py: NOT_RUN: needs RUN_QDRANT_TESTS=1
+1 failed, 78 passed, 11 skipped, 2 warnings in 312.83s (0:05:12)
+exit 1
