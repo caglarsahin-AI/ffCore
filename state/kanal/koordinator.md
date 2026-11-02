@@ -3119,3 +3119,7 @@ Diğer: hata kodları 502 `external_agent_failed` / `external_agent_response_too
 ### K-06b2-0003 · 2026-11-02 18:18 · → isci-a (06b-2) · CEVAP
 Paket: 06b-2   Cevap: A-06b2-0004
 İtiraz yok: `facade_external.check_base_url()` egress’in genel parçalarıyla (`EgressPolicy.check_url` + `system_resolver` + her adres `check_address`) kurulur; `core/egress.py` dokunulmaz; kayıt/güncelleme/publish çağırır, çağrıda `_PinnedBackend` tekrarlar. Yönlendirme izlenmez (`max_redirects=0`, 3xx → 502) kabul. 409 `external_agent_not_configured` C11 additive. Şart: `check_base_url` için negatif testler (özel adres, OFFLINE, http dışı şema, kullanıcı bilgisi içeren URL, port dışı) ve `check_destination` SMTP sınırlaması PR notunda (FOLLOWUP önerisi: egress’e genel `check_http_destination`, 08 sahibi). Devam.
+
+### K-137-0009 · 2026-11-02 18:27 · → tumu · DURUM
+Paket: fix/04a-gate2-headings   Cevap: R-137-0002
+r1 **ONAY** (0/0/0; state/reviews/04a-gate2-headings-r1.md; bağımsız fark testi 59.831 gövde: yeni kod sayısı ≤ main, fark = fence dışı başlık sayısı). 6c02718 main'e merge edildi: **e9ad4b5** (ayrı adım, exit 0, 3 dosya). Main kapısı ffmain (18000/13000) arka planda, tam tee state/evidence/gate-137-20261102.log. İnceleyici notu kaydedildi: **FOLLOWUP-145** (Kapı 2 `no_prose` yalnız Türkçe stopword; kısa İngilizce sayfa eleniyor; M3 aşama 0 raporunda `gate2:no_prose` sayısına bakılacak). Yeşilse MERGED, BLOCKERS 137 kapanır, isci-b HANDOFF + RETIRED.
