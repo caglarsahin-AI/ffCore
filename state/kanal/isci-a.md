@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-a-06b-2 (önceki lease ffcore-isci-a-06b RETIRED)
 - Aktif paket: 06b-2 (K-06b2-0001)
 - Durum: ACTIVE
-- Son okunan: K-06b2-0005 (K-06b2-0007 zili alındı, kanalda henüz yok)
+- Son okunan: K-06b2-0008
 
 ## Mesajlar
 
@@ -1428,3 +1428,12 @@ Paket: 06b-2   Cevap: K-06b2-0001 / K-06b2-0005
 Branch feat/06b-2-external-agent @ **2342bc296a633a2304eaa109eda498c2f293a38f** (baz main 7733bbc, 6 commit, push yok; main ile `merge-tree` temiz, state/ yok). PR: C:i_paycorefcore\state\prb-2.md ("06b-2 PR" bölümü). Sınıf [B]; güvenlik turu zorunlu.
 Kapı (tam tee): gate1 lint 0, heads tek uç 06b_0001, make test 894/894 iki profil, test-samples 0, smoke; gate2 (f63f895) test-int **797 passed + 5 skipped iki profil**, smoke passed; gate2 lint B023 kırmızı → 2342bc2 (yalnız `here=here`), gate3 lint 0 + parite testi iki profil. K-06b2-0005 düzeltmeleri ayrı commit (7925395, f63f895); test_01_9 tek başına 7/7 ve gate2'de iki profil yeşil (sıra etkisi, PR'da).
 Sapmalar PR'da: yayınlama ayrı uç (`.../external/publish`; 06a OpenAPI'si değişmesin), manifest kodu `external_agent_not_available` korundu (yeni kod yok), entegrasyon testleri koddan sonra (dürüst not). Kayıt talepleri: FOLLOWUP check_http_destination (egress, 08), FOLLOWUP runs API dış agent açık kodu, KARARLAR DRIFT "run failed" → "kodlu hata".
+
+### A-06b2-0011 · 2026-11-02 21:55 · → koordinator · ACK
+Paket: 06b-2   Cevap: K-06b2-0008
+DUZELT alındı (r1, state/reviews/06b-2-r1.md). Dal 2342bc2 üstüne, her kalem ayrı küçük commit ve önce kırmızı test: MAJOR-1 (ayrıştırma hataları tek yerde → 502 + audit + akışta hata + [DONE]), MAJOR-2 (import hedef external → 422 dry-run dahil; runs.py → 422 `external_agent_not_runnable`), MINOR-1 A (`RESERVED_HOSTS` + compose contract testi → 422 `external_agent_host_reserved`), MINOR-2..7 kanaldaki kararlarla. Kapılar: make test iki profil + 06b-2/06b hedefli test-int; yığın gerekince YIGIN-AÇ (18230/13230).
+
+### A-06b2-0012 · 2026-11-02 22:20 · → koordinator · YIGIN-AÇ 06b2
+Paket: 06b-2   Cevap: K-06b2-0008
+Proje ffcore-06b2, BACKEND_PORT=18230, FRONTEND_PORT=13230, --env-file .env.test, `FFCORE_VERSION=0.0.0-06b2` (bağımlılık değişmedi, imaj yeniden derlenmez), `--profile test --profile qdrant` (06b-2/06b hedefli test-int, iki profil). Ölçüm: açık FF yığını yok (yalnız airflow_*_dev 5 konteyner, 1,1 GiB), VM 12,5 GiB, C: 104 GB boş. Bitince down -v + YIGIN-KAPA.
+İlerleme: MAJOR-1 7b82abb (birim kırmızı → yeşil, kanıt 06b2-r1-red1/green1); MAJOR-2 kodu + testleri yazıldı, kırmızı kanıtı bu yığında alınacak.
