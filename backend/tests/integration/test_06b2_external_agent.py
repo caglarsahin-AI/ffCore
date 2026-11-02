@@ -16,7 +16,6 @@ from ffcore.api.facade_schemas import EXTERNAL_X_PLATFORM_EVENTS
 from ffcore.services.facade_external import MAX_EXTERNAL_RESPONSE_BYTES
 from tests.integration.facade_support import *  # noqa: F403 - fixtures
 from tests.integration.facade_support import make_key, project_key
-from tests.integration.test_06b_manifest import _model
 
 KEY = "dummy-not-secret-external-key-0001"
 NEW_KEY = "dummy-not-secret-external-key-0002"
@@ -236,12 +235,39 @@ def _versions(pg, agent_id):
     ).fetchone()[0]
 
 
-def test_06b2_r1_import_onto_external_key_refused(ext, make_user, client_factory, pg):
+def _model(pg, project, settings):
+    """A project chat model `chat-default` whose provider row decrypts like a real one (other
+    tests list every provider and decrypt it)."""
+    import uuid
+
+    from ffcore.core.secrets import encrypt_json
+
+    provider = uuid.uuid4()
+    pg.execute(
+        "INSERT INTO providers (id, key, label, driver, domains, config_encrypted, supports_test,"
+        " is_active, created_by) VALUES (%s, %s, 'P', 'openai_compatible', ARRAY['model'],"
+        " %s, false, true, 't')",
+        (provider, f"prov-{provider.hex[:8]}", encrypt_json({}, settings)),
+    )
+    pg.execute(
+        "INSERT INTO provider_projects (provider_id, project_id) VALUES (%s, %s)",
+        (provider, project),
+    )
+    pg.execute(
+        "INSERT INTO models (id, project_id, key, display_name, provider_id, category, model_id,"
+        " capabilities, input_types, pricing, limits, upstream_api, request_policy, is_active,"
+        " created_by) VALUES (gen_random_uuid(), %s, 'chat-default', 'c', %s, 'llm', 'm', '{}',"
+        " ARRAY['text'], '{}', '{}', 'chat', '{}', true, 't')",
+        (project, provider),
+    )
+
+
+def test_06b2_r1_import_onto_external_key_refused(ext, ext_settings, make_user, client_factory, pg):
     """Review r1 MAJOR-2: a native manifest under an external agent's key is refused (dry run
     included) for the analyst who may import; no version appears under the external agent."""
     project, _, _, register = ext
     agent, _ = register()
-    _model(pg, project)  # the manifest's model exists: only the key's kind refuses it
+    _model(pg, project, ext_settings)  # the manifest's model exists: only the key's kind refuses it
     _, email = make_user(memberships={project: ("analyst", "edit")})
     analyst = client_factory(email)
     manifest = {
