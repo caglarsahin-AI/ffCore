@@ -1501,3 +1501,7 @@ Koşular: 88 passed + 2 failed (probe 3 ve MINOR-1 testi); unit+contract 734 pas
 - MINOR: (1) tokenize yer tutucuları üretimde geri çevrilmiyor (`<<PII_1>>` istemciye gidiyor); 08 full/C17'ye ertelenmiş, docs'ta yok; ayrıca 134 r2 raporumdaki "detokenize geri açar" cümlem üretim yolunda yanlıştı (yalnız testlerde doğru) — düzeltme rapora yazıldı. (2) "LiteLLM dışa kapalı" için test yok (compose kanıtı var). (3) resume sahipliği notu.
 - Geçenler: tam entegrasyon 739 passed + 4 skipped; unit+contract 766 iki profilde; kimlik byte-eşit 403, audit ayrımı, kapsamsız anahtar etkisiz; S7 (runtime imajında openai/jiter yok, lock'ta dev grubunda pinli); S2 iç uç; manifest; parite muafiyetleri gerekçeli.
 - NOT_RUN: airgap entegrasyon, lint/smoke/önyüz, Redis-yok kota probe'u. Rapor: state/reviews/06b-r1.md; probe state/reviews/06b-r1-probe.py. Worktree .worktrees/review-06b-r1 temiz doğrulandı ama git worktree remove yine "Permission denied" verdi (--force yok); dizin temizlik listesinde. Dosyalar commit edilmemiş.
+
+## R-06B-0003 | 2026-11-02 13:49 | ACK | K-06b-0014
+- REVIEW-ISTEK 06b r2 delta alindi. SHA f4f7766232856bf88ee7a91d0b0c653af89d09ce (45d901b + 2 commit, 13 dosya, state/ diff 0) mevcut. Kisa yigin review-06b (18210/13210, FFCORE_VERSION=0.0.0-review-06b); acik FF yigini yok, C: 47 GB. Statik delta + r1 probe dosyam yeniden.
+- 2026-11-02 13:50 YIGIN-AC review-06b (18210/13210, FFCORE_VERSION=0.0.0-review-06b), imajlar f4f7766'dan derleniyor; acik FF yigini yok.
