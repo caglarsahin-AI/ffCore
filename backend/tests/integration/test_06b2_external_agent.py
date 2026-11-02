@@ -277,6 +277,30 @@ def test_06b2_r1_external_agent_is_not_runnable(ext, pg):
     assert runs.fetchone()[0] == 0
 
 
+def test_06b2_r1_rename_and_delete_external_need_admin(ext, make_user, client_factory, pg):
+    """Review r1 MINOR-3: the general PATCH and DELETE of an external agent need the project
+    admin (edit), as its registration does; an analyst is 403 (audited `denied`) and the agent,
+    its key and its facade name stay. A native agent is unchanged (analyst + edit)."""
+    project, console, _, register = ext
+    agent, _ = register()
+    analyst_id, email = make_user(memberships={project: ("analyst", "edit")})
+    analyst = client_factory(email)
+    base = f"/api/v1/projects/{project}/agents/{agent['id']}"
+    assert analyst.patch(base, json={"name": "Başka"}).status_code == 403
+    assert analyst.delete(base).status_code == 403
+    row = pg.execute("SELECT name, deleted_at FROM agents WHERE id = %s", (agent["id"],)).fetchone()
+    assert row == ("Dış", None)
+    # the decorator's rows (authorize also writes its route row, as for every refused route)
+    denied = pg.execute(
+        "SELECT action, outcome FROM audit_events WHERE resource_type = 'agent'"
+        " AND action IN ('update_agent', 'delete_agent') AND actor_id = %s ORDER BY ts",
+        (str(analyst_id),),
+    ).fetchall()
+    assert denied == [("update_agent", "denied"), ("delete_agent", "denied")]
+    assert console.patch(base, json={"name": "Yeni"}).status_code == 200
+    assert console.delete(base).status_code == 204
+
+
 # --- the facade ---
 
 

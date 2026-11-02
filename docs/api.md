@@ -527,7 +527,9 @@ project administrator and called through the same `agent:<project_key>/<agent_ke
   `external_agent_not_configured` without an endpoint). The `api_key` is stored with Fernet and is
   never returned (`***`), never in an audit row, never in a manifest. Version, rollback and
   manifest routes refuse an external agent (409 `external_agent_has_no_versions`, 422
-  `external_agent_not_available`); the console's `POST .../agents` cannot create one (422).
+  `external_agent_not_available`, an import onto its key included); the console's
+  `POST .../agents` cannot create one (422). Renaming (`PATCH .../agents/{agent_id}`) and deleting
+  an external agent also need the project admin with edit access (403 otherwise).
 - The base URL passes the egress policy at registration, update and publish (422
   `external_agent_url_refused` with the reason code): `http`/`https` only, no credentials in the URL,
   no query or fragment (422 `base_url_query_not_allowed`), a valid port, host in `EGRESS_ALLOWLIST` (or `ALLOWED_INTERNAL_HOSTS`), `OFFLINE=true` refuses

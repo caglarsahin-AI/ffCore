@@ -36,7 +36,7 @@ from ffcore.api.agents_schemas import (
 )
 from ffcore.api.common import ERROR_RESPONSES, SessionDep, conflict, not_found, path_resource
 from ffcore.core.audit import audited
-from ffcore.core.auth import Actor, require_role
+from ffcore.core.auth import Actor, authorize, require_role
 from ffcore.core.config import Settings, get_settings
 from ffcore.core.errors import ApiError
 from ffcore.models.agents import Agent, AgentVersion
@@ -78,6 +78,13 @@ def no_versions() -> ApiError:
         "external_agent_has_no_versions",
         "An external agent has no versions; it is configured at .../external (06b-2).",
     )
+
+
+async def _admin_if_external(request: Request, actor: Actor, project_id: UUID, agent: Agent):
+    """Review r1 MINOR-3: an external agent's lifecycle is the project admin's (edit), as its
+    registration is; the general rename and delete must not take it from an analyst."""
+    if agent.kind == "external":
+        await authorize(request, actor, str(project_id), require_role("admin", write=True))
 
 
 def _native(agent: Agent) -> Agent:
@@ -256,6 +263,7 @@ async def update_agent(
 ):
     """Name and description; the definition changes through versions."""
     agent = await _agent(session, project_id, agent_id)
+    await _admin_if_external(request, actor, project_id, agent)
     for field, value in body.model_dump(exclude_unset=True).items():
         setattr(agent, field, value)
     await session.flush()
@@ -275,6 +283,7 @@ async def delete_agent(
 ) -> None:
     """Soft delete; runs and versions stay for audit and traces."""
     agent = await _agent(session, project_id, agent_id)
+    await _admin_if_external(request, actor, project_id, agent)
     agent.deleted_at = func.now()
     agent.status = AgentStatus.inactive
 
