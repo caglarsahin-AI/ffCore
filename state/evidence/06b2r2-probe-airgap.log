@@ -1,0 +1,453 @@
+M6 import ffcore.services.facade_external 0 
+.M6 import ffcore.services.external_config 0 
+.M6 import ffcore.api.agents 0 
+.2026-11-02 20:21:53,996 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-02 20:21:54,023 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=495
+2026-11-02 20:21:54,626 INFO ffcore.access access method=POST path=/api/v1/projects/80c4a11e-9b8e-4d50-9d52-5d22eebd54c0/api-keys status=201 ms=596
+2026-11-02 20:21:54,937 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-02 20:21:55,058 INFO ffcore.access access method=POST path=/api/v1/projects/80c4a11e-9b8e-4d50-9d52-5d22eebd54c0/agents/external status=422 ms=309
+2026-11-02 20:21:55,180 INFO ffcore.access access method=POST path=/api/v1/projects/80c4a11e-9b8e-4d50-9d52-5d22eebd54c0/agents/external status=422 ms=113
+2026-11-02 20:21:55,376 INFO ffcore.access access method=POST path=/api/v1/projects/80c4a11e-9b8e-4d50-9d52-5d22eebd54c0/agents/external status=422 ms=173
+2026-11-02 20:21:55,505 INFO ffcore.access access method=POST path=/api/v1/projects/80c4a11e-9b8e-4d50-9d52-5d22eebd54c0/agents/external status=422 ms=116
+2026-11-02 20:21:55,655 INFO ffcore.access access method=POST path=/api/v1/projects/80c4a11e-9b8e-4d50-9d52-5d22eebd54c0/agents/external status=422 ms=127
+2026-11-02 20:21:55,756 INFO ffcore.access access method=POST path=/api/v1/projects/80c4a11e-9b8e-4d50-9d52-5d22eebd54c0/agents/external status=422 ms=95
+2026-11-02 20:21:55,839 INFO ffcore.access access method=POST path=/api/v1/projects/80c4a11e-9b8e-4d50-9d52-5d22eebd54c0/agents/external status=422 ms=76
+2026-11-02 20:21:55,922 INFO ffcore.access access method=POST path=/api/v1/projects/80c4a11e-9b8e-4d50-9d52-5d22eebd54c0/agents/external status=422 ms=77
+2026-11-02 20:21:56,049 INFO ffcore.access access method=POST path=/api/v1/projects/80c4a11e-9b8e-4d50-9d52-5d22eebd54c0/agents/external status=422 ms=121
+2026-11-02 20:21:56,167 INFO ffcore.access access method=POST path=/api/v1/projects/80c4a11e-9b8e-4d50-9d52-5d22eebd54c0/agents/external status=422 ms=111
+2026-11-02 20:21:56,845 INFO ffcore.access access method=POST path=/api/v1/projects/80c4a11e-9b8e-4d50-9d52-5d22eebd54c0/agents/external status=422 ms=644
+2026-11-02 20:21:57,152 INFO ffcore.access access method=POST path=/api/v1/projects/80c4a11e-9b8e-4d50-9d52-5d22eebd54c0/agents/external status=422 ms=136
+2026-11-02 20:21:57,273 INFO ffcore.access access method=POST path=/api/v1/projects/80c4a11e-9b8e-4d50-9d52-5d22eebd54c0/agents/external status=422 ms=113
+2026-11-02 20:21:57,428 INFO ffcore.access access method=POST path=/api/v1/projects/80c4a11e-9b8e-4d50-9d52-5d22eebd54c0/agents/external status=422 ms=143
+2026-11-02 20:21:57,547 INFO ffcore.access access method=POST path=/api/v1/projects/80c4a11e-9b8e-4d50-9d52-5d22eebd54c0/agents/external status=422 ms=98
+2026-11-02 20:21:57,663 INFO ffcore.access access method=POST path=/api/v1/projects/80c4a11e-9b8e-4d50-9d52-5d22eebd54c0/agents/external status=422 ms=108
+2026-11-02 20:21:57,768 INFO ffcore.access access method=POST path=/api/v1/projects/80c4a11e-9b8e-4d50-9d52-5d22eebd54c0/agents/external status=422 ms=98
+2026-11-02 20:21:57,897 INFO ffcore.access access method=POST path=/api/v1/projects/80c4a11e-9b8e-4d50-9d52-5d22eebd54c0/agents/external status=422 ms=117
+2026-11-02 20:21:58,017 INFO ffcore.access access method=POST path=/api/v1/projects/80c4a11e-9b8e-4d50-9d52-5d22eebd54c0/agents/external status=422 ms=112
+2026-11-02 20:21:58,181 INFO ffcore.access access method=POST path=/api/v1/projects/80c4a11e-9b8e-4d50-9d52-5d22eebd54c0/agents/external status=422 ms=157
+2026-11-02 20:21:58,304 INFO ffcore.access access method=POST path=/api/v1/projects/80c4a11e-9b8e-4d50-9d52-5d22eebd54c0/agents/external status=422 ms=119
+2026-11-02 20:21:58,531 INFO ffcore.access access method=POST path=/api/v1/projects/80c4a11e-9b8e-4d50-9d52-5d22eebd54c0/agents/external status=422 ms=214
+2026-11-02 20:21:58,686 INFO ffcore.access access method=POST path=/api/v1/projects/80c4a11e-9b8e-4d50-9d52-5d22eebd54c0/agents/external status=422 ms=145
+2026-11-02 20:21:59,017 INFO ffcore.access access method=POST path=/api/v1/projects/80c4a11e-9b8e-4d50-9d52-5d22eebd54c0/agents/external status=422 ms=322
+2026-11-02 20:21:59,115 INFO ffcore.access access method=POST path=/api/v1/projects/80c4a11e-9b8e-4d50-9d52-5d22eebd54c0/agents/external status=422 ms=91
+2026-11-02 20:21:59,218 INFO ffcore.access access method=POST path=/api/v1/projects/80c4a11e-9b8e-4d50-9d52-5d22eebd54c0/agents/external status=422 ms=95
+2026-11-02 20:21:59,310 INFO ffcore.access access method=POST path=/api/v1/projects/80c4a11e-9b8e-4d50-9d52-5d22eebd54c0/agents/external status=422 ms=87
+2026-11-02 20:21:59,384 INFO ffcore.access access method=POST path=/api/v1/projects/80c4a11e-9b8e-4d50-9d52-5d22eebd54c0/agents/external status=422 ms=69
+2026-11-02 20:21:59,474 INFO ffcore.access access method=POST path=/api/v1/projects/80c4a11e-9b8e-4d50-9d52-5d22eebd54c0/agents/external status=422 ms=81
+2026-11-02 20:21:59,552 INFO ffcore.access access method=POST path=/api/v1/projects/80c4a11e-9b8e-4d50-9d52-5d22eebd54c0/agents/external status=422 ms=74
+2026-11-02 20:21:59,633 INFO ffcore.access access method=POST path=/api/v1/projects/80c4a11e-9b8e-4d50-9d52-5d22eebd54c0/agents/external status=422 ms=75
+P1 ('http://127.0.0.2:80/v1', 422, 'external_agent_url_refused')
+P1 ('http://[::1]/v1', 422, 'external_agent_url_refused')
+P1 ('http://169.254.169.254/latest', 422, 'external_agent_url_refused')
+P1 ('http://0.0.0.0/v1', 422, 'external_agent_url_refused')
+P1 ('http://2130706433/v1', 422, 'external_agent_url_refused')
+P1 ('http://0x7f000001/v1', 422, 'external_agent_url_refused')
+P1 ('http://127.1/v1', 422, 'external_agent_url_refused')
+P1 ('http://localhost/v1', 422, 'external_agent_url_refused')
+P1 ('http://10.0.0.5./v1', 422, 'external_agent_url_refused')
+P1 ('HTTP://10.0.0.5/v1', 422, 'external_agent_url_refused')
+P1 ('http://[::ffff:10.0.0.5]/v1', 422, 'external_agent_url_refused')
+P1 ('http://[::ffff:127.0.0.2]/v1', 422, 'external_agent_url_refused')
+P1 ('http://[fe80::1]/v1', 422, 'external_agent_url_refused')
+P1 ('http://100.64.0.1/v1', 422, 'external_agent_url_refused')
+P1 ('http://192.168.1.1/v1', 422, 'external_agent_url_refused')
+P1 ('http://172.17.0.1/v1', 422, 'external_agent_url_refused')
+P1 ('ftp://example.com/v1', 422, 'external_agent_url_refused')
+P1 ('http://user:pw@example.com/v1', 422, 'external_agent_url_refused')
+P1 ('http://:pw@example.com/v1', 422, 'external_agent_url_refused')
+P1 ('http://example.com:0/v1', 422, 'external_agent_url_refused')
+P1 ('http://example.com:70000/v1', 422, 'external_agent_url_refused')
+P1 ('http://example.com:-1/v1', 422, 'external_agent_url_refused')
+P1 ('http:///v1', 422, 'external_agent_url_refused')
+P1 ('http://', 422, 'external_agent_url_refused')
+P1 ('javascript:alert(1)', 422, 'external_agent_url_refused')
+P1 ('//example.com/v1', 422, 'external_agent_url_refused')
+P1 ('http://example.com/v1', 422, 'external_agent_url_refused')
+P1 ('http://metadata.google.internal/v1', 422, 'external_agent_url_refused')
+P1 ('http://postgres:5432/x', 422, 'external_agent_host_reserved')
+P1 ('http://redis:6379/x', 422, 'external_agent_host_reserved')
+P1 ('http://qdrant:6333/x', 422, 'external_agent_host_reserved')
+.2026-11-02 20:22:03,820 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 20:22:04,083 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 20:22:04,286 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-02 20:22:04,306 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=217
+2026-11-02 20:22:04,387 INFO ffcore.access access method=POST path=/api/v1/projects/c72e5358-3df1-4d1a-8983-4c3d867a372b/api-keys status=201 ms=78
+2026-11-02 20:22:04,489 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 20:22:04,557 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-02 20:22:04,585 INFO ffcore.access access method=POST path=/api/v1/projects/c72e5358-3df1-4d1a-8983-4c3d867a372b/agents/external status=422 ms=93
+2026-11-02 20:22:04,654 INFO ffcore.access access method=POST path=/api/v1/projects/c72e5358-3df1-4d1a-8983-4c3d867a372b/agents/external status=422 ms=64
+2026-11-02 20:22:04,744 INFO ffcore.access access method=POST path=/api/v1/projects/c72e5358-3df1-4d1a-8983-4c3d867a372b/agents/external status=422 ms=87
+2026-11-02 20:22:04,817 INFO ffcore.access access method=POST path=/api/v1/projects/c72e5358-3df1-4d1a-8983-4c3d867a372b/agents/external status=422 ms=69
+2026-11-02 20:22:04,895 INFO ffcore.access access method=POST path=/api/v1/projects/c72e5358-3df1-4d1a-8983-4c3d867a372b/agents/external status=422 ms=74
+2026-11-02 20:22:04,973 INFO ffcore.access access method=POST path=/api/v1/projects/c72e5358-3df1-4d1a-8983-4c3d867a372b/agents/external status=422 ms=72
+2026-11-02 20:22:05,035 INFO ffcore.access access method=POST path=/api/v1/projects/c72e5358-3df1-4d1a-8983-4c3d867a372b/agents/external status=422 ms=59
+2026-11-02 20:22:05,106 INFO ffcore.access access method=POST path=/api/v1/projects/c72e5358-3df1-4d1a-8983-4c3d867a372b/agents/external status=422 ms=67
+2026-11-02 20:22:05,169 INFO ffcore.access access method=POST path=/api/v1/projects/c72e5358-3df1-4d1a-8983-4c3d867a372b/agents/external status=422 ms=59
+2026-11-02 20:22:05,235 INFO ffcore.access access method=POST path=/api/v1/projects/c72e5358-3df1-4d1a-8983-4c3d867a372b/agents/external status=422 ms=61
+2026-11-02 20:22:05,311 INFO ffcore.access access method=POST path=/api/v1/projects/c72e5358-3df1-4d1a-8983-4c3d867a372b/agents/external status=422 ms=71
+2026-11-02 20:22:05,396 INFO ffcore.access access method=POST path=/api/v1/projects/c72e5358-3df1-4d1a-8983-4c3d867a372b/agents/external status=422 ms=79
+2026-11-02 20:22:05,490 INFO ffcore.access access method=POST path=/api/v1/projects/c72e5358-3df1-4d1a-8983-4c3d867a372b/agents/external status=422 ms=90
+2026-11-02 20:22:05,565 INFO ffcore.access access method=POST path=/api/v1/projects/c72e5358-3df1-4d1a-8983-4c3d867a372b/agents/external status=422 ms=72
+2026-11-02 20:22:05,640 INFO ffcore.access access method=POST path=/api/v1/projects/c72e5358-3df1-4d1a-8983-4c3d867a372b/agents/external status=422 ms=70
+2026-11-02 20:22:05,714 INFO ffcore.access access method=POST path=/api/v1/projects/c72e5358-3df1-4d1a-8983-4c3d867a372b/agents/external status=422 ms=70
+2026-11-02 20:22:05,785 INFO ffcore.access access method=POST path=/api/v1/projects/c72e5358-3df1-4d1a-8983-4c3d867a372b/agents/external status=422 ms=66
+2026-11-02 20:22:05,868 INFO ffcore.access access method=POST path=/api/v1/projects/c72e5358-3df1-4d1a-8983-4c3d867a372b/agents/external status=422 ms=78
+2026-11-02 20:22:05,960 INFO ffcore.access access method=POST path=/api/v1/projects/c72e5358-3df1-4d1a-8983-4c3d867a372b/agents/external status=422 ms=87
+2026-11-02 20:22:06,039 INFO ffcore.access access method=POST path=/api/v1/projects/c72e5358-3df1-4d1a-8983-4c3d867a372b/agents/external status=422 ms=75
+M1 ('http://litellm:4000/v1', 422, 'external_agent_host_reserved')
+M1 ('http://LITELLM:4000/v1', 422, 'external_agent_host_reserved')
+M1 ('http://litellm.:4000/v1', 422, 'external_agent_host_reserved')
+M1 ('http://litellm/v1', 422, 'external_agent_host_reserved')
+M1 ('https://litellm:4000/v1', 422, 'external_agent_host_reserved')
+M1 ('http://langfuse-web:3000/api', 422, 'external_agent_host_reserved')
+M1 ('http://mcp-sql:8000/mcp', 422, 'external_agent_host_reserved')
+M1 ('http://mcp-search:8000/mcp', 422, 'external_agent_host_reserved')
+M1 ('http://ticket-desk:8000/v1', 422, 'external_agent_host_reserved')
+M1 ('http://ollama:11434/v1', 422, 'external_agent_host_reserved')
+M1 ('http://host.docker.internal:11434/v1', 422, 'external_agent_host_reserved')
+M1 ('http://HOST.DOCKER.INTERNAL:11434/v1', 422, 'external_agent_host_reserved')
+M1 ('http://backend:8000/api', 422, 'external_agent_host_reserved')
+M1 ('http://qdrant:6333/x', 422, 'external_agent_host_reserved')
+M1 ('http://127.0.0.1:8000/api/v1', 422, 'external_agent_host_reserved')
+M1 ('http://localhost:8000/api', 422, 'external_agent_host_reserved')
+M1 ('http://127.0.0.2:8000/api', 422, 'external_agent_host_reserved')
+M1 ('http://[::1]:8000/api', 422, 'external_agent_host_reserved')
+M1 ('http://[::ffff:127.0.0.1]:8000/api', 422, 'external_agent_host_reserved')
+M1 ('http://127.0.0.1:08000/api', 422, 'external_agent_host_reserved')
+.2026-11-02 20:22:06,288 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 20:22:06,450 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-02 20:22:06,473 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=181
+2026-11-02 20:22:06,581 INFO ffcore.access access method=POST path=/api/v1/projects/6e047772-6fca-4d33-a32b-ac9f8694b9e5/api-keys status=201 ms=104
+2026-11-02 20:22:06,730 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 20:22:06,816 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-02 20:22:06,827 INFO ffcore.access access method=POST path=/api/v1/projects/6e047772-6fca-4d33-a32b-ac9f8694b9e5/agents/external status=201 ms=91
+2026-11-02 20:22:06,892 INFO ffcore.access access method=POST path=/api/v1/projects/6e047772-6fca-4d33-a32b-ac9f8694b9e5/agents/c922fe82-5a0e-4555-b584-4c3327573159/external/publish status=200 ms=61
+2026-11-02 20:22:06,970 INFO ffcore.access access method=PUT path=/api/v1/projects/6e047772-6fca-4d33-a32b-ac9f8694b9e5/agents/c922fe82-5a0e-4555-b584-4c3327573159/external status=422 ms=72
+M1 update to litellm: 422 external_agent_host_reserved
+2026-11-02 20:22:07,161 INFO ffcore.access access method=POST path=/v1/chat/completions status=200 ms=186
+M1 127.0.0.1:<fake port> still callable: 200
+.2026-11-02 20:22:07,320 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 20:22:07,445 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-02 20:22:07,465 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=142
+2026-11-02 20:22:07,545 INFO ffcore.access access method=POST path=/api/v1/projects/ba01b7e3-f312-44b1-81da-bc818d8840e8/api-keys status=201 ms=75
+2026-11-02 20:22:07,662 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 20:22:07,732 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-02 20:22:07,736 INFO ffcore.access access method=POST path=/api/v1/projects/ba01b7e3-f312-44b1-81da-bc818d8840e8/agents/external status=422 ms=71
+2026-11-02 20:22:07,797 INFO ffcore.access access method=POST path=/api/v1/projects/ba01b7e3-f312-44b1-81da-bc818d8840e8/agents/external status=422 ms=57
+2026-11-02 20:22:07,863 INFO ffcore.access access method=POST path=/api/v1/projects/ba01b7e3-f312-44b1-81da-bc818d8840e8/agents/external status=422 ms=63
+2026-11-02 20:22:07,922 INFO ffcore.access access method=POST path=/api/v1/projects/ba01b7e3-f312-44b1-81da-bc818d8840e8/agents/external status=422 ms=55
+2026-11-02 20:22:07,991 INFO ffcore.access access method=POST path=/api/v1/projects/ba01b7e3-f312-44b1-81da-bc818d8840e8/agents/external status=422 ms=66
+2026-11-02 20:22:08,049 INFO ffcore.access access method=POST path=/api/v1/projects/ba01b7e3-f312-44b1-81da-bc818d8840e8/agents/external status=201 ms=55
+M2 ('/ok?token=dummy-not-secret-qs', 422, 'base_url_query_not_allowed', False)
+M2 ('/ok?', 422, 'base_url_query_not_allowed', False)
+M2 ('/ok#frag', 422, 'base_url_query_not_allowed', False)
+M2 ('/ok#', 422, 'base_url_query_not_allowed', False)
+M2 ('/ok?a=1#b', 422, 'base_url_query_not_allowed', False)
+M2 ('/ok%3Fx=1', 201, '-', False)
+2026-11-02 20:22:08,111 INFO ffcore.access access method=POST path=/api/v1/projects/ba01b7e3-f312-44b1-81da-bc818d8840e8/agents/external status=201 ms=58
+2026-11-02 20:22:08,168 INFO ffcore.access access method=POST path=/api/v1/projects/ba01b7e3-f312-44b1-81da-bc818d8840e8/agents/24b1061d-53f0-43e5-b2c2-44c37243eb7e/external/publish status=200 ms=53
+2026-11-02 20:22:08,229 INFO ffcore.access access method=PUT path=/api/v1/projects/ba01b7e3-f312-44b1-81da-bc818d8840e8/agents/24b1061d-53f0-43e5-b2c2-44c37243eb7e/external status=422 ms=56
+M2 PUT with query: 422 base_url_query_not_allowed
+.2026-11-02 20:22:08,393 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 20:22:08,526 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-02 20:22:08,542 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=146
+2026-11-02 20:22:08,609 INFO ffcore.access access method=POST path=/api/v1/projects/cacb5b45-6af5-4331-9663-93bd0dbf8eca/api-keys status=201 ms=63
+2026-11-02 20:22:08,678 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 20:22:08,754 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-02 20:22:08,768 INFO ffcore.access access method=POST path=/api/v1/projects/cacb5b45-6af5-4331-9663-93bd0dbf8eca/agents/external status=201 ms=84
+2026-11-02 20:22:08,829 INFO ffcore.access access method=POST path=/api/v1/projects/cacb5b45-6af5-4331-9663-93bd0dbf8eca/agents/79df4b6c-565f-476b-949a-d5229a92e655/external/publish status=200 ms=57
+2026-11-02 20:22:08,991 WARNING ffcore.facade facade_external_call agent=79df4b6c-565f-476b-949a-d5229a92e655 code=external_agent_response_too_large reason=too_large
+2026-11-02 20:22:08,994 INFO ffcore.access access method=POST path=/v1/chat/completions status=502 ms=161
+MAJ1 chunked: got=(502, 'external_agent_response_too_large') leaked=False audit=[('error', {'host': '127.0.0.1', 'error_code': 'too_large', 'duration_ms': 41, 'response_bytes': 65610, 'upstream_status': 200})]
+.2026-11-02 20:22:09,160 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 20:22:09,301 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-02 20:22:09,317 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=154
+2026-11-02 20:22:09,375 INFO ffcore.access access method=POST path=/api/v1/projects/0f79b426-7894-4a2f-92c3-89a98b3a087e/api-keys status=201 ms=54
+2026-11-02 20:22:09,450 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 20:22:09,533 INFO ffcore.access access method=POST path=/api/v1/projects/0f79b426-7894-4a2f-92c3-89a98b3a087e/agents/external status=201 ms=77
+2026-11-02 20:22:09,540 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-02 20:22:09,602 INFO ffcore.access access method=POST path=/api/v1/projects/0f79b426-7894-4a2f-92c3-89a98b3a087e/agents/60aa2dc6-de82-428d-a329-fe7e27ea1dec/external/publish status=200 ms=58
+2026-11-02 20:22:09,743 WARNING ffcore.facade facade_external_call agent=60aa2dc6-de82-428d-a329-fe7e27ea1dec code=external_agent_failed reason=invalid_answer
+2026-11-02 20:22:09,746 INFO ffcore.access access method=POST path=/v1/chat/completions status=502 ms=139
+MAJ1 deep: got=(502, 'external_agent_failed') leaked=False audit=[('error', {'host': '127.0.0.1', 'error_code': 'invalid_answer', 'duration_ms': 31, 'response_bytes': 60000, 'upstream_status': 200})]
+.2026-11-02 20:22:09,916 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 20:22:10,054 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-02 20:22:10,070 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=150
+2026-11-02 20:22:10,137 INFO ffcore.access access method=POST path=/api/v1/projects/a76a7daf-d9c2-4427-861e-8806edf94f27/api-keys status=201 ms=63
+2026-11-02 20:22:10,213 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 20:22:10,282 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-02 20:22:10,287 INFO ffcore.access access method=POST path=/api/v1/projects/a76a7daf-d9c2-4427-861e-8806edf94f27/agents/external status=201 ms=69
+2026-11-02 20:22:10,407 INFO ffcore.access access method=POST path=/api/v1/projects/a76a7daf-d9c2-4427-861e-8806edf94f27/agents/25870635-71bd-4609-9937-cb436fce64cb/external/publish status=200 ms=116
+2026-11-02 20:22:10,617 WARNING ffcore.facade facade_external_call agent=25870635-71bd-4609-9937-cb436fce64cb code=external_agent_failed reason=invalid_answer
+2026-11-02 20:22:10,620 INFO ffcore.access access method=POST path=/v1/chat/completions status=502 ms=208
+MAJ1 deepdict: got=(502, 'external_agent_failed') leaked=False audit=[('error', {'host': '127.0.0.1', 'error_code': 'invalid_answer', 'duration_ms': 60, 'response_bytes': 40012, 'upstream_status': 200})]
+.2026-11-02 20:22:10,813 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 20:22:10,940 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-02 20:22:10,959 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=142
+2026-11-02 20:22:11,035 INFO ffcore.access access method=POST path=/api/v1/projects/0bc82f1f-f6e6-4dc0-8d85-815eeda06c31/api-keys status=201 ms=71
+2026-11-02 20:22:11,123 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 20:22:11,198 INFO ffcore.access access method=POST path=/api/v1/projects/0bc82f1f-f6e6-4dc0-8d85-815eeda06c31/agents/external status=201 ms=71
+2026-11-02 20:22:11,208 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-02 20:22:11,279 INFO ffcore.access access method=POST path=/api/v1/projects/0bc82f1f-f6e6-4dc0-8d85-815eeda06c31/agents/99cbf7c6-dc01-4021-bd6e-85185c47fbe0/external/publish status=200 ms=76
+2026-11-02 20:22:11,431 WARNING ffcore.facade facade_external_call agent=99cbf7c6-dc01-4021-bd6e-85185c47fbe0 code=external_agent_failed reason=invalid_answer
+2026-11-02 20:22:11,434 INFO ffcore.access access method=POST path=/v1/chat/completions status=502 ms=149
+MAJ1 deepmsg: got=(502, 'external_agent_failed') leaked=False audit=[('error', {'host': '127.0.0.1', 'error_code': 'invalid_answer', 'duration_ms': 29, 'response_bytes': 40066, 'upstream_status': 200})]
+.2026-11-02 20:22:11,599 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 20:22:11,747 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-02 20:22:11,763 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=161
+2026-11-02 20:22:11,825 INFO ffcore.access access method=POST path=/api/v1/projects/0ba5c78e-5858-409c-8ca8-58213bb8fd0b/api-keys status=201 ms=58
+2026-11-02 20:22:11,910 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 20:22:11,990 INFO ffcore.access access method=POST path=/api/v1/projects/0ba5c78e-5858-409c-8ca8-58213bb8fd0b/agents/external status=201 ms=80
+2026-11-02 20:22:11,998 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-02 20:22:12,069 INFO ffcore.access access method=POST path=/api/v1/projects/0ba5c78e-5858-409c-8ca8-58213bb8fd0b/agents/414996c0-2040-49ae-9f0a-a8aa8cda87dd/external/publish status=200 ms=75
+2026-11-02 20:22:12,223 WARNING ffcore.facade facade_external_call agent=414996c0-2040-49ae-9f0a-a8aa8cda87dd code=external_agent_failed reason=invalid_answer
+2026-11-02 20:22:12,227 INFO ffcore.access access method=POST path=/v1/chat/completions status=502 ms=153
+MAJ1 nocontent: got=(502, 'external_agent_failed') leaked=False audit=[('error', {'host': '127.0.0.1', 'error_code': 'invalid_answer', 'duration_ms': 38, 'response_bytes': 49, 'upstream_status': 200})]
+.2026-11-02 20:22:12,394 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 20:22:12,508 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-02 20:22:12,527 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=129
+2026-11-02 20:22:12,585 INFO ffcore.access access method=POST path=/api/v1/projects/64e4edac-7e5d-4453-bf78-a86d0807584e/api-keys status=201 ms=54
+2026-11-02 20:22:12,657 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 20:22:12,715 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-02 20:22:12,731 INFO ffcore.access access method=POST path=/api/v1/projects/64e4edac-7e5d-4453-bf78-a86d0807584e/agents/external status=201 ms=67
+2026-11-02 20:22:12,793 INFO ffcore.access access method=POST path=/api/v1/projects/64e4edac-7e5d-4453-bf78-a86d0807584e/agents/a856092d-0d2e-4991-85c6-ed580ab5f897/external/publish status=200 ms=58
+2026-11-02 20:22:12,930 WARNING ffcore.facade facade_external_call agent=a856092d-0d2e-4991-85c6-ed580ab5f897 code=external_agent_failed reason=invalid_answer
+2026-11-02 20:22:12,932 INFO ffcore.access access method=POST path=/v1/chat/completions status=502 ms=135
+MAJ1 choicestr: got=(502, 'external_agent_failed') leaked=False audit=[('error', {'host': '127.0.0.1', 'error_code': 'invalid_answer', 'duration_ms': 32, 'response_bytes': 18, 'upstream_status': 200})]
+.2026-11-02 20:22:13,116 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 20:22:13,285 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-02 20:22:13,291 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=171
+2026-11-02 20:22:13,352 INFO ffcore.access access method=POST path=/api/v1/projects/08dcd706-67bc-46fa-8940-5f833d3d35d9/api-keys status=201 ms=55
+2026-11-02 20:22:13,420 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 20:22:13,508 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-02 20:22:13,511 INFO ffcore.access access method=POST path=/api/v1/projects/08dcd706-67bc-46fa-8940-5f833d3d35d9/agents/external status=201 ms=87
+2026-11-02 20:22:13,599 INFO ffcore.access access method=POST path=/api/v1/projects/08dcd706-67bc-46fa-8940-5f833d3d35d9/agents/f29ea758-eeb2-4686-ba64-50a4a0b812df/external/publish status=200 ms=81
+2026-11-02 20:22:13,795 WARNING ffcore.facade facade_external_call agent=f29ea758-eeb2-4686-ba64-50a4a0b812df code=external_agent_failed reason=invalid_answer
+2026-11-02 20:22:13,798 INFO ffcore.access access method=POST path=/v1/chat/completions status=502 ms=193
+MAJ1 toolsonly: got=(502, 'external_agent_failed') leaked=False audit=[('error', {'host': '127.0.0.1', 'error_code': 'invalid_answer', 'duration_ms': 46, 'response_bytes': 199, 'upstream_status': 200})]
+.2026-11-02 20:22:14,008 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 20:22:14,174 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-02 20:22:14,208 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=197
+2026-11-02 20:22:14,281 INFO ffcore.access access method=POST path=/api/v1/projects/60d30a33-aaa2-4515-a66d-9393a59018d9/api-keys status=201 ms=69
+2026-11-02 20:22:14,392 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 20:22:14,505 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-02 20:22:14,508 INFO ffcore.access access method=POST path=/api/v1/projects/60d30a33-aaa2-4515-a66d-9393a59018d9/agents/external status=201 ms=112
+2026-11-02 20:22:14,588 INFO ffcore.access access method=POST path=/api/v1/projects/60d30a33-aaa2-4515-a66d-9393a59018d9/agents/906de6af-9520-42f2-9b2d-a68e830fbbd7/external/publish status=200 ms=76
+2026-11-02 20:22:14,723 WARNING ffcore.facade facade_external_call agent=906de6af-9520-42f2-9b2d-a68e830fbbd7 code=external_agent_failed reason=invalid_answer
+2026-11-02 20:22:14,725 INFO ffcore.access access method=POST path=/v1/chat/completions status=502 ms=132
+MAJ1 parts: got=(502, 'external_agent_failed') leaked=False audit=[('error', {'host': '127.0.0.1', 'error_code': 'invalid_answer', 'duration_ms': 27, 'response_bytes': 134, 'upstream_status': 200})]
+.2026-11-02 20:22:14,878 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 20:22:14,993 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-02 20:22:15,009 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=128
+2026-11-02 20:22:15,064 INFO ffcore.access access method=POST path=/api/v1/projects/e64b0e2c-e985-41f6-b1a6-88c5f4512559/api-keys status=201 ms=51
+2026-11-02 20:22:15,126 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 20:22:15,191 INFO ffcore.access access method=POST path=/api/v1/projects/e64b0e2c-e985-41f6-b1a6-88c5f4512559/agents/external status=201 ms=60
+2026-11-02 20:22:15,210 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-02 20:22:15,262 INFO ffcore.access access method=POST path=/api/v1/projects/e64b0e2c-e985-41f6-b1a6-88c5f4512559/agents/d2918267-70c1-4435-84c7-9d0727a25e1b/external/publish status=200 ms=63
+2026-11-02 20:22:15,391 WARNING ffcore.facade facade_external_call agent=d2918267-70c1-4435-84c7-9d0727a25e1b code=external_agent_failed reason=upstream_status
+2026-11-02 20:22:15,393 INFO ffcore.access access method=POST path=/v1/chat/completions status=502 ms=126
+MAJ1 err500: got=(502, 'external_agent_failed') leaked=False audit=[('error', {'host': '127.0.0.1', 'error_code': 'upstream_status', 'duration_ms': 25, 'response_bytes': 52, 'upstream_status': 500})]
+.2026-11-02 20:22:15,587 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 20:22:15,730 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-02 20:22:15,750 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=163
+2026-11-02 20:22:15,807 INFO ffcore.access access method=POST path=/api/v1/projects/9fe451ee-47cc-411b-a222-08d5d9483cd6/api-keys status=201 ms=53
+2026-11-02 20:22:15,868 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 20:22:15,929 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-02 20:22:15,934 INFO ffcore.access access method=POST path=/api/v1/projects/9fe451ee-47cc-411b-a222-08d5d9483cd6/agents/external status=201 ms=61
+2026-11-02 20:22:15,996 INFO ffcore.access access method=POST path=/api/v1/projects/9fe451ee-47cc-411b-a222-08d5d9483cd6/agents/e3abf4e7-dad7-4490-8f75-7a46943d30a3/external/publish status=200 ms=58
+2026-11-02 20:22:16,122 WARNING ffcore.facade facade_external_call agent=e3abf4e7-dad7-4490-8f75-7a46943d30a3 code=external_agent_failed reason=invalid_answer
+2026-11-02 20:22:16,124 INFO ffcore.access access method=POST path=/v1/chat/completions status=502 ms=124
+MAJ1 nonjson: got=(502, 'external_agent_failed') leaked=False audit=[('error', {'host': '127.0.0.1', 'error_code': 'invalid_answer', 'duration_ms': 26, 'response_bytes': 38, 'upstream_status': 200})]
+.2026-11-02 20:22:16,325 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 20:22:16,491 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-02 20:22:16,514 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=185
+2026-11-02 20:22:16,578 INFO ffcore.access access method=POST path=/api/v1/projects/ff9175b8-1786-4b68-a03d-3b3c5fe83ae1/api-keys status=201 ms=60
+2026-11-02 20:22:16,660 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 20:22:16,730 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-02 20:22:16,738 INFO ffcore.access access method=POST path=/api/v1/projects/ff9175b8-1786-4b68-a03d-3b3c5fe83ae1/agents/external status=201 ms=73
+2026-11-02 20:22:16,800 INFO ffcore.access access method=POST path=/api/v1/projects/ff9175b8-1786-4b68-a03d-3b3c5fe83ae1/agents/7b4bc719-f28b-4370-9575-d56addb7e80b/external/publish status=200 ms=58
+2026-11-02 20:22:16,944 WARNING ffcore.facade facade_external_call agent=7b4bc719-f28b-4370-9575-d56addb7e80b code=external_agent_failed reason=invalid_answer
+2026-11-02 20:22:16,944 WARNING ffcore.facade facade_stream_error code=external_agent_failed model=agent:p-ff9175b817/s-deep
+2026-11-02 20:22:16,946 INFO ffcore.access access method=POST path=/v1/chat/completions status=200 ms=141
+MAJ1 stream deep: 200 ['data: {"error":{"message":"The external agent call failed.","type":"api_error","code":"external_agent_failed"}}', 'data: [DONE]'] audit: [('error', {'host': '127.0.0.1', 'error_code': 'invalid_answer', 'duration_ms': 31, 'response_bytes': 60000, 'upstream_status': 200})]
+.2026-11-02 20:22:17,198 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 20:22:17,329 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-02 20:22:17,350 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=149
+2026-11-02 20:22:17,412 INFO ffcore.access access method=POST path=/api/v1/projects/1beebd60-56e9-4bef-b0cc-3919ddfd60a9/api-keys status=201 ms=57
+2026-11-02 20:22:17,479 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 20:22:17,546 INFO ffcore.access access method=POST path=/api/v1/projects/1beebd60-56e9-4bef-b0cc-3919ddfd60a9/agents/external status=201 ms=63
+2026-11-02 20:22:17,556 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-02 20:22:17,611 INFO ffcore.access access method=POST path=/api/v1/projects/1beebd60-56e9-4bef-b0cc-3919ddfd60a9/agents/a37aeab4-ba26-4414-ae02-68d7a22d1818/external/publish status=200 ms=59
+2026-11-02 20:22:17,753 WARNING ffcore.facade facade_external_call agent=a37aeab4-ba26-4414-ae02-68d7a22d1818 code=external_agent_failed reason=invalid_answer
+2026-11-02 20:22:17,753 WARNING ffcore.facade facade_stream_error code=external_agent_failed model=agent:p-1beebd6056/s-deepdict
+2026-11-02 20:22:17,755 INFO ffcore.access access method=POST path=/v1/chat/completions status=200 ms=140
+MAJ1 stream deepdict: 200 ['data: {"error":{"message":"The external agent call failed.","type":"api_error","code":"external_agent_failed"}}', 'data: [DONE]'] audit: [('error', {'host': '127.0.0.1', 'error_code': 'invalid_answer', 'duration_ms': 29, 'response_bytes': 40012, 'upstream_status': 200})]
+.2026-11-02 20:22:17,923 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 20:22:18,069 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-02 20:22:18,090 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=164
+2026-11-02 20:22:18,161 INFO ffcore.access access method=POST path=/api/v1/projects/d2f9e68c-1928-4863-8fcd-75445464ca15/api-keys status=201 ms=67
+2026-11-02 20:22:18,277 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 20:22:18,372 INFO ffcore.access access method=POST path=/api/v1/projects/d2f9e68c-1928-4863-8fcd-75445464ca15/agents/external status=201 ms=88
+2026-11-02 20:22:18,384 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-02 20:22:18,430 INFO ffcore.access access method=POST path=/api/v1/projects/d2f9e68c-1928-4863-8fcd-75445464ca15/agents/df35223a-121d-401a-8c69-2a0270b97075/external/publish status=200 ms=54
+2026-11-02 20:22:18,586 WARNING ffcore.facade facade_external_call agent=df35223a-121d-401a-8c69-2a0270b97075 code=external_agent_failed reason=invalid_answer
+2026-11-02 20:22:18,586 WARNING ffcore.facade facade_stream_error code=external_agent_failed model=agent:p-d2f9e68c19/s-deepmsg
+2026-11-02 20:22:18,593 INFO ffcore.access access method=POST path=/v1/chat/completions status=200 ms=159
+MAJ1 stream deepmsg: 200 ['data: {"error":{"message":"The external agent call failed.","type":"api_error","code":"external_agent_failed"}}', 'data: [DONE]'] audit: [('error', {'host': '127.0.0.1', 'error_code': 'invalid_answer', 'duration_ms': 31, 'response_bytes': 40066, 'upstream_status': 200})]
+.2026-11-02 20:22:18,853 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 20:22:18,994 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-02 20:22:19,012 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=156
+2026-11-02 20:22:19,076 INFO ffcore.access access method=POST path=/api/v1/projects/a0075f98-5a01-4adc-a276-42cd690c1016/api-keys status=201 ms=59
+2026-11-02 20:22:19,146 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 20:22:19,202 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-02 20:22:19,213 INFO ffcore.access access method=POST path=/api/v1/projects/a0075f98-5a01-4adc-a276-42cd690c1016/agents/external status=201 ms=63
+2026-11-02 20:22:19,270 INFO ffcore.access access method=POST path=/api/v1/projects/a0075f98-5a01-4adc-a276-42cd690c1016/agents/dd2304dd-9f8b-40d9-85a8-559c2e18af9f/external/publish status=200 ms=53
+2026-11-02 20:22:19,505 WARNING ffcore.facade facade_external_call agent=dd2304dd-9f8b-40d9-85a8-559c2e18af9f code=external_agent_failed reason=invalid_answer
+2026-11-02 20:22:19,505 WARNING ffcore.facade facade_stream_error code=external_agent_failed model=agent:p-a0075f985a/s-nonjson
+2026-11-02 20:22:19,507 INFO ffcore.access access method=POST path=/v1/chat/completions status=200 ms=233
+MAJ1 stream nonjson: 200 ['data: {"error":{"message":"The external agent call failed.","type":"api_error","code":"external_agent_failed"}}', 'data: [DONE]'] audit: [('error', {'host': '127.0.0.1', 'error_code': 'invalid_answer', 'duration_ms': 31, 'response_bytes': 38, 'upstream_status': 200})]
+.2026-11-02 20:22:19,698 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 20:22:19,862 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-02 20:22:19,887 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=186
+2026-11-02 20:22:20,381 INFO ffcore.access access method=POST path=/api/v1/projects/b69f9b05-b5ec-407d-a3f3-7ed13cf3cd4c/api-keys status=201 ms=489
+2026-11-02 20:22:20,462 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 20:22:20,484 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=KeyError
+2026-11-02 20:22:20,546 INFO ffcore.access access method=POST path=/api/v1/projects/b69f9b05-b5ec-407d-a3f3-7ed13cf3cd4c/agents/external status=201 ms=69
+2026-11-02 20:22:20,610 INFO ffcore.access access method=POST path=/api/v1/projects/b69f9b05-b5ec-407d-a3f3-7ed13cf3cd4c/agents/29c4885d-85eb-4e88-84b5-ae671ef64e11/external/publish status=200 ms=60
+2026-11-02 20:22:20,742 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 20:22:20,784 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=KeyError
+2026-11-02 20:22:20,878 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=130
+2026-11-02 20:22:20,962 INFO ffcore.access access method=POST path=/api/v1/projects/b69f9b05-b5ec-407d-a3f3-7ed13cf3cd4c/agents/import status=422 ms=80
+2026-11-02 20:22:21,031 INFO ffcore.access access method=POST path=/api/v1/projects/b69f9b05-b5ec-407d-a3f3-7ed13cf3cd4c/agents/import status=422 ms=63
+2026-11-02 20:22:21,098 INFO ffcore.access access method=POST path=/api/v1/projects/b69f9b05-b5ec-407d-a3f3-7ed13cf3cd4c/agents/import status=422 ms=63
+2026-11-02 20:22:21,165 INFO ffcore.access access method=POST path=/api/v1/projects/b69f9b05-b5ec-407d-a3f3-7ed13cf3cd4c/agents/import status=422 ms=64
+MAJ2 import onto external key: {('analyst', False): (422, 'external_agent_not_available'), ('analyst', True): (422, 'external_agent_not_available'), ('admin', False): (422, 'external_agent_not_available'), ('admin', True): (422, 'external_agent_not_available')}
+2026-11-02 20:22:21,238 INFO ffcore.access access method=POST path=/api/v1/projects/b69f9b05-b5ec-407d-a3f3-7ed13cf3cd4c/agents/import status=422 ms=68
+MAJ2 import onto external with unknown model: 422 external_agent_not_available
+MAJ2 versions under external: 0
+2026-11-02 20:22:21,311 INFO ffcore.access access method=POST path=/api/v1/projects/b69f9b05-b5ec-407d-a3f3-7ed13cf3cd4c/agents/imp/runs status=422 ms=68
+2026-11-02 20:22:21,386 INFO ffcore.access access method=POST path=/api/v1/projects/b69f9b05-b5ec-407d-a3f3-7ed13cf3cd4c/agents/imp/runs status=422 ms=71
+2026-11-02 20:22:21,459 INFO ffcore.access access method=POST path=/api/v1/projects/b69f9b05-b5ec-407d-a3f3-7ed13cf3cd4c/agents/imp/runs status=422 ms=70
+MAJ2 runs on external: {'{"input": "x"}': (422, 'external_agent_not_runnable'), '{"input": "x", "channel": "test", "version": 1}': (422, 'external_agent_not_runnable'), '{"input": "x", "channel": "test"}': (422, 'external_agent_not_runnable')}
+MAJ2 runs rows for external: 0
+2026-11-02 20:22:21,508 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=2 error=KeyError
+2026-11-02 20:22:21,541 INFO ffcore.access access method=POST path=/api/v1/projects/b69f9b05-b5ec-407d-a3f3-7ed13cf3cd4c/agents/import status=200 ms=75
+MAJ2 native import fresh key: 200
+.2026-11-02 20:22:21,739 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 20:22:21,772 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=KeyError
+2026-11-02 20:22:21,868 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=125
+2026-11-02 20:22:21,939 INFO ffcore.access access method=POST path=/api/v1/projects/ee9417f1-93d8-4f96-9016-5bbdafb09fa5/api-keys status=201 ms=66
+2026-11-02 20:22:22,022 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 20:22:22,051 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=KeyError
+2026-11-02 20:22:22,099 INFO ffcore.access access method=POST path=/api/v1/projects/ee9417f1-93d8-4f96-9016-5bbdafb09fa5/agents/external status=201 ms=59
+2026-11-02 20:22:22,163 INFO ffcore.access access method=POST path=/api/v1/projects/ee9417f1-93d8-4f96-9016-5bbdafb09fa5/agents/d269af1a-edcf-4837-912d-ba2a832e96b4/external/publish status=200 ms=60
+2026-11-02 20:22:22,245 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 20:22:22,268 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=KeyError
+2026-11-02 20:22:22,352 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=102
+2026-11-02 20:22:22,444 INFO ffcore.access access method=PATCH path=/api/v1/projects/ee9417f1-93d8-4f96-9016-5bbdafb09fa5/agents/d269af1a-edcf-4837-912d-ba2a832e96b4 status=403 ms=88
+2026-11-02 20:22:22,496 INFO ffcore.access access method=PUT path=/api/v1/projects/ee9417f1-93d8-4f96-9016-5bbdafb09fa5/agents/d269af1a-edcf-4837-912d-ba2a832e96b4/external status=403 ms=48
+2026-11-02 20:22:22,544 INFO ffcore.access access method=POST path=/api/v1/projects/ee9417f1-93d8-4f96-9016-5bbdafb09fa5/agents/d269af1a-edcf-4837-912d-ba2a832e96b4/external/publish status=403 ms=43
+2026-11-02 20:22:22,635 INFO ffcore.access access method=DELETE path=/api/v1/projects/ee9417f1-93d8-4f96-9016-5bbdafb09fa5/agents/d269af1a-edcf-4837-912d-ba2a832e96b4 status=403 ms=86
+2026-11-02 20:22:22,686 INFO ffcore.access access method=GET path=/api/v1/projects/ee9417f1-93d8-4f96-9016-5bbdafb09fa5/agents/d269af1a-edcf-4837-912d-ba2a832e96b4/external status=200 ms=48
+2026-11-02 20:22:22,763 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 20:22:22,789 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=KeyError
+2026-11-02 20:22:22,796 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=2 error=KeyError
+2026-11-02 20:22:22,874 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=108
+2026-11-02 20:22:22,935 INFO ffcore.access access method=PATCH path=/api/v1/projects/ee9417f1-93d8-4f96-9016-5bbdafb09fa5/agents/d269af1a-edcf-4837-912d-ba2a832e96b4 status=403 ms=57
+2026-11-02 20:22:22,996 INFO ffcore.access access method=PUT path=/api/v1/projects/ee9417f1-93d8-4f96-9016-5bbdafb09fa5/agents/d269af1a-edcf-4837-912d-ba2a832e96b4/external status=403 ms=58
+2026-11-02 20:22:23,046 INFO ffcore.access access method=POST path=/api/v1/projects/ee9417f1-93d8-4f96-9016-5bbdafb09fa5/agents/d269af1a-edcf-4837-912d-ba2a832e96b4/external/publish status=403 ms=47
+2026-11-02 20:22:23,073 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=2 error=KeyError
+2026-11-02 20:22:23,105 INFO ffcore.access access method=DELETE path=/api/v1/projects/ee9417f1-93d8-4f96-9016-5bbdafb09fa5/agents/d269af1a-edcf-4837-912d-ba2a832e96b4 status=403 ms=55
+2026-11-02 20:22:23,157 INFO ffcore.access access method=GET path=/api/v1/projects/ee9417f1-93d8-4f96-9016-5bbdafb09fa5/agents/d269af1a-edcf-4837-912d-ba2a832e96b4/external status=200 ms=47
+2026-11-02 20:22:23,247 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 20:22:23,265 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=KeyError
+2026-11-02 20:22:23,291 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=2 error=KeyError
+2026-11-02 20:22:23,367 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=117
+2026-11-02 20:22:23,417 INFO ffcore.access access method=PATCH path=/api/v1/projects/ee9417f1-93d8-4f96-9016-5bbdafb09fa5/agents/d269af1a-edcf-4837-912d-ba2a832e96b4 status=403 ms=46
+2026-11-02 20:22:23,471 INFO ffcore.access access method=PUT path=/api/v1/projects/ee9417f1-93d8-4f96-9016-5bbdafb09fa5/agents/d269af1a-edcf-4837-912d-ba2a832e96b4/external status=403 ms=48
+2026-11-02 20:22:23,518 INFO ffcore.access access method=POST path=/api/v1/projects/ee9417f1-93d8-4f96-9016-5bbdafb09fa5/agents/d269af1a-edcf-4837-912d-ba2a832e96b4/external/publish status=403 ms=43
+2026-11-02 20:22:23,561 INFO ffcore.access access method=DELETE path=/api/v1/projects/ee9417f1-93d8-4f96-9016-5bbdafb09fa5/agents/d269af1a-edcf-4837-912d-ba2a832e96b4 status=403 ms=41
+2026-11-02 20:22:23,609 INFO ffcore.access access method=GET path=/api/v1/projects/ee9417f1-93d8-4f96-9016-5bbdafb09fa5/agents/d269af1a-edcf-4837-912d-ba2a832e96b4/external status=403 ms=44
+M3 non-admin lifecycle: {('analyst', 'edit'): {'patch': 403, 'put': 403, 'publish': 403, 'delete': 403, 'get': 200}, ('admin', 'read'): {'patch': 403, 'put': 403, 'publish': 403, 'delete': 403, 'get': 200}, ('user', 'edit'): {'patch': 403, 'put': 403, 'publish': 403, 'delete': 403, 'get': 403}}
+M3 agent after attempts: (True, 'P')
+2026-11-02 20:22:23,679 INFO ffcore.access access method=PATCH path=/api/v1/projects/ee9417f1-93d8-4f96-9016-5bbdafb09fa5/agents/d269af1a-edcf-4837-912d-ba2a832e96b4 status=200 ms=65
+2026-11-02 20:22:23,757 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 20:22:23,868 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=2 error=KeyError
+2026-11-02 20:22:23,941 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=KeyError
+2026-11-02 20:22:23,979 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=209
+2026-11-02 20:22:24,078 INFO ffcore.access access method=POST path=/api/v1/projects/ee9417f1-93d8-4f96-9016-5bbdafb09fa5/agents status=201 ms=93
+M3 analyst creates native: 201
+2026-11-02 20:22:24,153 INFO ffcore.access access method=PATCH path=/api/v1/projects/ee9417f1-93d8-4f96-9016-5bbdafb09fa5/agents/6c0c26cc-04ad-4c2f-9f37-b65510f5f26e status=200 ms=69
+M3 analyst renames native: 200
+2026-11-02 20:22:24,230 INFO ffcore.access access method=DELETE path=/api/v1/projects/ee9417f1-93d8-4f96-9016-5bbdafb09fa5/agents/d269af1a-edcf-4837-912d-ba2a832e96b4 status=204 ms=73
+M3 admin delete external: 204
+.2026-11-02 20:22:24,417 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 20:22:24,447 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=KeyError
+2026-11-02 20:22:24,545 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=124
+2026-11-02 20:22:24,600 INFO ffcore.access access method=POST path=/api/v1/projects/225e9cdc-5615-4bb1-9a78-5de5491ee967/api-keys status=201 ms=52
+2026-11-02 20:22:24,689 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 20:22:24,713 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=KeyError
+2026-11-02 20:22:24,758 INFO ffcore.access access method=POST path=/api/v1/projects/225e9cdc-5615-4bb1-9a78-5de5491ee967/agents/external status=201 ms=61
+2026-11-02 20:22:24,822 INFO ffcore.access access method=POST path=/api/v1/projects/225e9cdc-5615-4bb1-9a78-5de5491ee967/agents/f4d46a69-c200-4b3d-98fc-3eeffb7dd5b8/external/publish status=200 ms=61
+2026-11-02 20:22:24,886 INFO ffcore.access access method=PUT path=/api/v1/projects/225e9cdc-5615-4bb1-9a78-5de5491ee967/agents/f4d46a69-c200-4b3d-98fc-3eeffb7dd5b8/external status=200 ms=59
+M4 same origin path change: 200 {'base_url': 'http://127.0.0.1:35993/ok2', 'model': 'm', 'api_key': '***'}
+2026-11-02 20:22:25,075 INFO ffcore.access access method=POST path=/v1/chat/completions status=200 ms=186
+2026-11-02 20:22:25,163 INFO ffcore.access access method=PUT path=/api/v1/projects/225e9cdc-5615-4bb1-9a78-5de5491ee967/agents/f4d46a69-c200-4b3d-98fc-3eeffb7dd5b8/external status=200 ms=83
+M4 case-only change: 200 {'base_url': 'HTTP://127.0.0.1:35993/ok', 'model': 'm', 'api_key': '***'}
+2026-11-02 20:22:25,224 INFO ffcore.access access method=PUT path=/api/v1/projects/225e9cdc-5615-4bb1-9a78-5de5491ee967/agents/f4d46a69-c200-4b3d-98fc-3eeffb7dd5b8/external status=200 ms=57
+M4 other origin no key: 200 {'base_url': 'http://127.0.0.1:34907/ok', 'model': 'm', 'api_key': None}
+M4 reset audit: [('success', {'reason': 'origin_changed', 'to_origin': 'http://127.0.0.1:34907', 'from_origin': 'http://127.0.0.1:35993'})]
+2026-11-02 20:22:25,279 INFO ffcore.access access method=GET path=/api/v1/projects/225e9cdc-5615-4bb1-9a78-5de5491ee967/agents/f4d46a69-c200-4b3d-98fc-3eeffb7dd5b8/external status=200 ms=49
+M4 GET after reset: {'base_url': 'http://127.0.0.1:34907/ok', 'model': 'm', 'api_key': None}
+2026-11-02 20:22:25,329 INFO ffcore.access access method=POST path=/v1/chat/completions status=501 ms=47
+M4 call after reset: 501 external_agent_not_available requests at new origin: 0
+2026-11-02 20:22:25,376 INFO ffcore.access access method=POST path=/v1/chat/completions status=501 ms=44
+M4 stream after reset: 501 ['{"error":{"message":"The external agent has no endpoint key; an administrator must set it again.","type":"api_error","code":"external_agent_not_available"}}']
+2026-11-02 20:22:25,443 INFO ffcore.access access method=POST path=/api/v1/projects/225e9cdc-5615-4bb1-9a78-5de5491ee967/agents/f4d46a69-c200-4b3d-98fc-3eeffb7dd5b8/external/publish status=409 ms=62
+M4 publish after reset: 409 external_agent_not_configured
+2026-11-02 20:22:25,470 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=2 error=KeyError
+2026-11-02 20:22:25,509 INFO ffcore.access access method=PUT path=/api/v1/projects/225e9cdc-5615-4bb1-9a78-5de5491ee967/agents/f4d46a69-c200-4b3d-98fc-3eeffb7dd5b8/external status=200 ms=63
+M4 move back: {'base_url': 'http://127.0.0.1:35993/ok', 'model': 'm', 'api_key': None}
+2026-11-02 20:22:25,585 INFO ffcore.access access method=PUT path=/api/v1/projects/225e9cdc-5615-4bb1-9a78-5de5491ee967/agents/f4d46a69-c200-4b3d-98fc-3eeffb7dd5b8/external status=200 ms=73
+M4 other origin + new key: 200 {'base_url': 'http://127.0.0.1:34907/ok', 'model': 'm', 'api_key': '***'} reset rows: 1
+2026-11-02 20:22:25,780 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=2 error=KeyError
+2026-11-02 20:22:25,808 INFO ffcore.access access method=POST path=/v1/chat/completions status=200 ms=217
+M4 call with new key: 200 True
+2026-11-02 20:22:25,844 INFO ffcore.access access method=PUT path=/api/v1/projects/225e9cdc-5615-4bb1-9a78-5de5491ee967/agents/f4d46a69-c200-4b3d-98fc-3eeffb7dd5b8/external status=422 ms=32
+M4 api_key null: 422 validation_error
+.2026-11-02 20:22:26,461 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 20:22:26,620 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=KeyError
+2026-11-02 20:22:26,641 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=173
+2026-11-02 20:22:26,697 INFO ffcore.access access method=POST path=/api/v1/projects/4ebb8b3d-0194-4c7e-b5d7-0e18739d1873/api-keys status=201 ms=53
+2026-11-02 20:22:26,772 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 20:22:26,795 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=KeyError
+2026-11-02 20:22:26,835 INFO ffcore.access access method=POST path=/api/v1/projects/4ebb8b3d-0194-4c7e-b5d7-0e18739d1873/agents/external status=201 ms=57
+2026-11-02 20:22:26,894 INFO ffcore.access access method=POST path=/api/v1/projects/4ebb8b3d-0194-4c7e-b5d7-0e18739d1873/agents/bc78685d-fc41-4f60-9d53-9c2276395022/external/publish status=200 ms=55
+2026-11-02 20:22:27,032 INFO ffcore.facade facade_external_ignored agent=bc78685d-fc41-4f60-9d53-9c2276395022 fields=2
+2026-11-02 20:22:27,057 INFO ffcore.access access method=POST path=/v1/chat/completions status=200 ms=159
+M5 log lines: ['facade_external_ignored agent=bc78685d-fc41-4f60-9d53-9c2276395022 fields=2']
+.2026-11-02 20:22:27,265 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 20:22:27,294 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=KeyError
+2026-11-02 20:22:27,377 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=110
+2026-11-02 20:22:27,432 INFO ffcore.access access method=POST path=/api/v1/projects/d8d5da59-1d70-4ee8-a6a0-da7acc161f3f/api-keys status=201 ms=51
+2026-11-02 20:22:27,493 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 20:22:27,512 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=KeyError
+2026-11-02 20:22:27,559 INFO ffcore.access access method=POST path=/api/v1/projects/d8d5da59-1d70-4ee8-a6a0-da7acc161f3f/agents/external status=201 ms=62
+2026-11-02 20:22:27,615 INFO ffcore.access access method=POST path=/api/v1/projects/d8d5da59-1d70-4ee8-a6a0-da7acc161f3f/agents/316b62cf-9215-4dde-a8da-73e5c5b3e59b/external/publish status=200 ms=52
+2026-11-02 20:22:27,753 WARNING ffcore.facade facade_external_call agent=316b62cf-9215-4dde-a8da-73e5c5b3e59b code=external_agent_failed reason=egress_too_many_redirects
+2026-11-02 20:22:27,755 INFO ffcore.access access method=POST path=/v1/chat/completions status=502 ms=136
+REG redirect: 502 external_agent_failed 1 [('error', {'host': '127.0.0.1', 'error_code': 'egress_too_many_redirects', 'duration_ms': 33, 'response_bytes': 0, 'upstream_status': None})]
+.REG rebinding at call: 502 {'host': 'agent.example.test', 'upstream_status': None, 'error_code': 'egress_private_address', 'duration_ms': 22, 'response_bytes': 0}
+.2026-11-02 20:22:27,954 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 20:22:27,987 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=KeyError
+2026-11-02 20:22:28,081 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=125
+2026-11-02 20:22:28,146 INFO ffcore.access access method=POST path=/api/v1/projects/f3ae9da5-0ece-43b5-bf56-d007dcec0aea/api-keys status=201 ms=60
+2026-11-02 20:22:28,222 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 20:22:28,252 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=KeyError
+2026-11-02 20:22:28,299 INFO ffcore.access access method=POST path=/api/v1/projects/f3ae9da5-0ece-43b5-bf56-d007dcec0aea/agents/external status=201 ms=72
+2026-11-02 20:22:28,362 INFO ffcore.access access method=POST path=/api/v1/projects/f3ae9da5-0ece-43b5-bf56-d007dcec0aea/agents/01ed0679-45b8-4452-a983-95c1c1902ebf/external/publish status=200 ms=59
+2026-11-02 20:22:28,411 INFO ffcore.access access method=GET path=/api/v1/projects/f3ae9da5-0ece-43b5-bf56-d007dcec0aea/agents/01ed0679-45b8-4452-a983-95c1c1902ebf/external status=200 ms=45
+2026-11-02 20:22:28,565 INFO ffcore.access access method=POST path=/v1/chat/completions status=200 ms=150
+SEC key in GET: False key in audit: False
+.
+28 passed in 52.43s

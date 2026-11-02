@@ -1,0 +1,52 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+__________________ test_06b2_r1_origin_change_resets_the_key ___________________
+
+ext = (UUID('b18c39d1-75a6-4be9-8d91-b9a8e57df60d'), <starlette.testclient.TestClient object at 0x7f0bb5c83590>, <tests.integration.facade_support.Facade object at 0x7f0bb39bdf70>, <function ext.<locals>.register at 0x7f0bb39b71a0>)
+fake_agent = <http.server.ThreadingHTTPServer object at 0x7f0bb6525f70>
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_29a1a66ee13c) at 0x7f0bb5cdb6b0>
+
+    def test_06b2_r1_origin_change_resets_the_key(ext, fake_agent, pg):
+        """Review r1 MINOR-4: a stored key never follows the base URL to another origin. Changing
+        the path keeps it; changing scheme, host or port without a new `api_key` deletes it (audited
+        `reset_external_agent_key`): publish is 409 `external_agent_not_configured`, the published
+        agent answers 501 `external_agent_not_available` and nothing is sent until a key is given."""
+        project, console, client, register = ext
+        agent, model = register()
+        port = fake_agent.server_address[1]
+        base = f"/api/v1/projects/{project}/agents/{agent['id']}/external"
+        same = console.put(base, json={"base_url": f"http://127.0.0.1:{port}/tools"})
+        assert same.status_code == 200 and same.json()["external"]["api_key"] == "***"
+        moved = console.put(base, json={"base_url": "http://127.0.0.1:1/ok"})
+        assert moved.status_code == 200, moved.text
+>       assert moved.json()["external"]["api_key"] is None
+E       AssertionError: assert '***' is None
+
+tests/integration/test_06b2_external_agent.py:317: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+2026-11-02 19:30:01,605 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-02 19:30:01,640 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=955
+2026-11-02 19:30:02,191 INFO ffcore.access access method=POST path=/api/v1/projects/b18c39d1-75a6-4be9-8d91-b9a8e57df60d/api-keys status=201 ms=541
+------------------------------ Captured log setup ------------------------------
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=955
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/b18c39d1-75a6-4be9-8d91-b9a8e57df60d/api-keys status=201 ms=541
+----------------------------- Captured stderr call -----------------------------
+2026-11-02 19:30:02,524 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-02 19:30:02,671 INFO ffcore.access access method=POST path=/api/v1/projects/b18c39d1-75a6-4be9-8d91-b9a8e57df60d/agents/external status=201 ms=333
+2026-11-02 19:30:02,786 INFO ffcore.access access method=POST path=/api/v1/projects/b18c39d1-75a6-4be9-8d91-b9a8e57df60d/agents/3d57dc60-e5cf-495a-b2aa-cb36af251c5b/external/publish status=200 ms=105
+2026-11-02 19:30:03,002 INFO ffcore.access access method=PUT path=/api/v1/projects/b18c39d1-75a6-4be9-8d91-b9a8e57df60d/agents/3d57dc60-e5cf-495a-b2aa-cb36af251c5b/external status=200 ms=202
+2026-11-02 19:30:03,124 INFO ffcore.access access method=PUT path=/api/v1/projects/b18c39d1-75a6-4be9-8d91-b9a8e57df60d/agents/3d57dc60-e5cf-495a-b2aa-cb36af251c5b/external status=200 ms=106
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/b18c39d1-75a6-4be9-8d91-b9a8e57df60d/agents/external status=201 ms=333
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/b18c39d1-75a6-4be9-8d91-b9a8e57df60d/agents/3d57dc60-e5cf-495a-b2aa-cb36af251c5b/external/publish status=200 ms=105
+INFO     ffcore.access:logging.py:263 access method=PUT path=/api/v1/projects/b18c39d1-75a6-4be9-8d91-b9a8e57df60d/agents/3d57dc60-e5cf-495a-b2aa-cb36af251c5b/external status=200 ms=202
+INFO     ffcore.access:logging.py:263 access method=PUT path=/api/v1/projects/b18c39d1-75a6-4be9-8d91-b9a8e57df60d/agents/3d57dc60-e5cf-495a-b2aa-cb36af251c5b/external status=200 ms=106
+--------------------------- Captured stderr teardown ---------------------------
+2026-11-02 19:30:11,136 ERROR ffcore.readiness warmup failed: ModelMissing
+---------------------------- Captured log teardown -----------------------------
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+=========================== short test summary info ============================
+FAILED tests/integration/test_06b2_external_agent.py::test_06b2_r1_origin_change_resets_the_key
+1 failed, 23 deselected in 22.58s

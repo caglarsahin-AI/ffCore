@@ -1,0 +1,17 @@
+HEAD 674fecde945c0a86223580cb5beaf329e03b8ba8
+=== tools make lint (22:58:59)
+ruff check backend scripts data/samples/scripts services
+All checks passed!
+ruff format --check backend scripts data/samples/scripts services
+395 files already formatted
+=== exit 0 (22:59:11)
+=== -w /work/backend tools pytest -q -p no:cacheprovider tests/integration/test_03a_read_side.py tests/integration/test_06a_agents.py tests/integration/test_06a_read_side.py tests/integration/test_06a_runs_api.py tests/integration/test_06b2_external_agent.py tests/integration/test_06b2_migration.py tests/integration/test_06b_agent.py tests/integration/test_06b_direct.py tests/integration/test_06b_identity.py tests/integration/test_06b_key_search.py tests/integration/test_06b_manifest.py tests/integration/test_57_alembic_merge.py (22:59:12)
+........................................................................ [ 54%]
+............................................................             [100%]
+132 passed in 216.10s (0:03:36)
+=== exit 0 (23:03:05)
+=== -e DEPLOY_PROFILE=airgap -w /work/backend tools pytest -q -p no:cacheprovider tests/integration/test_03a_read_side.py tests/integration/test_06a_agents.py tests/integration/test_06a_read_side.py tests/integration/test_06a_runs_api.py tests/integration/test_06b2_external_agent.py tests/integration/test_06b2_migration.py tests/integration/test_06b_agent.py tests/integration/test_06b_direct.py tests/integration/test_06b_identity.py tests/integration/test_06b_key_search.py tests/integration/test_06b_manifest.py tests/integration/test_57_alembic_merge.py (23:03:05)
+........................................................................ [ 54%]
+............................................................             [100%]
+132 passed in 232.19s (0:03:52)
+=== exit 0 (23:07:15)

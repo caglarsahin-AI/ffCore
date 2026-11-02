@@ -1,0 +1,4 @@
+ACCEPTED http://vllm:8000/v1
+ACCEPTED http://gpu01.corp:11434/v1
+REFUSED http://ollama:11434/v1 external_agent_host_reserved
+ACCEPTED http://llm.corp.:4000/v1

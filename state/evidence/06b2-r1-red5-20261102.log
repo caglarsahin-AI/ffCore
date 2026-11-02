@@ -1,0 +1,56 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+______________ test_06b2_r1_rename_and_delete_external_need_admin ______________
+
+ext = (UUID('4569122f-1ec2-4810-ac40-29c7b4bc77de'), <starlette.testclient.TestClient object at 0x7f8ec00972c0>, <tests.integration.facade_support.Facade object at 0x7f8e82fdddc0>, <function ext.<locals>.register at 0x7f8ea2ed2e80>)
+make_user = <function make_user.<locals>.make at 0x7f8ec0105800>
+client_factory = <function client_factory.<locals>.make at 0x7f8ec0105940>
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_f0d352fbcd96) at 0x7f8ec00f32c0>
+
+    def test_06b2_r1_rename_and_delete_external_need_admin(ext, make_user, client_factory, pg):
+        """Review r1 MINOR-3: the general PATCH and DELETE of an external agent need the project
+        admin (edit), as its registration does; an analyst is 403 (audited `denied`) and the agent,
+        its key and its facade name stay. A native agent is unchanged (analyst + edit)."""
+        project, console, _, register = ext
+        agent, _ = register()
+        _, email = make_user(memberships={project: ("analyst", "edit")})
+        analyst = client_factory(email)
+        base = f"/api/v1/projects/{project}/agents/{agent['id']}"
+>       assert analyst.patch(base, json={"name": "Başka"}).status_code == 403
+E       AssertionError: assert 200 == 403
+E        +  where 200 = <Response [200 OK]>.status_code
+E        +    where <Response [200 OK]> = patch('/api/v1/projects/4569122f-1ec2-4810-ac40-29c7b4bc77de/agents/7f3caa9b-1205-45de-99b5-5aa0988e90b2', json={'name': 'Başka'})
+E        +      where patch = <starlette.testclient.TestClient object at 0x7f8e83319bb0>.patch
+
+tests/integration/test_06b2_external_agent.py:289: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+2026-11-02 19:20:19,804 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-02 19:20:19,847 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=870
+2026-11-02 19:20:20,312 INFO ffcore.access access method=POST path=/api/v1/projects/4569122f-1ec2-4810-ac40-29c7b4bc77de/api-keys status=201 ms=458
+------------------------------ Captured log setup ------------------------------
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=870
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/4569122f-1ec2-4810-ac40-29c7b4bc77de/api-keys status=201 ms=458
+----------------------------- Captured stderr call -----------------------------
+2026-11-02 19:20:20,593 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-02 19:20:20,677 INFO ffcore.access access method=POST path=/api/v1/projects/4569122f-1ec2-4810-ac40-29c7b4bc77de/agents/external status=201 ms=238
+2026-11-02 19:20:20,808 INFO ffcore.access access method=POST path=/api/v1/projects/4569122f-1ec2-4810-ac40-29c7b4bc77de/agents/7f3caa9b-1205-45de-99b5-5aa0988e90b2/external/publish status=200 ms=121
+2026-11-02 19:20:21,280 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-02 19:20:21,314 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=250
+2026-11-02 19:20:21,440 INFO ffcore.access access method=PATCH path=/api/v1/projects/4569122f-1ec2-4810-ac40-29c7b4bc77de/agents/7f3caa9b-1205-45de-99b5-5aa0988e90b2 status=200 ms=111
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/4569122f-1ec2-4810-ac40-29c7b4bc77de/agents/external status=201 ms=238
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/4569122f-1ec2-4810-ac40-29c7b4bc77de/agents/7f3caa9b-1205-45de-99b5-5aa0988e90b2/external/publish status=200 ms=121
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=250
+INFO     ffcore.access:logging.py:263 access method=PATCH path=/api/v1/projects/4569122f-1ec2-4810-ac40-29c7b4bc77de/agents/7f3caa9b-1205-45de-99b5-5aa0988e90b2 status=200 ms=111
+--------------------------- Captured stderr teardown ---------------------------
+2026-11-02 19:20:30,068 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 19:20:30,069 ERROR ffcore.readiness warmup failed: ModelMissing
+---------------------------- Captured log teardown -----------------------------
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+=========================== short test summary info ============================
+FAILED tests/integration/test_06b2_external_agent.py::test_06b2_r1_rename_and_delete_external_need_admin
+1 failed, 22 deselected in 21.70s

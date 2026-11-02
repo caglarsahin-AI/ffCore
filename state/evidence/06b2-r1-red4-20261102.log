@@ -1,0 +1,6 @@
+=========================== short test summary info ============================
+FAILED tests/unit/test_06b2_external.py::test_06b2_r1_base_url_query_refused[https://agent.example/v1?api-key=dummy-not-secret-qs]
+FAILED tests/unit/test_06b2_external.py::test_06b2_r1_base_url_query_refused[https://agent.example/v1?]
+FAILED tests/unit/test_06b2_external.py::test_06b2_r1_base_url_query_refused[https://agent.example/v1#frag]
+FAILED tests/unit/test_06b2_external.py::test_06b2_r1_base_url_query_refused[https://agent.example/v1/#]
+4 failed, 53 deselected in 5.72s

@@ -1,0 +1,116 @@
+FF.                                                                      [100%]
+=================================== FAILURES ===================================
+________________ test_06b2_r1_import_onto_external_key_refused _________________
+
+ext = (UUID('fa5f3508-d060-46dc-8b89-ca70bf766901'), <starlette.testclient.TestClient object at 0x7f56154764b0>, <tests.integration.facade_support.Facade object at 0x7f55bef2cc20>, <function ext.<locals>.register at 0x7f56131a6fc0>)
+make_user = <function make_user.<locals>.make at 0x7f56154e5620>
+client_factory = <function client_factory.<locals>.make at 0x7f56154e5760>
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_9ea237f40fde) at 0x7f56154d32c0>
+
+    def test_06b2_r1_import_onto_external_key_refused(ext, make_user, client_factory, pg):
+        """Review r1 MAJOR-2: a native manifest under an external agent's key is refused (dry run
+        included) for the analyst who may import; no version appears under the external agent."""
+        project, _, _, register = ext
+        agent, _ = register()
+        _model(pg, project)  # the manifest's model exists: only the key's kind refuses it
+        _, email = make_user(memberships={project: ("analyst", "edit")})
+        analyst = client_factory(email)
+        manifest = {
+            "agent": {"key": "dis", "name": "x", "kind": "native"},
+            "definition": {"model": "chat-default", "system_prompt": "x"},
+        }
+        for params in ({}, {"dry_run": "true"}):
+            response = analyst.post(
+                f"/api/v1/projects/{project}/agents/import", params=params, json=manifest
+            )
+>           assert response.status_code == 422, response.text
+E           AssertionError: {"dry_run":false,"action":"new_version","agent_key":"dis","id":"999abd61-3213-44d4-8be3-4f955db65187","version":1,"definition":{"schema_version":1,"model":"chat-default","system_prompt":"x","langfuse_prompt":null,"variables":[],"knowledge":[],"tools":[],"approval":null,"ask_user":false,"guardrail_policy_key":"default","structured_output":null,"limits":{"max_tool_calls":6,"max_turns":10,"run_timeout_s":null,"context_tokens":16000,"output_tokens":800},"context_policy":{"history_turns":6,"history_summarize":true,"history_max_tokens":3000,"memory_max_tokens":300,"rag_max_tokens":4000,"tools_schema_max_tokens":1500,"output_reserve_tokens":800,"trim_order":["history","rag","memory"]},"answer_rules":{"cite_sources":true,"unknown_reply":"This information is not in the documents.","confidence_formula":"cited","confidence_threshold":null,"show_confidence":false,"verify":false,"max_answer_tokens":400},"reasoning":"none","runtime_profile":"default"}}
+E           assert 200 == 422
+E            +  where 200 = <Response [200 OK]>.status_code
+
+tests/integration/test_06b2_external_agent.py:252: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+2026-11-02 19:11:50,016 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-02 19:11:50,195 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=629
+2026-11-02 19:11:50,620 INFO ffcore.access access method=POST path=/api/v1/projects/fa5f3508-d060-46dc-8b89-ca70bf766901/api-keys status=201 ms=399
+------------------------------ Captured log setup ------------------------------
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=629
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/fa5f3508-d060-46dc-8b89-ca70bf766901/api-keys status=201 ms=399
+----------------------------- Captured stderr call -----------------------------
+2026-11-02 19:11:50,985 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-02 19:11:51,082 INFO ffcore.access access method=POST path=/api/v1/projects/fa5f3508-d060-46dc-8b89-ca70bf766901/agents/external status=201 ms=297
+2026-11-02 19:11:51,216 INFO ffcore.access access method=POST path=/api/v1/projects/fa5f3508-d060-46dc-8b89-ca70bf766901/agents/999abd61-3213-44d4-8be3-4f955db65187/external/publish status=200 ms=127
+2026-11-02 19:11:51,429 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=SecretDecryptError
+2026-11-02 19:11:51,629 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=229
+2026-11-02 19:11:51,989 INFO ffcore.access access method=POST path=/api/v1/projects/fa5f3508-d060-46dc-8b89-ca70bf766901/agents/import status=200 ms=346
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/fa5f3508-d060-46dc-8b89-ca70bf766901/agents/external status=201 ms=297
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/fa5f3508-d060-46dc-8b89-ca70bf766901/agents/999abd61-3213-44d4-8be3-4f955db65187/external/publish status=200 ms=127
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:451 litellm_reconcile_retry attempt=1 error=SecretDecryptError
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=229
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/fa5f3508-d060-46dc-8b89-ca70bf766901/agents/import status=200 ms=346
+--------------------------- Captured stderr teardown ---------------------------
+2026-11-02 19:11:52,593 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=2 error=SecretDecryptError
+2026-11-02 19:11:54,617 ERROR ffcore.litellm_reconcile litellm_reconcile_failed attempts=3 error=SecretDecryptError
+2026-11-02 19:11:58,418 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 19:11:58,419 ERROR ffcore.readiness warmup failed: ModelMissing
+---------------------------- Captured log teardown -----------------------------
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:451 litellm_reconcile_retry attempt=2 error=SecretDecryptError
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:447 litellm_reconcile_failed attempts=3 error=SecretDecryptError
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+_________________ test_06b2_r1_external_agent_is_not_runnable __________________
+
+ext = (UUID('6b428c9b-e20d-4db2-9d2c-7d944153dde7'), <starlette.testclient.TestClient object at 0x7f55dc81e1e0>, <tests.integration.facade_support.Facade object at 0x7f555c091760>, <function ext.<locals>.register at 0x7f55bdb9e160>)
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_9ea237f40fde) at 0x7f55bcb3c350>
+
+    def test_06b2_r1_external_agent_is_not_runnable(ext, pg):
+        """Review r1 MAJOR-2 (defence): even with a version row under its key (written before the
+        import refusal), an external agent is never a run: 422 `external_agent_not_runnable`."""
+        project, console, _, register = ext
+        agent, _ = register()
+        pg.execute(
+            "INSERT INTO agent_versions (id, agent_id, version, definition, created_by)"
+            " VALUES (gen_random_uuid(), %s, 1, %s, 'test')",
+            (agent["id"], json.dumps({"model": "chat-default", "system_prompt": "x"})),
+        )
+        url = f"/api/v1/projects/{project}/agents/dis/runs"
+        for body in ({"channel": "test", "version": 1, "input": "x"}, {"input": "x"}):
+            # Streamed: an accepted run is an SSE stream that would wait for a worker (the red run
+            # hung there); its first line is enough to fail.
+            with console.stream("POST", url, json=body) as response:
+                status = response.status_code
+                text = response.read().decode() if status != 200 else next(response.iter_lines())
+>           assert status == 422, text
+E           AssertionError: id: 1-0
+E           assert 200 == 422
+
+tests/integration/test_06b2_external_agent.py:274: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+2026-11-02 19:11:58,710 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 19:11:58,738 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=SecretDecryptError
+2026-11-02 19:11:58,820 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=108
+2026-11-02 19:11:58,886 INFO ffcore.access access method=POST path=/api/v1/projects/6b428c9b-e20d-4db2-9d2c-7d944153dde7/api-keys status=201 ms=62
+2026-11-02 19:11:58,959 ERROR ffcore.readiness warmup failed: ModelMissing
+------------------------------ Captured log setup ------------------------------
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:451 litellm_reconcile_retry attempt=1 error=SecretDecryptError
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=108
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/6b428c9b-e20d-4db2-9d2c-7d944153dde7/api-keys status=201 ms=62
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+----------------------------- Captured stderr call -----------------------------
+2026-11-02 19:11:58,977 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=SecretDecryptError
+2026-11-02 19:11:59,034 INFO ffcore.access access method=POST path=/api/v1/projects/6b428c9b-e20d-4db2-9d2c-7d944153dde7/agents/external status=201 ms=69
+2026-11-02 19:11:59,110 INFO ffcore.access access method=POST path=/api/v1/projects/6b428c9b-e20d-4db2-9d2c-7d944153dde7/agents/79e9940e-d9e2-44db-87ad-d249bc683a6c/external/publish status=200 ms=72
+2026-11-02 19:11:59,260 INFO ffcore.access access method=POST path=/api/v1/projects/6b428c9b-e20d-4db2-9d2c-7d944153dde7/agents/dis/runs status=200 ms=141
+------------------------------ Captured log call -------------------------------
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:451 litellm_reconcile_retry attempt=1 error=SecretDecryptError
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/6b428c9b-e20d-4db2-9d2c-7d944153dde7/agents/external status=201 ms=69
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/6b428c9b-e20d-4db2-9d2c-7d944153dde7/agents/79e9940e-d9e2-44db-87ad-d249bc683a6c/external/publish status=200 ms=72
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/6b428c9b-e20d-4db2-9d2c-7d944153dde7/agents/dis/runs status=200 ms=141
+=========================== short test summary info ============================
+FAILED tests/integration/test_06b2_external_agent.py::test_06b2_r1_import_onto_external_key_refused
+FAILED tests/integration/test_06b2_external_agent.py::test_06b2_r1_external_agent_is_not_runnable
+2 failed, 1 passed, 19 deselected in 19.79s

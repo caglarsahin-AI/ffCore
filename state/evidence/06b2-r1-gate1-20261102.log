@@ -1,0 +1,620 @@
+HEAD 3d5c83bc287a4231854f04dcdf7b74644a69bbd0
+=== tools make lint (22:44:15)
+ruff check backend scripts data/samples/scripts services
+All checks passed!
+ruff format --check backend scripts data/samples/scripts services
+395 files already formatted
+=== exit 0 (22:44:30)
+=== -w /work/backend tools alembic heads (22:44:31)
+06b_0001 (05a, 03c, 04a, 06b, 03a, 08, 06a, 03b, 07) (head)
+=== exit 0 (22:44:43)
+=== tools make test (22:44:43)
+cd backend && pytest tests/unit tests/contract
+============================= test session starts ==============================
+platform linux -- Python 3.12.10, pytest-9.2.0, pluggy-1.7.0
+rootdir: /work/backend
+configfile: pyproject.toml
+plugins: Faker-40.43.0, anyio-4.15.1, langsmith-0.14.8
+collected 919 items
+
+tests/unit/test_00_1_healthz.py .                                        [  0%]
+tests/unit/test_00_package.py ..                                         [  0%]
+tests/unit/test_00_repo_skeleton.py ...........                          [  1%]
+tests/unit/test_00_smoke_script.py ....                                  [  1%]
+tests/unit/test_01_client.py ..............                              [  3%]
+tests/unit/test_01_config.py ...                                         [  3%]
+tests/unit/test_01_egress_stream.py ..................                   [  5%]
+tests/unit/test_01_r1_safety.py ..............................           [  9%]
+tests/unit/test_01_reconcile_params.py ................                  [ 10%]
+tests/unit/test_01_scheduler.py .....                                    [ 11%]
+tests/unit/test_01_seed.py .............                                 [ 12%]
+tests/unit/test_02_logging.py ...........                                [ 13%]
+tests/unit/test_02_pricing.py ...                                        [ 14%]
+tests/unit/test_02_r1_logging.py ..............                          [ 15%]
+tests/unit/test_02_r1_tracing.py ...                                     [ 16%]
+tests/unit/test_02_tracing.py .......................                    [ 18%]
+tests/unit/test_03a_providers_service.py .....                           [ 19%]
+tests/unit/test_03a_session.py ........                                  [ 20%]
+tests/unit/test_03a_write_flag.py ....                                   [ 20%]
+tests/unit/test_03b_auth.py .................                            [ 22%]
+tests/unit/test_03b_config_errors.py ........                            [ 23%]
+tests/unit/test_03b_dns_opt_in.py ..                                     [ 23%]
+tests/unit/test_03b_egress.py .......................................... [ 27%]
+............                                                             [ 29%]
+tests/unit/test_04a_convert.py .............................             [ 32%]
+tests/unit/test_04a_redis_pin.py ...                                     [ 32%]
+tests/unit/test_04a_review_r1_audit_fields.py ..                         [ 32%]
+tests/unit/test_04a_review_r1_chunk_budget.py .....                      [ 33%]
+tests/unit/test_04a_review_r1_limits.py ...........                      [ 34%]
+tests/unit/test_04a_review_r1_offline.py ......                          [ 35%]
+tests/unit/test_04a_text_rules.py ..............................         [ 38%]
+tests/unit/test_05a_mcp_client.py ...................................... [ 42%]
+.                                                                        [ 42%]
+tests/unit/test_05a_obo_verifier.py .....                                [ 43%]
+tests/unit/test_05a_services_config.py ..........                        [ 44%]
+tests/unit/test_05a_sql_validator.py ................................... [ 48%]
+................                                                         [ 50%]
+tests/unit/test_05a_tool_read_roles.py ..                                [ 50%]
+tests/unit/test_05a_unverified_claims.py ....                            [ 50%]
+tests/unit/test_06a_definition.py ..................                     [ 52%]
+tests/unit/test_06a_model_adapter.py .                                   [ 52%]
+tests/unit/test_06a_no_langsmith.py ...                                  [ 53%]
+tests/unit/test_06a_prompting.py .....................                   [ 55%]
+tests/unit/test_06a_search_adapter.py .                                  [ 55%]
+tests/unit/test_06b2_external.py ....................................... [ 59%]
+.....................                                                    [ 62%]
+tests/unit/test_06b_facade.py .......................................... [ 66%]
+                                                                         [ 66%]
+tests/unit/test_07_rules.py ...........                                  [ 67%]
+tests/unit/test_07_worker.py .                                           [ 67%]
+tests/unit/test_07f_compose.py .                                         [ 68%]
+tests/unit/test_07f_follow.py ...                                        [ 68%]
+tests/unit/test_08_cost.py .......                                       [ 69%]
+tests/unit/test_08_egress_enforce.py ...............................     [ 72%]
+tests/unit/test_08_engine.py .....................                       [ 74%]
+tests/unit/test_08_masking.py ..........                                 [ 75%]
+tests/unit/test_08_recognizers.py .............                          [ 77%]
+tests/unit/test_116_source_state.py ..                                   [ 77%]
+tests/unit/test_134_egress_all_messages.py ........                      [ 78%]
+tests/unit/test_18td_server.py ...........                               [ 79%]
+tests/unit/test_18td_sql_write_attempts.py ................              [ 81%]
+tests/unit/test_19_eval_out.py ..........                                [ 82%]
+tests/unit/test_19_offline.py ............                               [ 83%]
+tests/unit/test_19_preflight.py ...............                          [ 85%]
+tests/unit/test_19_raw_staging.py ........................               [ 87%]
+tests/unit/test_af_1_definition_error_codes.py ............              [ 89%]
+tests/unit/test_af_2_structural_breadcrumb.py .........                  [ 90%]
+tests/unit/test_af_2c_source_mask_paths.py ..                            [ 90%]
+tests/unit/test_fake_openai_tool_mode.py .....                           [ 90%]
+tests/contract/test_03a_openapi.py ....                                  [ 91%]
+tests/contract/test_03c_openapi.py ....                                  [ 91%]
+tests/contract/test_04a_makefile_test_int.py ...                         [ 92%]
+tests/contract/test_04a_openapi.py ......                                [ 92%]
+tests/contract/test_05a_openapi.py ....                                  [ 93%]
+tests/contract/test_06a_openapi.py ....                                  [ 93%]
+tests/contract/test_06b2_reserved_hosts.py ..                            [ 93%]
+tests/contract/test_06b_litellm_not_published.py .                       [ 94%]
+tests/contract/test_06b_openapi.py ...                                   [ 94%]
+tests/contract/test_07_openapi.py ....                                   [ 94%]
+tests/contract/test_08_openapi.py ......                                 [ 95%]
+tests/contract/test_57_alembic_single_head.py ...                        [ 95%]
+tests/contract/test_c11_facade.py .....                                  [ 96%]
+tests/contract/test_c1_namespace.py ...............                      [ 97%]
+tests/contract/test_c2_api_key_scopes.py ..                              [ 98%]
+tests/contract/test_c2_on_behalf_of.py ..                                [ 98%]
+tests/contract/test_c3_common_columns.py .....                           [ 98%]
+tests/contract/test_c5_vectorstore.py ...                                [ 99%]
+tests/contract/test_c9_runs.py .......                                   [100%]
+
+======================= 919 passed in 164.63s (0:02:44) ========================
+=== exit 0 (22:47:45)
+=== -e DEPLOY_PROFILE=airgap tools make test (22:47:45)
+cd backend && pytest tests/unit tests/contract
+============================= test session starts ==============================
+platform linux -- Python 3.12.10, pytest-9.2.0, pluggy-1.7.0
+rootdir: /work/backend
+configfile: pyproject.toml
+plugins: Faker-40.43.0, anyio-4.15.1, langsmith-0.14.8
+collected 919 items
+
+tests/unit/test_00_1_healthz.py .                                        [  0%]
+tests/unit/test_00_package.py ..                                         [  0%]
+tests/unit/test_00_repo_skeleton.py ...........                          [  1%]
+tests/unit/test_00_smoke_script.py ....                                  [  1%]
+tests/unit/test_01_client.py ..............                              [  3%]
+tests/unit/test_01_config.py ...                                         [  3%]
+tests/unit/test_01_egress_stream.py ..................                   [  5%]
+tests/unit/test_01_r1_safety.py ..............................           [  9%]
+tests/unit/test_01_reconcile_params.py ................                  [ 10%]
+tests/unit/test_01_scheduler.py .....                                    [ 11%]
+tests/unit/test_01_seed.py .............                                 [ 12%]
+tests/unit/test_02_logging.py ...........                                [ 13%]
+tests/unit/test_02_pricing.py ...                                        [ 14%]
+tests/unit/test_02_r1_logging.py ..............                          [ 15%]
+tests/unit/test_02_r1_tracing.py ...                                     [ 16%]
+tests/unit/test_02_tracing.py .......................                    [ 18%]
+tests/unit/test_03a_providers_service.py .....                           [ 19%]
+tests/unit/test_03a_session.py ........                                  [ 20%]
+tests/unit/test_03a_write_flag.py ....                                   [ 20%]
+tests/unit/test_03b_auth.py .................                            [ 22%]
+tests/unit/test_03b_config_errors.py ........                            [ 23%]
+tests/unit/test_03b_dns_opt_in.py ..                                     [ 23%]
+tests/unit/test_03b_egress.py .....................................Traceback (most recent call last):
+.  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/local/lib/python3.12/socketserver.py", line 766, in __init__
+    self.handle()
+  File "/usr/local/lib/python3.12/http/server.py", line 436, in handle
+    self.handle_one_request()
+  File "/usr/local/lib/python3.12/http/server.py", line 424, in handle_one_request
+    method()
+  File "/work/backend/tests/unit/test_03b_egress.py", line 62, in do_GET
+    self._reply(200, b"late")
+  File "/work/backend/tests/unit/test_03b_egress.py", line 81, in _reply
+    self.wfile.write(body)
+  File "/usr/local/lib/python3.12/socketserver.py", line 845, in write
+    self._sock.sendall(b)
+BrokenPipeError: [Errno 32] Broken pipe
+----------------------------------------.... [ 27%]
+............                                                             [ 29%]
+tests/unit/test_04a_convert.py .............................             [ 32%]
+tests/unit/test_04a_redis_pin.py ...                                     [ 32%]
+tests/unit/test_04a_review_r1_audit_fields.py ..                         [ 32%]
+tests/unit/test_04a_review_r1_chunk_budget.py .....                      [ 33%]
+tests/unit/test_04a_review_r1_limits.py ...........                      [ 34%]
+tests/unit/test_04a_review_r1_offline.py ......                          [ 35%]
+tests/unit/test_04a_text_rules.py ..............................         [ 38%]
+tests/unit/test_05a_mcp_client.py ...................................... [ 42%]
+.                                                                        [ 42%]
+tests/unit/test_05a_obo_verifier.py .....                                [ 43%]
+tests/unit/test_05a_services_config.py ..........                        [ 44%]
+tests/unit/test_05a_sql_validator.py ................................... [ 48%]
+................                                                         [ 50%]
+tests/unit/test_05a_tool_read_roles.py ..                                [ 50%]
+tests/unit/test_05a_unverified_claims.py ....                            [ 50%]
+tests/unit/test_06a_definition.py ..................                     [ 52%]
+tests/unit/test_06a_model_adapter.py .                                   [ 52%]
+tests/unit/test_06a_no_langsmith.py ...                                  [ 53%]
+tests/unit/test_06a_prompting.py .....................                   [ 55%]
+tests/unit/test_06a_search_adapter.py .                                  [ 55%]
+tests/unit/test_06b2_external.py ....................................... [ 59%]
+.....................                                                    [ 62%]
+tests/unit/test_06b_facade.py .......................................... [ 66%]
+                                                                         [ 66%]
+tests/unit/test_07_rules.py ...........                                  [ 67%]
+tests/unit/test_07_worker.py .                                           [ 67%]
+tests/unit/test_07f_compose.py .                                         [ 68%]
+tests/unit/test_07f_follow.py ...                                        [ 68%]
+tests/unit/test_08_cost.py .......                                       [ 69%]
+tests/unit/test_08_egress_enforce.py ...............................     [ 72%]
+tests/unit/test_08_engine.py .....................                       [ 74%]
+tests/unit/test_08_masking.py ..........                                 [ 75%]
+tests/unit/test_08_recognizers.py .............                          [ 77%]
+tests/unit/test_116_source_state.py ..                                   [ 77%]
+tests/unit/test_134_egress_all_messages.py ........                      [ 78%]
+tests/unit/test_18td_server.py ...........                               [ 79%]
+tests/unit/test_18td_sql_write_attempts.py ................              [ 81%]
+tests/unit/test_19_eval_out.py ..........                                [ 82%]
+tests/unit/test_19_offline.py ............                               [ 83%]
+tests/unit/test_19_preflight.py ...............                          [ 85%]
+tests/unit/test_19_raw_staging.py ........................               [ 87%]
+tests/unit/test_af_1_definition_error_codes.py ............              [ 89%]
+tests/unit/test_af_2_structural_breadcrumb.py .........                  [ 90%]
+tests/unit/test_af_2c_source_mask_paths.py ..                            [ 90%]
+tests/unit/test_fake_openai_tool_mode.py .....                           [ 90%]
+tests/contract/test_03a_openapi.py ....                                  [ 91%]
+tests/contract/test_03c_openapi.py ....                                  [ 91%]
+tests/contract/test_04a_makefile_test_int.py ...                         [ 92%]
+tests/contract/test_04a_openapi.py ......                                [ 92%]
+tests/contract/test_05a_openapi.py ....                                  [ 93%]
+tests/contract/test_06a_openapi.py ....                                  [ 93%]
+tests/contract/test_06b2_reserved_hosts.py ..                            [ 93%]
+tests/contract/test_06b_litellm_not_published.py .                       [ 94%]
+tests/contract/test_06b_openapi.py ...                                   [ 94%]
+tests/contract/test_07_openapi.py ....                                   [ 94%]
+tests/contract/test_08_openapi.py ......                                 [ 95%]
+tests/contract/test_57_alembic_single_head.py ...                        [ 95%]
+tests/contract/test_c11_facade.py .....                                  [ 96%]
+tests/contract/test_c1_namespace.py ...............                      [ 97%]
+tests/contract/test_c2_api_key_scopes.py ..                              [ 98%]
+tests/contract/test_c2_on_behalf_of.py ..                                [ 98%]
+tests/contract/test_c3_common_columns.py .....                           [ 98%]
+tests/contract/test_c5_vectorstore.py ...                                [ 99%]
+tests/contract/test_c9_runs.py .......                                   [100%]
+
+======================= 919 passed in 152.85s (0:02:32) ========================
+=== exit 0 (22:50:34)
+=== -w /work/backend tools pytest -q -p no:cacheprovider tests/integration/test_06b2_external_agent.py tests/integration/test_06b2_migration.py tests/integration/test_06b_agent.py tests/integration/test_06b_direct.py tests/integration/test_06b_identity.py tests/integration/test_06b_key_search.py tests/integration/test_06b_manifest.py tests/integration/test_06a_agents.py tests/integration/test_06a_runs_api.py tests/integration/test_06a_read_side.py tests/integration/test_03a_read_side.py tests/integration/test_57_alembic_merge.py (22:50:35)
+........................................................................ [ 54%]
+..............................................F.............             [100%]
+=================================== FAILURES ===================================
+_______________________ test_03a_2_read_mode_get_parity ________________________
+
+app = <fastapi.applications.FastAPI object at 0x7fef9e9e0530>
+world = {'edit': <starlette.testclient.TestClient object at 0x7fee843ce750>, 'read': <starlette.testclient.TestClient object a...680>, 'project_id': 'ef12ab87-0643-4d46-b70c-556256710640', 'provider_id': 'ddd8dc2d-30de-411f-9c9a-17a14d37f6d5', ...}
+
+    def test_03a_2_read_mode_get_parity(app, world):
+        checked = 0
+        for path in _get_paths(app):
+            if path in PARITY_EXEMPT or path.startswith(PARITY_EXEMPT_PREFIXES):
+                continue
+            url = re.sub(r"\{(\w+)\}", lambda m: world[m.group(1)], path)
+>           edit, read = world["edit"].get(url), world["read"].get(url)
+                         ^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_03a_read_side.py:99: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:1112: in get
+    return self.request(
+/opt/venv/lib/python3.12/site-packages/starlette/testclient.py:518: in request
+    return super().request(
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:796: in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:993: in send
+    raise exc
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:987: in send
+    response.read()
+/opt/venv/lib/python3.12/site-packages/httpx2/_models.py:877: in read
+    self._content = b"".join(self.iter_bytes())
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_models.py:893: in iter_bytes
+    for raw_bytes in self.iter_raw():
+                     ^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_models.py:948: in iter_raw
+    for raw_stream_bytes in self.stream:
+                            ^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:143: in __iter__
+    yield from self._stream
+/opt/venv/lib/python3.12/site-packages/starlette/testclient.py:384: in iter_body
+    exit_stack.close()
+/usr/local/lib/python3.12/contextlib.py:618: in close
+    self.__exit__(None, None, None)
+/usr/local/lib/python3.12/contextlib.py:610: in __exit__
+    raise exc_details[1]
+/usr/local/lib/python3.12/contextlib.py:595: in __exit__
+    if cb(*exc_details):
+       ^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/starlette/testclient.py:399: in close_app
+    raise exception
+/opt/venv/lib/python3.12/site-packages/anyio/from_thread.py:265: in _call_func
+    retval = await retval_or_awaitable
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/starlette/testclient.py:366: in run_app
+    await self.app(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/applications.py:1194: in __call__
+    await super().__call__(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/applications.py:96: in __call__
+    await self.middleware_stack(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/middleware/errors.py:186: in __call__
+    raise exc
+/opt/venv/lib/python3.12/site-packages/starlette/middleware/errors.py:164: in __call__
+    await self.app(scope, receive, _send)
+/opt/venv/lib/python3.12/site-packages/fastapi/telemetry/_asgi.py:151: in __call__
+    await self.app(scope, receive, send)
+ffcore/core/logging.py:261: in __call__
+    await self.app(scope, receive, send_status)
+ffcore/api/upload_limit.py:44: in __call__
+    await self.app(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py:63: in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    raise exc
+/opt/venv/lib/python3.12/site-packages/starlette/_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+/opt/venv/lib/python3.12/site-packages/fastapi/middleware/asyncexitstack.py:18: in __call__
+    await self.app(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/routing.py:683: in __call__
+    await self.middleware_stack(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:2811: in app
+    await route.handle(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:1839: in handle
+    await self.original_router.handle(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:2894: in handle
+    await included_router._handle_selected(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:1850: in _handle_selected
+    await route.handle(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:1839: in handle
+    await self.original_router.handle(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:2894: in handle
+    await included_router._handle_selected(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:1865: in _handle_selected
+    await original_route.handle(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:1328: in handle
+    await effective_context.app(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:166: in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    raise exc
+/opt/venv/lib/python3.12/site-packages/starlette/_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:152: in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:745: in app
+    raw_response = await run_endpoint_function(
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:372: in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ffcore/api/providers.py:130: in list_providers
+    return ProviderList(data=[await provider_out(session, p, settings) for p in rows])
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ffcore/api/providers.py:54: in provider_out
+    config = decrypt_json(provider.config_encrypted, settings)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+token = b'x'
+settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+
+    def decrypt_json(token: bytes, settings: Settings) -> dict[str, Any]:
+        try:
+            return json.loads(_fernet(settings).decrypt(bytes(token)))
+        except InvalidToken:
+>           raise SecretDecryptError(
+                "stored secret does not decrypt with FERNET_KEY (was the key changed?)"
+            ) from None
+E           ffcore.core.secrets.SecretDecryptError: stored secret does not decrypt with FERNET_KEY (was the key changed?)
+
+ffcore/core/secrets.py:31: SecretDecryptError
+---------------------------- Captured stderr setup -----------------------------
+2026-11-02 19:53:09,950 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 19:53:09,985 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=SecretDecryptError
+2026-11-02 19:53:10,095 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=142
+2026-11-02 19:53:10,177 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 19:53:10,202 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=SecretDecryptError
+2026-11-02 19:53:10,289 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=108
+2026-11-02 19:53:10,364 INFO ffcore.access access method=POST path=/api/v1/providers status=201 ms=68
+2026-11-02 19:53:10,429 INFO ffcore.access access method=POST path=/api/v1/projects/ef12ab87-0643-4d46-b70c-556256710640/models status=201 ms=61
+------------------------------ Captured log setup ------------------------------
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:451 litellm_reconcile_retry attempt=1 error=SecretDecryptError
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=142
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:451 litellm_reconcile_retry attempt=1 error=SecretDecryptError
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=108
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/providers status=201 ms=68
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/ef12ab87-0643-4d46-b70c-556256710640/models status=201 ms=61
+----------------------------- Captured stderr call -----------------------------
+2026-11-02 19:53:10,498 INFO ffcore.access access method=GET path=/api/v1/users status=200 ms=58
+2026-11-02 19:53:10,550 INFO ffcore.access access method=GET path=/api/v1/users status=200 ms=48
+2026-11-02 19:53:10,598 INFO ffcore.access access method=GET path=/api/v1/users/218dcb33-93cb-4b76-947f-1670442daa99 status=200 ms=45
+2026-11-02 19:53:10,648 INFO ffcore.access access method=GET path=/api/v1/users/218dcb33-93cb-4b76-947f-1670442daa99 status=200 ms=47
+2026-11-02 19:53:10,699 INFO ffcore.access access method=GET path=/api/v1/projects status=200 ms=47
+2026-11-02 19:53:10,749 INFO ffcore.access access method=GET path=/api/v1/projects status=200 ms=47
+2026-11-02 19:53:10,812 INFO ffcore.access access method=GET path=/api/v1/projects/ef12ab87-0643-4d46-b70c-556256710640 status=200 ms=58
+2026-11-02 19:53:10,864 INFO ffcore.access access method=GET path=/api/v1/projects/ef12ab87-0643-4d46-b70c-556256710640 status=200 ms=48
+2026-11-02 19:53:10,928 INFO ffcore.access access method=GET path=/api/v1/projects/ef12ab87-0643-4d46-b70c-556256710640/readiness status=200 ms=60
+2026-11-02 19:53:10,998 INFO ffcore.access access method=GET path=/api/v1/projects/ef12ab87-0643-4d46-b70c-556256710640/readiness status=200 ms=66
+2026-11-02 19:53:11,010 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=2 error=SecretDecryptError
+2026-11-02 19:53:11,056 INFO ffcore.access access method=GET path=/api/v1/projects/ef12ab87-0643-4d46-b70c-556256710640/members status=200 ms=54
+2026-11-02 19:53:11,104 INFO ffcore.access access method=GET path=/api/v1/projects/ef12ab87-0643-4d46-b70c-556256710640/members status=200 ms=44
+2026-11-02 19:53:11,155 INFO ffcore.access access method=GET path=/api/v1/provider-drivers status=200 ms=49
+2026-11-02 19:53:11,191 INFO ffcore.access access method=GET path=/api/v1/provider-drivers status=200 ms=31
+2026-11-02 19:53:11,222 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=2 error=SecretDecryptError
+2026-11-02 19:53:11,241 INFO ffcore.access access method=GET path=/api/v1/providers status=500 ms=45
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/users status=200 ms=58
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/users status=200 ms=48
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/users/218dcb33-93cb-4b76-947f-1670442daa99 status=200 ms=45
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/users/218dcb33-93cb-4b76-947f-1670442daa99 status=200 ms=47
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects status=200 ms=47
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects status=200 ms=47
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/ef12ab87-0643-4d46-b70c-556256710640 status=200 ms=58
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/ef12ab87-0643-4d46-b70c-556256710640 status=200 ms=48
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/ef12ab87-0643-4d46-b70c-556256710640/readiness status=200 ms=60
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/ef12ab87-0643-4d46-b70c-556256710640/readiness status=200 ms=66
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:451 litellm_reconcile_retry attempt=2 error=SecretDecryptError
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/ef12ab87-0643-4d46-b70c-556256710640/members status=200 ms=54
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/ef12ab87-0643-4d46-b70c-556256710640/members status=200 ms=44
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/provider-drivers status=200 ms=49
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/provider-drivers status=200 ms=31
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:451 litellm_reconcile_retry attempt=2 error=SecretDecryptError
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/providers status=500 ms=45
+=========================== short test summary info ============================
+FAILED tests/integration/test_03a_read_side.py::test_03a_2_read_mode_get_parity
+1 failed, 131 passed in 202.00s (0:03:21)
+=== exit 1 (22:54:13)
+=== -e DEPLOY_PROFILE=airgap -w /work/backend tools pytest -q -p no:cacheprovider tests/integration/test_06b2_external_agent.py tests/integration/test_06b2_migration.py tests/integration/test_06b_agent.py tests/integration/test_06b_direct.py tests/integration/test_06b_identity.py tests/integration/test_06b_key_search.py tests/integration/test_06b_manifest.py tests/integration/test_06a_agents.py tests/integration/test_06a_runs_api.py tests/integration/test_06a_read_side.py tests/integration/test_03a_read_side.py tests/integration/test_57_alembic_merge.py (22:54:14)
+........................................................................ [ 54%]
+..............................................F.............             [100%]
+=================================== FAILURES ===================================
+_______________________ test_03a_2_read_mode_get_parity ________________________
+
+app = <fastapi.applications.FastAPI object at 0x7f0c11fed100>
+world = {'edit': <starlette.testclient.TestClient object at 0x7f0ac05929c0>, 'read': <starlette.testclient.TestClient object a...d90>, 'project_id': 'ce1d80bd-38ac-4854-8eb3-3edcdebe1b91', 'provider_id': '6652d726-83bb-4cee-bffb-6e4730f064c0', ...}
+
+    def test_03a_2_read_mode_get_parity(app, world):
+        checked = 0
+        for path in _get_paths(app):
+            if path in PARITY_EXEMPT or path.startswith(PARITY_EXEMPT_PREFIXES):
+                continue
+            url = re.sub(r"\{(\w+)\}", lambda m: world[m.group(1)], path)
+>           edit, read = world["edit"].get(url), world["read"].get(url)
+                         ^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_03a_read_side.py:99: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:1112: in get
+    return self.request(
+/opt/venv/lib/python3.12/site-packages/starlette/testclient.py:518: in request
+    return super().request(
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:796: in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:993: in send
+    raise exc
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:987: in send
+    response.read()
+/opt/venv/lib/python3.12/site-packages/httpx2/_models.py:877: in read
+    self._content = b"".join(self.iter_bytes())
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_models.py:893: in iter_bytes
+    for raw_bytes in self.iter_raw():
+                     ^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_models.py:948: in iter_raw
+    for raw_stream_bytes in self.stream:
+                            ^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:143: in __iter__
+    yield from self._stream
+/opt/venv/lib/python3.12/site-packages/starlette/testclient.py:384: in iter_body
+    exit_stack.close()
+/usr/local/lib/python3.12/contextlib.py:618: in close
+    self.__exit__(None, None, None)
+/usr/local/lib/python3.12/contextlib.py:610: in __exit__
+    raise exc_details[1]
+/usr/local/lib/python3.12/contextlib.py:595: in __exit__
+    if cb(*exc_details):
+       ^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/starlette/testclient.py:399: in close_app
+    raise exception
+/opt/venv/lib/python3.12/site-packages/anyio/from_thread.py:265: in _call_func
+    retval = await retval_or_awaitable
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/starlette/testclient.py:366: in run_app
+    await self.app(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/applications.py:1194: in __call__
+    await super().__call__(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/applications.py:96: in __call__
+    await self.middleware_stack(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/middleware/errors.py:186: in __call__
+    raise exc
+/opt/venv/lib/python3.12/site-packages/starlette/middleware/errors.py:164: in __call__
+    await self.app(scope, receive, _send)
+/opt/venv/lib/python3.12/site-packages/fastapi/telemetry/_asgi.py:151: in __call__
+    await self.app(scope, receive, send)
+ffcore/core/logging.py:261: in __call__
+    await self.app(scope, receive, send_status)
+ffcore/api/upload_limit.py:44: in __call__
+    await self.app(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py:63: in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    raise exc
+/opt/venv/lib/python3.12/site-packages/starlette/_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+/opt/venv/lib/python3.12/site-packages/fastapi/middleware/asyncexitstack.py:18: in __call__
+    await self.app(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/routing.py:683: in __call__
+    await self.middleware_stack(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:2811: in app
+    await route.handle(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:1839: in handle
+    await self.original_router.handle(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:2894: in handle
+    await included_router._handle_selected(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:1850: in _handle_selected
+    await route.handle(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:1839: in handle
+    await self.original_router.handle(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:2894: in handle
+    await included_router._handle_selected(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:1865: in _handle_selected
+    await original_route.handle(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:1328: in handle
+    await effective_context.app(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:166: in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    raise exc
+/opt/venv/lib/python3.12/site-packages/starlette/_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:152: in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:745: in app
+    raw_response = await run_endpoint_function(
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:372: in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ffcore/api/providers.py:130: in list_providers
+    return ProviderList(data=[await provider_out(session, p, settings) for p in rows])
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ffcore/api/providers.py:54: in provider_out
+    config = decrypt_json(provider.config_encrypted, settings)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+token = b'x'
+settings = Settings(deploy_profile='airgap', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+
+    def decrypt_json(token: bytes, settings: Settings) -> dict[str, Any]:
+        try:
+            return json.loads(_fernet(settings).decrypt(bytes(token)))
+        except InvalidToken:
+>           raise SecretDecryptError(
+                "stored secret does not decrypt with FERNET_KEY (was the key changed?)"
+            ) from None
+E           ffcore.core.secrets.SecretDecryptError: stored secret does not decrypt with FERNET_KEY (was the key changed?)
+
+ffcore/core/secrets.py:31: SecretDecryptError
+---------------------------- Captured stderr setup -----------------------------
+2026-11-02 19:57:05,740 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 19:57:05,772 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=SecretDecryptError
+2026-11-02 19:57:05,869 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=126
+2026-11-02 19:57:05,952 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 19:57:05,971 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=SecretDecryptError
+2026-11-02 19:57:06,061 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=106
+2026-11-02 19:57:06,171 INFO ffcore.access access method=POST path=/api/v1/providers status=201 ms=101
+2026-11-02 19:57:06,274 INFO ffcore.access access method=POST path=/api/v1/projects/ce1d80bd-38ac-4854-8eb3-3edcdebe1b91/models status=201 ms=99
+------------------------------ Captured log setup ------------------------------
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:451 litellm_reconcile_retry attempt=1 error=SecretDecryptError
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=126
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:451 litellm_reconcile_retry attempt=1 error=SecretDecryptError
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=106
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/providers status=201 ms=101
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/ce1d80bd-38ac-4854-8eb3-3edcdebe1b91/models status=201 ms=99
+----------------------------- Captured stderr call -----------------------------
+2026-11-02 19:57:06,364 INFO ffcore.access access method=GET path=/api/v1/users status=200 ms=73
+2026-11-02 19:57:06,525 INFO ffcore.access access method=GET path=/api/v1/users status=200 ms=155
+2026-11-02 19:57:06,644 INFO ffcore.access access method=GET path=/api/v1/users/10dd8852-3286-4544-a71e-24ac574116f1 status=200 ms=116
+2026-11-02 19:57:06,699 INFO ffcore.access access method=GET path=/api/v1/users/10dd8852-3286-4544-a71e-24ac574116f1 status=200 ms=50
+2026-11-02 19:57:06,752 INFO ffcore.access access method=GET path=/api/v1/projects status=200 ms=50
+2026-11-02 19:57:06,800 INFO ffcore.access access method=GET path=/api/v1/projects status=200 ms=43
+2026-11-02 19:57:06,802 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=2 error=SecretDecryptError
+2026-11-02 19:57:06,855 INFO ffcore.access access method=GET path=/api/v1/projects/ce1d80bd-38ac-4854-8eb3-3edcdebe1b91 status=200 ms=50
+2026-11-02 19:57:06,917 INFO ffcore.access access method=GET path=/api/v1/projects/ce1d80bd-38ac-4854-8eb3-3edcdebe1b91 status=200 ms=59
+2026-11-02 19:57:06,990 INFO ffcore.access access method=GET path=/api/v1/projects/ce1d80bd-38ac-4854-8eb3-3edcdebe1b91/readiness status=200 ms=69
+2026-11-02 19:57:07,006 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=2 error=SecretDecryptError
+2026-11-02 19:57:07,072 INFO ffcore.access access method=GET path=/api/v1/projects/ce1d80bd-38ac-4854-8eb3-3edcdebe1b91/readiness status=200 ms=76
+2026-11-02 19:57:07,136 INFO ffcore.access access method=GET path=/api/v1/projects/ce1d80bd-38ac-4854-8eb3-3edcdebe1b91/members status=200 ms=60
+2026-11-02 19:57:07,200 INFO ffcore.access access method=GET path=/api/v1/projects/ce1d80bd-38ac-4854-8eb3-3edcdebe1b91/members status=200 ms=61
+2026-11-02 19:57:07,242 INFO ffcore.access access method=GET path=/api/v1/provider-drivers status=200 ms=39
+2026-11-02 19:57:07,276 INFO ffcore.access access method=GET path=/api/v1/provider-drivers status=200 ms=30
+2026-11-02 19:57:07,333 INFO ffcore.access access method=GET path=/api/v1/providers status=500 ms=53
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/users status=200 ms=73
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/users status=200 ms=155
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/users/10dd8852-3286-4544-a71e-24ac574116f1 status=200 ms=116
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/users/10dd8852-3286-4544-a71e-24ac574116f1 status=200 ms=50
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects status=200 ms=50
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects status=200 ms=43
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:451 litellm_reconcile_retry attempt=2 error=SecretDecryptError
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/ce1d80bd-38ac-4854-8eb3-3edcdebe1b91 status=200 ms=50
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/ce1d80bd-38ac-4854-8eb3-3edcdebe1b91 status=200 ms=59
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/ce1d80bd-38ac-4854-8eb3-3edcdebe1b91/readiness status=200 ms=69
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:451 litellm_reconcile_retry attempt=2 error=SecretDecryptError
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/ce1d80bd-38ac-4854-8eb3-3edcdebe1b91/readiness status=200 ms=76
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/ce1d80bd-38ac-4854-8eb3-3edcdebe1b91/members status=200 ms=60
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/ce1d80bd-38ac-4854-8eb3-3edcdebe1b91/members status=200 ms=61
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/provider-drivers status=200 ms=39
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/provider-drivers status=200 ms=30
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/providers status=500 ms=53
+=========================== short test summary info ============================
+FAILED tests/integration/test_03a_read_side.py::test_03a_2_read_mode_get_parity
+1 failed, 131 passed in 233.95s (0:03:53)
+=== exit 1 (22:58:25)
+=== tools make smoke (22:58:26)
+python scripts/smoke.py
+ok    backend /healthz 200
+ok    litellm /health/liveliness 200
+ok    langfuse /api/public/health 200, /api/public/projects 200
+ok    mcp-search /healthz 200
+ok    mcp-sql /healthz 200
+ok    skipped: ollama profile inactive
+smoke: passed
+=== exit 0 (22:58:35)

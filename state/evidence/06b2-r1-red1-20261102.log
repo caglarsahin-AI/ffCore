@@ -1,0 +1,33 @@
+ Network ffcore-06b2_default  Creating
+ Network ffcore-06b2_default  Created
+ Volume "ffcore-06b2_langfuse_clickhouse_data"  Creating
+ Volume "ffcore-06b2_langfuse_clickhouse_data"  Created
+ Volume "ffcore-06b2_langfuse_clickhouse_logs"  Creating
+ Volume "ffcore-06b2_langfuse_clickhouse_logs"  Created
+ Volume "ffcore-06b2_redis_data"  Creating
+ Volume "ffcore-06b2_redis_data"  Created
+ Volume "ffcore-06b2_langfuse_minio_data"  Creating
+ Volume "ffcore-06b2_langfuse_minio_data"  Created
+ Volume "ffcore-06b2_model_cache"  Creating
+ Volume "ffcore-06b2_model_cache"  Created
+ Volume "ffcore-06b2_knowledge_storage"  Creating
+ Volume "ffcore-06b2_knowledge_storage"  Created
+ Volume "ffcore-06b2_postgres_data"  Creating
+ Volume "ffcore-06b2_postgres_data"  Created
+ Volume "ffcore-06b2_langfuse_postgres_data"  Creating
+ Volume "ffcore-06b2_langfuse_postgres_data"  Created
+    
+        This can be used to decode a JSON document from a string that may
+        have extraneous data at the end.
+    
+        """
+        try:
+>           obj, end = self.scan_once(s, idx)
+                       ^^^^^^^^^^^^^^^^^^^^^^
+E           RecursionError: maximum recursion depth exceeded while decoding a JSON array from a unicode string
+
+/usr/local/lib/python3.12/json/decoder.py:354: RecursionError
+=========================== short test summary info ============================
+FAILED tests/unit/test_06b2_external.py::test_06b2_r1_unparsable_answer_is_a_coded_failure[deep]
+FAILED tests/unit/test_06b2_external.py::test_06b2_r1_unparsable_answer_is_a_coded_failure[deepdict]
+2 failed, 4 passed, 37 deselected in 9.88s

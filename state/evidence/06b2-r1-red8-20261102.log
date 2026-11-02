@@ -1,0 +1,4 @@
+=========================== short test summary info ============================
+FAILED tests/unit/test_06b2_external.py::test_06b2_r1_module_imports_alone[ffcore.services.facade_external]
+FAILED tests/unit/test_06b2_external.py::test_06b2_r1_module_imports_alone[ffcore.services.external_config]
+2 failed, 57 deselected in 6.73s

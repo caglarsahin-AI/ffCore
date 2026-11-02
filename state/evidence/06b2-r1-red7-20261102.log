@@ -1,0 +1,48 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_________________ test_06b2_r1_ignored_field_names_not_logged __________________
+
+ext = (UUID('91a3d80b-bbca-4724-a379-245f86dda119'), <starlette.testclient.TestClient object at 0x7f3040d0a930>, <tests.integration.facade_support.Facade object at 0x7f303e443650>, <function ext.<locals>.register at 0x7f303e597380>)
+caplog = <_pytest.logging.LogCaptureFixture object at 0x7f300818e0c0>
+
+    def test_06b2_r1_ignored_field_names_not_logged(ext, caplog):
+        """Review r1 MINOR-5: the names of the answer's other fields are the upstream's text and do
+        not pass output.pre; the log has only how many were ignored."""
+        _, _, client, register = ext
+        _, model = register(key="tuhaf", mode="oddfield")
+        with caplog.at_level("INFO", logger="ffcore.facade"):
+            assert client.chat(model, "x").status_code == 200
+        lines = [r.getMessage() for r in caplog.records if r.name == "ffcore.facade"]
+>       assert any("facade_external_ignored" in line and "fields=2" in line for line in lines), lines
+E       AssertionError: ["facade_external_ignored agent=7ece8d78-9c8d-40e3-9295-d45e1b37b8dd fields=['tool_calls', 'x************@example.test']"]
+E       assert False
+E        +  where False = any(<generator object test_06b2_r1_ignored_field_names_not_logged.<locals>.<genexpr> at 0x7f3003900fb0>)
+
+tests/integration/test_06b2_external_agent.py:348: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+2026-11-02 19:36:23,177 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-02 19:36:23,189 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=612
+2026-11-02 19:36:23,584 INFO ffcore.access access method=POST path=/api/v1/projects/91a3d80b-bbca-4724-a379-245f86dda119/api-keys status=201 ms=384
+------------------------------ Captured log setup ------------------------------
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=612
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/91a3d80b-bbca-4724-a379-245f86dda119/api-keys status=201 ms=384
+----------------------------- Captured stderr call -----------------------------
+2026-11-02 19:36:23,836 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-02 19:36:23,891 INFO ffcore.access access method=POST path=/api/v1/projects/91a3d80b-bbca-4724-a379-245f86dda119/agents/external status=201 ms=210
+2026-11-02 19:36:23,997 INFO ffcore.access access method=POST path=/api/v1/projects/91a3d80b-bbca-4724-a379-245f86dda119/agents/7ece8d78-9c8d-40e3-9295-d45e1b37b8dd/external/publish status=200 ms=99
+2026-11-02 19:36:24,435 INFO ffcore.facade facade_external_ignored agent=7ece8d78-9c8d-40e3-9295-d45e1b37b8dd fields=['tool_calls', 'x************@example.test']
+2026-11-02 19:36:24,497 INFO ffcore.access access method=POST path=/v1/chat/completions status=200 ms=493
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/91a3d80b-bbca-4724-a379-245f86dda119/agents/external status=201 ms=210
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/91a3d80b-bbca-4724-a379-245f86dda119/agents/7ece8d78-9c8d-40e3-9295-d45e1b37b8dd/external/publish status=200 ms=99
+INFO     ffcore.facade:facade_external.py:526 facade_external_ignored agent=7ece8d78-9c8d-40e3-9295-d45e1b37b8dd fields=['tool_calls', 'x************@example.test']
+INFO     ffcore.access:logging.py:263 access method=POST path=/v1/chat/completions status=200 ms=493
+--------------------------- Captured stderr teardown ---------------------------
+2026-11-02 19:36:30,572 ERROR ffcore.readiness warmup failed: ModelMissing
+---------------------------- Captured log teardown -----------------------------
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+=========================== short test summary info ============================
+FAILED tests/integration/test_06b2_external_agent.py::test_06b2_r1_ignored_field_names_not_logged
+1 failed, 24 deselected in 16.64s
