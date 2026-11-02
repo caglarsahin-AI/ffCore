@@ -27,7 +27,7 @@ from ffcore.core import db, tracing
 from ffcore.core.config import Settings
 from ffcore.core.errors import ApiError, error_body
 from ffcore.knowledge.chunking import approx_tokens
-from ffcore.services.facade_guard import FacadeGuard, guard_messages
+from ffcore.services.facade_guard import FacadeGuard, client_messages, guard_messages
 from ffcore.services.facade_identity import FacadeCaller
 from ffcore.services.litellm_client import LiteLLMClient, resolve_target
 from ffcore.services.quota import (
@@ -57,6 +57,9 @@ PASSED_PARAMS = frozenset(
         "logit_bias",
     }
 )
+# The passed parameters that can carry text; each goes through `egress` (strings inside a JSON
+# value included, the structure kept). The rest are numbers (logit_bias: token ids, checked).
+TEXT_PARAMS = ("stop", "tools", "tool_choice", "response_format")
 # Accepted and handled by the facade itself (not passed on as given).
 OWN_FIELDS = frozenset({"model", "messages", "stream", "user", "n", "stream_options"})
 # The most a held (buffered) answer may grow to before it is cut off (S4); max_tokens bounds it
@@ -76,7 +79,32 @@ def call_params(body: ChatCompletionRequest) -> dict[str, Any]:
         raise _invalid("parameter_not_supported", f"Unsupported parameters: {unknown}")
     if body.n not in (None, 1):
         raise _invalid("parameter_not_supported", "Only n=1 is supported.")
+    bias = given.get("logit_bias")
+    if bias is not None and not (
+        isinstance(bias, dict)
+        and all(isinstance(k, str) and k.isdigit() for k in bias)
+        and all(isinstance(v, int | float) and not isinstance(v, bool) for v in bias.values())
+    ):
+        # Token ids and numbers only: nothing in it is text for egress to check.
+        raise _invalid("parameter_not_supported", "logit_bias maps token ids to numbers.")
     return {k: v for k, v in given.items() if k in PASSED_PARAMS}
+
+
+def litellm_user(caller: FacadeCaller) -> str:
+    """LiteLLM's `user` (it may reach the provider): the acting user's id or the key's id, never
+    the client's `user` label (review r1 MAJOR-1: the label is often an e-mail)."""
+    return caller.user_id or f"api_key:{caller.key_id}"
+
+
+async def guard_params(guard: FacadeGuard, params: dict[str, Any]) -> dict[str, Any]:
+    """Every parameter that carries text leaves through `egress` (review r1 MAJOR-1). S9: the
+    client's tool definitions are its input too."""
+    if params.get("tools"):
+        params["tools"] = await guard.json_text("input.pre", params["tools"])
+    for name in TEXT_PARAMS:
+        if params.get(name) is not None:
+            params[name] = await guard.json_text("egress", params[name])
+    return params
 
 
 def quota_error(decision) -> ApiError:
@@ -124,7 +152,7 @@ def _fallback_platform(result) -> dict | None:
 
 async def complete(request: Request, caller: FacadeCaller, target, body, settings: Settings):
     params = call_params(body)
-    raw_messages = [m.model_dump(exclude_none=True) for m in body.messages]
+    raw_messages = client_messages(body)
     stack = contextlib.AsyncExitStack()
     try:
         redis = redis_client(settings)
@@ -133,10 +161,7 @@ async def complete(request: Request, caller: FacadeCaller, target, body, setting
         model = await resolve_target(session, caller.project_id, target.key)
         guard = await FacadeGuard.load(session, redis, caller.project_id)
         messages = await guard_messages(guard, raw_messages)
-        if params.get("tools"):
-            # S9: the client's tool definitions leave with the request: input.pre and egress.
-            tools = await guard.json_text("input.pre", params["tools"])
-            params["tools"] = await guard.json_text("egress", tools)
+        params = await guard_params(guard, params)
         gate = QuotaGate(
             engine_for(settings, redis),
             redis,
@@ -159,7 +184,7 @@ async def complete(request: Request, caller: FacadeCaller, target, body, setting
         if lease is not None and lease.blocked:
             raise quota_error(lease)
         client = await stack.enter_async_context(LiteLLMClient(settings))
-        user = caller.user_id or caller.label or f"api_key:{caller.key_id}"
+        user = litellm_user(caller)
         metadata = tracing.trace_context(user_id=caller.user_id) | {
             "project_id": caller.project_id,
             "api_key_id": caller.key_id,

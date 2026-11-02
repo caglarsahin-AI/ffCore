@@ -51,6 +51,7 @@ def test_c11_error_codes_include_the_frozen_ones():
         "quota_exceeded",
         "output_buffer_exceeded",
         "external_agent_not_available",
+        "unsupported_field",
     }
     assert frozen <= set(c11.FACADE_ERROR_CODES)
 

@@ -139,3 +139,93 @@ def test_06b_error_codes_map_to_c11():
 
 def test_06b_unknown_event_ignored():
     assert _t().on("memory_used", {"x": 1}) == []
+
+
+# --- review r1 (K-06b-0012) ---
+
+
+def _policy(mode, rule_mode=None, stages=("output.pre",)):
+    from ffcore.guardrails.schemas import PolicySpec, ResolvedPolicy, Rule
+
+    rule = Rule(type="secrets", action="block", stages=list(stages), mode=rule_mode)
+    return ResolvedPolicy(key="default", spec=PolicySpec(mode=mode, rules=[rule]))
+
+
+@pytest.mark.parametrize(
+    ("mode", "rule_mode", "stages", "enforced"),
+    [
+        ("monitor", "enforce", ("output.pre",), True),  # r1 MAJOR-2: the rule's own mode
+        ("enforce", None, ("output.pre",), True),
+        ("monitor", None, ("output.pre",), False),
+        ("enforce", "monitor", ("output.pre",), False),  # the engine runs it as monitor
+        ("off", "enforce", ("output.pre",), False),  # a policy that is off runs nothing
+        ("enforce", None, ("input.pre",), False),  # no output stage
+    ],
+)
+def test_06b_4_effective_output_mode(mode, rule_mode, stages, enforced):
+    from ffcore.guardrails import engine
+    from ffcore.runtime.adapters import EngineGuard
+    from ffcore.services.facade_guard import FacadeGuard
+
+    policy = _policy(mode, rule_mode, stages)
+    assert engine.enforced_at(policy, {"output.pre", "output.stream.delta"}) is enforced
+    facade = FacadeGuard(session=None, redis=None, policy=policy, project_id="p")
+    runtime = EngineGuard(
+        None, None, None, policy, run_id="r", project_id="p", egress_enabled=True, token_ttl_s=60
+    )
+    assert facade.streams_live is (not enforced)
+    assert runtime.streams_live is (not enforced)  # 06a: the same rule (FOLLOWUP-140)
+
+
+def test_06b_4_builtin_policy_still_streams():
+    from ffcore.guardrails.builtin import BUILTIN_DEFAULT
+    from ffcore.services.facade_guard import FacadeGuard
+
+    # Its only enforce rule is the egress PII rule: output is not held.
+    assert FacadeGuard(None, None, BUILTIN_DEFAULT, "p").streams_live is True
+
+
+def _messages_body(*messages, **extra):
+    return ChatCompletionRequest.model_validate(
+        {"model": "chat-default", "messages": list(messages), **extra}
+    )
+
+
+def test_06b_7_unknown_message_field_refused():
+    from ffcore.services.facade_guard import client_messages
+
+    body = _messages_body({"role": "user", "content": "x", "audio": {"id": "a"}})
+    with pytest.raises(ApiError) as exc:
+        client_messages(body)
+    assert (exc.value.status_code, exc.value.code) == (400, "unsupported_field")
+    assert "audio" in exc.value.message
+    known = _messages_body(
+        {"role": "user", "content": "x", "name": "n"},
+        {"role": "tool", "content": "r", "tool_call_id": "c1"},
+    )
+    assert client_messages(known) == [
+        {"role": "user", "content": "x", "name": "n"},
+        {"role": "tool", "content": "r", "tool_call_id": "c1"},
+    ]
+
+
+def test_06b_7_logit_bias_must_be_token_ids():
+    with pytest.raises(ApiError) as exc:
+        facade_proxy.call_params(_body(logit_bias={"a@b.example": 1}))
+    assert exc.value.code == "parameter_not_supported"
+    assert facade_proxy.call_params(_body(logit_bias={"50256": -100})) == {
+        "logit_bias": {"50256": -100}
+    }
+
+
+def test_06b_7_user_label_never_leaves():
+    from ffcore.core.auth import Actor
+
+    caller = FacadeCaller(
+        actor=Actor(actor_type="api_key", actor_id="k", project_id="p"),
+        key_id="k",
+        project_id="p",
+        scopes=frozenset(),
+        label="ayse@example.test",
+    )
+    assert facade_proxy.litellm_user(caller) == "api_key:k"

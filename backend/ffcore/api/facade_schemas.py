@@ -52,6 +52,8 @@ FACADE_ERROR_CODES = (
     "model_unavailable",
     "run_not_found",
     "external_agent_not_available",
+    # Review r1 MAJOR-1: a message field outside OpenAI's known ones is refused, not passed.
+    "unsupported_field",
 )
 
 # The model name prefix of the agent path (C1: agent:<project_key>/<agent_key>).
@@ -59,6 +61,9 @@ AGENT_PREFIX = "agent:"
 
 
 class ChatMessage(BaseModel):
+    # Other fields are parsed so the facade can refuse them the OpenAI way, 400
+    # `unsupported_field` (facade_guard.client_messages); a parse-time refusal would be the
+    # app's 422 `validation_error`. Nothing outside MESSAGE_FIELDS is ever passed on.
     model_config = ConfigDict(extra="allow")
 
     role: Literal["system", "developer", "user", "assistant", "tool"]

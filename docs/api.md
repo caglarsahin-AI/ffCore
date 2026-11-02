@@ -447,16 +447,25 @@ about targets outside its scopes. Another project's model or agent, or a missing
   max_completion_tokens, stop, presence_penalty, frequency_penalty, seed, response_format, tools,
   tool_choice, logit_bias` (plus `stream`, `user`, `n=1`). Anything else: 400
   `parameter_not_supported` (LiteLLM reads provider settings from the body; nothing is passed or
-  dropped silently). Content parts must be text (400 `content_type_not_supported`: a guardrail
+  dropped silently). `logit_bias` maps token ids to numbers only. Messages carry OpenAI's fields
+  only: `role, content, name, tool_calls, tool_call_id`; any other message field: 400
+  `unsupported_field`. Content parts must be text (400 `content_type_not_supported`: a guardrail
   cannot check images).
+- The `user` field is never passed on: LiteLLM (and the provider) see the acting user's id or
+  `api_key:<key id>`, not the client's label.
 - Guardrails (the project's `default` policy, 08): `input.pre` on system, developer, user and tool
-  messages; `egress` on everything that leaves (llmaas; `GUARDRAIL_EGRESS_ENABLED`), the client's
-  `tools` definitions included; `output.pre` on the answer and on returned `tool_calls` arguments.
-  A block: 400 `guardrail_blocked` (reference in the message). With an enforce-mode policy that
-  checks output, the answer is held until `output.pre` has seen it: the stream starts with
+  messages; `egress` on every text field that leaves (llmaas; `GUARDRAIL_EGRESS_ENABLED`): message
+  content, `name`, `tool_call_id` and earlier `tool_calls`, and the `stop`, `tools`, `tool_choice`
+  and `response_format` parameters (strings inside them; their structure is kept); `output.pre` on
+  the answer and on returned `tool_calls` arguments. A block: 400 `guardrail_blocked` (reference in
+  the message). When a rule that checks output is in enforce mode (its own mode, or the policy's
+  when it has none), the answer is held until `output.pre` has seen it: the stream starts with
   `x_platform: {"event": "progress", "kind": "output_buffered"}` and the checked answer comes in one
   piece, so the first token is later; a held answer over 1 MB is cut off with
   `output_buffer_exceeded`. A request's tokenized values share one token scope (`facade-<uuid>`).
+- Personal data tokenized at `egress` stays a placeholder (`<<PII_n>>`) in the answer: placeholders
+  are not turned back into the values until 08's full release (C17, permission-bound). This is the
+  safe side; the agent path behaves the same.
 - The client's own tools: definitions pass, the model's `tool_calls` come back with OpenAI's
   meaning. The client runs them; they are not platform tools and do not go through the approval
   queue (07).
@@ -486,7 +495,8 @@ about targets outside its scopes. Another project's model or agent, or a missing
   `X-Agent-Events: none` only these ids, never the action's arguments). The client cannot approve:
   a person decides in the console. Then `X-Resume-Run-Id: <run id>` on the same route follows the
   run from where it stopped (409 `run_still_waiting` before the decision; 404 `run_not_found` for
-  another caller's run).
+  another caller's run). A run belongs to its actor: a key's own run to that key, a user's run
+  (through `impersonate`) to that user, so another key acting for the same user may follow it.
 - A question to the user (`ask_user`) ends with `finish_reason: "stop"` and
   `x_platform: {"event": "question", ...}`; answering it is a console action for now.
 - Errors: non-streaming requests get the HTTP status (400 `guardrail_blocked`, 429

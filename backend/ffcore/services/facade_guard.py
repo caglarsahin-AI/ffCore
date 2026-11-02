@@ -20,6 +20,8 @@ OUTPUT_STAGES = frozenset({"output.pre", "output.stream.delta"})
 # The roles whose text comes from the client and is checked as input (S9: tool results too);
 # every message, the assistant's included, leaves through `egress`.
 INPUT_ROLES = frozenset({"system", "developer", "user", "tool"})
+# The message fields the facade accepts (OpenAI's); every one that carries text is checked.
+MESSAGE_FIELDS = frozenset({"role", "content", "name", "tool_calls", "tool_call_id"})
 
 
 class GuardrailBlocked(ApiError):
@@ -69,10 +71,9 @@ class FacadeGuard:
 
     @property
     def streams_live(self) -> bool:
-        """06a V8: an enforce-mode policy that checks output shows nothing before the check."""
-        spec = self.policy.spec
-        checks_output = any(OUTPUT_STAGES & set(rule.stages) for rule in spec.rules)
-        return not (spec.mode == "enforce" and checks_output)
+        """06a V8: when an enforce rule checks output (its own mode or the policy's), nothing is
+        shown before the check (review r1 MAJOR-2)."""
+        return not engine.enforced_at(self.policy, OUTPUT_STAGES)
 
     async def text(self, stage: str, text: str) -> str:
         """The checked text (redacted, tokenized); a block raises GuardrailBlocked."""
@@ -119,6 +120,24 @@ class FacadeGuard:
             ) from None
 
 
+def client_messages(body) -> list[dict]:
+    """The request's messages with OpenAI's known fields only (review r1 MAJOR-1): what is passed
+    on is what is checked. Any other message field is refused, never passed or dropped."""
+    out = []
+    for i, message in enumerate(body.messages):
+        given = message.model_dump(exclude_none=True)
+        unknown = sorted(set(given) - MESSAGE_FIELDS)
+        if unknown:
+            raise ApiError(
+                400,
+                "invalid_request_error",
+                "unsupported_field",
+                f"Unsupported fields in messages[{i}]: {unknown}",
+            )
+        out.append(given)
+    return out
+
+
 def message_text(message: dict) -> str:
     """A message's text; list content is accepted only when every part is text."""
     content = message.get("content")
@@ -133,7 +152,8 @@ def message_text(message: dict) -> str:
 
 
 async def guard_messages(guard: FacadeGuard, messages: list[dict]) -> list[dict]:
-    """`input.pre` on the client's own text, then `egress` on everything that leaves."""
+    """`input.pre` on the client's own text, then `egress` on every text field that leaves:
+    content, `name`, `tool_call_id` and earlier tool calls (review r1 MAJOR-1)."""
     out = []
     for message in messages:
         message = dict(message)
@@ -143,6 +163,9 @@ async def guard_messages(guard: FacadeGuard, messages: list[dict]) -> list[dict]
         text = await guard.text("egress", text)
         if message.get("content") is not None:
             message["content"] = text
+        for name in ("name", "tool_call_id"):
+            if message.get(name):
+                message[name] = await guard.text("egress", message[name])
         if message.get("tool_calls"):
             # An earlier assistant turn's calls go out again: egress, like any text.
             message["tool_calls"] = await guard.json_text("egress", message["tool_calls"])

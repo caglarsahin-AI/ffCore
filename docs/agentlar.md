@@ -71,6 +71,10 @@ user: its searches use the key's `acl_role` (the backend reads it from the key r
 forward the user's identity cannot run (`tool_needs_run_user`), approvals are decided in the
 console only.
 
+Personal data tokenized at `egress` (llmaas) appears in answers as placeholders (`<<PII_n>>`), on
+the console and through the facade alike: turning them back into the values comes with 08's full
+release (C17, permission-bound).
+
 ## Runs
 
 `POST /agents/{agent_key}/runs {input, variables, conversation_id?, channel: chat|test, version?}`
@@ -157,7 +161,8 @@ outcome label, confidence).
 
 - A documents-only agent whose search found nothing answers its `unknown_reply` without a model
   call (`progress {"skipped_model": "no_sources"}`, outcome `declined`).
-- With an `enforce` policy that checks output, the stream starts with `progress {"stage":
+- When a rule that checks output is in enforce mode (its own mode, or the policy's when it has
+  none), the stream starts with `progress {"stage":
   "output_buffered", "reason": "guardrail_enforce"}` and the answer arrives in one piece after
   `output.pre`; otherwise tokens stream as they are written.
 - A model fallback happens only with an active `chat-fallback` model; it is a `fallback` event.

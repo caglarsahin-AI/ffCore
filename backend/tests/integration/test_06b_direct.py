@@ -302,3 +302,86 @@ def test_06b_7_image_parts_400(direct):
     )
     assert response.status_code == 400
     assert response.json()["error"]["code"] == "content_type_not_supported"
+
+
+# --- review r1 (K-06b-0012) ---
+
+
+def test_06b_2_every_text_field_goes_through_egress(direct, pg):
+    """MAJOR-1: nothing of the client's text leaves raw: the message `name`, `stop`, `tool_choice`,
+    `response_format` (json_schema included), `tools` and the `user` label."""
+    from ffcore.guardrails.settings import get_guardrail_settings
+
+    _, _, _, client = direct
+    if not get_guardrail_settings().guardrail_egress_enabled:
+        pytest.skip("NOT_RUN: GUARDRAIL_EGRESS_ENABLED=false in this environment")
+    schema = {
+        "type": "json_schema",
+        "json_schema": {
+            "name": "answer",
+            "description": f"Reply for {EMAIL}",
+            "schema": {"type": "object", "properties": {"a": {"type": "string"}}},
+        },
+    }
+    response = client._client.post(
+        "/v1/chat/completions",
+        json={
+            "model": "chat-default",
+            "messages": [{"role": "user", "content": "x", "name": EMAIL}],
+            "stop": [EMAIL, "END"],
+            "tools": [TOOL],
+            "tool_choice": {"type": "function", "function": {"name": "lookup"}},
+            "response_format": schema,
+            "user": EMAIL,  # no impersonate scope: a label only
+        },
+        headers=client.headers(),
+    )
+    assert response.status_code == 200, response.text
+    sent = fake_requests()[-1]
+    assert EMAIL not in json.dumps(sent, ensure_ascii=False)
+    # The structure the provider needs is kept.
+    assert sent["tool_choice"] == {"type": "function", "function": {"name": "lookup"}}
+    assert sent["response_format"]["json_schema"]["name"] == "answer"
+    assert "END" in sent["stop"]
+
+
+def test_06b_7_unknown_message_field_400(direct):
+    _, _, _, client = direct
+    response = client._client.post(
+        "/v1/chat/completions",
+        json={
+            "model": "chat-default",
+            "messages": [{"role": "user", "content": "x", "audio": {"id": "a1"}}],
+        },
+        headers=client.headers(),
+    )
+    assert response.status_code == 400, response.text
+    assert response.json()["error"]["code"] == "unsupported_field"
+    assert fake_requests() == []
+
+
+@pytest.mark.parametrize(
+    ("policy_mode", "rule_mode", "held"),
+    [("monitor", "enforce", True), ("enforce", None, True), ("monitor", None, False)],
+)
+def test_06b_4_stream_holds_when_a_rule_enforces(direct, pg, policy_mode, rule_mode, held):
+    """MAJOR-2: an enforce rule in a monitor policy holds the stream as an enforce policy does; the
+    secret never reaches the client. Both monitor: live chunks (the rule only records)."""
+    project, console, _, client = direct
+    rule = {"type": "secrets", "action": "block", "stages": ["output.pre"]}
+    if rule_mode:
+        rule["mode"] = rule_mode
+    _policy(console, project, [rule], mode=policy_mode)
+    status, chunks, lines = client.stream("tooly", messages=_tool_turn(SECRET), tools=[TOOL])
+    assert status == 200
+    buffered = {"event": "progress", "kind": "output_buffered"}
+    if held:
+        assert chunks[0]["x_platform"] == buffered
+        errors = [json.loads(line[6:]) for line in lines if line.startswith('data: {"error"')]
+        assert errors and errors[0]["error"]["code"] == "guardrail_blocked"
+        assert SECRET not in "\n".join(lines)
+    else:
+        assert all(c.get("x_platform") != buffered for c in chunks)
+        assert not [line for line in lines if line.startswith('data: {"error"')]
+        assert ("block", "api") in _guard_events(pg, project, "output.pre")  # recorded only
+    assert lines[-1] == "data: [DONE]"

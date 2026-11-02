@@ -49,7 +49,7 @@ from ffcore.models.runs import Conversation, Message, Run, RunEvent
 from ffcore.runtime import events as run_events
 from ffcore.runtime.contracts import Channel, RunEventType, RunStatus, TriggerType
 from ffcore.runtime.definition import parse_definition
-from ffcore.services.facade_guard import FacadeGuard, message_text
+from ffcore.services.facade_guard import FacadeGuard, client_messages, message_text
 from ffcore.services.facade_identity import FacadeCaller
 from ffcore.services.facade_proxy import chunk_json
 from ffcore.services.quota import redis_client
@@ -88,7 +88,7 @@ def events_mode(request: Request) -> bool:
 def _split(body) -> tuple[list[dict], str]:
     """(earlier messages, the new user question). The agent's own instructions govern: system
     and developer messages are refused, not merged; the last message must be the user's."""
-    messages = [m.model_dump(exclude_none=True) for m in body.messages]
+    messages = client_messages(body)
     for m in messages:
         if m["role"] not in ("user", "assistant"):
             raise _invalid(
