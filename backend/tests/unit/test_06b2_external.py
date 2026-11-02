@@ -251,6 +251,32 @@ def test_06b2_r1_other_internal_hosts_stay(settings):
         )
 
 
+@pytest.mark.parametrize(
+    "url",
+    [
+        "https://agent.example/v1?api-key=dummy-not-secret-qs",
+        "https://agent.example/v1?",
+        "https://agent.example/v1#frag",
+        "https://agent.example/v1/#",
+    ],
+)
+def test_06b2_r1_base_url_query_refused(settings, url):
+    """Review r1 MINOR-2: scheme, host, port and path only; a query or fragment would carry a
+    credential into every place the URL is shown and choose the upstream path."""
+    allowed = settings.model_copy(update={"egress_allowlist": ["agent.example"]})
+    with pytest.raises(ApiError) as exc:
+        anyio.run(
+            lambda: facade_external.check_base_url(
+                url, allowed, resolver=_resolver({"agent.example": [PUBLIC_IP]})
+            )
+        )
+    assert (exc.value.status_code, exc.value.code, exc.value.param) == (
+        422,
+        "base_url_query_not_allowed",
+        "base_url",
+    )
+
+
 def _any_private():
     async def resolve(host, port):
         return ["10.0.0.9"]

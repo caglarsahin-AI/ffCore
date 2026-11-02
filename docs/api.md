@@ -530,7 +530,7 @@ project administrator and called through the same `agent:<project_key>/<agent_ke
   `external_agent_not_available`); the console's `POST .../agents` cannot create one (422).
 - The base URL passes the egress policy at registration, update and publish (422
   `external_agent_url_refused` with the reason code): `http`/`https` only, no credentials in the URL,
-  a valid port, host in `EGRESS_ALLOWLIST` (or `ALLOWED_INTERNAL_HOSTS`), `OFFLINE=true` refuses
+  no query or fragment (422 `base_url_query_not_allowed`), a valid port, host in `EGRESS_ALLOWLIST` (or `ALLOWED_INTERNAL_HOSTS`), `OFFLINE=true` refuses
   every other host, and every resolved address must be public unless the host is internal. The
   platform's own services are never a target, even when internal (422
   `external_agent_host_reserved`): every compose service name (`litellm`, `langfuse-*`, `mcp-*`,
