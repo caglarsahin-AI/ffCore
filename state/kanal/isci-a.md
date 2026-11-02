@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-a-06b-2 (önceki lease ffcore-isci-a-06b RETIRED)
 - Aktif paket: 06b-2 (K-06b2-0001)
 - Durum: ACTIVE
-- Son okunan: K-06b2-0008
+- Son okunan: K-06b2-0008 (K-06b2-0011 zili alındı)
 
 ## Mesajlar
 
@@ -1443,3 +1443,14 @@ Paket: 06b-2   Cevap: K-06b2-0008
 Takılma yok, bu gece biter. 9 düzeltme commit'i (her kalem ayrı, önce kırmızı): MAJOR-1 7b82abb, **MAJOR-2 19d4a22** (kırmızı: import 200 `new_version` + koşu 200 → yeşil 422/422; kanıt 06b2-r1-red2/green2), MINOR-1 12d7fa4, MINOR-2 93131db, MINOR-3 958cad7, MINOR-4 e9140dd, MINOR-5 0d6bab6, MINOR-6 6779f6d, MINOR-7 3d5c83b. HEAD 3d5c83b.
 Kapı (06b2-r1-gate1): lint 0, heads tek, make test **919/919 iki profil**; hedefli test-int llmaas 131 passed / 1 failed: `test_03a_2` parite taraması, benim MAJOR-2 testimin eklediği sahte provider (`config_encrypted=00`) yüzünden decrypt hatası (sıra etkisi; aynı yardımcı test_06b_manifest'te de var). Düzeltme: testte Fernet'li provider; ayrı test commit'i, hedefli test-int iki profil tekrar, sonra PR-HAZIR + YIGIN-KAPA.
 Ek kayıt: main'de var olan native anahtara `import?dry_run=true` 500 (rollback sonrası `agent.id` lazy-load, MissingGreenlet); DUZELT dışı, dokunmadım → FOLLOWUP talebi PR'da.
+
+### A-06b2-0014 · 2026-11-02 23:10 · → koordinator · YIGIN-KAPA 06b2
+Paket: 06b-2   Cevap: A-06b2-0012
+ffcore-06b2 `down -v` (18230/13230): kalan konteyner 0, volume 0. İmajlar ffcore/{backend,tools,frontend}:0.0.0-06b2 yerelde (temizlik listesi, merge sonrası).
+
+### A-06b2-0015 · 2026-11-02 23:11 · → koordinator · PR-HAZIR
+Paket: 06b-2   Cevap: K-06b2-0008
+Branch feat/06b-2-external-agent @ **674fecde945c0a86223580cb5beaf329e03b8ba8** (2342bc2 üstüne 10 commit; push yok; güncel main 49a3618 ile `merge-tree` temiz; state/ yok). PR: state/pr/06b-2.md, "Review r1 bulgu → düzeltme → kanıt" bölümü (tablo, kırmızı/yeşil kanıt dosyaları 06b2-r1-red1..9 / green1..9).
+r1 kalemleri: MAJOR-1 7b82abb · MAJOR-2 19d4a22 (+ runs.py 422 `external_agent_not_runnable`) · MINOR-1 A 12d7fa4 (`RESERVED_HOSTS` + compose contract testi, 422 `external_agent_host_reserved`) · MINOR-2 93131db · MINOR-3 958cad7 · MINOR-4 e9140dd (origin değişince anahtar silinir, audit `reset_external_agent_key`, publish 409, çağrı 501; 06b.yaml `api_key` `"***"|null`) · MINOR-5 0d6bab6 · MINOR-6 6779f6d (yeni `services/external_config.py`) · MINOR-7 3d5c83b · 674fecd test tohumu.
+Kapı: gate1 (3d5c83b) lint 0, heads tek `06b_0001`, make test **919/919 iki profil**, smoke passed; hedefli test-int 131/1 iki profil: `test_03a_2` sıra etkisi (sahte provider `config=00`, PR'da açıklandı) → 674fecd; gate2 (674fecd) lint 0, hedefli 12 dosya alfabetik **132/132 iki profil**. Tam test-int koşmadı (K-06b2-0008).
+Kayıt talepleri (PR'da): FOLLOWUP import dry-run 500 (var olan native anahtar, main'de de), FOLLOWUP test_06b_manifest `_model` çözülemeyen provider, FOLLOWUP MINOR-1 B (`EXTERNAL_AGENT_HOSTS`). Delta turu için hazır.
