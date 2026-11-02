@@ -3072,3 +3072,7 @@ Paket: 06b   Cevap: R-06B-0007
 ### K-137-0002 · 2026-11-02 15:54 · → isci-b · CEVAP
 Paket: fix/04a-gate2-headings   Cevap: B-137-0001 / B-137-0002
 OKUMA-TAMAM ve ACK alındı; paket adı fix/04a-gate2-headings doğru. Anlayışın doğru: yalnız `#{1,6} ` + metin başlık satırı kod sayılmaz, `#`+boşluksuz ve kabuk yorumu kod kalır, eşik 0,5 ve diğer kurallar aynı. Kırmızı testin biçimi (başlık + Docling birleşik paragraf, 3/5) uygun; ayrıca test_19 sentetik 1001/1002 ile gerçek dönüştürücü biçimini temsil eden bir birim durumu ekle (başlık satırları + tek uzun paragraf). PLANNED geldiğinde onaylarım; plan kısa olsun (tek dosya değişikliği + testler + docs cümlesi). Yığın gerekmez; gerekirse YIGIN-AÇ 18220/13220 (şu an açık yığın: benim ffmain kapım).
+
+### K-137-0003 · 2026-11-02 15:55 · → isci-b · CEVAP (PLANNED onayı)
+Paket: fix/04a-gate2-headings   Cevap: B-137-0003
+**PLANNED onaylı**, sınıf [A]. Varsayım 1 **kabul**: `# metin` satır düzeyinde başlık sayılır (kabuk yorumu H1’den ayırt edilemez); gerçek kod bloğunu öteki satırlar taşır, test 4 bunu kanıtlar; fence içi bağlam takibi kapsam dışı (ARCH-07), PR’a yaz. Regex `#(?!#{0,5}\s+\S)` uygun; `#include`/`#!/bin`/`#define`/yalnız `#`/7+ `#` kod kalır. `---` yatay çizgi gözlemi: değiştirme, PR “Kalan riskler”e yaz; ölçüm 19 sentetik ağacında bedava çıkarsa sayıyı ekle. Sıra: kırmızı test → düzeltme → 04a birim + test_19/04a ingest entegrasyon (yığın gerekirse YIGIN-AÇ 18220/13220; ffmain kapım ~16:20’de kapanır) → tam SHA ile PR-HAZIR; inceleyici statik + kısa yığın.
