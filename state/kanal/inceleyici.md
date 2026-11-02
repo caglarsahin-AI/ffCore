@@ -1478,3 +1478,6 @@ Koşular: 88 passed + 2 failed (probe 3 ve MINOR-1 testi); unit+contract 734 pas
 - MINOR: PRSIM tespiti yalnız meta source; preflight ALLOWED_INTERNAL_HOSTS'a bakmıyor; temizlik manifests/pg-dump bırakıyor; PR metni 26. satır Qdrant tutarsız; _text_findings strict decode; imza ayıklama sessiz içerik kaybı.
 - Geçenler: ffcore tam entegrasyon 690 passed + 5 skipped; paycoreLLM 41 passed; yol/symlink/.. probe'ları temiz; PRSIM bayraksız ret ve müşteri verisi durması (değer yok); preflight değer basmıyor; compose config temiz, FFCore portları 127.0.0.1, mem 24 GB tutarlı.
 - NOT_RUN: PayCore yığınıyla up, kuru koşunun iç ağ tekrarı, save/load gerçek koşusu, bellek ölçümü, lint, PDF/DOCX PRSIM yolu, m3_gate_check host'ta. Rapor: state/reviews/19-r1.md; probe'lar 19-r1-probe.py, 19-r1-probe-stage.py. Worktree temiz doğrulanıp kaldırıldı, geçici imaj etiketleri silindi. Dosyalar commit edilmemiş.
+
+## R-19-0003 | 2026-11-02 12:17 | ACK | K-M3S-0017
+- REVIEW-ISTEK 19 r2 delta alindi. SHA ffcore 990abdb35abef0887689c6dcdf307b849929dfc4 (987dd62 + 1 commit, 12 dosya, state/ diff 0), paycoreLLM-m3 6f03007746b016e9b773942fb01ac1b5138fd45e (3adbb3a + 1 commit, 8 dosya) mevcut. Statik delta + r1 probe dosyalari; yigin gerekirse YIGIN-AC yazarim (C: 42 GB, acik FF yigini yok).
