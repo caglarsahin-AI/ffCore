@@ -1481,3 +1481,4 @@ Koşular: 88 passed + 2 failed (probe 3 ve MINOR-1 testi); unit+contract 734 pas
 
 ## R-19-0003 | 2026-11-02 12:17 | ACK | K-M3S-0017
 - REVIEW-ISTEK 19 r2 delta alindi. SHA ffcore 990abdb35abef0887689c6dcdf307b849929dfc4 (987dd62 + 1 commit, 12 dosya, state/ diff 0), paycoreLLM-m3 6f03007746b016e9b773942fb01ac1b5138fd45e (3adbb3a + 1 commit, 8 dosya) mevcut. Statik delta + r1 probe dosyalari; yigin gerekirse YIGIN-AC yazarim (C: 42 GB, acik FF yigini yok).
+- 2026-11-02 12:18 YIGIN-AC review-19 (18200/13200, FFCORE_VERSION=0.0.0-review-19, imajlar 0.0.0-main etiketli, kod worktree salt-okunur); kisa tur: r1 probe yeniden + meta kapanisi. Acik FF yigini yok.
