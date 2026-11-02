@@ -1,0 +1,30 @@
+P1 status: 200 {"id":"chatcmpl-931ff6f44fdf4d828bb61c34999e6830","object":"chat.completion","created":1793613330,"model":"p86e31b46.chat-default","choices":[{"index":0,"message":{"role":"assistant","content":"hello"
+P1 provider saw e-mail: True | name field present: True
+P1 name reaches provider unmasked: True
+P1 stop reaches provider unmasked: True
+.2026-11-02 09:55:35,379 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 09:55:35,901 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 09:55:36,126 ERROR ffcore.readiness warmup failed: ModelMissing
+P2 client text: hello kayit <<PII_1>>
+P2 raw e-mail back to client: False | placeholder shown: True
+2026-11-02 09:55:36,891 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 09:55:37,171 ERROR ffcore.readiness warmup failed: ModelMissing
+P3 non-stream: 400 secret in body: False
+P3 stream status: 200 | secret reached client in stream: True
+P3 first progress chunk: None
+2026-11-02 09:55:38,216 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 09:55:38,468 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 09:55:38,635 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 09:55:38,905 ERROR ffcore.readiness warmup failed: ModelMissing
+P4 unknown : 403 b'{"error":{"message":"This credential may not act for a user.","type":"permission_error","code":"impersonation_denied"}}'
+P4 outsider: 403 b'{"error":{"message":"This credential may not act for a user.","type":"permission_error","code":"impersonation_denied"}}'
+P4 audit reasons: ['user_not_mapped', 'not_member']
+P4 member: 200
+2026-11-02 09:55:39,349 ERROR ffcore.readiness warmup failed: ModelMissing
+P4 no-scope key + outsider email: 200
+2026-11-02 09:55:40,167 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 09:55:40,463 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-02 09:55:40,581 ERROR ffcore.readiness warmup failed: ModelMissing
+P5 ec22e121 404 run_not_found
+P5 not-a-uu 404 run_not_found
+5 passed in 18.58s

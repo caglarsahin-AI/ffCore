@@ -2,6 +2,9 @@
 
 **Bağımlılık:** 00i, 04a, 06a, 07, 13b (MERGED); 03c (anahtar/kota; MERGED). **Süre:** ~4 gün. **PoC:** evet (M3 kapısının kalan yarısı). **Karar kaynağı:** kullanıcı, 1 Kasım 2026 ("M3 başlatılsın, 2-3 korpus kullanılabiliyor"; korpus yolu A: raw katmandan ingest, KARARLAR).
 
+
+**Durum (2 Kasım 2026):** MERGED: ffcore f25268e (990abdb, r2 ONAY R-19-0004), paycoreLLM master ca1b287 (6f03007). Kalan: kullanıcının sunucu koşusu (runbook `docs/paycore/m3-sunucu.md`), kabul 3 bellek bütçesi `free -g` ile (PENDING_ENV), FOLLOWUP-137 (Kapı 2 başlık satırı) M3 ingest'inden önce.
+
 ## Amaç
 
 PLAN 8 M3 kapısı PayCore sunucusunda (`airgap`, Qwen 3.5 35B CPU, internetsiz) gerçek modelle `make eval` (S1 ≥ %80, `docs/paycore/s1-taban.md` ile karşılaştırma) ve cpu süre ölçümü ister. Kod hazır ama sunucuya kurulum hazır değil. Bu paket, **kullanıcının sunucuda yalnız belgeli komutları koşturarak** FFCore'u kurup PayCore korpusuyla ölçüm alabilmesini sağlar. Ajan sunucuya bağlanmaz, `.env`'e dokunmaz, `data/**` ve `eval/results/**` okumaz (CLAUDE.md, PLAN 5 R3.1).

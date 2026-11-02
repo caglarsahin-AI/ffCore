@@ -1,0 +1,153 @@
+git head: f25268e 2026-11-02 12:38:04
+
+=== 12:38:06 build backend frontend tools
+
+#37 [frontend] exporting to image
+#37 exporting layers done
+#37 writing image sha256:a81da830ccd8bd4ec2dfc5f7f00d0152585633df4bcaf4367633e27cf27d1e2c 0.0s done
+#37 naming to docker.io/ffcore/frontend:0.0.0-main done
+#37 DONE 0.0s
+build exit=0
+
+=== 12:38:21 compose config
+config exit=0
+
+=== 12:38:28 up
+ Container ffmain-langfuse-minio-1  Healthy
+ Container ffmain-langfuse-redis-1  Healthy
+ Container ffmain-worker-1  Healthy
+ Container ffmain-langfuse-clickhouse-1  Healthy
+ Container ffmain-mcp-search-1  Healthy
+ Container ffmain-mcp-sql-1  Healthy
+up exit=0
+ffmain-agent-worker-bg-1 Up 13 seconds
+ffmain-mcp-sql-1 Up 13 seconds (healthy)
+ffmain-worker-1 Restarting (1) Less than a second ago
+ffmain-agent-worker-1 Up 13 seconds
+ffmain-mcp-search-1 Up 13 seconds (healthy)
+ffmain-frontend-1 Up 13 seconds
+ffmain-backend-1 Up 24 seconds (healthy)
+ffmain-langfuse-worker-1 Up 48 seconds
+ffmain-langfuse-web-1 Up 48 seconds (healthy)
+ffmain-litellm-1 Up 53 seconds (healthy)
+ffmain-ticket-desk-1 Up 59 seconds (healthy)
+ffmain-langfuse-clickhouse-1 Up 59 seconds (healthy)
+ffmain-fake-llm-1 Up 58 seconds
+ffmain-langfuse-redis-1 Up 59 seconds (healthy)
+ffmain-langfuse-minio-1 Up 59 seconds (healthy)
+ffmain-qdrant-1 Up 58 seconds (healthy)
+ffmain-postgres-1 Up 59 seconds (healthy)
+ffmain-redis-1 Up 59 seconds (healthy)
+ffmain-langfuse-postgres-1 Up 59 seconds (healthy)
+
+=== 12:39:35 lint
+ruff check backend scripts data/samples/scripts services
+All checks passed!
+ruff format --check backend scripts data/samples/scripts services
+372 files already formatted
+lint exit=0
+
+=== 12:39:45 alembic heads
+57_0002 (06a, 03c, 05a, 03b, 04a, 08, 07, 03a) (head)
+heads exit=0
+
+=== 12:39:55 make test llmaas
+........................................................................ [  8%]
+........................................................................ [ 17%]
+........................................................................ [ 26%]
+........................................................................ [ 35%]
+........................................................................ [ 44%]
+........................................................................ [ 53%]
+........................................................................ [ 62%]
+........................................................................ [ 71%]
+........................................................................ [ 80%]
+........................................................................ [ 89%]
+........................................................................ [ 98%]
+..............                                                           [100%]
+806 passed in 162.61s (0:02:42)
+test exit=0
+
+=== 12:42:57 make test airgap
+........................................................................ [  8%]
+........................................................................ [ 17%]
+........................................................................ [ 26%]
+........................................................................ [ 35%]
+........................................................................ [ 44%]
+........................................................................ [ 53%]
+........................................................................ [ 62%]
+........................................................................ [ 71%]
+........................................................................ [ 80%]
+........................................................................ [ 89%]
+........................................................................ [ 98%]
+..............                                                           [100%]
+806 passed in 132.24s (0:02:12)
+test-airgap exit=0
+
+=== 12:45:37 test-samples
+
+----------------------------------------------------------------------
+Ran 54 tests in 3.776s
+
+OK (skipped=5)
+samples exit=0
+
+=== 12:45:52 test-int
+........................................................................ [ 10%]
+........................................................................ [ 20%]
+........................................................................ [ 30%]
+........s............................................................... [ 41%]
+............................................................s..........s [ 51%]
+........................................................................ [ 61%]
+......s................................................................. [ 71%]
+........................................................................ [ 82%]
+........................................................................ [ 92%]
+...............................s......................                   [100%]
+=============================== warnings summary ===============================
+tests/integration/test_04a_worker.py::test_04a_upload_job_runs_in_worker
+tests/integration/test_04a_worker.py::test_04a_job_for_missing_row_retries_then_fails_loud
+  /opt/venv/lib/python3.12/site-packages/arq/worker.py:877: DeprecationWarning: Call to deprecated close. (Use aclose() instead) -- Deprecated since version 5.0.1.
+    await self.pool.close(close_connection_pool=True)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+SKIPPED [1] tests/integration/test_03b_egress_dns.py: NOT_RUN: needs RUN_DNS_TESTS=1
+SKIPPED [1] tests/integration/test_04a_ingest.py:124: NOT_RUN: needs RUN_MODEL_TESTS=1
+SKIPPED [1] tests/integration/test_04a_ingest.py:279: NOT_RUN: needs RUN_MODEL_TESTS=1
+SKIPPED [1] tests/integration/test_05a_sql.py:288: NOT_RUN: needs RUN_MODEL_TESTS=1
+SKIPPED [1] tests/integration/test_19_ingest_raw.py:155: root ignores file modes; the mount test runs :ro
+697 passed, 5 skipped, 2 warnings in 579.25s (0:09:39)
+test-int exit=0
+
+=== 12:55:51 smoke
+python scripts/smoke.py
+ok    backend /healthz 200
+ok    litellm /health/liveliness 200
+ok    langfuse /api/public/health 200, /api/public/projects 200
+ok    mcp-search /healthz 200
+ok    mcp-sql /healthz 200
+ok    skipped: ollama profile inactive
+smoke: passed
+smoke exit=0
+
+=== 12:56:01 frontend lint/typecheck/check:api (node, --network none, repo root)
+
+> ffcore-frontend@0.1.0 lint
+> eslint
+
+
+> ffcore-frontend@0.1.0 typecheck
+> tsc --noEmit
+
+
+> ffcore-frontend@0.1.0 check:api
+> node scripts/check-api.mjs
+
+API contract copies and generated types are current.
+frontend exit=0
+
+=== 12:56:31 down -v
+ Volume ffmain_knowledge_storage  Removed
+ Volume ffmain_redis_data  Removed
+
+=== 12:56:53 done
+gate script exit 0
