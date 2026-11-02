@@ -93,6 +93,22 @@ class Decision:
 _SEVERITY_RANK = {None: 0, "low": 1, "medium": 2, "high": 3}
 
 
+def rule_mode(spec, rule: Rule) -> str:
+    """The mode a rule runs in: its own when it has one, else the policy's."""
+    return rule.mode or spec.mode
+
+
+def enforced_at(policy: ResolvedPolicy, stages) -> bool:
+    """True when some rule on one of these stages can change or block the text: its mode is
+    enforce and the policy is not off (an off policy runs nothing). A guard that streams decides
+    with this whether text may be shown before the check (06a V8, review 06b r1 MAJOR-2)."""
+    spec = policy.spec
+    if spec.mode == "off":
+        return False
+    wanted = set(stages)
+    return any(wanted & set(r.stages) and rule_mode(spec, r) == "enforce" for r in spec.rules)
+
+
 def _egress_enabled(ctx: EvalContext) -> bool:
     if ctx.egress_enabled is not None:
         return ctx.egress_enabled
@@ -240,7 +256,7 @@ async def evaluate(
         if blocked and spec.short_circuit:
             break
         started = time.perf_counter()
-        mode = rule.mode or spec.mode  # a rule may carry its own mode (built-in egress PII)
+        mode = rule_mode(spec, rule)  # a rule may carry its own mode (built-in egress PII)
         event = GuardrailEvent(
             policy_key=policy.key,
             stage=stage,

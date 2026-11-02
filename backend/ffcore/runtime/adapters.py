@@ -348,10 +348,9 @@ class EngineGuard:
 
     @property
     def streams_live(self) -> bool:
-        """V8: with an enforce-mode policy checking output, nothing is shown before the check."""
-        spec = self._policy.spec
-        checks_output = any(OUTPUT_STAGES & set(rule.stages) for rule in spec.rules)
-        return not (spec.mode == "enforce" and checks_output)
+        """V8: when an enforce rule checks output (its own mode or the policy's), nothing is
+        shown before the check."""
+        return not engine.enforced_at(self._policy, OUTPUT_STAGES)
 
     async def check(self, stage, text, *, tool=None) -> GuardResult:
         if stage == "egress" and not self._egress:
