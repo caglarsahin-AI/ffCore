@@ -1455,3 +1455,16 @@ Koşular: 88 passed + 2 failed (probe 3 ve MINOR-1 testi); unit+contract 734 pas
 ## R-134-0003 | 2026-11-02 11:00 | ACK | K-134-0006
 - REVIEW-ISTEK 06a-egress r2 alındı; SHA 10e86bf0d54215e2783ed304e6af712798666858 mevcut (b9eefe3 üstüne 2 commit, 4 dosya; state/ diff 0). Yığınlı tur. YIGIN-AÇ review-134 (18190/13190, FFCORE_VERSION=0.0.0-review-134, --profile test --profile qdrant); açık yığın yalnız ffcore-19, C: 43 GB.
 - 2026-11-02 11:00 YIGIN-AÇ review-134 başlatılıyor (build + up).
+
+## R-134-0004 | 2026-11-02 11:18 | REVIEW-SONUC | K-134-0006
+- Paket/SHA: fix/06a-egress-all-messages r2, 10e86bf0d54215e2783ed304e6af712798666858. Yığın review-134 (18190/13190) açıldı ve `down -v` ile kapatıldı (YIGIN-KAPA review134). state/ diff 0.
+- Karar: **ONAY** (BLOCKER 0, MAJOR 0, MINOR 1 düşük). r1 MINOR 1-3 kapandı: arguments değer değer tokenlı (iç içe JSON, detokenize geri getiriyor), mesaj başına tek denetim (hook satırı çiftlenmiyor), str olmayan içerik / JSON olmayan arguments / 200.001 karakter kodlu hata ve sağlayıcıya hiçbir şey gitmiyor.
+- Koşular: hedefli 12; tam entegrasyon llmaas 682 passed + 4 skipped; unit+contract llmaas 745, airgap 749 (iki 134 entegrasyonu dahil); kendi probe'um 4/4. Sağlayıcı isteğinde (fake-llm /_requests) ham e-posta/telefon yok; worker/backend/litellm/fake-llm loglarında 0 eşleşme (sınırlı: testler model düğümünü tools konteynerinde sürüyor).
+- Madde 5 (işçi sınırı): kabul edilebilir; gerçek API→worker→mcp-sql koşusu koşulmadı, DUZELT şartı yapmadım.
+- MINOR-4: sayısal JSON değerleri (örn. TCKN sayı) egress'ten geçmiyor; probe'da ham gitti; düşük etki, merge'ü engellemez.
+- NOT_RUN: lint (işçi kanıtı), uçtan uca run. Rapor: state/reviews/06a-egress-r2.md. Koordinatör merge edebilir (06b bekliyordu). Worktree .worktrees/review-134-r2 temiz doğrulandı ve kaldırıldı. Dosyalar commit edilmemiş.
+- Sıradaki: K-M3S-0013 (19 M3 sunucu paketi) mesajı alındı; kanalı okuyup ayrı ACK ile başlayacağım.
+
+## R-19-0001 | 2026-11-02 11:19 | ACK | K-M3S-0013
+- REVIEW-ISTEK 19 M3 sunucu paketi alındı. SHA'lar mevcut: ffcore 987dd62721c346fd376a8861944ecd1ab6de2422 (feat/m3-server-package, baz 3f20541), paycoreLLM-m3 3adbb3a98d671137b77a70680ac18126ab43d754 (baz 8594bb0). Güvenlik turu + yığınlı, iki depo ayrı başlık. paycoreLLM tarafında .env, data/**, eval/results/** okunmaz; PayCore sunucusuna bağlanılmaz; paycoreLLM'i `git archive` ile salt-okunur çıkarıp (depoya yazmadan) inceliyorum.
+- YIGIN-AÇ review-19 (18200/13200, FFCORE_VERSION=0.0.0-review-19, --profile test --profile qdrant) hazırlığı; açık FF yığını yok, C: 42 GB.
