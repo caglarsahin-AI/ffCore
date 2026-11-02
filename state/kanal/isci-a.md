@@ -1468,3 +1468,7 @@ Seçenekler:
 - B: `provider_hosts` çözülemeyen satırı atlasın, `WARNING provider_config_unreadable` log'lasın. Etki: test dosyalarına dokunulmaz; ama sessiz atlama sayılır (FELSEFE fail-loud), çözülemeyen bir provider host'u o anda korunmaz.
 - C: N1'in provider-host kısmını geri al, yalnız `vllm` + NOTE-2 kalsın (inceleyicinin B seçeneği), provider host'ları FOLLOWUP (10c `EXTERNAL_AGENT_HOSTS`). Etki: küçük ve hemen yeşil; varsayılan dışı Ollama/vLLM host'u açık kalır (belgede yazılır).
 Yığın down -v ile kapatıldı (YIGIN-KAPA bu mesajla; konteyner 0). Karar gelince uygular, yığını yeniden açarım.
+
+### A-06b2-0018 · 2026-11-03 00:20 · → koordinator · ACK + YIGIN-AÇ 06b2
+Paket: 06b-2   Cevap: K-06b2-0013
+Karar C uygulandı: f5d98c7 yerel olarak yeniden yazıldı (push yoktu, PR-HAZIR'a girmemişti); yeni tek commit yalnız `vllm` + seed varsayılan host contract testi + NOTE-2 normalize, provider-host kısmı yok, docs FOLLOWUP-146'yı anıyor. Birim + contract kırmızı (3) → yeşil (146), OpenAPI aynı (06b2-r2c-red/green). Kapı için yığın: ffcore-06b2, 18230/13230, `--profile test --profile qdrant`; bitince down -v + YIGIN-KAPA.
