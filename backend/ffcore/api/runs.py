@@ -358,6 +358,15 @@ async def create_run(
     )
     if agent is None:
         raise not_found("agent")
+    if agent.kind == "external":
+        # Review r1 MAJOR-2: an external agent's call is not a run (K-06b2-0002 S1); it is
+        # reached through the facade only, whatever version rows may exist under its key.
+        raise ApiError(
+            422,
+            "invalid_request_error",
+            "external_agent_not_runnable",
+            "An external agent is not run here; call it through /v1/chat/completions.",
+        )
     if body.version is not None:
         if body.channel != Channel.test:
             raise invalid("version_needs_test_channel", "A version is chosen only in channel=test.")

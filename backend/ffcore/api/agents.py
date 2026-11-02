@@ -517,7 +517,6 @@ async def import_manifest(
     except ValidationError as exc:
         where = ".".join(str(p) for p in exc.errors()[0].get("loc", ()))
         raise _manifest_invalid(f"definition.{where}: {exc.errors()[0].get('msg')}") from None
-    await check_context(session, project_id, definition, settings)
     agent = await session.scalar(
         select(Agent).where(
             Agent.project_id == project_id,
@@ -525,6 +524,11 @@ async def import_manifest(
             Agent.deleted_at.is_(None),
         )
     )
+    if agent is not None and agent.kind == "external":
+        # Review r1 MAJOR-2: the key is an external agent's; a native version under it would
+        # make it runnable as a native agent. Refused, dry run included; never converted.
+        raise not_portable()
+    await check_context(session, project_id, definition, settings)
     action = "new_version" if agent is not None else "create"
     version = await _latest(session, agent.id) + 1 if agent is not None else 1
     if dry_run:

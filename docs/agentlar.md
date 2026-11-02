@@ -266,5 +266,6 @@ Every stop is a coded `error` event and the run's `error_code`; nothing ends sil
 | `run_error` | anything else; the worker log has the exception |
 
 API errors at start: `agent_not_published` (404), `run_needs_membership` (403), `variable_unknown`
-(422), `run_not_waiting` (409), `run_not_completed` (409, feedback). Langfuse delivery problems are
+(422), `external_agent_not_runnable` (422: an external agent is called through the facade, never
+run), `run_not_waiting` (409), `run_not_completed` (409, feedback). Langfuse delivery problems are
 logged as `trace_delivery_failed` and never fail a run or a request.

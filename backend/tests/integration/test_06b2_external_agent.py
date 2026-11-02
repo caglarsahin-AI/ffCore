@@ -16,6 +16,7 @@ from ffcore.api.facade_schemas import EXTERNAL_X_PLATFORM_EVENTS
 from ffcore.services.facade_external import MAX_EXTERNAL_RESPONSE_BYTES
 from tests.integration.facade_support import *  # noqa: F403 - fixtures
 from tests.integration.facade_support import make_key, project_key
+from tests.integration.test_06b_manifest import _model
 
 KEY = "dummy-not-secret-external-key-0001"
 NEW_KEY = "dummy-not-secret-external-key-0002"
@@ -224,6 +225,56 @@ def test_06b2_17_no_versions_no_manifest_no_kind_change(ext):
     assert exported.json()["error"]["code"] == "external_agent_not_available"
     assert console.patch(base, json={"kind": "native"}).status_code == 422
     assert console.put(base + "/external", json={"kind": "native"}).status_code == 422
+
+
+def _versions(pg, agent_id):
+    return pg.execute(
+        "SELECT count(*) FROM agent_versions WHERE agent_id = %s", (agent_id,)
+    ).fetchone()[0]
+
+
+def test_06b2_r1_import_onto_external_key_refused(ext, make_user, client_factory, pg):
+    """Review r1 MAJOR-2: a native manifest under an external agent's key is refused (dry run
+    included) for the analyst who may import; no version appears under the external agent."""
+    project, _, _, register = ext
+    agent, _ = register()
+    _model(pg, project)  # the manifest's model exists: only the key's kind refuses it
+    _, email = make_user(memberships={project: ("analyst", "edit")})
+    analyst = client_factory(email)
+    manifest = {
+        "agent": {"key": "dis", "name": "x", "kind": "native"},
+        "definition": {"model": "chat-default", "system_prompt": "x"},
+    }
+    for params in ({}, {"dry_run": "true"}):
+        response = analyst.post(
+            f"/api/v1/projects/{project}/agents/import", params=params, json=manifest
+        )
+        assert response.status_code == 422, response.text
+        assert response.json()["error"]["code"] == "external_agent_not_available"
+    assert _versions(pg, agent["id"]) == 0
+
+
+def test_06b2_r1_external_agent_is_not_runnable(ext, pg):
+    """Review r1 MAJOR-2 (defence): even with a version row under its key (written before the
+    import refusal), an external agent is never a run: 422 `external_agent_not_runnable`."""
+    project, console, _, register = ext
+    agent, _ = register()
+    pg.execute(
+        "INSERT INTO agent_versions (id, agent_id, version, definition, created_by)"
+        " VALUES (gen_random_uuid(), %s, 1, %s, 'test')",
+        (agent["id"], json.dumps({"model": "chat-default", "system_prompt": "x"})),
+    )
+    url = f"/api/v1/projects/{project}/agents/dis/runs"
+    for body in ({"channel": "test", "version": 1, "input": "x"}, {"input": "x"}):
+        # Streamed: an accepted run is an SSE stream that would wait for a worker (the red run
+        # hung there); its first line is enough to fail.
+        with console.stream("POST", url, json=body) as response:
+            status = response.status_code
+            text = response.read().decode() if status != 200 else next(response.iter_lines())
+        assert status == 422, text
+        assert json.loads(text)["error"]["code"] == "external_agent_not_runnable"
+    runs = pg.execute("SELECT count(*) FROM runs WHERE agent_id = %s", (agent["id"],))
+    assert runs.fetchone()[0] == 0
 
 
 # --- the facade ---
