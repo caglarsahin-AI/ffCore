@@ -1,0 +1,79 @@
+...............FF..FF.                                                   [100%]
+=================================== FAILURES ===================================
+___ test_137_4_real_code_still_code_heavy[fenced_python_with_prose_comments] ___
+
+block = '```python\n# bu betik her gün çalışır ve sonuç için bir kayıt yazar\nimport json\n# dosya yoksa hata verilir, çünkü e...   return json.loads(open(path).read())\n# kayıt ile ilgili ayrıntı için ekibe bakılır\nclass Reader:\n    pass\n```\n'
+
+    @pytest.mark.parametrize(
+        "block",
+        [
+            "#include <stdio.h>\n#define MAX 10\nint main(void)\n{\n    return 0;\n}\n"
+            "// toplam değeri yazdırılır ve program kapanır\n",
+            f"```python\n{PY_WITH_COMMENTS}```\n",
+            f"~~~\n{PY_WITH_COMMENTS}~~~\n",
+        ],
+        ids=["c", "fenced_python_with_prose_comments", "tilde_fenced_python"],
+    )
+    def test_137_4_real_code_still_code_heavy(block):
+        """Inside a fence every line is code, a `# text` comment included (K-137-0004 A)."""
+>       assert gates.text_quality(block, title="T", min_tokens=1) == ("skipped", "code_heavy")
+E       AssertionError: assert ('ok', None) == ('skipped', 'code_heavy')
+E         
+E         At index 0 diff: 'ok' != 'skipped'
+E         Use -v to get more diff
+
+tests/unit/test_137_gate2_headings.py:81: AssertionError
+__________ test_137_4_real_code_still_code_heavy[tilde_fenced_python] __________
+
+block = '~~~\n# bu betik her gün çalışır ve sonuç için bir kayıt yazar\nimport json\n# dosya yoksa hata verilir, çünkü eksik v...   return json.loads(open(path).read())\n# kayıt ile ilgili ayrıntı için ekibe bakılır\nclass Reader:\n    pass\n~~~\n'
+
+    @pytest.mark.parametrize(
+        "block",
+        [
+            "#include <stdio.h>\n#define MAX 10\nint main(void)\n{\n    return 0;\n}\n"
+            "// toplam değeri yazdırılır ve program kapanır\n",
+            f"```python\n{PY_WITH_COMMENTS}```\n",
+            f"~~~\n{PY_WITH_COMMENTS}~~~\n",
+        ],
+        ids=["c", "fenced_python_with_prose_comments", "tilde_fenced_python"],
+    )
+    def test_137_4_real_code_still_code_heavy(block):
+        """Inside a fence every line is code, a `# text` comment included (K-137-0004 A)."""
+>       assert gates.text_quality(block, title="T", min_tokens=1) == ("skipped", "code_heavy")
+E       AssertionError: assert ('ok', None) == ('skipped', 'code_heavy')
+E         
+E         At index 0 diff: 'ok' != 'skipped'
+E         Use -v to get more diff
+
+tests/unit/test_137_gate2_headings.py:81: AssertionError
+_____________________ test_137_7_fenced_log_counts_as_code _____________________
+
+    def test_137_7_fenced_log_counts_as_code():
+        """A fenced log or config sample is code by intent, prose-like words or not."""
+        log = "\n".join(f"servis {i} yeniden başlatıldı ve kuyruk boşaltıldı" for i in range(4))
+        text = f"## Günlük örneği\n{PROSE}\n```\n{log}\n```\n"
+>       assert gates.text_quality(text, title="T") == ("skipped", "code_heavy")
+E       AssertionError: assert ('ok', None) == ('skipped', 'code_heavy')
+E         
+E         At index 0 diff: 'ok' != 'skipped'
+E         Use -v to get more diff
+
+tests/unit/test_137_gate2_headings.py:101: AssertionError
+____________________ test_137_8_unclosed_fence_rest_is_code ____________________
+
+    def test_137_8_unclosed_fence_rest_is_code():
+        """A fence that never closes: every line after it is code (fail-safe, not prose)."""
+        unclosed = f"{PROSE}\n```\n{PROSE}\n{PROSE}"
+>       assert gates.text_quality(unclosed, title="T") == ("skipped", "code_heavy")
+E       AssertionError: assert ('ok', None) == ('skipped', 'code_heavy')
+E         
+E         At index 0 diff: 'ok' != 'skipped'
+E         Use -v to get more diff
+
+tests/unit/test_137_gate2_headings.py:107: AssertionError
+=========================== short test summary info ============================
+FAILED tests/unit/test_137_gate2_headings.py::test_137_4_real_code_still_code_heavy[fenced_python_with_prose_comments]
+FAILED tests/unit/test_137_gate2_headings.py::test_137_4_real_code_still_code_heavy[tilde_fenced_python]
+FAILED tests/unit/test_137_gate2_headings.py::test_137_7_fenced_log_counts_as_code
+FAILED tests/unit/test_137_gate2_headings.py::test_137_8_unclosed_fence_rest_is_code
+4 failed, 18 passed in 0.53s

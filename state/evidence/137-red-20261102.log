@@ -1,0 +1,125 @@
+ Network fix137_default  Creating
+ Network fix137_default  Created
+ Volume "fix137_langfuse_postgres_data"  Creating
+ Volume "fix137_langfuse_postgres_data"  Created
+ Volume "fix137_redis_data"  Creating
+ Volume "fix137_redis_data"  Created
+ Volume "fix137_model_cache"  Creating
+ Volume "fix137_model_cache"  Created
+ Volume "fix137_knowledge_storage"  Creating
+ Volume "fix137_knowledge_storage"  Created
+ Volume "fix137_postgres_data"  Creating
+ Volume "fix137_postgres_data"  Created
+ Volume "fix137_langfuse_minio_data"  Creating
+ Volume "fix137_langfuse_minio_data"  Created
+ Volume "fix137_langfuse_clickhouse_data"  Creating
+ Volume "fix137_langfuse_clickhouse_data"  Created
+ Volume "fix137_langfuse_clickhouse_logs"  Creating
+ Volume "fix137_langfuse_clickhouse_logs"  Created
+FFFFFFF..........F                                                       [100%]
+=================================== FAILURES ===================================
+_____________________ test_137_1_short_headed_page_passes ______________________
+
+    def test_137_1_short_headed_page_passes():
+        lines = [ln for ln in PAGE_1001.splitlines() if ln.strip()]
+        assert len(lines) == 5 and sum(ln.startswith("#") for ln in lines) == 3  # the 0.6 shape
+>       assert gates.text_quality(PAGE_1001, title="Ödeme Geçidi Kurulum Rehberi") == ("ok", None)
+E       AssertionError: assert ('skipped', 'code_heavy') == ('ok', None)
+E         
+E         At index 0 diff: 'skipped' != 'ok'
+E         Use -v to get more diff
+
+tests/unit/test_137_gate2_headings.py:38: AssertionError
+____________________ test_137_2_heading_levels_not_code[1] _____________________
+
+level = 1
+
+    @pytest.mark.parametrize("level", range(1, 7))
+    def test_137_2_heading_levels_not_code(level):
+        hashes = "#" * level
+>       assert not _is_code(f"{hashes} Kurulum")
+E       AssertionError: assert not True
+E        +  where True = _is_code('# Kurulum')
+
+tests/unit/test_137_gate2_headings.py:44: AssertionError
+____________________ test_137_2_heading_levels_not_code[2] _____________________
+
+level = 2
+
+    @pytest.mark.parametrize("level", range(1, 7))
+    def test_137_2_heading_levels_not_code(level):
+        hashes = "#" * level
+>       assert not _is_code(f"{hashes} Kurulum")
+E       AssertionError: assert not True
+E        +  where True = _is_code('## Kurulum')
+
+tests/unit/test_137_gate2_headings.py:44: AssertionError
+____________________ test_137_2_heading_levels_not_code[3] _____________________
+
+level = 3
+
+    @pytest.mark.parametrize("level", range(1, 7))
+    def test_137_2_heading_levels_not_code(level):
+        hashes = "#" * level
+>       assert not _is_code(f"{hashes} Kurulum")
+E       AssertionError: assert not True
+E        +  where True = _is_code('### Kurulum')
+
+tests/unit/test_137_gate2_headings.py:44: AssertionError
+____________________ test_137_2_heading_levels_not_code[4] _____________________
+
+level = 4
+
+    @pytest.mark.parametrize("level", range(1, 7))
+    def test_137_2_heading_levels_not_code(level):
+        hashes = "#" * level
+>       assert not _is_code(f"{hashes} Kurulum")
+E       AssertionError: assert not True
+E        +  where True = _is_code('#### Kurulum')
+
+tests/unit/test_137_gate2_headings.py:44: AssertionError
+____________________ test_137_2_heading_levels_not_code[5] _____________________
+
+level = 5
+
+    @pytest.mark.parametrize("level", range(1, 7))
+    def test_137_2_heading_levels_not_code(level):
+        hashes = "#" * level
+>       assert not _is_code(f"{hashes} Kurulum")
+E       AssertionError: assert not True
+E        +  where True = _is_code('##### Kurulum')
+
+tests/unit/test_137_gate2_headings.py:44: AssertionError
+____________________ test_137_2_heading_levels_not_code[6] _____________________
+
+level = 6
+
+    @pytest.mark.parametrize("level", range(1, 7))
+    def test_137_2_heading_levels_not_code(level):
+        hashes = "#" * level
+>       assert not _is_code(f"{hashes} Kurulum")
+E       AssertionError: assert not True
+E        +  where True = _is_code('###### Kurulum')
+
+tests/unit/test_137_gate2_headings.py:44: AssertionError
+_____________________ test_137_6_chunk_with_heading_passes _____________________
+
+    def test_137_6_chunk_with_heading_passes():
+        chunk = f"## Destek\n### İletişim\n{PROSE}"  # breadcrumb-free chunk body (ingest.py:533)
+>       assert gates.text_quality(chunk, title=None) == ("ok", None)
+E       AssertionError: assert ('skipped', 'code_heavy') == ('ok', None)
+E         
+E         At index 0 diff: 'skipped' != 'ok'
+E         Use -v to get more diff
+
+tests/unit/test_137_gate2_headings.py:83: AssertionError
+=========================== short test summary info ============================
+FAILED tests/unit/test_137_gate2_headings.py::test_137_1_short_headed_page_passes
+FAILED tests/unit/test_137_gate2_headings.py::test_137_2_heading_levels_not_code[1]
+FAILED tests/unit/test_137_gate2_headings.py::test_137_2_heading_levels_not_code[2]
+FAILED tests/unit/test_137_gate2_headings.py::test_137_2_heading_levels_not_code[3]
+FAILED tests/unit/test_137_gate2_headings.py::test_137_2_heading_levels_not_code[4]
+FAILED tests/unit/test_137_gate2_headings.py::test_137_2_heading_levels_not_code[5]
+FAILED tests/unit/test_137_gate2_headings.py::test_137_2_heading_levels_not_code[6]
+FAILED tests/unit/test_137_gate2_headings.py::test_137_6_chunk_with_heading_passes
+8 failed, 10 passed in 2.28s

@@ -1,0 +1,256 @@
+=== make test DEPLOY_PROFILE=llmaas
+cd backend && pytest tests/unit tests/contract
+============================= test session starts ==============================
+platform linux -- Python 3.12.10, pytest-9.2.0, pluggy-1.7.0
+rootdir: /work/backend
+configfile: pyproject.toml
+plugins: Faker-40.43.0, anyio-4.15.1, langsmith-0.14.8
+collected 874 items
+
+tests/unit/test_00_1_healthz.py .                                        [  0%]
+tests/unit/test_00_package.py ..                                         [  0%]
+tests/unit/test_00_repo_skeleton.py ...........                          [  1%]
+tests/unit/test_00_smoke_script.py ....                                  [  2%]
+tests/unit/test_01_client.py ..............                              [  3%]
+tests/unit/test_01_config.py ...                                         [  4%]
+tests/unit/test_01_egress_stream.py ..................                   [  6%]
+tests/unit/test_01_r1_safety.py ..............................           [  9%]
+tests/unit/test_01_reconcile_params.py ................                  [ 11%]
+tests/unit/test_01_scheduler.py .....                                    [ 11%]
+tests/unit/test_01_seed.py .............                                 [ 13%]
+tests/unit/test_02_logging.py ...........                                [ 14%]
+tests/unit/test_02_pricing.py ...                                        [ 14%]
+tests/unit/test_02_r1_logging.py ..............                          [ 16%]
+tests/unit/test_02_r1_tracing.py ...                                     [ 16%]
+tests/unit/test_02_tracing.py .......................                    [ 19%]
+tests/unit/test_03a_providers_service.py .....                           [ 20%]
+tests/unit/test_03a_session.py ........                                  [ 21%]
+tests/unit/test_03a_write_flag.py ....                                   [ 21%]
+tests/unit/test_03b_auth.py .................                            [ 23%]
+tests/unit/test_03b_config_errors.py ........                            [ 24%]
+tests/unit/test_03b_dns_opt_in.py ..                                     [ 24%]
+tests/unit/test_03b_egress.py .......................................... [ 29%]
+............                                                             [ 30%]
+tests/unit/test_04a_convert.py .............................             [ 34%]
+tests/unit/test_04a_redis_pin.py ...                                     [ 34%]
+tests/unit/test_04a_review_r1_audit_fields.py ..                         [ 34%]
+tests/unit/test_04a_review_r1_chunk_budget.py .....                      [ 35%]
+tests/unit/test_04a_review_r1_limits.py ...........                      [ 36%]
+tests/unit/test_04a_review_r1_offline.py ......                          [ 37%]
+tests/unit/test_04a_text_rules.py ..............................         [ 40%]
+tests/unit/test_05a_mcp_client.py ...................................... [ 44%]
+.                                                                        [ 45%]
+tests/unit/test_05a_obo_verifier.py .....                                [ 45%]
+tests/unit/test_05a_services_config.py ..........                        [ 46%]
+tests/unit/test_05a_sql_validator.py ................................... [ 50%]
+................                                                         [ 52%]
+tests/unit/test_05a_tool_read_roles.py ..                                [ 52%]
+tests/unit/test_05a_unverified_claims.py ....                            [ 53%]
+tests/unit/test_06a_definition.py ..................                     [ 55%]
+tests/unit/test_06a_model_adapter.py .                                   [ 55%]
+tests/unit/test_06a_no_langsmith.py ...                                  [ 55%]
+tests/unit/test_06a_prompting.py .....................                   [ 58%]
+tests/unit/test_06a_search_adapter.py .                                  [ 58%]
+tests/unit/test_06b_facade.py .......................................... [ 63%]
+                                                                         [ 63%]
+tests/unit/test_07_rules.py ...........                                  [ 64%]
+tests/unit/test_07_worker.py .                                           [ 64%]
+tests/unit/test_07f_compose.py .                                         [ 64%]
+tests/unit/test_07f_follow.py ...                                        [ 64%]
+tests/unit/test_08_cost.py .......                                       [ 65%]
+tests/unit/test_08_egress_enforce.py ...............................     [ 69%]
+tests/unit/test_08_engine.py .....................                       [ 71%]
+tests/unit/test_08_masking.py ..........                                 [ 72%]
+tests/unit/test_08_recognizers.py .............                          [ 74%]
+tests/unit/test_116_source_state.py ..                                   [ 74%]
+tests/unit/test_134_egress_all_messages.py ........                      [ 75%]
+tests/unit/test_137_gate2_headings.py ...............F..                 [ 77%]
+tests/unit/test_18td_server.py ...........                               [ 78%]
+tests/unit/test_18td_sql_write_attempts.py ................              [ 80%]
+tests/unit/test_19_eval_out.py ..........                                [ 81%]
+tests/unit/test_19_offline.py ............                               [ 83%]
+tests/unit/test_19_preflight.py ...............                          [ 84%]
+tests/unit/test_19_raw_staging.py ........................               [ 87%]
+tests/unit/test_af_1_definition_error_codes.py ............              [ 89%]
+tests/unit/test_af_2_structural_breadcrumb.py .........                  [ 90%]
+tests/unit/test_af_2c_source_mask_paths.py ..                            [ 90%]
+tests/unit/test_fake_openai_tool_mode.py .....                           [ 90%]
+tests/contract/test_03a_openapi.py ....                                  [ 91%]
+tests/contract/test_03c_openapi.py ....                                  [ 91%]
+tests/contract/test_04a_makefile_test_int.py ...                         [ 92%]
+tests/contract/test_04a_openapi.py ......                                [ 92%]
+tests/contract/test_05a_openapi.py ....                                  [ 93%]
+tests/contract/test_06a_openapi.py ....                                  [ 93%]
+tests/contract/test_06b_litellm_not_published.py .                       [ 93%]
+tests/contract/test_06b_openapi.py ...                                   [ 94%]
+tests/contract/test_07_openapi.py ....                                   [ 94%]
+tests/contract/test_08_openapi.py ......                                 [ 95%]
+tests/contract/test_57_alembic_single_head.py ...                        [ 95%]
+tests/contract/test_c11_facade.py ....                                   [ 96%]
+tests/contract/test_c1_namespace.py ...............                      [ 97%]
+tests/contract/test_c2_api_key_scopes.py ..                              [ 98%]
+tests/contract/test_c2_on_behalf_of.py ..                                [ 98%]
+tests/contract/test_c3_common_columns.py .....                           [ 98%]
+tests/contract/test_c5_vectorstore.py ...                                [ 99%]
+tests/contract/test_c9_runs.py .......                                   [100%]
+
+=================================== FAILURES ===================================
+_________ test_137_4_real_code_still_code_heavy[python_with_comments] __________
+
+block = '# ödeme kayıtlarını okuyan yardımcı betik\nimport json\nfrom pathlib import Path\n# her dosya ayrı okunur\ndef read(path):\n    return json.loads(Path(path).read_text())\nclass Reader:\n    pass\n'
+
+    @pytest.mark.parametrize(
+        "block",
+        [
+            "#include <stdio.h>\n#define MAX 10\nint main(void)\n{\n    return 0;\n}\n"
+            "// toplam değeri yazdırılır ve program kapanır\n",
+            "# ödeme kayıtlarını okuyan yardımcı betik\nimport json\nfrom pathlib import Path\n"
+            "# her dosya ayrı okunur\ndef read(path):\n    return json.loads(Path(path).read_text())\n"
+            "class Reader:\n    pass\n",
+        ],
+        ids=["c", "python_with_comments"],
+    )
+    def test_137_4_real_code_still_code_heavy(block):
+>       assert gates.text_quality(block, title="T", min_tokens=1) == ("skipped", "code_heavy")
+E       AssertionError: assert ('skipped', 'no_prose') == ('skipped', 'code_heavy')
+E         
+E         At index 1 diff: 'no_prose' != 'code_heavy'
+E         Use -v to get more diff
+
+tests/unit/test_137_gate2_headings.py:70: AssertionError
+=========================== short test summary info ============================
+FAILED tests/unit/test_137_gate2_headings.py::test_137_4_real_code_still_code_heavy[python_with_comments]
+================== 1 failed, 873 passed in 249.51s (0:04:09) ===================
+make: *** [Makefile:18: test] Error 1
+exit 2
+=== make test DEPLOY_PROFILE=airgap
+cd backend && pytest tests/unit tests/contract
+============================= test session starts ==============================
+platform linux -- Python 3.12.10, pytest-9.2.0, pluggy-1.7.0
+rootdir: /work/backend
+configfile: pyproject.toml
+plugins: Faker-40.43.0, anyio-4.15.1, langsmith-0.14.8
+collected 874 items
+
+tests/unit/test_00_1_healthz.py .                                        [  0%]
+tests/unit/test_00_package.py ..                                         [  0%]
+tests/unit/test_00_repo_skeleton.py ...........                          [  1%]
+tests/unit/test_00_smoke_script.py ....                                  [  2%]
+tests/unit/test_01_client.py ..............                              [  3%]
+tests/unit/test_01_config.py ...                                         [  4%]
+tests/unit/test_01_egress_stream.py ..................                   [  6%]
+tests/unit/test_01_r1_safety.py ..............................           [  9%]
+tests/unit/test_01_reconcile_params.py ................                  [ 11%]
+tests/unit/test_01_scheduler.py .....                                    [ 11%]
+tests/unit/test_01_seed.py .............                                 [ 13%]
+tests/unit/test_02_logging.py ...........                                [ 14%]
+tests/unit/test_02_pricing.py ...                                        [ 14%]
+tests/unit/test_02_r1_logging.py ..............                          [ 16%]
+tests/unit/test_02_r1_tracing.py ...                                     [ 16%]
+tests/unit/test_02_tracing.py .......................                    [ 19%]
+tests/unit/test_03a_providers_service.py .....                           [ 20%]
+tests/unit/test_03a_session.py ........                                  [ 21%]
+tests/unit/test_03a_write_flag.py ....                                   [ 21%]
+tests/unit/test_03b_auth.py .................                            [ 23%]
+tests/unit/test_03b_config_errors.py ........                            [ 24%]
+tests/unit/test_03b_dns_opt_in.py ..                                     [ 24%]
+tests/unit/test_03b_egress.py .......................................... [ 29%]
+............                                                             [ 30%]
+tests/unit/test_04a_convert.py .............................             [ 34%]
+tests/unit/test_04a_redis_pin.py ...                                     [ 34%]
+tests/unit/test_04a_review_r1_audit_fields.py ..                         [ 34%]
+tests/unit/test_04a_review_r1_chunk_budget.py .....                      [ 35%]
+tests/unit/test_04a_review_r1_limits.py ...........                      [ 36%]
+tests/unit/test_04a_review_r1_offline.py ......                          [ 37%]
+tests/unit/test_04a_text_rules.py ..............................         [ 40%]
+tests/unit/test_05a_mcp_client.py ...................................... [ 44%]
+.                                                                        [ 45%]
+tests/unit/test_05a_obo_verifier.py .....                                [ 45%]
+tests/unit/test_05a_services_config.py ..........                        [ 46%]
+tests/unit/test_05a_sql_validator.py ................................... [ 50%]
+................                                                         [ 52%]
+tests/unit/test_05a_tool_read_roles.py ..                                [ 52%]
+tests/unit/test_05a_unverified_claims.py ....                            [ 53%]
+tests/unit/test_06a_definition.py ..................                     [ 55%]
+tests/unit/test_06a_model_adapter.py .                                   [ 55%]
+tests/unit/test_06a_no_langsmith.py ...                                  [ 55%]
+tests/unit/test_06a_prompting.py .....................                   [ 58%]
+tests/unit/test_06a_search_adapter.py .                                  [ 58%]
+tests/unit/test_06b_facade.py .......................................... [ 63%]
+                                                                         [ 63%]
+tests/unit/test_07_rules.py ...........                                  [ 64%]
+tests/unit/test_07_worker.py .                                           [ 64%]
+tests/unit/test_07f_compose.py .                                         [ 64%]
+tests/unit/test_07f_follow.py ...                                        [ 64%]
+tests/unit/test_08_cost.py .......                                       [ 65%]
+tests/unit/test_08_egress_enforce.py ...............................     [ 69%]
+tests/unit/test_08_engine.py .....................                       [ 71%]
+tests/unit/test_08_masking.py ..........                                 [ 72%]
+tests/unit/test_08_recognizers.py .............                          [ 74%]
+tests/unit/test_116_source_state.py ..                                   [ 74%]
+tests/unit/test_134_egress_all_messages.py ........                      [ 75%]
+tests/unit/test_137_gate2_headings.py ...............F..                 [ 77%]
+tests/unit/test_18td_server.py ...........                               [ 78%]
+tests/unit/test_18td_sql_write_attempts.py ................              [ 80%]
+tests/unit/test_19_eval_out.py ..........                                [ 81%]
+tests/unit/test_19_offline.py ............                               [ 83%]
+tests/unit/test_19_preflight.py ...............                          [ 84%]
+tests/unit/test_19_raw_staging.py ........................               [ 87%]
+tests/unit/test_af_1_definition_error_codes.py ............              [ 89%]
+tests/unit/test_af_2_structural_breadcrumb.py .........                  [ 90%]
+tests/unit/test_af_2c_source_mask_paths.py ..                            [ 90%]
+tests/unit/test_fake_openai_tool_mode.py .....                           [ 90%]
+tests/contract/test_03a_openapi.py ....                                  [ 91%]
+tests/contract/test_03c_openapi.py ....                                  [ 91%]
+tests/contract/test_04a_makefile_test_int.py ...                         [ 92%]
+tests/contract/test_04a_openapi.py ......                                [ 92%]
+tests/contract/test_05a_openapi.py ....                                  [ 93%]
+tests/contract/test_06a_openapi.py ....                                  [ 93%]
+tests/contract/test_06b_litellm_not_published.py .                       [ 93%]
+tests/contract/test_06b_openapi.py ...                                   [ 94%]
+tests/contract/test_07_openapi.py ....                                   [ 94%]
+tests/contract/test_08_openapi.py ......                                 [ 95%]
+tests/contract/test_57_alembic_single_head.py ...                        [ 95%]
+tests/contract/test_c11_facade.py ....                                   [ 96%]
+tests/contract/test_c1_namespace.py ...............                      [ 97%]
+tests/contract/test_c2_api_key_scopes.py ..                              [ 98%]
+tests/contract/test_c2_on_behalf_of.py ..                                [ 98%]
+tests/contract/test_c3_common_columns.py .....                           [ 98%]
+tests/contract/test_c5_vectorstore.py ...                                [ 99%]
+tests/contract/test_c9_runs.py .......                                   [100%]
+
+=================================== FAILURES ===================================
+_________ test_137_4_real_code_still_code_heavy[python_with_comments] __________
+
+block = '# ödeme kayıtlarını okuyan yardımcı betik\nimport json\nfrom pathlib import Path\n# her dosya ayrı okunur\ndef read(path):\n    return json.loads(Path(path).read_text())\nclass Reader:\n    pass\n'
+
+    @pytest.mark.parametrize(
+        "block",
+        [
+            "#include <stdio.h>\n#define MAX 10\nint main(void)\n{\n    return 0;\n}\n"
+            "// toplam değeri yazdırılır ve program kapanır\n",
+            "# ödeme kayıtlarını okuyan yardımcı betik\nimport json\nfrom pathlib import Path\n"
+            "# her dosya ayrı okunur\ndef read(path):\n    return json.loads(Path(path).read_text())\n"
+            "class Reader:\n    pass\n",
+        ],
+        ids=["c", "python_with_comments"],
+    )
+    def test_137_4_real_code_still_code_heavy(block):
+>       assert gates.text_quality(block, title="T", min_tokens=1) == ("skipped", "code_heavy")
+E       AssertionError: assert ('skipped', 'no_prose') == ('skipped', 'code_heavy')
+E         
+E         At index 1 diff: 'no_prose' != 'code_heavy'
+E         Use -v to get more diff
+
+tests/unit/test_137_gate2_headings.py:70: AssertionError
+=========================== short test summary info ============================
+FAILED tests/unit/test_137_gate2_headings.py::test_137_4_real_code_still_code_heavy[python_with_comments]
+================== 1 failed, 873 passed in 192.22s (0:03:12) ===================
+make: *** [Makefile:18: test] Error 1
+exit 2
+=== make lint
+ruff check backend scripts data/samples/scripts services
+All checks passed!
+ruff format --check backend scripts data/samples/scripts services
+390 files already formatted
+exit 0
