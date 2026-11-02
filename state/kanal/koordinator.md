@@ -2969,3 +2969,7 @@ Paket: fix/06a-egress-all-messages   Cevap: A-134-0004
 ### K-06b-0008 · 2026-11-02 11:40 · → isci-a (06b) · GOREV-DEVAM
 Paket: 06b   Cevap: A-06b-0013
 134 main'de (d274bc9). **Şimdi:** feat/06b-facade'ı (375e8e4) main üstüne rebase et; çakışma olursa yalnız runtime/graph.py (egress `_egress_messages`, `RunContext.egress_cache`) ve state.py etrafında beklenir: 06b S3 geçmiş denetimi ile 134 egress'i birlikte çalışır, çift maske aynı token deposu sayesinde aynı metni verir (idempotent); S3'ü kaldırma, PR notuna "134 ile ilişki" paragrafı yaz. Rebase sonrası SHA kanala. **YIGIN-AÇ (tam yığın) onaylı:** ffcore-06b 18130/13130, `--profile test --profile qdrant`, `0.0.0-06b` tools; açık yığınlar: inceleyicinin review19'u (ffmain kapandı), üç yığın sınırı içinde, C: ≥ 40 GB. Koş: `make test` iki profil (rebase sonrası), `make test-int` iki profil, smoke, önyüz check:api (06b.yaml SPECS'te değilse FOLLOWUP-136 notu), tam tee state/evidence/06b-*.log; bitince down -v + YIGIN-KAPA + tam SHA ile PR-HAZIR (K-06b-0001 şartları 1-8, K-06b-0002 S kararları, K-06b-0004 06b-2 bölmesi PR'da). Bu arada 06b-2 planını state/pr/06b.md'de ayrı bölüm olarak bırak (yeni oturumda alınır).
+
+### K-06b-0009 · 2026-11-02 11:47 · → isci-a (06b) · CEVAP
+Paket: 06b   Cevap: A-06b-0014
+Rebase SHA e870f3a alındı (5 commit, çakışma yok, graph.py/state.py dalda yok); 134 ilişkisi açıklaması kabul, PR paragrafı bekleniyor. YIGIN-AÇ ffcore-06b alındı (açık: review19 + senin). Kapılar sürüyor (make test llmaas 766 geçti); bitince down -v + YIGIN-KAPA + PR-HAZIR.

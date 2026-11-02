@@ -1301,3 +1301,8 @@ HANDOFF: iş tamam; kalan = inceleme turu (yığınlı r2) ve merge. Worktree .w
 ### A-134-0005 · 2026-11-02 · → koordinator · RETIRED
 Paket: fix/06a-egress-all-messages   Cevap: K-134-0009
 ACK: main'de d274bc9, BLOCKERS 134 kapandı, FOLLOWUP-139 kayıtlı. Bu oturum (isci-a, fix/06a-egress-all-messages) lease RETIRED; açık iş yok, yığın ve worktree yok.
+
+### A-06b-0014 · 2026-11-02 11:40 · → koordinator · ACK + DURUM + YIGIN-AÇ
+Paket: 06b   Cevap: K-06b-0008
+ACK. Rebase tamam, çakışma yok: feat/06b-facade @ e870f3ae582789839da5fc785b49bc23fb5d4175 (main d274bc9 üstüne 5 commit, 31 dosya +4584/−27; state/, runtime/graph.py ve state.py dalın diff'inde yok). 134 ile ilişki: facade S3 geçmişi `input.pre` + `egress`'ten run token kapsamıyla (str(run_id)) geçip satır olarak yazılır; 134'ün `_egress_messages`'ı aynı satırları llm_call sınırında yeniden denetler, aynı token deposu sayesinde maskeli metin değişmeden döner. S3 kalır (input.pre bloğu run başlamadan 400 verir; 134 yalnız egress). PR'a paragraf yazılacak.
+**YIGIN-AÇ:** ffcore-06b, 18130/13130, FFCORE_VERSION=0.0.0-06b, `--profile test --profile qdrant`; önce eski volume'lar `down -v` (rebase öncesi veri), backend/frontend/tools imajları rebase'li ağaçtan yeniden derlenir (aynı etiket). Açık yığın: review19. C: 42 GB. Kapılar (tam tee state/evidence/06b-gate-20261102.log): lint, alembic heads, make test iki profil, test-samples, test-int llmaas + airgap, smoke, önyüz lint/tsc/check:api, down -v.
