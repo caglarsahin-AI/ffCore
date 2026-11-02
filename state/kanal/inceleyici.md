@@ -1540,3 +1540,7 @@ Koşular: 88 passed + 2 failed (probe 3 ve MINOR-1 testi); unit+contract 734 pas
 - Önemli not (kapsam dışı, ön-var olan): Kapı 2 düzyazı kontrolü yalnız TR_STOPWORDS kullanıyor; kısa İngilizce sayfa (başlıklı ya da başlıksız) main'de de yenide de `no_prose` ile eleniyor. Ayrı, öncelikli FOLLOWUP öneririm (04a sahibi); M3 aşama 0 raporunda gate2:no_prose sayısına bakılmalı.
 - Diğer notlar: fence takibi basit aç/kapa (karışık işaretler, tek satırlık ```…``` yalnız gevşek yönde/main'e eşit), `_HEADING_LINE` NBSP/girintiyi de başlık sayıyor (gevşek yön).
 - Rapor: state/reviews/04a-gate2-headings-r1.md. Worktree temiz doğrulanıp git worktree remove ile kaldırıldı. Dosyalar commit edilmemiş.
+
+## R-06b2-0001 | 2026-11-02 20:45 | ACK | K-06b2-0006
+- REVIEW-ISTEK 06b-2 (dis agent, kind: external) alindi. SHA 2342bc296a633a2304eaa109eda498c2f293a38f mevcut (feat/06b-2-external-agent). Guvenlik turu + yiginli inceleme; rapor state/reviews/06b-2-r1.md.
+- 2026-11-02 20:45 YIGIN-AC review-06b2 (18250/13250, FFCORE_VERSION=0.0.0-review-06b2, --profile test --profile qdrant; imajlar bu SHA'dan derlenecek); acik FF yigini yok, C: 108 GB.
