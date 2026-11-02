@@ -14,6 +14,7 @@ piece; a held answer larger than OUTPUT_BUFFER_BYTES is cut off with `output_buf
 import contextlib
 import json
 import logging
+import math
 import time
 import uuid
 from collections.abc import AsyncIterator
@@ -85,7 +86,8 @@ def _bad_value(param: str, message: str) -> ApiError:
 def _number(name: str, value: Any) -> None:
     kind, low, high = NUMERIC_PARAMS[name]
     allowed = int if kind == "integer" else int | float
-    if isinstance(value, bool) or not isinstance(value, allowed):
+    # NaN and the infinities are floats but no number in a range (FOLLOWUP-142).
+    if isinstance(value, bool) or not isinstance(value, allowed) or not math.isfinite(value):
         raise _bad_value(name, f"'{name}' must be an {kind}.")
     if (low is not None and value < low) or (high is not None and value > high):
         bounds = f"at least {low}" if high is None else f"between {low} and {high}"
