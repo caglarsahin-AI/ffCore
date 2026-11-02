@@ -200,6 +200,64 @@ def test_06b2_4_register_url_policy(settings):
     check(airgap, "http://agent.test:8080/v1", {"agent.test": ["10.0.0.7"]})
 
 
+# --- review r1 MINOR-1: the platform's own services are not targets ----------------------
+
+
+@pytest.mark.parametrize(
+    "url",
+    [
+        "http://litellm:4000/v1",
+        "http://LiteLLM./v1",  # case and the root dot do not hide a name
+        "http://langfuse-web:3000/api/public",
+        "http://mcp-sql:8000/v1",
+        "http://ollama:11434/v1",
+        "http://host.docker.internal:11434/v1",
+        "http://backend:8000/v1",
+        "http://my-litellm:4000/v1",  # LITELLM_URL's host, whatever it is called
+        "http://127.0.0.1:8000/v1",  # the backend itself, from inside its container
+    ],
+)
+def test_06b2_r1_platform_hosts_reserved(settings, url):
+    internal = settings.model_copy(
+        update={
+            "litellm_url": "http://my-litellm:4000",
+            "allowed_internal_hosts": [
+                "litellm",
+                "langfuse-web",
+                "mcp-sql",
+                "ollama",
+                "host.docker.internal",
+                "backend",
+                "my-litellm",
+                "127.0.0.1",
+            ],
+        }
+    )
+    with pytest.raises(ApiError) as exc:
+        anyio.run(lambda: facade_external.check_base_url(url, internal, resolver=_any_private()))
+    assert (exc.value.status_code, exc.value.code, exc.value.param) == (
+        422,
+        "external_agent_host_reserved",
+        "base_url",
+    )
+
+
+def test_06b2_r1_other_internal_hosts_stay(settings):
+    """KARARLAR:172: an internal host the installation allows is still a valid target."""
+    internal = settings.model_copy(update={"allowed_internal_hosts": ["agent.test", "127.0.0.1"]})
+    for url in ("http://agent.test:8080/v1", "http://127.0.0.1:18080/v1"):
+        anyio.run(
+            lambda url=url: facade_external.check_base_url(url, internal, resolver=_any_private())
+        )
+
+
+def _any_private():
+    async def resolve(host, port):
+        return ["10.0.0.9"]
+
+    return resolve
+
+
 # --- the call: SSRF matrix -------------------------------------------------------------------
 
 

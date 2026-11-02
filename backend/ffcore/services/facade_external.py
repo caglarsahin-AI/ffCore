@@ -100,6 +100,58 @@ def not_this_path() -> ApiError:
     )
 
 
+# Review r1 MINOR-1 (K-06b2-0008, decision A): the platform's own services are never an external
+# agent's target, even when ALLOWED_INTERNAL_HOSTS lets them be reached; wrapping LiteLLM or
+# Ollama as an "external agent" would take the platform's own model outside quota and tracing.
+# Every compose service is a host name on the platform network (tests/contract checks the list
+# against deploy/docker-compose*.yml); host.docker.internal is airgap Ollama on the host (seed).
+# Other internal hosts stay valid targets (KARARLAR:172).
+RESERVED_HOSTS = frozenset(
+    {
+        "agent-worker",
+        "agent-worker-bg",
+        "backend",
+        "e2e",
+        "fake-llm",
+        "frontend",
+        "langfuse-clickhouse",
+        "langfuse-minio",
+        "langfuse-postgres",
+        "langfuse-redis",
+        "langfuse-web",
+        "langfuse-worker",
+        "litellm",
+        "mcp-search",
+        "mcp-sql",
+        "migrate",
+        "ollama",
+        "postgres",
+        "qdrant",
+        "redis",
+        "ticket-desk",
+        "tools",
+        "worker",
+        "host.docker.internal",
+    }
+)
+# The port the backend listens on in its container (compose maps BACKEND_PORT to it): a loopback
+# address on it is the backend itself.
+BACKEND_CONTAINER_PORT = 8000
+
+
+def _reserved(host: str, port: int, settings: Settings) -> bool:
+    configured = {
+        (httpx2.URL(url).host or "").lower()
+        for url in (settings.litellm_url, settings.langfuse_host)
+        if url
+    }
+    if host in RESERVED_HOSTS or host in configured:
+        return True
+    literal = _parse_ip(host)
+    loopback = host == "localhost" or (literal is not None and literal.is_loopback)
+    return loopback and port == BACKEND_CONTAINER_PORT
+
+
 def url_refused(code: str) -> ApiError:
     return ApiError(
         422,
@@ -126,11 +178,20 @@ async def check_base_url(url: str, settings: Settings, *, resolver: Resolver | N
     if target.port is not None and not 0 < target.port < 65536:
         # httpx2 parses any number as a port; the dial would fail later and less clearly.
         raise url_refused("egress_invalid_port")
+    port = target.port or (443 if target.scheme == "https" else 80)
+    if _reserved((target.host or "").lower().rstrip("."), port, settings):
+        raise ApiError(
+            422,
+            "invalid_request_error",
+            "external_agent_host_reserved",
+            "The base URL names one of the platform's own services; it cannot be an external "
+            "agent.",
+            param="base_url",
+        )
     policy = EgressPolicy(settings)
     try:
         policy.check_url(target)
         host = target.host
-        port = target.port or (443 if target.scheme == "https" else 80)
         literal = _parse_ip(host)
         try:
             addresses = (

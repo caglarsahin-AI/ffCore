@@ -532,8 +532,14 @@ project administrator and called through the same `agent:<project_key>/<agent_ke
   `external_agent_url_refused` with the reason code): `http`/`https` only, no credentials in the URL,
   a valid port, host in `EGRESS_ALLOWLIST` (or `ALLOWED_INTERNAL_HOSTS`), `OFFLINE=true` refuses
   every other host, and every resolved address must be public unless the host is internal. The
-  same check runs again at every connection (a name that resolves to a private address at call
-  time is refused at the dial). Redirects are not followed: a 3xx answer is a failure.
+  platform's own services are never a target, even when internal (422
+  `external_agent_host_reserved`): every compose service name (`litellm`, `langfuse-*`, `mcp-*`,
+  `ollama`, `backend`, ...; `RESERVED_HOSTS` in `services/facade_external.py`),
+  `host.docker.internal`, the hosts of `LITELLM_URL` and `LANGFUSE_HOST`, and a loopback address
+  on the backend's own port; other internal hosts stay valid targets. The same egress check runs
+  again at every connection (a name that resolves to a private address at call time is refused at
+  the dial). Redirects are not followed: a 3xx answer is a failure (audit reason
+  `egress_too_many_redirects`).
 - The call is one non-streaming `POST <base_url>/chat/completions` with the registered `model`,
   the client's `user`/`assistant` messages and its numeric parameters and `stop`; only the
   registered key is sent (`Authorization: Bearer`): no user identity, no `X-On-Behalf-Of`, none of
