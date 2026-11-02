@@ -3,9 +3,9 @@
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
 - Oturum kimliği: ffcore-isci-b-137-7e3079e2
-- Aktif paket: fix/04a-gate2-headings (FOLLOWUP-137)
-- Durum: ACTIVE
-- Son okunan: koordinator K-06b-0021 (2026-11-02 15:42); bana adresli son GOREV K-137-0001
+- Aktif paket: — (fix/04a-gate2-headings MERGED e9ad4b5)
+- Durum: RETIRED
+- Son okunan: koordinator K-137-0010 (zil, 2026-11-02 18:56)
 
 ## Mesajlar
 
@@ -1490,3 +1490,16 @@ Branch fix/04a-gate2-headings · worktree .worktrees/fix/04a-gate2-headings · b
 Kanıt (tam tee state/evidence/137-gate3-20261102.log): 0eed4c8'de make test llmaas 878/878, airgap 878/878; test_19_ingest_raw + test_04a_* entegrasyon iki profil 79 geçti / 11 bayraklı NOT_RUN (main ile aynı; test_19 `indexed 4, skipped 1`, `gate2:boilerplate 1`). İlk lint E501 (test docstring) 6c02718'de düzeldi; son HEAD'de lint 0 + test_137/test_04a_text_rules 52/52. Kırmızı kanıtlar 137-red, 137-red2, A'nın entegrasyon gerilemesi 137-test-int ve 137-probe-samples.
 Kalan riskler PR'da: fence dışında düzyazı yorumlu kod geçer (test 9 sabitledi); Docling fence'i yalnız HTML/MD örneğinde ölçüldü (dil etiketsiz), Confluence dışa aktarımı denenmedi; `---` / `--` main davranışı, 19 ağacında 0 satır.
 Branch'e başka commit atmıyorum.
+
+### B-137-0011 · 2026-11-02 18:56 · → koordinator · HANDOFF
+Paket: fix/04a-gate2-headings   Cevap: K-137-0010
+### fix/04a-gate2-headings · ffcore-isci-b-137-7e3079e2 · 2026-11-02 18:56
+- Durum: MERGED (main e9ad4b5, 6c02718'den; koordinatör doğruladı). BLOCKERS 137 kapandı.
+- Tam sonraki adım: yok. Takip adayı (kayıt koordinatörde): Confluence dışa aktarımında Docling fence biçimi doğrulanmadı (yalnız HTML/MD ölçüldü); `---` / `--` main davranışı; fence dışı düzyazı yorumlu kod test_137_9 ile sabit.
+- Değişen dosyalar: backend/ffcore/knowledge/gates.py, backend/tests/unit/test_137_gate2_headings.py, docs/bilgi-tabani.md.
+- Koşan testler: lint 0; make test 878/878 iki profil; test_19 + test_04a_* entegrasyon iki profil 79 + 11 bayraklı NOT_RUN (state/evidence/137-*). Kalan: gerçek Docling ingest (make models, kullanıcı).
+- Kararlar: K-137-0003 (plan, varsayım 1), K-137-0004 (A), K-137-0006 (A′, son kural).
+- Blocker'lar: yok. Yığın fix137 kapalı (B-137-0009).
+- Commit edilmemiş durum: yok. Worktree ve branch koordinatörce kaldırılıyor.
+- Branch ve son commit: fix/04a-gate2-headings @ 6c0271846e26d7d2241827348c0b2fe697e73e7f → main e9ad4b5.
+Lease: RETIRED.
