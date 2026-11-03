@@ -103,6 +103,7 @@ class CooperativeRedis:
 
     def __init__(self):
         self.data: dict[str, dict[str, str]] = {}
+        self.counters: dict[str, int] = {}
 
     async def _tick(self):
         await asyncio.sleep(0)
@@ -137,12 +138,13 @@ class CooperativeRedis:
     async def expire(self, name, ttl):
         await self._tick()
 
-    async def eval(self, script, numkeys, name, key, value, ttl):
+    async def eval(self, script, numkeys, name, counter, key, value, ttl, counter_ttl):
+        # The store's get-or-create script: mapping hash + its own counter key (r1 MAJOR-1).
         await self._tick()
         h = self.data.setdefault(name, {})
         if "k:" + key not in h:
-            n = int(h.get("n", 0)) + 1
-            h["n"] = str(n)
+            n = self.counters.get(counter, 0) + 1
+            self.counters[counter] = n
             token = f"<<PII_{n}>>"
             h["k:" + key] = token
             h["t:" + token] = value

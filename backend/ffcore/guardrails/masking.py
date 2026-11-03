@@ -33,6 +33,11 @@ class TokenStore(Protocol):
 
     async def lookup(self, scope: str, token: str) -> str | None: ...
 
+    async def reserve(self, scope: str, number: int) -> None:
+        """The scope's next placeholder number is above `number` (08-tam-1a r1 MAJOR-2: a
+        placeholder carried over from an earlier scope never becomes a new value's)."""
+        ...
+
 
 def _identity(category: str, value: str) -> str:
     # Exactly the same value gets the same placeholder. No normalisation: "a.b@x" and "ab@x" are
@@ -46,11 +51,13 @@ class MemoryTokenStore:
 
     def __init__(self) -> None:
         self._scopes: dict[str, dict[str, str]] = {}
+        self._counters: dict[str, int] = {}
 
     async def token_for(self, scope: str, key: str, value: str) -> str:
         mapping = self._scopes.setdefault(scope, {})
         if "k:" + key not in mapping:
-            token = f"<<PII_{sum(1 for k in mapping if k.startswith('k:')) + 1}>>"
+            self._counters[scope] = self._counters.get(scope, 0) + 1
+            token = f"<<PII_{self._counters[scope]}>>"
             mapping["k:" + key] = token
             mapping["t:" + token] = value
         return mapping["k:" + key]
@@ -58,24 +65,51 @@ class MemoryTokenStore:
     async def lookup(self, scope: str, token: str) -> str | None:
         return self._scopes.get(scope, {}).get("t:" + token)
 
+    async def reserve(self, scope: str, number: int) -> None:
+        self._counters[scope] = max(self._counters.get(scope, 0), number)
+
 
 # Get-or-create in one Redis call: Lua runs atomically, so no caller ever sees the forward entry
-# (`k:`) without the reverse one (`t:`) (review r1).
+# (`k:`) without the reverse one (`t:`) (review r1). The counter lives in its own key with a long
+# lifetime (r1 MAJOR-1, KARARLAR "Yer tutucu sayacı"): when the mapping expires
+# (PII_TOKEN_TTL_S), a new value in the same scope gets the next number, never an old one, so a
+# stored placeholder is never read as another person's value. A mapping written before the
+# counter key existed seeds it from its own `n` field.
 _TOKEN_FOR = """
 local token = redis.call('HGET', KEYS[1], 'k:' .. ARGV[1])
 if not token then
-  token = '<<PII_' .. redis.call('HINCRBY', KEYS[1], 'n', 1) .. '>>'
+  if redis.call('EXISTS', KEYS[2]) == 0 then
+    local seed = redis.call('HGET', KEYS[1], 'n')
+    if seed then redis.call('SET', KEYS[2], seed) end
+  end
+  token = '<<PII_' .. redis.call('INCR', KEYS[2]) .. '>>'
   redis.call('HSET', KEYS[1], 'k:' .. ARGV[1], token, 't:' .. token, ARGV[2])
 end
 redis.call('EXPIRE', KEYS[1], ARGV[3])
+redis.call('EXPIRE', KEYS[2], ARGV[4])
 return token
 """
 
+_RESERVE = """
+local current = tonumber(redis.call('GET', KEYS[1]) or '0')
+if current < tonumber(ARGV[1]) then
+  redis.call('SET', KEYS[1], ARGV[1])
+end
+redis.call('EXPIRE', KEYS[1], ARGV[2])
+return 1
+"""
+
+# The counter outlives every stored copy of a placeholder: run events and messages are kept at
+# most a year by retention (03c: jobs 90-365 days, content 1-90).
+COUNTER_TTL_S = 400 * 24 * 3600
+
 
 class RedisTokenStore:
-    """One hash per scope: `k:<identity>` → token, `t:<token>` → value, `n` → counter.
+    """One hash per scope: `k:<identity>` → token, `t:<token>` → value; the counter in
+    `<prefix>n:<scope>`.
 
-    The TTL is renewed on every write so the mapping lives as long as the run uses it.
+    The mapping's TTL is renewed on every write and every lookup, so it lives as long as the run
+    uses it (r1 MAJOR-1: a long wait for an approval that still reads its placeholders).
     """
 
     def __init__(self, redis, ttl_s: int, prefix: str = "ffcore:pii:") -> None:
@@ -83,13 +117,26 @@ class RedisTokenStore:
         self._ttl = ttl_s
         self._prefix = prefix
 
+    def _keys(self, scope: str) -> tuple[str, str]:
+        return self._prefix + scope, self._prefix + "n:" + scope
+
     async def token_for(self, scope: str, key: str, value: str) -> str:
-        token = await self._redis.eval(_TOKEN_FOR, 1, self._prefix + scope, key, value, self._ttl)
+        mapping, counter = self._keys(scope)
+        token = await self._redis.eval(
+            _TOKEN_FOR, 2, mapping, counter, key, value, self._ttl, COUNTER_TTL_S
+        )
         return token.decode() if isinstance(token, bytes) else token
 
     async def lookup(self, scope: str, token: str) -> str | None:
-        value = await self._redis.hget(self._prefix + scope, "t:" + token)
+        mapping, _ = self._keys(scope)
+        value = await self._redis.hget(mapping, "t:" + token)
+        if value is not None:
+            await self._redis.expire(mapping, self._ttl)
         return value.decode() if isinstance(value, bytes) else value
+
+    async def reserve(self, scope: str, number: int) -> None:
+        _, counter = self._keys(scope)
+        await self._redis.eval(_RESERVE, 1, counter, number, COUNTER_TTL_S)
 
 
 def redact_label(category: str) -> str:
