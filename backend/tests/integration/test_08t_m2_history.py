@@ -115,15 +115,15 @@ def test_08t_r2_question_numbers_are_reserved_first(database_url, pg, make_proje
 
 
 def test_08t_r2_only_numbers_a_scope_can_issue_are_reserved(database_url, pg, make_project):
-    # MINOR-r2-1: a nine-digit or overflowing number someone wrote is not reserved.
+    # MINOR-r2-1, r5 (h): a number from 10,000,000 or an overflowing one is not reserved.
     conversation_id, _, run_b = _setup(pg, make_project)
-    question = "<<PII_100000000>> <<PII_99999999999999999999999>> <<PII_12345678>>"
+    question = "<<PII_100000000>> <<PII_99999999999999999999999>> <<PII_1234567>>"
 
     async def body(session, store, client, prefix):
         await _history(session, conversation_id, run_b, store, question)
         return await store.token_for(str(run_b), "EMAIL_ADDRESS:" + FATMA, FATMA)
 
-    assert _go(database_url, body) == "<<PII_12345679>>"
+    assert _go(database_url, body) == "<<PII_1234568>>"
 
 
 def test_08t_r2_history_does_not_renew_the_earlier_mapping(database_url, pg, make_project):
@@ -162,27 +162,29 @@ def test_08t_r2_client_history_rows_take_the_following_runs_scope(database_url, 
     assert AYSE not in str(later) and value == AYSE
 
 
-def test_08t_r4_history_99999999_is_ignored_and_the_range_ends_loudly(
+def test_08t_r5_large_carried_numbers_are_ignored_and_the_range_ends_loudly(
     database_url, pg, make_project
 ):
-    # r4 MINOR-r4-2 (KARARLAR ek (f′)): `<<PII_99999999>>` in the conversation is ignored, so the
-    # conversation keeps working; a scope that would issue past 99,999,998 fails with a code.
+    # r5 MINOR-r5-1 (KARARLAR "C17 HTML kuralı, düzeltmeler" (h)): carried numbers from
+    # 10,000,000 and non-ASCII digits are ignored, so the conversation keeps working and later
+    # values get ordinary numbers; a scope that would issue past 9,999,999 fails with a code.
     import pytest
 
     from ffcore.guardrails.masking import PlaceholderOutOfRange
 
     conversation_id, run_a, run_b = _setup(pg, make_project)
-    _message(pg, conversation_id, run_a, "assistant", "Yankı <<PII_99999999>>", 1.5)
+    arabic = "<<PII_" + "\u0669" * 8 + ">>"
+    _message(pg, conversation_id, run_a, "assistant", f"Yankı <<PII_99999998>> {arabic}", 1.5)
 
     async def body(session, store, client, prefix):
         history = await _history(session, conversation_id, run_b, store)
         first = await store.token_for(str(run_b), "EMAIL_ADDRESS:" + FATMA, FATMA)
-        await store.reserve(str(run_b), 99_999_997)
+        await store.reserve(str(run_b), 9_999_998)
         last = await store.token_for(str(run_b), "EMAIL_ADDRESS:" + AYSE, AYSE)
         with pytest.raises(PlaceholderOutOfRange):
             await store.token_for(str(run_b), "EMAIL_ADDRESS:x@example.test", "x@example.test")
         return history, first, last
 
     history, first, last = _go(database_url, body)
-    assert history[2]["content"] == "Yankı <<PII_99999999>>"
-    assert (first, last) == ("<<PII_2>>", "<<PII_99999998>>")  # after the stale <<PII_1>>
+    assert history[2]["content"] == f"Yankı <<PII_99999998>> {arabic}"
+    assert (first, last) == ("<<PII_2>>", "<<PII_9999999>>")  # after the stale <<PII_1>>

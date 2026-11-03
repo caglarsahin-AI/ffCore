@@ -45,9 +45,9 @@ def test_08t_r2_rescope_same_scope_is_unchanged():
     assert run(go()) == "<<PII_1>>"
 
 
-def test_08t_r2_numbers_are_at_most_eight_digits():
-    text = "<<PII_3>> <<PII_12345678>> <<PII_123456789>> <<PII_99999999999999999999999>>"
-    assert placeholder_numbers(text) == [3, 12345678]
+def test_08t_r2_numbers_are_at_most_seven_digits():
+    text = "<<PII_3>> <<PII_1234567>> <<PII_12345678>> <<PII_99999999999999999999999>>"
+    assert placeholder_numbers(text) == [3, 1234567]  # r5 (h): from 10,000,000 none
 
 
 def test_08t_r2_reserve_carried_reads_text_and_data():
