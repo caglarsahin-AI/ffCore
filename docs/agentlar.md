@@ -82,9 +82,34 @@ user: its searches use the key's `acl_role` (the backend reads it from the key r
 forward the user's identity cannot run (`tool_needs_run_user`), approvals are decided in the
 console only.
 
-Personal data tokenized at `egress` (llmaas) appears in answers as placeholders (`<<PII_n>>`), on
-the console and through the facade alike: turning them back into the values comes with 08's full
-release (C17, permission-bound).
+Personal data tokenized at `egress` (llmaas) leaves for the provider as placeholders (`<<PII_n>>`).
+Placeholders go back to their values at the exit only (C17, 08-tam-1a): the run's own user on
+the console (live stream and replay) and the caller of a facade request see the values; any
+other reader (another analyst, an admin, an approver) sees the placeholders, as stored. The
+stored answer, `messages`, `run_events` and the history sent to the model keep placeholders,
+never values: an earlier run's placeholder in the conversation becomes this run's placeholder for
+the same value (read in the earlier run's scope, without renewing it there), and a facade agent
+client's earlier turns are stored as `egress` left them, in the run's scope. Before its first
+value a run's counter passes every placeholder number up to 1,000,000 in its question and
+history, so a carried placeholder never reads as one of this run's values (a scope issues at
+most 9,999,999; past it the run fails with `placeholder_out_of_range`; a carried number above
+1,000,000 is ignored). After the first HTML tag (`<` and a letter, also `<br>`,
+`List<String>` or `x<y`) no placeholder of the rest of the reader's stream is reversed, the
+run's own user on the console included, and across the run's turns (a reader that continues
+after an approval replays the earlier entries),
+and a placeholder on a URL line stays (a URL scheme such as `http:`, or a markdown, CSS or
+attribute marker: `](`, `]:`, `//`, `url(`, `src=`, `href=`, `style=`, `data=`; the full rule,
+its markdown carry-over and its trade-offs in docs/guardrail.md), for every reader, logged as
+`detokenize_skipped_url` with a count; an upstream could otherwise make a client that renders
+the answer send the value to its host. A reader that reconnects (`Last-Event-ID`, the console
+after an approval) rebuilds this state from the live token entries; when it cannot, the rest of
+the stream keeps the placeholders. When the run's guardrail policy enforces a `pii` rule on the output, the
+placeholders stay for everyone (the output was checked with them in it; logged as
+`detokenize_skipped_policy` with a count). A placeholder whose
+mapping is gone (`PII_TOKEN_TTL_S`, default 1800 s after its last use; the run's own reads and
+the exit renew it, a later run reading the history does not) or that the run never issued stays as it is and is logged with its count
+(`detokenize_unresolved`, no value). Stored views (`GET /runs/{id}`, `GET /runs/{id}/events`,
+approvals) are not reversed.
 
 ## Runs
 
@@ -94,7 +119,11 @@ Event names (C9): `token, tool_call, tool_result, approval_required, question, s
 fallback, done, error`; a client ignores names it does not know. Each event has an `id`; the
 stream ends after `done`, `error`, `approval_required` or `question`.
 A `sources` event names each source (document id and name, page, breadcrumb, source date),
-never its text. When a document is deleted later, the stored event and the live stream keep the
+never its text. Each source passes `egress` on its own (llmaas): a source the guardrail blocks
+(an encoded blob under the `secrets` rule, say) is left out of the model's input and listed
+under `blocked` with `reason: guardrail_block` and the guardrail `reference_id`; the answer goes
+on with the other sources, and the run fails `guardrail_block` only when none is left
+(FOLLOWUP-107). The same holds for `search_documents` results. When a document is deleted later, the stored event and the live stream keep the
 reference, and every read shows its breadcrumb as `[deleted]`: `GET /runs/{id}/events`, a
 reconnect to the live stream (Redis, within `RUN_EVENT_STREAM_TTL_S`) and a replay from
 `run_events` (FOLLOWUP-108).

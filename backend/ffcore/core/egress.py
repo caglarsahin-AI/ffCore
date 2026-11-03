@@ -188,6 +188,44 @@ async def system_resolver(host: str, port: int) -> list[str]:
     return list(dict.fromkeys(str(info[4][0]) for info in infos))
 
 
+async def _checked_addresses(
+    policy: EgressPolicy, host: str, port: int, origin: str, resolver: Resolver
+) -> list[str]:
+    """Every address `host` resolves to, each one through the policy (DNS rebinding: not only
+    the first). A name that does not resolve is a failed request, without the system text."""
+    literal = _parse_ip(host)
+    try:
+        addresses = [str(literal)] if literal is not None else await resolver(host, port)
+    except OSError:
+        raise EgressRequestFailed("egress_dns_failed", origin, "name does not resolve") from None
+    if not addresses:
+        raise EgressDenied("egress_private_address", origin, "no address")
+    for address in addresses:
+        policy.check_address(host, address, port)
+    return addresses
+
+
+async def check_http_destination(
+    settings: Settings, url: str, *, resolver: Resolver = system_resolver
+) -> list[str]:
+    """(08-tam-1a, FOLLOWUP-147) The rules SafeOutboundClient applies when it dials, checked
+    before any connection, for callers that must refuse a destination up front (an external
+    agent's base URL, a webhook): http/https only, a valid port, host name (OFFLINE, allowlist
+    or internal), then every resolved address. Returns the checked addresses. The connection
+    itself still goes through SafeOutboundClient, which checks again at dial time."""
+    try:
+        target = httpx2.URL(url)
+    except httpx2.InvalidURL:
+        raise EgressDenied("egress_invalid_url", "", "the URL does not parse") from None
+    policy = EgressPolicy(settings)
+    policy.check_url(target)
+    if target.port is not None and not 0 < target.port < 65536:
+        # httpx2 parses any number as a port; the dial would fail later and less clearly.
+        raise EgressDenied("egress_invalid_port", _origin(target), "port out of range")
+    port = target.port or (443 if target.scheme == "https" else 80)
+    return await _checked_addresses(policy, target.host, port, _origin(target), resolver)
+
+
 SMTP_PORTS = (25, 465, 587)
 
 
@@ -203,15 +241,7 @@ async def check_destination(
         raise EgressDenied("egress_port_not_allowed", origin, "only SMTP ports 25, 465, 587")
     policy = EgressPolicy(settings)
     policy.check_host(host, origin)
-    literal = _parse_ip(host)
-    try:
-        addresses = [str(literal)] if literal is not None else await resolver(host, port)
-    except OSError:
-        raise EgressRequestFailed("egress_dns_failed", origin, "name does not resolve") from None
-    if not addresses:
-        raise EgressDenied("egress_private_address", origin, "no address")
-    for address in addresses:
-        policy.check_address(host, address, port)
+    addresses = await _checked_addresses(policy, host, port, origin, resolver)
     return addresses[0]
 
 

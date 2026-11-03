@@ -31,7 +31,12 @@ from ffcore.core.config import Settings
 from ffcore.core.egress import EgressTimeout, SafeOutboundClient
 from ffcore.core.errors import ApiError
 from ffcore.guardrails import engine
-from ffcore.guardrails.masking import RedisTokenStore
+from ffcore.guardrails.masking import (
+    RedisTokenStore,
+    TokenStore,
+    rescope,
+    reserve_carried,
+)
 from ffcore.guardrails.service import record_events, resolve_policy
 from ffcore.guardrails.settings import get_guardrail_settings
 from ffcore.knowledge.chunking import approx_tokens
@@ -558,16 +563,46 @@ def _function(name: str, description: str, properties: dict, required: list[str]
     }
 
 
-async def _history(session: AsyncSession, conversation_id, run_id) -> list[dict[str, str]]:
-    if conversation_id is None:
-        return []
-    rows = await session.scalars(
-        select(Message)
-        .where(Message.conversation_id == conversation_id)
-        .order_by(Message.created_at)
-    )
+async def _history(
+    session: AsyncSession,
+    conversation_id,
+    run_id,
+    store: TokenStore | None = None,
+    question: str = "",
+) -> list[dict[str, str]]:
+    """The conversation before this run. An earlier run's text carries that run's placeholders;
+    each becomes this run's placeholder for the same value, never the raw value (r2 MAJOR-r2-3,
+    KARARLAR "Konuşma geçmişinde yer tutucu eşlemesi doğrudan ve hamsız"). One whose mapping is
+    gone stays, and this run's counter starts after every number in the history and the question
+    first, so it never becomes one of this run's values (r1 MAJOR-2, r2 MAJOR-r2-2)."""
+    rows = []
+    if conversation_id is not None:
+        rows = (
+            await session.scalars(
+                select(Message)
+                .where(Message.conversation_id == conversation_id)
+                .order_by(Message.created_at)
+            )
+        ).all()
+    # A client's earlier turns (facade agent) are stored without a run, just before the question
+    # of the run that took them, in that run's scope.
+    scopes, following = [], None
+    for m in reversed(rows):
+        following = m.run_id or following
+        scopes.append(following)
+    scopes.reverse()
     # This run's own user message is the question, not history.
-    return [{"role": m.role, "content": m.content} for m in rows.all() if m.run_id != run_id]
+    turns = [(m, s) for m, s in zip(rows, scopes, strict=True) if m.run_id != run_id]
+    if store is None:
+        return [{"role": m.role, "content": m.content} for m, _ in turns]
+    await reserve_carried(store, str(run_id), [question, *(m.content for m, _ in turns)])
+    history = []
+    for m, scope in turns:
+        content = m.content
+        if scope is not None:
+            content = await rescope(content, store=store, source=str(scope), target=str(run_id))
+        history.append({"role": m.role, "content": content})
+    return history
 
 
 def _platform_rules(prompts, definition: AgentDefinition) -> str:
@@ -640,7 +675,13 @@ def context_factory(
             guard=guard,
             boundary=boundary,
             system=system_parts(_platform_rules(prompts, definition), instructions),
-            history=await _history(session, run.conversation_id, run.id),
+            history=await _history(
+                session,
+                run.conversation_id,
+                run.id,
+                RedisTokenStore(redis, guardrail.pii_token_ttl_s),
+                run.input or "",
+            ),
             stream_live=guard.streams_live,
             approvals=RunApprovalGate(session, settings, project_id=run.project_id, run_id=run.id),
         )

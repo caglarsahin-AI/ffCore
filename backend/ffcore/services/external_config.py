@@ -6,7 +6,13 @@ import httpx2
 from pydantic import BaseModel, ConfigDict, SecretStr
 
 from ffcore.core.config import Settings
-from ffcore.core.egress import EgressDenied, EgressPolicy, Resolver, _parse_ip, system_resolver
+from ffcore.core.egress import (
+    EgressError,
+    Resolver,
+    _parse_ip,
+    check_http_destination,
+    system_resolver,
+)
 from ffcore.core.errors import ApiError
 from ffcore.core.secrets import decrypt_json, encrypt_json
 
@@ -114,8 +120,9 @@ def url_refused(code: str) -> ApiError:
 async def check_base_url(url: str, settings: Settings, *, resolver: Resolver | None = None) -> None:
     """The egress rules for an HTTP base URL, as SafeOutboundClient applies them at connect
     time: scheme, OFFLINE, allowlist or internal host, then every resolved address (no private
-    address unless the host is internal). core/egress.check_destination is SMTP-only, so the
-    same public parts are composed here (K-06b2-0002 S3a)."""
+    address unless the host is internal), through core/egress.check_http_destination
+    (FOLLOWUP-147), plus what a base URL adds: no credentials, query or fragment, and none of
+    the platform's own hosts."""
     try:
         target = httpx2.URL(url)
     except httpx2.InvalidURL:
@@ -147,22 +154,9 @@ async def check_base_url(url: str, settings: Settings, *, resolver: Resolver | N
             "agent.",
             param="base_url",
         )
-    policy = EgressPolicy(settings)
     try:
-        policy.check_url(target)
-        host = target.host
-        literal = _parse_ip(host)
-        try:
-            addresses = (
-                [str(literal)]
-                if literal is not None
-                else await (resolver or system_resolver)(host, port)
-            )
-        except OSError:
-            raise url_refused("egress_dns_failed") from None
-        if not addresses:
-            raise url_refused("egress_private_address")
-        for address in addresses:
-            policy.check_address(host, address, port)
-    except EgressDenied as exc:
+        # The scheme, host and address rules are egress's own (FOLLOWUP-147); the checks above
+        # are what a base URL adds to them.
+        await check_http_destination(settings, url, resolver=resolver or system_resolver)
+    except EgressError as exc:
         raise url_refused(exc.code) from None

@@ -456,7 +456,9 @@ async def test_guardrails(
 )
 async def evaluate_guardrails(body: EvaluateRequest, actor: ServiceActor, session: SessionDep):
     """CONTRACTS C4. Writes one guardrail event per evaluated rule. A `block` decision is a
-    200 response with `action=block`; the caller fails the run (06a) or returns 400 (06b)."""
+    200 response with `action=block`; the caller fails the run (06a) or returns 400 (06b). A
+    token scope whose placeholder numbers are used up (it would issue past 9999999) is 400
+    `placeholder_out_of_range`, whatever the policy's `on_error` says (08-tam-1a r4/r5)."""
     project = await session.scalar(
         select(Project.id).where(Project.id == body.project_id, Project.deleted_at.is_(None))
     )

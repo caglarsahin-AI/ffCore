@@ -394,19 +394,19 @@ def seed_agents(admin: Client, projects: dict, ids: dict[str, str]) -> None:
 
 def seed_guardrails(admin: Client, ids: dict[str, str]) -> None:
     """The target project's `default` policy: the built-in rules in enforce mode, the secrets
-    rule only logging. The poisoned documents (F11) carry an encoded instruction (P5, base64)
-    that the secrets rule rightly takes for a token; enforced, one such chunk blocks every
-    answer that retrieves it, P3's included (K-SEN-0048 A; whole-answer block → FOLLOWUP-107,
-    per-source masking in 08 full). Document names no longer trip it since the 08 fix. The
-    other project keeps the built-in policy, whose egress PII rule is enforced (test_18_f4_1c).
-    A same-key row overrides the built-in policy."""
+    rule included. The poisoned documents (F11) carry an encoded instruction (P5, base64) that
+    the secrets rule rightly takes for a token; since 08-tam-1a (FOLLOWUP-107) such a chunk is
+    left out at egress on its own and the answer goes on with the other sources, so P3 is
+    answered (the temporary `secrets: log` of K-SEN-0048 is gone). The other project keeps the
+    built-in policy, whose egress PII rule is enforced (test_18_f4_1c). A same-key row
+    overrides the built-in policy."""
     base = f"/projects/{ids[TARGET]}/guardrail-policies"
     current = admin.find(base, "default")
     if current is None:
         raise SeedError(f"{base}: no default policy")
     if not current["builtin"]:
         return  # idempotent: the seeded row is kept as it is
-    rules = [{**r, "action": "log"} if r["type"] == "secrets" else r for r in current["rules"]]
+    rules = current["rules"]
     body = {
         "key": "default",
         "name": "Default (enforce, plan/18 F4)",

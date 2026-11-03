@@ -404,3 +404,37 @@ def test_08_20_short_and_chained_values_never_raw_in_db_or_response(
     assert {m["category"] for m in masked} >= {"EMAIL_ADDRESS", "PIN", "PASSWORD"}
     assert all("value" not in m and m["masked_value"] for m in masked)
     assert {m["masked_value"] for m in masked if m["category"] == "PIN"} == {"*"}
+
+
+def test_08t_r5_evaluate_used_up_range_is_400(admin, service_client, project, egress):
+    # 08-tam-1a r5 MINOR-r5-4: the internal evaluate answers a used-up placeholder range with a
+    # coded 400, also under `on_error=log` (r4 MINOR-r4-1), never the text untokenized.
+    egress(True)
+    _policy(
+        admin,
+        project,
+        key="default",
+        mode="enforce",
+        on_error="log",
+        rules=[
+            {"type": "pii", "action": "tokenize", "stages": ["egress"], "pii_policy_key": "default"}
+        ],
+    )
+    run_id = uuid.uuid4()
+
+    async def fill():
+        from redis.asyncio import Redis
+
+        from ffcore.guardrails.masking import RedisTokenStore
+
+        client = Redis.from_url(os.environ["REDIS_URL"])
+        try:
+            await RedisTokenStore(client, 60).reserve(str(run_id), 9_999_999)
+        finally:
+            await client.aclose()
+
+    asyncio.run(fill())
+    response = _evaluate(service_client, project, TEXT, stage="egress", run_id=str(run_id))
+    assert response.status_code == 400, response.text
+    assert response.json()["error"]["code"] == "placeholder_out_of_range"
+    assert TC not in response.text

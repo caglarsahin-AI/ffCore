@@ -39,7 +39,15 @@ from ffcore.api.facade_schemas import (
     RESUME_HEADER,
     STREAM_END,
 )
-from ffcore.api.runs import _audit, _finished, _mask_live_event, _queued_event, _replay_rows
+from ffcore.api.runs import (
+    _audit,
+    _finished,
+    _queued_event,
+    _replay_rows,
+    exit_hook,
+    live_transform,
+    policy_allows_reveal,
+)
 from ffcore.core import db
 from ffcore.core.auth import RoleRequirement, authorize
 from ffcore.core.config import Settings
@@ -175,6 +183,10 @@ async def start(request: Request, caller: FacadeCaller, target, body, settings, 
             if earlier:
                 # S3: the client's history leaves with the run's prompt. Its checks share the
                 # run's token scope; the events are written without a run (it does not exist yet).
+                # The rows keep the text as egress left it, in the run's scope (r2 MAJOR-r2-3: no
+                # raw value is stored or carried); `_history` reads rows without a run in the
+                # scope of the run whose question follows them. The scope's counter first passes
+                # every number the request carries in (r2 MAJOR-r2-2).
                 guard = await FacadeGuard.load(
                     session,
                     redis,
@@ -182,11 +194,13 @@ async def start(request: Request, caller: FacadeCaller, target, body, settings, 
                     policy_key=definition.guardrail_policy_key,
                     scope=str(run_id),
                 )
+                await guard.reserve_carried([message_text(m) for m in earlier] + [question])
                 for m in earlier:
                     text = message_text(m)
                     if m["role"] == "user":
                         text = await guard.text("input.pre", text)
-                    history.append((m["role"], await guard.text("egress", text)))
+                    text = await guard.text("egress", text)  # a block stops the request here
+                    history.append((m["role"], text))
             if conversation_id:
                 conversation = await _conversation(session, caller, agent, conversation_id)
             else:
@@ -420,6 +434,9 @@ def _parse(text: str) -> tuple[str, dict] | None:
 
 async def _events(settings: Settings, run: Run, after: str | None):
     client = run_events.redis_client(settings)
+    async with db.session_scope() as session:
+        allowed = await policy_allows_reveal(session, run)
+    reveal = exit_hook(client, run.id, "reveal" if allowed else "policy", after=after)
     try:
         async for text in run_events.follow(
             client,
@@ -427,9 +444,12 @@ async def _events(settings: Settings, run: Run, after: str | None):
             after=after,
             keepalive_s=settings.sse_keepalive_s,
             grace_s=settings.run_abandon_grace_s,
-            replay_rows=_replay_rows(run.project_id, run.id),
+            # C17 S8: the caller is the run's owner (start, or `resumable` checked it), so
+            # placeholders go back to their values here, before the translation (annotation
+            # offsets are computed on the text the client gets).
+            replay_rows=_replay_rows(run.project_id, run.id, reveal),
             finished=_finished(run.id),
-            transform=_mask_live_event,
+            transform=live_transform(reveal),
         ):
             if text.startswith(":"):
                 yield None  # keepalive

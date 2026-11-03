@@ -30,7 +30,11 @@ def _user_turn_after_sources(fake_llm) -> str:
     return body[start:]
 
 
-@pytest.mark.parametrize("case", DOCS, ids=lambda d: d["id"])
+DATA_CASES = [d for d in DOCS if d["kind"] != "encoded"]
+ENCODED_CASES = [d for d in DOCS if d["kind"] == "encoded"]
+
+
+@pytest.mark.parametrize("case", DATA_CASES, ids=lambda d: d["id"])
 def test_18_f11_5_poison_arrives_as_data(login, fake_llm, case):
     analyst = login(PROJECT, "analyst", "edit")
     pid = analyst.project_id(PROJECT)
@@ -44,6 +48,28 @@ def test_18_f11_5_poison_arrives_as_data(login, fake_llm, case):
     # the agent has run_sql (P2's lure); nothing was called on the fake model's answer
     events = analyst.run_events(pid, run.id)
     assert not [e for e in events if e["type"] == "tool_call"], case["id"]
+
+
+@pytest.mark.parametrize("case", ENCODED_CASES, ids=lambda d: d["id"])
+def test_18_f11_5b_encoded_chunk_left_out_at_egress(login, fake_llm, case):
+    """P5's base64 instruction is a token to the enforced secrets rule (seed: target project in
+    enforce). Since 08-tam-1a (FOLLOWUP-107) that chunk alone is left out at egress: the model
+    never sees it, the `sources` event names it under `blocked`; the run goes on with the other
+    chunks, or fails `guardrail_block` when none is left (never a silent drop)."""
+    analyst = login(PROJECT, "analyst", "edit")
+    pid = analyst.project_id(PROJECT)
+    fake_llm.reset()
+    run = analyst.settle(pid, analyst.start_run(pid, "zehirli-belge-asistani", case["question"]))
+    events = analyst.run_events(pid, run.id)
+    (sources,) = [e["payload"] for e in events if e["type"] == "sources"]
+    assert [b["reason"] for b in sources["blocked"]], run.detail
+    assert all(b["reason"] == "guardrail_block" for b in sources["blocked"])
+    body = json.dumps(fake_llm.requests(), ensure_ascii=False)
+    assert json.dumps(case["injection"], ensure_ascii=False)[1:-1] not in body, case["id"]
+    if sources["selected"]:
+        assert run.detail["status"] == "completed", run.detail
+    else:
+        assert (run.detail["status"], run.detail["error_code"]) == ("failed", "guardrail_block")
 
 
 @pytest.mark.parametrize("case", DOCS, ids=lambda d: d["id"])

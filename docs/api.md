@@ -471,9 +471,28 @@ about targets outside its scopes. Another project's model or agent, or a missing
   `x_platform: {"event": "progress", "kind": "output_buffered"}` and the checked answer comes in one
   piece, so the first token is later; a held answer over 1 MB is cut off with
   `output_buffer_exceeded`. A request's tokenized values share one token scope (`facade-<uuid>`).
-- Personal data tokenized at `egress` stays a placeholder (`<<PII_n>>`) in the answer: placeholders
-  are not turned back into the values until 08's full release (C17, permission-bound). This is the
-  safe side; the agent path behaves the same.
+- Personal data tokenized at `egress` leaves for the provider as a placeholder (`<<PII_n>>`); the
+  answer comes back to the caller with the request's placeholders turned into the values (C17),
+  in one piece and in a live stream alike (a placeholder split over two chunks is held, at most
+  15 characters, until it is whole). When the project's policy enforces a `pii` rule on the
+  output, the placeholders stay. A placeholder after the first HTML tag (`<` and a letter, also
+  `List<String>` or `<br>`) stays for the rest of the stream,
+  and so does one on a URL line (a URL scheme such as `http:`, or `](`, `]:`, `//`, `url(`,
+  `src=`, `href=`, `style=`, `data=` and the other markers in docs/guardrail.md;
+  `detokenize_skipped_url`: an upstream could otherwise make a client send the value to its
+  host). A placeholder the request never issued stays as it is and is logged with its count.
+  The agent path does the same for the run's own user (docs/agentlar.md). Who sees what:
+
+  | Who | Sees |
+  |---|---|
+  | The provider and an external agent (llmaas) | placeholders (egress tokenizes) |
+  | The run's own user on the console (live stream, replay) | values |
+  | The caller of a facade request (direct model, agent, external agent) | values |
+  | Another member reading the run (analyst, admin, approver) | placeholders |
+  | Stored views (`GET /runs/{id}`, `GET /runs/{id}/events`, approvals) | placeholders |
+  | A placeholder after the first HTML tag in the reader's stream (also `<br>`, `List<String>`), or on a URL line (a URL scheme such as `http:`, or `](`, `]:`, `//`, `url(`, `src=`, `href=`, `srcset=`, `action=`, `poster=`, `background=`, `style=`, `data=`), for every reader | placeholder (`detokenize_skipped_url`, count only) |
+  | Any reader when the policy enforces a `pii` rule on the output | placeholders (`detokenize_skipped_policy`, count only) |
+
 - The client's own tools: definitions pass, the model's `tool_calls` come back with OpenAI's
   meaning. The client runs them; they are not platform tools and do not go through the approval
   queue (07).
@@ -512,7 +531,19 @@ about targets outside its scopes. Another project's model or agent, or a missing
   `x_platform: {"event": "question", ...}`; answering it is a console action for now.
 - Errors: non-streaming requests get the HTTP status (400 `guardrail_blocked`, 429
   `quota_exceeded`, 502 with the run's code); once a stream has started, the error is an event
-  `data: {"error": {"message", "type", "code"}}` followed by `data: [DONE]`.
+  `data: {"error": {"message", "type", "code"}}` followed by `data: [DONE]`. A token store that
+  cannot be read while the answer is prepared for the caller is 502 `api_error`
+  `detokenize_unavailable`; in a stream it is the error event above (no id) and `[DONE]`. The run
+  goes on: `X-Resume-Run-Id` follows it again from its last approval or question event (or from
+  the start). The direct model path (one piece, live and buffered stream) and the external agent
+  answer the same way. When a token scope's placeholder numbers are used up (it would issue
+  past 9,999,999, e.g. the request carries `<<PII_9999999>>` and a new value), the request
+  fails with `placeholder_out_of_range`: 400 `invalid_request_error` on the direct model path
+  (one piece; a buffered or live stream that has started sends the error event and `[DONE]`),
+  the external agent and a facade agent request's client history check; 502 `api_error` (the
+  run's code) when it happens inside a facade agent run (its question and stored history).
+  A carried placeholder above 1,000,000, a longer `<<PII_n>>` and one with non-ASCII digits
+  are ignored.
 
 ### External agent path (06b-2)
 
@@ -556,7 +587,8 @@ project administrator and called through the same `agent:<project_key>/<agent_ke
 - The answer is untrusted text: only `choices[0].message.content` is taken; `tool_calls`,
   `function_call` and any other field are never executed or turned into text (only their count is
   logged; the names are the upstream's text). The text passes `output.pre` (a block: 400 `guardrail_blocked`). A placeholder-like
-  string in it (`<<PII_n>>`) is not one of this request's tokens and stays as it is.
+  string in it (`<<PII_n>>`) stays as it is unless it is one of this request's own tokens (an
+  upstream that echoes the placeholder it was sent gets the value back to the same caller, C17).
 - Limits: the whole call within `LLM_CALL_TIMEOUT_S` (504 `external_agent_timeout`), the answer
   at most 64 KiB (502 `external_agent_response_too_large`; nothing partial is sent); a refused
   address, an error status, a non-JSON or empty answer: 502 `external_agent_failed` (the reason is

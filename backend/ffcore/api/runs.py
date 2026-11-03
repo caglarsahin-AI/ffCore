@@ -12,13 +12,14 @@ the body decides which rule applies (write-flag scan exemption, with this reason
 """
 
 import logging
-from collections.abc import AsyncIterator
+from collections.abc import AsyncIterator, Awaitable, Callable
 from datetime import UTC, datetime
 from typing import Annotated, Literal
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Header, Query, Request
 from fastapi.responses import StreamingResponse
+from redis.exceptions import RedisError
 from sqlalchemy import select
 
 from ffcore.api.agents_schemas import (
@@ -39,6 +40,18 @@ from ffcore.core.audit import AuditEntry, audited, request_context, write_event
 from ffcore.core.auth import Actor, RoleRequirement, authorize, require_role
 from ffcore.core.config import Settings, get_settings
 from ffcore.core.errors import ApiError
+from ffcore.guardrails.engine import masks_pii_at
+from ffcore.guardrails.masking import (
+    ContextReveal,
+    RedisTokenStore,
+    RevealUnavailable,
+    count_placeholders,
+    log_skipped_policy,
+    log_skipped_url,
+    log_unresolved,
+)
+from ffcore.guardrails.service import resolve_policy
+from ffcore.guardrails.settings import get_guardrail_settings
 from ffcore.models.agents import Agent, AgentVersion
 from ffcore.models.identity import ProjectMember
 from ffcore.models.knowledge import Document
@@ -162,8 +175,9 @@ async def _audit(
 # so the mask is applied when a sources event is read, on every path that hands one to a client:
 # the events list, the replay from run_events and the live Redis stream (review r1 MAJOR-1).
 DELETED_BREADCRUMB = "[deleted]"
-# Stored `sources` payloads list sources under "selected", the live SSE data under "sources".
-_SOURCE_LISTS = ("selected", "sources")
+# Stored `sources` payloads list sources under "selected", the live SSE data under "sources";
+# both list the sources blocked at egress under "blocked" (107, r1 MAJOR-7).
+_SOURCE_LISTS = ("selected", "sources", "blocked")
 
 
 def masked_sources(payload: dict, alive: set[str]) -> dict:
@@ -218,8 +232,110 @@ async def _mask_live_event(event: str, data: dict) -> dict:
         return (await mask_deleted_sources(session, [data]))[0]
 
 
-def _replay_rows(project_id: UUID, run_id: UUID):
-    """Stored events as SSE, when the live stream has expired; ends with the run's outcome."""
+def is_run_owner(run: Run, actor_id: str | None) -> bool:
+    """C17 S8 (K-08T1-0002): placeholders are turned back into their values only for the run's
+    own user; every other reader (another analyst, an admin, an approver) sees the placeholders,
+    as stored. A run started by a key without a user has no console owner."""
+    return run.user_id is not None and actor_id is not None and str(run.user_id) == actor_id
+
+
+async def policy_allows_reveal(session, run: Run) -> bool:
+    """False when the run's guardrail policy enforces a `pii` rule on the output: the answer was
+    checked with placeholders in it, and its values must not come back after that check."""
+    version = await session.get(AgentVersion, run.agent_version_id)
+    key = parse_definition(version.definition).guardrail_policy_key
+    policy = await resolve_policy(session, run.project_id, key)
+    return not masks_pii_at(policy, ("output.pre", "output.stream.delta"))
+
+
+async def exit_mode(session, run: Run, actor_id: str | None) -> str:
+    """`reveal` (owner, policy allows), `policy` (owner, kept by the output pii rule: logged,
+    K-08T1-0004) or `keep` (any other reader: placeholders as stored)."""
+    if not is_run_owner(run, actor_id):
+        return "keep"
+    return "reveal" if await policy_allows_reveal(session, run) else "policy"
+
+
+def skip_counter(run_id: UUID) -> Callable[..., Awaitable[dict]]:
+    """The exit hook of an owner whose placeholders the policy keeps: data unchanged, the
+    placeholders counted in `detokenize_skipped_policy`."""
+    scope = str(run_id)
+
+    async def count(data: dict, event: str | None = None) -> dict:
+        log_skipped_policy(scope, count_placeholders(data))
+        return data
+
+    return count
+
+
+def exit_hook(
+    redis, run_id: UUID, mode: str, *, after: str | None = None
+) -> Callable[..., Awaitable[dict]] | None:
+    if mode == "reveal":
+        return detokenizer(redis, run_id, after=after)
+    return skip_counter(run_id) if mode == "policy" else None
+
+
+def detokenizer(redis, run_id: UUID, *, after: str | None = None) -> Callable[..., Awaitable[dict]]:
+    """The exit reversal of one reader's run events (C17): every string, within the run's token
+    scope. A placeholder the scope cannot resolve (never issued, mapping expired after
+    PII_TOKEN_TTL_S) stays and is logged with its count (S9); one inside a URL stays and is
+    logged (r1 MAJOR-3); live `token` entries share a context, so a URL split over entries is
+    seen. A Redis failure is `RevealUnavailable`: the stream ends with an error event (r1
+    MINOR-11), never silently. A reader that starts `after` an entry rebuilds the URL line state
+    from the token entries up to it; when it cannot, the rest of the answer keeps its
+    placeholders (r3 MINOR-r3-1, r4 MINOR-r4-3, KARARLAR ek (d'))."""
+    reveal = ContextReveal(
+        RedisTokenStore(redis, get_guardrail_settings().pii_token_ttl_s), str(run_id)
+    )
+    scope = str(run_id)
+    primed = after in (None, "0-0")
+
+    async def prime() -> None:
+        # Any failure (Redis, an entry that is not text, r4 MINOR-r4-6) keeps the rest of the
+        # answer under the rule; the stream itself goes on.
+        try:
+            texts = await run_events.token_texts(redis, run_id, after)
+            for text in texts if texts is not None else ():
+                reveal.prime(text)
+        except Exception:
+            log.warning("detokenize_rebuild_failed scope=%s", scope, exc_info=True)
+            texts = None
+        if texts is None:
+            reveal.fail_closed()
+
+    async def hook(data: dict, event: str | None = None) -> dict:
+        nonlocal primed
+        if not primed:
+            primed = True
+            await prime()
+        before = (reveal.unresolved, reveal.skipped_url)
+        try:
+            out = await reveal.data(data, stream_text=event == SseEvent.token)
+        except (RedisError, OSError) as exc:
+            raise RevealUnavailable(str(type(exc).__name__)) from None
+        log_unresolved(scope, reveal.unresolved - before[0])
+        log_skipped_url(scope, reveal.skipped_url - before[1])
+        return out
+
+    return hook
+
+
+def live_transform(reveal: Callable[..., Awaitable[dict]] | None):
+    """The live stream's read-time hook: deleted sources masked, then (owner only) reversal."""
+
+    async def transform(event: str, data: dict) -> dict:
+        data = await _mask_live_event(event, data)
+        return await reveal(data, event) if reveal is not None else data
+
+    return transform
+
+
+def _replay_rows(
+    project_id: UUID, run_id: UUID, reveal: Callable[[dict], Awaitable[dict]] | None = None
+):
+    """Stored events as SSE, when the live stream has expired; ends with the run's outcome.
+    The stored text stays tokenized; `reveal` (the owner's reader) reverses what is sent."""
 
     async def rows(after_seq: int) -> AsyncIterator[run_events.SseMessage]:
         async with db.session_scope() as session:
@@ -241,6 +357,8 @@ def _replay_rows(project_id: UUID, run_id: UUID):
                     if sse is SseEvent.token
                     else payloads[row.seq]
                 )
+                if reveal is not None:
+                    data = await reveal(data, sse)
                 yield run_events.SseMessage(f"{row.seq}-0", sse, data)
             run = await _run(session, project_id, run_id)
             if run.status == RunStatus.completed:
@@ -269,10 +387,11 @@ def _finished(run_id: UUID):
 
 
 def _stream(
-    settings: Settings, project_id: UUID, run_id: UUID, after: str | None
+    settings: Settings, project_id: UUID, run_id: UUID, after: str | None, *, mode: str
 ) -> EventStreamResponse:
     async def body() -> AsyncIterator[str]:
         client = run_events.redis_client(settings)
+        reveal_data = exit_hook(client, run_id, mode, after=after)
         try:
             async for chunk in run_events.follow(
                 client,
@@ -280,9 +399,9 @@ def _stream(
                 after=after,
                 keepalive_s=settings.sse_keepalive_s,
                 grace_s=settings.run_abandon_grace_s,
-                replay_rows=_replay_rows(project_id, run_id),
+                replay_rows=_replay_rows(project_id, run_id, reveal_data),
                 finished=_finished(run_id),
-                transform=_mask_live_event,
+                transform=live_transform(reveal_data),
             ):
                 yield chunk
         finally:
@@ -441,7 +560,13 @@ async def create_run(
     await session.commit()
     await _queued_event(session, settings, run)
     await queue.enqueue(str(run.id))
-    return _stream(settings, project_id, run.id, None)
+    return _stream(
+        settings,
+        project_id,
+        run.id,
+        None,
+        mode=await exit_mode(session, run, actor.actor_id),
+    )
 
 
 @router.get("/runs", response_model=RunList)
@@ -593,8 +718,14 @@ async def stream_run(
     last_event_id: LastEventId = None,
 ):
     """(Re)attach to a run's events: replay, then live until the run stops or waits."""
-    await _readable_run(session, request, actor, project_id, run_id)
-    return _stream(settings, project_id, run_id, last_event_id)
+    run = await _readable_run(session, request, actor, project_id, run_id)
+    return _stream(
+        settings,
+        project_id,
+        run_id,
+        last_event_id,
+        mode=await exit_mode(session, run, actor.actor_id),
+    )
 
 
 @router.post("/runs/{run_id}/resume", response_class=EventStreamResponse, responses=SSE_RESPONSE)
@@ -633,7 +764,14 @@ async def resume_run(
         request_id=request_id,
         ip=ip,
     )
-    return _stream(settings, project_id, run.id, after)
+    # The approver sees the placeholders unless the run is their own (S8).
+    return _stream(
+        settings,
+        project_id,
+        run.id,
+        after,
+        mode=await exit_mode(session, run, actor.actor_id),
+    )
 
 
 @router.post("/runs/{run_id}/cancel", response_model=RunOut)

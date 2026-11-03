@@ -26,6 +26,7 @@ from langgraph.types import interrupt
 
 from ffcore.core import tracing
 from ffcore.guardrails.engine import TextTooLong
+from ffcore.guardrails.masking import PlaceholderAligner
 from ffcore.runtime.contracts import RunEventType, RunStatus, SseEvent
 from ffcore.runtime.definition import DEFAULT_APPROVER, approval_name
 from ffcore.runtime.prompting import (
@@ -114,18 +115,20 @@ async def retrieve(state: RunState, runtime: Runtime[RunContext]) -> dict:
     for n, source in enumerate(found, start=1):
         source.n = n
     budget = ctx.budget or plan_budget(ctx.definition, state["messages"][0]["content"], [])
-    kept = fit_sources(budget, found)
+    kept, blocked, all_blocked = await _egress_sources(ctx, fit_sources(budget, found))
     payload = {
         "selected": [s.public() for s in kept],
         "dropped_by_budget": budget.dropped.get("rag", []),
+        "blocked": blocked,
         "search": details,
     }
     await ctx.events.record(
         RunEventType.sources,
         payload,
         sse=SseEvent.sources,
-        sse_data={"sources": payload["selected"]},
+        sse_data={"sources": payload["selected"], "blocked": blocked},
     )
+    _stop_if_all_blocked(all_blocked)
     ms = _ms(started)
     # The text rides along to guard_in, the next step, which writes it into the user message and
     # keeps the sources without it.
@@ -181,6 +184,50 @@ async def _egress_text(ctx: RunContext, text: str) -> str:
         masked = checked.text
         ctx.egress_cache[key] = ctx.egress_cache[_digest(masked)] = masked
     return masked
+
+
+async def _egress_sources(
+    ctx: RunContext, sources: list[Source]
+) -> tuple[list[Source], list[dict[str, Any]]]:
+    """Each retrieved chunk through `egress` on its own (FOLLOWUP-107): a blocked chunk is left
+    out and named in `blocked` (its public fields, the reason and the reference; never its
+    text), the others go on tokenized. One chunk with an encoded blob no longer fails every
+    answer that retrieves it; when no chunk is left the run fails `guardrail_block`."""
+    kept: list[Source] = []
+    blocked: list[dict[str, Any]] = []
+    last_block = None
+    for source in sources:
+        key = _digest(source.text)
+        masked = ctx.egress_cache.get(key)
+        if masked is None:
+            try:
+                checked = await ctx.guard.check("egress", source.text)
+            except TextTooLong as exc:
+                raise StopRun(RunStatus.failed, "guardrail_text_too_long", str(exc)) from exc
+            if checked.action == "block":
+                last_block = checked
+                blocked.append(
+                    source.public()
+                    | {"reason": "guardrail_block", "reference_id": checked.reference_id}
+                )
+                continue
+            masked = checked.text
+            ctx.egress_cache[key] = ctx.egress_cache[_digest(masked)] = masked
+        source.text = masked
+        kept.append(source)
+    return kept, blocked, (last_block if not kept else None)
+
+
+def _stop_if_all_blocked(all_blocked) -> None:
+    """After the `sources` event (r1 MAJOR-6: it names what was blocked even when nothing is
+    left), the run fails `guardrail_block` when every chunk was blocked."""
+    if all_blocked is not None:
+        raise StopRun(
+            RunStatus.failed,
+            "guardrail_block",
+            all_blocked.message,
+            reference_id=all_blocked.reference_id,
+        )
 
 
 async def _egress_json(ctx: RunContext, node: Any) -> Any:
@@ -258,18 +305,30 @@ async def model(state: RunState, runtime: Runtime[RunContext]) -> dict:
         )
         return {"iteration": iteration, "answer": d.answer_rules.unknown_reply}
 
+    # C17: a delta may end inside a placeholder; the aligner holds that tail so every live
+    # token entry carries whole placeholders and a reader reverses it entry by entry.
+    aligner = PlaceholderAligner()
+
     async def on_token(text: str) -> None:
-        await ctx.events.live(SseEvent.token, {"text": text})
+        ready = aligner.feed(text)
+        if ready:
+            await ctx.events.live(SseEvent.token, {"text": ready})
 
     outgoing = await _egress_messages(ctx, state["messages"])
-    turn = await ctx.model.call(
-        outgoing,
-        tools=ctx.tools.schemas(),
-        max_tokens=min(d.limits.output_tokens, d.answer_rules.max_answer_tokens)
-        if not ctx.tools.schemas()
-        else d.limits.output_tokens,
-        on_token=on_token if ctx.stream_live else None,
-    )
+    try:
+        turn = await ctx.model.call(
+            outgoing,
+            tools=ctx.tools.schemas(),
+            max_tokens=min(d.limits.output_tokens, d.answer_rules.max_answer_tokens)
+            if not ctx.tools.schemas()
+            else d.limits.output_tokens,
+            on_token=on_token if ctx.stream_live else None,
+        )
+    finally:
+        # Also when the call fails or the run is cancelled: what the aligner held (at most 15
+        # characters) was the model's and reaches the reader (r1 MINOR-1).
+        if ctx.stream_live and (tail := aligner.flush()):
+            await ctx.events.live(SseEvent.token, {"text": tail})
     usage = dict(state.get("usage") or {})
     for key in ("prompt_tokens", "completion_tokens"):
         usage[key] = usage.get(key, 0) + int((turn.usage or {}).get(key) or 0)
@@ -503,13 +562,20 @@ async def _search_tool(ctx: RunContext, state: RunState, arguments: dict) -> tup
     start = len(state.get("sources") or [])
     for offset, source in enumerate(hits, start=1):
         source.n = start + offset
+    hits, blocked, all_blocked = await _egress_sources(ctx, hits)
     await ctx.events.record(
         RunEventType.sources,
-        {"selected": [s.public() for s in hits], "dropped_by_budget": [], "tool": SEARCH_TOOL},
+        {
+            "selected": [s.public() for s in hits],
+            "dropped_by_budget": [],
+            "blocked": blocked,
+            "tool": SEARCH_TOOL,
+        },
         sse=SseEvent.sources,
-        sse_data={"sources": [s.public() for s in hits]},
+        sse_data={"sources": [s.public() for s in hits], "blocked": blocked},
         iteration=state["iteration"],
     )
+    _stop_if_all_blocked(all_blocked)
     text = "\n\n".join(f"[{s.n}] {s.document_name} ({s.breadcrumb})\n{s.text}" for s in hits)
     return text or "No matching passages.", _source_payload(hits)
 

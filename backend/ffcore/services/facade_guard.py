@@ -3,16 +3,28 @@
 graph, so their `input.pre`, `egress` and `output.pre` checks run here and their events go to
 `guardrail_events` with source `api` (and the run id when there is a run)."""
 
+import contextlib
 import json
 import uuid
 from dataclasses import dataclass, field, replace
 from typing import Any
 
+from redis.exceptions import RedisError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ffcore.core.errors import ApiError
 from ffcore.guardrails import engine
-from ffcore.guardrails.masking import RedisTokenStore
+from ffcore.guardrails.masking import (
+    RedisTokenStore,
+    RevealUnavailable,
+    StreamDetokenizer,
+    count_placeholders,
+    log_skipped_policy,
+    log_skipped_url,
+    log_unresolved,
+    reserve_carried,
+    reveal_text,
+)
 from ffcore.guardrails.service import record_events, resolve_policy
 from ffcore.guardrails.settings import get_guardrail_settings
 
@@ -25,6 +37,23 @@ MESSAGE_FIELDS = frozenset({"role", "content", "name", "tool_calls", "tool_call_
 # Fields of an earlier answer that OpenAI SDKs send back with it (review r2 MINOR-A): accepted on
 # assistant messages, never passed on, and reported (`dropped_fields`), not dropped silently.
 ECHO_FIELDS = frozenset({"annotations", "refusal", "audio"})
+
+
+@contextlib.contextmanager
+def token_store_errors():
+    """r2 MINOR-r2-3, r3 MINOR-r3-3: the token store fails while the answer is prepared for the
+    caller (live stream, one piece, buffered stream, tool call arguments, external agent): 502
+    `detokenize_unavailable`, which a stream sends before `[DONE]`, never a broken stream or an
+    unhandled 500."""
+    try:
+        yield
+    except (RedisError, OSError, RevealUnavailable) as exc:
+        raise ApiError(
+            502,
+            "api_error",
+            "detokenize_unavailable",
+            "The answer could not be prepared: the token store is unavailable.",
+        ) from exc
 
 
 class GuardrailBlocked(ApiError):
@@ -105,6 +134,43 @@ class FacadeGuard:
             raise GuardrailBlocked(decision.message, decision.reference_id)
         return decision.text_out
 
+    @property
+    def reveals(self) -> bool:
+        """Placeholders go back to values unless an enforced `pii` rule checks the output (the
+        policy hides personal data from answers; the placeholders stay, C17)."""
+        return not engine.masks_pii_at(self.policy, OUTPUT_STAGES)
+
+    def _token_store(self) -> RedisTokenStore:
+        return RedisTokenStore(self.redis, get_guardrail_settings().pii_token_ttl_s)
+
+    async def reserve_carried(self, data: Any) -> None:
+        """Before the scope's first check: its counter passes every placeholder number the
+        request carries in (r2 MAJOR-r2-2), so none of them becomes one of its values."""
+        await reserve_carried(self._token_store(), self.scope, data)
+
+    async def reveal(self, text: str, *, json_escape: bool = False) -> str:
+        """C17: the request's placeholders back to their values, at the exit to the caller who
+        made the request (S8). A placeholder the scope never issued stays as it is and is logged
+        with its count (S9); one inside a URL stays and is logged (r1 MAJOR-3); nothing is
+        invented. `json_escape` for tool call arguments, which are JSON text (r1 MINOR-3)."""
+        if not text or "<<PII_" not in text:
+            return text
+        if not self.reveals:
+            log_skipped_policy(self.scope, count_placeholders(text))
+            return text
+        with token_store_errors():
+            out, unresolved, skipped = await reveal_text(
+                text, store=self._token_store(), scope=self.scope, json_escape=json_escape
+            )
+        log_unresolved(self.scope, unresolved)
+        log_skipped_url(self.scope, skipped)
+        return out
+
+    def stream_reveal(self, *, json_escape: bool = False) -> StreamDetokenizer:
+        """The same for a live stream: a placeholder split over two chunks is held until whole;
+        a URL that began in an earlier chunk is seen."""
+        return StreamDetokenizer(self._token_store(), self.scope, json_escape=json_escape)
+
     async def json_text(self, stage: str, value: Any) -> Any:
         """A JSON value (tool definitions, tool call arguments) through a text stage; the result
         must still parse, otherwise the call is refused (a broken argument is never sent)."""
@@ -161,6 +227,7 @@ def message_text(message: dict) -> str:
 async def guard_messages(guard: FacadeGuard, messages: list[dict]) -> list[dict]:
     """`input.pre` on the client's own text, then `egress` on every text field that leaves:
     content, `name`, `tool_call_id` and earlier tool calls (review r1 MAJOR-1)."""
+    await guard.reserve_carried(messages)
     out = []
     for message in messages:
         message = dict(message)
