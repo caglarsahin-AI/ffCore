@@ -22,7 +22,6 @@ from typing import Any
 
 from fastapi import Request
 from fastapi.responses import JSONResponse, StreamingResponse
-from redis.exceptions import RedisError
 
 from ffcore.api.facade_schemas import (
     KEEPALIVE,
@@ -34,14 +33,18 @@ from ffcore.core import db, tracing
 from ffcore.core.config import Settings
 from ffcore.core.errors import ApiError, error_body
 from ffcore.guardrails.masking import (
-    RevealUnavailable,
     count_placeholders,
     log_skipped_policy,
     log_skipped_url,
     log_unresolved,
 )
 from ffcore.knowledge.chunking import approx_tokens
-from ffcore.services.facade_guard import FacadeGuard, client_messages, guard_messages
+from ffcore.services.facade_guard import (
+    FacadeGuard,
+    client_messages,
+    guard_messages,
+    token_store_errors,
+)
 from ffcore.services.facade_identity import FacadeCaller
 from ffcore.services.litellm_client import LiteLLMClient, resolve_target
 from ffcore.services.quota import (
@@ -348,21 +351,6 @@ class _Held:
             )
 
 
-@contextlib.contextmanager
-def _token_store_errors():
-    """r2 MINOR-r2-3: the token store fails during the live reveal: a coded error the stream
-    sends before `[DONE]`, never a broken stream without one."""
-    try:
-        yield
-    except (RedisError, OSError, RevealUnavailable) as exc:
-        raise ApiError(
-            502,
-            "api_error",
-            "detokenize_unavailable",
-            "The answer could not be prepared: the token store is unavailable.",
-        ) from exc
-
-
 class _LiveReveal:
     """C17 on the live direct stream: each choice's content and each tool call's argument
     deltas pass their own StreamDetokenizer, so a placeholder split over two chunks reaches the
@@ -384,7 +372,7 @@ class _LiveReveal:
         return self._open[key]
 
     async def choice(self, choice: dict) -> dict:
-        with _token_store_errors():
+        with token_store_errors():
             return await self._choice(choice)
 
     async def _choice(self, choice: dict) -> dict:
@@ -430,7 +418,7 @@ class _LiveReveal:
 
     async def rest(self) -> dict:
         delta: dict[str, Any] = {}
-        with _token_store_errors():
+        with token_store_errors():
             for index in sorted({k[1] for k in self._open}):
                 await self._close(index, delta)
         return delta

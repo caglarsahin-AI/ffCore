@@ -3,17 +3,20 @@
 graph, so their `input.pre`, `egress` and `output.pre` checks run here and their events go to
 `guardrail_events` with source `api` (and the run id when there is a run)."""
 
+import contextlib
 import json
 import uuid
 from dataclasses import dataclass, field, replace
 from typing import Any
 
+from redis.exceptions import RedisError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ffcore.core.errors import ApiError
 from ffcore.guardrails import engine
 from ffcore.guardrails.masking import (
     RedisTokenStore,
+    RevealUnavailable,
     StreamDetokenizer,
     count_placeholders,
     log_skipped_policy,
@@ -34,6 +37,23 @@ MESSAGE_FIELDS = frozenset({"role", "content", "name", "tool_calls", "tool_call_
 # Fields of an earlier answer that OpenAI SDKs send back with it (review r2 MINOR-A): accepted on
 # assistant messages, never passed on, and reported (`dropped_fields`), not dropped silently.
 ECHO_FIELDS = frozenset({"annotations", "refusal", "audio"})
+
+
+@contextlib.contextmanager
+def token_store_errors():
+    """r2 MINOR-r2-3, r3 MINOR-r3-3: the token store fails while the answer is prepared for the
+    caller (live stream, one piece, buffered stream, tool call arguments, external agent): 502
+    `detokenize_unavailable`, which a stream sends before `[DONE]`, never a broken stream or an
+    unhandled 500."""
+    try:
+        yield
+    except (RedisError, OSError, RevealUnavailable) as exc:
+        raise ApiError(
+            502,
+            "api_error",
+            "detokenize_unavailable",
+            "The answer could not be prepared: the token store is unavailable.",
+        ) from exc
 
 
 class GuardrailBlocked(ApiError):
@@ -138,9 +158,10 @@ class FacadeGuard:
         if not self.reveals:
             log_skipped_policy(self.scope, count_placeholders(text))
             return text
-        out, unresolved, skipped = await reveal_text(
-            text, store=self._token_store(), scope=self.scope, json_escape=json_escape
-        )
+        with token_store_errors():
+            out, unresolved, skipped = await reveal_text(
+                text, store=self._token_store(), scope=self.scope, json_escape=json_escape
+            )
         log_unresolved(self.scope, unresolved)
         log_skipped_url(self.scope, skipped)
         return out
