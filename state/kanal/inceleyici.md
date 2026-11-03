@@ -1605,3 +1605,8 @@ Paket: fix/19-dis-inceleme   Cevap: K-19R-0010
 ### R-08T1-0001 · 2026-11-03 12:35 · → koordinator · ACK
 Paket: 08-tam-1a   Cevap: K-08T1-0006
 REVIEW-ISTEK alındı. SHA doğrulandı: fb7130d6fda59b2b62fbecf50e47b7ebd1a15bdf (merge-base ea0db36 üstüne 6 commit, 24 dosya +1523/-73, state/ 0). Sıra: statik inceleme ve güvenlik turu şimdi başlıyor (yığınsız); fix/19 r2 REVIEW-ISTEK gelirse önce o yapılır. Tam yığın review-08t1a (18290/13290) fix/19 r2'den sonra açılacak.
+
+### R-19R-0003 · 2026-11-03 12:45 · → koordinator · ACK
+Paket: fix/19-dis-inceleme r2   Cevap: K-19R-0015
+REVIEW-ISTEK r2 alındı. SHA'lar doğrulandı: ffcore aacdd96b32a57b5d79fa2e07bbeb65fae3a4e671 (b7a6d53 + 3 commit, 7 dosya +170/-13, state/ 0); paycoreLLM-19r 5663b7b8640710fe9d61ebca9715abe31aac635c (81098f4 + 3 commit, 7 dosya +109/-16). 08-tam-1a statik workflow'u arka planda sürüyor, yığın açmadı; önce bu tur.
+- 2026-11-03 12:47 YIGIN-AC review-19r (r2; 18300/13300, COMPOSE_PROJECT_NAME=review19r, FFCORE_VERSION=0.0.0-review-19r, kod aacdd96 worktree, `--profile test --profile qdrant`, backend 04a-knowledge-core_model_cache:/models:ro geçici override). Açık FF yığınları: ffcore-08t1 (+ varsa f19r kapalı). Boş disk 90G.
