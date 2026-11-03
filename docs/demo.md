@@ -35,8 +35,8 @@ $C run --rm -e E2E_PASSWORD tools make eval MODEL=fake-llm APPROVE_SQL=1
 - `make e2e`: every API e2e test (plan/18 scenarios and the negative set) and the **F table**
   (one row per use case: passed / failed / NOT_RUN with reasons) in `eval/results/e2e-<time>.md`.
 - `make eval`: the exam set through the run API, report in `eval/results/eval-<time>.md`:
-  outcome labels, right sources, unanswerable questions held, SQL results, answer time, LLM calls
-  per question. `MODEL` names what answered (required); `APPROVE_SQL=1` approves each `run_sql`
+  outcome labels, source accuracy (expected document cited), answers holding the expected text,
+  unanswerable questions held, SQL results, answer time, LLM calls per question. `MODEL` names what answered (required); `APPROVE_SQL=1` approves each `run_sql`
   call (without it SQL items are NOT_RUN); `llm_judge` is NOT_RUN until M3 picks a judge model.
 - The console's own browser tests are a separate service: `docker compose --profile e2e run --rm
   e2e` (docs/onyuz.md).
@@ -83,7 +83,7 @@ make eval MODEL="qwen3.5:35b cpu" APPROVE_SQL=1     # sozlesme-33
 |---|---|---|---|
 | `make seed && make e2e` total | NOT_RUN | NOT_RUN | to be measured |
 | One RAG answer (≤ 4 min on cpu) | NOT_RUN | NOT_RUN | to be measured |
-| Document questions, right source (≥ 16/20 on cpu) | NOT_RUN | NOT_RUN | to be measured |
+| Document questions passed: answer text and source (≥ 16/20 on cpu) | NOT_RUN | NOT_RUN | to be measured |
 | Unanswerable questions held (≥ 7/8 on cpu) | NOT_RUN | NOT_RUN | to be measured |
 | SQL questions (≥ 4/5) | NOT_RUN | NOT_RUN | to be measured |
 
@@ -93,7 +93,7 @@ query rewriting is package 04b (K-13b-0006 S3); the column stays empty with that
 
 | | Baseline (PayCore) | Run 1, `rewrite=false` | Run 2, `rewrite=true` |
 |---|---|---|---|
-| Source accuracy | `docs/paycore/s1-taban.md` | to be measured | NOT_RUN (04b) |
+| Source accuracy (expected document cited) | `docs/paycore/s1-taban.md` | to be measured | NOT_RUN (04b) |
 | Median / P95 answer time | idem | to be measured | NOT_RUN (04b) |
 | Extra LLM calls per question | idem | to be measured | NOT_RUN (04b) |
 

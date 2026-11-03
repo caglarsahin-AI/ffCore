@@ -115,9 +115,12 @@ def passed(scores: dict) -> bool:
     return all(v for v in scores.values() if v is not None)
 
 
-def _count(results, predicate) -> tuple[int, int]:
+def _count(results, predicate, scorer: str | None = None) -> tuple[int, int]:
+    """(hits, n) over the items the predicate picks: the full pass, or one scorer alone."""
     chosen = [r for r in results if predicate(r) and r.status != "not_run"]
-    return sum(passed(r.scores) for r in chosen), len(chosen)
+    if scorer is None:
+        return sum(passed(r.scores) for r in chosen), len(chosen)
+    return sum(bool(r.scores.get(scorer)) for r in chosen), len(chosen)
 
 
 def markdown(meta: dict, results: list[ItemResult]) -> str:
@@ -148,7 +151,15 @@ def markdown(meta: dict, results: list[ItemResult]) -> str:
     for r in results:
         labels[r.outcome_label or r.status] = labels.get(r.outcome_label or r.status, 0) + 1
     lines += [f"| {k} | {v} |" for k, v in sorted(labels.items())]
-    doc = _count(results, lambda r: r.answerable and not r.sql)
+
+    def is_doc(r):
+        return r.answerable and not r.sql
+
+    doc = _count(results, is_doc)
+    # FOLLOWUP-156 (ARCH-13): source accuracy is the cited-source scorer alone, as PayCore's S1
+    # baseline counts it; whether the answer holds the expected text is its own line.
+    cited = _count(results, is_doc, "cites_source")
+    contains = _count(results, is_doc, "contains")
     held = _count(results, lambda r: not r.answerable)
     sql = _count(results, lambda r: r.sql)
     sql_skipped = sum(1 for r in results if r.sql and r.status == "not_run")
@@ -159,10 +170,12 @@ def markdown(meta: dict, results: list[ItemResult]) -> str:
         "",
         "## Summary",
         "",
-        f"- Document questions with the right source: {doc[0]}/{doc[1]}",
-        f"- Source accuracy: {doc[0]}/{doc[1]} ({100 * doc[0] / doc[1]:.1f}%)"
-        if doc[1]
+        f"- Source accuracy (expected document cited): {cited[0]}/{cited[1]} "
+        f"({100 * cited[0] / cited[1]:.1f}%)"
+        if cited[1]
         else "- Source accuracy: no document question",
+        f"- Answer contains the expected text: {contains[0]}/{contains[1]}",
+        f"- Document questions passed (answer text and source): {doc[0]}/{doc[1]}",
         f"- Unanswerable questions held: {held[0]}/{held[1]}",
         f"- SQL questions: {sql[0]}/{sql[1]}"
         + (f" ({sql_skipped} NOT_RUN: --approve-sql not given)" if sql_skipped else ""),

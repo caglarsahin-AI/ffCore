@@ -110,4 +110,47 @@ def test_19_s5_report_states_n_of_total_and_warmup():
     text = er.markdown(meta, results)
     assert "Scored items: 1/50 (excluded by source: prsim 9)" in text
     assert "Warmup runs (not scored, not in times): 2" in text
-    assert "Source accuracy: 1/1 (100.0%)" in text
+    assert "Source accuracy (expected document cited): 1/1 (100.0%)" in text
+
+
+# --- FOLLOWUP-156 (T-18k2-0005 B3, ARCH-13): source accuracy counts `cites_source` only; the
+# answer's expected text is its own line; the full pass has its own name. ---
+
+
+def _doc(i, contains, cites):
+    return er.ItemResult(
+        id=f"q{i}",
+        style="dogrudan",
+        answerable=True,
+        sql=False,
+        outcome_label="answered",
+        status="completed",
+        scores={"contains": contains, "cites_source": cites, "llm_judge": None},
+        seconds=1.0,
+        llm_calls=1,
+    )
+
+
+META = {"dataset": "s1", "agent": "doc", "model": "qwen3.5:35b cpu"}
+
+
+def _summary(results):
+    text = er.markdown(META, results)
+    return text.split("## Summary", 1)[1].split("\n## ", 1)[0]
+
+
+def test_19r_156_source_accuracy_is_cites_source():
+    # the fake-llm shape of 18-kosu-2: sources right, answer text not there
+    results = [_doc(i, contains=False, cites=True) for i in range(19)]
+    results.append(_doc(19, contains=False, cites=False))
+    summary = _summary(results)
+    assert "- Source accuracy (expected document cited): 19/20 (95.0%)" in summary
+    assert "right source" not in summary
+
+
+def test_19r_156_contains_separate_line():
+    results = [_doc(0, True, True), _doc(1, True, False), _doc(2, False, True)]
+    summary = _summary(results)
+    assert "- Answer contains the expected text: 2/3" in summary
+    assert "- Source accuracy (expected document cited): 2/3 (66.7%)" in summary
+    assert "- Document questions passed (answer text and source): 1/3" in summary
