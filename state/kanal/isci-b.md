@@ -1644,3 +1644,19 @@ Kapılar: ffcore lint 0, make test 952 ×2 profil, test-int 809 geçti / 5 atlan
 ### B-19R-0020 · 2026-11-03 12:45 · → koordinator · ACK
 Paket: fix/19-dis-inceleme   Cevap: K-19R-0016
 Alındı. Dallar donuk (ffcore aacdd96, paycoreLLM 5663b7b); yığın yok. Delta REVIEW-SONUC / DUZELT bekleniyor.
+
+### B-19R-0021 · 2026-11-03 14:10 · → koordinator · HANDOFF
+Paket: fix/19-dis-inceleme   Cevap: K-19R-0018
+Durum: MERGED (ffcore main ade6364 ← aacdd96, paycoreLLM master 530be09 ← 5663b7b). Bu oturumdan açık iş, worktree, dal, yığın kalmadı (f19r/pc19r B-19R-0018'de `down -v`; review-19r inceleyicinin yığını, bu oturum açmadı).
+Öğrenilenler:
+- İki depolu dal yönetimi: her bulgu ayrı commit, PR-HAZIR iki SHA ile; paycoreLLM worktree'si depo dışında (`C:\ai_paycore\paycoreLLM-<paket>`), ffcore `.worktrees/fix/<ad>`; state/ yalnız mutlak yoldan. Git Bash'te `MSYS_NO_PATHCONV=1` konteyner yolları için gerekli ama host yollarını (`git -C`, `python <yol>`) bozar; host komutlarında kullanma.
+- ffcore_compat kuralı: FFCore'a dair PayCore tarafı sözleşme kodu tek kopya `src/paycore_llm/ffcore_compat.py` (StagingError, is_prsim, check_sources); script'ler oradan ya da `ffcore.knowledge.raw_staging`'den alır, kopya yok (`test_19r_ffcore_rule.py`).
+- Staging scrub deseni: `@login` maskesi dar (lookbehind ayraç kümesi, lookahead `(`, `/`, `@`, noktalı ad), `AT_TECHNICAL` muafiyeti, fence (``` ~~~ {code} {noformat}) ve satır içi kod atlanır, imza temizliği son 8 satır ve fence'e duyarlı; Jira özeti ve meta `title` de aynı yardımcıdan geçer. Bilinen sınır: büyük harfli `@Ahmet` (runbook). KARARLAR "PRSIM M3 ölçümüne girer" koruması (a) daraltıldı, kaldırılmadı.
+- Compose: ortak env `x-app-env` / `x-ffcore-app-env` uzantı alanında; servis `<<: *app-env` ile alıp yalnız kendi farkını ezer (backend `ALLOWED_INTERNAL_HOSTS`).
+- `register_upload` aynı baytta da sürüm artırır (FOLLOWUP-157); raw ingest aynı sha + DONE dışı statüde `retried` yolunu kullanır, kayıt öncesi hata `failed_unregistered` (yer tutucu satır yok, K-19R-0013 A).
+İşaretçiler: FOLLOWUP-157 (register_upload sürüm), FOLLOWUP-158 (langfuse/OTel lock yenileme + NOTE-8 lock `requires-dist` langfuse>=2.50), FOLLOWUP-159 (MINOR-3: backend iç host iken araç/sağlayıcı/webhook hedefi, 05a/01/03c touch-zone), FOLLOWUP-160 (MINOR-r2-1, 08 tam 1b ile). MINOR-1 kısıtı PR'da: yeniden denenen belge DB'deki ACL/metadata ile indexlenir.
+Kanıt ve PR: C:\ai_paycore\ffcore\state\pr\19-dis-inceleme.md.
+
+### B-19R-0022 · 2026-11-03 14:10 · → koordinator · DURUM
+Paket: fix/19-dis-inceleme   Cevap: K-19R-0018
+Lease: RETIRED (ffcore-isci-b-19r). Bu oturum kanala başka yazmayacak.
