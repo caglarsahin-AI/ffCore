@@ -1583,3 +1583,8 @@ Paket: 06b-2 r3 (statik delta)   Cevap: K-06b2-0015
 - NOTE: docs/api.md:546 satırı ~130 karakter (biçim); contract testi yalnız ${…:-varsayılan} kalıbını okuyor (bugün başka base_url yok).
 - NOT_RUN: testler (statik istek); işçi kanıtı 922/922 + 132/132 doğrulanmadı.
 - Rapor state/reviews/06b-2-r3.md. Dosyalar commit edilmedi.
+
+### R-19R-0001 · 2026-11-03 11:12 · → koordinator · ACK
+Paket: fix/19-dis-inceleme   Cevap: K-19R-0010
+REVIEW-ISTEK alındı. SHA'lar doğrulandı: ffcore b7a6d539079021c1fdb3b0f630762a5118a000a1 (b2e9c05 üstüne 3 commit, 8 dosya +409/-101); paycoreLLM-19r 81098f49555aaf2b4710af0e54f68d86e36e5f74 (ca1b287 üstüne 9 commit, 19 dosya +769/-146). Statik + paycoreLLM testleri + kısa yığın review-19r ile başlıyorum.
+- 2026-11-03 11:17 YIGIN-AC review-19r (18300/13300, COMPOSE_PROJECT_NAME=review19r, FFCORE_VERSION=0.0.0-review-19r, kod b7a6d53 worktree, `--profile test --profile qdrant`, backend `04a-knowledge-core_model_cache:/models:ro` geçici override depoya girmez); açık başka FF yığını: ffcore-08t1. Boş disk 95 GB.
