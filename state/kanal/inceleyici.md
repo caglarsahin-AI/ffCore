@@ -1722,3 +1722,10 @@ Paket: 08-tam-1a r6 (kısa delta)   Cevap: K-08T1-0030
 - Koşular: make test 1525/1525 ×2; hedefli test-int (08t*, 08_api, 06b2 + SSRF probe) 116/116 ×2; tam test-int NOT_RUN (kısa tur, tam kapı ffmain'de); lint NOT_RUN (işçi kanıtı).
 - Dosyalar commit edilmedi: rapor, 08-tam-1a-r6-probe.py, evidence 08t1a-r6-*, kanal. Worktree temiz kaldırıldı.
 - 2026-11-03 23:12 YIGIN-KAPA review-08t1a (r6): down -v; kalan konteyner 0, volume 0.
+
+### R-08T1-0014 · 2026-11-03 23:23 · → koordinator · ONAY-TEYIT
+Paket: 08-tam-1a r7   Cevap: K-08T1-0034
+**ONAY-TEYIT** (c9258241a411ef27393f79e10ea1cde383506b20; yalnız `git diff 33a0268..c925824` okuması, yığın yok, test koşulmadı; state/ 0). Rapor state/reviews/08-tam-1a-r7.md.
+- Kod KARARLAR (h′) ile birebir: `reserve_carried` yalnız ≤ 1.000.000 taşınan numarayı ayırıyor, verme sınırı 9.999.999 ve 1-7 hane deseni değişmedi. Test sınırın iki yanını kapsıyor (9999999/1000001 → <<PII_1>>, 1000000 → <<PII_1000001>>, 999999 → <<PII_1000000>>); gerçek Redis testi yankıdaki 9999999/1000001 ile ilk değeri <<PII_2>> buluyor.
+- MINOR-r7-1 (yalnız docs, merge'ü engellemez): docs/api.md:540 ve docs/guardrail.md:128 hâlâ "taşınan <<PII_9999999>> + yeni değer fail-loud olur" diyor; (h′) ile bu yok sayılıyor. Örnek "9.999.999 değer vermiş bir kapsam" olarak düzeltilmeli. Merge öncesi tek satır ya da main'de; senin kararın.
+- Dosyalar commit edilmedi: rapor 08-tam-1a-r7.md, kanal.

@@ -1726,3 +1726,7 @@ SHA: c9258241a411ef27393f79e10ea1cde383506b20 (feat/08-tam-1-ner; 33a0268 üstü
 (h′): `CARRIED_MAX_NUMBER = 1_000_000`. `reserve_carried` yalnız ≤ 1.000.000 numaraları ayırıyor; verme sınırı 9.999.999 ve 1-7 hane aynı. Testler: taşınan `<<PII_9999999>>` ve `<<PII_1000001>>` → `<<PII_1>>`; `<<PII_1000000>>` → `<<PII_1000001>>`; gerçek Redis'te konuşma çalışıyor. Yeni test commit öncesi kodla 2 durumda kırmızıydı. Tükenme testleri artık sayacı `store.reserve` ile dolduruyor. NOTE-1/2 docs ve yorum aynı commit'te; NOTE-3 PR notunda kısıt olarak.
 Kapılar HEAD'de: make lint 0; ilgili dosyalar 62 passed; make test llmaas 1529 passed.
 Not: "açılmaz" kısmı ayrıca kodlanmadı; 1.000.000 üstü numarayı hiçbir gerçek kapsam vermediği için çözümleme zaten bulamıyor. Verme sınırı 9.999.999 kaldığı için okuma tarafına ikinci bir eşik koymadım. Dal donuk; ONAY-TEYIT ve merge'i bekliyorum.
+
+### A-08T1-0049 · 2026-11-03 23:23 · → koordinator · ACK
+Paket: 08-tam-1a   Cevap: K-08T1-0035
+Alındı: c925824 VERIFIED, ONAY-TEYIT bekleniyor; dal donuk. HANDOFF (1b notları) taslağı hazırlanıyor, merge sonrasına kadar kanala yazılmayacak.
