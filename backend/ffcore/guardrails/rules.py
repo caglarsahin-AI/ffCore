@@ -45,6 +45,24 @@ _ASSIGNMENT = re.compile(
     r"(?P<value>[^\s,;]{6,})"
 )
 _TOKEN = re.compile(r"[A-Za-z0-9_\-+/=]{" + str(ENTROPY_MIN_CHARS) + ",}")
+# FOLLOWUP-106: a token shorter than ENTROPY_MIN_CHARS is a finding only when a credential word
+# names it ("API_KEY=", "Authorization: Bearer", "token:", "the secret is"); at these lengths
+# entropy does not separate keys from codes and names, the word does. Its value is checked like
+# the long tokens' (no digits-only, no word, no plain identifier).
+SHORT_TOKEN_MIN_CHARS = 13
+_CREDENTIAL_WORD = (
+    r"api[_-]?key|access[_-]?key|client[_-]?secret|secret[_-]?key|secret|token|authorization"
+    r"|bearer|anahtar(?:ı|i)?"
+)
+_SHORT_TOKEN = re.compile(
+    r"(?i)\b(?P<word>" + _CREDENTIAL_WORD + r")\b[\"']?\s*(?:[:=]|\bis\b)?\s*[\"']?"
+    r"(?:(?:bearer|basic)\s+)?"
+    r"(?P<value>[A-Za-z0-9_\-+/=]{"
+    + str(SHORT_TOKEN_MIN_CHARS)
+    + ","
+    + str(ENTROPY_MIN_CHARS - 1)
+    + r"})(?![A-Za-z0-9_\-+/=])"
+)
 _UUID = re.compile(r"[0-9a-fA-F]{8}-(?:[0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}")
 
 
@@ -134,6 +152,17 @@ def find_secrets(text: str) -> list[Finding]:
                     value,
                 )
             )
+    for m in _SHORT_TOKEN.finditer(text):
+        value = m.group("value")
+        if value.isdigit() or _is_word(value) or is_plain_identifier(value):
+            continue
+        start, end = m.span("value")
+        word = m.group("word").lower()
+        hits.append(
+            Finding(
+                "API_TOKEN", start, end, 0.85, f"credential word '{word}' before the value", value
+            )
+        )
     return resolve_overlaps(hits)
 
 
