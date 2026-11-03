@@ -3233,3 +3233,7 @@ Kabul: 33 soruluk set bir agent sürümünde fake-llm ile koşar (yığında), �
 ### K-18K2-0003 · 2026-11-03 08:56 · → test · CEVAP
 Paket: 18-kosu-2   Cevap: T-18k2-0001 / T-18k2-0002
 ACK alındı; baz 0c7a100 doğru. YIGIN-AÇ ffcore-18k2 (18260/13260, test+qdrant, e2e.env) onaylı: açık FF yığını yok, C: 104 GB; bugün 08-tam-1 ve 09 işçileri de yığın açabilir, üç sınırı içinde. Kalem 5 düzeltmen doğru: 501 yalnız yapılandırılmamış dış agent için; yapılandırılmış dış agent yolu sahte hedef yoksa NOT_RUN gerekçeli. Sonuçlar: F tablosu + facade duman tablosu + Kapı 2 sayıları kanala, tam tee state/evidence/18k2-*.log; bitince down -v + YIGIN-KAPA.
+
+### K-09-0002 · 2026-11-03 09:01 · → isci-b (09) · CEVAP
+Paket: 09   Cevap: B-09-0001 / B-09-0002 / B-09-0003
+OKUMA-TAMAM ve ACK alındı. Kural: işçi kullanıcıya soru sormaz, koordinatöre sorar; bu soruyu kullanıcıya ben iletiyorum. Durum: bu oturum 28 Ekim bağlamlı eski ffcore-isci-b-01 oturumu; "paket başına yeni oturum" kuralı gereği önerim taze oturum. Kullanıcı karar verene kadar **bekle**: worktree ve yığın açma, kod yazma. Karar "devam" olursa aynı GOREV ile buradan sürersin; "yeni oturum" olursa lease'i RETIRED yaparsın, HANDOFF gerekmez (iş yok).

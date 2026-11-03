@@ -2,10 +2,10 @@
 
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
-- Oturum kimliği: ffcore-isci-a-06b-2 (önceki lease ffcore-isci-a-06b RETIRED)
-- Aktif paket: 06b-2 (K-06b2-0001)
-- Durum: RETIRED (06b-2 merged 614c150, K-06b2-0018)
-- Son okunan: K-06b2-0018
+- Oturum kimliği: ffcore-isci-a-08-tam-1 (önceki lease ffcore-isci-a-06b-2 RETIRED)
+- Aktif paket: 08-tam-1 (K-08T1-0001)
+- Durum: ACTIVE
+- Son okunan: K-08T1-0001 / K-18K2-0003
 
 ## Mesajlar
 
@@ -1488,3 +1488,12 @@ Paket: 06b-2   Cevap: K-06b2-0018
 06b-2 main'de (614c150). Teslim edilen: dış agent (`kind: external`) kaydı, okuma, güncelleme ve yayını (admin + edit); facade yolu (egress/input.pre/output.pre, yalnız `content`, 64 KiB, `LLM_CALL_TIMEOUT_S`, yönlendirme yok, her çağrı bir audit satırı, kopmada `client_disconnected`); migration 06b_0001; `services/external_config.py` (`RESERVED_HOSTS`, `check_base_url`, origin değişince anahtar sıfırlama); C11 dış altkümesi.
 Açık kalanlar (koordinatörde kayıtlı): FOLLOWUP-146 (provider satırına düz metin host alanı + reserved denetimi), 10c `EXTERNAL_AGENT_HOSTS`, import dry-run 500 (var olan native anahtar), test yardımcılarının sahte provider yapılandırması (FOLLOWUP-143 ailesi), r2 NOTE-3/NOTE-4, kota/hız sınırı FOLLOWUP-144.
 Yerel temizlik: ffcore/{backend,tools,frontend}:0.0.0-06b2 imajları duruyor (temizlik listesi); yığın kapalı, konteyner/volume 0. Lease RETIRED; bu oturum kapanır, sıradaki paket yeni oturumda.
+
+### A-08T1-0001 · 2026-11-03 09:02 · → koordinator · DURUM
+Paket: 08-tam-1   Cevap: -
+DURUM: OKUMA-TAMAM (yeni oturum ffcore-isci-a-08-tam-1; lease ACTIVE)
+Okunan gruplar: 1 FELSEFE + FELSEFE_UYGULAMA; 2 CLAUDE (yeni metin); 3 PLAN v2.10 (2d.7 PRSIM kararı, geçmiş 2.6-2.10); 4 KARARLAR (28 Ekim sonrası tüm eklemeler: 08-lite, C4/C7/C8-C10/C11 donmaları, egress tüm mesajlar, PRSIM M3 kararı A, NER adayları, yığın üç, model ağırlıkları offline); 5 handbook (CONTRACTS C2/C3/C6/C8/C9/C11 değişiklikleri, RELEASE downgrade notu, TERMINOLOGY); 6 WORK_QUEUE, BLOCKERS 83/106/107/118/141/147, kanallar (koordinator K-08T1-0001'e kadar, isci-a 06b-2 HANDOFF); 7 plan/08 tamamı + state/pr/08-lite.md (C4 donmuş biçim) + data/samples/pii (100 satır mevcut); 8 BASLATMA (soru penceresi yok kuralı).
+
+### A-08T1-0002 · 2026-11-03 09:02 · → koordinator · ACK
+Paket: 08-tam-1   Cevap: K-08T1-0001
+GOREV alındı. Branch feat/08-tam-1-ner, worktree .worktrees/feat/08-tam-1-ner (main HEAD'den, 614c150+; ben açıyorum). Touch-zone WORK_QUEUE satırındaki gibi. Sıradaki: kaynak keşfi (guardrails/, masking detokenize, runtime çıkış sınırı, facade, core/egress, knowledge ingest_mask, cli ingest-raw) → state/pr/08-tam-1.md planı (felsefe üçlüsü, NER ölçüm yöntemi, volume/imaj kararı, bölme önerisi) → DURUM: PLANNED. Kod onaydan sonra. Ağırlık indirme bende değil: `make models` NER hedefini yazarım, kullanıcı koşturur.
