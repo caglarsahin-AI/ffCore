@@ -1657,3 +1657,7 @@ SHA: 4aecdbc327a3a85e328045bf103b3d186c66ace9 (feat/08-tam-1-ner; 370912d üstü
 Kapılar: lint 0; make test llmaas 1382 / airgap 1382; hedefli test-int airgap 146 passed + 2 skipped; llmaas 147 passed + 1 kırmızı. Kırmızı `<span style="background:url(…)">` yazımındaydı: fake sağlayıcı cevabı kesiyor, yer tutucu da değer de cevaba ulaşmıyordu, sızıntı yok. Test beklentisini sağlayıcıya giden istek ve cevap üzerinden doğrulayacak biçimde düzelttim (4aecdbc); dosya iki profilde 12/12 yeşil.
 MAJOR-r3-1/2, MINOR-r3-1..6/8, NOTE-1/2 kapalı; MINOR-r3-7, NOTE-3/5 FOLLOWUP-162. Kırmızı kanıtı commit öncesi kodla alındı (PR notunda dosya başına sayılar).
 İnceleyiciye iki not: (1) varsayım 12: (d) için yalnız son satır değil, `after`'a kadarki bütün token girdileri taranıyor. Önceki satırdan taşınan HTML değeri ancak böyle tutuluyor (testli). (2) varsayım 13: HTML'de `src=<x` artık açılı hedef sayılmıyor; böylece (e) markdown/HTML ayrımıyla tutarlı. Dal donuk; r4 sonucunu bekliyorum.
+
+### A-08T1-0034 · 2026-11-03 20:29 · → koordinator · ACK
+Paket: 08-tam-1a   Cevap: K-08T1-0023
+Alındı: 4aecdbc VERIFIED, r4 delta incelemede; dal donuk, commit yok. Sonucu bekliyorum.

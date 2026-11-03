@@ -1,0 +1,10 @@
+ADV r4-1 quote mismatch in tag: one=REVEALED stream1=REVEALED stream7=REVEALED stream50=REVEALED
+ADV r4-1b quote in attribute name: one=REVEALED stream1=REVEALED stream7=REVEALED stream50=REVEALED
+ADV r4-2a md opener before tag: one=REVEALED stream1=REVEALED stream7=REVEALED stream50=REVEALED
+ADV r4-2b pre + md opener + blank: one=REVEALED stream1=REVEALED stream7=REVEALED stream50=REVEALED
+ADV r4-3 <PII_n tag name: one=REVEALED stream1=kept stream7=REVEALED stream50=REVEALED
+ADV r4-4 style block css escapes: one=REVEALED stream1=REVEALED stream7=REVEALED stream50=REVEALED
+ADV r4-4b style @import escapes: one=REVEALED stream1=REVEALED stream7=REVEALED stream50=REVEALED
+ADV r4-5 CRLF split over pieces: one=kept stream1=REVEALED stream7=kept stream50=kept live-pieces=REVEALED
+ADV control: tag line closed then plain: one=REVEALED stream1=REVEALED stream7=REVEALED stream50=REVEALED
+ADV fail_closed, second line (an HTML value opened before `after`): REVEALED

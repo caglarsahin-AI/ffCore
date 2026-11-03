@@ -1675,3 +1675,19 @@ Paket: 08-tam-1a r3 (delta)   Cevap: K-08T1-0016
 - Koşular: make test llmaas 1210/1210; airgap 1205 + 5 zaman bütçesi kırmızısı (yük; dosya tek başına 7/7; NOTE); test-int llmaas 837 passed 1 failed (03a_9 .invalid DNS zaman aşımı, tek başına 16/16, ortam), airgap 836 passed; 06b-2 138/138 ×2; r2 entegrasyon probe'u yeşil.
 - Dosyalar commit edilmedi: rapor, 08-tam-1a-r3-probe.py, 08-tam-1a-r3-e2e-probe.py, evidence 08t1a-r3-*, kanal. Worktree git'ten çıktı, dizin Permission denied ile kaldı (--force yok).
 - 2026-11-03 19:43 YIGIN-KAPA review-08t1a (r3): down -v; kalan konteyner 0, volume 0.
+
+### R-08T1-0008 · 2026-11-03 20:30 · → koordinator · ACK
+Paket: 08-tam-1a r4 (delta)   Cevap: K-08T1-0022
+REVIEW-ISTEK r4 alındı. SHA doğrulandı: 4aecdbc327a3a85e328045bf103b3d186c66ace9 (370912d üstüne 9 commit, 19 dosya +801/-98, state/ 0). KARARLAR "C17 URL bağlam kuralı, ek" (a)-(f) düzeltilmiş hâliyle okundu. Worktree .worktrees/review-08t1a-r4 (temiz). Delta statik inceleme + r2/r3 probe'larının yeniden koşusu + yeni yazımlar + performans başlıyor.
+- 2026-11-03 20:30 YIGIN-AC review-08t1a (r4; 18290/13290, COMPOSE_PROJECT_NAME=review08t1a, FFCORE_VERSION=0.0.0-review-08t1a, kod 4aecdbc worktree, `--profile test --profile qdrant`). Açık başka FF yığını yok. Boş disk 92G.
+
+### R-08T1-0009 · 2026-11-03 21:09 · → koordinator · REVIEW-SONUC
+Paket: 08-tam-1a r4 (delta)   Cevap: K-08T1-0022
+**DEGISIKLIK** (4aecdbc327a3a85e328045bf103b3d186c66ace9). BLOCKER 0, MAJOR 1, MINOR 6, NOTE 7. Rapor state/reviews/08-tam-1a-r4.md (güvenlik turu ayrı bölüm).
+- Kapandı: MAJOR-r3-2 (100 bin/1'lik parça 0,4-0,6 s; r3'te 23-28 s), MINOR-r3-1 (gerçek Redis + detokenizer(after): r3 senaryosu tutuldu, onay sonrası sahip değeri görüyor, iki satır önce açılan HTML değeri tutuldu, bilinmeyen after fail-closed), MINOR-r3-2 (99.999.998 sınırı, 9 hane açılmaz), MINOR-r3-3/4/6, NOTE-1. İstenen yazımların hepsi (r3 tablosu + `<a\nhref`, svg href, url( 'http:' ), IMG SRC, entity, 3 satırlı etiket, boş satır sonrası etiket değeri, srcdoc, css blok) dört okuma biçiminde tutuldu; facade düz uçtan uca 7 HTML yazımı temiz.
+- Varsayım 12 KABUL (bütün girdileri taramak HTML taşımasını kurmak için gerekli; 20 bin girdi 0,36 s; COUNT sayfalama önerisi), varsayım 13 KABUL. 4aecdbc: fake `hello + [:50]` kesiyor; yalnız style yazımı boşuna geçiyor, diğer 9'da `<<PII_` iddiası gereksiz kaldırılmış (MINOR).
+- MAJOR-r4-1 (karar gerekir): satır/taşıma modeli yine atlatılıyor, 7 yazım doğrulandı: etikette `alt=a"b src="…` tırnak uyuşmazlığı (gerileme), `[a]( <img src="…` açıcı önceliği, `<pre>` + `](` + boş satır (gerileme), `<PII_1 style` etiket adı istisnası, `<style>` içinde CSS kaçışları (`\75 rl`, `@import`), parçalara bölünmüş CRLF. Öneri A: cevap düzeyinde HTML fail-closed (ilk `<harf`'ten sonra cevabın geri kalanında açma yok; istisna yalnız tam `<<PII_n>>`; markdown satır kuralı kalır; CRLF bekletme). B: satır modelini yine yamala. C: HTML'i tehdit modelinden çıkar.
+- MINOR: aralık taşması egress'te on_error yolundan geçiyor (block → guardrail_block, log → ham değer sağlayıcıya; çağıran tetikleyebilir) ve docs durum/kodu yanlış; konuşmadaki <<PII_99999999>> sonraki her koşuyu kalıcı düşürüyor (karar); hazırlık hatasında yalnız ilk satır tutuluyor (karar: _lost); 4aecdbc test zayıflığı; kullanılabilirlik (data:/file: düzyazı, x<y tag kipi); prime beklenmeyen hata akışı olaysız kesiyor.
+- Koşular: make test 1382/1382 ×2; tam yığın test-int llmaas 848 passed 5 skipped, airgap 846 passed 7 skipped; 06b-2 138/138 ×2; r2+r3+r4 entegrasyon probe'ları 13/13; lint NOT_RUN (işçi kanıtı).
+- Dosyalar commit edilmedi: rapor, 08-tam-1a-r4-probe.py, -int-probe.py, -adv-probe.py, evidence 08t1a-r4-*, kanal. Worktree temiz kaldırıldı.
+- 2026-11-03 21:09 YIGIN-KAPA review-08t1a (r4): down -v; kalan konteyner 0, volume 0.
