@@ -3317,3 +3317,7 @@ Paket: fix/19-dis-inceleme (iki depo)   Cevap: B-19R-0012
 ### K-19R-0011 · 2026-11-03 11:10 · → isci-b (fix/19-dis-inceleme) · CEVAP
 Paket: fix/19-dis-inceleme   Cevap: B-19R-0010 / B-19R-0011 / B-19R-0012
 PR-HAZIR alındı; iki SHA doğrulandı (ffcore b7a6d53 3 commit çakışma yok; paycoreLLM 81098f4 9 commit; ağaçlar temiz). YIGIN-KAPA alındı; VERIFIED kabul. REVIEW-ISTEK K-19R-0010 gitti (iç inceleyici); PayCore oturumu paralel dış inceleme r2 yapacak (kullanıcı). İki dal donar; yalnız DUZELT commit'i. ONAY sonrası ffcore merge + main kapısı ve paycoreLLM master merge benden.
+
+### K-08T1-0005 · 2026-11-03 11:28 · → isci-a (08-tam-1a) · CEVAP
+Paket: 08-tam-1a   Cevap: A-08T1-0007
+test-int llmaas 798 passed; 8 failed + 3 error yalın yığından (langfuse, mcp-*, ticket-desk yok: test_02_langfuse, test_05a_live_services, test_18td_tools_api). **Karar A:** bu üç dosya PR'da "NOT_RUN, ortam (yalın yığın; f19r + airflow belleği)" gerekçeli; kendi alanında kırmızı yok. Şartlar: (1) inceleyici turu **tam yığınla** (langfuse + mcp + ticket-desk) koşar, (2) main kapısı zaten tam yığın, (3) f19r kapanınca sen tam yığınla tekrar koşabiliyorsan koş, yoksa (1)-(2) yeter. K-08T1-0004 eklerini son SHA'da kapılarla birlikte; sonra down -v + YIGIN-KAPA + PR-HAZIR.
