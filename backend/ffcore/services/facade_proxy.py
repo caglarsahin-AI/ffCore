@@ -22,6 +22,7 @@ from typing import Any
 
 from fastapi import Request
 from fastapi.responses import JSONResponse, StreamingResponse
+from redis.exceptions import RedisError
 
 from ffcore.api.facade_schemas import (
     KEEPALIVE,
@@ -33,6 +34,7 @@ from ffcore.core import db, tracing
 from ffcore.core.config import Settings
 from ffcore.core.errors import ApiError, error_body
 from ffcore.guardrails.masking import (
+    RevealUnavailable,
     count_placeholders,
     log_skipped_policy,
     log_skipped_url,
@@ -346,6 +348,21 @@ class _Held:
             )
 
 
+@contextlib.contextmanager
+def _token_store_errors():
+    """r2 MINOR-r2-3: the token store fails during the live reveal: a coded error the stream
+    sends before `[DONE]`, never a broken stream without one."""
+    try:
+        yield
+    except (RedisError, OSError, RevealUnavailable) as exc:
+        raise ApiError(
+            502,
+            "api_error",
+            "detokenize_unavailable",
+            "The answer could not be prepared: the token store is unavailable.",
+        ) from exc
+
+
 class _LiveReveal:
     """C17 on the live direct stream: each choice's content and each tool call's argument
     deltas pass their own StreamDetokenizer, so a placeholder split over two chunks reaches the
@@ -367,6 +384,10 @@ class _LiveReveal:
         return self._open[key]
 
     async def choice(self, choice: dict) -> dict:
+        with _token_store_errors():
+            return await self._choice(choice)
+
+    async def _choice(self, choice: dict) -> dict:
         if not self._guard.reveals:
             self.skipped += count_placeholders(choice.get("delta") or {})
             return choice
@@ -409,8 +430,24 @@ class _LiveReveal:
 
     async def rest(self) -> dict:
         delta: dict[str, Any] = {}
-        for index in sorted({k[1] for k in self._open}):
-            await self._close(index, delta)
+        with _token_store_errors():
+            for index in sorted({k[1] for k in self._open}):
+                await self._close(index, delta)
+        return delta
+
+    def held(self) -> dict:
+        """What the reveals still hold, as it is (placeholders, never a value): the store failed,
+        so it goes out unreversed rather than being dropped."""
+        delta: dict[str, Any] = {}
+        for key, reveal in sorted(self._open.items()):
+            tail = reveal.abandon()
+            if key[0] == "content":
+                delta["content"] = (delta.get("content") or "") + tail
+            elif tail:
+                delta.setdefault("tool_calls", []).append(
+                    {"index": key[2], "function": {"arguments": tail}}
+                )
+        self._open.clear()
         return delta
 
 
@@ -499,7 +536,11 @@ async def _relay(stream, stack, gate, guard, model, public_name) -> AsyncIterato
         # What the reveal still held (at most 15 characters) goes out first (r1 MINOR-1).
         log.warning("facade_stream_error code=%s model=%s", exc.code, public_name)
         if live and revealer.has_open:
-            yield await _rest_chunk(revealer, cid, created, public_name, held)
+            if exc.code == "detokenize_unavailable":
+                rest = revealer.held()
+                yield chunk_json(_chunk(cid, created, public_name, rest, held.finish or "stop"))
+            else:
+                yield await _rest_chunk(revealer, cid, created, public_name, held)
         yield error_event(exc)
         yield STREAM_END
     finally:

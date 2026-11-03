@@ -152,7 +152,8 @@ def _decode(value) -> str:
 
 def _reveal_unavailable(last: str) -> str:
     """C17 r1 MINOR-11: the reader's placeholders could not be reversed (token store down): the
-    stream ends with a coded error (the run itself goes on; a reconnect continues after `last`)."""
+    stream ends with a coded error (the run itself goes on). `last` is the id of the last entry
+    the reader got (r2 MINOR-r2-2), so a reconnect with it continues from the failed entry."""
     return SseMessage(
         last,
         SseEvent.error,
@@ -194,11 +195,13 @@ async def follow(
         yield SseMessage(
             f"{after_seq}-0", SseEvent.progress, {"replay": "run_events", "run_id": str(run_id)}
         ).render()
+        delivered = f"{after_seq}-0"
         try:
             async for message in replay_rows(after_seq):
                 yield message.render()
+                delivered = message.id
         except RevealUnavailable:
-            yield _reveal_unavailable(f"{after_seq}-0")
+            yield _reveal_unavailable(delivered)
         return
     while True:
         await mark_listening(redis, run_id, grace_s)
@@ -207,11 +210,13 @@ async def follow(
             yield ": keepalive\n\n"
             if await finished():
                 if ended_seen:
+                    delivered = last
                     try:
                         async for message in replay_rows(int(last.split("-")[0])):
                             yield message.render()
+                            delivered = message.id
                     except RevealUnavailable:
-                        yield _reveal_unavailable(last)
+                        yield _reveal_unavailable(delivered)
                     return
                 # The writer publishes right after its commit: give it one more turn, so a
                 # normal ending arrives live (tokens are not given twice by a replay).
@@ -219,7 +224,7 @@ async def follow(
             continue
         for _, entries in result:
             for entry_id, fields in entries:
-                last = _decode(entry_id)
+                delivered, last = last, _decode(entry_id)
                 event = _decode(fields[b"event"] if b"event" in fields else fields["event"])
                 raw = fields[b"data"] if b"data" in fields else fields["data"]
                 data = json.loads(_decode(raw))
@@ -227,7 +232,7 @@ async def follow(
                     try:
                         data = await transform(event, data)
                     except RevealUnavailable:
-                        yield _reveal_unavailable(last)
+                        yield _reveal_unavailable(delivered)
                         return
                 yield SseMessage(last, event, data).render()
                 if event in TERMINAL_SSE:

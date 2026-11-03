@@ -423,13 +423,16 @@ class StreamDetokenizer:
         self._store, self._scope, self._json = store, scope, json_escape
         self._aligner = PlaceholderAligner()
         self._lines = UrlLines()
+        self._pending = ""
         self.unresolved = 0
         self.skipped_url = 0
 
     async def _reverse(self, text: str) -> str:
+        self._pending = text  # until it is reversed: `abandon` gives it back as it is
         out, unresolved, skipped = await reveal_text(
             text, store=self._store, scope=self._scope, lines=self._lines, json_escape=self._json
         )
+        self._pending = ""
         self.unresolved += unresolved
         self.skipped_url += skipped
         return out
@@ -439,6 +442,12 @@ class StreamDetokenizer:
 
     async def flush(self) -> str:
         return await self._reverse(self._aligner.flush())
+
+    def abandon(self) -> str:
+        """What it holds, unreversed (the token store failed): the piece it was reversing and
+        the aligned tail."""
+        pending, self._pending = self._pending, ""
+        return pending + self._aligner.flush()
 
 
 class ContextReveal:
