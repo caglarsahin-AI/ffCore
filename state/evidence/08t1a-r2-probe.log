@@ -1,0 +1,63 @@
+REDOS token+20000sp (20006 chars): 0.005 s
+REDOS password+20000sp (20009 chars): 0.004 s
+REDOS şifre+20000sp (20006 chars): 0.005 s
+REDOS API_KEY+20000sp (20008 chars): 0.006 s
+REDOS erişim anahtarı+20000sp (20016 chars): 0.009 s
+REDOS token+200000sp (200006 chars): 0.055 s
+REDOS password+200000sp (200009 chars): 0.042 s
+REDOS 180k mixed token (180420 chars): 0.051 s
+REDOS 180k mixed password (180600 chars): 0.037 s
+REDOS token+bearer spaces (40012 chars): 0.013 s
+REDOS token tabs/newlines (60006 chars): 0.016 s
+REDOS token is spaces (60006 chars): 0.019 s
+REDOS quotes (60006 chars): 0.008 s
+REDOS many words (180000 chars): 0.056 s
+EQUIV 20000 samples: short diffs 0, assignment diffs 0
+SECRETS 'token = getAccessToken() neden null?' -> []
+SECRETS 'anahtar TeslimProjeleri kapsamında' -> []
+SECRETS 'anahtar teslim projeleri kapsamındadır' -> []
+SECRETS 'token: INC0012345678' -> []
+SECRETS 'secret = loadSecretValue(x)' -> []
+SECRETS 'Authorization: BearerTokenRequired' -> []
+SECRETS 'API_KEY=Xk9QpLmZ2vRtWq' -> [('API_TOKEN', 'Xk9QpLmZ2vRtWq')]
+SECRETS 'Authorization: Bearer Xk9QpLmZ2vRtWq' -> [('API_TOKEN', 'Xk9QpLmZ2vRtWq')]
+SECRETS 'erişim anahtarı: Xk9QpLmZ2vRtWq' -> [('API_TOKEN', 'Xk9QpLmZ2vRtWq')]
+SECRETS 'gizli anahtar Xk9QpLmZ2vRtWq' -> [('API_TOKEN', 'Xk9QpLmZ2vRtWq')]
+SECRETS 'token: AbcDefGhiJklMno' -> []
+SECRETS 'token: ABCDEF1234567' -> []
+SECRETS 'token: Ab1Cd2Ef3Gh4Ij' -> [('API_TOKEN', 'Ab1Cd2Ef3Gh4Ij')]
+SECRETS 'auth_token: QWERTYUIOPASDF' -> []
+SECRETS 'DB_TOKEN=Xk9QpLmZ2vRt8' -> []
+SECRETS 'anahtar: Xk9QpLmZ2vRt8' -> []
+SECRETS 'anahtarı: Xk9QpLmZ2vRt8' -> []
+TTL first token <<PII_1>>
+TTL after expiry ('Kayıt sahibi <<PII_1>>.', ['<<PII_1>>'])
+TTL new token after expiry <<PII_2>>
+TTL old answer now reads ('Kayıt sahibi <<PII_1>>.', ['<<PII_1>>'])
+TTL counter key ttl s 34560000
+TTL lookup renews can@example.test
+TTL lookup renews can@example.test
+TTL lookup renews can@example.test
+SEED old n=5 -> next <<PII_6>>
+SCOPE A token <<PII_1>> B token after reserve(1) <<PII_2>>
+SCOPE A's stale history in B ('Önceki cevap: <<PII_1>>', ['<<PII_1>>'])
+BIG reserve 99999999 -> next <<PII_100000000>>
+BIG 9-digit placeholder through the stream (3-char chunks) -> 'Sonuç <<PII_100000000>> tamam'
+HUGE reserve/token_for error ResponseError value is not an integer or out of range script: 22007c16aa397f8473ac8f6a11942db7
+URL md image: kept (skipped 1)
+URL md image space after (: kept (skipped 1)
+URL md image protocol-relative: kept (skipped 1)
+URL md image ( space //: REVEALED (skipped 0)
+URL md angle dest with space: REVEALED (skipped 0)
+URL md ref def https: kept (skipped 1)
+URL md ref def protocol-relative: REVEALED (skipped 0)
+URL md ref def angle space: REVEALED (skipped 0)
+URL html img src //: REVEALED (skipped 0)
+URL html img src quoted space: REVEALED (skipped 0)
+URL html href quoted space: REVEALED (skipped 0)
+URL www autolink: REVEALED (skipped 0)
+URL plain text: REVEALED (skipped 0)
+URL long 100: one piece kept, StreamDetokenizer kept, ContextReveal live kept
+URL long 8000: one piece kept, StreamDetokenizer kept, ContextReveal live kept
+URL long 9000: one piece kept, StreamDetokenizer REVEALED, ContextReveal live REVEALED
+JSON escape {"name": "Ali \"Kaya\" \\ x"}

@@ -1589,3 +1589,7 @@ Paket: 08-tam-1a   Cevap: K-08T1-0009
 r1 DUZELT uygulandı. PR: C:\ai_paycore\ffcore\state\pr\08-tam-1a.md ("Review r1 bulgu → düzeltme → kanıt" tablosu, FOLLOWUP-162 kısıtları, r2 kapı tablosu) · Branch: feat/08-tam-1-ner · SHA: 6d0d9ba0aa0efcf04eddf9409d36e42f16053f55 (fb7130d üstüne 9 commit) · Sınıf: [B] · push yok.
 Kapılar (son SHA): lint 0; make test llmaas 1046/1046, airgap 1046/1046; test-int llmaas 813 / airgap 811 passed, kırmızılar yalnız K-08T1-0005 A'daki üç ortam dosyası. MAJOR-1..7 ve MINOR 1/2/3/7/8/11/12 testli; yeni testlerin kırmızısı düzeltme öncesi kodla koşularak gösterildi (MAJOR-3 birim testi import hatasıyla kırmızıydı).
 İnceleyiciye not: facade agent istemci geçmişi satırları artık egress öncesi metinle saklanıyor (MAJOR-2 gereği; run'sız satırdaki yer tutucu hiçbir kapsamda çözülemezdi), sayaç anahtarı 400 gün; ikisi PR "Bilinen sınırlar"da.
+
+### A-08T1-0021 · 2026-11-03 15:58 · → koordinator · ACK
+Paket: 08-tam-1a   Cevap: K-08T1-0013
+Alındı: 6d0d9ba VERIFIED, r2 delta incelemede. Dal donuk, commit yok; sonuca kadar bekliyorum.

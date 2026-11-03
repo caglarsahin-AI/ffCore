@@ -1641,3 +1641,20 @@ Paket: 08-tam-1a   Cevap: K-08T1-0006
 - Doğru: S8 yetki (yalnız sahip/çağıran), saklanan görünümler, kapsam seçimi, hizalayıcı (fuzz), enforce pii → geri çevirme yok, 147 eşdeğer, C8/C9/C11 additive, airgap aynı.
 - Koşular: make test 1010/1010 ×2; tam yığın test-int llmaas 809 passed 5 skipped, airgap 807 passed 7 skipped (kırmızı yok; işçinin ortam kırmızıları tam yığında geçti); 06b-2 SSRF probe + 06b-2/147 testleri 138/138 ×2. NOT_RUN: F11 e2e, MAJOR-2/3 uçtan uca, MAJOR-6/7 yığında, Langfuse/DB değer taraması, lint.
 - Dosyalar commit edilmedi (rapor, 08-tam-1a-r1-probe.py, evidence 08t1a-r1-*, kanal). Worktree dizini Permission denied ile diskte kaldı (git'ten çıktı).
+
+### R-08T1-0004 · 2026-11-03 15:58 · → koordinator · ACK
+Paket: 08-tam-1a r2 (delta)   Cevap: K-08T1-0012
+REVIEW-ISTEK r2 alındı. SHA doğrulandı: 6d0d9ba0aa0efcf04eddf9409d36e42f16053f55 (fb7130d üstüne 9 commit, 26 dosya +1294/-101, state/ 0). Worktree .worktrees/review-08t1a-r2 (temiz). Delta statik inceleme + tam yığın r1 probe'larının yeniden koşusu başlıyor.
+- 2026-11-03 15:58 YIGIN-AC review-08t1a (r2; 18290/13290, COMPOSE_PROJECT_NAME=review08t1a, FFCORE_VERSION=0.0.0-review-08t1a, kod 6d0d9ba worktree, `--profile test --profile qdrant`: langfuse + mcp + ticket-desk dahil). Açık başka FF yığını yok. Boş disk 93G.
+
+### R-08T1-0005 · 2026-11-03 17:05 · → koordinator · REVIEW-SONUC
+Paket: 08-tam-1a r2 (delta)   Cevap: K-08T1-0012
+**DEGISIKLIK** (6d0d9ba0aa0efcf04eddf9409d36e42f16053f55). BLOCKER 0, MAJOR 3, MINOR 7, NOTE 8. Rapor state/reviews/08-tam-1a-r2.md (güvenlik turu ayrı bölüm).
+- Kapandı (yığında r1 probe'larıyla): MAJOR-1 (TTL sonrası yeni değer <<PII_2>>, eski cevap çözülmüyor; lookup TTL yeniliyor), MAJOR-4 (200 bin boşluk 0,055 s; 20.000 örnekte span farkı 0), MAJOR-5, MAJOR-6, MAJOR-7; MINOR 1/2/3/7/8/12.
+- MAJOR-r2-1 (MAJOR-3 kısmi, CONFIRMED uçtan uca): URL kuralı atlatılıyor: `]( //host`, `[1]: //host` referans tanımı, `](<… boşluklu>)`, `<img src=//>`; akışta 8.192 karakter öncesi başlayan URL. Facade düz yolda istemciye ham e-posta döndü. Öneri: fail-closed bağlam; 8.192 sınırının fail-closed olması koordinatör kararı.
+- MAJOR-r2-2 (MAJOR-2 kısmi, CONFIRMED): facade agent istemci geçmişinde istek anı egress denetimi reserve'den önce tokenize ediyor; bayat <<PII_1>> yeni isteğin e-postasına çözülüyor. Soru metni ve facade düz yol aynı mekanizma (kod).
+- MAJOR-r2-3 (PLAUSIBLE, mekanizma yığında): _history ham değere çeviriyor, yeniden tokenize egress'in yeniden bulmasına bağlı; telefon bağlamla 0,85, bağlamsız 0,75 → min_confidence 0,8 projede sağlayıcıya ham gider (KARARLAR "yeni kapsamda yeniden tokenize" ile farklı). Öneri: eski yer tutucu → yeni yer tutucu doğrudan eşleme.
+- MINOR: büyük numara reserve (9 hane akışta açılmıyor, >2^63 INCR hatası); detokenize_unavailable sonrası yeniden bağlanmada girdi kaybı/yineleme; facade düz akışta Redis hatası olaysız kesiyor; geçmiş okuması eski eşlemeleri canlı tutuyor; docs/agentlar.md kodla çelişiyor; PR notu bayat; test boşlukları.
+- Koşular: make test 1046/1046 ×2; tam yığın test-int llmaas 824 passed 5 skipped, airgap 822 passed 7 skipped; 06b-2 SSRF probe + 147 138/138 ×2; lint NOT_RUN (işçi kanıtı).
+- Dosyalar commit edilmedi: rapor, 08-tam-1a-r2-probe.py, 08-tam-1a-r2-int-probe.py, evidence 08t1a-r2-*, kanal. Worktree git'ten çıktı, dizin Permission denied ile diskte kaldı (--force kullanılmadı).
+- 2026-11-03 17:05 YIGIN-KAPA review-08t1a (r2): down -v; kalan konteyner 0, volume 0.

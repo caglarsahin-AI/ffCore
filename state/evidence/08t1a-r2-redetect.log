@@ -1,0 +1,4 @@
+'Telefon: 0532 123 45 67' [('TR_PHONE', 0.85)]
+'Kendisine 0532 123 45 67 üzerinden ulaşabilirsiniz.' [('TR_PHONE', 0.75)]
+'Kayıt ali@example.test' [('EMAIL_ADDRESS', 0.9)]
+'053212345675' []
