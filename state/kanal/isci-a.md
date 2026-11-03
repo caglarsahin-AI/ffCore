@@ -199,7 +199,7 @@ DUZELT r1 alındı (state/reviews/03b-r1.md okundu, üç MAJOR doğru). Uygulama
 
 ### A-03b-0011 · 2026-10-28 12:03 · → koordinator · PR-HAZIR
 Paket: 03b   Cevap: K-03b-0008
-r1 DUZELT uygulandı. Branch feat/03b-audit-egress @ 480c60e7318b891c6ad94a0db255f55ebe78a155 (de56c75 üstüne 2 commit, push yok). PR: C:i_paycorefcore\state\prb.md "Review r1 bulgu → düzeltme → kanıt".
+r1 DUZELT uygulandı. Branch feat/03b-audit-egress @ 480c60e7318b891c6ad94a0db255f55ebe78a155 (de56c75 üstüne 2 commit, push yok). PR: C:\ai_paycore\ffcore\state\pr\03b.md "Review r1 bulgu → düzeltme → kanıt".
 - MAJOR-1 (227930c): açık imza, politika seçenekleri TypeError (8 seçenek testli); bağlantı katmanı da OFFLINE/izin listesi uygular.
 - MAJOR-2 (227930c): cross-origin (şema/host/port, https→http dahil) yönlendirmede 5 adlı + `*-token/-key/-secret` başlıkları düşer, `redirect_cross_origin` log olayı (yalnız adlar); aynı origin korunur; ikinci gerçek sunucuyla port testi.
 - MAJOR-3 (480c60e): load_before → commit tek sınır; hata → rollback + detached error satırı; audit yazımı da düşerse AuditWriteError (notta yalnız hata türü).
@@ -1425,7 +1425,7 @@ Paket: 06b-2   Cevap: K-06b2-0004
 
 ### A-06b2-0010 · 2026-11-02 20:45 · → koordinator · PR-HAZIR
 Paket: 06b-2   Cevap: K-06b2-0001 / K-06b2-0005
-Branch feat/06b-2-external-agent @ **2342bc296a633a2304eaa109eda498c2f293a38f** (baz main 7733bbc, 6 commit, push yok; main ile `merge-tree` temiz, state/ yok). PR: C:i_paycorefcore\state\prb-2.md ("06b-2 PR" bölümü). Sınıf [B]; güvenlik turu zorunlu.
+Branch feat/06b-2-external-agent @ **2342bc296a633a2304eaa109eda498c2f293a38f** (baz main 7733bbc, 6 commit, push yok; main ile `merge-tree` temiz, state/ yok). PR: C:\ai_paycore\ffcore\state\pr\06b-2.md ("06b-2 PR" bölümü). Sınıf [B]; güvenlik turu zorunlu.
 Kapı (tam tee): gate1 lint 0, heads tek uç 06b_0001, make test 894/894 iki profil, test-samples 0, smoke; gate2 (f63f895) test-int **797 passed + 5 skipped iki profil**, smoke passed; gate2 lint B023 kırmızı → 2342bc2 (yalnız `here=here`), gate3 lint 0 + parite testi iki profil. K-06b2-0005 düzeltmeleri ayrı commit (7925395, f63f895); test_01_9 tek başına 7/7 ve gate2'de iki profil yeşil (sıra etkisi, PR'da).
 Sapmalar PR'da: yayınlama ayrı uç (`.../external/publish`; 06a OpenAPI'si değişmesin), manifest kodu `external_agent_not_available` korundu (yeni kod yok), entegrasyon testleri koddan sonra (dürüst not). Kayıt talepleri: FOLLOWUP check_http_destination (egress, 08), FOLLOWUP runs API dış agent açık kodu, KARARLAR DRIFT "run failed" → "kodlu hata".
 
@@ -1500,7 +1500,7 @@ GOREV alındı. Branch feat/08-tam-1-ner, worktree .worktrees/feat/08-tam-1-ner 
 
 ### A-08T1-0003 · 2026-11-03 09:12 · → koordinator · DURUM
 Paket: 08-tam-1   Cevap: K-08T1-0001
-DURUM: PLANNED talebi. Plan: C:i_paycorefcore\state\pr8-tam-1.md (bulunan semboller, C17 çıkış haritası kaynakta doğrulanmış, kabul → test 1-17, felsefe üçlüsü). Worktree .worktrees/feat/08-tam-1-ner @ ea0db36 açıldı; kod yok.
+DURUM: PLANNED talebi. Plan: C:\ai_paycore\ffcore\state\pr8-tam-1.md (bulunan semboller, C17 çıkış haritası kaynakta doğrulanmış, kabul → test 1-17, felsefe üçlüsü). Worktree .worktrees/feat/08-tam-1-ner @ ea0db36 açıldı; kod yok.
 Oturum notu (K-09-0002 emsali için): bu oturum kullanıcının 28 Ekim okuma oturumundan açtığı fork; 28 Ekim sonrası değişen kural belgelerini (KARARLAR, PLAN 2.10, CONTRACTS, BASLATMA, CLAUDE) git diff 8ba004c..HEAD ile yeniden okudum. Kullanıcı ROL/PAKET'i bu fork'a açıkça verdi.
 Onay istediğim 9 nokta (planda A/B/C, önerim hepsinde A): S1 Presidio eklenmez (transformers zaten bağımlılık); S2 NER modeli yalnız API'de, worker ve ingest `POST /internal/ner` ile (04a embed deseni); S3 `NER_MODEL`/`NER_REVISION` açık değer, `:?`; S4 ağırlık `model_cache` volume (brief "imaja gömülür" ↔ KARARLAR 04a: KARARLAR kazanır, DRIFT adayı); S5 lisans ve TabiBERT NER başlığı doğrulanmadı: kullanıcının `make models`'ı model kartlarını da indirir, offline okurum; S6 `tests/e2e/scenarios/seed.py` secrets geri alma bu PR'da (touch-zone genişletmesi); S7 **bölme: 08-tam-1a (C17+106+107+147, modelsiz, hemen) + 08-tam-1b (NER+PRSIM, ağırlıklar gelince)**; S8 geri çevrilmiş değer yalnız koşu sahibine/facade çağırana, diğer okuyucular yer tutucu görür; S9 TTL dolunca yer tutucu kalır + `detokenize_unresolved` logu, GET uçları tokenize kalır.
 Bulgu: GOREV "CONTRACTS C17" diyor, CONTRACTS'ta C17 yok (C1-C14); plan/08 kabul maddesi anlamında uyguluyorum (DRIFT adayı).
@@ -1544,7 +1544,7 @@ DURUM: VERIFIED talebi. HEAD fb7130d6fda59b2b62fbecf50e47b7ebd1a15bdf (baz ea0db
 
 ### A-08T1-0011 · 2026-11-03 12:33 · → koordinator · PR-HAZIR
 Paket: 08-tam-1a   Cevap: K-08T1-0002
-PR: C:i_paycorefcore\state\pr 8-tam-1a.md · Branch: feat/08-tam-1-ner · SHA: fb7130d6fda59b2b62fbecf50e47b7ebd1a15bdf · Sınıf: [B] · push yok. Güvenlik turu zorunlu (PR'da "Güvenlik turu için notlar"). 08-tam-1b (NER + PRSIM) ayrı PR; ağırlıklar ve oturum kararı 1a merge'ünde.
+PR: C:\ai_paycore\ffcore\state\pr\08-tam-1a.md · Branch: feat/08-tam-1-ner · SHA: fb7130d6fda59b2b62fbecf50e47b7ebd1a15bdf · Sınıf: [B] · push yok. Güvenlik turu zorunlu (PR'da "Güvenlik turu için notlar"). 08-tam-1b (NER + PRSIM) ayrı PR; ağırlıklar ve oturum kararı 1a merge'ünde.
 
 ### A-08T1-0012 · 2026-11-03 12:33 · → koordinator · DURUM
 Paket: 08-tam-1a   Cevap: A-08T1-0011
