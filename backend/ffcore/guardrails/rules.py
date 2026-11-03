@@ -41,7 +41,7 @@ _VENDOR = (
 _VENDOR_RE = [(cat, re.compile(pat), ev) for cat, pat, ev in _VENDOR]
 # "password: X", "şifre X", "parola=X": the value after the keyword.
 _ASSIGNMENT = re.compile(
-    r"(?i)\b(?:password|passwd|pwd|şifre(?:m|si|niz)?|parola(?:m|sı)?)\b\s*(?:[:=]|is)?\s*"
+    r"(?i)\b(?:password|passwd|pwd|şifre(?:m|si|niz)?|parola(?:m|sı)?)\b(?:\s*(?:[:=]|is))?\s*"
     r"(?P<value>[^\s,;]{6,})"
 )
 _TOKEN = re.compile(r"[A-Za-z0-9_\-+/=]{" + str(ENTROPY_MIN_CHARS) + ",}")
@@ -55,7 +55,11 @@ _CREDENTIAL_WORD = (
     r"|bearer|anahtar(?:ı|i)?"
 )
 _SHORT_TOKEN = re.compile(
-    r"(?i)\b(?P<word>" + _CREDENTIAL_WORD + r")\b[\"']?\s*(?:[:=]|\bis\b)?\s*[\"']?"
+    # One `\s*` inside the optional separator group, one after it: whitespace has a single way
+    # to match, so a word followed by many spaces is linear (r1 MAJOR-4: two `\s*` around an
+    # optional group backtracked quadratically, 20,000 spaces took 43 s).
+    r"(?i)\b(?P<word>" + _CREDENTIAL_WORD + r")\b" + "[\"']?" + r"(?:\s*(?:[:=]|\bis\b))?\s*"
+    "[\"']?"
     r"(?:(?:bearer|basic)\s+)?"
     r"(?P<value>[A-Za-z0-9_\-+/=]{"
     + str(SHORT_TOKEN_MIN_CHARS)
