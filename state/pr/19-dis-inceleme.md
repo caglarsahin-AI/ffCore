@@ -1,7 +1,7 @@
 # fix/19-dis-inceleme: M3 ingest öncesi düzeltmeler (FFCore 154-156 + paycoreLLM dış inceleme R1-R8)
 
 **Paket:** fix/19-dis-inceleme · **Sınıf:** [B] (iki depo, ayrı SHA) · **İşçi:** isci-b (ffcore-isci-b-19r)
-**PR-HAZIR SHA'ları:** ffcore `b7a6d539079021c1fdb3b0f630762a5118a000a1` (main b2e9c05 üstüne 3 commit) · paycoreLLM `81098f49555aaf2b4710af0e54f68d86e36e5f74` (master ca1b287 üstüne 9 commit)
+**PR-HAZIR SHA'ları (r2):** ffcore `aacdd96b32a57b5d79fa2e07bbeb65fae3a4e671` (main b2e9c05 üstüne 6 commit) · paycoreLLM `5663b7b8640710fe9d61ebca9715abe31aac635c` (master ca1b287 üstüne 12 commit). r1: ffcore b7a6d53, paycoreLLM 81098f4.
 **ffcore:** branch `fix/19-ingest-followups` · worktree `.worktrees/fix/19-ingest-followups` · baz main b2e9c05 (614c150+)
 **paycoreLLM:** branch `feat/19-dis-inceleme` · kardeş worktree `C:\ai_paycore\paycoreLLM-19r` · baz master ca1b287
 **GOREV:** K-19R-0001, K-19R-0002, K-19R-0003. Kaynaklar: `state/reviews/paycore-19-dis-inceleme.md` (R1-R8), `state/pr/18-kosu-2.md` "Bulgular" (B1-B3).
@@ -204,3 +204,39 @@ Kapanış: `down -v` (f19r ve pc19r), kalan konteyner 0, volume 0.
 - 154c koşusu `0.0.0-main` imajıyla yapıldı (kod değişikliği 155 bağlama ile koşu 3'te); dal için yeni imaj derlenmedi (bağımlılık değişmedi).
 - paycoreLLM 3 `bs4` hatası bu turda master'da yeniden doğrulanmadı.
 - İmaj çekme: içeriğe bakmak için `alpine:3.20` çekildi (işçi imaj izni kapsamında); silinmedi (temizlik kullanıcıda).
+
+
+## Review r1 bulgu → düzeltme → kanıt (K-19R-0012, K-19R-0013; state/reviews/19-dis-inceleme-r1.md)
+
+r2 SHA'ları: ffcore `aacdd96b32a57b5d79fa2e07bbeb65fae3a4e671` (b7a6d53 üstüne 3 commit) · paycoreLLM `5663b7b8640710fe9d61ebca9715abe31aac635c` (81098f4 üstüne 3 commit).
+
+| Bulgu | Düzeltme | Commit | Kanıt |
+|---|---|---|---|
+| MAJOR-1 (155): kayıt öncesi hata konsolda/manifestte yok, exit 0 | K-19R-0013 A: yer tutucu satır yok; `failed_unregistered` (kaynak, raw yolu, hata kodu; içerik yok) konsolda (`failed_unregistered N` + satır başına `unregistered: <kaynak> <yol> <kod>`) ve manifestte, manifest `failed` bunu sayar → CLI exit 1; sonraki koşu dosyayı `ingest_from_raw`'dan yeniden dener | ffcore aacdd96 | `test_19r_r1m1_error_before_registration_counted` (yığında; önce kırmızı), `test_19r_r1m1_cli_exits_1_on_unregistered_failure` (birim; önce kırmızı) |
+| MAJOR-2 (155): new_version kayıt öncesi hatası eski sürümü `failed` yapıp aramadan düşürüyor | `_mark_failed` yalnız bu koşunun baytlarını taşıyan satırı işaretler (`sha256` ile); kayıt geri alındıysa eski satıra dokunulmaz, dosya `failed_unregistered` | ffcore aacdd96 | `test_19r_r1m2_new_version_error_keeps_old_version_searchable` (yığında: eski sürüm `indexed`, `version 1`, `error_code` yok, arama sonucunda) |
+| MAJOR-3 (156): demo eşik satırı tam geçişe bağlı | `docs/demo.md` satırı "Source accuracy (expected document cited) (≥ 16/20 on cpu)" (plan/13:44, plan/18 F1 dili) | ffcore e6a1c67 | `test_19r_156_demo_threshold_is_source_accuracy` (önce kırmızı) |
+| MAJOR-4 (R1): Jira özetindeki `@login` kalıyor | özet (başlık `# KEY — özet`) ve meta `title` dar desenden geçer (`_heading`); yanlış yorum düzeltildi | paycoreLLM ebf50dd | `test_19r_r1_jira_summary_and_title_mentions_cleaned` (önce kırmızı) |
+| MINOR-1: yeniden denemede `--acl`/metadata uygulanmıyor | davranış değişmedi (eski ACL operatörün önceki tercihi, gevşeme yok); kısıt olarak not: yeniden denenen belge DB'deki ACL ve metadata ile indexlenir; ACL/metadata değiştirmek için dosyanın baytı değişmeli ya da belge silinip yeniden alınmalı | — | — |
+| MINOR-2: ffcore testi migrate/tools genişlemesini görmüyor | `test_19r_154_other_services_not_widened`: `x-app-env` bloğu, `migrate`, `tools` `backend` taşımaz (regresyon koruması: bugünkü durum doğru, önce-kırmızı yok) | ffcore cfdd3c1 | test yeşil |
+| MINOR-3: backend kendini iç host sayınca araç/sağlayıcı/webhook hedefi olabilir | Karar A, **ayrı dal FOLLOWUP-159** (05a/01/03c touch-zone; admin-only, `SafeOutboundClient` servis token'ı eklemiyor; M3'ü bekletmez). Bu PR'ın kısıtı | — | — |
+| MINOR-4: noktalı adda kısmi maske (`[USER].get(`, `[USER].Yilmaz`) | lookahead noktadan sonra da `(`, `/`, `@` ya da ad karakterini görür; `@app.get(...)`, `@pytest.mark...(`, `@ahmet.Yilmaz` bütün kalır, `@ahmet.yilmaz@firma.com` bölünmez | paycoreLLM ebf50dd | `test_19r_r1_review_technical_text_kept[*]`, `test_19r_r1_review_mentions[*]`, `test_19r_r1_dotted_login_before_email_not_split` (önce kırmızı) |
+| MINOR-5: `AT_TECHNICAL` eksik | `author, since, version, code, type, example, keyframes, font-face` eklendi (`{@code}` dahil); runbook listesi güncel | paycoreLLM ebf50dd | aynı testler |
+| MINOR-6: Jira `{code}`/`{noformat}` fence sayılmıyor | `FENCE` bu blokları da tanır (ingest/turkish.py ile aynı bloklar) | paycoreLLM ebf50dd | `test_19r_r3_jira_code_block_is_a_fence` (önce kırmızı) |
+| MINOR-7: iki farklı bütçe tanımı | eski kabul-3 testi de `ONE_SHOT` dışlar; iki testin toplamı eşit tutulur | paycoreLLM 5663b7b | `test_19r_mem_budget_tests_agree` |
+| NOTE-2: yedek etiket, yüzdeler | yedek satır yeni etiketle; `contains` ve tam geçiş satırları yüzde taşır | ffcore e6a1c67 | `test_19r_156_no_document_question_line`, `test_19r_156_contains_separate_line` (önce kırmızı) |
+| NOTE-4: meta `title` maskesiz | MAJOR-4 ile aynı yardımcı | paycoreLLM ebf50dd | MAJOR-4 testi |
+| NOTE-5: `|`, `*`, `_` önündeki login | lookbehind kümesine eklendi; büyük harfli `@Ahmet` bilinen sınır (runbook) | paycoreLLM ebf50dd | `test_19r_r1_review_mentions[*]` |
+| NOTE-6: `x-api-key`, `proxy-authorization` | ad listesine eklendi | paycoreLLM 5aed66f | `test_19r_r2_listed_names_masked[x-api-key / Proxy-Authorization]` (önce kırmızı) |
+| NOTE-7: "`free -g`" etiketi yanıltıcı | bellek.md satırı "kullanıcı kararı K-19R-0005; `free -g` teyidi kullanıcıda" | paycoreLLM 5663b7b | — |
+| NOTE-1, NOTE-3 | bilgi; değişiklik yok | — | — |
+| NOTE-8: lock `requires-dist` pyproject'ten ayrışıyor | FOLLOWUP-158 kapsamına eklenmesi için koordinatöre iletildi | — | — |
+
+**r2 komutları:**
+
+| Komut | Ortam | Exit | Sonuç |
+|---|---|---|---|
+| ffcore `make lint` | llmaas / airgap | 0 / 0 | |
+| ffcore `make test` | llmaas / airgap | 0 / 0 | 952 / 952 |
+| ffcore `make test-int` (f19r yığını, `--profile test --profile qdrant`) | llmaas / airgap | 0 / 0 | 809 geçti, 5 atlandı (llmaas 16 dk 53 s) / 809 geçti, 5 atlandı (airgap 17 dk 57 s) |
+| ffcore `pytest tests/integration/test_19_ingest_raw.py` (yığında) | | 0 | 21 geçti, 1 atlandı (`:156` root dosya modu); MAJOR-1/2 testleri eski `raw_ingest.py` ile kırmızı (`KeyError: 'failed_unregistered'`) |
+| paycoreLLM lint + `make test` @ 5663b7b | | 0 / 1 | lint 0; 600 geçti, 3 kaldı (aynı `bs4` bazı, inceleyici master'da doğruladı), 2 atlandı |

@@ -1558,3 +1558,7 @@ Ağırlık indirmesi kullanıcıya bağlı ve 1b'nin kritik yolu. Öneri:
 - B: 1a merge'ünü bekle, 1b yeni oturumda baştan. Bedel: indirme ve ölçüm 1a review'u kadar gecikir.
 - C: indirme komutunu ben yazmadan kullanıcı `huggingface-cli download` ile elle indirsin. Bedel: models.txt/`make models` deseninin dışında, offline manifest elle tutulur (ARCH-10'a ters).
 Lisans ve id2label model kartından offline okunur (S5); kapalı lisans çıkarsa dururum.
+
+### A-08T1-0014 · 2026-11-03 12:36 · → koordinator · ACK
+Paket: 08-tam-1a   Cevap: K-08T1-0008
+Karar B alındı: bu oturumda 1b yok, başka dal açılmıyor. feat/08-tam-1-ner @ fb7130d donuk. DUZELT gelirse uygulayıp yeni tam SHA ile PR-HAZIR; ONAY ve merge sonrası HANDOFF (1b notları: NER aday listesi, S1-S5 kararları, worker/ingest için /internal/ner deseni) + lease RETIRED.

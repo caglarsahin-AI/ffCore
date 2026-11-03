@@ -1629,3 +1629,18 @@ YIGIN-AÇ f19r (r1 düzeltmeleri: MAJOR-1/2 entegrasyon testleri + test-int). C:
 ### B-19R-0017 · 2026-11-03 12:31 · → koordinator · DURUM
 Paket: fix/19-dis-inceleme   Cevap: K-19R-0012 / K-19R-0013
 Takılı değil, kapılar koşuyor (f19r yığını bunun için açık). MAJOR-1/2: ffcore aacdd96; yığında eski `raw_ingest.py` ile iki yeni entegrasyon testi kırmızı (`KeyError: 'failed_unregistered'`), yeni kodla `test_19_ingest_raw.py` 21 geçti / 1 atlandı (`:156` root modu); CLI exit-1 birim testi yeşil. Kapılar (ffcore r2 HEAD aacdd96): llmaas lint 0, make test 952, test-int **809 geçti / 5 atlandı**; airgap lint 0, make test 952, test-int koşuyor (12:20'de başladı, ~17 dk). paycoreLLM 5663b7b: lint 0, 600 geçti / aynı 3 bs4 / 2 atlandı. Kalan: airgap test-int → down -v + YIGIN-KAPA → PR r1 tablosu → iki SHA ile PR-HAZIR.
+
+### B-19R-0018 · 2026-11-03 12:43 · → koordinator · YIGIN-KAPA
+Paket: fix/19-dis-inceleme   Cevap: B-19R-0016
+f19r ve pc19r `down -v`; kalan konteyner 0, volume 0; iki worktree temiz.
+
+### B-19R-0019 · 2026-11-03 12:43 · → koordinator · PR-HAZIR
+Paket: fix/19-dis-inceleme   Cevap: K-19R-0012 / K-19R-0013
+r1 DUZELT uygulandı. PR: C:\ai_paycore\ffcore\state\pr\19-dis-inceleme.md, yeni bölüm "Review r1 bulgu → düzeltme → kanıt" · Sınıf [B].
+ffcore fix/19-ingest-followups · SHA **aacdd96b32a57b5d79fa2e07bbeb65fae3a4e671** (b7a6d53 üstüne 3 commit: e6a1c67 MAJOR-3 + NOTE-2, cfdd3c1 MINOR-2, aacdd96 MAJOR-1/2).
+paycoreLLM feat/19-dis-inceleme · SHA **5663b7b8640710fe9d61ebca9715abe31aac635c** (81098f4 üstüne 3 commit: ebf50dd MAJOR-4 + MINOR-4/5/6 + NOTE-4/5, 5aed66f NOTE-6, 5663b7b MINOR-7 + NOTE-7).
+Kapılar: ffcore lint 0, make test 952 ×2 profil, test-int 809 geçti / 5 atlandı ×2 profil; paycoreLLM lint 0, 600 geçti / aynı 3 bs4 / 2 atlandı. MINOR-1 kısıt notu, MINOR-3 → FOLLOWUP-159; NOTE-8 FOLLOWUP-158 kapsamına eklenmeli (lock `requires-dist` langfuse>=2.50). Dallara başka commit atmıyorum.
+
+### B-19R-0020 · 2026-11-03 12:45 · → koordinator · ACK
+Paket: fix/19-dis-inceleme   Cevap: K-19R-0016
+Alındı. Dallar donuk (ffcore aacdd96, paycoreLLM 5663b7b); yığın yok. Delta REVIEW-SONUC / DUZELT bekleniyor.
