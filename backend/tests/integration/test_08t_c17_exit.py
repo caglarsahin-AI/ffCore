@@ -16,10 +16,11 @@ import redis.asyncio as aioredis
 from ffcore.api.runs import (
     _replay_rows,
     detokenizer,
+    exit_hook,
+    exit_mode,
     is_run_owner,
     live_transform,
     policy_allows_reveal,
-    reveals_values,
 )
 from ffcore.core import db
 from ffcore.guardrails.masking import RedisTokenStore
@@ -84,8 +85,8 @@ def test_08t_7_console_owner_gets_values_others_placeholders(database_url, pg, m
     project_id, run_id, owner = _seed(pg, make_project)
 
     async def body(session, client, run):
-        assert await reveals_values(session, run, owner)
-        assert not await reveals_values(session, run, str(uuid.uuid4()))  # another reader
+        assert await exit_mode(session, run, owner) == "reveal"
+        assert await exit_mode(session, run, str(uuid.uuid4())) == "keep"  # another reader
         assert not is_run_owner(run, None)
         reveal = detokenizer(client, run_id)
         live = await live_transform(reveal)("token", {"text": STORED})
@@ -103,14 +104,20 @@ def test_08t_7_console_owner_gets_values_others_placeholders(database_url, pg, m
     assert stored[0]["text"] == STORED  # Postgres keeps the placeholders
 
 
-def test_08t_9_enforced_output_pii_keeps_placeholders(database_url, pg, make_project):
+def test_08t_9_enforced_output_pii_keeps_placeholders(database_url, pg, make_project, caplog):
     project_id, run_id, owner = _seed(pg, make_project, policy_key="out-pii")
     _enforce_output_pii(pg, project_id, "out-pii")
 
     async def body(session, client, run):
-        return await policy_allows_reveal(session, run), await reveals_values(session, run, owner)
+        mode = await exit_mode(session, run, owner)
+        hook = exit_hook(client, run_id, mode)
+        return mode, await policy_allows_reveal(session, run), await hook({"text": STORED})
 
-    assert _with(database_url, run_id, body) == (False, False)
+    with caplog.at_level(logging.INFO, logger="ffcore.guardrails.masking"):
+        mode, allowed, data = _with(database_url, run_id, body)
+    assert (mode, allowed, data) == ("policy", False, {"text": STORED})
+    assert f"detokenize_skipped_policy scope={run_id} count=1" in caplog.text
+    assert NAME not in caplog.text
 
 
 def test_08t_9_other_scope_placeholder_stays_and_is_logged(database_url, pg, make_project, caplog):

@@ -88,7 +88,8 @@ the console (live stream and replay) and the caller of a facade request see the 
 other reader (another analyst, an admin, an approver) sees the placeholders, as stored. The
 stored answer, `messages`, `run_events` and the history sent to the model keep the
 placeholders. When the run's guardrail policy enforces a `pii` rule on the output, the
-placeholders stay for everyone (the output was checked with them in it). A placeholder whose
+placeholders stay for everyone (the output was checked with them in it; logged as
+`detokenize_skipped_policy` with a count). A placeholder whose
 mapping is gone (`PII_TOKEN_TTL_S`, default 1800 s, e.g. a run that waited long for an
 approval) or that the run never issued stays as it is and is logged with its count
 (`detokenize_unresolved`, no value). Stored views (`GET /runs/{id}`, `GET /runs/{id}/events`,

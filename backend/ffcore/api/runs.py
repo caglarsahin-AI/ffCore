@@ -40,7 +40,13 @@ from ffcore.core.auth import Actor, RoleRequirement, authorize, require_role
 from ffcore.core.config import Settings, get_settings
 from ffcore.core.errors import ApiError
 from ffcore.guardrails.engine import masks_pii_at
-from ffcore.guardrails.masking import RedisTokenStore, detokenize_json, log_unresolved
+from ffcore.guardrails.masking import (
+    RedisTokenStore,
+    count_placeholders,
+    detokenize_json,
+    log_skipped_policy,
+    log_unresolved,
+)
 from ffcore.guardrails.service import resolve_policy
 from ffcore.guardrails.settings import get_guardrail_settings
 from ffcore.models.agents import Agent, AgentVersion
@@ -238,8 +244,30 @@ async def policy_allows_reveal(session, run: Run) -> bool:
     return not masks_pii_at(policy, ("output.pre", "output.stream.delta"))
 
 
-async def reveals_values(session, run: Run, actor_id: str | None) -> bool:
-    return is_run_owner(run, actor_id) and await policy_allows_reveal(session, run)
+async def exit_mode(session, run: Run, actor_id: str | None) -> str:
+    """`reveal` (owner, policy allows), `policy` (owner, kept by the output pii rule: logged,
+    K-08T1-0004) or `keep` (any other reader: placeholders as stored)."""
+    if not is_run_owner(run, actor_id):
+        return "keep"
+    return "reveal" if await policy_allows_reveal(session, run) else "policy"
+
+
+def skip_counter(run_id: UUID) -> Callable[[dict], Awaitable[dict]]:
+    """The exit hook of an owner whose placeholders the policy keeps: data unchanged, the
+    placeholders counted in `detokenize_skipped_policy`."""
+    scope = str(run_id)
+
+    async def count(data: dict) -> dict:
+        log_skipped_policy(scope, count_placeholders(data))
+        return data
+
+    return count
+
+
+def exit_hook(redis, run_id: UUID, mode: str) -> Callable[[dict], Awaitable[dict]] | None:
+    if mode == "reveal":
+        return detokenizer(redis, run_id)
+    return skip_counter(run_id) if mode == "policy" else None
 
 
 def detokenizer(redis, run_id: UUID) -> Callable[[dict], Awaitable[dict]]:
@@ -323,11 +351,11 @@ def _finished(run_id: UUID):
 
 
 def _stream(
-    settings: Settings, project_id: UUID, run_id: UUID, after: str | None, *, reveal: bool
+    settings: Settings, project_id: UUID, run_id: UUID, after: str | None, *, mode: str
 ) -> EventStreamResponse:
     async def body() -> AsyncIterator[str]:
         client = run_events.redis_client(settings)
-        reveal_data = detokenizer(client, run_id) if reveal else None
+        reveal_data = exit_hook(client, run_id, mode)
         try:
             async for chunk in run_events.follow(
                 client,
@@ -501,7 +529,7 @@ async def create_run(
         project_id,
         run.id,
         None,
-        reveal=await reveals_values(session, run, actor.actor_id),
+        mode=await exit_mode(session, run, actor.actor_id),
     )
 
 
@@ -660,7 +688,7 @@ async def stream_run(
         project_id,
         run_id,
         last_event_id,
-        reveal=await reveals_values(session, run, actor.actor_id),
+        mode=await exit_mode(session, run, actor.actor_id),
     )
 
 
@@ -706,7 +734,7 @@ async def resume_run(
         project_id,
         run.id,
         after,
-        reveal=await reveals_values(session, run, actor.actor_id),
+        mode=await exit_mode(session, run, actor.actor_id),
     )
 
 

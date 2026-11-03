@@ -251,3 +251,21 @@ def log_unresolved(scope: str, count: int) -> None:
     scope and the count, never the value."""
     if count:
         log.warning("detokenize_unresolved scope=%s count=%d", scope, count)
+
+
+def count_placeholders(data: Any) -> int:
+    """How many placeholders the strings of `data` carry (no lookup, no value)."""
+    if isinstance(data, str):
+        return len(PLACEHOLDER.findall(data)) if "<<PII_" in data else 0
+    if isinstance(data, list):
+        return sum(count_placeholders(v) for v in data)
+    if isinstance(data, dict):
+        return sum(count_placeholders(v) for v in data.values())
+    return 0
+
+
+def log_skipped_policy(scope: str, count: int) -> None:
+    """K-08T1-0004: placeholders kept at the exit because the policy enforces a `pii` rule on
+    the output; logged with the scope and the count, never a value."""
+    if count:
+        log.info("detokenize_skipped_policy scope=%s count=%d", scope, count)

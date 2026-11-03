@@ -146,3 +146,10 @@ def test_08t_7_detokenize_json_walks_every_string():
 def test_08t_7_detokenize_json_without_placeholders_is_identity(value):
     store = MemoryTokenStore()
     assert run(detokenize_json(value, store=store, scope="s")) == (value, 0)
+
+
+def test_08t_9_count_placeholders_without_lookup():
+    from ffcore.guardrails.masking import count_placeholders
+
+    data = {"text": "<<PII_1>> ve <<PII_2>>", "args": ["<<PII_3>>", 4], "n": "<<PII_"}
+    assert count_placeholders(data) == 3

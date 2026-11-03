@@ -32,7 +32,7 @@ from ffcore.api.facade_schemas import (
 from ffcore.core import db, tracing
 from ffcore.core.config import Settings
 from ffcore.core.errors import ApiError, error_body
-from ffcore.guardrails.masking import log_unresolved
+from ffcore.guardrails.masking import count_placeholders, log_skipped_policy, log_unresolved
 from ffcore.knowledge.chunking import approx_tokens
 from ffcore.services.facade_guard import FacadeGuard, client_messages, guard_messages
 from ffcore.services.facade_identity import FacadeCaller
@@ -352,6 +352,7 @@ class _LiveReveal:
         # ("content", choice index) or ("arguments", choice index, tool call index)
         self._open: dict[tuple, Any] = {}
         self.unresolved = 0
+        self.skipped = 0
 
     def _reveal(self, key: tuple):
         if key not in self._open:
@@ -360,6 +361,7 @@ class _LiveReveal:
 
     async def choice(self, choice: dict) -> dict:
         if not self._guard.reveals:
+            self.skipped += count_placeholders(choice.get("delta") or {})
             return choice
         index = choice.get("index", 0)
         delta = dict(choice.get("delta") or {})
@@ -450,6 +452,7 @@ async def _relay(stream, stack, gate, guard, model, public_name) -> AsyncIterato
         if live and (rest := await revealer.rest()):
             yield chunk_json(_chunk(cid, created, public_name, rest))
         log_unresolved(guard.scope, revealer.unresolved)
+        log_skipped_policy(guard.scope, revealer.skipped)
         text = "".join(held.content)
         checked_text = await guard.text("output.pre", text) if text else text
         calls = [held.calls[i] for i in sorted(held.calls)]

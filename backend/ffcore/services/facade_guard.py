@@ -15,7 +15,9 @@ from ffcore.guardrails import engine
 from ffcore.guardrails.masking import (
     RedisTokenStore,
     StreamDetokenizer,
+    count_placeholders,
     detokenize,
+    log_skipped_policy,
     log_unresolved,
 )
 from ffcore.guardrails.service import record_events, resolve_policy
@@ -123,7 +125,10 @@ class FacadeGuard:
         """C17: the request's placeholders back to their values, at the exit to the caller who
         made the request (S8). A placeholder the scope never issued stays as it is and is logged
         with its count (S9); nothing is invented."""
-        if not text or "<<PII_" not in text or not self.reveals:
+        if not text or "<<PII_" not in text:
+            return text
+        if not self.reveals:
+            log_skipped_policy(self.scope, count_placeholders(text))
             return text
         out, unresolved = await detokenize(text, store=self._token_store(), scope=self.scope)
         log_unresolved(self.scope, len(unresolved))

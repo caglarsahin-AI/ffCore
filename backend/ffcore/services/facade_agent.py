@@ -44,7 +44,7 @@ from ffcore.api.runs import (
     _finished,
     _queued_event,
     _replay_rows,
-    detokenizer,
+    exit_hook,
     live_transform,
     policy_allows_reveal,
 )
@@ -430,7 +430,7 @@ async def _events(settings: Settings, run: Run, after: str | None):
     client = run_events.redis_client(settings)
     async with db.session_scope() as session:
         allowed = await policy_allows_reveal(session, run)
-    reveal = detokenizer(client, run.id) if allowed else None
+    reveal = exit_hook(client, run.id, "reveal" if allowed else "policy")
     try:
         async for text in run_events.follow(
             client,
