@@ -138,7 +138,7 @@ class CooperativeRedis:
     async def expire(self, name, ttl):
         await self._tick()
 
-    async def eval(self, script, numkeys, name, counter, key, value, ttl, counter_ttl):
+    async def eval(self, script, numkeys, name, counter, key, value, ttl, counter_ttl, top):
         # The store's get-or-create script: mapping hash + its own counter key (r1 MAJOR-1).
         await self._tick()
         h = self.data.setdefault(name, {})

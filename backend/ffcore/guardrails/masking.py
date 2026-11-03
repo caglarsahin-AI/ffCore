@@ -13,10 +13,16 @@ import re
 from collections.abc import Sequence
 from typing import Any, Protocol
 
+from redis.exceptions import ResponseError
+
+from ffcore.core.errors import ApiError
 from ffcore.guardrails.findings import Finding
 
 KEEP_VISIBLE = 4
-PLACEHOLDER = re.compile(r"<<PII_\d+>>")
+# A scope issues at most 8 digits (r3 MINOR-r3-2, KARARLAR ek (f)): a longer `<<PII_n>>` is no
+# placeholder, never reversed in any scope.
+PLACEHOLDER = re.compile(r"<<PII_\d{1,8}>>")
+PLACEHOLDER_MAX_NUMBER = 99_999_999
 # plan/08 C17: the longest placeholder is 16 characters (`<<PII_` + up to 8 digits + `>>`); a
 # stream holds at most 15 while one may still be open. A longer run passes as it is.
 PLACEHOLDER_MAX_CHARS = 16
@@ -28,6 +34,19 @@ log = logging.getLogger(__name__)
 class RevealUnavailable(RuntimeError):
     """The token store could not be read at the exit (C17, r1 MINOR-11): the reader's stream ends
     with an error event instead of breaking without one or showing placeholders silently."""
+
+
+class PlaceholderOutOfRange(ApiError):
+    """A scope would issue a 9-digit placeholder (r3 MINOR-r3-2, KARARLAR ek (f)): fail loudly
+    instead of a number a stream cannot align and an older text may already carry."""
+
+    def __init__(self) -> None:
+        super().__init__(
+            400,
+            "invalid_request_error",
+            "placeholder_out_of_range",
+            "A placeholder number in the text is out of range (at most 99999998 can be carried).",
+        )
 
 
 class TokenScopeMissing(ValueError):
@@ -67,6 +86,8 @@ class MemoryTokenStore:
     async def token_for(self, scope: str, key: str, value: str) -> str:
         mapping = self._scopes.setdefault(scope, {})
         if "k:" + key not in mapping:
+            if self._counters.get(scope, 0) >= PLACEHOLDER_MAX_NUMBER:
+                raise PlaceholderOutOfRange()
             self._counters[scope] = self._counters.get(scope, 0) + 1
             token = f"<<PII_{self._counters[scope]}>>"
             mapping["k:" + key] = token
@@ -99,6 +120,9 @@ if not token then
   if redis.call('EXISTS', KEYS[2]) == 0 then
     local seed = redis.call('HGET', KEYS[1], 'n')
     if seed then redis.call('SET', KEYS[2], seed) end
+  end
+  if tonumber(redis.call('GET', KEYS[2]) or '0') >= tonumber(ARGV[5]) then
+    return redis.error_reply('placeholder_out_of_range')
   end
   token = '<<PII_' .. redis.call('INCR', KEYS[2]) .. '>>'
   redis.call('HSET', KEYS[1], 'k:' .. ARGV[1], token, 't:' .. token, ARGV[2],
@@ -141,9 +165,22 @@ class RedisTokenStore:
 
     async def token_for(self, scope: str, key: str, value: str) -> str:
         mapping, counter = self._keys(scope)
-        token = await self._redis.eval(
-            _TOKEN_FOR, 2, mapping, counter, key, value, self._ttl, COUNTER_TTL_S
-        )
+        try:
+            token = await self._redis.eval(
+                _TOKEN_FOR,
+                2,
+                mapping,
+                counter,
+                key,
+                value,
+                self._ttl,
+                COUNTER_TTL_S,
+                PLACEHOLDER_MAX_NUMBER,
+            )
+        except ResponseError as exc:
+            if "placeholder_out_of_range" in str(exc):
+                raise PlaceholderOutOfRange() from None
+            raise
         return token.decode() if isinstance(token, bytes) else token
 
     async def lookup(self, scope: str, token: str) -> str | None:
@@ -603,14 +640,9 @@ def log_unresolved(scope: str, count: int) -> None:
 
 
 def placeholder_numbers(text: str) -> list[int]:
-    """The numbers of the placeholders in `text` (`<<PII_7>>` → 7), only those a scope can issue
-    (at most 8 digits, r2 MINOR-r2-1): a `<<PII_99999999999>>` someone wrote is not one, and
-    reserving it would push the counter past what a stream aligns or Redis counts."""
-    return [
-        int(m.group(0)[6:-2])
-        for m in PLACEHOLDER.finditer(text)
-        if len(m.group(0)) <= PLACEHOLDER_MAX_CHARS
-    ]
+    """The numbers of the placeholders in `text` (`<<PII_7>>` → 7); a 9+ digit `<<PII_n>>` is
+    not one (r2 MINOR-r2-1)."""
+    return [int(m.group(0)[6:-2]) for m in PLACEHOLDER.finditer(text)]
 
 
 async def reserve_carried(store: TokenStore, scope: str, data: Any) -> None:
@@ -621,6 +653,9 @@ async def reserve_carried(store: TokenStore, scope: str, data: Any) -> None:
     text = data if isinstance(data, str) else json.dumps(data, ensure_ascii=False)
     numbers = placeholder_numbers(text) if "<<PII_" in text else []
     if numbers:
+        if max(numbers) >= PLACEHOLDER_MAX_NUMBER:
+            # the next number would have 9 digits (r3 MINOR-r3-2, KARARLAR ek (f))
+            raise PlaceholderOutOfRange()
         await store.reserve(scope, max(numbers))
 
 
