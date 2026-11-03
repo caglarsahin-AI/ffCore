@@ -16,6 +16,7 @@ from pathlib import Path
 import pytest
 
 from ffcore.knowledge import ingest, ingest_mask, raw_ingest
+from ffcore.knowledge.convert.types import failed
 from tests.converters import convert_without_weights
 from tests.integration.test_04a_api import create_kb, queue, search, settings, world
 
@@ -53,8 +54,8 @@ def _ingest(settings, project_key, kb_key, tree, **kw):
             sources=kw.pop("sources", SOURCES),
             limit=kw.pop("limit", None),
             settings=settings,
-            embed_client=ingest.LocalEmbedClient(settings),
-            convert=convert_without_weights,
+            embed_client=kw.pop("embed_client", None) or ingest.LocalEmbedClient(settings),
+            convert=kw.pop("convert", convert_without_weights),
         )
     )
 
@@ -348,3 +349,99 @@ def test_19_r1_invalid_encoding_refused_and_counted(world, pg, settings, tmp_pat
     report = _ingest_prsim(settings, pg, world, kb["key"], tree, accept=True)
     assert report.rejected == {"invalid_encoding": 1}
     assert report.outcomes == {"created": 1}
+
+
+# --- FOLLOWUP-155 (T-18k2-0005 B2): only an indexed document is `unchanged`; failed, gated and
+# other unfinished documents are retried on the next run without a new version; an exception
+# leaves the row `failed` with its code; the console status line is the database's. ---
+
+FAILING = "confluence/DEMO/1002.md"
+
+
+def _fail_one(path, filename, settings):
+    if filename == FAILING:
+        return failed("test", "docling_failed", "conversion failed in the test")
+    return convert_without_weights(path, filename, settings)
+
+
+class _RaisingEmbed:
+    model = "never"
+
+    async def embed(self, texts):
+        raise RuntimeError("embedding service unreachable in the test")
+
+
+def _rows(pg, kb_id):
+    return {
+        r[0]: (r[1], r[2], r[3])
+        for r in pg.execute(
+            "SELECT filename, status, version, metadata FROM documents WHERE kb_id = %s",
+            (kb_id,),
+        ).fetchall()
+    }
+
+
+def test_19r_155_rerun_retries_failed(world, pg, settings, ro_tree):
+    kb = create_kb(world, key="paycore-retry")
+    key = _project_key(pg, world["project"])
+    first = _ingest(settings, key, kb["key"], ro_tree, convert=_fail_one)
+    assert first.statuses == {"indexed": 3, "failed": 1, "skipped": 1}, first.lines()
+    assert _rows(pg, kb["id"])[FAILING][0] == "failed"
+
+    second = _ingest(settings, key, kb["key"], ro_tree)  # the cause is gone (e.g. make models)
+    assert second.outcomes == {"unchanged": 4, "retried": 1}, second.lines()
+    assert second.statuses == {"indexed": 1}, second.lines()
+    rows = _rows(pg, kb["id"])
+    assert rows[FAILING][0] == "indexed"
+    assert {version for _, version, _ in rows.values()} == {1}  # a retry is not a new version
+
+
+def test_19r_155_rerun_retries_gated_keeps_indexed(world, pg, settings, ro_tree):
+    kb = create_kb(world, key="paycore-gated")
+    key = _project_key(pg, world["project"])
+    _ingest(settings, key, kb["key"], ro_tree)
+    # A run that stopped between steps leaves the row in an intermediate status.
+    pg.execute(
+        "UPDATE documents SET status = 'gated' WHERE kb_id = %s AND filename = %s",
+        (kb["id"], FAILING),
+    )
+    again = _ingest(settings, key, kb["key"], ro_tree)
+    assert again.outcomes == {"unchanged": 4, "retried": 1}, again.lines()
+    rows = _rows(pg, kb["id"])
+    assert rows[FAILING][0] == "indexed"
+    # indexed and skipped (a gate decision on the same bytes) are not retried
+    assert sorted(status for status, _, _ in rows.values()) == ["indexed"] * 4 + ["skipped"]
+
+
+def test_19r_155_exception_marks_failed(world, pg, settings, ro_tree):
+    kb = create_kb(world, key="paycore-raise")
+    key = _project_key(pg, world["project"])
+    report = _ingest(settings, key, kb["key"], ro_tree, embed_client=_RaisingEmbed())
+    rows = _rows(pg, kb["id"])
+    stuck = {name: row for name, row in rows.items() if row[0] != "skipped"}
+    assert stuck and all(status == "failed" for status, _, _ in stuck.values()), rows
+    for _, _, meta in stuck.values():
+        assert meta["error_code"] == "RuntimeError"  # the class name, never the message
+        assert "unreachable" not in json.dumps(meta)
+    assert report.manifest()["failed"] == len(stuck)
+    assert report.statuses["failed"] == len(stuck)
+    # the retry that succeeds leaves no stale code behind
+    again = _ingest(settings, key, kb["key"], ro_tree)
+    assert again.outcomes["retried"] == len(stuck), again.lines()
+    for name in stuck:
+        status, _, meta = _rows(pg, kb["id"])[name]
+        assert status == "indexed" and "error_code" not in meta
+
+
+def test_19r_155_console_statuses_match_manifest(world, pg, settings, ro_tree):
+    kb = create_kb(world, key="paycore-console")
+    key = _project_key(pg, world["project"])
+    _ingest(settings, key, kb["key"], ro_tree, convert=_fail_one)
+    # Same bytes, same failure: the second run retries and says so; the status line is the
+    # database's (the manifest's), not this run's counter.
+    report = _ingest(settings, key, kb["key"], ro_tree, convert=_fail_one)
+    manifest = report.manifest()
+    assert manifest["statuses"] == {"failed": 1, "indexed": 3, "skipped": 1}
+    lines = report.lines()
+    assert "status: failed 1, indexed 3, skipped 1" in lines, lines
+    assert "retried 1" in lines and "unchanged 4" in lines, lines
