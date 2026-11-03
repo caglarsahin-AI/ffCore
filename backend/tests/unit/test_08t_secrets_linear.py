@@ -25,25 +25,32 @@ OLD_ASSIGNMENT = re.compile(
 
 
 def _finishes_within(seconds, text_expr):
-    """`find_secrets` on the text in a child process, killed after `seconds`: `re` holds the GIL,
-    so a thread with a timeout could not stop a backtracking match."""
-    code = f"from ffcore.guardrails import rules; rules.find_secrets({text_expr})"
+    """`find_secrets` on the text in a child process: the child times the call itself (r3 NOTE-1:
+    process start and imports stay out of the budget, so a loaded machine does not fail it), and
+    a hard limit kills it if it backtracks (`re` holds the GIL, a thread could not stop it)."""
+    code = (
+        "import time; from ffcore.guardrails import rules; "
+        f"t = {text_expr}; s = time.perf_counter(); rules.find_secrets(t); "
+        "print(time.perf_counter() - s)"
+    )
     try:
-        subprocess.run([sys.executable, "-c", code], check=True, timeout=seconds)
+        done = subprocess.run(
+            [sys.executable, "-c", code], check=True, timeout=120, capture_output=True, text=True
+        )
     except subprocess.TimeoutExpired:
         return False
-    return True
+    return float(done.stdout.strip()) < seconds
 
 
 @pytest.mark.parametrize("word", ["token", "password", "API_KEY", "secret", "şifre"])
 def test_08t_m4_many_spaces_after_a_credential_word_is_linear(word):
-    # 200,000 spaces; the quadratic form needed 43 s for 20,000. Process start is in the budget.
-    assert _finishes_within(10, f"{word!r} + ' ' * 200_000 + '!'"), word
+    # 200,000 spaces; the quadratic form needed 43 s for 20,000 (measured here: about 0.03 s).
+    assert _finishes_within(2, f"{word!r} + ' ' * 200_000 + '!'"), word
 
 
 def test_08t_m4_repeated_words_under_the_text_limit_is_linear():
     # 180,000 characters (MAX_TEXT_CHARS 200,000); the quadratic form needed 58.8 s.
-    assert _finishes_within(10, "('token' + ' ' * 3000 + 'x ') * 60")
+    assert _finishes_within(2, "('token' + ' ' * 3000 + 'x ') * 60")
 
 
 def _sample(rng):
