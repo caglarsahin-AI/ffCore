@@ -103,10 +103,14 @@ def test_08t_12_blocked_source_dropped_answer_goes_on():
 
 
 def test_08t_12b_every_source_blocked_fails_the_run():
-    ctx, _ = _ctx(MaskingGuard(block_word=BLOB), [f"a {BLOB}", f"b {BLOB}"])
+    ctx, rec = _ctx(MaskingGuard(block_word=BLOB), [f"a {BLOB}", f"b {BLOB}"])
     with pytest.raises(StopRun) as exc:
         run(retrieve(_state(), SimpleNamespace(context=ctx)))
     assert (exc.value.status, exc.value.code) == (RunStatus.failed, "guardrail_block")
+    # r1 MAJOR-6: the sources event is written before the run stops, naming what was blocked.
+    (event,) = _sources_events(rec)
+    assert event["selected"] == []
+    assert [b["n"] for b in event["blocked"]] == [1, 2]
 
 
 def test_08t_12_egress_disabled_changes_nothing():
@@ -138,7 +142,9 @@ def test_08t_12c_search_result_item_dropped():
 
 
 def test_08t_12c_search_result_all_blocked_fails_the_run():
-    ctx, _ = _ctx(MaskingGuard(block_word=BLOB), [f"a {BLOB}"], knowledge_mode="tool")
+    ctx, rec = _ctx(MaskingGuard(block_word=BLOB), [f"a {BLOB}"], knowledge_mode="tool")
     with pytest.raises(StopRun) as exc:
         run(tools(_tool_state(), SimpleNamespace(context=ctx)))
     assert exc.value.code == "guardrail_block"
+    (event,) = _sources_events(rec)
+    assert event["selected"] == [] and [b["n"] for b in event["blocked"]] == [1]

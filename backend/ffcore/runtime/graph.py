@@ -115,7 +115,7 @@ async def retrieve(state: RunState, runtime: Runtime[RunContext]) -> dict:
     for n, source in enumerate(found, start=1):
         source.n = n
     budget = ctx.budget or plan_budget(ctx.definition, state["messages"][0]["content"], [])
-    kept, blocked = await _egress_sources(ctx, fit_sources(budget, found))
+    kept, blocked, all_blocked = await _egress_sources(ctx, fit_sources(budget, found))
     payload = {
         "selected": [s.public() for s in kept],
         "dropped_by_budget": budget.dropped.get("rag", []),
@@ -128,6 +128,7 @@ async def retrieve(state: RunState, runtime: Runtime[RunContext]) -> dict:
         sse=SseEvent.sources,
         sse_data={"sources": payload["selected"], "blocked": blocked},
     )
+    _stop_if_all_blocked(all_blocked)
     ms = _ms(started)
     # The text rides along to guard_in, the next step, which writes it into the user message and
     # keeps the sources without it.
@@ -214,14 +215,19 @@ async def _egress_sources(
             ctx.egress_cache[key] = ctx.egress_cache[_digest(masked)] = masked
         source.text = masked
         kept.append(source)
-    if last_block is not None and not kept:
+    return kept, blocked, (last_block if not kept else None)
+
+
+def _stop_if_all_blocked(all_blocked) -> None:
+    """After the `sources` event (r1 MAJOR-6: it names what was blocked even when nothing is
+    left), the run fails `guardrail_block` when every chunk was blocked."""
+    if all_blocked is not None:
         raise StopRun(
             RunStatus.failed,
             "guardrail_block",
-            last_block.message,
-            reference_id=last_block.reference_id,
+            all_blocked.message,
+            reference_id=all_blocked.reference_id,
         )
-    return kept, blocked
 
 
 async def _egress_json(ctx: RunContext, node: Any) -> Any:
@@ -552,7 +558,7 @@ async def _search_tool(ctx: RunContext, state: RunState, arguments: dict) -> tup
     start = len(state.get("sources") or [])
     for offset, source in enumerate(hits, start=1):
         source.n = start + offset
-    hits, blocked = await _egress_sources(ctx, hits)
+    hits, blocked, all_blocked = await _egress_sources(ctx, hits)
     await ctx.events.record(
         RunEventType.sources,
         {
@@ -565,6 +571,7 @@ async def _search_tool(ctx: RunContext, state: RunState, arguments: dict) -> tup
         sse_data={"sources": [s.public() for s in hits], "blocked": blocked},
         iteration=state["iteration"],
     )
+    _stop_if_all_blocked(all_blocked)
     text = "\n\n".join(f"[{s.n}] {s.document_name} ({s.breadcrumb})\n{s.text}" for s in hits)
     return text or "No matching passages.", _source_payload(hits)
 
