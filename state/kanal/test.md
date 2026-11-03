@@ -2,10 +2,10 @@
 
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
-- Oturum kimliği: ffcore-test-13b-kosu
-- Aktif paket: 13b-kosu
-- Durum: RETIRED
-- Son okunan: koordinator K-13BK-0004 (2026-10-31)
+- Oturum kimliği: ffcore-test-18-kosu-2
+- Aktif paket: 18-kosu-2
+- Durum: ACTIVE
+- Son okunan: koordinator K-06b2-0017 (2026-11-03)
 
 ## Mesajlar
 
@@ -1004,3 +1004,14 @@ Paket: 13b-kosu   Cevap: K-13BK-0004
 - Blocker: yok.
 - Commit edilmemiş durum: yok (worktree ve branch koordinatörce kaldırıldı). Yığın ffcore-13bk kapalı (konteyner 0, volume 0); `ffcore/*:0.0.0-13bk` imajları temizlik listesinde. Scratchpad'deki test parolası dosyası depo dışı, oturumla atılır.
 - Branch ve son commit: feat/13bk-ttl-negative (kaldırıldı) @ 8fd02bd49b6e394a148cc4f8302c941c6ebde53a → main ad3d95c.
+
+### T-18k2-0001 · 2026-11-03 08:55 · → koordinator · ACK
+Paket: 18-kosu-2   Cevap: K-18K2-0001
+GOREV alındı (kullanıcı talimatı ROL=test PAKET=18-kosu-2; lease ACTIVE, ffcore-test-18-kosu-2). Baz: main **0c7a100** (e9ad4b5 + 06b-2 merge 614c150 dahil). Ürün kodu değişmez; branch/worktree açmıyorum, yığın ana çalışma kopyasından (main, yalnız `eval/results/` ve `state/` yazılır).
+Okunan: FELSEFE + FELSEFE_UYGULAMA, CLAUDE, MULTI_AGENT_PROTOCOL, ENVIRONMENT_AND_COMMANDS, docs/demo.md, Makefile seed/e2e/eval, e2e.env, test kanalı handoff'u, koordinatör K-18K2-0001 ve 06b-2 mesajları.
+Not (GOREV kalemi 5): 06b-2 merge edildiği için `kind: external` → 501 artık beklenen davranış değil (K-06b2-0008: yapılandırılmamış/anahtarı sıfırlanmış dış agent → 501, yapılandırılmış → upstream). Dumanda güncel davranışı ölçüp öyle raporlayacağım; 501'i yapılandırılmamış dış agent ile sınarım.
+Sıra: YIGIN-AÇ → seed ×2 → e2e → eval → TTL negatif → facade dumanı → Kapı 2 kuru koşu → down -v → DURUM.
+
+### T-18k2-0002 · 2026-11-03 08:55 · → koordinator · YIGIN-AÇ 18k2
+Paket: 18-kosu-2   Cevap: K-18K2-0001
+Proje ffcore-18k2, FFCORE_VERSION=0.0.0-main, BACKEND_PORT=18260 FRONTEND_PORT=13260, --env-file .env.test --env-file tests/e2e/scenarios/e2e.env --profile test --profile qdrant; main 0c7a100. Açık FF yığını yok (yalnız airflow_* dev konteynerleri, FF değil); C: 104 GB boş.
