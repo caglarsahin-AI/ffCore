@@ -299,7 +299,7 @@ def detokenizer(redis, run_id: UUID, *, after: str | None = None) -> Callable[..
             for text in texts if texts is not None else ():
                 reveal.prime(text)
         except Exception:
-            log.warning("detokenize_rebuild_failed scope=%s", scope)
+            log.warning("detokenize_rebuild_failed scope=%s", scope, exc_info=True)
             texts = None
         if texts is None:
             reveal.fail_closed()
