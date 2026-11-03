@@ -1609,3 +1609,14 @@ paycoreLLM: branch feat/19-dis-inceleme · worktree C:\ai_paycore\paycoreLLM-19r
 ### B-19R-0013 · 2026-11-03 11:10 · → koordinator · ACK
 Paket: fix/19-dis-inceleme   Cevap: K-19R-0011
 Alındı. İki dal donuk (ffcore b7a6d53, paycoreLLM 81098f4); commit yok, yığın yok. REVIEW-SONUC / DUZELT bekleniyor.
+
+### B-19R-0014 · 2026-11-03 11:44 · → koordinator · ACK
+Paket: fix/19-dis-inceleme   Cevap: K-19R-0012 (state/reviews/19-dis-inceleme-r1.md)
+DUZELT alındı, r1 okundu. Bu turda: MAJOR-1..4; MINOR-1 (PR notu), 2, 4, 5, 6, 7; MINOR-3 → FOLLOWUP-159 (PR'a kısıt notu); NOTE-2 (yedek etiket + yüzdeler), NOTE-4 (meta title'a da `_mentions`), NOTE-5 (`|`, `*`, `_` lookbehind), NOTE-6 (`x-api-key`, `proxy-authorization`), NOTE-7 (bellek.md etiketi); NOTE-1/3/8 PR notu. Her biri önce kırmızı.
+
+### B-19R-0015 · 2026-11-03 11:44 · → koordinator · KARAR-GEREK
+Paket: fix/19-dis-inceleme   Cevap: K-19R-0012 (MAJOR-1/2)
+K-19R-0012 MAJOR-1 "satır yoksa oluşturulur" ile inceleyicinin önerisi (ayrı sayaç) ayrışıyor; uygulamada fark var:
+- **A (önerim):** yer tutucu satır açılmaz. Kayıt öncesi hata ayrı sayaç `failed_unregistered` (dosya yolu logda, içerik yok); konsol statü satırı, manifest `failed` (DB failed + unregistered) ve CLI çıkış kodu (failed > 0 ya da timeout > 0 → 1) bunu sayar. MAJOR-2: `_mark_failed` yalnız id ile (aynı sha dalında `existed.id`, yeni kayıtta `document_id`); kayıt öncesi hata eski `indexed` sürüme dokunmaz, aramada kalır. Etki: DB'de sahte belge yok; bir sonraki koşu dosyayı yeniden `ingest_from_raw`'dan (metadata eşlemesi dahil) dener; şema değişmez.
+- B: satır yoksa `failed` belge satırı oluşturulur. Bedel: satır kayıt yolunun dışında doğar (bozuk metadata yüzünden `updated_at_source`/breadcrumb yok), bir sonraki koşu onu aynı-sha "retried" yolundan `ingest_document` ile yeniden işler ve metadata eşlemesini atlar → metadata'sız `indexed` belge; ayrıca `new_version` hatası için "ayrı deneme kaydı" yeni kolon/tablo ister (şema, Alembic).
+Cevap gelene kadar MAJOR-3/4 ve MINOR/NOTE'larla ilerliyorum; MAJOR-1/2 kırmızı testleri A ve B'de aynı (konsol/manifest/çıkış kodu ve eski sürümün aramada kalması), onları da yazıyorum.
