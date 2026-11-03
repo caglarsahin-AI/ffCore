@@ -43,3 +43,37 @@ manifest written to ../eval/results/18k2-ingest-manifest-2.json
 real	0m18.045s
 user	0m0.046s
 sys	0m0.108s
+=== ingest-raw in backend image 09:14:25
+2026-11-03 06:14:55,831 ERROR ffcore.knowledge.raw_ingest ingest-raw failed path=jira/DEMO/DEMO-7.txt error=EgressDenied
+2026-11-03 06:14:55,856 WARNING ffcore.knowledge.raw_ingest ingest-raw rejected path=jira/PRSIM/PRSIM-1.txt code=prsim_requires_ner
+created 4
+new_version 0
+unchanged 0
+status: failed 5
+rejected: prsim_requires_ner 1
+gates: -
+masked (pii_regex): -
+stage: stage0-pipeline-evidence (--limit): pipeline evidence, not acceptance
+manifest: documents 5, chunks 0, raw_manifest_sha256 56139353ac1759bf12407b6888d67a55aaba908e37275886eeaad99dcde1a506
+confluence/DEMO/1003.md|failed|||model_missing: docling-project/docling-models is not in /models/huggingface/hub; run `make
+confluence/DEMO/1004.md|failed|||model_missing: docling-project/docling-models is not in /models/huggingface/hub; run `make
+confluence/DEMO/1001.md|failed|||model_missing: docling-project/docling-models is not in /models/huggingface/hub; run `make
+confluence/DEMO/1002.md|failed|||model_missing: docling-project/docling-models is not in /models/huggingface/hub; run `make
+jira/DEMO/DEMO-7.txt|gated|ok||
+=== ingest-raw backend image + ALLOWED_INTERNAL_HOSTS=backend,... (hypothesis check) 09:16:25
+2026-11-03 06:16:59,919 INFO ffcore.knowledge.ingest gold document=1f676b1c-554b-4aa1-bac6-706d936355e2 reused=0 embedded=1
+2026-11-03 06:16:59,946 WARNING ffcore.knowledge.raw_ingest ingest-raw rejected path=jira/PRSIM/PRSIM-1.txt code=prsim_requires_ner
+created 5
+new_version 0
+unchanged 0
+status: failed 4, indexed 1
+rejected: prsim_requires_ner 1
+gates: -
+masked (pii_regex): -
+stage: stage0-pipeline-evidence (--limit): pipeline evidence, not acceptance
+manifest: documents 5, chunks 1, raw_manifest_sha256 56139353ac1759bf12407b6888d67a55aaba908e37275886eeaad99dcde1a506
+confluence/DEMO/1004.md|failed|ok|||
+confluence/DEMO/1001.md|failed|ok|||
+confluence/DEMO/1002.md|failed|ok|||
+confluence/DEMO/1003.md|failed|ok|||
+jira/DEMO/DEMO-7.txt|indexed|ok|ok|ok|
