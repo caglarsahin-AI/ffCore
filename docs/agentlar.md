@@ -86,12 +86,16 @@ Personal data tokenized at `egress` (llmaas) leaves for the provider as placehol
 Placeholders go back to their values at the exit only (C17, 08-tam-1a): the run's own user on
 the console (live stream and replay) and the caller of a facade request see the values; any
 other reader (another analyst, an admin, an approver) sees the placeholders, as stored. The
-stored answer, `messages`, `run_events` and the history sent to the model keep the
-placeholders. When the run's guardrail policy enforces a `pii` rule on the output, the
+stored answer, `messages`, `run_events` and the history sent to the model keep placeholders,
+never values: an earlier run's placeholder in the conversation becomes this run's placeholder for
+the same value (read in the earlier run's scope, without renewing it there), and a facade agent
+client's earlier turns are stored as `egress` left them, in the run's scope. Before its first
+value a run's counter passes every placeholder number (up to 8 digits) in its question and
+history, so a carried placeholder never reads as one of this run's values. When the run's guardrail policy enforces a `pii` rule on the output, the
 placeholders stay for everyone (the output was checked with them in it; logged as
 `detokenize_skipped_policy` with a count). A placeholder whose
-mapping is gone (`PII_TOKEN_TTL_S`, default 1800 s, e.g. a run that waited long for an
-approval) or that the run never issued stays as it is and is logged with its count
+mapping is gone (`PII_TOKEN_TTL_S`, default 1800 s after its last use; the run's own reads and
+the exit renew it, a later run reading the history does not) or that the run never issued stays as it is and is logged with its count
 (`detokenize_unresolved`, no value). Stored views (`GET /runs/{id}`, `GET /runs/{id}/events`,
 approvals) are not reversed.
 
