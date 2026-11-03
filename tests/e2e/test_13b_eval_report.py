@@ -114,7 +114,7 @@ def test_13b_7_report_shape():
     )
     assert "fake-llm" in text and "not a measurement" in text  # a fake model is never a result
     assert "| answered | 1 |" in text and "| declined | 1 |" in text
-    assert "Document questions with the right source: 1/1" in text
+    assert "Document questions passed (answer text and source): 1/1" in text
     assert "Unanswerable questions held: 1/1" in text
     assert "SQL questions: 0/0 (1 NOT_RUN" in text
     assert "llm_judge: NOT_RUN" in text

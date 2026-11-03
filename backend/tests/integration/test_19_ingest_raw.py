@@ -16,6 +16,7 @@ from pathlib import Path
 import pytest
 
 from ffcore.knowledge import ingest, ingest_mask, raw_ingest
+from ffcore.knowledge.convert.types import failed
 from tests.converters import convert_without_weights
 from tests.integration.test_04a_api import create_kb, queue, search, settings, world
 
@@ -53,8 +54,8 @@ def _ingest(settings, project_key, kb_key, tree, **kw):
             sources=kw.pop("sources", SOURCES),
             limit=kw.pop("limit", None),
             settings=settings,
-            embed_client=ingest.LocalEmbedClient(settings),
-            convert=convert_without_weights,
+            embed_client=kw.pop("embed_client", None) or ingest.LocalEmbedClient(settings),
+            convert=kw.pop("convert", convert_without_weights),
         )
     )
 
@@ -348,3 +349,158 @@ def test_19_r1_invalid_encoding_refused_and_counted(world, pg, settings, tmp_pat
     report = _ingest_prsim(settings, pg, world, kb["key"], tree, accept=True)
     assert report.rejected == {"invalid_encoding": 1}
     assert report.outcomes == {"created": 1}
+
+
+# --- FOLLOWUP-155 (T-18k2-0005 B2): only an indexed document is `unchanged`; failed, gated and
+# other unfinished documents are retried on the next run without a new version; an exception
+# leaves the row `failed` with its code; the console status line is the database's. ---
+
+FAILING = "confluence/DEMO/1002.md"
+
+
+def _fail_one(path, filename, settings):
+    if filename == FAILING:
+        return failed("test", "docling_failed", "conversion failed in the test")
+    return convert_without_weights(path, filename, settings)
+
+
+class _RaisingEmbed:
+    model = "never"
+
+    async def embed(self, texts):
+        raise RuntimeError("embedding service unreachable in the test")
+
+
+def _rows(pg, kb_id):
+    return {
+        r[0]: (r[1], r[2], r[3])
+        for r in pg.execute(
+            "SELECT filename, status, version, metadata FROM documents WHERE kb_id = %s",
+            (kb_id,),
+        ).fetchall()
+    }
+
+
+def test_19r_155_rerun_retries_failed(world, pg, settings, ro_tree):
+    kb = create_kb(world, key="paycore-retry")
+    key = _project_key(pg, world["project"])
+    first = _ingest(settings, key, kb["key"], ro_tree, convert=_fail_one)
+    assert first.statuses == {"indexed": 3, "failed": 1, "skipped": 1}, first.lines()
+    assert _rows(pg, kb["id"])[FAILING][0] == "failed"
+
+    second = _ingest(settings, key, kb["key"], ro_tree)  # the cause is gone (e.g. make models)
+    assert second.outcomes == {"unchanged": 4, "retried": 1}, second.lines()
+    assert second.statuses == {"indexed": 1}, second.lines()
+    rows = _rows(pg, kb["id"])
+    assert rows[FAILING][0] == "indexed"
+    assert {version for _, version, _ in rows.values()} == {1}  # a retry is not a new version
+
+
+def test_19r_155_rerun_retries_gated_keeps_indexed(world, pg, settings, ro_tree):
+    kb = create_kb(world, key="paycore-gated")
+    key = _project_key(pg, world["project"])
+    _ingest(settings, key, kb["key"], ro_tree)
+    # A run that stopped between steps leaves the row in an intermediate status.
+    pg.execute(
+        "UPDATE documents SET status = 'gated' WHERE kb_id = %s AND filename = %s",
+        (kb["id"], FAILING),
+    )
+    again = _ingest(settings, key, kb["key"], ro_tree)
+    assert again.outcomes == {"unchanged": 4, "retried": 1}, again.lines()
+    rows = _rows(pg, kb["id"])
+    assert rows[FAILING][0] == "indexed"
+    # indexed and skipped (a gate decision on the same bytes) are not retried
+    assert sorted(status for status, _, _ in rows.values()) == ["indexed"] * 4 + ["skipped"]
+
+
+def test_19r_155_exception_marks_failed(world, pg, settings, ro_tree):
+    kb = create_kb(world, key="paycore-raise")
+    key = _project_key(pg, world["project"])
+    report = _ingest(settings, key, kb["key"], ro_tree, embed_client=_RaisingEmbed())
+    rows = _rows(pg, kb["id"])
+    stuck = {name: row for name, row in rows.items() if row[0] != "skipped"}
+    assert stuck and all(status == "failed" for status, _, _ in stuck.values()), rows
+    for _, _, meta in stuck.values():
+        assert meta["error_code"] == "RuntimeError"  # the class name, never the message
+        assert "unreachable" not in json.dumps(meta)
+    assert report.manifest()["failed"] == len(stuck)
+    assert report.statuses["failed"] == len(stuck)
+    # the retry that succeeds leaves no stale code behind
+    again = _ingest(settings, key, kb["key"], ro_tree)
+    assert again.outcomes["retried"] == len(stuck), again.lines()
+    for name in stuck:
+        status, _, meta = _rows(pg, kb["id"])[name]
+        assert status == "indexed" and "error_code" not in meta
+
+
+def test_19r_155_console_statuses_match_manifest(world, pg, settings, ro_tree):
+    kb = create_kb(world, key="paycore-console")
+    key = _project_key(pg, world["project"])
+    _ingest(settings, key, kb["key"], ro_tree, convert=_fail_one)
+    # Same bytes, same failure: the second run retries and says so; the status line is the
+    # database's (the manifest's), not this run's counter.
+    report = _ingest(settings, key, kb["key"], ro_tree, convert=_fail_one)
+    manifest = report.manifest()
+    assert manifest["statuses"] == {"failed": 1, "indexed": 3, "skipped": 1}
+    lines = report.lines()
+    assert "status: failed 1, indexed 3, skipped 1" in lines, lines
+    assert "retried 1" in lines and "unchanged 4" in lines, lines
+
+
+# --- review r1 MAJOR-1/2 (K-19R-0013 A): an error before the document is registered is counted
+# (`failed_unregistered`: source, raw path, error code; no content), the manifest's `failed` and
+# the CLI exit code see it, no placeholder row is created, and an earlier indexed version of the
+# same file is not touched (it stays in search). ---
+
+
+def _writable_tree(tmp_path):
+    target = tmp_path / "raw-rw"
+    shutil.copytree(TREE, target)
+    return target
+
+
+def _break_meta(tree, rel, **changes):
+    meta_path = tree / f"{rel}.meta.json"
+    meta = json.loads(meta_path.read_text(encoding="utf-8"))
+    meta.update(changes)
+    meta_path.write_text(json.dumps(meta, ensure_ascii=False), encoding="utf-8")
+
+
+def test_19r_r1m1_error_before_registration_counted(world, pg, settings, tmp_path):
+    kb = create_kb(world, key="paycore-unreg")
+    tree = _writable_tree(tmp_path)
+    new = tree / "confluence" / "DEMO" / "9001.md"
+    new.write_text("# Yeni sayfa\n\nKurulum adımları ve kontrol listesi.\n", encoding="utf-8")
+    (tree / "confluence" / "DEMO" / "9001.md.meta.json").write_text(
+        json.dumps({"source": "confluence:DEMO", "source_item_id": "9001"}), encoding="utf-8"
+    )
+    _break_meta(tree, "confluence/DEMO/9001.md", updated_at_source="not-a-date")
+    report = _ingest(settings, _project_key(pg, world["project"]), kb["key"], tree)
+    manifest = report.manifest()
+    assert manifest["failed_unregistered"] == [
+        {"source": "confluence:DEMO", "path": "confluence/DEMO/9001.md", "error_code": "ValueError"}
+    ]
+    assert manifest["failed"] == 1  # what the CLI exit code reads
+    assert "failed_unregistered 1" in report.lines(), report.lines()
+    assert "not-a-date" not in json.dumps(manifest)  # no content, only the code
+    rows = _rows(pg, kb["id"])
+    assert "confluence/DEMO/9001.md" not in rows  # no placeholder row
+    assert sorted(s for s, _, _ in rows.values()) == ["indexed"] * 4 + ["skipped"]
+
+
+def test_19r_r1m2_new_version_error_keeps_old_version_searchable(world, pg, settings, tmp_path):
+    kb = create_kb(world, key="paycore-oldver")
+    key = _project_key(pg, world["project"])
+    tree = _writable_tree(tmp_path)
+    _ingest(settings, key, kb["key"], tree)
+    rel = "confluence/DEMO/1002.md"
+    page = tree / rel
+    page.write_text(page.read_text(encoding="utf-8") + "\nYeni paragraf.\n", encoding="utf-8")
+    _break_meta(tree, rel, updated_at_source="not-a-date")
+    report = _ingest(settings, key, kb["key"], tree)
+    assert [e["path"] for e in report.manifest()["failed_unregistered"]] == [rel]
+    status, version, meta = _rows(pg, kb["id"])[rel]
+    assert (status, version) == ("indexed", 1) and "error_code" not in meta
+    response = search(world["analyst"], world, kb["id"], "fesih bildirim süresi kaç gün")
+    assert response.status_code == 200, response.text
+    assert any(h["document_name"] == rel for h in response.json()["hits"])

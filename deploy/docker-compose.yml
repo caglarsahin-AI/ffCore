@@ -44,6 +44,78 @@ x-langfuse-depends: &langfuse-depends
   langfuse-redis:
     condition: service_healthy
 
+# Application environment shared by the backend, workers, migrate and the MCP services.
+x-app-env: &app-env
+  DEPLOY_PROFILE: ${DEPLOY_PROFILE:?DEPLOY_PROFILE tanımlı değil}
+  INFERENCE_BACKEND: ${INFERENCE_BACKEND:?INFERENCE_BACKEND tanımlı değil}
+  # 04a /readyz compares it with the Ollama models' context_tokens (C13).
+  OLLAMA_CONTEXT_LENGTH: ${OLLAMA_CONTEXT_LENGTH:-}
+  VECTOR_BACKEND: ${VECTOR_BACKEND:?VECTOR_BACKEND tanımlı değil}
+  QDRANT_URL: ${QDRANT_URL:-}
+  # 04a knowledge base (defaults = measured values, .env.example)
+  EMBED_MODEL: ${EMBED_MODEL:-BAAI/bge-m3}
+  RERANK_MODEL: ${RERANK_MODEL:-BAAI/bge-reranker-v2-m3}
+  RERANK_MIN_SCORE: ${RERANK_MIN_SCORE:-0.1}
+  # Deterministic stand-in embedding/rerank models for console e2e without weights
+  # (10b-poc-1, K-10bp-0002 D2). Off by default; /readyz names it when on.
+  FAKE_EMBED: ${FAKE_EMBED:-0}
+  # The approval sweep test hook (FOLLOWUP-111, docs/onaylar.md); off unless a test stack
+  # sets it. The hook runs in the backend; the workers share this block but do not read it.
+  FFCORE_TEST_HOOKS: ${FFCORE_TEST_HOOKS:-0}
+  CONVERT_TIMEOUT_SECONDS: ${CONVERT_TIMEOUT_SECONDS:-600}
+  CONVERT_WORKER_START_TIMEOUT_SECONDS: ${CONVERT_WORKER_START_TIMEOUT_SECONDS:-60}
+  OCR_PDF_MAX_PAGES: ${OCR_PDF_MAX_PAGES:-200}
+  # Converter process and upload limits (review r1 MAJOR-5; measured values in config.py).
+  # Offline by default in both profiles (review r1 MAJOR-6, K-04a-0020): weights come only
+  # from `make models`, never from a loader at run time.
+  HF_HUB_OFFLINE: ${HF_HUB_OFFLINE:-1}
+  TRANSFORMERS_OFFLINE: ${TRANSFORMERS_OFFLINE:-1}
+  CONVERT_MEMORY_LIMIT_MB: ${CONVERT_MEMORY_LIMIT_MB:-10240}
+  CONVERT_CPU_LIMIT_SECONDS: ${CONVERT_CPU_LIMIT_SECONDS:-3600}
+  UPLOAD_MAX_REQUEST_BYTES: ${UPLOAD_MAX_REQUEST_BYTES:-541065216}
+  ALLOWED_LANGUAGES: ${ALLOWED_LANGUAGES:-tr,en}
+  ARQ_QUEUE_INGEST: ${ARQ_QUEUE_INGEST:-ingest}
+  OFFLINE: ${OFFLINE:?OFFLINE tanımlı değil}
+  DATABASE_URL: postgresql+psycopg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+  REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379/0
+  SERVICE_TOKEN: ${SERVICE_TOKEN:?SERVICE_TOKEN is not set}
+  OBO_JWT_SECRET: ${OBO_JWT_SECRET:?OBO_JWT_SECRET is not set}
+  EGRESS_ALLOWLIST: ${EGRESS_ALLOWLIST:-}
+  ALLOWED_INTERNAL_HOSTS: ${ALLOWED_INTERNAL_HOSTS:-}
+  SECRET_KEY: ${SECRET_KEY:?SECRET_KEY is not set}
+  FERNET_KEY: ${FERNET_KEY:?FERNET_KEY is not set}
+  EMBED_DIM: ${EMBED_DIM:?EMBED_DIM is not set}
+  CONSOLE_ORIGINS: ${CONSOLE_ORIGINS:-}
+  SESSION_TTL_S: ${SESSION_TTL_S:-28800}
+  GUARDRAIL_EGRESS_ENABLED: ${GUARDRAIL_EGRESS_ENABLED:?GUARDRAIL_EGRESS_ENABLED is not set}
+  PII_TOKEN_TTL_S: ${PII_TOKEN_TTL_S:-1800}
+  LITELLM_URL: ${LITELLM_URL:-}
+  LITELLM_MASTER_KEY: ${LITELLM_MASTER_KEY:?LITELLM_MASTER_KEY is not set}
+  LITELLM_INTERNAL_KEY: ${LITELLM_INTERNAL_KEY:?LITELLM_INTERNAL_KEY is not set}
+  LLM_CALL_TIMEOUT_S: ${LLM_CALL_TIMEOUT_S:-60}
+  # 06a agent runtime: profile values (.env.example lists llmaas and airgap).
+  LLM_SLOTS: ${LLM_SLOTS:-4}
+  BACKGROUND_WINDOW: ${BACKGROUND_WINDOW:-}
+  BACKGROUND_WINDOW_WEEKENDS: ${BACKGROUND_WINDOW_WEEKENDS:-false}
+  BACKGROUND_WINDOW_TZ: ${BACKGROUND_WINDOW_TZ:-Europe/Istanbul}
+  RUN_TIMEOUT_S: ${RUN_TIMEOUT_S:-120}
+  RUN_ABANDON_GRACE_S: ${RUN_ABANDON_GRACE_S:-120}
+  # 03c API keys: failed attempts per client address per minute; last_used_at write buffer.
+  API_KEY_AUTH_FAILURES_PER_MIN: ${API_KEY_AUTH_FAILURES_PER_MIN:-20}
+  API_KEY_LAST_USED_FLUSH_S: ${API_KEY_LAST_USED_FLUSH_S:-60}
+  # 03c retention and alerts: dry run by default, audit partitions need the second flag.
+  RETENTION_DRY_RUN: ${RETENTION_DRY_RUN:-true}
+  RETENTION_AUDIT_DROP_ENABLED: ${RETENTION_AUDIT_DROP_ENABLED:-false}
+  RETENTION_BATCH: ${RETENTION_BATCH:-5000}
+  ALERT_SERVICE_DOWN_S: ${ALERT_SERVICE_DOWN_S:-300}
+  RUN_EVENT_STREAM_TTL_S: ${RUN_EVENT_STREAM_TTL_S:-86400}
+  ARQ_QUEUE_INTERACTIVE: ${ARQ_QUEUE_INTERACTIVE:-llm-interactive}
+  ARQ_QUEUE_BACKGROUND: ${ARQ_QUEUE_BACKGROUND:-llm-background}
+  LOG_LEVEL: ${LOG_LEVEL:-INFO}
+  LANGFUSE_HOST: http://langfuse-web:3000
+  LANGFUSE_PUBLIC_KEY: ${LANGFUSE_INIT_PROJECT_PUBLIC_KEY:?LANGFUSE_INIT_PROJECT_PUBLIC_KEY is not set}
+  LANGFUSE_SECRET_KEY: ${LANGFUSE_INIT_PROJECT_SECRET_KEY:?LANGFUSE_INIT_PROJECT_SECRET_KEY is not set}
+
 services:
   postgres:
     image: ${REGISTRY_PREFIX}pgvector/pgvector:0.8.1-pg16
@@ -224,76 +296,11 @@ services:
       args:
         REGISTRY_PREFIX: ${REGISTRY_PREFIX:-}
     restart: unless-stopped
-    environment: &app-env
-      DEPLOY_PROFILE: ${DEPLOY_PROFILE:?DEPLOY_PROFILE tanımlı değil}
-      INFERENCE_BACKEND: ${INFERENCE_BACKEND:?INFERENCE_BACKEND tanımlı değil}
-      # 04a /readyz compares it with the Ollama models' context_tokens (C13).
-      OLLAMA_CONTEXT_LENGTH: ${OLLAMA_CONTEXT_LENGTH:-}
-      VECTOR_BACKEND: ${VECTOR_BACKEND:?VECTOR_BACKEND tanımlı değil}
-      QDRANT_URL: ${QDRANT_URL:-}
-      # 04a knowledge base (defaults = measured values, .env.example)
-      EMBED_MODEL: ${EMBED_MODEL:-BAAI/bge-m3}
-      RERANK_MODEL: ${RERANK_MODEL:-BAAI/bge-reranker-v2-m3}
-      RERANK_MIN_SCORE: ${RERANK_MIN_SCORE:-0.1}
-      # Deterministic stand-in embedding/rerank models for console e2e without weights
-      # (10b-poc-1, K-10bp-0002 D2). Off by default; /readyz names it when on.
-      FAKE_EMBED: ${FAKE_EMBED:-0}
-      # The approval sweep test hook (FOLLOWUP-111, docs/onaylar.md); off unless a test stack
-      # sets it. The hook runs in the backend; the workers share this block but do not read it.
-      FFCORE_TEST_HOOKS: ${FFCORE_TEST_HOOKS:-0}
-      CONVERT_TIMEOUT_SECONDS: ${CONVERT_TIMEOUT_SECONDS:-600}
-      CONVERT_WORKER_START_TIMEOUT_SECONDS: ${CONVERT_WORKER_START_TIMEOUT_SECONDS:-60}
-      OCR_PDF_MAX_PAGES: ${OCR_PDF_MAX_PAGES:-200}
-      # Converter process and upload limits (review r1 MAJOR-5; measured values in config.py).
-      # Offline by default in both profiles (review r1 MAJOR-6, K-04a-0020): weights come only
-      # from `make models`, never from a loader at run time.
-      HF_HUB_OFFLINE: ${HF_HUB_OFFLINE:-1}
-      TRANSFORMERS_OFFLINE: ${TRANSFORMERS_OFFLINE:-1}
-      CONVERT_MEMORY_LIMIT_MB: ${CONVERT_MEMORY_LIMIT_MB:-10240}
-      CONVERT_CPU_LIMIT_SECONDS: ${CONVERT_CPU_LIMIT_SECONDS:-3600}
-      UPLOAD_MAX_REQUEST_BYTES: ${UPLOAD_MAX_REQUEST_BYTES:-541065216}
-      ALLOWED_LANGUAGES: ${ALLOWED_LANGUAGES:-tr,en}
-      ARQ_QUEUE_INGEST: ${ARQ_QUEUE_INGEST:-ingest}
-      OFFLINE: ${OFFLINE:?OFFLINE tanımlı değil}
-      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
-      REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379/0
-      SERVICE_TOKEN: ${SERVICE_TOKEN:?SERVICE_TOKEN is not set}
-      OBO_JWT_SECRET: ${OBO_JWT_SECRET:?OBO_JWT_SECRET is not set}
-      EGRESS_ALLOWLIST: ${EGRESS_ALLOWLIST:-}
-      ALLOWED_INTERNAL_HOSTS: ${ALLOWED_INTERNAL_HOSTS:-}
-      SECRET_KEY: ${SECRET_KEY:?SECRET_KEY is not set}
-      FERNET_KEY: ${FERNET_KEY:?FERNET_KEY is not set}
-      EMBED_DIM: ${EMBED_DIM:?EMBED_DIM is not set}
-      CONSOLE_ORIGINS: ${CONSOLE_ORIGINS:-}
-      SESSION_TTL_S: ${SESSION_TTL_S:-28800}
-      GUARDRAIL_EGRESS_ENABLED: ${GUARDRAIL_EGRESS_ENABLED:?GUARDRAIL_EGRESS_ENABLED is not set}
-      PII_TOKEN_TTL_S: ${PII_TOKEN_TTL_S:-1800}
-      LITELLM_URL: ${LITELLM_URL:-}
-      LITELLM_MASTER_KEY: ${LITELLM_MASTER_KEY:?LITELLM_MASTER_KEY is not set}
-      LITELLM_INTERNAL_KEY: ${LITELLM_INTERNAL_KEY:?LITELLM_INTERNAL_KEY is not set}
-      LLM_CALL_TIMEOUT_S: ${LLM_CALL_TIMEOUT_S:-60}
-      # 06a agent runtime: profile values (.env.example lists llmaas and airgap).
-      LLM_SLOTS: ${LLM_SLOTS:-4}
-      BACKGROUND_WINDOW: ${BACKGROUND_WINDOW:-}
-      BACKGROUND_WINDOW_WEEKENDS: ${BACKGROUND_WINDOW_WEEKENDS:-false}
-      BACKGROUND_WINDOW_TZ: ${BACKGROUND_WINDOW_TZ:-Europe/Istanbul}
-      RUN_TIMEOUT_S: ${RUN_TIMEOUT_S:-120}
-      RUN_ABANDON_GRACE_S: ${RUN_ABANDON_GRACE_S:-120}
-      # 03c API keys: failed attempts per client address per minute; last_used_at write buffer.
-      API_KEY_AUTH_FAILURES_PER_MIN: ${API_KEY_AUTH_FAILURES_PER_MIN:-20}
-      API_KEY_LAST_USED_FLUSH_S: ${API_KEY_LAST_USED_FLUSH_S:-60}
-      # 03c retention and alerts: dry run by default, audit partitions need the second flag.
-      RETENTION_DRY_RUN: ${RETENTION_DRY_RUN:-true}
-      RETENTION_AUDIT_DROP_ENABLED: ${RETENTION_AUDIT_DROP_ENABLED:-false}
-      RETENTION_BATCH: ${RETENTION_BATCH:-5000}
-      ALERT_SERVICE_DOWN_S: ${ALERT_SERVICE_DOWN_S:-300}
-      RUN_EVENT_STREAM_TTL_S: ${RUN_EVENT_STREAM_TTL_S:-86400}
-      ARQ_QUEUE_INTERACTIVE: ${ARQ_QUEUE_INTERACTIVE:-llm-interactive}
-      ARQ_QUEUE_BACKGROUND: ${ARQ_QUEUE_BACKGROUND:-llm-background}
-      LOG_LEVEL: ${LOG_LEVEL:-INFO}
-      LANGFUSE_HOST: http://langfuse-web:3000
-      LANGFUSE_PUBLIC_KEY: ${LANGFUSE_INIT_PROJECT_PUBLIC_KEY:?LANGFUSE_INIT_PROJECT_PUBLIC_KEY is not set}
-      LANGFUSE_SECRET_KEY: ${LANGFUSE_INIT_PROJECT_SECRET_KEY:?LANGFUSE_INIT_PROJECT_SECRET_KEY is not set}
+    # The shared block lives in x-app-env (top); the backend adds itself to the internal
+    # hosts: `ingest-raw` runs here and embeds over HTTP through the API (FOLLOWUP-154).
+    environment:
+      <<: *app-env
+      ALLOWED_INTERNAL_HOSTS: backend,${ALLOWED_INTERNAL_HOSTS:-}
     ports:
       - "${BACKEND_PORT:-8000}:8000"
     volumes:
