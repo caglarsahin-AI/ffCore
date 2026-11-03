@@ -92,15 +92,18 @@ the same value (read in the earlier run's scope, without renewing it there), and
 client's earlier turns are stored as `egress` left them, in the run's scope. Before its first
 value a run's counter passes every placeholder number (up to 8 digits) in its question and
 history, so a carried placeholder never reads as one of this run's values (a scope issues at
-most 99,999,998; past it the run fails with `placeholder_out_of_range`; `<<PII_99999999>>` is
-ignored). After the first HTML tag of an answer no placeholder of the rest of it is reversed,
+most 9,999,999; past it the run fails with `placeholder_out_of_range`; a carried number from
+10,000,000 is ignored). After the first HTML tag (`<` and a letter, also `<br>`,
+`List<String>` or `x<y`) no placeholder of the rest of the reader's stream is reversed, the
+run's own user on the console included, and across the run's turns (a reader that continues
+after an approval replays the earlier entries),
 and a placeholder on a URL line stays (a URL scheme such as `http:`, or a markdown, CSS or
 attribute marker: `](`, `]:`, `//`, `url(`, `src=`, `href=`, `style=`, `data=`; the full rule,
 its markdown carry-over and its trade-offs in docs/guardrail.md), for every reader, logged as
 `detokenize_skipped_url` with a count; an upstream could otherwise make a client that renders
 the answer send the value to its host. A reader that reconnects (`Last-Event-ID`, the console
 after an approval) rebuilds this state from the live token entries; when it cannot, the rest of
-the answer keeps the placeholders. When the run's guardrail policy enforces a `pii` rule on the output, the
+the stream keeps the placeholders. When the run's guardrail policy enforces a `pii` rule on the output, the
 placeholders stay for everyone (the output was checked with them in it; logged as
 `detokenize_skipped_policy` with a count). A placeholder whose
 mapping is gone (`PII_TOKEN_TTL_S`, default 1800 s after its last use; the run's own reads and

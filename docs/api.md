@@ -475,7 +475,8 @@ about targets outside its scopes. Another project's model or agent, or a missing
   answer comes back to the caller with the request's placeholders turned into the values (C17),
   in one piece and in a live stream alike (a placeholder split over two chunks is held, at most
   15 characters, until it is whole). When the project's policy enforces a `pii` rule on the
-  output, the placeholders stay. A placeholder after the first HTML tag of the answer stays,
+  output, the placeholders stay. A placeholder after the first HTML tag (`<` and a letter, also
+  `List<String>` or `<br>`) stays for the rest of the stream,
   and so does one on a URL line (a URL scheme such as `http:`, or `](`, `]:`, `//`, `url(`,
   `src=`, `href=`, `style=`, `data=` and the other markers in docs/guardrail.md;
   `detokenize_skipped_url`: an upstream could otherwise make a client send the value to its
@@ -489,7 +490,7 @@ about targets outside its scopes. Another project's model or agent, or a missing
   | The caller of a facade request (direct model, agent, external agent) | values |
   | Another member reading the run (analyst, admin, approver) | placeholders |
   | Stored views (`GET /runs/{id}`, `GET /runs/{id}/events`, approvals) | placeholders |
-  | A placeholder after the first HTML tag of an answer, or on a URL line (a URL scheme such as `http:`, or `](`, `]:`, `//`, `url(`, `src=`, `href=`, `srcset=`, `action=`, `poster=`, `background=`, `style=`, `data=`), for every reader | placeholder (`detokenize_skipped_url`, count only) |
+  | A placeholder after the first HTML tag in the reader's stream (also `<br>`, `List<String>`), or on a URL line (a URL scheme such as `http:`, or `](`, `]:`, `//`, `url(`, `src=`, `href=`, `srcset=`, `action=`, `poster=`, `background=`, `style=`, `data=`), for every reader | placeholder (`detokenize_skipped_url`, count only) |
   | Any reader when the policy enforces a `pii` rule on the output | placeholders (`detokenize_skipped_policy`, count only) |
 
 - The client's own tools: definitions pass, the model's `tool_calls` come back with OpenAI's
@@ -536,11 +537,12 @@ about targets outside its scopes. Another project's model or agent, or a missing
   goes on: `X-Resume-Run-Id` follows it again from its last approval or question event (or from
   the start). The direct model path (one piece, live and buffered stream) and the external agent
   answer the same way. When a token scope's placeholder numbers are used up (it would issue
-  past 99,999,998, e.g. the request carries `<<PII_99999998>>` and a new value), the request
-  fails with `placeholder_out_of_range`: 400 `invalid_request_error` on the direct model path,
+  past 9,999,999, e.g. the request carries `<<PII_9999999>>` and a new value), the request
+  fails with `placeholder_out_of_range`: 400 `invalid_request_error` on the direct model path
+  (one piece; a buffered or live stream that has started sends the error event and `[DONE]`),
   the external agent and a facade agent request's client history check; 502 `api_error` (the
   run's code) when it happens inside a facade agent run (its question and stored history).
-  `<<PII_99999999>>` and longer numbers are no placeholders and are ignored.
+  A `<<PII_n>>` from 10,000,000 or with non-ASCII digits is no placeholder and is ignored.
 
 ### External agent path (06b-2)
 
