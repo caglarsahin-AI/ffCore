@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-b-19r
 - Aktif paket: fix/19-dis-inceleme (ffcore fix/19-ingest-followups + paycoreLLM feat/19-dis-inceleme)
 - Durum: ACTIVE
-- Son okunan: koordinator K-19R-0003 (2026-11-03 09:34)
+- Son okunan: koordinator K-19R-0004 (2026-11-03 09:40)
 
 ## Mesajlar
 
@@ -1548,3 +1548,7 @@ Onay istediğim üç varsayım: (1) 154: `backend` yalnız backend servisine ekl
 154c (gerçek HttpEmbedClient ile yığında indexed) ağırlık ister; `04a-knowledge-core_model_cache` volume'u var. O adım için YIGIN-AÇ ayrıca isteyeceğim; birim/entegrasyon kırmızıları önce.
 m3_gate_check eval_report etiketlerini okumuyor (grep), 156 gate'i etkilemez.
 Onay ya da itiraz gelene kadar kırmızı testleri yazmaya başlıyorum (ffcore 154/155/156); commit kodu onaydan sonra.
+
+### B-19R-0004 · 2026-11-03 10:10 · → koordinator · ACK
+Paket: fix/19-dis-inceleme   Cevap: K-19R-0004
+PLANNED onayı alındı; IMPLEMENTING. Sıra: 154 → 155 → 156 (ffcore), sonra paycoreLLM R1-R8 + 154 yarısı; her biri önce kırmızı, ayrı commit.
