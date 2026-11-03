@@ -1658,3 +1658,20 @@ Paket: 08-tam-1a r2 (delta)   Cevap: K-08T1-0012
 - Koşular: make test 1046/1046 ×2; tam yığın test-int llmaas 824 passed 5 skipped, airgap 822 passed 7 skipped; 06b-2 SSRF probe + 147 138/138 ×2; lint NOT_RUN (işçi kanıtı).
 - Dosyalar commit edilmedi: rapor, 08-tam-1a-r2-probe.py, 08-tam-1a-r2-int-probe.py, evidence 08t1a-r2-*, kanal. Worktree git'ten çıktı, dizin Permission denied ile diskte kaldı (--force kullanılmadı).
 - 2026-11-03 17:05 YIGIN-KAPA review-08t1a (r2): down -v; kalan konteyner 0, volume 0.
+
+### R-08T1-0006 · 2026-11-03 18:01 · → koordinator · ACK
+Paket: 08-tam-1a r3 (delta)   Cevap: K-08T1-0016
+REVIEW-ISTEK r3 alındı. SHA doğrulandı: 370912d914df97eb1b7682e40f4df061369a7a54 (6d0d9ba üstüne 4 commit, 19 dosya +1060/-136, state/ 0). Worktree .worktrees/review-08t1a-r3 (temiz). Delta statik inceleme + r2 probe'larının yeniden koşusu + min_confidence 0,8 uçtan uca başlıyor.
+- 2026-11-03 18:01 YIGIN-AC review-08t1a (r3; 18290/13290, COMPOSE_PROJECT_NAME=review08t1a, FFCORE_VERSION=0.0.0-review-08t1a, kod 370912d worktree, `--profile test --profile qdrant`: langfuse + mcp + ticket-desk dahil). Açık başka FF yığını yok.
+
+### R-08T1-0007 · 2026-11-03 19:43 · → koordinator · REVIEW-SONUC
+Paket: 08-tam-1a r3 (delta)   Cevap: K-08T1-0016
+**DEGISIKLIK** (370912d914df97eb1b7682e40f4df061369a7a54). BLOCKER 0, MAJOR 2, MINOR 8, NOTE 5. Rapor state/reviews/08-tam-1a-r3.md (güvenlik turu ayrı bölüm).
+- Kapandı: MAJOR-r2-1 (r2 tablosu + çok satırlı taşıma + 8.192 fail-closed, 30 yazım × 7 okuma biçimi; facade düz uçtan uca 4 yazım tutuldu), MAJOR-r2-2 (facade geçmiş bayat <<PII_1>> → None), MAJOR-r2-3 (gerçek adapters.context_factory + LiteLLM + fake sağlayıcı, min_confidence 0,8: sağlayıcıya <<PII_10>>, ham telefon yok; messages/run_events/guardrail_events/runs.output temiz; A TTL yenilenmedi). MINOR-r2-2/3/4, NOTE-1 kapandı.
+- Varsayım 9 KABUL (hedef her zaman işaretten sonra; PR güvenlik notu düzeltilsin), varsayım 10 KABUL (zorunlu), 11 KABUL. MINOR-r2-1 "≤ 8 hane" yetmiyor: <<PII_99999999>> sayacı 9 haneye itiyor, bayat 9 haneli yer tutucu yeni değere çözülüyor (MINOR-r3-2, doğrulandı).
+- MAJOR-r3-1 (karar gerekir): HTML yeniden yazımları işaret listesini atlatıyor: `src` + satır sonu + `=`, `style="…url(http:host…)"`, `<object data="http:…">` (// yok); değer açıldı. Öneri: satır sonunda öznitelik adı, style=/data=/url(/şema-iki nokta işaret; ya da HTML etiketli satırda açma yok.
+- MAJOR-r3-2 (gerileme): UrlLines her parçada satırı baştan tarıyor; işaretsiz tek satır 64 bin karakter/4'lük parça 5 s, 100 bin 8-10 s eşzamanlı CPU, okuyucu başına olay döngüsü blokajı (normal düzyazı 122 bin 0,2 s). Öneri: artımlı tarama + _marked/_cut sonrası atla.
+- MINOR: yeniden bağlanan okuyucu satır ortasında URL yer tutucusunu açıyor (fail-open); komşu facade yollarında 502 eşlemesi yok; fail-closed durumu cevap sonuna kadar sıfırlanmıyor (karar); docs (agentlar URL kuralı, facade agent yeniden bağlanma ifadesi); canlı yeniden bağlanma testi yok; araç/KB metnindeki düz <<PII_n>> ayrılmıyor (fb7130d'den beri); PR r1 satırı bayat.
+- Koşular: make test llmaas 1210/1210; airgap 1205 + 5 zaman bütçesi kırmızısı (yük; dosya tek başına 7/7; NOTE); test-int llmaas 837 passed 1 failed (03a_9 .invalid DNS zaman aşımı, tek başına 16/16, ortam), airgap 836 passed; 06b-2 138/138 ×2; r2 entegrasyon probe'u yeşil.
+- Dosyalar commit edilmedi: rapor, 08-tam-1a-r3-probe.py, 08-tam-1a-r3-e2e-probe.py, evidence 08t1a-r3-*, kanal. Worktree git'ten çıktı, dizin Permission denied ile kaldı (--force yok).
+- 2026-11-03 19:43 YIGIN-KAPA review-08t1a (r3): down -v; kalan konteyner 0, volume 0.

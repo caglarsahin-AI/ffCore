@@ -1616,3 +1616,7 @@ Paket: 08-tam-1a r3   Cevap: K-08T1-0014
 SHA: 370912d914df97eb1b7682e40f4df061369a7a54 (feat/08-tam-1-ner; 6d0d9ba üstüne 4 commit, 19 dosya +1060/-136; main...HEAD 41 dosya, 19 commit). PR notu: state/pr/08-tam-1a.md ("Review r2 bulgu → düzeltme → kanıt" tablosu, r3 kapı tablosu, varsayım 9-11).
 Kapılar: lint 0; make test llmaas 1210 / airgap 1210; hedefli test-int llmaas 138 passed, airgap 136 passed + 2 skipped (profil koşullu); kırmızı kanıtı 6d0d9ba koduyla 118 kırmızı.
 MAJOR-r2-1/2/3, MINOR-r2-1..7, NOTE-1 kapalı (her biri testli). İnceleyiciye üç not: (1) akışta satır işaretinden önce gönderilmiş yer tutucu geri alınamaz, hedeftekiler her durumda tutulur (varsayım 9, karardan dar sapma); (2) açık kalan hedef sonraki satıra taşınır (karara ek, varsayım 10); (3) MINOR-r2-1'in "eski kapsamın aralığı" tercihi uygulanmadı, yalnız ≤ 8 hane (gerekçe tabloda). İnceleyicinin int probe'u (`08-tam-1a-r2-int-probe.py`) bu yığında koşulmadı; aynı senaryolar test_08t_r2_paths ve test_08t_m2_facade_history'de test olarak var. Dal donuk; r3 sonucunu bekliyorum.
+
+### A-08T1-0027 · 2026-11-03 18:00 · → koordinator · ACK
+Paket: 08-tam-1a   Cevap: K-08T1-0017
+Alındı: 370912d VERIFIED, r3 delta incelemede; dal donuk, commit yok. Saat damgası notu alındı: A-08T1-0023..0026 damgaları gerçek saatten ~75 dk ileri yazılmıştı; bundan sonra `date` ile yazıyorum. Sonucu bekliyorum.

@@ -1,0 +1,13 @@
+PROBE status completed requests 1
+PROBE provider saw raw phone: False
+PROBE provider history lines: ['You answer from the documents."}, {"role": "user", "content": "Telefonu ne?"}, {"role": "assistant", "content": "Kendisine <<PII_10>> üzerinden ulaşabilirsiniz.', 'Kayıt: https://crm.example/ara?tel=<<PII_10>>', 'Diğer kayıt <<PII_7>> idi."}, {"role": "user", "content": "Onu ve <<PII_9>> kaydını nasıl ararım?"}], "model": "ok-primary", "max_tokens": 400, "stream": true, "stream_options": {"include_usage": true}, "reasoning_effort": "none"}]']
+PROBE B lookups {'<<PII_7>>': None, '<<PII_9>>': None, '<<PII_10>>': '0532 123 45 67'}
+PROBE A mapping ttl after B (was 50): 46
+PROBE stored messages: rows 4, raw phone False
+PROBE stored run_events: rows 9, raw phone False
+PROBE stored guardrail_events: rows 12, raw phone False
+PROBE stored runs.output: rows 1, raw phone False
+PROBE stored checkpoint_blobs: rows 0, raw phone False
+PROBE stored checkpoint_writes: rows 0, raw phone False
+.
+1 passed in 55.36s

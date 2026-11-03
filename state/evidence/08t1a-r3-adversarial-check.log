@@ -1,0 +1,14 @@
+BYPASS src NL = REVEALED
+BYPASS src NL = NL REVEALED
+BYPASS style url http: REVEALED
+BYPASS object data http: REVEALED
+BYPASS img src http: (control) kept
+PERF StreamDetokenizer one line 16000 chars, 4-char chunks: 0.89 s
+PERF ContextReveal one line 16000 chars, 4-char chunks: 0.85 s
+PERF StreamDetokenizer one line 64000 chars, 4-char chunks: 5.14 s
+PERF ContextReveal one line 64000 chars, 4-char chunks: 5.05 s
+PERF StreamDetokenizer one line 100000 chars, 4-char chunks: 7.83 s
+PERF ContextReveal one line 100000 chars, 4-char chunks: 9.51 s
+PERF StreamDetokenizer one line 100000 chars, 1-char chunks: 28.52 s
+PERF ContextReveal one line 100000 chars, 1-char chunks: 23.68 s
+PERF ContextReveal normal prose 122000 chars (61-char lines), 4-char chunks: 0.20 s

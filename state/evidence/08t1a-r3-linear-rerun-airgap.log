@@ -1,0 +1,12 @@
+.......                                                                  [100%]
+============================= slowest 8 durations ==============================
+3.22s call     tests/unit/test_08t_secrets_linear.py::test_08t_m4_many_spaces_after_a_credential_word_is_linear[password]
+2.50s call     tests/unit/test_08t_secrets_linear.py::test_08t_m4_many_spaces_after_a_credential_word_is_linear[API_KEY]
+2.22s call     tests/unit/test_08t_secrets_linear.py::test_08t_m4_many_spaces_after_a_credential_word_is_linear[\u015fifre]
+2.06s call     tests/unit/test_08t_secrets_linear.py::test_08t_m4_many_spaces_after_a_credential_word_is_linear[secret]
+1.64s call     tests/unit/test_08t_secrets_linear.py::test_08t_m4_many_spaces_after_a_credential_word_is_linear[token]
+1.61s call     tests/unit/test_08t_secrets_linear.py::test_08t_m4_repeated_words_under_the_text_limit_is_linear
+0.32s setup    tests/unit/test_08t_secrets_linear.py::test_08t_m4_many_spaces_after_a_credential_word_is_linear[token]
+0.26s call     tests/unit/test_08t_secrets_linear.py::test_08t_m4_linear_patterns_match_the_same_spans
+7 passed in 14.89s
+sh: 1: time: not found

