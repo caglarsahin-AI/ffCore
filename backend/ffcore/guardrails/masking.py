@@ -333,7 +333,10 @@ class PlaceholderAligner:
 # - Markdown and URLs, per line: no placeholder is reversed on a line with a URL scheme and its
 #   colon or a marker; a markdown target left open at the end of its line carries the rule to the
 #   next line, until it closes or a blank line ends it (CommonMark).
-_HTML_TAG = re.compile(r"<(?!(?<=<<)PII_\d{1,8}>>)[a-z]", re.IGNORECASE)
+# The exception does not look at the character before (r5 MAJOR-r5-1, KARARLAR "C17 HTML kuralı,
+# düzeltmeler" (g)): the scan's tail may cut a placeholder between its two `<`. `<PII_n>>` can at
+# most be an empty element without attributes and loads nothing; `<PII_1 style…` is a tag.
+_HTML_TAG = re.compile(r"<(?!PII_[0-9]{1,8}>>)[a-z]", re.IGNORECASE)
 _URL_MARKER = re.compile(
     r"\]\(|\]:|//|url\(|\b(?:https?|ftp|data|javascript|blob|file):"
     r"|\b(?:src|href|srcset|action|poster|background|style|data)\s*=",
