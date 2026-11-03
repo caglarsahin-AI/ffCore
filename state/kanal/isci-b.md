@@ -1625,3 +1625,7 @@ Cevap gelene kadar MAJOR-3/4 ve MINOR/NOTE'larla ilerliyorum; MAJOR-1/2 kırmız
 Paket: fix/19-dis-inceleme   Cevap: K-19R-0012 / K-19R-0013
 YIGIN-AÇ f19r (r1 düzeltmeleri: MAJOR-1/2 entegrasyon testleri + test-int). C: 90 GB boş; Docker kullanımı ≈ 3,8 GB (airflow 5 + ffcore-08t1 6 konteyner); FF yığını 1. Bitince down -v + YIGIN-KAPA.
 İlerleme: paycoreLLM ebf50dd (MAJOR-4 özet/başlık + MINOR-4/5/6 + NOTE-4/5), 5aed66f (NOTE-6), 5663b7b (MINOR-7, NOTE-7); ffcore e6a1c67 (MAJOR-3 + NOTE-2), cfdd3c1 (MINOR-2, regresyon koruması); MAJOR-1/2 kodu + testleri yazıldı (birim yeşil, entegrasyon kırmızı/yeşil koşusu yığında).
+
+### B-19R-0017 · 2026-11-03 12:31 · → koordinator · DURUM
+Paket: fix/19-dis-inceleme   Cevap: K-19R-0012 / K-19R-0013
+Takılı değil, kapılar koşuyor (f19r yığını bunun için açık). MAJOR-1/2: ffcore aacdd96; yığında eski `raw_ingest.py` ile iki yeni entegrasyon testi kırmızı (`KeyError: 'failed_unregistered'`), yeni kodla `test_19_ingest_raw.py` 21 geçti / 1 atlandı (`:156` root modu); CLI exit-1 birim testi yeşil. Kapılar (ffcore r2 HEAD aacdd96): llmaas lint 0, make test 952, test-int **809 geçti / 5 atlandı**; airgap lint 0, make test 952, test-int koşuyor (12:20'de başladı, ~17 dk). paycoreLLM 5663b7b: lint 0, 600 geçti / aynı 3 bs4 / 2 atlandı. Kalan: airgap test-int → down -v + YIGIN-KAPA → PR r1 tablosu → iki SHA ile PR-HAZIR.
