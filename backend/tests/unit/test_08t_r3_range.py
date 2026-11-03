@@ -29,10 +29,10 @@ ARABIC = "<<PII_" + "٩" * 8 + ">>"
 def test_08t_r3_largest_carried_number_is_reserved():
     async def go():
         store = MemoryTokenStore()
-        await reserve_carried(store, "s", "<<PII_9999998>>")
+        await reserve_carried(store, "s", "<<PII_3>> <<PII_999998>> <<PII_12>>")
         return await store.token_for("s", "EMAIL_ADDRESS:" + AYSE, AYSE)
 
-    assert run(go()) == "<<PII_9999999>>"
+    assert run(go()) == "<<PII_999999>>"
 
 
 @pytest.mark.parametrize(
@@ -50,7 +50,7 @@ def test_08t_r5_carried_numbers_from_ten_million_are_ignored(carried):
 def test_08t_r5_issuing_past_9999999_fails_loudly():
     async def go():
         store = MemoryTokenStore()
-        await reserve_carried(store, "s", "<<PII_9999999>>")
+        await store.reserve("s", 9_999_999)  # a scope that has issued them all
         await store.token_for("s", "EMAIL_ADDRESS:a@x.test", "a@x.test")
 
     with pytest.raises(ApiError) as caught:
@@ -78,11 +78,11 @@ def _log_on_error_policy():
 
 
 def test_08t_r4_engine_fails_loudly_whatever_on_error_says():
-    # MINOR-r4-1: the caller fills the scope (`<<PII_9999999>>`) and sends a value; with
-    # `on_error=log` the old engine let the text through untokenized.
+    # MINOR-r4-1: a scope whose numbers are used up gets a value; with `on_error=log` the old
+    # engine let the text through untokenized.
     async def go():
         store = MemoryTokenStore()
-        await reserve_carried(store, "s", "<<PII_9999999>>")
+        await store.reserve("s", 9_999_999)
         ctx = engine.EvalContext(
             run_id="s", project_id="p", source="api", token_store=store, egress_enabled=True
         )
@@ -90,3 +90,23 @@ def test_08t_r4_engine_fails_loudly_whatever_on_error_says():
 
     with pytest.raises(PlaceholderOutOfRange):
         run(go())
+
+
+@pytest.mark.parametrize(
+    ("carried", "first"),
+    [
+        ("<<PII_9999999>>", "<<PII_1>>"),
+        ("<<PII_1000001>>", "<<PII_1>>"),
+        ("<<PII_1000000>>", "<<PII_1000001>>"),
+        ("<<PII_999999>>", "<<PII_1000000>>"),
+    ],
+)
+def test_08t_r6_carried_numbers_above_one_million_are_ignored(carried, first):
+    # r6 MINOR-r6-1 (KARARLAR (h′)): the ignore threshold sits far below the issue limit, so a
+    # carried 7-digit number never uses up the scope.
+    async def go():
+        store = MemoryTokenStore()
+        await reserve_carried(store, "s", f"geçmiş {carried}")
+        return await store.token_for("s", "EMAIL_ADDRESS:" + AYSE, AYSE)
+
+    assert run(go()) == first

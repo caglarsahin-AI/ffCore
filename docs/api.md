@@ -542,7 +542,8 @@ about targets outside its scopes. Another project's model or agent, or a missing
   (one piece; a buffered or live stream that has started sends the error event and `[DONE]`),
   the external agent and a facade agent request's client history check; 502 `api_error` (the
   run's code) when it happens inside a facade agent run (its question and stored history).
-  A `<<PII_n>>` from 10,000,000 or with non-ASCII digits is no placeholder and is ignored.
+  A carried placeholder above 1,000,000, a longer `<<PII_n>>` and one with non-ASCII digits
+  are ignored.
 
 ### External agent path (06b-2)
 

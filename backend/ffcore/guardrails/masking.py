@@ -25,8 +25,13 @@ KEEP_VISIBLE = 4
 # that carries one keeps working.
 PLACEHOLDER = re.compile(r"<<PII_[0-9]{1,7}>>")
 PLACEHOLDER_MAX_NUMBER = 9_999_999
-# plan/08 C17: the longest placeholder is 16 characters (`<<PII_` + up to 8 digits + `>>`); a
-# stream holds at most 15 while one may still be open. A longer run passes as it is.
+# A carried number above this is ignored, not reserved (r6 MINOR-r6-1, KARARLAR (h′)): far below
+# the issue limit, so a number someone wrote into a conversation never uses up a scope, and no
+# real scope reaches it, so ignoring it cannot collide.
+CARRIED_MAX_NUMBER = 1_000_000
+# plan/08 C17: a placeholder has at most 7 digits; the aligner holds a tail of up to 15 characters
+# (`<<PII_` + up to 8 digits + `>`) while one may still be open, so a run longer than any
+# placeholder passes as it is.
 PLACEHOLDER_MAX_CHARS = 16
 _OPEN_PLACEHOLDER = re.compile(r"<(?:<(?:P(?:I(?:I(?:_(?:\d{1,8}>?)?)?)?)?)?)?")
 
@@ -613,7 +618,7 @@ async def reserve_carried(store: TokenStore, scope: str, data: Any) -> None:
     carried in from elsewhere never becomes one of the scope's values (r2 MAJOR-r2-2, KARARLAR
     "Konuşma geçmişinde yer tutucu eşlemesi doğrudan ve hamsız")."""
     text = data if isinstance(data, str) else json.dumps(data, ensure_ascii=False)
-    numbers = placeholder_numbers(text) if "<<PII_" in text else []
+    numbers = [n for n in placeholder_numbers(text) if n <= CARRIED_MAX_NUMBER]
     if numbers:
         await store.reserve(scope, max(numbers))
 

@@ -117,13 +117,13 @@ def test_08t_r2_question_numbers_are_reserved_first(database_url, pg, make_proje
 def test_08t_r2_only_numbers_a_scope_can_issue_are_reserved(database_url, pg, make_project):
     # MINOR-r2-1, r5 (h): a number from 10,000,000 or an overflowing one is not reserved.
     conversation_id, _, run_b = _setup(pg, make_project)
-    question = "<<PII_100000000>> <<PII_99999999999999999999999>> <<PII_1234567>>"
+    question = "<<PII_100000000>> <<PII_99999999999999999999999>> <<PII_123456>>"
 
     async def body(session, store, client, prefix):
         await _history(session, conversation_id, run_b, store, question)
         return await store.token_for(str(run_b), "EMAIL_ADDRESS:" + FATMA, FATMA)
 
-    assert _go(database_url, body) == "<<PII_1234568>>"
+    assert _go(database_url, body) == "<<PII_123457>>"
 
 
 def test_08t_r2_history_does_not_renew_the_earlier_mapping(database_url, pg, make_project):
@@ -174,7 +174,8 @@ def test_08t_r5_large_carried_numbers_are_ignored_and_the_range_ends_loudly(
 
     conversation_id, run_a, run_b = _setup(pg, make_project)
     arabic = "<<PII_" + "\u0669" * 8 + ">>"
-    _message(pg, conversation_id, run_a, "assistant", f"Yankı <<PII_99999998>> {arabic}", 1.5)
+    echo = f"Yankı <<PII_99999998>> {arabic} <<PII_9999999>> <<PII_1000001>>"  # r6 (h′)
+    _message(pg, conversation_id, run_a, "assistant", echo, 1.5)
 
     async def body(session, store, client, prefix):
         history = await _history(session, conversation_id, run_b, store)
@@ -186,5 +187,5 @@ def test_08t_r5_large_carried_numbers_are_ignored_and_the_range_ends_loudly(
         return history, first, last
 
     history, first, last = _go(database_url, body)
-    assert history[2]["content"] == f"Yankı <<PII_99999998>> {arabic}"
+    assert history[2]["content"] == echo
     assert (first, last) == ("<<PII_2>>", "<<PII_9999999>>")  # after the stale <<PII_1>>
