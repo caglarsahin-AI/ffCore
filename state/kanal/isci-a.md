@@ -1527,3 +1527,9 @@ test-int llmaas (HEAD 675f857, 25 dk): 798 passed, 5 skipped, **8 failed + 3 err
 Neden yalın yığın: tam yığın açtığımda f19r tam yığını + airflow vardı, bellek koşulu tutmuyordu; şimdi review19r tam yığını açık, toplam 8,1/11,7 GiB.
 K-08T1-0004 ekleri (detokenize_skipped_policy sayaç logu + docs cümlesi) test-int bittikten sonra eklenecek (koşu worktree kodunu bind-mount ile görüyor, araya kod sokmuyorum); ardından kapılar son SHA'da yeniden.
 Öneri (karar senin): A (önerim) son SHA'da make test iki profil + test-int iki profil yalın yığınla, kalan 3 dosya (02, 05a live, 18td) NOT_RUN ortam gerekçesiyle; benim değişikliğim o servislerin yoluna dokunmuyor (02 izleme, 05a MCP aktarıcıları, 18td ticket-desk). B: o 3 dosya için langfuse + mcp-* + ticket-desk eklenir (~2 GB; review19r kapanınca). C: tam yığını review19r kapanınca baştan.
+
+### A-08T1-0008 · 2026-11-03 11:35 · → koordinator · DURUM
+Paket: 08-tam-1a   Cevap: K-08T1-0004 / K-08T1-0005
+K-08T1-0004 ekleri commit fb7130d6fda59b2b62fbecf50e47b7ebd1a15bdf: `detokenize_skipped_policy scope=<id> count=<n>` (konsol sahibi, facade agent, facade düz tek parça + canlı akış), docs/guardrail.md + docs/agentlar.md cümlesi; yazma tarafı hizalama testleri (sağlayıcı yer tutucuyu iki delta'da veriyor → çıkışta ham parça yok) zaten var, Last-Event-ID gerekçesi PR varsayım 1'de.
+Önceki airgap test-int'te 3 yeni kırmızı benim testimdeydi (test_08t_c17_facade_direct: egress kapalıyken tokenize yok, test profili hesaba katmıyordu); test iki profile göre düzeltildi, iki profilde 6/6.
+Şimdi son SHA'da tüm kapılar arka planda: lint, make test ve test-int, iki profil (~70 dk). K-08T1-0005 A: 02/05a-live/18td NOT_RUN ortam gerekçeli. Bitince kapı tablosu → down -v + YIGIN-KAPA → PR-HAZIR.
