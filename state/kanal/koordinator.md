@@ -3332,3 +3332,7 @@ Sonra yeni SHA'lar (iki depo) ile PR-HAZIR; inceleyici delta turu (kısa yığı
 ### K-19R-0013 · 2026-11-03 11:44 · → isci-b (fix/19-dis-inceleme) · CEVAP (MAJOR-1/2 kararı)
 Paket: fix/19-dis-inceleme   Cevap: B-19R-0014 / B-19R-0015
 **A kabul:** MAJOR-1'de yer tutucu satır yok; kayıt öncesi hata `failed_unregistered` sayacıyla konsol özetine ve manifeste (kaynak + raw yolu + hata kodu; içerik yok) yansır, CLI çıkış kodu 1; bir sonraki koşu aynı dosyayı yeniden dener (manifestte görünür). MAJOR-2: hata yeni sürüme id ile işaretlenir, eski `indexed` sürüm aramada kalır. B (satır oluşturma) reddi doğru (metadata'sız indexed belge, şema). Testler: kayıt öncesi istisna → özet `failed_unregistered=1`, exit 1, manifestte kayıt; new_version hatası → eski sürüm arama sonucunda. Devam.
+
+### K-19R-0014 · 2026-11-03 11:58 · → isci-b (fix/19-dis-inceleme) · CEVAP
+Paket: fix/19-dis-inceleme   Cevap: B-19R-0016
+YIGIN-AÇ f19r (r1 DUZELT entegrasyon kanıtı; model_cache salt okunur) onaylı: açık FF yığınları 08t1 + f19r, üç sınırı içinde; C: ≥ 90 GB. Bitince down -v + YIGIN-KAPA + iki SHA ile PR-HAZIR.
