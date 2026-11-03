@@ -107,10 +107,11 @@ def test_08t_r2_other_lines_are_reversed():
 
 
 def test_08t_r2_closed_target_does_not_carry():
-    # The target closes on its own line: the next line is reversed.
-    text = '<img src="https://h/a.png">\n<<PII_1>>\n![x](//h/b.png)\n<<PII_1>>'
+    # A markdown target closes on its own line: the next line is reversed. (An HTML tag keeps
+    # the rest of the answer since r4, KARARLAR "cevap düzeyinde HTML fail-closed".)
+    text = "![x](//h/a.png)\n<<PII_1>>\n[1]: //h/b.png\n<<PII_1>>"
     out, _, _ = _reveal(text)
-    assert out == f'<img src="https://h/a.png">\n{NAME}\n![x](//h/b.png)\n{NAME}'
+    assert out == f"![x](//h/a.png)\n{NAME}\n[1]: //h/b.png\n{NAME}"
 
 
 def test_08t_r2_apostrophes_in_prose_do_not_carry():

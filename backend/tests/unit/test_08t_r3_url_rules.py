@@ -82,7 +82,6 @@ def test_08t_r3_url_rules_keep_the_placeholder(text, form):
         "<<PII_1>>",
         "a < b ve <<PII_1>>",
         "Sözleşme 3:5 maddesi, sahibi <<PII_1>>",
-        "<img src=x>\n\nSahibi <<PII_1>>",
     ],
 )
 def test_08t_r3_lines_without_a_rule_are_reversed(text, form):

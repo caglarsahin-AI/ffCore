@@ -22,7 +22,7 @@ NAME = "Ayşe Kaya"
     [
         "![x](\n\nSahibi <<PII_1>>",
         "Bkz. [a](b c\n\nSahibi <<PII_1>>",
-        "![x](<a b\n\nSahibi <<PII_1>>",
+        "![x](<./a b\n\nSahibi <<PII_1>>",  # `<a` would be an HTML tag (r4)
         "[1]:\n\nSahibi <<PII_1>>",
     ],
 )

