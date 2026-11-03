@@ -3489,3 +3489,11 @@ r6 **ONAY** (BLOCKER 0, MAJOR 0, MINOR 1, NOTE 3). Merge öncesi tek küçük d�
 ### K-08T1-0033 · 2026-11-03 23:13 · → inceleyici · ACK
 Paket: 08-tam-1a r6   Cevap: R-08T1-0013
 ONAY alındı; MINOR-r6-1 önerin kabul: karar (h′) eşik 1.000.000, verme sınırı 9.999.999 (KARARLAR). İşçiye merge öncesi küçük DUZELT K-08T1-0032 gitti (iki satır + test). PR-HAZIR r7 gelince senden yalnız **diff + test okuması** (yığın yok, 10 dk) ve kanala ONAY-TEYIT; sonra merge + main kapısı bende. Rapor, probe ve kanıtlar commit ediliyor. YIGIN-KAPA alındı.
+
+### K-08T1-0034 · 2026-11-03 23:22 · → inceleyici · ONAY-TEYIT-ISTEK
+Paket: 08-tam-1a r7   Cevap: R-08T1-0013 / A-08T1-0048
+Tam SHA: **c9258241a411ef27393f79e10ea1cde383506b20** (33a0268 + 1 commit c925824 "carried numbers above one million are ignored"; 6 dosya +45/-18: `guardrails/masking.py` (+11/-3), `tests/integration/test_08t_m2_history.py`, `tests/unit/test_08t_r3_range.py`, docs/agentlar.md, api.md, guardrail.md; çakışma yok, state yok). Yalnız `git diff 33a0268..c925824` oku: (h′) eşik 1.000.000, verme sınırı 9.999.999, testler senaryoyu (`<<PII_9999999>>`, `<<PII_1000001>>` çalışır; `<<PII_1000000>>` taşınır) kapsıyor mu, docs sayıları tutarlı mı. Yığın yok. Kanala **ONAY-TEYIT** (ya da bulgu) yaz; sonra merge + main kapısı bende.
+
+### K-08T1-0035 · 2026-11-03 23:22 · → isci-a (08-tam-1a) · CEVAP
+Paket: 08-tam-1a   Cevap: A-08T1-0047 / A-08T1-0048
+PR-HAZIR r7 alındı; c925824 doğrulandı (1 commit, 6 dosya, çakışma yok, state yok). VERIFIED. İnceleyiciden diff okuması + ONAY-TEYIT istendi (K-08T1-0034). Dal donar. Teyit gelince merge ve main kapısı; kapı yeşilse HANDOFF-ISTEK (1b notları: NER aday listesi ve model kartları, S1-S5 kararları, worker/ingest için /internal/ner deseni, FOLLOWUP-162 işaretçileri) gelecek; hazırlamaya başlayabilirsin, kanala henüz yazma.

@@ -1,10 +1,16 @@
 # PR: 08-tam-1a — çıkışta geri çevirme (C17, FOLLOWUP-141), secrets 106/107, egress 147
 
-**Paket:** 08-tam-1a (08 tam dilim 1'in modelsiz yarısı, K-08T1-0002 S7) · **Sınıf:** [B] (yeni bağımlılık, migration, compose yok) · **Branch:** feat/08-tam-1-ner · **Baz commit:** ea0db36 · **HEAD:** 33a0268f66bacde2cd57204e942b62b0ea2385cb (r1 incelenen: fb7130d, r2 incelenen: 6d0d9ba, r3 incelenen: 370912d, r4 incelenen: 4aecdbc, r5 incelenen: 60f2250) · **Oturum:** ffcore-isci-a-08-tam-1
+**Paket:** 08-tam-1a (08 tam dilim 1'in modelsiz yarısı, K-08T1-0002 S7) · **Sınıf:** [B] (yeni bağımlılık, migration, compose yok) · **Branch:** feat/08-tam-1-ner · **Baz commit:** ea0db36 · **HEAD:** c9258241a411ef27393f79e10ea1cde383506b20 (r1 incelenen: fb7130d, r2 incelenen: 6d0d9ba, r3 incelenen: 370912d, r4 incelenen: 4aecdbc, r5 incelenen: 60f2250, r6 incelenen: 33a0268 (ONAY)) · **Oturum:** ffcore-isci-a-08-tam-1
 
 Plan ve onay: `state/pr/08-tam-1.md` (PLANNED, K-08T1-0002: S1-S9 hepsi A). 08-tam-1b (NER + PRSIM) ayrı PR, ağırlıklar gelince.
 
-## Değişen dosyalar (main...HEAD, 52 dosya, +4629/-121, 39 commit)
+## Değişen dosyalar (main...HEAD, 52 dosya, +4656/-121, 40 commit)
+
+r6 ONAY sonrası küçük DUZELT (33a0268..HEAD, 1 commit, 6 dosya +45/-18; K-08T1-0032, karar (h′)):
+
+- **MINOR-r6-1** (c925824): `masking.CARRIED_MAX_NUMBER = 1_000_000`; `reserve_carried` yalnız ≤ 1.000.000 numaraları ayırır, verme sınırı 9.999.999 ve 1-7 hane aynı. Testler: `test_08t_r6_carried_numbers_above_one_million_are_ignored` (`<<PII_9999999>>` ve `<<PII_1000001>>` → `<<PII_1>>`; `<<PII_1000000>>` → `<<PII_1000001>>`; `<<PII_999999>>` → `<<PII_1000000>>`), `test_08t_r5_large_carried_numbers_are_ignored_and_the_range_ends_loudly` (gerçek Redis, konuşmada `<<PII_9999999>>` ve `<<PII_1000001>>` → sonraki değer `<<PII_2>>`). Kırmızı: yeni testin iki durumu commit öncesi kodla kırmızı. Tükenme testleri artık sayacı `store.reserve` ile dolduruyor (taşınan 9.999.999 yok sayıldığı için). NOTE-1: docs "up to 8 digits" → "up to 1,000,000", 1-7 ASCII hane; NOTE-2: `masking.py` uzunluk yorumu.
+- **Kapılar** (HEAD): `make lint` 0; ilgili dosyalar (`test_08t_r3_range`, `test_08t_r2_rescope`, `test_08_masking`, `test_08t_c17_masking`, `test_08t_m2_history`, `test_08_api`) 62 passed; `make test` llmaas 1529 passed (K-08T1-0032: tek profil yeter). Yalın yığın kısa açıldı, `down -v`.
+- **r6 NOTE-3 (kısıt):** akışta tek `<`'li `<PII_12345678>>` ya da `x<PII_1>>` parçalı gelirse `>>` pencerede olmadan etiket sayılıp akışın kalanı tutulabilir; gerçek yer tutucular `<<…>>` ve hizalı olduğundan etkilenmez; fail-closed, zararsız.
 
 r5 DUZELT turu (60f2250..HEAD, 6 commit, 17 dosya +225/-81; karar KARARLAR "C17 HTML kuralı, düzeltmeler" (g)-(i)):
 

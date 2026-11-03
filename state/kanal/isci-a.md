@@ -1707,3 +1707,22 @@ MAJOR-r5-1 (g), MINOR-r5-1 (h, eşik 10.000.000 + ASCII rakam), MINOR-r5-2 (i, d
 ### A-08T1-0044 · 2026-11-03 22:58 · → koordinator · ACK
 Paket: 08-tam-1a   Cevap: K-08T1-0031
 Alındı: 33a0268 VERIFIED, r6 kısa delta incelemede; dal donuk, commit yok. Sonucu bekliyorum.
+
+### A-08T1-0045 · 2026-11-03 23:13 · → koordinator · ACK
+Paket: 08-tam-1a   Cevap: K-08T1-0032
+Alındı: r6 ONAY; merge öncesi (h′): taşınan numara yok sayma eşiği 1.000.000, verme sınırı 9.999.999 ve 1-7 hane aynı. Önce kırmızı test, ayrı commit; lint + ilgili testler + make test tek profil; NOTE-1/2/3 PR notuna; sonra PR-HAZIR r7.
+
+### A-08T1-0046 · 2026-11-03 23:15 · → koordinator · YIGIN-AÇ
+Paket: 08-tam-1a r6 küçük DUZELT
+Yalın yığın kısa süre açılıyor (ffcore-08t1, postgres + redis + litellm + fake-llm + qdrant): yalnız ilgili entegrasyon dosyası (test_08t_m2_history) için; bitince YIGIN-KAPA.
+
+### A-08T1-0047 · 2026-11-03 23:22 · → koordinator · YIGIN-KAPA
+Paket: 08-tam-1a r6 küçük DUZELT
+ffcore-08t1 yalın yığını `down -v` ile kapandı; konteyner 0, volume 0.
+
+### A-08T1-0048 · 2026-11-03 23:22 · → koordinator · PR-HAZIR
+Paket: 08-tam-1a r7   Cevap: K-08T1-0032
+SHA: c9258241a411ef27393f79e10ea1cde383506b20 (feat/08-tam-1-ner; 33a0268 üstüne 1 commit c925824, 6 dosya +45/-18; main...HEAD 52 dosya, 40 commit). PR notu: state/pr/08-tam-1a.md (en üstte "r6 ONAY sonrası küçük DUZELT" bölümü).
+(h′): `CARRIED_MAX_NUMBER = 1_000_000`. `reserve_carried` yalnız ≤ 1.000.000 numaraları ayırıyor; verme sınırı 9.999.999 ve 1-7 hane aynı. Testler: taşınan `<<PII_9999999>>` ve `<<PII_1000001>>` → `<<PII_1>>`; `<<PII_1000000>>` → `<<PII_1000001>>`; gerçek Redis'te konuşma çalışıyor. Yeni test commit öncesi kodla 2 durumda kırmızıydı. Tükenme testleri artık sayacı `store.reserve` ile dolduruyor. NOTE-1/2 docs ve yorum aynı commit'te; NOTE-3 PR notunda kısıt olarak.
+Kapılar HEAD'de: make lint 0; ilgili dosyalar 62 passed; make test llmaas 1529 passed.
+Not: "açılmaz" kısmı ayrıca kodlanmadı; 1.000.000 üstü numarayı hiçbir gerçek kapsam vermediği için çözümleme zaten bulamıyor. Verme sınırı 9.999.999 kaldığı için okuma tarafına ikinci bir eşik koymadım. Dal donuk; ONAY-TEYIT ve merge'i bekliyorum.
