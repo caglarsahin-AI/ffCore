@@ -3,9 +3,9 @@
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
 - Oturum kimliği: ffcore-isci-a-08-tam-1 (önceki lease ffcore-isci-a-06b-2 RETIRED)
-- Aktif paket: 08-tam-1 (K-08T1-0001)
-- Durum: ACTIVE
-- Son okunan: K-08T1-0001 / K-18K2-0003
+- Aktif paket: yok (08-tam-1a MERGED 1d836a0; 08-tam-1b yeni oturumda)
+- Durum: RETIRED
+- Son okunan: K-08T1-0037
 
 ## Mesajlar
 
@@ -1730,3 +1730,81 @@ Not: "açılmaz" kısmı ayrıca kodlanmadı; 1.000.000 üstü numarayı hiçbir
 ### A-08T1-0049 · 2026-11-03 23:23 · → koordinator · ACK
 Paket: 08-tam-1a   Cevap: K-08T1-0035
 Alındı: c925824 VERIFIED, ONAY-TEYIT bekleniyor; dal donuk. HANDOFF (1b notları) taslağı hazırlanıyor, merge sonrasına kadar kanala yazılmayacak.
+
+### A-08T1-0050 · 2026-11-03 23:48 · → koordinator · HANDOFF
+Paket: 08-tam-1a (MERGED, main 1d836a0 ← c925824) → 08-tam-1b (NER + PRSIM)   Cevap: K-08T1-0037
+Lease: ffcore-isci-a-08-tam-1 → **RETIRED** (başlık güncellendi). `.worktrees/feat/08-tam-1-ner` içinde açık ya da izlenmeyen dosyam yok (git status temiz). Yığın kapalı (ffcore-08t1: konteyner 0, volume 0). `ffcore/{backend,tools}:0.0.0-08t1` imajları duruyor; silme kararı koordinatörün. Scratchpad'deki geçici dosyalar (tee logları, düzenleme betikleri) depoda değil.
+
+**1. 1a'nın bıraktığı yapı (1b bunun üstüne kurulur)**
+- `guardrails/masking.py`:
+  - yazma tarafı `PlaceholderAligner`; okuma tarafı `StreamDetokenizer` (facade düz) ve `ContextReveal` (konsol/facade agent);
+  - `UrlLines`: akış düzeyinde HTML + markdown satır kuralı, artımlı tarama;
+  - `reveal_text`; geçmiş için `rescope` + `entry()` (TTL yenilemez);
+  - `reserve_carried`; `PlaceholderOutOfRange`.
+- `api/runs.py`: `exit_mode`, `exit_hook(after=)`, `detokenizer` (yeniden bağlanmada `token_texts` ile durum kurma).
+- facade: `FacadeGuard.reveal` + `token_store_errors` → 502 `detokenize_unavailable`.
+- `runtime/adapters._history`: hamsız eşleme.
+- Ters eşlemede `i:<token>` (`category:value`): NER kategorileri (`PERSON`, `ORGANIZATION`, `LOCATION`) aynı `_identity` ve `tokenize` yolundan girer, C17 için ek iş yok.
+- Yer tutucu: 1-7 ASCII hane; verme sınırı 9.999.999 (aşarsa `placeholder_out_of_range`, `on_error`'dan bağımsız); taşınan > 1.000.000 yok sayılır.
+
+**2. C17 son biçimi (KARARLAR, bağlayıcı)**
+- "C17 geri çevirme bağlam istisnası" (A).
+- "C17 URL bağlam kuralı satır düzeyinde ve fail-closed" + ek (b) işaretler, (c) artımlı tarama, (d)/(d′) yeniden bağlanmada durum kurma ve başarısızsa akışın kalanı, (e) boş satır yalnız markdown hedefini kapatır.
+- "C17 geri çevirme: cevap düzeyinde HTML fail-closed" (A; ek (a)'nın yerini aldı).
+- "C17 HTML kuralı, düzeltmeler":
+  - (g) istisna önceki karaktere bakmaz;
+  - (h)/(h′) eşikler;
+  - (i) kapsam okuyucunun akışıdır, bedel konsol sahibine de düşer.
+- Docs: `docs/guardrail.md` "Reversal at the exit" ve "The trade-off" paragrafları.
+
+**3. 08-tam-1b: S1-S5 ve işaretçiler**
+- K-08T1-0002 (S1-S9 hepsi A; S7: 1b ağırlıklar gelince), K-08T1-0004 (yazma tarafında hizalama; çıkışta enforce `pii` kuralı varsa geri çevirme yok), K-08T1-0008 (1b yeni oturumda, 1a merge sonrası). Plan: `state/pr/08-tam-1.md` ("08-tam-1b" bölümü, kabul kriterleri 1-6 ve 15, S1-S5).
+- **S1:** Presidio yok. `guardrails/recognizers/ner.py` transformers `pipeline("token-classification")` (transformers 4.57.6, torch 2.14.0 CPU zaten bağımlılık, yeni paket yok). Bulgular `Finding`, regex ile aynı `resolve_overlaps`.
+- **S2:** model yalnız API sürecinde. Worker (`EngineGuard`) ve ingest filtresi `POST /api/v1/internal/ner` çağırır. Desen 04a `/internal/embed`: servis jetonu, `SafeOutboundClient`, `LocalEmbedClient`/`HttpEmbedClient` benzeri Local/Http istemci, `GUARDRAIL_NER_URL`. Ingest filtresi bu çağrı için async'e alınır. API kapalıysa açık hata; regex'e sessiz düşüş yok (NER politikası `on_error` fail-closed).
+- **S3:** `NER_MODEL` + `NER_REVISION` `.env.example`'da açık değer, compose `${…:?}` fail-loud. `deploy/offline/models.txt` aynı revizyon (repo, revision, yol, sha256, bayt; bge-m3 satırı deseni).
+- **S4:** ağırlık `model_cache` volume + `make models` (`knowledge/models.py` `required()`/`download()`/`hf_path(local_files_only=True)`). İmaja girmez; Makefile hedefi aynı.
+- **S5, aday listesi ve model kartları (hiçbiri doğrulanmadı, ağa bağlanılmadı):**
+  - BERTurk-NER: `savasy/bert-base-turkish-ner-cased` ve `akdeniz27/bert-base-turkish-cased-ner`;
+  - TabiBERT: yalnız NER başlıklı hazır model varsa. Taban encoder ise eğitim kapsam dışı (ARCH-07), aday elenir, gerekçe PR'da.
+  - Kullanıcının `make models` adımı model kartı (`README.md`) ve `config.json`'u da indirmeli. Lisans ve `id2label` etiketleri offline okunur.
+  - Gerçek model koşusu öncesi indirme yolu ve `--network none` kanıtı gerekir (ENV-83). Ağırlık yoksa NER testleri NOT_RUN gerekçeli; VERIFIED için `make models` şart (K-04a-0020).
+- **Ölçüm:** `data/samples/pii/pii-100.jsonl` (PERSON 22, ORG 4, LOC 4; değiştirilmez).
+  - Kabul: ad-soyad recall ≥ 0,85 (llmaas hedefi 0,90 raporda); TC/telefon/IBAN/e-posta ≥ 0,98 regresyonsuz; 1.000 karakter P95 < 300 ms (tek CPU ayrıca).
+  - Hiçbir aday tutmazsa ölçüm tablosuyla KARAR-GEREK (M4 eşiği kullanıcı kararı).
+  - Testler: `test_08t_1_ner_recall_person`, `test_08t_1b_quality_report_matches_docs`, `test_08t_2_regex_recall_unchanged_with_ner`, `test_08t_3_ner_latency_p95` (`-m models`), `test_08t_6_worker_uses_http_ner`, `test_08t_15*`.
+- **Şema:** `schemas.py` `engine: ner` reddi (`engine_unsupported`) kalkar; additive, C4 biçimi değişmez. `engine: regex` politikası NER'i hiç çağırmaz.
+- **PRSIM ingest guard'ı:**
+  - `knowledge/ingest_mask.py` `pii_ner@1` (regex + NER, HTTP);
+  - `raw_ingest.py` `TEXT_FILTER` varsayılanı;
+  - `raw_staging.py` `prsim_requires_ner` reddi `pii_ner` ile kalkar;
+  - `cli.py` `--accept-personnel-data` geriye uyumlu (deprecation notu);
+  - eski `pii_regex@1` belgeleri değişmez;
+  - M3 koşusu sürüyorsa ve ölçüm manifestine dokunulacaksa dur.
+
+**4. FOLLOWUP-162 (açık; 1b'ye ya da ayrı)**
+- **İlk commit önerisi:** docs/api.md:540 ve docs/guardrail.md:128 örneği. Koordinatörün işaret ettiği iki yer; eşik örneği (h′) sonrası `<<PII_9999999>>` ile sayaç doldurma, 1.000.000 ile tutarlı yazılmalı.
+- **1b'yi doğrudan ilgilendiren:** MINOR-r3-7. Araç sonucu ve KB parçasındaki düz `<<PII_n>>` metni `reserve_carried`'dan geçmiyor; NER bulguları KB'den de geleceği için egress tokenize öncesi ayrılmalı.
+- **Diğerleri (PR notunda kısıt olarak):**
+  - r1 MINOR 4, 5, 6, 9, 10, 13 (106 yanlış negatifleri: `auth_token:`, `DB_TOKEN=`, boşluklu `api key`), 14 ve NOTE 1-8;
+  - r2 NOTE 2-8;
+  - r3 NOTE-3/4/5;
+  - r4 NOTE 1/2/4/5 (`gate.commit` finally, ikinci hata dalında `rest()`, XRANGE `COUNT` sayfalama, büyük tek parçada span × yer tutucu);
+  - r5 NOTE-3/4;
+  - r6 NOTE-3.
+
+**5. Yedi turdan öğrenilenler**
+- **Fail-closed kural kendi ayrımlarına güvenmemeli.** HTML'i satır satır izleyen her ayrım (tırnak, açıcı önceliği, blok türü, kaçışlar) bir sonraki turda yeni bir yazımla atlatıldı. Sınıf kuralı (ilk etiketten sonra akışın kalanı) dört turluk yamayı bitirdi ve kodu küçülttü. Benzer bir kural yazılırken önce sınıf düzeyi seçenek koordinatöre sorulmalı.
+- **Optimizasyon güvenlik istisnasını sessizce değiştirebilir.** Artımlı taramanın 32 karakterlik penceresi istisnanın geriye bakışını bozdu (r5 MAJOR). Pencereli taramada her istisna pencere sınırında test edilmeli; inceleyicinin kuyruk probe'u bunu yakaladı.
+- **Sınır/eşik çiftleri aynı noktada olmamalı.** Taşınan numara eşiği verme sınırıyla aynı yerdeyken konuşma iki kez kalıcı bozuldu (99.999.999, sonra 9.999.999). Eşik sınırın çok altında olmalı (h′).
+- **Kararın lafzıyla amacı ayrıştığında KARAR-GEREK açılmalı.** (d) ve (e) yazıldığı gibi uygulansaydı biri sızıntı, biri kullanılabilirlik sorunu yaratacaktı; ikisi KARAR-GEREK ile düzeltildi (K-08T1-0020/0021).
+- **Kırmızı kanıtı her turda commit öncesi kodla alındı;** imza değişikliğiyle (TypeError) gelen kırmızılar PR notunda ayrıca belirtildi. Kapsama testleri (eski kodda da yeşil) ayrı yazıldı.
+- **Süreç:**
+  - Bash aracı heredoc'ta `\\` çiftini teke indiriyor; ters bölülü düzenlemeler Write ile dosyaya yazılıp oradan çalıştırılmalı (memory notu var).
+  - Kanal saatleri `date` ile (K-08T1-0017).
+  - Fake sağlayıcı cevabı 50 karakterde kesiyor; entegrasyon şekilleri buna sığmalı.
+- **Kapı komutları:**
+  - `MSYS_NO_PATHCONV=1 FFCORE_VERSION=0.0.0-08t1 docker compose -p ffcore-08t1 --env-file .env.test run --rm [--no-deps] [-e GUARDRAIL_EGRESS_ENABLED=false -e DEPLOY_PROFILE=airgap] tools make lint|test`;
+  - hedefli test-int `-w /work/backend tools pytest …` + `QDRANT_URL=http://qdrant:6333 RUN_QDRANT_TESTS=1`;
+  - yalın yığın `--profile test --profile qdrant up -d --wait postgres redis litellm fake-llm qdrant`.
+
+Sonrası yok; bu oturum durur. 08-tam-1b için kullanıcının yeni oturum açması gerekiyor (ROL=isci-a PAKET=08-tam-1b).
