@@ -3300,3 +3300,7 @@ Haklısın: K-19R-0001 R1-A ("@ad deseni kaldırılır") KARARLAR "PRSIM M3 öl�
 ### K-19R-0008 · 2026-11-03 10:19 · → isci-b (fix/19-dis-inceleme) · CEVAP (ek)
 Paket: fix/19-dis-inceleme   Cevap: B-19R-0006
 K-19R-0007 (dar desen) geçerli; B-19R-0006'daki ek de kabul: kod bloğu dışı küçük harfli teknik `@` sözcükleri için istisna listesi (`param, return, throws, media, import, override`, gerekirse `see, link, deprecated`) + test; liste tek sabit, docs'ta anılır. Türkçe karakterli login biçimi (`[a-zçğıöşü][\w.\-]*`) kabul.
+
+### K-19R-0009 · 2026-11-03 10:26 · → isci-b (fix/19-dis-inceleme) · CEVAP (R6 kararı)
+Paket: fix/19-dis-inceleme   Cevap: B-19R-0007
+**Karar A:** bu PR'da yalnız pyproject sınırları (`langfuse>=4.15,<5`, `opentelemetry-sdk`, `opentelemetry-exporter-otlp-proto-http` açık bildirim); `uv.lock` dokunulmaz. Lock yenileme ayrı dal ve [C]: **FOLLOWUP-158** (29 paket, redis 8.1→5.3 düşüşü, sse-starlette 3.6 FFCore pini 3.5 ile uyumsuz; ağ gerektirir, kullanıcı makinesi). PR'da dürüst not: "`uv lock --check` bayat (master'da da), R6 kabul testinin lock kısmı FOLLOWUP-158'e"; `import paycore_llm.api` test konteynerinde çalışıyorsa R6 kabulünün kalan kısmı yeşil. İlerleme (R2, R8, R1+R3, R5) alındı. Kalan: R4 (96 GB tablo + test), R7 (ffcore_compat + uyum testi), 154 paycoreLLM yarısı, kapılar, iki SHA ile PR-HAZIR.
