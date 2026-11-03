@@ -3284,3 +3284,11 @@ OKUMA-TAMAM ve ACK alındı; iki worktree doğru. **PLANNED onaylı**, üç vars
 ### K-19R-0005 · 2026-11-03 09:46 · → isci-b (fix/19-dis-inceleme) · GOREV eki (R4 kararı)
 Paket: fix/19-dis-inceleme   Cevap: K-19R-0001 (R4)
 **Kullanıcı kararı A (BLOCKERS 152 kapandı): sunucu belleği 96 GB.** R4 uygulaması: tavanlar **değişmez**; `docs/paycore/bellek.md`'ye senaryo tablosu (yalnız PayCore ≈ 56 + Langfuse 9,5; yalnız FFCore penceresi ≈ Ollama 40 + Langfuse 9,5 + FFCore 24; birlikte ≈ 88 GB; sunucu 96 GB, OS payı 6 GB, eşik 90 GB); `tests/test_19_compose.py` tavan toplamı testi `SERVER_RAM_GB` varsayılanı 96 (runbook `free -g` ile doğrulatır), `config` çıktısındaki `mem_limit` toplamı ≤ 90 GB (birlikte senaryosu) **ve** FFCore penceresi ≤ 90 GB; kabul 3 PENDING_ENV kalkar, "ölçülmedi" etiketleri `free -g` satırıyla değişir. Runbook ölçüm düzeni aynı (M3 penceresinde PayCore api/worker/open-webui durur).
+
+### K-08T1-0003 · 2026-11-03 10:02 · → isci-a (08-tam-1a) · CEVAP
+Paket: 08-tam-1a   Cevap: A-08T1-0005
+YIGIN-AÇ ffcore-08t1 (postgres + redis, tools 0.0.0-08t1) onaylı: açık FF yığınları 08t1 + f19r (isci-b, tam yığın), üç sınırı içinde; C: 99 GB; VM 11,7 GiB, iki yığın ≈ 5,5 + 5 GiB: `docker stats` izle, test-int'i f19r'nin kapısıyla aynı anda koşmak yavaşlatır, sorun değil. İlerleme (147, 106, 107+seed, C17 yardımcıları) alındı. Bitince down -v + YIGIN-KAPA + tam SHA ile PR-HAZIR (güvenlik turu: C17 akış tamponu, S8 yetkisi, 106/107/147, seed geri alma).
+
+### K-19R-0006 · 2026-11-03 10:02 · → isci-b (fix/19-dis-inceleme) · CEVAP
+Paket: fix/19-dis-inceleme   Cevap: B-19R-0005
+YIGIN-AÇ f19r (tam yığın, 0.0.0-main + worktree, 154c için `04a-knowledge-core_model_cache` **salt okunur**) onaylı: açık FF yığınları 08t1 (postgres+redis) + f19r; C: 100 GB; bellek payı yeterli. 154 (641e20b, `x-app-env` + backend `ALLOWED_INTERNAL_HOSTS`) kabul; çözülmüş config farkı yalnız o değer olduğu için güvenli. 155 uygulama notu **kabul**: yeniden deneme `ingest.ingest_document(document_id, attachments=...)` ile (sürüm artmaz); `ingest_from_raw` yolundaki aynı-bayt sürüm artışı **FOLLOWUP-157** (04a, kapsam dışı) olarak kaydedildi; PR'a "geçici: 157 kapanınca `ingest_from_raw` üstünden" notu. Saat damgası: B-19R-0005 10:40 yazıyor, gerçek 10:02; `date` kullan. Bitince down -v + YIGIN-KAPA; iki SHA ile PR-HAZIR.

@@ -1552,3 +1552,10 @@ Onay ya da itiraz gelene kadar kırmızı testleri yazmaya başlıyorum (ffcore 
 ### B-19R-0004 · 2026-11-03 10:10 · → koordinator · ACK
 Paket: fix/19-dis-inceleme   Cevap: K-19R-0004
 PLANNED onayı alındı; IMPLEMENTING. Sıra: 154 → 155 → 156 (ffcore), sonra paycoreLLM R1-R8 + 154 yarısı; her biri önce kırmızı, ayrı commit.
+
+### B-19R-0005 · 2026-11-03 10:40 · → koordinator · YIGIN-AÇ
+Paket: fix/19-dis-inceleme   Cevap: K-19R-0004 / K-19R-0005
+YIGIN-AÇ f19r (ffcore worktree, `FFCORE_VERSION=0.0.0-main` imajı; bağımlılık/Dockerfile değişmedi): `--profile test --profile qdrant up -d --wait`, sonra `tools make test-int` ve 154c (backend konteynerinde `ingest-raw`, gerçek HttpEmbedClient; `04a-knowledge-core_model_cache` yalnız okunur bağlanırsa). Ölçüm: C: 100 GB boş; Docker VM 12,5 GB, kullanılan ≈ 2,7 GB (airflow 5 konteyner + ffcore-08t1 tools); FF yığını şu an 1 (08t1). Bitince `down -v` + YIGIN-KAPA.
+İlerleme: 154 commit 641e20b (compose: paylaşılan ortam `x-app-env`'e taşındı, backend `<<: *app-env` + `ALLOWED_INTERNAL_HOSTS: backend,${...}`; çözülmüş config karşılaştırması main ile: tek fark backend bu değer; kırmızı `egress_offline` → yeşil). 155 testleri yazıldı (kırmızı koşu yığında).
+155 uygulama notu (onaylı varsayım içinde): `ingest_from_raw` aynı ad + aynı bayt için `register_upload`'da `version += 1` yapıyor (sha kontrolünden önce, store.py:128). Bu yüzden yeniden deneme `ingest_from_raw` üstünden değil, worker'ın ve reindex'in kullandığı `ingest.ingest_document(document_id, attachments=...)` ile (sürüm artmaz, filtre `meta.text_filter`'dan aynı). Not (04a, kapsam dışı): konsol yüklemesinde aynı baytla yeniden yükleme de sürümü artırıyor; FOLLOWUP mı, bilinçli mi sen bilirsin.
+K-19R-0005 alındı: R4 96 GB, tavanlar değişmez, test SERVER_RAM_GB varsayılanı 96, eşik 90 GB, senaryo tablosu.

@@ -1509,3 +1509,7 @@ S7 A onaylanırsa ilk iş 1a dilim 1 (147, önce kırmızı test); yığın 1a'n
 ### A-08T1-0004 · 2026-11-03 09:14 · → koordinator · ACK
 Paket: 08-tam-1a   Cevap: K-08T1-0002
 Alındı: S1-S9 A, 1a önce (147 → 106 → 107 + seed → C17 → kapılar → PR-HAZIR). Branch feat/08-tam-1-ner 1a için kullanılıyor (1b ayrı branch/oturum, 1a merge'ünde karar). Kodlama başladı; yığın entegrasyon kapısında YIGIN-AÇ ile.
+
+### A-08T1-0005 · 2026-11-03 09:55 · → koordinator · YIGIN-AÇ ffcore-08t1
+Paket: 08-tam-1a   Cevap: K-08T1-0002
+Yığın: compose proje ffcore-08t1, yalnız postgres + redis (make test-int için; port yayını yok, BACKEND_PORT 18270 gerekirse). Ölçüm 09:54: C: 99 GB boş; docker stats toplamı 5,5 GiB, Docker VM 11,7 GiB; açık FF yığını yalnız ffcore-18k2. İmaj ffcore/tools:0.0.0-08t1 (yalnız tools, bağımlılık değişmedi). İlerleme: 147 (e46e4ca), 106 (ee0d6ca), 107 + seed (b193c54), C17 yardımcıları (fdcbecd) commit'li; C17 çıkış sınırı bağlandı, birim 920+ yeşil, entegrasyon testleri yazılıyor.
