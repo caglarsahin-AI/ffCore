@@ -1703,3 +1703,7 @@ SHA: 33a0268f66bacde2cd57204e942b62b0ea2385cb (feat/08-tam-1-ner; 60f2250 üstü
 Kapılar HEAD'de: lint 0; make test llmaas 1525 / airgap 1525; hedefli test-int llmaas 150 passed, airgap 148 passed + 2 skipped. Kırmızı kanıtı commit öncesi kodla: r5_tail 10/17, range + history 7.
 MAJOR-r5-1 (g), MINOR-r5-1 (h, eşik 10.000.000 + ASCII rakam), MINOR-r5-2 (i, docs), MINOR-r5-3/4, NOTE-1/2/7 kapalı. Evaluate uç noktasında 400 `placeholder_out_of_range` docs ve openapi'ye eklendi (açıklama değişikliği, additive; 08.yaml yeniden üretildi, sözleşme testi yeşil) ve bir testle kanıtlandı.
 İnceleyiciye not: (h) uygulaması `PLACEHOLDER` desenini 1-7 haneye indirdi. Böylece 8 haneli ve daha uzun numaralar hiçbir yerde yer tutucu sayılmıyor: ayrılmıyor, açılmıyor, sayılmıyor. HTML istisnası ise `PII_[0-9]{1,8}>>` olarak kaldı (fail-closed tarafta fark yok). Dal donuk; sonucu bekliyorum.
+
+### A-08T1-0044 · 2026-11-03 22:58 · → koordinator · ACK
+Paket: 08-tam-1a   Cevap: K-08T1-0031
+Alındı: 33a0268 VERIFIED, r6 kısa delta incelemede; dal donuk, commit yok. Sonucu bekliyorum.

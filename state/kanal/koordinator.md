@@ -3481,3 +3481,11 @@ Tam SHA: **33a0268f66bacde2cd57204e942b62b0ea2385cb** (feat/08-tam-1-ner; 60f225
 ### K-08T1-0031 · 2026-11-03 22:57 · → isci-a (08-tam-1a) · CEVAP
 Paket: 08-tam-1a   Cevap: A-08T1-0042 / A-08T1-0043
 PR-HAZIR r6 alındı; 33a0268 doğrulandı (6 commit, 17 dosya, çakışma yok, state yok). YIGIN-KAPA alındı; VERIFIED. REVIEW-ISTEK r6 K-08T1-0030 inceleyiciye gitti (1-7 hane notu değerlendirmeye açıldı). Dal donar; sonucu bekle. ONAY ve merge sonrası HANDOFF (1b notları) + RETIRED istenecek.
+
+### K-08T1-0032 · 2026-11-03 23:13 · → isci-a (08-tam-1a) · DUZELT (küçük, merge öncesi)
+Paket: 08-tam-1a   Cevap: R-08T1-0013 (state/reviews/08-tam-1a-r6.md)
+r6 **ONAY** (BLOCKER 0, MAJOR 0, MINOR 1, NOTE 3). Merge öncesi tek küçük düzeltme, **karar (h′)** (KARARLAR güncellendi): taşınan yer tutucu numaraları için yok sayma eşiği **1.000.000** (> 1.000.000 taşınan numara ayrılmaz/açılmaz), verme sınırı 9.999.999 ve 1-7 haneli biçim aynı kalır. Gerekçe: eşik verme sınırıyla aynı yerde olunca taşınan `<<PII_9999999>>` konuşmayı yine kalıcı düşürüyordu (gerçek Redis'te doğrulandı). İki satır + test (konuşmada `<<PII_9999999>>` ve `<<PII_1000001>>` → sonraki koşular çalışır; `<<PII_1000000>>` taşınır); docs'ta eşik sayısı. Ayrı commit, önce kırmızı test; lint + ilgili test dosyaları + make test tek profil yeter (delta iki satır). NOTE-1/2/3 PR notuna. Sonra yeni tam SHA ile PR-HAZIR r7; inceleyici yalnız diff + test okur (yığın yok), ardından merge. Soru: KARAR-GEREK + zil.
+
+### K-08T1-0033 · 2026-11-03 23:13 · → inceleyici · ACK
+Paket: 08-tam-1a r6   Cevap: R-08T1-0013
+ONAY alındı; MINOR-r6-1 önerin kabul: karar (h′) eşik 1.000.000, verme sınırı 9.999.999 (KARARLAR). İşçiye merge öncesi küçük DUZELT K-08T1-0032 gitti (iki satır + test). PR-HAZIR r7 gelince senden yalnız **diff + test okuması** (yığın yok, 10 dk) ve kanala ONAY-TEYIT; sonra merge + main kapısı bende. Rapor, probe ve kanıtlar commit ediliyor. YIGIN-KAPA alındı.

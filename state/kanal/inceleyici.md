@@ -1706,3 +1706,19 @@ Paket: 08-tam-1a r5 (delta)   Cevap: K-08T1-0026
 - Koşular: make test airgap 1505/1505, llmaas 1503 + 2 zaman bütçesi kırmızısı (yük; dosya tek başına 3×6/6); tam yığın test-int llmaas 849 passed, airgap 847 passed; 06b-2 138/138 ×2; entegrasyon probe'ları 15/15; lint NOT_RUN (işçi kanıtı).
 - Dosyalar commit edilmedi: rapor, 08-tam-1a-r5-probe.py, -tail-probe.py, -int-probe.py, evidence 08t1a-r5-*, kanal. Worktree temiz kaldırıldı.
 - 2026-11-03 22:27 YIGIN-KAPA review-08t1a (r5): down -v; kalan konteyner 0, volume 0.
+
+### R-08T1-0012 · 2026-11-03 22:58 · → koordinator · ACK
+Paket: 08-tam-1a r6 (kısa delta)   Cevap: K-08T1-0030
+REVIEW-ISTEK r6 alındı. SHA doğrulandı: 33a0268f66bacde2cd57204e942b62b0ea2385cb (60f2250 üstüne 6 commit, 17 dosya +225/-81, state/ 0). KARARLAR (g)-(i) okundu. Worktree .worktrees/review-08t1a-r6 (temiz). Yığın kararı: tam yığın review-08t1a (probe'lar Redis ve yeni kodlu backend konteyneri istiyor); koşular make test iki profil + hedefli test-int iki profil + kuyruk/sınır probe'ları.
+- 2026-11-03 22:58 YIGIN-AC review-08t1a (r6; 18290/13290, COMPOSE_PROJECT_NAME=review08t1a, FFCORE_VERSION=0.0.0-review-08t1a, kod 33a0268 worktree, `--profile test --profile qdrant`). Açık başka FF yığını yok. Boş disk 93G.
+
+### R-08T1-0013 · 2026-11-03 23:12 · → koordinator · REVIEW-SONUC
+Paket: 08-tam-1a r6 (kısa delta)   Cevap: K-08T1-0030
+**ONAY** (33a0268f66bacde2cd57204e942b62b0ea2385cb). BLOCKER 0, MAJOR 0, MINOR 1, NOTE 3. Rapor state/reviews/08-tam-1a-r6.md (güvenlik turu ayrı bölüm).
+- MAJOR-r5-1 kapandı: kuyruk probe'u iki yolda 1-11'lik parçalarda 3/3, rastgele 0/200 kayıp (r5'te 97/200); `<PII_1 style` tutuluyor; r4'ün 7 adversarial yazımı 0 açılma. (h): taşınan 8 haneli/Unicode numara → konuşma çalışıyor (gerçek Redis). (i) docs doğru. MINOR-r5-3/4, NOTE-1/2/7 kapandı.
+- 1-7 hane uygulaması: C17 ile tutarlı, sayaç 9.999.999'da fail-loud, sızıntı/yanlış atıf yönü yok (8 haneli eşleme oluşamaz).
+- MINOR-r6-1 (karar): yok sayma eşiği verme sınırıyla aynı yerde; taşınan `<<PII_9999999>>` ilk değeri düşürüyor, konuşma yine kalıcı bozuluyor (doğrulandı). Öneri: taşınan > 1.000.000 yok sayılsın, verme sınırı 9.999.999 kalsın (iki satır, merge öncesi önerilir).
+- NOTE: docs "up to 8 digits" → 7; MAX_CHARS yorumu; tek `<`'li yer tutucu benzeri metin akışta fail-closed.
+- Koşular: make test 1525/1525 ×2; hedefli test-int (08t*, 08_api, 06b2 + SSRF probe) 116/116 ×2; tam test-int NOT_RUN (kısa tur, tam kapı ffmain'de); lint NOT_RUN (işçi kanıtı).
+- Dosyalar commit edilmedi: rapor, 08-tam-1a-r6-probe.py, evidence 08t1a-r6-*, kanal. Worktree temiz kaldırıldı.
+- 2026-11-03 23:12 YIGIN-KAPA review-08t1a (r6): down -v; kalan konteyner 0, volume 0.
