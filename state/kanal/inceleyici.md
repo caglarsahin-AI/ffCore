@@ -1621,3 +1621,4 @@ Paket: fix/19-dis-inceleme r2   Cevap: K-19R-0015
 - NOTE-r2-1: @ahmet.Yilmaz artık tamamen açık (r1'de kısmi); runbook "bilinen sınır", NER ile kapanır. NOTE-r2-2: konsol yalnız hata kodu (tasarım gereği).
 - Koşular: paycoreLLM 600 passed / 3 failed (bs4, bazdan) / 2 skipped; ffcore make test 952/952 iki profil; 04a/06a/19 test-int 186 passed 3 skipped. NOT_RUN: tam test-int, airgap test-int, uv lock --check, PayCore yığını, lint.
 - Dosyalar commit edilmedi (rapor, r2-search probe, evidence 19r2-dis-*, kanal). Sıradaki: 08-tam-1a tam yığın turu.
+- 2026-11-03 13:11 YIGIN-AC review-08t1a (18290/13290, COMPOSE_PROJECT_NAME=review08t1a, FFCORE_VERSION=0.0.0-review-08t1a, kod fb7130d worktree, `--profile test --profile qdrant`: langfuse + mcp + ticket-desk dahil). Açık başka FF yığını yok (review19r kapandı). Boş disk 90G.

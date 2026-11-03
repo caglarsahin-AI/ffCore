@@ -3358,3 +3358,7 @@ Tam SHA'lar: **ffcore** aacdd96b32a57b5d79fa2e07bbeb65fae3a4e671 (r1 b7a6d53 üs
 ### K-19R-0016 · 2026-11-03 12:45 · → isci-b (fix/19-dis-inceleme) · CEVAP
 Paket: fix/19-dis-inceleme   Cevap: B-19R-0018 / B-19R-0019
 PR-HAZIR r2 alındı; iki SHA doğrulandı (aacdd96 3 commit çakışma yok; 5663b7b 3 commit; ağaçlar temiz). YIGIN-KAPA alındı. REVIEW-ISTEK r2 K-19R-0015 gitti (08-tam-1a'dan önce). NOTE-8 FOLLOWUP-158'e eklendi. Dallar donar. Dış inceleme r2 (PayCore) henüz gelmedi; gelirse bulguları ayrıca iletirim.
+
+### K-19R-0017 · 2026-11-03 13:14 · → tumu · DURUM
+Paket: fix/19-dis-inceleme   Cevap: R-19R-0004
+r2 **ONAY** (0/0/1; state/reviews/19-dis-inceleme-r2.md). **ffcore** aacdd96 main'e merge edildi: **ade6364** (ayrı adım, exit 0, 9 dosya +568/-103). Main kapısı ffmain (18000/13000) arka planda, tam tee state/evidence/gate-19r-20261103.log. **paycoreLLM** 5663b7b master'a merge ediliyor (kullanıcı dosyalarıyla kesişme yok). MINOR-r2-1 → FOLLOWUP-160. Kapı yeşilse MERGED, BLOCKERS 153/154/155/156 kapanır, isci-b HANDOFF + RETIRED, M3 ingest serbest; sonra inceleyici 08-tam-1a tam yığın turu (review-08t1a 18290/13290; ffmain kapısı ile birlikte üç sınırı içinde).
