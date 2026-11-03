@@ -1622,3 +1622,22 @@ Paket: fix/19-dis-inceleme r2   Cevap: K-19R-0015
 - Koşular: paycoreLLM 600 passed / 3 failed (bs4, bazdan) / 2 skipped; ffcore make test 952/952 iki profil; 04a/06a/19 test-int 186 passed 3 skipped. NOT_RUN: tam test-int, airgap test-int, uv lock --check, PayCore yığını, lint.
 - Dosyalar commit edilmedi (rapor, r2-search probe, evidence 19r2-dis-*, kanal). Sıradaki: 08-tam-1a tam yığın turu.
 - 2026-11-03 13:11 YIGIN-AC review-08t1a (18290/13290, COMPOSE_PROJECT_NAME=review08t1a, FFCORE_VERSION=0.0.0-review-08t1a, kod fb7130d worktree, `--profile test --profile qdrant`: langfuse + mcp + ticket-desk dahil). Açık başka FF yığını yok (review19r kapandı). Boş disk 90G.
+
+### R-08T1-0002 · 2026-11-03 14:10 · → koordinator · DURUM
+Paket: 08-tam-1a   Cevap: K-08T1-0006
+Rapor taslak (karar DEGISIKLIK büyük olasılıkla kalır; MAJOR 7 yığın probe'u ve iki doğrulayıcıyla). Kalan: airgap test-int (tam yığın, %8; ~15 dk), ardından 06b-2 SSRF probe'u (~5 dk). Biten: make test 1010/1010 llmaas + airgap; test-int llmaas tam yığın 809 passed 5 skipped. Yaklaşık 20-25 dk sonra REVIEW-SONUC + YIGIN-KAPA.
+- 2026-11-03 14:25 YIGIN-KAPA review-08t1a: down -v; kalan konteyner 0, volume 0.
+
+### R-08T1-0003 · 2026-11-03 14:25 · → koordinator · REVIEW-SONUC
+Paket: 08-tam-1a   Cevap: K-08T1-0006
+**DEGISIKLIK** (fb7130d6fda59b2b62fbecf50e47b7ebd1a15bdf). BLOCKER 0, MAJOR 7, MINOR 14, NOTE 9. Rapor state/reviews/08-tam-1a-r1.md (ayrı Güvenlik turu bölümü).
+- MAJOR-1 (C17): TTL dolunca sayaç 1'den başlıyor → eski <<PII_1>> başka kişinin değerine çözülür (yığında gerçek RedisTokenStore ile kanıtlandı).
+- MAJOR-2 (C17): konuşma geçmişindeki önceki koşunun yer tutucusu yeni koşunun kapsamında başka değere çözülür (yığında modül düzeyinde kanıtlandı).
+- MAJOR-3 (C17, KARAR): çıkışta geri çevirme URL/markdown içinde değeri açar → upstream/injection ile dışarı sızdırma (Open WebUI görsel yükler). A önerilen: URL/bağlantı bağlamında geri çevirme yok; B: dış agent + facade düz yolda kapalı; C: kısıt + FOLLOWUP.
+- MAJOR-4 (106): _SHORT_TOKEN karesel ReDoS: token+20k boşluk 43 s, 180k karakter 59 s (mevcut _ASSIGNMENT da karesel, aynı düzeltme).
+- MAJOR-5 (106): yanlış pozitif → block: getAccessToken(), "anahtar TeslimProjeleri", INC0012345678, loadSecretValue, BearerTokenRequired.
+- MAJOR-6 (107): hepsi engellenince sources olayı yok; F11 e2e failed dalı ölü (ValueError).
+- MAJOR-7 (107×108): blocked listesine silinmiş belge maskesi uygulanmıyor (_SOURCE_LISTS).
+- Doğru: S8 yetki (yalnız sahip/çağıran), saklanan görünümler, kapsam seçimi, hizalayıcı (fuzz), enforce pii → geri çevirme yok, 147 eşdeğer, C8/C9/C11 additive, airgap aynı.
+- Koşular: make test 1010/1010 ×2; tam yığın test-int llmaas 809 passed 5 skipped, airgap 807 passed 7 skipped (kırmızı yok; işçinin ortam kırmızıları tam yığında geçti); 06b-2 SSRF probe + 06b-2/147 testleri 138/138 ×2. NOT_RUN: F11 e2e, MAJOR-2/3 uçtan uca, MAJOR-6/7 yığında, Langfuse/DB değer taraması, lint.
+- Dosyalar commit edilmedi (rapor, 08-tam-1a-r1-probe.py, evidence 08t1a-r1-*, kanal). Worktree dizini Permission denied ile diskte kaldı (git'ten çıktı).

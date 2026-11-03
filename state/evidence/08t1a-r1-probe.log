@@ -1,0 +1,20 @@
+REDOS token+5000 spaces: 3.19 s
+REDOS token+10000 spaces: 13.20 s
+REDOS password+10000 spaces: 3.22 s
+REDOS token+20000 spaces: 43.13 s
+REDOS 180k mixed: 58.83 s
+SECRETS 'token = getAccessToken() neden null?' -> [('API_TOKEN', 'getAccessToken')]
+SECRETS 'anahtar TeslimProjeleri kapsamında' -> [('API_TOKEN', 'TeslimProjeleri')]
+SECRETS 'token: INC0012345678' -> [('API_TOKEN', 'INC0012345678')]
+SECRETS 'secret = loadSecretValue(x)' -> [('API_TOKEN', 'loadSecretValue')]
+SECRETS 'Authorization: BearerTokenRequired' -> [('API_TOKEN', 'BearerTokenRequired')]
+SECRETS 'API_KEY=Xk9QpLmZ2vRtWq' -> [('API_TOKEN', 'Xk9QpLmZ2vRtWq')]
+SECRETS 'Authorization: Bearer Xk9QpLmZ2vRtWq' -> [('API_TOKEN', 'Xk9QpLmZ2vRtWq')]
+SECRETS 'auth_token: QWERTYUIOPASDF' -> []
+SECRETS 'DB_TOKEN=Xk9QpLmZ2vRt8' -> []
+TTL first token <<PII_1>>
+TTL after expiry ('Kayıt sahibi <<PII_1>>.', ['<<PII_1>>'])
+TTL new token after expiry <<PII_1>>
+TTL old answer now reads ('Kayıt sahibi veli@example.test.', [])
+SCOPE run A token <<PII_1>> run B token <<PII_1>>
+SCOPE A's history in B ('Önceki cevap: fatma@example.test', [])
