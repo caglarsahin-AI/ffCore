@@ -1,0 +1,16 @@
+2026-11-03 08:25:13,727 INFO ffcore.knowledge.ingest gold document=0bab1052-e9a9-4bc0-b129-329279edbdb3 reused=0 embedded=1
+2026-11-03 08:25:16,563 INFO ffcore.knowledge.ingest gold document=5517913e-8950-4cd1-961a-24bfaca9d302 reused=0 embedded=1
+2026-11-03 08:25:18,726 INFO ffcore.knowledge.ingest gold document=dd3aadb5-b7b7-415b-8203-ff7b8fe77ebb reused=0 embedded=2
+2026-11-03 08:25:19,989 INFO ffcore.knowledge.ingest gold document=1ac50bc1-dec7-43c8-88aa-0a9ba55ad12c reused=0 embedded=1
+2026-11-03 08:25:20,016 WARNING ffcore.knowledge.raw_ingest ingest-raw rejected path=jira/PRSIM/PRSIM-1.txt code=prsim_requires_ner
+created 5
+new_version 0
+unchanged 0
+retried 0
+status: indexed 4, skipped 1
+rejected: prsim_requires_ner 1
+gates: gate2:boilerplate 1
+masked (pii_regex): EMAIL_ADDRESS 1, TR_NATIONAL_ID 1, TR_PHONE 1
+stage: full
+manifest: documents 5, chunks 5, raw_manifest_sha256 56139353ac1759bf12407b6888d67a55aaba908e37275886eeaad99dcde1a506
+EXIT A 0

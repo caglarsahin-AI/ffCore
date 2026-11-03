@@ -1,0 +1,13 @@
+2026-11-03 08:27:28,914 ERROR ffcore.knowledge.raw_ingest ingest-raw failed path=confluence/DEMO/9001.md error=ValueError
+2026-11-03 08:27:29,009 WARNING ffcore.knowledge.raw_ingest ingest-raw rejected path=jira/PRSIM/PRSIM-1.txt code=prsim_requires_ner
+created 0
+new_version 0
+unchanged 5
+retried 0
+status: indexed 4, skipped 1
+rejected: prsim_requires_ner 1
+gates: -
+masked (pii_regex): -
+stage: full
+manifest: documents 6, chunks 5, raw_manifest_sha256 521bea6aa848c3a0bdccc123aa0f3f652906a17963721fce872ef87f2da28c7b
+EXIT D 0

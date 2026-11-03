@@ -1,0 +1,13 @@
+2026-11-03 08:27:03,698 INFO ffcore.knowledge.ingest gold document=5517913e-8950-4cd1-961a-24bfaca9d302 reused=1 embedded=0
+2026-11-03 08:27:03,802 WARNING ffcore.knowledge.raw_ingest ingest-raw rejected path=jira/PRSIM/PRSIM-1.txt code=prsim_requires_ner
+created 0
+new_version 0
+unchanged 4
+retried 1
+status: indexed 4, skipped 1
+rejected: prsim_requires_ner 1
+gates: -
+masked (pii_regex): -
+stage: full
+manifest: documents 5, chunks 5, raw_manifest_sha256 56139353ac1759bf12407b6888d67a55aaba908e37275886eeaad99dcde1a506
+EXIT C 0

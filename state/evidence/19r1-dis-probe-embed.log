@@ -1,0 +1,5 @@
+PROJECT 201
+KB 201 
+OFFLINE True allowed ['backend', 'langfuse-web', 'litellm', 'mcp-search', 'mcp-sql', 'ticket-desk']
+EMBED_OK dense 1024 truncated [False]
+OLD_VALUE EgressDenied egress_offline
