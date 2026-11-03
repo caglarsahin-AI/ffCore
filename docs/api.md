@@ -475,10 +475,10 @@ about targets outside its scopes. Another project's model or agent, or a missing
   answer comes back to the caller with the request's placeholders turned into the values (C17),
   in one piece and in a live stream alike (a placeholder split over two chunks is held, at most
   15 characters, until it is whole). When the project's policy enforces a `pii` rule on the
-  output, the placeholders stay. A placeholder on a URL line stays too (a line with `](`, `]:`,
-  `//`, `src=`, `href=`, `srcset=`, `action=`, `poster=` or `background=`;
-  `detokenize_skipped_url`: an upstream could otherwise make a client send the value to its host;
-  docs/guardrail.md). A placeholder the request never issued stays as it is and is logged with its count.
+  output, the placeholders stay. A placeholder on a URL line stays too (a line with an HTML
+  tag, a URL scheme such as `http:`, or `](`, `]:`, `//`, `url(`, `src=`, `href=`, `style=`,
+  `data=` and the other markers in docs/guardrail.md; `detokenize_skipped_url`: an upstream could
+  otherwise make a client send the value to its host). A placeholder the request never issued stays as it is and is logged with its count.
   The agent path does the same for the run's own user (docs/agentlar.md). Who sees what:
 
   | Who | Sees |
@@ -488,7 +488,7 @@ about targets outside its scopes. Another project's model or agent, or a missing
   | The caller of a facade request (direct model, agent, external agent) | values |
   | Another member reading the run (analyst, admin, approver) | placeholders |
   | Stored views (`GET /runs/{id}`, `GET /runs/{id}/events`, approvals) | placeholders |
-  | A placeholder on a URL line (one with `](`, `]:`, `//`, `src=`, `href=`, `srcset=`, `action=`, `poster=` or `background=`), for every reader | placeholder (`detokenize_skipped_url`, count only) |
+  | A placeholder on a URL line (one with an HTML tag, a URL scheme such as `http:`, or `](`, `]:`, `//`, `url(`, `src=`, `href=`, `srcset=`, `action=`, `poster=`, `background=`, `style=`, `data=`), for every reader | placeholder (`detokenize_skipped_url`, count only) |
   | Any reader when the policy enforces a `pii` rule on the output | placeholders (`detokenize_skipped_policy`, count only) |
 
 - The client's own tools: definitions pass, the model's `tool_calls` come back with OpenAI's
@@ -531,8 +531,11 @@ about targets outside its scopes. Another project's model or agent, or a missing
   `quota_exceeded`, 502 with the run's code); once a stream has started, the error is an event
   `data: {"error": {"message", "type", "code"}}` followed by `data: [DONE]`. A token store that
   cannot be read while the answer is prepared for the caller is 502 `api_error`
-  `detokenize_unavailable` (the run goes on; follow it again to continue); the direct model
-  path's live stream ends the same way.
+  `detokenize_unavailable`; in a stream it is the error event above (no id) and `[DONE]`. The run
+  goes on: `X-Resume-Run-Id` follows it again from its last approval or question event (or from
+  the start). The direct model path (one piece, live and buffered stream) and the external agent
+  answer the same way. A placeholder number past 8 digits in the request is 400
+  `placeholder_out_of_range`.
 
 ### External agent path (06b-2)
 
