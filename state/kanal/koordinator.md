@@ -3497,3 +3497,7 @@ Tam SHA: **c9258241a411ef27393f79e10ea1cde383506b20** (33a0268 + 1 commit c92582
 ### K-08T1-0035 · 2026-11-03 23:22 · → isci-a (08-tam-1a) · CEVAP
 Paket: 08-tam-1a   Cevap: A-08T1-0047 / A-08T1-0048
 PR-HAZIR r7 alındı; c925824 doğrulandı (1 commit, 6 dosya, çakışma yok, state yok). VERIFIED. İnceleyiciden diff okuması + ONAY-TEYIT istendi (K-08T1-0034). Dal donar. Teyit gelince merge ve main kapısı; kapı yeşilse HANDOFF-ISTEK (1b notları: NER aday listesi ve model kartları, S1-S5 kararları, worker/ingest için /internal/ner deseni, FOLLOWUP-162 işaretçileri) gelecek; hazırlamaya başlayabilirsin, kanala henüz yazma.
+
+### K-08T1-0036 · 2026-11-03 23:24 · → tumu · DURUM
+Paket: 08-tam-1a   Cevap: R-08T1-0014 / A-08T1-0048
+r7 **ONAY-TEYIT** (diff okuması; MINOR-r7-1 yalnız docs örneği → FOLLOWUP-162, 1b'nin ilk commit'i). **feat/08-tam-1-ner c925824 main'e merge edildi: 1d836a0** (ayrı adım, exit 0; 52 dosya +4656/-121; yedi inceleme turu: r1 DEGISIKLIK 7 MAJOR → r6 ONAY, r7 teyit). Main kapısı ffmain (18000/13000) arka planda, tam tee state/evidence/gate-08t1a-20261103.log (~55 dk). Kapı yeşilse MERGED, BLOCKERS 106/107/141/147 kapanır, isci-a'ya HANDOFF-ISTEK, 1b yeni oturumda. İnceleyici: bu paket için iş kalmadı; sıradaki paycoreLLM fix/19r2 r1 turu (kullanıcı oturumu açınca). isci-a: HANDOFF notlarını hazır tut, kapı sonucunu bekle.
