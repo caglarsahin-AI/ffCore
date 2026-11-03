@@ -32,7 +32,7 @@ Her kullanım senaryosunun hangi paketlerle mümkün olduğunu, hangi test düze
 | F12 | Kesinti davranışı | 01, 02, 04a, 06a | e2e: sağlayıcı (fake-llm) kapalı → koşu `failed` + `model_unavailable`, airgap'te dış sağlayıcıya istek 0; Langfuse kapalı → koşu tamamlanır, `trace_delivery_failed` kaydı; Qdrant kapalı → arama kodlu hata, worker sağlıklı kalır; `LLM_SLOTS` dolu → koşu `queued`, bekleme olayı görünür; her durumda kullanıcıya kodlu mesaj, sessiz yedek yok | yok (servis durdurma) | test | 06a merge sonrası | yeşil: SSE kopuşu run'ı iptal etmiyor, Last-Event-ID reconnect, fail modeli (S8) |
 | F13 | Belge güncelliği | 04a, 06a, 04b | e2e: aynı belgenin v1 ve v2'si indeksli; cevap v2'den kurulur, v1'in farklı dediği tarihiyle belirtilir (06a prompt kuralı, PayCore D5); 04b "iki sürüm farkı" kabulü | sentetik sözleşme çift sürümleri (test işçisi üretir) | test + 04b işçisi | prompt kuralı 06a sonrası; fark 04b | kısmi: platform kuralı modele gidiyor; `updated_at_source` + sürüm sıralaması yeşil (3f2bc31, F13_3 iki sürümde); cevabın v2 + tarih içermesi NOT_RUN gerçek model |
 
-Durum sütunu son güncelleme: 31 Ekim 2026 00:12; kaynak artık `make e2e` F tablosu (`eval/results/`, 13b); gerçek model satırları kullanıcı koşusuyla dolar (aşama 2 + F2 aşama 3 kanıtları: state/pr/18-e2e.md, state/pr/10b-poc-2.md).
+Durum sütunu son güncelleme: 3 Kasım 2026 09:35 (18-kosu-2, main 0c7a100: F tablosu 64/0/22, taban 31 Ekim ile aynı; F1-F4, F9-F13 PoC hat kanıtı yeşil, NOT_RUN gerçek model; 06b facade 26/26 + 06b-2 dış agent 15/15 duman; kaynak state/pr/18-kosu-2.md; gerçek model satırları kullanıcı M3 koşusuyla dolar)
 
 ## Aşamalar
 
