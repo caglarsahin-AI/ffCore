@@ -151,6 +151,30 @@ def test_19r_156_source_accuracy_is_cites_source():
 def test_19r_156_contains_separate_line():
     results = [_doc(0, True, True), _doc(1, True, False), _doc(2, False, True)]
     summary = _summary(results)
-    assert "- Answer contains the expected text: 2/3" in summary
+    assert "- Answer contains the expected text: 2/3 (66.7%)" in summary
     assert "- Source accuracy (expected document cited): 2/3 (66.7%)" in summary
-    assert "- Document questions passed (answer text and source): 1/3" in summary
+    assert "- Document questions passed (answer text and source): 1/3 (33.3%)" in summary
+
+
+def test_19r_156_no_document_question_line():
+    """Review r1 NOTE-2: the fallback line carries the same label."""
+    held = er.ItemResult(
+        id="u1",
+        style="dogrudan",
+        answerable=False,
+        sql=False,
+        outcome_label="declined",
+        status="completed",
+        scores={"holds": True, "llm_judge": None},
+        seconds=1.0,
+        llm_calls=1,
+    )
+    summary = _summary([held])
+    assert "- Source accuracy (expected document cited): no document question" in summary
+
+
+def test_19r_156_demo_threshold_is_source_accuracy():
+    """Review r1 MAJOR-3: brief 13's measure is source accuracy, not the full pass."""
+    demo = (REPO / "docs" / "demo.md").read_text(encoding="utf-8")
+    assert "| Source accuracy (expected document cited) (≥ 16/20 on cpu) |" in demo
+    assert "passed: answer text and source (≥" not in demo

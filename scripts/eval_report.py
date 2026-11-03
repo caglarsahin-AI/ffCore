@@ -123,6 +123,10 @@ def _count(results, predicate, scorer: str | None = None) -> tuple[int, int]:
     return sum(bool(r.scores.get(scorer)) for r in chosen), len(chosen)
 
 
+def _pct(count: tuple[int, int]) -> str:
+    return f" ({100 * count[0] / count[1]:.1f}%)" if count[1] else ""
+
+
 def markdown(meta: dict, results: list[ItemResult]) -> str:
     lines = [
         f"# Exam report: {meta['dataset']}",
@@ -173,9 +177,9 @@ def markdown(meta: dict, results: list[ItemResult]) -> str:
         f"- Source accuracy (expected document cited): {cited[0]}/{cited[1]} "
         f"({100 * cited[0] / cited[1]:.1f}%)"
         if cited[1]
-        else "- Source accuracy: no document question",
-        f"- Answer contains the expected text: {contains[0]}/{contains[1]}",
-        f"- Document questions passed (answer text and source): {doc[0]}/{doc[1]}",
+        else "- Source accuracy (expected document cited): no document question",
+        f"- Answer contains the expected text: {contains[0]}/{contains[1]}{_pct(contains)}",
+        f"- Document questions passed (answer text and source): {doc[0]}/{doc[1]}{_pct(doc)}",
         f"- Unanswerable questions held: {held[0]}/{held[1]}",
         f"- SQL questions: {sql[0]}/{sql[1]}"
         + (f" ({sql_skipped} NOT_RUN: --approve-sql not given)" if sql_skipped else ""),

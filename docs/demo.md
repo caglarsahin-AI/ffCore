@@ -83,7 +83,7 @@ make eval MODEL="qwen3.5:35b cpu" APPROVE_SQL=1     # sozlesme-33
 |---|---|---|---|
 | `make seed && make e2e` total | NOT_RUN | NOT_RUN | to be measured |
 | One RAG answer (≤ 4 min on cpu) | NOT_RUN | NOT_RUN | to be measured |
-| Document questions passed: answer text and source (≥ 16/20 on cpu) | NOT_RUN | NOT_RUN | to be measured |
+| Source accuracy (expected document cited) (≥ 16/20 on cpu) | NOT_RUN | NOT_RUN | to be measured |
 | Unanswerable questions held (≥ 7/8 on cpu) | NOT_RUN | NOT_RUN | to be measured |
 | SQL questions (≥ 4/5) | NOT_RUN | NOT_RUN | to be measured |
 
