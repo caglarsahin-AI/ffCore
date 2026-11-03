@@ -268,25 +268,45 @@ def skip_counter(run_id: UUID) -> Callable[..., Awaitable[dict]]:
     return count
 
 
-def exit_hook(redis, run_id: UUID, mode: str) -> Callable[..., Awaitable[dict]] | None:
+def exit_hook(
+    redis, run_id: UUID, mode: str, *, after: str | None = None
+) -> Callable[..., Awaitable[dict]] | None:
     if mode == "reveal":
-        return detokenizer(redis, run_id)
+        return detokenizer(redis, run_id, after=after)
     return skip_counter(run_id) if mode == "policy" else None
 
 
-def detokenizer(redis, run_id: UUID) -> Callable[..., Awaitable[dict]]:
+def detokenizer(redis, run_id: UUID, *, after: str | None = None) -> Callable[..., Awaitable[dict]]:
     """The exit reversal of one reader's run events (C17): every string, within the run's token
     scope. A placeholder the scope cannot resolve (never issued, mapping expired after
     PII_TOKEN_TTL_S) stays and is logged with its count (S9); one inside a URL stays and is
     logged (r1 MAJOR-3); live `token` entries share a context, so a URL split over entries is
     seen. A Redis failure is `RevealUnavailable`: the stream ends with an error event (r1
-    MINOR-11), never silently."""
+    MINOR-11), never silently. A reader that starts `after` an entry rebuilds the URL line state
+    from the token entries up to it; when it cannot, its first line keeps its placeholders (r3
+    MINOR-r3-1, KARARLAR ek (d))."""
     reveal = ContextReveal(
         RedisTokenStore(redis, get_guardrail_settings().pii_token_ttl_s), str(run_id)
     )
     scope = str(run_id)
+    primed = after in (None, "0-0")
+
+    async def prime() -> None:
+        try:
+            texts = await run_events.token_texts(redis, run_id, after)
+        except (RedisError, OSError):
+            texts = None
+        if texts is None:
+            reveal.fail_closed()
+            return
+        for text in texts:
+            reveal.prime(text)
 
     async def hook(data: dict, event: str | None = None) -> dict:
+        nonlocal primed
+        if not primed:
+            primed = True
+            await prime()
         before = (reveal.unresolved, reveal.skipped_url)
         try:
             out = await reveal.data(data, stream_text=event == SseEvent.token)
@@ -369,7 +389,7 @@ def _stream(
 ) -> EventStreamResponse:
     async def body() -> AsyncIterator[str]:
         client = run_events.redis_client(settings)
-        reveal_data = exit_hook(client, run_id, mode)
+        reveal_data = exit_hook(client, run_id, mode, after=after)
         try:
             async for chunk in run_events.follow(
                 client,

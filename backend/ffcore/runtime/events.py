@@ -150,6 +150,22 @@ def _decode(value) -> str:
     return value.decode() if isinstance(value, bytes) else value
 
 
+async def token_texts(redis, run_id, until: str) -> list[str] | None:
+    """The text of the live `token` entries up to `until`, in order, for a reader that starts
+    after `until` to rebuild its URL line state (r3 MINOR-r3-1, KARARLAR ek (d)); None when
+    `until` is not in the stream (gone, trimmed, never written)."""
+    entries = await redis.xrange(stream_key(run_id), "-", until)
+    if not entries or _decode(entries[-1][0]) != until:
+        return None
+    texts = []
+    for _, fields in entries:
+        event = _decode(fields[b"event"] if b"event" in fields else fields["event"])
+        if event == SseEvent.token:
+            raw = fields[b"data"] if b"data" in fields else fields["data"]
+            texts.append(json.loads(_decode(raw)).get("text", ""))
+    return texts
+
+
 def _reveal_unavailable(last: str) -> str:
     """C17 r1 MINOR-11: the reader's placeholders could not be reversed (token store down): the
     stream ends with a coded error (the run itself goes on). `last` is the id of the last entry

@@ -423,6 +423,11 @@ class UrlLines:
             start = brk.end()
         return out
 
+    def mark(self) -> None:
+        """The current line is under the rule whatever it carries (a reader whose earlier text
+        is unknown, r3 MINOR-r3-1)."""
+        self._marked = True
+
     def _add(self, piece: str) -> None:
         if not piece:
             return
@@ -541,6 +546,14 @@ class ContextReveal:
         self._lines = UrlLines()
         self.unresolved = 0
         self.skipped_url = 0
+
+    def prime(self, text: str) -> None:
+        """Text the reader got before this reader started (rebuilds the line state, no reveal)."""
+        self._lines.spans(text)
+
+    def fail_closed(self) -> None:
+        """The earlier text is unknown: the first line keeps its placeholders."""
+        self._lines.mark()
 
     async def data(self, data: Any, *, stream_text: bool = False) -> Any:
         if stream_text and isinstance(data, dict) and isinstance(data.get("text"), str):
