@@ -1,17 +1,27 @@
 """Masking modes (brief 08): redact `[CODE]`, mask (last characters visible), tokenize
 `<<PII_n>>` with the mapping in Redis for the run (`PII_TOKEN_TTL_S`), reversed on the way out.
 
-Streaming reversal across SSE chunks (C17) is 08 full; `detokenize` works on whole texts.
+C17 (08-tam-1a): reversal happens at the exit only (the stored text and the history stay
+tokenized). `PlaceholderAligner` keeps a placeholder whole across stream chunks on the writing
+side; `StreamDetokenizer` aligns and reverses a stream one request reads and writes;
+`detokenize_json` reverses every string of an event's data.
 """
 
+import logging
 import re
 from collections.abc import Sequence
-from typing import Protocol
+from typing import Any, Protocol
 
 from ffcore.guardrails.findings import Finding
 
 KEEP_VISIBLE = 4
 PLACEHOLDER = re.compile(r"<<PII_\d+>>")
+# plan/08 C17: a stream holds at most 16 characters while a placeholder may still be open:
+# `<<PII_` + up to 8 digits + `>>`. A longer run is not a placeholder and passes as it is.
+PLACEHOLDER_MAX_CHARS = 16
+_OPEN_PLACEHOLDER = re.compile(r"<(?:<(?:P(?:I(?:I(?:_(?:\d{1,8}>?)?)?)?)?)?)?")
+
+log = logging.getLogger(__name__)
 
 
 class TokenScopeMissing(ValueError):
@@ -170,3 +180,74 @@ async def detokenize(text: str, *, store: TokenStore, scope: str) -> tuple[str, 
         cursor = match.end()
     out.append(text[cursor:])
     return "".join(out), unresolved
+
+
+class PlaceholderAligner:
+    """The writing side of a stream: `feed` returns the text that may be published now, holding
+    back a tail that could be the start of a placeholder (at most 15 characters) until the next
+    chunk shows how it ends; `flush` returns that tail at the end of the stream, as it is."""
+
+    def __init__(self) -> None:
+        self._held = ""
+
+    def feed(self, text: str) -> str:
+        buffer = self._held + text
+        cut = len(buffer)
+        for i in range(max(0, len(buffer) - (PLACEHOLDER_MAX_CHARS - 1)), len(buffer)):
+            if buffer[i] == "<" and _OPEN_PLACEHOLDER.fullmatch(buffer, i):
+                cut = i
+                break
+        self._held = buffer[cut:]
+        return buffer[:cut]
+
+    def flush(self) -> str:
+        held, self._held = self._held, ""
+        return held
+
+
+class StreamDetokenizer:
+    """Aligner + reversal for a stream one request writes and reads (the facade's direct model
+    path): no chunk it returns contains a placeholder the scope issued, split or whole.
+    `unresolved` counts placeholders the scope never issued (left as they are)."""
+
+    def __init__(self, store: TokenStore, scope: str) -> None:
+        self._store, self._scope = store, scope
+        self._aligner = PlaceholderAligner()
+        self.unresolved = 0
+
+    async def _reverse(self, text: str) -> str:
+        if "<<PII_" not in text:
+            return text
+        out, unresolved = await detokenize(text, store=self._store, scope=self._scope)
+        self.unresolved += len(unresolved)
+        return out
+
+    async def feed(self, text: str) -> str:
+        return await self._reverse(self._aligner.feed(text))
+
+    async def flush(self) -> str:
+        return await self._reverse(self._aligner.flush())
+
+
+async def detokenize_json(data: Any, *, store: TokenStore, scope: str) -> tuple[Any, int]:
+    """(a copy of `data` with every string reversed within `scope`, placeholders left as they
+    are because the scope never issued them or its mapping expired)."""
+    if isinstance(data, str):
+        if "<<PII_" not in data:
+            return data, 0
+        out, unresolved = await detokenize(data, store=store, scope=scope)
+        return out, len(unresolved)
+    if isinstance(data, list):
+        items = [await detokenize_json(v, store=store, scope=scope) for v in data]
+        return [v for v, _ in items], sum(n for _, n in items)
+    if isinstance(data, dict):
+        pairs = {k: await detokenize_json(v, store=store, scope=scope) for k, v in data.items()}
+        return {k: v for k, (v, _) in pairs.items()}, sum(n for _, n in pairs.values())
+    return data, 0
+
+
+def log_unresolved(scope: str, count: int) -> None:
+    """S9 (K-08T1-0002): a placeholder that cannot be reversed stays; it is logged with the
+    scope and the count, never the value."""
+    if count:
+        log.warning("detokenize_unresolved scope=%s count=%d", scope, count)
