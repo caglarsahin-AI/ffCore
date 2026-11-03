@@ -91,14 +91,16 @@ never values: an earlier run's placeholder in the conversation becomes this run'
 the same value (read in the earlier run's scope, without renewing it there), and a facade agent
 client's earlier turns are stored as `egress` left them, in the run's scope. Before its first
 value a run's counter passes every placeholder number (up to 8 digits) in its question and
-history, so a carried placeholder never reads as one of this run's values (numbers stay at 8
-digits; past it the run fails with `placeholder_out_of_range`). A placeholder on a URL line
-stays for every reader: a line with an HTML tag, a URL scheme such as `http:`, or a markdown,
-CSS or attribute marker (`](`, `]:`, `//`, `url(`, `src=`, `href=`, `style=`, `data=`; the full
-rule and its carry-over in docs/guardrail.md), logged as `detokenize_skipped_url` with a count;
-an upstream could otherwise make a client that loads images send the value to its host. A
-reader that reconnects (`Last-Event-ID`, the console after an approval) rebuilds this line state
-from the live token entries; when it cannot, its first line keeps the placeholders. When the run's guardrail policy enforces a `pii` rule on the output, the
+history, so a carried placeholder never reads as one of this run's values (a scope issues at
+most 99,999,998; past it the run fails with `placeholder_out_of_range`; `<<PII_99999999>>` is
+ignored). After the first HTML tag of an answer no placeholder of the rest of it is reversed,
+and a placeholder on a URL line stays (a URL scheme such as `http:`, or a markdown, CSS or
+attribute marker: `](`, `]:`, `//`, `url(`, `src=`, `href=`, `style=`, `data=`; the full rule,
+its markdown carry-over and its trade-offs in docs/guardrail.md), for every reader, logged as
+`detokenize_skipped_url` with a count; an upstream could otherwise make a client that renders
+the answer send the value to its host. A reader that reconnects (`Last-Event-ID`, the console
+after an approval) rebuilds this state from the live token entries; when it cannot, the rest of
+the answer keeps the placeholders. When the run's guardrail policy enforces a `pii` rule on the output, the
 placeholders stay for everyone (the output was checked with them in it; logged as
 `detokenize_skipped_policy` with a count). A placeholder whose
 mapping is gone (`PII_TOKEN_TTL_S`, default 1800 s after its last use; the run's own reads and
