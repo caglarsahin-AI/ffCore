@@ -17,7 +17,13 @@ from dataclasses import fields as dataclass_fields
 
 from ffcore.guardrails.categories import ACTION_RANK, STAGES
 from ffcore.guardrails.findings import Finding
-from ffcore.guardrails.masking import TokenStore, apply_findings, mask_value, redact_label
+from ffcore.guardrails.masking import (
+    PlaceholderOutOfRange,
+    TokenStore,
+    apply_findings,
+    mask_value,
+    redact_label,
+)
 from ffcore.guardrails.recognizers import regex as regex_recognizers
 from ffcore.guardrails.recognizers.regex import recognize, resolve_overlaps
 from ffcore.guardrails.rules import find_secrets, find_tool_arg_violations
@@ -325,7 +331,9 @@ async def evaluate(
                         event.status = "redacted"
                     current = rewritten
                 applied.append(action)
-        except GuardrailConfigError:
+        except (GuardrailConfigError, PlaceholderOutOfRange):
+            # r4 MINOR-r4-1: a used-up placeholder range fails loudly whatever `on_error` says;
+            # under `log` the text would leave untokenized.
             raise
         except Exception as exc:  # noqa: BLE001 - every rule failure follows on_error
             event.status = "failed"

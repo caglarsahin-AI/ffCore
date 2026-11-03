@@ -162,9 +162,11 @@ def test_08t_r2_client_history_rows_take_the_following_runs_scope(database_url, 
     assert AYSE not in str(later) and value == AYSE
 
 
-def test_08t_r3_history_number_past_the_range_fails_loudly(database_url, pg, make_project):
-    # r3 MINOR-r3-2, the reviewer's case: `<<PII_99999999>>` in the conversation would push the
-    # counter to 9 digits; the run fails with a code instead (KARARLAR ek (f)).
+def test_08t_r4_history_99999999_is_ignored_and_the_range_ends_loudly(
+    database_url, pg, make_project
+):
+    # r4 MINOR-r4-2 (KARARLAR ek (f′)): `<<PII_99999999>>` in the conversation is ignored, so the
+    # conversation keeps working; a scope that would issue past 99,999,998 fails with a code.
     import pytest
 
     from ffcore.guardrails.masking import PlaceholderOutOfRange
@@ -173,12 +175,14 @@ def test_08t_r3_history_number_past_the_range_fails_loudly(database_url, pg, mak
     _message(pg, conversation_id, run_a, "assistant", "Yankı <<PII_99999999>>", 1.5)
 
     async def body(session, store, client, prefix):
-        with pytest.raises(PlaceholderOutOfRange):
-            await _history(session, conversation_id, run_b, store)
-        await store.reserve(str(run_b), 99_999_998)
+        history = await _history(session, conversation_id, run_b, store)
+        first = await store.token_for(str(run_b), "EMAIL_ADDRESS:" + FATMA, FATMA)
+        await store.reserve(str(run_b), 99_999_997)
         last = await store.token_for(str(run_b), "EMAIL_ADDRESS:" + AYSE, AYSE)
         with pytest.raises(PlaceholderOutOfRange):
-            await store.token_for(str(run_b), "EMAIL_ADDRESS:" + FATMA, FATMA)
-        return last
+            await store.token_for(str(run_b), "EMAIL_ADDRESS:x@example.test", "x@example.test")
+        return history, first, last
 
-    assert _go(database_url, body) == "<<PII_99999999>>"
+    history, first, last = _go(database_url, body)
+    assert history[2]["content"] == "Yankı <<PII_99999999>>"
+    assert (first, last) == ("<<PII_2>>", "<<PII_99999998>>")  # after the stale <<PII_1>>

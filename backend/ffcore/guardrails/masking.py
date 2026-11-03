@@ -19,10 +19,11 @@ from ffcore.core.errors import ApiError
 from ffcore.guardrails.findings import Finding
 
 KEEP_VISIBLE = 4
-# A scope issues at most 8 digits (r3 MINOR-r3-2, KARARLAR ek (f)): a longer `<<PII_n>>` is no
-# placeholder, never reversed in any scope.
-PLACEHOLDER = re.compile(r"<<PII_\d{1,8}>>")
-PLACEHOLDER_MAX_NUMBER = 99_999_999
+# A scope issues at most 99,999,998 (r3 MINOR-r3-2, r4 MINOR-r4-2, KARARLAR ek (f′)): a longer
+# `<<PII_n>>` and `<<PII_99999999>>` are no placeholders, never reserved or reversed in any
+# scope, so a conversation that carries one keeps working.
+PLACEHOLDER = re.compile(r"<<PII_(?!99999999>>)\d{1,8}>>")
+PLACEHOLDER_MAX_NUMBER = 99_999_998
 # plan/08 C17: the longest placeholder is 16 characters (`<<PII_` + up to 8 digits + `>>`); a
 # stream holds at most 15 while one may still be open. A longer run passes as it is.
 PLACEHOLDER_MAX_CHARS = 16
@@ -37,15 +38,16 @@ class RevealUnavailable(RuntimeError):
 
 
 class PlaceholderOutOfRange(ApiError):
-    """A scope would issue a 9-digit placeholder (r3 MINOR-r3-2, KARARLAR ek (f)): fail loudly
-    instead of a number a stream cannot align and an older text may already carry."""
+    """A scope would issue past 99,999,998 (r3 MINOR-r3-2, KARARLAR ek (f′)): fail loudly, in
+    the engine too whatever `on_error` says (r4 MINOR-r4-1), instead of a number a stream cannot
+    align or an older text may already carry."""
 
     def __init__(self) -> None:
         super().__init__(
             400,
             "invalid_request_error",
             "placeholder_out_of_range",
-            "A placeholder number in the text is out of range (at most 99999998 can be carried).",
+            "The placeholder numbers of this run or request are used up (at most 99999998).",
         )
 
 
@@ -610,9 +612,6 @@ async def reserve_carried(store: TokenStore, scope: str, data: Any) -> None:
     text = data if isinstance(data, str) else json.dumps(data, ensure_ascii=False)
     numbers = placeholder_numbers(text) if "<<PII_" in text else []
     if numbers:
-        if max(numbers) >= PLACEHOLDER_MAX_NUMBER:
-            # the next number would have 9 digits (r3 MINOR-r3-2, KARARLAR ek (f))
-            raise PlaceholderOutOfRange()
         await store.reserve(scope, max(numbers))
 
 
