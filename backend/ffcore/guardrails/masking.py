@@ -305,6 +305,10 @@ _TARGET_CLOSE = {"dq": '"', "sq": "'", "angle": ">"}
 # How much of a stream's current line is kept to see a marker split over chunks; a line longer
 # than this lost its start and its placeholders are kept (fail-closed).
 URL_CONTEXT_MAX_CHARS = 8192
+# How much of the text before a piece the scan looks at again, so a marker split over pieces is
+# seen; longer than every marker (spaces between an attribute name and `=` are `_gap`).
+_MARKER_OVERLAP = 32
+_ATTR_NAME_END = re.compile(r"\b(?:src|href|srcset|action|poster|background)\s*\Z", re.IGNORECASE)
 
 
 def _open_target(line: str, mode: str | int | None) -> str | int | None:
@@ -342,11 +346,18 @@ def _open_target(line: str, mode: str | int | None) -> str | int | None:
 
 class UrlLines:
     """Which parts of a text, or of a stream fed piece by piece, sit on a URL line: `spans` takes
-    the next piece and returns its (start, end) ranges whose placeholders are kept."""
+    the next piece and returns its (start, end) ranges whose placeholders are kept.
+
+    The scan is incremental (r3 MAJOR-r3-2, KARARLAR "C17 URL bağlam kuralı, ek" (c)): a piece is
+    scanned with the last `_MARKER_OVERLAP` characters before it, and not at all once its line
+    is marked or cut; the line's text is kept only while its open target may be needed."""
 
     def __init__(self) -> None:
-        self._line = ""  # the current line so far, at most URL_CONTEXT_MAX_CHARS of its end
-        self._cut = False  # the current line is longer than that
+        self._pieces: list[str] = []  # the current line, while it is at most the window
+        self._length = 0
+        self._tail = ""  # the current line's last _MARKER_OVERLAP characters
+        self._gap = False  # the line ends with an attribute name and spaces: `=` may follow
+        self._cut = False  # the current line is longer than URL_CONTEXT_MAX_CHARS
         self._marked = False  # a marker was seen on the current line
         self._open: str | int | None = None  # the target open at the start of the current line
         self._lost = False  # a URL line lost its start: what it left open is unknown
@@ -355,13 +366,7 @@ class UrlLines:
         out, start = [], 0
         for brk in [*_LINE_BREAK.finditer(text), None]:
             end = brk.start() if brk else len(text)
-            line = self._line + text[start:end]
-            if len(line) > URL_CONTEXT_MAX_CHARS:
-                line, self._cut = line[-URL_CONTEXT_MAX_CHARS:], True
-                # a marker whose spaces run across the cut (`src` + 8,000 spaces + `=`)
-                self._marked = self._marked or line.lstrip()[:1] == "=" != line[:1]
-            self._marked = self._marked or _URL_MARKER.search(line) is not None
-            self._line = line
+            self._add(text[start:end])
             if self._lost or self._open is not None or self._marked or self._cut:
                 out.append((start, end))
             if brk is None:
@@ -370,13 +375,35 @@ class UrlLines:
             start = brk.end()
         return out
 
+    def _add(self, piece: str) -> None:
+        if not piece:
+            return
+        if not self._cut:
+            self._length += len(piece)
+            if self._length > URL_CONTEXT_MAX_CHARS:
+                self._cut, self._pieces = True, []
+            else:
+                self._pieces.append(piece)
+        if self._marked:
+            return
+        if self._gap and piece.lstrip()[:1] == "=":
+            self._marked = True  # `src` + any number of spaces + `=`
+            return
+        window = self._tail + piece
+        if _URL_MARKER.search(window):
+            self._marked = True
+            return
+        self._gap = (self._gap and piece.isspace()) or _ATTR_NAME_END.search(window) is not None
+        self._tail = window[-_MARKER_OVERLAP:]
+
     def _end_line(self) -> None:
         if self._marked or self._open is not None:
             if self._cut:
                 self._lost = True
             elif not self._lost:
-                self._open = _open_target(self._line, self._open)
-        self._line, self._cut, self._marked = "", False, False
+                self._open = _open_target("".join(self._pieces), self._open)
+        self._pieces, self._length, self._tail = [], 0, ""
+        self._gap = self._cut = self._marked = False
 
 
 async def reveal_text(
