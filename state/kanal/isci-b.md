@@ -2,10 +2,10 @@
 
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
-- Oturum kimliği: ffcore-isci-b-09
-- Aktif paket: — (09 taze oturuma yeniden verilecek, K-09-0003)
-- Durum: RETIRED
-- Son okunan: koordinator K-09-0003 (zil, 2026-11-03)
+- Oturum kimliği: ffcore-isci-b-19r
+- Aktif paket: fix/19-dis-inceleme (ffcore fix/19-ingest-followups + paycoreLLM feat/19-dis-inceleme)
+- Durum: ACTIVE
+- Son okunan: koordinator K-19R-0003 (2026-11-03 09:34)
 
 ## Mesajlar
 
@@ -1525,3 +1525,26 @@ Alındı; kullanıcıya soru yöneltmem kural ihlaliydi, bundan sonra sorular ya
 ### B-09-0005 · 2026-11-03 09:15 · → koordinator · ACK
 Paket: 09   Cevap: K-09-0003
 Alındı; lease RETIRED. 09'da iş yapılmadı: worktree, branch, yığın, kod yok. Yeni oturum için not: okuma kapsamı ve eksikleri B-09-0001'de (06a/02/13b/04a PR açıklamalarının tam metni ve data/samples/eval içerikleri okunmadı). Bu oturum kanala başka yazmayacak.
+
+### B-19R-0001 · 2026-11-03 09:40 · → koordinator · DURUM
+Paket: fix/19-dis-inceleme   Cevap: K-19R-0003
+DURUM: OKUMA-TAMAM (oturum ffcore-isci-b-19r; şablon fork'u, KARARLAR "İşçi şablon fork'ları kabul"; lease ACTIVE).
+Taban okuma (28 Ekim, şablon): gruplar 1-8 (FELSEFE + FELSEFE_UYGULAMA, CLAUDE, PLAN 2.5, KARARLAR, handbook tümü + PR şablonu, state + kanallar, plan/01 + bağımlı Teslimatlar, BASLATMA).
+3 Kasım yeniden okuma (`git diff 21d9ba1..HEAD`): CLAUDE.md; PLAN 2.6-2.10 + 2d.7 PRSIM eki; KARARLAR 28 Ekim sonrası tüm eklemeler (01/02/03c/04a/05a/06a/06b/06b-2/08 kararları, PRSIM koşullu ingest D sınıfı tam metni, M3 korpus, yığın sınırı üç, paket başına yeni oturum, şablon fork'u); CONTRACTS (C2/C3/C6 text_filter/C8/C9/C11); RELEASE_AND_ROLLBACK (Alembic açık revizyon); TERMINOLOGY (FastFlow, alt başlık). BASLATMA ve MULTI_AGENT_PROTOCOL 21d9ba1'den beri değişmedi (diff boş). BLOCKERS 140-156 (152 R4 RAM, 153 R7, 154-156).
+GOREV girdileri: plan/19 tamamı; state/reviews/paycore-19-dis-inceleme.md tamamı (R1-R8); state/pr/18-kosu-2.md "Bulgular" (B1-B3, N1); K-19R-0001/0002/0003.
+Okunmayan: koordinatör kanalının 28 Ekim-3 Kasım arası gövdesi (yalnız bana adresli 19R/09 mesajları), state/pr/19.md (plan aşamasında okunacak), diğer brief'ler.
+
+### B-19R-0002 · 2026-11-03 09:40 · → koordinator · ACK
+Paket: fix/19-dis-inceleme   Cevap: K-19R-0001 / K-19R-0002 / K-19R-0003
+GOREV + ek + karar alındı. Sıra: önce FFCore tarafı (154 B1 ALLOWED_INTERNAL_HOSTS backend + HttpEmbedClient yolu testi, 155 B2 raw_ingest statü/yeniden deneme/istisna→failed/konsol özeti, 156 B3 eval_report kaynak isabeti = yalnız cites_source + docs/demo.md etiketleri), sonra paycoreLLM R1-R8 (kararlar K-19R-0001'deki gibi; R4 yalnız belge + parametreli test, BLOCKERS 152). Her bulgu ayrı commit, önce kırmızı; PR-HAZIR iki SHA ile.
+Worktree'ler henüz yok: ffcore `.worktrees/fix/19-ingest-followups` (branch fix/19-ingest-followups, main b2e9c05'ten) ve paycoreLLM kardeş `C:\ai_paycore\paycoreLLM-19r` (branch feat/19-dis-inceleme, master ca1b287). WORK_QUEUE'da açan belirtilmediği için ikisini plan adımında ben açıyorum (00i deseni); itiraz varsa kanala yaz. paycoreLLM ana kopyasındaki kullanıcı değişikliklerine dokunulmaz.
+Sıradaki: rg ile semboller → state/pr/19-dis-inceleme.md planı → DURUM: PLANNED.
+
+### B-19R-0003 · 2026-11-03 10:05 · → koordinator · DURUM
+Paket: fix/19-dis-inceleme   Cevap: K-19R-0001 / K-19R-0002
+DURUM: PLANNED. Plan: C:\ai_paycore\ffcore\state\pr\19-dis-inceleme.md (semboller, dosyalar, kabul → test tablosu, durma koşulları, felsefe üçlüsü).
+Worktree'ler açıldı: ffcore `.worktrees/fix/19-ingest-followups` (fix/19-ingest-followups @ b2e9c05), paycoreLLM `C:\ai_paycore\paycoreLLM-19r` (feat/19-dis-inceleme @ ca1b287); ana kopyalar dokunulmadı.
+Onay istediğim üç varsayım: (1) 154: `backend` yalnız backend servisine eklenir, `&app-env` anchor'ına değil (mcp-*/migrate genişlemesin); paycoreLLM compose.ffcore.yml:320 ffcore-backend aynısı. (2) 155: sha aynı + statü ≠ indexed → yeniden dene (yeni sürüm açmadan; ingest_from_raw'ın mevcut-belge yolu açarsa dururum); istisnada `failed` + `meta.error_code` (sınıf adı); konsol statü satırı DB'den, manifestle aynı kaynak. (3) R7: FFCore `_is_prsim` özel; seed (ffcore-backend imajı) public `raw_staging.check_sources` üstünden çalışır, FFCore'a public alias eklemem (touch-zone dışı); stage_raw (PayCore ingest imajı) `paycore_llm/ffcore_compat.py`'den alır.
+154c (gerçek HttpEmbedClient ile yığında indexed) ağırlık ister; `04a-knowledge-core_model_cache` volume'u var. O adım için YIGIN-AÇ ayrıca isteyeceğim; birim/entegrasyon kırmızıları önce.
+m3_gate_check eval_report etiketlerini okumuyor (grep), 156 gate'i etkilemez.
+Onay ya da itiraz gelene kadar kırmızı testleri yazmaya başlıyorum (ffcore 154/155/156); commit kodu onaydan sonra.
