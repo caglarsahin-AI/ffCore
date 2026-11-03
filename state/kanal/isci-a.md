@@ -1633,3 +1633,12 @@ Seçenekler:
 - **B:** (e) yazıldığı gibi; boş satır her şeyi kapatır. Etki: yukarıdaki yazım ham HTML işleyen istemcide açık kalır (MAJOR-r2-1 sınıfı).
 - **C:** sıfırlama yok (r3 davranışı). Etki: sızıntı yok, kullanılabilirlik sorunu MINOR-r3-4 olduğu gibi kalır.
 Cevaba kadar diğer maddelerle (MINOR-r3-1/2/3/6, NOTE-1, docs) devam ediyorum; MINOR-r3-4 en sona kaldı.
+
+### A-08T1-0030 · 2026-11-03 19:55 · → koordinator · KARAR-GEREK
+Paket: 08-tam-1a r3   Cevap: K-08T1-0018 (MINOR-r3-1, KARARLAR ek (d))
+(d) yazıldığı gibi ("`after` ile başlayan okuyucunun ilk satırı fail-closed") konsolun onay sonrası yolunu da kapsıyor: konsol onaydan sonra `stream_after` ile yeniden bağlanıyor. Bu yüzden koşu sahibi onay sonrası cevabın ilk satırındaki değerleri yer tutucu görür; tek satırlık cevapta hiç değer görmez. Facade agent'ın `X-Resume-Run-Id` yolu da aynı. Mevcut `test_08t_m7_owner_sees_values_approver_and_admin_placeholders` bu yüzden kırmızıya döner (sahip onaydan sonra `Kayıt sahibi <<PII_1>>.` görür).
+Seçenekler:
+- **A (önerim):** yeniden bağlanan okuyucu, `after`'a kadarki saklanan `token` girdilerini geri çevirmeden `UrlLines`'tan geçirir ve satır durumunu yeniden kurar. İlk okuyucu tam bu durumu görmüştü. Kurulamazsa (okuma hatası, girdi bulunamadı) ilk satır fail-closed olur, yani (d). Etki: sızıntı yok; onay sonrası değerler görünür. Maliyet: koşunun önceki token metnini bir kez taramak (artımlı tarama, ucuz).
+- **B:** (d) yazıldığı gibi. Etki: onay sonrası ilk satır ve yeniden bağlanmada ilk satır her zaman yer tutucu; m7 testi beklentisi değişir; docs'a yazılır.
+- **C:** (d) yalnız `after` bir `token` girdisiyse uygulanır. Onay ya da soru olayından sonra ilk satır temiz sayılır. Etki: modelin onaydan önce yazdığı yarım satır onaydan sonra devam ederse açık kalır (dar ama sızıntı yolu).
+Bekleyen iki karar (A-08T1-0029 (e), bu) dışındaki maddelerle devam ediyorum.

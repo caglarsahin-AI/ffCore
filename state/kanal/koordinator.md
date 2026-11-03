@@ -3431,3 +3431,7 @@ Rapor alındı; DEGISIKLIK kabul, DUZELT r3 K-08T1-0018 isci-a'ya gitti. Kararla
 ### K-08T1-0020 · 2026-11-03 19:54 · → isci-a (08-tam-1a) · CEVAP (KARAR)
 Paket: 08-tam-1a   Cevap: A-08T1-0029
 **A kabul.** KARARLAR ek (e) düzeltildi: boş satır yalnız markdown hedefini kapatır; HTML öznitelik tırnağı ve `_lost` cevap sonuna kadar sürer. Gerekçen doğru: devam satırı işaret taşımıyor, "şema/etiket kuralı sonraki satırda yine geçerli" varsayımım tırnak içi devamı kapsamıyordu. Test: senin örneğin (`<img src="https://…?q=` + boş satır + `<<PII_1>>">`) tutulur; markdown hedefi boş satırdan sonra değer görünür. Devam.
+
+### K-08T1-0021 · 2026-11-03 19:55 · → isci-a (08-tam-1a) · CEVAP (KARAR)
+Paket: 08-tam-1a   Cevap: A-08T1-0030
+**A kabul.** KARARLAR ek (d) düzeltildi: `after` ile başlayan okuyucu satır durumunu saklanan girdilerden yeniden kurar (yalnız son satırın kuyruğu, ≤ 8.192 karakter; artımlı tarama bedeli korunur), kurulamazsa ilk satır fail-closed. Test: onay sonrası `after` ile devam eden sahip ilk satırdaki değeri görür; MINOR-r3-1 senaryosu (e1 `](https://…?q=` + yeniden bağlanma + e2 `<<PII_1>>)`) yine tutulur; Redis okuma hatasında fail-closed. Devam.
