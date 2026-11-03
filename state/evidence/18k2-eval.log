@@ -1,0 +1,39 @@
+python scripts/eval_report.py --model "fake-llm" --project "hastane-a"  --approve-sql   
+q01: completed fail
+q02: completed fail
+q03: completed fail
+q04: completed fail
+q05: completed fail
+q06: completed fail
+q07: completed fail
+q08: completed fail
+q09: completed fail
+q10: completed fail
+q11: completed fail
+q12: completed fail
+q13: completed fail
+q14: completed fail
+q15: completed fail
+q16: completed fail
+q17: completed fail
+q18: completed fail
+q19: completed fail
+q20: completed fail
+q21: completed fail
+q22: completed fail
+q23: completed fail
+q24: completed fail
+q25: completed fail
+q26: completed fail
+q27: completed fail
+q28: completed fail
+q29: completed fail
+q30: completed fail
+q31: completed fail
+q32: completed fail
+q33: completed fail
+report written to /work/eval/results/eval-20261103-0600.md
+
+real	0m37.106s
+user	0m0.184s
+sys	0m0.215s

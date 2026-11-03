@@ -1,0 +1,14 @@
+=== seed 1 08:55:53
+python -m tests.e2e.scenarios.seed
+seeded: projects ['hastane-a', 'klinik-b'], models ['chat-default', 'chat-fail', 'chat-slow', 'chat-tools'], agents in hastane-a; created 36, uploaded 15
+
+real	1m15.375s
+user	0m0.030s
+sys	0m0.107s
+=== seed 2 08:57:09
+python -m tests.e2e.scenarios.seed
+seeded: projects ['hastane-a', 'klinik-b'], models ['chat-default', 'chat-fail', 'chat-slow', 'chat-tools'], agents in hastane-a; created 0, uploaded 0
+
+real	0m48.000s
+user	0m0.076s
+sys	0m0.184s

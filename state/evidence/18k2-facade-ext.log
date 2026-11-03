@@ -1,0 +1,18 @@
+| # | Check | Expected | Got | Result |
+|---|---|---|---|---|
+| 1 | key create ['chat_direct', 'agents'] | 201 | 201 | PASS |
+| 2 | external register ext-agent (internal, not reserved) | 201 | 201  | PASS |
+| 3 | external read: api_key masked | *** | '***' | PASS |
+| 4 | /v1/models before publish | absent | False | PASS |
+| 5 | call before publish | (measured) | 404 agent_not_published | PASS |
+| 6 | external publish | 200 | 200 | PASS |
+| 7 | /v1/models after publish | listed | True | PASS |
+| 8 | external non-stream (via ext-agent) | 200 + content | 200 'hello' | PASS |
+| 9 | egress external: e-mail in message | no raw value upstream | 1 upstream req, raw=False | PASS |
+| 10 | external stream | 200 + chunk + [DONE] | 200 3 chunks, DONE=True, text='hello' | PASS |
+| 11 | external system role | 400 | 400 role_not_supported | PASS |
+| 12 | PUT new origin without api_key | 200, api_key null | 200 api_key=None | PASS |
+| 13 | call after key reset | 501 external_agent_not_available | 501 external_agent_not_available | PASS |
+| 14 | audit external_agent_call rows | >= 2 | 200 4 | PASS |
+| 15 | audit reset_external_agent_key | >= 1 | 2 | PASS |
+TOTAL 15/15 PASS

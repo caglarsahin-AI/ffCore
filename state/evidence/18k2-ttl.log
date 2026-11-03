@@ -1,0 +1,15 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.10, pytest-9.2.0, pluggy-1.7.0 -- /opt/venv/bin/python
+cachedir: .pytest_cache
+rootdir: /work
+plugins: Faker-40.43.0, anyio-4.15.1, langsmith-0.14.8
+collecting ... collected 14 items / 12 deselected / 2 selected
+
+tests/e2e/negative/test_13b_negative.py::test_13b_neg_approval_1_expired_approval_closes_the_run PASSED [ 50%]
+tests/e2e/negative/test_13b_negative.py::test_13b_neg_approval_2_sweep_hook_is_for_the_service_account_only PASSED [100%]
+
+============================== F table (plan/18) ===============================
+| Use case | Status | Passed | Failed | NOT_RUN | Failing tests | NOT_RUN reasons |
+|---|---|---|---|---|---|---|
+| Negative | passed | 2 | 0 | 0 |  |  |
+======================= 2 passed, 12 deselected in 5.07s =======================

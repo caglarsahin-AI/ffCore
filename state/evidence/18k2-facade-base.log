@@ -1,0 +1,31 @@
+models: ['hastane-a.chat-default', 'hastane-a.chat-fail', 'hastane-a.chat-slow', 'hastane-a.chat-tools'] 
+agents: ['agent:hastane-a/e2e-bilet', 'agent:hastane-a/e2e-hatali', 'agent:hastane-a/e2e-silme-a1949756', 'agent:hastane-a/e2e-sql', 'agent:hastane-a/e2e-yavas', 'agent:hastane-a/karma-asistan', 'agent:hastane-a/neg-guard-e546ce33', 'agent:hastane-a/sozlesme-asistani', 'agent:hastane-a/surum-asistani', 'agent:hastane-a/veri-soru-cevap', 'agent:hastane-a/zehirli-belge-asistani']
+| # | Check | Expected | Got | Result |
+|---|---|---|---|---|
+| 1 | key create ['chat_direct', 'agents'] | 201 | 201 | PASS |
+| 2 | key create ['agents'] | 201 | 201 | PASS |
+| 3 | key create ['chat_direct'] | 201 | 201 | PASS |
+| 4 | GET /v1/models (both scopes) | models + agents | 4 models, 11 agents | PASS |
+| 5 | GET /v1/models scope agents | agents only | 11 ids, all agent: True | PASS |
+| 6 | GET /v1/models scope chat_direct | models only | 4 ids, no agent: True | PASS |
+| 7 | GET /v1/models other project | absent | False | PASS |
+| 8 | direct non-stream | 200 + content | 200 'hello' | PASS |
+| 9 | direct stream | 200 + chunks + [DONE] | 200 3 chunks, DONE=True, text='hello' | PASS |
+| 10 | direct short model name | 200 | 200 | PASS |
+| 11 | direct with agents-only key | 403 scope_missing | 403 scope_missing | PASS |
+| 12 | unknown field | 400 unsupported_field | 400 unsupported_field | PASS |
+| 13 | top_p as text | 400 invalid_parameter | 400 invalid_parameter | PASS |
+| 14 | temperature 3 | 400 invalid_parameter | 400 invalid_parameter | PASS |
+| 15 | other project's model | 404 model_not_found | 404 model_not_found | PASS |
+| 16 | egress direct: e-mail in message | fake-llm has no raw value | 200, 1 upstream req, raw=False | PASS |
+| 17 | agent non-stream agent:hastane-a/sozlesme-asistani | 200 + X-Run-Id | 200 run=True 'hello' | PASS |
+| 18 | agent stream agent:hastane-a/sozlesme-asistani | 200 + chunks + [DONE] | 200 6 chunks, DONE=True, x_platform=['progress', 'sources'] | PASS |
+| 19 | agent with chat_direct-only key | 403 scope_missing | 403 scope_missing | PASS |
+| 20 | agent unknown field | 400 unsupported_field | 400 unsupported_field | PASS |
+| 21 | agent top_p as text | 400 invalid_parameter | 400 invalid_parameter | PASS |
+| 22 | egress agent: e-mail in message | fake-llm has no raw value | 200, 1 upstream req, raw=False | PASS |
+| 23 | console session on facade | 401 api_key_required | 401 api_key_required | PASS |
+| 24 | external register http://fake-llm:9999/v1 | 422 external_agent_host_reserved | 422 external_agent_host_reserved | PASS |
+| 25 | external register http://ticket-desk:8080/v1 | 422 external_agent_host_reserved | 422 external_agent_host_reserved | PASS |
+| 26 | external register https://agent.example.org/v1 | 422 external_agent_url_refused | 422 external_agent_url_refused | PASS |
+TOTAL 26/26 PASS

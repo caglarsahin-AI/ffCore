@@ -1,0 +1,45 @@
+=== ingest-raw 1 09:10:18
+error: prsim_requires_ner: jira:PRSIM carries person data; it is ingested once 08 full recognizes names
+
+real	0m19.705s
+user	0m0.000s
+sys	0m0.000s
+=== ingest-raw 2 09:10:40
+error: prsim_requires_ner: jira:PRSIM carries person data; it is ingested once 08 full recognizes names
+
+real	0m22.488s
+user	0m0.000s
+sys	0m0.107s
+=== ingest-raw (no PRSIM) 1 09:11:15
+2026-11-03 06:11:52,668 ERROR ffcore.knowledge.raw_ingest ingest-raw failed path=jira/DEMO/DEMO-7.txt error=EgressDenied
+2026-11-03 06:11:52,702 WARNING ffcore.knowledge.raw_ingest ingest-raw rejected path=jira/PRSIM/PRSIM-1.txt code=prsim_requires_ner
+created 4
+new_version 0
+unchanged 0
+status: failed 5
+rejected: prsim_requires_ner 1
+gates: -
+masked (pii_regex): -
+stage: stage0-pipeline-evidence (--limit): pipeline evidence, not acceptance
+manifest: documents 5, chunks 0, raw_manifest_sha256 56139353ac1759bf12407b6888d67a55aaba908e37275886eeaad99dcde1a506
+manifest written to ../eval/results/18k2-ingest-manifest-1.json
+
+real	0m39.823s
+user	0m0.109s
+sys	0m0.061s
+=== ingest-raw (no PRSIM) 2 09:11:56
+2026-11-03 06:12:13,712 WARNING ffcore.knowledge.raw_ingest ingest-raw rejected path=jira/PRSIM/PRSIM-1.txt code=prsim_requires_ner
+created 0
+new_version 0
+unchanged 5
+status: -
+rejected: prsim_requires_ner 1
+gates: -
+masked (pii_regex): -
+stage: stage0-pipeline-evidence (--limit): pipeline evidence, not acceptance
+manifest: documents 5, chunks 0, raw_manifest_sha256 56139353ac1759bf12407b6888d67a55aaba908e37275886eeaad99dcde1a506
+manifest written to ../eval/results/18k2-ingest-manifest-2.json
+
+real	0m18.045s
+user	0m0.046s
+sys	0m0.108s
