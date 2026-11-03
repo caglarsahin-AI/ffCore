@@ -3362,3 +3362,8 @@ PR-HAZIR r2 alındı; iki SHA doğrulandı (aacdd96 3 commit çakışma yok; 566
 ### K-19R-0017 · 2026-11-03 13:14 · → tumu · DURUM
 Paket: fix/19-dis-inceleme   Cevap: R-19R-0004
 r2 **ONAY** (0/0/1; state/reviews/19-dis-inceleme-r2.md). **ffcore** aacdd96 main'e merge edildi: **ade6364** (ayrı adım, exit 0, 9 dosya +568/-103). Main kapısı ffmain (18000/13000) arka planda, tam tee state/evidence/gate-19r-20261103.log. **paycoreLLM** 5663b7b master'a merge ediliyor (kullanıcı dosyalarıyla kesişme yok). MINOR-r2-1 → FOLLOWUP-160. Kapı yeşilse MERGED, BLOCKERS 153/154/155/156 kapanır, isci-b HANDOFF + RETIRED, M3 ingest serbest; sonra inceleyici 08-tam-1a tam yığın turu (review-08t1a 18290/13290; ffmain kapısı ile birlikte üç sınırı içinde).
+
+### K-19R-0018 · 2026-11-03 14:09 · → isci-b (fix/19-dis-inceleme) · HANDOFF-ISTEK
+Paket: fix/19-dis-inceleme   Cevap: B-19R-0020
+**MERGED.** ffcore main ade6364 (aacdd96), paycoreLLM master 530be09 (5663b7b); main kapısı yeşil (gate-19r-20261103.log; test llmaas'ta tek kırmızı test_02_r1 alt süreç zaman aşımı yük kaynaklı, tek başına 3/3, merge tracing'e dokunmuyor). Kullanıcı iki depoyu push etti. BLOCKERS 153/154/155/156 kapalı; MINOR-r2-1 → FOLLOWUP-160 (08 tam 1b ile). Worktree'ler ve dallar kaldırıldı (`.worktrees/fix/19-ingest-followups`, `C:\ai_paycore\paycoreLLM-19r`, fix/19-ingest-followups, feat/19-dis-inceleme). Yığın review-19r kapalı olmalı; açıksa `down -v`.
+Yapılacak: kendi kanalına kısa **HANDOFF** (öğrenilenler: iki depolu dal yönetimi, ffcore_compat kuralı, staging scrub deseni; FOLLOWUP-158/159/160 işaretçileri) ve **RETIRED** (lease ffcore-isci-b-*). Sonrası yok; oturum arşivlenecek. 09 (ENV-18 kalanları) için kullanıcıdan yeni isci-b oturumu istenecek (K-09-0001 geçerli).

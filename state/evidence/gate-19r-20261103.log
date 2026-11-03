@@ -1,0 +1,228 @@
+git head: ade6364 2026-11-03 13:11:40
+
+=== 13:11:43 build backend frontend tools
+
+#37 [frontend] exporting to image
+#37 exporting layers done
+#37 writing image sha256:a81da830ccd8bd4ec2dfc5f7f00d0152585633df4bcaf4367633e27cf27d1e2c 0.0s done
+#37 naming to docker.io/ffcore/frontend:0.0.0-main 0.0s done
+#37 DONE 0.0s
+build exit=0
+
+=== 13:12:19 compose config
+config exit=0
+
+=== 13:12:31 up
+ Container ffmain-migrate-1  Exited
+ Container ffmain-langfuse-web-1  Healthy
+ Container ffmain-langfuse-postgres-1  Healthy
+ Container ffmain-langfuse-worker-1  Healthy
+ Container ffmain-mcp-sql-1  Healthy
+ Container ffmain-mcp-search-1  Healthy
+up exit=0
+ffmain-worker-1 Up 8 seconds
+ffmain-mcp-sql-1 Up 22 seconds (healthy)
+ffmain-agent-worker-bg-1 Up 22 seconds
+ffmain-frontend-1 Up 21 seconds
+ffmain-agent-worker-1 Up 21 seconds
+ffmain-mcp-search-1 Up 20 seconds (healthy)
+ffmain-backend-1 Up 48 seconds (healthy)
+ffmain-langfuse-web-1 Up About a minute (healthy)
+ffmain-litellm-1 Up About a minute (healthy)
+ffmain-langfuse-worker-1 Up About a minute
+ffmain-langfuse-clickhouse-1 Up 2 minutes (healthy)
+ffmain-langfuse-postgres-1 Up 2 minutes (healthy)
+ffmain-ticket-desk-1 Up 2 minutes (healthy)
+ffmain-langfuse-minio-1 Up 2 minutes (healthy)
+ffmain-fake-llm-1 Up 2 minutes
+ffmain-redis-1 Up 2 minutes (healthy)
+ffmain-postgres-1 Up 2 minutes (healthy)
+ffmain-langfuse-redis-1 Up 2 minutes (healthy)
+ffmain-qdrant-1 Up 2 minutes (healthy)
+
+=== 13:15:01 lint
+ruff check backend scripts data/samples/scripts services
+All checks passed!
+ruff format --check backend scripts data/samples/scripts services
+398 files already formatted
+lint exit=0
+
+=== 13:15:29 alembic heads
+06b_0001 (06b, 06a, 04a, 07, 03a, 08, 03c, 03b, 05a) (head)
+heads exit=0
+
+=== 13:16:22 make test llmaas
+........................................................................ [  7%]
+........................................................................ [ 15%]
+...F.................................................................... [ 22%]
+........................................................................ [ 30%]
+........................................................................ [ 37%]
+........................................................................ [ 45%]
+........................................................................ [ 52%]
+........................................................................ [ 60%]
+........................................................................ [ 68%]
+........................................................................ [ 75%]
+........................................................................ [ 83%]
+........................................................................ [ 90%]
+........................................................................ [ 98%]
+................                                                         [100%]
+=================================== FAILURES ===================================
+_________________ test_02_r1_m3_child_process_exits_by_itself __________________
+
+trickle = 'http://127.0.0.1:42865'
+
+    def test_02_r1_m3_child_process_exits_by_itself(trickle):
+        limit = tracing.SHUTDOWN_TIMEOUT_S + 5
+        started = time.monotonic()
+        try:
+>           child = subprocess.run(
+                [sys.executable, "-c", CHILD, trickle],
+                cwd=BACKEND,
+                capture_output=True,
+                text=True,
+                timeout=limit,
+            )
+
+tests/unit/test_02_r1_tracing.py:128: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.12/subprocess.py:550: in run
+    stdout, stderr = process.communicate(input, timeout=timeout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/subprocess.py:1209: in communicate
+    stdout, stderr = self._communicate(input, endtime, timeout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/subprocess.py:2116: in _communicate
+    self._check_timeout(endtime, orig_timeout, stdout, stderr)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <Popen: returncode: -9 args: ['/opt/venv/bin/python', '-c', '\nimport sys, t...>
+endtime = 88128.0495369, orig_timeout = 15, stdout_seq = [], stderr_seq = []
+skip_check_and_raise = False
+
+    def _check_timeout(self, endtime, orig_timeout, stdout_seq, stderr_seq,
+                       skip_check_and_raise=False):
+        """Convenience for checking if a timeout has expired."""
+        if endtime is None:
+            return
+        if skip_check_and_raise or _time() > endtime:
+>           raise TimeoutExpired(
+                    self.args, orig_timeout,
+                    output=b''.join(stdout_seq) if stdout_seq else None,
+                    stderr=b''.join(stderr_seq) if stderr_seq else None)
+E           subprocess.TimeoutExpired: Command '['/opt/venv/bin/python', '-c', '\nimport sys, time\nfrom pydantic import SecretStr\nfrom ffcore.core import tracing\nfrom ffcore.core.config import Settings\nfrom tests.dummy import SETTINGS_03A\n\nsettings = Settings(\n    deploy_profile="llmaas", offline=False,\n    service_token="dummy-not-secret-service-token-0123456789",\n    obo_jwt_secret="dummy-not-secret-obo-jwt-secret-0123456789",\n    egress_allowlist=[], allowed_internal_hosts=["127.0.0.0/8"],\n    langfuse_host=sys.argv[1], langfuse_public_key=SecretStr("pk-lf-dummy-not-secret"),\n    langfuse_secret_key=SecretStr("sk-lf-dummy-not-secret"), **SETTINGS_03A,\n)\ntracing.init_tracing(settings)\nwith tracing.span("child-span"):\n    pass\nstarted = time.monotonic()\ntracing.shutdown_tracing()\nprint(f"shutdown_returned {time.monotonic() - started:.1f}", flush=True)\n', 'http://127.0.0.1:42865']' timed out after 15 seconds
+
+/usr/local/lib/python3.12/subprocess.py:1253: TimeoutExpired
+
+During handling of the above exception, another exception occurred:
+
+trickle = 'http://127.0.0.1:42865'
+
+    def test_02_r1_m3_child_process_exits_by_itself(trickle):
+        limit = tracing.SHUTDOWN_TIMEOUT_S + 5
+        started = time.monotonic()
+        try:
+            child = subprocess.run(
+                [sys.executable, "-c", CHILD, trickle],
+                cwd=BACKEND,
+                capture_output=True,
+                text=True,
+                timeout=limit,
+            )
+        except subprocess.TimeoutExpired:
+>           pytest.fail(f"child did not exit within {limit} s (killed by the test)")
+E           Failed: child did not exit within 15 s (killed by the test)
+
+tests/unit/test_02_r1_tracing.py:136: Failed
+=========================== short test summary info ============================
+FAILED tests/unit/test_02_r1_tracing.py::test_02_r1_m3_child_process_exits_by_itself
+1 failed, 951 passed in 1481.26s (0:24:41)
+test exit=1
+
+=== 13:42:20 make test airgap
+........................................................................ [  7%]
+........................................................................ [ 15%]
+........................................................................ [ 22%]
+........................................................................ [ 30%]
+........................................................................ [ 37%]
+........................................................................ [ 45%]
+........................................................................ [ 52%]
+........................................................................ [ 60%]
+........................................................................ [ 68%]
+........................................................................ [ 75%]
+........................................................................ [ 83%]
+........................................................................ [ 90%]
+........................................................................ [ 98%]
+................                                                         [100%]
+952 passed in 338.05s (0:05:38)
+test-airgap exit=0
+
+=== 13:48:39 test-samples
+
+----------------------------------------------------------------------
+Ran 54 tests in 11.891s
+
+OK (skipped=5)
+samples exit=0
+
+=== 13:49:08 test-int
+........................................................................ [  8%]
+........................................................................ [ 17%]
+........................................................................ [ 26%]
+..............s......................................................... [ 35%]
+..................................................................s..... [ 44%]
+.....s.................................................................. [ 53%]
+............s........................................................... [ 61%]
+........................................................................ [ 70%]
+........................................................................ [ 79%]
+........................................................................ [ 88%]
+.................................................................s...... [ 97%]
+......................                                                   [100%]
+=============================== warnings summary ===============================
+tests/integration/test_04a_worker.py::test_04a_upload_job_runs_in_worker
+tests/integration/test_04a_worker.py::test_04a_job_for_missing_row_retries_then_fails_loud
+  /opt/venv/lib/python3.12/site-packages/arq/worker.py:877: DeprecationWarning: Call to deprecated close. (Use aclose() instead) -- Deprecated since version 5.0.1.
+    await self.pool.close(close_connection_pool=True)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+SKIPPED [1] tests/integration/test_03b_egress_dns.py: NOT_RUN: needs RUN_DNS_TESTS=1
+SKIPPED [1] tests/integration/test_04a_ingest.py:124: NOT_RUN: needs RUN_MODEL_TESTS=1
+SKIPPED [1] tests/integration/test_04a_ingest.py:279: NOT_RUN: needs RUN_MODEL_TESTS=1
+SKIPPED [1] tests/integration/test_05a_sql.py:288: NOT_RUN: needs RUN_MODEL_TESTS=1
+SKIPPED [1] tests/integration/test_19_ingest_raw.py:156: root ignores file modes; the mount test runs :ro
+809 passed, 5 skipped, 2 warnings in 1007.30s (0:16:47)
+test-int exit=0
+
+=== 14:06:32 smoke
+python scripts/smoke.py
+ok    backend /healthz 200
+ok    litellm /health/liveliness 200
+ok    langfuse /api/public/health 200, /api/public/projects 200
+ok    mcp-search /healthz 200
+ok    mcp-sql /healthz 200
+ok    skipped: ollama profile inactive
+smoke: passed
+smoke exit=0
+
+=== 14:06:45 frontend lint/typecheck/check:api (node, --network none, repo root)
+
+> ffcore-frontend@0.1.0 lint
+> eslint
+
+
+> ffcore-frontend@0.1.0 typecheck
+> tsc --noEmit
+
+
+> ffcore-frontend@0.1.0 check:api
+> node scripts/check-api.mjs
+
+API contract copies and generated types are current.
+frontend exit=0
+
+=== 14:07:28 down -v
+ Volume ffmain_postgres_data  Removed
+ Volume ffmain_langfuse_postgres_data  Removed
+
+=== 14:07:57 done
+gate script exit 0
