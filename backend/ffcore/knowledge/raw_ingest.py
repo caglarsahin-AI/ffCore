@@ -5,8 +5,12 @@ no option to leave it off (plan/19 şart 1). A file whose bytes are already inde
 name is `unchanged` and not touched again (the second run reports `created 0`). Same bytes in any
 other status but `skipped` (a gate decision on these bytes) is `retried`: the pipeline runs again
 on the same record, no new version (FOLLOWUP-155: a fixed environment must not leave a failed
-document behind a clean-looking run). A file that raises is `failed` in the database with the
-exception's class name in `metadata.error_code`, never a message. This process
+document behind a clean-looking run). A file that raises after its record was registered is
+`failed` in the database with the exception's class name in `metadata.error_code`, never a
+message. One that raises before (bad metadata: the registration rolls back) has no row of its
+own: it is `failed_unregistered` (source, path, code) in the console and the manifest, counts
+in `failed` and the exit code, no placeholder row is created and an earlier indexed version of
+the same file is left as it is (review r1 MAJOR-1/2, K-19R-0013 A). This process
 converts in its own bounded pool and asks the API for embeddings (C10), like the ingest worker.
 
 The report is counts only: outcomes, refusal codes, gate reasons, masked findings per category.
@@ -70,6 +74,8 @@ class RawIngestReport:
     current: dict[str, tuple[str, int]] = field(default_factory=dict)
     ingested_at: str = ""
     personnel_data_sources: set[str] = field(default_factory=set)
+    # (source, relpath, error code) of files that failed before their record was registered.
+    unregistered: list[tuple[str, str, str]] = field(default_factory=list)
 
     def manifest(self) -> dict:
         sources: dict[str, dict[str, int]] = {}
@@ -87,7 +93,11 @@ class RawIngestReport:
             "chunks": sum(e["chunks"] for e in sources.values()),
             "sources": dict(sorted(sources.items())),
             "statuses": dict(sorted(statuses.items())),
-            "failed": statuses["failed"],
+            "failed": statuses["failed"] + len(self.unregistered),
+            "failed_unregistered": [
+                {"source": source, "path": relpath, "error_code": code}
+                for source, relpath, code in sorted(self.unregistered)
+            ],
             "timeout": statuses["timeout"],
             "rejected": dict(sorted(self.rejected.items())),
             "personnel_data_sources": sorted(self.personnel_data_sources),
@@ -106,6 +116,11 @@ class RawIngestReport:
             # Every document of the tree as the database has it (the manifest's statuses), not
             # only this run's: an unchanged failure stays visible (FOLLOWUP-155).
             f"status: {fmt(Counter(status for status, _ in self.current.values()))}",
+            f"failed_unregistered {len(self.unregistered)}",
+            *(
+                f"  unregistered: {source} {relpath} {code}"
+                for source, relpath, code in sorted(self.unregistered)
+            ),
             f"rejected: {fmt(self.rejected)}",
             f"gates: {fmt(self.gates)}",
             f"masked ({TEXT_FILTER}): {fmt(self.masked)}",
@@ -166,24 +181,28 @@ async def _clear_error(document_id) -> None:
             await session.commit()
 
 
-async def _mark_failed(kb_id, filename: str, code: str) -> None:
+async def _mark_failed(kb_id, filename: str, sha256: str, code: str) -> bool:
     """An exception between steps leaves the row where the last commit put it (`gated`,
     `embedding`): it becomes `failed` with the class name, so the database says what the console
-    says. No row (the error came before registration): nothing to mark, the count stays."""
+    says. Only the record this run registered, i.e. the one holding these bytes: if the
+    registration rolled back, the row (if any) is an earlier version and stays untouched; the
+    caller counts the file as unregistered (review r1 MAJOR-2). True when a row was marked."""
     async with db.session_scope() as session:
         document = await session.scalar(
             select(Document).where(
                 Document.kb_id == kb_id,
                 Document.filename == filename,
+                Document.sha256 == sha256,
                 Document.deleted_at.is_(None),
             )
         )
         if document is None:
-            return
+            return False
         document.status = "failed"
         document.error = code
         document.meta = {**(document.meta or {}), "error_code": code}
         await session.commit()
+        return True
 
 
 async def _fill_current(report: RawIngestReport, kb_id) -> None:
@@ -321,7 +340,9 @@ async def ingest_tree(
         except Exception as exc:  # one file must not stop the tree; counted and logged by code
             report.statuses["failed"] += 1
             log.error("ingest-raw failed path=%s error=%s", entry.relpath, type(exc).__name__)
-            await _mark_failed(kb.id, entry.relpath, type(exc).__name__)
+            code = type(exc).__name__
+            if not await _mark_failed(kb.id, entry.relpath, sha256, code):
+                report.unregistered.append((raw_staging.source_of(entry), entry.relpath, code))
             continue
         report.outcomes["retried" if same_bytes else "new_version" if existed else "created"] += 1
         async with db.session_scope() as session:

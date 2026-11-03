@@ -445,3 +445,62 @@ def test_19r_155_console_statuses_match_manifest(world, pg, settings, ro_tree):
     lines = report.lines()
     assert "status: failed 1, indexed 3, skipped 1" in lines, lines
     assert "retried 1" in lines and "unchanged 4" in lines, lines
+
+
+# --- review r1 MAJOR-1/2 (K-19R-0013 A): an error before the document is registered is counted
+# (`failed_unregistered`: source, raw path, error code; no content), the manifest's `failed` and
+# the CLI exit code see it, no placeholder row is created, and an earlier indexed version of the
+# same file is not touched (it stays in search). ---
+
+
+def _writable_tree(tmp_path):
+    target = tmp_path / "raw-rw"
+    shutil.copytree(TREE, target)
+    return target
+
+
+def _break_meta(tree, rel, **changes):
+    meta_path = tree / f"{rel}.meta.json"
+    meta = json.loads(meta_path.read_text(encoding="utf-8"))
+    meta.update(changes)
+    meta_path.write_text(json.dumps(meta, ensure_ascii=False), encoding="utf-8")
+
+
+def test_19r_r1m1_error_before_registration_counted(world, pg, settings, tmp_path):
+    kb = create_kb(world, key="paycore-unreg")
+    tree = _writable_tree(tmp_path)
+    new = tree / "confluence" / "DEMO" / "9001.md"
+    new.write_text("# Yeni sayfa\n\nKurulum adımları ve kontrol listesi.\n", encoding="utf-8")
+    (tree / "confluence" / "DEMO" / "9001.md.meta.json").write_text(
+        json.dumps({"source": "confluence:DEMO", "source_item_id": "9001"}), encoding="utf-8"
+    )
+    _break_meta(tree, "confluence/DEMO/9001.md", updated_at_source="not-a-date")
+    report = _ingest(settings, _project_key(pg, world["project"]), kb["key"], tree)
+    manifest = report.manifest()
+    assert manifest["failed_unregistered"] == [
+        {"source": "confluence:DEMO", "path": "confluence/DEMO/9001.md", "error_code": "ValueError"}
+    ]
+    assert manifest["failed"] == 1  # what the CLI exit code reads
+    assert "failed_unregistered 1" in report.lines(), report.lines()
+    assert "not-a-date" not in json.dumps(manifest)  # no content, only the code
+    rows = _rows(pg, kb["id"])
+    assert "confluence/DEMO/9001.md" not in rows  # no placeholder row
+    assert sorted(s for s, _, _ in rows.values()) == ["indexed"] * 4 + ["skipped"]
+
+
+def test_19r_r1m2_new_version_error_keeps_old_version_searchable(world, pg, settings, tmp_path):
+    kb = create_kb(world, key="paycore-oldver")
+    key = _project_key(pg, world["project"])
+    tree = _writable_tree(tmp_path)
+    _ingest(settings, key, kb["key"], tree)
+    rel = "confluence/DEMO/1002.md"
+    page = tree / rel
+    page.write_text(page.read_text(encoding="utf-8") + "\nYeni paragraf.\n", encoding="utf-8")
+    _break_meta(tree, rel, updated_at_source="not-a-date")
+    report = _ingest(settings, key, kb["key"], tree)
+    assert [e["path"] for e in report.manifest()["failed_unregistered"]] == [rel]
+    status, version, meta = _rows(pg, kb["id"])[rel]
+    assert (status, version) == ("indexed", 1) and "error_code" not in meta
+    response = search(world["analyst"], world, kb["id"], "fesih bildirim süresi kaç gün")
+    assert response.status_code == 200, response.text
+    assert any(h["document_name"] == rel for h in response.json()["hits"])
