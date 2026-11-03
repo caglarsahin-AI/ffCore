@@ -1642,3 +1642,18 @@ Seçenekler:
 - **B:** (d) yazıldığı gibi. Etki: onay sonrası ilk satır ve yeniden bağlanmada ilk satır her zaman yer tutucu; m7 testi beklentisi değişir; docs'a yazılır.
 - **C:** (d) yalnız `after` bir `token` girdisiyse uygulanır. Onay ya da soru olayından sonra ilk satır temiz sayılır. Etki: modelin onaydan önce yazdığı yarım satır onaydan sonra devam ederse açık kalır (dar ama sızıntı yolu).
 Bekleyen iki karar (A-08T1-0029 (e), bu) dışındaki maddelerle devam ediyorum.
+
+### A-08T1-0031 · 2026-11-03 19:59 · → koordinator · YIGIN-AÇ
+Paket: 08-tam-1a r3 DUZELT
+Yalın yığın açılıyor: ffcore-08t1, postgres + redis + litellm + fake-llm + qdrant (`--profile test --profile qdrant`), imaj 0.0.0-08t1. Hedefli test-int iki profil; bitince YIGIN-KAPA.
+
+### A-08T1-0032 · 2026-11-03 20:28 · → koordinator · YIGIN-KAPA
+Paket: 08-tam-1a r3 DUZELT
+ffcore-08t1 yalın yığını `down -v` ile kapandı; konteyner 0, volume 0.
+
+### A-08T1-0033 · 2026-11-03 20:28 · → koordinator · PR-HAZIR
+Paket: 08-tam-1a r4   Cevap: K-08T1-0018, K-08T1-0020, K-08T1-0021
+SHA: 4aecdbc327a3a85e328045bf103b3d186c66ace9 (feat/08-tam-1-ner; 370912d üstüne 9 commit, 19 dosya +801/-98; main...HEAD 47 dosya, 28 commit). PR notu: state/pr/08-tam-1a.md ("Review r3 bulgu → düzeltme → kanıt" tablosu, r4 kapı tablosu, varsayım 12-13).
+Kapılar: lint 0; make test llmaas 1382 / airgap 1382; hedefli test-int airgap 146 passed + 2 skipped; llmaas 147 passed + 1 kırmızı. Kırmızı `<span style="background:url(…)">` yazımındaydı: fake sağlayıcı cevabı kesiyor, yer tutucu da değer de cevaba ulaşmıyordu, sızıntı yok. Test beklentisini sağlayıcıya giden istek ve cevap üzerinden doğrulayacak biçimde düzelttim (4aecdbc); dosya iki profilde 12/12 yeşil.
+MAJOR-r3-1/2, MINOR-r3-1..6/8, NOTE-1/2 kapalı; MINOR-r3-7, NOTE-3/5 FOLLOWUP-162. Kırmızı kanıtı commit öncesi kodla alındı (PR notunda dosya başına sayılar).
+İnceleyiciye iki not: (1) varsayım 12: (d) için yalnız son satır değil, `after`'a kadarki bütün token girdileri taranıyor. Önceki satırdan taşınan HTML değeri ancak böyle tutuluyor (testli). (2) varsayım 13: HTML'de `src=<x` artık açılı hedef sayılmıyor; böylece (e) markdown/HTML ayrımıyla tutarlı. Dal donuk; r4 sonucunu bekliyorum.
