@@ -1,10 +1,18 @@
 # PR: 08-tam-1a — çıkışta geri çevirme (C17, FOLLOWUP-141), secrets 106/107, egress 147
 
-**Paket:** 08-tam-1a (08 tam dilim 1'in modelsiz yarısı, K-08T1-0002 S7) · **Sınıf:** [B] (yeni bağımlılık, migration, compose yok) · **Branch:** feat/08-tam-1-ner · **Baz commit:** ea0db36 · **HEAD:** 4aecdbc327a3a85e328045bf103b3d186c66ace9 (r1 incelenen: fb7130d, r2 incelenen: 6d0d9ba, r3 incelenen: 370912d) · **Oturum:** ffcore-isci-a-08-tam-1
+**Paket:** 08-tam-1a (08 tam dilim 1'in modelsiz yarısı, K-08T1-0002 S7) · **Sınıf:** [B] (yeni bağımlılık, migration, compose yok) · **Branch:** feat/08-tam-1-ner · **Baz commit:** ea0db36 · **HEAD:** 60f2250caf8fa089abb0ee476b7a0325394d3c44 (r1 incelenen: fb7130d, r2 incelenen: 6d0d9ba, r3 incelenen: 370912d, r4 incelenen: 4aecdbc) · **Oturum:** ffcore-isci-a-08-tam-1
 
 Plan ve onay: `state/pr/08-tam-1.md` (PLANNED, K-08T1-0002: S1-S9 hepsi A). 08-tam-1b (NER + PRSIM) ayrı PR, ağırlıklar gelince.
 
-## Değişen dosyalar (main...HEAD, 47 dosya, 28 commit; +4387/-117)
+## Değişen dosyalar (main...HEAD, 48 dosya, 33 commit; +4483/-119)
+
+r4 DUZELT turu (4aecdbc..HEAD, 5 commit, 14 dosya +282/-188; kararlar KARARLAR "C17 geri çevirme: cevap düzeyinde HTML fail-closed", (d′), (f′)):
+
+- **MAJOR-r4-1** (c22894a): `guardrails/masking.py` cevap düzeyinde HTML (`_HTML_TAG`, istisna tam yer tutucu; `UrlLines._html`), `tag`/`tag_dq`/`tag_sq`/`expect`/CSS paren kipleri, öznitelik taşıması ve `_gap` kalktı (masking.py +56/−99 satır, net 43 satır küçülme), parça sonundaki `\r` satırı bitirmez, satır kuyruğu satır sonunda sıfırlanır; `tests/unit/test_08t_r4_html_response.py`; kaldırılan davranışın testleri güncellendi (`test_08t_r2_url_lines.py` kapanmış hedef testi yalnız markdown, `test_08t_r3_blank_line.py` açılı hedef `<./a`, `test_08t_r3_url_rules.py` `<img src=x>` olumlu kontrolü kalktı).
+- **MINOR-r4-3/6** (a0795ad): `UrlLines.lose`, `ContextReveal.fail_closed` → `_lost`; `api/runs.py` `prime` her hatada fail-closed (`detokenize_rebuild_failed` logu); `tests/integration/test_08t_r3_resume.py`.
+- **MINOR-r4-1/2** (7a10789): `masking.py` `PLACEHOLDER` 99.999.999'u dışlar, verme üst sınırı 99.999.998, `reserve_carried` artık hata vermez; `guardrails/engine.py` `PlaceholderOutOfRange` `on_error`'dan bağımsız yeniden yükseltilir; `tests/unit/test_08t_r3_range.py`, `tests/integration/test_08t_m2_history.py`.
+- **MINOR-r4-4** (8897584): `tests/integration/test_08t_r2_paths.py` güçlü iddia geri, `style` yazımı kısaltıldı.
+- **MINOR-r4-1/5 docs** (60f2250): `docs/{guardrail,api,agentlar}.md`.
 
 r3 DUZELT turu (370912d..HEAD, 9 commit, 19 dosya +801/-98):
 
@@ -82,6 +90,19 @@ r1 öncesi eşdeğer girdiler 43 s ve 59 s sürüyordu (inceleyici r1). Testteki
 
 ## Çalıştırılan komutlar
 
+**r5 (r4 düzeltmesi; yalın yığın postgres + redis + litellm + fake-llm + qdrant, tee çıktıları scratchpad `r5-*.txt`):**
+
+| Komut | Ortam | Exit | Süre | Sonuç |
+|---|---|---|---|---|
+| `tools make lint` | | 0 | | temiz |
+| `tools make test` | llmaas | 0 | 148 s | 1505 passed |
+| `tools make test` | `GUARDRAIL_EGRESS_ENABLED=false DEPLOY_PROFILE=airgap` | 0 | 135 s | 1505 passed |
+| hedefli test-int: `test_08t_*` (11 dosya), `test_06b_agent`, `test_06b_direct`, `test_06b2_external_agent`, `test_06a_runs_api`, `test_134_provider_request`, `test_08_api` | llmaas | 0 | 263 s | 149 passed |
+| aynı | airgap | 0 | 276 s | 147 passed, 2 skipped (profil koşullu) |
+| `down -v` | | 0 | | konteyner 0, volume 0 |
+
+Kapılar son commit'te (HEAD) koşuldu. Tam `make test-int` bu turda koşulmadı (K-08T1-0024: hedefli yeter; inceleyici r5'i tam yığınla koşar).
+
 **r4 (r3 düzeltmesi, HEAD 4aecdbc; yalın yığın postgres + redis + litellm + fake-llm + qdrant, tee çıktıları scratchpad `r4-*.txt`):**
 
 | Komut | Ortam | Exit | Süre | Sonuç |
@@ -153,7 +174,7 @@ fb7130d üstüne 9 commit; her MAJOR ayrı commit, önce kırmızı test (kırm�
 | MAJOR-6 hepsi engellenince `sources` olayı yok | olay (`selected=[]`, `blocked=[…]`) önce yazılır, sonra `StopRun` (e851997) | `test_08t_12b`, `test_08t_12c_*all_blocked*` olayı doğrular; e2e F11 5b'nin `failed` dalı artık erişilebilir (e2e NOT_RUN, S6) |
 | MAJOR-7 `blocked` silinmiş belge maskesi | `_SOURCE_LISTS` + `blocked` (bd0f0d1) | `test_08t_m7_blocked_source_masked_on_list_and_live_stream`, `..._on_db_replay` (gerçek API, Redis, Postgres) |
 | MAJOR-1 TTL sonrası numara tekrarı | sayaç ayrı uzun ömürlü anahtarda (400 gün; eski hash'in `n`'inden tohumlanır), `lookup` TTL yeniler, `reserve()` (90dca7f) | `test_08t_m1_*` (gerçek Redis, inceleyicinin probe'u: TTL 2 s, eski cevap yeni değere çözülmez; lookup yenileme; reserve geri gitmez); eski kodla 3/3 kırmızı |
-| MAJOR-2 geçmişteki yer tutucu yeni kapsamda | `_history` önceki koşunun yer tutucusunu kendi kapsamında çözer (egress yeni kapsamda yeniden tokenize eder), çözülemeyen kalır, yeni kapsam sayacı taşınan en büyük numaranın üstüne alınır; facade agent istemci geçmişini egress öncesi metinle saklıyordu (5083e5e). **r2'de tersine döndü:** geçmiş doğrudan yeni yer tutucuya eşlenir, istemci geçmişi run kapsamında tokenize saklanır (e2c32b2, aşağıdaki r2 tablosu) | `test_08t_m2_history_*` (A/B kapsam probe'u), `test_08t_m2_client_history_stored_before_egress` (eski kodla kırmızı); `test_06b_agent`, `test_134_provider_request` yeşil |
+| MAJOR-2 geçmişteki yer tutucu yeni kapsamda | `_history` önceki koşunun yer tutucusunu kendi kapsamında çözer (egress yeni kapsamda yeniden tokenize eder), çözülemeyen kalır, yeni kapsam sayacı taşınan en büyük numaranın üstüne alınır; facade agent istemci geçmişini egress öncesi metinle saklıyordu (5083e5e). **r2'de tersine döndü:** geçmiş doğrudan yeni yer tutucuya eşlenir, istemci geçmişi run kapsamında tokenize saklanır (e2c32b2, aşağıdaki r2 tablosu) | `test_08t_m2_history_*` (A/B kapsam probe'u), r1'de `test_08t_m2_client_history_stored_before_egress` (eski kodla kırmızı; r2'de `test_08t_r2_client_history_stored_in_the_runs_scope` olarak tersine döndü); `test_06b_agent`, `test_134_provider_request` yeşil |
 | MAJOR-3 URL/markdown sızdırma kanalı (karar A) | `](…)`, `href=…`, `scheme://…` içindeki yer tutucu geri çevrilmez, `detokenize_skipped_url` (sayı); akışlar son boşluktan beri metni bağlam olarak tutar (≤ 8.192) (1850df3) | `test_08t_m3_url_context.py` (7 bağlam, parça sınırı 3 biçim), `test_08t_m3_paths.py` (dış agent, facade agent `_events`, konsol canlı akış), `test_08t_m3_direct_placeholder_in_a_url_stays` (tek parça + canlı); docs "kim neyi görür" tablosu |
 | MINOR-1 hata/iptalde kuyruk | graph model düğümü `finally`; facade düz akış `ApiError`'da önce kuyruk (1a36dfa) | `test_08t_r1_minor1_*` (eski kodla kırmızı) |
 | MINOR-2 `rest` usage'dan sonra, finish'siz | usage chunk'ından önce, `finish_reason` ile (yoksa `stop`) (1a36dfa) | `test_08t_r1_minor2_*` (eski kodla kırmızı) |
@@ -165,11 +186,13 @@ fb7130d üstüne 9 commit; her MAJOR ayrı commit, önce kırmızı test (kırm�
 
 **FOLLOWUP-162'ye ertelenenler (kısıt olarak):** MINOR-4 (politika okuma anında çözülür; koşu sırasında enforce olan kural sonradan monitor'a alınırsa saklanan cevap sahibine açılır), MINOR-5 (açık SSE bağlantısı üyelik/rol değişikliğini görmez; yeniden bağlanmada reddedilir), MINOR-6 (canlı facade akışında sayaç logları iki kez), MINOR-9 (enforce politikada C17 fiilen kapalı; seed hedef projesinde C17 çalışmaz), MINOR-10 (`masks_pii_at` aksiyon/kategoriye bakmaz; yön güvenli), MINOR-13 (106 yanlış negatifleri: `auth_token:`, `DB_TOKEN=` öneki, boşluklu `api key`), MINOR-14 (`search_documents` kaynak numarası çakışması; F11 5b sızıntı iddiası bütün injection satırıyla), NOTE 1-8 (impersonation sahip sayılır; başarılı geri çevirme audit'i yok; `Run.input` ham; 9+ haneli yer tutucu hizalanmaz; tümü engellenen `search_documents` koşuyu düşürür ve bütçe boşluğu doldurulmaz; parça başına egress olay çoğalması; konsol arayüzü `blocked`'ı göstermez; `check_http_destination` userinfo/query/rezerve reddi yapmaz, webhook için 06b-2 kuralları ayrıca gerekir).
 
-**Bilinen sınırlar (r2 sonrası):**
+**Bilinen sınırlar (r4 sonrası):**
+- Cevap düzeyinde HTML (karar A, r4): HTML yazan cevapta ilk etiketten sonraki değerler yer tutucu kalır, `a<b` gibi düzyazı dahil. Konsol düz metin gösterdiği için etki ham HTML işleyen üçüncü taraf istemcilerde.
 - r1 notundaki "URL başı 8.192'den önceyse açılabilir" sınırı kalktı (fail-closed, MAJOR-r2-1).
 - Sayaç anahtarı 400 gün yaşar (en uzun saklama sınıfının üstü). Daha eski saklanan bir yer tutucunun kapsamı tekrar açılırsa numara çakışabilir.
-- URL satırı kuralının takası: bağlantı içeren satırdaki değer okuyucuya yer tutucu olarak gider (docs/guardrail.md).
-- Akışta 8.192 karakteri aşan satır yer tutucularını tutar. Kural altındaki bir satır böyle kesilirse akışın geri kalanı da tutar.
+- URL satırı kuralının takası: bağlantı ya da işaret içeren satırdaki değer okuyucuya yer tutucu olarak gider; düzyazıdaki işaretler de dahil (`Personal data:` → `data:`, `Attached file:` → `file:`, `//` yorumu) (docs/guardrail.md).
+- Akışta 8.192 karakteri aşan satır yer tutucularını tutar. Açık bir satır böyle kesilirse cevabın geri kalanı da tutar; yeniden bağlanmada durum kurulamazsa da (r4 (d′)).
+- Bir kapsam en çok 99.999.998 numara verir; aşarsa istek ya da koşu `placeholder_out_of_range` ile düşer (`on_error`'dan bağımsız). `<<PII_99999999>>` ve daha uzunları yer tutucu değildir.
 - Facade agent istemci geçmişi satırları artık run kapsamında tokenize (llmaas). airgap'te egress olmadığı için denetlenmiş metinle saklanır (önceden olduğu gibi). Kullanıcı sorusu (`Run.input`, soru satırı) ham saklanmaya devam eder (r1 NOTE, FOLLOWUP-162).
 
 ## Review r2 bulgu → düzeltme → kanıt (state/reviews/08-tam-1a-r2.md, DUZELT K-08T1-0014)
@@ -209,6 +232,23 @@ fb7130d üstüne 9 commit; her MAJOR ayrı commit, önce kırmızı test (kırm�
 | NOTE-1 süre bütçesi | ölçüm alt süreç içinde (aa26bd7) | `test_08t_secrets_linear.py` 7/7 |
 | NOTE-2 güvenlik notu | varsayım 9'a göre yazıldı | bu not |
 
+## Review r4 bulgu → düzeltme → kanıt (state/reviews/08-tam-1a-r4.md, DUZELT K-08T1-0024; karar A)
+
+4aecdbc üstüne commit'ler yukarıda. Kırmızı kanıtı commit öncesi kodla: html_response 96 kırmızı / 29 yeşil (yeşiller olumlu kontroller ve r3'ün zaten tuttuğu biçimler); resume 3/6 kırmızı (bilinmeyen girdi, Redis hatası, beklenmeyen hata); range 4 kırmızı (99.999.999 yok sayma, 99.999.998 sınırı, 9+ hane/99.999.999 yer tutucu değil, motor `on_error=log`). MINOR-r4-4 yalnız test (kırmızı yok).
+
+| Bulgu | Düzeltme (commit) | Kanıt |
+|---|---|---|
+| MAJOR-r4-1 HTML yazımları (yapısal) | karar A: cevap düzeyinde HTML; HTML kipleri ve öznitelik taşıması kalktı; CR bekletme (c22894a) | `test_08t_r4_after_the_first_tag_nothing_is_reversed`: raporun yedi yazımı ((a), (a′), (b), (b′), (c), (d) iki biçim) + etiketli satırdan sonraki düz satır + `a<b` × dört okuma biçimi × parça 1/7/50; `test_08t_r4_crlf_split_over_pieces_is_one_line_break` ((e)); `test_08t_r4_answers_without_html_before_it_are_reversed` (HTML'siz cevap, tam yer tutucu, ilk etiketten önceki satır, `a < b`, yalnız markdown); r2/r3 tabloları (`test_08t_r2_url_lines.py`, `test_08t_r3_url_rules.py`) ve r3 entegrasyon şekilleri yeşil |
+| MINOR-r4-1 aralık hatası `on_error` yolundan | motor `PlaceholderOutOfRange`'ı yeniden yükseltir (7a10789); docs yola göre (60f2250) | `test_08t_r4_engine_fails_loudly_whatever_on_error_says` (`on_error=log`, enforce, sağlayıcıya gidecek metin dönmez) |
+| MINOR-r4-2 kalıcı konuşma düşmesi | (f′): 99.999.999 verilmez/ayrılmaz/açılmaz, taşınan yok sayılır (7a10789) | `test_08t_r4_carried_99999999_is_ignored`, `test_08t_r4_issuing_past_99999998_fails_loudly`, `test_08t_r4_history_99999999_is_ignored_and_the_range_ends_loudly` (gerçek Redis: konuşma çalışır, sonraki değer `<<PII_2>>`, 99.999.998'den sonra fail-loud) |
+| MINOR-r4-3 hazırlık hatasında ikinci satır | (d′): `_lost` (a0795ad) | `test_08t_r3_unknown_entry_keeps_the_rest`, `test_08t_r3_redis_failure_keeps_the_rest` |
+| MINOR-r4-4 zayıf test | güçlü iddia geri, `style` kısaltıldı (8897584) | `test_08t_r2_paths.py` 12/12 (iki profil) |
+| MINOR-r4-5 takaslar docs'ta | guardrail.md "The trade-off" paragrafı (60f2250) | — |
+| MINOR-r4-6 `prime` beklenmeyen hata | her hata fail-closed (a0795ad) | `test_08t_r4_unexpected_rebuild_error_keeps_the_rest` |
+| NOTE-6 PR notu | r1 tablosu MAJOR-2 satırı, "Bilinen sınırlar", r3 NOTE-4 FOLLOWUP listesinde | bu not |
+
+**FOLLOWUP-162'ye (r4, koordinatör ekledi):** NOTE 1 (`gate.commit` `finally` içinde Redis hatası akışı olaysız bitirir), NOTE 2 (ikinci hata dalında `rest()` 502), NOTE 4 (hazırlık XRANGE `COUNT` ile sayfalansın), NOTE 5 (büyük tek parça cevapta span × yer tutucu karşılaştırması); r3 NOTE-4 (probe'un hizalanmamış parçalarla `ContextReveal` kullanması yapay; gerçek yolda yazar hizalar, testler hizalı girdi kullanıyor).
+
 **FOLLOWUP-162'ye (r3):** MINOR-r3-7 (araç sonucu ve KB parçasındaki düz `<<PII_n>>` metni ayrılmıyor; koşunun kendi değerine açılabilir, kapsamlar arası sızıntı değil), NOTE-3 (r2 öncesi istemci geçmişi satırları; yalnız dağıtım öncesi veri), NOTE-5 (onay bekleyen koşunun checkpoint'i ölçülmedi; kod okumasıyla ham değer girmez).
 
 **FOLLOWUP-162'ye (r2):** NOTE 2-8 (koordinatör ekledi): `finally` içinde `events.live` hatası özgün hatayı örter; hata dalında rest chunk `stop` + hata; MAJOR-5 yan etkileri; URL'den sonraki yer tutucu (satır kuralıyla artık bilinçli takas); S8 kapsanmayan roller ve tek parça MINOR-3 testi; İngilizce sabit hata mesajı; `_search_tool` tümü engellenince koşuyu düşürür.
@@ -227,7 +267,9 @@ fb7130d üstüne 9 commit; her MAJOR ayrı commit, önce kırmızı test (kırm�
 7. `docs/guardrail.md` `output.stream.delta` satırı: "C17 buffer gerekir" yerine "henüz kural türü yok" (C17 tamponu kural aşaması değil, çıkış sınırı).
 8. C17 bir CONTRACTS kimliği değil (DRIFT-151); bu PR plan/08 kabulünü testle kanıtlar.
 12. **Yeniden bağlanmada durum kurma (r3, KARARLAR ek (d)'nin uygulaması):** karar "yalnız son satırın kuyruğu" diyor. Uygulama `after`'a kadarki **bütün** canlı token girdilerini artımlı taramadan geçirir; tutulan durum yine en çok 8.192 karakter. Neden: önceki satırdan taşınan açık HTML hedefi (`<img src="https://…` + satır sonu) yalnız son satırla kurulamaz, e2 açılırdı (`test_08t_r3_reconnect_inside_an_html_value_from_an_earlier_line`). Maliyet koşunun token metniyle doğrusal (artımlı tarama). Canlı akış süresi dolmuşsa (replay) durum kurulamaz, ilk satır tutulur.
-13. **HTML beklenen değer `<` ile başlarsa:** `src=<x` gibi bir değer artık açılı hedef sayılmaz (yalnız markdown `](<` açılı hedeftir); boş satır kuralı (e) yalnız markdown hedeflerini kapattığı için HTML tarafı bu ayrımla tutarlı kalır.
+13. **HTML beklenen değer `<` ile başlarsa (r3):** `src=<x` açılı hedef sayılmaz. r4'te HTML kipleri tümden kalktığı için konu kapandı (`<x` cevap düzeyinde HTML).
+14. **Markdown açılı hedefte harf (r4):** `](<a b>)` içindeki `<a` HTML etiketi sayılır ve cevabın kalanı tutulur (fail-closed); açılı hedefin ilk karakteri harf değilse (`](<./a b>)`) yalnız markdown satır kuralı geçerli.
+15. **CSS `url(` (r4):** CSS paren taşıması HTML ile birlikte kalktı; `url(` satır işareti olarak duruyor, CSS ancak HTML içinde (`style`) yüklenir ve o durumda cevap düzeyi kural geçerli.
 
 ## Güvenlik turu için notlar (zorunlu)
 
@@ -235,7 +277,7 @@ fb7130d üstüne 9 commit; her MAJOR ayrı commit, önce kırmızı test (kırm�
 - Geri çevirme yalnız aynı kapsamın (run id ya da `facade-<hex>`) Redis eşlemesiyle; dış agent/model kendi uydurduğu yer tutucuyla başka kapsamın değerine ulaşamaz. Kendi isteğinin yer tutucusunu yankılayan upstream, değeri aynı çağırana geri getirir (docs/api.md'de yazılı).
 - Log: `detokenize_unresolved scope=<id> count=<n>`; değer yok (`test_08t_9_other_scope_placeholder_stays_and_is_logged` logda ad olmadığını doğrular).
 - Kaynak düşürmede `blocked` girdisi parça metni taşımaz (`test_08t_12_blocked_source_dropped_answer_goes_on`).
-- URL satırı kuralı (r2, r3): HTML etiketi, şema-iki nokta ya da işaret (`](`, `]:`, `//`, `url(`, `src=`, `href=`, `style=`, `data=`, …) içeren satırdaki ve açık kalan hedefin sonraki satırlarındaki **hedef içindeki** yer tutucu hiçbir okuyucuya açılmaz. Tek parça metinde satırın bütün yer tutucuları tutulur; akışta satırın işaretinden önce gönderilmiş yer tutucu geri alınamaz (varsayım 9, inceleyici kabul etti; hedefte değil). Akışta kesik satır fail-closed; yeniden bağlanan okuyucu satır durumunu saklanan girdilerden kurar, kuramazsa ilk satırı tutar. Sıfır tıkla dış hosta değer gönderme kanalı inceleyicinin r2 ve r3 yazımlarının hepsinde kapalı (birim, dört okuma biçimi + gerçek LiteLLM entegrasyon).
+- HTML (r4, karar A): bir cevapta ilk HTML etiketinden sonra hiçbir yer tutucu hiçbir okuyucuya açılmaz (tek istisna tam yer tutucu). URL satırı kuralı (r2, r3): şema-iki nokta ya da işaret (`](`, `]:`, `//`, `url(`, `src=`, `href=`, `style=`, `data=`, …) içeren satırdaki ve açık kalan markdown hedefinin sonraki satırlarındaki **hedef içindeki** yer tutucu açılmaz. Tek parça metinde satırın bütün yer tutucuları tutulur; akışta satırın işaretinden ya da cevabın ilk etiketinden önce gönderilmiş yer tutucu geri alınamaz (varsayım 9, inceleyici kabul etti; hedefte değil). Akışta kesik satır fail-closed; yeniden bağlanan okuyucu durumu saklanan girdilerden kurar, kuramazsa cevabın kalanını tutar. Sıfır tıkla dış hosta değer gönderme kanalı inceleyicinin r2 ve r3 yazımlarının hepsinde kapalı (birim, dört okuma biçimi + gerçek LiteLLM entegrasyon).
 - Geçmiş (r2): sağlayıcıya, state'e, checkpoint'e, `messages`'a ve `guardrail_events`'e geçmişten ham değer girmez. Yeniden tespite güvenilmez (`min_confidence` 0,8 uçtan uca testi). Bir kapsamın sayacı içeri taşınan her numaranın üstünden başlar, bayat yer tutucu yeni değere çözülmez (S9).
 
 ## Kalan riskler

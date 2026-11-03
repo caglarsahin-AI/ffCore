@@ -1661,3 +1661,22 @@ MAJOR-r3-1/2, MINOR-r3-1..6/8, NOTE-1/2 kapalı; MINOR-r3-7, NOTE-3/5 FOLLOWUP-1
 ### A-08T1-0034 · 2026-11-03 20:29 · → koordinator · ACK
 Paket: 08-tam-1a   Cevap: K-08T1-0023
 Alındı: 4aecdbc VERIFIED, r4 delta incelemede; dal donuk, commit yok. Sonucu bekliyorum.
+
+### A-08T1-0035 · 2026-11-03 21:11 · → koordinator · ACK
+Paket: 08-tam-1a   Cevap: K-08T1-0024
+Alındı: r4 DUZELT (MAJOR-r4-1 karar A, MINOR-r4-1..6, NOTE-6). KARARLAR "C17 geri çevirme: cevap düzeyinde HTML fail-closed" ile (d′)/(f′) bağlayıcı kabul. Sıra: MAJOR-r4-1 (cevap düzeyinde HTML, tag/tırnak/expect kipleri ve öznitelik taşıması kalkar, CR bekletme) → MINOR-r4-3/6 (hazırlık hatası `_lost`) → MINOR-r4-2 (99.999.999) → MINOR-r4-1 (motorda fail-loud) → MINOR-r4-4 → docs/PR notu. Her biri önce kırmızı test, ayrı commit.
+
+### A-08T1-0036 · 2026-11-03 21:19 · → koordinator · YIGIN-AÇ
+Paket: 08-tam-1a r4 DUZELT
+Yalın yığın açılıyor: ffcore-08t1, postgres + redis + litellm + fake-llm + qdrant, imaj 0.0.0-08t1. Hedefli test-int iki profil; bitince YIGIN-KAPA.
+
+### A-08T1-0037 · 2026-11-03 21:43 · → koordinator · YIGIN-KAPA
+Paket: 08-tam-1a r4 DUZELT
+ffcore-08t1 yalın yığını `down -v` ile kapandı; konteyner 0, volume 0.
+
+### A-08T1-0038 · 2026-11-03 21:43 · → koordinator · PR-HAZIR
+Paket: 08-tam-1a r5   Cevap: K-08T1-0024
+SHA: 60f2250caf8fa089abb0ee476b7a0325394d3c44 (feat/08-tam-1-ner; 4aecdbc üstüne 5 commit, 14 dosya +282/-188; main...HEAD 48 dosya, 33 commit). PR notu: state/pr/08-tam-1a.md ("Review r4 bulgu → düzeltme → kanıt" tablosu, r5 kapı tablosu, varsayım 14-15).
+Kapılar HEAD'de: lint 0; make test llmaas 1505 / airgap 1505; hedefli test-int llmaas 149 passed, airgap 147 passed + 2 skipped. Kırmızı kanıtı commit öncesi kodla: html_response 96, resume 3, range 4.
+MAJOR-r4-1 karar A ile kapandı: HTML artık cevap düzeyinde; tag/tırnak/expect/CSS kipleri ve öznitelik taşıması kalktı (masking.py net 43 satır küçüldü); CR bekletiliyor. MINOR-r4-1..6 ve NOTE-6 kapalı; NOTE 1/2/4/5 ve r3 NOTE-4 FOLLOWUP-162 kısıtı olarak PR notunda.
+İnceleyiciye not (varsayım 14): `](<a b>)` içindeki `<a` HTML etiketi sayılıyor, cevabın kalanı tutuluyor (fail-closed). Açılı hedefin ilk karakteri harf değilse yalnız markdown kuralı geçerli. r5 odağı markdown ve CRLF. Dal donuk; sonucu bekliyorum.
