@@ -310,7 +310,7 @@ _ATTR_NAME_END = re.compile(r"\b" + _ATTRS + r"\s*\Z", re.IGNORECASE)
 _LINE_BREAK = re.compile(r"\r\n|\r|\n")
 _PARENS = re.compile(r"[()]")
 _TAG_STOP = re.compile(r"[>\"']")
-_TARGET_OPEN = {'"': "dq", "'": "sq", "<": "angle"}
+_TARGET_OPEN = {'"': "dq", "'": "sq"}
 # mode -> (what closes it, the mode after it)
 _TARGET_CLOSE = {
     "dq": ('"', None),
@@ -329,11 +329,19 @@ _MARKER_OVERLAP = 32
 
 def _open_target(line: str, mode: str | int | None) -> str | int | None:
     """The target still open at the end of `line`, given the one open at its start: None, a
-    markdown destination's or CSS `url(`'s paren depth, "expect" (a value is due), "tag" (inside
-    an HTML tag) or the quote/angle that closes it."""
+    markdown destination's paren depth (positive) or CSS `url(`'s (negative), "md_expect" or
+    "expect" (a markdown or an HTML value is due), "tag" (inside an HTML tag) or the quote/angle
+    that closes it."""
     i = 0
     while i < len(line):
-        if mode == "expect":
+        if mode == "md_expect":
+            while i < len(line) and line[i] in " \t":
+                i += 1
+            if i == len(line):
+                return mode
+            mode = "angle" if line[i] == "<" else None
+            i += 1 if mode else 0
+        elif mode == "expect":
             while i < len(line) and line[i] in " \t=":
                 i += 1
             if i == len(line):
@@ -347,12 +355,14 @@ def _open_target(line: str, mode: str | int | None) -> str | int | None:
             i, token = opener.end(), opener.group(0).lower()
             if token == "](<":
                 mode = "angle"
-            elif token in ("](", "url("):
+            elif token == "](":
                 mode = 1
+            elif token == "url(":
+                mode = -1
             elif token.startswith("<"):
                 mode = "tag"
             else:
-                mode = "expect"
+                mode = "md_expect" if token == "]:" else "expect"
         elif mode == "tag":
             stop = _TAG_STOP.search(line, i)
             if stop is None:
@@ -364,7 +374,8 @@ def _open_target(line: str, mode: str | int | None) -> str | int | None:
             if paren is None:
                 return mode
             i = paren.end()
-            mode = mode + 1 if paren.group(0) == "(" else (mode - 1 or None)
+            step = 1 if mode > 0 else -1
+            mode = mode + step if paren.group(0) == "(" else (mode - step or None)
         else:
             closer, after = _TARGET_CLOSE[mode]
             j = line.find(closer, i)
@@ -374,6 +385,10 @@ def _open_target(line: str, mode: str | int | None) -> str | int | None:
     if mode is None and _ATTR_NAME_END.search(line):
         return "expect"
     return mode
+
+
+def _closes_on_blank(mode: str | int | None) -> bool:
+    return mode in ("angle", "md_expect") or (isinstance(mode, int) and mode > 0)
 
 
 class UrlLines:
@@ -393,6 +408,7 @@ class UrlLines:
         self._marked = False  # a marker was seen on the current line
         self._open: str | int | None = None  # the target open at the start of the current line
         self._lost = False  # a URL line lost its start: what it left open is unknown
+        self._blank = True  # the current line has only whitespace so far
 
     def spans(self, text: str) -> list[tuple[int, int]]:
         out, start = [], 0
@@ -410,6 +426,7 @@ class UrlLines:
     def _add(self, piece: str) -> None:
         if not piece:
             return
+        self._blank = self._blank and piece.isspace()
         if not self._cut:
             self._length += len(piece)
             if self._length > URL_CONTEXT_MAX_CHARS:
@@ -429,13 +446,18 @@ class UrlLines:
         self._tail = window[-_MARKER_OVERLAP:]
 
     def _end_line(self) -> None:
-        if self._marked or self._open is not None:
+        if self._blank and _closes_on_blank(self._open):
+            # r3 MINOR-r3-4, KARARLAR ek (e): a markdown target does not cross a blank line; an
+            # HTML one may (a browser drops line breaks from a URL), and a lost state is unknown.
+            self._open = None
+        elif self._marked or self._open is not None:
             if self._cut:
                 self._lost = True
             elif not self._lost:
                 self._open = _open_target("".join(self._pieces), self._open)
         self._pieces, self._length, self._tail = [], 0, ""
         self._gap = self._cut = self._marked = False
+        self._blank = True
 
 
 async def reveal_text(
