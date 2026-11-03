@@ -1500,8 +1500,12 @@ GOREV alındı. Branch feat/08-tam-1-ner, worktree .worktrees/feat/08-tam-1-ner 
 
 ### A-08T1-0003 · 2026-11-03 09:12 · → koordinator · DURUM
 Paket: 08-tam-1   Cevap: K-08T1-0001
-DURUM: PLANNED talebi. Plan: C:i_paycorefcore\state\pr 8-tam-1.md (bulunan semboller, C17 çıkış haritası kaynakta doğrulanmış, kabul → test 1-17, felsefe üçlüsü). Worktree .worktrees/feat/08-tam-1-ner @ ea0db36 açıldı; kod yok.
+DURUM: PLANNED talebi. Plan: C:i_paycorefcore\state\pr8-tam-1.md (bulunan semboller, C17 çıkış haritası kaynakta doğrulanmış, kabul → test 1-17, felsefe üçlüsü). Worktree .worktrees/feat/08-tam-1-ner @ ea0db36 açıldı; kod yok.
 Oturum notu (K-09-0002 emsali için): bu oturum kullanıcının 28 Ekim okuma oturumundan açtığı fork; 28 Ekim sonrası değişen kural belgelerini (KARARLAR, PLAN 2.10, CONTRACTS, BASLATMA, CLAUDE) git diff 8ba004c..HEAD ile yeniden okudum. Kullanıcı ROL/PAKET'i bu fork'a açıkça verdi.
 Onay istediğim 9 nokta (planda A/B/C, önerim hepsinde A): S1 Presidio eklenmez (transformers zaten bağımlılık); S2 NER modeli yalnız API'de, worker ve ingest `POST /internal/ner` ile (04a embed deseni); S3 `NER_MODEL`/`NER_REVISION` açık değer, `:?`; S4 ağırlık `model_cache` volume (brief "imaja gömülür" ↔ KARARLAR 04a: KARARLAR kazanır, DRIFT adayı); S5 lisans ve TabiBERT NER başlığı doğrulanmadı: kullanıcının `make models`'ı model kartlarını da indirir, offline okurum; S6 `tests/e2e/scenarios/seed.py` secrets geri alma bu PR'da (touch-zone genişletmesi); S7 **bölme: 08-tam-1a (C17+106+107+147, modelsiz, hemen) + 08-tam-1b (NER+PRSIM, ağırlıklar gelince)**; S8 geri çevrilmiş değer yalnız koşu sahibine/facade çağırana, diğer okuyucular yer tutucu görür; S9 TTL dolunca yer tutucu kalır + `detokenize_unresolved` logu, GET uçları tokenize kalır.
 Bulgu: GOREV "CONTRACTS C17" diyor, CONTRACTS'ta C17 yok (C1-C14); plan/08 kabul maddesi anlamında uyguluyorum (DRIFT adayı).
 S7 A onaylanırsa ilk iş 1a dilim 1 (147, önce kırmızı test); yığın 1a'nın entegrasyon kapısında YIGIN-AÇ ile.
+
+### A-08T1-0004 · 2026-11-03 09:14 · → koordinator · ACK
+Paket: 08-tam-1a   Cevap: K-08T1-0002
+Alındı: S1-S9 A, 1a önce (147 → 106 → 107 + seed → C17 → kapılar → PR-HAZIR). Branch feat/08-tam-1-ner 1a için kullanılıyor (1b ayrı branch/oturum, 1a merge'ünde karar). Kodlama başladı; yığın entegrasyon kapısında YIGIN-AÇ ile.
