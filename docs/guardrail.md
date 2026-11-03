@@ -17,7 +17,7 @@ with the full package (08).
 | `prompt.pre` | once per user turn |
 | `input.pre` | before every model call |
 | `output.pre` | before the answer reaches the caller |
-| `output.stream.delta` | during streaming (needs the C17 buffer; refused in 08-lite) |
+| `output.stream.delta` | during streaming (no rule type runs here yet; refused as a rule stage) |
 | `tool.pre` | tool name and arguments, before the call |
 | `tool.post` | tool result, before it goes back to the model |
 | `egress` | the final packet sent to the model provider (llmaas) |
@@ -129,6 +129,10 @@ replaces the built-in one.
 
 Tokenize needs a run id (`run_id` in the internal request); without one the rule fails and
 follows `on_error`.
+
+### Reversal at the exit (C17)
+
+Placeholders are reversed only where text leaves the backend: the console run stream (live and replay) for the run's own user, the facade's agent path, direct model path (one piece and live stream) and external agent path for the caller. A live stream never splits a placeholder: on the agent path the writer holds a delta's tail that may still open one (`PlaceholderAligner`, at most 15 characters) so every stored stream entry has whole placeholders; on the direct path each choice's content and tool call arguments pass a `StreamDetokenizer`. Nothing is reversed when the policy enforces a `pii` rule on `output.pre`/`output.stream.delta`, and nothing stored is reversed. Unresolved placeholders stay and are logged (`detokenize_unresolved scope=<run or request> count=<n>`).
 
 ## PII categories (canonical list)
 

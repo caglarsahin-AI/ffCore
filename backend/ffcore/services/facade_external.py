@@ -389,7 +389,10 @@ class _Work:
                 guard = await FacadeGuard.load(
                     session, redis, self.caller.project_id, scope=self.scope
                 )
-                content = await guard.text("output.pre", answer.content)
+                checked = await guard.text("output.pre", answer.content)
+                # C17: an upstream that echoes this request's placeholder gets the value back
+                # to the same caller; one this scope never issued stays as it is.
+                content = await guard.reveal(checked)
         finally:
             await redis.aclose()
         return content, answer.finish_reason

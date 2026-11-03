@@ -32,6 +32,7 @@ from ffcore.api.facade_schemas import (
 from ffcore.core import db, tracing
 from ffcore.core.config import Settings
 from ffcore.core.errors import ApiError, error_body
+from ffcore.guardrails.masking import log_unresolved
 from ffcore.knowledge.chunking import approx_tokens
 from ffcore.services.facade_guard import FacadeGuard, client_messages, guard_messages
 from ffcore.services.facade_identity import FacadeCaller
@@ -273,7 +274,8 @@ async def _answer(caller, target, model, result, settings, scope) -> JSONRespons
             guard = await FacadeGuard.load(session, redis, caller.project_id, scope=scope)
             message = {"role": "assistant", "content": result.message.get("content")}
             if message["content"]:
-                message["content"] = await guard.text("output.pre", message["content"])
+                checked = await guard.text("output.pre", message["content"])
+                message["content"] = await guard.reveal(checked)
             if result.message.get("tool_calls"):
                 message["tool_calls"] = await _checked_calls(guard, result.message["tool_calls"])
     finally:
@@ -293,13 +295,15 @@ async def _answer(caller, target, model, result, settings, scope) -> JSONRespons
 
 
 async def _checked_calls(guard: FacadeGuard, calls: list[dict]) -> list[dict]:
-    """S9: a tool call's arguments reach the client only after `output.pre`."""
+    """S9: a tool call's arguments reach the client only after `output.pre`, then with the
+    request's placeholders reversed (C17)."""
     checked = []
     for call in calls:
         call = json.loads(json.dumps(call))
         function = call.get("function") or {}
         if function.get("arguments"):
-            function["arguments"] = await guard.text("output.pre", function["arguments"])
+            arguments = await guard.text("output.pre", function["arguments"])
+            function["arguments"] = await guard.reveal(arguments)
         checked.append(call)
     return checked
 
@@ -337,11 +341,71 @@ class _Held:
             )
 
 
+class _LiveReveal:
+    """C17 on the live direct stream: each choice's content and each tool call's argument
+    deltas pass their own StreamDetokenizer, so a placeholder split over two chunks reaches the
+    client as its value. A choice that finishes gets what is still held in its own delta; what
+    is held when the stream ends without a finish comes in one last delta (`rest`)."""
+
+    def __init__(self, guard: FacadeGuard) -> None:
+        self._guard = guard
+        # ("content", choice index) or ("arguments", choice index, tool call index)
+        self._open: dict[tuple, Any] = {}
+        self.unresolved = 0
+
+    def _reveal(self, key: tuple):
+        if key not in self._open:
+            self._open[key] = self._guard.stream_reveal()
+        return self._open[key]
+
+    async def choice(self, choice: dict) -> dict:
+        if not self._guard.reveals:
+            return choice
+        index = choice.get("index", 0)
+        delta = dict(choice.get("delta") or {})
+        if delta.get("content"):
+            delta["content"] = await self._reveal(("content", index)).feed(delta["content"])
+        if delta.get("tool_calls"):
+            parts = []
+            for part in delta["tool_calls"]:
+                part = json.loads(json.dumps(part))
+                function = part.get("function") or {}
+                if function.get("arguments"):
+                    key = ("arguments", index, part.get("index", 0))
+                    function["arguments"] = await self._reveal(key).feed(function["arguments"])
+                parts.append(part)
+            delta["tool_calls"] = parts
+        if choice.get("finish_reason"):
+            await self._close(index, delta)
+        return dict(choice, delta=delta)
+
+    async def _close(self, index: int, delta: dict) -> None:
+        for key in [k for k in self._open if k[1] == index]:
+            reveal = self._open.pop(key)
+            tail = await reveal.flush()
+            self.unresolved += reveal.unresolved
+            if not tail:
+                continue
+            if key[0] == "content":
+                delta["content"] = (delta.get("content") or "") + tail
+            else:
+                delta.setdefault("tool_calls", []).append(
+                    {"index": key[2], "function": {"arguments": tail}}
+                )
+
+    async def rest(self) -> dict:
+        delta: dict[str, Any] = {}
+        for index in sorted({k[1] for k in self._open}):
+            await self._close(index, delta)
+        return delta
+
+
 async def _relay(stream, stack, gate, guard, model, public_name) -> AsyncIterator[str]:
     cid = f"chatcmpl-{uuid.uuid4().hex}"
     created = int(time.time())
     live = guard.streams_live
     held = _Held()
+    revealer = _LiveReveal(guard)
     usage = None
     try:
         if stream.result.fallback is not None:
@@ -369,6 +433,8 @@ async def _relay(stream, stack, gate, guard, model, public_name) -> AsyncIterato
                         held.finish = choice["finish_reason"]
                 if live:
                     chunk = dict(chunk, model=public_name, id=cid)
+                    if chunk.get("choices"):
+                        chunk["choices"] = [await revealer.choice(c) for c in chunk["choices"]]
                     yield chunk_json(chunk)
                 elif time.monotonic() - last > KEEPALIVE_S:
                     yield KEEPALIVE
@@ -381,12 +447,18 @@ async def _relay(stream, stack, gate, guard, model, public_name) -> AsyncIterato
                 model_name=model_name,
                 usage=stream.result.usage or {},
             )
+        if live and (rest := await revealer.rest()):
+            yield chunk_json(_chunk(cid, created, public_name, rest))
+        log_unresolved(guard.scope, revealer.unresolved)
         text = "".join(held.content)
         checked_text = await guard.text("output.pre", text) if text else text
         calls = [held.calls[i] for i in sorted(held.calls)]
         checked_calls = await _checked_calls(guard, calls) if calls else []
         if not live:
-            delta: dict[str, Any] = {"role": "assistant", "content": checked_text}
+            delta: dict[str, Any] = {
+                "role": "assistant",
+                "content": await guard.reveal(checked_text),
+            }
             if checked_calls:
                 delta["tool_calls"] = [dict(c, index=i) for i, c in enumerate(checked_calls)]
             yield chunk_json(_chunk(cid, created, public_name, delta, held.finish))

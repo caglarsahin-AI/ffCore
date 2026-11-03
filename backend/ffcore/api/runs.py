@@ -12,7 +12,7 @@ the body decides which rule applies (write-flag scan exemption, with this reason
 """
 
 import logging
-from collections.abc import AsyncIterator
+from collections.abc import AsyncIterator, Awaitable, Callable
 from datetime import UTC, datetime
 from typing import Annotated, Literal
 from uuid import UUID
@@ -39,6 +39,10 @@ from ffcore.core.audit import AuditEntry, audited, request_context, write_event
 from ffcore.core.auth import Actor, RoleRequirement, authorize, require_role
 from ffcore.core.config import Settings, get_settings
 from ffcore.core.errors import ApiError
+from ffcore.guardrails.engine import masks_pii_at
+from ffcore.guardrails.masking import RedisTokenStore, detokenize_json, log_unresolved
+from ffcore.guardrails.service import resolve_policy
+from ffcore.guardrails.settings import get_guardrail_settings
 from ffcore.models.agents import Agent, AgentVersion
 from ffcore.models.identity import ProjectMember
 from ffcore.models.knowledge import Document
@@ -218,8 +222,56 @@ async def _mask_live_event(event: str, data: dict) -> dict:
         return (await mask_deleted_sources(session, [data]))[0]
 
 
-def _replay_rows(project_id: UUID, run_id: UUID):
-    """Stored events as SSE, when the live stream has expired; ends with the run's outcome."""
+def is_run_owner(run: Run, actor_id: str | None) -> bool:
+    """C17 S8 (K-08T1-0002): placeholders are turned back into their values only for the run's
+    own user; every other reader (another analyst, an admin, an approver) sees the placeholders,
+    as stored. A run started by a key without a user has no console owner."""
+    return run.user_id is not None and actor_id is not None and str(run.user_id) == actor_id
+
+
+async def policy_allows_reveal(session, run: Run) -> bool:
+    """False when the run's guardrail policy enforces a `pii` rule on the output: the answer was
+    checked with placeholders in it, and its values must not come back after that check."""
+    version = await session.get(AgentVersion, run.agent_version_id)
+    key = parse_definition(version.definition).guardrail_policy_key
+    policy = await resolve_policy(session, run.project_id, key)
+    return not masks_pii_at(policy, ("output.pre", "output.stream.delta"))
+
+
+async def reveals_values(session, run: Run, actor_id: str | None) -> bool:
+    return is_run_owner(run, actor_id) and await policy_allows_reveal(session, run)
+
+
+def detokenizer(redis, run_id: UUID) -> Callable[[dict], Awaitable[dict]]:
+    """The exit reversal of one run's event data (C17): every string, within the run's token
+    scope; a placeholder the scope cannot resolve (never issued, mapping expired after
+    PII_TOKEN_TTL_S) stays and is logged with its count (S9)."""
+    store = RedisTokenStore(redis, get_guardrail_settings().pii_token_ttl_s)
+    scope = str(run_id)
+
+    async def reveal(data: dict) -> dict:
+        out, unresolved = await detokenize_json(data, store=store, scope=scope)
+        log_unresolved(scope, unresolved)
+        return out
+
+    return reveal
+
+
+def live_transform(reveal: Callable[[dict], Awaitable[dict]] | None):
+    """The live stream's read-time hook: deleted sources masked, then (owner only) reversal."""
+
+    async def transform(event: str, data: dict) -> dict:
+        data = await _mask_live_event(event, data)
+        return await reveal(data) if reveal is not None else data
+
+    return transform
+
+
+def _replay_rows(
+    project_id: UUID, run_id: UUID, reveal: Callable[[dict], Awaitable[dict]] | None = None
+):
+    """Stored events as SSE, when the live stream has expired; ends with the run's outcome.
+    The stored text stays tokenized; `reveal` (the owner's reader) reverses what is sent."""
 
     async def rows(after_seq: int) -> AsyncIterator[run_events.SseMessage]:
         async with db.session_scope() as session:
@@ -241,6 +293,8 @@ def _replay_rows(project_id: UUID, run_id: UUID):
                     if sse is SseEvent.token
                     else payloads[row.seq]
                 )
+                if reveal is not None:
+                    data = await reveal(data)
                 yield run_events.SseMessage(f"{row.seq}-0", sse, data)
             run = await _run(session, project_id, run_id)
             if run.status == RunStatus.completed:
@@ -269,10 +323,11 @@ def _finished(run_id: UUID):
 
 
 def _stream(
-    settings: Settings, project_id: UUID, run_id: UUID, after: str | None
+    settings: Settings, project_id: UUID, run_id: UUID, after: str | None, *, reveal: bool
 ) -> EventStreamResponse:
     async def body() -> AsyncIterator[str]:
         client = run_events.redis_client(settings)
+        reveal_data = detokenizer(client, run_id) if reveal else None
         try:
             async for chunk in run_events.follow(
                 client,
@@ -280,9 +335,9 @@ def _stream(
                 after=after,
                 keepalive_s=settings.sse_keepalive_s,
                 grace_s=settings.run_abandon_grace_s,
-                replay_rows=_replay_rows(project_id, run_id),
+                replay_rows=_replay_rows(project_id, run_id, reveal_data),
                 finished=_finished(run_id),
-                transform=_mask_live_event,
+                transform=live_transform(reveal_data),
             ):
                 yield chunk
         finally:
@@ -441,7 +496,13 @@ async def create_run(
     await session.commit()
     await _queued_event(session, settings, run)
     await queue.enqueue(str(run.id))
-    return _stream(settings, project_id, run.id, None)
+    return _stream(
+        settings,
+        project_id,
+        run.id,
+        None,
+        reveal=await reveals_values(session, run, actor.actor_id),
+    )
 
 
 @router.get("/runs", response_model=RunList)
@@ -593,8 +654,14 @@ async def stream_run(
     last_event_id: LastEventId = None,
 ):
     """(Re)attach to a run's events: replay, then live until the run stops or waits."""
-    await _readable_run(session, request, actor, project_id, run_id)
-    return _stream(settings, project_id, run_id, last_event_id)
+    run = await _readable_run(session, request, actor, project_id, run_id)
+    return _stream(
+        settings,
+        project_id,
+        run_id,
+        last_event_id,
+        reveal=await reveals_values(session, run, actor.actor_id),
+    )
 
 
 @router.post("/runs/{run_id}/resume", response_class=EventStreamResponse, responses=SSE_RESPONSE)
@@ -633,7 +700,14 @@ async def resume_run(
         request_id=request_id,
         ip=ip,
     )
-    return _stream(settings, project_id, run.id, after)
+    # The approver sees the placeholders unless the run is their own (S8).
+    return _stream(
+        settings,
+        project_id,
+        run.id,
+        after,
+        reveal=await reveals_values(session, run, actor.actor_id),
+    )
 
 
 @router.post("/runs/{run_id}/cancel", response_model=RunOut)

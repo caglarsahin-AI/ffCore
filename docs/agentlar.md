@@ -82,9 +82,17 @@ user: its searches use the key's `acl_role` (the backend reads it from the key r
 forward the user's identity cannot run (`tool_needs_run_user`), approvals are decided in the
 console only.
 
-Personal data tokenized at `egress` (llmaas) appears in answers as placeholders (`<<PII_n>>`), on
-the console and through the facade alike: turning them back into the values comes with 08's full
-release (C17, permission-bound).
+Personal data tokenized at `egress` (llmaas) leaves for the provider as placeholders (`<<PII_n>>`).
+Placeholders go back to their values at the exit only (C17, 08-tam-1a): the run's own user on
+the console (live stream and replay) and the caller of a facade request see the values; any
+other reader (another analyst, an admin, an approver) sees the placeholders, as stored. The
+stored answer, `messages`, `run_events` and the history sent to the model keep the
+placeholders. When the run's guardrail policy enforces a `pii` rule on the output, the
+placeholders stay for everyone (the output was checked with them in it). A placeholder whose
+mapping is gone (`PII_TOKEN_TTL_S`, default 1800 s, e.g. a run that waited long for an
+approval) or that the run never issued stays as it is and is logged with its count
+(`detokenize_unresolved`, no value). Stored views (`GET /runs/{id}`, `GET /runs/{id}/events`,
+approvals) are not reversed.
 
 ## Runs
 

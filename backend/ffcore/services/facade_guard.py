@@ -12,7 +12,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ffcore.core.errors import ApiError
 from ffcore.guardrails import engine
-from ffcore.guardrails.masking import RedisTokenStore
+from ffcore.guardrails.masking import (
+    RedisTokenStore,
+    StreamDetokenizer,
+    detokenize,
+    log_unresolved,
+)
 from ffcore.guardrails.service import record_events, resolve_policy
 from ffcore.guardrails.settings import get_guardrail_settings
 
@@ -104,6 +109,29 @@ class FacadeGuard:
         if decision.action == "block":
             raise GuardrailBlocked(decision.message, decision.reference_id)
         return decision.text_out
+
+    @property
+    def reveals(self) -> bool:
+        """Placeholders go back to values unless an enforced `pii` rule checks the output (the
+        policy hides personal data from answers; the placeholders stay, C17)."""
+        return not engine.masks_pii_at(self.policy, OUTPUT_STAGES)
+
+    def _token_store(self) -> RedisTokenStore:
+        return RedisTokenStore(self.redis, get_guardrail_settings().pii_token_ttl_s)
+
+    async def reveal(self, text: str) -> str:
+        """C17: the request's placeholders back to their values, at the exit to the caller who
+        made the request (S8). A placeholder the scope never issued stays as it is and is logged
+        with its count (S9); nothing is invented."""
+        if not text or "<<PII_" not in text or not self.reveals:
+            return text
+        out, unresolved = await detokenize(text, store=self._token_store(), scope=self.scope)
+        log_unresolved(self.scope, len(unresolved))
+        return out
+
+    def stream_reveal(self) -> StreamDetokenizer:
+        """The same for a live stream: a placeholder split over two chunks is held until whole."""
+        return StreamDetokenizer(self._token_store(), self.scope)
 
     async def json_text(self, stage: str, value: Any) -> Any:
         """A JSON value (tool definitions, tool call arguments) through a text stage; the result

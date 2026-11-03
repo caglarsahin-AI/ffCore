@@ -109,6 +109,20 @@ def enforced_at(policy: ResolvedPolicy, stages) -> bool:
     return any(wanted & set(r.stages) and rule_mode(spec, r) == "enforce" for r in spec.rules)
 
 
+def masks_pii_at(policy: ResolvedPolicy, stages) -> bool:
+    """True when an enforced `pii` rule checks one of these stages. C17 (08-tam-1a): the exit
+    then keeps the egress placeholders, because turning them back into values after
+    `output.pre` would show what the policy hides from the output."""
+    spec = policy.spec
+    if spec.mode == "off":
+        return False
+    wanted = set(stages)
+    return any(
+        r.type == "pii" and wanted & set(r.stages) and rule_mode(spec, r) == "enforce"
+        for r in spec.rules
+    )
+
+
 def _egress_enabled(ctx: EvalContext) -> bool:
     if ctx.egress_enabled is not None:
         return ctx.egress_enabled

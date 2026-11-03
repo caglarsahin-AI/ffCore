@@ -26,6 +26,7 @@ from langgraph.types import interrupt
 
 from ffcore.core import tracing
 from ffcore.guardrails.engine import TextTooLong
+from ffcore.guardrails.masking import PlaceholderAligner
 from ffcore.runtime.contracts import RunEventType, RunStatus, SseEvent
 from ffcore.runtime.definition import DEFAULT_APPROVER, approval_name
 from ffcore.runtime.prompting import (
@@ -298,8 +299,14 @@ async def model(state: RunState, runtime: Runtime[RunContext]) -> dict:
         )
         return {"iteration": iteration, "answer": d.answer_rules.unknown_reply}
 
+    # C17: a delta may end inside a placeholder; the aligner holds that tail so every live
+    # token entry carries whole placeholders and a reader reverses it entry by entry.
+    aligner = PlaceholderAligner()
+
     async def on_token(text: str) -> None:
-        await ctx.events.live(SseEvent.token, {"text": text})
+        ready = aligner.feed(text)
+        if ready:
+            await ctx.events.live(SseEvent.token, {"text": ready})
 
     outgoing = await _egress_messages(ctx, state["messages"])
     turn = await ctx.model.call(
@@ -310,6 +317,8 @@ async def model(state: RunState, runtime: Runtime[RunContext]) -> dict:
         else d.limits.output_tokens,
         on_token=on_token if ctx.stream_live else None,
     )
+    if ctx.stream_live and (tail := aligner.flush()):
+        await ctx.events.live(SseEvent.token, {"text": tail})
     usage = dict(state.get("usage") or {})
     for key in ("prompt_tokens", "completion_tokens"):
         usage[key] = usage.get(key, 0) + int((turn.usage or {}).get(key) or 0)
