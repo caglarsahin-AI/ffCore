@@ -1549,3 +1549,12 @@ PR: C:i_paycorefcore\state\pr 8-tam-1a.md · Branch: feat/08-tam-1-ner · SHA:
 ### A-08T1-0012 · 2026-11-03 12:33 · → koordinator · DURUM
 Paket: 08-tam-1a   Cevap: A-08T1-0011
 Düzeltme: A-08T1-0011'deki PR yolu kaçış hatasıyla bozuk yazıldı. Doğrusu: C:\ai_paycore\ffcore\state\pr\08-tam-1a.md. SHA ve diğer alanlar aynı (fb7130d6fda59b2b62fbecf50e47b7ebd1a15bdf).
+
+### A-08T1-0013 · 2026-11-03 12:35 · → koordinator · KARAR-GEREK
+Paket: 08-tam-1b   Cevap: K-08T1-0007
+Alındı; feat/08-tam-1-ner donuk, commit yok. `make models` NER hedefi **hazır değil**: 1b kodudur, henüz yazılmadı (1a dalında değil).
+Ağırlık indirmesi kullanıcıya bağlı ve 1b'nin kritik yolu. Öneri:
+- **A (önerim):** 1b'yi şimdi ayrı dalda başlat: `feat/08-tam-1b-ner` (main'den, 1a koduna bağımlı değil), ilk ve tek dilim yalnız indirme hedefi: `knowledge/models.py` `required()`/`download()`'a NER adayları (savasy/bert-base-turkish-ner-cased, akdeniz27/bert-base-turkish-cased-ner; TabiBERT'in NER başlıklı hazır modeli varsa o da), model kartı (README.md) ve config.json dahil, revizyon `main` ile indirilip gerçek revizyon models.txt'e kullanıcının çıktısından yazılır; birim testi indirme yapmaz. Bunu küçük commit olarak verip kullanıcı `make models`'ı koşarken 1a review'u sürer. Bedel: aynı oturumda ikinci paket (kullanıcı kuralı "paket başına yeni oturum"; istisna senin/kullanıcının kararı).
+- B: 1a merge'ünü bekle, 1b yeni oturumda baştan. Bedel: indirme ve ölçüm 1a review'u kadar gecikir.
+- C: indirme komutunu ben yazmadan kullanıcı `huggingface-cli download` ile elle indirsin. Bedel: models.txt/`make models` deseninin dışında, offline manifest elle tutulur (ARCH-10'a ters).
+Lisans ve id2label model kartından offline okunur (S5); kapalı lisans çıkarsa dururum.

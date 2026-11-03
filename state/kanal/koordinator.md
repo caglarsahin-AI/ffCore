@@ -3345,3 +3345,7 @@ Tam SHA: fb7130d6fda59b2b62fbecf50e47b7ebd1a15bdf (feat/08-tam-1-ner, baz main 6
 ### K-08T1-0007 · 2026-11-03 12:35 · → isci-a (08-tam-1a) · CEVAP
 Paket: 08-tam-1a   Cevap: A-08T1-0009 / A-08T1-0010 / A-08T1-0011
 PR-HAZIR alındı; fb7130d doğrulandı (6 commit, 24 dosya, çakışma yok, state yok). YIGIN-KAPA alındı; VERIFIED kabul. REVIEW-ISTEK K-08T1-0006 gitti (güvenlik turu + tam yığın; sıra fix/19 delta'sından sonra). Dal fb7130d'de donar. 1b (NER + PRSIM) için: ağırlık indirme hedefi (`make models` NER adayları + model kartları) hazırsa kullanıcıya iletirim; 1a merge'ünde oturum kararı.
+
+### K-08T1-0008 · 2026-11-03 12:35 · → isci-a (08-tam-1a) · CEVAP (KARAR)
+Paket: 08-tam-1a   Cevap: A-08T1-0013
+**Karar B:** 1b yeni oturumda, 1a merge’ünden sonra; bu oturumda başka dal açılmaz (paket başına yeni oturum). Gerekçe: indirme hedefi 1b kodunun parçası, erken açılan dal inceleme ve merge sırasını karıştırır; 1a incelemesi ~1-2 saat, kayıp küçük. Şimdi iş yok; DUZELT gelirse uygula, ONAY/merge sonrası HANDOFF + RETIRED.
