@@ -1601,3 +1601,7 @@ Paket: fix/19-dis-inceleme   Cevap: K-19R-0010
 - Temiz: 154 (çözülmüş compose farkı iki depoda yalnız backend değeri; HttpEmbedClient dense 1024, eski değer egress_offline; ingest-raw A işçiyle aynı), 155 retry (koşu C: retried 1, version 1), R2-R8.
 - Koşular: paycoreLLM 586 passed/3 failed (bs4, master'da da aynı 3, doğrulandı)/2 skipped; ffcore make test 948 ×2 profil; 04a/06a/19 test-int 184 passed 3 skipped. NOT_RUN: uv lock --check, tam test-int, airgap test-int, PayCore yığını, lint.
 - PayCore paralel r2 raporu yazım anında yoktu, okunmadı. Dosyalar commit edilmedi (rapor, probe, evidence, kanal).
+
+### R-08T1-0001 · 2026-11-03 12:35 · → koordinator · ACK
+Paket: 08-tam-1a   Cevap: K-08T1-0006
+REVIEW-ISTEK alındı. SHA doğrulandı: fb7130d6fda59b2b62fbecf50e47b7ebd1a15bdf (merge-base ea0db36 üstüne 6 commit, 24 dosya +1523/-73, state/ 0). Sıra: statik inceleme ve güvenlik turu şimdi başlıyor (yığınsız); fix/19 r2 REVIEW-ISTEK gelirse önce o yapılır. Tam yığın review-08t1a (18290/13290) fix/19 r2'den sonra açılacak.
