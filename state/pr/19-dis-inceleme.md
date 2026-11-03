@@ -1,6 +1,7 @@
 # fix/19-dis-inceleme: M3 ingest öncesi düzeltmeler (FFCore 154-156 + paycoreLLM dış inceleme R1-R8)
 
 **Paket:** fix/19-dis-inceleme · **Sınıf:** [B] (iki depo, ayrı SHA) · **İşçi:** isci-b (ffcore-isci-b-19r)
+**PR-HAZIR SHA'ları:** ffcore `b7a6d539079021c1fdb3b0f630762a5118a000a1` (main b2e9c05 üstüne 3 commit) · paycoreLLM `81098f49555aaf2b4710af0e54f68d86e36e5f74` (master ca1b287 üstüne 9 commit)
 **ffcore:** branch `fix/19-ingest-followups` · worktree `.worktrees/fix/19-ingest-followups` · baz main b2e9c05 (614c150+)
 **paycoreLLM:** branch `feat/19-dis-inceleme` · kardeş worktree `C:\ai_paycore\paycoreLLM-19r` · baz master ca1b287
 **GOREV:** K-19R-0001, K-19R-0002, K-19R-0003. Kaynaklar: `state/reviews/paycore-19-dis-inceleme.md` (R1-R8), `state/pr/18-kosu-2.md` "Bulgular" (B1-B3).
@@ -102,18 +103,104 @@ Her bulgu ayrı commit; `git revert <sha>`. Compose değişikliği tek değer. r
 - **ARCH-10 / ARCH-06:** 155 sessiz `unchanged` (fail-loud açığı) kapatılıyor; 156 iki ölçüyü tek etikette karıştırma (ARCH-13) ayrılıyor; R1/R3 sessiz içerik kaybı kaldırılıyor ve sayısı belge başına görünür; R2 gizli maskeleme ile kaybolan sayı geri geliyor, secret koruması değer tabanlı kalıyor.
 
 ## Değişen dosyalar
-(uygulamada doldurulur)
+
+**ffcore** (`git diff main...b7a6d53`, 8 dosya):
+
+| Commit | Bulgu | Dosyalar |
+|---|---|---|
+| 641e20b | 154 (B1) | `deploy/docker-compose.yml` (paylaşılan ortam `x-app-env`'e taşındı; backend `<<: *app-env` + `ALLOWED_INTERNAL_HOSTS: backend,${ALLOWED_INTERNAL_HOSTS:-}`), `backend/tests/unit/test_19r_154_internal_hosts.py` (yeni) |
+| c60b61d | 155 (B2) | `backend/ffcore/knowledge/raw_ingest.py`, `backend/tests/integration/test_19_ingest_raw.py` (+4 test, `_ingest` yardımcısı `convert`/`embed_client` alır) |
+| b7a6d53 | 156 (B3) | `scripts/eval_report.py`, `backend/tests/unit/test_19_eval_out.py` (+2 test, 1 etiket), `tests/e2e/test_13b_eval_report.py` (1 etiket satırı), `docs/demo.md` |
+
+**paycoreLLM** (`git diff ca1b287..81098f4`, 19 dosya):
+
+| Commit | Bulgu | Dosyalar |
+|---|---|---|
+| 89e908a | R2 | `src/paycore_llm/config.py`, `tests/test_19r_redact.py` (yeni) |
+| fb3bf0d | R8 | `src/paycore_llm/config.py`, `tests/conftest.py` (autouse önbellek temizliği), `tests/test_19r_redact.py` |
+| 6802713 | R1 + R3 | `scripts/ffcore_stage_raw.py`, `tests/test_19r_stage_raw.py` (yeni), `tests/test_19_stage_raw.py` (meta anahtar seti + sınırlı imza testi R3'e göre), `docs/paycore/m3-sunucu.md` |
+| aa54f05 | R5 | `src/paycore_llm/rag/embed.py`, `src/paycore_llm/ingest/sync.py` (`_index_doc` açık `truncated()`), `tests/test_19r_embed_truncation.py` (yeni) |
+| c0480e3 | R6 | `pyproject.toml`, `tests/test_19r_langfuse_floor.py` (yeni) |
+| b627fda | R7 | `src/paycore_llm/ffcore_compat.py` (yeni), `scripts/ffcore_stage_raw.py`, `scripts/ffcore_seed_paycore.py`, `tests/test_19_seed.py`, `tests/test_19r_ffcore_rule.py` (yeni) |
+| 144a957 | R4 | `docs/paycore/bellek.md` (senaryo tablosu, sunucu satırları), `docs/paycore/m3-sunucu.md` ("Aynı anda hangi yığınlar"), `tests/test_19_compose.py` |
+| a051cc6 | 154 yarısı | `compose.ffcore.yml` (`x-ffcore-app-env`; ffcore-backend `backend,` önekli), `tests/test_19_compose.py` |
+| 81098f4 | R1 eki (K-19R-0008) | `scripts/ffcore_stage_raw.py` (`AT_TECHNICAL`, Türkçe harfli login), `tests/test_19r_stage_raw.py`, `docs/paycore/m3-sunucu.md` |
+
+R1 ve R3 tek commit: ikisi aynı fence tespitini (`_fenced`) kullanıyor; ayırmak ara commit'te ölü kod bırakırdı.
 
 ## Kabul kriterleri → testler
-(uygulamada doldurulur)
+
+| # | Kriter | Test | Durum |
+|---|---|---|---|
+| 154a | ffcore backend `ALLOWED_INTERNAL_HOSTS`'ta `backend` (operatör ekleri korunur) | `test_19r_154_backend_allows_itself` | geçti (önce kırmızı) |
+| 154b | gerçek `HttpEmbedClient`, backend ortamıyla (`OFFLINE=true`), egress geçer | `test_19r_154_http_embed_client_reaches_backend` | geçti (önce kırmızı: `egress_offline`) |
+| 154c | yığında backend kapsayıcısında `ingest-raw`, gerçek `HttpEmbedClient` + gerçek ağırlık, indexed | yığın koşusu (aşağıda) | geçti |
+| 154d | paycoreLLM ffcore-backend `backend` önekli; migrate genişlemez | `test_19r_154_ffcore_backend_allows_itself` | geçti (önce kırmızı) |
+| 155a | ikinci koşu failed belgeyi yeniden dener, yeni sürüm yok | `test_19r_155_rerun_retries_failed` | geçti (önce kırmızı) |
+| 155b | gated yeniden denenir; indexed/skipped `unchanged` | `test_19r_155_rerun_retries_gated_keeps_indexed` | geçti (önce kırmızı) |
+| 155c | istisna → satır `failed` + `metadata.error_code` (sınıf adı, mesaj yok); başarılı yeniden deneme kodu temizler | `test_19r_155_exception_marks_failed` | geçti (önce kırmızı: satır `gated`'da) |
+| 155d | konsol statü satırı = manifest (DB) | `test_19r_155_console_statuses_match_manifest` | geçti (önce kırmızı: `status: -`) |
+| 156a | Source accuracy yalnız `cites_source` (18-kosu-2 biçimi 19/20) | `test_19r_156_source_accuracy_is_cites_source` | geçti (önce kırmızı: 0/20) |
+| 156b | `contains` ayrı satır, tam geçiş kendi adıyla | `test_19r_156_contains_separate_line` | geçti (önce kırmızı) |
+| R1 | `@Component`, `@Transactional(REQUIRES_NEW)`, `@angular/core`, kod içi `@Order(1)`, e-posta `@`'si, `@param`/`@media`… aynen; `[~ahmet.yilmaz]`, `@ahmet.yilmaz`, Türkçe harfli login → `[USER]` | `test_19r_r1_technical_text_kept[*]`, `test_19r_r1_login_mentions_cleaned[*]` | geçti (önce kırmızı) |
+| R2 | `tokens=5`, `issue_key=PRSIM-1`, `api_key=***`, `password=***`; serbest metindeki secret değeri `***` | `test_19r_r2_*` + mevcut `test_00i_redact.py` | geçti (önce kırmızı 11) |
+| R3 | fence içi `--` kalır; ortadaki "Teşekkürler" + 3 madde kalır; son blok imzası düşer; belge başına `signature_lines_dropped` | `test_19r_r3_*` (4) | geçti (önce kırmızı) |
+| R4 | senaryo başına tavan ≤ RAM − 6 GB (`SERVER_RAM_GB` varsayılan 96 → 90 GB); tablo = compose | `test_19r_r4_mem_budget_by_scenario[*]`, `test_19r_r4_scenario_table_matches_compose`, `test_19_3_mem_budget_within_limit` (artık atlamıyor) | geçti (tablo testi önce kırmızı) |
+| R5 | 9.000 token'lık parça: `embedding_truncated` bir kez, tokenizer bir kez; eski `_index_doc` yolu yine bildirir | `test_19r_r5_truncation_checked_once`, `test_19r_r5_legacy_index_path_still_reports` | geçti (önce kırmızı: 2 kez / 0 kez) |
+| R6 | pyproject sınırları; `import paycore_llm.api` konteynerde | `test_19r_r6_langfuse_and_otel_declared`, `test_19r_r6_api_imports` | geçti; `uv lock --check` **NOT_RUN** (aşağı bakınız) |
+| R7 | PRSIM kuralı depoda tek yerde; uyum testi atlanmadan | `test_19r_r7_single_prsim_rule`, `test_19r_r7_scripts_take_the_rule_from_one_place`, `test_19r_r7_compat_matches_ffcore[*]` | geçti (önce kırmızı: modül yok) |
+| R8 | 1.000 log satırında `secret_values` bir kez | `test_19r_r8_secret_values_cached` | geçti (önce kırmızı) |
 
 ## Çalıştırılan komutlar
-(uygulamada doldurulur)
+
+Host'ta make yok (ENV-19); hedefler kendi konteynerlerinde, `MSYS_NO_PATHCONV=1`. ffcore: `FFCORE_VERSION=0.0.0-main` (bağımlılık/Dockerfile değişmedi), proje `f19r`.
+
+| Komut | Ortam | Exit | Sonuç / süre |
+|---|---|---|---|
+| `docker compose -p f19r --env-file .env.test run --rm --no-deps tools make lint` | llmaas, airgap | 0 / 0 | |
+| `... tools make test` | `DEPLOY_PROFILE=llmaas` | 0 | 948 geçti, 3 dk 37 s |
+| `... tools make test` | `DEPLOY_PROFILE=airgap` | 0 | 948 geçti, 3 dk 21 s |
+| `... --profile test --profile qdrant up -d --wait` sonra `tools make test-int` | llmaas | 0 | 807 geçti, 5 atlandı, 28 dk 9 s |
+| aynı | airgap | 0 | 807 geçti, 5 atlandı, 17 dk 47 s |
+| çözülmüş compose karşılaştırması (`config --format json`, main ↔ dal, `--profile '*'`) | | 0 | tek fark: backend `ALLOWED_INTERNAL_HOSTS` |
+| paycoreLLM `docker compose -p pc19r -f compose.test.yml run --rm -T test sh -c "ruff check . && ruff format --check ."` (= `make lint`) | | 0 | 211 dosya |
+| paycoreLLM `... test uv run --frozen --extra dev --group ffcore pytest -q` (= `make test`) @ 81098f4 | | 1 | 586 geçti, 3 kaldı, 2 atlandı, 82 s |
+| paycoreLLM `test_19_compose.py` `FFCORE_DEPLOY_DIR=../ffcore/deploy` ve `=../ffcore/.worktrees/fix/19-ingest-followups/deploy` | | 0 / 0 | 17 / 17 (app-env uyumu iki ffcore compose'una karşı) |
+| paycoreLLM çözülmüş config karşılaştırması (ca1b287 ↔ dal) | | 0 | tek fark: ffcore-backend `ALLOWED_INTERNAL_HOSTS` |
+| paycoreLLM `uv lock --check --offline` (master ca1b287, değişikliksiz) | | 1 | lock zaten bayat → R6 lock kısmı FOLLOWUP-158 |
+
+**paycoreLLM 3 kalan:** `test_data_dump::test_an_html_email_becomes_its_text_not_an_xml_pile`, `test_mhtml::test_only_the_html_part_becomes_text`, `test_reconvert::test_msg_html_body_bytes_are_decoded`: hepsi `No module named 'bs4'` (test konteynerine `ingest` extra'sı kurulmuyor); 00i'den beri kayıtlı aynı üç baz hatası (B-00i-0019). Bu turda master'da yeniden koşulup doğrulanmadı. 2 atlanan: `fitz` yok, `build_scenario2_eval.py` seti üretilmemiş (ikisi de önceden var).
+
+**ffcore 5 atlanan (test-int):** `test_03b_egress_dns` (resolver bütçesi), `test_04a_ingest` ×2 ve `test_05a_sql` ×1 (atlama nedenleri bu turda `-rs` ile listelenmedi; bu dosyalara dokunulmadı), `test_19_ingest_raw:156` (root dosya modunu yok sayar; `:ro` bağlama testi ayrı koşar); beşi de bu PR'ın yeni testleri değil.
+
+**154c yığın koşusu** (f19r, YIGIN-AÇ B-19R-0005, onay K-19R-0006): backend `04a-knowledge-core_model_cache:/models:ro` ile yeniden başlatıldı (geçici override, depoya girmedi); yerel test yöneticisi `create-superadmin` (atılan rastgele parola, yazdırılmadı), proje `f19r-paycore-like`, KB `paycore-like`; `ingest-raw` backend kapsayıcısında `-e OFFLINE=true`, ağaç `data/samples/paycore-like/raw:/raw:ro`:
+
+| Adım | Sonuç |
+|---|---|
+| eski değerle (`ALLOWED_INTERNAL_HOSTS` backend'siz) `HttpEmbedClient.embed` | `EgressDenied egress_offline` (B1'in aynısı) |
+| yeni compose değeriyle, ağırlıksız | egress geçer, backend 500 (`hf_path`: ağırlık yok) |
+| yeni compose değeriyle, ağırlık bağlı | `EMBED_OK dense 1024` |
+| `ingest-raw` koşu 1 (imaj kodu) | created 5, `status: indexed 4, skipped 1`, gates `gate2:boilerplate 1`, masked EMAIL 1 / TR_NATIONAL_ID 1 / TR_PHONE 1, `prsim_requires_ner 1`, manifest 5 belge 5 parça |
+| koşu 2 (imaj kodu = main) | created 0, unchanged 5, `status: -` (eski konsol davranışı, 155'in düzelttiği) |
+| koşu 3 (worktree `backend/ffcore` salt okunur bağlı) | created 0, unchanged 5, retried 0, `status: indexed 4, skipped 1` (manifestle aynı) |
+
+Kapanış: `down -v` (f19r ve pc19r), kalan konteyner 0, volume 0.
 
 ## Varsayımlar ve brief'teki çelişkiler
 1. Worktree'leri işçi açtı (WORK_QUEUE açanı yazmıyor; 00i deseni).
-2. R7: FFCore `_is_prsim` özel; seed public `check_sources` üstünden çalışır, FFCore'a public alias eklenmez (ffcore touch-zone'u raw_staging'i içermiyor).
-3. 154: anchor değil yalnız backend servisi genişletilir.
+2. R7: FFCore `_is_prsim` özel; seed public `raw_staging.check_sources` üstünden çalışır, FFCore'a public alias eklenmedi (K-19R-0004).
+3. 154: anchor değil yalnız backend servisi genişletildi (K-19R-0004); iki compose'da da paylaşılan blok `x-` uzantı alanına taşındı (YAML'da aynı eşlemede anchor tanımlayıp birleştirmek mümkün değil).
+4. **R1 — KARARLAR (a) daraltıldı, kaldırılmadı** (K-19R-0007/0008): dış incelemenin "deseni kaldır" önerisi kullanıcının D sınıfı PRSIM kararıyla (koruma a: "`@ad` izleri temizlenir") çelişiyordu (B-19R-0006). Dar desen: küçük harfli login biçimi (Türkçe harf dahil, ≥ 3 karakter), satır başı ya da boşluk/noktalama sonrası, fence ve satır içi kod dışında, ardından `(`, `/` ya da sözcük karakteri gelmiyor; `AT_TECHNICAL` istisnaları.
+5. R3: imza kuralı her **mesaja** ayrı uygulanır (Jira açıklaması ve her yorum); tüm gövdeye uygulansaydı açıklamanın imzası yorumlar yüzünden "son 8 satır" dışında kalırdı.
+6. R5: dış inceleme "kontrol yalnız gold'da" diyordu; eski `sync._index_doc` yolu `embed()`'i `flag_truncated`'sız çağırıyor; orada açık `truncated()` çağrısı eklendi (sessiz kesilme olmasın, ARCH-06).
+7. R6 (K-19R-0009 A): yalnız pyproject; `uv.lock` master'da da bayat (ffcore grubu kayması; yenileme 29 paket ekliyor, redis 8.1.0 → 5.3.1, httpx2/httpcore2 2.12 → 2.16, cryptography 50.0.1 → 50.0.2, sse-starlette 3.6.0 ≠ FFCore pini 3.5.0) → FOLLOWUP-158 [C].
+8. R4 (K-19R-0005 A): sunucu belleği 96 GB **kullanıcı kararından**; `free -g` teyidi ve kullanım sütunları kullanıcı ölçümü. Senaryo toplamlarında `ingest` ve `ffcore-migrate` tek seferlik sayıldı (hariç).
+9. 155: yeniden deneme `ingest_from_raw` değil `ingest.ingest_document` ile; `register_upload` aynı baytta da `version += 1` yapıyor (store.py:128) → FOLLOWUP-157 (04a). `timeout` ve ara statüler de yeniden denenir; yalnız `indexed` ve `skipped` (kapı kararı) atlanır.
 
 ## Kalan riskler
-(uygulamada doldurulur)
+- R1: kod bloğu dışında, listede olmayan küçük harfli teknik `@sözcük` (ör. `@keyframes`, `@font-face` bileşenleri dışı biçimler) `[USER]` olur; liste tek sabit (`AT_TECHNICAL`), genişletmek bir satır. Gövde içi kişi adları NER'e (08 tam) kadar maskelenmez (bilinen sınır, runbook).
+- 155: `timeout` olan bir belge her koşuda yeniden denenir (dönüşüm süresi kadar); bu bilinçli (ortam/limit düzeltmesi sonrası iyileşsin), konsolda `retried` sayısıyla görünür.
+- R6: lock dışı kurulum artık langfuse 2.x seçemez, ama lock bayat kalıyor (FOLLOWUP-158); sunucu imajı `--frozen` ile bugünkü lock'tan kurulur, davranış değişmez.
+- 154c koşusu `0.0.0-main` imajıyla yapıldı (kod değişikliği 155 bağlama ile koşu 3'te); dal için yeni imaj derlenmedi (bağımlılık değişmedi).
+- paycoreLLM 3 `bs4` hatası bu turda master'da yeniden doğrulanmadı.
+- İmaj çekme: içeriğe bakmak için `alpine:3.20` çekildi (işçi imaj izni kapsamında); silinmedi (temizlik kullanıcıda).

@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-b-19r
 - Aktif paket: fix/19-dis-inceleme (ffcore fix/19-ingest-followups + paycoreLLM feat/19-dis-inceleme)
 - Durum: ACTIVE
-- Son okunan: koordinator K-19R-0004 (2026-11-03 09:40)
+- Son okunan: koordinator K-19R-0011
 
 ## Mesajlar
 
@@ -1586,3 +1586,26 @@ R1 notu: K-19R-0007'deki desen aynen; benim önerdiğim `@param/@media` istisna 
 ### B-19R-0009 · 2026-11-03 10:46 · → koordinator · ACK
 Paket: fix/19-dis-inceleme   Cevap: K-19R-0008 / K-19R-0009
 Düzeltme: B-19R-0008'deki "istisna listesi eklenmedi" notu yanlıştı; K-19R-0008'i geç okudum. Şimdi uygulandı: 81098f4 (paycoreLLM) `AT_TECHNICAL` tek sabit (param, return, returns, throws, see, link, deprecated, override, media, import; runbook'ta anılır) + Türkçe harfli login biçimi; önce kırmızı (4 test), sonra yeşil (51). K-19R-0009 (R6 A) c0480e3'te uygulanmıştı.
+
+### B-19R-0010 · 2026-11-03 11:08 · → koordinator · YIGIN-KAPA
+Paket: fix/19-dis-inceleme   Cevap: B-19R-0005
+f19r ve pc19r `down -v`; kalan konteyner 0, volume 0. Worktree'lerde geçici dosya yok (154c override ve bootstrap betiği silindi, depoya girmedi).
+
+### B-19R-0011 · 2026-11-03 11:08 · → koordinator · DURUM
+Paket: fix/19-dis-inceleme   Cevap: K-19R-0004
+DURUM: VERIFIED talebi. Kanıt state/pr/19-dis-inceleme.md (kabul → test tablosu, komutlar, 154c yığın koşusu, varsayımlar 1-9, kalan riskler).
+ffcore: lint 0; make test 948/948 llmaas + airgap; make test-int 807 geçti / 5 atlandı iki profilde; çözülmüş compose farkı tek değer.
+paycoreLLM: lint 0; make test 586 geçti, 3 kaldı (aynı bs4 baz hataları, 00i'den kayıtlı; master'da bu turda yeniden koşulmadı), 2 atlandı; compose testleri iki ffcore compose'una karşı yeşil.
+154c: backend kapsayıcısında OFFLINE=true, gerçek HttpEmbedClient + gerçek bge-m3/Docling (04a model_cache ro): ingest-raw indexed 4, skipped 1; ikinci koşu created 0; worktree koduyla statü satırı DB'den.
+NOT_RUN: R6 `uv lock --check` (lock master'da da bayat, FOLLOWUP-158).
+
+### B-19R-0012 · 2026-11-03 11:08 · → koordinator · PR-HAZIR
+Paket: fix/19-dis-inceleme   Cevap: -
+PR açıklaması: C:\ai_paycore\ffcore\state\pr\19-dis-inceleme.md · Sınıf [B].
+ffcore: branch fix/19-ingest-followups · worktree .worktrees/fix/19-ingest-followups · baz main b2e9c05 · SHA **b7a6d539079021c1fdb3b0f630762a5118a000a1** (3 commit: 641e20b 154, c60b61d 155, b7a6d53 156).
+paycoreLLM: branch feat/19-dis-inceleme · worktree C:\ai_paycore\paycoreLLM-19r · baz master ca1b287 · SHA **81098f49555aaf2b4710af0e54f68d86e36e5f74** (9 commit: 89e908a R2, fb3bf0d R8, 6802713 R1+R3, aa54f05 R5, c0480e3 R6, b627fda R7, 144a957 R4, a051cc6 154 yarısı, 81098f4 R1 eki).
+İnceleyici için: paycoreLLM testleri `docker compose -f compose.test.yml run --rm -T test uv run --frozen --extra dev --group ffcore pytest -q` (ffcore bağı `FFCORE_BACKEND_DIR`/`FFCORE_DEPLOY_DIR` ile dalın ffcore'una çevrilebilir); ffcore entegrasyon `--profile test --profile qdrant up -d --wait` + `tools make test-int`. İki dala başka commit atmıyorum.
+
+### B-19R-0013 · 2026-11-03 11:10 · → koordinator · ACK
+Paket: fix/19-dis-inceleme   Cevap: K-19R-0011
+Alındı. İki dal donuk (ffcore b7a6d53, paycoreLLM 81098f4); commit yok, yığın yok. REVIEW-SONUC / DUZELT bekleniyor.
