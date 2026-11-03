@@ -1684,3 +1684,22 @@ MAJOR-r4-1 karar A ile kapandı: HTML artık cevap düzeyinde; tag/tırnak/expec
 ### A-08T1-0039 · 2026-11-03 21:45 · → koordinator · ACK
 Paket: 08-tam-1a   Cevap: K-08T1-0027
 Alındı: 60f2250 VERIFIED, r5 delta incelemede; dal donuk, commit yok. Sonucu bekliyorum.
+
+### A-08T1-0040 · 2026-11-03 22:28 · → koordinator · ACK
+Paket: 08-tam-1a   Cevap: K-08T1-0028
+Alındı: r5 DUZELT (MAJOR-r5-1 gerileme, MINOR-r5-1..4, NOTE-1/2/7). KARARLAR "C17 HTML kuralı, düzeltmeler" (g)-(i) bağlayıcı kabul. Sıra: MAJOR-r5-1 (istisna önceki karaktere bakmaz, kuyruk testi iki yolda) → MINOR-r5-1 (eşik 10.000.000, ASCII rakam) → NOTE-7 → MINOR-r5-4 + NOTE-1 → MINOR-r5-2/3 (docs, testler, PR notu). Her biri önce kırmızı test, ayrı commit.
+
+### A-08T1-0041 · 2026-11-03 22:30 · → koordinator · YIGIN-AÇ
+Paket: 08-tam-1a r5 DUZELT
+Yalın yığın açılıyor: ffcore-08t1, postgres + redis + litellm + fake-llm + qdrant, imaj 0.0.0-08t1. Hedefli test-int iki profil; bitince YIGIN-KAPA.
+
+### A-08T1-0042 · 2026-11-03 22:56 · → koordinator · YIGIN-KAPA
+Paket: 08-tam-1a r5 DUZELT
+ffcore-08t1 yalın yığını `down -v` ile kapandı; konteyner 0, volume 0.
+
+### A-08T1-0043 · 2026-11-03 22:56 · → koordinator · PR-HAZIR
+Paket: 08-tam-1a r6   Cevap: K-08T1-0028
+SHA: 33a0268f66bacde2cd57204e942b62b0ea2385cb (feat/08-tam-1-ner; 60f2250 üstüne 6 commit, 17 dosya +225/-81; main...HEAD 52 dosya, 39 commit). PR notu: state/pr/08-tam-1a.md ("Review r5 bulgu → düzeltme → kanıt" tablosu, r6 kapı tablosu, bilinen sınırlar güncel).
+Kapılar HEAD'de: lint 0; make test llmaas 1525 / airgap 1525; hedefli test-int llmaas 150 passed, airgap 148 passed + 2 skipped. Kırmızı kanıtı commit öncesi kodla: r5_tail 10/17, range + history 7.
+MAJOR-r5-1 (g), MINOR-r5-1 (h, eşik 10.000.000 + ASCII rakam), MINOR-r5-2 (i, docs), MINOR-r5-3/4, NOTE-1/2/7 kapalı. Evaluate uç noktasında 400 `placeholder_out_of_range` docs ve openapi'ye eklendi (açıklama değişikliği, additive; 08.yaml yeniden üretildi, sözleşme testi yeşil) ve bir testle kanıtlandı.
+İnceleyiciye not: (h) uygulaması `PLACEHOLDER` desenini 1-7 haneye indirdi. Böylece 8 haneli ve daha uzun numaralar hiçbir yerde yer tutucu sayılmıyor: ayrılmıyor, açılmıyor, sayılmıyor. HTML istisnası ise `PII_[0-9]{1,8}>>` olarak kaldı (fail-closed tarafta fark yok). Dal donuk; sonucu bekliyorum.

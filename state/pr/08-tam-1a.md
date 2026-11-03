@@ -1,10 +1,19 @@
 # PR: 08-tam-1a — çıkışta geri çevirme (C17, FOLLOWUP-141), secrets 106/107, egress 147
 
-**Paket:** 08-tam-1a (08 tam dilim 1'in modelsiz yarısı, K-08T1-0002 S7) · **Sınıf:** [B] (yeni bağımlılık, migration, compose yok) · **Branch:** feat/08-tam-1-ner · **Baz commit:** ea0db36 · **HEAD:** 60f2250caf8fa089abb0ee476b7a0325394d3c44 (r1 incelenen: fb7130d, r2 incelenen: 6d0d9ba, r3 incelenen: 370912d, r4 incelenen: 4aecdbc) · **Oturum:** ffcore-isci-a-08-tam-1
+**Paket:** 08-tam-1a (08 tam dilim 1'in modelsiz yarısı, K-08T1-0002 S7) · **Sınıf:** [B] (yeni bağımlılık, migration, compose yok) · **Branch:** feat/08-tam-1-ner · **Baz commit:** ea0db36 · **HEAD:** 33a0268f66bacde2cd57204e942b62b0ea2385cb (r1 incelenen: fb7130d, r2 incelenen: 6d0d9ba, r3 incelenen: 370912d, r4 incelenen: 4aecdbc, r5 incelenen: 60f2250) · **Oturum:** ffcore-isci-a-08-tam-1
 
 Plan ve onay: `state/pr/08-tam-1.md` (PLANNED, K-08T1-0002: S1-S9 hepsi A). 08-tam-1b (NER + PRSIM) ayrı PR, ağırlıklar gelince.
 
-## Değişen dosyalar (main...HEAD, 48 dosya, 33 commit; +4483/-119)
+## Değişen dosyalar (main...HEAD, 52 dosya, +4629/-121, 39 commit)
+
+r5 DUZELT turu (60f2250..HEAD, 6 commit, 17 dosya +225/-81; karar KARARLAR "C17 HTML kuralı, düzeltmeler" (g)-(i)):
+
+- **MAJOR-r5-1** (d1c2960): `masking._HTML_TAG` istisnası önceki karaktere bakmaz (`<(?!PII_[0-9]{1,8}>>)[a-z]`); `tests/unit/test_08t_r5_tail.py` (inceleyicinin kuyruk probe'u: 1-11 karakterlik parçalar iki yolda + rastgele 1-6 parçalama 200 deneme).
+- **MINOR-r5-1** (14b8db7): `PLACEHOLDER` `<<PII_[0-9]{1,7}>>`, verme üst sınırı 9.999.999; 10.000.000'dan büyük ya da ASCII olmayan rakamlı numara yer tutucu değil; `tests/unit/test_08t_r3_range.py`, `test_08t_m2_history.py`, `test_08t_r2_rescope.py` (7 hane).
+- **NOTE-7** (07c17ee): `test_08t_r3_url_scan.py` süreç CPU süresi.
+- **MINOR-r5-4 + NOTE-1** (bb720a1): `api/guardrails.py` evaluate açıklaması 400 `placeholder_out_of_range` (additive), `backend/openapi/08.yaml` yeniden üretildi (sözleşme testi yeşil), `test_08_api.py` 400 testi; `api/runs.py` `exc_info=True`.
+- **MINOR-r5-3** (4c5e732): test açıklamaları ve bir test adı (`..._does_not_reopen_after_html`).
+- **MINOR-r5-2/4 docs** (33a0268): `docs/{guardrail,api,agentlar}.md`.
 
 r4 DUZELT turu (4aecdbc..HEAD, 5 commit, 14 dosya +282/-188; kararlar KARARLAR "C17 geri çevirme: cevap düzeyinde HTML fail-closed", (d′), (f′)):
 
@@ -89,6 +98,19 @@ Tek tablo; r3 HEAD'inde yeniden ölçüldü (`test_08t_secrets_short.py` üretec
 r1 öncesi eşdeğer girdiler 43 s ve 59 s sürüyordu (inceleyici r1). Testteki sınır (alt süreç, < 10 s) yalnız regresyon bekçisi.
 
 ## Çalıştırılan komutlar
+
+**r6 (r5 düzeltmesi; yalın yığın postgres + redis + litellm + fake-llm + qdrant, tee çıktıları scratchpad `r6-*.txt`; kapılar HEAD'de):**
+
+| Komut | Ortam | Exit | Süre | Sonuç |
+|---|---|---|---|---|
+| `tools make lint` | | 0 | | temiz |
+| `tools make test` | llmaas | 0 | 137 s | 1525 passed |
+| `tools make test` | `GUARDRAIL_EGRESS_ENABLED=false DEPLOY_PROFILE=airgap` | 0 | 133 s | 1525 passed |
+| hedefli test-int: `test_08t_*` (11 dosya), `test_06b_agent`, `test_06b_direct`, `test_06b2_external_agent`, `test_06a_runs_api`, `test_134_provider_request`, `test_08_api` | llmaas | 0 | 262 s | 150 passed |
+| aynı | airgap | 0 | 266 s | 148 passed, 2 skipped (profil koşullu) |
+| `down -v` | | 0 | | konteyner 0, volume 0 |
+
+Tam `make test-int` bu turda koşulmadı (K-08T1-0028: hedefli yeter).
 
 **r5 (r4 düzeltmesi; yalın yığın postgres + redis + litellm + fake-llm + qdrant, tee çıktıları scratchpad `r5-*.txt`):**
 
@@ -192,7 +214,9 @@ fb7130d üstüne 9 commit; her MAJOR ayrı commit, önce kırmızı test (kırm�
 - Sayaç anahtarı 400 gün yaşar (en uzun saklama sınıfının üstü). Daha eski saklanan bir yer tutucunun kapsamı tekrar açılırsa numara çakışabilir.
 - URL satırı kuralının takası: bağlantı ya da işaret içeren satırdaki değer okuyucuya yer tutucu olarak gider; düzyazıdaki işaretler de dahil (`Personal data:` → `data:`, `Attached file:` → `file:`, `//` yorumu) (docs/guardrail.md).
 - Akışta 8.192 karakteri aşan satır yer tutucularını tutar. Açık bir satır böyle kesilirse cevabın geri kalanı da tutar; yeniden bağlanmada durum kurulamazsa da (r4 (d′)).
-- Bir kapsam en çok 99.999.998 numara verir; aşarsa istek ya da koşu `placeholder_out_of_range` ile düşer (`on_error`'dan bağımsız). `<<PII_99999999>>` ve daha uzunları yer tutucu değildir.
+- Bir kapsam en çok 9.999.999 numara verir (r5, karar (h)); aşarsa istek ya da koşu `placeholder_out_of_range` ile düşer (`on_error`'dan bağımsız). 10.000.000'dan büyük ya da ASCII olmayan rakamlı `<<PII_n>>` yer tutucu değildir; taşınırsa yok sayılır.
+- HTML kuralının kapsamı okuyucunun akışının geri kalanı (r5, karar (i)): turlar arası sıfırlanmaz, onay sonrası hazırlık önceki girdileri yeniden oynatır; bedel konsol sahibine de düşer (`<br>`, `List<String>`, `#include <stdio.h>`, `Bearer <token>`, `<your-email>`, `x<y`).
+- Replay'de (canlı akış süresi dolmuş) `after` ile bağlanan okuyucu saklanan bütün satırların yer tutucularını tutar (d′'nin yan etkisi, fail-closed; r5 NOTE-2).
 - Facade agent istemci geçmişi satırları artık run kapsamında tokenize (llmaas). airgap'te egress olmadığı için denetlenmiş metinle saklanır (önceden olduğu gibi). Kullanıcı sorusu (`Run.input`, soru satırı) ham saklanmaya devam eder (r1 NOTE, FOLLOWUP-162).
 
 ## Review r2 bulgu → düzeltme → kanıt (state/reviews/08-tam-1a-r2.md, DUZELT K-08T1-0014)
@@ -222,7 +246,7 @@ fb7130d üstüne 9 commit; her MAJOR ayrı commit, önce kırmızı test (kırm�
 | MAJOR-r3-2 tarama gerilemesi | `UrlLines` artımlı (1d6e84e) | `test_08t_r3_long_line_in_one_character_pieces` (100 bin karakter, 1 karakterlik parça, StreamDetokenizer ve ContextReveal < 1 s), `..._in_four_pieces` (64 bin, < 0,2 s), `test_08t_r3_marker_split_over_pieces_still_seen` |
 | MAJOR-r3-1 HTML yeniden yazımları | sınıf kuralı (a)+(b) (0ad2aab) | `test_08t_r3_url_rules_keep_the_placeholder`: inceleyicinin dört yazımı + 9 ek (çok satırlı etiket, erken kapanan etiket + satır sonunda öznitelik, `http:`/`HTTPS:`/`javascript:`/`data:`, CSS `url(`, `<<img`, `<p>`) + r2 tablosu; tek parça, JSON, StreamDetokenizer, konsol (hizalı girdiler). Negatif kontrol: düz yer tutucu, `a < b`, `3:5`, boş satırdan sonra. Entegrasyon: dört yazım facade düz yolda gerçek LiteLLM ile (iki profil) |
 | MINOR-r3-1 yeniden bağlanma | durum saklanan girdilerden kurulur, kurulamazsa ilk satır tutulur (77cc903) | `test_08t_r3_resume.py`: inceleyicinin senaryosu (e1 `](https://…?q=` + yeniden bağlanma + e2), önceki satırdan taşınan HTML değeri, onay sonrası temiz satır değer gösterir, bilinmeyen girdi ve Redis hatası fail-closed; `test_08t_m7_owner_sees_values_approver_and_admin_placeholders` (sahip onay sonrası değeri görür) yeşil |
-| MINOR-r3-2 9 hane çakışması | ≤ 99.999.998 ayırma, sayaç sınırı, 9+ hane yer tutucu değil (2e35856) | `test_08t_r3_range.py`, `test_08t_r3_history_number_past_the_range_fails_loudly` (inceleyicinin senaryosu gerçek Redis'te: `_history` 400 `placeholder_out_of_range`, sayaç 99.999.999'da durur) |
+| MINOR-r3-2 9 hane çakışması | sayaç sınırı ve 9+ hane yer tutucu değil (2e35856); r4'te f′, r5'te karar (h) ile değişti: sınır 9.999.999, 10.000.000 ve üstü taşınan numara yok sayılır | `test_08t_r3_range.py`; r3'teki `test_08t_r3_history_number_past_the_range_fails_loudly` r4'te `..._99999999_is_ignored_...`, r5'te `test_08t_r5_large_carried_numbers_are_ignored_and_the_range_ends_loudly` oldu |
 | MINOR-r3-3 komşu facade yolları | `FacadeGuard.reveal` → 502 `detokenize_unavailable` (de30d05) | `test_08t_r3_minor3_facade_reveal_maps_store_errors_to_502` (gerçek `FacadeGuard`, düşük Redis), `..._buffered_stream_ends_with_the_error_and_done` |
 | MINOR-r3-4 boş satır | yalnız markdown hedefi kapanır (4c3f5ae) | `test_08t_r3_blank_line.py` (markdown 4 biçim açılır; HTML 5 biçim ve `_lost` tutulur) |
 | MINOR-r3-5 docs | (8837a72) | agentlar.md URL kuralı + yeniden bağlanma; guardrail.md sınıf kuralı, boş satır, yeniden bağlanma, facade hata biçimi (kimliksiz, `X-Resume-Run-Id`), 8 hane; api.md aynı; takas ifadesi "a line with a link, an HTML tag, a URL scheme or a marker" |
@@ -247,6 +271,23 @@ fb7130d üstüne 9 commit; her MAJOR ayrı commit, önce kırmızı test (kırm�
 | MINOR-r4-6 `prime` beklenmeyen hata | her hata fail-closed (a0795ad) | `test_08t_r4_unexpected_rebuild_error_keeps_the_rest` |
 | NOTE-6 PR notu | r1 tablosu MAJOR-2 satırı, "Bilinen sınırlar", r3 NOTE-4 FOLLOWUP listesinde | bu not |
 
+## Review r5 bulgu → düzeltme → kanıt (state/reviews/08-tam-1a-r5.md, DUZELT K-08T1-0028; kararlar (g)-(i))
+
+Kırmızı kanıtı commit öncesi kodla: r5_tail 10/17 kırmızı (yeşiller parça boyu 4, 5, 11 gibi pencerenin yer tutucuyu kesmediği durumlar); range + history 7 kırmızı. NOTE-7, MINOR-r5-3 ve docs için kırmızı yok (test/metin). Evaluate 400 testi kapsama testi (davranış r4'ten beri var).
+
+| Bulgu | Düzeltme (commit) | Kanıt |
+|---|---|---|
+| MAJOR-r5-1 kuyruk penceresi | istisna önceki karaktere bakmaz, (g) (d1c2960) | `test_08t_r5_facade_stream_shows_every_value` ve `test_08t_r5_console_live_shows_every_value` (parça 1, 2, 3, 4, 5, 6, 8, 11: 3/3), `test_08t_r5_random_token_pieces_lose_no_value` (200 deneme, 0 kayıp); `<PII_1 style` testi (r4) yeşil |
+| MINOR-r5-1 konuşma kalıcı bozulması | (h): eşik 10.000.000, ASCII rakam (14b8db7) | `test_08t_r5_carried_numbers_from_ten_million_are_ignored` (`<<PII_99999999>>`, `<<PII_99999998>>`, `<<PII_10000000>>`, Arap-Hint rakamları), `test_08t_r5_issuing_past_9999999_fails_loudly`, `test_08t_r5_large_and_non_ascii_numbers_are_no_placeholders`, `test_08t_r5_large_carried_numbers_are_ignored_and_the_range_ends_loudly` (gerçek Redis: konuşma çalışır, değerler normal numara) |
+| MINOR-r5-2 HTML bedeli ve kapsamı | (i) docs: "okuyucunun akışının geri kalanı", konsol sahibi dahil, tetikleyici listesi (33a0268) | — (kod değişikliği yok) |
+| MINOR-r5-3 bayat test/PR metni | test açıklamaları (4c5e732), PR varsayım 10/12, r3 tablo satırı, güvenlik notu | bu not |
+| MINOR-r5-4 docs sapmaları | evaluate 400 docs + openapi (bb720a1), api.md tamponlu akış, guardrail.md "işaretli ya da açık satır" (33a0268) | `test_08t_r5_evaluate_used_up_range_is_400` (`on_error=log`), `test_08_22_openapi_draft_matches_app` |
+| NOTE-1 | `exc_info=True` (bb720a1) | — |
+| NOTE-2 | PR "Bilinen sınırlar" | — |
+| NOTE-7 | CPU süresi (07c17ee) | `test_08t_r3_url_scan.py` 6/6 |
+
+**FOLLOWUP-162'ye (r5, koordinatör ekledi):** NOTE-3 (9 haneli ve `x<PII_1>>` gibi biçimler, `<` + Unicode harf etiket sayılır; fail-closed), NOTE-4 (CR CR tek parçada ve akışta tutarsız; ikisi de güvenli). r4 NOTE-3 (replay'de `fail_closed` saklanan cevabı gereksiz tutar) d′ ile "Bilinen sınırlar"da.
+
 **FOLLOWUP-162'ye (r4, koordinatör ekledi):** NOTE 1 (`gate.commit` `finally` içinde Redis hatası akışı olaysız bitirir), NOTE 2 (ikinci hata dalında `rest()` 502), NOTE 4 (hazırlık XRANGE `COUNT` ile sayfalansın), NOTE 5 (büyük tek parça cevapta span × yer tutucu karşılaştırması); r3 NOTE-4 (probe'un hizalanmamış parçalarla `ContextReveal` kullanması yapay; gerçek yolda yazar hizalar, testler hizalı girdi kullanıyor).
 
 **FOLLOWUP-162'ye (r3):** MINOR-r3-7 (araç sonucu ve KB parçasındaki düz `<<PII_n>>` metni ayrılmıyor; koşunun kendi değerine açılabilir, kapsamlar arası sızıntı değil), NOTE-3 (r2 öncesi istemci geçmişi satırları; yalnız dağıtım öncesi veri), NOTE-5 (onay bekleyen koşunun checkpoint'i ölçülmedi; kod okumasıyla ham değer girmez).
@@ -262,11 +303,11 @@ fb7130d üstüne 9 commit; her MAJOR ayrı commit, önce kırmızı test (kırm�
 5. **S9 TTL (r2 güncel):** eşleme son kullanımdan `PII_TOKEN_TTL_S` (1800 s) sonra düşer. Koşunun kendi okuması ve çıkış okuması TTL'i yeniler (r1 MAJOR-1). Sonraki bir koşunun geçmiş okuması yenilemez (MINOR-r2-4). Onay beklerken hiç okunmayan bir koşunun eşlemesi 1800 s sonra düşer; yer tutucu kalır ve loglanır. Onay beklerken TTL uzatma FOLLOWUP adayı olarak duruyor.
 6. **Model çağrısı yarıda düşerse (r2 güncel):** hizalayıcının tuttuğu en çok 15 karakterlik kuyruk `finally` ile canlı akışa yazılır (r1 MINOR-1). Facade düz akışta token deposu düşerse tutulan parça geri çevrilmeden gider (MINOR-r2-3).
 9. **URL satırı, akışta işaretten önceki yer tutucu (r2, KARARLAR metninden dar sapma):** karar "satırdaki hiçbir yer tutucu çözülmez" diyor. Tek parça metinde öyle. Akışta (canlı konsol, facade düz canlı) satırın işaretinden önce gelmiş ve gönderilmiş bir yer tutucu geri alınamaz. Satırı sonuna kadar tutmak canlı akışı satır satır yapardı. Güvenlik amacı korunuyor: her hedef işaretinden sonra başlar, hedefteki yer tutucu her durumda tutulur. `test_08t_r2_placeholder_before_the_marker` iki davranışı da yazılı tutar. Koordinatör farklı isterse satır tamponu tek değişiklik.
-10. **Alt satıra taşan hedef (r2, karara ek):** CommonMark hedefi `](`'dan sonra satır sonuna, HTML tırnaklı öznitelik değeri birden çok satıra yayılabilir. Satır kuralı tek başına `![x](\n<<PII_1>>)` ve `src="…\n<<PII_1>>"` biçimlerini kaçırırdı. Bu yüzden açık kalan hedef sonraki satıra taşınır. Yalnız öznitelik `=`'inden hemen sonra açılan tırnak taşınır; düzyazıdaki kesme işareti (`Ayşe'nin`) taşınmaz (testli).
+10. **Alt satıra taşan hedef (r2, karara ek; r4'te daraldı):** CommonMark hedefi `](`'dan sonra satır sonuna yayılabilir; açık kalan markdown hedefi sonraki satıra taşınır, boş satırla kapanır. r2-r3'teki HTML tırnağı ve öznitelik taşıması r4'te karar A ile kalktı; HTML artık okuyucunun akışı düzeyinde tutulur.
 11. **`i:` alanı olmayan eski eşleme (r2):** dağıtım öncesi yazılmış eşlemede kimlik alanı yok. `rescope` kimliği `PII:<değer>` sayar; yalnız aynı değerin yeni kapsamda ayrı bir yer tutucu alabilmesi demek, değer doğru.
 7. `docs/guardrail.md` `output.stream.delta` satırı: "C17 buffer gerekir" yerine "henüz kural türü yok" (C17 tamponu kural aşaması değil, çıkış sınırı).
 8. C17 bir CONTRACTS kimliği değil (DRIFT-151); bu PR plan/08 kabulünü testle kanıtlar.
-12. **Yeniden bağlanmada durum kurma (r3, KARARLAR ek (d)'nin uygulaması):** karar "yalnız son satırın kuyruğu" diyor. Uygulama `after`'a kadarki **bütün** canlı token girdilerini artımlı taramadan geçirir; tutulan durum yine en çok 8.192 karakter. Neden: önceki satırdan taşınan açık HTML hedefi (`<img src="https://…` + satır sonu) yalnız son satırla kurulamaz, e2 açılırdı (`test_08t_r3_reconnect_inside_an_html_value_from_an_earlier_line`). Maliyet koşunun token metniyle doğrusal (artımlı tarama). Canlı akış süresi dolmuşsa (replay) durum kurulamaz, ilk satır tutulur.
+12. **Yeniden bağlanmada durum kurma (r3, KARARLAR ek (d)/(d′)):** karar "yalnız son satırın kuyruğu" diyor. Uygulama `after`'a kadarki **bütün** canlı token girdilerini artımlı taramadan geçirir; tutulan durum yine en çok 8.192 karakter. Neden (r4 sonrası): HTML durumu (`_html`) ve kayıp durumu (`_lost`) satırdan bağımsız, önceki bir satırda görülmüş olabilir; yalnız son satırla kurulamaz. Maliyet koşunun token metniyle doğrusal. Canlı akış süresi dolmuşsa (replay) durum kurulamaz ve d′ gereği saklanan satırların hepsi tutulur.
 13. **HTML beklenen değer `<` ile başlarsa (r3):** `src=<x` açılı hedef sayılmaz. r4'te HTML kipleri tümden kalktığı için konu kapandı (`<x` cevap düzeyinde HTML).
 14. **Markdown açılı hedefte harf (r4):** `](<a b>)` içindeki `<a` HTML etiketi sayılır ve cevabın kalanı tutulur (fail-closed); açılı hedefin ilk karakteri harf değilse (`](<./a b>)`) yalnız markdown satır kuralı geçerli.
 15. **CSS `url(` (r4):** CSS paren taşıması HTML ile birlikte kalktı; `url(` satır işareti olarak duruyor, CSS ancak HTML içinde (`style`) yüklenir ve o durumda cevap düzeyi kural geçerli.
@@ -277,7 +318,7 @@ fb7130d üstüne 9 commit; her MAJOR ayrı commit, önce kırmızı test (kırm�
 - Geri çevirme yalnız aynı kapsamın (run id ya da `facade-<hex>`) Redis eşlemesiyle; dış agent/model kendi uydurduğu yer tutucuyla başka kapsamın değerine ulaşamaz. Kendi isteğinin yer tutucusunu yankılayan upstream, değeri aynı çağırana geri getirir (docs/api.md'de yazılı).
 - Log: `detokenize_unresolved scope=<id> count=<n>`; değer yok (`test_08t_9_other_scope_placeholder_stays_and_is_logged` logda ad olmadığını doğrular).
 - Kaynak düşürmede `blocked` girdisi parça metni taşımaz (`test_08t_12_blocked_source_dropped_answer_goes_on`).
-- HTML (r4, karar A): bir cevapta ilk HTML etiketinden sonra hiçbir yer tutucu hiçbir okuyucuya açılmaz (tek istisna tam yer tutucu). URL satırı kuralı (r2, r3): şema-iki nokta ya da işaret (`](`, `]:`, `//`, `url(`, `src=`, `href=`, `style=`, `data=`, …) içeren satırdaki ve açık kalan markdown hedefinin sonraki satırlarındaki **hedef içindeki** yer tutucu açılmaz. Tek parça metinde satırın bütün yer tutucuları tutulur; akışta satırın işaretinden ya da cevabın ilk etiketinden önce gönderilmiş yer tutucu geri alınamaz (varsayım 9, inceleyici kabul etti; hedefte değil). Akışta kesik satır fail-closed; yeniden bağlanan okuyucu durumu saklanan girdilerden kurar, kuramazsa cevabın kalanını tutar. Sıfır tıkla dış hosta değer gönderme kanalı inceleyicinin r2 ve r3 yazımlarının hepsinde kapalı (birim, dört okuma biçimi + gerçek LiteLLM entegrasyon).
+- HTML (r4 karar A, r5 (g)/(i)): ilk HTML etiketinden (`<` + harf; tek istisna `<PII_n>>`, öncesine bakılmaz) sonra okuyucunun akışının geri kalanında hiçbir yer tutucu açılmaz; r4 raporunun yedi yazımı ((a) tırnak uyuşmazlığı, (a′), (b) `](` + `<img`, (b′) `<pre>` + boş satır, (c) `<PII_1 style`, (d) `<style>` CSS kaçışları iki biçim, (e) CRLF bölünmesi) bu sınıfla kapalı. URL satırı kuralı (r2, r3): şema-iki nokta ya da işaret (`](`, `]:`, `//`, `url(`, `src=`, `href=`, `style=`, `data=`, …) içeren satırdaki ve açık kalan markdown hedefinin sonraki satırlarındaki **hedef içindeki** yer tutucu açılmaz. Tek parça metinde satırın bütün yer tutucuları tutulur; akışta satırın işaretinden ya da ilk etiketten önce gönderilmiş yer tutucu geri alınamaz (varsayım 9; hedefte değil). Akışta kesik satır fail-closed; yeniden bağlanan okuyucu durumu saklanan girdilerden kurar, kuramazsa akışın kalanını tutar.
 - Geçmiş (r2): sağlayıcıya, state'e, checkpoint'e, `messages`'a ve `guardrail_events`'e geçmişten ham değer girmez. Yeniden tespite güvenilmez (`min_confidence` 0,8 uçtan uca testi). Bir kapsamın sayacı içeri taşınan her numaranın üstünden başlar, bayat yer tutucu yeni değere çözülmez (S9).
 
 ## Kalan riskler
