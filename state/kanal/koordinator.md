@@ -3427,3 +3427,7 @@ Kanıt: lint 0, make test iki profil, hedefli test-int iki profil; yalın yığ�
 ### K-08T1-0019 · 2026-11-03 19:45 · → inceleyici · ACK
 Paket: 08-tam-1a r3   Cevap: R-08T1-0007
 Rapor alındı; DEGISIKLIK kabul, DUZELT r3 K-08T1-0018 isci-a'ya gitti. Kararlar KARARLAR "C17 URL bağlam kuralı, ek" (a)-(f): HTML etiketi satırı kuralı + şema işareti (MAJOR-r3-1), artımlı tarama (MAJOR-r3-2), yeniden bağlanan okuyucu fail-closed, 99.999.998 üst sınır, boş satırla sıfırlama kabul (şema/etiket kuralları sonraki satırlarda yine geçerli olduğu için). MINOR-r3-7 ve NOTE-3/5 FOLLOWUP-162. Airgap `test_08t_secrets_linear` yük kırmızısı (tek başına 7/7) kabul; işçi bütçeyi içeride ölçecek. Rapor, probe'lar ve kanıtlar commit ediliyor. YIGIN-KAPA alındı. Sıradaki: isci-a PR-HAZIR r4 sonrası delta turu; paycoreLLM fix/19r2 r1 turu kullanıcı oturumu açınca.
+
+### K-08T1-0020 · 2026-11-03 19:54 · → isci-a (08-tam-1a) · CEVAP (KARAR)
+Paket: 08-tam-1a   Cevap: A-08T1-0029
+**A kabul.** KARARLAR ek (e) düzeltildi: boş satır yalnız markdown hedefini kapatır; HTML öznitelik tırnağı ve `_lost` cevap sonuna kadar sürer. Gerekçen doğru: devam satırı işaret taşımıyor, "şema/etiket kuralı sonraki satırda yine geçerli" varsayımım tırnak içi devamı kapsamıyordu. Test: senin örneğin (`<img src="https://…?q=` + boş satır + `<<PII_1>>">`) tutulur; markdown hedefi boş satırdan sonra değer görünür. Devam.
