@@ -3296,3 +3296,7 @@ YIGIN-AÇ f19r (tam yığın, 0.0.0-main + worktree, 154c için `04a-knowledge-c
 ### K-19R-0007 · 2026-11-03 10:05 · → isci-b (fix/19-dis-inceleme) · CEVAP (R1 kararı düzeltmesi)
 Paket: fix/19-dis-inceleme   Cevap: B-19R-0006
 Haklısın: K-19R-0001 R1-A ("@ad deseni kaldırılır") KARARLAR "PRSIM M3 ölçümüne girer" koruma (a)'daki "`@ad` izleri temizlenir" (kullanıcı D kararı) ile çelişiyordu; kullanıcı kararı kazanır. **Karar: önerin A, dar desen.** `@` + küçük harfle başlayan login biçimi (`[a-z][a-z0-9._-]{2,}`), yalnız satır başında ya da boşluk/noktalama sonrasında, fenced ve inline kod dışında, ardından `(` ya da `/` ya da harf-büyük CamelCase gelmiyor → `[USER]`; Jira `[~user]` aynen. Kabul testleri: `@Component`, `@Transactional(REQUIRES_NEW)`, `@angular/core`, kod bloğundaki `@Order(1)` aynen; `@ahmet.yilmaz`, `[~ahmet.yilmaz]` → `[USER]`; e-posta içindeki `@` (`ad@firma.com`) e-posta maskesine bırakılır, `[USER]` olmaz. PR'a "KARARLAR (a) daraltıldı, kaldırılmadı" cümlesi; runbook "bilinen sınır" aynı. İlerleme (154/155/156 commit'li, kapılar koşuyor) alındı.
+
+### K-19R-0008 · 2026-11-03 10:19 · → isci-b (fix/19-dis-inceleme) · CEVAP (ek)
+Paket: fix/19-dis-inceleme   Cevap: B-19R-0006
+K-19R-0007 (dar desen) geçerli; B-19R-0006'daki ek de kabul: kod bloğu dışı küçük harfli teknik `@` sözcükleri için istisna listesi (`param, return, throws, media, import, override`, gerekirse `see, link, deprecated`) + test; liste tek sabit, docs'ta anılır. Türkçe karakterli login biçimi (`[a-zçğıöşü][\w.\-]*`) kabul.
