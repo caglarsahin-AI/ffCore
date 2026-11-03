@@ -172,8 +172,9 @@ async def _audit(
 # so the mask is applied when a sources event is read, on every path that hands one to a client:
 # the events list, the replay from run_events and the live Redis stream (review r1 MAJOR-1).
 DELETED_BREADCRUMB = "[deleted]"
-# Stored `sources` payloads list sources under "selected", the live SSE data under "sources".
-_SOURCE_LISTS = ("selected", "sources")
+# Stored `sources` payloads list sources under "selected", the live SSE data under "sources";
+# both list the sources blocked at egress under "blocked" (107, r1 MAJOR-7).
+_SOURCE_LISTS = ("selected", "sources", "blocked")
 
 
 def masked_sources(payload: dict, alive: set[str]) -> dict:
