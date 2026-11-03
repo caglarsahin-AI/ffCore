@@ -1691,3 +1691,18 @@ Paket: 08-tam-1a r4 (delta)   Cevap: K-08T1-0022
 - Koşular: make test 1382/1382 ×2; tam yığın test-int llmaas 848 passed 5 skipped, airgap 846 passed 7 skipped; 06b-2 138/138 ×2; r2+r3+r4 entegrasyon probe'ları 13/13; lint NOT_RUN (işçi kanıtı).
 - Dosyalar commit edilmedi: rapor, 08-tam-1a-r4-probe.py, -int-probe.py, -adv-probe.py, evidence 08t1a-r4-*, kanal. Worktree temiz kaldırıldı.
 - 2026-11-03 21:09 YIGIN-KAPA review-08t1a (r4): down -v; kalan konteyner 0, volume 0.
+
+### R-08T1-0010 · 2026-11-03 21:45 · → koordinator · ACK
+Paket: 08-tam-1a r5 (delta)   Cevap: K-08T1-0026
+REVIEW-ISTEK r5 alındı. SHA doğrulandı: 60f2250caf8fa089abb0ee476b7a0325394d3c44 (4aecdbc üstüne 5 commit, 14 dosya +282/-188, state/ 0). KARARLAR "C17 geri çevirme: cevap düzeyinde HTML fail-closed" (+ d′, f′) okundu. Worktree .worktrees/review-08t1a-r5 (temiz). Delta + adversarial (markdown/CRLF) + probe yeniden koşusu başlıyor.
+- 2026-11-03 21:45 YIGIN-AC review-08t1a (r5; 18290/13290, COMPOSE_PROJECT_NAME=review08t1a, FFCORE_VERSION=0.0.0-review-08t1a, kod 60f2250 worktree, `--profile test --profile qdrant`). Açık başka FF yığını yok. Boş disk 92G.
+
+### R-08T1-0011 · 2026-11-03 22:27 · → koordinator · REVIEW-SONUC
+Paket: 08-tam-1a r5 (delta)   Cevap: K-08T1-0026
+**DEGISIKLIK** (60f2250caf8fa089abb0ee476b7a0325394d3c44). BLOCKER 0, MAJOR 1, MINOR 4, NOTE 7. Rapor state/reviews/08-tam-1a-r5.md (güvenlik turu ayrı bölüm).
+- Kapandı: karar A (r1-r4 bütün yazımlar + r4'ün 7 atlatması + bu turun markdown/CRLF listesi tutuldu; facade düz uçtan uca 11 yazım temiz; adversarial okumada sıfır tık yol yok), MINOR-r4-1 (on_error=allow + aralık → 400, sağlayıcı çağrılmadı), f′ (99.999.999 konuşmada sorun değil), d′/MINOR-r4-6 (hazırlık hatası cevap sonuna kadar), MINOR-r4-4. Varsayım 14/15 KABUL. Performans gerilemesi yok (100 bin/1'lik 0,34-0,42 s).
+- MAJOR-r5-1 (gerileme, c22894a): _HTML_TAG istisnası `(?<=<<)` önceki karaktere bakıyor; 32 karakterlik kuyruk bir yer tutucunun iki `<`'i arasından kesilince `<PII_1>>` etiket sayılıyor, cevabın kalanı tutuluyor. Canlı akışta sahip değerleri göremiyor: rastgele 1-6 karakterlik girdilerde 97/200 cevap değer kaybetti. Düzeltme tek satır: `<(?!PII_\d{1,8}>>)[a-z]`.
+- MINOR: taşınan <<PII_99999998>> kapsamı tüketiyor (konuşma yine kalıcı düşüyor; Unicode rakam da 99999999 istisnasını atlatıyor) — eşik önerisi, karar; HTML kuralının bedeli konsola da düşüyor (`<br>`, `List<String>`, `<your-email>`) ve kapsam okuyucunun akışı, docs yanlış — (a) docs önerim, (b) konsol muafiyeti, karar; bayat test/PR metni; küçük docs sapmaları (C4 evaluate 400).
+- Koşular: make test airgap 1505/1505, llmaas 1503 + 2 zaman bütçesi kırmızısı (yük; dosya tek başına 3×6/6); tam yığın test-int llmaas 849 passed, airgap 847 passed; 06b-2 138/138 ×2; entegrasyon probe'ları 15/15; lint NOT_RUN (işçi kanıtı).
+- Dosyalar commit edilmedi: rapor, 08-tam-1a-r5-probe.py, -tail-probe.py, -int-probe.py, evidence 08t1a-r5-*, kanal. Worktree temiz kaldırıldı.
+- 2026-11-03 22:27 YIGIN-KAPA review-08t1a (r5): down -v; kalan konteyner 0, volume 0.

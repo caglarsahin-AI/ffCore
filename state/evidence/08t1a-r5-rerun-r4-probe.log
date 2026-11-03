@@ -1,0 +1,62 @@
+SHAPE src NL =: one=kept stream1=kept stream7=kept stream50=kept live=kept
+SHAPE src NL = NL: one=kept stream1=kept stream7=kept stream50=kept live=kept
+SHAPE style url http:: one=kept stream1=kept stream7=kept stream50=kept live=kept
+SHAPE object data http:: one=kept stream1=kept stream7=kept stream50=kept live=kept
+SHAPE a NL href: one=kept stream1=kept stream7=kept stream50=kept live=kept
+SHAPE svg image href: one=kept stream1=kept stream7=kept stream50=kept live=kept
+SHAPE url( 'http:' ): one=kept stream1=kept stream7=kept stream50=kept live=kept
+SHAPE IMG SRC upper: one=kept stream1=kept stream7=kept stream50=kept live=kept
+SHAPE entity colon attr: one=kept stream1=kept stream7=kept stream50=kept live=kept
+SHAPE entity colon md: one=kept stream1=kept stream7=kept stream50=kept live=kept
+SHAPE tag over 3 lines: one=kept stream1=kept stream7=kept stream50=kept live=kept
+SHAPE tag value after blank: one=kept stream1=kept stream7=kept stream50=kept live=kept
+SHAPE unquoted after NL in tag: one=kept stream1=kept stream7=kept stream50=kept live=kept
+SHAPE css block: one=kept stream1=kept stream7=kept stream50=kept live=kept
+SHAPE srcdoc: one=kept stream1=kept stream7=kept stream50=kept live=kept
+SHAPE md autolink scheme: one=kept stream1=kept stream7=kept stream50=kept live=kept
+SHAPE md ref def angle: one=kept stream1=kept stream7=kept stream50=kept live=kept
+SHAPE md ( NL NL value (not a link): one=REVEALED stream1=REVEALED stream7=REVEALED stream50=REVEALED live=REVEALED
+SHAPE md ( NL value: one=kept stream1=kept stream7=kept stream50=kept live=kept
+SHAPE plain: one=REVEALED stream1=REVEALED stream7=REVEALED stream50=REVEALED live=REVEALED
+SHAPE plain after closed tag line: one=kept stream1=kept stream7=kept stream50=kept live=kept
+SHAPE math a<b same line: one=kept stream1=kept stream7=kept stream50=kept live=kept
+SHAPE prose data: same line: one=kept stream1=kept stream7=kept stream50=kept live=kept
+SHAPE after unclosed HTML quote, 3 lines later: one=kept stream1=kept stream7=kept stream50=kept live=kept
+SHAPE after md target + blank: one=REVEALED stream1=REVEALED stream7=REVEALED stream50=REVEALED live=REVEALED
+RESUME r3 MINOR-r3-1 (md target split, reconnect): kept
+RESUME owner after approval, new line: REVEALED
+RESUME owner after approval, same plain line: REVEALED
+RESUME HTML value opened two lines earlier: kept
+RESUME after id not in stream (fail-closed): kept
+PRIME cost 2000 token entries: 0.016 s
+PRIME cost 20000 token entries: 0.284 s
+PERF StreamDetokenizer one line, no marker 100000 chars, 1-char chunks: 0.42 s
+PERF ContextReveal one line, no marker 100000 chars, 1-char chunks: 0.34 s
+PERF StreamDetokenizer one line, no marker 64000 chars, 4-char chunks: 0.10 s
+PERF ContextReveal one line, no marker 64000 chars, 4-char chunks: 0.08 s
+PERF StreamDetokenizer one line, marker at start 100000 chars, 1-char chunks: 0.27 s
+PERF ContextReveal one line, marker at start 100000 chars, 1-char chunks: 0.24 s
+PERF ContextReveal every line has a tag 362000 chars, 4-char chunks: 0.10 s
+PERF ContextReveal every piece ends with an attribute name 162000 chars, 4-char chunks: 0.23 s
+PERF ContextReveal plain prose 122000 chars: 0.19 s
+BOUND reserve 99999997 -> next <<PII_99999998>>
+Traceback (most recent call last):
+  File "/tmp/p-r4-probe.py", line 195, in <module>
+    asyncio.run(main())
+  File "/usr/local/lib/python3.12/asyncio/runners.py", line 195, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 691, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/tmp/p-r4-probe.py", line 192, in main
+    await bounds()
+  File "/tmp/p-r4-probe.py", line 165, in bounds
+    print("BOUND then", await store.token_for(scope, "EMAIL:b@example.test", "b@example.test"))
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/ffcore/guardrails/masking.py", line 184, in token_for
+    raise PlaceholderOutOfRange() from None
+ffcore.guardrails.masking.PlaceholderOutOfRange: The placeholder numbers of this run or request are used up (at most 99999998).

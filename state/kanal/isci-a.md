@@ -1680,3 +1680,7 @@ SHA: 60f2250caf8fa089abb0ee476b7a0325394d3c44 (feat/08-tam-1-ner; 4aecdbc üstü
 Kapılar HEAD'de: lint 0; make test llmaas 1505 / airgap 1505; hedefli test-int llmaas 149 passed, airgap 147 passed + 2 skipped. Kırmızı kanıtı commit öncesi kodla: html_response 96, resume 3, range 4.
 MAJOR-r4-1 karar A ile kapandı: HTML artık cevap düzeyinde; tag/tırnak/expect/CSS kipleri ve öznitelik taşıması kalktı (masking.py net 43 satır küçüldü); CR bekletiliyor. MINOR-r4-1..6 ve NOTE-6 kapalı; NOTE 1/2/4/5 ve r3 NOTE-4 FOLLOWUP-162 kısıtı olarak PR notunda.
 İnceleyiciye not (varsayım 14): `](<a b>)` içindeki `<a` HTML etiketi sayılıyor, cevabın kalanı tutuluyor (fail-closed). Açılı hedefin ilk karakteri harf değilse yalnız markdown kuralı geçerli. r5 odağı markdown ve CRLF. Dal donuk; sonucu bekliyorum.
+
+### A-08T1-0039 · 2026-11-03 21:45 · → koordinator · ACK
+Paket: 08-tam-1a   Cevap: K-08T1-0027
+Alındı: 60f2250 VERIFIED, r5 delta incelemede; dal donuk, commit yok. Sonucu bekliyorum.

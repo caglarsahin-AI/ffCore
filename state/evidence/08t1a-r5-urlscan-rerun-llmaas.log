@@ -1,0 +1,9 @@
+0.40s call     tests/unit/test_08t_r3_url_scan.py::test_08t_r3_long_line_in_one_character_pieces[StreamDetokenizer]
+0.34s call     tests/unit/test_08t_r3_url_scan.py::test_08t_r3_long_line_in_one_character_pieces[ContextReveal]
+6 passed in 1.55s
+0.40s call     tests/unit/test_08t_r3_url_scan.py::test_08t_r3_long_line_in_one_character_pieces[StreamDetokenizer]
+0.36s call     tests/unit/test_08t_r3_url_scan.py::test_08t_r3_long_line_in_one_character_pieces[ContextReveal]
+6 passed in 1.65s
+0.42s call     tests/unit/test_08t_r3_url_scan.py::test_08t_r3_long_line_in_one_character_pieces[StreamDetokenizer]
+0.33s call     tests/unit/test_08t_r3_url_scan.py::test_08t_r3_long_line_in_one_character_pieces[ContextReveal]
+6 passed in 1.53s

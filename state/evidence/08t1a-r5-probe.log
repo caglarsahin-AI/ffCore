@@ -1,0 +1,34 @@
+MD CR only line ending, ]( then value: one=kept stream1=kept stream4=kept stream7=kept stream50=kept
+MD CR at piece end, LF next: one=kept stream1=kept stream4=kept stream7=kept stream50=kept live-pieces=kept
+MD CRLF split, entity value: one=kept stream1=kept stream4=kept stream7=kept stream50=kept live-pieces=kept
+MD CR CR (blank) then value: one=REVEALED stream1=kept stream4=REVEALED stream7=kept stream50=REVEALED live-pieces=kept
+MD ref def 3 spaces: one=kept stream1=kept stream4=kept stream7=kept stream50=kept
+MD ref def upper label: one=kept stream1=kept stream4=kept stream7=kept stream50=kept
+MD ref def value next line //: one=kept stream1=kept stream4=kept stream7=kept stream50=kept
+MD ref def value next line backslashes: one=kept stream1=kept stream4=kept stream7=kept stream50=kept
+MD md ( NL backslashes: one=kept stream1=kept stream4=kept stream7=kept stream50=kept
+MD md ( backslashes same line: one=kept stream1=kept stream4=kept stream7=kept stream50=kept
+MD angle dest multi-line: one=kept stream1=kept stream4=kept stream7=kept stream50=kept
+MD angle dest letter (assumption 14): one=kept stream1=kept stream4=kept stream7=kept stream50=kept
+MD angle dest dot (assumption 14): one=kept stream1=kept stream4=kept stream7=kept stream50=kept
+MD autolink: one=kept stream1=kept stream4=kept stream7=kept stream50=kept
+MD ref def angle //: one=kept stream1=kept stream4=kept stream7=kept stream50=kept
+MD ref def angle no scheme: one=kept stream1=kept stream4=kept stream7=kept stream50=kept
+MD md ( NL NL value (not a link): one=REVEALED stream1=REVEALED stream4=REVEALED stream7=REVEALED stream50=REVEALED
+MD blockquote ref def: one=kept stream1=kept stream4=kept stream7=kept stream50=kept
+MD list item ref def next line: one=kept stream1=kept stream4=kept stream7=kept stream50=kept
+MD plain: one=REVEALED stream1=REVEALED stream4=REVEALED stream7=REVEALED stream50=REVEALED
+MD a<b prose (trade-off): one=kept stream1=kept stream4=kept stream7=kept stream50=kept
+TAIL 1-char pieces: stream reveals 1/2, live reveals 0/2
+TAIL 2-char pieces: stream reveals 1/2, live reveals 0/2
+TAIL 3-char pieces: stream reveals 2/2, live reveals 0/2
+TAIL 4-char pieces: stream reveals 2/2, live reveals 0/2
+TAIL 5-char pieces: stream reveals 2/2, live reveals 0/2
+TAIL 7-char pieces: stream reveals 2/2, live reveals 1/2
+TAIL 11-char pieces: stream reveals 2/2, live reveals 2/2
+RESUME failed rebuild: line2 kept line3 kept
+BOUND carried <<PII_99999997>>: ['<<PII_99999998>>', 'PlaceholderOutOfRange']
+BOUND carried <<PII_99999998>>: ['PlaceholderOutOfRange']
+BOUND carried <<PII_99999999>>: ['<<PII_1>>', '<<PII_2>>', '<<PII_3>>']
+BOUND carried <<PII_100000000>>: ['<<PII_1>>', '<<PII_2>>', '<<PII_3>>']
+BOUND reveal 99999999 / 99999998 -> 'A <<PII_99999999>> B y@example.test'
