@@ -300,6 +300,11 @@ def log_unresolved(scope: str, count: int) -> None:
         log.warning("detokenize_unresolved scope=%s count=%d", scope, count)
 
 
+def placeholder_numbers(text: str) -> list[int]:
+    """The numbers of the placeholders in `text` (`<<PII_7>>` → 7)."""
+    return [int(m.group(0)[6:-2]) for m in PLACEHOLDER.finditer(text)]
+
+
 def count_placeholders(data: Any) -> int:
     """How many placeholders the strings of `data` carry (no lookup, no value)."""
     if isinstance(data, str):

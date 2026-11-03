@@ -183,6 +183,9 @@ async def start(request: Request, caller: FacadeCaller, target, body, settings, 
             if earlier:
                 # S3: the client's history leaves with the run's prompt. Its checks share the
                 # run's token scope; the events are written without a run (it does not exist yet).
+                # The rows keep the checked text before egress (r1 MAJOR-2): they have no run, so
+                # a placeholder stored here could not be reversed in its own scope later; the
+                # graph's egress tokenizes the history on every model call (BLOCKERS 134).
                 guard = await FacadeGuard.load(
                     session,
                     redis,
@@ -194,7 +197,8 @@ async def start(request: Request, caller: FacadeCaller, target, body, settings, 
                     text = message_text(m)
                     if m["role"] == "user":
                         text = await guard.text("input.pre", text)
-                    history.append((m["role"], await guard.text("egress", text)))
+                    await guard.text("egress", text)  # a block stops the request here
+                    history.append((m["role"], text))
             if conversation_id:
                 conversation = await _conversation(session, caller, agent, conversation_id)
             else:

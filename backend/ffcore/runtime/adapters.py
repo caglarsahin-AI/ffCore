@@ -31,7 +31,12 @@ from ffcore.core.config import Settings
 from ffcore.core.egress import EgressTimeout, SafeOutboundClient
 from ffcore.core.errors import ApiError
 from ffcore.guardrails import engine
-from ffcore.guardrails.masking import RedisTokenStore
+from ffcore.guardrails.masking import (
+    RedisTokenStore,
+    TokenStore,
+    detokenize,
+    placeholder_numbers,
+)
 from ffcore.guardrails.service import record_events, resolve_policy
 from ffcore.guardrails.settings import get_guardrail_settings
 from ffcore.knowledge.chunking import approx_tokens
@@ -558,7 +563,14 @@ def _function(name: str, description: str, properties: dict, required: list[str]
     }
 
 
-async def _history(session: AsyncSession, conversation_id, run_id) -> list[dict[str, str]]:
+async def _history(
+    session: AsyncSession, conversation_id, run_id, store: TokenStore | None = None
+) -> list[dict[str, str]]:
+    """The conversation before this run. An earlier run's answer carries that run's placeholders:
+    they are reversed in that run's scope (egress tokenizes the values again in this run's scope
+    before the model sees them); one whose mapping is gone stays, and this run's counter starts
+    after it, so it never becomes one of this run's values (r1 MAJOR-2, KARARLAR "Yer tutucu
+    sayacı ve konuşma geçmişi")."""
     if conversation_id is None:
         return []
     rows = await session.scalars(
@@ -567,7 +579,20 @@ async def _history(session: AsyncSession, conversation_id, run_id) -> list[dict[
         .order_by(Message.created_at)
     )
     # This run's own user message is the question, not history.
-    return [{"role": m.role, "content": m.content} for m in rows.all() if m.run_id != run_id]
+    history = []
+    carried = 0
+    for m in rows.all():
+        if m.run_id == run_id:
+            continue
+        content = m.content
+        if store is not None and "<<PII_" in content:
+            if m.run_id is not None:
+                content, _ = await detokenize(content, store=store, scope=str(m.run_id))
+            carried = max([carried, *placeholder_numbers(content)])
+        history.append({"role": m.role, "content": content})
+    if store is not None and carried:
+        await store.reserve(str(run_id), carried)
+    return history
 
 
 def _platform_rules(prompts, definition: AgentDefinition) -> str:
@@ -640,7 +665,12 @@ def context_factory(
             guard=guard,
             boundary=boundary,
             system=system_parts(_platform_rules(prompts, definition), instructions),
-            history=await _history(session, run.conversation_id, run.id),
+            history=await _history(
+                session,
+                run.conversation_id,
+                run.id,
+                RedisTokenStore(redis, guardrail.pii_token_ttl_s),
+            ),
             stream_live=guard.streams_live,
             approvals=RunApprovalGate(session, settings, project_id=run.project_id, run_id=run.id),
         )
