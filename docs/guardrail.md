@@ -57,7 +57,7 @@ Two entities, both per project:
 | Type | Finds | Action |
 |---|---|---|
 | `pii` | categories enabled in the referenced PII policy (`pii_policy_key`) | the rule's action; without one, each category's action, else the PII policy's default action |
-| `secrets` | vendor keys (`sk-`, AWS, GitHub, Slack), JSON web tokens, private key blocks, connection strings with a password, values after a password keyword, high-entropy tokens (≥ 24 characters, ≥ 3.5 bits per character; UUIDs excluded, and names made of plain words and numbers such as `SZL-2025-003_temizlik-hizmet`: every `-`/`_` segment is digits, a word (case-normalized: at least 30 % vowels, no run of 3 consonants), a short tag (`v2`, `q3`, `kdv`) or an upper-case code of 2-6 letters directly before a number (`PRSIM-1234`); one other segment, or more than 15 tag and code letters in three or more segments, keeps the value under the check), hex strings of 32+ characters with letters and digits; tokens of 13-23 characters only when a credential word names them (`API_KEY=`, `Authorization: Bearer`, `token:`, `client_secret=`, `the secret is`, `anahtarı:`), with the same exemptions (see "Short tokens") | required |
+| `secrets` | vendor keys (`sk-`, AWS, GitHub, Slack), JSON web tokens, private key blocks, connection strings with a password, values after a password keyword, high-entropy tokens (≥ 24 characters, ≥ 3.5 bits per character; UUIDs excluded, and names made of plain words and numbers such as `SZL-2025-003_temizlik-hizmet`: every `-`/`_` segment is digits, a word (case-normalized: at least 30 % vowels, no run of 3 consonants), a short tag (`v2`, `q3`, `kdv`) or an upper-case code of 2-6 letters directly before a number (`PRSIM-1234`); one other segment, or more than 15 tag and code letters in three or more segments, keeps the value under the check), hex strings of 32+ characters with letters and digits; tokens of 13-23 characters only when a credential word names them (`API_KEY=`, `Authorization: Bearer`, `token:`, `client_secret=`, `the secret is`, `erişim anahtarı:`), with the same exemptions (see "Short tokens") | required |
 | `tool_args` | regex `patterns` in the arguments of `tools` (`<tool_key>.<action>`, wildcards allowed); `args` limits the search to named arguments of a JSON object | `block`, `warn` or `log`; only at `tool.pre` |
 
 `injection`, `topic`, `output_format` and `banned_words` are refused with
@@ -67,14 +67,14 @@ category_unsupported`. Nothing that looks enabled is silently ignored.
 
 ### Short tokens (FOLLOWUP-106)
 
-Below 24 characters entropy does not separate a key from a code or a name, so a short token is a finding only when a credential word stands right before it (`api_key`, `access_key`, `client_secret`, `secret_key`, `secret`, `token`, `authorization`, `bearer`, `anahtar`; then an optional `:`/`=`/`is`, quotes and `Bearer`/`Basic`). Digits only, a single word and plain identifiers (as above) stay exempt. Measured with random values in nine credential phrasings (seed 106, 2,000 per shape; `tests/unit/test_08t_secrets_short.py`):
+Below 24 characters entropy does not separate a key from a code or a name, so a short token is a finding only when a credential word stands right before it (`api_key`, `access_key`, `client_secret`, `secret_key`, `secret`, `token`, `authorization`, `bearer`, and `anahtar` only as `erişim/API/gizli anahtar(ı)`, since "anahtar teslim" is an idiom; then an optional `:`/`=`/`is`, quotes and `Bearer`/`Basic`). Digits only, a single word, plain identifiers (as above), camelCase/PascalCase names of whole humps (`getAccessToken`, `BearerTokenRequired`) and ticket ids (letters then 6+ digits, `INC0012345678`) stay exempt. The patterns are linear in the input (one way to match whitespace; 200,000 spaces after a credential word finish well under a second). Measured with random values in nine credential phrasings (seed 106, 2,000 per shape; `tests/unit/test_08t_secrets_short.py`):
 
 | Shape (13-23 characters) | With a credential word | Same values without one |
 |---|---|---|
 | upper case 2x6 (`ABCDEF_GHIJKL`) | 95.2 % | 0 / 200 |
 | upper case 3x6 | 99.0 % | 0 / 200 |
 | upper case 16 | 99.1 % | 0 / 200 |
-| mixed case and digits 14 | 100 % | 0 / 200 |
+| mixed case and digits 14 | 99.95 % | 0 / 200 |
 | upper case and digits 20 | 100 % | 0 / 200 |
 
 Upper case 2x6 stays near 95 %: about one random pair of six letters in twenty reads as two words and keeps the plain-identifier exemption, which document names and codes need. Without a credential word nothing changed (08 r3: 0 % for these shapes).

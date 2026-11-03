@@ -52,8 +52,15 @@ _TOKEN = re.compile(r"[A-Za-z0-9_\-+/=]{" + str(ENTROPY_MIN_CHARS) + ",}")
 SHORT_TOKEN_MIN_CHARS = 13
 _CREDENTIAL_WORD = (
     r"api[_-]?key|access[_-]?key|client[_-]?secret|secret[_-]?key|secret|token|authorization"
-    r"|bearer|anahtar(?:ı|i)?"
+    # "anahtar" alone is too common ("anahtar teslim"): only its credential compounds count
+    # (r1 MAJOR-5).
+    r"|bearer|(?:erişim|erisim|api|gizli)\s+anahtar(?:ı|i)?"
 )
+# Values that are names, not secrets (r1 MAJOR-5): a camelCase or PascalCase name of whole
+# humps (`getAccessToken`, `BearerTokenRequired`, `TeslimProjeleri`) and a ticket id (letters
+# then digits, `INC0012345678`).
+_CODE_NAME = re.compile(r"(?:[a-z]{2,}|[A-Z][a-z]{2,})(?:[A-Z][a-z]{2,})+")
+_TICKET_ID = re.compile(r"[A-Z]{2,6}\d{6,}")
 _SHORT_TOKEN = re.compile(
     # One `\s*` inside the optional separator group, one after it: whitespace has a single way
     # to match, so a word followed by many spaces is linear (r1 MAJOR-4: two `\s*` around an
@@ -158,7 +165,13 @@ def find_secrets(text: str) -> list[Finding]:
             )
     for m in _SHORT_TOKEN.finditer(text):
         value = m.group("value")
-        if value.isdigit() or _is_word(value) or is_plain_identifier(value):
+        if (
+            value.isdigit()
+            or _is_word(value)
+            or is_plain_identifier(value)
+            or _CODE_NAME.fullmatch(value)
+            or _TICKET_ID.fullmatch(value)
+        ):
             continue
         start, end = m.span("value")
         word = m.group("word").lower()

@@ -91,3 +91,34 @@ def test_08t_11_finding_covers_the_value_only():
     assert text[finding.start : finding.end] == "QWERTYUIOPASDF"
     assert "credential word" in finding.evidence
     assert "QWERTYUIOPASDF" not in finding.evidence
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        # r1 MAJOR-5: the reviewer's five false positives (the secrets rule blocks)
+        "token = getAccessToken() neden null?",
+        "anahtar TeslimProjeleri kapsamında",  # "anahtar teslim" is a Turkish idiom
+        "token: INC0012345678",  # a ticket id: a word and digits
+        "secret = loadSecretValue(x)",
+        "Authorization: BearerTokenRequired",
+        # the same shapes once more
+        "anahtar TeslimEdilenIsler listesi",
+        "access_key: getAccessKeyFromVault",
+        "ticket token: REQ0004567891",
+    ],
+)
+def test_08t_m5_code_names_and_ticket_ids_are_not_tokens(text):
+    assert not _caught(text), text
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "erişim anahtarı: QWERTYUIOPASDF",
+        "API anahtarı = ZXCVBNMASDFGHJ",
+        "gizli anahtar QWERTYUIOPASDF",
+    ],
+)
+def test_08t_m5_anahtar_counts_in_its_compound_forms(text):
+    assert _caught(text), text
