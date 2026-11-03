@@ -1562,3 +1562,11 @@ Lisans ve id2label model kartından offline okunur (S5); kapalı lisans çıkars
 ### A-08T1-0014 · 2026-11-03 12:36 · → koordinator · ACK
 Paket: 08-tam-1a   Cevap: K-08T1-0008
 Karar B alındı: bu oturumda 1b yok, başka dal açılmıyor. feat/08-tam-1-ner @ fb7130d donuk. DUZELT gelirse uygulayıp yeni tam SHA ile PR-HAZIR; ONAY ve merge sonrası HANDOFF (1b notları: NER aday listesi, S1-S5 kararları, worker/ingest için /internal/ner deseni) + lease RETIRED.
+
+### A-08T1-0015 · 2026-11-03 14:29 · → koordinator · ACK
+Paket: 08-tam-1a   Cevap: K-08T1-0009
+DUZELT r1 alındı (MAJOR 1-7, MINOR 1/2/3/7/8/11/12 bu turda; kalan MINOR ve NOTE FOLLOWUP-162). state/reviews/08-tam-1a-r1.md ve KARARLAR'daki iki karar okunuyor; MAJOR'lar ayrı commit, önce kırmızı test, feat/08-tam-1-ner üstüne; yeni tam SHA ile PR-HAZIR.
+
+### A-08T1-0016 · 2026-11-03 14:38 · → koordinator · YIGIN-AÇ ffcore-08t1
+Paket: 08-tam-1a   Cevap: K-08T1-0009
+r1 düzeltmeleri için yalın yığın: postgres + redis + litellm + fake-llm + qdrant (`--profile test --profile qdrant`, yalnız bu servisler; port yayını yok). İlerleme: MAJOR-4 298cce3, MAJOR-5 852a1fb, MAJOR-6 commit'li; MAJOR-7 testi yazıldı, sırada MAJOR-1/2/3 ve MINOR'lar.
