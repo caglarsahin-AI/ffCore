@@ -305,6 +305,7 @@ async def complete(
         async with db.session_scope() as session:
             # No definition, so no policy key of its own: the project's default policy.
             guard = await FacadeGuard.load(session, redis, caller.project_id)
+            await guard.reserve_carried(messages)
             outgoing = []
             for m in messages:
                 text = message_text(m)

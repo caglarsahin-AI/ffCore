@@ -19,6 +19,7 @@ from ffcore.guardrails.masking import (
     log_skipped_policy,
     log_skipped_url,
     log_unresolved,
+    reserve_carried,
     reveal_text,
 )
 from ffcore.guardrails.service import record_events, resolve_policy
@@ -122,6 +123,11 @@ class FacadeGuard:
     def _token_store(self) -> RedisTokenStore:
         return RedisTokenStore(self.redis, get_guardrail_settings().pii_token_ttl_s)
 
+    async def reserve_carried(self, data: Any) -> None:
+        """Before the scope's first check: its counter passes every placeholder number the
+        request carries in (r2 MAJOR-r2-2), so none of them becomes one of its values."""
+        await reserve_carried(self._token_store(), self.scope, data)
+
     async def reveal(self, text: str, *, json_escape: bool = False) -> str:
         """C17: the request's placeholders back to their values, at the exit to the caller who
         made the request (S8). A placeholder the scope never issued stays as it is and is logged
@@ -200,6 +206,7 @@ def message_text(message: dict) -> str:
 async def guard_messages(guard: FacadeGuard, messages: list[dict]) -> list[dict]:
     """`input.pre` on the client's own text, then `egress` on every text field that leaves:
     content, `name`, `tool_call_id` and earlier tool calls (review r1 MAJOR-1)."""
+    await guard.reserve_carried(messages)
     out = []
     for message in messages:
         message = dict(message)

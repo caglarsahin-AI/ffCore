@@ -39,6 +39,11 @@ class TokenStore(Protocol):
 
     async def lookup(self, scope: str, token: str) -> str | None: ...
 
+    async def entry(self, scope: str, token: str) -> tuple[str, str] | None:
+        """(value, identity) of a placeholder, without renewing the mapping's lifetime (r2
+        MINOR-r2-4: reading a conversation's history does not keep earlier runs' values)."""
+        ...
+
     async def reserve(self, scope: str, number: int) -> None:
         """The scope's next placeholder number is above `number` (08-tam-1a r1 MAJOR-2: a
         placeholder carried over from an earlier scope never becomes a new value's)."""
@@ -66,10 +71,17 @@ class MemoryTokenStore:
             token = f"<<PII_{self._counters[scope]}>>"
             mapping["k:" + key] = token
             mapping["t:" + token] = value
+            mapping["i:" + token] = key
         return mapping["k:" + key]
 
     async def lookup(self, scope: str, token: str) -> str | None:
         return self._scopes.get(scope, {}).get("t:" + token)
+
+    async def entry(self, scope: str, token: str) -> tuple[str, str] | None:
+        mapping = self._scopes.get(scope, {})
+        if "t:" + token not in mapping:
+            return None
+        return mapping["t:" + token], mapping["i:" + token]
 
     async def reserve(self, scope: str, number: int) -> None:
         self._counters[scope] = max(self._counters.get(scope, 0), number)
@@ -89,7 +101,8 @@ if not token then
     if seed then redis.call('SET', KEYS[2], seed) end
   end
   token = '<<PII_' .. redis.call('INCR', KEYS[2]) .. '>>'
-  redis.call('HSET', KEYS[1], 'k:' .. ARGV[1], token, 't:' .. token, ARGV[2])
+  redis.call('HSET', KEYS[1], 'k:' .. ARGV[1], token, 't:' .. token, ARGV[2],
+    'i:' .. token, ARGV[1])
 end
 redis.call('EXPIRE', KEYS[1], ARGV[3])
 redis.call('EXPIRE', KEYS[2], ARGV[4])
@@ -111,8 +124,8 @@ COUNTER_TTL_S = 400 * 24 * 3600
 
 
 class RedisTokenStore:
-    """One hash per scope: `k:<identity>` → token, `t:<token>` → value; the counter in
-    `<prefix>n:<scope>`.
+    """One hash per scope: `k:<identity>` → token, `t:<token>` → value, `i:<token>` → identity;
+    the counter in `<prefix>n:<scope>`.
 
     The mapping's TTL is renewed on every write and every lookup, so it lives as long as the run
     uses it (r1 MAJOR-1: a long wait for an approval that still reads its placeholders).
@@ -139,6 +152,18 @@ class RedisTokenStore:
         if value is not None:
             await self._redis.expire(mapping, self._ttl)
         return value.decode() if isinstance(value, bytes) else value
+
+    async def entry(self, scope: str, token: str) -> tuple[str, str] | None:
+        mapping, _ = self._keys(scope)
+        value, identity = await self._redis.hmget(mapping, "t:" + token, "i:" + token)
+        if value is None:
+            return None
+        value = value.decode() if isinstance(value, bytes) else value
+        if identity is None:
+            # A mapping issued before the identity field: same value, a category of its own (it
+            # only decides which values share a placeholder).
+            return value, _identity("PII", value)
+        return value, identity.decode() if isinstance(identity, bytes) else identity
 
     async def reserve(self, scope: str, number: int) -> None:
         _, counter = self._keys(scope)
@@ -475,8 +500,46 @@ def log_unresolved(scope: str, count: int) -> None:
 
 
 def placeholder_numbers(text: str) -> list[int]:
-    """The numbers of the placeholders in `text` (`<<PII_7>>` → 7)."""
-    return [int(m.group(0)[6:-2]) for m in PLACEHOLDER.finditer(text)]
+    """The numbers of the placeholders in `text` (`<<PII_7>>` → 7), only those a scope can issue
+    (at most 8 digits, r2 MINOR-r2-1): a `<<PII_99999999999>>` someone wrote is not one, and
+    reserving it would push the counter past what a stream aligns or Redis counts."""
+    return [
+        int(m.group(0)[6:-2])
+        for m in PLACEHOLDER.finditer(text)
+        if len(m.group(0)) <= PLACEHOLDER_MAX_CHARS
+    ]
+
+
+async def reserve_carried(store: TokenStore, scope: str, data: Any) -> None:
+    """Before a scope's first tokenize: its counter goes past every placeholder number in the text
+    that enters it (client history, the question, the conversation's history), so a placeholder
+    carried in from elsewhere never becomes one of the scope's values (r2 MAJOR-r2-2, KARARLAR
+    "Konuşma geçmişinde yer tutucu eşlemesi doğrudan ve hamsız")."""
+    text = data if isinstance(data, str) else json.dumps(data, ensure_ascii=False)
+    numbers = placeholder_numbers(text) if "<<PII_" in text else []
+    if numbers:
+        await store.reserve(scope, max(numbers))
+
+
+async def rescope(text: str, *, store: TokenStore, source: str, target: str) -> str:
+    """`text` with `source`'s placeholders turned into `target`'s for the same values, never
+    through the raw text (r2 MAJOR-r2-3): the value is read in `source` (without renewing it) and
+    issued in `target` by its identity. A placeholder `source` cannot resolve stays as it is;
+    `reserve_carried` has kept `target` from issuing its number."""
+    if source == target or "<<PII_" not in text:
+        return text
+    out, cursor = [], 0
+    for match in PLACEHOLDER.finditer(text):
+        out.append(text[cursor : match.start()])
+        cursor = match.end()
+        found = await store.entry(source, match.group(0))
+        if found is None:
+            out.append(match.group(0))
+        else:
+            value, identity = found
+            out.append(await store.token_for(target, identity, value))
+    out.append(text[cursor:])
+    return "".join(out)
 
 
 def count_placeholders(data: Any) -> int:
