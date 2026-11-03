@@ -1593,3 +1593,26 @@ Kapılar (son SHA): lint 0; make test llmaas 1046/1046, airgap 1046/1046; test-i
 ### A-08T1-0021 · 2026-11-03 15:58 · → koordinator · ACK
 Paket: 08-tam-1a   Cevap: K-08T1-0013
 Alındı: 6d0d9ba VERIFIED, r2 delta incelemede. Dal donuk, commit yok; sonuca kadar bekliyorum.
+
+### A-08T1-0022 · 2026-11-03 17:15 · → koordinator · ACK
+Paket: 08-tam-1a   Cevap: K-08T1-0014
+Alındı: r2 DUZELT (MAJOR-r2-1/2/3, MINOR-r2-1..7, NOTE-1). KARARLAR'daki iki yeni karar (URL satır düzeyinde fail-closed; geçmiş eşlemesi doğrudan ve hamsız) bağlayıcı kabul. Sıra: MAJOR-r2-1 → r2-2 (+MINOR-r2-1) → r2-3 (+MINOR-r2-4) → MINOR-r2-2/3 → docs/PR notu; her biri önce kırmızı test, ayrı commit. Kanıt: lint, make test iki profil, hedefli test-int iki profil (yalın yığın, YIGIN-AÇ/KAPA).
+
+### A-08T1-0023 · 2026-11-03 18:20 · → koordinator · YIGIN-AÇ
+Paket: 08-tam-1a r2 DUZELT
+Yalın yığın açılıyor: proje ffcore-08t1, postgres + redis + litellm + fake-llm + qdrant (`--profile test --profile qdrant`), imaj 0.0.0-08t1. Disk 93 GB boş; çalışan başka konteyner yok. Hedefli test-int iki profil; bitince YIGIN-KAPA.
+
+### A-08T1-0024 · 2026-11-03 18:55 · → koordinator · DURUM
+Paket: 08-tam-1a r2 DUZELT   Cevap: K-08T1-0014
+4 commit (6d0d9ba üstüne): 87b7e7b MAJOR-r2-1 (URL satır kuralı, alt satıra taşan hedef, 8.192 fail-closed), e2c32b2 MAJOR-r2-2/3 + MINOR-r2-1/4 (geçmiş doğrudan eşleme `i:` kimliğiyle, hamsız; reserve_carried dört yolda; ≤ 8 hane; geçmiş okuması TTL yenilemez), 07279b1 MINOR-r2-2/3, 370912d docs. Kırmızı kanıtı: yeni testler 6d0d9ba koduyla 118 kırmızı. Hedefli test-int iki profilde 22/22 yeşil (min_confidence 0,8 uçtan uca dahil). Şimdi kapılar (lint 0; make test iki profil koşuyor), sonra hedefli test-int iki profil ve PR-HAZIR.
+Not (PR varsayım 9): akışta satırın işaretinden önce gönderilmiş yer tutucu geri alınamaz; tek parça metinde satırın hepsi tutulur. Hedefteki yer tutucu her durumda tutulur. Satır tamponu istenirse tek değişiklik.
+
+### A-08T1-0025 · 2026-11-03 19:10 · → koordinator · YIGIN-KAPA
+Paket: 08-tam-1a r2 DUZELT
+ffcore-08t1 yalın yığını `down -v` ile kapandı; ffcore-08t1 konteyner 0, volume 0. Başka yığına dokunulmadı.
+
+### A-08T1-0026 · 2026-11-03 19:11 · → koordinator · PR-HAZIR
+Paket: 08-tam-1a r3   Cevap: K-08T1-0014
+SHA: 370912d914df97eb1b7682e40f4df061369a7a54 (feat/08-tam-1-ner; 6d0d9ba üstüne 4 commit, 19 dosya +1060/-136; main...HEAD 41 dosya, 19 commit). PR notu: state/pr/08-tam-1a.md ("Review r2 bulgu → düzeltme → kanıt" tablosu, r3 kapı tablosu, varsayım 9-11).
+Kapılar: lint 0; make test llmaas 1210 / airgap 1210; hedefli test-int llmaas 138 passed, airgap 136 passed + 2 skipped (profil koşullu); kırmızı kanıtı 6d0d9ba koduyla 118 kırmızı.
+MAJOR-r2-1/2/3, MINOR-r2-1..7, NOTE-1 kapalı (her biri testli). İnceleyiciye üç not: (1) akışta satır işaretinden önce gönderilmiş yer tutucu geri alınamaz, hedeftekiler her durumda tutulur (varsayım 9, karardan dar sapma); (2) açık kalan hedef sonraki satıra taşınır (karara ek, varsayım 10); (3) MINOR-r2-1'in "eski kapsamın aralığı" tercihi uygulanmadı, yalnız ≤ 8 hane (gerekçe tabloda). İnceleyicinin int probe'u (`08-tam-1a-r2-int-probe.py`) bu yığında koşulmadı; aynı senaryolar test_08t_r2_paths ve test_08t_m2_facade_history'de test olarak var. Dal donuk; r3 sonucunu bekliyorum.
