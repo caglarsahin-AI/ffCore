@@ -315,16 +315,20 @@ async def model(state: RunState, runtime: Runtime[RunContext]) -> dict:
             await ctx.events.live(SseEvent.token, {"text": ready})
 
     outgoing = await _egress_messages(ctx, state["messages"])
-    turn = await ctx.model.call(
-        outgoing,
-        tools=ctx.tools.schemas(),
-        max_tokens=min(d.limits.output_tokens, d.answer_rules.max_answer_tokens)
-        if not ctx.tools.schemas()
-        else d.limits.output_tokens,
-        on_token=on_token if ctx.stream_live else None,
-    )
-    if ctx.stream_live and (tail := aligner.flush()):
-        await ctx.events.live(SseEvent.token, {"text": tail})
+    try:
+        turn = await ctx.model.call(
+            outgoing,
+            tools=ctx.tools.schemas(),
+            max_tokens=min(d.limits.output_tokens, d.answer_rules.max_answer_tokens)
+            if not ctx.tools.schemas()
+            else d.limits.output_tokens,
+            on_token=on_token if ctx.stream_live else None,
+        )
+    finally:
+        # Also when the call fails or the run is cancelled: what the aligner held (at most 15
+        # characters) was the model's and reaches the reader (r1 MINOR-1).
+        if ctx.stream_live and (tail := aligner.flush()):
+            await ctx.events.live(SseEvent.token, {"text": tail})
     usage = dict(state.get("usage") or {})
     for key in ("prompt_tokens", "completion_tokens"):
         usage[key] = usage.get(key, 0) + int((turn.usage or {}).get(key) or 0)

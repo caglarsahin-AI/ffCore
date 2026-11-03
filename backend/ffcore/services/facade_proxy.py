@@ -403,11 +403,22 @@ class _LiveReveal:
                     {"index": key[2], "function": {"arguments": tail}}
                 )
 
+    @property
+    def has_open(self) -> bool:
+        return bool(self._open)
+
     async def rest(self) -> dict:
         delta: dict[str, Any] = {}
         for index in sorted({k[1] for k in self._open}):
             await self._close(index, delta)
         return delta
+
+
+async def _rest_chunk(revealer: _LiveReveal, cid, created, public_name, held: _Held) -> str:
+    """The held tails as one last content delta, with the finish_reason the stream gave (or
+    `stop` when it gave none)."""
+    rest = await revealer.rest()
+    return chunk_json(_chunk(cid, created, public_name, rest, held.finish or "stop"))
 
 
 async def _relay(stream, stack, gate, guard, model, public_name) -> AsyncIterator[str]:
@@ -445,6 +456,10 @@ async def _relay(stream, stack, gate, guard, model, public_name) -> AsyncIterato
                     chunk = dict(chunk, model=public_name, id=cid)
                     if chunk.get("choices"):
                         chunk["choices"] = [await revealer.choice(c) for c in chunk["choices"]]
+                    elif chunk.get("usage") and revealer.has_open:
+                        # r1 MINOR-2: what is still held goes out before the usage chunk, with
+                        # a finish_reason, as a client expects the last content delta.
+                        yield await _rest_chunk(revealer, cid, created, public_name, held)
                     yield chunk_json(chunk)
                 elif time.monotonic() - last > KEEPALIVE_S:
                     yield KEEPALIVE
@@ -457,8 +472,8 @@ async def _relay(stream, stack, gate, guard, model, public_name) -> AsyncIterato
                 model_name=model_name,
                 usage=stream.result.usage or {},
             )
-        if live and (rest := await revealer.rest()):
-            yield chunk_json(_chunk(cid, created, public_name, rest))
+        if live and revealer.has_open:
+            yield await _rest_chunk(revealer, cid, created, public_name, held)
         log_unresolved(guard.scope, revealer.unresolved)
         log_skipped_policy(guard.scope, revealer.skipped)
         log_skipped_url(guard.scope, revealer.skipped_url)
@@ -481,7 +496,10 @@ async def _relay(stream, stack, gate, guard, model, public_name) -> AsyncIterato
         yield STREAM_END
     except ApiError as exc:
         # Headers are sent: the OpenAI form of an error inside a stream, then the end marker.
+        # What the reveal still held (at most 15 characters) goes out first (r1 MINOR-1).
         log.warning("facade_stream_error code=%s model=%s", exc.code, public_name)
+        if live and revealer.has_open:
+            yield await _rest_chunk(revealer, cid, created, public_name, held)
         yield error_event(exc)
         yield STREAM_END
     finally:
