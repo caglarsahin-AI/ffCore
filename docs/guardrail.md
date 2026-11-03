@@ -79,6 +79,10 @@ Below 24 characters entropy does not separate a key from a code or a name, so a 
 
 Upper case 2x6 stays near 95 %: about one random pair of six letters in twenty reads as two words and keeps the plain-identifier exemption, which document names and codes need. Without a credential word nothing changed (08 r3: 0 % for these shapes).
 
+### Egress per source (FOLLOWUP-107)
+
+In an agent run every retrieved chunk goes through `egress` on its own before it is put into the model's input (`always` retrieval and `search_documents` results alike). A block on one chunk leaves that chunk out and lists it under `blocked` in the `sources` event (public fields, `reason`, `reference_id`; never the text); the run fails `guardrail_block` only when every chunk is blocked. The question, history and tool results still pass `egress` as a whole message (BLOCKERS 134): a secret there fails the run as before.
+
 ### Chain, modes and errors
 
 - Rules bound to the stage run in order; each rule's output is the next rule's input (a redacted

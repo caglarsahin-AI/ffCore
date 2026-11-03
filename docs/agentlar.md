@@ -94,7 +94,11 @@ Event names (C9): `token, tool_call, tool_result, approval_required, question, s
 fallback, done, error`; a client ignores names it does not know. Each event has an `id`; the
 stream ends after `done`, `error`, `approval_required` or `question`.
 A `sources` event names each source (document id and name, page, breadcrumb, source date),
-never its text. When a document is deleted later, the stored event and the live stream keep the
+never its text. Each source passes `egress` on its own (llmaas): a source the guardrail blocks
+(an encoded blob under the `secrets` rule, say) is left out of the model's input and listed
+under `blocked` with `reason: guardrail_block` and the guardrail `reference_id`; the answer goes
+on with the other sources, and the run fails `guardrail_block` only when none is left
+(FOLLOWUP-107). The same holds for `search_documents` results. When a document is deleted later, the stored event and the live stream keep the
 reference, and every read shows its breadcrumb as `[deleted]`: `GET /runs/{id}/events`, a
 reconnect to the live stream (Redis, within `RUN_EVENT_STREAM_TTL_S`) and a replay from
 `run_events` (FOLLOWUP-108).

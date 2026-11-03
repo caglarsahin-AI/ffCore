@@ -114,17 +114,18 @@ async def retrieve(state: RunState, runtime: Runtime[RunContext]) -> dict:
     for n, source in enumerate(found, start=1):
         source.n = n
     budget = ctx.budget or plan_budget(ctx.definition, state["messages"][0]["content"], [])
-    kept = fit_sources(budget, found)
+    kept, blocked = await _egress_sources(ctx, fit_sources(budget, found))
     payload = {
         "selected": [s.public() for s in kept],
         "dropped_by_budget": budget.dropped.get("rag", []),
+        "blocked": blocked,
         "search": details,
     }
     await ctx.events.record(
         RunEventType.sources,
         payload,
         sse=SseEvent.sources,
-        sse_data={"sources": payload["selected"]},
+        sse_data={"sources": payload["selected"], "blocked": blocked},
     )
     ms = _ms(started)
     # The text rides along to guard_in, the next step, which writes it into the user message and
@@ -181,6 +182,45 @@ async def _egress_text(ctx: RunContext, text: str) -> str:
         masked = checked.text
         ctx.egress_cache[key] = ctx.egress_cache[_digest(masked)] = masked
     return masked
+
+
+async def _egress_sources(
+    ctx: RunContext, sources: list[Source]
+) -> tuple[list[Source], list[dict[str, Any]]]:
+    """Each retrieved chunk through `egress` on its own (FOLLOWUP-107): a blocked chunk is left
+    out and named in `blocked` (its public fields, the reason and the reference; never its
+    text), the others go on tokenized. One chunk with an encoded blob no longer fails every
+    answer that retrieves it; when no chunk is left the run fails `guardrail_block`."""
+    kept: list[Source] = []
+    blocked: list[dict[str, Any]] = []
+    last_block = None
+    for source in sources:
+        key = _digest(source.text)
+        masked = ctx.egress_cache.get(key)
+        if masked is None:
+            try:
+                checked = await ctx.guard.check("egress", source.text)
+            except TextTooLong as exc:
+                raise StopRun(RunStatus.failed, "guardrail_text_too_long", str(exc)) from exc
+            if checked.action == "block":
+                last_block = checked
+                blocked.append(
+                    source.public()
+                    | {"reason": "guardrail_block", "reference_id": checked.reference_id}
+                )
+                continue
+            masked = checked.text
+            ctx.egress_cache[key] = ctx.egress_cache[_digest(masked)] = masked
+        source.text = masked
+        kept.append(source)
+    if last_block is not None and not kept:
+        raise StopRun(
+            RunStatus.failed,
+            "guardrail_block",
+            last_block.message,
+            reference_id=last_block.reference_id,
+        )
+    return kept, blocked
 
 
 async def _egress_json(ctx: RunContext, node: Any) -> Any:
@@ -503,11 +543,17 @@ async def _search_tool(ctx: RunContext, state: RunState, arguments: dict) -> tup
     start = len(state.get("sources") or [])
     for offset, source in enumerate(hits, start=1):
         source.n = start + offset
+    hits, blocked = await _egress_sources(ctx, hits)
     await ctx.events.record(
         RunEventType.sources,
-        {"selected": [s.public() for s in hits], "dropped_by_budget": [], "tool": SEARCH_TOOL},
+        {
+            "selected": [s.public() for s in hits],
+            "dropped_by_budget": [],
+            "blocked": blocked,
+            "tool": SEARCH_TOOL,
+        },
         sse=SseEvent.sources,
-        sse_data={"sources": [s.public() for s in hits]},
+        sse_data={"sources": [s.public() for s in hits], "blocked": blocked},
         iteration=state["iteration"],
     )
     text = "\n\n".join(f"[{s.n}] {s.document_name} ({s.breadcrumb})\n{s.text}" for s in hits)
