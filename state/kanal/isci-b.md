@@ -1575,3 +1575,14 @@ R6 durma koşulu tetiklendi, ama beklenen biçimde değil: `uv lock --offline` *
 - B: lock bu PR'da yenilenir (sse-starlette pini aynalanarak), PR'da sürüm farkları; C sınıfı onay ister, 19r kapsamını büyütür, M3 öncesi sunucu imajı değişir.
 - C: R6 tamamen ertelenir. Etki: pyproject ile kod uyumsuz kalır; önermiyorum.
 Cevaba kadar R6 commit'lenmedi (pyproject değişikliği çalışma ağacında); R7, R4, 154 yarısıyla devam.
+
+### B-19R-0008 · 2026-11-03 10:42 · → koordinator · DURUM
+Paket: fix/19-dis-inceleme   Cevap: K-19R-0006 / K-19R-0007 / K-19R-0009
+İlerleme (IMPLEMENTING). ffcore fix/19-ingest-followups: 641e20b (154), c60b61d (155), b7a6d53 (156); `make lint` 0 ve `make test` 948/948 iki profilde (llmaas, airgap); `test-int` iki profil koşuyor. paycoreLLM feat/19-dis-inceleme: 89e908a R2, fb3bf0d R8, 6802713 R1+R3 (ortak fence tespiti, tek commit; K-19R-0007 dar desen), aa54f05 R5, c0480e3 R6 (yalnız pyproject, K-19R-0009 A), b627fda R7 (ffcore_compat + seed FFCore'dan), 144a957 R4 (96 GB senaryo tablosu: yalnız PayCore 65,5 / FFCore penceresi 74,5 / birlikte 87,5 GB, eşik 90; eski bütçe testi artık atlamıyor), a051cc6 154 yarısı (çözülmüş config: tek fark ffcore-backend değeri; uyum testi hem main hem worktree ffcore compose'una karşı yeşil). Tam paycoreLLM kapısı koşuyor.
+154c ara kanıt (f19r yığını, backend kapsayıcısında `OFFLINE=true`, gerçek HttpEmbedClient): eski değer → `EgressDenied egress_offline` (B1'in aynısı); yeni compose değeri → egress geçer, backend 500 (yığında ağırlık yok, `hf_path` model_missing). test-int bitince backend'i `04a-knowledge-core_model_cache` salt okunur bağlı yeniden başlatıp sentetik paycore-like ağacında `ingest-raw` CLI'yı uçtan uca koşacağım (yerel test kullanıcısı create-superadmin ile, sahte parola).
+R5 notu: `embed()`'den `truncated()` kaldırıldı; eski `sync._index_doc` yolu `embed()`'i flag_truncated'sız çağırıyordu, orada açık `truncated()` çağrısı eklendi (sessiz kesilme olmasın), testli.
+R1 notu: K-19R-0007'deki desen aynen; benim önerdiğim `@param/@media` istisna listesi eklenmedi (kararda yok); kod dışı düz metindeki `@param` biçimi `[USER]` olur, PR kalan risklerine yazılıyor.
+
+### B-19R-0009 · 2026-11-03 10:46 · → koordinator · ACK
+Paket: fix/19-dis-inceleme   Cevap: K-19R-0008 / K-19R-0009
+Düzeltme: B-19R-0008'deki "istisna listesi eklenmedi" notu yanlıştı; K-19R-0008'i geç okudum. Şimdi uygulandı: 81098f4 (paycoreLLM) `AT_TECHNICAL` tek sabit (param, return, returns, throws, see, link, deprecated, override, media, import; runbook'ta anılır) + Türkçe harfli login biçimi; önce kırmızı (4 test), sonra yeşil (51). K-19R-0009 (R6 A) c0480e3'te uygulanmıştı.

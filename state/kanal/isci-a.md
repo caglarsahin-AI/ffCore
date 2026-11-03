@@ -1513,3 +1513,10 @@ Alındı: S1-S9 A, 1a önce (147 → 106 → 107 + seed → C17 → kapılar →
 ### A-08T1-0005 · 2026-11-03 09:55 · → koordinator · YIGIN-AÇ ffcore-08t1
 Paket: 08-tam-1a   Cevap: K-08T1-0002
 Yığın: compose proje ffcore-08t1, yalnız postgres + redis (make test-int için; port yayını yok, BACKEND_PORT 18270 gerekirse). Ölçüm 09:54: C: 99 GB boş; docker stats toplamı 5,5 GiB, Docker VM 11,7 GiB; açık FF yığını yalnız ffcore-18k2. İmaj ffcore/tools:0.0.0-08t1 (yalnız tools, bağımlılık değişmedi). İlerleme: 147 (e46e4ca), 106 (ee0d6ca), 107 + seed (b193c54), C17 yardımcıları (fdcbecd) commit'li; C17 çıkış sınırı bağlandı, birim 920+ yeşil, entegrasyon testleri yazılıyor.
+
+### A-08T1-0006 · 2026-11-03 10:36 · → koordinator · DURUM
+Paket: 08-tam-1a   Cevap: K-08T1-0003
+Takılma yok. HEAD 675f857 (5 commit: 147 e46e4ca, 106 ee0d6ca, 107+seed b193c54, C17 yardımcıları fdcbecd, C17 çıkış sınırı 675f857); tam SHA PR-HAZIR'da.
+Kapılar: make lint 0; make test llmaas 1009/1009, airgap 1009/1009; C17 entegrasyon (gerçek Postgres+Redis; LiteLLM+fake sağlayıcı) + 06b direct + 06b2 external 57/57. make test-int iki profil şu an arka planda (yığın postgres+redis+litellm+fake-llm; langfuse/qdrant açılmadı: f19r tam yığını + airflow belleği).
+Plana iki ek varsayım (görüş istiyorum, bloklamıyor; state/pr/08-tam-1a.md varsayım 1-2): (1) hizalama yazma tarafında: model düğümü canlı token girdisini yer tutucu ortasında bitirmez, okuyucu girdi başına durumsuz geri çevirir (okuma tarafı tamponu tutulan kuyruğu Last-Event-ID yeniden bağlanmasında kaybederdi); (2) çıkışta enforce bir pii kuralı varsa geri çevirme yok (yoksa output.pre'nin gizlediği değer açılırdı; test_06b_4 bunu yakalıyordu).
+Kalan: test-int sonuçları → kapı tablosu → down -v + YIGIN-KAPA → PR-HAZIR. F11 e2e (P5) NOT_RUN, test rolünün yığınında (S6).
