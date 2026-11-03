@@ -1533,3 +1533,19 @@ Paket: 08-tam-1a   Cevap: K-08T1-0004 / K-08T1-0005
 K-08T1-0004 ekleri commit fb7130d6fda59b2b62fbecf50e47b7ebd1a15bdf: `detokenize_skipped_policy scope=<id> count=<n>` (konsol sahibi, facade agent, facade düz tek parça + canlı akış), docs/guardrail.md + docs/agentlar.md cümlesi; yazma tarafı hizalama testleri (sağlayıcı yer tutucuyu iki delta'da veriyor → çıkışta ham parça yok) zaten var, Last-Event-ID gerekçesi PR varsayım 1'de.
 Önceki airgap test-int'te 3 yeni kırmızı benim testimdeydi (test_08t_c17_facade_direct: egress kapalıyken tokenize yok, test profili hesaba katmıyordu); test iki profile göre düzeltildi, iki profilde 6/6.
 Şimdi son SHA'da tüm kapılar arka planda: lint, make test ve test-int, iki profil (~70 dk). K-08T1-0005 A: 02/05a-live/18td NOT_RUN ortam gerekçeli. Bitince kapı tablosu → down -v + YIGIN-KAPA → PR-HAZIR.
+
+### A-08T1-0009 · 2026-11-03 12:33 · → koordinator · YIGIN-KAPA ffcore-08t1
+Paket: 08-tam-1a   Cevap: K-08T1-0003
+`docker compose -p ffcore-08t1 ... --profile test --profile qdrant down -v` exit 0; kalan konteyner 0, volume 0. Yerel imajlar ffcore/tools:0.0.0-08t1 ve ffcore/backend:0.0.0-08t1 duruyor (temizlik listesine).
+
+### A-08T1-0010 · 2026-11-03 12:33 · → koordinator · DURUM
+Paket: 08-tam-1a   Cevap: K-08T1-0005
+DURUM: VERIFIED talebi. HEAD fb7130d6fda59b2b62fbecf50e47b7ebd1a15bdf (baz ea0db36, 6 commit, ağaç temiz, push yok). Son SHA'da: lint 0; make test llmaas 1010/1010, airgap 1010/1010; test-int llmaas 798 passed / airgap 796 passed, kırmızılar yalnız K-08T1-0005 A'daki üç ortam dosyası (02 langfuse, 05a live, 18td; DNS/bağlantı). C17 entegrasyon dosyaları iki profilde 6/6. F11 e2e NOT_RUN (S6, test rolü).
+
+### A-08T1-0011 · 2026-11-03 12:33 · → koordinator · PR-HAZIR
+Paket: 08-tam-1a   Cevap: K-08T1-0002
+PR: C:i_paycorefcore\state\pr 8-tam-1a.md · Branch: feat/08-tam-1-ner · SHA: fb7130d6fda59b2b62fbecf50e47b7ebd1a15bdf · Sınıf: [B] · push yok. Güvenlik turu zorunlu (PR'da "Güvenlik turu için notlar"). 08-tam-1b (NER + PRSIM) ayrı PR; ağırlıklar ve oturum kararı 1a merge'ünde.
+
+### A-08T1-0012 · 2026-11-03 12:33 · → koordinator · DURUM
+Paket: 08-tam-1a   Cevap: A-08T1-0011
+Düzeltme: A-08T1-0011'deki PR yolu kaçış hatasıyla bozuk yazıldı. Doğrusu: C:\ai_paycore\ffcore\state\pr\08-tam-1a.md. SHA ve diğer alanlar aynı (fb7130d6fda59b2b62fbecf50e47b7ebd1a15bdf).

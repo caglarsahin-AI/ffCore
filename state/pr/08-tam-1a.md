@@ -1,15 +1,16 @@
 # PR: 08-tam-1a — çıkışta geri çevirme (C17, FOLLOWUP-141), secrets 106/107, egress 147
 
-**Paket:** 08-tam-1a (08 tam dilim 1'in modelsiz yarısı, K-08T1-0002 S7) · **Sınıf:** [B] (yeni bağımlılık, migration, compose yok) · **Branch:** feat/08-tam-1-ner · **Baz commit:** ea0db36 · **HEAD:** (PR-HAZIR mesajında tam SHA) · **Oturum:** ffcore-isci-a-08-tam-1
+**Paket:** 08-tam-1a (08 tam dilim 1'in modelsiz yarısı, K-08T1-0002 S7) · **Sınıf:** [B] (yeni bağımlılık, migration, compose yok) · **Branch:** feat/08-tam-1-ner · **Baz commit:** ea0db36 · **HEAD:** fb7130d6fda59b2b62fbecf50e47b7ebd1a15bdf · **Oturum:** ffcore-isci-a-08-tam-1
 
 Plan ve onay: `state/pr/08-tam-1.md` (PLANNED, K-08T1-0002: S1-S9 hepsi A). 08-tam-1b (NER + PRSIM) ayrı PR, ağırlıklar gelince.
 
-## Değişen dosyalar (main...HEAD, 24 dosya, 5 commit)
+## Değişen dosyalar (main...HEAD, 24 dosya, 6 commit)
 
 - **147** (e46e4ca): `backend/ffcore/core/egress.py` (`check_http_destination`, ortak `_checked_addresses`; `check_destination` aynı denetimi kullanır), `services/external_config.py` (`check_base_url` yalnız base URL'nin eklediklerini yapar: userinfo, query, rezerve host), `tests/unit/test_08t_egress_http.py`.
 - **106** (ee0d6ca): `guardrails/rules.py` (`_SHORT_TOKEN`, `SHORT_TOKEN_MIN_CHARS = 13`), `tests/unit/test_08t_secrets_short.py`, `docs/guardrail.md` (ölçüm tablosu).
 - **107** (b193c54): `runtime/graph.py` (`_egress_sources`; `retrieve` ve `_search_tool`), `tests/unit/test_08t_source_egress.py`, `tests/e2e/scenarios/seed.py` (secrets enforce'a döndü, S6), `tests/e2e/scenarios/test_18_f11_f13_content.py` (P5 beklentisi), `docs/agentlar.md`, `docs/guardrail.md`.
 - **C17 yardımcıları** (fdcbecd): `guardrails/masking.py` (`PlaceholderAligner`, `StreamDetokenizer`, `detokenize_json`, `log_unresolved`), `tests/unit/test_08t_c17_masking.py`.
+- **K-08T1-0004 ekleri** (fb7130d): `masking.count_placeholders`/`log_skipped_policy`, `api/runs.py` `exit_mode`/`exit_hook`/`skip_counter`, facade guard/proxy sayaç, iki profile duyarlı facade testleri, docs cümleleri.
 - **C17 çıkış sınırı** (675f857): `runtime/graph.py` (model düğümünde hizalayıcı), `api/runs.py` (`is_run_owner`, `policy_allows_reveal`, `reveals_values`, `detokenizer`, `live_transform`, `_replay_rows(reveal)`, `_stream(reveal=)`), `services/facade_agent.py`, `services/facade_guard.py` (`reveals`, `reveal`, `stream_reveal`), `services/facade_proxy.py` (`_LiveReveal`, tek parça ve tamponlu yol), `services/facade_external.py`, `guardrails/engine.py` (`masks_pii_at`), testler `tests/unit/test_08t_c17_{runtime,facade}.py`, `tests/integration/test_08t_c17_{exit,facade_direct}.py`, `docs/{agentlar,api,guardrail}.md`.
 
 `state/` değişikliği yok (branch'te). Yeni bağımlılık, migration, compose, OpenAPI değişikliği yok.
@@ -46,12 +47,28 @@ NER (1-6), PRSIM (15), yerleşik v3 (16): 08-tam-1b.
 
 Ortam: tools konteyneri `ffcore/tools:0.0.0-08t1` (bağımlılık değişmedi, yalnız etiket), compose proje `ffcore-08t1`, `--env-file .env.test`; yığın postgres + redis + litellm + fake-llm (`--profile test`), langfuse/qdrant **açılmadı** (bellek koşulu: f19r tam yığını + airflow açıktı, K-08T1-0003).
 
-(KAPI TABLOSU: kapılar bitince doldurulur)
+Son SHA fb7130d, tam çıktılar oturum scratchpad'inde (`final-*.txt`, tee).
+
+| Komut | Ortam | Exit | Süre | Sonuç |
+|---|---|---|---|---|
+| `tools make lint` | | 0 | 14 s | ruff check + format temiz (404 dosya) |
+| `tools make test` | `DEPLOY_PROFILE=llmaas GUARDRAIL_EGRESS_ENABLED=true` | 0 | 197 s | 1010 passed |
+| `tools make test` | `DEPLOY_PROFILE=airgap GUARDRAIL_EGRESS_ENABLED=false` | 0 | 212 s | 1010 passed |
+| `tools make test-int` | llmaas | 2 | 1417 s | 798 passed, 5 skipped; 8 failed + 3 error **yalnız ortam** (aşağıda) |
+| `tools make test-int` | airgap | 2 | 1435 s | 796 passed, 7 skipped; 8 failed + 3 error **yalnız ortam** |
+| C17 entegrasyon dosyaları ayrıca | iki profil | 0 | | `test_08t_c17_exit.py` 3/3, `test_08t_c17_facade_direct.py` 3/3 (her profil) |
+| `docker compose -p ffcore-08t1 ... down -v` | | 0 | | konteyner 0, volume 0 |
+
+**NOT_RUN, ortam (K-08T1-0005 A; inceleyici ve main kapısı tam yığınla koşar):** `tests/integration/test_02_langfuse.py` (3, Langfuse yok), `tests/integration/test_05a_live_services.py` (5, mcp-search/mcp-sql konteynerleri yok, `egress_dns_failed`), `tests/integration/test_18td_tools_api.py` (3 error, ticket-desk yok). Bu PR bu servislerin yoluna dokunmuyor (izleme, MCP aktarıcıları, ticket-desk); hata nedenleri DNS/bağlantı, başka neden yok. Yığın: postgres + redis + litellm + fake-llm + qdrant (bellek koşulu: f19r/review19r tam yığını + airflow açıktı).
+
+Ara koşu notu: fb7130d öncesi airgap test-int'te `test_08t_c17_facade_direct.py` 3 testi düştü: testler egress'in airgap'te olmadığını hesaba katmıyordu (kod hatası değil); fb7130d'de iki profile göre düzeltildi.
+
+**F11 e2e** (`test_18_f11_5b_encoded_chunk_left_out_at_egress`, seed geri alma): NOT_RUN, e2e yığını test rolünde (K-08T1-0002 S6).
 
 ## Varsayımlar ve sapmalar
 
-1. **Yazma tarafında hizalama (plandan sapma):** plan konsol akışında okuma tarafında durumlu tampon öngörüyordu. Uygulanan: model düğümü canlı `token` girdisini yer tutucu ortasında bitirmez (`PlaceholderAligner`), okuyucu girdi başına durumsuz geri çevirir. Neden: okuma tarafı tamponu tutulan kuyruğu ayrı bir SSE mesajıyla, aynı SSE kimliğiyle yollamak zorunda kalırdı; `Last-Event-ID` ile yeniden bağlanan istemci o kuyruğu kaybederdi. Yazma tarafında tutmak kimlik/yeniden oynatma düzenini değiştirmez; Redis'teki metin yine tokenize.
-2. **Çıkışta enforce `pii` kuralı varsa geri çevirme yok (plana ek, koordinatör görüşü istenir):** `output.pre`/`output.stream.delta`'da enforce bir `pii` kuralı varsa, cevap yer tutucularla denetlendiği için değerleri sonradan açmak politikanın gizlediğini gösterirdi (`test_06b_4_stream_output_buffered_then_checked` bunu yakalardı). Güvenli taraf: yer tutucu kalır (`engine.masks_pii_at`). Yerleşik politika monitor olduğu için varsayılan kurulumda geri çevirme çalışır; e2e hedef projesi (enforce) yer tutucu görür.
+1. **Yazma tarafında hizalama (plandan sapma; K-08T1-0004 kabul):** plan konsol akışında okuma tarafında durumlu tampon öngörüyordu. Uygulanan: model düğümü canlı `token` girdisini yer tutucu ortasında bitirmez (`PlaceholderAligner`), okuyucu girdi başına durumsuz geri çevirir. Neden: okuma tarafı tamponu tutulan kuyruğu ayrı bir SSE mesajıyla, aynı SSE kimliğiyle yollamak zorunda kalırdı; `Last-Event-ID` ile yeniden bağlanan istemci o kuyruğu kaybederdi. Yazma tarafında tutmak kimlik/yeniden oynatma düzenini değiştirmez; Redis'teki metin yine tokenize.
+2. **Çıkışta enforce `pii` kuralı varsa geri çevirme yok (plana ek; K-08T1-0004 kabul, `detokenize_skipped_policy` sayaç logu fb7130d):** `output.pre`/`output.stream.delta`'da enforce bir `pii` kuralı varsa, cevap yer tutucularla denetlendiği için değerleri sonradan açmak politikanın gizlediğini gösterirdi (`test_06b_4_stream_output_buffered_then_checked` bunu yakalardı). Güvenli taraf: yer tutucu kalır (`engine.masks_pii_at`). Yerleşik politika monitor olduğu için varsayılan kurulumda geri çevirme çalışır; e2e hedef projesi (enforce) yer tutucu görür.
 3. **Facade `x_platform.sources`:** `blocked` listesi koşu olayında ve konsol SSE'sinde var; facade `x_platform.sources` olayına eklenmedi (C11 donmuş biçim; additive olurdu ama GOREV kapsamı koşu olayıydı). FOLLOWUP adayı.
 4. **107 sırası:** kaynak başına egress `retrieve` düğümünde, `sources` olayından önce koşar; soru `input.pre`'de bloklanırsa kaynaklar için egress olayları yine yazılmış olur (gönderilmemiş metin için kayıt). Kaynak egress'i `guard_in`'e taşımak `sources` olay sırasını değiştirirdi.
 5. **S9 TTL:** onay bekleyen uzun koşularda (`PII_TOKEN_TTL_S` 1800 s) yer tutucu açılmaz, log düşer. FOLLOWUP adayı: onay beklerken TTL uzatma (K-08T1-0002 notu).
