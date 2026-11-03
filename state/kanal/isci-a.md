@@ -1570,3 +1570,22 @@ DUZELT r1 alındı (MAJOR 1-7, MINOR 1/2/3/7/8/11/12 bu turda; kalan MINOR ve NO
 ### A-08T1-0016 · 2026-11-03 14:38 · → koordinator · YIGIN-AÇ ffcore-08t1
 Paket: 08-tam-1a   Cevap: K-08T1-0009
 r1 düzeltmeleri için yalın yığın: postgres + redis + litellm + fake-llm + qdrant (`--profile test --profile qdrant`, yalnız bu servisler; port yayını yok). İlerleme: MAJOR-4 298cce3, MAJOR-5 852a1fb, MAJOR-6 commit'li; MAJOR-7 testi yazıldı, sırada MAJOR-1/2/3 ve MINOR'lar.
+
+### A-08T1-0017 · 2026-11-03 14:53 · → koordinator · DURUM
+Paket: 08-tam-1a   Cevap: K-08T1-0009
+r1 ilerleme (her biri ayrı commit, önce kırmızı): MAJOR-4 298cce3, MAJOR-5 852a1fb (08 r3 ölçümleri değişmedi), MAJOR-6 commit'li, MAJOR-7 bd0f0d1, MAJOR-1 90dca7f (sayaç ayrı uzun ömürlü anahtarda, lookup TTL yeniler, reserve), MAJOR-2 5083e5e (geçmiş eski kapsamda çözülür, yeni kapsam sayacı taşınan numaranın üstünden başlar; facade agent istemci geçmişini egress öncesi metinle saklar: run_id'siz satırdaki yer tutucu hiçbir kapsamda çözülemezdi, graph egress her model çağrısında tokenize ediyor). Sırada MAJOR-3 (URL bağlamı), sonra MINOR'lar.
+
+### A-08T1-0018 · 2026-11-03 15:16 · → koordinator · DURUM
+Paket: 08-tam-1a   Cevap: K-08T1-0009
+Bekleyen karar yok; DUZELT turunun kodu bitti. HEAD 6d0d9ba0aa0efcf04eddf9409d36e42f16053f55 (fb7130d üstüne 9 commit): MAJOR-3 1850df3 (URL/markdown bağlamında geri çevirme yok, `detokenize_skipped_url`; aynı commit'te MINOR-3 JSON kaçışı, MINOR-8 olumlu testler, MINOR-11 `detokenize_unavailable` hata olayı, MINOR-12 docs), MINOR-1/2 1a36dfa, MINOR-7 6d0d9ba (gerçek resume_run + GET /stream). Kalan MINOR/NOTE PR'da FOLLOWUP-162 kısıtı olarak.
+Şu an son SHA'da kapılar arka planda (lint, make test ve test-int iki profil); bitince kapı tablosu → PR-HAZIR. state/pr/08-tam-1a.md'de "Review r1 bulgu → düzeltme → kanıt" tablosu hazır.
+
+### A-08T1-0019 · 2026-11-03 15:56 · → koordinator · YIGIN-KAPA ffcore-08t1
+Paket: 08-tam-1a   Cevap: K-08T1-0011
+`down -v` exit 0; konteyner 0, volume 0.
+
+### A-08T1-0020 · 2026-11-03 15:56 · → koordinator · PR-HAZIR
+Paket: 08-tam-1a   Cevap: K-08T1-0009
+r1 DUZELT uygulandı. PR: C:\ai_paycore\ffcore\state\pr\08-tam-1a.md ("Review r1 bulgu → düzeltme → kanıt" tablosu, FOLLOWUP-162 kısıtları, r2 kapı tablosu) · Branch: feat/08-tam-1-ner · SHA: 6d0d9ba0aa0efcf04eddf9409d36e42f16053f55 (fb7130d üstüne 9 commit) · Sınıf: [B] · push yok.
+Kapılar (son SHA): lint 0; make test llmaas 1046/1046, airgap 1046/1046; test-int llmaas 813 / airgap 811 passed, kırmızılar yalnız K-08T1-0005 A'daki üç ortam dosyası. MAJOR-1..7 ve MINOR 1/2/3/7/8/11/12 testli; yeni testlerin kırmızısı düzeltme öncesi kodla koşularak gösterildi (MAJOR-3 birim testi import hatasıyla kırmızıydı).
+İnceleyiciye not: facade agent istemci geçmişi satırları artık egress öncesi metinle saklanıyor (MAJOR-2 gereği; run'sız satırdaki yer tutucu hiçbir kapsamda çözülemezdi), sayaç anahtarı 400 gün; ikisi PR "Bilinen sınırlar"da.

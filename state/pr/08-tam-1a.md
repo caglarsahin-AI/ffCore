@@ -1,6 +1,6 @@
 # PR: 08-tam-1a — çıkışta geri çevirme (C17, FOLLOWUP-141), secrets 106/107, egress 147
 
-**Paket:** 08-tam-1a (08 tam dilim 1'in modelsiz yarısı, K-08T1-0002 S7) · **Sınıf:** [B] (yeni bağımlılık, migration, compose yok) · **Branch:** feat/08-tam-1-ner · **Baz commit:** ea0db36 · **HEAD:** fb7130d6fda59b2b62fbecf50e47b7ebd1a15bdf · **Oturum:** ffcore-isci-a-08-tam-1
+**Paket:** 08-tam-1a (08 tam dilim 1'in modelsiz yarısı, K-08T1-0002 S7) · **Sınıf:** [B] (yeni bağımlılık, migration, compose yok) · **Branch:** feat/08-tam-1-ner · **Baz commit:** ea0db36 · **HEAD:** 6d0d9ba0aa0efcf04eddf9409d36e42f16053f55 (r1 incelenen: fb7130d) · **Oturum:** ffcore-isci-a-08-tam-1
 
 Plan ve onay: `state/pr/08-tam-1.md` (PLANNED, K-08T1-0002: S1-S9 hepsi A). 08-tam-1b (NER + PRSIM) ayrı PR, ağırlıklar gelince.
 
@@ -45,6 +45,19 @@ NER (1-6), PRSIM (15), yerleşik v3 (16): 08-tam-1b.
 
 ## Çalıştırılan komutlar
 
+**r2 (r1 düzeltmesi, HEAD 6d0d9ba; aynı yalın yığın, tee çıktıları scratchpad `r2-*.txt`):**
+
+| Komut | Ortam | Exit | Süre | Sonuç |
+|---|---|---|---|---|
+| `tools make lint` | | 0 | 9 s | temiz |
+| `tools make test` | llmaas | 0 | 158 s | 1046 passed |
+| `tools make test` | airgap | 0 | 167 s | 1046 passed |
+| `tools make test-int` | llmaas | 2 | 1062 s | 813 passed, 5 skipped; kırmızılar yalnız üç ortam dosyası (02 langfuse 3, 05a live 5, 18td 3 error) |
+| `tools make test-int` | airgap | 2 | 1035 s | 811 passed, 7 skipped; aynı üç ortam dosyası |
+| `down -v` | | 0 | | konteyner 0, volume 0 |
+
+**r1 (fb7130d):**
+
 Ortam: tools konteyneri `ffcore/tools:0.0.0-08t1` (bağımlılık değişmedi, yalnız etiket), compose proje `ffcore-08t1`, `--env-file .env.test`; yığın postgres + redis + litellm + fake-llm (`--profile test`), langfuse/qdrant **açılmadı** (bellek koşulu: f19r tam yığını + airflow açıktı, K-08T1-0003).
 
 Son SHA fb7130d, tam çıktılar oturum scratchpad'inde (`final-*.txt`, tee).
@@ -64,6 +77,31 @@ Son SHA fb7130d, tam çıktılar oturum scratchpad'inde (`final-*.txt`, tee).
 Ara koşu notu: fb7130d öncesi airgap test-int'te `test_08t_c17_facade_direct.py` 3 testi düştü: testler egress'in airgap'te olmadığını hesaba katmıyordu (kod hatası değil); fb7130d'de iki profile göre düzeltildi.
 
 **F11 e2e** (`test_18_f11_5b_encoded_chunk_left_out_at_egress`, seed geri alma): NOT_RUN, e2e yığını test rolünde (K-08T1-0002 S6).
+
+## Review r1 bulgu → düzeltme → kanıt (state/reviews/08-tam-1a-r1.md, DUZELT K-08T1-0009)
+
+fb7130d üstüne 9 commit; her MAJOR ayrı commit, önce kırmızı test (kırmızı kanıtı: yeni test commit öncesi kodla koşuldu).
+
+| Bulgu | Düzeltme (commit) | Kanıt |
+|---|---|---|
+| MAJOR-4 ReDoS (`_SHORT_TOKEN`, `_ASSIGNMENT`) | ayırıcı grubu ilk `\s*`'ı içerir, tek eşleşme yolu (298cce3) | `test_08t_m4_*`: 200.000 boşluk alt süreçte < 10 s (eskisi zaman aşımı; re GIL'i bırakmadığı için iş parçacığı değil alt süreç), 180 bin karakter tekrar; 3.000 rastgele örnekte eski desenle span eşitliği |
+| MAJOR-5 yanlış pozitif → block | `anahtar` yalnız `erişim/API/gizli anahtar(ı)`; tam tümsekli camel/PascalCase ve harf+6 hane bilet kimliği muaf (852a1fb) | raporun 5 örneği + 3 benzer negatif, 3 bileşik pozitif; yakalama: büyük 2x6 %95,2, 3x6 %99,0, 16 %99,1, karışık 14 %99,95, büyük+rakam 20 %100 (sözcüksüz 0/200); 08 r3 probe'ları (`08-entropy-probe*.py`) aynı sayılar |
+| MAJOR-6 hepsi engellenince `sources` olayı yok | olay (`selected=[]`, `blocked=[…]`) önce yazılır, sonra `StopRun` (e851997) | `test_08t_12b`, `test_08t_12c_*all_blocked*` olayı doğrular; e2e F11 5b'nin `failed` dalı artık erişilebilir (e2e NOT_RUN, S6) |
+| MAJOR-7 `blocked` silinmiş belge maskesi | `_SOURCE_LISTS` + `blocked` (bd0f0d1) | `test_08t_m7_blocked_source_masked_on_list_and_live_stream`, `..._on_db_replay` (gerçek API, Redis, Postgres) |
+| MAJOR-1 TTL sonrası numara tekrarı | sayaç ayrı uzun ömürlü anahtarda (400 gün; eski hash'in `n`'inden tohumlanır), `lookup` TTL yeniler, `reserve()` (90dca7f) | `test_08t_m1_*` (gerçek Redis, inceleyicinin probe'u: TTL 2 s, eski cevap yeni değere çözülmez; lookup yenileme; reserve geri gitmez); eski kodla 3/3 kırmızı |
+| MAJOR-2 geçmişteki yer tutucu yeni kapsamda | `_history` önceki koşunun yer tutucusunu kendi kapsamında çözer (egress yeni kapsamda yeniden tokenize eder), çözülemeyen kalır, yeni kapsam sayacı taşınan en büyük numaranın üstüne alınır; facade agent istemci geçmişini egress öncesi metinle saklar (run'sız satırdaki yer tutucu hiçbir kapsamda çözülemezdi; graph egress her model çağrısında tokenize ediyor, BLOCKERS 134) (5083e5e) | `test_08t_m2_history_*` (A/B kapsam probe'u), `test_08t_m2_client_history_stored_before_egress` (eski kodla kırmızı); `test_06b_agent`, `test_134_provider_request` yeşil |
+| MAJOR-3 URL/markdown sızdırma kanalı (karar A) | `](…)`, `href=…`, `scheme://…` içindeki yer tutucu geri çevrilmez, `detokenize_skipped_url` (sayı); akışlar son boşluktan beri metni bağlam olarak tutar (≤ 8.192) (1850df3) | `test_08t_m3_url_context.py` (7 bağlam, parça sınırı 3 biçim), `test_08t_m3_paths.py` (dış agent, facade agent `_events`, konsol canlı akış), `test_08t_m3_direct_placeholder_in_a_url_stays` (tek parça + canlı); docs "kim neyi görür" tablosu |
+| MINOR-1 hata/iptalde kuyruk | graph model düğümü `finally`; facade düz akış `ApiError`'da önce kuyruk (1a36dfa) | `test_08t_r1_minor1_*` (eski kodla kırmızı) |
+| MINOR-2 `rest` usage'dan sonra, finish'siz | usage chunk'ından önce, `finish_reason` ile (yoksa `stop`) (1a36dfa) | `test_08t_r1_minor2_*` (eski kodla kırmızı) |
+| MINOR-3 araç argümanında JSON kaçışı | değer JSON-escape (tek parça ve canlı) (1850df3) | `test_08t_r1_minor3_*` (`"` içeren değer, JSON ayrışır) |
+| MINOR-7 S8 uç nokta + rol | test (6d0d9ba) | `test_08t_m7_owner_sees_values_approver_and_admin_placeholders` (gerçek `resume_run` + `GET /stream`) |
+| MINOR-8 dış agent / facade agent olumlu | test (1850df3) | `test_08t_m8_external_agent_echo_reversed_for_the_caller`, `test_08t_m8_facade_agent_events_reversed` |
+| MINOR-11 okuma tarafı Redis hatası | `RevealUnavailable` → akış `error` olayı `detokenize_unavailable` ile biter (koşu sürer) (1850df3) | `test_08t_r1_minor11_*` |
+| MINOR-12 16 ↔ 15 | docs/api.md 15 (1850df3) | — |
+
+**FOLLOWUP-162'ye ertelenenler (kısıt olarak):** MINOR-4 (politika okuma anında çözülür; koşu sırasında enforce olan kural sonradan monitor'a alınırsa saklanan cevap sahibine açılır), MINOR-5 (açık SSE bağlantısı üyelik/rol değişikliğini görmez; yeniden bağlanmada reddedilir), MINOR-6 (canlı facade akışında sayaç logları iki kez), MINOR-9 (enforce politikada C17 fiilen kapalı; seed hedef projesinde C17 çalışmaz), MINOR-10 (`masks_pii_at` aksiyon/kategoriye bakmaz; yön güvenli), MINOR-13 (106 yanlış negatifleri: `auth_token:`, `DB_TOKEN=` öneki, boşluklu `api key`), MINOR-14 (`search_documents` kaynak numarası çakışması; F11 5b sızıntı iddiası bütün injection satırıyla), NOTE 1-8 (impersonation sahip sayılır; başarılı geri çevirme audit'i yok; `Run.input` ham; 9+ haneli yer tutucu hizalanmaz; tümü engellenen `search_documents` koşuyu düşürür ve bütçe boşluğu doldurulmaz; parça başına egress olay çoğalması; konsol arayüzü `blocked`'ı göstermez; `check_http_destination` userinfo/query/rezerve reddi yapmaz, webhook için 06b-2 kuralları ayrıca gerekir).
+
+**Bilinen sınırlar (yeni):** URL bağlamı son boşluktan beri en çok 8.192 karakter; daha uzun bir URL'nin başı kaybolursa içindeki yer tutucu açılabilir. Sayaç anahtarı 400 gün yaşar (en uzun saklama sınıfının üstü); daha eski saklanan bir yer tutucu kapsamı tekrar açılırsa numara çakışabilir. Facade agent'ın istemci geçmişi satırları artık ham (egress öncesi) metin taşır; kullanıcı mesajları zaten ham saklanıyordu.
 
 ## Varsayımlar ve sapmalar
 
