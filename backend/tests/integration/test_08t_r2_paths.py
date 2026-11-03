@@ -53,7 +53,10 @@ def test_08t_r2_direct_url_lines_keep_the_placeholder(direct, shape):
     assert response.status_code == 200, response.text
     content = response.json()["choices"][0]["message"]["content"]
     if _egress_on():
-        assert EMAIL not in content and "<<PII_" in content
+        # the provider saw a placeholder and the caller does not get the value back; the fake
+        # provider cuts long answers, so the placeholder itself may not reach the answer
+        assert EMAIL not in json.dumps(fake_requests()[-1], ensure_ascii=False)
+        assert EMAIL not in content
     else:  # airgap: no egress stage, the provider saw the value (control)
         assert EMAIL in json.dumps(fake_requests()[-1], ensure_ascii=False)
 
