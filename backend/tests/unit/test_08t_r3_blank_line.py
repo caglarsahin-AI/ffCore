@@ -1,8 +1,9 @@
 """08-tam-1a r3 MINOR-r3-4 (KARARLAR "C17 URL bağlam kuralı, ek" (e), corrected by K-08T1-0020 A):
 a blank line closes a markdown target left open (`](`, `](<`, `]:` with its value due), as
-CommonMark does, so the rest of the answer reads normally again. An HTML target (an open tag, a
-quoted attribute value, `=` with its value due) and a lost line state go on: an HTML attribute
-value may cross a blank line and a browser drops the line breaks from a URL."""
+CommonMark does, so the rest of the answer reads normally again. A lost line state goes on, and
+since r4 (KARARLAR "C17 geri çevirme: cevap düzeyinde HTML fail-closed") any HTML tag keeps the
+rest of the reader's stream: the HTML cases below stay kept by that rule, not by following
+quotes or attribute values (an HTML attribute value may cross a blank line)."""
 
 import asyncio
 
@@ -41,7 +42,7 @@ def test_08t_r3_blank_line_closes_a_markdown_target(text, form):
         "<img src=\n\n<<PII_1>>>",
     ],
 )
-def test_08t_r3_blank_line_does_not_close_an_html_target(text, form):
+def test_08t_r3_blank_line_does_not_reopen_after_html(text, form):
     assert NAME not in _read(text, form, size=5)
 
 

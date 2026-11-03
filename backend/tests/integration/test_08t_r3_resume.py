@@ -2,7 +2,8 @@
 on the real Redis: a reader that starts after an entry (`Last-Event-ID`, `after`) rebuilds its URL
 line state from the stored `token` entries up to it, so a URL begun before the reconnect still
 keeps its placeholder, and a clean line after an approval reads the value. When the state cannot
-be rebuilt (the entry is not in the stream, Redis fails) its first line is kept (fail-closed)."""
+be rebuilt (the entry is not in the stream, Redis fails, any other error) the rest of the
+answer keeps its placeholders (fail-closed, r4 MINOR-r4-3/6, KARARLAR ek (d′))."""
 
 import asyncio
 import json
