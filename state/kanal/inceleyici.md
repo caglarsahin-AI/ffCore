@@ -1610,3 +1610,14 @@ REVIEW-ISTEK alındı. SHA doğrulandı: fb7130d6fda59b2b62fbecf50e47b7ebd1a15bd
 Paket: fix/19-dis-inceleme r2   Cevap: K-19R-0015
 REVIEW-ISTEK r2 alındı. SHA'lar doğrulandı: ffcore aacdd96b32a57b5d79fa2e07bbeb65fae3a4e671 (b7a6d53 + 3 commit, 7 dosya +170/-13, state/ 0); paycoreLLM-19r 5663b7b8640710fe9d61ebca9715abe31aac635c (81098f4 + 3 commit, 7 dosya +109/-16). 08-tam-1a statik workflow'u arka planda sürüyor, yığın açmadı; önce bu tur.
 - 2026-11-03 12:47 YIGIN-AC review-19r (r2; 18300/13300, COMPOSE_PROJECT_NAME=review19r, FFCORE_VERSION=0.0.0-review-19r, kod aacdd96 worktree, `--profile test --profile qdrant`, backend 04a-knowledge-core_model_cache:/models:ro geçici override). Açık FF yığınları: ffcore-08t1 (+ varsa f19r kapalı). Boş disk 90G.
+- 2026-11-03 13:10 YIGIN-KAPA review-19r (r2): down -v; kalan konteyner 0, volume 0; 04a-knowledge-core_model_cache dokunulmadı.
+
+### R-19R-0004 · 2026-11-03 13:10 · → koordinator · REVIEW-SONUC
+Paket: fix/19-dis-inceleme r2   Cevap: K-19R-0015
+**ONAY** (ffcore aacdd96b32a57b5d79fa2e07bbeb65fae3a4e671, paycoreLLM 5663b7b8640710fe9d61ebca9715abe31aac635c). BLOCKER 0, MAJOR 0, MINOR 1, NOTE 2. Rapor state/reviews/19-dis-inceleme-r2.md.
+- r1 MAJOR 1-4 kapandı, yığında r1 probe'larıyla: koşu B exit 1, failed_unregistered 2 (1002, 9001; kaynak+yol+kod), 1002 indexed v1 eski sha, aramada isabet (0,991); koşu D exit 1, failed_unregistered 1; demo.md:86 kaynak doğruluğu; Jira özeti ve meta title [USER].
+- r1 MINOR 1-7 / NOTE'lar kapandı (MINOR-3 → FOLLOWUP-159, PR notunda; NOTE-8 → FOLLOWUP-158).
+- MINOR-r2-1 (bekletmez): '-' ve '_' sonrası geri izleme hâlâ kısmi maske: @ahmet-yilmaz@firma.com → [USER]-yilmaz@firma.com, @ahmet_yilmaz( → [USER]_yilmaz(, @app_get( → [USER]_get(. Öneri: lookahead'e [._-]? + 2 test; FOLLOWUP ya da 08 tam 1b.
+- NOTE-r2-1: @ahmet.Yilmaz artık tamamen açık (r1'de kısmi); runbook "bilinen sınır", NER ile kapanır. NOTE-r2-2: konsol yalnız hata kodu (tasarım gereği).
+- Koşular: paycoreLLM 600 passed / 3 failed (bs4, bazdan) / 2 skipped; ffcore make test 952/952 iki profil; 04a/06a/19 test-int 186 passed 3 skipped. NOT_RUN: tam test-int, airgap test-int, uv lock --check, PayCore yığını, lint.
+- Dosyalar commit edilmedi (rapor, r2-search probe, evidence 19r2-dis-*, kanal). Sıradaki: 08-tam-1a tam yığın turu.

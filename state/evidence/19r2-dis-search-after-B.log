@@ -1,0 +1,3 @@
+SEARCH 200 ['filtered_by_min_score', 'filtered_by_rerank_floor', 'hits', 'latency_ms', 'normalizer_config_id', 'query_id', 'threshold_mode']
+ keys ['age_days', 'breadcrumb', 'chunk_id', 'chunk_status', 'document_id', 'document_name', 'embed_score', 'page', 'rerank_score', 'section_path', 'text', 'updated_at_source']
+ hit confluence/DEMO/1002.md fd747b63-eb07-4a92-b346-ff9dee21b782 0.991 pl › DEMO › Sözleşmeler › Üye İşyeri Sözleşmesi Fesih Kurall

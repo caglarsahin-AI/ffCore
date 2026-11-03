@@ -1,0 +1,13 @@
+2026-11-03 09:56:51,469 WARNING ffcore.knowledge.raw_ingest ingest-raw rejected path=jira/PRSIM/PRSIM-1.txt code=prsim_requires_ner
+created 0
+new_version 0
+unchanged 5
+retried 0
+status: indexed 4, skipped 1
+failed_unregistered 0
+rejected: prsim_requires_ner 1
+gates: -
+masked (pii_regex): -
+stage: full
+manifest: documents 5, chunks 5, raw_manifest_sha256 56139353ac1759bf12407b6888d67a55aaba908e37275886eeaad99dcde1a506
+EXIT C 0
