@@ -90,3 +90,13 @@ def test_19r_154_http_embed_client_reaches_backend(settings, embed_server, monke
     )
     result = anyio.run(ingest.HttpEmbedClient(backend_settings).embed, ["a", "b"])
     assert len(result.dense) == 2
+
+
+def test_19r_154_other_services_not_widened():
+    """Review r1 MINOR-2: only the backend names itself. If `backend,` moved into the shared
+    x-app-env block, migrate and tools would be widened too; this test would see it."""
+    data = yaml.safe_load(COMPOSE.read_text(encoding="utf-8"))
+    assert "backend" not in _expand(data["x-app-env"]["ALLOWED_INTERNAL_HOSTS"], {})
+    for name in ("migrate", "tools"):
+        value = (data["services"][name].get("environment") or {}).get("ALLOWED_INTERNAL_HOSTS", "")
+        assert "backend" not in _expand(value, {}), name
