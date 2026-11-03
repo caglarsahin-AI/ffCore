@@ -283,8 +283,8 @@ def detokenizer(redis, run_id: UUID, *, after: str | None = None) -> Callable[..
     logged (r1 MAJOR-3); live `token` entries share a context, so a URL split over entries is
     seen. A Redis failure is `RevealUnavailable`: the stream ends with an error event (r1
     MINOR-11), never silently. A reader that starts `after` an entry rebuilds the URL line state
-    from the token entries up to it; when it cannot, its first line keeps its placeholders (r3
-    MINOR-r3-1, KARARLAR ek (d))."""
+    from the token entries up to it; when it cannot, the rest of the answer keeps its
+    placeholders (r3 MINOR-r3-1, r4 MINOR-r4-3, KARARLAR ek (d'))."""
     reveal = ContextReveal(
         RedisTokenStore(redis, get_guardrail_settings().pii_token_ttl_s), str(run_id)
     )
@@ -292,15 +292,17 @@ def detokenizer(redis, run_id: UUID, *, after: str | None = None) -> Callable[..
     primed = after in (None, "0-0")
 
     async def prime() -> None:
+        # Any failure (Redis, an entry that is not text, r4 MINOR-r4-6) keeps the rest of the
+        # answer under the rule; the stream itself goes on.
         try:
             texts = await run_events.token_texts(redis, run_id, after)
-        except (RedisError, OSError):
+            for text in texts if texts is not None else ():
+                reveal.prime(text)
+        except Exception:
+            log.warning("detokenize_rebuild_failed scope=%s", scope)
             texts = None
         if texts is None:
             reveal.fail_closed()
-            return
-        for text in texts:
-            reveal.prime(text)
 
     async def hook(data: dict, event: str | None = None) -> dict:
         nonlocal primed

@@ -77,17 +77,24 @@ def test_08t_r3_clean_line_before_the_reconnect_reads_the_value(database_url, pg
     assert out == [f"Kayıt sahibi {NAME}."]
 
 
-def test_08t_r3_unknown_entry_keeps_the_first_line(database_url, pg, make_project):
-    _, run_id, _ = _seed(pg, make_project)
-    entries = [("5-1", "token", {"text": "Merhaba\n"})]
-    out = _go(database_url, run_id, entries, "9-9", ["Sahibi <<PII_1>>", "\nYine <<PII_1>>"])
-    assert out == ["Sahibi <<PII_1>>", f"\nYine {NAME}"]
+# r4 MINOR-r4-3/6 (KARARLAR ek (d')): when the state cannot be rebuilt, the rest of the answer
+# keeps its placeholders, not only the first line; an unexpected error in the rebuild too.
+KEPT = ["Sahibi <<PII_1>>", "\nYine <<PII_1>>"]
 
 
-def test_08t_r3_redis_failure_keeps_the_first_line(database_url, pg, make_project):
+def test_08t_r3_unknown_entry_keeps_the_rest(database_url, pg, make_project):
     _, run_id, _ = _seed(pg, make_project)
     entries = [("5-1", "token", {"text": "Merhaba\n"})]
-    out = _go(
-        database_url, run_id, entries, "5-1", ["Sahibi <<PII_1>>", "\nYine <<PII_1>>"], broken=True
-    )
-    assert out == ["Sahibi <<PII_1>>", f"\nYine {NAME}"]
+    assert _go(database_url, run_id, entries, "9-9", KEPT) == KEPT
+
+
+def test_08t_r3_redis_failure_keeps_the_rest(database_url, pg, make_project):
+    _, run_id, _ = _seed(pg, make_project)
+    entries = [("5-1", "token", {"text": "Merhaba\n"})]
+    assert _go(database_url, run_id, entries, "5-1", KEPT, broken=True) == KEPT
+
+
+def test_08t_r4_unexpected_rebuild_error_keeps_the_rest(database_url, pg, make_project):
+    _, run_id, _ = _seed(pg, make_project)
+    entries = [("5-1", "token", {"text": 5})]  # not text: the rebuild fails
+    assert _go(database_url, run_id, entries, "5-1", KEPT) == KEPT

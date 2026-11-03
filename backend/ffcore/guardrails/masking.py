@@ -422,10 +422,10 @@ class UrlLines:
             start = brk.end()
         return out
 
-    def mark(self) -> None:
-        """The current line is under the rule whatever it carries (a reader whose earlier text
-        is unknown, r3 MINOR-r3-1)."""
-        self._marked = True
+    def lose(self) -> None:
+        """The earlier text is unknown: the rest of the answer keeps its placeholders (r4
+        MINOR-r4-3, KARARLAR ek (d'))."""
+        self._lost = True
 
     def _add(self, piece: str) -> None:
         if not piece:
@@ -546,8 +546,8 @@ class ContextReveal:
         self._lines.spans(text)
 
     def fail_closed(self) -> None:
-        """The earlier text is unknown: the first line keeps its placeholders."""
-        self._lines.mark()
+        """The earlier text is unknown: the rest of the answer keeps its placeholders."""
+        self._lines.lose()
 
     async def data(self, data: Any, *, stream_text: bool = False) -> Any:
         if stream_text and isinstance(data, dict) and isinstance(data.get("text"), str):
