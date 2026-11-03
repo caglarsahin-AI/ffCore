@@ -18,21 +18,23 @@ NAME = "Ayşe Kaya"
 
 
 def _timed(pieces, cls):
+    # CPU time of this process (r5 NOTE-7): other work on the machine does not count; the r2 scan
+    # needed 13 s here, the incremental one about 0.4 s.
     store, _ = _store_with([NAME])
 
     async def go():
         if cls is StreamDetokenizer:
             sd = StreamDetokenizer(store, "run-1")
-            start = time.perf_counter()
+            start = time.process_time()
             for p in pieces:
                 await sd.feed(p)
             await sd.flush()
         else:
             cr = ContextReveal(store, "run-1")
-            start = time.perf_counter()
+            start = time.process_time()
             for p in pieces:
                 await cr.data({"text": p}, stream_text=True)
-        return time.perf_counter() - start
+        return time.process_time() - start
 
     return run(go())
 
