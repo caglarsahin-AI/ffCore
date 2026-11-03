@@ -16,9 +16,10 @@ from ffcore.guardrails.masking import (
     RedisTokenStore,
     StreamDetokenizer,
     count_placeholders,
-    detokenize,
     log_skipped_policy,
+    log_skipped_url,
     log_unresolved,
+    reveal_text,
 )
 from ffcore.guardrails.service import record_events, resolve_policy
 from ffcore.guardrails.settings import get_guardrail_settings
@@ -121,22 +122,27 @@ class FacadeGuard:
     def _token_store(self) -> RedisTokenStore:
         return RedisTokenStore(self.redis, get_guardrail_settings().pii_token_ttl_s)
 
-    async def reveal(self, text: str) -> str:
+    async def reveal(self, text: str, *, json_escape: bool = False) -> str:
         """C17: the request's placeholders back to their values, at the exit to the caller who
         made the request (S8). A placeholder the scope never issued stays as it is and is logged
-        with its count (S9); nothing is invented."""
+        with its count (S9); one inside a URL stays and is logged (r1 MAJOR-3); nothing is
+        invented. `json_escape` for tool call arguments, which are JSON text (r1 MINOR-3)."""
         if not text or "<<PII_" not in text:
             return text
         if not self.reveals:
             log_skipped_policy(self.scope, count_placeholders(text))
             return text
-        out, unresolved = await detokenize(text, store=self._token_store(), scope=self.scope)
-        log_unresolved(self.scope, len(unresolved))
+        out, unresolved, skipped = await reveal_text(
+            text, store=self._token_store(), scope=self.scope, json_escape=json_escape
+        )
+        log_unresolved(self.scope, unresolved)
+        log_skipped_url(self.scope, skipped)
         return out
 
-    def stream_reveal(self) -> StreamDetokenizer:
-        """The same for a live stream: a placeholder split over two chunks is held until whole."""
-        return StreamDetokenizer(self._token_store(), self.scope)
+    def stream_reveal(self, *, json_escape: bool = False) -> StreamDetokenizer:
+        """The same for a live stream: a placeholder split over two chunks is held until whole;
+        a URL that began in an earlier chunk is seen."""
+        return StreamDetokenizer(self._token_store(), self.scope, json_escape=json_escape)
 
     async def json_text(self, stage: str, value: Any) -> Any:
         """A JSON value (tool definitions, tool call arguments) through a text stage; the result

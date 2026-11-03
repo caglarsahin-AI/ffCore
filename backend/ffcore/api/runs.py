@@ -19,6 +19,7 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, Header, Query, Request
 from fastapi.responses import StreamingResponse
+from redis.exceptions import RedisError
 from sqlalchemy import select
 
 from ffcore.api.agents_schemas import (
@@ -41,10 +42,12 @@ from ffcore.core.config import Settings, get_settings
 from ffcore.core.errors import ApiError
 from ffcore.guardrails.engine import masks_pii_at
 from ffcore.guardrails.masking import (
+    ContextReveal,
     RedisTokenStore,
+    RevealUnavailable,
     count_placeholders,
-    detokenize_json,
     log_skipped_policy,
+    log_skipped_url,
     log_unresolved,
 )
 from ffcore.guardrails.service import resolve_policy
@@ -253,45 +256,55 @@ async def exit_mode(session, run: Run, actor_id: str | None) -> str:
     return "reveal" if await policy_allows_reveal(session, run) else "policy"
 
 
-def skip_counter(run_id: UUID) -> Callable[[dict], Awaitable[dict]]:
+def skip_counter(run_id: UUID) -> Callable[..., Awaitable[dict]]:
     """The exit hook of an owner whose placeholders the policy keeps: data unchanged, the
     placeholders counted in `detokenize_skipped_policy`."""
     scope = str(run_id)
 
-    async def count(data: dict) -> dict:
+    async def count(data: dict, event: str | None = None) -> dict:
         log_skipped_policy(scope, count_placeholders(data))
         return data
 
     return count
 
 
-def exit_hook(redis, run_id: UUID, mode: str) -> Callable[[dict], Awaitable[dict]] | None:
+def exit_hook(redis, run_id: UUID, mode: str) -> Callable[..., Awaitable[dict]] | None:
     if mode == "reveal":
         return detokenizer(redis, run_id)
     return skip_counter(run_id) if mode == "policy" else None
 
 
-def detokenizer(redis, run_id: UUID) -> Callable[[dict], Awaitable[dict]]:
-    """The exit reversal of one run's event data (C17): every string, within the run's token
-    scope; a placeholder the scope cannot resolve (never issued, mapping expired after
-    PII_TOKEN_TTL_S) stays and is logged with its count (S9)."""
-    store = RedisTokenStore(redis, get_guardrail_settings().pii_token_ttl_s)
+def detokenizer(redis, run_id: UUID) -> Callable[..., Awaitable[dict]]:
+    """The exit reversal of one reader's run events (C17): every string, within the run's token
+    scope. A placeholder the scope cannot resolve (never issued, mapping expired after
+    PII_TOKEN_TTL_S) stays and is logged with its count (S9); one inside a URL stays and is
+    logged (r1 MAJOR-3); live `token` entries share a context, so a URL split over entries is
+    seen. A Redis failure is `RevealUnavailable`: the stream ends with an error event (r1
+    MINOR-11), never silently."""
+    reveal = ContextReveal(
+        RedisTokenStore(redis, get_guardrail_settings().pii_token_ttl_s), str(run_id)
+    )
     scope = str(run_id)
 
-    async def reveal(data: dict) -> dict:
-        out, unresolved = await detokenize_json(data, store=store, scope=scope)
-        log_unresolved(scope, unresolved)
+    async def hook(data: dict, event: str | None = None) -> dict:
+        before = (reveal.unresolved, reveal.skipped_url)
+        try:
+            out = await reveal.data(data, stream_text=event == SseEvent.token)
+        except (RedisError, OSError) as exc:
+            raise RevealUnavailable(str(type(exc).__name__)) from None
+        log_unresolved(scope, reveal.unresolved - before[0])
+        log_skipped_url(scope, reveal.skipped_url - before[1])
         return out
 
-    return reveal
+    return hook
 
 
-def live_transform(reveal: Callable[[dict], Awaitable[dict]] | None):
+def live_transform(reveal: Callable[..., Awaitable[dict]] | None):
     """The live stream's read-time hook: deleted sources masked, then (owner only) reversal."""
 
     async def transform(event: str, data: dict) -> dict:
         data = await _mask_live_event(event, data)
-        return await reveal(data) if reveal is not None else data
+        return await reveal(data, event) if reveal is not None else data
 
     return transform
 
@@ -323,7 +336,7 @@ def _replay_rows(
                     else payloads[row.seq]
                 )
                 if reveal is not None:
-                    data = await reveal(data)
+                    data = await reveal(data, sse)
                 yield run_events.SseMessage(f"{row.seq}-0", sse, data)
             run = await _run(session, project_id, run_id)
             if run.status == RunStatus.completed:

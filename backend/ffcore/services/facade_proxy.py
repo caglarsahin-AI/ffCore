@@ -32,7 +32,12 @@ from ffcore.api.facade_schemas import (
 from ffcore.core import db, tracing
 from ffcore.core.config import Settings
 from ffcore.core.errors import ApiError, error_body
-from ffcore.guardrails.masking import count_placeholders, log_skipped_policy, log_unresolved
+from ffcore.guardrails.masking import (
+    count_placeholders,
+    log_skipped_policy,
+    log_skipped_url,
+    log_unresolved,
+)
 from ffcore.knowledge.chunking import approx_tokens
 from ffcore.services.facade_guard import FacadeGuard, client_messages, guard_messages
 from ffcore.services.facade_identity import FacadeCaller
@@ -303,7 +308,7 @@ async def _checked_calls(guard: FacadeGuard, calls: list[dict]) -> list[dict]:
         function = call.get("function") or {}
         if function.get("arguments"):
             arguments = await guard.text("output.pre", function["arguments"])
-            function["arguments"] = await guard.reveal(arguments)
+            function["arguments"] = await guard.reveal(arguments, json_escape=True)
         checked.append(call)
     return checked
 
@@ -353,10 +358,12 @@ class _LiveReveal:
         self._open: dict[tuple, Any] = {}
         self.unresolved = 0
         self.skipped = 0
+        self.skipped_url = 0
 
     def _reveal(self, key: tuple):
         if key not in self._open:
-            self._open[key] = self._guard.stream_reveal()
+            # Arguments are JSON text: a value goes in escaped (r1 MINOR-3).
+            self._open[key] = self._guard.stream_reveal(json_escape=key[0] == "arguments")
         return self._open[key]
 
     async def choice(self, choice: dict) -> dict:
@@ -386,6 +393,7 @@ class _LiveReveal:
             reveal = self._open.pop(key)
             tail = await reveal.flush()
             self.unresolved += reveal.unresolved
+            self.skipped_url += reveal.skipped_url
             if not tail:
                 continue
             if key[0] == "content":
@@ -453,6 +461,7 @@ async def _relay(stream, stack, gate, guard, model, public_name) -> AsyncIterato
             yield chunk_json(_chunk(cid, created, public_name, rest))
         log_unresolved(guard.scope, revealer.unresolved)
         log_skipped_policy(guard.scope, revealer.skipped)
+        log_skipped_url(guard.scope, revealer.skipped_url)
         text = "".join(held.content)
         checked_text = await guard.text("output.pre", text) if text else text
         calls = [held.calls[i] for i in sorted(held.calls)]

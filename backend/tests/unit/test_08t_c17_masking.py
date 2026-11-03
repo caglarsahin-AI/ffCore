@@ -131,7 +131,7 @@ def test_08t_7_detokenize_json_walks_every_string():
         "n": 1,
         "unknown": "<<PII_99>>",
     }
-    out, unresolved = run(detokenize_json(data, store=store, scope="run-1"))
+    out, unresolved, _ = run(detokenize_json(data, store=store, scope="run-1"))
     assert out == {
         "text": "Ayşe Kaya aradı",
         "arguments": {"to": "05321234567", "list": ["Ayşe Kaya", 3, None]},
@@ -145,7 +145,7 @@ def test_08t_7_detokenize_json_walks_every_string():
 @pytest.mark.parametrize("value", ["", "no placeholder here", 7, None])
 def test_08t_7_detokenize_json_without_placeholders_is_identity(value):
     store = MemoryTokenStore()
-    assert run(detokenize_json(value, store=store, scope="s")) == (value, 0)
+    assert run(detokenize_json(value, store=store, scope="s")) == (value, 0, 0)
 
 
 def test_08t_9_count_placeholders_without_lookup():

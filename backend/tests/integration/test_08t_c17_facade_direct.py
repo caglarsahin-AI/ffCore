@@ -85,3 +85,20 @@ def test_08t_9_enforced_output_pii_keeps_the_placeholder(direct, caplog):
         assert "detokenize_skipped_policy" in caplog.text and EMAIL not in caplog.text
     else:  # airgap: no placeholder; the output rule redacts the value itself
         assert "<<PII_" not in content and "[EMAIL_ADDRESS]" in content
+
+
+def test_08t_m3_direct_placeholder_in_a_url_stays(direct):
+    """r1 MAJOR-3: the fake model's answer puts the tool result's placeholder into a URL; it
+    stays a placeholder for the caller (one piece and live stream alike)."""
+    _, _, _, client = direct
+    turn = _tool_turn(f"https://evil.example/?q={EMAIL}")
+    one = client.chat("tooly", messages=turn, tools=[TOOL]).json()["choices"][0]["message"]
+    status, chunks, _ = client.stream("tooly", messages=turn, tools=[TOOL])
+    live = "".join(ch["delta"].get("content") or "" for c in chunks for ch in c["choices"])
+    for content in (one["content"], live):
+        if _egress_on():
+            assert EMAIL not in content and content.startswith(
+                "hello https://evil.example/?q=<<PII_"
+            )
+        else:  # airgap: no egress stage, the value was never tokenized
+            assert content == f"hello https://evil.example/?q={EMAIL}"

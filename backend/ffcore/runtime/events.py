@@ -25,6 +25,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ffcore.core.config import Settings
 from ffcore.core.errors import ApiError
+from ffcore.guardrails.masking import RevealUnavailable
 from ffcore.models.runs import RunEvent
 from ffcore.runtime.contracts import TERMINAL_SSE, RunEventType, SseEvent
 
@@ -149,6 +150,20 @@ def _decode(value) -> str:
     return value.decode() if isinstance(value, bytes) else value
 
 
+def _reveal_unavailable(last: str) -> str:
+    """C17 r1 MINOR-11: the reader's placeholders could not be reversed (token store down): the
+    stream ends with a coded error (the run itself goes on; a reconnect continues after `last`)."""
+    return SseMessage(
+        last,
+        SseEvent.error,
+        {
+            "code": "detokenize_unavailable",
+            "status": None,
+            "message": "The answer could not be prepared for this reader; reconnect to continue.",
+        },
+    ).render()
+
+
 async def follow(
     redis,
     run_id,
@@ -179,8 +194,11 @@ async def follow(
         yield SseMessage(
             f"{after_seq}-0", SseEvent.progress, {"replay": "run_events", "run_id": str(run_id)}
         ).render()
-        async for message in replay_rows(after_seq):
-            yield message.render()
+        try:
+            async for message in replay_rows(after_seq):
+                yield message.render()
+        except RevealUnavailable:
+            yield _reveal_unavailable(f"{after_seq}-0")
         return
     while True:
         await mark_listening(redis, run_id, grace_s)
@@ -189,8 +207,11 @@ async def follow(
             yield ": keepalive\n\n"
             if await finished():
                 if ended_seen:
-                    async for message in replay_rows(int(last.split("-")[0])):
-                        yield message.render()
+                    try:
+                        async for message in replay_rows(int(last.split("-")[0])):
+                            yield message.render()
+                    except RevealUnavailable:
+                        yield _reveal_unavailable(last)
                     return
                 # The writer publishes right after its commit: give it one more turn, so a
                 # normal ending arrives live (tokens are not given twice by a replay).
@@ -203,7 +224,11 @@ async def follow(
                 raw = fields[b"data"] if b"data" in fields else fields["data"]
                 data = json.loads(_decode(raw))
                 if transform is not None:
-                    data = await transform(event, data)
+                    try:
+                        data = await transform(event, data)
+                    except RevealUnavailable:
+                        yield _reveal_unavailable(last)
+                        return
                 yield SseMessage(last, event, data).render()
                 if event in TERMINAL_SSE:
                     return

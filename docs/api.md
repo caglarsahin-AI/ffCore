@@ -474,9 +474,22 @@ about targets outside its scopes. Another project's model or agent, or a missing
 - Personal data tokenized at `egress` leaves for the provider as a placeholder (`<<PII_n>>`); the
   answer comes back to the caller with the request's placeholders turned into the values (C17),
   in one piece and in a live stream alike (a placeholder split over two chunks is held, at most
-  16 characters, until it is whole). When the project's policy enforces a `pii` rule on the
-  output, the placeholders stay. A placeholder the request never issued stays as it is and is
-  logged with its count. The agent path does the same for the run's own user (docs/agentlar.md).
+  15 characters, until it is whole). When the project's policy enforces a `pii` rule on the
+  output, the placeholders stay. A placeholder inside a URL or a markdown link/image target
+  stays too (`detokenize_skipped_url`: an upstream could otherwise make a client send the value to
+  its host). A placeholder the request never issued stays as it is and is logged with its count.
+  The agent path does the same for the run's own user (docs/agentlar.md). Who sees what:
+
+  | Who | Sees |
+  |---|---|
+  | The provider and an external agent (llmaas) | placeholders (egress tokenizes) |
+  | The run's own user on the console (live stream, replay) | values |
+  | The caller of a facade request (direct model, agent, external agent) | values |
+  | Another member reading the run (analyst, admin, approver) | placeholders |
+  | Stored views (`GET /runs/{id}`, `GET /runs/{id}/events`, approvals) | placeholders |
+  | A placeholder inside a URL or a markdown link/image target (`](…)`, `href=…`, `https://…`), for every reader | placeholder (`detokenize_skipped_url`, count only) |
+  | Any reader when the policy enforces a `pii` rule on the output | placeholders (`detokenize_skipped_policy`, count only) |
+
 - The client's own tools: definitions pass, the model's `tool_calls` come back with OpenAI's
   meaning. The client runs them; they are not platform tools and do not go through the approval
   queue (07).

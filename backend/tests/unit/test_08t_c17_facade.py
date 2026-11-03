@@ -19,8 +19,8 @@ class Guard:
     def __init__(self, store):
         self.store = store
 
-    def stream_reveal(self):
-        return StreamDetokenizer(self.store, "run-1")
+    def stream_reveal(self, *, json_escape=False):
+        return StreamDetokenizer(self.store, "run-1", json_escape=json_escape)
 
 
 def _choice(content=None, args=None, finish=None, call=0):

