@@ -1,6 +1,6 @@
 # PR: 08 tam dilim 1b — Türkçe NER tanıyıcısı, `/internal/ner`, `pii_ner` ingest filtresi, PRSIM guard'ı
 
-**Paket:** 08-tam-1b · **Sınıf:** [B]; NER ağırlıkları [C] (kullanıcı `make models`, K-08T1B-0002 A) · **Branch:** feat/08-tam-1b-ner · **Baz commit:** 7af41e5 (main; 1d836a0 + yalnız state commit'leri) · **Oturum:** ffcore-isci-a-08-tam-1b (Opus 5.5) · **Durum:** PLANNED
+**Paket:** 08-tam-1b · **Sınıf:** [B]; NER ağırlıkları [C] (kullanıcı `make models`, K-08T1B-0002 A) · **Branch:** feat/08-tam-1b-ner · **Baz commit:** 7af41e5 (main; 1d836a0 + yalnız state commit'leri) · **Oturum:** ffcore-isci-a-08-tam-1b (Opus 5.5) · **Durum:** IMPLEMENTED (test-int ve ölçüm bekliyor) · **HEAD:** 9db7a05b344e776b36805e93e05c7044c816d782 (12 commit)
 
 Kaynak: GOREV K-08T1B-0001, kararlar K-08T1-0002 (S1-S9 A; 1b'ye düşen S1-S5), K-08T1B-0002 (indirme yolu A), HANDOFF A-08T1-0050, state/pr/08-tam-1.md "08-tam-1b" bölümü (bu plan onu güncel koda göre ayrıntılandırır).
 
@@ -90,3 +90,78 @@ Hiçbir aday ad-soyad ≥ 0,85 ya da P95 < 300 ms tutmazsa ölçüm tablosuyla K
 - n=22 PERSON: bir kaçırma ≈ 0,045; sentetik biçimler (BÜYÜK, küçük, SOYAD Ad) cased modellerde zayıf olabilir; ölçüm olduğu gibi yazılır.
 - Ingest'te belge başına HTTP turu ve CPU süresi (yük altında) ayrıca ölçülür.
 - Docker motoru kapalıyken birim testleri koşulamaz (araçlar Docker'da); koşu zamanı PR'da yazılır.
+
+
+---
+
+## Uygulama (kodlamadan sonra)
+
+### Commit'ler (sırayla; her dilimde önce kırmızı test)
+
+| Commit | Dilim | Kırmızı kanıtı |
+|---|---|---|
+| 12ffcd8 | FOLLOWUP-162 MINOR-r7-1 docs örneği (api.md:540, guardrail.md:128) | docs |
+| e6dd8e8 → 378faff | 0: `NER_CANDIDATES` + `allow_patterns`, `models-check` listesi | e6dd8e8'de 2 düştü / 1 geçti (18b kapsama) |
+| 6fe151f → cdcbd75 | 1: `recognizers/ner.py`, `engine: ner`, dört çağrı noktası | 378faff'te toplama hatası |
+| 9b49514 | 2: `POST /api/v1/internal/guardrails/ner`, 08.yaml | **test kodla aynı commit'te** (sıra ihlali, açıkça) |
+| d2a6ca7 → d97f290 | 4: `pii_ner@1`, PRSIM guard'ı, CLI | 9b49514'te 6 düştü + 4 hata (15c eski davranış, geçti) |
+| 266c332 → e3e7eb6 | 3: yerleşik v3 `default-egress`, `GUARDRAIL_EGRESS_NER`, açılış denetimi | d97f290'da toplama hatası |
+| f4f6332 | FOLLOWUP-165: iki süre testi oran + asılı-kalma tavanı | oran 3,1-4,7 (eşik 8) |
+| 9db7a05 | docs | — |
+
+Kanıt dosyaları: `state/evidence/08t1b-*.log` (red/green dilim 0-4, maketest, maketest3).
+
+### Değişen dosyalar (41, +1503/-94; `git diff 7af41e5..9db7a05 --stat`)
+
+- **guardrails:** `recognizers/ner.py` (yeni), `engine.py` (NER bulguları, `EvalContext.ner`), `schemas.py` (`engine_unsupported` kalktı), `categories.py` (`NER_CATEGORIES`), `builtin.py` (v3), `service.py` (`default-egress` çözümü), `settings.py` (`GUARDRAIL_EGRESS_NER`, `check_egress_ner`), `api_schemas.py` (NER gövdeleri).
+- **api / servis / runtime:** `api/guardrails.py` (iç uç, `local_ner`), `services/facade_guard.py`, `runtime/adapters.py` (`HttpNer`), `runtime/worker.py` + `main.py` (açılış denetimi), `core/readiness.py` (NER ısınma), `core/config.py` (`ner_model`, `ner_revision`).
+- **knowledge:** `models.py` (adaylar), `ingest_mask.py` (`pii_ner@1`, async `mask`), `ingest.py` (filtre await), `raw_ingest.py` (filtre parametresi, NER ön denetimi, M3 kipi), `raw_staging.py` (`text_filter`, `is_prsim`), `cli.py`.
+- **yapılandırma:** `deploy/docker-compose.yml` (`GUARDRAIL_EGRESS_NER` `${…:?}`, `NER_MODEL`, `NER_REVISION`), `.env.example`, `.env.test`, `scripts/m3_preflight.py`.
+- **OpenAPI:** `backend/openapi/08.yaml` (yalnız ek; önyüz bu dosyayı tüketmiyor).
+- **testler:** yeni `test_08t_ner.py`, `test_08t_15_pii_ner.py`, `test_08t_16_builtin_v3.py`, `test_08t_18_ner_candidates.py`; güncellenen `test_08_engine.py`, `integration/test_08_api.py` (`engine_unsupported` iddiaları yeni davranışa), `integration/test_19_ingest_raw.py` (`pii_regex` açık), `test_03a_write_flag.py`, `test_19_preflight.py`, `contract/test_08_openapi.py`, `test_08t_r3_url_scan.py` (FOLLOWUP-165).
+- **docs:** `guardrail.md`, `bilgi-tabani.md`, `api.md`, `paycore-entegrasyon.md`.
+
+### Kabul kriterleri → testler
+
+| # | Kriter | Test | Durum |
+|---|---|---|---|
+| 1 | Ad-soyad recall ≥ 0,85 (llmaas 0,90 raporda) | `test_08t_1_ner_recall_person` (`-m models`) | **NOT_RUN** (ağırlık yok, ENV-163); yazılmadı, ağırlıkla gelir |
+| 2 | TC/telefon/IBAN/e-posta ≥ 0,98 regresyonsuz, NER regex'i ezmez | `test_08t_2b_ner_never_overrides_a_regex_finding` (birim); gerçek modelle `test_08t_2_*` | birim geçti; model koşusu NOT_RUN |
+| 3 | 1.000 karakter P95 < 300 ms | `test_08t_3_ner_latency_p95` (`-m models`) | **NOT_RUN** |
+| 4 | Aday tablosu, lisans, boyut; TabiBERT elenme gerekçesi | ölçüm betiği | **NOT_RUN**; kazanan seçimi ertelendi (K-08T1B-0006: ölçümsüz seçim yok) |
+| 5 | Ağırlık yoksa `model_missing`, indirme yok | `test_08t_5_ner_missing_weights_fail_loud`, `test_08t_5b_unknown_label_fails_at_load`, `test_08t_5c_ner_not_configured_is_loud` | geçti; `--network none` konteyner kanıtı ağırlıkla |
+| 6 | Worker'da model yok, NER API'den; API düşerse fail-closed | `test_08t_6_worker_uses_http_ner`, `6b_ner_down_fails_closed`, `6c_http_ner_rebuilds_values_and_checks_model`, `6d_internal_ner_returns_spans_not_values` | geçti |
+| 15 | `pii_ner` maskesi, PRSIM kabul/ret, eski manifest | `test_08t_15_*`, `15b`, `15c`, `15d`, `15e` | geçti |
+| 16 | Yerleşik v3 egress PERSON; metin aşamaları NER çağırmaz; açılış denetimi; dış agent aynı politika | `test_08t_16_*` (a-g) | geçti |
+| 17 | `engine: ner` kabul; `engine: regex` NER çağırmaz | `test_08t_17*` | geçti |
+| 18 | Adaylar `make models` ile, yalnız izinli dosyalar | `test_08t_18*` | geçti |
+| 19 | `make test` iki profil, `make lint`, test-int | kapı | make test/lint geçti; test-int bekliyor (YIGIN-AÇ A-08T1B-0011) |
+
+### Çalıştırılan komutlar
+
+| Komut | Ortam | Exit | Sonuç |
+|---|---|---|---|
+| `make test` (tools 0.0.0-main + worktree, `--no-deps`) | `DEPLOY_PROFILE=llmaas`, `FAKE_LLM` varsayılan | 0 | 1572/1572 (e3e7eb6) |
+| `make test` | `DEPLOY_PROFILE=airgap` | 0 | 1572/1572 (e3e7eb6) |
+| `make lint` | — | 0 | temiz (e3e7eb6); f4f6332/9db7a05'te ruff check + format --check temiz |
+| `pytest tests/unit/test_08t_r3_url_scan.py` ×2 | llmaas | 0 | 6/6 (f4f6332) |
+| `make test-int` | yığın ffcore-08t1b | — | **bekliyor** |
+| `make models` | kullanıcı makinesi | — | **NOT_RUN** (ENV-163, kullanıcıda) |
+
+Not: d97f290'daki ilk llmaas koşusunda 1a'nın `test_08t_r3_long_line_in_one_character_pieces` süre testi yük altında düştü (1562/1563); tek başına 4/4 geçti; FOLLOWUP-165 ile f4f6332'de oran testine çevrildi.
+
+### Varsayımlar (planın 1-4'üne ek)
+
+5. `pii_ner` ingest'te yalnız `PERSON` maskelenir (kurum/konum kişi verisi değil; PRSIM bilinen sınırı kişi adıydı).
+6. `ingest-raw`'da filtre seçeneği yok (plan/19 "maskeleme adla kapatılamaz" testi); yeni ingest `pii_ner`, `--accept-personnel-data` M3 ölçüm kipi = `pii_regex@1` (ölçülen manifest değişmez). Koordinatörün kabul ettiği varsayım 3'ün ("geriye uyumlu + deprecation") uygulaması budur: bayrak çalışır ve loglanır.
+7. NER erişilemezse PRSIM içeren `ingest-raw` `prsim_requires_ner` (CLI çıkış 2, DB'den önce; eski sözleşme kodu korunur), diğer kaynaklar `ner_unavailable`.
+8. Proje `default-egress` anahtarlı PII politikası saklarsa yerleşiği geçersiz kılar (`default` ile aynı kural); yerleşik `default-egress` PII listesinde (GET) gösterilmiyor: yalnız kural metninde. İstenirse additive eklenir.
+9. `NER_MODEL`/`NER_REVISION` compose'da `${…:-}` (koşullu zorunluluk compose'da ifade edilemiyor); zorunluluğu açılış denetimi uygular.
+
+### Kalan riskler
+
+- Ölçüm yapılmadı: kazanan model, lisans (savasy kartında lisans etiketi olmayabilir; K-08T1B-0002: ürün seçimine giremez), `id2label` gerçek etiketleri ve P95 bilinmiyor. `ner_label_unknown` gerçek kartta tetiklenebilir.
+- Uzun metin pencereleri (`stride=128`) yalnız gerçek modelle doğrulanır; sahte pipeline bunu kanıtlamaz.
+- **Dağıtım:** `GUARDRAIL_EGRESS_NER` olmayan `.env` ile yığın açılmaz (PayCore sunucusu dahil, DECISION-166).
+- 9b49514'te test ayrı kırmızı commit olarak yazılmadı.
+- FOLLOWUP-162'nin 1b dışı kalemleri bu PR'da yok (MINOR-r3-7 `reserve_carried` araç/KB yolu dahil).
