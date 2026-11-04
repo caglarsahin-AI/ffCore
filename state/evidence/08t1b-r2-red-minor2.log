@@ -1,0 +1,194 @@
+FFF                                                                      [100%]
+=================================== FAILURES ===================================
+____________ test_08t_24_transport_error_is_ner_unavailable[error0] ____________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f256cb786b0>
+error = EgressRequestFailed('Outbound call to http://backend:8000 failed: request_failed (connection refused).')
+
+    @pytest.mark.parametrize("error", ERRORS)
+    def test_08t_24_transport_error_is_ner_unavailable(monkeypatch, error):
+        monkeypatch.setattr(egress, "SafeOutboundClient", _refusing(error))
+        monkeypatch.setattr(ner, "service_authorization", lambda s: {"Authorization": "x"})
+        with pytest.raises(ner.NerUnavailable):
+>           asyncio.run(ner.HttpNer(_settings()).find("Bay Ayşe Demir", ["PERSON"]))
+
+tests/unit/test_08t_24_ner_transport_errors.py:55: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.12/asyncio/runners.py:195: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/base_events.py:691: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+ffcore/guardrails/recognizers/ner.py:201: in find
+    for category, start, end, score, evidence in await self._post(window, categories):
+                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ffcore/guardrails/recognizers/ner.py:213: in _post
+    response = await client.request(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <tests.unit.test_08t_24_ner_transport_errors._refusing.<locals>.Client object at 0x7f256c9bdcd0>
+args = ('POST', 'http://backend:8000/api/v1/internal/guardrails/ner')
+kwargs = {'headers': {'Authorization': 'x'}, 'json': {'text': 'Bay Ayşe Demir', 'categories': ['PERSON']}}
+
+    async def request(self, *args, **kwargs):
+>       raise error
+E       ffcore.core.egress.EgressRequestFailed: Outbound call to http://backend:8000 failed: request_failed (connection refused).
+
+tests/unit/test_08t_24_ner_transport_errors.py:39: EgressRequestFailed
+____________ test_08t_24_transport_error_is_ner_unavailable[error1] ____________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f256c9d2ba0>
+error = EgressTimeoutError('Outbound call to http://backend:8000 failed: timeout (read).')
+
+    @pytest.mark.parametrize("error", ERRORS)
+    def test_08t_24_transport_error_is_ner_unavailable(monkeypatch, error):
+        monkeypatch.setattr(egress, "SafeOutboundClient", _refusing(error))
+        monkeypatch.setattr(ner, "service_authorization", lambda s: {"Authorization": "x"})
+        with pytest.raises(ner.NerUnavailable):
+>           asyncio.run(ner.HttpNer(_settings()).find("Bay Ayşe Demir", ["PERSON"]))
+
+tests/unit/test_08t_24_ner_transport_errors.py:55: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.12/asyncio/runners.py:195: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/base_events.py:691: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+ffcore/guardrails/recognizers/ner.py:201: in find
+    for category, start, end, score, evidence in await self._post(window, categories):
+                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ffcore/guardrails/recognizers/ner.py:213: in _post
+    response = await client.request(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <tests.unit.test_08t_24_ner_transport_errors._refusing.<locals>.Client object at 0x7f256c9d3110>
+args = ('POST', 'http://backend:8000/api/v1/internal/guardrails/ner')
+kwargs = {'headers': {'Authorization': 'x'}, 'json': {'text': 'Bay Ayşe Demir', 'categories': ['PERSON']}}
+
+    async def request(self, *args, **kwargs):
+>       raise error
+E       ffcore.core.egress.EgressTimeoutError: Outbound call to http://backend:8000 failed: timeout (read).
+
+tests/unit/test_08t_24_ner_transport_errors.py:39: EgressTimeoutError
+___________________ test_08t_24b_cli_prsim_exits_2_with_code ___________________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f256c9d32f0>
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_08t_24b_cli_prsim_exits_20')
+capsys = <_pytest.capture.CaptureFixture object at 0x7f256c9d3620>
+
+    def test_08t_24b_cli_prsim_exits_2_with_code(monkeypatch, tmp_path, capsys):
+        monkeypatch.setattr(egress, "SafeOutboundClient", _refusing(ERRORS[0]))
+        monkeypatch.setattr(ner, "service_authorization", lambda s: {"Authorization": "x"})
+        monkeypatch.setattr(ingest_mask, "ner_client", lambda: ner.HttpNer(_settings()))
+        raw = tmp_path / "raw"
+        raw.mkdir()
+>       code = cli.main(
+            [
+                "ingest-raw",
+                "--project", "p",
+                "--kb", "k",
+                "--raw-dir", str(raw),
+                "--acl", "analyst",
+                "--sources", "jira:PRSIM",
+            ]
+        )
+
+tests/unit/test_08t_24_ner_transport_errors.py:64: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+ffcore/cli.py:219: in main
+    asyncio.run(raw_ingest.check_ner(args.sources))
+/usr/local/lib/python3.12/asyncio/runners.py:195: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/base_events.py:691: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+ffcore/knowledge/raw_ingest.py:291: in check_ner
+    await ingest_mask.ner_client().find("NER readiness check.", ["PERSON"])
+ffcore/guardrails/recognizers/ner.py:201: in find
+    for category, start, end, score, evidence in await self._post(window, categories):
+                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ffcore/guardrails/recognizers/ner.py:213: in _post
+    response = await client.request(
+tests/unit/test_08t_24_ner_transport_errors.py:39: in request
+    raise error
+/opt/venv/lib/python3.12/site-packages/_pytest/runner.py:361: in from_call
+    result: TResult | None = func()
+                             ^^^^^^
+/opt/venv/lib/python3.12/site-packages/_pytest/runner.py:250: in <lambda>
+    lambda: runtest_hook(item=item, **kwds),
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/pluggy/_caller.py:197: in __call__
+    return self._hookexec(
+/opt/venv/lib/python3.12/site-packages/pluggy/_manager.py:183: in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/_pytest/logging.py:878: in pytest_runtest_call
+    yield
+/opt/venv/lib/python3.12/site-packages/_pytest/capture.py:906: in pytest_runtest_call
+    return (yield)
+            ^^^^^
+/opt/venv/lib/python3.12/site-packages/pluggy/_execution.py:64: in run_old_style_hookwrapper
+    return result.get_result()
+           ^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/pluggy/_execution.py:49: in run_old_style_hookwrapper
+    res = yield
+          ^^^^^
+/opt/venv/lib/python3.12/site-packages/_pytest/skipping.py:268: in pytest_runtest_call
+    return (yield)
+            ^^^^^
+/opt/venv/lib/python3.12/site-packages/_pytest/runner.py:184: in pytest_runtest_call
+    item.runtest()
+/opt/venv/lib/python3.12/site-packages/_pytest/python.py:1798: in runtest
+    self.ihook.pytest_pyfunc_call(pyfuncitem=self)
+/opt/venv/lib/python3.12/site-packages/pluggy/_caller.py:197: in __call__
+    return self._hookexec(
+/opt/venv/lib/python3.12/site-packages/pluggy/_manager.py:183: in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/_pytest/python.py:187: in pytest_pyfunc_call
+    result = testfunction(**testargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+tests/unit/test_08t_24_ner_transport_errors.py:55: in test_08t_24_transport_error_is_ner_unavailable
+    asyncio.run(ner.HttpNer(_settings()).find("Bay Ayşe Demir", ["PERSON"]))
+/usr/local/lib/python3.12/asyncio/runners.py:195: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/base_events.py:691: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+ffcore/guardrails/recognizers/ner.py:201: in find
+    for category, start, end, score, evidence in await self._post(window, categories):
+                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ffcore/guardrails/recognizers/ner.py:213: in _post
+    response = await client.request(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <tests.unit.test_08t_24_ner_transport_errors._refusing.<locals>.Client object at 0x7f256c9bdcd0>
+args = ('POST', 'http://backend:8000/api/v1/internal/guardrails/ner')
+kwargs = {'headers': {'Authorization': 'x'}, 'json': {'text': 'Bay Ayşe Demir', 'categories': ['PERSON']}}
+
+    async def request(self, *args, **kwargs):
+>       raise error
+E       ffcore.core.egress.EgressRequestFailed: Outbound call to http://backend:8000 failed: request_failed (connection refused).
+
+tests/unit/test_08t_24_ner_transport_errors.py:39: EgressRequestFailed
+=========================== short test summary info ============================
+FAILED tests/unit/test_08t_24_ner_transport_errors.py::test_08t_24_transport_error_is_ner_unavailable[error0]
+FAILED tests/unit/test_08t_24_ner_transport_errors.py::test_08t_24_transport_error_is_ner_unavailable[error1]
+FAILED tests/unit/test_08t_24_ner_transport_errors.py::test_08t_24b_cli_prsim_exits_2_with_code
+3 failed in 16.52s

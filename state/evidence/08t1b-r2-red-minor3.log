@@ -1,0 +1,49 @@
+FFF                                                                      [100%]
+=================================== FAILURES ===================================
+___________________ test_08t_25_missing_weights_stop_the_api ___________________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f9688d90b90>
+
+    def test_08t_25_missing_weights_stop_the_api(monkeypatch):
+        seen = []
+    
+        def missing(repo, revision="main"):
+            seen.append((repo, revision))
+            raise models.ModelMissing(repo, Path("/models/hf"))
+    
+        monkeypatch.setattr(models, "hf_path", missing)
+        on = GuardrailSettings(guardrail_egress_enabled=True, guardrail_egress_ner=True)
+        with pytest.raises(RuntimeError) as raised:
+>           guard_settings.check_ner_weights(on, _Core())
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AttributeError: module 'ffcore.guardrails.settings' has no attribute 'check_ner_weights'
+
+tests/unit/test_08t_25_ner_weights_at_startup.py:31: AttributeError
+_________________ test_08t_25b_present_weights_or_ner_off_pass _________________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f9680a37200>
+
+    def test_08t_25b_present_weights_or_ner_off_pass(monkeypatch):
+        calls = []
+        monkeypatch.setattr(models, "hf_path", lambda repo, revision="main": calls.append(repo))
+        on = GuardrailSettings(guardrail_egress_enabled=True, guardrail_egress_ner=True)
+>       guard_settings.check_ner_weights(on, _Core())
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'ffcore.guardrails.settings' has no attribute 'check_ner_weights'
+
+tests/unit/test_08t_25_ner_weights_at_startup.py:40: AttributeError
+___________________ test_08t_25c_api_lifespan_runs_the_check ___________________
+
+    def test_08t_25c_api_lifespan_runs_the_check():
+>       assert "check_ner_weights(" in inspect.getsource(main.lifespan)
+E       AssertionError: assert 'check_ner_weights(' in '@asynccontextmanager\nasync def lifespan(app: FastAPI):\n    def settings():\n        # The request dependency, so an...eave its transaction open.\n        await scheduler.stop()\n    shutdown_tracing()  # flushes what is still buffered\n'
+E        +  where '@asynccontextmanager\nasync def lifespan(app: FastAPI):\n    def settings():\n        # The request dependency, so an...eave its transaction open.\n        await scheduler.stop()\n    shutdown_tracing()  # flushes what is still buffered\n' = <function getsource at 0x7f968ad9e340>(<function lifespan at 0x7f9681151440>)
+E        +    where <function getsource at 0x7f968ad9e340> = inspect.getsource
+E        +    and   <function lifespan at 0x7f9681151440> = main.lifespan
+
+tests/unit/test_08t_25_ner_weights_at_startup.py:50: AssertionError
+=========================== short test summary info ============================
+FAILED tests/unit/test_08t_25_ner_weights_at_startup.py::test_08t_25_missing_weights_stop_the_api
+FAILED tests/unit/test_08t_25_ner_weights_at_startup.py::test_08t_25b_present_weights_or_ner_off_pass
+FAILED tests/unit/test_08t_25_ner_weights_at_startup.py::test_08t_25c_api_lifespan_runs_the_check
+3 failed in 15.99s

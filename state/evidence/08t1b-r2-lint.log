@@ -1,0 +1,22 @@
+ruff check backend scripts data/samples/scripts services
+E501 Line too long (103 > 100)
+  --> backend/ffcore/guardrails/builtin.py:46:101
+   |
+46 | def builtin_egress_pii(egress_ner: bool, stored_default: PiiPolicySpec | None = None) -> PiiPolicySpec:
+   |                                                                                                     ^^^
+47 |     """The egress PII policy when no `default-egress` is stored.
+   |
+
+E501 Line too long (149 > 100)
+ --> backend/ffcore/knowledge/raw_ingest.py:5:101
+  |
+3 | …a named text filter, always (`pii_ner`;
+4 | …n to leave it off (plan/19 şart 1). A
+5 | …er_mismatch`), never processed again. A file whose bytes are already indexed under the same
+  |                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+6 | …reports `created 0`). Same bytes in any
+7 | …) is `retried`: the pipeline runs again
+  |
+
+Found 2 errors.
+make: *** [Makefile:9: lint] Error 1

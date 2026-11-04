@@ -1,0 +1,77 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+__________________ test_08t_26_builtin_chain_stores_as_shown ___________________
+
+admin = <starlette.testclient.TestClient object at 0x7f36704fd670>
+base = '/api/v1/projects/cc6678c3-937d-44d8-8a03-083eb59cd86c'
+
+    def test_08t_26_builtin_chain_stores_as_shown(admin, base):  # noqa: F811
+        listed = admin.get(base + "/pii-policies").json()["data"]
+        builtins = {p["key"]: p for p in listed if p["builtin"]}
+>       assert set(builtins) == {"default", "default-egress"}, listed
+E       AssertionError: [{'id': None, 'project_id': 'cc6678c3-937d-44d8-8a03-083eb59cd86c', 'key': 'default', 'name': 'Built-in default', ...}]
+E       assert {'default'} == {'default', 'default-egress'}
+E         
+E         Extra items in the right set:
+E         'default-egress'
+E         Use -v to get more diff
+
+tests/integration/test_08t_26_builtin_egress_key.py:22: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+2026-11-04 19:39:38,959 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-04 19:39:39,037 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=760
+------------------------------ Captured log setup ------------------------------
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=760
+----------------------------- Captured stderr call -----------------------------
+2026-11-04 19:39:39,592 INFO ffcore.access access method=GET path=/api/v1/projects/cc6678c3-937d-44d8-8a03-083eb59cd86c/pii-policies status=200 ms=547
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/cc6678c3-937d-44d8-8a03-083eb59cd86c/pii-policies status=200 ms=547
+________________ test_08t_26b_panel_reports_builtin_egress_pii _________________
+
+admin = <starlette.testclient.TestClient object at 0x7f35f46ee540>
+base = '/api/v1/projects/7f1bb513-7084-49b8-bffa-0256e5c874ea'
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f35edbea960>
+
+    def test_08t_26b_panel_reports_builtin_egress_pii(admin, base, monkeypatch):  # noqa: F811
+        from ffcore.api import guardrails as api
+        from ffcore.guardrails.settings import get_guardrail_settings
+    
+        # NER on: the built-in egress PII is then the NER variant (not DEFAULT_PII).
+        monkeypatch.setenv("GUARDRAIL_EGRESS_NER", "true")
+        get_guardrail_settings.cache_clear()
+        monkeypatch.setattr(api, "local_ner", lambda: FakeNer())
+        try:
+            out = admin.post(
+                base + "/guardrails/test",
+                json={
+                    "text": "e-posta ayse@ornek.com",
+                    "stage": "input.pre",
+                    "policy_key": "default-egress",
+                    "action": "redact",
+                },
+            )
+        finally:
+            monkeypatch.undo()
+            get_guardrail_settings.cache_clear()
+        assert out.status_code == 200, out.text
+>       assert out.json()["builtin"] is True
+E       assert False is True
+
+tests/integration/test_08t_26_builtin_egress_key.py:68: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+2026-11-04 19:39:48,855 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-04 19:39:48,999 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-04 19:39:49,020 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=162
+------------------------------ Captured log setup ------------------------------
+ERROR    ffcore.readiness:readiness.py:63 warmup failed: ModelMissing
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=162
+----------------------------- Captured stderr call -----------------------------
+2026-11-04 19:39:49,087 INFO ffcore.access access method=POST path=/api/v1/projects/7f1bb513-7084-49b8-bffa-0256e5c874ea/guardrails/test status=200 ms=62
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/7f1bb513-7084-49b8-bffa-0256e5c874ea/guardrails/test status=200 ms=62
+=========================== short test summary info ============================
+FAILED tests/integration/test_08t_26_builtin_egress_key.py::test_08t_26_builtin_chain_stores_as_shown
+FAILED tests/integration/test_08t_26_builtin_egress_key.py::test_08t_26b_panel_reports_builtin_egress_pii
+2 failed in 22.20s
