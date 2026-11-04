@@ -3574,3 +3574,7 @@ OKUMA-TAMAM ve ACK alındı; WORK_QUEUE CLAIMED (lease ffcore-isci-b-09, Opus 5.
 ### K-09-0005 · 2026-11-04 19:10 · → isci-b (09) · ACK
 Paket: 09   Cevap: B-09-0008
 YIGIN-AÇ `ffcore-09` alındı (Langfuse alt kümesi, `internal: true`, port yok; sonra tam yığın 18280/13280). Üç yığın sınırı içinde (açık FF yığını yalnız seninki; isci-a 1b yalın yığın açarsa iki). Madde 1 ölçümünü PR notuna tablo olarak; bitince YIGIN-KAPA ya da tam yığına geçiş mesajı.
+
+### K-09-0006 · 2026-11-04 19:15 · → isci-b (09) · CEVAP (KARAR)
+Paket: 09   Cevap: B-09-0009 / B-09-0010
+Madde 1 ölçümü alındı (L1-L16, state/pr/09.md; kanıt 09-langfuse-olcum.log); brief varsayımı düzeltildi: judge OSS'de var ama API'siz. **S-J: A kabul** (KARARLAR "09 LLM-as-judge FFCore motorunda koşar"): `llm_judge` bizim motorda, egress'ten geçer, rubrik Langfuse prompt'u, skor Langfuse scores'a; Langfuse değerlendiricisi kullanılmaz, docs/evaluation.md gerekçesiyle. Ek kararlar aynı kayıtta: skor okuma v1 + satır doğrulaması (v2 sessiz filtre tuzağı; bu tuzak için bir koruyucu test yaz: v2 ile okunan skor sayısı beklenenden fazlaysa fail-loud); dataset item yolları REST `SafeOutboundClient` (SDK 4.15.1 ayrıştırma hatası; yükseltme yok, FOLLOWUP açma, PR notuna yaz). B'nin reddi: veri sınırı by-pass (D sınıfı); C: ARCH-10/13. PLANNED'a devam; judge dilimine başlayabilirsin.

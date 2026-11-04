@@ -1731,3 +1731,17 @@ GOREV alındı (K-09-0003'e göre taze oturum). Sıra: worktree C:\ai_paycore\ff
 ### B-09-0008 · 2026-11-04 19:08 · → koordinator · YIGIN-AÇ
 Paket: 09   Cevap: K-09-0004
 YIGIN-AÇ `ffcore-09` (FFCORE_VERSION=0.0.0-09, .env.test). Önce yalnız Langfuse alt kümesi (langfuse-web/worker/postgres/clickhouse/minio/redis; port yayını yok), ağ `internal: true` geçersiz kılma dosyasıyla (dış çıkış yok) → madde 1 ölçümü. Tam yığın sonra aynı proje adıyla, backend 18280 / frontend 13280. Ölçüm: C: 114 GB boş, açık FF yığını yok, Docker VM 11,7 GiB, kullanıcı airflow konteynerleri ≈ 2 GiB.
+
+### B-09-0009 · 2026-11-04 19:14 · → koordinator · DURUM
+Paket: 09   Cevap: K-09-0001 madde 1 / K-09-0004
+Madde 1 ölçümü tamam: tablo state/pr/09.md "Madde 1" (L1-L16), kanıt state/evidence/09-langfuse-olcum.log + betikler. Yığın: ffcore-09 yalnız Langfuse alt kümesi, ağ internal, port yok.
+Özet: datasets, item upsert, dataset-run-items (dışarıda üretilmiş traceId ile, yani 06a koşu izi doğrudan bağlanır), run listesi/silme, skorlar (NUMERIC/BOOLEAN/CATEGORICAL + metadata, run düzeyi, id ile upsert), score-configs **OSS'de var**. İki tuzak: (1) v2 skor okumada `traceId`/`datasetRunId` filtresi **sessizce yok sayılıyor**; v1 `?traceId=` çalışıyor → okuma v1 + satır doğrulaması. (2) SDK langfuse 4.15.1 dataset item yolları sunucu 3.120.0 cevabını ayrıştıramıyor (`media_references` ValidationError) → 09 Langfuse REST'i SafeOutboundClient ile çağırır; yükseltme gerekmez.
+Brief varsayımı tutmuyor: **LLM-as-judge OSS'de var** (worker evaluation modülü, plan kapısı yok) ama yapılandırma public API'si yok (404) ve model çağrısı Langfuse'tan doğrudan gider (egress yok).
+
+### B-09-0010 · 2026-11-04 19:14 · → koordinator · KARAR-GEREK
+Paket: 09   Cevap: -
+S-J judge nerede koşar (ayrıntı state/pr/09.md "S-J"):
+- **A (Önerilen):** `llm_judge` bizim motorda (litellm_client + LLM_SLOTS arka plan, egress'ten geçer, rubrik Langfuse prompt'u, skor Langfuse scores'a); Langfuse değerlendiricisi kullanılmaz, docs'ta gerekçesiyle. Gerekçe: kodla kurulamaz/test edilemez, egress/veri sınırı by-pass, ±1 tutarlılık testi ve kuyruk kuralı yalnız bizde. Bedel: brief'teki scorer modülü (zaten kapsamda).
+- B: Langfuse değerlendiricisi (LLM connection → LiteLLM). Bedel: llmaas'ta maskesiz içerik (D sınıfı veri sınırı), UI'da elle kurulum, kuyruk dışı, kabul testi yazılamaz.
+- C: ikisi birden. Bedel: iki judge yolu, geçerli skor belirsiz (ARCH-10/13).
+Beklerken A varsayımıyla bağımlı teslimatları okuyup PLANNED yazıyorum (judge dilimine A cevabı gelmeden kod yazmam).
