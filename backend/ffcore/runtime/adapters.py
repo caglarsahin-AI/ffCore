@@ -37,6 +37,7 @@ from ffcore.guardrails.masking import (
     rescope,
     reserve_carried,
 )
+from ffcore.guardrails.recognizers import ner as ner_recognizers
 from ffcore.guardrails.service import record_events, resolve_policy
 from ffcore.guardrails.settings import get_guardrail_settings
 from ffcore.knowledge.chunking import approx_tokens
@@ -350,6 +351,10 @@ class EngineGuard:
         self._run_id, self._project_id = str(run_id), project_id
         self._egress = egress_enabled
         self._tokens = RedisTokenStore(redis, token_ttl_s)
+        # 08 tam 1b: the worker never loads the NER model; it asks the API (POST /internal/ner).
+        from ffcore.core.config import get_settings
+
+        self._ner = ner_recognizers.HttpNer(get_settings())
 
     @property
     def streams_live(self) -> bool:
@@ -368,6 +373,7 @@ class EngineGuard:
             tool=tool,
             token_store=self._tokens,
             egress_enabled=self._egress,
+            ner=self._ner,
         )
         decision = await engine.evaluate(text, stage, self._policy, ctx=ctx)
         if decision.events:

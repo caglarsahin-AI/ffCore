@@ -43,6 +43,7 @@ from ffcore.guardrails.engine import (
     evaluate,
 )
 from ffcore.guardrails.masking import MemoryTokenStore
+from ffcore.guardrails.recognizers.ner import local_ner
 from ffcore.guardrails.schemas import (
     GuardrailConfigError,
     PiiPolicySpec,
@@ -433,6 +434,7 @@ async def test_guardrails(
         locale=body.locale,
         tool=body.tool,
         token_store=MemoryTokenStore(),
+        ner=local_ner(),
     )
     try:
         decision = await evaluate(body.text, body.stage, policy, ctx=ctx)
@@ -474,6 +476,7 @@ async def evaluate_guardrails(body: EvaluateRequest, actor: ServiceActor, sessio
             locale=body.locale,
             tool=body.tool,
             token_store=store,
+            ner=local_ner(),
         )
         return await evaluate(body.text, body.stage, policy, ctx=ctx)
 

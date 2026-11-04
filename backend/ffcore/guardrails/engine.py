@@ -15,7 +15,7 @@ import uuid
 from dataclasses import dataclass, field
 from dataclasses import fields as dataclass_fields
 
-from ffcore.guardrails.categories import ACTION_RANK, STAGES
+from ffcore.guardrails.categories import ACTION_RANK, NER_CATEGORIES, STAGES
 from ffcore.guardrails.findings import Finding
 from ffcore.guardrails.masking import (
     PlaceholderOutOfRange,
@@ -25,6 +25,7 @@ from ffcore.guardrails.masking import (
     redact_label,
 )
 from ffcore.guardrails.recognizers import regex as regex_recognizers
+from ffcore.guardrails.recognizers.ner import NerClient
 from ffcore.guardrails.recognizers.regex import recognize, resolve_overlaps
 from ffcore.guardrails.rules import find_secrets, find_tool_arg_violations
 from ffcore.guardrails.schemas import GuardrailConfigError, PiiPolicySpec, ResolvedPolicy, Rule
@@ -64,6 +65,9 @@ class EvalContext:
     token_store: TokenStore | None = None
     # None: read GUARDRAIL_EGRESS_ENABLED from the environment.
     egress_enabled: bool | None = None
+    # 08 tam 1b: the NER client an `engine: ner` policy needs (API: LocalNer, workers: HttpNer);
+    # None there is `ner_not_configured`.
+    ner: "NerClient | None" = None
 
 
 @dataclass
@@ -137,12 +141,38 @@ def _egress_enabled(ctx: EvalContext) -> bool:
     return get_guardrail_settings().guardrail_egress_enabled
 
 
-def _pii_findings(text: str, rule: Rule, pii: PiiPolicySpec) -> list[tuple[Finding, str, str]]:
-    active = {
+def _active(pii: PiiPolicySpec) -> dict:
+    return {
         code: setting
         for code, setting in pii.categories.items()
         if setting.enabled and (setting.lang is None or set(setting.lang) & set(pii.languages))
     }
+
+
+async def _ner_findings(
+    text: str, rule: Rule, policy: ResolvedPolicy, ctx: EvalContext
+) -> list[Finding]:
+    """The NER hits a `pii` rule of an `engine: ner` policy needs (awaited before the scan:
+    a worker gets them over HTTP). `engine: regex` never calls NER."""
+    if rule.type != "pii":
+        return []
+    pii = policy.pii_policies.get(rule.pii_policy_key or "")
+    if pii is None or pii.engine != "ner":
+        return []
+    wanted = sorted(set(_active(pii)) & set(NER_CATEGORIES))
+    if not wanted:
+        return []
+    if ctx.ner is None:
+        raise GuardrailConfigError(
+            "ner_not_configured", "This caller has no NER client for an `engine: ner` policy."
+        )
+    return await ctx.ner.find(text, wanted)
+
+
+def _pii_findings(
+    text: str, rule: Rule, pii: PiiPolicySpec, ner_hits: list[Finding] = ()
+) -> list[tuple[Finding, str, str]]:
+    active = _active(pii)
     hits = list(recognize(text, active, context_boost=pii.context_boost))
     for pattern in pii.custom_patterns:
         if pattern.category not in active:
@@ -158,6 +188,10 @@ def _pii_findings(text: str, rule: Rule, pii: PiiPolicySpec) -> list[tuple[Findi
                     m.group(0),
                 )
             )
+    # A NER span never overrides a regex or custom finding (checksummed values win, 08t_2).
+    hits.extend(
+        n for n in ner_hits if n.category in active and not any(n.overlaps(h) for h in hits)
+    )
     result = []
     for finding in resolve_overlaps(hits):
         if finding.score < pii.min_confidence:
@@ -169,7 +203,12 @@ def _pii_findings(text: str, rule: Rule, pii: PiiPolicySpec) -> list[tuple[Findi
 
 
 def _rule_findings(
-    text: str, stage: str, rule: Rule, policy: ResolvedPolicy, ctx: EvalContext
+    text: str,
+    stage: str,
+    rule: Rule,
+    policy: ResolvedPolicy,
+    ctx: EvalContext,
+    ner_hits: list[Finding] = (),
 ) -> list[tuple[Finding, str, str]]:
     if rule.type == "pii":
         pii = policy.pii_policies.get(rule.pii_policy_key or "")
@@ -177,7 +216,7 @@ def _rule_findings(
             raise GuardrailConfigError(
                 "pii_policy_not_found", f"PII policy '{rule.pii_policy_key}' not found."
             )
-        return _pii_findings(text, rule, pii)
+        return _pii_findings(text, rule, pii, ner_hits)
     if rule.type == "secrets":
         return [(f, rule.action, "high") for f in find_secrets(text)]
     if rule.type == "tool_args":
@@ -289,8 +328,11 @@ async def evaluate(
             run_id=ctx.run_id,
         )
         try:
+            ner_hits = await _ner_findings(current, rule, policy, ctx)
             # CPU-bound scanning runs off the event loop (00i pattern).
-            hits = await asyncio.to_thread(_rule_findings, current, stage, rule, policy, ctx)
+            hits = await asyncio.to_thread(
+                _rule_findings, current, stage, rule, policy, ctx, ner_hits
+            )
             action = _strongest(a for _, a, _ in hits)
             pending.append((event, current, [f for f, _, _ in hits]))
             for f, _, _ in hits:

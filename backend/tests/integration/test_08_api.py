@@ -144,8 +144,9 @@ def test_08_14_pii_policy_reference(admin, project):
 def test_08_15_unsupported_rejected_by_api(admin, project):
     person = _pii(admin, project, categories={"PERSON": {}})
     assert person.json()["error"]["code"] == "category_unsupported"
-    ner = _pii(admin, project, key="ner", engine="ner")
-    assert ner.json()["error"]["code"] == "engine_unsupported"
+    # 08 tam 1b: `engine: ner` makes PERSON recognizable (no `engine_unsupported` any more).
+    ner = _pii(admin, project, key="ner", engine="ner", categories={"PERSON": {}})
+    assert ner.status_code == 201, ner.json()
     later = _policy(
         admin, project, rules=[{"type": "injection", "action": "block", "stages": ["input.pre"]}]
     )
