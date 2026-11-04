@@ -85,6 +85,9 @@ calls the model.
   API cannot answer, the rule fails and follows `on_error` (default `block`); nothing falls back
   to regex only.
 - Long texts are read in overlapping windows (stride 128 tokens), never cut at the model limit.
+  The internal endpoint takes at most 200,000 characters per request; a worker sends a longer
+  text (a large document at ingest) in windows overlapping by 2,000 characters and merges the
+  spans the overlap repeats, so a name on a window edge is still found.
 - Weights: `make models` downloads the candidates (model card, config, tokenizer, PyTorch
   weights only) into the `model_cache` volume; `make models-check` lists them offline. The
   measured model, its licence and the quality and latency table are added when the measurement

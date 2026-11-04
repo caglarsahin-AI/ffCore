@@ -32,6 +32,11 @@ IGNORED_LABELS = ("O", "MISC", "DATE", "TIME", "MONEY", "PERCENT")
 _PREFIXES = ("B-", "I-", "E-", "S-", "L-", "U-")
 # Long texts are cut into overlapping windows by the pipeline (no silent truncation at 512).
 STRIDE = 128
+# The internal endpoint's request limit (NerRequest.text). A longer text is sent by HttpNer in
+# overlapping windows below it (r1 MAJOR-2): a name cut by one window's edge is whole in the
+# next, and the spans the overlap repeats are merged. The overlap is far above any name.
+NER_TEXT_MAX_CHARS = 200_000
+NER_WINDOW_OVERLAP_CHARS = 2_000
 
 
 class NerConfigError(GuardrailConfigError):
@@ -176,6 +181,16 @@ class HttpNer:
     async def find(self, text: str, categories: Collection[str]) -> list[Finding]:
         if not self.model or not self.revision:
             raise NerConfigError("ner_not_configured", "NER_MODEL and NER_REVISION are not set.")
+        hits = []
+        for offset, window in windows(text):
+            for category, start, end, score, evidence in await self._post(window, categories):
+                hits.append((category, start + offset, end + offset, score, evidence))
+        return [
+            Finding(category, start, end, score, evidence, text[start:end])
+            for category, start, end, score, evidence in merge_spans(hits)
+        ]
+
+    async def _post(self, text: str, categories: Collection[str]) -> list[tuple]:
         from ffcore.core import egress
 
         timeout = egress.EgressTimeout(connect=5, read=120, total=180)
@@ -199,14 +214,34 @@ class HttpNer:
             start, end = int(hit["start"]), int(hit["end"])
             if not 0 <= start < end <= len(text):
                 raise NerUnavailable("internal ner returned a span outside the text")
-            out.append(
-                Finding(
-                    hit["category"],
-                    start,
-                    end,
-                    float(hit["score"]),
-                    hit["evidence"],
-                    text[start:end],
-                )
-            )
+            out.append((hit["category"], start, end, float(hit["score"]), hit["evidence"]))
         return out
+
+
+def windows(text: str, size: int = NER_TEXT_MAX_CHARS, overlap: int = NER_WINDOW_OVERLAP_CHARS):
+    """(offset, window) pieces of at most `size` characters, each overlapping the previous one by
+    `overlap`; a text within `size` is one piece. Nothing is dropped."""
+    if len(text) <= size:
+        yield 0, text
+        return
+    start = 0
+    while True:
+        end = min(start + size, len(text))
+        yield start, text[start:end]
+        if end == len(text):
+            return
+        start = end - overlap
+
+
+def merge_spans(hits: list[tuple]) -> list[tuple]:
+    """Overlapping spans (the same name seen by two windows, or cut by one window's edge) become
+    their union, with the category, score and evidence of the higher-scored one."""
+    merged: list[tuple] = []
+    for hit in sorted(hits, key=lambda h: (h[1], -h[2])):
+        if merged and hit[1] < merged[-1][2]:
+            last = merged[-1]
+            best = last if last[3] >= hit[3] else hit
+            merged[-1] = (best[0], last[1], max(last[2], hit[2]), best[3], best[4])
+        else:
+            merged.append(hit)
+    return merged

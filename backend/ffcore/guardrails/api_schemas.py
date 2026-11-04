@@ -17,6 +17,7 @@ from ffcore.guardrails.categories import (
     ON_ERROR,
     STAGES,
 )
+from ffcore.guardrails.recognizers.ner import NER_TEXT_MAX_CHARS
 from ffcore.guardrails.schemas import BlockMessage, CustomPattern, PiiCategorySetting, Rule
 
 PolicyKey = Annotated[
@@ -208,7 +209,7 @@ class DecisionOut(BaseModel):
 
 
 class NerRequest(Strict):
-    text: str = Field(max_length=200_000)
+    text: str = Field(max_length=NER_TEXT_MAX_CHARS)
     categories: list[Literal[NER_CATEGORIES]] = Field(min_length=1)
 
 
