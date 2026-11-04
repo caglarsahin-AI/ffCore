@@ -59,6 +59,17 @@ cases = {
     "uppercase SELECT prose": f"SELECT {LOGIN} ekibinden",
     "lowercase set prose": f"set {LOGIN} olarak",
     "decorator line": "@pytest.fixture\ndef x(): pass",
+    # r2 additions (decision A, MINOR-1)
+    "chained decorators then def": "@pytest.fixture\n@pytest.mark.slow\n\ndef x(): pass",
+    "decorator then class": "@dataclass\nclass A: pass",
+    "async def after decorator": "@app.get('/x')\nasync def f(): pass",
+    "login alone at the end": f"Soru:\n{LOGIN}",
+    "login alone then blank then prose": f"{LOGIN}\n\nKontrol eder misin?",
+    "login alone then another login line": f"{LOGIN}\n@mehmet.kaya\nbakın",
+    "login alone then def prose": f"{LOGIN}\ndefinitely bak",
+    "DECLARE @x = 1": "DECLARE @x = 1",
+    "lowercase declare assignment": "declare @ali.veli = 1",
+    "login = 1 without SQL": "@ali.veli = 1",
     "@echo off": "@echo off",
     "@echo then login line": f"@echo {LOGIN}",
     # FOLLOWUP-160
@@ -69,3 +80,4 @@ cases = {
 for name, text in cases.items():
     show(name, text)
 print("heading:", m._heading(f"Özet {LOGIN} ve {{{{@ali.veli}}}}"))
+print("heading alone:", m._heading(LOGIN))

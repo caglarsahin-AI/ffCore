@@ -1,0 +1,45 @@
+ok    one-line {code} + mention + signature: '{code}SELECT 1{code} [USER] bakar mısın' dropped=3
+ok    unclosed fence then mention: '```\nkod\n[USER] bak' dropped=0
+ok    single backtick then mention: '`x [USER] bak' dropped=0
+ok    two-line {code} keeps @Inject/@foo: '{code}\n@Inject @foo\n{code}\n[USER] bak' dropped=0
+ok    {noformat} one line: '{noformat}x{noformat} [USER]' dropped=0
+ok    ~~~ block then prose: '~~~\n@foo\n~~~\n[USER] bak' dropped=0
+ok    indented fence: '   ```python\n@foo\n   ```\n[USER] bak' dropped=0
+ok    {code:sql}SELECT{code} @ali.veli: '{code:sql}SELECT{code} [USER]' dropped=0
+ok    CRLF fences: '```\n@foo\n```\n[USER] bak\n' dropped=0
+ok    fence in fence: ~~~ closed by ```: '~~~\n```\n~~~\n[USER] bak\n```' dropped=0
+ok    fence in fence: {code} closed by {noformat}: '{code}\n{noformat}\n{code}\n[USER] bak\n{code}' dropped=0
+ok    4-backtick block with ``` inside: '````\n```\n````\n[USER] bak\n```' dropped=0
+LEAK  {{...}} inline (decision: code): '{{@ali.veli}} ve [USER]' dropped=0
+ok    info string with a space (``` sql): '``` sql\nSELECT 1\n```\n[USER] bak\n```\nx\n```' dropped=0
+ok    info string with attrs (```js title=a): '```js title=a\nx\n```\n[USER] bak\n```\ny\n```' dropped=0
+ok    ~~~~ (4 tildes): '~~~~\n~~~\n~~~~\n[USER] bak\n~~~' dropped=0
+ok    {code:title=A b}: '{code:title=A b|borderStyle=solid}\n@foo\n{code}\n[USER] bak' dropped=0
+ok    DECLARE @x: 'DECLARE @x INT' dropped=0
+ok    SET @x =: 'SET @x = 1' dropped=0
+ok    lutfen @ahmet.yilmaz bak: 'lutfen [USER] bak' dropped=0
+ok    login alone on a line (Jira reply): '[USER]\nKontrol eder misin?' dropped=0
+ok    login alone + punctuation: '[USER],\nKontrol eder misin?' dropped=0
+ok    two logins on one line: '[USER] [USER]' dropped=0
+ok    login = assignment-like prose: 'Sorumlu: [USER] = onaylayan' dropped=0
+ok    login => arrow prose: '[USER] => devraldı' dropped=0
+LEAK  uppercase SELECT prose: 'SELECT @ahmet.yilmaz ekibinden' dropped=0
+ok    lowercase set prose: 'set [USER] olarak' dropped=0
+ok    decorator line: '@pytest.fixture\ndef x(): pass' dropped=0
+ok    chained decorators then def: '@pytest.fixture\n@pytest.mark.slow\n\ndef x(): pass' dropped=0
+ok    decorator then class: '@dataclass\nclass A: pass' dropped=0
+ok    async def after decorator: "@app.get('/x')\nasync def f(): pass" dropped=0
+ok    login alone at the end: 'Soru:\n[USER]' dropped=0
+ok    login alone then blank then prose: '[USER]\n\nKontrol eder misin?' dropped=0
+ok    login alone then another login line: '[USER]\n[USER]\nbakın' dropped=0
+ok    login alone then def prose: '[USER]\ndefinitely bak' dropped=0
+ok    DECLARE @x = 1: 'DECLARE @x = 1' dropped=0
+ok    lowercase declare assignment: 'declare [USER] = 1' dropped=0
+ok    login = 1 without SQL: '[USER] = 1' dropped=0
+ok    @echo off: '@echo off' dropped=0
+ok    @echo then login line: '@echo [USER]' dropped=0
+ok    @ahmet-yilmaz@firma.com: 'iletişim @ahmet-yilmaz@firma.com' dropped=0
+ok    @app_get(: '@app_get(path)' dropped=0
+ok    @al short: '@al bak' dropped=0
+heading: Özet [USER] ve {{@ali.veli}}
+heading alone: [USER]
