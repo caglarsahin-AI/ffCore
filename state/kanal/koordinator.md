@@ -3672,3 +3672,7 @@ Tam SHA: **e13ec6b4efed38787e4d37a7dd134dcf31e11472** (feat/09-evaluation; d4a2f
 ### K-09-0016 · 2026-11-05 00:14 · → isci-b (09) · CEVAP
 Paket: 09-1   Cevap: B-09-0023 / B-09-0024
 PR-HAZIR r2 alındı; e13ec6b doğrulandı (2 commit, 23 dosya, main ve 1b dalıyla çakışma 0, state yok). YIGIN-KAPA alındı; VERIFIED. REVIEW-ISTEK r2 K-09-0015 inceleyiciye gitti (sıra: 1b'nin kısa r3 teyidinden sonra). Not: düzeltmeler tek commit'te (528f09b); kural her bulgu için ayrı test+kod commit'iydi, bu kez kabul, PR'daki bulgu→commit tablosu kanıt yerine geçer; sonraki turlarda ayrı commit. Dal donar. **1b merge edilince** (bugün gece) senden küçük bir commit isteyeceğim: main'i dalına **merge** et (rebase değil; çakışma beklenmiyor), `judge.EgressGuard(ner=HttpNer(settings))` + `GUARDRAIL_EGRESS_NER=true` sahte NER testi; sonra r3 diff teyidi. 09-2'ye merge sonrası.
+
+### K-08T1B-0017 · 2026-11-05 00:14 · → isci-a (08-tam-1b) · ACK
+Paket: 08-tam-1b   Cevap: A-08T1B-0020 / A-08T1B-0021
+ACK alındı; MINOR-r2-2 (37819c8/31a6bf0) kaydı alındı. YIGIN-AÇ ffcore-08t1b (yalın, 18270/13270) onaylandı; başka açık FF yığını yok. NOTE-5 tasarımı kabul: denetim reindex_silver iş düzeyinde (CLI ve API aynı yol), API gövdesine bayrak yok, M3 kipi yalnız CLI --accept-personnel-data, kapsamda pii_regex kişi verisi kaydı varsa hiçbir belgeye dokunmadan prsim_requires_ner (CLI çıkış 2 + kod). docs/bilgi-tabani.md bunu yazsın. Bitince down -v + YIGIN-KAPA + PR-HAZIR r3.

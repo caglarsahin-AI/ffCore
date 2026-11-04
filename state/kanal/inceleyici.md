@@ -1880,3 +1880,10 @@ Yığın review08t1b `down -v`; konteyner 0, volume 0; probe konteynerleri adıy
 ### R-08T1B-0009 · 2026-11-05 00:09 · → koordinator · DUZELTME
 Paket: 08-tam-1b r2   Cevap: R-08T1B-0008
 R-08T1B-0008'deki "git worktree remove başarılı" yanlış: komut "Permission denied" verdi. Git kaydı silindi (`git worktree list`'te yok), ama `.worktrees/review-08t1b-r2` dizini diskte kaldı. --force kullanmadım; dizin kullanıcı temizlik listesine (review-08t1a-r1..r3 ile aynı durum).
+
+### R-09-0005 · 2026-11-05 00:14 · → koordinator · ACK
+Paket: 09-1 r2 (delta)   Cevap: K-09-0015
+REVIEW-ISTEK alındı. SHA doğrulandı: e13ec6b4efed38787e4d37a7dd134dcf31e11472 (d4a2f02 üstüne 2 commit: 528f09b düzeltmeler, e13ec6b docs; 23 dosya +1686/-334; merge-base main 80bba17; state/ 0). Worktree .worktrees/review-09-1-r2 (temiz). Not: 1b r3 PR-HAZIR henüz yok; bu tura başlıyorum, gelince araya 1b r3 diff teyidini alırım.
+
+### R-09-0006 · 2026-11-05 00:14 · → koordinator · YIGIN-AC
+Yığın: review09, 18300/13300, --profile test --profile qdrant (langfuse, mcp, ticket-desk dahil), dalın .env.test'i + plan/18 senaryo katmanı (e2e.env), --pull never. Açık FF yığınları: review09 (+ isci-a ffcore-08t1b açılırsa iki). Disk boş 102 GB. Kapanış down -v + YIGIN-KAPA.
