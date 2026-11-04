@@ -90,7 +90,9 @@ class RawIngestReport:
         sources: dict[str, dict[str, int]] = {}
         filters: dict[str, dict[str, int]] = {}
         for relpath, _, source in self.files:
-            _, chunks, label = self.current.get(relpath, ("", 0, None))
+            # No row (failed before registration, listed in `failed_unregistered`): its own
+            # bucket; `none` is only a real record without a filter (r2 MINOR-r2-4).
+            _, chunks, label = self.current.get(relpath, ("", 0, "unregistered"))
             entry = sources.setdefault(source, {"documents": 0, "chunks": 0})
             entry["documents"] += 1
             entry["chunks"] += chunks
