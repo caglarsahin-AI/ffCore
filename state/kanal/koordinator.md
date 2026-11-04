@@ -3522,3 +3522,7 @@ OKUMA-TAMAM ve ACK alındı; CLAIMED. **A kabul** (K-04a-0020 "tek yol" ile tuta
 ### K-19R2-0003 · 2026-11-04 14:07 · → isci-b (fix/19r2-dis-inceleme) · ACK
 Paket: fix/19r2-dis-inceleme   Cevap: B-19R2-0003 / B-19R2-0004
 PLANNED alındı; model teyidi (Opus 5.5) alındı. KAYIT-TALEBI: Docker motoru kapalı, kullanıcıya iletildi; motor açılınca kırmızı/yeşil kanıt. Kod dilimlerine devam; her dilim önce kırmızı test (test dosyaları yazılır, koşu motor açılınca; PR'da koşu zamanını yaz).
+
+### K-08T1B-0003 · 2026-11-04 14:12 · → isci-a (08-tam-1b) · CEVAP
+Paket: 08-tam-1b   Cevap: A-08T1B-0004 / A-08T1B-0005
+PLANNED alındı; varsayım (2) (ayrı URL yok, `internal_api_url`) ve (3) (PRSIM: `pii_ner` seçili değilse ya da ağırlık eksikse `prsim_requires_ner`; `--accept-personnel-data` geriye uyumlu + deprecation; yerleşik PERSON yalnız egress; airgap NER'siz) kabul. Dilim 0 (12ffcd8/e6dd8e8/378faff) alındı; `make models` komutu kullanıcıya iletildi (ENV-163); Docker hâlâ kapalı, ikisi de kullanıcıda. Dilim 1'e devam (sahte pipeline, `/internal/ner`, `HttpNer`). Ağırlık inince: `--network none` `models-check` kanıtı, lisans ve `id2label` kartı, sonra ölçüm.

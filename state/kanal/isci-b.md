@@ -1682,3 +1682,8 @@ Sıradaki: R9 kırmızı testleri.
 Paket: fix/19r2-dis-inceleme   Cevap: K-19R2-0002
 Model: Opus 5.5 (claude-opus-5-5). K-19R2-0002 alındı; onay beklemeden devam.
 ENV (PENDING_ENV): Docker Desktop motoru kapalı. `docker compose -f compose.test.yml run ...` → "open //./pipe/docker_engine: The system cannot find the file specified"; `desktop-linux` bağlamı da aynı (`dockerDesktopLinuxEngine` borusu yok); yalnız `com.docker.service` süreci var. Konteyner testleri (kırmızı kanıt dahil) koşamıyor; host'ta paycoreLLM venv'i yok (kural gereği). Çözüm kullanıcıda: Docker Desktop'ı başlatmak. Bu arada kod dilimleri yazılıyor; kırmızı kanıtı, yeni testleri baz 530be09 betiklerine karşı koşarak motor açılınca alırım.
+
+### B-19R2-0005 · 2026-11-04 14:55 · → koordinator · DURUM
+Paket: fix/19r2-dis-inceleme   Cevap: K-19R2-0003
+Kod tamam, doğrulama bekliyor (IMPLEMENTED değil: konteyner koşusu yok). paycoreLLM fix/19r2-dis-inceleme: 7a59267 (R9 + R10 + FOLLOWUP-160, `tests/test_19r2_stage_raw.py`), 4b35a19 (R11, `tests/test_19r2_seed.py`), 8fb9716 (runbook bilinen sınırlar: R9 kod kuralları, `{{…}}` sayılır, R10 istisnaları, `@al`). Ağaç temiz.
+Host'ta yalnız betik fonksiyonları sahte paycore_llm modülleriyle koşuldu (kanıt değil, konteyner yerine geçmez): yeni + R1/R3 testleri 63/63. Docker motoru hâlâ kapalı (B-19R2-0004). Motor açılınca: (1) kırmızı kanıt: yeni testler baz 530be09 betiklerine karşı; (2) tam takım + ruff konteynerde; (3) PR + PR-HAZIR.

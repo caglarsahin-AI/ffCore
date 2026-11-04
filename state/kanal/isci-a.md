@@ -1834,3 +1834,22 @@ Her adaydan yalnız `config.json`, `README.md`, tokenizer dosyaları, `*.safeten
 - **B:** kullanıcı şimdi `huggingface-cli download` ile volume'a elle indirir. Etki: hemen başlar ama yol `make models` dışı (K-04a-0020 "tek yol" kuralına aykırı), revizyon ve dosya kümesi elle tutulur.
 - **C:** ağırlıklar ölçümden sonra tek aday için indirilir. Etki: ölçüm yapılamaz, seçim ölçümsüz olur (GOREV ve KARARLAR "seçim ölçümle" ile çelişir).
 Ayrıca kullanıcıya: Docker Desktop'ın açılması (ölçüm ve test-int için).
+
+### A-08T1B-0004 · 2026-11-04 14:20 · → koordinator · DURUM
+Paket: 08-tam-1b   Cevap: K-08T1B-0002
+DURUM: PLANNED. Plan: state/pr/08-tam-1b.md (semboller güncel kodda, dilim 0-5, kabul 1-6/15-19, felsefe üçlüsü). S1-S5 HANDOFF'tan A; ACK K-08T1B-0002 (A, CLAIMED).
+Varsayımlar (itiraz yoksa geçerli): (2) ayrı GUARDRAIL_NER_URL eklenmez, HttpNer embed gibi internal_api_url kullanır; (3) PRSIM: pii_ner seçili değilse ya da NER ağırlığı eksikse prsim_requires_ner, eski --accept-personnel-data geriye uyumlu + deprecation uyarısı; yerleşik v3 PERSON yalnız egress aşamasında, airgap (egress kapalı) NER'e ve ağırlığa ihtiyaç duymaz.
+Sıra: dilim 0 (docs 162 + NER_CANDIDATES) şimdi; commit'ten sonra kullanıcı komutunu yazarım. Docker kapalıyken testler yazılır, koşu motor açılınca.
+
+### A-08T1B-0005 · 2026-11-04 14:40 · → koordinator · DURUM
+Paket: 08-tam-1b   Cevap: K-08T1B-0002
+Dilim 0 commit'li (feat/08-tam-1b-ner, push yok): 12ffcd8 docs FOLLOWUP-162 (api.md:540, guardrail.md:128 → "a scope that has already issued 9,999,999 values"), e6dd8e8 test (kırmızı), 378faff `NER_CANDIDATES` + `allow_patterns` + `models-check` listesi (worker açılış denetimi değişmedi). Testler Docker kapalı olduğu için **koşulmadı**; kırmızı/yeşil kanıt motor açılınca (e6dd8e8 ayrı worktree'de kırmızı, 378faff yeşil).
+**Kullanıcıya iletilecek tek adım** (dışarı bağlanır; Docker Desktop açık; PowerShell, dizin `C:\ai_paycore\ffcore\.worktrees\feat\08-tam-1b-ner`):
+```
+$env:FFCORE_VERSION="0.0.0-08t1b"; docker compose -p 04a-knowledge-core --env-file .env.test build tools
+$env:FFCORE_VERSION="0.0.0-08t1b"; docker compose -p 04a-knowledge-core --env-file .env.test run --rm --no-deps tools make models
+```
+- `-p 04a-knowledge-core`: ağırlıklar mevcut `04a-knowledge-core_model_cache` volume'una iner (bge-m3/reranker/Docling yeniden indirilmez, yalnız denetlenir; PaddleOCR yerindeyse dokunulmaz).
+- Yeni inen: `savasy/bert-base-turkish-ner-cased`, `akdeniz27/bert-base-turkish-cased-ner`; her biri yalnız README, config, tokenizer, `*.safetensors`/`pytorch_model.bin`; tahmini toplam ≤ ~1,8 GB (iki biçim de varsa aday başına ~0,9 GB). Çıktının son satırları (`download ... (NER candidate)` ve `ok/missing`) yeterli.
+- Lisans ve `id2label` model kartından ben offline okurum; `--network none` `models-check` kanıtını ben koşarım (indirme değil).
+Sıradaki (Docker beklemeden): dilim 1 `recognizers/ner.py` sahte pipeline ile + `/internal/ner` + `HttpNer` testleri.
