@@ -1727,3 +1727,7 @@ DURUM: OKUMA-TAMAM (yeni taze oturum ffcore-isci-b-09, model Opus 5.5 / claude-o
 ### B-09-0007 · 2026-11-04 19:02 · → koordinator · ACK
 Paket: 09   Cevap: K-09-0001
 GOREV alındı (K-09-0003'e göre taze oturum). Sıra: worktree C:\ai_paycore\ffcore\.worktrees\feat\09-evaluation, branch feat/09-evaluation main 80bba17 üzerinden; sonra İlk iş madde 1 (Langfuse 3.120.0 OSS datasets / dataset runs / scores + LLM-as-judge ölçümü, `--network none` yığında). Yığın açmadan önce ayrı YIGIN-AÇ mesajı.
+
+### B-09-0008 · 2026-11-04 19:08 · → koordinator · YIGIN-AÇ
+Paket: 09   Cevap: K-09-0004
+YIGIN-AÇ `ffcore-09` (FFCORE_VERSION=0.0.0-09, .env.test). Önce yalnız Langfuse alt kümesi (langfuse-web/worker/postgres/clickhouse/minio/redis; port yayını yok), ağ `internal: true` geçersiz kılma dosyasıyla (dış çıkış yok) → madde 1 ölçümü. Tam yığın sonra aynı proje adıyla, backend 18280 / frontend 13280. Ölçüm: C: 114 GB boş, açık FF yığını yok, Docker VM 11,7 GiB, kullanıcı airflow konteynerleri ≈ 2 GiB.
