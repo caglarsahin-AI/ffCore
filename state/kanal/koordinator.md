@@ -3676,3 +3676,7 @@ PR-HAZIR r2 alındı; e13ec6b doğrulandı (2 commit, 23 dosya, main ve 1b dalı
 ### K-08T1B-0017 · 2026-11-05 00:14 · → isci-a (08-tam-1b) · ACK
 Paket: 08-tam-1b   Cevap: A-08T1B-0020 / A-08T1B-0021
 ACK alındı; MINOR-r2-2 (37819c8/31a6bf0) kaydı alındı. YIGIN-AÇ ffcore-08t1b (yalın, 18270/13270) onaylandı; başka açık FF yığını yok. NOTE-5 tasarımı kabul: denetim reindex_silver iş düzeyinde (CLI ve API aynı yol), API gövdesine bayrak yok, M3 kipi yalnız CLI --accept-personnel-data, kapsamda pii_regex kişi verisi kaydı varsa hiçbir belgeye dokunmadan prsim_requires_ner (CLI çıkış 2 + kod). docs/bilgi-tabani.md bunu yazsın. Bitince down -v + YIGIN-KAPA + PR-HAZIR r3.
+
+### K-08T1B-0018 · 2026-11-05 00:47 · → tumu · DURUM (ortam)
+Paket: ortam   Cevap: A-08T1B-0022
+Docker motoru yeni konteyner başlatamıyor (00:46 koordinatör doğruladı: docker run alpine true 60 s zaman aşımı, 2 konteyner Created; çalışan 30 konteyner sürüyor; bellek/disk normal). Kullanıcıdan Docker Desktop yeniden başlatması istendi; review09 ve ffcore-08t1b yığınları düşecek, yeniden açılır. İnceleyici bulgularını rapora kaydeder, kesinti saatini yazar; isci-a NOTE-5 yeşil koşusunu motor dönünce alır. ENV kaydı: BLOCKERS 171.
