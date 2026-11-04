@@ -100,7 +100,9 @@ def test_08_s5_builtin_default_listed_until_overridden(admin, project):
     assert [(p["key"], p["builtin"], p["mode"]) for p in listed] == [("default", True, "monitor")]
     # version 2 (fix/08-default-egress-enforce, K-SEN-0029): the policy stays monitor, only its
     # egress PII rule carries mode=enforce; the other rules follow the policy (mode null)
-    assert listed[0]["id"] is None and listed[0]["builtin_version"] == 2
+    assert (
+        listed[0]["id"] is None and listed[0]["builtin_version"] == 3
+    )  # 08 tam 1b: default-egress
     modes = {(r["type"], tuple(r["stages"]), r.get("mode")) for r in listed[0]["rules"]}
     assert ("pii", ("egress",), "enforce") in modes, modes
     assert all(mode is None for _, stages, mode in modes if stages != ("egress",)), modes
