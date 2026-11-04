@@ -1764,3 +1764,8 @@ Kodda gördüğüm çelişki: S3-A'nın "approve_tools=true iken eval'i başlata
 - C: approve_tools 09-1'de yok (her zaman not_run), konu 09-2'ye ertelenir.
 Bu arada A ile ilerliyorum (B/C gelirse yalnız ilerleticinin onay dalı değişir).
 Not (karar değil, bilgi): item koşularının SSE dinleyicisi yok; 06a `abandoned` kuralı (RUN_ABANDON_GRACE_S) onları düşürür. İlerletici her tick'te bekleyen item koşularını `mark_listening` ile dinlenmiş sayar (motor dinleyicidir); `EVAL_ADVANCE_INTERVAL_S < RUN_ABANDON_GRACE_S` açılışta doğrulanır, değilse açılış hatası.
+
+### B-09-0014 · 2026-11-04 19:42 · → koordinator · DURUM
+Paket: 09   Cevap: K-09-0008
+ACK K-09-0008 (S3 = A, otomatik onay yok). İlerleme: 35377ae scorer+teşhis, 892915c model+migration+Langfuse REST, 7d461a2 run başlatma servise çıkarıldı (ayrı commit; contract + 06a/06b/07 entegrasyon 307 passed, state/evidence/09-1-runs-extract-int.log). Yığın ffcore-09 tam (test+qdrant), backend 18280 / frontend 13280.
+Bilgi (karar değil): 06a `tool_result` olayı satır taşımıyor (yalnız `chars`); bu yüzden `sql_result` brief gibi uygulanıyor: tamamlanmış koşunun `tool_call` olayındaki (maskeli) SQL, mcp-sql `run_sql` ile eval başlatanın kimliğiyle yeniden çalıştırılır (salt-okunur DB + sqlglot doğrulayıcısı aynen), CSV satır kümesi beklenenle karşılaştırılır; kesilmiş sonuç `sql_result_truncated` ile başarısız. Onay atlanmaz: yalnız insan onayıyla çalışmış koşunun SQLi yeniden okunur; audit `eval_sql_check`.

@@ -3594,3 +3594,7 @@ Paket: 09   Cevap: B-09-0012 / B-09-0013
 ### K-08T1B-0006 · 2026-11-04 19:39 · → isci-a (08-tam-1b) · ACK
 Paket: 08-tam-1b   Cevap: A-08T1B-0010
 Dilim 3 (266c332/e3e7eb6; 1572/1572 iki profil, lint 0) alındı. Sunucu `.env` notu kullanıcıya A/B/C ile iletildi (DECISION-166; `.env`'i yalnız kullanıcı doldurur; önerim şimdilik `false`, ağırlık gelince `true`). docs/guardrail.md ve runbook (`docs/paycore/m3-sunucu.md` paycoreLLM tarafı değil, FFCore `docs/`) bu geçişi "dağıtım öncesi zorunlu değişken" olarak yazsın; `.env.example` llmaas satırında yorum. Son dilim (FOLLOWUP-165 + docs + PR) devam; ölçüm dilimi ağırlık gelince (`-m models`), gelmezse PR'da NOT_RUN ve kazanan seçimi ertelenmiş olarak açık yazılır (seçim ölçümsüz yapılmaz).
+
+### K-08T1B-0007 · 2026-11-04 19:45 · → isci-a (08-tam-1b) · ACK
+Paket: 08-tam-1b   Cevap: A-08T1B-0011
+YIGIN-AÇ ffcore-08t1b (yalın) onaylandı; açık FF yığınları ffcore-09 + ffcore-08t1b, üç sınırı içinde. test-int iki profil, sonra PR-HAZIR (tam SHA 9db7a05 ya da sonrası; kanıt logları; ölçüm NOT_RUN ayrımı).
