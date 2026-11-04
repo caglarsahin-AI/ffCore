@@ -25,7 +25,7 @@ from ffcore.guardrails.masking import (
     redact_label,
 )
 from ffcore.guardrails.recognizers import regex as regex_recognizers
-from ffcore.guardrails.recognizers.ner import NerClient
+from ffcore.guardrails.recognizers.ner import NerClient, NerEgressUnavailable
 from ffcore.guardrails.recognizers.regex import recognize, resolve_overlaps
 from ffcore.guardrails.rules import find_secrets, find_tool_arg_violations
 from ffcore.guardrails.schemas import GuardrailConfigError, PiiPolicySpec, ResolvedPolicy, Rule
@@ -328,7 +328,15 @@ async def evaluate(
             run_id=ctx.run_id,
         )
         try:
-            ner_hits = await _ner_findings(current, rule, policy, ctx)
+            try:
+                ner_hits = await _ner_findings(current, rule, policy, ctx)
+            except GuardrailConfigError:
+                raise
+            except Exception as exc:
+                if stage == "egress" and mode == "enforce":
+                    # r1 MINOR-1 (A): never on_error at egress (class name only, no value).
+                    raise NerEgressUnavailable(type(exc).__name__) from exc
+                raise
             # CPU-bound scanning runs off the event loop (00i pattern).
             hits = await asyncio.to_thread(
                 _rule_findings, current, stage, rule, policy, ctx, ner_hits
@@ -373,7 +381,7 @@ async def evaluate(
                         event.status = "redacted"
                     current = rewritten
                 applied.append(action)
-        except (GuardrailConfigError, PlaceholderOutOfRange):
+        except (GuardrailConfigError, PlaceholderOutOfRange, NerEgressUnavailable):
             # r4 MINOR-r4-1: a used-up placeholder range fails loudly whatever `on_error` says;
             # under `log` the text would leave untokenized.
             raise

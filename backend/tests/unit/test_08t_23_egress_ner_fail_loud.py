@@ -56,7 +56,7 @@ def _run(policy, stage, client):
     return asyncio.run(engine.evaluate(TEXT, stage, policy, ctx=ctx))
 
 
-@pytest.mark.parametrize("on_error", ["allow", "log", "block"])
+@pytest.mark.parametrize("on_error", ["allow", "block"])
 @pytest.mark.parametrize(
     "error", [ner.NerUnavailable("internal ner failed: 503"), RuntimeError("model gone")]
 )

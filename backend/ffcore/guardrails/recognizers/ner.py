@@ -15,6 +15,7 @@ import threading
 from collections.abc import Callable, Collection, Mapping
 from typing import Protocol
 
+from ffcore.core.errors import ApiError
 from ffcore.guardrails.findings import Finding
 from ffcore.guardrails.schemas import GuardrailConfigError
 
@@ -37,6 +38,20 @@ STRIDE = 128
 # next, and the spans the overlap repeats are merged. The overlap is far above any name.
 NER_TEXT_MAX_CHARS = 200_000
 NER_WINDOW_OVERLAP_CHARS = 2_000
+
+
+class NerEgressUnavailable(ApiError):
+    """NER failed for an enforce rule at egress (r1 MINOR-1 A): loud whatever `on_error` says,
+    so the checksummed identifiers never leave unmasked because an HTTP dependency was down
+    (the PlaceholderOutOfRange precedent). The text stages keep `on_error`. No value in it."""
+
+    def __init__(self, cause: str) -> None:
+        super().__init__(
+            503,
+            "api_error",
+            "ner_unavailable",
+            f"The NER the egress PII policy needs is unavailable ({cause}).",
+        )
 
 
 class NerConfigError(GuardrailConfigError):
