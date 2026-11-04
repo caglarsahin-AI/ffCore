@@ -18,6 +18,7 @@ from ffcore.evaluation.scorers import JudgeParseError, Score, judge_score, parse
 
 RUBRIC_PROMPT = "eval_judge_rubric"
 REASON_MAX = 500
+JUDGE_SOURCE = "agent-playground"
 JUDGE_MAX_TOKENS = 300
 
 
@@ -101,7 +102,8 @@ class EgressGuard:
         ctx = engine.EvalContext(
             run_id=self._run_id,
             project_id=str(self._project_id),
-            source="eval",
+            # Exam runs are channel=test runs: their guardrail source (08 EVENT_SOURCES).
+            source=JUDGE_SOURCE,
             token_store=self._tokens,
             egress_enabled=True,
         )

@@ -7,8 +7,9 @@ Measured on the pinned server 3.120.0 (state/pr/09.md, L1-L16, K-09-0006):
 - Items and scores are upserted by id (L3, L10): seeding and re-scoring are idempotent.
 - A dataset run opens with its first run item, linked to an existing trace (L5): the 06a run's
   own trace becomes the exam item's trace; no second trace is made.
-- v2 `GET /scores` ignores `traceId` silently (L12). Scores are read with v1 `?traceId=` and
-  every returned row is checked; a foreign row is a loud error, never a silent mix (ARCH-06).
+- Neither v1 nor v2 `GET /scores` honors a trace filter (`traceId`, `traceIds`): both return
+  every score silently (L12, re-measured on the stack). Scores are read by their deterministic
+  ids (`scoreIds`), and every returned row is checked; a foreign row is a loud error (ARCH-06).
 """
 
 import base64
@@ -20,6 +21,8 @@ from ffcore.core.egress import EgressTimeout, SafeOutboundClient
 
 TIMEOUT = EgressTimeout(connect=5, read=30, total=60)
 PAGE = 100
+# Score ids per v2 call (ids are ~45 characters; keeps the query string short).
+SCORE_IDS_PER_CALL = 50
 
 
 class LangfuseApiError(RuntimeError):
@@ -191,27 +194,37 @@ class LangfuseApi:
         body["traceId" if trace_id else "datasetRunId"] = trace_id or dataset_run_id
         return await self._call("POST", "/api/public/scores", json=body)
 
-    async def trace_scores(self, trace_id: str) -> list[dict]:
-        """All scores of one trace (v1 filter; L12). Rows of another trace are a loud error."""
+    async def scores_by_ids(self, ids: list[str]) -> list[dict]:
+        """Scores by their ids (v2 `scoreIds`, the one score filter this server honors; L12).
+        Our ids are deterministic (`score_id`), so a reader asks for exactly what it wrote.
+        A returned row that was not asked for is a loud error (a filter ignored silently)."""
+        wanted = set(ids)
         out: list[dict] = []
-        page = 1
-        while True:
+        for start in range(0, len(ids), SCORE_IDS_PER_CALL):
+            chunk = ids[start : start + SCORE_IDS_PER_CALL]
             body = await self._call(
                 "GET",
-                "/api/public/scores",
-                params={"traceId": trace_id, "page": str(page), "limit": str(PAGE)},
+                "/api/public/v2/scores",
+                params={"scoreIds": ",".join(chunk), "limit": str(PAGE)},
             )
             rows = body.get("data", [])
-            foreign = [r.get("id") for r in rows if r.get("traceId") != trace_id]
+            foreign = [r.get("id") for r in rows if r.get("id") not in wanted]
             if foreign:
                 raise LangfuseApiError(
-                    "langfuse_filter_ignored",
-                    f"scores of other traces for {trace_id}: {len(foreign)}",
+                    "langfuse_filter_ignored", f"scores not asked for: {len(foreign)}"
                 )
             out.extend(rows)
-            if page >= int(body.get("meta", {}).get("totalPages", 1) or 1):
-                return out
-            page += 1
+        return out
+
+    async def trace_scores(self, trace_id: str, names: list[str]) -> list[dict]:
+        """The named scores of one trace, read by id; rows of another trace are a loud error."""
+        rows = await self.scores_by_ids([score_id(trace_id, n) for n in names])
+        foreign = [r.get("id") for r in rows if r.get("traceId") != trace_id]
+        if foreign:
+            raise LangfuseApiError(
+                "langfuse_filter_ignored", f"scores of other traces for {trace_id}: {len(foreign)}"
+            )
+        return rows
 
 
 def score_id(trace_id: str, scorer: str) -> str:

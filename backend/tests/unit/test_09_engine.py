@@ -410,3 +410,153 @@ def test_09_g4_no_local_dataset_tables():
         Base.metadata.tables
     )
     assert {"eval_suites", "eval_runs"} <= set(Base.metadata.tables)
+
+
+def test_09_judge_guardrail_source_is_an_08_event_source():
+    # Stack finding: an unknown source broke guardrail_events' check and stalled the exam.
+    from ffcore.guardrails.categories import EVENT_SOURCES
+
+    assert judge_mod.JUDGE_SOURCE in EVENT_SOURCES
+
+
+# --- start: the exam is queued until every item run exists (stack finding b) --------------------
+
+
+class _StartSession:
+    def __init__(self):
+        self.rows, self.commits = [], 0
+
+    def add(self, row):
+        self.rows.append(row)
+
+    async def flush(self):
+        for r in self.rows:
+            r.id = getattr(r, "id", None) or "ev-1"
+
+    async def commit(self):
+        self.commits += 1
+
+    async def rollback(self):
+        pass
+
+    async def get(self, _model, _id):
+        return self.rows[0]
+
+
+class _ItemsApi:
+    async def items(self, _dataset):
+        return [_item("q01"), _item("q02")]
+
+
+def _start(monkeypatch, fail_on: int | None = None):
+    from types import SimpleNamespace
+
+    from ffcore.evaluation import runner
+
+    seen = []
+
+    async def fake_start_run(session, settings, queue, **kw):
+        ev = session.rows[0]
+        seen.append(ev.status)
+        if fail_on is not None and len(seen) == fail_on:
+            raise RuntimeError("queue down")
+        return SimpleNamespace(id=f"run-{len(seen)}")
+
+    async def no_audit(session, entry):
+        pass
+
+    monkeypatch.setattr(runner, "start_run", fake_start_run)
+    monkeypatch.setattr(runner, "write_event", no_audit)
+    session = _StartSession()
+    suite = SimpleNamespace(id="s", project_id="p", key="k", repeat=1, langfuse_dataset_name="p.k")
+    starter = runner.Starter("u", "user", "u", "req", None)
+
+    async def go():
+        return await runner.start_eval(
+            session,
+            None,
+            suite=suite,
+            agent=SimpleNamespace(id="a"),
+            version=SimpleNamespace(id="v", version=1),
+            starter=starter,
+            api=_ItemsApi(),
+            queue=None,
+            queued_event=None,
+        )
+
+    return session, seen, go
+
+
+def test_09_exam_is_queued_until_every_item_run_started(monkeypatch):
+    session, seen, go = _start(monkeypatch)
+    ev = anyio.run(go)
+    assert seen == ["queued", "queued"] and ev.status == "running"
+
+
+def test_09_broken_start_ends_exam_failed(monkeypatch):
+    session, seen, go = _start(monkeypatch, fail_on=2)
+    with pytest.raises(RuntimeError):
+        anyio.run(go)
+    ev = session.rows[0]
+    assert (ev.status, ev.error_code) == ("failed", "start_failed")
+
+
+def test_09_advancer_takes_only_running_exams():
+    from sqlalchemy.dialects import postgresql
+
+    from ffcore.evaluation import runner
+
+    captured = {}
+
+    class _S:
+        async def scalars(self, stmt):
+            captured["sql"] = str(
+                stmt.compile(dialect=postgresql.dialect(), compile_kwargs={"literal_binds": True})
+            )
+            return type("R", (), {"all": lambda self: []})()
+
+    anyio.run(runner.active_runs, _S())
+    assert "eval_runs.status = 'running'" in captured["sql"]
+
+
+def test_09_repeated_tick_failure_ends_exam_failed(monkeypatch):
+    # Stack finding a: a tick that keeps failing must not leave the exam running forever.
+    from contextlib import asynccontextmanager
+    from types import SimpleNamespace
+
+    from ffcore.evaluation import worker_tick
+    from ffcore.evaluation.engine import MAX_ATTEMPTS
+
+    ev = SimpleNamespace(status="running", error_code=None, ended_at=None)
+
+    class _Redis:
+        n = 0
+
+        async def incr(self, _k):
+            self.n += 1
+            return self.n
+
+        async def expire(self, *_):
+            pass
+
+        async def delete(self, *_):
+            pass
+
+    class _Sess:
+        async def get(self, *_):
+            return ev
+
+        async def commit(self):
+            pass
+
+    @asynccontextmanager
+    async def scope():
+        yield _Sess()
+
+    monkeypatch.setattr(worker_tick.db, "session_scope", scope)
+    redis = _Redis()
+    for _ in range(MAX_ATTEMPTS - 1):
+        anyio.run(worker_tick._count_failure, redis, "ev", ValueError("x"))
+    assert ev.status == "running"
+    anyio.run(worker_tick._count_failure, redis, "ev", ValueError("x"))
+    assert (ev.status, ev.error_code) == ("failed", "advance_failed:ValueError")

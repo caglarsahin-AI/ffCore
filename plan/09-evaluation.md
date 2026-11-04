@@ -20,11 +20,13 @@ Agent'ı yayınlamadan önce ve her değişiklikte otomatik sınava sokmak; sonu
 
 "Cevap yanlış" denince arama mı, sıralama mı, model mi başarısız olduğu görünmeli. Her item için `outcome`, `run_events` ve `kb_queries.candidates` (04a, C12; top-30 aday ve skorları) kaydından türetilir; ilk düşülen aşama kazanır:
 
+(DRIFT-164, K-09-0007 S5: sıra koda göre; `knowledge/search.py` tabanı `top_k` kesiminden önce uygular. Her aşama beklenen belgelerin hepsi için geçilir.)
+
 | outcome | Anlamı |
 |---|---|
 | `not_retrieved` | `expected_docs` hibrit adaylarda (top-30) yok |
-| `not_reranked` | adayda var, reranker sonrası seçilenlerde yok |
-| `below_rerank_floor` | seçildi ama rerank tabanı altında elendi |
+| `below_rerank_floor` | adayda var ama beklenen belgenin tüm adayları rerank tabanı altında |
+| `not_reranked` | taban üstünde ama modele verilen kaynaklarda (top_k) yok |
 | `declined` | kaynak modele gitti, model "bulamadım" dedi (06'daki olumsuz biçim tespiti) |
 | `below_threshold` | cevap verildi, güven skoru eşik altı (yalnızca agent'ta eşik ayarlıysa; eşik kalibrasyonu bu koşuların `formula_comparison` çıktısıyla yapılır; PayCore kontrolü K3) |
 | `answered` | cevap verildi, eşik üstü |

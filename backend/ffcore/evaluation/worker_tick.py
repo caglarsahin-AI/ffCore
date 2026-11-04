@@ -12,6 +12,7 @@ from ffcore.core import db
 from ffcore.core.audit import AuditEntry, write_event
 from ffcore.core.config import Settings
 from ffcore.evaluation import judge as judge_mod
+from ffcore.evaluation.engine import now_utc
 from ffcore.evaluation.langfuse_api import LangfuseApi
 from ffcore.evaluation.runner import active_runs, advance_eval, parse_csv_rows
 from ffcore.evaluation.scorers import Score
@@ -49,9 +50,31 @@ async def tick(settings: Settings, redis, slots, prompts) -> None:
                     sql=_sql(settings, session),
                     embed=_embed(settings),
                 )
-            except Exception:  # one exam's error never stops the others; arq logs the tick
+            except Exception as exc:  # one exam's error never stops the others
                 log.exception("eval_advance_failed eval_run=%s", ev_id)
                 await session.rollback()
+                await _count_failure(redis, ev_id, exc)
+
+
+async def _count_failure(redis, ev_id, exc: Exception) -> None:
+    """A tick that keeps failing ends the exam `failed` after MAX_ATTEMPTS ticks with the error
+    type as its code: a stuck exam is visible, never `running` forever (ARCH-06)."""
+    from ffcore.evaluation.engine import MAX_ATTEMPTS
+    from ffcore.models.eval import EvalRun
+
+    key = f"eval:{ev_id}:advance_failures"
+    count = await redis.incr(key)
+    await redis.expire(key, 3600)
+    if count < MAX_ATTEMPTS:
+        return
+    async with db.session_scope() as session:
+        ev = await session.get(EvalRun, ev_id)
+        if ev is not None and ev.status == "running":
+            ev.status = "failed"
+            ev.error_code = f"advance_failed:{type(exc).__name__}"
+            ev.ended_at = now_utc()
+            await session.commit()
+    await redis.delete(key)
 
 
 def _judge(settings, session, redis, slots, prompts):

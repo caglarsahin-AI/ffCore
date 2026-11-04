@@ -92,7 +92,9 @@ async def start_eval(
         agent_version_id=version.id,
         user_id=starter.user_id,
         langfuse_run_name=run_name(suite, version),
-        status="running",
+        # Queued until every item run exists: the advancer only takes running exams, so it
+        # never summarizes half a plan (stack finding: 19 of 33 items).
+        status="queued",
         started_at=now_utc(),
         created_by=starter.actor_id,
         item_runs={},
@@ -120,55 +122,69 @@ async def start_eval(
             ip=starter.ip,
         ),
     )
-    plan: dict[str, Any] = {}
-    for item in items:
-        runs: list[str] = []
-        for _ in range(suite.repeat):
+    ev_id = ev.id
+    try:
+        plan: dict[str, Any] = {}
+        for item in items:
+            runs: list[str] = []
+            for _ in range(suite.repeat):
 
-            async def audit(session, run, version, _item=item["id"]):
-                await write_event(
+                async def audit(session, run, version, _item=item["id"]):
+                    await write_event(
+                        session,
+                        AuditEntry(
+                            action="start_run",
+                            resource_type="run",
+                            outcome="success",
+                            actor_type=starter.actor_type,
+                            actor_id=starter.actor_id,
+                            project_id=str(suite.project_id),
+                            resource_id=str(run.id),
+                            before=None,
+                            after={
+                                "agent_id": str(agent.id),
+                                "version": version.version,
+                                "channel": "test",
+                                "eval_run_id": str(ev.id),
+                                "item_id": _item,
+                            },
+                            request_id=starter.request_id,
+                            ip=starter.ip,
+                        ),
+                    )
+
+                run = await start_run(
                     session,
-                    AuditEntry(
-                        action="start_run",
-                        resource_type="run",
-                        outcome="success",
-                        actor_type=starter.actor_type,
-                        actor_id=starter.actor_id,
-                        project_id=str(suite.project_id),
-                        resource_id=str(run.id),
-                        before=None,
-                        after={
-                            "agent_id": str(agent.id),
-                            "version": version.version,
-                            "channel": "test",
-                            "eval_run_id": str(ev.id),
-                            "item_id": _item,
-                        },
-                        request_id=starter.request_id,
-                        ip=starter.ip,
-                    ),
+                    settings,
+                    queue,
+                    project_id=suite.project_id,
+                    agent=agent,
+                    version=version,
+                    user_id=starter.user_id,
+                    created_by=starter.actor_id,
+                    input=item["input"]["message"],
+                    variables=dict(item["input"].get("variables") or {}),
+                    channel="test",
+                    conversation_id=None,
+                    audit=audit,
+                    queued_event=queued_event,
                 )
-
-            run = await start_run(
-                session,
-                settings,
-                queue,
-                project_id=suite.project_id,
-                agent=agent,
-                version=version,
-                user_id=starter.user_id,
-                created_by=starter.actor_id,
-                input=item["input"]["message"],
-                variables=dict(item["input"].get("variables") or {}),
-                channel="test",
-                conversation_id=None,
-                audit=audit,
-                queued_event=queued_event,
-            )
-            runs.append(str(run.id))
-        plan[item["id"]] = {"item": item, "runs": runs, "scored": False, "attempts": 0}
-        ev.item_runs = dict(plan)
-        await session.commit()
+                runs.append(str(run.id))
+            plan[item["id"]] = {"item": item, "runs": runs, "scored": False, "attempts": 0}
+            ev.item_runs = dict(plan)
+            await session.commit()
+    except Exception:
+        # A start that breaks halfway ends the exam failed; the runs already started finish
+        # on their own (they are ordinary test runs) and are not scored.
+        await session.rollback()
+        broken = await session.get(EvalRun, ev_id)
+        if broken is not None:  # None: nothing was committed, the exam never existed
+            broken.status, broken.error_code = "failed", "start_failed"
+            broken.ended_at = now_utc()
+            await session.commit()
+        raise
+    ev.status = "running"
+    await session.commit()
     return ev
 
 

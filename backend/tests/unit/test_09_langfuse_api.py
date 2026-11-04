@@ -78,24 +78,23 @@ async def test_09_upsert_item_maps_brief_schema():
 
 @_sync
 async def test_09_g3_score_read_rejects_foreign_rows():
-    # v2 ignores traceId (L12); if v1 ever did the same, a foreign row must fail loudly.
-    rows = [{"id": "a", "traceId": "t1"}, {"id": "b", "traceId": "t2"}]
-    api = LangfuseApi(
-        _settings(), transport=_Fake(_Resp(200, {"data": rows, "meta": {"totalPages": 1}}))
-    )
+    # No trace filter works on 3.120 (L12); if scoreIds were ever ignored too, the rows that were
+    # not asked for must fail loudly instead of mixing into the exam.
+    rows = [{"id": "t1-contains", "traceId": "t1"}, {"id": "t2-contains", "traceId": "t2"}]
+    api = LangfuseApi(_settings(), transport=_Fake(_Resp(200, {"data": rows, "meta": {}})))
     with pytest.raises(LangfuseApiError) as e:
-        await api.trace_scores("t1")
+        await api.trace_scores("t1", ["contains"])
     assert e.value.code == "langfuse_filter_ignored"
 
 
 @_sync
-async def test_09_score_read_uses_v1_trace_filter_and_pages():
-    page1 = {"data": [{"id": "a", "traceId": "t1"}], "meta": {"totalPages": 2}}
-    page2 = {"data": [{"id": "b", "traceId": "t1"}], "meta": {"totalPages": 2}}
-    fake = _Fake(_Resp(200, page1), _Resp(200, page2))
-    rows = await LangfuseApi(_settings(), transport=fake).trace_scores("t1")
-    assert [r["id"] for r in rows] == ["a", "b"]
-    assert all(c[1].endswith("/api/public/scores") and c[2]["traceId"] == "t1" for c in fake.calls)
+async def test_09_score_read_by_deterministic_ids():
+    rows = [{"id": "t1-contains", "traceId": "t1"}, {"id": "t1-passed", "traceId": "t1"}]
+    fake = _Fake(_Resp(200, {"data": rows, "meta": {}}))
+    got = await LangfuseApi(_settings(), transport=fake).trace_scores("t1", ["contains", "passed"])
+    assert [r["id"] for r in got] == ["t1-contains", "t1-passed"]
+    _, url, params, _, _ = fake.calls[0]
+    assert url.endswith("/api/public/v2/scores") and params["scoreIds"] == "t1-contains,t1-passed"
 
 
 @_sync
