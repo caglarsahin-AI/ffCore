@@ -1,18 +1,19 @@
 """`python -m ffcore.cli ingest-raw` (19): a raw-staging tree into one knowledge base.
 
-Each accepted file goes through C6 `ingest_from_raw` with a named text filter, always (`pii_ner`;
-`pii_regex` in the M3 measurement mode): there is no option to leave it off (plan/19 şart 1). A
-record written under another filter is refused (`text_filter_mismatch`), never processed again. A file whose bytes are already indexed under the same
-name is `unchanged` and not touched again (the second run reports `created 0`). Same bytes in any
-other status but `skipped` (a gate decision on these bytes) is `retried`: the pipeline runs again
-on the same record, no new version (FOLLOWUP-155: a fixed environment must not leave a failed
-document behind a clean-looking run). A file that raises after its record was registered is
-`failed` in the database with the exception's class name in `metadata.error_code`, never a
-message. One that raises before (bad metadata: the registration rolls back) has no row of its
-own: it is `failed_unregistered` (source, path, code) in the console and the manifest, counts
-in `failed` and the exit code, no placeholder row is created and an earlier indexed version of
-the same file is left as it is (review r1 MAJOR-1/2, K-19R-0013 A). This process
-converts in its own bounded pool and asks the API for embeddings (C10), like the ingest worker.
+Each accepted file goes through C6 `ingest_from_raw` with a named text filter, always
+(`pii_ner`; `pii_regex` in the M3 measurement mode): there is no option to leave it off (plan/19
+şart 1). A record written under another filter is refused (`text_filter_mismatch`), never
+processed again. A file whose bytes are already indexed under the same name is `unchanged` and
+not touched again (the second run reports `created 0`). Same bytes in any other status but
+`skipped` (a gate decision on these bytes) is `retried`: the pipeline runs again on the same
+record, no new version (FOLLOWUP-155: a fixed environment must not leave a failed document
+behind a clean-looking run). A file that raises after its record was registered is `failed` in
+the database with the exception's class name in `metadata.error_code`, never a message. One that
+raises before (bad metadata: the registration rolls back) has no row of its own: it is
+`failed_unregistered` (source, path, code) in the console and the manifest, counts in `failed`
+and the exit code, no placeholder row is created and an earlier indexed version of the same file
+is left as it is (review r1 MAJOR-1/2, K-19R-0013 A). This process converts in its own bounded
+pool and asks the API for embeddings (C10), like the ingest worker.
 
 The report is counts only: outcomes, refusal codes, gate reasons, masked findings per category.
 No document text, no title, no person value; an error line names the path, never the content.

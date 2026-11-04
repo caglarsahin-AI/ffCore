@@ -66,8 +66,15 @@ def test_08t_21_prsim_m3_failed_record_not_retried_by_pii_ner(
         raise RuntimeError("conversion failed in the test")
 
     m3 = _run(
-        settings, pg, world, kb["key"], tree,
-        sources=["jira:PRSIM"], text_filter="pii_regex", accept=True, convert=failing,
+        settings,
+        pg,
+        world,
+        kb["key"],
+        tree,
+        sources=["jira:PRSIM"],
+        text_filter="pii_regex",
+        accept=True,
+        convert=failing,
     )
     assert m3.statuses == {"failed": 1}, m3.lines()
     calls.clear()
@@ -77,8 +84,14 @@ def test_08t_21_prsim_m3_failed_record_not_retried_by_pii_ner(
         return convert_without_weights(path, filename, s)
 
     report = _run(
-        settings, pg, world, kb["key"], tree,
-        sources=["jira:PRSIM"], text_filter="pii_ner", convert=recording,
+        settings,
+        pg,
+        world,
+        kb["key"],
+        tree,
+        sources=["jira:PRSIM"],
+        text_filter="pii_ner",
+        convert=recording,
     )
     assert calls == []  # never converted again, never written with names unmasked
     assert "retried" not in report.outcomes, report.lines()
@@ -86,7 +99,7 @@ def test_08t_21_prsim_m3_failed_record_not_retried_by_pii_ner(
     assert manifest["text_filter"] == "pii_ner@1"
     assert manifest["text_filter_mismatch"] == 1
     assert manifest["text_filters"] == {"pii_regex@1": {"documents": 1, "chunks": 0}}
-    (status, _, meta), = _rows(pg, kb["id"]).values()
+    ((status, _, meta),) = _rows(pg, kb["id"]).values()
     assert status == "failed" and meta["text_filter"] == "pii_regex@1"
     assert any("text_filter_mismatch 1" in line for line in report.lines()), report.lines()
 

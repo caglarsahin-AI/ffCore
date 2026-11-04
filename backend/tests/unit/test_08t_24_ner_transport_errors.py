@@ -64,11 +64,16 @@ def test_08t_24b_cli_prsim_exits_2_with_code(monkeypatch, tmp_path, capsys):
     code = cli.main(
         [
             "ingest-raw",
-            "--project", "p",
-            "--kb", "k",
-            "--raw-dir", str(raw),
-            "--acl", "analyst",
-            "--sources", "jira:PRSIM",
+            "--project",
+            "p",
+            "--kb",
+            "k",
+            "--raw-dir",
+            str(raw),
+            "--acl",
+            "analyst",
+            "--sources",
+            "jira:PRSIM",
         ]
     )
     assert code == 2

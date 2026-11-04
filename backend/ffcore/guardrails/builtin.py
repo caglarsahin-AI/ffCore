@@ -43,7 +43,9 @@ DEFAULT_EGRESS_PII_NER = PiiPolicySpec(
 )
 
 
-def builtin_egress_pii(egress_ner: bool, stored_default: PiiPolicySpec | None = None) -> PiiPolicySpec:
+def builtin_egress_pii(
+    egress_ner: bool, stored_default: PiiPolicySpec | None = None
+) -> PiiPolicySpec:
     """The egress PII policy when no `default-egress` is stored.
 
     r1 MAJOR-1 (A): a project's stored `default` fed the egress rule in v2, so its categories

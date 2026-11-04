@@ -60,9 +60,7 @@ def _tree(tmp_path, source: str, item: str) -> Path:
 
 
 def _stored(pg, kb_id):
-    doc = pg.execute(
-        "SELECT id, silver_path FROM documents WHERE kb_id = %s", (kb_id,)
-    ).fetchone()
+    doc = pg.execute("SELECT id, silver_path FROM documents WHERE kb_id = %s", (kb_id,)).fetchone()
     attachments = pg.execute(
         "SELECT filename, raw_path FROM attachments WHERE document_id = %s", (doc[0],)
     ).fetchall()

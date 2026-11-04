@@ -104,9 +104,7 @@ def test_08t_20b_pii_ner_masks_the_name_on_the_window_edge(monkeypatch):
     monkeypatch.setattr(egress, "SafeOutboundClient", _fake_api(requests))
     monkeypatch.setattr(ner, "service_authorization", lambda s: {"Authorization": "x"})
     monkeypatch.setattr(ingest_mask, "ner_client", lambda: ner.HttpNer(_settings()))
-    masked, counts = asyncio.run(
-        ingest_mask.PiiNerFilter().mask(_long_text(NER_TEXT_MAX_CHARS))
-    )
+    masked, counts = asyncio.run(ingest_mask.PiiNerFilter().mask(_long_text(NER_TEXT_MAX_CHARS)))
     assert NAME not in masked and "Ayşe" not in masked
     assert counts["PERSON"] == 2
 

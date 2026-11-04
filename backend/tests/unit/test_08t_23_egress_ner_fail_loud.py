@@ -42,8 +42,14 @@ def _policy(on_error, stage, mode="enforce"):
         {
             "mode": mode,
             "on_error": on_error,
-            "rules": [{"type": "pii", "action": "tokenize" if stage == "egress" else "redact",
-                       "pii_policy_key": "p", "stages": [stage]}],
+            "rules": [
+                {
+                    "type": "pii",
+                    "action": "tokenize" if stage == "egress" else "redact",
+                    "pii_policy_key": "p",
+                    "stages": [stage],
+                }
+            ],
         }
     )
     return ResolvedPolicy(key="t", spec=spec, pii_policies={"p": pii}, builtin=False)
