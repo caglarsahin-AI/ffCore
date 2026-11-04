@@ -12,6 +12,7 @@ The background worker also runs 07's approval sweep once a minute (`expire_appro
 unique per tick; K-07-0002 S4): expired approvals close their runs, old ones are reported.
 """
 
+import asyncio
 import logging
 
 from ffcore.core import db, tracing
@@ -56,6 +57,12 @@ def _startup_for(job_class: JobClass):
         prompts = PromptStore(tracing.get_client())
         # 09: the exam advancer's judge uses the same slot pool and prompt store.
         ctx["slots"], ctx["prompts"] = slots, prompts
+        if job_class is JobClass.background:
+            # 09 r1 MAJOR-2: exam item runs are followed by a task of this process, not by an
+            # arq job, so full job slots or a long tick never leave them unlistened.
+            from ffcore.evaluation import worker_tick
+
+            ctx["eval_listener"] = asyncio.create_task(worker_tick.listen_loop(settings, redis))
         ctx["attempt"] = Attempt(
             settings,
             redis,
@@ -68,6 +75,9 @@ def _startup_for(job_class: JobClass):
 
 
 async def shutdown(ctx) -> None:
+    listener = ctx.get("eval_listener")
+    if listener is not None:
+        listener.cancel()
     tracing.shutdown_tracing()
 
 
@@ -122,7 +132,7 @@ async def run_retention(ctx) -> None:
 
 
 async def advance_eval_runs(ctx) -> None:
-    """09: one short tick per running exam (score finished items, keep item runs listened)."""
+    """09: one tick per active exam under its lock (start item runs, score finished items)."""
     from ffcore.evaluation import worker_tick
 
     await worker_tick.tick(get_settings(), ctx["redis"], ctx["slots"], ctx["prompts"])
@@ -133,6 +143,12 @@ async def audit_partitions(ctx) -> None:
     from ffcore.core.audit import ensure_audit_partitions
 
     await ensure_audit_partitions(2)
+
+
+def _eval_tick_timeout() -> int:
+    from ffcore.evaluation.worker_tick import TICK_TIMEOUT_S
+
+    return TICK_TIMEOUT_S
 
 
 def cron_jobs_for(job_class: JobClass) -> list:
@@ -153,6 +169,7 @@ def cron_jobs_for(job_class: JobClass) -> list:
             advance_eval_runs,
             second=set(range(0, 60, get_settings().eval_advance_interval_s)),
             unique=True,
+            timeout=_eval_tick_timeout(),
         ),
     ]
 

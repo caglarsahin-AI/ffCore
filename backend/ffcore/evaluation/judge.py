@@ -45,7 +45,10 @@ def clip(text: str, limit: int = REASON_MAX) -> str:
     """Short comment field: an explicit mark, never a silent cut (PLAN 5, K-05a-0002)."""
     if len(text) <= limit:
         return text
-    return text[:limit] + f" [truncated: {limit}/{len(text)} chars]"
+    # The mark counts towards the limit (r1 NOTE-1): the comment is never longer than `limit`.
+    mark = f" [truncated: {{}}/{len(text)} chars]"
+    keep = limit - len(mark.format(limit))
+    return text[:keep] + mark.format(keep)
 
 
 async def judge(

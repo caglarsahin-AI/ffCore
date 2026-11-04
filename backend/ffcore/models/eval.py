@@ -60,8 +60,8 @@ class EvalSuite(Timestamps, Base):
     scorers: Mapped[list] = mapped_column(JSONB)
     pass_threshold: Mapped[float] = mapped_column(Float)
     repeat: Mapped[int] = mapped_column(Integer, server_default=sql_text("1"))
-    # S3: items whose run waits for an approval are approved by the exam's starter only when
-    # this is true (audited as eval_auto_approve); false: such items are not_run.
+    # S3 (K-09-0008): true, an item run that waits for an approval stays in the 07 queue for a
+    # person (the exam never approves); false, the advancer cancels it and the item is not_run.
     approve_tools: Mapped[bool] = mapped_column(Boolean, server_default=sql_text("false"))
     created_by: Mapped[str] = mapped_column(Text)
     deleted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
@@ -92,6 +92,10 @@ class EvalRun(Timestamps, Base):
     error_code: Mapped[str | None] = mapped_column(Text)
     # {item_id: {"runs": [run_id, ...], "scored": bool, "outcome": ..., "scores": {...}}}
     item_runs: Mapped[dict] = mapped_column(JSONB, server_default=sql_text("'{}'::jsonb"))
+    # The suite as the exam started: {"scorers", "pass_threshold", "repeat", "approve_tools",
+    # "dataset", "starter"}. The advancer and the summary read only this, so a PATCH of the
+    # suite never changes a running exam and a result repeats with its own setup (r1 MAJOR-4).
+    config: Mapped[dict] = mapped_column(JSONB)
     summary: Mapped[dict | None] = mapped_column(JSONB)
     cost_usd: Mapped[float | None] = mapped_column(Numeric(14, 6))
     started_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))

@@ -165,6 +165,12 @@ class Settings(BaseSettings):
     # Seconds between exam advancer ticks (arq cron on the background worker, K-09-0007 S4);
     # divides 60 and stays under RUN_ABANDON_GRACE_S (the advancer keeps item runs listened).
     eval_advance_interval_s: int = Field(default=15, gt=0, le=60)
+    # Upper bound of items x repeat in one exam (each is a billed background run); more: 422
+    # eval_too_many_runs at start (09-1 r1 MINOR-2).
+    eval_max_item_runs: int = Field(default=500, gt=0)
+    # Judge calls one advancer tick may make for one exam; the rest wait for the next tick, so a
+    # tick stays short (09-1 r1 MAJOR-2).
+    eval_judge_calls_per_tick: int = Field(default=20, gt=0)
 
     # --- 03c governance ---
     # Wrong API keys from one client address per minute before 429 too_many_auth_failures.

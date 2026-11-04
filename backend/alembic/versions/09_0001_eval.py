@@ -82,6 +82,9 @@ def upgrade() -> None:
         sa.Column("status", sa.Text, server_default="queued", nullable=False),
         sa.Column("error_code", sa.Text),
         sa.Column("item_runs", JSONB, server_default=sa.text("'{}'::jsonb"), nullable=False),
+        # The suite as the exam started (scorers, threshold, repeat, approve_tools, dataset,
+        # starter): the advancer and the summary read only this (09-1 r1 MAJOR-4).
+        sa.Column("config", JSONB, nullable=False),
         sa.Column("summary", JSONB),
         sa.Column("cost_usd", sa.Numeric(14, 6)),
         sa.Column("started_at", sa.DateTime(timezone=True)),

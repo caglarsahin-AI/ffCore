@@ -106,6 +106,13 @@ async def resume_run(
     )
     await session.commit()
     after = await _last_entry(settings, run.id)
+    if run.channel == "test":
+        # 09 r1 MINOR-6: an exam item run goes on in the background class it started in.
+        from ffcore.evaluation.runner import is_exam_run
+        from ffcore.runtime.queue import get_background_queue
+
+        if await is_exam_run(session, run.id):
+            queue = get_background_queue(settings)
     await queue.enqueue(str(run.id), resume)
     return after
 

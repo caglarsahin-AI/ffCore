@@ -37,8 +37,8 @@ def _suite_and_run(pg, project):
     )
     pg.execute(
         "INSERT INTO eval_runs (id, project_id, suite_id, agent_version_id, user_id,"
-        " langfuse_run_name, status, item_runs, summary, created_by)"
-        " VALUES (%s, %s, %s, %s, %s, 'exam-v1-x', 'completed', %s, %s, 't')",
+        " langfuse_run_name, status, item_runs, summary, config, created_by)"
+        " VALUES (%s, %s, %s, %s, %s, 'exam-v1-x', 'completed', %s, %s, '{}', 't')",
         (
             eval_id,
             project,
@@ -84,3 +84,27 @@ def test_09_cancel_finished_exam_is_409(pg, member, project):
     _, eval_id = _suite_and_run(pg, project)
     r = member("analyst").post(f"{P.format(project)}/eval-runs/{eval_id}/cancel")
     assert r.status_code == 409 and r.json()["error"]["code"] == "eval_run_finished"
+
+
+def test_09_start_with_another_projects_version_is_the_same_404(
+    pg, app, project, make_project, make_user, client_factory
+):
+    # r1 NOTE-6: a version of another project answers like a missing one.
+    from ffcore.api.eval import langfuse_dependency
+
+    suite_id, _ = _suite_and_run(pg, project)
+    other = make_project()
+    foreign = pg.execute(
+        "SELECT agent_version_id FROM runs WHERE id = %s", (seed_run(pg, other, definition()),)
+    ).fetchone()[0]
+    _, email = make_user(memberships={project: ("analyst", "edit")})
+    client = client_factory(email)
+    app.dependency_overrides[langfuse_dependency] = lambda: object()
+    try:
+        base = f"{P.format(project)}/eval-suites/{suite_id}/run"
+        a = client.post(f"{base}?agent_version_id={foreign}")
+        b = client.post(f"{base}?agent_version_id={uuid.uuid4()}")
+    finally:
+        app.dependency_overrides.pop(langfuse_dependency, None)
+    assert (a.status_code, b.status_code) == (404, 404)
+    assert a.json()["error"]["code"] == b.json()["error"]["code"]

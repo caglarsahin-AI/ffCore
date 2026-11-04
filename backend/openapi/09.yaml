@@ -192,6 +192,10 @@ paths:
       tags:
       - evaluation
       summary: Update Suite
+      description: 'A running exam keeps the suite as it started (its own `config`); a change applies
+        to
+
+        the next exam.'
       operationId: update_suite_api_v1_projects__project_id__eval_suites__suite_id__patch
       parameters:
       - name: project_id
@@ -325,9 +329,11 @@ paths:
       description: 'Start an exam: every active item becomes `repeat` background `channel=test` runs of
         the
 
-        version, for the caller. Progress: GET …/eval-runs/{id} or …/stream. Audited per run
+        version, for the caller. The items are checked and the exam is written `queued`; the
 
-        (start_run) and once for the exam (start_eval_run).'
+        advancer starts the runs and the exam turns `running`. Progress: GET …/eval-runs/{id} or
+
+        …/stream. Audited once for the exam (start_eval_run) and per run (start_run).'
       operationId: start_eval_run_api_v1_projects__project_id__eval_suites__suite_id__run_post
       parameters:
       - name: project_id
@@ -1006,3 +1012,7 @@ components:
       additionalProperties: false
       type: object
       title: SuiteUpdate
+      description: 'Only the given fields change. `agent_id: null` removes the gate; the other fields
+        cannot
+
+        be set to null (r1 MINOR-7).'

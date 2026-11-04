@@ -57,22 +57,36 @@ class SuiteCreate(Strict):
     @field_validator("scorers")
     @classmethod
     def _unique(cls, value: list[ScorerConfig]) -> list[ScorerConfig]:
-        names = [s.name for s in value]
-        if len(names) != len(set(names)):
-            raise ValueError("each scorer once")
-        for s in value:
-            if s.name == "latency_cost" and s.max_ms is None and s.max_usd is None:
-                raise ValueError("latency_cost needs max_ms or max_usd")
-        return value
+        return check_scorers(value)
+
+
+def check_scorers(value: list[ScorerConfig]) -> list[ScorerConfig]:
+    names = [s.name for s in value]
+    if len(names) != len(set(names)):
+        raise ValueError("each scorer once")
+    for s in value:
+        if s.name == "latency_cost" and s.max_ms is None and s.max_usd is None:
+            raise ValueError("latency_cost needs max_ms or max_usd")
+    return value
 
 
 class SuiteUpdate(Strict):
+    """Only the given fields change. `agent_id: null` removes the gate; the other fields cannot
+    be set to null (r1 MINOR-7)."""
+
     name: str | None = Field(default=None, min_length=1, max_length=200)
     agent_id: UUID | None = None
     scorers: list[ScorerConfig] | None = Field(default=None, min_length=1)
     pass_threshold: float | None = Field(default=None, gt=0, le=1)
     repeat: int | None = Field(default=None, ge=1, le=10)
     approve_tools: bool | None = None
+
+    @field_validator("name", "scorers", "pass_threshold", "repeat", "approve_tools")
+    @classmethod
+    def _not_null(cls, value, info):
+        if value is None:
+            raise ValueError(f"{info.field_name} cannot be null")
+        return check_scorers(value) if info.field_name == "scorers" else value
 
 
 class SuiteOut(BaseModel):

@@ -101,14 +101,20 @@ def _row(row) -> tuple[str, ...]:
     return tuple(normalize(str(v)) for v in row)
 
 
-def sql_result(expected: list[list] | None, returned: list[list] | None) -> Score:
+def sql_result(
+    expected: list[list] | None, returned: list[list] | None, missing: str | None = None
+) -> Score:
     """Row set of the agent's own `run_sql` result against the expected rows (order-free).
-    The SQL is not run again here: the score is about what the agent got, and a second query
-    path would be a second, unaudited reader of the database."""
+    `returned` are the rows of the last run_sql call the run really made (executed, approved
+    when asked), read again by the advancer (the run's events keep no rows). `missing` says why
+    there are none: a person rejected the call (`approval_rejected`: the exam could not see
+    the rows, not_run) or the agent made no executed call (`no_executed_sql`, a failure)."""
     if not expected:
         return _not_run("sql_result", "no_expectation")
+    if missing == "approval_rejected":
+        return _not_run("sql_result", "approval_rejected")
     if returned is None:
-        return Score("sql_result", 0.0, False, "no_sql_result")
+        return Score("sql_result", 0.0, False, missing or "no_sql_result")
     ok = sorted(map(_row, expected)) == sorted(map(_row, returned))
     return Score("sql_result", 1.0 if ok else 0.0, ok)
 
@@ -154,22 +160,31 @@ class JudgeVerdict:
     reason: str
 
 
-_SCORE_LINE = re.compile(r"\bscore\s*[:=]\s*(-?\d+)\b", re.IGNORECASE)
+# A fallback for models that do not keep to JSON: a whole line `SCORE: n` (r1 MINOR-1). A
+# `score: 5` inside a sentence (quoted from the answer or a document) is not one.
+_SCORE_LINE = re.compile(r"^\s*SCORE\s*:\s*([1-5])\s*$", re.IGNORECASE | re.MULTILINE)
+_FENCE = re.compile(r"^```[a-zA-Z]*\s*\n(.*)\n```\s*$", re.DOTALL)
 
 
 def parse_judge(text: str) -> JudgeVerdict:
-    """The rubric asks for JSON {"score": 1-5, "reason": "..."}; a `SCORE: n` line is accepted
-    for models that do not keep to JSON. Anything else raises."""
+    """The rubric asks for JSON {"score": 1-5, "reason": "..."} (a code fence around it is
+    taken off); otherwise exactly one whole `SCORE: n` line. Anything else raises: two score
+    lines are ambiguous, nothing is guessed."""
     raw = (text or "").strip()
+    fenced = _FENCE.match(raw)
+    if fenced:
+        raw = fenced.group(1).strip()
     score = reason = None
     try:
         data = json.loads(raw)
         if isinstance(data, dict):
             score, reason = data.get("score"), data.get("reason")
     except ValueError:
-        m = _SCORE_LINE.search(raw)
-        if m:
-            score = int(m.group(1))
+        lines = _SCORE_LINE.findall(raw)
+        if len(lines) > 1:
+            raise JudgeParseError("judge_output_ambiguous") from None
+        if lines:
+            score = int(lines[0])
     if isinstance(score, bool) or not isinstance(score, int):
         raise JudgeParseError("judge_output_unreadable")
     if not JUDGE_MIN <= score <= JUDGE_MAX:

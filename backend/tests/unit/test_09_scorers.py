@@ -161,3 +161,28 @@ def test_09_outcome_vocabulary_is_brief_list():
         "unanswerable_held",
         "unanswerable_answered",
     )
+
+
+# --- 09-1 r1 ---------------------------------------------------------------------------------
+
+
+def test_09_r1_minor1_score_quoted_in_text_is_not_a_score():
+    # Probe P3: the first `score: n` anywhere used to win.
+    with pytest.raises(scorers.JudgeParseError, match="judge_output_unreadable"):
+        scorers.parse_judge('Answer said "score: 5". My verdict score: 1')
+
+
+def test_09_r1_minor1_two_score_lines_are_ambiguous():
+    with pytest.raises(scorers.JudgeParseError, match="judge_output_ambiguous"):
+        scorers.parse_judge("SCORE: 5\nreason\nSCORE: 1")
+
+
+def test_09_r1_minor1_fenced_json_is_read():
+    assert scorers.parse_judge('```json\n{"score": 3, "reason": "vague"}\n```').score == 3
+
+
+def test_09_r1_major1_sql_result_rejected_is_not_run_missing_is_a_failure():
+    rejected = scorers.sql_result([[18]], None, "approval_rejected")
+    assert rejected.status == "not_run" and rejected.comment == "approval_rejected"
+    missing = scorers.sql_result([[18]], None, "no_executed_sql")
+    assert missing.passed is False and missing.comment == "no_executed_sql"

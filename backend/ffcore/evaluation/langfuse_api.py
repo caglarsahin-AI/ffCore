@@ -15,9 +15,10 @@ Measured on the pinned server 3.120.0 (state/pr/09.md, L1-L16, K-09-0006):
 import base64
 from dataclasses import dataclass
 from typing import Any, Protocol
+from urllib.parse import quote
 
 from ffcore.core.config import Settings
-from ffcore.core.egress import EgressTimeout, SafeOutboundClient
+from ffcore.core.egress import EgressError, EgressTimeout, SafeOutboundClient
 
 TIMEOUT = EgressTimeout(connect=5, read=30, total=60)
 PAGE = 100
@@ -69,15 +70,22 @@ class LangfuseApi:
 
     async def _call(self, method: str, path: str, *, params=None, json=None) -> Any:
         headers = {"Authorization": self._auth, "Content-Type": "application/json"}
-        if self._transport is not None:
-            response = await self._transport.request(
-                method, self._base + path, headers=headers, params=params, json=json
-            )
-        else:
-            async with SafeOutboundClient(timeout=TIMEOUT, settings=self._settings) as client:
-                response = await client.request(
+        try:
+            if self._transport is not None:
+                response = await self._transport.request(
                     method, self._base + path, headers=headers, params=params, json=json
                 )
+            else:
+                async with SafeOutboundClient(timeout=TIMEOUT, settings=self._settings) as client:
+                    response = await client.request(
+                        method, self._base + path, headers=headers, params=params, json=json
+                    )
+        except EgressError as exc:
+            # Connection refused, timeout, denied host: a Langfuse failure with its own code,
+            # counted per item like any other (r1 MINOR-8). The type only, no message.
+            raise LangfuseApiError(
+                "langfuse_unreachable", f"{method} {path}: {type(exc).__name__}"
+            ) from None
         if response.status_code == 404:
             raise LangfuseApiError("langfuse_not_found", f"{method} {path}")
         if not 200 <= response.status_code < 300:
@@ -157,7 +165,9 @@ class LangfuseApi:
         )
 
     async def run_items(self, dataset: str, run_name: str) -> list[RunItem]:
-        body = await self._call("GET", f"/api/public/datasets/{dataset}/runs/{run_name}")
+        body = await self._call(
+            "GET", f"/api/public/datasets/{_seg(dataset)}/runs/{_seg(run_name)}"
+        )
         return [
             RunItem(r["datasetItemId"], r["traceId"])
             for r in body.get("datasetRunItems", [])
@@ -165,7 +175,7 @@ class LangfuseApi:
         ]
 
     async def delete_run(self, dataset: str, run_name: str) -> None:
-        await self._call("DELETE", f"/api/public/datasets/{dataset}/runs/{run_name}")
+        await self._call("DELETE", f"/api/public/datasets/{_seg(dataset)}/runs/{_seg(run_name)}")
 
     # --- scores -----------------------------------------------------------------------------
 
@@ -225,6 +235,11 @@ class LangfuseApi:
                 "langfuse_filter_ignored", f"scores of other traces for {trace_id}: {len(foreign)}"
             )
         return rows
+
+
+def _seg(value: str) -> str:
+    """One URL path segment: `/` and `..` cannot leave it (r1 MINOR-11)."""
+    return quote(value, safe="")
 
 
 def score_id(trace_id: str, scorer: str) -> str:

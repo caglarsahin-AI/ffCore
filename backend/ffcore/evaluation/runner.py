@@ -4,21 +4,26 @@ import csv
 import io
 import logging
 import uuid
+from collections import Counter
 from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
+from datetime import UTC, datetime
 from typing import Any
 
-from sqlalchemy import select
+from sqlalchemy import select, text, update
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm.attributes import flag_modified
 
 from ffcore.core.audit import AuditEntry, write_event
 from ffcore.core.config import Settings
 from ffcore.core.errors import ApiError
 from ffcore.evaluation import scorers
+from ffcore.evaluation.diagnosis import DIAGNOSIS_ORDER
 from ffcore.evaluation.engine import (
     MAX_ATTEMPTS,
     TERMINAL,
     ItemFacts,
+    ItemResult,
     _scorer_cfg,
     deterministic_scores,
     item_result,
@@ -30,18 +35,26 @@ from ffcore.evaluation.engine import (
 from ffcore.evaluation.langfuse_api import LangfuseApi, LangfuseApiError
 from ffcore.evaluation.scorers import Score
 from ffcore.models.agents import Agent, AgentVersion
+from ffcore.models.approvals import Approval
 from ffcore.models.eval import EvalRun, EvalSuite
 from ffcore.models.runs import Run
-from ffcore.runtime import events as run_events
 from ffcore.runtime.contracts import RunStatus
+from ffcore.runtime.definition import parse_definition
 from ffcore.runtime.queue import RunQueue
 from ffcore.services.runs_start import start_run
 
 log = logging.getLogger("ffcore.evaluation")
 
 JudgeFn = Callable[[Run, dict, ItemFacts, dict], Awaitable[tuple[Score, str]]]
-SqlFn = Callable[[Run, str, str], Awaitable[list[list] | None]]
+# The re-read of the agent's last executed run_sql: (rows, None) or (None, code).
+SqlFn = Callable[[Run, str, str], Awaitable[tuple[list[list] | None, str | None]]]
 EmbedFn = Callable[[list[str]], Awaitable[list[list[float]]]]
+# Writes the end of a run the advancer cancelled (the `error` event, like POST …/cancel).
+CloseFn = Callable[[AsyncSession, Run, str], Awaitable[None]]
+
+ACTIVE = ("queued", "running")
+# Who closes an approval whose run the exam cancelled (approve_tools=false).
+EVAL_RESOLVER = "system:eval"
 
 
 @dataclass(frozen=True)
@@ -53,8 +66,57 @@ class Starter:
     ip: str | None
 
 
+@dataclass
+class Budget:
+    """Judge calls this tick may still make for one exam (EVAL_JUDGE_CALLS_PER_TICK)."""
+
+    judge_calls: int
+
+
 def run_name(suite: EvalSuite, version: AgentVersion) -> str:
     return f"{suite.key}-v{version.version}-{uuid.uuid4().hex[:8]}"
+
+
+def snapshot(suite: EvalSuite, starter: Starter) -> dict[str, Any]:
+    """The suite as the exam starts (r1 MAJOR-4) and who started it (the advancer starts the
+    item runs for this user and audits them with this request)."""
+    return {
+        "scorers": list(suite.scorers),
+        "pass_threshold": suite.pass_threshold,
+        "repeat": suite.repeat,
+        "approve_tools": suite.approve_tools,
+        "dataset": suite.langfuse_dataset_name,
+        "starter": {
+            "actor_type": starter.actor_type,
+            "actor_id": starter.actor_id,
+            "request_id": starter.request_id,
+            "ip": starter.ip,
+        },
+    }
+
+
+def _check_items(items: list[dict], version: AgentVersion) -> None:
+    """Every item is checked before anything starts: a broken item halfway would leave runs
+    already billed for an exam that cannot finish (r1 MINOR-2)."""
+    known = {v.key for v in parse_definition(version.definition).variables}
+    bad: list[str] = []
+    for i in items:
+        given = i.get("input") or {}
+        variables = given.get("variables") or {}
+        if (
+            not isinstance(given.get("message"), str)
+            or not isinstance(variables, dict)
+            or not all(isinstance(v, str) for v in variables.values())
+            or set(variables) - known
+        ):
+            bad.append(i["id"])
+    if bad:
+        raise ApiError(
+            422,
+            "invalid_request_error",
+            "item_input_invalid",
+            f"Items without a text input.message or with unknown/non-text variables: {bad[:5]}",
+        )
 
 
 async def start_eval(
@@ -62,13 +124,12 @@ async def start_eval(
     settings: Settings,
     *,
     suite: EvalSuite,
-    agent: Agent,
     version: AgentVersion,
     starter: Starter,
     api: LangfuseApi,
-    queue: RunQueue,
-    queued_event,
 ) -> EvalRun:
+    """Check the dataset and write the exam `queued` with its plan; the advancer starts the
+    item runs (in the background, resumable: a start that dies halfway goes on next tick)."""
     items = [
         i
         for i in await api.items(suite.langfuse_dataset_name)
@@ -78,26 +139,27 @@ async def start_eval(
         raise ApiError(
             409, "conflict_error", "dataset_empty", "The suite's dataset has no active items."
         )
-    bad = [i["id"] for i in items if not isinstance((i.get("input") or {}).get("message"), str)]
-    if bad:
+    total = len(items) * suite.repeat
+    if total > settings.eval_max_item_runs:
         raise ApiError(
             422,
             "invalid_request_error",
-            "item_input_invalid",
-            f"Items without input.message: {bad[:5]}",
+            "eval_too_many_runs",
+            f"{len(items)} items x repeat {suite.repeat} = {total} runs; "
+            f"EVAL_MAX_ITEM_RUNS is {settings.eval_max_item_runs}.",
         )
+    _check_items(items, version)
     ev = EvalRun(
         project_id=suite.project_id,
         suite_id=suite.id,
         agent_version_id=version.id,
         user_id=starter.user_id,
         langfuse_run_name=run_name(suite, version),
-        # Queued until every item run exists: the advancer only takes running exams, so it
-        # never summarizes half a plan (stack finding: 19 of 33 items).
         status="queued",
         started_at=now_utc(),
         created_by=starter.actor_id,
-        item_runs={},
+        config=snapshot(suite, starter),
+        item_runs={i["id"]: {"item": i, "runs": [], "scored": False, "attempts": 0} for i in items},
     )
     session.add(ev)
     await session.flush()
@@ -122,81 +184,122 @@ async def start_eval(
             ip=starter.ip,
         ),
     )
-    ev_id = ev.id
-    try:
-        plan: dict[str, Any] = {}
-        for item in items:
-            runs: list[str] = []
-            for _ in range(suite.repeat):
-
-                async def audit(session, run, version, _item=item["id"]):
-                    await write_event(
-                        session,
-                        AuditEntry(
-                            action="start_run",
-                            resource_type="run",
-                            outcome="success",
-                            actor_type=starter.actor_type,
-                            actor_id=starter.actor_id,
-                            project_id=str(suite.project_id),
-                            resource_id=str(run.id),
-                            before=None,
-                            after={
-                                "agent_id": str(agent.id),
-                                "version": version.version,
-                                "channel": "test",
-                                "eval_run_id": str(ev.id),
-                                "item_id": _item,
-                            },
-                            request_id=starter.request_id,
-                            ip=starter.ip,
-                        ),
-                    )
-
-                run = await start_run(
-                    session,
-                    settings,
-                    queue,
-                    project_id=suite.project_id,
-                    agent=agent,
-                    version=version,
-                    user_id=starter.user_id,
-                    created_by=starter.actor_id,
-                    input=item["input"]["message"],
-                    variables=dict(item["input"].get("variables") or {}),
-                    channel="test",
-                    conversation_id=None,
-                    audit=audit,
-                    queued_event=queued_event,
-                )
-                runs.append(str(run.id))
-            plan[item["id"]] = {"item": item, "runs": runs, "scored": False, "attempts": 0}
-            ev.item_runs = dict(plan)
-            await session.commit()
-    except Exception:
-        # A start that breaks halfway ends the exam failed; the runs already started finish
-        # on their own (they are ordinary test runs) and are not scored.
-        await session.rollback()
-        broken = await session.get(EvalRun, ev_id)
-        if broken is not None:  # None: nothing was committed, the exam never existed
-            broken.status, broken.error_code = "failed", "start_failed"
-            broken.ended_at = now_utc()
-            await session.commit()
-        raise
-    ev.status = "running"
     await session.commit()
     return ev
 
 
-async def _cancel(session: AsyncSession, settings: Settings, run: Run, reason: str) -> None:
-    """Same rule as POST /runs/{id}/cancel: a running run stops at its next step boundary, a
-    queued or waiting one is cancelled at once."""
-    now = now_utc()
-    if run.status == RunStatus.running:
-        run.cancel_requested_at = now
-    else:
-        run.status, run.error_code, run.ended_at = RunStatus.cancelled, reason, now
-        run.cancel_requested_at = now
+def _save(ev: EvalRun, plan: dict) -> None:
+    ev.item_runs = {k: dict(v) for k, v in plan.items()}
+    flag_modified(ev, "item_runs")
+
+
+async def start_items(
+    session: AsyncSession,
+    settings: Settings,
+    ev: EvalRun,
+    *,
+    queue: RunQueue,
+    queued_event,
+) -> None:
+    """A queued exam: start the item runs still missing, one commit per run, then `running`.
+    The exam stays queued until every item run exists, so the advancer never summarizes half a
+    plan; a tick that fails here is counted like any tick failure (worker_tick)."""
+    version = await session.get(AgentVersion, ev.agent_version_id)
+    agent = await session.get(Agent, version.agent_id)
+    who = ev.config["starter"]
+    repeat = int(ev.config["repeat"])
+    plan = {k: dict(v) for k, v in (ev.item_runs or {}).items()}
+    for item_id, entry in plan.items():
+        while len(entry["runs"]) < repeat:
+            item = entry["item"]
+
+            async def audit(session, run, version, _item=item_id):
+                await write_event(
+                    session,
+                    AuditEntry(
+                        action="start_run",
+                        resource_type="run",
+                        outcome="success",
+                        actor_type=who["actor_type"],
+                        actor_id=who["actor_id"],
+                        project_id=str(ev.project_id),
+                        resource_id=str(run.id),
+                        before=None,
+                        after={
+                            "agent_id": str(agent.id),
+                            "version": version.version,
+                            "channel": "test",
+                            "eval_run_id": str(ev.id),
+                            "item_id": _item,
+                        },
+                        request_id=who["request_id"],
+                        ip=who["ip"],
+                    ),
+                )
+
+            # start_run commits the run and enqueues it; the plan row follows at once, so a
+            # failure in between leaves at most one run outside the plan (it runs, unscored).
+            run = await start_run(
+                session,
+                settings,
+                queue,
+                project_id=ev.project_id,
+                agent=agent,
+                version=version,
+                user_id=ev.user_id,
+                created_by=who["actor_id"],
+                input=item["input"]["message"],
+                variables=dict(item["input"].get("variables") or {}),
+                channel="test",
+                conversation_id=None,
+                audit=audit,
+                queued_event=queued_event,
+            )
+            entry["runs"] = [*entry["runs"], str(run.id)]
+            _save(ev, plan)
+            await session.commit()
+    ev.status = "running"
+    await session.commit()
+
+
+async def cancel_waiting(session: AsyncSession, run: Run, code: str, *, close: CloseFn) -> bool:
+    """Cancel an item run that waits for a user or an approval (r1 MINOR-5): only if it still
+    waits (a person who decided first wins), its pending approval closed, `cancel_run` audited,
+    the run's `error` event written. Committed together by the event write. False: the run
+    moved on since it was read; nothing is changed."""
+    now = datetime.now(UTC)
+    changed = await session.scalar(
+        update(Run)
+        .where(Run.id == run.id, Run.status == run.status)
+        .values(status=RunStatus.cancelled, error_code=code, ended_at=now, cancel_requested_at=now)
+        .returning(Run.id)
+    )
+    if changed is None:
+        return False
+    await session.execute(
+        update(Approval)
+        .where(Approval.run_id == run.id, Approval.status == "pending")
+        .values(status="expired", resolved_at=now, resolved_by=EVAL_RESOLVER, updated_at=now)
+    )
+    await write_event(
+        session,
+        AuditEntry(
+            action="cancel_run",
+            resource_type="run",
+            outcome="success",
+            actor_type="system",
+            actor_id="eval",
+            project_id=str(run.project_id),
+            resource_id=str(run.id),
+            before={"status": str(run.status)},
+            after={"status": "cancelled", "error_code": code},
+            request_id="eval",
+            ip=None,
+        ),
+    )
+    await close(session, run, code)
+    await session.commit()
+    return True
 
 
 def parse_csv_rows(text: str) -> list[list] | None:
@@ -208,18 +311,34 @@ def parse_csv_rows(text: str) -> list[list] | None:
     return reader[1:] if reader else []
 
 
+async def _cancel_all(session: AsyncSession, runs: dict[str, Run], close: CloseFn) -> None:
+    for r in runs.values():
+        if r.status in TERMINAL:
+            continue
+        if r.status == RunStatus.running:
+            # Same rule as POST /runs/{id}/cancel: it stops at its next step boundary.
+            r.cancel_requested_at = now_utc()
+            await session.commit()
+        else:
+            await cancel_waiting(session, r, "cancelled", close=close)
+
+
 async def advance_eval(
     session: AsyncSession,
     settings: Settings,
     ev: EvalRun,
     *,
     api: LangfuseApi,
-    redis,
     judge: JudgeFn | None,
     sql: SqlFn | None,
     embed: EmbedFn | None,
+    close: CloseFn,
+    budget: Budget,
 ) -> None:
-    suite = await session.get(EvalSuite, ev.suite_id)
+    """One tick of a running exam, under its lock (worker_tick). Reads only `ev.config`.
+    Every scored item is committed on its own (r1 MAJOR-3): a later error in the tick never
+    takes back a score, and a not_run note comes from the run's own end code."""
+    cfg = ev.config
     plan = {k: dict(v) for k, v in (ev.item_runs or {}).items()}
     run_ids = [uuid.UUID(r) for v in plan.values() for r in v["runs"]]
     runs = {
@@ -227,39 +346,39 @@ async def advance_eval(
     }
 
     if ev.cancel_requested_at is not None:
-        for r in runs.values():
-            if r.status not in TERMINAL:
-                await _cancel(session, settings, r, "cancelled")
+        await _cancel_all(session, runs, close)
         ev.status, ev.ended_at = "cancelled", now_utc()
         await session.commit()
         return
 
-    for r in runs.values():
-        if r.status in TERMINAL:
-            continue
-        # The engine follows its runs (06a abandons a run nobody listens to).
-        await run_events.mark_listening(redis, r.id, settings.run_abandon_grace_s)
+    for r in list(runs.values()):
         if r.status == RunStatus.waiting_user:
-            await _cancel(session, settings, r, "eval_waiting_user")
-            _note(plan, str(r.id), "waiting_user")
-        elif r.status == RunStatus.waiting_approval and not suite.approve_tools:
-            await _cancel(session, settings, r, "eval_approval_required")
-            _note(plan, str(r.id), "approval_required")
-    await session.commit()
+            await cancel_waiting(session, r, "eval_waiting_user", close=close)
+        elif r.status == RunStatus.waiting_approval and not cfg["approve_tools"]:
+            await cancel_waiting(session, r, "eval_approval_required", close=close)
+    runs = {
+        str(r.id): r
+        for r in (
+            await session.scalars(
+                select(Run).where(Run.id.in_(run_ids)).execution_options(populate_existing=True)
+            )
+        ).all()
+    }
 
-    cfg = _scorer_cfg(suite.scorers)
+    scorer_cfg = _scorer_cfg(cfg["scorers"])
+    judged = "llm_judge" in scorer_cfg
     for item_id, entry in plan.items():
         if entry["scored"] or any(runs[r].status not in TERMINAL for r in entry["runs"]):
             continue
+        if judged and budget.judge_calls <= 0:
+            break  # the rest waits for the next tick
         try:
             entry["result"] = await _score_item(
                 session,
-                settings,
                 ev,
-                suite,
                 entry,
                 runs,
-                cfg,
+                scorer_cfg,
                 api=api,
                 judge=judge,
                 sql=sql,
@@ -273,42 +392,42 @@ async def advance_eval(
                 "eval_item_langfuse_failed eval_run=%s item=%s code=%s", ev.id, item_id, exc.code
             )
             if entry["attempts"] >= MAX_ATTEMPTS:
-                ev.item_runs = plan
+                _save(ev, plan)
                 ev.status, ev.error_code, ev.ended_at = "failed", exc.code, now_utc()
                 await session.commit()
                 return
-    ev.item_runs = plan
+        if judged:
+            budget.judge_calls -= len(entry["runs"])
+        _save(ev, plan)
+        await session.commit()
     if all(e["scored"] for e in plan.values()):
-        ev.summary = _summary(plan, runs, suite)
+        ev.summary = _summary(plan, runs, cfg)
         costs = [float(r.cost_usd) for r in runs.values() if r.cost_usd is not None]
         ev.cost_usd = sum(costs) if costs else None
         ev.status, ev.ended_at = "completed", now_utc()
-    await session.commit()
+        await session.commit()
 
 
-def _note(plan: dict, run_id: str, note: str) -> None:
-    for entry in plan.values():
-        if run_id in entry["runs"]:
-            entry["note"] = note
-
-
-async def _score_item(
-    session, settings, ev, suite, entry, runs, cfg, *, api, judge, sql, embed
-) -> dict:
+async def _score_item(session, ev, entry, runs, cfg, *, api, judge, sql, embed) -> dict:
     item = entry["item"]
     per_run = []
     for i, rid in enumerate(entry["runs"]):
         run = runs[rid]
-        if entry.get("note"):
-            res = item_result(item, None, [], entry["note"])
-            per_run.append({"run_id": rid, **_dump(res)})
-            continue
         facts = await load_facts(session, run)
-        sql_rows = None
-        if "sql_result" in cfg and facts.status == "completed" and facts.sql and sql is not None:
-            sql_rows = await sql(run, *facts.sql[-1])
+        sql_rows, sql_missing = None, None
+        if "sql_result" in cfg and facts.status == "completed":
+            if facts.sql and sql is not None:
+                sql_rows, sql_missing = await sql(run, *facts.sql[-1])
+            elif facts.sql_rejected:
+                sql_missing = "approval_rejected"
+            elif sql is None:
+                sql_missing = "sql_unavailable"
+            else:
+                sql_missing = "no_executed_sql"
         scores = (
-            deterministic_scores(item, facts, cfg, sql_rows) if facts.status == "completed" else []
+            deterministic_scores(item, facts, cfg, sql_rows, sql_missing)
+            if facts.status == "completed"
+            else []
         )
         reason = ""
         answerable = (item.get("metadata") or {}).get("answerable", True)
@@ -317,12 +436,17 @@ async def _score_item(
             if "semantic" in cfg:
                 scores.append(await _semantic(facts.answer, expected, cfg["semantic"], embed))
             if "llm_judge" in cfg:
-                if judge is None:
+                if not _judge_expectation(item):
+                    scores.append(Score("llm_judge", None, None, "no_expectation", "not_run"))
+                elif judge is None:
                     scores.append(Score("llm_judge", None, None, "judge_unavailable", "error"))
                 else:
                     s, reason = await judge(run, item, facts, cfg["llm_judge"])
                     scores.append(s)
         res = item_result(item, facts, scores, "")
+        if res.passed is None:  # not run: nothing to write to Langfuse
+            per_run.append({"run_id": rid, **_dump(res)})
+            continue
         if facts.trace_id is None:
             raise LangfuseApiError("trace_missing", f"run {rid} has no Langfuse trace")
         if i == 0:
@@ -349,6 +473,13 @@ async def _score_item(
             )
         per_run.append({"run_id": rid, "duration_ms": facts.duration_ms, **_dump(res)})
     return {"runs": per_run}
+
+
+def _judge_expectation(item: dict) -> bool:
+    """The judge compares with an expected answer (or the texts it must contain); an item with
+    neither has nothing to judge against (r1 MINOR-3)."""
+    expected = item.get("expectedOutput") or {}
+    return bool(expected.get("answer") or expected.get("must_contain"))
 
 
 async def _semantic(answer: str, expected: str | None, c: dict, embed: EmbedFn | None) -> Score:
@@ -378,9 +509,7 @@ def _dump(res) -> dict:
     }
 
 
-def _load(item: dict, d: dict):
-    from ffcore.evaluation.engine import ItemResult
-
+def _load(item: dict, d: dict) -> ItemResult:
     meta = item.get("metadata") or {}
     return ItemResult(
         item_id=item["id"],
@@ -396,43 +525,63 @@ def _load(item: dict, d: dict):
     )
 
 
-def combine(item: dict, per_run: list[dict]):
-    """repeat > 1: scores are averaged per scorer; the item passes when most runs pass; the
-    outcome is the most frequent one (ties: the earlier stage)."""
-    from collections import Counter
-
-    from ffcore.evaluation.diagnosis import OUTCOMES
-
+def combine(item: dict, per_run: list[dict]) -> ItemResult:
+    """repeat > 1: scores are averaged per scorer over the runs that ran; a scorer error in any
+    run stays an error; the item passes when most decided runs pass; not-run runs are left
+    out (all not run: the item is not run); the outcome is the most frequent one (ties: the
+    earlier stage, diagnosis order)."""
     loaded = [_load(item, d) for d in per_run]
     if len(loaded) == 1:
         return loaded[0]
-    first = loaded[0]
-    names = [s.name for s in first.scores]
+    ran = [r for r in loaded if r.passed is not None]
+    if not ran:
+        return loaded[0]
+    names = list(dict.fromkeys(s.name for r in ran for s in r.scores))
     scores = []
     for n in names:
-        vals = [s.value for r in loaded for s in r.scores if s.name == n and s.value is not None]
-        oks = [s.passed for r in loaded for s in r.scores if s.name == n and s.passed is not None]
+        mine = [s for r in ran for s in r.scores if s.name == n]
+        if any(s.status == "error" for s in mine):
+            errs = sorted({s.comment for s in mine if s.status == "error"})
+            scores.append(Score(n, None, None, ";".join(errs) or "error", "error"))
+            continue
+        vals = [s.value for s in mine if s.value is not None]
+        oks = [s.passed for s in mine if s.passed is not None]
+        if not oks:
+            scores.append(Score(n, None, None, mine[0].comment if mine else "", "not_run"))
+            continue
         scores.append(
             Score(
                 n,
                 sum(vals) / len(vals) if vals else None,
-                (sum(oks) * 2 > len(oks)) if oks else None,
+                sum(oks) * 2 > len(oks),
                 f"repeat={len(loaded)}",
             )
         )
-    outs = Counter(r.outcome for r in loaded if r.outcome)
+    outs = Counter(r.outcome for r in ran if r.outcome)
     outcome = None
     if outs:
         top = max(outs.values())
-        outcome = next(o for o in OUTCOMES if outs.get(o) == top)
-    decided = [r.passed for r in loaded if r.passed is not None]
-    passed = (sum(decided) * 2 > len(decided)) if decided else None
-    first.scores, first.outcome, first.passed = scores, outcome, passed
-    return first
+        outcome = next(o for o in DIAGNOSIS_ORDER if outs.get(o) == top)
+    passed = sum(1 for r in ran if r.passed) * 2 > len(ran)
+    if any(s.status == "error" for s in scores):
+        passed = False
+    first = ran[0]
+    note = first.note
+    if len(ran) < len(loaded):
+        note = note or f"not_run={len(loaded) - len(ran)}/{len(loaded)}"
+    return ItemResult(
+        item_id=first.item_id,
+        style=first.style,
+        answerable=first.answerable,
+        outcome=outcome,
+        passed=passed,
+        scores=scores,
+        note=note,
+    )
 
 
-def _summary(plan: dict, runs: dict, suite: EvalSuite) -> dict:
-    results, latencies, firsts = [], [], []
+def _summary(plan: dict, runs: dict, cfg: dict) -> dict:
+    results, firsts = [], []
     for entry in plan.values():
         per_run = entry["result"]["runs"]
         results.append(combine(entry["item"], per_run))
@@ -443,12 +592,43 @@ def _summary(plan: dict, runs: dict, suite: EvalSuite) -> dict:
     warmup = firsts[0][1] if firsts else None
     latencies = [ms for _, ms in firsts[1:]]
     return summarize(
-        results, pass_threshold=suite.pass_threshold, warmup_ms=warmup, latencies_ms=latencies
+        results,
+        pass_threshold=float(cfg["pass_threshold"]),
+        warmup_ms=warmup,
+        latencies_ms=latencies,
     )
 
 
+async def is_exam_run(session: AsyncSession, run_id: uuid.UUID) -> bool:
+    """Whether the run is an item run of an active exam (its resume stays in the background
+    queue, r1 MINOR-6). Active exams are few; their plans are searched in Postgres."""
+    hit = await session.scalar(
+        select(EvalRun.id)
+        .where(
+            EvalRun.status.in_(ACTIVE),
+            text(
+                "jsonb_path_exists(eval_runs.item_runs, '$.*.runs[*] ? (@ == $id)', "
+                "jsonb_build_object('id', CAST(:rid AS text)))"
+            ).bindparams(rid=str(run_id)),
+        )
+        .limit(1)
+    )
+    return hit is not None
+
+
 async def active_runs(session: AsyncSession) -> list[EvalRun]:
-    return list((await session.scalars(select(EvalRun).where(EvalRun.status == "running"))).all())
+    return list((await session.scalars(select(EvalRun).where(EvalRun.status.in_(ACTIVE)))).all())
 
 
-__all__ = ["Starter", "active_runs", "advance_eval", "parse_csv_rows", "start_eval"]
+__all__ = [
+    "ACTIVE",
+    "Budget",
+    "Starter",
+    "active_runs",
+    "advance_eval",
+    "cancel_waiting",
+    "is_exam_run",
+    "parse_csv_rows",
+    "start_eval",
+    "start_items",
+]

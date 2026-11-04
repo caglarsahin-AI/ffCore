@@ -1,20 +1,26 @@
 """Exam engine (09): start an exam, advance it, summarize it.
 
-Start (`POST …/eval-suites/{id}/run`): every ACTIVE item of the suite's Langfuse dataset becomes
-`repeat` ordinary `channel=test` runs of the chosen agent version (services/runs_start), queued
-on `llm-background` (C10), acting for the user who started the exam.
+Start (`POST …/eval-suites/{id}/run`): every ACTIVE item of the suite's Langfuse dataset is
+checked (input, variables, items x repeat <= EVAL_MAX_ITEM_RUNS) and the exam is written
+`queued` with its plan and a snapshot of the suite (`eval_runs.config`: scorers, threshold,
+repeat, approve_tools). The advancer then starts `repeat` ordinary `channel=test` runs per
+item (services/runs_start) on `llm-background` (C10), for the user who started the exam, and
+turns the exam `running`; a start that dies halfway goes on at the next tick.
 
-Advance (`advance_eval_runs`, arq cron on the background worker, K-09-0007 S4): a short tick
-per running exam. It keeps the item runs "listened" (06a abandons a run nobody follows; the
-engine is its follower), cancels runs that wait for a user answer, and for runs that wait for
-an approval either leaves them in the 07 queue for a person (`approve_tools=true`) or cancels
-them as not_run (`approval_required`), never approving itself (K-09-0008). A finished item is
-diagnosed and scored; its run's own Langfuse trace is linked into the dataset run and the
-scores are written there (upsert by id: a tick that dies halfway is repeated safely). When every
-item is scored the summary is written and the exam is `completed`.
+Advance (`advance_eval_runs`, arq cron on the background worker, K-09-0007 S4, 09-1 r1): one
+tick per active exam under a Redis lock, reading only the snapshot. Item runs are followed by
+the worker's own listener task (worker_tick.listen_loop), so a long tick never abandons them.
+Runs that wait for a user answer are cancelled; runs that wait for an approval either stay in
+the 07 queue for a person (`approve_tools=true`) or are cancelled (`approval_required`), never
+approved by the exam (K-09-0008); the item's not_run note comes from the run's end code. A
+finished item is diagnosed and scored (at most EVAL_JUDGE_CALLS_PER_TICK judge calls a tick);
+its run's own Langfuse trace is linked into the dataset run and the scores written there
+(upsert by id), and the item is committed on its own. When every item is scored the summary is
+written and the exam is `completed`.
 
 Langfuse failures are counted per item; after MAX_ATTEMPTS the exam ends `failed` with the
-error code (fail-loud; no local copy of what could not be written).
+error code. A tick that keeps failing (MAX_ATTEMPTS in a row, a timeout included) ends the exam
+`failed(advance_failed:<type>)` (fail-loud; no local copy of what could not be written).
 """
 
 import logging
@@ -39,9 +45,16 @@ from ffcore.models.runs import Run, RunEvent
 log = logging.getLogger("ffcore.evaluation")
 
 TERMINAL = {"completed", "failed", "cancelled", "abandoned"}
-# Run end codes that mean "the exam could not ask", not "the agent failed" (K-09-0008): an
-# approval nobody gave in time. Counted apart (n/N) and never part of the pass rate.
-NOT_RUN_CODES = {"approval_expired"}
+# Run end codes that mean "the exam could not ask", not "the agent failed" (K-09-0008, 09-1 r1
+# MAJOR-3): an approval nobody gave in time, a run the advancer cancelled because it waited for
+# an approval (approve_tools=false) or for a user answer. The note comes from the run's own end
+# code, so it survives a tick that died after the cancel. Counted apart (n/N), never part of the
+# pass rate.
+NOT_RUN_CODES = {
+    "approval_expired": "approval_expired",
+    "eval_approval_required": "approval_required",
+    "eval_waiting_user": "waiting_user",
+}
 MAX_ATTEMPTS = 5
 WORST = 10
 
@@ -63,7 +76,11 @@ class ItemFacts:
     cost_usd: float | None
     selected: list[str] = field(default_factory=list)
     candidates: list[Candidate] = field(default_factory=list)
-    sql: list[tuple[str, str]] = field(default_factory=list)  # (tool_key, sql)
+    # run_sql calls that ran: a successful tool_result and, when an approval was asked, an
+    # approved one (09-1 r1 MAJOR-1); (tool_key, sql) in call order.
+    sql: list[tuple[str, str]] = field(default_factory=list)
+    # A run_sql call a person rejected: the exam could not see the agent's rows.
+    sql_rejected: bool = False
 
 
 @dataclass
@@ -86,7 +103,11 @@ def _scorer_cfg(suite_scorers: list[dict]) -> dict[str, dict]:
 
 
 def deterministic_scores(
-    item: dict, facts: ItemFacts, cfg: dict[str, dict], sql_rows: list[list] | None
+    item: dict,
+    facts: ItemFacts,
+    cfg: dict[str, dict],
+    sql_rows: list[list] | None,
+    sql_missing: str | None = None,
 ) -> list[Score]:
     """Every configured scorer except llm_judge and semantic (they call services)."""
     expected = item.get("expectedOutput") or {}
@@ -107,7 +128,7 @@ def deterministic_scores(
         wanted = expected.get("must_cite") or meta.get("expected_docs") or []
         out.append(scorers.cites_source(facts.selected, wanted))
     if "sql_result" in cfg:
-        out.append(scorers.sql_result(expected.get("sql_result"), sql_rows))
+        out.append(scorers.sql_result(expected.get("sql_result"), sql_rows, sql_missing))
     if "latency_cost" in cfg:
         c = cfg["latency_cost"]
         out.append(
@@ -135,16 +156,24 @@ def item_result(item: dict, facts: ItemFacts | None, scores: list[Score], note: 
         )
     )
     if facts.status != "completed" and facts.error_code in NOT_RUN_CODES:
-        return ItemResult(**base, outcome=None, passed=None, scores=[], note=facts.error_code)
+        return ItemResult(
+            **base, outcome=None, passed=None, scores=[], note=NOT_RUN_CODES[facts.error_code]
+        )
     if facts.status != "completed":
         return ItemResult(
             **base, outcome=None, passed=False, scores=[], note=facts.error_code or facts.status
         )
     checked = [s for s in scores if s.status != "not_run"]
+    if not checked:
+        # No scorer had anything to compare (suite and item do not fit): a visible failure,
+        # not a not_run that would only mark the exam incomplete (09-1 r1 MINOR-3).
+        return ItemResult(
+            **base, outcome=outcome, passed=False, scores=scores, note=note or "nothing_scored"
+        )
     if any(s.status == "error" for s in checked):
         passed = False
     else:
-        passed = all(s.passed for s in checked) if checked else None
+        passed = all(s.passed for s in checked)
     return ItemResult(**base, outcome=outcome, passed=passed, scores=scores, note=note)
 
 
@@ -167,7 +196,7 @@ def summarize(
                 by_scorer.setdefault(s.name, []).append(s.value)
             elif s.status == "error":
                 errors[s.comment or "error"] += 1
-        if r.passed is False and not r.scores and r.note:
+        if r.passed is False and r.note and not any(s.status == "error" for s in r.scores):
             errors[r.note] += 1
     outcomes = Counter(r.outcome for r in results if r.outcome)
     styles: dict[str, dict] = {}
@@ -233,14 +262,10 @@ async def load_facts(session: AsyncSession, run: Run) -> ItemFacts:
         )
     ).all()
     selected: list[str] = []
-    sql: list[tuple[str, str]] = []
     for e in events:
         if e.type == "sources":
             selected.extend(_stem_names(e.payload or {}))
-        elif e.type == "tool_call" and str((e.payload or {}).get("name", "")).endswith("__run_sql"):
-            args = (e.payload or {}).get("arguments") or {}
-            if isinstance(args.get("sql"), str):
-                sql.append((e.payload["name"].removesuffix("__run_sql"), args["sql"]))
+    sql, sql_rejected = executed_sql(events)
     queries = (await session.scalars(select(KbQuery).where(KbQuery.run_id == run.id))).all()
     raw = [c for q in queries for c in (q.candidates or [])]
     ids = {uuid.UUID(c["document_id"]) for c in raw if c.get("document_id")}
@@ -273,7 +298,48 @@ async def load_facts(session: AsyncSession, run: Run) -> ItemFacts:
         selected=selected,
         candidates=candidates,
         sql=sql,
+        sql_rejected=sql_rejected,
     )
+
+
+SQL_SUFFIX = "__run_sql"
+
+
+def executed_sql(events) -> tuple[list[tuple[str, str]], bool]:
+    """The run_sql calls the run really made (09-1 r1 MAJOR-1): a `tool_result` without an
+    error and, when the call asked for an approval, `approval_resolved` approved (or an approved
+    twin reused). A call a person rejected, one that failed, and one the runtime refused (a tool
+    the agent was not given ends `tool_unknown`) are never read again. Returns the calls in
+    order and whether a person rejected one."""
+    calls: dict[str, dict] = {}
+    order: list[str] = []
+    for e in events:
+        p = e.payload or {}
+        cid = p.get("tool_call_id")
+        if e.type == "tool_call" and str(p.get("name", "")).endswith(SQL_SUFFIX):
+            args = p.get("arguments") or {}
+            if isinstance(args.get("sql"), str) and cid:
+                calls[cid] = {
+                    "tool_key": p["name"].removesuffix(SQL_SUFFIX),
+                    "sql": args["sql"],
+                    "needs_approval": bool(p.get("needs_approval")),
+                    "decision": None,
+                    "ok": False,
+                }
+                order.append(cid)
+        elif cid in calls and e.type == "approval_resolved":
+            calls[cid]["decision"] = p.get("decision")
+        elif cid in calls and e.type == "approval_reused":
+            calls[cid]["decision"] = "approved"
+        elif cid in calls and e.type == "tool_result":
+            calls[cid]["ok"] = not p.get("is_error") and not p.get("error_code")
+    done = [
+        (c["tool_key"], c["sql"])
+        for c in (calls[i] for i in order)
+        if c["ok"] and (not c["needs_approval"] or c["decision"] == "approved")
+    ]
+    rejected = any(c["needs_approval"] and c["decision"] == "rejected" for c in calls.values())
+    return done, rejected
 
 
 def now_utc() -> datetime:

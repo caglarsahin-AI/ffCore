@@ -30,6 +30,19 @@ OUTCOMES = (
     "unanswerable_held",
     "unanswerable_answered",
 )
+# The order `diagnose` checks the stages in (DRIFT-164: the floor before the top_k cut); ties
+# between repeats go to the earlier stage (09-1 r1 MINOR-3). OUTCOMES keeps the brief's order.
+DIAGNOSIS_ORDER = (
+    "not_retrieved",
+    "below_rerank_floor",
+    "not_reranked",
+    "declined",
+    "below_threshold",
+    "answered",
+    "unanswerable_held",
+    "unanswerable_answered",
+)
+assert set(DIAGNOSIS_ORDER) == set(OUTCOMES)
 
 
 @dataclass(frozen=True)

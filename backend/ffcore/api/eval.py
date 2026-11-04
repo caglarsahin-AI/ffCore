@@ -8,6 +8,7 @@ import) or seeded with `make seed-eval`; there is no local item table (A5).
 
 import asyncio
 import json
+import re
 from typing import Annotated
 from uuid import UUID
 
@@ -33,7 +34,6 @@ from ffcore.evaluation.runner import Starter, start_eval
 from ffcore.models.agents import Agent, AgentVersion
 from ffcore.models.eval import EvalRun, EvalSuite
 from ffcore.models.identity import Project, ProjectMember
-from ffcore.runtime.queue import RunQueue, get_background_queue
 
 router = APIRouter(prefix="/projects/{project_id}", tags=["evaluation"], responses=ERROR_RESPONSES)
 
@@ -43,11 +43,30 @@ Editor = Annotated[Actor, Depends(require_role("analyst", write=True))]
 SettingsDep = Annotated[Settings, Depends(get_settings)]
 
 
-def background_queue_dependency(settings: SettingsDep) -> RunQueue:
-    return get_background_queue(settings)
+def suite_resource(suite_id: UUID) -> UUID:
+    """The audited resource of a suite endpoint (also when it fails or deletes, r1 MINOR-7)."""
+    return suite_id
 
 
-BackgroundQueueDep = Annotated[RunQueue, Depends(background_queue_dependency)]
+def eval_run_resource(eval_run_id: UUID) -> UUID:
+    return eval_run_id
+
+
+SuiteResource = Annotated[UUID, Depends(suite_resource)]
+EvalRunResource = Annotated[UUID, Depends(eval_run_resource)]
+
+# After `<project_key>.`: lower-case letters, digits, `.`, `_`, `-`; no `..` (r1 MINOR-11; the
+# name goes into Langfuse URL paths).
+DATASET_TAIL = re.compile(r"[a-z0-9][a-z0-9._-]{0,127}")
+
+
+def dataset_name_ok(name: str, project_key: str) -> bool:
+    prefix = f"{project_key}."
+    return (
+        name.startswith(prefix)
+        and DATASET_TAIL.fullmatch(name[len(prefix) :]) is not None
+        and ".." not in name
+    )
 
 
 def langfuse_dependency(settings: SettingsDep) -> LangfuseApi:
@@ -160,10 +179,11 @@ async def create_suite(
     if project is None:
         raise not_found("project")
     dataset = body.langfuse_dataset_name or f"{project.key}.{body.key}"
-    if not dataset.startswith(f"{project.key}."):
+    if not dataset_name_ok(dataset, project.key):
         raise invalid(
             "dataset_name_not_in_project",
-            f"The dataset name must start with '{project.key}.' (one Langfuse project is shared).",
+            f"The dataset name must be '{project.key}.' and then lower-case letters, digits, "
+            "'.', '_' or '-' without '..' (one Langfuse project is shared).",
         )
     threshold = body.pass_threshold or settings.eval_pass_threshold
     if threshold is None:
@@ -226,7 +246,10 @@ async def update_suite(
     actor: Editor,
     session: SessionDep,
     settings: SettingsDep,
+    resource_id: SuiteResource,
 ):
+    """A running exam keeps the suite as it started (its own `config`); a change applies to
+    the next exam."""
     row = await _suite(session, project_id, suite_id)
     fields = body.model_dump(exclude_unset=True)
     if "scorers" in fields:
@@ -244,7 +267,12 @@ async def update_suite(
 @router.delete("/eval-suites/{suite_id}", status_code=status.HTTP_204_NO_CONTENT)
 @audited("delete_eval_suite", "eval_suite", load_before=_suite_before)
 async def delete_suite(
-    project_id: UUID, suite_id: UUID, request: Request, actor: Editor, session: SessionDep
+    project_id: UUID,
+    suite_id: UUID,
+    request: Request,
+    actor: Editor,
+    session: SessionDep,
+    resource_id: SuiteResource,
 ):
     """Soft delete; the Langfuse dataset and its runs stay (they are the exam history)."""
     row = await _suite(session, project_id, suite_id)
@@ -263,12 +291,12 @@ async def start_eval_run(
     session: SessionDep,
     settings: SettingsDep,
     langfuse: LangfuseDep,
-    queue: BackgroundQueueDep,
     agent_version_id: Annotated[UUID, Query(description="The agent version to examine.")],
 ):
     """Start an exam: every active item becomes `repeat` background `channel=test` runs of the
-    version, for the caller. Progress: GET …/eval-runs/{id} or …/stream. Audited per run
-    (start_run) and once for the exam (start_eval_run)."""
+    version, for the caller. The items are checked and the exam is written `queued`; the
+    advancer starts the runs and the exam turns `running`. Progress: GET …/eval-runs/{id} or
+    …/stream. Audited once for the exam (start_eval_run) and per run (start_run)."""
     if actor.actor_type != "user":
         raise invalid("run_user_missing", "An exam is started by a user.")
     member = await session.scalar(
@@ -287,23 +315,29 @@ async def start_eval_run(
     version = await session.get(AgentVersion, agent_version_id)
     if version is None:
         raise not_found("version")
-    agent = await _native_agent(session, project_id, version.agent_id)
+    # Another project's version is the same 404 as a missing one (r1 NOTE-6).
+    agent = await session.scalar(
+        select(Agent).where(
+            Agent.id == version.agent_id,
+            Agent.project_id == project_id,
+            Agent.deleted_at.is_(None),
+        )
+    )
+    if agent is None:
+        raise not_found("version")
+    if agent.kind == "external":
+        raise invalid("external_agent_not_runnable", "An external agent has no versions to test.")
     if suite.agent_id is not None and suite.agent_id != agent.id:
         raise invalid("version_not_of_suite_agent", "The version belongs to another agent.")
     request_id, ip = request_context(request)
-    from ffcore.api.runs import _queued_event
-
     try:
         ev = await start_eval(
             session,
             settings,
             suite=suite,
-            agent=agent,
             version=version,
             starter=Starter(UUID(actor.actor_id), actor.actor_type, actor.actor_id, request_id, ip),
             api=langfuse,
-            queue=queue,
-            queued_event=_queued_event,
         )
     except LangfuseApiError as exc:
         await session.rollback()
@@ -331,7 +365,12 @@ async def get_eval_run(project_id: UUID, eval_run_id: UUID, actor: Reader, sessi
 @router.post("/eval-runs/{eval_run_id}/cancel", response_model=EvalRunOut)
 @audited("cancel_eval_run", "eval_run")
 async def cancel_eval_run(
-    project_id: UUID, eval_run_id: UUID, request: Request, actor: Editor, session: SessionDep
+    project_id: UUID,
+    eval_run_id: UUID,
+    request: Request,
+    actor: Editor,
+    session: SessionDep,
+    resource_id: EvalRunResource,
 ):
     """The advancer cancels the item runs on its next tick and ends the exam `cancelled`."""
     row = await _eval_run(session, project_id, eval_run_id)
