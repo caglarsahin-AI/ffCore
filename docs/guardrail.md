@@ -83,8 +83,10 @@ calls the model.
 - Fail-loud: without `NER_MODEL`/`NER_REVISION` a NER policy is `ner_not_configured` (a
   configuration error, not `on_error`); a missing weight is `model_missing` (offline cache only,
   `make models`); a model label that maps to no category is `ner_label_unknown` at load. When NER
-  cannot answer at egress, an enforce rule fails loudly with `503 ner_unavailable` whatever
-  `on_error` says (the identifiers must not leave unmasked because NER is down); in the text
+  cannot answer at egress, an enforce rule fails loudly with `ner_unavailable` whatever
+  `on_error` says (the identifiers must not leave unmasked because NER is down): 503 `api_error`
+  on the direct model path, the external agent and the internal evaluate endpoint, 502
+  `api_error` (the run's code) inside a facade agent run (see the API reference). In the text
   stages the rule fails and follows `on_error` (default `block`). Nothing falls back to regex
   only.
 - Long texts are read in overlapping windows (stride 128 tokens), never cut at the model limit.

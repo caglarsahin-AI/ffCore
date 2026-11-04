@@ -7,8 +7,10 @@ pattern.
 
 Fail-loud: no model configured is `ner_not_configured`, a missing weight is `model_missing`
 (ModelMissing, offline cache only), a label the model knows but no category maps is
-`ner_label_unknown` at load; an unreachable API is `NerUnavailable`, which the engine treats
-as a rule failure (`on_error`, default block). Nothing falls back to regex only.
+`ner_label_unknown` at load; an unreachable API is `NerUnavailable`. At egress an enforce rule
+turns it into `NerEgressUnavailable` (503 `ner_unavailable`) whatever `on_error` says (r1 MINOR-1
+A); in the text stages it is a rule failure that follows `on_error` (default block). Nothing
+falls back to regex only.
 """
 
 import asyncio
@@ -98,7 +100,8 @@ class NerConfigError(GuardrailConfigError):
 
 
 class NerUnavailable(RuntimeError):
-    """The internal NER endpoint did not answer usably (a rule failure, `on_error`)."""
+    """The internal NER endpoint did not answer usably. The engine raises it as
+    `NerEgressUnavailable` at egress (enforce) and follows `on_error` in the text stages."""
 
 
 class NerClient(Protocol):

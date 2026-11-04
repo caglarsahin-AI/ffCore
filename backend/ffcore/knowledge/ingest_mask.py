@@ -75,7 +75,8 @@ class PiiNerFilter:
         return f"{self.name}@{self.version}"
 
     async def mask(self, text: str) -> tuple[str, Counter]:
-        """`pii_regex` plus person names; a name overlapping a regex finding is dropped."""
+        """`pii_regex` plus person names; a name is cut to the parts outside the regex findings
+        (r1 MINOR-5), never dropped whole and never over a regex finding."""
         base = recognize(text, PII_REGEX_CATEGORIES)
         names = await ner_client().find(text, PII_NER_CATEGORIES) if text.strip() else []
         from ffcore.guardrails.recognizers.ner import trim_names

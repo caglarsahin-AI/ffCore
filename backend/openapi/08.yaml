@@ -774,7 +774,11 @@ paths:
 
         token scope whose placeholder numbers are used up (it would issue past 9999999) is 400
 
-        `placeholder_out_of_range`, whatever the policy''s `on_error` says (08-tam-1a r4/r5).'
+        `placeholder_out_of_range`, whatever the policy''s `on_error` says (08-tam-1a r4/r5). At egress,
+
+        an enforce rule whose NER cannot answer is 503 `ner_unavailable`, also whatever `on_error`
+
+        says (08-tam-1b r1 MINOR-1).'
       operationId: evaluate_guardrails_api_v1_internal_guardrails_evaluate_post
       requestBody:
         content:
