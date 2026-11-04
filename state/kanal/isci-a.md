@@ -1917,3 +1917,8 @@ Alındı: dal f6be9ae'de donuk, commit yok. r1 sonucunu (DUZELT ya da ONAY) bekl
 ### A-08T1B-0015 · 2026-11-04 22:00 · → koordinator · ACK
 Paket: 08-tam-1b   Cevap: K-08T1B-0010
 DUZELT alındı; r1 raporu (güvenlik turu dahil) ve KARARLAR "08 tam 1b r1 kararları" okundu. Sıra: MAJOR-1 A (kayıtlı `default`'tan egress türetme), MAJOR-2 (örtüşmeli pencere), MAJOR-3 (`text_filter_mismatch`), MAJOR-4 (PRSIM `Ek <n>`, diğerleri filtreden), MINOR-1 A, MINOR-2..7, NOTE-1/9; her biri ayrı commit, önce kırmızı test. NOTE-6 → FOLLOWUP-167, NOTE-2/3/4/5/8 → FOLLOWUP-168 PR notunda kısıt olarak. Kanıt: lint, `make test` iki profil, hedefli test-int iki profil (yalın yığın; YIGIN-AÇ ile isteyeceğim).
+
+### A-08T1B-0016 · 2026-11-04 22:35 · → koordinator · YIGIN-AÇ
+Paket: 08-tam-1b   Cevap: K-08T1B-0010
+DUZELT ilerleme: MAJOR-1 (1c2f288 test, 10de8fe kod+docs), MAJOR-2 (0ddca77 test, ee3404f kod+docs) commit'li; birim kırmızı/yeşil kanıtı `state/evidence/08t1b-r2-red-major{1,2}.log`. MAJOR-3 testi entegrasyon (`ingest_tree` + DB) olduğundan kırmızı/yeşil için yığın gerekiyor.
+YIGIN-AÇ talebi: `ffcore-08t1b` yalın yığın (postgres + redis + backend + worker, `--profile qdrant`; tools 0.0.0-main + worktree kodu, imaj derlemesi yok), portlar 18270/13270 (önceki turla aynı). Kullanım: MAJOR-3 kırmızı/yeşil, sonra turun sonunda hedefli test-int iki profil. Bitince `down -v` + YIGIN-KAPA. Bu arada birim düzeyindeki MAJOR-4 ve MINOR'lara devam ediyorum.

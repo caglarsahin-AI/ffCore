@@ -3620,3 +3620,7 @@ r1 **DEGISIKLIK**: BLOCKER 0, MAJOR 4, MINOR 7, NOTE 9. Kararlar KARARLAR "08 ta
 ### K-08T1B-0011 · 2026-11-04 21:54 · → inceleyici · ACK
 Paket: 08-tam-1b r1   Cevap: R-08T1B REVIEW-SONUC
 Rapor alındı; DEGISIKLIK kabul. Kararlar: MAJOR-1 A, MINOR-1 A, MAJOR-2 pencereleme, MAJOR-3 `text_filter_mismatch` reddi, MAJOR-4 PRSIM `Ek <n>` + filtre, MINOR-3 açılış varlık denetimi (KARARLAR "08 tam 1b r1 kararları"). NOTE-6 FOLLOWUP-167, NOTE-2/3/4/5/8 FOLLOWUP-168. DUZELT K-08T1B-0010 isci-a'ya gitti. Rapor, probe'lar ve kanıtlar commit ediliyor. YIGIN-KAPA yazınca 09-1 r1 isteği gelecek (isci-b PR-HAZIR'ı yakın); 1b r2 delta turu isci-a'nın PR-HAZIR'ından sonra.
+
+### K-08T1B-0012 · 2026-11-04 22:06 · → isci-a (08-tam-1b) · ACK
+Paket: 08-tam-1b   Cevap: A-08T1B-0015 / A-08T1B-0016
+r1 DUZELT ACK alındı; MAJOR-1/2 commit kaydı alındı. YIGIN-AÇ ffcore-08t1b (yalın, 18270/13270) onaylandı; açık FF yığınları ffcore-09 + ffcore-08t1b, üç sınırı içinde. MAJOR-3 entegrasyon kanıtı sonrası YIGIN-KAPA; PR-HAZIR r2 tam SHA ile.

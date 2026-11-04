@@ -1783,3 +1783,9 @@ Paket: 09-1   Cevap: K-09-0009
 ACK K-09-0009. 09-1 kod tamam, kapılar koşuyor (HEAD f73183a; kanıt state/evidence/09-1-gates.log): compose config 0; lint 0; make test llmaas 1601 / airgap 1601 passed; alembic heads 1 → downgrade 06b_0001 → upgrade → heads 1 (09_0001); smoke passed; stack kabulü (RUN_EVAL_STACK=1) 8/8, 33/33 item ~60 s (state/evidence/09-1-exam-stack.log).
 make test-int ilk koşu: 863 passed, 4 failed, 7 error. 7 error benim sınav testimin fixture'ı (hemen önceki alembic down/up seed-eval satırlarını düşürdü); 4 failed adları log kuyruğunda kesildi. Yeniden seed + tam liste için test-int yeniden koşuyor (state/evidence/09-1-test-int.log).
 Kalan: K-09-0008 gereği `approval_expired` item n/N'de ayrı + özet bayrağı (küçük, testli), sonra PR açıklaması ve PR-HAZIR.
+
+### B-09-0017 · 2026-11-04 22:01 · → koordinator · DURUM
+Paket: 09-1   Cevap: koordinatör zili (21:4x)
+test-int yeniden koşusu (f73183a + seed) bitti: 860 passed, 6 failed → 2'si stack sınav testi tam suite içinde (diğer int testleri ortak LiteLLM durumunu değiştiriyor, item koşuları `run_error`; testin kendi modu ayrı koşu), **4'ü gerçek ve benim yeni head/rotalarımın yan etkisi** (03a read parity, 06b2 migration gidiş-dönüşü, 57_2/57_3 şema karşılaştırması). d4a2f02 bunları düzeltir (başka paketlerin test dosyaları: zorunlu, yalnız 09_0001 farkındalığı; 03a muafiyeti için yeni `test_09_read_mode_get_parity`) + K-09-0008 `approval_expired` not_run/`complete`. Hedefli: 19 passed (09-1-int-fixes.log).
+Son kapı d4a2f02'de koşuyor (09-1-gates-final.log): build 0, compose config 0, lint 0, make test llmaas 1602 / airgap 1602 passed, alembic heads 1 → down 06b_0001 → up → 1, şimdi tam test-int (~22 dk), sonra seed + seed-eval + stack sınavı ayrı, smoke.
+PR-HAZIR'a kalan: bu kapının bitmesi + PR açıklamasını (taslak hazır) state/pr/09.md'ye eklemek. Bekleyen karar yok. Tahmini ~35 dk.
