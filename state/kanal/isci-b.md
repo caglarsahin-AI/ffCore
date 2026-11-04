@@ -1817,3 +1817,16 @@ Karar "aksi hâlde `not_run(no_executed_sql)`" diyor. `not_run` scorer düzeyind
 - **B:** karar metni gibi, hepsi `not_run(no_executed_sql)`. Etki: yukarıdaki delik kalır; 09-2 kapısı bunu `complete` ile de yakalamaz (scorer not_run maddeyi not_run yapmaz).
 - **C:** hepsi `fail`. Etki: insan reddi agent'a ceza olarak yazılır; S3 ruhuna aykırı.
 A ile ilerliyorum (eşleme tek satır; B gelirse değiştiririm). Diğer MAJOR'lar devam ediyor.
+
+### B-09-0023 · 2026-11-05 00:14 · → koordinator · YIGIN-KAPA
+Paket: 09-1 r2   Cevap: K-09-0012
+`ffcore-09` `down -v` ile kapatıldı (exit 0; kalan konteyner 0, volume 0). İmajlar `ffcore/{backend,tools}:0.0.0-09` duruyor.
+
+### B-09-0024 · 2026-11-05 00:15 · → koordinator · PR-HAZIR
+Paket: 09-1 r2   Cevap: K-09-0012 / K-09-0014
+PR: state/pr/09.md bölüm "PR 09-1 r2" · Sınıf [B]. Branch feat/09-evaluation · SHA **e13ec6b4efed38787e4d37a7dd134dcf31e11472** (d4a2f02 üstüne 2 commit: 528f09b fix, e13ec6b docs). Ağaç temiz, state/ yok.
+Düzeltmeler: MAJOR-1 (yalnız çalışmış + onaylı + bağlı araç; ret → not_run `approval_rejected`, çalışmamış → fail `no_executed_sql`, K-09-0014), MAJOR-2 (sınav başına Redis kilidi; dinleyici işçi sürecinin görevi, arq yuvasından bağımsız; tick başına judge sınırı; iptal/timeout hata sayılır), MAJOR-3 (not koşu kodundan, madde başına commit), MAJOR-4 (`eval_runs.config` 09_0001 içinde), MINOR-1..8, 10, 11, NOTE-1, NOTE-6. MINOR-9: 1b main'de değil; 1b önce merge edilirse PR-HAZIR'dan önce main'i merge eder, `ner=` + sahte NER testini eklerim.
+Ek bulgu: eval audit'leri `actor_type="service"` yazıyordu, `audit_events` kısıtı reddediyor (d4a2f02'de gerçek SQL yeniden okuması tick'i düşürürdü); `system` yapıldı, testli.
+Davranış farkı: başlatma artık arka planda (POST 202 `queued`, koşuları ilerletici başlatır, yarıda kalan devam eder). Yeni C12 (additive): `EVAL_MAX_ITEM_RUNS`=500, `EVAL_JUDGE_CALLS_PER_TICK`=20. Başka paket dosyası: `runtime/resume.py` (MINOR-6, yalnız aktif sınav koşusu için arka plan kuyruğu).
+Kanıt (state/evidence/09-1-r2-gates.log @ e13ec6b): build 0, config 0, lint 0, make test llmaas 1623 / airgap 1623, alembic tek head + gidiş-dönüş, hedefli test-int llmaas 84 / airgap 84 (09 + 03a/06b2/57 + 06a runs + 07 decide/flow/service/api_read), seed + seed-eval, stack sınavı 8 passed (33/33, 33 s), smoke passed. Kırmızı: 09-1-r2-red-unit.log (r2 birim testleri d4a2f02 koduyla 24 failed). Probe yeniden: 09-1-r2-probe.log (P3 sahte skor reddedildi, çitli JSON okunuyor, gerekçe 500).
+Dala başka commit atmıyorum; delta inceleme bekliyorum.

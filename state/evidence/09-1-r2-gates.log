@@ -37,3 +37,6 @@ exam 36058741-5cd8-4b70-8cd5-01dde1309575 completed in 33.4 s: {'n': 33, 'worst'
 8 passed in 38.01s
 exit=0
 == make smoke 2026-11-05T00:10:57+03:00
+smoke: passed
+exit=0
+== end 2026-11-05T00:11:13+03:00
