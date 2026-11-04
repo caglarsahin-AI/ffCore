@@ -1756,3 +1756,10 @@ Paket: fix/19r2-dis-inceleme r2 (delta)   Cevap: K-19R2-0008
 - NOTE: KARARLAR "başka bir @… dekoratör satırı" cümlesi koddan geniş (kod zinciri def/class'a bağlıyor, daha güvenli); İngilizce "class …" düzyazı satırı tanım sayılır (bilgi).
 - Koşular 17:11-17:12 konteyner --network none: hedefli 191/191, tam takım 656 + 3 bs4 (master'da aynı), ruff temiz. Yığın yok, PRSIM staging koşulmadı.
 - Dosyalar commit edilmedi: rapor, güncellenmiş probe (19r2-dis-inceleme-r1-probe.py), evidence 19r2-r2-*, kanal.
+
+### R-08T1B-0001 · 2026-11-04 20:47 · → koordinator · ACK
+Paket: 08-tam-1b r1   Cevap: K-08T1B-0008
+REVIEW-ISTEK alındı. SHA doğrulandı: f6be9ae5c6b3b7be3d6fc8a6a02282b52d23877c (feat/08-tam-1b-ner; merge-base main 7af41e5, 13 commit, 41 dosya +1506/-95, state/ 0). Worktree .worktrees/review-08t1b-r1 (temiz). Güvenlik turu + tam yığın.
+
+### R-08T1B-0002 · 2026-11-04 20:47 · → koordinator · YIGIN-AC
+Yığın: review08t1b (COMPOSE_PROJECT_NAME), BACKEND_PORT 18290, FRONTEND_PORT 13290, --profile test --profile qdrant (langfuse, mcp, ticket-desk dahil), --env-file .env.test, --pull never. Açık FF yığınları: ffcore-09 + review08t1b (üç sınırı içinde). Disk boş 113 GB. Kapanış down -v + YIGIN-KAPA.

@@ -1,0 +1,23 @@
+== backend EGRESS_ENABLED=true EGRESS_NER=true NER_MODEL=''
+exit=3
+    raise RuntimeError(
+RuntimeError: ner_not_configured: GUARDRAIL_EGRESS_NER=true needs NER_MODEL and NER_REVISION
+== backend EGRESS_ENABLED=false EGRESS_NER=true NER_MODEL=''
+exit=124
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+== backend EGRESS_ENABLED=true EGRESS_NER=false NER_MODEL=''
+exit=124
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+== agent-worker EGRESS_ENABLED=true EGRESS_NER=true NER_MODEL=''
+exit=1
+18:06:33: Starting worker for 1 functions: run_agent
+    raise RuntimeError(
+RuntimeError: ner_not_configured: GUARDRAIL_EGRESS_NER=true needs NER_MODEL and NER_REVISION
+== agent-worker EGRESS_ENABLED=false EGRESS_NER=true NER_MODEL=''
+exit=124
+18:06:47: Starting worker for 1 functions: run_agent
+== agent-worker EGRESS_ENABLED=true EGRESS_NER=false NER_MODEL=''
+exit=124
+18:07:52: Starting worker for 1 functions: run_agent

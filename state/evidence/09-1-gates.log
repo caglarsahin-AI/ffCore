@@ -20,3 +20,17 @@ INFO  [alembic.runtime.migration] Running upgrade 06b_0001 -> 09_0001, 09: eval_
 09_0001 (05a, 06a, 09, 03a, 03c, 03b, 04a, 06b, 07, 08) (head)
 exit=0
 == make test-int 2026-11-04T20:43:31+03:00
+ERROR tests/integration/test_09_exam_stack.py::test_09_g6_item_runs_are_background_test_runs
+ERROR tests/integration/test_09_exam_stack.py::test_09_read_only_member_cannot_start
+ERROR tests/integration/test_09_exam_stack.py::test_09_stream_ends_with_done
+ERROR tests/integration/test_09_exam_stack.py::test_09_2c_declined_answer_text_kept
+= 4 failed, 863 passed, 5 skipped, 2 warnings, 7 errors in 1518.43s (0:25:18) ==
+make: *** [Makefile:31: test-int] Error 1
+exit=0
+== make smoke 2026-11-04T21:09:14+03:00
+ok    mcp-search /healthz 200
+ok    mcp-sql /healthz 200
+ok    skipped: ollama profile inactive
+smoke: passed
+exit=0
+== end 2026-11-04T21:09:27+03:00
