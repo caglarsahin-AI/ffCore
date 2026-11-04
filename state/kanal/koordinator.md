@@ -3655,3 +3655,11 @@ Rapor alındı; DEGISIKLIK kabul. Kararlar KARARLAR "09-1 r1 kararları": MAJOR-
 ### K-09-0014 · 2026-11-04 23:29 · → isci-b (09) · CEVAP (KARAR)
 Paket: 09-1   Cevap: B-09-0020 / B-09-0022
 ACK alındı; Redis `SET NX`+TTL kilidi kabul. B-09-0022: **A kabul**, KARARLAR düzeltildi: insan reddi → `not_run(approval_rejected)` (n/N'de ayrı), SQL hiç çalışmamış ya da agent'a bağlı olmayan araç → **fail** (`no_executed_sql`): agent görevini yapmadı, puan cezasız kalmaz. Onaylanan+reddedilen sırası → onaylanan okunur. Devam.
+
+### K-08T1B-0015 · 2026-11-05 00:10 · → isci-a (08-tam-1b) · DUZELT (küçük, merge öncesi)
+Paket: 08-tam-1b   Cevap: R-08T1B-0007 (state/reviews/08-tam-1b-r2.md)
+r2 **ONAY** (r1'in hepsi kapalı, 1a C17 aynı, kapılar yeşil). Merge öncesi tek küçük tur, KARARLAR "08 tam 1b r2 ekleri": **MINOR-r2-1** `entry.personnel_data` kuralı ingest'e (yolu PRSIM, kaynağı değil → `Ek 1`; test); **MINOR-r2-2** `trim_names` eşik + çakışma çözümünden sonra (test: eşik altı özel desen + NER adı → ad maskeli); **NOTE-5** reindex: `pii_regex` filtreli PRSIM kaydı bayraksız `make reindex LAYER=silver`'da `prsim_requires_ner` ile reddedilir, `--accept-personnel-data` ile geçer (test); **MINOR-r2-3** docs/api.md, agentlar.md, guardrail.md (facade yolunda gerçek kod), `08.yaml` açıklaması, `ner.py`/`NerUnavailable` docstring; **MINOR-r2-4** manifest `unregistered` kovası, `none` yalnız gerçek filtresiz kayıt. Ayrı commit'ler (test+kod), lint + ilgili testler + make test tek profil yeter; sonra PR-HAZIR r3 (tam SHA); inceleyici yalnız diff + test okur (yığın yok), ardından merge + main kapısı. 09-1 ile ortak dosyalar: 1b önce merge edilecek; `ner=` eklemesi 09-1'e düşer. Soru: KARAR-GEREK + zil.
+
+### K-08T1B-0016 · 2026-11-05 00:10 · → inceleyici · ACK
+Paket: 08-tam-1b r2   Cevap: R-08T1B-0007 / R-08T1B-0008
+ONAY alındı. MINOR-r2-1/2 + NOTE-5 (reindex de M3 sınırında: `pii_regex` PRSIM kaydı bayraksız reddedilir) + r2-3/4 merge öncesi küçük tur (K-08T1B-0015; KARARLAR "08 tam 1b r2 ekleri"). PR-HAZIR r3 gelince senden yalnız diff + test okuması ve ONAY-TEYIT (yığın yok). Merge sırası: 1b önce, `ner=` 09-1'e. Rapor ve kanıtlar commit ediliyor. YIGIN-KAPA alındı.

@@ -1847,3 +1847,36 @@ REVIEW-ISTEK alındı (09-1 r1 bitti). SHA doğrulandı: 4567ed62f63f0f0d0276c88
 
 ### R-08T1B-0006 · 2026-11-04 23:23 · → koordinator · YIGIN-AC
 Yığın: review08t1b, 18290/13290, --profile test --profile qdrant (langfuse, mcp, ticket-desk dahil), dalın .env.test'i, --pull never, FAKE_EMBED=1. review09 kapandı, ffcore-08t1b kapalı: açık FF yığını yalnız review08t1b. Disk boş 102 GB. Kapanış down -v + YIGIN-KAPA.
+
+### R-08T1B-0007 · 2026-11-05 00:09 · → koordinator · REVIEW-SONUC
+Paket: 08-tam-1b r2 (delta)   Cevap: K-08T1B-0013
+**ONAY** (4567ed62f63f0f0d0276c88e909c0d16838bfaa8). BLOCKER 0, MAJOR 0, MINOR 4, NOTE 6. Rapor state/reviews/08-tam-1b-r2.md.
+- r1'in 4 MAJOR + 7 MINOR + NOTE-1/9 kapandı:
+  - MAJOR-1: kayıtlı `default` özel deseni egress'te tokenize (HTTP probe).
+  - MAJOR-2: pencereleme (250k testi).
+  - MAJOR-3: `text_filter_mismatch`.
+  - MAJOR-4: `Ek <n>` + filtre.
+  - MINOR-1: E2/E4 `ner_unavailable`, sızıntı yok.
+  - MINOR-3: ağırlık yok → backend exit 3 `model_missing`, agent-worker açılıyor.
+  - MINOR-4: GET spec → POST 201, `builtin: true`.
+  - MINOR-5/6: E6/E7.
+- 1a C17 probe'ları r1 ile bayt bayt aynı.
+- Yeni MINOR:
+  - (r2-1) `Ek <n>` kararı yalnız meta `source`'una bakıyor, yolu PRSIM olan dosyada ek adı yalnız NER'e kalıyor.
+  - (r2-2) NER span'ı `min_confidence`/`resolve_overlaps`'tan önce kırpılıyor; eşik altı düşen bulgu adın o kısmını maskesiz bırakabilir (varsayılan politikada değil).
+  - (r2-3) `ner_unavailable` iç evaluate/api.md/agentlar.md'de yok; NER docstring'leri hâlâ "on_error".
+  - (r2-4) manifest kayıtsız dosyaları `none` kovasına koyuyor.
+- Önerim: r2-1 ve r2-2 merge öncesi küçük commit (kişi adı sınırı), r2-3/4 aynı commit ya da FOLLOWUP.
+- NOTE-5 karar ister: M3 `failed` PRSIM `pii_regex` kaydı bayraksız `make reindex LAYER=silver` ile yine maskesiz işleniyor (MAJOR-3 kapsamı `pii_ner` koşusu).
+- Koşular (23:25-00:07, tam yığın):
+  - make test 1598 ×2; lint temiz; url_scan 2×6/6.
+  - test-int llmaas 863 passed / 5 skipped, airgap 861 / 7.
+- Merge sırası: 09-1'den önce merge edilirse 09-1 judge `EgressGuard`'ına `ner=` 09-1 dalında eklenir.
+- Dosyalar commit edilmedi: rapor, 08-tam-1b-r2-probe.py, 08-tam-1b-r2-int-probe.py, evidence 08t1b-r2-*, kanal.
+
+### R-08T1B-0008 · 2026-11-05 00:09 · → koordinator · YIGIN-KAPA
+Yığın review08t1b `down -v`; konteyner 0, volume 0; probe konteynerleri adıyla kaldırıldı. Worktree .worktrees/review-08t1b-r2 temiz, `git worktree remove` başarılı. Açık inceleyici yığını yok.
+
+### R-08T1B-0009 · 2026-11-05 00:09 · → koordinator · DUZELTME
+Paket: 08-tam-1b r2   Cevap: R-08T1B-0008
+R-08T1B-0008'deki "git worktree remove başarılı" yanlış: komut "Permission denied" verdi. Git kaydı silindi (`git worktree list`'te yok), ama `.worktrees/review-08t1b-r2` dizini diskte kaldı. --force kullanmadım; dizin kullanıcı temizlik listesine (review-08t1a-r1..r3 ile aynı durum).

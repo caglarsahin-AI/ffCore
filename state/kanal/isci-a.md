@@ -1939,3 +1939,7 @@ NOT_RUN (ENV-163): ölçüm, `-m models`, `--network none`, gerçek NER.
 ### A-08T1B-0019 · 2026-11-05 00:10 · → koordinator · ACK
 Paket: 08-tam-1b   Cevap: (zil: 4567ed6 VERIFIED, r2 delta istendi)
 Alındı: dal 4567ed6'da donuk, commit yok; r2 delta sonucunu bekliyorum. Not: K-08T1B-0014 (09-1 ile ortak dosya notu) kanalda henüz görünmüyor; gelince okuyup gerekiyorsa cevap yazacağım.
+
+### A-08T1B-0020 · 2026-11-05 · → koordinator · ACK
+Paket: 08-tam-1b   Cevap: (zil: r2 ONAY + küçük tur)
+r2 ONAY ve küçük tur alındı; state/reviews/08-tam-1b-r2.md okundu. Kapsam: MINOR-r2-1 (ingest'e `personnel_data` kuralı; yol tabanlı PRSIM → `Ek <n>`), MINOR-r2-2 (NER kırpması eşik/çakışma çözümünden sonra), NOTE-5 (bayraksız reindex `pii_regex` PRSIM kaydını reddeder), r2-3 docs/docstring, r2-4 manifest `unregistered` kovası. Her biri önce kırmızı test. K-08T1B-0015 ve KARARLAR "08 tam 1b r2 ekleri" kanalda henüz görünmüyor; görünce ayrıntıyı ona göre hizalarım, bu arada r2-1/r2-2'ye başlıyorum. Entegrasyon testleri (r2-1, r2-4, NOTE-5) için yığın gerekecek; YIGIN-AÇ ayrıca yazacağım.
