@@ -1,0 +1,61 @@
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-0a077faea7.chat code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-271abf9873.chat code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-556ee41ad5.chat-default code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-73cc8e72a4.chat-default code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-a9f7e77dee.chat code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-ebd5c97f84.chat code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=proj-6832f5.chat-default code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=proj-a78d2e.chat-default code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-0a077faea7.chat code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-271abf9873.chat code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-556ee41ad5.chat-default code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-73cc8e72a4.chat-default code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-a9f7e77dee.chat code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-ebd5c97f84.chat code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=proj-6832f5.chat-default code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=proj-a78d2e.chat-default code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-0a077faea7.chat code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-271abf9873.chat code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-556ee41ad5.chat-default code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-73cc8e72a4.chat-default code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-a9f7e77dee.chat code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-ebd5c97f84.chat code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=proj-6832f5.chat-default code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=proj-a78d2e.chat-default code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-0a077faea7.chat code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-271abf9873.chat code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-556ee41ad5.chat-default code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-73cc8e72a4.chat-default code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-a9f7e77dee.chat code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-ebd5c97f84.chat code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=proj-6832f5.chat-default code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=proj-a78d2e.chat-default code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-0a077faea7.chat code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-271abf9873.chat code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-556ee41ad5.chat-default code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-73cc8e72a4.chat-default code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-a9f7e77dee.chat code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-c01f71fd7c.chat-default code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-ebd5c97f84.chat code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=proj-6832f5.chat-default code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=proj-a78d2e.chat-default code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-0a077faea7.chat code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-271abf9873.chat code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-556ee41ad5.chat-default code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-73cc8e72a4.chat-default code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-a9f7e77dee.chat code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-c01f71fd7c.chat-default code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-ebd5c97f84.chat code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=proj-6832f5.chat-default code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=proj-a78d2e.chat-default code=egress_not_allowlisted
+exam 86adfb55-a18f-40a4-863b-7f792fe4a7ca completed in 79.9 s: {'n': 33, 'worst': [{'mean': None, 'note': 'run_error', 'style': 'dogrudan', 'passed': False, 'item_id': 'hastane-a.sozlesme-33-q01', 'outcome': None}, {'mean': None, 'note': 'run_error', 'style': 'dogrudan', 'passed': False, 'item_id': 'hastane-a.sozlesme-33-q02', 'outcome': None}, {'mean': None, 'note': 'run_error', 'style': 'dogrudan', 'passed': False, 'item_id': 'hastane-a.sozlesme-33-q03', 'outcome': None}, {'mean': None, 'note': 'run_error', 'style': 'dogrudan', 'passed': False, 'item_id': 'hastane-a.sozlesme-33-q04', 'outcome': None}, {'mean': None, 'note': 'run_error', 'style': 'dogrudan', 'passed': False, 'item_id': 'hastane-a.sozlesme-33-q05', 'outcome': None}, {'mean': None, 'note': 'run_error', 'style': 'dogrudan', 'passed': False, 'item_id': 'hastane-a.sozlesme-33-q06', 'outcome': None}, {'mean': None, 'note': 'run_error', 'style': 'dogrudan', 'passed': False, 'item_id': 'hastane-a.sozlesme-33-q07', 'outcome': None}, {'mean': None, 'note': 'run_error', 'style': 'dogrudan', 'passed': False, 'item_id': 'hastane-a.sozlesme-33-q08', 'outcome': None}, {'mean': None, 'note': 'run_error', 'style': 'dogrudan', 'passed': False, 'item_id': 'hastane-a.sozlesme-33-q09', 'outcome': None}, {'mean': None, 'note': 'run_error', 'style': 'dogrudan', 'passed': False, 'item_id': 'hastane-a.sozlesme-33-q10', 'outcome': None}], 'errors': {'run_error': 31, 'judge_failed:LiteLLMError': 2}, 'passed': False, 'scored': 33, 'scores': {'contains': 0.0, 'sql_result': 0.0, 'cites_source': 0.0}, 'styles': {'dolayli': {'n': 8, 'passed': 0, 'outcomes': {'below_rerank_floor': 1}}, 'dogrudan': {'n': 17, 'passed': 0, 'outcomes': {'declined': 1}}, 'alan_ici_cevapsiz': {'n': 5, 'passed': 0, 'outcomes': {}}, 'alan_disi_cevapsiz': {'n': 3, 'passed': 0, 'outcomes': {}}}, 'not_run': {}, 'outcomes': {'answered': 0, 'declined': 1, 'not_reranked': 0, 'not_retrieved': 0, 'below_threshold': 0, 'unanswerable_held': 0, 'below_rerank_floor': 1, 'unanswerable_answered': 0}, 'pass_rate': 0.0, 'warmup_ms': 3715, 'latency_ms': {'max': 6154, 'p50': 3795}, 'warm_cache': True, 'passed_items': 0, 'pass_threshold': 0.8}
+        scores = anyio.run(api.trace_scores, items[0].trace_id, ["outcome", "passed", "contains"])
+>       assert {"outcome", "passed"} <= {s["name"] for s in scores}
+E       AssertionError: assert {'outcome', 'passed'} <= {'passed'}
+FAILED tests/integration/test_03a_read_side.py::test_03a_2_read_mode_get_parity
+FAILED tests/integration/test_06b2_migration.py::test_06b2_1_migration_roundtrip
+FAILED tests/integration/test_09_exam_stack.py::test_09_1_suite_runs_33_items
+FAILED tests/integration/test_09_exam_stack.py::test_09_langfuse_dataset_run_links_every_item
+FAILED tests/integration/test_57_alembic_merge.py::test_57_2_empty_database_upgrade_head_and_back
+FAILED tests/integration/test_57_alembic_merge.py::test_57_3_pre_merge_database_upgrades_to_one_head
+6 failed, 860 passed, 13 skipped, 2 warnings in 1341.36s (0:22:21)

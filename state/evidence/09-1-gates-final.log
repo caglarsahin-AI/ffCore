@@ -1,0 +1,20 @@
+== HEAD d4a2f020c898f77b3f22e1fe42cbbb651030dcf8 tree-clean=0 2026-11-04T21:41:54+03:00
+== build exit=0
+== up exit=0
+== compose config
+exit=0
+== make lint + make test DEPLOY_PROFILE=llmaas 2026-11-04T21:43:20+03:00
+lint-ok
+======================= 1602 passed in 210.10s (0:03:30) =======================
+exit=0
+== make lint + make test DEPLOY_PROFILE=airgap 2026-11-04T21:47:13+03:00
+lint-ok
+======================= 1602 passed in 206.17s (0:03:26) =======================
+exit=0
+== alembic heads / downgrade 06b_0001 / upgrade heads / heads 2026-11-04T21:51:05+03:00
+09_0001 (06a, 07, 05a, 04a, 06b, 03c, 08, 03a, 03b, 09) (head)
+INFO  [alembic.runtime.migration] Running downgrade 09_0001 -> 06b_0001, 09: eval_suites, eval_runs (local rows over Langfuse datasets and dataset runs)
+INFO  [alembic.runtime.migration] Running upgrade 06b_0001 -> 09_0001, 09: eval_suites, eval_runs (local rows over Langfuse datasets and dataset runs)
+09_0001 (09, 05a, 08, 03b, 06a, 04a, 03c, 06b, 07, 03a) (head)
+exit=0
+== make test-int (full; stack exam NOT_RUN here) 2026-11-04T21:51:23+03:00

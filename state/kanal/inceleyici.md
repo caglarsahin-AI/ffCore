@@ -1763,3 +1763,36 @@ REVIEW-ISTEK alındı. SHA doğrulandı: f6be9ae5c6b3b7be3d6fc8a6a02282b52d23877
 
 ### R-08T1B-0002 · 2026-11-04 20:47 · → koordinator · YIGIN-AC
 Yığın: review08t1b (COMPOSE_PROJECT_NAME), BACKEND_PORT 18290, FRONTEND_PORT 13290, --profile test --profile qdrant (langfuse, mcp, ticket-desk dahil), --env-file .env.test, --pull never. Açık FF yığınları: ffcore-09 + review08t1b (üç sınırı içinde). Disk boş 113 GB. Kapanış down -v + YIGIN-KAPA.
+
+### R-08T1B-0003 · 2026-11-04 21:54 · → koordinator · REVIEW-SONUC
+Paket: 08-tam-1b r1   Cevap: K-08T1B-0008
+**DEGISIKLIK** (f6be9ae5c6b3b7be3d6fc8a6a02282b52d23877c). BLOCKER 0, MAJOR 4, MINOR 7, NOTE 9. Rapor state/reviews/08-tam-1b-r1.md (güvenlik turu ayrı bölüm).
+- Çalışanlar:
+  - İç NER ucu: anonim 401, üye/superadmin 403, cevapta değer yok, 200.000 sınırı, sıkı şema, SSRF yüzeyi yok.
+  - Yerleşik v3: NER açıkken ad + kimlik tokenize, kapalıyken regex sürer; metin aşamaları NER çağırmaz.
+  - Açılış: `true` + model adı yok → backend ve agent-worker durur; airgap açılır.
+  - NER düşünce yerleşik politika block eder; PRSIM reddi DB'den önce.
+  - 1a C17 probe'ları aynı.
+  - FOLLOWUP-165 oran testi yük altında 2×6/6.
+- MAJOR-1: v3 egress kuralı `default-egress`'e bakıyor; projenin kayıtlı `default` PII politikası (özel desen ve kategoriler) egress'ten sessizce düşüyor, değerler sağlayıcıya ham gidiyor. Karar A/B (önerim A: kayıtlı `default` varsa egress PII'si ondan türetilsin, `PERSON` eklenmiş).
+- MAJOR-2: `pii_ner` tüm belgeyi tek istekte gönderiyor; 200.000 karakter üstü 422 → `NerUnavailable`, uzun belge hiç ingest edilemiyor (regresyon). Pencereleme ya da açık kod.
+- MAJOR-3: `pii_ner` koşusu eski `pii_regex@1` kayıtlarını işliyor: `failed` olanlar eski filtreyle yeniden yazılıyor (PRSIM adları maskesiz), manifest tek etiketle `pii_ner@1` diyor.
+- MAJOR-4: Ek dosya adları maskelenmiyor: silver `# Ek: <ad>`, chunk breadcrumb, embedding, `Attachment.filename` (paycoreLLM `--attachments` adları veriyor).
+- MINOR:
+  - (1) `on_error: allow` + NER kesintisi egress'te regex kimliklerini de açık gönderiyor (probe); karar, önerim A: egress'te NER hatası `on_error`'dan bağımsız fail-loud.
+  - (2) Taşıma hataları `NerUnavailable`'a sarılmıyor, CLI'da kodsuz traceback.
+  - (3) Eksik ağırlık açılışta değil (KARARLAR "açılışta"), docs "stops" diyor.
+  - (4) `default-egress` `available_pii_keys`'te yok: yerleşik spec kaydedilemiyor (422); test paneli `builtin: false`.
+  - (5) Kısmi örtüşmede NER adı bütünüyle düşüyor.
+  - (6) NER span'ı mevcut `<<PII_n>>`'ye değerse iç içe/kırık yer tutucu (probe).
+  - (7) docs DECISION-166'yı kapanmış yazıyor; `.env.example` model notu; PR C12 notu.
+- Koşular (20:55-21:51, tam yığın review08t1b):
+  - make test: airgap 1572/1572; llmaas 1571 + `test_04a_9d` mutlak 30 sn yük altında 33,3 sn (bu daldan değil; tek başına 29/29).
+  - lint temiz.
+  - test-int: llmaas 856 passed / 5 skipped, airgap 854 passed / 7 skipped (Langfuse, mcp, ticket-desk dahil yeşil).
+  - NOT_RUN: ölçüm, `-m models`, gerçek NER (ağırlık yok).
+- Ortam: main kopyasındaki `.env.test`'te `GUARDRAIL_EGRESS_NER` yok (compose durdu; dalın `.env.test`'i kullanıldı). Ingest worker'ı bge-m3 ağırlığı olmadan döngüdeydi; `FAKE_EMBED=1` ile açıldı.
+- Dosyalar commit edilmedi: rapor, probe'lar (`08-tam-1b-r1-probe.py`, `08-tam-1b-r1-int-probe.py`), evidence `08t1b-r1-*`, kanal.
+
+### R-08T1B-0004 · 2026-11-04 21:54 · → koordinator · YIGIN-KAPA
+Yığın review08t1b `down -v` (21:53); konteyner 0, volume 0. Probe konteynerleri (review08t1b-probe-*) adıyla kaldırıldı. Worktree .worktrees/review-08t1b-r1 temiz, `git worktree remove` başarılı.
