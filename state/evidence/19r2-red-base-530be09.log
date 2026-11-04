@@ -1,0 +1,494 @@
+ Network paycorellm-19r2_default  Creating
+ Network paycorellm-19r2_default  Created
+ Volume "paycorellm-19r2_paycore_test_venv"  Creating
+ Volume "paycorellm-19r2_paycore_test_venv"  Created
+ Volume "paycorellm-19r2_paycore_test_uv_cache"  Creating
+ Volume "paycorellm-19r2_paycore_test_uv_cache"  Created
+Using CPython 3.12.16 interpreter at: /usr/local/bin/python3
+Creating virtual environment at: /opt/test-venv
+   Building ffcore @ file:///ffcore/backend
+   Building paycore-llm @ file:///app
+Downloading pygments (1.2MiB)
+Downloading ruff (9.8MiB)
+Downloading mypy (14.6MiB)
+Downloading duckdb (20.5MiB)
+Downloading pydantic-core (2.1MiB)
+Downloading uvloop (4.2MiB)
+Downloading grpcio (6.7MiB)
+Downloading openai (1.7MiB)
+Downloading numpy (15.9MiB)
+Downloading ast-serialize (1.2MiB)
+Downloading sqlalchemy (4.5MiB)
+Downloading psycopg-binary (5.0MiB)
+Downloading grpcio-tools (2.6MiB)
+      Built paycore-llm @ file:///app
+ Downloaded pygments
+ Downloaded ast-serialize
+ Downloaded openai
+      Built ffcore @ file:///ffcore/backend
+ Downloaded pydantic-core
+ Downloaded grpcio-tools
+ Downloaded uvloop
+ Downloaded sqlalchemy
+ Downloaded psycopg-binary
+ Downloaded grpcio
+ Downloaded ruff
+ Downloaded mypy
+ Downloaded numpy
+ Downloaded duckdb
+Installed 79 packages in 401ms
+FFFFFFF......FFFFF.FFFFFF.....FFF.                                       [100%]
+=================================== FAILURES ===================================
+_______________ test_19r2_r9_one_line_code_block_is_not_a_fence ________________
+
+    def test_19r2_r9_one_line_code_block_is_not_a_fence() -> None:
+        text = (
+            "{code}SELECT 1{code}\n"
+            "lutfen @ahmet.yilmaz bakar misin\n"
+            "\n"
+            "Saygılarımla\n"
+            "Ahmet Yılmaz\n"
+            "PayCore\n"
+        )
+        out, dropped = _scrub_counted(text)
+>       assert "@ahmet.yilmaz" not in out and "lutfen [USER] bakar misin" in out
+E       AssertionError: assert ('@ahmet.yilmaz' not in '{code}SELEC...z\nPayCore\n'
+E         
+E         '@ahmet.yilmaz' is contained here:
+E           {code}SELECT 1{code}
+E           lutfen @ahmet.yilmaz bakar misin
+E         ?        +++++++++++++
+E           
+E           Saygılarımla
+E           Ahmet Yılmaz
+E           PayCore)
+
+/base/tests/test_19r2_stage_raw.py:45: AssertionError
+_ test_19r2_r9_same_line_block_is_inline_code[{noformat}x @not.a.mention{noformat} sonra @ahmet.yilmaz] _
+
+line = '{noformat}x @not.a.mention{noformat} sonra @ahmet.yilmaz'
+
+    @pytest.mark.parametrize(
+        "line",
+        [
+            "{noformat}x @not.a.mention{noformat} sonra @ahmet.yilmaz",
+            "{code:sql}SELECT @kept.here{code} sonra @ahmet.yilmaz",
+            "{{@kept.here}} sonra @ahmet.yilmaz",
+        ],
+    )
+    def test_19r2_r9_same_line_block_is_inline_code(line: str) -> None:
+        out = st._scrub(line)
+>       assert out.endswith("sonra [USER]")
+E       AssertionError: assert False
+E        +  where False = <built-in method endswith of str object at 0x7f15c85af4b0>('sonra [USER]')
+E        +    where <built-in method endswith of str object at 0x7f15c85af4b0> = '{noformat}x @not.a.mention{noformat} sonra @ahmet.yilmaz'.endswith
+
+/base/tests/test_19r2_stage_raw.py:61: AssertionError
+_ test_19r2_r9_same_line_block_is_inline_code[{code:sql}SELECT @kept.here{code} sonra @ahmet.yilmaz] _
+
+line = '{code:sql}SELECT @kept.here{code} sonra @ahmet.yilmaz'
+
+    @pytest.mark.parametrize(
+        "line",
+        [
+            "{noformat}x @not.a.mention{noformat} sonra @ahmet.yilmaz",
+            "{code:sql}SELECT @kept.here{code} sonra @ahmet.yilmaz",
+            "{{@kept.here}} sonra @ahmet.yilmaz",
+        ],
+    )
+    def test_19r2_r9_same_line_block_is_inline_code(line: str) -> None:
+        out = st._scrub(line)
+>       assert out.endswith("sonra [USER]")
+E       AssertionError: assert False
+E        +  where False = <built-in method endswith of str object at 0x7f15c859acd0>('sonra [USER]')
+E        +    where <built-in method endswith of str object at 0x7f15c859acd0> = '{code:sql}SELECT @kept.here{code} sonra @ahmet.yilmaz'.endswith
+
+/base/tests/test_19r2_stage_raw.py:61: AssertionError
+_ test_19r2_r9_same_line_block_is_inline_code[{{@kept.here}} sonra @ahmet.yilmaz] _
+
+line = '{{@kept.here}} sonra @ahmet.yilmaz'
+
+    @pytest.mark.parametrize(
+        "line",
+        [
+            "{noformat}x @not.a.mention{noformat} sonra @ahmet.yilmaz",
+            "{code:sql}SELECT @kept.here{code} sonra @ahmet.yilmaz",
+            "{{@kept.here}} sonra @ahmet.yilmaz",
+        ],
+    )
+    def test_19r2_r9_same_line_block_is_inline_code(line: str) -> None:
+        out = st._scrub(line)
+        assert out.endswith("sonra [USER]")
+>       assert "@kept.here" in out or "@not.a.mention" in out
+E       AssertionError: assert ('@kept.here' in '{{[USER]}} sonra [USER]' or '@not.a.mention' in '{{[USER]}} sonra [USER]')
+
+/base/tests/test_19r2_stage_raw.py:62: AssertionError
+___________________ test_19r2_r9_unclosed_fence_is_no_fence ____________________
+
+    def test_19r2_r9_unclosed_fence_is_no_fence() -> None:
+        text = f"{FENCE3}\nx=1\nsonra @mehmet.kaya baksın\n\nSaygılarımla\nMehmet Kaya\n"
+        out, dropped = _scrub_counted(text)
+>       assert "@mehmet.kaya" not in out and "[USER]" in out
+E       AssertionError: assert ('@mehmet.kaya' not in '```\nx=1\ns...ehmet Kaya\n'
+E         
+E         '@mehmet.kaya' is contained here:
+E           ```
+E           x=1
+E           sonra @mehmet.kaya baksın
+E           
+E           Saygılarımla
+E           Mehmet Kaya)
+
+/base/tests/test_19r2_stage_raw.py:68: AssertionError
+_________________ test_19r2_r9_unclosed_jira_block_is_no_fence _________________
+
+    def test_19r2_r9_unclosed_jira_block_is_no_fence() -> None:
+        text = "{code:java}\nint x;\n@ali.veli bakacak\n"
+>       assert "@ali.veli" not in st._scrub(text)
+E       AssertionError: assert '@ali.veli' not in '{code:java}...li bakacak\n'
+E         
+E         '@ali.veli' is contained here:
+E           {code:java}
+E           int x;
+E           @ali.veli bakacak
+
+/base/tests/test_19r2_stage_raw.py:74: AssertionError
+___________________ test_19r2_r9_single_backtick_is_not_code ___________________
+
+    def test_19r2_r9_single_backtick_is_not_code() -> None:
+>       assert st._scrub("dosya `a.txt ve @ali.veli ekle") == "dosya `a.txt ve [USER] ekle"
+E       AssertionError: assert 'dosya `a.txt...ali.veli ekle' == 'dosya `a.txt ve [USER] ekle'
+E         
+E         - dosya `a.txt ve [USER] ekle
+E         + dosya `a.txt ve @ali.veli ekle
+
+/base/tests/test_19r2_stage_raw.py:78: AssertionError
+_____________ test_19r2_r9_closer_of_another_family_does_not_close _____________
+
+    def test_19r2_r9_closer_of_another_family_does_not_close() -> None:
+        """A `{code}` line inside a ``` block is code, not the block's end."""
+        text = f"{FENCE3}\n{{code}}\n@foo\n{FENCE3}\n"
+>       assert st._scrub(text) == text
+E       AssertionError: assert '```\n{code}\n[USER]\n```\n' == '```\n{code}\n@foo\n```\n'
+E         
+E           ```
+E           {code}
+E         - @foo
+E         + [USER]
+E           ```
+
+/base/tests/test_19r2_stage_raw.py:104: AssertionError
+__________________________ test_19r2_r9_fenced_marks ___________________________
+
+    def test_19r2_r9_fenced_marks() -> None:
+        lines = ["a", "{code}", "b", "{code}", "c", FENCE3, "d"]
+>       assert st._fenced(lines) == [False, True, True, True, False, False, False]
+E       assert [False, True,...se, True, ...] == [False, True,...e, False, ...]
+E         
+E         At index 5 diff: True != False
+E         Use -v to get more diff
+
+/base/tests/test_19r2_stage_raw.py:109: AssertionError
+__________________ test_19r2_r10_technical_at_kept[@property] __________________
+
+text = '@property'
+
+    @pytest.mark.parametrize(
+        "text",
+        [
+            "@property",
+            "    @dataclass",
+            "@pytest.fixture",
+            '@app.route("/x")',
+            "DECLARE @tran_id INT",
+            "DECLARE @a INT, @b_c VARCHAR(10)",
+            "SET @tran_id = 5",
+            "SELECT @tran_id",
+            "@tran_id = 7",
+            "@echo off",
+        ],
+    )
+    def test_19r2_r10_technical_at_kept(text: str) -> None:
+>       assert st._scrub(text) == text
+E       AssertionError: assert '[USER]' == '@property'
+E         
+E         - @property
+E         + [USER]
+
+/base/tests/test_19r2_stage_raw.py:131: AssertionError
+_______________ test_19r2_r10_technical_at_kept[    @dataclass] ________________
+
+text = '    @dataclass'
+
+    @pytest.mark.parametrize(
+        "text",
+        [
+            "@property",
+            "    @dataclass",
+            "@pytest.fixture",
+            '@app.route("/x")',
+            "DECLARE @tran_id INT",
+            "DECLARE @a INT, @b_c VARCHAR(10)",
+            "SET @tran_id = 5",
+            "SELECT @tran_id",
+            "@tran_id = 7",
+            "@echo off",
+        ],
+    )
+    def test_19r2_r10_technical_at_kept(text: str) -> None:
+>       assert st._scrub(text) == text
+E       AssertionError: assert '    [USER]' == '    @dataclass'
+E         
+E         -     @dataclass
+E         +     [USER]
+
+/base/tests/test_19r2_stage_raw.py:131: AssertionError
+_______________ test_19r2_r10_technical_at_kept[@pytest.fixture] _______________
+
+text = '@pytest.fixture'
+
+    @pytest.mark.parametrize(
+        "text",
+        [
+            "@property",
+            "    @dataclass",
+            "@pytest.fixture",
+            '@app.route("/x")',
+            "DECLARE @tran_id INT",
+            "DECLARE @a INT, @b_c VARCHAR(10)",
+            "SET @tran_id = 5",
+            "SELECT @tran_id",
+            "@tran_id = 7",
+            "@echo off",
+        ],
+    )
+    def test_19r2_r10_technical_at_kept(text: str) -> None:
+>       assert st._scrub(text) == text
+E       AssertionError: assert '[USER]' == '@pytest.fixture'
+E         
+E         - @pytest.fixture
+E         + [USER]
+
+/base/tests/test_19r2_stage_raw.py:131: AssertionError
+____________ test_19r2_r10_technical_at_kept[DECLARE @tran_id INT] _____________
+
+text = 'DECLARE @tran_id INT'
+
+    @pytest.mark.parametrize(
+        "text",
+        [
+            "@property",
+            "    @dataclass",
+            "@pytest.fixture",
+            '@app.route("/x")',
+            "DECLARE @tran_id INT",
+            "DECLARE @a INT, @b_c VARCHAR(10)",
+            "SET @tran_id = 5",
+            "SELECT @tran_id",
+            "@tran_id = 7",
+            "@echo off",
+        ],
+    )
+    def test_19r2_r10_technical_at_kept(text: str) -> None:
+>       assert st._scrub(text) == text
+E       AssertionError: assert 'DECLARE [USER] INT' == 'DECLARE @tran_id INT'
+E         
+E         - DECLARE @tran_id INT
+E         + DECLARE [USER] INT
+
+/base/tests/test_19r2_stage_raw.py:131: AssertionError
+______ test_19r2_r10_technical_at_kept[DECLARE @a INT, @b_c VARCHAR(10)] _______
+
+text = 'DECLARE @a INT, @b_c VARCHAR(10)'
+
+    @pytest.mark.parametrize(
+        "text",
+        [
+            "@property",
+            "    @dataclass",
+            "@pytest.fixture",
+            '@app.route("/x")',
+            "DECLARE @tran_id INT",
+            "DECLARE @a INT, @b_c VARCHAR(10)",
+            "SET @tran_id = 5",
+            "SELECT @tran_id",
+            "@tran_id = 7",
+            "@echo off",
+        ],
+    )
+    def test_19r2_r10_technical_at_kept(text: str) -> None:
+>       assert st._scrub(text) == text
+E       AssertionError: assert 'DECLARE @a I...] VARCHAR(10)' == 'DECLARE @a I...c VARCHAR(10)'
+E         
+E         - DECLARE @a INT, @b_c VARCHAR(10)
+E         ?                 ^^^^
+E         + DECLARE @a INT, [USER] VARCHAR(10)
+E         ?                 ^^^^^^
+
+/base/tests/test_19r2_stage_raw.py:131: AssertionError
+______________ test_19r2_r10_technical_at_kept[SET @tran_id = 5] _______________
+
+text = 'SET @tran_id = 5'
+
+    @pytest.mark.parametrize(
+        "text",
+        [
+            "@property",
+            "    @dataclass",
+            "@pytest.fixture",
+            '@app.route("/x")',
+            "DECLARE @tran_id INT",
+            "DECLARE @a INT, @b_c VARCHAR(10)",
+            "SET @tran_id = 5",
+            "SELECT @tran_id",
+            "@tran_id = 7",
+            "@echo off",
+        ],
+    )
+    def test_19r2_r10_technical_at_kept(text: str) -> None:
+>       assert st._scrub(text) == text
+E       AssertionError: assert 'SET [USER] = 5' == 'SET @tran_id = 5'
+E         
+E         - SET @tran_id = 5
+E         + SET [USER] = 5
+
+/base/tests/test_19r2_stage_raw.py:131: AssertionError
+_______________ test_19r2_r10_technical_at_kept[SELECT @tran_id] _______________
+
+text = 'SELECT @tran_id'
+
+    @pytest.mark.parametrize(
+        "text",
+        [
+            "@property",
+            "    @dataclass",
+            "@pytest.fixture",
+            '@app.route("/x")',
+            "DECLARE @tran_id INT",
+            "DECLARE @a INT, @b_c VARCHAR(10)",
+            "SET @tran_id = 5",
+            "SELECT @tran_id",
+            "@tran_id = 7",
+            "@echo off",
+        ],
+    )
+    def test_19r2_r10_technical_at_kept(text: str) -> None:
+>       assert st._scrub(text) == text
+E       AssertionError: assert 'SELECT [USER]' == 'SELECT @tran_id'
+E         
+E         - SELECT @tran_id
+E         + SELECT [USER]
+
+/base/tests/test_19r2_stage_raw.py:131: AssertionError
+________________ test_19r2_r10_technical_at_kept[@tran_id = 7] _________________
+
+text = '@tran_id = 7'
+
+    @pytest.mark.parametrize(
+        "text",
+        [
+            "@property",
+            "    @dataclass",
+            "@pytest.fixture",
+            '@app.route("/x")',
+            "DECLARE @tran_id INT",
+            "DECLARE @a INT, @b_c VARCHAR(10)",
+            "SET @tran_id = 5",
+            "SELECT @tran_id",
+            "@tran_id = 7",
+            "@echo off",
+        ],
+    )
+    def test_19r2_r10_technical_at_kept(text: str) -> None:
+>       assert st._scrub(text) == text
+E       AssertionError: assert '[USER] = 7' == '@tran_id = 7'
+E         
+E         - @tran_id = 7
+E         + [USER] = 7
+
+/base/tests/test_19r2_stage_raw.py:131: AssertionError
+__________________ test_19r2_r10_technical_at_kept[@echo off] __________________
+
+text = '@echo off'
+
+    @pytest.mark.parametrize(
+        "text",
+        [
+            "@property",
+            "    @dataclass",
+            "@pytest.fixture",
+            '@app.route("/x")',
+            "DECLARE @tran_id INT",
+            "DECLARE @a INT, @b_c VARCHAR(10)",
+            "SET @tran_id = 5",
+            "SELECT @tran_id",
+            "@tran_id = 7",
+            "@echo off",
+        ],
+    )
+    def test_19r2_r10_technical_at_kept(text: str) -> None:
+>       assert st._scrub(text) == text
+E       AssertionError: assert '[USER] off' == '@echo off'
+E         
+E         - @echo off
+E         + [USER] off
+
+/base/tests/test_19r2_stage_raw.py:131: AssertionError
+______________ test_19r2_f160_hyphen_login_before_email_not_split ______________
+
+    def test_19r2_f160_hyphen_login_before_email_not_split() -> None:
+        out = st._scrub("Yaz: @ahmet-yilmaz@firma.com")
+>       assert "[USER]-" not in out and "ahmet-yilmaz@firma.com" in out
+E       AssertionError: assert ('[USER]-' not in 'Yaz: [USER]...az@firma.com'
+E         
+E         '[USER]-' is contained here:
+E           Yaz: [USER]-yilmaz@firma.com
+E         ?      +++++++)
+
+/base/tests/test_19r2_stage_raw.py:153: AssertionError
+_____________________ test_19r2_f160_underscore_call_kept ______________________
+
+    def test_19r2_f160_underscore_call_kept() -> None:
+>       assert st._scrub("Çağrı @app_get(x) yapılır") == "Çağrı @app_get(x) yapılır"
+E       AssertionError: assert 'Çağrı [USER]_get(x) yapılır' == 'Çağrı @app_get(x) yapılır'
+E         
+E         - Çağrı @app_get(x) yapılır
+E         ?       ^^^^
+E         + Çağrı [USER]_get(x) yapılır
+E         ?       ^^^^^^
+
+/base/tests/test_19r2_stage_raw.py:157: AssertionError
+___________________ test_19r2_r11_seed_reraises_other_codes ____________________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f15be5d8c50>
+
+    def test_19r2_r11_seed_reraises_other_codes(monkeypatch: pytest.MonkeyPatch) -> None:
+        _fake_raw_staging(monkeypatch, "other")
+>       with pytest.raises(seed.SeedError, match=r"^other: refused by FFCore$"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE SeedError
+
+/base/tests/test_19r2_seed.py:40: Failed
+=========================== short test summary info ============================
+FAILED ../base/tests/test_19r2_stage_raw.py::test_19r2_r9_one_line_code_block_is_not_a_fence
+FAILED ../base/tests/test_19r2_stage_raw.py::test_19r2_r9_same_line_block_is_inline_code[{noformat}x @not.a.mention{noformat} sonra @ahmet.yilmaz]
+FAILED ../base/tests/test_19r2_stage_raw.py::test_19r2_r9_same_line_block_is_inline_code[{code:sql}SELECT @kept.here{code} sonra @ahmet.yilmaz]
+FAILED ../base/tests/test_19r2_stage_raw.py::test_19r2_r9_same_line_block_is_inline_code[{{@kept.here}} sonra @ahmet.yilmaz]
+FAILED ../base/tests/test_19r2_stage_raw.py::test_19r2_r9_unclosed_fence_is_no_fence
+FAILED ../base/tests/test_19r2_stage_raw.py::test_19r2_r9_unclosed_jira_block_is_no_fence
+FAILED ../base/tests/test_19r2_stage_raw.py::test_19r2_r9_single_backtick_is_not_code
+FAILED ../base/tests/test_19r2_stage_raw.py::test_19r2_r9_closer_of_another_family_does_not_close
+FAILED ../base/tests/test_19r2_stage_raw.py::test_19r2_r9_fenced_marks - asse...
+FAILED ../base/tests/test_19r2_stage_raw.py::test_19r2_r10_technical_at_kept[@property]
+FAILED ../base/tests/test_19r2_stage_raw.py::test_19r2_r10_technical_at_kept[    @dataclass]
+FAILED ../base/tests/test_19r2_stage_raw.py::test_19r2_r10_technical_at_kept[@pytest.fixture]
+FAILED ../base/tests/test_19r2_stage_raw.py::test_19r2_r10_technical_at_kept[DECLARE @tran_id INT]
+FAILED ../base/tests/test_19r2_stage_raw.py::test_19r2_r10_technical_at_kept[DECLARE @a INT, @b_c VARCHAR(10)]
+FAILED ../base/tests/test_19r2_stage_raw.py::test_19r2_r10_technical_at_kept[SET @tran_id = 5]
+FAILED ../base/tests/test_19r2_stage_raw.py::test_19r2_r10_technical_at_kept[SELECT @tran_id]
+FAILED ../base/tests/test_19r2_stage_raw.py::test_19r2_r10_technical_at_kept[@tran_id = 7]
+FAILED ../base/tests/test_19r2_stage_raw.py::test_19r2_r10_technical_at_kept[@echo off]
+FAILED ../base/tests/test_19r2_stage_raw.py::test_19r2_f160_hyphen_login_before_email_not_split
+FAILED ../base/tests/test_19r2_stage_raw.py::test_19r2_f160_underscore_call_kept
+FAILED ../base/tests/test_19r2_seed.py::test_19r2_r11_seed_reraises_other_codes
+21 failed, 13 passed in 1.96s

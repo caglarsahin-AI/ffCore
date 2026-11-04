@@ -1,0 +1,30 @@
+ANN202 Missing return type annotation for private function `check_sources`
+  --> tests/test_19r2_seed.py:25:9
+   |
+24 | def _fake_raw_staging(monkeypatch: pytest.MonkeyPatch, code: str) -> None:
+25 |     def check_sources(sources, *, accept_personnel_data=False):
+   |         ^^^^^^^^^^^^^
+26 |         raise _StagingError(code, "refused by FFCore")
+   |
+help: Add return type annotation: `Never`
+
+ANN001 Missing type annotation for function argument `sources`
+  --> tests/test_19r2_seed.py:25:23
+   |
+24 | def _fake_raw_staging(monkeypatch: pytest.MonkeyPatch, code: str) -> None:
+25 |     def check_sources(sources, *, accept_personnel_data=False):
+   |                       ^^^^^^^
+26 |         raise _StagingError(code, "refused by FFCore")
+   |
+
+ANN001 Missing type annotation for function argument `accept_personnel_data`
+  --> tests/test_19r2_seed.py:25:35
+   |
+24 | def _fake_raw_staging(monkeypatch: pytest.MonkeyPatch, code: str) -> None:
+25 |     def check_sources(sources, *, accept_personnel_data=False):
+   |                                   ^^^^^^^^^^^^^^^^^^^^^
+26 |         raise _StagingError(code, "refused by FFCore")
+   |
+
+Found 3 errors.
+No fixes available (1 hidden fix can be enabled with the `--unsafe-fixes` option).

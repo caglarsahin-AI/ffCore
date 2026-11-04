@@ -1,0 +1,69 @@
+ Network red08t1b_default  Creating
+ Network red08t1b_default  Created
+ Volume "red08t1b_langfuse_clickhouse_data"  Creating
+ Volume "red08t1b_langfuse_clickhouse_data"  Created
+ Volume "red08t1b_langfuse_clickhouse_logs"  Creating
+ Volume "red08t1b_langfuse_clickhouse_logs"  Created
+ Volume "red08t1b_postgres_data"  Creating
+ Volume "red08t1b_postgres_data"  Created
+ Volume "red08t1b_langfuse_postgres_data"  Creating
+ Volume "red08t1b_langfuse_postgres_data"  Created
+ Volume "red08t1b_model_cache"  Creating
+ Volume "red08t1b_model_cache"  Created
+ Volume "red08t1b_knowledge_storage"  Creating
+ Volume "red08t1b_knowledge_storage"  Created
+ Volume "red08t1b_langfuse_minio_data"  Creating
+ Volume "red08t1b_langfuse_minio_data"  Created
+ Volume "red08t1b_redis_data"  Creating
+ Volume "red08t1b_redis_data"  Created
+F.F                                                                      [100%]
+=================================== FAILURES ===================================
+______________________ test_08t_18_ner_candidates_checked ______________________
+
+empty_cache = PosixPath('/tmp/pytest-of-root/pytest-0/test_08t_18_ner_candidates_che0')
+capsys = <_pytest.capture.CaptureFixture object at 0x7f229a1d6750>
+
+    def test_08t_18_ner_candidates_checked(empty_cache, capsys):
+>       assert models.NER_CANDIDATES == CANDIDATES
+               ^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'ffcore.knowledge.models' has no attribute 'NER_CANDIDATES'
+
+tests/unit/test_08t_18_ner_candidates.py:34: AttributeError
+______________ test_08t_18c_download_takes_only_the_allowed_files ______________
+
+empty_cache = PosixPath('/tmp/pytest-of-root/pytest-0/test_08t_18c_download_takes_on0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f2299d72fc0>
+
+    def test_08t_18c_download_takes_only_the_allowed_files(empty_cache, monkeypatch):
+        calls = []
+    
+        def snapshot_download(repo, revision=None, cache_dir=None, **kwargs):
+            calls.append((repo, revision, kwargs))
+            return str(empty_cache / repo)
+    
+        hub = types.ModuleType("huggingface_hub")
+        hub.snapshot_download = snapshot_download
+        monkeypatch.setitem(sys.modules, "huggingface_hub", hub)
+        paddle = types.ModuleType("paddleocr")
+        paddle.PaddleOCR = lambda **kwargs: None
+        monkeypatch.setitem(sys.modules, "paddleocr", paddle)
+    
+        models.download("BAAI/bge-m3", "BAAI/bge-reranker-v2-m3")
+    
+        by_repo = {repo: (revision, kwargs) for repo, revision, kwargs in calls}
+        for repo in CANDIDATES:
+>           revision, kwargs = by_repo[repo]
+                               ^^^^^^^^^^^^^
+E           KeyError: 'savasy/bert-base-turkish-ner-cased'
+
+tests/unit/test_08t_18_ner_candidates.py:66: KeyError
+----------------------------- Captured stdout call -----------------------------
+download BAAI/bge-m3@main -> /tmp/pytest-of-root/pytest-0/test_08t_18c_download_takes_on0/hf/hub
+download BAAI/bge-reranker-v2-m3@main -> /tmp/pytest-of-root/pytest-0/test_08t_18c_download_takes_on0/hf/hub
+download docling-project/docling-models@v2.3.0 -> /tmp/pytest-of-root/pytest-0/test_08t_18c_download_takes_on0/hf/hub
+download docling-project/docling-layout-heron@main -> /tmp/pytest-of-root/pytest-0/test_08t_18c_download_takes_on0/hf/hub
+download PaddleOCR tr -> /tmp/pytest-of-root/pytest-0/test_08t_18c_download_takes_on0/models/paddleocr
+=========================== short test summary info ============================
+FAILED tests/unit/test_08t_18_ner_candidates.py::test_08t_18_ner_candidates_checked
+FAILED tests/unit/test_08t_18_ner_candidates.py::test_08t_18c_download_takes_only_the_allowed_files
+2 failed, 1 passed in 0.92s

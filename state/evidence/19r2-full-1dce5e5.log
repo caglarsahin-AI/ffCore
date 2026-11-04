@@ -1,0 +1,102 @@
+........................................................................ [ 11%]
+........................................................................ [ 22%]
+........................................................................ [ 33%]
+........................................................................ [ 45%]
+.......s....................................F........................... [ 56%]
+...........................................s.......................F.... [ 67%]
+....................................................F................... [ 78%]
+........................................................................ [ 90%]
+...............................................................          [100%]
+=================================== FAILURES ===================================
+_____________ test_an_html_email_becomes_its_text_not_an_xml_pile ______________
+
+    def test_an_html_email_becomes_its_text_not_an_xml_pile() -> None:
+        """BKM correspondence came through as `<html xmlns:v=…>` markup and was taken for a dump."""
+        from paycore_llm.ingest.convert.email_msg import html_body_text
+    
+        html = (
+            '<html xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office">'
+            "<head><style>p.MsoNormal {margin:0cm;}</style></head><body>"
+            + "".join(f"<p class=MsoNormal>{line}<o:p></o:p></p>" for line in _PROSE_LINES * 8)
+            + "</body></html>"
+        )
+>       text = html_body_text(html)
+               ^^^^^^^^^^^^^^^^^^^^
+
+tests/test_data_dump.py:96: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+body = '<html xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office"><head><style>p.MsoNormal {ma...class=MsoNormal>Taksit sayısı seçildikten sonra müşteri bilgilendirilir ve işlem kapanır.<o:p></o:p></p></body></html>'
+
+    def html_body_text(body: str) -> str:
+        """An e-mail's HTML body as the text a reader sees (karar 2026-09-29).
+    
+        When an Outlook message has no plain-text body, extract-msg hands over the HTML one, and it
+        used to be stored as markup: `<html xmlns:v=…>`, Office `<o:p>` tags, a `<style>` block. The
+        data-dump gate then read BKM correspondence as an XML pile, and the e-mails it let through
+        went into the index as tag soup. Plain text is returned unchanged.
+    
+        `beautifulsoup4` is a declared `ingest` dependency. Without it this raises and the e-mail
+        is recorded as `error`, retried every run and visible in the log. It used to fall back to
+        `html_to_text`, which leaves `<o:p>`/MsoNormal residue that Kapı 1 then drops as a data
+        dump: a silent loss (code review 2026-09-30).
+        """
+        if not _HTML_START.match(body):
+            return body
+>       from bs4 import BeautifulSoup
+E       ModuleNotFoundError: No module named 'bs4'
+
+src/paycore_llm/ingest/convert/email_msg.py:33: ModuleNotFoundError
+_____________________ test_only_the_html_part_becomes_text _____________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_only_the_html_part_become0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7b1c0a35c0>
+
+    def test_only_the_html_part_becomes_text(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+        """Docling unavailable: the visible text, Turkish intact, no base64, no Office markup."""
+        monkeypatch.setattr(
+            docling_convert,
+            "convert_with_docling",
+            lambda p: ConversionResult("", "docling@missing", status="error", confidence=0.0),
+        )
+        result = mhtml.convert_mhtml(_web_archive(tmp_path / "k.doc"))
+>       assert result.status == "converted" and result.method == "mhtml+html_text"
+E       AssertionError: assert ('error' == 'converted'
+E         
+E         - converted
+E         + error)
+
+tests/test_mhtml.py:62: AssertionError
+_____________________ test_msg_html_body_bytes_are_decoded _____________________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7b1d840140>
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_msg_html_body_bytes_are_d0')
+
+    def test_msg_html_body_bytes_are_decoded(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+        class FakeMessage:
+            def __init__(self, _path: str, **_: Any) -> None:
+                self.subject, self.sender, self.date, self.body = "Konu", "a@b", "", ""
+                self.htmlBody = f"<p>{_TR}</p>".encode("cp1254")
+    
+            def close(self) -> None:
+                pass
+    
+        monkeypatch.setitem(sys.modules, "extract_msg", types.SimpleNamespace(Message=FakeMessage))
+>       assert _TR in email_msg.convert_msg(tmp_path / "x.msg").text_md
+E       assert 'İşlem kaydı oluşturuldu, ödeme ağı yanıt vermedi.' in ''
+E        +  where '' = ConversionResult(text_md='', method='extract-msg', confidence=0.0, warnings=["No module named 'bs4'"], status='error', ocr_engine=None, page_count=None).text_md
+E        +    where ConversionResult(text_md='', method='extract-msg', confidence=0.0, warnings=["No module named 'bs4'"], status='error', ocr_engine=None, page_count=None) = <function convert_msg at 0x7f7b21b17ba0>((PosixPath('/tmp/pytest-of-root/pytest-0/test_msg_html_body_bytes_are_d0') / 'x.msg'))
+E        +      where <function convert_msg at 0x7f7b21b17ba0> = email_msg.convert_msg
+
+tests/test_reconvert.py:79: AssertionError
+=============================== warnings summary ===============================
+../opt/test-venv/lib/python3.12/site-packages/starlette/testclient.py:53
+  /opt/test-venv/lib/python3.12/site-packages/starlette/testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_data_dump.py::test_an_html_email_becomes_its_text_not_an_xml_pile
+FAILED tests/test_mhtml.py::test_only_the_html_part_becomes_text - AssertionE...
+FAILED tests/test_reconvert.py::test_msg_html_body_bytes_are_decoded - assert...
+3 failed, 634 passed, 2 skipped, 1 warning in 52.48s

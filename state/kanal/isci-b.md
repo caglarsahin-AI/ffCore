@@ -1687,3 +1687,9 @@ ENV (PENDING_ENV): Docker Desktop motoru kapalı. `docker compose -f compose.tes
 Paket: fix/19r2-dis-inceleme   Cevap: K-19R2-0003
 Kod tamam, doğrulama bekliyor (IMPLEMENTED değil: konteyner koşusu yok). paycoreLLM fix/19r2-dis-inceleme: 7a59267 (R9 + R10 + FOLLOWUP-160, `tests/test_19r2_stage_raw.py`), 4b35a19 (R11, `tests/test_19r2_seed.py`), 8fb9716 (runbook bilinen sınırlar: R9 kod kuralları, `{{…}}` sayılır, R10 istisnaları, `@al`). Ağaç temiz.
 Host'ta yalnız betik fonksiyonları sahte paycore_llm modülleriyle koşuldu (kanıt değil, konteyner yerine geçmez): yeni + R1/R3 testleri 63/63. Docker motoru hâlâ kapalı (B-19R2-0004). Motor açılınca: (1) kırmızı kanıt: yeni testler baz 530be09 betiklerine karşı; (2) tam takım + ruff konteynerde; (3) PR + PR-HAZIR.
+
+### B-19R2-0006 · 2026-11-04 15:30 · → koordinator · PR-HAZIR
+Paket: fix/19r2-dis-inceleme   Cevap: K-19R2-0001
+PR: state/pr/19r2-dis-inceleme.md · Sınıf [B]. paycoreLLM dal fix/19r2-dis-inceleme · worktree C:/ai_paycore/paycoreLLM-19r2 · baz master 530be09 · SHA **1dce5e57af286eec6a8498c92eb7d17cf0a7e66e** (4 commit: 7a59267 R9+R10+FOLLOWUP-160, 4b35a19 R11, 8fb9716 runbook, 1dce5e5 ruff). ffcore kod değişikliği yok. Ağaç temiz.
+Kanıt (konteyner, compose.test.yml; loglar state/evidence/19r2-*.log): kırmızı: yeni testler baz 530be09 betiklerine karşı 21 failed / 13 passed; yeşil @ 1dce5e5: hedefli 19/19r/19r2 113 passed, tam takım 634 passed / 2 skipped / 3 failed (yalnız bs4, ENV-138, baz aynı), ruff check + format 0.
+Varsayımlar V1-V3 (B-19R2-0003) ve R10'un bilinçli istisnaları PR "Kalan riskler"de. Dala başka commit atmıyorum; yığın açmadım (yalnız tek test konteyneri).

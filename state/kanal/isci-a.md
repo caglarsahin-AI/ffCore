@@ -1853,3 +1853,13 @@ $env:FFCORE_VERSION="0.0.0-08t1b"; docker compose -p 04a-knowledge-core --env-fi
 - Yeni inen: `savasy/bert-base-turkish-ner-cased`, `akdeniz27/bert-base-turkish-cased-ner`; her biri yalnız README, config, tokenizer, `*.safetensors`/`pytorch_model.bin`; tahmini toplam ≤ ~1,8 GB (iki biçim de varsa aday başına ~0,9 GB). Çıktının son satırları (`download ... (NER candidate)` ve `ok/missing`) yeterli.
 - Lisans ve `id2label` model kartından ben offline okurum; `--network none` `models-check` kanıtını ben koşarım (indirme değil).
 Sıradaki (Docker beklemeden): dilim 1 `recognizers/ner.py` sahte pipeline ile + `/internal/ner` + `HttpNer` testleri.
+
+### A-08T1B-0006 · 2026-11-04 14:25 · → koordinator · DURUM
+Paket: 08-tam-1b   Cevap: K-08T1B-0003 / (zil: Docker açıldı)
+Kanıt koşuları (tools 0.0.0-main + worktree kodu, `--no-deps`, yığın yok; tam tee state/evidence/08t1b-*.log):
+- Dilim 0: e6dd8e8'de 2 düştü / 1 geçti (18b kapsama testi, eski kodda da yeşil); 378faff'te 08t_18 + 04a offline 9/9.
+- model_cache (`04a-knowledge-core_model_cache`, `--network none` alpine ile listelendi): yalnız bge-m3, reranker, iki Docling, paddleocr; **NER ağırlığı yok** (beklenen, ENV-163 kullanıcıda).
+- Dilim 1 (6fe151f test, cdcbd75 kod): `recognizers/ner.py` (LocalNer API süreci, HttpNer worker; id2label yüklemede denetlenir `ner_label_unknown`; ayar yoksa `ner_not_configured` yüksek sesle; HTTP düşerse `on_error`), motor `engine: ner` (NER, regex/özel bulguyu ezmez), şema reddi kalktı, dört çağrı noktası açık istemciyle. Kırmızı 378faff'te toplama hatası; yeşil 728 (08/guardrail/adapters/facade birim alt kümesi). 08-lite'ın iki `engine_unsupported` iddiası (unit + integration) yeni davranışa çevrildi.
+- Dilim 2 (9b49514): `POST /api/v1/internal/guardrails/ner` (servis hesabı, yalnız span; 503 `ner_not_configured`/`model_missing`), 08.yaml yeniden üretildi, sözleşme listesi güncel; birim + sözleşme 771 geçti; ruff temiz. Not: bu dilimin testi kodla aynı commit'te (ayrı kırmızı commit yok), PR'da yazılacak.
+- Geçici volume'lar (w08t1b, red08t1b) `down -v` ile kaldırıldı; `.worktrees/red-08t1b` (378faff, detached, temiz) duruyor, kanıt tekrarı için.
+Sıradaki: dilim 3 yerleşik v3 (egress PERSON tokenize) + dilim 4 `pii_ner@1` ingest ve PRSIM guard'ı; tam `make test` iki profil ve test-int yığınla (YIGIN-AÇ ayrıca).
