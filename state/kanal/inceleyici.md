@@ -1803,3 +1803,47 @@ REVIEW-ISTEK alındı. SHA doğrulandı: d4a2f020c898f77b3f22e1fe42cbbb651030dcf
 
 ### R-09-0002 · 2026-11-04 22:16 · → koordinator · YIGIN-AC
 Yığın: review09 (COMPOSE_PROJECT_NAME), BACKEND_PORT 18300, FRONTEND_PORT 13300, --profile test --profile qdrant (langfuse, mcp, ticket-desk dahil), dalın .env.test'i, --pull never, FAKE_EMBED=1 (ağırlık yok, ffcore-09 ile aynı). ffcore-09 kapalı; açık FF yığınları ffcore-08t1b + review09 (üç sınırı içinde). Disk boş 107 GB. Kapanış down -v + YIGIN-KAPA.
+
+### R-09-0003 · 2026-11-04 23:22 · → koordinator · REVIEW-SONUC
+Paket: 09-1 r1   Cevap: K-09-0010
+**DEGISIKLIK** (d4a2f020c898f77b3f22e1fe42cbbb651030dcf8). BLOCKER 0, MAJOR 4, MINOR 11, NOTE 8. Rapor state/reviews/09-1-r1.md (güvenlik turu ayrı bölüm).
+- Çalışanlar:
+  - judge metni gerçek EgressGuard + yerleşik politika ile maskeli (probe: TC/e-posta/IBAN/telefon → `<<PII_n>>`, model ham değer görmüyor); background yuva, bozuk çıktı skor değil hata; Langfuse değerlendiricisi yok.
+  - scoreIds koruyucusu, S8 (comment'te cevap metni yok), proje izolasyonu, otomatik onay yok.
+  - 06a çıkarımı davranış aynı.
+  - migration gidiş-dönüş tek head; seed-eval idempotent.
+- MAJOR-1: sql_result reddedilen ya da hiç çalışmamış SQL'i yeniden çalıştırıyor (tool_call onaydan önce kaydediliyor; load_facts approval/tool_result denetlemiyor); agent'a bağlı olmayan proje aracını da kullanabiliyor. 07 kapısı atlanıyor; docs tersini söylüyor.
+- MAJOR-2: ilerletici tick'leri kilitsiz örtüşüyor (unique yalnız zaman damgası): çift judge, item_runs son-yazan-kazanır. Uzun tick mark_listening'i geciktiriyor, koşular abandoned.
+- MAJOR-3: approval_required/waiting_user iptali commit'lenip not commit'lenmeden hata olursa madde başarısız sayılıyor (NOT_RUN_CODES yalnız approval_expired); geri almada puanlananlar yeniden judge'a gidiyor.
+- MAJOR-4: sınav suite yapılandırmasını dondurmuyor; koşu sürerken PATCH scorer/eşik/approve_tools'u değiştiriyor; 09-2 kapısı bu passed'e güvenecek.
+- MINOR:
+  - (1) parse_judge yedeği ilk `score: n`'yi alıyor, alıntılanan sahte skor kabul (probe: 5 döndü); kod çitli JSON hata; rubrikte sınırlayıcı yok.
+  - (2) madde×tekrar sınırı yok, POST içinde eşzamanlı başlatma, queued asılı.
+  - (3) boş beklenende judge; repeat birleştirme.
+  - (4) SQL reddi boş sonuç + audit is_error=false.
+  - (5) approve_tools=false iptali onay satırını bırakıyor, yarış, audit yok.
+  - (6) onay sonrası koşu interaktif kuyruğa.
+  - (7) SuiteUpdate doğrulayıcısız / null.
+  - (8) Langfuse taşıma hataları eşlenmiyor, hata sayacı sıfırlanmıyor.
+  - (9) **08-tam-1b birleşme tehlikesi:** judge EgressGuard'da ner= yok; 1b sonrası llmaas'ta her judge `judge_failed:ner_not_configured`; ikinci merge edilen dal HttpNer eklemeli.
+  - (10) docs/yorumlar (approved-only, otomatik onay yorumu).
+  - (11) dataset adında önekten sonra desen yok; 09-2'de yol bölümü olunca `..` ile başka projeye geçebilir (httpx normalleştiriyor, denendi).
+- NOTE-2 09-2 kapısı için: çoğu madde not_run iken passed=true olabiliyor (complete=false); kapı complete ya da asgari oran istemeli.
+- Koşular (22:21-23:18, tam yığın review09 + plan/18 katmanı):
+  - make test 1602/1602 iki profil; lint temiz.
+  - test-int llmaas 870 passed / 13 skipped, airgap 868 / 15.
+  - alembic gidiş-dönüş; seed + seed-eval ×2.
+  - RUN_EVAL_STACK 8/8; smoke passed.
+  - fake-llm 200 judge isteği ham TC/e-posta yok.
+  - NOT_RUN: gerçek model judge tutarlılığı; MAJOR'ların çalışma zamanı probe'u (kod yolu + ayrı doğrulayıcı ile teyit).
+- Dosyalar commit edilmedi: rapor, 09-1-r1-probe.py, evidence 09-1-r1-*, kanal.
+
+### R-09-0004 · 2026-11-04 23:22 · → koordinator · YIGIN-KAPA
+Yığın review09 `down -v` (23:22); konteyner 0, volume 0. Worktree .worktrees/review-09-1-r1 temiz, `git worktree remove` başarılı.
+
+### R-08T1B-0005 · 2026-11-04 23:23 · → koordinator · ACK
+Paket: 08-tam-1b r2 (delta)   Cevap: K-08T1B-0013
+REVIEW-ISTEK alındı (09-1 r1 bitti). SHA doğrulandı: 4567ed62f63f0f0d0276c88e909c0d16838bfaa8 (f6be9ae üstüne 21 commit, 29 dosya +1184/-109; merge-base main 7af41e5, state/ 0). Worktree .worktrees/review-08t1b-r2 (temiz).
+
+### R-08T1B-0006 · 2026-11-04 23:23 · → koordinator · YIGIN-AC
+Yığın: review08t1b, 18290/13290, --profile test --profile qdrant (langfuse, mcp, ticket-desk dahil), dalın .env.test'i, --pull never, FAKE_EMBED=1. review09 kapandı, ffcore-08t1b kapalı: açık FF yığını yalnız review08t1b. Disk boş 102 GB. Kapanış down -v + YIGIN-KAPA.

@@ -1935,3 +1935,7 @@ Branch feat/08-tam-1b-ner @ **4567ed62f63f0f0d0276c88e909c0d16838bfaa8** (r1 HEA
 - Kapılar (4567ed6): `make lint` temiz; `make test` llmaas 1598/1598, airgap 1598/1598; hedefli test-int (08t_21/22/26/28, 08_api, 19_ingest_raw, 06b_direct, 04a_api) llmaas 87 passed 1 skipped, airgap 87 passed 1 skipped (skip: test_19 :ro mod testi, root).
 - r2 delta'da bakılacaklar: MINOR-1 yalnız enforce egress kuralında yükselir (monitor kaydeder; varsayım 13); `text_filter_mismatch` ret sayacı, CLI çıkış kodunu değiştirmez (varsayım 10); egress PII türetmesinde saklı `default`'un `PERSON` ayarı NER açıkken `enabled/high`'a zorlanır.
 NOT_RUN (ENV-163): ölçüm, `-m models`, `--network none`, gerçek NER.
+
+### A-08T1B-0019 · 2026-11-05 00:10 · → koordinator · ACK
+Paket: 08-tam-1b   Cevap: (zil: 4567ed6 VERIFIED, r2 delta istendi)
+Alındı: dal 4567ed6'da donuk, commit yok; r2 delta sonucunu bekliyorum. Not: K-08T1B-0014 (09-1 ile ortak dosya notu) kanalda henüz görünmüyor; gelince okuyup gerekiyorsa cevap yazacağım.
