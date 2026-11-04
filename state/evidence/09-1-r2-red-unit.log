@@ -1,0 +1,33 @@
+== r2 unit tests against d4a2f02 code (tests from r2 working tree) 2026-11-04T23:46:58+03:00
+>           assert (r.passed, r.note) == (None, note)
+>       assert r.passed is False and r.note == "nothing_scored"
+E        +  where None = ItemResult(item_id='q01', style='dogrudan', answerable=True, outcome='answered', passed=None, scores=[Score(name='contains', value=None, passed=None, comment='no_expectation', status='not_run')], note='').passed
+            item_result(item, _facts(), [Score("contains", None, None, "judge_failed:x", "error")], "")
+>       assert r.passed is False and r.scores[0].status == "error"
+E        +  where True = ItemResult(item_id='q01', style='dogrudan', answerable=True, outcome='answered', passed=True, scores=[Score(name='contains', value=1.0, passed=True, comment='repeat=3', status='ok')], note='').passed
+E       ffcore.core.egress.EgressTimeoutError: Outbound call to http://langfuse:3000 failed: timeout (read).
+FAILED tests/unit/test_09_engine.py::test_09_judge_reason_clipped_with_mark
+FAILED tests/unit/test_09_engine.py::test_09_r1_major4_exam_starts_queued_with_a_suite_snapshot
+FAILED tests/unit/test_09_engine.py::test_09_r1_minor2_too_many_item_runs_is_422
+FAILED tests/unit/test_09_engine.py::test_09_r1_minor2_every_item_checked_before_anything_is_written
+FAILED tests/unit/test_09_engine.py::test_09_exam_is_queued_until_every_item_run_started
+FAILED tests/unit/test_09_engine.py::test_09_r1_minor2_broken_start_resumes_next_tick
+FAILED tests/unit/test_09_engine.py::test_09_advancer_takes_queued_and_running_exams
+FAILED tests/unit/test_09_engine.py::test_09_r1_major1_rejected_sql_is_not_read_again
+FAILED tests/unit/test_09_engine.py::test_09_r1_major1_unbound_tool_is_not_read_again
+FAILED tests/unit/test_09_engine.py::test_09_r1_major1_approved_then_rejected_reads_the_approved_one
+FAILED tests/unit/test_09_engine.py::test_09_r1_major1_call_without_approval_needs_a_result
+FAILED tests/unit/test_09_engine.py::test_09_r1_major1_tool_not_given_to_the_version_is_not_used
+FAILED tests/unit/test_09_engine.py::test_09_r1_major2_one_holder_per_exam_lock
+FAILED tests/unit/test_09_engine.py::test_09_r1_major3_cancelled_waiting_runs_are_not_run_from_their_code
+FAILED tests/unit/test_09_engine.py::test_09_r1_minor3_item_without_any_checked_scorer_fails_visibly
+FAILED tests/unit/test_09_engine.py::test_09_r1_minor3_repeat_keeps_errors_and_leaves_out_not_run_repeats
+FAILED tests/unit/test_09_engine.py::test_09_r1_minor3_outcome_ties_follow_diagnosis_order
+FAILED tests/unit/test_09_engine.py::test_09_r1_minor3_judge_needs_an_expectation
+FAILED tests/unit/test_09_engine.py::test_09_r1_minor8_transport_error_is_a_langfuse_error
+FAILED tests/unit/test_09_engine.py::test_09_r1_minor8_a_good_tick_resets_the_failure_count
+FAILED tests/unit/test_09_scorers.py::test_09_r1_minor1_score_quoted_in_text_is_not_a_score
+FAILED tests/unit/test_09_scorers.py::test_09_r1_minor1_two_score_lines_are_ambiguous
+FAILED tests/unit/test_09_scorers.py::test_09_r1_minor1_fenced_json_is_read
+FAILED tests/unit/test_09_scorers.py::test_09_r1_major1_sql_result_rejected_is_not_run_missing_is_a_failure
+24 failed, 52 passed in 5.16s

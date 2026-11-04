@@ -1,0 +1,9 @@
+PROBE stored default: 201 {"id":"cdd6c9b7-d48d-4b3c-a117-14832a365ead","project_id":"d432a843-ca55-4762-8031-a0bc87352f23","key":"default","name":
+PROBE egress built-in chain with stored default: 200 action=tokenize plate_raw=False out='Araç <<PII_1>>, e-posta <<PII_2>>'
+PROBE input.pre built-in chain with stored default: 200 action=allow plate_raw=True out='Araç 34 ABC 123, e-posta a.b@ornek.com'
+PROBE GET builtin: 200 key=default version=3
+PROBE POST built-in rules as stored default: 201 {"id":"a9b327e1-7b6b-48ac-83da-d761793108e5","project_id":"a4570093-a691-4209-9275-7c4bed3ab3a6","key":"default","name":"Stored built-in","rules":[{"type":"secr
+PROBE PII listing: [('default', True), ('default-egress', True)]
+PROBE test panel default-egress: 200 builtin=True
+PROBE NER auth: anon=401 superadmin=403 service=503 {"error":{"message":"NER_MODEL and NER_REVISION are not set.","type":"api_error","code":"ner_not_con
+3 passed in 11.08s

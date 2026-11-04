@@ -1,0 +1,4 @@
+ruff check backend scripts data/samples/scripts services
+All checks passed!
+ruff format --check backend scripts data/samples/scripts services
+443 files already formatted
