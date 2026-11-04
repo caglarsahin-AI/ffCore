@@ -209,13 +209,20 @@ class HttpNer:
         from ffcore.core import egress
 
         timeout = egress.EgressTimeout(connect=5, read=120, total=180)
-        async with egress.SafeOutboundClient(timeout=timeout, settings=self._settings) as client:
-            response = await client.request(
-                "POST",
-                f"{self._settings.internal_api_url.rstrip('/')}/api/v1/internal/guardrails/ner",
-                headers=service_authorization(self._settings),
-                json={"text": text, "categories": sorted(categories)},
-            )
+        try:
+            async with egress.SafeOutboundClient(
+                timeout=timeout, settings=self._settings
+            ) as client:
+                response = await client.request(
+                    "POST",
+                    f"{self._settings.internal_api_url.rstrip('/')}/api/v1/internal/guardrails/ner",
+                    headers=service_authorization(self._settings),
+                    json={"text": text, "categories": sorted(categories)},
+                )
+        except egress.EgressError as exc:
+            # r1 MINOR-2: refused, DNS, timeout are an outage like a 5xx (coded, no traceback);
+            # the message names scheme and host only.
+            raise NerUnavailable(f"internal ner unreachable: {exc}") from None
         if response.status_code != 200:
             raise NerUnavailable(f"internal ner failed: {response.status_code}")
         body = response.json()
