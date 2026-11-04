@@ -28,17 +28,25 @@ ignored. Then:
 python -m ffcore.cli ingest-raw --project <p> --kb <kb> --raw-dir <tree, read-only>   --acl <role> --sources <kind:space> ... [--limit N] [--manifest-out <file>] [--accept-personnel-data]
 ```
 
-- Every file goes through C6 `ingest_from_raw` with the named text filter `pii_regex`
-  (e-mail, phone, national id, IBAN, card; redacted to `[CODE]` before silver is written, so
+- Every file goes through C6 `ingest_from_raw` with the named text filter `pii_ner` (08 full
+  1b): e-mail, phone, national id, IBAN, card (regex) and person names (the API's NER over
+  `POST /api/v1/internal/guardrails/ner`), redacted to `[CODE]` before silver is written, so
   silver, `.raw.md` and gold are masked; raw stays byte for byte; the document records
-  `metadata.text_filter = "pii_regex@<version>"`). There is no option to turn it off. Names
-  need NER (08 full) and are not masked.
+  `metadata.text_filter = "pii_ner@<version>"`. A name never overrides a regex finding. There is
+  no option to turn it off or to name another filter. The NER is checked before the first file:
+  unreachable or not configured stops the run (`ner_unavailable`; with a PRSIM source
+  `prsim_requires_ner`, before the database), a tree is never half name-masked.
+- `--accept-personnel-data` is the M3 measurement mode: it keeps `pii_regex` (identifiers only,
+  person names not masked) so the measured manifest stays as it was, and is logged as such.
+  Documents ingested before 08 full 1b keep `pii_regex@1`; a reindex applies the filter the
+  document records.
 - The record key is the path inside the tree; an unchanged file (same sha256) is `unchanged`
   and not processed again. The breadcrumb from the meta file is used when given.
 - Refused, counted, never silently skipped: `path_outside_base` (symlink, `..`, outside the
   tree), `too_large` (Kapı 0 limits), `meta_missing`, `meta_invalid`, `source_not_selected`,
-  `prsim_requires_ner` (PRSIM without `--accept-personnel-data`). With the flag, a card number,
-  IBAN or national id in a personnel-data source stops the run (`customer_data_suspected`).
+  `prsim_requires_ner` (PRSIM while names cannot be masked). In a personnel-data source (PRSIM,
+  with `pii_ner` or in the M3 mode) a card number, IBAN or national id stops the run
+  (`customer_data_suspected`).
 - The output is counts only. The manifest (`--manifest-out`, never under the tree) holds stage
   (`full` or `stage0-pipeline-evidence` with `--limit`), per-source documents and chunks, current
   statuses, `failed`/`timeout`, refusals and `raw_manifest_sha256`.

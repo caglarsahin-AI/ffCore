@@ -46,7 +46,8 @@ The internal endpoint returns the same shape (`DecisionOut` in `backend/openapi/
 
 Two entities, both per project:
 
-- **PII policy** (`pii_policies`): engine (`regex`; `ner` with 08 full), default action, languages,
+- **PII policy** (`pii_policies`): engine (`regex`, or `ner`: the regex recognizers plus the
+  Turkish NER model for `PERSON`, `ORGANIZATION`, `LOCATION`), default action, languages,
   minimum confidence, context boost, categories (each with enabled, severity, action, language)
   and custom patterns.
 - **Guardrail policy** (`guardrail_policies`): an ordered rule chain, mode, `short_circuit`,
@@ -61,9 +62,33 @@ Two entities, both per project:
 | `tool_args` | regex `patterns` in the arguments of `tools` (`<tool_key>.<action>`, wildcards allowed); `args` limits the search to named arguments of a JSON object | `block`, `warn` or `log`; only at `tool.pre` |
 
 `injection`, `topic`, `output_format` and `banned_words` are refused with
-`422 rule_type_unsupported` until they are delivered. A category without a recognizer (for example
-`PERSON`) can only be enabled together with a custom pattern; otherwise `422
-category_unsupported`. Nothing that looks enabled is silently ignored.
+`422 rule_type_unsupported` until they are delivered. A category without a recognizer can only
+be enabled together with a custom pattern; otherwise `422 category_unsupported`. `PERSON`,
+`ORGANIZATION` and `LOCATION` are recognized by a PII policy with `engine: ner` (see "Turkish
+NER"); with `engine: regex` they still need a custom pattern. Nothing that looks enabled is
+silently ignored.
+
+### Turkish NER (08 full 1b)
+
+`engine: ner` runs the regex recognizers and a Hugging Face token-classification model
+(`NER_MODEL` at `NER_REVISION`, CPU) for person, organization and location names. A name never
+overrides a regex or custom finding: an overlapping NER span is dropped, so checksummed values
+keep their category. The evidence is `ner <model>@<revision> score 0.97`. `engine: regex` never
+calls the model.
+
+- The model is loaded only by the API process (like the embedding model). The agent worker and
+  the ingest (worker and `ingest-raw`) ask `POST /api/v1/internal/guardrails/ner` (service
+  account; spans, category, score and evidence, never the value).
+- Fail-loud: without `NER_MODEL`/`NER_REVISION` a NER policy is `ner_not_configured` (a
+  configuration error, not `on_error`); a missing weight is `model_missing` (offline cache only,
+  `make models`); a model label that maps to no category is `ner_label_unknown` at load. When the
+  API cannot answer, the rule fails and follows `on_error` (default `block`); nothing falls back
+  to regex only.
+- Long texts are read in overlapping windows (stride 128 tokens), never cut at the model limit.
+- Weights: `make models` downloads the candidates (model card, config, tokenizer, PyTorch
+  weights only) into the `model_cache` volume; `make models-check` lists them offline. The
+  measured model, its licence and the quality and latency table are added when the measurement
+  has run (package 08 full 1b; until then the choice is open).
 
 ### Short tokens (FOLLOWUP-106)
 
@@ -100,14 +125,14 @@ In an agent run every retrieved chunk goes through `egress` on its own before it
 
 ### Built-in default policy
 
-A project without a stored policy keyed `default` uses the built-in one (version 2, shown in the
+A project without a stored policy keyed `default` uses the built-in one (version 3, shown in the
 API with `builtin: true`):
 
 | Rule | Stages | Action | Mode |
 |---|---|---|---|
 | `secrets` | all text stages and `egress` | `block` | policy (`monitor`) |
 | `pii` (built-in PII policy) | `prompt.pre`, `input.pre`, `output.pre`, `tool.pre`, `tool.post` | `redact` | policy (`monitor`) |
-| `pii` (built-in PII policy) | `egress` | `tokenize` | `enforce` |
+| `pii` (built-in egress PII policy `default-egress`) | `egress` | `tokenize` | `enforce` |
 
 The policy is `monitor`: it blocks and redacts nothing until an administrator stores an
 enforce policy. The egress rule is enforced regardless: with `GUARDRAIL_EGRESS_ENABLED=true`
@@ -118,6 +143,12 @@ five regex categories that are on by default in the brief: `TR_NATIONAL_ID`, `TR
 `TR_IBAN`, `EMAIL_ADDRESS`, `CREDIT_CARD`. `CVV` and `PIN` are on by default in the brief but
 need context-aware recognition; they arrive with 08 full. Storing a policy with key `default`
 replaces the built-in one.
+
+Version 3 (08 full 1b): the egress rule reads its own PII policy, `default-egress`. With
+`GUARDRAIL_EGRESS_NER=true` it is the five regex categories plus `PERSON` (`engine: ner`): person
+names leave for the provider as placeholders too. With `false` it is the five regex categories
+only (version 2's egress). The text stages keep the regex-only `default` and never call NER. A
+stored PII policy keyed `default-egress` replaces the built-in one, as `default` does.
 
 ## Masking
 
@@ -170,9 +201,9 @@ English, Presidio-compatible codes; the 13a set uses the same list (a test keeps
 | `TR_PLATE` | licence plate | custom pattern | no |
 | `TR_PASSPORT` | passport number | custom pattern | no |
 | `TR_ADDRESS` | address | custom pattern | no |
-| `PERSON` | person name | NER (08 full) | no |
-| `ORGANIZATION` | organization name | NER (08 full) | no |
-| `LOCATION` | location | NER (08 full) | no |
+| `PERSON` | person name | NER (`engine: ner`) | no; at egress with `GUARDRAIL_EGRESS_NER=true` |
+| `ORGANIZATION` | organization name | NER (`engine: ner`) | no |
+| `LOCATION` | location | NER (`engine: ner`) | no |
 | `EMAIL_ADDRESS` | e-mail address | regex | yes |
 | `CREDIT_CARD` | card number (Luhn) | regex | yes |
 | `CVV` | card security code | 08 full | no |
@@ -207,6 +238,7 @@ The contract is `backend/openapi/08.yaml`
 | `GET/POST /api/v1/projects/{project_id}/guardrail-policies`, `GET/PATCH/DELETE .../{policy_id}` | same |
 | `POST /api/v1/projects/{project_id}/guardrails/test` | analyst, also with read access (dry run) |
 | `POST /api/v1/internal/guardrails/evaluate` | the internal service account (`SERVICE_TOKEN`) only |
+| `POST /api/v1/internal/guardrails/ner` | the internal service account only (workers' NER; 503 `ner_not_configured` / `model_missing`) |
 
 The test panel runs a PII policy with an action (`detect`, `redact`, `mask`, `tokenize`) or a
 guardrail policy as if it were enforced, and returns the output text and the findings with
@@ -218,8 +250,19 @@ deleted (`409 pii_policy_in_use`).
 | Variable | Meaning |
 |---|---|
 | `GUARDRAIL_EGRESS_ENABLED` | mandatory; `true` for llmaas, `false` for airgap |
+| `GUARDRAIL_EGRESS_NER` | mandatory, no default (08 full 1b): `true` masks person names at egress (llmaas production); `false` only for test stacks and airgap. `false` in llmaas production is a change-control [C] decision |
+| `NER_MODEL`, `NER_REVISION` | the NER model (Hugging Face repository and commit); required when `GUARDRAIL_EGRESS_NER=true` and egress is on, otherwise the API and the agent worker do not start |
 | `PII_TOKEN_TTL_S` | tokenize mapping lifetime in seconds (default 1800) |
 | `REDIS_URL` | the compose Redis (already set) |
+
+### Before deploying 08 full 1b (mandatory variable)
+
+`GUARDRAIL_EGRESS_NER` has no default: an installation's `.env` must set it before this version
+starts, otherwise Compose stops with `GUARDRAIL_EGRESS_NER is not set`. Existing installations:
+- llmaas production: `true`, with `NER_MODEL`/`NER_REVISION` and the weights from `make models`
+  (without them the API and the agent worker stop at start-up, `/readyz` shows `model_missing`).
+- airgap and the PayCore M3 server: `false` until the NER weights are on the server
+  (`m3_preflight` checks that the variable is set).
 
 ## Latency
 
