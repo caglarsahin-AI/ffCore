@@ -12,8 +12,8 @@ from uuid import UUID
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ffcore.api.common import invalid, not_found
 from ffcore.core.config import Settings
+from ffcore.core.errors import ApiError
 from ffcore.models.agents import Agent, AgentVersion
 from ffcore.models.runs import Conversation, Message, Run
 from ffcore.runtime.contracts import RunStatus, TriggerType
@@ -47,7 +47,9 @@ async def start_run(
     definition = parse_definition(version.definition)
     unknown = sorted(set(variables) - {v.key for v in definition.variables})
     if unknown:
-        raise invalid("variable_unknown", f"Unknown variables: {unknown}")
+        raise ApiError(
+            422, "invalid_request_error", "variable_unknown", f"Unknown variables: {unknown}"
+        )
 
     if conversation_id is not None:
         conversation = await session.scalar(
@@ -60,7 +62,9 @@ async def start_run(
             )
         )
         if conversation is None:
-            raise not_found("conversation")
+            raise ApiError(
+                404, "not_found_error", "conversation_not_found", "Conversation not found."
+            )
     else:
         conversation = Conversation(
             project_id=project_id,
