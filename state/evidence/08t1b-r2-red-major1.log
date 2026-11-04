@@ -1,0 +1,53 @@
+ Network w08t1b_default  Creating
+ Network w08t1b_default  Created
+ Volume "w08t1b_langfuse_postgres_data"  Creating
+ Volume "w08t1b_langfuse_postgres_data"  Created
+ Volume "w08t1b_postgres_data"  Creating
+ Volume "w08t1b_postgres_data"  Created
+ Volume "w08t1b_langfuse_clickhouse_data"  Creating
+ Volume "w08t1b_langfuse_clickhouse_data"  Created
+ Volume "w08t1b_langfuse_clickhouse_logs"  Creating
+ Volume "w08t1b_langfuse_clickhouse_logs"  Created
+ Volume "w08t1b_redis_data"  Creating
+ Volume "w08t1b_redis_data"  Created
+ Volume "w08t1b_model_cache"  Creating
+ Volume "w08t1b_model_cache"  Created
+ Volume "w08t1b_knowledge_storage"  Creating
+ Volume "w08t1b_knowledge_storage"  Created
+ Volume "w08t1b_langfuse_minio_data"  Creating
+ Volume "w08t1b_langfuse_minio_data"  Created
+FF..                                                                     [100%]
+=================================== FAILURES ===================================
+________ test_08t_19_stored_default_custom_pattern_tokenized_at_egress _________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f830ef37bc0>
+
+    def test_08t_19_stored_default_custom_pattern_tokenized_at_egress(monkeypatch):
+        resolved, egress = _egress(monkeypatch, {"default": STORED_DEFAULT}, False)
+        assert egress.engine == "regex" and "PERSON" not in egress.categories
+        ctx = engine.EvalContext(run_id="r1", token_store=MemoryTokenStore(), egress_enabled=True)
+        decision = asyncio.run(engine.evaluate("VKN 1234567890 sorulur", "egress", resolved, ctx=ctx))
+>       assert decision.text_out == "VKN <<PII_1>> sorulur"
+E       AssertionError: assert 'VKN 1234567890 sorulur' == 'VKN <<PII_1>> sorulur'
+E         
+E         - VKN <<PII_1>> sorulur
+E         + VKN 1234567890 sorulur
+
+tests/unit/test_08t_19_egress_from_default.py:56: AssertionError
+__________ test_08t_19b_egress_ner_adds_person_to_the_stored_default ___________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f830ef5dcd0>
+
+    def test_08t_19b_egress_ner_adds_person_to_the_stored_default(monkeypatch):
+        _, egress = _egress(monkeypatch, {"default": STORED_DEFAULT}, True)
+        assert egress.engine == "ner"
+        assert egress.categories["PERSON"].enabled
+>       assert egress.categories["TR_TAX_ID"].enabled
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'TR_TAX_ID'
+
+tests/unit/test_08t_19_egress_from_default.py:63: KeyError
+=========================== short test summary info ============================
+FAILED tests/unit/test_08t_19_egress_from_default.py::test_08t_19_stored_default_custom_pattern_tokenized_at_egress
+FAILED tests/unit/test_08t_19_egress_from_default.py::test_08t_19b_egress_ner_adds_person_to_the_stored_default
+2 failed, 2 passed in 2.78s

@@ -1913,3 +1913,7 @@ NOT_RUN (ağırlık yok, K-08T1B-0006): kabul 1/3/4 ölçüm, `-m models` testle
 ### A-08T1B-0014 · 2026-11-04 21:46 · → koordinator · ACK
 Paket: 08-tam-1b   Cevap: (zil: VERIFIED, r1 istendi)
 Alındı: dal f6be9ae'de donuk, commit yok. r1 sonucunu (DUZELT ya da ONAY) bekliyorum; ağırlık (ENV-163) gelirse ölçüm dilimi ayrı commit'le, yeni SHA ve yeniden PR-HAZIR ile. Not: K-08T1B-0009 kanalda henüz görünmüyor (20:46 taraması).
+
+### A-08T1B-0015 · 2026-11-04 22:00 · → koordinator · ACK
+Paket: 08-tam-1b   Cevap: K-08T1B-0010
+DUZELT alındı; r1 raporu (güvenlik turu dahil) ve KARARLAR "08 tam 1b r1 kararları" okundu. Sıra: MAJOR-1 A (kayıtlı `default`'tan egress türetme), MAJOR-2 (örtüşmeli pencere), MAJOR-3 (`text_filter_mismatch`), MAJOR-4 (PRSIM `Ek <n>`, diğerleri filtreden), MINOR-1 A, MINOR-2..7, NOTE-1/9; her biri ayrı commit, önce kırmızı test. NOTE-6 → FOLLOWUP-167, NOTE-2/3/4/5/8 → FOLLOWUP-168 PR notunda kısıt olarak. Kanıt: lint, `make test` iki profil, hedefli test-int iki profil (yalın yığın; YIGIN-AÇ ile isteyeceğim).
