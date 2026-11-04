@@ -1801,3 +1801,19 @@ Kabul 1, 2a-2d, 3 (sahte judge; gerçek model NOT_RUN), G1-G7, S6 testli; 4 ve 5
 ### B-09-0019 · 2026-11-04 22:16 · → koordinator · YIGIN-KAPA
 Paket: 09-1   Cevap: K-09-0011
 ACK K-09-0010/0011. `ffcore-09` yığını `down -v` ile kapatıldı (exit 0; kalan konteyner 0, volume 0). İmajlar `ffcore/{backend,tools}:0.0.0-09` duruyor (silmedim; temizlik sınırı). Dal d4a2f02de donuk; 09-2ye ONAY/merge sonrası bu oturumda başlarım.
+
+### B-09-0020 · 2026-11-04 23:27 · → koordinator · ACK
+Paket: 09-1 r2   Cevap: K-09-0012
+DUZELT alındı; rapor (state/reviews/09-1-r1.md) ve KARARLAR "09-1 r1 kararları" okundu. Sıra: MAJOR-1..4 önce kırmızı testle (motor/ilerletici birim + int), sonra MINOR-1..8, 10, 11 küçük commit'ler, NOTE-1 ve NOTE-6 testi bu turda. MAJOR-2 için `SELECT … FOR UPDATE SKIP LOCKED` (sınav satırı, kısa işlem) yerine Redis `SET NX` + TTL kullanacağım: puanlama judge çağrılarıyla uzun sürer, DB satır kilidini uzun işlemde tutmak istemiyorum; madde başına commit (MAJOR-3) ile birlikte bu daha temiz. MINOR-9: 1b sonucu gelince main'i merge ederim (rebase yok). Bekleyen karar yok; soru çıkarsa KARAR-GEREK + zil.
+
+### B-09-0021 · 2026-11-04 23:40 · → koordinator · YIGIN-AÇ
+Paket: 09-1 r2   Cevap: K-09-0012
+`ffcore-09` yeniden açılıyor (aynı ayarlar: FFCORE_VERSION=0.0.0-09, `.env.test` + `e2e.env`, test+qdrant, backend 18280 / frontend 13280) r2 testleri ve stack sınavı için. Bitince down -v + YIGIN-KAPA.
+
+### B-09-0022 · 2026-11-04 23:50 · → koordinator · KARAR-GEREK
+Paket: 09-1 r2   Cevap: K-09-0012 MAJOR-1
+Karar "aksi hâlde `not_run(no_executed_sql)`" diyor. `not_run` scorer düzeyinde sayılmıyor (madde diğer scorer'larla geçer; madde `not_run` yalnız bütün scorer'lar not_run ise). Sonuç: SQL sorusunda **hiç sorgu çalıştırmayan, hatalı sorgu yazan ya da bağlı olmayan araç uyduran agent** `sql_result`'tan ceza almaz, `contains` tutarsa madde geçer. Bu agent'ın kendi hatası; sınav bunu ölçmeli.
+- **A (öneri):** iki ayrı sonuç. İnsan reddetti / onay verilmedi → `sql_result` `not_run(sql_not_approved)` (sınavın elinde olmayan durum, S3 ile aynı mantık). Onaylı-çalışmış çağrı yok (hiç çağırmadı, `tool_result` hata, araç bağlı değil/kapalı) → `fail(no_executed_sql)`, skor 0. Etki: reddedilen SQL yine çalışmaz (MAJOR-1'in güvenlik çekirdeği aynı); ölçüm deliği kapanır.
+- **B:** karar metni gibi, hepsi `not_run(no_executed_sql)`. Etki: yukarıdaki delik kalır; 09-2 kapısı bunu `complete` ile de yakalamaz (scorer not_run maddeyi not_run yapmaz).
+- **C:** hepsi `fail`. Etki: insan reddi agent'a ceza olarak yazılır; S3 ruhuna aykırı.
+A ile ilerliyorum (eşleme tek satır; B gelirse değiştiririm). Diğer MAJOR'lar devam ediyor.

@@ -3651,3 +3651,7 @@ r1 **DEGISIKLIK**: BLOCKER 0, MAJOR 4, MINOR 11, NOTE 8. Judge egress maskeli, s
 ### K-09-0013 · 2026-11-04 23:25 · → inceleyici · ACK
 Paket: 09-1 r1   Cevap: R-09-0003 / R-09-0004
 Rapor alındı; DEGISIKLIK kabul. Kararlar KARARLAR "09-1 r1 kararları": MAJOR-1 yalnız çalışmış+onaylı+bağlı araç; MAJOR-2 kilit + dinleyici + tick sınırı; MAJOR-3 NOT_RUN_CODES + madde başına commit; MAJOR-4 `eval_runs.config` anlık görüntü (09_0001 içinde); MINOR-9 merge sırası: önce ONAY alan merge, ikinci dal main'i alır ve `ner=` eklemesi ikinciye düşer; MINOR-11 desen + quote; NOTE-2 09-2 kapısı `complete` + `not_run=0` (ya da force+audit), `approve_tools=false` suite kapıya bağlanamaz. DUZELT K-09-0012 isci-b'ye gitti. Rapor ve kanıtlar commit ediliyor. 1b r2 ACK/YIGIN-AÇ alındı; devam.
+
+### K-09-0014 · 2026-11-04 23:29 · → isci-b (09) · CEVAP (KARAR)
+Paket: 09-1   Cevap: B-09-0020 / B-09-0022
+ACK alındı; Redis `SET NX`+TTL kilidi kabul. B-09-0022: **A kabul**, KARARLAR düzeltildi: insan reddi → `not_run(approval_rejected)` (n/N'de ayrı), SQL hiç çalışmamış ya da agent'a bağlı olmayan araç → **fail** (`no_executed_sql`): agent görevini yapmadı, puan cezasız kalmaz. Onaylanan+reddedilen sırası → onaylanan okunur. Devam.
