@@ -8,7 +8,8 @@ the provider under version 1). A stored policy with key `default` replaces it.
 Version 3 (08 tam 1b, K-08T1B-0004 A): the egress rule reads its own PII policy,
 `default-egress`: with GUARDRAIL_EGRESS_NER=true the regex identifiers plus person names
 (`engine: ner`), with false the same regex identifiers as before. The text stages keep
-`default` (regex) and never call NER. A stored PII policy with either key replaces the built-in.
+`default` (regex) and never call NER. A stored PII policy with either key replaces the built-in;
+a stored `default` without a stored `default-egress` also feeds egress (r1 MAJOR-1 A).
 """
 
 from ffcore.guardrails.categories import CATEGORIES, STAGES
@@ -42,8 +43,25 @@ DEFAULT_EGRESS_PII_NER = PiiPolicySpec(
 )
 
 
-def builtin_egress_pii(egress_ner: bool) -> PiiPolicySpec:
-    return DEFAULT_EGRESS_PII_NER if egress_ner else DEFAULT_PII
+def builtin_egress_pii(egress_ner: bool, stored_default: PiiPolicySpec | None = None) -> PiiPolicySpec:
+    """The egress PII policy when no `default-egress` is stored.
+
+    r1 MAJOR-1 (A): a project's stored `default` fed the egress rule in v2, so its categories
+    and custom patterns stay at egress; with GUARDRAIL_EGRESS_NER=true `PERSON` and
+    `engine: ner` are added. The built-in five only when `default` is not stored either.
+    """
+    if stored_default is None:
+        return DEFAULT_EGRESS_PII_NER if egress_ner else DEFAULT_PII
+    if not egress_ner:
+        return stored_default
+    data = stored_default.model_dump()
+    data["engine"] = "ner"
+    data["categories"]["PERSON"] = {
+        **data["categories"].get("PERSON", {}),
+        "enabled": True,
+        "severity": "high",
+    }
+    return PiiPolicySpec.model_validate(data)
 
 
 DEFAULT_SPEC = PolicySpec(

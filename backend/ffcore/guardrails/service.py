@@ -87,8 +87,13 @@ async def resolve_pii(session: AsyncSession, project_id, key: str) -> PiiPolicyS
     if key == BUILTIN_KEY:
         return DEFAULT_PII
     if key == EGRESS_PII_KEY:
-        # 08 tam 1b: the built-in egress PII follows GUARDRAIL_EGRESS_NER (K-08T1B-0004 A).
-        return builtin_egress_pii(get_guardrail_settings().guardrail_egress_ner)
+        # 08 tam 1b: the built-in egress PII follows GUARDRAIL_EGRESS_NER (K-08T1B-0004 A) and
+        # is derived from the project's stored `default` when there is one (r1 MAJOR-1 A).
+        default = await stored_pii(session, project_id, BUILTIN_KEY)
+        return builtin_egress_pii(
+            get_guardrail_settings().guardrail_egress_ner,
+            pii_spec(default) if default is not None else None,
+        )
     return None
 
 

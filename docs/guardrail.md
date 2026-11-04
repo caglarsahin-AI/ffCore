@@ -144,11 +144,17 @@ five regex categories that are on by default in the brief: `TR_NATIONAL_ID`, `TR
 need context-aware recognition; they arrive with 08 full. Storing a policy with key `default`
 replaces the built-in one.
 
-Version 3 (08 full 1b): the egress rule reads its own PII policy, `default-egress`. With
-`GUARDRAIL_EGRESS_NER=true` it is the five regex categories plus `PERSON` (`engine: ner`): person
-names leave for the provider as placeholders too. With `false` it is the five regex categories
-only (version 2's egress). The text stages keep the regex-only `default` and never call NER. A
-stored PII policy keyed `default-egress` replaces the built-in one, as `default` does.
+Version 3 (08 full 1b): the egress rule reads its own PII policy, `default-egress`, resolved in
+this order:
+
+1. A stored PII policy keyed `default-egress` is used as it is.
+2. Otherwise, a stored PII policy keyed `default` (which fed egress in version 2): its categories
+   and custom patterns, with `PERSON` and `engine: ner` added when `GUARDRAIL_EGRESS_NER=true`.
+3. Otherwise the built-in one: the five regex categories, plus `PERSON` (`engine: ner`) when
+   `GUARDRAIL_EGRESS_NER=true`.
+
+With `true`, person names leave for the provider as placeholders too; with `false`, egress masks
+what version 2 masked. The text stages keep `default` and never call NER.
 
 ## Masking
 
