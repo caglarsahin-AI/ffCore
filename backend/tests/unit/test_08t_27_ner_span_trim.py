@@ -82,17 +82,28 @@ def _custom(min_confidence, custom_score):
             "engine": "ner",
             "default_action": "tokenize",
             "min_confidence": min_confidence,
-            "categories": {"PERSON": {"enabled": True}, "TR_TAX_ID": {"enabled": True},
-                           "TR_PHONE": {"enabled": True}},
+            "categories": {
+                "PERSON": {"enabled": True},
+                "TR_TAX_ID": {"enabled": True},
+                "TR_PHONE": {"enabled": True},
+            },
             "custom_patterns": [
-                {"name": "kayit", "category": "TR_TAX_ID", "pattern": r"Ayşe Kaya \d+",
-                 "score": custom_score}
+                {
+                    "name": "kayit",
+                    "category": "TR_TAX_ID",
+                    "pattern": r"Ayşe Kaya \d+",
+                    "score": custom_score,
+                }
             ],
         }
     )
     spec = PolicySpec.model_validate(
-        {"mode": "enforce", "rules": [{"type": "pii", "action": "tokenize",
-                                       "pii_policy_key": "p", "stages": ["egress"]}]}
+        {
+            "mode": "enforce",
+            "rules": [
+                {"type": "pii", "action": "tokenize", "pii_policy_key": "p", "stages": ["egress"]}
+            ],
+        }
     )
     return ResolvedPolicy(key="t", spec=spec, pii_policies={"p": pii}, builtin=False)
 
