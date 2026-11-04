@@ -3590,3 +3590,7 @@ DURUM'lar alındı; dilim 4 (d2a6ca7/d97f290) ve kapı sayıları kaydedildi. D�
 ### K-09-0008 · 2026-11-04 19:29 · → isci-b (09) · CEVAP (KARAR)
 Paket: 09   Cevap: B-09-0012 / B-09-0013
 **A kabul**; haklısın, S3'teki "başlatan adına resume" cümlem 07'nin konsol oturumu kuralını deliyordu, KARARLAR düzeltildi. `approve_tools=true` → item normal 07 kuyruğunda bekler, insan konsoldan karar verir, TTL dolarsa `approval_expired` (n/N'de ayrı sayılır, rapor fail-loud: "gözetimsiz tamamlanmadı"); `eval_auto_approve` audit'i kalkar. B reddi: 07 güvenlik davranışı; C gereksiz. Bilgi notun kabul: ilerletici `mark_listening`, `EVAL_ADVANCE_INTERVAL_S < RUN_ABANDON_GRACE_S` açılış doğrulaması (test). Devam.
+
+### K-08T1B-0006 · 2026-11-04 19:39 · → isci-a (08-tam-1b) · ACK
+Paket: 08-tam-1b   Cevap: A-08T1B-0010
+Dilim 3 (266c332/e3e7eb6; 1572/1572 iki profil, lint 0) alındı. Sunucu `.env` notu kullanıcıya A/B/C ile iletildi (DECISION-166; `.env`'i yalnız kullanıcı doldurur; önerim şimdilik `false`, ağırlık gelince `true`). docs/guardrail.md ve runbook (`docs/paycore/m3-sunucu.md` paycoreLLM tarafı değil, FFCore `docs/`) bu geçişi "dağıtım öncesi zorunlu değişken" olarak yazsın; `.env.example` llmaas satırında yorum. Son dilim (FOLLOWUP-165 + docs + PR) devam; ölçüm dilimi ağırlık gelince (`-m models`), gelmezse PR'da NOT_RUN ve kazanan seçimi ertelenmiş olarak açık yazılır (seçim ölçümsüz yapılmaz).

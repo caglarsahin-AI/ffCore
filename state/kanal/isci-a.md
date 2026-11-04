@@ -1885,3 +1885,11 @@ Dilim 4 commit'li: d2a6ca7 (test, kırmızı 9b49514'te 6 düştü + 4 hata), d9
 Düşen tek test: `test_08t_r3_long_line_in_one_character_pieces[StreamDetokenizer]` (1a'nın `< 1,0 s` mutlak süre sınırlı testi; bu dalda masking koduna dokunulmadı). Tek başına 3 tekrar 4/4 geçti: yük altında oynuyor (iki profil koşusu arka arkaya, makinede başka yığınlar).
 KAYIT-TALEBI (FOLLOWUP): KARARLAR "Birim testinde mutlak süre sınırı yok" (K-SEN-0015) ile çelişen test_08t_r3_url_scan süre testleri (`< 1,0`, `< 0,2`) oran ya da asılı-kalma korumasına çevrilmeli; FOLLOWUP-162 demetine ya da 1a sahibine. Bu PR'da dokunmuyorum (kapsam dışı), PR'a kalan risk.
 Sıradaki: dilim 3 (yerleşik v3 `default-egress` + `GUARDRAIL_EGRESS_NER`, K-08T1B-0004 ekleri 1-4).
+
+### A-08T1B-0010 · 2026-11-04 20:05 · → koordinator · DURUM
+Paket: 08-tam-1b   Cevap: K-08T1B-0004 / K-08T1B-0005
+ACK K-08T1B-0005 (FOLLOWUP-165 son dilimde). Dilim 3 commit'li: 266c332 (test; kırmızı d97f290'da toplama hatası), e3e7eb6 (kod). Kapı (tools 0.0.0-main + worktree; tee state/evidence/08t1b-maketest3-*.log): `make test` llmaas 1572/1572, airgap 1572/1572; `make lint` temiz.
+- Yerleşik v3: egress kuralı `default-egress` PII politikasını okur; `GUARDRAIL_EGRESS_NER=true` → regex + PERSON (`engine: ner`), `false` → yalnız regex (v2 egress'i). Metin aşamaları NER çağırmaz. Projenin `default-egress` anahtarlı PII politikası yerleşiği geçersiz kılar (`default` ile aynı kural).
+- `GUARDRAIL_EGRESS_NER` varsayılansız (compose `${…:?}`); `.env.example` true (+ `NER_MODEL`/`NER_REVISION` boş, ölçümden sonra dolacak), `.env.test` false. Açılış: egress açık + true + model adı yok → API ve agent worker durur; ağırlık yoksa API `/readyz` `model_missing`. Dış agent yolu aynı egress politikasından geçer (test_08t_16g).
+- **Kullanıcıya iletilmesi gereken (sunucu):** PayCore sunucu `.env`'inde `GUARDRAIL_EGRESS_NER` yok; bu sürümle yığın `${…:?}` hatasıyla açılmaz. M3 için `GUARDRAIL_EGRESS_NER=false` eklenmeli (m3_preflight artık bunu denetler). Merge öncesi runbook notu PR'da.
+Sıradaki son dilim: FOLLOWUP-165 (süre testleri → oran/asılı-kalma), docs (guardrail.md NER bölümü, api.md iç uç, bilgi-tabani/ingest PRSIM, degisiklikler), PR açıklaması. Ağırlık hâlâ yok; ölçüm, lisans/id2label, `--network none` kanıtı ve `-m models` testleri ağırlık gelince.
