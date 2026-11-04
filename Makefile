@@ -3,7 +3,7 @@
 # Servisleri başlatma/durdurma doğrudan compose ile: docker compose up -d --wait | down | logs -f
 # Önyüz lint'i ayrı konteynerde: docker compose run --rm frontend npm run lint
 
-.PHONY: lint format test test-samples test-int seed e2e eval test-models models models-check smoke pull seed-models render-litellm reindex langfuse-init seed-prompts seed-sql-demo seed-sql-context
+.PHONY: lint format test test-samples test-int seed e2e eval test-models models models-check smoke pull seed-models render-litellm reindex langfuse-init seed-prompts seed-sql-demo seed-sql-context seed-eval
 
 lint:
 	ruff check backend scripts data/samples/scripts services
@@ -70,6 +70,13 @@ render-litellm:
 # 02: print a new Langfuse key pair and admin password once (copy into .env; nothing is written).
 langfuse-init:
 	sh deploy/langfuse/init.sh
+
+# 09: the sample exam sets (13a) into a project's Langfuse datasets and suites; idempotent.
+# WITHOUT=llm_judge leaves the judge out when EVAL_JUDGE_MODEL is empty (explicit, never silent).
+seed-eval:
+	@test -n "$(PROJECT)" || (echo "usage: make seed-eval PROJECT=<project_key> [WITHOUT=llm_judge]" >&2; exit 2)
+	cd backend && python -m ffcore.cli seed-eval --project "$(PROJECT)" --suite ../data/samples/eval/suite.json --items ../data/samples/eval/sozlesme-33.json $(if $(WITHOUT),--without $(WITHOUT),)
+	cd backend && python -m ffcore.cli seed-eval --project "$(PROJECT)" --suite ../data/samples/eval/suite-sql-20.json --items ../data/samples/eval/sql-20.json $(if $(WITHOUT),--without $(WITHOUT),)
 
 # 02: first-install prompts (backend/prompts/*.md) into Langfuse; existing prompts stay.
 seed-prompts:

@@ -144,6 +144,15 @@ def build_parser() -> argparse.ArgumentParser:
         "--tool", default="mcp-sql", help="key of the project's registered mcp-sql tool"
     )
     sql_context.add_argument("--path", required=True, type=Path, help="data/samples/schema")
+    seed_eval = commands.add_parser(
+        "seed-eval", help="a sample exam set into a project's Langfuse dataset and suite (09)"
+    )
+    seed_eval.add_argument("--project", required=True, help="existing project key")
+    seed_eval.add_argument("--suite", required=True, type=Path, help="suite file (JSON)")
+    seed_eval.add_argument("--items", required=True, type=Path, help="items file (JSON list)")
+    seed_eval.add_argument(
+        "--without", action="append", default=[], help="leave a scorer out (explicit)"
+    )
     commands.add_parser(
         "setup-checkpointer",
         help="create the LangGraph checkpoint tables in the checkpoints schema (06a, idempotent)",
@@ -183,6 +192,27 @@ def build_parser() -> argparse.ArgumentParser:
         help="write the corpus manifest JSON here (outside --raw-dir)",
     )
     return parser
+
+
+async def _seed_eval(args):
+    from ffcore.evaluation import seed as eval_seed
+    from ffcore.evaluation.langfuse_api import LangfuseApi, LangfuseApiError
+
+    settings = get_settings()
+    try:
+        api = LangfuseApi(settings)
+        async with db.session_scope() as session:
+            return await eval_seed.seed(
+                session,
+                settings,
+                api,
+                project_key=args.project,
+                suite_path=args.suite,
+                items_path=args.items,
+                without=set(args.without),
+            )
+    except LangfuseApiError as exc:
+        raise CliError(f"Langfuse: {exc.code}") from None
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -281,6 +311,18 @@ def main(argv: list[str] | None = None) -> int:
                 print(f"manifest written to {args.manifest_out}")
             if manifest["failed"] or manifest["timeout"]:
                 return 1
+        elif args.command == "seed-eval":
+            from ffcore.evaluation import seed as eval_seed
+
+            try:
+                report = asyncio.run(_seed_eval(args))
+            except eval_seed.SeedError as exc:
+                raise CliError(str(exc)) from None
+            print(f"dataset: {report.dataset}")
+            print(f"items upserted: {report.items_upserted}; archived: {report.items_archived}")
+            print(f"suite: {'created' if report.suite_created else 'already present'}")
+            for note in report.notes:
+                print(f"note: {note}")
         elif args.command == "setup-checkpointer":
             settings = get_settings()
             if settings.database_url is None:

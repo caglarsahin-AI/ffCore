@@ -11,11 +11,12 @@ class RunQueue(Protocol):
 
 
 class ArqRunQueue:
-    def __init__(self, settings: Settings) -> None:
+    def __init__(self, settings: Settings, queue_name: str | None = None) -> None:
         if settings.redis_url is None:
             raise RuntimeError("REDIS_URL is not set; the run queue needs Redis")
         self._dsn = settings.redis_url.get_secret_value()
-        self._queue_name = settings.arq_queue_interactive
+        # Default: the interactive queue (chat, test panel); 09 exams pass llm-background.
+        self._queue_name = queue_name or settings.arq_queue_interactive
         self._pool = None
 
     async def enqueue(self, run_id: str, resume: dict[str, Any] | None = None) -> str:
@@ -34,6 +35,7 @@ class ArqRunQueue:
 
 
 _queue: RunQueue | None = None
+_background: RunQueue | None = None
 
 
 def get_run_queue(settings: Settings) -> RunQueue:
@@ -41,3 +43,11 @@ def get_run_queue(settings: Settings) -> RunQueue:
     if _queue is None:
         _queue = ArqRunQueue(settings)
     return _queue
+
+
+def get_background_queue(settings: Settings) -> RunQueue:
+    """09: exam item runs are background-class runs (C10 llm-background)."""
+    global _background
+    if _background is None:
+        _background = ArqRunQueue(settings, settings.arq_queue_background)
+    return _background

@@ -61,6 +61,11 @@ PACKAGES = {
         "(package 06b).",
         "tags": {"facade", "facade-internal", "agent-manifest", "agent-external"},
     },
+    "09": {
+        "version": "0.9",
+        "description": "Exams over Langfuse datasets: suites, exam runs, progress (package 09).",
+        "tags": {"evaluation"},
+    },
 }
 
 

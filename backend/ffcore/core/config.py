@@ -155,6 +155,17 @@ class Settings(BaseSettings):
     langsmith_tracing: bool = False
     langchain_tracing_v2: bool = False
 
+    # --- 09 evaluation (profile values, PLAN 2b; .env.example lists each profile) ---
+    # Default pass threshold of a new suite: llmaas 0.85, airgap 0.8. None: a suite must name
+    # its own (no hidden default, ARCH-10).
+    eval_pass_threshold: float | None = Field(default=None, gt=0, le=1)
+    # Model key (in the suite's project) of the llm_judge scorer: llmaas a strong provider
+    # model, airgap the local model. None: suites with llm_judge are refused.
+    eval_judge_model: str | None = None
+    # Seconds between exam advancer ticks (arq cron on the background worker, K-09-0007 S4);
+    # divides 60 and stays under RUN_ABANDON_GRACE_S (the advancer keeps item runs listened).
+    eval_advance_interval_s: int = Field(default=15, gt=0, le=60)
+
     # --- 03c governance ---
     # Wrong API keys from one client address per minute before 429 too_many_auth_failures.
     api_key_auth_failures_per_min: int = Field(default=20, gt=0)
@@ -186,12 +197,31 @@ class Settings(BaseSettings):
         return value
 
     @field_validator(
-        "ollama_context_length", "inference_backend", "qdrant_url", "qdrant_api_key", mode="before"
+        "ollama_context_length",
+        "inference_backend",
+        "qdrant_url",
+        "qdrant_api_key",
+        "eval_pass_threshold",
+        "eval_judge_model",
+        mode="before",
     )
     @classmethod
     def _empty_is_unset(cls, value: object) -> object:
         # Compose passes unset optional variables as "" (${VAR:-}); that means "not set".
         return None if value == "" else value
+
+    @model_validator(mode="after")
+    def _eval_advance_interval(self) -> "Settings":
+        if 60 % self.eval_advance_interval_s:
+            raise ValueError(
+                "eval_advance_interval_invalid: EVAL_ADVANCE_INTERVAL_S must divide 60"
+            )
+        if self.eval_advance_interval_s >= self.run_abandon_grace_s:
+            raise ValueError(
+                "eval_advance_interval_invalid: EVAL_ADVANCE_INTERVAL_S must be below "
+                "RUN_ABANDON_GRACE_S, or exam runs are abandoned between two ticks"
+            )
+        return self
 
     @model_validator(mode="after")
     def _no_langsmith(self) -> "Settings":

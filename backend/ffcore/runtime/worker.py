@@ -54,6 +54,8 @@ def _startup_for(job_class: JobClass):
         )
         slots = LlmSlots(redis, SlotSettings(slots=settings.llm_slots), window)
         prompts = PromptStore(tracing.get_client())
+        # 09: the exam advancer's judge uses the same slot pool and prompt store.
+        ctx["slots"], ctx["prompts"] = slots, prompts
         ctx["attempt"] = Attempt(
             settings,
             redis,
@@ -119,6 +121,13 @@ async def run_retention(ctx) -> None:
     )
 
 
+async def advance_eval_runs(ctx) -> None:
+    """09: one short tick per running exam (score finished items, keep item runs listened)."""
+    from ffcore.evaluation import worker_tick
+
+    await worker_tick.tick(get_settings(), ctx["redis"], ctx["slots"], ctx["prompts"])
+
+
 async def audit_partitions(ctx) -> None:
     """FOLLOWUP-47: this month's and next month's audit partition, every day (idempotent)."""
     from ffcore.core.audit import ensure_audit_partitions
@@ -139,6 +148,12 @@ def cron_jobs_for(job_class: JobClass) -> list:
         cron(clear_source_deleted, second=45, unique=True),
         cron(audit_partitions, hour=2, minute=30, second=0, unique=True),
         cron(run_retention, hour=3, minute=0, second=0, unique=True),
+        # 09: exam advancer (K-09-0007 S4), every EVAL_ADVANCE_INTERVAL_S seconds.
+        cron(
+            advance_eval_runs,
+            second=set(range(0, 60, get_settings().eval_advance_interval_s)),
+            unique=True,
+        ),
     ]
 
 

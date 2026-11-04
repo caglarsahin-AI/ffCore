@@ -1,0 +1,318 @@
+"""Exam engine (09): start an exam, advance it, summarize it.
+
+Start (`POST …/eval-suites/{id}/run`): every ACTIVE item of the suite's Langfuse dataset becomes
+`repeat` ordinary `channel=test` runs of the chosen agent version (services/runs_start), queued
+on `llm-background` (C10), acting for the user who started the exam.
+
+Advance (`advance_eval_runs`, arq cron on the background worker, K-09-0007 S4): a short tick
+per running exam. It keeps the item runs "listened" (06a abandons a run nobody follows; the
+engine is its follower), cancels runs that wait for a user answer, and for runs that wait for
+an approval either leaves them in the 07 queue for a person (`approve_tools=true`) or cancels
+them as not_run (`approval_required`), never approving itself (K-09-0008). A finished item is
+diagnosed and scored; its run's own Langfuse trace is linked into the dataset run and the
+scores are written there (upsert by id: a tick that dies halfway is repeated safely). When every
+item is scored the summary is written and the exam is `completed`.
+
+Langfuse failures are counted per item; after MAX_ATTEMPTS the exam ends `failed` with the
+error code (fail-loud; no local copy of what could not be written).
+"""
+
+import logging
+import statistics
+import uuid
+from collections import Counter
+from dataclasses import dataclass, field
+from datetime import UTC, datetime
+from typing import Any
+
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from ffcore.evaluation import scorers
+from ffcore.evaluation.diagnosis import OUTCOMES, Candidate, RunFacts, diagnose
+from ffcore.evaluation.langfuse_api import score_id
+from ffcore.evaluation.scorers import Score
+from ffcore.models.eval import EvalRun, EvalSuite
+from ffcore.models.knowledge import Document, KbQuery
+from ffcore.models.runs import Run, RunEvent
+
+log = logging.getLogger("ffcore.evaluation")
+
+TERMINAL = {"completed", "failed", "cancelled", "abandoned"}
+MAX_ATTEMPTS = 5
+WORST = 10
+
+
+# --- item scoring (pure over loaded facts) -----------------------------------------------------
+
+
+@dataclass
+class ItemFacts:
+    """What one finished item run left behind, loaded by `load_facts`."""
+
+    run_id: str
+    status: str
+    error_code: str | None
+    outcome_label: str | None
+    answer: str
+    trace_id: str | None
+    duration_ms: int | None
+    cost_usd: float | None
+    selected: list[str] = field(default_factory=list)
+    candidates: list[Candidate] = field(default_factory=list)
+    sql: list[tuple[str, str]] = field(default_factory=list)  # (tool_key, sql)
+
+
+@dataclass
+class ItemResult:
+    item_id: str
+    style: str
+    answerable: bool
+    outcome: str | None
+    passed: bool | None  # None: not_run
+    scores: list[Score]
+    note: str = ""
+
+    def mean(self) -> float | None:
+        values = [s.value for s in self.scores if s.status == "ok" and s.value is not None]
+        return sum(values) / len(values) if values else None
+
+
+def _scorer_cfg(suite_scorers: list[dict]) -> dict[str, dict]:
+    return {c["name"]: c for c in suite_scorers}
+
+
+def deterministic_scores(
+    item: dict, facts: ItemFacts, cfg: dict[str, dict], sql_rows: list[list] | None
+) -> list[Score]:
+    """Every configured scorer except llm_judge and semantic (they call services)."""
+    expected = item.get("expectedOutput") or {}
+    meta = item.get("metadata") or {}
+    out: list[Score] = []
+    if not meta.get("answerable", True):
+        # An unanswerable item is judged by holding back only (13b `holds`); content scorers
+        # have nothing to compare.
+        held = facts.outcome_label != "answered"
+        return [Score("holds", 1.0 if held else 0.0, held)]
+    if "contains" in cfg:
+        out.append(scorers.contains(facts.answer, expected.get("must_contain") or []))
+    if "regex" in cfg:
+        out.append(scorers.regex(facts.answer, expected.get("regex")))
+    if "json_schema" in cfg:
+        out.append(scorers.json_schema(facts.answer, expected.get("json")))
+    if "cites_source" in cfg:
+        wanted = expected.get("must_cite") or meta.get("expected_docs") or []
+        out.append(scorers.cites_source(facts.selected, wanted))
+    if "sql_result" in cfg:
+        out.append(scorers.sql_result(expected.get("sql_result"), sql_rows))
+    if "latency_cost" in cfg:
+        c = cfg["latency_cost"]
+        out.append(
+            scorers.latency_cost(
+                facts.duration_ms, facts.cost_usd, max_ms=c.get("max_ms"), max_usd=c.get("max_usd")
+            )
+        )
+    return out
+
+
+def item_result(item: dict, facts: ItemFacts | None, scores: list[Score], note: str) -> ItemResult:
+    meta = item.get("metadata") or {}
+    answerable = bool(meta.get("answerable", True))
+    base = dict(item_id=item["id"], style=meta.get("style", "-"), answerable=answerable)
+    if facts is None:
+        return ItemResult(**base, outcome=None, passed=None, scores=[], note=note)
+    outcome = diagnose(
+        RunFacts(
+            status=facts.status,
+            outcome_label=facts.outcome_label,
+            answerable=answerable,
+            expected_docs=list(meta.get("expected_docs") or []),
+            candidates=facts.candidates,
+            selected=facts.selected,
+        )
+    )
+    if facts.status != "completed":
+        return ItemResult(
+            **base, outcome=None, passed=False, scores=[], note=facts.error_code or facts.status
+        )
+    checked = [s for s in scores if s.status != "not_run"]
+    if any(s.status == "error" for s in checked):
+        passed = False
+    else:
+        passed = all(s.passed for s in checked) if checked else None
+    return ItemResult(**base, outcome=outcome, passed=passed, scores=scores, note=note)
+
+
+def summarize(
+    results: list[ItemResult],
+    *,
+    pass_threshold: float,
+    warmup_ms: int | None,
+    latencies_ms: list[int],
+) -> dict[str, Any]:
+    scored = [r for r in results if r.passed is not None]
+    not_run = Counter(r.note or "not_run" for r in results if r.passed is None)
+    passed_items = sum(1 for r in scored if r.passed)
+    pass_rate = passed_items / len(scored) if scored else 0.0
+    by_scorer: dict[str, list[float]] = {}
+    errors: Counter = Counter()
+    for r in results:
+        for s in r.scores:
+            if s.status == "ok" and s.value is not None:
+                by_scorer.setdefault(s.name, []).append(s.value)
+            elif s.status == "error":
+                errors[s.comment or "error"] += 1
+        if r.passed is False and not r.scores and r.note:
+            errors[r.note] += 1
+    outcomes = Counter(r.outcome for r in results if r.outcome)
+    styles: dict[str, dict] = {}
+    for r in results:
+        s = styles.setdefault(r.style, {"n": 0, "passed": 0, "outcomes": {}})
+        s["n"] += 1
+        s["passed"] += 1 if r.passed else 0
+        if r.outcome:
+            s["outcomes"][r.outcome] = s["outcomes"].get(r.outcome, 0) + 1
+    worst = sorted(
+        (r for r in scored),
+        key=lambda r: (r.passed is True, r.mean() if r.mean() is not None else -1.0, r.item_id),
+    )[:WORST]
+    return {
+        "n": len(results),
+        "scored": len(scored),
+        "not_run": dict(not_run),
+        "passed_items": passed_items,
+        "pass_rate": round(pass_rate, 4),
+        "pass_threshold": pass_threshold,
+        "passed": bool(scored) and pass_rate >= pass_threshold,
+        "scores": {k: round(sum(v) / len(v), 4) for k, v in sorted(by_scorer.items())},
+        "outcomes": {o: outcomes.get(o, 0) for o in OUTCOMES},
+        "styles": styles,
+        "worst": [
+            {
+                "item_id": r.item_id,
+                "style": r.style,
+                "outcome": r.outcome,
+                "passed": r.passed,
+                "mean": None if r.mean() is None else round(r.mean(), 4),
+                "note": r.note,
+            }
+            for r in worst
+        ],
+        "errors": dict(errors),
+        # No model-server reset before an exam (EVAL_RESET_MODEL rejected, N22): the first
+        # run's time is reported apart as warm-up and left out of the latency figures.
+        "warm_cache": True,
+        "warmup_ms": warmup_ms,
+        "latency_ms": (
+            {"p50": int(statistics.median(latencies_ms)), "max": max(latencies_ms)}
+            if latencies_ms
+            else None
+        ),
+    }
+
+
+# --- loading facts from the database ---------------------------------------------------------
+
+
+def _stem_names(payload: dict) -> list[str]:
+    return [s.get("document_name", "") for s in payload.get("selected") or []]
+
+
+async def load_facts(session: AsyncSession, run: Run) -> ItemFacts:
+    events = (
+        await session.scalars(
+            select(RunEvent).where(RunEvent.run_id == run.id).order_by(RunEvent.seq)
+        )
+    ).all()
+    selected: list[str] = []
+    sql: list[tuple[str, str]] = []
+    for e in events:
+        if e.type == "sources":
+            selected.extend(_stem_names(e.payload or {}))
+        elif e.type == "tool_call" and str((e.payload or {}).get("name", "")).endswith("__run_sql"):
+            args = (e.payload or {}).get("arguments") or {}
+            if isinstance(args.get("sql"), str):
+                sql.append((e.payload["name"].removesuffix("__run_sql"), args["sql"]))
+    queries = (await session.scalars(select(KbQuery).where(KbQuery.run_id == run.id))).all()
+    raw = [c for q in queries for c in (q.candidates or [])]
+    ids = {uuid.UUID(c["document_id"]) for c in raw if c.get("document_id")}
+    names = {}
+    if ids:
+        rows = await session.execute(
+            select(Document.id, Document.filename).where(Document.id.in_(ids))
+        )
+        names = {str(i): f for i, f in rows.all()}
+    candidates = [
+        Candidate(
+            names.get(c["document_id"], c["document_id"]),
+            bool(c.get("below_rerank_floor") or c.get("below_min_score")),
+        )
+        for c in raw
+        if c.get("document_id")
+    ]
+    duration = None
+    if run.started_at and run.ended_at:
+        duration = int((run.ended_at - run.started_at).total_seconds() * 1000)
+    return ItemFacts(
+        run_id=str(run.id),
+        status=run.status,
+        error_code=run.error_code,
+        outcome_label=run.outcome_label,
+        answer=run.output or "",
+        trace_id=run.langfuse_trace_id,
+        duration_ms=duration,
+        cost_usd=float(run.cost_usd) if run.cost_usd is not None else None,
+        selected=selected,
+        candidates=candidates,
+        sql=sql,
+    )
+
+
+def now_utc() -> datetime:
+    return datetime.now(UTC)
+
+
+def langfuse_scores(
+    result: ItemResult, run_id: str, trace_id: str, judge_reason: str
+) -> list[dict]:
+    """The Langfuse score rows of one item run (ids deterministic, L10). No answer text (S8)."""
+    meta = {"run_id": run_id, "outcome": result.outcome, "passed": result.passed}
+    rows = [
+        {
+            "score_id": score_id(trace_id, s.name),
+            "name": s.name,
+            "value": s.value,
+            "data_type": "NUMERIC",
+            "comment": judge_reason if s.name == "llm_judge" else s.comment,
+            "metadata": meta | {"passed": s.passed, "status": s.status},
+        }
+        for s in result.scores
+        if s.value is not None
+    ]
+    if result.outcome:
+        rows.append(
+            {
+                "score_id": score_id(trace_id, "outcome"),
+                "name": "outcome",
+                "value": result.outcome,
+                "data_type": "CATEGORICAL",
+                "comment": "",
+                "metadata": meta,
+            }
+        )
+    if result.passed is not None:
+        rows.append(
+            {
+                "score_id": score_id(trace_id, "passed"),
+                "name": "passed",
+                "value": 1 if result.passed else 0,
+                "data_type": "BOOLEAN",
+                "comment": "",
+                "metadata": meta,
+            }
+        )
+    return rows
+
+
+def suite_of(session: AsyncSession, ev: EvalRun):
+    return session.get(EvalSuite, ev.suite_id)
