@@ -1,0 +1,149 @@
+ Network red08t1b_default  Creating
+ Network red08t1b_default  Created
+ Volume "red08t1b_langfuse_clickhouse_logs"  Creating
+ Volume "red08t1b_langfuse_clickhouse_logs"  Created
+ Volume "red08t1b_postgres_data"  Creating
+ Volume "red08t1b_postgres_data"  Created
+ Volume "red08t1b_langfuse_minio_data"  Creating
+ Volume "red08t1b_langfuse_minio_data"  Created
+ Volume "red08t1b_model_cache"  Creating
+ Volume "red08t1b_model_cache"  Created
+ Volume "red08t1b_knowledge_storage"  Creating
+ Volume "red08t1b_knowledge_storage"  Created
+ Volume "red08t1b_redis_data"  Creating
+ Volume "red08t1b_redis_data"  Created
+ Volume "red08t1b_langfuse_postgres_data"  Creating
+ Volume "red08t1b_langfuse_postgres_data"  Created
+ Volume "red08t1b_langfuse_clickhouse_data"  Creating
+ Volume "red08t1b_langfuse_clickhouse_data"  Created
+EEEFEFFF.FF                                                              [100%]
+==================================== ERRORS ====================================
+_________________ ERROR at setup of test_08t_15_pii_ner_filter _________________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f8eec5d6030>
+
+    @pytest.fixture
+    def fake_ner(monkeypatch):
+        client = FakeNer(names=["Ayşe Demir", "Demir ayse.demir"])
+>       monkeypatch.setattr(ingest_mask, "ner_client", lambda: client)
+E       AttributeError: <module 'ffcore.knowledge.ingest_mask' from '/work/backend/ffcore/knowledge/ingest_mask.py'> has no attribute 'ner_client'
+
+tests/unit/test_08t_15_pii_ner.py:40: AttributeError
+_________ ERROR at setup of test_08t_15_pii_ner_never_overrides_regex __________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f8eec5f8ad0>
+
+    @pytest.fixture
+    def fake_ner(monkeypatch):
+        client = FakeNer(names=["Ayşe Demir", "Demir ayse.demir"])
+>       monkeypatch.setattr(ingest_mask, "ner_client", lambda: client)
+E       AttributeError: <module 'ffcore.knowledge.ingest_mask' from '/work/backend/ffcore/knowledge/ingest_mask.py'> has no attribute 'ner_client'
+
+tests/unit/test_08t_15_pii_ner.py:40: AttributeError
+___________ ERROR at setup of test_08t_15_metadata_masked_by_pii_ner ___________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f8eec5ea180>
+
+    @pytest.fixture
+    def fake_ner(monkeypatch):
+        client = FakeNer(names=["Ayşe Demir", "Demir ayse.demir"])
+>       monkeypatch.setattr(ingest_mask, "ner_client", lambda: client)
+E       AttributeError: <module 'ffcore.knowledge.ingest_mask' from '/work/backend/ffcore/knowledge/ingest_mask.py'> has no attribute 'ner_client'
+
+tests/unit/test_08t_15_pii_ner.py:40: AttributeError
+___________ ERROR at setup of test_08t_15_counting_filter_is_awaited ___________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f8eec5ea540>
+
+    @pytest.fixture
+    def fake_ner(monkeypatch):
+        client = FakeNer(names=["Ayşe Demir", "Demir ayse.demir"])
+>       monkeypatch.setattr(ingest_mask, "ner_client", lambda: client)
+E       AttributeError: <module 'ffcore.knowledge.ingest_mask' from '/work/backend/ffcore/knowledge/ingest_mask.py'> has no attribute 'ner_client'
+
+tests/unit/test_08t_15_pii_ner.py:40: AttributeError
+=================================== FAILURES ===================================
+______________ test_08t_15_ner_down_fails_the_text_never_unmasked ______________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f8eec5eb650>
+
+    def test_08t_15_ner_down_fails_the_text_never_unmasked(monkeypatch):
+        client = FakeNer(error=ner.NerUnavailable("internal ner failed: 503"))
+>       monkeypatch.setattr(ingest_mask, "ner_client", lambda: client)
+E       AttributeError: <module 'ffcore.knowledge.ingest_mask' from '/work/backend/ffcore/knowledge/ingest_mask.py'> has no attribute 'ner_client'
+
+tests/unit/test_08t_15_pii_ner.py:70: AttributeError
+_____________________ test_08t_15b_prsim_accepted_with_ner _____________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_08t_15b_prsim_accepted_wi0')
+
+    def test_08t_15b_prsim_accepted_with_ner(tmp_path):
+>       assert raw_staging.check_sources(["jira:PRSIM"], text_filter="pii_ner") == ["jira:prsim"]
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: check_sources() got an unexpected keyword argument 'text_filter'
+
+tests/unit/test_08t_15_pii_ner.py:82: TypeError
+_________________ test_08t_15d_prsim_refused_without_ner[None] _________________
+
+text_filter = None
+
+    @pytest.mark.parametrize("text_filter", [None, "pii_regex"])
+    def test_08t_15d_prsim_refused_without_ner(text_filter):
+        with pytest.raises(StagingError) as raised:
+>           raw_staging.check_sources(["jira:PRSIM"], text_filter=text_filter)
+E           TypeError: check_sources() got an unexpected keyword argument 'text_filter'
+
+tests/unit/test_08t_15_pii_ner.py:96: TypeError
+______________ test_08t_15d_prsim_refused_without_ner[pii_regex] _______________
+
+text_filter = 'pii_regex'
+
+    @pytest.mark.parametrize("text_filter", [None, "pii_regex"])
+    def test_08t_15d_prsim_refused_without_ner(text_filter):
+        with pytest.raises(StagingError) as raised:
+>           raw_staging.check_sources(["jira:PRSIM"], text_filter=text_filter)
+E           TypeError: check_sources() got an unexpected keyword argument 'text_filter'
+
+tests/unit/test_08t_15_pii_ner.py:96: TypeError
+_ test_08t_15e_ingest_raw_checks_ner_before_any_work[jira:PRSIM-prsim_requires_ner] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f8eec6287a0>
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_08t_15e_ingest_raw_checks0')
+source = 'jira:PRSIM', code = 'prsim_requires_ner'
+
+    @pytest.mark.parametrize(
+        ("source", "code"), [("jira:PRSIM", "prsim_requires_ner"), ("confluence:OCR", "ner_unavailable")]
+    )
+    def test_08t_15e_ingest_raw_checks_ner_before_any_work(monkeypatch, tmp_path, source, code):
+        client = FakeNer(error=ner.NerUnavailable("internal ner failed: 503"))
+>       monkeypatch.setattr(ingest_mask, "ner_client", lambda: client)
+E       AttributeError: <module 'ffcore.knowledge.ingest_mask' from '/work/backend/ffcore/knowledge/ingest_mask.py'> has no attribute 'ner_client'
+
+tests/unit/test_08t_15_pii_ner.py:115: AttributeError
+_ test_08t_15e_ingest_raw_checks_ner_before_any_work[confluence:OCR-ner_unavailable] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f8eec628b60>
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_08t_15e_ingest_raw_checks1')
+source = 'confluence:OCR', code = 'ner_unavailable'
+
+    @pytest.mark.parametrize(
+        ("source", "code"), [("jira:PRSIM", "prsim_requires_ner"), ("confluence:OCR", "ner_unavailable")]
+    )
+    def test_08t_15e_ingest_raw_checks_ner_before_any_work(monkeypatch, tmp_path, source, code):
+        client = FakeNer(error=ner.NerUnavailable("internal ner failed: 503"))
+>       monkeypatch.setattr(ingest_mask, "ner_client", lambda: client)
+E       AttributeError: <module 'ffcore.knowledge.ingest_mask' from '/work/backend/ffcore/knowledge/ingest_mask.py'> has no attribute 'ner_client'
+
+tests/unit/test_08t_15_pii_ner.py:115: AttributeError
+=========================== short test summary info ============================
+FAILED tests/unit/test_08t_15_pii_ner.py::test_08t_15_ner_down_fails_the_text_never_unmasked
+FAILED tests/unit/test_08t_15_pii_ner.py::test_08t_15b_prsim_accepted_with_ner
+FAILED tests/unit/test_08t_15_pii_ner.py::test_08t_15d_prsim_refused_without_ner[None]
+FAILED tests/unit/test_08t_15_pii_ner.py::test_08t_15d_prsim_refused_without_ner[pii_regex]
+FAILED tests/unit/test_08t_15_pii_ner.py::test_08t_15e_ingest_raw_checks_ner_before_any_work[jira:PRSIM-prsim_requires_ner]
+FAILED tests/unit/test_08t_15_pii_ner.py::test_08t_15e_ingest_raw_checks_ner_before_any_work[confluence:OCR-ner_unavailable]
+ERROR tests/unit/test_08t_15_pii_ner.py::test_08t_15_pii_ner_filter - Attribu...
+ERROR tests/unit/test_08t_15_pii_ner.py::test_08t_15_pii_ner_never_overrides_regex
+ERROR tests/unit/test_08t_15_pii_ner.py::test_08t_15_metadata_masked_by_pii_ner
+ERROR tests/unit/test_08t_15_pii_ner.py::test_08t_15_counting_filter_is_awaited
+6 failed, 1 passed, 4 errors in 3.17s
