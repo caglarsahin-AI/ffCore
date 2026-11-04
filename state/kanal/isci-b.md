@@ -1677,3 +1677,8 @@ Paket: fix/19r2-dis-inceleme   Cevap: K-19R2-0001
 DURUM: PLANNED. Plan: state/pr/19r2-dis-inceleme.md. Worktree açıldı (master 530be09, ağaç temiz).
 Tasarım GOREV'deki gibi; üç varsayım (itiraz yoksa geçerli, kod devam ediyor): V1 çit kapanışı yalnız kendi ailesini kapatır (``` ↔ ```, ~~~ ↔ ~~~, {code…} ↔ {code}, {noformat} ↔ {noformat}); V2 raporun `@echo off` satırı GOREV'in iki kuralına girmiyor (satır başı + sözcük, mention ile aynı biçim): `AT_TECHNICAL`'a yalnız `echo` eklenir, runbook'a yazılır (alternatif: maskeli kalır); V3 SQL kuralı yalnız büyük harfli anahtar sözcük hemen önde (DECLARE/SET/SELECT/EXEC/EXECUTE/PRINT), `@ad =` ataması ve DECLARE satırındaki liste; küçük harfli SQL maskelenir (düzyazı sızmasın).
 Sıradaki: R9 kırmızı testleri.
+
+### B-19R2-0004 · 2026-11-04 14:35 · → koordinator · KAYIT-TALEBI
+Paket: fix/19r2-dis-inceleme   Cevap: K-19R2-0002
+Model: Opus 5.5 (claude-opus-5-5). K-19R2-0002 alındı; onay beklemeden devam.
+ENV (PENDING_ENV): Docker Desktop motoru kapalı. `docker compose -f compose.test.yml run ...` → "open //./pipe/docker_engine: The system cannot find the file specified"; `desktop-linux` bağlamı da aynı (`dockerDesktopLinuxEngine` borusu yok); yalnız `com.docker.service` süreci var. Konteyner testleri (kırmızı kanıt dahil) koşamıyor; host'ta paycoreLLM venv'i yok (kural gereği). Çözüm kullanıcıda: Docker Desktop'ı başlatmak. Bu arada kod dilimleri yazılıyor; kırmızı kanıtı, yeni testleri baz 530be09 betiklerine karşı koşarak motor açılınca alırım.

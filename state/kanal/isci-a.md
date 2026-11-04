@@ -2,10 +2,10 @@
 
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
-- Oturum kimliği: ffcore-isci-a-08-tam-1 (önceki lease ffcore-isci-a-06b-2 RETIRED)
-- Aktif paket: yok (08-tam-1a MERGED 1d836a0; 08-tam-1b yeni oturumda)
-- Durum: RETIRED
-- Son okunan: K-08T1-0037
+- Oturum kimliği: ffcore-isci-a-08-tam-1b (önceki lease ffcore-isci-a-08-tam-1 RETIRED)
+- Aktif paket: 08-tam-1b (K-08T1B-0001)
+- Durum: ACTIVE
+- Son okunan: K-08T1B-0001
 
 ## Mesajlar
 
@@ -1808,3 +1808,29 @@ Lease: ffcore-isci-a-08-tam-1 → **RETIRED** (başlık güncellendi). `.worktre
   - yalın yığın `--profile test --profile qdrant up -d --wait postgres redis litellm fake-llm qdrant`.
 
 Sonrası yok; bu oturum durur. 08-tam-1b için kullanıcının yeni oturum açması gerekiyor (ROL=isci-a PAKET=08-tam-1b).
+
+### A-08T1B-0001 · 2026-11-04 14:06 · → koordinator · DURUM
+Paket: 08-tam-1b   Cevap: K-08T1B-0001
+DURUM: OKUMA-TAMAM. Oturum ffcore-isci-a-08-tam-1b, model **Opus 5.5** (claude-opus-5-5). Şablon fork'u (taban 8ba004c, 28 Ekim tam okuma A-INIT-0001).
+Fork diff'i okundu: `git diff 8ba004c..HEAD -- CLAUDE.md PLAN.md KARARLAR.md BASLATMA.md handbook/ plan/`: CLAUDE.md (alt başlık), PLAN 2.6-2.10 + 2d.7 PRSIM eki, KARARLAR eklemelerinin tamamı (03a/03b/04a/05a/06a/06b/06b-2/08-lite kararları, model ağırlıkları/`make models` K-04a-0020, NER adayları, PRSIM M3 koşullu ingest, şablon fork kuralı, C17 kararları bağlam istisnası A, satır kuralı + ek (b)-(f), cevap düzeyinde HTML fail-closed, (g)/(h′)/(i)), CONTRACTS C2/C3/C6/C8/C9/C11, TERMINOLOGY, RELEASE (downgrade), BASLATMA (soru penceresi yok); BLOCKERS 150-162. Ayrıca: K-08T1-0001/0002/0008/0036/0037, HANDOFF A-08T1-0050, state/pr/08-tam-1.md (1b bölümü, S1-S9), plan/08 NER/PRSIM satırları, `knowledge/models.py`, `deploy/offline/models.txt`, Makefile `models`.
+Worktree açıldı: `.worktrees/feat/08-tam-1b-ner`, dal `feat/08-tam-1b-ner`, baz main 7af41e5 (1d836a0 + yalnız state commit'leri).
+Ortam: Docker motoru şu an kapalı (`//./pipe/docker_engine` yok); `model_cache` volume'unda NER ağırlığı olup olmadığı **doğrulanmadı**. Yığın ve test-int Docker Desktop açılınca.
+
+### A-08T1B-0002 · 2026-11-04 14:06 · → koordinator · ACK
+Paket: 08-tam-1b   Cevap: K-08T1B-0001
+GOREV alındı. Sıra: state/pr/08-tam-1b.md planı (S1-S5 HANDOFF'tan, A) → DURUM: PLANNED → ilk commit FOLLOWUP-162 docs örneği (docs/api.md:540, docs/guardrail.md:128) → modelsiz dilimler sahte modelle → ağırlık gelince ölçüm. Ağırlık listesi ve tek açık soru A-08T1B-0003'te.
+
+### A-08T1B-0003 · 2026-11-04 14:06 · → koordinator · KARAR-GEREK
+Paket: 08-tam-1b   Cevap: K-08T1B-0001
+**Kullanıcıdan gereken ağırlıklar** (hiçbiri ağa bağlanılarak doğrulanmadı; boyut ve lisans model kartından offline okunacak):
+| # | Aday | HF yolu | Tahmini boyut | Lisans (doğrulanmadı) |
+|---|---|---|---|---|
+| 1 | BERTurk-NER (brief'in adayı) | `savasy/bert-base-turkish-ner-cased` | ~0,45 GB (yalnız PyTorch ağırlığı + tokenizer) | kartta etiket yok olabilir → lisanssızsa elenir |
+| 2 | BERTurk-NER (ikinci fine-tune) | `akdeniz27/bert-base-turkish-cased-ner` | ~0,45 GB | MIT olduğu düşünülüyor |
+| 3 | TabiBERT | NER başlıklı hazır model bilinmiyor; taban encoder ise eğitim kapsam dışı (ARCH-07) → **indirilmez**, elenme gerekçesi PR'da | — | — |
+Her adaydan yalnız `config.json`, `README.md`, tokenizer dosyaları, `*.safetensors` ya da `pytorch_model.bin` (TF/Flax/ONNX yok); toplam ≤ ~1 GB, `04a-knowledge-core_model_cache` volume'u.
+**Soru: indirme nasıl yapılsın?** Bugünkü `make models` NER adaylarını bilmiyor (`knowledge/models.py` yalnız bge-m3, reranker, Docling, PaddleOCR).
+- **A (önerilen):** dilim 0'da `models.py`'ye `NER_CANDIDATES` (yukarıdaki iki repo, `allow_patterns` ile) eklerim, `models-check` onları listeler; commit'ten sonra kullanıcıya bu dalın tools imajıyla tek komut veririm (`make models` + `--network none` ile `models-check` kanıtı). Ölçüm sonrası kazanan `NER_MODEL`/`NER_REVISION` olur, kaybeden `NER_CANDIDATES`'ten çıkar ve temizlik listesine girer. Etki: indirme tekrarlanabilir ve manifestle uyumlu; kullanıcı adımı dilim 0 commit'ini bekler (~1 saat).
+- **B:** kullanıcı şimdi `huggingface-cli download` ile volume'a elle indirir. Etki: hemen başlar ama yol `make models` dışı (K-04a-0020 "tek yol" kuralına aykırı), revizyon ve dosya kümesi elle tutulur.
+- **C:** ağırlıklar ölçümden sonra tek aday için indirilir. Etki: ölçüm yapılamaz, seçim ölçümsüz olur (GOREV ve KARARLAR "seçim ölçümle" ile çelişir).
+Ayrıca kullanıcıya: Docker Desktop'ın açılması (ölçüm ve test-int için).
