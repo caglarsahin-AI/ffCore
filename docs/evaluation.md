@@ -13,7 +13,8 @@ tells you per question *where* it failed: retrieval, reranking, the model, or no
 
 FFCore keeps no copy of the questions: edit them in Langfuse (its own CSV/JSON import) or seed
 them with `make seed-eval`. One Langfuse project serves every FFCore project, so a suite's
-dataset is always named `<project_key>.<suite_key>`; another name is refused with
+dataset is named `<project_key>.` followed by lower-case letters, digits, `.`, `_` or `-`
+(default `<project_key>.<suite_key>`, no `..`); another name is refused with
 `422 dataset_name_not_in_project`.
 
 ## Item format
@@ -40,11 +41,13 @@ direct questions only makes quality look better than it is.
 | `cites_source` | every expected document is among the run's sources (matched by file stem) |
 | `semantic` | cosine similarity of answer and `answer` ≥ `threshold` (default 0.8; bge-m3 dense) |
 | `llm_judge` | the rubric judge gives ≥ `pass_min` of 5 (default 4) |
-| `sql_result` | the rows of the agent's approved `run_sql`, read again, equal `sql_result` (order-free) |
+| `sql_result` | the rows of the agent's last executed `run_sql`, read again, equal `sql_result` (order-free) |
 | `latency_cost` | the run stays within `max_ms` / `max_usd` |
 
 Unanswerable items (`answerable: false`) are scored only by holding back: the agent must not
-answer them. An item passes when every scorer that ran passed; a scorer error fails the item.
+answer them. An item passes when every scorer that ran passed; a scorer error fails the item,
+and so does an item no scorer could check (`nothing_scored`: suite and item do not fit).
+`llm_judge` needs an expected `answer` (or `must_contain`); without one it is not run.
 
 Prefer the deterministic scorers (`contains`, `cites_source`, `sql_result`). The judge is a
 model; on a small local model it is the weakest signal.
@@ -58,14 +61,29 @@ calls the model directly. FFCore's judge instead:
   Langfuse),
 - sends the text through the egress guardrail of the agent's policy first, like any model call,
 - calls `EVAL_JUDGE_MODEL` as a background job (model slots, background window, quotas),
-- refuses unreadable output (`judge_output_unreadable`) instead of guessing a score.
+- keeps the question, expected answer and answer between markers and tells the model that
+  text inside them is data, not instructions,
+- reads the score from the JSON reply (a code fence is taken off) or from exactly one whole
+  `SCORE: n` line; anything else is `judge_output_unreadable` / `judge_output_ambiguous`,
+  never a guessed score.
 
 ### SQL results
 
 A run's event log does not keep query rows. `sql_result` therefore reads the agent's last
-`run_sql` statement again through the same tool (read-only database, same validator) with the
-exam starter's identity, audited as `eval_sql_check`. A cut result (`[truncated: ...]`) fails.
-Only statements a person approved are read again: the exam never approves anything.
+executed `run_sql` statement again through the same tool (read-only database, same validator)
+with the exam starter's identity, audited as `eval_sql_check` (outcome `failure` when the read
+was refused or failed). Only a call the run really made is read again: one with a successful
+tool result and, when it asked for an approval, approved by a person (the exam never approves
+anything); the tool must be one the agent version was given, discovered, its action available
+and enabled.
+
+- A person rejected the call: `sql_result` is not run (`approval_rejected`); the exam could
+  not see the rows.
+- The agent made no executed call (none, a failed one, a tool it was not given):
+  `sql_result` fails (`no_executed_sql`).
+- The read is refused or fails (`no_sql_result:sql_rejected`, `no_sql_result:sql_error`,
+  `no_sql_result:tool_error`) or is cut (`sql_result_truncated`): it fails, never an empty
+  result.
 
 ## Stage diagnosis (`outcome`)
 
@@ -98,20 +116,53 @@ GET  /api/v1/projects/{project_id}/eval-runs/{id}/stream   # SSE progress, then 
 POST /api/v1/projects/{project_id}/eval-runs/{id}/cancel
 ```
 
-Each item becomes `repeat` background runs of that version for the caller (a project member;
-read-only access cannot start one). The background worker advances the exam every
-`EVAL_ADVANCE_INTERVAL_S` seconds: it follows the runs (so they are not abandoned), scores
-finished items, links each run's trace into the Langfuse dataset run and writes the scores.
+Suites:
+
+```
+GET    /api/v1/projects/{project_id}/eval-suites
+POST   /api/v1/projects/{project_id}/eval-suites        # creates the Langfuse dataset if missing
+GET    /api/v1/projects/{project_id}/eval-suites/{id}
+PATCH  /api/v1/projects/{project_id}/eval-suites/{id}   # given fields; agent_id null: no gate
+DELETE /api/v1/projects/{project_id}/eval-suites/{id}   # soft; the dataset and its runs stay
+GET    /api/v1/projects/{project_id}/eval-suites/{id}/runs
+```
+
+Starting checks every item first (a text `input.message`, known text variables) and the size
+(items x `repeat` at most `EVAL_MAX_ITEM_RUNS`, else `422 eval_too_many_runs`), then writes
+the exam `queued` with a snapshot of the suite (`config`: scorers, threshold, `repeat`,
+`approve_tools`). A suite change applies to the next exam, never to a running one.
+
+The background worker then starts `repeat` background runs per item of that version for the
+caller (a project member; read-only access cannot start one) and turns the exam `running`. It
+advances each exam every `EVAL_ADVANCE_INTERVAL_S` seconds, one worker at a time (a lock per
+exam): it scores finished items (at most `EVAL_JUDGE_CALLS_PER_TICK` judge calls a tick),
+links each run's trace into the Langfuse dataset run, writes the scores and commits each item
+on its own. A separate follower task of the worker keeps the item runs listened, so a long
+tick never abandons them.
 
 Runs that ask the user a question are cancelled (`not_run: waiting_user`). Runs that wait for a
-tool approval are cancelled as `not_run: approval_required` unless the suite has
-`approve_tools: true`; then they wait in the normal approval queue for a person; one that
-expires there makes the item `not_run: approval_expired`. Not-run items are counted apart and
-left out of the pass rate, and the summary's `complete` is false: the exam did not finish
-unattended.
+tool approval are cancelled as `not_run: approval_required` (their pending approval is closed,
+the cancel audited) unless the suite has `approve_tools: true`; then they wait in the normal
+approval queue for a person and go on in the background queue after the decision; one that
+expires there makes the item `not_run: approval_expired`. The exam never approves anything.
+Not-run items are counted apart and left out of the pass rate, and the summary's `complete`
+is false: the exam did not finish unattended. With `repeat > 1` a not-run repeat is left out
+of the item's result; a scorer error in any repeat stays an error.
 
-A tick that keeps failing ends the exam `failed` with the error code; nothing stays `running`
-forever. To stop an exam, use `cancel`.
+A tick that keeps failing (`MAX_ATTEMPTS` ticks in a row, a tick timeout included) ends the exam
+`failed` with the error code; nothing stays `queued` or `running` forever. To stop an exam, use
+`cancel`.
+
+## Langfuse 3.120 notes (measured)
+
+- The Python SDK cannot read this server's dataset items; FFCore uses the REST API (L13).
+- `GET /scores` ignores trace filters in v1 and v2 and returns every score: FFCore reads
+  scores only by their deterministic ids (`<traceId>-<scorer>`, v2 `scoreIds`) and fails loud
+  on any row it did not ask for (L12).
+- Dataset run items written a moment ago may not be readable yet; a reader polls for a short,
+  bounded time (L17).
+- A connection error or timeout towards Langfuse is `langfuse_unreachable`, counted per item
+  like any other Langfuse failure.
 
 ## Summary and threshold
 
@@ -131,3 +182,5 @@ version you trust, not on one run.
 | `EVAL_PASS_THRESHOLD` | default pass threshold of a new suite; empty: every suite names its own |
 | `EVAL_JUDGE_MODEL` | model key (in the suite's project) of `llm_judge`; empty: `llm_judge` refused |
 | `EVAL_ADVANCE_INTERVAL_S` | advancer tick; divides 60 and stays below `RUN_ABANDON_GRACE_S` |
+| `EVAL_MAX_ITEM_RUNS` | most items x `repeat` in one exam (default 500) |
+| `EVAL_JUDGE_CALLS_PER_TICK` | judge calls per exam per advancer tick (default 20) |
