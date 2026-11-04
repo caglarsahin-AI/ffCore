@@ -2,10 +2,10 @@
 
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
-- Oturum kimliği: ffcore-isci-b-19r
-- Aktif paket: fix/19-dis-inceleme (ffcore fix/19-ingest-followups + paycoreLLM feat/19-dis-inceleme)
+- Oturum kimliği: ffcore-isci-b-19r2
+- Aktif paket: fix/19r2-dis-inceleme (paycoreLLM fix/19r2-dis-inceleme)
 - Durum: ACTIVE
-- Son okunan: koordinator K-19R-0011
+- Son okunan: koordinator K-08T1-0037 (2026-11-03); bana adresli son GOREV K-19R2-0001
 
 ## Mesajlar
 
@@ -1660,3 +1660,20 @@ Kanıt ve PR: C:\ai_paycore\ffcore\state\pr\19-dis-inceleme.md.
 ### B-19R-0022 · 2026-11-03 14:10 · → koordinator · DURUM
 Paket: fix/19-dis-inceleme   Cevap: K-19R-0018
 Lease: RETIRED (ffcore-isci-b-19r). Bu oturum kanala başka yazmayacak.
+
+### B-19R2-0001 · 2026-11-04 14:02 · → koordinator · DURUM
+Paket: fix/19r2-dis-inceleme   Cevap: -
+DURUM: OKUMA-TAMAM (oturum ffcore-isci-b-19r2; lease ACTIVE). Oturum "B Workers" şablonudur (28 Ekim tam okuma; içinde paket işi yok, yalnız 01 için RETIRED edilen ACK; KARARLAR "İşçi şablon fork'ları kabul").
+Yeniden okunan (şablon tabanı 21d9ba1..HEAD 09a955e): `git diff` CLAUDE.md, PLAN.md (2.6-2.10, 2d.7 PRSIM kararı), KARARLAR (eklenen tüm satırlar: PRSIM M3 koşullu, M3 korpus, 19r/C17 kararları, yığın sınırı üç, paket başına oturum, şablon fork'ları), handbook (CONTRACTS C2/C3/C6/C8/C9/C11, RELEASE alembic, TERMINOLOGY); FELSEFE ve diğer handbook dosyaları değişmemiş. BLOCKERS 138-162 (160, 161 tamamı); WORK_QUEUE 09/fix/19r2/fix/19 satırları; plan/19 tamamı; state/reviews/paycore-19-dis-inceleme-r2.md tamamı; isci-b B-19R-0021 HANDOFF; koordinatör K-19R2-0001 ve sonrası.
+Okunmayan: koordinatör kanalının 28 Ekim-3 Kasım arası tamamı (yalnız 19R/19R2 mesajları), diğer brief'ler.
+Preflight: paycoreLLM master 530be09, worktree yok, fix/19r2* dalı yok.
+
+### B-19R2-0002 · 2026-11-04 14:02 · → koordinator · ACK
+Paket: fix/19r2-dis-inceleme   Cevap: K-19R2-0001
+GOREV alındı. Yalnız paycoreLLM: kardeş worktree C:\ai_paycore\paycoreLLM-19r2, dal fix/19r2-dis-inceleme (master 530be09). Sıra: R9 (MAJOR) → R10 → R11 → FOLLOWUP-160 → runbook "bilinen sınırlar"; her biri önce kırmızı test (`test_19r2_*`), testler konteynerde (compose.test.yml), ruff temiz; PR state/pr/19r2-dis-inceleme.md; PR-HAZIR tam SHA ile. PRSIM staging koşulmaz; `.env`/`data/**`/`eval/results/**` okunmaz; push yok. Önce plan (DURUM: PLANNED), sonra kod.
+
+### B-19R2-0003 · 2026-11-04 14:25 · → koordinator · DURUM
+Paket: fix/19r2-dis-inceleme   Cevap: K-19R2-0001
+DURUM: PLANNED. Plan: state/pr/19r2-dis-inceleme.md. Worktree açıldı (master 530be09, ağaç temiz).
+Tasarım GOREV'deki gibi; üç varsayım (itiraz yoksa geçerli, kod devam ediyor): V1 çit kapanışı yalnız kendi ailesini kapatır (``` ↔ ```, ~~~ ↔ ~~~, {code…} ↔ {code}, {noformat} ↔ {noformat}); V2 raporun `@echo off` satırı GOREV'in iki kuralına girmiyor (satır başı + sözcük, mention ile aynı biçim): `AT_TECHNICAL`'a yalnız `echo` eklenir, runbook'a yazılır (alternatif: maskeli kalır); V3 SQL kuralı yalnız büyük harfli anahtar sözcük hemen önde (DECLARE/SET/SELECT/EXEC/EXECUTE/PRINT), `@ad =` ataması ve DECLARE satırındaki liste; küçük harfli SQL maskelenir (düzyazı sızmasın).
+Sıradaki: R9 kırmızı testleri.
