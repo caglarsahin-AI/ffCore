@@ -188,11 +188,14 @@ def _pii_findings(
                     m.group(0),
                 )
             )
-    # A NER span never overrides a regex or custom finding (checksummed values win, 08t_2); it is
-    # cut to the parts outside them and outside carried placeholders (r1 MINOR-5/6).
-    hits.extend(trim_names(text, [n for n in ner_hits if n.category in active], hits))
+    # Overlaps and the threshold first: only a regex or custom finding that is kept may cut a name
+    # (r2 MINOR-r2-2; a dropped finding must not leave the part it covered unmasked).
+    kept = [f for f in resolve_overlaps(hits) if f.score >= pii.min_confidence]
+    # A NER span never overrides a kept regex or custom finding (checksummed values win, 08t_2);
+    # it is cut to the parts outside them and outside carried placeholders (r1 MINOR-5/6).
+    names = trim_names(text, [n for n in ner_hits if n.category in active], kept)
     result = []
-    for finding in resolve_overlaps(hits):
+    for finding in resolve_overlaps([*kept, *names]):
         if finding.score < pii.min_confidence:
             continue
         setting = active[finding.category]
