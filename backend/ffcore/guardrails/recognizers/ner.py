@@ -129,13 +129,19 @@ class LocalNer:
         self._recognizer = recognizer
         self._lock = threading.Lock()
 
-    def _recognize(self, text: str, categories: Collection[str]) -> list[Finding]:
+    def load(self) -> NerRecognizer:
+        """The model, loaded once (warm-up calls this; ModelMissing names the cache path)."""
         if not self.model or not self.revision:
             raise NerConfigError("ner_not_configured", "NER_MODEL and NER_REVISION are not set.")
         with self._lock:
             if self._recognizer is None:
                 self._recognizer = NerRecognizer.load(self.model, self.revision)
-            return self._recognizer.recognize(text, categories)
+            return self._recognizer
+
+    def _recognize(self, text: str, categories: Collection[str]) -> list[Finding]:
+        recognizer = self.load()
+        with self._lock:
+            return recognizer.recognize(text, categories)
 
     async def find(self, text: str, categories: Collection[str]) -> list[Finding]:
         return await asyncio.to_thread(self._recognize, text, categories)

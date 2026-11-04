@@ -8,7 +8,13 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ffcore.core.errors import ApiError
-from ffcore.guardrails.builtin import BUILTIN_DEFAULT, BUILTIN_KEY, DEFAULT_PII
+from ffcore.guardrails.builtin import (
+    BUILTIN_DEFAULT,
+    BUILTIN_KEY,
+    DEFAULT_PII,
+    EGRESS_PII_KEY,
+    builtin_egress_pii,
+)
 from ffcore.guardrails.engine import GuardrailEvent
 from ffcore.guardrails.masking import RedisTokenStore
 from ffcore.guardrails.schemas import (
@@ -17,6 +23,7 @@ from ffcore.guardrails.schemas import (
     PolicySpec,
     ResolvedPolicy,
 )
+from ffcore.guardrails.settings import get_guardrail_settings
 from ffcore.models.guardrails import GuardrailEventRow, GuardrailPolicy, PiiPolicy
 
 
@@ -77,7 +84,12 @@ async def resolve_pii(session: AsyncSession, project_id, key: str) -> PiiPolicyS
     row = await stored_pii(session, project_id, key)
     if row is not None:
         return pii_spec(row)
-    return DEFAULT_PII if key == BUILTIN_KEY else None
+    if key == BUILTIN_KEY:
+        return DEFAULT_PII
+    if key == EGRESS_PII_KEY:
+        # 08 tam 1b: the built-in egress PII follows GUARDRAIL_EGRESS_NER (K-08T1B-0004 A).
+        return builtin_egress_pii(get_guardrail_settings().guardrail_egress_ner)
+    return None
 
 
 async def resolve_policy(session: AsyncSession, project_id, key: str) -> ResolvedPolicy:

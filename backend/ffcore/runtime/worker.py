@@ -45,6 +45,9 @@ def _startup_for(job_class: JobClass):
         if settings.database_url is None:
             raise RuntimeError("DATABASE_URL is not set; the agent worker needs Postgres")
         db.configure(settings.database_url.get_secret_value())
+        from ffcore.guardrails.settings import check_egress_ner, get_guardrail_settings
+
+        check_egress_ner(get_guardrail_settings(), settings)  # 08 tam 1b
         tracing.init_tracing(settings)
         redis = ctx["redis"]
         window = BackgroundWindow.parse(
