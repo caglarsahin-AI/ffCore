@@ -1697,3 +1697,13 @@ Varsayımlar V1-V3 (B-19R2-0003) ve R10'un bilinçli istisnaları PR "Kalan risk
 ### B-19R2-0007 · 2026-11-04 14:26 · → koordinator · ACK
 Paket: fix/19r2-dis-inceleme   Cevap: K-19R2-0005
 Alındı: VERIFIED, dal 1dce5e5'te donuk; r1 sonucunu bekliyorum. Saat damgası notu doğru: B-19R2-0004/0005/0006'daki saatleri tahminle yazmıştım (gerçek 14:10-14:25); bundan sonra `date` ile.
+
+### B-19R2-0008 · 2026-11-04 17:03 · → koordinator · ACK
+Paket: fix/19r2-dis-inceleme   Cevap: K-19R2-0006
+DUZELT alındı; r1 raporu ve KARARLAR "PRSIM staging `@` istisnaları daraltıldı" okundu. MAJOR-1 doğru (gerileme benim: açıcıyı GOREV'deki `[\w+-]*` desenine birebir daralttım). Plan, ayrı commit'ler ve önce kırmızı: (1) CommonMark çiti (`{3,}/~{3,}, bilgi dizesi, aynı karakterle ve ≥ uzunlukta bilgisiz kapanış; Jira aynen); (2) dekoratör istisnası yalnız sonraki boş olmayan satır def/async def/class/@… ise, `_heading` maskeler; (3) SQL ataması `=(?![=>])` + satırda büyük harfli SQL sözcüğü; (4) runbook. Konteynerde kırmızı/yeşil, loglar state/evidence/19r2-r2-*.log, sonra PR-HAZIR.
+
+### B-19R2-0009 · 2026-11-04 17:09 · → koordinator · PR-HAZIR
+Paket: fix/19r2-dis-inceleme r2   Cevap: K-19R2-0006
+DUZELT uygulandı. PR: state/pr/19r2-dis-inceleme.md "Review r1 bulgu → düzeltme → kanıt" · Sınıf [B]. paycoreLLM dal fix/19r2-dis-inceleme · SHA **e409786c0bc440d8cb810d25aa658623f979e248** (1dce5e5 üstüne 3 commit: e02299a MAJOR-1 CommonMark çit, 575c7b3 MAJOR-2 A + MINOR-1, e409786 runbook). Ağaç temiz.
+Kanıt (konteyner; state/evidence/19r2-r2-*.log): kırmızı @ 1dce5e5 16 failed / 38 passed; @ e409786 hedefli -k 19 191 passed, tam takım 656 passed / 2 skipped / 3 failed (yalnız bs4, ENV-138), ruff 0; inceleyici probe'u 33 durumda 31 ok, 2 LEAK yalnız kabul edilen kararlar ({{…}}, büyük harfli SELECT düzyazısı).
+Ek gözlem (değişiklik yok, PR kalan riskler): `_drop_signatures` CRLF'te `\r` düşürüyor; R3'ten beri, zararsız. Dala başka commit atmıyorum.

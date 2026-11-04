@@ -1,0 +1,393 @@
+...............................FFFF...FFF.FFFFFFFFF...                   [100%]
+=================================== FAILURES ===================================
+_ test_19r2_rv1_major1_commonmark_fence_prose_after_masked[``` sql\nSELECT 1\n```\n@ali.veli bak\n```\nx\n```\n] _
+
+text = '``` sql\nSELECT 1\n```\n@ali.veli bak\n```\nx\n```\n'
+
+    @pytest.mark.parametrize(
+        "text",
+        [
+            # MAJOR-1: CommonMark fences: an info string with spaces or attributes, 4+ characters
+            f"{FENCE3} sql\nSELECT 1\n{FENCE3}\n@ali.veli bak\n{FENCE3}\nx\n{FENCE3}\n",
+            f"{FENCE3}js title=a\nx\n{FENCE3}\n@ali.veli bak\n{FENCE3}\ny\n{FENCE3}\n",
+            f"````\n{FENCE3}\n````\n@ali.veli bak\n{FENCE3}\n",
+            "~~~~\n~~~\n~~~~\n@ali.veli bak\n~~~\n",
+            "~~~ python\n@foo\n~~~\n@ali.veli bak\n",
+            f"{FENCE3}{{r}}\n@foo\n{FENCE3}\n@ali.veli bak\n",
+        ],
+    )
+    def test_19r2_rv1_major1_commonmark_fence_prose_after_masked(text: str) -> None:
+        out = st._scrub(text)
+>       assert "@ali.veli" not in out and "[USER] bak" in out
+E       AssertionError: assert ('@ali.veli' not in '``` sql\nSE...``\nx\n```\n'
+E         
+E         '@ali.veli' is contained here:
+E           ``` sql
+E           SELECT 1
+E           ```
+E           @ali.veli bak
+E           ```
+E           x
+E           ```)
+
+tests/test_19r2_stage_raw.py:173: AssertionError
+_ test_19r2_rv1_major1_commonmark_fence_prose_after_masked[```js title=a\nx\n```\n@ali.veli bak\n```\ny\n```\n] _
+
+text = '```js title=a\nx\n```\n@ali.veli bak\n```\ny\n```\n'
+
+    @pytest.mark.parametrize(
+        "text",
+        [
+            # MAJOR-1: CommonMark fences: an info string with spaces or attributes, 4+ characters
+            f"{FENCE3} sql\nSELECT 1\n{FENCE3}\n@ali.veli bak\n{FENCE3}\nx\n{FENCE3}\n",
+            f"{FENCE3}js title=a\nx\n{FENCE3}\n@ali.veli bak\n{FENCE3}\ny\n{FENCE3}\n",
+            f"````\n{FENCE3}\n````\n@ali.veli bak\n{FENCE3}\n",
+            "~~~~\n~~~\n~~~~\n@ali.veli bak\n~~~\n",
+            "~~~ python\n@foo\n~~~\n@ali.veli bak\n",
+            f"{FENCE3}{{r}}\n@foo\n{FENCE3}\n@ali.veli bak\n",
+        ],
+    )
+    def test_19r2_rv1_major1_commonmark_fence_prose_after_masked(text: str) -> None:
+        out = st._scrub(text)
+>       assert "@ali.veli" not in out and "[USER] bak" in out
+E       AssertionError: assert ('@ali.veli' not in '```js title...``\ny\n```\n'
+E         
+E         '@ali.veli' is contained here:
+E           ```js title=a
+E           x
+E           ```
+E           @ali.veli bak
+E           ```
+E           y
+E           ```)
+
+tests/test_19r2_stage_raw.py:173: AssertionError
+_ test_19r2_rv1_major1_commonmark_fence_prose_after_masked[````\n```\n````\n@ali.veli bak\n```\n] _
+
+text = '````\n```\n````\n@ali.veli bak\n```\n'
+
+    @pytest.mark.parametrize(
+        "text",
+        [
+            # MAJOR-1: CommonMark fences: an info string with spaces or attributes, 4+ characters
+            f"{FENCE3} sql\nSELECT 1\n{FENCE3}\n@ali.veli bak\n{FENCE3}\nx\n{FENCE3}\n",
+            f"{FENCE3}js title=a\nx\n{FENCE3}\n@ali.veli bak\n{FENCE3}\ny\n{FENCE3}\n",
+            f"````\n{FENCE3}\n````\n@ali.veli bak\n{FENCE3}\n",
+            "~~~~\n~~~\n~~~~\n@ali.veli bak\n~~~\n",
+            "~~~ python\n@foo\n~~~\n@ali.veli bak\n",
+            f"{FENCE3}{{r}}\n@foo\n{FENCE3}\n@ali.veli bak\n",
+        ],
+    )
+    def test_19r2_rv1_major1_commonmark_fence_prose_after_masked(text: str) -> None:
+        out = st._scrub(text)
+>       assert "@ali.veli" not in out and "[USER] bak" in out
+E       AssertionError: assert ('@ali.veli' not in '````\n```\n...i bak\n```\n'
+E         
+E         '@ali.veli' is contained here:
+E           ````
+E           ```
+E           ````
+E           @ali.veli bak
+E           ```)
+
+tests/test_19r2_stage_raw.py:173: AssertionError
+_ test_19r2_rv1_major1_commonmark_fence_prose_after_masked[~~~~\n~~~\n~~~~\n@ali.veli bak\n~~~\n] _
+
+text = '~~~~\n~~~\n~~~~\n@ali.veli bak\n~~~\n'
+
+    @pytest.mark.parametrize(
+        "text",
+        [
+            # MAJOR-1: CommonMark fences: an info string with spaces or attributes, 4+ characters
+            f"{FENCE3} sql\nSELECT 1\n{FENCE3}\n@ali.veli bak\n{FENCE3}\nx\n{FENCE3}\n",
+            f"{FENCE3}js title=a\nx\n{FENCE3}\n@ali.veli bak\n{FENCE3}\ny\n{FENCE3}\n",
+            f"````\n{FENCE3}\n````\n@ali.veli bak\n{FENCE3}\n",
+            "~~~~\n~~~\n~~~~\n@ali.veli bak\n~~~\n",
+            "~~~ python\n@foo\n~~~\n@ali.veli bak\n",
+            f"{FENCE3}{{r}}\n@foo\n{FENCE3}\n@ali.veli bak\n",
+        ],
+    )
+    def test_19r2_rv1_major1_commonmark_fence_prose_after_masked(text: str) -> None:
+        out = st._scrub(text)
+>       assert "@ali.veli" not in out and "[USER] bak" in out
+E       AssertionError: assert ('@ali.veli' not in '~~~~\n~~~\n...i bak\n~~~\n'
+E         
+E         '@ali.veli' is contained here:
+E           ~~~~
+E           ~~~
+E           ~~~~
+E           @ali.veli bak
+E           ~~~)
+
+tests/test_19r2_stage_raw.py:173: AssertionError
+_______________ test_19r2_rv1_major1_fenced_marks[lines0-marks0] _______________
+
+lines = ['``` sql', 'a', '```', 'b'], marks = [True, True, True, False]
+
+    @pytest.mark.parametrize(
+        ("lines", "marks"),
+        [
+            ([FENCE3 + " sql", "a", FENCE3, "b"], [True, True, True, False]),
+            (["~~~~", "~~~", "~~~~", "b"], [True, True, True, False]),
+            (["````", FENCE3 + "x", "````", "b"], [True, True, True, False]),  # info closer = code
+            ([FENCE3, "a", "~~~", "b"], [False, False, False, False]),  # never closed
+        ],
+    )
+    def test_19r2_rv1_major1_fenced_marks(lines: list[str], marks: list[bool]) -> None:
+>       assert st._fenced(lines) == marks
+E       assert [False, False, False, False] == [True, True, True, False]
+E         
+E         At index 0 diff: False != True
+E         Use -v to get more diff
+
+tests/test_19r2_stage_raw.py:192: AssertionError
+_______________ test_19r2_rv1_major1_fenced_marks[lines1-marks1] _______________
+
+lines = ['~~~~', '~~~', '~~~~', 'b'], marks = [True, True, True, False]
+
+    @pytest.mark.parametrize(
+        ("lines", "marks"),
+        [
+            ([FENCE3 + " sql", "a", FENCE3, "b"], [True, True, True, False]),
+            (["~~~~", "~~~", "~~~~", "b"], [True, True, True, False]),
+            (["````", FENCE3 + "x", "````", "b"], [True, True, True, False]),  # info closer = code
+            ([FENCE3, "a", "~~~", "b"], [False, False, False, False]),  # never closed
+        ],
+    )
+    def test_19r2_rv1_major1_fenced_marks(lines: list[str], marks: list[bool]) -> None:
+>       assert st._fenced(lines) == marks
+E       assert [False, False, False, False] == [True, True, True, False]
+E         
+E         At index 0 diff: False != True
+E         Use -v to get more diff
+
+tests/test_19r2_stage_raw.py:192: AssertionError
+_______________ test_19r2_rv1_major1_fenced_marks[lines2-marks2] _______________
+
+lines = ['````', '```x', '````', 'b'], marks = [True, True, True, False]
+
+    @pytest.mark.parametrize(
+        ("lines", "marks"),
+        [
+            ([FENCE3 + " sql", "a", FENCE3, "b"], [True, True, True, False]),
+            (["~~~~", "~~~", "~~~~", "b"], [True, True, True, False]),
+            (["````", FENCE3 + "x", "````", "b"], [True, True, True, False]),  # info closer = code
+            ([FENCE3, "a", "~~~", "b"], [False, False, False, False]),  # never closed
+        ],
+    )
+    def test_19r2_rv1_major1_fenced_marks(lines: list[str], marks: list[bool]) -> None:
+>       assert st._fenced(lines) == marks
+E       assert [False, False, False, False] == [True, True, True, False]
+E         
+E         At index 0 diff: False != True
+E         Use -v to get more diff
+
+tests/test_19r2_stage_raw.py:192: AssertionError
+_ test_19r2_rv1_major2_lone_login_masked[@ahmet.yilmaz\nKontrol eder misin?-[USER]\nKontrol eder misin?] _
+
+text = '@ahmet.yilmaz\nKontrol eder misin?'
+expected = '[USER]\nKontrol eder misin?'
+
+    @pytest.mark.parametrize(
+        ("text", "expected"),
+        [
+            ("@ahmet.yilmaz\nKontrol eder misin?", "[USER]\nKontrol eder misin?"),
+            ("@ahmet.yilmaz\n\nKontrol eder misin?", "[USER]\n\nKontrol eder misin?"),
+            ("@ahmet.yilmaz", "[USER]"),
+            ("@ahmet.yilmaz\n@mehmet.kaya\nbakar mısınız", "[USER]\n[USER]\nbakar mısınız"),
+            ("@property", "[USER]"),  # no def after it: masked (the accepted over-mask)
+        ],
+    )
+    def test_19r2_rv1_major2_lone_login_masked(text: str, expected: str) -> None:
+>       assert st._scrub(text) == expected
+E       AssertionError: assert '@ahmet.yilma...l eder misin?' == '[USER]\nKontrol eder misin?'
+E         
+E         - [USER]
+E         + @ahmet.yilmaz
+E           Kontrol eder misin?
+
+tests/test_19r2_stage_raw.py:206: AssertionError
+_ test_19r2_rv1_major2_lone_login_masked[@ahmet.yilmaz\n\nKontrol eder misin?-[USER]\n\nKontrol eder misin?] _
+
+text = '@ahmet.yilmaz\n\nKontrol eder misin?'
+expected = '[USER]\n\nKontrol eder misin?'
+
+    @pytest.mark.parametrize(
+        ("text", "expected"),
+        [
+            ("@ahmet.yilmaz\nKontrol eder misin?", "[USER]\nKontrol eder misin?"),
+            ("@ahmet.yilmaz\n\nKontrol eder misin?", "[USER]\n\nKontrol eder misin?"),
+            ("@ahmet.yilmaz", "[USER]"),
+            ("@ahmet.yilmaz\n@mehmet.kaya\nbakar mısınız", "[USER]\n[USER]\nbakar mısınız"),
+            ("@property", "[USER]"),  # no def after it: masked (the accepted over-mask)
+        ],
+    )
+    def test_19r2_rv1_major2_lone_login_masked(text: str, expected: str) -> None:
+>       assert st._scrub(text) == expected
+E       AssertionError: assert '@ahmet.yilma...l eder misin?' == '[USER]\n\nKo...l eder misin?'
+E         
+E         - [USER]
+E         + @ahmet.yilmaz
+E           
+E           Kontrol eder misin?
+
+tests/test_19r2_stage_raw.py:206: AssertionError
+_________ test_19r2_rv1_major2_lone_login_masked[@ahmet.yilmaz-[USER]] _________
+
+text = '@ahmet.yilmaz', expected = '[USER]'
+
+    @pytest.mark.parametrize(
+        ("text", "expected"),
+        [
+            ("@ahmet.yilmaz\nKontrol eder misin?", "[USER]\nKontrol eder misin?"),
+            ("@ahmet.yilmaz\n\nKontrol eder misin?", "[USER]\n\nKontrol eder misin?"),
+            ("@ahmet.yilmaz", "[USER]"),
+            ("@ahmet.yilmaz\n@mehmet.kaya\nbakar mısınız", "[USER]\n[USER]\nbakar mısınız"),
+            ("@property", "[USER]"),  # no def after it: masked (the accepted over-mask)
+        ],
+    )
+    def test_19r2_rv1_major2_lone_login_masked(text: str, expected: str) -> None:
+>       assert st._scrub(text) == expected
+E       AssertionError: assert '@ahmet.yilmaz' == '[USER]'
+E         
+E         - [USER]
+E         + @ahmet.yilmaz
+
+tests/test_19r2_stage_raw.py:206: AssertionError
+_ test_19r2_rv1_major2_lone_login_masked[@ahmet.yilmaz\n@mehmet.kaya\nbakar m\u0131s\u0131n\u0131z-[USER]\n[USER]\nbakar m\u0131s\u0131n\u0131z] _
+
+text = '@ahmet.yilmaz\n@mehmet.kaya\nbakar mısınız'
+expected = '[USER]\n[USER]\nbakar mısınız'
+
+    @pytest.mark.parametrize(
+        ("text", "expected"),
+        [
+            ("@ahmet.yilmaz\nKontrol eder misin?", "[USER]\nKontrol eder misin?"),
+            ("@ahmet.yilmaz\n\nKontrol eder misin?", "[USER]\n\nKontrol eder misin?"),
+            ("@ahmet.yilmaz", "[USER]"),
+            ("@ahmet.yilmaz\n@mehmet.kaya\nbakar mısınız", "[USER]\n[USER]\nbakar mısınız"),
+            ("@property", "[USER]"),  # no def after it: masked (the accepted over-mask)
+        ],
+    )
+    def test_19r2_rv1_major2_lone_login_masked(text: str, expected: str) -> None:
+>       assert st._scrub(text) == expected
+E       AssertionError: assert '@ahmet.yilma...bakar mısınız' == '[USER]\n[USE...bakar mısınız'
+E         
+E         - [USER]
+E         - [USER]
+E         + @ahmet.yilmaz
+E         + @mehmet.kaya
+E           bakar mısınız
+
+tests/test_19r2_stage_raw.py:206: AssertionError
+___________ test_19r2_rv1_major2_lone_login_masked[@property-[USER]] ___________
+
+text = '@property', expected = '[USER]'
+
+    @pytest.mark.parametrize(
+        ("text", "expected"),
+        [
+            ("@ahmet.yilmaz\nKontrol eder misin?", "[USER]\nKontrol eder misin?"),
+            ("@ahmet.yilmaz\n\nKontrol eder misin?", "[USER]\n\nKontrol eder misin?"),
+            ("@ahmet.yilmaz", "[USER]"),
+            ("@ahmet.yilmaz\n@mehmet.kaya\nbakar mısınız", "[USER]\n[USER]\nbakar mısınız"),
+            ("@property", "[USER]"),  # no def after it: masked (the accepted over-mask)
+        ],
+    )
+    def test_19r2_rv1_major2_lone_login_masked(text: str, expected: str) -> None:
+>       assert st._scrub(text) == expected
+E       AssertionError: assert '@property' == '[USER]'
+E         
+E         - [USER]
+E         + @property
+
+tests/test_19r2_stage_raw.py:206: AssertionError
+________________ test_19r2_rv1_major2_heading_lone_login_masked ________________
+
+    def test_19r2_rv1_major2_heading_lone_login_masked() -> None:
+>       assert st._heading("@ahmet.yilmaz") == "[USER]"
+E       AssertionError: assert '@ahmet.yilmaz' == '[USER]'
+E         
+E         - [USER]
+E         + @ahmet.yilmaz
+
+tests/test_19r2_stage_raw.py:210: AssertionError
+_ test_19r2_rv1_minor1_assignment_needs_sql_line[Sorumlu: @ahmet.yilmaz = onaylayan-Sorumlu: [USER] = onaylayan] _
+
+text = 'Sorumlu: @ahmet.yilmaz = onaylayan'
+expected = 'Sorumlu: [USER] = onaylayan'
+
+    @pytest.mark.parametrize(
+        ("text", "expected"),
+        [
+            ("Sorumlu: @ahmet.yilmaz = onaylayan", "Sorumlu: [USER] = onaylayan"),
+            ("@ahmet.yilmaz => devraldı", "[USER] => devraldı"),
+            ("@tran_id = 7", "[USER] = 7"),  # no SQL keyword on the line
+        ],
+    )
+    def test_19r2_rv1_minor1_assignment_needs_sql_line(text: str, expected: str) -> None:
+>       assert st._scrub(text) == expected
+E       AssertionError: assert 'Sorumlu: @ah...z = onaylayan' == 'Sorumlu: [USER] = onaylayan'
+E         
+E         - Sorumlu: [USER] = onaylayan
+E         + Sorumlu: @ahmet.yilmaz = onaylayan
+
+tests/test_19r2_stage_raw.py:222: AssertionError
+_ test_19r2_rv1_minor1_assignment_needs_sql_line[@ahmet.yilmaz => devrald\u0131-[USER] => devrald\u0131] _
+
+text = '@ahmet.yilmaz => devraldı', expected = '[USER] => devraldı'
+
+    @pytest.mark.parametrize(
+        ("text", "expected"),
+        [
+            ("Sorumlu: @ahmet.yilmaz = onaylayan", "Sorumlu: [USER] = onaylayan"),
+            ("@ahmet.yilmaz => devraldı", "[USER] => devraldı"),
+            ("@tran_id = 7", "[USER] = 7"),  # no SQL keyword on the line
+        ],
+    )
+    def test_19r2_rv1_minor1_assignment_needs_sql_line(text: str, expected: str) -> None:
+>       assert st._scrub(text) == expected
+E       AssertionError: assert '@ahmet.yilmaz => devraldı' == '[USER] => devraldı'
+E         
+E         - [USER] => devraldı
+E         + @ahmet.yilmaz => devraldı
+
+tests/test_19r2_stage_raw.py:222: AssertionError
+___ test_19r2_rv1_minor1_assignment_needs_sql_line[@tran_id = 7-[USER] = 7] ____
+
+text = '@tran_id = 7', expected = '[USER] = 7'
+
+    @pytest.mark.parametrize(
+        ("text", "expected"),
+        [
+            ("Sorumlu: @ahmet.yilmaz = onaylayan", "Sorumlu: [USER] = onaylayan"),
+            ("@ahmet.yilmaz => devraldı", "[USER] => devraldı"),
+            ("@tran_id = 7", "[USER] = 7"),  # no SQL keyword on the line
+        ],
+    )
+    def test_19r2_rv1_minor1_assignment_needs_sql_line(text: str, expected: str) -> None:
+>       assert st._scrub(text) == expected
+E       AssertionError: assert '@tran_id = 7' == '[USER] = 7'
+E         
+E         - [USER] = 7
+E         + @tran_id = 7
+
+tests/test_19r2_stage_raw.py:222: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_19r2_stage_raw.py::test_19r2_rv1_major1_commonmark_fence_prose_after_masked[``` sql\nSELECT 1\n```\n@ali.veli bak\n```\nx\n```\n]
+FAILED tests/test_19r2_stage_raw.py::test_19r2_rv1_major1_commonmark_fence_prose_after_masked[```js title=a\nx\n```\n@ali.veli bak\n```\ny\n```\n]
+FAILED tests/test_19r2_stage_raw.py::test_19r2_rv1_major1_commonmark_fence_prose_after_masked[````\n```\n````\n@ali.veli bak\n```\n]
+FAILED tests/test_19r2_stage_raw.py::test_19r2_rv1_major1_commonmark_fence_prose_after_masked[~~~~\n~~~\n~~~~\n@ali.veli bak\n~~~\n]
+FAILED tests/test_19r2_stage_raw.py::test_19r2_rv1_major1_fenced_marks[lines0-marks0]
+FAILED tests/test_19r2_stage_raw.py::test_19r2_rv1_major1_fenced_marks[lines1-marks1]
+FAILED tests/test_19r2_stage_raw.py::test_19r2_rv1_major1_fenced_marks[lines2-marks2]
+FAILED tests/test_19r2_stage_raw.py::test_19r2_rv1_major2_lone_login_masked[@ahmet.yilmaz\nKontrol eder misin?-[USER]\nKontrol eder misin?]
+FAILED tests/test_19r2_stage_raw.py::test_19r2_rv1_major2_lone_login_masked[@ahmet.yilmaz\n\nKontrol eder misin?-[USER]\n\nKontrol eder misin?]
+FAILED tests/test_19r2_stage_raw.py::test_19r2_rv1_major2_lone_login_masked[@ahmet.yilmaz-[USER]]
+FAILED tests/test_19r2_stage_raw.py::test_19r2_rv1_major2_lone_login_masked[@ahmet.yilmaz\n@mehmet.kaya\nbakar m\u0131s\u0131n\u0131z-[USER]\n[USER]\nbakar m\u0131s\u0131n\u0131z]
+FAILED tests/test_19r2_stage_raw.py::test_19r2_rv1_major2_lone_login_masked[@property-[USER]]
+FAILED tests/test_19r2_stage_raw.py::test_19r2_rv1_major2_heading_lone_login_masked
+FAILED tests/test_19r2_stage_raw.py::test_19r2_rv1_minor1_assignment_needs_sql_line[Sorumlu: @ahmet.yilmaz = onaylayan-Sorumlu: [USER] = onaylayan]
+FAILED tests/test_19r2_stage_raw.py::test_19r2_rv1_minor1_assignment_needs_sql_line[@ahmet.yilmaz => devrald\u0131-[USER] => devrald\u0131]
+FAILED tests/test_19r2_stage_raw.py::test_19r2_rv1_minor1_assignment_needs_sql_line[@tran_id = 7-[USER] = 7]
+16 failed, 38 passed in 1.31s

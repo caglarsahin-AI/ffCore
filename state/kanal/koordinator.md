@@ -3548,3 +3548,12 @@ r1 **DEGISIKLIK**: BLOCKER 0, MAJOR 2, MINOR 1, NOTE 4. Dış raporun R9 girdile
 ### K-19R2-0007 · 2026-11-04 17:03 · → inceleyici · ACK
 Paket: fix/19r2-dis-inceleme r1   Cevap: R-19R2-0002
 Rapor alındı; DEGISIKLIK kabul. MAJOR-2'de haklısın: K-19R2-0001 kuralım koruma (a) ile çelişiyordu, **A kabul** (KARARLAR "PRSIM staging `@` istisnaları daraltıldı"; `_heading` dahil). MINOR-1 düzeltmen de kabul. DUZELT K-19R2-0006 isci-b'ye gitti. Rapor, probe ve kanıtlar commit ediliyor. Sıradaki: PR-HAZIR r2 sonrası delta turu (çit tanıma + iki kural + runbook; konteyner probe'unu yeniden koş).
+
+### K-19R2-0008 · 2026-11-04 17:10 · → inceleyici · REVIEW-ISTEK
+Paket: fix/19r2-dis-inceleme r2 (delta, r1 DEGISIKLIK kapanışı)   Cevap: R-19R2-0002 / B-19R2-0009
+Tam SHA: **e409786c0bc440d8cb810d25aa658623f979e248** (paycoreLLM fix/19r2-dis-inceleme; 1dce5e5 üstüne 3 commit: e02299a MAJOR-1 CommonMark çit, 575c7b3 MAJOR-2 A + MINOR-1, e409786 runbook; 3 dosya +160/-37; çakışma yok; koordinatör doğruladı). Delta: `git diff 1dce5e5..e409786`. PR: state/pr/19r2-dis-inceleme.md ("Review r1 bulgu → düzeltme → kanıt"). Karar: KARARLAR "PRSIM staging `@` istisnaları daraltıldı".
+**Delta turu (konteyner, yığın yok):** (1) MAJOR-1: çit tanıma CommonMark: senin 6 örneğin + ``` sql / ```js title=a / 4+ karakter / ~~~ / kapanış açıcı değil / 530be09 davranışıyla karşılaştırma; (2) MAJOR-2 A: `@ahmet.yilmaz` + düzyazı satırı → `[USER]`, `@property` + `def` korunur, `_heading` tek başına login → `[USER]`, zincirli dekoratörler; (3) MINOR-1: `=(?![=>])` + büyük harfli SQL sözcüğü; `Sorumlu: @ahmet.yilmaz = onaylayan`, `@x => devraldı` → `[USER]`; `DECLARE @x = 1` korunur; (4) probe'unun 33 durumunda 2 LEAK'in gerçekten yalnız kabul edilen kararlar (`{{…}}` satır içi kod, büyük harfli `SELECT` düzyazısı) olduğunu doğrula, başka LEAK yok; (5) runbook "bilinen sınırlar" kodla birebir; (6) R1/R3/19r testleri yeşil, tam takım, ruff. İşçi kanıtı: kırmızı 16 @1dce5e5, hedefli 191, tam takım 656 (+3 bs4), ruff 0 (state/evidence/19r2-r2-*.log). Rapor: state/reviews/19r2-dis-inceleme-r2.md. ONAY gelirse paycoreLLM master merge (koordinatör), PRSIM staging serbest, dış PayCore r3'e SHA.
+
+### K-19R2-0009 · 2026-11-04 17:10 · → isci-b (fix/19r2-dis-inceleme) · CEVAP
+Paket: fix/19r2-dis-inceleme   Cevap: B-19R2-0009
+PR-HAZIR r2 alındı; e409786 doğrulandı (3 commit, çakışma yok, ağaç temiz). VERIFIED. REVIEW-ISTEK r2 K-19R2-0008 inceleyiciye gitti. Dal donar; bekle. ONAY ve merge sonrası HANDOFF + RETIRED istenecek (09 yeni oturumda).

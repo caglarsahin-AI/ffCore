@@ -44,6 +44,31 @@ HEAD **1dce5e57af286eec6a8498c92eb7d17cf0a7e66e** (530be09 üstüne 4 commit: 7a
 
 R1/R3 testleri (`tests/test_19r_stage_raw.py`) değişmeden geçiyor.
 
+## Review r1 bulgu → düzeltme → kanıt (DUZELT K-19R2-0006, state/reviews/19r2-dis-inceleme-r1.md)
+
+HEAD **e409786c0bc440d8cb810d25aa658623f979e248** (r1 1dce5e5 üstüne 3 commit). Delta: `git -C C:\ai_paycore\paycoreLLM-19r2 diff 1dce5e5..e409786`.
+
+| Bulgu | Düzeltme | Commit | Test | Durum |
+|---|---|---|---|---|
+| MAJOR-1 çit tanıma gerilemesi (bilgi dizesinde boşluk/öznitelik, 4+ karakter) | `MD_FENCE_OPEN` `` `{3,}``/`~{3,}` + herhangi bilgi dizesi (backtick çitinde bilgi backtick içermez); `MD_FENCE_CLOSE` aynı karakter, ≥ açılış uzunluğu, bilgisiz; Jira açılış/kapanış ayrı, ad eşleşmeli; `_fence_open` / `_fence_closes` | e02299a | `test_19r2_rv1_major1_commonmark_fence_prose_after_masked` ×6 (inceleyicinin 4 girdisi + `~~~ python` + `` ```{r} ``), `_fence_content_kept` (4'lü çit içinde ``` ```), `_fenced_marks` ×4 | geçti; 1dce5e5'te 7'si kırmızı |
+| MAJOR-2 tek başına satırdaki login (karar A) | `_decorators(lines)`: dekoratör satırı yalnız sonraki boş olmayan satır `def`/`async def`/`class` ya da yine geçerli dekoratör satırıysa (sondan başa zincir); `_mentions(line, decorator)`; `_heading` sonraki satır yok → maskeler | 575c7b3 | `test_19r2_rv1_major2_lone_login_masked` ×5 (seslenme, boş satırlı, tek satır, iki ardışık login, sonrasız `@property`), `_heading_lone_login_masked`; R10 korunanlar `@property`+`def`, `@dataclass`+`class`, boş satır + `async def`, iki dekoratör + `def` | geçti; 1dce5e5'te 6'sı kırmızı |
+| MINOR-1 SQL atama | `SQL_ASSIGN` `\s*=(?![=>])` + satırda büyük harfli SQL sözcüğü (`SQL_LINE`) | 575c7b3 | `test_19r2_rv1_minor1_assignment_needs_sql_line` ×3 (`Sorumlu: @ad = …`, `@ad => …`, `@tran_id = 7`), `_declare_assignment_kept`, R10 `SELECT @a = 1, @b_c = 2` | geçti; 1dce5e5'te 3'ü kırmızı |
+| NOTE-1 `{{…}}`, NOTE-3 `@echo` | değişmedi (karar), runbook'ta | — | probe | açık (karar) |
+| NOTE-2 `_heading` | MAJOR-2 ile kapandı | 575c7b3 | `_heading_lone_login_masked` | kapandı |
+| Runbook | çit tanımı (CommonMark, Jira), daraltılmış dekoratör ve SQL istisnaları, `SELECT @ad` kabul edilen sınır | e409786 | `test_19_runbook` | geçti |
+
+r2 komutları (konteyner, compose.test.yml; loglar `state/evidence/19r2-r2-*.log`):
+
+| Komut | Exit | Sonuç |
+|---|---|---|
+| Kırmızı: yeni/değişen testler @ 1dce5e5 (`pytest tests/test_19r2_stage_raw.py`) | 1 | 16 failed, 38 passed (`19r2-r2-red-1dce5e5.log`) |
+| Hedefli `pytest -k 19` @ e409786 | 0 | 191 passed (`19r2-r2-targeted-e409786.log`) |
+| Tam takım @ e409786 | 1 | 656 passed, 2 skipped, 3 failed (yalnız bs4: `test_data_dump`, `test_mhtml`, `test_reconvert`; ENV-138) (`19r2-r2-full-e409786.log`) |
+| `ruff check . && ruff format --check .` @ e409786 | 0 | 213 dosya (`19r2-r2-lint-e409786.log`) |
+| İnceleyici probe'u (`state/reviews/19r2-dis-inceleme-r1-probe.py`, host `python -I`) worktree @ e409786 | 0 | 33 durum: 31 ok, 2 LEAK yalnız kabul edilen kararlar (`{{@ali.veli}}`, `SELECT @ahmet.yilmaz ekibinden`) (`19r2-r2-probe-e409786.log`) |
+
+Ara commit e02299a da yeşil koşuldu (`-k 19` 180 passed, ruff temiz; log tutulmadı, yalnız konsol).
+
 ## Değişen dosyalar (paycoreLLM)
 
 - `scripts/ffcore_stage_raw.py`: çit/satır içi kod (R9), teknik `@` kuralları (R10), lookahead (F160)
@@ -75,7 +100,8 @@ NOT_RUN: `test_workers::test_a_slow_file_times_out…` zamanlama testi bu koşud
 
 ## Kalan riskler
 
-- R10 kişi maskesinden bilinçli istisnalar açar: satırda **tek başına** duran `@ahmet.yilmaz` (dekoratör biçimiyle ayırt edilemez) ve büyük harfli SQL sözcüğünden hemen sonraki `@ad` (`SELECT @ahmet.yilmaz …` düzyazısı) maskelenmez. Rapor ve GOREV bu takası kabul ediyor; runbook'ta yazılı.
+- ~~Satırda tek başına duran `@ahmet.yilmaz` maskelenmez~~ (r1 MAJOR-2 ile kapandı: yalnız def/class/dekoratör öncesindeki dekoratör satırı korunur). Kalan bilinçli istisna: büyük harfli SQL sözcüğünden hemen sonraki `@ad` (`SELECT @ahmet.yilmaz …` düzyazısı) maskelenmez; runbook'ta yazılı. Ters yönde: kodsuz yazılmış tek dekoratör satırı maskelenir (kabul edilen fazla maske).
+- `_drop_signatures` `splitlines()` + `\n` ile birleştirdiği için CRLF metinde `\r` düşer (r1 probe'unda görüldü; R3'ten beri var, bu dalda değişmedi; staging metni için zararsız).
 - V2 `@echo` liste girdisi: satır başındaki `@echo …` maskelenmez; `echo` adlı bir login olasılığı yok sayıldı.
 - Jira `{{…}}` içindeki `@ad` maskelenmez (sayma kararı); `{{@ahmet.yilmaz}}` biçiminde bahsetme nadir, runbook'ta.
 - Bilinen sınırlar değişmedi: büyük harfli `@Ahmet`, gövdedeki personel adı (NER 08 tam).
