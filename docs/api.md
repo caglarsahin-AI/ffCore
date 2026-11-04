@@ -537,7 +537,7 @@ about targets outside its scopes. Another project's model or agent, or a missing
   goes on: `X-Resume-Run-Id` follows it again from its last approval or question event (or from
   the start). The direct model path (one piece, live and buffered stream) and the external agent
   answer the same way. When a token scope's placeholder numbers are used up (it would issue
-  past 9,999,999, e.g. the request carries `<<PII_9999999>>` and a new value), the request
+  past 9,999,999, i.e. the scope has already issued 9,999,999 values), the request
   fails with `placeholder_out_of_range`: 400 `invalid_request_error` on the direct model path
   (one piece; a buffered or live stream that has started sends the error event and `[DONE]`),
   the external agent and a facade agent request's client history check; 502 `api_error` (the
