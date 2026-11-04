@@ -351,7 +351,8 @@ class EngineGuard:
         self._run_id, self._project_id = str(run_id), project_id
         self._egress = egress_enabled
         self._tokens = RedisTokenStore(redis, token_ttl_s)
-        # 08 tam 1b: the worker never loads the NER model; it asks the API (POST /internal/ner).
+        # 08 tam 1b: the worker never loads the NER model; it asks the API
+        # (POST /api/v1/internal/guardrails/ner).
         from ffcore.core.config import get_settings
 
         self._ner = ner_recognizers.HttpNer(get_settings())

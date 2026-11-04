@@ -2,7 +2,8 @@
 
 A transformers `token-classification` pipeline (no Presidio; findings are the same `Finding`
 as the regex recognizers). The model is loaded only by the API process (`LocalNer`); the agent
-and ingest workers call `POST /internal/ner` (`HttpNer`), the `/internal/embed` pattern.
+and ingest workers call `POST /api/v1/internal/guardrails/ner` (`HttpNer`), the `/internal/embed`
+pattern.
 
 Fail-loud: no model configured is `ner_not_configured`, a missing weight is `model_missing`
 (ModelMissing, offline cache only), a label the model knows but no category maps is
@@ -225,7 +226,7 @@ def service_authorization(settings) -> dict:
 
 
 class HttpNer:
-    """In the agent and ingest workers: POST /internal/ner with the service token."""
+    """In the agent and ingest workers: POST /api/v1/internal/guardrails/ner (service token)."""
 
     def __init__(self, settings) -> None:
         self._settings = settings

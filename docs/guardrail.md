@@ -276,8 +276,10 @@ starts, otherwise Compose stops with `GUARDRAIL_EGRESS_NER is not set`. Existing
 - llmaas production: `true`, with `NER_MODEL`/`NER_REVISION` and the weights from `make models`
   (without the names the API and the agent worker stop at start-up with `ner_not_configured`;
   without the weights in the offline cache the API stops at start-up with `model_missing`).
-- airgap and the PayCore M3 server: `false` until the NER weights are on the server
-  (`m3_preflight` checks that the variable is set).
+- airgap: `false` (egress is off, no NER call).
+- the PayCore M3 server (llmaas, egress on): the value follows DECISION-166, a user decision
+  that is still open; `false` there is a change-control [C] decision (KARARLAR). `m3_preflight`
+  checks that the variable is set.
 
 ## Latency
 
