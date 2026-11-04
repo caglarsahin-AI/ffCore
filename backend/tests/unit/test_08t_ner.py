@@ -172,12 +172,10 @@ class _Unset:
 
 def test_08t_6b_ner_down_fails_closed():
     client = FakeClient(error=ner.NerUnavailable("internal ner failed: 503"))
-    decision = run("Ayşe Demir 0532 123 45 67", resolved(pii_policy()), client)
-    assert decision.action == "block" and decision.text_out == ""
-    assert decision.events[0].error == "NerUnavailable"
-    # on_error=allow records the failure; nothing is sent as if NER had run.
-    decision = run("Ayşe Demir", resolved(pii_policy(), on_error="allow"), client)
-    assert decision.events[0].status == "failed"
+    # r1 MINOR-1 (A): at egress the failure is loud whatever on_error says (test_08t_23).
+    for on_error in ("block", "allow"):
+        with pytest.raises(ner.NerEgressUnavailable):
+            run("Ayşe Demir 0532 123 45 67", resolved(pii_policy(), on_error=on_error), client)
 
 
 def test_08t_6_worker_uses_http_ner(monkeypatch):
