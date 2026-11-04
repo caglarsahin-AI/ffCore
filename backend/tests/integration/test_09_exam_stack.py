@@ -141,3 +141,22 @@ def test_09_dataset_name_not_in_project():
         },
     )
     assert r.status_code == 422 and r.json()["error"]["code"] == "dataset_name_not_in_project"
+
+
+def test_09_stream_ends_with_done(exam):
+    c, pid, _, out = exam
+    with c.stream("GET", f"/api/v1/projects/{pid}/eval-runs/{out['id']}/stream") as r:
+        assert r.status_code == 200
+        text = "".join(r.iter_text())
+    assert "event: done" in text and '"status": "completed"' in text
+
+
+def test_09_2c_declined_answer_text_kept(exam):
+    c, pid, _, out = exam
+    declined = [w for w in out["summary"]["worst"] if w["outcome"] == "declined"]
+    runs = c.get(f"/api/v1/projects/{pid}/runs", params={"channel": "test"}).json()["items"]
+    labelled = [r for r in runs if r.get("outcome_label") == "declined"]
+    assert out["summary"]["outcomes"]["declined"] >= 1 or not declined
+    for r in labelled:
+        detail = c.get(f"/api/v1/projects/{pid}/runs/{r['id']}").json()
+        assert detail["output"], "a declined answer keeps its text"
