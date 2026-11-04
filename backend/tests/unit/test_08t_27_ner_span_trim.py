@@ -72,3 +72,52 @@ def test_08t_27d_pii_ner_filter_trims_too(monkeypatch):
     masked, counts = asyncio.run(ingest_mask.PiiNerFilter().mask("Ayşe Kaya05321234567 aradı"))
     assert "Ayşe" not in masked and "05321234567" not in masked
     assert counts["PERSON"] == 1 and counts["TR_PHONE"] == 1
+
+
+def _custom(min_confidence, custom_score):
+    from ffcore.guardrails.schemas import PiiPolicySpec, PolicySpec, ResolvedPolicy
+
+    pii = PiiPolicySpec.model_validate(
+        {
+            "engine": "ner",
+            "default_action": "tokenize",
+            "min_confidence": min_confidence,
+            "categories": {"PERSON": {"enabled": True}, "TR_TAX_ID": {"enabled": True},
+                           "TR_PHONE": {"enabled": True}},
+            "custom_patterns": [
+                {"name": "kayit", "category": "TR_TAX_ID", "pattern": r"Ayşe Kaya \d+",
+                 "score": custom_score}
+            ],
+        }
+    )
+    spec = PolicySpec.model_validate(
+        {"mode": "enforce", "rules": [{"type": "pii", "action": "tokenize",
+                                       "pii_policy_key": "p", "stages": ["egress"]}]}
+    )
+    return ResolvedPolicy(key="t", spec=spec, pii_policies={"p": pii}, builtin=False)
+
+
+def _run_policy(text, span, policy):
+    ctx = engine.EvalContext(
+        run_id="r1", token_store=MemoryTokenStore(), egress_enabled=True, ner=SpanNer(span)
+    )
+    return asyncio.run(engine.evaluate(text, "egress", policy, ctx=ctx))
+
+
+def test_08t_27e_trim_after_the_threshold_custom_pattern():
+    # r2 MINOR-r2-2: a finding below min_confidence must not cut the name and then vanish.
+    out = _run_policy("Ayşe Kaya 12345 aradı", "Ayşe Kaya", _custom(0.85, 0.8)).text_out
+    assert "Ayşe" not in out and "Kaya" not in out, out
+
+
+def test_08t_27f_trim_after_the_threshold_phone():
+    from ffcore.guardrails.recognizers.regex import recognize
+
+    text = "Ayşe Kaya05321234567 aradı"
+    phone = [f for f in recognize(text, ["TR_PHONE"]) if f.category == "TR_PHONE"]
+    assert phone, "the phone recognizer must see the glued number"
+    threshold = phone[0].score + 0.01  # the phone falls below min_confidence
+    out = _run_policy(text, "Ayşe Kaya05321234567", _custom(threshold, 0.99)).text_out
+    # the dropped phone no longer cuts the NER span: the digits it covered stay masked too
+    for value in ("Ayşe", "Kaya", "05321234567"):
+        assert value not in out, out
