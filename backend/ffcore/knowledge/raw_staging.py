@@ -64,6 +64,13 @@ def _prsim_path(rel: str) -> bool:
     return any(part.lower().startswith("prsim") for part in Path(rel).parts[:-1])
 
 
+def personnel_data(source: str, relpath: str) -> bool:
+    """The one personnel-data rule (KARARLAR "08 tam 1b r2 ekleri", MINOR-r2-1): a PRSIM source
+    or a `prsim*` directory on the path. Staging, the counters, the attachment names (`Ek <n>`)
+    and reindex all ask this."""
+    return _is_prsim(_norm(source)) or _prsim_path(relpath)
+
+
 def is_prsim(source: str) -> bool:
     return _is_prsim(_norm(source))
 
@@ -166,7 +173,7 @@ def iter_staged(
                 yield Rejected(rel, meta)
                 continue
             source = _norm(str(meta["source"]))
-            personnel = _is_prsim(source) or _prsim_path(rel)
+            personnel = personnel_data(source, rel)
             if personnel and not personnel_ok:
                 yield Rejected(rel, "prsim_requires_ner")
                 continue

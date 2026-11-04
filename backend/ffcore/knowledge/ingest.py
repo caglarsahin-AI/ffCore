@@ -490,7 +490,8 @@ async def ingest_document(
             settings,
             convert,
             masking,
-            personnel_data=bool(source) and raw_staging.is_prsim(str(source)),
+            # The staging rule (source or path), r2 MINOR-r2-1; filename is the tree relpath.
+            personnel_data=raw_staging.personnel_data(str(source or ""), document.filename),
         )
         if masking is not None:
             document.meta = {**document.meta, "text_filter_counts": dict(masking.counts)}
