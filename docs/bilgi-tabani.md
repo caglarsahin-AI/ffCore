@@ -39,7 +39,10 @@ python -m ffcore.cli ingest-raw --project <p> --kb <kb> --raw-dir <tree, read-on
 - `--accept-personnel-data` is the M3 measurement mode: it keeps `pii_regex` (identifiers only,
   person names not masked) so the measured manifest stays as it was, and is logged as such.
   Documents ingested before 08 full 1b keep `pii_regex@1`; a reindex applies the filter the
-  document records.
+  document records. A run never processes a record written under another filter: the same
+  bytes recorded as `pii_regex@1` in a `pii_ner` run (or the other way round) are refused as
+  `text_filter_mismatch`, counted, and the record stays as it is (a PRSIM record from the M3
+  mode is never retried with names unmasked).
 - The record key is the path inside the tree; an unchanged file (same sha256) is `unchanged`
   and not processed again. The breadcrumb from the meta file is used when given.
 - Refused, counted, never silently skipped: `path_outside_base` (symlink, `..`, outside the
@@ -49,7 +52,8 @@ python -m ffcore.cli ingest-raw --project <p> --kb <kb> --raw-dir <tree, read-on
   (`customer_data_suspected`).
 - The output is counts only. The manifest (`--manifest-out`, never under the tree) holds stage
   (`full` or `stage0-pipeline-evidence` with `--limit`), per-source documents and chunks, current
-  statuses, `failed`/`timeout`, refusals and `raw_manifest_sha256`.
+  statuses, `failed`/`timeout`, refusals, `text_filter` (the run's), `text_filters` (documents
+  and chunks per filter the documents carry), `text_filter_mismatch` and `raw_manifest_sha256`.
 - Deleting a document keeps raw and silver files (FOLLOWUP-133).
 
 ## Conversion

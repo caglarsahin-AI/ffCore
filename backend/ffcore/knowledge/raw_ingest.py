@@ -1,7 +1,8 @@
 """`python -m ffcore.cli ingest-raw` (19): a raw-staging tree into one knowledge base.
 
-Each accepted file goes through C6 `ingest_from_raw` with the `pii_regex` filter, always: there is
-no option to leave it off (plan/19 şart 1). A file whose bytes are already indexed under the same
+Each accepted file goes through C6 `ingest_from_raw` with a named text filter, always (`pii_ner`;
+`pii_regex` in the M3 measurement mode): there is no option to leave it off (plan/19 şart 1). A
+record written under another filter is refused (`text_filter_mismatch`), never processed again. A file whose bytes are already indexed under the same
 name is `unchanged` and not touched again (the second run reports `created 0`). Same bytes in any
 other status but `skipped` (a gate decision on these bytes) is `retried`: the pipeline runs again
 on the same record, no new version (FOLLOWUP-155: a fixed environment must not leave a failed
@@ -81,19 +82,29 @@ class RawIngestReport:
     personnel_data_sources: set[str] = field(default_factory=set)
     # (source, relpath, error code) of files that failed before their record was registered.
     unregistered: list[tuple[str, str, str]] = field(default_factory=list)
+    # r1 MAJOR-3: same bytes recorded under another filter, refused (never processed again).
+    text_filter_mismatch: int = 0
 
     def manifest(self) -> dict:
         sources: dict[str, dict[str, int]] = {}
+        filters: dict[str, dict[str, int]] = {}
         for relpath, _, source in self.files:
+            _, chunks, label = self.current.get(relpath, ("", 0, None))
             entry = sources.setdefault(source, {"documents": 0, "chunks": 0})
             entry["documents"] += 1
-            entry["chunks"] += self.current.get(relpath, ("", 0))[1]
-        statuses = Counter(status for status, _ in self.current.values())
+            entry["chunks"] += chunks
+            # The filter each document was written with, from the database (r1 MAJOR-3).
+            per = filters.setdefault(label or "none", {"documents": 0, "chunks": 0})
+            per["documents"] += 1
+            per["chunks"] += chunks
+        statuses = Counter(status for status, _, _ in self.current.values())
         listing = "".join(f"{relpath} {sha}\n" for relpath, sha, _ in sorted(self.files))
         return {
             "stage": self.stage,
             "ingested_at": self.ingested_at,
             "text_filter": ingest_mask.resolve(self.text_filter).label,
+            "text_filters": dict(sorted(filters.items())),
+            "text_filter_mismatch": self.text_filter_mismatch,
             "documents": len(self.files),
             "chunks": sum(e["chunks"] for e in sources.values()),
             "sources": dict(sorted(sources.items())),
@@ -120,13 +131,14 @@ class RawIngestReport:
             f"retried {self.outcomes['retried']}",
             # Every document of the tree as the database has it (the manifest's statuses), not
             # only this run's: an unchanged failure stays visible (FOLLOWUP-155).
-            f"status: {fmt(Counter(status for status, _ in self.current.values()))}",
+            f"status: {fmt(Counter(status for status, _, _ in self.current.values()))}",
             f"failed_unregistered {len(self.unregistered)}",
             *(
                 f"  unregistered: {source} {relpath} {code}"
                 for source, relpath, code in sorted(self.unregistered)
             ),
             f"rejected: {fmt(self.rejected)}",
+            f"text_filter_mismatch {self.text_filter_mismatch}",
             f"gates: {fmt(self.gates)}",
             f"masked ({self.text_filter}): {fmt(self.masked)}",
             "stage: "
@@ -168,7 +180,7 @@ async def _current(kb_id, filename: str):
     async with db.session_scope() as session:
         return (
             await session.execute(
-                select(Document.id, Document.sha256, Document.status).where(
+                select(Document.id, Document.sha256, Document.status, Document.meta).where(
                     Document.kb_id == kb_id,
                     Document.filename == filename,
                     Document.deleted_at.is_(None),
@@ -214,7 +226,7 @@ async def _fill_current(report: RawIngestReport, kb_id) -> None:
     names = [relpath for relpath, _, _ in report.files]
     async with db.session_scope() as session:
         rows = await session.execute(
-            select(Document.filename, Document.status, func.count(Chunk.id))
+            select(Document.filename, Document.status, Document.meta, func.count(Chunk.id))
             .outerjoin(
                 Chunk, (Chunk.document_id == Document.id) & (Chunk.chunk_status != "skipped")
             )
@@ -223,9 +235,12 @@ async def _fill_current(report: RawIngestReport, kb_id) -> None:
                 Document.filename.in_(names),
                 Document.deleted_at.is_(None),
             )
-            .group_by(Document.filename, Document.status)
+            .group_by(Document.id, Document.filename, Document.status)
         )
-        report.current = {name: (status, count) for name, status, count in rows}
+        report.current = {
+            name: (status, count, (meta or {}).get("text_filter"))
+            for name, status, meta, count in rows
+        }
 
 
 class InvalidEncoding(ValueError):
@@ -315,6 +330,7 @@ async def ingest_tree(
         ingested_at=datetime.now(UTC).isoformat(timespec="seconds"),
         text_filter=text_filter,
     )
+    label = ingest_mask.resolve(text_filter).label
     entries = raw_staging.iter_staged(
         raw_dir,
         sources,
@@ -342,6 +358,14 @@ async def ingest_tree(
         report.files.append((entry.relpath, sha256, raw_staging.source_of(entry)))
         existed = await _current(kb.id, entry.relpath)
         same_bytes = existed is not None and existed.sha256 == sha256
+        if same_bytes and (existed.meta or {}).get("text_filter") != label:
+            # r1 MAJOR-3: a record written under another filter is never processed again by
+            # this run (a PRSIM `pii_regex` record is never retried by `pii_ner`), nor counted
+            # as unchanged under this run's label. Refused and counted; the manifest shows the
+            # filter each document carries.
+            report.text_filter_mismatch += 1
+            log.warning("ingest-raw rejected path=%s code=text_filter_mismatch", entry.relpath)
+            continue
         if same_bytes and existed.status in DONE:
             report.outcomes["unchanged"] += 1
             continue
@@ -349,7 +373,7 @@ async def ingest_tree(
         try:
             if same_bytes:
                 # Not through ingest_from_raw: its registration bumps the version even for the
-                # same bytes. The record keeps its filter (`metadata.text_filter`).
+                # same bytes. The record's filter is this run's (checked above).
                 await _clear_error(existed.id)
                 await ingest.ingest_document(
                     existed.id,
