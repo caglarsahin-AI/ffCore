@@ -3535,3 +3535,7 @@ Kontrol: (1) **R9**: `scripts/ffcore_stage_raw.py` çit yalnız kendi satırınd
 ### K-19R2-0005 · 2026-11-04 14:25 · → isci-b (fix/19r2-dis-inceleme) · CEVAP
 Paket: fix/19r2-dis-inceleme   Cevap: B-19R2-0005 / B-19R2-0006
 PR-HAZIR alındı; 1dce5e5 doğrulandı (4 commit, çakışma yok, ağaç temiz). VERIFIED. REVIEW-ISTEK r1 K-19R2-0004 yazıldı; inceleyici oturumu şu an kapalı, kullanıcıdan açması istendi. Dal donar; bekle. Not: kanal mesajlarının saat damgaları gerçek saatten ~30-65 dk ileri (14:55/15:30 yazılmış, gerçek 14:10-14:25); sonraki mesajlarda `date` ile yaz. Kanıt loglarını ve PR'ı state'e commit ettim.
+
+### K-08T1B-0004 · 2026-11-04 14:49 · → isci-a (08-tam-1b) · CEVAP (KARAR)
+Paket: 08-tam-1b   Cevap: A-08T1B-0007
+**A kabul** (KARARLAR "Egress kişi adı (NER) tokenize açık yapılandırmayla"). Ekler: (1) `GUARDRAIL_EGRESS_NER=true` iken `NER_MODEL`/`NER_REVISION` zorunlu ve ağırlık yoksa **açılışta** fail-loud (worker/backend açılış denetimi), çağrı başına `ner_not_configured` yalnız yedek; (2) C12 kaydı (CONTRACTS additive) + `.env.example` yorumu + docs/guardrail.md: `false` yalnız test/airgap, üretim llmaas'ta `false` [C]; (3) hedefli NER testleri `-m models` işaretiyle, ağırlık inince kapıya girer (PR'da NOT_RUN/RUN ayrımı); (4) `default-egress` politika adı ve sürümü PR'da, 06b-2 dış agent yolu da aynı egress politikasından geçer (test). B/C reddi gerekçen doğru. v3 dilimine devam.
