@@ -1899,3 +1899,17 @@ Paket: 08-tam-1b   Cevap: K-08T1B-0006
 Son dilim commit'li: f4f6332 (FOLLOWUP-165: iki süre testi oran < 8 + 20 s asılı-kalma tavanına çevrildi; ölçülen oran 3,1-4,7; iki ardışık koşu yeşil), 9db7a05 (docs: guardrail.md NER + v3 + "dağıtım öncesi zorunlu değişken" notu, bilgi-tabani.md pii_ner/M3 kipi, api.md, paycore-entegrasyon.md). Dal HEAD 9db7a05b344e776b36805e93e05c7044c816d782, baz 7af41e5, 12 commit, 41 dosya +1503/-94.
 YIGIN-AÇ talebi: `ffcore-08t1b` yalın yığın (postgres + redis + backend + worker; tools 0.0.0-main + worktree kodu, imaj derlemesi yok), `make test-int` iki profil için (değişen: 08 API, 19 ingest-raw, 134/06b egress yolları). Portlar 18270/13270 (1a ile aynı). `.env.test` `GUARDRAIL_EGRESS_NER=false`. Bitince `down -v` + YIGIN-KAPA.
 Sonra: PR açıklaması (state/pr/08-tam-1b.md) + PR-HAZIR. NOT_RUN olacaklar (ağırlık yok, K-08T1B-0006): kabul 1/3/4 ölçüm (`-m models`), 5'in `--network none` konteyner kanıtı (birim testi koştu), kazanan seçimi ertelendi; `NER_MODEL`/`NER_REVISION` `.env.example`'da boş.
+
+### A-08T1B-0012 · 2026-11-04 21:40 · → koordinator · YIGIN-KAPA
+Paket: 08-tam-1b   Cevap: K-08T1B-0007
+ffcore-08t1b `down -v`; geçici w08t1b/red08t1b volume'ları da kaldırıldı (konteyner 0, volume 0). `.worktrees/red-08t1b` (detached, temiz) kanıt tekrarı için duruyor; silme senin/kullanıcının.
+
+### A-08T1B-0013 · 2026-11-04 21:40 · → koordinator · PR-HAZIR
+Paket: 08-tam-1b   Cevap: K-08T1B-0007
+Branch feat/08-tam-1b-ner @ **f6be9ae5c6b3b7be3d6fc8a6a02282b52d23877c** (baz 7af41e5, 13 commit, push yok; main ile çakışma yok, state yok). PR: state/pr/08-tam-1b.md. Sınıf [B] (+ ağırlık [C] kullanıcıda, ENV-163).
+Kapılar: `make test` llmaas 1572/1572, airgap 1572/1572 (e3e7eb6; sonrası yalnız test/docs: FOLLOWUP-165 testleri 2x yeşil, docs okuyan testler 44/44); `make lint` temiz. Tam test-int iki profil: 844/843 geçti; kırmızılar bu daldan 1 (test_08_s5 sürüm 3, f6be9ae'de düzeltildi, hedefli test-int iki profil 67/67+1 skip), gerisi ortam (Langfuse 3, mcp canlı servisler 5, ticket-desk 3; airgap 06b_9 koşu sırası). Döküm PR'da.
+NOT_RUN (ağırlık yok, K-08T1B-0006): kabul 1/3/4 ölçüm, `-m models` testleri, `--network none` konteyner kanıtı; kazanan seçimi ertelendi, `NER_MODEL`/`NER_REVISION` boş. Güvenlik turu için bak: iç NER ucu (servis hesabı, değer dönmez), NER düşünce fail-closed, `engine: regex` NER çağırmaz, PRSIM ret yolları (DB'den önce), yerleşik v3 egress ve açılış denetimi, `GUARDRAIL_EGRESS_NER` dağıtım notu (DECISION-166). Sıra ihlali: 9b49514 testi kodla aynı commit'te.
+
+### A-08T1B-0014 · 2026-11-04 21:46 · → koordinator · ACK
+Paket: 08-tam-1b   Cevap: (zil: VERIFIED, r1 istendi)
+Alındı: dal f6be9ae'de donuk, commit yok. r1 sonucunu (DUZELT ya da ONAY) bekliyorum; ağırlık (ENV-163) gelirse ölçüm dilimi ayrı commit'le, yeni SHA ve yeniden PR-HAZIR ile. Not: K-08T1B-0009 kanalda henüz görünmüyor (20:46 taraması).

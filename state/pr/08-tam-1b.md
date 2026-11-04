@@ -1,6 +1,6 @@
 # PR: 08 tam dilim 1b — Türkçe NER tanıyıcısı, `/internal/ner`, `pii_ner` ingest filtresi, PRSIM guard'ı
 
-**Paket:** 08-tam-1b · **Sınıf:** [B]; NER ağırlıkları [C] (kullanıcı `make models`, K-08T1B-0002 A) · **Branch:** feat/08-tam-1b-ner · **Baz commit:** 7af41e5 (main; 1d836a0 + yalnız state commit'leri) · **Oturum:** ffcore-isci-a-08-tam-1b (Opus 5.5) · **Durum:** IMPLEMENTED (test-int ve ölçüm bekliyor) · **HEAD:** 9db7a05b344e776b36805e93e05c7044c816d782 (12 commit)
+**Paket:** 08-tam-1b · **Sınıf:** [B]; NER ağırlıkları [C] (kullanıcı `make models`, K-08T1B-0002 A) · **Branch:** feat/08-tam-1b-ner · **Baz commit:** 7af41e5 (main; 1d836a0 + yalnız state commit'leri) · **Oturum:** ffcore-isci-a-08-tam-1b (Opus 5.5) · **Durum:** VERIFIED (ölçüm NOT_RUN, ağırlık bekliyor) · **HEAD:** f6be9ae5c6b3b7be3d6fc8a6a02282b52d23877c (13 commit)
 
 Kaynak: GOREV K-08T1B-0001, kararlar K-08T1-0002 (S1-S9 A; 1b'ye düşen S1-S5), K-08T1B-0002 (indirme yolu A), HANDOFF A-08T1-0050, state/pr/08-tam-1.md "08-tam-1b" bölümü (bu plan onu güncel koda göre ayrıntılandırır).
 
@@ -108,6 +108,7 @@ Hiçbir aday ad-soyad ≥ 0,85 ya da P95 < 300 ms tutmazsa ölçüm tablosuyla K
 | 266c332 → e3e7eb6 | 3: yerleşik v3 `default-egress`, `GUARDRAIL_EGRESS_NER`, açılış denetimi | d97f290'da toplama hatası |
 | f4f6332 | FOLLOWUP-165: iki süre testi oran + asılı-kalma tavanı | oran 3,1-4,7 (eşik 8) |
 | 9db7a05 | docs | — |
+| f6be9ae | test-int: `test_08_s5` yerleşik sürüm 3 | tam test-int'te kırmızı (2 bekliyordu) |
 
 Kanıt dosyaları: `state/evidence/08t1b-*.log` (red/green dilim 0-4, maketest, maketest3).
 
@@ -135,7 +136,7 @@ Kanıt dosyaları: `state/evidence/08t1b-*.log` (red/green dilim 0-4, maketest, 
 | 16 | Yerleşik v3 egress PERSON; metin aşamaları NER çağırmaz; açılış denetimi; dış agent aynı politika | `test_08t_16_*` (a-g) | geçti |
 | 17 | `engine: ner` kabul; `engine: regex` NER çağırmaz | `test_08t_17*` | geçti |
 | 18 | Adaylar `make models` ile, yalnız izinli dosyalar | `test_08t_18*` | geçti |
-| 19 | `make test` iki profil, `make lint`, test-int | kapı | make test/lint geçti; test-int bekliyor (YIGIN-AÇ A-08T1B-0011) |
+| 19 | `make test` iki profil, `make lint`, test-int | kapı | make test/lint geçti; test-int aşağıda (ortam dışı kırmızılar ayrık) |
 
 ### Çalıştırılan komutlar
 
@@ -145,8 +146,16 @@ Kanıt dosyaları: `state/evidence/08t1b-*.log` (red/green dilim 0-4, maketest, 
 | `make test` | `DEPLOY_PROFILE=airgap` | 0 | 1572/1572 (e3e7eb6) |
 | `make lint` | — | 0 | temiz (e3e7eb6); f4f6332/9db7a05'te ruff check + format --check temiz |
 | `pytest tests/unit/test_08t_r3_url_scan.py` ×2 | llmaas | 0 | 6/6 (f4f6332) |
-| `make test-int` | yığın ffcore-08t1b | — | **bekliyor** |
+| `make test-int` (tam) | yığın ffcore-08t1b: postgres, redis, litellm, fake-llm, qdrant; `DEPLOY_PROFILE=llmaas` | 2 | 844 geçti, 9 düştü, 3 hata, 5 atlandı (22 dk); `state/evidence/08t1b-testint-llmaas.log` |
+| `make test-int` (tam) | aynı yığın; `airgap` | 2 | 843 geçti, 9 düştü, 4 hata, 5 atlandı; `08t1b-testint-airgap.log` |
+| hedefli test-int `test_08_api`, `test_06b_direct`, `test_19_ingest_raw` (f6be9ae) | aynı yığın; airgap ve llmaas | 0 | 67 geçti, 1 atlandı (her profil); `08t1b-testint-targeted-*.log` |
 | `make models` | kullanıcı makinesi | — | **NOT_RUN** (ENV-163, kullanıcıda) |
+
+Tam test-int kırmızılarının dökümü (iki profil aynı):
+- **Bu daldan, düzeltildi:** `test_08_s5_builtin_default_listed_until_overridden` (`builtin_version` 2 bekliyordu) → f6be9ae; hedefli koşu iki profilde yeşil.
+- **Ortam (yalın yığında olmayan servisler, bu dal dokunmuyor):** `test_02_langfuse` 3 test (Langfuse yok), `test_05a_live_services` 5 test (backend/mcp-sql/mcp-search konteynerleri yok), `test_18td_tools_api` 3 hata (ticket-desk yok).
+- **Koşu sırası:** airgap `test_06b_9` kurulum hatası: aynı LiteLLM, llmaas koşusundan kalan model kaydını silerken `/model/delete` 400; hedefli airgap koşusunda geçti.
+Tam yığınla (Langfuse, mcp-*, ticket-desk) koşu inceleyicinin yığınında.
 
 Not: d97f290'daki ilk llmaas koşusunda 1a'nın `test_08t_r3_long_line_in_one_character_pieces` süre testi yük altında düştü (1562/1563); tek başına 4/4 geçti; FOLLOWUP-165 ile f4f6332'de oran testine çevrildi.
 

@@ -1,0 +1,6 @@
+=========================== short test summary info ============================
+FAILED tests/unit/test_09_engine.py::test_09_judge_guardrail_source_is_an_08_event_source
+FAILED tests/unit/test_09_engine.py::test_09_exam_is_queued_until_every_item_run_started
+FAILED tests/unit/test_09_engine.py::test_09_broken_start_ends_exam_failed - ...
+FAILED tests/unit/test_09_engine.py::test_09_repeated_tick_failure_ends_exam_failed
+4 failed, 23 deselected in 3.45s
