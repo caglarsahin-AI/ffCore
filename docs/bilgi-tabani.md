@@ -43,6 +43,9 @@ python -m ffcore.cli ingest-raw --project <p> --kb <kb> --raw-dir <tree, read-on
   bytes recorded as `pii_regex@1` in a `pii_ner` run (or the other way round) are refused as
   `text_filter_mismatch`, counted, and the record stays as it is (a PRSIM record from the M3
   mode is never retried with names unmasked).
+- Attachment file names are masked too: in a personnel-data source (PRSIM) the shown name
+  (attachment record, silver heading, chunk breadcrumb) is `Ek <n>`; in other sources the name
+  goes through the text filter with `_` and `-` read as spaces. The raw file keeps its name.
 - The record key is the path inside the tree; an unchanged file (same sha256) is `unchanged`
   and not processed again. The breadcrumb from the meta file is used when given.
 - Refused, counted, never silently skipped: `path_outside_base` (symlink, `..`, outside the

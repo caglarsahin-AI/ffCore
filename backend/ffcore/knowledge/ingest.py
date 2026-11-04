@@ -28,7 +28,7 @@ from sqlalchemy import select
 
 from ffcore.core import db
 from ffcore.core.config import Settings
-from ffcore.knowledge import gates, ingest_mask, scope
+from ffcore.knowledge import gates, ingest_mask, raw_staging, scope
 from ffcore.knowledge.chunking import (
     BREADCRUMB_SEPARATOR,
     ChunkingError,
@@ -356,15 +356,27 @@ async def _attachment_texts(
     settings,
     convert: Converter,
     text_filter: Callable[[str], Awaitable[str]] | None = None,
+    personnel_data: bool = False,
 ) -> list[tuple[str, str]]:
-    """Convert the document's attachments; data dumps and low quality are recorded, not used."""
+    """Convert the document's attachments; data dumps and low quality are recorded, not used.
+
+    The shown name (attachment row, silver heading, chunk breadcrumb) is inside the personnel-data
+    boundary (r1 MAJOR-4): `Ek <n>` in a personnel-data source, otherwise the name through the
+    text filter with `_`/`-` read as spaces. Gate 0 and the converter see the real file name;
+    `raw_path` is the real file."""
     texts = []
-    for name in names:
+    for n, name in enumerate(names, 1):
         path = raw / name
+        if personnel_data:
+            shown = f"Ek {n}"
+        elif text_filter is not None:
+            shown = await text_filter(re.sub(r"[_-]+", " ", name))
+        else:
+            shown = name
         attachment = Attachment(
             id=uuid.uuid4(),
             document_id=document.id,
-            filename=name,
+            filename=shown,
             size=path.stat().st_size,
             raw_path=str(path),
         )
@@ -386,10 +398,10 @@ async def _attachment_texts(
         if dump:
             attachment.gate2_status, attachment.gate2_reason = "skipped", f"data_dump:{dump}"
             continue
-        verdict = gates.text_quality(text, title=name)
+        verdict = gates.text_quality(text, title=shown)
         attachment.gate2_status, attachment.gate2_reason = verdict
         if verdict[0] != "skipped":
-            texts.append((name, text))
+            texts.append((shown, text))
     await session.flush()
     return texts
 
@@ -469,8 +481,16 @@ async def ingest_document(
         body = clean_markdown(text_md)
         if masking is not None:
             body = await masking(body)
+        source = (document.meta or {}).get("source")
         extra = await _attachment_texts(
-            session, document, attachments or [], raw.parent, settings, convert, masking
+            session,
+            document,
+            attachments or [],
+            raw.parent,
+            settings,
+            convert,
+            masking,
+            personnel_data=bool(source) and raw_staging.is_prsim(str(source)),
         )
         if masking is not None:
             document.meta = {**document.meta, "text_filter_counts": dict(masking.counts)}
