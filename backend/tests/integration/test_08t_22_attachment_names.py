@@ -109,3 +109,32 @@ def test_08t_22b_other_source_attachment_name_through_the_filter(
     _assert_no_name(attachments, chunks, silver)
     assert [filename for filename, _ in attachments] == ["[PERSON] izin.txt"]
     assert report.masked["PERSON"] >= 1
+
+
+def test_08t_22c_prsim_by_path_is_ek_n_too(world, pg, settings, tmp_path, monkeypatch):
+    # r2 MINOR-r2-1: staging marks a file as personnel data by its source OR a `prsim*` directory
+    # on its path; the attachment name follows the same rule (one decision, KARARLAR r2 ekleri).
+    monkeypatch.setattr(ingest_mask, "ner_client", lambda: FakeNer())
+    kb = create_kb(world, key="prsim-by-path")
+    tree = tmp_path / "raw"
+    here = tree / "confluence" / "HR" / "PRSIM-ARSIV" / "123"
+    here.mkdir(parents=True)
+    (here / "123.md").write_text(BODY, encoding="utf-8")
+    (here / "ayse_demir_izin.txt").write_text(ATTACHMENT_BODY, encoding="utf-8")
+    meta = {
+        "source": "confluence:HR",
+        "source_item_id": "confluence:123",
+        "title": "123",
+        "attachments": ["ayse_demir_izin.txt"],
+    }
+    (here / "123.md.meta.json").write_text(json.dumps(meta), encoding="utf-8")
+    report = _run(
+        settings, pg, world, kb["key"], tree, sources=["confluence:HR"], text_filter="pii_ner"
+    )
+    assert report.statuses == {"indexed": 1}, report.lines()
+    assert report.manifest()["personnel_data_sources"] == ["confluence:HR"]
+    attachments, chunks, silver = _stored(pg, kb["id"])
+    assert [filename for filename, _ in attachments] == ["Ek 1"]
+    for value in ("ayse", "demir"):
+        assert value not in silver.lower()
+        assert all(value not in crumb.lower() for crumb, _ in chunks)
