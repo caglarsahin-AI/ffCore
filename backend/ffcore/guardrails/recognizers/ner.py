@@ -176,7 +176,7 @@ class HttpNer:
         async with egress.SafeOutboundClient(timeout=timeout, settings=self._settings) as client:
             response = await client.request(
                 "POST",
-                f"{self._settings.internal_api_url.rstrip('/')}/internal/ner",
+                f"{self._settings.internal_api_url.rstrip('/')}/api/v1/internal/guardrails/ner",
                 headers=service_authorization(self._settings),
                 json={"text": text, "categories": sorted(categories)},
             )

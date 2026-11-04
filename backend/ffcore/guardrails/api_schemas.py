@@ -13,6 +13,7 @@ from ffcore.guardrails.categories import (
     EVENT_SOURCES,
     LANGUAGES,
     MODES,
+    NER_CATEGORIES,
     ON_ERROR,
     STAGES,
 )
@@ -32,7 +33,9 @@ class PiiPolicyCreate(Strict):
     key: PolicyKey
     name: str = Field(min_length=1, max_length=200)
     engine: Literal["regex", "ner"] = Field(
-        default="regex", description="`ner` arrives with the full guardrail package (422 now)."
+        default="regex",
+        description="`ner`: the regex recognizers plus the NER model (PERSON, ORGANIZATION, "
+        "LOCATION); needs NER_MODEL / NER_REVISION.",
     )
     default_action: Literal[ACTIONS] = "redact"
     languages: list[Locale] = Field(default_factory=lambda: list(LANGUAGES))
@@ -199,3 +202,27 @@ class DecisionOut(BaseModel):
     policy_key: str
     builtin: bool
     events: list[EventOut]
+
+
+# --- 08 tam 1b: internal NER (service account) ---
+
+
+class NerRequest(Strict):
+    text: str = Field(max_length=200_000)
+    categories: list[Literal[NER_CATEGORIES]] = Field(min_length=1)
+
+
+class NerFindingOut(BaseModel):
+    """A span and its category; never the value (the caller holds the text)."""
+
+    category: Literal[NER_CATEGORIES]
+    start: int
+    end: int
+    score: float
+    evidence: str
+
+
+class NerResponse(BaseModel):
+    model: str
+    revision: str
+    findings: list[NerFindingOut]

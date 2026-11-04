@@ -22,6 +22,8 @@ EXPECTED = {
     P + "/guardrail-policies/{policy_id}": {"get", "patch", "delete"},
     P + "/guardrails/test": {"post"},
     "/api/v1/internal/guardrails/evaluate": {"post"},
+    # 08 tam 1b: the workers' NER (service account).
+    "/api/v1/internal/guardrails/ner": {"post"},
 }
 
 

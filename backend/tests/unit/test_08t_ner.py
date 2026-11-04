@@ -255,10 +255,30 @@ def test_08t_6c_http_ner_rebuilds_values_and_checks_model(monkeypatch):
     )
     client = ner.HttpNer(settings)
     found = asyncio.run(client.find("Bay Ayşe Demir geldi", ["PERSON"]))
-    assert calls[0][1] == "http://backend:8000/internal/ner"
+    assert calls[0][1] == "http://backend:8000/api/v1/internal/guardrails/ner"
     assert calls[0][2] == {"text": "Bay Ayşe Demir geldi", "categories": ["PERSON"]}
     assert found[0].value == "Ayşe Demir" and found[0].category == "PERSON"
 
     settings = base.model_copy(update={"ner_model": "other/model", "ner_revision": "x"})
     with pytest.raises(ner.NerUnavailable):
         asyncio.run(ner.HttpNer(settings).find("Bay Ayşe Demir geldi", ["PERSON"]))
+
+
+def test_08t_6d_internal_ner_returns_spans_not_values(monkeypatch):
+    from ffcore.api import guardrails as api
+    from ffcore.core.errors import ApiError
+    from ffcore.guardrails.api_schemas import NerRequest
+
+    rec = recognizer([("Ayşe Demir", "PER", 0.97), ("Ankara", "LOC", 0.9)])
+    client = ner.LocalNer("acme/turkish-ner", "0123456789abcdef", recognizer=rec)
+    monkeypatch.setattr(api, "local_ner", lambda: client)
+    body = NerRequest(text="Ayşe Demir Ankara'da", categories=["PERSON"])
+    out = asyncio.run(api.internal_ner(body, actor=None))
+    assert (out.model, out.revision) == ("acme/turkish-ner", "0123456789abcdef")
+    assert [(f.category, f.start, f.end) for f in out.findings] == [("PERSON", 0, 10)]
+    assert "Ayşe" not in out.model_dump_json()
+
+    monkeypatch.setattr(api, "local_ner", lambda: ner.LocalNer(None, None))
+    with pytest.raises(ApiError) as raised:
+        asyncio.run(api.internal_ner(body, actor=None))
+    assert raised.value.status_code == 503 and raised.value.code == "ner_not_configured"

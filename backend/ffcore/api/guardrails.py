@@ -29,6 +29,9 @@ from ffcore.guardrails.api_schemas import (
     GuardrailPolicyUpdate,
     GuardrailTestRequest,
     GuardrailTestResult,
+    NerFindingOut,
+    NerRequest,
+    NerResponse,
     PiiPolicyCreate,
     PiiPolicyList,
     PiiPolicyOut,
@@ -43,7 +46,7 @@ from ffcore.guardrails.engine import (
     evaluate,
 )
 from ffcore.guardrails.masking import MemoryTokenStore
-from ffcore.guardrails.recognizers.ner import local_ner
+from ffcore.guardrails.recognizers.ner import NerConfigError, local_ner
 from ffcore.guardrails.schemas import (
     GuardrailConfigError,
     PiiPolicySpec,
@@ -53,6 +56,7 @@ from ffcore.guardrails.schemas import (
     validate_pii_policy,
     validate_policy,
 )
+from ffcore.knowledge.models import ModelMissing
 from ffcore.models.guardrails import GuardrailPolicy, PiiPolicy
 from ffcore.models.identity import Project
 
@@ -447,6 +451,35 @@ async def test_guardrails(
         findings=_findings(decision),
         policy_mode=stored_mode,
         builtin=policy.builtin,
+    )
+
+
+@router.post(
+    "/internal/guardrails/ner",
+    response_model=NerResponse,
+    tags=["guardrails-internal"],
+    summary="Find person, organization and location names (service account only)",
+)
+async def internal_ner(body: NerRequest, actor: ServiceActor):
+    """08 tam 1b: the API process holds the NER model; the agent and ingest workers ask here
+    (the /internal/embed pattern). Spans only, never values. Without NER_MODEL / NER_REVISION
+    503 `ner_not_configured`; a missing weight 503 `model_missing` (run `make models`)."""
+    client = local_ner()
+    try:
+        findings = await client.find(body.text, body.categories)
+    except NerConfigError as exc:
+        raise ApiError(503, "api_error", exc.code, exc.message) from None
+    except ModelMissing as exc:
+        raise ApiError(503, "api_error", "model_missing", str(exc)) from None
+    return NerResponse(
+        model=client.model,
+        revision=client.revision,
+        findings=[
+            NerFindingOut(
+                category=f.category, start=f.start, end=f.end, score=f.score, evidence=f.evidence
+            )
+            for f in findings
+        ],
     )
 
 
