@@ -26,6 +26,21 @@ DOCLING_REPOS = {
 }
 # PaddleOCR `tr`: multilingual detection, Latin recognition, angle classifier.
 PADDLE_PARTS = ("det", "rec", "cls")
+# 08 tam 1b (K-08T1B-0002): the Turkish NER candidates measured on data/samples/pii before one
+# is chosen (NER_MODEL / NER_REVISION). Only the model card (licence, labels), config,
+# tokenizer and PyTorch weights: no TF/Flax/ONNX copies. The loser leaves this list after the
+# measurement; the worker never needs these (the model lives in the API process only).
+NER_CANDIDATES = ("savasy/bert-base-turkish-ner-cased", "akdeniz27/bert-base-turkish-cased-ner")
+NER_ALLOW_PATTERNS = (
+    "README.md",
+    "config.json",
+    "tokenizer.json",
+    "tokenizer_config.json",
+    "special_tokens_map.json",
+    "vocab.txt",
+    "*.safetensors",
+    "pytorch_model.bin",
+)
 
 
 class ModelMissing(RuntimeError):
@@ -86,6 +101,17 @@ def missing(embed_model: str, rerank_model: str) -> list[ModelMissing]:
     return out
 
 
+def ner_missing() -> list[ModelMissing]:
+    """The NER candidates not in the cache (models-check only; not the worker's startup)."""
+    out = []
+    for repo in NER_CANDIDATES:
+        try:
+            hf_path(repo)
+        except ModelMissing as exc:
+            out.append(exc)
+    return out
+
+
 def download(embed_model: str, rerank_model: str) -> None:
     """The preparation step (connects out). Not called by any runtime path."""
     from huggingface_hub import snapshot_download
@@ -94,6 +120,11 @@ def download(embed_model: str, rerank_model: str) -> None:
     for repo, revision in revisions.items():
         print(f"download {repo}@{revision} -> {hub_cache()}", flush=True)
         snapshot_download(repo, revision=revision, cache_dir=hub_cache())
+    for repo in NER_CANDIDATES:
+        print(f"download {repo}@main (NER candidate) -> {hub_cache()}", flush=True)
+        snapshot_download(
+            repo, revision="main", cache_dir=hub_cache(), allow_patterns=list(NER_ALLOW_PATTERNS)
+        )
     from paddleocr import PaddleOCR
 
     base = model_cache() / "paddleocr"
@@ -116,7 +147,7 @@ def main(argv: list[str]) -> int:
     rerank_model = os.environ.get("RERANK_MODEL") or fields["rerank_model"].default
     if argv[:1] == ["download"]:
         download(embed_model, rerank_model)
-    gaps = missing(embed_model, rerank_model)
+    gaps = missing(embed_model, rerank_model) + ner_missing()
     for gap in gaps:
         print(f"missing  {gap.name}  ({gap.path})")
     if not gaps:
