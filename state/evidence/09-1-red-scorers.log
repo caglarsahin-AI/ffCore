@@ -1,0 +1,5 @@
+E   ImportError: cannot import name 'diagnosis' from 'ffcore.evaluation' (/work/backend/ffcore/evaluation/__init__.py)
+=========================== short test summary info ============================
+ERROR tests/unit/test_09_scorers.py
+!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+1 error in 2.33s

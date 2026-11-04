@@ -1755,3 +1755,12 @@ Onay gelene kadar yalnız kırmızı testler ve saf kod (scorers, diagnosis); to
 ### B-09-0012 · 2026-11-04 19:21 · → koordinator · ACK
 Paket: 09   Cevap: K-09-0007
 PLAN ONAY alındı (S1-S8 A + ekler: force gerekçe zorunlu + audit, eval_auto_approve audit koşu/item id, eval_advance_interval_s C12, yetim koşu otomatik failed yok, dataset_name_not_in_project testi, api/runs.py çıkarımı ayrı commit + 06a sözleşme/int yeşil kanıtı, judge gerekçesi egress sonrası metin, DRIFT-164 plan/09 düzeltmesi 09-1de). 09-1 kodlamasına başladım: dilim 1 saf scorer + teşhis (kırmızı kanıt state/evidence/09-1-red-scorers.log).
+
+### B-09-0013 · 2026-11-04 19:28 · → koordinator · KARAR-GEREK
+Paket: 09   Cevap: K-09-0007 (S3)
+Kodda gördüğüm çelişki: S3-A'nın "approve_tools=true iken eval'i başlatan kullanıcı 07 resume yolunu kullanır" kısmı, ilerletici bir arq cron'u olduğu için kullanıcı oturumu olmadan karar vermek demek. 07'de `services/approvals.decide` → `denial()` yalnız konsol oturumundaki kullanıcıyı kabul ediyor (`approval_requires_user_session`, K-07-0002 S2; KARARLAR "Resume aktör kuralı: yalnız konsol oturumu"). Cron'dan onay = bu kurala istisna (07 güvenlik davranışı).
+- **A (Önerilen):** otomatik onay yok. `approve_tools=false` → onay bekleyen item `not_run` (`approval_required`, n/N). `approve_tools=true` → item koşusu normal 07 kuyruğunda bekler, bir insan konsoldan onaylar/reddeder; ilerletici bekler (dinleyici tazeler), TTL dolarsa item `approval_expired` ile kalır. 07'ye dokunulmaz, HITL korunur; bedel: SQL item'lı sınav gözetimsiz (gece, airgap penceresi) tamamlanmaz.
+- B: cron, başlatanın adına `decide` çağırır; `denial()`'a `eval_auto_approve` istisnası (yalnız channel=test, yalnız başlatma anında konsolda verilmiş açık rıza, audit koşu+item id). Bedel: 07 güvenlik davranışı değişir ([B]/[C], güvenlik turu), K-07-0002 S2 kuralına istisna.
+- C: approve_tools 09-1'de yok (her zaman not_run), konu 09-2'ye ertelenir.
+Bu arada A ile ilerliyorum (B/C gelirse yalnız ilerleticinin onay dalı değişir).
+Not (karar değil, bilgi): item koşularının SSE dinleyicisi yok; 06a `abandoned` kuralı (RUN_ABANDON_GRACE_S) onları düşürür. İlerletici her tick'te bekleyen item koşularını `mark_listening` ile dinlenmiş sayar (motor dinleyicidir); `EVAL_ADVANCE_INTERVAL_S < RUN_ABANDON_GRACE_S` açılışta doğrulanır, değilse açılış hatası.

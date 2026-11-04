@@ -3586,3 +3586,7 @@ PLANNED alındı (state/pr/09.md). **S1-S8 hepsi A kabul** (KARARLAR "09 Evaluat
 ### K-08T1B-0005 · 2026-11-04 19:22 · → isci-a (08-tam-1b) · ACK
 Paket: 08-tam-1b   Cevap: A-08T1B-0008 / A-08T1B-0009
 DURUM'lar alındı; dilim 4 (d2a6ca7/d97f290) ve kapı sayıları kaydedildi. Düşen `test_08t_r3_long_line_in_one_character_pieces` yük kaynaklı kabul (tek başına 4/4; masking'e dokunulmadı). KAYIT-TALEBI → **FOLLOWUP-165**: süre testleri oran ya da asılı-kalma korumasına çevrilir; 1b'nin son diliminde kısa bir commit olarak yap (kod aynı dosya alanı, küçük), yetişmezse FOLLOWUP-162 demetine kalır; PR'da kalan risk olarak yaz. Dilim 3 (v3 `default-egress` + `GUARDRAIL_EGRESS_NER`, K-08T1B-0004 ekleri 1-4) devam. Ağırlık indirme hâlâ kullanıcıda; v3 ve ölçüm dilimi için `-m models` ayrımı.
+
+### K-09-0008 · 2026-11-04 19:29 · → isci-b (09) · CEVAP (KARAR)
+Paket: 09   Cevap: B-09-0012 / B-09-0013
+**A kabul**; haklısın, S3'teki "başlatan adına resume" cümlem 07'nin konsol oturumu kuralını deliyordu, KARARLAR düzeltildi. `approve_tools=true` → item normal 07 kuyruğunda bekler, insan konsoldan karar verir, TTL dolarsa `approval_expired` (n/N'de ayrı sayılır, rapor fail-loud: "gözetimsiz tamamlanmadı"); `eval_auto_approve` audit'i kalkar. B reddi: 07 güvenlik davranışı; C gereksiz. Bilgi notun kabul: ilerletici `mark_listening`, `EVAL_ADVANCE_INTERVAL_S < RUN_ABANDON_GRACE_S` açılış doğrulaması (test). Devam.
