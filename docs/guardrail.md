@@ -262,7 +262,7 @@ deleted (`409 pii_policy_in_use`).
 |---|---|
 | `GUARDRAIL_EGRESS_ENABLED` | mandatory; `true` for llmaas, `false` for airgap |
 | `GUARDRAIL_EGRESS_NER` | mandatory, no default (08 full 1b): `true` masks person names at egress (llmaas production); `false` only for test stacks and airgap. `false` in llmaas production is a change-control [C] decision |
-| `NER_MODEL`, `NER_REVISION` | the NER model (Hugging Face repository and commit); required when `GUARDRAIL_EGRESS_NER=true` and egress is on, otherwise the API and the agent worker do not start |
+| `NER_MODEL`, `NER_REVISION` | the NER model (Hugging Face repository and commit); required when `GUARDRAIL_EGRESS_NER=true` and egress is on, otherwise the API and the agent worker do not start; the API also checks at start-up that the weights are in the offline cache (`model_missing`, presence only) |
 | `PII_TOKEN_TTL_S` | tokenize mapping lifetime in seconds (default 1800) |
 | `REDIS_URL` | the compose Redis (already set) |
 
@@ -271,7 +271,8 @@ deleted (`409 pii_policy_in_use`).
 `GUARDRAIL_EGRESS_NER` has no default: an installation's `.env` must set it before this version
 starts, otherwise Compose stops with `GUARDRAIL_EGRESS_NER is not set`. Existing installations:
 - llmaas production: `true`, with `NER_MODEL`/`NER_REVISION` and the weights from `make models`
-  (without them the API and the agent worker stop at start-up, `/readyz` shows `model_missing`).
+  (without the names the API and the agent worker stop at start-up with `ner_not_configured`;
+  without the weights in the offline cache the API stops at start-up with `model_missing`).
 - airgap and the PayCore M3 server: `false` until the NER weights are on the server
   (`m3_preflight` checks that the variable is set).
 

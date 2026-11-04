@@ -39,10 +39,15 @@ async def lifespan(app: FastAPI):
 
     # 02: one log configuration, secrets scrubbed, third-party HTTP loggers quiet (FOLLOWUP-49).
     configure_logging(settings())
-    # 08 tam 1b: GUARDRAIL_EGRESS_NER=true without a NER model stops the start-up here.
-    from ffcore.guardrails.settings import check_egress_ner, get_guardrail_settings
+    # 08 tam 1b: GUARDRAIL_EGRESS_NER=true without a NER model or its weights stops the start-up.
+    from ffcore.guardrails.settings import (
+        check_egress_ner,
+        check_ner_weights,
+        get_guardrail_settings,
+    )
 
     check_egress_ner(get_guardrail_settings(), settings())
+    check_ner_weights(get_guardrail_settings(), settings())
     # 02: Langfuse client; a half or non-internal configuration stops the start-up here.
     app.state.langfuse = init_tracing(settings())
     # The schema comes from the migrate service; this only adds missing monthly partitions.

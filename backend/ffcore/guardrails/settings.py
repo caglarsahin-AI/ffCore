@@ -30,11 +30,25 @@ def get_guardrail_settings() -> GuardrailSettings:
 
 
 def check_egress_ner(guard: GuardrailSettings, settings) -> None:
-    """Start-up check (API and agent worker): person names at egress need a NER model. A missing
-    weight is the API's `/readyz` `model_missing`; a missing name stops the start here."""
+    """Start-up check (API and agent worker): person names at egress need a NER model; a missing
+    name stops the start here. The API also checks the weights (check_ner_weights)."""
     if not (guard.guardrail_egress_enabled and guard.guardrail_egress_ner):
         return
     if not (settings.ner_model and settings.ner_revision):
         raise RuntimeError(
             "ner_not_configured: GUARDRAIL_EGRESS_NER=true needs NER_MODEL and NER_REVISION"
         )
+
+
+def check_ner_weights(guard: GuardrailSettings, settings) -> None:
+    """API start-up (r1 MINOR-3, KARARLAR "Egress kişi adı (NER)"): the weights of NER_MODEL at
+    NER_REVISION must be in the offline cache; presence only, the model is loaded by the warmup.
+    The agent worker holds no model cache: it asks the API, whose start-up this is."""
+    if not (guard.guardrail_egress_enabled and guard.guardrail_egress_ner):
+        return
+    from ffcore.knowledge import models
+
+    try:
+        models.hf_path(settings.ner_model, settings.ner_revision)
+    except models.ModelMissing as exc:
+        raise RuntimeError(f"model_missing: {exc}") from None
