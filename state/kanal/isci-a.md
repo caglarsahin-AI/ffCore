@@ -1922,3 +1922,16 @@ DUZELT alındı; r1 raporu (güvenlik turu dahil) ve KARARLAR "08 tam 1b r1 kara
 Paket: 08-tam-1b   Cevap: K-08T1B-0010
 DUZELT ilerleme: MAJOR-1 (1c2f288 test, 10de8fe kod+docs), MAJOR-2 (0ddca77 test, ee3404f kod+docs) commit'li; birim kırmızı/yeşil kanıtı `state/evidence/08t1b-r2-red-major{1,2}.log`. MAJOR-3 testi entegrasyon (`ingest_tree` + DB) olduğundan kırmızı/yeşil için yığın gerekiyor.
 YIGIN-AÇ talebi: `ffcore-08t1b` yalın yığın (postgres + redis + backend + worker, `--profile qdrant`; tools 0.0.0-main + worktree kodu, imaj derlemesi yok), portlar 18270/13270 (önceki turla aynı). Kullanım: MAJOR-3 kırmızı/yeşil, sonra turun sonunda hedefli test-int iki profil. Bitince `down -v` + YIGIN-KAPA. Bu arada birim düzeyindeki MAJOR-4 ve MINOR'lara devam ediyorum.
+
+### A-08T1B-0017 · 2026-11-04 23:55 · → koordinator · YIGIN-KAPA
+Paket: 08-tam-1b   Cevap: K-08T1B-0012
+ffcore-08t1b `down -v` (konteyner 0, volume 0); w08t1b ağı da kaldırıldı.
+
+### A-08T1B-0018 · 2026-11-04 23:55 · → koordinator · PR-HAZIR
+Paket: 08-tam-1b   Cevap: K-08T1B-0010
+Branch feat/08-tam-1b-ner @ **4567ed62f63f0f0d0276c88e909c0d16838bfaa8** (r1 HEAD f6be9ae + 22 commit; f6be9ae..HEAD 29 dosya +1184/-109; push yok, state yok). PR: state/pr/08-tam-1b.md "r1 düzeltmeleri" bölümü (bulgu → test commit → kod commit → test tablosu, r2 varsayımları 10-14, FOLLOWUP-167/168 kısıtları).
+- MAJOR-1 A, MAJOR-2, MAJOR-3, MAJOR-4, MINOR-1 A, MINOR-2..7, NOTE-1, NOTE-9: her biri önce test sonra kod commit'i; kırmızı kanıtı `state/evidence/08t1b-r2-red-*.log`. NOTE-9 testi kırmızısız (davranış zaten doğruydu, regresyon testi).
+- Kararla tersine dönen eski testler: `test_08t_6b` (MINOR-1), `test_08t_2b` ve `test_08t_15_pii_ner_never_overrides_regex` (MINOR-5 kırpma).
+- Kapılar (4567ed6): `make lint` temiz; `make test` llmaas 1598/1598, airgap 1598/1598; hedefli test-int (08t_21/22/26/28, 08_api, 19_ingest_raw, 06b_direct, 04a_api) llmaas 87 passed 1 skipped, airgap 87 passed 1 skipped (skip: test_19 :ro mod testi, root).
+- r2 delta'da bakılacaklar: MINOR-1 yalnız enforce egress kuralında yükselir (monitor kaydeder; varsayım 13); `text_filter_mismatch` ret sayacı, CLI çıkış kodunu değiştirmez (varsayım 10); egress PII türetmesinde saklı `default`'un `PERSON` ayarı NER açıkken `enabled/high`'a zorlanır.
+NOT_RUN (ENV-163): ölçüm, `-m models`, `--network none`, gerçek NER.

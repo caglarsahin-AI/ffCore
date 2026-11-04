@@ -1,6 +1,6 @@
 # PR: 08 tam dilim 1b — Türkçe NER tanıyıcısı, `/internal/ner`, `pii_ner` ingest filtresi, PRSIM guard'ı
 
-**Paket:** 08-tam-1b · **Sınıf:** [B]; NER ağırlıkları [C] (kullanıcı `make models`, K-08T1B-0002 A) · **Branch:** feat/08-tam-1b-ner · **Baz commit:** 7af41e5 (main; 1d836a0 + yalnız state commit'leri) · **Oturum:** ffcore-isci-a-08-tam-1b (Opus 5.5) · **Durum:** VERIFIED (ölçüm NOT_RUN, ağırlık bekliyor) · **HEAD:** f6be9ae5c6b3b7be3d6fc8a6a02282b52d23877c (13 commit)
+**Paket:** 08-tam-1b · **Sınıf:** [B]; NER ağırlıkları [C] (kullanıcı `make models`, K-08T1B-0002 A) · **Branch:** feat/08-tam-1b-ner · **Baz commit:** 7af41e5 (main; 1d836a0 + yalnız state commit'leri) · **Oturum:** ffcore-isci-a-08-tam-1b (Opus 5.5) · **Durum:** PR-HAZIR r2 (r1 DEGISIKLIK düzeltildi; ölçüm NOT_RUN, ağırlık bekliyor) · **HEAD:** 4567ed62f63f0f0d0276c88e909c0d16838bfaa8 (35 commit; r1 HEAD f6be9ae)
 
 Kaynak: GOREV K-08T1B-0001, kararlar K-08T1-0002 (S1-S9 A; 1b'ye düşen S1-S5), K-08T1B-0002 (indirme yolu A), HANDOFF A-08T1-0050, state/pr/08-tam-1.md "08-tam-1b" bölümü (bu plan onu güncel koda göre ayrıntılandırır).
 
@@ -40,7 +40,7 @@ Kaynak: GOREV K-08T1B-0001, kararlar K-08T1-0002 (S1-S9 A; 1b'ye düşen S1-S5),
 
 ### 4. Sözleşme, yapılandırma, profil etkisi
 
-- C4 donmuş: aşama/`action_taken`/`Decision` değişmez; `engine: ner` kabulü additive. C6: `text_filter` yeni ad `pii_ner` additive; eski `pii_regex@1` belgeleri değişmez. C11/C17: 1a biçimi aynen (NER kategorileri aynı `tokenize` yolundan). C12: yeni ortam değişkenleri `NER_MODEL`, `NER_REVISION`.
+- C4 donmuş: aşama/`action_taken`/`Decision` değişmez; `engine: ner` kabulü additive. C6: `text_filter` yeni ad `pii_ner` additive; eski `pii_regex@1` belgeleri değişmez. C11/C17: 1a biçimi aynen (NER kategorileri aynı `tokenize` yolundan). C12: yeni ortam değişkenleri `GUARDRAIL_EGRESS_NER` (varsayılansız, zorunlu), `NER_MODEL`, `NER_REVISION` (r1 MINOR-7).
 - Profil: kodda dal yok. Yerleşik v3 `PERSON` yalnız egress aşamasında (airgap'te `GUARDRAIL_EGRESS_ENABLED=false` → NER çağrılmaz, ağırlık şartı doğmaz); `pii_ner` ingest her iki profilde aynı.
 - Bellek: model yalnız API sürecinde (~0,45 GB); bellek tablosu notu.
 
@@ -164,7 +164,7 @@ Not: d97f290'daki ilk llmaas koşusunda 1a'nın `test_08t_r3_long_line_in_one_ch
 5. `pii_ner` ingest'te yalnız `PERSON` maskelenir (kurum/konum kişi verisi değil; PRSIM bilinen sınırı kişi adıydı).
 6. `ingest-raw`'da filtre seçeneği yok (plan/19 "maskeleme adla kapatılamaz" testi); yeni ingest `pii_ner`, `--accept-personnel-data` M3 ölçüm kipi = `pii_regex@1` (ölçülen manifest değişmez). Koordinatörün kabul ettiği varsayım 3'ün ("geriye uyumlu + deprecation") uygulaması budur: bayrak çalışır ve loglanır.
 7. NER erişilemezse PRSIM içeren `ingest-raw` `prsim_requires_ner` (CLI çıkış 2, DB'den önce; eski sözleşme kodu korunur), diğer kaynaklar `ner_unavailable`.
-8. Proje `default-egress` anahtarlı PII politikası saklarsa yerleşiği geçersiz kılar (`default` ile aynı kural); yerleşik `default-egress` PII listesinde (GET) gösterilmiyor: yalnız kural metninde. İstenirse additive eklenir.
+8. Proje `default-egress` anahtarlı PII politikası saklarsa yerleşiği geçersiz kılar; saklamazsa ve `default` saklıysa egress PII'si ondan türetilir (r1 MAJOR-1 A). r1 MINOR-4 ile yerleşik `default-egress` PII listesinde `builtin: true` görünür ve saklı zincirde başvurulabilir.
 9. `NER_MODEL`/`NER_REVISION` compose'da `${…:-}` (koşullu zorunluluk compose'da ifade edilemiyor); zorunluluğu açılış denetimi uygular.
 
 ### Kalan riskler
@@ -174,3 +174,67 @@ Not: d97f290'daki ilk llmaas koşusunda 1a'nın `test_08t_r3_long_line_in_one_ch
 - **Dağıtım:** `GUARDRAIL_EGRESS_NER` olmayan `.env` ile yığın açılmaz (PayCore sunucusu dahil, DECISION-166).
 - 9b49514'te test ayrı kırmızı commit olarak yazılmadı.
 - FOLLOWUP-162'nin 1b dışı kalemleri bu PR'da yok (MINOR-r3-7 `reserve_carried` araç/KB yolu dahil).
+
+## r1 düzeltmeleri (K-08T1B-0010 DUZELT, KARARLAR "08 tam 1b r1 kararları")
+
+**HEAD:** 4567ed62f63f0f0d0276c88e909c0d16838bfaa8 · f6be9ae'nin üstüne 22 commit (`git diff f6be9ae..HEAD --stat`: 29 dosya +1184/-109). Her bulgu için önce test commit'i, sonra kod commit'i; kırmızı kanıtları `state/evidence/08t1b-r2-red-*.log`.
+
+| Bulgu | Test commit | Kod commit | Test | Ne değişti |
+|---|---|---|---|---|
+| MAJOR-1 (A) | 1c2f288 | 10de8fe | `test_08t_19_egress_from_default.py` (4) | `default-egress` saklı değilse ve `default` saklıysa egress PII'si `default`'tan türetilir (kategoriler, özel desenler; NER açıksa `PERSON` + `engine: ner`). Yerleşik beşli yalnız ikisi de yoksa. docs'taki "version 2's egress" cümlesi üç adımlı çözüm sırasıyla değişti. |
+| MAJOR-2 | 0ddca77 | ee3404f | `test_08t_20_http_ner_windows.py` (4; 250.000 karakter, sahte HTTP NER 200.000 üstüne 422) | `HttpNer` 200.000 karakteri aşan metni 2.000 karakter örtüşmeli pencerelerle gönderir, offset'i kaydırır, örtüşen span'ları birleştirir (birleşimde skoru yüksek olanın kategorisi). Pencere sınırı `NerRequest` sınırıyla aynı sabit (`NER_TEXT_MAX_CHARS`). |
+| MAJOR-3 | 2c92e32 | 0435695 | `test_08t_21_text_filter_mismatch.py` (2, entegrasyon) | Aynı bayt + kayıtlı filtre ≠ koşu filtresi: yeniden işleme yok. `text_filter_mismatch` sayacı konsol satırında ve manifestte. Manifest `text_filters`: filtre başına belge/chunk, DB'deki `metadata.text_filter`'dan. PRSIM M3 `failed` kaydı bayraksız koşuda dönüştürülmüyor. |
+| MAJOR-4 | 27a1bbd | 01bdda5 | `test_08t_22_attachment_names.py` (2, entegrasyon) | Ekin görünen adı (Attachment.filename, silver `# Ek:` başlığı, chunk breadcrumb'ı) PRSIM'de `Ek <n>`. Diğer kaynaklarda ad, `_`/`-` boşluğa çevrilip filtreden geçer. Kapı 0 ve dönüştürücü gerçek adı görür; `raw_path` aynı. |
+| MINOR-1 (A) | f5345cc | e6a0669 | `test_08t_23_egress_ner_fail_loud.py` (6; E4 probe senaryosu) | Egress'te enforce kural için NER hatası `on_error`'dan bağımsız `503 ner_unavailable` (`NerEgressUnavailable`, değer içermez). Metin aşamalarında `on_error` sürer. |
+| MINOR-2 | 26fba3d | 11d3b6c | `test_08t_24_ner_transport_errors.py` (3) | `HttpNer` `EgressError`'ı (ret, DNS, zaman aşımı) `NerUnavailable`'a sarar. CLI'da PRSIM'le çıkış 2 + `prsim_requires_ner`, traceback yok. |
+| MINOR-3 | 570f03d | 7373e74 | `test_08t_25_ner_weights_at_startup.py` (3) | API açılışında `check_ner_weights`: egress + NER açıkken `hf_path(NER_MODEL, NER_REVISION)` yoksa (yalnız varlık) `model_missing` ile durur. Agent worker'da model önbelleği yok (compose), denetim API'nin. docs ve `.env.example` buna göre. |
+| MINOR-4 | 6f72540 | 3fcdfce | `test_08t_26_builtin_egress_key.py` (2, entegrasyon) | `default-egress` kullanılabilir anahtar. PII listesinde `builtin: true` (`resolve_pii`'nin verdiği spec). Test paneli `builtin`: o anahtarda saklı kayıt yok. GET'teki yerleşik zincir POST ile 201. `08.yaml`'da yalnız `builtin` açıklaması değişti. |
+| MINOR-5/6 | 12fcfe8 | ffea023 | `test_08t_27_ner_span_trim.py` (6; E6'nın iki yazımı) | NER span'ı, regex/özel bulgunun ve mevcut `<<PII_n>>`'in dışında kalan parçalara kırpılır (kenarlar alfanümeriğe kadar; 2 karakterden kısası atılır). Motor ve `pii_ner` filtresi aynı `trim_names`'i kullanır. |
+| MINOR-7, NOTE-1 | — | 8d97e65 | — (metin) | docs PayCore satırı DECISION-166'ya (açık, kullanıcı kararı) bağlandı. `.env.example`: "ölçüm dalında doldurulur". Bu PR'ın §4 C12 satırı düzeltildi. Kod yorumlarında yol `/api/v1/internal/guardrails/ner`. |
+| NOTE-9 | e530f82 | — | `test_08t_28_internal_ner_http_auth.py` (1, entegrasyon) | HTTP yetki: anonim 401, üye 403 `service_account_required`, servis 200, cevapta değer yok. Davranış zaten doğruydu; kırmızısı yok (regresyon testi). |
+| — | — | 4567ed6 | — | ruff format ve satır boyu (davranış değişmez). |
+
+Değişen eski testler (kararla tersine dönen davranış; gerekçe test yorumunda):
+- `test_08t_6b`: egress'te NER düşünce block yerine `NerEgressUnavailable` (MINOR-1 A).
+- `test_08t_2b` ve `test_08t_15_pii_ner_never_overrides_regex`: çakışan NER span'ı atılmak yerine kırpılıyor (MINOR-5); regex bulgusu kategorisini koruyor.
+
+Sıra notları:
+- MAJOR-3 testi kırmızıdan önce bir kez sıkılaştırıldı (amend): ikinci koşu ayrı dönüştürücüyle çağrıldığı için `calls == []` boşuna geçiyordu.
+- MINOR-1 testinde geçersiz `on_error: log` parametresi kod commit'inde düzeltildi (`ON_ERROR` yalnız `block`/`allow`).
+
+### r2 komutları ve sonuçları
+
+Tools 0.0.0-main + worktree kodu.
+- Birim: `docker compose -p w08t1b --env-file .env.test run --rm --no-deps -e DEPLOY_PROFILE=<p> tools make test`.
+- Entegrasyon: `ffcore-08t1b` yalın yığın (postgres, redis, litellm, fake-llm, qdrant; K-08T1B-0012), `-w /work/backend tools python -m pytest -q <dosyalar>`.
+
+| Koşu | Sonuç | Kanıt |
+|---|---|---|
+| `make lint` | temiz (ruff check + format --check, 443 dosya) | `08t1b-r2-lint.log` |
+| `make test` llmaas | 1598 passed | `08t1b-r2-maketest-llmaas.log` |
+| `make test` airgap | 1598 passed | `08t1b-r2-maketest-airgap.log` |
+| Hedefli test-int llmaas (08t_21/22/26/28, 08_api, 19_ingest_raw, 06b_direct, 04a_api) | 87 passed, 1 skipped (test_19 :ro mod testi, root dosya modunu yok sayar; önceki turlarla aynı) | `08t1b-r2-testint-targeted-llmaas.log` |
+| Hedefli test-int airgap (aynı dosyalar) | 87 passed, 1 skipped (aynı) | `08t1b-r2-testint-targeted-airgap.log` |
+| Kırmızı kanıtları | MAJOR-1/2/3/4, MINOR-1/2/3/4/5-6 kırmızı | `08t1b-r2-red-*.log` |
+| Ölçüm, `-m models`, `--network none`, gerçek NER | NOT_RUN: ağırlık yok (ENV-163) | — |
+
+### r2 varsayımları
+
+10. (MAJOR-3) `text_filter_mismatch` bir ret sayacıdır, `failed` değil.
+    - CLI çıkış kodunu değiştirmez (diğer `rejected` kodları gibi); konsolda ve manifestte ayrı satır.
+    - Farklı baytlı yeni sürüm koşunun filtresiyle yazılır (yeni kayıt).
+    - Filtresiz eski kayıt (`text_filter` yok) `none` etiketiyle sayılır ve aynı baytta reddedilir.
+11. (MAJOR-2) Örtüşen span'lar birleşince kategori, skoru yüksek olanınkidir. Pencereler sözcük sınırı aramaz; 2.000 karakterlik örtüşme, kesilen adı sonraki pencerede bütün verir.
+12. (MAJOR-4) `Ek <n>` numarası belge metadata'sındaki ek sırasıdır (1'den). Kaynak PRSIM ise bayraktan (M3) bağımsız `Ek <n>`. Filtresiz belgede (C6 `text_filter` yok) ek adı olduğu gibi kalır (main ile aynı).
+13. (MINOR-1) Yalnız enforce egress kuralında geçerli. Monitor bir egress kuralı zaten maskelemez; hatası kaydedilir (`rule_error`), yükseltilmez (`test_08t_23c`).
+14. (MINOR-5/6) "Bay <<PII_1>> Hanım" span'ında "Bay" ve "Hanım" ayrı PERSON değeri olur: fazla maskeleme, sızıntı değil.
+
+### r2 kısıtları (FOLLOWUP, bu PR'da yok)
+
+- FOLLOWUP-167 (NOTE-6): paycoreLLM `ffcore_stage_raw.py` PRSIM'i hâlâ yalnız M3 bayrağıyla stage ediyor. Bayraksız `pii_ner` PRSIM akışı için stager değişikliği gerekecek; bugün daha sıkı, sızıntı yok.
+- FOLLOWUP-168 (NOTE-2/3/4/5/8), ölçüm dalında:
+  - `local_ner()` kilitsiz kayıt ve tek kilitli çağrı (ölçümle bakılacak);
+  - `stride` pencerelemesinin gerçek modelle doğrulanması;
+  - docs kanıt biçimi, OpenAPI 503 listesi, `/readyz` `ner_label_unknown`;
+  - `test_08t_secrets_linear` mutlak süre;
+  - airgap `ingest-raw`'da NER ihtiyacının docs'ta açık yazılması.
