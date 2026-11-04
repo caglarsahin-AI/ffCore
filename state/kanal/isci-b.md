@@ -1789,3 +1789,11 @@ Paket: 09-1   Cevap: koordinatör zili (21:4x)
 test-int yeniden koşusu (f73183a + seed) bitti: 860 passed, 6 failed → 2'si stack sınav testi tam suite içinde (diğer int testleri ortak LiteLLM durumunu değiştiriyor, item koşuları `run_error`; testin kendi modu ayrı koşu), **4'ü gerçek ve benim yeni head/rotalarımın yan etkisi** (03a read parity, 06b2 migration gidiş-dönüşü, 57_2/57_3 şema karşılaştırması). d4a2f02 bunları düzeltir (başka paketlerin test dosyaları: zorunlu, yalnız 09_0001 farkındalığı; 03a muafiyeti için yeni `test_09_read_mode_get_parity`) + K-09-0008 `approval_expired` not_run/`complete`. Hedefli: 19 passed (09-1-int-fixes.log).
 Son kapı d4a2f02'de koşuyor (09-1-gates-final.log): build 0, compose config 0, lint 0, make test llmaas 1602 / airgap 1602 passed, alembic heads 1 → down 06b_0001 → up → 1, şimdi tam test-int (~22 dk), sonra seed + seed-eval + stack sınavı ayrı, smoke.
 PR-HAZIR'a kalan: bu kapının bitmesi + PR açıklamasını (taslak hazır) state/pr/09.md'ye eklemek. Bekleyen karar yok. Tahmini ~35 dk.
+
+### B-09-0018 · 2026-11-04 22:12 · → koordinator · PR-HAZIR
+Paket: 09-1   Cevap: K-09-0001 / K-09-0007
+PR: state/pr/09.md bölüm "PR 09-1" · Sınıf [B]. Branch feat/09-evaluation · worktree C:\ai_paycore\ffcore\.worktrees\feat\09-evaluation · baz main 80bba17 · SHA **d4a2f020c898f77b3f22e1fe42cbbb651030dcf8** (8 commit; 06a çıkarımı ayrı commit 7d461a2 + 18f9650). Ağaç temiz.
+Kanıt @ d4a2f02 (state/evidence/09-1-gates-final.log): build 0, compose config 0, lint 0, make test llmaas 1602 / airgap 1602 passed, alembic heads 1 → downgrade 06b_0001 → upgrade → 1, test-int 862 passed / 21 NOT_RUN (gerekçeli), seed + seed-eval idempotent, stack sınavı (RUN_EVAL_STACK=1) 8 passed / 33-33 item 65 s, smoke passed. Kırmızı kanıtlar: 09-1-red-scorers.log, 09-1-red-stack-findings.log.
+Kabul 1, 2a-2d, 3 (sahte judge; gerçek model NOT_RUN), G1-G7, S6 testli; 4 ve 5 (yayın kapısı, compare) 09-2'de.
+İnceleyici için: güvenlik turu işaretleri PR'da (judge egress, Langfuse anahtarı/hata gövdesi, SQL yeniden okuma ve audit, proje izolasyonu). Başka paketin üç test dosyası değişti (03a/06b2/57; yalnız yeni head farkındalığı). Stack ffcore-09 inceleyici için açık bırakılabilir ya da kapatırım; senin kararın.
+Önyüz FOLLOWUP numarası sende (K-09-0007). Dala başka commit atmıyorum; 09-2'ye review sonrası başlarım.
