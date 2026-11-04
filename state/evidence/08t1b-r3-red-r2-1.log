@@ -1,0 +1,69 @@
+..F                                                                      [100%]
+=================================== FAILURES ===================================
+____________________ test_08t_22c_prsim_by_path_is_ek_n_too ____________________
+
+world = {'project': '736dfd4b-bcf5-49d8-867d-8af81219893c', 'other': 'e84a9a87-4868-43c7-9cea-c9ed7dcbc5f2', 'admin': <starlet...nt.TestClient object at 0x7f76e05f0050>, 'admin_read': <starlette.testclient.TestClient object at 0x7f76d04c4a10>, ...}
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_b4eab402ff84) at 0x7f76d87ef680>
+settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_08t_22c_prsim_by_path_is_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f76bc75bbf0>
+
+    def test_08t_22c_prsim_by_path_is_ek_n_too(world, pg, settings, tmp_path, monkeypatch):
+        # r2 MINOR-r2-1: staging marks a file as personnel data by its source OR a `prsim*` directory
+        # on its path; the attachment name follows the same rule (one decision, KARARLAR r2 ekleri).
+        monkeypatch.setattr(ingest_mask, "ner_client", lambda: FakeNer())
+        kb = create_kb(world, key="prsim-by-path")
+        tree = tmp_path / "raw"
+        here = tree / "confluence" / "HR" / "PRSIM-ARSIV" / "123"
+        here.mkdir(parents=True)
+        (here / "123.md").write_text(BODY, encoding="utf-8")
+        (here / "ayse_demir_izin.txt").write_text(ATTACHMENT_BODY, encoding="utf-8")
+        meta = {
+            "source": "confluence:HR",
+            "source_item_id": "confluence:123",
+            "title": "123",
+            "attachments": ["ayse_demir_izin.txt"],
+        }
+        (here / "123.md.meta.json").write_text(json.dumps(meta), encoding="utf-8")
+        report = _run(
+            settings, pg, world, kb["key"], tree, sources=["confluence:HR"], text_filter="pii_ner"
+        )
+        assert report.statuses == {"indexed": 1}, report.lines()
+        assert report.manifest()["personnel_data_sources"] == ["confluence:HR"]
+        attachments, chunks, silver = _stored(pg, kb["id"])
+>       assert [filename for filename, _ in attachments] == ["Ek 1"]
+E       AssertionError: assert ['ayse demir izin.txt'] == ['Ek 1']
+E         
+E         At index 0 diff: 'ayse demir izin.txt' != 'Ek 1'
+E         Use -v to get more diff
+
+tests/integration/test_08t_22_attachment_names.py:137: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+2026-11-04 21:18:24,171 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-04 21:18:24,200 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=286
+2026-11-04 21:18:24,672 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-04 21:18:24,684 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=355
+2026-11-04 21:18:25,113 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-04 21:18:25,156 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=319
+2026-11-04 21:18:25,551 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-04 21:18:25,555 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=254
+------------------------------ Captured log setup ------------------------------
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=286
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=355
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=319
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=254
+----------------------------- Captured stderr call -----------------------------
+2026-11-04 21:18:25,936 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-04 21:18:25,950 INFO ffcore.access access method=POST path=/api/v1/projects/736dfd4b-bcf5-49d8-867d-8af81219893c/knowledge-bases status=201 ms=274
+2026-11-04 21:18:26,175 INFO ffcore.knowledge.ingest gold document=683d592c-9896-4468-b93b-d983c1ea37f4 reused=0 embedded=2
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/736dfd4b-bcf5-49d8-867d-8af81219893c/knowledge-bases status=201 ms=274
+INFO     ffcore.knowledge.ingest:ingest.py:657 gold document=683d592c-9896-4468-b93b-d983c1ea37f4 reused=0 embedded=2
+=========================== short test summary info ============================
+FAILED tests/integration/test_08t_22_attachment_names.py::test_08t_22c_prsim_by_path_is_ek_n_too
+1 failed, 2 passed in 21.95s
