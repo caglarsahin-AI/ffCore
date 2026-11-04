@@ -1878,3 +1878,10 @@ ACK K-08T1B-0004 (A). Oturum bir süre koptu; iki profil `make test` koşusu yar
 Dilim 4 (pii_ner ingest + PRSIM guard) kodlandı, commit'lenmedi (8 dosya): `pii_ner@1` (regex + NER PERSON, HTTP; regex bulgusu ezilmez), ingest filtreleri async, PRSIM `pii_ner` ile kabul; NER yoksa PRSIM için `prsim_requires_ner` (CLI çıkış 2, DB'den önce), diğerleri `ner_unavailable`; `--accept-personnel-data` M3 ölçüm kipi = `pii_regex@1` (manifest ölçüldüğü gibi kalır), CLI'da filtre seçeneği yok (plan/19 kuralı). 19 entegrasyon testleri `text_filter="pii_regex"` açık verildi.
 Kanıt: kırmızı 9b49514'te 6 düştü + 4 hata (15c eski davranış, geçti). Yeşil ara koşu: birim+sözleşme 1558 geçti, 5 düştü → üçü test beklentisi (kaynak adı büyük harf), biri `internal_ner` write-muafiyet listesi, biri CLI ön denetimi (yalnız PRSIM'e daraltıldı); hepsi düzeltildi, yeniden koşu bekliyor.
 Sıradaki: kapı yeşilse dilim 4 commit'i, sonra dilim 3 (v3 + `GUARDRAIL_EGRESS_NER`, K-08T1B-0004 ekleriyle). Beklediğim karar yok.
+
+### A-08T1B-0009 · 2026-11-04 19:25 · → koordinator · DURUM
+Paket: 08-tam-1b   Cevap: A-08T1B-0008
+Dilim 4 commit'li: d2a6ca7 (test, kırmızı 9b49514'te 6 düştü + 4 hata), d97f290 (kod). Kapı (tools 0.0.0-main + worktree kodu; tee state/evidence/08t1b-maketest-*.log): ruff check/format temiz; `make test` airgap 1563/1563; llmaas 1562/1563.
+Düşen tek test: `test_08t_r3_long_line_in_one_character_pieces[StreamDetokenizer]` (1a'nın `< 1,0 s` mutlak süre sınırlı testi; bu dalda masking koduna dokunulmadı). Tek başına 3 tekrar 4/4 geçti: yük altında oynuyor (iki profil koşusu arka arkaya, makinede başka yığınlar).
+KAYIT-TALEBI (FOLLOWUP): KARARLAR "Birim testinde mutlak süre sınırı yok" (K-SEN-0015) ile çelişen test_08t_r3_url_scan süre testleri (`< 1,0`, `< 0,2`) oran ya da asılı-kalma korumasına çevrilmeli; FOLLOWUP-162 demetine ya da 1a sahibine. Bu PR'da dokunmuyorum (kapsam dışı), PR'a kalan risk.
+Sıradaki: dilim 3 (yerleşik v3 `default-egress` + `GUARDRAIL_EGRESS_NER`, K-08T1B-0004 ekleri 1-4).

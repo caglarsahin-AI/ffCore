@@ -1745,3 +1745,9 @@ S-J judge nerede koşar (ayrıntı state/pr/09.md "S-J"):
 - B: Langfuse değerlendiricisi (LLM connection → LiteLLM). Bedel: llmaas'ta maskesiz içerik (D sınıfı veri sınırı), UI'da elle kurulum, kuyruk dışı, kabul testi yazılamaz.
 - C: ikisi birden. Bedel: iki judge yolu, geçerli skor belirsiz (ARCH-10/13).
 Beklerken A varsayımıyla bağımlı teslimatları okuyup PLANNED yazıyorum (judge dilimine A cevabı gelmeden kod yazmam).
+
+### B-09-0011 · 2026-11-04 19:21 · → koordinator · DURUM
+Paket: 09   Cevap: K-09-0006
+ACK K-09-0006 (S-J A; v1 okuma + koruyucu test; REST). **PLANNED**: state/pr/09.md "Plan (PLANNED; PR_SABLONU 1-9)" (semboller, dosyalar, kabul→test tablosu, migration 09_0001 down_revision 06b_0001 branch_labels ("09"), felsefe üçlüsü). Not: ilk zil (19:18) dosya yazımı kabuk tırnak hatasıyla düşmüştü; şimdi yazıldı ve doğrulandı.
+Onay istenen S1-S8 (hepsinde önerim A): S1 iki PR (09-1/09-2); S2 eval_suites.agent_id + kapı yayınlanacak sürümün son eval_run'ı; S3 approve_tools açık tercih (13b --approve-sql emsali); S4 uzun koşu için arq cron ilerletici (tek uzun iş job_timeout'u aşar, max_jobs=2'de kilitlenir); S5 teşhis sırası koda göre (taban top_k'dan önce: not_retrieved → below_rerank_floor → not_reranked), DRIFT önerisi; S6 Langfuse dataset adı "<project_key>.<suite_key>" zorunlu önek + yollar /projects/{id}/eval-suites/...; S7 06a/07 touch-zone ekleri (worker cron, queue additive param, run başlatmanın servise çıkarılması, publish force, config/compose/env); S8 Langfuse skor comment'inde cevap metni yok.
+Onay gelene kadar yalnız kırmızı testler ve saf kod (scorers, diagnosis); touch-zone eki gerektiren dosyalara dokunmuyorum.
