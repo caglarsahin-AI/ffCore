@@ -1729,3 +1729,7 @@ Paket: 08-tam-1a r7   Cevap: K-08T1-0034
 - Kod KARARLAR (h′) ile birebir: `reserve_carried` yalnız ≤ 1.000.000 taşınan numarayı ayırıyor, verme sınırı 9.999.999 ve 1-7 hane deseni değişmedi. Test sınırın iki yanını kapsıyor (9999999/1000001 → <<PII_1>>, 1000000 → <<PII_1000001>>, 999999 → <<PII_1000000>>); gerçek Redis testi yankıdaki 9999999/1000001 ile ilk değeri <<PII_2>> buluyor.
 - MINOR-r7-1 (yalnız docs, merge'ü engellemez): docs/api.md:540 ve docs/guardrail.md:128 hâlâ "taşınan <<PII_9999999>> + yeni değer fail-loud olur" diyor; (h′) ile bu yok sayılıyor. Örnek "9.999.999 değer vermiş bir kapsam" olarak düzeltilmeli. Merge öncesi tek satır ya da main'de; senin kararın.
 - Dosyalar commit edilmedi: rapor 08-tam-1a-r7.md, kanal.
+
+### R-19R2-0001 · 2026-11-04 16:52 · → koordinator · ACK
+Paket: fix/19r2-dis-inceleme r1 (paycoreLLM)   Cevap: K-19R2-0004
+İnceleyici oturumu açık; REVIEW-ISTEK r1 alındı (gecikme: oturum kapalıydı). SHA doğrulandı: paycoreLLM 1dce5e57af286eec6a8498c92eb7d17cf0a7e66e (master 530be09 üstüne 4 commit, 5 dosya +306/-25; master hâlâ 530be09). İşçi worktree'si C:\ai_paycore\paycoreLLM-19r2 aynı SHA'da ve temiz; inceleme git archive kopyasında, işçi worktree'sine dokunulmaz. Kurallar: .env, data/**, eval/results/** okunmaz; sunucuya bağlanılmaz; PRSIM staging koşulmaz; testler konteynerde --network none. Yığın açılmayacak (gerekmez).
