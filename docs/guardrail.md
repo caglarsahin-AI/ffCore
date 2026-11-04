@@ -159,7 +159,9 @@ this order:
    `GUARDRAIL_EGRESS_NER=true`.
 
 With `true`, person names leave for the provider as placeholders too; with `false`, egress masks
-what version 2 masked. The text stages keep `default` and never call NER.
+what version 2 masked. The text stages keep `default` and never call NER. The PII policy list
+shows `default-egress` as built-in (`builtin: true`, as resolved above) until one is stored, and a
+stored chain may reference it: the built-in chain can be stored as it is shown.
 
 ## Masking
 

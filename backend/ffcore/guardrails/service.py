@@ -77,7 +77,8 @@ async def available_pii_keys(session: AsyncSession, project_id) -> set[str]:
             PiiPolicy.project_id == project_id, PiiPolicy.deleted_at.is_(None)
         )
     )
-    return {*rows, BUILTIN_KEY}
+    # r1 MINOR-4: the built-in chain's egress key is usable in a stored chain too.
+    return {*rows, BUILTIN_KEY, EGRESS_PII_KEY}
 
 
 async def resolve_pii(session: AsyncSession, project_id, key: str) -> PiiPolicySpec | None:

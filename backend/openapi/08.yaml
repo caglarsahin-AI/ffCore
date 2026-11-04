@@ -1623,7 +1623,8 @@ components:
         builtin:
           type: boolean
           title: Builtin
-          description: 'True: the built-in `default`, not stored.'
+          description: 'True: a built-in PII policy (`default`, or the egress rule''s `default-egress`),
+            not stored.'
         created_at:
           anyOf:
           - type: string

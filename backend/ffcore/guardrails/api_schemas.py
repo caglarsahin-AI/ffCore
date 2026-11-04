@@ -74,7 +74,10 @@ class PiiPolicyOut(BaseModel):
     categories: dict[str, PiiCategorySetting]
     custom_patterns: list[CustomPattern]
     is_default: bool
-    builtin: bool = Field(description="True: the built-in `default`, not stored.")
+    builtin: bool = Field(
+        description="True: a built-in PII policy (`default`, or the egress rule's "
+        "`default-egress`), not stored."
+    )
     created_at: datetime | None
     updated_at: datetime | None
 

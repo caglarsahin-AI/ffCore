@@ -37,7 +37,13 @@ from ffcore.guardrails.api_schemas import (
     PiiPolicyOut,
     PiiPolicyUpdate,
 )
-from ffcore.guardrails.builtin import BUILTIN_DEFAULT, BUILTIN_KEY, BUILTIN_VERSION, DEFAULT_PII
+from ffcore.guardrails.builtin import (
+    BUILTIN_DEFAULT,
+    BUILTIN_KEY,
+    BUILTIN_VERSION,
+    DEFAULT_PII,
+    EGRESS_PII_KEY,
+)
 from ffcore.guardrails.engine import (
     Decision,
     EgressStageDisabled,
@@ -97,17 +103,19 @@ def pii_out(row: PiiPolicy) -> PiiPolicyOut:
     return PiiPolicyOut.model_validate({**row.__dict__, "builtin": False})
 
 
-def builtin_pii_out(project_id: UUID) -> PiiPolicyOut:
+def builtin_pii_out(
+    project_id: UUID, key: str = BUILTIN_KEY, spec: PiiPolicySpec = DEFAULT_PII
+) -> PiiPolicyOut:
     return PiiPolicyOut(
         id=None,
         project_id=project_id,
-        key=BUILTIN_KEY,
-        name="Built-in default",
+        key=key,
+        name="Built-in default" if key == BUILTIN_KEY else "Built-in egress default",
         is_default=False,
         builtin=True,
         created_at=None,
         updated_at=None,
-        **DEFAULT_PII.model_dump(),
+        **spec.model_dump(),
     )
 
 
@@ -155,7 +163,12 @@ async def list_pii_policies(project_id: UUID, actor: Reader, session: SessionDep
         )
     )
     data = [pii_out(r) for r in rows]
-    if not any(r.key == BUILTIN_KEY for r in rows):
+    stored = {r.key for r in rows}
+    if EGRESS_PII_KEY not in stored:
+        # r1 MINOR-4: the egress rule's built-in PII, as resolve_pii gives it (MAJOR-1).
+        egress = await service.resolve_pii(session, project_id, EGRESS_PII_KEY)
+        data.insert(0, builtin_pii_out(project_id, EGRESS_PII_KEY, egress))
+    if BUILTIN_KEY not in stored:
         data.insert(0, builtin_pii_out(project_id))
     return PiiPolicyList(data=data)
 
@@ -419,7 +432,8 @@ async def test_guardrails(
             key=body.policy_key,
             spec=PolicySpec(rules=[rule], mode="enforce"),
             pii_policies={"panel": pii},
-            builtin=pii is DEFAULT_PII,
+            # Not stored under that key: the built-in one (`default` or `default-egress`).
+            builtin=await service.stored_pii(session, project_id, body.policy_key) is None,
         )
         stored_mode = None
     else:
