@@ -17,7 +17,7 @@ import re
 import time
 import uuid
 from collections import Counter
-from collections.abc import Callable
+from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
@@ -355,7 +355,7 @@ async def _attachment_texts(
     raw: Path,
     settings,
     convert: Converter,
-    text_filter: Callable[[str], str] | None = None,
+    text_filter: Callable[[str], Awaitable[str]] | None = None,
 ) -> list[tuple[str, str]]:
     """Convert the document's attachments; data dumps and low quality are recorded, not used."""
     texts = []
@@ -381,7 +381,7 @@ async def _attachment_texts(
             continue
         text = clean_markdown(result.text_md)
         if text_filter is not None:
-            text = text_filter(text)
+            text = await text_filter(text)
         dump = gates.data_dump(text)
         if dump:
             attachment.gate2_status, attachment.gate2_reason = "skipped", f"data_dump:{dump}"
@@ -401,8 +401,8 @@ class _CountingFilter:
         self.filter = ingest_mask.resolve(name)
         self.counts: Counter = Counter()
 
-    def __call__(self, text: str) -> str:
-        masked, found = self.filter.apply(text)
+    async def __call__(self, text: str) -> str:
+        masked, found = await self.filter.mask(text)
         self.counts.update(found)
         return masked
 
@@ -465,10 +465,10 @@ async def ingest_document(
         if masking is not None:
             # 19: raw stays byte for byte; silver (and text_raw beside it) is masked before it
             # is written, so gold and the model only ever see the masked text (K-M3S-0003).
-            text_md = masking(text_md)
+            text_md = await masking(text_md)
         body = clean_markdown(text_md)
         if masking is not None:
-            body = masking(body)
+            body = await masking(body)
         extra = await _attachment_texts(
             session, document, attachments or [], raw.parent, settings, convert, masking
         )
@@ -689,7 +689,7 @@ async def ingest_from_raw(
         if label is not None:
             # Silver frontmatter, documents.breadcrumb and search results read these fields:
             # masked before they are stored, like the body (r1 MAJOR-2).
-            document.meta, meta_counts = ingest_mask.mask_metadata(
+            document.meta, meta_counts = await ingest_mask.mask_metadata(
                 ingest_mask.resolve(text_filter), document.meta
             )
             document.meta["text_filter"] = label

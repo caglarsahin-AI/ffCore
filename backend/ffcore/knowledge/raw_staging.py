@@ -64,14 +64,24 @@ def _prsim_path(rel: str) -> bool:
     return any(part.lower().startswith("prsim") for part in Path(rel).parts[:-1])
 
 
-def check_sources(sources: Iterable[str], *, accept_personnel_data: bool = False) -> list[str]:
-    """The explicit source list; PRSIM refused unless `accept_personnel_data` (KARARLAR karar 5
-    and its M3 exception)."""
+def is_prsim(source: str) -> bool:
+    return _is_prsim(_norm(source))
+
+
+def check_sources(
+    sources: Iterable[str],
+    *,
+    accept_personnel_data: bool = False,
+    text_filter: str | None = None,
+) -> list[str]:
+    """The explicit source list; PRSIM refused unless names are masked (`text_filter` pii_ner,
+    08 tam 1b) or `accept_personnel_data` (KARARLAR karar 5 and its M3 exception)."""
+    personnel_ok = accept_personnel_data or text_filter == "pii_ner"
     chosen = [_norm(s) for s in sources if _norm(s)]
     if not chosen:
         raise StagingError("sources_required", "name the sources to ingest (--sources)")
     for source in chosen:
-        if _is_prsim(source) and not accept_personnel_data:
+        if _is_prsim(source) and not personnel_ok:
             raise StagingError(
                 "prsim_requires_ner",
                 f"{source} carries person data; it is ingested once 08 full recognizes names",
@@ -114,10 +124,14 @@ def iter_staged(
     *,
     limit: int | None = None,
     accept_personnel_data: bool = False,
+    text_filter: str | None = None,
 ) -> Iterator[StagedItem | Rejected]:
     """Documents under `raw_dir` in path order, with every refusal on the way. `limit` counts
     accepted documents only (the first small slice, plan/19 madde 3)."""
-    selected = set(check_sources(sources, accept_personnel_data=accept_personnel_data))
+    selected = set(
+        check_sources(sources, accept_personnel_data=accept_personnel_data, text_filter=text_filter)
+    )
+    personnel_ok = accept_personnel_data or text_filter == "pii_ner"
     base = Path(os.path.realpath(raw_dir))
     if not base.is_dir():
         raise StagingError("raw_dir_missing", f"{raw_dir} is not a directory")
@@ -153,7 +167,7 @@ def iter_staged(
                 continue
             source = _norm(str(meta["source"]))
             personnel = _is_prsim(source) or _prsim_path(rel)
-            if personnel and not accept_personnel_data:
+            if personnel and not personnel_ok:
                 yield Rejected(rel, "prsim_requires_ner")
                 continue
             if source not in selected:

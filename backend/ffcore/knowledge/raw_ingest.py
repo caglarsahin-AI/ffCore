@@ -46,7 +46,11 @@ from ffcore.knowledge.jobs import get_vector_store
 from ffcore.models.identity import Project
 from ffcore.models.knowledge import Chunk, Document, KnowledgeBase
 
-TEXT_FILTER = "pii_regex"
+# 08 tam 1b: person names masked too (NER over HTTP). The M3 measurement mode
+# (`accept_personnel_data`) keeps `pii_regex`, so its manifest stays as measured (KARARLAR
+# "PRSIM M3 olcumune girer"); a new ingest without it is `pii_ner`.
+TEXT_FILTER = "pii_ner"
+M3_TEXT_FILTER = "pii_regex"
 CUSTOMER_DATA = ("CREDIT_CARD", "TR_IBAN", "TR_NATIONAL_ID")
 # Same bytes in one of these statuses is not retried: indexed is done, skipped is the gates'
 # decision on these bytes (it would be the same again).
@@ -73,6 +77,7 @@ class RawIngestReport:
     files: list[tuple[str, str, str]] = field(default_factory=list)
     current: dict[str, tuple[str, int]] = field(default_factory=dict)
     ingested_at: str = ""
+    text_filter: str = TEXT_FILTER
     personnel_data_sources: set[str] = field(default_factory=set)
     # (source, relpath, error code) of files that failed before their record was registered.
     unregistered: list[tuple[str, str, str]] = field(default_factory=list)
@@ -88,7 +93,7 @@ class RawIngestReport:
         return {
             "stage": self.stage,
             "ingested_at": self.ingested_at,
-            "text_filter": ingest_mask.resolve(TEXT_FILTER).label,
+            "text_filter": ingest_mask.resolve(self.text_filter).label,
             "documents": len(self.files),
             "chunks": sum(e["chunks"] for e in sources.values()),
             "sources": dict(sorted(sources.items())),
@@ -123,7 +128,7 @@ class RawIngestReport:
             ),
             f"rejected: {fmt(self.rejected)}",
             f"gates: {fmt(self.gates)}",
-            f"masked ({TEXT_FILTER}): {fmt(self.masked)}",
+            f"masked ({self.text_filter}): {fmt(self.masked)}",
             "stage: "
             + (
                 "full"
@@ -227,12 +232,13 @@ class InvalidEncoding(ValueError):
     pass
 
 
-def _text_findings(path: Path, metadata: dict) -> dict[str, int]:
+async def _text_findings(path: Path, metadata: dict) -> dict[str, int]:
     """Regex PII counts of a staged text file (Markdown/plain) and of its metadata strings
     (r1 MAJOR-2); other formats are checked on their converted text after ingest. Text that is
     not UTF-8 is a coded refusal of that file (r1 MINOR-5), never a traceback for the run."""
-    f = ingest_mask.resolve(TEXT_FILTER)
-    counts = ingest_mask.mask_metadata(f, metadata)[1]
+    # The customer-data stop counts checksummed identifiers only (names are not customer data).
+    f = ingest_mask.resolve("pii_regex")
+    counts = (await ingest_mask.mask_metadata(f, metadata))[1]
     if path.suffix.lower() in (".md", ".txt"):
         try:
             text = path.read_text(encoding="utf-8", errors="strict")
@@ -261,6 +267,19 @@ def _sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
+async def check_ner(sources: list[str]) -> None:
+    """`pii_ner` needs the API's NER before the first file: a tree is never half name-masked.
+    With a PRSIM source the refusal keeps its name (`prsim_requires_ner`, karar 5)."""
+    from ffcore.guardrails.recognizers.ner import NerConfigError, NerUnavailable
+
+    try:
+        await ingest_mask.ner_client().find("NER readiness check.", ["PERSON"])
+    except (NerConfigError, NerUnavailable) as exc:
+        prsim = any(raw_staging.is_prsim(s) for s in sources)
+        code = "prsim_requires_ner" if prsim else "ner_unavailable"
+        raise RawIngestError(code, f"pii_ner needs the API's NER: {exc}") from None
+
+
 async def ingest_tree(
     *,
     project_key: str,
@@ -273,20 +292,35 @@ async def ingest_tree(
     embed_client: ingest.EmbedClient | None = None,
     convert: ingest.Converter = ingest.convert_bounded,
     accept_personnel_data: bool = False,
+    text_filter: str = TEXT_FILTER,
 ) -> RawIngestReport:
     # before any database or model work
-    raw_staging.check_sources(sources, accept_personnel_data=accept_personnel_data)
+    raw_staging.check_sources(
+        sources, accept_personnel_data=accept_personnel_data, text_filter=text_filter
+    )
     if not acl_roles:
         raise RawIngestError("acl_required", "name the roles that may read these documents")
+    if accept_personnel_data:
+        log.warning(
+            "ingest-raw accept_personnel_data is the M3 measurement mode (pii_regex, names not "
+            "masked); a new PRSIM ingest uses pii_ner without the flag (08 tam 1b)"
+        )
+    if text_filter == "pii_ner":
+        await check_ner(sources)
     kb = await _kb(project_key, kb_key)
     store = get_vector_store(settings)
     client = embed_client or ingest.HttpEmbedClient(settings)
     report = RawIngestReport(
         stage="full" if limit is None else "stage0-pipeline-evidence",
         ingested_at=datetime.now(UTC).isoformat(timespec="seconds"),
+        text_filter=text_filter,
     )
     entries = raw_staging.iter_staged(
-        raw_dir, sources, limit=limit, accept_personnel_data=accept_personnel_data
+        raw_dir,
+        sources,
+        limit=limit,
+        accept_personnel_data=accept_personnel_data,
+        text_filter=text_filter,
     )
     for entry in entries:
         if isinstance(entry, raw_staging.Rejected):
@@ -296,7 +330,7 @@ async def ingest_tree(
         if entry.personnel_data:
             report.personnel_data_sources.add(raw_staging.source_of(entry))
             try:
-                findings = _text_findings(
+                findings = await _text_findings(
                     entry.path, raw_staging.metadata_for(entry, kb_id=str(kb.id))
                 )
             except InvalidEncoding:
@@ -335,7 +369,7 @@ async def ingest_tree(
                     store=store,
                     embed_client=client,
                     convert=convert,
-                    text_filter=TEXT_FILTER,
+                    text_filter=text_filter,
                 )
         except Exception as exc:  # one file must not stop the tree; counted and logged by code
             report.statuses["failed"] += 1

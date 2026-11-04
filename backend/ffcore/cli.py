@@ -151,9 +151,10 @@ def build_parser() -> argparse.ArgumentParser:
     raw = commands.add_parser(
         "ingest-raw",
         help="ingest a raw-staging tree (file + <file>.meta.json) into a knowledge base (19)",
-        description="PII regex masking is always applied to silver and gold; raw is never "
-        "written. PRSIM is refused until 08 full (prsim_requires_ner) unless "
-        "--accept-personnel-data (M3 measurement only, KARARLAR).",
+        description="PII masking (regex identifiers and NER person names, pii_ner) is always "
+        "applied to silver and gold; raw is never written. PRSIM is ingested with name "
+        "masking; --accept-personnel-data is the M3 measurement mode (regex only, as "
+        "measured, KARARLAR).",
     )
     raw.add_argument("--project", required=True, help="project key")
     raw.add_argument("--kb", required=True, help="knowledge base key")
@@ -185,6 +186,14 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
+def _raw_text_filter(args) -> str:
+    """No option names the filter (masking cannot be named away, plan/19): new ingests mask
+    names too (`pii_ner`); the M3 measurement flag keeps `pii_regex` as measured (08 tam 1b)."""
+    from ffcore.knowledge import raw_ingest
+
+    return raw_ingest.M3_TEXT_FILTER if args.accept_personnel_data else raw_ingest.TEXT_FILTER
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
@@ -194,11 +203,23 @@ def main(argv: list[str] | None = None) -> int:
 
         try:
             raw_staging.check_sources(
-                args.sources, accept_personnel_data=args.accept_personnel_data
+                args.sources,
+                accept_personnel_data=args.accept_personnel_data,
+                text_filter=_raw_text_filter(args),
             )
         except raw_staging.StagingError as exc:
             print(f"error: {exc}", file=sys.stderr)
             return 2
+        if _raw_text_filter(args) == "pii_ner" and any(map(raw_staging.is_prsim, args.sources)):
+            # PRSIM: still before logging and the database (exit 2, as before 08 tam 1b); other
+            # sources are checked by ingest_tree before the first file.
+            from ffcore.knowledge import raw_ingest
+
+            try:
+                asyncio.run(raw_ingest.check_ner(args.sources))
+            except raw_ingest.RawIngestError as exc:
+                print(f"error: {exc}", file=sys.stderr)
+                return 2
     configure_logging(get_settings())
 
     try:
@@ -262,6 +283,7 @@ def main(argv: list[str] | None = None) -> int:
                         limit=args.limit,
                         settings=get_settings(),
                         accept_personnel_data=args.accept_personnel_data,
+                        text_filter=_raw_text_filter(args),
                     )
                 )
             except (raw_ingest.RawIngestError, raw_ingest.raw_staging.StagingError) as exc:

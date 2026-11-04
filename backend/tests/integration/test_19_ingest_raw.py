@@ -47,6 +47,7 @@ def _project_key(pg, project_id):
 def _ingest(settings, project_key, kb_key, tree, **kw):
     return asyncio.run(
         raw_ingest.ingest_tree(
+            text_filter="pii_regex",  # 19 measures the regex filter (08 tam 1b default pii_ner)
             project_key=project_key,
             kb_key=kb_key,
             raw_dir=tree,
@@ -229,6 +230,7 @@ PRSIM_BODY = (
 def _ingest_prsim(settings, pg, world, kb_key, tree, accept):
     return asyncio.run(
         raw_ingest.ingest_tree(
+            text_filter="pii_regex",  # 19 measures the regex filter (08 tam 1b default pii_ner)
             project_key=_project_key(pg, world["project"]),
             kb_key=kb_key,
             raw_dir=tree,
@@ -298,6 +300,7 @@ def test_19_r1_metadata_strings_masked_everywhere(world, pg, settings, tmp_path)
     )
     report = asyncio.run(
         raw_ingest.ingest_tree(
+            text_filter="pii_regex",  # 19 measures the regex filter (08 tam 1b default pii_ner)
             project_key=_project_key(pg, world["project"]),
             kb_key=kb["key"],
             raw_dir=tree,
