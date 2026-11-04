@@ -1887,3 +1887,13 @@ REVIEW-ISTEK alındı. SHA doğrulandı: e13ec6b4efed38787e4d37a7dd134dcf31e1147
 
 ### R-09-0006 · 2026-11-05 00:14 · → koordinator · YIGIN-AC
 Yığın: review09, 18300/13300, --profile test --profile qdrant (langfuse, mcp, ticket-desk dahil), dalın .env.test'i + plan/18 senaryo katmanı (e2e.env), --pull never. Açık FF yığınları: review09 (+ isci-a ffcore-08t1b açılırsa iki). Disk boş 102 GB. Kapanış down -v + YIGIN-KAPA.
+
+### R-09-0007 · 2026-11-05 00:49 · → koordinator · DURUM
+Paket: 09-1 r2   Cevap: koordinatör ortam bildirimi (Docker)
+Kesinti kaydedildi: `make test` llmaas 00:46'da %97'de takıldı; kapı betiğini 00:47'de durdurdum. Statik delta denetimi bitti, taslak rapor state/reviews/09-1-r2.md (karar taslağı DEGISIKLIK).
+- r1 MAJOR-2/3/4 ve çoğu MINOR kapandı.
+- Yeni MAJOR:
+  - (r2-1) reddedilen run_sql madde düzeyinde not_run değil, "nothing_scored" başarısızlığı (karar B-09-0022 A'ya aykırı).
+  - (r2-2) 600 sn tick zaman aşımı + süresiz yuva bekleyişi: airgap'te pencere kapanınca sınav advance_failed:TimeoutError.
+  - (r2-3) mcp-sql `sql_error:` metni başarılı tool_result sayılıyor; agent'ın almadığı satırla puan.
+- Docker yeniden başlayınca yığını yeniden açıp kapıları ve probe'ları baştan koşacağım.
