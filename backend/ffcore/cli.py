@@ -75,7 +75,9 @@ async def create_superadmin(email: str, full_name: str, password: str, access: s
         return str(user.id)
 
 
-async def enqueue_reindex(project_key: str, kb_key: str, layer: str, full: bool) -> str:
+async def enqueue_reindex(
+    project_key: str, kb_key: str, layer: str, full: bool, accept_personnel_data: bool = False
+) -> str:
     """04a: `make reindex`. Enqueues the worker job; the API process embeds (C10)."""
     from sqlalchemy import select
 
@@ -97,7 +99,17 @@ async def enqueue_reindex(project_key: str, kb_key: str, layer: str, full: bool)
         )
     if kb_id is None:
         raise CliError(f"knowledge base {project_key}/{kb_key} not found")
-    return await get_queue(get_settings()).enqueue("reindex_job", str(kb_id), layer, full)
+    if layer == "silver":
+        # r2 NOTE-5: the job checks too (the API road); here the operator gets the code and exit 2
+        # before anything is queued.
+        from ffcore.knowledge import ingest
+
+        await ingest.check_reindex_silver(
+            kb_id, full=full, accept_personnel_data=accept_personnel_data
+        )
+    return await get_queue(get_settings()).enqueue(
+        "reindex_job", str(kb_id), layer, full, accept_personnel_data
+    )
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -128,6 +140,12 @@ def build_parser() -> argparse.ArgumentParser:
     reindex.add_argument("--kb", required=True, help="knowledge base key")
     reindex.add_argument("--layer", choices=("silver", "gold"), required=True)
     reindex.add_argument("--full", action="store_true", help="every document, not only changed")
+    reindex.add_argument(
+        "--accept-personnel-data",
+        action="store_true",
+        help="the M3 measurement mode: reconvert personnel-data records written with pii_regex "
+        "(names not masked); without it such a record refuses the reindex (prsim_requires_ner)",
+    )
     seed_prompts = commands.add_parser(
         "seed-prompts", help="first-install prompts from backend/prompts into Langfuse (02)"
     )
@@ -250,7 +268,17 @@ def main(argv: list[str] | None = None) -> int:
             if result.problems or (args.check and result.changed):
                 return 1
         elif args.command == "reindex":
-            job = asyncio.run(enqueue_reindex(args.project, args.kb, args.layer, args.full))
+            from ffcore.knowledge import ingest
+
+            try:
+                job = asyncio.run(
+                    enqueue_reindex(
+                        args.project, args.kb, args.layer, args.full, args.accept_personnel_data
+                    )
+                )
+            except ingest.ReindexRefused as exc:
+                print(f"error: {exc}", file=sys.stderr)
+                return 2
             print(f"reindex queued: job {job} (worker log shows reused=N embedded=M)")
         elif args.command == "seed-prompts":
             client = tracing.init_tracing(get_settings())

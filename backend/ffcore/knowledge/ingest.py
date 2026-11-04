@@ -741,6 +741,47 @@ class ReindexReport:
     embedded: int = 0
 
 
+class ReindexRefused(Exception):
+    """A reindex refused before it touched any document (code, path; never content)."""
+
+    def __init__(self, code: str, detail: str) -> None:
+        super().__init__(f"{code}: {detail}")
+        self.code = code
+
+
+def _silver_scope(kb_id: uuid.UUID, full: bool):
+    statement = select(Document.id, Document.filename, Document.meta).where(
+        Document.kb_id == kb_id, Document.deleted_at.is_(None)
+    )
+    if not full:
+        statement = statement.where(Document.status.in_(("failed", "timeout", "pending")))
+    return statement
+
+
+async def check_reindex_silver(
+    kb_id: uuid.UUID, *, full: bool, accept_personnel_data: bool = False
+) -> None:
+    """r2 NOTE-5 (KARARLAR "08 tam 1b r2 ekleri"): a personnel-data record written with
+    `pii_regex` (the M3 mode, names not masked) is reconverted only with
+    `--accept-personnel-data`; otherwise the whole reindex is refused before any document is
+    touched (`prsim_requires_ner`). The same personnel-data rule as staging (MINOR-r2-1)."""
+    if accept_personnel_data:
+        return
+    async with db.session_scope() as session:
+        rows = (await session.execute(_silver_scope(kb_id, full))).all()
+    for _, filename, meta in rows:
+        meta = meta or {}
+        label = str(meta.get("text_filter") or "")
+        if label.startswith("pii_regex@") and raw_staging.personnel_data(
+            str(meta.get("source") or ""), filename
+        ):
+            raise ReindexRefused(
+                "prsim_requires_ner",
+                f"{filename} is personnel data written with {label} (the M3 mode); reindex it "
+                "with --accept-personnel-data or ingest it again with pii_ner",
+            )
+
+
 async def reindex_gold(
     kb_id: uuid.UUID,
     *,
@@ -777,20 +818,18 @@ async def reindex_silver(
     settings: Settings,
     store: VectorStore,
     embed_client: EmbedClient,
+    convert: Converter = convert_bounded,
+    accept_personnel_data: bool = False,
 ) -> ReindexReport:
-    """`make reindex LAYER=silver`: reconvert from raw (never the source); then gold."""
+    """`make reindex LAYER=silver`: reconvert from raw (never the source); then gold. Refused
+    as a whole when an M3 personnel-data record is in scope without the flag (r2 NOTE-5)."""
+    await check_reindex_silver(kb_id, full=full, accept_personnel_data=accept_personnel_data)
     async with db.session_scope() as session:
-        statuses = None if full else ("failed", "timeout", "pending")
-        statement = select(Document.id).where(
-            Document.kb_id == kb_id, Document.deleted_at.is_(None)
-        )
-        if statuses:
-            statement = statement.where(Document.status.in_(statuses))
-        ids = list((await session.scalars(statement)).all())
+        ids = [row[0] for row in (await session.execute(_silver_scope(kb_id, full))).all()]
     report = ReindexReport()
     for document_id in ids:
         result = await ingest_document(
-            document_id, settings=settings, store=store, embed_client=embed_client
+            document_id, settings=settings, store=store, embed_client=embed_client, convert=convert
         )
         report.documents += 1
         report.reused += result.reused
@@ -812,6 +851,8 @@ __all__ = [
     "ingest_document",
     "ingest_from_raw",
     "register_upload",
+    "ReindexRefused",
+    "check_reindex_silver",
     "reindex_gold",
     "reindex_silver",
 ]

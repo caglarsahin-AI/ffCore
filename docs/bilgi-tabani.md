@@ -43,6 +43,11 @@ python -m ffcore.cli ingest-raw --project <p> --kb <kb> --raw-dir <tree, read-on
   bytes recorded as `pii_regex@1` in a `pii_ner` run (or the other way round) are refused as
   `text_filter_mismatch`, counted, and the record stays as it is (a PRSIM record from the M3
   mode is never retried with names unmasked).
+- Reindex is inside the same boundary: `make reindex LAYER=silver` refuses with
+  `prsim_requires_ner` (exit 2, nothing queued or touched) when a personnel-data record written
+  with `pii_regex@1` (the M3 mode) is in its scope; `python -m ffcore.cli reindex ...
+  --accept-personnel-data` runs it in the M3 mode. A reindex requested through the API with such
+  a record in scope is refused by the job the same way (the API has no M3 flag).
 - Attachment file names are masked too: in a personnel-data source (PRSIM) the shown name
   (attachment record, silver heading, chunk breadcrumb) is `Ek <n>`; in other sources the name
   goes through the text filter with `_` and `-` read as spaces. The raw file keeps its name.
