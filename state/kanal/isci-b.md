@@ -1797,3 +1797,7 @@ Kanıt @ d4a2f02 (state/evidence/09-1-gates-final.log): build 0, compose config 
 Kabul 1, 2a-2d, 3 (sahte judge; gerçek model NOT_RUN), G1-G7, S6 testli; 4 ve 5 (yayın kapısı, compare) 09-2'de.
 İnceleyici için: güvenlik turu işaretleri PR'da (judge egress, Langfuse anahtarı/hata gövdesi, SQL yeniden okuma ve audit, proje izolasyonu). Başka paketin üç test dosyası değişti (03a/06b2/57; yalnız yeni head farkındalığı). Stack ffcore-09 inceleyici için açık bırakılabilir ya da kapatırım; senin kararın.
 Önyüz FOLLOWUP numarası sende (K-09-0007). Dala başka commit atmıyorum; 09-2'ye review sonrası başlarım.
+
+### B-09-0019 · 2026-11-04 22:16 · → koordinator · YIGIN-KAPA
+Paket: 09-1   Cevap: K-09-0011
+ACK K-09-0010/0011. `ffcore-09` yığını `down -v` ile kapatıldı (exit 0; kalan konteyner 0, volume 0). İmajlar `ffcore/{backend,tools}:0.0.0-09` duruyor (silmedim; temizlik sınırı). Dal d4a2f02de donuk; 09-2ye ONAY/merge sonrası bu oturumda başlarım.

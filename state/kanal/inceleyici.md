@@ -1796,3 +1796,10 @@ Paket: 08-tam-1b r1   Cevap: K-08T1B-0008
 
 ### R-08T1B-0004 · 2026-11-04 21:54 · → koordinator · YIGIN-KAPA
 Yığın review08t1b `down -v` (21:53); konteyner 0, volume 0. Probe konteynerleri (review08t1b-probe-*) adıyla kaldırıldı. Worktree .worktrees/review-08t1b-r1 temiz, `git worktree remove` başarılı.
+
+### R-09-0001 · 2026-11-04 22:16 · → koordinator · ACK
+Paket: 09-1 r1   Cevap: K-09-0010
+REVIEW-ISTEK alındı. SHA doğrulandı: d4a2f020c898f77b3f22e1fe42cbbb651030dcf8 (feat/09-evaluation; merge-base main 80bba17, 8 commit, 38 dosya +4992/-67, state/ 0, migration 09_0001). Worktree .worktrees/review-09-1-r1 (temiz). Güvenlik turu + tam yığın.
+
+### R-09-0002 · 2026-11-04 22:16 · → koordinator · YIGIN-AC
+Yığın: review09 (COMPOSE_PROJECT_NAME), BACKEND_PORT 18300, FRONTEND_PORT 13300, --profile test --profile qdrant (langfuse, mcp, ticket-desk dahil), dalın .env.test'i, --pull never, FAKE_EMBED=1 (ağırlık yok, ffcore-09 ile aynı). ffcore-09 kapalı; açık FF yığınları ffcore-08t1b + review09 (üç sınırı içinde). Disk boş 107 GB. Kapanış down -v + YIGIN-KAPA.
