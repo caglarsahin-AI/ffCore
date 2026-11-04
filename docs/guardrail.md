@@ -72,8 +72,9 @@ silently ignored.
 
 `engine: ner` runs the regex recognizers and a Hugging Face token-classification model
 (`NER_MODEL` at `NER_REVISION`, CPU) for person, organization and location names. A name never
-overrides a regex or custom finding: an overlapping NER span is dropped, so checksummed values
-keep their category. The evidence is `ner <model>@<revision> score 0.97`. `engine: regex` never
+overrides a regex or custom finding: an overlapping NER span is cut to the parts outside it (and
+outside any `<<PII_n>>` placeholder already in the text), so checksummed values keep their
+category and a name glued to one is still masked. The evidence is `ner <model>@<revision> score 0.97`. `engine: regex` never
 calls the model.
 
 - The model is loaded only by the API process (like the embedding model). The agent worker and

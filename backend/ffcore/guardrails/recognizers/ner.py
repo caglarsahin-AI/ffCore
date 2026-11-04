@@ -11,6 +11,8 @@ as a rule failure (`on_error`, default block). Nothing falls back to regex only.
 """
 
 import asyncio
+import dataclasses
+import re
 import threading
 from collections.abc import Callable, Collection, Mapping
 from typing import Protocol
@@ -38,6 +40,42 @@ STRIDE = 128
 # next, and the spans the overlap repeats are merged. The overlap is far above any name.
 NER_TEXT_MAX_CHARS = 200_000
 NER_WINDOW_OVERLAP_CHARS = 2_000
+
+
+_PLACEHOLDER = re.compile(r"<<PII_[0-9]{1,7}>>")  # masking.PLACEHOLDER (no import cycle)
+
+
+def trim_names(text: str, names, findings) -> list[Finding]:
+    """NER spans cut to the parts outside the regex/custom `findings` and the `<<PII_n>>`
+    placeholders already in the text (r1 MINOR-5/6): a name glued to a phone keeps its name
+    part, a span never wraps or splits a placeholder. Parts are trimmed of non-alphanumeric
+    edges; a part left with fewer than two characters is dropped."""
+    blocked = sorted(
+        [(f.start, f.end) for f in findings]
+        + [(m.start(), m.end()) for m in _PLACEHOLDER.finditer(text)]
+    )
+    out = []
+    for name in names:
+        pieces = [(name.start, name.end)]
+        for b_start, b_end in blocked:
+            cut = []
+            for start, end in pieces:
+                if b_end <= start or b_start >= end:
+                    cut.append((start, end))
+                    continue
+                if start < b_start:
+                    cut.append((start, b_start))
+                if b_end < end:
+                    cut.append((b_end, end))
+            pieces = cut
+        for start, end in pieces:
+            while start < end and not text[start].isalnum():
+                start += 1
+            while end > start and not text[end - 1].isalnum():
+                end -= 1
+            if end - start >= 2:
+                out.append(dataclasses.replace(name, start=start, end=end, value=text[start:end]))
+    return out
 
 
 class NerEgressUnavailable(ApiError):

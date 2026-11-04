@@ -78,8 +78,10 @@ class PiiNerFilter:
         """`pii_regex` plus person names; a name overlapping a regex finding is dropped."""
         base = recognize(text, PII_REGEX_CATEGORIES)
         names = await ner_client().find(text, PII_NER_CATEGORIES) if text.strip() else []
-        kept = [n for n in names if not any(n.overlaps(b) for b in base)]
-        return _redact(text, [*base, *kept])
+        from ffcore.guardrails.recognizers.ner import trim_names
+
+        # Cut to the parts outside the regex findings (r1 MINOR-5), never dropped whole.
+        return _redact(text, [*base, *trim_names(text, names, base)])
 
 
 TextFilter = PiiRegexFilter | PiiNerFilter

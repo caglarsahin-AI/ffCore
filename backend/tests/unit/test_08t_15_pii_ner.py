@@ -52,10 +52,11 @@ def test_08t_15_pii_ner_filter(fake_ner):
 
 
 def test_08t_15_pii_ner_never_overrides_regex(fake_ner):
-    # The NER span "Demir ayse.demir" overlaps the e-mail address: the checksum-free regex
-    # finding still wins, the name part is not masked by a guess.
+    # The NER span "Demir ayse.demir" overlaps the e-mail address: the regex finding keeps the
+    # whole address, the span is cut to its name part (r1 MINOR-5).
     masked, counts = asyncio.run(ingest_mask.resolve("pii_ner").mask("Demir ayse.demir@ornek.com"))
-    assert masked == "Demir [EMAIL_ADDRESS]" and counts == {"EMAIL_ADDRESS": 1}
+    assert masked == "[PERSON] [EMAIL_ADDRESS]"
+    assert counts == {"PERSON": 1, "EMAIL_ADDRESS": 1}
 
 
 def test_08t_15_metadata_masked_by_pii_ner(fake_ner):

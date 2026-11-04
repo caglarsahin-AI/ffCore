@@ -25,7 +25,7 @@ from ffcore.guardrails.masking import (
     redact_label,
 )
 from ffcore.guardrails.recognizers import regex as regex_recognizers
-from ffcore.guardrails.recognizers.ner import NerClient, NerEgressUnavailable
+from ffcore.guardrails.recognizers.ner import NerClient, NerEgressUnavailable, trim_names
 from ffcore.guardrails.recognizers.regex import recognize, resolve_overlaps
 from ffcore.guardrails.rules import find_secrets, find_tool_arg_violations
 from ffcore.guardrails.schemas import GuardrailConfigError, PiiPolicySpec, ResolvedPolicy, Rule
@@ -188,10 +188,9 @@ def _pii_findings(
                     m.group(0),
                 )
             )
-    # A NER span never overrides a regex or custom finding (checksummed values win, 08t_2).
-    hits.extend(
-        n for n in ner_hits if n.category in active and not any(n.overlaps(h) for h in hits)
-    )
+    # A NER span never overrides a regex or custom finding (checksummed values win, 08t_2); it is
+    # cut to the parts outside them and outside carried placeholders (r1 MINOR-5/6).
+    hits.extend(trim_names(text, [n for n in ner_hits if n.category in active], hits))
     result = []
     for finding in resolve_overlaps(hits):
         if finding.score < pii.min_confidence:

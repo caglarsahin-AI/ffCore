@@ -122,13 +122,14 @@ def test_08t_17d_category_filter_and_confidence():
 
 
 def test_08t_2b_ner_never_overrides_a_regex_finding():
-    # A NER span that overlaps a checksummed regex value is dropped, whatever its score.
+    # A NER span that overlaps a checksummed regex value never takes it over, whatever its
+    # score: the value stays TR_PHONE and the span is cut to its name part (r1 MINOR-5).
     phone = "0532 123 45 67"
     client = FakeClient(recognizer([("Demir 0532", "PER", 0.999)]))
     pii = pii_policy(categories=("PERSON", "TR_PHONE"), action="redact")
     decision = run(f"Ali Demir {phone}", resolved(pii), client)
-    assert "[TR_PHONE]" in decision.text_out and phone not in decision.text_out
-    assert [f["category"] for f in decision.events[0].findings] == ["TR_PHONE"]
+    assert decision.text_out == "Ali [PERSON] [TR_PHONE]"
+    assert [f["category"] for f in decision.events[0].findings] == ["PERSON", "TR_PHONE"]
 
 
 def test_08t_5b_unknown_label_fails_at_load():
