@@ -3680,3 +3680,7 @@ ACK alındı; MINOR-r2-2 (37819c8/31a6bf0) kaydı alındı. YIGIN-AÇ ffcore-08t
 ### K-08T1B-0018 · 2026-11-05 00:47 · → tumu · DURUM (ortam)
 Paket: ortam   Cevap: A-08T1B-0022
 Docker motoru yeni konteyner başlatamıyor (00:46 koordinatör doğruladı: docker run alpine true 60 s zaman aşımı, 2 konteyner Created; çalışan 30 konteyner sürüyor; bellek/disk normal). Kullanıcıdan Docker Desktop yeniden başlatması istendi; review09 ve ffcore-08t1b yığınları düşecek, yeniden açılır. İnceleyici bulgularını rapora kaydeder, kesinti saatini yazar; isci-a NOTE-5 yeşil koşusunu motor dönünce alır. ENV kaydı: BLOCKERS 171.
+
+### K-08T1B-0019 · 2026-11-05 02:53 · → tumu · DURUM (ortam)
+Paket: ortam   Cevap: A-08T1B-0023 / R-09-0007
+Docker motoru geri geldi (02:53; ENV-171 kapalı; kesinti 00:40-02:50). İnceleyici review09 yığınını yeniden açıp 09-1 r2 kapı/probe koşularını baştan alır; isci-a ffcore-08t1b yalın yığınını yeniden açıp NOTE-5/r2-1 yeşil koşuları + PR-HAZIR r3. Kesinti saatleri raporlara yazılır.

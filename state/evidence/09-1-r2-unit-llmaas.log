@@ -119,4 +119,4 @@ tests/contract/test_06b_openapi.py ...                                   [ 96%]
 tests/contract/test_07_openapi.py ....                                   [ 96%]
 tests/contract/test_08_openapi.py ......                                 [ 97%]
 tests/contract/test_09_openapi.py ..                                     [ 97%]
-tests/contract/test_57_alembic_single_head.py 
+tests/contract/test_57_alembic_single_head.py time="2026-11-05T02:51:30+03:00" level=error msg="error waiting for container: "
