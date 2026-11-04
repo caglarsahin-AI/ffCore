@@ -105,8 +105,10 @@ finished items, links each run's trace into the Langfuse dataset run and writes 
 
 Runs that ask the user a question are cancelled (`not_run: waiting_user`). Runs that wait for a
 tool approval are cancelled as `not_run: approval_required` unless the suite has
-`approve_tools: true`; then they wait in the normal approval queue for a person, and expire
-there like any approval. Not-run items are counted apart and left out of the pass rate.
+`approve_tools: true`; then they wait in the normal approval queue for a person; one that
+expires there makes the item `not_run: approval_expired`. Not-run items are counted apart and
+left out of the pass rate, and the summary's `complete` is false: the exam did not finish
+unattended.
 
 A tick that keeps failing ends the exam `failed` with the error code; nothing stays `running`
 forever. To stop an exam, use `cancel`.

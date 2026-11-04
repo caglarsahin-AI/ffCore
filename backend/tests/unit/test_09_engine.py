@@ -560,3 +560,13 @@ def test_09_repeated_tick_failure_ends_exam_failed(monkeypatch):
     assert ev.status == "running"
     anyio.run(worker_tick._count_failure, redis, "ev", ValueError("x"))
     assert (ev.status, ev.error_code) == ("failed", "advance_failed:ValueError")
+
+
+def test_09_approval_expired_counted_apart_and_marks_incomplete():
+    expired = _facts(status="failed", error_code="approval_expired", outcome_label=None)
+    r = item_result(_item(), expired, [], "")
+    assert r.passed is None and r.note == "approval_expired"
+    ok = item_result(_item("q02"), _facts(), [Score("contains", 1.0, True)], "")
+    s = summarize([r, ok], pass_threshold=0.8, warmup_ms=None, latencies_ms=[])
+    assert s["not_run"] == {"approval_expired": 1} and s["scored"] == 1
+    assert s["complete"] is False and s["passed"] is True

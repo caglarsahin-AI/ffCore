@@ -39,6 +39,9 @@ from ffcore.models.runs import Run, RunEvent
 log = logging.getLogger("ffcore.evaluation")
 
 TERMINAL = {"completed", "failed", "cancelled", "abandoned"}
+# Run end codes that mean "the exam could not ask", not "the agent failed" (K-09-0008): an
+# approval nobody gave in time. Counted apart (n/N) and never part of the pass rate.
+NOT_RUN_CODES = {"approval_expired"}
 MAX_ATTEMPTS = 5
 WORST = 10
 
@@ -131,6 +134,8 @@ def item_result(item: dict, facts: ItemFacts | None, scores: list[Score], note: 
             selected=facts.selected,
         )
     )
+    if facts.status != "completed" and facts.error_code in NOT_RUN_CODES:
+        return ItemResult(**base, outcome=None, passed=None, scores=[], note=facts.error_code)
     if facts.status != "completed":
         return ItemResult(
             **base, outcome=None, passed=False, scores=[], note=facts.error_code or facts.status
@@ -184,6 +189,9 @@ def summarize(
         "pass_rate": round(pass_rate, 4),
         "pass_threshold": pass_threshold,
         "passed": bool(scored) and pass_rate >= pass_threshold,
+        # False when any item was not run (waiting for a user, approval required or expired):
+        # the exam did not complete unattended and its pass rate covers `scored` items only.
+        "complete": not not_run,
         "scores": {k: round(sum(v) / len(v), 4) for k, v in sorted(by_scorer.items())},
         "outcomes": {o: outcomes.get(o, 0) for o in OUTCOMES},
         "styles": styles,

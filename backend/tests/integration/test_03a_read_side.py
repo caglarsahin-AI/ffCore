@@ -87,6 +87,10 @@ PARITY_EXEMPT_PREFIXES = (
     # test_03c_21_read_mode_get_parity (the lists and usage stay checked here).
     f"{API}/projects/{{project_id}}/api-keys/{{key_id}}",
     f"{API}/projects/{{project_id}}/quotas/{{quota_id}}",
+    # 09: single suite and exam GETs need a suite and an exam run in the world; their parity is
+    # test_09_read_mode_get_parity (the /eval-suites list stays checked here).
+    f"{API}/projects/{{project_id}}/eval-suites/{{suite_id}}",
+    f"{API}/projects/{{project_id}}/eval-runs/{{eval_run_id}}",
 )
 
 
