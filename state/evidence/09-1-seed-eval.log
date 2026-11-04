@@ -1,0 +1,14 @@
+== run 1
+dataset: hastane-a.sozlesme-33
+items upserted: 33; archived: 0
+suite: created
+dataset: hastane-a.sql-20
+items upserted: 20; archived: 0
+suite: created
+== run 2
+dataset: hastane-a.sozlesme-33
+items upserted: 33; archived: 0
+suite: already present
+dataset: hastane-a.sql-20
+items upserted: 20; archived: 0
+suite: already present

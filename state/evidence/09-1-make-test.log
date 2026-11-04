@@ -1,0 +1,8 @@
+tests/contract/test_c5_vectorstore.py ...                                [ 99%]
+tests/contract/test_c9_runs.py .......                                   [100%]
+
+======================= 1596 passed in 197.00s (0:03:17) =======================
+tests/contract/test_c5_vectorstore.py ...                                [ 99%]
+tests/contract/test_c9_runs.py .......                                   [100%]
+
+======================= 1596 passed in 185.94s (0:03:05) =======================

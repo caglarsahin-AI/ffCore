@@ -1,0 +1,8 @@
+v2 all total 332
+/api/public/scores dict_keys(['traceId']) 332 4
+/api/public/v2/scores dict_keys(['traceId']) 332 4
+/api/public/v2/scores dict_keys(['traceIds']) 332 4
+/api/public/scores dict_keys(['traceIds']) 332 4
+scoreIds 3 ['60f630a1b1e47193dfe46839e6045d7c-contains', '60f630a1b1e47193dfe46839e6045d7c-outcome', '60f630a1b1e47193dfe46839e6045d7c-passed']
+scoreIds unknown 0
+trace.scores 4 ['cites_source', 'contains', 'outcome', 'passed']

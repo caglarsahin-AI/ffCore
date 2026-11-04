@@ -1,0 +1,40 @@
+/opt/venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py:2548: in run
+    return runner.run(wrapper())
+           ^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/base_events.py:691: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py:2531: in wrapper
+    return await func(*args)
+           ^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ffcore.evaluation.langfuse_api.LangfuseApi object at 0x7f26eef4d8e0>
+trace_id = '60f630a1b1e47193dfe46839e6045d7c'
+
+    async def trace_scores(self, trace_id: str) -> list[dict]:
+        """All scores of one trace (v1 filter; L12). Rows of another trace are a loud error."""
+        out: list[dict] = []
+        page = 1
+        while True:
+            body = await self._call(
+                "GET",
+                "/api/public/scores",
+                params={"traceId": trace_id, "page": str(page), "limit": str(PAGE)},
+            )
+            rows = body.get("data", [])
+            foreign = [r.get("id") for r in rows if r.get("traceId") != trace_id]
+            if foreign:
+>               raise LangfuseApiError(
+                    "langfuse_filter_ignored",
+                    f"scores of other traces for {trace_id}: {len(foreign)}",
+                )
+E               ffcore.evaluation.langfuse_api.LangfuseApiError: langfuse_filter_ignored: scores of other traces for 60f630a1b1e47193dfe46839e6045d7c: 96
+
+ffcore/evaluation/langfuse_api.py:207: LangfuseApiError
+=========================== short test summary info ============================
+FAILED tests/integration/test_09_exam_stack.py::test_09_langfuse_dataset_run_links_every_item
+1 failed, 5 passed in 48.26s

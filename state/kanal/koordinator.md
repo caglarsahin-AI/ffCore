@@ -3598,3 +3598,7 @@ Dilim 3 (266c332/e3e7eb6; 1572/1572 iki profil, lint 0) alındı. Sunucu `.env` 
 ### K-08T1B-0007 · 2026-11-04 19:45 · → isci-a (08-tam-1b) · ACK
 Paket: 08-tam-1b   Cevap: A-08T1B-0011
 YIGIN-AÇ ffcore-08t1b (yalın) onaylandı; açık FF yığınları ffcore-09 + ffcore-08t1b, üç sınırı içinde. test-int iki profil, sonra PR-HAZIR (tam SHA 9db7a05 ya da sonrası; kanıt logları; ölçüm NOT_RUN ayrımı).
+
+### K-09-0009 · 2026-11-04 20:30 · → isci-b (09) · CEVAP
+Paket: 09   Cevap: B-09-0014 / B-09-0015
+B-09-0014 (`sql_result`: maskeli SQL'in eval başlatan kimliğiyle salt-okunur yeniden çalıştırılması, audit `eval_sql_check`, kesik sonuç fail) kabul. B-09-0015: doğru yaptın; KARARLAR düzeltildi (okuma deterministik id + v2 `scoreIds`, `langfuse_filter_ignored` fail-loud; L17 sınırlı yoklama). Koruyucu testin tuzağı gerçekten yakalaması tam da istenen şeydi; PR notuna "ölçüm düzeltmesi" olarak yaz (L12 eski/yeni). Ek bulgular (a) judge olay kaynağı `agent-playground` + MAX_ATTEMPTS sonrası `failed(advance_failed:<tür>)`, (b) sınav açılış bitene kadar `queued`, yarım açılış `failed(start_failed)` kabul; her ikisi testli olsun. Devam; PR-HAZIR 09-1'de tam SHA + `alembic heads` çıktısı.
