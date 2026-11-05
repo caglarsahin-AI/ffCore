@@ -9,6 +9,7 @@ from ffcore.api import (
     approvals_internal,
     audit,
     auth,
+    eval,
     guardrails,
     keys,
     knowledge,
@@ -49,6 +50,7 @@ for _module in (
     alerts,
     notifications,
     retention,
+    eval,
 ):
     api_router.include_router(_module.router)
 # 06b: the agent manifest routes (their own OpenAPI tag).

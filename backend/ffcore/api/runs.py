@@ -55,7 +55,7 @@ from ffcore.guardrails.settings import get_guardrail_settings
 from ffcore.models.agents import Agent, AgentVersion
 from ffcore.models.identity import ProjectMember
 from ffcore.models.knowledge import Document
-from ffcore.models.runs import Conversation, Message, Run, RunEvent
+from ffcore.models.runs import Message, Run, RunEvent
 from ffcore.runtime import events as run_events
 from ffcore.runtime import resume
 from ffcore.runtime.contracts import (
@@ -64,10 +64,10 @@ from ffcore.runtime.contracts import (
     RunEventType,
     RunStatus,
     SseEvent,
-    TriggerType,
 )
 from ffcore.runtime.definition import DEFAULT_APPROVER, parse_definition
 from ffcore.runtime.queue import RunQueue, get_run_queue
+from ffcore.services.runs_start import start_run
 
 router = APIRouter(prefix="/projects/{project_id}", tags=["runs"], responses=ERROR_RESPONSES)
 log = logging.getLogger("ffcore.runtime.feedback")
@@ -502,64 +502,34 @@ async def create_run(
                 404, "not_found_error", "agent_not_published", "The agent is not published."
             )
         version = await session.get(AgentVersion, agent.current_version_id)
-    definition = parse_definition(version.definition)
-    unknown = sorted(set(body.variables) - {v.key for v in definition.variables})
-    if unknown:
-        raise invalid("variable_unknown", f"Unknown variables: {unknown}")
 
-    user_id = UUID(actor.actor_id)
-    if body.conversation_id is not None:
-        conversation = await session.scalar(
-            select(Conversation).where(
-                Conversation.id == body.conversation_id,
-                Conversation.project_id == project_id,
-                Conversation.agent_id == agent.id,
-                Conversation.user_id == user_id,
-                Conversation.deleted_at.is_(None),
-            )
+    async def audit(session, run: Run, version: AgentVersion) -> None:
+        await _audit(
+            session,
+            request,
+            actor,
+            project_id,
+            "start_run",
+            run.id,
+            after={"agent_id": str(agent.id), "version": version.version, "channel": body.channel},
         )
-        if conversation is None:
-            raise not_found("conversation")
-    else:
-        conversation = Conversation(
-            project_id=project_id,
-            agent_id=agent.id,
-            user_id=user_id,
-            title=body.input[:80],
-            created_by=actor.actor_id,
-        )
-        session.add(conversation)
-        await session.flush()
-    run = Run(
+
+    run = await start_run(
+        session,
+        settings,
+        queue,
         project_id=project_id,
-        agent_id=agent.id,
-        agent_version_id=version.id,
-        conversation_id=conversation.id,
-        user_id=user_id,
-        channel=body.channel,
-        trigger_type=TriggerType.chat,
-        status=RunStatus.queued,
+        agent=agent,
+        version=version,
+        user_id=UUID(actor.actor_id),
+        created_by=actor.actor_id,
         input=body.input,
         variables=body.variables,
-        created_by=actor.actor_id,
+        channel=body.channel,
+        conversation_id=body.conversation_id,
+        audit=audit,
+        queued_event=_queued_event,
     )
-    session.add(run)
-    await session.flush()
-    session.add(
-        Message(conversation_id=conversation.id, run_id=run.id, role="user", content=body.input)
-    )
-    await _audit(
-        session,
-        request,
-        actor,
-        project_id,
-        "start_run",
-        run.id,
-        after={"agent_id": str(agent.id), "version": version.version, "channel": body.channel},
-    )
-    await session.commit()
-    await _queued_event(session, settings, run)
-    await queue.enqueue(str(run.id))
     return _stream(
         settings,
         project_id,

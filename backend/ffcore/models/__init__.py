@@ -4,6 +4,7 @@ from ffcore.models.approvals import Approval  # 07
 from ffcore.models.audit import AuditEvent  # 03b
 from ffcore.models.base import Base
 from ffcore.models.catalog import Model, ModelCatalogEntry, Provider, ProviderProject  # 03a
+from ffcore.models.eval import EvalRun, EvalSuite  # 09
 from ffcore.models.guardrails import GuardrailEventRow, GuardrailPolicy, PiiPolicy  # 08
 from ffcore.models.identity import Project, ProjectMember, User  # 03a
 from ffcore.models.keys import ApiKey  # 03c
@@ -26,6 +27,8 @@ __all__ = [
     "Chunk",
     "Conversation",
     "Document",
+    "EvalRun",
+    "EvalSuite",
     "FewShot",
     "GuardrailEventRow",
     "GuardrailPolicy",

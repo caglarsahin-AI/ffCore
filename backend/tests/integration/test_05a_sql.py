@@ -182,6 +182,19 @@ def test_05a_run_sql_unknown_table_and_db_error_coded(chain, settings, world):
     assert bad.text.startswith("sql_error: 42703")
 
 
+def test_05a_run_sql_refusal_and_db_error_are_tool_errors(chain, settings, world):
+    """09-1 r2 MAJOR-r2-3 (KARARLAR "09-1 r2 kararları", 05a additive): a refused query and a
+    database error come back as a tool error with the same coded text; rows do not."""
+    unknown = _call(
+        chain, settings, world, "run_sql", {"sql": "SELECT * FROM patients", "reason": "t"}
+    )
+    assert unknown.is_error and unknown.text.startswith("sql_rejected: sql_unknown_table")
+    bad = _call(chain, settings, world, "run_sql", {"sql": "SELECT nope FROM beds", "reason": "t"})
+    assert bad.is_error and bad.text.startswith("sql_error: 42703")
+    rows = _call(chain, settings, world, "run_sql", {"sql": "SELECT 1 AS n", "reason": "t"})
+    assert not rows.is_error, rows.text
+
+
 def test_05a_run_sql_timeout(chain, settings, world):
     _, sql_settings = chain
     sql_settings.sql_timeout_s = 1

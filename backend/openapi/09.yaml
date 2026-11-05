@@ -1,0 +1,1018 @@
+openapi: 3.1.0
+info:
+  title: FFCore API
+  description: 'Exams over Langfuse datasets: suites, exam runs, progress (package 09).'
+  version: '0.9'
+paths:
+  /api/v1/projects/{project_id}/eval-suites:
+    get:
+      tags:
+      - evaluation
+      summary: List Suites
+      operationId: list_suites_api_v1_projects__project_id__eval_suites_get
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuiteList'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+    post:
+      tags:
+      - evaluation
+      summary: Create Suite
+      description: Create a suite and its Langfuse dataset (created if missing; an existing one is kept).
+      operationId: create_suite_api_v1_projects__project_id__eval_suites_post
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SuiteCreate'
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuiteOut'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+  /api/v1/projects/{project_id}/eval-suites/{suite_id}:
+    get:
+      tags:
+      - evaluation
+      summary: Get Suite
+      operationId: get_suite_api_v1_projects__project_id__eval_suites__suite_id__get
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      - name: suite_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Suite Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuiteOut'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+    patch:
+      tags:
+      - evaluation
+      summary: Update Suite
+      description: 'A running exam keeps the suite as it started (its own `config`); a change applies
+        to
+
+        the next exam.'
+      operationId: update_suite_api_v1_projects__project_id__eval_suites__suite_id__patch
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      - name: suite_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Suite Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SuiteUpdate'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuiteOut'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+    delete:
+      tags:
+      - evaluation
+      summary: Delete Suite
+      description: Soft delete; the Langfuse dataset and its runs stay (they are the exam history).
+      operationId: delete_suite_api_v1_projects__project_id__eval_suites__suite_id__delete
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      - name: suite_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Suite Id
+      responses:
+        '204':
+          description: Successful Response
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+  /api/v1/projects/{project_id}/eval-suites/{suite_id}/run:
+    post:
+      tags:
+      - evaluation
+      summary: Start Eval Run
+      description: 'Start an exam: every active item becomes `repeat` background `channel=test` runs of
+        the
+
+        version, for the caller. The items are checked and the exam is written `queued`; the
+
+        advancer starts the runs and the exam turns `running`. Progress: GET …/eval-runs/{id} or
+
+        …/stream. Audited once for the exam (start_eval_run) and per run (start_run).'
+      operationId: start_eval_run_api_v1_projects__project_id__eval_suites__suite_id__run_post
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      - name: suite_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Suite Id
+      - name: agent_version_id
+        in: query
+        required: true
+        schema:
+          type: string
+          format: uuid
+          description: The agent version to examine.
+          title: Agent Version Id
+        description: The agent version to examine.
+      responses:
+        '202':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvalRunOut'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+  /api/v1/projects/{project_id}/eval-suites/{suite_id}/runs:
+    get:
+      tags:
+      - evaluation
+      summary: List Eval Runs
+      operationId: list_eval_runs_api_v1_projects__project_id__eval_suites__suite_id__runs_get
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      - name: suite_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Suite Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvalRunList'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+  /api/v1/projects/{project_id}/eval-runs/{eval_run_id}:
+    get:
+      tags:
+      - evaluation
+      summary: Get Eval Run
+      operationId: get_eval_run_api_v1_projects__project_id__eval_runs__eval_run_id__get
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      - name: eval_run_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Eval Run Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvalRunOut'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+  /api/v1/projects/{project_id}/eval-runs/{eval_run_id}/cancel:
+    post:
+      tags:
+      - evaluation
+      summary: Cancel Eval Run
+      description: The advancer cancels the item runs on its next tick and ends the exam `cancelled`.
+      operationId: cancel_eval_run_api_v1_projects__project_id__eval_runs__eval_run_id__cancel_post
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      - name: eval_run_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Eval Run Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvalRunOut'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+  /api/v1/projects/{project_id}/eval-runs/{eval_run_id}/stream:
+    get:
+      tags:
+      - evaluation
+      summary: Stream Eval Run
+      description: 'Server-sent `progress` events (`status`, `items`, `scored`) until the exam ends, then
+
+        one `done` with the status and `passed`. The stream only reads; closing it changes nothing.'
+      operationId: stream_eval_run_api_v1_projects__project_id__eval_runs__eval_run_id__stream_get
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      - name: eval_run_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Eval Run Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+            text/event-stream:
+              schema:
+                type: string
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+components:
+  schemas:
+    ErrorBody:
+      properties:
+        error:
+          $ref: '#/components/schemas/ErrorDetail'
+      type: object
+      required:
+      - error
+      title: ErrorBody
+      description: OpenAI-shaped error body used by every 4xx response.
+    ErrorDetail:
+      properties:
+        message:
+          type: string
+          title: Message
+          description: English, actionable, never contains secrets.
+        type:
+          type: string
+          title: Type
+          description: authentication_error, permission_error, not_found_error, ...
+        code:
+          type: string
+          title: Code
+          description: Stable machine-readable code, e.g. read_only_access.
+      type: object
+      required:
+      - message
+      - type
+      - code
+      title: ErrorDetail
+    EvalRunList:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/EvalRunOut'
+          type: array
+          title: Items
+      type: object
+      required:
+      - items
+      title: EvalRunList
+    EvalRunOut:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+        project_id:
+          type: string
+          format: uuid
+          title: Project Id
+        suite_id:
+          type: string
+          format: uuid
+          title: Suite Id
+        agent_version_id:
+          type: string
+          format: uuid
+          title: Agent Version Id
+        langfuse_run_name:
+          type: string
+          title: Langfuse Run Name
+        status:
+          type: string
+          enum:
+          - queued
+          - running
+          - completed
+          - failed
+          - cancelled
+          title: Status
+        error_code:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Error Code
+        items:
+          type: integer
+          title: Items
+        scored:
+          type: integer
+          title: Scored
+        summary:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Summary
+        cost_usd:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Cost Usd
+        started_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Started At
+        ended_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Ended At
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+      type: object
+      required:
+      - id
+      - project_id
+      - suite_id
+      - agent_version_id
+      - langfuse_run_name
+      - status
+      - error_code
+      - items
+      - scored
+      - summary
+      - cost_usd
+      - started_at
+      - ended_at
+      - created_at
+      title: EvalRunOut
+    ScorerConfig:
+      properties:
+        name:
+          type: string
+          enum:
+          - contains
+          - regex
+          - json_schema
+          - cites_source
+          - semantic
+          - llm_judge
+          - sql_result
+          - latency_cost
+          title: Name
+        pass_min:
+          anyOf:
+          - type: integer
+            maximum: 5.0
+            minimum: 1.0
+          - type: 'null'
+          title: Pass Min
+        threshold:
+          anyOf:
+          - type: number
+            maximum: 1.0
+            exclusiveMinimum: 0.0
+          - type: 'null'
+          title: Threshold
+        max_ms:
+          anyOf:
+          - type: integer
+            exclusiveMinimum: 0.0
+          - type: 'null'
+          title: Max Ms
+        max_usd:
+          anyOf:
+          - type: number
+            exclusiveMinimum: 0.0
+          - type: 'null'
+          title: Max Usd
+      additionalProperties: false
+      type: object
+      required:
+      - name
+      title: ScorerConfig
+    SuiteCreate:
+      properties:
+        key:
+          type: string
+          pattern: ^[a-z0-9][a-z0-9-]{0,62}$
+          title: Key
+        name:
+          type: string
+          maxLength: 200
+          minLength: 1
+          title: Name
+        agent_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Agent Id
+          description: 'The agent whose publish this suite gates (none: no gate).'
+        langfuse_dataset_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Langfuse Dataset Name
+          description: Default `<project_key>.<key>`; must start with `<project_key>.`.
+        scorers:
+          items:
+            $ref: '#/components/schemas/ScorerConfig'
+          type: array
+          minItems: 1
+          title: Scorers
+        pass_threshold:
+          anyOf:
+          - type: number
+            maximum: 1.0
+            exclusiveMinimum: 0.0
+          - type: 'null'
+          title: Pass Threshold
+          description: Default EVAL_PASS_THRESHOLD (profile value).
+        repeat:
+          type: integer
+          maximum: 10.0
+          minimum: 1.0
+          title: Repeat
+          default: 1
+        approve_tools:
+          type: boolean
+          title: Approve Tools
+          description: 'false: item runs waiting for an approval are not_run; true: they wait in the approval
+            queue for a person (never approved by the exam).'
+          default: false
+      additionalProperties: false
+      type: object
+      required:
+      - key
+      - name
+      - scorers
+      title: SuiteCreate
+    SuiteList:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/SuiteOut'
+          type: array
+          title: Items
+      type: object
+      required:
+      - items
+      title: SuiteList
+    SuiteOut:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+        project_id:
+          type: string
+          format: uuid
+          title: Project Id
+        key:
+          type: string
+          title: Key
+        name:
+          type: string
+          title: Name
+        agent_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Agent Id
+        langfuse_dataset_name:
+          type: string
+          title: Langfuse Dataset Name
+        scorers:
+          items:
+            additionalProperties: true
+            type: object
+          type: array
+          title: Scorers
+        pass_threshold:
+          type: number
+          title: Pass Threshold
+        repeat:
+          type: integer
+          title: Repeat
+        approve_tools:
+          type: boolean
+          title: Approve Tools
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+        updated_at:
+          type: string
+          format: date-time
+          title: Updated At
+      type: object
+      required:
+      - id
+      - project_id
+      - key
+      - name
+      - agent_id
+      - langfuse_dataset_name
+      - scorers
+      - pass_threshold
+      - repeat
+      - approve_tools
+      - created_at
+      - updated_at
+      title: SuiteOut
+    SuiteUpdate:
+      properties:
+        name:
+          anyOf:
+          - type: string
+            maxLength: 200
+            minLength: 1
+          - type: 'null'
+          title: Name
+        agent_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Agent Id
+        scorers:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/ScorerConfig'
+            type: array
+            minItems: 1
+          - type: 'null'
+          title: Scorers
+        pass_threshold:
+          anyOf:
+          - type: number
+            maximum: 1.0
+            exclusiveMinimum: 0.0
+          - type: 'null'
+          title: Pass Threshold
+        repeat:
+          anyOf:
+          - type: integer
+            maximum: 10.0
+            minimum: 1.0
+          - type: 'null'
+          title: Repeat
+        approve_tools:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Approve Tools
+      additionalProperties: false
+      type: object
+      title: SuiteUpdate
+      description: 'Only the given fields change. `agent_id: null` removes the gate; the other fields
+        cannot
+
+        be set to null (r1 MINOR-7).'

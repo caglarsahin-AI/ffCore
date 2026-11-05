@@ -9,6 +9,8 @@ from typing import Annotated, Literal
 from pydantic import Field, SecretStr, field_validator, model_validator
 from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
+from ffcore.evaluation.ticks import TICK_PLAN_S
+
 CommaList = Annotated[list[str], NoDecode]
 
 
@@ -161,6 +163,27 @@ class Settings(BaseSettings):
     langsmith_tracing: bool = False
     langchain_tracing_v2: bool = False
 
+    # --- 09 evaluation (profile values, PLAN 2b; .env.example lists each profile) ---
+    # Default pass threshold of a new suite: llmaas 0.85, airgap 0.8. None: a suite must name
+    # its own (no hidden default, ARCH-10).
+    eval_pass_threshold: float | None = Field(default=None, gt=0, le=1)
+    # Model key (in the suite's project) of the llm_judge scorer: llmaas a strong provider
+    # model, airgap the local model. None: suites with llm_judge are refused.
+    eval_judge_model: str | None = None
+    # Seconds between exam advancer ticks (arq cron on the background worker, K-09-0007 S4);
+    # divides 60 and stays under RUN_ABANDON_GRACE_S (the advancer keeps item runs listened).
+    eval_advance_interval_s: int = Field(default=15, gt=0, le=60)
+    # Upper bound of items x repeat in one exam (each is a billed background run); more: 422
+    # eval_too_many_runs at start (09-1 r1 MINOR-2).
+    eval_max_item_runs: int = Field(default=500, gt=0)
+    # Judge calls one advancer tick may make for one exam; the rest wait for the next tick, so a
+    # tick stays short (09-1 r1 MAJOR-2).
+    eval_judge_calls_per_tick: int = Field(default=20, gt=0)
+    # Planned length of one judge call (09-1 r4 decision, correction): what a tick plans with,
+    # not the hard limit (LLM_CALL_TIMEOUT_S stays that). At most the usable window of a tick
+    # (evaluation.ticks.TICK_PLAN_S, r5 MAJOR-r5-1); a CPU judge (airgap) sets its own.
+    eval_judge_call_s: int = Field(default=60, gt=0, le=TICK_PLAN_S)
+
     # --- 03c governance ---
     # Wrong API keys from one client address per minute before 429 too_many_auth_failures.
     api_key_auth_failures_per_min: int = Field(default=20, gt=0)
@@ -192,12 +215,31 @@ class Settings(BaseSettings):
         return value
 
     @field_validator(
-        "ollama_context_length", "inference_backend", "qdrant_url", "qdrant_api_key", mode="before"
+        "ollama_context_length",
+        "inference_backend",
+        "qdrant_url",
+        "qdrant_api_key",
+        "eval_pass_threshold",
+        "eval_judge_model",
+        mode="before",
     )
     @classmethod
     def _empty_is_unset(cls, value: object) -> object:
         # Compose passes unset optional variables as "" (${VAR:-}); that means "not set".
         return None if value == "" else value
+
+    @model_validator(mode="after")
+    def _eval_advance_interval(self) -> "Settings":
+        if 60 % self.eval_advance_interval_s:
+            raise ValueError(
+                "eval_advance_interval_invalid: EVAL_ADVANCE_INTERVAL_S must divide 60"
+            )
+        if self.eval_advance_interval_s >= self.run_abandon_grace_s:
+            raise ValueError(
+                "eval_advance_interval_invalid: EVAL_ADVANCE_INTERVAL_S must be below "
+                "RUN_ABANDON_GRACE_S, or exam runs are abandoned between two ticks"
+            )
+        return self
 
     @model_validator(mode="after")
     def _no_langsmith(self) -> "Settings":

@@ -103,6 +103,14 @@ x-app-env: &app-env
   BACKGROUND_WINDOW_TZ: ${BACKGROUND_WINDOW_TZ:-Europe/Istanbul}
   RUN_TIMEOUT_S: ${RUN_TIMEOUT_S:-120}
   RUN_ABANDON_GRACE_S: ${RUN_ABANDON_GRACE_S:-120}
+  # 09 exams: profile values (.env.example). Empty threshold: every suite names its own; empty
+  # judge model: suites with llm_judge are refused (no hidden default, ARCH-10).
+  EVAL_PASS_THRESHOLD: ${EVAL_PASS_THRESHOLD:-}
+  EVAL_JUDGE_MODEL: ${EVAL_JUDGE_MODEL:-}
+  EVAL_ADVANCE_INTERVAL_S: ${EVAL_ADVANCE_INTERVAL_S:-15}
+  EVAL_MAX_ITEM_RUNS: ${EVAL_MAX_ITEM_RUNS:-500}
+  EVAL_JUDGE_CALLS_PER_TICK: ${EVAL_JUDGE_CALLS_PER_TICK:-20}
+  EVAL_JUDGE_CALL_S: ${EVAL_JUDGE_CALL_S:-60}
   # 03c API keys: failed attempts per client address per minute; last_used_at write buffer.
   API_KEY_AUTH_FAILURES_PER_MIN: ${API_KEY_AUTH_FAILURES_PER_MIN:-20}
   API_KEY_LAST_USED_FLUSH_S: ${API_KEY_LAST_USED_FLUSH_S:-60}

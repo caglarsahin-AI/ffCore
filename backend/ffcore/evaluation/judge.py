@@ -1,0 +1,150 @@
+"""`llm_judge` (09): the rubric judge runs in FFCore, not in Langfuse (K-09-0006, S-J A).
+
+The judge sees the question, the expected answer and the agent's answer, rendered into the
+Langfuse prompt `eval_judge_rubric_v2` (seed backend/prompts/eval_judge_rubric_v2.md). Before the
+model call the whole text goes through the item run's guardrail policy at the `egress` stage
+(08; a no-op where GUARDRAIL_EGRESS_ENABLED=false): the judge never sees what the agent's own
+model call would not have been allowed to send. The call is a background-class model call
+(LLM_SLOTS, BACKGROUND_WINDOW) on EVAL_JUDGE_MODEL, under the project's quotas, traced on the
+item run's trace. Unreadable output is an error, never a guessed score (scorers.parse_judge).
+The judge's reason is the model's answer to masked input; it is kept short with an explicit
+truncation mark (S8).
+"""
+
+import logging
+from dataclasses import dataclass
+from typing import Any, Protocol
+
+from ffcore.evaluation.scorers import JudgeParseError, Score, judge_score, parse_judge
+
+# Seeding never overwrites a prompt Langfuse already has, so a changed rubric text is a new
+# prompt name (r2 MINOR-r2-6; v2: r1 MINOR-1 delimiters). The test pins text to name.
+RUBRIC_PROMPT = "eval_judge_rubric_v2"
+log = logging.getLogger("ffcore.evaluation")
+REASON_MAX = 500
+JUDGE_SOURCE = "agent-playground"
+JUDGE_MAX_TOKENS = 300
+
+
+class Guard(Protocol):
+    async def egress(self, text: str) -> tuple[str, str]:
+        """(action, text after the stage): action is allow, mask or block."""
+
+
+class Model(Protocol):
+    async def complete(self, text: str) -> str: ...
+
+
+class Rubric(Protocol):
+    def render(self, *, question: str, expected: str, answer: str) -> str: ...
+
+
+@dataclass(frozen=True)
+class JudgeResult:
+    score: Score
+    reason: str
+
+
+def clip(text: str, limit: int = REASON_MAX) -> str:
+    """Short comment field: an explicit mark, never a silent cut (PLAN 5, K-05a-0002)."""
+    if len(text) <= limit:
+        return text
+    # The mark counts towards the limit (r1 NOTE-1): the comment is never longer than `limit`.
+    mark = f" [truncated: {{}}/{len(text)} chars]"
+    keep = limit - len(mark.format(limit))
+    return text[:keep] + mark.format(keep)
+
+
+async def judge(
+    *,
+    question: str,
+    expected: str,
+    answer: str,
+    rubric: Rubric,
+    guard: Guard,
+    model: Model,
+    pass_min: int,
+) -> JudgeResult:
+    from ffcore.guardrails.recognizers.ner import NerEgressUnavailable
+
+    text = rubric.render(question=question, expected=expected, answer=answer)
+    try:
+        action, outgoing = await guard.egress(text)
+    except NerEgressUnavailable as exc:
+        # The API's NER (GUARDRAIL_EGRESS_NER=true) is down: nothing leaves unmasked, and an
+        # outage is not the agent's score (r3 NOTE-6, MINOR-r3-4): the item is not run.
+        # Logged with the cause's class only, never the text (r4 NOTE-9).
+        cause = type(exc.__cause__).__name__ if exc.__cause__ else "unknown"
+        log.warning("eval_judge_ner_unavailable cause=%s", cause)
+        return JudgeResult(Score("llm_judge", None, None, "ner_unavailable", "not_run"), "")
+    if action == "block":
+        return JudgeResult(Score("llm_judge", None, None, "judge_blocked_at_egress", "error"), "")
+    raw = await model.complete(outgoing)
+    try:
+        verdict = parse_judge(raw)
+    except JudgeParseError as exc:
+        return JudgeResult(Score("llm_judge", None, None, str(exc), "error"), "")
+    return JudgeResult(judge_score(verdict, pass_min=pass_min), clip(verdict.reason))
+
+
+# --- production bindings ---------------------------------------------------------------------
+
+
+class PromptRubric:
+    def __init__(self, prompts: Any) -> None:
+        self._prompts = prompts
+
+    def render(self, *, question: str, expected: str, answer: str) -> str:
+        prompt = self._prompts.get(RUBRIC_PROMPT)
+        return prompt.compile(question=question, expected=expected, answer=answer)
+
+
+class EgressGuard:
+    """The item run's policy at the egress stage, events recorded like the run's own."""
+
+    def __init__(
+        self, session, redis, policy, *, run_id, project_id, egress_enabled, ttl_s, ner=None
+    ):
+        from ffcore.guardrails.masking import RedisTokenStore
+
+        self._session, self._policy = session, policy
+        self._run_id, self._project_id = str(run_id), project_id
+        self._egress = egress_enabled
+        self._tokens = RedisTokenStore(redis, ttl_s)
+        # 08 tam 1b: an `engine: ner` egress policy (GUARDRAIL_EGRESS_NER=true) needs a NER
+        # client; the worker passes HttpNer. None fails such a policy loudly (ner_not_configured).
+        self._ner = ner
+
+    async def egress(self, text: str) -> tuple[str, str]:
+        from ffcore.guardrails import engine
+        from ffcore.guardrails.service import record_events
+
+        if not self._egress:
+            return "allow", text
+        ctx = engine.EvalContext(
+            run_id=self._run_id,
+            project_id=str(self._project_id),
+            # Exam runs are channel=test runs: their guardrail source (08 EVENT_SOURCES).
+            source=JUDGE_SOURCE,
+            token_store=self._tokens,
+            egress_enabled=True,
+            ner=self._ner,
+        )
+        decision = await engine.evaluate(text, "egress", self._policy, ctx=ctx)
+        if decision.events:
+            record_events(self._session, self._project_id, decision.events, decision.reference_id)
+        return decision.action, decision.text_out
+
+
+class LiteLLMJudgeModel:
+    def __init__(self, inner) -> None:
+        self._inner = inner  # runtime.adapters.LiteLLMModel, job class background
+
+    async def complete(self, text: str) -> str:
+        turn = await self._inner.call(
+            [{"role": "user", "content": text}],
+            tools=None,
+            max_tokens=JUDGE_MAX_TOKENS,
+            on_token=None,
+        )
+        return turn.content

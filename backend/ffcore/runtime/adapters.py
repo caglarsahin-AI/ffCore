@@ -61,7 +61,7 @@ from ffcore.runtime.state import (
     ToolCall,
     ToolOutcome,
 )
-from ffcore.services import mcp_client, mcp_tools
+from ffcore.services import mcp_client, mcp_sql, mcp_tools
 from ffcore.services.approvals import RunApprovalGate
 from ffcore.services.litellm_client import LiteLLMClient, resolve_target
 from ffcore.services.quota import QuotaGate, QuotaUnavailable, Subject, engine_for
@@ -554,8 +554,15 @@ class AgentTools:
             ms = int((time.monotonic() - started) * 1000)
             text = f"The tool call failed ({exc.code})."
             return ToolOutcome(text, False, len(text), True, ms, exc.code)
+        # 09-1 r2 MAJOR-r2-3: an mcp-sql refusal or database error keeps its code on the event.
+        code = mcp_sql.error_code(result.text) if result.is_error else None
         return ToolOutcome(
-            result.text, result.truncated, result.total_chars, result.is_error, result.latency_ms
+            result.text,
+            result.truncated,
+            result.total_chars,
+            result.is_error,
+            result.latency_ms,
+            code,
         )
 
 

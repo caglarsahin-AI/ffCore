@@ -42,9 +42,11 @@ def _agent(db, project, kind, status="draft", config=None) -> uuid.UUID:
 
 def test_06b2_1_migration_roundtrip(scratch_db):
     db = scratch_db
-    assert "06b_0001" in db.versions()
     heads = [line for line in db.run("heads").splitlines() if line.strip()]
-    assert len(heads) == 1 and heads[0].startswith("06b_0001")
+    assert len(heads) == 1
+    # 09_0001 and later sit above 06b_0001: the round trip is about this revision alone.
+    db.run("downgrade", "06b_0001")
+    assert "06b_0001" in db.versions()
     assert "external_config" in _columns(db)
     checks = _constraints(db)
     assert "kind = 'external'" in checks["ck_agents_published_has_version"]
@@ -72,5 +74,5 @@ def test_06b2_1_migration_roundtrip(scratch_db):
     assert "external_config" not in _columns(db)
     assert "kind = 'external'" not in _constraints(db)["ck_agents_published_has_version"]
 
-    db.run("upgrade", "head")
+    db.run("upgrade", "06b_0001")
     assert "06b_0001" in db.versions() and "external_config" in _columns(db)
