@@ -2,17 +2,28 @@
 
 Tools container: python -m ffcore.guardrails.quality ../data/samples/pii/pii-100.jsonl
 prints the table that docs/guardrail.md carries (a test keeps the two equal).
+
+With `--ner MODEL@REVISION` (repeatable; weights from `make models`, offline) it also prints the
+person, organization and location table of each NER model and its P95 for 1,000 characters
+(local rules and NER together), the 08 full 1c measurement of the candidates.
 """
 
+import argparse
 import json
 import statistics
 import sys
 import time
+from collections.abc import Callable, Collection
 from dataclasses import dataclass
 from pathlib import Path
 
 from ffcore.guardrails.categories import REGEX_CATEGORIES
+from ffcore.guardrails.findings import Finding
 from ffcore.guardrails.recognizers.regex import recognize
+
+NER_CATEGORIES = ("PERSON", "ORGANIZATION", "LOCATION")
+
+FindFn = Callable[[str, Collection[str]], list[Finding]]
 
 
 @dataclass(frozen=True)
@@ -35,16 +46,16 @@ def load_set(path: Path) -> list[dict]:
         return [json.loads(line) for line in handle if line.strip()]
 
 
-def quality_report(records: list[dict]) -> dict[str, Row]:
-    """Per regex category: a prediction counts when it overlaps an unmatched gold span of the
-    same category; every other prediction is a false positive."""
-    counts = {code: [0, 0, 0] for code in REGEX_CATEGORIES}
+def _score(records: list[dict], categories: Collection[str], find: FindFn) -> dict[str, Row]:
+    """Per category: a prediction counts when it overlaps an unmatched gold span of the same
+    category; every other prediction is a false positive."""
+    counts = {code: [0, 0, 0] for code in categories}
     for record in records:
         gold = [e for e in record["entities"] if e["category"] in counts]
         for entity in gold:
             counts[entity["category"]][0] += 1
         matched: set[int] = set()
-        for finding in recognize(record["text"]):
+        for finding in find(record["text"], categories):
             counts[finding.category][1] += 1
             for i, entity in enumerate(gold):
                 if (
@@ -57,6 +68,16 @@ def quality_report(records: list[dict]) -> dict[str, Row]:
                     counts[finding.category][2] += 1
                     break
     return {code: Row(*values) for code, values in counts.items()}
+
+
+def quality_report(records: list[dict]) -> dict[str, Row]:
+    """The regex recognizers over the regex categories."""
+    return _score(records, REGEX_CATEGORIES, lambda text, categories: recognize(text))
+
+
+def ner_quality_report(records: list[dict], find: FindFn) -> dict[str, Row]:
+    """A NER model (`find(text, categories)`) over person, organization and location."""
+    return _score(records, NER_CATEGORIES, find)
 
 
 def markdown_table(report: dict[str, Row]) -> str:
@@ -94,19 +115,57 @@ def latency_text(chars: int) -> str:
     return "".join(parts)[:chars]
 
 
-def latency_sample(chars: int = 1000, runs: int = 200) -> float:
-    """P95 in milliseconds of `recognize` over a `chars`-long text."""
-    text = latency_text(chars)
-    recognize(text)  # compile and warm caches outside the measurement
+def _p95(call: Callable[[], object], runs: int) -> float:
+    call()  # compile and warm caches outside the measurement
     timings = []
     for _ in range(runs):
         started = time.perf_counter()
-        recognize(text)
+        call()
         timings.append((time.perf_counter() - started) * 1000)
     return statistics.quantiles(timings, n=100)[94]
 
 
+def latency_sample(chars: int = 1000, runs: int = 200) -> float:
+    """P95 in milliseconds of `recognize` over a `chars`-long text."""
+    text = latency_text(chars)
+    return _p95(lambda: recognize(text), runs)
+
+
+def ner_latency_sample(find: FindFn, chars: int = 1000, runs: int = 100) -> float:
+    """P95 in milliseconds of the local rules and the NER together over a `chars`-long text."""
+    text = latency_text(chars)
+
+    def both():
+        recognize(text)
+        find(text, NER_CATEGORIES)
+
+    return _p95(both, runs)
+
+
+def _ner_rows(records: list[dict], spec: str) -> str:
+    import torch
+
+    from ffcore.guardrails.recognizers.ner import LocalNer
+
+    model, _, revision = spec.partition("@")
+    client = LocalNer(model, revision)
+    client.load()
+    report = ner_quality_report(records, client._recognize)
+    p95 = ner_latency_sample(client._recognize)
+    return (
+        f"\n{model}@{revision} (torch threads {torch.get_num_threads()})\n"
+        f"{markdown_table(report)}\n"
+        f"P95, 1000 characters, local rules + NER: {p95:.0f} ms\n"
+    )
+
+
 if __name__ == "__main__":
-    records = load_set(Path(sys.argv[1]))
+    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    parser.add_argument("set", type=Path)
+    parser.add_argument("--ner", action="append", default=[], metavar="MODEL@REVISION")
+    args = parser.parse_args()
+    records = load_set(args.set)
     sys.stdout.write(markdown_table(quality_report(records)) + "\n")
     sys.stdout.write(f"\nregex P95, 1000 characters: {latency_sample():.2f} ms\n")
+    for spec in args.ner:
+        sys.stdout.write(_ner_rows(records, spec))

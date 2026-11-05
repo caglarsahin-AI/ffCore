@@ -26,11 +26,16 @@ DOCLING_REPOS = {
 }
 # PaddleOCR `tr`: multilingual detection, Latin recognition, angle classifier.
 PADDLE_PARTS = ("det", "rec", "cls")
-# 08 tam 1b (K-08T1B-0002): the Turkish NER candidates measured on data/samples/pii before one
-# is chosen (NER_MODEL / NER_REVISION). Only the model card (licence, labels), config,
-# tokenizer and PyTorch weights: no TF/Flax/ONNX copies. The loser leaves this list after the
-# measurement; the worker never needs these (the model lives in the API process only).
-NER_CANDIDATES = ("savasy/bert-base-turkish-ner-cased", "akdeniz27/bert-base-turkish-cased-ner")
+# 08 tam 1b (K-08T1B-0002): the Turkish NER model, at the commit measured on data/samples/pii in
+# 08 tam 1c-b (docs/guardrail.md; the other candidate, savasy/bert-base-turkish-ner-cased, had
+# no licence on its card and left the list). Downloaded at that commit, not `main`, so the
+# volume always holds the snapshot NER_REVISION names. Only the model card (licence, labels),
+# config, tokenizer and safetensors weights: no pickle, TF/Flax/ONNX copies. The worker never
+# needs it (the model lives in the API process only).
+NER_REVISIONS = {
+    "akdeniz27/bert-base-turkish-cased-ner": "99995f7d2be4b3a28c74f0d36ee97f8c04ee0571",
+}
+NER_CANDIDATES = tuple(NER_REVISIONS)
 NER_ALLOW_PATTERNS = (
     "README.md",
     "config.json",
@@ -39,7 +44,6 @@ NER_ALLOW_PATTERNS = (
     "special_tokens_map.json",
     "vocab.txt",
     "*.safetensors",
-    "pytorch_model.bin",
 )
 
 
@@ -102,11 +106,11 @@ def missing(embed_model: str, rerank_model: str) -> list[ModelMissing]:
 
 
 def ner_missing() -> list[ModelMissing]:
-    """The NER candidates not in the cache (models-check only; not the worker's startup)."""
+    """The NER model not in the cache (models-check only; not the worker's startup)."""
     out = []
-    for repo in NER_CANDIDATES:
+    for repo, revision in NER_REVISIONS.items():
         try:
-            hf_path(repo)
+            hf_path(repo, revision)
         except ModelMissing as exc:
             out.append(exc)
     return out
@@ -120,10 +124,10 @@ def download(embed_model: str, rerank_model: str) -> None:
     for repo, revision in revisions.items():
         print(f"download {repo}@{revision} -> {hub_cache()}", flush=True)
         snapshot_download(repo, revision=revision, cache_dir=hub_cache())
-    for repo in NER_CANDIDATES:
-        print(f"download {repo}@main (NER candidate) -> {hub_cache()}", flush=True)
+    for repo, revision in NER_REVISIONS.items():
+        print(f"download {repo}@{revision} (NER) -> {hub_cache()}", flush=True)
         snapshot_download(
-            repo, revision="main", cache_dir=hub_cache(), allow_patterns=list(NER_ALLOW_PATTERNS)
+            repo, revision=revision, cache_dir=hub_cache(), allow_patterns=list(NER_ALLOW_PATTERNS)
         )
     from paddleocr import PaddleOCR
 
