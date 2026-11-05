@@ -1,0 +1,67 @@
+$ docker run --rm --network none --env-file .env.test -v C:/ai_paycore/ffcore/.worktrees/review-08t1c-b-r1b:/work -w /work -e RUN_MODEL_TESTS=1 -v 04a-knowledge-core_model_cache:/models:ro ffcore/tools:0.0.0-08t1c pytest -m models tests/models
+    lo  tunl0 ip6tnl0 /dev/sda1 /models ext4 ro,relatime,discard 0 0
+........EEE............                                                  [100%]
+==================================== ERRORS ====================================
+__ ERROR at setup of test_04a_1_ten_page_contract_indexed_within_two_minutes ___
+
+    @pytest.fixture(scope="module")
+    def session():
+        email, password = os.environ.get("E2E_EMAIL"), os.environ.get("E2E_PASSWORD")
+        if not email or not password:
+>           pytest.fail("E2E_EMAIL / E2E_PASSWORD not set (create-superadmin first)")
+E           Failed: E2E_EMAIL / E2E_PASSWORD not set (create-superadmin first)
+
+tests/models/test_04a_e2e_stack.py:37: Failed
+___________ ERROR at setup of test_04a_2_termination_notice_in_top3 ____________
+
+    @pytest.fixture(scope="module")
+    def session():
+        email, password = os.environ.get("E2E_EMAIL"), os.environ.get("E2E_PASSWORD")
+        if not email or not password:
+>           pytest.fail("E2E_EMAIL / E2E_PASSWORD not set (create-superadmin first)")
+E           Failed: E2E_EMAIL / E2E_PASSWORD not set (create-superadmin first)
+
+tests/models/test_04a_e2e_stack.py:37: Failed
+______ ERROR at setup of test_04a_14_health_responsive_under_search_load _______
+
+    @pytest.fixture(scope="module")
+    def session():
+        email, password = os.environ.get("E2E_EMAIL"), os.environ.get("E2E_PASSWORD")
+        if not email or not password:
+>           pytest.fail("E2E_EMAIL / E2E_PASSWORD not set (create-superadmin first)")
+E           Failed: E2E_EMAIL / E2E_PASSWORD not set (create-superadmin first)
+
+tests/models/test_04a_e2e_stack.py:37: Failed
+=============================== warnings summary ===============================
+tests/models/test_04a_convert_models.py::test_04a_9c_fifty_page_text_pdf_never_reaches_ocr
+  /opt/venv/lib/python3.12/site-packages/docling/pipeline/standard_pdf_pipeline.py:603: DeprecationWarning: This field is deprecated. Use `generate_page_images=True` and call `TableItem.get_image()` to extract table images from page images.
+    or self.pipeline_options.generate_table_images
+
+tests/models/test_04a_convert_models.py::test_04a_scanned_pdf_goes_to_paddle_ocr
+  /opt/venv/lib/python3.12/site-packages/paddle/utils/cpp_extension/extension_utils.py:712: UserWarning: No ccache found. Please be aware that recompiling all source files may be required. You can download and install ccache from: https://github.com/ccache/ccache/blob/master/doc/INSTALL.md
+    warnings.warn(warning_message)
+
+tests/models/test_08t_ner_models.py::test_08t_1_ner_recall_person
+  /work/backend/ffcore/guardrails/recognizers/ner.py:167: DeprecationWarning: torch.ao.quantization is deprecated and will be removed in 2.10. 
+  For migrations of users: 
+  1. Eager mode quantization (torch.ao.quantization.quantize, torch.ao.quantization.quantize_dynamic), please migrate to use torchao eager mode quantize_ API instead 
+  2. FX graph mode quantization (torch.ao.quantization.quantize_fx.prepare_fx,torch.ao.quantization.quantize_fx.convert_fx, please migrate to use torchao pt2e quantization API instead (prepare_pt2e, convert_pt2e) 
+  3. pt2e quantization has been migrated to torchao (https://github.com/pytorch/ao/tree/main/torchao/quantization/pt2e) 
+  see https://github.com/pytorch/ao/issues/2259 for more details
+    pipe.model = quantize_dynamic(pipe.model, {torch.nn.Linear}, dtype=torch.qint8)
+
+tests/models/test_08t_ner_models.py::test_08t_1_ner_recall_person
+  /opt/venv/lib/python3.12/site-packages/torch/ao/quantization/quantize.py:570: DeprecationWarning: torch.ao.quantization is deprecated and will be removed in 2.10. 
+  For migrations of users: 
+  1. Eager mode quantization (torch.ao.quantization.quantize, torch.ao.quantization.quantize_dynamic), please migrate to use torchao eager mode quantize_ API instead 
+  2. FX graph mode quantization (torch.ao.quantization.quantize_fx.prepare_fx,torch.ao.quantization.quantize_fx.convert_fx, please migrate to use torchao pt2e quantization API instead (prepare_pt2e, convert_pt2e) 
+  3. pt2e quantization has been migrated to torchao (https://github.com/pytorch/ao/tree/main/torchao/quantization/pt2e) 
+  see https://github.com/pytorch/ao/issues/2259 for more details
+    convert(model, mapping, inplace=True)
+
+tests/models/test_08t_ner_models.py::test_08t_1_ner_recall_person
+  /opt/venv/lib/python3.12/site-packages/torch/ao/nn/quantized/modules/utils.py:72: UserWarning: torch.quantize_per_tensor, torch.quantize_per_channel and other quantized tensor creation functions that produce tensors with dtype torch.quint8, torch.qint8, and torch.qint32 are deprecated and will be removed in a future PyTorch release. Please see https://github.com/pytorch/pytorch/issues/184982 for more information. (Triggered internally at /__w/pytorch/pytorch/aten/src/ATen/quantized/Quantizer.cpp:111.)
+    qweight = torch.quantize_per_tensor(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+20 passed, 1 deselected, 5 warnings, 3 errors in 135.74s (0:02:15)

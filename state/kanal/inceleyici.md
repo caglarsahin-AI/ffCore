@@ -2166,3 +2166,19 @@ review09 `down -v --remove-orphans` (19:51): 0 konteyner, 0 hacim (geçici probe
 ### R-08T1C-0008 · 2026-11-05 19:53 · → koordinator · ACK
 Paket: 08-tam-1c-b r1 (r1b)   Cevap: K-08T1C-0022
 5e9a68881a4f51d9a2cd1ad91aeab8eaabc0a809 doğrulandı (2a7b430 atası, 1 commit, 7 dosya). Worktree `.worktrees/review-08t1c-b-r1b`; 2a7b430 worktree'si kaldırıldı. Koşular yığınsız, `ffcore/tools:0.0.0-08t1c` imajıyla (build yok): lint, make test ×2, `-m models` (`--network none`, `04a-knowledge-core_model_cache:/models:ro`, komut ve mount logda), gecikme testi yalnız bilgi amaçlı (kabul hedef donanımda, NOT_RUN).
+
+### R-08T1C-0009 · 2026-11-05 20:06 · → koordinator · REVIEW-SONUC
+Paket: 08-tam-1c-b r1 (r1b)   Cevap: K-08T1C-0020 / K-08T1C-0022
+**ONAY 5e9a68881a4f51d9a2cd1ad91aeab8eaabc0a809.** Rapor state/reviews/08-tam-1c-b-r1.md. BLOCKER/MAJOR 0, MINOR 6, NOTE 7.
+- KAPANDI:
+  - `first` (keşifte `simple` 'LIK' / 'AR' parçalıyordu);
+  - int8 yalnız Linear, sessiz fp32 yok, her yükleme yolunda;
+  - akdeniz27 sabit commit + safetensors; savasy seçilmedi;
+  - uzun metin üç pencere; egress PERSON gerçek modelle;
+  - r1b: `ner_latency` ayrı işaret (`-m models`'te 1 deselected), egress özellik testi sızıntı açısından gevşemedi (`fullmatch` her şeyi yer tutucu ister).
+- Koşular (yığınsız, `--network none`, `/models:ro`): lint, make test 1743 ×2, `-m models` 20 passed + 1 deselected, `verify.sh --models` OK 73. 3 error `test_04a_e2e_stack` canlı yığın ister, 1c-b dışı, NOT_RUN. Gecikme bilgi amaçlı P95 191 ms (dizüstü; kabul hedef donanımda).
+- **Merge öncesi önerilen MINOR'lar:**
+  - (4) model volume'unda lisanssız savasy ve pickle `pytorch_model.bin` var; `save.sh` volume'u bütünüyle paketliyor, `verify.sh` fazlayı işaretlemiyor → air-gap paketine gider;
+  - (2) her adın tam kapsandığını assert eden test yok (örtüşme "bulundu" sayılıyor).
+- Diğerleri FOLLOWUP: `simple` kırmızısı yalnız keşifte; `min_confidence` ölçümde yok; docs gecikme aralığı loglarla uyumsuz.
+- Worktree kaldırıldı. Sıradaki 09-2 r2.
