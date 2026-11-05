@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-a-08-tam-1c-olcum (Opus 5.5; önceki lease ffcore-isci-a-08-tam-1b RETIRED, HANDOFF koordinatör özeti K-08T1B-0026)
 - Aktif paket: 08-tam-1c-b-olcum (K-08T1C-0014; 1c-a MERGED c5b234c)
 - Durum: ACTIVE
-- Son okunan: K-08T1C-0014
+- Son okunan: K-09-0044
 
 ## Mesajlar
 
@@ -2049,3 +2049,10 @@ Paket: 08-tam-1c-b-olcum   Cevap: K-08T1C-0014
 Worktree `.worktrees/feat/08-tam-1c-olcum` artık `feat/08-tam-1c-b-olcum` dalında (`checkout -B ... main`, baz bf4ec66; 60c6169 main'de doğrulandı); eski dal `feat/08-tam-1c-olcum` silinmeyi bekliyor (sende). Ağaç temiz, commit yok.
 Ağırlık yeniden denetlendi (`--network none`, salt-okunur): `04a-knowledge-core_model_cache` hub'ında hâlâ yalnız bge-m3, bge-reranker-v2-m3, docling-layout-heron, docling-models; **NER adayları yok** (ENV-163 açık; kullanıcı komutu A-08T1C-0003, dizin aynı worktree).
 Bekliyorum; ağırlık gelince D6-D8 + FOLLOWUP-168 NOTE-2b/3, 1c-a r1 NOTE'ları PR notuna.
+
+### A-08T1C-0014 · 2026-11-05 13:45 · → koordinator · DURUM
+Paket: 08-tam-1c-b-olcum   Cevap: K-08T1C-0014, K-09-0044
+**Ağırlık geldi (ENV-163 kapatılabilir).** Kullanıcı `make models` koştu; dal main'e ileri sarıldı (105d176). `--network none` + salt-okunur volume ile `make models-check`: `ok all model weights are in the cache`, exit 0 (state/evidence/08t1c-b-models-check.log). İki aday tam (`.incomplete` 0): `savasy/bert-base-turkish-ner-cased@7678083d645af39967e0ebe8213a6049deb6e2cc`, `akdeniz27/bert-base-turkish-cased-ner@99995f7d2be4b3a28c74f0d36ee97f8c04ee0571`, her biri ~0,44 GB.
+D6 kart okuması (offline): **akdeniz27 `license: mit`**; **savasy kartında lisans alanı yok** (README yalnız `language: tr`) → K-08T1B-0002 gereği ürün seçimine giremez, yine ölçülür ve tabloda "lisans belirtilmemiş" yazar. `id2label` ikisinde de `O, B/I-PER, B/I-ORG, B/I-LOC` → `ner_label_unknown` yok. Durma koşulu yok (bir lisanslı aday var); akdeniz27 recall < 0,85 çıkarsa KARAR-GEREK.
+Yığın gerekmiyor: ölçüm yalnız tools konteyneri (`docker run --network none`, 04a model volume salt-okunur). Egress PERSON testi (`GUARDRAIL_EGRESS_NER=true`, `-m models`) için yığın gerekirse YIGIN-AÇ yazarım. Sıra: kırmızı testler → ölçüm betiği → D8.
+

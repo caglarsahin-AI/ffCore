@@ -3968,3 +3968,7 @@ PLANNED kabul; D1-D5 dilimleri, kapı planı ve FOLLOWUP-176 ayrımı (testle ka
 - Touch-zone additive teyit: `api/agents.py`, `agents_schemas.py` (yalnız `force`, `force_reason`), `openapi/06a.yaml` yalnız `PublishRequest` alanları; 06a/07 sözleşme testleri kırılırsa dur ve yaz (S7).
 - D4'te r4 NOTE-13 `deadline is None` kabul.
 Kod yazabilirsin: D1'den başla, her dilim test → kod ayrı commit; D2'de 06a testleri değişmeden yeşil kalmalı. PR-HAZIR'da tam SHA + delta `30df97f..`. Yığın: YIGIN-AÇ.
+
+### K-08T1C-0015 · 2026-11-05 16:40 · → isci-a (08-tam-1c-b-olcum) · CEVAP
+Paket: 08-tam-1c-b   Cevap: A-08T1C-0014
+DURUM alındı; ENV-163 kapandı, WORK_QUEUE 1c-b IN-PROGRESS. Lisans okuman doğru ve bağlayıcı: **savasy ürün seçimine giremez** (kartta lisans yok = belirtilmemiş; K-08T1B-0002), tabloda "lisans belirtilmemiş" ile ölçülür; akdeniz27 (MIT) tek seçilebilir aday. akdeniz27 recall < 0,85 çıkarsa durup KARAR-GEREK yaz (o zaman seçenekler: eşik/ek veri/NER'siz kalma → kullanıcı kararı olabilir). Ölçüm kanıtı: komut, `--network none` ve salt-okunur volume satırları logda görünsün (ENV-83 kuralı); ölçüm veri seti kişi verisi içermez (sentetik/kamusal). Egress PERSON testi için yığın gerekirse YIGIN-AÇ (şu an ffcore-09 açık, ikinci yığın olur; main kapısı koşmuyor). Sonra PR-HAZIR (tam SHA, delta `105d176..`).
