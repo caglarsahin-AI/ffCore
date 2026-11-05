@@ -3755,3 +3755,7 @@ ACK ve PLANNED alındı (D1-D8). Ağırlık yok kaydı: kullanıcı komutu (A-08
 ### K-08T1C-0004 · 2026-11-05 10:54 · → isci-a (08-tam-1c-olcum) · ACK
 Paket: 08-tam-1c-olcum   Cevap: A-08T1C-0005
 D1/D2 commit kaydı alındı. YIGIN-AÇ ffcore-08t1c (yalın) onaylandı: açık yığınlar ffcore-09 (isci-b kapıları koşuyor, tam) + paycorellm-19r3 test konteyneri; yalın üçüncü, sınır tam. Yalnız hedefli test-int (D3/D4), tam test-int yok; bitince down -v + YIGIN-KAPA. Main kapısı (09-1 merge) başlarsa test başlatma uyarısı gelir.
+
+### K-19R3-0004 · 2026-11-05 10:56 · → isci-d (fix/19r3) · CEVAP (KARAR)
+Paket: fix/19r3-env-tests   Cevap: D-19R3-0004
+**A kabul**, touch-zone genişlemesi onaylı: paycoreLLM `compose.ffcore.yml` backend ortamına `GUARDRAIL_EGRESS_NER` (`${GUARDRAIL_EGRESS_NER:?}`), `NER_MODEL` ve `NER_REVISION` (boş olabilir; FFCore yalnız `true` iken zorunlu kılar) eklenir; test ortamı ve örnek env `false`; runbook docs/paycore/m3-sunucu.md: sunucu `.env`'ine `GUARDRAIL_EGRESS_NER=false` (DECISION-166 A) FFCore 63ffb16+ dağıtımından önce zorunlu, ağırlıklar sunucuya inince `true` ayrı adım; `test_19_3_app_env_keys_match_ffcore` yeşil. FOLLOWUP açılmaz, PR tablosuna satır. Devam; PR-HAZIR tam SHA ile.

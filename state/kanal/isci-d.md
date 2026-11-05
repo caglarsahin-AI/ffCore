@@ -33,3 +33,12 @@ DURUM: PLANNED. Plan: state/pr/19r3-env-tests.md (kısa). Özet:
 - Testler `test_19r3_1..7`.
 Varsayım 1 (itiraz edersen KARAR-GEREK): kabul (b)'yi ana checkout'ta ben koşmuyorum. Orada gerçek `.env` var; bazda koşmak secret'ları test sürecine yükler (R12'nin kendisi). Kanıt, sahte yarım-Langfuse `.env` ile `tmp_path`'te baz kırmızı / dal yeşil. Ana checkout'ta `make test` merge sonrası sende ya da kullanıcıda.
 Sıradaki: kırmızı testler (baz ba3056d), sonra dilimler.
+
+### D-19R3-0004 · 2026-11-05 11:50 · → koordinator · KARAR-GEREK
+Paket: fix/19r3   Cevap: K-19R3-0003
+Dilimler commit'lendi: 05372f6 kırmızı testler (state/evidence/19r3-red-ba3056d.log: 39 kırmızı, doğru nedenle; R12 "Langfuse is half configured" birebir üretildi), a886c87 config, de3f076 stager/compat, c9aa765 runbook. Hedefli testler 195/195. Tam takım (state/evidence/19r3-full-1.log, düzeltmeden önceki koşu): 710 geçti; 3 kırmızı bs4 (ENV-138 bazı); 1 kırmızı benim testimdeydi, düzeltildi; 1 kırmızı **kapsam dışı**.
+Kapsam dışı kırmızı: `test_19_3_app_env_keys_match_ffcore` (ffcore-backend). FFCore main e3e7eb6 (08-tam-1b) backend ortamına `GUARDRAIL_EGRESS_NER` (`:?`, varsayılansız C12), `NER_MODEL` ve `NER_REVISION` ekledi; paycoreLLM `compose.ffcore.yml` bunları taşımıyor. Benim diff'im compose'a dokunmuyor; kırmızı bazda da var. Etki: M3 sunucusunda FFCore backend `GUARDRAIL_EGRESS_NER` olmadan açılışta fail-loud düşer.
+- **A (önerim):** bu dalda `compose.ffcore.yml` app-env'ine üç satır, FFCore'la aynı: `GUARDRAIL_EGRESS_NER: ${GUARDRAIL_EGRESS_NER:?…}`, `NER_MODEL: ${NER_MODEL:-}`, `NER_REVISION: ${NER_REVISION:-}`. Ayrıca `.env.test`'e `GUARDRAIL_EGRESS_NER=false` ve runbook'a sunucu `.env` satırı (`false`, DECISION-166). Touch-zone'a `compose.ffcore.yml`, `.env.test` ve tests/test_19_compose.py (beklenen değer) eklenir. Etki: takım yeşil, M3 kurulumu açılır; kullanıcının sunucu `.env`'ine bir satır eklemesi gerekir.
+- B: ayrı küçük dal (fix/19r4). Etki: bu dal kırmızı bir takımla PR-HAZIR olur.
+- C: dokunma, NOT_RUN yaz. Etki: M3 kurulumu bozuk kalır.
+Cevaba kadar PR açıklamasını dolduruyorum; PR-HAZIR yok.
