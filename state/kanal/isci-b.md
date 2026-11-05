@@ -1919,3 +1919,34 @@ Kapılar @ b424013 (state/evidence/09-1-r4-gates.log):
 - Hedefli test-int (09 + 05a + 18td): 107 passed / 1 skipped, her iki profilde.
 - seed + seed-eval; stack sınavı 8 passed; smoke passed.
 Dala başka commit atmıyorum; delta inceleme bekliyorum.
+
+### B-09-0035 · 2026-11-05 · → koordinator · ACK
+Paket: 09-1 r4   Cevap: K-09-0026
+ACK. Dal b424013 sabit. Yığın kapalı, test koşmuyorum. DUZELT gelirse uygularım. ONAY gelirse merge ve main kapısını beklerim; kapı sürerken test başlatmam.
+
+### B-09-0036 · 2026-11-05 · → koordinator · ACK
+Paket: 09-1 r5   Cevap: K-09-0027
+ACK. 09-1-r4 raporunu ve KARARLAR'daki "09-1 r4 kararı"nı (A + ek) okudum. Plan:
+- `may_judge`: ilk madde de `time_left() >= call_s × max(calls, 1)` ister.
+- `Budget.total_s` (tick bütçesi). Planlanan süre bu bütçeyi aşarsa madde hemen `error(judge_out_of_time)` olur, not `planned_exceeds_tick_budget`.
+- MINOR-r4-1: docstring'ler.
+- NOTE-1/5/9: docs, PR notu ve warning log.
+- "09-2'ye kalan" listesi FOLLOWUP-176'ya işaret edecek.
+Sıra: önce test commit'i (kırmızı kanıt 472e04f yerine b424013 koduyla, `git archive` kopyası), sonra kod commit'i, sonra docs commit'i.
+Kapı: lint, make test iki profil, hedefli test-int (09). Yığını açmadan önce YIGIN-AÇ yazacağım.
+
+### B-09-0037 · 2026-11-05 · → koordinator · YIGIN-AÇ
+Paket: 09-1 r5   Cevap: K-09-0027
+`ffcore-09` (18280/13280): birim testleri, ardından hedefli test-int.
+
+### B-09-0038 · 2026-11-05 · → koordinator · KARAR-GEREK
+Paket: 09-1 r5   Cevap: K-09-0027 / KARARLAR "09-1 r4 kararı"
+Kararın yan etkisi (kaynaktan doğrulandı): planlanan süre `call_s × calls`, `call_s = LLM_CALL_TIMEOUT_S`. docs/gateway.md:80 ve deploy/seed/models.airgap.yaml:9 airgap CPU için `LLM_CALL_TIMEOUT_S=600` öneriyor; tick bütçesi 570 s.
+- A tek başına: `llm_judge`'lı her madde (600 > 570) hiçbir tick'te başlamaz.
+- Ek ile: her madde hemen `error(judge_out_of_time, planned_exceeds_tick_budget)` olur.
+Yani airgap CPU'da judge'lı sınav hiç puanlanamaz. llmaas'ta (60 s) `repeat=10` olunca da aynı şey (600 > 570). Gerçek judge çağrısı çoğunlukla bundan kısa; 600 s bir üst sınır, tahmin değil.
+Seçenekler:
+- **B (önerim):** planlama ayrı bir tahminle yapılır: yeni C12 değişkeni `EVAL_JUDGE_CALL_S` (varsayılan 60, additive). `LLM_CALL_TIMEOUT_S` her çağrının sert sınırı olarak kalır. Ek olarak başlatmada `EVAL_JUDGE_CALL_S × repeat > tick bütçesi` ise 422 `eval_plan_exceeds_tick` döner, yani hata sınavın başında görünür. Etki: airgap CPU'da judge çalışır. Tahmin düşük kalırsa A'nın kesme sayacı (r3) yakalar.
+- A: karar aynen kalır, docs uyarır: airgap CPU'da `llm_judge` kullanılmaz ya da `LLM_CALL_TIMEOUT_S` < 570 s olmalı. Etki: kod değişmez, ama airgap'te judge pratikte kapalı.
+- C: tick süresi çağrı süresine göre büyür (`TICK_TIMEOUT_S = max(600, LLM_CALL_TIMEOUT_S × repeat + marj)`). Etki: uzun tick'ler sırayı ve diğer sınavları geciktirir; cron `timeout` değeri ayardan türer.
+Bu sırada A + ek'i kararın lafzıyla uyguluyorum. B seçilirse değişecek tek yer `tick_budget`'in `call_s` kaynağı ve başlatma denetimi. PR-HAZIR r5'i cevaba kadar tutuyorum.
