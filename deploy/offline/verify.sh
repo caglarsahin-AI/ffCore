@@ -8,7 +8,8 @@
 # --images        every images.txt line: `docker image inspect --format '{{.Id}}'` of
 #                 ${REGISTRY_PREFIX}<image> equals image_id (PENDING is a failure)
 # --models <dir>  every models.txt file under <dir> (the model_cache content: huggingface/,
-#                 paddleocr/) has the listed sha256 and size
+#                 paddleocr/) has the listed sha256 and size, and no hub model directory or
+#                 snapshot file outside models.txt is there
 # --dry-run       print what would be checked, run nothing
 # Exit 0 only if every check passes; each failure is one line with the image or file name.
 set -euo pipefail
@@ -19,7 +20,7 @@ MODELS="${MODELS_TXT:-$HERE/models.txt}"
 PREFIX="${REGISTRY_PREFIX:-}"
 DRY=0 DO_IMAGES=0 MODELS_DIR=""
 
-usage() { sed -n '2,13p' "$0" | sed 's/^# \{0,1\}//'; }
+usage() { sed -n '2,14p' "$0" | sed 's/^# \{0,1\}//'; }
 while [ $# -gt 0 ]; do
   case "$1" in
     --images) DO_IMAGES=1 ;;
@@ -76,6 +77,24 @@ if [ -n "$MODELS_DIR" ]; then
       echo "FAIL model $repo $path: sha256 or size differs from models.txt"; fail=1
     fi
   done < "$MODELS"
+  # 08 tam 1c-b r1 MINOR-4: nothing outside the list is shipped or loaded unnoticed (an
+  # unlicensed candidate, a pickle copy). Named, never deleted (docs/guardrail.md, cleanup).
+  hub="$MODELS_DIR/huggingface/hub"
+  if [ "$DRY" = 0 ] && [ -d "$hub" ]; then
+    listed="$(bash "$HERE/models-files.sh" "$MODELS")"
+    for dir in "$hub"/models--*; do
+      [ -d "$dir" ] || continue
+      name="${dir##*/}"
+      if ! grep -q "^huggingface/hub/$name/" <<<"$listed"; then
+        echo "FAIL model dir $name: not in models.txt"; fail=1; continue
+      fi
+      repo="${name#models--}"; repo="${repo//--//}"
+      while IFS= read -r file; do
+        grep -qxF "huggingface/hub/$name/${file#./}" <<<"$listed" && continue
+        echo "FAIL model $repo ${file#./snapshots/}: not in models.txt"; fail=1
+      done < <(cd "$dir" && find ./snapshots \( -type f -o -type l \) 2>/dev/null | LC_ALL=C sort)
+    done
+  fi
   [ "$DRY" = 1 ] || [ "$fail" = 1 ] || echo "OK models ($(grep -cv '^#' "$MODELS") files)"
 fi
 

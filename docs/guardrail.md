@@ -344,34 +344,44 @@ Limits of this measurement:
 
 Measured on the same set (22 person, 4 organization, 4 location names) with the model the API
 loads (int8, `aggregation_strategy="first"`), offline (`docker run --network none`, the
-`model_cache` volume read-only). Regenerate with
+`model_cache` volume read-only). Findings under the built-in egress policy's `min_confidence`
+(0.5) are dropped first, as the engine drops them. Recall counts a gold name as found when a
+prediction overlaps it; Covered counts it only when every letter of it is inside predicted spans
+of the same category (a first name alone does not cover a full name). Regenerate with
 `docker compose run --rm tools sh -c "cd backend && python -m ffcore.guardrails.quality ../data/samples/pii/pii-100.jsonl --ner akdeniz27/bert-base-turkish-cased-ner@99995f7d2be4b3a28c74f0d36ee97f8c04ee0571"`;
 a test with the weights (`make test-models`) keeps this table equal to the measurement.
 
-| Category | Support | Predicted | Recall | Precision |
-|---|---|---|---|---|
-| `PERSON` | 22 | 22 | 1.00 | 1.00 |
-| `ORGANIZATION` | 4 | 6 | 1.00 | 0.67 |
-| `LOCATION` | 4 | 23 | 1.00 | 0.17 |
+| Category | Support | Predicted | Recall | Precision | Covered |
+|---|---|---|---|---|---|
+| `PERSON` | 22 | 22 | 1.00 | 1.00 | 1.00 |
+| `ORGANIZATION` | 4 | 5 | 1.00 | 0.80 | 1.00 |
+| `LOCATION` | 4 | 23 | 1.00 | 0.17 | 1.00 |
 
-Candidates (08 full 1c; both on the same set, same matching rule):
+Candidates (08 full 1c; same set, same matching rule):
 
-| Model | Licence | Person recall / precision | Organization | Location | P95, 1,000 characters | Size |
+| Model | Licence | Person recall / precision / covered | Organization recall / precision | Location recall / precision | P95, 1,000 characters | Size |
 |---|---|---|---|---|---|---|
-| `akdeniz27/bert-base-turkish-cased-ner`, int8, `first` (chosen) | MIT | 1.00 / 1.00 | 1.00 / 0.67 | 1.00 / 0.17 | P95 158-840 ms on the development laptop (see below); the target machine is measured with `make test-ner-latency` | 0.44 GB |
-| the same, fp32, `first` | MIT | 1.00 / 1.00 | 1.00 / 0.67 | 1.00 / 0.17 | P95 484 ms, median 370 ms, best run 318 ms (other stacks busy) | 0.44 GB |
-| the same, fp32, `simple` (the 1b setting) | MIT | 1.00 / 0.56 | 1.00 / 0.40 | 1.00 / 0.11 | median 430 ms (other stacks busy) | 0.44 GB |
-| `savasy/bert-base-turkish-ner-cased`, int8, `first` | none on the model card | 0.95 / 0.88 | 1.00 / 0.31 | 1.00 / 0.17 | 490 ms | 0.44 GB |
+| `akdeniz27/bert-base-turkish-cased-ner`, int8, `first` (chosen) | MIT | 1.00 / 1.00 / 1.00 | 1.00 / 0.80 | 1.00 / 0.17 | 158-840 ms on the development laptop (see below); the target machine is measured with `make test-ner-latency` | 0.44 GB |
+| `savasy/bert-base-turkish-ner-cased`, int8, `first` | none on the model card | 0.95 / 0.91 / 0.95 | 1.00 / 0.36 | 1.00 / 0.20 | 245-490 ms (laptop) | 0.44 GB |
+| `akdeniz27/...`, fp32, `first` (exploration, no threshold) | MIT | 1.00 / 1.00 / — | 1.00 / 0.67 | 1.00 / 0.17 | P95 484 ms, best run 318 ms (other stacks busy) | 0.44 GB |
+| `akdeniz27/...`, fp32, `simple`, the 1b setting (exploration, no threshold) | MIT | 1.00 / 0.56 / — | 1.00 / 0.40 | 1.00 / 0.11 | median 430 ms (other stacks busy) | 0.44 GB |
 
 - `savasy/bert-base-turkish-ner-cased` was measured but could not be chosen: its model card
-  names no licence (K-08T1B-0002). It left `NER_CANDIDATES`; an installation that ran
-  `make models` before 08 full 1c may delete its cache directory
-  `huggingface/hub/models--savasy--bert-base-turkish-ner-cased` and the
-  `pytorch_model.bin` copy of the chosen model from the `model_cache` volume (nothing reads
-  them).
-- With `simple` aggregation the chosen model split words into sub-word pieces (`Ay`, `şe`),
-  so a name could be masked in part; `first` labels whole words (a test checks every person
-  span starts and ends at a word boundary).
+  names no licence (K-08T1B-0002). It left `NER_CANDIDATES`.
+- Old volumes: a `model_cache` filled by `make models` before 08 full 1c still holds that model
+  and a `pytorch_model.bin` (pickle) copy of the chosen one. Nothing reads them, but
+  `deploy/offline/verify.sh --models` fails on them (every hub model directory and snapshot file
+  must be in `deploy/offline/models.txt`), and `save.sh` packs only the listed files. Remove them
+  once, where the volume is (the command deletes only these two paths), then run `verify.sh`
+  again:
+
+  ```bash
+  docker compose run --rm --no-deps tools sh -c 'cd /models/huggingface/hub && rm -rf models--savasy--bert-base-turkish-ner-cased && s=models--akdeniz27--bert-base-turkish-cased-ner/snapshots/99995f7d2be4b3a28c74f0d36ee97f8c04ee0571/pytorch_model.bin && if [ -L "$s" ]; then rm -f "$(readlink -f "$s")" "$s"; fi'
+  ```
+- With `simple` aggregation the chosen model split words into sub-word pieces (`Ay`, `şe`), so a
+  name could be masked in part; this was seen in the exploration runs, not as a failing test.
+  `first` labels whole words; tests check that every person span starts and ends at a word
+  boundary and that every gold name is fully covered.
 - Location precision is low because the set labels street addresses `TR_ADDRESS`: the
   neighbourhood, district and city inside an address are location names to the model and count
   as false positives here. For masking that is the safe direction.
@@ -380,14 +390,15 @@ Candidates (08 full 1c; both on the same set, same matching rule):
   by 128 tokens; `make test-models`). The model sometimes tags a surname as a name of its own
   (`Mehmet` and `Yılmaz`), so a full name can become two adjacent placeholders; both are masked.
 - Latency is the forward pass of BERT-base (293 tokens for the 1,000-character text); tokenizing
-  takes about 1 ms. Measured on a development laptop (Intel Core i7-1165G7, 4 cores / 8
-  threads, Docker Desktop VM with 7 CPUs, 4 torch threads), where the same code gave int8 P95
-  297 ms in one run and 825-840 ms twenty minutes later with no container running (turbo and
-  host load), 158 ms in a later run; with one CPU and one thread int8 was 442-458 ms, fp32 936-1,300 ms. int8 was 2-3
-  times faster than fp32 in every run. The laptop is not the target: the acceptance (P95 <
-  300 ms) is measured on the installation's machine with
-  `docker compose run --rm --no-deps tools make test-ner-latency` (offline, prints the P95; its
-  own test marker, so `make test-models` does not run it).
+  takes about 1 ms. Measured on a development laptop (Intel Core i7-1165G7, 4 cores / 8 threads,
+  Docker Desktop VM with 7 CPUs), int8 P95 ranged from 158 to 840 ms for the same code (turbo,
+  host load and other stacks; 825-840 ms with no container running). Measured at the same
+  moment, int8 was 1.5-1.7 times faster than fp32 with 4 torch threads (825 / 1,259 ms and
+  840 / 1,462 ms) and 2.1-2.8 times with one CPU and one thread (442-458 / 936-1,300 ms). The
+  laptop is not the target: the acceptance (P95 < 300 ms) is measured on the installation's
+  machine with `docker compose run --rm --no-deps tools make test-ner-latency` (offline, prints
+  the P95; its own test marker, so `make test-models` does not run it). One run decides little
+  on a noisy machine; run it two or three times.
 - Small support (22 names): one miss is 0.05 of recall. The set is synthetic and was written by
   the same team; treat 1.00 as "no regression on the known shapes", not as a field recall.
 - int8 uses `torch.ao.quantization.quantize_dynamic`, which torch marks for migration to
