@@ -1,0 +1,6 @@
+# 2026-11-05T14:48:27Z HEAD 2a7b430d680d1bf6c99b3741b62a21339fa6fcf1
+$ docker run --rm --network none -v C:/ai_paycore/ffcore/.worktrees/feat/08-tam-1c-olcum:/work -v 04a-knowledge-core_model_cache:/models:ro -w /work ffcore/tools:0.0.0-08t1c bash -c 'MODELS_TXT=deploy/offline/models.txt bash deploy/offline/verify.sh --models /models'
+ip6tnl0 lo tunl0 /dev/sda1 /models ext4 ro,relatime,discard 0 0
+OK models (73 files)
+verify: OK
+exit=0

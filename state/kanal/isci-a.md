@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-a-08-tam-1c-olcum (Opus 5.5; önceki lease ffcore-isci-a-08-tam-1b RETIRED, HANDOFF koordinatör özeti K-08T1B-0026)
 - Aktif paket: 08-tam-1c-b-olcum (K-08T1C-0014; 1c-a MERGED c5b234c)
 - Durum: ACTIVE
-- Son okunan: K-08T1C-0018
+- Son okunan: K-08T1C-0019
 
 ## Mesajlar
 
@@ -2094,3 +2094,17 @@ FOLLOWUP önerileri (kayıt sende): torchao/ONNX geçişi (torch nicemleme API's
 Paket: 08-tam-1c-b-olcum   Cevap: K-08T1C-0014
 Branch `feat/08-tam-1c-b-olcum` · SHA **2a7b430d680d1bf6c99b3741b62a21339fa6fcf1** · baz 105d176 · delta `105d176..2a7b430` (7 commit, 10 dosya +441/-47) · Sınıf [B] · push yok · PR açıklaması state/pr/08-tam-1c.md "PR 1c-b" bölümü (1c-a r1 NOTE'ları içinde).
 İnceleyici için: yığın gerekmez. `-m models` testleri `04a-knowledge-core_model_cache` volume'unu salt-okunur bağlayarak: `docker run --rm --network none --env-file .env.test -e RUN_MODEL_TESTS=1 -v <worktree>:/work -v 04a-knowledge-core_model_cache:/models:ro -w /work/backend ffcore/tools:0.0.0-08t1c pytest -m models tests/models/test_08t_ner_models.py`; ölçüm CLI'sı docs/guardrail.md "NER quality report". Gecikme testi makineye bağlı (kabul 3 NOT_RUN). Her kalemde önce test commit'i. Dal donar; DUZELT gelirse yeni SHA ile PR-HAZIR.
+
+### A-08T1C-0019 · 2026-11-05 15:00 · → koordinator · DURUM
+Paket: 08-tam-1c-b-olcum   Cevap: K-08T1C-0019
+Kullanıcı isteğiyle öz-kontrol (dal 2a7b430'da donuk, değişiklik yok, yığın yok). Doğrulananlar: HEAD 2a7b430, 7 commit, main b6981f0 ile `merge-tree` temiz; test/lint logları 2a7b430 SHA'sını taşıyor ve PR'daki sayılarla aynı (1743×2, lint 0). `08t1c-b-green-models.log` başlığı "e2ee8f8 + çalışma ağacı": e2ee8f8..2a7b430 farkı yalnız o koşunun içerdiği 3 dosya (Makefile, test_08t_ner_models.py, docs), commit'ler koşudan sonra ve arada düzenleme yok.
+**Kanıt boşluğu kapandı:** PR'daki "verify OK 73 dosya" hiçbir log'da yazmıyordu (yalnız `verify_exit=0`); offline yeniden koşuldu: state/evidence/08t1c-b-verify-models.log (`OK models (73 files)`, exit 0, HEAD 2a7b430).
+Kendi bulgularım (DUZELT kararı sende; küçük, tek commit):
+- **MINOR-a:** docs/guardrail.md aday tablosu seçilen satırda "P95 297-840 ms" diyor, PR "158-840 ms"; ölçülen tam aralık 158-840 ms (08t1c-b-green-models.log 158 ms). Docs düzelmeli.
+- **MINOR-b:** `.env.example` `GUARDRAIL_EGRESS_NER=true` yorumu "`make test-ner-latency` hedef makinede yeşil olmadan true yok" şartını söylemiyor (docs iki yerde söylüyor). Kurulum yapan önce `.env.example`'ı okur.
+NOTE'lar (kod değişikliği önermiyorum, inceleyici bilsin):
+1. `test_08t1c_10` (egress) `"<<PII_1>> <<PII_2>> arar."` bekliyor; model bazen soyadını ayrı `B-PER` veriyor (hata ayıklamada kısa metnin başındaki "Ayşe Demir" ikiye bölündü). Bu cümlede bölünmüyor ve deterministik, ama model/torch değişirse üç yer tutucuya dönebilir (maskeleme yine tam).
+2. Revizyon iki yerde: `.env.example` `NER_REVISION` ve `models.py` `NER_REVISIONS` (test 7d eşitliği tutuyor). Başka revizyon seçen kurulum `make models` ile onu indiremez; bilinçli (ölçülen commit), docs yazıyor.
+3. `make test-models` artık gecikme testini de içeriyor; hedef olmayan makinede kırmızı olabilir (dizüstü 158-840 ms). Hedefli komut `make test-ner-latency`.
+4. Bellek: int8'in çalışma belleği ölçülmedi; `quantize_dynamic` kopya üretir, yüklemede kısa süre fp32 + int8 birlikte bellekte. Docs'taki 0,44 GB disk boyutu.
+5. Her API açılışında torch nicemleme kullanım dışı uyarısı loga düşer (FOLLOWUP-178 ile gider).
