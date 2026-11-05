@@ -2082,3 +2082,27 @@ Paket: 09-1 r5   Cevap: K-09-0030
 
 ### R-09-0023 · 2026-11-05 14:54 · → koordinator · YIGIN-KAPA
 review09 `down -v --remove-orphans` (14:54): 0 konteyner, 0 hacim. Worktree kaldırıldı (dizin de silindi). Açık inceleyici yığını yok.
+
+### R-09-0024 · 2026-11-05 15:23 · → koordinator · ACK
+Paket: 09-1 r6   Cevap: K-09-0035
+9def741db3eb911c4e4e29b6dbceda0ce9a89fb9 doğrulandı (b443a54 atası; 3 commit, 11 dosya; merge-base main'e göre `state/` 0). Worktree `.worktrees/review-09-1-r6` (temiz).
+
+### R-09-0025 · 2026-11-05 15:23 · → koordinator · YIGIN-AC
+review09, 18300/13300, tam yığın + plan/18 katmanı (exam-stack için). İşçinin `0.0.0-09` imajı 9def741 ile dosya dosya eşleşti (169 py, fark 0); `--no-build --pull never`. Koşular: unit ×2, lint, hedefli test-int ×2 (09/05a), alembic heads, seed, seed-eval ×2, exam-stack, smoke, probe P0-P4, 540 sınır probe'u. Açık FF yığını: bu tek.
+
+### R-09-0026 · 2026-11-05 15:38 · → koordinator · REVIEW-SONUC
+Paket: 09-1 r6   Cevap: K-09-0035
+**ONAY 9def741db3eb911c4e4e29b6dbceda0ce9a89fb9.** Rapor state/reviews/09-1-r6.md. BLOCKER/MAJOR 0, MINOR 2 (aynı kök), NOTE 8.
+- KAPANDI:
+  - `TICK_PLAN_S=540` tek kaynak üç yerde (config `le` sabitten). Yığın probe'u: 540 / 539 / 2 × 270 başlar, 541 / 2 × 271 kodlu biter; beklemede kalan yok.
+  - Kesme sayma `min(LLM_CALL_TIMEOUT_S × calls, 540)`; kısmi kesme commit'siz, sıra önde. K-09-0034 testi var.
+  - 422 HTTP testi; docs NOTE'ları; `runtime/worker.py` additive.
+- **PR not 3 pozisyonum: MINOR, MAJOR değil.** Ön koşul her tick ilk maddeden önce >30 sn iş (kalıcı altyapı bozulması). Ama risk not 3'ten geniş: aynı koşulda airgap'te (`LLM_CALL_TIMEOUT_S=600`) asılı judge her tick "kısmi" kesiliyor, sayılmıyor, commit yok, yalnız info logu; sınav sessizce sonsuz `running` ve tick başına ~539 sn judge harcıyor. Fail-loud kuralı gereği öneri:
+  - **A** merge öncesi küçük commit: ilk sınavın penceresi < `TICK_PLAN_S` ise ölçülen yükle `warning` logu + docs:176 "arada hiçbir şey sonsuza dek beklemez" cümlesine koşul + FOLLOWUP-176 genişletmesi;
+  - B yalnız FOLLOWUP + docs;
+  - C ilk sınavın ilk maddesindeki kesme her zaman sayılır (09-2).
+  - B seçilirse ONAY değişmez.
+- Kapılar (işçinin doğrulanmış imajı, build yok): unit 1730 ×2, lint, hedefli test-int 42 ×2, alembic tek head, seed-eval idempotent, exam-stack 8/8, smoke, probe P0-P4. DNS hatası 0.
+
+### R-09-0027 · 2026-11-05 15:38 · → koordinator · YIGIN-KAPA
+review09 `down -v --remove-orphans` (15:37): 0 konteyner, 0 hacim. Worktree kaldırıldı (dizin de silindi). Açık inceleyici yığını yok.

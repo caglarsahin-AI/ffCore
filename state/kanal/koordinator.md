@@ -3924,3 +3924,11 @@ Tam SHA: **9def741db3eb911c4e4e29b6dbceda0ce9a89fb9** (feat/09-evaluation; b443a
 ### K-09-0036 · 2026-11-05 15:21 · → isci-b (09) · CEVAP
 Paket: 09-1 r6   Cevap: B-09-0044 / B-09-0045
 PR-HAZIR r6 alındı; 9def741 doğrulandı (3 commit test/kod/docs, 11 dosya, state yok, çakışma yok). YIGIN-KAPA alındı. VERIFIED. REVIEW-ISTEK r6 K-09-0035 inceleyiciye gitti. PR not 3 riski FOLLOWUP-176'ya eklendi (koordinatör pozisyonu: merge engeli değil; inceleyici aksini savunursa karar). Dal donar; ONAY → merge + main kapısı (kapı sırasında koşu yapma) → 09-2 GOREV teyidi.
+
+### K-09-0037 · 2026-11-05 15:39 · → isci-b (09) · DUZELT (küçük, merge öncesi)
+Paket: 09-1 r6   Cevap: R-09-0026 (state/reviews/09-1-r6.md) / B-09-0045
+r6 **ONAY** (MAJOR 0). Merge öncesi tek küçük commit (karar KARARLAR "09-1 r6: tick yükü aşımı fail-loud", A): (1) tick'te sıradaki **ilk** sınavın penceresi `TICK_PLAN_S`'ın altındaysa `warning` logu `eval_tick_overhead_exceeded overhead_s=<ölçülen>` (içerik yok; her tick'te en fazla bir kez); (2) docs/evaluation.md:176 "arada hiçbir şey sonsuza dek beklemez" → "tick yükü `TICK_OVERHEAD_S`'ı (30 s) aşmadıkça; aşarsa `eval_tick_overhead_exceeded` uyarısı" ; (3) PR notu 3 → FOLLOWUP-176 işareti (C seçeneği 09-2'de). Birim test: yapay yükle uyarı yazılıyor, normal tick'te yazılmıyor. Test/kod ayrı iki küçük commit olabilir; lint + ilgili testler yeter (tam kapı yok). Sonra **PR-HAZIR r7** (tam SHA, delta `9def741..`); inceleyici yalnız diff okur (ONAY-TEYIT); ardından merge + main kapısı bende. NOTE'lar: PR "09-2'ye kalan" listesine (kod yok).
+
+### K-09-0038 · 2026-11-05 15:39 · → inceleyici · ACK
+Paket: 09-1 r6   Cevap: R-09-0026 / R-09-0027
+ONAY alındı; rapor, kanıtlar, kanal commit edildi. MINOR-r6-1/2 için **A** (uyarı logu + docs koşulu, merge öncesi küçük commit, K-09-0037); C FOLLOWUP-176'da 09-2'ye. PR-HAZIR r7 gelince yalnız `git diff 9def741..r7` oku, kanala **ONAY-TEYIT** (ya da bulgu); yığın gerekmez. YIGIN-KAPA alındı. Sonra merge + main kapısı (kapı sırasında koşu yok). Dört turda zamanlama sınıfını probe'larla kapatman bu paketi kurtardı; teşekkürler.

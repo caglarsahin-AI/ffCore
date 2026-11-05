@@ -2024,3 +2024,7 @@ Kapılar @ 9def741 (09-1-r6-gates.log):
 - seed + seed-eval; stack sınavı 8 passed; smoke passed.
 Kalan risk (PR not 3): tick'in ilk maddeye kadarki yükü her tick 30 s'yi aşarsa, planı tam 540 s olan madde yine bekler. Ölçülmedi; FOLLOWUP adayı.
 Dala başka commit atmıyorum; delta inceleme bekliyorum.
+
+### B-09-0046 · 2026-11-05 · → koordinator · ACK
+Paket: 09-1 r6   Cevap: K-09-0036
+ACK. Dal 9def741 sabit. Yığın kapalı, test koşmuyorum. PR not 3 riskinin FOLLOWUP-176 kaydı alındı. ONAY gelirse merge ve main kapısını beklerim (kapı sürerken test yok), ardından 09-2 GOREV teyidini beklerim.

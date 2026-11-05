@@ -1,0 +1,36 @@
+== HEAD 9def741db3eb911c4e4e29b6dbceda0ce9a89fb9 tree-clean=0 2026-11-05T15:08:10+03:00
+== build exit=0
+== up exit=0
+== compose config
+exit=0
+== make lint + make test DEPLOY_PROFILE=llmaas 2026-11-05T15:09:24+03:00
+lint-ok
+======================= 1730 passed in 130.71s (0:02:10) =======================
+exit=0
+== make lint + make test DEPLOY_PROFILE=airgap 2026-11-05T15:11:47+03:00
+lint-ok
+======================= 1730 passed in 129.46s (0:02:09) =======================
+exit=0
+== targeted test-int (09, 05a, 18td) DEPLOY_PROFILE=llmaas 2026-11-05T15:14:08+03:00
+SKIPPED [1] tests/integration/test_05a_sql.py:301: NOT_RUN: needs RUN_MODEL_TESTS=1
+113 passed, 1 skipped in 81.47s (0:01:21)
+exit=0
+== targeted test-int (09, 05a, 18td) DEPLOY_PROFILE=airgap 2026-11-05T15:15:40+03:00
+SKIPPED [1] tests/integration/test_05a_sql.py:301: NOT_RUN: needs RUN_MODEL_TESTS=1
+113 passed, 1 skipped in 81.87s (0:01:21)
+exit=0
+== make seed + seed-eval + stack exam 2026-11-05T15:17:12+03:00
+seeded: projects ['hastane-a', 'klinik-b'], models ['chat-default', 'chat-fail', 'chat-slow', 'chat-tools'], agents in hastane-a; created 36, uploaded 15
+cd backend && python -m ffcore.cli seed-eval --project "hastane-a" --suite ../data/samples/eval/suite.json --items ../data/samples/eval/sozlesme-33.json 
+items upserted: 33; archived: 0
+suite: created
+cd backend && python -m ffcore.cli seed-eval --project "hastane-a" --suite ../data/samples/eval/suite-sql-20.json --items ../data/samples/eval/sql-20.json 
+items upserted: 20; archived: 0
+suite: created
+exam edf3b938-9f0f-4720-af35-e6474d0c59da completed in 21.2 s: {'n': 33, 'worst': [{'mean': 0.0, 'note': '', 'style': 'dolayli', 'passed': False, 'item_id': 'hastane-a.sozlesme-33-q18', 'outcome': 'below_rerank_floor'}, {'mean': 0.0, 'note': '', 'style': 'alan_ici_cevapsiz', 'passed': False, 'item_i
+8 passed in 28.39s
+exit=0
+== make smoke 2026-11-05T15:18:52+03:00
+smoke: passed
+exit=0
+== end 2026-11-05T15:18:59+03:00

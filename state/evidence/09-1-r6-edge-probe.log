@@ -1,0 +1,6 @@
+R6 TICK_PLAN_S=540 TICK_BUDGET_S=570 config le=[540]
+R6 plan=540x1=540s exceeds_tick=False may_judge=True  => starts
+R6 plan=539x1=539s exceeds_tick=False may_judge=True  => starts
+R6 plan=541x1=541s exceeds_tick=True may_judge=True  => ends coded
+R6 plan=270x2=540s exceeds_tick=False may_judge=True  => starts
+R6 plan=271x2=542s exceeds_tick=True may_judge=True  => ends coded

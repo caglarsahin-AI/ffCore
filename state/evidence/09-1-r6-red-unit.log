@@ -1,0 +1,30 @@
+== 09-1 r6: unit tests (r5 findings) on the b443a54 code, worktree, before any code change 2026-11-05T15:00:11+03:00
+-- test_09_r5.py: collection fails (no ffcore.evaluation.ticks); every r5 test red by construction
+All checks passed!
+E   ImportError: cannot import name 'ticks' from 'ffcore.evaluation' (ffcore/evaluation/__init__.py)
+ERROR tests/unit/test_09_r5.py
+E   ImportError: cannot import name 'ticks' from 'ffcore.evaluation' (ffcore/evaluation/__init__.py)
+tests/unit/test_09_r4.py:41: ImportError: cannot import name 'ticks' from 'ffcore.evaluation' (/work/backend/ffcore/evaluation/__init__.py)
+E   Failed: DID NOT RAISE ValidationError
+tests/unit/test_09_r4.py:80: Failed: DID NOT RAISE ValidationError
+FAILED tests/unit/test_09_r4.py::test_09_r4_major1_tick_budget_carries_the_whole_tick_length
+FAILED tests/unit/test_09_r4.py::test_09_r4b_judge_call_estimate_is_configured_and_bounded_by_a_tick
+2 failed, 77 passed in 4.63s
+
+== test_09_r5.py on the b443a54 code + only the constants module ffcore/evaluation/ticks.py (git archive copy; behaviour unchanged) 2026-11-05T15:00:54+03:00
+E   AssertionError: assert 570.0 == 540
+tests/unit/test_09_r5.py:23: AssertionError: assert 570.0 == 540
+E   Failed: DID NOT RAISE ValidationError
+tests/unit/test_09_r5.py:30: Failed: DID NOT RAISE ValidationError
+E   TypeError: Budget.__init__() got an unexpected keyword argument 'hard_s'
+tests/unit/test_09_r5.py:52: TypeError: Budget.__init__() got an unexpected keyword argument 'hard_s'
+E   AttributeError: 'Budget' object has no attribute 'hard_s'
+tests/unit/test_09_r5.py:66: AttributeError: 'Budget' object has no attribute 'hard_s'
+E   Failed: DID NOT RAISE ApiError
+tests/unit/test_09_r5.py:95: Failed: DID NOT RAISE ApiError
+FAILED tests/unit/test_09_r5.py::test_09_r5_major1_one_usable_window_constant
+FAILED tests/unit/test_09_r5.py::test_09_r5_major1_judge_call_estimate_bounded_by_the_usable_window
+FAILED tests/unit/test_09_r5.py::test_09_r5_minor1_a_cut_counts_only_after_a_full_window
+FAILED tests/unit/test_09_r5.py::test_09_r5_minor1_tick_budget_knows_the_hard_limit
+FAILED tests/unit/test_09_r5.py::test_09_r5_major1_start_compares_with_the_usable_window
+5 failed, 1 passed in 3.52s
