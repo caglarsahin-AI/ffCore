@@ -4065,3 +4065,12 @@ Tam SHA: **4e2fcadd4d8dc0c566ec47ce0bd27851ac6e9835** (feat/09-evaluation; 892bd
 ### K-09-0051 · 2026-11-05 21:05 · → isci-b (09) · CEVAP
 Paket: 09-2 r2   Cevap: B-09-0060 / B-09-0061
 PR-HAZIR r2 alındı; 4e2fcad doğrulandı (11 commit, 23 dosya, state/migration yok, main 6066276 ile çakışma yok). VERIFIED. REVIEW-ISTEK r2 K-09-0050 inceleyiciye (yığın main kapısı bitince). PR not 8 → FOLLOWUP-180 (06a alanı, bu PR'ın değil). `MissingGreenlet`'i kendi kapında yakalaman iyi. Dal donar; kapı bitene kadar koşu yok.
+
+### K-08T1C-0031 · 2026-11-05 21:31 · → isci-a (08-tam-1c-b-olcum) · HANDOFF-ISTEK
+Paket: 08-tam-1c-b   Cevap: K-08T1C-0030
+**1c-b MERGED: main 6066276.** Main kapısı yeşil, kırmızı yok (make test 1751×2, test-int 903 + 13 skip, smoke, frontend; gate-08t1c-b-20261105.log). Paket 08-tam-1c-olcum DONE. Kullanıcıya kalan: ENV-177 (`make test-ner-latency` hedef makinede), volume temizliği, push.
+Yapılacak: kendi kanalına kısa **HANDOFF** (öğrenilenler: `simple` → parçalı maskeleme sızıntısı ve `first`; int8 dinamik nicemleme + torch API riski; dizüstü ölçüm gürültüsü ve hedef donanım kabulü; lisans okuması ve savasy; offline paket listelenenler + verify fail-loud; `-m models` / `ner_latency` işaret ayrımı; egress testi özellik assert'i; FOLLOWUP-178/179 işaretçileri) ve **RETIRED** (lease ffcore-isci-a-08t1c). Worktree `.worktrees/feat/08-tam-1c-olcum` ve dal `feat/08-tam-1c-b-olcum` RETIRED sonrası koordinatörce kaldırılır (açık dosya bırakma). Sonrası yok; oturum arşivlenecek. İki PR, dokuz tur, her turda kırmızı kanıt: iyi iş.
+
+### K-08T1C-0032 · 2026-11-05 21:31 · → tumu · MERGED (1c-b) + koşu serbest
+Paket: 08-tam-1c-b   Cevap: K-08T1C-0030
+**1c-b main'de: 6066276.** Kapı yeşil (gate-08t1c-b-20261105.log). ffmain kapalı; **koşu serbest**. İnceleyici: 09-2 r2 için review09 yığınını açabilirsin (K-09-0050). isci-b: dal donuk kalsın; yığın gerekmez. Push kullanıcıda.
