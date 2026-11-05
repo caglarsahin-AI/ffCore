@@ -2209,3 +2209,58 @@ Uygulama planı (DUZELT gelince):
   - `approve_tools`'u dışarıda bırakıyorum: true→false değişimi zaten `suite_not_gateable` ya da `incomplete` yoluna düşüyor.
   - Langfuse dataset madde değişimi bu mekanizmayla yakalanmaz. Bunu docs'a sınır olarak yazacağım.
 - **Kapı:** tam `make test-int` iki profilde. 03a ve 18td ayrıca açıkça koşulacak.
+
+### B-09-0058 · 2026-11-05 · → koordinator · ACK
+Paket: 09-2 r1   Cevap: K-09-0048
+ACK DUZELT. İş sırası:
+1. Kırmızı testler, kalem başına ayrı commit:
+   - MAJOR-1: `stale_exam`, `definition_changed`, `stale_suite`.
+   - MAJOR-2: eşlik testi ve iki kipte aynı 422.
+   - MINOR 1/2/3/5/6+7/8/9/10.
+   - `masking` alanı.
+2. Kod commit'leri.
+3. MINOR-12 pay düzeltmesi: yalnız test.
+4. docs.
+5. YIGIN-AÇ, ardından kapılar: lint, make test iki profilde, **tam** test-int iki profilde (03a ve 18td ayrıca açık), exam-stack, smoke.
+6. YIGIN-KAPA.
+7. PR-HAZIR r2.
+
+MINOR-4/11'e dokunmuyorum.
+
+### B-09-0059 · 2026-11-05 20:13 · → koordinator · YIGIN-AÇ
+Paket: 09-2 r2   Cevap: K-09-0048
+`ffcore-09` (ports 18280/13280), `up -d --build --wait --pull never`. Plan:
+1. OpenAPI 06a/09 yeniden üretimi.
+2. Kırmızı kanıt (9fdf788 dışa aktarımı).
+3. lint, make test iki profilde.
+4. **Tam** test-int iki profilde; 03a ve 18td ayrıca.
+5. seed, seed-eval, exam-stack, smoke.
+
+Sonra `down -v` ve YIGIN-KAPA.
+
+### B-09-0060 · 2026-11-05 21:03 · → koordinator · YIGIN-KAPA
+Paket: 09-2 r2   Cevap: K-09-0048 / K-08T1C-0028
+`ffcore-09` `down -v` ile kapatıldı (konteyner 0, volume 0). Main kapısı bitene kadar test koşmuyorum, yığın açmıyorum.
+
+### B-09-0061 · 2026-11-05 21:03 · → koordinator · PR-HAZIR
+Paket: 09-2 r2   Cevap: K-09-0048
+PR: `state/pr/09.md`, bölüm "PR 09-2 r2" · Sınıf [B] · branch feat/09-evaluation · SHA **4e2fcadd4d8dc0c566ec47ce0bd27851ac6e9835**. Delta `892bdfe..4e2fcad`, 11 commit; önce kırmızı test (9fdf788), sonra ayrı fix commit'leri. Ağaç temiz.
+
+Kapsam:
+- **MAJOR-1:** `definition_sha256`, `stale_exam` (özeti olmayan sınav da), `stale_suite` (scorer/eşik/repeat), sınav ortasında `failed(definition_changed)` ve süren koşuların durdurulması.
+- **MAJOR-2:** 03a istisnası; iki kipte aynı 422; edit ve read compare gövdeleri eşit.
+- **MINOR 1/2/3/5/6+7/8/9/10/12** ve `masking` alanı; docs.
+
+Kırmızı kanıt (`09-2-r2-red.log`, eski kod `/red`'de): birim+sözleşme 20 failed / 61 passed, entegrasyon 17 failed / 48 passed.
+
+Kapılar @ 4e2fcad (`09-2-r2-gates.log`):
+- lint: iki profilde geçti.
+- make test: 1777 / 1777, iki profilde.
+- **Tam test-int:** 941 passed / 13 skipped, iki profilde.
+- 03a + 18td ayrıca: 10 / 10, iki profilde.
+- exam-stack 8 passed; smoke passed.
+
+Notlar:
+- İlk koşu bir hatamı yakaladı: from-run ret audit'i rollback'ten sonra kimlik okuyordu, `MissingGreenlet`. b809b3a ile düzeltildi.
+- PR not 8: var olan bir sıra bağımlılığı. `test_06a_agents` → `test_03a` sırasıyla koşulunca 03a `SecretDecryptError` ile düşüyor; tam koşuda alfabetik sıra yüzünden görünmüyor. FOLLOWUP önerisi.
+- Touch-zone: `ner.py` (08) additive; 1c-b'nin aynı dosyadaki değişikliği başka bölgede.

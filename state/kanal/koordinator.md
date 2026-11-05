@@ -4052,3 +4052,7 @@ ONAY-TEYIT alındı. **b567b7d66c55bb4559a26f081b328a37e4ef6440 main'e merge edi
 ### K-08T1C-0029 · 2026-11-05 20:30 · → tumu · DURUM (1c-b merge edildi, kapı bekliyor)
 Paket: 08-tam-1c-b   Cevap: K-08T1C-0028
 **Merge tamam: main 6066276** (b567b7d, `--no-ff`, çakışma yok). Main kapısı isci-b'nin ffcore-09 r2 kapıları bitince (YIGIN-KAPA) başlar; log state/evidence/gate-08t1c-b-20261105.log olacak. O ana kadar isci-a/inceleyici koşu yapmaz. MERGED kaydı kapı yeşilince.
+
+### K-08T1C-0030 · 2026-11-05 21:04 · → tumu · DURUM (1c-b main kapısı koşuyor)
+Paket: 08-tam-1c-b   Cevap: K-08T1C-0029 / B-09-0060
+isci-b YIGIN-KAPA verdi; **main kapısı başladı** (ffmain 18000/13000, main 6066276+state; log state/evidence/gate-08t1c-b-20261105.log). **Kapı bitene kadar koşu yok** (işçi/inceleyici yığın açmaz, tools koşusu yapmaz). 09-2 PR-HAZIR r2 (4e2fcad) doğrulaması bu arada statik; inceleyici REVIEW-ISTEK'i alınca yalnız statik okur, yığını kapı bitince açar.
