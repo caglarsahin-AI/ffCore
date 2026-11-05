@@ -108,3 +108,44 @@ def test_08t1c_7d_measured_winner_is_the_only_candidate():
     assert {"config.json", "tokenizer.json", "vocab.txt", "model.safetensors"} <= files
     assert not any(r[1] == "savasy/bert-base-turkish-ner-cased" for r in rows)
     assert "pytorch_model.bin" not in files
+
+
+# --- r1 MINOR-2/3 (K-08T1C-0024): a name counts only when fully covered; the engine threshold ---
+
+
+def test_08t1c_7e_partial_name_is_found_but_not_covered():
+    report = quality.ner_quality_report(RECORDS, fake_find)
+    person = report["PERSON"]
+    # "Ayşe" overlaps "Ayşe Demir" (found) but leaves "Demir" open (not covered).
+    assert person.true_positive == 1 and person.covered == 0
+    assert person.coverage == 0.0
+    assert report["ORGANIZATION"].covered == 0  # "Acme" of "Acme A.Ş."
+    table = quality.markdown_table(report)
+    assert table.splitlines()[0].endswith("| Covered |")
+    assert "| `PERSON` | 1 | 2 | 1.00 | 0.50 | 0.00 |" in table
+    # The regex table keeps its columns (docs test 08_1b).
+    assert "Covered" not in quality.markdown_table(quality.quality_report(RECORDS))
+
+
+def test_08t1c_7f_two_spans_cover_a_full_name():
+    def split(text, categories):
+        return [
+            Finding("PERSON", 0, 4, 0.9, "fake", "Ayşe"),
+            Finding("PERSON", 5, 10, 0.9, "fake", "Demir"),
+        ]
+
+    person = quality.ner_quality_report(RECORDS[:1], split)["PERSON"]
+    assert (person.true_positive, person.covered, person.predicted) == (1, 1, 2)
+
+
+def test_08t1c_7g_findings_below_the_engine_threshold_are_not_counted():
+    from ffcore.guardrails import builtin
+
+    threshold = builtin.builtin_egress_pii(True).min_confidence
+    assert quality.NER_MIN_CONFIDENCE == threshold
+
+    def weak(text, categories):
+        return [Finding("PERSON", 0, 10, threshold - 0.01, "fake", "Ayşe Demir")]
+
+    person = quality.ner_quality_report(RECORDS[:1], weak)["PERSON"]
+    assert (person.predicted, person.true_positive, person.covered) == (0, 0, 0)

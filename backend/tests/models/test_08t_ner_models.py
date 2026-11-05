@@ -51,6 +51,12 @@ def test_08t_1_ner_recall_person(report):
     assert report["PERSON"].recall >= 0.85, report["PERSON"]
 
 
+def test_08t1c_13_person_names_fully_covered(report):
+    """r1 MINOR-2: recall counts any overlap; every letter of a gold name must be inside the
+    model's PERSON spans (above the engine threshold) for the name to count as covered."""
+    assert report["PERSON"].coverage >= 0.85, report["PERSON"]
+
+
 def test_08t_1b_ner_quality_report_matches_docs(report):
     assert quality.markdown_table(report) in DOCS.read_text(encoding="utf-8")
 
@@ -127,7 +133,7 @@ def test_08t1c_11_int8_quality_equals_fp32(client, report):
     )
     fp32 = NerRecognizer(model, revision, pipeline=pipe, labels=pipe.model.config.id2label)
     reference = quality.ner_quality_report(quality.load_set(PII_SET), fp32.recognize)
-    assert report["PERSON"] == reference["PERSON"]
+    assert report["PERSON"] == reference["PERSON"]  # covered included
     assert report["ORGANIZATION"] == reference["ORGANIZATION"]
     assert report["LOCATION"].recall == reference["LOCATION"].recall
     assert abs(report["LOCATION"].predicted - reference["LOCATION"].predicted) <= 1
