@@ -25,22 +25,29 @@ A connector or a consumer that already has the content (PayCore's raw layer) wri
 ignored. Then:
 
 ```
-python -m ffcore.cli ingest-raw --project <p> --kb <kb> --raw-dir <tree, read-only>   --acl <role> --sources <kind:space> ... [--limit N] [--manifest-out <file>] [--accept-personnel-data]
+python -m ffcore.cli ingest-raw --project <p> --kb <kb> --raw-dir <tree, read-only>   --acl <role> --sources <kind:space> ... [--limit N] [--manifest-out <file>] [--text-filter pii_ner|pii_regex] [--accept-personnel-data]
 ```
 
-- Every file goes through C6 `ingest_from_raw` with the named text filter `pii_ner` (08 full
+- Every file goes through C6 `ingest_from_raw` with a named text filter, by default `pii_ner` (08 full
   1b): e-mail, phone, national id, IBAN, card (regex) and person names (the API's NER over
   `POST /api/v1/internal/guardrails/ner`), redacted to `[CODE]` before silver is written, so
   silver, `.raw.md` and gold are masked; raw stays byte for byte; the document records
-  `metadata.text_filter = "pii_ner@<version>"`. A name never overrides a regex finding. There is
-  no option to turn it off or to name another filter. The NER is checked before the first file:
+  `metadata.text_filter = "pii_ner@<version>"`. A name never overrides a regex finding. Masking
+  cannot be turned off: the only other choice is `--text-filter pii_regex` (below). The NER is checked before the first file:
   unreachable or not configured stops the run (`ner_unavailable`; with a PRSIM source
   `prsim_requires_ner`, before the database), a tree is never half name-masked.
 - `pii_ner` is the default in every profile, airgap included: without the NER weights (or an
-  API that answers NER) an `ingest-raw` stops with `ner_unavailable` whatever the source, and only
-  the M3 flag below passes. `GUARDRAIL_EGRESS_NER=false` (airgap) is about egress, not ingest.
+  API that answers NER) a default `ingest-raw` stops with `ner_unavailable` whatever the source.
+  `GUARDRAIL_EGRESS_NER=false` (airgap) is about egress, not ingest.
+- `--text-filter pii_regex` (FOLLOWUP-174) is for sources without person data (for example a
+  product documentation space) on an installation without NER: identifiers are masked as above,
+  person names are not looked for, no NER is called, and documents record `pii_regex@1`. A
+  personnel-data source (PRSIM, by source or path) is still refused (`prsim_requires_ner`): it
+  needs `pii_ner` or the M3 flag. Choosing the filter is the operator's statement that the
+  sources carry no person data; the regex identifiers still stop customer data as before.
 - `--accept-personnel-data` is the M3 measurement mode: it keeps `pii_regex` (identifiers only,
-  person names not masked) so the measured manifest stays as it was, and is logged as such.
+  person names not masked) so the measured manifest stays as it was, and is logged as such. With
+  an explicit `--text-filter pii_ner` it is refused (`text_filter_conflict`, exit 2).
   Documents ingested before 08 full 1b keep `pii_regex@1`; a reindex applies the filter the
   document records. A run never processes a record written under another filter: the same
   bytes recorded as `pii_regex@1` in a `pii_ner` run (or the other way round) are refused as
