@@ -44,7 +44,9 @@ python -m ffcore.cli ingest-raw --project <p> --kb <kb> --raw-dir <tree, read-on
   person names are not looked for, no NER is called, and documents record `pii_regex@1`. A
   personnel-data source (PRSIM, by source or path) is still refused (`prsim_requires_ner`): it
   needs `pii_ner` or the M3 flag. Choosing the filter is the operator's statement that the
-  sources carry no person data; the regex identifiers still stop customer data as before.
+  sources carry no person data: no NER runs, so names in them stay as written. The regex
+  identifiers (card, IBAN, national id, e-mail, phone) are still masked; the run does not stop
+  on them (stopping on customer data is the personnel-data path's rule, below).
 - `--accept-personnel-data` is the M3 measurement mode: it keeps `pii_regex` (identifiers only,
   person names not masked) so the measured manifest stays as it was, and is logged as such. With
   an explicit `--text-filter pii_ner` it is refused (`text_filter_conflict`, exit 2).

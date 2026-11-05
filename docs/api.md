@@ -385,7 +385,7 @@ openapi/04a.yaml`; contract test `test_04a_20_*`). Lists are `{"data": [...]}`. 
 | `POST /{kb_id}/search` | analyst, also in read mode | `{query, top_k?, filters{document_ids, metadata}, hybrid?}`; header `X-Run-Id` is stored in `kb_queries.run_id` |
 | `POST /{kb_id}/test-query` | analyst, also in read mode | the same search, logged with `source=playground` |
 | `POST /internal/embed` | service account only | for the ingest worker; 403 `service_account_required` for anybody else |
-| `POST /api/v1/internal/guardrails/ner` | service account only | the workers' Turkish NER (08 full 1b): spans, category, score and evidence, never values; 503 `ner_not_configured` / `ner_label_unknown` / `model_missing` |
+| `POST /api/v1/internal/guardrails/ner` | service account only | the workers' Turkish NER (08 full 1b): spans, category, score and evidence, never values; 503 `ner_not_configured` / `ner_label_unknown` / `ner_offsets_unavailable` / `model_missing` |
 | `GET /readyz` | none | 200 ready; 503 `warming`, `warmup_failed`, `model_missing`, `embed_dim_mismatch`, `context_configuration_invalid`, `vector_store_unavailable`; with `GUARDRAIL_EGRESS_NER=true` also the NER load codes `ner_not_configured` and `ner_label_unknown` |
 
 Document ACL: `acl_roles` and `acl_users`. A manual upload without either gets `["analyst"]`
