@@ -63,7 +63,10 @@ calls the model directly. FFCore's judge instead:
   (with `GUARDRAIL_EGRESS_NER=true` that check asks the API's NER endpoint for person names; if
   it is down nothing is sent and the item is not run, `ner_unavailable`, counted apart: an
   outage is not the agent's score; the exam's `complete` is then false, so it cannot pass a
-  publish gate that asks for a complete exam until it is run again),
+  publish gate that asks for a complete exam until it is run again; an NER endpoint that
+  refuses the request (4xx) or runs another model than the worker expects is a configuration
+  error instead: the tick fails loudly and the exam ends `failed(advance_failed:
+  ner_misconfigured)` after `MAX_ATTEMPTS` ticks),
 - calls `EVAL_JUDGE_MODEL` as a background job (model slots, background window, quotas),
 - keeps the question, expected answer and answer between markers and tells the model that
   text inside them is data, not instructions,
@@ -185,6 +188,9 @@ one `EVAL_JUDGE_CALL_S` too. Rules:
 - A single call is never longer than the tick allows: with `LLM_CALL_TIMEOUT_S` above 540 s
   the tick still cuts it at its deadline (at most 570 s after the tick starts), and that cut
   counts when the item had the full 540 s window.
+- The first item of the first exam a tick advances always counts its cut, whatever its window:
+  nothing ran before it in that tick, so a tick whose own work keeps eating the window still
+  ends a hung item after `MAX_ATTEMPTS` ticks.
 - Scores an earlier, cut attempt of such an item already wrote to Langfuse stay there (upserted
   by id); the exam's own result in FFCore is the error.
 
@@ -208,6 +214,61 @@ something (an item scored, the item runs started) starts the count again; a tick
 nothing leaves it as it is. Nothing stays `queued` or `running` forever. The
 exam lock is renewed and released only by its holder; when a renewal fails the tick stops
 rather than work on without the lock. To stop an exam, use `cancel`.
+
+## Comparing two exams
+
+```
+GET /api/v1/projects/{project_id}/eval-runs/compare?a=<eval_run_id>&b=<eval_run_id>
+```
+
+Both exams must be `completed` and of the same suite (else `422 eval_runs_not_comparable`).
+The comparison reads FFCore's own item results (the same per-item combination the summary
+uses), not Langfuse. Each item gets a `change`: `fixed`, `regressed`, `same`, `not_comparable`
+(not run in either exam: nothing is guessed), `only_a`, `only_b`; with `mean_delta` (b - a over
+the scorers that ran). The answer also has the summary differences (pass rate, scored, passed
+items, scorer means, outcome counts, not-run counts), the 10 worst items (regressions first,
+then the largest drops), each exam's `complete` and `config_differs` (scorers, threshold,
+`repeat` or `approve_tools` differ: compare with care). A reader can compare.
+
+## The publish gate
+
+A suite bound to an agent (`agent_id`) gates `POST /agents/{id}/publish {version}`. For every
+live suite bound to the agent, the version needs a latest completed exam that:
+
+- `passed` (pass rate at least the suite's threshold),
+- is `complete` and has nothing in `not_run` (an approval rejected or never given, a user
+  question, an NER outage: the exam did not finish unattended).
+
+Otherwise publishing is `409 eval_gate_failed`; the message names each suite as
+`<key>=<reason>`: `no_exam`, `not_passed`, `incomplete`, or `suite_not_gateable`. The last one:
+a suite with `approve_tools: false` cannot gate a version that binds an action asking for
+approval (the exam can never complete unattended); set `approve_tools: true` on that suite, or
+leave it unbound. A suite on an agent without such actions gates with `approve_tools: false`.
+
+An admin may publish past the gate: `{"version": n, "force": true, "force_reason": "..."}`.
+Anyone else gets `403 force_requires_admin`; a force without a reason is
+`422 force_reason_required`. A forced publish is audited as `eval_gate_forced` with the suites
+and the reason. `rollback` is not gated: it returns to a version that was published before.
+An agent without a bound suite publishes as before.
+
+## An exam item from a run
+
+```
+POST /api/v1/projects/{project_id}/eval-suites/{suite_id}/items/from-run/{run_id}
+{"expected": {"answer": "...", "must_contain": ["..."]}, "style": "dolayli", "answerable": true}
+```
+
+Saves a run's question (and its variables) as an item of the suite's Langfuse dataset, with the
+expected output given here (keys as in "Item format"). The run must be `completed` and readable
+by the caller as in the run API (a `user` reads only their own runs; another's is 404).
+
+Before anything leaves for Langfuse the question goes through the egress stage of the agent
+version's guardrail policy in the API process: identifiers are tokenized (`<<PII_n>>`). With
+`GUARDRAIL_EGRESS_NER=false` only the regex categories are masked, so person names stay; with
+`true` names are masked by the API's NER. A blocked question is `422 run_input_blocked`, an NER
+outage `503 ner_unavailable`; nothing is saved then. The item id is `<suite_key>-run-<run_id>`
+(saving the same run again updates it); its metadata says `source: from_run`. Audited as
+`eval_item_from_run` without the text. The console's "add to exam" button is FOLLOWUP-170.
 
 ## Langfuse 3.120 notes (measured)
 

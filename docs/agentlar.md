@@ -46,7 +46,10 @@ Saving or publishing checks the budget against the model (C13): `context_tokens`
 2. `PUT /agents/{id}/versions/{v}` fills the definition of a draft. A published version is never
    edited (409 `version_published`); `POST /agents/{id}/versions` opens a new draft from one.
 3. `POST /agents/{id}/publish {version}`; `POST /agents/{id}/rollback {version}` (only to a version
-   that was published before). Runs without an explicit version use the published one.
+   that was published before). Runs without an explicit version use the published one. When
+   an exam suite is bound to the agent, publish passes the exam gate first (409
+   `eval_gate_failed`; an admin may `force` with a `force_reason`, audited); rollback is not
+   gated. See evaluation.md, "The publish gate".
 
 Analysts with edit access build and publish agents; read-only access gets 403 on every mutation.
 Every mutation is audited.
