@@ -210,6 +210,9 @@ class LocalNer:
 
 
 _local: dict[tuple, LocalNer] = {}
+# The warm-up thread and the first request may arrive together; one client per key, or the
+# model would be loaded twice (FOLLOWUP-168).
+_local_lock = threading.Lock()
 
 
 def local_ner() -> LocalNer:
@@ -217,9 +220,10 @@ def local_ner() -> LocalNer:
 
     settings = get_settings()
     key = (settings.ner_model, settings.ner_revision)
-    if key not in _local:
-        _local[key] = LocalNer(*key)
-    return _local[key]
+    with _local_lock:
+        if key not in _local:
+            _local[key] = LocalNer(*key)
+        return _local[key]
 
 
 def service_authorization(settings) -> dict:
