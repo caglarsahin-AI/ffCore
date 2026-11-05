@@ -1878,3 +1878,44 @@ Kanıt @ 472e04f (state/evidence/09-1-r3-gates.log):
 - seed + seed-eval; stack sınavı **8 passed**; e2e F1-F3 4 passed / 3 skipped; smoke passed.
 Kırmızı kanıt: 09-1-r3-red-unit.log (14 failed / 8 passed @ 0a02d0f) ve 09-1-r3-red-ner.log.
 Dala başka commit atmıyorum; delta inceleme bekliyorum.
+
+### B-09-0031 · 2026-11-05 · → koordinator · ACK
+Paket: 09-1 r4   Cevap: K-09-0023
+ACK. 09-1-r3 raporunu ve KARARLAR'daki "09-1 r3 kararları"nı okudum. Plan:
+- MAJOR-r3-1 (A): plan girdisinde ardışık süre kesmesi sayacı. `MAX_ATTEMPTS`'ta madde `error(judge_out_of_time)`. `failures_key` yalnız commit'li tick'te sıfırlanır.
+- NOTE-6 + MINOR-r3-4: NER kesintisi → `not_run(ner_unavailable)`.
+- MINOR-r3-1..5.
+- NOTE'lar PR'daki "09-2'ye kalan" listesine.
+Sıra: önce test commit'i (kırmızı kanıtla), sonra kod commit'i.
+Kapı: lint, make test iki profil, hedefli test-int (09 + 05a/18td). Yığını açmadan önce YIGIN-AÇ yazacağım.
+
+### B-09-0032 · 2026-11-05 · → koordinator · YIGIN-AÇ
+Paket: 09-1 r4   Cevap: K-09-0023
+`ffcore-09` (18280/13280): önce tools (birim testleri), sonra hedefli test-int için yığın.
+
+### B-09-0033 · 2026-11-05 13:26 · → koordinator · YIGIN-KAPA
+Paket: 09-1 r4   Cevap: K-09-0023
+`ffcore-09` `down -v` ile kapatıldı (konteyner 0, volume 0).
+
+### B-09-0034 · 2026-11-05 13:27 · → koordinator · PR-HAZIR
+Paket: 09-1 r4   Cevap: K-09-0023
+PR: state/pr/09.md, bölüm "PR 09-1 r4" · Sınıf [B]. Branch feat/09-evaluation · SHA **b424013f02a1c88955e7d9e31a513625234d750a**. Delta `472e04f..b424013`, 3 commit:
+- 7f81cea: yalnız test.
+- 9e1391c: kod.
+- b424013: docs.
+Ağaç temiz; main'e göre farkta `state/` yok.
+Düzeltmeler:
+- MAJOR-r3-1 (A): madde başına `timeouts` sayacı; `MAX_ATTEMPTS`'ta `error(judge_out_of_time)`. `failures_key` yalnız commit'li tick'te (puanlanmış madde ya da `start_items`) siliniyor.
+- NER kesintisi → `not_run(ner_unavailable)`; özet `complete=false`.
+- MINOR-r3-1: ilk maddeden sonra katı sınır, docs aynen yazıyor.
+- MINOR-r3-2: `active_runs` `ORDER BY updated_at, id`.
+- MINOR-r3-3: `make seed-prompts`; docs ve state/pr/09.md r3 bölümü düzeltildi.
+- MINOR-r3-5: docs'ta judge'ın NER bağımlılığı.
+- NOTE'lar: PR'daki "09-2'ye kalan" listesinde.
+Kırmızı kanıt: state/evidence/09-1-r4-red-unit.log. 7f81cea testleri 472e04f koduyla (`git archive` kopyası) koşuldu: 5 failed, doğru sebeplerle. Kopyada iki `seed` testi de `data/` olmadığından düştü; logda not var.
+Kapılar @ b424013 (state/evidence/09-1-r4-gates.log):
+- build, config, lint (iki profil): yeşil.
+- make test: 1717 / 1717.
+- Hedefli test-int (09 + 05a + 18td): 107 passed / 1 skipped, her iki profilde.
+- seed + seed-eval; stack sınavı 8 passed; smoke passed.
+Dala başka commit atmıyorum; delta inceleme bekliyorum.
