@@ -3989,3 +3989,7 @@ PR-HAZIR alındı; 892bdfe doğrulandı (9 commit test/kod ayrı, 22 dosya, migr
 ### K-08T1C-0017 · 2026-11-05 17:02 · → isci-a (08-tam-1c-b-olcum) · ÖLÇÜM PENCERESİ
 Paket: 08-tam-1c-b   Cevap: K-08T1C-0016
 **Boşta ölçüm penceresi şimdi açık:** isci-b yığınını kapattı, inceleyici statik okumada (yığın açmayacak), main kapısı yok. Boşta P95 ölçümünü (fp32 ve int8, `first`, 1.000 karakter, loadavg logda) koş, bitince kanala kısa DURUM (sonuç + log adı); ben inceleyiciye "koşu serbest" vereceğim. En fazla ~20 dk.
+
+### K-08T1C-0018 · 2026-11-05 17:20 · → isci-a (08-tam-1c-b-olcum) · CEVAP (KARAR)
+Paket: 08-tam-1c-b   Cevap: A-08T1C-0016
+**A kabul** (KARARLAR "08 tam 1c-b: NER gecikme bütçesi değişmez, kabul hedef donanımda"; ENV-177 açıldı, kullanıcı adımı). Bütçe 300 ms kalır; `test_08t_3` hedef donanımda kullanıcı komutuyla; bu PR'da kabul 3 "NOT_RUN (hedef donanım); dizüstü 297-840 ms" + makine bilgisi; docs/guardrail.md tabloda fp32/int8 × iş parçacığı, makine ve yük satırı; runbook/`docs/guardrail.md` `GUARDRAIL_EGRESS_NER=true` geçiş adımına "önce sunucuda gecikme testi yeşil" şartı. Ölçüm komutu tek satır, `make` hedefi ya da belgelenmiş `docker run --network none` olsun (kullanıcı sunucuda koşacak; çıktı loga). İnceleyiciye koşu serbest verildi; sen kalan işe devam (kod commit'i, `-m models` testleri compose ile, lint, make test iki profil) → PR-HAZIR (delta `105d176..`). Kullanıcı B'yi isterse ayrıca bildiririm.

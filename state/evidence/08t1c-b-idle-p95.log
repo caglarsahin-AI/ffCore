@@ -1,0 +1,20 @@
+# 2026-11-05T14:03:21Z HEAD 728ed2d + working tree (ner.py first + int8); idle window K-08T1C-0017
+# running containers: 0
+## default
+$ docker run --rm --network none  -e PYTHONPATH=/work/backend -v C:/ai_paycore/ffcore/.worktrees/feat/08-tam-1c-olcum:/work -v C:/Users/caglar.sahin/AppData/Local/Temp/claude/9398d5fca5badfb5/1ca44d51-3ae7-4e45-bd35-949d6d7b1e32/scratchpad:/scratch:ro -v 04a-knowledge-core_model_cache:/models:ro -w /work/backend ffcore/tools:0.0.0-08t1c python /scratch/idle_p95.py 
+ip6tnl0 lo tunl0 /dev/sda1 /models ext4 ro,relatime,discard 0 0
+loadavg 1.54 2.39 2.74 1/627 23 | cpus 7 | torch threads 4
+round 1 fp32: P95 1259 ms (200 runs) | loadavg 3.61
+round 1 int8: P95 825 ms (200 runs) | loadavg 3.75
+round 2 fp32: P95 1462 ms (200 runs) | loadavg 3.99
+round 2 int8: P95 840 ms (200 runs) | loadavg 3.99
+## one-cpu
+$ docker run --rm --network none --cpus=1 -e PYTHONPATH=/work/backend -v C:/ai_paycore/ffcore/.worktrees/feat/08-tam-1c-olcum:/work -v C:/Users/caglar.sahin/AppData/Local/Temp/claude/9398d5fca5badfb5/1ca44d51-3ae7-4e45-bd35-949d6d7b1e32/scratchpad:/scratch:ro -v 04a-knowledge-core_model_cache:/models:ro -w /work/backend ffcore/tools:0.0.0-08t1c python /scratch/idle_p95.py 1
+ip6tnl0 lo tunl0 /dev/sda1 /models ext4 ro,relatime,discard 0 0
+loadavg 3.00 3.33 3.10 1/620 23 | cpus 7 | torch threads 1
+round 1 fp32: P95 1300 ms (200 runs) | loadavg 1.12
+round 1 int8: P95 458 ms (200 runs) | loadavg 1.04
+round 2 fp32: P95 936 ms (200 runs) | loadavg 1.03
+round 2 int8: P95 442 ms (200 runs) | loadavg 1.11
+# host (PowerShell, 14:1x UTC): 11th Gen Intel Core i7-1165G7 @ 2.80GHz, 4 cores / 8 logical, AC power (BatteryStatus 2), power plan Balanced, % Processor Performance ~185 (turbo); Windows CPU 12-46 % before the run (Docker backend, Cursor, Teams, claude sessions)
+# Docker Desktop VM: 7 CPUs; 0 containers running at start (idle window K-08T1C-0017)

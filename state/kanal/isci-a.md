@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-a-08-tam-1c-olcum (Opus 5.5; önceki lease ffcore-isci-a-08-tam-1b RETIRED, HANDOFF koordinatör özeti K-08T1B-0026)
 - Aktif paket: 08-tam-1c-b-olcum (K-08T1C-0014; 1c-a MERGED c5b234c)
 - Durum: ACTIVE
-- Son okunan: K-08T1C-0015
+- Son okunan: K-08T1C-0017
 
 ## Mesajlar
 
@@ -2066,4 +2066,19 @@ Seçenekler:
 - **B:** fp32 kalır, gecikme bütçesi ölçülen değere çekilir (P95 ~500 ms; M4 eşiği kullanıcı kararı, [C]). Kod basit, egress çağrısı başına ~0,4 s.
 - **C:** ONNX Runtime ihracı (yeni bağımlılık ve imaj değişikliği, ayrı dilim); bu PR gecikme kriterini NOT_RUN/kırmızı bırakır.
 A, 80/20'ye uyuyor: platformun (torch) sunduğu tek çağrı, kalite kaybı ölçülmedi. Bu arada birim testleri, ölçüm modülü ve `first` dilimine devam ediyorum; nicemleme kodunu karar gelene kadar yazmıyorum. Boşta ölçüm için ffcore-09'un test koşmadığı bir pencere lazım; söylersen o an koşarım.
+
+### A-08T1C-0016 · 2026-11-05 14:40 · → koordinator · KARAR-GEREK
+Paket: 08-tam-1c-b-olcum   Cevap: K-08T1C-0016, K-08T1C-0017
+**Boşta P95 < 300 ms tutmadı (durma koşulu, K-08T1C-0016).** Pencere bitti, koşum yok; inceleyiciye koşu serbest verilebilir. Log: state/evidence/08t1c-b-idle-p95.log (komut satırı, `--network none`, `/models ro`, loadavg, host bilgisi). Betikler state/evidence/08t1c-b-scripts/. Ölçüm `quality.ner_latency_sample`: yerel kurallar + NER, 1.000 karakter (293 token), 200 koşu; akdeniz27, `first`.
+| Kip | 4 torch iş parçacığı (VM 7 CPU) | `--cpus=1`, 1 iş parçacığı |
+|---|---|---|
+| fp32 | P95 1.259 / 1.462 ms | P95 1.300 / 936 ms |
+| int8 | P95 825 / 840 ms | P95 458 / 442 ms |
+Aynı kodla 13:59'da (ffcore-09 yeni bitmişti) int8 P95 **297 ms** ölçmüştüm (08t1c-b-measure-candidates.log); 20 dk sonra boş VM'de 825 ms. Fark bizim yükümüzden değil: makine **i7-1165G7 dizüstü (4 çekirdek / 8 iş parçacığı, Balanced güç planı, turbo)**, Windows tarafında Docker, Cursor, Teams ve claude oturumları %12-46 CPU kullanıyor. Isı/turbo ve host gürültüsü sonucu 3 kat oynatıyor; tek iş parçacığı 4 iş parçacığından hızlı çıktı (hiper-iş parçacığı çakışması). Bu makine bütçeyi sınamak için temsilî değil; yine de tek doğrulanmış sayı: int8 P95 297-840 ms, fp32 936-1.462 ms. int8 her koşulda fp32'den 2-3 kat hızlı, kalite aynı.
+Seçenekler (bütçe değişikliği kullanıcı kararı):
+- **A (önerilen):** Kod int8 + `first` ile merge edilir; `test_08t_3` eşiği 300 ms kalır ve **hedef donanımda** (PayCore sunucusu ya da llmaas kurulum makinesi) kullanıcı komutuyla koşulur; bu PR'da kabul 3 "NOT_RUN (hedef donanım), geliştirme dizüstünde 297-840 ms" olarak yazılır. Bugün üretim etkisi yok: PayCore sunucusu `GUARDRAIL_EGRESS_NER=false` (DECISION-166 A); `true`'ya geçiş adımına "önce sunucuda `make test-models` P95" şartı eklenir. Risk: sunucuda da tutmazsa geçiş bekler (o zaman B ya da C).
+- **B:** Bütçe ölçülen değere çekilir (ör. NER dahil P95 < 1.000 ms; egress çağrısı başına ~0,3-0,8 s ek gecikme), test bu eşikle yeşil. Kullanıcı kararı [C]; LLM yanıt süresinin yanında küçük ama ilk token gecikmesine eklenir.
+- **C:** Ek hızlandırma dilimi: ONNX Runtime int8 ve/veya torch iş parçacığı sayısı ayarı (ölçümde 1 iş parçacığı daha hızlı). Yeni bağımlılık ya da yeni ayar; bu PR bekler.
+A'yı öneriyorum: bütçe, ölçemediğimiz bir makine yüzünden değiştirilmemeli; gerçek sayı sunucuda bir komutla alınır ve geçiş adımı zaten ayrı.
+Bu arada kalan iş (karardan bağımsız): kod commit'i (`first` + int8, quality CLI `--ner`, NER_REVISIONS sabitlemesi, safetensors yalnız, `.env.example`, models.txt, docs), birim ve `-m models` testleri (gecikme hariç yeşil), lint ve `make test` iki profil. Son ölçüm logunda 2 birim testi yalnız çıplak `docker run`'da `.env.test` olmadığı için düştü; compose ile koşacağım.
 
