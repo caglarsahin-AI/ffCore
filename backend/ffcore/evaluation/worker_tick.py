@@ -37,6 +37,9 @@ from ffcore.evaluation.engine import MAX_ATTEMPTS, TERMINAL, now_utc
 from ffcore.evaluation.langfuse_api import LangfuseApi
 from ffcore.evaluation.runner import (
     ACTIVE,
+    TICK_BUDGET_S,
+    TICK_MARGIN_S,
+    TICK_TIMEOUT_S,
     Budget,
     active_runs,
     advance_eval,
@@ -61,10 +64,6 @@ log = logging.getLogger("ffcore.evaluation")
 
 # Lock life; renewed every LOCK_TTL_S / 3 while the tick works, so only a dead tick lets it go.
 LOCK_TTL_S = 60
-# arq cron timeout of one tick. The tick's own budget ends TICK_MARGIN_S before it (r2
-# MAJOR-r2-2), so a slow judge stops the tick on time instead of being cancelled.
-TICK_TIMEOUT_S = 600
-TICK_MARGIN_S = 30
 # Owner-checked renew and release (r2 MINOR-r2-2): never extend or delete another holder's lock.
 _RENEW = (
     "if redis.call('get', KEYS[1]) == ARGV[1] then "
@@ -164,7 +163,8 @@ async def listen_loop(settings: Settings, redis) -> None:
 def tick_budget(settings: Settings, deadline: float | None = None) -> Budget:
     """One tick's budget for an exam (r2 MAJOR-r2-2): judge calls, the tick's deadline (shared
     by the tick's exams), the model call timeout as the planned length of a judge call, and the
-    background window (the judge runs in the background class)."""
+    background window (the judge runs in the background class). A judge call is planned at
+    EVAL_JUDGE_CALL_S, not at the hard LLM_CALL_TIMEOUT_S (r4 decision, correction)."""
     window = BackgroundWindow.parse(
         settings.background_window,
         weekends_all_day=settings.background_window_weekends,
@@ -173,9 +173,9 @@ def tick_budget(settings: Settings, deadline: float | None = None) -> Budget:
     return Budget(
         settings.eval_judge_calls_per_tick,
         deadline=deadline or time.monotonic() + TICK_TIMEOUT_S - TICK_MARGIN_S,
-        call_s=float(settings.llm_call_timeout_s),
+        call_s=float(settings.eval_judge_call_s),
         is_open=window.is_open,
-        total_s=float(TICK_TIMEOUT_S - TICK_MARGIN_S),
+        total_s=float(TICK_BUDGET_S),
     )
 
 

@@ -177,6 +177,10 @@ class Settings(BaseSettings):
     # Judge calls one advancer tick may make for one exam; the rest wait for the next tick, so a
     # tick stays short (09-1 r1 MAJOR-2).
     eval_judge_calls_per_tick: int = Field(default=20, gt=0)
+    # Planned length of one judge call (09-1 r4 decision, correction): what a tick plans with,
+    # not the hard limit (LLM_CALL_TIMEOUT_S stays that). At most one tick's budget
+    # (evaluation.runner.TICK_BUDGET_S, 600 - 30 s); a CPU judge (airgap) sets its own.
+    eval_judge_call_s: int = Field(default=60, gt=0, le=570)
 
     # --- 03c governance ---
     # Wrong API keys from one client address per minute before 429 too_many_auth_failures.

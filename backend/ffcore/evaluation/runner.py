@@ -68,6 +68,13 @@ class Starter:
     ip: str | None
 
 
+# arq cron timeout of one advancer tick. The tick's own budget ends TICK_MARGIN_S before it
+# (r2 MAJOR-r2-2), so a slow judge stops the tick on time instead of being cancelled.
+TICK_TIMEOUT_S = 600
+TICK_MARGIN_S = 30
+TICK_BUDGET_S = TICK_TIMEOUT_S - TICK_MARGIN_S
+
+
 def _always() -> bool:
     return True
 
@@ -176,6 +183,18 @@ async def start_eval(
 ) -> EvalRun:
     """Check the dataset and write the exam `queued` with its plan; the advancer starts the
     item runs (in the background, resumable: a start that dies halfway goes on next tick)."""
+    if any(c.get("name") == "llm_judge" for c in suite.scorers):
+        planned = settings.eval_judge_call_s * suite.repeat
+        if planned > TICK_BUDGET_S:
+            # A judged item (repeat calls) that fits in no tick: refused before anything is
+            # written (09-1 r4 decision, correction), not left to end judge_out_of_time.
+            raise ApiError(
+                422,
+                "invalid_request_error",
+                "eval_plan_exceeds_tick",
+                f"repeat {suite.repeat} x EVAL_JUDGE_CALL_S {settings.eval_judge_call_s} s = "
+                f"{planned} s; one advancer tick has {TICK_BUDGET_S} s.",
+            )
     items = [
         i
         for i in await api.items(suite.langfuse_dataset_name)
