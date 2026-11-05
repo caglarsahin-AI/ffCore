@@ -65,3 +65,24 @@ Saatler yerel (TST). Kanıtlar `state/evidence/08t1c-b-r1-rv-*`.
 ## Karar
 
 ONAY (5e9a68881a4f51d9a2cd1ad91aeab8eaabc0a809). MINOR-4 (air-gap paketine lisanssız model) ve MINOR-2 (ad tam kapsama testi) merge öncesi küçük commit önerilir; diğerleri FOLLOWUP. Koordinatör kararı. Gecikme kabulü (kabul 3) hedef donanımda, ENV-177.
+
+## r1c teyidi (b567b7d66c55bb4559a26f081b328a37e4ef6440)
+
+İstek K-08T1C-0026. Yalnız diff (5e9a688 + 2 commit, 9 dosya +326/-48) + hedefli koşu (`--network none`, `/models:ro`, `ffcore/tools:0.0.0-08t1c`, build yok). Kanıt `state/evidence/08t1c-b-r1c-rv.log`.
+- **MINOR-2 KAPANDI:** `Row.covered` / `coverage`: altın span'ın her harfi aynı kategorideki tahminlerin içindeyse sayılıyor (`quality.py`); tabloda "Covered" sütunu; birim testi `test_08t1c_7_*` ("Ayşe" tek başına "Ayşe Demir"i kapsamıyor).
+- **MINOR-3 KAPANDI:** NER ölçümü motorun eşiğini kullanıyor (`NER_MIN_CONFIDENCE = builtin_egress_pii(True).min_confidence`; eşik altı tahmin önce atılıyor).
+- **MINOR-4 KAPANDI:**
+  - `models-files.sh` `models.txt`'teki yolları üretiyor.
+  - `save.sh` yalnız onları paketliyor (`tar --dereference --files-from=-`; listede olup volume'da olmayan dosya tar'ı yüksek sesle düşürür).
+  - `verify.sh --models` listede olmayan model dizinini ve snapshot dosyasını adıyla FAIL veriyor, hiçbir şey silmiyor.
+  - **Gerçek volume'da beklenen FAIL:** `FAIL model … akdeniz27 …/pytorch_model.bin: not in models.txt`, `FAIL model dir models--savasy--bert-base-turkish-ner-cased`, `verify: FAIL` (exit 1).
+  - Temiz liste PASS ve paket içeriği `test_08t1c_12` (5 passed) ile.
+- **MINOR-5 ve MINOR-1 (PR metni):** docs gecikme ve kalite tablosu yeni ölçümle güncellendi (Covered sütunu).
+- **Koşular:**
+  - hedefli birim (`test_08t1c_12`, `test_08t1c_7`, `test_08t_18`) 15 passed (iki kez);
+  - `-m models test_08t_ner_models.py` 7 passed (docs tablosu eşitliği dahil);
+  - lint temiz (478 dosya).
+  - İlk birleşik birim koşusu, worktree oluşturulduktan hemen sonra tek seferlik `FileNotFoundError` verdi; aynı dosyalar tek tek ve birleşik iki kez yeşil. Yeniden üretilemedi, bilgi.
+- **Not:** gerçek `04a-knowledge-core_model_cache` volume'u artık `verify` FAIL veriyor. `save.sh` önce `verify.sh` koştuğu için temizlenmeden air-gap paketi hazırlanamaz. Doğru davranış; temizlik adımı docs/guardrail.md'de. Kullanıcıya hatırlatma: ilk paketlemeden önce bu volume'dan savasy ve pickle elle silinmeli (komut docs'ta).
+
+**ONAY-TEYIT b567b7d66c55bb4559a26f081b328a37e4ef6440.**

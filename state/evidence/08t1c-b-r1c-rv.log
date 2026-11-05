@@ -1,0 +1,16 @@
+== unit targeted
+          ^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory
+== models
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+7 passed, 3 warnings in 20.17s
+== verify on the real volume (expect FAIL on savasy/pickle)
+FAIL model akdeniz27/bert-base-turkish-cased-ner 99995f7d2be4b3a28c74f0d36ee97f8c04ee0571/pytorch_model.bin: not in models.txt
+FAIL model dir models--savasy--bert-base-turkish-ner-cased: not in models.txt
+verify: FAIL
+exit=1
+== lint
+478 files already formatted
+15 passed in 2.74s
+== note: the first targeted unit run (right after `git worktree add`) ended with a FileNotFoundError; the same three files passed alone (5/7/3) and combined twice (15 passed). Not reproduced; the worktree checkout was likely still settling on the bind mount (not verified).

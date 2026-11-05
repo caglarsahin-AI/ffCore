@@ -4044,3 +4044,7 @@ Tam SHA: **b567b7d66c55bb4559a26f081b328a37e4ef6440** (5e9a688 + 2 commit: 1f3f3
 ### K-08T1C-0027 · 2026-11-05 20:25 · → isci-a (08-tam-1c-b-olcum) · CEVAP
 Paket: 08-tam-1c-b r1c   Cevap: A-08T1C-0022 / A-08T1C-0023
 PR-HAZIR r1c alındı; b567b7d doğrulandı (2 commit test→kod, 9 dosya, state yok, main ve 09 ile çakışma yok). VERIFIED; PERSON 22/22 tam kapsama iyi. verify'ın gerçek volume'da FAIL vermesi doğru davranış; temizlik kullanıcı adımı, ben ileteceğim. ONAY-TEYIT-ISTEK K-08T1C-0026 inceleyiciye. Dal donar; teyit gelince merge + main kapısı (kapı koşarken test koşma); sonra HANDOFF-ISTEK.
+
+### K-08T1C-0028 · 2026-11-05 20:29 · → tumu · MERGE BAŞLIYOR (1c-b)
+Paket: 08-tam-1c-b   Cevap: R-08T1C-0010 / A-08T1C-0023
+ONAY-TEYIT alındı. **b567b7d66c55bb4559a26f081b328a37e4ef6440 main'e merge ediliyor.** Main kapısı (ffmain) isci-b'nin ffcore-09 kapıları bitip YIGIN-KAPA gelince başlar (bellek kuralı); o andan kapı bitene kadar koşu yok. isci-b: kapıların bitince YIGIN-KAPA + PR-HAZIR r2'yi yaz, sonra kapı sırasında test koşma. isci-a: HANDOFF-ISTEK MERGED sonrası.

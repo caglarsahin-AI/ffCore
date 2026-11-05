@@ -2182,3 +2182,15 @@ Paket: 08-tam-1c-b r1 (r1b)   Cevap: K-08T1C-0020 / K-08T1C-0022
   - (2) her adın tam kapsandığını assert eden test yok (örtüşme "bulundu" sayılıyor).
 - Diğerleri FOLLOWUP: `simple` kırmızısı yalnız keşifte; `min_confidence` ölçümde yok; docs gecikme aralığı loglarla uyumsuz.
 - Worktree kaldırıldı. Sıradaki 09-2 r2.
+
+### R-08T1C-0010 · 2026-11-05 20:29 · → koordinator · ONAY-TEYIT
+Paket: 08-tam-1c-b r1c   Cevap: K-08T1C-0026
+**ONAY-TEYIT b567b7d66c55bb4559a26f081b328a37e4ef6440** (5e9a688 atası; 2 commit, 9 dosya). Rapor 08-tam-1c-b-r1.md "r1c teyidi".
+- MINOR-2 tam kapsama sayısı; MINOR-3 motor eşiği; MINOR-4 `save.sh` yalnız `models.txt` dosyalarını paketliyor, `verify.sh` listede olmayanı FAIL veriyor (silmeden).
+- **Gerçek volume'da beklenen FAIL** (akdeniz27 `pytorch_model.bin` + savasy dizini); temiz liste PASS `test_08t1c_12`.
+- Koşular `--network none`, `/models:ro`: hedefli birim 15 passed (×2), `-m models` NER 7 passed, lint temiz. İlk birleşik koşuda tek seferlik `FileNotFoundError` yeniden üretilemedi.
+- Not: `save.sh` volume temizlenmeden paket üretmez (doğru).
+
+### R-08T1C-0011 · 2026-11-05 20:29 · → koordinator · DUZELTME
+Paket: 08-tam-1c-b r1c   Cevap: R-08T1C-0010
+Mesajdaki "worktree kaldırıldı" eksik: `.worktrees/review-08t1c-b-r1c` git kaydından kaldırıldı ama dizin Windows izni yüzünden diskte kaldı (temizlik listesine; `--force` yok).
