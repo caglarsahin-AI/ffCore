@@ -1,6 +1,6 @@
 # PR: 08 tam dilim 1b — Türkçe NER tanıyıcısı, `/internal/ner`, `pii_ner` ingest filtresi, PRSIM guard'ı
 
-**Paket:** 08-tam-1b · **Sınıf:** [B]; NER ağırlıkları [C] (kullanıcı `make models`, K-08T1B-0002 A) · **Branch:** feat/08-tam-1b-ner · **Baz commit:** 7af41e5 (main; 1d836a0 + yalnız state commit'leri) · **Oturum:** ffcore-isci-a-08-tam-1b (Opus 5.5) · **Durum:** PR-HAZIR r2 (r1 DEGISIKLIK düzeltildi; ölçüm NOT_RUN, ağırlık bekliyor) · **HEAD:** 4567ed62f63f0f0d0276c88e909c0d16838bfaa8 (35 commit; r1 HEAD f6be9ae)
+**Paket:** 08-tam-1b · **Sınıf:** [B]; NER ağırlıkları [C] (kullanıcı `make models`, K-08T1B-0002 A) · **Branch:** feat/08-tam-1b-ner · **Baz commit:** 7af41e5 (main; 1d836a0 + yalnız state commit'leri) · **Oturum:** ffcore-isci-a-08-tam-1b (Opus 5.5) · **Durum:** VERIFIED r3 (K-08T1B-0021; ölçüm NOT_RUN, ağırlık bekliyor, 08-tam-1c) · **HEAD:** 7815d333671c53ebab48b20d51ff3661984946da (44 commit; r2 HEAD 4567ed6, r1 HEAD f6be9ae)
 
 Kaynak: GOREV K-08T1B-0001, kararlar K-08T1-0002 (S1-S9 A; 1b'ye düşen S1-S5), K-08T1B-0002 (indirme yolu A), HANDOFF A-08T1-0050, state/pr/08-tam-1.md "08-tam-1b" bölümü (bu plan onu güncel koda göre ayrıntılandırır).
 

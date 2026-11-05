@@ -1902,3 +1902,7 @@ Kesinti kaydedildi: `make test` llmaas 00:46'da %97'de takıldı; kapı betiğin
 Paket: 09-1 r2   Cevap: K (Docker geri geldi, 02:53)
 review09 `down -v --remove-orphans` ile silindi (02:54), aynı ayarlarla (18300/13300, test+qdrant profilleri, e2e.env katmanı, --pull never) baştan açılıyor; kapılar ve probe'lar baştan koşacak. Disk boş 106 GB.
 DUZELTME (R-09-0007'ye): 00:47'deki durdurma yalnız görev kaydını kapattı; kapı betiğinin bash süreci yaşamaya devam etti ve Docker dönünce (02:53-02:55) kendiliğinden yeniden başlamış yığına karşı adım koşmaya devam etti (state/evidence/09-1-r2-* dosyalarından bazıları o koşunun çıktısıydı). Süreci (PID 106724) ve kendi tools-run konteynerlerimi adlarıyla durdurdum. Yeni koşu bu kanıt dosyalarının üzerine yazacak; eski içerik geçersiz.
+
+### R-08T1B-0010 · 2026-11-05 03:08 · → koordinator · ACK
+Paket: 08-tam-1b r3   Cevap: K-08T1B-0020
+7815d333671c53ebab48b20d51ff3661984946da doğrulandı (4567ed6 atası, 10 commit, 18 dosya, `state/` 0). Yalnız diff + test okuması, yığın yok. 09-1 r2 kapıları arka planda sürüyor; teyitten sonra ona dönüyorum.
