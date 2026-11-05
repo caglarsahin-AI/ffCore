@@ -61,8 +61,9 @@ calls the model directly. FFCore's judge instead:
   in Langfuse),
 - sends the text through the egress guardrail of the agent's policy first, like any model call
   (with `GUARDRAIL_EGRESS_NER=true` that check asks the API's NER endpoint for person names; if
-  it is down nothing is sent and the item is not run, `ner_unavailable`, counted apart and
-  making the exam incomplete: an outage is not the agent's score),
+  it is down nothing is sent and the item is not run, `ner_unavailable`, counted apart: an
+  outage is not the agent's score; the exam's `complete` is then false, so it cannot pass a
+  publish gate that asks for a complete exam until it is run again),
 - calls `EVAL_JUDGE_MODEL` as a background job (model slots, background window, quotas),
 - keeps the question, expected answer and answer between markers and tells the model that
   text inside them is data, not instructions,
@@ -155,15 +156,29 @@ exam): it scores finished items, links each run's trace into the Langfuse datase
 the scores and commits each item on its own. A separate follower task of the worker keeps the
 item runs listened, so a long tick never abandons them.
 
-A tick has a budget per exam. No judge call while `BACKGROUND_WINDOW` is closed (the judge is a
-background model call). The tick's first item always starts, cut at the tick's deadline (30 s
-before its own 600 s timeout). A later item starts only if its judge calls fit in what is left
-of `EVAL_JUDGE_CALLS_PER_TICK` and, planned at `LLM_CALL_TIMEOUT_S` each, before the deadline.
-So a tick makes at most `EVAL_JUDGE_CALLS_PER_TICK` judge calls per exam, or the first item's
-calls (`repeat`) when that is more. When the budget runs out the exam stays `running` and the
-next tick goes on: a closed window or a slow CPU judge never fails an exam. An item cut at the
-deadline `MAX_ATTEMPTS` ticks in a row ends as an error (`judge_out_of_time`) and the exam
-moves on. Exams are advanced in a fixed order, the one with the oldest progress first.
+A tick has a budget, shared by the exams it advances in a fixed order (the oldest progress
+first); its deadline is 30 s before the tick's own 600 s timeout (570 s). A judge call is
+planned at `EVAL_JUDGE_CALL_S` (an estimate; `LLM_CALL_TIMEOUT_S` stays the hard limit of each
+call), an item without a judge at one such call. Rules:
+
+- No judge call while `BACKGROUND_WINDOW` is closed (the judge is a background model call).
+- Every item, a tick's first one too, starts only if its planned time fits before the
+  deadline; otherwise the exam waits, still `running`, nothing committed, and keeps its place.
+- The first item of an exam in a tick ignores `EVAL_JUDGE_CALLS_PER_TICK`; a later one starts
+  only if its judge calls fit in what is left of it. So a tick makes at most
+  `EVAL_JUDGE_CALLS_PER_TICK` judge calls per exam, or the first item's calls (`repeat`) when
+  that is more.
+- An item still cut at the deadline `MAX_ATTEMPTS` ticks in a row ends as an error
+  (`judge_out_of_time`) and the exam moves on. An item whose plan is longer than a whole tick
+  ends at once (`judge_out_of_time`, note `planned_exceeds_tick_budget`); starting such an exam
+  is refused up front when it has `llm_judge`: `422 eval_plan_exceeds_tick` (`repeat` x
+  `EVAL_JUDGE_CALL_S` > 570 s).
+- Scores an earlier, cut attempt of such an item already wrote to Langfuse stay there (upserted
+  by id); the exam's own result in FFCore is the error.
+
+A closed window or a slow judge never fails an exam by itself. On airgap with a CPU judge
+(`LLM_CALL_TIMEOUT_S` 600 s) measure one judge call and set `EVAL_JUDGE_CALL_S` to it; keep
+`repeat` x `EVAL_JUDGE_CALL_S` under 570 s.
 
 Runs that ask the user a question are cancelled (`not_run: waiting_user`). Runs that wait for a
 tool approval are cancelled as `not_run: approval_required` (their pending approval is closed,
@@ -213,3 +228,4 @@ version you trust, not on one run.
 | `EVAL_ADVANCE_INTERVAL_S` | advancer tick; divides 60 and stays below `RUN_ABANDON_GRACE_S` |
 | `EVAL_MAX_ITEM_RUNS` | most items x `repeat` in one exam (default 500) |
 | `EVAL_JUDGE_CALLS_PER_TICK` | judge calls per exam per advancer tick (default 20) |
+| `EVAL_JUDGE_CALL_S` | planned seconds of one judge call (default 60, at most 570); not the hard limit (`LLM_CALL_TIMEOUT_S`) |
