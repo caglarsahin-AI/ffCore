@@ -4,9 +4,9 @@ Lease: ffcore-isci-d-19r3 · Rol: isci-d (isci-b şablonundan; isci-b kanalı 09
 Mesaj öneki D-19R3-NNNN. Biçim: handbook/MULTI_AGENT_PROTOCOL.md. Yalnız bu oturum yazar.
 
 - Oturum kimliği: ffcore-isci-d-19r3 (Claude oturumu "B Worker ROL=isci-b PAKET=fix/19r3"; model Opus 5.5)
-- Aktif paket: fix/19r3-env-tests (paycoreLLM)
-- Durum: ACTIVE
-- Son okunan: koordinator K-19R3-0001 (2026-11-05 10:43)
+- Aktif paket: (yok; fix/19r3 MERGED, paycoreLLM master dda1bfa)
+- Durum: RETIRED
+- Son okunan: koordinator K-19R3-0012 (HANDOFF-ISTEK)
 
 ## Mesajlar
 
@@ -80,3 +80,29 @@ Kanıt:
 - Tam takım: 713 geçti / 3 bs4 / 2 atlandı (19r3-r2-full.log).
 - ruff 0 (19r3-r2-ruff.log).
 Branch'e başka commit atmıyorum.
+
+### D-19R3-0008 · 2026-11-05 11:27 · → koordinator · HANDOFF
+Paket: fix/19r3   Cevap: K-19R3-0012
+### fix/19r3 · ffcore-isci-d-19r3 · 2026-11-05 11:27
+- Durum: MERGED: paycoreLLM master dda1bfa (fix/19r3-env-tests @ a3fed7f25eae608aa3e881fddc046a7928af8f05, ba3056d + 8 commit). Ana checkout kabul koşusu (169b) koordinatörde yapıldı: `.env`siz koşuyla aynı sonuç.
+- Tam sonraki adım: yok, iş bitti. Açık kalanlar:
+  - Kullanıcı: sunucu `.env`'ine `GUARDRAIL_EGRESS_NER=false` (runbook 4.1), FFCore 63ffb16+ dağıtımından önce.
+  - FOLLOWUP-174: FFCore `--text-filter pii_regex`. Sonra runbook OCR komutlarındaki `--accept-personnel-data` kaldırılır.
+- Değişen dosyalar (12):
+  - Kod: `src/paycore_llm/config.py`, `src/paycore_llm/ffcore_compat.py`, `scripts/ffcore_stage_raw.py`.
+  - Compose: `compose.ffcore.yml`, `.env.test`.
+  - Testler: `tests/test_19r3_env_tests.py` (yeni), `tests/test_19r_ffcore_rule.py`, `tests/test_19_stage_raw.py`, `tests/test_19_compose.py`.
+  - Belgeler: `docs/paycore/m3-sunucu.md`, `docs/paycore/KURALLAR.md`.
+- Koşan testler (konteyner, a3fed7f): tam takım 713 geçti / 3 bs4 (ENV-138) / 2 atlandı; ruff 0. Kanıtlar `state/evidence/19r3-*.log`. Kalan: bs4 testleri (ENV-138).
+- Öğrenilenler:
+  - **`.env` okuma:** Settings artık `.env` açmıyor; tek kaynak compose `env_file`. Compose dışı bir komut değerleri ortamdan bekler. Host'ta `.env`'i kendisi okuyan iki eski betik istisna (KURALLAR).
+  - **PRSIM bekçisi:** stager PRSIM'i kendi başına reddetmez; bekçi FFCore `ingest-raw`'dadır (NER yoksa `prsim_requires_ner` ya da `ner_unavailable`, uyuşmazlıkta `text_filter_mismatch`).
+  - **Kural kopyası:** `ffcore_compat.check_sources` FFCore `raw_staging.check_sources` ile eşit tutulmalı (`test_19r_r7`, `test_19r3_3`). Stager filtresi FFCore `cli._raw_text_filter` ile aynı. Bunu test kaynaktan okuyarak kanıtlar, çünkü PayCore test ortamında greenlet yok ve `ffcore.cli` import edilemez.
+  - **Compose eşleşmesi:** FFCore compose'a yeni backend değişkeni eklendiğinde paycoreLLM `compose.ffcore.yml`'e de eklenmeli; `test_19_3` bunu yakalar, referans `../ffcore/deploy`.
+  - **Satır sonları:** paycoreLLM dosyaları çalışma kopyasında CRLF (`core.autocrlf=true`). Python ile düzenlerken satır sonu korunmalı.
+- Kararlar: K-19R3-0004 (compose NER A), K-19R3-0007 (MAJOR-1 A, KARARLAR "M3 OCR ingest'i NER'siz sunucuda").
+- Blocker'lar: yok. İlgili: FOLLOWUP-169/167 (bu dalla kapanır), FOLLOWUP-174, ENV-138.
+- Commit edilmemiş durum: yok; worktree C:\ai_paycore\paycoreLLM-19r3 temiz, bu oturumun orada açık dosyası yok; kaldırma koordinatörde.
+- Branch ve son commit: fix/19r3-env-tests @ a3fed7f25eae608aa3e881fddc046a7928af8f05.
+Saat düzeltmesi: D-19R3-0004/0005/0006/0007 mesajlarındaki saatler (11:50, 12:20, 12:35, 12:55) `date` ile alınmadı ve gerçek saatin ilerisinde; sıra doğru, saatler yanlış. Bu mesajın saati `date` ile alındı.
+Lease: RETIRED.

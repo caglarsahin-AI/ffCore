@@ -1,0 +1,128 @@
+== HEAD 6568069445031ce798937c65b6dce111b2f5accb tree-clean=0 2026-11-05T10:36:39+03:00
+== build exit=0
+== up exit=0
+== compose config
+exit=0
+== make lint + make test DEPLOY_PROFILE=llmaas 2026-11-05T10:38:11+03:00
+lint-ok
+======================= 1712 passed in 197.93s (0:03:17) =======================
+exit=0
+== make lint + make test DEPLOY_PROFILE=airgap 2026-11-05T10:41:48+03:00
+lint-ok
+======================= 1712 passed in 179.79s (0:02:59) =======================
+exit=0
+== alembic heads / downgrade 06b_0001 / upgrade heads / heads 2026-11-05T10:45:05+03:00
+09_0001 (09, 03b, 07, 04a, 06b, 03a, 05a, 03c, 06a, 08) (head)
+INFO  [alembic.runtime.migration] Running downgrade 09_0001 -> 06b_0001, 09: eval_suites, eval_runs (local rows over Langfuse datasets and dataset runs)
+INFO  [alembic.runtime.migration] Running upgrade 06b_0001 -> 09_0001, 09: eval_suites, eval_runs (local rows over Langfuse datasets and dataset runs)
+09_0001 (08, 06a, 03c, 05a, 07, 03a, 06b, 04a, 03b, 09) (head)
+exit=0
+== make test-int DEPLOY_PROFILE=llmaas 2026-11-05T10:45:18+03:00
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-723bbecc23.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-723bbecc23.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-723bbecc23.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-723bbecc23.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-723bbecc23.chat-default code=provider_not_assigned
+2026-11-05 07:51:00,229 INFO mcp.server.mcpserver.server Tool 'run_sql' failed: 'Error executing tool run_sql: sql_rejected: sql_not_select (Delete is not allowed)'
+INFO     mcp.server.mcpserver.server:server.py:453 Tool 'run_sql' failed: 'Error executing tool run_sql: sql_rejected: sql_not_select (Delete is not allowed)'
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-723bbecc23.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-723bbecc23.chat-default code=provider_not_assigned
+2026-11-05 07:51:02,107 INFO mcp.server.mcpserver.server Tool 'run_sql' failed: 'Error executing tool run_sql: sql_rejected: sql_unknown_table (unknown table patients)'
+INFO     mcp.server.mcpserver.server:server.py:453 Tool 'run_sql' failed: 'Error executing tool run_sql: sql_rejected: sql_unknown_table (unknown table patients)'
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-723bbecc23.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-723bbecc23.chat-default code=provider_not_assigned
+2026-11-05 07:51:02,713 INFO mcp.server.mcpserver.server Tool 'run_sql' failed: 'Error executing tool run_sql: sql_rejected: sql_unknown_table (unknown table patients)'
+INFO     mcp.server.mcpserver.server:server.py:453 Tool 'run_sql' failed: 'Error executing tool run_sql: sql_rejected: sql_unknown_table (unknown table patients)'
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-723bbecc23.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-723bbecc23.chat-default code=provider_not_assigned
+2026-11-05 07:51:04,339 INFO mcp.server.mcpserver.server Tool 'run_sql' failed: 'Error executing tool run_sql: sql_error: sql_timeout (exceeded 1 s)'
+INFO     mcp.server.mcpserver.server:server.py:453 Tool 'run_sql' failed: 'Error executing tool run_sql: sql_error: sql_timeout (exceeded 1 s)'
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-723bbecc23.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-723bbecc23.chat-default code=provider_not_assigned
+2026-11-05 07:51:08,662 INFO mcp.server.mcpserver.server Tool 'run_sql' failed: 'Error executing tool run_sql: sql_rejected: sql_multiple_statements (send exactly one statement)'
+INFO     mcp.server.mcpserver.server:server.py:453 Tool 'run_sql' failed: 'Error executing tool run_sql: sql_rejected: sql_multiple_statements (send exactly one statement)'
+FAILED tests/integration/test_04a_qdrant.py::test_04a_6_pgvector_qdrant_top5_parity
+FAILED tests/integration/test_04a_qdrant.py::test_04a_3_qdrant_acl_in_query
+FAILED tests/integration/test_04a_qdrant.py::test_04a_qdrant_delete_by_document_and_hybrid_query
+FAILED tests/integration/test_04a_review_r1_acl.py::test_04a_r1_1_role_narrowing_with_same_bytes_closes_access[qdrant]
+FAILED tests/integration/test_04a_review_r1_acl.py::test_04a_r1_1_user_narrowing_with_same_bytes_closes_access[qdrant]
+FAILED tests/integration/test_04a_review_r1_acl.py::test_04a_r1_7_document_metadata_follows_its_acl[qdrant]
+FAILED tests/integration/test_04a_review_r1_acl.py::test_04a_r1_7_audit_carries_no_file_names_or_free_text[qdrant]
+FAILED tests/integration/test_05a_sql.py::test_05a_2_delete_rejected_before_db
+FAILED tests/integration/test_05a_sql.py::test_05a_run_sql_unknown_table_and_db_error_coded
+FAILED tests/integration/test_05a_sql.py::test_05a_run_sql_refusal_and_db_error_are_tool_errors
+FAILED tests/integration/test_05a_sql.py::test_05a_run_sql_timeout - Assertio...
+FAILED tests/integration/test_05a_sql.py::test_05a_sql_matrix_never_reaches_the_database
+ERROR tests/integration/test_04a_review_r1_acl.py::test_04a_r1_1_role_narrowing_with_same_bytes_closes_access[qdrant]
+ERROR tests/integration/test_04a_review_r1_acl.py::test_04a_r1_1_user_narrowing_with_same_bytes_closes_access[qdrant]
+ERROR tests/integration/test_04a_review_r1_acl.py::test_04a_r1_7_document_metadata_follows_its_acl[qdrant]
+ERROR tests/integration/test_04a_review_r1_acl.py::test_04a_r1_7_audit_carries_no_file_names_or_free_text[qdrant]
+= 12 failed, 880 passed, 13 skipped, 2 warnings, 4 errors in 886.33s (0:14:46) =
+exit=0
+== make test-int DEPLOY_PROFILE=airgap 2026-11-05T11:00:30+03:00
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-87e421e211.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-87e421e211.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-87e421e211.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-87e421e211.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-87e421e211.chat-default code=provider_not_assigned
+2026-11-05 08:06:52,253 INFO mcp.server.mcpserver.server Tool 'run_sql' failed: 'Error executing tool run_sql: sql_rejected: sql_not_select (Delete is not allowed)'
+INFO     mcp.server.mcpserver.server:server.py:453 Tool 'run_sql' failed: 'Error executing tool run_sql: sql_rejected: sql_not_select (Delete is not allowed)'
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-87e421e211.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-87e421e211.chat-default code=provider_not_assigned
+2026-11-05 08:06:54,590 INFO mcp.server.mcpserver.server Tool 'run_sql' failed: 'Error executing tool run_sql: sql_rejected: sql_unknown_table (unknown table patients)'
+INFO     mcp.server.mcpserver.server:server.py:453 Tool 'run_sql' failed: 'Error executing tool run_sql: sql_rejected: sql_unknown_table (unknown table patients)'
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-87e421e211.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-87e421e211.chat-default code=provider_not_assigned
+2026-11-05 08:06:55,277 INFO mcp.server.mcpserver.server Tool 'run_sql' failed: 'Error executing tool run_sql: sql_rejected: sql_unknown_table (unknown table patients)'
+INFO     mcp.server.mcpserver.server:server.py:453 Tool 'run_sql' failed: 'Error executing tool run_sql: sql_rejected: sql_unknown_table (unknown table patients)'
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-87e421e211.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-87e421e211.chat-default code=provider_not_assigned
+2026-11-05 08:06:56,894 INFO mcp.server.mcpserver.server Tool 'run_sql' failed: 'Error executing tool run_sql: sql_error: sql_timeout (exceeded 1 s)'
+INFO     mcp.server.mcpserver.server:server.py:453 Tool 'run_sql' failed: 'Error executing tool run_sql: sql_error: sql_timeout (exceeded 1 s)'
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-87e421e211.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-87e421e211.chat-default code=provider_not_assigned
+2026-11-05 08:07:02,788 INFO mcp.server.mcpserver.server Tool 'run_sql' failed: 'Error executing tool run_sql: sql_rejected: sql_multiple_statements (send exactly one statement)'
+INFO     mcp.server.mcpserver.server:server.py:453 Tool 'run_sql' failed: 'Error executing tool run_sql: sql_rejected: sql_multiple_statements (send exactly one statement)'
+FAILED tests/integration/test_04a_qdrant.py::test_04a_6_pgvector_qdrant_top5_parity
+FAILED tests/integration/test_04a_qdrant.py::test_04a_3_qdrant_acl_in_query
+FAILED tests/integration/test_04a_qdrant.py::test_04a_qdrant_delete_by_document_and_hybrid_query
+FAILED tests/integration/test_04a_review_r1_acl.py::test_04a_r1_1_role_narrowing_with_same_bytes_closes_access[qdrant]
+FAILED tests/integration/test_04a_review_r1_acl.py::test_04a_r1_1_user_narrowing_with_same_bytes_closes_access[qdrant]
+FAILED tests/integration/test_04a_review_r1_acl.py::test_04a_r1_7_document_metadata_follows_its_acl[qdrant]
+FAILED tests/integration/test_04a_review_r1_acl.py::test_04a_r1_7_audit_carries_no_file_names_or_free_text[qdrant]
+FAILED tests/integration/test_05a_sql.py::test_05a_2_delete_rejected_before_db
+FAILED tests/integration/test_05a_sql.py::test_05a_run_sql_unknown_table_and_db_error_coded
+FAILED tests/integration/test_05a_sql.py::test_05a_run_sql_refusal_and_db_error_are_tool_errors
+FAILED tests/integration/test_05a_sql.py::test_05a_run_sql_timeout - Assertio...
+FAILED tests/integration/test_05a_sql.py::test_05a_sql_matrix_never_reaches_the_database
+ERROR tests/integration/test_04a_review_r1_acl.py::test_04a_r1_1_role_narrowing_with_same_bytes_closes_access[qdrant]
+ERROR tests/integration/test_04a_review_r1_acl.py::test_04a_r1_1_user_narrowing_with_same_bytes_closes_access[qdrant]
+ERROR tests/integration/test_04a_review_r1_acl.py::test_04a_r1_7_document_metadata_follows_its_acl[qdrant]
+ERROR tests/integration/test_04a_review_r1_acl.py::test_04a_r1_7_audit_carries_no_file_names_or_free_text[qdrant]
+= 12 failed, 880 passed, 13 skipped, 2 warnings, 4 errors in 887.09s (0:14:47) =
+exit=0
+== make seed + seed-eval + stack exam alone 2026-11-05T11:15:35+03:00
+seeded: projects ['hastane-a', 'klinik-b'], models ['chat-default', 'chat-fail', 'chat-slow', 'chat-tools'], agents in hastane-a; created 36, uploaded 15
+cd backend && python -m ffcore.cli seed-eval --project "hastane-a" --suite ../data/samples/eval/suite.json --items ../data/samples/eval/sozlesme-33.json 
+dataset: hastane-a.sozlesme-33
+items upserted: 33; archived: 0
+suite: created
+cd backend && python -m ffcore.cli seed-eval --project "hastane-a" --suite ../data/samples/eval/suite-sql-20.json --items ../data/samples/eval/sql-20.json 
+dataset: hastane-a.sql-20
+items upserted: 20; archived: 0
+suite: created
+exam 2700024d-5bdd-4f21-9f9a-13326cd92915 completed in 27.3 s: {'n': 33, 'worst': [{'mean': 0.0, 'note': '', 'style': 'dolayli', 'passed': False, 'item_id': 'hastane-a.sozlesme-33-q18', 'outcome': 'below_rerank_floor'}, {'mean': 0.0, 'note': '', 'style': 'alan_ici_cevapsiz', 'passed': False, 'item_id': 'hastane-a.sozlesme-33-q21', 'outcome': 'unanswerable_answered'}, {'mean': 0.0, 'note': '', 'sty
+8 passed in 35.06s
+exit=0
+== e2e F1-F3 (plan/18, fake-llm) 2026-11-05T11:17:39+03:00
+| F1 | passed | 2 | 0 | 2 |  | NOT_RUN: gerçek model gerekir (PayCore S1 / llmaas); fake-llm 'hello' der (declined = the model's unknown_reply); NOT_RUN: gerçek model gerekir (PayCore S1 / llmaas); fake-llm 'hello' der (make eval sozlesme-33, 13b) |
+| F3 | failed | 1 | 1 | 1 | test_18_f3_9_write_attempts_refused_and_db_unchanged | NOT_RUN: gerçek model gerekir (PayCore S1 / llmaas); fake-llm 'hello' der (sql-20 ≥ 80 % via make eval, 13b) |
+SKIPPED [1] tests/e2e/scenarios/test_18_f1_f3_answers.py:61: NOT_RUN: gerçek model gerekir (PayCore S1 / llmaas); fake-llm 'hello' der (declined = the model's unknown_reply)
+SKIPPED [1] tests/e2e/scenarios/test_18_f1_f3_answers.py:65: NOT_RUN: gerçek model gerekir (PayCore S1 / llmaas); fake-llm 'hello' der (make eval sozlesme-33, 13b)
+SKIPPED [1] tests/e2e/scenarios/test_18_f1_f3_answers.py:89: NOT_RUN: gerçek model gerekir (PayCore S1 / llmaas); fake-llm 'hello' der (sql-20 ≥ 80 % via make eval, 13b)
+1 failed, 3 passed, 3 skipped in 6.52s
+exit=0
+== make smoke 2026-11-05T11:17:57+03:00
+smoke: passed
+exit=0
+== end 2026-11-05T11:18:08+03:00
