@@ -1,0 +1,56 @@
+== 09-2 r2 red @ 9fdf788 (tests of the r1 corrections on 892bdfe code; tree mounted at /red) 2026-11-05T20:59:45+03:00
+0
+gate.py has no definition_sha256: old code confirmed
+-- unit + contract
+E       ffcore.guardrails.recognizers.ner.NerUnavailable: internal ner failed: 401
+                status="passed",
+        for message in ("internal ner failed: 401", "API runs NER x@1, worker expects y@2"):
+E               ffcore.evaluation.judge.NerMisconfigured: internal ner failed: 401
+ERROR    ffcore.evaluation:judge.py:91 eval_judge_ner_misconfigured cause=NerUnavailable
+            ("internal ner failed: 401", {"status": 401}),
+            ("internal ner failed: 422", {"status": 422}),
+        # missing; 502: the Langfuse call failed.
+FAILED tests/unit/test_09_2_r1.py::test_09_2_r1_major1_exam_records_the_examined_definition
+FAILED tests/unit/test_09_2_r1.py::test_09_2_r1_major1_digest_ignores_key_order
+FAILED tests/unit/test_09_2_r1.py::test_09_2_r1_major1_queued_exam_with_a_changed_definition_starts_nothing
+FAILED tests/unit/test_09_2_r1.py::test_09_2_r1_minor6_http_ner_carries_the_apis_code[503-body0-ner_not_configured]
+FAILED tests/unit/test_09_2_r1.py::test_09_2_r1_minor6_http_ner_carries_the_apis_code[503-body1-model_missing]
+FAILED tests/unit/test_09_2_r1.py::test_09_2_r1_minor6_http_ner_carries_the_apis_code[401-body2-invalid_token]
+FAILED tests/unit/test_09_2_r1.py::test_09_2_r1_minor6_http_ner_carries_the_apis_code[502-body3-None]
+FAILED tests/unit/test_09_2_r1.py::test_09_2_r1_minor7_model_mismatch_has_a_code
+FAILED tests/unit/test_09_2_r1.py::test_09_2_r1_minor6_misconfiguration_by_code_fails_loudly[kw0]
+FAILED tests/unit/test_09_2_r1.py::test_09_2_r1_minor6_misconfiguration_by_code_fails_loudly[kw1]
+FAILED tests/unit/test_09_2_r1.py::test_09_2_r1_minor6_misconfiguration_by_code_fails_loudly[kw2]
+FAILED tests/unit/test_09_2_r1.py::test_09_2_r1_minor6_misconfiguration_by_code_fails_loudly[kw3]
+FAILED tests/unit/test_09_2_r1.py::test_09_2_r1_minor6_misconfiguration_by_code_fails_loudly[kw4]
+FAILED tests/unit/test_09_2_r1.py::test_09_2_r1_minor6_misconfiguration_by_code_fails_loudly[kw5]
+FAILED tests/unit/test_09_2_r1.py::test_09_2_r1_minor6_misconfiguration_by_code_fails_loudly[kw6]
+FAILED tests/unit/test_09_2_r1.py::test_09_2_r1_minor7_message_text_alone_decides_nothing
+FAILED tests/unit/test_09_2_r1.py::test_09_2_r1_minor6_worker_maps_unknown_cause_to_outage
+FAILED tests/unit/test_09_2_r1.py::test_09_2_r1_masking_names_ner_only_when_an_egress_pii_rule_uses_it
+FAILED tests/unit/test_09_followup176.py::test_09_2_ner_misconfiguration_is_a_loud_failure
+FAILED tests/contract/test_09_openapi.py::test_09_2_r1_minor10_from_run_documents_its_upstream_errors
+20 failed, 61 passed in 9.49s
+-- integration (llmaas; 03a first, as in the full run's order)
+>       assert row == ("failed", "definition_changed", True, None)
+E       AssertionError: assert ('running', None, False, None) == ('failed', 'd...', True, None)
+E         At index 0 diff: 'running' != 'failed'
+>       assert eval_run_id == latest  # several suites: the latest of the exams that passed
+FAILED tests/integration/test_03a_read_side.py::test_03a_2_read_mode_get_parity
+FAILED tests/integration/test_09_advance.py::test_09_2_r1_major1_definition_edited_mid_exam_ends_it
+FAILED tests/integration/test_09_from_run.py::test_09_2_r1_minor9_expected_output_is_masked_with_the_question
+FAILED tests/integration/test_09_from_run.py::test_09_2_r1_masking_says_how_the_item_was_masked
+FAILED tests/integration/test_09_from_run.py::test_09_2_r1_minor5_refused_from_run_is_audited_with_its_code
+FAILED tests/integration/test_09_from_run.py::test_09_2_r1_minor8_guardrail_errors_are_coded[config-422-rule_type_unsupported]
+FAILED tests/integration/test_09_from_run.py::test_09_2_r1_minor8_guardrail_errors_are_coded[ner_config-503-ner_not_configured]
+FAILED tests/integration/test_09_from_run.py::test_09_2_r1_minor8_guardrail_errors_are_coded[too_long-422-text_too_long]
+FAILED tests/integration/test_09_publish_gate.py::test_09_2_r1_major1_draft_edited_after_its_exam_is_stale
+FAILED tests/integration/test_09_publish_gate.py::test_09_2_r1_major1_exam_without_a_definition_digest_is_stale
+FAILED tests/integration/test_09_publish_gate.py::test_09_2_r1_major1_suite_changed_after_the_exam_is_stale[pass_threshold = 0.9]
+FAILED tests/integration/test_09_publish_gate.py::test_09_2_r1_major1_suite_changed_after_the_exam_is_stale[repeat = 2]
+FAILED tests/integration/test_09_publish_gate.py::test_09_2_r1_major1_suite_changed_after_the_exam_is_stale[scorers = '[{"name": "contains"}, {"name": "regex"}]']
+FAILED tests/integration/test_09_publish_gate.py::test_09_2_r1_minor1_blank_force_reason_is_refused
+FAILED tests/integration/test_09_publish_gate.py::test_09_2_r1_minor1_force_reason_is_audited_stripped
+FAILED tests/integration/test_09_publish_gate.py::test_09_2_r1_minor2_the_version_names_the_exam_that_opened_the_gate
+FAILED tests/integration/test_09_publish_gate.py::test_09_2_r1_minor3_forced_publish_through_a_key_is_audited_with_it
+17 failed, 48 passed in 54.38s

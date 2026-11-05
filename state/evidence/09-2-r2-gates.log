@@ -1,0 +1,46 @@
+== HEAD 4e2fcadd4d8dc0c566ec47ce0bd27851ac6e9835 tree-dirty=0 2026-11-05T20:24:36+03:00
+== up --build (image = HEAD)
+exit=0
+== compose config
+exit=0
+== make lint + make test DEPLOY_PROFILE=llmaas 2026-11-05T20:25:43+03:00
+exit=0
+lint-ok
+tests/unit/test_03b_config_errors.py ........                            [ 11%]
+tests/unit/test_08t_24_ner_transport_errors.py ...                       [ 42%]
+tests/unit/test_af_1_definition_error_codes.py ............              [ 94%]
+======================= 1777 passed in 165.78s (0:02:45) =======================
+== make lint + make test DEPLOY_PROFILE=airgap 2026-11-05T20:28:45+03:00
+exit=0
+lint-ok
+tests/unit/test_03b_config_errors.py ........                            [ 11%]
+tests/unit/test_08t_24_ner_transport_errors.py ...                       [ 42%]
+tests/unit/test_af_1_definition_error_codes.py ............              [ 94%]
+======================= 1777 passed in 162.78s (0:02:42) =======================
+== FULL make test-int DEPLOY_PROFILE=llmaas 2026-11-05T20:31:45+03:00
+exit=0
+=========== 941 passed, 13 skipped, 2 warnings in 696.38s (0:11:36) ============
+== FULL make test-int DEPLOY_PROFILE=airgap 2026-11-05T20:43:39+03:00
+exit=0
+=========== 941 passed, 13 skipped, 2 warnings in 725.81s (0:12:05) ============
+== explicit 03a + 18td DEPLOY_PROFILE=llmaas 2026-11-05T20:56:00+03:00
+10 passed in 18.98s
+exit=0
+== explicit 03a + 18td DEPLOY_PROFILE=airgap 2026-11-05T20:56:29+03:00
+10 passed in 19.54s
+exit=0
+== make seed + seed-eval + stack exam 2026-11-05T20:56:59+03:00
+seeded: projects ['hastane-a', 'klinik-b'], models ['chat-default', 'chat-fail', 'chat-slow', 'chat-tools'], agents in hastane-a; created 36, uploaded 15
+cd backend && python -m ffcore.cli seed-eval --project "hastane-a" --suite ../data/samples/eval/suite.json --items ../data/samples/eval/sozlesme-33.json 
+items upserted: 33; archived: 0
+suite: created
+cd backend && python -m ffcore.cli seed-eval --project "hastane-a" --suite ../data/samples/eval/suite-sql-20.json --items ../data/samples/eval/sql-20.json 
+items upserted: 20; archived: 0
+suite: created
+exam 8f702c37-e4aa-4f41-a06c-a92562e9ed8d completed in 21.2 s: {'n': 33, 'worst': [{'mean': 0.0, 'note': '', 'style': 'dolayli', 'passed': False, 'item_id': 'hastane-a.sozlesme-33-q18', 'outcome': 'below_rerank_floor'}, {'mean': 0.0, 'note': '', 'style': 'alan_ici_cevapsiz', 'passed': False, 'item_i
+8 passed in 28.46s
+exit=0
+== make smoke 2026-11-05T20:58:50+03:00
+smoke: passed
+exit=0
+== end 2026-11-05T20:58:58+03:00
