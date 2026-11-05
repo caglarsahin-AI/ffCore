@@ -87,6 +87,12 @@ class VersionCreate(Strict):
 
 class PublishRequest(Strict):
     version: int = Field(ge=1)
+    # 09-2 exam gate (additive): an admin may publish past a failed gate, with a reason that is
+    # audited (`eval_gate_forced`).
+    force: bool = Field(default=False, description="Admin only: publish past the exam gate.")
+    force_reason: str | None = Field(
+        default=None, min_length=1, max_length=500, description="Required with force; audited."
+    )
 
 
 class RollbackRequest(Strict):

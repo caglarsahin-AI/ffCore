@@ -608,10 +608,14 @@ paths:
       tags:
       - agents
       summary: Publish Agent
-      description: 'Publish a version: runs without an explicit version use it. The exam gate (09) is
-        a flag
+      description: 'Publish a version: runs without an explicit version use it. The exam gate (09-2):
+        every
 
-        until 09 lands.'
+        live suite bound to the agent needs a latest completed exam of this version that passed,
+
+        is complete and has nothing not run; otherwise 409 `eval_gate_failed` naming each suite as
+
+        `<key>=<reason>`. An admin may pass `force` with a `force_reason` (audited).'
       operationId: publish_agent_api_v1_projects__project_id__agents__agent_id__publish_post
       parameters:
       - name: project_id
@@ -1896,6 +1900,19 @@ components:
           type: integer
           minimum: 1.0
           title: Version
+        force:
+          type: boolean
+          title: Force
+          description: 'Admin only: publish past the exam gate.'
+          default: false
+        force_reason:
+          anyOf:
+          - type: string
+            maxLength: 500
+            minLength: 1
+          - type: 'null'
+          title: Force Reason
+          description: Required with force; audited.
       additionalProperties: false
       type: object
       required:

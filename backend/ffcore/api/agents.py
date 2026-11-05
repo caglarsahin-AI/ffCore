@@ -382,12 +382,66 @@ async def publish_agent(
     session: SessionDep,
     settings: SettingsDep,
 ):
-    """Publish a version: runs without an explicit version use it. The exam gate (09) is a flag
-    until 09 lands."""
+    """Publish a version: runs without an explicit version use it. The exam gate (09-2): every
+    live suite bound to the agent needs a latest completed exam of this version that passed,
+    is complete and has nothing not run; otherwise 409 `eval_gate_failed` naming each suite as
+    `<key>=<reason>`. An admin may pass `force` with a `force_reason` (audited)."""
+    from ffcore.evaluation.gate import gate_failures
+
+    if body.force_reason is not None and not body.force:
+        raise ApiError(
+            422, "invalid_request_error", "force_reason_without_force", "force_reason needs force."
+        )
     agent = _native(await _agent(session, project_id, agent_id))
     row = await _version(session, agent, body.version)
+    definition = parse_definition(row.definition)
     # The model may have changed since the draft was saved: checked again (C13).
-    await check_context(session, project_id, parse_definition(row.definition), settings)
+    await check_context(session, project_id, definition, settings)
+    failures = await gate_failures(session, project_id, agent.id, row.id, definition)
+    if failures and not body.force:
+        listed = ", ".join(f"{f.key}={f.reason}" for f in failures)
+        raise ApiError(
+            409,
+            "conflict_error",
+            "eval_gate_failed",
+            f"The exam gate refuses version {row.version}: {listed}.",
+        )
+    if body.force:
+        grant = request.state.grant
+        if grant.role != "admin" and not grant.is_superadmin:
+            raise ApiError(
+                403, "permission_error", "force_requires_admin", "Only an admin forces the gate."
+            )
+        if not body.force_reason:
+            raise ApiError(
+                422,
+                "invalid_request_error",
+                "force_reason_required",
+                "Forcing the exam gate needs a force_reason.",
+            )
+        if failures:
+            request_id, ip = request_context(request)
+            await write_event(
+                session,
+                AuditEntry(
+                    action="eval_gate_forced",
+                    resource_type="agent",
+                    outcome="success",
+                    actor_type=actor.actor_type,
+                    actor_id=actor.actor_id,
+                    project_id=str(project_id),
+                    resource_id=str(agent.id),
+                    before=None,
+                    after={
+                        "agent_id": str(agent.id),
+                        "version": row.version,
+                        "reason": body.force_reason,
+                        "suites": [f.public() for f in failures],
+                    },
+                    request_id=request_id,
+                    ip=ip,
+                ),
+            )
     await _point_at(session, agent, row)
     return await agent_out(session, agent)
 
