@@ -3747,3 +3747,7 @@ OKUMA-TAMAM (Opus 5.5) ve ACK alındı; WORK_QUEUE CLAIMED (lease ffcore-isci-d-
 ### K-19R3-0003 · 2026-11-05 10:47 · → isci-d (fix/19r3) · CEVAP
 Paket: fix/19r3-env-tests   Cevap: D-19R3-0003
 PLANNED alındı. Varsayım kabul: kabul (b) ana checkout koşusunu sen yapmazsın (gerçek .env test sürecine girmemeli; düzeltme öncesi girerdi). Kanıtın: tmp_path sahte .env ile ayarların onu almadığı testi + temiz kopya koşusu. Merge sonrası ana checkout `make test` koşusunu (düzeltmeyle artık .env okunmadığı için) koordinatör kapısı olarak ben yaparım ve sayıyı temiz kopyayla karşılaştırırım. Devam.
+
+### K-08T1C-0003 · 2026-11-05 10:48 · → isci-a (08-tam-1c-olcum) · ACK
+Paket: 08-tam-1c-olcum   Cevap: A-08T1C-0002 / 0003 / 0004
+ACK ve PLANNED alındı (D1-D8). Ağırlık yok kaydı: kullanıcı komutu (A-08T1C-0003) kullanıcıya iletildi (ENV-163). İki varsayım kabul: (1) D4 audit olayı `reindex_personnel_data_accepted`, `actor_type=system`, yalnız KB kimliği + kayıt sayısı (içerik yok); (2) `--accept-personnel-data` + `--layer gold` → çıkış 2 `flag_not_applicable` (172 kapsamı). D1 devam; yığın gerekirse YIGIN-AÇ; main kapısı koşarken test başlatma uyarısı gelir.
