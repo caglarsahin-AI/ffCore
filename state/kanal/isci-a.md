@@ -4,8 +4,8 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 
 - Oturum kimliği: ffcore-isci-a-08-tam-1c-olcum (Opus 5.5; önceki lease ffcore-isci-a-08-tam-1b RETIRED, HANDOFF koordinatör özeti K-08T1B-0026)
 - Aktif paket: 08-tam-1c-b-olcum (K-08T1C-0014; 1c-a MERGED c5b234c)
-- Durum: ACTIVE
-- Son okunan: K-08T1C-0024
+- Durum: RETIRED (2026-11-05 18:30; 08-tam-1c-olcum DONE, main 6066276)
+- Son okunan: K-08T1C-0031
 
 ## Mesajlar
 
@@ -2129,3 +2129,21 @@ Branch `feat/08-tam-1c-b-olcum` · SHA **b567b7d66c55bb4559a26f081b328a37e4ef644
 MINOR-2: `Covered` sütunu; **PERSON covered 22/22 = 1,00**, recall düşmedi. MINOR-3: ölçüm motorun eşiğiyle (0,5); akdeniz27 ORG 6 → 5 tahmin (precision 0,80), PERSON/LOC aynı. MINOR-4: `models-files.sh`; `save.sh` yalnız listelenenler (`tar --dereference`); `verify.sh` listede olmayan model dizini/snapshot dosyasını FAIL ile adlandırır, silmez; paketlenen ağaç ağsız yüklendi. MINOR-5: docs 158-840 ms, hız farkı 4 iş parçacığında 1,5-1,7, tek iş parçacığında 2,1-2,8 kat. MINOR-1: PR/docs metni (keşif kanıtı). MINOR-6 değişiklik yok.
 Kapı: `make lint` 0; `make test` llmaas 1751/1751, airgap 1751/1751; birim 52 passed; `-m models` 7 passed + 1 deselected (state/evidence/08t1c-b-r1c-*.log). Konteynerler yalnız `docker run --rm --network none` (model volume `:ro`); yığın yok, hepsi kapandı.
 **Kullanıcı adımı (merge sonrası, tek seferlik):** gerçek volume'da `verify.sh --models` artık FAIL (savasy dizini + akdeniz27 `pytorch_model.bin`; 08t1c-b-r1c-checks.log); temizlik komutu docs/guardrail.md "Old volumes". Ben silmedim. Dal donar.
+
+### A-08T1C-0024 · 2026-11-05 18:30 · → koordinator · HANDOFF
+Paket: 08-tam-1c-olcum (1c-a + 1c-b)   Cevap: K-08T1C-0031
+**Bitti:** 1c-a main c5b234c (FOLLOWUP-168/172/174); 1c-b main 6066276 (NER ölçümü ve seçimi: akdeniz27@99995f7, MIT, `first` + int8, sabit commit indirme, yalnız safetensors, `make test-ner-latency`, kapsama sayımı, listelenen-modeller-yalnız offline paket). Açık dosya yok; worktree temiz; çalışan konteyner yok.
+**Açık kalanlar (sahipleri kayıtlı):** ENV-177 sunucuda `make test-ner-latency` (kullanıcı; `GUARDRAIL_EGRESS_NER=true` öncesi şart); eski volume temizliği (kullanıcı, komut docs/guardrail.md "Old volumes"; yapılana kadar `verify.sh --models` FAIL); FOLLOWUP-178 torchao/ONNX; FOLLOWUP-179 paycoreLLM runbook; 1c-a r1 NOTE 1-5 ve 1c-b r1 NOTE 1-7 PR notunda.
+**Öğrenilenler:**
+1. Windows'ta Python `open(p, 'w')` CRLF yazar; `.gitattributes eol=lf` commit'te düzeltir ama kanal/state dosyası kirlenir. `newline=''` ile yaz.
+2. Bash aracı heredoc'ta `\n`'yi gerçek satır sonuna çevirebiliyor (f-string kırıldı); ters bölülü kod Write/Edit ile.
+3. `conftest` `item.keywords` dizin adlarını da içerir: `tests/models/` altındaki her test `models` anahtarını taşır; ayrı işaretli test yine `RUN_MODEL_TESTS` ister.
+4. `pytest --collect-only -m X -q` seçimi kanıtlamaz (hepsini listeler); `-m X` ile koşup "N deselected" satırı kanıttır.
+5. Dizüstünde gecikme ölçümü temsilî değil: aynı kod 20 dk arayla 3 kat oynadı; tek iş parçacığı 4'ten hızlı çıkabiliyor. Bütçe kararı hedef donanımda.
+6. HF pipeline `aggregation_strategy` modele göre seçilmeli (kart önerisi); `simple` alt kelime parçalarıyla kısmi maskeleme yaptı.
+7. Kanıt iddiası (ör. "verify OK 73") mutlaka log dosyasında olmalı; terminal çıktısı kanıt değil.
+8. Çıplak `docker run` `.env.test` olmadan `get_settings()` testlerini düşürür; `--env-file .env.test` ver.
+
+### A-08T1C-0025 · 2026-11-05 18:30 · → koordinator · RETIRED
+Paket: 08-tam-1c-olcum   Cevap: K-08T1C-0031
+Lease `ffcore-isci-a-08-tam-1c-olcum` bırakıldı. Worktree/dal kaldırma koordinatörde.
