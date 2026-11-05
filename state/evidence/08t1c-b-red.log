@@ -1,0 +1,25 @@
+    def test_08t1c_7d_measured_winner_is_the_only_candidate():
+        from ffcore.knowledge import models
+    
+        env = _env_example()
+        model, revision = env["NER_MODEL"], env["NER_REVISION"]
+>       assert models.NER_CANDIDATES == (model,), "the loser leaves the list after the measurement"
+E       AssertionError: the loser leaves the list after the measurement
+E       assert ('savasy/bert...sh-cased-ner') == ('',)
+E         
+E         At index 0 diff: 'savasy/bert-base-turkish-ner-cased' != ''
+E         Left contains one more item: 'akdeniz27/bert-base-turkish-cased-ner'
+E         Use -v to get more diff
+
+tests/unit/test_08t1c_7_ner_quality.py:98: AssertionError
+=========================== short test summary info ============================
+FAILED tests/unit/test_08t1c_7_ner_quality.py::test_08t1c_7_ner_quality_report_counts
+FAILED tests/unit/test_08t1c_7_ner_quality.py::test_08t1c_7c_pipeline_aggregates_whole_words
+FAILED tests/unit/test_08t1c_7_ner_quality.py::test_08t1c_7d_measured_winner_is_the_only_candidate
+ERROR tests/models/test_08t_ner_models.py::test_08t_1_ner_recall_person - ffc...
+ERROR tests/models/test_08t_ner_models.py::test_08t_1b_ner_quality_report_matches_docs
+ERROR tests/models/test_08t_ner_models.py::test_08t_3_ner_latency_p95 - ffcor...
+ERROR tests/models/test_08t_ner_models.py::test_08t1c_8_person_spans_are_whole_words
+ERROR tests/models/test_08t_ner_models.py::test_08t1c_9_long_text_windows_find_every_name
+ERROR tests/models/test_08t_ner_models.py::test_08t1c_10_egress_person_tokenized_with_the_real_model
+3 failed, 1 passed, 6 errors in 4.83s

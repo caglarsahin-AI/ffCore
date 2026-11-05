@@ -1,0 +1,10 @@
+# 2026-11-05T14:38:59Z HEAD 2a7b430; FOLLOWUP-168 NOTE-2b
+$ docker run --rm --network none -e PYTHONPATH=/work/backend -v C:/ai_paycore/ffcore/.worktrees/feat/08-tam-1c-olcum:/work -v C:/Users/caglar.sahin/AppData/Local/Temp/claude/9398d5fca5badfb5/1ca44d51-3ae7-4e45-bd35-949d6d7b1e32/scratchpad:/scratch:ro -v 04a-knowledge-core_model_cache:/models:ro -w /work/backend ffcore/tools:0.0.0-08t1c python /scratch/lock_latency.py
+# running containers before: 20
+ip6tnl0 lo tunl0 /dev/sda1 /models ext4 ro,relatime,discard 0 0
+loadavg 2.83 2.84 2.69 2/3159 26 | cpus 7 | torch threads 4
+lock (as shipped)   concurrency 1: per-call median 190 ms, P95 379 ms, throughput 4.7 calls/s
+lock (as shipped)   concurrency 2: per-call median 460 ms, P95 686 ms, throughput 4.3 calls/s
+lock (as shipped)   concurrency 4: per-call median 716 ms, P95 2047 ms, throughput 4.0 calls/s
+no lock (probe)     concurrency 2: per-call median 419 ms, P95 740 ms, throughput 4.5 calls/s
+no lock (probe)     concurrency 4: per-call median 693 ms, P95 931 ms, throughput 5.6 calls/s

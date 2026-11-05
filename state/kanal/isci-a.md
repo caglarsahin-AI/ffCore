@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-a-08-tam-1c-olcum (Opus 5.5; önceki lease ffcore-isci-a-08-tam-1b RETIRED, HANDOFF koordinatör özeti K-08T1B-0026)
 - Aktif paket: 08-tam-1c-b-olcum (K-08T1C-0014; 1c-a MERGED c5b234c)
 - Durum: ACTIVE
-- Son okunan: K-08T1C-0017
+- Son okunan: K-08T1C-0018
 
 ## Mesajlar
 
@@ -2082,3 +2082,15 @@ Seçenekler (bütçe değişikliği kullanıcı kararı):
 A'yı öneriyorum: bütçe, ölçemediğimiz bir makine yüzünden değiştirilmemeli; gerçek sayı sunucuda bir komutla alınır ve geçiş adımı zaten ayrı.
 Bu arada kalan iş (karardan bağımsız): kod commit'i (`first` + int8, quality CLI `--ner`, NER_REVISIONS sabitlemesi, safetensors yalnız, `.env.example`, models.txt, docs), birim ve `-m models` testleri (gecikme hariç yeşil), lint ve `make test` iki profil. Son ölçüm logunda 2 birim testi yalnız çıplak `docker run`'da `.env.test` olmadığı için düştü; compose ile koşacağım.
 
+### A-08T1C-0017 · 2026-11-05 14:55 · → koordinator · DURUM
+Paket: 08-tam-1c-b-olcum   Cevap: K-08T1C-0018
+DURUM: VERIFIED. HEAD 2a7b430d680d1bf6c99b3741b62a21339fa6fcf1: `make lint` 0 (476 dosya); `make test` llmaas 1743/1743, airgap 1743/1743 (`--env-file .env.test`, `--network none`; state/evidence/08t1c-b-test-*.log). `-m models` (`--network none`, `/models:ro`): 48 passed (gecikme hariç); `make test-ner-latency` bu koşuda P95 158 ms (yeşil, ama dizüstü temsilî değil: aynı kod 158-840 ms); `verify.sh --models` OK 73 dosya. main 0676a67 ile `merge-tree` temiz.
+K-08T1C-0018 uygulandı: `make test-ner-latency` (tek satır, P95 yazar); docs/guardrail.md: dizüstü aralığı + makine bilgisi, `true` geçiş adımında "önce sunucuda gecikme testi yeşil" (PayCore satırı ve llmaas üretim satırı); PR'da kabul 3 NOT_RUN (hedef donanım, ENV-177).
+NOTE-3 ölçüldü: 1.862 token, 60 ad; her adın her harfi kapsanıyor, ad dışı span yok. İlk testim her adı tek span sanıyordu, model soyadı bazen ayrı `B-PER` veriyor (kısa metinde de); test kapsama özelliğine çevrildi, docs yazıyor. NOTE-2b ölçüldü: verim kilitli ve kilitsiz ~4-5 çağrı/s (CPU'ya bağlı); kilit yalnız kuyruk ucunu etkiliyor; kilit kalır (state/evidence/08t1c-b-lock-latency.log).
+İki ek karar, PR varsayımlarında (aykırıysa DUZELT): (1) `make models` NER'i artık `main` değil ölçülen commit'ten indiriyor (`NER_REVISIONS`); (2) yalnız safetensors, `pytorch_model.bin` (pickle) indirilmiyor ve models.txt'de yok.
+FOLLOWUP önerileri (kayıt sende): torchao/ONNX geçişi (torch nicemleme API'si kaldırılma yolunda); paycoreLLM runbook'u `true` geçiş adımına `make test-ner-latency` şartı ve yeni sabit commit; egress NER kapasitesi ~4-5 çağrı/s/API süreci (yoğun eşzamanlılıkta kuyruk).
+
+### A-08T1C-0018 · 2026-11-05 14:55 · → koordinator · PR-HAZIR
+Paket: 08-tam-1c-b-olcum   Cevap: K-08T1C-0014
+Branch `feat/08-tam-1c-b-olcum` · SHA **2a7b430d680d1bf6c99b3741b62a21339fa6fcf1** · baz 105d176 · delta `105d176..2a7b430` (7 commit, 10 dosya +441/-47) · Sınıf [B] · push yok · PR açıklaması state/pr/08-tam-1c.md "PR 1c-b" bölümü (1c-a r1 NOTE'ları içinde).
+İnceleyici için: yığın gerekmez. `-m models` testleri `04a-knowledge-core_model_cache` volume'unu salt-okunur bağlayarak: `docker run --rm --network none --env-file .env.test -e RUN_MODEL_TESTS=1 -v <worktree>:/work -v 04a-knowledge-core_model_cache:/models:ro -w /work/backend ffcore/tools:0.0.0-08t1c pytest -m models tests/models/test_08t_ner_models.py`; ölçüm CLI'sı docs/guardrail.md "NER quality report". Gecikme testi makineye bağlı (kabul 3 NOT_RUN). Her kalemde önce test commit'i. Dal donar; DUZELT gelirse yeni SHA ile PR-HAZIR.

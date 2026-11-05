@@ -1,0 +1,17 @@
+# 2026-11-05T14:33:53Z HEAD 2a7b430d680d1bf6c99b3741b62a21339fa6fcf1
+$ docker run --rm --network none --env-file .env.test -e DEPLOY_PROFILE=airgap -v C:/ai_paycore/ffcore/.worktrees/feat/08-tam-1c-olcum:/work -w /work ffcore/tools:0.0.0-08t1c make test
+tests/contract/test_06b_litellm_not_published.py .                       [ 96%]
+tests/contract/test_06b_openapi.py ...                                   [ 96%]
+tests/contract/test_07_openapi.py ....                                   [ 97%]
+tests/contract/test_08_openapi.py .......                                [ 97%]
+tests/contract/test_09_openapi.py ..                                     [ 97%]
+tests/contract/test_57_alembic_single_head.py ...                        [ 97%]
+tests/contract/test_c11_facade.py .....                                  [ 98%]
+tests/contract/test_c1_namespace.py ...............                      [ 98%]
+tests/contract/test_c2_api_key_scopes.py ..                              [ 99%]
+tests/contract/test_c2_on_behalf_of.py ..                                [ 99%]
+tests/contract/test_c3_common_columns.py .....                           [ 99%]
+tests/contract/test_c5_vectorstore.py ...                                [ 99%]
+tests/contract/test_c9_runs.py .......                                   [100%]
+
+======================= 1743 passed in 224.44s (0:03:44) =======================

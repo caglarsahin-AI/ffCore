@@ -1,0 +1,10 @@
+# 2026-11-05T14:26:13Z HEAD e2ee8f8 + working tree (test 08t1c_9 coverage, make test-ner-latency)
+$ docker run --rm --network none --env-file .env.test -e RUN_MODEL_TESTS=1 -v C:/ai_paycore/ffcore/.worktrees/feat/08-tam-1c-olcum:/work -v 04a-knowledge-core_model_cache:/models:ro -w /work ffcore/tools:0.0.0-08t1c sh -c 'cd /work/backend && pytest -q -p no:cacheprovider -W ignore::DeprecationWarning -W ignore::UserWarning tests/unit/test_08t1c_7_ner_quality.py tests/unit/test_08t_18_ner_candidates.py tests/unit/test_08_recognizers.py tests/unit/test_19_offline.py tests/unit/test_08t_ner.py tests/models/test_08t_ner_models.py -k "not latency"; cd /work && make test-ner-latency 2>&1 | grep -E "NER P95|passed|failed"; MODELS_TXT=deploy/offline/models.txt bash deploy/offline/verify.sh --models /models > /tmp/v.txt; echo verify_exit=$?; grep -c "OK" /tmp/v.txt; grep -i -E "akdeniz|FAIL" /tmp/v.txt | head -3'
+ip6tnl0 lo tunl0 /dev/sda1 /models ext4 ro,relatime,discard 0 0
+1.72 2.46 2.49 3/1816 10
+................................................                         [100%]
+48 passed, 3 deselected in 32.32s
+NER P95, 1000 characters, local rules + NER: 158 ms
+================= 1 passed, 6 deselected, 3 warnings in 20.19s =================
+verify_exit=0
+2
