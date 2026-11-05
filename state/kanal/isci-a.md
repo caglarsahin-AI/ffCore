@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-a-08-tam-1c-olcum (Opus 5.5; önceki lease ffcore-isci-a-08-tam-1b RETIRED, HANDOFF koordinatör özeti K-08T1B-0026)
 - Aktif paket: 08-tam-1c-b-olcum (K-08T1C-0014; 1c-a MERGED c5b234c)
 - Durum: ACTIVE
-- Son okunan: K-08T1C-0019
+- Son okunan: K-08T1C-0021
 
 ## Mesajlar
 
@@ -2108,3 +2108,13 @@ NOTE'lar (kod değişikliği önermiyorum, inceleyici bilsin):
 3. `make test-models` artık gecikme testini de içeriyor; hedef olmayan makinede kırmızı olabilir (dizüstü 158-840 ms). Hedefli komut `make test-ner-latency`.
 4. Bellek: int8'in çalışma belleği ölçülmedi; `quantize_dynamic` kopya üretir, yüklemede kısa süre fp32 + int8 birlikte bellekte. Docs'taki 0,44 GB disk boyutu.
 5. Her API açılışında torch nicemleme kullanım dışı uyarısı loga düşer (FOLLOWUP-178 ile gider).
+
+### A-08T1C-0020 · 2026-11-05 16:05 · → koordinator · DURUM
+Paket: 08-tam-1c-b-olcum   Cevap: K-08T1C-0021
+r1b commit 5e9a68881a4f51d9a2cd1ad91aeab8eaabc0a809 (2a7b430 + 1; MINOR-a/b, NOTE-1/3; lint 0; `-m models` 6 passed + gecikme ayrı işarette deselected; `make test-ner-latency` koşuyor: 08t1c-b-r1b-models.log). Kapı yavaş: review09 yığını ~%180 CPU'da test koşuyor; `make test` llmaas 28:53 sürdü (normalde 3:52) ve **1742/1743**: düşen `test_02_r1_m3_child_process_exits_by_itself` (mutlak duvar saati: `elapsed < SHUTDOWN_TIMEOUT_S + 3`, alt süreç); r1b tracing'e dokunmuyor, aynı test 2a7b430'da yeşildi. airgap `make test` şu an koşuyor. Bitince o testi tek başına 3 kez koşup sonuçla PR-HAZIR r1b yazacağım. Takılma yok; yük kaynaklı yavaşlık.
+
+### A-08T1C-0021 · 2026-11-05 16:50 · → koordinator · PR-HAZIR r1b
+Paket: 08-tam-1c-b-olcum   Cevap: K-08T1C-0021
+Branch `feat/08-tam-1c-b-olcum` · SHA **5e9a68881a4f51d9a2cd1ad91aeab8eaabc0a809** · baz 105d176 · delta `105d176..5e9a688` (8 commit, 13 dosya +484/-52); r1b delta `2a7b430..5e9a688` (1 commit, 7 dosya +59/-21) · [B] · push yok · main c6c9d83 ile `merge-tree` temiz · PR state/pr/08-tam-1c.md "r1b" bölümü.
+r1b: MINOR-a (docs P95 158-840 ms), MINOR-b (`.env.example` `true` öncesi `make test-ner-latency` şartı), NOTE-3 (gecikme testi `tests/models/test_08t_ner_latency.py`, işaret `ner_latency`, `make test-models` koşmaz: `6 passed, 1 deselected`), NOTE-1 (egress testi özellik: ham ad/telefon yok, 2-3 yer tutucu). NOTE-2/4/5 PR notunda.
+Kapı: `make lint` 0; `make test` airgap 1743/1743; llmaas 1742/1743: `test_02_r1_m3_child_process_exits_by_itself` yük altında 1 kez düştü (mutlak duvar saati; review09 ~%180 CPU, makine uykusu), **tek başına 3/3 yeşil** (08t1c-b-r1b-tracing-rerun.log); 02'ye dokunulmadı. `-m models` 6 passed; `make test-ner-latency` koşuyor (dizüstü 266/367 ms, ENV-177). Dal donar.

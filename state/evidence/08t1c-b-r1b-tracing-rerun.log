@@ -1,0 +1,6 @@
+# 2026-11-05T16:41:53Z HEAD 5e9a68881a4f51d9a2cd1ad91aeab8eaabc0a809; llmaas make test'te düşen test, tek başına 3 kez
+$ docker run --rm --network none --env-file .env.test -e DEPLOY_PROFILE=llmaas -v C:/ai_paycore/ffcore/.worktrees/feat/08-tam-1c-olcum:/work -w /work/backend ffcore/tools:0.0.0-08t1c pytest -q -p no:cacheprovider --count... (3 ayrı koşu)
+# load: review09-agent-worker-bg-1=72.67% review09-langfuse-worker-1=29.98% review09-langfuse-web-1=23.08% 
+1 passed in 7.60s
+1 passed in 7.22s
+1 passed in 7.72s

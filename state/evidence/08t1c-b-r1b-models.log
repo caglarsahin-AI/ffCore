@@ -1,0 +1,14 @@
+# 2026-11-05T15:03:03Z HEAD 2a7b430 + working tree (K-08T1C-0021 r1b)
+$ docker run --rm --network none --env-file .env.test -v C:/ai_paycore/ffcore/.worktrees/feat/08-tam-1c-olcum:/work -v 04a-knowledge-core_model_cache:/models:ro -w /work ffcore/tools:0.0.0-08t1c sh -c 'make lint 2>&1 | tail -n 2; cd backend; echo "## make test-models selection: -m models over both NER files (latency must be deselected)"; RUN_MODEL_TESTS=1 pytest -q -p no:cacheprovider -W ignore::DeprecationWarning -W ignore::UserWarning -m models tests/models/test_08t_ner_models.py tests/models/test_08t_ner_latency.py 2>&1 | tail -n 1; echo "## latency test without flags"; pytest -q -p no:cacheprovider tests/models/test_08t_ner_latency.py -rs 2>&1 | tail -n 2; echo "## make test-ner-latency (dev laptop; red expected above 300 ms, ENV-177)"; cd /work && make test-ner-latency 2>&1 | grep -E "^NER P95|passed|failed|skipped"'
+ip6tnl0 lo tunl0 /dev/sda1 /models ext4 ro,relatime,discard 0 0
+5.00 4.68 3.65 2/3531 10
+ruff format --check backend scripts data/samples/scripts services
+477 files already formatted
+## make test-models selection: -m models over both NER files (latency must be deselected)
+6 passed, 1 deselected in 27.40s
+## latency test without flags
+SKIPPED [1] tests/models/test_08t_ner_latency.py: NOT_RUN: needs RUN_MODEL_TESTS=1
+1 skipped in 0.59s
+## make test-ner-latency (dev laptop; red expected above 300 ms, ENV-177)
+NER P95, 1000 characters, local rules + NER: 266 ms
+======================== 1 passed, 3 warnings in 27.32s ========================
