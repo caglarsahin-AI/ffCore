@@ -1,0 +1,11 @@
+09_0001 (08, 03a, 05a, 04a, 03b, 09, 06b, 07, 03c, 06a) (head)
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+INFO  [alembic.runtime.migration] Running downgrade 09_0001 -> 06b_0001, 09: eval_suites, eval_runs (local rows over Langfuse datasets and dataset runs)
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade 06b_0001 -> 09_0001, 09: eval_suites, eval_runs (local rows over Langfuse datasets and dataset runs)
+09_0001 (07, 08, 03a, 06b, 03b, 04a, 09, 06a, 05a, 03c) (head)
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+09_0001 (head)

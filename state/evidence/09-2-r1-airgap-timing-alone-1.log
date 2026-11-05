@@ -1,0 +1,216 @@
+F....F                                                                   [100%]
+=================================== FAILURES ===================================
+_________ test_09_r2_major2_slow_judge_spreads_over_ticks_and_finishes _________
+
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_94c597a84035) at 0x7ff6ab94e570>
+project = UUID('2d910097-baa3-4c80-9f78-e4c5bbd16c9e')
+database = <module 'ffcore.core.db' from '/work/backend/ffcore/core/db.py'>
+app_settings = Settings(deploy_profile='airgap', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+
+    def test_09_r2_major2_slow_judge_spreads_over_ticks_and_finishes(
+        pg, project, database, app_settings
+    ):
+        import time
+    
+        from ffcore.evaluation.runner import Budget
+    
+        ev_id = _judged_exam(pg, project)
+        judge = _Judge(delay=0.3)
+        ticks = 0
+        while _ev(pg, ev_id)[0] == "running":
+            ticks += 1
+            assert ticks <= 5, "the exam does not progress"
+            budget = Budget(20, deadline=time.monotonic() + 0.7, call_s=0.2)
+            _advance(database, app_settings, ev_id, judge=judge, budget=budget)  # never raises
+        status, _, summary = _ev(pg, ev_id)
+        assert status == "completed" and ticks == 2 and summary["scored"] == 3
+>       assert sorted(judge.calls) == ["q1", "q2", "q3"]
+E       AssertionError: assert ['q1', 'q2', 'q2', 'q3'] == ['q1', 'q2', 'q3']
+E         
+E         At index 2 diff: 'q2' != 'q3'
+E         Left contains one more item: 'q3'
+E         Use -v to get more diff
+
+tests/integration/test_09_advance.py:350: AssertionError
+_______________________ test_03a_2_read_mode_get_parity ________________________
+
+app = <fastapi.applications.FastAPI object at 0x7ff6ab6a23c0>
+world = {'edit': <starlette.testclient.TestClient object at 0x7ff6ab132de0>, 'read': <starlette.testclient.TestClient object a...4a0>, 'project_id': '216516b3-f381-4ace-929a-bfbb98b086f1', 'provider_id': '124f72fc-5d62-412e-85c9-aeb7f116aeb4', ...}
+
+    def test_03a_2_read_mode_get_parity(app, world):
+        checked = 0
+        for path in _get_paths(app):
+            if path in PARITY_EXEMPT or path.startswith(PARITY_EXEMPT_PREFIXES):
+                continue
+            url = re.sub(r"\{(\w+)\}", lambda m: world[m.group(1)], path)
+            edit, read = world["edit"].get(url), world["read"].get(url)
+>           assert edit.status_code == 200, (url, edit.text)
+E           AssertionError: ('/api/v1/projects/216516b3-f381-4ace-929a-bfbb98b086f1/eval-runs/compare', '{"error":{"message":"Invalid request: query.a, query.b","type":"invalid_request_error","code":"validation_error"}}')
+E           assert 422 == 200
+E            +  where 422 = <Response [422 Unprocessable Content]>.status_code
+
+tests/integration/test_03a_read_side.py:104: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+2026-11-05 16:48:42,301 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=664
+2026-11-05 16:48:42,923 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=358
+2026-11-05 16:48:43,245 INFO ffcore.access access method=POST path=/api/v1/providers status=201 ms=308
+2026-11-05 16:48:43,557 INFO ffcore.access access method=POST path=/api/v1/projects/216516b3-f381-4ace-929a-bfbb98b086f1/models status=201 ms=300
+------------------------------ Captured log setup ------------------------------
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=664
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=358
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/providers status=201 ms=308
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/216516b3-f381-4ace-929a-bfbb98b086f1/models status=201 ms=300
+----------------------------- Captured stderr call -----------------------------
+2026-11-05 16:48:46,619 INFO ffcore.access access method=GET path=/api/v1/users status=200 ms=133
+2026-11-05 16:48:46,753 INFO ffcore.access access method=GET path=/api/v1/users status=200 ms=125
+2026-11-05 16:48:46,894 INFO ffcore.access access method=GET path=/api/v1/users/5b662591-cd78-4ca2-ab17-cac3b21848aa status=200 ms=131
+2026-11-05 16:48:47,010 INFO ffcore.access access method=GET path=/api/v1/users/5b662591-cd78-4ca2-ab17-cac3b21848aa status=200 ms=108
+2026-11-05 16:48:47,099 INFO ffcore.access access method=GET path=/api/v1/projects status=200 ms=83
+2026-11-05 16:48:47,185 INFO ffcore.access access method=GET path=/api/v1/projects status=200 ms=79
+2026-11-05 16:48:47,390 INFO ffcore.access access method=GET path=/api/v1/projects/216516b3-f381-4ace-929a-bfbb98b086f1 status=200 ms=189
+2026-11-05 16:48:47,561 INFO ffcore.access access method=GET path=/api/v1/projects/216516b3-f381-4ace-929a-bfbb98b086f1 status=200 ms=161
+2026-11-05 16:48:47,811 INFO ffcore.access access method=GET path=/api/v1/projects/216516b3-f381-4ace-929a-bfbb98b086f1/readiness status=200 ms=240
+2026-11-05 16:48:48,019 INFO ffcore.access access method=GET path=/api/v1/projects/216516b3-f381-4ace-929a-bfbb98b086f1/readiness status=200 ms=196
+2026-11-05 16:48:48,183 INFO ffcore.access access method=GET path=/api/v1/projects/216516b3-f381-4ace-929a-bfbb98b086f1/members status=200 ms=154
+2026-11-05 16:48:48,343 INFO ffcore.access access method=GET path=/api/v1/projects/216516b3-f381-4ace-929a-bfbb98b086f1/members status=200 ms=150
+2026-11-05 16:48:48,497 INFO ffcore.access access method=GET path=/api/v1/provider-drivers status=200 ms=144
+2026-11-05 16:48:48,630 INFO ffcore.access access method=GET path=/api/v1/provider-drivers status=200 ms=122
+2026-11-05 16:48:48,856 INFO ffcore.access access method=GET path=/api/v1/providers status=200 ms=208
+2026-11-05 16:48:49,007 INFO ffcore.access access method=GET path=/api/v1/providers status=200 ms=141
+2026-11-05 16:48:49,151 INFO ffcore.access access method=GET path=/api/v1/providers/124f72fc-5d62-412e-85c9-aeb7f116aeb4 status=200 ms=134
+2026-11-05 16:48:49,333 INFO ffcore.access access method=GET path=/api/v1/providers/124f72fc-5d62-412e-85c9-aeb7f116aeb4 status=200 ms=173
+2026-11-05 16:48:49,441 INFO ffcore.access access method=GET path=/api/v1/model-catalog status=200 ms=98
+2026-11-05 16:48:49,524 INFO ffcore.access access method=GET path=/api/v1/model-catalog status=200 ms=76
+2026-11-05 16:48:49,650 INFO ffcore.access access method=GET path=/api/v1/projects/216516b3-f381-4ace-929a-bfbb98b086f1/models status=200 ms=118
+2026-11-05 16:48:49,789 INFO ffcore.access access method=GET path=/api/v1/projects/216516b3-f381-4ace-929a-bfbb98b086f1/models status=200 ms=124
+2026-11-05 16:48:49,907 INFO ffcore.access access method=GET path=/api/v1/projects/216516b3-f381-4ace-929a-bfbb98b086f1/models/fb47b6d6-4490-4f89-977c-5e2cf393a3ec status=200 ms=112
+2026-11-05 16:48:50,031 INFO ffcore.access access method=GET path=/api/v1/projects/216516b3-f381-4ace-929a-bfbb98b086f1/models/fb47b6d6-4490-4f89-977c-5e2cf393a3ec status=200 ms=117
+2026-11-05 16:48:50,179 INFO ffcore.access access method=GET path=/api/v1/audit status=200 ms=141
+2026-11-05 16:48:50,328 INFO ffcore.access access method=GET path=/api/v1/audit status=200 ms=139
+2026-11-05 16:48:50,543 INFO ffcore.access access method=GET path=/api/v1/audit.csv status=200 ms=205
+2026-11-05 16:48:50,680 INFO ffcore.access access method=GET path=/api/v1/audit.csv status=200 ms=129
+2026-11-05 16:48:50,829 INFO ffcore.access access method=GET path=/api/v1/projects/216516b3-f381-4ace-929a-bfbb98b086f1/pii-policies status=200 ms=139
+2026-11-05 16:48:50,979 INFO ffcore.access access method=GET path=/api/v1/projects/216516b3-f381-4ace-929a-bfbb98b086f1/pii-policies status=200 ms=144
+2026-11-05 16:48:51,135 INFO ffcore.access access method=GET path=/api/v1/projects/216516b3-f381-4ace-929a-bfbb98b086f1/guardrail-policies status=200 ms=148
+2026-11-05 16:48:51,256 INFO ffcore.access access method=GET path=/api/v1/projects/216516b3-f381-4ace-929a-bfbb98b086f1/guardrail-policies status=200 ms=112
+2026-11-05 16:48:51,378 INFO ffcore.access access method=GET path=/api/v1/projects/216516b3-f381-4ace-929a-bfbb98b086f1/tools status=200 ms=114
+2026-11-05 16:48:51,475 INFO ffcore.access access method=GET path=/api/v1/projects/216516b3-f381-4ace-929a-bfbb98b086f1/tools status=200 ms=90
+2026-11-05 16:48:51,583 INFO ffcore.access access method=GET path=/api/v1/projects/216516b3-f381-4ace-929a-bfbb98b086f1/agents status=200 ms=103
+2026-11-05 16:48:51,682 INFO ffcore.access access method=GET path=/api/v1/projects/216516b3-f381-4ace-929a-bfbb98b086f1/agents status=200 ms=90
+2026-11-05 16:48:51,799 INFO ffcore.access access method=GET path=/api/v1/projects/216516b3-f381-4ace-929a-bfbb98b086f1/runs status=200 ms=112
+2026-11-05 16:48:51,893 INFO ffcore.access access method=GET path=/api/v1/projects/216516b3-f381-4ace-929a-bfbb98b086f1/runs status=200 ms=88
+2026-11-05 16:48:51,986 INFO ffcore.access access method=GET path=/api/v1/projects/216516b3-f381-4ace-929a-bfbb98b086f1/approvals status=200 ms=88
+2026-11-05 16:48:52,061 INFO ffcore.access access method=GET path=/api/v1/projects/216516b3-f381-4ace-929a-bfbb98b086f1/approvals status=200 ms=70
+2026-11-05 16:48:52,148 INFO ffcore.access access method=GET path=/api/v1/projects/216516b3-f381-4ace-929a-bfbb98b086f1/approvals/count status=200 ms=82
+2026-11-05 16:48:52,228 INFO ffcore.access access method=GET path=/api/v1/projects/216516b3-f381-4ace-929a-bfbb98b086f1/approvals/count status=200 ms=74
+2026-11-05 16:48:52,512 INFO ffcore.access access method=GET path=/api/v1/projects/216516b3-f381-4ace-929a-bfbb98b086f1/api-keys status=200 ms=279
+2026-11-05 16:48:52,588 INFO ffcore.access access method=GET path=/api/v1/projects/216516b3-f381-4ace-929a-bfbb98b086f1/api-keys status=200 ms=72
+2026-11-05 16:48:52,671 INFO ffcore.access access method=GET path=/api/v1/projects/216516b3-f381-4ace-929a-bfbb98b086f1/quotas status=200 ms=78
+2026-11-05 16:48:52,743 INFO ffcore.access access method=GET path=/api/v1/projects/216516b3-f381-4ace-929a-bfbb98b086f1/quotas status=200 ms=68
+2026-11-05 16:48:52,824 INFO ffcore.access access method=GET path=/api/v1/projects/216516b3-f381-4ace-929a-bfbb98b086f1/usage status=200 ms=77
+2026-11-05 16:48:52,895 INFO ffcore.access access method=GET path=/api/v1/projects/216516b3-f381-4ace-929a-bfbb98b086f1/usage status=200 ms=67
+2026-11-05 16:48:52,931 INFO ffcore.access access method=GET path=/api/v1/alert-kinds status=200 ms=31
+2026-11-05 16:48:52,961 INFO ffcore.access access method=GET path=/api/v1/alert-kinds status=200 ms=25
+2026-11-05 16:48:53,011 INFO ffcore.access access method=GET path=/api/v1/projects/216516b3-f381-4ace-929a-bfbb98b086f1/alert-rules status=200 ms=87
+2026-11-05 16:48:53,084 INFO ffcore.access access method=GET path=/api/v1/projects/216516b3-f381-4ace-929a-bfbb98b086f1/alert-rules status=200 ms=65
+2026-11-05 16:48:53,156 INFO ffcore.access access method=GET path=/api/v1/projects/216516b3-f381-4ace-929a-bfbb98b086f1/alerts status=200 ms=67
+2026-11-05 16:48:53,225 INFO ffcore.access access method=GET path=/api/v1/projects/216516b3-f381-4ace-929a-bfbb98b086f1/alerts status=200 ms=65
+2026-11-05 16:48:53,295 INFO ffcore.access access method=GET path=/api/v1/projects/216516b3-f381-4ace-929a-bfbb98b086f1/alerts/count status=200 ms=65
+2026-11-05 16:48:53,362 INFO ffcore.access access method=GET path=/api/v1/projects/216516b3-f381-4ace-929a-bfbb98b086f1/alerts/count status=200 ms=62
+2026-11-05 16:48:53,426 INFO ffcore.access access method=GET path=/api/v1/alert-rules status=200 ms=59
+2026-11-05 16:48:53,488 INFO ffcore.access access method=GET path=/api/v1/alert-rules status=200 ms=58
+2026-11-05 16:48:53,556 INFO ffcore.access access method=GET path=/api/v1/alerts status=200 ms=64
+2026-11-05 16:48:53,640 INFO ffcore.access access method=GET path=/api/v1/alerts status=200 ms=77
+2026-11-05 16:48:53,713 INFO ffcore.access access method=GET path=/api/v1/alerts/count status=200 ms=68
+2026-11-05 16:48:53,900 INFO ffcore.access access method=GET path=/api/v1/alerts/count status=200 ms=181
+2026-11-05 16:48:54,100 INFO ffcore.access access method=GET path=/api/v1/projects/216516b3-f381-4ace-929a-bfbb98b086f1/notification-settings status=200 ms=187
+2026-11-05 16:48:54,232 INFO ffcore.access access method=GET path=/api/v1/projects/216516b3-f381-4ace-929a-bfbb98b086f1/notification-settings status=200 ms=124
+2026-11-05 16:48:54,388 INFO ffcore.access access method=GET path=/api/v1/notification-settings status=200 ms=141
+2026-11-05 16:48:54,498 INFO ffcore.access access method=GET path=/api/v1/notification-settings status=200 ms=103
+2026-11-05 16:48:54,626 INFO ffcore.access access method=GET path=/api/v1/retention/policies status=200 ms=121
+2026-11-05 16:48:54,765 INFO ffcore.access access method=GET path=/api/v1/retention/policies status=200 ms=131
+2026-11-05 16:48:54,923 INFO ffcore.access access method=GET path=/api/v1/retention/runs status=200 ms=151
+2026-11-05 16:48:55,065 INFO ffcore.access access method=GET path=/api/v1/retention/runs status=200 ms=134
+2026-11-05 16:48:55,198 INFO ffcore.access access method=GET path=/api/v1/projects/216516b3-f381-4ace-929a-bfbb98b086f1/eval-suites status=200 ms=126
+2026-11-05 16:48:55,293 INFO ffcore.access access method=GET path=/api/v1/projects/216516b3-f381-4ace-929a-bfbb98b086f1/eval-suites status=200 ms=88
+2026-11-05 16:48:55,365 INFO ffcore.access access method=GET path=/api/v1/projects/216516b3-f381-4ace-929a-bfbb98b086f1/eval-runs/compare status=422 ms=66
+2026-11-05 16:48:55,426 INFO ffcore.access access method=GET path=/api/v1/projects/216516b3-f381-4ace-929a-bfbb98b086f1/eval-runs/compare status=422 ms=55
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/users status=200 ms=133
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/users status=200 ms=125
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/users/5b662591-cd78-4ca2-ab17-cac3b21848aa status=200 ms=131
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/users/5b662591-cd78-4ca2-ab17-cac3b21848aa status=200 ms=108
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects status=200 ms=83
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects status=200 ms=79
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/216516b3-f381-4ace-929a-bfbb98b086f1 status=200 ms=189
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/216516b3-f381-4ace-929a-bfbb98b086f1 status=200 ms=161
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/216516b3-f381-4ace-929a-bfbb98b086f1/readiness status=200 ms=240
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/216516b3-f381-4ace-929a-bfbb98b086f1/readiness status=200 ms=196
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/216516b3-f381-4ace-929a-bfbb98b086f1/members status=200 ms=154
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/216516b3-f381-4ace-929a-bfbb98b086f1/members status=200 ms=150
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/provider-drivers status=200 ms=144
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/provider-drivers status=200 ms=122
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/providers status=200 ms=208
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/providers status=200 ms=141
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/providers/124f72fc-5d62-412e-85c9-aeb7f116aeb4 status=200 ms=134
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/providers/124f72fc-5d62-412e-85c9-aeb7f116aeb4 status=200 ms=173
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/model-catalog status=200 ms=98
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/model-catalog status=200 ms=76
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/216516b3-f381-4ace-929a-bfbb98b086f1/models status=200 ms=118
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/216516b3-f381-4ace-929a-bfbb98b086f1/models status=200 ms=124
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/216516b3-f381-4ace-929a-bfbb98b086f1/models/fb47b6d6-4490-4f89-977c-5e2cf393a3ec status=200 ms=112
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/216516b3-f381-4ace-929a-bfbb98b086f1/models/fb47b6d6-4490-4f89-977c-5e2cf393a3ec status=200 ms=117
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/audit status=200 ms=141
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/audit status=200 ms=139
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/audit.csv status=200 ms=205
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/audit.csv status=200 ms=129
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/216516b3-f381-4ace-929a-bfbb98b086f1/pii-policies status=200 ms=139
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/216516b3-f381-4ace-929a-bfbb98b086f1/pii-policies status=200 ms=144
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/216516b3-f381-4ace-929a-bfbb98b086f1/guardrail-policies status=200 ms=148
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/216516b3-f381-4ace-929a-bfbb98b086f1/guardrail-policies status=200 ms=112
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/216516b3-f381-4ace-929a-bfbb98b086f1/tools status=200 ms=114
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/216516b3-f381-4ace-929a-bfbb98b086f1/tools status=200 ms=90
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/216516b3-f381-4ace-929a-bfbb98b086f1/agents status=200 ms=103
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/216516b3-f381-4ace-929a-bfbb98b086f1/agents status=200 ms=90
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/216516b3-f381-4ace-929a-bfbb98b086f1/runs status=200 ms=112
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/216516b3-f381-4ace-929a-bfbb98b086f1/runs status=200 ms=88
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/216516b3-f381-4ace-929a-bfbb98b086f1/approvals status=200 ms=88
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/216516b3-f381-4ace-929a-bfbb98b086f1/approvals status=200 ms=70
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/216516b3-f381-4ace-929a-bfbb98b086f1/approvals/count status=200 ms=82
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/216516b3-f381-4ace-929a-bfbb98b086f1/approvals/count status=200 ms=74
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/216516b3-f381-4ace-929a-bfbb98b086f1/api-keys status=200 ms=279
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/216516b3-f381-4ace-929a-bfbb98b086f1/api-keys status=200 ms=72
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/216516b3-f381-4ace-929a-bfbb98b086f1/quotas status=200 ms=78
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/216516b3-f381-4ace-929a-bfbb98b086f1/quotas status=200 ms=68
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/216516b3-f381-4ace-929a-bfbb98b086f1/usage status=200 ms=77
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/216516b3-f381-4ace-929a-bfbb98b086f1/usage status=200 ms=67
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/alert-kinds status=200 ms=31
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/alert-kinds status=200 ms=25
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/216516b3-f381-4ace-929a-bfbb98b086f1/alert-rules status=200 ms=87
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/216516b3-f381-4ace-929a-bfbb98b086f1/alert-rules status=200 ms=65
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/216516b3-f381-4ace-929a-bfbb98b086f1/alerts status=200 ms=67
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/216516b3-f381-4ace-929a-bfbb98b086f1/alerts status=200 ms=65
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/216516b3-f381-4ace-929a-bfbb98b086f1/alerts/count status=200 ms=65
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/216516b3-f381-4ace-929a-bfbb98b086f1/alerts/count status=200 ms=62
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/alert-rules status=200 ms=59
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/alert-rules status=200 ms=58
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/alerts status=200 ms=64
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/alerts status=200 ms=77
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/alerts/count status=200 ms=68
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/alerts/count status=200 ms=181
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/216516b3-f381-4ace-929a-bfbb98b086f1/notification-settings status=200 ms=187
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/216516b3-f381-4ace-929a-bfbb98b086f1/notification-settings status=200 ms=124
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/notification-settings status=200 ms=141
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/notification-settings status=200 ms=103
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/retention/policies status=200 ms=121
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/retention/policies status=200 ms=131
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/retention/runs status=200 ms=151
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/retention/runs status=200 ms=134
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/216516b3-f381-4ace-929a-bfbb98b086f1/eval-suites status=200 ms=126
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/216516b3-f381-4ace-929a-bfbb98b086f1/eval-suites status=200 ms=88
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/216516b3-f381-4ace-929a-bfbb98b086f1/eval-runs/compare status=422 ms=66
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/216516b3-f381-4ace-929a-bfbb98b086f1/eval-runs/compare status=422 ms=55
+=========================== short test summary info ============================
+FAILED tests/integration/test_09_advance.py::test_09_r2_major2_slow_judge_spreads_over_ticks_and_finishes
+FAILED tests/integration/test_03a_read_side.py::test_03a_2_read_mode_get_parity
+2 failed, 4 passed in 29.81s

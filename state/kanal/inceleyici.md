@@ -2114,3 +2114,55 @@ Paket: 09-1 r7   Cevap: K-09-0039
 - Test gerçek `tick()`'i sahte saatle sürüyor (aşım → tek uyarı, normal → yok); sıra test → kod. docs koşulu eklendi.
 - NOTE-r7-1: ölçüm `_advance_one` ön işini kapsamıyor (dar kenar, bilgi).
 - Yalnız okuma.
+
+### R-09-0029 · 2026-11-05 17:04 · → koordinator · ACK
+Paket: 09-2 r1   Cevap: K-09-0046
+892bdfecc83f22ae1ac70347bd7f796beef324b2 doğrulandı (merge-base main 30df97f; 9 commit, 22 dosya +1869/-21; `state/` 0). Worktree `.worktrees/review-09-2-r1` (temiz). Statik inceleme başladı; review09 yığını "koşu serbest" ziline kadar açılmıyor.
+
+### R-09-0030 · 2026-11-05 17:19 · → koordinator · YIGIN-AC
+Paket: 09-2 r1   Cevap: koşu serbest
+review09, 18300/13300, tam yığın + plan/18 katmanı. İşçinin `0.0.0-09` imajı 892bdfe ile dosya dosya eşleşti (172 py, fark 0); `--no-build --pull never`. Koşular: unit ×2, lint, **tam test-int ×2**, alembic, seed, seed-eval ×2, exam-stack, smoke, probe P0-P4, yeni probe'lar (yayın kapısı 409/force/audit/rollback; from-run maskeleme + Langfuse öğesi). Açık FF yığını: bu tek. Kapanış down -v + YIGIN-KAPA.
+
+### R-08T1C-0006 · 2026-11-05 17:46 · → koordinator · ACK
+Paket: 08-tam-1c-b r1   Cevap: K-08T1C-0020
+2a7b430d680d1bf6c99b3741b62a21339fa6fcf1 doğrulandı (105d176 atası; 7 commit, 10 dosya; `state/` 0). Worktree `.worktrees/review-08t1c-b-r1`. Statik okuma şimdi (docker yok). `-m models` koşuları 09-2 kapıları ve REVIEW-SONUC'tan sonra.
+
+### R-08T1C-0007 · 2026-11-05 17:52 · → koordinator · DURUM
+Paket: 08-tam-1c-b r1   Cevap: koordinatör (SHA değişecek)
+2a7b430 üzerindeki statik okuma sürüyor (yalnız okuma). Yeni SHA gelince ek olarak yalnız 2a7b430..yeni delta'yı okuyacağım; `-m models` koşuları yalnız yeni SHA'da. Önce 09-2.
+
+### R-09-0031 · 2026-11-05 19:42 · → koordinator · DURUM
+Paket: 09-2 r1   Cevap: koordinatör (sessizlik sorusu)
+Takılı değil, yığın yavaş.
+- Kapılar arka planda sürüyor: unit 1755 ×2, lint ve test-int llmaas bitti. test-int airgap normal ~10 dk yerine 52 dk sürdü; seed-eval-1 52 dk (18:48 → 19:40). Şu an exam-stack (19:40), sonra smoke ve yeni probe'lar.
+- Yavaşlık: `review09-langfuse-clickhouse-1` sürekli ~%99 CPU; başka FF yığını yok. Neden araştırılmadı.
+- Bulunanlar:
+  - test-int llmaas 1 failed: `test_03a_2_read_mode_get_parity`. Yeni `GET /eval-runs/compare` parametresiz 422; deterministik, kod bulgusu (MAJOR).
+  - airgap'te aynısı + `test_09_advance` içindeki 5 zaman duyarlı test (0,2-0,4 sn son süreli r2/r3/r5/K-34 testleri). Yük altında; tek başına yeniden koşacağım.
+- Statik: MAJOR (draft düzenlenince eski sınav kapıyı açıyor) + MINOR'lar.
+- REVIEW-SONUC tahmini 20:30.
+- 1c-b statik okuması bitti (MAJOR yok); `-m models` yeni SHA ve 09-2 sonucundan sonra.
+
+### R-09-0032 · 2026-11-05 19:52 · → koordinator · REVIEW-SONUC
+Paket: 09-2 r1   Cevap: K-09-0046
+**DEGISIKLIK 892bdfecc83f22ae1ac70347bd7f796beef324b2.** Rapor state/reviews/09-2-r1.md. BLOCKER 0, MAJOR 2, MINOR 12, NOTE 15.
+- **MAJOR-1 (KARAR-GEREK):** taslağın sınavı, taslak sonradan düzenlense de kapıyı açıyor (kapı sınavı yalnız `agent_version_id` ile eşliyor, taslak düzenlenebilir, sınav tanımı tutmuyor). Force ve iz olmadan atlatma.
+  - **A (önerilen):** sınav başında tanım özeti `eval_runs.config`'e, kapıda farklıysa 409 `stale_exam` (migration yok);
+  - B sınavlı taslağı düzenlemeyi reddet;
+  - C `updated_at > started_at`.
+- **MAJOR-2:** yeni `GET /eval-runs/compare` `test_03a_2_read_mode_get_parity`'yi kırıyor (parametresiz 422). Deterministik; tam test-int iki profilde kırmızı. İşçi yalnız hedefli koştu. `PARITY_EXEMPT`'e gerekçeyle ya da teste `a`/`b`.
+- **Merge öncesi önerilen MINOR'lar:**
+  - (1) yalnız boşluktan `force_reason` kabul (canlı probe 200);
+  - (9) from-run'da `expected` Langfuse'a maskesiz;
+  - (12) zaman duyarlı `test_09_advance` testleri kararsız: yük altında 5 düştü; tek başına `slow_judge_spreads` 2 koşunun 1'inde düştü, `q2` kesilip yeniden judge ediliyor ama test tek çağrı bekliyor.
+- **Canlı probe'lar:** kapı 409 `no_exam` / 403 / 422 / 422 / 200 + `eval_gate_forced` audit içeriksiz. from-run'da TC ve e-posta maskeli, audit temiz, ikinci kayıt idempotent. **Kişi adı NER kapalı yığında Langfuse öğesine açık gidiyor:** karar gereği (yalnız regex), kod bulgusu değil; NER'siz kurulumda bilinçli bir veri sınırı.
+- Sapma notu 2 pozisyonu: bu PR için kabul; `error.details` additive FOLLOWUP.
+- Kapılar: unit 1755 ×2, lint, alembic, seed-eval, exam-stack 8/8, smoke, P0-P4 yeşil.
+- **Ortam:** langfuse-clickhouse ~%99 CPU, test-int airgap 52 dk.
+
+### R-09-0033 · 2026-11-05 19:52 · → koordinator · YIGIN-KAPA
+review09 `down -v --remove-orphans` (19:51): 0 konteyner, 0 hacim (geçici probe superadmin'leri de silindi). Worktree kaldırıldı. Açık inceleyici yığını yok. Sıradaki: 1c-b r1b (5e9a688).
+
+### R-08T1C-0008 · 2026-11-05 19:53 · → koordinator · ACK
+Paket: 08-tam-1c-b r1 (r1b)   Cevap: K-08T1C-0022
+5e9a68881a4f51d9a2cd1ad91aeab8eaabc0a809 doğrulandı (2a7b430 atası, 1 commit, 7 dosya). Worktree `.worktrees/review-08t1c-b-r1b`; 2a7b430 worktree'si kaldırıldı. Koşular yığınsız, `ffcore/tools:0.0.0-08t1c` imajıyla (build yok): lint, make test ×2, `-m models` (`--network none`, `04a-knowledge-core_model_cache:/models:ro`, komut ve mount logda), gecikme testi yalnız bilgi amaçlı (kabul hedef donanımda, NOT_RUN).

@@ -4014,3 +4014,17 @@ Tam SHA: **5e9a68881a4f51d9a2cd1ad91aeab8eaabc0a809** (2a7b430 + 1 commit 5e9a68
 ### K-08T1C-0023 · 2026-11-05 19:44 · → isci-a (08-tam-1c-b-olcum) · CEVAP
 Paket: 08-tam-1c-b   Cevap: A-08T1C-0020 / A-08T1C-0021
 PR-HAZIR r1b alındı; 5e9a688 doğrulandı (1 commit, 7 dosya, state yok, main ve 09-2 ile çakışma yok). test_02 düşüşü yük/uyku kaynaklı, tek başına 3/3 kabul; 02'ye dokunmaman doğru. VERIFIED. İnceleyiciye SHA güncellendi (K-08T1C-0022; 09-2'den sonra). Dal donar; yığın/konteyner açma; DUZELT gelirse uygula.
+
+### K-09-0048 · 2026-11-05 19:54 · → isci-b (09) · DUZELT
+Paket: 09-2 r1   Cevap: R-09-0032 (state/reviews/09-2-r1.md) / B-09-0056
+**DEGISIKLIK 892bdfe.** Kararlar KARARLAR "09-2 r1 kararları"; HAZIRLIK yönün onaylı. Önce kırmızı test, test/kod ayrı commit:
+1. **MAJOR-1 (A):** `definition_sha256` → `eval_runs.config`; kapıda `stale_exam`; sınav ortası düzenleme → `failed(definition_changed)`; **`stale_suite`** (scorer/eşik/repeat anlık görüntüsü ≠ suite bugünkü). Testler: düzenlenen taslak + eski sınav → 409; sınav ortası düzenleme; suite eşiği değişince kapı kapanır.
+2. **MAJOR-2 (A):** compare yolu `PARITY_EXEMPT_PREFIXES`'e + edit/read kipinde aynı 422 gövdesi testi; 03a testi iki profilde yeşil.
+3. **MINOR merge öncesi:** (1) `force_reason` strip + boş 422; (2) `agent_versions.eval_run_id` kapıyı açan sınavla dolar; (3) `eval_gate_forced` audit'e `via_key_id`; (5) reddedilen from-run kodlu audit olayı (içerik yok); (6+7) judge NER sınıflandırması API hata koduna göre, metin eşleşmesi kalkar; (8) from-run guardrail yapılandırma/uzunluk hataları kodlu 422/503; (9) `expected` de maskeden geçer; (10) OpenAPI 503/502; (12) slow_judge testi "en az bir kez" + paylar; diğer zaman duyarlı testlerde paylar.
+4. **Canlı probe (NER kapalı → kişi adı Langfuse'a açık):** kod reddi yok, kabul edilen davranış; docs/evaluation.md açık cümle + from-run cevabına `masking: "regex" | "regex+ner"` (additive) ekle; test.
+5. MINOR-4/11 FOLLOWUP-176'ya yazıldı, dokunma.
+Kapı: lint, make test iki profil, **tam make test-int iki profil** (03a eşlik ve 18td açıkça), exam-stack, smoke; YIGIN-AÇ (inceleyici 1c-b'de yığınsız; başka yığın yok). PR-HAZIR r2 (tam SHA, delta `892bdfe..`).
+
+### K-09-0049 · 2026-11-05 19:54 · → inceleyici · ACK
+Paket: 09-2 r1   Cevap: R-09-0032 / R-09-0033
+DEGISIKLIK alındı; rapor, kanıtlar, kanal commit edildi. MAJOR-1 A (+ `stale_suite`), MAJOR-2 A (eşlik istisnası + kipler arası eşitlik testi; 200+boş yok); MINOR 1/2/3/5/6/7/8/9/10/12 merge öncesi, 4/11 FOLLOWUP-176; canlı probe davranışı kabul + docs + `masking` alanı (K-09-0048). İyi tur: iki MAJOR da gerçek. YIGIN-KAPA alındı. 1c-b r1b (5e9a688) koşularına geç; sonra 09-2 r2.

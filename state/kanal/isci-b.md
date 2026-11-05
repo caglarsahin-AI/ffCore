@@ -2153,3 +2153,59 @@ Kapılar @ 892bdfe (09-2-gates.log):
 - Hedefli test-int (09 + 06a agents/runs + 07 + 05a sql + 18td): 127 passed / 1 skipped, her iki profilde.
 - seed + seed-eval; stack sınavı 8 passed; smoke passed.
 Dala başka commit atmıyorum; inceleme bekliyorum.
+
+### B-09-0055 · 2026-11-05 · → koordinator · ACK
+Paket: 09-2   Cevap: K-09-0047
+ACK. Dal 892bdfe sabit. Yığın açmıyorum. DUZELT gelirse uygularım. Not 2 sapması için inceleyicinin hata sözleşmesi pozisyonunu bekliyorum.
+
+### B-09-0056 · 2026-11-05 · → koordinator · HAZIRLIK (kod yok, dal 892bdfe donuk)
+Paket: 09-2   Cevap: koordinatör ön bilgisi (r1 MAJOR 1-2 beklentisi)
+
+**MAJOR 1 — `test_03a_2_read_mode_get_parity` kırmızı.**
+Kaynak:
+- Tarama OpenAPI'deki her GET yolunu parametresiz çağırıyor (`test_03a_read_side.py:97`).
+- `/eval-runs/compare` iki zorunlu sorgu parametresi (`a`, `b`) istiyor; parametresiz çağrı FastAPI'de 422 dönüyor.
+- Mevcut istisna öneki `.../eval-runs/{eval_run_id}` bu yolu kapsamıyor.
+
+Kaçışın nedeni: hedefli test-int setime 03a'yı koymadım. Bu bir kapı açığı, olgu olarak yazıyorum.
+
+- **A (önerim):** Yolu `PARITY_EXEMPT_PREFIXES`'e ekle; yanına, eşliği nerede kanıtlandığını gösteren bir yorum yaz. Bu, 04a/05a/06a/07/03c/08/09-1'in kurduğu kalıp (45d901b gibi). Ayrıca `test_09_2_compare_over_http_and_read_mode` bugün yalnız read'i çağırıyor; edit ve read gövdelerinin eşit olduğunu da doğrulasın. Etki: 03a test dosyasında tek satır ve yorum (önceki paketler de bu dosyaya dokundu). Sözleşme değişmez.
+- B: `a` ve `b` isteğe bağlı olsun, parametresiz çağrı 200 ile boş ya da "parametre gerekli" dönsün. **Karşıyım.** Anlamsız bir isteğe başarılı cevap vermek fail-loud'a aykırı; yalnız test için sözleşmeye yapay bir dal eklenir. Zorunlu parametre eksikse 422 doğru sözleşme.
+- C: Tarama, zorunlu sorgu parametrelerini dünyadan doldursun (dünyaya iki tamamlanmış sınav eklenir). Etki: 03a fikstürü 09'a bağımlı hale gelir ve tüm paketlerin taramasının anlamı değişir. 80/20'ye uymuyor.
+
+**MAJOR 2 — taslak sınavdan sonra düzenlenince eski sınav kapıyı açıyor.**
+Kaynak doğrulandı:
+- `PUT /agents/{id}/versions/{v}` yayınlanmamış taslağın `definition`'ını değiştiriyor (`agents.py:339-362`).
+- `gate.gate_failures` yalnız `agent_version_id` ile son `completed` sınava bakıyor.
+- `runner.snapshot` tanım özetini saklamıyor.
+- Ek bulgu: taslak koşan bir sınavın ortasında düzenlenirse, madde koşuları karışık tanımla koşar.
+
+- **A (önerim):** `start_eval`, `eval_runs.config.definition_sha256` alanına kanonik JSON'un (`sort_keys`, `separators`) sha256 özetini yazar. Kapı mevcut tanımın özetini hesaplar; özet farklıysa ya da sınavda hiç özet yoksa yeni sebep `stale_exam` döner. Gerekçe: eski kaydı kanıtsız kabul etmek fail-loud'a aykırı; 09-1 üretimde değil.
+  - Advancer her tick'te özeti karşılaştırır; tanım değişmişse sınav `failed(definition_changed)` olur. Sınav karışık koşmaz.
+  - Etki: migration yok (`config` JSONB). Sebep listesine additive bir değer eklenir. Docs ve OpenAPI'ye açıklama eklenir. 06a dosyasına dokunulmaz.
+- B: `update_version` o sürümün sınavlarını geçersiz kılsın (silsin ya da işaretlesin). Etki: 06a rotası 09 tablosuna yazar; paket bağı ters yönde kurulur ve touch-zone büyür. Sınav ortasındaki düzenleme yine çözülmez.
+- C: Sınav başladıktan sonra taslak donsun (PUT 409). Etki: başarısız bir sınavdan sonra taslağı düzeltip yeniden sınamak imkânsız olur; yeni sürüm açmak zorunlu hale gelir. Akışı bozuyor.
+
+A'nın sınırı: özet yalnız sürümün tanımını kapsıyor. Tanımın dışında değişebilecekler kapsam dışı:
+- tool katalogundaki `needs_approval`,
+- KB içeriği,
+- suite'in eşiği, scorer'ları ve Langfuse dataset maddeleri.
+
+Bunlardan suite eşiği ya da scorer'ı sınavdan sonra değişirse eski sınav eski kurallarla kapıyı açıyor. İstenirse aynı mekanizmayla `config` ile suite'in o anki halini de karşılaştırırım; bunu NOTE olarak işaretliyorum, kararı inceleyici ve sizin.
+
+DUZELT gelince sıram: ACK → kırmızı testler (03a eşliği, edit/read compare eşitliği, düzenlenmiş taslakta `stale_exam`, sınav ortasında düzenlemede `definition_changed`) → kod → YIGIN-AÇ → kapılar. Bu kez 03a'yı da kapsayan tam `make test-int`, iki profilde.
+
+### B-09-0057 · 2026-11-05 · → koordinator · ACK (ön karar)
+Paket: 09-2   Cevap: koordinatör ön kararı (MAJOR 1 A, MAJOR 2 A + `stale_suite`)
+ACK. Dal 892bdfe'de donuk; yığın açmıyorum; REVIEW-SONUC'u bekliyorum.
+
+Uygulama planı (DUZELT gelince):
+- **MAJOR 1:**
+  - compare yolunu exempt listesine ekleyeceğim.
+  - Parametresiz çağrının edit ve read kipinde aynı 422 gövdesini döndüğünü gösteren test.
+  - Parametreli çağrıda edit ve read gövde eşitliği testi.
+- **MAJOR 2:** `config.definition_sha256`, kapıda `stale_exam`, advancer'da `failed(definition_changed)`.
+- **`stale_suite`:** sınavın `config`'indeki `scorers`, `pass_threshold` ve `repeat` değerleri suite'in bugünkü değerleriyle karşılaştırılır.
+  - `approve_tools`'u dışarıda bırakıyorum: true→false değişimi zaten `suite_not_gateable` ya da `incomplete` yoluna düşüyor.
+  - Langfuse dataset madde değişimi bu mekanizmayla yakalanmaz. Bunu docs'a sınır olarak yazacağım.
+- **Kapı:** tam `make test-int` iki profilde. 03a ve 18td ayrıca açıkça koşulacak.

@@ -1,0 +1,8 @@
+M0 add member: 201
+G0 agent=sozlesme-asistani current_version=1 versions=[1]
+F0 run f627152e-958c-46d5-af80-e38dd02fd0ec events=['sources', 'token', 'done']
+F1 from-run (expect 201): 201 {"item_id": "sozlesme-33-run-f627152e-958c-46d5-af80-e38dd02fd0ec", "dataset": "hastane-a.sozlesme-33", "run_id": "f627152e-958c-46d5-af80-e38dd02fd0ec"}
+F2 same run again: 201 {"item_id": "sozlesme-33-run-f627152e-958c-46d5-af80-e38dd02fd0ec", "dataset": "hastane-a.sozlesme-33", "run_id": "f627152e-958c-46d5-af80-e38dd02fd0ec"}
+F3 other member: NOT_RUN in the probe (seed passwords were ephemeral); covered by test_09_from_run
+F4 item ids: sozlesme-33-run-f627152e-958c-46d5-af80-e38dd02fd0ec / sozlesme-33-run-f627152e-958c-46d5-af80-e38dd02fd0ec
+F5 audit eval_item_from_run: n=2 raw_pii_in_audit=[]

@@ -1,0 +1,16 @@
+G0 agent=sozlesme-asistani current_version=1 versions=[1]
+G1 bound suite create: 201 {"id": "c08ab751-a835-49ef-b974-79482da90ac4", "project_id": "0c1ce38f-693f-4338-b38d-deb448e1eaf6", "key": "rv-gate", "name": "Reviewer gate", "agent_id": "a66cb6fe-2f4f-4971-9cd9-9d4a0f4638b4", "langfuse_dataset_name": "hastane-a.rv-gate", "scorers": [{"name": "contains"}], "pass_threshold": 0.8, 
+G2 publish, no exam (expect 409 eval_gate_failed): 409 {"message": "The exam gate refuses version 1: rv-gate=no_exam.", "type": "conflict_error", "code": "eval_gate_failed"}
+G3 editor force (expect 403): 403 {"message": "Only an admin forces the gate.", "type": "permission_error", "code": "force_requires_admin"}
+G4 admin force, no reason (expect 422): 422 {"message": "Forcing the exam gate needs a force_reason.", "type": "invalid_request_error", "code": "force_reason_required"}
+G5 reason without force (expect 422): 422 {"message": "force_reason needs force.", "type": "invalid_request_error", "code": "force_reason_without_force"}
+G6 admin force, blank reason (expect 422): 200 {"id": "a66cb6fe-2f4f-4971-9cd9-9d4a0f4638b4", "project_id": "0c1ce38f-693f-4338-b38d-deb448e1eaf6", "key": "sozlesme-asistani", "name": "Sözleşme Asistanı", "description": "Tedarikçi sözleşmeleri hakkındaki soruları belgelere dayanarak, kaynak göstererek cevaplar.", "status": "published", "kind": "
+G7 admin force + reason (expect 200): 200 {"id": "a66cb6fe-2f4f-4971-9cd9-9d4a0f4638b4", "project_id": "0c1ce38f-693f-4338-b38d-deb448e1eaf6", "key": "sozlesme-asistani", "name": "Sözleşme Asistanı", "description": "Tedarikçi sözleşmeleri hakkındaki soruları belgelere dayanarak, kaynak göstererek cevaplar.", "status": "published", "kind": "
+G8 audit eval_gate_forced: n=2 keys=['action', 'actor_id', 'actor_type', 'after', 'before', 'id', 'ip', 'outcome', 'project_id', 'request_id', 'resource_id', 'resource_type', 'ts'] after={"reason": "reviewer probe 09-2", "suites": [{"key": "rv-gate", "reason": "no_exam", "suite_id": "c08ab751-a835-49ef-b974-79482da90ac4", "eval_run_id": null}], "version": 1, "agent_id": "a66cb6fe-2f4f-4971-9cd9-9d4a0f4638b4"}
+G8 audit publish_agent: n=3 keys=['action', 'actor_id', 'actor_type', 'after', 'before', 'id', 'ip', 'outcome', 'project_id', 'request_id', 'resource_id', 'resource_type', 'ts'] after={"id": "a66cb6fe-2f4f-4971-9cd9-9d4a0f4638b4", "key": "***", "kind": "native", "name": "Sözleşme Asistanı", "status": "published", "created_at": "2026-11-05T15:48:17.707407Z", "project_id": "0c1ce38f-693f-4338-b38d-deb448e1eaf6", "updated_at": "2026-11-05T15:48:17.906447Z", "description": "Tedarikçi sözleşmeleri hakkındaki soruları belgelere dayanarak, kaynak göstererek cevaplar.", "latest_version
+G9 rollback: NOT_RUN (no earlier published version in the seed)
+Traceback (most recent call last):
+  File "/tmp/probe092.py", line 68, in <module>
+    print(f"F0 run {run.run_id} events={run.names()[-3:]}")
+                    ^^^^^^^^^^
+AttributeError: 'Run' object has no attribute 'run_id'
