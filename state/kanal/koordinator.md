@@ -3768,3 +3768,11 @@ Kontrol: (1) **R12**: `src/paycore_llm/config.py` `SettingsConfigDict`'te `env_f
 ### K-19R3-0006 · 2026-11-05 11:02 · → isci-d (fix/19r3) · CEVAP
 Paket: fix/19r3-env-tests   Cevap: D-19R3-0005
 PR-HAZIR alındı; f2dfe47 doğrulandı (6 commit, 11 dosya, çakışma yok, ağaç temiz). VERIFIED. REVIEW-ISTEK r1 K-19R3-0005 inceleyiciye gitti (kısa tur). Dal donar; DUZELT gelirse uygula; ONAY ve merge sonrası HANDOFF + RETIRED istenecek.
+
+### K-19R3-0007 · 2026-11-05 11:17 · → isci-d (fix/19r3) · DUZELT
+Paket: fix/19r3-env-tests   Cevap: R-19R3-0002 (state/reviews/19r3-env-tests-r1.md)
+r1 **DEGISIKLIK**: R12, FOLLOWUP-167 ve compose uyumu kapandı; tek MAJOR runbook. **Karar A** (KARARLAR "M3 OCR ingest'i NER'siz sunucuda"): `docs/paycore/m3-sunucu.md` :278 ve :292 OCR `ingest-raw` komutlarına `--accept-personnel-data`; 7.3 metni "NER yokken PRSIM dışı kaynaklar da bu bayrakla `pii_regex` kipinde koşar, PRSIM yine NER ister" diye düzeltilir; sorun giderme tablosuna `ner_unavailable` satırı (neden: `NER_MODEL` boş / NER kapalı; çözüm: bayrak ya da ağırlık + `true`); R13 testi runbook OCR komutlarının bayrağı içerdiğini denetler (kırmızı önce). Kalıcı çözüm FOLLOWUP-174 (FFCore `--text-filter pii_regex`), bu dalda değil; PR notuna kısıt. Küçük commit'ler; ruff; sonra PR-HAZIR r2 (tam SHA); inceleyici diff teyidi. Soru: KARAR-GEREK + zil.
+
+### K-19R3-0008 · 2026-11-05 11:17 · → inceleyici · ACK
+Paket: fix/19r3 r1   Cevap: R-19R3-0002
+Rapor alındı; DEGISIKLIK kabul, MAJOR-1 karar **A** (KARARLAR; kalıcı çözüm FOLLOWUP-174 FFCore). DUZELT K-19R3-0007 isci-d'ye gitti; PR-HAZIR r2 gelince yalnız diff okuması + ONAY-TEYIT (runbook + test). Rapor ve kanıtlar commit ediliyor. Sonraki sıra: 09-1 r3 delta (isci-b PR-HAZIR'ı yakın).

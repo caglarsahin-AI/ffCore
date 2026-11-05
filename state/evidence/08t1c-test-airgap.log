@@ -1,0 +1,40 @@
+cd backend && pytest tests/unit tests/contract
+============================= test session starts ==============================
+platform linux -- Python 3.12.10, pytest-9.2.0, pluggy-1.7.0
+rootdir: /work/backend
+configfile: pyproject.toml
+plugins: Faker-40.43.0, anyio-4.15.1, langsmith-0.14.8
+collected 1603 items
+
+tests/unit/test_00_1_healthz.py .                                        [  0%]
+tests/unit/test_00_package.py ..                                         [  0%]
+tests/unit/test_00_repo_skeleton.py ...........                          [  0%]
+tests/unit/test_00_smoke_script.py ....                                  [  1%]
+tests/unit/test_01_client.py ..............                              [  1%]
+tests/unit/test_01_config.py ...                                         [  2%]
+tests/unit/test_01_egress_stream.py ..................                   [  3%]
+tests/unit/test_01_r1_safety.py ..............................           [  5%]
+tests/unit/test_01_reconcile_params.py ................                  [  6%]
+tests/unit/test_01_scheduler.py .....                                    [  6%]
+tests/unit/test_01_seed.py .............                                 [  7%]
+tests/unit/test_02_logging.py ...........                                [  7%]
+tests/unit/test_02_pricing.py ...                                        [  8%]
+tests/unit/test_02_r1_logging.py ..............                          [  9%]
+tests/unit/test_02_r1_tracing.py ...                                     [  9%]
+tests/unit/test_02_tracing.py .......................                    [ 10%]
+tests/unit/test_03a_providers_service.py .....                           [ 10%]
+tests/unit/test_03a_session.py ........                                  [ 11%]
+tests/unit/test_03a_write_flag.py ....                                   [ 11%]
+tests/unit/test_03b_auth.py .................                            [ 12%]
+tests/unit/test_03b_config_errors.py ........                            [ 13%]
+tests/unit/test_03b_dns_opt_in.py ..                                     [ 13%]
+tests/unit/test_03b_egress.py .......................................Exception occurred during processing of request from ('127.0.0.1', 34566)
+Traceback (most recent call last):
+... [ 16%]
+............                                                             [ 16%]
+tests/unit/test_04a_convert.py .............................             [ 18%]
+tests/unit/test_04a_redis_pin.py ...                                     [ 18%]
+tests/unit/test_04a_review_r1_audit_fields.py ..                         [ 18%]
+tests/unit/test_04a_review_r1_chunk_budget.py .....                      [ 19%]
+tests/unit/test_04a_review_r1_limits.py ...........                      [ 19%]
+tests/unit/test_04a_review_r1_offline.py 

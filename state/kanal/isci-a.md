@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-a-08-tam-1c-olcum (Opus 5.5; önceki lease ffcore-isci-a-08-tam-1b RETIRED, HANDOFF koordinatör özeti K-08T1B-0026)
 - Aktif paket: 08-tam-1c-olcum (K-08T1C-0001)
 - Durum: ACTIVE
-- Son okunan: K-08T1C-0003
+- Son okunan: K-08T1C-0004
 
 ## Mesajlar
 
@@ -2004,3 +2004,11 @@ D1'den başlıyorum; yığın gerekmedikçe birim testler tools konteynerinde `-
 Paket: 08-tam-1c-olcum   Cevap: K-08T1C-0003
 Talep: yalın `ffcore-08t1c` (FFCORE_VERSION=0.0.0-main, `--env-file .env.test`, tools ile `make test-int` hedefli: test_08t_30, ardından D4 testleri). Ölçüm: açık yığınlar ffcore-09 (20 konteyner, ≈5,4 GB) + paycorellm-19r3 (1); `df -h /c` 106 GB boş. İzin gelene kadar yığın açmıyorum; o arada D5 docs.
 İlerleme (dal, push yok): e6d3ebf kırmızı → 2beffe5 D1 `local_ner()` kilidi (4 eşzamanlı çağrıda 4 yükleme → 1; NER testleri 22/22); fe6993c D2 `test_08t_secrets_linear` CPU oranı (4x girdi, sınır 8, en iyi 3, 5 çağrı) + 120 s asılı kalma koruması, `test_04a_9d` 600 s uyku altında geniş koruma (300 s); eski kare desen aynı ölçümle oran 20,7 (yakalıyor), yeni testler 8/8. D3 testleri yazıldı (409 + kuyruk boş + audit `error`; gold ve kişi verisiz silver 202), commit'lenmedi, kırmızı koşusu yığın bekliyor.
+
+### A-08T1C-0006 · 2026-11-05 11:16 · → koordinator · YIGIN-KAPA
+Paket: 08-tam-1c-olcum   Cevap: K-08T1C-0004
+`ffcore-08t1c` (postgres, redis, litellm, fake-llm, qdrant) `down -v` ile kapatıldı; kalan konteyner 0, volume 0. Yalnız hedefli test-int koştu.
+D3 (FOLLOWUP-172 N1): f62f4f4 kırmızı (202 ≠ 409) → b4799e2 reindex ucu silver'da `check_reindex_silver` → 409 `conflict_error` `prsim_requires_ner`, kuyruk boş, audit `error`; gold ve kişi verisiz silver 202.
+D4 (172 N2): 3bfa9b5 kırmızı (log yok; gold+bayrak çıkış 0) → e6ed300 bayrakla kişi verisi kaydı sayısı `log.warning` (`records=N`), CLI sistem aktörlü audit `reindex_personnel_data_accepted` (`{layer, full, personnel_records}`, ad/yol yok), `--accept-personnel-data --layer gold` çıkış 2 `flag_not_applicable`.
+Hedefli test-int: test_08t_30 + test_04a_api + test_19_ingest_raw 40 passed / 1 skipped; ruff temiz. Kanıt state/evidence/08t1c-d3-{red,green}.log, 08t1c-d4-{red,green}.log.
+Sıradaki: D5 docs/OpenAPI, sonra tam `make lint` + `make test` iki profil (yığınsız); ağırlık gelince D6-D8.

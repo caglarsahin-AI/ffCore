@@ -1,0 +1,42 @@
+ Network review19r3_default  Creating
+ Network review19r3_default  Created
+ Volume "review19r3_paycore_test_venv"  Creating
+ Volume "review19r3_paycore_test_venv"  Created
+ Volume "review19r3_paycore_test_uv_cache"  Creating
+ Volume "review19r3_paycore_test_uv_cache"  Created
+Using CPython 3.12.16 interpreter at: /usr/local/bin/python3
+Creating virtual environment at: /opt/test-venv
+   Building ffcore @ file:///ffcore/backend
+   Building paycore-llm @ file:///app
+Downloading pygments (1.2MiB)
+Downloading mypy (14.6MiB)
+Downloading grpcio (6.7MiB)
+Downloading ruff (9.8MiB)
+Downloading grpcio-tools (2.6MiB)
+Downloading uvloop (4.2MiB)
+Downloading openai (1.7MiB)
+Downloading psycopg-binary (5.0MiB)
+Downloading duckdb (20.5MiB)
+Downloading sqlalchemy (4.5MiB)
+Downloading numpy (15.9MiB)
+Downloading ast-serialize (1.2MiB)
+Downloading pydantic-core (2.1MiB)
+      Built paycore-llm @ file:///app
+ Downloaded pygments
+ Downloaded ast-serialize
+ Downloaded openai
+      Built ffcore @ file:///ffcore/backend
+ Downloaded pydantic-core
+ Downloaded grpcio-tools
+ Downloaded uvloop
+ Downloaded sqlalchemy
+ Downloaded psycopg-binary
+ Downloaded grpcio
+ Downloaded ruff
+ Downloaded mypy
+ Downloaded numpy
+ Downloaded duckdb
+Installed 79 packages in 791ms
+........................................................................ [ 70%]
+..............................                                           [100%]
+102 passed in 7.17s

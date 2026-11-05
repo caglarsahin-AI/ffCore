@@ -1,0 +1,73 @@
+2026-11-05 08:03:03,571 ERROR ffcore.knowledge.raw_ingest ingest-raw failed path=jira/PRSIM/PRSIM-1/PRSIM-1.md error=RuntimeError
+ERROR    ffcore.knowledge.raw_ingest:raw_ingest.py:403 ingest-raw failed path=jira/PRSIM/PRSIM-1/PRSIM-1.md error=RuntimeError
+2026-11-05 08:03:05,343 ERROR ffcore.knowledge.raw_ingest ingest-raw failed path=jira/PRSIM/PRSIM-1/PRSIM-1.md error=RuntimeError
+ERROR    ffcore.knowledge.raw_ingest:raw_ingest.py:403 ingest-raw failed path=jira/PRSIM/PRSIM-1/PRSIM-1.md error=RuntimeError
+2026-11-05 08:03:07,039 ERROR ffcore.knowledge.raw_ingest ingest-raw failed path=jira/PRSIM/PRSIM-1/PRSIM-1.md error=RuntimeError
+ERROR    ffcore.knowledge.raw_ingest:raw_ingest.py:403 ingest-raw failed path=jira/PRSIM/PRSIM-1/PRSIM-1.md error=RuntimeError
+2026-11-05 08:03:08,811 ERROR ffcore.knowledge.raw_ingest ingest-raw failed path=jira/PRSIM/PRSIM-1/PRSIM-1.md error=RuntimeError
+ERROR    ffcore.knowledge.raw_ingest:raw_ingest.py:403 ingest-raw failed path=jira/PRSIM/PRSIM-1/PRSIM-1.md error=RuntimeError
+2026-11-05 08:03:11,472 ERROR ffcore.knowledge.raw_ingest ingest-raw failed path=jira/PRSIM/PRSIM-1/PRSIM-1.md error=RuntimeError
+ERROR    ffcore.knowledge.raw_ingest:raw_ingest.py:403 ingest-raw failed path=jira/PRSIM/PRSIM-1/PRSIM-1.md error=RuntimeError
+2026-11-05 08:03:15,037 ERROR ffcore.knowledge.raw_ingest ingest-raw failed path=jira/PRSIM/PRSIM-1/PRSIM-1.md error=RuntimeError
+ERROR    ffcore.knowledge.raw_ingest:raw_ingest.py:403 ingest-raw failed path=jira/PRSIM/PRSIM-1/PRSIM-1.md error=RuntimeError
+ERROR    ffcore.knowledge.raw_ingest:raw_ingest.py:272 ingest-raw stopped path=jira/PRSIM/PRSIM-1/PRSIM-1.md customer_data=['CREDIT_CARD']
+ERROR    ffcore.knowledge.raw_ingest:raw_ingest.py:272 ingest-raw stopped path=jira/PRSIM/PRSIM-1/PRSIM-1.md customer_data=['TR_NATIONAL_ID']
+ERROR    ffcore.knowledge.raw_ingest:raw_ingest.py:272 ingest-raw stopped path=jira/PRSIM/PRSIM-1/PRSIM-1.md customer_data=['TR_IBAN']
+ERROR    ffcore.knowledge.raw_ingest:raw_ingest.py:272 ingest-raw stopped path=jira/PRSIM/PRSIM-9/PRSIM-9.md customer_data=['CREDIT_CARD']
+______________________ test_19r_155_rerun_retries_failed _______________________
+_____________________ test_19r_155_exception_marks_failed ______________________
+2026-11-05 08:04:10,732 ERROR ffcore.knowledge.raw_ingest ingest-raw failed path=confluence/DEMO/1001.md error=RuntimeError
+2026-11-05 08:04:10,847 ERROR ffcore.knowledge.raw_ingest ingest-raw failed path=confluence/DEMO/1002.md error=RuntimeError
+2026-11-05 08:04:10,958 ERROR ffcore.knowledge.raw_ingest ingest-raw failed path=confluence/DEMO/1003.md error=RuntimeError
+2026-11-05 08:04:11,184 ERROR ffcore.knowledge.raw_ingest ingest-raw failed path=jira/DEMO/DEMO-7.txt error=RuntimeError
+ERROR    ffcore.knowledge.raw_ingest:raw_ingest.py:403 ingest-raw failed path=confluence/DEMO/1001.md error=RuntimeError
+ERROR    ffcore.knowledge.raw_ingest:raw_ingest.py:403 ingest-raw failed path=confluence/DEMO/1002.md error=RuntimeError
+ERROR    ffcore.knowledge.raw_ingest:raw_ingest.py:403 ingest-raw failed path=confluence/DEMO/1003.md error=RuntimeError
+ERROR    ffcore.knowledge.raw_ingest:raw_ingest.py:403 ingest-raw failed path=jira/DEMO/DEMO-7.txt error=RuntimeError
+2026-11-05 08:04:15,393 ERROR ffcore.knowledge.raw_ingest ingest-raw failed path=confluence/DEMO/9001.md error=ValueError
+ERROR    ffcore.knowledge.raw_ingest:raw_ingest.py:403 ingest-raw failed path=confluence/DEMO/9001.md error=ValueError
+2026-11-05 08:04:17,432 ERROR ffcore.knowledge.raw_ingest ingest-raw failed path=confluence/DEMO/1002.md error=ValueError
+ERROR    ffcore.knowledge.raw_ingest:raw_ingest.py:403 ingest-raw failed path=confluence/DEMO/1002.md error=ValueError
+PASSED tests/integration/test_08t_30_reindex_prsim.py::test_08t_30_reindex_refuses_m3_prsim_record_without_flag
+PASSED tests/integration/test_08t_30_reindex_prsim.py::test_08t_30b_cli_reindex_exits_2_with_the_code
+PASSED tests/integration/test_08t_30_reindex_prsim.py::test_08t1c_3_reindex_api_409_prsim
+PASSED tests/integration/test_08t_30_reindex_prsim.py::test_08t1c_3b_reindex_api_ok_without_personnel
+PASSED tests/integration/test_08t_30_reindex_prsim.py::test_08t1c_4_reindex_m3_logged_and_audited
+PASSED tests/integration/test_08t_30_reindex_prsim.py::test_08t1c_4b_accept_flag_with_gold_refused
+PASSED tests/integration/test_04a_api.py::test_04a_kb_create_permissions_and_audit
+PASSED tests/integration/test_04a_api.py::test_04a_kb_create_refuses_other_model_and_overlap
+PASSED tests/integration/test_04a_api.py::test_04a_16_upload_default_acl_is_analyst_and_shown
+PASSED tests/integration/test_04a_api.py::test_04a_upload_acl_open_and_conflict
+PASSED tests/integration/test_04a_api.py::test_04a_upload_read_only_403
+PASSED tests/integration/test_04a_api.py::test_04a_3_admin_document_hidden_from_analyst
+PASSED tests/integration/test_04a_api.py::test_04a_16_empty_acl_not_visible_to_another_project
+PASSED tests/integration/test_04a_api.py::test_04a_18_search_on_behalf_of_user
+PASSED tests/integration/test_04a_api.py::test_04a_15_run_id_header_reaches_kb_queries
+PASSED tests/integration/test_04a_api.py::test_04a_search_open_in_read_only_mode
+PASSED tests/integration/test_04a_api.py::test_04a_delete_document_leaves_search
+PASSED tests/integration/test_04a_api.py::test_04a_reindex_enqueues_job
+PASSED tests/integration/test_04a_api.py::test_04a_read_mode_get_parity
+PASSED tests/integration/test_19_ingest_raw.py::test_19_1_ingest_raw_paycore_like_idempotent
+PASSED tests/integration/test_19_ingest_raw.py::test_19_s1_pii_masked_in_silver_text_raw_and_chunks
+PASSED tests/integration/test_19_ingest_raw.py::test_19_1_search_returns_the_cited_source
+PASSED tests/integration/test_19_ingest_raw.py::test_19_1_limit_first_slice
+PASSED tests/integration/test_19_ingest_raw.py::test_19_s2_raw_dir_missing_and_kb_missing
+PASSED tests/integration/test_19_ingest_raw.py::test_19_1_manifest_full_run
+PASSED tests/integration/test_19_ingest_raw.py::test_19_1_manifest_limit_is_pipeline_evidence
+PASSED tests/integration/test_19_ingest_raw.py::test_19_1_manifest_written_outside_raw_dir_only
+PASSED tests/integration/test_19_ingest_raw.py::test_19_s1_prsim_ingest_with_flag_masks_and_records
+PASSED tests/integration/test_19_ingest_raw.py::test_19_s1_customer_data_in_personnel_source_stops[kart 4111 1111 1111 1111]
+PASSED tests/integration/test_19_ingest_raw.py::test_19_s1_customer_data_in_personnel_source_stops[TC 10000000146]
+PASSED tests/integration/test_19_ingest_raw.py::test_19_s1_customer_data_in_personnel_source_stops[IBAN TR33 0006 1005 1978 6457 8413 26]
+PASSED tests/integration/test_19_ingest_raw.py::test_19_r1_metadata_strings_masked_everywhere
+PASSED tests/integration/test_19_ingest_raw.py::test_19_r1_customer_data_in_prsim_title_stops
+PASSED tests/integration/test_19_ingest_raw.py::test_19_r1_invalid_encoding_refused_and_counted
+PASSED tests/integration/test_19_ingest_raw.py::test_19r_155_rerun_retries_failed
+PASSED tests/integration/test_19_ingest_raw.py::test_19r_155_rerun_retries_gated_keeps_indexed
+PASSED tests/integration/test_19_ingest_raw.py::test_19r_155_exception_marks_failed
+PASSED tests/integration/test_19_ingest_raw.py::test_19r_155_console_statuses_match_manifest
+PASSED tests/integration/test_19_ingest_raw.py::test_19r_r1m1_error_before_registration_counted
+PASSED tests/integration/test_19_ingest_raw.py::test_19r_r1m2_new_version_error_keeps_old_version_searchable
+40 passed, 1 skipped in 96.07s (0:01:36)
+All checks passed!
+3 files already formatted
