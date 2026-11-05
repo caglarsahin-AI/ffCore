@@ -1916,3 +1916,21 @@ Paket: 08-tam-1b r3   Cevap: K-08T1B-0020
   - (N2) `--accept-personnel-data` reindex M3 kipi loglanmıyor (`ingest-raw` gibi `log.warning` + kayıt sayısı); `--layer gold` ile bayrak sessizce etkisiz.
 - 09-1 merge sırası notu geçerli: `ner=HttpNer(settings)` 09-1 dalına.
 Şimdi 09-1 r2 kapı/probe koşusuna dönüyorum.
+
+### R-09-0009 · 2026-11-05 10:09 · → koordinator · REVIEW-SONUC
+Paket: 09-1 r2   Cevap: K-09-0015
+**DEGISIKLIK e13ec6b4efed38787e4d37a7dd134dcf31e11472.** Rapor state/reviews/09-1-r2.md. BLOCKER 0, MAJOR 3, MINOR 8, NOTE 9.
+- r1: MAJOR-2/3/4 ve çoğu MINOR KAPANDI. MAJOR-1'in yeniden çalıştırma yarısı kapandı, sınıflama yarısı açık.
+- MAJOR:
+  - (r2-1) reddedilen `run_sql` madde düzeyinde not_run değil (B-09-0022 A).
+  - (r2-2) 600 sn tick zaman aşımı + süresiz yuva bekleyişi → airgap'te `advance_failed:TimeoutError`.
+  - (r2-3) `sql_error:` metni çalışmış SQL sayılıyor.
+- Yeni MINOR-r2-8: exam-stack testi skorları yoklamıyor. İki koşuda da düştü, her seferinde başka bir skor eksikti; saatler sonra skorlar tamdı (Langfuse gecikmesi). 09-2 kapısı için merge öncesi öneri.
+- Probe P1-P4 geçti: judge'a ham PII gitmiyor; çıktı ayrıştırma adversarial girdilerde doğru; kilit çekişme, bırakma, yenileme ve eski kilit durumlarında doğru.
+- Kapılar: unit iki profil 1623, lint, test-int llmaas 877, alembic, seed, seed-eval idempotent ve smoke yeşil.
+- **ENV önerisi:** Docker yeniden başlatmasından sonra review09 ağında aralıklı DNS düşmesi (`postgres` çözülmüyor, redis zaman aşımı). Yalnız agent-worker-bg ve tools konteynerinde görüldü; agent-worker-bg 7 kez yeniden başladı. airgap test-int iki koşuda da yalnız 09 dışı testlerde kırmızı → NOT_RUN (ortam); r3 tam yığında yeniden.
+- Kesinti 00:46-02:53 rapora yazıldı.
+- worktree git'ten kaldırıldı, dizin Windows izni yüzünden diskte kaldı (temizlik listesine; `--force` yok).
+
+### R-09-0010 · 2026-11-05 10:09 · → koordinator · YIGIN-KAPA
+review09 `down -v --remove-orphans` (10:08): 0 konteyner, 0 hacim. Açık inceleyici yığını yok. Disk boş 106 GB.
