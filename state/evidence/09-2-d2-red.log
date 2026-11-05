@@ -1,0 +1,17 @@
+== 09-2 D2 red @ d4b0e7a 2026-11-05T16:22:22+03:00 (before the ollama_32k usefixtures lint fix; same tests)
+tests/integration/test_09_publish_gate.py:81: AssertionError: {"id":"9bfc5f66-3464-4506-beac-af492ec51909","project_id":"adb22788-913c-4c87-b1ed-ad139aad4512","key":"a-b3c91b5e","name":"A","description":"","status":"published","kind":"native","current_version_id":"981a1a44-2742-4216-939d-49c653b21228","latest_version":1,"created_at":"2026-11-05T13:21:34.889738Z","updated_at":"2026-11-05T13:21:35.034319Z"}
+tests/integration/test_09_publish_gate.py:81: AssertionError: {"id":"6b829dfa-a96f-4d8a-971f-d2c62d3e27a1","project_id":"d5b785de-1032-4a16-9b97-fe3762815833","key":"a-ed76a8f4","name":"A","description":"","status":"published","kind":"native","current_version_id":"f18460a6-18a4-4b76-877b-60fedece5aa3","latest_version":1,"created_at":"2026-11-05T13:21:35.529086Z","updated_at":"2026-11-05T13:21:35.662733Z"}
+tests/integration/test_09_publish_gate.py:81: AssertionError: {"id":"2c2affa3-71a1-4871-bd10-147e45a7872d","project_id":"dec2f463-37db-47f5-bd39-f1c28ff110a5","key":"a-c5c61aa3","name":"A","description":"","status":"published","kind":"native","current_version_id":"b2135f99-860f-469a-913f-fc47dc7409c9","latest_version":2,"created_at":"2026-11-05T13:21:36.015532Z","updated_at":"2026-11-05T13:21:36.250796Z"}
+tests/integration/test_09_publish_gate.py:125: assert (422 == 403)
+tests/integration/test_09_publish_gate.py:151: ImportError: cannot import name 'gate' from 'ffcore.evaluation' (/work/backend/ffcore/evaluation/__init__.py)
+FAILED tests/integration/test_09_publish_gate.py::test_09_2_gate_without_exam_refuses_publish
+FAILED tests/integration/test_09_publish_gate.py::test_09_2_gate_needs_passed_complete_and_nothing_not_run
+FAILED tests/integration/test_09_publish_gate.py::test_09_2_gate_counts_only_the_published_versions_exam
+FAILED tests/integration/test_09_publish_gate.py::test_09_2_force_is_admin_only_needs_a_reason_and_is_audited
+FAILED tests/integration/test_09_publish_gate.py::test_09_2_unattended_suite_on_a_version_asking_approval_is_not_gateable
+5 failed, 3 passed in 12.82s
+
+== after fix @ D2 code:
+All checks passed!
+openapi-ok
+103 passed in 28.28s

@@ -1,0 +1,15 @@
+== 09-2 D1 red @ 30df97f 2026-11-05T16:15:44+03:00
+All checks passed!
+E   ModuleNotFoundError: No module named 'ffcore.evaluation.compare'
+ERROR tests/unit/test_09_compare.py
+E   AssertionError: {"error":{"message":"Invalid request: path.eval_run_id","type":"invalid_request_error","code":"validation_error"}}
+tests/integration/test_09_api.py:185: AssertionError: {"error":{"message":"Invalid request: path.eval_run_id","type":"invalid_request_error","code":"validation_error"}}
+E   AssertionError: assert (422 == 422 and 'validation_error' == 'eval_runs_not_comparable'
+tests/integration/test_09_api.py:205: AssertionError: assert (422 == 422 and 'validation_error' == 'eval_runs_not_comparable'
+FAILED tests/integration/test_09_api.py::test_09_2_compare_over_http_and_read_mode
+FAILED tests/integration/test_09_api.py::test_09_2_compare_other_suite_is_422
+2 failed, 6 deselected in 10.16s
+
+== after fix:
+All checks passed!
+99 passed in 25.86s

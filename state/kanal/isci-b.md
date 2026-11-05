@@ -2123,3 +2123,33 @@ FOLLOWUP-176 kalemleri:
   - r5 NOTE-5 (suite kaydında 422 yerine başlatmada: `EVAL_JUDGE_CALL_S` sonradan değişebilir; docs).
   - r4 NOTE-6/7: docs'ta var; `llm_judge` etiketi kalır.
 Kapı planı: lint, make test ×2, hedefli test-int (09 + 06a agents/publish + 07) ×2, stack sınavı, smoke. Yığın gerekince YIGIN-AÇ.
+
+### B-09-0051 · 2026-11-05 · → koordinator · ACK
+Paket: 09-2   Cevap: K-09-0045
+ACK. KARARLAR "09-2 plan kararları" okundu: S1 A (yayın anında, 409 reason `suite_not_gateable`), S2 A, S3 A. `force` + `force_reason` + audit kabul edildi. from-run egress maskeli; NER=false ortamda yalnız regex maskesi uygulanır (docs). r4 NOTE-3: 4xx → `advance_failed:ner_misconfigured`. Touch-zone teyidi alındı. D1 compare ile başlıyorum: önce test, sonra kod.
+
+### B-09-0052 · 2026-11-05 · → koordinator · YIGIN-AÇ
+Paket: 09-2   Cevap: K-09-0045
+`ffcore-09` (18280/13280): D1-D5 süresince birim ve hedefli test-int; her dilim sonrası açık kalır, PR-HAZIR öncesi `down -v`.
+
+### B-09-0053 · 2026-11-05 17:01 · → koordinator · YIGIN-KAPA
+Paket: 09-2   Cevap: K-09-0045
+`ffcore-09` `down -v` ile kapatıldı (konteyner 0, volume 0).
+
+### B-09-0054 · 2026-11-05 17:02 · → koordinator · PR-HAZIR
+Paket: 09-2   Cevap: K-09-0043 / K-09-0045
+PR: state/pr/09.md, bölüm "PR 09-2" · Sınıf [B]. Branch feat/09-evaluation · SHA **892bdfecc83f22ae1ac70347bd7f796beef324b2**. Taban main 30df97f, 9 commit; her dilim için önce test, sonra kod commit'i. Ağaç temiz; main'e göre farkta `state/` ve migration yok.
+Kapsam:
+- D1 compare: `GET /eval-runs/compare`, yalnız yerel DB.
+- D2 yayın kapısı: 409 `eval_gate_failed`, `<key>=<reason>`; `force` yalnız admin ve `force_reason` zorunlu; `eval_gate_forced` audit'i; `suite_not_gateable` yayın anında; rollback kapısız.
+- D3 from-run: egress maskeli; 422 `run_input_blocked`; audit içeriksiz.
+- D4 FOLLOWUP-176: C ve `ner_misconfigured` + `deadline=0`, ayrıca NOTE-10/7. Testli kapatılanlar: r3 NOTE-1/3/5/11, r4 NOTE-2/4/11. Devredilenler gerekçeleriyle PR tablosunda (r3 NOTE-9/12/14, r4 NOTE-12, r5 NOTE-5).
+- D5 docs.
+PLANNED'dan sapma: kapı hatası suite'leri `details` yerine mesajda listeliyor (`ApiError` `details` taşımıyor; PR not 2).
+Kırmızı kanıt: 09-2-d1..d4-red.log.
+Kapılar @ 892bdfe (09-2-gates.log):
+- build, config, lint (iki profil): yeşil.
+- make test: 1755 / 1755.
+- Hedefli test-int (09 + 06a agents/runs + 07 + 05a sql + 18td): 127 passed / 1 skipped, her iki profilde.
+- seed + seed-eval; stack sınavı 8 passed; smoke passed.
+Dala başka commit atmıyorum; inceleme bekliyorum.

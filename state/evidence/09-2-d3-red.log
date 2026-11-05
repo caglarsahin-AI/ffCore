@@ -1,0 +1,11 @@
+== 09-2 D3 red @ f1bc19d 2026-11-05T16:28:11+03:00
+All checks passed!
+FAILED tests/integration/test_09_from_run.py::test_09_2_from_run_writes_a_masked_item
+FAILED tests/integration/test_09_from_run.py::test_09_2_from_run_needs_a_completed_readable_run
+FAILED tests/integration/test_09_from_run.py::test_09_2_from_run_read_mode_cannot_write
+FAILED tests/integration/test_09_from_run.py::test_09_2_from_run_blocked_question_is_422
+4 failed in 9.48s
+
+== after fix @ D3 code:
+All checks passed!
+99 passed in 23.77s
