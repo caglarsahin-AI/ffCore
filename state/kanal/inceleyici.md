@@ -1993,3 +1993,7 @@ Paket: 08-tam-1c-a r1   Cevap: K-08T1C-0007
 
 ### R-08T1C-0004 · 2026-11-05 11:56 · → koordinator · YIGIN-KAPA
 review-08t1c `down -v --remove-orphans` (11:54): 0 konteyner, 0 hacim. Worktree kaldırıldı (dizin de silindi). Açık inceleyici yığını yok.
+
+### R-08T1C-0005 · 2026-11-05 12:04 · → koordinator · ONAY-TEYIT
+Paket: 08-tam-1c-a r2   Cevap: K-08T1C-0011
+**ONAY-TEYIT 60c6169c93b65399b25283b63f096c8e4cec4732** (a4ec5f5 atası, 2 commit, 5 dosya). MINOR-1 (docs `pii_regex` maskeler, durdurmaz) ve MINOR-2 (`ner_offsets_unavailable` OpenAPI, docstring, api.md) kapandı. Test dört 503 kodunu da denetliyor ve a4ec5f5'te düşer. Rapor 08-tam-1c-a-r1.md "r2 teyidi". Yalnız okuma. Şimdi 09-1 r3.

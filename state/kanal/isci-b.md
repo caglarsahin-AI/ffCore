@@ -1852,3 +1852,29 @@ ACK. Okudum: 09-1-r2 raporu (tamamı) ve KARARLAR "09-1 r2 kararları". Sıra ş
 ### B-09-0028 · 2026-11-05 · → koordinator · YIGIN-AÇ
 Paket: 09-1 r3   Cevap: K-09-0018
 `ffcore-09` (18280/13280) açılıyor: önce yalnız tools konteyneri (birim testleri), kapılarda tam yığın.
+
+### B-09-0029 · 2026-11-05 12:02 · → koordinator · YIGIN-KAPA
+Paket: 09-1 r3   Cevap: K-09-0018
+`ffcore-09` `down -v` ile kapatıldı (konteyner 0, volume 0).
+
+### B-09-0030 · 2026-11-05 12:03 · → koordinator · PR-HAZIR
+Paket: 09-1 r3   Cevap: K-09-0017 / K-09-0018
+PR: state/pr/09.md, bölüm "PR 09-1 r3" · Sınıf [B]. Branch feat/09-evaluation · SHA **472e04faffb8d6cb75b9ea1c77ac75098c7a5e40**. Ağaç temiz; main'e göre farkta `state/` yok.
+e13ec6b üstüne commit'ler:
+- d0b1d76: main merge (1b).
+- 0a02d0f: `EgressGuard ner=`.
+- a5d91ad: yalnız testler (kırmızı).
+- 6b3cc78 ve 472e04f: mcp-sql araç hatası.
+- 744364a: ilerletici düzeltmeleri.
+- 6568069: docs.
+Kapsam: MAJOR-r2-1, 2, 3 ve MINOR-r2-1..8.
+Ek bulgu (kendi hatam, düzeltildi): MCP SDK, fırlatılan `ToolError` metninin başına "Error executing tool …" ekliyor. 6568069'daki tam test-int bunu 05a testleriyle yakaladı; 472e04f `CallToolResult(is_error=True)` döndürüyor. Kod öneki korunuyor.
+Başka paket dosyaları (onaylı, additive): `mcp_sql.py`, `mcp_sql_server.py`, `runtime/adapters.py`. Test değişiklikleri: `test_05a_sql.py` (yeni test) ve e2e `test_18_f1_f3_answers.py` (F3 yardımcısı artık `is_error` ile ret metninin eşleşmesini istiyor).
+Kanıt @ 472e04f (state/evidence/09-1-r3-gates.log):
+- build, config, lint (iki profil): yeşil.
+- make test: llmaas 1712 / airgap 1712.
+- alembic: tek head + gidiş-dönüş.
+- **tam test-int: llmaas 892 passed / 13 skipped, airgap 892 passed / 13 skipped** (r2'deki airgap NOT_RUN kapandı).
+- seed + seed-eval; stack sınavı **8 passed**; e2e F1-F3 4 passed / 3 skipped; smoke passed.
+Kırmızı kanıt: 09-1-r3-red-unit.log (14 failed / 8 passed @ 0a02d0f) ve 09-1-r3-red-ner.log.
+Dala başka commit atmıyorum; delta inceleme bekliyorum.

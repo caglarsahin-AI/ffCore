@@ -1,6 +1,6 @@
 # PR 1c-a: 08 tam dilim 1c — FOLLOWUP-168/172/174 (ağırlıksız); ölçüm 1c-b'de
 
-**Paket:** 08-tam-1c-olcum · **Sınıf:** [B]; ağırlık indirme [C] kullanıcıda (ENV-163) · **Branch:** feat/08-tam-1c-olcum · **Baz commit:** 8aa8442 (main; 63ffb16 + state) · **Oturum:** ffcore-isci-a-08-tam-1c-olcum (Opus 5.5) · **GOREV:** K-08T1C-0001, iş sırası A (K-08T1C-0002) · **Durum:** VERIFIED (1c-a, K-08T1C-0005 B: iki PR) · **HEAD:** a4ec5f565c076a232e392f93557ffdf10d1cb69b (13 commit; main ile çakışma yok) · D6-D8 ölçüm ayrı PR 1c-b (`feat/08-tam-1c-b-olcum`, ENV-163 sonrası)
+**Paket:** 08-tam-1c-olcum · **Sınıf:** [B]; ağırlık indirme [C] kullanıcıda (ENV-163) · **Branch:** feat/08-tam-1c-olcum · **Baz commit:** 8aa8442 (main; 63ffb16 + state) · **Oturum:** ffcore-isci-a-08-tam-1c-olcum (Opus 5.5) · **GOREV:** K-08T1C-0001, iş sırası A (K-08T1C-0002) · **Durum:** r1 ONAY + DUZELT küçük (K-08T1C-0009) uygulandı · **HEAD:** 60c6169c93b65399b25283b63f096c8e4cec4732 (15 commit; r1 HEAD a4ec5f5) · D6-D8 ölçüm ayrı PR 1c-b (`feat/08-tam-1c-b-olcum`, ENV-163 sonrası)
 
 ## Plan
 
@@ -67,12 +67,18 @@ Hepsi `FFCORE_VERSION=0.0.0-main`, `--env-file .env.test`, tools konteyneri (hos
 | `-m models`, `models-check --network none`, ölçüm | | NOT_RUN (ENV-163) | |
 Yığın `down -v` ile kapatıldı (konteyner 0, volume 0).
 
+## Review r1 bulgu → düzeltme → kanıt
+| Bulgu | Test commit'i | Düzeltme | Kanıt |
+|---|---|---|---|
+| MINOR-1 docs `pii_regex` "durdurur" | — (metin) | 60c6169 | docs/bilgi-tabani.md: regex kategorileri maskelenir, koşu durmaz, NER yok, PRSIM ret; varsayım 3 düzeltildi |
+| MINOR-2 NER 503'te `ner_offsets_unavailable` yok | b1cd3ab (düştü: eksik kod) | 60c6169 | `test_08t1c_5` dört kod (`model_missing` dahil, NOTE-6); 08.yaml yeniden üretildi; contract 85/85; `make lint` 0 (`08t1c-a-r2-lint.log`) |
+
 ## Varsayımlar ve brief'teki çelişkiler
 0. **plan/19 S1 testi değişti (koordinatör kabulü K-08T1C-0006, inceleyici bakar).** Eski kural (`test_19_s1_masking_cannot_be_disabled`): `ingest-raw`'ın hiçbir seçeneğinin adında `mask` ya da `filter` geçmez. Yeni kural: adında `mask`/`filter` geçen tek seçenek `--text-filter`, seçimleri tam `{pii_ner, pii_regex}`. Gerekçe: testin amacı "maskeleme adla kapatılamaz" (plan/19 S1); FOLLOWUP-174 kararı (K-08T1C-0005) açık bir filtre seçeneği istiyor; iki seçim de maskeler (`pii_regex` kimlik numaralarını, `pii_ner` ek olarak kişi adlarını), kapatan değer yok (`none` argparse 2, `test_08t1c_6e`), PRSIM `pii_regex` ile reddedilir (`test_08t1c_6b`); yani amaç korunur, yalnız ad tabanlı yasak dar sınıf tabanlı denetime döner.
 1. FOLLOWUP-172 N2 "audit olayı": reindex CLI'sı istek bağlamı dışında; olay sistem aktörlü yazılır (`actor_type=system`), içerik yok, yalnız KB kimliği ve kayıt sayısı.
 2. `test_04a_9d` 04a'nın testi; GOREV bu dalda açıkça istediği için dokunuluyor, yalnız süre iddiası.
 
-3. FOLLOWUP-174: `--text-filter pii_regex` seçmek operatörün "kaynaklarda kişi verisi yok" beyanıdır; kişi verisi olan PRSIM dışındaki bir kaynak için de bu beyan yanlışsa adlar maskelenmez (regex kimlik numaraları yine maskelenir, müşteri verisi durdurması aynen). docs/bilgi-tabani.md bunu açık yazar.
+3. FOLLOWUP-174: `--text-filter pii_regex` seçmek operatörün "kaynaklarda kişi verisi yok" beyanıdır; beyan yanlışsa adlar maskelenmez. Regex kimlik numaraları (kart, IBAN, TC, e-posta, telefon) maskelenir; koşu onlarda **durmaz** (müşteri verisinde durma yalnız kişi verisi yolunun kuralıdır; r1 MINOR-1 düzeltmesi). docs/bilgi-tabani.md bunu açık yazar.
 4. D3: `check_reindex_silver` uçta kendi oturumunu açar (istek oturumu değil); yalnız SELECT.
 
 ## Kalan riskler

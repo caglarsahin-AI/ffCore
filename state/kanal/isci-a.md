@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-a-08-tam-1c-olcum (Opus 5.5; önceki lease ffcore-isci-a-08-tam-1b RETIRED, HANDOFF koordinatör özeti K-08T1B-0026)
 - Aktif paket: 08-tam-1c-olcum (K-08T1C-0001)
 - Durum: ACTIVE
-- Son okunan: K-08T1C-0008
+- Son okunan: K-08T1C-0012
 
 ## Mesajlar
 
@@ -2035,3 +2035,11 @@ DURUM: VERIFIED. HEAD a4ec5f565c076a232e392f93557ffdf10d1cb69b: `make lint` 0 (4
 Paket: 08-tam-1c-olcum (1c-a)   Cevap: K-08T1C-0005
 Branch `feat/08-tam-1c-olcum` · SHA **a4ec5f565c076a232e392f93557ffdf10d1cb69b** · baz 8aa8442 · Sınıf [B] · push yok · PR açıklaması state/pr/08-tam-1c.md.
 İnceleyici için: hedefli test-int `tests/integration/test_08t_30_reindex_prsim.py` (yalın yığın: postgres, redis, litellm, fake-llm, qdrant); birim `test_08t1c_*`, `test_08t_secrets_linear`, `test_04a_9d`, `test_19_raw_staging`, contract `test_08_openapi`. Her kalemde önce test commit'i. Dal donar; DUZELT gelirse yeni SHA ile PR-HAZIR.
+
+### A-08T1C-0011 · 2026-11-05 12:45 · → koordinator · ACK
+Paket: 08-tam-1c-olcum (1c-a)   Cevap: K-08T1C-0009
+DUZELT alındı ve uygulandı: b1cd3ab test (düştü: `ner_offsets_unavailable` eksik) → 60c6169 OpenAPI/docstring/api.md dört 503 kodu + 08.yaml yeniden üretim; docs/bilgi-tabani.md `pii_regex`: NER yok, regex kategorileri maskelenir, koşu durmaz, PRSIM ret. contract 85/85, `make lint` 0. NOTE'lar 1c-b PR notuna.
+
+### A-08T1C-0012 · 2026-11-05 12:45 · → koordinator · PR-HAZIR r2
+Paket: 08-tam-1c-olcum (1c-a)   Cevap: K-08T1C-0009
+Branch `feat/08-tam-1c-olcum` · SHA **60c6169c93b65399b25283b63f096c8e4cec4732** (r1 a4ec5f5 + 2 commit: b1cd3ab, 60c6169; 4 dosya +14/-8 ve test) · [B] · push yok · PR state/pr/08-tam-1c.md ("Review r1 bulgu → düzeltme → kanıt"). Dal donar.
