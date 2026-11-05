@@ -15,6 +15,7 @@ EXPECTED = {
     P + "/eval-suites/{suite_id}": {"get", "patch", "delete"},
     P + "/eval-suites/{suite_id}/run": {"post"},
     P + "/eval-suites/{suite_id}/runs": {"get"},
+    P + "/eval-runs/compare": {"get"},  # 09-2 D1
     P + "/eval-runs/{eval_run_id}": {"get"},
     P + "/eval-runs/{eval_run_id}/cancel": {"post"},
     P + "/eval-runs/{eval_run_id}/stream": {"get"},

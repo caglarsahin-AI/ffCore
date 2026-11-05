@@ -466,6 +466,84 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorBody'
+  /api/v1/projects/{project_id}/eval-runs/compare:
+    get:
+      tags:
+      - evaluation
+      summary: Compare Eval Runs
+      description: 'Item by item difference of two completed exams of one suite (09-2), read from FFCore''s
+
+        own results; not-run items are `not_comparable`. Declared before `/eval-runs/{id}`.'
+      operationId: compare_eval_runs_api_v1_projects__project_id__eval_runs_compare_get
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      - name: a
+        in: query
+        required: true
+        schema:
+          type: string
+          format: uuid
+          description: The exam compared against (earlier).
+          title: A
+        description: The exam compared against (earlier).
+      - name: b
+        in: query
+        required: true
+        schema:
+          type: string
+          format: uuid
+          description: The exam compared (later).
+          title: B
+        description: The exam compared (later).
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompareOut'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
   /api/v1/projects/{project_id}/eval-runs/{eval_run_id}:
     get:
       tags:
@@ -666,6 +744,164 @@ paths:
                 $ref: '#/components/schemas/ErrorBody'
 components:
   schemas:
+    CompareItem:
+      properties:
+        item_id:
+          type: string
+          title: Item Id
+        style:
+          type: string
+          title: Style
+        change:
+          type: string
+          enum:
+          - fixed
+          - regressed
+          - same
+          - not_comparable
+          - only_a
+          - only_b
+          title: Change
+        a:
+          anyOf:
+          - $ref: '#/components/schemas/CompareSide'
+          - type: 'null'
+        b:
+          anyOf:
+          - $ref: '#/components/schemas/CompareSide'
+          - type: 'null'
+        mean_delta:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Mean Delta
+          description: b - a over the scorers that ran; None if not.
+      type: object
+      required:
+      - item_id
+      - style
+      - change
+      - a
+      - b
+      - mean_delta
+      title: CompareItem
+    CompareOut:
+      properties:
+        a:
+          type: string
+          format: uuid
+          title: A
+        b:
+          type: string
+          format: uuid
+          title: B
+        suite_id:
+          type: string
+          format: uuid
+          title: Suite Id
+        complete:
+          additionalProperties:
+            type: boolean
+          type: object
+          title: Complete
+        config_differs:
+          type: boolean
+          title: Config Differs
+        summary:
+          $ref: '#/components/schemas/CompareSummary'
+        counts:
+          additionalProperties:
+            type: integer
+          type: object
+          title: Counts
+        items:
+          items:
+            $ref: '#/components/schemas/CompareItem'
+          type: array
+          title: Items
+        worst:
+          items:
+            $ref: '#/components/schemas/CompareItem'
+          type: array
+          title: Worst
+          description: 'At most 10: regressions, then mean drops.'
+      type: object
+      required:
+      - a
+      - b
+      - suite_id
+      - complete
+      - config_differs
+      - summary
+      - counts
+      - items
+      - worst
+      title: CompareOut
+      description: 'Exam `b` against exam `a` (same suite, both completed). `complete` and
+
+        `config_differs` say how far the two are comparable.'
+    CompareSide:
+      properties:
+        passed:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Passed
+          description: 'None: the item was not run in this exam.'
+        mean:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Mean
+        outcome:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Outcome
+        note:
+          type: string
+          title: Note
+      type: object
+      required:
+      - passed
+      - mean
+      - outcome
+      - note
+      title: CompareSide
+    CompareSummary:
+      properties:
+        pass_rate:
+          $ref: '#/components/schemas/MetricDiff'
+        scored:
+          $ref: '#/components/schemas/MetricDiff'
+        passed_items:
+          $ref: '#/components/schemas/MetricDiff'
+        scores:
+          additionalProperties:
+            $ref: '#/components/schemas/MetricDiff'
+          type: object
+          title: Scores
+        outcomes:
+          additionalProperties:
+            $ref: '#/components/schemas/MetricDiff'
+          type: object
+          title: Outcomes
+        not_run:
+          additionalProperties:
+            additionalProperties:
+              type: integer
+            type: object
+          type: object
+          title: Not Run
+      type: object
+      required:
+      - pass_rate
+      - scored
+      - passed_items
+      - scores
+      - outcomes
+      - not_run
+      title: CompareSummary
     ErrorBody:
       properties:
         error:
@@ -791,6 +1027,32 @@ components:
       - ended_at
       - created_at
       title: EvalRunOut
+    MetricDiff:
+      properties:
+        a:
+          anyOf:
+          - type: number
+          - type: integer
+          - type: 'null'
+          title: A
+        b:
+          anyOf:
+          - type: number
+          - type: integer
+          - type: 'null'
+          title: B
+        delta:
+          anyOf:
+          - type: number
+          - type: integer
+          - type: 'null'
+          title: Delta
+      type: object
+      required:
+      - a
+      - b
+      - delta
+      title: MetricDiff
     ScorerConfig:
       properties:
         name:

@@ -127,3 +127,54 @@ class EvalRunOut(BaseModel):
 
 class EvalRunList(BaseModel):
     items: list[EvalRunOut]
+
+
+# --- 09-2: comparing two exams ---------------------------------------------------------------
+
+Change = Literal["fixed", "regressed", "same", "not_comparable", "only_a", "only_b"]
+
+
+class MetricDiff(BaseModel):
+    a: float | int | None
+    b: float | int | None
+    delta: float | int | None
+
+
+class CompareSide(BaseModel):
+    passed: bool | None = Field(description="None: the item was not run in this exam.")
+    mean: float | None
+    outcome: str | None
+    note: str
+
+
+class CompareItem(BaseModel):
+    item_id: str
+    style: str
+    change: Change
+    a: CompareSide | None
+    b: CompareSide | None
+    mean_delta: float | None = Field(description="b - a over the scorers that ran; None if not.")
+
+
+class CompareSummary(BaseModel):
+    pass_rate: MetricDiff
+    scored: MetricDiff
+    passed_items: MetricDiff
+    scores: dict[str, MetricDiff]
+    outcomes: dict[str, MetricDiff]
+    not_run: dict[str, dict[str, int]]
+
+
+class CompareOut(BaseModel):
+    """Exam `b` against exam `a` (same suite, both completed). `complete` and
+    `config_differs` say how far the two are comparable."""
+
+    a: UUID
+    b: UUID
+    suite_id: UUID
+    complete: dict[str, bool]
+    config_differs: bool
+    summary: CompareSummary
+    counts: dict[str, int]
+    items: list[CompareItem]
+    worst: list[CompareItem] = Field(description="At most 10: regressions, then mean drops.")

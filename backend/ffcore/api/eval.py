@@ -17,6 +17,7 @@ from sqlalchemy import func, select
 
 from ffcore.api.common import ERROR_RESPONSES, SessionDep, conflict, invalid, not_found
 from ffcore.api.eval_schemas import (
+    CompareOut,
     EvalRunList,
     EvalRunOut,
     SuiteCreate,
@@ -29,6 +30,7 @@ from ffcore.core.audit import audited, request_context
 from ffcore.core.auth import Actor, require_role
 from ffcore.core.config import Settings, get_settings
 from ffcore.core.errors import ApiError
+from ffcore.evaluation.compare import CompareError, compare
 from ffcore.evaluation.langfuse_api import LangfuseApi, LangfuseApiError
 from ffcore.evaluation.runner import Starter, start_eval
 from ffcore.models.agents import Agent, AgentVersion
@@ -355,6 +357,29 @@ async def list_eval_runs(project_id: UUID, suite_id: UUID, actor: Reader, sessio
         .order_by(EvalRun.created_at.desc())
     )
     return EvalRunList(items=[run_out(r) for r in rows])
+
+
+@router.get("/eval-runs/compare", response_model=CompareOut)
+async def compare_eval_runs(
+    project_id: UUID,
+    actor: Reader,
+    session: SessionDep,
+    a: Annotated[UUID, Query(description="The exam compared against (earlier).")],
+    b: Annotated[UUID, Query(description="The exam compared (later).")],
+):
+    """Item by item difference of two completed exams of one suite (09-2), read from FFCore's
+    own results; not-run items are `not_comparable`. Declared before `/eval-runs/{id}`."""
+    first = await _eval_run(session, project_id, a)
+    second = await _eval_run(session, project_id, b)
+    try:
+        return compare(first, second)
+    except CompareError as exc:
+        raise ApiError(
+            422,
+            "invalid_request_error",
+            "eval_runs_not_comparable",
+            f"The two exams cannot be compared ({exc.reason}).",
+        ) from None
 
 
 @router.get("/eval-runs/{eval_run_id}", response_model=EvalRunOut)
