@@ -68,7 +68,10 @@ class VersionOut(BaseModel):
     created_by: str = Field(description="Actor id that created the version.")
     created_at: datetime
     published_at: datetime | None
-    eval_run_id: UUID | None = Field(description="Exam run that gated publishing (09); null.")
+    eval_run_id: UUID | None = Field(
+        description="The exam that opened the publish gate (09-2); null when the gate was forced "
+        "or the agent has no bound suite."
+    )
 
 
 class VersionList(BaseModel):

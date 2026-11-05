@@ -384,9 +384,11 @@ async def publish_agent(
 ):
     """Publish a version: runs without an explicit version use it. The exam gate (09-2): every
     live suite bound to the agent needs a latest completed exam of this version that passed,
-    is complete and has nothing not run; otherwise 409 `eval_gate_failed` naming each suite as
-    `<key>=<reason>`. An admin may pass `force` with a `force_reason` (audited)."""
-    from ffcore.evaluation.gate import gate_failures
+    is complete, has nothing not run and examined the version and the suite as they are now
+    (r1 MAJOR-1: `stale_exam`, `stale_suite`); otherwise 409 `eval_gate_failed` naming each
+    suite as `<key>=<reason>`. An admin may pass `force` with a `force_reason` (audited). The
+    version keeps the exam that opened the gate (`eval_run_id`; r1 MINOR-2)."""
+    from ffcore.evaluation.gate import check_gate
 
     if body.force_reason is not None and not body.force:
         raise ApiError(
@@ -397,7 +399,8 @@ async def publish_agent(
     definition = parse_definition(row.definition)
     # The model may have changed since the draft was saved: checked again (C13).
     await check_context(session, project_id, definition, settings)
-    failures = await gate_failures(session, project_id, agent.id, row.id, definition)
+    gate = await check_gate(session, project_id, agent.id, row, definition)
+    failures = gate.failures
     if failures and not body.force:
         listed = ", ".join(f"{f.key}={f.reason}" for f in failures)
         raise ApiError(
@@ -412,7 +415,8 @@ async def publish_agent(
             raise ApiError(
                 403, "permission_error", "force_requires_admin", "Only an admin forces the gate."
             )
-        if not body.force_reason:
+        reason = (body.force_reason or "").strip()  # r1 MINOR-1: blank is no reason
+        if not reason:
             raise ApiError(
                 422,
                 "invalid_request_error",
@@ -435,13 +439,17 @@ async def publish_agent(
                     after={
                         "agent_id": str(agent.id),
                         "version": row.version,
-                        "reason": body.force_reason,
+                        "reason": reason,
                         "suites": [f.public() for f in failures],
                     },
                     request_id=request_id,
                     ip=ip,
+                    via_key_id=getattr(actor, "via_key_id", None),  # r1 MINOR-3
                 ),
             )
+    # r1 MINOR-2: the exam that opened the gate (with several suites the latest that passed);
+    # none when the gate was forced or the agent has no bound suite.
+    row.eval_run_id = gate.passed[0].id if gate.passed and not failures else None
     await _point_at(session, agent, row)
     return await agent_out(session, agent)
 
