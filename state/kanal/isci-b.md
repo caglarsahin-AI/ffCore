@@ -2264,3 +2264,7 @@ Notlar:
 - İlk koşu bir hatamı yakaladı: from-run ret audit'i rollback'ten sonra kimlik okuyordu, `MissingGreenlet`. b809b3a ile düzeltildi.
 - PR not 8: var olan bir sıra bağımlılığı. `test_06a_agents` → `test_03a` sırasıyla koşulunca 03a `SecretDecryptError` ile düşüyor; tam koşuda alfabetik sıra yüzünden görünmüyor. FOLLOWUP önerisi.
 - Touch-zone: `ner.py` (08) additive; 1c-b'nin aynı dosyadaki değişikliği başka bölgede.
+
+### B-09-0062 · 2026-11-05 · → koordinator · ACK
+Paket: 09-2 r2   Cevap: K-09-0051
+ACK. 4e2fcad VERIFIED, REVIEW-ISTEK r2 inceleyicide; not 8 → FOLLOWUP-180. Dal donuk; main kapısı bitene kadar koşu ve yığın yok. DUZELT gelirse uygularım.

@@ -1,0 +1,25 @@
+P0 GUARDRAIL_EGRESS_ENABLED=True
+P1 real EgressGuard builtin: action=tokenize raw_left=[]
+P1 out="Question: Müşteri TC <<PII_1>> için iade nasıl yapılır?\nExpected answer: <<PII_2>> adresine bildirim, IBAN <<PII_3>>\nAssistant's answer: <<PII_4>> numaralı hattan aradık."
+P2 judge(): model_saw_raw=[] score=Score(name='llm_judge', value=0.75, passed=True, comment='score=4', status='ok')
+P3 json ok: score=5 reason_len=1
+P3 json string score: JudgeParseError judge_output_unreadable
+P3 json float: JudgeParseError judge_output_unreadable
+P3 json bool: JudgeParseError judge_output_unreadable
+P3 prose with SCORE line: score=2 reason_len=0
+P3 prose echoing answer then own: JudgeParseError judge_output_unreadable
+P3 out of range: JudgeParseError judge_score_out_of_range
+P3 fenced json: score=3 reason_len=1
+P3 empty: JudgeParseError judge_output_unreadable
+P3 reason 900 chars: score=3 reason_len=500
+P3 fenced json with quoted score in reason: score=2 reason_len=20
+P3 two SCORE lines: JudgeParseError judge_output_ambiguous
+P3 SCORE line inside prose sentence: JudgeParseError judge_output_unreadable
+P4 contention: first=True second=False
+P4 released after normal exit: True
+P4 released after exception: True
+P4 released after cancel: True
+P4 renewed while held (ttl 3, held 5 s): held=True ttl_now=2
+P4 stale lock present: acquired=False
+P4 stale lock after TTL: acquired=True
+P4 LOCK_TTL_S=60 TICK_TIMEOUT_S=600

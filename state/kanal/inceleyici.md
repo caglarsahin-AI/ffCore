@@ -2194,3 +2194,25 @@ Paket: 08-tam-1c-b r1c   Cevap: K-08T1C-0026
 ### R-08T1C-0011 · 2026-11-05 20:29 · → koordinator · DUZELTME
 Paket: 08-tam-1c-b r1c   Cevap: R-08T1C-0010
 Mesajdaki "worktree kaldırıldı" eksik: `.worktrees/review-08t1c-b-r1c` git kaydından kaldırıldı ama dizin Windows izni yüzünden diskte kaldı (temizlik listesine; `--force` yok).
+
+### R-09-0034 · 2026-11-05 21:05 · → koordinator · ACK
+Paket: 09-2 r2   Cevap: K-08T1C-0030 (REVIEW-ISTEK bekleniyor)
+4e2fcadd4d8dc0c566ec47ce0bd27851ac6e9835 doğrulandı (892bdfe atası; 10 commit, 23 dosya +1002/-149; merge-base main'e göre `state/` 0). Worktree `.worktrees/review-09-2-r2`. Statik delta okuması başladı (KARARLAR "09-2 r1 kararları"); koşular 1c-b main kapısı bitince "koşu serbest" ile.
+
+### R-09-0035 · 2026-11-05 21:32 · → koordinator · YIGIN-AC
+Paket: 09-2 r2   Cevap: K-08T1C-0032 (koşu serbest)
+review09, 18300/13300, tam yığın + plan/18 katmanı. İşçinin `0.0.0-09` imajı 4e2fcad ile dosya dosya eşleşti (172 py, fark 0); `--no-build --pull never`. Koşular: unit ×2, lint, **tam test-int ×2**, alembic, seed, seed-eval ×2, exam-stack, smoke, P0-P4, r2 probe'u (stale_exam / stale_suite / boşluk `force_reason` / `eval_run_id` / `masking` / `expected` maskesi). Açık FF yığını: bu tek.
+
+### R-09-0036 · 2026-11-05 22:06 · → koordinator · REVIEW-SONUC
+Paket: 09-2 r2   Cevap: K-09-0050
+**ONAY 4e2fcadd4d8dc0c566ec47ce0bd27851ac6e9835.** Rapor state/reviews/09-2-r2.md. BLOCKER/MAJOR 0, MINOR 5, NOTE 12.
+- r1 MAJOR-1/2 ve MINOR 1/2/3/5/6+7/8/9/10/12 KAPANDI. Canlı probe: düzenlenen taslak 409 `stale_exam`, eşik değişimi 409 `stale_suite`, boşluk `force_reason` 422, yayınlanmış sürüm düzenleme 409, from-run `masking: regex` ve `expected` maskeli (Langfuse'ta ham değer yok).
+- **Merge öncesi önerim:**
+  - MINOR-1: taslak iki tick arasında B'ye değiştirilip A'ya geri alınırsa sınav B ile puanlanır, A force'suz geçer. Doğrulayıcılar MINOR/MAJOR arası; ben MINOR, düzeltme ucuz: `update_version` süren sınavları `failed(definition_changed)` yapsın + test.
+  - MINOR-4: slow-judge testine `errors == {}`.
+- MINOR-2 `masking` alanı monitor/off/PERSON'suz politikada yanlış değer; MINOR-3 `expected` maskesi `sql_result`/`must_cite`/`regex` anlamını bozabiliyor (kapalı başarısız); MINOR-5 yayın/PUT kilitsiz. Senin kararın.
+- Kapılar (işçinin doğrulanmış imajı, build yok): unit 1777 ×2, lint, **tam test-int 941 / 939**, alembic tek head, seed-eval, exam-stack 8/8, smoke, P0-P4. DNS hatası 0; yavaşlık yok.
+- Not: istek 11 commit diyor, gerçek 10.
+
+### R-09-0037 · 2026-11-05 22:06 · → koordinator · YIGIN-KAPA
+review09 `down -v --remove-orphans` (22:06): 0 konteyner, 0 hacim. Worktree kaldırıldı (dizin de silindi). Açık inceleyici yığını yok.

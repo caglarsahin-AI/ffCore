@@ -1,0 +1,18 @@
+S1 suite: 201 {"id": "3a314c8e-3c04-4e63-8fac-5e9cc126ce78", "project_id": "c0c25e74-1609-4996-aecc-edae81197e6d", "key": "rv2-gate", "name": "Reviewer r2", "agent_id": "6c3ec9ce-c0f5-4fee-ac89-d5b846b1072f", "langfuse_dataset_name": "hastane-a.rv2-gate", "scorers": [{"name": "contains"}], "pa
+M1 from-run: 201 {"item_id": "rv2-gate-run-4c3db153-0634-4c59-93aa-873f659b87da", "dataset": "hastane-a.rv2-gate", "run_id": "4c3db153-0634-4c59-93aa-873f659b87da", "masking": "regex"}
+M2 masking field: regex
+S2 draft: 201 {"id": "5c57529f-9d1f-4d81-90b8-a563429d6cda", "agent_id": "6c3ec9ce-c0f5-4fee-ac89-d5b846b1072f", "version": 2, "definition": {"schema_version": 1, "model": "chat-default", "system_prompt": "Sen {{hospital_name}} için sözleşme asistanısın. Yalnızca verilen sözleşme parçalarına d
+S3 exam on draft: 202 {"id": "247ce5d9-a35e-415e-8cad-3509ec067ee8", "project_id": "c0c25e74-1609-4996-aecc-edae81197e6d", "suite_id": "3a314c8e-3c04-4e63-8fac-5e9cc126ce78", "agent_version_id": "5c57529f-9d1f-4d81-90b8-a563429d6cda", "langfuse_run_name": "rv2-gate-v2-c8706340", "status": "queued", "e
+S4 exam status=completed passed=False complete=True
+S5 exam config has definition_sha256: False
+S6 edit draft: 200 {"id": "5c57529f-9d1f-4d81-90b8-a563429d6cda", "agent_id": "6c3ec9ce-c0f5-4fee-ac89-d5b846b1072f", "version": 2, "definition": {"schema_version": 1, "model": "chat-default", "system_prompt": "Sen {{hospital_name}} için sözleşme asistanısın. Yalnızca verilen sözleşme parçalarına d
+S7 publish edited draft (expect 409 stale_exam): 409 {"message": "The exam gate refuses version 2: rv2-gate=stale_exam.", "type": "conflict_error", "code": "eval_gate_failed"}
+S8 exam again: 202 {"id": "e8cebec5-b4bc-42a3-b086-0d369a29afc4", "project_id": "c0c25e74-1609-4996-aecc-edae81197e6d", "suite_id": "3a314c8e-3c04-4e63-8fac-5e9cc126ce78", "agent_version_id": "5c57529f-9d1f-4d81-90b8-a563429d6cda", "langfuse_run_name": "rv2-gate-v2-4aac2ebe", "status": "queued", "e
+S9 exam2 status=completed passed=False
+S10 publish before suite change (reason after the exam): 409 {"message": "The exam gate refuses version 2: rv2-gate=not_passed.", "type": "conflict_error", "code": "eval_gate_failed"}
+S11 change suite threshold: 200 {"id": "3a314c8e-3c04-4e63-8fac-5e9cc126ce78", "project_id": "c0c25e74-1609-4996-aecc-edae81197e6d", "key": "rv2-gate", "name": "Reviewer r2", "agent_id": "6c3ec9ce-c0f5-4fee-ac89-d5b846b1072f", "langfuse_dataset_name": "hastane-a.rv2-gate", "scorers": [{"name": "contains"}], "pa
+S12 publish after suite change (expect 409 stale_suite): 409 {"message": "The exam gate refuses version 2: rv2-gate=stale_suite.", "type": "conflict_error", "code": "eval_gate_failed"}
+S13 admin force, blank reason (expect 422): 422 {"message": "Forcing the exam gate needs a force_reason.", "type": "invalid_request_error", "code": "force_reason_required"}
+S14 admin force with reason: 200 {"id": "6c3ec9ce-c0f5-4fee-ac89-d5b846b1072f", "project_id": "c0c25e74-1609-4996-aecc-edae81197e6d", "key": "sozlesme-asistani", "name": "Sözleşme Asistanı", "description": "Tedarikçi sözleşmeleri hakkındaki soruları belgelere dayanarak, kaynak göstererek cevaplar.", "status": "p
+S15 version record: published=True eval_run_id=None
+S16 edit a published version (expect 409): 409 {"message": "A published version cannot be edited.", "type": "conflict_error", "code": "version_published"}

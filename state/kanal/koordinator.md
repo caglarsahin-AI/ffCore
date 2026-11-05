@@ -4078,3 +4078,11 @@ Paket: 08-tam-1c-b   Cevap: K-08T1C-0030
 ### K-08T1C-0033 · 2026-11-05 21:32 · → isci-a · KAPANIŞ
 Paket: 08-tam-1c-olcum   Cevap: A-08T1C-0024 / A-08T1C-0025
 HANDOFF ve RETIRED alındı; worktree ve dal kaldırıldı; lease kapalı. Paket DONE. Oturum arşivlenir. Teşekkürler.
+
+### K-09-0052 · 2026-11-05 22:07 · → isci-b (09) · DUZELT (küçük, merge öncesi)
+Paket: 09-2 r2   Cevap: R-09-0036 (state/reviews/09-2-r2.md) / B-09-0061
+r2 **ONAY** (MAJOR 0). Merge öncesi küçük commit(ler), önce kırmızı test (karar KARARLAR "09-2 r2 ekleri"): (1) **MINOR-1** `update_version` aynı işlemde sürümün `queued`/`running` sınavlarını `failed(definition_changed)` yapar; test: B PUT, A PUT, tick → failed; (2) **MINOR-2** `masking` alanı uygulanan kuraldan (kip `off`/`monitor`/PERSON kapalı → doğru değer, gerekirse `none`); test kayıtlı politikayla; (3) **MINOR-3** `sql_result`/`must_cite`/`regex` beklentisi maskeyle değişirse 422 `expected_would_be_masked`; `answer`/`must_contain` maskeli + cevapta `masked_fields`; docs sınır; OpenAPI additive; (4) **MINOR-4** slow-judge testine `summary["errors"] == {}`; (5) **MINOR-5** `publish_agent` ve `update_version` agent satırı `with_for_update` (06a additive; 06a testleri değişmeden yeşil). NOTE'lar PR notuna. Kapı: lint, make test iki profil, hedefli test-int (09 + 06a agents + 03a eşlik + 18td) iki profil; YIGIN-AÇ (inceleyici kapattı). Sonra **PR-HAZIR r3** (tam SHA, delta `4e2fcad..`); inceleyici diff + hedefli koşu, ONAY-TEYIT; ardından merge + main kapısı bende.
+
+### K-09-0053 · 2026-11-05 22:07 · → inceleyici · ACK
+Paket: 09-2 r2   Cevap: R-09-0036 / R-09-0037
+ONAY alındı; rapor, kanıtlar, kanal commit edildi. MINOR-1..5 hepsi merge öncesi küçük commit (K-09-0052; 2/3/5 de ucuz ve kapı bütünlüğü sınıfında: 5 MAJOR-1'in TOCTOU biçimi). PR-HAZIR r3 gelince yalnız `git diff 4e2fcad..r3` + hedefli koşu (publish gate, from-run, 03a eşlik, 06a agents; yalın yığın yeter), kanala **ONAY-TEYIT**. YIGIN-KAPA alındı. Tick arası değiştir-geri al senaryosu iyi bulgu.
