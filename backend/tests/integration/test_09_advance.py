@@ -487,3 +487,71 @@ def test_09_r4_major1_item_planned_longer_than_a_tick_ends_at_once(
     assert status == "completed" and judge.calls == []
     assert plan["q1"]["result"]["runs"][0]["note"] == "planned_exceeds_tick_budget"
     assert summary["errors"] == {"judge_out_of_time": 1}
+
+
+# --- 09-1 r5 MINOR-r5-1 / K-09-0034: a cut counts only after a full window --------------------
+
+
+def test_09_r5_minor1_cut_in_a_partial_window_is_not_counted(pg, project, database, app_settings):
+    import time
+
+    from ffcore.evaluation.runner import Budget, active_runs
+
+    first, second = _judged_exam(pg, project, n=1), _judged_exam(pg, project, n=1)
+    pg.execute(
+        "UPDATE eval_runs SET updated_at = now() - interval '1 hour' WHERE id = %s", (first,)
+    )
+    before = pg.execute("SELECT updated_at FROM eval_runs WHERE id = %s", (second,)).fetchone()[0]
+    deadline = time.monotonic() + 0.5
+
+    def budget():
+        return Budget(20, deadline=deadline, call_s=0.05, hard_s=1.0, total_s=540.0)
+
+    _advance(database, app_settings, first, judge=_Judge(delay=0.3), budget=budget())
+    assert _ev(pg, first)[0] == "completed"
+    _advance(database, app_settings, second, judge=_Judge(delay=2.0), budget=budget())
+    status, plan, _ = _ev(pg, second)
+    # ~0.2 s left < min(1.0 s hard limit, 540 s): a partial window, the cut is not counted.
+    assert status == "running" and plan["q1"].get("timeouts", 0) == 0
+    after = pg.execute("SELECT updated_at FROM eval_runs WHERE id = %s", (second,)).fetchone()[0]
+    assert after == before
+
+    async def order():
+        async with database.session_scope() as session:
+            return [ev.id for ev in await active_runs(session) if ev.id in (first, second)]
+
+    assert asyncio.run(order()) == [second]  # the first one completed; the second is next
+
+
+def test_09_r5_minor1_cut_in_a_full_window_is_counted(pg, project, database, app_settings):
+    import time
+
+    from ffcore.evaluation.runner import Budget
+
+    ev_id = _judged_exam(pg, project, n=1)
+    budget = Budget(20, deadline=time.monotonic() + 0.4, call_s=0.05, hard_s=0.2, total_s=540.0)
+    _advance(database, app_settings, ev_id, judge=_Judge(delay=2.0), budget=budget)
+    status, plan, _ = _ev(pg, ev_id)
+    assert status == "running" and plan["q1"]["timeouts"] == 1
+
+
+def test_09_r5_k34_hard_limit_above_the_window_still_ends_a_hung_judge(
+    pg, project, database, app_settings
+):
+    # K-09-0034: LLM_CALL_TIMEOUT_S above TICK_PLAN_S. A hung judge that got the whole usable
+    # window (here TICK_PLAN_S stands at 0.3 s) is cut, counted, and ends judge_out_of_time.
+    import time
+
+    from ffcore.evaluation.engine import MAX_ATTEMPTS
+    from ffcore.evaluation.runner import Budget
+
+    ev_id = _judged_exam(pg, project, n=1)
+    for _ in range(MAX_ATTEMPTS):
+        budget = Budget(
+            20, deadline=time.monotonic() + 0.4, call_s=0.05, hard_s=1000.0, total_s=0.3
+        )
+        _advance(database, app_settings, ev_id, judge=_Judge(delay=5.0), budget=budget)
+    status, plan, summary = _ev(pg, ev_id)
+    assert status == "completed"
+    assert plan["q1"]["result"]["runs"][0]["note"] == "judge_out_of_time"
+    assert summary["errors"] == {"judge_out_of_time": 1}

@@ -108,3 +108,38 @@ def test_09_start_with_another_projects_version_is_the_same_404(
         app.dependency_overrides.pop(langfuse_dependency, None)
     assert (a.status_code, b.status_code) == (404, 404)
     assert a.json()["error"]["code"] == b.json()["error"]["code"]
+
+
+def test_09_r5_start_plan_longer_than_a_tick_is_422_over_http(
+    pg, app, project, make_user, client_factory
+):
+    # r5 NOTE-2: the start refusal over HTTP, before Langfuse is asked anything.
+    from ffcore.api.eval import langfuse_dependency
+
+    run_id = seed_run(pg, project, definition())
+    version_id = pg.execute(
+        "SELECT agent_version_id FROM runs WHERE id = %s", (run_id,)
+    ).fetchone()[0]
+    suite_id = uuid.uuid4()
+    pg.execute(
+        "INSERT INTO eval_suites (id, project_id, key, name, langfuse_dataset_name, scorers,"
+        " pass_threshold, repeat, created_by)"
+        " VALUES (%s, %s, 'judged', 'Judged', 'p.judged', %s, 0.8, 10, 't')",
+        (suite_id, project, json.dumps([{"name": "llm_judge"}])),
+    )
+    _, email = make_user(memberships={project: ("analyst", "edit")})
+    client = client_factory(email)
+
+    class _NoLangfuse:
+        async def items(self, name):
+            raise AssertionError("refused before the dataset is read")
+
+    app.dependency_overrides[langfuse_dependency] = lambda: _NoLangfuse()
+    try:
+        r = client.post(
+            f"{P.format(project)}/eval-suites/{suite_id}/run?agent_version_id={version_id}"
+        )
+    finally:
+        app.dependency_overrides.pop(langfuse_dependency, None)
+    assert r.status_code == 422, r.text
+    assert r.json()["error"]["code"] == "eval_plan_exceeds_tick"

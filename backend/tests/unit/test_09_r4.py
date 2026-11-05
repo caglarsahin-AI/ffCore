@@ -38,7 +38,9 @@ def test_09_r4_major1_plan_longer_than_a_whole_tick():
 
 def test_09_r4_major1_tick_budget_carries_the_whole_tick_length():
     b = worker_tick.tick_budget(_window_settings(open_now=True))
-    assert b.total_s == worker_tick.TICK_TIMEOUT_S - worker_tick.TICK_MARGIN_S
+    from ffcore.evaluation import ticks
+
+    assert b.total_s == ticks.TICK_PLAN_S  # r5 MAJOR-r5-1: the usable window
 
 
 def test_09_r4_note9_judge_ner_outage_is_logged_without_content(monkeypatch, caplog):
@@ -72,11 +74,9 @@ def test_09_r4b_judge_call_estimate_is_configured_and_bounded_by_a_tick(monkeypa
     from tests.unit.test_09_engine import _full
 
     assert _full().eval_judge_call_s == 60
-    monkeypatch.setenv(
-        "EVAL_JUDGE_CALL_S", str(worker_tick.TICK_TIMEOUT_S - worker_tick.TICK_MARGIN_S)
-    )
-    assert _full().eval_judge_call_s == 570
-    monkeypatch.setenv("EVAL_JUDGE_CALL_S", "571")
+    monkeypatch.setenv("EVAL_JUDGE_CALL_S", "540")  # r5: TICK_PLAN_S
+    assert _full().eval_judge_call_s == 540
+    monkeypatch.setenv("EVAL_JUDGE_CALL_S", "541")
     with pytest.raises(ValidationError):
         _full()
 
@@ -118,5 +118,5 @@ def test_09_r4b_start_refuses_a_plan_longer_than_a_tick(monkeypatch):
     with pytest.raises(ApiError) as err:
         start(_suite(scorers=judged, repeat=10))  # 10 x 60 s > 570 s
     assert (err.value.status_code, err.value.code) == (422, "eval_plan_exceeds_tick")
-    start(_suite(scorers=judged, repeat=9))  # 540 s fits
+    start(_suite(scorers=judged, repeat=9))  # 540 s fits (TICK_PLAN_S)
     start(_suite(scorers=[{"name": "contains"}], repeat=10))  # no judge: one call each
