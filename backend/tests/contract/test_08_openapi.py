@@ -84,9 +84,10 @@ def test_c4_decision_contract_in_draft():
 
 
 def test_08t1c_5_internal_ner_503_listed():
-    """FOLLOWUP-168 NOTE-4: the internal NER endpoint's 503 (`ner_not_configured`,
-    `ner_label_unknown`, `model_missing`) is in its response list, not only in the description."""
+    """FOLLOWUP-168 NOTE-4 (r1 MINOR-2): every 503 code of the internal NER endpoint is in its
+    response list, not only in the description."""
     op = _paths(render("08"))["/api/v1/internal/guardrails/ner"]["post"]
     assert "503" in op["responses"], sorted(op["responses"])
     described = op["responses"]["503"]["description"]
-    assert all(code in described for code in ("ner_not_configured", "ner_label_unknown"))
+    codes = ("ner_not_configured", "ner_label_unknown", "ner_offsets_unavailable", "model_missing")
+    assert [code for code in codes if code not in described] == []
