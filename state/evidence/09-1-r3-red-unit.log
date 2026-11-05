@@ -1,0 +1,24 @@
+== 09-1 r3: tests/unit/test_09_r2.py on 0a02d0f (r2 code, before the r3 fixes) 2026-11-05
+
+>       assert (rejected.passed, rejected.note) == (None, "approval_rejected")
+        async def progressed_then_failed(*a, budget, **kw):
+            raise RuntimeError("later item failed")
+        redis, run = _advance_one_with(monkeypatch, progressed_then_failed)
+ERROR    ffcore.evaluation:worker_tick.py:168 eval_advance_failed eval_run=ev
+  File "/work/backend/tests/unit/test_09_r2.py", line 143, in progressed_then_failed
+        assert combined.passed is True
+FAILED tests/unit/test_09_r2.py::test_09_r2_major1_rejected_sql_item_is_not_run_and_exam_incomplete
+FAILED tests/unit/test_09_r2.py::test_09_r2_major2_tick_budget_knows_the_background_window
+FAILED tests/unit/test_09_r2.py::test_09_r2_major2_budget_refuses_a_judge_call_past_the_deadline
+FAILED tests/unit/test_09_r2.py::test_09_r2_major2_failing_tick_that_saved_progress_resets_the_count
+FAILED tests/unit/test_09_r2.py::test_09_r2_major3_mcp_sql_refusal_and_db_error_are_tool_errors
+FAILED tests/unit/test_09_r2.py::test_09_r2_major3_tool_outcome_carries_the_sql_code
+FAILED tests/unit/test_09_r2.py::test_09_r2_major3_reread_refusal_flagged_as_error_keeps_its_code
+FAILED tests/unit/test_09_r2.py::test_09_r2_minor1_reread_tool_call_error_is_audited_and_not_run
+FAILED tests/unit/test_09_r2.py::test_09_r2_minor7_removed_tool_is_not_run_not_the_agents_failure
+FAILED tests/unit/test_09_r2.py::test_09_r2_minor2_lost_lock_stops_the_holder_and_is_released
+FAILED tests/unit/test_09_r2.py::test_09_r2_minor2_release_never_deletes_another_holders_lock
+FAILED tests/unit/test_09_r2.py::test_09_r2_minor3_cancel_waiting_locks_approval_before_run
+FAILED tests/unit/test_09_r2.py::test_09_r2_minor4_partly_not_run_repeats_mark_the_exam_incomplete
+FAILED tests/unit/test_09_r2.py::test_09_r2_minor6_rubric_change_needs_a_new_prompt_name
+14 failed, 8 passed in 9.81s

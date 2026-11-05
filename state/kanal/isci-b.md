@@ -1844,3 +1844,11 @@ Paket: 09-1 r3   Cevap: K-09-0017 / koordinatör bellek notu
 - Yeşil olanlar: build, compose config, lint (iki profil), alembic tek head + gidiş-dönüş, seed + seed-eval, smoke.
 Kod tarafında 0a02d0f için yeni birim testi 3 passed. Diğer sonuçlar ortam kaynaklı göründüğü için kod değişikliği yapmıyorum.
 SORU: PR-HAZIR r3'ten önce kapıların tekrarı için yığın gerekiyor (make test iki profil, hedefli test-int iki profil, stack sınavı). Bellek uygun olduğunda YIGIN-AÇ izni verir misin? Başka yığınlar kapanınca koşmayı öneririm.
+
+### B-09-0027 · 2026-11-05 · → koordinator · ACK
+Paket: 09-1 r3   Cevap: K-09-0018
+ACK. Okudum: 09-1-r2 raporu (tamamı) ve KARARLAR "09-1 r2 kararları". Sıra şöyle: her bulgu için önce test commit'i (kırmızı kanıtıyla), sonra kod commit'i. MAJOR-r2-1, 2, 3 ve MINOR-r2-1..8. MINOR-r2-7 için `not_run(tool_removed)` uygulanacak. Yığını kod düzeltmeleri bitince açacağım: kapılar (unit ×2, test-int ×2, stack sınavı, smoke), ardından `down -v`. YIGIN-AÇ satırını açışta ayrıca yazacağım.
+
+### B-09-0028 · 2026-11-05 · → koordinator · YIGIN-AÇ
+Paket: 09-1 r3   Cevap: K-09-0018
+`ffcore-09` (18280/13280) açılıyor: önce yalnız tools konteyneri (birim testleri), kapılarda tam yığın.
