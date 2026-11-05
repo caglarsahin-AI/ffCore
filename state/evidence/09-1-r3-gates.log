@@ -1,0 +1,19 @@
+== HEAD 0a02d0fd6ea2bf3f19c09607fea3fed2a75dfbda tree-clean=0 2026-11-05T03:37:23+03:00
+== build exit=0
+== up exit=0
+== compose config
+exit=0
+== make lint + make test DEPLOY_PROFILE=llmaas 2026-11-05T03:45:33+03:00
+lint-ok
+make: *** [Makefile:18: test] Error 137
+exit=0
+== make lint + make test DEPLOY_PROFILE=airgap 2026-11-05T04:00:25+03:00
+lint-ok
+exit=0
+== alembic heads / downgrade 06b_0001 / upgrade heads / heads 2026-11-05T04:12:15+03:00
+09_0001 (03a, 03c, 06a, 03b, 04a, 08, 06b, 09, 05a, 07) (head)
+INFO  [alembic.runtime.migration] Running downgrade 09_0001 -> 06b_0001, 09: eval_suites, eval_runs (local rows over Langfuse datasets and dataset runs)
+INFO  [alembic.runtime.migration] Running upgrade 06b_0001 -> 09_0001, 09: eval_suites, eval_runs (local rows over Langfuse datasets and dataset runs)
+09_0001 (03b, 03a, 06b, 06a, 03c, 04a, 09, 08, 05a, 07) (head)
+exit=0
+== targeted test-int DEPLOY_PROFILE=llmaas 2026-11-05T04:12:46+03:00

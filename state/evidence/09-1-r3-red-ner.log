@@ -1,0 +1,8 @@
+== 09-1 r3 MINOR-9: tests/unit/test_09_judge_ner.py on d0b1d76 (merge of main 63ffb16, before ner=) 2026-11-05
+FAILED tests/unit/test_09_judge_ner.py::test_09_judge_egress_masks_a_name_with_egress_ner
+FAILED tests/unit/test_09_judge_ner.py::test_09_judge_egress_without_ner_client_fails_loudly
+FAILED tests/unit/test_09_judge_ner.py::test_09_worker_judge_guard_gets_the_http_ner
+  (E KeyError: 'ner' - worker_tick._judge built EgressGuard without a NER client)
+3 failed in 6.89s
+== after fix (judge.EgressGuard ner=, worker_tick ner=HttpNer(settings))
+3 passed in 4.39s

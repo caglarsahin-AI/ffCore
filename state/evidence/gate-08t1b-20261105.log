@@ -10,3 +10,104 @@ git head: 63ffb16 2026-11-05 03:32:21
 build exit=0
 
 === 03:32:40 compose config
+config exit=0
+
+=== 03:32:51 up
+ Container ffmain-worker-1  Healthy
+ Container ffmain-redis-1  Healthy
+ Container ffmain-agent-worker-1  Healthy
+ Container ffmain-litellm-1  Healthy
+ Container ffmain-mcp-search-1  Healthy
+ Container ffmain-mcp-sql-1  Healthy
+up exit=0
+ffmain-frontend-1 Up 14 seconds
+ffmain-mcp-search-1 Up 14 seconds (healthy)
+ffmain-agent-worker-bg-1 Up 14 seconds
+ffmain-agent-worker-1 Up 14 seconds
+ffmain-worker-1 Up 4 seconds
+ffmain-mcp-sql-1 Up 14 seconds (healthy)
+ffmain-backend-1 Up 26 seconds (healthy)
+ffmain-langfuse-worker-1 Up About a minute
+ffmain-litellm-1 Up About a minute (healthy)
+ffmain-langfuse-web-1 Up About a minute (healthy)
+ffmain-langfuse-minio-1 Up About a minute (healthy)
+ffmain-langfuse-postgres-1 Up About a minute (healthy)
+ffmain-qdrant-1 Up About a minute (healthy)
+ffmain-fake-llm-1 Up About a minute
+ffmain-langfuse-redis-1 Up About a minute (healthy)
+ffmain-ticket-desk-1 Up About a minute (healthy)
+ffmain-redis-1 Up About a minute (healthy)
+ffmain-langfuse-clickhouse-1 Up About a minute (healthy)
+ffmain-postgres-1 Up About a minute (healthy)
+
+=== 03:34:36 lint
+ruff check backend scripts data/samples/scripts services
+All checks passed!
+ruff format --check backend scripts data/samples/scripts services
+445 files already formatted
+lint exit=0
+
+=== 03:34:53 alembic heads
+06b_0001 (03c, 05a, 04a, 08, 03b, 06b, 03a, 06a, 07) (head)
+heads exit=0
+
+=== 03:35:08 make test llmaas
+........................................................................ [  4%]
+........................................................................ [  8%]
+........................................................................ [ 13%]
+........................................................................ [ 17%]
+........................................................................ [ 22%]
+........................................................................ [ 26%]
+........................................................................ [ 31%]
+........................................................................ [ 35%]
+........................................................................ [ 40%]
+........................................................................ [ 44%]
+........................................................................ [ 49%]
+........................................................................ [ 53%]
+........................................................................ [ 58%]
+........................................................................ [ 62%]
+........................................................................ [ 67%]
+........................................................................ [ 71%]
+........................................................................ [ 76%]
+........................................................................ [ 80%]
+........................................................................ [ 85%]
+........................................................................ [ 89%]
+........................................................................ [ 94%]
+........................................................................ [ 98%]
+.................                                                        [100%]
+1601 passed in 521.93s (0:08:41)
+test exit=0
+
+=== 03:44:19 make test airgap
+........................................................................ [  4%]
+........................................................................ [  8%]
+...F.................................................................... [ 13%]
+........................................................................ [ 17%]
+........................................................................ [ 22%]
+........................................................................ [ 26%]
+........................................................................ [ 31%]
+.....................................................test-airgap exit=137
+
+=== 03:58:08 test-samples
+
+----------------------------------------------------------------------
+Ran 54 tests in 5.144s
+
+OK (skipped=5)
+samples exit=0
+
+=== 03:58:27 test-int
+..F....E.test-int exit=137
+
+=== 04:10:46 smoke
+python scripts/smoke.py
+ok    backend /healthz 200
+ok    litellm /health/liveliness 200
+ok    langfuse /api/public/health 200, /api/public/projects 200
+ok    mcp-search /healthz 200
+ok    mcp-sql /healthz 200
+ok    skipped: ollama profile inactive
+smoke: passed
+smoke exit=0
+
+=== 04:11:10 frontend lint/typecheck/check:api (node, --network none, repo root)

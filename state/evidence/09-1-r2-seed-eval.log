@@ -1,0 +1,196 @@
+cd backend && python -m ffcore.cli seed-eval --project "hastane-a" --suite ../data/samples/eval/suite.json --items ../data/samples/eval/sozlesme-33.json 
+dataset: hastane-a.sozlesme-33
+items upserted: 33; archived: 0
+suite: created
+cd backend && python -m ffcore.cli seed-eval --project "hastane-a" --suite ../data/samples/eval/suite-sql-20.json --items ../data/samples/eval/sql-20.json 
+dataset: hastane-a.sql-20
+items upserted: 20; archived: 0
+suite: created
+cd backend && python -m ffcore.cli seed-eval --project "hastane-a" --suite ../data/samples/eval/suite.json --items ../data/samples/eval/sozlesme-33.json 
+Traceback (most recent call last):
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 149, in __init__
+    self._dbapi_connection = engine.raw_connection()
+                             ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 3299, in raw_connection
+    return self.pool.connect()
+           ^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py", line 445, in connect
+    return _ConnectionFairy._checkout(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py", line 1324, in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py", line 709, in checkout
+    rec = pool._do_get()
+          ^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/impl.py", line 176, in _do_get
+    with util.safe_reraise():
+         ^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/util/langhelpers.py", line 166, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/impl.py", line 174, in _do_get
+    return self._create_connection()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py", line 386, in _create_connection
+    return _ConnectionRecord(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py", line 671, in __init__
+    self.__connect()
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py", line 916, in __connect
+    with util.safe_reraise():
+         ^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/util/langhelpers.py", line 166, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py", line 912, in __connect
+    self.dbapi_connection = connection = pool._invoke_creator(self)
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/create.py", line 645, in connect
+    return dialect.connect(*cargs_tup, **cparams)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 869, in connect
+    return self.loaded_dbapi.connect(*cargs, **cparams)  # type: ignore[no-any-return]  # NOQA: E501
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/dialects/postgresql/psycopg.py", line 760, in connect
+    return await_(
+           ^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/util/concurrency.py", line 167, in await_
+    return current.parent.switch(awaitable)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/util/concurrency.py", line 205, in greenlet_spawn
+    value = await result
+            ^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/connectors/asyncio.py", line 378, in create
+    cls._handle_exception_no_connection(dbapi, error)
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/connectors/asyncio.py", line 409, in _handle_exception_no_connection
+    raise error.with_traceback(exc_info[2])
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/connectors/asyncio.py", line 376, in create
+    connection = await connection_awaitable
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/psycopg/connection_async.py", line 116, in connect
+    attempts = await conninfo_attempts_async(params)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/psycopg/_conninfo_attempts_async.py", line 53, in conninfo_attempts_async
+    raise last_exc
+psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/work/backend/ffcore/cli.py", line 404, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/work/backend/ffcore/cli.py", line 318, in main
+    report = asyncio.run(_seed_eval(args))
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/asyncio/runners.py", line 195, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 691, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/work/backend/ffcore/cli.py", line 205, in _seed_eval
+    return await eval_seed.seed(
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/work/backend/ffcore/evaluation/seed.py", line 60, in seed
+    project = await session.scalar(select(Project).where(Project.key == project_key))
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/ext/asyncio/session.py", line 720, in scalar
+    return await greenlet_spawn(
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/util/concurrency.py", line 210, in greenlet_spawn
+    result = context.throw(*sys.exc_info())
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 2534, in scalar
+    return self._execute_internal(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 2350, in _execute_internal
+    conn = self._connection_for_bind(bind)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 2173, in _connection_for_bind
+    return trans._connection_for_bind(engine, execution_options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<sqlalchemy generated _go() wrapper for sqlalchemy.orm.session.SessionTransaction._connection_for_bind>", line 2, in _connection_for_bind
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/state_changes.py", line 137, in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 1203, in _connection_for_bind
+    conn = bind.connect()
+           ^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 3275, in connect
+    return self._connection_cls(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 151, in __init__
+    Connection._handle_dbapi_exception_noconnection(
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 2432, in _handle_dbapi_exception_noconnection
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 149, in __init__
+    self._dbapi_connection = engine.raw_connection()
+                             ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 3299, in raw_connection
+    return self.pool.connect()
+           ^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py", line 445, in connect
+    return _ConnectionFairy._checkout(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py", line 1324, in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py", line 709, in checkout
+    rec = pool._do_get()
+          ^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/impl.py", line 176, in _do_get
+    with util.safe_reraise():
+         ^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/util/langhelpers.py", line 166, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/impl.py", line 174, in _do_get
+    return self._create_connection()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py", line 386, in _create_connection
+    return _ConnectionRecord(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py", line 671, in __init__
+    self.__connect()
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py", line 916, in __connect
+    with util.safe_reraise():
+         ^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/util/langhelpers.py", line 166, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py", line 912, in __connect
+    self.dbapi_connection = connection = pool._invoke_creator(self)
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/create.py", line 645, in connect
+    return dialect.connect(*cargs_tup, **cparams)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 869, in connect
+    return self.loaded_dbapi.connect(*cargs, **cparams)  # type: ignore[no-any-return]  # NOQA: E501
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/dialects/postgresql/psycopg.py", line 760, in connect
+    return await_(
+           ^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/util/concurrency.py", line 167, in await_
+    return current.parent.switch(awaitable)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/util/concurrency.py", line 205, in greenlet_spawn
+    value = await result
+            ^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/connectors/asyncio.py", line 378, in create
+    cls._handle_exception_no_connection(dbapi, error)
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/connectors/asyncio.py", line 409, in _handle_exception_no_connection
+    raise error.with_traceback(exc_info[2])
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/connectors/asyncio.py", line 376, in create
+    connection = await connection_awaitable
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/psycopg/connection_async.py", line 116, in connect
+    attempts = await conninfo_attempts_async(params)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/psycopg/_conninfo_attempts_async.py", line 53, in conninfo_attempts_async
+    raise last_exc
+sqlalchemy.exc.OperationalError: (psycopg.OperationalError) failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+(Background on this error at: https://sqlalche.me/e/21/e3q8)
+make: *** [Makefile:78: seed-eval] Error 1
