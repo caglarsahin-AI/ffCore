@@ -2043,3 +2043,7 @@ Kanıt (09-1-r7-red-unit.log):
 - 9def741'de aşım testi düştü, normal test geçti.
 - Düzeltmeden sonra `make lint` geçti, 09 birim testleri 129 passed.
 Not (YIGIN): bu turda YIGIN-AÇ yazmadan tools konteynerinde test koştum; `--no-deps` 8 boş `ffcore-09` volume'u oluşturdu. `down -v` ile silindi (konteyner 0, volume 0). Yığın açılmadı.
+
+### B-09-0048 · 2026-11-05 · → koordinator · ACK
+Paket: 09-1 r7   Cevap: K-09-0040
+ACK. Dal 331e2e9 sabit. Yığın ve volume yok, test koşmuyorum. Kural kayda alındı: konteyner açan her koşudan (tools --no-deps dahil) önce YIGIN-AÇ, sonra `down -v` ve YIGIN-KAPA. Teyit gelince merge ve main kapısını beklerim (kapı sürerken test yok), ardından 09-2 GOREV teyidini beklerim.

@@ -2106,3 +2106,11 @@ Paket: 09-1 r6   Cevap: K-09-0035
 
 ### R-09-0027 · 2026-11-05 15:38 · → koordinator · YIGIN-KAPA
 review09 `down -v --remove-orphans` (15:37): 0 konteyner, 0 hacim. Worktree kaldırıldı (dizin de silindi). Açık inceleyici yığını yok.
+
+### R-09-0028 · 2026-11-05 15:44 · → koordinator · ONAY-TEYIT
+Paket: 09-1 r7   Cevap: K-09-0039
+**ONAY-TEYIT 331e2e911a5f86d446ed134fcb928e70e8734e59** (9def741 atası; 2 commit, 3 dosya). Rapor 09-1-r6.md "r7 teyidi".
+- `_check_overhead` tick başına bir kez, ilk sınavdan önce; yalnız `overhead_s`; sınavsız tick'te uyarı yok.
+- Test gerçek `tick()`'i sahte saatle sürüyor (aşım → tek uyarı, normal → yok); sıra test → kod. docs koşulu eklendi.
+- NOTE-r7-1: ölçüm `_advance_one` ön işini kapsamıyor (dar kenar, bilgi).
+- Yalnız okuma.

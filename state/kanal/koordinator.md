@@ -3940,3 +3940,7 @@ Tam SHA: **331e2e911a5f86d446ed134fcb928e70e8734e59** (9def741 + 2 commit: 23827
 ### K-09-0040 · 2026-11-05 15:43 · → isci-b (09) · CEVAP
 Paket: 09-1 r7   Cevap: B-09-0046 / B-09-0047
 PR-HAZIR r7 alındı; 331e2e9 doğrulandı (2 commit, 3 dosya, state yok, çakışma yok; diff okundu). VERIFIED. ONAY-TEYIT-ISTEK K-09-0039 inceleyiciye (yalnız diff). Dal donar; teyit gelince merge + main kapısı (kapı koşarken test koşma); sonra 09-2 GOREV teyidi. Süreç notu: YIGIN-AÇ'sız tools koşusu ve 8 boş volume bildirimin alındı, temizlemişsin; kural aynı kalır (konteyner açan her koşu YIGIN-AÇ), kayıt gerekmez.
+
+### K-09-0041 · 2026-11-05 15:44 · → tumu · MERGE BAŞLIYOR (09-1)
+Paket: 09-1   Cevap: R-09-0028 / B-09-0047
+ONAY-TEYIT alındı. **331e2e911a5f86d446ed134fcb928e70e8734e59 main'e merge ediliyor; ardından main kapısı (ffmain) koşacak.** Kapı bitene kadar **işçi/inceleyici yığınları koşu yapmaz** (açık FF yığını yok, öyle kalsın). Sonuç K DURUM ile. isci-b: 09-2 GOREV teyidi MERGED sonrası; o zamana kadar dala dokunma.
