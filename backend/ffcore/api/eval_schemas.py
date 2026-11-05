@@ -155,9 +155,14 @@ class FromRunOut(BaseModel):
     # 09-2 r1 (live probe, additive): how the question and the expected output were masked.
     # `regex`: identifiers only, person names stay as written (GUARDRAIL_EGRESS_NER=false);
     # `regex+ner`: names too.
-    masking: Literal["regex", "regex+ner"] = Field(
-        description="`regex`: identifiers only, person names are stored as written; "
-        "`regex+ner`: person names are masked too."
+    masking: Literal["none", "regex", "regex+ner"] = Field(
+        description="What the agent's egress policy really masked: `none` (off, monitor, or no "
+        "masking category), `regex` (identifiers; person names are stored as written), "
+        "`regex+ner` (person names too)."
+    )
+    # 09-2 r2 MINOR-3: which of message, variables, answer, must_contain were masked.
+    masked_fields: list[str] = Field(
+        description="The fields saved masked (message, variables, answer, must_contain)."
     )
 
 

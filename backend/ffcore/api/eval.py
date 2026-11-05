@@ -417,7 +417,7 @@ async def item_from_run(
         )
 
     try:
-        masked, expected, masking = await from_run.masked_item(
+        masked, expected, masking, masked_fields = await from_run.masked_item(
             session,
             project_id,
             version,
@@ -451,7 +451,9 @@ async def item_from_run(
         raise
     await write_event(session, entry("success", {"item_id": item}))
     await session.commit()
-    return FromRunOut(item_id=item, dataset=dataset, run_id=run_ref, masking=masking)
+    return FromRunOut(
+        item_id=item, dataset=dataset, run_id=run_ref, masking=masking, masked_fields=masked_fields
+    )
 
 
 @router.get("/eval-suites/{suite_id}/runs", response_model=EvalRunList)

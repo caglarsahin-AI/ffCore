@@ -7,7 +7,12 @@ in the API process, with one token store: a value the question and the expected 
 gets the same placeholder (r1 MINOR-9). Identifiers are tokenized; with
 GUARDRAIL_EGRESS_NER=false the regex categories only, so a person's name is stored in the
 (in-house) Langfuse item as written: accepted, documented behaviour that the answer shows as
-`masking: "regex"` (r1 live probe). A blocked text is refused (`run_input_blocked`), a NER
+`masking: "regex"` (r1 live probe; r2 MINOR-2: the value is what the egress rule really
+does, `none` when it masks nothing). An expectation compared with real rows, ids or text
+(`sql_result`, `must_cite`, `regex`) that a mask would change is refused
+(`expected_would_be_masked`, r2 MINOR-3): a placeholder there could never match. `answer` and
+`must_contain` are saved masked and `masked_fields` names them. A blocked text is refused
+(`run_input_blocked`), a NER
 outage is `ner_unavailable`, a policy or NER configuration error and a text over the engine's
 limit are coded errors (r1 MINOR-8; fail-loud). The masking runs whatever
 GUARDRAIL_EGRESS_ENABLED says: the item is stored text, not a model call.
@@ -27,7 +32,10 @@ from ffcore.guardrails.service import config_error, record_events, resolve_polic
 from ffcore.models.agents import AgentVersion
 from ffcore.runtime.definition import parse_definition
 
-Masking = Literal["regex", "regex+ner"]
+Masking = Literal["none", "regex", "regex+ner"]
+# Compared with the agent's real output (rows, cited ids, a pattern): a mask breaks them.
+EXACT_FIELDS = ("sql_result", "must_cite", "regex")
+_MASKING_ACTIONS = ("redact", "mask", "tokenize")
 
 
 def item_id(suite_key: str, run_id) -> str:
@@ -35,15 +43,32 @@ def item_id(suite_key: str, run_id) -> str:
 
 
 def masking_of(policy: ResolvedPolicy) -> Masking:
-    """`regex+ner` when a PII rule of the policy runs at egress with an `engine: ner` PII
-    policy (person names are masked too), else `regex`."""
-    for rule in policy.spec.rules:
+    """What the egress PII rules really mask (r2 MINOR-2), as the engine runs them: nothing
+    when the policy is off or the rule does not enforce; per category the rule's action, else
+    the category's, else the PII policy's default; `redact`, `mask` and `tokenize` change the
+    text. `regex+ner` when such a rule masks person names with an `engine: ner` PII policy,
+    `regex` when it masks something else, `none` when it masks nothing."""
+    spec, found = policy.spec, "none"
+    if spec.mode == "off":
+        return found
+    for rule in spec.rules:
         if rule.type != "pii" or "egress" not in rule.stages:
             continue
+        if engine.rule_mode(spec, rule) != "enforce":
+            continue
         pii = policy.pii_policies.get(rule.pii_policy_key or "")
-        if pii is not None and pii.engine == "ner":
+        if pii is None:
+            continue
+        masked = {
+            code
+            for code, setting in engine._active(pii).items()
+            if (rule.action or setting.action or pii.default_action) in _MASKING_ACTIONS
+        }
+        if pii.engine == "ner" and "PERSON" in masked:
             return "regex+ner"
-    return "regex"
+        if masked:
+            found = "regex"
+    return found
 
 
 def _engine_error(exc: Exception) -> ApiError:
@@ -62,8 +87,8 @@ async def masked_item(
     message: str,
     variables: dict,
     expected: dict[str, Any],
-) -> tuple[dict, dict, Masking]:
-    """(input, expected output, masking) as they may leave for Langfuse."""
+) -> tuple[dict, dict, Masking, list[str]]:
+    """(input, expected output, masking, masked fields) as they may leave for Langfuse."""
     definition = parse_definition(version.definition)
     policy = await resolve_policy(session, project_id, definition.guardrail_policy_key)
     tokens = MemoryTokenStore()
@@ -99,9 +124,26 @@ async def masked_item(
             return [await walk(v) for v in value]
         return value  # numbers, booleans and null in sql_result carry no text
 
+    plain_variables = {k: str(v) for k, v in (variables or {}).items()}
     masked_input = {
         "message": await mask(message),
-        "variables": {k: await mask(str(v)) for k, v in (variables or {}).items()},
+        "variables": {k: await mask(v) for k, v in plain_variables.items()},
     }
     masked_expected = {k: await walk(v) for k, v in expected.items()}
-    return masked_input, masked_expected, masking_of(policy)
+    changed = [k for k in EXACT_FIELDS if k in expected and masked_expected[k] != expected[k]]
+    if changed:
+        raise ApiError(
+            422,
+            "invalid_request_error",
+            "expected_would_be_masked",
+            f"The expected {', '.join(changed)} would be masked; a placeholder there never "
+            "matches the agent's real output. Give an expectation without personal data.",
+        )
+    shown = [k for k in ("answer", "must_contain") if k in expected]
+    pairs = [
+        ("message", message, masked_input["message"]),
+        ("variables", plain_variables, masked_input["variables"]),
+        *((k, expected[k], masked_expected[k]) for k in shown),
+    ]
+    fields = [name for name, before, after in pairs if before != after]
+    return masked_input, masked_expected, masking_of(policy), fields
