@@ -243,7 +243,8 @@ live suite bound to the agent, the version needs a latest completed exam that:
   its exam no longer matches, and the exam is `stale_exam` (so is an exam without a digest),
 - ran with the suite as it is now: the suite's `scorers`, `pass_threshold` and `repeat` must be
   the ones in the exam's snapshot, else `stale_suite` (`approve_tools` is not compared: a
-  change to `false` is `suite_not_gateable` or an incomplete exam already). The suite's
+  change to `false` is `suite_not_gateable` or an incomplete exam already; the scorer list is
+  compared as it is stored, so reordering it also asks for a new exam). The suite's
   Langfuse dataset items are not compared: an item edited or added in Langfuse after the exam
   does not make it stale; run the exam again after changing the dataset,
 - `passed` (pass rate at least the suite's threshold),
@@ -257,13 +258,17 @@ that binds an action asking for approval (the exam can never complete unattended
 `approve_tools: true` on that suite, or leave it unbound. A suite on an agent without such
 actions gates with `approve_tools: false`.
 
-A draft edited while its exam is queued or running ends the exam `failed(definition_changed)` at
-the advancer's next tick: its item runs still going are stopped as a cancelled exam's are, and
-nothing is scored against a definition that was not the one examined.
+A draft edit that changes the definition (`PUT .../versions/{n}`) ends the version's queued and
+running exams `failed(definition_changed)` in the same transaction, even if a later edit puts
+the old definition back: item runs may already have run with the other one. Their item runs
+still going finish unscored. The advancer also checks the digest at every tick, so an exam that
+has no digest (started before this check existed) ends `failed(definition_changed)` too.
+Publishing and editing a draft of the same agent lock the agent row and run one after the
+other, so a publish never takes a definition that changed while the gate was checked.
 
 The published version keeps the exam that opened the gate in `eval_run_id` (with several suites,
-the latest of the exams that passed); it is null when the gate was forced or the agent has no
-bound suite.
+the latest of the exams that passed). It is null when the agent has no bound suite or when the
+publish was forced past a failing gate; a `force` on a gate that passes keeps the exam.
 
 An admin may publish past the gate: `{"version": n, "force": true, "force_reason": "..."}`.
 Anyone else gets `403 force_requires_admin`; a force without a reason (or a blank one) is
@@ -290,13 +295,24 @@ Before anything leaves for Langfuse the question, its variables and the expected
 through the egress stage of the agent version's guardrail policy in the API process, with one
 token store: identifiers are tokenized (`<<PII_n>>`), and a value the question and the expected
 output share gets the same placeholder, so `must_contain` still matches what the agent is asked.
-The answer's `masking` says what was masked:
+The answer's `masking` says what the agent's egress rules really mask, as the engine runs them:
 
+- `none`: nothing (the policy is `off`, its egress PII rule only monitors, or no masking
+  category is on). The item is stored as the run was asked.
 - `regex`: identifiers only (TC number, e-mail, phone, IBAN, card). **With
   `GUARDRAIL_EGRESS_NER=false` a person's name is written to the Langfuse item as it was asked.**
   Langfuse runs in-house; this is the accepted behaviour for tests and airgap. An installation
   whose runs carry personnel or patient names sets `GUARDRAIL_EGRESS_NER=true`.
-- `regex+ner`: person names are masked too (the API's NER, `engine: ner` at egress).
+- `regex+ner`: person names are masked too (the API's NER, `engine: ner` at egress, `PERSON`
+  on).
+
+`masked_fields` lists which of `message`, `variables`, `answer` and `must_contain` were saved
+masked. A placeholder in `answer` or `must_contain` is what the masked question leads to; but an
+agent that reads the real value from another source (a tool, a document) answers with it, and
+such an item then fails `contains`: give these expectations without personal data where you can.
+`sql_result`, `must_cite` and `regex` are compared with real rows, ids or text, where a
+placeholder never matches: if masking would change one of them the request is
+`422 expected_would_be_masked` and nothing is saved.
 
 The exam then asks the agent the masked question (placeholders, not the original values): the
 mapping is not kept.
