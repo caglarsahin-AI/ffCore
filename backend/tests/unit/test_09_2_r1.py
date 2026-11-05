@@ -196,12 +196,60 @@ def test_09_2_r1_minor6_worker_maps_unknown_cause_to_outage():
 
 def test_09_2_r1_masking_names_ner_only_when_an_egress_pii_rule_uses_it():
     from ffcore.evaluation.from_run import masking_of
-    from ffcore.guardrails.schemas import PiiPolicySpec, PolicySpec, ResolvedPolicy, Rule
+    from ffcore.guardrails.schemas import (
+        PiiCategorySetting,
+        PiiPolicySpec,
+        PolicySpec,
+        ResolvedPolicy,
+        Rule,
+    )
 
     def policy(stages, engine):
         rule = Rule(type="pii", stages=stages, pii_policy_key="p")
-        return ResolvedPolicy("k", PolicySpec(rules=[rule]), {"p": PiiPolicySpec(engine=engine)})
+        spec = PolicySpec(rules=[rule], mode="enforce")  # r2 MINOR-2: only enforce masks
+        cats = {"TR_NATIONAL_ID": PiiCategorySetting(), "PERSON": PiiCategorySetting()}
+        return ResolvedPolicy("k", spec, {"p": PiiPolicySpec(engine=engine, categories=cats)})
 
     assert masking_of(policy(["egress"], "regex")) == "regex"
     assert masking_of(policy(["egress"], "ner")) == "regex+ner"
-    assert masking_of(policy(["input.pre"], "ner")) == "regex"  # NER, but not at egress
+    assert masking_of(policy(["input.pre"], "ner")) == "none"  # nothing at egress
+
+
+# --- 09-2 r2 MINOR-2: `masking` is what the egress rule really does ----------------------------
+
+
+def _resolved(*, policy_mode="enforce", rule_mode=None, action=None, engine="ner", **categories):
+    from ffcore.guardrails.schemas import (
+        PiiCategorySetting,
+        PiiPolicySpec,
+        PolicySpec,
+        ResolvedPolicy,
+        Rule,
+    )
+
+    cats = {"TR_NATIONAL_ID": PiiCategorySetting(), "PERSON": PiiCategorySetting()}
+    cats.update({k: PiiCategorySetting(**v) for k, v in categories.items()})
+    rule = Rule(type="pii", stages=["egress"], pii_policy_key="p", mode=rule_mode, action=action)
+    pii = PiiPolicySpec(engine=engine, categories=cats)
+    return ResolvedPolicy("k", PolicySpec(rules=[rule], mode=policy_mode), {"p": pii})
+
+
+@pytest.mark.parametrize(
+    "kw,expected",
+    [
+        ({}, "regex+ner"),
+        ({"engine": "regex"}, "regex"),
+        ({"PERSON": {"enabled": False}}, "regex"),  # NER engine, but names are not a category
+        ({"PERSON": {"action": "log"}}, "regex"),  # names are found but only logged
+        ({"policy_mode": "off"}, "none"),  # an off policy runs nothing
+        ({"policy_mode": "monitor"}, "none"),  # monitor records, changes nothing
+        ({"policy_mode": "monitor", "rule_mode": "enforce"}, "regex+ner"),  # the rule's own mode
+        ({"rule_mode": "monitor"}, "none"),
+        ({"action": "log"}, "none"),  # the rule's action wins over the categories'
+        ({"TR_NATIONAL_ID": {"enabled": False}, "PERSON": {"enabled": False}}, "none"),
+    ],
+)
+def test_09_2_r2_minor2_masking_is_what_the_egress_rule_does(kw, expected):
+    from ffcore.evaluation.from_run import masking_of
+
+    assert masking_of(_resolved(**kw)) == expected

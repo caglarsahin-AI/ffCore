@@ -339,3 +339,60 @@ def test_09_2_r1_minor3_forced_publish_through_a_key_is_audited_with_it(
         (str(project),),
     ).fetchone()
     assert row == (str(user_id), uuid.UUID(key["id"]))
+
+
+# --- 09-2 r2 MINOR-1/5 (KARARLAR "09-2 r2 ekleri") -------------------------------------------
+
+
+def _exam_status(pg, ev_id):
+    return pg.execute(
+        "SELECT status, error_code, ended_at IS NOT NULL FROM eval_runs WHERE id = %s", (ev_id,)
+    ).fetchone()
+
+
+def test_09_2_r2_minor1_editing_a_draft_ends_its_running_exams(pg, analyst, project):
+    # Change and change back between two advancer ticks: the item runs may have loaded B while
+    # the digest says A again. The PUT itself ends the version's queued and running exams.
+    agent_id, url = _agent(analyst, project)
+    suite_id = _suite(pg, project, agent_id)
+    v1 = _version_id(pg, agent_id)
+    running = _exam(pg, project, suite_id, v1, status="running")
+    queued = _exam(pg, project, suite_id, v1, status="queued")
+    done = _exam(pg, project, suite_id, v1, age_s=30)
+    _edit_draft(analyst, url, prompt="B")
+    _edit_draft(analyst, url, prompt=TEMPLATE["system_prompt"])  # back to A
+    assert _exam_status(pg, running) == ("failed", "definition_changed", True)
+    assert _exam_status(pg, queued) == ("failed", "definition_changed", True)
+    assert _exam_status(pg, done)[0] == "completed"  # a finished exam is the gate's to judge
+
+
+def test_09_2_r2_minor1_saving_the_same_definition_keeps_the_exam(pg, analyst, project):
+    agent_id, url = _agent(analyst, project)
+    suite_id = _suite(pg, project, agent_id)
+    running = _exam(pg, project, suite_id, _version_id(pg, agent_id), status="running")
+    _edit_draft(analyst, url, prompt=TEMPLATE["system_prompt"])  # unchanged
+    assert _exam_status(pg, running) == ("running", None, False)
+
+
+def test_09_2_r2_minor5_publish_and_draft_edit_lock_the_agent_row(pg, analyst, project):
+    from sqlalchemy import event
+    from sqlalchemy.engine import Engine
+
+    agent_id, url = _agent(analyst, project)
+    seen: list[str] = []
+
+    def grab(conn, cursor, statement, *args):
+        seen.append(statement)
+
+    def locks() -> int:
+        return sum(1 for s in seen if "FROM agents" in s and "FOR UPDATE" in s)
+
+    event.listen(Engine, "before_cursor_execute", grab)
+    try:
+        _edit_draft(analyst, url, prompt="locked edit")
+        after_put = locks()
+        assert analyst.post(f"{url}/publish", json={"version": 1}).status_code == 200
+        after_publish = locks()
+    finally:
+        event.remove(Engine, "before_cursor_execute", grab)
+    assert after_put >= 1 and after_publish > after_put

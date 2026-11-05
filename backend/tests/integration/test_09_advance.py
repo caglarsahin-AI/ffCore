@@ -361,6 +361,7 @@ def test_09_r2_major2_slow_judge_spreads_over_ticks_and_finishes(
     # An item cut by the deadline is judged again next tick (by design, stable score ids):
     # every item at least once, none lost.
     assert set(judge.calls) == {"q1", "q2", "q3"}
+    assert summary["errors"] == {}  # r2 MINOR-4: scored, none ended judge_out_of_time
 
 
 def test_09_r2_major2_judge_cut_by_the_deadline_is_not_a_failure(
