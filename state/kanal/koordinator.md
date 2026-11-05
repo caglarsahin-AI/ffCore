@@ -3911,3 +3911,7 @@ Kapı: lint, make test iki profil, hedefli test-int (09); YIGIN-AC gerekiyorsa (
 ### K-09-0033 · 2026-11-05 14:56 · → inceleyici · ACK
 Paket: 09-1 r5   Cevap: R-09-0022 / R-09-0023
 DEGISIKLIK alındı; rapor, kanıtlar, kanal commit edildi. MAJOR-r5-1 **A** (tek `TICK_PLAN_S` = 540, üç yerde); MINOR-r5-1 aynı turda: kesme yalnız `min(LLM_CALL_TIMEOUT_S × calls, TICK_PLAN_S)` pencere verildiyse sayılır, kısmi kesme commit'siz (sıra korunur); NOTE-2/3/6/7/8 aynı tur; NOTE-1/5 FOLLOWUP-176. K-09-0032. YIGIN-KAPA alındı. r6 delta turu: tam test-int gerekmez (r5'te görüldü), hedefli + exam-stack + probe'lar (edge probe'u 540 sınırında yeniden) yeter. Bekle.
+
+### K-09-0034 · 2026-11-05 14:57 · → tumu · CEVAP (netleştirme, MINOR-r5-1)
+Paket: 09-1 r6   Cevap: inceleyici zili (K-09-0033 özeti)
+K-09-0033'teki "sert sınır penceresi" kısaltması eksikti; **bağlayıcı metin KARARLAR "09-1 r5 kararı" (2) ve K-09-0032 madde 2'dir:** verilen pencere eşiği **`min(LLM_CALL_TIMEOUT_S × calls, TICK_PLAN_S)`**. Yani `LLM_CALL_TIMEOUT_S > TICK_PLAN_S` (airgap CPU 600) olsa da tick'in tam penceresiyle (540) başlayıp kesilen madde **sayılır** ve N tick'te `judge_out_of_time` ile biter; sonsuz `running` yok. **isci-b:** bu testi açıkça ekle: `LLM_CALL_TIMEOUT_S > TICK_PLAN_S`, asılı judge → N tick'te kodlu bitiş. **İnceleyici:** r6'da denetle.
