@@ -7,12 +7,15 @@ Two parts:
   as listened. The exam is the item runs' follower; while the worker lives they are never
   abandoned, however long a tick takes. A dead worker stops following, and 06a abandons them.
 - `tick` (arq cron): per active exam, under a Redis lock (`SET NX` + TTL, kept alive while the
-  tick works), start the missing item runs of a queued exam or advance a running one. Per
-  exam and tick at most EVAL_JUDGE_CALLS_PER_TICK judge calls, no judge call while the
-  background window is closed, and no item started that does not fit before the tick's
-  deadline (r2 MAJOR-r2-2): the exam waits, still running. A failure, the job's timeout
-  (`CancelledError`) included, counts towards MAX_ATTEMPTS unless the tick saved an item; a
-  tick that saved one, or succeeded, resets the count.
+  tick works), start the missing item runs of a queued exam or advance a running one.
+  Exams go oldest progress first and share the tick's deadline. The budget rules are
+  runner.Budget.may_judge (no judge call while the background window is closed; every item
+  needs its planned time before the deadline; after the first item the judge-call limit is
+  strict): when an item does not fit, the exam waits, still running, nothing committed. An
+  item cut at the deadline MAX_ATTEMPTS times in a row, or planned longer than a whole tick,
+  ends `error(judge_out_of_time)`. A failed tick, the job's timeout (`CancelledError`)
+  included, counts towards MAX_ATTEMPTS unless it committed something; only a tick that
+  committed something resets the count.
 
 Production bindings for runner.advance_eval: the judge (LiteLLM, background class, egress),
 the SQL re-read (mcp-sql as the exam's starter), the embedding (API /internal/embed).
@@ -172,6 +175,7 @@ def tick_budget(settings: Settings, deadline: float | None = None) -> Budget:
         deadline=deadline or time.monotonic() + TICK_TIMEOUT_S - TICK_MARGIN_S,
         call_s=float(settings.llm_call_timeout_s),
         is_open=window.is_open,
+        total_s=float(TICK_TIMEOUT_S - TICK_MARGIN_S),
     )
 
 

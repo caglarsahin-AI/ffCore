@@ -84,6 +84,9 @@ class Budget:
     deadline: float | None = None
     call_s: float = 0.0
     is_open: Callable[[], bool] = field(default=_always)
+    # The whole tick's length (deadline - margin, r4 MAJOR-r4-1 ek): an item planned longer
+    # than this can start in no tick. None: no such check (tests).
+    total_s: float | None = None
     started: int = 0
     committed: int = 0
 
@@ -92,20 +95,23 @@ class Budget:
 
     def may_judge(self, calls: int) -> bool:
         """Whether the next item (with `calls` judge calls, 0 without a judge) starts now.
-        Judge calls only while the window is open. The tick's first item always starts (cut at
-        `time_left`), so a slow judge still progresses one item per tick. A later item only
-        when its calls fit in the judge calls left (a strict limit, r3 MINOR-r3-1) and, at
-        `call_s` each, before the deadline. So a tick makes at most EVAL_JUDGE_CALLS_PER_TICK
-        judge calls, or its first item's calls when that is more."""
+        Judge calls only while the window is open. Every item, the tick's first one too (r4
+        MAJOR-r4-1), needs its planned time (`call_s` per call, at least one) before the
+        deadline; otherwise the exam waits for a later tick, nothing is committed. The first
+        item ignores the judge-call limit, so a repeat above it still progresses; a later item
+        must fit in the calls left (strict, r3 MINOR-r3-1). So a tick makes at most
+        EVAL_JUDGE_CALLS_PER_TICK judge calls, or its first item's calls when that is more."""
         if calls and not self.is_open():
             return False
-        if self.started == 0:
-            return True
-        if calls > self.judge_calls:
+        if self.started and calls > self.judge_calls:
             return False
         return self.deadline is None or (
             time.monotonic() + self.call_s * max(calls, 1) <= self.deadline
         )
+
+    def exceeds_tick(self, calls: int) -> bool:
+        """The item's planned time is longer than a whole tick: no tick could ever start it."""
+        return self.total_s is not None and self.call_s * max(calls, 1) > self.total_s
 
     def time_left(self) -> float | None:
         if self.deadline is None:
@@ -418,6 +424,17 @@ async def advance_eval(
         if entry["scored"] or any(runs[r].status not in TERMINAL for r in entry["runs"]):
             continue
         calls = len(entry["runs"]) if judged else 0
+        if budget.exceeds_tick(calls):
+            # r4 MAJOR-r4-1 ek: waiting would be forever; the item ends coded at once.
+            log.warning(
+                "eval_item_exceeds_tick eval_run=%s item=%s calls=%s", ev.id, item_id, calls
+            )
+            entry["result"] = _out_of_time(entry, "planned_exceeds_tick_budget")
+            entry["scored"] = True
+            _save(ev, plan)
+            await session.commit()
+            budget.committed += 1
+            continue
         if not budget.may_judge(calls):
             # Out of judge calls or time, or the background window is closed: the exam stays
             # running and waits for a later tick (r2 MAJOR-r2-2); not a failure.
@@ -451,7 +468,7 @@ async def advance_eval(
                 entry["timeouts"],
             )
             if entry["timeouts"] >= MAX_ATTEMPTS:
-                entry["result"] = _out_of_time(entry)
+                entry["result"] = _out_of_time(entry, "judge_out_of_time")
                 entry["scored"] = True
                 budget.committed += 1
             _save(ev, plan)
@@ -548,8 +565,10 @@ async def _score_item(session, ev, entry, runs, cfg, *, api, judge, sql, embed) 
     return {"runs": per_run}
 
 
-def _out_of_time(entry: dict) -> dict:
-    """The result of an item whose scoring never fitted in a tick: an error per run."""
+def _out_of_time(entry: dict, note: str) -> dict:
+    """The result of an item whose scoring never fitted in a tick: an error per run. Scores
+    an earlier, cut attempt already wrote to Langfuse stay there (upserted by id); this
+    database result is the exam's verdict (r4 NOTE-1)."""
     score = {
         "name": "llm_judge",
         "value": None,
@@ -563,9 +582,9 @@ def _out_of_time(entry: dict) -> dict:
                 "run_id": rid,
                 "outcome": None,
                 "passed": False,
-                "note": "judge_out_of_time",
+                "note": note,
                 "scores": [dict(score)],
-            }  # fmt: skip
+            }
             for rid in entry["runs"]
         ]
     }

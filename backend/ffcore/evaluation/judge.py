@@ -11,6 +11,7 @@ The judge's reason is the model's answer to masked input; it is kept short with 
 truncation mark (S8).
 """
 
+import logging
 from dataclasses import dataclass
 from typing import Any, Protocol
 
@@ -19,6 +20,7 @@ from ffcore.evaluation.scorers import JudgeParseError, Score, judge_score, parse
 # Seeding never overwrites a prompt Langfuse already has, so a changed rubric text is a new
 # prompt name (r2 MINOR-r2-6; v2: r1 MINOR-1 delimiters). The test pins text to name.
 RUBRIC_PROMPT = "eval_judge_rubric_v2"
+log = logging.getLogger("ffcore.evaluation")
 REASON_MAX = 500
 JUDGE_SOURCE = "agent-playground"
 JUDGE_MAX_TOKENS = 300
@@ -68,9 +70,12 @@ async def judge(
     text = rubric.render(question=question, expected=expected, answer=answer)
     try:
         action, outgoing = await guard.egress(text)
-    except NerEgressUnavailable:
+    except NerEgressUnavailable as exc:
         # The API's NER (GUARDRAIL_EGRESS_NER=true) is down: nothing leaves unmasked, and an
         # outage is not the agent's score (r3 NOTE-6, MINOR-r3-4): the item is not run.
+        # Logged with the cause's class only, never the text (r4 NOTE-9).
+        cause = type(exc.__cause__).__name__ if exc.__cause__ else "unknown"
+        log.warning("eval_judge_ner_unavailable cause=%s", cause)
         return JudgeResult(Score("llm_judge", None, None, "ner_unavailable", "not_run"), "")
     if action == "block":
         return JudgeResult(Score("llm_judge", None, None, "judge_blocked_at_egress", "error"), "")

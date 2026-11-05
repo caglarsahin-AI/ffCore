@@ -13,14 +13,15 @@ the worker's own listener task (worker_tick.listen_loop), so a long tick never a
 Runs that wait for a user answer are cancelled; runs that wait for an approval either stay in
 the 07 queue for a person (`approve_tools=true`) or are cancelled (`approval_required`), never
 approved by the exam (K-09-0008); the item's not_run note comes from the run's end code. A
-finished item is diagnosed and scored (at most EVAL_JUDGE_CALLS_PER_TICK judge calls a tick);
+finished item is diagnosed and scored within the tick's budget (runner.Budget);
 its run's own Langfuse trace is linked into the dataset run and the scores written there
 (upsert by id), and the item is committed on its own. When every item is scored the summary is
 written and the exam is `completed`.
 
 Langfuse failures are counted per item; after MAX_ATTEMPTS the exam ends `failed` with the
-error code. A tick that keeps failing (MAX_ATTEMPTS in a row, a timeout included) ends the exam
-`failed(advance_failed:<type>)` (fail-loud; no local copy of what could not be written).
+error code. A tick that keeps failing without committing anything (MAX_ATTEMPTS in a row, a
+timeout included) ends the exam `failed(advance_failed:<type>)` (fail-loud; no local copy of
+what could not be written).
 """
 
 import logging
