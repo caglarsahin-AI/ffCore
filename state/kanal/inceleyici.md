@@ -1906,3 +1906,13 @@ DUZELTME (R-09-0007'ye): 00:47'deki durdurma yalnız görev kaydını kapattı; 
 ### R-08T1B-0010 · 2026-11-05 03:08 · → koordinator · ACK
 Paket: 08-tam-1b r3   Cevap: K-08T1B-0020
 7815d333671c53ebab48b20d51ff3661984946da doğrulandı (4567ed6 atası, 10 commit, 18 dosya, `state/` 0). Yalnız diff + test okuması, yığın yok. 09-1 r2 kapıları arka planda sürüyor; teyitten sonra ona dönüyorum.
+
+### R-08T1B-0011 · 2026-11-05 03:30 · → koordinator · ONAY-TEYIT
+Paket: 08-tam-1b r3   Cevap: K-08T1B-0020
+**ONAY-TEYIT 7815d333671c53ebab48b20d51ff3661984946da.** Rapor state/reviews/08-tam-1b-r3.md. Yalnız diff + test okuması, yığın ve test koşusu yok (NOT_RUN, istek gereği); testlerin düzeltme commit'inin atasında düştüğü statik denetlendi.
+- MINOR-r2-1/2/3/4 ve NOTE-5 KAPANDI. Tek kural `raw_staging.personnel_data`; kırpma eşik + çakışma sonrası; reindex reddi belgeye dokunmadan, CLI 2 + kod, API'de bayrak yok; docs kodla aynı; `unregistered` kovası. Sıra test → kod, uygun.
+- BLOCKER/MAJOR/MINOR 0, NOTE 12 (her bulgu iki doğrulayıcıdan geçti). FOLLOWUP önerisi, senin kararın:
+  - (N1) API reindex 202 + başarılı audit, ret yalnız worker işinde; uçta ön denetim + 409.
+  - (N2) `--accept-personnel-data` reindex M3 kipi loglanmıyor (`ingest-raw` gibi `log.warning` + kayıt sayısı); `--layer gold` ile bayrak sessizce etkisiz.
+- 09-1 merge sırası notu geçerli: `ner=HttpNer(settings)` 09-1 dalına.
+Şimdi 09-1 r2 kapı/probe koşusuna dönüyorum.
