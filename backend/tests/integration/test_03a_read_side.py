@@ -91,6 +91,10 @@ PARITY_EXEMPT_PREFIXES = (
     # test_09_read_mode_get_parity (the /eval-suites list stays checked here).
     f"{API}/projects/{{project_id}}/eval-suites/{{suite_id}}",
     f"{API}/projects/{{project_id}}/eval-runs/{{eval_run_id}}",
+    # 09-2: compare needs two exams (`a`, `b` are required; a bare call is 422 in both modes);
+    # its parity is test_09_2_compare_over_http_and_read_mode and
+    # test_09_2_r1_major2_bare_compare_is_the_same_422_in_both_modes.
+    f"{API}/projects/{{project_id}}/eval-runs/compare",
 )
 
 
