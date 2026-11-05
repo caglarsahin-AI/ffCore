@@ -1,0 +1,16 @@
+# 2026-11-05T17:09:46Z HEAD 5e9a688 + red tests (K-08T1C-0024)
+$ docker run --rm --network none --env-file .env.test -v C:/ai_paycore/ffcore/.worktrees/feat/08-tam-1c-olcum:/work -w /work/backend ffcore/tools:0.0.0-08t1c sh -c 'pytest -q -p no:cacheprovider tests/unit/test_08t1c_7_ner_quality.py tests/unit/test_08t1c_12_offline_models_listed.py 2>&1 | tail -n 14'
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['bash', '/work/deploy/offline/verify.sh', '--models', '/tmp/pytest-of-root/pytest-0/test_08t1c_...acme/ner model.safetensors: missing\nFAIL model paddleocr det/inference.pdiparams: missing\nverify: FAIL\n', stderr='').returncode
+
+tests/unit/test_08t1c_12_offline_models_listed.py:121: AssertionError
+=========================== short test summary info ============================
+FAILED tests/unit/test_08t1c_7_ner_quality.py::test_08t1c_7e_partial_name_is_found_but_not_covered
+FAILED tests/unit/test_08t1c_7_ner_quality.py::test_08t1c_7f_two_spans_cover_a_full_name
+FAILED tests/unit/test_08t1c_7_ner_quality.py::test_08t1c_7g_findings_below_the_engine_threshold_are_not_counted
+FAILED tests/unit/test_08t1c_12_offline_models_listed.py::test_08t1c_12b_verify_names_unlisted_model_dirs_and_files
+FAILED tests/unit/test_08t1c_12_offline_models_listed.py::test_08t1c_12c_models_files_lists_only_the_listed_files
+FAILED tests/unit/test_08t1c_12_offline_models_listed.py::test_08t1c_12d_save_packs_only_the_listed_files
+FAILED tests/unit/test_08t1c_12_offline_models_listed.py::test_08t1c_12e_packed_tree_loads_offline
+7 failed, 5 passed in 3.59s

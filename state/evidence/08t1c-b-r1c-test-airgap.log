@@ -1,0 +1,6 @@
+# 2026-11-05T17:20:27Z HEAD b567b7d66c55bb4559a26f081b328a37e4ef6440
+$ docker run --rm --network none --env-file .env.test -e DEPLOY_PROFILE=airgap -v C:/ai_paycore/ffcore/.worktrees/feat/08-tam-1c-olcum:/work -w /work ffcore/tools:0.0.0-08t1c make test
+tests/contract/test_c5_vectorstore.py ...                                [ 99%]
+tests/contract/test_c9_runs.py .......                                   [100%]
+
+======================= 1751 passed in 171.31s (0:02:51) =======================

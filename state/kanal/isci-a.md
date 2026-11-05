@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-a-08-tam-1c-olcum (Opus 5.5; önceki lease ffcore-isci-a-08-tam-1b RETIRED, HANDOFF koordinatör özeti K-08T1B-0026)
 - Aktif paket: 08-tam-1c-b-olcum (K-08T1C-0014; 1c-a MERGED c5b234c)
 - Durum: ACTIVE
-- Son okunan: K-08T1C-0021
+- Son okunan: K-08T1C-0024
 
 ## Mesajlar
 
@@ -2118,3 +2118,14 @@ Paket: 08-tam-1c-b-olcum   Cevap: K-08T1C-0021
 Branch `feat/08-tam-1c-b-olcum` · SHA **5e9a68881a4f51d9a2cd1ad91aeab8eaabc0a809** · baz 105d176 · delta `105d176..5e9a688` (8 commit, 13 dosya +484/-52); r1b delta `2a7b430..5e9a688` (1 commit, 7 dosya +59/-21) · [B] · push yok · main c6c9d83 ile `merge-tree` temiz · PR state/pr/08-tam-1c.md "r1b" bölümü.
 r1b: MINOR-a (docs P95 158-840 ms), MINOR-b (`.env.example` `true` öncesi `make test-ner-latency` şartı), NOTE-3 (gecikme testi `tests/models/test_08t_ner_latency.py`, işaret `ner_latency`, `make test-models` koşmaz: `6 passed, 1 deselected`), NOTE-1 (egress testi özellik: ham ad/telefon yok, 2-3 yer tutucu). NOTE-2/4/5 PR notunda.
 Kapı: `make lint` 0; `make test` airgap 1743/1743; llmaas 1742/1743: `test_02_r1_m3_child_process_exits_by_itself` yük altında 1 kez düştü (mutlak duvar saati; review09 ~%180 CPU, makine uykusu), **tek başına 3/3 yeşil** (08t1c-b-r1b-tracing-rerun.log); 02'ye dokunulmadı. `-m models` 6 passed; `make test-ner-latency` koşuyor (dizüstü 266/367 ms, ENV-177). Dal donar.
+
+### A-08T1C-0022 · 2026-11-05 17:40 · → koordinator · ACK
+Paket: 08-tam-1c-b-olcum   Cevap: K-08T1C-0024
+r1c başladı: MINOR-1..5 (state/reviews/08-tam-1c-b-r1.md). Kırmızı testler yazıldı. Konteyner notu: yalnız tools `docker run --rm --network none` (+ `04a-knowledge-core_model_cache:/models:ro` -m models için); yığın yok.
+
+### A-08T1C-0023 · 2026-11-05 17:35 · → koordinator · PR-HAZIR r1c
+Paket: 08-tam-1c-b-olcum   Cevap: K-08T1C-0024
+Branch `feat/08-tam-1c-b-olcum` · SHA **b567b7d66c55bb4559a26f081b328a37e4ef6440** · baz 105d176 · delta `105d176..b567b7d` (10 commit, 18 dosya +775/-65); r1c delta `5e9a688..b567b7d` (2 commit: 1f3f391 kırmızı test → b567b7d; 9 dosya +326/-48) · [B] · push yok · PR state/pr/08-tam-1c.md "r1c" bölümü.
+MINOR-2: `Covered` sütunu; **PERSON covered 22/22 = 1,00**, recall düşmedi. MINOR-3: ölçüm motorun eşiğiyle (0,5); akdeniz27 ORG 6 → 5 tahmin (precision 0,80), PERSON/LOC aynı. MINOR-4: `models-files.sh`; `save.sh` yalnız listelenenler (`tar --dereference`); `verify.sh` listede olmayan model dizini/snapshot dosyasını FAIL ile adlandırır, silmez; paketlenen ağaç ağsız yüklendi. MINOR-5: docs 158-840 ms, hız farkı 4 iş parçacığında 1,5-1,7, tek iş parçacığında 2,1-2,8 kat. MINOR-1: PR/docs metni (keşif kanıtı). MINOR-6 değişiklik yok.
+Kapı: `make lint` 0; `make test` llmaas 1751/1751, airgap 1751/1751; birim 52 passed; `-m models` 7 passed + 1 deselected (state/evidence/08t1c-b-r1c-*.log). Konteynerler yalnız `docker run --rm --network none` (model volume `:ro`); yığın yok, hepsi kapandı.
+**Kullanıcı adımı (merge sonrası, tek seferlik):** gerçek volume'da `verify.sh --models` artık FAIL (savasy dizini + akdeniz27 `pytorch_model.bin`; 08t1c-b-r1c-checks.log); temizlik komutu docs/guardrail.md "Old volumes". Ben silmedim. Dal donar.

@@ -1,0 +1,29 @@
+# 2026-11-05T17:14:58Z HEAD 1f3f391 + working tree (r1c code+docs)
+$ docker run --rm --network none --env-file .env.test -v C:/ai_paycore/ffcore/.worktrees/feat/08-tam-1c-olcum:/work -v C:/Users/caglar.sahin/AppData/Local/Temp/claude/9398d5fca5badfb5/1ca44d51-3ae7-4e45-bd35-949d6d7b1e32/scratchpad:/scratch:ro -v 04a-knowledge-core_model_cache:/models:ro -w /work ffcore/tools:0.0.0-08t1c bash /scratch/r1c_checks.sh
+ip6tnl0 lo tunl0 /dev/sda1 /models ext4 ro,relatime,discard 0 0
+## make lint
+ruff format --check backend scripts data/samples/scripts services
+478 files already formatted
+## unit (quality, offline, 19, recognizers, 08t_ner, 18)
+52 passed in 9.11s
+## -m models (NER files; latency deselected)
+7 passed, 1 deselected in 22.37s
+## verify.sh --models on the real (old) volume: expected FAIL naming savasy and the pickle
+FAIL model akdeniz27/bert-base-turkish-cased-ner 99995f7d2be4b3a28c74f0d36ee97f8c04ee0571/pytorch_model.bin: not in models.txt
+FAIL model dir models--savasy--bert-base-turkish-ner-cased: not in models.txt
+verify: FAIL
+verify_exit=1
+## packed tree (akdeniz27 rows only) loads offline
+huggingface/hub/models--akdeniz27--bert-base-turkish-cased-ner/refs/
+huggingface/hub/models--akdeniz27--bert-base-turkish-cased-ner/refs/main
+huggingface/hub/models--akdeniz27--bert-base-turkish-cased-ner/snapshots/99995f7d2be4b3a28c74f0d36ee97f8c04ee0571/README.md
+huggingface/hub/models--akdeniz27--bert-base-turkish-cased-ner/snapshots/99995f7d2be4b3a28c74f0d36ee97f8c04ee0571/config.json
+huggingface/hub/models--akdeniz27--bert-base-turkish-cased-ner/snapshots/99995f7d2be4b3a28c74f0d36ee97f8c04ee0571/model.safetensors
+huggingface/hub/models--akdeniz27--bert-base-turkish-cased-ner/snapshots/99995f7d2be4b3a28c74f0d36ee97f8c04ee0571/special_tokens_map.json
+huggingface/hub/models--akdeniz27--bert-base-turkish-cased-ner/snapshots/99995f7d2be4b3a28c74f0d36ee97f8c04ee0571/tokenizer.json
+huggingface/hub/models--akdeniz27--bert-base-turkish-cased-ner/snapshots/99995f7d2be4b3a28c74f0d36ee97f8c04ee0571/tokenizer_config.json
+huggingface/hub/models--akdeniz27--bert-base-turkish-cased-ner/snapshots/99995f7d2be4b3a28c74f0d36ee97f8c04ee0571/vocab.txt
+OK models (7 files)
+verify: OK
+verify_packed_exit=0
+loaded from packed tree: [('PERSON', 'Ayşe Demir')]

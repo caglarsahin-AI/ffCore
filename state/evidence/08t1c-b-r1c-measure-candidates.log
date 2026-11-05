@@ -1,0 +1,29 @@
+# 2026-11-05T17:12:34Z HEAD 1f3f391 + working tree (r1c: min_confidence + coverage)
+$ docker run --rm --network none -v C:/ai_paycore/ffcore/.worktrees/feat/08-tam-1c-olcum:/work -v 04a-knowledge-core_model_cache:/models:ro -w /work/backend ffcore/tools:0.0.0-08t1c sh -c 'python -m ffcore.guardrails.quality ../data/samples/pii/pii-100.jsonl --ner akdeniz27/bert-base-turkish-cased-ner@99995f7d2be4b3a28c74f0d36ee97f8c04ee0571 --ner savasy/bert-base-turkish-ner-cased@7678083d645af39967e0ebe8213a6049deb6e2cc'
+ip6tnl0 lo tunl0 /dev/sda1 /models ext4 ro,relatime,discard 0 0
+0.07 0.32 1.90 2/605 10
+| Category | Support | Predicted | Recall | Precision |
+|---|---|---|---|---|
+| `TR_NATIONAL_ID` | 9 | 9 | 1.00 | 1.00 |
+| `TR_PHONE` | 9 | 9 | 1.00 | 1.00 |
+| `TR_IBAN` | 6 | 6 | 1.00 | 1.00 |
+| `EMAIL_ADDRESS` | 8 | 8 | 1.00 | 1.00 |
+| `CREDIT_CARD` | 5 | 5 | 1.00 | 1.00 |
+
+regex P95, 1000 characters: 0.78 ms
+
+akdeniz27/bert-base-turkish-cased-ner@99995f7d2be4b3a28c74f0d36ee97f8c04ee0571 (torch threads 4)
+| Category | Support | Predicted | Recall | Precision | Covered |
+|---|---|---|---|---|---|
+| `PERSON` | 22 | 22 | 1.00 | 1.00 | 1.00 |
+| `ORGANIZATION` | 4 | 5 | 1.00 | 0.80 | 1.00 |
+| `LOCATION` | 4 | 23 | 1.00 | 0.17 | 1.00 |
+P95, 1000 characters, local rules + NER: 197 ms
+
+savasy/bert-base-turkish-ner-cased@7678083d645af39967e0ebe8213a6049deb6e2cc (torch threads 4)
+| Category | Support | Predicted | Recall | Precision | Covered |
+|---|---|---|---|---|---|
+| `PERSON` | 22 | 23 | 0.95 | 0.91 | 0.95 |
+| `ORGANIZATION` | 4 | 11 | 1.00 | 0.36 | 0.75 |
+| `LOCATION` | 4 | 20 | 1.00 | 0.20 | 1.00 |
+P95, 1000 characters, local rules + NER: 245 ms

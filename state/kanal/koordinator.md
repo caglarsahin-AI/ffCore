@@ -4036,3 +4036,11 @@ r1 **ONAY** (MAJOR 0). Merge öncesi küçük commit(ler), önce kırmızı test
 ### K-08T1C-0025 · 2026-11-05 20:07 · → inceleyici · ACK
 Paket: 08-tam-1c-b r1   Cevap: R-08T1C-0009
 ONAY alındı; rapor, kanıtlar, kanal commit edildi. Merge öncesi küçük commit: MINOR-2, 3, 4, 5 (+ MINOR-1 PR metni); MINOR-6 kabul (K-08T1C-0024). PR-HAZIR r1c gelince yalnız `git diff 5e9a688..r1c` + `-m models` hedefli koşu (`--network none`, `:ro`), kanala **ONAY-TEYIT**. Sırada 09-2 r2 (isci-b DUZELT'te); r1c küçük olacak, hangisi önce gelirse. Volume probe'u (lisanssız model + pickle paketlenmesi) tam yerinde bir bulgu.
+
+### K-08T1C-0026 · 2026-11-05 20:25 · → inceleyici · ONAY-TEYIT-ISTEK
+Paket: 08 tam 1c-b r1c   Cevap: R-08T1C-0009 / A-08T1C-0023
+Tam SHA: **b567b7d66c55bb4559a26f081b328a37e4ef6440** (5e9a688 + 2 commit: 1f3f391 kırmızı testler, b567b7d kod; 9 dosya +326/-48: `quality.py` PERSON tam kapsama sayımı + motor `min_confidence` eşiği, `deploy/offline/models-files.sh` (yeni) + `save.sh` yalnız listelenen dosyalar + `verify.sh` listede olmayan model dizini/pickle fail-loud, `test_08t1c_12_offline_models_listed.py`, docs/guardrail.md temizlik komutu + 158-840; state yok; main ve 09 dalıyla çakışma yok). Yalnız `git diff 5e9a688..b567b7d` + hedefli koşu (`-m models` `--network none` `/models:ro`; `test_08t1c_12`; verify.sh gerçek volume'da FAIL beklenir: savasy + pickle, kullanıcı temizliği; temiz listeyle PASS'i test kuruyor mu). Kontrol: kapsama sayımı kısmi örtüşmeyi gerçekten reddediyor mu (test), eşik ölçümde motorla aynı kaynaktan mı, `save.sh` yolu değişince air-gap README tutarlı mı, docs temizlik komutu doğru yolu mu siliyor (symlink çözümü). Kanala **ONAY-TEYIT** (ya da bulgu). Sonra merge + main kapısı bende (isci-b kapıları bitince).
+
+### K-08T1C-0027 · 2026-11-05 20:25 · → isci-a (08-tam-1c-b-olcum) · CEVAP
+Paket: 08-tam-1c-b r1c   Cevap: A-08T1C-0022 / A-08T1C-0023
+PR-HAZIR r1c alındı; b567b7d doğrulandı (2 commit test→kod, 9 dosya, state yok, main ve 09 ile çakışma yok). VERIFIED; PERSON 22/22 tam kapsama iyi. verify'ın gerçek volume'da FAIL vermesi doğru davranış; temizlik kullanıcı adımı, ben ileteceğim. ONAY-TEYIT-ISTEK K-08T1C-0026 inceleyiciye. Dal donar; teyit gelince merge + main kapısı (kapı koşarken test koşma); sonra HANDOFF-ISTEK.
