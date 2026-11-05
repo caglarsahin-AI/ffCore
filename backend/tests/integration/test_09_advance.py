@@ -435,3 +435,55 @@ def test_09_r3_major1_item_cut_every_tick_ends_with_a_code(pg, project, database
         status, plan, summary = tick()
     assert status == "completed"
     assert summary["errors"] == {"judge_out_of_time": 2} and summary["passed_items"] == 0
+
+
+# --- 09-1 r4 MAJOR-r4-1: a shared deadline used up by an earlier exam is not a cut ----------------
+
+
+def test_09_r4_major1_second_exam_waits_and_comes_first_next_tick(
+    pg, project, database, app_settings
+):
+    import time
+
+    from ffcore.evaluation.runner import Budget, active_runs
+
+    first, second = _judged_exam(pg, project, n=1), _judged_exam(pg, project, n=1)
+    pg.execute(
+        "UPDATE eval_runs SET updated_at = now() - interval '1 hour' WHERE id = %s", (first,)
+    )
+    before = pg.execute("SELECT updated_at FROM eval_runs WHERE id = %s", (second,)).fetchone()[0]
+    deadline = time.monotonic() + 0.3  # one tick's deadline, shared by both exams
+    _advance(database, app_settings, first, judge=_Judge(delay=2.0),
+             budget=Budget(20, deadline=deadline, call_s=0.05))  # fmt: skip
+    judge = _Judge()
+    _advance(database, app_settings, second, judge=judge,
+             budget=Budget(20, deadline=deadline, call_s=0.05))  # fmt: skip
+    status, plan, _ = _ev(pg, second)
+    assert status == "running" and judge.calls == []
+    assert plan["q1"].get("timeouts", 0) == 0 and not plan["q1"]["scored"]
+    after = pg.execute("SELECT updated_at FROM eval_runs WHERE id = %s", (second,)).fetchone()[0]
+    assert after == before  # nothing committed: its place in the order is kept
+    assert _ev(pg, first)[1]["q1"]["timeouts"] == 1  # the first exam's judge was really cut
+
+    async def order():
+        async with database.session_scope() as session:
+            return [ev.id for ev in await active_runs(session) if ev.id in (first, second)]
+
+    assert asyncio.run(order()) == [second, first]
+
+
+def test_09_r4_major1_item_planned_longer_than_a_tick_ends_at_once(
+    pg, project, database, app_settings
+):
+    import time
+
+    from ffcore.evaluation.runner import Budget
+
+    ev_id = _judged_exam(pg, project, n=1)
+    judge = _Judge()
+    budget = Budget(20, deadline=time.monotonic() + 5.0, call_s=10.0, total_s=5.0)
+    _advance(database, app_settings, ev_id, judge=judge, budget=budget)
+    status, plan, summary = _ev(pg, ev_id)
+    assert status == "completed" and judge.calls == []
+    assert plan["q1"]["result"]["runs"][0]["note"] == "planned_exceeds_tick_budget"
+    assert summary["errors"] == {"judge_out_of_time": 1}

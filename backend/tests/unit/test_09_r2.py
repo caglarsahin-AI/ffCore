@@ -94,7 +94,8 @@ def test_09_r2_major2_tick_budget_knows_the_background_window():
 
 def test_09_r2_major2_budget_refuses_a_judge_call_past_the_deadline():
     b = Budget(5, deadline=time.monotonic() + 1.0, call_s=0.4)
-    assert b.may_judge(9) is True  # the first item of a tick always starts (bounded by time)
+    # r4 MAJOR-r4-1: the first item too needs its planned time (9 x 0.4 s does not fit).
+    assert b.may_judge(9) is False and b.may_judge(2) is True
     b.started = 1
     assert b.may_judge(2) is True
     assert b.may_judge(3) is False  # 3 x 0.4 s does not fit in the second left
