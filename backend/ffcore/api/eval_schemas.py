@@ -129,6 +129,31 @@ class EvalRunList(BaseModel):
     items: list[EvalRunOut]
 
 
+# --- 09-2: an exam item from a run ------------------------------------------------------------
+
+
+class ExpectedOutput(Strict):
+    """What the item expects; the scorers read these keys (docs/evaluation.md)."""
+
+    answer: str | None = Field(default=None, max_length=5000)
+    must_contain: list[str] | None = None
+    must_cite: list[str] | None = None
+    regex: str | None = None
+    sql_result: list[list] | None = None
+
+
+class FromRunItem(Strict):
+    expected: ExpectedOutput
+    style: str = Field(min_length=1, max_length=40, pattern=r"^[a-z0-9_]+$")
+    answerable: bool = True
+
+
+class FromRunOut(BaseModel):
+    item_id: str
+    dataset: str
+    run_id: UUID
+
+
 # --- 09-2: comparing two exams ---------------------------------------------------------------
 
 Change = Literal["fixed", "regressed", "same", "not_comparable", "only_a", "only_b"]

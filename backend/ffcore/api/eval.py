@@ -20,13 +20,15 @@ from ffcore.api.eval_schemas import (
     CompareOut,
     EvalRunList,
     EvalRunOut,
+    FromRunItem,
+    FromRunOut,
     SuiteCreate,
     SuiteList,
     SuiteOut,
     SuiteUpdate,
 )
 from ffcore.core import db
-from ffcore.core.audit import audited, request_context
+from ffcore.core.audit import AuditEntry, audited, request_context, write_event
 from ffcore.core.auth import Actor, require_role
 from ffcore.core.config import Settings, get_settings
 from ffcore.core.errors import ApiError
@@ -346,6 +348,72 @@ async def start_eval_run(
         raise langfuse_failed(exc) from None
     await session.refresh(ev)
     return run_out(ev)
+
+
+@router.post(
+    "/eval-suites/{suite_id}/items/from-run/{run_id}",
+    response_model=FromRunOut,
+    status_code=status.HTTP_201_CREATED,
+)
+async def item_from_run(
+    project_id: UUID,
+    suite_id: UUID,
+    run_id: UUID,
+    body: FromRunItem,
+    request: Request,
+    actor: Editor,
+    session: SessionDep,
+    langfuse: LangfuseDep,
+):
+    """Save a run's question as an item of the suite's dataset with the expected answer given
+    here (09-2). The question and its variables are masked by the agent version's egress policy
+    first; a blocked one is 422 `run_input_blocked`. The run is read as the run API reads it.
+    Audited once (`eval_item_from_run`), without content."""
+    from ffcore.api.runs import _readable_run
+    from ffcore.evaluation import from_run
+
+    suite = await _suite(session, project_id, suite_id)
+    run = await _readable_run(session, request, actor, project_id, run_id)
+    if run.status != "completed":
+        raise conflict("run_not_completed", f"The run is {run.status}, not completed.")
+    version = await session.get(AgentVersion, run.agent_version_id)
+    masked = await from_run.masked_input(session, project_id, version, run.input, run.variables)
+    item = from_run.item_id(suite.key, run.id)
+    try:
+        await langfuse.upsert_item(
+            suite.langfuse_dataset_name,
+            item,
+            input=masked,
+            expected_output=body.expected.model_dump(exclude_none=True),
+            metadata={
+                "style": body.style,
+                "answerable": body.answerable,
+                "source": "from_run",
+                "run_id": str(run.id),
+            },  # fmt: skip
+        )
+    except LangfuseApiError as exc:
+        await session.rollback()
+        raise langfuse_failed(exc) from None
+    request_id, ip = request_context(request)
+    await write_event(
+        session,
+        AuditEntry(
+            action="eval_item_from_run",
+            resource_type="eval_suite",
+            outcome="success",
+            actor_type=actor.actor_type,
+            actor_id=actor.actor_id,
+            project_id=str(project_id),
+            resource_id=str(suite.id),
+            before=None,
+            after={"suite_id": str(suite.id), "item_id": item, "run_id": str(run.id)},
+            request_id=request_id,
+            ip=ip,
+        ),
+    )
+    await session.commit()
+    return FromRunOut(item_id=item, dataset=suite.langfuse_dataset_name, run_id=run.id)
 
 
 @router.get("/eval-suites/{suite_id}/runs", response_model=EvalRunList)

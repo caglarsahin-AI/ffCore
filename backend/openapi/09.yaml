@@ -402,6 +402,91 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorBody'
+  /api/v1/projects/{project_id}/eval-suites/{suite_id}/items/from-run/{run_id}:
+    post:
+      tags:
+      - evaluation
+      summary: Item From Run
+      description: 'Save a run''s question as an item of the suite''s dataset with the expected answer
+        given
+
+        here (09-2). The question and its variables are masked by the agent version''s egress policy
+
+        first; a blocked one is 422 `run_input_blocked`. The run is read as the run API reads it.
+
+        Audited once (`eval_item_from_run`), without content.'
+      operationId: item_from_run_api_v1_projects__project_id__eval_suites__suite_id__items_from_run__run_id__post
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      - name: suite_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Suite Id
+      - name: run_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Run Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FromRunItem'
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FromRunOut'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
   /api/v1/projects/{project_id}/eval-suites/{suite_id}/runs:
     get:
       tags:
@@ -1027,6 +1112,83 @@ components:
       - ended_at
       - created_at
       title: EvalRunOut
+    ExpectedOutput:
+      properties:
+        answer:
+          anyOf:
+          - type: string
+            maxLength: 5000
+          - type: 'null'
+          title: Answer
+        must_contain:
+          anyOf:
+          - items:
+              type: string
+            type: array
+          - type: 'null'
+          title: Must Contain
+        must_cite:
+          anyOf:
+          - items:
+              type: string
+            type: array
+          - type: 'null'
+          title: Must Cite
+        regex:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Regex
+        sql_result:
+          anyOf:
+          - items:
+              items: {}
+              type: array
+            type: array
+          - type: 'null'
+          title: Sql Result
+      additionalProperties: false
+      type: object
+      title: ExpectedOutput
+      description: What the item expects; the scorers read these keys (docs/evaluation.md).
+    FromRunItem:
+      properties:
+        expected:
+          $ref: '#/components/schemas/ExpectedOutput'
+        style:
+          type: string
+          maxLength: 40
+          minLength: 1
+          pattern: ^[a-z0-9_]+$
+          title: Style
+        answerable:
+          type: boolean
+          title: Answerable
+          default: true
+      additionalProperties: false
+      type: object
+      required:
+      - expected
+      - style
+      title: FromRunItem
+    FromRunOut:
+      properties:
+        item_id:
+          type: string
+          title: Item Id
+        dataset:
+          type: string
+          title: Dataset
+        run_id:
+          type: string
+          format: uuid
+          title: Run Id
+      type: object
+      required:
+      - item_id
+      - dataset
+      - run_id
+      title: FromRunOut
     MetricDiff:
       properties:
         a:
