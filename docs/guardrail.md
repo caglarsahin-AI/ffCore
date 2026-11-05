@@ -93,10 +93,16 @@ calls the model.
   The internal endpoint takes at most 200,000 characters per request; a worker sends a longer
   text (a large document at ingest) in windows overlapping by 2,000 characters and merges the
   spans the overlap repeats, so a name on a window edge is still found.
-- Weights: `make models` downloads the candidates (model card, config, tokenizer, PyTorch
-  weights only) into the `model_cache` volume; `make models-check` lists them offline. The
-  measured model, its licence and the quality and latency table are added when the measurement
-  has run (package 08 full 1b; until then the choice is open).
+- Model: `akdeniz27/bert-base-turkish-cased-ner` at `99995f7d2be4b3a28c74f0d36ee97f8c04ee0571`
+  (MIT licence on the model card; BERT-base, labels `PER`/`ORG`/`LOC`), chosen by measurement
+  (08 full 1c, [NER quality report](#ner-quality-report)). The pipeline labels whole words
+  (`aggregation_strategy="first"`) and the API loads the linear layers as int8 (dynamic
+  quantization): fp32 did not fit the latency budget on a CPU, and int8 finds the same names on
+  the PII set.
+- Weights: `make models` downloads exactly that commit (model card, config, tokenizer and
+  safetensors weights; no pickle, TF/Flax/ONNX copies) into the `model_cache` volume, about
+  0.44 GB; `make models-check` lists it offline; `deploy/offline/models.txt` lists each file
+  with its sha256 for the offline package.
 
 ### Short tokens (FOLLOWUP-106)
 
@@ -289,7 +295,8 @@ starts, otherwise Compose stops with `GUARDRAIL_EGRESS_NER is not set`. Existing
 
 Regex path (all five recognizers), 1,000 characters, 200 runs in the tools container:
 **P95 0.61 ms** (`python -m ffcore.guardrails.quality`). The brief budget of P95 < 300 ms covers
-local rules, NER and the injection model together; NER and injection are measured with 08 full.
+local rules, NER and the injection model together. Local rules and NER together are measured in
+the [NER quality report](#ner-quality-report) (P95 297 ms); the injection model is not part of 08 full.
 
 Whole evaluation on the real path (built-in policy, `input.pre`: `secrets` + `pii` rules, event
 previews included), one CPU and 512 MB (`docker run --cpus=1 --memory=512m`), single runs:
@@ -328,5 +335,50 @@ Limits of this measurement:
   threshold (0.99) the same way.
 - The set and the recognizers were written by the same team; the formats in the set are known.
   Treat 1.00 as "no regression on the known formats", not as a field recall.
-- `PERSON`, `ORGANIZATION` and `LOCATION` need the Turkish NER model (08 full); they are not
-  measured here.
+- `PERSON`, `ORGANIZATION` and `LOCATION` need the Turkish NER model; see the next section.
+
+## NER quality report
+
+Measured on the same set (22 person, 4 organization, 4 location names) with the model the API
+loads (int8, `aggregation_strategy="first"`), offline (`docker run --network none`, the
+`model_cache` volume read-only). Regenerate with
+`docker compose run --rm tools sh -c "cd backend && python -m ffcore.guardrails.quality ../data/samples/pii/pii-100.jsonl --ner akdeniz27/bert-base-turkish-cased-ner@99995f7d2be4b3a28c74f0d36ee97f8c04ee0571"`;
+a test with the weights (`make test-models`) keeps this table equal to the measurement.
+
+| Category | Support | Predicted | Recall | Precision |
+|---|---|---|---|---|
+| `PERSON` | 22 | 22 | 1.00 | 1.00 |
+| `ORGANIZATION` | 4 | 6 | 1.00 | 0.67 |
+| `LOCATION` | 4 | 23 | 1.00 | 0.17 |
+
+Candidates (08 full 1c; both on the same set, same matching rule):
+
+| Model | Licence | Person recall / precision | Organization | Location | P95, 1,000 characters | Size |
+|---|---|---|---|---|---|---|
+| `akdeniz27/bert-base-turkish-cased-ner`, int8, `first` (chosen) | MIT | 1.00 / 1.00 | 1.00 / 0.67 | 1.00 / 0.17 | P95 297 ms | 0.44 GB |
+| the same, fp32, `first` | MIT | 1.00 / 1.00 | 1.00 / 0.67 | 1.00 / 0.17 | P95 484 ms, median 370 ms, best run 318 ms (other stacks busy) | 0.44 GB |
+| the same, fp32, `simple` (the 1b setting) | MIT | 1.00 / 0.56 | 1.00 / 0.40 | 1.00 / 0.11 | median 430 ms (other stacks busy) | 0.44 GB |
+| `savasy/bert-base-turkish-ner-cased`, int8, `first` | none on the model card | 0.95 / 0.88 | 1.00 / 0.31 | 1.00 / 0.17 | 490 ms | 0.44 GB |
+
+- `savasy/bert-base-turkish-ner-cased` was measured but could not be chosen: its model card
+  names no licence (K-08T1B-0002). It left `NER_CANDIDATES`; an installation that ran
+  `make models` before 08 full 1c may delete its cache directory
+  `huggingface/hub/models--savasy--bert-base-turkish-ner-cased` and the
+  `pytorch_model.bin` copy of the chosen model from the `model_cache` volume (nothing reads
+  them).
+- With `simple` aggregation the chosen model split words into sub-word pieces (`Ay`, `şe`),
+  so a name could be masked in part; `first` labels whole words (a test checks every person
+  span starts and ends at a word boundary).
+- Location precision is low because the set labels street addresses `TR_ADDRESS`: the
+  neighbourhood, district and city inside an address are location names to the model and count
+  as false positives here. For masking that is the safe direction.
+- Long texts: a 60-name text of more than 1,800 tokens finds every name once with its offsets
+  (the pipeline's windows overlap by 128 tokens; `make test-models`).
+- Latency is the forward pass of BERT-base (293 tokens for the 1,000-character text); tokenizing
+  takes about 1 ms. The machine: 7 CPUs, 4 torch threads; int8 rows with the other stacks idle,
+  fp32 rows while another stack ran tests (fp32 did not reach 300 ms even in its best run).
+- Small support (22 names): one miss is 0.05 of recall. The set is synthetic and was written by
+  the same team; treat 1.00 as "no regression on the known shapes", not as a field recall.
+- int8 uses `torch.ao.quantization.quantize_dynamic`, which torch marks for migration to
+  torchao. If a torch upgrade removes it, the API stops at load (fail-loud), not silently in
+  fp32; the move to torchao or ONNX is a follow-up.
