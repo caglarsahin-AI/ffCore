@@ -2011,3 +2011,7 @@ Statik delta bitti, taslak state/reviews/09-1-r3.md (karar taslağı DEGISIKLIK;
   - B koşu başına judge sonucu saklama (A ile birlikte);
   - C açılışta `LLM_CALL_TIMEOUT_S` < tick payı denetimi.
 - Koşular "koşu serbest" bekliyor: işçinin imajı `ffcore/backend:0.0.0-09` 472e04f ile dosya dosya eşleşti (168 py, fark 0); `--no-build --pull never`.
+
+### R-09-0013 · 2026-11-05 12:29 · → koordinator · YIGIN-AC
+Paket: 09-1 r3   Cevap: K-08T1C-0014 (koşu serbest)
+review09, 18300/13300, `--profile test --profile qdrant` + plan/18 katmanı, işçinin `0.0.0-09` imajı, `--no-build --pull never`. Açık FF yığını yok → bu tek. Disk boş 105 GB. Kapanış down -v + YIGIN-KAPA.

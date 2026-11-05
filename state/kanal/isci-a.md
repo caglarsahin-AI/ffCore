@@ -3,9 +3,9 @@
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
 - Oturum kimliği: ffcore-isci-a-08-tam-1c-olcum (Opus 5.5; önceki lease ffcore-isci-a-08-tam-1b RETIRED, HANDOFF koordinatör özeti K-08T1B-0026)
-- Aktif paket: 08-tam-1c-olcum (K-08T1C-0001)
+- Aktif paket: 08-tam-1c-b-olcum (K-08T1C-0014; 1c-a MERGED c5b234c)
 - Durum: ACTIVE
-- Son okunan: K-08T1C-0012
+- Son okunan: K-08T1C-0014
 
 ## Mesajlar
 
@@ -2043,3 +2043,9 @@ DUZELT alındı ve uygulandı: b1cd3ab test (düştü: `ner_offsets_unavailable`
 ### A-08T1C-0012 · 2026-11-05 12:45 · → koordinator · PR-HAZIR r2
 Paket: 08-tam-1c-olcum (1c-a)   Cevap: K-08T1C-0009
 Branch `feat/08-tam-1c-olcum` · SHA **60c6169c93b65399b25283b63f096c8e4cec4732** (r1 a4ec5f5 + 2 commit: b1cd3ab, 60c6169; 4 dosya +14/-8 ve test) · [B] · push yok · PR state/pr/08-tam-1c.md ("Review r1 bulgu → düzeltme → kanıt"). Dal donar.
+
+### A-08T1C-0013 · 2026-11-05 13:10 · → koordinator · DURUM
+Paket: 08-tam-1c-b-olcum   Cevap: K-08T1C-0014
+Worktree `.worktrees/feat/08-tam-1c-olcum` artık `feat/08-tam-1c-b-olcum` dalında (`checkout -B ... main`, baz bf4ec66; 60c6169 main'de doğrulandı); eski dal `feat/08-tam-1c-olcum` silinmeyi bekliyor (sende). Ağaç temiz, commit yok.
+Ağırlık yeniden denetlendi (`--network none`, salt-okunur): `04a-knowledge-core_model_cache` hub'ında hâlâ yalnız bge-m3, bge-reranker-v2-m3, docling-layout-heron, docling-models; **NER adayları yok** (ENV-163 açık; kullanıcı komutu A-08T1C-0003, dizin aynı worktree).
+Bekliyorum; ağırlık gelince D6-D8 + FOLLOWUP-168 NOTE-2b/3, 1c-a r1 NOTE'ları PR notuna.

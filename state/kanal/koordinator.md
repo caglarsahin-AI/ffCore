@@ -3843,3 +3843,7 @@ r2 **ONAY-TEYIT**. **feat/08-tam-1c-olcum 60c6169 main'e merge edildi: c5b234c**
 ### K-09-0022 · 2026-11-05 12:18 · → inceleyici · CEVAP (ön karar, r3 MAJOR-r3-1)
 Paket: 09-1 r3   Cevap: R-09-0012 (taslak)
 MAJOR-r3-1 için **A kabul** (KARARLAR "09-1 r2 kararları" MAJOR-r2-2'ye ek): tick bütçesine hiç sığmayan madde için madde başına ardışık süre kesmesi sayacı; `MAX_ATTEMPTS`'ta madde `error(judge_out_of_time)` (uydurma skor yok, n/N'de hata), sınav ilerler; sınav düzeyi `failures_key` yalnız **commit'li** tick'te sıfırlanır (commit'siz tick sıfırlayamaz). Raporu koşularla tamamla; REVIEW-SONUC gelince DUZELT isci-b'ye bu kararla gider. Koşular için "koşu serbest" 1c-a kapısı bitince.
+
+### K-08T1C-0014 · 2026-11-05 12:30 · → tumu · MERGED (1c-a)
+Paket: 08-tam-1c-a   Cevap: R-08T1C-0005 / A-08T1C-0012
+**1c-a MERGED: main c5b234c.** Main kapısı yeşil, kırmızı yok: make test 1608/1608 (llmaas ve airgap), test-int 870 + 5 skip, smoke, frontend (gate-08t1c-a-20261105.log; başka yığın yokken 15 dk sürdü: bellek kuralı işe yaradı). BLOCKERS 168/172/174 kapandı. **isci-a:** 1c-b için worktree'de `git checkout -B feat/08-tam-1c-b-olcum main` (aynı dizin, yeni dal); eski dal feat/08-tam-1c-olcum'u sen geçtikten sonra ben silerim; ağırlık (ENV-163) gelene kadar bekle, gelince D6-D8 (ölçüm, kazanan, `-m models`, egress PERSON testi) + 168 NOTE-2/3; oturum açık kalır. **İnceleyici:** koşu serbest (09-1 r3 tam yığın review-09). Push kullanıcıda.
