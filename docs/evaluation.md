@@ -59,7 +59,10 @@ calls the model directly. FFCore's judge instead:
 
 - renders the Langfuse prompt `eval_judge_rubric_v2` (seeded from `backend/prompts/`; edit it
   in Langfuse),
-- sends the text through the egress guardrail of the agent's policy first, like any model call,
+- sends the text through the egress guardrail of the agent's policy first, like any model call
+  (with `GUARDRAIL_EGRESS_NER=true` that check asks the API's NER endpoint for person names; if
+  it is down nothing is sent and the item is not run, `ner_unavailable`, counted apart and
+  making the exam incomplete: an outage is not the agent's score),
 - calls `EVAL_JUDGE_MODEL` as a background job (model slots, background window, quotas),
 - keeps the question, expected answer and answer between markers and tells the model that
   text inside them is data, not instructions,
@@ -69,7 +72,7 @@ calls the model directly. FFCore's judge instead:
 
 Seeding never overwrites a prompt Langfuse already has. A new rubric text therefore ships under
 a new prompt name (`eval_judge_rubric` → `eval_judge_rubric_v2`); after an upgrade run
-`make seed` once so the new prompt exists. The old prompt stays in Langfuse, unused.
+`make seed-prompts` once so the new prompt exists. The old prompt stays in Langfuse, unused.
 
 ### SQL results
 
@@ -152,13 +155,15 @@ exam): it scores finished items, links each run's trace into the Langfuse datase
 the scores and commits each item on its own. A separate follower task of the worker keeps the
 item runs listened, so a long tick never abandons them.
 
-A tick has a budget per exam: at most `EVAL_JUDGE_CALLS_PER_TICK` judge calls; no judge call
-while `BACKGROUND_WINDOW` is closed (the judge is a background model call); and a deadline 30 s
-before the tick's own 600 s timeout. The first item of a tick always starts (cut at the
-deadline if it takes longer); a later item starts only if its judge calls, planned at
-`LLM_CALL_TIMEOUT_S` each, fit before the deadline. When the budget runs out the exam simply
-stays `running` and the next tick goes on: a closed window or a slow CPU judge never fails an
-exam.
+A tick has a budget per exam. No judge call while `BACKGROUND_WINDOW` is closed (the judge is a
+background model call). The tick's first item always starts, cut at the tick's deadline (30 s
+before its own 600 s timeout). A later item starts only if its judge calls fit in what is left
+of `EVAL_JUDGE_CALLS_PER_TICK` and, planned at `LLM_CALL_TIMEOUT_S` each, before the deadline.
+So a tick makes at most `EVAL_JUDGE_CALLS_PER_TICK` judge calls per exam, or the first item's
+calls (`repeat`) when that is more. When the budget runs out the exam stays `running` and the
+next tick goes on: a closed window or a slow CPU judge never fails an exam. An item cut at the
+deadline `MAX_ATTEMPTS` ticks in a row ends as an error (`judge_out_of_time`) and the exam
+moves on. Exams are advanced in a fixed order, the one with the oldest progress first.
 
 Runs that ask the user a question are cancelled (`not_run: waiting_user`). Runs that wait for a
 tool approval are cancelled as `not_run: approval_required` (their pending approval is closed,
@@ -171,8 +176,9 @@ of the item's result and counted in `not_run` as `partial:<code>` (so `complete`
 a scorer error in any repeat stays an error.
 
 A tick that keeps failing without saving any item (`MAX_ATTEMPTS` ticks in a row, a tick
-timeout included) ends the exam `failed` with the error code; a failed tick that saved an item
-made progress and starts the count again. Nothing stays `queued` or `running` forever. The
+timeout included) ends the exam `failed` with the error code. Only a tick that committed
+something (an item scored, the item runs started) starts the count again; a tick that saved
+nothing leaves it as it is. Nothing stays `queued` or `running` forever. The
 exam lock is renewed and released only by its holder; when a renewal fails the tick stops
 rather than work on without the lock. To stop an exam, use `cancel`.
 
