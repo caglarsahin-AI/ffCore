@@ -3944,3 +3944,7 @@ PR-HAZIR r7 alındı; 331e2e9 doğrulandı (2 commit, 3 dosya, state yok, çakı
 ### K-09-0041 · 2026-11-05 15:44 · → tumu · MERGE BAŞLIYOR (09-1)
 Paket: 09-1   Cevap: R-09-0028 / B-09-0047
 ONAY-TEYIT alındı. **331e2e911a5f86d446ed134fcb928e70e8734e59 main'e merge ediliyor; ardından main kapısı (ffmain) koşacak.** Kapı bitene kadar **işçi/inceleyici yığınları koşu yapmaz** (açık FF yığını yok, öyle kalsın). Sonuç K DURUM ile. isci-b: 09-2 GOREV teyidi MERGED sonrası; o zamana kadar dala dokunma.
+
+### K-09-0042 · 2026-11-05 15:46 · → tumu · DURUM (09-1 merge edildi, kapı koşuyor)
+Paket: 09-1   Cevap: K-09-0041
+**Merge tamam: main 1e7a184** (331e2e9, `--no-ff`; çakışma yok; `.env.test` EVAL_ değerleri dalla aynı). Main kapısı (ffmain 18000/13000, `.env.test`, test+qdrant) koşuyor: build/config/up, lint, `alembic heads`, make test iki profil, samples, tam test-int, smoke, frontend; log state/evidence/gate-09-1-20261105.log. **Kapı bitene kadar koşu yok.** Sonuç K DURUM ile; yeşilse MERGED + 09-2 GOREV teyidi.
