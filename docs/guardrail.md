@@ -74,7 +74,7 @@ silently ignored.
 (`NER_MODEL` at `NER_REVISION`, CPU) for person, organization and location names. A name never
 overrides a regex or custom finding: an overlapping NER span is cut to the parts outside it (and
 outside any `<<PII_n>>` placeholder already in the text), so checksummed values keep their
-category and a name glued to one is still masked. The evidence is `ner <model>@<revision> score 0.97`. `engine: regex` never
+category and a name glued to one is still masked. The evidence is `ner <model>@<first 7 characters of the revision> score 0.97`. `engine: regex` never
 calls the model.
 
 - The model is loaded only by the API process (like the embedding model). The agent worker and
@@ -278,10 +278,11 @@ starts, otherwise Compose stops with `GUARDRAIL_EGRESS_NER is not set`. Existing
 - llmaas production: `true`, with `NER_MODEL`/`NER_REVISION` and the weights from `make models`
   (without the names the API and the agent worker stop at start-up with `ner_not_configured`;
   without the weights in the offline cache the API stops at start-up with `model_missing`).
-- airgap: `false` (egress is off, no NER call).
-- the PayCore M3 server (llmaas, egress on): the value follows DECISION-166, a user decision
-  that is still open; `false` there is a change-control [C] decision (KARARLAR). `m3_preflight`
-  checks that the variable is set.
+- airgap: `false` (egress is off, no NER call at egress). The ingest's `pii_ner` filter still
+  needs NER in every profile (docs/bilgi-tabani.md, raw ingest).
+- the PayCore M3 server (llmaas, egress on): `false` (DECISION-166 A, user decision): no person
+  name mask at egress, the regex categories stay; turning it on once the NER weights are on the
+  server is a separate step. `m3_preflight` checks that the variable is set.
 
 ## Latency
 

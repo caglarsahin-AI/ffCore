@@ -36,6 +36,9 @@ python -m ffcore.cli ingest-raw --project <p> --kb <kb> --raw-dir <tree, read-on
   no option to turn it off or to name another filter. The NER is checked before the first file:
   unreachable or not configured stops the run (`ner_unavailable`; with a PRSIM source
   `prsim_requires_ner`, before the database), a tree is never half name-masked.
+- `pii_ner` is the default in every profile, airgap included: without the NER weights (or an
+  API that answers NER) an `ingest-raw` stops with `ner_unavailable` whatever the source, and only
+  the M3 flag below passes. `GUARDRAIL_EGRESS_NER=false` (airgap) is about egress, not ingest.
 - `--accept-personnel-data` is the M3 measurement mode: it keeps `pii_regex` (identifiers only,
   person names not masked) so the measured manifest stays as it was, and is logged as such.
   Documents ingested before 08 full 1b keep `pii_regex@1`; a reindex applies the filter the
@@ -46,8 +49,12 @@ python -m ffcore.cli ingest-raw --project <p> --kb <kb> --raw-dir <tree, read-on
 - Reindex is inside the same boundary: `make reindex LAYER=silver` refuses with
   `prsim_requires_ner` (exit 2, nothing queued or touched) when a personnel-data record written
   with `pii_regex@1` (the M3 mode) is in its scope; `python -m ffcore.cli reindex ...
-  --accept-personnel-data` runs it in the M3 mode. A reindex requested through the API with such
-  a record in scope is refused by the job the same way (the API has no M3 flag).
+  --accept-personnel-data` runs it in the M3 mode, logged with the number of such records
+  (`records=N`) and audited as `reindex_personnel_data_accepted` (system actor; layer, `full`
+  and the count, never a file name or content). The flag concerns the silver reconversion only:
+  with `--layer gold` it is refused (`flag_not_applicable`, exit 2). A reindex requested through
+  the API with such a record in scope is refused at the endpoint with 409 `prsim_requires_ner`
+  before anything is queued (the API has no M3 flag; the job checks again).
 - Attachment file names are masked too: in a personnel-data source (PRSIM) the shown name
   (attachment record, silver heading, chunk breadcrumb) is `Ek <n>`; in other sources the name
   goes through the text filter with `_` and `-` read as spaces. The raw file keeps its name.
