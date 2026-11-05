@@ -77,3 +77,17 @@ Her durumda: 7.3 metni ve sorun giderme tablosuna `ner_unavailable` satırı (ne
 ## Karar
 
 DEGISIKLIK (f2dfe4799b77c21be92100c4f93f18011543f7ce). Tek gerekli değişiklik MAJOR-1: koordinatörün A/B/C kararıyla runbook OCR komutları ve sorun giderme satırı, artı bir R13 testi. NOTE 6-7 aynı küçük commit'e girebilir. Gerisi bilgi.
+
+## r2 teyidi (a3fed7f25eae608aa3e881fddc046a7928af8f05)
+
+İstek K-19R3-0009. Yalnız diff + test okuması (f2dfe47 + 2 commit, 3 dosya); yığın ve koşu yok (NOT_RUN, istek gereği).
+
+- **MAJOR-1 KAPANDI** (KARARLAR "M3 OCR ingest'i NER'siz sunucuda" A ile aynı):
+  - m3-sunucu.md:278 ve :296'daki iki OCR komutu `--accept-personnel-data` aldı.
+  - 7.3 metni NER'siz sunucuda bayraksız komutun `ner_unavailable` ile durduğunu, M3'te her `ingest-raw`'ın bayrakla `pii_regex` koştuğunu ve bayrak adının OCR için anlamını yazıyor (FOLLOWUP-174).
+  - Sorun giderme tablosuna `ner_unavailable` satırı eklendi; `prsim_requires_ner` satırının nedeni güncellendi.
+- **Test:** `test_19r3_8` runbook'taki her `ffcore.cli ingest-raw` satırında bayrağı, en az bir OCR komutunu ve `ner_unavailable` satırını denetliyor. Sıra test (884af80) → doküman (a3fed7f). f2dfe47'de 2 bayraksız satır var, test orada düşer (statik).
+- **Kapsam:** repoda bayraksız başka `ingest-raw` komutu yok; yalnız düzyazı anmalar kaldı (`docs/archive` hariç). NOTE-7 (eski "08 tam" ifadesi) de kapandı: m3-sunucu.md:30 ve `ffcore_stage_raw.py:19-21`.
+- **Lint:** yeni test satırları 100 karakter altında. `scripts/` ruff'tan hariç (`extend-exclude`), bu yüzden stager docstring'indeki 112 karakterlik satır kapı dışı.
+
+**ONAY-TEYIT a3fed7f25eae608aa3e881fddc046a7928af8f05.**

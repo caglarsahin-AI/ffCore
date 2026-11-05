@@ -1,6 +1,6 @@
 # PR: 08 tam dilim 1c — NER ölçümü, kazanan seçimi, FOLLOWUP-168/172
 
-**Paket:** 08-tam-1c-olcum · **Sınıf:** [B]; ağırlık indirme [C] kullanıcıda (ENV-163) · **Branch:** feat/08-tam-1c-olcum · **Baz commit:** 8aa8442 (main; 63ffb16 + state) · **Oturum:** ffcore-isci-a-08-tam-1c-olcum (Opus 5.5) · **GOREV:** K-08T1C-0001, iş sırası A (K-08T1C-0002) · **Durum:** PLANNED
+**Paket:** 08-tam-1c-olcum · **Sınıf:** [B]; ağırlık indirme [C] kullanıcıda (ENV-163) · **Branch:** feat/08-tam-1c-olcum · **Baz commit:** 8aa8442 (main; 63ffb16 + state) · **Oturum:** ffcore-isci-a-08-tam-1c-olcum (Opus 5.5) · **GOREV:** K-08T1C-0001, iş sırası A (K-08T1C-0002) · **Durum:** IMPLEMENTED (ağırlıksız dilimler D1-D5); D6-D8 ağırlık bekliyor (ENV-163) · **HEAD:** 6395c6e (10 commit)
 
 ## Plan
 
@@ -30,13 +30,37 @@
 9. **Felsefe kontrolü:** ARCH-07: her dilim mevcut bir yolun boşluğunu kapatır (kilit, görünürlük, test kararlılığı, docs); yeni kalıcı yüzey yalnız 409 yanıtı ve bir audit eylemi. ARCH-09: NER pencereleme `transformers` pipeline'ında; ayrı bölücü yazılmaz (NOTE-3 yalnız doğrular); audit 03b decorator/olay tablosu. ARCH-10/06: kazanan seçimi ölçümle ve `.env.example`'da açık, "auto" yok; `--layer gold` ile bayrağın sessizce etkisiz kalması açık hataya çevrilir; 409 iş reddinin sessiz 202'sini görünür yapar.
 
 ## Değişen dosyalar
-(dilimlerle dolar)
+`git diff --stat main...HEAD`: 14 dosya, +283/-43; state yok.
+- kod: `backend/ffcore/guardrails/recognizers/ner.py` (D1 kayıt kilidi), `api/knowledge.py` (D3 409), `knowledge/ingest.py` (D4 sayım + log; `check_reindex_silver` artık `int` döner, çağıranlar dönüşü kullanmıyordu), `cli.py` (D4 audit + `flag_not_applicable`), `api/guardrails.py` (D5 503 yanıtı)
+- OpenAPI: `backend/openapi/08.yaml` (yeniden üretildi; yalnız iç NER ucuna 503, additive)
+- testler: yeni `tests/unit/test_08t1c_1_local_ner_single_load.py`; `tests/unit/test_08t_secrets_linear.py` (oran), `tests/unit/test_04a_convert.py` (9d koruma), `tests/integration/test_08t_30_reindex_prsim.py` (+4 test), `tests/contract/test_08_openapi.py` (+1)
+- docs: `docs/api.md`, `docs/bilgi-tabani.md`, `docs/guardrail.md`
 
 ## Kabul kriterleri → testler
-(dilimlerle dolar)
+| # | Kriter | Test | Durum |
+|---|---|---|---|
+| D1 (168 NOTE-2a) | eşzamanlı ilk çağrıda tek `LocalNer`, tek yükleme | `test_08t1c_1_local_ner_single_load` | geçti; e6d3ebf'de düştü (4 yükleme) |
+| D2 (168 NOTE-5) | doğrusallık CPU oranıyla, mutlak süre yalnız asılı kalma koruması | `test_08t_m4_*` (oran < 8, 4x girdi), `test_04a_9d` (< 300 s, uyku 600 s) | geçti; eski kare desen aynı ölçümde oran 20,7 (yakalanıyor) |
+| D3 (172 N1) | silver reindex ucu kişi verisi kaydında 409, kuyruk boş, audit `error` | `test_08t1c_3_reindex_api_409_prsim`, `test_08t1c_3b_reindex_api_ok_without_personnel` | geçti; f62f4f4'te düştü (202) |
+| D4 (172 N2) | M3 kipi `records=N` logu + sistem aktörlü audit (yalnız sayılar); gold + bayrak çıkış 2 | `test_08t1c_4_reindex_m3_logged_and_audited`, `test_08t1c_4b_accept_flag_with_gold_refused` | geçti; 3bfa9b5'te düştü (log yok; çıkış 0) |
+| D5 (168 NOTE-4) | iç NER 503 yanıt listesinde | `test_08t1c_5_internal_ner_503_listed` | geçti; 2771e24'te düştü |
+| brief 08 kriter 1 | ad-soyad recall ≥ 0,85 | `test_08t_1_ner_recall_person` (`-m models`) | NOT_RUN (ENV-163) |
+| brief 08 kriter 3 | 1.000 karakter P95 < 300 ms | `test_08t_3_ner_latency_p95` (`-m models`) | NOT_RUN (ENV-163) |
+| brief 08 kriter 4 | aday tablosu, lisans, boyut | ölçüm betiği | NOT_RUN (ENV-163) |
 
 ## Çalıştırılan komutlar
-(dilimlerle dolar)
+Hepsi `FFCORE_VERSION=0.0.0-main`, `--env-file .env.test`, tools konteyneri (host'ta araç yok); kanıt `state/evidence/08t1c-*.log` (tee).
+| Komut | Ortam | Exit | Süre |
+|---|---|---|---|
+| hedefli birim D1/D2/D5 (kırmızı ve yeşil) | `--no-deps` | 1 → 0 | < 15 s |
+| hedefli test-int `test_08t_30`, `test_04a_api`, `test_19_ingest_raw` | yalın yığın `ffcore-08t1c` (postgres, redis, litellm, fake-llm, qdrant) | 0; 40 passed / 1 skipped | 96 s |
+| `make lint` | | 0 (446 dosya) | |
+| `make test` | `DEPLOY_PROFILE=llmaas FAKE_LLM=1` | 0; 1603 passed | 164 s |
+| `make test` | `DEPLOY_PROFILE=airgap FAKE_LLM=1` | 0; 1603 passed | 176 s |
+| tam `make test-int` | | NOT_RUN (koordinatör: yalnız hedefli; kapı koordinatörde) | |
+| ağırlık kontrolü `04a-knowledge-core_model_cache` (alpine, `--network none`, salt-okunur) | | NER adayı yok | |
+| `-m models`, `models-check --network none`, ölçüm | | NOT_RUN (ENV-163) | |
+Yığın `down -v` ile kapatıldı (konteyner 0, volume 0).
 
 ## Varsayımlar ve brief'teki çelişkiler
 1. FOLLOWUP-172 N2 "audit olayı": reindex CLI'sı istek bağlamı dışında; olay sistem aktörlü yazılır (`actor_type=system`), içerik yok, yalnız KB kimliği ve kayıt sayısı.

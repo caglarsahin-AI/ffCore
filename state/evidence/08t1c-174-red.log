@@ -1,0 +1,147 @@
+FF.F.                                                                    [100%]
+=================================== FAILURES ===================================
+______________ test_08t1c_6_text_filter_pii_regex_without_m3_flag ______________
+
+calls = []
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_08t1c_6_text_filter_pii_r0')
+
+    def test_08t1c_6_text_filter_pii_regex_without_m3_flag(calls, tmp_path):
+>       assert _ingest(tmp_path, "--text-filter", "pii_regex") == 0
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/unit/test_08t1c_6_ingest_raw_text_filter.py:53: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/unit/test_08t1c_6_ingest_raw_text_filter.py:34: in _ingest
+    return cli.main(
+ffcore/cli.py:249: in main
+    args = parser.parse_args(argv)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/argparse.py:1908: in parse_args
+    self.error(msg)
+/usr/local/lib/python3.12/argparse.py:2650: in error
+    self.exit(2, _('%(prog)s: error: %(message)s\n') % args)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = ArgumentParser(prog='python -m ffcore.cli', usage=None, description=None, formatter_class=<class 'argparse.HelpFormatter'>, conflict_handler='error', add_help=True)
+status = 2
+message = 'python -m ffcore.cli: error: unrecognized arguments: --text-filter pii_regex\n'
+
+    def exit(self, status=0, message=None):
+        if message:
+            self._print_message(message, _sys.stderr)
+>       _sys.exit(status)
+E       SystemExit: 2
+
+/usr/local/lib/python3.12/argparse.py:2637: SystemExit
+----------------------------- Captured stderr call -----------------------------
+usage: python -m ffcore.cli [-h]
+                            {create-superadmin,load-model-catalog,seed-models,render-litellm,reindex,seed-prompts,seed-sql-demo,seed-sql-context,setup-checkpointer,ingest-raw}
+                            ...
+python -m ffcore.cli: error: unrecognized arguments: --text-filter pii_regex
+_________________ test_08t1c_6b_pii_regex_still_refuses_prsim __________________
+
+calls = []
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_08t1c_6b_pii_regex_still_0')
+capsys = <_pytest.capture.CaptureFixture object at 0x7fb71bafe1b0>
+
+    def test_08t1c_6b_pii_regex_still_refuses_prsim(calls, tmp_path, capsys):
+>       assert _ingest(tmp_path, "--text-filter", "pii_regex", sources=("jira:PRSIM",)) == 2
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/unit/test_08t1c_6_ingest_raw_text_filter.py:60: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/unit/test_08t1c_6_ingest_raw_text_filter.py:34: in _ingest
+    return cli.main(
+ffcore/cli.py:249: in main
+    args = parser.parse_args(argv)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/argparse.py:1908: in parse_args
+    self.error(msg)
+/usr/local/lib/python3.12/argparse.py:2650: in error
+    self.exit(2, _('%(prog)s: error: %(message)s\n') % args)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = ArgumentParser(prog='python -m ffcore.cli', usage=None, description=None, formatter_class=<class 'argparse.HelpFormatter'>, conflict_handler='error', add_help=True)
+status = 2
+message = 'python -m ffcore.cli: error: unrecognized arguments: --text-filter pii_regex\n'
+
+    def exit(self, status=0, message=None):
+        if message:
+            self._print_message(message, _sys.stderr)
+>       _sys.exit(status)
+E       SystemExit: 2
+
+/usr/local/lib/python3.12/argparse.py:2637: SystemExit
+----------------------------- Captured stderr call -----------------------------
+usage: python -m ffcore.cli [-h]
+                            {create-superadmin,load-model-catalog,seed-models,render-litellm,reindex,seed-prompts,seed-sql-demo,seed-sql-context,setup-checkpointer,ingest-raw}
+                            ...
+python -m ffcore.cli: error: unrecognized arguments: --text-filter pii_regex
+_______________ test_08t1c_6d_m3_flag_with_pii_ner_is_a_conflict _______________
+
+calls = []
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_08t1c_6d_m3_flag_with_pii0')
+capsys = <_pytest.capture.CaptureFixture object at 0x7fb71baf6c30>
+
+    def test_08t1c_6d_m3_flag_with_pii_ner_is_a_conflict(calls, tmp_path, capsys):
+        flags = ("--accept-personnel-data", "--text-filter", "pii_ner")
+>       assert _ingest(tmp_path, *flags) == 2
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/unit/test_08t1c_6_ingest_raw_text_filter.py:73: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/unit/test_08t1c_6_ingest_raw_text_filter.py:34: in _ingest
+    return cli.main(
+ffcore/cli.py:249: in main
+    args = parser.parse_args(argv)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/argparse.py:1908: in parse_args
+    self.error(msg)
+/usr/local/lib/python3.12/argparse.py:2650: in error
+    self.exit(2, _('%(prog)s: error: %(message)s\n') % args)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = ArgumentParser(prog='python -m ffcore.cli', usage=None, description=None, formatter_class=<class 'argparse.HelpFormatter'>, conflict_handler='error', add_help=True)
+status = 2
+message = 'python -m ffcore.cli: error: unrecognized arguments: --text-filter pii_ner\n'
+
+    def exit(self, status=0, message=None):
+        if message:
+            self._print_message(message, _sys.stderr)
+>       _sys.exit(status)
+E       SystemExit: 2
+
+/usr/local/lib/python3.12/argparse.py:2637: SystemExit
+----------------------------- Captured stderr call -----------------------------
+usage: python -m ffcore.cli [-h]
+                            {create-superadmin,load-model-catalog,seed-models,render-litellm,reindex,seed-prompts,seed-sql-demo,seed-sql-context,setup-checkpointer,ingest-raw}
+                            ...
+python -m ffcore.cli: error: unrecognized arguments: --text-filter pii_ner
+==================================== PASSES ====================================
+_____________________ test_08t1c_6c_default_stays_pii_ner ______________________
+----------------------------- Captured stdout call -----------------------------
+created 0
+new_version 0
+unchanged 0
+retried 0
+status: -
+failed_unregistered 0
+rejected: -
+text_filter_mismatch 0
+gates: -
+masked (pii_ner): -
+stage: full
+manifest: documents 0, chunks 0, raw_manifest_sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+_______________ test_08t1c_6e_no_filter_choice_turns_masking_off _______________
+----------------------------- Captured stderr call -----------------------------
+usage: python -m ffcore.cli [-h]
+                            {create-superadmin,load-model-catalog,seed-models,render-litellm,reindex,seed-prompts,seed-sql-demo,seed-sql-context,setup-checkpointer,ingest-raw}
+                            ...
+python -m ffcore.cli: error: unrecognized arguments: --text-filter none
+=========================== short test summary info ============================
+PASSED tests/unit/test_08t1c_6_ingest_raw_text_filter.py::test_08t1c_6c_default_stays_pii_ner
+PASSED tests/unit/test_08t1c_6_ingest_raw_text_filter.py::test_08t1c_6e_no_filter_choice_turns_masking_off
+FAILED tests/unit/test_08t1c_6_ingest_raw_text_filter.py::test_08t1c_6_text_filter_pii_regex_without_m3_flag
+FAILED tests/unit/test_08t1c_6_ingest_raw_text_filter.py::test_08t1c_6b_pii_regex_still_refuses_prsim
+FAILED tests/unit/test_08t1c_6_ingest_raw_text_filter.py::test_08t1c_6d_m3_flag_with_pii_ner_is_a_conflict
+3 failed, 2 passed in 9.59s

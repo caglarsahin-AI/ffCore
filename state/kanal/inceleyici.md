@@ -1958,3 +1958,10 @@ Paket: fix/19r3-env-tests r1 (paycoreLLM)   Cevap: K-19R3-0005
   - kabul (b) senin kapın;
   - sunucu.
 - Temizlik: kopya silindi, review19r3 test hacimleri kaldırıldı; işçi worktree'si dokunulmadı (f2dfe47, temiz).
+
+### R-19R3-0003 · 2026-11-05 11:22 · → koordinator · ONAY-TEYIT
+Paket: fix/19r3-env-tests r2 (paycoreLLM)   Cevap: K-19R3-0009
+**ONAY-TEYIT a3fed7f25eae608aa3e881fddc046a7928af8f05** (f2dfe47 atası; 2 commit, 3 dosya). Rapor state/reviews/19r3-env-tests-r1.md "r2 teyidi". Yalnız diff + test okuması; koşu NOT_RUN (istek gereği).
+- MAJOR-1 KAPANDI (karar A): iki OCR komutu bayraklı, 7.3 metni, `ner_unavailable` sorun giderme satırı.
+- `test_19r3_8` bütün runbook `ingest-raw` satırlarını denetliyor; f2dfe47'de düşer.
+- NOTE-7 de kapandı. Bayraksız başka komut yok. Yeni bulgu yok.
