@@ -92,8 +92,8 @@ def test_18_f3_8b_exam_80_percent():
 @pytest.fixture(scope="module")
 def sql(login):
     """The admin's test call to mcp-sql's run_sql (05a invoke): the real chain backend →
-    mcp-sql → validator → demo DB, without a model. A refusal is text starting with its code
-    (mcp_sql.run_sql_text), not a tool error: the model reads it and corrects the query."""
+    mcp-sql → validator → demo DB, without a model. A refusal is a tool error whose text starts
+    with its code (09-1 r2 MAJOR-r2-3): the model still reads it and corrects the query."""
     admin = login(PROJECT, "admin", "edit")
     pid = admin.project_id(PROJECT)
     url = f"/api/v1/projects/{pid}/tools/{admin.tool_id(pid, 'mcp-sql')}/actions/run_sql/invoke"
@@ -101,8 +101,10 @@ def sql(login):
     def call(statement: str) -> str:
         r = admin.post(url, json={"arguments": {"sql": statement, "reason": "plan/18 F3"}})
         assert r.status_code == 200, r.text
-        assert not r.json()["is_error"], r.json()["text"][:200]
-        return r.json()["text"]
+        body = r.json()
+        refused = body["text"].startswith(("sql_rejected", "sql_error"))
+        assert body["is_error"] is refused, body["text"][:200]
+        return body["text"]
 
     return call
 

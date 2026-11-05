@@ -107,8 +107,17 @@ def test_09_langfuse_dataset_run_links_every_item(exam):
             break
         time.sleep(3)
     assert len({i.item_id for i in items}) == 33
-    scores = anyio.run(api.trace_scores, items[0].trace_id, ["outcome", "passed", "contains"])
-    assert {"outcome", "passed"} <= {s["name"] for s in scores}
+    # 09-1 r2 MINOR-r2-8: trace scores show up with their own lag (one run had only `passed`,
+    # another only `contains` + `outcome`, all three later): the same bounded poll.
+    wanted = {"outcome", "passed"}
+    deadline = time.monotonic() + 60
+    while True:
+        scores = anyio.run(api.trace_scores, items[0].trace_id, ["outcome", "passed", "contains"])
+        names = {s["name"] for s in scores}
+        if wanted <= names or time.monotonic() > deadline:
+            break
+        time.sleep(3)
+    assert wanted <= names, names
 
 
 def test_09_g6_item_runs_are_background_test_runs(exam):

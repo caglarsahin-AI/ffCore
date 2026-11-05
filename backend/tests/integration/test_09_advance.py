@@ -128,7 +128,7 @@ def _advance(database, settings, ev_id, *, judge=None, embed=None, budget=20):
                 sql=None,
                 embed=embed,
                 close=_close,
-                budget=Budget(budget),
+                budget=budget if isinstance(budget, Budget) else Budget(budget),
             )
 
     asyncio.run(go())
@@ -303,3 +303,107 @@ def test_09_r1_minor6_resumed_exam_run_is_an_exam_run(pg, project, database):
     assert asyncio.run(go(run)) is True and asyncio.run(go(lone)) is False
     pg.execute("UPDATE eval_runs SET status = 'completed' WHERE id = %s", (ev_id,))
     assert asyncio.run(go(run)) is False
+
+
+# --- 09-1 r2 MAJOR-r2-2: tick time budget and the background window ---------------------------
+
+
+def _judged_exam(pg, project, n=3):
+    runs = [seed_run(pg, project, definition()) for _ in range(n)]
+    for r in runs:
+        _finish(pg, r)
+    return _exam(
+        pg, project, {f"q{i}": [r] for i, r in enumerate(runs, 1)}, scorers=[{"name": "llm_judge"}]
+    )
+
+
+def test_09_r2_major2_closed_window_waits_without_judging(pg, project, database, app_settings):
+    from ffcore.evaluation.runner import Budget
+
+    ev_id = _judged_exam(pg, project)
+    judge = _Judge()
+    _advance(database, app_settings, ev_id, judge=judge, budget=Budget(20, is_open=lambda: False))
+    status, plan, _ = _ev(pg, ev_id)
+    assert status == "running" and judge.calls == []
+    assert not any(e["scored"] for e in plan.values())
+    _advance(database, app_settings, ev_id, judge=judge)  # the window opened
+    assert _ev(pg, ev_id)[0] == "completed" and len(judge.calls) == 3
+
+
+def test_09_r2_major2_slow_judge_spreads_over_ticks_and_finishes(
+    pg, project, database, app_settings
+):
+    import time
+
+    from ffcore.evaluation.runner import Budget
+
+    ev_id = _judged_exam(pg, project)
+    judge = _Judge(delay=0.3)
+    ticks = 0
+    while _ev(pg, ev_id)[0] == "running":
+        ticks += 1
+        assert ticks <= 5, "the exam does not progress"
+        budget = Budget(20, deadline=time.monotonic() + 0.7, call_s=0.2)
+        _advance(database, app_settings, ev_id, judge=judge, budget=budget)  # never raises
+    status, _, summary = _ev(pg, ev_id)
+    assert status == "completed" and ticks == 2 and summary["scored"] == 3
+    assert sorted(judge.calls) == ["q1", "q2", "q3"]
+
+
+def test_09_r2_major2_judge_cut_by_the_deadline_is_not_a_failure(
+    pg, project, database, app_settings
+):
+    import time
+
+    from ffcore.evaluation.runner import Budget
+
+    ev_id = _judged_exam(pg, project, n=1)
+    budget = Budget(20, deadline=time.monotonic() + 0.3, call_s=0.1)
+    _advance(database, app_settings, ev_id, judge=_Judge(delay=2.0), budget=budget)
+    status, plan, _ = _ev(pg, ev_id)
+    assert status == "running" and not plan["q1"]["scored"]
+    assert budget.committed == 0
+    _advance(database, app_settings, ev_id, judge=_Judge())
+    assert _ev(pg, ev_id)[0] == "completed"
+
+
+# --- 09-1 r2 MINOR-r2-5: the resume path of an exam run uses the background queue -------------
+
+
+def test_09_r2_minor5_resumed_exam_run_goes_to_the_background_queue(
+    pg, project, database, app_settings, monkeypatch
+):
+    from ffcore.core.auth import Actor
+    from ffcore.runtime import queue as queue_mod
+    from ffcore.runtime import resume
+
+    class _Queue:
+        def __init__(self):
+            self.enqueued = []
+
+        async def enqueue(self, run_id, payload):
+            self.enqueued.append(run_id)
+
+    interactive, background = _Queue(), _Queue()
+    monkeypatch.setattr(queue_mod, "get_background_queue", lambda settings: background)
+    user = uuid.uuid4()
+    exam_run, lone = (seed_run(pg, project, definition()) for _ in range(2))
+    for r in (exam_run, lone):
+        pg.execute("UPDATE runs SET status = 'waiting_user', user_id = %s WHERE id = %s", (user, r))
+    _exam(pg, project, {"q1": [exam_run]}, scorers=[{"name": "contains"}])
+
+    async def go(rid):
+        async with database.session_scope() as session:
+            await resume.resume_run(
+                session,
+                interactive,
+                app_settings,
+                project_id=project,
+                run_id=rid,
+                actor=Actor("user", str(user)),
+                answer="evet",
+            )
+
+    asyncio.run(go(exam_run))
+    asyncio.run(go(lone))
+    assert background.enqueued == [str(exam_run)] and interactive.enqueued == [str(lone)]
