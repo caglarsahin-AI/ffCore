@@ -201,10 +201,10 @@ def build_parser() -> argparse.ArgumentParser:
     raw = commands.add_parser(
         "ingest-raw",
         help="ingest a raw-staging tree (file + <file>.meta.json) into a knowledge base (19)",
-        description="PII masking (regex identifiers and NER person names, pii_ner) is always "
-        "applied to silver and gold; raw is never written. PRSIM is ingested with name "
-        "masking; --accept-personnel-data is the M3 measurement mode (regex only, as "
-        "measured, KARARLAR).",
+        description="PII masking is always applied to silver and gold (pii_ner: regex "
+        "identifiers and NER person names, the default; pii_regex: identifiers only, for sources "
+        "without person data); raw is never written. PRSIM is ingested with name masking; "
+        "--accept-personnel-data is the M3 measurement mode (regex only, as measured, KARARLAR).",
     )
     raw.add_argument("--project", required=True, help="project key")
     raw.add_argument("--kb", required=True, help="knowledge base key")
@@ -222,6 +222,13 @@ def build_parser() -> argparse.ArgumentParser:
         help="first N accepted files only (stage 0: pipeline evidence, not an acceptance corpus)",
     )
     raw.add_argument(
+        "--text-filter",
+        choices=("pii_ner", "pii_regex"),
+        default=None,
+        help="pii_ner (default): identifiers and person names; pii_regex: identifiers only, for "
+        "sources without person data (no NER needed; PRSIM still needs pii_ner); both mask",
+    )
+    raw.add_argument(
         "--accept-personnel-data",
         action="store_true",
         default=False,
@@ -237,11 +244,21 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def _raw_text_filter(args) -> str:
-    """No option names the filter (masking cannot be named away, plan/19): new ingests mask
-    names too (`pii_ner`); the M3 measurement flag keeps `pii_regex` as measured (08 tam 1b)."""
+    """Masking cannot be named away (plan/19): both choices mask. New ingests mask names too
+    (`pii_ner`, the default); `--text-filter pii_regex` masks identifiers only, for sources
+    without person data (FOLLOWUP-174; PRSIM is still refused without NER); the M3 measurement
+    flag keeps `pii_regex` as measured (08 tam 1b) and contradicts an explicit `pii_ner`."""
     from ffcore.knowledge import raw_ingest
 
-    return raw_ingest.M3_TEXT_FILTER if args.accept_personnel_data else raw_ingest.TEXT_FILTER
+    if args.accept_personnel_data:
+        if args.text_filter not in (None, raw_ingest.M3_TEXT_FILTER):
+            raise raw_ingest.raw_staging.StagingError(
+                "text_filter_conflict",
+                "--accept-personnel-data is the M3 mode (pii_regex); it cannot run with "
+                f"--text-filter {args.text_filter}",
+            )
+        return raw_ingest.M3_TEXT_FILTER
+    return args.text_filter or raw_ingest.TEXT_FILTER
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -252,15 +269,16 @@ def main(argv: list[str] | None = None) -> int:
         from ffcore.knowledge import raw_staging
 
         try:
+            text_filter = _raw_text_filter(args)
             raw_staging.check_sources(
                 args.sources,
                 accept_personnel_data=args.accept_personnel_data,
-                text_filter=_raw_text_filter(args),
+                text_filter=text_filter,
             )
         except raw_staging.StagingError as exc:
             print(f"error: {exc}", file=sys.stderr)
             return 2
-        if _raw_text_filter(args) == "pii_ner" and any(map(raw_staging.is_prsim, args.sources)):
+        if text_filter == "pii_ner" and any(map(raw_staging.is_prsim, args.sources)):
             # PRSIM: still before logging and the database (exit 2, as before 08 tam 1b); other
             # sources are checked by ingest_tree before the first file.
             from ffcore.knowledge import raw_ingest
@@ -343,7 +361,7 @@ def main(argv: list[str] | None = None) -> int:
                         limit=args.limit,
                         settings=get_settings(),
                         accept_personnel_data=args.accept_personnel_data,
-                        text_filter=_raw_text_filter(args),
+                        text_filter=text_filter,
                     )
                 )
             except (raw_ingest.RawIngestError, raw_ingest.raw_staging.StagingError) as exc:

@@ -122,8 +122,12 @@ def test_19_s1_text_filter_name_and_version():
 def test_19_s1_masking_cannot_be_disabled():
     parser_help = cli.build_parser().format_help()
     sub = cli.build_parser()._subparsers._group_actions[0].choices["ingest-raw"]
-    options = {o for a in sub._actions for o in a.option_strings}
-    assert not {o for o in options if "mask" in o or "filter" in o}, options
+    options = {o: a for a in sub._actions for o in a.option_strings}
+    # 08 tam 1c, FOLLOWUP-174 (K-08T1C-0005): the one filter option chooses between two masking
+    # filters; no choice turns masking off and no other option names masking or a filter.
+    named = {o for o in options if "mask" in o or "filter" in o}
+    assert named == {"--text-filter"}, named
+    assert set(options["--text-filter"].choices) == {"pii_ner", "pii_regex"}
     assert "ingest-raw" in parser_help
 
 
