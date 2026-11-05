@@ -34,6 +34,7 @@ from ffcore.api.knowledge_schemas import (
     KnowledgeBaseOut,
     KnowledgeBaseUpdate,
     ReindexAccepted,
+    ReindexLayer,
     ReindexRequest,
     SearchHit,
     SearchRequest,
@@ -517,6 +518,13 @@ async def reindex_knowledge_base(
     resource_id: KbIdDep,
 ):
     kb = await _kb(session, project_id, kb_id)
+    if body.layer == ReindexLayer.silver:
+        # FOLLOWUP-172 N1: refuse here (409) instead of a 202 whose job fails; the job keeps the
+        # same check (the API body has no personnel-data flag, the CLI has).
+        try:
+            await ingest.check_reindex_silver(kb.id, full=body.full)
+        except ingest.ReindexRefused as exc:
+            raise conflict(exc.code, str(exc)) from None
     documents = await session.scalar(
         select(func.count())
         .select_from(Document)
