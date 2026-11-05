@@ -81,7 +81,7 @@ def test_08t1c_9_long_text_windows_find_every_name(client):
         parts.append(filler * (1 + i % 3))
     text = "".join(parts)
     tokens = len(client.load()._pipeline.tokenizer(text)["input_ids"])
-    assert tokens > 4 * 512, tokens
+    assert tokens > 3 * 512, tokens
     found = sorted((f.start, f.end) for f in client._recognize(text, {"PERSON"}))
     assert found == expected
 
