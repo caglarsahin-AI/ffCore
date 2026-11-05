@@ -203,3 +203,21 @@ def test_09_2_compare_other_suite_is_422(pg, member, project):
     b = _scored_exam(pg, project, suite_b, version_id, {"q1": True})
     r = member("analyst").get(f"{P.format(project)}/eval-runs/compare?a={a}&b={b}")
     assert r.status_code == 422 and r.json()["error"]["code"] == "eval_runs_not_comparable"
+
+
+def test_09_2_r3n11_patch_checks_scorers_and_delete_audits_the_suite(pg, member, project):
+    # FOLLOWUP-176 (r3 NOTE-11): r1 MINOR-7 had no HTTP test.
+    from tests.integration.conftest import audit_rows
+
+    suite_id, _ = _suite_and_run(pg, project)
+    client = member("analyst")
+    base = f"{P.format(project)}/eval-suites/{suite_id}"
+    bad = client.patch(base, json={"scorers": [{"name": "no_such_scorer"}]})
+    assert bad.status_code == 422
+    assert client.patch(base, json={"pass_threshold": None}).status_code == 422
+    assert client.delete(base).status_code == 204
+    rows = pg.execute(
+        "SELECT resource_id FROM audit_events WHERE action = %s AND project_id = %s",
+        ("delete_eval_suite", project),
+    ).fetchall()
+    assert [r[0] for r in rows] == [str(suite_id)], audit_rows

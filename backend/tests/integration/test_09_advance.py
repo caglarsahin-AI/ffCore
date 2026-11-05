@@ -555,3 +555,40 @@ def test_09_r5_k34_hard_limit_above_the_window_still_ends_a_hung_judge(
     assert status == "completed"
     assert plan["q1"]["result"]["runs"][0]["note"] == "judge_out_of_time"
     assert summary["errors"] == {"judge_out_of_time": 1}
+
+
+# --- 09-2 D4 (FOLLOWUP-176, r4 NOTE-2): a real cut keeps the exam's failure count -----------------
+
+
+def test_09_2_r4n2_real_cut_keeps_the_failure_count(
+    pg, project, database, app_settings, monkeypatch
+):
+    import time
+
+    from ffcore.evaluation import worker_tick
+
+    ev_id = _judged_exam(pg, project, n=1)
+    settings = app_settings.model_copy(update={"llm_call_timeout_s": 1, "eval_judge_call_s": 1})
+    monkeypatch.setattr(worker_tick, "_judge", lambda *a: _Judge(delay=3.0))
+    monkeypatch.setattr(worker_tick, "_sql", lambda *a: None)
+    monkeypatch.setattr(worker_tick, "_embed", lambda *a: None)
+
+    async def go():
+        redis = aioredis.from_url(os.environ["REDIS_URL"])
+        try:
+            await redis.set(worker_tick.failures_key(ev_id), 2)
+            await worker_tick._advance_one(
+                settings, redis, None, None, _Api(), ev_id, None,
+                deadline=time.monotonic() + 1.5,
+            )  # fmt: skip
+            return await redis.get(worker_tick.failures_key(ev_id))
+        finally:
+            await redis.delete(worker_tick.failures_key(ev_id))
+            await redis.aclose()
+
+    count = asyncio.run(go())
+    status, plan, _ = _ev(pg, ev_id)
+    # A full window (1.5 s >= 1 s hard limit): the cut counts on the item, the tick saved no
+    # item, so the exam's failure count is neither raised nor reset (r3 MAJOR-r3-1).
+    assert status == "running" and plan["q1"]["timeouts"] == 1
+    assert count == b"2"
