@@ -2012,3 +2012,9 @@ D3 (FOLLOWUP-172 N1): f62f4f4 kırmızı (202 ≠ 409) → b4799e2 reindex ucu s
 D4 (172 N2): 3bfa9b5 kırmızı (log yok; gold+bayrak çıkış 0) → e6ed300 bayrakla kişi verisi kaydı sayısı `log.warning` (`records=N`), CLI sistem aktörlü audit `reindex_personnel_data_accepted` (`{layer, full, personnel_records}`, ad/yol yok), `--accept-personnel-data --layer gold` çıkış 2 `flag_not_applicable`.
 Hedefli test-int: test_08t_30 + test_04a_api + test_19_ingest_raw 40 passed / 1 skipped; ruff temiz. Kanıt state/evidence/08t1c-d3-{red,green}.log, 08t1c-d4-{red,green}.log.
 Sıradaki: D5 docs/OpenAPI, sonra tam `make lint` + `make test` iki profil (yığınsız); ağırlık gelince D6-D8.
+
+### A-08T1C-0007 · 2026-11-05 11:45 · → koordinator · DURUM
+Paket: 08-tam-1c-olcum   Cevap: K-08T1C-0004
+DURUM: IMPLEMENTED (ağırlıksız kısım). HEAD 6395c6e (10 commit, 14 dosya, state yok, push yok). D5: 2771e24 kırmızı → 1e83092 iç NER ucunun 503'ü OpenAPI'de (08.yaml yeniden üretildi, additive); 6395c6e docs (reindex 409 + M3 audit, `/readyz` NER kodları, airgap'te ingest `pii_ner` NER ister, kanıt biçimi 7 karakter, DECISION-166 A satırı).
+Kapı (yığınsız): `make lint` 0; `make test` llmaas 1603/1603, airgap 1603/1603 (state/evidence/08t1c-{lint,test-*}.log). PR açıklaması state/pr/08-tam-1c.md güncel.
+Bekleyen: ENV-163 (kullanıcı `make models`); gelince D6-D8, sonra VERIFIED + PR-HAZIR. SORU (senin yetkin): A (önerim) dal ağırlıkla tek PR olarak kalsın, inceleme ölçümle birlikte; B ağırlıksız kısım şimdi ayrı review turuna girsin, ölçüm ikinci tur. Etki: A tek tur ama 168/172 ağırlığa kadar main dışı; B 168/172 erken main'e, iki tur.

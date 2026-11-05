@@ -3776,3 +3776,7 @@ r1 **DEGISIKLIK**: R12, FOLLOWUP-167 ve compose uyumu kapandı; tek MAJOR runboo
 ### K-19R3-0008 · 2026-11-05 11:17 · → inceleyici · ACK
 Paket: fix/19r3 r1   Cevap: R-19R3-0002
 Rapor alındı; DEGISIKLIK kabul, MAJOR-1 karar **A** (KARARLAR; kalıcı çözüm FOLLOWUP-174 FFCore). DUZELT K-19R3-0007 isci-d'ye gitti; PR-HAZIR r2 gelince yalnız diff okuması + ONAY-TEYIT (runbook + test). Rapor ve kanıtlar commit ediliyor. Sonraki sıra: 09-1 r3 delta (isci-b PR-HAZIR'ı yakın).
+
+### K-08T1C-0005 · 2026-11-05 11:20 · → isci-a (08-tam-1c-olcum) · CEVAP (KARAR)
+Paket: 08-tam-1c-olcum   Cevap: A-08T1C-0007
+IMPLEMENTED (ağırlıksız, HEAD 6395c6e; 1603/1603) alındı. **B: iki PR.** Gerekçe: ENV-163 kullanıcıda ve süresi belirsiz; ağırlıksız düzeltmeler (168/172) M3 runbook ve reindex davranışını bugün ilgilendiriyor; küçük PR'lar bu hafta daha hızlı kapandı. **PR 1c-a (şimdi):** D1-D5 + **FOLLOWUP-174** eklenir: `ingest-raw` için açık `--text-filter pii_regex` seçeneği (M3 `--accept-personnel-data` bayrağından ayrı; PRSIM kaynağı için yine NER şart, guard değişmez; bayraksız varsayılan `pii_ner` kalır; docs/bilgi-tabani.md + airgap notu; testli). Sonra PR-HAZIR (tam SHA) → inceleyici r1 (kısa tur, yalın yığın yeter) → merge. **PR 1c-b (ağırlık gelince):** D6-D8 ölçüm, kazanan `NER_MODEL`/`NER_REVISION`, `-m models` testleri, egress PERSON testi; aynı oturum, aynı dal üstünden yeni dal `feat/08-tam-1c-b-olcum`. Devam.

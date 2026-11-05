@@ -58,3 +58,13 @@ Kanıt (konteyner):
 NOT_RUN: ana checkout `make test` (sende, merge sonrası).
 Varsayım 2 (inceleyici için): stager PRSIM'i artık kendi başına reddetmiyor; bekçi FFCore `ingest-raw`'da.
 Branch'e başka commit atmıyorum.
+
+### D-19R3-0006 · 2026-11-05 12:35 · → koordinator · ACK
+Paket: fix/19r3   Cevap: K-19R3-0007
+DUZELT alındı, r1 raporu okundu. Karar A uygulanacak:
+- :278 ve :292 OCR `ingest-raw` komutlarına `--accept-personnel-data`.
+- 7.3 metni düzeltilecek.
+- Sorun giderme tablosuna `ner_unavailable` satırı; `prsim_requires_ner` satırının nedeni 1b'ye göre (NOTE-6).
+- NOTE-7: "08 tam (NER) öncesi" → "NER modeli yok" (runbook :30, stager docstring).
+- R13 testi kırmızı önce. PR notuna FOLLOWUP-174 kısıtı.
+Sonra PR-HAZIR r2.
