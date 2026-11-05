@@ -173,7 +173,9 @@ one `EVAL_JUDGE_CALL_S` too. Rules:
 - A plan up to 540 s can start in a tick; a longer one can start in none. Such an item ends
   at once (`judge_out_of_time`, note `planned_exceeds_tick_budget`), and starting an exam with
   `llm_judge` whose `repeat` x `EVAL_JUDGE_CALL_S` is over 540 s is refused up front:
-  `422 eval_plan_exceeds_tick`. Nothing in between waits forever.
+  `422 eval_plan_exceeds_tick`. Nothing in between waits forever, as long as a tick's own
+  work before its first exam stays under `TICK_OVERHEAD_S` (30 s); when it does not, the
+  worker logs the warning `eval_tick_overhead_exceeded overhead_s=<seconds>` (once per tick).
 - An item running past the deadline is cut. The cut counts only if the item started with a
   full window: its calls at `LLM_CALL_TIMEOUT_S`, at most 540 s. A cut in a shorter window
   (earlier exams used the tick) counts nothing and commits nothing; the exam keeps its place

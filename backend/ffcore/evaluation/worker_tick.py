@@ -188,13 +188,26 @@ async def tick(settings: Settings, redis, slots, prompts, *, queue=None) -> None
         return
     await keep_listening(settings, redis)
     api = LangfuseApi(settings)
+    checked = False
     for ev_id in ids:
         async with exam_lock(redis, ev_id) as held:
             if not held:
                 continue
+            if not checked:
+                checked = True
+                _check_overhead(deadline)
             await _advance_one(
                 settings, redis, slots, prompts, api, ev_id, queue, deadline=deadline
             )
+
+
+def _check_overhead(deadline: float) -> None:
+    """Once per tick, before its first exam (r6 decision A, fail-loud): a window under
+    TICK_PLAN_S means the tick's own work took more than TICK_OVERHEAD_S, and a plan of exactly
+    TICK_PLAN_S could not start. Logged with the measured time only."""
+    window = deadline - time.monotonic()
+    if window < TICK_PLAN_S:
+        log.warning("eval_tick_overhead_exceeded overhead_s=%.1f", TICK_BUDGET_S - window)
 
 
 async def _advance_one(
