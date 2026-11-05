@@ -64,9 +64,12 @@ calls the model directly. FFCore's judge instead:
   it is down nothing is sent and the item is not run, `ner_unavailable`, counted apart: an
   outage is not the agent's score; the exam's `complete` is then false, so it cannot pass a
   publish gate that asks for a complete exam until it is run again; an NER endpoint that
-  refuses the request (4xx) or runs another model than the worker expects is a configuration
-  error instead: the tick fails loudly and the exam ends `failed(advance_failed:
-  ner_misconfigured)` after `MAX_ATTEMPTS` ticks),
+  answers with one of its configuration codes (`ner_not_configured`, `model_missing`,
+  `ner_label_unknown`, `ner_offsets_unavailable`), refuses the request (any 4xx) or runs another
+  model than the worker expects (`ner_model_mismatch`) is a configuration error instead: the
+  tick fails loudly and the exam ends `failed(advance_failed:ner_misconfigured)` after
+  `MAX_ATTEMPTS` ticks; a 5xx without such a code or no answer at all is the outage. The worker
+  decides by the API's status and error code, never by the text of a message),
 - calls `EVAL_JUDGE_MODEL` as a background job (model slots, background window, quotas),
 - keeps the question, expected answer and answer between markers and tells the model that
   text inside them is data, not instructions,
@@ -235,21 +238,41 @@ then the largest drops), each exam's `complete` and `config_differs` (scorers, t
 A suite bound to an agent (`agent_id`) gates `POST /agents/{id}/publish {version}`. For every
 live suite bound to the agent, the version needs a latest completed exam that:
 
+- examined the version as it is now: an exam records the digest of the definition it examines
+  (`config.definition_sha256`, sha256 of the definition's canonical JSON); a draft edited after
+  its exam no longer matches, and the exam is `stale_exam` (so is an exam without a digest),
+- ran with the suite as it is now: the suite's `scorers`, `pass_threshold` and `repeat` must be
+  the ones in the exam's snapshot, else `stale_suite` (`approve_tools` is not compared: a
+  change to `false` is `suite_not_gateable` or an incomplete exam already). The suite's
+  Langfuse dataset items are not compared: an item edited or added in Langfuse after the exam
+  does not make it stale; run the exam again after changing the dataset,
 - `passed` (pass rate at least the suite's threshold),
 - is `complete` and has nothing in `not_run` (an approval rejected or never given, a user
   question, an NER outage: the exam did not finish unattended).
 
 Otherwise publishing is `409 eval_gate_failed`; the message names each suite as
-`<key>=<reason>`: `no_exam`, `not_passed`, `incomplete`, or `suite_not_gateable`. The last one:
-a suite with `approve_tools: false` cannot gate a version that binds an action asking for
-approval (the exam can never complete unattended); set `approve_tools: true` on that suite, or
-leave it unbound. A suite on an agent without such actions gates with `approve_tools: false`.
+`<key>=<reason>`: `no_exam`, `stale_exam`, `stale_suite`, `not_passed`, `incomplete`, or
+`suite_not_gateable`. The last one: a suite with `approve_tools: false` cannot gate a version
+that binds an action asking for approval (the exam can never complete unattended); set
+`approve_tools: true` on that suite, or leave it unbound. A suite on an agent without such
+actions gates with `approve_tools: false`.
+
+A draft edited while its exam is queued or running ends the exam `failed(definition_changed)` at
+the advancer's next tick: its item runs still going are stopped as a cancelled exam's are, and
+nothing is scored against a definition that was not the one examined.
+
+The published version keeps the exam that opened the gate in `eval_run_id` (with several suites,
+the latest of the exams that passed); it is null when the gate was forced or the agent has no
+bound suite.
 
 An admin may publish past the gate: `{"version": n, "force": true, "force_reason": "..."}`.
-Anyone else gets `403 force_requires_admin`; a force without a reason is
-`422 force_reason_required`. A forced publish is audited as `eval_gate_forced` with the suites
-and the reason. `rollback` is not gated: it returns to a version that was published before.
-An agent without a bound suite publishes as before.
+Anyone else gets `403 force_requires_admin`; a force without a reason (or a blank one) is
+`422 force_reason_required`, a `force_reason` without `force` is `422
+force_reason_without_force`. A forced publish past a failing gate is audited as
+`eval_gate_forced` with each failing suite (`suite_id`, `key`, `eval_run_id`, `reason`) and the
+reason as given (trimmed); through an API key the audit row carries the key (`via_key_id`).
+`rollback` is not gated: it returns to a version that was published before. An agent without a
+bound suite publishes as before.
 
 ## An exam item from a run
 
@@ -259,16 +282,34 @@ POST /api/v1/projects/{project_id}/eval-suites/{suite_id}/items/from-run/{run_id
 ```
 
 Saves a run's question (and its variables) as an item of the suite's Langfuse dataset, with the
-expected output given here (keys as in "Item format"). The run must be `completed` and readable
-by the caller as in the run API (a `user` reads only their own runs; another's is 404).
+expected output given here (keys as in "Item format"). The caller is an editor of the project
+(analyst or above, edit mode); the run must be `completed` and in the project (another
+project's run is 404).
 
-Before anything leaves for Langfuse the question goes through the egress stage of the agent
-version's guardrail policy in the API process: identifiers are tokenized (`<<PII_n>>`). With
-`GUARDRAIL_EGRESS_NER=false` only the regex categories are masked, so person names stay; with
-`true` names are masked by the API's NER. A blocked question is `422 run_input_blocked`, an NER
-outage `503 ner_unavailable`; nothing is saved then. The item id is `<suite_key>-run-<run_id>`
-(saving the same run again updates it); its metadata says `source: from_run`. Audited as
-`eval_item_from_run` without the text. The console's "add to exam" button is FOLLOWUP-170.
+Before anything leaves for Langfuse the question, its variables and the expected output go
+through the egress stage of the agent version's guardrail policy in the API process, with one
+token store: identifiers are tokenized (`<<PII_n>>`), and a value the question and the expected
+output share gets the same placeholder, so `must_contain` still matches what the agent is asked.
+The answer's `masking` says what was masked:
+
+- `regex`: identifiers only (TC number, e-mail, phone, IBAN, card). **With
+  `GUARDRAIL_EGRESS_NER=false` a person's name is written to the Langfuse item as it was asked.**
+  Langfuse runs in-house; this is the accepted behaviour for tests and airgap. An installation
+  whose runs carry personnel or patient names sets `GUARDRAIL_EGRESS_NER=true`.
+- `regex+ner`: person names are masked too (the API's NER, `engine: ner` at egress).
+
+The exam then asks the agent the masked question (placeholders, not the original values): the
+mapping is not kept.
+
+A blocked text is `422 run_input_blocked`; a guardrail policy error is a coded `422` (its own
+code, e.g. `rule_type_unsupported`), a text over the engine's limit `422 text_too_long`; an NER
+outage is `503 ner_unavailable` and an NER that is not configured `503 ner_not_configured` (or
+the API's other NER code); a failed Langfuse call is `502`. Nothing is saved then, but the
+refusal is audited as `eval_item_from_run` with outcome `error` and its `error_code` (no text);
+a blocked text keeps the guardrail events that blocked it. The item id is
+`<suite_key>-run-<run_id>` (saving the same run again updates it); its metadata says
+`source: from_run`. Audited as `eval_item_from_run` without the text. The console's "add to
+exam" button is FOLLOWUP-170.
 
 ## Langfuse 3.120 notes (measured)
 

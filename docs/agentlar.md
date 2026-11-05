@@ -49,7 +49,9 @@ Saving or publishing checks the budget against the model (C13): `context_tokens`
    that was published before). Runs without an explicit version use the published one. When
    an exam suite is bound to the agent, publish passes the exam gate first (409
    `eval_gate_failed`; an admin may `force` with a `force_reason`, audited); rollback is not
-   gated. See evaluation.md, "The publish gate".
+   gated. The exam must be of the draft as it is now: editing a draft after its exam makes the
+   exam `stale_exam` (run it again), editing it while the exam runs ends the exam
+   `failed(definition_changed)`. See evaluation.md, "The publish gate".
 
 Analysts with edit access build and publish agents; read-only access gets 403 on every mutation.
 Every mutation is audited.
