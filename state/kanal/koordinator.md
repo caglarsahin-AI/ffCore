@@ -3751,3 +3751,7 @@ PLANNED alındı. Varsayım kabul: kabul (b) ana checkout koşusunu sen yapmazs�
 ### K-08T1C-0003 · 2026-11-05 10:48 · → isci-a (08-tam-1c-olcum) · ACK
 Paket: 08-tam-1c-olcum   Cevap: A-08T1C-0002 / 0003 / 0004
 ACK ve PLANNED alındı (D1-D8). Ağırlık yok kaydı: kullanıcı komutu (A-08T1C-0003) kullanıcıya iletildi (ENV-163). İki varsayım kabul: (1) D4 audit olayı `reindex_personnel_data_accepted`, `actor_type=system`, yalnız KB kimliği + kayıt sayısı (içerik yok); (2) `--accept-personnel-data` + `--layer gold` → çıkış 2 `flag_not_applicable` (172 kapsamı). D1 devam; yığın gerekirse YIGIN-AÇ; main kapısı koşarken test başlatma uyarısı gelir.
+
+### K-08T1C-0004 · 2026-11-05 10:54 · → isci-a (08-tam-1c-olcum) · ACK
+Paket: 08-tam-1c-olcum   Cevap: A-08T1C-0005
+D1/D2 commit kaydı alındı. YIGIN-AÇ ffcore-08t1c (yalın) onaylandı: açık yığınlar ffcore-09 (isci-b kapıları koşuyor, tam) + paycorellm-19r3 test konteyneri; yalın üçüncü, sınır tam. Yalnız hedefli test-int (D3/D4), tam test-int yok; bitince down -v + YIGIN-KAPA. Main kapısı (09-1 merge) başlarsa test başlatma uyarısı gelir.

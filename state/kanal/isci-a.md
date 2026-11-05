@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-a-08-tam-1c-olcum (Opus 5.5; önceki lease ffcore-isci-a-08-tam-1b RETIRED, HANDOFF koordinatör özeti K-08T1B-0026)
 - Aktif paket: 08-tam-1c-olcum (K-08T1C-0001)
 - Durum: ACTIVE
-- Son okunan: K-08T1C-0002
+- Son okunan: K-08T1C-0003
 
 ## Mesajlar
 
@@ -1999,3 +1999,8 @@ Paket: 08-tam-1c-olcum   Cevap: K-08T1C-0001 / K-08T1C-0002
 DURUM: PLANNED. Plan state/pr/08-tam-1c.md (kısa; PR_SABLONU 1-9, felsefe üç sorusu). Dilimler: ağırlıksız D1 `local_ner()` kilidi, D2 mutlak süre testleri oran/asılı-kalma, D3 reindex API 409 `prsim_requires_ner` (ön denetim; iş denetimi kalır), D4 M3 kipi reindex log + sistem aktörlü audit olayı + `--layer gold` ile bayrak açık hata, D5 docs/OpenAPI (503, 409, `ner_label_unknown`, airgap `pii_ner`); ağırlıkla D6-D8 (models-check, lisans/id2label, ölçüm, kazanan, egress PERSON testi).
 Görüş isteyen iki varsayım (itiraz yoksa böyle): (1) D4 audit olayı `reindex_personnel_data_accepted`, `actor_type=system`, yalnız KB kimliği ve kayıt sayısı; (2) `--accept-personnel-data` + `--layer gold` çıkış 2 `flag_not_applicable` (r3 NOTE-2'nin ikinci yarısı, 172 kapsamında sayıyorum).
 D1'den başlıyorum; yığın gerekmedikçe birim testler tools konteynerinde `--no-deps`.
+
+### A-08T1C-0005 · 2026-11-05 11:40 · → koordinator · YIGIN-AÇ
+Paket: 08-tam-1c-olcum   Cevap: K-08T1C-0003
+Talep: yalın `ffcore-08t1c` (FFCORE_VERSION=0.0.0-main, `--env-file .env.test`, tools ile `make test-int` hedefli: test_08t_30, ardından D4 testleri). Ölçüm: açık yığınlar ffcore-09 (20 konteyner, ≈5,4 GB) + paycorellm-19r3 (1); `df -h /c` 106 GB boş. İzin gelene kadar yığın açmıyorum; o arada D5 docs.
+İlerleme (dal, push yok): e6d3ebf kırmızı → 2beffe5 D1 `local_ner()` kilidi (4 eşzamanlı çağrıda 4 yükleme → 1; NER testleri 22/22); fe6993c D2 `test_08t_secrets_linear` CPU oranı (4x girdi, sınır 8, en iyi 3, 5 çağrı) + 120 s asılı kalma koruması, `test_04a_9d` 600 s uyku altında geniş koruma (300 s); eski kare desen aynı ölçümle oran 20,7 (yakalıyor), yeni testler 8/8. D3 testleri yazıldı (409 + kuyruk boş + audit `error`; gold ve kişi verisiz silver 202), commit'lenmedi, kırmızı koşusu yığın bekliyor.
