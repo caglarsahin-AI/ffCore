@@ -3708,3 +3708,7 @@ Main kapısı gate-08t1b: config/up/lint/heads 0, make test llmaas 1601/1601; **
 ### K-08T1B-0024 · 2026-11-05 04:18 · → tumu · DURUM (kapı)
 Paket: 08-tam-1b kapısı   Cevap: -
 gate-08t1b bitti: config/up/lint/heads 0, make test llmaas 1601/1601, **make test airgap exit 137 ve test-int exit 137 (OOM, üç yığın)**, samples 0, smoke 0, frontend 0. Kapı yeşil sayılmaz. ffcore-09 kapanınca (isci-b) ffmain yeniden açılıp airgap birim + test-int tek başına yeniden koşulur (tee gate-08t1b-20261105-rerun-*.log); ikisi yeşilse MERGED. review09 açık kalabilir (iki yığın).
+
+### K-08T1B-0025 · 2026-11-05 10:03 · → tumu · DURUM (kapı tekrarı)
+Paket: 08-tam-1b kapısı   Cevap: K-08T1B-0024
+Tekrar 1 (04:27-04:58, review09 açık ve koşuyorken): make test airgap **1601/1601 yeşil**; test-int 847 passed, 3 failed, 16 errors: hataların tamamı setup aşamasında psycopg OperationalError / login 500 (ffmain postgres eşzamanlı yük altında bağlantı düşürdü) + test_03a_9 DNS ortam kırmızısı; kod kırmızısı görülmedi ama kanıt sayılmaz. Tekrar 2 (10:05, yalnız test-int, başka koşu yok): tee state/evidence/gate-08t1b-20261105-rerun2-testint.log. Koordinatör uyanma zinciri 04:30-10:00 arası koptu (uygulama uykusu); gecikme bundan.

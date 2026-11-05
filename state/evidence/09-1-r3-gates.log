@@ -252,3 +252,31 @@ ERROR tests/integration/test_08t_26_builtin_egress_key.py::test_08t_26b_panel_re
 9 passed, 77 errors in 333.71s (0:05:33)
 exit=0
 == targeted test-int DEPLOY_PROFILE=airgap 2026-11-05T04:18:45+03:00
+86 passed in 153.51s (0:02:33)
+exit=0
+== make seed + seed-eval + stack exam alone 2026-11-05T04:21:41+03:00
+seeded: projects ['hastane-a', 'klinik-b'], models ['chat-default', 'chat-fail', 'chat-slow', 'chat-tools'], agents in hastane-a; created 36, uploaded 15
+cd backend && python -m ffcore.cli seed-eval --project "hastane-a" --suite ../data/samples/eval/suite.json --items ../data/samples/eval/sozlesme-33.json 
+dataset: hastane-a.sozlesme-33
+items upserted: 33; archived: 0
+suite: created
+cd backend && python -m ffcore.cli seed-eval --project "hastane-a" --suite ../data/samples/eval/suite-sql-20.json --items ../data/samples/eval/sql-20.json 
+dataset: hastane-a.sql-20
+items upserted: 20; archived: 0
+suite: created
+exam ec8c6e9a-1288-4681-bc8e-933bd352b6b7 completed in 33.4 s: {'n': 33, 'worst': [{'mean': 0.0, 'note': '', 'style': 'dolayli', 'passed': False, 'item_id': 'hastane-a.sozlesme-33-q18', 'outcome': 'below_rerank_floor'}, {'mean': 0.0, 'note': '', 'style': 'alan_ici_cevapsiz', 'passed': False, 'item_id': 'hastane-a.sozlesme-33-q21', 'outcome': 'unanswerable_answered'}, {'mean': 0.0, 'note': '', 'sty
+exam = (<httpx.Client object at 0x7f2f23b0d4f0>, '5ed5718d-47ff-46d8-9ed4-b39186b55918', {'id': '5806bb16-6f53-4140-84ec-d72d..., 'suite_id': '5806bb16-6f53-4140-84ec-d72d0482d347', 'agent_version_id': '2d524e52-17b7-4768-9477-b9da2938b8f7', ...})
+        # exam ended, 33/33 seconds later; state/pr/09.md L17): poll, bounded.
+        scores = anyio.run(api.trace_scores, items[0].trace_id, ["outcome", "passed", "contains"])
+>       assert {"outcome", "passed"} <= {s["name"] for s in scores}
+E       AssertionError: assert {'outcome', 'passed'} <= set()
+E         
+E         Extra items in the left set:
+E         'passed'
+E         'outcome'
+1 failed, 7 passed in 39.21s
+exit=0
+== make smoke 2026-11-05T04:24:13+03:00
+smoke: passed
+exit=0
+== end 2026-11-05T04:24:23+03:00

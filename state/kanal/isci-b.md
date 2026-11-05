@@ -1834,3 +1834,13 @@ Dala başka commit atmıyorum; delta inceleme bekliyorum.
 ### B-09-0025 · 2026-11-05 · → koordinator · ACK + YIGIN-AÇ
 Paket: 09-1 r3   Cevap: K-09-0017
 ACK. `git merge main` (rebase değil) → d0b1d76; tek çatışma `backend/ffcore/cli.py` (`_seed_eval` + 1b `_raw_text_filter`, ikisi de korundu); migration zinciri değişmedi (09_0001 → 06b_0001). MINOR-9 → 0a02d0f: `judge.EgressGuard(ner=)` + worker `ner=HttpNer(settings)`; `tests/unit/test_09_judge_ner.py` (GUARDRAIL_EGRESS_NER=true sahte NER: ad maskelenir; NER'siz guard `ner_not_configured`; worker HttpNer geçirir). Kırmızı: state/evidence/09-1-r3-red-ner.log. `.env.test` false satırı dokunulmadı. YIGIN-AÇ `ffcore-09` (18280/13280) kapılar için; PR-HAZIR r3'ü r2 DUZELT sonrası veririm.
+
+### B-09-0026 · 2026-11-05 04:26 · → koordinator · YIGIN-KAPA + DURUM
+Paket: 09-1 r3   Cevap: K-09-0017 / koordinatör bellek notu
+`ffcore-09` `down -v` ile kapatıldı (konteyner 0, volume 0). Kapı koşusu @ 0a02d0f (state/evidence/09-1-r3-gates.log) bellek baskısı yüzünden **geçerli kanıt değil**:
+- `make test` llmaas `Error 137` (OOM öldürmesi); airgap özet satırı yok (muhtemelen aynı sebep). Betikteki `exit=0` yanıltıcı, çünkü `tail` sonucunu gösteriyor.
+- Hedefli test-int llmaas: 9 passed, 77 error. Hepsi `failed to resolve host 'postgres'`, yani koşu sırasında postgres konteyneri düştü. airgap: **86 passed**.
+- Stack sınavı: 33/33 madde, 33,4 s. Ancak 1 failed / 7 passed. Langfuse `trace_scores` sınırlı yoklamada boş döndü (L17 gecikmesi). r2'de aynı test geçti; bellek baskısından olduğunu tahmin ediyorum, doğrulamadım.
+- Yeşil olanlar: build, compose config, lint (iki profil), alembic tek head + gidiş-dönüş, seed + seed-eval, smoke.
+Kod tarafında 0a02d0f için yeni birim testi 3 passed. Diğer sonuçlar ortam kaynaklı göründüğü için kod değişikliği yapmıyorum.
+SORU: PR-HAZIR r3'ten önce kapıların tekrarı için yığın gerekiyor (make test iki profil, hedefli test-int iki profil, stack sınavı). Bellek uygun olduğunda YIGIN-AÇ izni verir misin? Başka yığınlar kapanınca koşmayı öneririm.

@@ -1,0 +1,27 @@
+..F.....                                                                 [100%]
+=================================== FAILURES ===================================
+________________ test_09_langfuse_dataset_run_links_every_item _________________
+
+exam = (<httpx.Client object at 0x7fad35625ca0>, '28102c9d-8436-494f-84a5-49662b4d3523', {'id': '29836faa-1ea7-4c53-ae99-9cbb..., 'suite_id': '29836faa-1ea7-4c53-ae99-9cbb7d53235e', 'agent_version_id': 'e1c13825-3b3a-42cf-86c6-bdfcf9f6a757', ...})
+
+    def test_09_langfuse_dataset_run_links_every_item(exam):
+        _, _, suite, out = exam
+        api = LangfuseApi(get_settings())
+        # Langfuse 3.120 reads dataset run items back with a lag (measured 31/33 right after the
+        # exam ended, 33/33 seconds later; state/pr/09.md L17): poll, bounded.
+        deadline = time.monotonic() + 60
+        while True:
+            items = anyio.run(api.run_items, suite["langfuse_dataset_name"], out["langfuse_run_name"])
+            if len({i.item_id for i in items}) == 33 or time.monotonic() > deadline:
+                break
+            time.sleep(3)
+        assert len({i.item_id for i in items}) == 33
+        scores = anyio.run(api.trace_scores, items[0].trace_id, ["outcome", "passed", "contains"])
+>       assert {"outcome", "passed"} <= {s["name"] for s in scores}
+E       AssertionError: assert {'outcome', 'passed'} <= {'passed'}
+E         
+E         Extra items in the left set:
+E         'outcome'
+
+tests/integration/test_09_exam_stack.py:111: AssertionError
+1 failed, 7 passed in 635.00s (0:10:34)
