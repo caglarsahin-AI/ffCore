@@ -143,3 +143,63 @@ def test_09_r5_start_plan_longer_than_a_tick_is_422_over_http(
         app.dependency_overrides.pop(langfuse_dependency, None)
     assert r.status_code == 422, r.text
     assert r.json()["error"]["code"] == "eval_plan_exceeds_tick"
+
+
+def _scored_exam(pg, project, suite_id, version_id, passed: dict):
+    """A completed exam whose item results are given as {item_id: passed}."""
+    ev_id = uuid.uuid4()
+    plan = {
+        i: {
+            "item": {"id": i, "input": {"message": i, "variables": {}},
+                     "expectedOutput": {"must_contain": ["x"]},
+                     "metadata": {"style": "dogrudan", "answerable": True}},
+            "runs": ["r"],
+            "scored": True,
+            "result": {"runs": [{"run_id": "r", "outcome": "answered", "passed": ok, "note": "",
+                                  "scores": [{"name": "contains", "value": 1.0 if ok else 0.0,
+                                              "passed": ok, "status": "ok", "comment": ""}]}]},
+        }
+        for i, ok in passed.items()
+    }  # fmt: skip
+    pg.execute(
+        "INSERT INTO eval_runs (id, project_id, suite_id, agent_version_id, user_id,"
+        " langfuse_run_name, status, item_runs, summary, config, created_by)"
+        " VALUES (%s, %s, %s, %s, %s, 'exam-x', 'completed', %s, %s, %s, 't')",
+        (ev_id, project, suite_id, version_id, uuid.uuid4(), json.dumps(plan),
+         json.dumps({"n": len(passed), "complete": True, "pass_rate": 0.5, "scored": len(passed)}),
+         json.dumps({"scorers": [{"name": "contains"}], "pass_threshold": 0.8, "repeat": 1,
+                     "approve_tools": False})),
+    )  # fmt: skip
+    return ev_id
+
+
+def test_09_2_compare_over_http_and_read_mode(pg, member, project):
+    suite_id, _ = _suite_and_run(pg, project)
+    version_id = pg.execute(
+        "SELECT agent_version_id FROM eval_runs WHERE suite_id = %s", (suite_id,)
+    ).fetchone()[0]
+    a = _scored_exam(pg, project, suite_id, version_id, {"q1": True, "q2": False})
+    b = _scored_exam(pg, project, suite_id, version_id, {"q1": False, "q2": True})
+    read = member("analyst", "read")
+    r = read.get(f"{P.format(project)}/eval-runs/compare?a={a}&b={b}")
+    assert r.status_code == 200, r.text
+    body = r.json()
+    assert {i["item_id"]: i["change"] for i in body["items"]} == {"q1": "regressed", "q2": "fixed"}
+    assert body["worst"][0]["item_id"] == "q1" and body["complete"] == {"a": True, "b": True}
+
+
+def test_09_2_compare_other_suite_is_422(pg, member, project):
+    suite_a, _ = _suite_and_run(pg, project)
+    version_id = pg.execute(
+        "SELECT agent_version_id FROM eval_runs WHERE suite_id = %s", (suite_a,)
+    ).fetchone()[0]
+    suite_b = uuid.uuid4()
+    pg.execute(
+        "INSERT INTO eval_suites (id, project_id, key, name, langfuse_dataset_name, scorers,"
+        " pass_threshold, created_by) VALUES (%s, %s, 'other', 'O', 'p.other', %s, 0.8, 't')",
+        (suite_b, project, json.dumps([{"name": "contains"}])),
+    )
+    a = _scored_exam(pg, project, suite_a, version_id, {"q1": True})
+    b = _scored_exam(pg, project, suite_b, version_id, {"q1": True})
+    r = member("analyst").get(f"{P.format(project)}/eval-runs/compare?a={a}&b={b}")
+    assert r.status_code == 422 and r.json()["error"]["code"] == "eval_runs_not_comparable"
