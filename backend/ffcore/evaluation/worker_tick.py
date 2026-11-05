@@ -205,6 +205,7 @@ async def _advance_one(
                 await start_items(
                     session, settings, ev, queue=queue or _queue(settings), queued_event=_queued()
                 )
+                budget.committed += 1  # the item runs started and were committed
             else:
                 await advance_eval(
                     session,
@@ -228,7 +229,10 @@ async def _advance_one(
             await session.rollback()
             await _after_failure(redis, ev_id, budget, exc)
             return
-    await redis.delete(failures_key(ev_id))  # r1 MINOR-8: only consecutive failures count
+    if budget.committed:
+        # r1 MINOR-8 / r3 MAJOR-r3-1: only a tick that committed something resets the count; a
+        # tick that ran out of time without saving an item leaves it as it is.
+        await redis.delete(failures_key(ev_id))
 
 
 async def _after_failure(redis, ev_id, budget: Budget, exc: BaseException) -> None:

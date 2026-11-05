@@ -63,8 +63,15 @@ async def judge(
     model: Model,
     pass_min: int,
 ) -> JudgeResult:
+    from ffcore.guardrails.recognizers.ner import NerEgressUnavailable
+
     text = rubric.render(question=question, expected=expected, answer=answer)
-    action, outgoing = await guard.egress(text)
+    try:
+        action, outgoing = await guard.egress(text)
+    except NerEgressUnavailable:
+        # The API's NER (GUARDRAIL_EGRESS_NER=true) is down: nothing leaves unmasked, and an
+        # outage is not the agent's score (r3 NOTE-6, MINOR-r3-4): the item is not run.
+        return JudgeResult(Score("llm_judge", None, None, "ner_unavailable", "not_run"), "")
     if action == "block":
         return JudgeResult(Score("llm_judge", None, None, "judge_blocked_at_egress", "error"), "")
     raw = await model.complete(outgoing)

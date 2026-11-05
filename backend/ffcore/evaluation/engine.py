@@ -58,7 +58,8 @@ NOT_RUN_CODES = {
 # Why an item's own check could not be made (09-1 r2): a person rejected its run_sql (MAJOR-r2-1,
 # the agent never saw rows), the advancer could not read the SQL again (MINOR-r2-1), or the tool
 # of an executed call was removed since (MINOR-r2-7). Item-level not_run, never a failure.
-ITEM_NOT_RUN = scorers.CHECK_NOT_MADE
+# r3 NOTE-6: the judge's egress NER was down (`ner_unavailable`): an outage, not a score.
+ITEM_NOT_RUN = (*scorers.CHECK_NOT_MADE, "ner_unavailable")
 MAX_ATTEMPTS = 5
 WORST = 10
 

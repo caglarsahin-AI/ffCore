@@ -76,28 +76,36 @@ def _always() -> bool:
 class Budget:
     """What one tick may still spend on an exam (r1 MAJOR-2, r2 MAJOR-r2-2): judge calls
     (EVAL_JUDGE_CALLS_PER_TICK), time until `deadline` (monotonic; a model call is planned at
-    `call_s` seconds), judge calls only while the background window `is_open`. `committed`
-    counts the items this tick saved: a tick that saved one made progress."""
+    `call_s` seconds), judge calls only while the background window `is_open`. `started`
+    counts the items this tick began, `committed` the ones it saved: a tick that saved one made
+    progress."""
 
     judge_calls: int
     deadline: float | None = None
     call_s: float = 0.0
     is_open: Callable[[], bool] = field(default=_always)
+    started: int = 0
     committed: int = 0
 
     def judge_open(self) -> bool:
         return self.is_open()
 
     def may_judge(self, calls: int) -> bool:
-        """Whether the next item (with `calls` judge calls, 0 without a judge) starts now. The
-        first item of a tick always starts (bounded by `time_left`), so a slow judge still
-        progresses one item per tick; a later one only when its calls fit before the
-        deadline."""
-        if calls and (self.judge_calls <= 0 or not self.is_open()):
+        """Whether the next item (with `calls` judge calls, 0 without a judge) starts now.
+        Judge calls only while the window is open. The tick's first item always starts (cut at
+        `time_left`), so a slow judge still progresses one item per tick. A later item only
+        when its calls fit in the judge calls left (a strict limit, r3 MINOR-r3-1) and, at
+        `call_s` each, before the deadline. So a tick makes at most EVAL_JUDGE_CALLS_PER_TICK
+        judge calls, or its first item's calls when that is more."""
+        if calls and not self.is_open():
             return False
-        if self.committed == 0 or self.deadline is None:
+        if self.started == 0:
             return True
-        return time.monotonic() + self.call_s * max(calls, 1) <= self.deadline
+        if calls > self.judge_calls:
+            return False
+        return self.deadline is None or (
+            time.monotonic() + self.call_s * max(calls, 1) <= self.deadline
+        )
 
     def time_left(self) -> float | None:
         if self.deadline is None:
@@ -414,6 +422,7 @@ async def advance_eval(
             # Out of judge calls or time, or the background window is closed: the exam stays
             # running and waits for a later tick (r2 MAJOR-r2-2); not a failure.
             break
+        budget.started += 1
         timer = asyncio.timeout(budget.time_left())
         try:
             async with timer:
@@ -432,8 +441,22 @@ async def advance_eval(
         except TimeoutError:
             if not timer.expired():
                 raise
-            log.info("eval_tick_out_of_time eval_run=%s item=%s", ev.id, item_id)
-            break  # the item is scored again next tick (score ids are stable)
+            # r3 MAJOR-r3-1 (A): consecutive cuts are counted per item; at MAX_ATTEMPTS the
+            # item ends `error(judge_out_of_time)` and the exam goes on (never running forever).
+            entry["timeouts"] = entry.get("timeouts", 0) + 1
+            log.info(
+                "eval_tick_out_of_time eval_run=%s item=%s cuts=%s",
+                ev.id,
+                item_id,
+                entry["timeouts"],
+            )
+            if entry["timeouts"] >= MAX_ATTEMPTS:
+                entry["result"] = _out_of_time(entry)
+                entry["scored"] = True
+                budget.committed += 1
+            _save(ev, plan)
+            await session.commit()
+            break  # otherwise scored again next tick (score ids are stable)
         except LangfuseApiError as exc:
             entry["attempts"] = entry.get("attempts", 0) + 1
             entry["last_error"] = exc.code
@@ -523,6 +546,29 @@ async def _score_item(session, ev, entry, runs, cfg, *, api, judge, sql, embed) 
             )
         per_run.append({"run_id": rid, "duration_ms": facts.duration_ms, **_dump(res)})
     return {"runs": per_run}
+
+
+def _out_of_time(entry: dict) -> dict:
+    """The result of an item whose scoring never fitted in a tick: an error per run."""
+    score = {
+        "name": "llm_judge",
+        "value": None,
+        "passed": None,
+        "status": "error",
+        "comment": "judge_out_of_time",
+    }
+    return {
+        "runs": [
+            {
+                "run_id": rid,
+                "outcome": None,
+                "passed": False,
+                "note": "judge_out_of_time",
+                "scores": [dict(score)],
+            }  # fmt: skip
+            for rid in entry["runs"]
+        ]
+    }
 
 
 def _judge_expectation(item: dict) -> bool:
@@ -669,7 +715,12 @@ async def is_exam_run(session: AsyncSession, run_id: uuid.UUID) -> bool:
 
 
 async def active_runs(session: AsyncSession) -> list[EvalRun]:
-    return list((await session.scalars(select(EvalRun).where(EvalRun.status.in_(ACTIVE)))).all())
+    """Queued and running exams, the oldest progress first (r3 MINOR-r3-2): a tick's shared
+    deadline goes to the exam that waited longest."""
+    stmt = (
+        select(EvalRun).where(EvalRun.status.in_(ACTIVE)).order_by(EvalRun.updated_at, EvalRun.id)
+    )
+    return list((await session.scalars(stmt)).all())
 
 
 __all__ = [
