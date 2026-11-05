@@ -1,0 +1,19 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_______________ test_19r3_8_runbook_ocr_ingest_runs_without_ner ________________
+
+    def test_19r3_8_runbook_ocr_ingest_runs_without_ner() -> None:
+        """r1 MAJOR-1 (K-19R3-0007, KARARLAR "M3 OCR ingest'i NER'siz sunucuda" A): on the M3 server
+        NER_MODEL is empty, so a flagless `ingest-raw` takes pii_ner and stops with ner_unavailable.
+        Every runbook ingest-raw command carries the M3 flag, and the failure is in troubleshooting."""
+        runbook = (ROOT / "docs" / "paycore" / "m3-sunucu.md").read_text(encoding="utf-8")
+        commands = [line for line in runbook.splitlines() if "ffcore.cli ingest-raw" in line]
+        assert any("confluence:OCR" in line for line in commands)
+>       assert commands and all("--accept-personnel-data" in line for line in commands)
+E       assert (['cd "$PAYCORE_DIR" && $C run --rm --no-deps -T -v "$DATA"/ffcore/staging:/raw:ro -v "$DATA"/ffcore/manifests:/manifes...m --raw-dir /raw --acl analyst --sources jira:PRSIM --accept-personnel-data --manifest-out /manifests/full-prsim.json'] and False)
+E        +  where False = all(<generator object test_19r3_8_runbook_ocr_ingest_runs_without_ner.<locals>.<genexpr> at 0x7fb09f57c860>)
+
+tests/test_19r3_env_tests.py:184: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_19r3_env_tests.py::test_19r3_8_runbook_ocr_ingest_runs_without_ner
+1 failed, 40 deselected in 2.14s

@@ -3780,3 +3780,11 @@ Rapor alındı; DEGISIKLIK kabul, MAJOR-1 karar **A** (KARARLAR; kalıcı çöz�
 ### K-08T1C-0005 · 2026-11-05 11:20 · → isci-a (08-tam-1c-olcum) · CEVAP (KARAR)
 Paket: 08-tam-1c-olcum   Cevap: A-08T1C-0007
 IMPLEMENTED (ağırlıksız, HEAD 6395c6e; 1603/1603) alındı. **B: iki PR.** Gerekçe: ENV-163 kullanıcıda ve süresi belirsiz; ağırlıksız düzeltmeler (168/172) M3 runbook ve reindex davranışını bugün ilgilendiriyor; küçük PR'lar bu hafta daha hızlı kapandı. **PR 1c-a (şimdi):** D1-D5 + **FOLLOWUP-174** eklenir: `ingest-raw` için açık `--text-filter pii_regex` seçeneği (M3 `--accept-personnel-data` bayrağından ayrı; PRSIM kaynağı için yine NER şart, guard değişmez; bayraksız varsayılan `pii_ner` kalır; docs/bilgi-tabani.md + airgap notu; testli). Sonra PR-HAZIR (tam SHA) → inceleyici r1 (kısa tur, yalın yığın yeter) → merge. **PR 1c-b (ağırlık gelince):** D6-D8 ölçüm, kazanan `NER_MODEL`/`NER_REVISION`, `-m models` testleri, egress PERSON testi; aynı oturum, aynı dal üstünden yeni dal `feat/08-tam-1c-b-olcum`. Devam.
+
+### K-19R3-0009 · 2026-11-05 11:21 · → inceleyici · ONAY-TEYIT-ISTEK
+Paket: fix/19r3 r2   Cevap: R-19R3-0002 / D-19R3-0007
+Tam SHA: **a3fed7f25eae608aa3e881fddc046a7928af8f05** (f2dfe47 + 2 commit: 884af80 test, a3fed7f docs/paycore/m3-sunucu.md OCR komutlarına `--accept-personnel-data`, 7.3 metni, sorun giderme `ner_unavailable` satırı, NOTE-6/7; 3 dosya +25/-9; çakışma yok). Yalnız `git diff f2dfe47..a3fed7f` + `test_19r3_8` oku (yığın yok): runbook OCR komutları (:278/:292) bayraklı mı, 7.3 "PRSIM için NER şartı değişmez" diyor mu, sorun giderme satırı neden/çözüm veriyor mu, test runbook komutlarını gerçekten denetliyor mu. Kanala **ONAY-TEYIT** (ya da bulgu); sonra master merge + ana checkout `make test` karşılaştırması bende.
+
+### K-19R3-0010 · 2026-11-05 11:21 · → isci-d (fix/19r3) · CEVAP
+Paket: fix/19r3-env-tests   Cevap: D-19R3-0006 / D-19R3-0007
+PR-HAZIR r2 alındı; a3fed7f doğrulandı (2 commit, 3 dosya, çakışma yok). VERIFIED. İnceleyiciden diff teyidi istendi (K-19R3-0009). Dal donar. Teyit gelince master merge + ana checkout kabul koşusu; sonra HANDOFF + RETIRED istenecek; hazırlamaya başlayabilirsin, kanala henüz yazma.

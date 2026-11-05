@@ -111,3 +111,18 @@ cd backend && python -m ffcore.cli seed-eval --project "hastane-a" --suite ../da
 dataset: hastane-a.sql-20
 items upserted: 20; archived: 0
 suite: created
+exam 2700024d-5bdd-4f21-9f9a-13326cd92915 completed in 27.3 s: {'n': 33, 'worst': [{'mean': 0.0, 'note': '', 'style': 'dolayli', 'passed': False, 'item_id': 'hastane-a.sozlesme-33-q18', 'outcome': 'below_rerank_floor'}, {'mean': 0.0, 'note': '', 'style': 'alan_ici_cevapsiz', 'passed': False, 'item_id': 'hastane-a.sozlesme-33-q21', 'outcome': 'unanswerable_answered'}, {'mean': 0.0, 'note': '', 'sty
+8 passed in 35.06s
+exit=0
+== e2e F1-F3 (plan/18, fake-llm) 2026-11-05T11:17:39+03:00
+| F1 | passed | 2 | 0 | 2 |  | NOT_RUN: gerçek model gerekir (PayCore S1 / llmaas); fake-llm 'hello' der (declined = the model's unknown_reply); NOT_RUN: gerçek model gerekir (PayCore S1 / llmaas); fake-llm 'hello' der (make eval sozlesme-33, 13b) |
+| F3 | failed | 1 | 1 | 1 | test_18_f3_9_write_attempts_refused_and_db_unchanged | NOT_RUN: gerçek model gerekir (PayCore S1 / llmaas); fake-llm 'hello' der (sql-20 ≥ 80 % via make eval, 13b) |
+SKIPPED [1] tests/e2e/scenarios/test_18_f1_f3_answers.py:61: NOT_RUN: gerçek model gerekir (PayCore S1 / llmaas); fake-llm 'hello' der (declined = the model's unknown_reply)
+SKIPPED [1] tests/e2e/scenarios/test_18_f1_f3_answers.py:65: NOT_RUN: gerçek model gerekir (PayCore S1 / llmaas); fake-llm 'hello' der (make eval sozlesme-33, 13b)
+SKIPPED [1] tests/e2e/scenarios/test_18_f1_f3_answers.py:89: NOT_RUN: gerçek model gerekir (PayCore S1 / llmaas); fake-llm 'hello' der (sql-20 ≥ 80 % via make eval, 13b)
+1 failed, 3 passed, 3 skipped in 6.52s
+exit=0
+== make smoke 2026-11-05T11:17:57+03:00
+smoke: passed
+exit=0
+== end 2026-11-05T11:18:08+03:00

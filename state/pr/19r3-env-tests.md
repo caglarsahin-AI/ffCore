@@ -115,3 +115,24 @@ NOT_RUN:
 ## Kalan riskler
 - **Sunucu `.env`'i:** `GUARDRAIL_EGRESS_NER` satırı kullanıcının sunucu `.env`'inde yoksa compose `GUARDRAIL_EGRESS_NER is not set` ile durur. Bu fail-loud bir davranış ve runbook 4.1'de yazılı.
 - **Compose dışında koşan komut:** `get_settings()` artık `.env`'i okumaz. Secret'lar varsayılanı `None` olan alanlar olduğu için açılışta değil, kullanıldıkları anda hata verirler (ör. Atlassian çağrısı). Compose dışında koşan üretim yolu bulunmadı. Bunu grep ile kontrol ettim: CLAUDE.md ve runbook'taki komutların hepsi compose `run` ya da `exec` kullanıyor.
+
+## Review r1 bulgu → düzeltme → kanıt (r2)
+
+**Tam SHA r2:** `a3fed7f25eae608aa3e881fddc046a7928af8f05`. f2dfe47 üstüne 2 commit:
+- `884af80`: kırmızı test.
+- `a3fed7f`: runbook ve stager docstring'i.
+
+Toplam 2 dosya, +14/-9; test dosyası ayrıca.
+
+| Bulgu | Karar | Düzeltme | Kanıt |
+|---|---|---|---|
+| MAJOR-1 runbook OCR `ingest-raw` NER'siz sunucuda `ner_unavailable` | A (K-19R3-0007, KARARLAR "M3 OCR ingest'i NER'siz sunucuda") | `m3-sunucu.md` 7.2 ve 7.3 OCR komutlarına `--accept-personnel-data`. 7.3 metni: NER yokken her `ingest-raw` M3 bayrağıyla `pii_regex`, PRSIM'in NER şartı değişmez, kalıcı çözüm FOLLOWUP-174. Sorun giderme tablosuna `ner_unavailable` satırı | `test_19r3_8_runbook_ocr_ingest_runs_without_ner`: f2dfe47'de kırmızı (state/evidence/19r3-r2-red.log), a3fed7f'de yeşil |
+| NOTE-6 | uygulandı | `prsim_requires_ner` satırının nedeni: "PRSIM, NER modeli olmadan ve bayraksız" | aynı test dosyası (runbook) |
+| NOTE-7 | uygulandı | runbook bilinen sınırlar (1) ve stager docstring'i "08 tam öncesi" yerine "NER modeli yok" | — |
+| NOTE 1-5, 8-12 | bilgi | değişiklik yok | — |
+
+**Kısıt (PR notu):** OCR için `--accept-personnel-data` geçici çözümdür. Bayrağın adı "personel verisi" diyor ama OCR'da anlamı "NER'siz regex kipi". FFCore'da kalıcı `--text-filter pii_regex` yolu FOLLOWUP-174.
+
+**r2 kapıları @ a3fed7f (konteyner):**
+- Tam takım: **713 geçti, 3 kırmızı (bs4, ENV-138), 2 atlandı** (state/evidence/19r3-r2-full.log).
+- ruff check + format: 0 (state/evidence/19r3-r2-ruff.log).

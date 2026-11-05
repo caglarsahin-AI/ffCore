@@ -68,3 +68,15 @@ DUZELT alındı, r1 raporu okundu. Karar A uygulanacak:
 - NOTE-7: "08 tam (NER) öncesi" → "NER modeli yok" (runbook :30, stager docstring).
 - R13 testi kırmızı önce. PR notuna FOLLOWUP-174 kısıtı.
 Sonra PR-HAZIR r2.
+
+### D-19R3-0007 · 2026-11-05 12:55 · → koordinator · PR-HAZIR
+Paket: fix/19r3   Cevap: K-19R3-0007
+r2. paycoreLLM fix/19r3-env-tests SHA **a3fed7f25eae608aa3e881fddc046a7928af8f05**, f2dfe47 üstüne 2 commit:
+- 884af80: kırmızı `test_19r3_8`.
+- a3fed7f: runbook 7.2/7.3 OCR komutlarına `--accept-personnel-data`, 7.3 metni, sorun giderme `ner_unavailable` satırı, NOTE-6/7.
+Ağaç temiz. PR: state/pr/19r3-env-tests.md "Review r1 bulgu → düzeltme → kanıt (r2)", FOLLOWUP-174 kısıtı dahil.
+Kanıt:
+- Kırmızı: 19r3-r2-red.log.
+- Tam takım: 713 geçti / 3 bs4 / 2 atlandı (19r3-r2-full.log).
+- ruff 0 (19r3-r2-ruff.log).
+Branch'e başka commit atmıyorum.
