@@ -397,6 +397,8 @@ async def item_from_run(
     version = await session.get(AgentVersion, run.agent_version_id)
     item = from_run.item_id(suite.key, run.id)
     request_id, ip = request_context(request)
+    # Read before anything can roll back: a rollback expires the loaded rows.
+    suite_ref, run_ref, dataset = str(suite.id), str(run.id), suite.langfuse_dataset_name
 
     def entry(outcome: str, after: dict) -> AuditEntry:
         return AuditEntry(
@@ -406,9 +408,9 @@ async def item_from_run(
             actor_type=actor.actor_type,
             actor_id=actor.actor_id,
             project_id=str(project_id),
-            resource_id=str(suite.id),
+            resource_id=suite_ref,
             before=None,
-            after={"suite_id": str(suite.id), "run_id": str(run.id), **after},
+            after={"suite_id": suite_ref, "run_id": run_ref, **after},
             request_id=request_id,
             ip=ip,
             via_key_id=getattr(actor, "via_key_id", None),
@@ -449,9 +451,7 @@ async def item_from_run(
         raise
     await write_event(session, entry("success", {"item_id": item}))
     await session.commit()
-    return FromRunOut(
-        item_id=item, dataset=suite.langfuse_dataset_name, run_id=run.id, masking=masking
-    )
+    return FromRunOut(item_id=item, dataset=dataset, run_id=run_ref, masking=masking)
 
 
 @router.get("/eval-suites/{suite_id}/runs", response_model=EvalRunList)
