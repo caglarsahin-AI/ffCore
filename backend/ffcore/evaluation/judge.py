@@ -12,7 +12,6 @@ truncation mark (S8).
 """
 
 import logging
-import re
 from dataclasses import dataclass
 from typing import Any, Protocol
 
@@ -21,15 +20,33 @@ from ffcore.evaluation.scorers import JudgeParseError, Score, judge_score, parse
 # Seeding never overwrites a prompt Langfuse already has, so a changed rubric text is a new
 # prompt name (r2 MINOR-r2-6; v2: r1 MINOR-1 delimiters). The test pins text to name.
 RUBRIC_PROMPT = "eval_judge_rubric_v2"
-# The API's NER answered 4xx or runs another model than the worker expects: configuration,
-# not an outage (FOLLOWUP-176, r4 NOTE-3; recognizers.ner.HttpNer messages).
-_MISCONFIGURED = re.compile(r"internal ner failed: 4\d\d\b|worker expects")
+# The API's NER is misconfigured, not down (FOLLOWUP-176, r4 NOTE-3; 09-2 r1 MINOR-6/7): the
+# API's own NER codes (api/guardrails.py NER endpoint), the worker's model mismatch, or any 4xx
+# (the API refuses the worker). Told by HttpNer's status and code, never by message text.
+MISCONFIGURED_CODES = frozenset(
+    {
+        "ner_not_configured",
+        "model_missing",
+        "ner_label_unknown",
+        "ner_offsets_unavailable",
+        "ner_model_mismatch",
+    }
+)
 
 
 class NerMisconfigured(RuntimeError):
     """The judge's egress NER is misconfigured: a loud tick failure, never a not-run item."""
 
     advance_code = "ner_misconfigured"
+
+
+def ner_failure(exc: BaseException) -> str:
+    """`ner_misconfigured` or `ner_unavailable` for an egress NER failure, from its cause."""
+    cause = exc.__cause__
+    code, status = getattr(cause, "code", None), getattr(cause, "status", None)
+    if code in MISCONFIGURED_CODES or (status is not None and 400 <= status < 500):
+        return "ner_misconfigured"
+    return "ner_unavailable"
 
 
 log = logging.getLogger("ffcore.evaluation")
@@ -87,9 +104,11 @@ async def judge(
         # outage is not the agent's score (r3 NOTE-6, MINOR-r3-4): the item is not run.
         # Logged with the cause's class only, never the text (r4 NOTE-9).
         cause = type(exc.__cause__).__name__ if exc.__cause__ else "unknown"
-        if exc.__cause__ is not None and _MISCONFIGURED.search(str(exc.__cause__)):
-            log.error("eval_judge_ner_misconfigured cause=%s", cause)
-            raise NerMisconfigured(str(exc.__cause__)) from exc
+        if ner_failure(exc) == "ner_misconfigured":
+            code = getattr(exc.__cause__, "code", None)
+            status = getattr(exc.__cause__, "status", None)
+            log.error("eval_judge_ner_misconfigured code=%s status=%s", code, status)
+            raise NerMisconfigured(f"{code or 'refused'} ({status})") from exc
         log.warning("eval_judge_ner_unavailable cause=%s", cause)
         return JudgeResult(Score("llm_judge", None, None, "ner_unavailable", "not_run"), "")
     if action == "block":
