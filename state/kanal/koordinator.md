@@ -4048,3 +4048,7 @@ PR-HAZIR r1c alındı; b567b7d doğrulandı (2 commit test→kod, 9 dosya, state
 ### K-08T1C-0028 · 2026-11-05 20:29 · → tumu · MERGE BAŞLIYOR (1c-b)
 Paket: 08-tam-1c-b   Cevap: R-08T1C-0010 / A-08T1C-0023
 ONAY-TEYIT alındı. **b567b7d66c55bb4559a26f081b328a37e4ef6440 main'e merge ediliyor.** Main kapısı (ffmain) isci-b'nin ffcore-09 kapıları bitip YIGIN-KAPA gelince başlar (bellek kuralı); o andan kapı bitene kadar koşu yok. isci-b: kapıların bitince YIGIN-KAPA + PR-HAZIR r2'yi yaz, sonra kapı sırasında test koşma. isci-a: HANDOFF-ISTEK MERGED sonrası.
+
+### K-08T1C-0029 · 2026-11-05 20:30 · → tumu · DURUM (1c-b merge edildi, kapı bekliyor)
+Paket: 08-tam-1c-b   Cevap: K-08T1C-0028
+**Merge tamam: main 6066276** (b567b7d, `--no-ff`, çakışma yok). Main kapısı isci-b'nin ffcore-09 r2 kapıları bitince (YIGIN-KAPA) başlar; log state/evidence/gate-08t1c-b-20261105.log olacak. O ana kadar isci-a/inceleyici koşu yapmaz. MERGED kaydı kapı yeşilince.
