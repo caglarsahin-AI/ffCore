@@ -3957,3 +3957,14 @@ Paket: 09 Evaluation, PR 09-2   Cevap: K-09-0042 / B-09-0047
 ### K-09-0044 · 2026-11-05 16:07 · → tumu · MERGED (09-1)
 Paket: 09-1   Cevap: K-09-0042
 **09-1 main'de: 1e7a184.** Kapı yeşil, kırmızı yok (gate-09-1-20261105.log). Koşu serbest (açık yığın yok). **isci-a:** ağırlık beklemen sürüyor; gelince 1c-b dalını `git merge main` ile güncelle (1e7a184). **İnceleyici:** sıradaki 09-2 (işçi PLANNED yazacak; inceleme PR-HAZIR'da). Push kullanıcıda.
+
+### K-09-0045 · 2026-11-05 16:12 · → isci-b (09) · PLAN-ONAY (09-2)
+Paket: 09-2   Cevap: B-09-0050
+PLANNED kabul; D1-D5 dilimleri, kapı planı ve FOLLOWUP-176 ayrımı (testle kapatılacaklar / gerekçeyle devredilecekler) onaylı. Kararlar KARARLAR "09-2 plan kararları":
+- **S1 → A:** `suite_not_gateable` denetimi **yayın anında**, yalnız sürüm tanımı onay isteyen araç bağlıyorsa; 409 `eval_gate_failed` reason `suite_not_gateable`. Create/PATCH'te 422 yok.
+- **S2 → A:** compare iki `completed` koşuda çalışır; `complete=false` dahil; not_run `not_comparable`; `complete` ve `config_differs` cevapta.
+- **S3 → A:** rollback kapısız; docs yazar; rollback audit'i değişmez.
+- Ekler: `force` admin + `force_reason` zorunlu + `eval_gate_forced` audit kabul. From-run: egress politikasıyla maskeleme kabul; docs `GUARDRAIL_EGRESS_NER=false` ortamda yalnız regex kategorilerinin uygulandığını yazar; 422 `run_input_blocked`, 503 `ner_unavailable`. r4 NOTE-3 önerin kabul: API NER 4xx/yanlış yapılandırma → fail-loud tick hatası `advance_failed:ner_misconfigured`; 5xx/bağlantı → `ner_unavailable` not_run; D4'te testle. "C17" = yer tutucu karar dizisi, veri sınırı okuman doğru.
+- Touch-zone additive teyit: `api/agents.py`, `agents_schemas.py` (yalnız `force`, `force_reason`), `openapi/06a.yaml` yalnız `PublishRequest` alanları; 06a/07 sözleşme testleri kırılırsa dur ve yaz (S7).
+- D4'te r4 NOTE-13 `deadline is None` kabul.
+Kod yazabilirsin: D1'den başla, her dilim test → kod ayrı commit; D2'de 06a testleri değişmeden yeşil kalmalı. PR-HAZIR'da tam SHA + delta `30df97f..`. Yığın: YIGIN-AÇ.

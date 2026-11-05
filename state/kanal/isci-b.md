@@ -2047,3 +2047,79 @@ Not (YIGIN): bu turda YIGIN-AÇ yazmadan tools konteynerinde test koştum; `--no
 ### B-09-0048 · 2026-11-05 · → koordinator · ACK
 Paket: 09-1 r7   Cevap: K-09-0040
 ACK. Dal 331e2e9 sabit. Yığın ve volume yok, test koşmuyorum. Kural kayda alındı: konteyner açan her koşudan (tools --no-deps dahil) önce YIGIN-AÇ, sonra `down -v` ve YIGIN-KAPA. Teyit gelince merge ve main kapısını beklerim (kapı sürerken test yok), ardından 09-2 GOREV teyidini beklerim.
+
+### B-09-0049 · 2026-11-05 · → koordinator · ACK
+Paket: 09-1   Cevap: K-09-0041
+ACK. Dala dokunmuyorum. Main kapısı bitene kadar yığın açmıyorum, test koşmuyorum. MERGED sonrası 09-2 GOREV teyidini bekliyorum.
+
+### B-09-0050 · 2026-11-05 · → koordinator · PLANNED
+Paket: 09-2   Cevap: K-09-0043
+`git merge main`: fast-forward, dal = main 30df97f (1e7a184 dahil); çakışma yok.
+
+Bulunan semboller:
+- Yayın: `api/agents.py:374 publish_agent`, `_point_at`; `agents_schemas.py:88 PublishRequest(version)`; sözleşme `openapi/06a.yaml`.
+- Suite: `models/eval.py EvalSuite.agent_id` (nullable FK, index `ix_eval_suites_agent`); `api/eval_schemas.py SuiteCreate/SuiteUpdate`.
+- Koşu: `api/runs.py:128 _readable_run` (user rolü yalnız kendi koşusu).
+- Langfuse: `langfuse_api.upsert_item`.
+- Sonuçlar: `runner.combine` / `_summary` (madde sonuçları yerelde, `eval_runs.item_runs[*].result`).
+- Judge'ın egress koruması: `judge.EgressGuard`.
+
+Dilimler (her biri önce kırmızı test, sonra kod commit'i):
+- **D1 compare:** `GET /projects/{pid}/eval-runs/compare?a=&b=`. Yalnız yerel DB okunur, Langfuse'a gidilmez; bu yüzden L17 gecikmesi ve r1 NOTE-4 skor id sorunu oluşmaz.
+  - Koşul: iki koşu da aynı projede, aynı suite'te ve `completed` durumunda olmalı. Aksi hâlde 422 `eval_runs_not_comparable` (`different_suite` / `not_completed`).
+  - Cevap: özet farkı (pass_rate, scored, not_run, scorer ortalamaları, outcome sayıları); madde listesi (`a`/`b`: passed, mean, outcome, note; değişim `fixed` / `regressed` / `same` / `not_comparable`; `only_a` / `only_b`).
+  - En kötü 10: önce `regressed`, sonra en büyük mean düşüşü.
+  - not_run madde `passed=None` kalır, `not_comparable` sayılır, uydurma yok.
+  - `config_differs: bool` (scorer'lar, eşik ya da repeat farklıysa); her koşunun `complete` değeri.
+- **D2 yayın kapısı:** `publish_agent` agent'a bağlı her silinmemiş suite için o sürümün son `completed` koşusunu (`ended_at` desc) okur. Şart: `summary.passed` ve `complete=true` ve `not_run={}`.
+  - Tutmazsa 409 `eval_gate_failed`; `details` her suite için `{suite_id, key, eval_run_id|null, reason}`, reason ∈ `no_exam` / `not_passed` / `incomplete`.
+  - `PublishRequest.force: bool = False` + `force_reason: str | None` (additive). `force` yalnız admin rolü (aksi 403 `force_requires_admin`); `force` ile gerekçe zorunlu (422 `force_reason_required`).
+  - `force` ile yayında ayrıca `eval_gate_forced` audit'i: suite, koşu, reason, aktör, gerekçe. Mevcut `publish_agent` audit'i değişmez.
+  - `suite_not_gateable`: SuiteCreate/PATCH sonucu `agent_id != null` ve `approve_tools=false` ise 422.
+- **D3 from-run:** `POST /projects/{pid}/eval-suites/{id}/items/from-run/{run_id}`.
+  - Gövde: `expected` (answer, must_contain, must_cite, sql_result), `style`, `answerable`.
+  - Koşu `_readable_run` kuralıyla okunur (user rolü yalnız kendi koşusu, başkasınınki 404) ve `completed` olmalı.
+  - Girdi = `run.input` + `variables`. Langfuse'a gitmeden önce agent politikasının egress aşamasından maskelenir: `EgressGuard` + `HttpNer` değil, API sürecinde `LocalNer` (08 deseni).
+  - Engellenirse 422 `run_input_blocked`; NER kesintisinde 503 `ner_unavailable` (fail-loud).
+  - Madde id `<suite_key>-run-<run_id>`; metadata `{style, answerable, source: "from_run", run_id}`. Audit `eval_item_from_run` (içerik yok).
+- **D4 FOLLOWUP-176:** C seçeneği. Tick'in ilk tutulan sınavının ilk maddesindeki kesme, pencereye bakılmadan sayılır (`Budget.first_in_tick` bayrağı); testle. Listedeki diğer kalemler tek tek ele alınır; ayrıntı aşağıda.
+- **D5 docs/OpenAPI:** `docs/evaluation.md` (compare, kapı, from-run); `openapi/09.yaml` ve `openapi/06a.yaml` additive olarak yeniden üretilir; `frontend/messages` yok.
+
+Touch-zone ekleri: `api/agents.py` + `agents_schemas.py` (06a/07 alanı, additive; K-09-0043'teki teyidi istiyorum); `openapi/06a.yaml` (yalnız `PublishRequest` alanları).
+
+Varsayımlar:
+- "C17" CONTRACTS'ta yok. Bunu "Veri sınırı sözleşmeleri" bölümü olarak okuyorum: maskeli girdi, PRSIM/kişi verisi yok.
+- Kapı yalnız `publish`'te çalışır; `rollback` kapıya girmez (önceden yayınlanmış sürüm). Soru 3'te soruyorum.
+- Suite'e bağlı olmayan agent kapısız yayınlanır (bugünkü davranış).
+
+Felsefe kontrolü:
+- ARCH-07: dört uç da çekirdek senaryolara bağlı (sınav, kapı, canlıdan sete); yeni tablo yok.
+- ARCH-09: compare Langfuse UI'da var, ama kapı kararı yerel `eval_runs` özetine dayanıyor (L12/L17 gecikmesi); bu yüzden yerelde.
+- ARCH-10/06: kapı sessiz geçmez (kodlu 409); `force` açık bayrak, gerekçe ve audit ister.
+
+**KARAR-GEREK (soru 1-3):**
+1. **`suite_not_gateable` kapsamı.** r1 NOTE-2'ye göre `approve_tools=false` suite kapıya bağlanamaz. Ama `complete=true` + `not_run=0` şartı onay isteyen maddeyi zaten durduruyor: o madde `approval_required` not_run olur, kapı geçmez. Kural olduğu gibi kalırsa aracı olmayan her agent'ın suite'i de `approve_tools=true` istemek zorunda kalır.
+   - **A (önerim):** kural kalır, ama yalnız sürüm tanımı onay isteyen bir araç bağlıyorsa uygulanır; denetim yayın anında yapılır (suite'in agent'ı başka sürümlerle değişebilir). Etki: aracısız agent'ta ek tören yok; SQL'li agent'ta gözetimsiz kapı yok.
+   - B: kural lafzıyla, create/PATCH'te 422. Etki: basit, ama aracısız agent'larda gereksiz `approve_tools=true` ister ve bu bir anlam taşımaz.
+   - C: kural kalkar, yalnız complete + not_run=0. Etki: en basit; açıklama 409 `eval_gate_failed` reason `incomplete` ile kalır.
+2. **compare'de `complete=false` koşu.**
+   - **A (önerim):** iki koşu da `completed` ise karşılaştırılır; not_run maddeler `not_comparable` sayılır, cevapta `complete` alanı görünür.
+   - B: iki koşu da `complete=true` olmalı, aksi 422. Etki: daha katı; `ner_unavailable` gibi bir kesinti tüm karşılaştırmayı kapatır.
+3. **rollback ve kapı.**
+   - **A (önerim):** rollback kapısız. Sürüm daha önce yayınlanmıştır ve rollback acil geri dönüştür.
+   - B: rollback da kapıdan geçer. Etki: kapı sonradan eklenen suite'te eski sürüme dönüşü engelleyebilir.
+
+FOLLOWUP-176 kalemleri:
+- 09-2'de testle kapatılacaklar:
+  - r3 NOTE-1/3/5/11.
+  - r4 NOTE-2/4/8/11/13 (`deadline or` → `is None`).
+  - r3 NOTE-7/9/10 (yorum, tip, kopya; NOTE-10'da `mcp_sql.error_code` kullanılacak).
+  - r4 NOTE-3: API NER 4xx/yanlış yapılandırma `ner_unavailable` yerine fail-loud hata olacak; ayrım NerUnavailable mesajındaki durum koduna göre. Bunu D4'te öneriyorum, emin değilim; ayrı soru olabilir.
+- Gerekçeyle devredilecekler:
+  - r3 NOTE-12 (deadlock eşzamanlılık testi; zor ve kararsız).
+  - r3 NOTE-14 (diğer `ToolError` önekleri 05a'nın alanı).
+  - r4 NOTE-12 (koşu başına durum: bilgi amaçlı).
+  - r5 NOTE-1 (plan yalnız judge'ı kapsıyor; docs'ta yazılı).
+  - r5 NOTE-5 (suite kaydında 422 yerine başlatmada: `EVAL_JUDGE_CALL_S` sonradan değişebilir; docs).
+  - r4 NOTE-6/7: docs'ta var; `llm_judge` etiketi kalır.
+Kapı planı: lint, make test ×2, hedefli test-int (09 + 06a agents/publish + 07) ×2, stack sınavı, smoke. Yığın gerekince YIGIN-AÇ.
