@@ -97,3 +97,69 @@ def test_09_r5_major1_start_compares_with_the_usable_window(monkeypatch):
             assert err.value.code == "eval_plan_exceeds_tick"
         else:
             start(call_s, repeat)
+
+
+# --- 09-1 r6 (KARARLAR "09-1 r6: tick yükü aşımı fail-loud", A): overhead over TICK_OVERHEAD_S --
+
+
+def _tick_with_overhead(monkeypatch, overhead_s):
+    """Run worker_tick.tick over two exams; the clock jumps `overhead_s` before the first one."""
+    from contextlib import asynccontextmanager
+    from types import SimpleNamespace
+
+    clock = {"now": 1000.0}
+
+    class _Clock:
+        @staticmethod
+        def monotonic():
+            return clock["now"]
+
+    @asynccontextmanager
+    async def scope():
+        yield SimpleNamespace()
+
+    async def two_exams(session):
+        return [SimpleNamespace(id="a"), SimpleNamespace(id="b")]
+
+    async def listen(settings, redis):
+        clock["now"] += overhead_s  # the tick's work before its first exam
+
+    @asynccontextmanager
+    async def lock(redis, ev_id):
+        yield True
+
+    advanced = []
+
+    async def advance(*a, deadline, **kw):
+        advanced.append(deadline - clock["now"])
+
+    monkeypatch.setattr(worker_tick, "time", _Clock)
+    monkeypatch.setattr(worker_tick.db, "session_scope", scope)
+    monkeypatch.setattr(worker_tick, "active_runs", two_exams)
+    monkeypatch.setattr(worker_tick, "keep_listening", listen)
+    monkeypatch.setattr(worker_tick, "exam_lock", lock)
+    monkeypatch.setattr(worker_tick, "LangfuseApi", lambda settings: None)
+    monkeypatch.setattr(worker_tick, "_advance_one", advance)
+    anyio.run(worker_tick.tick, None, None, None, None)
+    return advanced
+
+
+def test_09_r6_tick_overhead_over_the_allowance_is_a_warning(monkeypatch, caplog):
+    import logging
+
+    with caplog.at_level(logging.WARNING, logger="ffcore.evaluation"):
+        windows = _tick_with_overhead(monkeypatch, ticks.TICK_OVERHEAD_S + 5)
+    assert windows[0] < ticks.TICK_PLAN_S
+    warned = [
+        r.getMessage() for r in caplog.records if "eval_tick_overhead_exceeded" in r.getMessage()
+    ]
+    assert warned == [f"eval_tick_overhead_exceeded overhead_s={ticks.TICK_OVERHEAD_S + 5:.1f}"]
+
+
+def test_09_r6_normal_tick_overhead_writes_no_warning(monkeypatch, caplog):
+    import logging
+
+    with caplog.at_level(logging.WARNING, logger="ffcore.evaluation"):
+        windows = _tick_with_overhead(monkeypatch, ticks.TICK_OVERHEAD_S - 5)
+    assert windows[0] >= ticks.TICK_PLAN_S
+    assert not [r for r in caplog.records if "eval_tick_overhead_exceeded" in r.getMessage()]
