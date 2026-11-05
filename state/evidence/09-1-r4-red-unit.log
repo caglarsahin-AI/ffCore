@@ -1,0 +1,23 @@
+== 09-1 r4: unit tests of 7f81cea run on the 472e04f code (git archive copy) 2026-11-05T13:12:16+03:00
+E   AssertionError: assert (['eval:ev:advance_failures'] == []
+tests/unit/test_09_r3.py:32: AssertionError: assert (['eval:ev:advance_failures'] == []
+E   ffcore.guardrails.recognizers.ner.NerUnavailable: internal ner failed: 503
+E   ffcore.guardrails.recognizers.ner.NerEgressUnavailable: The NER the egress PII policy needs is unavailable (NerUnavailable).
+ffcore/guardrails/engine.py:340: ffcore.guardrails.recognizers.ner.NerEgressUnavailable: The NER the egress PII policy needs is unavailable (NerUnavailable).
+E   assert (True is True and True is False)
+tests/unit/test_09_r3.py:103: assert (True is True and True is False)
+E   assert 'ORDER BY eval_runs.updated_at, eval_runs.id' in "SELECT eval_runs.id, eval_runs.project_id, eval_runs.suite_id, eval_runs.agent_version_id, eval_runs.user_id, eval_ru...eted_at, eval_runs.created_at, eval_runs.updated_at \nFROM eval_runs \nWHERE eval_runs.status IN ('queued', 'running')"
+tests/unit/test_09_r3.py:132: assert 'ORDER BY eval_runs.updated_at, eval_runs.id' in "SELECT eval_runs.id, eval_runs.project_id, eval_runs.suite_id, eval_runs.agent_version_id, eval_runs.user_id, eval_ru...eted_at, eval_runs.created_at, eval_runs.updated_at \nFROM eval_runs \nWHERE eval_runs.status IN ('queued', 'running')"
+E   assert True is False
+tests/unit/test_09_r2.py:100: assert True is False
+E   FileNotFoundError: [Errno 2] No such file or directory: '/data/samples/eval/suite.json'
+E   FileNotFoundError: [Errno 2] No such file or directory: '/data/samples/eval/suite.json'
+FAILED tests/unit/test_09_r3.py::test_09_r3_major1_tick_without_a_commit_keeps_the_failure_count
+FAILED tests/unit/test_09_r3.py::test_09_r3_minor4_ner_outage_makes_the_item_not_run
+FAILED tests/unit/test_09_r3.py::test_09_r3_minor1_judge_call_limit_is_strict_after_the_first_item
+FAILED tests/unit/test_09_r3.py::test_09_r3_minor2_active_exams_oldest_progress_first
+FAILED tests/unit/test_09_r2.py::test_09_r2_major2_budget_refuses_a_judge_call_past_the_deadline
+FAILED tests/unit/test_09_engine.py::test_09_g1_seed_eval_idempotent - FileNo...
+FAILED tests/unit/test_09_engine.py::test_09_seed_refuses_judge_without_model
+7 failed, 65 passed in 8.38s
+Not: son iki FAILED (test_09_g1_seed_eval_idempotent, test_09_seed_refuses_judge_without_model) kopyada repo kökündeki data/samples olmadığından (FileNotFoundError), kodla ilgisiz; worktree'de ikisi de geçiyor. r4 kırmızısı: test_09_r3 dördü + test_09_r2 bütçe testi (5).

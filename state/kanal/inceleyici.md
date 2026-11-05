@@ -2033,3 +2033,29 @@ Paket: 09-1 r3   Cevap: K-09-0020 / K-09-0022
 
 ### R-09-0015 · 2026-11-05 13:01 · → koordinator · YIGIN-KAPA
 review09 `down -v --remove-orphans` (13:01): 0 konteyner, 0 hacim. Worktree git kaydından kaldırıldı; dizin Windows izni yüzünden diskte kaldı (temizlik listesine, `--force` yok). Açık inceleyici yığını yok.
+
+### R-09-0016 · 2026-11-05 13:28 · → koordinator · ACK
+Paket: 09-1 r4   Cevap: K-09-0025
+b424013f02a1c88955e7d9e31a513625234d750a doğrulandı (472e04f atası; 3 commit, 9 dosya; merge-base main'e göre `state/` 0). Delta incelemesi başladı. Yığın kararı: işçi imajı commit ile eşleşirse review09 tam yığın ama yalnız hedefli koşular; eşleşmezse yalın yığın (build yok, PROSES-175).
+
+### R-09-0017 · 2026-11-05 13:29 · → koordinator · YIGIN-AC
+review09, 18300/13300, tam yığın + plan/18 katmanı. İşçinin `0.0.0-09` imajı b424013 ile dosya dosya eşleşti (168 py, fark 0); `--no-build --pull never`. Koşular: unit ×2, lint, hedefli test-int ×2 (09/05a), alembic heads, seed, seed-eval ×2, exam-stack, smoke, probe. Açık FF yığını: bu tek. Kapanış down -v + YIGIN-KAPA.
+
+### R-09-0018 · 2026-11-05 13:45 · → koordinator · REVIEW-SONUC
+Paket: 09-1 r4   Cevap: K-09-0025
+**DEGISIKLIK b424013f02a1c88955e7d9e31a513625234d750a.** Rapor state/reviews/09-1-r4.md. BLOCKER 0, MAJOR 1, MINOR 1, NOTE 14.
+- KAPANDI:
+  - MAJOR-r3-1 A: madde başına sayaç kalıcı, `judge_out_of_time`, sayaç yalnız commit'li tick'te siliniyor; `start_items` bir kez koşuyor, döngü açmıyor.
+  - NER kesintisi → `not_run(ner_unavailable)`.
+  - MINOR-r3-1 katı sınır; r3-3/5 docs; "09-2'ye kalan" listesi tam.
+- **MAJOR-r4-1 (KARAR-GEREK):** tick'in ortak son süresi önceki sınavlarca tüketilince sonraki sınavın ilk maddesi taze `Budget` (`started=0`) ile yine başlıyor, `timeout(0.0)` ile kesiliyor ve sayaca yazılıyor. Kesme commit'i `updated_at`'ı ilerlettiği için `ORDER BY updated_at` aynı sınavı yine sona koyuyor. 5 tick'te yavaş olmayan madde `judge_out_of_time`: yanlış sonuç. Yığında probe: son süre geçmişken `may_judge(1)=True`, `time_left=0.0`.
+  - **A (önerilen)** ilk madde de `time_left >= call_s × calls` değilse başlamaz (sınav bekler, sayılmaz);
+  - B kesme yalnız planlanan süre verildiyse sayılır ve commit edilir;
+  - C sınav başına süre payı.
+  - Test: iki sınav tek son süre.
+- MINOR-r4-1: modül docstring'lerinde eski tick kuralı.
+- Kapılar (işçinin doğrulanmış imajı, build yok): unit 1717 ×2, lint, hedefli test-int 36 ×2, alembic tek head, seed-eval idempotent, exam-stack 8/8, smoke, probe P0-P4. DNS hatası 0.
+- NOT_RUN: tam test-int (delta turu).
+
+### R-09-0019 · 2026-11-05 13:45 · → koordinator · YIGIN-KAPA
+review09 `down -v --remove-orphans` (13:45): 0 konteyner, 0 hacim. Worktree kaldırıldı (dizin de silindi). Açık inceleyici yığını yok.

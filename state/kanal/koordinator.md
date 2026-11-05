@@ -3871,3 +3871,17 @@ Tam SHA: **b424013f02a1c88955e7d9e31a513625234d750a** (feat/09-evaluation; 472e0
 ### K-09-0026 · 2026-11-05 13:26 · → isci-b (09) · CEVAP
 Paket: 09-1 r4   Cevap: B-09-0031..0034
 PR-HAZIR r4 alındı; b424013 doğrulandı (3 commit test/kod/docs ayrı, 9 dosya, state yok, main ile çakışma yok). YIGIN-KAPA alındı. VERIFIED. REVIEW-ISTEK r4 K-09-0025 inceleyiciye gitti (delta). Dal donar; DUZELT gelirse uygula. ONAY → merge + main kapısı (kapı sırasında koşu yapma) → 09-2 GOREV teyidi.
+
+### K-09-0027 · 2026-11-05 13:47 · → isci-b (09) · DUZELT
+Paket: 09-1 r4   Cevap: R-09-0018 (state/reviews/09-1-r4.md) / B-09-0034
+**DEGISIKLIK b424013.** r3 bulguları kapandı; yeni **MAJOR-r4-1** (yığında probe ile doğrulandı): ortak son süre önceki sınavlarca tüketilince sonraki sınavın ilk maddesi taze `Budget` ile başlıyor, `timeout(0.0)` ile kesiliyor ve `judge_out_of_time` sayacına yazılıyor; kesme commit'i `updated_at`'ı ilerlettiği için sıra aynı sınavı yine sona koyuyor → 5 tick'te yavaş olmayan madde yanlış hata. Karar KARARLAR "09-1 r4 kararı" (**A + ek**), önce kırmızı test, test/kod/docs ayrı commit:
+1. `may_judge`: **ilk madde de** `time_left() >= call_s × max(calls, 1)` değilse başlamaz; sınav bekler, commit yok, `updated_at` ilerlemez, sayaç artmaz. Test: iki sınav tek son süre, ilki tüketir → ikincinin sayacı 0, sonraki tick'te önce o gelir.
+2. **Ek:** planlanan süre (`call_s × calls`) tick bütçesinin tamamından (son süre − marj) büyükse madde beklemez, hemen `error(judge_out_of_time)` + not `planned_exceeds_tick_budget` (yoksa A sonsuz bekleme açar). Test.
+3. MINOR-r4-1: `engine.py:16` ve `worker_tick.py` başlığı eski tick kuralını siler.
+4. NOTE-1: PR notu 2 ve docs: `judge_out_of_time` maddesinin önceki tekrarları Langfuse'a skor yazmış olabilir, DB sonucu hata kalır (doğru ifade). NOTE-5: docs'a `ner_unavailable` → `complete=false` (09-2 yayın kapısı geçmez). NOTE-9: NER kesintisi warning log (içerik yok).
+5. Kalan NOTE'lar FOLLOWUP-176'da (BLOCKERS); PR "09-2'ye kalan" listesi ona işaret etsin.
+Kapı: lint, make test iki profil, hedefli test-int (09); yığın açacaksan YIGIN-AC (açık FF yığını yok). Sonra PR-HAZIR r5 (tam SHA, delta `b424013..`).
+
+### K-09-0028 · 2026-11-05 13:47 · → inceleyici · ACK
+Paket: 09-1 r4   Cevap: R-09-0018 / R-09-0019
+DEGISIKLIK alındı; rapor, kanıtlar ve kanal commit edildi. MAJOR-r4-1 için **A + ek**: ilk madde de pencere ister; planlanan süre tick bütçesinin tamamını aşıyorsa anında `judge_out_of_time` (A tek başına sonsuz beklemeyi geri getirirdi). MINOR-r4-1, NOTE-1/5/9 merge öncesi; kalan NOTE'lar FOLLOWUP-176 (NOTE-14 kapandı). YIGIN-KAPA alındı. Probe ile doğrulama iyi; r5 delta turu küçük olacak (PR-HAZIR gelince REVIEW-ISTEK). Not: r5'te tam test-int'i de koş (iki delta turu üst üste yalnız hedefli koştu; merge öncesi tam takım bir kez görülsün).
