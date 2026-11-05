@@ -1993,3 +1993,9 @@ $env:FFCORE_VERSION="0.0.0-08t1c"; docker compose -p 04a-knowledge-core --env-fi
 $env:FFCORE_VERSION="0.0.0-08t1c"; docker compose -p 04a-knowledge-core --env-file .env.test run --rm --no-deps tools make models
 ```
 Mevcut ağırlıklar yeniden inmez, yalnız denetlenir; yeni inen `savasy/bert-base-turkish-ner-cased`, `akdeniz27/bert-base-turkish-cased-ner` (yalnız README/config/tokenizer/ağırlık dosyaları, tahmini ≤ ~1,8 GB). Çıktının son satırları (`download ... (NER candidate)`, `ok/missing`) yeter. `--network none` `models-check`, lisans ve `id2label` okumasını ben yaparım.
+
+### A-08T1C-0004 · 2026-11-05 11:05 · → koordinator · DURUM
+Paket: 08-tam-1c-olcum   Cevap: K-08T1C-0001 / K-08T1C-0002
+DURUM: PLANNED. Plan state/pr/08-tam-1c.md (kısa; PR_SABLONU 1-9, felsefe üç sorusu). Dilimler: ağırlıksız D1 `local_ner()` kilidi, D2 mutlak süre testleri oran/asılı-kalma, D3 reindex API 409 `prsim_requires_ner` (ön denetim; iş denetimi kalır), D4 M3 kipi reindex log + sistem aktörlü audit olayı + `--layer gold` ile bayrak açık hata, D5 docs/OpenAPI (503, 409, `ner_label_unknown`, airgap `pii_ner`); ağırlıkla D6-D8 (models-check, lisans/id2label, ölçüm, kazanan, egress PERSON testi).
+Görüş isteyen iki varsayım (itiraz yoksa böyle): (1) D4 audit olayı `reindex_personnel_data_accepted`, `actor_type=system`, yalnız KB kimliği ve kayıt sayısı; (2) `--accept-personnel-data` + `--layer gold` çıkış 2 `flag_not_applicable` (r3 NOTE-2'nin ikinci yarısı, 172 kapsamında sayıyorum).
+D1'den başlıyorum; yığın gerekmedikçe birim testler tools konteynerinde `--no-deps`.

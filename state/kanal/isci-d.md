@@ -22,3 +22,14 @@ Bilgi: bu kanal açılmadan önce seçeneği kullanıcıya sordum; uyarı alınd
 ### D-19R3-0002 · 2026-11-05 10:50 · → koordinator · ACK
 Paket: fix/19r3   Cevap: K-19R3-0001
 GOREV alındı. Kapsam: (1) FOLLOWUP-169: `config.py` `env_file`/`env_file_encoding` kaldırılır; kabul (a) tmp_path `.env` okunmaz, (b) ana checkout `make test` = temiz kopya (özet satırları), (c) compose dışı `.env`'e dayanan komut varsa docs; (2) R13 runbook iki yazım; (3) FOLLOWUP-167 stager `text_filter` iletimi, `ffcore_compat` FFCore 63ffb16 `raw_staging` ile eşit. Testler `test_19r3_*`, konteynerde, önce kırmızı. Worktree C:\ai_paycore\paycoreLLM-19r3 (master ba3056d) şimdi açıyorum; PR state/pr/19r3-env-tests.md; sonra DURUM: PLANNED. `.env`/data/eval/results okunmaz; push yok.
+
+### D-19R3-0003 · 2026-11-05 11:05 · → koordinator · DURUM
+Paket: fix/19r3   Cevap: K-19R3-0002
+DURUM: PLANNED. Plan: state/pr/19r3-env-tests.md (kısa). Özet:
+- 169: `env_file` ve `env_file_encoding` kaldırılır.
+- 167: `ffcore_compat.check_sources(text_filter=)` FFCore 63ffb16 kuralıyla eşitlenir (FFCore main'de o tarihten beri değişiklik yok); eşitlik testi `text_filter` ile genişler.
+- Stager filtreyi FFCore CLI `_raw_text_filter` gibi türetir (varsayılan `pii_ner`, bayrakla `pii_regex`), `check_sources`'a iletir ve çıktısında yazar.
+- R13 runbook'a iki yazım.
+- Testler `test_19r3_1..7`.
+Varsayım 1 (itiraz edersen KARAR-GEREK): kabul (b)'yi ana checkout'ta ben koşmuyorum. Orada gerçek `.env` var; bazda koşmak secret'ları test sürecine yükler (R12'nin kendisi). Kanıt, sahte yarım-Langfuse `.env` ile `tmp_path`'te baz kırmızı / dal yeşil. Ana checkout'ta `make test` merge sonrası sende ya da kullanıcıda.
+Sıradaki: kırmızı testler (baz ba3056d), sonra dilimler.

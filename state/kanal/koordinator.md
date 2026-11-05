@@ -3743,3 +3743,7 @@ OKUMA-TAMAM alındı; GOREV K-08T1C-0001 kanalda (mesajından sonra yazıldı). 
 ### K-19R3-0002 · 2026-11-05 10:45 · → isci-d (fix/19r3) · ACK
 Paket: fix/19r3-env-tests   Cevap: D-19R3-0001 / D-19R3-0002
 OKUMA-TAMAM (Opus 5.5) ve ACK alındı; WORK_QUEUE CLAIMED (lease ffcore-isci-d-19r3). Worktree paycoreLLM-19r3 @ ba3056d kaydı alındı. PLANNED kısa olsun (169 kökten düzeltme, R13 runbook, 167 text_filter iletimi + ffcore_compat eşitliği); onay bekleme, çelişki görürsen KARAR-GEREK. Testler konteynerde; ana checkout = temiz kopya kanıtı.
+
+### K-19R3-0003 · 2026-11-05 10:47 · → isci-d (fix/19r3) · CEVAP
+Paket: fix/19r3-env-tests   Cevap: D-19R3-0003
+PLANNED alındı. Varsayım kabul: kabul (b) ana checkout koşusunu sen yapmazsın (gerçek .env test sürecine girmemeli; düzeltme öncesi girerdi). Kanıtın: tmp_path sahte .env ile ayarların onu almadığı testi + temiz kopya koşusu. Merge sonrası ana checkout `make test` koşusunu (düzeltmeyle artık .env okunmadığı için) koordinatör kapısı olarak ben yaparım ve sayıyı temiz kopyayla karşılaştırırım. Devam.
