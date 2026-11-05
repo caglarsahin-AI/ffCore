@@ -1,6 +1,6 @@
-# PR: 08 tam dilim 1c — NER ölçümü, kazanan seçimi, FOLLOWUP-168/172
+# PR 1c-a: 08 tam dilim 1c — FOLLOWUP-168/172/174 (ağırlıksız); ölçüm 1c-b'de
 
-**Paket:** 08-tam-1c-olcum · **Sınıf:** [B]; ağırlık indirme [C] kullanıcıda (ENV-163) · **Branch:** feat/08-tam-1c-olcum · **Baz commit:** 8aa8442 (main; 63ffb16 + state) · **Oturum:** ffcore-isci-a-08-tam-1c-olcum (Opus 5.5) · **GOREV:** K-08T1C-0001, iş sırası A (K-08T1C-0002) · **Durum:** IMPLEMENTED (ağırlıksız dilimler D1-D5); D6-D8 ağırlık bekliyor (ENV-163) · **HEAD:** 6395c6e (10 commit)
+**Paket:** 08-tam-1c-olcum · **Sınıf:** [B]; ağırlık indirme [C] kullanıcıda (ENV-163) · **Branch:** feat/08-tam-1c-olcum · **Baz commit:** 8aa8442 (main; 63ffb16 + state) · **Oturum:** ffcore-isci-a-08-tam-1c-olcum (Opus 5.5) · **GOREV:** K-08T1C-0001, iş sırası A (K-08T1C-0002) · **Durum:** VERIFIED (1c-a, K-08T1C-0005 B: iki PR) · **HEAD:** a4ec5f565c076a232e392f93557ffdf10d1cb69b (13 commit; main ile çakışma yok) · D6-D8 ölçüm ayrı PR 1c-b (`feat/08-tam-1c-b-olcum`, ENV-163 sonrası)
 
 ## Plan
 
@@ -30,11 +30,11 @@
 9. **Felsefe kontrolü:** ARCH-07: her dilim mevcut bir yolun boşluğunu kapatır (kilit, görünürlük, test kararlılığı, docs); yeni kalıcı yüzey yalnız 409 yanıtı ve bir audit eylemi. ARCH-09: NER pencereleme `transformers` pipeline'ında; ayrı bölücü yazılmaz (NOTE-3 yalnız doğrular); audit 03b decorator/olay tablosu. ARCH-10/06: kazanan seçimi ölçümle ve `.env.example`'da açık, "auto" yok; `--layer gold` ile bayrağın sessizce etkisiz kalması açık hataya çevrilir; 409 iş reddinin sessiz 202'sini görünür yapar.
 
 ## Değişen dosyalar
-`git diff --stat main...HEAD`: 14 dosya, +283/-43; state yok.
-- kod: `backend/ffcore/guardrails/recognizers/ner.py` (D1 kayıt kilidi), `api/knowledge.py` (D3 409), `knowledge/ingest.py` (D4 sayım + log; `check_reindex_silver` artık `int` döner, çağıranlar dönüşü kullanmıyordu), `cli.py` (D4 audit + `flag_not_applicable`), `api/guardrails.py` (D5 503 yanıtı)
+`git diff --stat $(merge-base)..HEAD`: 17 dosya, +412/-61; state yok.
+- kod: `backend/ffcore/cli.py` ayrıca FOLLOWUP-174 (`ingest-raw --text-filter`); `backend/ffcore/guardrails/recognizers/ner.py` (D1 kayıt kilidi), `api/knowledge.py` (D3 409), `knowledge/ingest.py` (D4 sayım + log; `check_reindex_silver` artık `int` döner, çağıranlar dönüşü kullanmıyordu), `cli.py` (D4 audit + `flag_not_applicable`), `api/guardrails.py` (D5 503 yanıtı)
 - OpenAPI: `backend/openapi/08.yaml` (yeniden üretildi; yalnız iç NER ucuna 503, additive)
-- testler: yeni `tests/unit/test_08t1c_1_local_ner_single_load.py`; `tests/unit/test_08t_secrets_linear.py` (oran), `tests/unit/test_04a_convert.py` (9d koruma), `tests/integration/test_08t_30_reindex_prsim.py` (+4 test), `tests/contract/test_08_openapi.py` (+1)
-- docs: `docs/api.md`, `docs/bilgi-tabani.md`, `docs/guardrail.md`
+- testler: yeni `tests/unit/test_08t1c_1_local_ner_single_load.py`, `tests/unit/test_08t1c_6_ingest_raw_text_filter.py` (174); `tests/unit/test_19_raw_staging.py` (S1 testi, aşağıda); `tests/unit/test_08t_secrets_linear.py` (oran), `tests/unit/test_04a_convert.py` (9d koruma), `tests/integration/test_08t_30_reindex_prsim.py` (+4 test), `tests/contract/test_08_openapi.py` (+1)
+- docs: `docs/api.md`, `docs/bilgi-tabani.md`, `docs/guardrail.md`, `docs/paycore-entegrasyon.md` (174 satırı)
 
 ## Kabul kriterleri → testler
 | # | Kriter | Test | Durum |
@@ -44,6 +44,8 @@
 | D3 (172 N1) | silver reindex ucu kişi verisi kaydında 409, kuyruk boş, audit `error` | `test_08t1c_3_reindex_api_409_prsim`, `test_08t1c_3b_reindex_api_ok_without_personnel` | geçti; f62f4f4'te düştü (202) |
 | D4 (172 N2) | M3 kipi `records=N` logu + sistem aktörlü audit (yalnız sayılar); gold + bayrak çıkış 2 | `test_08t1c_4_reindex_m3_logged_and_audited`, `test_08t1c_4b_accept_flag_with_gold_refused` | geçti; 3bfa9b5'te düştü (log yok; çıkış 0) |
 | D5 (168 NOTE-4) | iç NER 503 yanıt listesinde | `test_08t1c_5_internal_ner_503_listed` | geçti; 2771e24'te düştü |
+| 174 | `--text-filter pii_regex` NER'siz, M3 bayrağından ayrı; PRSIM yine ret; varsayılan `pii_ner`; M3 + açık `pii_ner` çatışma; kapatma seçimi yok | `test_08t1c_6_*` (6, 6b, 6c, 6d, 6e) | geçti; 627e067'de 6/6b/6d düştü (6c/6e değişmeyen davranışın koruması) |
+| plan/19 S1 | maskeleme adla kapatılamaz | `test_19_s1_masking_cannot_be_disabled` (güncellendi) | geçti |
 | brief 08 kriter 1 | ad-soyad recall ≥ 0,85 | `test_08t_1_ner_recall_person` (`-m models`) | NOT_RUN (ENV-163) |
 | brief 08 kriter 3 | 1.000 karakter P95 < 300 ms | `test_08t_3_ner_latency_p95` (`-m models`) | NOT_RUN (ENV-163) |
 | brief 08 kriter 4 | aday tablosu, lisans, boyut | ölçüm betiği | NOT_RUN (ENV-163) |
@@ -54,17 +56,27 @@ Hepsi `FFCORE_VERSION=0.0.0-main`, `--env-file .env.test`, tools konteyneri (hos
 |---|---|---|---|
 | hedefli birim D1/D2/D5 (kırmızı ve yeşil) | `--no-deps` | 1 → 0 | < 15 s |
 | hedefli test-int `test_08t_30`, `test_04a_api`, `test_19_ingest_raw` | yalın yığın `ffcore-08t1c` (postgres, redis, litellm, fake-llm, qdrant) | 0; 40 passed / 1 skipped | 96 s |
-| `make lint` | | 0 (446 dosya) | |
-| `make test` | `DEPLOY_PROFILE=llmaas FAKE_LLM=1` | 0; 1603 passed | 164 s |
-| `make test` | `DEPLOY_PROFILE=airgap FAKE_LLM=1` | 0; 1603 passed | 176 s |
+| `make lint` (D1-D5) | | 0 (446 dosya) | |
+| `make test` (D1-D5) | llmaas / airgap | 0; 1603 / 1603 | 164 / 176 s |
+| hedefli 174 + S1 + CLI testleri | `--no-deps` | 1 → 0; 33 passed | 6 s |
+| **`make lint` (HEAD a4ec5f5)** | | 0 (447 dosya); `08t1c-a-lint.log` | |
+| **`make test` (HEAD a4ec5f5)** | `DEPLOY_PROFILE=llmaas FAKE_LLM=1` | 0; 1608 passed; `08t1c-a-test-llmaas.log` | 174 s |
+| **`make test` (HEAD a4ec5f5)** | `DEPLOY_PROFILE=airgap FAKE_LLM=1` | 0; 1608 passed; `08t1c-a-test-airgap.log` | 151 s |
 | tam `make test-int` | | NOT_RUN (koordinatör: yalnız hedefli; kapı koordinatörde) | |
 | ağırlık kontrolü `04a-knowledge-core_model_cache` (alpine, `--network none`, salt-okunur) | | NER adayı yok | |
 | `-m models`, `models-check --network none`, ölçüm | | NOT_RUN (ENV-163) | |
 Yığın `down -v` ile kapatıldı (konteyner 0, volume 0).
 
 ## Varsayımlar ve brief'teki çelişkiler
+0. **plan/19 S1 testi değişti (koordinatör kabulü K-08T1C-0006, inceleyici bakar).** Eski kural (`test_19_s1_masking_cannot_be_disabled`): `ingest-raw`'ın hiçbir seçeneğinin adında `mask` ya da `filter` geçmez. Yeni kural: adında `mask`/`filter` geçen tek seçenek `--text-filter`, seçimleri tam `{pii_ner, pii_regex}`. Gerekçe: testin amacı "maskeleme adla kapatılamaz" (plan/19 S1); FOLLOWUP-174 kararı (K-08T1C-0005) açık bir filtre seçeneği istiyor; iki seçim de maskeler (`pii_regex` kimlik numaralarını, `pii_ner` ek olarak kişi adlarını), kapatan değer yok (`none` argparse 2, `test_08t1c_6e`), PRSIM `pii_regex` ile reddedilir (`test_08t1c_6b`); yani amaç korunur, yalnız ad tabanlı yasak dar sınıf tabanlı denetime döner.
 1. FOLLOWUP-172 N2 "audit olayı": reindex CLI'sı istek bağlamı dışında; olay sistem aktörlü yazılır (`actor_type=system`), içerik yok, yalnız KB kimliği ve kayıt sayısı.
 2. `test_04a_9d` 04a'nın testi; GOREV bu dalda açıkça istediği için dokunuluyor, yalnız süre iddiası.
 
+3. FOLLOWUP-174: `--text-filter pii_regex` seçmek operatörün "kaynaklarda kişi verisi yok" beyanıdır; kişi verisi olan PRSIM dışındaki bir kaynak için de bu beyan yanlışsa adlar maskelenmez (regex kimlik numaraları yine maskelenir, müşteri verisi durdurması aynen). docs/bilgi-tabani.md bunu açık yazar.
+4. D3: `check_reindex_silver` uçta kendi oturumunu açar (istek oturumu değil); yalnız SELECT.
+
 ## Kalan riskler
-- Ölçüm ve kazanan seçimi ENV-163'e (kullanıcı `make models`) bağlı; o gelene kadar D6-D8 NOT_RUN.
+- Ölçüm ve kazanan seçimi ENV-163'e (kullanıcı `make models`) bağlı; 1c-b'de (D6-D8).
+- PayCore runbook'u (paycoreLLM, `docs/paycore/m3-sunucu.md`) OCR için geçici `--accept-personnel-data` yolunu anlatıyor; `--text-filter pii_regex`'e çevrilmesi paycoreLLM'de ayrı iş (1c-a merge sonrası).
+- Tam `make test-int` bu dalda koşmadı (koordinatör: yalnız hedefli); kapı koordinatörde.
+- Hedefli test-int'te 1 skipped (test_19_ingest_raw; nedenine bakılmadı, dalın dokunmadığı bir test).

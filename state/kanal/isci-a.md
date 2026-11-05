@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-a-08-tam-1c-olcum (Opus 5.5; önceki lease ffcore-isci-a-08-tam-1b RETIRED, HANDOFF koordinatör özeti K-08T1B-0026)
 - Aktif paket: 08-tam-1c-olcum (K-08T1C-0001)
 - Durum: ACTIVE
-- Son okunan: K-08T1C-0005
+- Son okunan: K-08T1C-0008
 
 ## Mesajlar
 
@@ -2026,3 +2026,12 @@ B alındı: 1c-a = D1-D5 + FOLLOWUP-174, aynı dal `feat/08-tam-1c-olcum`; 1c-b 
 **İşaret (kararına aykırıysa DUZELT):** plan/19 S1 testi `test_19_s1_masking_cannot_be_disabled` adında `filter` geçen her seçeneği yasaklıyordu; senin 174 kararınla çelişti. Testi amacına göre değiştirdim: adında mask/filter geçen tek seçenek `--text-filter`, seçimleri tam `{pii_ner, pii_regex}` (ikisi de maskeler). PR varsayımına yazılacak.
 Not: paycoreLLM runbook'undaki geçici `--accept-personnel-data` yolu (FOLLOWUP-174 metni) paycoreLLM'de; touch-zone'um dışında, 1c-a merge sonrası runbook'un `--text-filter pii_regex`'e çevrilmesi ayrı iş.
 Kapı (lint + make test iki profil) koşuyor; yeşilse PR-HAZIR.
+
+### A-08T1C-0009 · 2026-11-05 12:25 · → koordinator · DURUM
+Paket: 08-tam-1c-olcum (1c-a)   Cevap: K-08T1C-0006
+DURUM: VERIFIED. HEAD a4ec5f565c076a232e392f93557ffdf10d1cb69b: `make lint` 0 (447 dosya); `make test` llmaas 1608/1608, airgap 1608/1608 (state/evidence/08t1c-a-*.log). 13 commit, 17 dosya +412/-61, state yok, main ile çakışma yok (`merge-tree`). PR notunda S1 eski/yeni kural + gerekçe (varsayım 0).
+
+### A-08T1C-0010 · 2026-11-05 12:25 · → koordinator · PR-HAZIR
+Paket: 08-tam-1c-olcum (1c-a)   Cevap: K-08T1C-0005
+Branch `feat/08-tam-1c-olcum` · SHA **a4ec5f565c076a232e392f93557ffdf10d1cb69b** · baz 8aa8442 · Sınıf [B] · push yok · PR açıklaması state/pr/08-tam-1c.md.
+İnceleyici için: hedefli test-int `tests/integration/test_08t_30_reindex_prsim.py` (yalın yığın: postgres, redis, litellm, fake-llm, qdrant); birim `test_08t1c_*`, `test_08t_secrets_linear`, `test_04a_9d`, `test_19_raw_staging`, contract `test_08_openapi`. Her kalemde önce test commit'i. Dal donar; DUZELT gelirse yeni SHA ile PR-HAZIR.

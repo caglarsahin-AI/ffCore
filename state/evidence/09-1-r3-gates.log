@@ -5,3 +5,16 @@
 exit=0
 == make lint + make test DEPLOY_PROFILE=llmaas 2026-11-05T11:25:37+03:00
 lint-ok
+======================= 1712 passed in 165.25s (0:02:45) =======================
+exit=0
+== make lint + make test DEPLOY_PROFILE=airgap 2026-11-05T11:28:36+03:00
+lint-ok
+======================= 1712 passed in 141.84s (0:02:21) =======================
+exit=0
+== alembic heads / downgrade 06b_0001 / upgrade heads / heads 2026-11-05T11:31:13+03:00
+09_0001 (08, 09, 06b, 04a, 07, 03c, 05a, 03a, 03b, 06a) (head)
+INFO  [alembic.runtime.migration] Running downgrade 09_0001 -> 06b_0001, 09: eval_suites, eval_runs (local rows over Langfuse datasets and dataset runs)
+INFO  [alembic.runtime.migration] Running upgrade 06b_0001 -> 09_0001, 09: eval_suites, eval_runs (local rows over Langfuse datasets and dataset runs)
+09_0001 (07, 05a, 06a, 09, 06b, 03c, 04a, 03a, 08, 03b) (head)
+exit=0
+== make test-int DEPLOY_PROFILE=llmaas 2026-11-05T11:31:24+03:00
