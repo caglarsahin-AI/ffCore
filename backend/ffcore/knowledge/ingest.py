@@ -760,26 +760,38 @@ def _silver_scope(kb_id: uuid.UUID, full: bool):
 
 async def check_reindex_silver(
     kb_id: uuid.UUID, *, full: bool, accept_personnel_data: bool = False
-) -> None:
+) -> int:
     """r2 NOTE-5 (KARARLAR "08 tam 1b r2 ekleri"): a personnel-data record written with
     `pii_regex` (the M3 mode, names not masked) is reconverted only with
     `--accept-personnel-data`; otherwise the whole reindex is refused before any document is
-    touched (`prsim_requires_ner`). The same personnel-data rule as staging (MINOR-r2-1)."""
-    if accept_personnel_data:
-        return
+    touched (`prsim_requires_ner`). The same personnel-data rule as staging (MINOR-r2-1).
+
+    With the flag the reindex goes on and the number of such records in scope is returned and
+    logged (FOLLOWUP-172 N2: the M3 mode is visible, as ingest-raw's is)."""
     async with db.session_scope() as session:
         rows = (await session.execute(_silver_scope(kb_id, full))).all()
+    personnel = 0
     for _, filename, meta in rows:
         meta = meta or {}
         label = str(meta.get("text_filter") or "")
         if label.startswith("pii_regex@") and raw_staging.personnel_data(
             str(meta.get("source") or ""), filename
         ):
-            raise ReindexRefused(
-                "prsim_requires_ner",
-                f"{filename} is personnel data written with {label} (the M3 mode); reindex it "
-                "with --accept-personnel-data or ingest it again with pii_ner",
-            )
+            if not accept_personnel_data:
+                raise ReindexRefused(
+                    "prsim_requires_ner",
+                    f"{filename} is personnel data written with {label} (the M3 mode); reindex "
+                    "it with --accept-personnel-data or ingest it again with pii_ner",
+                )
+            personnel += 1
+    if accept_personnel_data:
+        log.warning(
+            "reindex accept_personnel_data is the M3 measurement mode (pii_regex, names not "
+            "masked) kb=%s records=%d",
+            kb_id,
+            personnel,
+        )
+    return personnel
 
 
 async def reindex_gold(

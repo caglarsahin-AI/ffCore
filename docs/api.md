@@ -381,12 +381,12 @@ openapi/04a.yaml`; contract test `test_04a_20_*`). Lists are `{"data": [...]}`. 
 | `GET /{kb_id}/documents`, `GET …/{document_id}` | analyst | status, the three gate decisions with reasons, converter and seconds, `updated_at_source` |
 | `PATCH …/{document_id}` | analyst + edit | `{updated_at_source}`: the source date (ISO 8601, `null` clears it); takes effect in search at once; audited as `update_document`, readable to the caller or 404 |
 | `DELETE …/{document_id}` | analyst + edit | the document leaves search at once; raw stays on disk |
-| `POST /{kb_id}/reindex` | analyst + edit | `{layer: silver or gold, full}`; gold never reads raw or the source |
+| `POST /{kb_id}/reindex` | analyst + edit | `{layer: silver or gold, full}`; gold never reads raw or the source; silver with a personnel-data record written with `pii_regex@1` (the M3 mode) in scope is 409 `prsim_requires_ner`, nothing queued (the job checks again; the API has no M3 flag) |
 | `POST /{kb_id}/search` | analyst, also in read mode | `{query, top_k?, filters{document_ids, metadata}, hybrid?}`; header `X-Run-Id` is stored in `kb_queries.run_id` |
 | `POST /{kb_id}/test-query` | analyst, also in read mode | the same search, logged with `source=playground` |
 | `POST /internal/embed` | service account only | for the ingest worker; 403 `service_account_required` for anybody else |
-| `POST /api/v1/internal/guardrails/ner` | service account only | the workers' Turkish NER (08 full 1b): spans, category, score and evidence, never values; 503 `ner_not_configured` / `model_missing` |
-| `GET /readyz` | none | 200 ready; 503 `warming`, `warmup_failed`, `embed_dim_mismatch`, `context_configuration_invalid`, `vector_store_unavailable` |
+| `POST /api/v1/internal/guardrails/ner` | service account only | the workers' Turkish NER (08 full 1b): spans, category, score and evidence, never values; 503 `ner_not_configured` / `ner_label_unknown` / `ner_offsets_unavailable` / `model_missing` |
+| `GET /readyz` | none | 200 ready; 503 `warming`, `warmup_failed`, `model_missing`, `embed_dim_mismatch`, `context_configuration_invalid`, `vector_store_unavailable`; with `GUARDRAIL_EGRESS_NER=true` also the NER load codes `ner_not_configured` and `ner_label_unknown` |
 
 Document ACL: `acl_roles` and `acl_users`. A manual upload without either gets `["analyst"]`
 (shown in the response). An empty ACL (open to every member of the project, C15) is only set on

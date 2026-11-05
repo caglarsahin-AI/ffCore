@@ -24,33 +24,55 @@ OLD_ASSIGNMENT = re.compile(
 )
 
 
-def _finishes_within(seconds, text_expr):
-    """`find_secrets` on the text in a child process: the child times the call itself (r3 NOTE-1:
-    process start and imports stay out of the budget, so a loaded machine does not fail it), and
-    a hard limit kills it if it backtracks (`re` holds the GIL, a thread could not stop it)."""
+# FOLLOWUP-168 NOTE-5 (KARARLAR "Birim testinde mutlak süre sınırı yok"): linearity is proven by
+# the CPU-time ratio of two input sizes, 4x apart (a quadratic pattern gives about 16); the child
+# process limit is only a wide guard against hanging (the 2 s wall-clock bound failed under load).
+RATIO_LIMIT = 8.0
+HANG_GUARD_S = 120
+CALLS = 5  # per measurement, so the small input is well above the timer's resolution
+
+
+def _cpu_seconds(text_expr):
+    """Best of three CPU times of `find_secrets` on the text, measured in a child process (process
+    start and imports stay out of it; `re` holds the GIL, so only a process can be killed if the
+    pattern backtracks)."""
     code = (
         "import time; from ffcore.guardrails import rules; "
-        f"t = {text_expr}; s = time.perf_counter(); rules.find_secrets(t); "
-        "print(time.perf_counter() - s)"
+        f"t = {text_expr}; best = None\n"
+        "for _ in range(3):\n"
+        "    s = time.process_time()\n"
+        f"    for _ in range({CALLS}): rules.find_secrets(t)\n"
+        "    d = time.process_time() - s; best = d if best is None else min(best, d)\n"
+        "print(best)"
     )
     try:
         done = subprocess.run(
-            [sys.executable, "-c", code], check=True, timeout=120, capture_output=True, text=True
+            [sys.executable, "-c", code],
+            check=True,
+            timeout=HANG_GUARD_S,
+            capture_output=True,
+            text=True,
         )
     except subprocess.TimeoutExpired:
-        return False
-    return float(done.stdout.strip()) < seconds
+        pytest.fail(f"find_secrets did not finish within {HANG_GUARD_S} s: {text_expr}")
+    return float(done.stdout.strip())
+
+
+def _ratio(small_expr, large_expr):
+    return _cpu_seconds(large_expr) / max(_cpu_seconds(small_expr), 1e-3)
 
 
 @pytest.mark.parametrize("word", ["token", "password", "API_KEY", "secret", "şifre"])
 def test_08t_m4_many_spaces_after_a_credential_word_is_linear(word):
-    # 200,000 spaces; the quadratic form needed 43 s for 20,000 (measured here: about 0.03 s).
-    assert _finishes_within(2, f"{word!r} + ' ' * 200_000 + '!'"), word
+    # 50,000 vs 200,000 spaces; the quadratic form needed 43 s for 20,000.
+    ratio = _ratio(f"{word!r} + ' ' * 50_000 + '!'", f"{word!r} + ' ' * 200_000 + '!'")
+    assert ratio < RATIO_LIMIT, (word, ratio)
 
 
 def test_08t_m4_repeated_words_under_the_text_limit_is_linear():
-    # 180,000 characters (MAX_TEXT_CHARS 200,000); the quadratic form needed 58.8 s.
-    assert _finishes_within(2, "('token' + ' ' * 3000 + 'x ') * 60")
+    # 45,000 vs 180,000 characters (MAX_TEXT_CHARS 200,000); the quadratic form needed 58.8 s.
+    ratio = _ratio("('token' + ' ' * 3000 + 'x ') * 15", "('token' + ' ' * 3000 + 'x ') * 60")
+    assert ratio < RATIO_LIMIT, ratio
 
 
 def _sample(rng):

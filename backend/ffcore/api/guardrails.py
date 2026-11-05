@@ -14,6 +14,7 @@ from ffcore.api.common import (
     not_found,
     path_resource,
 )
+from ffcore.api.schemas import ErrorBody
 from ffcore.core.audit import audited
 from ffcore.core.auth import Actor, require_role, resolve_actor
 from ffcore.core.errors import ApiError
@@ -473,11 +474,22 @@ async def test_guardrails(
     response_model=NerResponse,
     tags=["guardrails-internal"],
     summary="Find person, organization and location names (service account only)",
+    responses={
+        503: {
+            "model": ErrorBody,
+            "description": "NER not available: `ner_not_configured` (NER_MODEL / NER_REVISION "
+            "not set), `ner_label_unknown` (a model label maps to no PII category), "
+            "`ner_offsets_unavailable` (the model gives no character offsets) or `model_missing` "
+            "(the weights are not in the offline cache; run `make models`).",
+        }
+    },
 )
 async def internal_ner(body: NerRequest, actor: ServiceActor):
     """08 tam 1b: the API process holds the NER model; the agent and ingest workers ask here
     (the /internal/embed pattern). Spans only, never values. Without NER_MODEL / NER_REVISION
-    503 `ner_not_configured`; a missing weight 503 `model_missing` (run `make models`)."""
+    503 `ner_not_configured`; a model label that maps to no category 503 `ner_label_unknown`; a
+    model without character offsets 503 `ner_offsets_unavailable`; a missing weight 503
+    `model_missing` (run `make models`)."""
     client = local_ner()
     try:
         findings = await client.find(body.text, body.categories)

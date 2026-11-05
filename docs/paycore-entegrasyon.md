@@ -91,7 +91,7 @@ deposunda `docs/paycore/` altında tutulur.
 
 | Parça | Yer | Ne yapar |
 |---|---|---|
-| `python -m ffcore.cli ingest-raw` | FFCore | nötr raw-staging ağacını (dosya + `<dosya>.meta.json`) C6 `ingest_from_raw` ile içeri alır; PII maskesi her zaman (`pii_ner`: regex + NER kişi adı, 08 tam 1b; `--accept-personnel-data` M3 ölçüm kipi `pii_regex`), PRSIM NER ile ya da M3 kipinde; manifest (`--manifest-out`) |
+| `python -m ffcore.cli ingest-raw` | FFCore | nötr raw-staging ağacını (dosya + `<dosya>.meta.json`) C6 `ingest_from_raw` ile içeri alır; PII maskesi her zaman (`pii_ner` varsayılan: regex + NER kişi adı, 08 tam 1b; `--text-filter pii_regex` kişi verisi olmayan kaynaklar için yalnız regex, NER gerekmez; `--accept-personnel-data` M3 ölçüm kipi `pii_regex`), PRSIM NER ile ya da M3 kipinde; manifest (`--manifest-out`) |
 | `deploy/offline/` | FFCore | `images.txt` (registry digest + image id), `models.txt` (HF revision + SHA-256), `save.sh` / `load.sh` / `verify.sh` |
 | `scripts/m3_preflight.py`, `scripts/m3_gate_check.py` | FFCore | sağlık kontrol listesi (değer basmaz); izlenen S1/rapor dosyası kapısı |
 | `make eval EVAL_OUT=… EXCLUDE_SOURCES=… WARMUP=…` | FFCore | depo dışı rapor, kaynağa göre dışlama (n/N), ayrı ısınma |

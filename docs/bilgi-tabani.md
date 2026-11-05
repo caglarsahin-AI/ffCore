@@ -25,19 +25,31 @@ A connector or a consumer that already has the content (PayCore's raw layer) wri
 ignored. Then:
 
 ```
-python -m ffcore.cli ingest-raw --project <p> --kb <kb> --raw-dir <tree, read-only>   --acl <role> --sources <kind:space> ... [--limit N] [--manifest-out <file>] [--accept-personnel-data]
+python -m ffcore.cli ingest-raw --project <p> --kb <kb> --raw-dir <tree, read-only>   --acl <role> --sources <kind:space> ... [--limit N] [--manifest-out <file>] [--text-filter pii_ner|pii_regex] [--accept-personnel-data]
 ```
 
-- Every file goes through C6 `ingest_from_raw` with the named text filter `pii_ner` (08 full
+- Every file goes through C6 `ingest_from_raw` with a named text filter, by default `pii_ner` (08 full
   1b): e-mail, phone, national id, IBAN, card (regex) and person names (the API's NER over
   `POST /api/v1/internal/guardrails/ner`), redacted to `[CODE]` before silver is written, so
   silver, `.raw.md` and gold are masked; raw stays byte for byte; the document records
-  `metadata.text_filter = "pii_ner@<version>"`. A name never overrides a regex finding. There is
-  no option to turn it off or to name another filter. The NER is checked before the first file:
+  `metadata.text_filter = "pii_ner@<version>"`. A name never overrides a regex finding. Masking
+  cannot be turned off: the only other choice is `--text-filter pii_regex` (below). The NER is checked before the first file:
   unreachable or not configured stops the run (`ner_unavailable`; with a PRSIM source
   `prsim_requires_ner`, before the database), a tree is never half name-masked.
+- `pii_ner` is the default in every profile, airgap included: without the NER weights (or an
+  API that answers NER) a default `ingest-raw` stops with `ner_unavailable` whatever the source.
+  `GUARDRAIL_EGRESS_NER=false` (airgap) is about egress, not ingest.
+- `--text-filter pii_regex` (FOLLOWUP-174) is for sources without person data (for example a
+  product documentation space) on an installation without NER: identifiers are masked as above,
+  person names are not looked for, no NER is called, and documents record `pii_regex@1`. A
+  personnel-data source (PRSIM, by source or path) is still refused (`prsim_requires_ner`): it
+  needs `pii_ner` or the M3 flag. Choosing the filter is the operator's statement that the
+  sources carry no person data: no NER runs, so names in them stay as written. The regex
+  identifiers (card, IBAN, national id, e-mail, phone) are still masked; the run does not stop
+  on them (stopping on customer data is the personnel-data path's rule, below).
 - `--accept-personnel-data` is the M3 measurement mode: it keeps `pii_regex` (identifiers only,
-  person names not masked) so the measured manifest stays as it was, and is logged as such.
+  person names not masked) so the measured manifest stays as it was, and is logged as such. With
+  an explicit `--text-filter pii_ner` it is refused (`text_filter_conflict`, exit 2).
   Documents ingested before 08 full 1b keep `pii_regex@1`; a reindex applies the filter the
   document records. A run never processes a record written under another filter: the same
   bytes recorded as `pii_regex@1` in a `pii_ner` run (or the other way round) are refused as
@@ -46,8 +58,12 @@ python -m ffcore.cli ingest-raw --project <p> --kb <kb> --raw-dir <tree, read-on
 - Reindex is inside the same boundary: `make reindex LAYER=silver` refuses with
   `prsim_requires_ner` (exit 2, nothing queued or touched) when a personnel-data record written
   with `pii_regex@1` (the M3 mode) is in its scope; `python -m ffcore.cli reindex ...
-  --accept-personnel-data` runs it in the M3 mode. A reindex requested through the API with such
-  a record in scope is refused by the job the same way (the API has no M3 flag).
+  --accept-personnel-data` runs it in the M3 mode, logged with the number of such records
+  (`records=N`) and audited as `reindex_personnel_data_accepted` (system actor; layer, `full`
+  and the count, never a file name or content). The flag concerns the silver reconversion only:
+  with `--layer gold` it is refused (`flag_not_applicable`, exit 2). A reindex requested through
+  the API with such a record in scope is refused at the endpoint with 409 `prsim_requires_ner`
+  before anything is queued (the API has no M3 flag; the job checks again).
 - Attachment file names are masked too: in a personnel-data source (PRSIM) the shown name
   (attachment record, silver heading, chunk breadcrumb) is `Ek <n>`; in other sources the name
   goes through the text filter with `_` and `-` read as spaces. The raw file keeps its name.

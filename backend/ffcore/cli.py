@@ -99,17 +99,49 @@ async def enqueue_reindex(
         )
     if kb_id is None:
         raise CliError(f"knowledge base {project_key}/{kb_key} not found")
+    from ffcore.knowledge import ingest
+
+    if accept_personnel_data and layer != "silver":
+        # FOLLOWUP-172 N2: the flag concerns the silver reconversion only; with gold it would be
+        # silently without effect.
+        raise ingest.ReindexRefused(
+            "flag_not_applicable", "--accept-personnel-data applies to --layer silver only"
+        )
     if layer == "silver":
         # r2 NOTE-5: the job checks too (the API road); here the operator gets the code and exit 2
         # before anything is queued.
-        from ffcore.knowledge import ingest
-
-        await ingest.check_reindex_silver(
+        personnel = await ingest.check_reindex_silver(
             kb_id, full=full, accept_personnel_data=accept_personnel_data
         )
+        if accept_personnel_data:
+            await _audit_m3_reindex(kb_id, full, personnel)
     return await get_queue(get_settings()).enqueue(
         "reindex_job", str(kb_id), layer, full, accept_personnel_data
     )
+
+
+async def _audit_m3_reindex(kb_id, full: bool, personnel: int) -> None:
+    """FOLLOWUP-172 N2: the M3 mode of reindex is an audit event of the system actor; the
+    numbers only, never a file name or content."""
+    from ffcore.core import db
+    from ffcore.models.knowledge import KnowledgeBase
+
+    async with db.session_scope() as session:
+        kb = await session.get(KnowledgeBase, kb_id)
+        await write_event(
+            session,
+            AuditEntry(
+                action="reindex_personnel_data_accepted",
+                resource_type="knowledge_base",
+                outcome="success",
+                actor_type="system",
+                actor_id="cli",
+                project_id=str(kb.project_id),
+                resource_id=str(kb_id),
+                after={"layer": "silver", "full": full, "personnel_records": personnel},
+            ),
+        )
+        await session.commit()
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -169,10 +201,10 @@ def build_parser() -> argparse.ArgumentParser:
     raw = commands.add_parser(
         "ingest-raw",
         help="ingest a raw-staging tree (file + <file>.meta.json) into a knowledge base (19)",
-        description="PII masking (regex identifiers and NER person names, pii_ner) is always "
-        "applied to silver and gold; raw is never written. PRSIM is ingested with name "
-        "masking; --accept-personnel-data is the M3 measurement mode (regex only, as "
-        "measured, KARARLAR).",
+        description="PII masking is always applied to silver and gold (pii_ner: regex "
+        "identifiers and NER person names, the default; pii_regex: identifiers only, for sources "
+        "without person data); raw is never written. PRSIM is ingested with name masking; "
+        "--accept-personnel-data is the M3 measurement mode (regex only, as measured, KARARLAR).",
     )
     raw.add_argument("--project", required=True, help="project key")
     raw.add_argument("--kb", required=True, help="knowledge base key")
@@ -190,6 +222,13 @@ def build_parser() -> argparse.ArgumentParser:
         help="first N accepted files only (stage 0: pipeline evidence, not an acceptance corpus)",
     )
     raw.add_argument(
+        "--text-filter",
+        choices=("pii_ner", "pii_regex"),
+        default=None,
+        help="pii_ner (default): identifiers and person names; pii_regex: identifiers only, for "
+        "sources without person data (no NER needed; PRSIM still needs pii_ner); both mask",
+    )
+    raw.add_argument(
         "--accept-personnel-data",
         action="store_true",
         default=False,
@@ -205,11 +244,21 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def _raw_text_filter(args) -> str:
-    """No option names the filter (masking cannot be named away, plan/19): new ingests mask
-    names too (`pii_ner`); the M3 measurement flag keeps `pii_regex` as measured (08 tam 1b)."""
+    """Masking cannot be named away (plan/19): both choices mask. New ingests mask names too
+    (`pii_ner`, the default); `--text-filter pii_regex` masks identifiers only, for sources
+    without person data (FOLLOWUP-174; PRSIM is still refused without NER); the M3 measurement
+    flag keeps `pii_regex` as measured (08 tam 1b) and contradicts an explicit `pii_ner`."""
     from ffcore.knowledge import raw_ingest
 
-    return raw_ingest.M3_TEXT_FILTER if args.accept_personnel_data else raw_ingest.TEXT_FILTER
+    if args.accept_personnel_data:
+        if args.text_filter not in (None, raw_ingest.M3_TEXT_FILTER):
+            raise raw_ingest.raw_staging.StagingError(
+                "text_filter_conflict",
+                "--accept-personnel-data is the M3 mode (pii_regex); it cannot run with "
+                f"--text-filter {args.text_filter}",
+            )
+        return raw_ingest.M3_TEXT_FILTER
+    return args.text_filter or raw_ingest.TEXT_FILTER
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -220,15 +269,16 @@ def main(argv: list[str] | None = None) -> int:
         from ffcore.knowledge import raw_staging
 
         try:
+            text_filter = _raw_text_filter(args)
             raw_staging.check_sources(
                 args.sources,
                 accept_personnel_data=args.accept_personnel_data,
-                text_filter=_raw_text_filter(args),
+                text_filter=text_filter,
             )
         except raw_staging.StagingError as exc:
             print(f"error: {exc}", file=sys.stderr)
             return 2
-        if _raw_text_filter(args) == "pii_ner" and any(map(raw_staging.is_prsim, args.sources)):
+        if text_filter == "pii_ner" and any(map(raw_staging.is_prsim, args.sources)):
             # PRSIM: still before logging and the database (exit 2, as before 08 tam 1b); other
             # sources are checked by ingest_tree before the first file.
             from ffcore.knowledge import raw_ingest
@@ -311,7 +361,7 @@ def main(argv: list[str] | None = None) -> int:
                         limit=args.limit,
                         settings=get_settings(),
                         accept_personnel_data=args.accept_personnel_data,
-                        text_filter=_raw_text_filter(args),
+                        text_filter=text_filter,
                     )
                 )
             except (raw_ingest.RawIngestError, raw_ingest.raw_staging.StagingError) as exc:

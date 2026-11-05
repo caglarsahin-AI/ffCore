@@ -188,6 +188,9 @@ def test_04a_9c_text_pdf_fallback_chain_without_docling(tmp_path, monkeypatch):
 # --- worker pool: a stuck file is killed, the others go on (D2) ---
 
 
+SLOW_TARGET_SLEEP_S = 600  # tests/unit/_convert_targets.py
+
+
 def test_04a_9d_timeout_kills_worker_and_continues(tmp_path):
     # The 2 s bound measures the files only: each fresh worker (the first, and the one after the
     # kill) starts under its own wide start timeout, so `fast` never races a spawn (FOLLOWUP-97).
@@ -204,7 +207,10 @@ def test_04a_9d_timeout_kills_worker_and_continues(tmp_path):
     )
     assert results["slow.txt"].status == TIMEOUT
     assert results["fast.txt"].status == CONVERTED and results["fast.txt"].text_md == "fast"
-    assert time.time() - started < 30
+    # FOLLOWUP-168 NOTE-5 (KARARLAR "Birim testinde mutlak süre sınırı yok"): the slow file sleeps
+    # 600 s, so finishing well before that proves the kill; the bound is only a wide hang guard
+    # (30 s failed under load at 33 s).
+    assert time.time() - started < SLOW_TARGET_SLEEP_S / 2
 
 
 def test_04a_persistent_pool_reuses_its_process_and_replaces_it_after_timeout(tmp_path):
