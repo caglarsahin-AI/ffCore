@@ -62,12 +62,13 @@ def context_invalid(message: str) -> ApiError:
     return ApiError(400, "invalid_request_error", "context_configuration_invalid", message)
 
 
-async def _agent(session, project_id: UUID, agent_id: UUID) -> Agent:
-    agent = await session.scalar(
-        select(Agent).where(
-            Agent.id == agent_id, Agent.project_id == project_id, Agent.deleted_at.is_(None)
-        )
+async def _agent(session, project_id: UUID, agent_id: UUID, *, lock: bool = False) -> Agent:
+    """`lock` (09-2 r2 MINOR-5, additive): the agent row FOR UPDATE, so a publish and a draft
+    edit of the same agent run one after the other (the gate checks what is published)."""
+    query = select(Agent).where(
+        Agent.id == agent_id, Agent.project_id == project_id, Agent.deleted_at.is_(None)
     )
+    agent = await session.scalar(query.with_for_update() if lock else query)
     if agent is None:
         raise not_found("agent")
     return agent
@@ -350,13 +351,18 @@ async def update_version(
 ):
     """Replace a draft's definition. A published version is never edited (409). A definition
     whose context_tokens exceed the model's context window or OLLAMA_CONTEXT_LENGTH is 400
-    `context_configuration_invalid` (C13)."""
-    agent = _native(await _agent(session, project_id, agent_id))
+    `context_configuration_invalid` (C13). A changed definition ends the version's queued and
+    running exams `failed(definition_changed)` in the same transaction (09-2 r2 MINOR-1)."""
+    from ffcore.evaluation.runner import end_exams_of_edited_version
+
+    agent = _native(await _agent(session, project_id, agent_id, lock=True))
     row = await _version(session, agent, version)
     if row.published_at is not None:
         raise conflict("version_published", "A published version cannot be edited.")
     await check_context(session, project_id, body.definition, settings)
-    row.definition = body.definition.model_dump(mode="json")
+    definition = body.definition.model_dump(mode="json")
+    await end_exams_of_edited_version(session, row, definition)
+    row.definition = definition
     await session.flush()
     await session.refresh(row)
     return version_out(row)
@@ -394,7 +400,7 @@ async def publish_agent(
         raise ApiError(
             422, "invalid_request_error", "force_reason_without_force", "force_reason needs force."
         )
-    agent = _native(await _agent(session, project_id, agent_id))
+    agent = _native(await _agent(session, project_id, agent_id, lock=True))  # r2 MINOR-5
     row = await _version(session, agent, body.version)
     definition = parse_definition(row.definition)
     # The model may have changed since the draft was saved: checked again (C13).

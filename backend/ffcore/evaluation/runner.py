@@ -405,6 +405,32 @@ def parse_csv_rows(text: str) -> list[list] | None:
     return reader[1:] if reader else []
 
 
+async def end_exams_of_edited_version(
+    session: AsyncSession, version: AgentVersion, definition: dict
+) -> int:
+    """09-2 r2 MINOR-1: a draft edit that changes the definition ends the version's queued and
+    running exams `failed(definition_changed)` in the edit's own transaction (not committed
+    here). A change and a change back between two advancer ticks could otherwise leave item
+    runs that loaded the other definition under an exam whose digest matches again. Item runs
+    already started finish unscored (bounded by the run timeout); the exam never completes."""
+    if definition_sha256(definition) == definition_sha256(version.definition):
+        return 0
+    ended = (
+        await session.scalars(
+            update(EvalRun)
+            .where(
+                EvalRun.agent_version_id == version.id,
+                EvalRun.status.in_(("queued", "running")),
+            )
+            .values(status="failed", error_code="definition_changed", ended_at=now_utc())
+            .returning(EvalRun.id)
+        )
+    ).all()
+    for ev_id in ended:
+        log.warning("eval_definition_changed eval_run=%s version=%s by=edit", ev_id, version.id)
+    return len(ended)
+
+
 async def _definition_changed(
     session: AsyncSession, ev: EvalRun, version: AgentVersion, *, close: CloseFn | None
 ) -> bool:
