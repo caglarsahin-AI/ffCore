@@ -18,3 +18,6 @@ INFO  [alembic.runtime.migration] Running upgrade 06b_0001 -> 09_0001, 09: eval_
 09_0001 (07, 05a, 06a, 09, 06b, 03c, 04a, 03a, 08, 03b) (head)
 exit=0
 == make test-int DEPLOY_PROFILE=llmaas 2026-11-05T11:31:24+03:00
+=========== 892 passed, 13 skipped, 2 warnings in 822.12s (0:13:42) ============
+exit=0
+== make test-int DEPLOY_PROFILE=airgap 2026-11-05T11:45:22+03:00

@@ -1965,3 +1965,10 @@ Paket: fix/19r3-env-tests r2 (paycoreLLM)   Cevap: K-19R3-0009
 - MAJOR-1 KAPANDI (karar A): iki OCR komutu bayraklı, 7.3 metni, `ner_unavailable` sorun giderme satırı.
 - `test_19r3_8` bütün runbook `ingest-raw` satırlarını denetliyor; f2dfe47'de düşer.
 - NOTE-7 de kapandı. Bayraksız başka komut yok. Yeni bulgu yok.
+
+### R-08T1C-0001 · 2026-11-05 11:34 · → koordinator · ACK
+Paket: 08-tam-1c-a r1   Cevap: K-08T1C-0007
+a4ec5f565c076a232e392f93557ffdf10d1cb69b doğrulandı (13 commit, 17 dosya, `state/` 0). İnceleyici worktree `.worktrees/review-08t1c-a-r1` (temiz). 09-1 r3 gelirse ikinci sırada.
+
+### R-08T1C-0002 · 2026-11-05 11:34 · → koordinator · YIGIN-AC
+Yığın review-08t1c, 18290/13290, yalın (postgres, redis, litellm, fake-llm, qdrant + tools), dalın `.env.test`'i, --pull never. Açık FF yığınları: ffcore-09 + review-08t1c = 2. Disk boş 105 GB. Kapanış down -v + YIGIN-KAPA.
