@@ -175,16 +175,17 @@ def test_09_r2_minor5_cancelled_tick_without_progress_counts_and_reraises(monkey
 
 
 def test_09_r2_major3_mcp_sql_refusal_and_db_error_are_tool_errors():
-    from mcp.server.mcpserver.exceptions import ToolError
+    from mcp.types import CallToolResult
 
     from ffcore.services import mcp_sql_server
 
     rows = "n\n3\nrows: 1"
     assert mcp_sql_server.checked(rows) == rows
     for text in ("sql_rejected: sql_not_select (UPDATE)", "sql_error: 42703 (no column nope)"):
-        with pytest.raises(ToolError) as err:
-            mcp_sql_server.checked(text)
-        assert str(err.value) == text  # the model still reads the code and corrects the query
+        out = mcp_sql_server.checked(text)
+        assert isinstance(out, CallToolResult) and out.is_error
+        # The exact text, no SDK prefix: the model reads the code and corrects the query.
+        assert [c.text for c in out.content] == [text]
 
 
 def test_09_r2_major3_tool_outcome_carries_the_sql_code(monkeypatch):

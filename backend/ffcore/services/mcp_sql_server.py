@@ -17,6 +17,7 @@ from typing import Annotated
 import psycopg
 from mcp.server.mcpserver import Context, MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
+from mcp.types import CallToolResult, TextContent
 from pydantic import Field
 
 from ffcore.core.config import Settings
@@ -51,11 +52,12 @@ def format_context(body: dict) -> str:
     return "\n".join(lines)
 
 
-def checked(text: str) -> str:
+def checked(text: str) -> str | CallToolResult:
     """run_sql's answer: rows as text; a refusal or a database error as a tool error with the
-    same coded text (09-1 r2 MAJOR-r2-3, 05a additive)."""
+    same coded text (09-1 r2 MAJOR-r2-3, 05a additive). Returned, not raised: the SDK prefixes a
+    raised ToolError's text ("Error executing tool …"), and the text must start with its code."""
     if mcp_sql.error_code(text) is not None:
-        raise ToolError(text)
+        return CallToolResult(content=[TextContent(type="text", text=text)], is_error=True)
     return text
 
 
