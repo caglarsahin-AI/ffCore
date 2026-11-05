@@ -76,6 +76,7 @@ def _window_settings(open_now: bool):
     return SimpleNamespace(
         eval_judge_calls_per_tick=20,
         llm_call_timeout_s=60,
+        eval_judge_call_s=60,
         background_window=f"{start:%H:%M}-{end:%H:%M}",
         background_window_weekends=False,
         background_window_tz="Europe/Istanbul",

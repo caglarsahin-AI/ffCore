@@ -853,6 +853,7 @@ def test_09_r1_minor8_a_good_tick_resets_the_failure_count(monkeypatch):
     settings = SimpleNamespace(
         eval_judge_calls_per_tick=1,
         llm_call_timeout_s=60,
+        eval_judge_call_s=60,
         background_window="",
         background_window_weekends=False,
         background_window_tz="Europe/Istanbul",

@@ -60,3 +60,63 @@ def test_09_r4_note9_judge_ner_outage_is_logged_without_content(monkeypatch, cap
     (record,) = [r for r in caplog.records if "eval_judge_ner_unavailable" in r.getMessage()]
     assert record.levelno == logging.WARNING
     assert "Ayşe" not in record.getMessage() and TEXT not in record.getMessage()
+
+
+# --- KARARLAR "09-1 r4 kararı, düzeltme" (B-09-0038 B): EVAL_JUDGE_CALL_S plans judge calls ----
+
+
+def test_09_r4b_judge_call_estimate_is_configured_and_bounded_by_a_tick(monkeypatch):
+    import pytest
+    from pydantic import ValidationError
+
+    from tests.unit.test_09_engine import _full
+
+    assert _full().eval_judge_call_s == 60
+    monkeypatch.setenv(
+        "EVAL_JUDGE_CALL_S", str(worker_tick.TICK_TIMEOUT_S - worker_tick.TICK_MARGIN_S)
+    )
+    assert _full().eval_judge_call_s == 570
+    monkeypatch.setenv("EVAL_JUDGE_CALL_S", "571")
+    with pytest.raises(ValidationError):
+        _full()
+
+
+def test_09_r4b_tick_plans_with_the_estimate_not_the_hard_timeout():
+    settings = _window_settings(open_now=True)
+    settings.llm_call_timeout_s, settings.eval_judge_call_s = 600, 45
+    assert worker_tick.tick_budget(settings).call_s == 45.0
+
+
+def test_09_r4b_start_refuses_a_plan_longer_than_a_tick(monkeypatch):
+    from types import SimpleNamespace
+
+    import pytest
+
+    from ffcore.core.errors import ApiError
+    from ffcore.evaluation import runner
+    from tests.unit.test_09_engine import _ItemsApi, _StartSession, _suite, _version
+
+    async def no_audit(session, entry):
+        pass
+
+    monkeypatch.setattr(runner, "write_event", no_audit)
+    settings = SimpleNamespace(eval_max_item_runs=500, eval_judge_call_s=60)
+
+    def start(suite):
+        return anyio.run(
+            lambda: runner.start_eval(
+                _StartSession(),
+                settings,
+                suite=suite,
+                version=_version(),
+                starter=runner.Starter("u", "user", "u", "req", None),
+                api=_ItemsApi(None),
+            )
+        )
+
+    judged = [{"name": "llm_judge"}]
+    with pytest.raises(ApiError) as err:
+        start(_suite(scorers=judged, repeat=10))  # 10 x 60 s > 570 s
+    assert (err.value.status_code, err.value.code) == (422, "eval_plan_exceeds_tick")
+    start(_suite(scorers=judged, repeat=9))  # 540 s fits
+    start(_suite(scorers=[{"name": "contains"}], repeat=10))  # no judge: one call each
