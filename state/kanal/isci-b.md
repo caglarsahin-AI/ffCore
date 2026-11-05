@@ -1950,3 +1950,35 @@ Seçenekler:
 - A: karar aynen kalır, docs uyarır: airgap CPU'da `llm_judge` kullanılmaz ya da `LLM_CALL_TIMEOUT_S` < 570 s olmalı. Etki: kod değişmez, ama airgap'te judge pratikte kapalı.
 - C: tick süresi çağrı süresine göre büyür (`TICK_TIMEOUT_S = max(600, LLM_CALL_TIMEOUT_S × repeat + marj)`). Etki: uzun tick'ler sırayı ve diğer sınavları geciktirir; cron `timeout` değeri ayardan türer.
 Bu sırada A + ek'i kararın lafzıyla uyguluyorum. B seçilirse değişecek tek yer `tick_budget`'in `call_s` kaynağı ve başlatma denetimi. PR-HAZIR r5'i cevaba kadar tutuyorum.
+
+### B-09-0039 · 2026-11-05 14:15 · → koordinator · YIGIN-KAPA
+Paket: 09-1 r5   Cevap: K-09-0027
+`ffcore-09` `down -v` ile kapatıldı (konteyner 0, volume 0).
+
+### B-09-0040 · 2026-11-05 14:16 · → koordinator · PR-HAZIR
+Paket: 09-1 r5   Cevap: K-09-0027 / K-09-0029
+PR: state/pr/09.md, bölüm "PR 09-1 r5" · Sınıf [B]. Branch feat/09-evaluation · SHA **b443a54b15688404e4fb63bcdc0ded32482049de**. Delta `b424013..b443a54`, 5 commit:
+- 0fab628: test.
+- 97176e2: A + ek kodu.
+- 9719347: B testleri.
+- 1458fa4: B kodu.
+- b443a54: docs.
+Ağaç temiz; main'e göre farkta `state/` yok.
+Düzeltmeler:
+- MAJOR-r4-1 (A): ilk madde de planlanan süreyi ister. Sığmazsa sınav bekler, commit yok, sırası korunur.
+- Ek: plan tick'ten uzunsa madde hemen `judge_out_of_time` olur, not `planned_exceeds_tick_budget`.
+- B: planlama `EVAL_JUDGE_CALL_S` ile (C12 additive, varsayılan 60, `le=570`). Başlatmada 422 `eval_plan_exceeds_tick`.
+- MINOR-r4-1: docstring'ler.
+- NOTE-1: docs ve PR r4 not 2 düzeltildi.
+- NOTE-5: docs'ta `ner_unavailable` → `complete=false`.
+- NOTE-9: warning log.
+- Kalan NOTE'lar FOLLOWUP-176'ya işaret ediyor.
+Kırmızı kanıt (state/evidence/09-1-r5-red-unit.log):
+- b424013 koduyla, `git archive` kopyası ve `data/samples` dahil: 5 failed.
+- B testleri: 3 failed.
+Kapılar @ b443a54 (state/evidence/09-1-r5-gates.log):
+- build, config, lint (iki profil): yeşil.
+- make test: 1724 / 1724.
+- Hedefli test-int (09 + 05a + 18td): 109 passed / 1 skipped, her iki profilde.
+- seed + seed-eval; stack sınavı 8 passed; smoke passed.
+Not: 0fab628 bir import sırası için amend edildi (yerel, push edilmemiş). Dala başka commit atmıyorum; delta inceleme bekliyorum.
