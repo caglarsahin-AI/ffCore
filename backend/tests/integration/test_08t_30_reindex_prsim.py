@@ -13,7 +13,7 @@ import uuid
 import pytest
 
 from ffcore import cli
-from ffcore.knowledge import ingest
+from ffcore.knowledge import ingest, jobs
 from ffcore.knowledge.jobs import get_vector_store
 from tests.converters import convert_without_weights
 from tests.integration.conftest import audit_rows
@@ -128,3 +128,43 @@ def test_08t1c_3b_reindex_api_ok_without_personnel(world, pg, settings, queue, t
         ("reindex_job", kb["id"], "gold", True),
         ("reindex_job", plain["id"], "silver", True),
     ]
+
+
+def _cli_reindex(pg, world, kb, *extra):
+    return cli.main(
+        ["reindex", "--project", _project_key(pg, world["project"]), "--kb", kb["key"], *extra]
+    )
+
+
+def test_08t1c_4_reindex_m3_logged_and_audited(
+    world, pg, settings, queue, tmp_path, caplog, monkeypatch
+):
+    """FOLLOWUP-172 N2: the M3 mode of reindex is visible, as ingest-raw's is: a warning with the
+    number of personnel-data records, and an audit event of the system actor (no content)."""
+    kb = _m3_failed_prsim(world, pg, settings, tmp_path, "prsim-reindex-m3-audit")
+    caplog.set_level("WARNING", logger="ffcore.knowledge.ingest")
+    monkeypatch.setattr(jobs, "get_queue", lambda s: queue)  # the CLI's queue: the fake
+    flags = ("--layer", "silver", "--accept-personnel-data")
+    assert _cli_reindex(pg, world, kb, *flags) == 0
+    assert [job[0] for job in queue.jobs] == ["reindex_job"]
+    warnings = [r.getMessage() for r in caplog.records if r.name == "ffcore.knowledge.ingest"]
+    assert any("accept_personnel_data" in m and "records=1" in m for m in warnings), warnings
+    ((actor, outcome, after),) = audit_rows(
+        pg, "reindex_personnel_data_accepted", project=world["project"]
+    )
+    assert (actor, outcome) == ("cli", "success")
+    assert after == {"layer": "silver", "full": False, "personnel_records": 1}
+    assert "Ayşe" not in str(after) and "PRSIM-1" not in str(after)
+
+
+def test_08t1c_4b_accept_flag_with_gold_refused(
+    world, pg, settings, queue, tmp_path, capsys, monkeypatch
+):
+    """The flag concerns silver only; with --layer gold it was silently without effect."""
+    kb = _m3_failed_prsim(world, pg, settings, tmp_path, "prsim-reindex-m3-gold")
+    monkeypatch.setattr(jobs, "get_queue", lambda s: queue)  # the CLI's queue: the fake
+    flags = ("--layer", "gold", "--accept-personnel-data")
+    assert _cli_reindex(pg, world, kb, *flags) == 2
+    assert queue.jobs == []
+    assert "flag_not_applicable" in capsys.readouterr().err
+    assert audit_rows(pg, "reindex_personnel_data_accepted", project=world["project"]) == []
