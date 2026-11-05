@@ -157,9 +157,11 @@ the scores and commits each item on its own. A separate follower task of the wor
 item runs listened, so a long tick never abandons them.
 
 A tick has a budget, shared by the exams it advances in a fixed order (the oldest progress
-first); its deadline is 30 s before the tick's own 600 s timeout (570 s). A judge call is
-planned at `EVAL_JUDGE_CALL_S` (an estimate; `LLM_CALL_TIMEOUT_S` stays the hard limit of each
-call), an item without a judge at one such call. Rules:
+first). Its deadline is 30 s before the tick's own 600 s timeout (570 s after it starts); of
+that, a tick may spend up to 30 s before its first item, which leaves a usable window of 540 s
+(`TICK_PLAN_S`). A judge call is planned at `EVAL_JUDGE_CALL_S`, an estimate;
+`LLM_CALL_TIMEOUT_S` stays the hard limit of each call. An item without a judge is planned at
+one `EVAL_JUDGE_CALL_S` too. Rules:
 
 - No judge call while `BACKGROUND_WINDOW` is closed (the judge is a background model call).
 - Every item, a tick's first one too, starts only if its planned time fits before the
@@ -168,17 +170,25 @@ call), an item without a judge at one such call. Rules:
   only if its judge calls fit in what is left of it. So a tick makes at most
   `EVAL_JUDGE_CALLS_PER_TICK` judge calls per exam, or the first item's calls (`repeat`) when
   that is more.
-- An item still cut at the deadline `MAX_ATTEMPTS` ticks in a row ends as an error
-  (`judge_out_of_time`) and the exam moves on. An item whose plan is longer than a whole tick
-  ends at once (`judge_out_of_time`, note `planned_exceeds_tick_budget`); starting such an exam
-  is refused up front when it has `llm_judge`: `422 eval_plan_exceeds_tick` (`repeat` x
-  `EVAL_JUDGE_CALL_S` > 570 s).
+- A plan up to 540 s can start in a tick; a longer one can start in none. Such an item ends
+  at once (`judge_out_of_time`, note `planned_exceeds_tick_budget`), and starting an exam with
+  `llm_judge` whose `repeat` x `EVAL_JUDGE_CALL_S` is over 540 s is refused up front:
+  `422 eval_plan_exceeds_tick`. Nothing in between waits forever.
+- An item running past the deadline is cut. The cut counts only if the item started with a
+  full window: its calls at `LLM_CALL_TIMEOUT_S`, at most 540 s. A cut in a shorter window
+  (earlier exams used the tick) counts nothing and commits nothing; the exam keeps its place
+  and gets a full window first. An item cut in a full window `MAX_ATTEMPTS` ticks in a row ends
+  as an error (`judge_out_of_time`) and the exam moves on. So `EVAL_JUDGE_CALL_S` only decides
+  whether an item is worth starting in a tick, never whether it fails.
+- A single call is never longer than the tick allows: with `LLM_CALL_TIMEOUT_S` above 540 s
+  the tick still cuts it at its deadline (at most 570 s after the tick starts), and that cut
+  counts when the item had the full 540 s window.
 - Scores an earlier, cut attempt of such an item already wrote to Langfuse stay there (upserted
   by id); the exam's own result in FFCore is the error.
 
-A closed window or a slow judge never fails an exam by itself. On airgap with a CPU judge
-(`LLM_CALL_TIMEOUT_S` 600 s) measure one judge call and set `EVAL_JUDGE_CALL_S` to it; keep
-`repeat` x `EVAL_JUDGE_CALL_S` under 570 s.
+A closed window or a slow judge never fails an exam by itself. Set `EVAL_JUDGE_CALL_S` to an
+upper-end estimate of one judge call (on airgap with a CPU judge, `LLM_CALL_TIMEOUT_S` 600 s,
+measure it), and keep `repeat` x `EVAL_JUDGE_CALL_S` at most 540 s.
 
 Runs that ask the user a question are cancelled (`not_run: waiting_user`). Runs that wait for a
 tool approval are cancelled as `not_run: approval_required` (their pending approval is closed,
@@ -228,4 +238,4 @@ version you trust, not on one run.
 | `EVAL_ADVANCE_INTERVAL_S` | advancer tick; divides 60 and stays below `RUN_ABANDON_GRACE_S` |
 | `EVAL_MAX_ITEM_RUNS` | most items x `repeat` in one exam (default 500) |
 | `EVAL_JUDGE_CALLS_PER_TICK` | judge calls per exam per advancer tick (default 20) |
-| `EVAL_JUDGE_CALL_S` | planned seconds of one judge call (default 60, at most 570); not the hard limit (`LLM_CALL_TIMEOUT_S`) |
+| `EVAL_JUDGE_CALL_S` | planned seconds of one judge call, an upper-end estimate (default 60, at most 540); not the hard limit (`LLM_CALL_TIMEOUT_S`) |
