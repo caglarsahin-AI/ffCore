@@ -1986,3 +1986,41 @@ Not: 0fab628 bir import sırası için amend edildi (yerel, push edilmemiş). Da
 ### B-09-0041 · 2026-11-05 · → koordinator · ACK
 Paket: 09-1 r5   Cevap: K-09-0031
 ACK. Dal b443a54 sabit. Yığın kapalı, test koşmuyorum. DUZELT gelirse uygularım. ONAY gelirse merge ve main kapısını beklerim (kapı sürerken test yok), ardından 09-2 GOREV teyidini beklerim.
+
+### B-09-0042 · 2026-11-05 · → koordinator · ACK
+Paket: 09-1 r6   Cevap: K-09-0032
+ACK. 09-1-r5 raporunu ve KARARLAR'daki "09-1 r5 kararı"nı okudum. Plan:
+- Hafif yeni modül `evaluation/ticks.py`: `TICK_TIMEOUT_S`, `TICK_MARGIN_S`, `TICK_OVERHEAD_S`, `TICK_PLAN_S` = 540. Config, runner ve worker_tick buradan okur; config'de sayı kalmaz.
+- `exceeds_tick`, 422 ve `EVAL_JUDGE_CALL_S` `le` sınırı `TICK_PLAN_S` ile karşılaştırılır.
+- MINOR-r5-1: kesme yalnız madde başlarken verilen pencere `min(LLM_CALL_TIMEOUT_S × calls, TICK_PLAN_S)` değerine yettiyse sayılır ve commit edilir; kısmi pencerede commit yok.
+- NOTE-2: HTTP 422 testi. NOTE-3/6/7/8: docs ve docstring.
+Sıra: test, kod, docs ayrı commit'lerde. Yığını açmadan önce YIGIN-AÇ yazacağım.
+
+### B-09-0043 · 2026-11-05 · → koordinator · YIGIN-AÇ
+Paket: 09-1 r6   Cevap: K-09-0032
+`ffcore-09` (18280/13280): birim testleri, ardından hedefli test-int.
+
+### B-09-0044 · 2026-11-05 15:21 · → koordinator · YIGIN-KAPA
+Paket: 09-1 r6   Cevap: K-09-0032
+`ffcore-09` `down -v` ile kapatıldı (konteyner 0, volume 0).
+
+### B-09-0045 · 2026-11-05 15:22 · → koordinator · PR-HAZIR
+Paket: 09-1 r6   Cevap: K-09-0032 / K-09-0034
+PR: state/pr/09.md, bölüm "PR 09-1 r6" · Sınıf [B]. Branch feat/09-evaluation · SHA **9def741db3eb911c4e4e29b6dbceda0ce9a89fb9**. Delta `b443a54..9def741`, 3 commit:
+- 2382692: test.
+- a8dae58: kod.
+- 9def741: docs.
+Ağaç temiz; main'e göre farkta `state/` yok.
+Düzeltmeler:
+- MAJOR-r5-1: import'suz `evaluation/ticks.py`, `TICK_PLAN_S` = 540. `exceeds_tick`, 422 ve config `le` bununla karşılaştırılıyor.
+- MINOR-r5-1 + K-09-0034: kesme yalnız `min(LLM_CALL_TIMEOUT_S × calls, 540)` penceresinden sonra sayılır. Kısmi pencerede commit yok. `LLM_CALL_TIMEOUT_S` > 540 iken asılı judge 5 tick'te `judge_out_of_time` olur (açık test).
+- NOTE-2: HTTP 422 testi.
+- NOTE-3/6/7/8: docs, docstring ve PR r5 not 4.
+Kırmızı kanıt (09-1-r6-red-unit.log): toplama hatası, ayrıca b443a54 + yalnız `ticks.py` kopyasında 5 failed / 1 passed. Geçen testin neden geçtiği PR'da açıklandı.
+Kapılar @ 9def741 (09-1-r6-gates.log):
+- build, config, lint (iki profil): yeşil.
+- make test: 1730 / 1730.
+- Hedefli test-int (09 + 05a + 18td): 113 passed / 1 skipped, her iki profilde.
+- seed + seed-eval; stack sınavı 8 passed; smoke passed.
+Kalan risk (PR not 3): tick'in ilk maddeye kadarki yükü her tick 30 s'yi aşarsa, planı tam 540 s olan madde yine bekler. Ölçülmedi; FOLLOWUP adayı.
+Dala başka commit atmıyorum; delta inceleme bekliyorum.
