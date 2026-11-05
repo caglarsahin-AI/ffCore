@@ -9,6 +9,8 @@ from typing import Annotated, Literal
 from pydantic import Field, SecretStr, field_validator, model_validator
 from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
+from ffcore.evaluation.ticks import TICK_PLAN_S
+
 CommaList = Annotated[list[str], NoDecode]
 
 
@@ -178,9 +180,9 @@ class Settings(BaseSettings):
     # tick stays short (09-1 r1 MAJOR-2).
     eval_judge_calls_per_tick: int = Field(default=20, gt=0)
     # Planned length of one judge call (09-1 r4 decision, correction): what a tick plans with,
-    # not the hard limit (LLM_CALL_TIMEOUT_S stays that). At most one tick's budget
-    # (evaluation.runner.TICK_BUDGET_S, 600 - 30 s); a CPU judge (airgap) sets its own.
-    eval_judge_call_s: int = Field(default=60, gt=0, le=570)
+    # not the hard limit (LLM_CALL_TIMEOUT_S stays that). At most the usable window of a tick
+    # (evaluation.ticks.TICK_PLAN_S, r5 MAJOR-r5-1); a CPU judge (airgap) sets its own.
+    eval_judge_call_s: int = Field(default=60, gt=0, le=TICK_PLAN_S)
 
     # --- 03c governance ---
     # Wrong API keys from one client address per minute before 429 too_many_auth_failures.

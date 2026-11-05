@@ -36,6 +36,7 @@ from ffcore.evaluation.engine import (
 )
 from ffcore.evaluation.langfuse_api import LangfuseApi, LangfuseApiError
 from ffcore.evaluation.scorers import Score
+from ffcore.evaluation.ticks import TICK_PLAN_S
 from ffcore.models.agents import Agent, AgentVersion
 from ffcore.models.approvals import Approval
 from ffcore.models.eval import EvalRun, EvalSuite
@@ -68,13 +69,6 @@ class Starter:
     ip: str | None
 
 
-# arq cron timeout of one advancer tick. The tick's own budget ends TICK_MARGIN_S before it
-# (r2 MAJOR-r2-2), so a slow judge stops the tick on time instead of being cancelled.
-TICK_TIMEOUT_S = 600
-TICK_MARGIN_S = 30
-TICK_BUDGET_S = TICK_TIMEOUT_S - TICK_MARGIN_S
-
-
 def _always() -> bool:
     return True
 
@@ -91,9 +85,12 @@ class Budget:
     deadline: float | None = None
     call_s: float = 0.0
     is_open: Callable[[], bool] = field(default=_always)
-    # The whole tick's length (deadline - margin, r4 MAJOR-r4-1 ek): an item planned longer
-    # than this can start in no tick. None: no such check (tests).
+    # The usable window of a tick (ticks.TICK_PLAN_S, r5 MAJOR-r5-1): an item planned longer
+    # can start in no tick. None: no such check (tests).
     total_s: float | None = None
+    # The hard limit of one model call (LLM_CALL_TIMEOUT_S): a cut counts only after a full
+    # window, min(hard_s x calls, total_s) (r5 MINOR-r5-1, K-09-0034). None: every cut counts.
+    hard_s: float | None = None
     started: int = 0
     committed: int = 0
 
@@ -115,6 +112,20 @@ class Budget:
         return self.deadline is None or (
             time.monotonic() + self.call_s * max(calls, 1) <= self.deadline
         )
+
+    def full_window(self, calls: int) -> float | None:
+        """The window an item must have had for its cut to count: its calls at the hard limit,
+        at most the usable window (a limit above it still counts after a whole tick)."""
+        if self.hard_s is None:
+            return None
+        need = self.hard_s * max(calls, 1)
+        return need if self.total_s is None else min(need, self.total_s)
+
+    def counts_cut(self, calls: int, window: float | None) -> bool:
+        """Whether a cut of an item that started with `window` seconds counts (r5 MINOR-r5-1).
+        A cut in a partial window (an earlier exam used the tick) is not the item's fault."""
+        need = self.full_window(calls)
+        return need is None or window is None or window >= need
 
     def exceeds_tick(self, calls: int) -> bool:
         """The item's planned time is longer than a whole tick: no tick could ever start it."""
@@ -185,7 +196,7 @@ async def start_eval(
     item runs (in the background, resumable: a start that dies halfway goes on next tick)."""
     if any(c.get("name") == "llm_judge" for c in suite.scorers):
         planned = settings.eval_judge_call_s * suite.repeat
-        if planned > TICK_BUDGET_S:
+        if planned > TICK_PLAN_S:
             # A judged item (repeat calls) that fits in no tick: refused before anything is
             # written (09-1 r4 decision, correction), not left to end judge_out_of_time.
             raise ApiError(
@@ -193,7 +204,7 @@ async def start_eval(
                 "invalid_request_error",
                 "eval_plan_exceeds_tick",
                 f"repeat {suite.repeat} x EVAL_JUDGE_CALL_S {settings.eval_judge_call_s} s = "
-                f"{planned} s; one advancer tick has {TICK_BUDGET_S} s.",
+                f"{planned} s; one advancer tick has {TICK_PLAN_S} s.",
             )
     items = [
         i
@@ -459,7 +470,8 @@ async def advance_eval(
             # running and waits for a later tick (r2 MAJOR-r2-2); not a failure.
             break
         budget.started += 1
-        timer = asyncio.timeout(budget.time_left())
+        window = budget.time_left()
+        timer = asyncio.timeout(window)
         try:
             async with timer:
                 entry["result"] = await _score_item(
@@ -477,6 +489,16 @@ async def advance_eval(
         except TimeoutError:
             if not timer.expired():
                 raise
+            if not budget.counts_cut(calls, window):
+                # r5 MINOR-r5-1: a partial window; nothing counted or committed, so the exam
+                # keeps its place and gets a full window first in a later tick.
+                log.info(
+                    "eval_tick_cut_partial eval_run=%s item=%s window_s=%.1f",
+                    ev.id,
+                    item_id,
+                    window,
+                )
+                break
             # r3 MAJOR-r3-1 (A): consecutive cuts are counted per item; at MAX_ATTEMPTS the
             # item ends `error(judge_out_of_time)` and the exam goes on (never running forever).
             entry["timeouts"] = entry.get("timeouts", 0) + 1

@@ -149,7 +149,7 @@ async def audit_partitions(ctx) -> None:
 
 
 def _eval_tick_timeout() -> int:
-    from ffcore.evaluation.worker_tick import TICK_TIMEOUT_S
+    from ffcore.evaluation.ticks import TICK_TIMEOUT_S
 
     return TICK_TIMEOUT_S
 
