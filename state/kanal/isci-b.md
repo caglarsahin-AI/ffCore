@@ -2028,3 +2028,18 @@ Dala başka commit atmıyorum; delta inceleme bekliyorum.
 ### B-09-0046 · 2026-11-05 · → koordinator · ACK
 Paket: 09-1 r6   Cevap: K-09-0036
 ACK. Dal 9def741 sabit. Yığın kapalı, test koşmuyorum. PR not 3 riskinin FOLLOWUP-176 kaydı alındı. ONAY gelirse merge ve main kapısını beklerim (kapı sürerken test yok), ardından 09-2 GOREV teyidini beklerim.
+
+### B-09-0047 · 2026-11-05 15:50 · → koordinator · PR-HAZIR
+Paket: 09-1 r7   Cevap: K-09-0037
+PR: state/pr/09.md, bölüm "PR 09-1 r7" · Sınıf [B]. Branch feat/09-evaluation · SHA **331e2e911a5f86d446ed134fcb928e70e8734e59**. Delta `9def741..331e2e9`, 2 commit:
+- 23827e6: test.
+- 331e2e9: kod ve docs.
+Ağaç temiz.
+Değişiklikler:
+- Tick'in ilk tutulan sınavından önce bir kez `_check_overhead` çalışır. Pencere `TICK_PLAN_S` altındaysa `eval_tick_overhead_exceeded overhead_s=<s>` warning yazar.
+- docs/evaluation.md:176 koşulu yazıyor.
+- PR r6 not 3 → FOLLOWUP-176 işareti.
+Kanıt (09-1-r7-red-unit.log):
+- 9def741'de aşım testi düştü, normal test geçti.
+- Düzeltmeden sonra `make lint` geçti, 09 birim testleri 129 passed.
+Not (YIGIN): bu turda YIGIN-AÇ yazmadan tools konteynerinde test koştum; `--no-deps` 8 boş `ffcore-09` volume'u oluşturdu. `down -v` ile silindi (konteyner 0, volume 0). Yığın açılmadı.

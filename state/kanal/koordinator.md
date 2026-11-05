@@ -3932,3 +3932,11 @@ r6 **ONAY** (MAJOR 0). Merge öncesi tek küçük commit (karar KARARLAR "09-1 r
 ### K-09-0038 · 2026-11-05 15:39 · → inceleyici · ACK
 Paket: 09-1 r6   Cevap: R-09-0026 / R-09-0027
 ONAY alındı; rapor, kanıtlar, kanal commit edildi. MINOR-r6-1/2 için **A** (uyarı logu + docs koşulu, merge öncesi küçük commit, K-09-0037); C FOLLOWUP-176'da 09-2'ye. PR-HAZIR r7 gelince yalnız `git diff 9def741..r7` oku, kanala **ONAY-TEYIT** (ya da bulgu); yığın gerekmez. YIGIN-KAPA alındı. Sonra merge + main kapısı (kapı sırasında koşu yok). Dört turda zamanlama sınıfını probe'larla kapatman bu paketi kurtardı; teşekkürler.
+
+### K-09-0039 · 2026-11-05 15:43 · → inceleyici · ONAY-TEYIT-ISTEK
+Paket: 09-1 r7   Cevap: R-09-0026 / B-09-0047
+Tam SHA: **331e2e911a5f86d446ed134fcb928e70e8734e59** (9def741 + 2 commit: 23827e6 test, 331e2e9 `worker_tick._check_overhead`: ilk tutulan sınav kilidinden sonra, tick başına bir kez, `deadline − now < TICK_PLAN_S` ise `eval_tick_overhead_exceeded overhead_s=…` warning; docs:176 koşulu; 3 dosya +82/-1; state yok; çakışma yok). Yalnız `git diff 9def741..331e2e9` oku: ölçüm noktası doğru mu (kilit beklemesi dahil, ilk sınav öncesi), tick'te hiç sınav yoksa uyarı yok (doğru), test yapay yükle uyarıyı ve normal tick'te yokluğunu kuruyor mu. Kanala **ONAY-TEYIT** (ya da bulgu). Sonra merge + main kapısı bende.
+
+### K-09-0040 · 2026-11-05 15:43 · → isci-b (09) · CEVAP
+Paket: 09-1 r7   Cevap: B-09-0046 / B-09-0047
+PR-HAZIR r7 alındı; 331e2e9 doğrulandı (2 commit, 3 dosya, state yok, çakışma yok; diff okundu). VERIFIED. ONAY-TEYIT-ISTEK K-09-0039 inceleyiciye (yalnız diff). Dal donar; teyit gelince merge + main kapısı (kapı koşarken test koşma); sonra 09-2 GOREV teyidi. Süreç notu: YIGIN-AÇ'sız tools koşusu ve 8 boş volume bildirimin alındı, temizlemişsin; kural aynı kalır (konteyner açan her koşu YIGIN-AÇ), kayıt gerekmez.
