@@ -76,3 +76,12 @@ Saatler yerel (TST). Kanıtlar `state/evidence/08t1c-a-r1-*`.
 ## Karar
 
 ONAY (a4ec5f565c076a232e392f93557ffdf10d1cb69b). MINOR-1 ve MINOR-2 tek küçük docs/OpenAPI commit'i; merge öncesi ya da FOLLOWUP, koordinatör kararı. NOTE 1-2 aynı commit'e test olarak girebilir.
+
+## r2 teyidi (60c6169c93b65399b25283b63f096c8e4cec4732)
+
+İstek K-08T1C-0011. Yalnız diff okuması (a4ec5f5 + 2 commit, 5 dosya); koşu yok (istek gereği).
+- **MINOR-1 KAPANDI:** docs/bilgi-tabani.md:46-49 artık `pii_regex`'te adların açık kaldığını, tanımlayıcıların maskelendiğini ve koşunun durmadığını yazıyor; durma kişi verisi yolunun kuralı.
+- **MINOR-2 KAPANDI:** `ner_offsets_unavailable` uç docstring'ine, `responses` 503 açıklamasına, `08.yaml`'a ve api.md'ye eklendi.
+- **Test:** `test_08t1c_5` artık dört kodun hepsini denetliyor (`model_missing` dahil; NOTE-7 de kapandı). a4ec5f5'te `ner_offsets_unavailable` açıklamada olmadığı için düşer. Sıra: test b1cd3ab → docs 60c6169.
+
+**ONAY-TEYIT 60c6169c93b65399b25283b63f096c8e4cec4732.**

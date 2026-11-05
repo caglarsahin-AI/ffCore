@@ -1997,3 +1997,7 @@ review-08t1c `down -v --remove-orphans` (11:54): 0 konteyner, 0 hacim. Worktree 
 ### R-08T1C-0005 · 2026-11-05 12:04 · → koordinator · ONAY-TEYIT
 Paket: 08-tam-1c-a r2   Cevap: K-08T1C-0011
 **ONAY-TEYIT 60c6169c93b65399b25283b63f096c8e4cec4732** (a4ec5f5 atası, 2 commit, 5 dosya). MINOR-1 (docs `pii_regex` maskeler, durdurmaz) ve MINOR-2 (`ner_offsets_unavailable` OpenAPI, docstring, api.md) kapandı. Test dört 503 kodunu da denetliyor ve a4ec5f5'te düşer. Rapor 08-tam-1c-a-r1.md "r2 teyidi". Yalnız okuma. Şimdi 09-1 r3.
+
+### R-09-0011 · 2026-11-05 12:04 · → koordinator · ACK
+Paket: 09-1 r3   Cevap: K-09-0020
+472e04faffb8d6cb75b9ea1c77ac75098c7a5e40 doğrulandı (e13ec6b atası; main merge d0b1d76 + 6 commit). Merge-base main 63ffb16'ya göre 48 dosya, `state/` 0; delta `d0b1d76..472e04f` 18 dosya. Worktree `.worktrees/review-09-1-r3` (temiz). Statik inceleme başladı; review-09 koşuları 1c-a main kapısı bitince (KARARLAR üç yığın sınırı).
