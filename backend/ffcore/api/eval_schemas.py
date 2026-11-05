@@ -152,6 +152,13 @@ class FromRunOut(BaseModel):
     item_id: str
     dataset: str
     run_id: UUID
+    # 09-2 r1 (live probe, additive): how the question and the expected output were masked.
+    # `regex`: identifiers only, person names stay as written (GUARDRAIL_EGRESS_NER=false);
+    # `regex+ner`: names too.
+    masking: Literal["regex", "regex+ner"] = Field(
+        description="`regex`: identifiers only, person names are stored as written; "
+        "`regex+ner`: person names are masked too."
+    )
 
 
 # --- 09-2: comparing two exams ---------------------------------------------------------------
