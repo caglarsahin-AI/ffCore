@@ -17,3 +17,238 @@ INFO  [alembic.runtime.migration] Running upgrade 06b_0001 -> 09_0001, 09: eval_
 09_0001 (03b, 03a, 06b, 06a, 03c, 04a, 09, 08, 05a, 07) (head)
 exit=0
 == targeted test-int DEPLOY_PROFILE=llmaas 2026-11-05T04:12:46+03:00
+_ ERROR at setup of test_09_r1_major3_not_run_survives_failed_tick_and_scored_item_not_rejudged _
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+                    f"failed to resolve host {attempt.get('host')!r}: {ex}"
+E           psycopg.OperationalError: failed to resolve host 'postgres': [Errno -3] Temporary failure in name resolution
+ERROR tests/integration/test_09_advance.py::test_09_r1_major3_not_run_survives_failed_tick_and_scored_item_not_rejudged
+ERROR tests/integration/test_09_advance.py::test_09_r1_major4_exam_reads_its_snapshot_not_the_suite
+ERROR tests/integration/test_09_advance.py::test_09_r1_major2_judge_budget_per_tick
+ERROR tests/integration/test_09_advance.py::test_09_r1_major2_two_ticks_judge_each_item_once
+ERROR tests/integration/test_09_advance.py::test_09_r1_major2_runs_listened_while_a_long_judge_runs
+ERROR tests/integration/test_09_advance.py::test_09_r1_minor6_resumed_exam_run_is_an_exam_run
+ERROR tests/integration/test_09_api.py::test_09_read_mode_get_parity - psycop...
+ERROR tests/integration/test_09_api.py::test_09_read_mode_cannot_mutate - psy...
+ERROR tests/integration/test_09_api.py::test_09_other_project_sees_404 - psyc...
+ERROR tests/integration/test_09_api.py::test_09_cancel_finished_exam_is_409
+ERROR tests/integration/test_09_api.py::test_09_start_with_another_projects_version_is_the_same_404
+ERROR tests/integration/test_03a_read_side.py::test_03a_2_read_mode_get_parity
+ERROR tests/integration/test_03a_read_side.py::test_03a_2_project_member_read_mode_parity
+ERROR tests/integration/test_03a_read_side.py::test_03a_11_readiness_three_checks
+ERROR tests/integration/test_03a_read_side.py::test_03a_12_audit_list_filters
+ERROR tests/integration/test_03a_read_side.py::test_03a_12_audit_csv - psycop...
+ERROR tests/integration/test_03a_read_side.py::test_03a_12_audit_requires_admin
+ERROR tests/integration/test_03a_read_side.py::test_03a_17_errors_openai_shape
+ERROR tests/integration/test_06a_runs_api.py::test_06a_11_sse_stream_and_replay
+ERROR tests/integration/test_06a_runs_api.py::test_06a_17a_reconnect_completes
+ERROR tests/integration/test_06a_runs_api.py::test_06a_17d_replay_from_db_after_ttl
+ERROR tests/integration/test_06a_runs_api.py::test_06a_3_resume_needs_role_and_edit_then_409
+ERROR tests/integration/test_06a_runs_api.py::test_06a_12_resume_not_waiting_409
+ERROR tests/integration/test_06a_runs_api.py::test_06a_17c_cancel - psycopg.O...
+ERROR tests/integration/test_06a_runs_api.py::test_06a_runs_read_endpoints - ...
+ERROR tests/integration/test_06a_runs_api.py::test_06a_unpublished_agent_is_404
+ERROR tests/integration/test_06a_runs_api.py::test_06a_superadmin_without_membership_cannot_start_a_run
+ERROR tests/integration/test_06a_run_access.py::test_06a_r1_user_starts_own_chat_run_but_not_a_test_run
+ERROR tests/integration/test_06a_run_access.py::test_06a_r1_user_answers_own_question_only
+ERROR tests/integration/test_06a_run_access.py::test_06a_r1_user_never_decides_an_approval
+ERROR tests/integration/test_06a_run_access.py::test_06a_r1_cancel_own_run_or_admin
+ERROR tests/integration/test_06a_run_access.py::test_06a_r1_feedback_user_own_run_with_edit
+ERROR tests/integration/test_06a_run_access.py::test_06a_r2_approval_needs_a_user_session
+ERROR tests/integration/test_06a_run_access.py::test_06a_r2_resume_service_function
+ERROR tests/integration/test_06a_run_access.py::test_06a_r2_user_reads_own_run_and_reconnects
+ERROR tests/integration/test_06a_run_access.py::test_06a_r2_other_users_run_is_not_found
+ERROR tests/integration/test_06a_run_access.py::test_06a_r2_user_lists_only_own_runs
+ERROR tests/integration/test_07_decide.py::test_07_decision_audited - psycopg...
+ERROR tests/integration/test_07_decide.py::test_07_analyst_cannot_approve_developer_403
+ERROR tests/integration/test_07_decide.py::test_07_read_access_cannot_decide
+ERROR tests/integration/test_07_decide.py::test_07_decision_requires_console_session[service]
+ERROR tests/integration/test_07_decide.py::test_07_decision_requires_console_session[on-behalf-of]
+ERROR tests/integration/test_07_decide.py::test_07_decision_requires_console_session[api-key]
+ERROR tests/integration/test_07_decide.py::test_07_second_decision_409 - psyc...
+ERROR tests/integration/test_07_decide.py::test_07_decision_after_ttl_409 - p...
+ERROR tests/integration/test_07_decide.py::test_07_decision_other_project_404
+ERROR tests/integration/test_07_flow.py::test_07_approval_opened_on_interrupt_with_masked_arguments
+ERROR tests/integration/test_07_flow.py::test_07_sse_continues_after_approval
+ERROR tests/integration/test_07_flow.py::test_07_reject_reaches_model - psyco...
+ERROR tests/integration/test_07_flow.py::test_07_same_args_not_asked_twice_in_a_run
+ERROR tests/integration/test_07_flow.py::test_07_decision_route_requires_console_session
+ERROR tests/integration/test_07_flow.py::test_07_decision_on_cancelled_run_is_409
+ERROR tests/integration/test_07_flow.py::test_07_ttl_expires_and_fails_run - ...
+ERROR tests/integration/test_07_flow.py::test_07_ttl_close_retried_writes_one_expired_event
+ERROR tests/integration/test_07_flow.py::test_07_run_without_gate_fails_loud
+ERROR tests/integration/test_07_flow.py::test_07_unknown_approval_404 - psyco...
+ERROR tests/integration/test_07_service.py::test_07_open_sets_ttl_and_is_idempotent
+ERROR tests/integration/test_07_service.py::test_07_assign_to_user_refused - ...
+ERROR tests/integration/test_07_service.py::test_07_same_args_not_asked_twice
+ERROR tests/integration/test_07_service.py::test_07_ttl_expires_and_closes_run
+ERROR tests/integration/test_07_service.py::test_07_ttl_close_failure_retried_next_tick
+ERROR tests/integration/test_07_service.py::test_07_ttl_closes_run_of_stranded_expired_approval
+ERROR tests/integration/test_07_service.py::test_07_pending_age_reported_once
+ERROR tests/integration/test_07_api_read.py::test_07_list_only_this_project_and_status
+ERROR tests/integration/test_07_api_read.py::test_07_count_pending - psycopg....
+ERROR tests/integration/test_07_api_read.py::test_07_detail_fields - psycopg....
+ERROR tests/integration/test_07_api_read.py::test_07_detail_of_other_project_is_404
+ERROR tests/integration/test_07_api_read.py::test_07_can_decide[admin-edit-analyst-True]
+ERROR tests/integration/test_07_api_read.py::test_07_can_decide[analyst-edit-analyst-True]
+ERROR tests/integration/test_07_api_read.py::test_07_can_decide[analyst-edit-developer-False]
+ERROR tests/integration/test_07_api_read.py::test_07_can_decide[admin-read-analyst-False]
+ERROR tests/integration/test_07_api_read.py::test_07_read_access_lists - psyc...
+ERROR tests/integration/test_07_api_read.py::test_07_queue_needs_analyst_membership
+ERROR tests/integration/test_07_api_read.py::test_07_service_token_without_user_cannot_read
+ERROR tests/integration/test_07_api_read.py::test_07_read_mode_get_parity - p...
+ERROR tests/integration/test_08t_26_builtin_egress_key.py::test_08t_26_builtin_chain_stores_as_shown
+ERROR tests/integration/test_08t_26_builtin_egress_key.py::test_08t_26b_panel_reports_builtin_egress_pii
+9 passed, 77 errors in 333.71s (0:05:33)
+exit=0
+== targeted test-int DEPLOY_PROFILE=airgap 2026-11-05T04:18:45+03:00

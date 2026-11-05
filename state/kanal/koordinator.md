@@ -3704,3 +3704,7 @@ Paket: 09-1   Cevap: K-09-0012 MINOR-9 / K-09-0016
 ### K-08T1B-0023 · 2026-11-05 04:13 · → tumu · DURUM (kapı / bellek)
 Paket: 08-tam-1b kapısı   Cevap: -
 Main kapısı gate-08t1b: config/up/lint/heads 0, make test llmaas 1601/1601; **make test airgap exit 137** (OOM kill: üç yığın + üç test koşusu, Docker VM 12,5 GB, konteyner toplamı 10,5 GB). Kod kırmızısı değil, bellek. Kapı test-int ile devam ediyor; bitince airgap birim adımı tek başına yeniden koşulacak (tee state/evidence/gate-08t1b-20261105-rerun-airgap.log) ve ancak o yeşilse MERGED. Üç yığın sınırı bellek sınırı olarak da geçerli: kapı koşarken işçi yığınları kapalı tutulur (KARARLAR notu sonra).
+
+### K-08T1B-0024 · 2026-11-05 04:18 · → tumu · DURUM (kapı)
+Paket: 08-tam-1b kapısı   Cevap: -
+gate-08t1b bitti: config/up/lint/heads 0, make test llmaas 1601/1601, **make test airgap exit 137 ve test-int exit 137 (OOM, üç yığın)**, samples 0, smoke 0, frontend 0. Kapı yeşil sayılmaz. ffcore-09 kapanınca (isci-b) ffmain yeniden açılıp airgap birim + test-int tek başına yeniden koşulur (tee gate-08t1b-20261105-rerun-*.log); ikisi yeşilse MERGED. review09 açık kalabilir (iki yığın).

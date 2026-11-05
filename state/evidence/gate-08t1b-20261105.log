@@ -111,3 +111,24 @@ smoke: passed
 smoke exit=0
 
 === 04:11:10 frontend lint/typecheck/check:api (node, --network none, repo root)
+
+> ffcore-frontend@0.1.0 lint
+> eslint
+
+
+> ffcore-frontend@0.1.0 typecheck
+> tsc --noEmit
+
+
+> ffcore-frontend@0.1.0 check:api
+> node scripts/check-api.mjs
+
+API contract copies and generated types are current.
+frontend exit=0
+
+=== 04:17:24 down -v
+ Volume ffmain_langfuse_clickhouse_logs  Removed
+ Volume ffmain_postgres_data  Removed
+
+=== 04:17:59 done
+gate script exit 0
