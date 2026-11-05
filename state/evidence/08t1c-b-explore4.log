@@ -1,0 +1,12 @@
+loadavg 4.42 4.74 3.27 1/1787 19 threads 4 engine x86
+== int8=False {'PERSON': 'r 1.00 p 1.00 (22)', 'ORGANIZATION': 'r 1.00 p 0.67 (6)', 'LOCATION': 'r 1.00 p 0.17 (24)'}
+   latency 1000 chars P95 484 median 370 min 318 ms
+For migrations of users: 
+1. Eager mode quantization (torch.ao.quantization.quantize, torch.ao.quantization.quantize_dynamic), please migrate to use torchao eager mode quantize_ API instead 
+2. FX graph mode quantization (torch.ao.quantization.quantize_fx.prepare_fx,torch.ao.quantization.quantize_fx.convert_fx, please migrate to use torchao pt2e quantization API instead (prepare_pt2e, convert_pt2e) 
+3. pt2e quantization has been migrated to torchao (https://github.com/pytorch/ao/tree/main/torchao/quantization/pt2e) 
+see https://github.com/pytorch/ao/issues/2259 for more details
+  pipe.model = torch.quantization.quantize_dynamic(pipe.model, {torch.nn.Linear}, dtype=torch.qint8)
+  qweight = torch.quantize_per_tensor(
+== int8=True {'PERSON': 'r 1.00 p 1.00 (22)', 'ORGANIZATION': 'r 1.00 p 0.67 (6)', 'LOCATION': 'r 1.00 p 0.17 (23)'}
+   latency 1000 chars P95 431 median 212 min 159 ms

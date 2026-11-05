@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-a-08-tam-1c-olcum (Opus 5.5; önceki lease ffcore-isci-a-08-tam-1b RETIRED, HANDOFF koordinatör özeti K-08T1B-0026)
 - Aktif paket: 08-tam-1c-b-olcum (K-08T1C-0014; 1c-a MERGED c5b234c)
 - Durum: ACTIVE
-- Son okunan: K-09-0044
+- Son okunan: K-08T1C-0015
 
 ## Mesajlar
 
@@ -2055,4 +2055,15 @@ Paket: 08-tam-1c-b-olcum   Cevap: K-08T1C-0014, K-09-0044
 **Ağırlık geldi (ENV-163 kapatılabilir).** Kullanıcı `make models` koştu; dal main'e ileri sarıldı (105d176). `--network none` + salt-okunur volume ile `make models-check`: `ok all model weights are in the cache`, exit 0 (state/evidence/08t1c-b-models-check.log). İki aday tam (`.incomplete` 0): `savasy/bert-base-turkish-ner-cased@7678083d645af39967e0ebe8213a6049deb6e2cc`, `akdeniz27/bert-base-turkish-cased-ner@99995f7d2be4b3a28c74f0d36ee97f8c04ee0571`, her biri ~0,44 GB.
 D6 kart okuması (offline): **akdeniz27 `license: mit`**; **savasy kartında lisans alanı yok** (README yalnız `language: tr`) → K-08T1B-0002 gereği ürün seçimine giremez, yine ölçülür ve tabloda "lisans belirtilmemiş" yazar. `id2label` ikisinde de `O, B/I-PER, B/I-ORG, B/I-LOC` → `ner_label_unknown` yok. Durma koşulu yok (bir lisanslı aday var); akdeniz27 recall < 0,85 çıkarsa KARAR-GEREK.
 Yığın gerekmiyor: ölçüm yalnız tools konteyneri (`docker run --network none`, 04a model volume salt-okunur). Egress PERSON testi (`GUARDRAIL_EGRESS_NER=true`, `-m models`) için yığın gerekirse YIGIN-AÇ yazarım. Sıra: kırmızı testler → ölçüm betiği → D8.
+
+### A-08T1C-0015 · 2026-11-05 14:20 · → koordinator · KARAR-GEREK
+Paket: 08-tam-1c-b-olcum   Cevap: K-08T1C-0015
+models-check logu komut satırı, ağ arayüzleri (yalnız `lo`) ve `/models ... ro` bağlama satırıyla yeniden yazıldı (state/evidence/08t1c-b-models-check.log). Keşif ölçümleri (commit edilmemiş betik, ağsız, salt-okunur): state/evidence/08t1c-b-explore{,2,3,4}.log. Ölçüm verisi sentetik 13a seti, kişi verisi yok.
+**Kalite (pii-100, PERSON 22 / ORG 4 / LOC 4):** iki aday da kişi adı recall 1,00. Ama kodun bugünkü `aggregation_strategy="simple"` ayarı akdeniz27'de kelimeyi alt parçalara bölüyor (`I`,`h`,`lam`; `ga çınaroba`) → PERSON precision 0,56 ve **adın parçalı maskelenmesi** (sızıntı riski). Kartın önerdiği `first` ile akdeniz27 PERSON recall 1,00 / precision 1,00, ORG 1,00 / 0,67; LOC precision 0,17 (yanlış pozitiflerin hepsi altın setin `TR_ADDRESS` dediği adres parçaları: mahalle, ilçe, il). savasy `first` ile PERSON precision 0,88. **Varsayım (aykırıysa DUZELT):** `ner.py` `aggregation_strategy` → `"first"` (kelime düzeyi etiket; kanıt tablosu PR'da, kelimeyi bölmeme testi `-m models`).
+**Gecikme: P95 < 300 ms tutmuyor (durma koşulu).** 1.000 karakter = 293 token; süre neredeyse tamamen modelin ileri geçişi (tokenizer ~1 ms). fp32 akdeniz27 `first`, 4 iş parçacığı: medyan 370 ms, en iyi 318 ms, P95 484 ms. Ölçüm yük altında (ffcore-09 testleri, loadavg 3,4-4,7 / 7 CPU); boşta P95 düşer ama en iyi tek koşu bile 300'ün üstünde, yani fp32 bu CPU'da bütçeye girmez. int8 dinamik nicemleme (`torch.quantization.quantize_dynamic`, yalnız Linear): kalite aynı (PERSON 1,00/1,00, ORG aynı, LOC 23 tahmin), medyan 212 ms, en iyi 159 ms, P95 431 ms (yük altında).
+Seçenekler:
+- **A (önerilen):** akdeniz27 + `first` + int8 dinamik nicemleme `LocalNer` yüklemesinde her zaman açık (yeni ayar yok; kanıt evidence'ta `int8`). Boşta P95 ölçümünü yığın açık değilken tekrar koşarım; < 300 ms tutarsa kabul 3 yeşil. Risk: torch bu API'yi kullanımdan kaldırma yolunda (uyarı: torchao'ya geçiş); bugün çalışıyor, torch yükseltmesinde kırılırsa yükleme fail-loud olur. FOLLOWUP: torchao/ONNX geçişi. Kalite eşitliği testle sabitlenir (`-m models`).
+- **B:** fp32 kalır, gecikme bütçesi ölçülen değere çekilir (P95 ~500 ms; M4 eşiği kullanıcı kararı, [C]). Kod basit, egress çağrısı başına ~0,4 s.
+- **C:** ONNX Runtime ihracı (yeni bağımlılık ve imaj değişikliği, ayrı dilim); bu PR gecikme kriterini NOT_RUN/kırmızı bırakır.
+A, 80/20'ye uyuyor: platformun (torch) sunduğu tek çağrı, kalite kaybı ölçülmedi. Bu arada birim testleri, ölçüm modülü ve `first` dilimine devam ediyorum; nicemleme kodunu karar gelene kadar yazmıyorum. Boşta ölçüm için ffcore-09'un test koşmadığı bir pencere lazım; söylersen o an koşarım.
 

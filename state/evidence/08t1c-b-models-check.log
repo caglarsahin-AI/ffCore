@@ -1,3 +1,11 @@
+# 2026-11-05T13:43:02Z host command:
+$ docker run --rm --network none -v C:/ai_paycore/ffcore/.worktrees/feat/08-tam-1c-olcum:/work -v 04a-knowledge-core_model_cache:/models:ro -w /work ffcore/tools:0.0.0-08t1c sh -c 'make models-check'
+# in container: network interfaces:
+ip6tnl0
+lo
+tunl0
+# /models mount:
+/dev/sda1 /models ext4 ro,relatime,discard 0 0
 TRANSFORMERS_OFFLINE=1
 HF_HOME=/models/huggingface
 HF_HUB_OFFLINE=1

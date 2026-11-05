@@ -1,0 +1,6 @@
+loadavg 3.71 4.59 2.92 1/1792 19 cpus 7
+tokens torch.Size([1, 293])
+threads 1: forward P95 768 median 659 min 616 ms | pipeline P95 953 median 721 min 628 ms | tokenizer P95 1 median 0 min 0 ms
+threads 2: forward P95 617 median 444 min 363 ms | pipeline P95 645 median 463 min 409 ms | tokenizer P95 1 median 0 min 0 ms
+threads 4: forward P95 483 median 360 min 322 ms | pipeline P95 503 median 372 min 327 ms | tokenizer P95 1 median 1 min 0 ms
+threads 7: forward P95 2242 median 778 min 478 ms | pipeline P95 1119 median 566 min 402 ms | tokenizer P95 1 median 1 min 0 ms

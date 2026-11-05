@@ -1,0 +1,118 @@
+Some weights of the model checkpoint at /models/huggingface/hub/models--savasy--bert-base-turkish-ner-cased/snapshots/7678083d645af39967e0ebe8213a6049deb6e2cc were not used when initializing BertForTokenClassification: ['bert.pooler.dense.bias', 'bert.pooler.dense.weight']
+- This IS expected if you are initializing BertForTokenClassification from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
+- This IS NOT expected if you are initializing BertForTokenClassification from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+Device set to use cpu
+== savasy/bert-base-turkish-ner-cased load 12.2s ignored=()
+  FP pii-001 ORGANIZATION 'TC kimlik' 0.66
+  FP pii-005 ORGANIZATION 'tc kimlik' 0.72
+  FP pii-024 ORGANIZATION 'Otopark' 0.90
+  FP pii-026 LOCATION 'Yurt dışı' 0.74
+  FP pii-028 LOCATION 'Ihlamur Mah.' 0.80
+  FP pii-028 LOCATION 'Keçiören' 0.99
+  FP pii-028 LOCATION 'Ankara' 0.99
+  FP pii-029 LOCATION 'Menekşe Mah' 0.93
+  FP pii-029 LOCATION 'ne' 0.43
+  FP pii-029 LOCATION 'Kadıköy' 0.99
+  FP pii-029 LOCATION 'İstanbul' 0.88
+  FP pii-030 LOCATION 'Defne Mah' 0.93
+  FP pii-030 LOCATION 'Defne' 0.50
+  FP pii-030 LOCATION 'Tepebaşı' 1.00
+  FP pii-030 LOCATION 'Eskişehir' 0.99
+  FP pii-031 LOCATION 'Akasya Mah.' 0.82
+  FP pii-031 LOCATION 'ekşe' 0.63
+  FP pii-031 LOCATION 'Nilüfer/' 0.77
+  FP pii-031 LOCATION 'Bursa' 0.94
+  FP pii-032 ORGANIZATION '. Şti.' 0.66
+  FP pii-048 ORGANIZATION 'CVV' 0.75
+  FP pii-048 PERSON '73' 0.58
+  FP pii-048 ORGANIZATION '8' 0.42
+  FP pii-049 ORGANIZATION 'Güvenlik' 0.51
+  FP pii-050 ORGANIZATION 'P' 0.90
+  FP pii-054 ORGANIZATION 'MA' 0.63
+  FP pii-057 ORGANIZATION 'zat' 0.86
+  FP pii-058 PERSON 'Yon' 0.73
+  FP pii-058 PERSON '6829' 0.44
+  FP pii-059 PERSON 'Bahar' 0.47
+  FP pii-060 ORGANIZATION '1995' 0.38
+  FP pii-061 ORGANIZATION '1963' 0.46
+  FP pii-062 ORGANIZATION '1984' 0.27
+  FP pii-065 ORGANIZATION 'CVV' 0.74
+  FP pii-066 LOCATION 'Çınar Mah' 0.74
+  FP pii-066 LOCATION 'Bornova' 0.98
+  FP pii-066 LOCATION 'İzmir' 0.84
+  FP pii-067 ORGANIZATION 'BF' 0.75
+  FP pii-067 ORGANIZATION 'E' 0.56
+  FP pii-068 ORGANIZATION '1977' 0.32
+  FP pii-073 ORGANIZATION 'kardiyoloji' 0.52
+  FP pii-077 ORGANIZATION 'Lütfen' 0.63
+  FP pii-077 ORGANIZATION 'yaz' 0.45
+  FP pii-092 PERSON 'EY' 0.78
+  FP pii-092 PERSON 'F' 0.56
+  FP pii-098 LOCATION 'çamdere' 0.82
+  PERSON: support 22 predicted 28 tp 22 recall 1.00 precision 0.79
+  ORGANIZATION: support 4 predicted 24 tp 4 recall 1.00 precision 0.17
+  LOCATION: support 4 predicted 24 tp 4 recall 1.00 precision 0.17
+  P95 1000 chars 1111.6 ms median 463.5
+Device set to use cpu
+== akdeniz27/bert-base-turkish-cased-ner load 0.1s ignored=()
+  FP pii-004 ORGANIZATION 'T' 0.60
+  FP pii-004 ORGANIZATION '.C' 0.41
+  FP pii-028 LOCATION 'I' 1.00
+  FP pii-028 LOCATION 'h' 1.00
+  FP pii-028 LOCATION 'lam' 1.00
+  FP pii-028 LOCATION 'ur Mah.' 0.98
+  FP pii-028 LOCATION 'Gül Sok.' 0.87
+  FP pii-028 LOCATION 'Keçiören' 0.99
+  FP pii-028 LOCATION 'Ankara' 0.98
+  FP pii-029 LOCATION 'Men' 0.99
+  FP pii-029 LOCATION 'ek' 0.99
+  FP pii-029 LOCATION 'şe Mah.' 0.97
+  FP pii-029 LOCATION 'Def' 0.95
+  FP pii-029 LOCATION 'ne Sok.' 0.90
+  FP pii-029 LOCATION 'Kadıköy' 1.00
+  FP pii-029 LOCATION 'İstanbul' 0.99
+  FP pii-030 LOCATION 'Def' 1.00
+  FP pii-030 LOCATION 'ne Mah.' 0.99
+  FP pii-030 LOCATION 'Def' 0.96
+  FP pii-030 LOCATION 'ne Sok.' 0.94
+  FP pii-030 LOCATION 'Tepe' 1.00
+  FP pii-030 LOCATION 'başı' 1.00
+  FP pii-030 LOCATION 'Eskişehir' 1.00
+  FP pii-031 LOCATION 'Ak' 1.00
+  FP pii-031 LOCATION 'asy' 1.00
+  FP pii-031 LOCATION 'a Mah.' 0.98
+  FP pii-031 LOCATION 'Men' 0.93
+  FP pii-031 LOCATION 'ek' 0.98
+  FP pii-031 LOCATION 'şe Sok.' 0.89
+  FP pii-031 LOCATION 'Nilüfer' 1.00
+  FP pii-031 LOCATION 'Bursa' 0.99
+  FP pii-032 ORGANIZATION 'eket Gıda Ltd. Şti' 0.99
+  FP pii-033 ORGANIZATION 'langıç Yapı A.Ş.' 0.99
+  FP pii-034 ORGANIZATION 'soy Tarım Kooperatifi' 0.98
+  FP pii-035 LOCATION 'altı' 0.95
+  FP pii-058 PERSON 'n' 0.56
+  FP pii-064 ORGANIZATION 'soy Tarım Kooperatifi' 1.00
+  FP pii-066 LOCATION 'Çınar Mah.' 0.95
+  FP pii-066 LOCATION 'Gül Sok.' 0.86
+  FP pii-066 LOCATION 'Bornova' 0.99
+  FP pii-066 LOCATION 'İzmir' 0.96
+  FP pii-082 PERSON 'l' 1.00
+  FP pii-082 PERSON 'ga çınaroba' 0.99
+  FP pii-084 PERSON 'uz tuzlaçay' 0.97
+  FP pii-086 PERSON 'YA GÖKÇEOBA' 1.00
+  FP pii-087 PERSON 'İF DEFNEDERE' 0.99
+  FP pii-088 PERSON 'AR' 1.00
+  FP pii-088 PERSON 'LIK' 0.99
+  FP pii-088 PERSON 'AYA Gizem' 0.92
+  FP pii-091 PERSON 'is Çınaroba' 0.99
+  FP pii-092 PERSON 'EY' 0.99
+  FP pii-092 PERSON 'NE' 0.99
+  FP pii-092 PERSON 'P DEFNEDERE' 1.00
+  FP pii-093 PERSON 'is Defnedere' 0.99
+  FP pii-094 PERSON 'e defnedere' 0.94
+  FP pii-095 PERSON 'an çınaroba' 0.98
+  FP pii-097 PERSON 'en ılgınçeşme' 0.98
+  PERSON: support 22 predicted 39 tp 22 recall 1.00 precision 0.56
+  ORGANIZATION: support 4 predicted 10 tp 4 recall 1.00 precision 0.40
+  LOCATION: support 4 predicted 38 tp 4 recall 1.00 precision 0.11
+  P95 1000 chars 1526.7 ms median 406.4
