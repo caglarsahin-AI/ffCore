@@ -40,6 +40,13 @@ alembic heads  # tek head bekler
 
 Profil matrisi: `DEPLOY_PROFILE=airgap make test` ve `DEPLOY_PROFILE=llmaas make test` ikisi de koşar.
 
+### Paralel yığınlar (işçi, inceleyici, main kapısı)
+
+- Her yığın kendi compose projesi ve port aralığıyla açılır (`-p <ad>`, `BACKEND_PORT`/`FRONTEND_PORT`); konteyner açan her koşu önce kanala `YIGIN-AÇ`, kapanışta `down -v` + `YIGIN-KAPA`.
+- **Dış bağlantı yok:** yığınlar `up -d --wait --no-build --pull never` ile ve işçinin doğruladığı etiketli imajla (`FFCORE_VERSION=<etiket>`) açılır. İmaj gerçekten yeniden derlenecekse `docker compose build --pull=false` (BuildKit aksi hâlde base imaj metadata'sı için docker.io/ghcr.io'ya gider; PROSES-175). `docker compose build` ve `up --build` çıplak kullanılmaz.
+- **Bellek sınırı:** aynı anda en fazla üç yığın; main kapısı koşarken işçi/inceleyici yığınları açık kalabilir ama test koşmaz (KARARLAR "Üç yığın sınırı bellek sınırıdır"). Kapı adımı 137 (OOM) ile düşerse adım tek başına yeniden koşulur; ancak o yeşilse MERGED.
+- Kapı çıktısı tamamen dosyaya alınır (`tee state/evidence/gate-<paket>-<tarih>.log`); yalnız son satır tutulmaz.
+
 ## Bayraklar
 
 | Değişken | Anlam |
