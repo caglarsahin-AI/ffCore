@@ -97,6 +97,9 @@ def test_08t1c_7d_measured_winner_is_the_only_candidate():
     model, revision = env["NER_MODEL"], env["NER_REVISION"]
     assert models.NER_CANDIDATES == (model,), "the loser leaves the list after the measurement"
     assert len(revision) == 40 and int(revision, 16) >= 0
+    # `make models` downloads the measured commit, not `main` (a moved `main` would leave the
+    # volume without the snapshot NER_REVISION names).
+    assert models.NER_REVISIONS == {model: revision}
     # Weights as safetensors only: no pickle file is downloaded or listed (A-08T1C-0016).
     assert "pytorch_model.bin" not in models.NER_ALLOW_PATTERNS
     listed = (REPO / "deploy" / "offline" / "models.txt").read_text(encoding="utf-8")

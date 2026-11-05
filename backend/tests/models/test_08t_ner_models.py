@@ -95,3 +95,29 @@ def test_08t1c_10_egress_person_tokenized_with_the_real_model(client):
         engine.evaluate("Ayşe Demir 0532 123 45 67 arar.", "egress", pol, ctx=ctx)
     )
     assert decision.text_out == "<<PII_1>> <<PII_2>> arar."
+
+
+def test_08t1c_11_int8_quality_equals_fp32(client, report):
+    """K-08T1C-0016 A: the int8 model the API loads finds the same person and organization
+    names as the fp32 weights on the PII set (location within one prediction)."""
+    from transformers import pipeline
+
+    from ffcore.guardrails.recognizers.ner import STRIDE, NerRecognizer
+    from ffcore.knowledge.models import hf_path
+
+    model, revision = _winner()
+    path = str(hf_path(model, revision))
+    pipe = pipeline(
+        "token-classification",
+        model=path,
+        tokenizer=path,
+        aggregation_strategy="first",
+        stride=STRIDE,
+        device=-1,
+    )
+    fp32 = NerRecognizer(model, revision, pipeline=pipe, labels=pipe.model.config.id2label)
+    reference = quality.ner_quality_report(quality.load_set(PII_SET), fp32.recognize)
+    assert report["PERSON"] == reference["PERSON"]
+    assert report["ORGANIZATION"] == reference["ORGANIZATION"]
+    assert report["LOCATION"].recall == reference["LOCATION"].recall
+    assert abs(report["LOCATION"].predicted - reference["LOCATION"].predicted) <= 1
