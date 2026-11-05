@@ -8,9 +8,10 @@ this git repository, not against anything inside the archive.
 |---|---|---|
 | `images.txt` | (list) | every image: registry digest (checked after `docker pull`) and image id (checked after `docker load`) |
 | `models.txt` | (list) | every model weight file: Hugging Face revision, path, SHA-256, size |
-| `save.sh` | preparation machine | pull + provenance check, build ids printed for `images.txt`, `docker save`, `models.tar`, `manifest.sha256` |
+| `save.sh` | preparation machine | pull + provenance check, build ids printed for `images.txt`, `docker save`, `models.tar` (only the `models.txt` files), `manifest.sha256` |
 | `load.sh` | server | `sha256sum -c` (transport), `docker load`, `models.tar` into the host models directory, then `verify.sh` |
-| `verify.sh` | server | loaded image ids and model files against `images.txt` / `models.txt` |
+| `verify.sh` | server | loaded image ids and model files against `images.txt` / `models.txt`; a hub model directory or snapshot file not in `models.txt` fails (named, never deleted) |
+| `models-files.sh` | (helper) | the `models.txt` paths in the volume, for `save.sh` and `verify.sh` |
 
 Why image ids on the server: `docker load` on the overlay2 image store does not keep
 `RepoDigests`, so a registry digest cannot be read back after transport. The id (config digest)

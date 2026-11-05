@@ -3,7 +3,7 @@
 # Servisleri başlatma/durdurma doğrudan compose ile: docker compose up -d --wait | down | logs -f
 # Önyüz lint'i ayrı konteynerde: docker compose run --rm frontend npm run lint
 
-.PHONY: lint format test test-samples test-int seed e2e eval test-models models models-check smoke pull seed-models render-litellm reindex langfuse-init seed-prompts seed-sql-demo seed-sql-context seed-eval
+.PHONY: lint format test test-samples test-int seed e2e eval test-models test-ner-latency models models-check smoke pull seed-models render-litellm reindex langfuse-init seed-prompts seed-sql-demo seed-sql-context seed-eval
 
 lint:
 	ruff check backend scripts data/samples/scripts services
@@ -33,6 +33,12 @@ test-int:
 # 04a: real model weights (bge-m3, reranker, Docling, PaddleOCR); required for VERIFIED (S4).
 test-models:
 	cd backend && RUN_MODEL_TESTS=1 pytest -m models -s tests
+
+# 08 full 1c (ENV-177): the NER latency acceptance (P95 < 300 ms, 1,000 characters, local rules
+# and NER) on the target machine, offline; prints the P95. Run before GUARDRAIL_EGRESS_NER=true.
+# Its own marker: `make test-models` does not run it (the result depends on the machine).
+test-ner-latency:
+	cd backend && RUN_MODEL_TESTS=1 RUN_NER_LATENCY=1 pytest -m ner_latency -s tests/models/test_08t_ner_latency.py
 
 # 04a: the one step that downloads model weights (bge-m3, reranker, Docling, PaddleOCR tr) into
 # the model_cache volume. It connects out (airgap: HF_ENDPOINT = the internal mirror) and is

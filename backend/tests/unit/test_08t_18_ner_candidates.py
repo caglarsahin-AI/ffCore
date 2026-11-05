@@ -1,8 +1,9 @@
-"""08 tam 1b, dilim 0 (K-08T1B-0002 A): the NER candidates come in through `make models` only.
+"""08 tam 1b, dilim 0 (K-08T1B-0002 A): the NER model comes in through `make models` only.
 
-`make models` downloads each candidate's model card, config, tokenizer and PyTorch weights (no
-TF/Flax/ONNX copies), `make models-check` lists them offline, and the ingest worker's startup
-check stays as it was: a candidate is not a weight the worker needs.
+`make models` downloads the model card, config, tokenizer and safetensors weights (no pickle,
+TF/Flax/ONNX copies) at the measured commit (08 tam 1c-b), `make models-check` lists them
+offline, and the ingest worker's startup check stays as it was: it is not a weight the worker
+needs.
 """
 
 import socket
@@ -13,7 +14,7 @@ import pytest
 
 from ffcore.knowledge import models
 
-CANDIDATES = ("savasy/bert-base-turkish-ner-cased", "akdeniz27/bert-base-turkish-cased-ner")
+CANDIDATES = ("akdeniz27/bert-base-turkish-cased-ner",)
 
 
 @pytest.fixture
@@ -64,11 +65,17 @@ def test_08t_18c_download_takes_only_the_allowed_files(empty_cache, monkeypatch)
     by_repo = {repo: (revision, kwargs) for repo, revision, kwargs in calls}
     for repo in CANDIDATES:
         revision, kwargs = by_repo[repo]
-        assert revision == "main"
+        assert revision == models.NER_REVISIONS[repo] != "main"
         allowed = kwargs["allow_patterns"]
-        for name in ("config.json", "README.md", "pytorch_model.bin", "model.safetensors"):
+        for name in ("config.json", "README.md", "tokenizer.json", "model.safetensors"):
             assert any(_match(name, p) for p in allowed), name
-        for name in ("tf_model.h5", "flax_model.msgpack", "onnx/model.onnx", "rust_model.ot"):
+        for name in (
+            "pytorch_model.bin",
+            "tf_model.h5",
+            "flax_model.msgpack",
+            "onnx/model.onnx",
+            "rust_model.ot",
+        ):
             assert not any(_match(name, p) for p in allowed), name
     # The 04a weights are downloaded as before (whole snapshot).
     assert "allow_patterns" not in by_repo["BAAI/bge-m3"][1]

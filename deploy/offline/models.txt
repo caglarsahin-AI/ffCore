@@ -3,7 +3,8 @@
 # hf: Hugging Face hub snapshot under huggingface/hub (revision = commit);
 # paddle: PaddleOCR inference dirs under paddleocr/ (no revision upstream).
 # Recorded 2026-11-01 from the model_cache volume filled by `make models` (04a); a changed
-# file is a reviewed change to this list, never an automatic update.
+# file is a reviewed change to this list, never an automatic update. The NER rows were added on
+# 2026-11-05 (08 full 1c-b, the measured model; safetensors only).
 hf BAAI/bge-m3 5617a9f61b028005a4858fdac845db406aefb181 .gitattributes 7363a8ebd782ede400e72bb3e88c19248478eb6f280a7376d398fc2f22707b9a 1627
 hf BAAI/bge-m3 5617a9f61b028005a4858fdac845db406aefb181 1_Pooling/config.json e54c164a07274f2eb45bb724f54a79d1efcc90c41573887cd9a29aeee0597352 191
 hf BAAI/bge-m3 5617a9f61b028005a4858fdac845db406aefb181 README.md 0b81ccf9134e5874d620a86e6905062ea999e779c34eb1a7e65eaeb7fe00e450 15822
@@ -61,6 +62,13 @@ hf docling-project/docling-models fc0f2d45e2218ea24bce5045f58a389aed16dc23 model
 hf docling-project/docling-models fc0f2d45e2218ea24bce5045f58a389aed16dc23 model_artifacts/tableformer/accurate/tm_config.json 984e122ceb8ccf84d84c9d2882f6f2302a44b4f1e577babd6289892c36f3cffd 7060
 hf docling-project/docling-models fc0f2d45e2218ea24bce5045f58a389aed16dc23 model_artifacts/tableformer/fast/tableformer_fast.safetensors 3119563aab5a7c96fda4d621119b63fd8806272b86c30936d15507616422f718 145453276
 hf docling-project/docling-models fc0f2d45e2218ea24bce5045f58a389aed16dc23 model_artifacts/tableformer/fast/tm_config.json dca6762508dddfae6d57d6cb4ef822c6000119dff0f3b6489db7413118c2622a 7060
+hf akdeniz27/bert-base-turkish-cased-ner 99995f7d2be4b3a28c74f0d36ee97f8c04ee0571 README.md 2640822f315acbb150da304d477007faba0b482a4c34f41123d8430dfed81d9c 2063
+hf akdeniz27/bert-base-turkish-cased-ner 99995f7d2be4b3a28c74f0d36ee97f8c04ee0571 config.json 3fbee7f6d361174e29cf8a5987bc324b9fc2572beba54704ebe3a26bfdb4e59e 956
+hf akdeniz27/bert-base-turkish-cased-ner 99995f7d2be4b3a28c74f0d36ee97f8c04ee0571 model.safetensors be2bc35fe98f7ff09534c58487ac1b526e040f23b644013a3e67f85f062c3711 440156076
+hf akdeniz27/bert-base-turkish-cased-ner 99995f7d2be4b3a28c74f0d36ee97f8c04ee0571 special_tokens_map.json 303df45a03609e4ead04bc3dc1536d0ab19b5358db685b6f3da123d05ec200e3 112
+hf akdeniz27/bert-base-turkish-cased-ner 99995f7d2be4b3a28c74f0d36ee97f8c04ee0571 tokenizer.json 9fe651b08086b38c51e2dece708586ecaadc8b7ad876eba6a6cccbcb24a9f95a 497438
+hf akdeniz27/bert-base-turkish-cased-ner 99995f7d2be4b3a28c74f0d36ee97f8c04ee0571 tokenizer_config.json 8be0ecb9d1145d71dcd7e339441ab3611cc3ee5c54d5efbfbb3544f8bb51f21c 373
+hf akdeniz27/bert-base-turkish-cased-ner 99995f7d2be4b3a28c74f0d36ee97f8c04ee0571 vocab.txt ca72d2012b1e46ed42f5df2dc9675f9da0b37a481601785cb4dff91f67fcca65 251003
 paddle paddleocr - cls/inference.pdiparams d1efda1b80e174b4fcb168a035ac96c1af4938892bd86a55f300a6027105d08c 539978
 paddle paddleocr - cls/inference.pdiparams.info ee0c2eaa4c09814802bf520c01dfdbc1345dc2879dc9e67424d32c7b0ee88e59 18545
 paddle paddleocr - cls/inference.pdmodel 3c4337ec61722a20b1dca2e5bfaffc313c0592bc89ad6e0d45168224186f6683 1624487

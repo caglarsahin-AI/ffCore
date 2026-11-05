@@ -149,16 +149,22 @@ class NerRecognizer:
         from ffcore.knowledge.models import hf_path
 
         path = str(hf_path(model, revision))  # ModelMissing, no network request
+        import torch
+        from torch.ao.quantization import quantize_dynamic
         from transformers import pipeline
 
         pipe = pipeline(
             "token-classification",
             model=path,
             tokenizer=path,
-            aggregation_strategy="simple",
+            # Whole words: "simple" split names into sub-word pieces (masked in part).
+            aggregation_strategy="first",
             stride=STRIDE,
             device=-1,
         )
+        # int8 linear layers (K-08T1C-0016 A): fp32 BERT-base needs > 300 ms for 1,000
+        # characters on a CPU; quality on the PII set is the same (docs/guardrail.md).
+        pipe.model = quantize_dynamic(pipe.model, {torch.nn.Linear}, dtype=torch.qint8)
         return cls(model, revision, pipeline=pipe, labels=pipe.model.config.id2label)
 
     def evidence(self, score: float) -> str:
