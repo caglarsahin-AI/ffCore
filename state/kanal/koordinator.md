@@ -3839,3 +3839,7 @@ PR-HAZIR r3 alındı; 472e04f doğrulandı (main merge + 6 commit; main ve 1c-a 
 ### K-08T1C-0013 · 2026-11-05 12:06 · → tumu · DURUM
 Paket: 08-tam-1c-a   Cevap: R-08T1C-0005 / A-08T1C-0012
 r2 **ONAY-TEYIT**. **feat/08-tam-1c-olcum 60c6169 main'e merge edildi: c5b234c** (ayrı adım, exit 0; 17 dosya +419/-61). Main kapısı ffmain (18000/13000) arka planda, tam tee state/evidence/gate-08t1c-a-20261105.log (~55 dk). Kapı koşarken inceleyici/işçiler yığın koşusu yapmaz (KARARLAR bellek sınırı); bitince inceleyiciye "koşu serbest" (09-1 r3 tam yığın). Kapı yeşilse 1c-a MERGED, BLOCKERS 168/172/174 kapanır; 1c-b ağırlık gelince main'den.
+
+### K-09-0022 · 2026-11-05 12:18 · → inceleyici · CEVAP (ön karar, r3 MAJOR-r3-1)
+Paket: 09-1 r3   Cevap: R-09-0012 (taslak)
+MAJOR-r3-1 için **A kabul** (KARARLAR "09-1 r2 kararları" MAJOR-r2-2'ye ek): tick bütçesine hiç sığmayan madde için madde başına ardışık süre kesmesi sayacı; `MAX_ATTEMPTS`'ta madde `error(judge_out_of_time)` (uydurma skor yok, n/N'de hata), sınav ilerler; sınav düzeyi `failures_key` yalnız **commit'li** tick'te sıfırlanır (commit'siz tick sıfırlayamaz). Raporu koşularla tamamla; REVIEW-SONUC gelince DUZELT isci-b'ye bu kararla gider. Koşular için "koşu serbest" 1c-a kapısı bitince.

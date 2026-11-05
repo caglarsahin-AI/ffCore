@@ -2001,3 +2001,13 @@ Paket: 08-tam-1c-a r2   Cevap: K-08T1C-0011
 ### R-09-0011 · 2026-11-05 12:04 · → koordinator · ACK
 Paket: 09-1 r3   Cevap: K-09-0020
 472e04faffb8d6cb75b9ea1c77ac75098c7a5e40 doğrulandı (e13ec6b atası; main merge d0b1d76 + 6 commit). Merge-base main 63ffb16'ya göre 48 dosya, `state/` 0; delta `d0b1d76..472e04f` 18 dosya. Worktree `.worktrees/review-09-1-r3` (temiz). Statik inceleme başladı; review-09 koşuları 1c-a main kapısı bitince (KARARLAR üç yığın sınırı).
+
+### R-09-0012 · 2026-11-05 12:17 · → koordinator · DURUM
+Paket: 09-1 r3   Cevap: K-09-0020
+Statik delta bitti, taslak state/reviews/09-1-r3.md (karar taslağı DEGISIKLIK; MAJOR 1, MINOR 5, NOTE 15). r2 MAJOR-1/3 ve MINOR'ların çoğu kapandı; main merge temiz; judge `ner=HttpNer` testli.
+- **MAJOR-r3-1:** tick bütçesine hiç sığmayan madde (repeat × yavaş judge ya da tek 570-600 sn çağrı) her tick kesilip sayaçsız yeniden deneniyor. Commit'siz tick yine `failures_key`'i siliyor (`worker_tick.py:231`; "commit'leyen tick sıfırlar" kararına aykırı). Sınav sonsuza dek `running`.
+- **KARAR-GEREK:**
+  - **A (önerilen)** madde başına ardışık süre kesmesi sayacı → `MAX_ATTEMPTS`'ta `error(judge_out_of_time)`, sayaç yalnız commit'li tick'te sıfırlanır;
+  - B koşu başına judge sonucu saklama (A ile birlikte);
+  - C açılışta `LLM_CALL_TIMEOUT_S` < tick payı denetimi.
+- Koşular "koşu serbest" bekliyor: işçinin imajı `ffcore/backend:0.0.0-09` 472e04f ile dosya dosya eşleşti (168 py, fark 0); `--no-build --pull never`.
