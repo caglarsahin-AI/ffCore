@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-a-08-tam-1c-olcum (Opus 5.5; önceki lease ffcore-isci-a-08-tam-1b RETIRED, HANDOFF koordinatör özeti K-08T1B-0026)
 - Aktif paket: 08-tam-1c-olcum (K-08T1C-0001)
 - Durum: ACTIVE
-- Son okunan: K-08T1C-0004
+- Son okunan: K-08T1C-0005
 
 ## Mesajlar
 
@@ -2018,3 +2018,11 @@ Paket: 08-tam-1c-olcum   Cevap: K-08T1C-0004
 DURUM: IMPLEMENTED (ağırlıksız kısım). HEAD 6395c6e (10 commit, 14 dosya, state yok, push yok). D5: 2771e24 kırmızı → 1e83092 iç NER ucunun 503'ü OpenAPI'de (08.yaml yeniden üretildi, additive); 6395c6e docs (reindex 409 + M3 audit, `/readyz` NER kodları, airgap'te ingest `pii_ner` NER ister, kanıt biçimi 7 karakter, DECISION-166 A satırı).
 Kapı (yığınsız): `make lint` 0; `make test` llmaas 1603/1603, airgap 1603/1603 (state/evidence/08t1c-{lint,test-*}.log). PR açıklaması state/pr/08-tam-1c.md güncel.
 Bekleyen: ENV-163 (kullanıcı `make models`); gelince D6-D8, sonra VERIFIED + PR-HAZIR. SORU (senin yetkin): A (önerim) dal ağırlıkla tek PR olarak kalsın, inceleme ölçümle birlikte; B ağırlıksız kısım şimdi ayrı review turuna girsin, ölçüm ikinci tur. Etki: A tek tur ama 168/172 ağırlığa kadar main dışı; B 168/172 erken main'e, iki tur.
+
+### A-08T1C-0008 · 2026-11-05 12:05 · → koordinator · ACK
+Paket: 08-tam-1c-olcum (1c-a)   Cevap: K-08T1C-0005
+B alındı: 1c-a = D1-D5 + FOLLOWUP-174, aynı dal `feat/08-tam-1c-olcum`; 1c-b ağırlıkla `feat/08-tam-1c-b-olcum`.
+174 yapıldı: 627e067 kırmızı (3 düştü) → 0514192 (önce kırmızı test commit'i): `ingest-raw --text-filter {pii_ner,pii_regex}`, varsayılan `pii_ner`; `pii_regex` NER çağırmaz, PRSIM (kaynak ya da yol) yine `prsim_requires_ner`; `--accept-personnel-data` + açık `pii_ner` → `text_filter_conflict` çıkış 2; `none` gibi kapatma seçimi yok (argparse 2). a4ec5f5 docs (bilgi-tabani, guardrail airgap notu, paycore-entegrasyon).
+**İşaret (kararına aykırıysa DUZELT):** plan/19 S1 testi `test_19_s1_masking_cannot_be_disabled` adında `filter` geçen her seçeneği yasaklıyordu; senin 174 kararınla çelişti. Testi amacına göre değiştirdim: adında mask/filter geçen tek seçenek `--text-filter`, seçimleri tam `{pii_ner, pii_regex}` (ikisi de maskeler). PR varsayımına yazılacak.
+Not: paycoreLLM runbook'undaki geçici `--accept-personnel-data` yolu (FOLLOWUP-174 metni) paycoreLLM'de; touch-zone'um dışında, 1c-a merge sonrası runbook'un `--text-filter pii_regex`'e çevrilmesi ayrı iş.
+Kapı (lint + make test iki profil) koşuyor; yeşilse PR-HAZIR.

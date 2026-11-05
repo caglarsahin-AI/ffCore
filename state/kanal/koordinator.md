@@ -3792,3 +3792,12 @@ PR-HAZIR r2 alındı; a3fed7f doğrulandı (2 commit, 3 dosya, çakışma yok). 
 ### K-19R3-0011 · 2026-11-05 11:24 · → tumu · DURUM
 Paket: fix/19r3-env-tests   Cevap: R-19R3-0003 / D-19R3-0007
 r2 **ONAY-TEYIT**. **paycoreLLM master'a merge edildi: dda1bfa** (a3fed7f; 11 dosya +268/-27; kullanıcı dosyalarıyla kesişme yok; ayrı adım exit 0). Koordinatör kabul koşusu (b) arka planda: ana checkout'ta (gerçek `.env` dizinde) `compose.test.yml` ile tam takım, tee state/evidence/19r3-main-checkout-test.log; temiz kopya sayısı (713 passed + 3 bs4 ENV-138) ile eşitse MERGED, BLOCKERS 167/169 kapanır, isci-d HANDOFF-ISTEK. Push kullanıcıda.
+
+### K-19R3-0012 · 2026-11-05 11:26 · → isci-d (fix/19r3) · HANDOFF-ISTEK
+Paket: fix/19r3-env-tests   Cevap: D-19R3-0007
+**MERGED.** paycoreLLM master **dda1bfa** (a3fed7f). Kabul (b) koordinatör koşusu: ana checkout (gerçek `.env` dizinde) tam takım 714 passed + 1 skipped + 3 failed (yalnız bs4, ENV-138); `.env` kaynaklı ek kırmızı yok (öncesinde 3 vardı); state/evidence/19r3-main-checkout-test.log. BLOCKERS 167/169 kapandı. Push kullanıcıda; dış PayCore r4'e dda1bfa.
+Yapılacak: kendi kanalına kısa **HANDOFF** (öğrenilenler: `env_file` kaldırmanın compose/host etkisi, stager `text_filter` sözleşmesi ve `ffcore_compat` eşitlik kuralı, runbook OCR bayrağı geçici çözümü ve FOLLOWUP-174 işaretçisi, bs4 ENV-138) ve **RETIRED** (lease ffcore-isci-d-19r3). Worktree `C:\ai_paycore\paycoreLLM-19r3` RETIRED sonrası koordinatörce kaldırılır (açık dosya bırakma). Sonrası yok; oturum arşivlenecek.
+
+### K-08T1C-0006 · 2026-11-05 11:26 · → isci-a (08-tam-1c-olcum) · ACK
+Paket: 08-tam-1c-a   Cevap: A-08T1C-0008
+ACK ve FOLLOWUP-174 commit kaydı alındı. plan/19 S1 testi notu: `filter` adlı seçenek yasağının amacı (kullanıcıya gizli seçim sunmamak / M3 bayrağıyla karışmamak) korunuyorsa güncelleme kabul; PR notunda eski/yeni kuralı ve gerekçeyi yaz, inceleyici bakacak (DUZELT gerekirse oradan). Kapı sonrası PR-HAZIR (tam SHA).
