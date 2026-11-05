@@ -719,6 +719,14 @@ class _LockRedis:
     async def delete(self, key):
         self.kv.pop(key, None)
 
+    async def eval(self, script, numkeys, key, token, *args):
+        # r2 MINOR-r2-2: owner-checked renew (expire) and release (del) scripts.
+        if self.kv.get(key) != token:
+            return 0
+        if "del" in script:
+            self.kv.pop(key)
+        return 1
+
 
 def test_09_r1_major2_one_holder_per_exam_lock():
     from ffcore.evaluation.worker_tick import exam_lock
@@ -842,7 +850,13 @@ def test_09_r1_minor8_a_good_tick_resets_the_failure_count(monkeypatch):
     monkeypatch.setattr(worker_tick, "advance_eval", fine)
     for name in ("_judge", "_sql", "_embed", "_closer"):
         monkeypatch.setattr(worker_tick, name, lambda *a: None)
-    settings = SimpleNamespace(eval_judge_calls_per_tick=1)
+    settings = SimpleNamespace(
+        eval_judge_calls_per_tick=1,
+        llm_call_timeout_s=60,
+        background_window="",
+        background_window_weekends=False,
+        background_window_tz="Europe/Istanbul",
+    )
     anyio.run(worker_tick._advance_one, settings, _R(), None, None, None, "ev", None)
     assert deleted == [worker_tick.failures_key("ev")]
 
@@ -928,6 +942,11 @@ def test_09_r1_minor4_refused_reread_is_a_coded_failure_and_audited_as_failure(m
         audits.append(entry)
 
     monkeypatch.setattr(worker_tick.db, "session_scope", scope)
+
+    async def given(session, run, key):
+        return True
+
+    monkeypatch.setattr(worker_tick, "sql_tool_given", given)
     monkeypatch.setattr(worker_tick, "bound_sql_action", bound)
     monkeypatch.setattr(worker_tick, "write_event", record)
     monkeypatch.setattr(mcp_client, "call", refused)

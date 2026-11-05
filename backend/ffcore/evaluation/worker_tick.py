@@ -7,9 +7,12 @@ Two parts:
   as listened. The exam is the item runs' follower; while the worker lives they are never
   abandoned, however long a tick takes. A dead worker stops following, and 06a abandons them.
 - `tick` (arq cron): per active exam, under a Redis lock (`SET NX` + TTL, kept alive while the
-  tick works), start the missing item runs of a queued exam or advance a running one. At most
-  EVAL_JUDGE_CALLS_PER_TICK judge calls per exam per tick. A failure, the job's timeout
-  (`CancelledError`) included, counts towards MAX_ATTEMPTS; a successful tick resets the count.
+  tick works), start the missing item runs of a queued exam or advance a running one. Per
+  exam and tick at most EVAL_JUDGE_CALLS_PER_TICK judge calls, no judge call while the
+  background window is closed, and no item started that does not fit before the tick's
+  deadline (r2 MAJOR-r2-2): the exam waits, still running. A failure, the job's timeout
+  (`CancelledError`) included, counts towards MAX_ATTEMPTS unless the tick saved an item; a
+  tick that saved one, or succeeded, resets the count.
 
 Production bindings for runner.advance_eval: the judge (LiteLLM, background class, egress),
 the SQL re-read (mcp-sql as the exam's starter), the embedding (API /internal/embed).
@@ -18,6 +21,7 @@ the SQL re-read (mcp-sql as the exam's starter), the embedding (API /internal/em
 import asyncio
 import contextlib
 import logging
+import time
 import uuid
 
 from sqlalchemy import select
@@ -47,14 +51,30 @@ from ffcore.models.tools import Tool, ToolAction
 from ffcore.runtime import events as run_events
 from ffcore.runtime.contracts import JobClass
 from ffcore.runtime.definition import parse_definition
+from ffcore.runtime.scheduler import BackgroundWindow
+from ffcore.services.mcp_sql import SQL_ERROR_PREFIXES
 
 log = logging.getLogger("ffcore.evaluation")
 
 # Lock life; renewed every LOCK_TTL_S / 3 while the tick works, so only a dead tick lets it go.
 LOCK_TTL_S = 60
-# arq cron timeout of one tick; past it the job is cancelled and that counts as a failure.
+# arq cron timeout of one tick. The tick's own budget ends TICK_MARGIN_S before it (r2
+# MAJOR-r2-2), so a slow judge stops the tick on time instead of being cancelled.
 TICK_TIMEOUT_S = 600
-SQL_ERROR_PREFIXES = ("sql_rejected:", "sql_error:")
+TICK_MARGIN_S = 30
+# Owner-checked renew and release (r2 MINOR-r2-2): never extend or delete another holder's lock.
+_RENEW = (
+    "if redis.call('get', KEYS[1]) == ARGV[1] then "
+    "return redis.call('expire', KEYS[1], ARGV[2]) else return 0 end"
+)
+_RELEASE = (
+    "if redis.call('get', KEYS[1]) == ARGV[1] then "
+    "return redis.call('del', KEYS[1]) else return 0 end"
+)
+
+
+class LockLost(RuntimeError):
+    """The exam lock could not be renewed: the tick stops, another worker may advance it."""
 
 
 def lock_key(ev_id) -> str:
@@ -66,29 +86,44 @@ def failures_key(ev_id) -> str:
 
 
 @contextlib.asynccontextmanager
-async def exam_lock(redis, ev_id, ttl_s: int = LOCK_TTL_S):
+async def exam_lock(redis, ev_id, ttl_s: float = LOCK_TTL_S):
     """One worker advances an exam at a time (r1 MAJOR-2). Yields False when another holds
-    it. The lock is renewed while held; it is released only by its holder."""
-    token = uuid.uuid4().hex
-    if not await redis.set(lock_key(ev_id), token, nx=True, ex=ttl_s):
+    it. The lock is renewed while held and released only by its holder; when a renewal fails
+    (Redis error, or the lock is no longer ours) the holder is stopped with LockLost
+    (r2 MINOR-r2-2), never left working without the lock."""
+    key, token = lock_key(ev_id), uuid.uuid4().hex
+    ttl = max(int(ttl_s), 1)
+    if not await redis.set(key, token, nx=True, ex=ttl):
         yield False
         return
+    holder, lost = asyncio.current_task(), []
 
     async def renew():
-        while True:
-            await asyncio.sleep(ttl_s / 3)
-            await redis.expire(lock_key(ev_id), ttl_s)
+        try:
+            while True:
+                await asyncio.sleep(ttl_s / 3)
+                if not await redis.eval(_RENEW, 1, key, token, ttl):
+                    raise LockLost(f"exam lock {ev_id} is no longer held")
+        except asyncio.CancelledError:
+            raise
+        except Exception as exc:  # noqa: BLE001 - any renewal failure stops the holder
+            lost.append(exc)
+            holder.cancel()
 
     keeper = asyncio.create_task(renew())
     try:
         yield True
+    except asyncio.CancelledError:
+        if not lost:
+            raise
+        holder.uncancel()
+        raise LockLost(f"exam lock {ev_id} lost: {lost[0]!r}") from lost[0]
     finally:
         keeper.cancel()
         with contextlib.suppress(asyncio.CancelledError):
             await keeper
-        held = await redis.get(lock_key(ev_id))
-        if held in (token, token.encode()):
-            await redis.delete(lock_key(ev_id))
+        with contextlib.suppress(Exception):  # a failed release expires with the TTL
+            await redis.eval(_RELEASE, 1, key, token)
 
 
 async def keep_listening(settings: Settings, redis) -> int:
@@ -123,7 +158,25 @@ async def listen_loop(settings: Settings, redis) -> None:
         await asyncio.sleep(settings.eval_advance_interval_s)
 
 
+def tick_budget(settings: Settings, deadline: float | None = None) -> Budget:
+    """One tick's budget for an exam (r2 MAJOR-r2-2): judge calls, the tick's deadline (shared
+    by the tick's exams), the model call timeout as the planned length of a judge call, and the
+    background window (the judge runs in the background class)."""
+    window = BackgroundWindow.parse(
+        settings.background_window,
+        weekends_all_day=settings.background_window_weekends,
+        zone=settings.background_window_tz,
+    )
+    return Budget(
+        settings.eval_judge_calls_per_tick,
+        deadline=deadline or time.monotonic() + TICK_TIMEOUT_S - TICK_MARGIN_S,
+        call_s=float(settings.llm_call_timeout_s),
+        is_open=window.is_open,
+    )
+
+
 async def tick(settings: Settings, redis, slots, prompts, *, queue=None) -> None:
+    deadline = time.monotonic() + TICK_TIMEOUT_S - TICK_MARGIN_S
     async with db.session_scope() as session:
         ids = [ev.id for ev in await active_runs(session)]
     if not ids:
@@ -134,10 +187,15 @@ async def tick(settings: Settings, redis, slots, prompts, *, queue=None) -> None
         async with exam_lock(redis, ev_id) as held:
             if not held:
                 continue
-            await _advance_one(settings, redis, slots, prompts, api, ev_id, queue)
+            await _advance_one(
+                settings, redis, slots, prompts, api, ev_id, queue, deadline=deadline
+            )
 
 
-async def _advance_one(settings, redis, slots, prompts, api, ev_id, queue) -> None:
+async def _advance_one(
+    settings, redis, slots, prompts, api, ev_id, queue, *, deadline: float | None = None
+) -> None:
+    budget = tick_budget(settings, deadline)
     async with db.session_scope() as session:
         ev = await session.get(EvalRun, ev_id)
         if ev is None or ev.status not in ACTIVE:
@@ -157,19 +215,29 @@ async def _advance_one(settings, redis, slots, prompts, api, ev_id, queue) -> No
                     sql=_sql(settings, session),
                     embed=_embed(settings),
                     close=_closer(settings),
-                    budget=Budget(settings.eval_judge_calls_per_tick),
+                    budget=budget,
                 )
         except asyncio.CancelledError:
-            # The job's timeout (or a shutdown): a failure like any other, never silent.
-            log.error("eval_advance_cancelled eval_run=%s", ev_id)
-            await asyncio.shield(_count_failure(redis, ev_id, TimeoutError("tick cancelled")))
+            # The job's timeout, a lost lock or a shutdown: counted unless the tick saved
+            # progress (r2 MAJOR-r2-2); never silent.
+            log.error("eval_advance_cancelled eval_run=%s saved=%s", ev_id, budget.committed)
+            await asyncio.shield(_after_failure(redis, ev_id, budget, TimeoutError("cancelled")))
             raise
         except Exception as exc:  # one exam's error never stops the others
-            log.exception("eval_advance_failed eval_run=%s", ev_id)
+            log.exception("eval_advance_failed eval_run=%s saved=%s", ev_id, budget.committed)
             await session.rollback()
-            await _count_failure(redis, ev_id, exc)
+            await _after_failure(redis, ev_id, budget, exc)
             return
     await redis.delete(failures_key(ev_id))  # r1 MINOR-8: only consecutive failures count
+
+
+async def _after_failure(redis, ev_id, budget: Budget, exc: BaseException) -> None:
+    """A failed tick that saved at least one item made progress: the count starts again (r2
+    MAJOR-r2-2). Only failed ticks without progress, in a row, end the exam."""
+    if budget.committed:
+        await redis.delete(failures_key(ev_id))
+    else:
+        await _count_failure(redis, ev_id, exc)
 
 
 async def _count_failure(redis, ev_id, exc: BaseException) -> None:
@@ -289,13 +357,18 @@ def _judge(settings, session, redis, slots, prompts):
     return run_judge
 
 
+async def sql_tool_given(session, run, tool_key: str) -> bool:
+    """Whether the run's agent version was given `tool_key` with its run_sql action."""
+    version = await session.get(AgentVersion, run.agent_version_id)
+    refs = parse_definition(version.definition).tools
+    return any(r.tool_key == tool_key and "run_sql" in r.actions for r in refs)
+
+
 async def bound_sql_action(session, run, tool_key: str):
     """The run_sql action of `tool_key` only if the run's agent version was given it and it is
     usable now (discovered tool, action available and enabled), as the runtime binds tools
     (r1 MAJOR-1). None otherwise."""
-    version = await session.get(AgentVersion, run.agent_version_id)
-    refs = parse_definition(version.definition).tools
-    if not any(r.tool_key == tool_key and "run_sql" in r.actions for r in refs):
+    if not await sql_tool_given(session, run, tool_key):
         return None
     found = (
         await session.execute(
@@ -318,27 +391,7 @@ async def bound_sql_action(session, run, tool_key: str):
 def _sql(settings, session):
     from ffcore.services import mcp_client, mcp_tools
 
-    async def reread(run, tool_key, sql_text):
-        """The last run_sql the agent really ran (executed; approved when asked, engine
-        `executed_sql`), read again with the same bound tool and the exam starter's identity:
-        the read-only database and the validator apply. A refused or failed read is a coded
-        failure, never an empty result (r1 MINOR-4); the audit is committed on its own."""
-        found = await bound_sql_action(session, run, tool_key)
-        if found is None:
-            return None, "no_executed_sql"
-        tool, action = found
-        caller = mcp_client.Caller(user_id=str(run.user_id), project_id=str(run.project_id))
-        result = await mcp_client.call(
-            mcp_tools.target_of(tool, settings),
-            action.name,
-            {"sql": sql_text, "reason": "exam check"},
-            settings,
-            caller=caller,
-            timeout_s=action.timeout_s,
-        )
-        text = result.text or ""
-        refused = next((p for p in SQL_ERROR_PREFIXES if text.startswith(p)), None)
-        failed = result.is_error or refused is not None
+    async def audit(run, tool_key, *, failed: bool, error_code: str | None = None):
         async with db.session_scope() as audit_session:
             await write_event(
                 audit_session,
@@ -351,16 +404,47 @@ def _sql(settings, session):
                     project_id=str(run.project_id),
                     resource_id=str(run.id),
                     before=None,
-                    after={"tool_key": tool_key, "is_error": failed},
+                    after={"tool_key": tool_key, "is_error": failed, "error_code": error_code},
                     request_id="eval",
                     ip=None,
                 ),
             )
             await audit_session.commit()
-        if result.is_error:
-            return None, "no_sql_result:tool_error"
+
+    async def reread(run, tool_key, sql_text):
+        """The last run_sql the agent really ran (executed, approved when asked, successful;
+        engine `executed_sql`), read again with the same bound tool and the exam starter's
+        identity: the read-only database and the validator apply. A refused or failed read is
+        a coded failure, never an empty result (r1 MINOR-4); a read that could not be made
+        (call error, r2 MINOR-r2-1) or a tool removed since (r2 MINOR-r2-7) is the exam's
+        not_run. Every call is audited, the audit committed on its own."""
+        if not await sql_tool_given(session, run, tool_key):
+            return None, "no_executed_sql"
+        found = await bound_sql_action(session, run, tool_key)
+        if found is None:
+            return None, "tool_removed"
+        tool, action = found
+        caller = mcp_client.Caller(user_id=str(run.user_id), project_id=str(run.project_id))
+        try:
+            result = await mcp_client.call(
+                mcp_tools.target_of(tool, settings),
+                action.name,
+                {"sql": sql_text, "reason": "exam check"},
+                settings,
+                caller=caller,
+                timeout_s=action.timeout_s,
+            )
+        except mcp_client.ToolCallError as exc:
+            await audit(run, tool_key, failed=True, error_code=exc.code)
+            return None, "sql_reread_failed"
+        text = result.text or ""
+        refused = next((p for p in SQL_ERROR_PREFIXES if text.startswith(p)), None)
+        failed = result.is_error or refused is not None
+        await audit(run, tool_key, failed=failed, error_code=refused and refused.rstrip(":"))
         if refused is not None:
             return None, f"no_sql_result:{refused.rstrip(':')}"
+        if result.is_error:
+            return None, "no_sql_result:tool_error"
         rows = parse_csv_rows(text)
         if rows is None:
             return None, "sql_result_truncated"

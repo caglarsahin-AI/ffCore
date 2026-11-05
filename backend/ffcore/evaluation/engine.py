@@ -55,6 +55,10 @@ NOT_RUN_CODES = {
     "eval_approval_required": "approval_required",
     "eval_waiting_user": "waiting_user",
 }
+# Why an item's own check could not be made (09-1 r2): a person rejected its run_sql (MAJOR-r2-1,
+# the agent never saw rows), the advancer could not read the SQL again (MINOR-r2-1), or the tool
+# of an executed call was removed since (MINOR-r2-7). Item-level not_run, never a failure.
+ITEM_NOT_RUN = scorers.CHECK_NOT_MADE
 MAX_ATTEMPTS = 5
 WORST = 10
 
@@ -92,6 +96,8 @@ class ItemResult:
     passed: bool | None  # None: not_run
     scores: list[Score]
     note: str = ""
+    # repeat > 1: the not-run code of repeats left out of a decided item (09-1 r2 MINOR-r2-4).
+    repeats_not_run: str = ""
 
     def mean(self) -> float | None:
         values = [s.value for s in self.scores if s.status == "ok" and s.value is not None]
@@ -163,6 +169,17 @@ def item_result(item: dict, facts: ItemFacts | None, scores: list[Score], note: 
         return ItemResult(
             **base, outcome=None, passed=False, scores=[], note=facts.error_code or facts.status
         )
+    if facts.sql_rejected and not facts.sql:
+        # A person rejected the agent's only run_sql: the exam could not see what the agent
+        # would have got (K-09-0014, KARARLAR "09-1 r2 kararları").
+        return ItemResult(
+            **base, outcome=outcome, passed=None, scores=scores, note="approval_rejected"
+        )
+    blocked = next(
+        (s.comment for s in scores if s.status == "not_run" and s.comment in ITEM_NOT_RUN), None
+    )
+    if blocked is not None:
+        return ItemResult(**base, outcome=outcome, passed=None, scores=scores, note=blocked)
     checked = [s for s in scores if s.status != "not_run"]
     if not checked:
         # No scorer had anything to compare (suite and item do not fit): a visible failure,
@@ -186,6 +203,8 @@ def summarize(
 ) -> dict[str, Any]:
     scored = [r for r in results if r.passed is not None]
     not_run = Counter(r.note or "not_run" for r in results if r.passed is None)
+    # Decided items with some repeats not run count apart: the exam did not run them all either.
+    not_run.update(f"partial:{r.repeats_not_run}" for r in scored if r.repeats_not_run)
     passed_items = sum(1 for r in scored if r.passed)
     pass_rate = passed_items / len(scored) if scored else 0.0
     by_scorer: dict[str, list[float]] = {}

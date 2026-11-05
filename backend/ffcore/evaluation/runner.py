@@ -1,12 +1,14 @@
 """Exam start and the per-tick advance (09; design in evaluation/engine.py)."""
 
+import asyncio
 import csv
 import io
 import logging
+import time
 import uuid
 from collections import Counter
 from collections.abc import Awaitable, Callable
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from typing import Any
 
@@ -66,11 +68,41 @@ class Starter:
     ip: str | None
 
 
+def _always() -> bool:
+    return True
+
+
 @dataclass
 class Budget:
-    """Judge calls this tick may still make for one exam (EVAL_JUDGE_CALLS_PER_TICK)."""
+    """What one tick may still spend on an exam (r1 MAJOR-2, r2 MAJOR-r2-2): judge calls
+    (EVAL_JUDGE_CALLS_PER_TICK), time until `deadline` (monotonic; a model call is planned at
+    `call_s` seconds), judge calls only while the background window `is_open`. `committed`
+    counts the items this tick saved: a tick that saved one made progress."""
 
     judge_calls: int
+    deadline: float | None = None
+    call_s: float = 0.0
+    is_open: Callable[[], bool] = field(default=_always)
+    committed: int = 0
+
+    def judge_open(self) -> bool:
+        return self.is_open()
+
+    def may_judge(self, calls: int) -> bool:
+        """Whether the next item (with `calls` judge calls, 0 without a judge) starts now. The
+        first item of a tick always starts (bounded by `time_left`), so a slow judge still
+        progresses one item per tick; a later one only when its calls fit before the
+        deadline."""
+        if calls and (self.judge_calls <= 0 or not self.is_open()):
+            return False
+        if self.committed == 0 or self.deadline is None:
+            return True
+        return time.monotonic() + self.call_s * max(calls, 1) <= self.deadline
+
+    def time_left(self) -> float | None:
+        if self.deadline is None:
+            return None
+        return max(self.deadline - time.monotonic(), 0.0)
 
 
 def run_name(suite: EvalSuite, version: AgentVersion) -> str:
@@ -268,6 +300,13 @@ async def cancel_waiting(session: AsyncSession, run: Run, code: str, *, close: C
     the run's `error` event written. Committed together by the event write. False: the run
     moved on since it was read; nothing is changed."""
     now = datetime.now(UTC)
+    # Lock order as approvals.decide (approval row, then run; r2 MINOR-r2-3): a person deciding
+    # at the same moment waits for this cancel, or this cancel finds the run moved on.
+    await session.execute(
+        select(Approval.id)
+        .where(Approval.run_id == run.id, Approval.status == "pending")
+        .with_for_update()
+    )
     changed = await session.scalar(
         update(Run)
         .where(Run.id == run.id, Run.status == run.status)
@@ -370,21 +409,31 @@ async def advance_eval(
     for item_id, entry in plan.items():
         if entry["scored"] or any(runs[r].status not in TERMINAL for r in entry["runs"]):
             continue
-        if judged and budget.judge_calls <= 0:
-            break  # the rest waits for the next tick
+        calls = len(entry["runs"]) if judged else 0
+        if not budget.may_judge(calls):
+            # Out of judge calls or time, or the background window is closed: the exam stays
+            # running and waits for a later tick (r2 MAJOR-r2-2); not a failure.
+            break
+        timer = asyncio.timeout(budget.time_left())
         try:
-            entry["result"] = await _score_item(
-                session,
-                ev,
-                entry,
-                runs,
-                scorer_cfg,
-                api=api,
-                judge=judge,
-                sql=sql,
-                embed=embed,
-            )
+            async with timer:
+                entry["result"] = await _score_item(
+                    session,
+                    ev,
+                    entry,
+                    runs,
+                    scorer_cfg,
+                    api=api,
+                    judge=judge,
+                    sql=sql,
+                    embed=embed,
+                )
             entry["scored"] = True
+        except TimeoutError:
+            if not timer.expired():
+                raise
+            log.info("eval_tick_out_of_time eval_run=%s item=%s", ev.id, item_id)
+            break  # the item is scored again next tick (score ids are stable)
         except LangfuseApiError as exc:
             entry["attempts"] = entry.get("attempts", 0) + 1
             entry["last_error"] = exc.code
@@ -396,10 +445,11 @@ async def advance_eval(
                 ev.status, ev.error_code, ev.ended_at = "failed", exc.code, now_utc()
                 await session.commit()
                 return
-        if judged:
-            budget.judge_calls -= len(entry["runs"])
+        budget.judge_calls -= calls
         _save(ev, plan)
         await session.commit()
+        if entry["scored"]:
+            budget.committed += 1
     if all(e["scored"] for e in plan.values()):
         ev.summary = _summary(plan, runs, cfg)
         costs = [float(r.cost_usd) for r in runs.values() if r.cost_usd is not None]
@@ -528,8 +578,8 @@ def _load(item: dict, d: dict) -> ItemResult:
 def combine(item: dict, per_run: list[dict]) -> ItemResult:
     """repeat > 1: scores are averaged per scorer over the runs that ran; a scorer error in any
     run stays an error; the item passes when most decided runs pass; not-run runs are left
-    out (all not run: the item is not run); the outcome is the most frequent one (ties: the
-    earlier stage, diagnosis order)."""
+    out (all not run: the item is not run; some: counted apart in the summary, r2 MINOR-r2-4);
+    the outcome is the most frequent one (ties: the earlier stage, diagnosis order)."""
     loaded = [_load(item, d) for d in per_run]
     if len(loaded) == 1:
         return loaded[0]
@@ -567,8 +617,9 @@ def combine(item: dict, per_run: list[dict]) -> ItemResult:
         passed = False
     first = ran[0]
     note = first.note
-    if len(ran) < len(loaded):
-        note = note or f"not_run={len(loaded) - len(ran)}/{len(loaded)}"
+    left_out = [r for r in loaded if r.passed is None]
+    if left_out:
+        note = note or f"not_run={len(left_out)}/{len(loaded)}"
     return ItemResult(
         item_id=first.item_id,
         style=first.style,
@@ -577,6 +628,7 @@ def combine(item: dict, per_run: list[dict]) -> ItemResult:
         passed=passed,
         scores=scores,
         note=note,
+        repeats_not_run=(left_out[0].note or "not_run") if left_out else "",
     )
 
 

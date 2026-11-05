@@ -94,10 +94,14 @@ def test_09_r2_major2_tick_budget_knows_the_background_window():
 
 def test_09_r2_major2_budget_refuses_a_judge_call_past_the_deadline():
     b = Budget(5, deadline=time.monotonic() + 1.0, call_s=0.4)
+    assert b.may_judge(9) is True  # the first item of a tick always starts (bounded by time)
+    b.committed = 1
     assert b.may_judge(2) is True
     assert b.may_judge(3) is False  # 3 x 0.4 s does not fit in the second left
-    assert Budget(5).may_judge(5) is True and Budget(5).may_judge(6) is False
+    assert Budget(0).may_judge(1) is False and Budget(0).may_judge(0) is True
+    assert Budget(1).may_judge(3) is True  # a repeat above the per-tick limit still progresses
     assert Budget(5, is_open=lambda: False).may_judge(1) is False
+    assert Budget(5, is_open=lambda: False).may_judge(0) is True  # no judge: no window
 
 
 class _CountRedis:
@@ -376,7 +380,8 @@ def test_09_r2_minor3_cancel_waiting_locks_approval_before_run():
 
     run = SimpleNamespace(id="r", status="waiting_approval", project_id="p")
     assert (
-        anyio.run(runner.cancel_waiting, _S(), run, "eval_approval_required", close=None) is False
+        anyio.run(lambda: runner.cancel_waiting(_S(), run, "eval_approval_required", close=None))
+        is False
     )
     first = seen[0]
     assert first.is_select and first._for_update_arg is not None

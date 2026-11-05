@@ -1,7 +1,7 @@
 """`llm_judge` (09): the rubric judge runs in FFCore, not in Langfuse (K-09-0006, S-J A).
 
 The judge sees the question, the expected answer and the agent's answer, rendered into the
-Langfuse prompt `eval_judge_rubric` (seed backend/prompts/eval_judge_rubric.md). Before the
+Langfuse prompt `eval_judge_rubric_v2` (seed backend/prompts/eval_judge_rubric_v2.md). Before the
 model call the whole text goes through the item run's guardrail policy at the `egress` stage
 (08; a no-op where GUARDRAIL_EGRESS_ENABLED=false): the judge never sees what the agent's own
 model call would not have been allowed to send. The call is a background-class model call
@@ -16,7 +16,9 @@ from typing import Any, Protocol
 
 from ffcore.evaluation.scorers import JudgeParseError, Score, judge_score, parse_judge
 
-RUBRIC_PROMPT = "eval_judge_rubric"
+# Seeding never overwrites a prompt Langfuse already has, so a changed rubric text is a new
+# prompt name (r2 MINOR-r2-6; v2: r1 MINOR-1 delimiters). The test pins text to name.
+RUBRIC_PROMPT = "eval_judge_rubric_v2"
 REASON_MAX = 500
 JUDGE_SOURCE = "agent-playground"
 JUDGE_MAX_TOKENS = 300

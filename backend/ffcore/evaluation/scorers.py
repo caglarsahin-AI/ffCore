@@ -101,18 +101,23 @@ def _row(row) -> tuple[str, ...]:
     return tuple(normalize(str(v)) for v in row)
 
 
+CHECK_NOT_MADE = ("approval_rejected", "sql_reread_failed", "tool_removed")
+
+
 def sql_result(
     expected: list[list] | None, returned: list[list] | None, missing: str | None = None
 ) -> Score:
     """Row set of the agent's own `run_sql` result against the expected rows (order-free).
     `returned` are the rows of the last run_sql call the run really made (executed, approved
     when asked), read again by the advancer (the run's events keep no rows). `missing` says why
-    there are none: a person rejected the call (`approval_rejected`: the exam could not see
-    the rows, not_run) or the agent made no executed call (`no_executed_sql`, a failure)."""
+    there are none. The exam could not check (not_run, the item too): a person rejected the call
+    (`approval_rejected`), the re-read failed (`sql_reread_failed`), the tool was removed since
+    (`tool_removed`). The agent's failure: no executed call (`no_executed_sql`), a refused or
+    failed re-read (`no_sql_result:<code>`)."""
     if not expected:
         return _not_run("sql_result", "no_expectation")
-    if missing == "approval_rejected":
-        return _not_run("sql_result", "approval_rejected")
+    if missing in CHECK_NOT_MADE:
+        return _not_run("sql_result", missing)
     if returned is None:
         return Score("sql_result", 0.0, False, missing or "no_sql_result")
     ok = sorted(map(_row, expected)) == sorted(map(_row, returned))
