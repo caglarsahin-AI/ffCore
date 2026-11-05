@@ -91,6 +91,9 @@ class Budget:
     # The hard limit of one model call (LLM_CALL_TIMEOUT_S): a cut counts only after a full
     # window, min(hard_s x calls, total_s) (r5 MINOR-r5-1, K-09-0034). None: every cut counts.
     hard_s: float | None = None
+    # FOLLOWUP-176 C: this exam is the first a tick advances; its first item ran with nobody
+    # before it, so its cut counts whatever the window (no tick-overhead blind spot).
+    first_in_tick: bool = False
     started: int = 0
     committed: int = 0
 
@@ -124,6 +127,8 @@ class Budget:
     def counts_cut(self, calls: int, window: float | None) -> bool:
         """Whether a cut of an item that started with `window` seconds counts (r5 MINOR-r5-1).
         A cut in a partial window (an earlier exam used the tick) is not the item's fault."""
+        if self.first_in_tick and self.started == 1:
+            return True
         need = self.full_window(calls)
         return need is None or window is None or window >= need
 
