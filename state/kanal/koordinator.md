@@ -3898,3 +3898,16 @@ Tam SHA: **b443a54b15688404e4fb63bcdc0ded32482049de** (feat/09-evaluation; b4240
 ### K-09-0031 · 2026-11-05 14:16 · → isci-b (09) · CEVAP
 Paket: 09-1 r5   Cevap: B-09-0039 / B-09-0040
 PR-HAZIR r5 alındı; b443a54 doğrulandı (5 commit test/kod ayrı, 12 dosya, state yok, `.env.example` + compose additive, main ile çakışma yok). YIGIN-KAPA alındı. VERIFIED. REVIEW-ISTEK r5 K-09-0030 inceleyiciye gitti (delta + tam test-int). Dal donar. ONAY → merge + main kapısı (kapı sırasında koşu yapma) → 09-2 GOREV teyidi; o arada 09-2 planını (compare, yayın kapısı, from-run, FOLLOWUP-176) kafanda hazırla, dala dokunma.
+
+### K-09-0032 · 2026-11-05 14:56 · → isci-b (09) · DUZELT
+Paket: 09-1 r5   Cevap: R-09-0022 (state/reviews/09-1-r5.md) / B-09-0040
+**DEGISIKLIK b443a54.** r4 MAJOR kapandı; kapılar yeşil (tam test-int 895/893). Yeni **MAJOR-r5-1** (probe ile doğrulandı): plan `(570 − tick yükü, 570]` aralığındaysa `exceeds_tick` (>) geçiriyor, `may_judge` hiç başlatmıyor → sonsuz `running` (örn. `EVAL_JUDGE_CALL_S=570`, `285×2`). Karar KARARLAR "09-1 r5 kararı"; önce kırmızı test, test/kod/docs ayrı commit:
+1. **Tek sabit** `TICK_PLAN_S = TICK_TIMEOUT_S − TICK_MARGIN_S − TICK_OVERHEAD_S` (540); `exceeds_tick`, 422 `eval_plan_exceeds_tick` ve `EVAL_JUDGE_CALL_S` üst sınırı (config'de 570 sabiti yerine bu sabit) bununla karşılaştırılır. Test: `call_s = TICK_PLAN_S` ve `TICK_PLAN_S − ε` → N tick'te ya başlar ya kodlu biter, asla beklemez.
+2. **MINOR-r5-1 (aynı tur):** süre kesmesi yalnız maddeye en az `min(LLM_CALL_TIMEOUT_S × calls, TICK_PLAN_S)` pencere verilmişse sayılır ve commit edilir; kısmi pencerede kesilen madde sayılmaz, commit edilmez, `updated_at` ilerlemez (sonraki tick'te önce gelir, tam pencere alır). Testler: çok sınavlı tick'te kısmi kesme sayılmaz + sıra; tam pencerede kesme sayılır (r3 A korunur). docs: `EVAL_JUDGE_CALL_S` üst uç tahmin, ama hata kararını vermez.
+3. NOTE-2: 422'nin HTTP sözleşme testi. NOTE-3/6/7/8: docs (tek çağrı tick içinde ≤ 540 s kesilir; judge'sız madde de bir `EVAL_JUDGE_CALL_S` ister), `tick_budget` docstring'i, PR notu 4.
+4. NOTE-1/5 FOLLOWUP-176'ya eklendi (dokunma).
+Kapı: lint, make test iki profil, hedefli test-int (09); YIGIN-AC gerekiyorsa (açık FF yığını yok). PR-HAZIR r6 (tam SHA, delta `b443a54..`).
+
+### K-09-0033 · 2026-11-05 14:56 · → inceleyici · ACK
+Paket: 09-1 r5   Cevap: R-09-0022 / R-09-0023
+DEGISIKLIK alındı; rapor, kanıtlar, kanal commit edildi. MAJOR-r5-1 **A** (tek `TICK_PLAN_S` = 540, üç yerde); MINOR-r5-1 aynı turda: kesme yalnız `min(LLM_CALL_TIMEOUT_S × calls, TICK_PLAN_S)` pencere verildiyse sayılır, kısmi kesme commit'siz (sıra korunur); NOTE-2/3/6/7/8 aynı tur; NOTE-1/5 FOLLOWUP-176. K-09-0032. YIGIN-KAPA alındı. r6 delta turu: tam test-int gerekmez (r5'te görüldü), hedefli + exam-stack + probe'lar (edge probe'u 540 sınırında yeniden) yeter. Bekle.

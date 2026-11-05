@@ -1,0 +1,28 @@
+== 09-1 r5: unit tests of 0fab628 run on the b424013 code (git archive copy, data/samples included) 2026-11-05T13:50:07+03:00
+E   assert (True is False)
+tests/unit/test_09_r4.py:24: assert (True is False)
+E   TypeError: Budget.__init__() got an unexpected keyword argument 'total_s'
+tests/unit/test_09_r4.py:32: TypeError: Budget.__init__() got an unexpected keyword argument 'total_s'
+E   AttributeError: 'Budget' object has no attribute 'total_s'
+tests/unit/test_09_r4.py:41: AttributeError: 'Budget' object has no attribute 'total_s'
+E   ValueError: not enough values to unpack (expected 1, got 0)
+tests/unit/test_09_r4.py:60: ValueError: not enough values to unpack (expected 1, got 0)
+E   assert (True is False)
+tests/unit/test_09_r2.py:98: assert (True is False)
+FAILED tests/unit/test_09_r4.py::test_09_r4_major1_first_item_waits_when_the_shared_deadline_is_used_up
+FAILED tests/unit/test_09_r4.py::test_09_r4_major1_plan_longer_than_a_whole_tick
+FAILED tests/unit/test_09_r4.py::test_09_r4_major1_tick_budget_carries_the_whole_tick_length
+FAILED tests/unit/test_09_r4.py::test_09_r4_note9_judge_ner_outage_is_logged_without_content
+FAILED tests/unit/test_09_r2.py::test_09_r2_major2_budget_refuses_a_judge_call_past_the_deadline
+5 failed, 71 passed in 9.60s
+== 09-1 r5 (B, KARARLAR '09-1 r4 kararı, düzeltme'): B testleri, 97176e2 koduyla (worktree, kod commit'lenmeden önce) 2026-11-05T13:56:08+03:00
+All checks passed!
+E   AttributeError: 'Settings' object has no attribute 'eval_judge_call_s'. Did you mean: 'eval_judge_model'?
+E   AssertionError: assert 600.0 == 45.0
+tests/unit/test_09_r4.py:87: AssertionError: assert 600.0 == 45.0
+E   Failed: DID NOT RAISE ApiError
+tests/unit/test_09_r4.py:118: Failed: DID NOT RAISE ApiError
+FAILED tests/unit/test_09_r4.py::test_09_r4b_judge_call_estimate_is_configured_and_bounded_by_a_tick
+FAILED tests/unit/test_09_r4.py::test_09_r4b_tick_plans_with_the_estimate_not_the_hard_timeout
+FAILED tests/unit/test_09_r4.py::test_09_r4b_start_refuses_a_plan_longer_than_a_tick
+3 failed, 71 passed in 5.95s

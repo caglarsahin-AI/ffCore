@@ -1,0 +1,3 @@
+R5E plan=570 exceeds_tick=False may_judge=False time_left=569.99
+R5E plan=2x285 exceeds_tick=False may_judge=False
+R5E => neither ends the item nor starts it: the exam waits every tick

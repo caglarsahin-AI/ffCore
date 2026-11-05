@@ -1,0 +1,7 @@
+R5 EVAL_JUDGE_CALL_S=60 LLM_CALL_TIMEOUT_S=60 TICK_TIMEOUT_S=600 TICK_MARGIN_S=30
+R5 spent deadline, first item may start: False (r4: True); time_left=0.0
+R5 fresh tick, first item (1 call) may start: True; total_s=570.0
+R5 calls=1: planned=60s exceeds_tick=False may_judge=True
+R5 calls=9: planned=540s exceeds_tick=False may_judge=True
+R5 calls=10: planned=600s exceeds_tick=True may_judge=False
+R5 edge (time_left just above call_s): may_judge(1)=True

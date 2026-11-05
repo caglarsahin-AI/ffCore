@@ -2059,3 +2059,26 @@ Paket: 09-1 r4   Cevap: K-09-0025
 
 ### R-09-0019 · 2026-11-05 13:45 · → koordinator · YIGIN-KAPA
 review09 `down -v --remove-orphans` (13:45): 0 konteyner, 0 hacim. Worktree kaldırıldı (dizin de silindi). Açık inceleyici yığını yok.
+
+### R-09-0020 · 2026-11-05 14:17 · → koordinator · ACK
+Paket: 09-1 r5   Cevap: K-09-0030
+b443a54b15688404e4fb63bcdc0ded32482049de doğrulandı (b424013 atası; 5 commit, 12 dosya; merge-base main'e göre `state/` 0). Worktree `.worktrees/review-09-1-r5` (temiz).
+
+### R-09-0021 · 2026-11-05 14:17 · → koordinator · YIGIN-AC
+review09, 18300/13300, tam yığın + plan/18 katmanı. İşçinin `0.0.0-09` imajı b443a54 ile dosya dosya eşleşti (168 py, fark 0); `--no-build --pull never`. Koşular: unit ×2, lint, **tam test-int ×2**, alembic, seed, seed-eval ×2, exam-stack, smoke, probe P0-P4 + r4 bütçe probe'u. Açık FF yığını: bu tek. Kapanış down -v + YIGIN-KAPA.
+
+### R-09-0022 · 2026-11-05 14:54 · → koordinator · REVIEW-SONUC
+Paket: 09-1 r5   Cevap: K-09-0030
+**DEGISIKLIK b443a54b15688404e4fb63bcdc0ded32482049de.** Rapor state/reviews/09-1-r5.md. BLOCKER 0, MAJOR 1, MINOR 1, NOTE 8.
+- KAPANDI:
+  - MAJOR-r4-1 A: ilk madde de planlanan süreyi istiyor; sığmazsa commit yok, sayaç yok, `updated_at` sabit; iki sınavlı test var; yığın probe'unda son süre geçmişken `may_judge(1)=False`.
+  - ek (`planned_exceeds_tick_budget`); B (`EVAL_JUDGE_CALL_S` C12 additive, 422 `eval_plan_exceeds_tick`, zamanlayıcı hâlâ `time_left`).
+  - r3 A korunuyor; docstring'ler ve NOTE-1/5/9.
+- **MAJOR-r5-1 (KARAR-GEREK):** plan bütçeye eşit ya da tick yükü kadar altındaysa (ör. `EVAL_JUDGE_CALL_S=570`, `le=570` izin veriyor, repeat 1; ya da 285 × 2) `exceeds_tick` (`>`) bitirmiyor, `may_judge` hiç başlatmıyor. Sınav sonsuza dek `running`. Yığında probe: plan 570 → `exceeds_tick=False`, `may_judge=False`.
+  - **A (önerilen)** tek "kullanılabilir pencere" sabiti (ör. 570 − 30 sn) `exceeds_tick`, 422 ve `EVAL_JUDGE_CALL_S` üst sınırında;
+  - B o tick'in `time_left`'ine göre bitirme.
+- MINOR-r5-1: çok sınavda kesilen madde sona düşüyor, tahminden yavaş ama sağlıklı judge 5 kısmi kesmede `judge_out_of_time` olabiliyor (öneri: `full_window` işareti ya da docs'ta "üst uç tahmin").
+- Kapılar (işçinin doğrulanmış imajı, build yok): unit 1724 ×2, lint, **tam test-int 895 / 893**, alembic tek head, seed-eval idempotent, exam-stack 8/8, smoke, probe P0-P4. DNS hatası 0.
+
+### R-09-0023 · 2026-11-05 14:54 · → koordinator · YIGIN-KAPA
+review09 `down -v --remove-orphans` (14:54): 0 konteyner, 0 hacim. Worktree kaldırıldı (dizin de silindi). Açık inceleyici yığını yok.
