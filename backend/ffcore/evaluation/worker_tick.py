@@ -37,6 +37,7 @@ from ffcore.evaluation.runner import (
     start_items,
 )
 from ffcore.evaluation.scorers import Score
+from ffcore.guardrails.recognizers.ner import HttpNer
 from ffcore.guardrails.service import resolve_policy
 from ffcore.guardrails.settings import get_guardrail_settings
 from ffcore.models.agents import AgentVersion
@@ -243,6 +244,8 @@ def _judge(settings, session, redis, slots, prompts):
             project_id=run.project_id,
             egress_enabled=guardrail.guardrail_egress_enabled,
             ttl_s=guardrail.pii_token_ttl_s,
+            # The worker never loads the NER model; it asks the API (08 tam 1b).
+            ner=HttpNer(settings),
         )
         model = judge_mod.LiteLLMJudgeModel(
             LiteLLMModel(

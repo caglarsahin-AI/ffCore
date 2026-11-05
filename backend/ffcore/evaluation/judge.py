@@ -88,13 +88,18 @@ class PromptRubric:
 class EgressGuard:
     """The item run's policy at the egress stage, events recorded like the run's own."""
 
-    def __init__(self, session, redis, policy, *, run_id, project_id, egress_enabled, ttl_s):
+    def __init__(
+        self, session, redis, policy, *, run_id, project_id, egress_enabled, ttl_s, ner=None
+    ):
         from ffcore.guardrails.masking import RedisTokenStore
 
         self._session, self._policy = session, policy
         self._run_id, self._project_id = str(run_id), project_id
         self._egress = egress_enabled
         self._tokens = RedisTokenStore(redis, ttl_s)
+        # 08 tam 1b: an `engine: ner` egress policy (GUARDRAIL_EGRESS_NER=true) needs a NER
+        # client; the worker passes HttpNer. None fails such a policy loudly (ner_not_configured).
+        self._ner = ner
 
     async def egress(self, text: str) -> tuple[str, str]:
         from ffcore.guardrails import engine
@@ -109,6 +114,7 @@ class EgressGuard:
             source=JUDGE_SOURCE,
             token_store=self._tokens,
             egress_enabled=True,
+            ner=self._ner,
         )
         decision = await engine.evaluate(text, "egress", self._policy, ctx=ctx)
         if decision.events:
