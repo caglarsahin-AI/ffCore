@@ -710,7 +710,9 @@ paths:
 
         (the /internal/embed pattern). Spans only, never values. Without NER_MODEL / NER_REVISION
 
-        503 `ner_not_configured`; a missing weight 503 `model_missing` (run `make models`).'
+        503 `ner_not_configured`; a model label that maps to no category 503 `ner_label_unknown`; a
+
+        missing weight 503 `model_missing` (run `make models`).'
       operationId: internal_ner_api_v1_internal_guardrails_ner_post
       requestBody:
         content:
@@ -757,6 +759,14 @@ paths:
                 $ref: '#/components/schemas/ErrorBody'
         '422':
           description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '503':
+          description: 'NER not available: `ner_not_configured` (NER_MODEL / NER_REVISION not set), `ner_label_unknown`
+            (a model label maps to no PII category) or `model_missing` (the weights are not in the offline
+            cache; run `make models`).'
           content:
             application/json:
               schema:
