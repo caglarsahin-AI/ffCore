@@ -1,0 +1,1048 @@
+FF.FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF                                 [100%]
+=================================== FAILURES ===================================
+______________________ test_19r3_1_settings_ignore_dotenv ______________________
+
+dotenv_dir = PosixPath('/tmp/pytest-of-root/pytest-0/test_19r3_1_settings_ignore_do0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f139f159730>
+
+    def test_19r3_1_settings_ignore_dotenv(dotenv_dir: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+        monkeypatch.delenv("JIRA_URL", raising=False)
+        (dotenv_dir / ".env").write_text("JIRA_URL=https://dotenv.invalid\n", encoding="utf-8")
+>       assert config.get_settings().jira_url == config.Settings.model_fields["jira_url"].default
+E       AssertionError: assert 'https://dotenv.invalid' == 'https://support.paycore.com'
+E         
+E         - https://support.paycore.com
+E         + https://dotenv.invalid
+
+/app/tests/test_19r3_env_tests.py:50: AssertionError
+________________ test_19r3_2_half_langfuse_dotenv_does_not_leak ________________
+
+dotenv_dir = PosixPath('/tmp/pytest-of-root/pytest-0/test_19r3_2_half_langfuse_dote0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f1395c7f6e0>
+
+    def test_19r3_2_half_langfuse_dotenv_does_not_leak(
+        dotenv_dir: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """The main checkout's failure: a `.env` with some Langfuse values made three tests raise
+        "Langfuse is half configured". With nothing set in the environment, there is no client."""
+        for name in LANGFUSE_VARS:
+            monkeypatch.delenv(name, raising=False)
+        (dotenv_dir / ".env").write_text("LANGFUSE_PUBLIC_KEY=pk-dummy-not-secret\n", encoding="utf-8")
+>       assert trace.langfuse_client() is None
+               ^^^^^^^^^^^^^^^^^^^^^^^
+
+/app/tests/test_19r3_env_tests.py:62: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    @lru_cache
+    def langfuse_client() -> Langfuse | None:
+        """The Langfuse client, or None when none of LANGFUSE_HOST / _PUBLIC_KEY / _SECRET_KEY is
+        set (said once in the log). Some but not all set is a typo, not a choice: RuntimeError, and
+        the API does not start (api._lifespan)."""
+        s = get_settings()
+        values = {name: getattr(s, name) for name in _LANGFUSE_SETTINGS}
+        if not any(values.values()):
+            log.info("langfuse_disabled", reason="LANGFUSE_HOST/_PUBLIC_KEY/_SECRET_KEY not set")
+            return None
+        missing = [name.upper() for name, value in values.items() if not value]
+        if missing:
+>           raise RuntimeError(f"Langfuse is half configured; not set: {', '.join(missing)}")
+E           RuntimeError: Langfuse is half configured; not set: LANGFUSE_HOST, LANGFUSE_SECRET_KEY
+
+/app/src/paycore_llm/rag/trace.py:312: RuntimeError
+______ test_19r3_3_compat_text_filter_matches_ffcore[None-False-sources0] ______
+
+sources = ['jira:PRSIM'], flag = False, text_filter = None
+
+    @pytest.mark.parametrize("sources", SOURCES)
+    @pytest.mark.parametrize("flag", [False, True])
+    @pytest.mark.parametrize("text_filter", [None, "pii_ner", "pii_regex"])
+    def test_19r3_3_compat_text_filter_matches_ffcore(
+        sources: list[str], flag: bool, text_filter: str | None
+    ) -> None:
+>       assert _outcome(ffcore_compat.check_sources, sources, flag, text_filter) == _outcome(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            raw_staging.check_sources, sources, flag, text_filter
+        )
+
+tests/test_19r3_env_tests.py:89: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+check = <function check_sources at 0x7f139f3b80e0>, sources = ['jira:PRSIM']
+flag = False, text_filter = None
+
+    def _outcome(check, sources: list[str], flag: bool, text_filter: str | None):  # noqa: ANN001, ANN202
+        try:
+>           return check(sources, accept_personnel_data=flag, text_filter=text_filter)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           TypeError: check_sources() got an unexpected keyword argument 'text_filter'
+
+tests/test_19r3_env_tests.py:78: TypeError
+______ test_19r3_3_compat_text_filter_matches_ffcore[None-False-sources1] ______
+
+sources = ['PRSIM'], flag = False, text_filter = None
+
+    @pytest.mark.parametrize("sources", SOURCES)
+    @pytest.mark.parametrize("flag", [False, True])
+    @pytest.mark.parametrize("text_filter", [None, "pii_ner", "pii_regex"])
+    def test_19r3_3_compat_text_filter_matches_ffcore(
+        sources: list[str], flag: bool, text_filter: str | None
+    ) -> None:
+>       assert _outcome(ffcore_compat.check_sources, sources, flag, text_filter) == _outcome(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            raw_staging.check_sources, sources, flag, text_filter
+        )
+
+tests/test_19r3_env_tests.py:89: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+check = <function check_sources at 0x7f139f3b80e0>, sources = ['PRSIM']
+flag = False, text_filter = None
+
+    def _outcome(check, sources: list[str], flag: bool, text_filter: str | None):  # noqa: ANN001, ANN202
+        try:
+>           return check(sources, accept_personnel_data=flag, text_filter=text_filter)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           TypeError: check_sources() got an unexpected keyword argument 'text_filter'
+
+tests/test_19r3_env_tests.py:78: TypeError
+______ test_19r3_3_compat_text_filter_matches_ffcore[None-False-sources2] ______
+
+sources = ['confluence:PRSIM-DOCS'], flag = False, text_filter = None
+
+    @pytest.mark.parametrize("sources", SOURCES)
+    @pytest.mark.parametrize("flag", [False, True])
+    @pytest.mark.parametrize("text_filter", [None, "pii_ner", "pii_regex"])
+    def test_19r3_3_compat_text_filter_matches_ffcore(
+        sources: list[str], flag: bool, text_filter: str | None
+    ) -> None:
+>       assert _outcome(ffcore_compat.check_sources, sources, flag, text_filter) == _outcome(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            raw_staging.check_sources, sources, flag, text_filter
+        )
+
+tests/test_19r3_env_tests.py:89: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+check = <function check_sources at 0x7f139f3b80e0>
+sources = ['confluence:PRSIM-DOCS'], flag = False, text_filter = None
+
+    def _outcome(check, sources: list[str], flag: bool, text_filter: str | None):  # noqa: ANN001, ANN202
+        try:
+>           return check(sources, accept_personnel_data=flag, text_filter=text_filter)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           TypeError: check_sources() got an unexpected keyword argument 'text_filter'
+
+tests/test_19r3_env_tests.py:78: TypeError
+______ test_19r3_3_compat_text_filter_matches_ffcore[None-False-sources3] ______
+
+sources = ['confluence:OCR'], flag = False, text_filter = None
+
+    @pytest.mark.parametrize("sources", SOURCES)
+    @pytest.mark.parametrize("flag", [False, True])
+    @pytest.mark.parametrize("text_filter", [None, "pii_ner", "pii_regex"])
+    def test_19r3_3_compat_text_filter_matches_ffcore(
+        sources: list[str], flag: bool, text_filter: str | None
+    ) -> None:
+>       assert _outcome(ffcore_compat.check_sources, sources, flag, text_filter) == _outcome(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            raw_staging.check_sources, sources, flag, text_filter
+        )
+
+tests/test_19r3_env_tests.py:89: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+check = <function check_sources at 0x7f139f3b80e0>, sources = ['confluence:OCR']
+flag = False, text_filter = None
+
+    def _outcome(check, sources: list[str], flag: bool, text_filter: str | None):  # noqa: ANN001, ANN202
+        try:
+>           return check(sources, accept_personnel_data=flag, text_filter=text_filter)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           TypeError: check_sources() got an unexpected keyword argument 'text_filter'
+
+tests/test_19r3_env_tests.py:78: TypeError
+______ test_19r3_3_compat_text_filter_matches_ffcore[None-False-sources4] ______
+
+sources = [], flag = False, text_filter = None
+
+    @pytest.mark.parametrize("sources", SOURCES)
+    @pytest.mark.parametrize("flag", [False, True])
+    @pytest.mark.parametrize("text_filter", [None, "pii_ner", "pii_regex"])
+    def test_19r3_3_compat_text_filter_matches_ffcore(
+        sources: list[str], flag: bool, text_filter: str | None
+    ) -> None:
+>       assert _outcome(ffcore_compat.check_sources, sources, flag, text_filter) == _outcome(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            raw_staging.check_sources, sources, flag, text_filter
+        )
+
+tests/test_19r3_env_tests.py:89: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+check = <function check_sources at 0x7f139f3b80e0>, sources = [], flag = False
+text_filter = None
+
+    def _outcome(check, sources: list[str], flag: bool, text_filter: str | None):  # noqa: ANN001, ANN202
+        try:
+>           return check(sources, accept_personnel_data=flag, text_filter=text_filter)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           TypeError: check_sources() got an unexpected keyword argument 'text_filter'
+
+tests/test_19r3_env_tests.py:78: TypeError
+______ test_19r3_3_compat_text_filter_matches_ffcore[None-True-sources0] _______
+
+sources = ['jira:PRSIM'], flag = True, text_filter = None
+
+    @pytest.mark.parametrize("sources", SOURCES)
+    @pytest.mark.parametrize("flag", [False, True])
+    @pytest.mark.parametrize("text_filter", [None, "pii_ner", "pii_regex"])
+    def test_19r3_3_compat_text_filter_matches_ffcore(
+        sources: list[str], flag: bool, text_filter: str | None
+    ) -> None:
+>       assert _outcome(ffcore_compat.check_sources, sources, flag, text_filter) == _outcome(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            raw_staging.check_sources, sources, flag, text_filter
+        )
+
+tests/test_19r3_env_tests.py:89: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+check = <function check_sources at 0x7f139f3b80e0>, sources = ['jira:PRSIM']
+flag = True, text_filter = None
+
+    def _outcome(check, sources: list[str], flag: bool, text_filter: str | None):  # noqa: ANN001, ANN202
+        try:
+>           return check(sources, accept_personnel_data=flag, text_filter=text_filter)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           TypeError: check_sources() got an unexpected keyword argument 'text_filter'
+
+tests/test_19r3_env_tests.py:78: TypeError
+______ test_19r3_3_compat_text_filter_matches_ffcore[None-True-sources1] _______
+
+sources = ['PRSIM'], flag = True, text_filter = None
+
+    @pytest.mark.parametrize("sources", SOURCES)
+    @pytest.mark.parametrize("flag", [False, True])
+    @pytest.mark.parametrize("text_filter", [None, "pii_ner", "pii_regex"])
+    def test_19r3_3_compat_text_filter_matches_ffcore(
+        sources: list[str], flag: bool, text_filter: str | None
+    ) -> None:
+>       assert _outcome(ffcore_compat.check_sources, sources, flag, text_filter) == _outcome(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            raw_staging.check_sources, sources, flag, text_filter
+        )
+
+tests/test_19r3_env_tests.py:89: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+check = <function check_sources at 0x7f139f3b80e0>, sources = ['PRSIM']
+flag = True, text_filter = None
+
+    def _outcome(check, sources: list[str], flag: bool, text_filter: str | None):  # noqa: ANN001, ANN202
+        try:
+>           return check(sources, accept_personnel_data=flag, text_filter=text_filter)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           TypeError: check_sources() got an unexpected keyword argument 'text_filter'
+
+tests/test_19r3_env_tests.py:78: TypeError
+______ test_19r3_3_compat_text_filter_matches_ffcore[None-True-sources2] _______
+
+sources = ['confluence:PRSIM-DOCS'], flag = True, text_filter = None
+
+    @pytest.mark.parametrize("sources", SOURCES)
+    @pytest.mark.parametrize("flag", [False, True])
+    @pytest.mark.parametrize("text_filter", [None, "pii_ner", "pii_regex"])
+    def test_19r3_3_compat_text_filter_matches_ffcore(
+        sources: list[str], flag: bool, text_filter: str | None
+    ) -> None:
+>       assert _outcome(ffcore_compat.check_sources, sources, flag, text_filter) == _outcome(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            raw_staging.check_sources, sources, flag, text_filter
+        )
+
+tests/test_19r3_env_tests.py:89: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+check = <function check_sources at 0x7f139f3b80e0>
+sources = ['confluence:PRSIM-DOCS'], flag = True, text_filter = None
+
+    def _outcome(check, sources: list[str], flag: bool, text_filter: str | None):  # noqa: ANN001, ANN202
+        try:
+>           return check(sources, accept_personnel_data=flag, text_filter=text_filter)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           TypeError: check_sources() got an unexpected keyword argument 'text_filter'
+
+tests/test_19r3_env_tests.py:78: TypeError
+______ test_19r3_3_compat_text_filter_matches_ffcore[None-True-sources3] _______
+
+sources = ['confluence:OCR'], flag = True, text_filter = None
+
+    @pytest.mark.parametrize("sources", SOURCES)
+    @pytest.mark.parametrize("flag", [False, True])
+    @pytest.mark.parametrize("text_filter", [None, "pii_ner", "pii_regex"])
+    def test_19r3_3_compat_text_filter_matches_ffcore(
+        sources: list[str], flag: bool, text_filter: str | None
+    ) -> None:
+>       assert _outcome(ffcore_compat.check_sources, sources, flag, text_filter) == _outcome(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            raw_staging.check_sources, sources, flag, text_filter
+        )
+
+tests/test_19r3_env_tests.py:89: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+check = <function check_sources at 0x7f139f3b80e0>, sources = ['confluence:OCR']
+flag = True, text_filter = None
+
+    def _outcome(check, sources: list[str], flag: bool, text_filter: str | None):  # noqa: ANN001, ANN202
+        try:
+>           return check(sources, accept_personnel_data=flag, text_filter=text_filter)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           TypeError: check_sources() got an unexpected keyword argument 'text_filter'
+
+tests/test_19r3_env_tests.py:78: TypeError
+______ test_19r3_3_compat_text_filter_matches_ffcore[None-True-sources4] _______
+
+sources = [], flag = True, text_filter = None
+
+    @pytest.mark.parametrize("sources", SOURCES)
+    @pytest.mark.parametrize("flag", [False, True])
+    @pytest.mark.parametrize("text_filter", [None, "pii_ner", "pii_regex"])
+    def test_19r3_3_compat_text_filter_matches_ffcore(
+        sources: list[str], flag: bool, text_filter: str | None
+    ) -> None:
+>       assert _outcome(ffcore_compat.check_sources, sources, flag, text_filter) == _outcome(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            raw_staging.check_sources, sources, flag, text_filter
+        )
+
+tests/test_19r3_env_tests.py:89: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+check = <function check_sources at 0x7f139f3b80e0>, sources = [], flag = True
+text_filter = None
+
+    def _outcome(check, sources: list[str], flag: bool, text_filter: str | None):  # noqa: ANN001, ANN202
+        try:
+>           return check(sources, accept_personnel_data=flag, text_filter=text_filter)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           TypeError: check_sources() got an unexpected keyword argument 'text_filter'
+
+tests/test_19r3_env_tests.py:78: TypeError
+____ test_19r3_3_compat_text_filter_matches_ffcore[pii_ner-False-sources0] _____
+
+sources = ['jira:PRSIM'], flag = False, text_filter = 'pii_ner'
+
+    @pytest.mark.parametrize("sources", SOURCES)
+    @pytest.mark.parametrize("flag", [False, True])
+    @pytest.mark.parametrize("text_filter", [None, "pii_ner", "pii_regex"])
+    def test_19r3_3_compat_text_filter_matches_ffcore(
+        sources: list[str], flag: bool, text_filter: str | None
+    ) -> None:
+>       assert _outcome(ffcore_compat.check_sources, sources, flag, text_filter) == _outcome(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            raw_staging.check_sources, sources, flag, text_filter
+        )
+
+tests/test_19r3_env_tests.py:89: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+check = <function check_sources at 0x7f139f3b80e0>, sources = ['jira:PRSIM']
+flag = False, text_filter = 'pii_ner'
+
+    def _outcome(check, sources: list[str], flag: bool, text_filter: str | None):  # noqa: ANN001, ANN202
+        try:
+>           return check(sources, accept_personnel_data=flag, text_filter=text_filter)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           TypeError: check_sources() got an unexpected keyword argument 'text_filter'
+
+tests/test_19r3_env_tests.py:78: TypeError
+____ test_19r3_3_compat_text_filter_matches_ffcore[pii_ner-False-sources1] _____
+
+sources = ['PRSIM'], flag = False, text_filter = 'pii_ner'
+
+    @pytest.mark.parametrize("sources", SOURCES)
+    @pytest.mark.parametrize("flag", [False, True])
+    @pytest.mark.parametrize("text_filter", [None, "pii_ner", "pii_regex"])
+    def test_19r3_3_compat_text_filter_matches_ffcore(
+        sources: list[str], flag: bool, text_filter: str | None
+    ) -> None:
+>       assert _outcome(ffcore_compat.check_sources, sources, flag, text_filter) == _outcome(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            raw_staging.check_sources, sources, flag, text_filter
+        )
+
+tests/test_19r3_env_tests.py:89: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+check = <function check_sources at 0x7f139f3b80e0>, sources = ['PRSIM']
+flag = False, text_filter = 'pii_ner'
+
+    def _outcome(check, sources: list[str], flag: bool, text_filter: str | None):  # noqa: ANN001, ANN202
+        try:
+>           return check(sources, accept_personnel_data=flag, text_filter=text_filter)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           TypeError: check_sources() got an unexpected keyword argument 'text_filter'
+
+tests/test_19r3_env_tests.py:78: TypeError
+____ test_19r3_3_compat_text_filter_matches_ffcore[pii_ner-False-sources2] _____
+
+sources = ['confluence:PRSIM-DOCS'], flag = False, text_filter = 'pii_ner'
+
+    @pytest.mark.parametrize("sources", SOURCES)
+    @pytest.mark.parametrize("flag", [False, True])
+    @pytest.mark.parametrize("text_filter", [None, "pii_ner", "pii_regex"])
+    def test_19r3_3_compat_text_filter_matches_ffcore(
+        sources: list[str], flag: bool, text_filter: str | None
+    ) -> None:
+>       assert _outcome(ffcore_compat.check_sources, sources, flag, text_filter) == _outcome(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            raw_staging.check_sources, sources, flag, text_filter
+        )
+
+tests/test_19r3_env_tests.py:89: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+check = <function check_sources at 0x7f139f3b80e0>
+sources = ['confluence:PRSIM-DOCS'], flag = False, text_filter = 'pii_ner'
+
+    def _outcome(check, sources: list[str], flag: bool, text_filter: str | None):  # noqa: ANN001, ANN202
+        try:
+>           return check(sources, accept_personnel_data=flag, text_filter=text_filter)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           TypeError: check_sources() got an unexpected keyword argument 'text_filter'
+
+tests/test_19r3_env_tests.py:78: TypeError
+____ test_19r3_3_compat_text_filter_matches_ffcore[pii_ner-False-sources3] _____
+
+sources = ['confluence:OCR'], flag = False, text_filter = 'pii_ner'
+
+    @pytest.mark.parametrize("sources", SOURCES)
+    @pytest.mark.parametrize("flag", [False, True])
+    @pytest.mark.parametrize("text_filter", [None, "pii_ner", "pii_regex"])
+    def test_19r3_3_compat_text_filter_matches_ffcore(
+        sources: list[str], flag: bool, text_filter: str | None
+    ) -> None:
+>       assert _outcome(ffcore_compat.check_sources, sources, flag, text_filter) == _outcome(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            raw_staging.check_sources, sources, flag, text_filter
+        )
+
+tests/test_19r3_env_tests.py:89: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+check = <function check_sources at 0x7f139f3b80e0>, sources = ['confluence:OCR']
+flag = False, text_filter = 'pii_ner'
+
+    def _outcome(check, sources: list[str], flag: bool, text_filter: str | None):  # noqa: ANN001, ANN202
+        try:
+>           return check(sources, accept_personnel_data=flag, text_filter=text_filter)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           TypeError: check_sources() got an unexpected keyword argument 'text_filter'
+
+tests/test_19r3_env_tests.py:78: TypeError
+____ test_19r3_3_compat_text_filter_matches_ffcore[pii_ner-False-sources4] _____
+
+sources = [], flag = False, text_filter = 'pii_ner'
+
+    @pytest.mark.parametrize("sources", SOURCES)
+    @pytest.mark.parametrize("flag", [False, True])
+    @pytest.mark.parametrize("text_filter", [None, "pii_ner", "pii_regex"])
+    def test_19r3_3_compat_text_filter_matches_ffcore(
+        sources: list[str], flag: bool, text_filter: str | None
+    ) -> None:
+>       assert _outcome(ffcore_compat.check_sources, sources, flag, text_filter) == _outcome(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            raw_staging.check_sources, sources, flag, text_filter
+        )
+
+tests/test_19r3_env_tests.py:89: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+check = <function check_sources at 0x7f139f3b80e0>, sources = [], flag = False
+text_filter = 'pii_ner'
+
+    def _outcome(check, sources: list[str], flag: bool, text_filter: str | None):  # noqa: ANN001, ANN202
+        try:
+>           return check(sources, accept_personnel_data=flag, text_filter=text_filter)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           TypeError: check_sources() got an unexpected keyword argument 'text_filter'
+
+tests/test_19r3_env_tests.py:78: TypeError
+_____ test_19r3_3_compat_text_filter_matches_ffcore[pii_ner-True-sources0] _____
+
+sources = ['jira:PRSIM'], flag = True, text_filter = 'pii_ner'
+
+    @pytest.mark.parametrize("sources", SOURCES)
+    @pytest.mark.parametrize("flag", [False, True])
+    @pytest.mark.parametrize("text_filter", [None, "pii_ner", "pii_regex"])
+    def test_19r3_3_compat_text_filter_matches_ffcore(
+        sources: list[str], flag: bool, text_filter: str | None
+    ) -> None:
+>       assert _outcome(ffcore_compat.check_sources, sources, flag, text_filter) == _outcome(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            raw_staging.check_sources, sources, flag, text_filter
+        )
+
+tests/test_19r3_env_tests.py:89: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+check = <function check_sources at 0x7f139f3b80e0>, sources = ['jira:PRSIM']
+flag = True, text_filter = 'pii_ner'
+
+    def _outcome(check, sources: list[str], flag: bool, text_filter: str | None):  # noqa: ANN001, ANN202
+        try:
+>           return check(sources, accept_personnel_data=flag, text_filter=text_filter)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           TypeError: check_sources() got an unexpected keyword argument 'text_filter'
+
+tests/test_19r3_env_tests.py:78: TypeError
+_____ test_19r3_3_compat_text_filter_matches_ffcore[pii_ner-True-sources1] _____
+
+sources = ['PRSIM'], flag = True, text_filter = 'pii_ner'
+
+    @pytest.mark.parametrize("sources", SOURCES)
+    @pytest.mark.parametrize("flag", [False, True])
+    @pytest.mark.parametrize("text_filter", [None, "pii_ner", "pii_regex"])
+    def test_19r3_3_compat_text_filter_matches_ffcore(
+        sources: list[str], flag: bool, text_filter: str | None
+    ) -> None:
+>       assert _outcome(ffcore_compat.check_sources, sources, flag, text_filter) == _outcome(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            raw_staging.check_sources, sources, flag, text_filter
+        )
+
+tests/test_19r3_env_tests.py:89: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+check = <function check_sources at 0x7f139f3b80e0>, sources = ['PRSIM']
+flag = True, text_filter = 'pii_ner'
+
+    def _outcome(check, sources: list[str], flag: bool, text_filter: str | None):  # noqa: ANN001, ANN202
+        try:
+>           return check(sources, accept_personnel_data=flag, text_filter=text_filter)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           TypeError: check_sources() got an unexpected keyword argument 'text_filter'
+
+tests/test_19r3_env_tests.py:78: TypeError
+_____ test_19r3_3_compat_text_filter_matches_ffcore[pii_ner-True-sources2] _____
+
+sources = ['confluence:PRSIM-DOCS'], flag = True, text_filter = 'pii_ner'
+
+    @pytest.mark.parametrize("sources", SOURCES)
+    @pytest.mark.parametrize("flag", [False, True])
+    @pytest.mark.parametrize("text_filter", [None, "pii_ner", "pii_regex"])
+    def test_19r3_3_compat_text_filter_matches_ffcore(
+        sources: list[str], flag: bool, text_filter: str | None
+    ) -> None:
+>       assert _outcome(ffcore_compat.check_sources, sources, flag, text_filter) == _outcome(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            raw_staging.check_sources, sources, flag, text_filter
+        )
+
+tests/test_19r3_env_tests.py:89: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+check = <function check_sources at 0x7f139f3b80e0>
+sources = ['confluence:PRSIM-DOCS'], flag = True, text_filter = 'pii_ner'
+
+    def _outcome(check, sources: list[str], flag: bool, text_filter: str | None):  # noqa: ANN001, ANN202
+        try:
+>           return check(sources, accept_personnel_data=flag, text_filter=text_filter)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           TypeError: check_sources() got an unexpected keyword argument 'text_filter'
+
+tests/test_19r3_env_tests.py:78: TypeError
+_____ test_19r3_3_compat_text_filter_matches_ffcore[pii_ner-True-sources3] _____
+
+sources = ['confluence:OCR'], flag = True, text_filter = 'pii_ner'
+
+    @pytest.mark.parametrize("sources", SOURCES)
+    @pytest.mark.parametrize("flag", [False, True])
+    @pytest.mark.parametrize("text_filter", [None, "pii_ner", "pii_regex"])
+    def test_19r3_3_compat_text_filter_matches_ffcore(
+        sources: list[str], flag: bool, text_filter: str | None
+    ) -> None:
+>       assert _outcome(ffcore_compat.check_sources, sources, flag, text_filter) == _outcome(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            raw_staging.check_sources, sources, flag, text_filter
+        )
+
+tests/test_19r3_env_tests.py:89: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+check = <function check_sources at 0x7f139f3b80e0>, sources = ['confluence:OCR']
+flag = True, text_filter = 'pii_ner'
+
+    def _outcome(check, sources: list[str], flag: bool, text_filter: str | None):  # noqa: ANN001, ANN202
+        try:
+>           return check(sources, accept_personnel_data=flag, text_filter=text_filter)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           TypeError: check_sources() got an unexpected keyword argument 'text_filter'
+
+tests/test_19r3_env_tests.py:78: TypeError
+_____ test_19r3_3_compat_text_filter_matches_ffcore[pii_ner-True-sources4] _____
+
+sources = [], flag = True, text_filter = 'pii_ner'
+
+    @pytest.mark.parametrize("sources", SOURCES)
+    @pytest.mark.parametrize("flag", [False, True])
+    @pytest.mark.parametrize("text_filter", [None, "pii_ner", "pii_regex"])
+    def test_19r3_3_compat_text_filter_matches_ffcore(
+        sources: list[str], flag: bool, text_filter: str | None
+    ) -> None:
+>       assert _outcome(ffcore_compat.check_sources, sources, flag, text_filter) == _outcome(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            raw_staging.check_sources, sources, flag, text_filter
+        )
+
+tests/test_19r3_env_tests.py:89: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+check = <function check_sources at 0x7f139f3b80e0>, sources = [], flag = True
+text_filter = 'pii_ner'
+
+    def _outcome(check, sources: list[str], flag: bool, text_filter: str | None):  # noqa: ANN001, ANN202
+        try:
+>           return check(sources, accept_personnel_data=flag, text_filter=text_filter)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           TypeError: check_sources() got an unexpected keyword argument 'text_filter'
+
+tests/test_19r3_env_tests.py:78: TypeError
+___ test_19r3_3_compat_text_filter_matches_ffcore[pii_regex-False-sources0] ____
+
+sources = ['jira:PRSIM'], flag = False, text_filter = 'pii_regex'
+
+    @pytest.mark.parametrize("sources", SOURCES)
+    @pytest.mark.parametrize("flag", [False, True])
+    @pytest.mark.parametrize("text_filter", [None, "pii_ner", "pii_regex"])
+    def test_19r3_3_compat_text_filter_matches_ffcore(
+        sources: list[str], flag: bool, text_filter: str | None
+    ) -> None:
+>       assert _outcome(ffcore_compat.check_sources, sources, flag, text_filter) == _outcome(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            raw_staging.check_sources, sources, flag, text_filter
+        )
+
+tests/test_19r3_env_tests.py:89: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+check = <function check_sources at 0x7f139f3b80e0>, sources = ['jira:PRSIM']
+flag = False, text_filter = 'pii_regex'
+
+    def _outcome(check, sources: list[str], flag: bool, text_filter: str | None):  # noqa: ANN001, ANN202
+        try:
+>           return check(sources, accept_personnel_data=flag, text_filter=text_filter)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           TypeError: check_sources() got an unexpected keyword argument 'text_filter'
+
+tests/test_19r3_env_tests.py:78: TypeError
+___ test_19r3_3_compat_text_filter_matches_ffcore[pii_regex-False-sources1] ____
+
+sources = ['PRSIM'], flag = False, text_filter = 'pii_regex'
+
+    @pytest.mark.parametrize("sources", SOURCES)
+    @pytest.mark.parametrize("flag", [False, True])
+    @pytest.mark.parametrize("text_filter", [None, "pii_ner", "pii_regex"])
+    def test_19r3_3_compat_text_filter_matches_ffcore(
+        sources: list[str], flag: bool, text_filter: str | None
+    ) -> None:
+>       assert _outcome(ffcore_compat.check_sources, sources, flag, text_filter) == _outcome(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            raw_staging.check_sources, sources, flag, text_filter
+        )
+
+tests/test_19r3_env_tests.py:89: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+check = <function check_sources at 0x7f139f3b80e0>, sources = ['PRSIM']
+flag = False, text_filter = 'pii_regex'
+
+    def _outcome(check, sources: list[str], flag: bool, text_filter: str | None):  # noqa: ANN001, ANN202
+        try:
+>           return check(sources, accept_personnel_data=flag, text_filter=text_filter)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           TypeError: check_sources() got an unexpected keyword argument 'text_filter'
+
+tests/test_19r3_env_tests.py:78: TypeError
+___ test_19r3_3_compat_text_filter_matches_ffcore[pii_regex-False-sources2] ____
+
+sources = ['confluence:PRSIM-DOCS'], flag = False, text_filter = 'pii_regex'
+
+    @pytest.mark.parametrize("sources", SOURCES)
+    @pytest.mark.parametrize("flag", [False, True])
+    @pytest.mark.parametrize("text_filter", [None, "pii_ner", "pii_regex"])
+    def test_19r3_3_compat_text_filter_matches_ffcore(
+        sources: list[str], flag: bool, text_filter: str | None
+    ) -> None:
+>       assert _outcome(ffcore_compat.check_sources, sources, flag, text_filter) == _outcome(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            raw_staging.check_sources, sources, flag, text_filter
+        )
+
+tests/test_19r3_env_tests.py:89: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+check = <function check_sources at 0x7f139f3b80e0>
+sources = ['confluence:PRSIM-DOCS'], flag = False, text_filter = 'pii_regex'
+
+    def _outcome(check, sources: list[str], flag: bool, text_filter: str | None):  # noqa: ANN001, ANN202
+        try:
+>           return check(sources, accept_personnel_data=flag, text_filter=text_filter)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           TypeError: check_sources() got an unexpected keyword argument 'text_filter'
+
+tests/test_19r3_env_tests.py:78: TypeError
+___ test_19r3_3_compat_text_filter_matches_ffcore[pii_regex-False-sources3] ____
+
+sources = ['confluence:OCR'], flag = False, text_filter = 'pii_regex'
+
+    @pytest.mark.parametrize("sources", SOURCES)
+    @pytest.mark.parametrize("flag", [False, True])
+    @pytest.mark.parametrize("text_filter", [None, "pii_ner", "pii_regex"])
+    def test_19r3_3_compat_text_filter_matches_ffcore(
+        sources: list[str], flag: bool, text_filter: str | None
+    ) -> None:
+>       assert _outcome(ffcore_compat.check_sources, sources, flag, text_filter) == _outcome(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            raw_staging.check_sources, sources, flag, text_filter
+        )
+
+tests/test_19r3_env_tests.py:89: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+check = <function check_sources at 0x7f139f3b80e0>, sources = ['confluence:OCR']
+flag = False, text_filter = 'pii_regex'
+
+    def _outcome(check, sources: list[str], flag: bool, text_filter: str | None):  # noqa: ANN001, ANN202
+        try:
+>           return check(sources, accept_personnel_data=flag, text_filter=text_filter)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           TypeError: check_sources() got an unexpected keyword argument 'text_filter'
+
+tests/test_19r3_env_tests.py:78: TypeError
+___ test_19r3_3_compat_text_filter_matches_ffcore[pii_regex-False-sources4] ____
+
+sources = [], flag = False, text_filter = 'pii_regex'
+
+    @pytest.mark.parametrize("sources", SOURCES)
+    @pytest.mark.parametrize("flag", [False, True])
+    @pytest.mark.parametrize("text_filter", [None, "pii_ner", "pii_regex"])
+    def test_19r3_3_compat_text_filter_matches_ffcore(
+        sources: list[str], flag: bool, text_filter: str | None
+    ) -> None:
+>       assert _outcome(ffcore_compat.check_sources, sources, flag, text_filter) == _outcome(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            raw_staging.check_sources, sources, flag, text_filter
+        )
+
+tests/test_19r3_env_tests.py:89: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+check = <function check_sources at 0x7f139f3b80e0>, sources = [], flag = False
+text_filter = 'pii_regex'
+
+    def _outcome(check, sources: list[str], flag: bool, text_filter: str | None):  # noqa: ANN001, ANN202
+        try:
+>           return check(sources, accept_personnel_data=flag, text_filter=text_filter)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           TypeError: check_sources() got an unexpected keyword argument 'text_filter'
+
+tests/test_19r3_env_tests.py:78: TypeError
+____ test_19r3_3_compat_text_filter_matches_ffcore[pii_regex-True-sources0] ____
+
+sources = ['jira:PRSIM'], flag = True, text_filter = 'pii_regex'
+
+    @pytest.mark.parametrize("sources", SOURCES)
+    @pytest.mark.parametrize("flag", [False, True])
+    @pytest.mark.parametrize("text_filter", [None, "pii_ner", "pii_regex"])
+    def test_19r3_3_compat_text_filter_matches_ffcore(
+        sources: list[str], flag: bool, text_filter: str | None
+    ) -> None:
+>       assert _outcome(ffcore_compat.check_sources, sources, flag, text_filter) == _outcome(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            raw_staging.check_sources, sources, flag, text_filter
+        )
+
+tests/test_19r3_env_tests.py:89: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+check = <function check_sources at 0x7f139f3b80e0>, sources = ['jira:PRSIM']
+flag = True, text_filter = 'pii_regex'
+
+    def _outcome(check, sources: list[str], flag: bool, text_filter: str | None):  # noqa: ANN001, ANN202
+        try:
+>           return check(sources, accept_personnel_data=flag, text_filter=text_filter)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           TypeError: check_sources() got an unexpected keyword argument 'text_filter'
+
+tests/test_19r3_env_tests.py:78: TypeError
+____ test_19r3_3_compat_text_filter_matches_ffcore[pii_regex-True-sources1] ____
+
+sources = ['PRSIM'], flag = True, text_filter = 'pii_regex'
+
+    @pytest.mark.parametrize("sources", SOURCES)
+    @pytest.mark.parametrize("flag", [False, True])
+    @pytest.mark.parametrize("text_filter", [None, "pii_ner", "pii_regex"])
+    def test_19r3_3_compat_text_filter_matches_ffcore(
+        sources: list[str], flag: bool, text_filter: str | None
+    ) -> None:
+>       assert _outcome(ffcore_compat.check_sources, sources, flag, text_filter) == _outcome(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            raw_staging.check_sources, sources, flag, text_filter
+        )
+
+tests/test_19r3_env_tests.py:89: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+check = <function check_sources at 0x7f139f3b80e0>, sources = ['PRSIM']
+flag = True, text_filter = 'pii_regex'
+
+    def _outcome(check, sources: list[str], flag: bool, text_filter: str | None):  # noqa: ANN001, ANN202
+        try:
+>           return check(sources, accept_personnel_data=flag, text_filter=text_filter)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           TypeError: check_sources() got an unexpected keyword argument 'text_filter'
+
+tests/test_19r3_env_tests.py:78: TypeError
+____ test_19r3_3_compat_text_filter_matches_ffcore[pii_regex-True-sources2] ____
+
+sources = ['confluence:PRSIM-DOCS'], flag = True, text_filter = 'pii_regex'
+
+    @pytest.mark.parametrize("sources", SOURCES)
+    @pytest.mark.parametrize("flag", [False, True])
+    @pytest.mark.parametrize("text_filter", [None, "pii_ner", "pii_regex"])
+    def test_19r3_3_compat_text_filter_matches_ffcore(
+        sources: list[str], flag: bool, text_filter: str | None
+    ) -> None:
+>       assert _outcome(ffcore_compat.check_sources, sources, flag, text_filter) == _outcome(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            raw_staging.check_sources, sources, flag, text_filter
+        )
+
+tests/test_19r3_env_tests.py:89: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+check = <function check_sources at 0x7f139f3b80e0>
+sources = ['confluence:PRSIM-DOCS'], flag = True, text_filter = 'pii_regex'
+
+    def _outcome(check, sources: list[str], flag: bool, text_filter: str | None):  # noqa: ANN001, ANN202
+        try:
+>           return check(sources, accept_personnel_data=flag, text_filter=text_filter)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           TypeError: check_sources() got an unexpected keyword argument 'text_filter'
+
+tests/test_19r3_env_tests.py:78: TypeError
+____ test_19r3_3_compat_text_filter_matches_ffcore[pii_regex-True-sources3] ____
+
+sources = ['confluence:OCR'], flag = True, text_filter = 'pii_regex'
+
+    @pytest.mark.parametrize("sources", SOURCES)
+    @pytest.mark.parametrize("flag", [False, True])
+    @pytest.mark.parametrize("text_filter", [None, "pii_ner", "pii_regex"])
+    def test_19r3_3_compat_text_filter_matches_ffcore(
+        sources: list[str], flag: bool, text_filter: str | None
+    ) -> None:
+>       assert _outcome(ffcore_compat.check_sources, sources, flag, text_filter) == _outcome(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            raw_staging.check_sources, sources, flag, text_filter
+        )
+
+tests/test_19r3_env_tests.py:89: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+check = <function check_sources at 0x7f139f3b80e0>, sources = ['confluence:OCR']
+flag = True, text_filter = 'pii_regex'
+
+    def _outcome(check, sources: list[str], flag: bool, text_filter: str | None):  # noqa: ANN001, ANN202
+        try:
+>           return check(sources, accept_personnel_data=flag, text_filter=text_filter)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           TypeError: check_sources() got an unexpected keyword argument 'text_filter'
+
+tests/test_19r3_env_tests.py:78: TypeError
+____ test_19r3_3_compat_text_filter_matches_ffcore[pii_regex-True-sources4] ____
+
+sources = [], flag = True, text_filter = 'pii_regex'
+
+    @pytest.mark.parametrize("sources", SOURCES)
+    @pytest.mark.parametrize("flag", [False, True])
+    @pytest.mark.parametrize("text_filter", [None, "pii_ner", "pii_regex"])
+    def test_19r3_3_compat_text_filter_matches_ffcore(
+        sources: list[str], flag: bool, text_filter: str | None
+    ) -> None:
+>       assert _outcome(ffcore_compat.check_sources, sources, flag, text_filter) == _outcome(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            raw_staging.check_sources, sources, flag, text_filter
+        )
+
+tests/test_19r3_env_tests.py:89: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+check = <function check_sources at 0x7f139f3b80e0>, sources = [], flag = True
+text_filter = 'pii_regex'
+
+    def _outcome(check, sources: list[str], flag: bool, text_filter: str | None):  # noqa: ANN001, ANN202
+        try:
+>           return check(sources, accept_personnel_data=flag, text_filter=text_filter)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           TypeError: check_sources() got an unexpected keyword argument 'text_filter'
+
+tests/test_19r3_env_tests.py:78: TypeError
+_________________ test_19r3_3_stager_filter_is_ffcores[False] __________________
+
+flag = False
+
+    @pytest.mark.parametrize("flag", [False, True])
+    def test_19r3_3_stager_filter_is_ffcores(flag: bool) -> None:
+        default, m3 = _ffcore_filters()
+>       assert st.run_text_filter(accept_personnel_data=flag) == (m3 if flag else default)
+               ^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'ffcore_stage_raw_r3' has no attribute 'run_text_filter'
+
+tests/test_19r3_env_tests.py:118: AttributeError
+__________________ test_19r3_3_stager_filter_is_ffcores[True] __________________
+
+flag = True
+
+    @pytest.mark.parametrize("flag", [False, True])
+    def test_19r3_3_stager_filter_is_ffcores(flag: bool) -> None:
+        default, m3 = _ffcore_filters()
+>       assert st.run_text_filter(accept_personnel_data=flag) == (m3 if flag else default)
+               ^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'ffcore_stage_raw_r3' has no attribute 'run_text_filter'
+
+tests/test_19r3_env_tests.py:118: AttributeError
+___________________ test_19r3_4_stager_prsim_pii_ner_staged ____________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_19r3_4_stager_prsim_pii_n0')
+
+    def test_19r3_4_stager_prsim_pii_ner_staged(tmp_path: Path) -> None:
+        """Without the M3 flag the run's filter is pii_ner, which names masked: staged (scrubbed);
+        FFCore's ingest-raw still refuses it while no NER model is there (08 tam 1b guard)."""
+        raw, out = _prsim_raw(tmp_path / "raw"), tmp_path / "s"
+>       counts = st.stage(raw, out, ["jira:PRSIM"], limit=None, attachments=False)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_19r3_env_tests.py:144: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+scripts/ffcore_stage_raw.py:352: in stage
+    chosen = check_sources(sources, accept_personnel_data=accept_personnel_data)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+sources = ['jira:PRSIM'], accept_personnel_data = False
+
+    def check_sources(sources: Iterable[str], *, accept_personnel_data: bool = False) -> list[str]:
+        """The explicit source list; PRSIM refused unless `accept_personnel_data` (KARARLAR karar 5
+        and its M3 exception)."""
+        chosen = [_norm(s) for s in sources if _norm(s)]
+        if not chosen:
+            raise StagingError("sources_required", "name the sources to stage (--sources)")
+        for source in chosen:
+            if is_prsim(source) and not accept_personnel_data:
+>               raise StagingError(
+                    "prsim_requires_ner",
+                    f"{source} carries person data; it is staged once 08 full recognizes names",
+                )
+E               paycore_llm.ffcore_compat.StagingError: prsim_requires_ner: jira:PRSIM carries person data; it is staged once 08 full recognizes names
+
+src/paycore_llm/ffcore_compat.py:40: StagingError
+___________________ test_19r3_5_stager_flag_gives_pii_regex ____________________
+
+    def test_19r3_5_stager_flag_gives_pii_regex() -> None:
+>       assert st.run_text_filter(accept_personnel_data=True) == "pii_regex"
+               ^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'ffcore_stage_raw_r3' has no attribute 'run_text_filter'
+
+tests/test_19r3_env_tests.py:151: AttributeError
+____________ test_19r3_6_stager_reports_text_filter[False-pii_ner] _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_19r3_6_stager_reports_tex0')
+capsys = <_pytest.capture.CaptureFixture object at 0x7f1395b44ad0>, flag = False
+expected = 'pii_ner'
+
+    @pytest.mark.parametrize(("flag", "expected"), [(False, "pii_ner"), (True, "pii_regex")])
+    def test_19r3_6_stager_reports_text_filter(
+        tmp_path: Path, capsys: pytest.CaptureFixture[str], flag: bool, expected: str
+    ) -> None:
+        raw = _prsim_raw(tmp_path / "raw")
+        argv = ["--raw-dir", str(raw), "--out", str(tmp_path / "s"), "--sources", "jira:PRSIM"]
+>       assert st.main(argv + (["--accept-personnel-data"] if flag else [])) == 0
+E       AssertionError: assert 2 == 0
+E        +  where 2 = <function main at 0x7f139f126d40>((['--raw-dir', '/tmp/pytest-of-root/pytest-0/test_19r3_6_stager_reports_tex0/raw', '--out', '/tmp/pytest-of-root/pytest-0/test_19r3_6_stager_reports_tex0/s', '--sources', 'jira:PRSIM'] + []))
+E        +    where <function main at 0x7f139f126d40> = st.main
+
+tests/test_19r3_env_tests.py:161: AssertionError
+----------------------------- Captured stderr call -----------------------------
+error: prsim_requires_ner: jira:PRSIM carries person data; it is staged once 08 full recognizes names
+____________ test_19r3_6_stager_reports_text_filter[True-pii_regex] ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_19r3_6_stager_reports_tex1')
+capsys = <_pytest.capture.CaptureFixture object at 0x7f1395b45010>, flag = True
+expected = 'pii_regex'
+
+    @pytest.mark.parametrize(("flag", "expected"), [(False, "pii_ner"), (True, "pii_regex")])
+    def test_19r3_6_stager_reports_text_filter(
+        tmp_path: Path, capsys: pytest.CaptureFixture[str], flag: bool, expected: str
+    ) -> None:
+        raw = _prsim_raw(tmp_path / "raw")
+        argv = ["--raw-dir", str(raw), "--out", str(tmp_path / "s"), "--sources", "jira:PRSIM"]
+        assert st.main(argv + (["--accept-personnel-data"] if flag else [])) == 0
+>       assert f"text_filter {expected}" in capsys.readouterr().out
+E       AssertionError: assert 'text_filter pii_regex' in 'staged 1\n'
+E        +  where 'staged 1\n' = CaptureResult(out='staged 1\n', err='').out
+E        +    where CaptureResult(out='staged 1\n', err='') = readouterr()
+E        +      where readouterr = <_pytest.capture.CaptureFixture object at 0x7f1395b45010>.readouterr
+
+tests/test_19r3_env_tests.py:162: AssertionError
+___________________ test_19r3_7_runbook_lists_r13_spellings ____________________
+
+    def test_19r3_7_runbook_lists_r13_spellings() -> None:
+        runbook = (ROOT / "docs" / "paycore" / "m3-sunucu.md").read_text(encoding="utf-8")
+>       assert "`SET @ahmet.yilmaz`" in runbook
+E       assert '`SET @ahmet.yilmaz`' in "# M3 sunucu runbook'u: FFCore'u PayCore sunucusunda kurmak ve S1'i ölçmek\n\n> FFCore paketi 19 (`plan/19-m3-sunucu-p...yCore api/worker/open-webui durmalı |\n| `eval_out_required` | depo dışı sette `--out-dir` yok | `--out-dir /eval` |\n"
+
+tests/test_19r3_env_tests.py:170: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_19r3_env_tests.py::test_19r3_1_settings_ignore_dotenv - Ass...
+FAILED tests/test_19r3_env_tests.py::test_19r3_2_half_langfuse_dotenv_does_not_leak
+FAILED tests/test_19r3_env_tests.py::test_19r3_3_compat_text_filter_matches_ffcore[None-False-sources0]
+FAILED tests/test_19r3_env_tests.py::test_19r3_3_compat_text_filter_matches_ffcore[None-False-sources1]
+FAILED tests/test_19r3_env_tests.py::test_19r3_3_compat_text_filter_matches_ffcore[None-False-sources2]
+FAILED tests/test_19r3_env_tests.py::test_19r3_3_compat_text_filter_matches_ffcore[None-False-sources3]
+FAILED tests/test_19r3_env_tests.py::test_19r3_3_compat_text_filter_matches_ffcore[None-False-sources4]
+FAILED tests/test_19r3_env_tests.py::test_19r3_3_compat_text_filter_matches_ffcore[None-True-sources0]
+FAILED tests/test_19r3_env_tests.py::test_19r3_3_compat_text_filter_matches_ffcore[None-True-sources1]
+FAILED tests/test_19r3_env_tests.py::test_19r3_3_compat_text_filter_matches_ffcore[None-True-sources2]
+FAILED tests/test_19r3_env_tests.py::test_19r3_3_compat_text_filter_matches_ffcore[None-True-sources3]
+FAILED tests/test_19r3_env_tests.py::test_19r3_3_compat_text_filter_matches_ffcore[None-True-sources4]
+FAILED tests/test_19r3_env_tests.py::test_19r3_3_compat_text_filter_matches_ffcore[pii_ner-False-sources0]
+FAILED tests/test_19r3_env_tests.py::test_19r3_3_compat_text_filter_matches_ffcore[pii_ner-False-sources1]
+FAILED tests/test_19r3_env_tests.py::test_19r3_3_compat_text_filter_matches_ffcore[pii_ner-False-sources2]
+FAILED tests/test_19r3_env_tests.py::test_19r3_3_compat_text_filter_matches_ffcore[pii_ner-False-sources3]
+FAILED tests/test_19r3_env_tests.py::test_19r3_3_compat_text_filter_matches_ffcore[pii_ner-False-sources4]
+FAILED tests/test_19r3_env_tests.py::test_19r3_3_compat_text_filter_matches_ffcore[pii_ner-True-sources0]
+FAILED tests/test_19r3_env_tests.py::test_19r3_3_compat_text_filter_matches_ffcore[pii_ner-True-sources1]
+FAILED tests/test_19r3_env_tests.py::test_19r3_3_compat_text_filter_matches_ffcore[pii_ner-True-sources2]
+FAILED tests/test_19r3_env_tests.py::test_19r3_3_compat_text_filter_matches_ffcore[pii_ner-True-sources3]
+FAILED tests/test_19r3_env_tests.py::test_19r3_3_compat_text_filter_matches_ffcore[pii_ner-True-sources4]
+FAILED tests/test_19r3_env_tests.py::test_19r3_3_compat_text_filter_matches_ffcore[pii_regex-False-sources0]
+FAILED tests/test_19r3_env_tests.py::test_19r3_3_compat_text_filter_matches_ffcore[pii_regex-False-sources1]
+FAILED tests/test_19r3_env_tests.py::test_19r3_3_compat_text_filter_matches_ffcore[pii_regex-False-sources2]
+FAILED tests/test_19r3_env_tests.py::test_19r3_3_compat_text_filter_matches_ffcore[pii_regex-False-sources3]
+FAILED tests/test_19r3_env_tests.py::test_19r3_3_compat_text_filter_matches_ffcore[pii_regex-False-sources4]
+FAILED tests/test_19r3_env_tests.py::test_19r3_3_compat_text_filter_matches_ffcore[pii_regex-True-sources0]
+FAILED tests/test_19r3_env_tests.py::test_19r3_3_compat_text_filter_matches_ffcore[pii_regex-True-sources1]
+FAILED tests/test_19r3_env_tests.py::test_19r3_3_compat_text_filter_matches_ffcore[pii_regex-True-sources2]
+FAILED tests/test_19r3_env_tests.py::test_19r3_3_compat_text_filter_matches_ffcore[pii_regex-True-sources3]
+FAILED tests/test_19r3_env_tests.py::test_19r3_3_compat_text_filter_matches_ffcore[pii_regex-True-sources4]
+FAILED tests/test_19r3_env_tests.py::test_19r3_3_stager_filter_is_ffcores[False]
+FAILED tests/test_19r3_env_tests.py::test_19r3_3_stager_filter_is_ffcores[True]
+FAILED tests/test_19r3_env_tests.py::test_19r3_4_stager_prsim_pii_ner_staged
+FAILED tests/test_19r3_env_tests.py::test_19r3_5_stager_flag_gives_pii_regex
+FAILED tests/test_19r3_env_tests.py::test_19r3_6_stager_reports_text_filter[False-pii_ner]
+FAILED tests/test_19r3_env_tests.py::test_19r3_6_stager_reports_text_filter[True-pii_regex]
+FAILED tests/test_19r3_env_tests.py::test_19r3_7_runbook_lists_r13_spellings
+39 failed, 1 passed in 2.54s

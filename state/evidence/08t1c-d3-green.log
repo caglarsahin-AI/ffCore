@@ -1,0 +1,11 @@
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/d56e6af4-e8cf-468b-abae-c25d718b2c62/knowledge-bases status=201 ms=121
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/d56e6af4-e8cf-468b-abae-c25d718b2c62/knowledge-bases/205236e4-f337-44e5-adb0-63f7ee1769e5/reindex status=202 ms=48
+=========================== short test summary info ============================
+PASSED tests/integration/test_08t_30_reindex_prsim.py::test_08t_30_reindex_refuses_m3_prsim_record_without_flag
+PASSED tests/integration/test_08t_30_reindex_prsim.py::test_08t_30b_cli_reindex_exits_2_with_the_code
+PASSED tests/integration/test_08t_30_reindex_prsim.py::test_08t1c_3_reindex_api_409_prsim
+PASSED tests/integration/test_08t_30_reindex_prsim.py::test_08t1c_3b_reindex_api_ok_without_personnel
+PASSED tests/integration/test_04a_api.py::test_04a_reindex_enqueues_job
+5 passed, 12 deselected in 19.69s
+All checks passed!
+2 files already formatted

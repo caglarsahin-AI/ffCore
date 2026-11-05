@@ -42,3 +42,19 @@ Kapsam dışı kırmızı: `test_19_3_app_env_keys_match_ffcore` (ffcore-backend
 - B: ayrı küçük dal (fix/19r4). Etki: bu dal kırmızı bir takımla PR-HAZIR olur.
 - C: dokunma, NOT_RUN yaz. Etki: M3 kurulumu bozuk kalır.
 Cevaba kadar PR açıklamasını dolduruyorum; PR-HAZIR yok.
+
+### D-19R3-0005 · 2026-11-05 12:20 · → koordinator · PR-HAZIR
+Paket: fix/19r3   Cevap: K-19R3-0004
+PR: state/pr/19r3-env-tests.md · Sınıf [B] · paycoreLLM branch fix/19r3-env-tests · worktree C:\ai_paycore\paycoreLLM-19r3 · baz master ba3056d · SHA **f2dfe4799b77c21be92100c4f93f18011543f7ce**. 6 commit, 11 dosya +245/-20; ağaç temiz; ana kopyadaki kullanıcı dosyalarıyla kesişme yok.
+Kapsam:
+- R12: config `env_file` kaldırıldı + KURALLAR notu.
+- 167: compat `text_filter` + stager `run_text_filter` + çıktıda filtre.
+- R13: runbook iki yazım.
+- K-19R3-0004 A: compose NER satırları + `.env.test` false + runbook 4.1.
+Kanıt (konteyner):
+- Kırmızı @05372f6: 39 (state/evidence/19r3-red-ba3056d.log).
+- Tam takım @f2dfe47: 712 geçti / 3 bs4 (ENV-138) / 2 atlandı (19r3-full-2.log).
+- ruff 0 (19r3-ruff.log).
+NOT_RUN: ana checkout `make test` (sende, merge sonrası).
+Varsayım 2 (inceleyici için): stager PRSIM'i artık kendi başına reddetmiyor; bekçi FFCore `ingest-raw`'da.
+Branch'e başka commit atmıyorum.

@@ -1,0 +1,155 @@
+..F.                                                                     [100%]
+=================================== FAILURES ===================================
+______________________ test_08t1c_3_reindex_api_409_prsim ______________________
+
+world = {'project': 'c857ade9-4015-4102-aace-434c661ac17d', 'other': 'c99c322a-ac6d-4bca-b60b-f9674235c08a', 'admin': <starlet...nt.TestClient object at 0x7f6b742101d0>, 'admin_read': <starlette.testclient.TestClient object at 0x7f6b8a4ece90>, ...}
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_6622088155d6) at 0x7f6b742124e0>
+settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+queue = <tests.integration.test_04a_api.FakeQueue object at 0x7f6b74211820>
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_08t1c_3_reindex_api_409_p0')
+
+    def test_08t1c_3_reindex_api_409_prsim(world, pg, settings, queue, tmp_path):
+        """FOLLOWUP-172 N1: the API refuses at the endpoint (409) instead of a 202 whose job fails;
+        nothing is queued, the attempt is audited, and the job keeps its own check."""
+        kb = _m3_failed_prsim(world, pg, settings, tmp_path, "prsim-reindex-api")
+        response = world["analyst"].post(
+            f"{kb_url(world, kb['id'])}/reindex", json={"layer": "silver", "full": False}
+        )
+>       assert response.status_code == 409, response.text
+E       AssertionError: {"job_id":"job-1","layer":"silver","full":false,"documents":1}
+E       assert 202 == 409
+E        +  where 202 = <Response [202 Accepted]>.status_code
+
+tests/integration/test_08t_30_reindex_prsim.py:105: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+2026-11-05 07:56:53,575 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-05 07:56:53,591 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=136
+2026-11-05 07:56:53,795 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-05 07:56:53,812 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=127
+2026-11-05 07:56:54,012 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-05 07:56:54,028 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=131
+2026-11-05 07:56:54,218 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-05 07:56:54,235 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=133
+------------------------------ Captured log setup ------------------------------
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=136
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=127
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=131
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=133
+----------------------------- Captured stderr call -----------------------------
+2026-11-05 07:56:54,377 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-05 07:56:54,388 INFO ffcore.access access method=POST path=/api/v1/projects/c857ade9-4015-4102-aace-434c661ac17d/knowledge-bases status=201 ms=76
+2026-11-05 07:56:54,391 WARNING ffcore.knowledge.raw_ingest ingest-raw accept_personnel_data is the M3 measurement mode (pii_regex, names not masked); a new PRSIM ingest uses pii_ner without the flag (08 tam 1b)
+2026-11-05 07:56:54,462 ERROR ffcore.knowledge.raw_ingest ingest-raw failed path=jira/PRSIM/PRSIM-1/PRSIM-1.md error=RuntimeError
+2026-11-05 07:56:54,563 INFO ffcore.access access method=POST path=/api/v1/projects/c857ade9-4015-4102-aace-434c661ac17d/knowledge-bases/c022bbb0-face-4998-9ad1-3ecf558fc0b7/reindex status=202 ms=59
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/c857ade9-4015-4102-aace-434c661ac17d/knowledge-bases status=201 ms=76
+WARNING  ffcore.knowledge.raw_ingest:raw_ingest.py:322 ingest-raw accept_personnel_data is the M3 measurement mode (pii_regex, names not masked); a new PRSIM ingest uses pii_ner without the flag (08 tam 1b)
+ERROR    ffcore.knowledge.raw_ingest:raw_ingest.py:403 ingest-raw failed path=jira/PRSIM/PRSIM-1/PRSIM-1.md error=RuntimeError
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/c857ade9-4015-4102-aace-434c661ac17d/knowledge-bases/c022bbb0-face-4998-9ad1-3ecf558fc0b7/reindex status=202 ms=59
+==================================== PASSES ====================================
+___________ test_08t_30_reindex_refuses_m3_prsim_record_without_flag ___________
+---------------------------- Captured stderr setup -----------------------------
+2026-11-05 07:56:50,524 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=303
+2026-11-05 07:56:50,539 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-05 07:56:50,721 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-05 07:56:50,735 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=148
+2026-11-05 07:56:50,897 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-05 07:56:50,911 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=115
+2026-11-05 07:56:51,094 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-05 07:56:51,110 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=132
+------------------------------ Captured log setup ------------------------------
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=303
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=148
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=115
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=132
+----------------------------- Captured stderr call -----------------------------
+2026-11-05 07:56:51,384 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-05 07:56:51,497 INFO ffcore.access access method=POST path=/api/v1/projects/16a57f31-2594-46ae-b768-65c7b00cde91/knowledge-bases status=201 ms=284
+2026-11-05 07:56:51,499 WARNING ffcore.knowledge.raw_ingest ingest-raw accept_personnel_data is the M3 measurement mode (pii_regex, names not masked); a new PRSIM ingest uses pii_ner without the flag (08 tam 1b)
+2026-11-05 07:56:51,618 ERROR ffcore.knowledge.raw_ingest ingest-raw failed path=jira/PRSIM/PRSIM-1/PRSIM-1.md error=RuntimeError
+2026-11-05 07:56:51,848 INFO ffcore.knowledge.ingest gold document=7453a5e8-27fb-4b23-9502-44ce40cf31bf reused=0 embedded=1
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/16a57f31-2594-46ae-b768-65c7b00cde91/knowledge-bases status=201 ms=284
+WARNING  ffcore.knowledge.raw_ingest:raw_ingest.py:322 ingest-raw accept_personnel_data is the M3 measurement mode (pii_regex, names not masked); a new PRSIM ingest uses pii_ner without the flag (08 tam 1b)
+ERROR    ffcore.knowledge.raw_ingest:raw_ingest.py:403 ingest-raw failed path=jira/PRSIM/PRSIM-1/PRSIM-1.md error=RuntimeError
+INFO     ffcore.knowledge.ingest:ingest.py:658 gold document=7453a5e8-27fb-4b23-9502-44ce40cf31bf reused=0 embedded=1
+________________ test_08t_30b_cli_reindex_exits_2_with_the_code ________________
+---------------------------- Captured stderr setup -----------------------------
+2026-11-05 07:56:52,191 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-05 07:56:52,220 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=143
+2026-11-05 07:56:52,442 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-05 07:56:52,451 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=148
+2026-11-05 07:56:52,657 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-05 07:56:52,683 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=151
+2026-11-05 07:56:52,902 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-05 07:56:52,919 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=142
+------------------------------ Captured log setup ------------------------------
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=143
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=148
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=151
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=142
+----------------------------- Captured stderr call -----------------------------
+2026-11-05 07:56:53,075 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-05 07:56:53,083 INFO ffcore.access access method=POST path=/api/v1/projects/149a7e4c-d50c-4f49-a4fb-0a1fd62230a5/knowledge-bases status=201 ms=85
+2026-11-05 07:56:53,085 WARNING ffcore.knowledge.raw_ingest ingest-raw accept_personnel_data is the M3 measurement mode (pii_regex, names not masked); a new PRSIM ingest uses pii_ner without the flag (08 tam 1b)
+2026-11-05 07:56:53,166 ERROR ffcore.knowledge.raw_ingest ingest-raw failed path=jira/PRSIM/PRSIM-1/PRSIM-1.md error=RuntimeError
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/149a7e4c-d50c-4f49-a4fb-0a1fd62230a5/knowledge-bases status=201 ms=85
+WARNING  ffcore.knowledge.raw_ingest:raw_ingest.py:322 ingest-raw accept_personnel_data is the M3 measurement mode (pii_regex, names not masked); a new PRSIM ingest uses pii_ner without the flag (08 tam 1b)
+ERROR    ffcore.knowledge.raw_ingest:raw_ingest.py:403 ingest-raw failed path=jira/PRSIM/PRSIM-1/PRSIM-1.md error=RuntimeError
+________________ test_08t1c_3b_reindex_api_ok_without_personnel ________________
+---------------------------- Captured stderr setup -----------------------------
+2026-11-05 07:56:55,000 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-05 07:56:55,015 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=137
+2026-11-05 07:56:55,244 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-05 07:56:55,261 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=159
+2026-11-05 07:56:55,453 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-05 07:56:55,479 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=151
+2026-11-05 07:56:55,646 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-05 07:56:55,665 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=126
+------------------------------ Captured log setup ------------------------------
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=137
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=159
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=151
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=126
+----------------------------- Captured stderr call -----------------------------
+2026-11-05 07:56:55,814 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-05 07:56:55,823 INFO ffcore.access access method=POST path=/api/v1/projects/47d1599c-cd20-49d7-a32c-e491f8868182/knowledge-bases status=201 ms=71
+2026-11-05 07:56:55,825 WARNING ffcore.knowledge.raw_ingest ingest-raw accept_personnel_data is the M3 measurement mode (pii_regex, names not masked); a new PRSIM ingest uses pii_ner without the flag (08 tam 1b)
+2026-11-05 07:56:55,897 ERROR ffcore.knowledge.raw_ingest ingest-raw failed path=jira/PRSIM/PRSIM-1/PRSIM-1.md error=RuntimeError
+2026-11-05 07:56:55,985 INFO ffcore.access access method=POST path=/api/v1/projects/47d1599c-cd20-49d7-a32c-e491f8868182/knowledge-bases/04dbd1ef-2989-47d2-af5c-d79dab2ae77f/reindex status=202 ms=53
+2026-11-05 07:56:56,053 INFO ffcore.access access method=POST path=/api/v1/projects/47d1599c-cd20-49d7-a32c-e491f8868182/knowledge-bases status=201 ms=64
+2026-11-05 07:56:56,106 INFO ffcore.access access method=POST path=/api/v1/projects/47d1599c-cd20-49d7-a32c-e491f8868182/knowledge-bases/90e85e95-0a46-4e88-8929-5a7b6bf12727/reindex status=202 ms=49
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/47d1599c-cd20-49d7-a32c-e491f8868182/knowledge-bases status=201 ms=71
+WARNING  ffcore.knowledge.raw_ingest:raw_ingest.py:322 ingest-raw accept_personnel_data is the M3 measurement mode (pii_regex, names not masked); a new PRSIM ingest uses pii_ner without the flag (08 tam 1b)
+ERROR    ffcore.knowledge.raw_ingest:raw_ingest.py:403 ingest-raw failed path=jira/PRSIM/PRSIM-1/PRSIM-1.md error=RuntimeError
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/47d1599c-cd20-49d7-a32c-e491f8868182/knowledge-bases/04dbd1ef-2989-47d2-af5c-d79dab2ae77f/reindex status=202 ms=53
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/47d1599c-cd20-49d7-a32c-e491f8868182/knowledge-bases status=201 ms=64
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/47d1599c-cd20-49d7-a32c-e491f8868182/knowledge-bases/90e85e95-0a46-4e88-8929-5a7b6bf12727/reindex status=202 ms=49
+=========================== short test summary info ============================
+PASSED tests/integration/test_08t_30_reindex_prsim.py::test_08t_30_reindex_refuses_m3_prsim_record_without_flag
+PASSED tests/integration/test_08t_30_reindex_prsim.py::test_08t_30b_cli_reindex_exits_2_with_the_code
+PASSED tests/integration/test_08t_30_reindex_prsim.py::test_08t1c_3b_reindex_api_ok_without_personnel
+FAILED tests/integration/test_08t_30_reindex_prsim.py::test_08t1c_3_reindex_api_409_prsim
+1 failed, 3 passed in 27.97s
