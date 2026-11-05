@@ -1,0 +1,54 @@
+== HEAD d4a2f020c898f77b3f22e1fe42cbbb651030dcf8 tree-clean=0 2026-11-04T21:41:54+03:00
+== build exit=0
+== up exit=0
+== compose config
+exit=0
+== make lint + make test DEPLOY_PROFILE=llmaas 2026-11-04T21:43:20+03:00
+lint-ok
+======================= 1602 passed in 210.10s (0:03:30) =======================
+exit=0
+== make lint + make test DEPLOY_PROFILE=airgap 2026-11-04T21:47:13+03:00
+lint-ok
+======================= 1602 passed in 206.17s (0:03:26) =======================
+exit=0
+== alembic heads / downgrade 06b_0001 / upgrade heads / heads 2026-11-04T21:51:05+03:00
+09_0001 (06a, 07, 05a, 04a, 06b, 03c, 08, 03a, 03b, 09) (head)
+INFO  [alembic.runtime.migration] Running downgrade 09_0001 -> 06b_0001, 09: eval_suites, eval_runs (local rows over Langfuse datasets and dataset runs)
+INFO  [alembic.runtime.migration] Running upgrade 06b_0001 -> 09_0001, 09: eval_suites, eval_runs (local rows over Langfuse datasets and dataset runs)
+09_0001 (09, 05a, 08, 03b, 06a, 04a, 03c, 06b, 07, 03a) (head)
+exit=0
+== make test-int (full; stack exam NOT_RUN here) 2026-11-04T21:51:23+03:00
+SKIPPED [1] tests/integration/test_03b_egress_dns.py: NOT_RUN: needs RUN_DNS_TESTS=1
+SKIPPED [1] tests/integration/test_04a_ingest.py:124: NOT_RUN: needs RUN_MODEL_TESTS=1
+SKIPPED [1] tests/integration/test_04a_ingest.py:279: NOT_RUN: needs RUN_MODEL_TESTS=1
+SKIPPED [4] tests/integration/test_04a_qdrant.py: NOT_RUN: needs RUN_QDRANT_TESTS=1
+SKIPPED [4] tests/integration/test_04a_review_r1_acl.py: NOT_RUN: needs RUN_QDRANT_TESTS=1
+SKIPPED [1] tests/integration/test_05a_sql.py:288: NOT_RUN: needs RUN_MODEL_TESTS=1
+SKIPPED [1] tests/integration/test_09_exam_stack.py:83: NOT_RUN: set RUN_EVAL_STACK=1 (scenario stack + make seed + make seed-eval)
+SKIPPED [1] tests/integration/test_09_exam_stack.py:92: NOT_RUN: set RUN_EVAL_STACK=1 (scenario stack + make seed + make seed-eval)
+SKIPPED [1] tests/integration/test_09_exam_stack.py:98: NOT_RUN: set RUN_EVAL_STACK=1 (scenario stack + make seed + make seed-eval)
+SKIPPED [1] tests/integration/test_09_exam_stack.py:114: NOT_RUN: set RUN_EVAL_STACK=1 (scenario stack + make seed + make seed-eval)
+SKIPPED [1] tests/integration/test_09_exam_stack.py:120: NOT_RUN: set RUN_EVAL_STACK=1 (scenario stack + make seed + make seed-eval)
+SKIPPED [1] tests/integration/test_09_exam_stack.py:131: NOT_RUN: set RUN_EVAL_STACK=1 (scenario stack + make seed + make seed-eval)
+SKIPPED [1] tests/integration/test_09_exam_stack.py:146: NOT_RUN: set RUN_EVAL_STACK=1 (scenario stack + make seed + make seed-eval)
+SKIPPED [1] tests/integration/test_09_exam_stack.py:154: NOT_RUN: set RUN_EVAL_STACK=1 (scenario stack + make seed + make seed-eval)
+SKIPPED [1] tests/integration/test_19_ingest_raw.py:156: root ignores file modes; the mount test runs :ro
+862 passed, 21 skipped, 2 warnings in 1034.61s (0:17:14)
+exit=0
+== make seed + seed-eval + stack exam alone 2026-11-04T22:09:05+03:00
+seeded: projects ['hastane-a', 'klinik-b'], models ['chat-default', 'chat-fail', 'chat-slow', 'chat-tools'], agents in hastane-a; created 0, uploaded 0
+cd backend && python -m ffcore.cli seed-eval --project "hastane-a" --suite ../data/samples/eval/suite.json --items ../data/samples/eval/sozlesme-33.json 
+dataset: hastane-a.sozlesme-33
+items upserted: 33; archived: 0
+suite: created
+cd backend && python -m ffcore.cli seed-eval --project "hastane-a" --suite ../data/samples/eval/suite-sql-20.json --items ../data/samples/eval/sql-20.json 
+dataset: hastane-a.sql-20
+items upserted: 20; archived: 0
+suite: created
+exam 34f34e5a-8ee5-4d26-affa-c2260dd1dfa7 completed in 65.3 s: {'n': 33, 'worst': [{'mean': 0.0, 'note': '', 'style': 'dolayli', 'passed': False, 'item_id': 'hastane-a.sozlesme-33-q18', 'outcome': 'below_rerank_floor'}, {'mean': 0.0, 'note': '', 'style': 'alan_ici_cevapsiz', 'passed': False, 'item_id': 'hastane-a.sozlesme-33-q21', 'outcome': 'unanswerable_answered'}, {'mean': 0.0, 'note': '', 'sty
+8 passed in 68.96s (0:01:08)
+exit=0
+== make smoke 2026-11-04T22:11:41+03:00
+smoke: passed
+exit=0
+== end 2026-11-04T22:11:55+03:00

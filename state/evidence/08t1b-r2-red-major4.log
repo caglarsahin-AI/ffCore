@@ -1,0 +1,142 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+_____________________ test_08t_22_prsim_attachment_is_ek_n _____________________
+
+world = {'project': '929d7e13-a880-4b96-916e-e1c40bbda421', 'other': 'e04e7a4b-d01d-4d71-af4e-d960b7a22760', 'admin': <starlet...nt.TestClient object at 0x7f9344b45d30>, 'admin_read': <starlette.testclient.TestClient object at 0x7f9344b63200>, ...}
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_6e716e30b2af) at 0x7f93454df860>
+settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_08t_22_prsim_attachment_i0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f9344b45cd0>
+
+    def test_08t_22_prsim_attachment_is_ek_n(world, pg, settings, tmp_path, monkeypatch):
+        monkeypatch.setattr(ingest_mask, "ner_client", lambda: FakeNer())
+        kb = create_kb(world, key="prsim-attachment")
+        tree = _tree(tmp_path, "jira:PRSIM", "PRSIM-2")
+        report = _run(
+            settings, pg, world, kb["key"], tree, sources=["jira:PRSIM"], text_filter="pii_ner"
+        )
+        assert report.statuses == {"indexed": 1}, report.lines()
+        attachments, chunks, silver = _stored(pg, kb["id"])
+>       _assert_no_name(attachments, chunks, silver)
+
+tests/integration/test_08t_22_attachment_names.py:94: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+attachments = [('Ayşe_Demir_izin.txt', '/tmp/pytest-of-root/pytest-0/test_08t_22_prsim_attachment_i0/raw/jira/PRSIM/PRSIM-2/Ayşe_Demir_izin.txt')]
+chunks = [('Sözleşmeler › jira/PRSIM/PRSIM-2/PRSIM-2.md › Yetki talebi', 'Sözleşmeler › jira/PRSIM/PRSIM-2/PRSIM-2.md › Yetki t...ünleri bakiyeden düşüldü ve ilgili ekip bilgilendirildi. Dönüş tarihi takvime işlendi ve vekil personel atandı.\n```')]
+silver = '---\ndocument_id: 7d58533e-aa29-4d2d-9446-22969f43d013\nkb: prsim-attachment\nbreadcrumb: Sözleşmeler › jira/PRSIM/PR...ünleri bakiyeden düşüldü ve ilgili ekip bilgilendirildi. Dönüş tarihi takvime işlendi ve vekil personel atandı.\n```\n'
+
+    def _assert_no_name(attachments, chunks, silver):
+        for value in ("Ayşe", "Demir"):
+>           assert value not in silver
+E           AssertionError: assert 'Ayşe' not in '---\ndocume...andı.\n```\n'
+E             
+E             'Ayşe' is contained here:
+E               i.
+E               
+E               # Ek: Ayşe_Demir_izin.txt
+E             ?       ++++
+E               ...
+E             
+E             ...Full output truncated, use '-vv' to show
+
+tests/integration/test_08t_22_attachment_names.py:78: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+2026-11-04 19:13:46,524 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-04 19:13:46,536 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=276
+2026-11-04 19:13:46,838 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-04 19:13:46,860 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=219
+2026-11-04 19:13:47,131 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-04 19:13:47,156 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=202
+2026-11-04 19:13:47,472 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-04 19:13:47,496 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=213
+------------------------------ Captured log setup ------------------------------
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=276
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=219
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=202
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=213
+----------------------------- Captured stderr call -----------------------------
+2026-11-04 19:13:47,811 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-04 19:13:47,984 INFO ffcore.access access method=POST path=/api/v1/projects/929d7e13-a880-4b96-916e-e1c40bbda421/knowledge-bases status=201 ms=386
+2026-11-04 19:13:48,226 INFO ffcore.knowledge.ingest gold document=7d58533e-aa29-4d2d-9446-22969f43d013 reused=0 embedded=2
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/929d7e13-a880-4b96-916e-e1c40bbda421/knowledge-bases status=201 ms=386
+INFO     ffcore.knowledge.ingest:ingest.py:637 gold document=7d58533e-aa29-4d2d-9446-22969f43d013 reused=0 embedded=2
+_________ test_08t_22b_other_source_attachment_name_through_the_filter _________
+
+world = {'project': '1fb884e1-9c8f-4e3b-b77a-373c3ece756c', 'other': 'e8aec4cb-fa7b-4aca-912f-19bbde93f67e', 'admin': <starlet...nt.TestClient object at 0x7f93289a1520>, 'admin_read': <starlette.testclient.TestClient object at 0x7f93427b1220>, ...}
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_6e716e30b2af) at 0x7f93289a3ec0>
+settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_08t_22b_other_source_atta0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f93289a18b0>
+
+    def test_08t_22b_other_source_attachment_name_through_the_filter(
+        world, pg, settings, tmp_path, monkeypatch
+    ):
+        monkeypatch.setattr(ingest_mask, "ner_client", lambda: FakeNer())
+        kb = create_kb(world, key="demo-attachment")
+        tree = _tree(tmp_path, "confluence:DEMO", "2001")
+        report = _run(
+            settings, pg, world, kb["key"], tree, sources=["confluence:DEMO"], text_filter="pii_ner"
+        )
+        assert report.statuses == {"indexed": 1}, report.lines()
+        attachments, chunks, silver = _stored(pg, kb["id"])
+>       _assert_no_name(attachments, chunks, silver)
+
+tests/integration/test_08t_22_attachment_names.py:111: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+attachments = [('Ayşe_Demir_izin.txt', '/tmp/pytest-of-root/pytest-0/test_08t_22b_other_source_atta0/raw/confluence/DEMO/2001/Ayşe_Demir_izin.txt')]
+chunks = [('Sözleşmeler › confluence/DEMO/2001/2001.md › Yetki talebi', 'Sözleşmeler › confluence/DEMO/2001/2001.md › Yetki tal...ünleri bakiyeden düşüldü ve ilgili ekip bilgilendirildi. Dönüş tarihi takvime işlendi ve vekil personel atandı.\n```')]
+silver = '---\ndocument_id: 5300afa1-75d7-4a12-924e-40612dfb072e\nkb: demo-attachment\nbreadcrumb: Sözleşmeler › confluence/DEM...ünleri bakiyeden düşüldü ve ilgili ekip bilgilendirildi. Dönüş tarihi takvime işlendi ve vekil personel atandı.\n```\n'
+
+    def _assert_no_name(attachments, chunks, silver):
+        for value in ("Ayşe", "Demir"):
+>           assert value not in silver
+E           AssertionError: assert 'Ayşe' not in '---\ndocume...andı.\n```\n'
+E             
+E             'Ayşe' is contained here:
+E               i.
+E               
+E               # Ek: Ayşe_Demir_izin.txt
+E             ?       ++++
+E               ...
+E             
+E             ...Full output truncated, use '-vv' to show
+
+tests/integration/test_08t_22_attachment_names.py:78: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+2026-11-04 19:13:48,898 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-04 19:13:48,903 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=207
+2026-11-04 19:13:49,339 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-04 19:13:49,365 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=259
+2026-11-04 19:13:49,717 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-04 19:13:49,724 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=245
+2026-11-04 19:13:50,419 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-04 19:13:50,425 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=478
+------------------------------ Captured log setup ------------------------------
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=207
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=259
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=245
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=478
+----------------------------- Captured stderr call -----------------------------
+2026-11-04 19:13:51,022 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-04 19:13:51,099 INFO ffcore.access access method=POST path=/api/v1/projects/1fb884e1-9c8f-4e3b-b77a-373c3ece756c/knowledge-bases status=201 ms=274
+2026-11-04 19:13:51,760 INFO ffcore.knowledge.ingest gold document=5300afa1-75d7-4a12-924e-40612dfb072e reused=0 embedded=2
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/1fb884e1-9c8f-4e3b-b77a-373c3ece756c/knowledge-bases status=201 ms=274
+INFO     ffcore.knowledge.ingest:ingest.py:637 gold document=5300afa1-75d7-4a12-924e-40612dfb072e reused=0 embedded=2
+=========================== short test summary info ============================
+FAILED tests/integration/test_08t_22_attachment_names.py::test_08t_22_prsim_attachment_is_ek_n
+FAILED tests/integration/test_08t_22_attachment_names.py::test_08t_22b_other_source_attachment_name_through_the_filter
+2 failed in 40.84s

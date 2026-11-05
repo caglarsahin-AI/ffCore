@@ -1,0 +1,8 @@
+All checks passed!
+400 files already formatted
+
+tests/unit/test_08t_r3_url_scan.py:45: AssertionError
+=========================== short test summary info ============================
+FAILED tests/unit/test_08t_r3_url_scan.py::test_08t_r3_long_line_in_one_character_pieces[StreamDetokenizer]
+================== 1 failed, 1562 passed in 234.39s (0:03:54) ==================
+make: *** [Makefile:18: test] Error 1

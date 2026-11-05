@@ -1,0 +1,42 @@
+== HEAD e13ec6b4efed38787e4d37a7dd134dcf31e11472 tree-clean=0 2026-11-04T23:52:52+03:00
+== build exit=0
+== up exit=0
+== compose config
+exit=0
+== make lint + make test DEPLOY_PROFILE=llmaas 2026-11-04T23:54:18+03:00
+lint-ok
+======================= 1623 passed in 190.53s (0:03:10) =======================
+exit=0
+== make lint + make test DEPLOY_PROFILE=airgap 2026-11-04T23:57:53+03:00
+lint-ok
+======================= 1623 passed in 202.75s (0:03:22) =======================
+exit=0
+== alembic heads / downgrade 06b_0001 / upgrade heads / heads 2026-11-05T00:01:39+03:00
+09_0001 (09, 08, 04a, 06b, 05a, 07, 06a, 03c, 03a, 03b) (head)
+INFO  [alembic.runtime.migration] Running downgrade 09_0001 -> 06b_0001, 09: eval_suites, eval_runs (local rows over Langfuse datasets and dataset runs)
+INFO  [alembic.runtime.migration] Running upgrade 06b_0001 -> 09_0001, 09: eval_suites, eval_runs (local rows over Langfuse datasets and dataset runs)
+09_0001 (07, 06b, 06a, 04a, 03a, 05a, 09, 03b, 03c, 08) (head)
+exit=0
+== targeted test-int DEPLOY_PROFILE=llmaas 2026-11-05T00:01:57+03:00
+84 passed in 178.36s (0:02:58)
+exit=0
+== targeted test-int DEPLOY_PROFILE=airgap 2026-11-05T00:05:14+03:00
+84 passed in 164.74s (0:02:44)
+exit=0
+== make seed + seed-eval + stack exam alone 2026-11-05T00:08:18+03:00
+seeded: projects ['hastane-a', 'klinik-b'], models ['chat-default', 'chat-fail', 'chat-slow', 'chat-tools'], agents in hastane-a; created 36, uploaded 15
+cd backend && python -m ffcore.cli seed-eval --project "hastane-a" --suite ../data/samples/eval/suite.json --items ../data/samples/eval/sozlesme-33.json 
+dataset: hastane-a.sozlesme-33
+items upserted: 33; archived: 0
+suite: created
+cd backend && python -m ffcore.cli seed-eval --project "hastane-a" --suite ../data/samples/eval/suite-sql-20.json --items ../data/samples/eval/sql-20.json 
+dataset: hastane-a.sql-20
+items upserted: 20; archived: 0
+suite: created
+exam 36058741-5cd8-4b70-8cd5-01dde1309575 completed in 33.4 s: {'n': 33, 'worst': [{'mean': 0.0, 'note': '', 'style': 'dolayli', 'passed': False, 'item_id': 'hastane-a.sozlesme-33-q18', 'outcome': 'below_rerank_floor'}, {'mean': 0.0, 'note': '', 'style': 'alan_ici_cevapsiz', 'passed': False, 'item_id': 'hastane-a.sozlesme-33-q21', 'outcome': 'unanswerable_answered'}, {'mean': 0.0, 'note': '', 'sty
+8 passed in 38.01s
+exit=0
+== make smoke 2026-11-05T00:10:57+03:00
+smoke: passed
+exit=0
+== end 2026-11-05T00:11:13+03:00

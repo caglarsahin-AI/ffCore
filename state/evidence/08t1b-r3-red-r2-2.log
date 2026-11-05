@@ -1,0 +1,40 @@
+......FF                                                                 [100%]
+=================================== FAILURES ===================================
+_____________ test_08t_27e_trim_after_the_threshold_custom_pattern _____________
+
+    def test_08t_27e_trim_after_the_threshold_custom_pattern():
+        # r2 MINOR-r2-2: a finding below min_confidence must not cut the name and then vanish.
+        out = _run_policy("Ayşe Kaya 12345 aradı", "Ayşe Kaya", _custom(0.85, 0.8)).text_out
+>       assert "Ayşe" not in out and "Kaya" not in out, out
+E       AssertionError: Ayşe Kaya 12345 aradı
+E       assert ('Ayşe' not in 'Ayşe Kaya 12345 aradı'
+E         
+E         'Ayşe' is contained here:
+E           Ayşe Kaya 12345 aradı
+E         ? ++++)
+
+tests/unit/test_08t_27_ner_span_trim.py:110: AssertionError
+_________________ test_08t_27f_trim_after_the_threshold_phone __________________
+
+    def test_08t_27f_trim_after_the_threshold_phone():
+        from ffcore.guardrails.recognizers.regex import recognize
+    
+        text = "Ayşe Kaya05321234567 aradı"
+        phone = [f for f in recognize(text, ["TR_PHONE"]) if f.category == "TR_PHONE"]
+        assert phone, "the phone recognizer must see the glued number"
+        threshold = phone[0].score + 0.01  # the phone falls below min_confidence
+        out = _run_policy(text, "Ayşe Kaya05321234567", _custom(threshold, 0.99)).text_out
+        # the dropped phone no longer cuts the NER span: the digits it covered stay masked too
+        for value in ("Ayşe", "Kaya", "05321234567"):
+>           assert value not in out, out
+E           AssertionError: <<PII_1>>05321234567 aradı
+E           assert '05321234567' not in '<<PII_1>>05321234567 aradı'
+E             
+E             '05321234567' is contained here:
+E               <<PII_1>>05321234567 aradı
+
+tests/unit/test_08t_27_ner_span_trim.py:123: AssertionError
+=========================== short test summary info ============================
+FAILED tests/unit/test_08t_27_ner_span_trim.py::test_08t_27e_trim_after_the_threshold_custom_pattern
+FAILED tests/unit/test_08t_27_ner_span_trim.py::test_08t_27f_trim_after_the_threshold_phone
+2 failed, 6 passed in 1.58s

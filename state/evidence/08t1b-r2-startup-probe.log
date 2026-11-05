@@ -1,0 +1,15 @@
+== backend-noweights
+exit=3
+    check_ner_weights(get_guardrail_settings(), settings())
+  File "/app/ffcore/guardrails/settings.py", line 54, in check_ner_weights
+    raise RuntimeError(f"model_missing: {exc}") from None
+== backend-noname
+exit=3
+    raise RuntimeError(
+RuntimeError: ner_not_configured: GUARDRAIL_EGRESS_NER=true needs NER_MODEL and NER_REVISION
+== agentworker-noweights
+exit=124
+20:32:12: Starting worker for 1 functions: run_agent
+== backend-airgap
+exit=124
+INFO:     Application startup complete.

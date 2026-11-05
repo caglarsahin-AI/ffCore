@@ -1,0 +1,82 @@
+FFF.FF                                                                   [100%]
+=================================== FAILURES ===================================
+______________ test_08t_27_name_glued_to_a_phone_is_still_masked _______________
+
+    def test_08t_27_name_glued_to_a_phone_is_still_masked():
+        out = _egress("Ayşe Kaya05321234567 aradı", "Ayşe Kaya05321234567").text_out
+        for value in ("Ayşe", "Kaya", "05321234567"):
+>           assert value not in out
+E           AssertionError: assert 'Ayşe' not in 'Ayşe Kaya<<PII_1>> aradı'
+E             
+E             'Ayşe' is contained here:
+E               Ayşe Kaya<<PII_1>> aradı
+E             ? ++++
+
+tests/unit/test_08t_27_ner_span_trim.py:50: AssertionError
+___________ test_08t_27b_span_covering_a_placeholder_keeps_it_intact ___________
+
+    def test_08t_27b_span_covering_a_placeholder_keeps_it_intact():
+        text = "Bay <<PII_1>> Hanım aradı"
+        out = _egress(text, "Bay <<PII_1>> Hanım").text_out
+        # the carried placeholder stays its own token between the trimmed parts, never inside a value
+>       assert re.fullmatch(r"<<PII_\d+>> <<PII_1>> <<PII_\d+>> aradı", out), out
+E       AssertionError: <<PII_1>> aradı
+E       assert None
+E        +  where None = <function fullmatch at 0x7f5b48e20ea0>('<<PII_\\d+>> <<PII_1>> <<PII_\\d+>> aradı', '<<PII_1>> aradı')
+E        +    where <function fullmatch at 0x7f5b48e20ea0> = re.fullmatch
+
+tests/unit/test_08t_27_ner_span_trim.py:59: AssertionError
+___________ test_08t_27c_span_inside_a_placeholder_is_dropped[PII_1] ___________
+
+span = 'PII_1'
+
+    @pytest.mark.parametrize("span", ["PII_1", "<<PII_1>>", "<PII_1>"])
+    def test_08t_27c_span_inside_a_placeholder_is_dropped(span):
+        text = "Bay <<PII_1>> aradı"
+        out = _egress(text, span).text_out
+>       assert out == text
+E       AssertionError: assert 'Bay <<<<PII_1>>>> aradı' == 'Bay <<PII_1>> aradı'
+E         
+E         - Bay <<PII_1>> aradı
+E         + Bay <<<<PII_1>>>> aradı
+E         ?     ++         ++
+
+tests/unit/test_08t_27_ner_span_trim.py:67: AssertionError
+__________ test_08t_27c_span_inside_a_placeholder_is_dropped[<PII_1>] __________
+
+span = '<PII_1>'
+
+    @pytest.mark.parametrize("span", ["PII_1", "<<PII_1>>", "<PII_1>"])
+    def test_08t_27c_span_inside_a_placeholder_is_dropped(span):
+        text = "Bay <<PII_1>> aradı"
+        out = _egress(text, span).text_out
+>       assert out == text
+E       AssertionError: assert 'Bay <<<PII_1>>> aradı' == 'Bay <<PII_1>> aradı'
+E         
+E         - Bay <<PII_1>> aradı
+E         + Bay <<<PII_1>>> aradı
+E         ?     +         +
+
+tests/unit/test_08t_27_ner_span_trim.py:67: AssertionError
+____________________ test_08t_27d_pii_ner_filter_trims_too _____________________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f5b469503b0>
+
+    def test_08t_27d_pii_ner_filter_trims_too(monkeypatch):
+        monkeypatch.setattr(ingest_mask, "ner_client", lambda: SpanNer("Ayşe Kaya05321234567"))
+        masked, counts = asyncio.run(ingest_mask.PiiNerFilter().mask("Ayşe Kaya05321234567 aradı"))
+>       assert "Ayşe" not in masked and "05321234567" not in masked
+E       AssertionError: assert ('Ayşe' not in 'Ayşe Kaya[TR_PHONE] aradı'
+E         
+E         'Ayşe' is contained here:
+E           Ayşe Kaya[TR_PHONE] aradı
+E         ? ++++)
+
+tests/unit/test_08t_27_ner_span_trim.py:73: AssertionError
+=========================== short test summary info ============================
+FAILED tests/unit/test_08t_27_ner_span_trim.py::test_08t_27_name_glued_to_a_phone_is_still_masked
+FAILED tests/unit/test_08t_27_ner_span_trim.py::test_08t_27b_span_covering_a_placeholder_keeps_it_intact
+FAILED tests/unit/test_08t_27_ner_span_trim.py::test_08t_27c_span_inside_a_placeholder_is_dropped[PII_1]
+FAILED tests/unit/test_08t_27_ner_span_trim.py::test_08t_27c_span_inside_a_placeholder_is_dropped[<PII_1>]
+FAILED tests/unit/test_08t_27_ner_span_trim.py::test_08t_27d_pii_ner_filter_trims_too
+5 failed, 1 passed in 1.72s

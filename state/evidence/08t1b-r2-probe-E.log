@@ -1,0 +1,18 @@
+E1 v3 egress NER on: action=tokenize leaks=[] out='Müşteri <<PII_1>>, TC <<PII_2>>, tel <<PII_3>>, <<PII_4>>'
+E1 v3 egress NER off: leaks=['Ayşe Demir'] ner_calls=0
+E2 built-in, NER down: action=RAISED NerEgressUnavailable code=ner_unavailable out='' events=[]
+E3 text stage input.pre: ner_calls=0 action=allow
+E3 text stage output.pre: ner_calls=0 action=allow
+E3 text stage tool.pre: ner_calls=0 action=allow
+E3 text stage tool.post: ner_calls=0 action=allow
+E4 stored on_error=block, NER down: action=RAISED NerEgressUnavailable code=ner_unavailable leaks=[]
+E4 stored on_error=allow, NER down: action=RAISED NerEgressUnavailable code=ner_unavailable leaks=[]
+E5 stored monitor, NER down: action=allow leaks=['Ayşe Demir', '10000000146', '0532 123 45 67', 'ayse@ornek.com']
+E6 first turn: '<<PII_1>> geldi'
+E6 NER span covering a placeholder: '<<PII_2>> <<PII_1>> <<PII_3>> aradı'
+E6 revealed: 'Bay Ayşe Demir Hanım aradı'
+E6 NER span inside a placeholder: '<<PII_1>> bilgi'
+E7 name glued to phone (partial overlap): '<<PII_1>><<PII_2>> aradı' leaks_name=False
+E8 text stage input.pre on_error=allow NER down: action=allow
+E9 egress monitor-mode stored on_error=allow NER down: action=allow
+E6 revealed: 'Ayşe Demir bilgi'

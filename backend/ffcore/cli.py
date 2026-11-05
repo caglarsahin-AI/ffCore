@@ -75,7 +75,9 @@ async def create_superadmin(email: str, full_name: str, password: str, access: s
         return str(user.id)
 
 
-async def enqueue_reindex(project_key: str, kb_key: str, layer: str, full: bool) -> str:
+async def enqueue_reindex(
+    project_key: str, kb_key: str, layer: str, full: bool, accept_personnel_data: bool = False
+) -> str:
     """04a: `make reindex`. Enqueues the worker job; the API process embeds (C10)."""
     from sqlalchemy import select
 
@@ -97,7 +99,17 @@ async def enqueue_reindex(project_key: str, kb_key: str, layer: str, full: bool)
         )
     if kb_id is None:
         raise CliError(f"knowledge base {project_key}/{kb_key} not found")
-    return await get_queue(get_settings()).enqueue("reindex_job", str(kb_id), layer, full)
+    if layer == "silver":
+        # r2 NOTE-5: the job checks too (the API road); here the operator gets the code and exit 2
+        # before anything is queued.
+        from ffcore.knowledge import ingest
+
+        await ingest.check_reindex_silver(
+            kb_id, full=full, accept_personnel_data=accept_personnel_data
+        )
+    return await get_queue(get_settings()).enqueue(
+        "reindex_job", str(kb_id), layer, full, accept_personnel_data
+    )
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -128,6 +140,12 @@ def build_parser() -> argparse.ArgumentParser:
     reindex.add_argument("--kb", required=True, help="knowledge base key")
     reindex.add_argument("--layer", choices=("silver", "gold"), required=True)
     reindex.add_argument("--full", action="store_true", help="every document, not only changed")
+    reindex.add_argument(
+        "--accept-personnel-data",
+        action="store_true",
+        help="the M3 measurement mode: reconvert personnel-data records written with pii_regex "
+        "(names not masked); without it such a record refuses the reindex (prsim_requires_ner)",
+    )
     seed_prompts = commands.add_parser(
         "seed-prompts", help="first-install prompts from backend/prompts into Langfuse (02)"
     )
@@ -160,9 +178,10 @@ def build_parser() -> argparse.ArgumentParser:
     raw = commands.add_parser(
         "ingest-raw",
         help="ingest a raw-staging tree (file + <file>.meta.json) into a knowledge base (19)",
-        description="PII regex masking is always applied to silver and gold; raw is never "
-        "written. PRSIM is refused until 08 full (prsim_requires_ner) unless "
-        "--accept-personnel-data (M3 measurement only, KARARLAR).",
+        description="PII masking (regex identifiers and NER person names, pii_ner) is always "
+        "applied to silver and gold; raw is never written. PRSIM is ingested with name "
+        "masking; --accept-personnel-data is the M3 measurement mode (regex only, as "
+        "measured, KARARLAR).",
     )
     raw.add_argument("--project", required=True, help="project key")
     raw.add_argument("--kb", required=True, help="knowledge base key")
@@ -215,6 +234,14 @@ async def _seed_eval(args):
         raise CliError(f"Langfuse: {exc.code}") from None
 
 
+def _raw_text_filter(args) -> str:
+    """No option names the filter (masking cannot be named away, plan/19): new ingests mask
+    names too (`pii_ner`); the M3 measurement flag keeps `pii_regex` as measured (08 tam 1b)."""
+    from ffcore.knowledge import raw_ingest
+
+    return raw_ingest.M3_TEXT_FILTER if args.accept_personnel_data else raw_ingest.TEXT_FILTER
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
@@ -224,11 +251,23 @@ def main(argv: list[str] | None = None) -> int:
 
         try:
             raw_staging.check_sources(
-                args.sources, accept_personnel_data=args.accept_personnel_data
+                args.sources,
+                accept_personnel_data=args.accept_personnel_data,
+                text_filter=_raw_text_filter(args),
             )
         except raw_staging.StagingError as exc:
             print(f"error: {exc}", file=sys.stderr)
             return 2
+        if _raw_text_filter(args) == "pii_ner" and any(map(raw_staging.is_prsim, args.sources)):
+            # PRSIM: still before logging and the database (exit 2, as before 08 tam 1b); other
+            # sources are checked by ingest_tree before the first file.
+            from ffcore.knowledge import raw_ingest
+
+            try:
+                asyncio.run(raw_ingest.check_ner(args.sources))
+            except raw_ingest.RawIngestError as exc:
+                print(f"error: {exc}", file=sys.stderr)
+                return 2
     configure_logging(get_settings())
 
     try:
@@ -259,7 +298,17 @@ def main(argv: list[str] | None = None) -> int:
             if result.problems or (args.check and result.changed):
                 return 1
         elif args.command == "reindex":
-            job = asyncio.run(enqueue_reindex(args.project, args.kb, args.layer, args.full))
+            from ffcore.knowledge import ingest
+
+            try:
+                job = asyncio.run(
+                    enqueue_reindex(
+                        args.project, args.kb, args.layer, args.full, args.accept_personnel_data
+                    )
+                )
+            except ingest.ReindexRefused as exc:
+                print(f"error: {exc}", file=sys.stderr)
+                return 2
             print(f"reindex queued: job {job} (worker log shows reused=N embedded=M)")
         elif args.command == "seed-prompts":
             client = tracing.init_tracing(get_settings())
@@ -292,6 +341,7 @@ def main(argv: list[str] | None = None) -> int:
                         limit=args.limit,
                         settings=get_settings(),
                         accept_personnel_data=args.accept_personnel_data,
+                        text_filter=_raw_text_filter(args),
                     )
                 )
             except (raw_ingest.RawIngestError, raw_ingest.raw_staging.StagingError) as exc:

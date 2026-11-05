@@ -100,7 +100,9 @@ def test_08_s5_builtin_default_listed_until_overridden(admin, project):
     assert [(p["key"], p["builtin"], p["mode"]) for p in listed] == [("default", True, "monitor")]
     # version 2 (fix/08-default-egress-enforce, K-SEN-0029): the policy stays monitor, only its
     # egress PII rule carries mode=enforce; the other rules follow the policy (mode null)
-    assert listed[0]["id"] is None and listed[0]["builtin_version"] == 2
+    assert (
+        listed[0]["id"] is None and listed[0]["builtin_version"] == 3
+    )  # 08 tam 1b: default-egress
     modes = {(r["type"], tuple(r["stages"]), r.get("mode")) for r in listed[0]["rules"]}
     assert ("pii", ("egress",), "enforce") in modes, modes
     assert all(mode is None for _, stages, mode in modes if stages != ("egress",)), modes
@@ -144,8 +146,9 @@ def test_08_14_pii_policy_reference(admin, project):
 def test_08_15_unsupported_rejected_by_api(admin, project):
     person = _pii(admin, project, categories={"PERSON": {}})
     assert person.json()["error"]["code"] == "category_unsupported"
-    ner = _pii(admin, project, key="ner", engine="ner")
-    assert ner.json()["error"]["code"] == "engine_unsupported"
+    # 08 tam 1b: `engine: ner` makes PERSON recognizable (no `engine_unsupported` any more).
+    ner = _pii(admin, project, key="ner", engine="ner", categories={"PERSON": {}})
+    assert ner.status_code == 201, ner.json()
     later = _policy(
         admin, project, rules=[{"type": "injection", "action": "block", "stages": ["input.pre"]}]
     )

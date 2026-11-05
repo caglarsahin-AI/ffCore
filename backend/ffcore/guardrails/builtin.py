@@ -4,13 +4,20 @@ Visible in the API (`builtin: true`, `builtin_version`), in monitor mode: it blo
 nothing until an administrator stores an enforce policy. One rule is enforced regardless: PII
 at egress leaves tokenized (version 2, K-SEN-0029 A; plan/18 F4 found raw identifiers reaching
 the provider under version 1). A stored policy with key `default` replaces it.
+
+Version 3 (08 tam 1b, K-08T1B-0004 A): the egress rule reads its own PII policy,
+`default-egress`: with GUARDRAIL_EGRESS_NER=true the regex identifiers plus person names
+(`engine: ner`), with false the same regex identifiers as before. The text stages keep
+`default` (regex) and never call NER. A stored PII policy with either key replaces the built-in;
+a stored `default` without a stored `default-egress` also feeds egress (r1 MAJOR-1 A).
 """
 
 from ffcore.guardrails.categories import CATEGORIES, STAGES
 from ffcore.guardrails.schemas import PiiPolicySpec, PolicySpec, ResolvedPolicy, Rule
 
 BUILTIN_KEY = "default"
-BUILTIN_VERSION = 2
+BUILTIN_VERSION = 3
+EGRESS_PII_KEY = "default-egress"
 
 # Text stages except egress (tokenized instead) and the stream (needs the C17 buffer, 08 full).
 _TEXT_STAGES = [s for s in STAGES if s not in ("egress", "output.stream.delta")]
@@ -24,6 +31,40 @@ DEFAULT_PII = PiiPolicySpec(
         if category.default_on and category.regex
     },
 )
+
+# GUARDRAIL_EGRESS_NER=true: what leaves for the provider has person names tokenized too.
+DEFAULT_EGRESS_PII_NER = PiiPolicySpec(
+    engine="ner",
+    default_action="tokenize",
+    categories={
+        **DEFAULT_PII.model_dump()["categories"],
+        "PERSON": {"enabled": True, "severity": "high"},
+    },
+)
+
+
+def builtin_egress_pii(
+    egress_ner: bool, stored_default: PiiPolicySpec | None = None
+) -> PiiPolicySpec:
+    """The egress PII policy when no `default-egress` is stored.
+
+    r1 MAJOR-1 (A): a project's stored `default` fed the egress rule in v2, so its categories
+    and custom patterns stay at egress; with GUARDRAIL_EGRESS_NER=true `PERSON` and
+    `engine: ner` are added. The built-in five only when `default` is not stored either.
+    """
+    if stored_default is None:
+        return DEFAULT_EGRESS_PII_NER if egress_ner else DEFAULT_PII
+    if not egress_ner:
+        return stored_default
+    data = stored_default.model_dump()
+    data["engine"] = "ner"
+    data["categories"]["PERSON"] = {
+        **data["categories"].get("PERSON", {}),
+        "enabled": True,
+        "severity": "high",
+    }
+    return PiiPolicySpec.model_validate(data)
+
 
 DEFAULT_SPEC = PolicySpec(
     mode="monitor",
@@ -39,12 +80,21 @@ DEFAULT_SPEC = PolicySpec(
             type="pii",
             action="tokenize",
             stages=["egress"],
-            pii_policy_key=BUILTIN_KEY,
+            pii_policy_key=EGRESS_PII_KEY,
             mode="enforce",
         ),
     ],
 )
 
-BUILTIN_DEFAULT = ResolvedPolicy(
-    key=BUILTIN_KEY, spec=DEFAULT_SPEC, pii_policies={BUILTIN_KEY: DEFAULT_PII}, builtin=True
-)
+
+def builtin_default(egress_ner: bool) -> ResolvedPolicy:
+    return ResolvedPolicy(
+        key=BUILTIN_KEY,
+        spec=DEFAULT_SPEC,
+        pii_policies={BUILTIN_KEY: DEFAULT_PII, EGRESS_PII_KEY: builtin_egress_pii(egress_ner)},
+        builtin=True,
+    )
+
+
+# Regex-only egress (GUARDRAIL_EGRESS_NER=false); resolve_policy builds the live one.
+BUILTIN_DEFAULT = builtin_default(False)

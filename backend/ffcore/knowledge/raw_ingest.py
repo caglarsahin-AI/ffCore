@@ -1,17 +1,19 @@
 """`python -m ffcore.cli ingest-raw` (19): a raw-staging tree into one knowledge base.
 
-Each accepted file goes through C6 `ingest_from_raw` with the `pii_regex` filter, always: there is
-no option to leave it off (plan/19 şart 1). A file whose bytes are already indexed under the same
-name is `unchanged` and not touched again (the second run reports `created 0`). Same bytes in any
-other status but `skipped` (a gate decision on these bytes) is `retried`: the pipeline runs again
-on the same record, no new version (FOLLOWUP-155: a fixed environment must not leave a failed
-document behind a clean-looking run). A file that raises after its record was registered is
-`failed` in the database with the exception's class name in `metadata.error_code`, never a
-message. One that raises before (bad metadata: the registration rolls back) has no row of its
-own: it is `failed_unregistered` (source, path, code) in the console and the manifest, counts
-in `failed` and the exit code, no placeholder row is created and an earlier indexed version of
-the same file is left as it is (review r1 MAJOR-1/2, K-19R-0013 A). This process
-converts in its own bounded pool and asks the API for embeddings (C10), like the ingest worker.
+Each accepted file goes through C6 `ingest_from_raw` with a named text filter, always
+(`pii_ner`; `pii_regex` in the M3 measurement mode): there is no option to leave it off (plan/19
+şart 1). A record written under another filter is refused (`text_filter_mismatch`), never
+processed again. A file whose bytes are already indexed under the same name is `unchanged` and
+not touched again (the second run reports `created 0`). Same bytes in any other status but
+`skipped` (a gate decision on these bytes) is `retried`: the pipeline runs again on the same
+record, no new version (FOLLOWUP-155: a fixed environment must not leave a failed document
+behind a clean-looking run). A file that raises after its record was registered is `failed` in
+the database with the exception's class name in `metadata.error_code`, never a message. One that
+raises before (bad metadata: the registration rolls back) has no row of its own: it is
+`failed_unregistered` (source, path, code) in the console and the manifest, counts in `failed`
+and the exit code, no placeholder row is created and an earlier indexed version of the same file
+is left as it is (review r1 MAJOR-1/2, K-19R-0013 A). This process converts in its own bounded
+pool and asks the API for embeddings (C10), like the ingest worker.
 
 The report is counts only: outcomes, refusal codes, gate reasons, masked findings per category.
 No document text, no title, no person value; an error line names the path, never the content.
@@ -46,7 +48,11 @@ from ffcore.knowledge.jobs import get_vector_store
 from ffcore.models.identity import Project
 from ffcore.models.knowledge import Chunk, Document, KnowledgeBase
 
-TEXT_FILTER = "pii_regex"
+# 08 tam 1b: person names masked too (NER over HTTP). The M3 measurement mode
+# (`accept_personnel_data`) keeps `pii_regex`, so its manifest stays as measured (KARARLAR
+# "PRSIM M3 olcumune girer"); a new ingest without it is `pii_ner`.
+TEXT_FILTER = "pii_ner"
+M3_TEXT_FILTER = "pii_regex"
 CUSTOMER_DATA = ("CREDIT_CARD", "TR_IBAN", "TR_NATIONAL_ID")
 # Same bytes in one of these statuses is not retried: indexed is done, skipped is the gates'
 # decision on these bytes (it would be the same again).
@@ -73,22 +79,35 @@ class RawIngestReport:
     files: list[tuple[str, str, str]] = field(default_factory=list)
     current: dict[str, tuple[str, int]] = field(default_factory=dict)
     ingested_at: str = ""
+    text_filter: str = TEXT_FILTER
     personnel_data_sources: set[str] = field(default_factory=set)
     # (source, relpath, error code) of files that failed before their record was registered.
     unregistered: list[tuple[str, str, str]] = field(default_factory=list)
+    # r1 MAJOR-3: same bytes recorded under another filter, refused (never processed again).
+    text_filter_mismatch: int = 0
 
     def manifest(self) -> dict:
         sources: dict[str, dict[str, int]] = {}
+        filters: dict[str, dict[str, int]] = {}
         for relpath, _, source in self.files:
+            # No row (failed before registration, listed in `failed_unregistered`): its own
+            # bucket; `none` is only a real record without a filter (r2 MINOR-r2-4).
+            _, chunks, label = self.current.get(relpath, ("", 0, "unregistered"))
             entry = sources.setdefault(source, {"documents": 0, "chunks": 0})
             entry["documents"] += 1
-            entry["chunks"] += self.current.get(relpath, ("", 0))[1]
-        statuses = Counter(status for status, _ in self.current.values())
+            entry["chunks"] += chunks
+            # The filter each document was written with, from the database (r1 MAJOR-3).
+            per = filters.setdefault(label or "none", {"documents": 0, "chunks": 0})
+            per["documents"] += 1
+            per["chunks"] += chunks
+        statuses = Counter(status for status, _, _ in self.current.values())
         listing = "".join(f"{relpath} {sha}\n" for relpath, sha, _ in sorted(self.files))
         return {
             "stage": self.stage,
             "ingested_at": self.ingested_at,
-            "text_filter": ingest_mask.resolve(TEXT_FILTER).label,
+            "text_filter": ingest_mask.resolve(self.text_filter).label,
+            "text_filters": dict(sorted(filters.items())),
+            "text_filter_mismatch": self.text_filter_mismatch,
             "documents": len(self.files),
             "chunks": sum(e["chunks"] for e in sources.values()),
             "sources": dict(sorted(sources.items())),
@@ -115,15 +134,16 @@ class RawIngestReport:
             f"retried {self.outcomes['retried']}",
             # Every document of the tree as the database has it (the manifest's statuses), not
             # only this run's: an unchanged failure stays visible (FOLLOWUP-155).
-            f"status: {fmt(Counter(status for status, _ in self.current.values()))}",
+            f"status: {fmt(Counter(status for status, _, _ in self.current.values()))}",
             f"failed_unregistered {len(self.unregistered)}",
             *(
                 f"  unregistered: {source} {relpath} {code}"
                 for source, relpath, code in sorted(self.unregistered)
             ),
             f"rejected: {fmt(self.rejected)}",
+            f"text_filter_mismatch {self.text_filter_mismatch}",
             f"gates: {fmt(self.gates)}",
-            f"masked ({TEXT_FILTER}): {fmt(self.masked)}",
+            f"masked ({self.text_filter}): {fmt(self.masked)}",
             "stage: "
             + (
                 "full"
@@ -163,7 +183,7 @@ async def _current(kb_id, filename: str):
     async with db.session_scope() as session:
         return (
             await session.execute(
-                select(Document.id, Document.sha256, Document.status).where(
+                select(Document.id, Document.sha256, Document.status, Document.meta).where(
                     Document.kb_id == kb_id,
                     Document.filename == filename,
                     Document.deleted_at.is_(None),
@@ -209,7 +229,7 @@ async def _fill_current(report: RawIngestReport, kb_id) -> None:
     names = [relpath for relpath, _, _ in report.files]
     async with db.session_scope() as session:
         rows = await session.execute(
-            select(Document.filename, Document.status, func.count(Chunk.id))
+            select(Document.filename, Document.status, Document.meta, func.count(Chunk.id))
             .outerjoin(
                 Chunk, (Chunk.document_id == Document.id) & (Chunk.chunk_status != "skipped")
             )
@@ -218,21 +238,25 @@ async def _fill_current(report: RawIngestReport, kb_id) -> None:
                 Document.filename.in_(names),
                 Document.deleted_at.is_(None),
             )
-            .group_by(Document.filename, Document.status)
+            .group_by(Document.id, Document.filename, Document.status)
         )
-        report.current = {name: (status, count) for name, status, count in rows}
+        report.current = {
+            name: (status, count, (meta or {}).get("text_filter"))
+            for name, status, meta, count in rows
+        }
 
 
 class InvalidEncoding(ValueError):
     pass
 
 
-def _text_findings(path: Path, metadata: dict) -> dict[str, int]:
+async def _text_findings(path: Path, metadata: dict) -> dict[str, int]:
     """Regex PII counts of a staged text file (Markdown/plain) and of its metadata strings
     (r1 MAJOR-2); other formats are checked on their converted text after ingest. Text that is
     not UTF-8 is a coded refusal of that file (r1 MINOR-5), never a traceback for the run."""
-    f = ingest_mask.resolve(TEXT_FILTER)
-    counts = ingest_mask.mask_metadata(f, metadata)[1]
+    # The customer-data stop counts checksummed identifiers only (names are not customer data).
+    f = ingest_mask.resolve("pii_regex")
+    counts = (await ingest_mask.mask_metadata(f, metadata))[1]
     if path.suffix.lower() in (".md", ".txt"):
         try:
             text = path.read_text(encoding="utf-8", errors="strict")
@@ -261,6 +285,19 @@ def _sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
+async def check_ner(sources: list[str]) -> None:
+    """`pii_ner` needs the API's NER before the first file: a tree is never half name-masked.
+    With a PRSIM source the refusal keeps its name (`prsim_requires_ner`, karar 5)."""
+    from ffcore.guardrails.recognizers.ner import NerConfigError, NerUnavailable
+
+    try:
+        await ingest_mask.ner_client().find("NER readiness check.", ["PERSON"])
+    except (NerConfigError, NerUnavailable) as exc:
+        prsim = any(raw_staging.is_prsim(s) for s in sources)
+        code = "prsim_requires_ner" if prsim else "ner_unavailable"
+        raise RawIngestError(code, f"pii_ner needs the API's NER: {exc}") from None
+
+
 async def ingest_tree(
     *,
     project_key: str,
@@ -273,20 +310,36 @@ async def ingest_tree(
     embed_client: ingest.EmbedClient | None = None,
     convert: ingest.Converter = ingest.convert_bounded,
     accept_personnel_data: bool = False,
+    text_filter: str = TEXT_FILTER,
 ) -> RawIngestReport:
     # before any database or model work
-    raw_staging.check_sources(sources, accept_personnel_data=accept_personnel_data)
+    raw_staging.check_sources(
+        sources, accept_personnel_data=accept_personnel_data, text_filter=text_filter
+    )
     if not acl_roles:
         raise RawIngestError("acl_required", "name the roles that may read these documents")
+    if accept_personnel_data:
+        log.warning(
+            "ingest-raw accept_personnel_data is the M3 measurement mode (pii_regex, names not "
+            "masked); a new PRSIM ingest uses pii_ner without the flag (08 tam 1b)"
+        )
+    if text_filter == "pii_ner":
+        await check_ner(sources)
     kb = await _kb(project_key, kb_key)
     store = get_vector_store(settings)
     client = embed_client or ingest.HttpEmbedClient(settings)
     report = RawIngestReport(
         stage="full" if limit is None else "stage0-pipeline-evidence",
         ingested_at=datetime.now(UTC).isoformat(timespec="seconds"),
+        text_filter=text_filter,
     )
+    label = ingest_mask.resolve(text_filter).label
     entries = raw_staging.iter_staged(
-        raw_dir, sources, limit=limit, accept_personnel_data=accept_personnel_data
+        raw_dir,
+        sources,
+        limit=limit,
+        accept_personnel_data=accept_personnel_data,
+        text_filter=text_filter,
     )
     for entry in entries:
         if isinstance(entry, raw_staging.Rejected):
@@ -296,7 +349,7 @@ async def ingest_tree(
         if entry.personnel_data:
             report.personnel_data_sources.add(raw_staging.source_of(entry))
             try:
-                findings = _text_findings(
+                findings = await _text_findings(
                     entry.path, raw_staging.metadata_for(entry, kb_id=str(kb.id))
                 )
             except InvalidEncoding:
@@ -308,6 +361,14 @@ async def ingest_tree(
         report.files.append((entry.relpath, sha256, raw_staging.source_of(entry)))
         existed = await _current(kb.id, entry.relpath)
         same_bytes = existed is not None and existed.sha256 == sha256
+        if same_bytes and (existed.meta or {}).get("text_filter") != label:
+            # r1 MAJOR-3: a record written under another filter is never processed again by
+            # this run (a PRSIM `pii_regex` record is never retried by `pii_ner`), nor counted
+            # as unchanged under this run's label. Refused and counted; the manifest shows the
+            # filter each document carries.
+            report.text_filter_mismatch += 1
+            log.warning("ingest-raw rejected path=%s code=text_filter_mismatch", entry.relpath)
+            continue
         if same_bytes and existed.status in DONE:
             report.outcomes["unchanged"] += 1
             continue
@@ -315,7 +376,7 @@ async def ingest_tree(
         try:
             if same_bytes:
                 # Not through ingest_from_raw: its registration bumps the version even for the
-                # same bytes. The record keeps its filter (`metadata.text_filter`).
+                # same bytes. The record's filter is this run's (checked above).
                 await _clear_error(existed.id)
                 await ingest.ingest_document(
                     existed.id,
@@ -335,7 +396,7 @@ async def ingest_tree(
                     store=store,
                     embed_client=client,
                     convert=convert,
-                    text_filter=TEXT_FILTER,
+                    text_filter=text_filter,
                 )
         except Exception as exc:  # one file must not stop the tree; counted and logged by code
             report.statuses["failed"] += 1

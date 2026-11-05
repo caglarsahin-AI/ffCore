@@ -1,0 +1,9 @@
+All checks passed!
+tests/contract/test_c1_namespace.py ...............                      [ 98%]
+tests/contract/test_c2_api_key_scopes.py ..                              [ 98%]
+tests/contract/test_c2_on_behalf_of.py ..                                [ 99%]
+tests/contract/test_c3_common_columns.py .....                           [ 99%]
+tests/contract/test_c5_vectorstore.py ...                                [ 99%]
+tests/contract/test_c9_runs.py .......                                   [100%]
+
+======================= 1572 passed in 213.51s (0:03:33) =======================

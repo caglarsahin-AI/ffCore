@@ -1,0 +1,104 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+___________ test_08t_30_reindex_refuses_m3_prsim_record_without_flag ___________
+
+world = {'project': 'd1a5b433-175e-437f-b089-5c3f3a8d021c', 'other': '5e49caee-ec93-4403-a894-b493cd1b6107', 'admin': <starlet...nt.TestClient object at 0x7f20f44c0890>, 'admin_read': <starlette.testclient.TestClient object at 0x7f20db97f8c0>, ...}
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_d55652a04466) at 0x7f20f45458b0>
+settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_08t_30_reindex_refuses_m30')
+
+    def test_08t_30_reindex_refuses_m3_prsim_record_without_flag(world, pg, settings, tmp_path):
+        kb = _m3_failed_prsim(world, pg, settings, tmp_path, "prsim-reindex")
+        calls: list[str] = []
+>       with pytest.raises(ingest.ReindexRefused) as refused:
+                           ^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'ffcore.knowledge.ingest' has no attribute 'ReindexRefused'. Did you mean: 'ReindexReport'?
+
+tests/integration/test_08t_30_reindex_prsim.py:69: AttributeError
+---------------------------- Captured stderr setup -----------------------------
+2026-11-04 21:22:11,265 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-04 21:22:11,294 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=371
+2026-11-04 21:22:11,569 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-04 21:22:11,574 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=170
+2026-11-04 21:22:11,847 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-04 21:22:11,872 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=202
+2026-11-04 21:22:12,163 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-04 21:22:12,167 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=185
+------------------------------ Captured log setup ------------------------------
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=371
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=170
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=202
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=185
+----------------------------- Captured stderr call -----------------------------
+2026-11-04 21:22:12,675 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-04 21:22:12,765 INFO ffcore.access access method=POST path=/api/v1/projects/d1a5b433-175e-437f-b089-5c3f3a8d021c/knowledge-bases status=201 ms=492
+2026-11-04 21:22:12,769 WARNING ffcore.knowledge.raw_ingest ingest-raw accept_personnel_data is the M3 measurement mode (pii_regex, names not masked); a new PRSIM ingest uses pii_ner without the flag (08 tam 1b)
+2026-11-04 21:22:12,885 ERROR ffcore.knowledge.raw_ingest ingest-raw failed path=jira/PRSIM/PRSIM-1/PRSIM-1.md error=RuntimeError
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/d1a5b433-175e-437f-b089-5c3f3a8d021c/knowledge-bases status=201 ms=492
+WARNING  ffcore.knowledge.raw_ingest:raw_ingest.py:322 ingest-raw accept_personnel_data is the M3 measurement mode (pii_regex, names not masked); a new PRSIM ingest uses pii_ner without the flag (08 tam 1b)
+ERROR    ffcore.knowledge.raw_ingest:raw_ingest.py:403 ingest-raw failed path=jira/PRSIM/PRSIM-1/PRSIM-1.md error=RuntimeError
+________________ test_08t_30b_cli_reindex_exits_2_with_the_code ________________
+
+world = {'project': '1bc0cfeb-e6f4-4f32-a25d-5102c14baa45', 'other': '0d2a51a9-fe26-44ec-b988-6617538a8709', 'admin': <starlet...nt.TestClient object at 0x7f20d84486e0>, 'admin_read': <starlette.testclient.TestClient object at 0x7f20db8faa80>, ...}
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_d55652a04466) at 0x7f20f4551f70>
+settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_08t_30b_cli_reindex_exits0')
+capsys = <_pytest.capture.CaptureFixture object at 0x7f20d82f7a40>
+
+    def test_08t_30b_cli_reindex_exits_2_with_the_code(world, pg, settings, tmp_path, capsys):
+        kb = _m3_failed_prsim(world, pg, settings, tmp_path, "prsim-reindex-cli")
+        code = cli.main(
+            [
+                "reindex",
+                "--project",
+                _project_key(pg, world["project"]),
+                "--kb",
+                kb["key"],
+                "--layer",
+                "silver",
+            ]
+        )
+>       assert code == 2
+E       assert 0 == 2
+
+tests/integration/test_08t_30_reindex_prsim.py:93: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+2026-11-04 21:22:13,652 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-04 21:22:13,679 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=254
+2026-11-04 21:22:13,976 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-04 21:22:13,982 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=193
+2026-11-04 21:22:14,255 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-04 21:22:14,275 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=184
+2026-11-04 21:22:14,503 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-04 21:22:14,522 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=154
+------------------------------ Captured log setup ------------------------------
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=254
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=193
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=184
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=154
+----------------------------- Captured stdout call -----------------------------
+reindex queued: job 0b7aaf7e693d4ef0b2f08aa2d016f632 (worker log shows reused=N embedded=M)
+----------------------------- Captured stderr call -----------------------------
+2026-11-04 21:22:14,684 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-04 21:22:14,699 INFO ffcore.access access method=POST path=/api/v1/projects/1bc0cfeb-e6f4-4f32-a25d-5102c14baa45/knowledge-bases status=201 ms=88
+2026-11-04 21:22:14,703 WARNING ffcore.knowledge.raw_ingest ingest-raw accept_personnel_data is the M3 measurement mode (pii_regex, names not masked); a new PRSIM ingest uses pii_ner without the flag (08 tam 1b)
+2026-11-04 21:22:14,801 ERROR ffcore.knowledge.raw_ingest ingest-raw failed path=jira/PRSIM/PRSIM-1/PRSIM-1.md error=RuntimeError
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/1bc0cfeb-e6f4-4f32-a25d-5102c14baa45/knowledge-bases status=201 ms=88
+WARNING  ffcore.knowledge.raw_ingest:raw_ingest.py:322 ingest-raw accept_personnel_data is the M3 measurement mode (pii_regex, names not masked); a new PRSIM ingest uses pii_ner without the flag (08 tam 1b)
+ERROR    ffcore.knowledge.raw_ingest:raw_ingest.py:403 ingest-raw failed path=jira/PRSIM/PRSIM-1/PRSIM-1.md error=RuntimeError
+=========================== short test summary info ============================
+FAILED tests/integration/test_08t_30_reindex_prsim.py::test_08t_30_reindex_refuses_m3_prsim_record_without_flag
+FAILED tests/integration/test_08t_30_reindex_prsim.py::test_08t_30b_cli_reindex_exits_2_with_the_code
+2 failed in 17.67s

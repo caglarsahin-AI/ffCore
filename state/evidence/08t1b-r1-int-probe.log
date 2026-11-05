@@ -1,0 +1,15 @@
+PROBE auth /api/v1/internal/guardrails/ner: anon=401 superadmin=403 service_account_required bogus=401 service(no model)=503 {"error":{"message":"NER_MODEL and NER_REVISION are not set.","type":"api_error","code":"ner_not_configured"}}
+PROBE auth /internal/guardrails/ner: anon=404 superadmin=404 not_found bogus=404 service(no model)=404 {"error":{"message":"Not Found","type":"not_found_error","code":"not_found"}}
+PROBE spans: 200 {"model":"acme/turkish-ner","revision":"0123456789abcdef","findings":[{"category":"PERSON","start":4,"end":14,"score":0.97,"evidence":"ner acme score 0.97"},{"category":"PERSON","start":18,"end":29,"score":0.97,"evidence":"ner acme score 0.97"}]}
+PROBE value-in-body: False
+PROBE limit 200001 chars: 422 {"error":{"message":"Invalid request: body.text","type":"invalid_request_error","code":"validation_error"}}
+PROBE limit 200000 chars: 200 {"model":"acme/turkish-ner","revision":"0123456789abcdef","findings":[]}
+PROBE limit no categories: 422 {"error":{"message":"Invalid request: body.categories","type":"invalid_request_error","code":"validation_error"}}
+PROBE limit bad category: 422 {"error":{"message":"Invalid request: body.categories.0","type":"invalid_request_error","code":"validation_error"}}
+PROBE limit extra field: 422 {"error":{"message":"Invalid request: body.url","type":"invalid_request_error","code":"validation_error"}}
+PROBE create engine ner: 201 {"id":"74ff4e63-e9f8-47ea-a093-d5a19b75b407","project_id":"0a910d61-99e8-4a5c-9387-4428b6156804","key":"ner-f5cb1f","name":"NER","engine":"ner","default_action"
+PROBE policy: 201 {"id":"98201594-d4da-4675-8928-640b1223adc1","project_id":"0a910d61-99e8-4a5c-9387-4428b6156804","key":"g-ner-f5cb1f","name":"G","rules":[{"type":"pii","action"
+PROBE /guardrails/test engine ner without model: 422 {"error":{"message":"NER_MODEL and NER_REVISION are not set.","type":"invalid_request_error","code":"ner_not_configured"}}
+PROBE builtin listing: 200 []
+PROBE pii listing keys: []
+4 passed in 21.29s

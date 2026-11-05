@@ -700,6 +700,67 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorBody'
+  /api/v1/internal/guardrails/ner:
+    post:
+      tags:
+      - guardrails
+      - guardrails-internal
+      summary: Find person, organization and location names (service account only)
+      description: '08 tam 1b: the API process holds the NER model; the agent and ingest workers ask here
+
+        (the /internal/embed pattern). Spans only, never values. Without NER_MODEL / NER_REVISION
+
+        503 `ner_not_configured`; a missing weight 503 `model_missing` (run `make models`).'
+      operationId: internal_ner_api_v1_internal_guardrails_ner_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NerRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NerResponse'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
   /api/v1/internal/guardrails/evaluate:
     post:
       tags:
@@ -713,7 +774,11 @@ paths:
 
         token scope whose placeholder numbers are used up (it would issue past 9999999) is 400
 
-        `placeholder_out_of_range`, whatever the policy''s `on_error` says (08-tam-1a r4/r5).'
+        `placeholder_out_of_range`, whatever the policy''s `on_error` says (08-tam-1a r4/r5). At egress,
+
+        an enforce rule whose NER cannot answer is 503 `ner_unavailable`, also whatever `on_error`
+
+        says (08-tam-1b r1 MINOR-1).'
       operationId: evaluate_guardrails_api_v1_internal_guardrails_evaluate_post
       requestBody:
         content:
@@ -1318,6 +1383,77 @@ components:
       - policy_mode
       - builtin
       title: GuardrailTestResult
+    NerFindingOut:
+      properties:
+        category:
+          type: string
+          enum:
+          - PERSON
+          - ORGANIZATION
+          - LOCATION
+          title: Category
+        start:
+          type: integer
+          title: Start
+        end:
+          type: integer
+          title: End
+        score:
+          type: number
+          title: Score
+        evidence:
+          type: string
+          title: Evidence
+      type: object
+      required:
+      - category
+      - start
+      - end
+      - score
+      - evidence
+      title: NerFindingOut
+      description: A span and its category; never the value (the caller holds the text).
+    NerRequest:
+      properties:
+        text:
+          type: string
+          maxLength: 200000
+          title: Text
+        categories:
+          items:
+            type: string
+            enum:
+            - PERSON
+            - ORGANIZATION
+            - LOCATION
+          type: array
+          minItems: 1
+          title: Categories
+      additionalProperties: false
+      type: object
+      required:
+      - text
+      - categories
+      title: NerRequest
+    NerResponse:
+      properties:
+        model:
+          type: string
+          title: Model
+        revision:
+          type: string
+          title: Revision
+        findings:
+          items:
+            $ref: '#/components/schemas/NerFindingOut'
+          type: array
+          title: Findings
+      type: object
+      required:
+      - model
+      - revision
+      - findings
+      title: NerResponse
     PiiCategorySetting:
       properties:
         enabled:
@@ -1375,7 +1511,8 @@ components:
           - regex
           - ner
           title: Engine
-          description: '`ner` arrives with the full guardrail package (422 now).'
+          description: '`ner`: the regex recognizers plus the NER model (PERSON, ORGANIZATION, LOCATION);
+            needs NER_MODEL / NER_REVISION.'
           default: regex
         default_action:
           type: string
@@ -1490,7 +1627,8 @@ components:
         builtin:
           type: boolean
           title: Builtin
-          description: 'True: the built-in `default`, not stored.'
+          description: 'True: a built-in PII policy (`default`, or the egress rule''s `default-egress`),
+            not stored.'
         created_at:
           anyOf:
           - type: string

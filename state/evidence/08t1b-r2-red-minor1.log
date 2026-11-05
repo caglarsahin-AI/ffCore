@@ -1,0 +1,106 @@
+FFFFFF..........F...                                                     [100%]
+=================================== FAILURES ===================================
+_____ test_08t_23_egress_ner_down_is_loud_whatever_on_error[error0-allow] ______
+
+on_error = 'allow', error = NerUnavailable('internal ner failed: 503')
+
+    @pytest.mark.parametrize("on_error", ["allow", "log", "block"])
+    @pytest.mark.parametrize(
+        "error", [ner.NerUnavailable("internal ner failed: 503"), RuntimeError("model gone")]
+    )
+    def test_08t_23_egress_ner_down_is_loud_whatever_on_error(on_error, error):
+>       with pytest.raises(ner.NerEgressUnavailable) as raised:
+                           ^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'ffcore.guardrails.recognizers.ner' has no attribute 'NerEgressUnavailable'. Did you mean: 'NerUnavailable'?
+
+tests/unit/test_08t_23_egress_ner_fail_loud.py:64: AttributeError
+______ test_08t_23_egress_ner_down_is_loud_whatever_on_error[error0-log] _______
+
+on_error = 'log', error = NerUnavailable('internal ner failed: 503')
+
+    @pytest.mark.parametrize("on_error", ["allow", "log", "block"])
+    @pytest.mark.parametrize(
+        "error", [ner.NerUnavailable("internal ner failed: 503"), RuntimeError("model gone")]
+    )
+    def test_08t_23_egress_ner_down_is_loud_whatever_on_error(on_error, error):
+>       with pytest.raises(ner.NerEgressUnavailable) as raised:
+                           ^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'ffcore.guardrails.recognizers.ner' has no attribute 'NerEgressUnavailable'. Did you mean: 'NerUnavailable'?
+
+tests/unit/test_08t_23_egress_ner_fail_loud.py:64: AttributeError
+_____ test_08t_23_egress_ner_down_is_loud_whatever_on_error[error0-block] ______
+
+on_error = 'block', error = NerUnavailable('internal ner failed: 503')
+
+    @pytest.mark.parametrize("on_error", ["allow", "log", "block"])
+    @pytest.mark.parametrize(
+        "error", [ner.NerUnavailable("internal ner failed: 503"), RuntimeError("model gone")]
+    )
+    def test_08t_23_egress_ner_down_is_loud_whatever_on_error(on_error, error):
+>       with pytest.raises(ner.NerEgressUnavailable) as raised:
+                           ^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'ffcore.guardrails.recognizers.ner' has no attribute 'NerEgressUnavailable'. Did you mean: 'NerUnavailable'?
+
+tests/unit/test_08t_23_egress_ner_fail_loud.py:64: AttributeError
+_____ test_08t_23_egress_ner_down_is_loud_whatever_on_error[error1-allow] ______
+
+on_error = 'allow', error = RuntimeError('model gone')
+
+    @pytest.mark.parametrize("on_error", ["allow", "log", "block"])
+    @pytest.mark.parametrize(
+        "error", [ner.NerUnavailable("internal ner failed: 503"), RuntimeError("model gone")]
+    )
+    def test_08t_23_egress_ner_down_is_loud_whatever_on_error(on_error, error):
+>       with pytest.raises(ner.NerEgressUnavailable) as raised:
+                           ^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'ffcore.guardrails.recognizers.ner' has no attribute 'NerEgressUnavailable'. Did you mean: 'NerUnavailable'?
+
+tests/unit/test_08t_23_egress_ner_fail_loud.py:64: AttributeError
+______ test_08t_23_egress_ner_down_is_loud_whatever_on_error[error1-log] _______
+
+on_error = 'log', error = RuntimeError('model gone')
+
+    @pytest.mark.parametrize("on_error", ["allow", "log", "block"])
+    @pytest.mark.parametrize(
+        "error", [ner.NerUnavailable("internal ner failed: 503"), RuntimeError("model gone")]
+    )
+    def test_08t_23_egress_ner_down_is_loud_whatever_on_error(on_error, error):
+>       with pytest.raises(ner.NerEgressUnavailable) as raised:
+                           ^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'ffcore.guardrails.recognizers.ner' has no attribute 'NerEgressUnavailable'. Did you mean: 'NerUnavailable'?
+
+tests/unit/test_08t_23_egress_ner_fail_loud.py:64: AttributeError
+_____ test_08t_23_egress_ner_down_is_loud_whatever_on_error[error1-block] ______
+
+on_error = 'block', error = RuntimeError('model gone')
+
+    @pytest.mark.parametrize("on_error", ["allow", "log", "block"])
+    @pytest.mark.parametrize(
+        "error", [ner.NerUnavailable("internal ner failed: 503"), RuntimeError("model gone")]
+    )
+    def test_08t_23_egress_ner_down_is_loud_whatever_on_error(on_error, error):
+>       with pytest.raises(ner.NerEgressUnavailable) as raised:
+                           ^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'ffcore.guardrails.recognizers.ner' has no attribute 'NerEgressUnavailable'. Did you mean: 'NerUnavailable'?
+
+tests/unit/test_08t_23_egress_ner_fail_loud.py:64: AttributeError
+______________________ test_08t_6b_ner_down_fails_closed _______________________
+
+    def test_08t_6b_ner_down_fails_closed():
+        client = FakeClient(error=ner.NerUnavailable("internal ner failed: 503"))
+        # r1 MINOR-1 (A): at egress the failure is loud whatever on_error says (test_08t_23).
+        for on_error in ("block", "allow"):
+>           with pytest.raises(ner.NerEgressUnavailable):
+                               ^^^^^^^^^^^^^^^^^^^^^^^^
+E           AttributeError: module 'ffcore.guardrails.recognizers.ner' has no attribute 'NerEgressUnavailable'. Did you mean: 'NerUnavailable'?
+
+tests/unit/test_08t_ner.py:177: AttributeError
+=========================== short test summary info ============================
+FAILED tests/unit/test_08t_23_egress_ner_fail_loud.py::test_08t_23_egress_ner_down_is_loud_whatever_on_error[error0-allow]
+FAILED tests/unit/test_08t_23_egress_ner_fail_loud.py::test_08t_23_egress_ner_down_is_loud_whatever_on_error[error0-log]
+FAILED tests/unit/test_08t_23_egress_ner_fail_loud.py::test_08t_23_egress_ner_down_is_loud_whatever_on_error[error0-block]
+FAILED tests/unit/test_08t_23_egress_ner_fail_loud.py::test_08t_23_egress_ner_down_is_loud_whatever_on_error[error1-allow]
+FAILED tests/unit/test_08t_23_egress_ner_fail_loud.py::test_08t_23_egress_ner_down_is_loud_whatever_on_error[error1-log]
+FAILED tests/unit/test_08t_23_egress_ner_fail_loud.py::test_08t_23_egress_ner_down_is_loud_whatever_on_error[error1-block]
+FAILED tests/unit/test_08t_ner.py::test_08t_6b_ner_down_fails_closed - Attrib...
+7 failed, 13 passed in 29.07s

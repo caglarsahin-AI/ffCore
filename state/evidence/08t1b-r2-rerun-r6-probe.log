@@ -1,0 +1,11 @@
+BOUND carried <<PII_99999998>>: ['<<PII_1>>', '<<PII_2>>', '<<PII_3>>']
+BOUND carried <<PII_٩٩٩٩٩٩٩٩>>: ['<<PII_1>>', '<<PII_2>>', '<<PII_3>>']
+BOUND carried <<PII_10000000>>: ['<<PII_1>>', '<<PII_2>>', '<<PII_3>>']
+BOUND carried <<PII_9999999>>: ['<<PII_1>>', '<<PII_2>>', '<<PII_3>>']
+BOUND carried <<PII_9999990>>: ['<<PII_1>>', '<<PII_2>>', '<<PII_3>>']
+BOUND carried <<PII_1000000>>: ['<<PII_1000001>>', '<<PII_1000002>>', '<<PII_1000003>>']
+BOUND numbers [9999999, 7]
+HTML <PII_1 style… (r4-3): one=kept stream3=kept
+HTML <PII_12345678>> then value: one=REVEALED stream3=kept
+HTML x<PII_1>> then value: one=REVEALED stream3=kept
+HTML plain: one=REVEALED stream3=REVEALED

@@ -1,0 +1,135 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+__________ test_08t_21_prsim_m3_failed_record_not_retried_by_pii_ner ___________
+
+world = {'project': '139d17a4-cbb0-4a5b-9f5a-c14e50bba68e', 'other': 'ed773330-5ac5-4510-8407-676d53556047', 'admin': <starlet...nt.TestClient object at 0x7f3f4f52bb90>, 'admin_read': <starlette.testclient.TestClient object at 0x7f3f4ec83d10>, ...}
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_c033ea933122) at 0x7f3f4facb3b0>
+settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_08t_21_prsim_m3_failed_re0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f3f345b4e00>
+
+    def test_08t_21_prsim_m3_failed_record_not_retried_by_pii_ner(
+        world, pg, settings, tmp_path, monkeypatch
+    ):
+        monkeypatch.setattr(ingest_mask, "ner_client", lambda: FakeNer())
+        kb = create_kb(world, key="prsim-mismatch")
+        tree = _prsim_tree(tmp_path, PRSIM_BODY + "\nTalep sahibi Ayşe Demir.\n")
+        calls = []
+    
+        def failing(path, filename, s):
+            calls.append(filename)
+            raise RuntimeError("conversion failed in the test")
+    
+        m3 = _run(
+            settings, pg, world, kb["key"], tree,
+            sources=["jira:PRSIM"], text_filter="pii_regex", accept=True, convert=failing,
+        )
+        assert m3.statuses == {"failed": 1}, m3.lines()
+        calls.clear()
+    
+        def recording(path, filename, s):
+            calls.append(filename)
+            return convert_without_weights(path, filename, s)
+    
+        report = _run(
+            settings, pg, world, kb["key"], tree,
+            sources=["jira:PRSIM"], text_filter="pii_ner", convert=recording,
+        )
+>       assert calls == []  # never converted again, never written with names unmasked
+        ^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert ['jira/PRSIM/...1/PRSIM-1.md'] == []
+E         
+E         Left contains one more item: 'jira/PRSIM/PRSIM-1/PRSIM-1.md'
+E         Use -v to get more diff
+
+tests/integration/test_08t_21_text_filter_mismatch.py:83: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+2026-11-04 19:08:53,690 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-04 19:08:53,724 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=320
+2026-11-04 19:08:54,089 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-04 19:08:54,117 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=245
+2026-11-04 19:08:54,485 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-04 19:08:54,504 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=262
+2026-11-04 19:08:54,792 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-04 19:08:54,815 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=220
+------------------------------ Captured log setup ------------------------------
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=320
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=245
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=262
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=220
+----------------------------- Captured stderr call -----------------------------
+2026-11-04 19:08:55,069 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-04 19:08:55,278 INFO ffcore.access access method=POST path=/api/v1/projects/139d17a4-cbb0-4a5b-9f5a-c14e50bba68e/knowledge-bases status=201 ms=355
+2026-11-04 19:08:55,281 WARNING ffcore.knowledge.raw_ingest ingest-raw accept_personnel_data is the M3 measurement mode (pii_regex, names not masked); a new PRSIM ingest uses pii_ner without the flag (08 tam 1b)
+2026-11-04 19:08:55,409 ERROR ffcore.knowledge.raw_ingest ingest-raw failed path=jira/PRSIM/PRSIM-1/PRSIM-1.md error=RuntimeError
+2026-11-04 19:08:55,661 INFO ffcore.knowledge.ingest gold document=7b9af4c0-68af-4abd-9a13-03bc3917c74a reused=0 embedded=1
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/139d17a4-cbb0-4a5b-9f5a-c14e50bba68e/knowledge-bases status=201 ms=355
+WARNING  ffcore.knowledge.raw_ingest:raw_ingest.py:304 ingest-raw accept_personnel_data is the M3 measurement mode (pii_regex, names not masked); a new PRSIM ingest uses pii_ner without the flag (08 tam 1b)
+ERROR    ffcore.knowledge.raw_ingest:raw_ingest.py:376 ingest-raw failed path=jira/PRSIM/PRSIM-1/PRSIM-1.md error=RuntimeError
+INFO     ffcore.knowledge.ingest:ingest.py:637 gold document=7b9af4c0-68af-4abd-9a13-03bc3917c74a reused=0 embedded=1
+______ test_08t_21b_indexed_regex_records_are_not_unchanged_under_pii_ner ______
+
+world = {'project': '059f7c41-9000-47e8-83fe-c5cf6278ff16', 'other': '7bb69612-1e60-4955-b4dd-8d771264421d', 'admin': <starlet...nt.TestClient object at 0x7f3f345b51f0>, 'admin_read': <starlette.testclient.TestClient object at 0x7f3f3462d340>, ...}
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_c033ea933122) at 0x7f3f345cc3b0>
+settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+ro_tree = PosixPath('/tmp/pytest-of-root/pytest-0/test_08t_21b_indexed_regex_rec0/raw')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f3f341706b0>
+
+    def test_08t_21b_indexed_regex_records_are_not_unchanged_under_pii_ner(
+        world, pg, settings, ro_tree, monkeypatch
+    ):
+        monkeypatch.setattr(ingest_mask, "ner_client", lambda: FakeNer())
+        kb = create_kb(world, key="regex-then-ner")
+        first = _run(settings, pg, world, kb["key"], ro_tree, sources=SOURCES, text_filter="pii_regex")
+        regex = first.manifest()
+>       assert regex["text_filters"] == {
+               ^^^^^^^^^^^^^^^^^^^^^
+            "pii_regex@1": {"documents": regex["documents"], "chunks": regex["chunks"]}
+        }
+E       KeyError: 'text_filters'
+
+tests/integration/test_08t_21_text_filter_mismatch.py:101: KeyError
+---------------------------- Captured stderr setup -----------------------------
+2026-11-04 19:08:56,324 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-04 19:08:56,336 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=179
+2026-11-04 19:08:56,554 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-04 19:08:56,571 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=162
+2026-11-04 19:08:56,951 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-04 19:08:56,971 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=314
+2026-11-04 19:08:57,237 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-04 19:08:57,255 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=193
+2026-11-04 19:08:57,441 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+------------------------------ Captured log setup ------------------------------
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=179
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=162
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=314
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=193
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+----------------------------- Captured stderr call -----------------------------
+2026-11-04 19:08:57,739 INFO ffcore.access access method=POST path=/api/v1/projects/059f7c41-9000-47e8-83fe-c5cf6278ff16/knowledge-bases status=201 ms=100
+2026-11-04 19:08:57,947 INFO ffcore.knowledge.ingest gold document=769beef1-bdf9-42a9-8457-921552bb1cea reused=0 embedded=1
+2026-11-04 19:08:58,142 INFO ffcore.knowledge.ingest gold document=97a40e2b-2fdf-42f1-a317-9ac26ea5e7f3 reused=0 embedded=1
+2026-11-04 19:08:58,362 INFO ffcore.knowledge.ingest gold document=684853fb-7aef-4029-a648-f10632cf88f9 reused=0 embedded=2
+2026-11-04 19:08:58,670 INFO ffcore.knowledge.ingest gold document=90ed4bba-cfb8-439a-acf5-46352fbbe4f6 reused=0 embedded=1
+2026-11-04 19:08:58,686 WARNING ffcore.knowledge.raw_ingest ingest-raw rejected path=jira/PRSIM/PRSIM-1.txt code=prsim_requires_ner
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/059f7c41-9000-47e8-83fe-c5cf6278ff16/knowledge-bases status=201 ms=100
+INFO     ffcore.knowledge.ingest:ingest.py:637 gold document=769beef1-bdf9-42a9-8457-921552bb1cea reused=0 embedded=1
+INFO     ffcore.knowledge.ingest:ingest.py:637 gold document=97a40e2b-2fdf-42f1-a317-9ac26ea5e7f3 reused=0 embedded=1
+INFO     ffcore.knowledge.ingest:ingest.py:637 gold document=684853fb-7aef-4029-a648-f10632cf88f9 reused=0 embedded=2
+INFO     ffcore.knowledge.ingest:ingest.py:637 gold document=90ed4bba-cfb8-439a-acf5-46352fbbe4f6 reused=0 embedded=1
+WARNING  ffcore.knowledge.raw_ingest:raw_ingest.py:328 ingest-raw rejected path=jira/PRSIM/PRSIM-1.txt code=prsim_requires_ner
+=========================== short test summary info ============================
+FAILED tests/integration/test_08t_21_text_filter_mismatch.py::test_08t_21_prsim_m3_failed_record_not_retried_by_pii_ner
+FAILED tests/integration/test_08t_21_text_filter_mismatch.py::test_08t_21b_indexed_regex_records_are_not_unchanged_under_pii_ner
+2 failed in 17.96s

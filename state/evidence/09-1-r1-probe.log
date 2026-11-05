@@ -1,0 +1,14 @@
+P0 GUARDRAIL_EGRESS_ENABLED=True
+P1 real EgressGuard builtin: action=tokenize raw_left=[]
+P1 out="Question: Müşteri TC <<PII_1>> için iade nasıl yapılır?\nExpected answer: <<PII_2>> adresine bildirim, IBAN <<PII_3>>\nAssistant's answer: <<PII_4>> numaralı hattan aradık."
+P2 judge(): model_saw_raw=[] score=Score(name='llm_judge', value=0.75, passed=True, comment='score=4', status='ok')
+P3 json ok: score=5 reason_len=1
+P3 json string score: JudgeParseError judge_output_unreadable
+P3 json float: JudgeParseError judge_output_unreadable
+P3 json bool: JudgeParseError judge_output_unreadable
+P3 prose with SCORE line: score=2 reason_len=0
+P3 prose echoing answer then own: score=5 reason_len=0
+P3 out of range: JudgeParseError judge_score_out_of_range
+P3 fenced json: JudgeParseError judge_output_unreadable
+P3 empty: JudgeParseError judge_output_unreadable
+P3 reason 900 chars: score=3 reason_len=527

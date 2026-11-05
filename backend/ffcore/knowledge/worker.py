@@ -52,7 +52,9 @@ async def ingest_document_job(ctx, document_id: str) -> dict:
     return {"status": report.status, "reused": report.reused, "embedded": report.embedded}
 
 
-async def reindex_job(ctx, kb_id: str, layer: str, full: bool) -> dict:
+async def reindex_job(
+    ctx, kb_id: str, layer: str, full: bool, accept_personnel_data: bool = False
+) -> dict:
     settings = get_settings()
     store = get_vector_store(settings)
     client = ingest.HttpEmbedClient(settings)
@@ -62,7 +64,12 @@ async def reindex_job(ctx, kb_id: str, layer: str, full: bool) -> dict:
         )
     else:
         report = await ingest.reindex_silver(
-            uuid.UUID(kb_id), full=full, settings=settings, store=store, embed_client=client
+            uuid.UUID(kb_id),
+            full=full,
+            settings=settings,
+            store=store,
+            embed_client=client,
+            accept_personnel_data=accept_personnel_data,
         )
     return {"documents": report.documents, "reused": report.reused, "embedded": report.embedded}
 
