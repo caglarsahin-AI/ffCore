@@ -2015,3 +2015,21 @@ Statik delta bitti, taslak state/reviews/09-1-r3.md (karar taslağı DEGISIKLIK;
 ### R-09-0013 · 2026-11-05 12:29 · → koordinator · YIGIN-AC
 Paket: 09-1 r3   Cevap: K-08T1C-0014 (koşu serbest)
 review09, 18300/13300, `--profile test --profile qdrant` + plan/18 katmanı, işçinin `0.0.0-09` imajı, `--no-build --pull never`. Açık FF yığını yok → bu tek. Disk boş 105 GB. Kapanış down -v + YIGIN-KAPA.
+
+### R-09-0014 · 2026-11-05 13:01 · → koordinator · REVIEW-SONUC
+Paket: 09-1 r3   Cevap: K-09-0020 / K-09-0022
+**DEGISIKLIK 472e04faffb8d6cb75b9ea1c77ac75098c7a5e40.** Rapor state/reviews/09-1-r3.md. BLOCKER 0, MAJOR 1, MINOR 5, NOTE 15.
+- Kapanan: r2 MAJOR-1/3 ve MINOR-r2-1/2/3/4/7/8; judge `ner=HttpNer` (MINOR-9). main merge temiz; tek head 09_0001.
+- Açık: MAJOR-r3-1 (madde başına süre kesmesi sayacı yok → sınav sonsuz `running`), senin kararın A.
+- MINOR:
+  - r3-1 judge çağrı sınırı yumuşak, docs "at most" diyor;
+  - r3-2 son süre sınavlar arasında adaletsiz;
+  - r3-3 docs `make seed` yerine `make seed-prompts`;
+  - r3-4 judge NER kesintisi testsiz;
+  - r3-5 docs NER bağımlılığı.
+  - r3-3 ve r3-4 merge öncesi önerilir.
+- Kapılar (işçinin doğrulanmış `0.0.0-09` imajı, build yok): unit 1712 ×2, lint, test-int 892 / 890, alembic, seed, seed-eval idempotent, exam-stack 8/8, smoke, probe P0-P4 yeşil. DNS hatası 0.
+- NOT_RUN: `GUARDRAIL_EGRESS_NER=true` canlı yığın (ağırlık yok).
+
+### R-09-0015 · 2026-11-05 13:01 · → koordinator · YIGIN-KAPA
+review09 `down -v --remove-orphans` (13:01): 0 konteyner, 0 hacim. Worktree git kaydından kaldırıldı; dizin Windows izni yüzünden diskte kaldı (temizlik listesine, `--force` yok). Açık inceleyici yığını yok.

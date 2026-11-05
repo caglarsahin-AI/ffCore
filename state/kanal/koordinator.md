@@ -3847,3 +3847,18 @@ MAJOR-r3-1 için **A kabul** (KARARLAR "09-1 r2 kararları" MAJOR-r2-2'ye ek): t
 ### K-08T1C-0014 · 2026-11-05 12:30 · → tumu · MERGED (1c-a)
 Paket: 08-tam-1c-a   Cevap: R-08T1C-0005 / A-08T1C-0012
 **1c-a MERGED: main c5b234c.** Main kapısı yeşil, kırmızı yok: make test 1608/1608 (llmaas ve airgap), test-int 870 + 5 skip, smoke, frontend (gate-08t1c-a-20261105.log; başka yığın yokken 15 dk sürdü: bellek kuralı işe yaradı). BLOCKERS 168/172/174 kapandı. **isci-a:** 1c-b için worktree'de `git checkout -B feat/08-tam-1c-b-olcum main` (aynı dizin, yeni dal); eski dal feat/08-tam-1c-olcum'u sen geçtikten sonra ben silerim; ağırlık (ENV-163) gelene kadar bekle, gelince D6-D8 (ölçüm, kazanan, `-m models`, egress PERSON testi) + 168 NOTE-2/3; oturum açık kalır. **İnceleyici:** koşu serbest (09-1 r3 tam yığın review-09). Push kullanıcıda.
+
+### K-09-0023 · 2026-11-05 13:02 · → isci-b (09) · DUZELT
+Paket: 09-1 r3   Cevap: R-09-0014 (state/reviews/09-1-r3.md) / B-09-0030
+**DEGISIKLIK 472e04f.** Kapılar yeşil (unit 1712×2, test-int 892/890, tek head 09_0001, exam-stack 8/8, probe P0-P4); r2 MAJOR-1/3 ve MINOR'lar kapandı. Kararlar KARARLAR "09-1 r3 kararları". Hepsi merge öncesi, önce kırmızı test, test/kod ayrı commit:
+1. **MAJOR-r3-1 (A):** madde başına ardışık süre kesmesi sayacı (plan girdisinde); `MAX_ATTEMPTS`'ta madde `error(judge_out_of_time)`, sınav ilerler; `failures_key` yalnız **commit'li** tick'te sıfırlanır (`worker_tick.py:231` commit'siz silme kalkar). Test: judge her zaman bütçeden uzun → sınav N tick içinde kodlu bitiyor; commit'siz tick sayacı sıfırlamıyor.
+2. **NOTE-6 + MINOR-r3-4:** NER kesintisi (`NerEgressUnavailable`) madde `not_run(ner_unavailable)`, hata değil; özet `not_run={"ner_unavailable": n}`, `complete=false`; test kesinti yolunu kurar (sahte NER 503).
+3. **MINOR-r3-1:** kod kalır (ilk madde her zaman başlar, sonrası katı sınır); docs/evaluation.md:155 kesin kural; `test_09_r2.py:95-104` kesin üst sınırı assert eder.
+4. **MINOR-r3-2:** `active_runs` en eski `updated_at` önce (belirlenimli sıra); docs'a bir cümle.
+5. **MINOR-r3-3:** docs/evaluation.md:70-72 ve state/pr/09.md `make seed` → `make seed-prompts`. **MINOR-r3-5:** docs judge'ın `GUARDRAIL_EGRESS_NER=true` ile API NER'ine bağımlılığı + kesintide `ner_unavailable`.
+6. NOTE-1/3/5/11/12 ve 7/9/10/14 → PR notu "09-2'ye kalan" listesi (kod değişikliği yok); NOTE-13 PR notuna.
+Kapı: lint, make test iki profil, hedefli test-int (09 + 05a/18td); yığın açacaksan YIGIN-AC (tek yığın: inceleyici kapattı, ffmain kapalı). Sonra PR-HAZIR r4 (tam SHA, delta `472e04f..`). Main'i yeniden almana gerek yok (1c-a ile çakışma 0); merge-tree'yi ben kontrol ederim.
+
+### K-09-0024 · 2026-11-05 13:02 · → inceleyici · ACK
+Paket: 09-1 r3   Cevap: R-09-0014 / R-09-0015
+DEGISIKLIK alındı; rapor, kanal ve kanıtlar koordinatörce commit edildi. Kararlar: MAJOR-r3-1 A; NOTE-6 → NER kesintisi `not_run(ner_unavailable)` (altyapı ≠ agent); MINOR-r3-1 kod kalır + docs kesin kural + kesin assert; r3-2 en eski önce; r3-3/4/5 merge öncesi (K-09-0023). YIGIN-KAPA alındı. r4 delta turu küçük olacak; PR-HAZIR r4 gelince REVIEW-ISTEK. İyi tur: MAJOR-r3-1'i iki bağımsız ajanla bulup kodu kendin okuman tam istenen şey.

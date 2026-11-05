@@ -1,0 +1,16 @@
+cd backend && python -m ffcore.cli seed-eval --project "hastane-a" --suite ../data/samples/eval/suite.json --items ../data/samples/eval/sozlesme-33.json 
+dataset: hastane-a.sozlesme-33
+items upserted: 33; archived: 0
+suite: created
+cd backend && python -m ffcore.cli seed-eval --project "hastane-a" --suite ../data/samples/eval/suite-sql-20.json --items ../data/samples/eval/sql-20.json 
+dataset: hastane-a.sql-20
+items upserted: 20; archived: 0
+suite: created
+cd backend && python -m ffcore.cli seed-eval --project "hastane-a" --suite ../data/samples/eval/suite.json --items ../data/samples/eval/sozlesme-33.json 
+dataset: hastane-a.sozlesme-33
+items upserted: 33; archived: 0
+suite: already present
+cd backend && python -m ffcore.cli seed-eval --project "hastane-a" --suite ../data/samples/eval/suite-sql-20.json --items ../data/samples/eval/sql-20.json 
+dataset: hastane-a.sql-20
+items upserted: 20; archived: 0
+suite: already present
