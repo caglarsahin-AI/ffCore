@@ -57,8 +57,8 @@ model; on a small local model it is the weakest signal.
 Langfuse 3.120 OSS ships an LLM-as-a-judge evaluator, but it is configured only in its UI and it
 calls the model directly. FFCore's judge instead:
 
-- renders the Langfuse prompt `eval_judge_rubric` (seeded from `backend/prompts/`; edit it in
-  Langfuse),
+- renders the Langfuse prompt `eval_judge_rubric_v2` (seeded from `backend/prompts/`; edit it
+  in Langfuse),
 - sends the text through the egress guardrail of the agent's policy first, like any model call,
 - calls `EVAL_JUDGE_MODEL` as a background job (model slots, background window, quotas),
 - keeps the question, expected answer and answer between markers and tells the model that
@@ -67,23 +67,36 @@ calls the model directly. FFCore's judge instead:
   `SCORE: n` line; anything else is `judge_output_unreadable` / `judge_output_ambiguous`,
   never a guessed score.
 
+Seeding never overwrites a prompt Langfuse already has. A new rubric text therefore ships under
+a new prompt name (`eval_judge_rubric` → `eval_judge_rubric_v2`); after an upgrade run
+`make seed` once so the new prompt exists. The old prompt stays in Langfuse, unused.
+
 ### SQL results
 
 A run's event log does not keep query rows. `sql_result` therefore reads the agent's last
 executed `run_sql` statement again through the same tool (read-only database, same validator)
 with the exam starter's identity, audited as `eval_sql_check` (outcome `failure` when the read
-was refused or failed). Only a call the run really made is read again: one with a successful
-tool result and, when it asked for an approval, approved by a person (the exam never approves
-anything); the tool must be one the agent version was given, discovered, its action available
-and enabled.
+was refused, failed or could not be made). Only a call the run really made is read again: the
+last one with a successful tool result and, when it asked for an approval, approved by a person
+(the exam never approves anything); the tool must be one the agent version was given,
+discovered, its action available and enabled.
 
-- A person rejected the call: `sql_result` is not run (`approval_rejected`); the exam could
-  not see the rows.
-- The agent made no executed call (none, a failed one, a tool it was not given):
-  `sql_result` fails (`no_executed_sql`).
-- The read is refused or fails (`no_sql_result:sql_rejected`, `no_sql_result:sql_error`,
-  `no_sql_result:tool_error`) or is cut (`sql_result_truncated`): it fails, never an empty
-  result.
+mcp-sql returns a refused query and a database error (timeout, connection, unknown column) as a
+tool error whose text starts with its code (`sql_rejected: …`, `sql_error: …`); the run records
+`is_error` and the code. The agent's model still reads the code and can correct the query; such
+a call is never taken for a result.
+
+The exam could not check (the item is not run, apart from the pass rate):
+
+- a person rejected the agent's only `run_sql` (`approval_rejected`): the agent never saw rows;
+- the read could not be made, e.g. the tool timed out (`sql_reread_failed`);
+- the tool of the executed call was removed or disabled since (`tool_removed`).
+
+The agent's failure (`sql_result` fails):
+
+- no executed call (none, only failed ones, a tool it was not given): `no_executed_sql`;
+- the read is refused or fails (`no_sql_result:sql_rejected`, `no_sql_result:sql_error`,
+  `no_sql_result:tool_error`) or is cut (`sql_result_truncated`), never an empty result.
 
 ## Stage diagnosis (`outcome`)
 
@@ -135,10 +148,17 @@ the exam `queued` with a snapshot of the suite (`config`: scorers, threshold, `r
 The background worker then starts `repeat` background runs per item of that version for the
 caller (a project member; read-only access cannot start one) and turns the exam `running`. It
 advances each exam every `EVAL_ADVANCE_INTERVAL_S` seconds, one worker at a time (a lock per
-exam): it scores finished items (at most `EVAL_JUDGE_CALLS_PER_TICK` judge calls a tick),
-links each run's trace into the Langfuse dataset run, writes the scores and commits each item
-on its own. A separate follower task of the worker keeps the item runs listened, so a long
-tick never abandons them.
+exam): it scores finished items, links each run's trace into the Langfuse dataset run, writes
+the scores and commits each item on its own. A separate follower task of the worker keeps the
+item runs listened, so a long tick never abandons them.
+
+A tick has a budget per exam: at most `EVAL_JUDGE_CALLS_PER_TICK` judge calls; no judge call
+while `BACKGROUND_WINDOW` is closed (the judge is a background model call); and a deadline 30 s
+before the tick's own 600 s timeout. The first item of a tick always starts (cut at the
+deadline if it takes longer); a later item starts only if its judge calls, planned at
+`LLM_CALL_TIMEOUT_S` each, fit before the deadline. When the budget runs out the exam simply
+stays `running` and the next tick goes on: a closed window or a slow CPU judge never fails an
+exam.
 
 Runs that ask the user a question are cancelled (`not_run: waiting_user`). Runs that wait for a
 tool approval are cancelled as `not_run: approval_required` (their pending approval is closed,
@@ -147,11 +167,14 @@ approval queue for a person and go on in the background queue after the decision
 expires there makes the item `not_run: approval_expired`. The exam never approves anything.
 Not-run items are counted apart and left out of the pass rate, and the summary's `complete`
 is false: the exam did not finish unattended. With `repeat > 1` a not-run repeat is left out
-of the item's result; a scorer error in any repeat stays an error.
+of the item's result and counted in `not_run` as `partial:<code>` (so `complete` is false too);
+a scorer error in any repeat stays an error.
 
-A tick that keeps failing (`MAX_ATTEMPTS` ticks in a row, a tick timeout included) ends the exam
-`failed` with the error code; nothing stays `queued` or `running` forever. To stop an exam, use
-`cancel`.
+A tick that keeps failing without saving any item (`MAX_ATTEMPTS` ticks in a row, a tick
+timeout included) ends the exam `failed` with the error code; a failed tick that saved an item
+made progress and starts the count again. Nothing stays `queued` or `running` forever. The
+exam lock is renewed and released only by its holder; when a renewal fails the tick stops
+rather than work on without the lock. To stop an exam, use `cancel`.
 
 ## Langfuse 3.120 notes (measured)
 
@@ -159,8 +182,8 @@ A tick that keeps failing (`MAX_ATTEMPTS` ticks in a row, a tick timeout include
 - `GET /scores` ignores trace filters in v1 and v2 and returns every score: FFCore reads
   scores only by their deterministic ids (`<traceId>-<scorer>`, v2 `scoreIds`) and fails loud
   on any row it did not ask for (L12).
-- Dataset run items written a moment ago may not be readable yet; a reader polls for a short,
-  bounded time (L17).
+- Dataset run items and trace scores written a moment ago may not be readable yet; a reader
+  polls for a short, bounded time (L17).
 - A connection error or timeout towards Langfuse is `langfuse_unreachable`, counted per item
   like any other Langfuse failure.
 

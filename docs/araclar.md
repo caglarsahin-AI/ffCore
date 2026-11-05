@@ -137,8 +137,10 @@ identity) and the query itself:
 - known tables only;
 - a `LIMIT` is added when missing.
 
-A refusal comes back as `sql_rejected: <code> (...)`, a database error as
-`sql_error: <code> (...)`. The model can correct the query and try again.
+A refusal comes back as a tool error with the text `sql_rejected: <code> (...)`, a database
+error as `sql_error: <code> (...)`; the run's `tool_result` event has `is_error: true` and
+`error_code` `sql_rejected` / `sql_error`. The model reads the code, can correct the query and
+try again.
 
 Setup:
 
