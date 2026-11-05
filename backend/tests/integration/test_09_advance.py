@@ -407,3 +407,31 @@ def test_09_r2_minor5_resumed_exam_run_goes_to_the_background_queue(
     asyncio.run(go(exam_run))
     asyncio.run(go(lone))
     assert background.enqueued == [str(exam_run)] and interactive.enqueued == [str(lone)]
+
+
+# --- 09-1 r3 MAJOR-r3-1: an item that never fits the tick ends as a coded error -----------------
+
+
+def test_09_r3_major1_item_cut_every_tick_ends_with_a_code(pg, project, database, app_settings):
+    import time
+
+    from ffcore.evaluation.engine import MAX_ATTEMPTS
+    from ffcore.evaluation.runner import Budget
+
+    ev_id = _judged_exam(pg, project, n=2)
+
+    def tick():
+        budget = Budget(20, deadline=time.monotonic() + 0.2, call_s=0.05)
+        _advance(database, app_settings, ev_id, judge=_Judge(delay=2.0), budget=budget)
+        return _ev(pg, ev_id)
+
+    for n in range(1, MAX_ATTEMPTS):
+        status, plan, _ = tick()
+        assert status == "running" and plan["q1"]["timeouts"] == n and not plan["q1"]["scored"]
+    status, plan, _ = tick()  # the MAX_ATTEMPTS-th cut in a row: q1 ends coded
+    assert status == "running" and plan["q1"]["scored"]
+    assert plan["q1"]["result"]["runs"][0]["note"] == "judge_out_of_time"
+    for _ in range(MAX_ATTEMPTS):  # q2 has its own count
+        status, plan, summary = tick()
+    assert status == "completed"
+    assert summary["errors"] == {"judge_out_of_time": 2} and summary["passed_items"] == 0

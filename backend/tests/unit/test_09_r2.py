@@ -95,11 +95,16 @@ def test_09_r2_major2_tick_budget_knows_the_background_window():
 def test_09_r2_major2_budget_refuses_a_judge_call_past_the_deadline():
     b = Budget(5, deadline=time.monotonic() + 1.0, call_s=0.4)
     assert b.may_judge(9) is True  # the first item of a tick always starts (bounded by time)
-    b.committed = 1
+    b.started = 1
     assert b.may_judge(2) is True
     assert b.may_judge(3) is False  # 3 x 0.4 s does not fit in the second left
-    assert Budget(0).may_judge(1) is False and Budget(0).may_judge(0) is True
     assert Budget(1).may_judge(3) is True  # a repeat above the per-tick limit still progresses
+    later = Budget(2)
+    later.started = 1
+    # r3 MINOR-r3-1: after the first item the limit is strict.
+    assert later.may_judge(2) is True and later.may_judge(3) is False
+    later.judge_calls = 0
+    assert later.may_judge(1) is False and later.may_judge(0) is True
     assert Budget(5, is_open=lambda: False).may_judge(1) is False
     assert Budget(5, is_open=lambda: False).may_judge(0) is True  # no judge: no window
 

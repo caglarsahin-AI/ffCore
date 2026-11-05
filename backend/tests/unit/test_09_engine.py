@@ -843,8 +843,8 @@ def test_09_r1_minor8_a_good_tick_resets_the_failure_count(monkeypatch):
 
         yield _S()
 
-    async def fine(*a, **kw):
-        pass
+    async def fine(*a, budget, **kw):
+        budget.committed += 1  # r3 MAJOR-r3-1: only a tick that committed resets the count
 
     monkeypatch.setattr(worker_tick.db, "session_scope", scope)
     monkeypatch.setattr(worker_tick, "advance_eval", fine)
