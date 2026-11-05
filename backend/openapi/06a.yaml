@@ -613,9 +613,13 @@ paths:
 
         live suite bound to the agent needs a latest completed exam of this version that passed,
 
-        is complete and has nothing not run; otherwise 409 `eval_gate_failed` naming each suite as
+        is complete, has nothing not run and examined the version and the suite as they are now
 
-        `<key>=<reason>`. An admin may pass `force` with a `force_reason` (audited).'
+        (r1 MAJOR-1: `stale_exam`, `stale_suite`); otherwise 409 `eval_gate_failed` naming each
+
+        suite as `<key>=<reason>`. An admin may pass `force` with a `force_reason` (audited). The
+
+        version keeps the exam that opened the gate (`eval_run_id`; r1 MINOR-2).'
       operationId: publish_agent_api_v1_projects__project_id__agents__agent_id__publish_post
       parameters:
       - name: project_id
@@ -2370,7 +2374,8 @@ components:
             format: uuid
           - type: 'null'
           title: Eval Run Id
-          description: Exam run that gated publishing (09); null.
+          description: The exam that opened the publish gate (09-2); null when the gate was forced or
+            the agent has no bound suite.
       type: object
       required:
       - id

@@ -410,11 +410,15 @@ paths:
       description: 'Save a run''s question as an item of the suite''s dataset with the expected answer
         given
 
-        here (09-2). The question and its variables are masked by the agent version''s egress policy
+        here (09-2). The question, its variables and the expected output are masked by the agent
 
-        first; a blocked one is 422 `run_input_blocked`. The run is read as the run API reads it.
+        version''s egress policy first (`masking` says how); a blocked text is 422
 
-        Audited once (`eval_item_from_run`), without content.'
+        `run_input_blocked`, a policy error a coded 422, the NER 503. The run is read as the run API
+
+        reads it. Audited once (`eval_item_from_run`), without content; a refusal too, with its
+
+        code (r1 MINOR-5).'
       operationId: item_from_run_api_v1_projects__project_id__eval_suites__suite_id__items_from_run__run_id__post
       parameters:
       - name: project_id
@@ -483,6 +487,19 @@ paths:
                 $ref: '#/components/schemas/ErrorBody'
         '422':
           description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '502':
+          description: The Langfuse call failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '503':
+          description: The NER the egress policy needs is unavailable (`ner_unavailable`) or not configured
+            (`ner_not_configured`, `model_missing`, ...), or Langfuse is not configured.
           content:
             application/json:
               schema:
@@ -1183,11 +1200,20 @@ components:
           type: string
           format: uuid
           title: Run Id
+        masking:
+          type: string
+          enum:
+          - regex
+          - regex+ner
+          title: Masking
+          description: '`regex`: identifiers only, person names are stored as written; `regex+ner`: person
+            names are masked too.'
       type: object
       required:
       - item_id
       - dataset
       - run_id
+      - masking
       title: FromRunOut
     MetricDiff:
       properties:
