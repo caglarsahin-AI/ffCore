@@ -180,12 +180,23 @@ def test_09_2_compare_over_http_and_read_mode(pg, member, project):
     ).fetchone()[0]
     a = _scored_exam(pg, project, suite_id, version_id, {"q1": True, "q2": False})
     b = _scored_exam(pg, project, suite_id, version_id, {"q1": False, "q2": True})
-    read = member("analyst", "read")
+    edit, read = member("analyst", "edit"), member("analyst", "read")
     r = read.get(f"{P.format(project)}/eval-runs/compare?a={a}&b={b}")
     assert r.status_code == 200, r.text
+    # 09-2 r1 MAJOR-2: the route is out of the 03a scan (it needs two exams); parity is here.
+    assert edit.get(f"{P.format(project)}/eval-runs/compare?a={a}&b={b}").content == r.content
     body = r.json()
     assert {i["item_id"]: i["change"] for i in body["items"]} == {"q1": "regressed", "q2": "fixed"}
     assert body["worst"][0]["item_id"] == "q1" and body["complete"] == {"a": True, "b": True}
+
+
+def test_09_2_r1_major2_bare_compare_is_the_same_422_in_both_modes(member, project):
+    # KARARLAR "09-2 r1 kararları" MAJOR-2 A: two required parameters; a call without them is
+    # a 422 in either mode, the same body (no empty 200: fail-loud).
+    url = f"{P.format(project)}/eval-runs/compare"
+    edit, read = member("analyst", "edit").get(url), member("analyst", "read").get(url)
+    assert edit.status_code == 422, edit.text
+    assert (read.status_code, read.content) == (edit.status_code, edit.content)
 
 
 def test_09_2_compare_other_suite_is_422(pg, member, project):

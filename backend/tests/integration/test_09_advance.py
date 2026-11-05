@@ -16,6 +16,7 @@ import pytest
 import redis.asyncio as aioredis
 
 from tests.integration.runtime_support import definition, seed_run
+from tests.integration.test_09_publish_gate import digest
 
 
 @pytest.fixture
@@ -62,6 +63,9 @@ def _exam(
         " pass_threshold, created_by) VALUES (%s, %s, %s, 'Exam', 'p.exam', %s, 0.99, 't')",
         (suite_id, project, f"s-{suite_id.hex[:8]}", json.dumps([{"name": "llm_judge"}])),
     )
+    (examined,) = pg.execute(
+        "SELECT definition FROM agent_versions WHERE id = %s", (version_id,)
+    ).fetchone()
     config = {
         "scorers": scorers,
         "pass_threshold": threshold,
@@ -69,6 +73,7 @@ def _exam(
         "approve_tools": approve_tools,
         "dataset": "p.exam",
         "starter": {"actor_type": "user", "actor_id": "t", "request_id": "r", "ip": None},
+        "definition_sha256": digest(examined),  # 09-2 r1 MAJOR-1: as start_eval writes it
     }
     items = {
         k: {"item": _item(k), "runs": [str(r) for r in runs], "scored": False, "attempts": 0}
@@ -592,3 +597,38 @@ def test_09_2_r4n2_real_cut_keeps_the_failure_count(
     # item, so the exam's failure count is neither raised nor reset (r3 MAJOR-r3-1).
     assert status == "running" and plan["q1"]["timeouts"] == 1
     assert count == b"2"
+
+
+# --- 09-2 r1 MAJOR-1: a definition edited while its exam runs ends the exam -------------------
+
+
+def test_09_2_r1_major1_definition_edited_mid_exam_ends_it(pg, project, database, app_settings):
+    done, running = seed_run(pg, project, definition()), seed_run(pg, project, definition())
+    _finish(pg, done)
+    pg.execute("UPDATE runs SET status = 'running' WHERE id = %s", (running,))
+    ev_id = _exam(pg, project, {"q1": [done], "q2": [running]}, scorers=[{"name": "llm_judge"}])
+    (version_id,) = pg.execute(
+        "SELECT agent_version_id FROM eval_runs WHERE id = %s", (ev_id,)
+    ).fetchone()
+    pg.execute(
+        "UPDATE agent_versions SET definition = definition || %s WHERE id = %s",
+        (json.dumps({"system_prompt": "Edited while the exam runs."}), version_id),
+    )
+    judge = _Judge()
+    _advance(database, app_settings, ev_id, judge=judge)
+    row = pg.execute(
+        "SELECT status, error_code, ended_at IS NOT NULL, summary FROM eval_runs WHERE id = %s",
+        (ev_id,),
+    ).fetchone()
+    assert row == ("failed", "definition_changed", True, None)
+    assert judge.calls == []  # nothing scored against a definition that is not the examined one
+    (cancel_requested,) = pg.execute(
+        "SELECT cancel_requested_at IS NOT NULL FROM runs WHERE id = %s", (running,)
+    ).fetchone()
+    assert cancel_requested  # the run still going is stopped, as a cancelled exam does
+
+
+def test_09_2_r1_major1_unchanged_definition_goes_on(pg, project, database, app_settings):
+    ev_id = _judged_exam(pg, project, n=1)
+    _advance(database, app_settings, ev_id, judge=_Judge())
+    assert _ev(pg, ev_id)[0] == "completed"

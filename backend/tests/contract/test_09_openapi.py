@@ -31,3 +31,11 @@ def test_09_openapi_draft_matches_app():
 def test_09_openapi_paths():
     spec = yaml.safe_load(render("09"))
     assert {p: set(m) for p, m in spec["paths"].items()} == EXPECTED
+
+
+def test_09_2_r1_minor10_from_run_documents_its_upstream_errors():
+    # 503: the NER the egress policy needs (`ner_unavailable`, `ner_not_configured`) or Langfuse
+    # missing; 502: the Langfuse call failed.
+    spec = yaml.safe_load(render("09"))
+    post = spec["paths"][P + "/eval-suites/{suite_id}/items/from-run/{run_id}"]["post"]
+    assert {"502", "503"} <= set(post["responses"]), sorted(post["responses"])

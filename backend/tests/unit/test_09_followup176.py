@@ -76,18 +76,18 @@ def test_09_2_c_only_the_first_held_exam_of_a_tick_is_first(monkeypatch):
 class _NerFails:
     model = "fake-ner"
 
-    def __init__(self, message):
-        self.message = message
+    def __init__(self, message, **kw):
+        self.message, self.kw = message, kw
 
     async def find(self, text, categories):
         from ffcore.guardrails.recognizers.ner import NerUnavailable
 
-        raise NerUnavailable(self.message)
+        raise NerUnavailable(self.message, **self.kw)
 
 
-def _judge_with(monkeypatch, message):
+def _judge_with(monkeypatch, message, **kw):
     policy = _egress_ner_on(monkeypatch)
-    guard = _guard(FakeSession(), policy, _NerFails(message))
+    guard = _guard(FakeSession(), policy, _NerFails(message, **kw))
     return anyio.run(
         lambda: judge_mod.judge(
             question="q", expected="e", answer=TEXT, rubric=_Rubric(), guard=guard,
@@ -97,19 +97,23 @@ def _judge_with(monkeypatch, message):
 
 
 def test_09_2_ner_outage_stays_not_run(monkeypatch):
-    for message in ("internal ner failed: 503", "internal ner unreachable: refused"):
-        score = _judge_with(monkeypatch, message).score
+    # 09-2 r1 MINOR-6/7: told apart by status and code (HttpNer), not by the message text.
+    for message, kw in (
+        ("internal ner failed: 503", {"status": 503}),
+        ("internal ner unreachable: refused", {}),
+    ):
+        score = _judge_with(monkeypatch, message, **kw).score
         assert (score.status, score.comment) == ("not_run", "ner_unavailable"), message
 
 
 def test_09_2_ner_misconfiguration_is_a_loud_failure(monkeypatch):
-    for message in (
-        "internal ner failed: 401",
-        "internal ner failed: 422",
-        "API runs NER other@1, worker expects fake-ner@2",
+    for message, kw in (
+        ("internal ner failed: 401", {"status": 401}),
+        ("internal ner failed: 422", {"status": 422}),
+        ("API runs NER other@1, worker expects fake-ner@2", {"code": "ner_model_mismatch"}),
     ):
         with pytest.raises(judge_mod.NerMisconfigured):
-            _judge_with(monkeypatch, message)
+            _judge_with(monkeypatch, message, **kw)
 
 
 def test_09_2_worker_judge_lets_a_misconfiguration_through(monkeypatch):
