@@ -358,7 +358,7 @@ Candidates (08 full 1c; both on the same set, same matching rule):
 
 | Model | Licence | Person recall / precision | Organization | Location | P95, 1,000 characters | Size |
 |---|---|---|---|---|---|---|
-| `akdeniz27/bert-base-turkish-cased-ner`, int8, `first` (chosen) | MIT | 1.00 / 1.00 | 1.00 / 0.67 | 1.00 / 0.17 | P95 297-840 ms on the development laptop (see below); the target machine is measured with `make test-ner-latency` | 0.44 GB |
+| `akdeniz27/bert-base-turkish-cased-ner`, int8, `first` (chosen) | MIT | 1.00 / 1.00 | 1.00 / 0.67 | 1.00 / 0.17 | P95 158-840 ms on the development laptop (see below); the target machine is measured with `make test-ner-latency` | 0.44 GB |
 | the same, fp32, `first` | MIT | 1.00 / 1.00 | 1.00 / 0.67 | 1.00 / 0.17 | P95 484 ms, median 370 ms, best run 318 ms (other stacks busy) | 0.44 GB |
 | the same, fp32, `simple` (the 1b setting) | MIT | 1.00 / 0.56 | 1.00 / 0.40 | 1.00 / 0.11 | median 430 ms (other stacks busy) | 0.44 GB |
 | `savasy/bert-base-turkish-ner-cased`, int8, `first` | none on the model card | 0.95 / 0.88 | 1.00 / 0.31 | 1.00 / 0.17 | 490 ms | 0.44 GB |
@@ -383,10 +383,11 @@ Candidates (08 full 1c; both on the same set, same matching rule):
   takes about 1 ms. Measured on a development laptop (Intel Core i7-1165G7, 4 cores / 8
   threads, Docker Desktop VM with 7 CPUs, 4 torch threads), where the same code gave int8 P95
   297 ms in one run and 825-840 ms twenty minutes later with no container running (turbo and
-  host load); with one CPU and one thread int8 was 442-458 ms, fp32 936-1,300 ms. int8 was 2-3
+  host load), 158 ms in a later run; with one CPU and one thread int8 was 442-458 ms, fp32 936-1,300 ms. int8 was 2-3
   times faster than fp32 in every run. The laptop is not the target: the acceptance (P95 <
   300 ms) is measured on the installation's machine with
-  `docker compose run --rm --no-deps tools make test-ner-latency` (offline, prints the P95).
+  `docker compose run --rm --no-deps tools make test-ner-latency` (offline, prints the P95; its
+  own test marker, so `make test-models` does not run it).
 - Small support (22 names): one miss is 0.05 of recall. The set is synthetic and was written by
   the same team; treat 1.00 as "no regression on the known shapes", not as a field recall.
 - int8 uses `torch.ao.quantization.quantize_dynamic`, which torch marks for migration to

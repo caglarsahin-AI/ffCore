@@ -1,16 +1,24 @@
 """Opt-in test groups (handbook ENVIRONMENT_AND_COMMANDS "Bayraklar").
 
 `-m models`: real bge-m3, reranker, Docling layout and PaddleOCR weights (RUN_MODEL_TESTS=1,
-`make test-models`). `-m vectorstore`: a Qdrant container (RUN_QDRANT_TESTS=1). `-m dns`: a real
-system DNS lookup, which Docker forwards to the host's resolver (RUN_DNS_TESTS=1). Without the flag
-they are skipped with the reason shown, so a run lists them as not run instead of hiding them.
+`make test-models`). `-m ner_latency`: the NER latency acceptance, machine-dependent, on the
+target machine only (RUN_NER_LATENCY=1, `make test-ner-latency`; under tests/models it needs
+RUN_MODEL_TESTS=1 too). `-m vectorstore`: a Qdrant container (RUN_QDRANT_TESTS=1). `-m dns`: a
+real system DNS lookup, which Docker forwards to the host's resolver (RUN_DNS_TESTS=1). Without
+the flag they are skipped with the reason shown, so a run lists them as not run instead of
+hiding them.
 """
 
 import os
 
 import pytest
 
-FLAGS = {"models": "RUN_MODEL_TESTS", "vectorstore": "RUN_QDRANT_TESTS", "dns": "RUN_DNS_TESTS"}
+FLAGS = {
+    "models": "RUN_MODEL_TESTS",
+    "ner_latency": "RUN_NER_LATENCY",
+    "vectorstore": "RUN_QDRANT_TESTS",
+    "dns": "RUN_DNS_TESTS",
+}
 
 
 def pytest_collection_modifyitems(config, items):

@@ -1,12 +1,14 @@
 """08 tam 1c-b with the real NER weights: the model `.env.example` names (the measured winner).
 
-Acceptance 1 and 3 of 08 full 1b (person-name recall, P95 for 1,000 characters), the docs table
-equal to the measurement, whole-word spans, the pipeline's windows over 512 tokens (r1 NOTE-3)
-and the egress PERSON tokenize of the built-in policy with GUARDRAIL_EGRESS_NER=true.
+Acceptance 1 of 08 full 1b (person-name recall), the docs table equal to the measurement,
+whole-word spans, the pipeline's windows over 512 tokens (r1 NOTE-3) and the egress PERSON
+tokenize of the built-in policy with GUARDRAIL_EGRESS_NER=true.
 Run: `make test-models` (RUN_MODEL_TESTS=1), weights from `make models`, no network needed.
+Acceptance 3 (latency) depends on the machine: test_08t_ner_latency.py, `make test-ner-latency`.
 """
 
 import asyncio
+import re
 from pathlib import Path
 
 import pytest
@@ -53,14 +55,6 @@ def test_08t_1b_ner_quality_report_matches_docs(report):
     assert quality.markdown_table(report) in DOCS.read_text(encoding="utf-8")
 
 
-def test_08t_3_ner_latency_p95(client):
-    """1,000 characters, local rules and NER together; idle target machine (acceptance 3,
-    `make test-ner-latency`; a developer laptop is not the target, ENV-177)."""
-    p95_ms = quality.ner_latency_sample(client._recognize, chars=1000, runs=100)
-    print(f"NER P95, 1000 characters, local rules + NER: {p95_ms:.0f} ms")
-    assert p95_ms < 300, p95_ms
-
-
 def test_08t1c_8_person_spans_are_whole_words(client):
     for record in quality.load_set(PII_SET):
         text = record["text"]
@@ -97,6 +91,9 @@ def test_08t1c_9_long_text_windows_find_every_name(client):
 
 
 def test_08t1c_10_egress_person_tokenized_with_the_real_model(client):
+    """The property, not the model's span split (K-08T1C-0021): no raw name or phone leaves;
+    the name is one or two placeholders (the model may tag the surname on its own), the phone
+    one, the rest of the text unchanged."""
     pol = builtin.builtin_default(True)
     ctx = engine.EvalContext(
         run_id="r1", token_store=MemoryTokenStore(), egress_enabled=True, ner=client
@@ -104,7 +101,10 @@ def test_08t1c_10_egress_person_tokenized_with_the_real_model(client):
     decision = asyncio.run(
         engine.evaluate("Ayşe Demir 0532 123 45 67 arar.", "egress", pol, ctx=ctx)
     )
-    assert decision.text_out == "<<PII_1>> <<PII_2>> arar."
+    out = decision.text_out
+    for raw in ("Ayşe", "Demir", "0532", "123 45 67"):
+        assert raw not in out, out
+    assert re.fullmatch(r"(<<PII_[0-9]+>> ){2,3}arar\.", out), out
 
 
 def test_08t1c_11_int8_quality_equals_fp32(client, report):

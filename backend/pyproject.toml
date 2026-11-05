@@ -115,6 +115,7 @@ testpaths = ["tests"]
 pythonpath = ["."]
 markers = [
     "models: needs real model weights (RUN_MODEL_TESTS=1, make test-models)",
+    "ner_latency: NER latency acceptance on the target machine (RUN_NER_LATENCY=1, make test-ner-latency)",
     "vectorstore: needs a Qdrant container (RUN_QDRANT_TESTS=1)",
     "dns: sends a real DNS lookup through the host resolver (RUN_DNS_TESTS=1)",
 ]
