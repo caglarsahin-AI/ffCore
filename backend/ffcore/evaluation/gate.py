@@ -5,19 +5,45 @@ Every live suite bound to the agent (`eval_suites.agent_id`) needs, for the vers
 published, a latest completed exam that passed, is complete and has nothing not run. A suite
 with `approve_tools=false` cannot gate a version that binds an action asking for approval: such
 an exam never completes unattended. Rollback is not gated (S3).
+
+The gate publishes what was examined (09-2 r1 MAJOR-1, KARARLAR "09-2 r1 kararları" A): the
+exam's `definition_sha256` must be the digest of the version's definition now (`stale_exam`,
+also for an exam without one), and the suite's scorers, threshold and repeat now must be the
+ones the exam ran with (`stale_suite`). `approve_tools` is not compared: true -> false is
+`suite_not_gateable` or an incomplete exam already, false -> true asks nothing new of a passed,
+complete exam.
 """
 
+import hashlib
+import json
 import uuid
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from ffcore.models.agents import AgentVersion
 from ffcore.models.eval import EvalRun, EvalSuite
 from ffcore.models.tools import Tool, ToolAction
 from ffcore.runtime.definition import AgentDefinition
 
-REASONS = ("no_exam", "not_passed", "incomplete", "suite_not_gateable")
+REASONS = (
+    "no_exam",
+    "stale_exam",
+    "stale_suite",
+    "not_passed",
+    "incomplete",
+    "suite_not_gateable",
+)
+# The suite's settings an exam's config snapshot keeps and the gate compares (stale_suite).
+SUITE_KEYS = ("scorers", "pass_threshold", "repeat")
+
+
+def definition_sha256(definition: dict) -> str:
+    """The digest of an agent definition: sha256 of its canonical JSON (sorted keys, no
+    spaces, UTF-8). Key order does not change it; any value does."""
+    text = json.dumps(definition, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+    return hashlib.sha256(text.encode()).hexdigest()
 
 
 @dataclass(frozen=True)
@@ -61,13 +87,20 @@ async def version_asks_approval(
     return False
 
 
-async def gate_failures(
+@dataclass
+class GateResult:
+    failures: list[GateFailure] = field(default_factory=list)
+    # The exams that let their suite through, the latest first (r1 MINOR-2).
+    passed: list[EvalRun] = field(default_factory=list)
+
+
+async def check_gate(
     session: AsyncSession,
     project_id: uuid.UUID,
     agent_id: uuid.UUID,
-    version_id: uuid.UUID,
+    version: AgentVersion,
     definition: AgentDefinition,
-) -> list[GateFailure]:
+) -> GateResult:
     suites = (
         await session.scalars(
             select(EvalSuite)
@@ -79,33 +112,42 @@ async def gate_failures(
             .order_by(EvalSuite.key)
         )
     ).all()
+    out = GateResult()
     if not suites:
-        return []
+        return out
     asks = await version_asks_approval(session, project_id, definition)
-    out = []
+    digest = definition_sha256(version.definition)
     for suite in suites:
         if asks and not suite.approve_tools:
-            out.append(GateFailure(suite.id, suite.key, None, "suite_not_gateable"))
+            out.failures.append(GateFailure(suite.id, suite.key, None, "suite_not_gateable"))
             continue
         ev = await session.scalar(
             select(EvalRun)
             .where(
                 EvalRun.suite_id == suite.id,
-                EvalRun.agent_version_id == version_id,
+                EvalRun.agent_version_id == version.id,
                 EvalRun.status == "completed",
             )
             .order_by(EvalRun.ended_at.desc().nulls_last(), EvalRun.created_at.desc())
             .limit(1)
         )
-        reason = _reason(ev)
-        if reason is not None:
-            out.append(GateFailure(suite.id, suite.key, ev.id if ev else None, reason))
+        reason = _reason(ev, suite, digest)
+        if reason is None:
+            out.passed.append(ev)
+        else:
+            out.failures.append(GateFailure(suite.id, suite.key, ev.id if ev else None, reason))
+    out.passed.sort(key=lambda e: (e.ended_at is not None, e.ended_at, e.created_at), reverse=True)
     return out
 
 
-def _reason(ev) -> str | None:
+def _reason(ev, suite: EvalSuite, digest: str) -> str | None:
     if ev is None:
         return "no_exam"
+    config = ev.config or {}
+    if config.get("definition_sha256") != digest:
+        return "stale_exam"  # the version was edited after the exam, or the exam has no digest
+    if any(config.get(k) != getattr(suite, k) for k in SUITE_KEYS):
+        return "stale_suite"
     summary = ev.summary or {}
     if not summary.get("passed"):
         return "not_passed"

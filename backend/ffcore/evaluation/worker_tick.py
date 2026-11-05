@@ -242,7 +242,12 @@ async def _advance_one(
         try:
             if ev.status == "queued" and ev.cancel_requested_at is None:
                 await start_items(
-                    session, settings, ev, queue=queue or _queue(settings), queued_event=_queued()
+                    session,
+                    settings,
+                    ev,
+                    queue=queue or _queue(settings),
+                    queued_event=_queued(),
+                    close=_closer(settings),
                 )
                 budget.committed += 1  # the item runs started and were committed
             else:

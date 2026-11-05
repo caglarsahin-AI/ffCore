@@ -34,6 +34,7 @@ from ffcore.evaluation.engine import (
     now_utc,
     summarize,
 )
+from ffcore.evaluation.gate import definition_sha256
 from ffcore.evaluation.langfuse_api import LangfuseApi, LangfuseApiError
 from ffcore.evaluation.scorers import Score
 from ffcore.evaluation.ticks import TICK_PLAN_S
@@ -146,10 +147,12 @@ def run_name(suite: EvalSuite, version: AgentVersion) -> str:
     return f"{suite.key}-v{version.version}-{uuid.uuid4().hex[:8]}"
 
 
-def snapshot(suite: EvalSuite, starter: Starter) -> dict[str, Any]:
-    """The suite as the exam starts (r1 MAJOR-4) and who started it (the advancer starts the
-    item runs for this user and audits them with this request)."""
+def snapshot(suite: EvalSuite, starter: Starter, version: AgentVersion) -> dict[str, Any]:
+    """The suite as the exam starts (r1 MAJOR-4), who started it (the advancer starts the item
+    runs for this user and audits them with this request) and the digest of the definition it
+    examines (09-2 r1 MAJOR-1: the publish gate and the advancer compare it)."""
     return {
+        "definition_sha256": definition_sha256(version.definition),
         "scorers": list(suite.scorers),
         "pass_threshold": suite.pass_threshold,
         "repeat": suite.repeat,
@@ -239,7 +242,7 @@ async def start_eval(
         status="queued",
         started_at=now_utc(),
         created_by=starter.actor_id,
-        config=snapshot(suite, starter),
+        config=snapshot(suite, starter, version),
         item_runs={i["id"]: {"item": i, "runs": [], "scored": False, "attempts": 0} for i in items},
     )
     session.add(ev)
@@ -281,11 +284,14 @@ async def start_items(
     *,
     queue: RunQueue,
     queued_event,
+    close: CloseFn | None = None,
 ) -> None:
     """A queued exam: start the item runs still missing, one commit per run, then `running`.
     The exam stays queued until every item run exists, so the advancer never summarizes half a
     plan; a tick that fails here is counted like any tick failure (worker_tick)."""
     version = await session.get(AgentVersion, ev.agent_version_id)
+    if await _definition_changed(session, ev, version, close=close):
+        return
     agent = await session.get(Agent, version.agent_id)
     who = ev.config["starter"]
     repeat = int(ev.config["repeat"])
@@ -399,6 +405,25 @@ def parse_csv_rows(text: str) -> list[list] | None:
     return reader[1:] if reader else []
 
 
+async def _definition_changed(
+    session: AsyncSession, ev: EvalRun, version: AgentVersion, *, close: CloseFn | None
+) -> bool:
+    """09-2 r1 MAJOR-1: the version's definition is no longer the one the exam examines (a
+    draft edited while its exam runs, or an exam without a digest). The exam ends
+    `failed(definition_changed)`, its item runs still going are stopped as a cancelled exam
+    stops them; nothing is scored against a definition that was not examined."""
+    if (ev.config or {}).get("definition_sha256") == definition_sha256(version.definition):
+        return False
+    log.warning("eval_definition_changed eval_run=%s version=%s", ev.id, version.id)
+    run_ids = [uuid.UUID(r) for v in (ev.item_runs or {}).values() for r in v["runs"]]
+    if run_ids and close is not None:
+        runs = (await session.scalars(select(Run).where(Run.id.in_(run_ids)))).all()
+        await _cancel_all(session, {str(r.id): r for r in runs}, close)
+    ev.status, ev.error_code, ev.ended_at = "failed", "definition_changed", now_utc()
+    await session.commit()
+    return True
+
+
 async def _cancel_all(session: AsyncSession, runs: dict[str, Run], close: CloseFn) -> None:
     for r in runs.values():
         if r.status in TERMINAL:
@@ -437,6 +462,9 @@ async def advance_eval(
         await _cancel_all(session, runs, close)
         ev.status, ev.ended_at = "cancelled", now_utc()
         await session.commit()
+        return
+    version = await session.get(AgentVersion, ev.agent_version_id)
+    if await _definition_changed(session, ev, version, close=close):
         return
 
     for r in list(runs.values()):
