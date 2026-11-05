@@ -1957,3 +1957,17 @@ Durum: MINOR-r2-1, r2-2, r2-4 commit'li ve yeşil; NOTE-5 testi commit'li ve kı
 ### A-08T1B-0023 · 2026-11-05 01:52 · → koordinator · DURUM (ortam)
 Paket: 08-tam-1b   Cevap: K-08T1B-0018
 Docker hâlâ konteyner başlatamıyor: 00:50-01:50 arası 60 deneme (`docker run --rm ffcore/tools:0.0.0-main true`, 30 s sınır) hepsi zaman aşımı; 01:52'de tekrar denendi, konteyner `Created`'da kaldı (kendi `a08t1b-probe2`'mi sildim). Docker Desktop yeniden başlatması henüz olmamış görünüyor (doğrulanmadı; yalnız davranıştan). Worktree'de NOTE-5 kodu ve r2-3 docs commit edilmemiş, hazır. Motor dönünce: yığın, NOTE-5 yeşil, 08.yaml regen, lint + `make test` + hedefli entegrasyon, PR-HAZIR r3. Yeni deneme döngüsü başlatmıyorum; uyandırman bekliyorum.
+
+### A-08T1B-0024 · 2026-11-05 03:07 · → koordinator · YIGIN-KAPA
+Paket: 08-tam-1b   Cevap: K-08T1B (Docker dönüşü mesajı)
+`ffcore-08t1b` yalın yığını `down -v` ile kapatıldı (konteyner sayısı 0). w08t1b tools koşuları `--rm`, kalan konteyner yok.
+
+### A-08T1B-0025 · 2026-11-05 03:07 · → koordinator · PR-HAZIR r3
+Paket: 08-tam-1b   Cevap: K-08T1B-0015
+HEAD: `7815d333671c53ebab48b20d51ff3661984946da` (feat/08-tam-1b-ner; 4567ed6..HEAD 10 commit, 18 dosya, +350/-30). PR notu: `state/pr/08-tam-1b.md` "r2 ekleri" bölümü.
+- MINOR-r2-1: add0c6d → 9352f06 (`test_08t_22c`)
+- MINOR-r2-2: 37819c8 → 31a6bf0 (`test_08t_27e/27f`)
+- MINOR-r2-4: 2f77f2e → 2ab04db (`test_08t_29`)
+- NOTE-5: e8b42ec → fb8ef38 (`test_08t_30`, 30b CLI çıkış 2); denetim `reindex_silver`'da iş düzeyinde, bayrak yalnız CLI
+- MINOR-r2-3: df38cd3 (docs + docstring + `08.yaml` regen, `test_08_openapi` yeşil); 7815d33 ruff format
+Kanıt (`state/evidence/`): kırmızılar `08t1b-r3-red-*.log`; `08t1b-r3-green-note5.log` (08t_30 + 08t_22, 5 geçti); lint geçti; `make test` llmaas 1601 geçti; hedefli test-int llmaas 44 geçti 1 atlandı (test_19:157 root kipi, önceden var). airgap bu turda koşulmadı (DUZELT tek profil). Kesinti sırasındaki düşük NOTE-5 logu gerçek koşuyla değiştirildi.

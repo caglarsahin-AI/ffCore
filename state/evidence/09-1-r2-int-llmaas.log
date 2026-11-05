@@ -4,3 +4,19 @@ platform linux -- Python 3.12.10, pytest-9.2.0, pluggy-1.7.0
 rootdir: /work/backend
 configfile: pyproject.toml
 plugins: Faker-40.43.0, anyio-4.15.1, langsmith-0.14.8
+collected 890 items
+
+tests/integration/test_01_client.py .......                              [  0%]
+tests/integration/test_01_events.py ...                                  [  1%]
+tests/integration/test_01_reconcile.py ...........                       [  2%]
+tests/integration/test_01_reconcile_shutdown.py ...                      [  2%]
+tests/integration/test_01_seed.py ...                                    [  3%]
+tests/integration/test_02_langfuse.py ....                               [  3%]
+tests/integration/test_02_pricing.py .                                   [  3%]
+tests/integration/test_02_r1_worker_logging.py .                         [  3%]
+tests/integration/test_03a_access.py ............                        [  5%]
+tests/integration/test_03a_auth.py ..............                        [  6%]
+tests/integration/test_03a_models.py ...........                         [  7%]
+tests/integration/test_03a_nonmember_404.py ............................ [ 11%]
+........................................................................ [ 19%]
+...........

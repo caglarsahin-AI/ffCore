@@ -1,0 +1,5 @@
+1 file reformatted, 444 files left unchanged
+ruff check backend scripts data/samples/scripts services
+All checks passed!
+ruff format --check backend scripts data/samples/scripts services
+445 files already formatted

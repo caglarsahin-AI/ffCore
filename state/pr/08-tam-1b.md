@@ -238,3 +238,35 @@ Tools 0.0.0-main + worktree kodu.
   - docs kanıt biçimi, OpenAPI 503 listesi, `/readyz` `ner_label_unknown`;
   - `test_08t_secrets_linear` mutlak süre;
   - airgap `ingest-raw`'da NER ihtiyacının docs'ta açık yazılması.
+
+## r2 ekleri, merge öncesi küçük tur (K-08T1B-0015, KARARLAR "08 tam 1b r2 ekleri")
+
+**HEAD:** 7815d333671c53ebab48b20d51ff3661984946da · 4567ed6'nın (r2) üstüne 10 commit (`git diff 4567ed6..HEAD --shortstat`: 18 dosya, +350/-30). Önce test commit'i, sonra kod commit'i.
+
+| Bulgu | Test commit | Kod commit | Test | Ne değişti |
+|---|---|---|---|---|
+| MINOR-r2-1 | add0c6d | 9352f06 | `test_08t_22c` (entegrasyon) | Tek kişisel veri kuralı: `raw_staging.personnel_data(source, relpath)` (kaynak PRSIM ya da yol PRSIM). Staging ve ek adı aynı kuralı kullanır; yolla PRSIM olan dosyanın eki `Ek <n>`. |
+| MINOR-r2-2 | 37819c8 | 31a6bf0 | `test_08t_27e/27f` (birim) | NER span'ı yalnız eşikten ve örtüşme çözümünden geçen bulguların çevresinde kırpılır; eşik altı regex bulgusu adı kesmez. |
+| MINOR-r2-4 | 2f77f2e | 2ab04db | `test_08t_29_manifest_filter_buckets.py` (birim) | Manifestte kayda girmemiş dosyalar `unregistered` kovasında; `none` yalnız gerçekten filtresiz kayıt. |
+| NOTE-5 | e8b42ec | fb8ef38 | `test_08t_30_reindex_prsim.py` (2, entegrasyon) | `reindex_silver` iş düzeyinde: kapsamda `pii_regex` ile yazılmış kişisel veri kaydı varsa, hiçbir belgeye dokunmadan `ReindexRefused(prsim_requires_ner)`. `--accept-personnel-data` (yalnız CLI, M3) geçirir. CLI kuyruğa almadan önce denetler, çıkış 2. API gövdesinde bayrak yok. |
+| MINOR-r2-3 | — | df38cd3 | — (metin; `test_08_openapi` yeşil) | `ner_unavailable`: docs/api.md (503 doğrudan, harici, istemci geçmişi denetimi, internal evaluate; facade agent koşusunda 502 koşu kodu), agentlar.md, guardrail.md; evaluate docstring'i ve yeniden üretilen `08.yaml` açıklaması; ner.py, NerUnavailable, `pii_ner` docstring'leri. |
+| — | — | 7815d33 | — | ruff format (davranış değişmez). |
+
+### r3 komutları ve sonuçları
+
+| Koşu | Sonuç | Kanıt |
+|---|---|---|
+| Kırmızılar | r2-1: 1 düştü · r2-2: 2 düştü · r2-4: 1 düştü · NOTE-5: 2 düştü | `08t1b-r3-red-*.log` |
+| Yeşiller (bulgu başına) | r2-1, r2-2, r2-4 yeşil | `08t1b-r3-green-r2-*.log` |
+| NOTE-5 + r2-1 (08t_30, 08t_22), Docker dönüşünden sonra yeniden açılan yığında | 5 geçti | `08t1b-r3-green-note5.log` |
+| `make lint` | geçti | `08t1b-r3-lint.log` |
+| `make test` llmaas | 1601 geçti | `08t1b-r3-maketest-llmaas.log` |
+| Hedefli test-int llmaas (08t_21/22/26/28/30, 19_ingest_raw, 04a_api) | 44 geçti, 1 atlandı (`test_19` :157, root dosya kipini yok sayar; önceden var) | `08t1b-r3-testint-targeted-llmaas.log` |
+| airgap | NOT_RUN bu turda (DUZELT tek profil istedi; r2'de iki profil yeşildi) | — |
+
+Not: Docker kesintisi (ENV-171, 00:46-02:53) sırasında ilk NOTE-5 yeşil denemesi motor hatasıyla düştü; o log Docker dönüşündeki gerçek koşuyla değiştirildi.
+
+### r3 varsayımları
+
+15. (NOTE-5) Denetim yalnız `silver` katmanında; `gold` yeniden dönüştürme yapmaz. Eski kayıt `text_filter` taşımıyorsa reddedilmez (M3 değil).
+16. (r2-1) `personnel_data` kaynak adı ya da göreli yoldan biri PRSIM ise doğru (`_is_prsim(_norm(source)) or _prsim_path(relpath)`).

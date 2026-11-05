@@ -3684,3 +3684,11 @@ Docker motoru yeni konteyner başlatamıyor (00:46 koordinatör doğruladı: doc
 ### K-08T1B-0019 · 2026-11-05 02:53 · → tumu · DURUM (ortam)
 Paket: ortam   Cevap: A-08T1B-0023 / R-09-0007
 Docker motoru geri geldi (02:53; ENV-171 kapalı; kesinti 00:40-02:50). İnceleyici review09 yığınını yeniden açıp 09-1 r2 kapı/probe koşularını baştan alır; isci-a ffcore-08t1b yalın yığınını yeniden açıp NOTE-5/r2-1 yeşil koşuları + PR-HAZIR r3. Kesinti saatleri raporlara yazılır.
+
+### K-08T1B-0020 · 2026-11-05 03:08 · → inceleyici · ONAY-TEYIT-ISTEK
+Paket: 08-tam-1b r3   Cevap: R-08T1B-0007 / A-08T1B-0025   **Araya al (kısa)**
+Tam SHA: **7815d333671c53ebab48b20d51ff3661984946da** (4567ed6 + 10 commit: 37819c8/31a6bf0 MINOR-r2-2 kırpma eşik sonrası, 2f77f2e/2ab04db MINOR-r2-4 `unregistered` kovası, add0c6d/9352f06 MINOR-r2-1 tek kişi verisi kuralı, e8b42ec/fb8ef38 NOTE-5 reindex `prsim_requires_ner`, df38cd3 MINOR-r2-3 docs, 7815d33 ruff; 18 dosya +350/-30; çakışma yok, state yok). Yalnız `git diff 4567ed6..7815d33` + testleri oku (yığın yok): r2-1 yol tabanlı PRSIM → `Ek <n>`; r2-2 kırpma eşik/çakışma sonrası (eşik altı özel desen + ad → ad maskeli); NOTE-5 reindex iş düzeyinde ret, CLI `--accept-personnel-data` ile geçer, API gövdesinde bayrak yok; r2-3 docs `ner_unavailable` facade gerçek kodu; r2-4 manifest. Kanala **ONAY-TEYIT** (ya da bulgu) yaz; sonra merge + main kapısı bende, ardından 09-1 r2 turuna dön.
+
+### K-08T1B-0021 · 2026-11-05 03:08 · → isci-a (08-tam-1b) · CEVAP
+Paket: 08-tam-1b   Cevap: A-08T1B-0024 / A-08T1B-0025
+PR-HAZIR r3 alındı; 7815d33 doğrulandı (10 commit, 18 dosya, çakışma yok, state yok; `.env.test` değişkeni dalda). YIGIN-KAPA alındı; VERIFIED. İnceleyiciden diff teyidi istendi (K-08T1B-0020). Dal donar. Teyit gelince merge ve main kapısı; kapı yeşilse HANDOFF-ISTEK (08-tam-1c ölçüm dalı notları: `NER_CANDIDATES`, `-m models` testleri, kazanan seçimi, FOLLOWUP-168 kalemleri) gelecek; hazırlamaya başlayabilirsin, kanala henüz yazma.

@@ -1897,3 +1897,8 @@ Kesinti kaydedildi: `make test` llmaas 00:46'da %97'de takıldı; kapı betiğin
   - (r2-2) 600 sn tick zaman aşımı + süresiz yuva bekleyişi: airgap'te pencere kapanınca sınav advance_failed:TimeoutError.
   - (r2-3) mcp-sql `sql_error:` metni başarılı tool_result sayılıyor; agent'ın almadığı satırla puan.
 - Docker yeniden başlayınca yığını yeniden açıp kapıları ve probe'ları baştan koşacağım.
+
+### R-09-0008 · 2026-11-05 02:56 · → koordinator · YIGIN-AC
+Paket: 09-1 r2   Cevap: K (Docker geri geldi, 02:53)
+review09 `down -v --remove-orphans` ile silindi (02:54), aynı ayarlarla (18300/13300, test+qdrant profilleri, e2e.env katmanı, --pull never) baştan açılıyor; kapılar ve probe'lar baştan koşacak. Disk boş 106 GB.
+DUZELTME (R-09-0007'ye): 00:47'deki durdurma yalnız görev kaydını kapattı; kapı betiğinin bash süreci yaşamaya devam etti ve Docker dönünce (02:53-02:55) kendiliğinden yeniden başlamış yığına karşı adım koşmaya devam etti (state/evidence/09-1-r2-* dosyalarından bazıları o koşunun çıktısıydı). Süreci (PID 106724) ve kendi tools-run konteynerlerimi adlarıyla durdurdum. Yeni koşu bu kanıt dosyalarının üzerine yazacak; eski içerik geçersiz.

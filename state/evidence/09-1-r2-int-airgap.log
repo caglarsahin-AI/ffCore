@@ -1,0 +1,11 @@
+cd backend && QDRANT_URL=http://qdrant:6333 RUN_QDRANT_TESTS=1 pytest tests/integration
+============================= test session starts ==============================
+platform linux -- Python 3.12.10, pytest-9.2.0, pluggy-1.7.0
+rootdir: /work/backend
+configfile: pyproject.toml
+plugins: Faker-40.43.0, anyio-4.15.1, langsmith-0.14.8
+collected 890 items
+
+============================ no tests ran in 39.03s ============================
+! _pytest.outcomes.Exit: integration services not reachable: qdrant (profile qdrant) at http://qdrant:6333, fake-llm (profile test) at http://fake-llm:9999. Start them: docker compose --profile test --profile qdrant up -d --wait !
+make: *** [Makefile:31: test-int] Error 1
