@@ -156,6 +156,17 @@ def format_rows(columns: list[str], rows: list[tuple[Any, ...]], max_rows: int) 
 
 Connect = Callable[[], Awaitable[psycopg.AsyncConnection]]
 
+# How run_sql_text starts a refusal and a database error. mcp-sql returns both as a tool error
+# with this text (09-1 r2 MAJOR-r2-3): the model still reads the code, the run records
+# `is_error` with the code, and a failed query is never taken for a result.
+SQL_ERROR_PREFIXES = ("sql_rejected:", "sql_error:")
+
+
+def error_code(text: str) -> str | None:
+    """`sql_rejected` or `sql_error` for a run_sql_text refusal or error, else None."""
+    prefix = next((p for p in SQL_ERROR_PREFIXES if text.startswith(p)), None)
+    return prefix.rstrip(":") if prefix else None
+
 
 async def run_sql_text(sql: str, *, connect: Connect, max_rows: int, timeout_s: int = 20) -> str:
     """What run_sql returns to the model. Rejections and database errors are text that starts

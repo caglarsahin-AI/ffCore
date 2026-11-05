@@ -51,6 +51,14 @@ def format_context(body: dict) -> str:
     return "\n".join(lines)
 
 
+def checked(text: str) -> str:
+    """run_sql's answer: rows as text; a refusal or a database error as a tool error with the
+    same coded text (09-1 r2 MAJOR-r2-3, 05a additive)."""
+    if mcp_sql.error_code(text) is not None:
+        raise ToolError(text)
+    return text
+
+
 def build_server(settings: Settings, *, tool_key: str, verifier: OboVerifier) -> MCPServer:
     server = MCPServer("mcp-sql")
 
@@ -84,7 +92,8 @@ def build_server(settings: Settings, *, tool_key: str, verifier: OboVerifier) ->
         ctx: Context,
     ) -> str:
         """Run one read-only SELECT. Results come as CSV, at most SQL_MAX_ROWS rows; a longer
-        result says it was cut. A refused or failed query returns its code."""
+        result says it was cut. A refused or failed query is an error that starts with its
+        code."""
         await verified(ctx)  # before any connection to the database
         url = settings.sql_demo_database_url
         if url is None:
@@ -96,8 +105,8 @@ def build_server(settings: Settings, *, tool_key: str, verifier: OboVerifier) ->
         text = await mcp_sql.run_sql_text(
             sql, connect=connect, max_rows=settings.sql_max_rows, timeout_s=settings.sql_timeout_s
         )
-        log.info("run_sql outcome=%s", text.split(":", 1)[0] if text.startswith("sql_") else "ok")
-        return text
+        log.info("run_sql outcome=%s", mcp_sql.error_code(text) or "ok")
+        return checked(text)
 
     return server
 
