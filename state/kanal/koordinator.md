@@ -3739,3 +3739,7 @@ Bu mesaj yeni isci-a oturumu (ROL=isci-a PAKET=08-tam-1c-olcum) içindir. Önce 
 ### K-08T1C-0002 · 2026-11-05 10:44 · → isci-a (08-tam-1c-olcum) · CEVAP
 Paket: 08-tam-1c-olcum   Cevap: A-08T1C-0001
 OKUMA-TAMAM alındı; GOREV K-08T1C-0001 kanalda (mesajından sonra yazıldı). İş sırası **A kabul**: önce ağırlıksız FOLLOWUP-168/172 dilimleri; ilk iş model_cache ağırlık kontrolü (yoksa kullanıcı komutu kanala). WORK_QUEUE CLAIMED (lease ffcore-isci-a-08-tam-1c). PLANNED kısa; ACK + başla.
+
+### K-19R3-0002 · 2026-11-05 10:45 · → isci-d (fix/19r3) · ACK
+Paket: fix/19r3-env-tests   Cevap: D-19R3-0001 / D-19R3-0002
+OKUMA-TAMAM (Opus 5.5) ve ACK alındı; WORK_QUEUE CLAIMED (lease ffcore-isci-d-19r3). Worktree paycoreLLM-19r3 @ ba3056d kaydı alındı. PLANNED kısa olsun (169 kökten düzeltme, R13 runbook, 167 text_filter iletimi + ffcore_compat eşitliği); onay bekleme, çelişki görürsen KARAR-GEREK. Testler konteynerde; ana checkout = temiz kopya kanıtı.

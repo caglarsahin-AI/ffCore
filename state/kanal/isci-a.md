@@ -3,9 +3,9 @@
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
 - Oturum kimliği: ffcore-isci-a-08-tam-1c-olcum (Opus 5.5; önceki lease ffcore-isci-a-08-tam-1b RETIRED, HANDOFF koordinatör özeti K-08T1B-0026)
-- Aktif paket: 08-tam-1c-olcum (GOREV bekleniyor)
+- Aktif paket: 08-tam-1c-olcum (K-08T1C-0001)
 - Durum: ACTIVE
-- Son okunan: K-08T1B-0026
+- Son okunan: K-08T1C-0002
 
 ## Mesajlar
 
@@ -1979,3 +1979,17 @@ Lease ACTIVE (eski 1b lease'i RETIRED yazıldı; 1b oturumu HANDOFF bırakmadı,
 Durum: bana adresli 08-tam-1c-olcum GOREV'i yok; ENV-163 (iki aday ağırlığı, kullanıcı `make models`) açık.
 SORU (iş sırası, senin yetkin): A (önerim) GOREV'i ağırlıktan bağımsız yaz; ağırlıksız dilimler önce: FOLLOWUP-168 NOTE-2 (`local_ner()` kilit), NOTE-4/8 docs, NOTE-5 mutlak süre testleri, FOLLOWUP-172 N1 (reindex erken 409) + N2 (M3 kipi audit); `-m models` ölçümü ve kazanan seçimi ENV-163 kapanınca aynı dalda. Etki: ağırlık beklerken dal ilerler, ölçüm ayrı commit'te kalır. B: GOREV'i ENV-163 kapanınca tek seferde yaz. Etki: boş bekleme, 168/172 ölçümle aynı turda incelenir. C: 168/172 ayrı küçük dala, 1c yalnız ölçüm. Etki: iki PR, iki inceleme turu.
 GOREV ya da CEVAP gelince ACK + state/pr/08-tam-1c-olcum.md planı.
+
+### A-08T1C-0002 · 2026-11-05 10:55 · → koordinator · ACK
+Paket: 08-tam-1c-olcum   Cevap: K-08T1C-0001 / K-08T1C-0002
+GOREV alındı; iş sırası A. Worktree `.worktrees/feat/08-tam-1c-olcum`, dal `feat/08-tam-1c-olcum`, baz main 8aa8442 (63ffb16 + state). Sıradaki: kısa plan state/pr/08-tam-1c.md + PLANNED, sonra ağırlıksız dilimler (168, 172).
+
+### A-08T1C-0003 · 2026-11-05 10:55 · → koordinator · DURUM (ağırlık yok, kullanıcı adımı)
+Paket: 08-tam-1c-olcum   Cevap: K-08T1C-0001 (ilk iş)
+Kontrol (salt-okunur, `--network none`, alpine): `04a-knowledge-core_model_cache` hub'ında yalnız bge-m3, bge-reranker-v2-m3, docling-layout-heron, docling-models var; **iki NER adayı yok** (ENV-163 açık).
+**Kullanıcıya iletilecek tek adım** (dışarı bağlanır; Docker Desktop açık; PowerShell, dizin `C:\ai_paycore\ffcore\.worktrees\feat\08-tam-1c-olcum`):
+```
+$env:FFCORE_VERSION="0.0.0-08t1c"; docker compose -p 04a-knowledge-core --env-file .env.test build tools
+$env:FFCORE_VERSION="0.0.0-08t1c"; docker compose -p 04a-knowledge-core --env-file .env.test run --rm --no-deps tools make models
+```
+Mevcut ağırlıklar yeniden inmez, yalnız denetlenir; yeni inen `savasy/bert-base-turkish-ner-cased`, `akdeniz27/bert-base-turkish-cased-ner` (yalnız README/config/tokenizer/ağırlık dosyaları, tahmini ≤ ~1,8 GB). Çıktının son satırları (`download ... (NER candidate)`, `ok/missing`) yeter. `--network none` `models-check`, lisans ve `id2label` okumasını ben yaparım.
