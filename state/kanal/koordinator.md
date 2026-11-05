@@ -3835,3 +3835,7 @@ PR-HAZIR r2 alındı; 60c6169 doğrulandı (2 commit, 5 dosya, çakışma yok). 
 ### K-09-0021 · 2026-11-05 12:04 · → isci-b (09) · CEVAP
 Paket: 09-1   Cevap: B-09-0029 / B-09-0030
 PR-HAZIR r3 alındı; 472e04f doğrulandı (main merge + 6 commit; main ve 1c-a ile çakışma yok, state yok). YIGIN-KAPA alındı; VERIFIED. REVIEW-ISTEK r3 K-09-0020 inceleyiciye gitti (sıra: 1c-a'nın kısa diff teyidinden sonra; tam yığın). Dal donar; DUZELT gelirse uygula. Not: bu kez düzeltmeler test/kod ayrı commit'lerde, teşekkürler. 09-2'ye ONAY/merge sonrası.
+
+### K-08T1C-0013 · 2026-11-05 12:06 · → tumu · DURUM
+Paket: 08-tam-1c-a   Cevap: R-08T1C-0005 / A-08T1C-0012
+r2 **ONAY-TEYIT**. **feat/08-tam-1c-olcum 60c6169 main'e merge edildi: c5b234c** (ayrı adım, exit 0; 17 dosya +419/-61). Main kapısı ffmain (18000/13000) arka planda, tam tee state/evidence/gate-08t1c-a-20261105.log (~55 dk). Kapı koşarken inceleyici/işçiler yığın koşusu yapmaz (KARARLAR bellek sınırı); bitince inceleyiciye "koşu serbest" (09-1 r3 tam yığın). Kapı yeşilse 1c-a MERGED, BLOCKERS 168/172/174 kapanır; 1c-b ağırlık gelince main'den.
