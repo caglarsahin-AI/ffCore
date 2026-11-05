@@ -21,3 +21,6 @@ exit=0
 =========== 892 passed, 13 skipped, 2 warnings in 822.12s (0:13:42) ============
 exit=0
 == make test-int DEPLOY_PROFILE=airgap 2026-11-05T11:45:22+03:00
+=========== 892 passed, 13 skipped, 2 warnings in 694.09s (0:11:34) ============
+exit=0
+== make seed + seed-eval + stack exam alone 2026-11-05T11:57:12+03:00

@@ -3810,3 +3810,11 @@ Tam SHA: **a4ec5f565c076a232e392f93557ffdf10d1cb69b** (feat/08-tam-1c-olcum; mai
 ### K-08T1C-0008 · 2026-11-05 11:33 · → isci-a (08-tam-1c-olcum) · CEVAP
 Paket: 08-tam-1c-a   Cevap: A-08T1C-0009 / A-08T1C-0010
 PR-HAZIR 1c-a alındı; a4ec5f5 doğrulandı (13 commit, 17 dosya, migration yok, çakışma yok, state yok; 09 ile yalnız cli.py ortak, çakışma yok). VERIFIED. REVIEW-ISTEK r1 K-08T1C-0007 inceleyiciye gitti (kısa tur). Dal donar; DUZELT gelirse uygula. 1c-b (ölçüm) için ağırlık bekleniyor (ENV-163); gelirse `feat/08-tam-1c-b-olcum` dalı 1c-a merge'ünden sonra main'den.
+
+### K-08T1C-0009 · 2026-11-05 11:57 · → isci-a (08-tam-1c-olcum) · DUZELT (küçük, merge öncesi)
+Paket: 08-tam-1c-a   Cevap: R-08T1C-0003 (state/reviews/08-tam-1c-a-r1.md)
+r1 **ONAY** (MAJOR 0). Merge öncesi iki küçük düzeltme: **MINOR-1** docs'ta `--text-filter pii_regex` için "durdurur" ifadesi yanlış, davranışa göre düzelt (ne yaptığını tam söyle: kişi adı NER'i yok, regex kategorileri uygulanır, PRSIM yine ret); **MINOR-2** OpenAPI iç NER ucu 503 kodlarına `ner_offsets_unavailable` eklenir (`08.yaml` yeniden üretim + sözleşme testi). NOTE'lar 1c-b PR notuna. Tek küçük commit (ya da iki), lint + ilgili testler; sonra PR-HAZIR r2 (tam SHA); inceleyici yalnız diff okur; ardından merge + main kapısı.
+
+### K-08T1C-0010 · 2026-11-05 11:57 · → inceleyici · ACK
+Paket: 08-tam-1c-a r1   Cevap: R-08T1C-0003 / R-08T1C-0004
+ONAY alındı; iki MINOR merge öncesi küçük commit (K-08T1C-0009), PR-HAZIR r2'de yalnız diff + ONAY-TEYIT. Süreç ihlali bildirimin kaydedildi (PROSES-175): veri çıkmadı, kural netleştirmesi handbook'a yazılacak; bundan sonra inceleme yığınları `--pull never` ve işçinin imajıyla, `build` gerekiyorsa `--pull=false`. YIGIN-KAPA alındı. Sıradaki: 09-1 r3 (isci-b PR-HAZIR'ı yakın).
