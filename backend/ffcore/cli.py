@@ -99,17 +99,49 @@ async def enqueue_reindex(
         )
     if kb_id is None:
         raise CliError(f"knowledge base {project_key}/{kb_key} not found")
+    from ffcore.knowledge import ingest
+
+    if accept_personnel_data and layer != "silver":
+        # FOLLOWUP-172 N2: the flag concerns the silver reconversion only; with gold it would be
+        # silently without effect.
+        raise ingest.ReindexRefused(
+            "flag_not_applicable", "--accept-personnel-data applies to --layer silver only"
+        )
     if layer == "silver":
         # r2 NOTE-5: the job checks too (the API road); here the operator gets the code and exit 2
         # before anything is queued.
-        from ffcore.knowledge import ingest
-
-        await ingest.check_reindex_silver(
+        personnel = await ingest.check_reindex_silver(
             kb_id, full=full, accept_personnel_data=accept_personnel_data
         )
+        if accept_personnel_data:
+            await _audit_m3_reindex(kb_id, full, personnel)
     return await get_queue(get_settings()).enqueue(
         "reindex_job", str(kb_id), layer, full, accept_personnel_data
     )
+
+
+async def _audit_m3_reindex(kb_id, full: bool, personnel: int) -> None:
+    """FOLLOWUP-172 N2: the M3 mode of reindex is an audit event of the system actor; the
+    numbers only, never a file name or content."""
+    from ffcore.core import db
+    from ffcore.models.knowledge import KnowledgeBase
+
+    async with db.session_scope() as session:
+        kb = await session.get(KnowledgeBase, kb_id)
+        await write_event(
+            session,
+            AuditEntry(
+                action="reindex_personnel_data_accepted",
+                resource_type="knowledge_base",
+                outcome="success",
+                actor_type="system",
+                actor_id="cli",
+                project_id=str(kb.project_id),
+                resource_id=str(kb_id),
+                after={"layer": "silver", "full": full, "personnel_records": personnel},
+            ),
+        )
+        await session.commit()
 
 
 def build_parser() -> argparse.ArgumentParser:
