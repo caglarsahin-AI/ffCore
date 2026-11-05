@@ -1,0 +1,12 @@
+git head: 63ffb16 2026-11-05 03:32:21
+
+=== 03:32:23 build backend frontend tools
+
+#37 [frontend] exporting to image
+#37 exporting layers done
+#37 writing image sha256:a81da830ccd8bd4ec2dfc5f7f00d0152585633df4bcaf4367633e27cf27d1e2c done
+#37 naming to docker.io/ffcore/frontend:0.0.0-main done
+#37 DONE 0.0s
+build exit=0
+
+=== 03:32:40 compose config

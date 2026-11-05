@@ -3692,3 +3692,11 @@ Tam SHA: **7815d333671c53ebab48b20d51ff3661984946da** (4567ed6 + 10 commit: 3781
 ### K-08T1B-0021 · 2026-11-05 03:08 · → isci-a (08-tam-1b) · CEVAP
 Paket: 08-tam-1b   Cevap: A-08T1B-0024 / A-08T1B-0025
 PR-HAZIR r3 alındı; 7815d33 doğrulandı (10 commit, 18 dosya, çakışma yok, state yok; `.env.test` değişkeni dalda). YIGIN-KAPA alındı; VERIFIED. İnceleyiciden diff teyidi istendi (K-08T1B-0020). Dal donar. Teyit gelince merge ve main kapısı; kapı yeşilse HANDOFF-ISTEK (08-tam-1c ölçüm dalı notları: `NER_CANDIDATES`, `-m models` testleri, kazanan seçimi, FOLLOWUP-168 kalemleri) gelecek; hazırlamaya başlayabilirsin, kanala henüz yazma.
+
+### K-08T1B-0022 · 2026-11-05 03:32 · → tumu · DURUM
+Paket: 08-tam-1b   Cevap: R-08T1B-0011 / A-08T1B-0025
+r3 **ONAY-TEYIT** (0/0/0, NOTE 12 → FOLLOWUP-172). **feat/08-tam-1b-ner 7815d33 main'e merge edildi: 63ffb16** (ayrı adım, exit 0; 55 dosya +2959/-153; üç inceleme turu: r1 DEGISIKLIK 4 MAJOR → r2 ONAY → r3 teyit). `.env.test` `GUARDRAIL_EGRESS_NER=false`. Main kapısı ffmain (18000/13000) arka planda, tam tee state/evidence/gate-08t1b-20261105.log (~55 dk). Kapı yeşilse MERGED, BLOCKERS 162/165 kapanır, isci-a HANDOFF-ISTEK; 1c ölçüm dalı ağırlık gelince. isci-b: main ilerledi, K-09-0017'ye bak.
+
+### K-09-0017 · 2026-11-05 03:32 · → isci-b (09) · GOREV-EK (main merge + NER istemcisi)
+Paket: 09-1   Cevap: K-09-0012 MINOR-9 / K-09-0016
+08-tam-1b main'e girdi (63ffb16). r2 inceleme sonucu beklenirken şimdi yap: (1) `git merge main` dalına (rebase değil; ortak dosyalar .env.example/.env.test/cli.py/core/config.py/runtime/worker.py/deploy/docker-compose.yml, çakışma beklenmiyor, çıkarsa iki tarafı koru); (2) `judge.EgressGuard(ner=HttpNer(settings))` (1b `guardrails/ner.py` `HttpNer`; `EngineGuard` deseni; worker'da model yok) + test: `GUARDRAIL_EGRESS_NER=true` ve sahte NER ile judge çağrısı `PERSON` tokenize eder, NER düşerse `ner_unavailable` fail-loud (1b MINOR-1 A kararı judge yolunda da); (3) `.env.test` ve compose'da 1b'nin `GUARDRAIL_EGRESS_NER=false` satırı korunur. Ayrı commit'ler; make test tek profil. r2 DUZELT gelince aynı PR-HAZIR r3'e girer (dalda bekle, PR-HAZIR'ı DUZELT'ten sonra ver).
