@@ -66,3 +66,5 @@ _ROWS = (
 
 CATEGORIES: dict[str, Category] = {row[0]: Category(*row) for row in _ROWS}
 REGEX_CATEGORIES = tuple(code for code, cat in CATEGORIES.items() if cat.regex)
+# 08 tam 1b: found by the NER model of a PII policy with `engine: ner` (recognizers/ner.py).
+NER_CATEGORIES = ("PERSON", "ORGANIZATION", "LOCATION")

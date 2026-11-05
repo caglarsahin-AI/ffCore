@@ -17,7 +17,7 @@ import re
 import time
 import uuid
 from collections import Counter
-from collections.abc import Callable
+from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
@@ -28,7 +28,7 @@ from sqlalchemy import select
 
 from ffcore.core import db
 from ffcore.core.config import Settings
-from ffcore.knowledge import gates, ingest_mask, scope
+from ffcore.knowledge import gates, ingest_mask, raw_staging, scope
 from ffcore.knowledge.chunking import (
     BREADCRUMB_SEPARATOR,
     ChunkingError,
@@ -355,16 +355,28 @@ async def _attachment_texts(
     raw: Path,
     settings,
     convert: Converter,
-    text_filter: Callable[[str], str] | None = None,
+    text_filter: Callable[[str], Awaitable[str]] | None = None,
+    personnel_data: bool = False,
 ) -> list[tuple[str, str]]:
-    """Convert the document's attachments; data dumps and low quality are recorded, not used."""
+    """Convert the document's attachments; data dumps and low quality are recorded, not used.
+
+    The shown name (attachment row, silver heading, chunk breadcrumb) is inside the personnel-data
+    boundary (r1 MAJOR-4): `Ek <n>` in a personnel-data source, otherwise the name through the
+    text filter with `_`/`-` read as spaces. Gate 0 and the converter see the real file name;
+    `raw_path` is the real file."""
     texts = []
-    for name in names:
+    for n, name in enumerate(names, 1):
         path = raw / name
+        if personnel_data:
+            shown = f"Ek {n}"
+        elif text_filter is not None:
+            shown = await text_filter(re.sub(r"[_-]+", " ", name))
+        else:
+            shown = name
         attachment = Attachment(
             id=uuid.uuid4(),
             document_id=document.id,
-            filename=name,
+            filename=shown,
             size=path.stat().st_size,
             raw_path=str(path),
         )
@@ -381,15 +393,15 @@ async def _attachment_texts(
             continue
         text = clean_markdown(result.text_md)
         if text_filter is not None:
-            text = text_filter(text)
+            text = await text_filter(text)
         dump = gates.data_dump(text)
         if dump:
             attachment.gate2_status, attachment.gate2_reason = "skipped", f"data_dump:{dump}"
             continue
-        verdict = gates.text_quality(text, title=name)
+        verdict = gates.text_quality(text, title=shown)
         attachment.gate2_status, attachment.gate2_reason = verdict
         if verdict[0] != "skipped":
-            texts.append((name, text))
+            texts.append((shown, text))
     await session.flush()
     return texts
 
@@ -401,8 +413,8 @@ class _CountingFilter:
         self.filter = ingest_mask.resolve(name)
         self.counts: Counter = Counter()
 
-    def __call__(self, text: str) -> str:
-        masked, found = self.filter.apply(text)
+    async def __call__(self, text: str) -> str:
+        masked, found = await self.filter.mask(text)
         self.counts.update(found)
         return masked
 
@@ -465,12 +477,21 @@ async def ingest_document(
         if masking is not None:
             # 19: raw stays byte for byte; silver (and text_raw beside it) is masked before it
             # is written, so gold and the model only ever see the masked text (K-M3S-0003).
-            text_md = masking(text_md)
+            text_md = await masking(text_md)
         body = clean_markdown(text_md)
         if masking is not None:
-            body = masking(body)
+            body = await masking(body)
+        source = (document.meta or {}).get("source")
         extra = await _attachment_texts(
-            session, document, attachments or [], raw.parent, settings, convert, masking
+            session,
+            document,
+            attachments or [],
+            raw.parent,
+            settings,
+            convert,
+            masking,
+            # The staging rule (source or path), r2 MINOR-r2-1; filename is the tree relpath.
+            personnel_data=raw_staging.personnel_data(str(source or ""), document.filename),
         )
         if masking is not None:
             document.meta = {**document.meta, "text_filter_counts": dict(masking.counts)}
@@ -689,7 +710,7 @@ async def ingest_from_raw(
         if label is not None:
             # Silver frontmatter, documents.breadcrumb and search results read these fields:
             # masked before they are stored, like the body (r1 MAJOR-2).
-            document.meta, meta_counts = ingest_mask.mask_metadata(
+            document.meta, meta_counts = await ingest_mask.mask_metadata(
                 ingest_mask.resolve(text_filter), document.meta
             )
             document.meta["text_filter"] = label
@@ -718,6 +739,47 @@ class ReindexReport:
     documents: int = 0
     reused: int = 0
     embedded: int = 0
+
+
+class ReindexRefused(Exception):
+    """A reindex refused before it touched any document (code, path; never content)."""
+
+    def __init__(self, code: str, detail: str) -> None:
+        super().__init__(f"{code}: {detail}")
+        self.code = code
+
+
+def _silver_scope(kb_id: uuid.UUID, full: bool):
+    statement = select(Document.id, Document.filename, Document.meta).where(
+        Document.kb_id == kb_id, Document.deleted_at.is_(None)
+    )
+    if not full:
+        statement = statement.where(Document.status.in_(("failed", "timeout", "pending")))
+    return statement
+
+
+async def check_reindex_silver(
+    kb_id: uuid.UUID, *, full: bool, accept_personnel_data: bool = False
+) -> None:
+    """r2 NOTE-5 (KARARLAR "08 tam 1b r2 ekleri"): a personnel-data record written with
+    `pii_regex` (the M3 mode, names not masked) is reconverted only with
+    `--accept-personnel-data`; otherwise the whole reindex is refused before any document is
+    touched (`prsim_requires_ner`). The same personnel-data rule as staging (MINOR-r2-1)."""
+    if accept_personnel_data:
+        return
+    async with db.session_scope() as session:
+        rows = (await session.execute(_silver_scope(kb_id, full))).all()
+    for _, filename, meta in rows:
+        meta = meta or {}
+        label = str(meta.get("text_filter") or "")
+        if label.startswith("pii_regex@") and raw_staging.personnel_data(
+            str(meta.get("source") or ""), filename
+        ):
+            raise ReindexRefused(
+                "prsim_requires_ner",
+                f"{filename} is personnel data written with {label} (the M3 mode); reindex it "
+                "with --accept-personnel-data or ingest it again with pii_ner",
+            )
 
 
 async def reindex_gold(
@@ -756,20 +818,18 @@ async def reindex_silver(
     settings: Settings,
     store: VectorStore,
     embed_client: EmbedClient,
+    convert: Converter = convert_bounded,
+    accept_personnel_data: bool = False,
 ) -> ReindexReport:
-    """`make reindex LAYER=silver`: reconvert from raw (never the source); then gold."""
+    """`make reindex LAYER=silver`: reconvert from raw (never the source); then gold. Refused
+    as a whole when an M3 personnel-data record is in scope without the flag (r2 NOTE-5)."""
+    await check_reindex_silver(kb_id, full=full, accept_personnel_data=accept_personnel_data)
     async with db.session_scope() as session:
-        statuses = None if full else ("failed", "timeout", "pending")
-        statement = select(Document.id).where(
-            Document.kb_id == kb_id, Document.deleted_at.is_(None)
-        )
-        if statuses:
-            statement = statement.where(Document.status.in_(statuses))
-        ids = list((await session.scalars(statement)).all())
+        ids = [row[0] for row in (await session.execute(_silver_scope(kb_id, full))).all()]
     report = ReindexReport()
     for document_id in ids:
         result = await ingest_document(
-            document_id, settings=settings, store=store, embed_client=embed_client
+            document_id, settings=settings, store=store, embed_client=embed_client, convert=convert
         )
         report.documents += 1
         report.reused += result.reused
@@ -791,6 +851,8 @@ __all__ = [
     "ingest_document",
     "ingest_from_raw",
     "register_upload",
+    "ReindexRefused",
+    "check_reindex_silver",
     "reindex_gold",
     "reindex_silver",
 ]

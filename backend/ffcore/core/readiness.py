@@ -46,6 +46,13 @@ def _load_models(settings: Settings) -> None:
         load = getattr(model, "load", None)
         if load is not None:
             load()
+    from ffcore.guardrails.recognizers.ner import local_ner
+    from ffcore.guardrails.settings import get_guardrail_settings
+
+    guard = get_guardrail_settings()
+    if guard.guardrail_egress_enabled and guard.guardrail_egress_ner:
+        # 08 tam 1b: egress needs the NER model; a missing weight is `model_missing` here.
+        local_ner().load()
 
 
 async def warmup(settings: Settings) -> None:

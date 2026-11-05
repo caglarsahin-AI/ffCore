@@ -15,7 +15,7 @@ import uuid
 from dataclasses import dataclass, field
 from dataclasses import fields as dataclass_fields
 
-from ffcore.guardrails.categories import ACTION_RANK, STAGES
+from ffcore.guardrails.categories import ACTION_RANK, NER_CATEGORIES, STAGES
 from ffcore.guardrails.findings import Finding
 from ffcore.guardrails.masking import (
     PlaceholderOutOfRange,
@@ -25,6 +25,7 @@ from ffcore.guardrails.masking import (
     redact_label,
 )
 from ffcore.guardrails.recognizers import regex as regex_recognizers
+from ffcore.guardrails.recognizers.ner import NerClient, NerEgressUnavailable, trim_names
 from ffcore.guardrails.recognizers.regex import recognize, resolve_overlaps
 from ffcore.guardrails.rules import find_secrets, find_tool_arg_violations
 from ffcore.guardrails.schemas import GuardrailConfigError, PiiPolicySpec, ResolvedPolicy, Rule
@@ -64,6 +65,9 @@ class EvalContext:
     token_store: TokenStore | None = None
     # None: read GUARDRAIL_EGRESS_ENABLED from the environment.
     egress_enabled: bool | None = None
+    # 08 tam 1b: the NER client an `engine: ner` policy needs (API: LocalNer, workers: HttpNer);
+    # None there is `ner_not_configured`.
+    ner: "NerClient | None" = None
 
 
 @dataclass
@@ -137,12 +141,38 @@ def _egress_enabled(ctx: EvalContext) -> bool:
     return get_guardrail_settings().guardrail_egress_enabled
 
 
-def _pii_findings(text: str, rule: Rule, pii: PiiPolicySpec) -> list[tuple[Finding, str, str]]:
-    active = {
+def _active(pii: PiiPolicySpec) -> dict:
+    return {
         code: setting
         for code, setting in pii.categories.items()
         if setting.enabled and (setting.lang is None or set(setting.lang) & set(pii.languages))
     }
+
+
+async def _ner_findings(
+    text: str, rule: Rule, policy: ResolvedPolicy, ctx: EvalContext
+) -> list[Finding]:
+    """The NER hits a `pii` rule of an `engine: ner` policy needs (awaited before the scan:
+    a worker gets them over HTTP). `engine: regex` never calls NER."""
+    if rule.type != "pii":
+        return []
+    pii = policy.pii_policies.get(rule.pii_policy_key or "")
+    if pii is None or pii.engine != "ner":
+        return []
+    wanted = sorted(set(_active(pii)) & set(NER_CATEGORIES))
+    if not wanted:
+        return []
+    if ctx.ner is None:
+        raise GuardrailConfigError(
+            "ner_not_configured", "This caller has no NER client for an `engine: ner` policy."
+        )
+    return await ctx.ner.find(text, wanted)
+
+
+def _pii_findings(
+    text: str, rule: Rule, pii: PiiPolicySpec, ner_hits: list[Finding] = ()
+) -> list[tuple[Finding, str, str]]:
+    active = _active(pii)
     hits = list(recognize(text, active, context_boost=pii.context_boost))
     for pattern in pii.custom_patterns:
         if pattern.category not in active:
@@ -158,8 +188,14 @@ def _pii_findings(text: str, rule: Rule, pii: PiiPolicySpec) -> list[tuple[Findi
                     m.group(0),
                 )
             )
+    # Overlaps and the threshold first: only a regex or custom finding that is kept may cut a name
+    # (r2 MINOR-r2-2; a dropped finding must not leave the part it covered unmasked).
+    kept = [f for f in resolve_overlaps(hits) if f.score >= pii.min_confidence]
+    # A NER span never overrides a kept regex or custom finding (checksummed values win, 08t_2);
+    # it is cut to the parts outside them and outside carried placeholders (r1 MINOR-5/6).
+    names = trim_names(text, [n for n in ner_hits if n.category in active], kept)
     result = []
-    for finding in resolve_overlaps(hits):
+    for finding in resolve_overlaps([*kept, *names]):
         if finding.score < pii.min_confidence:
             continue
         setting = active[finding.category]
@@ -169,7 +205,12 @@ def _pii_findings(text: str, rule: Rule, pii: PiiPolicySpec) -> list[tuple[Findi
 
 
 def _rule_findings(
-    text: str, stage: str, rule: Rule, policy: ResolvedPolicy, ctx: EvalContext
+    text: str,
+    stage: str,
+    rule: Rule,
+    policy: ResolvedPolicy,
+    ctx: EvalContext,
+    ner_hits: list[Finding] = (),
 ) -> list[tuple[Finding, str, str]]:
     if rule.type == "pii":
         pii = policy.pii_policies.get(rule.pii_policy_key or "")
@@ -177,7 +218,7 @@ def _rule_findings(
             raise GuardrailConfigError(
                 "pii_policy_not_found", f"PII policy '{rule.pii_policy_key}' not found."
             )
-        return _pii_findings(text, rule, pii)
+        return _pii_findings(text, rule, pii, ner_hits)
     if rule.type == "secrets":
         return [(f, rule.action, "high") for f in find_secrets(text)]
     if rule.type == "tool_args":
@@ -289,8 +330,19 @@ async def evaluate(
             run_id=ctx.run_id,
         )
         try:
+            try:
+                ner_hits = await _ner_findings(current, rule, policy, ctx)
+            except GuardrailConfigError:
+                raise
+            except Exception as exc:
+                if stage == "egress" and mode == "enforce":
+                    # r1 MINOR-1 (A): never on_error at egress (class name only, no value).
+                    raise NerEgressUnavailable(type(exc).__name__) from exc
+                raise
             # CPU-bound scanning runs off the event loop (00i pattern).
-            hits = await asyncio.to_thread(_rule_findings, current, stage, rule, policy, ctx)
+            hits = await asyncio.to_thread(
+                _rule_findings, current, stage, rule, policy, ctx, ner_hits
+            )
             action = _strongest(a for _, a, _ in hits)
             pending.append((event, current, [f for f, _, _ in hits]))
             for f, _, _ in hits:
@@ -331,7 +383,7 @@ async def evaluate(
                         event.status = "redacted"
                     current = rewritten
                 applied.append(action)
-        except (GuardrailConfigError, PlaceholderOutOfRange):
+        except (GuardrailConfigError, PlaceholderOutOfRange, NerEgressUnavailable):
             # r4 MINOR-r4-1: a used-up placeholder range fails loudly whatever `on_error` says;
             # under `log` the text would leave untokenized.
             raise

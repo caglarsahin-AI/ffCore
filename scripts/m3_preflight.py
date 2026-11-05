@@ -24,6 +24,8 @@ EXPECTED: dict[str, tuple[set[str], bool]] = {
     "INFERENCE_BACKEND": ({"ollama"}, False),
     "EGRESS_ALLOWLIST": ({""}, True),
     "GUARDRAIL_EGRESS_ENABLED": ({"true"}, False),
+    # 08 tam 1b: must be set; true needs NER_MODEL/NER_REVISION and the weights on the server.
+    "GUARDRAIL_EGRESS_NER": ({"true", "false"}, False),
     "FFCORE_TEST_HOOKS": ({"0"}, True),
     "RETENTION_DRY_RUN": ({"true"}, True),
     "RETENTION_AUDIT_DROP_ENABLED": ({"false"}, True),

@@ -6,7 +6,10 @@ never callables: the document records `<name>@<version>` and a reindex can tell 
 its text.
 
 `pii_regex` reuses 08-lite's checksummed recognizers and redacts each finding to its `[CODE]`
-label. Person names need NER (08 full) and are not caught: a known limit, written in the runbook.
+label; person names are not caught by it. `pii_ner` (08 tam 1b) adds person names from the NER
+model, asked over HTTP (`POST /api/v1/internal/guardrails/ner`: ingest runs in the worker or the
+ingest-raw CLI, never in the API process that holds the model); a regex finding always wins
+over an overlapping name. NER unreachable fails the text, it is never written unmasked.
 """
 
 from collections import Counter
@@ -16,11 +19,33 @@ from typing import Literal
 from ffcore.guardrails.masking import redact_label
 from ffcore.guardrails.recognizers.regex import recognize
 
-TextFilterName = Literal["pii_regex"]
+TextFilterName = Literal["pii_regex", "pii_ner"]
 
 # Bump when the categories or recognizers change: the label changes, so does text_hash.
 PII_REGEX_VERSION = 1
 PII_REGEX_CATEGORIES = ("EMAIL_ADDRESS", "TR_PHONE", "TR_NATIONAL_ID", "TR_IBAN", "CREDIT_CARD")
+PII_NER_VERSION = 1
+PII_NER_CATEGORIES = ("PERSON",)
+
+
+def _redact(text: str, findings) -> tuple[str, Counter]:
+    counts: Counter = Counter()
+    parts, at = [], 0
+    for f in sorted(findings, key=lambda f: f.start):
+        parts.append(text[at : f.start])
+        parts.append(redact_label(f.category))
+        counts[f.category] += 1
+        at = f.end
+    parts.append(text[at:])
+    return "".join(parts), counts
+
+
+def ner_client():
+    """The workers' NER: the API process holds the model (08 tam 1b S2)."""
+    from ffcore.core.config import get_settings
+    from ffcore.guardrails.recognizers.ner import HttpNer
+
+    return HttpNer(get_settings())
 
 
 @dataclass(frozen=True)
@@ -34,42 +59,57 @@ class PiiRegexFilter:
 
     def apply(self, text: str) -> tuple[str, Counter]:
         """(masked text, findings per category). Counts only: no value leaves this function."""
-        findings = sorted(recognize(text, PII_REGEX_CATEGORIES), key=lambda f: f.start)
-        counts: Counter = Counter()
-        parts, at = [], 0
-        for f in findings:
-            parts.append(text[at : f.start])
-            parts.append(redact_label(f.category))
-            counts[f.category] += 1
-            at = f.end
-        parts.append(text[at:])
-        return "".join(parts), counts
+        return _redact(text, recognize(text, PII_REGEX_CATEGORIES))
+
+    async def mask(self, text: str) -> tuple[str, Counter]:
+        return self.apply(text)
 
 
-_FILTERS = {"pii_regex": PiiRegexFilter()}
+@dataclass(frozen=True)
+class PiiNerFilter:
+    name: str = "pii_ner"
+    version: int = PII_NER_VERSION
+
+    @property
+    def label(self) -> str:
+        return f"{self.name}@{self.version}"
+
+    async def mask(self, text: str) -> tuple[str, Counter]:
+        """`pii_regex` plus person names; a name is cut to the parts outside the regex findings
+        (r1 MINOR-5), never dropped whole and never over a regex finding."""
+        base = recognize(text, PII_REGEX_CATEGORIES)
+        names = await ner_client().find(text, PII_NER_CATEGORIES) if text.strip() else []
+        from ffcore.guardrails.recognizers.ner import trim_names
+
+        # Cut to the parts outside the regex findings (r1 MINOR-5), never dropped whole.
+        return _redact(text, [*base, *trim_names(text, names, base)])
+
+
+TextFilter = PiiRegexFilter | PiiNerFilter
+_FILTERS = {"pii_regex": PiiRegexFilter(), "pii_ner": PiiNerFilter()}
 
 # Metadata keys that are identifiers or bookkeeping, not text a person wrote: left as given.
 UNMASKED_KEYS = frozenset({"source", "source_item_id", "text_filter"})
 
 
-def mask_metadata(f: PiiRegexFilter, metadata: dict) -> tuple[dict, Counter]:
+async def mask_metadata(f: TextFilter, metadata: dict) -> tuple[dict, Counter]:
     """Every string value (and string in a list) of a C6 metadata mapping through the filter,
     except UNMASKED_KEYS (r1 MAJOR-2: titles, breadcrumbs and links carry e-mail addresses too)."""
     counts: Counter = Counter()
 
-    def one(value):
+    async def one(value):
         if isinstance(value, str):
-            masked, found = f.apply(value)
+            masked, found = await f.mask(value)
             counts.update(found)
             return masked
         if isinstance(value, list):
-            return [one(v) for v in value]
+            return [await one(v) for v in value]
         return value
 
-    return {k: (v if k in UNMASKED_KEYS else one(v)) for k, v in metadata.items()}, counts
+    return {k: (v if k in UNMASKED_KEYS else await one(v)) for k, v in metadata.items()}, counts
 
 
-def resolve(name: str) -> PiiRegexFilter:
+def resolve(name: str) -> TextFilter:
     """The filter registered under `name`; an unknown name is an error, never a pass-through."""
     try:
         return _FILTERS[name]

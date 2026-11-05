@@ -385,6 +385,7 @@ openapi/04a.yaml`; contract test `test_04a_20_*`). Lists are `{"data": [...]}`. 
 | `POST /{kb_id}/search` | analyst, also in read mode | `{query, top_k?, filters{document_ids, metadata}, hybrid?}`; header `X-Run-Id` is stored in `kb_queries.run_id` |
 | `POST /{kb_id}/test-query` | analyst, also in read mode | the same search, logged with `source=playground` |
 | `POST /internal/embed` | service account only | for the ingest worker; 403 `service_account_required` for anybody else |
+| `POST /api/v1/internal/guardrails/ner` | service account only | the workers' Turkish NER (08 full 1b): spans, category, score and evidence, never values; 503 `ner_not_configured` / `model_missing` |
 | `GET /readyz` | none | 200 ready; 503 `warming`, `warmup_failed`, `embed_dim_mismatch`, `context_configuration_invalid`, `vector_store_unavailable` |
 
 Document ACL: `acl_roles` and `acl_users`. A manual upload without either gets `["analyst"]`
@@ -537,11 +538,16 @@ about targets outside its scopes. Another project's model or agent, or a missing
   goes on: `X-Resume-Run-Id` follows it again from its last approval or question event (or from
   the start). The direct model path (one piece, live and buffered stream) and the external agent
   answer the same way. When a token scope's placeholder numbers are used up (it would issue
-  past 9,999,999, e.g. the request carries `<<PII_9999999>>` and a new value), the request
+  past 9,999,999, i.e. the scope has already issued 9,999,999 values), the request
   fails with `placeholder_out_of_range`: 400 `invalid_request_error` on the direct model path
   (one piece; a buffered or live stream that has started sends the error event and `[DONE]`),
   the external agent and a facade agent request's client history check; 502 `api_error` (the
   run's code) when it happens inside a facade agent run (its question and stored history).
+  When the NER an egress PII policy needs cannot answer (`engine: ner`, enforce), the request
+  fails with `ner_unavailable` the same way, whatever the policy's `on_error` says: 503
+  `api_error` on the direct model path (one piece; a started stream sends the error event and
+  `[DONE]`), the external agent, a facade agent request's client history check and the internal
+  evaluate endpoint; 502 `api_error` (the run's code) inside a facade agent run.
   A carried placeholder above 1,000,000, a longer `<<PII_n>>` and one with non-ASCII digits
   are ignored.
 

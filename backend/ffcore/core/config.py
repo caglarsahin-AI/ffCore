@@ -109,6 +109,12 @@ class Settings(BaseSettings):
     upload_max_request_bytes: int = Field(default=516 * 1024 * 1024, gt=0)
     # Where the ingest worker reaches POST /internal/embed (the API loads the model, C10).
     internal_api_url: str = "http://backend:8000"
+    # 08 tam 1b: the Turkish NER model of this installation (HF repo + commit), loaded only by
+    # the API process; workers call POST /api/v1/internal/guardrails/ner. Unset: a policy with
+    # `engine: ner` and the `pii_ner` ingest filter fail loudly (ner_not_configured), nothing
+    # falls back to regex.
+    ner_model: str | None = None
+    ner_revision: str | None = None
     # --- 05a: tools ---
     # A tool result longer than this reaches the model cut, ending in "[truncated: N/M chars]"
     # (C13); the call log says truncated=true.

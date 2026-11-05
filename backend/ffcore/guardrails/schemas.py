@@ -16,6 +16,7 @@ from ffcore.guardrails.categories import (
     CATEGORIES,
     LANGUAGES,
     MODES,
+    NER_CATEGORIES,
     ON_ERROR,
     SEVERITIES,
     STAGES,
@@ -175,10 +176,9 @@ def validate_policy(spec: PolicySpec, pii_policy_keys) -> None:
 
 
 def validate_pii_policy(spec: PiiPolicySpec) -> None:
-    if spec.engine != "regex":
-        raise GuardrailConfigError(
-            "engine_unsupported", "The ner engine arrives with the full guardrail package."
-        )
+    # 08 tam 1b: `engine: ner` = the regex recognizers plus the NER model (NER_CATEGORIES);
+    # `engine: regex` never calls NER.
+    ner = set(NER_CATEGORIES) if spec.engine == "ner" else set()
     for code in list(spec.categories) + [p.category for p in spec.custom_patterns]:
         if code not in CATEGORIES:
             raise GuardrailConfigError("category_unknown", f"Unknown PII category '{code}'.")
@@ -187,7 +187,7 @@ def validate_pii_policy(spec: PiiPolicySpec) -> None:
         _compile(pattern.pattern, f"custom_patterns[{i}]")
         custom.add(pattern.category)
     for code, setting in spec.categories.items():
-        if setting.enabled and not CATEGORIES[code].regex and code not in custom:
+        if setting.enabled and not CATEGORIES[code].regex and code not in custom | ner:
             raise GuardrailConfigError(
                 "category_unsupported",
                 f"Category '{code}' has no recognizer in this release; add a custom pattern "

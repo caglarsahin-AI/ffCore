@@ -93,7 +93,8 @@ client's earlier turns are stored as `egress` left them, in the run's scope. Bef
 value a run's counter passes every placeholder number up to 1,000,000 in its question and
 history, so a carried placeholder never reads as one of this run's values (a scope issues at
 most 9,999,999; past it the run fails with `placeholder_out_of_range`; a carried number above
-1,000,000 is ignored). After the first HTML tag (`<` and a letter, also `<br>`,
+1,000,000 is ignored). When the NER an egress PII policy needs cannot answer, the run fails with
+`ner_unavailable` whatever `on_error` says (08 full 1b). After the first HTML tag (`<` and a letter, also `<br>`,
 `List<String>` or `x<y`) no placeholder of the rest of the reader's stream is reversed, the
 run's own user on the console included, and across the run's turns (a reader that continues
 after an approval replays the earlier entries),

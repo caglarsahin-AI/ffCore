@@ -25,6 +25,7 @@ from ffcore.guardrails.masking import (
     reserve_carried,
     reveal_text,
 )
+from ffcore.guardrails.recognizers.ner import local_ner
 from ffcore.guardrails.service import record_events, resolve_policy
 from ffcore.guardrails.settings import get_guardrail_settings
 
@@ -122,6 +123,7 @@ class FacadeGuard:
             source="api",
             token_store=RedisTokenStore(self.redis, guard.pii_token_ttl_s),
             egress_enabled=self.egress_enabled,
+            ner=local_ner(),  # the API process holds the model (08 tam 1b)
         )
         decision = await engine.evaluate(text, stage, self.policy, ctx=ctx)
         if decision.events:

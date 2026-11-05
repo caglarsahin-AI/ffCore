@@ -39,17 +39,36 @@ def _timed(pieces, cls):
     return run(go())
 
 
+# FOLLOWUP-165 (KARARLAR "Birim testinde mutlak süre sınırı yok", K-SEN-0015): the scan is
+# proven linear by the CPU-time ratio of two input sizes (best of three; a rescan of the whole
+# line on every piece is quadratic, ratio about 16 for 4x the input); the absolute bound is only
+# a wide guard against hanging (r2 needed 13 s for the large input).
+RATIO_LIMIT = 8.0
+HANG_GUARD_S = 20.0
+
+
+def _ratio(small, large, cls) -> tuple[float, float]:
+    best_small = min(_timed(small, cls) for _ in range(3))
+    best_large = min(_timed(large, cls) for _ in range(3))
+    return best_large / max(best_small, 1e-3), best_large
+
+
 @pytest.mark.parametrize("cls", [StreamDetokenizer, ContextReveal])
 def test_08t_r3_long_line_in_one_character_pieces(cls):
-    text = "a" * 100_000  # no marker, no line break
-    assert _timed(list(text), cls) < 1.0
+    # no marker, no line break; 4x the characters, 4x the pieces
+    ratio, large = _ratio(list("a" * 25_000), list("a" * 100_000), cls)
+    assert ratio < RATIO_LIMIT, ratio
+    assert large < HANG_GUARD_S
 
 
 @pytest.mark.parametrize("cls", [StreamDetokenizer, ContextReveal])
 def test_08t_r3_long_line_in_four_pieces(cls):
-    text = "b" * 64_000
-    pieces = [text[i : i + 16_000] for i in range(0, len(text), 16_000)]
-    assert _timed(pieces, cls) < 0.2
+    # 16,000-character pieces of one long line: 16 against 64 (the small input is large enough
+    # that the clock's resolution does not move the ratio)
+    piece = "b" * 16_000
+    ratio, large = _ratio([piece] * 16, [piece] * 64, cls)
+    assert ratio < RATIO_LIMIT, ratio
+    assert large < HANG_GUARD_S
 
 
 @pytest.mark.parametrize("cls", [StreamDetokenizer, ContextReveal])

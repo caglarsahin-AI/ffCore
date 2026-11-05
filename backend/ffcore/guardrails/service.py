@@ -8,7 +8,13 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ffcore.core.errors import ApiError
-from ffcore.guardrails.builtin import BUILTIN_DEFAULT, BUILTIN_KEY, DEFAULT_PII
+from ffcore.guardrails.builtin import (
+    BUILTIN_DEFAULT,
+    BUILTIN_KEY,
+    DEFAULT_PII,
+    EGRESS_PII_KEY,
+    builtin_egress_pii,
+)
 from ffcore.guardrails.engine import GuardrailEvent
 from ffcore.guardrails.masking import RedisTokenStore
 from ffcore.guardrails.schemas import (
@@ -17,6 +23,7 @@ from ffcore.guardrails.schemas import (
     PolicySpec,
     ResolvedPolicy,
 )
+from ffcore.guardrails.settings import get_guardrail_settings
 from ffcore.models.guardrails import GuardrailEventRow, GuardrailPolicy, PiiPolicy
 
 
@@ -70,14 +77,25 @@ async def available_pii_keys(session: AsyncSession, project_id) -> set[str]:
             PiiPolicy.project_id == project_id, PiiPolicy.deleted_at.is_(None)
         )
     )
-    return {*rows, BUILTIN_KEY}
+    # r1 MINOR-4: the built-in chain's egress key is usable in a stored chain too.
+    return {*rows, BUILTIN_KEY, EGRESS_PII_KEY}
 
 
 async def resolve_pii(session: AsyncSession, project_id, key: str) -> PiiPolicySpec | None:
     row = await stored_pii(session, project_id, key)
     if row is not None:
         return pii_spec(row)
-    return DEFAULT_PII if key == BUILTIN_KEY else None
+    if key == BUILTIN_KEY:
+        return DEFAULT_PII
+    if key == EGRESS_PII_KEY:
+        # 08 tam 1b: the built-in egress PII follows GUARDRAIL_EGRESS_NER (K-08T1B-0004 A) and
+        # is derived from the project's stored `default` when there is one (r1 MAJOR-1 A).
+        default = await stored_pii(session, project_id, BUILTIN_KEY)
+        return builtin_egress_pii(
+            get_guardrail_settings().guardrail_egress_ner,
+            pii_spec(default) if default is not None else None,
+        )
+    return None
 
 
 async def resolve_policy(session: AsyncSession, project_id, key: str) -> ResolvedPolicy:

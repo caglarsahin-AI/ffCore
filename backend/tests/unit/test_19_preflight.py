@@ -21,6 +21,7 @@ SAFE = {
     "INFERENCE_BACKEND": "ollama",
     "EGRESS_ALLOWLIST": "",
     "GUARDRAIL_EGRESS_ENABLED": "true",
+    "GUARDRAIL_EGRESS_NER": "false",
     "FFCORE_TEST_HOOKS": "0",
     "RETENTION_DRY_RUN": "true",
     "RETENTION_AUDIT_DROP_ENABLED": "false",

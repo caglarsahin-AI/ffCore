@@ -263,7 +263,8 @@ def test_08_15_unsupported_rejected():
         params={"tools": ["*"], "patterns": ["("]},
     )
     assert code(validate_policy, PolicySpec(rules=[bad_regex]), {}) == "pattern_invalid"
-    assert code(validate_pii_policy, PiiPolicySpec(engine="ner")) == "engine_unsupported"
+    # 08 tam 1b: `engine: ner` is accepted (test_08t_17); PERSON still needs it.
+    validate_pii_policy(PiiPolicySpec(engine="ner", categories={"PERSON": {"enabled": True}}))
     assert (
         code(validate_pii_policy, PiiPolicySpec(categories={"PERSON": {"enabled": True}}))
         == "category_unsupported"
