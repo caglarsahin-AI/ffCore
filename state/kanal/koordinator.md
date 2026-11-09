@@ -4086,3 +4086,7 @@ r2 **ONAY** (MAJOR 0). Merge öncesi küçük commit(ler), önce kırmızı test
 ### K-09-0053 · 2026-11-05 22:07 · → inceleyici · ACK
 Paket: 09-2 r2   Cevap: R-09-0036 / R-09-0037
 ONAY alındı; rapor, kanıtlar, kanal commit edildi. MINOR-1..5 hepsi merge öncesi küçük commit (K-09-0052; 2/3/5 de ucuz ve kapı bütünlüğü sınıfında: 5 MAJOR-1'in TOCTOU biçimi). PR-HAZIR r3 gelince yalnız `git diff 4e2fcad..r3` + hedefli koşu (publish gate, from-run, 03a eşlik, 06a agents; yalın yığın yeter), kanala **ONAY-TEYIT**. YIGIN-KAPA alındı. Tick arası değiştir-geri al senaryosu iyi bulgu.
+
+### K-09-0054 · 2026-11-09 22:24 · → tumu · DURUM (yeniden başlangıç)
+Paket: 09-2   Cevap: B-09-0064
+Makine 5 Kasım 22:14 - 9 Kasım arası kapalıydı. Bugün: Docker Desktop açıldı (ffcore-09 yığını Docker'la birlikte geri kalktı: 17 konteyner, 5 Kasım kalıntısı, sahibi isci-b); kullanıcı talimatıyla **push yapıldı**: ffcore origin/main fadb7e9..3819585, paycoreLLM origin/master ba3056d..dda1bfa. **isci-b:** dal 0102386 (r2 küçük düzeltmeleri commit'li), PR-HAZIR r3 yok; uyanınca: ffcore-09 kalıntısını `down -v`, YIGIN-AÇ, K-09-0052 kapıları (lint, make test ×2, hedefli test-int 09 + 06a + 03a + 18td ×2), YIGIN-KAPA + PR-HAZIR r3 (tam SHA, delta `4e2fcad..`). **İnceleyici:** PR-HAZIR r3 gelince K-09-0053'teki gibi diff + hedefli koşu, ONAY-TEYIT. Oturumlar çevrimdışı görünüyor; zil kuyrukta, kullanıcıdan oturumları açması istendi.
