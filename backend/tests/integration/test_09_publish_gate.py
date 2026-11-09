@@ -82,9 +82,10 @@ def _exam(pg, project, suite_id, version_id, *, passed=True, complete=True, not_
         "INSERT INTO eval_runs (id, project_id, suite_id, agent_version_id, user_id,"
         " langfuse_run_name, status, item_runs, summary, config, ended_at, created_by)"
         " VALUES (%s, %s, %s, %s, %s, 'exam-x', %s, '{}', %s, %s,"
-        " now() - make_interval(secs => %s), 't')",
+        " CASE WHEN %s IN ('queued', 'running') THEN NULL"  # an active exam has not ended
+        " ELSE now() - make_interval(secs => %s) END, 't')",
         (ev_id, project, suite_id, version_id, uuid.uuid4(), status, json.dumps(summary),
-         json.dumps(config), age_s),
+         json.dumps(config), status, age_s),
     )  # fmt: skip
     return ev_id
 
