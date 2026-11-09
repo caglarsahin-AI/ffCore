@@ -96,7 +96,7 @@ INTERNAL_HOSTS = {
         "mcp-search",
         "mcp-sql",
         "ffcore-qdrant",
-        "host.docker.internal",
+        "ollama",
     },
 }
 

@@ -31,9 +31,9 @@ as `litellm_model_not_written`, and by `render-litellm`):
 | `upstream_api_unsupported` | `upstream_api` is `responses`; only `chat` is wired |
 | `forward_unknown_params_unsupported` | LiteLLM has no per-model switch for it; leave it off |
 
-The same egress rules as for every outbound call apply (`core/egress.py`). An Ollama on the host
-(PayCore: `http://host.docker.internal:11434`) therefore needs `host.docker.internal` in
-`ALLOWED_INTERNAL_HOSTS`, and `litellm` itself must be there too.
+The same egress rules as for every outbound call apply (`core/egress.py`). The Ollama host therefore
+must be in `ALLOWED_INTERNAL_HOSTS` (PayCore: the compose service `ollama`, `http://ollama:11434`;
+`host.docker.internal` only when Ollama runs on the host), and `litellm` itself must be there too.
 
 ## Names
 
