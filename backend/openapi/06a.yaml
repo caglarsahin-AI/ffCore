@@ -531,7 +531,9 @@ paths:
 
         whose context_tokens exceed the model''s context window or OLLAMA_CONTEXT_LENGTH is 400
 
-        `context_configuration_invalid` (C13).'
+        `context_configuration_invalid` (C13). A changed definition ends the version''s queued and
+
+        running exams `failed(definition_changed)` in the same transaction (09-2 r2 MINOR-1).'
       operationId: update_version_api_v1_projects__project_id__agents__agent_id__versions__version__put
       parameters:
       - name: project_id

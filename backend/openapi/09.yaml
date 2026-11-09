@@ -1203,17 +1203,26 @@ components:
         masking:
           type: string
           enum:
+          - none
           - regex
           - regex+ner
           title: Masking
-          description: '`regex`: identifiers only, person names are stored as written; `regex+ner`: person
-            names are masked too.'
+          description: 'What the agent''s egress policy really masked: `none` (off, monitor, or no masking
+            category), `regex` (identifiers; person names are stored as written), `regex+ner` (person
+            names too).'
+        masked_fields:
+          items:
+            type: string
+          type: array
+          title: Masked Fields
+          description: The fields saved masked (message, variables, answer, must_contain).
       type: object
       required:
       - item_id
       - dataset
       - run_id
       - masking
+      - masked_fields
       title: FromRunOut
     MetricDiff:
       properties:
