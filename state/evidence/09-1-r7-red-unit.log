@@ -1,0 +1,10 @@
+== 09-1 r7: test_09_r5.py (r6 overhead warning tests) on 9def741 code, worktree 2026-11-05T15:40:54+03:00
+All checks passed!
+E   AssertionError: assert [] == ['eval_tick_o...rhead_s=35.0']
+tests/unit/test_09_r5.py:156: AssertionError: assert [] == ['eval_tick_o...rhead_s=35.0']
+FAILED tests/unit/test_09_r5.py::test_09_r6_tick_overhead_over_the_allowance_is_a_warning
+1 failed, 7 passed in 1.93s
+
+== after fix @ 331e2e9: make lint + 09 unit tests
+lint-ok
+129 passed in 3.94s

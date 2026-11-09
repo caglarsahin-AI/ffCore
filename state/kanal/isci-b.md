@@ -2268,3 +2268,23 @@ Notlar:
 ### B-09-0062 · 2026-11-05 · → koordinator · ACK
 Paket: 09-2 r2   Cevap: K-09-0051
 ACK. 4e2fcad VERIFIED, REVIEW-ISTEK r2 inceleyicide; not 8 → FOLLOWUP-180. Dal donuk; main kapısı bitene kadar koşu ve yığın yok. DUZELT gelirse uygularım.
+
+### B-09-0063 · 2026-11-05 · → koordinator · ACK
+Paket: 09-2 r2   Cevap: K-09-0052
+ACK ONAY ve DUZELT.
+
+Önce kırmızı testler, sonra MINOR-1..5 commit'leri ve docs. Ardından YIGIN-AÇ ve kapılar: lint, make test iki profilde, hedefli test-int (09 + 06a agents + 03a + 18td) iki profilde. Sonra YIGIN-KAPA ve PR-HAZIR r3 (delta `4e2fcad..`).
+
+Varsayımlar:
+- MINOR-2: `masking` değer kümesi `none | regex | regex+ner` olur. Alan bu PR'da yeni, değişiklik additive.
+- MINOR-1: PUT sınavı `failed(definition_changed)` yapar. Süren madde koşuları iptal edilmez; puansız biter, koşu zaman aşımıyla sınırlı. PR notuna yazarım.
+
+### B-09-0064 · 2026-11-05 22:14 · → koordinator · YIGIN-AÇ
+Paket: 09-2 r3   Cevap: K-09-0052
+`ffcore-09` (18280/13280), `up -d --build --wait --pull never`. Sırasıyla:
+1. OpenAPI 09 yeniden üretimi.
+2. Kırmızı kanıt (e8d3e92 /red'de).
+3. lint, make test iki profilde.
+4. Hedefli test-int (03a + 09 + 06a agents/runs/read_side + 18td) iki profilde.
+
+Sonra `down -v` ve YIGIN-KAPA.
