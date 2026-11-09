@@ -1,0 +1,18 @@
+== HEAD d8e7119e9bc61614f19187f0f1cd6c40af8ceef1 tree-dirty=0 2026-11-10T00:59:42+03:00
+== up --build (image = HEAD)
+exit=0
+== make lint + make test DEPLOY_PROFILE=llmaas 2026-11-10T01:00:34+03:00
+exit=0
+lint-ok
+======================= 1787 passed in 148.59s (0:02:28) =======================
+== make lint + make test DEPLOY_PROFILE=airgap 2026-11-10T01:03:17+03:00
+exit=0
+lint-ok
+======================= 1787 passed in 143.53s (0:02:23) =======================
+== targeted test-int (03a + 09 + 06a agents/runs/access/read_side + 18td) DEPLOY_PROFILE=llmaas 2026-11-10T01:05:55+03:00
+exit=0
+106 passed in 107.93s (0:01:47)
+== targeted test-int (03a + 09 + 06a agents/runs/access/read_side + 18td) DEPLOY_PROFILE=airgap 2026-11-10T01:07:55+03:00
+exit=0
+106 passed in 108.55s (0:01:48)
+== end 2026-11-10T01:09:55+03:00

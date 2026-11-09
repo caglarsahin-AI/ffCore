@@ -1,0 +1,28 @@
+== 09-2 r3 red @ e8d3e92 (tests of the r2 corrections on 4e2fcad code; tree mounted at /red) 2026-11-10T00:56:22+03:00
+0
+runner.py has no end_exams_of_edited_version: old code confirmed
+-- unit
+FAILED tests/unit/test_09_2_r1.py::test_09_2_r1_masking_names_ner_only_when_an_egress_pii_rule_uses_it
+FAILED tests/unit/test_09_2_r1.py::test_09_2_r2_minor2_masking_is_what_the_egress_rule_does[kw2-regex]
+FAILED tests/unit/test_09_2_r1.py::test_09_2_r2_minor2_masking_is_what_the_egress_rule_does[kw3-regex]
+FAILED tests/unit/test_09_2_r1.py::test_09_2_r2_minor2_masking_is_what_the_egress_rule_does[kw4-none]
+FAILED tests/unit/test_09_2_r1.py::test_09_2_r2_minor2_masking_is_what_the_egress_rule_does[kw5-none]
+FAILED tests/unit/test_09_2_r1.py::test_09_2_r2_minor2_masking_is_what_the_egress_rule_does[kw7-none]
+FAILED tests/unit/test_09_2_r1.py::test_09_2_r2_minor2_masking_is_what_the_egress_rule_does[kw8-none]
+FAILED tests/unit/test_09_2_r1.py::test_09_2_r2_minor2_masking_is_what_the_egress_rule_does[kw9-none]
+8 failed, 23 passed in 3.90s
+-- integration (llmaas)
+>       assert _exam_status(pg, running) == ("failed", "definition_changed", True)
+E       AssertionError: assert ('running', None, True) == ('failed', 'd...hanged', True)
+E         At index 0 diff: 'running' != 'failed'
+FAILED tests/integration/test_09_publish_gate.py::test_09_2_r2_minor1_editing_a_draft_ends_its_running_exams
+FAILED tests/integration/test_09_publish_gate.py::test_09_2_r2_minor1_saving_the_same_definition_keeps_the_exam
+FAILED tests/integration/test_09_publish_gate.py::test_09_2_r2_minor5_publish_and_draft_edit_lock_the_agent_row
+FAILED tests/integration/test_09_from_run.py::test_09_2_r1_minor9_expected_output_is_masked_with_the_question
+FAILED tests/integration/test_09_from_run.py::test_09_2_r2_minor3_expectation_a_mask_would_change_is_refused[sql_result]
+FAILED tests/integration/test_09_from_run.py::test_09_2_r2_minor3_expectation_a_mask_would_change_is_refused[must_cite]
+FAILED tests/integration/test_09_from_run.py::test_09_2_r2_minor3_expectation_a_mask_would_change_is_refused[regex]
+FAILED tests/integration/test_09_from_run.py::test_09_2_r2_minor3_nothing_masked_lists_no_field
+FAILED tests/integration/test_09_from_run.py::test_09_2_r2_minor2_masking_follows_the_stored_policy[monitor-none-False]
+FAILED tests/integration/test_09_from_run.py::test_09_2_r2_minor2_masking_follows_the_stored_policy[off-none-False]
+10 failed, 48 passed in 65.76s (0:01:05)

@@ -2288,3 +2288,44 @@ Paket: 09-2 r3   Cevap: K-09-0052
 4. Hedefli test-int (03a + 09 + 06a agents/runs/read_side + 18td) iki profilde.
 
 Sonra `down -v` ve YIGIN-KAPA.
+
+### B-09-0065 · 2026-11-10 00:54 · → koordinator · ACK
+Paket: 09-2 r3   Cevap: K-09-0054
+ACK. Dal 0102386, ağaç temiz. 5 Kasım'dan kalan `ffcore-09` yığını `down -v` ile kaldırılıyor. Ardından YIGIN-AÇ ve K-09-0052 kapıları, sonra YIGIN-KAPA ve PR-HAZIR r3.
+
+### B-09-0066 · 2026-11-10 00:54 · → koordinator · YIGIN-AÇ
+Paket: 09-2 r3   Cevap: K-09-0054
+Kalıntı temizlendi (konteyner 0, volume 0). `ffcore-09` (18280/13280) `up -d --build --wait --pull never` ile açılıyor. Sırasıyla:
+1. OpenAPI yeniden üretimi.
+2. Kırmızı kanıt (e8d3e92 /red'de).
+3. lint, make test iki profilde.
+4. Hedefli test-int (03a + 09 + 06a + 18td) iki profilde.
+
+Sonra `down -v` ve YIGIN-KAPA.
+
+### B-09-0067 · 2026-11-10 01:11 · → koordinator · YIGIN-KAPA
+Paket: 09-2 r3   Cevap: K-09-0054
+`ffcore-09` `down -v` ile kapatıldı (konteyner 0, volume 0).
+
+### B-09-0068 · 2026-11-10 01:11 · → koordinator · PR-HAZIR
+Paket: 09-2 r3   Cevap: K-09-0052 / K-09-0054
+PR: `state/pr/09.md`, bölüm "PR 09-2 r3" · Sınıf [B] · SHA **d8e7119e9bc61614f19187f0f1cd6c40af8ceef1**. Delta `4e2fcad..d8e7119`, 6 commit; önce kırmızı test (e8d3e92). Ağaç temiz.
+
+Kapsam:
+- MINOR-1: PUT o sürümün süren sınavlarını `failed(definition_changed)` yapar.
+- MINOR-2: `masking` uygulanan kuraldan (`none|regex|regex+ner`).
+- MINOR-3: 422 `expected_would_be_masked` + `masked_fields`.
+- MINOR-4: `errors == {}`.
+- MINOR-5: publish ve PUT'ta agent satırı `FOR UPDATE`.
+- docs ve OpenAPI.
+
+Kırmızı kanıt (`09-2-r3-red.log`): birim 8 failed, entegrasyon 10 failed. Biri yanlış nedenle düştü: `_exam` yardımcısı süren sınava `ended_at` yazıyordu; 43bfbcf düzeltti, PR notunda açık.
+
+Kapılar @ d8e7119 (`09-2-r3-gates.log`):
+- lint: iki profilde geçti.
+- make test: 1787 / 1787, iki profilde.
+- Hedefli test-int (03a + 09 + 06a + 18td): 106 / 106, iki profilde.
+
+PR notları:
+- Not 1: süren madde koşuları puansız biter.
+- Not 2: tick ortasındaki dar pencere ve neden kabul edildiği.
