@@ -7,7 +7,8 @@ import { selectProject, signIn } from "./support";
 
 // GOREV kabul 5 (brief 10): a read-only user sees every exam screen with the same data and no
 // change control enabled. Each screen is captured in edit and in read mode for the PR
-// (docs/images/10c1-<screen>-{edit,read}.png); the difference is the controls and the badge only.
+// (docs/images/10c1-<screen>-{edit,read}.png) by the two superadmins of the fixture (edit and
+// read: same role, same menu), so the difference is the controls and the badge only.
 type Data = Awaited<ReturnType<typeof completedExam>>;
 
 const SCREENS: { name: string; open: (page: Page, d: Data) => Promise<unknown>; controls: string[] }[] = [
@@ -41,9 +42,9 @@ test.beforeAll(async () => {
 
 for (const screen of SCREENS) {
   test(`test_10c1_5_read_only: ${screen.name} in edit and read mode`, async ({ page, context, baseURL }) => {
-    const { alpha, analyst, reader } = fixture();
+    const { alpha, superadmin, reader } = fixture();
     for (const [mode, email] of [
-      ["edit", analyst.email],
+      ["edit", superadmin.email],
       ["read", reader.email],
     ] as const) {
       await context.clearCookies();
