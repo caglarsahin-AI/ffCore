@@ -86,7 +86,14 @@ SHELLS = frozenset({"sh", "bash"})
 MAX_NESTING = 3
 MAX_FF_STACKS = 3
 FF_STACK_RE = re.compile(r"^(ff|review)", re.IGNORECASE)
-ENV_RE = re.compile(r"(?<![\w.])\.env(?![.\w])", re.IGNORECASE)  # Windows: .ENV is .env
+# `.env` as a path inside one shell word (argument, redirection, option value, volume spec);
+# Windows: .ENV is .env. Words with whitespace are text (FOLLOWUP-189 e).
+ENV_PATH_RE = re.compile(r"(?:^|[/\\=<>:])\.env(?![.\w-])", re.IGNORECASE)
+HEREDOC_RE = re.compile(r"(?<!<)<<(?!<)-?\s*(['\"]?)([A-Za-z_][\w-]*)\1")
+GREP_HEADS = frozenset({"grep", "egrep", "fgrep", "rg"})
+GREP_PATTERN_OPTS = frozenset({"-e", "--regexp"})
+GREP_GLOB_OPTS = frozenset({"-g", "--glob", "--iglob", "--exclude", "--include", "--exclude-dir"})
+GREP_GLOB_PREFIXES = ("--exclude=", "--include=", "--exclude-dir=", "--glob=", "--iglob=")
 PAYCORE_RE = re.compile(r"paycorellm[/\\]+(?:data|eval[/\\]+results)(?:[/\\]|\b)", re.IGNORECASE)
 LOG_DETAIL_MAX = 120
 # Log masking (SECURITY_AND_PERMISSIONS: logs carry no secrets); applied before truncation.
@@ -838,6 +845,81 @@ def check_tokens(
     return found
 
 
+def strip_heredocs(command: str) -> str:
+    """Drop heredoc bodies (data for the ENV rule, FOLLOWUP-189 e); delimiter lines go too."""
+    lines = command.split("\n")
+    out: list[str] = []
+    i = 0
+    while i < len(lines):
+        line = lines[i]
+        out.append(line)
+        i += 1
+        for m in HEREDOC_RE.finditer(line):
+            while i < len(lines) and lines[i].strip() != m.group(2):
+                i += 1
+            i += 1
+    return "\n".join(out)
+
+
+def grep_files(toks: list[str]) -> list[str]:
+    """Arguments of grep/rg without the pattern and glob filters (those are text)."""
+    kept: list[str] = []
+    pattern_seen = opts_done = False
+    i = 1
+    while i < len(toks):
+        t = toks[i]
+        if not opts_done and t == "--":
+            opts_done = True
+        elif not opts_done and t.startswith("-") and len(t) > 1:
+            if t in GREP_PATTERN_OPTS or t in GREP_GLOB_OPTS:
+                pattern_seen = pattern_seen or t in GREP_PATTERN_OPTS
+                i += 1
+            elif t.startswith("--regexp="):
+                pattern_seen = True
+            elif t.startswith(GREP_GLOB_PREFIXES) or (t.startswith("-g") and len(t) > 2):
+                pass
+            elif t in ("-f", "--file") and i + 1 < len(toks):
+                kept.append(toks[i + 1])  # a pattern file is read
+                i += 1
+            else:
+                kept.append(t)
+        elif not pattern_seen:
+            pattern_seen = True
+        else:
+            kept.append(t)
+        i += 1
+    return kept
+
+
+def env_words(toks: list[str]) -> list[str]:
+    toks = unwrap(toks)
+    if not toks:
+        return []
+    args = grep_files(toks) if basename(toks[0]) in GREP_HEADS else toks
+    return [a for a in args if not any(ch.isspace() for ch in a) and ENV_PATH_RE.search(a)]
+
+
+def env_hits(text: str) -> bool:
+    """True when `.env` stands in argument/redirection position anywhere in the command,
+    including groups, substitutions, `sh -c` text and `compose run|exec` commands.
+    Every recursion works on strictly shorter text, so it ends."""
+    for pipeline in split_pipelines(text):
+        for part in pipeline:
+            outer, groups, subs = extract_nested(part)
+            if any(env_hits(body) for body in groups + subs):
+                return True
+            toks = tokens(outer)
+            if env_words(toks):
+                return True
+            inner = shell_inner(unwrap(toks))
+            if inner is not None and inner != text and env_hits(inner):
+                return True
+            service = compose_service_command(unwrap(toks))
+            if service is not None and service[1] and env_hits(shlex.join(service[1])):
+                return True
+    return False
+
+
 def check_bash(
     command: str,
     payload: Mapping,
@@ -846,7 +928,7 @@ def check_bash(
     depth: int = 0,
 ) -> list[Violation]:
     found: list[Violation] = []
-    if ENV_RE.search(command):
+    if env_hits(strip_heredocs(command)):
         found.append(
             Violation(
                 "ENV", ".env okunmaz ve yazılmaz; testler .env.test ile (SECURITY_AND_PERMISSIONS)"
