@@ -76,3 +76,11 @@ Bak: (1) MAJOR-1: compose `run|exec` seçenek/servis atlama (`-e K=V`, `--entryp
 ### K-HOOK-0009 · 2026-11-16 19:39 · → isci-a · CEVAP
 Paket: fix/ajan-hooklari · Cevap: A-HOOK-0008
 PR-HAZIR r2 alındı; 49b4343 doğrulandı (4 commit test→kod→docs, 6 dosya, state yok, çakışma yok, 136 passed yeniden koşuldu). VERIFIED. REVIEW-ISTEK K-HOOK-0008 inceleyiciye. Tırnağa duyarlı ayırıcı sapması kabul (PR notunda kalsın). Dal donuk; DUZELT gelirse uygula.
+
+### K-HOOK-0010 · 2026-11-16 19:47 · → isci-a · DUZELT
+Paket: fix/ajan-hooklari · Cevap: A-HOOK-0008
+**r2 ONAY (R-HOOK-0004, B0 M0 m3 N5; rapor state/reviews/fix-ajan-hooklari-r2.md).** Merge öncesi **r3 küçük dilim**, karar KARARLAR 'fix/ajan-hooklari r2 kararları': (1) **MINOR-2 fail-loud:** `check_tokens` derinlik sınırında (`depth >= MAX_NESTING`) hâlâ `shell_inner` ya da `compose_service_command` iç komut buluyorsa sessiz dönme yok: `GUARD-DERINLIK` kuralı ('iç içe komut 3 düzeyi aşıyor; denetlenemedi'), engel; test: R13 girdisi (4 düzey `sh -c`) işçi rolünde engel + 3 düzey serbest kalır. Önce kırmızı test, ayrı commit. (2) **MINOR-1 yalnız belge:** ENVIRONMENT/SECURITY 'Bilinen sınırlar' satırına `env`, `command`, `time`, `bash -o <opt> -c`, `$(…)`, `{ …; }` öneklerinin denetlenmediği eklenir (kod değişmez; FOLLOWUP-189'a taşındı). (3) **MINOR-3** FOLLOWUP-189; dokunma. NOTE'lar PR notuna. Kapı: `tests/hooks` tee `hook-tests-r3.log`, ruff `hook-ruff-r3.log`. PR-HAZIR r3 (`SHA:`, delta `49b4343..`).
+
+### K-HOOK-0011 · 2026-11-16 19:47 · → inceleyici · ACK
+Paket: fix/ajan-hooklari · Cevap: R-HOOK-0004
+ONAY alındı; rapor ve kanıtlar commit edilecek. Karar: MINOR-2 (sessiz derinlik) fail-loud ihlali, r3 küçük dilimde kapanır (`GUARD-DERINLIK` engel + test); MINOR-1 kod olarak ve MINOR-3 FOLLOWUP-189'a (fix/ajan-hooklari-2) eklendi, r3'te yalnız belge satırı. r3 teyit turu: delta `49b4343..`, R13 girdisi + 3 düzey serbest + belge satırı; kısa.
