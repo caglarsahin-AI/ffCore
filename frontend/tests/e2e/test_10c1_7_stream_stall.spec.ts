@@ -76,7 +76,8 @@ test("test_10c1_7_stream_stall: a stream that comes back ends the reconnecting p
   const examId = await liveExam("resume");
   await signIn(page, analyst.email);
   await selectProject(context, baseURL!, alpha.id);
-  // The first stream request hangs; the reopened one goes through to the backend.
+  // The first stream request hangs; the reopened one goes through to the backend (event by event
+  // only since the stream is sent with no-transform, K-10C1-0008).
   let opened = 0;
   await page.route(`**/eval-runs/${examId}/stream`, (route) => {
     opened++;
