@@ -17,6 +17,13 @@
       "pr": "fix-ajan-hooklari",
       "lease": "ffcore-isci-a-hook",
       "acildi": "2026-11-16T10:47"
+    },
+    "local_44d96dbb-ad78-428a-9ad6-53359a5754cc": {
+      "rol": "isci-b",
+      "paket": "fix/ajan-hooklari-2",
+      "pr": "fix-ajan-hooklari-2",
+      "lease": "ffcore-isci-b-hook2",
+      "acildi": "2026-11-16T22:35"
     }
   }
 }
