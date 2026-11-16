@@ -382,13 +382,13 @@ def worktree_inner(rel: str, root: Path) -> list[str] | None:
 
 
 def owner_of(rel: str) -> tuple[str, str] | None:
-    """('role', name) or ('pr', stem) for single-writer files under the main root."""
+    """('role'|'channel', name) or ('pr', stem) for single-writer files under the main root."""
     low = rel.lower()
-    if low in COORDINATOR_FILES:
+    if low in COORDINATOR_FILES or low.startswith(("state/arsiv/", "state/kanal/arsiv/")):
         return ("role", "koordinator")
     m = re.match(r"^state/kanal/([^/]+)\.md$", rel, re.IGNORECASE)
     if m:
-        return ("role", m.group(1).lower())
+        return ("channel", m.group(1).lower())
     m = re.match(r"^state/pr/([^/]+)\.md$", rel, re.IGNORECASE)
     if m:
         return ("pr", m.group(1))
@@ -426,6 +426,12 @@ def check_write(path: str, payload: Mapping, env: Mapping[str, str]) -> list[Vio
     if info.rol is None:
         return [Violation("TEK-YAZAR", f"{rel}: {no_role_message(info, payload, env)}")]
     kind, name = owner
+    if kind == "channel":
+        # The coordinator moves MERGED-package messages to state/kanal/arsiv/
+        # (MULTI_AGENT_PROTOCOL "Bağlam bütçesi ve arşiv"); nobody else writes here.
+        if info.rol not in (name, "koordinator"):
+            return [Violation("TEK-YAZAR", f"{rel} → {name}; senin rolün {info.rol}")]
+        return []
     if kind == "role":
         if info.rol != name:
             return [Violation("TEK-YAZAR", f"{rel} → {name}; senin rolün {info.rol}")]
