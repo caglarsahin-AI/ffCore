@@ -49,4 +49,10 @@
 
 ## Varsayımlar ve brief'teki çelişkiler
 
+## Tasarım notu (isteğe bağlı; tur kuralı tetik 1: aynı MAJOR sınıfı iki ardışık turda)
+- Korunacak değişmez(ler):
+- Sınırın iki yanındaki testler:
+- Önceki yamanın neden yetmediği:
+- İnceleyici onayı (mesaj ID):
+
 ## Kalan riskler

@@ -610,7 +610,7 @@ NER gecikme kabulü (boşta P95 < 300 ms) geliştirme dizüstünde ölçüldü. 
 | 1 | Kesin kurallar yalnız metinde; hiçbiri araçla zorlanmıyor | PROSES-175 (çıplak `compose build` dışarı bağlandı), K-05a-0011 (kapı logu yok, kırmızı kayboldu), 5 Kasım OOM (yığın sınırı aşıldı) | Hook ve izin ayarı (9.2) | **Kullanıcı onayladı (16 Kasım); uygulama bekliyor** |
 | 2 | İnsan denetimi fiilen yok; dalga kapıları ve DOC-19 tutarlılık denetimi yapılmamış | `WORK_QUEUE.md` "Kapılar" tablosunun kanıt sütunu boş; belgeler arası üç çelişki (kanıt dosyası, iki ya da üç yığın, push) | A: dalga kapısında insana tek sayfalık rapor (9.3) | **Kullanıcı A'yı seçti (16 Kasım); uygulama bekliyor** |
 | 3 | Bağlam yükü büyüdü (context rot) | Koordinatör kanalı 4.107 satır, BLOCKERS 181 kayıt, KARARLAR satırları çok uzun | Kanal arşivi, BLOCKERS'ı açık ve kapalı olarak bölmek, KARARLAR indeksi (9.4) | **Kullanıcı kabul etti (16 Kasım); uygulama bekliyor** |
-| 4 | İnceleme döngüsünün durma kuralı yok | 08-tam-1a 7 tur, 09-1 6 tur; zamanlama sınıfı 4 tur | Aynı sınıf iki ardışık turda MAJOR verirse tasarım notu; üçüncü turda koordinatör kapsam kararı (9.5) | öneri, ayrıntılı |
+| 4 | İnceleme döngüsünün durma kuralı yok | 08-tam-1a 7 tur, 09-1 6 tur; zamanlama sınıfı 4 tur | Aynı sınıf iki ardışık turda MAJOR verirse tasarım notu; üçüncü turda koordinatör kapsam kararı (9.5) | **Kullanıcı A'yı seçti (16 Kasım); uygulama bekliyor** |
 | 5 | Sekreter depoda kayıtsız; push sahipliği yazılı değil | `MULTI_AGENT_PROTOCOL.md` "ajanlar push etmez" | Sekreter rolünü ve kanalını handbook'a yazmak; push: karar kullanıcıda, işlem koordinatörde | push sahipliği kullanıcı kararıyla netleşti (16 Kasım); handbook bekliyor |
 | 6 | CI yok, kapılar tek makinede | EXECUTION_HANDBOOK 5.11 hiç çalışmadı; ENV-171 Docker arızaları | Headless Claude ya da CI ile kapı | öneri |
 | 7 | Mesajlar serbest metin, makine okuyamıyor | DURUM ve PR-HAZIR mesajları yalnız insan için | Mesaj başlığına yapılandırılmış alanlar | öneri |
@@ -763,7 +763,7 @@ Her dalga kapanışında koordinatör tek sayfalık bir rapor hazırlar ve insan
 3. İlk arşivleme bir sonraki dalga kapanışında yapılır.
 4. Ölçüm betiği hook dalıyla (9.2) aynı PR'a girebilir. (Koordinatörün planında ayrı bir dilim; bkz. madde 1.)
 
-### 9.5 İnceleme tur kuralı (bulgu 4; öneri)
+### 9.5 İnceleme tur kuralı (bulgu 4; kullanıcı A'yı kabul etti, 16 Kasım; uygulama bekliyor)
 
 **Sorun.** İnceleme döngüsünün bir çıkış ölçütü yok. Her tur yeni bir kenar durumu bulunca döngü devam ediyor. Uzun döngülerin ortak noktası, **aynı hata sınıfının** her turda yeni bir biçimde geri gelmesi:
 

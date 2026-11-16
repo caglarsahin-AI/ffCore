@@ -103,6 +103,14 @@ Gözden geçiren, uygulayandan farklı ve kalıcı **inceleyici oturumudur** (MU
 
 Uygulayanın açıklaması kanıt değildir; gözden geçiren diff'i ve test çıktısını okur.
 
+### Tur kuralı (16 Kasım 2026, kullanıcı kararı)
+
+- İnceleyici her MAJOR'a kısa bir **sınıf adı** verir (ör. `tick-bütçesi`, `url-html-atlatma`); önceki turun devamıysa "tekrar: rN MAJOR-x" yazar. Rapor başlığında MAJOR sayısıyla birlikte sınıf listesi yer alır.
+- **Tetik 1:** aynı sınıf iki ardışık turda MAJOR verirse yama durur. İşçi kod yazmadan önce PR notuna **Tasarım notu** yazar: korunacak değişmez(ler), sınırın iki yanındaki testler, önceki yamanın neden yetmediği. İnceleyici notu kanalda onaylar (kısa), kod ondan sonra gelir.
+- **Tetik 2:** üçüncü turun sonunda hâlâ MAJOR varsa koordinatör kapsam kararı verir ve KARARLAR'a yazar: (a) tasarım notu, (b) paketi bölmek, (c) MAJOR'u gerekçesiyle FOLLOWUP'a indirmek. Güvenlik ve veri sınırı bulgularında (c) seçeneği yoktur.
+- Beşinci tura varan paket dalga raporunda ayrı satır olur.
+- MINOR ve NOTE turu uzatmaz; ONAY yine yalnız BLOCKER ve MAJOR sıfırken verilir.
+
 ## 8. Dalga kapanışı
 
 Dalga kapısı paket kapılarından geniştir: temiz checkout, tam test, Alembic tek head, `make smoke`, iki profil, docs güncel, açık blocker yok, kilometre taşı tanımı (PLAN 8) sağlandıysa kullanıcıya rapor. Ayrıca **iç tutarlılık denetimi** (FELSEFE DOC-19): PLAN.md sürüm ve geçmişi, brief ↔ CONTRACTS ↔ KARARLAR çapraz referansları, TERMINOLOGY'ye aykırı terim, "X yasak" deyip X kullanan yer; bulgular `DRIFT-` kaydı. Kapı kanıtı olmadan sonraki dalga READY olmaz.
