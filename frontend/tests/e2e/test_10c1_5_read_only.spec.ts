@@ -8,7 +8,8 @@ import { selectProject, signIn } from "./support";
 // GOREV kabul 5 (brief 10): a read-only user sees every exam screen with the same data and no
 // change control enabled. Each screen is captured in edit and in read mode for the PR
 // (docs/images/10c1-<screen>-{edit,read}.png) by the two superadmins of the fixture (edit and
-// read: same role, same menu), so the difference is the controls and the badge only.
+// read: same role, same menu), so the difference is the controls and the badge only. A project
+// member in read mode (analyst+read, R-10C1-0003 MINOR-3) gets the same checks, no screenshot.
 type Data = Awaited<ReturnType<typeof completedExam>>;
 
 const SCREENS: { name: string; open: (page: Page, d: Data) => Promise<unknown>; controls: string[] }[] = [
@@ -42,10 +43,11 @@ test.beforeAll(async () => {
 
 for (const screen of SCREENS) {
   test(`test_10c1_5_read_only: ${screen.name} in edit and read mode`, async ({ page, context, baseURL }) => {
-    const { alpha, superadmin, reader } = fixture();
-    for (const [mode, email] of [
-      ["edit", superadmin.email],
-      ["read", reader.email],
+    const { alpha, superadmin, reader, analystReader } = fixture();
+    for (const [mode, email, shot] of [
+      ["edit", superadmin.email, true],
+      ["read", reader.email, true],
+      ["read", analystReader.email, false],
     ] as const) {
       await context.clearCookies();
       await signIn(page, email);
@@ -65,7 +67,7 @@ for (const screen of SCREENS) {
         // No enabled cancel control on an ended exam and none in read mode at all.
         await expect(page.locator("button:not([disabled])[data-testid^='eval-cancel']")).toHaveCount(0);
       }
-      await page.screenshot({ path: `../docs/images/10c1-${screen.name}-${mode}.png`, fullPage: true });
+      if (shot) await page.screenshot({ path: `../docs/images/10c1-${screen.name}-${mode}.png`, fullPage: true });
     }
   });
 }
