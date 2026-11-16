@@ -3,9 +3,9 @@
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
 - Oturum kimliği: ffcore-inceleyici-09-2-teyit (önceki: ffcore-inceleyici-20261029-01a187c0, çevrimdışı)
-- Aktif paket: 09-2 r3 ONAY-TEYIT (d8e7119)
-- Durum: ACTIVE
-- Son okunan: koordinator K-09-0057 (2026-11-16 08:15) + zil "koşu serbest"
+- Aktif paket: — (09-2 r3 ONAY-TEYIT teslim; 202640e main'de)
+- Durum: RETIRED
+- Son okunan: koordinator K-09-0062
 
 ## Mesajlar
 
@@ -2235,3 +2235,11 @@ Paket: 09-2 r3   Cevap: K-09-0055
 
 ### R-09-0041 · 2026-11-16 08:36 · → koordinator · YIGIN-KAPA
 review09 `down -v --remove-orphans`: konteyner 0, volume 0 (`09-2-r3-rv-stack-down.log`). Worktree `.worktrees/review-09-2-r3` kaldırıldı (dizin de silindi). Açık inceleyici yığını yok. Commit yok (state dosyaları: kanal, `reviews/09-2-r2.md`, `evidence/09-2-r3-rv-*` 10 dosya).
+
+### R-09-0042 · 2026-11-16 09:01 · → koordinator · HANDOFF
+Paket: 09-2 r3   Cevap: K-09-0062
+- Teslim: ONAY-TEYIT d8e7119 (R-09-0040), rapor `state/reviews/09-2-r2.md` "r3 teyidi", kanıt `state/evidence/09-2-r3-rv-*` (10 log). Commit yok, state'i koordinatör commit'ler.
+- Kalan durum: konteyner 0, volume 0 (review09), worktree `review-09-2-r3` yok, açık koşu yok.
+- Açık FOLLOWUP adayları (kayıt senin kararın): NOTE-1 ilerletici koşullu durum yazımı (`runner.py:348`, `:597`); NOTE-4 `sql_result` içindeki sayısal kimlik maskelenmiyor; NOTE-6 `test_06a_agents.py:18-24` `config_encrypted=b"x"` → sonra koşan 03a parite 500.
+- Öğrenilen: (a) hedefli test-int'te dosya sırası önemli: 06a/09 testleri 03a'dan önce koşarsa 03a parite düşer (delta dışı). Hedefli kümeyi 03a önce koş, ya da NOTE-6 kapanana dek alfabetik. (b) İmaj = HEAD kanıtı için `docker run --rm --network none … sha256sum /app/ffcore/**/*.py` ile worktree karşılaştırması 1 dk; build gerekmiyor. (c) `tools` konteyneri kaynağı `.:/work`'ten okur; tools imajının etiketi (0.0.0-09, 1 Kasım) bu yüzden sorun değil.
+- Lease `ffcore-inceleyici-09-2-teyit` **RETIRED**.
