@@ -269,14 +269,29 @@ def no_role_message(info: RoleInfo, payload: Mapping, env: Mapping[str, str]) ->
 # --- Bash rules -------------------------------------------------------------
 
 
+COMPOUND_OPEN = frozenset({"for", "while", "until", "if", "case", "select"})
+COMPOUND_CLOSE = frozenset({"done", "fi", "esac"})
+# words after which the next word is again in command position
+CMD_PREFIX_WORDS = frozenset(
+    {"do", "then", "else", "elif", "!", "{", "time", "while", "until", "if"}
+)
+WORD_END = " \t\n;&|()<>"
+ENV_VALUE_OPTS = frozenset({"-u", "--unset", "-C", "--chdir", "-S", "--split-string"})
+SHELL_VALUE_OPTS = frozenset({"--rcfile", "--init-file"})
+
+
 def split_pipelines(command: str) -> list[list[str]]:
     """Split on unquoted `&&`, `||`, `;`, newline and `&` into pipelines, each split on
-    unquoted `|`. Quotes are respected so `sh -c 'a && b'` stays one element; redirections
-    such as `2>&1`, `&>` and `>&` are not separators."""
+    unquoted `|`. Quotes and backticks are respected so `sh -c 'a && b'` stays one element;
+    redirections such as `2>&1`, `&>` and `>&` are not separators. Groups `( … )`, `{ …; }`,
+    `$( … )` and compound commands (`for/while/until/if/case … done/fi/esac`) are kept whole
+    so a `| tee` after them covers their body (D2, FOLLOWUP-189 c)."""
     pipelines: list[list[str]] = []
     parts: list[str] = []
     buf: list[str] = []
     quote: str | None = None
+    depth = 0
+    cmd_start = True
     i, n = 0, len(command)
 
     def cut_part() -> None:
@@ -291,7 +306,7 @@ def split_pipelines(command: str) -> list[list[str]]:
     while i < n:
         c = command[i]
         if quote:
-            if c == "\\" and quote == '"' and i + 1 < n:
+            if c == "\\" and quote != "'" and i + 1 < n:
                 buf.append(command[i : i + 2])
                 i += 2
                 continue
@@ -300,22 +315,36 @@ def split_pipelines(command: str) -> list[list[str]]:
             buf.append(c)
             i += 1
             continue
-        if c in ("'", '"'):
+        if c in ("'", '"', "`"):
             quote = c
+            cmd_start = False
             buf.append(c)
             i += 1
             continue
         if c == "\\" and i + 1 < n:
             buf.append(command[i : i + 2])
+            cmd_start = False
             i += 2
+            continue
+        if c in " \t":
+            buf.append(c)
+            i += 1
             continue
         two = command[i : i + 2]
         if two in ("&&", "||"):
-            cut_pipeline()
+            cmd_start = True
+            if depth:
+                buf.append(two)
+            else:
+                cut_pipeline()
             i += 2
             continue
         if c in (";", "\n"):
-            cut_pipeline()
+            cmd_start = True
+            if depth:
+                buf.append(c)
+            else:
+                cut_pipeline()
             i += 1
             continue
         if c == "&":
@@ -324,22 +353,227 @@ def split_pipelines(command: str) -> list[list[str]]:
             if prev in (">", "<") or nxt == ">":
                 buf.append(c)
             else:
-                cut_pipeline()
+                cmd_start = True
+                if depth:
+                    buf.append(c)
+                else:
+                    cut_pipeline()
             i += 1
             continue
         if c == "|":
             if i and command[i - 1] == ">":  # `>|` clobber redirection
                 buf.append(c)
             else:
-                cut_part()
-                if i + 1 < n and command[i + 1] == "&":  # `|&` pipes stderr too
+                cmd_start = True
+                pipe_err = i + 1 < n and command[i + 1] == "&"  # `|&` pipes stderr too
+                if depth:
+                    buf.append("|&" if pipe_err else c)
+                else:
+                    cut_part()
+                if pipe_err:
                     i += 1
             i += 1
             continue
-        buf.append(c)
-        i += 1
+        if c == "(":
+            depth += 1
+            cmd_start = True
+            buf.append(c)
+            i += 1
+            continue
+        if c == ")":
+            depth = max(0, depth - 1)
+            cmd_start = False
+            buf.append(c)
+            i += 1
+            continue
+        j = i
+        while j < n and command[j] not in WORD_END and command[j] not in "'\"`\\":
+            j += 1
+        if j == i:  # `<` or `>`
+            buf.append(c)
+            i += 1
+            continue
+        word = command[i:j]
+        whole = j >= n or command[j] in WORD_END
+        if cmd_start and whole:
+            if word in COMPOUND_OPEN or word == "{":
+                depth += 1
+            elif word in COMPOUND_CLOSE or word == "}":
+                depth = max(0, depth - 1)
+        cmd_start = whole and (word in CMD_PREFIX_WORDS or (cmd_start and "=" in word))
+        buf.append(word)
+        i = j
     cut_pipeline()
     return pipelines
+
+
+def closing(s: str, start: int, open_c: str, close_c: str) -> int:
+    """Index of the bracket that closes the one just before `start` (len(s) if none)."""
+    level, quote, j = 1, None, start
+    while j < len(s):
+        c = s[j]
+        if quote:
+            if c == "\\" and quote != "'":
+                j += 2
+                continue
+            if c == quote:
+                quote = None
+        elif c in "'\"`":
+            quote = c
+        elif c == "\\":
+            j += 2
+            continue
+        elif c == open_c:
+            level += 1
+        elif c == close_c:
+            level -= 1
+            if level == 0:
+                return j
+        j += 1
+    return len(s)
+
+
+COMPOUND_WORD_RE = re.compile(r"(?<![\w$-])(for|while|until|if|case|select|done|fi|esac)(?![\w-])")
+
+
+def compound_body(part: str) -> tuple[str, str] | None:
+    """(body, trailing redirections) of a compound command part, else None."""
+    s = part.lstrip()
+    m = re.match(r"(for|while|until|if|case|select)(?=[\s;]|$)", s)
+    if not m:
+        return None
+    level = 0
+    for w in COMPOUND_WORD_RE.finditer(s):
+        level += 1 if w.group(1) in COMPOUND_OPEN else -1
+        if level == 0:
+            return s[m.end() : w.start()], s[w.end() :]
+    return s[m.end() :], ""
+
+
+def extract_nested(part: str) -> tuple[str, list[str], list[str]]:
+    """(outer text, group bodies, substitution bodies) of one pipeline element.
+
+    Groups (`( … )`, `{ …; }`, compound commands) stay on the same nesting level;
+    substitutions (`$( … )`, backticks; not inside single quotes) open a new level."""
+    body = compound_body(part)
+    if body is not None:
+        return body[1], [body[0]], []
+    out: list[str] = []
+    groups: list[str] = []
+    subs: list[str] = []
+    quote: str | None = None
+    i, n = 0, len(part)
+    while i < n:
+        c = part[i]
+        if quote == "'":
+            if c == "'":
+                quote = None
+            out.append(c)
+            i += 1
+            continue
+        if c == "\\" and i + 1 < n:
+            out.append(part[i : i + 2])
+            i += 2
+            continue
+        if part.startswith("$(", i):
+            j = closing(part, i + 2, "(", ")")
+            subs.append(part[i + 2 : j])
+            out.append("_")
+            i = j + 1
+            continue
+        if c == "`":
+            j = part.find("`", i + 1)
+            j = n if j < 0 else j
+            subs.append(part[i + 1 : j])
+            out.append("_")
+            i = j + 1
+            continue
+        if quote == '"':
+            if c == '"':
+                quote = None
+            out.append(c)
+            i += 1
+            continue
+        if c in ("'", '"'):
+            quote = c
+            out.append(c)
+            i += 1
+            continue
+        if c == "(":
+            j = closing(part, i + 1, "(", ")")
+            groups.append(part[i + 1 : j])
+            out.append(" ")
+            i = j + 1
+            continue
+        if (
+            c == "{"
+            and (i + 1 >= n or part[i + 1] in " \t\n")
+            and (i == 0 or part[i - 1] in " \t\n;&|(")
+        ):
+            j = closing(part, i + 1, "{", "}")
+            groups.append(part[i + 1 : j])
+            out.append(" ")
+            i = j + 1
+            continue
+        out.append(c)
+        i += 1
+    return "".join(out), groups, subs
+
+
+def unwrap(toks: list[str]) -> list[str]:
+    """Drop command wrappers and shell keywords so the rules see the real command.
+
+    Leading `K=V` assignments (also those given to `env`) are kept in front, which keeps
+    the push flag check working. Returns only the assignments for non-commands
+    (`command -v`, `for x in …` headers, closing keywords)."""
+    assigns: list[str] = []
+    rest = list(toks)
+    while True:
+        bare = strip_assignments(rest)
+        assigns += rest[: len(rest) - len(bare)]
+        rest = bare
+        if not rest:
+            return assigns
+        head = basename(rest[0])
+        if rest[0] in ("!", "{", "}", "then", "do", "else", "elif", "while", "until", "if"):
+            rest = rest[1:]
+        elif head in ("time", "nohup"):
+            rest = rest[1:]
+            if head == "time" and rest[:1] == ["-p"]:
+                rest = rest[1:]
+        elif rest[0] in ("for", "select", "case", "in", "done", "fi", "esac"):
+            return assigns
+        elif head == "env":
+            i = 1
+            while i < len(rest):
+                t = rest[i]
+                if t == "--":
+                    i += 1
+                    break
+                if t in ENV_VALUE_OPTS:
+                    i += 2
+                elif t.startswith("-"):
+                    i += 1
+                else:
+                    break
+            rest = rest[i:]
+        elif head == "command":
+            if rest[1:2] in (["-v"], ["-V"]):
+                return assigns
+            rest = rest[2:] if rest[1:2] == ["-p"] else rest[1:]
+        elif head == "nice":
+            if rest[1:2] in (["-n"], ["--adjustment"]):
+                rest = rest[3:]
+            elif rest[1:2] and rest[1].startswith("-"):
+                rest = rest[2:]
+            else:
+                rest = rest[1:]
+        elif head == "exec":
+            rest = rest[1:]
+            while rest and rest[0].startswith("-"):
+                rest = rest[2:] if rest[0] == "-a" else rest[1:]
+        else:
+            return assigns + rest
 
 
 def tokens(part: str) -> list[str]:
@@ -440,13 +674,20 @@ def shell_inner(toks: list[str]) -> str | None:
     rest = strip_assignments(toks)
     if not rest or basename(rest[0]) not in SHELLS:
         return None
-    for i in range(1, len(rest) - 1):
+    want_c, i = False, 1
+    while i < len(rest):
         t = rest[i]
-        if not t.startswith("-"):
-            return None
-        if not t.startswith("--") and "c" in t[1:]:
-            return rest[i + 1]
-    return None
+        if t in SHELL_VALUE_OPTS:
+            i += 2
+        elif t.startswith("--"):
+            i += 1
+        elif len(t) > 1 and t[0] in "-+":
+            # -o/-O take a value, also inside a cluster such as -euo pipefail
+            want_c = want_c or (t[0] == "-" and "c" in t[1:])
+            i += 2 if ("o" in t[1:] or "O" in t[1:]) else 1
+        else:
+            break
+    return rest[i] if want_c and i < len(rest) else None
 
 
 def check_compose(toks: list[str]) -> list[Violation]:
@@ -555,10 +796,18 @@ KAPI_MESSAGE = (
 )
 
 
+DEPTH_VIOLATION = Violation(
+    "GUARD-DERINLIK",
+    f"iç içe komut {MAX_NESTING} düzeyi aşıyor; denetlenemedi "
+    "(sh -c / compose run|exec / $(…) zincirini kısalt)",
+)
+
+
 def check_tokens(
     toks: list[str], has_tee: bool, payload: Mapping, env: Mapping[str, str], depth: int
 ) -> list[Violation]:
     """Rules for one pipeline element, recursing into compose run|exec and sh -c."""
+    toks = unwrap(toks)
     found = check_push(toks, payload, env) + check_compose(toks)
     if is_gate_command(toks) and not has_tee:
         found.append(Violation("KAPI", KAPI_MESSAGE))
@@ -566,13 +815,7 @@ def check_tokens(
         service = compose_service_command(toks)
         if shell_inner(toks) is not None or (service is not None and service[1]):
             # fail-loud: an inner command we will not inspect is never let through silently
-            found.append(
-                Violation(
-                    "GUARD-DERINLIK",
-                    f"iç içe komut {MAX_NESTING} düzeyi aşıyor; denetlenemedi "
-                    "(sh -c / compose run|exec zincirini kısalt)",
-                )
-            )
+            found.append(DEPTH_VIOLATION)
         return found
     service = compose_service_command(toks)
     if service is not None:
@@ -608,13 +851,23 @@ def check_bash(
             )
         )
     for pipeline in split_pipelines(command):
-        parts = [tokens(p) for p in pipeline]
-        has_tee = any(
-            strip_assignments(t)[:1] and basename(strip_assignments(t)[0]) == "tee" for t in parts
+        pieces = [extract_nested(p) for p in pipeline]
+        parts = [tokens(outer) for outer, _, _ in pieces]
+        tee = outer_tee or any(
+            strip_assignments(unwrap(t))[:1] and basename(strip_assignments(unwrap(t))[0]) == "tee"
+            for t in parts
         )
         for toks in parts:
             if toks:
-                found.extend(check_tokens(toks, has_tee or outer_tee, payload, env, depth))
+                found.extend(check_tokens(toks, tee, payload, env, depth))
+        for _, groups, subs in pieces:
+            for body in groups:  # same shell level; the body is strictly shorter
+                found.extend(check_bash(body, payload, env, outer_tee=tee, depth=depth))
+            for body in subs:
+                if depth >= MAX_NESTING:
+                    found.append(DEPTH_VIOLATION)
+                else:
+                    found.extend(check_bash(body, payload, env, outer_tee=tee, depth=depth + 1))
     unique: dict[tuple[str, str], Violation] = {}
     for v in found:
         unique.setdefault((v.rule, v.message), v)
