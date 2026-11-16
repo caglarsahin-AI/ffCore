@@ -1,1 +1,5 @@
 2026-11-16T19:09:21	warn	-	Bash	ENV	if [ -f .env ]; then echo ".env dosyası mevcut; içerik bu çıktıya yazılmadı"; else echo ".env bulunamadı"; fi
+2026-11-16T22:26:25	warn	koordinator	Bash	ENV	R=/c/ai_paycore/ffcore; P=/c/ai_paycore/paycoreLLM; echo "== ffcore"; grep -rn --exclude-dir=node_modules --exclude-dir=
+2026-11-16T22:29:03	warn	koordinator	Bash	ENV	R=/c/ai_paycore/ffcore; cat > "C:/Users/CAGLAR~1.SAH/AppData/Local/Temp/claude/9398d5fca5badfb5/d131353f-4058-4872-8ded-
+2026-11-16T22:33:05	warn	koordinator	Bash	ENV	R=/c/ai_paycore/ffcore; cat > "C:/Users/CAGLAR~1.SAH/AppData/Local/Temp/claude/9398d5fca5badfb5/d131353f-4058-4872-8ded-
+2026-11-16T22:35:56	warn	koordinator	Bash	ENV	R=/c/ai_paycore/ffcore; cat > "C:/Users/CAGLAR~1.SAH/AppData/Local/Temp/claude/9398d5fca5badfb5/d131353f-4058-4872-8ded-
