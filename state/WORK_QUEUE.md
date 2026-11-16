@@ -55,6 +55,7 @@ Bu tablo yalnız durumdur (bağlam bütçesi kararı, 16 Kasım 2026). Tam satı
 | 09 | DONE (09-1 + 09-2 MERGED) | B (yeni taze oturum, 4 Kasım 19:02, lease ffcore-isci-b-09, Opus 5.5) | feat/09-evaluation | R-09-0042 |
 | 10c-1 | DONE (MERGED) | isci-c (ffcore-isci-c-10c1, 2026-11-16) | feat/10c-1-eval-ui | R-10C1-0007 |
 | fix/ajan-hooklari | DONE | isci-a (ffcore-isci-a-hook, 2026-11-16) | fix/ajan-hooklari | A-HOOK-0002; A-HOOK-0007; r1 R-HOOK-0002 DEGISIKLIK (M2: kapi-tee-kapsami, kayit-secret-sizintisi; m2) → K-HOOK-0006; A-HOOK-0008 49b4343; r2 R-HOOK-0004 ONAY B0 M0 m3 N5 → K-HOOK-0010; A-HOOK-0009 7a1195a; r3 R-HOOK-0006 ONAY B0 M0 m0 N3; MERGED 2d44b0c (kapı gate-hook-20261116.log 142 passed, ruff temiz) |
+| fix/ajan-hooklari-2 | PLANNED (GOREV K-HOOK2-0001; kullanıcı A seçti 2026-11-16) | B (yeni oturum ROL=isci-b PAKET=fix/ajan-hooklari-2, lease ffcore-isci-b-hook2) | fix/ajan-hooklari-2 (baz main e2ce5e7) | K-HOOK2-0001 |
 | fix/19r2-dis-inceleme | MERGED | B (yeni oturum, 4 Kasım 14:02, lease ffcore-isci-b-19r2) | paycoreLLM fix/19r2-dis-inceleme (silindi) | K-19R2-0010 |
 | fix/19r3-env-tests | MERGED | B (yeni oturum ROL=isci-b PAKET=fix/19r3; kanal state/kanal/isci-d.md, lease ffcore-isci-d-19r3) | paycoreLLM fix/19r3-env-tests (silindi, HANDOFF sonrası) | K-19R3-0012 |
 | 08-tam-1c-olcum | DONE (1c-a + 1c-b MERGED) | A (yeni oturum ROL=isci-a PAKET=08-tam-1c-olcum) | feat/08-tam-1c-olcum (main 63ffb16+) | A-08T1C-0025 |
