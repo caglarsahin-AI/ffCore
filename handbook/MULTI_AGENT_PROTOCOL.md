@@ -69,16 +69,29 @@ Her rol ayrı bir oturumdur (ayrı sohbet). Oturumlar birbirinin bağlamını g�
 
 **Rol adları ve dosyaları:** `koordinator`, `inceleyici`, `isci-a`, `isci-b`, `isci-c`, `test` (yeni işçi gerekirse `isci-d`; dosyayı koordinatör açar). İşçi rolü bir şerittir, oturum değildir: her paket için yeni oturum açılır, aynı kanal dosyasını kullanır. Kanal başlığındaki `Aktif paket`, `Oturum kimliği` ve `Durum` (`ACTIVE`/`RETIRED`) bir lease'tir; koordinatör eski oturumu `RETIRED` yapmadan aynı role yeni paket vermez.
 
-**Mesaj biçimi.** Kendi kanal dosyasının sonuna eklenir, eski mesaj değiştirilmez:
+**Mesaj biçimi (16 Kasım 2026 kararı; yeni mesajlardan itibaren; eski mesajlar değişmez).** Kendi kanal dosyasının sonuna eklenir, eski mesaj değiştirilmez:
 
 ```
-### <ID> · <YYYY-MM-DD HH:MM> · → <alıcı rol> · <TÜR>
-Paket: <kod>   Cevap: <cevaplanan ID ya da ->
+### <ID> · <YYYY-MM-DD HH:MM> · → <alici> · <TUR>
+Paket: <kod> · Cevap: <ID|-> · <türe göre zorunlu alanlar>
 <en fazla ~15 satır; ayrıntı dosyadaysa yolunu ver>
 ```
 
-- ID: rol, paket ve sıra no: `K-00-0001`, `R-00-0001`, `A-00-0001`, `T-13a-0001`. Böylece aynı rolün yeni paket oturumunda ID çakışmaz.
-- Türler: `GOREV` (koordinatör → işçi: paket, branch, worktree, touch-zone, bağımlı teslimatlar), `ACK` (mesaj alındı ve işleme alındı), `SORU` ve `CEVAP`, `DURUM` (WORK_QUEUE geçişi talebi: PLANNED, IMPLEMENTED, VERIFIED, BLOCKED), `KARAR-GEREK` (kullanıcı kararı; A/B/C seçenekli, önerilen işaretli), `KAYIT-TALEBI` (BLOCKERS kaydı), `PR-HAZIR` (tam commit SHA zorunlu), `REVIEW-ISTEK` (tam commit SHA zorunlu), `REVIEW-SONUC` (incelenen tam SHA zorunlu), `DUZELT` (koordinatör → işçi), `HANDOFF` (oturum kapanışı). `GOREV`, `DUZELT`, `REVIEW-ISTEK` ve `KARAR-GEREK` alıcısı `ACK` yazar; aynı ID ikinci kez uygulanmaz.
+- **ID:** rol harfi, paket ve sıra: `K-00-0001`, `R-00-0001`, `A-00-0001`, `T-13a-0001`; aynı rolün yeni paket oturumunda çakışmaz.
+- **Tür listesi (kapalı, ASCII; açıklama türün yanına değil gövdeye):** `GOREV`, `GOREV-EK`, `ACK`, `SORU`, `CEVAP`, `DURUM`, `KARAR-GEREK`, `KAYIT-TALEBI`, `PLAN-ONAY`, `PR-HAZIR`, `REVIEW-ISTEK`, `REVIEW-SONUC`, `DUZELT`, `ONAY-TEYIT-ISTEK`, `ONAY-TEYIT`, `YIGIN-AC`, `YIGIN-KAPA`, `MERGE-BASLIYOR`, `MERGED`, `HANDOFF-ISTEK`, `HANDOFF`, `RETIRED`.
+- **Alıcı listesi (kapalı, ASCII):** `koordinator`, `inceleyici`, `isci-a`, `isci-b`, `isci-c`, `isci-d`, `test`, `sekreter` (rol kurulursa), `tumu`; `kullanici` yalnız koordinatör kanalında. Paket bilgisi alıcıya değil `Paket` alanına yazılır.
+- **İkinci satır sabit alanlı** (`·` ile ayrılır):
+
+| Tür | Zorunlu alanlar |
+|---|---|
+| hepsi | `Paket: <kod>` · `Cevap: <ID|->` |
+| `PR-HAZIR`, `REVIEW-ISTEK`, `ONAY-TEYIT-ISTEK`, `ONAY-TEYIT` | `SHA: <40 hex>` |
+| `REVIEW-SONUC` | `SHA: <40 hex>` · `Sonuc: ONAY|DEGISIKLIK` · `Bulgu: B<n> M<n> m<n> N<n>` |
+| `DURUM` | `Durum: PLANNED|IMPLEMENTED|VERIFIED|BLOCKED` |
+| `YIGIN-AC`, `YIGIN-KAPA` | `Yigin: <compose proje adı>` |
+
+- `GOREV`, `GOREV-EK`, `DUZELT`, `REVIEW-ISTEK` ve `KARAR-GEREK` alıcısı `ACK` yazar; aynı ID ikinci kez uygulanmaz. `PR-HAZIR`, `REVIEW-ISTEK` ve `REVIEW-SONUC` tam SHA taşır.
+- Doğrulama: hook (`.claude/hooks/ffcore_guard.py`, FOLLOWUP-189) `state/kanal/*.md`'ye eklenen yeni başlığı listeye ve zorunlu alanlara karşı denetler, uymayanı engeller; `scripts/kanal_ozet.py` ACK bekleyen bağlayıcı mesajları, paket başına son durumu ve son onaylı SHA'yı listeler (dalga raporu okur).
 - Dosyanın başındaki lease ve `Son okunan` satırlarını yalnızca sahibi günceller. Oturum başında, her iş adımının sonunda ve bildirim geldiğinde yeni mesajlar okunur.
 
 **Teslim ve isteğe bağlı zil.** Mesaj dosyaya başarıyla eklendiğinde teslim edilmiş sayılır. `SendMessage` varsa gönderen ayrıca `kanal: <ID> (state/kanal/<rol>.md)` bildirimi yollar. Araç yoksa süreç durmaz: oturumlar başlangıçta ve her iş adımının sonunda kanalları tarar; koordinatör en az saat başı veya kullanıcı `kanalları tara` dediğinde tüm kanalları kontrol eder. ACK alınmayan bağlayıcı mesaj saatlik özette görünür.

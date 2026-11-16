@@ -613,7 +613,7 @@ NER gecikme kabulü (boşta P95 < 300 ms) geliştirme dizüstünde ölçüldü. 
 | 4 | İnceleme döngüsünün durma kuralı yok | 08-tam-1a 7 tur, 09-1 6 tur; zamanlama sınıfı 4 tur | Aynı sınıf iki ardışık turda MAJOR verirse tasarım notu; üçüncü turda koordinatör kapsam kararı (9.5) | **Kullanıcı A'yı seçti (16 Kasım); uygulama bekliyor** |
 | 5 | Sekreter depoda kayıtsız; push sahipliği yazılı değil | `MULTI_AGENT_PROTOCOL.md` "ajanlar push etmez" | Sekreter rolünü ve kanalını handbook'a yazmak; push: karar kullanıcıda, işlem koordinatörde | push sahipliği kullanıcı kararıyla netleşti (16 Kasım); handbook bekliyor |
 | 6 | CI yok, kapılar tek makinede | EXECUTION_HANDBOOK 5.11 hiç çalışmadı; ENV-171 Docker arızaları | Headless Claude ya da CI ile kapı | öneri |
-| 7 | Mesajlar serbest metin, makine okuyamıyor | DURUM ve PR-HAZIR mesajları yalnız insan için | Mesaj başlığına yapılandırılmış alanlar | öneri |
+| 7 | Mesajlar serbest metin, makine okuyamıyor | DURUM ve PR-HAZIR mesajları yalnız insan için | Kapalı tür ve alıcı listesi, sabit alanlı ikinci satır, hook doğrulaması, özet betiği (9.6) | **Kullanıcı A'yı seçti (16 Kasım); uygulama bekliyor** |
 
 ### 9.2 Hook ve izin ayarı tasarımı
 
@@ -804,6 +804,56 @@ Her dalga kapanışında koordinatör tek sayfalık bir rapor hazırlar ve insan
 - KARARLAR kaydı.
 
 Yazarı koordinatör, mevcut inceleyici oturumlarına bir DURUM mesajıyla duyurulur.
+
+### 9.6 Mesaj biçimi (bulgu 7; kullanıcı A'yı kabul etti, 16 Kasım; uygulama bekliyor)
+
+**Sorun.** Mesaj başlığı aslında yarı yapılandırılmış (`### <ID> · <tarih> · → <alıcı> · <TÜR>`). Ama yazımı serbest bırakıldığı için makine güvenilir biçimde okuyamıyor. Bu yüzden "ACK gelmeyen mesajlar", "paketin son durumu" ya da "onaylanan SHA" gibi sorular her seferinde bir ajanın kanalı baştan okumasını gerektiriyor. Sekreterin ve koordinatörün token yükünün bir kısmı buradan geliyor. Ölçüm (16 Kasım, `state/kanal/*.md` başlıkları):
+
+| Gözlem | Sayı |
+|---|---|
+| Toplam mesaj başlığı | 2.047 |
+| Farklı "tür" yazımı | 151; örnekler: `CEVAP (KARAR)`, `DURUM (ölçüm düzeltmesi)`, `YIGIN-KAPA + DURUM`, `GOREV-EK (main merge + NER istemcisi)` |
+| Aynı türün iki yazımı | `YIGIN-AÇ` 45 / `YIGIN-AC` 14 |
+| Aynı alıcının iki yazımı | `→ koordinator` 1.125 / `→ koordinatör` 69; ayrıca `→ isci-b (09)` gibi paket ekli biçimler |
+| Dört parçalı biçime uymayan başlık | 17 |
+| Kullanıcıya yazılmış kanal mesajı (`→ kullanici`) | 14; protokole göre kullanıcıyla yalnız koordinatör konuşur |
+
+SHA, durum geçişi ve inceleme sonucu da mesaj gövdesinde serbest metin olarak duruyor (ör. `SHA **d4a2f02…**`, `**DEGISIKLIK**`).
+
+**Önerilen biçim (A).** Başlık insan için okunur kalır. Değerler kapalı listelere bağlanır ve ikinci satır sabit alanlı olur:
+
+```
+### B-09-0018 · 2026-11-04 22:12 · → koordinator · PR-HAZIR
+Paket: 09-1 · Cevap: K-09-0007 · SHA: d4a2f020c898f77b3f22e1fe42cbbb651030dcf8
+<serbest gövde, en fazla ~15 satır>
+```
+
+- **Tür listesi (kapalı, ASCII):** `GOREV, GOREV-EK, ACK, SORU, CEVAP, DURUM, KARAR-GEREK, KAYIT-TALEBI, PLAN-ONAY, PR-HAZIR, REVIEW-ISTEK, REVIEW-SONUC, DUZELT, ONAY-TEYIT-ISTEK, ONAY-TEYIT, YIGIN-AC, YIGIN-KAPA, MERGE-BASLIYOR, MERGED, HANDOFF-ISTEK, HANDOFF, RETIRED`. Açıklama türün yanına değil gövdeye yazılır.
+- **Alıcı listesi (kapalı, ASCII):** `koordinator, inceleyici, isci-a, isci-b, isci-c, isci-d, test, sekreter, tumu`. Paket bilgisi alıcıya değil `Paket:` alanına girer. `kullanici` alıcısı yalnız koordinatörün kanalında geçerlidir.
+- **Türe göre zorunlu alanlar:**
+
+| Tür | Zorunlu alanlar |
+|---|---|
+| Hepsi | `Paket`, `Cevap` (yoksa `-`) |
+| `PR-HAZIR`, `REVIEW-ISTEK`, `ONAY-TEYIT-ISTEK`, `ONAY-TEYIT` | `SHA` (40 karakter) |
+| `REVIEW-SONUC` | `SHA`, `Sonuc: ONAY` ya da `Sonuc: DEGISIKLIK`, `Bulgu: B<n> M<n> m<n> N<n>` |
+| `DURUM` | `Durum: PLANNED`, `IMPLEMENTED`, `VERIFIED` ya da `BLOCKED` |
+| `YIGIN-AC`, `YIGIN-KAPA` | `Yigin: <compose proje adı>` |
+
+- **Doğrulama:** hook paketine (9.2) bir kural eklenir. `state/kanal/*.md`'ye eklenen yeni başlık listeye ve zorunlu alanlara uymazsa yazma engellenir ve mesaj nedenini söyler. Eski mesajlar değişmez (kanal yalnız sona eklenir); kural yalnız yeni mesajlara uygulanır.
+- **Yararlanan araç:** küçük bir özet betiği (`scripts/kanal_ozet.py`). Betik ACK bekleyen bağlayıcı mesajları, her paketin son durumunu ve son onaylanan SHA'yı listeler. Sekreter ve koordinatör kanalın tamamı yerine bu özeti okur; dalga raporu (9.3) aynı çıktıdan beslenir. Bağlam bütçesiyle (9.4) birlikte çalışır.
+
+**Seçenekler.**
+- **A (önerilen):** mevcut başlık + kapalı listeler + sabit ikinci satır + hook doğrulaması + özet betiği. Bedel: ajanlara biçim kuralı; hook'a bir kural; küçük bir betik.
+- **B:** her mesaja JSON ya da YAML ön bilgisi. Makine için en net, ama insan okuması zorlaşır ve ajanların yazım hatası artar.
+- **C:** kanal dosyalarını bırakıp gerçek bir kuyruğa (Redis, GitHub issues) geçmek. Reddedilmesi önerilir: dış sistem ve yeni altyapı demek (ARCH-09; "dış sisteme bağlanma yok" kuralı). Dosya tabanlı ortak bellek de bugünkü düzenin güçlü yanı.
+
+**Uygulama.**
+- `MULTI_AGENT_PROTOCOL.md` "Mesaj biçimi" bölümüne listeler ve alan tablosu.
+- Hook paketine biçim doğrulama kuralı.
+- Özet betiği ayrı küçük bir dilim (ölçüm betiğiyle aynı dilim olabilir).
+- KARARLAR kaydı.
+- Açık oturumlara DURUM ile duyuru; biçim kuralı bir sonraki mesajdan itibaren geçerli.
 
 ---
 

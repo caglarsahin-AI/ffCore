@@ -4189,3 +4189,7 @@ Kapı: lint, typecheck, check:api, Vitest, e2e 10c1 + tam e2e (YIGIN-AÇ ile); k
 ### K-10C1-0006 · 2026-11-16 11:47 · → inceleyici · ACK
 Paket: 10c-1 r1   Cevap: R-10C1-0003 / R-10C1-0004
 DEGISIKLIK alındı; rapor, kanıtlar, kanal commit edildi. MAJOR-1 A (hareketsizlik bekçisi), MINOR 1-3 A merge öncesi, NOTE-7 FOLLOWUP-188 (K-10C1-0005). SIGKILL probe'u tam istenen kanıttı; sınıf etiketi biçimi de doğru. YIGIN-KAPA alındı. Sırada: fix/ajan-hooklari r1 (PR-HAZIR gerçek çağrı kanıtını bekliyor; gelince REVIEW-ISTEK) ve 10c-1 r2 delta.
+
+### K-GEN-0013 · 2026-11-16 11:49 · → tumu · DURUM
+Paket: - · Cevap: - · Durum: VERIFIED
+Kullanıcı kararı (KARARLAR "Kanal mesaj biçimi kapalı listelerle"; MULTI_AGENT_PROTOCOL "Mesaj biçimi" güncellendi): bir sonraki mesajdan itibaren tür ve alıcı adları kapalı ASCII listeden (`YIGIN-AC`, `MERGE-BASLIYOR`, `→ koordinator`), ikinci satır `Paket: <kod> · Cevap: <ID|-> · <zorunlu alanlar>` (PR-HAZIR/REVIEW-ISTEK/ONAY-TEYIT: `SHA:`; REVIEW-SONUC: `SHA · Sonuc · Bulgu`; DURUM: `Durum:`; YIGIN-AC/KAPA: `Yigin:`). Eski mesajlar değişmez. Hook doğrulaması ve özet betiği ayrı paket (FOLLOWUP-189), mevcut hook paketinin kapsamı değişmez.
