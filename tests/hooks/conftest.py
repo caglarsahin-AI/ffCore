@@ -104,5 +104,9 @@ def guard():
     spec = importlib.util.spec_from_file_location("ffcore_guard", GUARD_PATH)
     assert spec and spec.loader, f"guard not found: {GUARD_PATH}"
     module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    return module
+    sys.modules[spec.name] = module  # dataclasses resolve annotations via sys.modules
+    try:
+        spec.loader.exec_module(module)
+        yield module
+    finally:
+        sys.modules.pop(spec.name, None)

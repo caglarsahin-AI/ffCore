@@ -94,7 +94,9 @@ def test_paycore_src_allowed(main_root):
 
 
 def test_push_coordinator_with_flag_allowed(main_root):
-    proc = run_hook(bash("FFCORE_PUSH_OK=1 git push origin main"), main_root, FFCORE_ROL="koordinator")
+    proc = run_hook(
+        bash("FFCORE_PUSH_OK=1 git push origin main"), main_root, FFCORE_ROL="koordinator"
+    )
     assert_allowed(proc)
 
 
@@ -120,7 +122,9 @@ def test_push_flag_in_hook_env_is_not_enough(main_root):
 
 
 def test_push_git_c_variant_blocked(main_root):
-    proc = run_hook(bash("git -C /c/ai_paycore/ffcore push origin main"), main_root, FFCORE_ROL="isci-a")
+    proc = run_hook(
+        bash("git -C /c/ai_paycore/ffcore push origin main"), main_root, FFCORE_ROL="isci-a"
+    )
     assert_blocked(proc, "PUSH")
 
 
@@ -269,7 +273,9 @@ def test_worker_writes_coordinator_files_blocked(main_root, rel):
 
 
 def test_coordinator_writes_work_queue_allowed(main_root):
-    proc = run_hook(edit(main_root / "state" / "WORK_QUEUE.md"), main_root, FFCORE_ROL="koordinator")
+    proc = run_hook(
+        edit(main_root / "state" / "WORK_QUEUE.md"), main_root, FFCORE_ROL="koordinator"
+    )
     assert_allowed(proc)
 
 
@@ -305,7 +311,14 @@ def test_worker_without_package_writes_pr_blocked(main_root):
 def test_pr_alias_field_allowed(main_root):
     write_registry(
         main_root,
-        {SESSION_ID: {"rol": "isci-a", "paket": "08-tam-1c-b-olcum", "pr": "08-tam-1c", "acildi": "x"}},
+        {
+            SESSION_ID: {
+                "rol": "isci-a",
+                "paket": "08-tam-1c-b-olcum",
+                "pr": "08-tam-1c",
+                "acildi": "x",
+            }
+        },
     )
     path = main_root / "state" / "pr" / "08-tam-1c.md"
     assert_allowed(run_hook(edit(path), main_root))
@@ -372,7 +385,9 @@ def test_role_from_registry_session_id(main_root):
 def test_role_from_registry_host_id(main_root):
     write_registry(main_root, {"local_abc": {"rol": "koordinator", "acildi": "x"}})
     proc = run_hook(
-        edit(main_root / "state" / "WORK_QUEUE.md"), main_root, CLAUDE_CODE_HOST_SESSION_ID="local_abc"
+        edit(main_root / "state" / "WORK_QUEUE.md"),
+        main_root,
+        CLAUDE_CODE_HOST_SESSION_ID="local_abc",
     )
     assert_allowed(proc)
 
@@ -414,19 +429,25 @@ def test_worktree_state_write_blocked_for_coordinator(main_root):
 
 def test_review_worktree_state_write_blocked(main_root):
     wt = make_worktree(main_root, "review-10c-1")
-    proc = run_hook(edit(wt / "state" / "kanal" / "inceleyici.md"), main_root, FFCORE_ROL="inceleyici")
+    proc = run_hook(
+        edit(wt / "state" / "kanal" / "inceleyici.md"), main_root, FFCORE_ROL="inceleyici"
+    )
     assert_blocked(proc, "STATE-YOL")
 
 
 def test_worktree_non_state_write_allowed(main_root):
     wt = make_worktree(main_root, "fix", "ajan-hooklari")
-    proc = run_hook(edit(wt / ".claude" / "hooks" / "ffcore_guard.py"), main_root, FFCORE_ROL="isci-a")
+    proc = run_hook(
+        edit(wt / ".claude" / "hooks" / "ffcore_guard.py"), main_root, FFCORE_ROL="isci-a"
+    )
     assert_allowed(proc)
 
 
 def test_worktree_nested_state_dir_in_code_allowed(main_root):
     wt = make_worktree(main_root, "feat", "x")
-    proc = run_hook(edit(wt / "frontend" / "lib" / "state" / "a.ts"), main_root, FFCORE_ROL="isci-c")
+    proc = run_hook(
+        edit(wt / "frontend" / "lib" / "state" / "a.ts"), main_root, FFCORE_ROL="isci-c"
+    )
     assert_allowed(proc)
 
 
@@ -569,3 +590,25 @@ def test_settings_json_valid_and_wires_guard():
     assert "Read(**/.env)" in deny and "Edit(**/.env)" in deny
     assert any("paycoreLLM/data/**" in d for d in deny)
     assert any("paycoreLLM/eval/results/**" in d for d in deny)
+
+
+def test_settings_command_runs_guard(main_root):
+    """The exact settings.json command line (no shell) blocks a gate call without tee."""
+    import shlex
+    import subprocess
+
+    from conftest import REPO_ROOT
+
+    settings = json.loads(SETTINGS_PATH.read_text(encoding="utf-8"))
+    command = settings["hooks"]["PreToolUse"][0]["hooks"][0]["command"]
+    argv = shlex.split(command.replace("$CLAUDE_PROJECT_DIR", REPO_ROOT.as_posix()))
+    proc = subprocess.run(
+        argv,
+        input=json.dumps(bash("make test")),
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        env=base_env(main_root),
+        timeout=30,
+    )
+    assert_blocked(proc, "KAPI")
