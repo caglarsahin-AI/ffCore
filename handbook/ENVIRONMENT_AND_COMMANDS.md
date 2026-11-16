@@ -24,7 +24,7 @@ py -3.12 --version
 docker compose version
 ```
 
-Agent `.env` oluşturmaz, kopyalamaz veya okumaz; gerekiyorsa kullanıcı doldurur. Paket 00 MERGED olduktan ve Makefile hedefleri mevcut olduktan sonra ayrıca `make up && make smoke` koşulur. 00 öncesi bu iki komut preflight koşulu değildir.
+Agent `.env` oluşturmaz, kopyalamaz veya okumaz; gerekiyorsa kullanıcı doldurur. *(Hook ve `permissions.deny` ile zorlanır: `ENV`.)* Paket 00 MERGED olduktan ve Makefile hedefleri mevcut olduktan sonra ayrıca `make up && make smoke` koşulur. 00 öncesi bu iki komut preflight koşulu değildir.
 
 ## Kapı komutları
 
@@ -46,9 +46,19 @@ Profil matrisi: `DEPLOY_PROFILE=airgap make test` ve `DEPLOY_PROFILE=llmaas make
 ### Paralel yığınlar (işçi, inceleyici, main kapısı)
 
 - Her yığın kendi compose projesi ve port aralığıyla açılır (`-p <ad>`, `BACKEND_PORT`/`FRONTEND_PORT`); konteyner açan her koşu önce kanala `YIGIN-AÇ`, kapanışta `down -v` + `YIGIN-KAPA`.
-- **Dış bağlantı yok:** yığınlar `up -d --wait --no-build --pull never` ile ve işçinin doğruladığı etiketli imajla (`FFCORE_VERSION=<etiket>`) açılır. İmaj gerçekten yeniden derlenecekse `docker compose build --pull=false` (BuildKit aksi hâlde base imaj metadata'sı için docker.io/ghcr.io'ya gider; PROSES-175). `docker compose build` ve `up --build` çıplak kullanılmaz.
-- **Bellek sınırı:** aynı anda en fazla üç yığın; main kapısı koşarken işçi/inceleyici yığınları açık kalabilir ama test koşmaz (KARARLAR "Üç yığın sınırı bellek sınırıdır"). Kapı adımı 137 (OOM) ile düşerse adım tek başına yeniden koşulur; ancak o yeşilse MERGED.
-- Kapı çıktısı tamamen dosyaya alınır (`tee state/evidence/gate-<paket>-<tarih>.log`); yalnız son satır tutulmaz.
+- **Dış bağlantı yok:** yığınlar `up -d --wait --no-build --pull never` ile ve işçinin doğruladığı etiketli imajla (`FFCORE_VERSION=<etiket>`) açılır. İmaj gerçekten yeniden derlenecekse `docker compose build --pull=false` (BuildKit aksi hâlde base imaj metadata'sı için docker.io/ghcr.io'ya gider; PROSES-175). `docker compose build` ve `up --build` çıplak kullanılmaz. *(Hook ile zorlanır: `PROSES-175`.)*
+- **Bellek sınırı:** aynı anda en fazla üç yığın; main kapısı koşarken işçi/inceleyici yığınları açık kalabilir ama test koşmaz (KARARLAR "Üç yığın sınırı bellek sınırıdır"). Kapı adımı 137 (OOM) ile düşerse adım tek başına yeniden koşulur; ancak o yeşilse MERGED. *(Üç yığın sınırı hook ile zorlanır: `YIGIN`.)*
+- Kapı çıktısı tamamen dosyaya alınır (`tee state/evidence/gate-<paket>-<tarih>.log`); yalnız son satır tutulmaz. *(Hook ile zorlanır: `KAPI`; `make lint|test|test-int|smoke` ve test toplayan `pytest` aynı boru hattında `tee` ister.)*
+
+### Hook ile zorlanan kurallar
+
+`.claude/settings.json` her Bash ve dosya yazma çağrısından önce `.claude/hooks/ffcore_guard.py`'yi koşar (PreToolUse); `.env` ve PayCore verisi ayrıca `permissions.deny` ile kapalıdır. Kurallar, rol kaynağı ve bilinen sınırlar: docs/takim/ajanlarla-gelistirme.md 9.2.
+
+- **Kip:** `FFCORE_GUARD_MODE=block` (varsayılan; çağrı çalışmaz, mesaj modele gider) ya da `warn` (çağrı çalışır, uyarı görünür). Bilinmeyen değer `block` sayılır.
+- **Kayıt:** her tetiklenme `state/evidence/hook-guard.log`'a tek satır (zaman, kip, rol, araç, kural, komutun ilk 120 karakteri; içerik yok). Dalga raporu bu dosyayı sayar.
+- **Yükleme:** proje ayarı oturum açılışındaki klasörden okunur; tabanı eski worktree'lerde hook rebase'e kadar yoktur.
+- **Testler:** `py -3.12 -m pytest tests/hooks -q 2>&1 | tee state/evidence/hook-tests.log` (Docker gerekmez).
+- Hook güvenlik ağıdır, sandbox değil; bu belgedeki metin kuralları geçerliliğini korur.
 
 ## Bayraklar
 
