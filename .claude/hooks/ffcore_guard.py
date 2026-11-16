@@ -4,17 +4,20 @@ Enforces the agent rules that used to live only in text (KARARLAR 16 Nov 2026,
 "Ajan kuralları hook ile zorlanır"): no .env, PayCore data boundary, push only by
 the coordinator with a per-command flag, PROSES-175 compose flags, three-stack
 limit, gate output via tee, single-writer state files, no writes to a worktree's
-state/ copy.
+state/ copy, channel message format (KANAL-BICIM).
 
 Contract: Claude Code passes the tool call as JSON on stdin (tool_name,
 tool_input, session_id). Exit 2 blocks the call and stderr goes to the model.
 Exit 0 lets it run. FFCORE_GUARD_MODE=warn|block (default block).
 
-Bash rules also apply inside `sh -c` / `bash -c` text and to the command a
-`docker compose run|exec` starts in its service. This is a safety net, not a
-sandbox: commands built at runtime (variables, script files, Makefile recipes)
-and Bash writes to state files are not inspected. Log lines are masked
-(credentials in URLs, *KEY/TOKEN/SECRET/PASS*= values, Authorization/Bearer).
+Bash rules also apply inside `sh -c` / `bash -c` text, `$(…)` and backticks,
+`( … )` / `{ …; }` groups, compound commands, behind wrappers (`env`, `command`,
+`time`, `nice`, `nohup`, `exec`) and to the command a `docker compose run|exec`
+starts in its service. This is a safety net, not a sandbox: commands built at
+runtime (variables, script files, Makefile recipes) and Bash writes to state
+files are not inspected. Log lines are masked (credentials in URLs,
+*KEY/TOKEN/SECRET/PASS*= values, Authorization/Bearer, `-u user:pass`, JSON
+"token/secret/password/api_key/key" fields).
 Stdlib only, no network.
 """
 
@@ -83,11 +86,38 @@ SHELLS = frozenset({"sh", "bash"})
 MAX_NESTING = 3
 MAX_FF_STACKS = 3
 FF_STACK_RE = re.compile(r"^(ff|review)", re.IGNORECASE)
-ENV_RE = re.compile(r"(?<![\w.])\.env(?![.\w])", re.IGNORECASE)  # Windows: .ENV is .env
+# `.env` as a path inside one shell word (argument, redirection, option value, volume spec);
+# Windows: .ENV is .env. Words with whitespace are text (FOLLOWUP-189 e).
+# Inside code (`py -c`, a code heredoc) a quote or `(` before `.env` also makes it a path (r2).
+ENV_PATH_RE = re.compile(r"(?:^|[/\\=<>:'\"(])\.env(?![.\w-])", re.IGNORECASE)
+HEREDOC_RE = re.compile(r"(?<!<)<<(?!<)-?\s*(['\"]?)([A-Za-z_][\w-]*)\1")
+# A heredoc read by one of these is code, not data (K-HOOK2-0007 MINOR-2).
+CODE_READERS = frozenset({"sh", "bash", "py", "python", "python3", "node"})
+INTERPRETERS = frozenset({"py", "python", "python3", "node"})
+INLINE_CODE_OPTS = frozenset({"-c", "-e", "--eval"})
+# In interpreter code a space before `.env` also counts (`os.system('cat .env')`).
+CODE_ENV_RE = re.compile(r"(?:^|[\s/\\=<>:'\"(])\.env(?![.\w-])", re.IGNORECASE)
+CODE_PIPE_RE = re.compile(r"\|\s*(?:\S*[/\\])?(?:sh|bash|py|python3?|node)(?:\.exe)?(?:\s|$)")
+GREP_HEADS = frozenset({"grep", "egrep", "fgrep", "rg"})
+GREP_PATTERN_OPTS = frozenset({"-e", "--regexp"})
+GREP_GLOB_OPTS = frozenset({"-g", "--glob", "--iglob", "--exclude", "--include", "--exclude-dir"})
+GREP_GLOB_PREFIXES = ("--exclude=", "--include=", "--exclude-dir=", "--glob=", "--iglob=")
 PAYCORE_RE = re.compile(r"paycorellm[/\\]+(?:data|eval[/\\]+results)(?:[/\\]|\b)", re.IGNORECASE)
 LOG_DETAIL_MAX = 120
 # Log masking (SECURITY_AND_PERMISSIONS: logs carry no secrets); applied before truncation.
 MASKS = (
+    # -u user:pass, -uuser:pass, --user user:pass, --user=user:pass
+    (re.compile(r"(?<!\S)(-u|--user)(?:\s+|=)?[^\s:=]+:\S+"), r"\1 ***"),
+    (
+        # JSON credential field, also with escaped quotes ({\"token\":\"…\"}) and names such
+        # as access_token, apiKey, x-api-key, client_secret
+        re.compile(
+            r'\\?"([\w-]*(?:token|secret|password|api_?key|key))\\?"\s*:\s*\\?"'
+            r'(?:[^"\\]|\\(?!"))*\\?"',
+            re.IGNORECASE,
+        ),
+        r'"\1":"***"',
+    ),
     (re.compile(r"(\w+://)[^/\s@]+@"), r"\1***@"),
     (
         re.compile(
@@ -102,6 +132,71 @@ MASKS = (
     ),
     (re.compile(r"Bearer\s+[^\s\"']+", re.IGNORECASE), "Bearer ***"),
 )
+
+
+# Channel message format (handbook/MULTI_AGENT_PROTOCOL.md "Mesaj biçimi"; single source,
+# pinned by tests/hooks/test_kanal_bicim.py drift tests).
+MESSAGE_TYPES = (
+    "GOREV",
+    "GOREV-EK",
+    "ACK",
+    "SORU",
+    "CEVAP",
+    "DURUM",
+    "KARAR-GEREK",
+    "KAYIT-TALEBI",
+    "PLAN-ONAY",
+    "PR-HAZIR",
+    "REVIEW-ISTEK",
+    "REVIEW-SONUC",
+    "DUZELT",
+    "ONAY-TEYIT-ISTEK",
+    "ONAY-TEYIT",
+    "YIGIN-AC",
+    "YIGIN-KAPA",
+    "MERGE-BASLIYOR",
+    "MERGED",
+    "HANDOFF-ISTEK",
+    "HANDOFF",
+    "RETIRED",
+)
+RECIPIENTS = (
+    "koordinator",
+    "inceleyici",
+    "isci-a",
+    "isci-b",
+    "isci-c",
+    "isci-d",
+    "test",
+    "sekreter",
+    "tumu",
+)
+COORDINATOR_ONLY_RECIPIENTS = ("kullanici",)
+COMMON_FIELDS = ("Paket", "Cevap")
+TYPE_FIELDS = {
+    "PR-HAZIR": ("SHA",),
+    "REVIEW-ISTEK": ("SHA",),
+    "ONAY-TEYIT-ISTEK": ("SHA",),
+    "ONAY-TEYIT": ("SHA",),
+    "REVIEW-SONUC": ("SHA", "Sonuc", "Bulgu"),
+    "DURUM": ("Durum",),
+    "YIGIN-AC": ("Yigin",),
+    "YIGIN-KAPA": ("Yigin",),
+}
+FIELD_VALUES = {
+    "Sonuc": ("ONAY", "DEGISIKLIK"),
+    "Durum": ("PLANNED", "IMPLEMENTED", "VERIFIED", "BLOCKED", "DUYURU"),
+}
+MESSAGE_ID = r"[A-Z]-[A-Za-z0-9-]+-\d{4}"
+FIELD_PATTERNS = {
+    "Cevap": re.compile(rf"^(?:-|{MESSAGE_ID}(?:, {MESSAGE_ID})*)$"),
+    "SHA": re.compile(r"^[0-9a-f]{40}$"),
+    "Bulgu": re.compile(r"^B\d+ M\d+ m\d+ N\d+$"),
+}
+HEADER_RE = re.compile(r"^### (?P<id>\S+) · (?P<ts>.+?) · → (?P<to>.+?) · (?P<tur>.+?)\s*$")
+ID_RE = re.compile(rf"^{MESSAGE_ID}$")
+TS_RE = re.compile(r"^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$")
+SEP = " · "
 
 
 class GuardError(Exception):
@@ -204,14 +299,29 @@ def no_role_message(info: RoleInfo, payload: Mapping, env: Mapping[str, str]) ->
 # --- Bash rules -------------------------------------------------------------
 
 
+COMPOUND_OPEN = frozenset({"for", "while", "until", "if", "case", "select"})
+COMPOUND_CLOSE = frozenset({"done", "fi", "esac"})
+# words after which the next word is again in command position
+CMD_PREFIX_WORDS = frozenset(
+    {"do", "then", "else", "elif", "!", "{", "time", "while", "until", "if"}
+)
+WORD_END = " \t\n;&|()<>"
+ENV_VALUE_OPTS = frozenset({"-u", "--unset", "-C", "--chdir"})
+SHELL_VALUE_OPTS = frozenset({"--rcfile", "--init-file"})
+
+
 def split_pipelines(command: str) -> list[list[str]]:
     """Split on unquoted `&&`, `||`, `;`, newline and `&` into pipelines, each split on
-    unquoted `|`. Quotes are respected so `sh -c 'a && b'` stays one element; redirections
-    such as `2>&1`, `&>` and `>&` are not separators."""
+    unquoted `|`. Quotes and backticks are respected so `sh -c 'a && b'` stays one element;
+    redirections such as `2>&1`, `&>` and `>&` are not separators. Groups `( … )`, `{ …; }`,
+    `$( … )` and compound commands (`for/while/until/if/case … done/fi/esac`) are kept whole
+    so a `| tee` after them covers their body (D2, FOLLOWUP-189 c)."""
     pipelines: list[list[str]] = []
     parts: list[str] = []
     buf: list[str] = []
     quote: str | None = None
+    depth = 0
+    cmd_start = True
     i, n = 0, len(command)
 
     def cut_part() -> None:
@@ -226,7 +336,7 @@ def split_pipelines(command: str) -> list[list[str]]:
     while i < n:
         c = command[i]
         if quote:
-            if c == "\\" and quote == '"' and i + 1 < n:
+            if c == "\\" and quote != "'" and i + 1 < n:
                 buf.append(command[i : i + 2])
                 i += 2
                 continue
@@ -235,22 +345,36 @@ def split_pipelines(command: str) -> list[list[str]]:
             buf.append(c)
             i += 1
             continue
-        if c in ("'", '"'):
+        if c in ("'", '"', "`"):
             quote = c
+            cmd_start = False
             buf.append(c)
             i += 1
             continue
         if c == "\\" and i + 1 < n:
             buf.append(command[i : i + 2])
+            cmd_start = False
             i += 2
+            continue
+        if c in " \t":
+            buf.append(c)
+            i += 1
             continue
         two = command[i : i + 2]
         if two in ("&&", "||"):
-            cut_pipeline()
+            cmd_start = True
+            if depth:
+                buf.append(two)
+            else:
+                cut_pipeline()
             i += 2
             continue
         if c in (";", "\n"):
-            cut_pipeline()
+            cmd_start = True
+            if depth:
+                buf.append(c)
+            else:
+                cut_pipeline()
             i += 1
             continue
         if c == "&":
@@ -259,22 +383,289 @@ def split_pipelines(command: str) -> list[list[str]]:
             if prev in (">", "<") or nxt == ">":
                 buf.append(c)
             else:
-                cut_pipeline()
+                cmd_start = True
+                if depth:
+                    buf.append(c)
+                else:
+                    cut_pipeline()
             i += 1
             continue
         if c == "|":
             if i and command[i - 1] == ">":  # `>|` clobber redirection
                 buf.append(c)
             else:
-                cut_part()
-                if i + 1 < n and command[i + 1] == "&":  # `|&` pipes stderr too
+                cmd_start = True
+                pipe_err = i + 1 < n and command[i + 1] == "&"  # `|&` pipes stderr too
+                if depth:
+                    buf.append("|&" if pipe_err else c)
+                else:
+                    cut_part()
+                if pipe_err:
                     i += 1
             i += 1
             continue
-        buf.append(c)
-        i += 1
+        if c == "(":
+            depth += 1
+            cmd_start = True
+            buf.append(c)
+            i += 1
+            continue
+        if c == ")":
+            depth = max(0, depth - 1)
+            cmd_start = False
+            buf.append(c)
+            i += 1
+            continue
+        j = i
+        while j < n and command[j] not in WORD_END and command[j] not in "'\"`\\":
+            j += 1
+        if j == i:  # `<` or `>`
+            buf.append(c)
+            i += 1
+            continue
+        word = command[i:j]
+        whole = j >= n or command[j] in WORD_END
+        if cmd_start and whole:
+            if word in COMPOUND_OPEN or word == "{":
+                depth += 1
+            elif word in COMPOUND_CLOSE or word == "}":
+                depth = max(0, depth - 1)
+        cmd_start = whole and (word in CMD_PREFIX_WORDS or (cmd_start and "=" in word))
+        buf.append(word)
+        i = j
     cut_pipeline()
     return pipelines
+
+
+def closing(s: str, start: int, open_c: str, close_c: str) -> int:
+    """Index of the bracket that closes the one just before `start` (len(s) if none)."""
+    level, quote, j = 1, None, start
+    while j < len(s):
+        c = s[j]
+        if quote:
+            if c == "\\" and quote != "'":
+                j += 2
+                continue
+            if c == quote:
+                quote = None
+        elif c in "'\"`":
+            quote = c
+        elif c == "\\":
+            j += 2
+            continue
+        elif c == open_c:
+            level += 1
+        elif c == close_c:
+            level -= 1
+            if level == 0:
+                return j
+        j += 1
+    return len(s)
+
+
+def command_words(s: str):
+    """(start, end, word) of unquoted whole words in command position, the same notion of
+    command position as split_pipelines (K-HOOK2-0007 MINOR-1: `echo fi`, `"done"` and
+    `for x in done` are arguments, not keywords)."""
+    quote: str | None = None
+    cmd_start = True
+    i, n = 0, len(s)
+    while i < n:
+        c = s[i]
+        if quote:
+            if c == "\\" and quote != "'":
+                i += 2
+                continue
+            if c == quote:
+                quote = None
+            i += 1
+            continue
+        if c in ("'", '"', "`"):
+            quote = c
+            cmd_start = False
+            i += 1
+            continue
+        if c == "\\":
+            cmd_start = False
+            i += 2
+            continue
+        if c in " \t":
+            i += 1
+            continue
+        if c in ";&|\n(":
+            cmd_start = True
+            i += 1
+            continue
+        if c in ")<>":
+            cmd_start = False
+            i += 1
+            continue
+        j = i
+        while j < n and s[j] not in WORD_END and s[j] not in "'\"`\\":
+            j += 1
+        word = s[i:j]
+        whole = j >= n or s[j] in WORD_END
+        if cmd_start and whole:
+            yield i, j, word
+        cmd_start = whole and (word in CMD_PREFIX_WORDS or (cmd_start and "=" in word))
+        i = j
+
+
+def compound_body(part: str) -> tuple[str, str] | None:
+    """(body, trailing redirections) of a compound command part, else None.
+
+    Only keywords in command position count, so the body never ends early on an argument
+    or a quoted word; an unclosed compound runs to the end of the text (fail-loud side)."""
+    s = part.lstrip()
+    level, body_start = 0, None
+    for start, end, word in command_words(s):
+        if body_start is None:
+            if start != 0 or word not in COMPOUND_OPEN:
+                return None
+            level, body_start = 1, end
+        elif word in COMPOUND_OPEN:
+            level += 1
+        elif word in COMPOUND_CLOSE:
+            level -= 1
+            if level == 0:
+                return s[body_start:start], s[end:]
+    return None if body_start is None else (s[body_start:], "")
+
+
+def extract_nested(part: str) -> tuple[str, list[str], list[str]]:
+    """(outer text, group bodies, substitution bodies) of one pipeline element.
+
+    Groups (`( … )`, `{ …; }`, compound commands) stay on the same nesting level;
+    substitutions (`$( … )`, backticks; not inside single quotes) open a new level."""
+    body = compound_body(part)
+    if body is not None:
+        return body[1], [body[0]], []
+    out: list[str] = []
+    groups: list[str] = []
+    subs: list[str] = []
+    quote: str | None = None
+    i, n = 0, len(part)
+    while i < n:
+        c = part[i]
+        if quote == "'":
+            if c == "'":
+                quote = None
+            out.append(c)
+            i += 1
+            continue
+        if c == "\\" and i + 1 < n:
+            out.append(part[i : i + 2])
+            i += 2
+            continue
+        if part.startswith("$(", i):
+            j = closing(part, i + 2, "(", ")")
+            subs.append(part[i + 2 : j])
+            out.append("_")
+            i = j + 1
+            continue
+        if c == "`":
+            j = part.find("`", i + 1)
+            j = n if j < 0 else j
+            subs.append(part[i + 1 : j])
+            out.append("_")
+            i = j + 1
+            continue
+        if quote == '"':
+            if c == '"':
+                quote = None
+            out.append(c)
+            i += 1
+            continue
+        if c in ("'", '"'):
+            quote = c
+            out.append(c)
+            i += 1
+            continue
+        if c == "(":
+            j = closing(part, i + 1, "(", ")")
+            groups.append(part[i + 1 : j])
+            out.append(" ")
+            i = j + 1
+            continue
+        if (
+            c == "{"
+            and (i + 1 >= n or part[i + 1] in " \t\n")
+            and (i == 0 or part[i - 1] in " \t\n;&|(")
+        ):
+            j = closing(part, i + 1, "{", "}")
+            groups.append(part[i + 1 : j])
+            out.append(" ")
+            i = j + 1
+            continue
+        out.append(c)
+        i += 1
+    return "".join(out), groups, subs
+
+
+def unwrap(toks: list[str]) -> list[str]:
+    """Drop command wrappers and shell keywords so the rules see the real command.
+
+    Leading `K=V` assignments (also those given to `env`) are kept in front, which keeps
+    the push flag check working. Returns only the assignments for non-commands
+    (`command -v`, `for x in …` headers, closing keywords)."""
+    assigns: list[str] = []
+    rest = list(toks)
+    while True:
+        bare = strip_assignments(rest)
+        assigns += rest[: len(rest) - len(bare)]
+        rest = bare
+        if not rest:
+            return assigns
+        head = basename(rest[0])
+        if rest[0] in ("!", "{", "}", "then", "do", "else", "elif", "while", "until", "if"):
+            rest = rest[1:]
+        elif head in ("time", "nohup"):
+            rest = rest[1:]
+            if head == "time" and rest[:1] == ["-p"]:
+                rest = rest[1:]
+        elif rest[0] in ("for", "select", "case", "in", "done", "fi", "esac"):
+            return assigns
+        elif head == "env":
+            i, split = 1, None
+            while i < len(rest):
+                t = rest[i]
+                if t == "--":
+                    i += 1
+                    break
+                # -S/--split-string carries the command itself (K-HOOK2-0007 NOTE-4)
+                if t in ("-S", "--split-string") and i + 1 < len(rest):
+                    split, i = rest[i + 1], i + 2
+                    break
+                if t.startswith("--split-string="):
+                    split, i = t.split("=", 1)[1], i + 1
+                    break
+                if t.startswith("-S") and len(t) > 2:
+                    split, i = t[2:], i + 1
+                    break
+                if t in ENV_VALUE_OPTS:
+                    i += 2
+                elif t.startswith("-"):
+                    i += 1
+                else:
+                    break
+            rest = (tokens(split) if split is not None else []) + rest[i:]
+        elif head == "command":
+            if rest[1:2] in (["-v"], ["-V"]):
+                return assigns
+            rest = rest[2:] if rest[1:2] == ["-p"] else rest[1:]
+        elif head == "nice":
+            if rest[1:2] in (["-n"], ["--adjustment"]):
+                rest = rest[3:]
+            elif rest[1:2] and rest[1].startswith("-"):
+                rest = rest[2:]
+            else:
+                rest = rest[1:]
+        elif head == "exec":
+            rest = rest[1:]
+            while rest and rest[0].startswith("-"):
+                rest = rest[2:] if rest[0] == "-a" else rest[1:]
+        else:
+            return assigns + rest
 
 
 def tokens(part: str) -> list[str]:
@@ -375,13 +766,20 @@ def shell_inner(toks: list[str]) -> str | None:
     rest = strip_assignments(toks)
     if not rest or basename(rest[0]) not in SHELLS:
         return None
-    for i in range(1, len(rest) - 1):
+    want_c, i = False, 1
+    while i < len(rest):
         t = rest[i]
-        if not t.startswith("-"):
-            return None
-        if not t.startswith("--") and "c" in t[1:]:
-            return rest[i + 1]
-    return None
+        if t in SHELL_VALUE_OPTS:
+            i += 2
+        elif t.startswith("--"):
+            i += 1
+        elif len(t) > 1 and t[0] in "-+":
+            # -o/-O take a value, also inside a cluster such as -euo pipefail
+            want_c = want_c or (t[0] == "-" and "c" in t[1:])
+            i += 2 if ("o" in t[1:] or "O" in t[1:]) else 1
+        else:
+            break
+    return rest[i] if want_c and i < len(rest) else None
 
 
 def check_compose(toks: list[str]) -> list[Violation]:
@@ -490,10 +888,18 @@ KAPI_MESSAGE = (
 )
 
 
+DEPTH_VIOLATION = Violation(
+    "GUARD-DERINLIK",
+    f"iç içe komut {MAX_NESTING} düzeyi aşıyor; denetlenemedi "
+    "(sh -c / compose run|exec / $(…) zincirini kısalt)",
+)
+
+
 def check_tokens(
     toks: list[str], has_tee: bool, payload: Mapping, env: Mapping[str, str], depth: int
 ) -> list[Violation]:
     """Rules for one pipeline element, recursing into compose run|exec and sh -c."""
+    toks = unwrap(toks)
     found = check_push(toks, payload, env) + check_compose(toks)
     if is_gate_command(toks) and not has_tee:
         found.append(Violation("KAPI", KAPI_MESSAGE))
@@ -501,13 +907,7 @@ def check_tokens(
         service = compose_service_command(toks)
         if shell_inner(toks) is not None or (service is not None and service[1]):
             # fail-loud: an inner command we will not inspect is never let through silently
-            found.append(
-                Violation(
-                    "GUARD-DERINLIK",
-                    f"iç içe komut {MAX_NESTING} düzeyi aşıyor; denetlenemedi "
-                    "(sh -c / compose run|exec zincirini kısalt)",
-                )
-            )
+            found.append(DEPTH_VIOLATION)
         return found
     service = compose_service_command(toks)
     if service is not None:
@@ -518,8 +918,120 @@ def check_tokens(
             found.extend(check_tokens(inner, has_tee, payload, env, depth + 1))
     text = shell_inner(toks)
     if text is not None:
-        found.extend(check_bash(text, payload, env, outer_tee=has_tee, depth=depth + 1))
+        found.extend(check_bash(text, payload, env, outer_tee=has_tee, depth=depth + 1, top=False))
     return found
+
+
+def heredoc_reader(line: str, m: re.Match) -> str:
+    """Who reads this heredoc: 'shell', 'code' (an interpreter) or 'data'."""
+    segment = re.split(r"[;&|(]", line[: m.start()])[-1]
+    toks = unwrap(tokens(segment))
+    reader = basename(toks[0]) if toks else ""
+    piped = CODE_PIPE_RE.search(line[m.end() :])
+    if piped:
+        reader = basename(piped.group(0).lstrip("|").strip())
+    if reader in ("sh", "bash"):
+        return "shell"
+    return "code" if reader in INTERPRETERS else "data"
+
+
+def strip_heredocs(command: str) -> tuple[str, list[str]]:
+    """(shell text, interpreter code bodies) for the ENV rule.
+
+    A data heredoc body (`cat > f <<EOF`) is dropped (FOLLOWUP-189 e); a body read by
+    sh/bash stays as shell lines; a body read by py/python/node is returned as code and
+    scanned as code (K-HOOK2-0007 MINOR-2). Delimiter lines go."""
+    lines = command.split("\n")
+    out: list[str] = []
+    code: list[str] = []
+    i = 0
+    while i < len(lines):
+        line = lines[i]
+        out.append(line)
+        i += 1
+        for m in HEREDOC_RE.finditer(line):
+            kind = heredoc_reader(line, m)
+            body: list[str] = []
+            while i < len(lines) and lines[i].strip() != m.group(2):
+                body.append(lines[i])
+                i += 1
+            i += 1
+            if kind == "shell":
+                out.extend(body)
+            elif kind == "code":
+                code.append("\n".join(body))
+    return "\n".join(out), code
+
+
+def grep_files(toks: list[str]) -> list[str]:
+    """Arguments of grep/rg without the pattern and glob filters (those are text)."""
+    kept: list[str] = []
+    pattern_seen = opts_done = False
+    i = 1
+    while i < len(toks):
+        t = toks[i]
+        if not opts_done and t == "--":
+            opts_done = True
+        elif not opts_done and t.startswith("-") and len(t) > 1:
+            if t in GREP_PATTERN_OPTS or t in GREP_GLOB_OPTS:
+                pattern_seen = pattern_seen or t in GREP_PATTERN_OPTS
+                i += 1
+            elif t.startswith("--regexp="):
+                pattern_seen = True
+            elif t.startswith(GREP_GLOB_PREFIXES) or (t.startswith("-g") and len(t) > 2):
+                pass
+            elif t in ("-f", "--file") and i + 1 < len(toks):
+                kept.append(toks[i + 1])  # a pattern file is read
+                i += 1
+            else:
+                kept.append(t)
+        elif not pattern_seen:
+            pattern_seen = True
+        else:
+            kept.append(t)
+        i += 1
+    return kept
+
+
+def env_words(toks: list[str]) -> list[str]:
+    toks = unwrap(toks)
+    if not toks:
+        return []
+    head = basename(toks[0])
+    args = grep_files(toks) if head in GREP_HEADS else toks
+    found = [a for a in args if not any(ch.isspace() for ch in a) and ENV_PATH_RE.search(a)]
+    if head in INTERPRETERS:
+        # `py -c` / `node -e` code is code, spaces or not (K-HOOK2-0007 MINOR-2)
+        found += [
+            code
+            for opt, code in zip(toks, toks[1:], strict=False)
+            if opt in INLINE_CODE_OPTS and CODE_ENV_RE.search(code)
+        ]
+    return found
+
+
+def env_hits(text: str) -> bool:
+    """True when `.env` stands in argument/redirection position anywhere in the command,
+    including groups, substitutions, `sh -c` text and `compose run|exec` commands.
+    Every recursion works on strictly shorter text, so it ends."""
+    text, code_bodies = strip_heredocs(text)
+    if any(CODE_ENV_RE.search(body) for body in code_bodies):
+        return True
+    for pipeline in split_pipelines(text):
+        for part in pipeline:
+            outer, groups, subs = extract_nested(part)
+            if any(env_hits(body) for body in groups + subs):
+                return True
+            toks = tokens(outer)
+            if env_words(toks):
+                return True
+            inner = shell_inner(unwrap(toks))
+            if inner is not None and inner != text and env_hits(inner):
+                return True
+            service = compose_service_command(unwrap(toks))
+            if service is not None and service[1] and env_hits(shlex.join(service[1])):
+                return True
+    return False
 
 
 def check_bash(
@@ -528,28 +1040,43 @@ def check_bash(
     env: Mapping[str, str],
     outer_tee: bool = False,
     depth: int = 0,
+    top: bool = True,
 ) -> list[Violation]:
     found: list[Violation] = []
-    if ENV_RE.search(command):
+    # ENV and PAYCORE judge the whole command once; env_hits does its own recursion with
+    # heredoc handling (a nested call would see a data heredoc body as commands).
+    if top and env_hits(command):
         found.append(
             Violation(
                 "ENV", ".env okunmaz ve yazılmaz; testler .env.test ile (SECURITY_AND_PERMISSIONS)"
             )
         )
-    if PAYCORE_RE.search(command):
+    if top and PAYCORE_RE.search(command):
         found.append(
             Violation(
                 "PAYCORE", "paycoreLLM data/** ve eval/results/** okunmaz (CLAUDE.md, PLAN 2d)"
             )
         )
     for pipeline in split_pipelines(command):
-        parts = [tokens(p) for p in pipeline]
-        has_tee = any(
-            strip_assignments(t)[:1] and basename(strip_assignments(t)[0]) == "tee" for t in parts
+        pieces = [extract_nested(p) for p in pipeline]
+        parts = [tokens(outer) for outer, _, _ in pieces]
+        tee = outer_tee or any(
+            strip_assignments(unwrap(t))[:1] and basename(strip_assignments(unwrap(t))[0]) == "tee"
+            for t in parts
         )
         for toks in parts:
             if toks:
-                found.extend(check_tokens(toks, has_tee or outer_tee, payload, env, depth))
+                found.extend(check_tokens(toks, tee, payload, env, depth))
+        for _, groups, subs in pieces:
+            for body in groups:  # same shell level; the body is strictly shorter
+                found.extend(check_bash(body, payload, env, outer_tee=tee, depth=depth, top=False))
+            for body in subs:
+                if depth >= MAX_NESTING:
+                    found.append(DEPTH_VIOLATION)
+                else:
+                    found.extend(
+                        check_bash(body, payload, env, outer_tee=tee, depth=depth + 1, top=False)
+                    )
     unique: dict[tuple[str, str], Violation] = {}
     for v in found:
         unique.setdefault((v.rule, v.message), v)
@@ -588,6 +1115,116 @@ def owner_of(rel: str) -> tuple[str, str] | None:
     return None
 
 
+def parse_fields(line: str) -> dict[str, str]:
+    fields: dict[str, str] = {}
+    for part in line.split(SEP):
+        name, colon, value = part.partition(":")
+        if colon and re.match(r"^[A-Za-z]+$", name.strip()):
+            fields.setdefault(name.strip(), value.strip())
+    return fields
+
+
+def parse_message(header: str, second: str, channel: str) -> tuple[dict | None, list[str]]:
+    """Parse one channel message (header + second line) against the protocol.
+
+    Returns (message, problems); message is None when the header itself is unreadable.
+    Shared with scripts/kanal_ozet.py so "biçim dışı" means what the guard rejects.
+    """
+    m = HEADER_RE.match(header)
+    if not m:
+        return None, ["başlık '### <ID> · <YYYY-MM-DD HH:MM> · → <alici> · <TUR>' biçiminde değil"]
+    msg = {"id": m["id"], "ts": m["ts"], "to": m["to"], "tur": m["tur"], "kanal": channel}
+    problems: list[str] = []
+    if not ID_RE.match(msg["id"]):
+        problems.append(f"ID '{msg['id']}' <harf>-<paket>-<4 hane> değil")
+    if not TS_RE.match(msg["ts"]):
+        problems.append(f"tarih '{msg['ts']}' YYYY-MM-DD HH:MM değil")
+    allowed_to = RECIPIENTS + (COORDINATOR_ONLY_RECIPIENTS if channel == "koordinator" else ())
+    if msg["to"] not in allowed_to:
+        extra = " (kullanici yalnız koordinatör kanalında)" if msg["to"] == "kullanici" else ""
+        problems.append(f"alıcı '{msg['to']}' kapalı listede yok{extra}")
+    if msg["tur"] not in MESSAGE_TYPES:
+        problems.append(f"tür '{msg['tur']}' kapalı listede yok (açıklama gövdeye)")
+    fields = parse_fields(second)
+    msg["fields"] = fields
+    for name in COMMON_FIELDS + TYPE_FIELDS.get(msg["tur"], ()):
+        value = fields.get(name)
+        if not value:
+            problems.append(f"ikinci satırda {name} alanı yok")
+        elif name in FIELD_VALUES and value not in FIELD_VALUES[name]:
+            problems.append(f"{name} '{value}' değil: {'|'.join(FIELD_VALUES[name])}")
+        elif name in FIELD_PATTERNS and not FIELD_PATTERNS[name].match(value):
+            problems.append(f"{name} '{value[:50]}' biçimi yanlış")
+    return msg, problems
+
+
+def header_lines(text: str) -> list[tuple[int, str]]:
+    """(index, line) of `### ` headers outside fenced code blocks."""
+    out: list[tuple[int, str]] = []
+    fenced = False
+    for i, line in enumerate(text.split("\n")):
+        if line.lstrip().startswith("```"):
+            fenced = not fenced
+        elif not fenced and line.startswith("### "):
+            out.append((i, line))
+    return out
+
+
+def proposed_texts(payload: Mapping, path: Path) -> tuple[str, str]:
+    """(old, new) channel text for the write; only the difference is judged."""
+    inp = payload.get("tool_input") if isinstance(payload.get("tool_input"), dict) else {}
+    old = path.read_text(encoding="utf-8").replace("\r\n", "\n") if path.exists() else ""
+    tool = payload.get("tool_name")
+    if tool == "Write":
+        return old, str(inp.get("content") or "").replace("\r\n", "\n")
+    if tool == "Edit":
+        edits = [inp]
+    elif tool == "MultiEdit":
+        edits = [e for e in inp.get("edits") or [] if isinstance(e, dict)]
+    else:
+        return old, old
+    pairs = [
+        (
+            str(e.get("old_string") or "").replace("\r\n", "\n"),
+            str(e.get("new_string") or "").replace("\r\n", "\n"),
+            bool(e.get("replace_all")),
+        )
+        for e in edits
+    ]
+    cur = old
+    for o, n, every in pairs:
+        if not o or o not in cur:
+            # the tool will fail anyway; judge what the edit adds, never let it pass unread
+            return "\n".join(p[0] for p in pairs), "\n".join(p[1] for p in pairs)
+        cur = cur.replace(o, n) if every else cur.replace(o, n, 1)
+    return old, cur
+
+
+def check_channel_format(rel: str, channel: str, path: Path, payload: Mapping) -> list[Violation]:
+    from collections import Counter
+
+    old, new = proposed_texts(payload, path)
+    pending = Counter(line for _, line in header_lines(new))
+    pending.subtract(line for _, line in header_lines(old))
+    lines = new.split("\n")
+    found: list[Violation] = []
+    for i, line in header_lines(new):
+        if pending[line] <= 0:
+            continue
+        pending[line] -= 1
+        second = lines[i + 1] if i + 1 < len(lines) else ""
+        msg, problems = parse_message(line, second, channel)
+        if problems:
+            who = msg["id"] if msg else line[:40]
+            found.append(
+                Violation(
+                    "KANAL-BICIM",
+                    f'{rel} {who}: {"; ".join(problems)} (MULTI_AGENT_PROTOCOL "Mesaj biçimi")',
+                )
+            )
+    return found
+
+
 def check_write(path: str, payload: Mapping, env: Mapping[str, str]) -> list[Violation]:
     if not path:
         return []
@@ -613,16 +1250,17 @@ def check_write(path: str, payload: Mapping, env: Mapping[str, str]) -> list[Vio
     owner = owner_of(rel)
     if owner is None:
         return []
+    kind, name = owner
+    fmt = check_channel_format(rel, name, root / rel, payload) if kind == "channel" else []
     info = resolve_role(payload, env)
     if info.rol is None:
-        return [Violation("TEK-YAZAR", f"{rel}: {no_role_message(info, payload, env)}")]
-    kind, name = owner
+        return [Violation("TEK-YAZAR", f"{rel}: {no_role_message(info, payload, env)}")] + fmt
     if kind == "channel":
         # The coordinator moves MERGED-package messages to state/kanal/arsiv/
         # (MULTI_AGENT_PROTOCOL "Bağlam bütçesi ve arşiv"); nobody else writes here.
         if info.rol not in (name, "koordinator"):
-            return [Violation("TEK-YAZAR", f"{rel} → {name}; senin rolün {info.rol}")]
-        return []
+            return [Violation("TEK-YAZAR", f"{rel} → {name}; senin rolün {info.rol}")] + fmt
+        return fmt
     if kind == "role":
         if info.rol != name:
             return [Violation("TEK-YAZAR", f"{rel} → {name}; senin rolün {info.rol}")]
