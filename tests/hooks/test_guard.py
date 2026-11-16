@@ -805,3 +805,43 @@ def test_splitter_keeps_redirections_and_quotes(guard, main_root, cmd):
 
 def test_quoted_separator_does_not_hide_gate(guard, main_root):
     assert "KAPI" in rules(guard, bash("bash -c \"echo 'x;y' && make lint\""), main_root)
+
+
+# --- r3 (K-HOOK-0010): nesting limit is loud -----------------------------------
+
+
+def nest(command: str, levels: int) -> str:
+    import shlex
+
+    for _ in range(levels):
+        command = "sh -c " + shlex.quote(command)
+    return command
+
+
+def test_four_nested_shells_blocked(main_root):
+    """r2 MINOR-2 (R13): beyond the nesting limit the guard blocks instead of passing."""
+    proc = run_hook(bash(nest("git push origin main", 4)), main_root, FFCORE_ROL="isci-a")
+    assert_blocked(proc, "GUARD-DERINLIK")
+
+
+def test_four_nested_harmless_shells_blocked(guard, main_root):
+    assert "GUARD-DERINLIK" in rules(guard, bash(nest("ls", 4)), main_root)
+
+
+def test_three_nested_shells_still_checked(guard, main_root):
+    found = rules(guard, bash(nest("git push origin main", 3)), main_root, FFCORE_ROL="isci-a")
+    assert "PUSH" in found and "GUARD-DERINLIK" not in found
+
+
+def test_three_nested_harmless_shells_allowed(guard, main_root):
+    assert rules(guard, bash(nest("ls", 3)), main_root) == []
+
+
+def test_compose_run_at_nesting_limit_blocked(guard, main_root):
+    cmd = nest("docker compose run --rm tools ls", 3)
+    assert "GUARD-DERINLIK" in rules(guard, bash(cmd), main_root)
+
+
+def test_compose_run_without_command_at_limit_allowed(guard, main_root):
+    cmd = nest("docker compose run --rm tools", 3)
+    assert rules(guard, bash(cmd), main_root) == []
