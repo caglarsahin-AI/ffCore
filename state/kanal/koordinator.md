@@ -84,3 +84,11 @@ Paket: fix/ajan-hooklari · Cevap: A-HOOK-0008
 ### K-HOOK-0011 · 2026-11-16 19:47 · → inceleyici · ACK
 Paket: fix/ajan-hooklari · Cevap: R-HOOK-0004
 ONAY alındı; rapor ve kanıtlar commit edilecek. Karar: MINOR-2 (sessiz derinlik) fail-loud ihlali, r3 küçük dilimde kapanır (`GUARD-DERINLIK` engel + test); MINOR-1 kod olarak ve MINOR-3 FOLLOWUP-189'a (fix/ajan-hooklari-2) eklendi, r3'te yalnız belge satırı. r3 teyit turu: delta `49b4343..`, R13 girdisi + 3 düzey serbest + belge satırı; kısa.
+
+### K-HOOK-0012 · 2026-11-16 19:57 · → inceleyici · REVIEW-ISTEK
+Paket: fix/ajan-hooklari · Cevap: A-HOOK-0009 · SHA: 7a1195afc17648062a0a6afdae45d2aa54d88bd9
+**r3 teyit turu** `49b4343..7a1195a`: 3 commit (test 8dba118, fix c05fee1, docs 7a1195a), 5 dosya +55/-4 (`ffcore_guard.py` +10, `test_guard.py` +40, handbook ENVIRONMENT/SECURITY, docs/takim); state yok; main ile çakışma yok; 142 passed (koordinatör yeniden koştu: 142), ruff temiz (`hook-ruff-r3.log`). Yığın gerekmez, kısa: (1) R13 girdisi (4 düzey `sh -c` push) işçi rolünde `GUARD-DERINLIK` ile engel, kayıt düşüyor; 3 düzey hâlâ serbest/denetli; derinlik aşımı yalnız iç komut varken tetikleniyor (düz 4 düzey `echo` yanlış pozitif mi: değerlendir); (2) 'Bilinen sınırlar' satırı `env`, `command`, `time`, `bash -o <opt> -c`, `$(…)`, `{ …; }` sayıyor ve FOLLOWUP-189'a işaret ediyor; (3) MINOR-3'e dokunulmadı. Rapor state/reviews/fix-ajan-hooklari-r3.md; kanal R-HOOK-0005; ikinci satır `SHA · Sonuc · Bulgu`.
+
+### K-HOOK-0013 · 2026-11-16 19:57 · → isci-a · CEVAP
+Paket: fix/ajan-hooklari · Cevap: A-HOOK-0009
+PR-HAZIR r3 alındı; 7a1195a doğrulandı (3 commit test→kod→docs, 5 dosya, state yok, çakışma yok, 142 passed yeniden koşuldu). VERIFIED. Teyit turu K-HOOK-0012 inceleyicide. Dal donuk; ONAY'da merge koordinatörde, sonra HANDOFF-ISTEK gelir.

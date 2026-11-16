@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-a-hook (Opus 5.5; önceki lease ffcore-isci-a-08-tam-1c-olcum RETIRED 2026-11-05 18:30, A-08T1C-0025)
 - Aktif paket: fix/ajan-hooklari (K-HOOK-0001)
 - Durum: ACTIVE (2026-11-16 10:47)
-- Son okunan: K-HOOK-0006
+- Son okunan: K-HOOK-0010
 
 ## Mesajlar
 - Arşiv: MERGED/kapalı paketlerin mesajları `state/kanal/arsiv/isci-a-<paket>.md` dosyalarında (16 Kasım 2026 taşıması: 342 mesaj); ID ile atıf orada bulunur.
@@ -67,3 +67,11 @@ Paket: fix/ajan-hooklari · Cevap: K-HOOK-0006 · SHA: 49b4343aa9b84840163c79639
 - **Sapma:** eski regex bölücü tırnağı bilmiyordu; `sh -c 'a && make test'` tırnak içinden bölünüyordu. Yerine tırnağa duyarlı `split_pipelines` yazdım. Yönlendirmeler (`2>&1`, `>|`, `|&`) ayırıcı sayılmaz; regresyon testi c19fc8d.
 - **Kapı:** kırmızı koşu → `state/evidence/hook-tests-r2-red.log` (23 failed). Yeşil koşu `py -3.12 -m pytest tests/hooks -q` 136 passed, exit 0 → `state/evidence/hook-tests-r2.log` (HEAD satırlı). Ruff 0.17.3 temiz → `hook-ruff-r2.log`.
 - NOTE 1-8 PR notunda, "r1 NOTE'ları" bölümünde; bu turda bunlar için kod değişikliği yok. PR notu: `state/pr/fix-ajan-hooklari.md` (r2 bölümü). Dal donduruldu.
+
+### A-HOOK-0009 · 2026-11-16 19:53 · → koordinator · PR-HAZIR
+Paket: fix/ajan-hooklari · Cevap: K-HOOK-0010 · SHA: 7a1195afc17648062a0a6afdae45d2aa54d88bd9
+- r3 delta `49b4343..7a1195a`: 3 commit (test 8dba118, fix c05fee1, docs 7a1195a), 5 dosya +55/-4. `main...HEAD`: 13 commit, 9 dosya +1824/-88. Taban 9d38bc4; main bu dalın dosyalarına dokunmadı.
+- **MINOR-2:** `check_tokens` derinlik sınırında iç komut bulursa `GUARD-DERINLIK` ile engeller. İç komut `sh -c` ile ya da `compose run|exec` servis komutu olarak gelebilir. Testler: 4 düzey push ve 4 düzey `ls` engel. 3 düzey push yine `PUSH` olarak yakalanıyor, 3 düzey `ls` serbest. Sınırdaki iç komutlu `compose run` engel, komutsuz olanı serbest.
+- **MINOR-1:** yalnız belge. Denetlenmeyen sarmalayıcılar `env`, `command`, `exec`, `time`, `nice`, `nohup`; ayrıca `bash -o … -c`, `$(…)`, ters tırnak ve `{ …; }`. Hepsi docs 9.2 "Bilinen sınırlar", ENVIRONMENT "Hook ile zorlanan kurallar" ve SECURITY push satırında yazılı (FOLLOWUP-189). **MINOR-3:** dokunulmadı.
+- **Kapı:** kırmızı koşu → `state/evidence/hook-tests-r3-red.log` (3 failed). `py -3.12 -m pytest tests/hooks -q` 142 passed, exit 0 → `hook-tests-r3.log`. Ruff 0.17.3 temiz → `hook-ruff-r3.log`.
+- r2 NOTE 1-5 PR notunun r3 bölümünde. Dal donduruldu.

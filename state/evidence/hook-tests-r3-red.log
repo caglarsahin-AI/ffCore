@@ -1,0 +1,57 @@
+HEAD 49b4343aa9b84840163c79639c396bb7859ad312 + r3 red tests (uncommitted at run), 2026-11-16
+..FF..F.                                                                 [100%]
+================================== FAILURES ===================================
+_______________________ test_four_nested_shells_blocked _______________________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-35/test_four_nested_shells_blocke0/ffcore')
+
+    def test_four_nested_shells_blocked(main_root):
+        """r2 MINOR-2 (R13): beyond the nesting limit the guard blocks instead of passing."""
+        proc = run_hook(bash(nest("git push origin main", 4)), main_root, FFCORE_ROL="isci-a")
+>       assert_blocked(proc, "GUARD-DERINLIK")
+
+tests\hooks\test_guard.py:824: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py'], returncode=0, stdout='', stderr='')
+rule = 'GUARD-DERINLIK'
+
+    def assert_blocked(proc, rule: str) -> None:
+>       assert proc.returncode == BLOCK, (proc.returncode, proc.stderr)
+E       AssertionError: (0, '')
+E       assert 0 == 2
+E        +  where 0 = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py'], returncode=0, stdout='', stderr='').returncode
+
+tests\hooks\test_guard.py:29: AssertionError
+__________________ test_four_nested_harmless_shells_blocked ___________________
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-35/test_four_nested_harmless_shel0/ffcore')
+
+    def test_four_nested_harmless_shells_blocked(guard, main_root):
+>       assert "GUARD-DERINLIK" in rules(guard, bash(nest("ls", 4)), main_root)
+E       assert 'GUARD-DERINLIK' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py'>, {'hook_event_name': 'PreToolUse', 'session_id': '11111111-2222-3333-4444-555555555555', 'tool_input': {'command': 'sh -c \'sh -c \'"\'"\'sh -c \'"\'"\'"\'"\'"\'"\'"\'"\'sh -c ls\'"\'"\'"\'"\'"\'"\'"\'"\'\'"\'"\'\''}, 'tool_name': 'Bash'}, WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-35/test_four_nested_harmless_shel0/ffcore'))
+E        +    where {'hook_event_name': 'PreToolUse', 'session_id': '11111111-2222-3333-4444-555555555555', 'tool_input': {'command': 'sh -c \'sh -c \'"\'"\'sh -c \'"\'"\'"\'"\'"\'"\'"\'"\'sh -c ls\'"\'"\'"\'"\'"\'"\'"\'"\'\'"\'"\'\''}, 'tool_name': 'Bash'} = bash('sh -c \'sh -c \'"\'"\'sh -c \'"\'"\'"\'"\'"\'"\'"\'"\'sh -c ls\'"\'"\'"\'"\'"\'"\'"\'"\'\'"\'"\'\'')
+E        +      where 'sh -c \'sh -c \'"\'"\'sh -c \'"\'"\'"\'"\'"\'"\'"\'"\'sh -c ls\'"\'"\'"\'"\'"\'"\'"\'"\'\'"\'"\'\'' = nest('ls', 4)
+
+tests\hooks\test_guard.py:828: AssertionError
+__________________ test_compose_run_at_nesting_limit_blocked __________________
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-35/test_compose_run_at_nesting_li0/ffcore')
+
+    def test_compose_run_at_nesting_limit_blocked(guard, main_root):
+        cmd = nest("docker compose run --rm tools ls", 3)
+>       assert "GUARD-DERINLIK" in rules(guard, bash(cmd), main_root)
+E       assert 'GUARD-DERINLIK' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py'>, {'hook_event_name': 'PreToolUse', 'session_id': '11111111-2222-3333-4444-555555555555', 'tool_input': {'command': 'sh ... \'"\'"\'"\'"\'"\'"\'"\'"\'docker compose run --rm tools ls\'"\'"\'"\'"\'"\'"\'"\'"\'\'"\'"\'\''}, 'tool_name': 'Bash'}, WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-35/test_compose_run_at_nesting_li0/ffcore'))
+E        +    where {'hook_event_name': 'PreToolUse', 'session_id': '11111111-2222-3333-4444-555555555555', 'tool_input': {'command': 'sh ... \'"\'"\'"\'"\'"\'"\'"\'"\'docker compose run --rm tools ls\'"\'"\'"\'"\'"\'"\'"\'"\'\'"\'"\'\''}, 'tool_name': 'Bash'} = bash('sh -c \'sh -c \'"\'"\'sh -c \'"\'"\'"\'"\'"\'"\'"\'"\'docker compose run --rm tools ls\'"\'"\'"\'"\'"\'"\'"\'"\'\'"\'"\'\'')
+
+tests\hooks\test_guard.py:842: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/hooks/test_guard.py::test_four_nested_shells_blocked - Assertion...
+FAILED tests/hooks/test_guard.py::test_four_nested_harmless_shells_blocked - ...
+FAILED tests/hooks/test_guard.py::test_compose_run_at_nesting_limit_blocked
+3 failed, 5 passed, 134 deselected in 2.45s
+exit=1

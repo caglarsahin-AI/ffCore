@@ -2,7 +2,7 @@
 
 **Paket:** fix/ajan-hooklari · **Sınıf:** [C] (güvenlik davranışı; kullanıcı onayı 16 Kasım, KARARLAR "Ajan kuralları hook ile zorlanır…") · **Branch:** fix/ajan-hooklari · **Worktree:** `.worktrees/fix/ajan-hooklari` · **Baz commit:** 9d38bc4 (plan anında 38ced4d; b9f9fd7 ve 10c-1 merge sonrası docs çakışmasın diye iki kez rebase; ikisi de temiz) · **İşçi:** isci-a (`ffcore-isci-a-hook`) · **Brief:** K-HOOK-0001 GOREV + K-HOOK-0002 EK (push kuralı)
 
-Durum: **IMPLEMENTED (r2)**: DUZELT K-HOOK-0006 (r1 DEGISIKLIK, M2 m2) uygulandı. HEAD `49b4343aa9b84840163c79639c396bb7859ad312`; r1 HEAD `3ab062d` (VERIFIED, gerçek oturum kanıtı 19:09). PR-HAZIR r2 A-HOOK-0008.
+Durum: **IMPLEMENTED (r3)**: r2 ONAY (R-HOOK-0004, B0 M0 m3) ve merge öncesi küçük dilim DUZELT K-HOOK-0010 uygulandı. HEAD `7a1195afc17648062a0a6afdae45d2aa54d88bd9`. PR-HAZIR r3 A-HOOK-0009.
 
 ## Plan
 
@@ -252,3 +252,32 @@ Plandan sapma (gerekçeli): eski `TOP_SPLIT_RE`/`PIPE_SPLIT_RE` tırnağı bilmi
 6. **Göreli yol:** `check_write` göreli `file_path`'i kök dışı sayar. Claude Code yazma araçları mutlak yol ister; risk düşük. Engel istenirse ayrı karar.
 7. **`scripts/context_budget.py`:** iki fail-loud açığı (yok dosya ve bulunamayan `## İndeks` → 0 ve "ok"). Koordinatör betiği, bu paketin dışında.
 8. Kapsam ve dürüstlük işaretleri doğrulandı; ek iş yok.
+
+## r3: DUZELT K-HOOK-0010 (r2 ONAY, rapor `state/reviews/fix-ajan-hooklari-r2.md`)
+
+Delta `49b4343..7a1195a`: 3 commit, 5 dosya +55/-4. `main...HEAD`: 13 commit, 9 dosya +1824/-88. Taban hâlâ 9d38bc4; main o tarihten beri bu dalın dosyalarına dokunmadı, rebase gerekmedi.
+
+| Commit | Tür | İçerik |
+|---|---|---|
+| 8dba118 | test | kırmızı testler: 4 düzey `sh -c` (push ve zararsız `ls`) ve 3. düzeyde iç komutlu `compose run` → `GUARD-DERINLIK`; 3 düzey push yine `PUSH`; 3 düzey `ls` ve komutsuz `compose run` serbest. 3 kırmızı, 5 yeşil → `state/evidence/hook-tests-r3-red.log` |
+| c05fee1 | fix | `check_tokens` sınırda (`depth >= MAX_NESTING`) `shell_inner` ya da iç komutlu `compose_service_command` bulursa `GUARD-DERINLIK` (engel; warn kipinde uyarı) |
+| 7a1195a | docs | 9.2 kural tablosuna `GUARD-DERINLIK` satırı; "İç içe komutlar" ve "Bilinen sınırlar" bölümlerine `env`, `command`, `exec`, `time`, `nice`, `nohup`, `bash -o … -c`, `$(…)`, ters tırnak ve `{ …; }` (FOLLOWUP-189); `( … )` denetlenir. ENVIRONMENT "Hook ile zorlanan kurallar" ve SECURITY push satırında aynı sınır |
+
+| Bulgu | Sonuç |
+|---|---|
+| MINOR-2 (4. düzey sessiz geçiyordu) | kod + test: `test_four_nested_*`, `test_three_nested_*`, `test_compose_run_*_limit_*` |
+| MINOR-1 (önek ve gruplama biçimleri) | yalnız belge (karar: kod FOLLOWUP-189) |
+| MINOR-3 (JSON gövdesi ve `-u user:pass` maskesi) | dokunulmadı (FOLLOWUP-189) |
+
+| Komut | Ortam | Exit | Süre |
+|---|---|---|---|
+| `py -3.12 -m pytest tests/hooks -q -p no:cacheprovider -k "<r3 testleri>" 2>&1 \| tee state/evidence/hook-tests-r3-red.log` | kod öncesi | 1 (3 failed, 5 passed) | 2 sn |
+| `py -3.12 -m pytest tests/hooks -q -p no:cacheprovider 2>&1 \| tee state/evidence/hook-tests-r3.log` | HEAD 7a1195a | 0 (**142 passed**) | 90 sn |
+| `ruff check` + `ruff format --check` `.claude/hooks tests/hooks` → `state/evidence/hook-ruff-r3.log` | ruff 0.17.3, HEAD 7a1195a | 0 | <1 sn |
+
+### r2 NOTE'ları (koordinatöre bilgi; bu turda kod değişikliği yok)
+1. Dıştaki `tee` içteki `tail`'i örtüyor (`sh -c 'make test | tail -5' | tee x.log` serbest). Kural "dış tee iç kapıyı karşılar" olarak yazılı.
+2. Dengesiz tırnakta ayırıcı çökmüyor, çıkış 0; Bash o komutu zaten koşmaz. İstenirse warn eklenebilir.
+3. Yinelenen ihlaller tekilleştiriliyor (dalga raporu sayımı için doğru).
+4. r1 N2 warn gününde açık: `systemMessage` görünümü, `Read` deny (`//c/`), `Edit`'in Write'ı kapsaması, yeni `Edit(//c/…/paycoreLLM/.env)`.
+5. Delta düzeni ve sapma gerekçesi doğrulandı.
