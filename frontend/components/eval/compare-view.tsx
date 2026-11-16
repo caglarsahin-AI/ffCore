@@ -36,7 +36,8 @@ export function CompareView({ compare }: { compare: Compare }) {
         ] as [string, React.ReactNode, MetricDiff],
     ),
   ];
-  const notRun = Object.entries(compare.summary.not_run);
+  // A side without not-run codes gets no table (nothing to show is not an empty table).
+  const notRun = Object.entries(compare.summary.not_run).filter(([, counts]) => Object.keys(counts).length > 0);
   const sideName = (side: string) => (side === "a" ? t("examA") : side === "b" ? t("examB") : side);
   const completeOf = (id: string) => compare.complete[id];
 
