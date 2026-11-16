@@ -180,17 +180,19 @@ describe("test_10c1_3_eval_stream stall watchdog", () => {
   });
 });
 
-// R-10C1-0003 MAJOR-1 symptom "Queued while running": while the stream is followed, its status is
-// the newest; once it ended (done, lost, ended) the status read with GET is.
-describe("test_10c1_3_eval_stream shown status", () => {
-  it("prefers the stream's status only while streaming", async () => {
-    const { shownStatus } = await import("@/lib/eval-stream");
-    const running = { status: "running", items: 1, scored: 0 };
-    expect(shownStatus("queued", "streaming", running)).toBe("running");
-    expect(shownStatus("queued", "streaming", null)).toBe("queued");
-    expect(shownStatus("cancelled", "lost", running)).toBe("cancelled");
-    expect(shownStatus("completed", "done", running)).toBe("completed");
-    expect(shownStatus("queued", null, running)).toBe("queued");
+// R-10C1-0003 MAJOR-1 symptom "Queued while running", r2 probe 4 "Queued while reconnecting": the
+// page shows whichever it heard last, the stream's progress or the exam read with GET; a failed
+// GET does not bring back an older status.
+describe("test_10c1_3_eval_stream newest state", () => {
+  it("shows the newer of the stream's progress and the GET read", async () => {
+    const { newestState } = await import("@/lib/eval-stream");
+    const run = { status: "queued", items: 1, scored: 0 };
+    const progress = { status: "running", items: 1, scored: 0 };
+    expect(newestState(run, 1000, progress, 2000)).toEqual(progress);
+    expect(newestState(run, 3000, progress, 2000)).toEqual(run);
+    expect(newestState(run, 1000, null, 0)).toEqual(run);
+    // A tie goes to GET (the full record).
+    expect(newestState(run, 2000, progress, 2000)).toEqual(run);
   });
 });
 
