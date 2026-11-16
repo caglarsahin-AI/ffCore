@@ -18,6 +18,11 @@ export type EvalFollowOptions = {
   onDone: (done: EvalDone) => void;
   // An event name outside progress/done: reported, skipped; the stream goes on.
   onUnknown?: (name: string) => void;
+  // An attempt ended without done and the stream is being reopened: the page reads the exam with
+  // GET meanwhile (K-10C1-0007). Said once per phase; the last failed attempt is `lost` instead.
+  onReconnecting?: () => void;
+  // A reopened stream spoke again (its first event, before that event is delivered).
+  onResumed?: () => void;
   signal?: AbortSignal;
   maxReopens?: number;
   retryDelayMs?: number;
@@ -55,6 +60,7 @@ async function drain(response: Response, options: EvalFollowOptions, attempt: At
       if (attempt.signal.aborted) return null;
       attempt.alive();
       for (const message of parser.push(done ? decoder.decode() : decoder.decode(value, { stream: true }))) {
+        attempt.spoke();
         if (message.event !== "progress" && message.event !== "done") {
           options.onUnknown?.(message.event);
           continue;
@@ -91,9 +97,9 @@ async function drain(response: Response, options: EvalFollowOptions, attempt: At
 
 // One attempt: its own AbortController, chained to the outside signal and fired by the watchdog
 // when nothing arrived for `stallMs` (the request itself included).
-type Attempt = { signal: AbortSignal; alive: () => void; end: () => void };
+type Attempt = { signal: AbortSignal; alive: () => void; end: () => void; spoke: () => void };
 
-function startAttempt(stallMs: number, outside?: AbortSignal): Attempt {
+function startAttempt(stallMs: number, outside: AbortSignal | undefined, spoke: () => void): Attempt {
   const controller = new AbortController();
   const abort = () => controller.abort();
   outside?.addEventListener("abort", abort, { once: true });
@@ -106,6 +112,7 @@ function startAttempt(stallMs: number, outside?: AbortSignal): Attempt {
   return {
     signal: controller.signal,
     alive,
+    spoke,
     end: () => {
       clearTimeout(timer);
       outside?.removeEventListener("abort", abort);
@@ -137,11 +144,23 @@ export async function followEvalStream(options: EvalFollowOptions): Promise<Eval
   const maxReopens = options.maxReopens ?? MAX_REOPENS;
   const delay = options.retryDelayMs ?? REOPEN_DELAY_MS;
   const stallMs = options.stallMs ?? STALL_MS;
+  let reconnecting = false;
+  const spoke = () => {
+    if (!reconnecting) return;
+    reconnecting = false;
+    options.onResumed?.();
+  };
   for (let i = 0; i <= maxReopens; i++) {
     if (options.signal?.aborted) return "aborted";
-    if (i > 0) await sleep(delay, options.signal);
+    if (i > 0) {
+      if (!reconnecting) {
+        reconnecting = true;
+        options.onReconnecting?.();
+      }
+      await sleep(delay, options.signal);
+    }
     if (options.signal?.aborted) return "aborted";
-    const attempt = startAttempt(stallMs, options.signal);
+    const attempt = startAttempt(stallMs, options.signal, spoke);
     try {
       const response = await openWithin(attempt, options.open);
       attempt.alive();

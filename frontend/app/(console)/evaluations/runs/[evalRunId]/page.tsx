@@ -28,18 +28,21 @@ export default function ExamPage() {
   return <ExamDetail key={`${projectId}:${evalRunId}`} projectId={projectId} evalRunId={evalRunId} />;
 }
 
-// "streaming": following the stream; "lost": it dropped and could not be reopened, so the exam is
-// read with GET every few seconds instead; "done": the stream said the exam ended; "ended": the
-// exam had ended before the page opened.
-type StreamState = "streaming" | "lost" | "done" | "ended";
+// "streaming": following the stream; "reconnecting": an attempt ended without done (dropped or
+// silent for STALL_MS), the stream is being reopened and meanwhile the exam is read with GET every
+// few seconds (K-10C1-0007); "lost": it could not be reopened, GET goes on; "done": the stream said
+// the exam ended; "ended": the exam had ended before the page opened.
+type StreamState = "streaming" | "reconnecting" | "lost" | "done" | "ended";
 
 function ExamDetail({ projectId, evalRunId }: { projectId: string; evalRunId: string }) {
   const t = useTranslations("Evaluations");
   const tState = useTranslations("State");
   const [stream, setStream] = useState<StreamState | null>(null);
-  const query = useEvalRun(projectId, evalRunId, stream === "lost");
+  const query = useEvalRun(projectId, evalRunId, stream === "reconnecting" || stream === "lost");
   if (query.isPending || (query.isError && isUnauthenticated(query.error))) return <p className="text-muted-foreground">{tState("loading")}</p>;
-  if (query.isError) {
+  // A failed re-read keeps the exam on screen (and the stream followed) with the error above it;
+  // only a first read that failed has nothing to show.
+  if (query.isError && !query.data) {
     return (
       <div className="flex flex-col gap-4">
         <BackLink href="/evaluations" label={t("back")} />
@@ -47,7 +50,12 @@ function ExamDetail({ projectId, evalRunId }: { projectId: string; evalRunId: st
       </div>
     );
   }
-  return <Loaded projectId={projectId} run={query.data} stream={stream} setStream={setStream} />;
+  return (
+    <div className="flex flex-col gap-4">
+      {query.isError && <QueryError error={query.error} />}
+      <Loaded projectId={projectId} run={query.data} stream={stream} setStream={setStream} />
+    </div>
+  );
 }
 
 function Loaded({ projectId, run, stream, setStream }: { projectId: string; run: EvalRun; stream: StreamState | null; setStream: (s: StreamState) => void }) {
@@ -79,6 +87,12 @@ function Loaded({ projectId, run, stream, setStream }: { projectId: string; run:
       },
       // An event name the console does not know is noted and skipped (K-10C1-0002).
       onUnknown: (name) => console.warn(`eval stream: unknown event "${name}" ignored`),
+      // Read the exam with GET at once and every few seconds until the stream speaks again.
+      onReconnecting: () => {
+        setStream("reconnecting");
+        void client.invalidateQueries({ queryKey: evalKeys.run(projectId, run.id) });
+      },
+      onResumed: () => setStream("streaming"),
       signal: controller.signal,
     }).then((end) => {
       if (end === "done") setStream("done");
@@ -136,6 +150,7 @@ function Loaded({ projectId, run, stream, setStream }: { projectId: string; run:
             <div className="h-full bg-primary transition-all" style={{ width: `${Math.min(100, (scored / items) * 100)}%` }} />
           </div>
         )}
+        {stream === "reconnecting" && <p className="text-sm text-muted-foreground">{t("streamReconnectingHint")}</p>}
         {stream === "lost" && <p className="text-sm text-muted-foreground">{t("streamLostHint")}</p>}
         <EvalSummaryView run={run} />
       </Screen>

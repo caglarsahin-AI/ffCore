@@ -1209,6 +1209,7 @@
       "live": "Live updates",
       "stream": {
         "streaming": "Following",
+        "reconnecting": "Connection interrupted, reconnecting; reading every few seconds",
         "lost": "Connection lost, reading every few seconds",
         "done": "Ended",
         "ended": "Ended before this page opened"
@@ -1217,6 +1218,7 @@
       "version": "Agent version",
       "started": "Started",
       "ended": "Ended",
+      "streamReconnectingHint": "The live connection stopped. It is being reopened; meanwhile the page reads the exam again every few seconds.",
       "streamLostHint": "The live connection dropped and could not be reopened. The page reads the exam again every few seconds."
     },
     "summary": {

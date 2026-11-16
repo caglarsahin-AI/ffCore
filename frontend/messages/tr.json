@@ -1209,6 +1209,7 @@
       "live": "Canlı güncelleme",
       "stream": {
         "streaming": "İzleniyor",
+        "reconnecting": "Bağlantı kesildi, yeniden bağlanılıyor; birkaç saniyede bir okunuyor",
         "lost": "Bağlantı koptu, birkaç saniyede bir okunuyor",
         "done": "Bitti",
         "ended": "Bu sayfa açılmadan bitmişti"
@@ -1217,6 +1218,7 @@
       "version": "Agent sürümü",
       "started": "Başladı",
       "ended": "Bitti",
+      "streamReconnectingHint": "Canlı bağlantı durdu. Yeniden açılıyor; bu arada sayfa sınavı birkaç saniyede bir yeniden okuyor.",
       "streamLostHint": "Canlı bağlantı koptu ve yeniden açılamadı. Sayfa sınavı birkaç saniyede bir yeniden okuyor."
     },
     "summary": {
