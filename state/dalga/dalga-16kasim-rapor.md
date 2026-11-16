@@ -134,3 +134,5 @@ Adım 2 taşıması: 7 kanalda 2.076 mesaj → 13 aktif kaldı, 2.063 mesaj `sta
 ## Onay
 
 Kullanıcı bu raporu okuyup onaylar ya da bir maddeyi geri çevirir; koordinatör onayı WORK_QUEUE "Kapılar" tablosuna tarih ve rapor yoluyla yazar.
+
+**Onay: 2026-11-16, kullanıcı (koordinatör oturumunda "Onaylıyorum"); geri çevrilen madde yok.** Sonraki dalga READY.

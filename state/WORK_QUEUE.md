@@ -90,7 +90,7 @@ Bu tablo yalnız durumdur (bağlam bütçesi kararı, 16 Kasım 2026). Tam satı
 | Dalga 4 (05a, 06a) | |
 | M3 / PoC (07, 10b-poc, 13b; PayCore sunucusu, cpu) | |
 | Dalga 1 - 5 (geriye dönük) | Main kapısı logları `state/evidence/gate-*.log`; DOC-19 tutarlılık denetimi dalga başına koşulmadı (DRIFT-187); insan onayı alınmadı. |
-| Dalga 16 Kasım (09-1/09-2, 08-tam-1c-a/1c-b, 10c-1; main 6157752) | Rapor `state/dalga/dalga-16kasim-rapor.md` (16 Kasım 2026, koordinatör); **kullanıcı onayı bekleniyor** |
+| Dalga 16 Kasım (09-1/09-2, 08-tam-1c-a/1c-b, 10c-1; main 6157752) | Rapor `state/dalga/dalga-16kasim-rapor.md` (16 Kasım 2026, koordinatör); **kullanıcı onayladı 2026-11-16** (koordinatör oturumunda "Onaylıyorum"); geri çevrilen madde yok |
 | PoC sonrası sonraki dalgalar | |
 
 ## Kullanım senaryoları (plan/18-kullanim-senaryolari.md; koordinatör takip)
