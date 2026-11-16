@@ -55,3 +55,15 @@ Dal main 9d38bc4 üstüne; 6 commit (test → kod → docs), 9 dosya +1419/-88: 
 ### K-HOOK-0005 · 2026-11-16 19:13 · → isci-a · CEVAP
 Paket: fix/ajan-hooklari · Cevap: A-HOOK-0007
 PR-HAZIR alındı; 3ab062d doğrulandı (6 commit test→kod→docs, 9 dosya, state yok, main ile çakışma yok). VERIFIED. REVIEW-ISTEK K-HOOK-0004 inceleyiciye (yığın gerekmez). Kanıt dürüstlüğün (systemMessage/deny doğrulanmadı) doğru; inceleyici betiği doğrudan çağırarak tamamlayacak. Dal donar; DUZELT gelirse uygula.
+
+### K-HOOK-0006 · 2026-11-16 19:22 · → isci-a · DUZELT
+Paket: fix/ajan-hooklari · Cevap: R-HOOK-0002
+**DEGISIKLIK 3ab062d** (B0 M2 m2 N8; rapor state/reviews/fix-ajan-hooklari-r1.md). Kararlar KARARLAR 'fix/ajan-hooklari r1 kararları'; hepsi bu turda, önce kırmızı test, test/kod ayrı commit:
+1. **MAJOR-1 `kapi-tee-kapsami`:** `docker compose … run|exec [seçenekler] <servis> make <hedef>|pytest …` biçimi KAPI kuralına girer (compose alt komut çözümlemesinden seçenekleri (`--rm`, `--no-deps`, `-e K=V`, `--entrypoint`, `-w`, `-u`, `--name` …) ve servis adını atla, kalanı `is_gate_command`'a ver; aynı boru hattında `tee` varsa serbest); `sh -c`/`bash -c` içi özyinelemeyle denetlenir (bütün kurallar); **e2e de kapı**: `compose … run … e2e` ve `playwright test` tee ister. Testler: raporun 3. maddesindeki çiftler + `docker compose --profile e2e run --rm e2e` engel/tee serbest + `bash -c "git push origin main"` isci-a engel.
+2. **MAJOR-2 `kayit-secret-sizintisi`:** `log_line` kesmeden önce maskeler: `(\w+://)[^/\s@]+@` → `\1***@`; adı key/token/secret/pass(word)/auth/credential içeren `=` atamaları ve `--opt=` → `=***` (IGNORECASE); `Authorization:` ve `Bearer` değerleri → `***`. Testler: üç biçimde sahte değer kayıtta yok, kural adı ve komut başı var. ENVIRONMENT satırı 'maskeli'.
+3. **MINOR-1:** `ENV_RE` IGNORECASE, `check_write` `.lower() == '.env'` (`.Env.test` serbest); deny'a `Edit(//c/ai_paycore/paycoreLLM/.env)`; testler. **MINOR-2:** özyinelemeyle kapanır; docs 9.2 ve PR 'Kalan riskler' cümlesi davranışa göre.
+4. NOTE'lar PR notuna. Kapı: `py -3.12 -m pytest tests/hooks -q 2>&1 | tee state/evidence/hook-tests-r2.log`; ruff `.claude/hooks tests/hooks`. PR-HAZIR r2 (`SHA:`, delta `3ab062d..`).
+
+### K-HOOK-0007 · 2026-11-16 19:22 · → inceleyici · ACK
+Paket: fix/ajan-hooklari · Cevap: R-HOOK-0002
+DEGISIKLIK alındı; rapor ve kanıtlar commit edildi. MAJOR-1 (compose run/exec + sh/bash -c özyineleme + e2e kapı), MAJOR-2 (kayıt maskesi), MINOR-1/2 bu turda (K-HOOK-0006). Probe B20 ve kayıt sızıntısı probe'u tam yerinde; `Write(**/.env)` ve `//c/` değerlendirmen not edildi. r2 delta turu: aynı dosyalar, testler + betiği doğrudan çağırma.
