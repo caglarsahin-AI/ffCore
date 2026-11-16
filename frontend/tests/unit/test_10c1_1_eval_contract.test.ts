@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 
+import { hasRole } from "@/lib/access";
 import { errorMessageKey } from "@/lib/api/errors";
 import { EVAL_RUN_STATUSES, SCORER_NAMES, isLiveEvalRun } from "@/lib/api/eval-queries";
+import { NAV_GROUPS, canOpen } from "@/lib/navigation";
 import en from "@/messages/en.json";
 import tr from "@/messages/tr.json";
 
@@ -61,5 +63,12 @@ describe("test_10c1_1_eval_contract", () => {
         ? Object.entries(value).flatMap(([k, v]) => keys(v, `${prefix}${k}.`))
         : [prefix.slice(0, -1)];
     expect(keys(tr.Evaluations).sort()).toEqual(keys(en.Evaluations).sort());
+  });
+
+  it("opens the Evaluations screen to analyst and above, never to user (R10.5, backend Reader=analyst)", () => {
+    const item = NAV_GROUPS.flatMap((g) => g.items).find((i) => i.key === "evaluations")!;
+    expect(item).toMatchObject({ href: "/evaluations", minRole: "analyst", ready: true });
+    expect(canOpen(item, "user", false)).toBe(false);
+    for (const role of ["analyst", "developer", "admin"] as const) expect(canOpen(item, role, false) && hasRole(role, "analyst")).toBe(true);
   });
 });
