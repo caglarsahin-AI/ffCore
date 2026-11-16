@@ -1,0 +1,2008 @@
+FFFFFFEFFFFFFFFFFFFFFFFFFEEEEEEEFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF [ 76%]
+FFFFFFFFFFFFFFFEEEEEEF                                                   [100%]
+=================================== ERRORS ====================================
+_________ ERROR at setup of test_env_file_flag_with_env_test_allowed __________
+
+    @pytest.fixture
+    def guard():
+        """Import the guard module from its file path (it is not a package)."""
+        spec = importlib.util.spec_from_file_location("ffcore_guard", GUARD_PATH)
+        assert spec and spec.loader, f"guard not found: {GUARD_PATH}"
+        module = importlib.util.module_from_spec(spec)
+>       spec.loader.exec_module(module)
+E       FileNotFoundError: [Errno 2] No such file or directory: 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py'
+
+tests\hooks\conftest.py:107: FileNotFoundError
+____________ ERROR at setup of test_compose_up_pull_never_allowed _____________
+
+    @pytest.fixture
+    def guard():
+        """Import the guard module from its file path (it is not a package)."""
+        spec = importlib.util.spec_from_file_location("ffcore_guard", GUARD_PATH)
+        assert spec and spec.loader, f"guard not found: {GUARD_PATH}"
+        module = importlib.util.module_from_spec(spec)
+>       spec.loader.exec_module(module)
+E       FileNotFoundError: [Errno 2] No such file or directory: 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py'
+
+tests\hooks\conftest.py:107: FileNotFoundError
+_________ ERROR at setup of test_compose_up_pull_equals_never_allowed _________
+
+    @pytest.fixture
+    def guard():
+        """Import the guard module from its file path (it is not a package)."""
+        spec = importlib.util.spec_from_file_location("ffcore_guard", GUARD_PATH)
+        assert spec and spec.loader, f"guard not found: {GUARD_PATH}"
+        module = importlib.util.module_from_spec(spec)
+>       spec.loader.exec_module(module)
+E       FileNotFoundError: [Errno 2] No such file or directory: 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py'
+
+tests\hooks\conftest.py:107: FileNotFoundError
+_________________ ERROR at setup of test_fourth_stack_blocked _________________
+
+    @pytest.fixture
+    def guard():
+        """Import the guard module from its file path (it is not a package)."""
+        spec = importlib.util.spec_from_file_location("ffcore_guard", GUARD_PATH)
+        assert spec and spec.loader, f"guard not found: {GUARD_PATH}"
+        module = importlib.util.module_from_spec(spec)
+>       spec.loader.exec_module(module)
+E       FileNotFoundError: [Errno 2] No such file or directory: 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py'
+
+tests\hooks\conftest.py:107: FileNotFoundError
+_________________ ERROR at setup of test_third_stack_allowed __________________
+
+    @pytest.fixture
+    def guard():
+        """Import the guard module from its file path (it is not a package)."""
+        spec = importlib.util.spec_from_file_location("ffcore_guard", GUARD_PATH)
+        assert spec and spec.loader, f"guard not found: {GUARD_PATH}"
+        module = importlib.util.module_from_spec(spec)
+>       spec.loader.exec_module(module)
+E       FileNotFoundError: [Errno 2] No such file or directory: 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py'
+
+tests\hooks\conftest.py:107: FileNotFoundError
+____________ ERROR at setup of test_up_into_running_stack_allowed _____________
+
+    @pytest.fixture
+    def guard():
+        """Import the guard module from its file path (it is not a package)."""
+        spec = importlib.util.spec_from_file_location("ffcore_guard", GUARD_PATH)
+        assert spec and spec.loader, f"guard not found: {GUARD_PATH}"
+        module = importlib.util.module_from_spec(spec)
+>       spec.loader.exec_module(module)
+E       FileNotFoundError: [Errno 2] No such file or directory: 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py'
+
+tests\hooks\conftest.py:107: FileNotFoundError
+______________ ERROR at setup of test_stack_count_failure_blocks ______________
+
+    @pytest.fixture
+    def guard():
+        """Import the guard module from its file path (it is not a package)."""
+        spec = importlib.util.spec_from_file_location("ffcore_guard", GUARD_PATH)
+        assert spec and spec.loader, f"guard not found: {GUARD_PATH}"
+        module = importlib.util.module_from_spec(spec)
+>       spec.loader.exec_module(module)
+E       FileNotFoundError: [Errno 2] No such file or directory: 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py'
+
+tests\hooks\conftest.py:107: FileNotFoundError
+_________ ERROR at setup of test_stack_parser_counts_only_running_ff __________
+
+    @pytest.fixture
+    def guard():
+        """Import the guard module from its file path (it is not a package)."""
+        spec = importlib.util.spec_from_file_location("ffcore_guard", GUARD_PATH)
+        assert spec and spec.loader, f"guard not found: {GUARD_PATH}"
+        module = importlib.util.module_from_spec(spec)
+>       spec.loader.exec_module(module)
+E       FileNotFoundError: [Errno 2] No such file or directory: 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py'
+
+tests\hooks\conftest.py:107: FileNotFoundError
+_____________ ERROR at setup of test_guard_internal_error_blocks ______________
+
+    @pytest.fixture
+    def guard():
+        """Import the guard module from its file path (it is not a package)."""
+        spec = importlib.util.spec_from_file_location("ffcore_guard", GUARD_PATH)
+        assert spec and spec.loader, f"guard not found: {GUARD_PATH}"
+        module = importlib.util.module_from_spec(spec)
+>       spec.loader.exec_module(module)
+E       FileNotFoundError: [Errno 2] No such file or directory: 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py'
+
+tests\hooks\conftest.py:107: FileNotFoundError
+_ ERROR at setup of test_guard_internal_error_never_locks_guard_files[.claude/hooks/ffcore_guard.py] _
+
+    @pytest.fixture
+    def guard():
+        """Import the guard module from its file path (it is not a package)."""
+        spec = importlib.util.spec_from_file_location("ffcore_guard", GUARD_PATH)
+        assert spec and spec.loader, f"guard not found: {GUARD_PATH}"
+        module = importlib.util.module_from_spec(spec)
+>       spec.loader.exec_module(module)
+E       FileNotFoundError: [Errno 2] No such file or directory: 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py'
+
+tests\hooks\conftest.py:107: FileNotFoundError
+_ ERROR at setup of test_guard_internal_error_never_locks_guard_files[.claude/settings.json] _
+
+    @pytest.fixture
+    def guard():
+        """Import the guard module from its file path (it is not a package)."""
+        spec = importlib.util.spec_from_file_location("ffcore_guard", GUARD_PATH)
+        assert spec and spec.loader, f"guard not found: {GUARD_PATH}"
+        module = importlib.util.module_from_spec(spec)
+>       spec.loader.exec_module(module)
+E       FileNotFoundError: [Errno 2] No such file or directory: 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py'
+
+tests\hooks\conftest.py:107: FileNotFoundError
+_ ERROR at setup of test_guard_internal_error_never_locks_guard_files[.claude\\hooks\\x.py] _
+
+    @pytest.fixture
+    def guard():
+        """Import the guard module from its file path (it is not a package)."""
+        spec = importlib.util.spec_from_file_location("ffcore_guard", GUARD_PATH)
+        assert spec and spec.loader, f"guard not found: {GUARD_PATH}"
+        module = importlib.util.module_from_spec(spec)
+>       spec.loader.exec_module(module)
+E       FileNotFoundError: [Errno 2] No such file or directory: 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py'
+
+tests\hooks\conftest.py:107: FileNotFoundError
+______ ERROR at setup of test_guard_internal_error_warn_mode_only_warns _______
+
+    @pytest.fixture
+    def guard():
+        """Import the guard module from its file path (it is not a package)."""
+        spec = importlib.util.spec_from_file_location("ffcore_guard", GUARD_PATH)
+        assert spec and spec.loader, f"guard not found: {GUARD_PATH}"
+        module = importlib.util.module_from_spec(spec)
+>       spec.loader.exec_module(module)
+E       FileNotFoundError: [Errno 2] No such file or directory: 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py'
+
+tests\hooks\conftest.py:107: FileNotFoundError
+_____________________ ERROR at setup of test_fast_decide ______________________
+
+    @pytest.fixture
+    def guard():
+        """Import the guard module from its file path (it is not a package)."""
+        spec = importlib.util.spec_from_file_location("ffcore_guard", GUARD_PATH)
+        assert spec and spec.loader, f"guard not found: {GUARD_PATH}"
+        module = importlib.util.module_from_spec(spec)
+>       spec.loader.exec_module(module)
+E       FileNotFoundError: [Errno 2] No such file or directory: 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py'
+
+tests\hooks\conftest.py:107: FileNotFoundError
+================================== FAILURES ===================================
+____________________________ test_env_cat_blocked _____________________________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-20/test_env_cat_blocked0/ffcore')
+
+    def test_env_cat_blocked(main_root):
+>       assert_blocked(run_hook(bash("cat .env"), main_root), "ENV")
+
+tests\hooks\test_guard.py:46: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n")
+rule = 'ENV'
+
+    def assert_blocked(proc, rule: str) -> None:
+        assert proc.returncode == BLOCK, (proc.returncode, proc.stderr)
+>       assert f"[{rule}]" in proc.stderr, proc.stderr
+E       AssertionError: C:\Users\caglar.sahin\AppData\Local\Programs\Python\Python312\python.exe: can't open file 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py': [Errno 2] No such file or directory
+E         
+E       assert '[ENV]' in "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n"
+E        +  where "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n" = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n").stderr
+
+tests\hooks\test_guard.py:30: AssertionError
+__________________ test_env_variants_blocked[grep KEY .env] ___________________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-20/test_env_variants_blocked_grep0/ffcore')
+cmd = 'grep KEY .env'
+
+    @pytest.mark.parametrize("cmd", ["grep KEY .env", "echo X >> .env", "cat backend/.env"])
+    def test_env_variants_blocked(main_root, cmd):
+>       assert_blocked(run_hook(bash(cmd), main_root), "ENV")
+
+tests\hooks\test_guard.py:51: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n")
+rule = 'ENV'
+
+    def assert_blocked(proc, rule: str) -> None:
+        assert proc.returncode == BLOCK, (proc.returncode, proc.stderr)
+>       assert f"[{rule}]" in proc.stderr, proc.stderr
+E       AssertionError: C:\Users\caglar.sahin\AppData\Local\Programs\Python\Python312\python.exe: can't open file 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py': [Errno 2] No such file or directory
+E         
+E       assert '[ENV]' in "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n"
+E        +  where "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n" = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n").stderr
+
+tests\hooks\test_guard.py:30: AssertionError
+__________________ test_env_variants_blocked[echo X >> .env] __________________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-20/test_env_variants_blocked_echo0/ffcore')
+cmd = 'echo X >> .env'
+
+    @pytest.mark.parametrize("cmd", ["grep KEY .env", "echo X >> .env", "cat backend/.env"])
+    def test_env_variants_blocked(main_root, cmd):
+>       assert_blocked(run_hook(bash(cmd), main_root), "ENV")
+
+tests\hooks\test_guard.py:51: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n")
+rule = 'ENV'
+
+    def assert_blocked(proc, rule: str) -> None:
+        assert proc.returncode == BLOCK, (proc.returncode, proc.stderr)
+>       assert f"[{rule}]" in proc.stderr, proc.stderr
+E       AssertionError: C:\Users\caglar.sahin\AppData\Local\Programs\Python\Python312\python.exe: can't open file 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py': [Errno 2] No such file or directory
+E         
+E       assert '[ENV]' in "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n"
+E        +  where "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n" = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n").stderr
+
+tests\hooks\test_guard.py:30: AssertionError
+_________________ test_env_variants_blocked[cat backend/.env] _________________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-20/test_env_variants_blocked_cat_0/ffcore')
+cmd = 'cat backend/.env'
+
+    @pytest.mark.parametrize("cmd", ["grep KEY .env", "echo X >> .env", "cat backend/.env"])
+    def test_env_variants_blocked(main_root, cmd):
+>       assert_blocked(run_hook(bash(cmd), main_root), "ENV")
+
+tests\hooks\test_guard.py:51: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n")
+rule = 'ENV'
+
+    def assert_blocked(proc, rule: str) -> None:
+        assert proc.returncode == BLOCK, (proc.returncode, proc.stderr)
+>       assert f"[{rule}]" in proc.stderr, proc.stderr
+E       AssertionError: C:\Users\caglar.sahin\AppData\Local\Programs\Python\Python312\python.exe: can't open file 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py': [Errno 2] No such file or directory
+E         
+E       assert '[ENV]' in "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n"
+E        +  where "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n" = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n").stderr
+
+tests\hooks\test_guard.py:30: AssertionError
+____________________________ test_env_test_allowed ____________________________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-20/test_env_test_allowed0/ffcore')
+
+    def test_env_test_allowed(main_root):
+>       assert_allowed(run_hook(bash("cat .env.test"), main_root))
+
+tests\hooks\test_guard.py:55: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n")
+
+    def assert_allowed(proc) -> None:
+>       assert proc.returncode == 0, (proc.returncode, proc.stderr)
+E       AssertionError: (2, "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_payco...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory
+E         ")
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n").returncode
+
+tests\hooks\test_guard.py:34: AssertionError
+__________________________ test_env_example_allowed ___________________________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-20/test_env_example_allowed0/ffcore')
+
+    def test_env_example_allowed(main_root):
+>       assert_allowed(run_hook(bash("cp .env.example /tmp/x"), main_root))
+
+tests\hooks\test_guard.py:59: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n")
+
+    def assert_allowed(proc) -> None:
+>       assert proc.returncode == 0, (proc.returncode, proc.stderr)
+E       AssertionError: (2, "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_payco...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory
+E         ")
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n").returncode
+
+tests\hooks\test_guard.py:34: AssertionError
+_________________________ test_env_write_tool_blocked _________________________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-20/test_env_write_tool_blocked0/ffcore')
+
+    def test_env_write_tool_blocked(main_root):
+>       assert_blocked(run_hook(edit(main_root / ".env", "Write"), main_root), "ENV")
+
+tests\hooks\test_guard.py:69: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n")
+rule = 'ENV'
+
+    def assert_blocked(proc, rule: str) -> None:
+        assert proc.returncode == BLOCK, (proc.returncode, proc.stderr)
+>       assert f"[{rule}]" in proc.stderr, proc.stderr
+E       AssertionError: C:\Users\caglar.sahin\AppData\Local\Programs\Python\Python312\python.exe: can't open file 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py': [Errno 2] No such file or directory
+E         
+E       assert '[ENV]' in "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n"
+E        +  where "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n" = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n").stderr
+
+tests\hooks\test_guard.py:30: AssertionError
+______________________ test_env_test_write_tool_allowed _______________________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-20/test_env_test_write_tool_allow0/ffcore')
+
+    def test_env_test_write_tool_allowed(main_root):
+>       assert_allowed(run_hook(edit(main_root / ".env.test", "Write"), main_root))
+
+tests\hooks\test_guard.py:73: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n")
+
+    def assert_allowed(proc) -> None:
+>       assert proc.returncode == 0, (proc.returncode, proc.stderr)
+E       AssertionError: (2, "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_payco...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory
+E         ")
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n").returncode
+
+tests\hooks\test_guard.py:34: AssertionError
+_______________________ test_paycore_data_bash_blocked ________________________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-20/test_paycore_data_bash_blocked0/ffcore')
+
+    def test_paycore_data_bash_blocked(main_root):
+>       assert_blocked(run_hook(bash("cat /c/ai_paycore/paycoreLLM/data/x.txt"), main_root), "PAYCORE")
+
+tests\hooks\test_guard.py:80: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n")
+rule = 'PAYCORE'
+
+    def assert_blocked(proc, rule: str) -> None:
+        assert proc.returncode == BLOCK, (proc.returncode, proc.stderr)
+>       assert f"[{rule}]" in proc.stderr, proc.stderr
+E       AssertionError: C:\Users\caglar.sahin\AppData\Local\Programs\Python\Python312\python.exe: can't open file 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py': [Errno 2] No such file or directory
+E         
+E       assert '[PAYCORE]' in "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n"
+E        +  where "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n" = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n").stderr
+
+tests\hooks\test_guard.py:30: AssertionError
+______________________ test_paycore_eval_results_blocked ______________________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-20/test_paycore_eval_results_bloc0/ffcore')
+
+    def test_paycore_eval_results_blocked(main_root):
+        cmd = r"type C:\ai_paycore\paycoreLLM\eval\results\run1.json"
+>       assert_blocked(run_hook(bash(cmd), main_root), "PAYCORE")
+
+tests\hooks\test_guard.py:85: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n")
+rule = 'PAYCORE'
+
+    def assert_blocked(proc, rule: str) -> None:
+        assert proc.returncode == BLOCK, (proc.returncode, proc.stderr)
+>       assert f"[{rule}]" in proc.stderr, proc.stderr
+E       AssertionError: C:\Users\caglar.sahin\AppData\Local\Programs\Python\Python312\python.exe: can't open file 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py': [Errno 2] No such file or directory
+E         
+E       assert '[PAYCORE]' in "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n"
+E        +  where "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n" = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n").stderr
+
+tests\hooks\test_guard.py:30: AssertionError
+__________________________ test_paycore_src_allowed ___________________________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-20/test_paycore_src_allowed0/ffcore')
+
+    def test_paycore_src_allowed(main_root):
+        cmd = "cat /c/ai_paycore/paycoreLLM/src/paycore_llm/api.py"
+>       assert_allowed(run_hook(bash(cmd), main_root))
+
+tests\hooks\test_guard.py:90: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n")
+
+    def assert_allowed(proc) -> None:
+>       assert proc.returncode == 0, (proc.returncode, proc.stderr)
+E       AssertionError: (2, "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_payco...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory
+E         ")
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n").returncode
+
+tests\hooks\test_guard.py:34: AssertionError
+___________________ test_push_coordinator_with_flag_allowed ___________________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-20/test_push_coordinator_with_fla0/ffcore')
+
+    def test_push_coordinator_with_flag_allowed(main_root):
+        proc = run_hook(bash("FFCORE_PUSH_OK=1 git push origin main"), main_root, FFCORE_ROL="koordinator")
+>       assert_allowed(proc)
+
+tests\hooks\test_guard.py:98: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n")
+
+    def assert_allowed(proc) -> None:
+>       assert proc.returncode == 0, (proc.returncode, proc.stderr)
+E       AssertionError: (2, "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_payco...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory
+E         ")
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n").returncode
+
+tests\hooks\test_guard.py:34: AssertionError
+_________________ test_push_coordinator_without_flag_blocked __________________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-20/test_push_coordinator_without_0/ffcore')
+
+    def test_push_coordinator_without_flag_blocked(main_root):
+        proc = run_hook(bash("git push origin main"), main_root, FFCORE_ROL="koordinator")
+>       assert_blocked(proc, "PUSH")
+
+tests\hooks\test_guard.py:103: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n")
+rule = 'PUSH'
+
+    def assert_blocked(proc, rule: str) -> None:
+        assert proc.returncode == BLOCK, (proc.returncode, proc.stderr)
+>       assert f"[{rule}]" in proc.stderr, proc.stderr
+E       AssertionError: C:\Users\caglar.sahin\AppData\Local\Programs\Python\Python312\python.exe: can't open file 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py': [Errno 2] No such file or directory
+E         
+E       assert '[PUSH]' in "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n"
+E        +  where "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n" = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n").stderr
+
+tests\hooks\test_guard.py:30: AssertionError
+_____________________ test_push_worker_with_flag_blocked ______________________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-20/test_push_worker_with_flag_blo0/ffcore')
+
+    def test_push_worker_with_flag_blocked(main_root):
+        proc = run_hook(bash("FFCORE_PUSH_OK=1 git push origin main"), main_root, FFCORE_ROL="isci-a")
+>       assert_blocked(proc, "PUSH")
+
+tests\hooks\test_guard.py:108: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n")
+rule = 'PUSH'
+
+    def assert_blocked(proc, rule: str) -> None:
+        assert proc.returncode == BLOCK, (proc.returncode, proc.stderr)
+>       assert f"[{rule}]" in proc.stderr, proc.stderr
+E       AssertionError: C:\Users\caglar.sahin\AppData\Local\Programs\Python\Python312\python.exe: can't open file 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py': [Errno 2] No such file or directory
+E         
+E       assert '[PUSH]' in "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n"
+E        +  where "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n" = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n").stderr
+
+tests\hooks\test_guard.py:30: AssertionError
+_____________________ test_push_no_role_with_flag_blocked _____________________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-20/test_push_no_role_with_flag_bl0/ffcore')
+
+    def test_push_no_role_with_flag_blocked(main_root):
+>       assert_blocked(run_hook(bash("FFCORE_PUSH_OK=1 git push"), main_root), "PUSH")
+
+tests\hooks\test_guard.py:112: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n")
+rule = 'PUSH'
+
+    def assert_blocked(proc, rule: str) -> None:
+        assert proc.returncode == BLOCK, (proc.returncode, proc.stderr)
+>       assert f"[{rule}]" in proc.stderr, proc.stderr
+E       AssertionError: C:\Users\caglar.sahin\AppData\Local\Programs\Python\Python312\python.exe: can't open file 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py': [Errno 2] No such file or directory
+E         
+E       assert '[PUSH]' in "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n"
+E        +  where "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n" = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n").stderr
+
+tests\hooks\test_guard.py:30: AssertionError
+__________________ test_push_flag_in_hook_env_is_not_enough ___________________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-20/test_push_flag_in_hook_env_is_0/ffcore')
+
+    def test_push_flag_in_hook_env_is_not_enough(main_root):
+        proc = run_hook(
+            bash("git push origin main"), main_root, FFCORE_ROL="koordinator", FFCORE_PUSH_OK="1"
+        )
+>       assert_blocked(proc, "PUSH")
+
+tests\hooks\test_guard.py:119: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n")
+rule = 'PUSH'
+
+    def assert_blocked(proc, rule: str) -> None:
+        assert proc.returncode == BLOCK, (proc.returncode, proc.stderr)
+>       assert f"[{rule}]" in proc.stderr, proc.stderr
+E       AssertionError: C:\Users\caglar.sahin\AppData\Local\Programs\Python\Python312\python.exe: can't open file 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py': [Errno 2] No such file or directory
+E         
+E       assert '[PUSH]' in "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n"
+E        +  where "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n" = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n").stderr
+
+tests\hooks\test_guard.py:30: AssertionError
+_______________________ test_push_git_c_variant_blocked _______________________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-20/test_push_git_c_variant_blocke0/ffcore')
+
+    def test_push_git_c_variant_blocked(main_root):
+        proc = run_hook(bash("git -C /c/ai_paycore/ffcore push origin main"), main_root, FFCORE_ROL="isci-a")
+>       assert_blocked(proc, "PUSH")
+
+tests\hooks\test_guard.py:124: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n")
+rule = 'PUSH'
+
+    def assert_blocked(proc, rule: str) -> None:
+        assert proc.returncode == BLOCK, (proc.returncode, proc.stderr)
+>       assert f"[{rule}]" in proc.stderr, proc.stderr
+E       AssertionError: C:\Users\caglar.sahin\AppData\Local\Programs\Python\Python312\python.exe: can't open file 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py': [Errno 2] No such file or directory
+E         
+E       assert '[PUSH]' in "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n"
+E        +  where "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n" = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n").stderr
+
+tests\hooks\test_guard.py:30: AssertionError
+___________________________ test_git_status_allowed ___________________________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-20/test_git_status_allowed0/ffcore')
+
+    def test_git_status_allowed(main_root):
+>       assert_allowed(run_hook(bash("git status --short && git log --oneline -3"), main_root))
+
+tests\hooks\test_guard.py:128: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n")
+
+    def assert_allowed(proc) -> None:
+>       assert proc.returncode == 0, (proc.returncode, proc.stderr)
+E       AssertionError: (2, "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_payco...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory
+E         ")
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n").returncode
+
+tests\hooks\test_guard.py:34: AssertionError
+_______________________ test_compose_build_bare_blocked _______________________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-20/test_compose_build_bare_blocke0/ffcore')
+
+    def test_compose_build_bare_blocked(main_root):
+>       assert_blocked(run_hook(bash("docker compose build"), main_root), "PROSES-175")
+
+tests\hooks\test_guard.py:135: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n")
+rule = 'PROSES-175'
+
+    def assert_blocked(proc, rule: str) -> None:
+        assert proc.returncode == BLOCK, (proc.returncode, proc.stderr)
+>       assert f"[{rule}]" in proc.stderr, proc.stderr
+E       AssertionError: C:\Users\caglar.sahin\AppData\Local\Programs\Python\Python312\python.exe: can't open file 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py': [Errno 2] No such file or directory
+E         
+E       assert '[PROSES-175]' in "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n"
+E        +  where "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n" = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n").stderr
+
+tests\hooks\test_guard.py:30: AssertionError
+____________________ test_compose_build_with_file_blocked _____________________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-20/test_compose_build_with_file_b0/ffcore')
+
+    def test_compose_build_with_file_blocked(main_root):
+        proc = run_hook(bash("docker compose -f compose.yaml build backend"), main_root)
+>       assert_blocked(proc, "PROSES-175")
+
+tests\hooks\test_guard.py:140: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n")
+rule = 'PROSES-175'
+
+    def assert_blocked(proc, rule: str) -> None:
+        assert proc.returncode == BLOCK, (proc.returncode, proc.stderr)
+>       assert f"[{rule}]" in proc.stderr, proc.stderr
+E       AssertionError: C:\Users\caglar.sahin\AppData\Local\Programs\Python\Python312\python.exe: can't open file 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py': [Errno 2] No such file or directory
+E         
+E       assert '[PROSES-175]' in "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n"
+E        +  where "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n" = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n").stderr
+
+tests\hooks\test_guard.py:30: AssertionError
+____________________ test_compose_build_pull_false_allowed ____________________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-20/test_compose_build_pull_false_0/ffcore')
+
+    def test_compose_build_pull_false_allowed(main_root):
+        proc = run_hook(bash("docker compose -p x build --pull=false backend"), main_root)
+>       assert_allowed(proc)
+
+tests\hooks\test_guard.py:145: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n")
+
+    def assert_allowed(proc) -> None:
+>       assert proc.returncode == 0, (proc.returncode, proc.stderr)
+E       AssertionError: (2, "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_payco...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory
+E         ")
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n").returncode
+
+tests\hooks\test_guard.py:34: AssertionError
+________________________ test_compose_up_build_blocked ________________________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-20/test_compose_up_build_blocked0/ffcore')
+
+    def test_compose_up_build_blocked(main_root):
+        proc = run_hook(bash("docker compose up -d --build --pull never"), main_root)
+>       assert_blocked(proc, "PROSES-175")
+
+tests\hooks\test_guard.py:150: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n")
+rule = 'PROSES-175'
+
+    def assert_blocked(proc, rule: str) -> None:
+        assert proc.returncode == BLOCK, (proc.returncode, proc.stderr)
+>       assert f"[{rule}]" in proc.stderr, proc.stderr
+E       AssertionError: C:\Users\caglar.sahin\AppData\Local\Programs\Python\Python312\python.exe: can't open file 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py': [Errno 2] No such file or directory
+E         
+E       assert '[PROSES-175]' in "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n"
+E        +  where "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n" = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n").stderr
+
+tests\hooks\test_guard.py:30: AssertionError
+_________________ test_compose_up_without_pull_never_blocked __________________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-20/test_compose_up_without_pull_n0/ffcore')
+
+    def test_compose_up_without_pull_never_blocked(main_root):
+>       assert_blocked(run_hook(bash("docker compose up -d"), main_root), "PROSES-175")
+
+tests\hooks\test_guard.py:154: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n")
+rule = 'PROSES-175'
+
+    def assert_blocked(proc, rule: str) -> None:
+        assert proc.returncode == BLOCK, (proc.returncode, proc.stderr)
+>       assert f"[{rule}]" in proc.stderr, proc.stderr
+E       AssertionError: C:\Users\caglar.sahin\AppData\Local\Programs\Python\Python312\python.exe: can't open file 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py': [Errno 2] No such file or directory
+E         
+E       assert '[PROSES-175]' in "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n"
+E        +  where "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n" = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n").stderr
+
+tests\hooks\test_guard.py:30: AssertionError
+____________________ test_compose_up_pull_missing_blocked _____________________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-20/test_compose_up_pull_missing_b0/ffcore')
+
+    def test_compose_up_pull_missing_blocked(main_root):
+>       assert_blocked(run_hook(bash("docker compose up -d --pull missing"), main_root), "PROSES-175")
+
+tests\hooks\test_guard.py:158: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n")
+rule = 'PROSES-175'
+
+    def assert_blocked(proc, rule: str) -> None:
+        assert proc.returncode == BLOCK, (proc.returncode, proc.stderr)
+>       assert f"[{rule}]" in proc.stderr, proc.stderr
+E       AssertionError: C:\Users\caglar.sahin\AppData\Local\Programs\Python\Python312\python.exe: can't open file 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py': [Errno 2] No such file or directory
+E         
+E       assert '[PROSES-175]' in "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n"
+E        +  where "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n" = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n").stderr
+
+tests\hooks\test_guard.py:30: AssertionError
+_____________________ test_make_test_without_tee_blocked ______________________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-20/test_make_test_without_tee_blo0/ffcore')
+
+    def test_make_test_without_tee_blocked(main_root):
+>       assert_blocked(run_hook(bash("make test"), main_root), "KAPI")
+
+tests\hooks\test_guard.py:221: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n")
+rule = 'KAPI'
+
+    def assert_blocked(proc, rule: str) -> None:
+        assert proc.returncode == BLOCK, (proc.returncode, proc.stderr)
+>       assert f"[{rule}]" in proc.stderr, proc.stderr
+E       AssertionError: C:\Users\caglar.sahin\AppData\Local\Programs\Python\Python312\python.exe: can't open file 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py': [Errno 2] No such file or directory
+E         
+E       assert '[KAPI]' in "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n"
+E        +  where "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n" = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n").stderr
+
+tests\hooks\test_guard.py:30: AssertionError
+_______________________ test_make_test_with_tee_allowed _______________________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-20/test_make_test_with_tee_allowe0/ffcore')
+
+    def test_make_test_with_tee_allowed(main_root):
+        proc = run_hook(bash("make test 2>&1 | tee state/evidence/x.log"), main_root)
+>       assert_allowed(proc)
+
+tests\hooks\test_guard.py:226: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n")
+
+    def assert_allowed(proc) -> None:
+>       assert proc.returncode == 0, (proc.returncode, proc.stderr)
+E       AssertionError: (2, "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_payco...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory
+E         ")
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n").returncode
+
+tests\hooks\test_guard.py:34: AssertionError
+_________________________ test_make_lint_tail_blocked _________________________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-20/test_make_lint_tail_blocked0/ffcore')
+
+    def test_make_lint_tail_blocked(main_root):
+>       assert_blocked(run_hook(bash("make lint | tail -5"), main_root), "KAPI")
+
+tests\hooks\test_guard.py:230: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n")
+rule = 'KAPI'
+
+    def assert_blocked(proc, rule: str) -> None:
+        assert proc.returncode == BLOCK, (proc.returncode, proc.stderr)
+>       assert f"[{rule}]" in proc.stderr, proc.stderr
+E       AssertionError: C:\Users\caglar.sahin\AppData\Local\Programs\Python\Python312\python.exe: can't open file 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py': [Errno 2] No such file or directory
+E         
+E       assert '[KAPI]' in "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n"
+E        +  where "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n" = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n").stderr
+
+tests\hooks\test_guard.py:30: AssertionError
+__________________ test_make_gate_targets_blocked[test-int] ___________________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-20/test_make_gate_targets_blocked0/ffcore')
+target = 'test-int'
+
+    @pytest.mark.parametrize("target", ["test-int", "smoke"])
+    def test_make_gate_targets_blocked(main_root, target):
+>       assert_blocked(run_hook(bash(f"make {target}"), main_root), "KAPI")
+
+tests\hooks\test_guard.py:235: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n")
+rule = 'KAPI'
+
+    def assert_blocked(proc, rule: str) -> None:
+        assert proc.returncode == BLOCK, (proc.returncode, proc.stderr)
+>       assert f"[{rule}]" in proc.stderr, proc.stderr
+E       AssertionError: C:\Users\caglar.sahin\AppData\Local\Programs\Python\Python312\python.exe: can't open file 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py': [Errno 2] No such file or directory
+E         
+E       assert '[KAPI]' in "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n"
+E        +  where "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n" = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n").stderr
+
+tests\hooks\test_guard.py:30: AssertionError
+____________________ test_make_gate_targets_blocked[smoke] ____________________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-20/test_make_gate_targets_blocked1/ffcore')
+target = 'smoke'
+
+    @pytest.mark.parametrize("target", ["test-int", "smoke"])
+    def test_make_gate_targets_blocked(main_root, target):
+>       assert_blocked(run_hook(bash(f"make {target}"), main_root), "KAPI")
+
+tests\hooks\test_guard.py:235: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n")
+rule = 'KAPI'
+
+    def assert_blocked(proc, rule: str) -> None:
+        assert proc.returncode == BLOCK, (proc.returncode, proc.stderr)
+>       assert f"[{rule}]" in proc.stderr, proc.stderr
+E       AssertionError: C:\Users\caglar.sahin\AppData\Local\Programs\Python\Python312\python.exe: can't open file 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py': [Errno 2] No such file or directory
+E         
+E       assert '[KAPI]' in "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n"
+E        +  where "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n" = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n").stderr
+
+tests\hooks\test_guard.py:30: AssertionError
+_______________________ test_make_other_target_allowed ________________________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-20/test_make_other_target_allowed0/ffcore')
+
+    def test_make_other_target_allowed(main_root):
+>       assert_allowed(run_hook(bash("make help"), main_root))
+
+tests\hooks\test_guard.py:239: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n")
+
+    def assert_allowed(proc) -> None:
+>       assert proc.returncode == 0, (proc.returncode, proc.stderr)
+E       AssertionError: (2, "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_payco...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory
+E         ")
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n").returncode
+
+tests\hooks\test_guard.py:34: AssertionError
+_______________________ test_pytest_without_tee_blocked _______________________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-20/test_pytest_without_tee_blocke0/ffcore')
+
+    def test_pytest_without_tee_blocked(main_root):
+>       assert_blocked(run_hook(bash("py -3.12 -m pytest tests/hooks -q"), main_root), "KAPI")
+
+tests\hooks\test_guard.py:243: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n")
+rule = 'KAPI'
+
+    def assert_blocked(proc, rule: str) -> None:
+        assert proc.returncode == BLOCK, (proc.returncode, proc.stderr)
+>       assert f"[{rule}]" in proc.stderr, proc.stderr
+E       AssertionError: C:\Users\caglar.sahin\AppData\Local\Programs\Python\Python312\python.exe: can't open file 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py': [Errno 2] No such file or directory
+E         
+E       assert '[KAPI]' in "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n"
+E        +  where "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n" = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n").stderr
+
+tests\hooks\test_guard.py:30: AssertionError
+________________________ test_pytest_with_tee_allowed _________________________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-20/test_pytest_with_tee_allowed0/ffcore')
+
+    def test_pytest_with_tee_allowed(main_root):
+        cmd = "py -3.12 -m pytest tests/hooks -q 2>&1 | tee state/evidence/hook-tests.log"
+>       assert_allowed(run_hook(bash(cmd), main_root))
+
+tests\hooks\test_guard.py:248: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n")
+
+    def assert_allowed(proc) -> None:
+>       assert proc.returncode == 0, (proc.returncode, proc.stderr)
+E       AssertionError: (2, "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_payco...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory
+E         ")
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n").returncode
+
+tests\hooks\test_guard.py:34: AssertionError
+__________________ test_pytest_info_flags_allowed[--version] __________________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-20/test_pytest_info_flags_allowed0/ffcore')
+flag = '--version'
+
+    @pytest.mark.parametrize("flag", ["--version", "--help", "--collect-only -q"])
+    def test_pytest_info_flags_allowed(main_root, flag):
+>       assert_allowed(run_hook(bash(f"py -3.12 -m pytest {flag}"), main_root))
+
+tests\hooks\test_guard.py:253: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n")
+
+    def assert_allowed(proc) -> None:
+>       assert proc.returncode == 0, (proc.returncode, proc.stderr)
+E       AssertionError: (2, "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_payco...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory
+E         ")
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n").returncode
+
+tests\hooks\test_guard.py:34: AssertionError
+___________________ test_pytest_info_flags_allowed[--help] ____________________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-20/test_pytest_info_flags_allowed1/ffcore')
+flag = '--help'
+
+    @pytest.mark.parametrize("flag", ["--version", "--help", "--collect-only -q"])
+    def test_pytest_info_flags_allowed(main_root, flag):
+>       assert_allowed(run_hook(bash(f"py -3.12 -m pytest {flag}"), main_root))
+
+tests\hooks\test_guard.py:253: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n")
+
+    def assert_allowed(proc) -> None:
+>       assert proc.returncode == 0, (proc.returncode, proc.stderr)
+E       AssertionError: (2, "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_payco...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory
+E         ")
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n").returncode
+
+tests\hooks\test_guard.py:34: AssertionError
+______________ test_pytest_info_flags_allowed[--collect-only -q] ______________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-20/test_pytest_info_flags_allowed2/ffcore')
+flag = '--collect-only -q'
+
+    @pytest.mark.parametrize("flag", ["--version", "--help", "--collect-only -q"])
+    def test_pytest_info_flags_allowed(main_root, flag):
+>       assert_allowed(run_hook(bash(f"py -3.12 -m pytest {flag}"), main_root))
+
+tests\hooks\test_guard.py:253: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n")
+
+    def assert_allowed(proc) -> None:
+>       assert proc.returncode == 0, (proc.returncode, proc.stderr)
+E       AssertionError: (2, "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_payco...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory
+E         ")
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n").returncode
+
+tests\hooks\test_guard.py:34: AssertionError
+____________________ test_worker_writes_work_queue_blocked ____________________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-20/test_worker_writes_work_queue_0/ffcore')
+
+    def test_worker_writes_work_queue_blocked(main_root):
+        proc = run_hook(edit(main_root / "state" / "WORK_QUEUE.md"), main_root, FFCORE_ROL="isci-a")
+>       assert_blocked(proc, "TEK-YAZAR")
+
+tests\hooks\test_guard.py:261: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n")
+rule = 'TEK-YAZAR'
+
+    def assert_blocked(proc, rule: str) -> None:
+        assert proc.returncode == BLOCK, (proc.returncode, proc.stderr)
+>       assert f"[{rule}]" in proc.stderr, proc.stderr
+E       AssertionError: C:\Users\caglar.sahin\AppData\Local\Programs\Python\Python312\python.exe: can't open file 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py': [Errno 2] No such file or directory
+E         
+E       assert '[TEK-YAZAR]' in "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n"
+E        +  where "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n" = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n").stderr
+
+tests\hooks\test_guard.py:30: AssertionError
+_______ test_worker_writes_coordinator_files_blocked[state/BLOCKERS.md] _______
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-20/test_worker_writes_coordinator0/ffcore')
+rel = 'state/BLOCKERS.md'
+
+    @pytest.mark.parametrize("rel", ["state/BLOCKERS.md", "KARARLAR.md", "state/oturumlar.json"])
+    def test_worker_writes_coordinator_files_blocked(main_root, rel):
+        proc = run_hook(edit(main_root / rel, "Write"), main_root, FFCORE_ROL="isci-b")
+>       assert_blocked(proc, "TEK-YAZAR")
+
+tests\hooks\test_guard.py:268: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n")
+rule = 'TEK-YAZAR'
+
+    def assert_blocked(proc, rule: str) -> None:
+        assert proc.returncode == BLOCK, (proc.returncode, proc.stderr)
+>       assert f"[{rule}]" in proc.stderr, proc.stderr
+E       AssertionError: C:\Users\caglar.sahin\AppData\Local\Programs\Python\Python312\python.exe: can't open file 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py': [Errno 2] No such file or directory
+E         
+E       assert '[TEK-YAZAR]' in "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n"
+E        +  where "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n" = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n").stderr
+
+tests\hooks\test_guard.py:30: AssertionError
+__________ test_worker_writes_coordinator_files_blocked[KARARLAR.md] __________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-20/test_worker_writes_coordinator1/ffcore')
+rel = 'KARARLAR.md'
+
+    @pytest.mark.parametrize("rel", ["state/BLOCKERS.md", "KARARLAR.md", "state/oturumlar.json"])
+    def test_worker_writes_coordinator_files_blocked(main_root, rel):
+        proc = run_hook(edit(main_root / rel, "Write"), main_root, FFCORE_ROL="isci-b")
+>       assert_blocked(proc, "TEK-YAZAR")
+
+tests\hooks\test_guard.py:268: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n")
+rule = 'TEK-YAZAR'
+
+    def assert_blocked(proc, rule: str) -> None:
+        assert proc.returncode == BLOCK, (proc.returncode, proc.stderr)
+>       assert f"[{rule}]" in proc.stderr, proc.stderr
+E       AssertionError: C:\Users\caglar.sahin\AppData\Local\Programs\Python\Python312\python.exe: can't open file 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py': [Errno 2] No such file or directory
+E         
+E       assert '[TEK-YAZAR]' in "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n"
+E        +  where "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n" = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n").stderr
+
+tests\hooks\test_guard.py:30: AssertionError
+_____ test_worker_writes_coordinator_files_blocked[state/oturumlar.json] ______
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-20/test_worker_writes_coordinator2/ffcore')
+rel = 'state/oturumlar.json'
+
+    @pytest.mark.parametrize("rel", ["state/BLOCKERS.md", "KARARLAR.md", "state/oturumlar.json"])
+    def test_worker_writes_coordinator_files_blocked(main_root, rel):
+        proc = run_hook(edit(main_root / rel, "Write"), main_root, FFCORE_ROL="isci-b")
+>       assert_blocked(proc, "TEK-YAZAR")
+
+tests\hooks\test_guard.py:268: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n")
+rule = 'TEK-YAZAR'
+
+    def assert_blocked(proc, rule: str) -> None:
+        assert proc.returncode == BLOCK, (proc.returncode, proc.stderr)
+>       assert f"[{rule}]" in proc.stderr, proc.stderr
+E       AssertionError: C:\Users\caglar.sahin\AppData\Local\Programs\Python\Python312\python.exe: can't open file 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py': [Errno 2] No such file or directory
+E         
+E       assert '[TEK-YAZAR]' in "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n"
+E        +  where "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n" = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n").stderr
+
+tests\hooks\test_guard.py:30: AssertionError
+_________________ test_coordinator_writes_work_queue_allowed __________________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-20/test_coordinator_writes_work_q0/ffcore')
+
+    def test_coordinator_writes_work_queue_allowed(main_root):
+        proc = run_hook(edit(main_root / "state" / "WORK_QUEUE.md"), main_root, FFCORE_ROL="koordinator")
+>       assert_allowed(proc)
+
+tests\hooks\test_guard.py:273: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n")
+
+    def assert_allowed(proc) -> None:
+>       assert proc.returncode == 0, (proc.returncode, proc.stderr)
+E       AssertionError: (2, "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_payco...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory
+E         ")
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n").returncode
+
+tests\hooks\test_guard.py:34: AssertionError
+___________________ test_worker_writes_own_channel_allowed ____________________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-20/test_worker_writes_own_channel0/ffcore')
+
+    def test_worker_writes_own_channel_allowed(main_root):
+        path = main_root / "state" / "kanal" / "isci-a.md"
+>       assert_allowed(run_hook(edit(path), main_root, FFCORE_ROL="isci-a"))
+
+tests\hooks\test_guard.py:278: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n")
+
+    def assert_allowed(proc) -> None:
+>       assert proc.returncode == 0, (proc.returncode, proc.stderr)
+E       AssertionError: (2, "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_payco...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory
+E         ")
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n").returncode
+
+tests\hooks\test_guard.py:34: AssertionError
+__________________ test_worker_writes_other_channel_blocked ___________________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-20/test_worker_writes_other_chann0/ffcore')
+
+    def test_worker_writes_other_channel_blocked(main_root):
+        path = main_root / "state" / "kanal" / "koordinator.md"
+>       assert_blocked(run_hook(edit(path), main_root, FFCORE_ROL="isci-a"), "TEK-YAZAR")
+
+tests\hooks\test_guard.py:283: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n")
+rule = 'TEK-YAZAR'
+
+    def assert_blocked(proc, rule: str) -> None:
+        assert proc.returncode == BLOCK, (proc.returncode, proc.stderr)
+>       assert f"[{rule}]" in proc.stderr, proc.stderr
+E       AssertionError: C:\Users\caglar.sahin\AppData\Local\Programs\Python\Python312\python.exe: can't open file 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py': [Errno 2] No such file or directory
+E         
+E       assert '[TEK-YAZAR]' in "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n"
+E        +  where "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n" = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n").stderr
+
+tests\hooks\test_guard.py:30: AssertionError
+______________________ test_worker_writes_own_pr_allowed ______________________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-20/test_worker_writes_own_pr_allo0/ffcore')
+
+    def test_worker_writes_own_pr_allowed(main_root):
+        path = main_root / "state" / "pr" / "fix-ajan-hooklari.md"
+        proc = run_hook(
+            edit(path, "Write"), main_root, FFCORE_ROL="isci-a", FFCORE_PAKET="fix/ajan-hooklari"
+        )
+>       assert_allowed(proc)
+
+tests\hooks\test_guard.py:291: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n")
+
+    def assert_allowed(proc) -> None:
+>       assert proc.returncode == 0, (proc.returncode, proc.stderr)
+E       AssertionError: (2, "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_payco...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory
+E         ")
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n").returncode
+
+tests\hooks\test_guard.py:34: AssertionError
+_____________________ test_other_worker_writes_pr_blocked _____________________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-20/test_other_worker_writes_pr_bl0/ffcore')
+
+    def test_other_worker_writes_pr_blocked(main_root):
+        path = main_root / "state" / "pr" / "fix-ajan-hooklari.md"
+        proc = run_hook(edit(path, "Write"), main_root, FFCORE_ROL="isci-c", FFCORE_PAKET="10c-1")
+>       assert_blocked(proc, "TEK-YAZAR")
+
+tests\hooks\test_guard.py:297: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n")
+rule = 'TEK-YAZAR'
+
+    def assert_blocked(proc, rule: str) -> None:
+        assert proc.returncode == BLOCK, (proc.returncode, proc.stderr)
+>       assert f"[{rule}]" in proc.stderr, proc.stderr
+E       AssertionError: C:\Users\caglar.sahin\AppData\Local\Programs\Python\Python312\python.exe: can't open file 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py': [Errno 2] No such file or directory
+E         
+E       assert '[TEK-YAZAR]' in "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n"
+E        +  where "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n" = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n").stderr
+
+tests\hooks\test_guard.py:30: AssertionError
+________________ test_worker_without_package_writes_pr_blocked ________________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-20/test_worker_without_package_wr0/ffcore')
+
+    def test_worker_without_package_writes_pr_blocked(main_root):
+        path = main_root / "state" / "pr" / "fix-ajan-hooklari.md"
+>       assert_blocked(run_hook(edit(path), main_root, FFCORE_ROL="isci-a"), "TEK-YAZAR")
+
+tests\hooks\test_guard.py:302: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n")
+rule = 'TEK-YAZAR'
+
+    def assert_blocked(proc, rule: str) -> None:
+        assert proc.returncode == BLOCK, (proc.returncode, proc.stderr)
+>       assert f"[{rule}]" in proc.stderr, proc.stderr
+E       AssertionError: C:\Users\caglar.sahin\AppData\Local\Programs\Python\Python312\python.exe: can't open file 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py': [Errno 2] No such file or directory
+E         
+E       assert '[TEK-YAZAR]' in "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n"
+E        +  where "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n" = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n").stderr
+
+tests\hooks\test_guard.py:30: AssertionError
+_________________________ test_pr_alias_field_allowed _________________________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-20/test_pr_alias_field_allowed0/ffcore')
+
+    def test_pr_alias_field_allowed(main_root):
+        write_registry(
+            main_root,
+            {SESSION_ID: {"rol": "isci-a", "paket": "08-tam-1c-b-olcum", "pr": "08-tam-1c", "acildi": "x"}},
+        )
+        path = main_root / "state" / "pr" / "08-tam-1c.md"
+>       assert_allowed(run_hook(edit(path), main_root))
+
+tests\hooks\test_guard.py:311: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n")
+
+    def assert_allowed(proc) -> None:
+>       assert proc.returncode == 0, (proc.returncode, proc.stderr)
+E       AssertionError: (2, "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_payco...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory
+E         ")
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n").returncode
+
+tests\hooks\test_guard.py:34: AssertionError
+____________________ test_reviewer_writes_reviews_allowed _____________________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-20/test_reviewer_writes_reviews_a0/ffcore')
+
+    def test_reviewer_writes_reviews_allowed(main_root):
+        path = main_root / "state" / "reviews" / "10c-1-r1.md"
+>       assert_allowed(run_hook(edit(path, "Write"), main_root, FFCORE_ROL="inceleyici"))
+
+tests\hooks\test_guard.py:316: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n")
+
+    def assert_allowed(proc) -> None:
+>       assert proc.returncode == 0, (proc.returncode, proc.stderr)
+E       AssertionError: (2, "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_payco...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory
+E         ")
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n").returncode
+
+tests\hooks\test_guard.py:34: AssertionError
+_____________________ test_worker_writes_reviews_blocked ______________________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-20/test_worker_writes_reviews_blo0/ffcore')
+
+    def test_worker_writes_reviews_blocked(main_root):
+        path = main_root / "state" / "reviews" / "10c-1-r1.md"
+>       assert_blocked(run_hook(edit(path, "Write"), main_root, FFCORE_ROL="isci-c"), "TEK-YAZAR")
+
+tests\hooks\test_guard.py:321: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n")
+rule = 'TEK-YAZAR'
+
+    def assert_blocked(proc, rule: str) -> None:
+        assert proc.returncode == BLOCK, (proc.returncode, proc.stderr)
+>       assert f"[{rule}]" in proc.stderr, proc.stderr
+E       AssertionError: C:\Users\caglar.sahin\AppData\Local\Programs\Python\Python312\python.exe: can't open file 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py': [Errno 2] No such file or directory
+E         
+E       assert '[TEK-YAZAR]' in "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n"
+E        +  where "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n" = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n").stderr
+
+tests\hooks\test_guard.py:30: AssertionError
+_________________________ test_evidence_free_for_all __________________________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-20/test_evidence_free_for_all0/ffcore')
+
+    def test_evidence_free_for_all(main_root):
+        path = main_root / "state" / "evidence" / "x.log"
+>       assert_allowed(run_hook(edit(path, "Write"), main_root, FFCORE_ROL="isci-a"))
+
+tests\hooks\test_guard.py:326: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n")
+
+    def assert_allowed(proc) -> None:
+>       assert proc.returncode == 0, (proc.returncode, proc.stderr)
+E       AssertionError: (2, "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_payco...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory
+E         ")
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n").returncode
+
+tests\hooks\test_guard.py:34: AssertionError
+___________________ test_backslash_windows_path_normalized ____________________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-20/test_backslash_windows_path_no0/ffcore')
+
+    def test_backslash_windows_path_normalized(main_root):
+        path = str(main_root / "state" / "WORK_QUEUE.md").replace("/", "\\")
+>       assert_blocked(run_hook(edit(path), main_root, FFCORE_ROL="isci-a"), "TEK-YAZAR")
+
+tests\hooks\test_guard.py:331: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n")
+rule = 'TEK-YAZAR'
+
+    def assert_blocked(proc, rule: str) -> None:
+        assert proc.returncode == BLOCK, (proc.returncode, proc.stderr)
+>       assert f"[{rule}]" in proc.stderr, proc.stderr
+E       AssertionError: C:\Users\caglar.sahin\AppData\Local\Programs\Python\Python312\python.exe: can't open file 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py': [Errno 2] No such file or directory
+E         
+E       assert '[TEK-YAZAR]' in "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n"
+E        +  where "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n" = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n").stderr
+
+tests\hooks\test_guard.py:30: AssertionError
+_____________________ test_forward_slash_path_normalized ______________________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-20/test_forward_slash_path_normal0/ffcore')
+
+    def test_forward_slash_path_normalized(main_root):
+        path = str(main_root / "state" / "WORK_QUEUE.md").replace("\\", "/")
+>       assert_blocked(run_hook(edit(path), main_root, FFCORE_ROL="isci-a"), "TEK-YAZAR")
+
+tests\hooks\test_guard.py:336: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n")
+rule = 'TEK-YAZAR'
+
+    def assert_blocked(proc, rule: str) -> None:
+        assert proc.returncode == BLOCK, (proc.returncode, proc.stderr)
+>       assert f"[{rule}]" in proc.stderr, proc.stderr
+E       AssertionError: C:\Users\caglar.sahin\AppData\Local\Programs\Python\Python312\python.exe: can't open file 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py': [Errno 2] No such file or directory
+E         
+E       assert '[TEK-YAZAR]' in "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n"
+E        +  where "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n" = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n").stderr
+
+tests\hooks\test_guard.py:30: AssertionError
+_____________________ test_all_write_tools_checked[Write] _____________________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-20/test_all_write_tools_checked_W0/ffcore')
+tool = 'Write'
+
+    @pytest.mark.parametrize("tool", ["Write", "MultiEdit", "NotebookEdit"])
+    def test_all_write_tools_checked(main_root, tool):
+        proc = run_hook(edit(main_root / "state" / "BLOCKERS.md", tool), main_root, FFCORE_ROL="isci-a")
+>       assert_blocked(proc, "TEK-YAZAR")
+
+tests\hooks\test_guard.py:342: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n")
+rule = 'TEK-YAZAR'
+
+    def assert_blocked(proc, rule: str) -> None:
+        assert proc.returncode == BLOCK, (proc.returncode, proc.stderr)
+>       assert f"[{rule}]" in proc.stderr, proc.stderr
+E       AssertionError: C:\Users\caglar.sahin\AppData\Local\Programs\Python\Python312\python.exe: can't open file 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py': [Errno 2] No such file or directory
+E         
+E       assert '[TEK-YAZAR]' in "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n"
+E        +  where "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n" = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n").stderr
+
+tests\hooks\test_guard.py:30: AssertionError
+___________________ test_all_write_tools_checked[MultiEdit] ___________________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-20/test_all_write_tools_checked_M0/ffcore')
+tool = 'MultiEdit'
+
+    @pytest.mark.parametrize("tool", ["Write", "MultiEdit", "NotebookEdit"])
+    def test_all_write_tools_checked(main_root, tool):
+        proc = run_hook(edit(main_root / "state" / "BLOCKERS.md", tool), main_root, FFCORE_ROL="isci-a")
+>       assert_blocked(proc, "TEK-YAZAR")
+
+tests\hooks\test_guard.py:342: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n")
+rule = 'TEK-YAZAR'
+
+    def assert_blocked(proc, rule: str) -> None:
+        assert proc.returncode == BLOCK, (proc.returncode, proc.stderr)
+>       assert f"[{rule}]" in proc.stderr, proc.stderr
+E       AssertionError: C:\Users\caglar.sahin\AppData\Local\Programs\Python\Python312\python.exe: can't open file 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py': [Errno 2] No such file or directory
+E         
+E       assert '[TEK-YAZAR]' in "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n"
+E        +  where "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n" = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n").stderr
+
+tests\hooks\test_guard.py:30: AssertionError
+_________________ test_all_write_tools_checked[NotebookEdit] __________________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-20/test_all_write_tools_checked_N0/ffcore')
+tool = 'NotebookEdit'
+
+    @pytest.mark.parametrize("tool", ["Write", "MultiEdit", "NotebookEdit"])
+    def test_all_write_tools_checked(main_root, tool):
+        proc = run_hook(edit(main_root / "state" / "BLOCKERS.md", tool), main_root, FFCORE_ROL="isci-a")
+>       assert_blocked(proc, "TEK-YAZAR")
+
+tests\hooks\test_guard.py:342: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n")
+rule = 'TEK-YAZAR'
+
+    def assert_blocked(proc, rule: str) -> None:
+        assert proc.returncode == BLOCK, (proc.returncode, proc.stderr)
+>       assert f"[{rule}]" in proc.stderr, proc.stderr
+E       AssertionError: C:\Users\caglar.sahin\AppData\Local\Programs\Python\Python312\python.exe: can't open file 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py': [Errno 2] No such file or directory
+E         
+E       assert '[TEK-YAZAR]' in "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n"
+E        +  where "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n" = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n").stderr
+
+tests\hooks\test_guard.py:30: AssertionError
+_____________________ test_no_role_single_writer_blocked ______________________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-20/test_no_role_single_writer_blo0/ffcore')
+
+    def test_no_role_single_writer_blocked(main_root):
+        proc = run_hook(edit(main_root / "state" / "kanal" / "isci-a.md"), main_root)
+>       assert_blocked(proc, "TEK-YAZAR")
+
+tests\hooks\test_guard.py:350: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n")
+rule = 'TEK-YAZAR'
+
+    def assert_blocked(proc, rule: str) -> None:
+        assert proc.returncode == BLOCK, (proc.returncode, proc.stderr)
+>       assert f"[{rule}]" in proc.stderr, proc.stderr
+E       AssertionError: C:\Users\caglar.sahin\AppData\Local\Programs\Python\Python312\python.exe: can't open file 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py': [Errno 2] No such file or directory
+E         
+E       assert '[TEK-YAZAR]' in "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n"
+E        +  where "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n" = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n").stderr
+
+tests\hooks\test_guard.py:30: AssertionError
+__________________ test_no_role_message_contains_session_id ___________________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-20/test_no_role_message_contains_0/ffcore')
+
+    def test_no_role_message_contains_session_id(main_root):
+        proc = run_hook(
+            edit(main_root / "KARARLAR.md"), main_root, CLAUDE_CODE_HOST_SESSION_ID="local_abc"
+        )
+>       assert SESSION_ID in proc.stderr
+E       assert '11111111-2222-3333-4444-555555555555' in "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n"
+E        +  where "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n" = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n").stderr
+
+tests\hooks\test_guard.py:358: AssertionError
+_____________________ test_no_role_non_owned_file_allowed _____________________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-20/test_no_role_non_owned_file_al0/ffcore')
+
+    def test_no_role_non_owned_file_allowed(main_root):
+>       assert_allowed(run_hook(edit(main_root / "backend" / "app" / "x.py"), main_root))
+
+tests\hooks\test_guard.py:363: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n")
+
+    def assert_allowed(proc) -> None:
+>       assert proc.returncode == 0, (proc.returncode, proc.stderr)
+E       AssertionError: (2, "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_payco...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory
+E         ")
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n").returncode
+
+tests\hooks\test_guard.py:34: AssertionError
+_____________________ test_role_from_registry_session_id ______________________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-20/test_role_from_registry_sessio0/ffcore')
+
+    def test_role_from_registry_session_id(main_root):
+        write_registry(main_root, {SESSION_ID: {"rol": "koordinator", "acildi": "x"}})
+>       assert_allowed(run_hook(edit(main_root / "state" / "WORK_QUEUE.md"), main_root))
+
+tests\hooks\test_guard.py:369: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n")
+
+    def assert_allowed(proc) -> None:
+>       assert proc.returncode == 0, (proc.returncode, proc.stderr)
+E       AssertionError: (2, "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_payco...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory
+E         ")
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n").returncode
+
+tests\hooks\test_guard.py:34: AssertionError
+_______________________ test_role_from_registry_host_id _______________________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-20/test_role_from_registry_host_i0/ffcore')
+
+    def test_role_from_registry_host_id(main_root):
+        write_registry(main_root, {"local_abc": {"rol": "koordinator", "acildi": "x"}})
+        proc = run_hook(
+            edit(main_root / "state" / "WORK_QUEUE.md"), main_root, CLAUDE_CODE_HOST_SESSION_ID="local_abc"
+        )
+>       assert_allowed(proc)
+
+tests\hooks\test_guard.py:377: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n")
+
+    def assert_allowed(proc) -> None:
+>       assert proc.returncode == 0, (proc.returncode, proc.stderr)
+E       AssertionError: (2, "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_payco...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory
+E         ")
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n").returncode
+
+tests\hooks\test_guard.py:34: AssertionError
+______________________ test_env_role_overrides_registry _______________________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-20/test_env_role_overrides_regist0/ffcore')
+
+    def test_env_role_overrides_registry(main_root):
+        write_registry(main_root, {SESSION_ID: {"rol": "koordinator", "acildi": "x"}})
+        proc = run_hook(edit(main_root / "state" / "WORK_QUEUE.md"), main_root, FFCORE_ROL="isci-a")
+>       assert_blocked(proc, "TEK-YAZAR")
+
+tests\hooks\test_guard.py:383: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n")
+rule = 'TEK-YAZAR'
+
+    def assert_blocked(proc, rule: str) -> None:
+        assert proc.returncode == BLOCK, (proc.returncode, proc.stderr)
+>       assert f"[{rule}]" in proc.stderr, proc.stderr
+E       AssertionError: C:\Users\caglar.sahin\AppData\Local\Programs\Python\Python312\python.exe: can't open file 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py': [Errno 2] No such file or directory
+E         
+E       assert '[TEK-YAZAR]' in "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n"
+E        +  where "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n" = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n").stderr
+
+tests\hooks\test_guard.py:30: AssertionError
+________________________ test_registry_corrupt_is_loud ________________________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-20/test_registry_corrupt_is_loud0/ffcore')
+
+    def test_registry_corrupt_is_loud(main_root):
+        (main_root / "state" / "oturumlar.json").write_text("{not json", encoding="utf-8")
+        proc = run_hook(edit(main_root / "state" / "WORK_QUEUE.md"), main_root)
+>       assert_blocked(proc, "TEK-YAZAR")
+
+tests\hooks\test_guard.py:389: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n")
+rule = 'TEK-YAZAR'
+
+    def assert_blocked(proc, rule: str) -> None:
+        assert proc.returncode == BLOCK, (proc.returncode, proc.stderr)
+>       assert f"[{rule}]" in proc.stderr, proc.stderr
+E       AssertionError: C:\Users\caglar.sahin\AppData\Local\Programs\Python\Python312\python.exe: can't open file 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py': [Errno 2] No such file or directory
+E         
+E       assert '[TEK-YAZAR]' in "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n"
+E        +  where "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n" = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n").stderr
+
+tests\hooks\test_guard.py:30: AssertionError
+________________________ test_unknown_role_is_no_role _________________________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-20/test_unknown_role_is_no_role0/ffcore')
+
+    def test_unknown_role_is_no_role(main_root):
+        proc = run_hook(edit(main_root / "state" / "WORK_QUEUE.md"), main_root, FFCORE_ROL="admin")
+>       assert_blocked(proc, "TEK-YAZAR")
+
+tests\hooks\test_guard.py:395: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n")
+rule = 'TEK-YAZAR'
+
+    def assert_blocked(proc, rule: str) -> None:
+        assert proc.returncode == BLOCK, (proc.returncode, proc.stderr)
+>       assert f"[{rule}]" in proc.stderr, proc.stderr
+E       AssertionError: C:\Users\caglar.sahin\AppData\Local\Programs\Python\Python312\python.exe: can't open file 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py': [Errno 2] No such file or directory
+E         
+E       assert '[TEK-YAZAR]' in "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n"
+E        +  where "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n" = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n").stderr
+
+tests\hooks\test_guard.py:30: AssertionError
+______________ test_worktree_state_write_blocked_for_coordinator ______________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-20/test_worktree_state_write_bloc0/ffcore')
+
+    def test_worktree_state_write_blocked_for_coordinator(main_root):
+        wt = make_worktree(main_root, "fix", "ajan-hooklari")
+        proc = run_hook(edit(wt / "state" / "pr" / "x.md"), main_root, FFCORE_ROL="koordinator")
+>       assert_blocked(proc, "STATE-YOL")
+
+tests\hooks\test_guard.py:412: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n")
+rule = 'STATE-YOL'
+
+    def assert_blocked(proc, rule: str) -> None:
+        assert proc.returncode == BLOCK, (proc.returncode, proc.stderr)
+>       assert f"[{rule}]" in proc.stderr, proc.stderr
+E       AssertionError: C:\Users\caglar.sahin\AppData\Local\Programs\Python\Python312\python.exe: can't open file 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py': [Errno 2] No such file or directory
+E         
+E       assert '[STATE-YOL]' in "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n"
+E        +  where "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n" = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n").stderr
+
+tests\hooks\test_guard.py:30: AssertionError
+__________________ test_review_worktree_state_write_blocked ___________________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-20/test_review_worktree_state_wri0/ffcore')
+
+    def test_review_worktree_state_write_blocked(main_root):
+        wt = make_worktree(main_root, "review-10c-1")
+        proc = run_hook(edit(wt / "state" / "kanal" / "inceleyici.md"), main_root, FFCORE_ROL="inceleyici")
+>       assert_blocked(proc, "STATE-YOL")
+
+tests\hooks\test_guard.py:418: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n")
+rule = 'STATE-YOL'
+
+    def assert_blocked(proc, rule: str) -> None:
+        assert proc.returncode == BLOCK, (proc.returncode, proc.stderr)
+>       assert f"[{rule}]" in proc.stderr, proc.stderr
+E       AssertionError: C:\Users\caglar.sahin\AppData\Local\Programs\Python\Python312\python.exe: can't open file 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py': [Errno 2] No such file or directory
+E         
+E       assert '[STATE-YOL]' in "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n"
+E        +  where "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n" = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n").stderr
+
+tests\hooks\test_guard.py:30: AssertionError
+____________________ test_worktree_non_state_write_allowed ____________________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-20/test_worktree_non_state_write_0/ffcore')
+
+    def test_worktree_non_state_write_allowed(main_root):
+        wt = make_worktree(main_root, "fix", "ajan-hooklari")
+        proc = run_hook(edit(wt / ".claude" / "hooks" / "ffcore_guard.py"), main_root, FFCORE_ROL="isci-a")
+>       assert_allowed(proc)
+
+tests\hooks\test_guard.py:424: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n")
+
+    def assert_allowed(proc) -> None:
+>       assert proc.returncode == 0, (proc.returncode, proc.stderr)
+E       AssertionError: (2, "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_payco...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory
+E         ")
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n").returncode
+
+tests\hooks\test_guard.py:34: AssertionError
+_______________ test_worktree_nested_state_dir_in_code_allowed ________________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-20/test_worktree_nested_state_dir0/ffcore')
+
+    def test_worktree_nested_state_dir_in_code_allowed(main_root):
+        wt = make_worktree(main_root, "feat", "x")
+        proc = run_hook(edit(wt / "frontend" / "lib" / "state" / "a.ts"), main_root, FFCORE_ROL="isci-c")
+>       assert_allowed(proc)
+
+tests\hooks\test_guard.py:430: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n")
+
+    def assert_allowed(proc) -> None:
+>       assert proc.returncode == 0, (proc.returncode, proc.stderr)
+E       AssertionError: (2, "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_payco...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory
+E         ")
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n").returncode
+
+tests\hooks\test_guard.py:34: AssertionError
+____________________ test_worktree_kararlar_worker_blocked ____________________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-20/test_worktree_kararlar_worker_0/ffcore')
+
+    def test_worktree_kararlar_worker_blocked(main_root):
+        wt = make_worktree(main_root, "fix", "ajan-hooklari")
+        proc = run_hook(edit(wt / "KARARLAR.md"), main_root, FFCORE_ROL="isci-a")
+>       assert_blocked(proc, "TEK-YAZAR")
+
+tests\hooks\test_guard.py:436: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n")
+rule = 'TEK-YAZAR'
+
+    def assert_blocked(proc, rule: str) -> None:
+        assert proc.returncode == BLOCK, (proc.returncode, proc.stderr)
+>       assert f"[{rule}]" in proc.stderr, proc.stderr
+E       AssertionError: C:\Users\caglar.sahin\AppData\Local\Programs\Python\Python312\python.exe: can't open file 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py': [Errno 2] No such file or directory
+E         
+E       assert '[TEK-YAZAR]' in "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n"
+E        +  where "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n" = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n").stderr
+
+tests\hooks\test_guard.py:30: AssertionError
+______________________ test_warn_mode_exit0_with_message ______________________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-20/test_warn_mode_exit0_with_mess0/ffcore')
+
+    def test_warn_mode_exit0_with_message(main_root):
+        proc = run_hook(bash("make test"), main_root, FFCORE_GUARD_MODE="warn")
+>       assert proc.returncode == 0
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n").returncode
+
+tests\hooks\test_guard.py:444: AssertionError
+____________________________ test_block_is_default ____________________________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-20/test_block_is_default0/ffcore')
+
+    def test_block_is_default(main_root):
+>       assert_blocked(run_hook(bash("make test"), main_root), "KAPI")
+
+tests\hooks\test_guard.py:452: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n")
+rule = 'KAPI'
+
+    def assert_blocked(proc, rule: str) -> None:
+        assert proc.returncode == BLOCK, (proc.returncode, proc.stderr)
+>       assert f"[{rule}]" in proc.stderr, proc.stderr
+E       AssertionError: C:\Users\caglar.sahin\AppData\Local\Programs\Python\Python312\python.exe: can't open file 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py': [Errno 2] No such file or directory
+E         
+E       assert '[KAPI]' in "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n"
+E        +  where "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n" = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n").stderr
+
+tests\hooks\test_guard.py:30: AssertionError
+_______________________ test_unknown_mode_blocks_loudly _______________________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-20/test_unknown_mode_blocks_loudl0/ffcore')
+
+    def test_unknown_mode_blocks_loudly(main_root):
+        proc = run_hook(bash("make test"), main_root, FFCORE_GUARD_MODE="soft")
+>       assert_blocked(proc, "KAPI")
+
+tests\hooks\test_guard.py:457: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n")
+rule = 'KAPI'
+
+    def assert_blocked(proc, rule: str) -> None:
+        assert proc.returncode == BLOCK, (proc.returncode, proc.stderr)
+>       assert f"[{rule}]" in proc.stderr, proc.stderr
+E       AssertionError: C:\Users\caglar.sahin\AppData\Local\Programs\Python\Python312\python.exe: can't open file 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py': [Errno 2] No such file or directory
+E         
+E       assert '[KAPI]' in "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n"
+E        +  where "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n" = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n").stderr
+
+tests\hooks\test_guard.py:30: AssertionError
+______________________ test_allowed_call_prints_nothing _______________________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-20/test_allowed_call_prints_nothi0/ffcore')
+
+    def test_allowed_call_prints_nothing(main_root):
+        proc = run_hook(bash("ls"), main_root, FFCORE_GUARD_MODE="warn")
+>       assert proc.returncode == 0
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n").returncode
+
+tests\hooks\test_guard.py:463: AssertionError
+_________________ test_block_writes_log_line_without_content __________________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-20/test_block_writes_log_line_wit0/ffcore')
+
+    def test_block_writes_log_line_without_content(main_root):
+        run_hook(edit(main_root / "state" / "WORK_QUEUE.md", "Write"), main_root, FFCORE_ROL="isci-a")
+        lines = log_lines(main_root)
+>       assert len(lines) == 1
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests\hooks\test_guard.py:479: AssertionError
+__________________________ test_warn_writes_log_line __________________________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-20/test_warn_writes_log_line0/ffcore')
+
+    def test_warn_writes_log_line(main_root):
+        run_hook(bash("make test"), main_root, FFCORE_GUARD_MODE="warn")
+        lines = log_lines(main_root)
+>       assert len(lines) == 1
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests\hooks\test_guard.py:488: AssertionError
+__________________________ test_log_truncates_to_120 __________________________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-20/test_log_truncates_to_1200/ffcore')
+
+    def test_log_truncates_to_120(main_root):
+        cmd = "make test && echo " + "x" * 300
+        run_hook(bash(cmd), main_root)
+>       detail = log_lines(main_root)[0].split("\t")[5]
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+E       IndexError: list index out of range
+
+tests\hooks\test_guard.py:495: IndexError
+_______________________ test_allowed_call_writes_no_log _______________________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-20/test_allowed_call_writes_no_lo0/ffcore')
+
+    def test_allowed_call_writes_no_log(main_root):
+>       assert_allowed(run_hook(bash("ls"), main_root))
+
+tests\hooks\test_guard.py:500: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n")
+
+    def assert_allowed(proc) -> None:
+>       assert proc.returncode == 0, (proc.returncode, proc.stderr)
+E       AssertionError: (2, "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_payco...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory
+E         ")
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n").returncode
+
+tests\hooks\test_guard.py:34: AssertionError
+____________________ test_non_matching_tool_allowed[Read] _____________________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-20/test_non_matching_tool_allowed0/ffcore')
+tool = 'Read'
+
+    @pytest.mark.parametrize("tool", ["Read", "Glob", "Grep"])
+    def test_non_matching_tool_allowed(main_root, tool):
+        payload = {"session_id": SESSION_ID, "tool_name": tool, "tool_input": {"file_path": "x"}}
+>       assert_allowed(run_hook(payload, main_root))
+
+tests\hooks\test_guard.py:510: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n")
+
+    def assert_allowed(proc) -> None:
+>       assert proc.returncode == 0, (proc.returncode, proc.stderr)
+E       AssertionError: (2, "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_payco...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory
+E         ")
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n").returncode
+
+tests\hooks\test_guard.py:34: AssertionError
+____________________ test_non_matching_tool_allowed[Glob] _____________________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-20/test_non_matching_tool_allowed1/ffcore')
+tool = 'Glob'
+
+    @pytest.mark.parametrize("tool", ["Read", "Glob", "Grep"])
+    def test_non_matching_tool_allowed(main_root, tool):
+        payload = {"session_id": SESSION_ID, "tool_name": tool, "tool_input": {"file_path": "x"}}
+>       assert_allowed(run_hook(payload, main_root))
+
+tests\hooks\test_guard.py:510: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n")
+
+    def assert_allowed(proc) -> None:
+>       assert proc.returncode == 0, (proc.returncode, proc.stderr)
+E       AssertionError: (2, "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_payco...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory
+E         ")
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n").returncode
+
+tests\hooks\test_guard.py:34: AssertionError
+____________________ test_non_matching_tool_allowed[Grep] _____________________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-20/test_non_matching_tool_allowed2/ffcore')
+tool = 'Grep'
+
+    @pytest.mark.parametrize("tool", ["Read", "Glob", "Grep"])
+    def test_non_matching_tool_allowed(main_root, tool):
+        payload = {"session_id": SESSION_ID, "tool_name": tool, "tool_input": {"file_path": "x"}}
+>       assert_allowed(run_hook(payload, main_root))
+
+tests\hooks\test_guard.py:510: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n")
+
+    def assert_allowed(proc) -> None:
+>       assert proc.returncode == 0, (proc.returncode, proc.stderr)
+E       AssertionError: (2, "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_payco...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory
+E         ")
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n").returncode
+
+tests\hooks\test_guard.py:34: AssertionError
+_____________________ test_malformed_stdin_blocks_loudly ______________________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-20/test_malformed_stdin_blocks_lo0/ffcore')
+
+    def test_malformed_stdin_blocks_loudly(main_root):
+        proc = run_hook("{not json", main_root)
+        assert proc.returncode == BLOCK
+>       assert "FFCORE-GUARD" in proc.stderr
+E       assert 'FFCORE-GUARD' in "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n"
+E        +  where "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\...e\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n" = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_pay...\\\\.worktrees\\\\fix\\\\ajan-hooklari\\\\.claude\\\\hooks\\\\ffcore_guard.py': [Errno 2] No such file or directory\n").stderr
+
+tests\hooks\test_guard.py:516: AssertionError
+__________________ test_settings_json_valid_and_wires_guard ___________________
+
+    def test_settings_json_valid_and_wires_guard():
+>       settings = json.loads(SETTINGS_PATH.read_text(encoding="utf-8"))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\hooks\test_guard.py:561: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Users\caglar.sahin\AppData\Local\Programs\Python\Python312\Lib\pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('C:/ai_paycore/ffcore/.worktrees/fix/ajan-hooklari/.claude/settings.json')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\settings.json'
+
+C:\Users\caglar.sahin\AppData\Local\Programs\Python\Python312\Lib\pathlib.py:1013: FileNotFoundError
+=========================== short test summary info ===========================
+FAILED tests/hooks/test_guard.py::test_env_cat_blocked - AssertionError: C:\U...
+FAILED tests/hooks/test_guard.py::test_env_variants_blocked[grep KEY .env] - ...
+FAILED tests/hooks/test_guard.py::test_env_variants_blocked[echo X >> .env]
+FAILED tests/hooks/test_guard.py::test_env_variants_blocked[cat backend/.env]
+FAILED tests/hooks/test_guard.py::test_env_test_allowed - AssertionError: (2,...
+FAILED tests/hooks/test_guard.py::test_env_example_allowed - AssertionError: ...
+FAILED tests/hooks/test_guard.py::test_env_write_tool_blocked - AssertionErro...
+FAILED tests/hooks/test_guard.py::test_env_test_write_tool_allowed - Assertio...
+FAILED tests/hooks/test_guard.py::test_paycore_data_bash_blocked - AssertionE...
+FAILED tests/hooks/test_guard.py::test_paycore_eval_results_blocked - Asserti...
+FAILED tests/hooks/test_guard.py::test_paycore_src_allowed - AssertionError: ...
+FAILED tests/hooks/test_guard.py::test_push_coordinator_with_flag_allowed - A...
+FAILED tests/hooks/test_guard.py::test_push_coordinator_without_flag_blocked
+FAILED tests/hooks/test_guard.py::test_push_worker_with_flag_blocked - Assert...
+FAILED tests/hooks/test_guard.py::test_push_no_role_with_flag_blocked - Asser...
+FAILED tests/hooks/test_guard.py::test_push_flag_in_hook_env_is_not_enough - ...
+FAILED tests/hooks/test_guard.py::test_push_git_c_variant_blocked - Assertion...
+FAILED tests/hooks/test_guard.py::test_git_status_allowed - AssertionError: (...
+FAILED tests/hooks/test_guard.py::test_compose_build_bare_blocked - Assertion...
+FAILED tests/hooks/test_guard.py::test_compose_build_with_file_blocked - Asse...
+FAILED tests/hooks/test_guard.py::test_compose_build_pull_false_allowed - Ass...
+FAILED tests/hooks/test_guard.py::test_compose_up_build_blocked - AssertionEr...
+FAILED tests/hooks/test_guard.py::test_compose_up_without_pull_never_blocked
+FAILED tests/hooks/test_guard.py::test_compose_up_pull_missing_blocked - Asse...
+FAILED tests/hooks/test_guard.py::test_make_test_without_tee_blocked - Assert...
+FAILED tests/hooks/test_guard.py::test_make_test_with_tee_allowed - Assertion...
+FAILED tests/hooks/test_guard.py::test_make_lint_tail_blocked - AssertionErro...
+FAILED tests/hooks/test_guard.py::test_make_gate_targets_blocked[test-int] - ...
+FAILED tests/hooks/test_guard.py::test_make_gate_targets_blocked[smoke] - Ass...
+FAILED tests/hooks/test_guard.py::test_make_other_target_allowed - AssertionE...
+FAILED tests/hooks/test_guard.py::test_pytest_without_tee_blocked - Assertion...
+FAILED tests/hooks/test_guard.py::test_pytest_with_tee_allowed - AssertionErr...
+FAILED tests/hooks/test_guard.py::test_pytest_info_flags_allowed[--version]
+FAILED tests/hooks/test_guard.py::test_pytest_info_flags_allowed[--help] - As...
+FAILED tests/hooks/test_guard.py::test_pytest_info_flags_allowed[--collect-only -q]
+FAILED tests/hooks/test_guard.py::test_worker_writes_work_queue_blocked - Ass...
+FAILED tests/hooks/test_guard.py::test_worker_writes_coordinator_files_blocked[state/BLOCKERS.md]
+FAILED tests/hooks/test_guard.py::test_worker_writes_coordinator_files_blocked[KARARLAR.md]
+FAILED tests/hooks/test_guard.py::test_worker_writes_coordinator_files_blocked[state/oturumlar.json]
+FAILED tests/hooks/test_guard.py::test_coordinator_writes_work_queue_allowed
+FAILED tests/hooks/test_guard.py::test_worker_writes_own_channel_allowed - As...
+FAILED tests/hooks/test_guard.py::test_worker_writes_other_channel_blocked - ...
+FAILED tests/hooks/test_guard.py::test_worker_writes_own_pr_allowed - Asserti...
+FAILED tests/hooks/test_guard.py::test_other_worker_writes_pr_blocked - Asser...
+FAILED tests/hooks/test_guard.py::test_worker_without_package_writes_pr_blocked
+FAILED tests/hooks/test_guard.py::test_pr_alias_field_allowed - AssertionErro...
+FAILED tests/hooks/test_guard.py::test_reviewer_writes_reviews_allowed - Asse...
+FAILED tests/hooks/test_guard.py::test_worker_writes_reviews_blocked - Assert...
+FAILED tests/hooks/test_guard.py::test_evidence_free_for_all - AssertionError...
+FAILED tests/hooks/test_guard.py::test_backslash_windows_path_normalized - As...
+FAILED tests/hooks/test_guard.py::test_forward_slash_path_normalized - Assert...
+FAILED tests/hooks/test_guard.py::test_all_write_tools_checked[Write] - Asser...
+FAILED tests/hooks/test_guard.py::test_all_write_tools_checked[MultiEdit] - A...
+FAILED tests/hooks/test_guard.py::test_all_write_tools_checked[NotebookEdit]
+FAILED tests/hooks/test_guard.py::test_no_role_single_writer_blocked - Assert...
+FAILED tests/hooks/test_guard.py::test_no_role_message_contains_session_id - ...
+FAILED tests/hooks/test_guard.py::test_no_role_non_owned_file_allowed - Asser...
+FAILED tests/hooks/test_guard.py::test_role_from_registry_session_id - Assert...
+FAILED tests/hooks/test_guard.py::test_role_from_registry_host_id - Assertion...
+FAILED tests/hooks/test_guard.py::test_env_role_overrides_registry - Assertio...
+FAILED tests/hooks/test_guard.py::test_registry_corrupt_is_loud - AssertionEr...
+FAILED tests/hooks/test_guard.py::test_unknown_role_is_no_role - AssertionErr...
+FAILED tests/hooks/test_guard.py::test_worktree_state_write_blocked_for_coordinator
+FAILED tests/hooks/test_guard.py::test_review_worktree_state_write_blocked - ...
+FAILED tests/hooks/test_guard.py::test_worktree_non_state_write_allowed - Ass...
+FAILED tests/hooks/test_guard.py::test_worktree_nested_state_dir_in_code_allowed
+FAILED tests/hooks/test_guard.py::test_worktree_kararlar_worker_blocked - Ass...
+FAILED tests/hooks/test_guard.py::test_warn_mode_exit0_with_message - assert ...
+FAILED tests/hooks/test_guard.py::test_block_is_default - AssertionError: C:\...
+FAILED tests/hooks/test_guard.py::test_unknown_mode_blocks_loudly - Assertion...
+FAILED tests/hooks/test_guard.py::test_allowed_call_prints_nothing - assert 2...
+FAILED tests/hooks/test_guard.py::test_block_writes_log_line_without_content
+FAILED tests/hooks/test_guard.py::test_warn_writes_log_line - assert 0 == 1
+FAILED tests/hooks/test_guard.py::test_log_truncates_to_120 - IndexError: lis...
+FAILED tests/hooks/test_guard.py::test_allowed_call_writes_no_log - Assertion...
+FAILED tests/hooks/test_guard.py::test_non_matching_tool_allowed[Read] - Asse...
+FAILED tests/hooks/test_guard.py::test_non_matching_tool_allowed[Glob] - Asse...
+FAILED tests/hooks/test_guard.py::test_non_matching_tool_allowed[Grep] - Asse...
+FAILED tests/hooks/test_guard.py::test_malformed_stdin_blocks_loudly - assert...
+FAILED tests/hooks/test_guard.py::test_settings_json_valid_and_wires_guard - ...
+ERROR tests/hooks/test_guard.py::test_env_file_flag_with_env_test_allowed - F...
+ERROR tests/hooks/test_guard.py::test_compose_up_pull_never_allowed - FileNot...
+ERROR tests/hooks/test_guard.py::test_compose_up_pull_equals_never_allowed - ...
+ERROR tests/hooks/test_guard.py::test_fourth_stack_blocked - FileNotFoundErro...
+ERROR tests/hooks/test_guard.py::test_third_stack_allowed - FileNotFoundError...
+ERROR tests/hooks/test_guard.py::test_up_into_running_stack_allowed - FileNot...
+ERROR tests/hooks/test_guard.py::test_stack_count_failure_blocks - FileNotFou...
+ERROR tests/hooks/test_guard.py::test_stack_parser_counts_only_running_ff - F...
+ERROR tests/hooks/test_guard.py::test_guard_internal_error_blocks - FileNotFo...
+ERROR tests/hooks/test_guard.py::test_guard_internal_error_never_locks_guard_files[.claude/hooks/ffcore_guard.py]
+ERROR tests/hooks/test_guard.py::test_guard_internal_error_never_locks_guard_files[.claude/settings.json]
+ERROR tests/hooks/test_guard.py::test_guard_internal_error_never_locks_guard_files[.claude\\hooks\\x.py]
+ERROR tests/hooks/test_guard.py::test_guard_internal_error_warn_mode_only_warns
+ERROR tests/hooks/test_guard.py::test_fast_decide - FileNotFoundError: [Errno...
+80 failed, 14 errors in 22.24s

@@ -3,9 +3,9 @@
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
 - Oturum kimliği: ffcore-inceleyici-10c1 (önceki: ffcore-inceleyici-09-2-teyit, RETIRED)
-- Aktif paket: fix/ajan-hooklari r2 (49b4343aa9b84840163c79639c396bb7859ad312; K-HOOK-0008)
+- Aktif paket: fix/ajan-hooklari r3 (7a1195afc17648062a0a6afdae45d2aa54d88bd9; K-HOOK-0012)
 - Durum: ACTIVE
-- Son okunan: koordinator K-HOOK-0011
+- Son okunan: koordinator K-HOOK-0013
 
 ## Mesajlar
 - Arşiv: MERGED/kapalı paketlerin mesajları `state/kanal/arsiv/inceleyici-<paket>.md` dosyalarında (16 Kasım 2026 taşıması: 335 mesaj); ID ile atıf orada bulunur.
@@ -36,3 +36,16 @@ Rapor: `state/reviews/fix-ajan-hooklari-r2.md`. Kanıt: `state/evidence/fix-ajan
 - **MINOR-3:** `curl -u user:pass` ve JSON gövdesindeki `"token":"…"` maskesiz kalıyor.
 - Dengesiz tırnakta çökme yok (çıkış 0; bash komutu koşmaz). Dıştaki tee içteki `tail`'i örtüyor (NOTE). r1 N2'deki üç canlı doğrulama warn gününe kaldı.
 - MINOR'lar turu uzatmaz. Commit edilmemiş dosyalarım: rapor, üç kanıt dosyası, kanal.
+
+### R-HOOK-0005 · 2026-11-16 20:05 · → koordinator · ACK
+Paket: fix/ajan-hooklari · Cevap: K-HOOK-0012
+r3 teyit turu alındı (`49b4343..7a1195a`). Yığın yok. Pytest, R13 ve derinlik probe'ları, r2 probe regresyonu, belge satırı. Rapor `state/reviews/fix-ajan-hooklari-r3.md`, sonuç R-HOOK-0006.
+
+### R-HOOK-0006 · 2026-11-16 21:50 · → koordinator · REVIEW-SONUC
+Paket: fix/ajan-hooklari · Cevap: K-HOOK-0012 · SHA: 7a1195afc17648062a0a6afdae45d2aa54d88bd9 · Sonuc: ONAY · Bulgu: B0 M0 m0 N3
+Rapor: `state/reviews/fix-ajan-hooklari-r3.md`. Kanıt: `state/evidence/fix-ajan-hooklari-r3-rv-{tests,probe}.log` (142 passed; 112 doğrudan çağrı: r2'nin 104'ü ve 8 derinlik vakası).
+- R13 ve D01 (4 düzey push) `GUARD-DERINLIK` ile engelleniyor ve kayda düşüyor; warn kipinde `systemMessage` geliyor. 3 düzey hâlâ denetleniyor (PUSH ve KAPI). e2e tarifi serbest.
+- Düz 4 düzey `echo` da engelleniyor. Bu bilinçli bir yanlış pozitif ve fail-loud ilkesine uygun; gerçek tarifler en çok 2 düzey (N1).
+- "Bilinen sınırlar" satırı davranışla tutarlı. Regresyon: r2'nin 104 vakasından yalnız R13 değişti (0 → 2).
+- NOTE'lar: JSON gövdesindeki token FOLLOWUP-189'da adıyla geçsin; warn günü kontrolleri açık.
+- Not: R-HOOK-0005 ACK olarak 20:05'te kanalda; sonuç bu mesajda. Commit edilmemiş dosyalarım: rapor, üç kanıt dosyası, kanal.

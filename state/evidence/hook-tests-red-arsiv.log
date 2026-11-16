@@ -1,0 +1,78 @@
+FF..F.                                                                   [100%]
+================================== FAILURES ===================================
+_____ test_worker_writes_archive_blocked[state/arsiv/blockers-kapali.md] ______
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-24/test_worker_writes_archive_blo0/ffcore')
+rel = 'state/arsiv/blockers-kapali.md'
+
+    @pytest.mark.parametrize(
+        "rel", ["state/arsiv/blockers-kapali.md", "state/kanal/arsiv/isci-a-09.md"]
+    )
+    def test_worker_writes_archive_blocked(main_root, rel):
+        proc = run_hook(edit(main_root / rel, "Write"), main_root, FFCORE_ROL="isci-a")
+>       assert_blocked(proc, "TEK-YAZAR")
+
+tests\hooks\test_guard.py:625: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py'], returncode=0, stdout='', stderr='')
+rule = 'TEK-YAZAR'
+
+    def assert_blocked(proc, rule: str) -> None:
+>       assert proc.returncode == BLOCK, (proc.returncode, proc.stderr)
+E       AssertionError: (0, '')
+E       assert 0 == 2
+E        +  where 0 = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py'], returncode=0, stdout='', stderr='').returncode
+
+tests\hooks\test_guard.py:29: AssertionError
+_____ test_worker_writes_archive_blocked[state/kanal/arsiv/isci-a-09.md] ______
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-24/test_worker_writes_archive_blo1/ffcore')
+rel = 'state/kanal/arsiv/isci-a-09.md'
+
+    @pytest.mark.parametrize(
+        "rel", ["state/arsiv/blockers-kapali.md", "state/kanal/arsiv/isci-a-09.md"]
+    )
+    def test_worker_writes_archive_blocked(main_root, rel):
+        proc = run_hook(edit(main_root / rel, "Write"), main_root, FFCORE_ROL="isci-a")
+>       assert_blocked(proc, "TEK-YAZAR")
+
+tests\hooks\test_guard.py:625: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py'], returncode=0, stdout='', stderr='')
+rule = 'TEK-YAZAR'
+
+    def assert_blocked(proc, rule: str) -> None:
+>       assert proc.returncode == BLOCK, (proc.returncode, proc.stderr)
+E       AssertionError: (0, '')
+E       assert 0 == 2
+E        +  where 0 = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py'], returncode=0, stdout='', stderr='').returncode
+
+tests\hooks\test_guard.py:29: AssertionError
+________ test_coordinator_moves_messages_out_of_worker_channel_allowed ________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-24/test_coordinator_moves_message0/ffcore')
+
+    def test_coordinator_moves_messages_out_of_worker_channel_allowed(main_root):
+        path = main_root / "state" / "kanal" / "isci-a.md"
+>       assert_allowed(run_hook(edit(path), main_root, FFCORE_ROL="koordinator"))
+
+tests\hooks\test_guard.py:638: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\\\Users\\\\caglar.sahin\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python312\\\\python.exe', 'C:\\\\ai_pay..., returncode=2, stdout='', stderr='FFCORE-GUARD [TEK-YAZAR] state/kanal/isci-a.md \u2192 isci-a; senin rol\xfcn koordinator\\n')
+
+    def assert_allowed(proc) -> None:
+>       assert proc.returncode == 0, (proc.returncode, proc.stderr)
+E       AssertionError: (2, 'FFCORE-GUARD [TEK-YAZAR] state/kanal/isci-a.md \u2192 isci-a; senin rol\xfcn koordinator
+E         ')
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['C:\\\\Users\\\\caglar.sahin\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python312\\\\python.exe', 'C:\\\\ai_pay..., returncode=2, stdout='', stderr='FFCORE-GUARD [TEK-YAZAR] state/kanal/isci-a.md \u2192 isci-a; senin rol\xfcn koordinator\\n').returncode
+
+tests\hooks\test_guard.py:34: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/hooks/test_guard.py::test_worker_writes_archive_blocked[state/arsiv/blockers-kapali.md]
+FAILED tests/hooks/test_guard.py::test_worker_writes_archive_blocked[state/kanal/arsiv/isci-a-09.md]
+FAILED tests/hooks/test_guard.py::test_coordinator_moves_messages_out_of_worker_channel_allowed
+3 failed, 3 passed, 95 deselected in 5.43s

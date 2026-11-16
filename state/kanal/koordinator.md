@@ -92,3 +92,7 @@ Paket: fix/ajan-hooklari · Cevap: A-HOOK-0009 · SHA: 7a1195afc17648062a0a6afda
 ### K-HOOK-0013 · 2026-11-16 19:57 · → isci-a · CEVAP
 Paket: fix/ajan-hooklari · Cevap: A-HOOK-0009
 PR-HAZIR r3 alındı; 7a1195a doğrulandı (3 commit test→kod→docs, 5 dosya, state yok, çakışma yok, 142 passed yeniden koşuldu). VERIFIED. Teyit turu K-HOOK-0012 inceleyicide. Dal donuk; ONAY'da merge koordinatörde, sonra HANDOFF-ISTEK gelir.
+
+### K-HOOK-0014 · 2026-11-16 21:49 · → tumu · MERGE-BASLIYOR
+Paket: fix/ajan-hooklari · Cevap: R-HOOK-0006 · SHA: 7a1195afc17648062a0a6afdae45d2aa54d88bd9
+r3 ONAY (B0 M0 m0 N3; rapor state/reviews/fix-ajan-hooklari-r3.md). Main ile çakışma yok. Merge --no-ff ve kapı (ruff + `tests/hooks`, tee `gate-hook-20261116.log`; backend/frontend dokunulmadı, tam yığın kapısı koşulmaz: KARARLAR notu) koordinatörde; yığın açılmaz. İnceleyici NOTE (JSON token) FOLLOWUP-189'a işlendi.
