@@ -87,14 +87,14 @@ Paket: <kod> · Cevap: <ID|-> · <türe göre zorunlu alanlar>
 
 | Tür | Zorunlu alanlar |
 |---|---|
-| hepsi | `Paket: <kod>` · `Cevap: <ID|->` |
+| hepsi | `Paket: <kod>` · `Cevap: <ID|->` (birden çok ID virgül ve boşlukla) |
 | `PR-HAZIR`, `REVIEW-ISTEK`, `ONAY-TEYIT-ISTEK`, `ONAY-TEYIT` | `SHA: <40 hex>` |
 | `REVIEW-SONUC` | `SHA: <40 hex>` · `Sonuc: ONAY|DEGISIKLIK` · `Bulgu: B<n> M<n> m<n> N<n>` |
 | `DURUM` | `Durum: PLANNED|IMPLEMENTED|VERIFIED|BLOCKED|DUYURU` (DUYURU: koordinatörün pakete bağlı olmayan duyurusu) |
 | `YIGIN-AC`, `YIGIN-KAPA` | `Yigin: <compose proje adı>` |
 
 - `GOREV`, `GOREV-EK`, `DUZELT`, `REVIEW-ISTEK` ve `KARAR-GEREK` alıcısı `ACK` yazar; aynı ID ikinci kez uygulanmaz. `PR-HAZIR`, `REVIEW-ISTEK` ve `REVIEW-SONUC` tam SHA taşır.
-- Doğrulama: hook (`.claude/hooks/ffcore_guard.py`, FOLLOWUP-189) `state/kanal/*.md`'ye eklenen yeni başlığı listeye ve zorunlu alanlara karşı denetler, uymayanı engeller; `scripts/kanal_ozet.py` ACK bekleyen bağlayıcı mesajları, paket başına son durumu ve son onaylı SHA'yı listeler (dalga raporu okur).
+- Doğrulama (uygulandı, fix/ajan-hooklari-2): hook kuralı `KANAL-BICIM` (`.claude/hooks/ffcore_guard.py`) Edit/Write/MultiEdit ile `state/kanal/<rol>.md`'ye **eklenen** her `### ` başlığını (kod bloğu içi hariç) ve ikinci satırını bu listelere ve alan tablosuna karşı denetler; uymayanı engeller, mesaj hangi alanın bozuk olduğunu söyler. Eski mesajlar, lease satırları ve `state/kanal/arsiv/**` denetlenmez. Listeler guard'da sabittir; `tests/hooks/test_kanal_bicim.py` onları bu bölümden okuyup karşılaştırır (sürüklenme testi kırmızı olur). `python -X utf8 scripts/kanal_ozet.py [--json]` ACK bekleyen bağlayıcı mesajları (`GOREV`, `GOREV-EK`, `DUZELT`, `REVIEW-ISTEK`, `KARAR-GEREK`; `ACK`'in `Cevap` alanındaki her ID cevaplanmış sayılır), paket başına WORK_QUEUE durumunu ve son `DURUM`/`PR-HAZIR`/`REVIEW-SONUC`/`MERGED` mesajını, son `Sonuc: ONAY` SHA'sını ve biçim dışı eski başlık sayısını verir (dalga raporu okur).
 - Dosyanın başındaki lease ve `Son okunan` satırlarını yalnızca sahibi günceller. Oturum başında, her iş adımının sonunda ve bildirim geldiğinde yeni mesajlar okunur.
 
 **Teslim ve isteğe bağlı zil.** Mesaj dosyaya başarıyla eklendiğinde teslim edilmiş sayılır. `SendMessage` varsa gönderen ayrıca `kanal: <ID> (state/kanal/<rol>.md)` bildirimi yollar. Araç yoksa süreç durmaz: oturumlar başlangıçta ve her iş adımının sonunda kanalları tarar; koordinatör en az saat başı veya kullanıcı `kanalları tara` dediğinde tüm kanalları kontrol eder. ACK alınmayan bağlayıcı mesaj saatlik özette görünür.
