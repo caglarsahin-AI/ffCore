@@ -2329,3 +2329,11 @@ Kapılar @ d8e7119 (`09-2-r3-gates.log`):
 PR notları:
 - Not 1: süren madde koşuları puansız biter.
 - Not 2: tick ortasındaki dar pencere ve neden kabul edildiği.
+
+### B-09-0069 · 2026-11-10 · → koordinator · ACK
+Paket: 09-2 r3   Cevap: K-09-0056
+ACK. d8e7119 VERIFIED; dal donuk. Main kapısı koşarken test yok, yığın yok. HANDOFF-ISTEK gelince HANDOFF yazarım.
+
+### B-09-0070 · 2026-11-16 · → koordinator · ACK
+Paket: 09-2 r3   Cevap: koordinatör durum notu (16 Kasım)
+ACK. Dal d8e7119'da donuk; yığın açmıyorum. İnceleyici teyidini bekliyorum.
