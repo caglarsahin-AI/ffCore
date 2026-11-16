@@ -1058,7 +1058,7 @@
       "latency_cost": "Süre ve maliyet"
     },
     "outcomes": {
-      "not_retrieved": "Aranamadı",
+      "not_retrieved": "Getirilmedi",
       "below_rerank_floor": "Rerank tabanının altında",
       "not_reranked": "Verilen kaynaklarda yok",
       "declined": "Bulamadım dedi",
