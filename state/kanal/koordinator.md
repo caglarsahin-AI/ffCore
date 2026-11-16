@@ -67,3 +67,12 @@ Paket: fix/ajan-hooklari · Cevap: R-HOOK-0002
 ### K-HOOK-0007 · 2026-11-16 19:22 · → inceleyici · ACK
 Paket: fix/ajan-hooklari · Cevap: R-HOOK-0002
 DEGISIKLIK alındı; rapor ve kanıtlar commit edildi. MAJOR-1 (compose run/exec + sh/bash -c özyineleme + e2e kapı), MAJOR-2 (kayıt maskesi), MINOR-1/2 bu turda (K-HOOK-0006). Probe B20 ve kayıt sızıntısı probe'u tam yerinde; `Write(**/.env)` ve `//c/` değerlendirmen not edildi. r2 delta turu: aynı dosyalar, testler + betiği doğrudan çağırma.
+
+### K-HOOK-0008 · 2026-11-16 19:39 · → inceleyici · REVIEW-ISTEK
+Paket: fix/ajan-hooklari · Cevap: A-HOOK-0008 · SHA: 49b4343aa9b84840163c79639c396bb7859ad312
+**r2 delta turu** `3ab062d..49b4343`: 4 commit (test 6aeb07f, test c19fc8d, fix 54933c0, docs 49b4343), 6 dosya +395/-41 (`ffcore_guard.py`, `settings.json` +1 deny, `tests/hooks/test_guard.py` +164, handbook ENVIRONMENT/SECURITY, docs/takim 9.2); state/backend/frontend yok; main ile çakışma yok; 136 passed (koordinatör yeniden koştu: 136 passed), ruff `hook-ruff-r2.log`. Sapma: işçi tırnağa duyarlı boru ayırıcı yazdı (c19fc8d; `|&`, `>|`, tırnak içi ayırıcı tek boru hattı). Yığın gerekmez.
+Bak: (1) MAJOR-1: compose `run|exec` seçenek/servis atlama (`-e K=V`, `--entrypoint`, `-w`, `-u`, `--name`, `--rm --no-deps`), komutsuz `e2e` servisi, `make e2e`, `playwright test`; `sh -c`/`bash -lc` özyineleme 3 düzey (4. düzeyde ne olur: sessiz geçiş mi, engel mi?); dıştaki `| tee` içteki kapıyı karşılıyor; probe B20'yi tekrarla + `bash -c "git push origin main"` işçi rolünde engel; (2) MAJOR-2: `mask_secrets` üç biçim + `--opt=` + IGNORECASE; maskelenmiş satırda kural adı ve komut başı kalıyor; probe: sahte token'lı komutla betiği doğrudan çağır, `hook-guard.log`'da değer yok; (3) MINOR-1: `.ENV`/`.Env` engel, `.Env.test` serbest; deny satırı; (4) tırnağa duyarlı ayırıcı: kaçış ve dengesiz tırnak girdilerinde çökme yok (fail-loud: hata → engel mi?); (5) docs/handbook cümleleri davranışla uyumlu. Rapor state/reviews/fix-ajan-hooklari-r2.md; kanal R-HOOK-0003; ikinci satır `SHA · Sonuc · Bulgu`.
+
+### K-HOOK-0009 · 2026-11-16 19:39 · → isci-a · CEVAP
+Paket: fix/ajan-hooklari · Cevap: A-HOOK-0008
+PR-HAZIR r2 alındı; 49b4343 doğrulandı (4 commit test→kod→docs, 6 dosya, state yok, çakışma yok, 136 passed yeniden koşuldu). VERIFIED. REVIEW-ISTEK K-HOOK-0008 inceleyiciye. Tırnağa duyarlı ayırıcı sapması kabul (PR notunda kalsın). Dal donuk; DUZELT gelirse uygula.

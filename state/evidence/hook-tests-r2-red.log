@@ -1,0 +1,478 @@
+HEAD 3ab062dc5447c9f1fed9a1bd2a32108c2689898b + r2 red tests (uncommitted at run), 2026-11-16
+...F.F.FF.F.FFF.FF.FF.FFFFFFFFF.FF                                       [100%]
+================================== FAILURES ===================================
+__________________ test_compose_run_gate_without_tee_blocked __________________
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-29/test_compose_run_gate_without_0/ffcore')
+
+    def test_compose_run_gate_without_tee_blocked(guard, main_root):
+        """MAJOR-1: the project's real gate form is a compose run, not a host make."""
+>       assert "KAPI" in rules(guard, bash(REVIEW_GATE), main_root)
+E       AssertionError: assert 'KAPI' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py'>, {'hook_event_name': 'PreToolUse', 'session_id': '11111111-2222-3333-4444-555555555555', 'tool_input': {'command': 'doc...-env-file .env.test --profile tools run --rm --no-deps -e DEPLOY_PROFILE=airgap tools make test'}, 'tool_name': 'Bash'}, WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-29/test_compose_run_gate_without_0/ffcore'))
+E        +    where {'hook_event_name': 'PreToolUse', 'session_id': '11111111-2222-3333-4444-555555555555', 'tool_input': {'command': 'doc...-env-file .env.test --profile tools run --rm --no-deps -e DEPLOY_PROFILE=airgap tools make test'}, 'tool_name': 'Bash'} = bash('docker compose -p review1 --env-file .env.test --profile tools run --rm --no-deps -e DEPLOY_PROFILE=airgap tools make test')
+
+tests\hooks\test_guard.py:656: AssertionError
+_____________________ test_compose_run_make_lint_blocked ______________________
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-29/test_compose_run_make_lint_blo0/ffcore')
+
+    def test_compose_run_make_lint_blocked(guard, main_root):
+>       assert "KAPI" in rules(guard, bash("docker compose run --rm tools make lint"), main_root)
+E       AssertionError: assert 'KAPI' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py'>, {'hook_event_name': 'PreToolUse', 'session_id': '11111111-2222-3333-4444-555555555555', 'tool_input': {'command': 'docker compose run --rm tools make lint'}, 'tool_name': 'Bash'}, WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-29/test_compose_run_make_lint_blo0/ffcore'))
+E        +    where {'hook_event_name': 'PreToolUse', 'session_id': '11111111-2222-3333-4444-555555555555', 'tool_input': {'command': 'docker compose run --rm tools make lint'}, 'tool_name': 'Bash'} = bash('docker compose run --rm tools make lint')
+
+tests\hooks\test_guard.py:665: AssertionError
+______________________ test_compose_exec_pytest_blocked _______________________
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-29/test_compose_exec_pytest_block0/ffcore')
+
+    def test_compose_exec_pytest_blocked(guard, main_root):
+>       assert "KAPI" in rules(guard, bash("docker compose exec backend pytest -q"), main_root)
+E       AssertionError: assert 'KAPI' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py'>, {'hook_event_name': 'PreToolUse', 'session_id': '11111111-2222-3333-4444-555555555555', 'tool_input': {'command': 'docker compose exec backend pytest -q'}, 'tool_name': 'Bash'}, WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-29/test_compose_exec_pytest_block0/ffcore'))
+E        +    where {'hook_event_name': 'PreToolUse', 'session_id': '11111111-2222-3333-4444-555555555555', 'tool_input': {'command': 'docker compose exec backend pytest -q'}, 'tool_name': 'Bash'} = bash('docker compose exec backend pytest -q')
+
+tests\hooks\test_guard.py:673: AssertionError
+___________________ test_compose_run_value_options_skipped ____________________
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-29/test_compose_run_value_options0/ffcore')
+
+    def test_compose_run_value_options_skipped(guard, main_root):
+        cmd = "docker compose run --rm -w /app -u root --name x --entrypoint sh tools make smoke"
+>       assert "KAPI" in rules(guard, bash(cmd), main_root)
+E       AssertionError: assert 'KAPI' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py'>, {'hook_event_name': 'PreToolUse', 'session_id': '11111111-2222-3333-4444-555555555555', 'tool_input': {'command': 'docker compose run --rm -w /app -u root --name x --entrypoint sh tools make smoke'}, 'tool_name': 'Bash'}, WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-29/test_compose_run_value_options0/ffcore'))
+E        +    where {'hook_event_name': 'PreToolUse', 'session_id': '11111111-2222-3333-4444-555555555555', 'tool_input': {'command': 'docker compose run --rm -w /app -u root --name x --entrypoint sh tools make smoke'}, 'tool_name': 'Bash'} = bash('docker compose run --rm -w /app -u root --name x --entrypoint sh tools make smoke')
+
+tests\hooks\test_guard.py:678: AssertionError
+____________________ test_e2e_service_without_tee_blocked _____________________
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-29/test_e2e_service_without_tee_b0/ffcore')
+
+    def test_e2e_service_without_tee_blocked(guard, main_root):
+        cmd = "docker compose --profile e2e run --rm e2e"
+>       assert "KAPI" in rules(guard, bash(cmd), main_root)
+E       AssertionError: assert 'KAPI' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py'>, {'hook_event_name': 'PreToolUse', 'session_id': '11111111-2222-3333-4444-555555555555', 'tool_input': {'command': 'docker compose --profile e2e run --rm e2e'}, 'tool_name': 'Bash'}, WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-29/test_e2e_service_without_tee_b0/ffcore'))
+E        +    where {'hook_event_name': 'PreToolUse', 'session_id': '11111111-2222-3333-4444-555555555555', 'tool_input': {'command': 'docker compose --profile e2e run --rm e2e'}, 'tool_name': 'Bash'} = bash('docker compose --profile e2e run --rm e2e')
+
+tests\hooks\test_guard.py:688: AssertionError
+______________________ test_make_e2e_without_tee_blocked ______________________
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-29/test_make_e2e_without_tee_bloc0/ffcore')
+
+    def test_make_e2e_without_tee_blocked(guard, main_root):
+>       assert "KAPI" in rules(guard, bash("docker compose run --rm tools make e2e"), main_root)
+E       AssertionError: assert 'KAPI' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py'>, {'hook_event_name': 'PreToolUse', 'session_id': '11111111-2222-3333-4444-555555555555', 'tool_input': {'command': 'docker compose run --rm tools make e2e'}, 'tool_name': 'Bash'}, WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-29/test_make_e2e_without_tee_bloc0/ffcore'))
+E        +    where {'hook_event_name': 'PreToolUse', 'session_id': '11111111-2222-3333-4444-555555555555', 'tool_input': {'command': 'docker compose run --rm tools make e2e'}, 'tool_name': 'Bash'} = bash('docker compose run --rm tools make e2e')
+
+tests\hooks\test_guard.py:697: AssertionError
+________ test_playwright_test_without_tee_blocked[npx playwright test] ________
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-29/test_playwright_test_without_t0/ffcore')
+cmd = 'npx playwright test'
+
+    @pytest.mark.parametrize("cmd", ["npx playwright test", "pnpm exec playwright test --grep x"])
+    def test_playwright_test_without_tee_blocked(guard, main_root, cmd):
+>       assert "KAPI" in rules(guard, bash(cmd), main_root)
+E       AssertionError: assert 'KAPI' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py'>, {'hook_event_name': 'PreToolUse', 'session_id': '11111111-2222-3333-4444-555555555555', 'tool_input': {'command': 'npx playwright test'}, 'tool_name': 'Bash'}, WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-29/test_playwright_test_without_t0/ffcore'))
+E        +    where {'hook_event_name': 'PreToolUse', 'session_id': '11111111-2222-3333-4444-555555555555', 'tool_input': {'command': 'npx playwright test'}, 'tool_name': 'Bash'} = bash('npx playwright test')
+
+tests\hooks\test_guard.py:702: AssertionError
+_ test_playwright_test_without_tee_blocked[pnpm exec playwright test --grep x] _
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-29/test_playwright_test_without_t1/ffcore')
+cmd = 'pnpm exec playwright test --grep x'
+
+    @pytest.mark.parametrize("cmd", ["npx playwright test", "pnpm exec playwright test --grep x"])
+    def test_playwright_test_without_tee_blocked(guard, main_root, cmd):
+>       assert "KAPI" in rules(guard, bash(cmd), main_root)
+E       AssertionError: assert 'KAPI' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py'>, {'hook_event_name': 'PreToolUse', 'session_id': '11111111-2222-3333-4444-555555555555', 'tool_input': {'command': 'pnpm exec playwright test --grep x'}, 'tool_name': 'Bash'}, WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-29/test_playwright_test_without_t1/ffcore'))
+E        +    where {'hook_event_name': 'PreToolUse', 'session_id': '11111111-2222-3333-4444-555555555555', 'tool_input': {'command': 'pnpm exec playwright test --grep x'}, 'tool_name': 'Bash'} = bash('pnpm exec playwright test --grep x')
+
+tests\hooks\test_guard.py:702: AssertionError
+_______________________ test_bash_c_push_worker_blocked _______________________
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-29/test_bash_c_push_worker_blocke0/ffcore')
+
+    def test_bash_c_push_worker_blocked(guard, main_root):
+        """MINOR-2: every rule applies inside sh -c / bash -c."""
+        cmd = 'bash -c "git push origin main"'
+>       assert "PUSH" in rules(guard, bash(cmd), main_root, FFCORE_ROL="isci-a")
+E       assert 'PUSH' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py'>, {'hook_event_name': 'PreToolUse', 'session_id': '11111111-2222-3333-4444-555555555555', 'tool_input': {'command': 'bash -c "git push origin main"'}, 'tool_name': 'Bash'}, WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-29/test_bash_c_push_worker_blocke0/ffcore'), FFCORE_ROL='isci-a')
+E        +    where {'hook_event_name': 'PreToolUse', 'session_id': '11111111-2222-3333-4444-555555555555', 'tool_input': {'command': 'bash -c "git push origin main"'}, 'tool_name': 'Bash'} = bash('bash -c "git push origin main"')
+
+tests\hooks\test_guard.py:712: AssertionError
+_____________________ test_sh_c_gate_without_tee_blocked ______________________
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-29/test_sh_c_gate_without_tee_blo0/ffcore')
+
+    def test_sh_c_gate_without_tee_blocked(guard, main_root):
+>       assert "KAPI" in rules(guard, bash("sh -c 'cd backend && make test'"), main_root)
+E       assert 'KAPI' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py'>, {'hook_event_name': 'PreToolUse', 'session_id': '11111111-2222-3333-4444-555555555555', 'tool_input': {'command': "sh -c 'cd backend && make test'"}, 'tool_name': 'Bash'}, WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-29/test_sh_c_gate_without_tee_blo0/ffcore'))
+E        +    where {'hook_event_name': 'PreToolUse', 'session_id': '11111111-2222-3333-4444-555555555555', 'tool_input': {'command': "sh -c 'cd backend && make test'"}, 'tool_name': 'Bash'} = bash("sh -c 'cd backend && make test'")
+
+tests\hooks\test_guard.py:716: AssertionError
+_____________________ test_bash_lc_compose_build_blocked ______________________
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-29/test_bash_lc_compose_build_blo0/ffcore')
+
+    def test_bash_lc_compose_build_blocked(guard, main_root):
+>       assert "PROSES-175" in rules(guard, bash('bash -lc "docker compose build"'), main_root)
+E       assert 'PROSES-175' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py'>, {'hook_event_name': 'PreToolUse', 'session_id': '11111111-2222-3333-4444-555555555555', 'tool_input': {'command': 'bash -lc "docker compose build"'}, 'tool_name': 'Bash'}, WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-29/test_bash_lc_compose_build_blo0/ffcore'))
+E        +    where {'hook_event_name': 'PreToolUse', 'session_id': '11111111-2222-3333-4444-555555555555', 'tool_input': {'command': 'bash -lc "docker compose build"'}, 'tool_name': 'Bash'} = bash('bash -lc "docker compose build"')
+
+tests\hooks\test_guard.py:725: AssertionError
+_____________________ test_compose_run_sh_c_gate_blocked ______________________
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-29/test_compose_run_sh_c_gate_blo0/ffcore')
+
+    def test_compose_run_sh_c_gate_blocked(guard, main_root):
+        cmd = "docker compose run --rm tools sh -c 'make test-int'"
+>       assert "KAPI" in rules(guard, bash(cmd), main_root)
+E       assert 'KAPI' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py'>, {'hook_event_name': 'PreToolUse', 'session_id': '11111111-2222-3333-4444-555555555555', 'tool_input': {'command': "docker compose run --rm tools sh -c 'make test-int'"}, 'tool_name': 'Bash'}, WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-29/test_compose_run_sh_c_gate_blo0/ffcore'))
+E        +    where {'hook_event_name': 'PreToolUse', 'session_id': '11111111-2222-3333-4444-555555555555', 'tool_input': {'command': "docker compose run --rm tools sh -c 'make test-int'"}, 'tool_name': 'Bash'} = bash("docker compose run --rm tools sh -c 'make test-int'")
+
+tests\hooks\test_guard.py:730: AssertionError
+_ test_log_masks_secrets[git push https://probeuser:ghp_FAKETOKEN0000@github.com/o/r.git main-ghp_FAKETOKEN0000-git push https://] _
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-29/test_log_masks_secrets_git_pus0/ffcore')
+cmd = 'git push https://probeuser:ghp_FAKETOKEN0000@github.com/o/r.git main'
+secret = 'ghp_FAKETOKEN0000', kept = 'git push https://'
+
+    @pytest.mark.parametrize(
+        ("cmd", "secret", "kept"),
+        [
+            (
+                "git push https://probeuser:ghp_FAKETOKEN0000@github.com/o/r.git main",
+                "ghp_FAKETOKEN0000",
+                "git push https://",
+            ),
+            ("OPENAI_API_KEY=sk-FAKE0000 make test", "sk-FAKE0000", "make test"),
+            ("make test --db-password=hunter2fake", "hunter2fake", "make test"),
+            (
+                'curl -H "Authorization: Bearer eyFAKEJWT0000" http://x && make test',
+                "eyFAKEJWT0000",
+                "curl -H",
+            ),
+            ("pytest -q --token abc && curl -H 'Bearer eyFAKE0001'", "eyFAKE0001", "pytest -q"),
+        ],
+    )
+    def test_log_masks_secrets(main_root, cmd, secret, kept):
+        """MAJOR-2: hook-guard.log never carries a credential from the command."""
+        run_hook(bash(cmd), main_root, FFCORE_ROL="isci-a")
+        lines = log_lines(main_root)
+        assert lines, "expected a log line"
+        for line in lines:
+>           assert secret not in line
+E           AssertionError: assert 'ghp_FAKETOKEN0000' not in '2026-11-16T...o/r.git main'
+E             
+E             'ghp_FAKETOKEN0000' is contained here:
+E               probeuser:ghp_FAKETOKEN0000@github.com/o/r.git main
+E             ?           +++++++++++++++++
+
+tests\hooks\test_guard.py:762: AssertionError
+_ test_log_masks_secrets[OPENAI_API_KEY=sk-FAKE0000 make test-sk-FAKE0000-make test] _
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-29/test_log_masks_secrets_OPENAI_0/ffcore')
+cmd = 'OPENAI_API_KEY=sk-FAKE0000 make test', secret = 'sk-FAKE0000'
+kept = 'make test'
+
+    @pytest.mark.parametrize(
+        ("cmd", "secret", "kept"),
+        [
+            (
+                "git push https://probeuser:ghp_FAKETOKEN0000@github.com/o/r.git main",
+                "ghp_FAKETOKEN0000",
+                "git push https://",
+            ),
+            ("OPENAI_API_KEY=sk-FAKE0000 make test", "sk-FAKE0000", "make test"),
+            ("make test --db-password=hunter2fake", "hunter2fake", "make test"),
+            (
+                'curl -H "Authorization: Bearer eyFAKEJWT0000" http://x && make test',
+                "eyFAKEJWT0000",
+                "curl -H",
+            ),
+            ("pytest -q --token abc && curl -H 'Bearer eyFAKE0001'", "eyFAKE0001", "pytest -q"),
+        ],
+    )
+    def test_log_masks_secrets(main_root, cmd, secret, kept):
+        """MAJOR-2: hook-guard.log never carries a credential from the command."""
+        run_hook(bash(cmd), main_root, FFCORE_ROL="isci-a")
+        lines = log_lines(main_root)
+        assert lines, "expected a log line"
+        for line in lines:
+>           assert secret not in line
+E           AssertionError: assert 'sk-FAKE0000' not in '2026-11-16T...00 make test'
+E             
+E             'sk-FAKE0000' is contained here:
+E               I_API_KEY=sk-FAKE0000 make test
+E             ?           +++++++++++
+
+tests\hooks\test_guard.py:762: AssertionError
+_ test_log_masks_secrets[make test --db-password=hunter2fake-hunter2fake-make test] _
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-29/test_log_masks_secrets_make_te0/ffcore')
+cmd = 'make test --db-password=hunter2fake', secret = 'hunter2fake'
+kept = 'make test'
+
+    @pytest.mark.parametrize(
+        ("cmd", "secret", "kept"),
+        [
+            (
+                "git push https://probeuser:ghp_FAKETOKEN0000@github.com/o/r.git main",
+                "ghp_FAKETOKEN0000",
+                "git push https://",
+            ),
+            ("OPENAI_API_KEY=sk-FAKE0000 make test", "sk-FAKE0000", "make test"),
+            ("make test --db-password=hunter2fake", "hunter2fake", "make test"),
+            (
+                'curl -H "Authorization: Bearer eyFAKEJWT0000" http://x && make test',
+                "eyFAKEJWT0000",
+                "curl -H",
+            ),
+            ("pytest -q --token abc && curl -H 'Bearer eyFAKE0001'", "eyFAKE0001", "pytest -q"),
+        ],
+    )
+    def test_log_masks_secrets(main_root, cmd, secret, kept):
+        """MAJOR-2: hook-guard.log never carries a credential from the command."""
+        run_hook(bash(cmd), main_root, FFCORE_ROL="isci-a")
+        lines = log_lines(main_root)
+        assert lines, "expected a log line"
+        for line in lines:
+>           assert secret not in line
+E           AssertionError: assert 'hunter2fake' not in '2026-11-16T...=hunter2fake'
+E             
+E             'hunter2fake' is contained here:
+E               b-password=hunter2fake
+
+tests\hooks\test_guard.py:762: AssertionError
+_ test_log_masks_secrets[curl -H "Authorization: Bearer eyFAKEJWT0000" http://x && make test-eyFAKEJWT0000-curl -H] _
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-29/test_log_masks_secrets_curl__H0/ffcore')
+cmd = 'curl -H "Authorization: Bearer eyFAKEJWT0000" http://x && make test'
+secret = 'eyFAKEJWT0000', kept = 'curl -H'
+
+    @pytest.mark.parametrize(
+        ("cmd", "secret", "kept"),
+        [
+            (
+                "git push https://probeuser:ghp_FAKETOKEN0000@github.com/o/r.git main",
+                "ghp_FAKETOKEN0000",
+                "git push https://",
+            ),
+            ("OPENAI_API_KEY=sk-FAKE0000 make test", "sk-FAKE0000", "make test"),
+            ("make test --db-password=hunter2fake", "hunter2fake", "make test"),
+            (
+                'curl -H "Authorization: Bearer eyFAKEJWT0000" http://x && make test',
+                "eyFAKEJWT0000",
+                "curl -H",
+            ),
+            ("pytest -q --token abc && curl -H 'Bearer eyFAKE0001'", "eyFAKE0001", "pytest -q"),
+        ],
+    )
+    def test_log_masks_secrets(main_root, cmd, secret, kept):
+        """MAJOR-2: hook-guard.log never carries a credential from the command."""
+        run_hook(bash(cmd), main_root, FFCORE_ROL="isci-a")
+        lines = log_lines(main_root)
+        assert lines, "expected a log line"
+        for line in lines:
+>           assert secret not in line
+E           assert 'eyFAKEJWT0000' not in '2026-11-16T...&& make test'
+E             
+E             'eyFAKEJWT0000' is contained here:
+E               n: Bearer eyFAKEJWT0000" http://x && make test
+E             ?           +++++++++++++
+
+tests\hooks\test_guard.py:762: AssertionError
+_ test_log_masks_secrets[pytest -q --token abc && curl -H 'Bearer eyFAKE0001'-eyFAKE0001-pytest -q] _
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-29/test_log_masks_secrets_pytest_0/ffcore')
+cmd = "pytest -q --token abc && curl -H 'Bearer eyFAKE0001'"
+secret = 'eyFAKE0001', kept = 'pytest -q'
+
+    @pytest.mark.parametrize(
+        ("cmd", "secret", "kept"),
+        [
+            (
+                "git push https://probeuser:ghp_FAKETOKEN0000@github.com/o/r.git main",
+                "ghp_FAKETOKEN0000",
+                "git push https://",
+            ),
+            ("OPENAI_API_KEY=sk-FAKE0000 make test", "sk-FAKE0000", "make test"),
+            ("make test --db-password=hunter2fake", "hunter2fake", "make test"),
+            (
+                'curl -H "Authorization: Bearer eyFAKEJWT0000" http://x && make test',
+                "eyFAKEJWT0000",
+                "curl -H",
+            ),
+            ("pytest -q --token abc && curl -H 'Bearer eyFAKE0001'", "eyFAKE0001", "pytest -q"),
+        ],
+    )
+    def test_log_masks_secrets(main_root, cmd, secret, kept):
+        """MAJOR-2: hook-guard.log never carries a credential from the command."""
+        run_hook(bash(cmd), main_root, FFCORE_ROL="isci-a")
+        lines = log_lines(main_root)
+        assert lines, "expected a log line"
+        for line in lines:
+>           assert secret not in line
+E           assert 'eyFAKE0001' not in "2026-11-16T... eyFAKE0001'"
+E             
+E             'eyFAKE0001' is contained here:
+E               H 'Bearer eyFAKE0001'
+
+tests\hooks\test_guard.py:762: AssertionError
+___________________ test_log_mask_applies_before_truncation ___________________
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py'>
+
+    def test_log_mask_applies_before_truncation(guard):
+        cmd = "make test " + "x" * 100 + " API_KEY=" + "s" * 40
+>       masked = guard.mask_secrets(cmd)
+                 ^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'ffcore_guard' has no attribute 'mask_secrets'
+
+tests\hooks\test_guard.py:770: AttributeError
+____________________ test_env_upper_case_blocked[cat .ENV] ____________________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-29/test_env_upper_case_blocked_ca0/ffcore')
+cmd = 'cat .ENV'
+
+    @pytest.mark.parametrize("cmd", ["cat .ENV", "cat backend/.Env", "echo x >> .ENV"])
+    def test_env_upper_case_blocked(main_root, cmd):
+        """MINOR-1: Windows file names are case-insensitive."""
+>       assert_blocked(run_hook(bash(cmd), main_root), "ENV")
+
+tests\hooks\test_guard.py:777: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py'], returncode=0, stdout='', stderr='')
+rule = 'ENV'
+
+    def assert_blocked(proc, rule: str) -> None:
+>       assert proc.returncode == BLOCK, (proc.returncode, proc.stderr)
+E       AssertionError: (0, '')
+E       assert 0 == 2
+E        +  where 0 = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py'], returncode=0, stdout='', stderr='').returncode
+
+tests\hooks\test_guard.py:29: AssertionError
+________________ test_env_upper_case_blocked[cat backend/.Env] ________________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-29/test_env_upper_case_blocked_ca1/ffcore')
+cmd = 'cat backend/.Env'
+
+    @pytest.mark.parametrize("cmd", ["cat .ENV", "cat backend/.Env", "echo x >> .ENV"])
+    def test_env_upper_case_blocked(main_root, cmd):
+        """MINOR-1: Windows file names are case-insensitive."""
+>       assert_blocked(run_hook(bash(cmd), main_root), "ENV")
+
+tests\hooks\test_guard.py:777: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py'], returncode=0, stdout='', stderr='')
+rule = 'ENV'
+
+    def assert_blocked(proc, rule: str) -> None:
+>       assert proc.returncode == BLOCK, (proc.returncode, proc.stderr)
+E       AssertionError: (0, '')
+E       assert 0 == 2
+E        +  where 0 = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py'], returncode=0, stdout='', stderr='').returncode
+
+tests\hooks\test_guard.py:29: AssertionError
+_________________ test_env_upper_case_blocked[echo x >> .ENV] _________________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-29/test_env_upper_case_blocked_ec0/ffcore')
+cmd = 'echo x >> .ENV'
+
+    @pytest.mark.parametrize("cmd", ["cat .ENV", "cat backend/.Env", "echo x >> .ENV"])
+    def test_env_upper_case_blocked(main_root, cmd):
+        """MINOR-1: Windows file names are case-insensitive."""
+>       assert_blocked(run_hook(bash(cmd), main_root), "ENV")
+
+tests\hooks\test_guard.py:777: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py'], returncode=0, stdout='', stderr='')
+rule = 'ENV'
+
+    def assert_blocked(proc, rule: str) -> None:
+>       assert proc.returncode == BLOCK, (proc.returncode, proc.stderr)
+E       AssertionError: (0, '')
+E       assert 0 == 2
+E        +  where 0 = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py'], returncode=0, stdout='', stderr='').returncode
+
+tests\hooks\test_guard.py:29: AssertionError
+___________________ test_env_upper_case_write_tool_blocked ____________________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-29/test_env_upper_case_write_tool0/ffcore')
+
+    def test_env_upper_case_write_tool_blocked(main_root):
+>       assert_blocked(run_hook(edit(main_root / ".ENV", "Write"), main_root), "ENV")
+
+tests\hooks\test_guard.py:785: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+proc = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py'], returncode=0, stdout='', stderr='')
+rule = 'ENV'
+
+    def assert_blocked(proc, rule: str) -> None:
+>       assert proc.returncode == BLOCK, (proc.returncode, proc.stderr)
+E       AssertionError: (0, '')
+E       assert 0 == 2
+E        +  where 0 = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari\\.claude\\hooks\\ffcore_guard.py'], returncode=0, stdout='', stderr='').returncode
+
+tests\hooks\test_guard.py:29: AssertionError
+____________________ test_settings_denies_paycore_env_edit ____________________
+
+    def test_settings_denies_paycore_env_edit():
+        deny = json.loads(SETTINGS_PATH.read_text(encoding="utf-8"))["permissions"]["deny"]
+>       assert "Edit(//c/ai_paycore/paycoreLLM/.env)" in deny
+E       AssertionError: assert 'Edit(//c/ai_paycore/paycoreLLM/.env)' in ['Read(**/.env)', 'Edit(**/.env)', 'Read(//c/ai_paycore/paycoreLLM/.env)', 'Read(//c/ai_paycore/paycoreLLM/data/**)', 'Read(//c/ai_paycore/paycoreLLM/eval/results/**)']
+
+tests\hooks\test_guard.py:790: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/hooks/test_guard.py::test_compose_run_gate_without_tee_blocked
+FAILED tests/hooks/test_guard.py::test_compose_run_make_lint_blocked - Assert...
+FAILED tests/hooks/test_guard.py::test_compose_exec_pytest_blocked - Assertio...
+FAILED tests/hooks/test_guard.py::test_compose_run_value_options_skipped - As...
+FAILED tests/hooks/test_guard.py::test_e2e_service_without_tee_blocked - Asse...
+FAILED tests/hooks/test_guard.py::test_make_e2e_without_tee_blocked - Asserti...
+FAILED tests/hooks/test_guard.py::test_playwright_test_without_tee_blocked[npx playwright test]
+FAILED tests/hooks/test_guard.py::test_playwright_test_without_tee_blocked[pnpm exec playwright test --grep x]
+FAILED tests/hooks/test_guard.py::test_bash_c_push_worker_blocked - assert 'P...
+FAILED tests/hooks/test_guard.py::test_sh_c_gate_without_tee_blocked - assert...
+FAILED tests/hooks/test_guard.py::test_bash_lc_compose_build_blocked - assert...
+FAILED tests/hooks/test_guard.py::test_compose_run_sh_c_gate_blocked - assert...
+FAILED tests/hooks/test_guard.py::test_log_masks_secrets[git push https://probeuser:ghp_FAKETOKEN0000@github.com/o/r.git main-ghp_FAKETOKEN0000-git push https://]
+FAILED tests/hooks/test_guard.py::test_log_masks_secrets[OPENAI_API_KEY=sk-FAKE0000 make test-sk-FAKE0000-make test]
+FAILED tests/hooks/test_guard.py::test_log_masks_secrets[make test --db-password=hunter2fake-hunter2fake-make test]
+FAILED tests/hooks/test_guard.py::test_log_masks_secrets[curl -H "Authorization: Bearer eyFAKEJWT0000" http://x && make test-eyFAKEJWT0000-curl -H]
+FAILED tests/hooks/test_guard.py::test_log_masks_secrets[pytest -q --token abc && curl -H 'Bearer eyFAKE0001'-eyFAKE0001-pytest -q]
+FAILED tests/hooks/test_guard.py::test_log_mask_applies_before_truncation - A...
+FAILED tests/hooks/test_guard.py::test_env_upper_case_blocked[cat .ENV] - Ass...
+FAILED tests/hooks/test_guard.py::test_env_upper_case_blocked[cat backend/.Env]
+FAILED tests/hooks/test_guard.py::test_env_upper_case_blocked[echo x >> .ENV]
+FAILED tests/hooks/test_guard.py::test_env_upper_case_write_tool_blocked - As...
+FAILED tests/hooks/test_guard.py::test_settings_denies_paycore_env_edit - Ass...
+23 failed, 11 passed, 98 deselected in 12.50s

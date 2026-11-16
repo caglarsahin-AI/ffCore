@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-a-hook (Opus 5.5; önceki lease ffcore-isci-a-08-tam-1c-olcum RETIRED 2026-11-05 18:30, A-08T1C-0025)
 - Aktif paket: fix/ajan-hooklari (K-HOOK-0001)
 - Durum: ACTIVE (2026-11-16 10:47)
-- Son okunan: K-HOOK-0005
+- Son okunan: K-HOOK-0006
 
 ## Mesajlar
 - Arşiv: MERGED/kapalı paketlerin mesajları `state/kanal/arsiv/isci-a-<paket>.md` dosyalarında (16 Kasım 2026 taşıması: 342 mesaj); ID ile atıf orada bulunur.
@@ -57,3 +57,13 @@ Paket: fix/ajan-hooklari · Cevap: K-HOOK-0003 · SHA: 3ab062dc5447c9f1fed9a1bd2
 - Doğrulanmadı: kullanıcıya görünen `systemMessage` metni, `Read .env` deny reddi ve `//c/` mutlak deny biçimi; oturum çıktısını görmedim. `echo make test` bilerek tetiklemez, çünkü kapı komutu değil; `make test` tetikler (yerelde denendi).
 - S10: başsız haiku 1/3 deneme, model çağrısı 0.
 - PR notu: `state/pr/fix-ajan-hooklari.md` (VERIFIED, satır 14 dolu). Dal donduruldu; DUZELT gelirse uygularım.
+
+### A-HOOK-0008 · 2026-11-16 19:36 · → koordinator · PR-HAZIR
+Paket: fix/ajan-hooklari · Cevap: K-HOOK-0006 · SHA: 49b4343aa9b84840163c79639c396bb7859ad312
+- r2 delta `3ab062d..49b4343`: 4 commit (test 6aeb07f, test c19fc8d, fix 54933c0, docs 49b4343), 6 dosya +395/-41. `main...HEAD` 10 commit, 9 dosya +1773/-88; state, backend ve frontend değişikliği yok.
+- **MAJOR-1:** `compose run|exec` seçenekleri ve servis atlanır, servis komutu host komutu gibi denetlenir. Kapı sayılanlara komutsuz `e2e` servisi, `make e2e` ve `playwright test` eklendi. `sh -c` ve `bash -lc` metni bütün kurallarla özyinelemeli denetlenir (en çok 3 düzey). Dıştaki `| tee` içteki kapıyı da karşılar.
+- **MAJOR-2:** `log_line` satırı kesmeden önce `mask_secrets` uygular: URL kimliği, `*KEY|TOKEN|SECRET|PASS|AUTH|CREDENTIAL*=`, `Authorization`/`Bearer`.
+- **MINOR-1:** `.env` eşleşmesi harf duyarsız (`.Env.Test` serbest kalır); deny listesine `Edit(//c/ai_paycore/paycoreLLM/.env)` eklendi. **MINOR-2:** docs 9.2 ve PR notunun "Kalan riskler" bölümü yeni davranışa göre yazıldı.
+- **Sapma:** eski regex bölücü tırnağı bilmiyordu; `sh -c 'a && make test'` tırnak içinden bölünüyordu. Yerine tırnağa duyarlı `split_pipelines` yazdım. Yönlendirmeler (`2>&1`, `>|`, `|&`) ayırıcı sayılmaz; regresyon testi c19fc8d.
+- **Kapı:** kırmızı koşu → `state/evidence/hook-tests-r2-red.log` (23 failed). Yeşil koşu `py -3.12 -m pytest tests/hooks -q` 136 passed, exit 0 → `state/evidence/hook-tests-r2.log` (HEAD satırlı). Ruff 0.17.3 temiz → `hook-ruff-r2.log`.
+- NOTE 1-8 PR notunda, "r1 NOTE'ları" bölümünde; bu turda bunlar için kod değişikliği yok. PR notu: `state/pr/fix-ajan-hooklari.md` (r2 bölümü). Dal donduruldu.

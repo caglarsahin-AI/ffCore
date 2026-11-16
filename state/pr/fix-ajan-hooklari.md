@@ -2,7 +2,7 @@
 
 **Paket:** fix/ajan-hooklari · **Sınıf:** [C] (güvenlik davranışı; kullanıcı onayı 16 Kasım, KARARLAR "Ajan kuralları hook ile zorlanır…") · **Branch:** fix/ajan-hooklari · **Worktree:** `.worktrees/fix/ajan-hooklari` · **Baz commit:** 9d38bc4 (plan anında 38ced4d; b9f9fd7 ve 10c-1 merge sonrası docs çakışmasın diye iki kez rebase; ikisi de temiz) · **İşçi:** isci-a (`ffcore-isci-a-hook`) · **Brief:** K-HOOK-0001 GOREV + K-HOOK-0002 EK (push kuralı)
 
-Durum: **VERIFIED** (PLAN-ONAY K-HOOK-0003; S1-S10 A + iki ek). HEAD `3ab062dc5447c9f1fed9a1bd2a32108c2689898b`; gerçek oturum kanıtı 2026-11-16 19:09 (`state/evidence/hook-real-call.log`). PR-HAZIR A-HOOK-0007.
+Durum: **IMPLEMENTED (r2)**: DUZELT K-HOOK-0006 (r1 DEGISIKLIK, M2 m2) uygulandı. HEAD `49b4343aa9b84840163c79639c396bb7859ad312`; r1 HEAD `3ab062d` (VERIFIED, gerçek oturum kanıtı 19:09). PR-HAZIR r2 A-HOOK-0008.
 
 ## Plan
 
@@ -210,8 +210,45 @@ Not: pytest koşuları ~60-80 sn; neredeyse tamamı alt süreç başına ~1 sn P
 - Baz main 38ced4d (GOREV f3fb5f9 dedi; arada yalnız state commit'i).
 
 ## Kalan riskler
-- Hook bir güvenlik ağıdır, sandbox değil: `bash -c "…"` içi yakalanır (metin içinde), ama değişkenle kurulan komut (`c=pu; git ${c}sh`), betik dosyası, Makefile içi komutlar yakalanmaz.
+- Hook bir güvenlik ağıdır, sandbox değil. r2'den beri bütün Bash kuralları `sh -c` / `bash -c` metninin içinde ve `docker compose run|exec` servis komutunda özyinelemeyle denetlenir (en çok 3 düzey, tırnağa duyarlı ayırma). Değişkenle kurulan komut (`c=pu; git ${c}sh`), betik dosyası, Makefile içi komutlar, compose olmayan `docker exec`/`docker run` ise yakalanmaz.
+- Kayıt maskesi düzenli ifadeyle çalışır: URL kimliği, `*KEY|TOKEN|SECRET|PASS(WORD)|AUTH|CREDENTIAL*=` ve `--opt=` değerleri, `Authorization`/`Bearer` değerleri. Boşlukla ayrılmış değer (`--token abc`) ve adı bu listede olmayan atama maskelenmez.
 - `.env` kalıbı tırnak içi metinlerde yanlış pozitif verebilir (ör. `grep -n "\.env" .gitignore`); warn günü bunu gösterir.
 - `make lint` `.claude/hooks` ve `tests/hooks`'u denetlemiyor; PR'da ayrı `ruff check` koşusu.
 - Her Bash ve dosya yazma çağrısı bu makinede ~1 sn hook gecikmesi alır (Python açılışı); yığın kuralı ayrıca `docker compose ls` (≤5 sn) bekler. Warn günü bu gecikmenin kabul edilebilirliği de gözlenmeli.
 - Merge sonrası koordinatörün kendi oturumu da hook'a tabi: `state/oturumlar.json` kaydı yoksa ilk tek yazar yazımında (warn'da uyarı, block'ta engel) görünür.
+
+## r2: DUZELT K-HOOK-0006 (r1 DEGISIKLIK, rapor `state/reviews/fix-ajan-hooklari-r1.md`)
+
+Delta `3ab062d..49b4343`: 4 commit, 6 dosya +395/-41. `main...HEAD`: 10 commit, 9 dosya +1773/-88; state, backend ve frontend değişikliği yok.
+
+| Commit | Tür | İçerik |
+|---|---|---|
+| 6aeb07f | test | kırmızı: compose run/exec, e2e ve playwright kapıları, `sh -c`/`bash -c` özyineleme, kayıt maskesi, `.ENV`, PayCore `.env` Edit deny (23 kırmızı, 11 serbest çifti yeşil → `state/evidence/hook-tests-r2-red.log`) |
+| c19fc8d | test | tırnağa duyarlı ayırma regresyonu (`\|&`, `>\|`, tırnak içi `&&`/`;`/`\|`) |
+| 54933c0 | fix | guard: `compose_service_command`, `shell_inner`, `check_tokens` (özyineleme), `split_pipelines` (tırnağa duyarlı), `mask_secrets`, `GATE_SERVICES={e2e}`, `make e2e`, `playwright test`, `ENV_RE` IGNORECASE, yazma araçlarında `.lower()`; settings deny `Edit(//c/ai_paycore/paycoreLLM/.env)` |
+| 49b4343 | docs | docs/takim 9.2 (ENV, PAYCORE, KAPI satırları, "İç içe komutlar", "Bilinen sınırlar", maske), ENVIRONMENT (KAPI kapsamı, maskeli kayıt), SECURITY (harf duyarsız `.env`, PayCore Edit deny) |
+
+| Bulgu | Düzeltme | Test |
+|---|---|---|
+| MAJOR-1 `kapi-tee-kapsami` | compose `run\|exec`: compose seçenekleri, alt komut seçenekleri (`-e`, `--entrypoint`, `-w`, `-u`, `--name`, `-l`, `-p`, `-v`, `--pull`, `--index`, …) ve servis atlanır, kalan komut host komutu gibi denetlenir; komutsuz `e2e` servisi, `make e2e`, `playwright test` kapı; `sh -c`/`bash -lc` özyineleme (bütün kurallar); dış `\| tee` içteki kapıyı karşılar; kural başına tek ihlal | `test_compose_run_*`, `test_compose_exec_pytest_blocked`, `test_e2e_service_*`, `test_make_e2e_*`, `test_playwright_*`, `test_bash_c_push_worker_blocked`, `test_sh_c_*`, `test_bash_lc_compose_build_blocked`, `test_compose_run_sh_c_gate_blocked`, `test_nested_rule_reported_once`, `test_splitter_*`, `test_quoted_separator_does_not_hide_gate` |
+| MAJOR-2 `kayit-secret-sizintisi` | `log_line` kesmeden önce `mask_secrets` (inceleyicinin üç kalıbı; `Authorization`/`Bearer` değeri tırnakta durur) | `test_log_masks_secrets` (URL, `OPENAI_API_KEY=`, `--db-password=`, `Authorization: Bearer`, tek başına `Bearer`), `test_log_mask_applies_before_truncation` |
+| MINOR-1 | `ENV_RE` IGNORECASE, `check_write` `.lower()`; deny `Edit(//c/ai_paycore/paycoreLLM/.env)` | `test_env_upper_case_*`, `test_env_mixed_case_test_file_allowed`, `test_settings_denies_paycore_env_edit` |
+| MINOR-2 | özyinelemeyle kapandı; docs 9.2 ve "Kalan riskler" cümlesi davranışa göre | `test_bash_c_push_worker_blocked` |
+
+Plandan sapma (gerekçeli): eski `TOP_SPLIT_RE`/`PIPE_SPLIT_RE` tırnağı bilmiyordu. `sh -c 'cd backend && make test'` tırnak içinden bölündüğü için kırmızı test yeşile dönmedi; regex yerine küçük bir tarayıcı (`split_pipelines`) yazıldı. `2>&1`, `&>`, `>&`, `>|`, `|&` ayırıcı sayılmaz; c19fc8d bunu sabitler.
+
+| Komut | Ortam | Exit | Süre |
+|---|---|---|---|
+| `py -3.12 -m pytest tests/hooks -q -p no:cacheprovider -k "<r2 testleri>" 2>&1 \| tee state/evidence/hook-tests-r2-red.log` | kod öncesi | 1 (23 failed, 11 passed) | 13 sn |
+| `py -3.12 -m pytest tests/hooks -q -p no:cacheprovider 2>&1 \| tee state/evidence/hook-tests-r2.log` | HEAD 49b4343 | 0 (**136 passed**) | 83 sn |
+| `ruff check` + `ruff format --check` `.claude/hooks tests/hooks` → `state/evidence/hook-ruff-r2.log` | ruff 0.17.3, HEAD 49b4343 | 0 | <1 sn |
+
+### r1 NOTE'ları (koordinatöre bilgi; bu turda kod değişikliği yok)
+1. **Guard'ı guard'lanan düzenleyebilir:** worktree'de açılan oturum kendi dalındaki guard'ı koşar, S9 istisnası `.claude/**` düzenlemesini serbest bırakır. Öneri (inceleyicinin): PR-HAZIR doğrulamasına "`git diff main...HEAD -- .claude/` boş mu; değilse inceleme maddesi" satırı.
+2. **Warn gününde kapanacak üç doğrulama:** (a) `systemMessage` arayüzde görünüyor mu; (b) `Read C:\ai_paycore\paycoreLLM\data\<olmayan>` deny reddi (`//c/` biçimi); (c) proje içinde `**/.env` yoluna Write denemesi deny ile reddediliyor mu (Edit kuralı Write'ı kapsıyor mu).
+3. **Gecikme** çağrı başına ~1-2 sn; warn günü gözlenir.
+4. **Koordinatör her kanala yazabilir** (arşiv taşıması için); hook düzeyinde açık, MULTI_AGENT'ta yazılı.
+5. **`.env` yanlış pozitifi** (`if [ -f .env ]`, `grep '\.env' .gitignore`): bilinçli; r2'de harf duyarsızlıkla `.ENV` metinleri de tetikler. Warn günü sayısı dalga raporunda.
+6. **Göreli yol:** `check_write` göreli `file_path`'i kök dışı sayar. Claude Code yazma araçları mutlak yol ister; risk düşük. Engel istenirse ayrı karar.
+7. **`scripts/context_budget.py`:** iki fail-loud açığı (yok dosya ve bulunamayan `## İndeks` → 0 ve "ok"). Koordinatör betiği, bu paketin dışında.
+8. Kapsam ve dürüstlük işaretleri doğrulandı; ek iş yok.

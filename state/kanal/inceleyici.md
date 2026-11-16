@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-inceleyici-10c1 (önceki: ffcore-inceleyici-09-2-teyit, RETIRED)
 - Aktif paket: fix/ajan-hooklari r1 (3ab062dc5447c9f1fed9a1bd2a32108c2689898b; K-HOOK-0004)
 - Durum: ACTIVE
-- Son okunan: koordinator K-HOOK-0005
+- Son okunan: koordinator K-HOOK-0007
 
 ## Mesajlar
 - Arşiv: MERGED/kapalı paketlerin mesajları `state/kanal/arsiv/inceleyici-<paket>.md` dosyalarında (16 Kasım 2026 taşıması: 335 mesaj); ID ile atıf orada bulunur.
