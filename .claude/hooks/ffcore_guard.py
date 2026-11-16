@@ -88,8 +88,16 @@ MAX_FF_STACKS = 3
 FF_STACK_RE = re.compile(r"^(ff|review)", re.IGNORECASE)
 # `.env` as a path inside one shell word (argument, redirection, option value, volume spec);
 # Windows: .ENV is .env. Words with whitespace are text (FOLLOWUP-189 e).
-ENV_PATH_RE = re.compile(r"(?:^|[/\\=<>:])\.env(?![.\w-])", re.IGNORECASE)
+# Inside code (`py -c`, a code heredoc) a quote or `(` before `.env` also makes it a path (r2).
+ENV_PATH_RE = re.compile(r"(?:^|[/\\=<>:'\"(])\.env(?![.\w-])", re.IGNORECASE)
 HEREDOC_RE = re.compile(r"(?<!<)<<(?!<)-?\s*(['\"]?)([A-Za-z_][\w-]*)\1")
+# A heredoc read by one of these is code, not data (K-HOOK2-0007 MINOR-2).
+CODE_READERS = frozenset({"sh", "bash", "py", "python", "python3", "node"})
+INTERPRETERS = frozenset({"py", "python", "python3", "node"})
+INLINE_CODE_OPTS = frozenset({"-c", "-e", "--eval"})
+# In interpreter code a space before `.env` also counts (`os.system('cat .env')`).
+CODE_ENV_RE = re.compile(r"(?:^|[\s/\\=<>:'\"(])\.env(?![.\w-])", re.IGNORECASE)
+CODE_PIPE_RE = re.compile(r"\|\s*(?:\S*[/\\])?(?:sh|bash|py|python3?|node)(?:\.exe)?(?:\s|$)")
 GREP_HEADS = frozenset({"grep", "egrep", "fgrep", "rg"})
 GREP_PATTERN_OPTS = frozenset({"-e", "--regexp"})
 GREP_GLOB_OPTS = frozenset({"-g", "--glob", "--iglob", "--exclude", "--include", "--exclude-dir"})
@@ -98,9 +106,16 @@ PAYCORE_RE = re.compile(r"paycorellm[/\\]+(?:data|eval[/\\]+results)(?:[/\\]|\b)
 LOG_DETAIL_MAX = 120
 # Log masking (SECURITY_AND_PERMISSIONS: logs carry no secrets); applied before truncation.
 MASKS = (
-    (re.compile(r"(?<!\S)(-u|--user)\s+[^\s:]+:\S+"), r"\1 ***"),
+    # -u user:pass, -uuser:pass, --user user:pass, --user=user:pass
+    (re.compile(r"(?<!\S)(-u|--user)(?:\s+|=)?[^\s:=]+:\S+"), r"\1 ***"),
     (
-        re.compile(r'"(token|secret|password|api_key|key)"\s*:\s*"[^"]*"', re.IGNORECASE),
+        # JSON credential field, also with escaped quotes ({\"token\":\"…\"}) and names such
+        # as access_token, apiKey, x-api-key, client_secret
+        re.compile(
+            r'\\?"([\w-]*(?:token|secret|password|api_?key|key))\\?"\s*:\s*\\?"'
+            r'(?:[^"\\]|\\(?!"))*\\?"',
+            re.IGNORECASE,
+        ),
         r'"\1":"***"',
     ),
     (re.compile(r"(\w+://)[^/\s@]+@"), r"\1***@"),
@@ -291,7 +306,7 @@ CMD_PREFIX_WORDS = frozenset(
     {"do", "then", "else", "elif", "!", "{", "time", "while", "until", "if"}
 )
 WORD_END = " \t\n;&|()<>"
-ENV_VALUE_OPTS = frozenset({"-u", "--unset", "-C", "--chdir", "-S", "--split-string"})
+ENV_VALUE_OPTS = frozenset({"-u", "--unset", "-C", "--chdir"})
 SHELL_VALUE_OPTS = frozenset({"--rcfile", "--init-file"})
 
 
@@ -448,21 +463,73 @@ def closing(s: str, start: int, open_c: str, close_c: str) -> int:
     return len(s)
 
 
-COMPOUND_WORD_RE = re.compile(r"(?<![\w$-])(for|while|until|if|case|select|done|fi|esac)(?![\w-])")
+def command_words(s: str):
+    """(start, end, word) of unquoted whole words in command position, the same notion of
+    command position as split_pipelines (K-HOOK2-0007 MINOR-1: `echo fi`, `"done"` and
+    `for x in done` are arguments, not keywords)."""
+    quote: str | None = None
+    cmd_start = True
+    i, n = 0, len(s)
+    while i < n:
+        c = s[i]
+        if quote:
+            if c == "\\" and quote != "'":
+                i += 2
+                continue
+            if c == quote:
+                quote = None
+            i += 1
+            continue
+        if c in ("'", '"', "`"):
+            quote = c
+            cmd_start = False
+            i += 1
+            continue
+        if c == "\\":
+            cmd_start = False
+            i += 2
+            continue
+        if c in " \t":
+            i += 1
+            continue
+        if c in ";&|\n(":
+            cmd_start = True
+            i += 1
+            continue
+        if c in ")<>":
+            cmd_start = False
+            i += 1
+            continue
+        j = i
+        while j < n and s[j] not in WORD_END and s[j] not in "'\"`\\":
+            j += 1
+        word = s[i:j]
+        whole = j >= n or s[j] in WORD_END
+        if cmd_start and whole:
+            yield i, j, word
+        cmd_start = whole and (word in CMD_PREFIX_WORDS or (cmd_start and "=" in word))
+        i = j
 
 
 def compound_body(part: str) -> tuple[str, str] | None:
-    """(body, trailing redirections) of a compound command part, else None."""
+    """(body, trailing redirections) of a compound command part, else None.
+
+    Only keywords in command position count, so the body never ends early on an argument
+    or a quoted word; an unclosed compound runs to the end of the text (fail-loud side)."""
     s = part.lstrip()
-    m = re.match(r"(for|while|until|if|case|select)(?=[\s;]|$)", s)
-    if not m:
-        return None
-    level = 0
-    for w in COMPOUND_WORD_RE.finditer(s):
-        level += 1 if w.group(1) in COMPOUND_OPEN else -1
-        if level == 0:
-            return s[m.end() : w.start()], s[w.end() :]
-    return s[m.end() :], ""
+    level, body_start = 0, None
+    for start, end, word in command_words(s):
+        if body_start is None:
+            if start != 0 or word not in COMPOUND_OPEN:
+                return None
+            level, body_start = 1, end
+        elif word in COMPOUND_OPEN:
+            level += 1
+        elif word in COMPOUND_CLOSE:
+            level -= 1
+            if level == 0:
+                return s[body_start:start], s[end:]
+    return None if body_start is None else (s[body_start:], "")
 
 
 def extract_nested(part: str) -> tuple[str, list[str], list[str]]:
@@ -559,11 +626,21 @@ def unwrap(toks: list[str]) -> list[str]:
         elif rest[0] in ("for", "select", "case", "in", "done", "fi", "esac"):
             return assigns
         elif head == "env":
-            i = 1
+            i, split = 1, None
             while i < len(rest):
                 t = rest[i]
                 if t == "--":
                     i += 1
+                    break
+                # -S/--split-string carries the command itself (K-HOOK2-0007 NOTE-4)
+                if t in ("-S", "--split-string") and i + 1 < len(rest):
+                    split, i = rest[i + 1], i + 2
+                    break
+                if t.startswith("--split-string="):
+                    split, i = t.split("=", 1)[1], i + 1
+                    break
+                if t.startswith("-S") and len(t) > 2:
+                    split, i = t[2:], i + 1
                     break
                 if t in ENV_VALUE_OPTS:
                     i += 2
@@ -571,7 +648,7 @@ def unwrap(toks: list[str]) -> list[str]:
                     i += 1
                 else:
                     break
-            rest = rest[i:]
+            rest = (tokens(split) if split is not None else []) + rest[i:]
         elif head == "command":
             if rest[1:2] in (["-v"], ["-V"]):
                 return assigns
@@ -841,24 +918,49 @@ def check_tokens(
             found.extend(check_tokens(inner, has_tee, payload, env, depth + 1))
     text = shell_inner(toks)
     if text is not None:
-        found.extend(check_bash(text, payload, env, outer_tee=has_tee, depth=depth + 1))
+        found.extend(check_bash(text, payload, env, outer_tee=has_tee, depth=depth + 1, top=False))
     return found
 
 
-def strip_heredocs(command: str) -> str:
-    """Drop heredoc bodies (data for the ENV rule, FOLLOWUP-189 e); delimiter lines go too."""
+def heredoc_reader(line: str, m: re.Match) -> str:
+    """Who reads this heredoc: 'shell', 'code' (an interpreter) or 'data'."""
+    segment = re.split(r"[;&|(]", line[: m.start()])[-1]
+    toks = unwrap(tokens(segment))
+    reader = basename(toks[0]) if toks else ""
+    piped = CODE_PIPE_RE.search(line[m.end() :])
+    if piped:
+        reader = basename(piped.group(0).lstrip("|").strip())
+    if reader in ("sh", "bash"):
+        return "shell"
+    return "code" if reader in INTERPRETERS else "data"
+
+
+def strip_heredocs(command: str) -> tuple[str, list[str]]:
+    """(shell text, interpreter code bodies) for the ENV rule.
+
+    A data heredoc body (`cat > f <<EOF`) is dropped (FOLLOWUP-189 e); a body read by
+    sh/bash stays as shell lines; a body read by py/python/node is returned as code and
+    scanned as code (K-HOOK2-0007 MINOR-2). Delimiter lines go."""
     lines = command.split("\n")
     out: list[str] = []
+    code: list[str] = []
     i = 0
     while i < len(lines):
         line = lines[i]
         out.append(line)
         i += 1
         for m in HEREDOC_RE.finditer(line):
+            kind = heredoc_reader(line, m)
+            body: list[str] = []
             while i < len(lines) and lines[i].strip() != m.group(2):
+                body.append(lines[i])
                 i += 1
             i += 1
-    return "\n".join(out)
+            if kind == "shell":
+                out.extend(body)
+            elif kind == "code":
+                code.append("\n".join(body))
+    return "\n".join(out), code
 
 
 def grep_files(toks: list[str]) -> list[str]:
@@ -895,14 +997,26 @@ def env_words(toks: list[str]) -> list[str]:
     toks = unwrap(toks)
     if not toks:
         return []
-    args = grep_files(toks) if basename(toks[0]) in GREP_HEADS else toks
-    return [a for a in args if not any(ch.isspace() for ch in a) and ENV_PATH_RE.search(a)]
+    head = basename(toks[0])
+    args = grep_files(toks) if head in GREP_HEADS else toks
+    found = [a for a in args if not any(ch.isspace() for ch in a) and ENV_PATH_RE.search(a)]
+    if head in INTERPRETERS:
+        # `py -c` / `node -e` code is code, spaces or not (K-HOOK2-0007 MINOR-2)
+        found += [
+            code
+            for opt, code in zip(toks, toks[1:], strict=False)
+            if opt in INLINE_CODE_OPTS and CODE_ENV_RE.search(code)
+        ]
+    return found
 
 
 def env_hits(text: str) -> bool:
     """True when `.env` stands in argument/redirection position anywhere in the command,
     including groups, substitutions, `sh -c` text and `compose run|exec` commands.
     Every recursion works on strictly shorter text, so it ends."""
+    text, code_bodies = strip_heredocs(text)
+    if any(CODE_ENV_RE.search(body) for body in code_bodies):
+        return True
     for pipeline in split_pipelines(text):
         for part in pipeline:
             outer, groups, subs = extract_nested(part)
@@ -926,15 +1040,18 @@ def check_bash(
     env: Mapping[str, str],
     outer_tee: bool = False,
     depth: int = 0,
+    top: bool = True,
 ) -> list[Violation]:
     found: list[Violation] = []
-    if env_hits(strip_heredocs(command)):
+    # ENV and PAYCORE judge the whole command once; env_hits does its own recursion with
+    # heredoc handling (a nested call would see a data heredoc body as commands).
+    if top and env_hits(command):
         found.append(
             Violation(
                 "ENV", ".env okunmaz ve yazılmaz; testler .env.test ile (SECURITY_AND_PERMISSIONS)"
             )
         )
-    if PAYCORE_RE.search(command):
+    if top and PAYCORE_RE.search(command):
         found.append(
             Violation(
                 "PAYCORE", "paycoreLLM data/** ve eval/results/** okunmaz (CLAUDE.md, PLAN 2d)"
@@ -952,12 +1069,14 @@ def check_bash(
                 found.extend(check_tokens(toks, tee, payload, env, depth))
         for _, groups, subs in pieces:
             for body in groups:  # same shell level; the body is strictly shorter
-                found.extend(check_bash(body, payload, env, outer_tee=tee, depth=depth))
+                found.extend(check_bash(body, payload, env, outer_tee=tee, depth=depth, top=False))
             for body in subs:
                 if depth >= MAX_NESTING:
                     found.append(DEPTH_VIOLATION)
                 else:
-                    found.extend(check_bash(body, payload, env, outer_tee=tee, depth=depth + 1))
+                    found.extend(
+                        check_bash(body, payload, env, outer_tee=tee, depth=depth + 1, top=False)
+                    )
     unique: dict[tuple[str, str], Violation] = {}
     for v in found:
         unique.setdefault((v.rule, v.message), v)
