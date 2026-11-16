@@ -1,0 +1,36 @@
+time="2026-11-16T10:27:38+03:00" level=warning msg="volume \"ffcore-10c1_e2e_node_modules\" already exists but was not created by Docker Compose. Use `external: true` to use an existing volume"
+ Container ffcore-10c1-postgres-1  Running
+ Container ffcore-10c1-redis-1  Running
+ Container ffcore-10c1-migrate-1  Created
+ Container ffcore-10c1-litellm-1  Running
+ Container ffcore-10c1-backend-1  Running
+ Container ffcore-10c1-postgres-1  Waiting
+ Container ffcore-10c1-postgres-1  Waiting
+ Container ffcore-10c1-postgres-1  Healthy
+ Container ffcore-10c1-postgres-1  Healthy
+ Container ffcore-10c1-migrate-1  Starting
+ Container ffcore-10c1-migrate-1  Started
+ Container ffcore-10c1-litellm-1  Waiting
+ Container ffcore-10c1-migrate-1  Waiting
+ Container ffcore-10c1-postgres-1  Waiting
+ Container ffcore-10c1-redis-1  Waiting
+ Container ffcore-10c1-postgres-1  Healthy
+ Container ffcore-10c1-litellm-1  Healthy
+ Container ffcore-10c1-redis-1  Healthy
+ Container ffcore-10c1-migrate-1  Exited
+
+Running 6 tests using 1 worker
+
+  ✓  1 [chromium] › tests/e2e/test_10c1_5_read_only.spec.ts:44:7 › test_10c1_5_read_only: suites in edit and read mode (4.3s)
+  ✓  2 [chromium] › tests/e2e/test_10c1_5_read_only.spec.ts:44:7 › test_10c1_5_read_only: suite in edit and read mode (4.2s)
+  ✓  3 [chromium] › tests/e2e/test_10c1_5_read_only.spec.ts:44:7 › test_10c1_5_read_only: exam in edit and read mode (3.8s)
+  ✓  4 [chromium] › tests/e2e/test_10c1_5_read_only.spec.ts:44:7 › test_10c1_5_read_only: compare in edit and read mode (4.0s)
+  ✓  5 [chromium] › tests/e2e/test_10c1_5_read_only.spec.ts:44:7 › test_10c1_5_read_only: versions in edit and read mode (4.1s)
+  ✓  6 [chromium] › tests/e2e/test_10c1_5_read_only.spec.ts:44:7 › test_10c1_5_read_only: from-run in edit and read mode (4.0s)
+
+  6 passed (2.2m)
+npm notice
+npm notice New major version of npm available! 11.19.1 -> 12.2.2
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.2
+npm notice To update run: npm install -g npm@12.2.2
+npm notice

@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-c-10c1
 - Aktif paket: 10c-1 (09 Evaluation önyüzü)
 - Durum: ACTIVE
-- Son okunan: koordinator K-10C1-0002; son yazılan C-10C1-0004 (YIGIN-AÇ)
+- Son okunan: koordinator K-10C1-0002 (K-10C1-0003/0004 zille bildirildi, kanal dosyasında henüz yok); son yazılan C-10C1-0006 (PR-HAZIR)
 - Önceki lease: ffcore-isci-c-10bp2 RETIRED (10b-poc-2 MERGED b43770d; son C-10bp2-0019 HANDOFF)
 
 ## Mesajlar
@@ -775,3 +775,14 @@ YIGIN-AÇ ffcore-10c1 (compose `-p ffcore-10c1`, BACKEND_PORT=18410 FRONTEND_POR
 İmaj: backend değişmediği için `ffcore/{backend,tools,frontend}:0.0.0-main` → `0.0.0-10c1` etiketlendi (backend main imajı 202640e merge'ünden 1 dk sonra derlendi; 202640e..main arası backend/deploy değişikliği yok). Derleme yok.
 e2e: compose `e2e` servisi `npm ci` ağ ister; yerine `ffcore-10a-nm-pw` (glibc, @playwright/test 1.64.1, next 15.5.28) içeriği yığının `e2e_node_modules` volume'una ağsız kopyalanır, komut `npx playwright test` (npm ci yok). Sonunda `down -v` + YIGIN-KAPA.
 D1-D6 kodu dalda (HEAD 71c0bbb); lint/typecheck/check:api/Vitest 180 yeşil.
+
+### C-10C1-0005 · 2026-11-16 12:45 · → koordinator · YIGIN-KAPA
+Paket: 10c-1   Cevap: C-10C1-0004
+YIGIN-KAPA ffcore-10c1: `down -v` exit 0, e2e node_modules volume'u silindi; konteyner 0, volume 0. `ffcore/*:0.0.0-10c1` etiketleri (main imajlarının takma adı) duruyor, silinmesi sende.
+
+### C-10C1-0006 · 2026-11-16 12:46 · → koordinator · PR-HAZIR
+Paket: 10c-1   Cevap: K-10C1-0002
+PR-HAZIR: `feat/10c-1-eval-ui` @ `2ac405197efc01463beb75500ecf184fa53095ab`, delta `ff142a5..2ac4051` (6 commit, 71 dosya, 26'sı görüntü). Backend/deploy/state diff 0. PR notu `state/pr/10c-1.md`. Sınıf [B].
+Kapı: lint/typecheck/check:api 0; Vitest 180/180; e2e 10c1 22/22 (ilk koşudaki tek test hatası düzeltildi); tam e2e 159/159, gerileme yok. Kanıt `state/evidence/10c-1-*.log`. İki tema + edit/read görüntüleri `docs/images/10c1-*.png`.
+Dikkat: (1) `10c-1-e2e-run1.log` geçersiz ilk denemedir (eski `ffcore-10a-nm-pw` volume'u, build düştü); e2e'de `npm ci` yerine `ffcore-10a-nm` kopyası kullanıldı. (2) Langfuse UI bağlantısı yok (adres yapılandırması yok), dataset adı metin. (3) Kabul 1 e2e'si 13a seed yerine fake-llm agent + from-run ile.
+Dal donuk; inceleme bekliyorum.

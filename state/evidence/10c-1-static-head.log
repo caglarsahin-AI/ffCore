@@ -1,0 +1,17 @@
+HEAD=2ac405197efc01463beb75500ecf184fa53095ab
+
+> ffcore-frontend@0.1.0 lint
+> eslint
+
+EXIT=0
+
+> ffcore-frontend@0.1.0 typecheck
+> tsc --noEmit
+
+EXIT=0
+
+> ffcore-frontend@0.1.0 check:api
+> node scripts/check-api.mjs
+
+API contract copies and generated types are current.
+EXIT=0
