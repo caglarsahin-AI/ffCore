@@ -229,9 +229,16 @@ contract is shown as an error, never as "ready". Without model weights the page 
 - **Exams.** "Start exam" takes the suite's gated agent (or one the user picks) and a version with
   a visible default: the draft when there is one, else the published version (S4). The exam page
   follows `GET /eval-runs/{id}/stream` with `fetch`: `progress` counts, then `done`; an unknown
-  event name is logged and skipped. A dropped stream is reopened a few times, then reported as
-  lost and the page reads the exam with `GET` every few seconds; nothing is guessed about how it
-  ended. The summary is shown as written: pass rate against the threshold, scored / items,
+  event name is logged and skipped. A silent stream counts as dropped: the backend sends
+  `progress` every 2 s, so an attempt with nothing for 6 s (`STALL_MS`, `lib/eval-stream.ts`) is
+  ended, which covers a half-open connection after a backend kill or an idle proxy drop. As soon
+  as an attempt ends without `done` the page says "reconnecting" and reads the exam with `GET` at
+  once and every few seconds while the stream is reopened; a stream that speaks again takes over,
+  one that cannot be reopened is reported as lost and `GET` goes on. Status and counts come from
+  whichever arrived last, stream or `GET`; a failed `GET` is shown above the exam and does not
+  bring back an older status. Nothing is guessed about how it ended. Event streams are sent with
+  `Cache-Control: no-cache, no-transform` so that the console's proxy does not gzip-buffer them
+  (docs/degisiklikler.md). The summary is shown as written: pass rate against the threshold, scored / items,
   completeness (`complete=false` says the exam did not finish unattended), not-run reasons with
   their code (`approval_required`, `partial:<code>` for some repeats, an unknown code raw),
   errors (`judge_out_of_time`, `judge_failed:*`, `advance_failed:*`), outcome and style counts,
@@ -377,4 +384,5 @@ glibc `node_modules` volume and run `npx playwright test` instead of `npm ci && 
 | Exam result | ![](images/10c1-exam-light.png) | ![](images/10c1-exam-dark.png) |
 | Compare exams | ![](images/10c1-compare-light.png) | ![](images/10c1-compare-dark.png) |
 | Add to exam | ![](images/10c1-from-run-light.png) | ![](images/10c1-from-run-dark.png) |
+| Publish gate refusal | ![](images/10c1-gate-light.png) | ![](images/10c1-gate-dark.png) |
 | Suite, edit and read mode | ![](images/10c1-suite-edit.png) | ![](images/10c1-suite-read.png) |
