@@ -34,6 +34,14 @@ incele
 Paket: fix/x1 · Cevap: R-X1-0001
 düzelt
 
+### K-X1-0004 · 2026-11-16 11:40 · → isci-a · DUZELT
+Paket: fix/x1 · Cevap: -
+ACK yok, PR-HAZIR ile cevaplanır
+
+### K-X1-0005 · 2026-11-16 11:41 · → isci-a · GOREV
+Paket: fix/x1 · Cevap: -
+başka kanaldan cevap sayılmaz
+
 ### K-X2-0001 · 2026-11-16 10:30 · → isci-b · GOREV
 Paket: fix/x2 · Cevap: -
 iş
@@ -61,6 +69,9 @@ Paket: fix/x1 · Cevap: K-X1-0001
 ### A-X1-0002 · 2026-11-16 11:00 · → koordinator · PR-HAZIR
 Paket: fix/x1 · Cevap: K-X1-0001 · SHA: {SHA_A}
 
+### A-X1-0004 · 2026-11-16 11:45 · → koordinator · CEVAP
+Paket: fix/x1 · Cevap: K-X1-0004
+
 ### A-X1-0003 · 2026-11-16 11:30 · → koordinatör · DURUM
 biçim dışı (alıcı)
 """
@@ -71,6 +82,9 @@ INCELEYICI = f"""# Kanal: inceleyici
 
 ### R-X1-0000 · 2026-11-16 12:05 · → koordinator · ACK
 Paket: fix/x1 · Cevap: K-X1-0002
+
+### R-X1-0009 · 2026-11-16 12:10 · → koordinator · CEVAP
+Paket: fix/x1 · Cevap: K-X1-0005
 
 ### R-X1-0001 · 2026-11-16 13:00 · → koordinator · REVIEW-SONUC
 Paket: fix/x1 · Cevap: K-X1-0002 · SHA: {SHA_A} · Sonuc: DEGISIKLIK · Bulgu: B0 M1 m0 N0

@@ -46,3 +46,24 @@ def test_log_line_has_no_credentials(main_root):
     log = (main_root / "state" / "evidence" / "hook-guard.log").read_text(encoding="utf-8")
     assert "SECRETPW" not in log and "TOK123" not in log, log
     assert "ENV" in log
+
+
+# --- r2 (K-HOOK2-0007 MINOR-4): remaining variants M04-M08 --------------------
+
+
+@pytest.mark.parametrize(
+    ("raw", "secret"),
+    [
+        ('curl -d "{\\"token\\":\\"TOK4\\"}" x', "TOK4"),  # M04 escaped JSON
+        ("curl -uuser:PW5 https://x", "PW5"),  # M05 attached
+        ("curl --user=user:PW6 https://x", "PW6"),  # M06
+        ('{"access_token":"AT7"}', "AT7"),  # M07
+        ('{"apiKey":"AK8"}', "AK8"),  # M08
+        ('{"x-api-key": "AK9"}', "AK9"),
+        ('{"client_secret":"CS1"}', "CS1"),
+    ],
+)
+def test_r2_mask_variants(guard, raw, secret):
+    masked = guard.mask_secrets(raw)
+    assert secret not in masked, masked
+    assert "***" in masked, masked

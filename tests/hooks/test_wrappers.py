@@ -138,3 +138,40 @@ def test_compose_through_wrapper_blocked(guard, main_root, cmd):
 def test_substitution_depth_is_loud(guard, main_root):
     cmd = "echo $(echo $(echo $(echo $(git status))))"
     assert "GUARD-DERINLIK" in rules(guard, cmd, main_root)
+
+
+# --- r2 (K-HOOK2-0007): keywords count only in command position, env -S ------
+
+
+@pytest.mark.parametrize(
+    "cmd",
+    [
+        "if true; then echo fi; git push origin main; fi",  # W13
+        'if grep -q "done" x.txt; then git push origin main; fi',  # W14
+        "for x in done; do git push origin main; done",  # W15
+        "if echo 'fi'; then git push; fi",
+        "while read l; do echo done; git push; done < f",
+        "env -S 'git push origin main'",  # W28
+        'env -S"git push"',
+        "env --split-string='git push'",
+    ],
+)
+def test_r2_push_hidden_in_compound_or_env_s_blocked(guard, main_root, cmd):
+    assert "PUSH" in rules(guard, cmd, main_root), cmd
+
+
+def test_r2_gate_after_quoted_keyword_blocked(guard, main_root):
+    cmd = 'if grep -q "build done" log; then make test; fi'
+    assert "KAPI" in rules(guard, cmd, main_root)
+
+
+@pytest.mark.parametrize(
+    "cmd",
+    [
+        'if grep -q "build done" log; then make test; fi 2>&1 | tee x.log',
+        "env -S 'git status'",
+        "for x in done; do echo $x; done",
+    ],
+)
+def test_r2_harmless_forms_allowed(guard, main_root, cmd):
+    assert rules(guard, cmd, main_root) == [], cmd

@@ -27,9 +27,18 @@ def summary(root) -> dict:
 
 def test_json_schema(sample_root):
     data = summary(sample_root)
-    assert set(data) == {"kok", "mesaj", "bicim_disi", "bekleyen_ack", "paketler"}
+    assert set(data) == {
+        "kok",
+        "mesaj",
+        "bicim_disi",
+        "bekleyen_ack",
+        "acksiz_cevaplanmis",
+        "paketler",
+    }
     for item in data["bekleyen_ack"]:
         assert set(item) == {"id", "tarih", "kaynak", "alici", "tur", "paket"}
+    for item in data["acksiz_cevaplanmis"]:
+        assert set(item) == {"id", "tarih", "kaynak", "alici", "tur", "paket", "cevap_id"}
     for info in data["paketler"].values():
         assert set(info) == {"work_queue", "son_durum", "son_onay_sha"}
 
@@ -38,17 +47,17 @@ def test_counts_valid_and_old_format(sample_root):
     data = summary(sample_root)
     # K-01-0001 (old), A-X1-0003 (koordinatör), B-X2-0002 (kullanici outside coordinator)
     assert data["bicim_disi"] == 3
-    assert data["mesaj"] == 13
+    assert data["mesaj"] == 17
 
 
 def test_pending_ack(sample_root):
     pending = {p["id"] for p in summary(sample_root)["bekleyen_ack"]}
     # K-X1-0001 ACKed by A-X1-0001, K-X1-0002 by R-X1-0000, K-X2-0001 by a multi-ID Cevap
-    assert pending == {"K-X1-0003"}
+    assert pending == {"K-X1-0003", "K-X1-0005"}
 
 
 def test_pending_ack_item_fields(sample_root):
-    (item,) = summary(sample_root)["bekleyen_ack"]
+    item = next(p for p in summary(sample_root)["bekleyen_ack"] if p["id"] == "K-X1-0003")
     assert item == {
         "id": "K-X1-0003",
         "tarih": "2026-11-16 14:00",
@@ -98,3 +107,20 @@ def test_real_channels_parse():
     assert proc.returncode == 0, proc.stderr
     data = json.loads(proc.stdout)
     assert data["mesaj"] > 0 and data["bicim_disi"] >= 0
+
+
+def test_answered_without_ack(sample_root):
+    """r2 MINOR-3: a reply from the recipient's channel (Cevap names the ID) without an
+    ACK is listed apart and leaves the pending list; a reply from another channel does not."""
+    data = summary(sample_root)
+    (item,) = data["acksiz_cevaplanmis"]
+    assert item["id"] == "K-X1-0004"
+    assert item["cevap_id"] == "A-X1-0004"
+    assert "K-X1-0004" not in {p["id"] for p in data["bekleyen_ack"]}
+    assert "K-X1-0005" in {p["id"] for p in data["bekleyen_ack"]}
+
+
+def test_text_lists_answered_without_ack(sample_root):
+    out = run_script("--root", str(sample_root)).stdout
+    assert "ACK'siz cevaplanmış" in out
+    assert "K-X1-0004" in out

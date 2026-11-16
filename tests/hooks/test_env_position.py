@@ -74,3 +74,39 @@ def test_env_text_allowed(guard, main_root, cmd):
 
 def test_command_after_heredoc_still_checked(guard, main_root):
     assert env_hit(guard, "cat > x <<'EOF'\ntext\nEOF\ncat .env", main_root)
+
+
+# --- r2 (K-HOOK2-0007 MINOR-2): code read by a shell or interpreter is code ---
+
+
+@pytest.mark.parametrize(
+    "cmd",
+    [
+        "bash <<EOF\ncat .env\nEOF",  # E28
+        "sh <<'EOF'\nsource .env\nEOF",  # E36
+        "py -3.12 - <<'EOF'\nprint(open('.env').read())\nEOF",
+        "python3 <<EOF\nimport os; os.system('cat .env')\nEOF",
+        "node <<EOF\nrequire('fs').readFileSync('.env')\nEOF",
+        "cat <<'EOF' | bash\ncat .env\nEOF",
+        "py -3.12 -c \"print(open('.env').read())\"",  # E29
+        "py -3.12 -c \"data = open('.env').read(); print(data)\"",  # E30
+        "python -c 'import dotenv; dotenv.load_dotenv(\".env\")'",
+        "node -e \"require('fs').readFileSync('.env')\"",
+        "cat x(.env)",
+    ],
+)
+def test_r2_env_in_code_blocked(guard, main_root, cmd):
+    assert env_hit(guard, cmd, main_root), cmd
+
+
+@pytest.mark.parametrize(
+    "cmd",
+    [
+        "cat > x.py <<'EOF'\nopen('.env')\nEOF",
+        "py -3.12 -c \"print('no secrets here')\"",
+        'py -3.12 -c "print(1)" .env.test',
+        "node -e \"console.log('.env.example')\"",
+    ],
+)
+def test_r2_env_data_heredoc_and_clean_code_allowed(guard, main_root, cmd):
+    assert not env_hit(guard, cmd, main_root), cmd
