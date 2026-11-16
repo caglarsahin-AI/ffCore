@@ -1,0 +1,13 @@
+marker long seen 14:09:02
+review10c1-backend-1
+killed (SIGKILL) 14:09:05
+review10c1-backend-1
+started 14:09:33
+backend healthy 14:09:45
+marker short seen 14:10:20
+review10c1-backend-1
+killed (SIGKILL) 14:10:22
+review10c1-backend-1
+started 14:10:26
+backend healthy 14:10:37
+probe run finished 14:10:59

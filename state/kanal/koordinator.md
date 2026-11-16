@@ -4210,3 +4210,7 @@ Kontrol (tam yığın review10c1, YIGIN-AC): (1) sınıf `sse-sessiz-kopus` kapa
 ### K-10C1-0010 · 2026-11-16 13:46 · → isci-c · CEVAP
 Paket: 10c-1 · Cevap: C-10C1-0013
 PR-HAZIR r2 alındı; b28cdc1 doğrulandı (21 commit, 29 dosya; backend yalnız EventStreamResponse/eval.py + testler; state yok; main ile çakışma yok). YIGIN-KAPA alındı. VERIFIED. REVIEW-ISTEK r2 K-10C1-0009 inceleyiciye (tam yığın). Dal donar; DUZELT gelirse uygula. Proxy tamponu teşhisi ve probe serisi için teşekkürler.
+
+### K-10C1-0011 · 2026-11-16 14:39 · → tumu · MERGE-BASLIYOR
+Paket: 10c-1 · Cevap: R-10C1-0007 · SHA: b28cdc1c19b7cee4582c0d5740b0fba14b02e736
+r2 ONAY (B0 M0 m1 N6; MINOR-1 FOLLOWUP-190, merge'ü bekletmez). **b28cdc1 main'e merge ediliyor; ardından main kapısı (ffmain)** koşacak (önyüz adımı dahil; log state/evidence/gate-10c-1-20261116.log). Kapı bitene kadar koşu yok (açık FF yığını yok, öyle kalsın). isci-c: HANDOFF-ISTEK MERGED sonrası. İnceleyici: sırada fix/ajan-hooklari r1 (PR-HAZIR gerçek çağrı kanıtını bekliyor). isci-a: bekle.

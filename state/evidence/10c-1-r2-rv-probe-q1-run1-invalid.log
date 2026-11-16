@@ -1,0 +1,223 @@
+time="2026-11-16T14:01:33+03:00" level=warning msg="volume \"review10c1_e2e_node_modules\" already exists but was not created by Docker Compose. Use `external: true` to use an existing volume"
+ Container review10c1-postgres-1  Running
+ Container review10c1-redis-1  Running
+ Container review10c1-litellm-1  Running
+ Container review10c1-migrate-1  Created
+ Container review10c1-backend-1  Running
+ Container review10c1-postgres-1  Waiting
+ Container review10c1-postgres-1  Waiting
+ Container review10c1-postgres-1  Healthy
+ Container review10c1-postgres-1  Healthy
+ Container review10c1-migrate-1  Starting
+ Container review10c1-migrate-1  Started
+ Container review10c1-migrate-1  Waiting
+ Container review10c1-postgres-1  Waiting
+ Container review10c1-redis-1  Waiting
+ Container review10c1-litellm-1  Waiting
+ Container review10c1-postgres-1  Healthy
+ Container review10c1-redis-1  Healthy
+ Container review10c1-litellm-1  Healthy
+ Container review10c1-migrate-1  Exited
+
+Running 1 test using 1 worker
+
+[1/1] [chromium] › tests/e2e/zz_review10c1_r2_probe.spec.ts:87:5 › Q1 long kill
+[chromium] › tests/e2e/zz_review10c1_r2_probe.spec.ts:87:5 › Q1 long kill
+[PROBE] 2026-11-16T11:04:10.766Z marker (long) written; exam 7debc259-dc21-425d-8d46-6d8b5ef946e7
+
+[WebServer] Failed to proxy http://backend:8000/api/v1/projects/39053a79-8ef1-4f82-95a1-c75c1263af51/approvals/count?status=pending [Error: getaddrinfo EAI_AGAIN backend] {
+[WebServer]   errno: -3001,
+[WebServer]   code: 'EAI_AGAIN',
+[WebServer]   syscall: 'getaddrinfo',
+[WebServer]   hostname: 'backend'
+[WebServer] }
+
+[WebServer] [Error: getaddrinfo EAI_AGAIN backend] {
+[WebServer]   errno: -3001,
+[WebServer]   code: 'EAI_AGAIN',
+[WebServer]   syscall: 'getaddrinfo',
+[WebServer]   hostname: 'backend'
+[WebServer] }
+
+
+[WebServer] Failed to proxy http://backend:8000/api/v1/projects/39053a79-8ef1-4f82-95a1-c75c1263af51/eval-runs/7debc259-dc21-425d-8d46-6d8b5ef946e7 [Error: getaddrinfo EAI_AGAIN backend] {
+[WebServer]   errno: -3001,
+[WebServer]   code: 'EAI_AGAIN',
+[WebServer]   syscall: 'getaddrinfo',
+[WebServer]   hostname: 'backend'
+[WebServer] }
+[WebServer] [Error: getaddrinfo EAI_AGAIN backend] {
+[WebServer]   errno: -3001,
+[WebServer]   code: 'EAI_AGAIN',
+[WebServer]   syscall: 'getaddrinfo',
+[WebServer]   hostname: 'backend'
+[WebServer] }
+
+[WebServer] Failed to proxy http://backend:8000/api/v1/projects/39053a79-8ef1-4f82-95a1-c75c1263af51/eval-runs/7debc259-dc21-425d-8d46-6d8b5ef946e7 [Error: getaddrinfo EAI_AGAIN backend] {
+[WebServer]   errno: -3001,
+[WebServer]   code: 'EAI_AGAIN',
+[WebServer]   syscall: 'getaddrinfo',
+[WebServer]   hostname: 'backend'
+[WebServer] }
+[WebServer] [Error: getaddrinfo EAI_AGAIN backend] {
+[WebServer]   errno: -3001,
+[WebServer]   code: 'EAI_AGAIN',
+[WebServer]   syscall: 'getaddrinfo',
+[WebServer]   hostname: 'backend'
+[WebServer] }
+
+
+[WebServer] Failed to proxy http://backend:8000/api/v1/projects/39053a79-8ef1-4f82-95a1-c75c1263af51/eval-runs/7debc259-dc21-425d-8d46-6d8b5ef946e7/stream Error: connect ECONNREFUSED 192.168.240.13:8000
+[WebServer]     at <unknown> (Error: connect ECONNREFUSED 192.168.240.13:8000) {
+[WebServer]   errno: -111,
+[WebServer]   code: 'ECONNREFUSED',
+[WebServer]   syscall: 'connect',
+[WebServer]   address: '192.168.240.13',
+[WebServer]   port: 8000
+[WebServer] }
+
+[WebServer] Error: connect ECONNREFUSED 192.168.240.13:8000
+[WebServer]     at <unknown> (Error: connect ECONNREFUSED 192.168.240.13:8000) {
+[WebServer]   errno: -111,
+[WebServer]   code: 'ECONNREFUSED',
+[WebServer]   syscall: 'connect',
+[WebServer]   address: '192.168.240.13',
+[WebServer]   port: 8000
+[WebServer] }
+[WebServer] Failed to proxy http://backend:8000/api/v1/projects/39053a79-8ef1-4f82-95a1-c75c1263af51/eval-runs/7debc259-dc21-425d-8d46-6d8b5ef946e7/stream Error: connect ECONNREFUSED 192.168.240.13:8000
+[WebServer]     at <unknown> (Error: connect ECONNREFUSED 192.168.240.13:8000) {
+[WebServer]   errno: -111,
+[WebServer]   code: 'ECONNREFUSED',
+[WebServer]   syscall: 'connect',
+[WebServer]   address: '192.168.240.13',
+[WebServer]   port: 8000
+[WebServer] }
+
+[WebServer] Error: connect ECONNREFUSED 192.168.240.13:8000
+[WebServer]     at <unknown> (Error: connect ECONNREFUSED 192.168.240.13:8000) {
+[WebServer]   errno: -111,
+[WebServer]   code: 'ECONNREFUSED',
+[WebServer]   syscall: 'connect',
+[WebServer]   address: '192.168.240.13',
+[WebServer]   port: 8000
+[WebServer] }
+
+
+[WebServer] Failed to proxy http://backend:8000/api/v1/projects/39053a79-8ef1-4f82-95a1-c75c1263af51/approvals/count?status=pending [Error: getaddrinfo EAI_AGAIN backend] {
+[WebServer]   errno: -3001,
+[WebServer]   code: 'EAI_AGAIN',
+[WebServer]   syscall: 'getaddrinfo',
+[WebServer]   hostname: 'backend'
+[WebServer] }
+
+[WebServer] [Error: getaddrinfo EAI_AGAIN backend] {
+[WebServer]   errno: -3001,
+[WebServer]   code: 'EAI_AGAIN',
+[WebServer]   syscall: 'getaddrinfo',
+[WebServer]   hostname: 'backend'
+[WebServer] }
+
+[WebServer] Failed to proxy http://backend:8000/api/v1/projects/39053a79-8ef1-4f82-95a1-c75c1263af51/eval-runs/7debc259-dc21-425d-8d46-6d8b5ef946e7 Error: connect ECONNREFUSED 192.168.240.13:8000
+[WebServer]     at <unknown> (Error: connect ECONNREFUSED 192.168.240.13:8000) {
+[WebServer]   errno: -111,
+[WebServer]   code: 'ECONNREFUSED',
+[WebServer]   syscall: 'connect',
+[WebServer]   address: '192.168.240.13',
+[WebServer]   port: 8000
+[WebServer] }
+[WebServer] Error: connect ECONNREFUSED 192.168.240.13:8000
+[WebServer]     at <unknown> (Error: connect ECONNREFUSED 192.168.240.13:8000) {
+[WebServer]   errno: -111,
+[WebServer]   code: 'ECONNREFUSED',
+[WebServer]   syscall: 'connect',
+[WebServer]   address: '192.168.240.13',
+[WebServer]   port: 8000
+[WebServer] }
+
+[WebServer] Failed to proxy http://backend:8000/api/v1/projects/39053a79-8ef1-4f82-95a1-c75c1263af51/eval-runs/7debc259-dc21-425d-8d46-6d8b5ef946e7/stream Error: connect ECONNREFUSED 192.168.240.13:8000
+[WebServer]     at <unknown> (Error: connect ECONNREFUSED 192.168.240.13:8000) {
+[WebServer]   errno: -111,
+[WebServer]   code: 'ECONNREFUSED',
+[WebServer]   syscall: 'connect',
+[WebServer]   address: '192.168.240.13',
+[WebServer]   port: 8000
+[WebServer] }
+
+
+[WebServer] Error: connect ECONNREFUSED 192.168.240.13:8000
+[WebServer]     at <unknown> (Error: connect ECONNREFUSED 192.168.240.13:8000) {
+[WebServer]   errno: -111,
+[WebServer]   code: 'ECONNREFUSED',
+[WebServer]   syscall: 'connect',
+[WebServer]   address: '192.168.240.13',
+[WebServer]   port: 8000
+[WebServer] }
+[PROBE] 2026-11-16T11:04:52.866Z backend healthy at 8.1 s
+
+[WebServer] Failed to proxy http://backend:8000/api/v1/projects/39053a79-8ef1-4f82-95a1-c75c1263af51/eval-runs/7debc259-dc21-425d-8d46-6d8b5ef946e7/cancel Error: connect ECONNREFUSED 192.168.240.13:8000
+[WebServer]     at <unknown> (Error: connect ECONNREFUSED 192.168.240.13:8000) {
+[WebServer]   errno: -111,
+[WebServer]   code: 'ECONNREFUSED',
+[WebServer]   syscall: 'connect',
+[WebServer]   address: '192.168.240.13',
+[WebServer]   port: 8000
+[WebServer] }
+
+[WebServer] Error: connect ECONNREFUSED 192.168.240.13:8000
+[WebServer]     at <unknown> (Error: connect ECONNREFUSED 192.168.240.13:8000) {
+[WebServer]   errno: -111,
+[WebServer]   code: 'ECONNREFUSED',
+[WebServer]   syscall: 'connect',
+[WebServer]   address: '192.168.240.13',
+[WebServer]   port: 8000
+[WebServer] }
+
+  1) [chromium] › tests/e2e/zz_review10c1_r2_probe.spec.ts:87:5 › Q1 long kill ─────────────────────
+
+    Error: expect(locator).toHaveText(expected) failed
+
+    Locator:  getByTestId('eval-status')
+    Expected: "Cancelled"
+    Received: "Running"
+    Timeout:  60000ms
+
+    Call log:
+      - Expect "toHaveText" getByTestId('eval-status') with timeout 60000ms
+      - waiting for getByTestId('eval-status')
+        123 × locator resolved to <span data-slot="badge" data-variant="secondary" data-testid="eval-status" class="group/badge inline-flex h-5 w-fit shrink-0 items-center justify-center gap-1 overflow-hidden rounded-4xl border border-transparent px-2 py-0.5 text-xs font-medium whitespace-nowrap transition-all focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-inv…>Running</span>
+            - unexpected value "Running"
+
+
+      77 |   const c0 = Date.now();
+      78 |   await page.getByTestId("eval-cancel").click();
+    > 79 |   await expect(page.getByTestId("eval-status")).toHaveText(en.Evaluations.statuses.cancelled, { timeout: 60_000 });
+         |                                                 ^
+      80 |   await snap();
+      81 |   log(`cancelled shown ${((Date.now() - c0) / 1000).toFixed(1)} s after the click; final state ${await state.getAttribute("data-state")}`);
+      82 |   log("sequence:", JSON.stringify(seen));
+        at killProbe (/work/frontend/tests/e2e/zz_review10c1_r2_probe.spec.ts:79:49)
+        at /work/frontend/tests/e2e/zz_review10c1_r2_probe.spec.ts:89:3
+
+    Error Context: test-results/zz_review10c1_r2_probe-Q1-long-kill-chromium/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/zz_review10c1_r2_probe-Q1-long-kill-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/zz_review10c1_r2_probe-Q1-long-kill-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+  1 failed
+    [chromium] › tests/e2e/zz_review10c1_r2_probe.spec.ts:87:5 › Q1 long kill ──────────────────────
+npm notice
+npm notice New major version of npm available! 11.19.1 -> 12.2.2
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.2
+npm notice To update run: npm install -g npm@12.2.2
+npm notice
+EXIT_PROBE=1
+
+real	4m31.431s
+user	0m0.138s
+sys	0m0.138s

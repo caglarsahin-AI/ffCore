@@ -1,0 +1,37 @@
+user	0m0.076s
+sys	0m0.108s
+agent-worker Up 37 seconds
+agent-worker-bg Up 36 seconds
+backend Up 48 seconds (healthy)
+fake-llm Up About a minute
+frontend Up 37 seconds
+langfuse-clickhouse Up About a minute (healthy)
+langfuse-minio Up About a minute (healthy)
+langfuse-postgres Up About a minute (healthy)
+langfuse-redis Up About a minute (healthy)
+langfuse-web Up About a minute (healthy)
+langfuse-worker Up About a minute
+litellm Up About a minute (healthy)
+mcp-search Up 36 seconds (healthy)
+mcp-sql Up 36 seconds (healthy)
+postgres Up About a minute (healthy)
+redis Up About a minute (healthy)
+ticket-desk Up About a minute (healthy)
+worker Up 37 seconds
+cd backend && python -m ffcore.cli seed-prompts --path prompts
+2026-11-16 10:52:29,798 WARNING langfuse Prompt 'eval_judge_rubric_v2-label:production' not found during refresh, evicting from cache.
+2026-11-16 10:52:30,736 WARNING langfuse Prompt 'platform_rules-label:production' not found during refresh, evicting from cache.
+prompts created: ['eval_judge_rubric_v2', 'platform_rules']
+prompts already present: -
+EXIT_SEED=0
+superadmin created: dce1527c-cbc6-47e2-beb1-c8352ab303c7
+EXIT_SA=0
+review10c1_e2e_node_modules
+529
+EXIT_CP=0
+py files img=172 wt=172 diff=0
+--- header merge (backend image, starlette)
+None -> [('cache-control', 'no-cache, no-transform'), ('x-accel-buffering', 'no')]
+{'Cache-Control': 'no-cache'} -> [('cache-control', 'no-cache'), ('x-accel-buffering', 'no')]
+{'cache-control': 'private'} -> [('cache-control', 'no-cache, no-transform'), ('x-accel-buffering', 'no'), ('cache-control', 'private')]
+{'X-Extra': '1'} -> [('cache-control', 'no-cache, no-transform'), ('x-accel-buffering', 'no'), ('x-extra', '1')]

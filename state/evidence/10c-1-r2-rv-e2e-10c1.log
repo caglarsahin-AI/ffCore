@@ -1,0 +1,65 @@
+time="2026-11-16T13:53:59+03:00" level=warning msg="volume \"review10c1_e2e_node_modules\" already exists but was not created by Docker Compose. Use `external: true` to use an existing volume"
+ Container review10c1-postgres-1  Running
+ Container review10c1-redis-1  Running
+ Container review10c1-litellm-1  Running
+ Container review10c1-migrate-1  Created
+ Container review10c1-backend-1  Running
+ Container review10c1-postgres-1  Waiting
+ Container review10c1-postgres-1  Waiting
+ Container review10c1-postgres-1  Healthy
+ Container review10c1-postgres-1  Healthy
+ Container review10c1-migrate-1  Starting
+ Container review10c1-migrate-1  Started
+ Container review10c1-postgres-1  Waiting
+ Container review10c1-redis-1  Waiting
+ Container review10c1-litellm-1  Waiting
+ Container review10c1-migrate-1  Waiting
+ Container review10c1-redis-1  Healthy
+ Container review10c1-postgres-1  Healthy
+ Container review10c1-litellm-1  Healthy
+ Container review10c1-migrate-1  Exited
+
+Running 26 tests using 1 worker
+
+[1/26] [chromium] › tests/e2e/test_10c1_1_suite_run_stream.spec.ts:9:5 › test_10c1_1_suite_run_stream: analyst builds a suite, adds an item, runs the exam and reads it
+[2/26] [chromium] › tests/e2e/test_10c1_2_not_run_visible.spec.ts:11:5 › test_10c1_2_not_run_visible: approval_required and complete=false are shown as written
+[3/26] [chromium] › tests/e2e/test_10c1_3_compare.spec.ts:10:5 › test_10c1_3_compare: two completed exams compare; a mismatched pair shows eval_runs_not_comparable
+[4/26] [chromium] › tests/e2e/test_10c1_4_publish_gate.spec.ts:10:5 › test_10c1_4_publish_gate: reasons readable, force admin-only with a reason, exam link on the version
+[5/26] [chromium] › tests/e2e/test_10c1_5_read_only.spec.ts:45:7 › test_10c1_5_read_only: suites in edit and read mode
+[6/26] [chromium] › tests/e2e/test_10c1_5_read_only.spec.ts:45:7 › test_10c1_5_read_only: suite in edit and read mode
+[7/26] [chromium] › tests/e2e/test_10c1_5_read_only.spec.ts:45:7 › test_10c1_5_read_only: exam in edit and read mode
+[8/26] [chromium] › tests/e2e/test_10c1_5_read_only.spec.ts:45:7 › test_10c1_5_read_only: compare in edit and read mode
+[9/26] [chromium] › tests/e2e/test_10c1_5_read_only.spec.ts:45:7 › test_10c1_5_read_only: versions in edit and read mode
+[10/26] [chromium] › tests/e2e/test_10c1_5_read_only.spec.ts:45:7 › test_10c1_5_read_only: from-run in edit and read mode
+[11/26] [chromium] › tests/e2e/test_10c1_6_screens_themes_axe.spec.ts:52:9 › test_10c1_6_screens_themes_axe: suites light
+[12/26] [chromium] › tests/e2e/test_10c1_6_screens_themes_axe.spec.ts:52:9 › test_10c1_6_screens_themes_axe: suites dark
+[13/26] [chromium] › tests/e2e/test_10c1_6_screens_themes_axe.spec.ts:52:9 › test_10c1_6_screens_themes_axe: suite-new light
+[14/26] [chromium] › tests/e2e/test_10c1_6_screens_themes_axe.spec.ts:52:9 › test_10c1_6_screens_themes_axe: suite-new dark
+[15/26] [chromium] › tests/e2e/test_10c1_6_screens_themes_axe.spec.ts:52:9 › test_10c1_6_screens_themes_axe: suite light
+[16/26] [chromium] › tests/e2e/test_10c1_6_screens_themes_axe.spec.ts:52:9 › test_10c1_6_screens_themes_axe: suite dark
+[17/26] [chromium] › tests/e2e/test_10c1_6_screens_themes_axe.spec.ts:52:9 › test_10c1_6_screens_themes_axe: exam light
+[18/26] [chromium] › tests/e2e/test_10c1_6_screens_themes_axe.spec.ts:52:9 › test_10c1_6_screens_themes_axe: exam dark
+[19/26] [chromium] › tests/e2e/test_10c1_6_screens_themes_axe.spec.ts:52:9 › test_10c1_6_screens_themes_axe: compare light
+[20/26] [chromium] › tests/e2e/test_10c1_6_screens_themes_axe.spec.ts:52:9 › test_10c1_6_screens_themes_axe: compare dark
+[21/26] [chromium] › tests/e2e/test_10c1_6_screens_themes_axe.spec.ts:52:9 › test_10c1_6_screens_themes_axe: gate light
+[22/26] [chromium] › tests/e2e/test_10c1_6_screens_themes_axe.spec.ts:52:9 › test_10c1_6_screens_themes_axe: gate dark
+[23/26] [chromium] › tests/e2e/test_10c1_6_screens_themes_axe.spec.ts:52:9 › test_10c1_6_screens_themes_axe: from-run light
+[24/26] [chromium] › tests/e2e/test_10c1_6_screens_themes_axe.spec.ts:52:9 › test_10c1_6_screens_themes_axe: from-run dark
+[25/26] [chromium] › tests/e2e/test_10c1_7_stream_stall.spec.ts:30:5 › test_10c1_7_stream_stall: a silent stream reads with GET within STALL_MS, ends in lost, GET shows the real status
+[chromium] › tests/e2e/test_10c1_7_stream_stall.spec.ts:30:5 › test_10c1_7_stream_stall: a silent stream reads with GET within STALL_MS, ends in lost, GET shows the real status
+reconnecting after 7050 ms
+
+stream lost after 47021 ms, 6 stream requests
+
+[26/26] [chromium] › tests/e2e/test_10c1_7_stream_stall.spec.ts:73:5 › test_10c1_7_stream_stall: a stream that comes back ends the reconnecting phase
+  26 passed (6.7m)
+npm notice
+npm notice New major version of npm available! 11.19.1 -> 12.2.2
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.2
+npm notice To update run: npm install -g npm@12.2.2
+npm notice
+EXIT_E2E=0
+
+real	7m14.499s
+user	0m0.093s
+sys	0m0.107s

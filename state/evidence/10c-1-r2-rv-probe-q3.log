@@ -1,0 +1,48 @@
+time="2026-11-16T14:11:30+03:00" level=warning msg="volume \"review10c1_e2e_node_modules\" already exists but was not created by Docker Compose. Use `external: true` to use an existing volume"
+ Container review10c1-postgres-1  Running
+ Container review10c1-redis-1  Running
+ Container review10c1-litellm-1  Running
+ Container review10c1-migrate-1  Created
+ Container review10c1-backend-1  Running
+ Container review10c1-postgres-1  Waiting
+ Container review10c1-postgres-1  Waiting
+ Container review10c1-postgres-1  Healthy
+ Container review10c1-migrate-1  Starting
+ Container review10c1-postgres-1  Healthy
+ Container review10c1-migrate-1  Started
+ Container review10c1-migrate-1  Waiting
+ Container review10c1-postgres-1  Waiting
+ Container review10c1-redis-1  Waiting
+ Container review10c1-litellm-1  Waiting
+ Container review10c1-postgres-1  Healthy
+ Container review10c1-litellm-1  Healthy
+ Container review10c1-redis-1  Healthy
+ Container review10c1-migrate-1  Exited
+
+Running 1 test using 1 worker
+
+[1/1] [chromium] › tests/e2e/zz_review10c1_r2_probe.spec.ts:130:5 › Q3 proxy live: exam stream and 06a run stream, gzip accepted
+[chromium] › tests/e2e/zz_review10c1_r2_probe.spec.ts:130:5 › Q3 proxy live: exam stream and 06a run stream, gzip accepted
+[PROBE] 2026-11-16T11:14:01.048Z exam proxy gzip ["status 200 enc=null cc=no-cache, no-transform xab=no @0.2s","chunk 69B [event: progress] @0.2s","chunk 70B [event: progress] @2.2s","chunk 70B [event: progress] @4.2s","chunk 70B [event: progress] @6.2s","chunk 70B [event: progress] @8.2s","chunk 70B [event: progress] @10.2s","abort AbortError: This operation was @12.1s"]
+
+[PROBE] 2026-11-16T11:14:01.588Z run POST proxy gzip ["status 200 enc=null cc=no-cache, no-transform xab=no @0.1s","chunk 156B [event: progress] @0.1s","chunk 180B [event: tool_call] @0.4s","chunk 262B [event: approval_required] @0.5s","end @0.5s"]
+
+[PROBE] 2026-11-16T11:14:01.589Z run POST events ["progress","tool_call","approval_required"]
+
+[PROBE] 2026-11-16T11:14:01.589Z run id 7dec64ad-82e4-4266-ae25-b42fac4b5098
+
+[PROBE] 2026-11-16T11:14:01.621Z run GET stream proxy gzip ["status 200 enc=null cc=no-cache, no-transform xab=no @0.0s","chunk 156B [event: progress] @0.0s","chunk 442B [event: tool_call,event: approval_required] @0.0s","end @0.0s"]
+
+[PROBE] 2026-11-16T11:14:01.649Z run GET stream backend ["status 200 enc=null cc=no-cache, no-transform xab=no @0.0s","chunk 156B [event: progress] @0.0s","chunk 442B [event: tool_call,event: approval_required] @0.0s","end @0.0s"]
+
+  1 passed (2.2m)
+npm notice
+npm notice New major version of npm available! 11.19.1 -> 12.2.2
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.2
+npm notice To update run: npm install -g npm@12.2.2
+npm notice
+EXIT_PROBE=0
+
+real	2m40.150s
+user	0m0.000s
+sys	0m0.046s

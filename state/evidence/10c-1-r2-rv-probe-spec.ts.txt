@@ -1,0 +1,155 @@
+// REVIEW PROBE (inceleyici 10c-1 r2): not part of the PR; untracked, deleted after the run; a copy
+// goes to state/evidence/10c-1-r2-rv-probe-spec.ts.txt.
+// Q1 long: backend SIGKILL, started after 25 s. Q2 short: SIGKILL, started at once (stream should
+// come back: reconnecting -> streaming). Q3: proxy chunk timing with gzip for the exam stream and
+// the 06a run stream (POST run + GET stream of the waiting run), plus response headers.
+import { expect, test } from "@playwright/test";
+import { writeFileSync } from "node:fs";
+
+import en from "../../messages/en.json";
+import { approvalAgent } from "./agents";
+import { addItem, asAnalyst, createSuite, helloAgent, startExam } from "./eval";
+import { fixture } from "./fixtures";
+import { selectProject, signIn } from "./support";
+
+const log = (...a: unknown[]) => console.log("[PROBE]", new Date().toISOString(), ...a);
+
+async function liveExam(name: string) {
+  const { alpha } = fixture();
+  const hello = await helloAgent(alpha.id, name);
+  const { agent } = await approvalAgent(alpha.id);
+  const versions = await asAnalyst<{ items: { id: string; version: number }[] }>("GET", `/projects/${alpha.id}/agents/${agent.id}/versions`);
+  const suite = await createSuite(alpha.id, name, { approve_tools: true });
+  await addItem(alpha.id, suite.id, hello.runId);
+  let id = "";
+  await expect(async () => {
+    id = (await startExam(alpha.id, suite.id, versions.items[0].id)).id;
+  }).toPass({ timeout: 30_000 });
+  return { id, agent };
+}
+
+async function killProbe(page: import("@playwright/test").Page, context: import("@playwright/test").BrowserContext, baseURL: string, mode: "long" | "short") {
+  const { alpha, analyst } = fixture();
+  const { id } = await liveExam(`rv-${mode}`);
+  await signIn(page, analyst.email);
+  await selectProject(context, baseURL, alpha.id);
+  await page.goto(`/evaluations/runs/${id}`);
+  const state = page.getByTestId("eval-stream-state");
+  await expect(state).toHaveAttribute("data-state", "streaming");
+  await expect(page.getByTestId("eval-status")).toHaveText(/Running|Queued/);
+  await page.waitForTimeout(6_000);
+  const seen: string[] = [];
+  const gets: string[] = [];
+  const streams: string[] = [];
+  let t0 = Date.now();
+  page.on("response", (r) => {
+    const at = ((Date.now() - t0) / 1000).toFixed(1);
+    if (r.request().method() === "GET" && r.url().endsWith(`/eval-runs/${id}`)) gets.push(`${r.status()} @${at}s`);
+    if (r.url().endsWith(`/eval-runs/${id}/stream`)) streams.push(`${r.status()} enc=${r.headers()["content-encoding"] ?? "-"} @${at}s`);
+  });
+  const snap = async () => {
+    const s = await state.getAttribute("data-state").catch(() => "?");
+    const status = await page.getByTestId("eval-status").innerText().catch(() => "?");
+    const prog = await page.getByTestId("eval-progress").innerText().catch(() => "?");
+    const line = `${s} | ${status} | ${prog}`;
+    if (seen[seen.length - 1]?.split(" @")[0] !== line) seen.push(`${line} @${((Date.now() - t0) / 1000).toFixed(1)}s`);
+  };
+  t0 = Date.now();
+  writeFileSync("/work/.review-probe-marker", `${mode}\n`);
+  log(`marker (${mode}) written; exam`, id);
+  // Watch for 120 s or until (backend back and state settled).
+  let healthyAt = 0;
+  let downAt = 0;
+  while (Date.now() - t0 < 150_000) {
+    await snap();
+    if (!healthyAt) {
+      let ok = false;
+      try {
+        ok = (await fetch(`${process.env.FFCORE_BACKEND_URL}/healthz`, { signal: AbortSignal.timeout(1500) })).status === 200;
+      } catch {
+        ok = false;
+      }
+      if (!ok && !downAt) downAt = Date.now();
+      if (ok && downAt) healthyAt = Date.now();
+    }
+    const s = await state.getAttribute("data-state").catch(() => "?");
+    if (healthyAt && Date.now() - healthyAt > 20_000 && (s === "streaming" || s === "lost")) break;
+    await page.waitForTimeout(500);
+  }
+  log(`backend down seen at ${downAt ? ((downAt - t0) / 1000).toFixed(1) : "never"} s`);
+  log(`backend healthy at ${healthyAt ? ((healthyAt - t0) / 1000).toFixed(1) : "never"} s`);
+  await snap();
+  const c0 = Date.now();
+  await page.getByTestId("eval-cancel").click();
+  await expect(page.getByTestId("eval-status")).toHaveText(en.Evaluations.statuses.cancelled, { timeout: 60_000 });
+  await snap();
+  log(`cancelled shown ${((Date.now() - c0) / 1000).toFixed(1)} s after the click; final state ${await state.getAttribute("data-state")}`);
+  log("sequence:", JSON.stringify(seen));
+  log("GET responses:", JSON.stringify(gets));
+  log("stream responses:", JSON.stringify(streams));
+}
+
+test("Q1 long kill", async ({ page, context, baseURL }) => {
+  test.setTimeout(420_000);
+  await killProbe(page, context, baseURL!, "long");
+});
+
+test("Q2 short kill", async ({ page, context, baseURL }) => {
+  test.setTimeout(420_000);
+  await killProbe(page, context, baseURL!, "short");
+});
+
+async function timing(url: string, init: RequestInit, ms = 12_000) {
+  const t0 = Date.now();
+  const lines: string[] = [];
+  let all = "";
+  const controller = new AbortController();
+  const stop = setTimeout(() => controller.abort(), ms);
+  try {
+    const r = await fetch(url, { ...init, signal: controller.signal });
+    lines.push(`status ${r.status} enc=${r.headers.get("content-encoding")} cc=${r.headers.get("cache-control")} xab=${r.headers.get("x-accel-buffering")} @${((Date.now() - t0) / 1000).toFixed(1)}s`);
+    const reader = r.body!.getReader();
+    const dec = new TextDecoder();
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      const text = dec.decode(value, { stream: true });
+      all += text;
+      const ev = [...text.matchAll(/^(event: \w+|: \w*)/gm)].map((m) => m[1]).join(",");
+      lines.push(`chunk ${value.length}B [${ev}] @${((Date.now() - t0) / 1000).toFixed(1)}s`);
+    }
+    lines.push(`end @${((Date.now() - t0) / 1000).toFixed(1)}s`);
+  } catch (e) {
+    lines.push(`abort ${String(e).slice(0, 30)} @${((Date.now() - t0) / 1000).toFixed(1)}s`);
+  } finally {
+    clearTimeout(stop);
+  }
+  return Object.assign(lines, { all });
+}
+
+test("Q3 proxy live: exam stream and 06a run stream, gzip accepted", async ({ page, context, baseURL }) => {
+  test.setTimeout(300_000);
+  const { alpha, projectAdmin } = fixture();
+  const { id, agent } = await liveExam("rv-proxy");
+  await signIn(page, projectAdmin.email);
+  await selectProject(context, baseURL!, alpha.id);
+  const cookie = (await context.cookies()).map((c) => `${c.name}=${c.value}`).join("; ");
+  const gz = "gzip, deflate, br";
+  log("exam proxy gzip", JSON.stringify(await timing(`${baseURL}/api/v1/projects/${alpha.id}/eval-runs/${id}/stream`, { headers: { cookie, "accept-encoding": gz } })));
+  await asAnalyst("POST", `/projects/${alpha.id}/eval-runs/${id}/cancel`);
+  // 06a: start a run of the approval agent through the console proxy (it stops for approval).
+  const post = await timing(
+    `${baseURL}/api/v1/projects/${alpha.id}/agents/${agent.key}/runs`,
+    { method: "POST", headers: { cookie, "accept-encoding": gz, accept: "text/event-stream", "content-type": "application/json", origin: baseURL! }, body: JSON.stringify({ input: "Please reply to ticket 1.", variables: {}, channel: "test", version: 1 }) },
+    30_000,
+  );
+  log("run POST proxy gzip", JSON.stringify(post));
+  log("run POST events", JSON.stringify([...post.all.matchAll(/^event: (\w+)/gm)].map((m) => m[1])));
+  const runId = /"run_id":\s*"([0-9a-f-]{36})"/.exec(post.all)?.[1];
+  const waiting = runId ? { id: runId } : null;
+  log("run id", runId);
+  if (waiting) {
+    log("run GET stream proxy gzip", JSON.stringify(await timing(`${baseURL}/api/v1/projects/${alpha.id}/runs/${waiting.id}/stream`, { headers: { cookie, "accept-encoding": gz } }, 40_000)));
+    log("run GET stream backend", JSON.stringify(await timing(`${process.env.FFCORE_BACKEND_URL}/api/v1/projects/${alpha.id}/runs/${waiting.id}/stream`, { headers: { cookie, "accept-encoding": gz } }, 40_000)));
+  }
+});

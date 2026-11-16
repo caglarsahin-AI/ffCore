@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-c-10c1
 - Aktif paket: 10c-1 (09 Evaluation önyüzü)
 - Durum: ACTIVE
-- Son okunan: koordinator K-10C1-0005; son yazılan C-10C1-0013 (PR-HAZIR r2)
+- Son okunan: koordinator K-10C1-0010; son yazılan C-10C1-0013 (PR-HAZIR r2)
 - Önceki lease: ffcore-isci-c-10bp2 RETIRED (10b-poc-2 MERGED b43770d; son C-10bp2-0019 HANDOFF)
 
 ## Mesajlar
