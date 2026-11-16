@@ -1,0 +1,146 @@
+time="2026-11-16T13:23:02+03:00" level=warning msg="volume \"ffcore-10c1_e2e_node_modules\" already exists but was not created by Docker Compose. Use `external: true` to use an existing volume"
+ Container ffcore-10c1-redis-1  Running
+ Container ffcore-10c1-postgres-1  Running
+ Container ffcore-10c1-migrate-1  Created
+ Container ffcore-10c1-litellm-1  Running
+ Container ffcore-10c1-backend-1  Running
+ Container ffcore-10c1-postgres-1  Waiting
+ Container ffcore-10c1-postgres-1  Waiting
+ Container ffcore-10c1-postgres-1  Healthy
+ Container ffcore-10c1-migrate-1  Starting
+ Container ffcore-10c1-postgres-1  Healthy
+ Container ffcore-10c1-migrate-1  Started
+ Container ffcore-10c1-postgres-1  Waiting
+ Container ffcore-10c1-redis-1  Waiting
+ Container ffcore-10c1-litellm-1  Waiting
+ Container ffcore-10c1-migrate-1  Waiting
+ Container ffcore-10c1-redis-1  Healthy
+ Container ffcore-10c1-postgres-1  Healthy
+ Container ffcore-10c1-litellm-1  Healthy
+ Container ffcore-10c1-migrate-1  Exited
+
+Running 1 test using 1 worker
+
+[PROBE] 2026-11-16T10:25:04.684Z marker written; exam d61fef96-b0d7-481b-913b-6bf81bc2ab4f
+[PROBE] 2026-11-16T10:25:14.764Z reconnecting after 10.1 s from the marker (0 = never)
+[PROBE] 2026-11-16T10:25:17.821Z status while down: Running; alerts=1
+[WebServer] Failed to proxy http://backend:8000/api/v1/projects/5c240412-b134-45a1-aabc-54895079a3be/eval-runs/d61fef96-b0d7-481b-913b-6bf81bc2ab4f/stream [Error: getaddrinfo ENOTFOUND backend] {
+[WebServer]   errno: -3008,
+[WebServer]   code: 'ENOTFOUND',
+[WebServer]   syscall: 'getaddrinfo',
+[WebServer]   hostname: 'backend'
+[WebServer] }
+[WebServer] [Error: getaddrinfo ENOTFOUND backend] {
+[WebServer]   errno: -3008,
+[WebServer]   code: 'ENOTFOUND',
+[WebServer]   syscall: 'getaddrinfo',
+[WebServer]   hostname: 'backend'
+[WebServer] }
+[WebServer] Failed to proxy http://backend:8000/api/v1/projects/5c240412-b134-45a1-aabc-54895079a3be/eval-runs/d61fef96-b0d7-481b-913b-6bf81bc2ab4f [Error: getaddrinfo ENOTFOUND backend] {
+[WebServer]   errno: -3008,
+[WebServer]   code: 'ENOTFOUND',
+[WebServer]   syscall: 'getaddrinfo',
+[WebServer]   hostname: 'backend'
+[WebServer] }
+[WebServer] [Error: getaddrinfo ENOTFOUND backend] {
+[WebServer]   errno: -3008,
+[WebServer]   code: 'ENOTFOUND',
+[WebServer]   syscall: 'getaddrinfo',
+[WebServer]   hostname: 'backend'
+[WebServer] }
+[WebServer] Failed to proxy http://backend:8000/api/v1/projects/5c240412-b134-45a1-aabc-54895079a3be/approvals/count?status=pending [Error: getaddrinfo ENOTFOUND backend] {
+[WebServer]   errno: -3008,
+[WebServer]   code: 'ENOTFOUND',
+[WebServer]   syscall: 'getaddrinfo',
+[WebServer]   hostname: 'backend'
+[WebServer] }
+[WebServer] [Error: getaddrinfo ENOTFOUND backend] {
+[WebServer]   errno: -3008,
+[WebServer]   code: 'ENOTFOUND',
+[WebServer]   syscall: 'getaddrinfo',
+[WebServer]   hostname: 'backend'
+[WebServer] }
+[WebServer] Failed to proxy http://backend:8000/api/v1/projects/5c240412-b134-45a1-aabc-54895079a3be/eval-runs/d61fef96-b0d7-481b-913b-6bf81bc2ab4f [Error: getaddrinfo EAI_AGAIN backend] {
+[WebServer]   errno: -3001,
+[WebServer]   code: 'EAI_AGAIN',
+[WebServer]   syscall: 'getaddrinfo',
+[WebServer]   hostname: 'backend'
+[WebServer] }
+[WebServer] [Error: getaddrinfo EAI_AGAIN backend] {
+[WebServer]   errno: -3001,
+[WebServer]   code: 'EAI_AGAIN',
+[WebServer]   syscall: 'getaddrinfo',
+[WebServer]   hostname: 'backend'
+[WebServer] }
+[WebServer] Failed to proxy http://backend:8000/api/v1/projects/5c240412-b134-45a1-aabc-54895079a3be/approvals/count?status=pending [Error: getaddrinfo EAI_AGAIN backend] {
+[WebServer]   errno: -3001,
+[WebServer]   code: 'EAI_AGAIN',
+[WebServer]   syscall: 'getaddrinfo',
+[WebServer]   hostname: 'backend'
+[WebServer] }
+[WebServer] [Error: getaddrinfo EAI_AGAIN backend] {
+[WebServer]   errno: -3001,
+[WebServer]   code: 'EAI_AGAIN',
+[WebServer]   syscall: 'getaddrinfo',
+[WebServer]   hostname: 'backend'
+[WebServer] }
+[WebServer] Failed to proxy http://backend:8000/api/v1/projects/5c240412-b134-45a1-aabc-54895079a3be/eval-runs/d61fef96-b0d7-481b-913b-6bf81bc2ab4f/stream Error: connect ECONNREFUSED 192.168.208.11:8000
+[WebServer]     at <unknown> (Error: connect ECONNREFUSED 192.168.208.11:8000) {
+[WebServer]   errno: -111,
+[WebServer]   code: 'ECONNREFUSED',
+[WebServer]   syscall: 'connect',
+[WebServer]   address: '192.168.208.11',
+[WebServer]   port: 8000
+[WebServer] }
+[WebServer] Error: connect ECONNREFUSED 192.168.208.11:8000
+[WebServer]     at <unknown> (Error: connect ECONNREFUSED 192.168.208.11:8000) {
+[WebServer]   errno: -111,
+[WebServer]   code: 'ECONNREFUSED',
+[WebServer]   syscall: 'connect',
+[WebServer]   address: '192.168.208.11',
+[WebServer]   port: 8000
+[WebServer] }
+[WebServer] Failed to proxy http://backend:8000/api/v1/projects/5c240412-b134-45a1-aabc-54895079a3be/eval-runs/d61fef96-b0d7-481b-913b-6bf81bc2ab4f Error: connect ECONNREFUSED 192.168.208.11:8000
+[WebServer]     at <unknown> (Error: connect ECONNREFUSED 192.168.208.11:8000) {
+[WebServer]   errno: -111,
+[WebServer]   code: 'ECONNREFUSED',
+[WebServer]   syscall: 'connect',
+[WebServer]   address: '192.168.208.11',
+[WebServer]   port: 8000
+[WebServer] }
+[WebServer] Error: connect ECONNREFUSED 192.168.208.11:8000
+[WebServer]     at <unknown> (Error: connect ECONNREFUSED 192.168.208.11:8000) {
+[WebServer]   errno: -111,
+[WebServer]   code: 'ECONNREFUSED',
+[WebServer]   syscall: 'connect',
+[WebServer]   address: '192.168.208.11',
+[WebServer]   port: 8000
+[WebServer] }
+[WebServer] Failed to proxy http://backend:8000/api/v1/projects/5c240412-b134-45a1-aabc-54895079a3be/eval-runs/d61fef96-b0d7-481b-913b-6bf81bc2ab4f/stream Error: connect ECONNREFUSED 192.168.208.11:8000
+[WebServer]     at <unknown> (Error: connect ECONNREFUSED 192.168.208.11:8000) {
+[WebServer]   errno: -111,
+[WebServer]   code: 'ECONNREFUSED',
+[WebServer]   syscall: 'connect',
+[WebServer]   address: '192.168.208.11',
+[WebServer]   port: 8000
+[WebServer] }
+[WebServer] Error: connect ECONNREFUSED 192.168.208.11:8000
+[WebServer]     at <unknown> (Error: connect ECONNREFUSED 192.168.208.11:8000) {
+[WebServer]   errno: -111,
+[WebServer]   code: 'ECONNREFUSED',
+[WebServer]   syscall: 'connect',
+[WebServer]   address: '192.168.208.11',
+[WebServer]   port: 8000
+[WebServer] }
+[PROBE] 2026-11-16T10:25:46.633Z backend healthy again (healthz 200)
+[PROBE] 2026-11-16T10:25:53.107Z cancelled shown 6.4 s after the click
+[PROBE] 2026-11-16T10:25:53.107Z sequence: ["streaming | Running @0.0s","reconnecting | Running @10.1s","lost | Running @42.0s","lost | Cancelled @48.4s"]
+[PROBE] 2026-11-16T10:25:53.107Z GET responses after the marker: ["500 @16.7s","500 @27.7s","500 @37.7s","200 @41.2s","200 @42.1s","200 @45.1s","200 @48.1s"]
+  ✓  1 [chromium] › tests/e2e/probe_10c1_r2_sigkill.spec.ts:16:5 › probe r2: backend SIGKILL during a waiting exam ends in lost, then GET and cancel (58.2s)
+
+  1 passed (2.6m)
+npm notice
+npm notice New major version of npm available! 11.19.1 -> 12.2.2
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.2
+npm notice To update run: npm install -g npm@12.2.2
+npm notice

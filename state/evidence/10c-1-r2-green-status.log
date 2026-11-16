@@ -1,0 +1,12 @@
+
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.12 [39m[90m/repo/frontend[39m
+
+ [32m✓[39m tests/unit/test_10c1_3_eval_stream.test.ts [2m([22m[2m12 tests[22m[2m)[22m[32m 88[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m12 passed[39m[22m[90m (12)[39m
+[2m   Start at [22m 09:20:49
+[2m   Duration [22m 768ms[2m (transform 323ms, setup 0ms, import 445ms, tests 88ms, environment 0ms)[22m
+
+TC=0
+LINT=0

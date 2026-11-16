@@ -1,0 +1,94 @@
+// PROBE (isci-c 10c-1 r2, K-10C1-0005): not part of the PR; untracked, deleted after the run, a copy
+// is kept in state/evidence/10c-1-r2-probe-sigkill-spec.ts.txt. Same shape as the reviewer's P3:
+// a live exam waits in the approval queue, the host kills the backend (SIGKILL) on the marker and
+// starts it again; the page must say `lost` soon after, then read the real status with GET.
+import { expect, test } from "@playwright/test";
+import { writeFileSync } from "node:fs";
+
+import en from "../../messages/en.json";
+import { approvalAgent } from "./agents";
+import { addItem, asAnalyst, createSuite, helloAgent, startExam } from "./eval";
+import { fixture } from "./fixtures";
+import { selectProject, signIn } from "./support";
+
+const log = (...a: unknown[]) => console.log("[PROBE]", new Date().toISOString(), ...a);
+
+test("probe r2: backend SIGKILL during a waiting exam ends in lost, then GET and cancel", async ({ page, context, baseURL }) => {
+  test.setTimeout(480_000);
+  const { alpha, analyst } = fixture();
+  const hello = await helloAgent(alpha.id, "probe-kill");
+  const { agent } = await approvalAgent(alpha.id);
+  const versions = await asAnalyst<{ items: { id: string; version: number }[] }>("GET", `/projects/${alpha.id}/agents/${agent.id}/versions`);
+  const suite = await createSuite(alpha.id, "probe-kill", { approve_tools: true });
+  await addItem(alpha.id, suite.id, hello.runId);
+  let id = "";
+  await expect(async () => {
+    id = (await startExam(alpha.id, suite.id, versions.items[0].id)).id;
+  }).toPass({ timeout: 30_000 });
+
+  await signIn(page, analyst.email);
+  await selectProject(context, baseURL!, alpha.id);
+  await page.goto(`/evaluations/runs/${id}`);
+  const state = page.getByTestId("eval-stream-state");
+  await expect(state).toHaveAttribute("data-state", "streaming");
+  await expect(page.getByTestId("eval-status")).toHaveText(/Running|Queued/);
+  // Let a few progress events arrive first.
+  await page.waitForTimeout(6_000);
+
+  const seen: string[] = [];
+  const t0 = Date.now();
+  const snap = async () => {
+    const s = await state.getAttribute("data-state").catch(() => "?");
+    const status = await page.getByTestId("eval-status").innerText().catch(() => "?");
+    const line = `${s} | ${status}`;
+    if (seen[seen.length - 1]?.split(" @")[0] !== line) seen.push(`${line} @${((Date.now() - t0) / 1000).toFixed(1)}s`);
+  };
+  const gets: string[] = [];
+  page.on("response", (r) => {
+    if (r.request().method() === "GET" && r.url().endsWith(`/eval-runs/${id}`)) gets.push(`${r.status()} @${((Date.now() - t0) / 1000).toFixed(1)}s`);
+  });
+  writeFileSync("/work/.probe-10c1-r2-marker", `${t0}\n`);
+  log("marker written; exam", id);
+
+  // Reconnecting first (K-10C1-0007): GET starts at once.
+  let reconnectingAt = 0;
+  while (Date.now() - t0 < 120_000) {
+    await snap();
+    if ((await state.getAttribute("data-state")) === "reconnecting") {
+      reconnectingAt = Date.now();
+      break;
+    }
+    await page.waitForTimeout(250);
+  }
+  log(`reconnecting after ${((reconnectingAt - t0) / 1000).toFixed(1)} s from the marker (0 = never)`);
+  expect(reconnectingAt).toBeGreaterThan(0);
+  await expect(page.getByText(en.Evaluations.exam.streamReconnectingHint)).toBeVisible();
+  // While the backend is down, GET fails (shown above the exam) and the last status read stays.
+  await page.waitForTimeout(3_000);
+  await snap();
+  log(`status while down: ${await page.getByTestId("eval-status").innerText()}; alerts=${await page.locator("[role=alert]").count()}`);
+  // Whether the stream comes back (streaming) or the reopens run out (lost) depends on how long the
+  // backend stays down; both read the real state below.
+  // The backend comes back; GET reads the real status (running), not the stale one.
+  await expect
+    .poll(async () => {
+      try {
+        return (await fetch(`${process.env.FFCORE_BACKEND_URL}/healthz`)).status;
+      } catch {
+        return 0;
+      }
+    }, { timeout: 180_000, intervals: [2000] })
+    .toBe(200);
+  log("backend healthy again (healthz 200)");
+  await expect(page.getByTestId("eval-status")).toHaveText(en.Evaluations.statuses.running, { timeout: 30_000 });
+  await snap();
+
+  // Cancel from the page: GET shows the end without a reload.
+  const c0 = Date.now();
+  await page.getByTestId("eval-cancel").click();
+  await expect(page.getByTestId("eval-status")).toHaveText(en.Evaluations.statuses.cancelled, { timeout: 60_000 });
+  await snap();
+  log(`cancelled shown ${((Date.now() - c0) / 1000).toFixed(1)} s after the click`);
+  log("sequence:", JSON.stringify(seen));
+  log("GET responses after the marker:", JSON.stringify(gets));
+});

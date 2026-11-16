@@ -1,0 +1,51 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+______________________ test_10c1_stream_headers_defaults _______________________
+
+    def test_10c1_stream_headers_defaults():
+        response = EventStreamResponse(_body())
+>       assert response.headers["cache-control"] == "no-cache, no-transform"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/unit/test_10c1_stream_headers.py:18: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = MutableHeaders({'content-type': 'text/event-stream; charset=utf-8'})
+key = 'cache-control'
+
+    def __getitem__(self, key: str) -> str:
+        get_header_key = key.lower().encode("latin-1")
+        for header_key, header_value in self._list:
+            if header_key == get_header_key:
+                return header_value.decode("latin-1")
+>       raise KeyError(key)
+E       KeyError: 'cache-control'
+
+/opt/venv/lib/python3.12/site-packages/starlette/datastructures.py:565: KeyError
+______________ test_10c1_stream_headers_extra_kept_with_defaults _______________
+
+    def test_10c1_stream_headers_extra_kept_with_defaults():
+        response = EventStreamResponse(_body(), headers={"X-Extra": "1"})
+        assert response.headers["x-extra"] == "1"
+>       assert response.headers["cache-control"] == "no-cache, no-transform"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/unit/test_10c1_stream_headers.py:26: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = MutableHeaders({'x-extra': '1', 'content-type': 'text/event-stream; charset=utf-8'})
+key = 'cache-control'
+
+    def __getitem__(self, key: str) -> str:
+        get_header_key = key.lower().encode("latin-1")
+        for header_key, header_value in self._list:
+            if header_key == get_header_key:
+                return header_value.decode("latin-1")
+>       raise KeyError(key)
+E       KeyError: 'cache-control'
+
+/opt/venv/lib/python3.12/site-packages/starlette/datastructures.py:565: KeyError
+=========================== short test summary info ============================
+FAILED tests/unit/test_10c1_stream_headers.py::test_10c1_stream_headers_defaults
+FAILED tests/unit/test_10c1_stream_headers.py::test_10c1_stream_headers_extra_kept_with_defaults
+2 failed in 6.81s

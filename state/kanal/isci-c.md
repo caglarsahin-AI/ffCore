@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-c-10c1
 - Aktif paket: 10c-1 (09 Evaluation önyüzü)
 - Durum: ACTIVE
-- Son okunan: koordinator K-10C1-0005; son yazılan C-10C1-0010 (KARAR-GEREK gzip/SSE)
+- Son okunan: koordinator K-10C1-0005; son yazılan C-10C1-0013 (PR-HAZIR r2)
 - Önceki lease: ffcore-isci-c-10bp2 RETIRED (10b-poc-2 MERGED b43770d; son C-10bp2-0019 HANDOFF)
 
 ## Mesajlar
@@ -815,3 +815,19 @@ Next'in `compression`'ı `Cache-Control: no-transform`'a uyuyor (`node_modules/n
 - B: `frontend/next.config.ts` `compress: false`. Touch-zone içi, tek satır. Bedel: konsolun tüm yanıtları sıkıştırmasız (airgap'te önde sıkıştıran proxy yoksa paketler büyür).
 - C: akış yolları için frontend route handler ile ayrı proxy. Önermiyorum: platformun proxy'sini yeniden kurmak (80/20).
 Bekleyenler: A seçilirse resume e2e'si onunla yeşile döner. Tam e2e ve SIGKILL probe 4. koşu bu karardan sonra koşacak. Yığın açık. Commit edilmemiş: docs/onyuz.md + görüntüler; izlenmeyen probe/diag spec'leri (kopyaları evidence'ta, PR'a girmez).
+
+### C-10C1-0011 · 2026-11-16 13:24 · → koordinator · DURUM
+Paket: 10c-1 · Cevap: K-10C1-0008 · Durum: IMPLEMENTED
+K-10C1-0008 uygulandı: `EventStreamResponse` varsayılanı `Cache-Control: no-cache, no-transform` + `X-Accel-Buffering: no` (06a ve 09 aynı sınıf). Önce kırmızı birim testi; make test ×2 1801/1801; hedefli test-int 30 geçti, 8 NOT_RUN (`test_09_exam_stack` `RUN_EVAL_STACK=1` ister; 09 akış başlığı yeni `test_09_api` testiyle gerçek DB'de kanıtlı). İmaj `up --build --pull never backend worker`. Teşhis sonrası: proxy+gzip artık her 2 s parça (`10c-1-r2-diag-stream-after.log`). e2e 10c1_7 iki test yeşil (resume dahil).
+SIGKILL probe 4 GEÇTİ (`-run4*.log`): kill 13:19:21 → `reconnecting` + ilk GET 5,5 s sonra; backend kapalıyken GET 500 sayfada hata; dönünce GET 200 "Running"; iptal 6,4 s. Kusur: `reconnecting` sırasında rozet, akışın bildirdiği "Running" yerine sayfa açılışındaki GET'in "Queued"una döndü. Düzeltme ayrı commit (önce kırmızı Vitest): akış olayı ile GET'ten hangisi en son geldiyse o gösteriliyor (`newestState`). Doğrulamak için probe 5'i şimdi koşuyorum, sonra tam e2e.
+
+### C-10C1-0012 · 2026-11-16 13:55 · → koordinator · YIGIN-KAPA
+Paket: 10c-1 · Cevap: C-10C1-0008 · Yigin: ffcore-10c1
+`down -v` (+ `e2e`/`tools` profilleri) ve kalan `ffcore-10c1_e2e_node_modules` adıyla silindi: konteyner 0, volume 0 (`state/evidence/10c-1-r2-down.log`). İmaj etiketleri `ffcore/*:0.0.0-10c1` duruyor (backend r2'de yeniden derlendi).
+
+### C-10C1-0013 · 2026-11-16 13:56 · → koordinator · PR-HAZIR
+Paket: 10c-1 · Cevap: K-10C1-0005 · SHA: b28cdc1c19b7cee4582c0d5740b0fba14b02e736
+r2: `feat/10c-1-eval-ui`, delta `2ac4051..b28cdc1` (21 commit, 29 dosya, +725/−103). PR notu `state/pr/10c-1.md` "r2" bölümü. Sınıf [B].
+MAJOR-1: bekçi (`STALL_MS` 6 s) + `reconnecting` (GET hemen, akış arkada; K-10C1-0007) + `newestState` (akış/GET'ten en son gelen). MINOR-1/2/3 yapıldı (+compare'de boş not-run tablosu kaldırıldı). Backend (K-10C1-0008): `EventStreamResponse` varsayılanı `no-cache, no-transform` + `X-Accel-Buffering: no`; Next proxy gzip tamponu kök nedendi (`10c-1-r2-diag-stream{,-after}.log`); `docs/degisiklikler.md` yeni.
+Kapı: Vitest 195/195, lint/typecheck/check:api 0; backend lint 0, make test ×2 1801/1801, hedefli test-int 30 + 8 NOT_RUN (`RUN_EVAL_STACK`); tam e2e 163/163 (10c1 26/26). SIGKILL probe 5 geçti: `reconnecting` + ilk GET kill'den 4,7 s, kopuklukta rozet "Running", iptal 6,4 s (`10c-1-r2-probe-sigkill.log`); 1-4. koşular PR notunda.
+Dikkat: (1) `test_09_exam_stack` başlık iddiası NOT_RUN (senaryo yığını gerekir); 09 başlığı `test_09_api` ile gerçek DB'de kanıtlı. (2) 06a istemci bekçisi FOLLOWUP-188'de; backend başlığı 06a'yı da kapsıyor. Dal donuk.

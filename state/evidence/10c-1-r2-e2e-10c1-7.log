@@ -1,0 +1,34 @@
+time="2026-11-16T13:13:57+03:00" level=warning msg="volume \"ffcore-10c1_e2e_node_modules\" already exists but was not created by Docker Compose. Use `external: true` to use an existing volume"
+ Container ffcore-10c1-postgres-1  Running
+ Container ffcore-10c1-redis-1  Running
+ Container ffcore-10c1-litellm-1  Running
+ Container ffcore-10c1-migrate-1  Created
+ Container ffcore-10c1-backend-1  Running
+ Container ffcore-10c1-postgres-1  Waiting
+ Container ffcore-10c1-postgres-1  Waiting
+ Container ffcore-10c1-postgres-1  Healthy
+ Container ffcore-10c1-postgres-1  Healthy
+ Container ffcore-10c1-migrate-1  Starting
+ Container ffcore-10c1-migrate-1  Started
+ Container ffcore-10c1-redis-1  Waiting
+ Container ffcore-10c1-litellm-1  Waiting
+ Container ffcore-10c1-migrate-1  Waiting
+ Container ffcore-10c1-postgres-1  Waiting
+ Container ffcore-10c1-postgres-1  Healthy
+ Container ffcore-10c1-redis-1  Healthy
+ Container ffcore-10c1-litellm-1  Healthy
+ Container ffcore-10c1-migrate-1  Exited
+
+Running 2 tests using 1 worker
+
+reconnecting after 7086 ms
+stream lost after 46999 ms, 6 stream requests
+  ✓  1 [chromium] › tests/e2e/test_10c1_7_stream_stall.spec.ts:30:5 › test_10c1_7_stream_stall: a silent stream reads with GET within STALL_MS, ends in lost, GET shows the real status (52.0s)
+  ✓  2 [chromium] › tests/e2e/test_10c1_7_stream_stall.spec.ts:73:5 › test_10c1_7_stream_stall: a stream that comes back ends the reconnecting phase (15.3s)
+
+  2 passed (2.6m)
+npm notice
+npm notice New major version of npm available! 11.19.1 -> 12.2.2
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.2
+npm notice To update run: npm install -g npm@12.2.2
+npm notice

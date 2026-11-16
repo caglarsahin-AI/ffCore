@@ -1,0 +1,147 @@
+time="2026-11-16T12:11:56+03:00" level=warning msg="volume \"ffcore-10c1_e2e_node_modules\" already exists but was not created by Docker Compose. Use `external: true` to use an existing volume"
+ Container ffcore-10c1-postgres-1  Running
+ Container ffcore-10c1-redis-1  Running
+ Container ffcore-10c1-litellm-1  Running
+ Container ffcore-10c1-migrate-1  Created
+ Container ffcore-10c1-backend-1  Running
+ Container ffcore-10c1-postgres-1  Waiting
+ Container ffcore-10c1-postgres-1  Waiting
+ Container ffcore-10c1-postgres-1  Healthy
+ Container ffcore-10c1-postgres-1  Healthy
+ Container ffcore-10c1-migrate-1  Starting
+ Container ffcore-10c1-migrate-1  Started
+ Container ffcore-10c1-postgres-1  Waiting
+ Container ffcore-10c1-redis-1  Waiting
+ Container ffcore-10c1-litellm-1  Waiting
+ Container ffcore-10c1-migrate-1  Waiting
+ Container ffcore-10c1-postgres-1  Healthy
+ Container ffcore-10c1-litellm-1  Healthy
+ Container ffcore-10c1-redis-1  Healthy
+ Container ffcore-10c1-migrate-1  Exited
+
+Running 1 test using 1 worker
+
+[PROBE] 2026-11-16T09:14:12.608Z marker written; exam 428548da-a60d-4b96-9556-1ae48bb8dc65
+[WebServer] Failed to proxy http://backend:8000/api/v1/projects/a16ea6d7-9026-4c55-a4cd-fe7b26b5f1ed/approvals/count?status=pending [Error: getaddrinfo EAI_AGAIN backend] {
+[WebServer]   errno: -3001,
+[WebServer]   code: 'EAI_AGAIN',
+[WebServer]   syscall: 'getaddrinfo',
+[WebServer]   hostname: 'backend'
+[WebServer] }
+[WebServer] [Error: getaddrinfo EAI_AGAIN backend] {
+[WebServer]   errno: -3001,
+[WebServer]   code: 'EAI_AGAIN',
+[WebServer]   syscall: 'getaddrinfo',
+[WebServer]   hostname: 'backend'
+[WebServer] }
+[WebServer] Failed to proxy http://backend:8000/api/v1/projects/a16ea6d7-9026-4c55-a4cd-fe7b26b5f1ed/eval-runs/428548da-a60d-4b96-9556-1ae48bb8dc65/stream Error: connect ECONNREFUSED 192.168.208.11:8000
+[WebServer]     at <unknown> (Error: connect ECONNREFUSED 192.168.208.11:8000) {
+[WebServer]   errno: -111,
+[WebServer]   code: 'ECONNREFUSED',
+[WebServer]   syscall: 'connect',
+[WebServer]   address: '192.168.208.11',
+[WebServer]   port: 8000
+[WebServer] }
+[WebServer] Error: connect ECONNREFUSED 192.168.208.11:8000
+[WebServer]     at <unknown> (Error: connect ECONNREFUSED 192.168.208.11:8000) {
+[WebServer]   errno: -111,
+[WebServer]   code: 'ECONNREFUSED',
+[WebServer]   syscall: 'connect',
+[WebServer]   address: '192.168.208.11',
+[WebServer]   port: 8000
+[WebServer] }
+[PROBE] 2026-11-16T09:14:46.852Z lost after 34.3 s from the marker (0 = never)
+[PROBE] 2026-11-16T09:14:46.889Z backend healthy again
+[WebServer] Failed to proxy http://backend:8000/api/v1/projects/a16ea6d7-9026-4c55-a4cd-fe7b26b5f1ed/eval-runs/428548da-a60d-4b96-9556-1ae48bb8dc65/cancel Error: connect ECONNREFUSED 192.168.208.11:8000
+[WebServer]     at <unknown> (Error: connect ECONNREFUSED 192.168.208.11:8000) {
+[WebServer]   errno: -111,
+[WebServer]   code: 'ECONNREFUSED',
+[WebServer]   syscall: 'connect',
+[WebServer]   address: '192.168.208.11',
+[WebServer]   port: 8000
+[WebServer] }
+[WebServer] Error: connect ECONNREFUSED 192.168.208.11:8000
+[WebServer]     at <unknown> (Error: connect ECONNREFUSED 192.168.208.11:8000) {
+[WebServer]   errno: -111,
+[WebServer]   code: 'ECONNREFUSED',
+[WebServer]   syscall: 'connect',
+[WebServer]   address: '192.168.208.11',
+[WebServer]   port: 8000
+[WebServer] }
+[WebServer] Failed to proxy http://backend:8000/api/v1/projects/a16ea6d7-9026-4c55-a4cd-fe7b26b5f1ed/approvals/count?status=pending Error: connect ECONNREFUSED 192.168.208.11:8000
+[WebServer]     at <unknown> (Error: connect ECONNREFUSED 192.168.208.11:8000) {
+[WebServer]   errno: -111,
+[WebServer]   code: 'ECONNREFUSED',
+[WebServer]   syscall: 'connect',
+[WebServer]   address: '192.168.208.11',
+[WebServer]   port: 8000
+[WebServer] }
+[WebServer] Error: connect ECONNREFUSED 192.168.208.11:8000
+[WebServer]     at <unknown> (Error: connect ECONNREFUSED 192.168.208.11:8000) {
+[WebServer]   errno: -111,
+[WebServer]   code: 'ECONNREFUSED',
+[WebServer]   syscall: 'connect',
+[WebServer]   address: '192.168.208.11',
+[WebServer]   port: 8000
+[WebServer] }
+[WebServer] Failed to proxy http://backend:8000/api/v1/projects/a16ea6d7-9026-4c55-a4cd-fe7b26b5f1ed/eval-runs/428548da-a60d-4b96-9556-1ae48bb8dc65 Error: connect ECONNREFUSED 192.168.208.11:8000
+[WebServer]     at <unknown> (Error: connect ECONNREFUSED 192.168.208.11:8000) {
+[WebServer]   errno: -111,
+[WebServer]   code: 'ECONNREFUSED',
+[WebServer]   syscall: 'connect',
+[WebServer]   address: '192.168.208.11',
+[WebServer]   port: 8000
+[WebServer] }
+[WebServer] Error: connect ECONNREFUSED 192.168.208.11:8000
+[WebServer]     at <unknown> (Error: connect ECONNREFUSED 192.168.208.11:8000) {
+[WebServer]   errno: -111,
+[WebServer]   code: 'ECONNREFUSED',
+[WebServer]   syscall: 'connect',
+[WebServer]   address: '192.168.208.11',
+[WebServer]   port: 8000
+[WebServer] }
+  ✘  1 [chromium] › tests/e2e/probe_10c1_r2_sigkill.spec.ts:16:5 › probe r2: backend SIGKILL during a waiting exam ends in lost, then GET and cancel (1.7m)
+
+
+  1) [chromium] › tests/e2e/probe_10c1_r2_sigkill.spec.ts:16:5 › probe r2: backend SIGKILL during a waiting exam ends in lost, then GET and cancel 
+
+    Error: expect(locator).toHaveText(expected) failed
+
+    Locator:  getByTestId('eval-status')
+    Expected: "Cancelled"
+    Received: "Running"
+    Timeout:  60000ms
+
+    Call log:
+      - Expect "toHaveText" getByTestId('eval-status') with timeout 60000ms
+      - waiting for getByTestId('eval-status')
+        116 × locator resolved to <span data-slot="badge" data-variant="secondary" data-testid="eval-status" class="group/badge inline-flex h-5 w-fit shrink-0 items-center justify-center gap-1 overflow-hidden rounded-4xl border border-transparent px-2 py-0.5 text-xs font-medium whitespace-nowrap transition-all focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-inv…>Running</span>
+            - unexpected value "Running"
+
+
+      78 |   const c0 = Date.now();
+      79 |   await page.getByTestId("eval-cancel").click();
+    > 80 |   await expect(page.getByTestId("eval-status")).toHaveText(en.Evaluations.statuses.cancelled, { timeout: 60_000 });
+         |                                                 ^
+      81 |   await snap();
+      82 |   log(`cancelled shown ${((Date.now() - c0) / 1000).toFixed(1)} s after the click`);
+      83 |   log("sequence:", JSON.stringify(seen));
+        at /work/frontend/tests/e2e/probe_10c1_r2_sigkill.spec.ts:80:49
+
+    Error Context: test-results/probe_10c1_r2_sigkill-prob-d0fbf-in-lost-then-GET-and-cancel-chromium/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/probe_10c1_r2_sigkill-prob-d0fbf-in-lost-then-GET-and-cancel-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/probe_10c1_r2_sigkill-prob-d0fbf-in-lost-then-GET-and-cancel-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [chromium] › tests/e2e/probe_10c1_r2_sigkill.spec.ts:16:5 › probe r2: backend SIGKILL during a waiting exam ends in lost, then GET and cancel 
+npm notice
+npm notice New major version of npm available! 11.19.1 -> 12.2.2
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.2
+npm notice To update run: npm install -g npm@12.2.2
+npm notice

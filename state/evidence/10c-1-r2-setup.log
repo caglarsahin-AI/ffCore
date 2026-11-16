@@ -1,0 +1,9 @@
+2026-11-16 09:04:15,008 WARNING langfuse Prompt 'eval_judge_rubric_v2-label:production' not found during refresh, evicting from cache.
+2026-11-16 09:04:16,169 WARNING langfuse Prompt 'platform_rules-label:production' not found during refresh, evicting from cache.
+prompts created: ['eval_judge_rubric_v2', 'platform_rules']
+prompts already present: -
+                            {create-superadmin,load-model-catalog,seed-models,render-litellm,reindex,seed-prompts,seed-sql-demo,seed-sql-context,seed-eval,setup-checkpointer,ingest-raw}
+                            ...
+python -m ffcore.cli: error: unrecognized arguments: dummy-not-secret-e2e-pw
+529
+superadmin created: d4833292-7e90-4e28-8c57-16226a6e8dc5

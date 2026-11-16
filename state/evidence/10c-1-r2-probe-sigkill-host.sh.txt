@@ -1,0 +1,21 @@
+#!/bin/sh
+# Host side of the r2 SIGKILL probe: wait for the marker, SIGKILL the backend, start it after 25 s.
+W=/c/ai_paycore/ffcore/.worktrees/feat/10c-1-eval-ui
+LOG=/c/ai_paycore/ffcore/state/evidence/10c-1-r2-probe-sigkill-host.log
+: > $LOG
+rm -f $W/.probe-10c1-r2-marker $W/deploy/.probe-10c1-r2-marker
+i=0
+while [ ! -f $W/.probe-10c1-r2-marker ] && [ ! -f $W/deploy/.probe-10c1-r2-marker ]; do
+  i=$((i+1)); [ $i -gt 1200 ] && { echo "no marker in 20 min" >> $LOG; exit 1; }
+  sleep 1
+done
+echo "marker seen $(date +%H:%M:%S)" >> $LOG
+sleep 2
+docker kill ffcore-10c1-backend-1 >> $LOG 2>&1
+echo "killed (SIGKILL) $(date +%H:%M:%S)" >> $LOG
+sleep 25
+docker start ffcore-10c1-backend-1 >> $LOG 2>&1
+echo "started $(date +%H:%M:%S) exit=$?" >> $LOG
+until [ "$(docker inspect -f '{{.State.Health.Status}}' ffcore-10c1-backend-1 2>/dev/null)" = healthy ]; do sleep 1; done
+echo "backend healthy $(date +%H:%M:%S)" >> $LOG
+rm -f $W/.probe-10c1-r2-marker $W/deploy/.probe-10c1-r2-marker
