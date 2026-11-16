@@ -62,12 +62,13 @@ def context_invalid(message: str) -> ApiError:
     return ApiError(400, "invalid_request_error", "context_configuration_invalid", message)
 
 
-async def _agent(session, project_id: UUID, agent_id: UUID) -> Agent:
-    agent = await session.scalar(
-        select(Agent).where(
-            Agent.id == agent_id, Agent.project_id == project_id, Agent.deleted_at.is_(None)
-        )
+async def _agent(session, project_id: UUID, agent_id: UUID, *, lock: bool = False) -> Agent:
+    """`lock` (09-2 r2 MINOR-5, additive): the agent row FOR UPDATE, so a publish and a draft
+    edit of the same agent run one after the other (the gate checks what is published)."""
+    query = select(Agent).where(
+        Agent.id == agent_id, Agent.project_id == project_id, Agent.deleted_at.is_(None)
     )
+    agent = await session.scalar(query.with_for_update() if lock else query)
     if agent is None:
         raise not_found("agent")
     return agent
@@ -350,13 +351,18 @@ async def update_version(
 ):
     """Replace a draft's definition. A published version is never edited (409). A definition
     whose context_tokens exceed the model's context window or OLLAMA_CONTEXT_LENGTH is 400
-    `context_configuration_invalid` (C13)."""
-    agent = _native(await _agent(session, project_id, agent_id))
+    `context_configuration_invalid` (C13). A changed definition ends the version's queued and
+    running exams `failed(definition_changed)` in the same transaction (09-2 r2 MINOR-1)."""
+    from ffcore.evaluation.runner import end_exams_of_edited_version
+
+    agent = _native(await _agent(session, project_id, agent_id, lock=True))
     row = await _version(session, agent, version)
     if row.published_at is not None:
         raise conflict("version_published", "A published version cannot be edited.")
     await check_context(session, project_id, body.definition, settings)
-    row.definition = body.definition.model_dump(mode="json")
+    definition = body.definition.model_dump(mode="json")
+    await end_exams_of_edited_version(session, row, definition)
+    row.definition = definition
     await session.flush()
     await session.refresh(row)
     return version_out(row)
@@ -382,12 +388,74 @@ async def publish_agent(
     session: SessionDep,
     settings: SettingsDep,
 ):
-    """Publish a version: runs without an explicit version use it. The exam gate (09) is a flag
-    until 09 lands."""
-    agent = _native(await _agent(session, project_id, agent_id))
+    """Publish a version: runs without an explicit version use it. The exam gate (09-2): every
+    live suite bound to the agent needs a latest completed exam of this version that passed,
+    is complete, has nothing not run and examined the version and the suite as they are now
+    (r1 MAJOR-1: `stale_exam`, `stale_suite`); otherwise 409 `eval_gate_failed` naming each
+    suite as `<key>=<reason>`. An admin may pass `force` with a `force_reason` (audited). The
+    version keeps the exam that opened the gate (`eval_run_id`; r1 MINOR-2)."""
+    from ffcore.evaluation.gate import check_gate
+
+    if body.force_reason is not None and not body.force:
+        raise ApiError(
+            422, "invalid_request_error", "force_reason_without_force", "force_reason needs force."
+        )
+    agent = _native(await _agent(session, project_id, agent_id, lock=True))  # r2 MINOR-5
     row = await _version(session, agent, body.version)
+    definition = parse_definition(row.definition)
     # The model may have changed since the draft was saved: checked again (C13).
-    await check_context(session, project_id, parse_definition(row.definition), settings)
+    await check_context(session, project_id, definition, settings)
+    gate = await check_gate(session, project_id, agent.id, row, definition)
+    failures = gate.failures
+    if failures and not body.force:
+        listed = ", ".join(f"{f.key}={f.reason}" for f in failures)
+        raise ApiError(
+            409,
+            "conflict_error",
+            "eval_gate_failed",
+            f"The exam gate refuses version {row.version}: {listed}.",
+        )
+    if body.force:
+        grant = request.state.grant
+        if grant.role != "admin" and not grant.is_superadmin:
+            raise ApiError(
+                403, "permission_error", "force_requires_admin", "Only an admin forces the gate."
+            )
+        reason = (body.force_reason or "").strip()  # r1 MINOR-1: blank is no reason
+        if not reason:
+            raise ApiError(
+                422,
+                "invalid_request_error",
+                "force_reason_required",
+                "Forcing the exam gate needs a force_reason.",
+            )
+        if failures:
+            request_id, ip = request_context(request)
+            await write_event(
+                session,
+                AuditEntry(
+                    action="eval_gate_forced",
+                    resource_type="agent",
+                    outcome="success",
+                    actor_type=actor.actor_type,
+                    actor_id=actor.actor_id,
+                    project_id=str(project_id),
+                    resource_id=str(agent.id),
+                    before=None,
+                    after={
+                        "agent_id": str(agent.id),
+                        "version": row.version,
+                        "reason": reason,
+                        "suites": [f.public() for f in failures],
+                    },
+                    request_id=request_id,
+                    ip=ip,
+                    via_key_id=getattr(actor, "via_key_id", None),  # r1 MINOR-3
+                ),
+            )
+    # r1 MINOR-2: the exam that opened the gate (with several suites the latest that passed);
+    # none when the gate was forced or the agent has no bound suite.
+    row.eval_run_id = gate.passed[0].id if gate.passed and not failures else None
     await _point_at(session, agent, row)
     return await agent_out(session, agent)
 

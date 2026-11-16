@@ -143,3 +143,92 @@ def test_09_r5_start_plan_longer_than_a_tick_is_422_over_http(
         app.dependency_overrides.pop(langfuse_dependency, None)
     assert r.status_code == 422, r.text
     assert r.json()["error"]["code"] == "eval_plan_exceeds_tick"
+
+
+def _scored_exam(pg, project, suite_id, version_id, passed: dict):
+    """A completed exam whose item results are given as {item_id: passed}."""
+    ev_id = uuid.uuid4()
+    plan = {
+        i: {
+            "item": {"id": i, "input": {"message": i, "variables": {}},
+                     "expectedOutput": {"must_contain": ["x"]},
+                     "metadata": {"style": "dogrudan", "answerable": True}},
+            "runs": ["r"],
+            "scored": True,
+            "result": {"runs": [{"run_id": "r", "outcome": "answered", "passed": ok, "note": "",
+                                  "scores": [{"name": "contains", "value": 1.0 if ok else 0.0,
+                                              "passed": ok, "status": "ok", "comment": ""}]}]},
+        }
+        for i, ok in passed.items()
+    }  # fmt: skip
+    pg.execute(
+        "INSERT INTO eval_runs (id, project_id, suite_id, agent_version_id, user_id,"
+        " langfuse_run_name, status, item_runs, summary, config, created_by)"
+        " VALUES (%s, %s, %s, %s, %s, 'exam-x', 'completed', %s, %s, %s, 't')",
+        (ev_id, project, suite_id, version_id, uuid.uuid4(), json.dumps(plan),
+         json.dumps({"n": len(passed), "complete": True, "pass_rate": 0.5, "scored": len(passed)}),
+         json.dumps({"scorers": [{"name": "contains"}], "pass_threshold": 0.8, "repeat": 1,
+                     "approve_tools": False})),
+    )  # fmt: skip
+    return ev_id
+
+
+def test_09_2_compare_over_http_and_read_mode(pg, member, project):
+    suite_id, _ = _suite_and_run(pg, project)
+    version_id = pg.execute(
+        "SELECT agent_version_id FROM eval_runs WHERE suite_id = %s", (suite_id,)
+    ).fetchone()[0]
+    a = _scored_exam(pg, project, suite_id, version_id, {"q1": True, "q2": False})
+    b = _scored_exam(pg, project, suite_id, version_id, {"q1": False, "q2": True})
+    edit, read = member("analyst", "edit"), member("analyst", "read")
+    r = read.get(f"{P.format(project)}/eval-runs/compare?a={a}&b={b}")
+    assert r.status_code == 200, r.text
+    # 09-2 r1 MAJOR-2: the route is out of the 03a scan (it needs two exams); parity is here.
+    assert edit.get(f"{P.format(project)}/eval-runs/compare?a={a}&b={b}").content == r.content
+    body = r.json()
+    assert {i["item_id"]: i["change"] for i in body["items"]} == {"q1": "regressed", "q2": "fixed"}
+    assert body["worst"][0]["item_id"] == "q1" and body["complete"] == {"a": True, "b": True}
+
+
+def test_09_2_r1_major2_bare_compare_is_the_same_422_in_both_modes(member, project):
+    # KARARLAR "09-2 r1 kararları" MAJOR-2 A: two required parameters; a call without them is
+    # a 422 in either mode, the same body (no empty 200: fail-loud).
+    url = f"{P.format(project)}/eval-runs/compare"
+    edit, read = member("analyst", "edit").get(url), member("analyst", "read").get(url)
+    assert edit.status_code == 422, edit.text
+    assert (read.status_code, read.content) == (edit.status_code, edit.content)
+
+
+def test_09_2_compare_other_suite_is_422(pg, member, project):
+    suite_a, _ = _suite_and_run(pg, project)
+    version_id = pg.execute(
+        "SELECT agent_version_id FROM eval_runs WHERE suite_id = %s", (suite_a,)
+    ).fetchone()[0]
+    suite_b = uuid.uuid4()
+    pg.execute(
+        "INSERT INTO eval_suites (id, project_id, key, name, langfuse_dataset_name, scorers,"
+        " pass_threshold, created_by) VALUES (%s, %s, 'other', 'O', 'p.other', %s, 0.8, 't')",
+        (suite_b, project, json.dumps([{"name": "contains"}])),
+    )
+    a = _scored_exam(pg, project, suite_a, version_id, {"q1": True})
+    b = _scored_exam(pg, project, suite_b, version_id, {"q1": True})
+    r = member("analyst").get(f"{P.format(project)}/eval-runs/compare?a={a}&b={b}")
+    assert r.status_code == 422 and r.json()["error"]["code"] == "eval_runs_not_comparable"
+
+
+def test_09_2_r3n11_patch_checks_scorers_and_delete_audits_the_suite(pg, member, project):
+    # FOLLOWUP-176 (r3 NOTE-11): r1 MINOR-7 had no HTTP test.
+    from tests.integration.conftest import audit_rows
+
+    suite_id, _ = _suite_and_run(pg, project)
+    client = member("analyst")
+    base = f"{P.format(project)}/eval-suites/{suite_id}"
+    bad = client.patch(base, json={"scorers": [{"name": "no_such_scorer"}]})
+    assert bad.status_code == 422
+    assert client.patch(base, json={"pass_threshold": None}).status_code == 422
+    assert client.delete(base).status_code == 204
+    rows = pg.execute(
+        "SELECT resource_id FROM audit_events WHERE action = %s AND project_id = %s",
+        ("delete_eval_suite", project),
+    ).fetchall()
+    assert [r[0] for r in rows] == [str(suite_id)], audit_rows

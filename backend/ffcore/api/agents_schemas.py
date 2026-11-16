@@ -68,7 +68,10 @@ class VersionOut(BaseModel):
     created_by: str = Field(description="Actor id that created the version.")
     created_at: datetime
     published_at: datetime | None
-    eval_run_id: UUID | None = Field(description="Exam run that gated publishing (09); null.")
+    eval_run_id: UUID | None = Field(
+        description="The exam that opened the publish gate (09-2); null when the gate was forced "
+        "or the agent has no bound suite."
+    )
 
 
 class VersionList(BaseModel):
@@ -87,6 +90,12 @@ class VersionCreate(Strict):
 
 class PublishRequest(Strict):
     version: int = Field(ge=1)
+    # 09-2 exam gate (additive): an admin may publish past a failed gate, with a reason that is
+    # audited (`eval_gate_forced`).
+    force: bool = Field(default=False, description="Admin only: publish past the exam gate.")
+    force_reason: str | None = Field(
+        default=None, min_length=1, max_length=500, description="Required with force; audited."
+    )
 
 
 class RollbackRequest(Strict):

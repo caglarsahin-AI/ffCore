@@ -61,7 +61,9 @@ class ToolOutcome:
     total_chars: int
     is_error: bool
     latency_ms: int
-    # The closed code of a call that produced no result (05a ToolCallError), else None.
+    # The closed code of a call that produced no result (05a ToolCallError), or of an mcp-sql
+    # refusal or database error returned as a tool error (`sql_rejected`, `sql_error`; 09-1 r2
+    # MAJOR-r2-3), else None.
     error_code: str | None = None
 
 

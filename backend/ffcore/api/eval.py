@@ -17,18 +17,29 @@ from sqlalchemy import func, select
 
 from ffcore.api.common import ERROR_RESPONSES, SessionDep, conflict, invalid, not_found
 from ffcore.api.eval_schemas import (
+    CompareOut,
     EvalRunList,
     EvalRunOut,
+    FromRunItem,
+    FromRunOut,
     SuiteCreate,
     SuiteList,
     SuiteOut,
     SuiteUpdate,
 )
+from ffcore.api.schemas import ErrorBody
 from ffcore.core import db
-from ffcore.core.audit import audited, request_context
+from ffcore.core.audit import (
+    AuditEntry,
+    audited,
+    request_context,
+    write_event,
+    write_event_detached,
+)
 from ffcore.core.auth import Actor, require_role
 from ffcore.core.config import Settings, get_settings
 from ffcore.core.errors import ApiError
+from ffcore.evaluation.compare import CompareError, compare
 from ffcore.evaluation.langfuse_api import LangfuseApi, LangfuseApiError
 from ffcore.evaluation.runner import Starter, start_eval
 from ffcore.models.agents import Agent, AgentVersion
@@ -346,6 +357,105 @@ async def start_eval_run(
     return run_out(ev)
 
 
+@router.post(
+    "/eval-suites/{suite_id}/items/from-run/{run_id}",
+    response_model=FromRunOut,
+    status_code=status.HTTP_201_CREATED,
+    responses={  # 09-2 r1 MINOR-10
+        502: {"model": ErrorBody, "description": "The Langfuse call failed."},
+        503: {
+            "model": ErrorBody,
+            "description": "The NER the egress policy needs is unavailable (`ner_unavailable`) "
+            "or not configured (`ner_not_configured`, `model_missing`, ...), or Langfuse is "
+            "not configured.",
+        },
+    },
+)
+async def item_from_run(
+    project_id: UUID,
+    suite_id: UUID,
+    run_id: UUID,
+    body: FromRunItem,
+    request: Request,
+    actor: Editor,
+    session: SessionDep,
+    langfuse: LangfuseDep,
+):
+    """Save a run's question as an item of the suite's dataset with the expected answer given
+    here (09-2). The question, its variables and the expected output are masked by the agent
+    version's egress policy first (`masking` says how); a blocked text is 422
+    `run_input_blocked`, a policy error a coded 422, the NER 503. The run is read as the run API
+    reads it. Audited once (`eval_item_from_run`), without content; a refusal too, with its
+    code (r1 MINOR-5)."""
+    from ffcore.api.runs import _readable_run
+    from ffcore.evaluation import from_run
+
+    suite = await _suite(session, project_id, suite_id)
+    run = await _readable_run(session, request, actor, project_id, run_id)
+    if run.status != "completed":
+        raise conflict("run_not_completed", f"The run is {run.status}, not completed.")
+    version = await session.get(AgentVersion, run.agent_version_id)
+    item = from_run.item_id(suite.key, run.id)
+    request_id, ip = request_context(request)
+    # Read before anything can roll back: a rollback expires the loaded rows.
+    suite_ref, run_ref, dataset = str(suite.id), str(run.id), suite.langfuse_dataset_name
+
+    def entry(outcome: str, after: dict) -> AuditEntry:
+        return AuditEntry(
+            action="eval_item_from_run",
+            resource_type="eval_suite",
+            outcome=outcome,
+            actor_type=actor.actor_type,
+            actor_id=actor.actor_id,
+            project_id=str(project_id),
+            resource_id=suite_ref,
+            before=None,
+            after={"suite_id": suite_ref, "run_id": run_ref, **after},
+            request_id=request_id,
+            ip=ip,
+            via_key_id=getattr(actor, "via_key_id", None),
+        )
+
+    try:
+        masked, expected, masking, masked_fields = await from_run.masked_item(
+            session,
+            project_id,
+            version,
+            run.input,
+            run.variables,
+            body.expected.model_dump(exclude_none=True),
+        )
+        try:
+            await langfuse.upsert_item(
+                suite.langfuse_dataset_name,
+                item,
+                input=masked,
+                expected_output=expected,
+                metadata={
+                    "style": body.style,
+                    "answerable": body.answerable,
+                    "source": "from_run",
+                    "run_id": str(run.id),
+                },  # fmt: skip
+            )
+        except LangfuseApiError as exc:
+            raise langfuse_failed(exc) from None
+    except ApiError as exc:
+        # r1 MINOR-5: a refusal leaves a trace, its code only. A blocked text keeps the
+        # guardrail events that blocked it; anything else saves nothing.
+        if exc.code == "run_input_blocked":
+            await session.commit()
+        else:
+            await session.rollback()
+        await write_event_detached(entry("error", {"error_code": exc.code}))
+        raise
+    await write_event(session, entry("success", {"item_id": item}))
+    await session.commit()
+    return FromRunOut(
+        item_id=item, dataset=dataset, run_id=run_ref, masking=masking, masked_fields=masked_fields
+    )
+
+
 @router.get("/eval-suites/{suite_id}/runs", response_model=EvalRunList)
 async def list_eval_runs(project_id: UUID, suite_id: UUID, actor: Reader, session: SessionDep):
     await _suite(session, project_id, suite_id)
@@ -355,6 +465,29 @@ async def list_eval_runs(project_id: UUID, suite_id: UUID, actor: Reader, sessio
         .order_by(EvalRun.created_at.desc())
     )
     return EvalRunList(items=[run_out(r) for r in rows])
+
+
+@router.get("/eval-runs/compare", response_model=CompareOut)
+async def compare_eval_runs(
+    project_id: UUID,
+    actor: Reader,
+    session: SessionDep,
+    a: Annotated[UUID, Query(description="The exam compared against (earlier).")],
+    b: Annotated[UUID, Query(description="The exam compared (later).")],
+):
+    """Item by item difference of two completed exams of one suite (09-2), read from FFCore's
+    own results; not-run items are `not_comparable`. Declared before `/eval-runs/{id}`."""
+    first = await _eval_run(session, project_id, a)
+    second = await _eval_run(session, project_id, b)
+    try:
+        return compare(first, second)
+    except CompareError as exc:
+        raise ApiError(
+            422,
+            "invalid_request_error",
+            "eval_runs_not_comparable",
+            f"The two exams cannot be compared ({exc.reason}).",
+        ) from None
 
 
 @router.get("/eval-runs/{eval_run_id}", response_model=EvalRunOut)

@@ -57,7 +57,7 @@ from ffcore.runtime import events as run_events
 from ffcore.runtime.contracts import JobClass
 from ffcore.runtime.definition import parse_definition
 from ffcore.runtime.scheduler import BackgroundWindow
-from ffcore.services.mcp_sql import SQL_ERROR_PREFIXES
+from ffcore.services import mcp_sql
 
 log = logging.getLogger("ffcore.evaluation")
 
@@ -159,7 +159,9 @@ async def listen_loop(settings: Settings, redis) -> None:
         await asyncio.sleep(settings.eval_advance_interval_s)
 
 
-def tick_budget(settings: Settings, deadline: float | None = None) -> Budget:
+def tick_budget(
+    settings: Settings, deadline: float | None = None, *, first_in_tick: bool = False
+) -> Budget:
     """One tick's budget for an exam: judge calls (EVAL_JUDGE_CALLS_PER_TICK), the tick's
     deadline (TICK_BUDGET_S after its start, shared by the tick's exams), the background window
     (the judge is a background model call), the planned length of a judge call
@@ -172,11 +174,12 @@ def tick_budget(settings: Settings, deadline: float | None = None) -> Budget:
     )
     return Budget(
         settings.eval_judge_calls_per_tick,
-        deadline=deadline or time.monotonic() + TICK_BUDGET_S,
+        deadline=time.monotonic() + TICK_BUDGET_S if deadline is None else deadline,
         call_s=float(settings.eval_judge_call_s),
         is_open=window.is_open,
         total_s=float(TICK_PLAN_S),
         hard_s=float(settings.llm_call_timeout_s),
+        first_in_tick=first_in_tick,
     )
 
 
@@ -193,11 +196,20 @@ async def tick(settings: Settings, redis, slots, prompts, *, queue=None) -> None
         async with exam_lock(redis, ev_id) as held:
             if not held:
                 continue
-            if not checked:
+            first = not checked
+            if first:
                 checked = True
                 _check_overhead(deadline)
             await _advance_one(
-                settings, redis, slots, prompts, api, ev_id, queue, deadline=deadline
+                settings,
+                redis,
+                slots,
+                prompts,
+                api,
+                ev_id,
+                queue,
+                deadline=deadline,
+                first_in_tick=first,
             )
 
 
@@ -211,9 +223,18 @@ def _check_overhead(deadline: float) -> None:
 
 
 async def _advance_one(
-    settings, redis, slots, prompts, api, ev_id, queue, *, deadline: float | None = None
+    settings,
+    redis,
+    slots,
+    prompts,
+    api,
+    ev_id,
+    queue,
+    *,
+    deadline: float | None = None,
+    first_in_tick: bool = False,
 ) -> None:
-    budget = tick_budget(settings, deadline)
+    budget = tick_budget(settings, deadline, first_in_tick=first_in_tick)
     async with db.session_scope() as session:
         ev = await session.get(EvalRun, ev_id)
         if ev is None or ev.status not in ACTIVE:
@@ -221,7 +242,12 @@ async def _advance_one(
         try:
             if ev.status == "queued" and ev.cancel_requested_at is None:
                 await start_items(
-                    session, settings, ev, queue=queue or _queue(settings), queued_event=_queued()
+                    session,
+                    settings,
+                    ev,
+                    queue=queue or _queue(settings),
+                    queued_event=_queued(),
+                    close=_closer(settings),
                 )
                 budget.committed += 1  # the item runs started and were committed
             else:
@@ -274,7 +300,7 @@ async def _count_failure(redis, ev_id, exc: BaseException) -> None:
         ev = await session.get(EvalRun, ev_id)
         if ev is not None and ev.status in ACTIVE:
             ev.status = "failed"
-            ev.error_code = f"advance_failed:{type(exc).__name__}"
+            ev.error_code = f"advance_failed:{getattr(exc, 'advance_code', type(exc).__name__)}"
             ev.ended_at = now_utc()
             await session.commit()
     await redis.delete(key)
@@ -371,6 +397,8 @@ def _judge(settings, session, redis, slots, prompts):
                 model=model,
                 pass_min=int(cfg.get("pass_min", 4)),
             )
+        except judge_mod.NerMisconfigured:
+            raise  # FOLLOWUP-176 (r4 NOTE-3): a configuration error fails the tick, loudly
         except Exception as exc:  # model, quota or prompt failure: a coded item error
             code = getattr(exc, "code", None) or type(exc).__name__
             return Score("llm_judge", None, None, f"judge_failed:{code}", "error"), ""
@@ -460,11 +488,11 @@ def _sql(settings, session):
             await audit(run, tool_key, failed=True, error_code=exc.code)
             return None, "sql_reread_failed"
         text = result.text or ""
-        refused = next((p for p in SQL_ERROR_PREFIXES if text.startswith(p)), None)
+        refused = mcp_sql.error_code(text)  # r3 NOTE-10: one place knows the prefixes
         failed = result.is_error or refused is not None
-        await audit(run, tool_key, failed=failed, error_code=refused and refused.rstrip(":"))
+        await audit(run, tool_key, failed=failed, error_code=refused)
         if refused is not None:
-            return None, f"no_sql_result:{refused.rstrip(':')}"
+            return None, f"no_sql_result:{refused}"
         if result.is_error:
             return None, "no_sql_result:tool_error"
         rows = parse_csv_rows(text)

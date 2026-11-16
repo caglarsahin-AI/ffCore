@@ -101,7 +101,16 @@ class NerConfigError(GuardrailConfigError):
 
 class NerUnavailable(RuntimeError):
     """The internal NER endpoint did not answer usably. The engine raises it as
-    `NerEgressUnavailable` at egress (enforce) and follows `on_error` in the text stages."""
+    `NerEgressUnavailable` at egress (enforce) and follows `on_error` in the text stages.
+
+    Additive (09-2 r1 MINOR-6/7): `status` is the API's HTTP status (None: no answer at all)
+    and `code` the API's error code (`ner_not_configured`, `model_missing`, ...) or
+    `ner_model_mismatch`, so a caller tells configuration from an outage without reading the
+    message."""
+
+    def __init__(self, message: str, *, status: int | None = None, code: str | None = None):
+        super().__init__(message)
+        self.status, self.code = status, code
 
 
 class NerClient(Protocol):
@@ -276,12 +285,18 @@ class HttpNer:
             # the message names scheme and host only.
             raise NerUnavailable(f"internal ner unreachable: {exc}") from None
         if response.status_code != 200:
-            raise NerUnavailable(f"internal ner failed: {response.status_code}")
+            raise NerUnavailable(
+                f"internal ner failed: {response.status_code}",
+                status=response.status_code,
+                code=_error_code(response),
+            )
         body = response.json()
         if (body.get("model"), body.get("revision")) != (self.model, self.revision):
             raise NerUnavailable(
                 f"API runs NER {body.get('model')}@{body.get('revision')}, "
-                f"worker expects {self.model}@{self.revision}"
+                f"worker expects {self.model}@{self.revision}",
+                status=response.status_code,
+                code="ner_model_mismatch",
             )
         out = []
         for hit in body["findings"]:
@@ -290,6 +305,16 @@ class HttpNer:
                 raise NerUnavailable("internal ner returned a span outside the text")
             out.append((hit["category"], start, end, float(hit["score"]), hit["evidence"]))
         return out
+
+
+def _error_code(response) -> str | None:
+    """The FFCore error code of a refused NER call (`{"error": {"code": ...}}`), else None."""
+    try:
+        error = response.json().get("error")
+    except Exception:  # noqa: BLE001 - a body that is not FFCore's JSON has no code
+        return None
+    code = error.get("code") if isinstance(error, dict) else None
+    return code if isinstance(code, str) else None
 
 
 def windows(text: str, size: int = NER_TEXT_MAX_CHARS, overlap: int = NER_WINDOW_OVERLAP_CHARS):

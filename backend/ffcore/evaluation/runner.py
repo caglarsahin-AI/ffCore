@@ -34,6 +34,7 @@ from ffcore.evaluation.engine import (
     now_utc,
     summarize,
 )
+from ffcore.evaluation.gate import definition_sha256
 from ffcore.evaluation.langfuse_api import LangfuseApi, LangfuseApiError
 from ffcore.evaluation.scorers import Score
 from ffcore.evaluation.ticks import TICK_PLAN_S
@@ -91,6 +92,9 @@ class Budget:
     # The hard limit of one model call (LLM_CALL_TIMEOUT_S): a cut counts only after a full
     # window, min(hard_s x calls, total_s) (r5 MINOR-r5-1, K-09-0034). None: every cut counts.
     hard_s: float | None = None
+    # FOLLOWUP-176 C: this exam is the first a tick advances; its first item ran with nobody
+    # before it, so its cut counts whatever the window (no tick-overhead blind spot).
+    first_in_tick: bool = False
     started: int = 0
     committed: int = 0
 
@@ -124,6 +128,8 @@ class Budget:
     def counts_cut(self, calls: int, window: float | None) -> bool:
         """Whether a cut of an item that started with `window` seconds counts (r5 MINOR-r5-1).
         A cut in a partial window (an earlier exam used the tick) is not the item's fault."""
+        if self.first_in_tick and self.started == 1:
+            return True
         need = self.full_window(calls)
         return need is None or window is None or window >= need
 
@@ -141,10 +147,12 @@ def run_name(suite: EvalSuite, version: AgentVersion) -> str:
     return f"{suite.key}-v{version.version}-{uuid.uuid4().hex[:8]}"
 
 
-def snapshot(suite: EvalSuite, starter: Starter) -> dict[str, Any]:
-    """The suite as the exam starts (r1 MAJOR-4) and who started it (the advancer starts the
-    item runs for this user and audits them with this request)."""
+def snapshot(suite: EvalSuite, starter: Starter, version: AgentVersion) -> dict[str, Any]:
+    """The suite as the exam starts (r1 MAJOR-4), who started it (the advancer starts the item
+    runs for this user and audits them with this request) and the digest of the definition it
+    examines (09-2 r1 MAJOR-1: the publish gate and the advancer compare it)."""
     return {
+        "definition_sha256": definition_sha256(version.definition),
         "scorers": list(suite.scorers),
         "pass_threshold": suite.pass_threshold,
         "repeat": suite.repeat,
@@ -234,7 +242,7 @@ async def start_eval(
         status="queued",
         started_at=now_utc(),
         created_by=starter.actor_id,
-        config=snapshot(suite, starter),
+        config=snapshot(suite, starter, version),
         item_runs={i["id"]: {"item": i, "runs": [], "scored": False, "attempts": 0} for i in items},
     )
     session.add(ev)
@@ -276,11 +284,14 @@ async def start_items(
     *,
     queue: RunQueue,
     queued_event,
+    close: CloseFn | None = None,
 ) -> None:
     """A queued exam: start the item runs still missing, one commit per run, then `running`.
     The exam stays queued until every item run exists, so the advancer never summarizes half a
     plan; a tick that fails here is counted like any tick failure (worker_tick)."""
     version = await session.get(AgentVersion, ev.agent_version_id)
+    if await _definition_changed(session, ev, version, close=close):
+        return
     agent = await session.get(Agent, version.agent_id)
     who = ev.config["starter"]
     repeat = int(ev.config["repeat"])
@@ -394,6 +405,51 @@ def parse_csv_rows(text: str) -> list[list] | None:
     return reader[1:] if reader else []
 
 
+async def end_exams_of_edited_version(
+    session: AsyncSession, version: AgentVersion, definition: dict
+) -> int:
+    """09-2 r2 MINOR-1: a draft edit that changes the definition ends the version's queued and
+    running exams `failed(definition_changed)` in the edit's own transaction (not committed
+    here). A change and a change back between two advancer ticks could otherwise leave item
+    runs that loaded the other definition under an exam whose digest matches again. Item runs
+    already started finish unscored (bounded by the run timeout); the exam never completes."""
+    if definition_sha256(definition) == definition_sha256(version.definition):
+        return 0
+    ended = (
+        await session.scalars(
+            update(EvalRun)
+            .where(
+                EvalRun.agent_version_id == version.id,
+                EvalRun.status.in_(("queued", "running")),
+            )
+            .values(status="failed", error_code="definition_changed", ended_at=now_utc())
+            .returning(EvalRun.id)
+        )
+    ).all()
+    for ev_id in ended:
+        log.warning("eval_definition_changed eval_run=%s version=%s by=edit", ev_id, version.id)
+    return len(ended)
+
+
+async def _definition_changed(
+    session: AsyncSession, ev: EvalRun, version: AgentVersion, *, close: CloseFn | None
+) -> bool:
+    """09-2 r1 MAJOR-1: the version's definition is no longer the one the exam examines (a
+    draft edited while its exam runs, or an exam without a digest). The exam ends
+    `failed(definition_changed)`, its item runs still going are stopped as a cancelled exam
+    stops them; nothing is scored against a definition that was not examined."""
+    if (ev.config or {}).get("definition_sha256") == definition_sha256(version.definition):
+        return False
+    log.warning("eval_definition_changed eval_run=%s version=%s", ev.id, version.id)
+    run_ids = [uuid.UUID(r) for v in (ev.item_runs or {}).values() for r in v["runs"]]
+    if run_ids and close is not None:
+        runs = (await session.scalars(select(Run).where(Run.id.in_(run_ids)))).all()
+        await _cancel_all(session, {str(r.id): r for r in runs}, close)
+    ev.status, ev.error_code, ev.ended_at = "failed", "definition_changed", now_utc()
+    await session.commit()
+    return True
+
+
 async def _cancel_all(session: AsyncSession, runs: dict[str, Run], close: CloseFn) -> None:
     for r in runs.values():
         if r.status in TERMINAL:
@@ -432,6 +488,9 @@ async def advance_eval(
         await _cancel_all(session, runs, close)
         ev.status, ev.ended_at = "cancelled", now_utc()
         await session.commit()
+        return
+    version = await session.get(AgentVersion, ev.agent_version_id)
+    if await _definition_changed(session, ev, version, close=close):
         return
 
     for r in list(runs.values()):

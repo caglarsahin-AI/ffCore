@@ -15,6 +15,8 @@ EXPECTED = {
     P + "/eval-suites/{suite_id}": {"get", "patch", "delete"},
     P + "/eval-suites/{suite_id}/run": {"post"},
     P + "/eval-suites/{suite_id}/runs": {"get"},
+    P + "/eval-suites/{suite_id}/items/from-run/{run_id}": {"post"},  # 09-2 D3
+    P + "/eval-runs/compare": {"get"},  # 09-2 D1
     P + "/eval-runs/{eval_run_id}": {"get"},
     P + "/eval-runs/{eval_run_id}/cancel": {"post"},
     P + "/eval-runs/{eval_run_id}/stream": {"get"},
@@ -29,3 +31,11 @@ def test_09_openapi_draft_matches_app():
 def test_09_openapi_paths():
     spec = yaml.safe_load(render("09"))
     assert {p: set(m) for p, m in spec["paths"].items()} == EXPECTED
+
+
+def test_09_2_r1_minor10_from_run_documents_its_upstream_errors():
+    # 503: the NER the egress policy needs (`ner_unavailable`, `ner_not_configured`) or Langfuse
+    # missing; 502: the Langfuse call failed.
+    spec = yaml.safe_load(render("09"))
+    post = spec["paths"][P + "/eval-suites/{suite_id}/items/from-run/{run_id}"]["post"]
+    assert {"502", "503"} <= set(post["responses"]), sorted(post["responses"])

@@ -127,3 +127,91 @@ class EvalRunOut(BaseModel):
 
 class EvalRunList(BaseModel):
     items: list[EvalRunOut]
+
+
+# --- 09-2: an exam item from a run ------------------------------------------------------------
+
+
+class ExpectedOutput(Strict):
+    """What the item expects; the scorers read these keys (docs/evaluation.md)."""
+
+    answer: str | None = Field(default=None, max_length=5000)
+    must_contain: list[str] | None = None
+    must_cite: list[str] | None = None
+    regex: str | None = None
+    sql_result: list[list] | None = None
+
+
+class FromRunItem(Strict):
+    expected: ExpectedOutput
+    style: str = Field(min_length=1, max_length=40, pattern=r"^[a-z0-9_]+$")
+    answerable: bool = True
+
+
+class FromRunOut(BaseModel):
+    item_id: str
+    dataset: str
+    run_id: UUID
+    # 09-2 r1 (live probe, additive): how the question and the expected output were masked.
+    # `regex`: identifiers only, person names stay as written (GUARDRAIL_EGRESS_NER=false);
+    # `regex+ner`: names too.
+    masking: Literal["none", "regex", "regex+ner"] = Field(
+        description="What the agent's egress policy really masked: `none` (off, monitor, or no "
+        "masking category), `regex` (identifiers; person names are stored as written), "
+        "`regex+ner` (person names too)."
+    )
+    # 09-2 r2 MINOR-3: which of message, variables, answer, must_contain were masked.
+    masked_fields: list[str] = Field(
+        description="The fields saved masked (message, variables, answer, must_contain)."
+    )
+
+
+# --- 09-2: comparing two exams ---------------------------------------------------------------
+
+Change = Literal["fixed", "regressed", "same", "not_comparable", "only_a", "only_b"]
+
+
+class MetricDiff(BaseModel):
+    a: float | int | None
+    b: float | int | None
+    delta: float | int | None
+
+
+class CompareSide(BaseModel):
+    passed: bool | None = Field(description="None: the item was not run in this exam.")
+    mean: float | None
+    outcome: str | None
+    note: str
+
+
+class CompareItem(BaseModel):
+    item_id: str
+    style: str
+    change: Change
+    a: CompareSide | None
+    b: CompareSide | None
+    mean_delta: float | None = Field(description="b - a over the scorers that ran; None if not.")
+
+
+class CompareSummary(BaseModel):
+    pass_rate: MetricDiff
+    scored: MetricDiff
+    passed_items: MetricDiff
+    scores: dict[str, MetricDiff]
+    outcomes: dict[str, MetricDiff]
+    not_run: dict[str, dict[str, int]]
+
+
+class CompareOut(BaseModel):
+    """Exam `b` against exam `a` (same suite, both completed). `complete` and
+    `config_differs` say how far the two are comparable."""
+
+    a: UUID
+    b: UUID
+    suite_id: UUID
+    complete: dict[str, bool]
+    config_differs: bool
+    summary: CompareSummary
+    counts: dict[str, int]
+    items: list[CompareItem]
+    worst: list[CompareItem] = Field(description="At most 10: regressions, then mean drops.")

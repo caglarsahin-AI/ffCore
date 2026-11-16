@@ -536,6 +536,13 @@ def test_09_r1_minor2_every_item_checked_before_anything_is_written(monkeypatch)
     assert session.rows == []
 
 
+def _definition_digest(definition: dict) -> str:
+    import hashlib
+
+    text = json.dumps(definition, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+    return hashlib.sha256(text.encode()).hexdigest()
+
+
 def _start_items(monkeypatch, fail_on=None):
     from types import SimpleNamespace
 
@@ -551,7 +558,9 @@ def _start_items(monkeypatch, fail_on=None):
 
     monkeypatch.setattr(runner, "start_run", fake_start_run)
     monkeypatch.setattr(runner, "flag_modified", lambda *_: None)
-    version = SimpleNamespace(id="v", version=1, agent_id="a")
+    # 09-2 r1 MAJOR-1: the exam examines this definition (config `definition_sha256`).
+    examined = {"model": "examined", "system_prompt": "now"}
+    version = SimpleNamespace(id="v", version=1, agent_id="a", definition=examined)
 
     class _S(_StartSession):
         async def get(self, model, _id):
@@ -563,9 +572,12 @@ def _start_items(monkeypatch, fail_on=None):
         agent_version_id="v",
         user_id="u",
         status="queued",
+        error_code=None,
+        ended_at=None,
         config={
             "repeat": 1,
             "starter": {"actor_type": "user", "actor_id": "u", "request_id": "r", "ip": None},
+            "definition_sha256": _definition_digest(examined),
         },
         item_runs={
             "q01": {"item": _item("q01"), "runs": [], "scored": False},
