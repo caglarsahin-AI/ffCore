@@ -3,7 +3,7 @@
 ## Secret politikası
 
 - Secret yalnızca `.env` ve Postgres'te Fernet ile şifreli (anahtar `.env`'de). Kod, log, API cevabı, audit, test snapshot'ı, PR metni ve oturum mesajı secret içermez.
-- `.env`'i kullanıcı doldurur; agent `.env` yazmaz, `.env.example`'a yalnızca ad ve Türkçe açıklama ekler. *(Zorlanır: `.claude/settings.json` `permissions.deny` `Read(**/.env)`, `Edit(**/.env)` ve guard kuralı `ENV`; `.env.test`, `.env.example` serbest.)*
+- `.env`'i kullanıcı doldurur; agent `.env` yazmaz, `.env.example`'a yalnızca ad ve Türkçe açıklama ekler. *(Zorlanır: `.claude/settings.json` `permissions.deny` `Read(**/.env)`, `Edit(**/.env)` ve guard kuralı `ENV` (harf duyarsız: `.ENV` de engellenir); `.env.test`, `.env.example` serbest.)*
 - Test değerleri `tests/fixtures/` ve `data/samples/` altında; gerçek sağlayıcı anahtarı testte kullanılmaz (`FAKE_LLM=1`).
 - API anahtarının ham değeri yalnızca oluşturma cevabında bir kez; DB'de `key_hash`. Araç ve kaynak kimlikleri (`tools.auth_config`, 16 bağlantıları) şifreli, API'de maskeli.
 - Loglarda merkezi sanitizer: `Authorization`, `X-On-Behalf-Of`, `api_key`, `password`, `token` desenleri maskelenir; guardrail `matches` maskeli yazılır.
@@ -12,7 +12,7 @@
 
 - Hasta verisi ve kişi düzeyi kurum verisi platforma girmez (KARARLAR). Text-to-SQL yalnızca salt-okunur agent sunum DB'sine; kişi düzeyi veri yükleme anında maskelenmiş.
 - Embedding yerel; belge dışarı çıkmaz. `llmaas`'ta egress izin listesi; `airgap`'te `OFFLINE=true` ile hiç çıkış yok.
-- paycoreLLM deposunda okuma yasağı **dosya düzeyinde** (v9 P8, kararlar 4-5): `.env` (gerçek kimlik bilgileri), `data/**` (gerçek korpus), `eval/results/**` yasak; `eval/scenario*/questions.jsonl` (S1, iç dokümantasyon sorusu) ve `experts/*.yaml` (şablon) okunabilir ama FFCore deposuna kopyalanmaz. *(Zorlanır: ffcore oturumlarında `permissions.deny` `Read(//c/ai_paycore/paycoreLLM/{.env,data/**,eval/results/**})` ve guard kuralı `PAYCORE`.)* Worktree'lere gerçek `.env` kopyalanmaz; işçiler `.env.test` ile çalışır. PayCore kodu birebir kopyalanmaz, uzantı olarak kalır (C14).
+- paycoreLLM deposunda okuma yasağı **dosya düzeyinde** (v9 P8, kararlar 4-5): `.env` (gerçek kimlik bilgileri), `data/**` (gerçek korpus), `eval/results/**` yasak; `eval/scenario*/questions.jsonl` (S1, iç dokümantasyon sorusu) ve `experts/*.yaml` (şablon) okunabilir ama FFCore deposuna kopyalanmaz. *(Zorlanır: ffcore oturumlarında `permissions.deny` `Read(//c/ai_paycore/paycoreLLM/{.env,data/**,eval/results/**})`, `Edit(//c/ai_paycore/paycoreLLM/.env)` ve guard kuralı `PAYCORE`.)* Worktree'lere gerçek `.env` kopyalanmaz; işçiler `.env.test` ile çalışır. PayCore kodu birebir kopyalanmaz, uzantı olarak kalır (C14).
 - Örnek sözleşmeler ve şema (`data/samples/`) sentetiktir; gerçek kurum belgesi oraya konmaz. Kullanıcı gerçek belge verirse yalnızca kendi makinesindeki `.env` ile işaret ettiği dizinde kalır, depoya girmez.
 - Geliştirmede Anthropic API'ye yalnızca sentetik veri gider.
 
