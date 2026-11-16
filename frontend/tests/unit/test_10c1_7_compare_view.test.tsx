@@ -95,6 +95,15 @@ describe("test_10c1_7_compare_view", () => {
     expect(within(items).getByTestId("compare-item-i4").textContent).toContain("odd_outcome");
   });
 
+  it("shows no empty not-run table for a side without codes", () => {
+    renderAs("analyst", "read", <CompareView compare={{ ...compare, summary: { ...compare.summary, not_run: { a: {}, b: { approval_required: 1 } } } }} />);
+    expect(screen.queryByTestId("compare-not-run-a")).toBeNull();
+    expect(screen.getByTestId("compare-not-run-b")).toBeTruthy();
+    cleanup();
+    renderAs("analyst", "read", <CompareView compare={{ ...compare, summary: { ...compare.summary, not_run: { a: {}, b: {} } } }} />);
+    expect(screen.queryByTestId("compare-not-run")).toBeNull();
+  });
+
   it("uses the same words as the exam screen in English", () => {
     renderAs("analyst", "read", <CompareView compare={coded} />);
     const items = screen.getByTestId("compare-items");
