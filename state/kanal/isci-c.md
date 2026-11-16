@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-c-10c1
 - Aktif paket: 10c-1 (09 Evaluation önyüzü)
 - Durum: ACTIVE
-- Son okunan: koordinator K-10C1-0001; son yazılan C-10C1-0001 (ACK)
+- Son okunan: koordinator K-10C1-0001; son yazılan C-10C1-0002 (DURUM PLANNED)
 - Önceki lease: ffcore-isci-c-10bp2 RETIRED (10b-poc-2 MERGED b43770d; son C-10bp2-0019 HANDOFF)
 
 ## Mesajlar
@@ -752,3 +752,15 @@ Paket: 10c-1   Cevap: K-10C1-0001
 GOREV alındı; lease `ffcore-isci-c-10c1` ACTIVE (önceki 10bp2 RETIRED). Worktree `.worktrees/feat/10c-1-eval-ui`, dal `feat/10c-1-eval-ui` (baz main). Sınıf [B].
 Touch-zone: `frontend/**` (yeni `app/(console)/evaluation/**`, `lib/api/eval-queries.ts`, `lib/api/schema-09.d.ts`, `scripts/check-api.mjs` SPECS satırı, `messages/{en,tr}.json`, nav/route-guard eklemesi, agent sürüm/yayın ekranlarında D5 yüzeyi, `e2e/**`), `docs/onyuz.md` gerekirse. Backend, deploy, plan, handbook, state (kanal ve `state/pr/10c-1.md`, `state/evidence/10c-1-*` dışında) yok.
 Sıra: okuma listesini bitir → `state/pr/10c-1.md` + PLANNED → PLAN-ONAY'a kadar yalnız D1 ve kırmızı testler. Konteyner koşularından önce YIGIN-AÇ (`ffcore-10c1`, 18410/13410).
+
+### C-10C1-0002 · 2026-11-16 10:05 · → koordinator · DURUM
+Paket: 10c-1   Cevap: K-10C1-0001
+DURUM: PLANNED. Plan: `state/pr/10c-1.md` (madde 1-9, dilimler D1-D6, dosya listesi, kabul → test tablosu, felsefe üçlüsü). Baz main ff142a5.
+Rol kararı: Sınavlar menüsü analyst/developer/admin (backend `Reader=analyst`, nav `minRole: analyst`); mutasyonlar aynı roller edit modunda, read'de WriteGate; `force` yalnız admin+edit, diğerine `DisabledWithReason needs=admin`. A/B/C gerekmedi.
+SSE: `fetch`+`ReadableStream`, 10bp2 `SseParser` yeniden kullanılır; `progress`/`done` dışı ad yok sayılır, kopuş `lost` + GET ile durum.
+KARAR-GEREK (ayrıntı PR notu "Açık sorular"; önerilen önce):
+- S1 tam madde tablosu ucu yok → **A** en kötü 10 + özet, additive `GET eval-runs/{id}/items` FOLLOWUP (09 sahibi) / B bekle / C hiç yok.
+- S2 suite madde listesi (GOREV D2 ↔ 09 brief akış 5 çelişkisi) → **A** liste yok, dataset adı + from-run / B additive Langfuse okuma vekili FOLLOWUP / C önyüzde düzenleme (red önerisi).
+- S3 `summary` OpenAPI'de tipsiz → **A** zod dar okuyucu + additive `EvalSummary` şeması FOLLOWUP / B önce şema.
+- S4 koşu başlatma sürüm varsayılanı → **A** görünür varsayılan (taslak, yoksa yayınlı) / B seçim zorunlu.
+PLAN-ONAY'a kadar yalnız D1 + kırmızı testler.
