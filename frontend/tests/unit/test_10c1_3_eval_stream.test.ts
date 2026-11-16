@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { followEvalStream } from "@/lib/eval-stream";
 import type { EvalProgress } from "@/lib/eval-stream";
@@ -71,5 +71,111 @@ describe("test_10c1_3_eval_stream", () => {
     const result = await followEvalStream({ open, onProgress: () => {}, onDone: () => {}, signal: controller.signal });
     expect(result).toBe("aborted");
     expect(open).not.toHaveBeenCalled();
+  });
+});
+
+// R-10C1-0003 MAJOR-1 (sse-sessiz-kopus): a half-open connection sends no bytes and never closes.
+// The backend sends `progress` every PROGRESS_INTERVAL_MS, so silence for STALL_MS ends the
+// attempt and the usual reopen / lost path takes over.
+describe("test_10c1_3_eval_stream stall watchdog", () => {
+  const progress = 'event: progress\ndata: {"status":"running","items":3,"scored":1}\n\n';
+  const doneEvent = 'event: done\ndata: {"status":"completed","items":3,"scored":3,"error_code":null,"passed":true}\n\n';
+
+  // One chunk, then silence: the body stays open forever.
+  function silentAfter(chunk: string): Response {
+    const body = new ReadableStream<Uint8Array>({
+      start(controller) {
+        controller.enqueue(encoder.encode(chunk));
+      },
+    });
+    return new Response(body, { status: 200 });
+  }
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it("derives STALL_MS from the backend progress interval", async () => {
+    const { STALL_MS, PROGRESS_INTERVAL_MS } = await import("@/lib/eval-stream");
+    expect(PROGRESS_INTERVAL_MS).toBe(2000);
+    expect(STALL_MS).toBe(3 * PROGRESS_INTERVAL_MS);
+  });
+
+  it("ends a silent attempt after STALL_MS, aborts its request and reports lost after the reopens", async () => {
+    vi.useFakeTimers();
+    const signals: AbortSignal[] = [];
+    const open = vi.fn(async (signal: AbortSignal) => {
+      signals.push(signal);
+      return silentAfter(progress);
+    });
+    const seen: EvalProgress[] = [];
+    const end = followEvalStream({ open, onProgress: (p) => seen.push(p), onDone: () => {}, maxReopens: 1, retryDelayMs: 0, stallMs: 6000 });
+    await vi.advanceTimersByTimeAsync(5999);
+    expect(open).toHaveBeenCalledTimes(1);
+    await vi.advanceTimersByTimeAsync(1);
+    await vi.advanceTimersByTimeAsync(6000);
+    await expect(end).resolves.toBe("lost");
+    expect(open).toHaveBeenCalledTimes(2);
+    expect(signals.every((s) => s.aborted)).toBe(true);
+    expect(seen).toHaveLength(2);
+  });
+
+  it("reports done when the stream reopened after a stall ends with done", async () => {
+    vi.useFakeTimers();
+    let calls = 0;
+    const open = vi.fn(async () => (++calls === 1 ? silentAfter(progress) : response([progress, doneEvent])));
+    const onDone = vi.fn();
+    const end = followEvalStream({ open, onProgress: () => {}, onDone, maxReopens: 2, retryDelayMs: 0, stallMs: 6000 });
+    await vi.advanceTimersByTimeAsync(6000);
+    await expect(end).resolves.toBe("done");
+    expect(open).toHaveBeenCalledTimes(2);
+    expect(onDone).toHaveBeenCalledOnce();
+  });
+
+  it("ends an attempt whose request never answers", async () => {
+    vi.useFakeTimers();
+    const open = vi.fn(
+      (signal: AbortSignal) =>
+        new Promise<Response>((_, reject) => signal?.addEventListener("abort", () => reject(new DOMException("aborted", "AbortError")))),
+    );
+    const end = followEvalStream({ open, onProgress: () => {}, onDone: () => {}, maxReopens: 0, retryDelayMs: 0, stallMs: 6000 });
+    await vi.advanceTimersByTimeAsync(6000);
+    await expect(end).resolves.toBe("lost");
+    expect(open).toHaveBeenCalledTimes(1);
+  });
+
+  it("keeps a slow but living stream: every chunk resets the watchdog", async () => {
+    vi.useFakeTimers();
+    let push: ((chunk: string) => void) | undefined;
+    let close: (() => void) | undefined;
+    const open = vi.fn(async () => {
+      const body = new ReadableStream<Uint8Array>({
+        start(controller) {
+          push = (chunk) => controller.enqueue(encoder.encode(chunk));
+          close = () => controller.close();
+        },
+      });
+      return new Response(body, { status: 200 });
+    });
+    const end = followEvalStream({ open, onProgress: () => {}, onDone: () => {}, maxReopens: 0, retryDelayMs: 0, stallMs: 6000 });
+    for (let i = 0; i < 4; i++) {
+      await vi.advanceTimersByTimeAsync(5000);
+      push?.(progress);
+    }
+    push?.(doneEvent);
+    close?.();
+    await expect(end).resolves.toBe("done");
+    expect(open).toHaveBeenCalledTimes(1);
+  });
+
+  it("an outside abort still wins over the watchdog", async () => {
+    vi.useFakeTimers();
+    const controller = new AbortController();
+    const open = vi.fn(async () => silentAfter(progress));
+    const end = followEvalStream({ open, onProgress: () => {}, onDone: () => {}, signal: controller.signal, retryDelayMs: 0, stallMs: 6000 });
+    await vi.advanceTimersByTimeAsync(1000);
+    controller.abort();
+    await expect(end).resolves.toBe("aborted");
+    expect(open).toHaveBeenCalledTimes(1);
   });
 });
