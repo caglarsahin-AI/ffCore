@@ -156,6 +156,9 @@ def test_09_stream_ends_with_done(exam):
     c, pid, _, out = exam
     with c.stream("GET", f"/api/v1/projects/{pid}/eval-runs/{out['id']}/stream") as r:
         assert r.status_code == 200
+        # 10c-1 r2 (K-10C1-0008): no proxy may compress or buffer the exam stream.
+        assert r.headers["cache-control"] == "no-cache, no-transform"
+        assert r.headers["x-accel-buffering"] == "no"
         text = "".join(r.iter_text())
     assert "event: done" in text and '"status": "completed"' in text
 

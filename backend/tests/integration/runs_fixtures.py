@@ -100,6 +100,12 @@ def parse_sse(lines) -> list[tuple[str, str, dict]]:
     return out
 
 
+def assert_stream_headers(response):
+    # 10c-1 r2 (K-10C1-0008): no proxy may compress or buffer an event stream.
+    assert response.headers["cache-control"] == "no-cache, no-transform"
+    assert response.headers["x-accel-buffering"] == "no"
+
+
 def post_run(client, project_id, key="asistan", **body):
     with client.stream(
         "POST",
@@ -108,6 +114,7 @@ def post_run(client, project_id, key="asistan", **body):
     ) as response:
         assert response.status_code == 200, response.read()
         assert response.headers["content-type"].startswith("text/event-stream")
+        assert_stream_headers(response)
         return parse_sse(response.iter_lines())
 
 
@@ -117,6 +124,7 @@ def get_stream(client, project_id, run_id, last=None):
         "GET", f"/api/v1/projects/{project_id}/runs/{run_id}/stream", headers=headers
     ) as response:
         assert response.status_code == 200
+        assert_stream_headers(response)
         return parse_sse(response.iter_lines())
 
 
