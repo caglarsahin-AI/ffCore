@@ -232,3 +232,17 @@ def test_09_2_r3n11_patch_checks_scorers_and_delete_audits_the_suite(pg, member,
         ("delete_eval_suite", project),
     ).fetchall()
     assert [r[0] for r in rows] == [str(suite_id)], audit_rows
+
+
+def test_10c1_r2_exam_stream_is_not_compressed_or_buffered(pg, member, project):
+    # 10c-1 r2 (K-10C1-0008): the console's proxy gzip-buffered the exam stream until it ended.
+    _, eval_id = _suite_and_run(pg, project)
+    with member("analyst", "read").stream(
+        "GET", f"{P.format(project)}/eval-runs/{eval_id}/stream"
+    ) as r:
+        assert r.status_code == 200
+        assert r.headers["content-type"].startswith("text/event-stream")
+        assert r.headers["cache-control"] == "no-cache, no-transform"
+        assert r.headers["x-accel-buffering"] == "no"
+        text = "".join(r.iter_text())
+    assert "event: done" in text

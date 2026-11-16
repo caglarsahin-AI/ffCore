@@ -13,6 +13,7 @@ export type Fixture = {
   reader: Account; // superadmin with access "read"
   projectAdmin: Account; // admin+edit on alpha, admin+read on beta, not a superadmin
   analyst: Account; // analyst+edit on alpha
+  analystReader: Account; // analyst+read on alpha (10c-1 r2: a project member in read mode)
   stale: Account; // admin+edit on alpha; set to read during a test (kabul 5)
   lonely: Account; // no membership
   memberCandidate: Account; // not a member anywhere, added in the members test

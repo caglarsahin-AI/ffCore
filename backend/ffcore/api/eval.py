@@ -545,4 +545,4 @@ async def stream_eval_run(project_id: UUID, eval_run_id: UUID, actor: Reader, se
             yield f"event: progress\ndata: {json.dumps(data)}\n\n"
             await asyncio.sleep(PROGRESS_INTERVAL_S)
 
-    return EventStreamResponse(body(), headers={"Cache-Control": "no-cache"})
+    return EventStreamResponse(body())

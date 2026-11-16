@@ -58,6 +58,7 @@ export default async function globalSetup() {
     reader: await user("reader", "read"),
     projectAdmin: await user("project-admin"),
     analyst: await user("analyst"),
+    analystReader: await user("analyst-reader"),
     stale: await user("stale"),
     lonely: await user("lonely"),
     memberCandidate: await user("candidate"),
@@ -68,6 +69,7 @@ export default async function globalSetup() {
   await member(fixture.alpha.id, fixture.projectAdmin.id, "admin", "edit");
   await member(fixture.beta.id, fixture.projectAdmin.id, "admin", "read");
   await member(fixture.alpha.id, fixture.analyst.id, "analyst", "edit");
+  await member(fixture.alpha.id, fixture.analystReader.id, "analyst", "read");
   await member(fixture.alpha.id, fixture.stale.id, "admin", "edit");
   await member(fixture.alpha.id, fixture.expiring.id, "admin", "edit");
   process.env.E2E_FIXTURE = JSON.stringify(fixture);

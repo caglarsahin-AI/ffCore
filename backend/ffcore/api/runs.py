@@ -99,7 +99,19 @@ QueueDep = Annotated[RunQueue, Depends(queue_dependency)]
 
 
 class EventStreamResponse(StreamingResponse):
+    """An event stream that reaches the client event by event.
+
+    `no-transform` keeps a proxy from compressing it (the console's Next.js proxy buffers a gzip
+    response until it ends) and `X-Accel-Buffering: no` keeps nginx from buffering it (10c-1 r2,
+    K-10C1-0008). Extra headers are added to these.
+    """
+
     media_type = "text/event-stream"
+    DEFAULT_HEADERS = {"Cache-Control": "no-cache, no-transform", "X-Accel-Buffering": "no"}
+
+    def __init__(self, content, status_code=200, headers=None, media_type=None, background=None):
+        merged = {**self.DEFAULT_HEADERS, **(headers or {})}
+        super().__init__(content, status_code, merged, media_type, background)
 
 
 SSE_RESPONSE = {
@@ -407,9 +419,7 @@ def _stream(
         finally:
             await client.aclose()
 
-    return EventStreamResponse(
-        body(), headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"}
-    )
+    return EventStreamResponse(body())
 
 
 async def _queued_event(session, settings: Settings, run: Run) -> None:

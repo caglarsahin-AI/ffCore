@@ -4,6 +4,9 @@ import { ArrowLeftIcon } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useFormatter, useTranslations } from "next-intl";
+import { useState } from "react";
+
+import { FromRunForm } from "@/components/eval/from-run-form";
 
 import { RunFeedback } from "@/components/run-feedback";
 import { RunTimeline } from "@/components/run-timeline";
@@ -93,12 +96,36 @@ function Loaded({ projectId, run }: { projectId: string; run: Run }) {
           <h2 className="text-lg font-medium">{t("feedbackTitle")}</h2>
           <RunFeedback projectId={projectId} run={run} />
         </section>
+        <AddToExam projectId={projectId} run={run} />
         <section className="flex flex-col gap-2">
           <h2 className="text-lg font-medium">{t("timeline")}</h2>
           <RunTimeline projectId={projectId} runId={run.id} live={live} />
         </section>
       </Screen>
     </div>
+  );
+}
+
+// "Add to exam" (09-2 from-run): only a completed run can become an exam item. Opening the form
+// reads only; saving goes through WriteGate inside the form.
+function AddToExam({ projectId, run }: { projectId: string; run: Run }) {
+  const t = useTranslations("Evaluations.fromRun");
+  const [open, setOpen] = useState(false);
+  return (
+    <section className="flex flex-col gap-2" data-testid="add-to-exam">
+      <h2 className="text-lg font-medium">{t("title")}</h2>
+      {run.status !== "completed" ? (
+        <p className="text-sm text-muted-foreground">{t("onlyCompleted")}</p>
+      ) : open ? (
+        <FromRunForm projectId={projectId} runId={run.id} />
+      ) : (
+        <div>
+          <Button variant="outline" onClick={() => setOpen(true)} data-testid="from-run-open">
+            {t("open")}
+          </Button>
+        </div>
+      )}
+    </section>
   );
 }
 

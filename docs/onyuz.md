@@ -20,11 +20,15 @@ and system status).
 | `/tools` | Tools (MCP and OpenAPI servers) of the selected project | developer | list; register (admin) |
 | `/tools/{id}` | One tool: settings, discovered actions, try an action | developer | edit, delete, discover, action switches, try (admin + edit) |
 | `/agents` | Agents of the selected project | analyst | list; create (analyst + edit) |
-| `/agents/{id}` | Agent wizard and test panel | analyst | edit the draft, publish, new draft, roll back, test run (analyst + edit) |
+| `/agents/{id}` | Agent wizard and test panel | analyst | edit the draft, publish, new draft, roll back, test run (analyst + edit); publish past the exam gate (admin + edit) |
 | `/runs` | Runs of the selected project | analyst | list with filters |
-| `/runs/{id}` | One run: summary, answer, events, expert feedback | analyst | cancel (the run's user or an admin), feedback (edit) |
+| `/runs/{id}` | One run: summary, answer, events, expert feedback, Add to exam | analyst | cancel (the run's user or an admin), feedback (edit), add to exam (completed run, analyst + edit) |
 | `/approvals` | Approval queue | analyst | list, pending by default |
 | `/approvals/{id}` | One approval | analyst | approve, reject (when `can_decide`) |
+| `/evaluations` | Exam suites of the selected project | analyst | list; create (analyst + edit) |
+| `/evaluations/{id}` | One suite: settings, exam start, its exams, compare pick | analyst | edit, delete, start an exam (analyst + edit); compare (read too) |
+| `/evaluations/runs/{id}` | One exam: live progress, summary, the 10 worst items | analyst | cancel while it runs (analyst + edit) |
+| `/evaluations/compare?a=&b=` | Two exams of one suite, item by item | analyst | read only |
 | `/overview` and every other menu item | Later packages (10c and others) | see role matrix | "not available yet" page |
 | `/dev/theme` | Components in both themes side by side | none | done |
 
@@ -208,6 +212,51 @@ contract is shown as an error, never as "ready". Without model weights the page 
   run; the buttons follow `can_decide` (signed-in user, edit access, role at least the assigned
   one) and the backend's 403/409 codes become messages.
 
+## Evaluations (09)
+
+- **Suites.** Analysts and above read suites; creating, editing, deleting and starting an exam
+  need edit access (09 `Editor = analyst, write`). The form sends only what is filled: a blank
+  dataset name, pass threshold or scorer value leaves the backend's documented default
+  (`<project_key>.<key>`, `EVAL_PASS_THRESHOLD`, judge 4, semantic 0.8). `approve_tools` is an
+  explicit switch with its consequence written next to it; the exam never approves anything.
+  Binding an agent makes the suite gate that agent's publish.
+- **Items.** Exam questions live in the suite's Langfuse dataset (09 brief, ARCH-09). The console
+  does not list or edit them (K-10C1-0002 S2); it adds one from a completed run with "Add to
+  exam" on the run page. The backend masks the question and the expectation with the agent's
+  egress policy first, and the console shows what it did (`masking`: `none`, `regex` with person
+  names stored as written, or `regex+ner`; `masked_fields`). Refusals keep their code:
+  `run_input_blocked`, `expected_would_be_masked`, `ner_unavailable`.
+- **Exams.** "Start exam" takes the suite's gated agent (or one the user picks) and a version with
+  a visible default: the draft when there is one, else the published version (S4). The exam page
+  follows `GET /eval-runs/{id}/stream` with `fetch`: `progress` counts, then `done`; an unknown
+  event name is logged and skipped. A silent stream counts as dropped: the backend sends
+  `progress` every 2 s, so an attempt with nothing for 6 s (`STALL_MS`, `lib/eval-stream.ts`) is
+  ended, which covers a half-open connection after a backend kill or an idle proxy drop. As soon
+  as an attempt ends without `done` the page says "reconnecting" and reads the exam with `GET` at
+  once and every few seconds while the stream is reopened; a stream that speaks again takes over,
+  one that cannot be reopened is reported as lost and `GET` goes on. Status and counts come from
+  whichever arrived last, stream or `GET`; a failed `GET` is shown above the exam and does not
+  bring back an older status. Nothing is guessed about how it ended. Event streams are sent with
+  `Cache-Control: no-cache, no-transform` so that the console's proxy does not gzip-buffer them
+  (docs/degisiklikler.md). The summary is shown as written: pass rate against the threshold, scored / items,
+  completeness (`complete=false` says the exam did not finish unattended), not-run reasons with
+  their code (`approval_required`, `partial:<code>` for some repeats, an unknown code raw),
+  errors (`judge_out_of_time`, `judge_failed:*`, `advance_failed:*`), outcome and style counts,
+  warm-up apart from latency, and the 10 worst items, labelled as such: a full item table needs
+  FOLLOWUP-185. `EvalRunOut.summary` is untyped in the contract, so the console reads it with a
+  narrow schema and shows "could not be read" with the failing field rather than an empty result.
+- **Compare.** Two completed exams of one suite, picked on the suite page (read access too):
+  summary differences, each exam's completeness, the configuration warning (`config_differs`),
+  item changes (`fixed`, `regressed`, `same`, `not_comparable`, `only_a`, `only_b`) and the 10
+  worst. Another pair shows `eval_runs_not_comparable` with its message.
+- **Publish gate.** A publish the gate refuses (409 `eval_gate_failed`) lists each bound suite
+  and its reason, read from the message (`<key>=<reason>`; FOLLOWUP-176); an unknown reason or
+  another message shape is shown as written. "Publish past the gate" is for an admin with edit
+  access and needs a reason; others see it disabled with why (backend 403
+  `force_requires_admin`, 422 `force_reason_required`). The versions table links each version to
+  the exam that opened its gate (`eval_run_id`); "—" when there is none (no bound suite, or a
+  forced publish).
+
 ## Provider and model forms
 
 - **Driver fields.** The provider form asks `GET /provider-drivers` which uses and configuration
@@ -293,7 +342,13 @@ It also gets `LITELLM_URL` and `LITELLM_MASTER_KEY` (the `.env.test` test value)
 LiteLLM's `/model/info`; the key goes only in a header. CI runs the same commands. Playwright image: `mcr.microsoft.com/playwright:v1.64.1-noble`
 (`sha256:47b510dd9230bf0b9bfc9b20102241e577ea7a99334ab4c3ca19f19770e9b8ea`), matching
 `@playwright/test` 1.64.1, pinned in `deploy/docker-compose.yml`. Screenshots are written to
-`docs/images/<package>-<screen>-<theme>.png` (10a, 10bp1, 10mrk, 10bp2).
+`docs/images/<package>-<screen>-<theme>.png` (10a, 10bp1, 10mrk, 10bp2, 10c1).
+
+The exam tests (10c-1) need nothing more than the agent tests: Langfuse and the background
+worker's advancer are default services, fake-llm answers "hello", and each test adds its exam
+items from a completed run (from-run), so no `seed-eval` is needed. Without network access
+(`npm ci` cannot reach a registry), fill the stack's `e2e_node_modules` volume from an existing
+glibc `node_modules` volume and run `npx playwright test` instead of `npm ci && …`.
 
 ## Screenshots
 
@@ -323,3 +378,11 @@ LiteLLM's `/model/info`; the key goes only in a header. CI runs the same command
 | Run detail | ![](images/10bp2-run-detail-light.png) | ![](images/10bp2-run-detail-dark.png) |
 | Approvals | ![](images/10bp2-approvals-light.png) | ![](images/10bp2-approvals-dark.png) |
 | Approval detail | ![](images/10bp2-approval-detail-light.png) | ![](images/10bp2-approval-detail-dark.png) |
+| Exam suites | ![](images/10c1-suites-light.png) | ![](images/10c1-suites-dark.png) |
+| New suite | ![](images/10c1-suite-new-light.png) | ![](images/10c1-suite-new-dark.png) |
+| Suite: exam start, exams | ![](images/10c1-suite-light.png) | ![](images/10c1-suite-dark.png) |
+| Exam result | ![](images/10c1-exam-light.png) | ![](images/10c1-exam-dark.png) |
+| Compare exams | ![](images/10c1-compare-light.png) | ![](images/10c1-compare-dark.png) |
+| Add to exam | ![](images/10c1-from-run-light.png) | ![](images/10c1-from-run-dark.png) |
+| Publish gate refusal | ![](images/10c1-gate-light.png) | ![](images/10c1-gate-dark.png) |
+| Suite, edit and read mode | ![](images/10c1-suite-edit.png) | ![](images/10c1-suite-read.png) |
