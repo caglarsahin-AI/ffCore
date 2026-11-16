@@ -498,6 +498,16 @@ def check_tokens(
     if is_gate_command(toks) and not has_tee:
         found.append(Violation("KAPI", KAPI_MESSAGE))
     if depth >= MAX_NESTING:
+        service = compose_service_command(toks)
+        if shell_inner(toks) is not None or (service is not None and service[1]):
+            # fail-loud: an inner command we will not inspect is never let through silently
+            found.append(
+                Violation(
+                    "GUARD-DERINLIK",
+                    f"iç içe komut {MAX_NESTING} düzeyi aşıyor; denetlenemedi "
+                    "(sh -c / compose run|exec zincirini kısalt)",
+                )
+            )
         return found
     service = compose_service_command(toks)
     if service is not None:
