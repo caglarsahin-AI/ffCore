@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-c-10c1
 - Aktif paket: 10c-1 (09 Evaluation önyüzü)
 - Durum: ACTIVE
-- Son okunan: koordinator K-10C1-0005; son yazılan C-10C1-0009 (DURUM r2 probe)
+- Son okunan: koordinator K-10C1-0005; son yazılan C-10C1-0010 (KARAR-GEREK gzip/SSE)
 - Önceki lease: ffcore-isci-c-10bp2 RETIRED (10b-poc-2 MERGED b43770d; son C-10bp2-0019 HANDOFF)
 
 ## Mesajlar
@@ -805,3 +805,13 @@ KARAR-GEREK (ölçüt için):
 - C: olduğu gibi kalsın, PR notunda ~46 s üst sınır yazılsın. Bedel: ölçüt karşılanmaz.
 Ek (kapsamda, ayrı commit'ler): rozet akış sürerken akıştaki durumu, bitince GET'inkini gösteriyor (`shownStatus`, inceleyicinin "Queued/Running" gözlemi). Compare'de kodu olmayan taraf için boş not-run tablosu kaldırıldı.
 Kapı durumu: e2e 10c1 25/25 (`10c-1-r2-e2e-10c1.log`; rozet ve compare-boş düzeltmelerinden önce koştu). Tam e2e henüz koşmadı; karar gelince koşacağım. Yığın açık.
+
+### C-10C1-0010 · 2026-11-16 12:58 · → koordinator · KARAR-GEREK
+Paket: 10c-1 · Cevap: K-10C1-0007
+K-10C1-0007 A uygulandı (`reconnecting` + GET, Vitest 195/195; e2e 10c1_7 stall: `reconnecting` 6,9 s, lost 46,9 s ✓). Ancak "akış geri gelince yoklama durur" e2e'si düştü ve kök neden PR dışı çıktı.
+**Bulgu (kanıt `state/evidence/10c-1-r2-diag-stream.log`):** canlı sınav akışı Next proxy'sinden (`next.config` rewrites) gzip ile geçince hiç parça gelmiyor (12 s'de 0). `accept-encoding: identity` ile ve backend'den doğrudan okununca her 2 s'de 70 B geliyor. Next'in `compression` katmanı SSE'yi tamponluyor; tarayıcı her zaman gzip istiyor. Sonuç: konsolda sınav ilerlemesi akıştan hiç gelmiyor, olaylar yalnız akış kapanınca toplu geliyor (r1'de de böyleydi; test_10c1_1 `streaming|done` kabul ettiği için görünmedi). Bekçiyle sayfa artık her 6 s'de `reconnecting` + GET'e düşüp ~46 s'de `lost` oluyor: işlev doğru, akış ölü. 06a koşu akışı da aynı başlıklarla (`runs.py` `no-cache` + `X-Accel-Buffering: no`, `no-transform` yok) muhtemelen aynı durumda; doğrulamadım.
+Next'in `compression`'ı `Cache-Control: no-transform`'a uyuyor (`node_modules/next/dist/compiled/compression` regex).
+- **A (önerilen):** backend `eval.py:548` (ve `runs.py:411`) `Cache-Control: no-cache, no-transform`. Kaynağında doğru anlam, iki satır + backend testi. Bedel: touch-zone dışı (backend); ya bu PR'a ek izin ya da ayrı küçük paket.
+- B: `frontend/next.config.ts` `compress: false`. Touch-zone içi, tek satır. Bedel: konsolun tüm yanıtları sıkıştırmasız (airgap'te önde sıkıştıran proxy yoksa paketler büyür).
+- C: akış yolları için frontend route handler ile ayrı proxy. Önermiyorum: platformun proxy'sini yeniden kurmak (80/20).
+Bekleyenler: A seçilirse resume e2e'si onunla yeşile döner. Tam e2e ve SIGKILL probe 4. koşu bu karardan sonra koşacak. Yığın açık. Commit edilmemiş: docs/onyuz.md + görüntüler; izlenmeyen probe/diag spec'leri (kopyaları evidence'ta, PR'a girmez).
