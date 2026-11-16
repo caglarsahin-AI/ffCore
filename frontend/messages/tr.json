@@ -374,7 +374,29 @@
     "runNeedsMembership": "Agent'lar yalnızca üyesi olduğunuz projelerde çalışır.",
     "approvalRequiresUserSession": "Onay kararını yalnızca oturum açmış kullanıcı verir; servis ya da API anahtarı veremez.",
     "approvalNotPending": "Bu onay için zaten karar verilmiş.",
-    "approvalExpired": "Onayın süresi doldu; koşu kapatıldı."
+    "approvalExpired": "Onayın süresi doldu; koşu kapatıldı.",
+    "suiteKeyTaken": "Projede bu anahtarla bir sınav paketi zaten var.",
+    "datasetNameNotInProject": "Dataset adı proje anahtarı ve noktayla başlamalı (project_key.).",
+    "evalThresholdNotConfigured": "Bu kurulumda varsayılan geçme eşiği yok; pakete kendi eşiğini verin.",
+    "judgeModelNotConfigured": "llm_judge puanlayıcısı bir hakem modeli (EVAL_JUDGE_MODEL) ister ve tanımlı değil. Puanlayıcıyı çıkarın ya da yöneticiye sorun.",
+    "versionNotOfSuiteAgent": "Bu sürüm, paketin bağlı olduğu agent'ın değil, başka bir agent'ın.",
+    "evalPlanExceedsTick": "llm_judge ile repeat × planlanan hakem süresi bir ilerletme adımına sığmıyor. repeat değerini düşürün.",
+    "evalTooManyRuns": "Madde × repeat, bir sınavın başlatabileceği en çok koşuyu aşıyor. repeat'i düşürün ya da dataset'i bölün.",
+    "itemInputInvalid": "Dataset'teki bir madde koşturulamıyor: sorusu metin değil ya da agent'ın bilmediği bir değişken kullanıyor.",
+    "datasetEmpty": "Paketin dataset'inde henüz etkin madde yok. Önce madde ekleyin (bir koşudan ya da Langfuse'ta).",
+    "evalRunFinished": "Sınav zaten bitti.",
+    "evalRunsNotComparable": "Bu iki sınav karşılaştırılamaz: ikisi de tamamlanmış ve aynı paketin olmalı.",
+    "runInputBlocked": "Agent'ın guardrail politikası bu soruyu engelliyor; sınav maddesi olarak kaydedilemez.",
+    "expectedWouldBeMasked": "Beklenen bir değer guardrail politikasınca maskelenir ve hiç eşleşmez. Beklenen değerleri değiştirin.",
+    "nerUnavailable": "Guardrail politikasının ihtiyaç duyduğu ad tanıma servisine ulaşılamıyor. Sonra yeniden deneyin.",
+    "textTooLong": "Metin, guardrail motorunun kabul ettiğinden uzun.",
+    "langfuseUnreachable": "Sınav maddelerinin ve puanların tutulduğu Langfuse'a ulaşılamıyor.",
+    "langfuseNotConfigured": "Bu kurulumda Langfuse yapılandırılmamış; sınavlar kullanılamaz.",
+    "langfuseRequestFailed": "Langfuse isteği reddetti.",
+    "evalGateFailed": "Sınav kapısı bu sürümü reddediyor.",
+    "forceRequiresAdmin": "Sınav kapısını yalnız yönetici aşarak yayınlayabilir.",
+    "forceReasonRequired": "Sınav kapısını aşarak yayınlamak gerekçe ister.",
+    "forceReasonWithoutForce": "Kapı aşılmadan gerekçe verildi."
   },
   "ProviderTest": {
     "title": "Bağlantı testi",
@@ -1013,6 +1035,59 @@
       "analyst": "Analist",
       "developer": "Geliştirici",
       "admin": "Yönetici"
+    }
+  },
+  "Evaluations": {
+    "statuses": {
+      "queued": "Sırada",
+      "running": "Koşuyor",
+      "completed": "Tamamlandı",
+      "failed": "Başarısız",
+      "cancelled": "İptal edildi"
+    },
+    "scorers": {
+      "contains": "İçerir",
+      "regex": "Kalıp (regex)",
+      "json_schema": "JSON şeması",
+      "cites_source": "Kaynak gösterir",
+      "semantic": "Anlamsal yakınlık",
+      "llm_judge": "LLM hakem",
+      "sql_result": "SQL sonucu",
+      "latency_cost": "Süre ve maliyet"
+    },
+    "outcomes": {
+      "not_retrieved": "Aranamadı",
+      "below_rerank_floor": "Rerank tabanının altında",
+      "not_reranked": "Verilen kaynaklarda yok",
+      "declined": "Bulamadım dedi",
+      "below_threshold": "Güven eşiğinin altında",
+      "answered": "Cevapladı",
+      "unanswerable_held": "Cevapsız, doğru tuttu",
+      "unanswerable_answered": "Cevapsız, yine de cevapladı"
+    },
+    "notRun": {
+      "approval_required": "Bir araç onay istedi ve paket onay beklemiyor",
+      "approval_rejected": "Araç onayını bir kişi reddetti",
+      "approval_expired": "Araç onayı karar verilmeden süresi doldu",
+      "waiting_user": "Agent kullanıcıya soru sordu",
+      "ner_unavailable": "Ad tanıma kullanılamıyordu",
+      "sql_reread_failed": "SQL sonucu yeniden okunamadı",
+      "tool_removed": "Araç kaldırılmıştı"
+    },
+    "errorKinds": {
+      "judgeOutOfTime": "Hakem zamanında bitiremedi",
+      "judgeFailed": "Hakem çağrısı başarısız",
+      "advanceFailed": "Sınavı ilerletme başarısız"
+    },
+    "gate": {
+      "reasons": {
+        "no_exam": "Bu sürümün henüz tamamlanmış bir sınavı yok",
+        "stale_exam": "Sürüm sınavından sonra değişti; sınavı yeniden koşun",
+        "stale_suite": "Paketin puanlayıcı, eşik ya da repeat değeri sınavdan sonra değişti; yeniden koşun",
+        "not_passed": "Sınav geçme eşiğine ulaşmadı",
+        "incomplete": "Sınav gözetimsiz tamamlanmadı (bazı maddeler koşmadı)",
+        "suite_not_gateable": "Sürüm onay isteyen bir araç kullanıyor ve paket onay beklemiyor"
+      }
     }
   }
 }

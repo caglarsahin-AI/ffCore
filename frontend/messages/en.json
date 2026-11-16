@@ -374,7 +374,29 @@
     "runNeedsMembership": "Agents run only in projects where you are a member.",
     "approvalRequiresUserSession": "Approvals are decided only by a signed-in user, not by a service or an API key.",
     "approvalNotPending": "This approval has already been decided.",
-    "approvalExpired": "The approval expired; the run was closed."
+    "approvalExpired": "The approval expired; the run was closed.",
+    "suiteKeyTaken": "A suite with this key already exists in the project.",
+    "datasetNameNotInProject": "The dataset name must start with the project key and a dot (project_key.).",
+    "evalThresholdNotConfigured": "No default pass threshold is configured for this installation; give the suite its own threshold.",
+    "judgeModelNotConfigured": "The llm_judge scorer needs a judge model (EVAL_JUDGE_MODEL), and none is configured. Remove the scorer or ask an administrator.",
+    "versionNotOfSuiteAgent": "This version belongs to another agent than the one the suite is bound to.",
+    "evalPlanExceedsTick": "With llm_judge, repeat × the planned judge time does not fit into one advancer step. Lower repeat.",
+    "evalTooManyRuns": "Items × repeat is over the most runs one exam may start. Lower repeat or split the dataset.",
+    "itemInputInvalid": "An item of the dataset cannot be run: its question is not text or it uses a variable the agent does not know.",
+    "datasetEmpty": "The suite's dataset has no active items yet. Add items first (from a run, or in Langfuse).",
+    "evalRunFinished": "The exam has already ended.",
+    "evalRunsNotComparable": "These two exams cannot be compared: both must be completed and of the same suite.",
+    "runInputBlocked": "The agent's guardrail policy blocks this question, so it cannot be saved as an exam item.",
+    "expectedWouldBeMasked": "An expected value would be masked by the guardrail policy and could never match. Change the expected values.",
+    "nerUnavailable": "The name recognition service the guardrail policy needs is not reachable. Try again later.",
+    "textTooLong": "The text is longer than the guardrail engine accepts.",
+    "langfuseUnreachable": "Langfuse, where exam items and scores are kept, is not reachable.",
+    "langfuseNotConfigured": "Langfuse is not configured for this installation, so exams cannot be used.",
+    "langfuseRequestFailed": "Langfuse refused the request.",
+    "evalGateFailed": "The exam gate refuses this version.",
+    "forceRequiresAdmin": "Only an administrator may publish past the exam gate.",
+    "forceReasonRequired": "Publishing past the exam gate needs a reason.",
+    "forceReasonWithoutForce": "A reason was given without publishing past the gate."
   },
   "ProviderTest": {
     "title": "Connection test",
@@ -1013,6 +1035,59 @@
       "analyst": "Analyst",
       "developer": "Developer",
       "admin": "Admin"
+    }
+  },
+  "Evaluations": {
+    "statuses": {
+      "queued": "Queued",
+      "running": "Running",
+      "completed": "Completed",
+      "failed": "Failed",
+      "cancelled": "Cancelled"
+    },
+    "scorers": {
+      "contains": "Contains",
+      "regex": "Pattern (regex)",
+      "json_schema": "JSON schema",
+      "cites_source": "Cites the source",
+      "semantic": "Semantic similarity",
+      "llm_judge": "LLM judge",
+      "sql_result": "SQL result",
+      "latency_cost": "Latency and cost"
+    },
+    "outcomes": {
+      "not_retrieved": "Not retrieved",
+      "below_rerank_floor": "Below the rerank floor",
+      "not_reranked": "Not among the sources given",
+      "declined": "Declined",
+      "below_threshold": "Below the confidence threshold",
+      "answered": "Answered",
+      "unanswerable_held": "Unanswerable, held back",
+      "unanswerable_answered": "Unanswerable, answered"
+    },
+    "notRun": {
+      "approval_required": "A tool asked for approval and the suite does not wait for approvals",
+      "approval_rejected": "A person rejected the tool approval",
+      "approval_expired": "The tool approval expired before a decision",
+      "waiting_user": "The agent asked the user a question",
+      "ner_unavailable": "Name recognition was unavailable",
+      "sql_reread_failed": "The SQL result could not be read again",
+      "tool_removed": "The tool was removed"
+    },
+    "errorKinds": {
+      "judgeOutOfTime": "The judge did not finish in time",
+      "judgeFailed": "The judge call failed",
+      "advanceFailed": "Advancing the exam failed"
+    },
+    "gate": {
+      "reasons": {
+        "no_exam": "No completed exam of this version yet",
+        "stale_exam": "The version changed after its exam; run the exam again",
+        "stale_suite": "The suite's scorers, threshold or repeat changed after the exam; run it again",
+        "not_passed": "The exam did not reach the pass threshold",
+        "incomplete": "The exam did not complete unattended (some items were not run)",
+        "suite_not_gateable": "The version uses a tool that asks for approval and the suite does not wait for approvals"
+      }
     }
   }
 }
