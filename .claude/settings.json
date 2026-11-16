@@ -7,6 +7,7 @@
       "Read(**/.env)",
       "Edit(**/.env)",
       "Read(//c/ai_paycore/paycoreLLM/.env)",
+      "Edit(//c/ai_paycore/paycoreLLM/.env)",
       "Read(//c/ai_paycore/paycoreLLM/data/**)",
       "Read(//c/ai_paycore/paycoreLLM/eval/results/**)"
     ]

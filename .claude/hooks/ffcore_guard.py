@@ -10,9 +10,12 @@ Contract: Claude Code passes the tool call as JSON on stdin (tool_name,
 tool_input, session_id). Exit 2 blocks the call and stderr goes to the model.
 Exit 0 lets it run. FFCORE_GUARD_MODE=warn|block (default block).
 
-This is a safety net, not a sandbox: commands built at runtime (variables,
-script files, Makefile recipes, `bash -c` beyond plain text matching) and Bash
-writes to state files are not inspected. Stdlib only, no network.
+Bash rules also apply inside `sh -c` / `bash -c` text and to the command a
+`docker compose run|exec` starts in its service. This is a safety net, not a
+sandbox: commands built at runtime (variables, script files, Makefile recipes)
+and Bash writes to state files are not inspected. Log lines are masked
+(credentials in URLs, *KEY/TOKEN/SECRET/PASS*= values, Authorization/Bearer).
+Stdlib only, no network.
 """
 
 from __future__ import annotations
@@ -33,7 +36,9 @@ WRITE_TOOLS = frozenset({"Edit", "Write", "MultiEdit", "NotebookEdit"})
 COORDINATOR_FILES = frozenset(
     {"state/work_queue.md", "state/blockers.md", "kararlar.md", "state/oturumlar.json"}
 )
-GATE_MAKE_TARGETS = frozenset({"lint", "test", "test-int", "smoke"})
+GATE_MAKE_TARGETS = frozenset({"lint", "test", "test-int", "smoke", "e2e"})
+# compose services whose default command is a gate (KARARLAR r1: e2e is a gate)
+GATE_SERVICES = frozenset({"e2e"})
 PYTEST_INFO_FLAGS = frozenset({"--version", "--help", "-h", "--collect-only", "--co"})
 COMPOSE_VALUE_OPTS = frozenset(
     {
@@ -50,13 +55,53 @@ COMPOSE_VALUE_OPTS = frozenset(
     }
 )
 GIT_VALUE_OPTS = frozenset({"-C", "-c", "--git-dir", "--work-tree", "--namespace"})
+# `docker compose run|exec` options that take a value (skipped to find the service)
+COMPOSE_RUN_VALUE_OPTS = frozenset(
+    {
+        "-e",
+        "--env",
+        "--env-from-file",
+        "--entrypoint",
+        "-w",
+        "--workdir",
+        "-u",
+        "--user",
+        "--name",
+        "-l",
+        "--label",
+        "-p",
+        "--publish",
+        "-v",
+        "--volume",
+        "--cap-add",
+        "--cap-drop",
+        "--pull",
+        "--index",
+    }
+)
+SHELLS = frozenset({"sh", "bash"})
+MAX_NESTING = 3
 MAX_FF_STACKS = 3
 FF_STACK_RE = re.compile(r"^(ff|review)", re.IGNORECASE)
-ENV_RE = re.compile(r"(?<![\w.])\.env(?![.\w])")
+ENV_RE = re.compile(r"(?<![\w.])\.env(?![.\w])", re.IGNORECASE)  # Windows: .ENV is .env
 PAYCORE_RE = re.compile(r"paycorellm[/\\]+(?:data|eval[/\\]+results)(?:[/\\]|\b)", re.IGNORECASE)
-TOP_SPLIT_RE = re.compile(r"&&|\|\||;|\n|(?<![>&|])&(?![>&])")
-PIPE_SPLIT_RE = re.compile(r"\|")
 LOG_DETAIL_MAX = 120
+# Log masking (SECURITY_AND_PERMISSIONS: logs carry no secrets); applied before truncation.
+MASKS = (
+    (re.compile(r"(\w+://)[^/\s@]+@"), r"\1***@"),
+    (
+        re.compile(
+            r"\b([A-Za-z0-9_-]*(?:key|token|secret|pass(?:word)?|auth|credential)[A-Za-z0-9_-]*)=\S+",
+            re.IGNORECASE,
+        ),
+        r"\1=***",
+    ),
+    (
+        re.compile(r"Authorization:\s*[^\s\"']+(?:\s+[^\s\"']+)?", re.IGNORECASE),
+        "Authorization: ***",
+    ),
+    (re.compile(r"Bearer\s+[^\s\"']+", re.IGNORECASE), "Bearer ***"),
+)
 
 
 class GuardError(Exception):
@@ -159,6 +204,79 @@ def no_role_message(info: RoleInfo, payload: Mapping, env: Mapping[str, str]) ->
 # --- Bash rules -------------------------------------------------------------
 
 
+def split_pipelines(command: str) -> list[list[str]]:
+    """Split on unquoted `&&`, `||`, `;`, newline and `&` into pipelines, each split on
+    unquoted `|`. Quotes are respected so `sh -c 'a && b'` stays one element; redirections
+    such as `2>&1`, `&>` and `>&` are not separators."""
+    pipelines: list[list[str]] = []
+    parts: list[str] = []
+    buf: list[str] = []
+    quote: str | None = None
+    i, n = 0, len(command)
+
+    def cut_part() -> None:
+        parts.append("".join(buf))
+        buf.clear()
+
+    def cut_pipeline() -> None:
+        cut_part()
+        pipelines.append(parts.copy())
+        parts.clear()
+
+    while i < n:
+        c = command[i]
+        if quote:
+            if c == "\\" and quote == '"' and i + 1 < n:
+                buf.append(command[i : i + 2])
+                i += 2
+                continue
+            if c == quote:
+                quote = None
+            buf.append(c)
+            i += 1
+            continue
+        if c in ("'", '"'):
+            quote = c
+            buf.append(c)
+            i += 1
+            continue
+        if c == "\\" and i + 1 < n:
+            buf.append(command[i : i + 2])
+            i += 2
+            continue
+        two = command[i : i + 2]
+        if two in ("&&", "||"):
+            cut_pipeline()
+            i += 2
+            continue
+        if c in (";", "\n"):
+            cut_pipeline()
+            i += 1
+            continue
+        if c == "&":
+            prev = command[i - 1] if i else ""
+            nxt = command[i + 1] if i + 1 < n else ""
+            if prev in (">", "<") or nxt == ">":
+                buf.append(c)
+            else:
+                cut_pipeline()
+            i += 1
+            continue
+        if c == "|":
+            if i and command[i - 1] == ">":  # `>|` clobber redirection
+                buf.append(c)
+            else:
+                cut_part()
+                if i + 1 < n and command[i + 1] == "&":  # `|&` pipes stderr too
+                    i += 1
+            i += 1
+            continue
+        buf.append(c)
+        i += 1
+    cut_pipeline()
+    return pipelines
+
+
 def tokens(part: str) -> list[str]:
     try:
         toks = shlex.split(part, posix=True)
@@ -228,15 +346,46 @@ def running_ff_stacks() -> list[str]:
     return parse_compose_ls(proc.stdout)
 
 
-def check_compose(toks: list[str]) -> list[Violation]:
-    idx = None
+def compose_start(toks: list[str]) -> int | None:
+    """Index right after `docker compose` / `docker-compose`, or None."""
     for i, t in enumerate(toks):
         if basename(t) == "docker-compose":
-            idx = i + 1
-            break
+            return i + 1
         if t == "compose" and i > 0 and basename(toks[i - 1]) == "docker":
-            idx = i + 1
-            break
+            return i + 1
+    return None
+
+
+def compose_service_command(toks: list[str]) -> tuple[str, list[str]] | None:
+    """(service, command tokens) of `docker compose run|exec`, else None."""
+    idx = compose_start(toks)
+    if idx is None:
+        return None
+    pos, sub = subcommand(toks, idx, COMPOSE_VALUE_OPTS)
+    if sub not in ("run", "exec"):
+        return None
+    pos, service = subcommand(toks, pos + 1, COMPOSE_RUN_VALUE_OPTS)
+    if service is None:
+        return None
+    return service, toks[pos + 1 :]
+
+
+def shell_inner(toks: list[str]) -> str | None:
+    """The command text of `sh -c '<text>'` / `bash -lc '<text>'`, else None."""
+    rest = strip_assignments(toks)
+    if not rest or basename(rest[0]) not in SHELLS:
+        return None
+    for i in range(1, len(rest) - 1):
+        t = rest[i]
+        if not t.startswith("-"):
+            return None
+        if not t.startswith("--") and "c" in t[1:]:
+            return rest[i + 1]
+    return None
+
+
+def check_compose(toks: list[str]) -> list[Violation]:
+    idx = compose_start(toks)
     if idx is None:
         return []
     _, sub = subcommand(toks, idx, COMPOSE_VALUE_OPTS)
@@ -295,6 +444,11 @@ def is_gate_command(toks: list[str]) -> bool:
     if head == "make":
         targets = [t for t in toks[1:] if not t.startswith("-") and "=" not in t]
         return any(t in GATE_MAKE_TARGETS for t in targets)
+    if any(
+        basename(t) == "playwright" and i + 1 < len(toks) and toks[i + 1] == "test"
+        for i, t in enumerate(toks)
+    ):
+        return True
     is_pytest = head == "pytest" or any(
         t == "-m" and i + 1 < len(toks) and toks[i + 1] == "pytest" for i, t in enumerate(toks)
     )
@@ -330,7 +484,41 @@ def check_push(toks: list[str], payload: Mapping, env: Mapping[str, str]) -> lis
     return []
 
 
-def check_bash(command: str, payload: Mapping, env: Mapping[str, str]) -> list[Violation]:
+KAPI_MESSAGE = (
+    "kapı/test çıktısı tamamen dosyaya: ... 2>&1 | tee "
+    "state/evidence/<paket>-<adım>.log (K-05a-0011)"
+)
+
+
+def check_tokens(
+    toks: list[str], has_tee: bool, payload: Mapping, env: Mapping[str, str], depth: int
+) -> list[Violation]:
+    """Rules for one pipeline element, recursing into compose run|exec and sh -c."""
+    found = check_push(toks, payload, env) + check_compose(toks)
+    if is_gate_command(toks) and not has_tee:
+        found.append(Violation("KAPI", KAPI_MESSAGE))
+    if depth >= MAX_NESTING:
+        return found
+    service = compose_service_command(toks)
+    if service is not None:
+        name, inner = service
+        if not inner and name in GATE_SERVICES and not has_tee:
+            found.append(Violation("KAPI", KAPI_MESSAGE))
+        if inner:
+            found.extend(check_tokens(inner, has_tee, payload, env, depth + 1))
+    text = shell_inner(toks)
+    if text is not None:
+        found.extend(check_bash(text, payload, env, outer_tee=has_tee, depth=depth + 1))
+    return found
+
+
+def check_bash(
+    command: str,
+    payload: Mapping,
+    env: Mapping[str, str],
+    outer_tee: bool = False,
+    depth: int = 0,
+) -> list[Violation]:
     found: list[Violation] = []
     if ENV_RE.search(command):
         found.append(
@@ -344,25 +532,18 @@ def check_bash(command: str, payload: Mapping, env: Mapping[str, str]) -> list[V
                 "PAYCORE", "paycoreLLM data/** ve eval/results/** okunmaz (CLAUDE.md, PLAN 2d)"
             )
         )
-    for segment in TOP_SPLIT_RE.split(command):
-        parts = [tokens(p) for p in PIPE_SPLIT_RE.split(segment)]
+    for pipeline in split_pipelines(command):
+        parts = [tokens(p) for p in pipeline]
         has_tee = any(
             strip_assignments(t)[:1] and basename(strip_assignments(t)[0]) == "tee" for t in parts
         )
         for toks in parts:
-            if not toks:
-                continue
-            found.extend(check_push(toks, payload, env))
-            found.extend(check_compose(toks))
-            if is_gate_command(toks) and not has_tee:
-                found.append(
-                    Violation(
-                        "KAPI",
-                        "kapı/test çıktısı tamamen dosyaya: ... 2>&1 | tee "
-                        "state/evidence/<paket>-<adım>.log (K-05a-0011)",
-                    )
-                )
-    return found
+            if toks:
+                found.extend(check_tokens(toks, has_tee or outer_tee, payload, env, depth))
+    unique: dict[tuple[str, str], Violation] = {}
+    for v in found:
+        unique.setdefault((v.rule, v.message), v)
+    return list(unique.values())
 
 
 # --- file-tool rules ---------------------------------------------------------
@@ -400,7 +581,7 @@ def owner_of(rel: str) -> tuple[str, str] | None:
 def check_write(path: str, payload: Mapping, env: Mapping[str, str]) -> list[Violation]:
     if not path:
         return []
-    if norm(path).rsplit("/", 1)[-1] == ".env":
+    if norm(path).rsplit("/", 1)[-1].lower() == ".env":
         return [Violation("ENV", ".env okunmaz ve yazılmaz (SECURITY_AND_PERMISSIONS)")]
     root = main_root(env)
     rel = relative_to_root(path, root)
@@ -484,12 +665,18 @@ def targets_guard_files(payload: Mapping) -> bool:
     return "/.claude/hooks/" in p or p.endswith("/.claude/settings.json")
 
 
+def mask_secrets(text: str) -> str:
+    for pattern, repl in MASKS:
+        text = pattern.sub(repl, text)
+    return text
+
+
 def log_line(
     env: Mapping[str, str], mode: str, role: str, tool: str, rule: str, detail: str
 ) -> None:
     from datetime import datetime  # lazy: only violations are logged
 
-    detail = re.sub(r"[\r\n\t]+", " ", detail)[:LOG_DETAIL_MAX]
+    detail = mask_secrets(re.sub(r"[\r\n\t]+", " ", detail))[:LOG_DETAIL_MAX]
     line = "\t".join([datetime.now().isoformat(timespec="seconds"), mode, role, tool, rule, detail])
     log = main_root(env) / "state" / "evidence" / "hook-guard.log"
     try:
