@@ -57,7 +57,8 @@ def multiedit(path: Path, edits: list[tuple[str, str]]) -> dict:
 
 def violations(guard, payload, main_root, rol="isci-b"):
     return [
-        v for v in guard.decide(payload, base_env(main_root, FFCORE_ROL=rol))
+        v
+        for v in guard.decide(payload, base_env(main_root, FFCORE_ROL=rol))
         if v.rule == "KANAL-BICIM"
     ]
 
@@ -105,7 +106,10 @@ def test_valid_typed_fields_allowed(guard, main_root, tur, second):
 
 
 def test_kullanici_allowed_in_coordinator_channel(guard, main_root):
-    m = msg("### K-GEN-0099 · 2026-11-16 22:40 · → kullanici · DURUM", "Paket: - · Cevap: - · Durum: DUYURU")
+    m = msg(
+        "### K-GEN-0099 · 2026-11-16 22:40 · → kullanici · DURUM",
+        "Paket: - · Cevap: - · Durum: DUYURU",
+    )
     assert appended(guard, main_root, m, rol="koordinator") == []
 
 
@@ -132,7 +136,9 @@ def test_invalid_header_blocked(guard, main_root, header, field):
 
 
 def test_kullanici_blocked_in_worker_channel(guard, main_root):
-    found = appended(guard, main_root, msg("### B-HOOK2-0009 · 2026-11-16 22:40 · → kullanici · ACK", P))
+    found = appended(
+        guard, main_root, msg("### B-HOOK2-0009 · 2026-11-16 22:40 · → kullanici · ACK", P)
+    )
     assert found and "kullanici" in found[0].message
 
 
@@ -220,14 +226,18 @@ def test_edit_old_string_missing_checks_new_string(guard, main_root):
 def test_multiedit_checked(guard, main_root):
     path = kanal(main_root)
     bad = msg(H + "BILINMEYEN", P)
-    payload = multiedit(path, [("- Durum: ACTIVE", "- Durum: ACTIVE"), ("## Mesajlar\n", "## Mesajlar\n" + bad)])
+    payload = multiedit(
+        path, [("- Durum: ACTIVE", "- Durum: ACTIVE"), ("## Mesajlar\n", "## Mesajlar\n" + bad)]
+    )
     found = violations(guard, payload, main_root)
     assert found and "tür" in found[0].message
 
 
 def test_new_channel_file_checked(guard, main_root):
     path = main_root / "state" / "kanal" / "isci-d.md"
-    found = violations(guard, write(path, PREAMBLE + msg(H + "YIGIN-AÇ", P)), main_root, rol="isci-d")
+    found = violations(
+        guard, write(path, PREAMBLE + msg(H + "YIGIN-AÇ", P)), main_root, rol="isci-d"
+    )
     assert found
 
 
@@ -287,7 +297,7 @@ def test_types_match_protocol(guard):
 
 def test_recipients_match_protocol(guard):
     line = bullet(protocol_section(), "Alıcı listesi")
-    common, coordinator_only = line.split(";", 1)
+    common, coordinator_only = line.split(". ", 1)[0].split(";", 1)
     assert tuple(ticks(common)) == guard.RECIPIENTS
     assert tuple(ticks(coordinator_only)) == guard.COORDINATOR_ONLY_RECIPIENTS
 
@@ -304,7 +314,7 @@ def test_required_fields_match_protocol(guard):
         names = tuple(f.split(":", 1)[0] for f in fields)
         for f in fields:
             name, val = (s.strip() for s in f.split(":", 1))
-            if not val.startswith("<"):
+            if "<" not in val:
                 values[name] = tuple(val.split("|"))
         if not types:
             common = names
