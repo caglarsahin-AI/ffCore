@@ -75,5 +75,33 @@
 - Değişkenle kurulan komut, betik dosyası, Makefile tarifi, compose olmayan `docker exec/run`, `case` kolları ve Bash ile state yazımı yakalanmaz (belgede).
 - Tarayıcı tam bir kabuk ayrıştırıcısı değil: `case … in a) …;;` kolları ve process substitution `>(…)` yaklaşık; dengesiz parantez/tırnak sonuna kadar grup sayılır (komut zaten sözdizimi hatası).
 - Heredoc gövdesindeki `git push`/`make test` satırları `PUSH`/`KAPI`'yı tetikleyebilir (yanlış pozitif yönü); warn günü gösterir.
-- `kanal_ozet` ACK eşlemesi yalnız yeni biçimli `ACK`'lerden: eski biçimli ACK'le cevaplanmış yeni biçimli bağlayıcı mesaj (ör. K-HOOK-0006/0010) "bekleyen" görünür.
+- ~~`kanal_ozet` ACK eşlemesi … eski biçimli ACK'le cevaplanmış … "bekleyen" görünür.~~ **Düzeltme (r2, MINOR-3):** bu açıklama yanlıştı. C-10C1-0010, K-HOOK-0006 ve K-HOOK-0010'a hiç ACK yazılmamış; cevapları yeni biçimli K-10C1-0008 CEVAP, A-HOOK-0008 ve A-HOOK-0009 PR-HAZIR mesajları. r2'de bunlar ayrı "ACK'siz cevaplanmış" listesinde; gerçek kanallarda bekleyen ACK 0.
+- Yorumlayıcı kodunda (`py -c`, `python <<EOF`) metin olarak geçen `.env` engellenir (22:58:36 sınıfı geri döndü; K-HOOK2-0007 kararı, yanlış negatiften iyi). `timeout`, `xargs`, `sudo` sarmalayıcıları denetlenmez (belgede).
+
+## r2: DUZELT K-HOOK2-0007 (r1 ONAY B0 M0 m5 N6, rapor `state/reviews/fix-ajan-hooklari-2-r1.md`)
+
+Delta `571ae6f..d5e9c1142c6f5f9f7d356aafbf3533257c5d2ed2`: 4 commit, 11 dosya +341/-54. Baz değişmedi (main 7d87f04); main'in sonraki state commit'leriyle çakışma yok (`git merge-tree`). **Not:** r2 sırasında dalı bir kez main'e rebase ettim; bu, incelenmiş 571ae6f'yi geçmişten çıkardığı için hemen `ORIG_HEAD`'e geri aldım (yalnız dal; main'e dokunulmadı). Kapı geri alınmış HEAD'de yeniden koşuldu.
+
+| Commit | Tür | İçerik |
+|---|---|---|
+| 00c25b7 | test | r2 kırmızı: W13-W15 + tee'siz `make test`, `env -S` (W28), E28-E30/E36 + kod heredoc'ları, veri heredoc'u iç gruplarda serbest, M04-M08 (+`x-api-key`, `client_secret`), kanal_ozet ACK'siz cevaplanmış (29 kırmızı → `hook2-r2-red-hooks.log` 25, `hook2-r2-red-scripts.log` 4) |
+| 1207df2 | fix | `command_words` + `compound_body` (yalnız tırnak dışı ve komut konumundaki anahtar sözcük); `env -S/--split-string` değeri komut; heredoc okuyucusu `sh/bash` → kabuk, `py/python/python3/node` → kod (`CODE_ENV_RE`, boşluk önekli); `-c/-e/--eval` kodu taranır; `ENV_PATH_RE` ön ekine `' " (`; ENV/PAYCORE yalnız en üst düzeyde (iç grup özyinelemesi veri heredoc gövdesini komut sanıyordu: kırmızı testte ortaya çıktı); maske varyantları |
+| 60edb43 | feat | `kanal_ozet`: alıcının kanalından `Cevap` ile cevaplanan bağlayıcı mesaj `acksiz_cevaplanmis` listesine (`cevap_id`), `tumu` için her kanal |
+| d5e9c11 | docs | ENVIRONMENT Kip/Kayıt/Yükleme/Testler/Bilinen sınırlar; SECURITY; protokol `### yalnız başlık` + ACK'siz liste; docs 9.2 kip, ENV satırı, sınırlar |
+
+| Madde | Test |
+|---|---|
+| MINOR-1 | `test_wrappers::test_r2_push_hidden_in_compound_or_env_s_blocked[W13,W14,W15,+2]`, `test_r2_gate_after_quoted_keyword_blocked`, `test_r2_harmless_forms_allowed` |
+| MINOR-2 | `test_env_position::test_r2_env_in_code_blocked[E28,E36,E29,E30,+7]`, `test_r2_env_data_heredoc_and_clean_code_allowed[4]` |
+| MINOR-3 | `test_kanal_ozet::test_answered_without_ack`, `test_text_lists_answered_without_ack`, `test_pending_ack` (başka kanaldan cevap sayılmaz) |
+| MINOR-4 | `test_masks::test_r2_mask_variants[M04-M08,+2]` |
+| NOTE-4 | `test_r2_push_hidden_in_compound_or_env_s_blocked[env -S ×3]`, `env -S 'git status'` serbest |
+| MINOR-5, NOTE-1 | belge (d5e9c11) |
+
+| Komut | Ortam | Exit | Süre |
+|---|---|---|---|
+| `py -3.12 -m pytest tests/hooks tests/scripts -q 2>&1 \| tee state/evidence/hook2-tests-r2.log` (ilk satır HEAD) | host 3.12, HEAD d5e9c11 | 0 (**355 passed**) | 81 sn |
+| ruff check + format --check → `state/evidence/hook2-ruff-r2.log` | ruff 0.17.3 uv önbelleği | 0 / 0 | <1 sn |
+| `py -3.12 -X utf8 scripts/kanal_ozet.py` | gerçek kanallar | 0 | 64 geçerli, 2073 biçim dışı, bekleyen 0, ACK'siz cevaplanmış 3 |
+| yanlış pozitif sondası (17 gündelik komut, D2 betiği) | HEAD | — | hepsi kuralsız |
 - Hook çağrı başı gecikmesi (~1 sn) değişmedi; kanal yazımında dosya bir kez okunur.

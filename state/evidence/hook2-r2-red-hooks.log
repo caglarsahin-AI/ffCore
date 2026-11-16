@@ -1,0 +1,709 @@
+FFFFFFFFF...FF.F.FFFFF.F...FFFFFFF                                       [100%]
+================================== FAILURES ===================================
+_ test_r2_push_hidden_in_compound_or_env_s_blocked[if true; then echo fi; git push origin main; fi] _
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-61/test_r2_push_hidden_in_compoun0/ffcore')
+cmd = 'if true; then echo fi; git push origin main; fi'
+
+    @pytest.mark.parametrize(
+        "cmd",
+        [
+            "if true; then echo fi; git push origin main; fi",  # W13
+            'if grep -q "done" x.txt; then git push origin main; fi',  # W14
+            "for x in done; do git push origin main; done",  # W15
+            "if echo 'fi'; then git push; fi",
+            "while read l; do echo done; git push; done < f",
+            "env -S 'git push origin main'",  # W28
+            'env -S"git push"',
+            "env --split-string='git push'",
+        ],
+    )
+    def test_r2_push_hidden_in_compound_or_env_s_blocked(guard, main_root, cmd):
+>       assert "PUSH" in rules(guard, cmd, main_root), cmd
+E       AssertionError: if true; then echo fi; git push origin main; fi
+E       assert 'PUSH' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>, 'if true; then echo fi; git push origin main; fi', WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-61/test_r2_push_hidden_in_compoun0/ffcore'))
+
+tests\hooks\test_wrappers.py:160: AssertionError
+_ test_r2_push_hidden_in_compound_or_env_s_blocked[if grep -q "done" x.txt; then git push origin main; fi] _
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-61/test_r2_push_hidden_in_compoun1/ffcore')
+cmd = 'if grep -q "done" x.txt; then git push origin main; fi'
+
+    @pytest.mark.parametrize(
+        "cmd",
+        [
+            "if true; then echo fi; git push origin main; fi",  # W13
+            'if grep -q "done" x.txt; then git push origin main; fi',  # W14
+            "for x in done; do git push origin main; done",  # W15
+            "if echo 'fi'; then git push; fi",
+            "while read l; do echo done; git push; done < f",
+            "env -S 'git push origin main'",  # W28
+            'env -S"git push"',
+            "env --split-string='git push'",
+        ],
+    )
+    def test_r2_push_hidden_in_compound_or_env_s_blocked(guard, main_root, cmd):
+>       assert "PUSH" in rules(guard, cmd, main_root), cmd
+E       AssertionError: if grep -q "done" x.txt; then git push origin main; fi
+E       assert 'PUSH' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>, 'if grep -q "done" x.txt; then git push origin main; fi', WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-61/test_r2_push_hidden_in_compoun1/ffcore'))
+
+tests\hooks\test_wrappers.py:160: AssertionError
+_ test_r2_push_hidden_in_compound_or_env_s_blocked[for x in done; do git push origin main; done] _
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-61/test_r2_push_hidden_in_compoun2/ffcore')
+cmd = 'for x in done; do git push origin main; done'
+
+    @pytest.mark.parametrize(
+        "cmd",
+        [
+            "if true; then echo fi; git push origin main; fi",  # W13
+            'if grep -q "done" x.txt; then git push origin main; fi',  # W14
+            "for x in done; do git push origin main; done",  # W15
+            "if echo 'fi'; then git push; fi",
+            "while read l; do echo done; git push; done < f",
+            "env -S 'git push origin main'",  # W28
+            'env -S"git push"',
+            "env --split-string='git push'",
+        ],
+    )
+    def test_r2_push_hidden_in_compound_or_env_s_blocked(guard, main_root, cmd):
+>       assert "PUSH" in rules(guard, cmd, main_root), cmd
+E       AssertionError: for x in done; do git push origin main; done
+E       assert 'PUSH' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>, 'for x in done; do git push origin main; done', WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-61/test_r2_push_hidden_in_compoun2/ffcore'))
+
+tests\hooks\test_wrappers.py:160: AssertionError
+_ test_r2_push_hidden_in_compound_or_env_s_blocked[if echo 'fi'; then git push; fi] _
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-61/test_r2_push_hidden_in_compoun3/ffcore')
+cmd = "if echo 'fi'; then git push; fi"
+
+    @pytest.mark.parametrize(
+        "cmd",
+        [
+            "if true; then echo fi; git push origin main; fi",  # W13
+            'if grep -q "done" x.txt; then git push origin main; fi',  # W14
+            "for x in done; do git push origin main; done",  # W15
+            "if echo 'fi'; then git push; fi",
+            "while read l; do echo done; git push; done < f",
+            "env -S 'git push origin main'",  # W28
+            'env -S"git push"',
+            "env --split-string='git push'",
+        ],
+    )
+    def test_r2_push_hidden_in_compound_or_env_s_blocked(guard, main_root, cmd):
+>       assert "PUSH" in rules(guard, cmd, main_root), cmd
+E       AssertionError: if echo 'fi'; then git push; fi
+E       assert 'PUSH' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>, "if echo 'fi'; then git push; fi", WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-61/test_r2_push_hidden_in_compoun3/ffcore'))
+
+tests\hooks\test_wrappers.py:160: AssertionError
+_ test_r2_push_hidden_in_compound_or_env_s_blocked[while read l; do echo done; git push; done < f] _
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-61/test_r2_push_hidden_in_compoun4/ffcore')
+cmd = 'while read l; do echo done; git push; done < f'
+
+    @pytest.mark.parametrize(
+        "cmd",
+        [
+            "if true; then echo fi; git push origin main; fi",  # W13
+            'if grep -q "done" x.txt; then git push origin main; fi',  # W14
+            "for x in done; do git push origin main; done",  # W15
+            "if echo 'fi'; then git push; fi",
+            "while read l; do echo done; git push; done < f",
+            "env -S 'git push origin main'",  # W28
+            'env -S"git push"',
+            "env --split-string='git push'",
+        ],
+    )
+    def test_r2_push_hidden_in_compound_or_env_s_blocked(guard, main_root, cmd):
+>       assert "PUSH" in rules(guard, cmd, main_root), cmd
+E       AssertionError: while read l; do echo done; git push; done < f
+E       assert 'PUSH' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>, 'while read l; do echo done; git push; done < f', WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-61/test_r2_push_hidden_in_compoun4/ffcore'))
+
+tests\hooks\test_wrappers.py:160: AssertionError
+_ test_r2_push_hidden_in_compound_or_env_s_blocked[env -S 'git push origin main'] _
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-61/test_r2_push_hidden_in_compoun5/ffcore')
+cmd = "env -S 'git push origin main'"
+
+    @pytest.mark.parametrize(
+        "cmd",
+        [
+            "if true; then echo fi; git push origin main; fi",  # W13
+            'if grep -q "done" x.txt; then git push origin main; fi',  # W14
+            "for x in done; do git push origin main; done",  # W15
+            "if echo 'fi'; then git push; fi",
+            "while read l; do echo done; git push; done < f",
+            "env -S 'git push origin main'",  # W28
+            'env -S"git push"',
+            "env --split-string='git push'",
+        ],
+    )
+    def test_r2_push_hidden_in_compound_or_env_s_blocked(guard, main_root, cmd):
+>       assert "PUSH" in rules(guard, cmd, main_root), cmd
+E       AssertionError: env -S 'git push origin main'
+E       assert 'PUSH' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>, "env -S 'git push origin main'", WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-61/test_r2_push_hidden_in_compoun5/ffcore'))
+
+tests\hooks\test_wrappers.py:160: AssertionError
+_____ test_r2_push_hidden_in_compound_or_env_s_blocked[env -S"git push"] ______
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-61/test_r2_push_hidden_in_compoun6/ffcore')
+cmd = 'env -S"git push"'
+
+    @pytest.mark.parametrize(
+        "cmd",
+        [
+            "if true; then echo fi; git push origin main; fi",  # W13
+            'if grep -q "done" x.txt; then git push origin main; fi',  # W14
+            "for x in done; do git push origin main; done",  # W15
+            "if echo 'fi'; then git push; fi",
+            "while read l; do echo done; git push; done < f",
+            "env -S 'git push origin main'",  # W28
+            'env -S"git push"',
+            "env --split-string='git push'",
+        ],
+    )
+    def test_r2_push_hidden_in_compound_or_env_s_blocked(guard, main_root, cmd):
+>       assert "PUSH" in rules(guard, cmd, main_root), cmd
+E       AssertionError: env -S"git push"
+E       assert 'PUSH' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>, 'env -S"git push"', WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-61/test_r2_push_hidden_in_compoun6/ffcore'))
+
+tests\hooks\test_wrappers.py:160: AssertionError
+_ test_r2_push_hidden_in_compound_or_env_s_blocked[env --split-string='git push'] _
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-61/test_r2_push_hidden_in_compoun7/ffcore')
+cmd = "env --split-string='git push'"
+
+    @pytest.mark.parametrize(
+        "cmd",
+        [
+            "if true; then echo fi; git push origin main; fi",  # W13
+            'if grep -q "done" x.txt; then git push origin main; fi',  # W14
+            "for x in done; do git push origin main; done",  # W15
+            "if echo 'fi'; then git push; fi",
+            "while read l; do echo done; git push; done < f",
+            "env -S 'git push origin main'",  # W28
+            'env -S"git push"',
+            "env --split-string='git push'",
+        ],
+    )
+    def test_r2_push_hidden_in_compound_or_env_s_blocked(guard, main_root, cmd):
+>       assert "PUSH" in rules(guard, cmd, main_root), cmd
+E       AssertionError: env --split-string='git push'
+E       assert 'PUSH' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>, "env --split-string='git push'", WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-61/test_r2_push_hidden_in_compoun7/ffcore'))
+
+tests\hooks\test_wrappers.py:160: AssertionError
+__________________ test_r2_gate_after_quoted_keyword_blocked __________________
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-61/test_r2_gate_after_quoted_keyw0/ffcore')
+
+    def test_r2_gate_after_quoted_keyword_blocked(guard, main_root):
+        cmd = 'if grep -q "build done" log; then make test; fi'
+>       assert "KAPI" in rules(guard, cmd, main_root)
+E       assert 'KAPI' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>, 'if grep -q "build done" log; then make test; fi', WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-61/test_r2_gate_after_quoted_keyw0/ffcore'))
+
+tests\hooks\test_wrappers.py:165: AssertionError
+___________ test_r2_env_in_code_blocked[bash <<EOF\ncat .env\nEOF] ____________
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-61/test_r2_env_in_code_blocked_ba0/ffcore')
+cmd = 'bash <<EOF\ncat .env\nEOF'
+
+    @pytest.mark.parametrize(
+        "cmd",
+        [
+            "bash <<EOF\ncat .env\nEOF",  # E28
+            "sh <<'EOF'\nsource .env\nEOF",  # E36
+            "py -3.12 - <<'EOF'\nprint(open('.env').read())\nEOF",
+            "python3 <<EOF\nimport os; os.system('cat .env')\nEOF",
+            "node <<EOF\nrequire('fs').readFileSync('.env')\nEOF",
+            "cat <<'EOF' | bash\ncat .env\nEOF",
+            "py -3.12 -c \"print(open('.env').read())\"",  # E29
+            "py -3.12 -c \"data = open('.env').read(); print(data)\"",  # E30
+            "python -c 'import dotenv; dotenv.load_dotenv(\".env\")'",
+            "node -e \"require('fs').readFileSync('.env')\"",
+            "cat x(.env)",
+        ],
+    )
+    def test_r2_env_in_code_blocked(guard, main_root, cmd):
+>       assert env_hit(guard, cmd, main_root), cmd
+E       AssertionError: bash <<EOF
+E         cat .env
+E         EOF
+E       assert False
+E        +  where False = env_hit(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>, 'bash <<EOF\ncat .env\nEOF', WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-61/test_r2_env_in_code_blocked_ba0/ffcore'))
+
+tests\hooks\test_env_position.py:99: AssertionError
+__________ test_r2_env_in_code_blocked[sh <<'EOF'\nsource .env\nEOF] __________
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-61/test_r2_env_in_code_blocked_sh0/ffcore')
+cmd = "sh <<'EOF'\nsource .env\nEOF"
+
+    @pytest.mark.parametrize(
+        "cmd",
+        [
+            "bash <<EOF\ncat .env\nEOF",  # E28
+            "sh <<'EOF'\nsource .env\nEOF",  # E36
+            "py -3.12 - <<'EOF'\nprint(open('.env').read())\nEOF",
+            "python3 <<EOF\nimport os; os.system('cat .env')\nEOF",
+            "node <<EOF\nrequire('fs').readFileSync('.env')\nEOF",
+            "cat <<'EOF' | bash\ncat .env\nEOF",
+            "py -3.12 -c \"print(open('.env').read())\"",  # E29
+            "py -3.12 -c \"data = open('.env').read(); print(data)\"",  # E30
+            "python -c 'import dotenv; dotenv.load_dotenv(\".env\")'",
+            "node -e \"require('fs').readFileSync('.env')\"",
+            "cat x(.env)",
+        ],
+    )
+    def test_r2_env_in_code_blocked(guard, main_root, cmd):
+>       assert env_hit(guard, cmd, main_root), cmd
+E       AssertionError: sh <<'EOF'
+E         source .env
+E         EOF
+E       assert False
+E        +  where False = env_hit(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>, "sh <<'EOF'\nsource .env\nEOF", WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-61/test_r2_env_in_code_blocked_sh0/ffcore'))
+
+tests\hooks\test_env_position.py:99: AssertionError
+_ test_r2_env_in_code_blocked[python3 <<EOF\nimport os; os.system('cat .env')\nEOF] _
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-61/test_r2_env_in_code_blocked_py1/ffcore')
+cmd = "python3 <<EOF\nimport os; os.system('cat .env')\nEOF"
+
+    @pytest.mark.parametrize(
+        "cmd",
+        [
+            "bash <<EOF\ncat .env\nEOF",  # E28
+            "sh <<'EOF'\nsource .env\nEOF",  # E36
+            "py -3.12 - <<'EOF'\nprint(open('.env').read())\nEOF",
+            "python3 <<EOF\nimport os; os.system('cat .env')\nEOF",
+            "node <<EOF\nrequire('fs').readFileSync('.env')\nEOF",
+            "cat <<'EOF' | bash\ncat .env\nEOF",
+            "py -3.12 -c \"print(open('.env').read())\"",  # E29
+            "py -3.12 -c \"data = open('.env').read(); print(data)\"",  # E30
+            "python -c 'import dotenv; dotenv.load_dotenv(\".env\")'",
+            "node -e \"require('fs').readFileSync('.env')\"",
+            "cat x(.env)",
+        ],
+    )
+    def test_r2_env_in_code_blocked(guard, main_root, cmd):
+>       assert env_hit(guard, cmd, main_root), cmd
+E       AssertionError: python3 <<EOF
+E         import os; os.system('cat .env')
+E         EOF
+E       assert False
+E        +  where False = env_hit(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>, "python3 <<EOF\nimport os; os.system('cat .env')\nEOF", WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-61/test_r2_env_in_code_blocked_py1/ffcore'))
+
+tests\hooks\test_env_position.py:99: AssertionError
+_______ test_r2_env_in_code_blocked[cat <<'EOF' | bash\ncat .env\nEOF] ________
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-61/test_r2_env_in_code_blocked_ca0/ffcore')
+cmd = "cat <<'EOF' | bash\ncat .env\nEOF"
+
+    @pytest.mark.parametrize(
+        "cmd",
+        [
+            "bash <<EOF\ncat .env\nEOF",  # E28
+            "sh <<'EOF'\nsource .env\nEOF",  # E36
+            "py -3.12 - <<'EOF'\nprint(open('.env').read())\nEOF",
+            "python3 <<EOF\nimport os; os.system('cat .env')\nEOF",
+            "node <<EOF\nrequire('fs').readFileSync('.env')\nEOF",
+            "cat <<'EOF' | bash\ncat .env\nEOF",
+            "py -3.12 -c \"print(open('.env').read())\"",  # E29
+            "py -3.12 -c \"data = open('.env').read(); print(data)\"",  # E30
+            "python -c 'import dotenv; dotenv.load_dotenv(\".env\")'",
+            "node -e \"require('fs').readFileSync('.env')\"",
+            "cat x(.env)",
+        ],
+    )
+    def test_r2_env_in_code_blocked(guard, main_root, cmd):
+>       assert env_hit(guard, cmd, main_root), cmd
+E       AssertionError: cat <<'EOF' | bash
+E         cat .env
+E         EOF
+E       assert False
+E        +  where False = env_hit(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>, "cat <<'EOF' | bash\ncat .env\nEOF", WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-61/test_r2_env_in_code_blocked_ca0/ffcore'))
+
+tests\hooks\test_env_position.py:99: AssertionError
+____ test_r2_env_in_code_blocked[py -3.12 -c "print(open('.env').read())"] ____
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-61/test_r2_env_in_code_blocked_py2/ffcore')
+cmd = 'py -3.12 -c "print(open(\'.env\').read())"'
+
+    @pytest.mark.parametrize(
+        "cmd",
+        [
+            "bash <<EOF\ncat .env\nEOF",  # E28
+            "sh <<'EOF'\nsource .env\nEOF",  # E36
+            "py -3.12 - <<'EOF'\nprint(open('.env').read())\nEOF",
+            "python3 <<EOF\nimport os; os.system('cat .env')\nEOF",
+            "node <<EOF\nrequire('fs').readFileSync('.env')\nEOF",
+            "cat <<'EOF' | bash\ncat .env\nEOF",
+            "py -3.12 -c \"print(open('.env').read())\"",  # E29
+            "py -3.12 -c \"data = open('.env').read(); print(data)\"",  # E30
+            "python -c 'import dotenv; dotenv.load_dotenv(\".env\")'",
+            "node -e \"require('fs').readFileSync('.env')\"",
+            "cat x(.env)",
+        ],
+    )
+    def test_r2_env_in_code_blocked(guard, main_root, cmd):
+>       assert env_hit(guard, cmd, main_root), cmd
+E       AssertionError: py -3.12 -c "print(open('.env').read())"
+E       assert False
+E        +  where False = env_hit(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>, 'py -3.12 -c "print(open(\'.env\').read())"', WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-61/test_r2_env_in_code_blocked_py2/ffcore'))
+
+tests\hooks\test_env_position.py:99: AssertionError
+_ test_r2_env_in_code_blocked[py -3.12 -c "data = open('.env').read(); print(data)"] _
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-61/test_r2_env_in_code_blocked_py3/ffcore')
+cmd = 'py -3.12 -c "data = open(\'.env\').read(); print(data)"'
+
+    @pytest.mark.parametrize(
+        "cmd",
+        [
+            "bash <<EOF\ncat .env\nEOF",  # E28
+            "sh <<'EOF'\nsource .env\nEOF",  # E36
+            "py -3.12 - <<'EOF'\nprint(open('.env').read())\nEOF",
+            "python3 <<EOF\nimport os; os.system('cat .env')\nEOF",
+            "node <<EOF\nrequire('fs').readFileSync('.env')\nEOF",
+            "cat <<'EOF' | bash\ncat .env\nEOF",
+            "py -3.12 -c \"print(open('.env').read())\"",  # E29
+            "py -3.12 -c \"data = open('.env').read(); print(data)\"",  # E30
+            "python -c 'import dotenv; dotenv.load_dotenv(\".env\")'",
+            "node -e \"require('fs').readFileSync('.env')\"",
+            "cat x(.env)",
+        ],
+    )
+    def test_r2_env_in_code_blocked(guard, main_root, cmd):
+>       assert env_hit(guard, cmd, main_root), cmd
+E       AssertionError: py -3.12 -c "data = open('.env').read(); print(data)"
+E       assert False
+E        +  where False = env_hit(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>, 'py -3.12 -c "data = open(\'.env\').read(); print(data)"', WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-61/test_r2_env_in_code_blocked_py3/ffcore'))
+
+tests\hooks\test_env_position.py:99: AssertionError
+_ test_r2_env_in_code_blocked[python -c 'import dotenv; dotenv.load_dotenv(".env")'] _
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-61/test_r2_env_in_code_blocked_py4/ffcore')
+cmd = 'python -c \'import dotenv; dotenv.load_dotenv(".env")\''
+
+    @pytest.mark.parametrize(
+        "cmd",
+        [
+            "bash <<EOF\ncat .env\nEOF",  # E28
+            "sh <<'EOF'\nsource .env\nEOF",  # E36
+            "py -3.12 - <<'EOF'\nprint(open('.env').read())\nEOF",
+            "python3 <<EOF\nimport os; os.system('cat .env')\nEOF",
+            "node <<EOF\nrequire('fs').readFileSync('.env')\nEOF",
+            "cat <<'EOF' | bash\ncat .env\nEOF",
+            "py -3.12 -c \"print(open('.env').read())\"",  # E29
+            "py -3.12 -c \"data = open('.env').read(); print(data)\"",  # E30
+            "python -c 'import dotenv; dotenv.load_dotenv(\".env\")'",
+            "node -e \"require('fs').readFileSync('.env')\"",
+            "cat x(.env)",
+        ],
+    )
+    def test_r2_env_in_code_blocked(guard, main_root, cmd):
+>       assert env_hit(guard, cmd, main_root), cmd
+E       AssertionError: python -c 'import dotenv; dotenv.load_dotenv(".env")'
+E       assert False
+E        +  where False = env_hit(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>, 'python -c \'import dotenv; dotenv.load_dotenv(".env")\'', WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-61/test_r2_env_in_code_blocked_py4/ffcore'))
+
+tests\hooks\test_env_position.py:99: AssertionError
+__ test_r2_env_in_code_blocked[node -e "require('fs').readFileSync('.env')"] __
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-61/test_r2_env_in_code_blocked_no1/ffcore')
+cmd = 'node -e "require(\'fs\').readFileSync(\'.env\')"'
+
+    @pytest.mark.parametrize(
+        "cmd",
+        [
+            "bash <<EOF\ncat .env\nEOF",  # E28
+            "sh <<'EOF'\nsource .env\nEOF",  # E36
+            "py -3.12 - <<'EOF'\nprint(open('.env').read())\nEOF",
+            "python3 <<EOF\nimport os; os.system('cat .env')\nEOF",
+            "node <<EOF\nrequire('fs').readFileSync('.env')\nEOF",
+            "cat <<'EOF' | bash\ncat .env\nEOF",
+            "py -3.12 -c \"print(open('.env').read())\"",  # E29
+            "py -3.12 -c \"data = open('.env').read(); print(data)\"",  # E30
+            "python -c 'import dotenv; dotenv.load_dotenv(\".env\")'",
+            "node -e \"require('fs').readFileSync('.env')\"",
+            "cat x(.env)",
+        ],
+    )
+    def test_r2_env_in_code_blocked(guard, main_root, cmd):
+>       assert env_hit(guard, cmd, main_root), cmd
+E       AssertionError: node -e "require('fs').readFileSync('.env')"
+E       assert False
+E        +  where False = env_hit(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>, 'node -e "require(\'fs\').readFileSync(\'.env\')"', WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-61/test_r2_env_in_code_blocked_no1/ffcore'))
+
+tests\hooks\test_env_position.py:99: AssertionError
+_ test_r2_env_data_heredoc_and_clean_code_allowed[cat > x.py <<'EOF'\nopen('.env')\nEOF] _
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-61/test_r2_env_data_heredoc_and_c0/ffcore')
+cmd = "cat > x.py <<'EOF'\nopen('.env')\nEOF"
+
+    @pytest.mark.parametrize(
+        "cmd",
+        [
+            "cat > x.py <<'EOF'\nopen('.env')\nEOF",
+            "py -3.12 -c \"print('no secrets here')\"",
+            'py -3.12 -c "print(1)" .env.test',
+            "node -e \"console.log('.env.example')\"",
+        ],
+    )
+    def test_r2_env_data_heredoc_and_clean_code_allowed(guard, main_root, cmd):
+>       assert not env_hit(guard, cmd, main_root), cmd
+E       AssertionError: cat > x.py <<'EOF'
+E         open('.env')
+E         EOF
+E       assert not True
+E        +  where True = env_hit(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>, "cat > x.py <<'EOF'\nopen('.env')\nEOF", WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-61/test_r2_env_data_heredoc_and_c0/ffcore'))
+
+tests\hooks\test_env_position.py:112: AssertionError
+______ test_r2_mask_variants[curl -d "{\\"token\\":\\"TOK4\\"}" x-TOK4] _______
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+raw = 'curl -d "{\\"token\\":\\"TOK4\\"}" x', secret = 'TOK4'
+
+    @pytest.mark.parametrize(
+        ("raw", "secret"),
+        [
+            ('curl -d "{\\"token\\":\\"TOK4\\"}" x', "TOK4"),  # M04 escaped JSON
+            ("curl -uuser:PW5 https://x", "PW5"),  # M05 attached
+            ("curl --user=user:PW6 https://x", "PW6"),  # M06
+            ('{"access_token":"AT7"}', "AT7"),  # M07
+            ('{"apiKey":"AK8"}', "AK8"),  # M08
+            ('{"x-api-key": "AK9"}', "AK9"),
+            ('{"client_secret":"CS1"}', "CS1"),
+        ],
+    )
+    def test_r2_mask_variants(guard, raw, secret):
+        masked = guard.mask_secrets(raw)
+>       assert secret not in masked, masked
+E       AssertionError: curl -d "{\"token\":\"TOK4\"}" x
+E       assert 'TOK4' not in 'curl -d "{\..."TOK4\\"}" x'
+E         
+E         'TOK4' is contained here:
+E           curl -d "{\"token\":\"TOK4\"}" x
+E         ?                       ++++
+
+tests\hooks\test_masks.py:68: AssertionError
+____________ test_r2_mask_variants[curl -uuser:PW5 https://x-PW5] _____________
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+raw = 'curl -uuser:PW5 https://x', secret = 'PW5'
+
+    @pytest.mark.parametrize(
+        ("raw", "secret"),
+        [
+            ('curl -d "{\\"token\\":\\"TOK4\\"}" x', "TOK4"),  # M04 escaped JSON
+            ("curl -uuser:PW5 https://x", "PW5"),  # M05 attached
+            ("curl --user=user:PW6 https://x", "PW6"),  # M06
+            ('{"access_token":"AT7"}', "AT7"),  # M07
+            ('{"apiKey":"AK8"}', "AK8"),  # M08
+            ('{"x-api-key": "AK9"}', "AK9"),
+            ('{"client_secret":"CS1"}', "CS1"),
+        ],
+    )
+    def test_r2_mask_variants(guard, raw, secret):
+        masked = guard.mask_secrets(raw)
+>       assert secret not in masked, masked
+E       AssertionError: curl -uuser:PW5 https://x
+E       assert 'PW5' not in 'curl -uuser:PW5 https://x'
+E         
+E         'PW5' is contained here:
+E           curl -uuser:PW5 https://x
+E         ?             +++
+
+tests\hooks\test_masks.py:68: AssertionError
+__________ test_r2_mask_variants[curl --user=user:PW6 https://x-PW6] __________
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+raw = 'curl --user=user:PW6 https://x', secret = 'PW6'
+
+    @pytest.mark.parametrize(
+        ("raw", "secret"),
+        [
+            ('curl -d "{\\"token\\":\\"TOK4\\"}" x', "TOK4"),  # M04 escaped JSON
+            ("curl -uuser:PW5 https://x", "PW5"),  # M05 attached
+            ("curl --user=user:PW6 https://x", "PW6"),  # M06
+            ('{"access_token":"AT7"}', "AT7"),  # M07
+            ('{"apiKey":"AK8"}', "AK8"),  # M08
+            ('{"x-api-key": "AK9"}', "AK9"),
+            ('{"client_secret":"CS1"}', "CS1"),
+        ],
+    )
+    def test_r2_mask_variants(guard, raw, secret):
+        masked = guard.mask_secrets(raw)
+>       assert secret not in masked, masked
+E       AssertionError: curl --user=user:PW6 https://x
+E       assert 'PW6' not in 'curl --user...W6 https://x'
+E         
+E         'PW6' is contained here:
+E           curl --user=user:PW6 https://x
+E         ?                  +++
+
+tests\hooks\test_masks.py:68: AssertionError
+______________ test_r2_mask_variants[{"access_token":"AT7"}-AT7] ______________
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+raw = '{"access_token":"AT7"}', secret = 'AT7'
+
+    @pytest.mark.parametrize(
+        ("raw", "secret"),
+        [
+            ('curl -d "{\\"token\\":\\"TOK4\\"}" x', "TOK4"),  # M04 escaped JSON
+            ("curl -uuser:PW5 https://x", "PW5"),  # M05 attached
+            ("curl --user=user:PW6 https://x", "PW6"),  # M06
+            ('{"access_token":"AT7"}', "AT7"),  # M07
+            ('{"apiKey":"AK8"}', "AK8"),  # M08
+            ('{"x-api-key": "AK9"}', "AK9"),
+            ('{"client_secret":"CS1"}', "CS1"),
+        ],
+    )
+    def test_r2_mask_variants(guard, raw, secret):
+        masked = guard.mask_secrets(raw)
+>       assert secret not in masked, masked
+E       AssertionError: {"access_token":"AT7"}
+E       assert 'AT7' not in '{"access_token":"AT7"}'
+E         
+E         'AT7' is contained here:
+E           {"access_token":"AT7"}
+E         ?                  +++
+
+tests\hooks\test_masks.py:68: AssertionError
+_________________ test_r2_mask_variants[{"apiKey":"AK8"}-AK8] _________________
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+raw = '{"apiKey":"AK8"}', secret = 'AK8'
+
+    @pytest.mark.parametrize(
+        ("raw", "secret"),
+        [
+            ('curl -d "{\\"token\\":\\"TOK4\\"}" x', "TOK4"),  # M04 escaped JSON
+            ("curl -uuser:PW5 https://x", "PW5"),  # M05 attached
+            ("curl --user=user:PW6 https://x", "PW6"),  # M06
+            ('{"access_token":"AT7"}', "AT7"),  # M07
+            ('{"apiKey":"AK8"}', "AK8"),  # M08
+            ('{"x-api-key": "AK9"}', "AK9"),
+            ('{"client_secret":"CS1"}', "CS1"),
+        ],
+    )
+    def test_r2_mask_variants(guard, raw, secret):
+        masked = guard.mask_secrets(raw)
+>       assert secret not in masked, masked
+E       AssertionError: {"apiKey":"AK8"}
+E       assert 'AK8' not in '{"apiKey":"AK8"}'
+E         
+E         'AK8' is contained here:
+E           {"apiKey":"AK8"}
+E         ?            +++
+
+tests\hooks\test_masks.py:68: AssertionError
+_______________ test_r2_mask_variants[{"x-api-key": "AK9"}-AK9] _______________
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+raw = '{"x-api-key": "AK9"}', secret = 'AK9'
+
+    @pytest.mark.parametrize(
+        ("raw", "secret"),
+        [
+            ('curl -d "{\\"token\\":\\"TOK4\\"}" x', "TOK4"),  # M04 escaped JSON
+            ("curl -uuser:PW5 https://x", "PW5"),  # M05 attached
+            ("curl --user=user:PW6 https://x", "PW6"),  # M06
+            ('{"access_token":"AT7"}', "AT7"),  # M07
+            ('{"apiKey":"AK8"}', "AK8"),  # M08
+            ('{"x-api-key": "AK9"}', "AK9"),
+            ('{"client_secret":"CS1"}', "CS1"),
+        ],
+    )
+    def test_r2_mask_variants(guard, raw, secret):
+        masked = guard.mask_secrets(raw)
+>       assert secret not in masked, masked
+E       AssertionError: {"x-api-key": "AK9"}
+E       assert 'AK9' not in '{"x-api-key": "AK9"}'
+E         
+E         'AK9' is contained here:
+E           {"x-api-key": "AK9"}
+E         ?                +++
+
+tests\hooks\test_masks.py:68: AssertionError
+_____________ test_r2_mask_variants[{"client_secret":"CS1"}-CS1] ______________
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+raw = '{"client_secret":"CS1"}', secret = 'CS1'
+
+    @pytest.mark.parametrize(
+        ("raw", "secret"),
+        [
+            ('curl -d "{\\"token\\":\\"TOK4\\"}" x', "TOK4"),  # M04 escaped JSON
+            ("curl -uuser:PW5 https://x", "PW5"),  # M05 attached
+            ("curl --user=user:PW6 https://x", "PW6"),  # M06
+            ('{"access_token":"AT7"}', "AT7"),  # M07
+            ('{"apiKey":"AK8"}', "AK8"),  # M08
+            ('{"x-api-key": "AK9"}', "AK9"),
+            ('{"client_secret":"CS1"}', "CS1"),
+        ],
+    )
+    def test_r2_mask_variants(guard, raw, secret):
+        masked = guard.mask_secrets(raw)
+>       assert secret not in masked, masked
+E       AssertionError: {"client_secret":"CS1"}
+E       assert 'CS1' not in '{"client_secret":"CS1"}'
+E         
+E         'CS1' is contained here:
+E           {"client_secret":"CS1"}
+E         ?                   +++
+
+tests\hooks\test_masks.py:68: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/hooks/test_wrappers.py::test_r2_push_hidden_in_compound_or_env_s_blocked[if true; then echo fi; git push origin main; fi]
+FAILED tests/hooks/test_wrappers.py::test_r2_push_hidden_in_compound_or_env_s_blocked[if grep -q "done" x.txt; then git push origin main; fi]
+FAILED tests/hooks/test_wrappers.py::test_r2_push_hidden_in_compound_or_env_s_blocked[for x in done; do git push origin main; done]
+FAILED tests/hooks/test_wrappers.py::test_r2_push_hidden_in_compound_or_env_s_blocked[if echo 'fi'; then git push; fi]
+FAILED tests/hooks/test_wrappers.py::test_r2_push_hidden_in_compound_or_env_s_blocked[while read l; do echo done; git push; done < f]
+FAILED tests/hooks/test_wrappers.py::test_r2_push_hidden_in_compound_or_env_s_blocked[env -S 'git push origin main']
+FAILED tests/hooks/test_wrappers.py::test_r2_push_hidden_in_compound_or_env_s_blocked[env -S"git push"]
+FAILED tests/hooks/test_wrappers.py::test_r2_push_hidden_in_compound_or_env_s_blocked[env --split-string='git push']
+FAILED tests/hooks/test_wrappers.py::test_r2_gate_after_quoted_keyword_blocked
+FAILED tests/hooks/test_env_position.py::test_r2_env_in_code_blocked[bash <<EOF\ncat .env\nEOF]
+FAILED tests/hooks/test_env_position.py::test_r2_env_in_code_blocked[sh <<'EOF'\nsource .env\nEOF]
+FAILED tests/hooks/test_env_position.py::test_r2_env_in_code_blocked[python3 <<EOF\nimport os; os.system('cat .env')\nEOF]
+FAILED tests/hooks/test_env_position.py::test_r2_env_in_code_blocked[cat <<'EOF' | bash\ncat .env\nEOF]
+FAILED tests/hooks/test_env_position.py::test_r2_env_in_code_blocked[py -3.12 -c "print(open('.env').read())"]
+FAILED tests/hooks/test_env_position.py::test_r2_env_in_code_blocked[py -3.12 -c "data = open('.env').read(); print(data)"]
+FAILED tests/hooks/test_env_position.py::test_r2_env_in_code_blocked[python -c 'import dotenv; dotenv.load_dotenv(".env")']
+FAILED tests/hooks/test_env_position.py::test_r2_env_in_code_blocked[node -e "require('fs').readFileSync('.env')"]
+FAILED tests/hooks/test_env_position.py::test_r2_env_data_heredoc_and_clean_code_allowed[cat > x.py <<'EOF'\nopen('.env')\nEOF]
+FAILED tests/hooks/test_masks.py::test_r2_mask_variants[curl -d "{\\"token\\":\\"TOK4\\"}" x-TOK4]
+FAILED tests/hooks/test_masks.py::test_r2_mask_variants[curl -uuser:PW5 https://x-PW5]
+FAILED tests/hooks/test_masks.py::test_r2_mask_variants[curl --user=user:PW6 https://x-PW6]
+FAILED tests/hooks/test_masks.py::test_r2_mask_variants[{"access_token":"AT7"}-AT7]
+FAILED tests/hooks/test_masks.py::test_r2_mask_variants[{"apiKey":"AK8"}-AK8]
+FAILED tests/hooks/test_masks.py::test_r2_mask_variants[{"x-api-key": "AK9"}-AK9]
+FAILED tests/hooks/test_masks.py::test_r2_mask_variants[{"client_secret":"CS1"}-CS1]
+25 failed, 9 passed, 118 deselected in 1.01s

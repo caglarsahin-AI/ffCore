@@ -1,0 +1,67 @@
+F.F......FF                                                              [100%]
+================================== FAILURES ===================================
+______________________________ test_json_schema _______________________________
+
+sample_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-63/test_json_schema0/ffcore')
+
+    def test_json_schema(sample_root):
+        data = summary(sample_root)
+>       assert set(data) == {
+            "kok",
+            "mesaj",
+            "bicim_disi",
+            "bekleyen_ack",
+            "acksiz_cevaplanmis",
+            "paketler",
+        }
+E       AssertionError: assert {'bekleyen_ac...', 'paketler'} == {'acksiz_ceva...', 'paketler'}
+E         
+E         Extra items in the right set:
+E         'acksiz_cevaplanmis'
+E         Use -v to get more diff
+
+tests\scripts\test_kanal_ozet.py:30: AssertionError
+______________________________ test_pending_ack _______________________________
+
+sample_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-63/test_pending_ack0/ffcore')
+
+    def test_pending_ack(sample_root):
+        pending = {p["id"] for p in summary(sample_root)["bekleyen_ack"]}
+        # K-X1-0001 ACKed by A-X1-0001, K-X1-0002 by R-X1-0000, K-X2-0001 by a multi-ID Cevap
+>       assert pending == {"K-X1-0003", "K-X1-0005"}
+E       AssertionError: assert {'K-X1-0003',..., 'K-X1-0005'} == {'K-X1-0003', 'K-X1-0005'}
+E         
+E         Extra items in the left set:
+E         'K-X1-0004'
+E         Use -v to get more diff
+
+tests\scripts\test_kanal_ozet.py:56: AssertionError
+__________________________ test_answered_without_ack __________________________
+
+sample_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-63/test_answered_without_ack0/ffcore')
+
+    def test_answered_without_ack(sample_root):
+        """r2 MINOR-3: a reply from the recipient's channel (Cevap names the ID) without an
+        ACK is listed apart and leaves the pending list; a reply from another channel does not."""
+        data = summary(sample_root)
+>       (item,) = data["acksiz_cevaplanmis"]
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'acksiz_cevaplanmis'
+
+tests\scripts\test_kanal_ozet.py:116: KeyError
+____________________ test_text_lists_answered_without_ack _____________________
+
+sample_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-63/test_text_lists_answered_witho0/ffcore')
+
+    def test_text_lists_answered_without_ack(sample_root):
+        out = run_script("--root", str(sample_root)).stdout
+>       assert "ACK'siz cevaplanmýþ" in out
+E       assert "ACK'siz cevaplanmýþ" in 'Kanal özeti (C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-63/test_text_lists_answered_witho... MERGED | K-X2-0002 MERGED (2026-11-16 16:00) | 3333333333333333333333333333333333333333\n- fix/x3 | PLANNED | - | -\n'
+
+tests\scripts\test_kanal_ozet.py:125: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/scripts/test_kanal_ozet.py::test_json_schema - AssertionError: a...
+FAILED tests/scripts/test_kanal_ozet.py::test_pending_ack - AssertionError: a...
+FAILED tests/scripts/test_kanal_ozet.py::test_answered_without_ack - KeyError...
+FAILED tests/scripts/test_kanal_ozet.py::test_text_lists_answered_without_ack
+4 failed, 7 passed in 7.62s

@@ -43,3 +43,12 @@ Paket: fix/ajan-hooklari-2 · Cevap: K-HOOK2-0001 · SHA: 571ae6fe40560ac108234c
 Dal `fix/ajan-hooklari-2` (main 7d87f04 üstüne rebase), 13 commit, 13 dosya +1578/-57; state/backend/frontend/settings.json yok, `.claude/hooks/` var (paketin konusu). D1 KANAL-BICIM, D2 sarmalayıcı/grup/`$(…)`/anahtar sözcük (Q2), D3 maske, ENV eki (189 e), D4 `scripts/kanal_ozet.py`, D5 belge + K-HOOK2-0003.
 Kapı: `tests/hooks tests/scripts` **319 passed** (`state/evidence/hook2-tests.log`, ilk satır HEAD); ruff check + format temiz (`state/evidence/hook2-ruff.log`, ruff 0.17.3 uv önbelleği). Kırmızı kanıtlar `hook2-{d1,d2,d3,env,d4}-red.log`. PR notu `state/pr/fix-ajan-hooklari-2.md` (kabul → test, warn günü, varsayımlar, kalan riskler). `kanal_ozet` gerçek kanallarda: 54 geçerli, 2073 eski biçim, 3 ACK bekleyen.
 
+### B-HOOK2-0007 · 2026-11-16 23:40 · → koordinator · ACK
+Paket: fix/ajan-hooklari-2 · Cevap: K-HOOK2-0007
+DUZELT r2 alındı (r1 ONAY B0 M0 m5 N6): MINOR-1 bileşik gövde komut konumu, MINOR-2 ENV heredoc okuyucu + `-c/-e` + ön ek, MINOR-3 'ACK'siz cevaplanmış' listesi, MINOR-4 maske varyantları, NOTE-4 `env -S`, MINOR-5/NOTE-1 belge. Önce kırmızı test, test/kod ayrı commit; delta `571ae6f..`.
+
+### B-HOOK2-0008 · 2026-11-17 00:20 · → koordinator · PR-HAZIR
+Paket: fix/ajan-hooklari-2 · Cevap: K-HOOK2-0007 · SHA: d5e9c1142c6f5f9f7d356aafbf3533257c5d2ed2
+r2, delta `571ae6f..d5e9c11` (4 commit, 11 dosya +341/-54; baz değişmedi, main ile çakışma yok). MINOR-1 komut konumu (`command_words`), MINOR-2 heredoc okuyucusu sh/bash → kabuk, py/python/node → kod + `-c/-e` + ön ek `' " (`, MINOR-3 `acksiz_cevaplanmis` (gerçek: bekleyen 0, ACK'siz 3), MINOR-4 maske varyantları, NOTE-4 `env -S`, MINOR-5/NOTE-1 belge. Ek: ENV artık yalnız en üst düzeyde koşar (iç grup özyinelemesi veri heredoc gövdesini komut sanıyordu; r2 kırmızı testinde çıktı).
+Kapı: **355 passed** `state/evidence/hook2-tests-r2.log` (ilk satır HEAD); ruff temiz `state/evidence/hook2-ruff-r2.log`. Not: dalı bir kez main'e rebase ettim, incelenen 571ae6f geçmişten çıktığı için `ORIG_HEAD`'e geri aldım; kapı geri alınmış HEAD'de koştu. PR notu 'r2' bölümü.
+

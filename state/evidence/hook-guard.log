@@ -17,3 +17,12 @@
 2026-11-16T23:06:00	warn	isci-b	Bash	KAPI	RUFF=/c/Users/caglar.sahin/AppData/Local/uv/cache/archive-v0/7QES3OegvWUr43WNh2bST/ruff-0.17.3.data/scripts/ruff.exe; $R
 2026-11-16T23:11:35	warn	koordinator	Bash	ENV	R=/c/ai_paycore/ffcore; cat > "C:/Users/CAGLAR~1.SAH/AppData/Local/Temp/claude/9398d5fca5badfb5/d131353f-4058-4872-8ded-
 2026-11-16T23:18:22	warn	koordinator	Bash	ENV	R=/c/ai_paycore/ffcore; cat > "C:/Users/CAGLAR~1.SAH/AppData/Local/Temp/claude/9398d5fca5badfb5/d131353f-4058-4872-8ded-
+2026-11-16T23:25:35	warn	inceleyici	Bash	KAPI	S=/c/Users/CAGLAR~1.SAH/AppData/Local/Temp/claude/9398d5fca5badfb5/ecb79a59-6471-4590-b997-842940d7a702/scratchpad; D=$S
+2026-11-16T23:31:27	warn	inceleyici	Bash	ENV	echo '## MINOR-1 kapi yolu: if grep -q "build done" log; then make test; fi (isci-a, block) -> exit=0' >> state/evidence
+2026-11-16T23:33:47	warn	koordinator	Bash	ENV	R=/c/ai_paycore/ffcore; cat > "C:/Users/CAGLAR~1.SAH/AppData/Local/Temp/claude/9398d5fca5badfb5/d131353f-4058-4872-8ded-
+2026-11-16T23:36:16	warn	isci-b	Bash	ENV	cat >> tests/hooks/test_wrappers.py <<'PY' # --- r2 (K-HOOK2-0007): keywords count only in command position, env -S ----
+2026-11-16T23:36:57	warn	isci-b	Bash	KAPI	py -3.12 -m pytest tests/hooks/test_env_position.py -q -p no:cacheprovider -k "data_heredoc" 2>&1 | grep -E "^E" | head 
+2026-11-16T23:37:12	warn	isci-b	Bash	ENV	py -3.12 -c " import sys,importlib.util s=importlib.util.spec_from_file_location('g','.claude/hooks/ffcore_guard.py');g=
+2026-11-16T23:40:39	warn	isci-b	Bash	KAPI	py -3.12 - <<'PY' from pathlib import Path p = Path(".claude/hooks/ffcore_guard.py") t = p.read_text(encoding="utf-8") r
+2026-11-16T23:41:29	warn	isci-b	Bash	KAPI	py -3.12 - <<'PY' from pathlib import Path p = Path("scripts/kanal_ozet.py") t = p.read_text(encoding="utf-8") reps = [ 
+2026-11-16T23:52:31	warn	koordinator	Bash	ENV	R=/c/ai_paycore/ffcore; cat > "C:/Users/CAGLAR~1.SAH/AppData/Local/Temp/claude/9398d5fca5badfb5/d131353f-4058-4872-8ded-
