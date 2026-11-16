@@ -193,3 +193,82 @@ describe("test_10c1_3_eval_stream shown status", () => {
     expect(shownStatus("queued", null, running)).toBe("queued");
   });
 });
+
+// K-10C1-0007 (A): as soon as an attempt ends without done the page reads the exam with GET
+// (`reconnecting`) while the stream is reopened behind it; a reopened stream that speaks again
+// ends the reconnecting phase. The last failed attempt is `lost`, not one more `reconnecting`.
+describe("test_10c1_3_eval_stream reconnecting", () => {
+  const progress = 'event: progress\ndata: {"status":"running","items":3,"scored":1}\n\n';
+  const doneEvent = 'event: done\ndata: {"status":"completed","items":3,"scored":3,"error_code":null,"passed":true}\n\n';
+
+  it("says reconnecting once per failed attempt that will be reopened, never after the last one", async () => {
+    const order: string[] = [];
+    const result = await followEvalStream({
+      open: async () => response([progress]),
+      onProgress: () => order.push("progress"),
+      onDone: () => {},
+      onReconnecting: () => order.push("reconnecting"),
+      onResumed: () => order.push("resumed"),
+      maxReopens: 2,
+      retryDelayMs: 0,
+    });
+    expect(result).toBe("lost");
+    expect(order).toEqual(["progress", "reconnecting", "resumed", "progress", "reconnecting", "resumed", "progress"]);
+  });
+
+  it("says resumed before the first event of a reopened stream, then follows it to done", async () => {
+    let calls = 0;
+    const order: string[] = [];
+    const result = await followEvalStream({
+      open: async () => (++calls === 1 ? response([], 502) : response([progress, doneEvent])),
+      onProgress: () => order.push("progress"),
+      onDone: () => order.push("done"),
+      onReconnecting: () => order.push("reconnecting"),
+      onResumed: () => order.push("resumed"),
+      retryDelayMs: 0,
+    });
+    expect(result).toBe("done");
+    expect(order).toEqual(["reconnecting", "resumed", "progress", "done"]);
+  });
+
+  it("does not say resumed for a reopened attempt that brings nothing", async () => {
+    const reconnecting = vi.fn();
+    const resumed = vi.fn();
+    const result = await followEvalStream({
+      open: async () => response([], 502),
+      onProgress: () => {},
+      onDone: () => {},
+      onReconnecting: reconnecting,
+      onResumed: resumed,
+      maxReopens: 3,
+      retryDelayMs: 0,
+    });
+    expect(result).toBe("lost");
+    expect(reconnecting).toHaveBeenCalledTimes(1);
+    expect(resumed).not.toHaveBeenCalled();
+  });
+
+  it("starts reading with GET within STALL_MS of a silent stream", async () => {
+    vi.useFakeTimers();
+    try {
+      const reconnecting = vi.fn();
+      const open = vi.fn(async () => {
+        const body = new ReadableStream<Uint8Array>({
+          start(controller) {
+            controller.enqueue(encoder.encode(progress));
+          },
+        });
+        return new Response(body, { status: 200 });
+      });
+      const end = followEvalStream({ open, onProgress: () => {}, onDone: () => {}, onReconnecting: reconnecting, maxReopens: 1, retryDelayMs: 2000, stallMs: 6000 });
+      await vi.advanceTimersByTimeAsync(5999);
+      expect(reconnecting).not.toHaveBeenCalled();
+      await vi.advanceTimersByTimeAsync(1);
+      expect(reconnecting).toHaveBeenCalledOnce();
+      await vi.advanceTimersByTimeAsync(8000);
+      await expect(end).resolves.toBe("lost");
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+});
