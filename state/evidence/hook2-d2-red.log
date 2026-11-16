@@ -1,0 +1,736 @@
+FFFFFFFFFFFFFFF.FFFFFF...FFFFFF.............FFFFFF.FFF..FFF...F          [100%]
+================================== FAILURES ===================================
+_____ test_worker_push_through_wrapper_blocked[env X=1 git push origin x] _____
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-45/test_worker_push_through_wrapp0/ffcore')
+cmd = 'env X=1 git push origin x'
+
+    @pytest.mark.parametrize("cmd", PUSH_FORMS)
+    def test_worker_push_through_wrapper_blocked(guard, main_root, cmd):
+>       assert "PUSH" in rules(guard, cmd, main_root), cmd
+E       AssertionError: env X=1 git push origin x
+E       assert 'PUSH' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>, 'env X=1 git push origin x', WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-45/test_worker_push_through_wrapp0/ffcore'))
+
+tests\hooks\test_wrappers.py:54: AssertionError
+__________ test_worker_push_through_wrapper_blocked[env -i git push] __________
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-45/test_worker_push_through_wrapp1/ffcore')
+cmd = 'env -i git push'
+
+    @pytest.mark.parametrize("cmd", PUSH_FORMS)
+    def test_worker_push_through_wrapper_blocked(guard, main_root, cmd):
+>       assert "PUSH" in rules(guard, cmd, main_root), cmd
+E       AssertionError: env -i git push
+E       assert 'PUSH' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>, 'env -i git push', WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-45/test_worker_push_through_wrapp1/ffcore'))
+
+tests\hooks\test_wrappers.py:54: AssertionError
+_______ test_worker_push_through_wrapper_blocked[env -u HOME git push] ________
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-45/test_worker_push_through_wrapp2/ffcore')
+cmd = 'env -u HOME git push'
+
+    @pytest.mark.parametrize("cmd", PUSH_FORMS)
+    def test_worker_push_through_wrapper_blocked(guard, main_root, cmd):
+>       assert "PUSH" in rules(guard, cmd, main_root), cmd
+E       AssertionError: env -u HOME git push
+E       assert 'PUSH' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>, 'env -u HOME git push', WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-45/test_worker_push_through_wrapp2/ffcore'))
+
+tests\hooks\test_wrappers.py:54: AssertionError
+__________ test_worker_push_through_wrapper_blocked[env -- git push] __________
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-45/test_worker_push_through_wrapp3/ffcore')
+cmd = 'env -- git push'
+
+    @pytest.mark.parametrize("cmd", PUSH_FORMS)
+    def test_worker_push_through_wrapper_blocked(guard, main_root, cmd):
+>       assert "PUSH" in rules(guard, cmd, main_root), cmd
+E       AssertionError: env -- git push
+E       assert 'PUSH' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>, 'env -- git push', WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-45/test_worker_push_through_wrapp3/ffcore'))
+
+tests\hooks\test_wrappers.py:54: AssertionError
+_________ test_worker_push_through_wrapper_blocked[command git push] __________
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-45/test_worker_push_through_wrapp4/ffcore')
+cmd = 'command git push'
+
+    @pytest.mark.parametrize("cmd", PUSH_FORMS)
+    def test_worker_push_through_wrapper_blocked(guard, main_root, cmd):
+>       assert "PUSH" in rules(guard, cmd, main_root), cmd
+E       AssertionError: command git push
+E       assert 'PUSH' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>, 'command git push', WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-45/test_worker_push_through_wrapp4/ffcore'))
+
+tests\hooks\test_wrappers.py:54: AssertionError
+________ test_worker_push_through_wrapper_blocked[command -p git push] ________
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-45/test_worker_push_through_wrapp5/ffcore')
+cmd = 'command -p git push'
+
+    @pytest.mark.parametrize("cmd", PUSH_FORMS)
+    def test_worker_push_through_wrapper_blocked(guard, main_root, cmd):
+>       assert "PUSH" in rules(guard, cmd, main_root), cmd
+E       AssertionError: command -p git push
+E       assert 'PUSH' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>, 'command -p git push', WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-45/test_worker_push_through_wrapp5/ffcore'))
+
+tests\hooks\test_wrappers.py:54: AssertionError
+___________ test_worker_push_through_wrapper_blocked[time git push] ___________
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-45/test_worker_push_through_wrapp6/ffcore')
+cmd = 'time git push'
+
+    @pytest.mark.parametrize("cmd", PUSH_FORMS)
+    def test_worker_push_through_wrapper_blocked(guard, main_root, cmd):
+>       assert "PUSH" in rules(guard, cmd, main_root), cmd
+E       AssertionError: time git push
+E       assert 'PUSH' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>, 'time git push', WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-45/test_worker_push_through_wrapp6/ffcore'))
+
+tests\hooks\test_wrappers.py:54: AssertionError
+_________ test_worker_push_through_wrapper_blocked[time -p git push] __________
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-45/test_worker_push_through_wrapp7/ffcore')
+cmd = 'time -p git push'
+
+    @pytest.mark.parametrize("cmd", PUSH_FORMS)
+    def test_worker_push_through_wrapper_blocked(guard, main_root, cmd):
+>       assert "PUSH" in rules(guard, cmd, main_root), cmd
+E       AssertionError: time -p git push
+E       assert 'PUSH' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>, 'time -p git push', WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-45/test_worker_push_through_wrapp7/ffcore'))
+
+tests\hooks\test_wrappers.py:54: AssertionError
+___________ test_worker_push_through_wrapper_blocked[nice git push] ___________
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-45/test_worker_push_through_wrapp8/ffcore')
+cmd = 'nice git push'
+
+    @pytest.mark.parametrize("cmd", PUSH_FORMS)
+    def test_worker_push_through_wrapper_blocked(guard, main_root, cmd):
+>       assert "PUSH" in rules(guard, cmd, main_root), cmd
+E       AssertionError: nice git push
+E       assert 'PUSH' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>, 'nice git push', WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-45/test_worker_push_through_wrapp8/ffcore'))
+
+tests\hooks\test_wrappers.py:54: AssertionError
+________ test_worker_push_through_wrapper_blocked[nice -n 5 git push] _________
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-45/test_worker_push_through_wrapp9/ffcore')
+cmd = 'nice -n 5 git push'
+
+    @pytest.mark.parametrize("cmd", PUSH_FORMS)
+    def test_worker_push_through_wrapper_blocked(guard, main_root, cmd):
+>       assert "PUSH" in rules(guard, cmd, main_root), cmd
+E       AssertionError: nice -n 5 git push
+E       assert 'PUSH' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>, 'nice -n 5 git push', WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-45/test_worker_push_through_wrapp9/ffcore'))
+
+tests\hooks\test_wrappers.py:54: AssertionError
+_________ test_worker_push_through_wrapper_blocked[nice -5 git push] __________
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-45/test_worker_push_through_wrapp10/ffcore')
+cmd = 'nice -5 git push'
+
+    @pytest.mark.parametrize("cmd", PUSH_FORMS)
+    def test_worker_push_through_wrapper_blocked(guard, main_root, cmd):
+>       assert "PUSH" in rules(guard, cmd, main_root), cmd
+E       AssertionError: nice -5 git push
+E       assert 'PUSH' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>, 'nice -5 git push', WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-45/test_worker_push_through_wrapp10/ffcore'))
+
+tests\hooks\test_wrappers.py:54: AssertionError
+__________ test_worker_push_through_wrapper_blocked[nohup git push] ___________
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-45/test_worker_push_through_wrapp11/ffcore')
+cmd = 'nohup git push'
+
+    @pytest.mark.parametrize("cmd", PUSH_FORMS)
+    def test_worker_push_through_wrapper_blocked(guard, main_root, cmd):
+>       assert "PUSH" in rules(guard, cmd, main_root), cmd
+E       AssertionError: nohup git push
+E       assert 'PUSH' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>, 'nohup git push', WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-45/test_worker_push_through_wrapp11/ffcore'))
+
+tests\hooks\test_wrappers.py:54: AssertionError
+___________ test_worker_push_through_wrapper_blocked[exec git push] ___________
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-45/test_worker_push_through_wrapp12/ffcore')
+cmd = 'exec git push'
+
+    @pytest.mark.parametrize("cmd", PUSH_FORMS)
+    def test_worker_push_through_wrapper_blocked(guard, main_root, cmd):
+>       assert "PUSH" in rules(guard, cmd, main_root), cmd
+E       AssertionError: exec git push
+E       assert 'PUSH' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>, 'exec git push', WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-45/test_worker_push_through_wrapp12/ffcore'))
+
+tests\hooks\test_wrappers.py:54: AssertionError
+__ test_worker_push_through_wrapper_blocked[bash -o pipefail -c 'git push'] ___
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-45/test_worker_push_through_wrapp13/ffcore')
+cmd = "bash -o pipefail -c 'git push'"
+
+    @pytest.mark.parametrize("cmd", PUSH_FORMS)
+    def test_worker_push_through_wrapper_blocked(guard, main_root, cmd):
+>       assert "PUSH" in rules(guard, cmd, main_root), cmd
+E       AssertionError: bash -o pipefail -c 'git push'
+E       assert 'PUSH' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>, "bash -o pipefail -c 'git push'", WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-45/test_worker_push_through_wrapp13/ffcore'))
+
+tests\hooks\test_wrappers.py:54: AssertionError
+_ test_worker_push_through_wrapper_blocked[bash -euo pipefail -c 'git push'] __
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-45/test_worker_push_through_wrapp14/ffcore')
+cmd = "bash -euo pipefail -c 'git push'"
+
+    @pytest.mark.parametrize("cmd", PUSH_FORMS)
+    def test_worker_push_through_wrapper_blocked(guard, main_root, cmd):
+>       assert "PUSH" in rules(guard, cmd, main_root), cmd
+E       AssertionError: bash -euo pipefail -c 'git push'
+E       assert 'PUSH' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>, "bash -euo pipefail -c 'git push'", WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-45/test_worker_push_through_wrapp14/ffcore'))
+
+tests\hooks\test_wrappers.py:54: AssertionError
+__ test_worker_push_through_wrapper_blocked[sh -e -o errexit -c 'git push'] ___
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-45/test_worker_push_through_wrapp16/ffcore')
+cmd = "sh -e -o errexit -c 'git push'"
+
+    @pytest.mark.parametrize("cmd", PUSH_FORMS)
+    def test_worker_push_through_wrapper_blocked(guard, main_root, cmd):
+>       assert "PUSH" in rules(guard, cmd, main_root), cmd
+E       AssertionError: sh -e -o errexit -c 'git push'
+E       assert 'PUSH' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>, "sh -e -o errexit -c 'git push'", WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-45/test_worker_push_through_wrapp16/ffcore'))
+
+tests\hooks\test_wrappers.py:54: AssertionError
+_________ test_worker_push_through_wrapper_blocked[echo $(git push)] __________
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-45/test_worker_push_through_wrapp17/ffcore')
+cmd = 'echo $(git push)'
+
+    @pytest.mark.parametrize("cmd", PUSH_FORMS)
+    def test_worker_push_through_wrapper_blocked(guard, main_root, cmd):
+>       assert "PUSH" in rules(guard, cmd, main_root), cmd
+E       AssertionError: echo $(git push)
+E       assert 'PUSH' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>, 'echo $(git push)', WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-45/test_worker_push_through_wrapp17/ffcore'))
+
+tests\hooks\test_wrappers.py:54: AssertionError
+________ test_worker_push_through_wrapper_blocked[echo "$(git push)"] _________
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-45/test_worker_push_through_wrapp18/ffcore')
+cmd = 'echo "$(git push)"'
+
+    @pytest.mark.parametrize("cmd", PUSH_FORMS)
+    def test_worker_push_through_wrapper_blocked(guard, main_root, cmd):
+>       assert "PUSH" in rules(guard, cmd, main_root), cmd
+E       AssertionError: echo "$(git push)"
+E       assert 'PUSH' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>, 'echo "$(git push)"', WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-45/test_worker_push_through_wrapp18/ffcore'))
+
+tests\hooks\test_wrappers.py:54: AssertionError
+__________ test_worker_push_through_wrapper_blocked[echo `git push`] __________
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-45/test_worker_push_through_wrapp19/ffcore')
+cmd = 'echo `git push`'
+
+    @pytest.mark.parametrize("cmd", PUSH_FORMS)
+    def test_worker_push_through_wrapper_blocked(guard, main_root, cmd):
+>       assert "PUSH" in rules(guard, cmd, main_root), cmd
+E       AssertionError: echo `git push`
+E       assert 'PUSH' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>, 'echo `git push`', WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-45/test_worker_push_through_wrapp19/ffcore'))
+
+tests\hooks\test_wrappers.py:54: AssertionError
+_______ test_worker_push_through_wrapper_blocked[x=$(echo $(git push))] _______
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-45/test_worker_push_through_wrapp20/ffcore')
+cmd = 'x=$(echo $(git push))'
+
+    @pytest.mark.parametrize("cmd", PUSH_FORMS)
+    def test_worker_push_through_wrapper_blocked(guard, main_root, cmd):
+>       assert "PUSH" in rules(guard, cmd, main_root), cmd
+E       AssertionError: x=$(echo $(git push))
+E       assert 'PUSH' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>, 'x=$(echo $(git push))', WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-45/test_worker_push_through_wrapp20/ffcore'))
+
+tests\hooks\test_wrappers.py:54: AssertionError
+___________ test_worker_push_through_wrapper_blocked[{ git push; }] ___________
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-45/test_worker_push_through_wrapp21/ffcore')
+cmd = '{ git push; }'
+
+    @pytest.mark.parametrize("cmd", PUSH_FORMS)
+    def test_worker_push_through_wrapper_blocked(guard, main_root, cmd):
+>       assert "PUSH" in rules(guard, cmd, main_root), cmd
+E       AssertionError: { git push; }
+E       assert 'PUSH' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>, '{ git push; }', WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-45/test_worker_push_through_wrapp21/ffcore'))
+
+tests\hooks\test_wrappers.py:54: AssertionError
+____ test_worker_push_through_wrapper_blocked[if true; then git push; fi] _____
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-45/test_worker_push_through_wrapp25/ffcore')
+cmd = 'if true; then git push; fi'
+
+    @pytest.mark.parametrize("cmd", PUSH_FORMS)
+    def test_worker_push_through_wrapper_blocked(guard, main_root, cmd):
+>       assert "PUSH" in rules(guard, cmd, main_root), cmd
+E       AssertionError: if true; then git push; fi
+E       assert 'PUSH' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>, 'if true; then git push; fi', WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-45/test_worker_push_through_wrapp25/ffcore'))
+
+tests\hooks\test_wrappers.py:54: AssertionError
+___ test_worker_push_through_wrapper_blocked[if git push; then echo ok; fi] ___
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-45/test_worker_push_through_wrapp26/ffcore')
+cmd = 'if git push; then echo ok; fi'
+
+    @pytest.mark.parametrize("cmd", PUSH_FORMS)
+    def test_worker_push_through_wrapper_blocked(guard, main_root, cmd):
+>       assert "PUSH" in rules(guard, cmd, main_root), cmd
+E       AssertionError: if git push; then echo ok; fi
+E       assert 'PUSH' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>, 'if git push; then echo ok; fi', WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-45/test_worker_push_through_wrapp26/ffcore'))
+
+tests\hooks\test_wrappers.py:54: AssertionError
+___ test_worker_push_through_wrapper_blocked[for b in a; do git push; done] ___
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-45/test_worker_push_through_wrapp27/ffcore')
+cmd = 'for b in a; do git push; done'
+
+    @pytest.mark.parametrize("cmd", PUSH_FORMS)
+    def test_worker_push_through_wrapper_blocked(guard, main_root, cmd):
+>       assert "PUSH" in rules(guard, cmd, main_root), cmd
+E       AssertionError: for b in a; do git push; done
+E       assert 'PUSH' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>, 'for b in a; do git push; done', WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-45/test_worker_push_through_wrapp27/ffcore'))
+
+tests\hooks\test_wrappers.py:54: AssertionError
+__ test_worker_push_through_wrapper_blocked[while false; do git push; done] ___
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-45/test_worker_push_through_wrapp28/ffcore')
+cmd = 'while false; do git push; done'
+
+    @pytest.mark.parametrize("cmd", PUSH_FORMS)
+    def test_worker_push_through_wrapper_blocked(guard, main_root, cmd):
+>       assert "PUSH" in rules(guard, cmd, main_root), cmd
+E       AssertionError: while false; do git push; done
+E       assert 'PUSH' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>, 'while false; do git push; done', WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-45/test_worker_push_through_wrapp28/ffcore'))
+
+tests\hooks\test_wrappers.py:54: AssertionError
+____________ test_worker_push_through_wrapper_blocked[! git push] _____________
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-45/test_worker_push_through_wrapp29/ffcore')
+cmd = '! git push'
+
+    @pytest.mark.parametrize("cmd", PUSH_FORMS)
+    def test_worker_push_through_wrapper_blocked(guard, main_root, cmd):
+>       assert "PUSH" in rules(guard, cmd, main_root), cmd
+E       AssertionError: ! git push
+E       assert 'PUSH' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>, '! git push', WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-45/test_worker_push_through_wrapp29/ffcore'))
+
+tests\hooks\test_wrappers.py:54: AssertionError
+_ test_worker_push_through_wrapper_blocked[env X=1 time nice -n 2 command git push] _
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-45/test_worker_push_through_wrapp30/ffcore')
+cmd = 'env X=1 time nice -n 2 command git push'
+
+    @pytest.mark.parametrize("cmd", PUSH_FORMS)
+    def test_worker_push_through_wrapper_blocked(guard, main_root, cmd):
+>       assert "PUSH" in rules(guard, cmd, main_root), cmd
+E       AssertionError: env X=1 time nice -n 2 command git push
+E       assert 'PUSH' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>, 'env X=1 time nice -n 2 command git push', WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-45/test_worker_push_through_wrapp30/ffcore'))
+
+tests\hooks\test_wrappers.py:54: AssertionError
+___________ test_coordinator_unflagged_push_in_substitution_blocked ___________
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-45/test_coordinator_unflagged_pus0/ffcore')
+
+    def test_coordinator_unflagged_push_in_substitution_blocked(guard, main_root):
+>       assert "PUSH" in rules(guard, "echo $(git push)", main_root, rol="koordinator")
+E       AssertionError: assert 'PUSH' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>, 'echo $(git push)', WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-45/test_coordinator_unflagged_pus0/ffcore'), rol='koordinator')
+
+tests\hooks\test_wrappers.py:89: AssertionError
+________ test_gate_through_wrapper_without_tee_blocked[time make test] ________
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-45/test_gate_through_wrapper_with0/ffcore')
+cmd = 'time make test'
+
+    @pytest.mark.parametrize(
+        "cmd",
+        [
+            "time make test",
+            "nice -n 5 pytest -q",
+            "env DEPLOY_PROFILE=airgap make test",
+            "command make lint",
+            "{ make test; }",
+            "( make test; make lint )",
+            "echo $(make test)",
+            "for p in llmaas airgap; do DEPLOY_PROFILE=$p make test; done",
+            "if make test; then echo ok; fi",
+        ],
+    )
+    def test_gate_through_wrapper_without_tee_blocked(guard, main_root, cmd):
+>       assert "KAPI" in rules(guard, cmd, main_root), cmd
+E       AssertionError: time make test
+E       assert 'KAPI' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>, 'time make test', WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-45/test_gate_through_wrapper_with0/ffcore'))
+
+tests\hooks\test_wrappers.py:107: AssertionError
+_____ test_gate_through_wrapper_without_tee_blocked[nice -n 5 pytest -q] ______
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-45/test_gate_through_wrapper_with1/ffcore')
+cmd = 'nice -n 5 pytest -q'
+
+    @pytest.mark.parametrize(
+        "cmd",
+        [
+            "time make test",
+            "nice -n 5 pytest -q",
+            "env DEPLOY_PROFILE=airgap make test",
+            "command make lint",
+            "{ make test; }",
+            "( make test; make lint )",
+            "echo $(make test)",
+            "for p in llmaas airgap; do DEPLOY_PROFILE=$p make test; done",
+            "if make test; then echo ok; fi",
+        ],
+    )
+    def test_gate_through_wrapper_without_tee_blocked(guard, main_root, cmd):
+>       assert "KAPI" in rules(guard, cmd, main_root), cmd
+E       AssertionError: nice -n 5 pytest -q
+E       assert 'KAPI' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>, 'nice -n 5 pytest -q', WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-45/test_gate_through_wrapper_with1/ffcore'))
+
+tests\hooks\test_wrappers.py:107: AssertionError
+_ test_gate_through_wrapper_without_tee_blocked[env DEPLOY_PROFILE=airgap make test] _
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-45/test_gate_through_wrapper_with2/ffcore')
+cmd = 'env DEPLOY_PROFILE=airgap make test'
+
+    @pytest.mark.parametrize(
+        "cmd",
+        [
+            "time make test",
+            "nice -n 5 pytest -q",
+            "env DEPLOY_PROFILE=airgap make test",
+            "command make lint",
+            "{ make test; }",
+            "( make test; make lint )",
+            "echo $(make test)",
+            "for p in llmaas airgap; do DEPLOY_PROFILE=$p make test; done",
+            "if make test; then echo ok; fi",
+        ],
+    )
+    def test_gate_through_wrapper_without_tee_blocked(guard, main_root, cmd):
+>       assert "KAPI" in rules(guard, cmd, main_root), cmd
+E       AssertionError: env DEPLOY_PROFILE=airgap make test
+E       assert 'KAPI' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>, 'env DEPLOY_PROFILE=airgap make test', WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-45/test_gate_through_wrapper_with2/ffcore'))
+
+tests\hooks\test_wrappers.py:107: AssertionError
+______ test_gate_through_wrapper_without_tee_blocked[command make lint] _______
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-45/test_gate_through_wrapper_with3/ffcore')
+cmd = 'command make lint'
+
+    @pytest.mark.parametrize(
+        "cmd",
+        [
+            "time make test",
+            "nice -n 5 pytest -q",
+            "env DEPLOY_PROFILE=airgap make test",
+            "command make lint",
+            "{ make test; }",
+            "( make test; make lint )",
+            "echo $(make test)",
+            "for p in llmaas airgap; do DEPLOY_PROFILE=$p make test; done",
+            "if make test; then echo ok; fi",
+        ],
+    )
+    def test_gate_through_wrapper_without_tee_blocked(guard, main_root, cmd):
+>       assert "KAPI" in rules(guard, cmd, main_root), cmd
+E       AssertionError: command make lint
+E       assert 'KAPI' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>, 'command make lint', WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-45/test_gate_through_wrapper_with3/ffcore'))
+
+tests\hooks\test_wrappers.py:107: AssertionError
+________ test_gate_through_wrapper_without_tee_blocked[{ make test; }] ________
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-45/test_gate_through_wrapper_with4/ffcore')
+cmd = '{ make test; }'
+
+    @pytest.mark.parametrize(
+        "cmd",
+        [
+            "time make test",
+            "nice -n 5 pytest -q",
+            "env DEPLOY_PROFILE=airgap make test",
+            "command make lint",
+            "{ make test; }",
+            "( make test; make lint )",
+            "echo $(make test)",
+            "for p in llmaas airgap; do DEPLOY_PROFILE=$p make test; done",
+            "if make test; then echo ok; fi",
+        ],
+    )
+    def test_gate_through_wrapper_without_tee_blocked(guard, main_root, cmd):
+>       assert "KAPI" in rules(guard, cmd, main_root), cmd
+E       AssertionError: { make test; }
+E       assert 'KAPI' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>, '{ make test; }', WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-45/test_gate_through_wrapper_with4/ffcore'))
+
+tests\hooks\test_wrappers.py:107: AssertionError
+______ test_gate_through_wrapper_without_tee_blocked[echo $(make test)] _______
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-45/test_gate_through_wrapper_with6/ffcore')
+cmd = 'echo $(make test)'
+
+    @pytest.mark.parametrize(
+        "cmd",
+        [
+            "time make test",
+            "nice -n 5 pytest -q",
+            "env DEPLOY_PROFILE=airgap make test",
+            "command make lint",
+            "{ make test; }",
+            "( make test; make lint )",
+            "echo $(make test)",
+            "for p in llmaas airgap; do DEPLOY_PROFILE=$p make test; done",
+            "if make test; then echo ok; fi",
+        ],
+    )
+    def test_gate_through_wrapper_without_tee_blocked(guard, main_root, cmd):
+>       assert "KAPI" in rules(guard, cmd, main_root), cmd
+E       AssertionError: echo $(make test)
+E       assert 'KAPI' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>, 'echo $(make test)', WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-45/test_gate_through_wrapper_with6/ffcore'))
+
+tests\hooks\test_wrappers.py:107: AssertionError
+_ test_gate_through_wrapper_without_tee_blocked[for p in llmaas airgap; do DEPLOY_PROFILE=$p make test; done] _
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-45/test_gate_through_wrapper_with7/ffcore')
+cmd = 'for p in llmaas airgap; do DEPLOY_PROFILE=$p make test; done'
+
+    @pytest.mark.parametrize(
+        "cmd",
+        [
+            "time make test",
+            "nice -n 5 pytest -q",
+            "env DEPLOY_PROFILE=airgap make test",
+            "command make lint",
+            "{ make test; }",
+            "( make test; make lint )",
+            "echo $(make test)",
+            "for p in llmaas airgap; do DEPLOY_PROFILE=$p make test; done",
+            "if make test; then echo ok; fi",
+        ],
+    )
+    def test_gate_through_wrapper_without_tee_blocked(guard, main_root, cmd):
+>       assert "KAPI" in rules(guard, cmd, main_root), cmd
+E       AssertionError: for p in llmaas airgap; do DEPLOY_PROFILE=$p make test; done
+E       assert 'KAPI' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>, 'for p in llmaas airgap; do DEPLOY_PROFILE=$p make test; done', WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-45/test_gate_through_wrapper_with7/ffcore'))
+
+tests\hooks\test_wrappers.py:107: AssertionError
+_ test_gate_through_wrapper_without_tee_blocked[if make test; then echo ok; fi] _
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-45/test_gate_through_wrapper_with8/ffcore')
+cmd = 'if make test; then echo ok; fi'
+
+    @pytest.mark.parametrize(
+        "cmd",
+        [
+            "time make test",
+            "nice -n 5 pytest -q",
+            "env DEPLOY_PROFILE=airgap make test",
+            "command make lint",
+            "{ make test; }",
+            "( make test; make lint )",
+            "echo $(make test)",
+            "for p in llmaas airgap; do DEPLOY_PROFILE=$p make test; done",
+            "if make test; then echo ok; fi",
+        ],
+    )
+    def test_gate_through_wrapper_without_tee_blocked(guard, main_root, cmd):
+>       assert "KAPI" in rules(guard, cmd, main_root), cmd
+E       AssertionError: if make test; then echo ok; fi
+E       assert 'KAPI' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>, 'if make test; then echo ok; fi', WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-45/test_gate_through_wrapper_with8/ffcore'))
+
+tests\hooks\test_wrappers.py:107: AssertionError
+_ test_gate_through_wrapper_with_tee_allowed[{ make test; make lint; } 2>&1 | tee x.log] _
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-45/test_gate_through_wrapper_with11/ffcore')
+cmd = '{ make test; make lint; } 2>&1 | tee x.log'
+
+    @pytest.mark.parametrize(
+        "cmd",
+        [
+            "time make test 2>&1 | tee state/evidence/x.log",
+            "env DEPLOY_PROFILE=airgap make test 2>&1 | tee x.log",
+            "{ make test; make lint; } 2>&1 | tee x.log",
+            "( make test && make lint ) 2>&1 | tee x.log",
+            "nice -n 5 py -3.12 -m pytest tests/hooks -q 2>&1 | time tee x.log",
+        ],
+    )
+    def test_gate_through_wrapper_with_tee_allowed(guard, main_root, cmd):
+>       assert rules(guard, cmd, main_root) == [], cmd
+E       AssertionError: { make test; make lint; } 2>&1 | tee x.log
+E       assert ['KAPI'] == []
+E         
+E         Left contains one more item: 'KAPI'
+E         Use -v to get more diff
+
+tests\hooks\test_wrappers.py:121: AssertionError
+_ test_gate_through_wrapper_with_tee_allowed[( make test && make lint ) 2>&1 | tee x.log] _
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-45/test_gate_through_wrapper_with12/ffcore')
+cmd = '( make test && make lint ) 2>&1 | tee x.log'
+
+    @pytest.mark.parametrize(
+        "cmd",
+        [
+            "time make test 2>&1 | tee state/evidence/x.log",
+            "env DEPLOY_PROFILE=airgap make test 2>&1 | tee x.log",
+            "{ make test; make lint; } 2>&1 | tee x.log",
+            "( make test && make lint ) 2>&1 | tee x.log",
+            "nice -n 5 py -3.12 -m pytest tests/hooks -q 2>&1 | time tee x.log",
+        ],
+    )
+    def test_gate_through_wrapper_with_tee_allowed(guard, main_root, cmd):
+>       assert rules(guard, cmd, main_root) == [], cmd
+E       AssertionError: ( make test && make lint ) 2>&1 | tee x.log
+E       assert ['KAPI'] == []
+E         
+E         Left contains one more item: 'KAPI'
+E         Use -v to get more diff
+
+tests\hooks\test_wrappers.py:121: AssertionError
+_ test_gate_through_wrapper_with_tee_allowed[nice -n 5 py -3.12 -m pytest tests/hooks -q 2>&1 | time tee x.log] _
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-45/test_gate_through_wrapper_with13/ffcore')
+cmd = 'nice -n 5 py -3.12 -m pytest tests/hooks -q 2>&1 | time tee x.log'
+
+    @pytest.mark.parametrize(
+        "cmd",
+        [
+            "time make test 2>&1 | tee state/evidence/x.log",
+            "env DEPLOY_PROFILE=airgap make test 2>&1 | tee x.log",
+            "{ make test; make lint; } 2>&1 | tee x.log",
+            "( make test && make lint ) 2>&1 | tee x.log",
+            "nice -n 5 py -3.12 -m pytest tests/hooks -q 2>&1 | time tee x.log",
+        ],
+    )
+    def test_gate_through_wrapper_with_tee_allowed(guard, main_root, cmd):
+>       assert rules(guard, cmd, main_root) == [], cmd
+E       AssertionError: nice -n 5 py -3.12 -m pytest tests/hooks -q 2>&1 | time tee x.log
+E       assert ['KAPI'] == []
+E         
+E         Left contains one more item: 'KAPI'
+E         Use -v to get more diff
+
+tests\hooks\test_wrappers.py:121: AssertionError
+_______________________ test_substitution_depth_is_loud _______________________
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-45/test_substitution_depth_is_lou0/ffcore')
+
+    def test_substitution_depth_is_loud(guard, main_root):
+        cmd = "echo $(echo $(echo $(echo $(git status))))"
+>       assert "GUARD-DERINLIK" in rules(guard, cmd, main_root)
+E       AssertionError: assert 'GUARD-DERINLIK' in []
+E        +  where [] = rules(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>, 'echo $(echo $(echo $(echo $(git status))))', WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-45/test_substitution_depth_is_lou0/ffcore'))
+
+tests\hooks\test_wrappers.py:138: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/hooks/test_wrappers.py::test_worker_push_through_wrapper_blocked[env X=1 git push origin x]
+FAILED tests/hooks/test_wrappers.py::test_worker_push_through_wrapper_blocked[env -i git push]
+FAILED tests/hooks/test_wrappers.py::test_worker_push_through_wrapper_blocked[env -u HOME git push]
+FAILED tests/hooks/test_wrappers.py::test_worker_push_through_wrapper_blocked[env -- git push]
+FAILED tests/hooks/test_wrappers.py::test_worker_push_through_wrapper_blocked[command git push]
+FAILED tests/hooks/test_wrappers.py::test_worker_push_through_wrapper_blocked[command -p git push]
+FAILED tests/hooks/test_wrappers.py::test_worker_push_through_wrapper_blocked[time git push]
+FAILED tests/hooks/test_wrappers.py::test_worker_push_through_wrapper_blocked[time -p git push]
+FAILED tests/hooks/test_wrappers.py::test_worker_push_through_wrapper_blocked[nice git push]
+FAILED tests/hooks/test_wrappers.py::test_worker_push_through_wrapper_blocked[nice -n 5 git push]
+FAILED tests/hooks/test_wrappers.py::test_worker_push_through_wrapper_blocked[nice -5 git push]
+FAILED tests/hooks/test_wrappers.py::test_worker_push_through_wrapper_blocked[nohup git push]
+FAILED tests/hooks/test_wrappers.py::test_worker_push_through_wrapper_blocked[exec git push]
+FAILED tests/hooks/test_wrappers.py::test_worker_push_through_wrapper_blocked[bash -o pipefail -c 'git push']
+FAILED tests/hooks/test_wrappers.py::test_worker_push_through_wrapper_blocked[bash -euo pipefail -c 'git push']
+FAILED tests/hooks/test_wrappers.py::test_worker_push_through_wrapper_blocked[sh -e -o errexit -c 'git push']
+FAILED tests/hooks/test_wrappers.py::test_worker_push_through_wrapper_blocked[echo $(git push)]
+FAILED tests/hooks/test_wrappers.py::test_worker_push_through_wrapper_blocked[echo "$(git push)"]
+FAILED tests/hooks/test_wrappers.py::test_worker_push_through_wrapper_blocked[echo `git push`]
+FAILED tests/hooks/test_wrappers.py::test_worker_push_through_wrapper_blocked[x=$(echo $(git push))]
+FAILED tests/hooks/test_wrappers.py::test_worker_push_through_wrapper_blocked[{ git push; }]
+FAILED tests/hooks/test_wrappers.py::test_worker_push_through_wrapper_blocked[if true; then git push; fi]
+FAILED tests/hooks/test_wrappers.py::test_worker_push_through_wrapper_blocked[if git push; then echo ok; fi]
+FAILED tests/hooks/test_wrappers.py::test_worker_push_through_wrapper_blocked[for b in a; do git push; done]
+FAILED tests/hooks/test_wrappers.py::test_worker_push_through_wrapper_blocked[while false; do git push; done]
+FAILED tests/hooks/test_wrappers.py::test_worker_push_through_wrapper_blocked[! git push]
+FAILED tests/hooks/test_wrappers.py::test_worker_push_through_wrapper_blocked[env X=1 time nice -n 2 command git push]
+FAILED tests/hooks/test_wrappers.py::test_coordinator_unflagged_push_in_substitution_blocked
+FAILED tests/hooks/test_wrappers.py::test_gate_through_wrapper_without_tee_blocked[time make test]
+FAILED tests/hooks/test_wrappers.py::test_gate_through_wrapper_without_tee_blocked[nice -n 5 pytest -q]
+FAILED tests/hooks/test_wrappers.py::test_gate_through_wrapper_without_tee_blocked[env DEPLOY_PROFILE=airgap make test]
+FAILED tests/hooks/test_wrappers.py::test_gate_through_wrapper_without_tee_blocked[command make lint]
+FAILED tests/hooks/test_wrappers.py::test_gate_through_wrapper_without_tee_blocked[{ make test; }]
+FAILED tests/hooks/test_wrappers.py::test_gate_through_wrapper_without_tee_blocked[echo $(make test)]
+FAILED tests/hooks/test_wrappers.py::test_gate_through_wrapper_without_tee_blocked[for p in llmaas airgap; do DEPLOY_PROFILE=$p make test; done]
+FAILED tests/hooks/test_wrappers.py::test_gate_through_wrapper_without_tee_blocked[if make test; then echo ok; fi]
+FAILED tests/hooks/test_wrappers.py::test_gate_through_wrapper_with_tee_allowed[{ make test; make lint; } 2>&1 | tee x.log]
+FAILED tests/hooks/test_wrappers.py::test_gate_through_wrapper_with_tee_allowed[( make test && make lint ) 2>&1 | tee x.log]
+FAILED tests/hooks/test_wrappers.py::test_gate_through_wrapper_with_tee_allowed[nice -n 5 py -3.12 -m pytest tests/hooks -q 2>&1 | time tee x.log]
+FAILED tests/hooks/test_wrappers.py::test_substitution_depth_is_loud - Assert...
+40 failed, 23 passed in 1.71s

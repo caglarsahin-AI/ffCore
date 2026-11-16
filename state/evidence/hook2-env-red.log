@@ -1,0 +1,395 @@
+.........................FFFFFFF.FFF....F.                               [100%]
+================================== FAILURES ===================================
+_ test_env_text_allowed[grep -rn --exclude-dir=node_modules --exclude='.env' KEY .] _
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-50/test_env_text_allowed_grep__rn0/ffcore')
+cmd = "grep -rn --exclude-dir=node_modules --exclude='.env' KEY ."
+
+    @pytest.mark.parametrize(
+        "cmd",
+        [
+            "grep -rn --exclude-dir=node_modules --exclude='.env' KEY .",
+            "grep -rn --exclude=.env KEY .",
+            'grep -n "\\.env" .gitignore',
+            "grep -n .env .gitignore",
+            "grep -e .env -e KEY docs/x.md",
+            "rg -g '!.env' KEY",
+            'echo "the .env file is not read"',
+            "echo 'see .env.example'",
+            'git commit -m "docs: .env is never read"',
+            "cat > /tmp/x.md <<'EOF'\nthe .env file stays local\ncat .env\nEOF",
+            "cat <<EOF > x\n.env\nEOF\necho done",
+            "cat .env.test",
+            "cat .env.example",
+            "ls .envrc",
+            "docker compose --env-file .env.test up",
+            'printf "%s\\n" "no .env here"',
+        ],
+    )
+    def test_env_text_allowed(guard, main_root, cmd):
+>       assert not env_hit(guard, cmd, main_root), cmd
+E       AssertionError: grep -rn --exclude-dir=node_modules --exclude='.env' KEY .
+E       assert not True
+E        +  where True = env_hit(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>, "grep -rn --exclude-dir=node_modules --exclude='.env' KEY .", WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-50/test_env_text_allowed_grep__rn0/ffcore'))
+
+tests\hooks\test_env_position.py:72: AssertionError
+____________ test_env_text_allowed[grep -rn --exclude=.env KEY .] _____________
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-50/test_env_text_allowed_grep__rn1/ffcore')
+cmd = 'grep -rn --exclude=.env KEY .'
+
+    @pytest.mark.parametrize(
+        "cmd",
+        [
+            "grep -rn --exclude-dir=node_modules --exclude='.env' KEY .",
+            "grep -rn --exclude=.env KEY .",
+            'grep -n "\\.env" .gitignore',
+            "grep -n .env .gitignore",
+            "grep -e .env -e KEY docs/x.md",
+            "rg -g '!.env' KEY",
+            'echo "the .env file is not read"',
+            "echo 'see .env.example'",
+            'git commit -m "docs: .env is never read"',
+            "cat > /tmp/x.md <<'EOF'\nthe .env file stays local\ncat .env\nEOF",
+            "cat <<EOF > x\n.env\nEOF\necho done",
+            "cat .env.test",
+            "cat .env.example",
+            "ls .envrc",
+            "docker compose --env-file .env.test up",
+            'printf "%s\\n" "no .env here"',
+        ],
+    )
+    def test_env_text_allowed(guard, main_root, cmd):
+>       assert not env_hit(guard, cmd, main_root), cmd
+E       AssertionError: grep -rn --exclude=.env KEY .
+E       assert not True
+E        +  where True = env_hit(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>, 'grep -rn --exclude=.env KEY .', WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-50/test_env_text_allowed_grep__rn1/ffcore'))
+
+tests\hooks\test_env_position.py:72: AssertionError
+_____________ test_env_text_allowed[grep -n "\\.env" .gitignore] ______________
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-50/test_env_text_allowed_grep__n_0/ffcore')
+cmd = 'grep -n "\\.env" .gitignore'
+
+    @pytest.mark.parametrize(
+        "cmd",
+        [
+            "grep -rn --exclude-dir=node_modules --exclude='.env' KEY .",
+            "grep -rn --exclude=.env KEY .",
+            'grep -n "\\.env" .gitignore',
+            "grep -n .env .gitignore",
+            "grep -e .env -e KEY docs/x.md",
+            "rg -g '!.env' KEY",
+            'echo "the .env file is not read"',
+            "echo 'see .env.example'",
+            'git commit -m "docs: .env is never read"',
+            "cat > /tmp/x.md <<'EOF'\nthe .env file stays local\ncat .env\nEOF",
+            "cat <<EOF > x\n.env\nEOF\necho done",
+            "cat .env.test",
+            "cat .env.example",
+            "ls .envrc",
+            "docker compose --env-file .env.test up",
+            'printf "%s\\n" "no .env here"',
+        ],
+    )
+    def test_env_text_allowed(guard, main_root, cmd):
+>       assert not env_hit(guard, cmd, main_root), cmd
+E       AssertionError: grep -n "\.env" .gitignore
+E       assert not True
+E        +  where True = env_hit(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>, 'grep -n "\\.env" .gitignore', WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-50/test_env_text_allowed_grep__n_0/ffcore'))
+
+tests\hooks\test_env_position.py:72: AssertionError
+_______________ test_env_text_allowed[grep -n .env .gitignore] ________________
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-50/test_env_text_allowed_grep__n_1/ffcore')
+cmd = 'grep -n .env .gitignore'
+
+    @pytest.mark.parametrize(
+        "cmd",
+        [
+            "grep -rn --exclude-dir=node_modules --exclude='.env' KEY .",
+            "grep -rn --exclude=.env KEY .",
+            'grep -n "\\.env" .gitignore',
+            "grep -n .env .gitignore",
+            "grep -e .env -e KEY docs/x.md",
+            "rg -g '!.env' KEY",
+            'echo "the .env file is not read"',
+            "echo 'see .env.example'",
+            'git commit -m "docs: .env is never read"',
+            "cat > /tmp/x.md <<'EOF'\nthe .env file stays local\ncat .env\nEOF",
+            "cat <<EOF > x\n.env\nEOF\necho done",
+            "cat .env.test",
+            "cat .env.example",
+            "ls .envrc",
+            "docker compose --env-file .env.test up",
+            'printf "%s\\n" "no .env here"',
+        ],
+    )
+    def test_env_text_allowed(guard, main_root, cmd):
+>       assert not env_hit(guard, cmd, main_root), cmd
+E       AssertionError: grep -n .env .gitignore
+E       assert not True
+E        +  where True = env_hit(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>, 'grep -n .env .gitignore', WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-50/test_env_text_allowed_grep__n_1/ffcore'))
+
+tests\hooks\test_env_position.py:72: AssertionError
+____________ test_env_text_allowed[grep -e .env -e KEY docs/x.md] _____________
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-50/test_env_text_allowed_grep__e_0/ffcore')
+cmd = 'grep -e .env -e KEY docs/x.md'
+
+    @pytest.mark.parametrize(
+        "cmd",
+        [
+            "grep -rn --exclude-dir=node_modules --exclude='.env' KEY .",
+            "grep -rn --exclude=.env KEY .",
+            'grep -n "\\.env" .gitignore',
+            "grep -n .env .gitignore",
+            "grep -e .env -e KEY docs/x.md",
+            "rg -g '!.env' KEY",
+            'echo "the .env file is not read"',
+            "echo 'see .env.example'",
+            'git commit -m "docs: .env is never read"',
+            "cat > /tmp/x.md <<'EOF'\nthe .env file stays local\ncat .env\nEOF",
+            "cat <<EOF > x\n.env\nEOF\necho done",
+            "cat .env.test",
+            "cat .env.example",
+            "ls .envrc",
+            "docker compose --env-file .env.test up",
+            'printf "%s\\n" "no .env here"',
+        ],
+    )
+    def test_env_text_allowed(guard, main_root, cmd):
+>       assert not env_hit(guard, cmd, main_root), cmd
+E       AssertionError: grep -e .env -e KEY docs/x.md
+E       assert not True
+E        +  where True = env_hit(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>, 'grep -e .env -e KEY docs/x.md', WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-50/test_env_text_allowed_grep__e_0/ffcore'))
+
+tests\hooks\test_env_position.py:72: AssertionError
+__________________ test_env_text_allowed[rg -g '!.env' KEY] ___________________
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-50/test_env_text_allowed_rg__g___0/ffcore')
+cmd = "rg -g '!.env' KEY"
+
+    @pytest.mark.parametrize(
+        "cmd",
+        [
+            "grep -rn --exclude-dir=node_modules --exclude='.env' KEY .",
+            "grep -rn --exclude=.env KEY .",
+            'grep -n "\\.env" .gitignore',
+            "grep -n .env .gitignore",
+            "grep -e .env -e KEY docs/x.md",
+            "rg -g '!.env' KEY",
+            'echo "the .env file is not read"',
+            "echo 'see .env.example'",
+            'git commit -m "docs: .env is never read"',
+            "cat > /tmp/x.md <<'EOF'\nthe .env file stays local\ncat .env\nEOF",
+            "cat <<EOF > x\n.env\nEOF\necho done",
+            "cat .env.test",
+            "cat .env.example",
+            "ls .envrc",
+            "docker compose --env-file .env.test up",
+            'printf "%s\\n" "no .env here"',
+        ],
+    )
+    def test_env_text_allowed(guard, main_root, cmd):
+>       assert not env_hit(guard, cmd, main_root), cmd
+E       AssertionError: rg -g '!.env' KEY
+E       assert not True
+E        +  where True = env_hit(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>, "rg -g '!.env' KEY", WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-50/test_env_text_allowed_rg__g___0/ffcore'))
+
+tests\hooks\test_env_position.py:72: AssertionError
+___________ test_env_text_allowed[echo "the .env file is not read"] ___________
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-50/test_env_text_allowed_echo__th0/ffcore')
+cmd = 'echo "the .env file is not read"'
+
+    @pytest.mark.parametrize(
+        "cmd",
+        [
+            "grep -rn --exclude-dir=node_modules --exclude='.env' KEY .",
+            "grep -rn --exclude=.env KEY .",
+            'grep -n "\\.env" .gitignore',
+            "grep -n .env .gitignore",
+            "grep -e .env -e KEY docs/x.md",
+            "rg -g '!.env' KEY",
+            'echo "the .env file is not read"',
+            "echo 'see .env.example'",
+            'git commit -m "docs: .env is never read"',
+            "cat > /tmp/x.md <<'EOF'\nthe .env file stays local\ncat .env\nEOF",
+            "cat <<EOF > x\n.env\nEOF\necho done",
+            "cat .env.test",
+            "cat .env.example",
+            "ls .envrc",
+            "docker compose --env-file .env.test up",
+            'printf "%s\\n" "no .env here"',
+        ],
+    )
+    def test_env_text_allowed(guard, main_root, cmd):
+>       assert not env_hit(guard, cmd, main_root), cmd
+E       AssertionError: echo "the .env file is not read"
+E       assert not True
+E        +  where True = env_hit(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>, 'echo "the .env file is not read"', WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-50/test_env_text_allowed_echo__th0/ffcore'))
+
+tests\hooks\test_env_position.py:72: AssertionError
+_______ test_env_text_allowed[git commit -m "docs: .env is never read"] _______
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-50/test_env_text_allowed_git_comm0/ffcore')
+cmd = 'git commit -m "docs: .env is never read"'
+
+    @pytest.mark.parametrize(
+        "cmd",
+        [
+            "grep -rn --exclude-dir=node_modules --exclude='.env' KEY .",
+            "grep -rn --exclude=.env KEY .",
+            'grep -n "\\.env" .gitignore',
+            "grep -n .env .gitignore",
+            "grep -e .env -e KEY docs/x.md",
+            "rg -g '!.env' KEY",
+            'echo "the .env file is not read"',
+            "echo 'see .env.example'",
+            'git commit -m "docs: .env is never read"',
+            "cat > /tmp/x.md <<'EOF'\nthe .env file stays local\ncat .env\nEOF",
+            "cat <<EOF > x\n.env\nEOF\necho done",
+            "cat .env.test",
+            "cat .env.example",
+            "ls .envrc",
+            "docker compose --env-file .env.test up",
+            'printf "%s\\n" "no .env here"',
+        ],
+    )
+    def test_env_text_allowed(guard, main_root, cmd):
+>       assert not env_hit(guard, cmd, main_root), cmd
+E       AssertionError: git commit -m "docs: .env is never read"
+E       assert not True
+E        +  where True = env_hit(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>, 'git commit -m "docs: .env is never read"', WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-50/test_env_text_allowed_git_comm0/ffcore'))
+
+tests\hooks\test_env_position.py:72: AssertionError
+_ test_env_text_allowed[cat > /tmp/x.md <<'EOF'\nthe .env file stays local\ncat .env\nEOF] _
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-50/test_env_text_allowed_cat____t0/ffcore')
+cmd = "cat > /tmp/x.md <<'EOF'\nthe .env file stays local\ncat .env\nEOF"
+
+    @pytest.mark.parametrize(
+        "cmd",
+        [
+            "grep -rn --exclude-dir=node_modules --exclude='.env' KEY .",
+            "grep -rn --exclude=.env KEY .",
+            'grep -n "\\.env" .gitignore',
+            "grep -n .env .gitignore",
+            "grep -e .env -e KEY docs/x.md",
+            "rg -g '!.env' KEY",
+            'echo "the .env file is not read"',
+            "echo 'see .env.example'",
+            'git commit -m "docs: .env is never read"',
+            "cat > /tmp/x.md <<'EOF'\nthe .env file stays local\ncat .env\nEOF",
+            "cat <<EOF > x\n.env\nEOF\necho done",
+            "cat .env.test",
+            "cat .env.example",
+            "ls .envrc",
+            "docker compose --env-file .env.test up",
+            'printf "%s\\n" "no .env here"',
+        ],
+    )
+    def test_env_text_allowed(guard, main_root, cmd):
+>       assert not env_hit(guard, cmd, main_root), cmd
+E       AssertionError: cat > /tmp/x.md <<'EOF'
+E         the .env file stays local
+E         cat .env
+E         EOF
+E       assert not True
+E        +  where True = env_hit(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>, "cat > /tmp/x.md <<'EOF'\nthe .env file stays local\ncat .env\nEOF", WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-50/test_env_text_allowed_cat____t0/ffcore'))
+
+tests\hooks\test_env_position.py:72: AssertionError
+_________ test_env_text_allowed[cat <<EOF > x\n.env\nEOF\necho done] __________
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-50/test_env_text_allowed_cat___EO0/ffcore')
+cmd = 'cat <<EOF > x\n.env\nEOF\necho done'
+
+    @pytest.mark.parametrize(
+        "cmd",
+        [
+            "grep -rn --exclude-dir=node_modules --exclude='.env' KEY .",
+            "grep -rn --exclude=.env KEY .",
+            'grep -n "\\.env" .gitignore',
+            "grep -n .env .gitignore",
+            "grep -e .env -e KEY docs/x.md",
+            "rg -g '!.env' KEY",
+            'echo "the .env file is not read"',
+            "echo 'see .env.example'",
+            'git commit -m "docs: .env is never read"',
+            "cat > /tmp/x.md <<'EOF'\nthe .env file stays local\ncat .env\nEOF",
+            "cat <<EOF > x\n.env\nEOF\necho done",
+            "cat .env.test",
+            "cat .env.example",
+            "ls .envrc",
+            "docker compose --env-file .env.test up",
+            'printf "%s\\n" "no .env here"',
+        ],
+    )
+    def test_env_text_allowed(guard, main_root, cmd):
+>       assert not env_hit(guard, cmd, main_root), cmd
+E       AssertionError: cat <<EOF > x
+E         .env
+E         EOF
+E         echo done
+E       assert not True
+E        +  where True = env_hit(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>, 'cat <<EOF > x\n.env\nEOF\necho done', WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-50/test_env_text_allowed_cat___EO0/ffcore'))
+
+tests\hooks\test_env_position.py:72: AssertionError
+____________ test_env_text_allowed[printf "%s\\n" "no .env here"] _____________
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-50/test_env_text_allowed_printf__0/ffcore')
+cmd = 'printf "%s\\n" "no .env here"'
+
+    @pytest.mark.parametrize(
+        "cmd",
+        [
+            "grep -rn --exclude-dir=node_modules --exclude='.env' KEY .",
+            "grep -rn --exclude=.env KEY .",
+            'grep -n "\\.env" .gitignore',
+            "grep -n .env .gitignore",
+            "grep -e .env -e KEY docs/x.md",
+            "rg -g '!.env' KEY",
+            'echo "the .env file is not read"',
+            "echo 'see .env.example'",
+            'git commit -m "docs: .env is never read"',
+            "cat > /tmp/x.md <<'EOF'\nthe .env file stays local\ncat .env\nEOF",
+            "cat <<EOF > x\n.env\nEOF\necho done",
+            "cat .env.test",
+            "cat .env.example",
+            "ls .envrc",
+            "docker compose --env-file .env.test up",
+            'printf "%s\\n" "no .env here"',
+        ],
+    )
+    def test_env_text_allowed(guard, main_root, cmd):
+>       assert not env_hit(guard, cmd, main_root), cmd
+E       AssertionError: printf "%s\n" "no .env here"
+E       assert not True
+E        +  where True = env_hit(<module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>, 'printf "%s\\n" "no .env here"', WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-50/test_env_text_allowed_printf__0/ffcore'))
+
+tests\hooks\test_env_position.py:72: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/hooks/test_env_position.py::test_env_text_allowed[grep -rn --exclude-dir=node_modules --exclude='.env' KEY .]
+FAILED tests/hooks/test_env_position.py::test_env_text_allowed[grep -rn --exclude=.env KEY .]
+FAILED tests/hooks/test_env_position.py::test_env_text_allowed[grep -n "\\.env" .gitignore]
+FAILED tests/hooks/test_env_position.py::test_env_text_allowed[grep -n .env .gitignore]
+FAILED tests/hooks/test_env_position.py::test_env_text_allowed[grep -e .env -e KEY docs/x.md]
+FAILED tests/hooks/test_env_position.py::test_env_text_allowed[rg -g '!.env' KEY]
+FAILED tests/hooks/test_env_position.py::test_env_text_allowed[echo "the .env file is not read"]
+FAILED tests/hooks/test_env_position.py::test_env_text_allowed[git commit -m "docs: .env is never read"]
+FAILED tests/hooks/test_env_position.py::test_env_text_allowed[cat > /tmp/x.md <<'EOF'\nthe .env file stays local\ncat .env\nEOF]
+FAILED tests/hooks/test_env_position.py::test_env_text_allowed[cat <<EOF > x\n.env\nEOF\necho done]
+FAILED tests/hooks/test_env_position.py::test_env_text_allowed[printf "%s\\n" "no .env here"]
+11 failed, 31 passed in 1.16s

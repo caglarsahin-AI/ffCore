@@ -16,3 +16,4 @@
 2026-11-16T23:05:21	warn	isci-b	Bash	KAPI	py -3.12 -m pytest tests/scripts -q -p no:cacheprovider 2>&1 | tail -8
 2026-11-16T23:06:00	warn	isci-b	Bash	KAPI	RUFF=/c/Users/caglar.sahin/AppData/Local/uv/cache/archive-v0/7QES3OegvWUr43WNh2bST/ruff-0.17.3.data/scripts/ruff.exe; $R
 2026-11-16T23:11:35	warn	koordinator	Bash	ENV	R=/c/ai_paycore/ffcore; cat > "C:/Users/CAGLAR~1.SAH/AppData/Local/Temp/claude/9398d5fca5badfb5/d131353f-4058-4872-8ded-
+2026-11-16T23:18:22	warn	koordinator	Bash	ENV	R=/c/ai_paycore/ffcore; cat > "C:/Users/CAGLAR~1.SAH/AppData/Local/Temp/claude/9398d5fca5badfb5/d131353f-4058-4872-8ded-

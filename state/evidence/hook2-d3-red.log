@@ -1,0 +1,306 @@
+FFFFFFFFF...F                                                            [100%]
+================================== FAILURES ===================================
+_ test_mask_hides_value[curl -u probe:S3cr3tPass https://x-S3cr3tPass--u ***] _
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+raw = 'curl -u probe:S3cr3tPass https://x', secret = 'S3cr3tPass'
+kept = '-u ***'
+
+    @pytest.mark.parametrize(
+        ("raw", "secret", "kept"),
+        [
+            ("curl -u probe:S3cr3tPass https://x", "S3cr3tPass", "-u ***"),
+            ("curl --user probe:S3cr3tPass https://x", "S3cr3tPass", "--user ***"),
+            ("curl -s -u probe:S3cr3tPass", "probe:", "curl -s -u ***"),
+            ("""curl -d '{"token":"TOK123"}' x""", "TOK123", '"token":"***"'),
+            ('{"api_key": "AK-99"}', "AK-99", '"api_key":"***"'),
+            ('{"password":"pw1","user":"u"}', "pw1", '"user":"u"'),
+            ('{"secret":"s3"}', "s3", '"secret":"***"'),
+            ('{"key":"k1"}', "k1", '"key":"***"'),
+            ('{"Token":"T2"}', "T2", '"Token":"***"'),
+        ],
+    )
+    def test_mask_hides_value(guard, raw, secret, kept):
+        masked = guard.mask_secrets(raw)
+>       assert secret not in masked, masked
+E       AssertionError: curl -u probe:S3cr3tPass https://x
+E       assert 'S3cr3tPass' not in 'curl -u pro...ss https://x'
+E         
+E         'S3cr3tPass' is contained here:
+E           curl -u probe:S3cr3tPass https://x
+E         ?               ++++++++++
+
+tests\hooks\test_masks.py:26: AssertionError
+_ test_mask_hides_value[curl --user probe:S3cr3tPass https://x-S3cr3tPass---user ***] _
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+raw = 'curl --user probe:S3cr3tPass https://x', secret = 'S3cr3tPass'
+kept = '--user ***'
+
+    @pytest.mark.parametrize(
+        ("raw", "secret", "kept"),
+        [
+            ("curl -u probe:S3cr3tPass https://x", "S3cr3tPass", "-u ***"),
+            ("curl --user probe:S3cr3tPass https://x", "S3cr3tPass", "--user ***"),
+            ("curl -s -u probe:S3cr3tPass", "probe:", "curl -s -u ***"),
+            ("""curl -d '{"token":"TOK123"}' x""", "TOK123", '"token":"***"'),
+            ('{"api_key": "AK-99"}', "AK-99", '"api_key":"***"'),
+            ('{"password":"pw1","user":"u"}', "pw1", '"user":"u"'),
+            ('{"secret":"s3"}', "s3", '"secret":"***"'),
+            ('{"key":"k1"}', "k1", '"key":"***"'),
+            ('{"Token":"T2"}', "T2", '"Token":"***"'),
+        ],
+    )
+    def test_mask_hides_value(guard, raw, secret, kept):
+        masked = guard.mask_secrets(raw)
+>       assert secret not in masked, masked
+E       AssertionError: curl --user probe:S3cr3tPass https://x
+E       assert 'S3cr3tPass' not in 'curl --user...ss https://x'
+E         
+E         'S3cr3tPass' is contained here:
+E           curl --user probe:S3cr3tPass https://x
+E         ?                   ++++++++++
+
+tests\hooks\test_masks.py:26: AssertionError
+__ test_mask_hides_value[curl -s -u probe:S3cr3tPass-probe:-curl -s -u ***] ___
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+raw = 'curl -s -u probe:S3cr3tPass', secret = 'probe:', kept = 'curl -s -u ***'
+
+    @pytest.mark.parametrize(
+        ("raw", "secret", "kept"),
+        [
+            ("curl -u probe:S3cr3tPass https://x", "S3cr3tPass", "-u ***"),
+            ("curl --user probe:S3cr3tPass https://x", "S3cr3tPass", "--user ***"),
+            ("curl -s -u probe:S3cr3tPass", "probe:", "curl -s -u ***"),
+            ("""curl -d '{"token":"TOK123"}' x""", "TOK123", '"token":"***"'),
+            ('{"api_key": "AK-99"}', "AK-99", '"api_key":"***"'),
+            ('{"password":"pw1","user":"u"}', "pw1", '"user":"u"'),
+            ('{"secret":"s3"}', "s3", '"secret":"***"'),
+            ('{"key":"k1"}', "k1", '"key":"***"'),
+            ('{"Token":"T2"}', "T2", '"Token":"***"'),
+        ],
+    )
+    def test_mask_hides_value(guard, raw, secret, kept):
+        masked = guard.mask_secrets(raw)
+>       assert secret not in masked, masked
+E       AssertionError: curl -s -u probe:S3cr3tPass
+E       assert 'probe:' not in 'curl -s -u ...e:S3cr3tPass'
+E         
+E         'probe:' is contained here:
+E           curl -s -u probe:S3cr3tPass
+E         ?            ++++++
+
+tests\hooks\test_masks.py:26: AssertionError
+_ test_mask_hides_value[curl -d '{"token":"TOK123"}' x-TOK123-"token":"***"] __
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+raw = 'curl -d \'{"token":"TOK123"}\' x', secret = 'TOK123'
+kept = '"token":"***"'
+
+    @pytest.mark.parametrize(
+        ("raw", "secret", "kept"),
+        [
+            ("curl -u probe:S3cr3tPass https://x", "S3cr3tPass", "-u ***"),
+            ("curl --user probe:S3cr3tPass https://x", "S3cr3tPass", "--user ***"),
+            ("curl -s -u probe:S3cr3tPass", "probe:", "curl -s -u ***"),
+            ("""curl -d '{"token":"TOK123"}' x""", "TOK123", '"token":"***"'),
+            ('{"api_key": "AK-99"}', "AK-99", '"api_key":"***"'),
+            ('{"password":"pw1","user":"u"}', "pw1", '"user":"u"'),
+            ('{"secret":"s3"}', "s3", '"secret":"***"'),
+            ('{"key":"k1"}', "k1", '"key":"***"'),
+            ('{"Token":"T2"}', "T2", '"Token":"***"'),
+        ],
+    )
+    def test_mask_hides_value(guard, raw, secret, kept):
+        masked = guard.mask_secrets(raw)
+>       assert secret not in masked, masked
+E       AssertionError: curl -d '{"token":"TOK123"}' x
+E       assert 'TOK123' not in 'curl -d \'{...TOK123"}\' x'
+E         
+E         'TOK123' is contained here:
+E           curl -d '{"token":"TOK123"}' x
+E         ?                    ++++++
+
+tests\hooks\test_masks.py:26: AssertionError
+______ test_mask_hides_value[{"api_key": "AK-99"}-AK-99-"api_key":"***"] ______
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+raw = '{"api_key": "AK-99"}', secret = 'AK-99', kept = '"api_key":"***"'
+
+    @pytest.mark.parametrize(
+        ("raw", "secret", "kept"),
+        [
+            ("curl -u probe:S3cr3tPass https://x", "S3cr3tPass", "-u ***"),
+            ("curl --user probe:S3cr3tPass https://x", "S3cr3tPass", "--user ***"),
+            ("curl -s -u probe:S3cr3tPass", "probe:", "curl -s -u ***"),
+            ("""curl -d '{"token":"TOK123"}' x""", "TOK123", '"token":"***"'),
+            ('{"api_key": "AK-99"}', "AK-99", '"api_key":"***"'),
+            ('{"password":"pw1","user":"u"}', "pw1", '"user":"u"'),
+            ('{"secret":"s3"}', "s3", '"secret":"***"'),
+            ('{"key":"k1"}', "k1", '"key":"***"'),
+            ('{"Token":"T2"}', "T2", '"Token":"***"'),
+        ],
+    )
+    def test_mask_hides_value(guard, raw, secret, kept):
+        masked = guard.mask_secrets(raw)
+>       assert secret not in masked, masked
+E       AssertionError: {"api_key": "AK-99"}
+E       assert 'AK-99' not in '{"api_key": "AK-99"}'
+E         
+E         'AK-99' is contained here:
+E           {"api_key": "AK-99"}
+E         ?              +++++
+
+tests\hooks\test_masks.py:26: AssertionError
+_____ test_mask_hides_value[{"password":"pw1","user":"u"}-pw1-"user":"u"] _____
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+raw = '{"password":"pw1","user":"u"}', secret = 'pw1', kept = '"user":"u"'
+
+    @pytest.mark.parametrize(
+        ("raw", "secret", "kept"),
+        [
+            ("curl -u probe:S3cr3tPass https://x", "S3cr3tPass", "-u ***"),
+            ("curl --user probe:S3cr3tPass https://x", "S3cr3tPass", "--user ***"),
+            ("curl -s -u probe:S3cr3tPass", "probe:", "curl -s -u ***"),
+            ("""curl -d '{"token":"TOK123"}' x""", "TOK123", '"token":"***"'),
+            ('{"api_key": "AK-99"}', "AK-99", '"api_key":"***"'),
+            ('{"password":"pw1","user":"u"}', "pw1", '"user":"u"'),
+            ('{"secret":"s3"}', "s3", '"secret":"***"'),
+            ('{"key":"k1"}', "k1", '"key":"***"'),
+            ('{"Token":"T2"}', "T2", '"Token":"***"'),
+        ],
+    )
+    def test_mask_hides_value(guard, raw, secret, kept):
+        masked = guard.mask_secrets(raw)
+>       assert secret not in masked, masked
+E       AssertionError: {"password":"pw1","user":"u"}
+E       assert 'pw1' not in '{"password"...,"user":"u"}'
+E         
+E         'pw1' is contained here:
+E           {"password":"pw1","user":"u"}
+E         ?              +++
+
+tests\hooks\test_masks.py:26: AssertionError
+__________ test_mask_hides_value[{"secret":"s3"}-s3-"secret":"***"] ___________
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+raw = '{"secret":"s3"}', secret = 's3', kept = '"secret":"***"'
+
+    @pytest.mark.parametrize(
+        ("raw", "secret", "kept"),
+        [
+            ("curl -u probe:S3cr3tPass https://x", "S3cr3tPass", "-u ***"),
+            ("curl --user probe:S3cr3tPass https://x", "S3cr3tPass", "--user ***"),
+            ("curl -s -u probe:S3cr3tPass", "probe:", "curl -s -u ***"),
+            ("""curl -d '{"token":"TOK123"}' x""", "TOK123", '"token":"***"'),
+            ('{"api_key": "AK-99"}', "AK-99", '"api_key":"***"'),
+            ('{"password":"pw1","user":"u"}', "pw1", '"user":"u"'),
+            ('{"secret":"s3"}', "s3", '"secret":"***"'),
+            ('{"key":"k1"}', "k1", '"key":"***"'),
+            ('{"Token":"T2"}', "T2", '"Token":"***"'),
+        ],
+    )
+    def test_mask_hides_value(guard, raw, secret, kept):
+        masked = guard.mask_secrets(raw)
+>       assert secret not in masked, masked
+E       AssertionError: {"secret":"s3"}
+E       assert 's3' not in '{"secret":"s3"}'
+E         
+E         's3' is contained here:
+E           {"secret":"s3"}
+E         ?            ++
+
+tests\hooks\test_masks.py:26: AssertionError
+_____________ test_mask_hides_value[{"key":"k1"}-k1-"key":"***"] ______________
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+raw = '{"key":"k1"}', secret = 'k1', kept = '"key":"***"'
+
+    @pytest.mark.parametrize(
+        ("raw", "secret", "kept"),
+        [
+            ("curl -u probe:S3cr3tPass https://x", "S3cr3tPass", "-u ***"),
+            ("curl --user probe:S3cr3tPass https://x", "S3cr3tPass", "--user ***"),
+            ("curl -s -u probe:S3cr3tPass", "probe:", "curl -s -u ***"),
+            ("""curl -d '{"token":"TOK123"}' x""", "TOK123", '"token":"***"'),
+            ('{"api_key": "AK-99"}', "AK-99", '"api_key":"***"'),
+            ('{"password":"pw1","user":"u"}', "pw1", '"user":"u"'),
+            ('{"secret":"s3"}', "s3", '"secret":"***"'),
+            ('{"key":"k1"}', "k1", '"key":"***"'),
+            ('{"Token":"T2"}', "T2", '"Token":"***"'),
+        ],
+    )
+    def test_mask_hides_value(guard, raw, secret, kept):
+        masked = guard.mask_secrets(raw)
+>       assert secret not in masked, masked
+E       AssertionError: {"key":"k1"}
+E       assert 'k1' not in '{"key":"k1"}'
+E         
+E         'k1' is contained here:
+E           {"key":"k1"}
+E         ?         ++
+
+tests\hooks\test_masks.py:26: AssertionError
+___________ test_mask_hides_value[{"Token":"T2"}-T2-"Token":"***"] ____________
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+raw = '{"Token":"T2"}', secret = 'T2', kept = '"Token":"***"'
+
+    @pytest.mark.parametrize(
+        ("raw", "secret", "kept"),
+        [
+            ("curl -u probe:S3cr3tPass https://x", "S3cr3tPass", "-u ***"),
+            ("curl --user probe:S3cr3tPass https://x", "S3cr3tPass", "--user ***"),
+            ("curl -s -u probe:S3cr3tPass", "probe:", "curl -s -u ***"),
+            ("""curl -d '{"token":"TOK123"}' x""", "TOK123", '"token":"***"'),
+            ('{"api_key": "AK-99"}', "AK-99", '"api_key":"***"'),
+            ('{"password":"pw1","user":"u"}', "pw1", '"user":"u"'),
+            ('{"secret":"s3"}', "s3", '"secret":"***"'),
+            ('{"key":"k1"}', "k1", '"key":"***"'),
+            ('{"Token":"T2"}', "T2", '"Token":"***"'),
+        ],
+    )
+    def test_mask_hides_value(guard, raw, secret, kept):
+        masked = guard.mask_secrets(raw)
+>       assert secret not in masked, masked
+E       AssertionError: {"Token":"T2"}
+E       assert 'T2' not in '{"Token":"T2"}'
+E         
+E         'T2' is contained here:
+E           {"Token":"T2"}
+E         ?           ++
+
+tests\hooks\test_masks.py:26: AssertionError
+______________________ test_log_line_has_no_credentials _______________________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-48/test_log_line_has_no_credentia0/ffcore')
+
+    def test_log_line_has_no_credentials(main_root):
+        cmd = """cat .env; curl -u a:SECRETPW -d '{"token":"TOK123"}' http://h"""
+        proc = run_hook(bash(cmd), main_root)
+        assert proc.returncode == 2
+        log = (main_root / "state" / "evidence" / "hook-guard.log").read_text(encoding="utf-8")
+>       assert "SECRETPW" not in log and "TOK123" not in log, log
+E       AssertionError: 2026-11-16T22:54:32	block	-	Bash	ENV	cat .env; curl -u a:SECRETPW -d '{"token":"TOK123"}' http://h
+E         
+E       assert ('SECRETPW' not in '2026-11-16T...' http://h\n'
+E         
+E         'SECRETPW' is contained here:
+E           curl -u a:SECRETPW -d '{"token":"TOK123"}' http://h
+E         ?           ++++++++)
+
+tests\hooks\test_masks.py:47: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/hooks/test_masks.py::test_mask_hides_value[curl -u probe:S3cr3tPass https://x-S3cr3tPass--u ***]
+FAILED tests/hooks/test_masks.py::test_mask_hides_value[curl --user probe:S3cr3tPass https://x-S3cr3tPass---user ***]
+FAILED tests/hooks/test_masks.py::test_mask_hides_value[curl -s -u probe:S3cr3tPass-probe:-curl -s -u ***]
+FAILED tests/hooks/test_masks.py::test_mask_hides_value[curl -d '{"token":"TOK123"}' x-TOK123-"token":"***"]
+FAILED tests/hooks/test_masks.py::test_mask_hides_value[{"api_key": "AK-99"}-AK-99-"api_key":"***"]
+FAILED tests/hooks/test_masks.py::test_mask_hides_value[{"password":"pw1","user":"u"}-pw1-"user":"u"]
+FAILED tests/hooks/test_masks.py::test_mask_hides_value[{"secret":"s3"}-s3-"secret":"***"]
+FAILED tests/hooks/test_masks.py::test_mask_hides_value[{"key":"k1"}-k1-"key":"***"]
+FAILED tests/hooks/test_masks.py::test_mask_hides_value[{"Token":"T2"}-T2-"Token":"***"]
+FAILED tests/hooks/test_masks.py::test_log_line_has_no_credentials - AssertionError: 2026-11-16T22:54:32	block	-	Bash	ENV	cat .env; curl -u a:SECRETPW -d '{"token":"TOK123"}' http://h
+10 failed, 3 passed in 1.11s

@@ -34,3 +34,12 @@ PLAN-ONAY ve ek alındı: Q1 A + `DUYURU` (protokol tablosu ve guard listesi ayn
 Paket: fix/ajan-hooklari-2 · Cevap: K-HOOK2-0003
 GOREV-EK alındı: docs/takim 9.2 'Hangi oturum hangi ayarı yükler' cümlesi D5 commit'inde gözleme göre yazılır (hook-guard.log 16 Kasım 22:26, mekanizma iddiası yok). Ara durum: D1 4105bed, D2 a33caa5, D3 9844534, ENV eki 850c778; `tests/hooks` 310 passed, ruff temiz. Sırada D4.
 
+### B-HOOK2-0005 · 2026-11-16 23:30 · → koordinator · DURUM
+Paket: fix/ajan-hooklari-2 · Cevap: K-HOOK2-0004 · Durum: VERIFIED
+Warn günü verisi (bu oturum, main guard'ı, 22:42-23:06; 12 satır): 9 × `KAPI` gerçek (yinelemede `pytest | tail/grep` tee'siz; `sed`/`RUFF=` ile başlayan satırlarda da tetikleyen aynı zincirdeki pytest), 3 × `ENV` yanlış pozitif (commit mesajı ×2, `py -c` metni; ENV ekiyle kapanır, sınıf testte). Bulgu: warn kipinde uyarı modele görünmedi (r1 N2 a). Ayrıntı PR notu "Warn günü uyarıları".
+
+### B-HOOK2-0006 · 2026-11-16 23:31 · → koordinator · PR-HAZIR
+Paket: fix/ajan-hooklari-2 · Cevap: K-HOOK2-0001 · SHA: 571ae6fe40560ac108234c7011829cdef65d4c14
+Dal `fix/ajan-hooklari-2` (main 7d87f04 üstüne rebase), 13 commit, 13 dosya +1578/-57; state/backend/frontend/settings.json yok, `.claude/hooks/` var (paketin konusu). D1 KANAL-BICIM, D2 sarmalayıcı/grup/`$(…)`/anahtar sözcük (Q2), D3 maske, ENV eki (189 e), D4 `scripts/kanal_ozet.py`, D5 belge + K-HOOK2-0003.
+Kapı: `tests/hooks tests/scripts` **319 passed** (`state/evidence/hook2-tests.log`, ilk satır HEAD); ruff check + format temiz (`state/evidence/hook2-ruff.log`, ruff 0.17.3 uv önbelleği). Kırmızı kanıtlar `hook2-{d1,d2,d3,env,d4}-red.log`. PR notu `state/pr/fix-ajan-hooklari-2.md` (kabul → test, warn günü, varsayımlar, kalan riskler). `kanal_ozet` gerçek kanallarda: 54 geçerli, 2073 eski biçim, 3 ACK bekleyen.
+

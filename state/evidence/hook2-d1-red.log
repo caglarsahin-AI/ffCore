@@ -1,0 +1,827 @@
+...........FFFFFFFFFFFFFFFFFFFFFFF...F..FFF..F.FFF                       [100%]
+================================== FAILURES ===================================
+_ test_invalid_header_blocked[### B-HOOK2-0009 \xb7 2026-11-16 22:40 \xb7 \u2192 koordinator \xb7 YIGIN-A\xc7-t\xfcr] _
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-41/test_invalid_header_blocked___0/ffcore')
+header = '### B-HOOK2-0009 \xb7 2026-11-16 22:40 \xb7 \u2192 koordinator \xb7 YIGIN-A\xc7'
+field = 'tür'
+
+    @pytest.mark.parametrize(
+        ("header", "field"),
+        [
+            (H + "YIGIN-AÇ", "tür"),
+            (H + "DURUM (ölçüm)", "tür"),
+            ("### B-HOOK2-0009 \xb7 2026-11-16 22:40 \xb7 \u2192 koordinat\xf6r \xb7 ACK", "al\u0131c\u0131"),
+            ("### B-HOOK2-0009 \xb7 2026-11-16 22:40 \xb7 \u2192 isci-b (09) \xb7 ACK", "al\u0131c\u0131"),
+            ("### B-0009 \xb7 2026-11-16 22:40 \xb7 \u2192 koordinator \xb7 ACK", "ID"),
+            ("### B-HOOK2-0009 \xb7 2026-11-16 \xb7 \u2192 koordinator \xb7 ACK", "tarih"),
+            ("### B-HOOK2-0009 \xb7 16.11.2026 22:40 \xb7 \u2192 koordinator \xb7 ACK", "tarih"),
+            ("### B-HOOK2-0009 — 2026-11-16 22:40 — koordinator — ACK", "baþlýk"),
+        ],
+    )
+    def test_invalid_header_blocked(guard, main_root, header, field):
+        found = appended(guard, main_root, msg(header, P))
+>       assert len(found) == 1, found
+E       AssertionError: []
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests\hooks\test_kanal_bicim.py:130: AssertionError
+_ test_invalid_header_blocked[### B-HOOK2-0009 \xb7 2026-11-16 22:40 \xb7 \u2192 koordinator \xb7 DURUM (\xf6l\xe7\xfcm)-t\xfcr] _
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-41/test_invalid_header_blocked___1/ffcore')
+header = '### B-HOOK2-0009 \xb7 2026-11-16 22:40 \xb7 \u2192 koordinator \xb7 DURUM (\xf6l\xe7\xfcm)'
+field = 'tür'
+
+    @pytest.mark.parametrize(
+        ("header", "field"),
+        [
+            (H + "YIGIN-AÇ", "tür"),
+            (H + "DURUM (ölçüm)", "tür"),
+            ("### B-HOOK2-0009 \xb7 2026-11-16 22:40 \xb7 \u2192 koordinat\xf6r \xb7 ACK", "al\u0131c\u0131"),
+            ("### B-HOOK2-0009 \xb7 2026-11-16 22:40 \xb7 \u2192 isci-b (09) \xb7 ACK", "al\u0131c\u0131"),
+            ("### B-0009 \xb7 2026-11-16 22:40 \xb7 \u2192 koordinator \xb7 ACK", "ID"),
+            ("### B-HOOK2-0009 \xb7 2026-11-16 \xb7 \u2192 koordinator \xb7 ACK", "tarih"),
+            ("### B-HOOK2-0009 \xb7 16.11.2026 22:40 \xb7 \u2192 koordinator \xb7 ACK", "tarih"),
+            ("### B-HOOK2-0009 — 2026-11-16 22:40 — koordinator — ACK", "baþlýk"),
+        ],
+    )
+    def test_invalid_header_blocked(guard, main_root, header, field):
+        found = appended(guard, main_root, msg(header, P))
+>       assert len(found) == 1, found
+E       AssertionError: []
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests\hooks\test_kanal_bicim.py:130: AssertionError
+_ test_invalid_header_blocked[### B-HOOK2-0009 \xb7 2026-11-16 22:40 \xb7 \u2192 koordinat\xf6r \xb7 ACK-al\u0131c\u0131] _
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-41/test_invalid_header_blocked___2/ffcore')
+header = '### B-HOOK2-0009 \xb7 2026-11-16 22:40 \xb7 \u2192 koordinat\xf6r \xb7 ACK'
+field = 'alýcý'
+
+    @pytest.mark.parametrize(
+        ("header", "field"),
+        [
+            (H + "YIGIN-AÇ", "tür"),
+            (H + "DURUM (ölçüm)", "tür"),
+            ("### B-HOOK2-0009 \xb7 2026-11-16 22:40 \xb7 \u2192 koordinat\xf6r \xb7 ACK", "al\u0131c\u0131"),
+            ("### B-HOOK2-0009 \xb7 2026-11-16 22:40 \xb7 \u2192 isci-b (09) \xb7 ACK", "al\u0131c\u0131"),
+            ("### B-0009 \xb7 2026-11-16 22:40 \xb7 \u2192 koordinator \xb7 ACK", "ID"),
+            ("### B-HOOK2-0009 \xb7 2026-11-16 \xb7 \u2192 koordinator \xb7 ACK", "tarih"),
+            ("### B-HOOK2-0009 \xb7 16.11.2026 22:40 \xb7 \u2192 koordinator \xb7 ACK", "tarih"),
+            ("### B-HOOK2-0009 — 2026-11-16 22:40 — koordinator — ACK", "baþlýk"),
+        ],
+    )
+    def test_invalid_header_blocked(guard, main_root, header, field):
+        found = appended(guard, main_root, msg(header, P))
+>       assert len(found) == 1, found
+E       AssertionError: []
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests\hooks\test_kanal_bicim.py:130: AssertionError
+_ test_invalid_header_blocked[### B-HOOK2-0009 \xb7 2026-11-16 22:40 \xb7 \u2192 isci-b (09) \xb7 ACK-al\u0131c\u0131] _
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-41/test_invalid_header_blocked___3/ffcore')
+header = '### B-HOOK2-0009 \xb7 2026-11-16 22:40 \xb7 \u2192 isci-b (09) \xb7 ACK'
+field = 'alýcý'
+
+    @pytest.mark.parametrize(
+        ("header", "field"),
+        [
+            (H + "YIGIN-AÇ", "tür"),
+            (H + "DURUM (ölçüm)", "tür"),
+            ("### B-HOOK2-0009 \xb7 2026-11-16 22:40 \xb7 \u2192 koordinat\xf6r \xb7 ACK", "al\u0131c\u0131"),
+            ("### B-HOOK2-0009 \xb7 2026-11-16 22:40 \xb7 \u2192 isci-b (09) \xb7 ACK", "al\u0131c\u0131"),
+            ("### B-0009 \xb7 2026-11-16 22:40 \xb7 \u2192 koordinator \xb7 ACK", "ID"),
+            ("### B-HOOK2-0009 \xb7 2026-11-16 \xb7 \u2192 koordinator \xb7 ACK", "tarih"),
+            ("### B-HOOK2-0009 \xb7 16.11.2026 22:40 \xb7 \u2192 koordinator \xb7 ACK", "tarih"),
+            ("### B-HOOK2-0009 — 2026-11-16 22:40 — koordinator — ACK", "baþlýk"),
+        ],
+    )
+    def test_invalid_header_blocked(guard, main_root, header, field):
+        found = appended(guard, main_root, msg(header, P))
+>       assert len(found) == 1, found
+E       AssertionError: []
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests\hooks\test_kanal_bicim.py:130: AssertionError
+_ test_invalid_header_blocked[### B-0009 \xb7 2026-11-16 22:40 \xb7 \u2192 koordinator \xb7 ACK-ID] _
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-41/test_invalid_header_blocked___4/ffcore')
+header = '### B-0009 \xb7 2026-11-16 22:40 \xb7 \u2192 koordinator \xb7 ACK', field = 'ID'
+
+    @pytest.mark.parametrize(
+        ("header", "field"),
+        [
+            (H + "YIGIN-AÇ", "tür"),
+            (H + "DURUM (ölçüm)", "tür"),
+            ("### B-HOOK2-0009 \xb7 2026-11-16 22:40 \xb7 \u2192 koordinat\xf6r \xb7 ACK", "al\u0131c\u0131"),
+            ("### B-HOOK2-0009 \xb7 2026-11-16 22:40 \xb7 \u2192 isci-b (09) \xb7 ACK", "al\u0131c\u0131"),
+            ("### B-0009 \xb7 2026-11-16 22:40 \xb7 \u2192 koordinator \xb7 ACK", "ID"),
+            ("### B-HOOK2-0009 \xb7 2026-11-16 \xb7 \u2192 koordinator \xb7 ACK", "tarih"),
+            ("### B-HOOK2-0009 \xb7 16.11.2026 22:40 \xb7 \u2192 koordinator \xb7 ACK", "tarih"),
+            ("### B-HOOK2-0009 — 2026-11-16 22:40 — koordinator — ACK", "baþlýk"),
+        ],
+    )
+    def test_invalid_header_blocked(guard, main_root, header, field):
+        found = appended(guard, main_root, msg(header, P))
+>       assert len(found) == 1, found
+E       AssertionError: []
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests\hooks\test_kanal_bicim.py:130: AssertionError
+_ test_invalid_header_blocked[### B-HOOK2-0009 \xb7 2026-11-16 \xb7 \u2192 koordinator \xb7 ACK-tarih] _
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-41/test_invalid_header_blocked___5/ffcore')
+header = '### B-HOOK2-0009 \xb7 2026-11-16 \xb7 \u2192 koordinator \xb7 ACK', field = 'tarih'
+
+    @pytest.mark.parametrize(
+        ("header", "field"),
+        [
+            (H + "YIGIN-AÇ", "tür"),
+            (H + "DURUM (ölçüm)", "tür"),
+            ("### B-HOOK2-0009 \xb7 2026-11-16 22:40 \xb7 \u2192 koordinat\xf6r \xb7 ACK", "al\u0131c\u0131"),
+            ("### B-HOOK2-0009 \xb7 2026-11-16 22:40 \xb7 \u2192 isci-b (09) \xb7 ACK", "al\u0131c\u0131"),
+            ("### B-0009 \xb7 2026-11-16 22:40 \xb7 \u2192 koordinator \xb7 ACK", "ID"),
+            ("### B-HOOK2-0009 \xb7 2026-11-16 \xb7 \u2192 koordinator \xb7 ACK", "tarih"),
+            ("### B-HOOK2-0009 \xb7 16.11.2026 22:40 \xb7 \u2192 koordinator \xb7 ACK", "tarih"),
+            ("### B-HOOK2-0009 — 2026-11-16 22:40 — koordinator — ACK", "baþlýk"),
+        ],
+    )
+    def test_invalid_header_blocked(guard, main_root, header, field):
+        found = appended(guard, main_root, msg(header, P))
+>       assert len(found) == 1, found
+E       AssertionError: []
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests\hooks\test_kanal_bicim.py:130: AssertionError
+_ test_invalid_header_blocked[### B-HOOK2-0009 \xb7 16.11.2026 22:40 \xb7 \u2192 koordinator \xb7 ACK-tarih] _
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-41/test_invalid_header_blocked___6/ffcore')
+header = '### B-HOOK2-0009 \xb7 16.11.2026 22:40 \xb7 \u2192 koordinator \xb7 ACK'
+field = 'tarih'
+
+    @pytest.mark.parametrize(
+        ("header", "field"),
+        [
+            (H + "YIGIN-AÇ", "tür"),
+            (H + "DURUM (ölçüm)", "tür"),
+            ("### B-HOOK2-0009 \xb7 2026-11-16 22:40 \xb7 \u2192 koordinat\xf6r \xb7 ACK", "al\u0131c\u0131"),
+            ("### B-HOOK2-0009 \xb7 2026-11-16 22:40 \xb7 \u2192 isci-b (09) \xb7 ACK", "al\u0131c\u0131"),
+            ("### B-0009 \xb7 2026-11-16 22:40 \xb7 \u2192 koordinator \xb7 ACK", "ID"),
+            ("### B-HOOK2-0009 \xb7 2026-11-16 \xb7 \u2192 koordinator \xb7 ACK", "tarih"),
+            ("### B-HOOK2-0009 \xb7 16.11.2026 22:40 \xb7 \u2192 koordinator \xb7 ACK", "tarih"),
+            ("### B-HOOK2-0009 — 2026-11-16 22:40 — koordinator — ACK", "baþlýk"),
+        ],
+    )
+    def test_invalid_header_blocked(guard, main_root, header, field):
+        found = appended(guard, main_root, msg(header, P))
+>       assert len(found) == 1, found
+E       AssertionError: []
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests\hooks\test_kanal_bicim.py:130: AssertionError
+_ test_invalid_header_blocked[### B-HOOK2-0009 \u2014 2026-11-16 22:40 \u2014 koordinator \u2014 ACK-ba\u015fl\u0131k] _
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-41/test_invalid_header_blocked___7/ffcore')
+header = '### B-HOOK2-0009 — 2026-11-16 22:40 — koordinator — ACK'
+field = 'baþlýk'
+
+    @pytest.mark.parametrize(
+        ("header", "field"),
+        [
+            (H + "YIGIN-AÇ", "tür"),
+            (H + "DURUM (ölçüm)", "tür"),
+            ("### B-HOOK2-0009 \xb7 2026-11-16 22:40 \xb7 \u2192 koordinat\xf6r \xb7 ACK", "al\u0131c\u0131"),
+            ("### B-HOOK2-0009 \xb7 2026-11-16 22:40 \xb7 \u2192 isci-b (09) \xb7 ACK", "al\u0131c\u0131"),
+            ("### B-0009 \xb7 2026-11-16 22:40 \xb7 \u2192 koordinator \xb7 ACK", "ID"),
+            ("### B-HOOK2-0009 \xb7 2026-11-16 \xb7 \u2192 koordinator \xb7 ACK", "tarih"),
+            ("### B-HOOK2-0009 \xb7 16.11.2026 22:40 \xb7 \u2192 koordinator \xb7 ACK", "tarih"),
+            ("### B-HOOK2-0009 — 2026-11-16 22:40 — koordinator — ACK", "baþlýk"),
+        ],
+    )
+    def test_invalid_header_blocked(guard, main_root, header, field):
+        found = appended(guard, main_root, msg(header, P))
+>       assert len(found) == 1, found
+E       AssertionError: []
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests\hooks\test_kanal_bicim.py:130: AssertionError
+__________________ test_kullanici_blocked_in_worker_channel ___________________
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-41/test_kullanici_blocked_in_work0/ffcore')
+
+    def test_kullanici_blocked_in_worker_channel(guard, main_root):
+        found = appended(guard, main_root, msg("### B-HOOK2-0009 \xb7 2026-11-16 22:40 \xb7 \u2192 kullanici \xb7 ACK", P))
+>       assert found and "kullanici" in found[0].message
+E       assert ([])
+
+tests\hooks\test_kanal_bicim.py:136: AssertionError
+_ test_invalid_second_line_blocked[ACK-g\xf6vde hemen ba\u015fl\u0131yor-Paket] _
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-41/test_invalid_second_line_block0/ffcore')
+tur = 'ACK', second = 'gövde hemen baþlýyor', field = 'Paket'
+
+    @pytest.mark.parametrize(
+        ("tur", "second", "field"),
+        [
+            ("ACK", "gövde hemen baþlýyor", "Paket"),
+            ("ACK", "Paket: fix/x", "Cevap"),
+            ("ACK", "Paket: fix/x · Cevap: foo", "Cevap"),
+            ("PR-HAZIR", P, "SHA"),
+            ("PR-HAZIR", f"{P} · SHA: 7a1195a", "SHA"),
+            ("REVIEW-ISTEK", f"{P} · SHA: {SHA[:-1]}X", "SHA"),
+            ("REVIEW-SONUC", f"{P} · SHA: {SHA} · Bulgu: B0 M0 m0 N0", "Sonuc"),
+            ("REVIEW-SONUC", f"{P} · SHA: {SHA} · Sonuc: OK · Bulgu: B0 M0 m0 N0", "Sonuc"),
+            ("REVIEW-SONUC", f"{P} · SHA: {SHA} · Sonuc: ONAY · Bulgu: 0 bulgu", "Bulgu"),
+            ("DURUM", P, "Durum"),
+            ("DURUM", f"{P} · Durum: WARN-GUNU", "Durum"),
+            ("YIGIN-KAPA", P, "Yigin"),
+            ("ONAY-TEYIT", P, "SHA"),
+        ],
+    )
+    def test_invalid_second_line_blocked(guard, main_root, tur, second, field):
+        found = appended(guard, main_root, msg(H + tur, second))
+>       assert len(found) == 1, found
+E       AssertionError: []
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests\hooks\test_kanal_bicim.py:162: AssertionError
+__________ test_invalid_second_line_blocked[ACK-Paket: fix/x-Cevap] ___________
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-41/test_invalid_second_line_block1/ffcore')
+tur = 'ACK', second = 'Paket: fix/x', field = 'Cevap'
+
+    @pytest.mark.parametrize(
+        ("tur", "second", "field"),
+        [
+            ("ACK", "gövde hemen baþlýyor", "Paket"),
+            ("ACK", "Paket: fix/x", "Cevap"),
+            ("ACK", "Paket: fix/x · Cevap: foo", "Cevap"),
+            ("PR-HAZIR", P, "SHA"),
+            ("PR-HAZIR", f"{P} · SHA: 7a1195a", "SHA"),
+            ("REVIEW-ISTEK", f"{P} · SHA: {SHA[:-1]}X", "SHA"),
+            ("REVIEW-SONUC", f"{P} · SHA: {SHA} · Bulgu: B0 M0 m0 N0", "Sonuc"),
+            ("REVIEW-SONUC", f"{P} · SHA: {SHA} · Sonuc: OK · Bulgu: B0 M0 m0 N0", "Sonuc"),
+            ("REVIEW-SONUC", f"{P} · SHA: {SHA} · Sonuc: ONAY · Bulgu: 0 bulgu", "Bulgu"),
+            ("DURUM", P, "Durum"),
+            ("DURUM", f"{P} · Durum: WARN-GUNU", "Durum"),
+            ("YIGIN-KAPA", P, "Yigin"),
+            ("ONAY-TEYIT", P, "SHA"),
+        ],
+    )
+    def test_invalid_second_line_blocked(guard, main_root, tur, second, field):
+        found = appended(guard, main_root, msg(H + tur, second))
+>       assert len(found) == 1, found
+E       AssertionError: []
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests\hooks\test_kanal_bicim.py:162: AssertionError
+__ test_invalid_second_line_blocked[ACK-Paket: fix/x \xb7 Cevap: foo-Cevap] ___
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-41/test_invalid_second_line_block2/ffcore')
+tur = 'ACK', second = 'Paket: fix/x · Cevap: foo', field = 'Cevap'
+
+    @pytest.mark.parametrize(
+        ("tur", "second", "field"),
+        [
+            ("ACK", "gövde hemen baþlýyor", "Paket"),
+            ("ACK", "Paket: fix/x", "Cevap"),
+            ("ACK", "Paket: fix/x · Cevap: foo", "Cevap"),
+            ("PR-HAZIR", P, "SHA"),
+            ("PR-HAZIR", f"{P} · SHA: 7a1195a", "SHA"),
+            ("REVIEW-ISTEK", f"{P} · SHA: {SHA[:-1]}X", "SHA"),
+            ("REVIEW-SONUC", f"{P} · SHA: {SHA} · Bulgu: B0 M0 m0 N0", "Sonuc"),
+            ("REVIEW-SONUC", f"{P} · SHA: {SHA} · Sonuc: OK · Bulgu: B0 M0 m0 N0", "Sonuc"),
+            ("REVIEW-SONUC", f"{P} · SHA: {SHA} · Sonuc: ONAY · Bulgu: 0 bulgu", "Bulgu"),
+            ("DURUM", P, "Durum"),
+            ("DURUM", f"{P} · Durum: WARN-GUNU", "Durum"),
+            ("YIGIN-KAPA", P, "Yigin"),
+            ("ONAY-TEYIT", P, "SHA"),
+        ],
+    )
+    def test_invalid_second_line_blocked(guard, main_root, tur, second, field):
+        found = appended(guard, main_root, msg(H + tur, second))
+>       assert len(found) == 1, found
+E       AssertionError: []
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests\hooks\test_kanal_bicim.py:162: AssertionError
+_ test_invalid_second_line_blocked[PR-HAZIR-Paket: fix/ajan-hooklari-2 \xb7 Cevap: K-HOOK2-0001-SHA] _
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-41/test_invalid_second_line_block3/ffcore')
+tur = 'PR-HAZIR', second = 'Paket: fix/ajan-hooklari-2 · Cevap: K-HOOK2-0001'
+field = 'SHA'
+
+    @pytest.mark.parametrize(
+        ("tur", "second", "field"),
+        [
+            ("ACK", "gövde hemen baþlýyor", "Paket"),
+            ("ACK", "Paket: fix/x", "Cevap"),
+            ("ACK", "Paket: fix/x · Cevap: foo", "Cevap"),
+            ("PR-HAZIR", P, "SHA"),
+            ("PR-HAZIR", f"{P} · SHA: 7a1195a", "SHA"),
+            ("REVIEW-ISTEK", f"{P} · SHA: {SHA[:-1]}X", "SHA"),
+            ("REVIEW-SONUC", f"{P} · SHA: {SHA} · Bulgu: B0 M0 m0 N0", "Sonuc"),
+            ("REVIEW-SONUC", f"{P} · SHA: {SHA} · Sonuc: OK · Bulgu: B0 M0 m0 N0", "Sonuc"),
+            ("REVIEW-SONUC", f"{P} · SHA: {SHA} · Sonuc: ONAY · Bulgu: 0 bulgu", "Bulgu"),
+            ("DURUM", P, "Durum"),
+            ("DURUM", f"{P} · Durum: WARN-GUNU", "Durum"),
+            ("YIGIN-KAPA", P, "Yigin"),
+            ("ONAY-TEYIT", P, "SHA"),
+        ],
+    )
+    def test_invalid_second_line_blocked(guard, main_root, tur, second, field):
+        found = appended(guard, main_root, msg(H + tur, second))
+>       assert len(found) == 1, found
+E       AssertionError: []
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests\hooks\test_kanal_bicim.py:162: AssertionError
+_ test_invalid_second_line_blocked[PR-HAZIR-Paket: fix/ajan-hooklari-2 \xb7 Cevap: K-HOOK2-0001 \xb7 SHA: 7a1195a-SHA] _
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-41/test_invalid_second_line_block4/ffcore')
+tur = 'PR-HAZIR'
+second = 'Paket: fix/ajan-hooklari-2 · Cevap: K-HOOK2-0001 · SHA: 7a1195a'
+field = 'SHA'
+
+    @pytest.mark.parametrize(
+        ("tur", "second", "field"),
+        [
+            ("ACK", "gövde hemen baþlýyor", "Paket"),
+            ("ACK", "Paket: fix/x", "Cevap"),
+            ("ACK", "Paket: fix/x · Cevap: foo", "Cevap"),
+            ("PR-HAZIR", P, "SHA"),
+            ("PR-HAZIR", f"{P} · SHA: 7a1195a", "SHA"),
+            ("REVIEW-ISTEK", f"{P} · SHA: {SHA[:-1]}X", "SHA"),
+            ("REVIEW-SONUC", f"{P} · SHA: {SHA} · Bulgu: B0 M0 m0 N0", "Sonuc"),
+            ("REVIEW-SONUC", f"{P} · SHA: {SHA} · Sonuc: OK · Bulgu: B0 M0 m0 N0", "Sonuc"),
+            ("REVIEW-SONUC", f"{P} · SHA: {SHA} · Sonuc: ONAY · Bulgu: 0 bulgu", "Bulgu"),
+            ("DURUM", P, "Durum"),
+            ("DURUM", f"{P} · Durum: WARN-GUNU", "Durum"),
+            ("YIGIN-KAPA", P, "Yigin"),
+            ("ONAY-TEYIT", P, "SHA"),
+        ],
+    )
+    def test_invalid_second_line_blocked(guard, main_root, tur, second, field):
+        found = appended(guard, main_root, msg(H + tur, second))
+>       assert len(found) == 1, found
+E       AssertionError: []
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests\hooks\test_kanal_bicim.py:162: AssertionError
+_ test_invalid_second_line_blocked[REVIEW-ISTEK-Paket: fix/ajan-hooklari-2 \xb7 Cevap: K-HOOK2-0001 \xb7 SHA: 7a1195afc17648062a0a6afdae45d2aa54d88bdX-SHA] _
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-41/test_invalid_second_line_block5/ffcore')
+tur = 'REVIEW-ISTEK'
+second = 'Paket: fix/ajan-hooklari-2 · Cevap: K-HOOK2-0001 · SHA: 7a1195afc17648062a0a6afdae45d2aa54d88bdX'
+field = 'SHA'
+
+    @pytest.mark.parametrize(
+        ("tur", "second", "field"),
+        [
+            ("ACK", "gövde hemen baþlýyor", "Paket"),
+            ("ACK", "Paket: fix/x", "Cevap"),
+            ("ACK", "Paket: fix/x · Cevap: foo", "Cevap"),
+            ("PR-HAZIR", P, "SHA"),
+            ("PR-HAZIR", f"{P} · SHA: 7a1195a", "SHA"),
+            ("REVIEW-ISTEK", f"{P} · SHA: {SHA[:-1]}X", "SHA"),
+            ("REVIEW-SONUC", f"{P} · SHA: {SHA} · Bulgu: B0 M0 m0 N0", "Sonuc"),
+            ("REVIEW-SONUC", f"{P} · SHA: {SHA} · Sonuc: OK · Bulgu: B0 M0 m0 N0", "Sonuc"),
+            ("REVIEW-SONUC", f"{P} · SHA: {SHA} · Sonuc: ONAY · Bulgu: 0 bulgu", "Bulgu"),
+            ("DURUM", P, "Durum"),
+            ("DURUM", f"{P} · Durum: WARN-GUNU", "Durum"),
+            ("YIGIN-KAPA", P, "Yigin"),
+            ("ONAY-TEYIT", P, "SHA"),
+        ],
+    )
+    def test_invalid_second_line_blocked(guard, main_root, tur, second, field):
+        found = appended(guard, main_root, msg(H + tur, second))
+>       assert len(found) == 1, found
+E       AssertionError: []
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests\hooks\test_kanal_bicim.py:162: AssertionError
+_ test_invalid_second_line_blocked[REVIEW-SONUC-Paket: fix/ajan-hooklari-2 \xb7 Cevap: K-HOOK2-0001 \xb7 SHA: 7a1195afc17648062a0a6afdae45d2aa54d88bd9 \xb7 Bulgu: B0 M0 m0 N0-Sonuc] _
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-41/test_invalid_second_line_block6/ffcore')
+tur = 'REVIEW-SONUC'
+second = 'Paket: fix/ajan-hooklari-2 · Cevap: K-HOOK2-0001 · SHA: 7a1195afc17648062a0a6afdae45d2aa54d88bd9 · Bulgu: B0 M0 m0 N0'
+field = 'Sonuc'
+
+    @pytest.mark.parametrize(
+        ("tur", "second", "field"),
+        [
+            ("ACK", "gövde hemen baþlýyor", "Paket"),
+            ("ACK", "Paket: fix/x", "Cevap"),
+            ("ACK", "Paket: fix/x · Cevap: foo", "Cevap"),
+            ("PR-HAZIR", P, "SHA"),
+            ("PR-HAZIR", f"{P} · SHA: 7a1195a", "SHA"),
+            ("REVIEW-ISTEK", f"{P} · SHA: {SHA[:-1]}X", "SHA"),
+            ("REVIEW-SONUC", f"{P} · SHA: {SHA} · Bulgu: B0 M0 m0 N0", "Sonuc"),
+            ("REVIEW-SONUC", f"{P} · SHA: {SHA} · Sonuc: OK · Bulgu: B0 M0 m0 N0", "Sonuc"),
+            ("REVIEW-SONUC", f"{P} · SHA: {SHA} · Sonuc: ONAY · Bulgu: 0 bulgu", "Bulgu"),
+            ("DURUM", P, "Durum"),
+            ("DURUM", f"{P} · Durum: WARN-GUNU", "Durum"),
+            ("YIGIN-KAPA", P, "Yigin"),
+            ("ONAY-TEYIT", P, "SHA"),
+        ],
+    )
+    def test_invalid_second_line_blocked(guard, main_root, tur, second, field):
+        found = appended(guard, main_root, msg(H + tur, second))
+>       assert len(found) == 1, found
+E       AssertionError: []
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests\hooks\test_kanal_bicim.py:162: AssertionError
+_ test_invalid_second_line_blocked[REVIEW-SONUC-Paket: fix/ajan-hooklari-2 \xb7 Cevap: K-HOOK2-0001 \xb7 SHA: 7a1195afc17648062a0a6afdae45d2aa54d88bd9 \xb7 Sonuc: OK \xb7 Bulgu: B0 M0 m0 N0-Sonuc] _
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-41/test_invalid_second_line_block7/ffcore')
+tur = 'REVIEW-SONUC'
+second = 'Paket: fix/ajan-hooklari-2 · Cevap: K-HOOK2-0001 · SHA: 7a1195afc17648062a0a6afdae45d2aa54d88bd9 · Sonuc: OK · Bulgu: B0 M0 m0 N0'
+field = 'Sonuc'
+
+    @pytest.mark.parametrize(
+        ("tur", "second", "field"),
+        [
+            ("ACK", "gövde hemen baþlýyor", "Paket"),
+            ("ACK", "Paket: fix/x", "Cevap"),
+            ("ACK", "Paket: fix/x · Cevap: foo", "Cevap"),
+            ("PR-HAZIR", P, "SHA"),
+            ("PR-HAZIR", f"{P} · SHA: 7a1195a", "SHA"),
+            ("REVIEW-ISTEK", f"{P} · SHA: {SHA[:-1]}X", "SHA"),
+            ("REVIEW-SONUC", f"{P} · SHA: {SHA} · Bulgu: B0 M0 m0 N0", "Sonuc"),
+            ("REVIEW-SONUC", f"{P} · SHA: {SHA} · Sonuc: OK · Bulgu: B0 M0 m0 N0", "Sonuc"),
+            ("REVIEW-SONUC", f"{P} · SHA: {SHA} · Sonuc: ONAY · Bulgu: 0 bulgu", "Bulgu"),
+            ("DURUM", P, "Durum"),
+            ("DURUM", f"{P} · Durum: WARN-GUNU", "Durum"),
+            ("YIGIN-KAPA", P, "Yigin"),
+            ("ONAY-TEYIT", P, "SHA"),
+        ],
+    )
+    def test_invalid_second_line_blocked(guard, main_root, tur, second, field):
+        found = appended(guard, main_root, msg(H + tur, second))
+>       assert len(found) == 1, found
+E       AssertionError: []
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests\hooks\test_kanal_bicim.py:162: AssertionError
+_ test_invalid_second_line_blocked[REVIEW-SONUC-Paket: fix/ajan-hooklari-2 \xb7 Cevap: K-HOOK2-0001 \xb7 SHA: 7a1195afc17648062a0a6afdae45d2aa54d88bd9 \xb7 Sonuc: ONAY \xb7 Bulgu: 0 bulgu-Bulgu] _
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-41/test_invalid_second_line_block8/ffcore')
+tur = 'REVIEW-SONUC'
+second = 'Paket: fix/ajan-hooklari-2 · Cevap: K-HOOK2-0001 · SHA: 7a1195afc17648062a0a6afdae45d2aa54d88bd9 · Sonuc: ONAY · Bulgu: 0 bulgu'
+field = 'Bulgu'
+
+    @pytest.mark.parametrize(
+        ("tur", "second", "field"),
+        [
+            ("ACK", "gövde hemen baþlýyor", "Paket"),
+            ("ACK", "Paket: fix/x", "Cevap"),
+            ("ACK", "Paket: fix/x · Cevap: foo", "Cevap"),
+            ("PR-HAZIR", P, "SHA"),
+            ("PR-HAZIR", f"{P} · SHA: 7a1195a", "SHA"),
+            ("REVIEW-ISTEK", f"{P} · SHA: {SHA[:-1]}X", "SHA"),
+            ("REVIEW-SONUC", f"{P} · SHA: {SHA} · Bulgu: B0 M0 m0 N0", "Sonuc"),
+            ("REVIEW-SONUC", f"{P} · SHA: {SHA} · Sonuc: OK · Bulgu: B0 M0 m0 N0", "Sonuc"),
+            ("REVIEW-SONUC", f"{P} · SHA: {SHA} · Sonuc: ONAY · Bulgu: 0 bulgu", "Bulgu"),
+            ("DURUM", P, "Durum"),
+            ("DURUM", f"{P} · Durum: WARN-GUNU", "Durum"),
+            ("YIGIN-KAPA", P, "Yigin"),
+            ("ONAY-TEYIT", P, "SHA"),
+        ],
+    )
+    def test_invalid_second_line_blocked(guard, main_root, tur, second, field):
+        found = appended(guard, main_root, msg(H + tur, second))
+>       assert len(found) == 1, found
+E       AssertionError: []
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests\hooks\test_kanal_bicim.py:162: AssertionError
+_ test_invalid_second_line_blocked[DURUM-Paket: fix/ajan-hooklari-2 \xb7 Cevap: K-HOOK2-0001-Durum] _
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-41/test_invalid_second_line_block9/ffcore')
+tur = 'DURUM', second = 'Paket: fix/ajan-hooklari-2 · Cevap: K-HOOK2-0001'
+field = 'Durum'
+
+    @pytest.mark.parametrize(
+        ("tur", "second", "field"),
+        [
+            ("ACK", "gövde hemen baþlýyor", "Paket"),
+            ("ACK", "Paket: fix/x", "Cevap"),
+            ("ACK", "Paket: fix/x · Cevap: foo", "Cevap"),
+            ("PR-HAZIR", P, "SHA"),
+            ("PR-HAZIR", f"{P} · SHA: 7a1195a", "SHA"),
+            ("REVIEW-ISTEK", f"{P} · SHA: {SHA[:-1]}X", "SHA"),
+            ("REVIEW-SONUC", f"{P} · SHA: {SHA} · Bulgu: B0 M0 m0 N0", "Sonuc"),
+            ("REVIEW-SONUC", f"{P} · SHA: {SHA} · Sonuc: OK · Bulgu: B0 M0 m0 N0", "Sonuc"),
+            ("REVIEW-SONUC", f"{P} · SHA: {SHA} · Sonuc: ONAY · Bulgu: 0 bulgu", "Bulgu"),
+            ("DURUM", P, "Durum"),
+            ("DURUM", f"{P} · Durum: WARN-GUNU", "Durum"),
+            ("YIGIN-KAPA", P, "Yigin"),
+            ("ONAY-TEYIT", P, "SHA"),
+        ],
+    )
+    def test_invalid_second_line_blocked(guard, main_root, tur, second, field):
+        found = appended(guard, main_root, msg(H + tur, second))
+>       assert len(found) == 1, found
+E       AssertionError: []
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests\hooks\test_kanal_bicim.py:162: AssertionError
+_ test_invalid_second_line_blocked[DURUM-Paket: fix/ajan-hooklari-2 \xb7 Cevap: K-HOOK2-0001 \xb7 Durum: WARN-GUNU-Durum] _
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-41/test_invalid_second_line_block10/ffcore')
+tur = 'DURUM'
+second = 'Paket: fix/ajan-hooklari-2 · Cevap: K-HOOK2-0001 · Durum: WARN-GUNU'
+field = 'Durum'
+
+    @pytest.mark.parametrize(
+        ("tur", "second", "field"),
+        [
+            ("ACK", "gövde hemen baþlýyor", "Paket"),
+            ("ACK", "Paket: fix/x", "Cevap"),
+            ("ACK", "Paket: fix/x · Cevap: foo", "Cevap"),
+            ("PR-HAZIR", P, "SHA"),
+            ("PR-HAZIR", f"{P} · SHA: 7a1195a", "SHA"),
+            ("REVIEW-ISTEK", f"{P} · SHA: {SHA[:-1]}X", "SHA"),
+            ("REVIEW-SONUC", f"{P} · SHA: {SHA} · Bulgu: B0 M0 m0 N0", "Sonuc"),
+            ("REVIEW-SONUC", f"{P} · SHA: {SHA} · Sonuc: OK · Bulgu: B0 M0 m0 N0", "Sonuc"),
+            ("REVIEW-SONUC", f"{P} · SHA: {SHA} · Sonuc: ONAY · Bulgu: 0 bulgu", "Bulgu"),
+            ("DURUM", P, "Durum"),
+            ("DURUM", f"{P} · Durum: WARN-GUNU", "Durum"),
+            ("YIGIN-KAPA", P, "Yigin"),
+            ("ONAY-TEYIT", P, "SHA"),
+        ],
+    )
+    def test_invalid_second_line_blocked(guard, main_root, tur, second, field):
+        found = appended(guard, main_root, msg(H + tur, second))
+>       assert len(found) == 1, found
+E       AssertionError: []
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests\hooks\test_kanal_bicim.py:162: AssertionError
+_ test_invalid_second_line_blocked[YIGIN-KAPA-Paket: fix/ajan-hooklari-2 \xb7 Cevap: K-HOOK2-0001-Yigin] _
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-41/test_invalid_second_line_block11/ffcore')
+tur = 'YIGIN-KAPA', second = 'Paket: fix/ajan-hooklari-2 · Cevap: K-HOOK2-0001'
+field = 'Yigin'
+
+    @pytest.mark.parametrize(
+        ("tur", "second", "field"),
+        [
+            ("ACK", "gövde hemen baþlýyor", "Paket"),
+            ("ACK", "Paket: fix/x", "Cevap"),
+            ("ACK", "Paket: fix/x · Cevap: foo", "Cevap"),
+            ("PR-HAZIR", P, "SHA"),
+            ("PR-HAZIR", f"{P} · SHA: 7a1195a", "SHA"),
+            ("REVIEW-ISTEK", f"{P} · SHA: {SHA[:-1]}X", "SHA"),
+            ("REVIEW-SONUC", f"{P} · SHA: {SHA} · Bulgu: B0 M0 m0 N0", "Sonuc"),
+            ("REVIEW-SONUC", f"{P} · SHA: {SHA} · Sonuc: OK · Bulgu: B0 M0 m0 N0", "Sonuc"),
+            ("REVIEW-SONUC", f"{P} · SHA: {SHA} · Sonuc: ONAY · Bulgu: 0 bulgu", "Bulgu"),
+            ("DURUM", P, "Durum"),
+            ("DURUM", f"{P} · Durum: WARN-GUNU", "Durum"),
+            ("YIGIN-KAPA", P, "Yigin"),
+            ("ONAY-TEYIT", P, "SHA"),
+        ],
+    )
+    def test_invalid_second_line_blocked(guard, main_root, tur, second, field):
+        found = appended(guard, main_root, msg(H + tur, second))
+>       assert len(found) == 1, found
+E       AssertionError: []
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests\hooks\test_kanal_bicim.py:162: AssertionError
+_ test_invalid_second_line_blocked[ONAY-TEYIT-Paket: fix/ajan-hooklari-2 \xb7 Cevap: K-HOOK2-0001-SHA] _
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-41/test_invalid_second_line_block12/ffcore')
+tur = 'ONAY-TEYIT', second = 'Paket: fix/ajan-hooklari-2 · Cevap: K-HOOK2-0001'
+field = 'SHA'
+
+    @pytest.mark.parametrize(
+        ("tur", "second", "field"),
+        [
+            ("ACK", "gövde hemen baþlýyor", "Paket"),
+            ("ACK", "Paket: fix/x", "Cevap"),
+            ("ACK", "Paket: fix/x · Cevap: foo", "Cevap"),
+            ("PR-HAZIR", P, "SHA"),
+            ("PR-HAZIR", f"{P} · SHA: 7a1195a", "SHA"),
+            ("REVIEW-ISTEK", f"{P} · SHA: {SHA[:-1]}X", "SHA"),
+            ("REVIEW-SONUC", f"{P} · SHA: {SHA} · Bulgu: B0 M0 m0 N0", "Sonuc"),
+            ("REVIEW-SONUC", f"{P} · SHA: {SHA} · Sonuc: OK · Bulgu: B0 M0 m0 N0", "Sonuc"),
+            ("REVIEW-SONUC", f"{P} · SHA: {SHA} · Sonuc: ONAY · Bulgu: 0 bulgu", "Bulgu"),
+            ("DURUM", P, "Durum"),
+            ("DURUM", f"{P} · Durum: WARN-GUNU", "Durum"),
+            ("YIGIN-KAPA", P, "Yigin"),
+            ("ONAY-TEYIT", P, "SHA"),
+        ],
+    )
+    def test_invalid_second_line_blocked(guard, main_root, tur, second, field):
+        found = appended(guard, main_root, msg(H + tur, second))
+>       assert len(found) == 1, found
+E       AssertionError: []
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests\hooks\test_kanal_bicim.py:162: AssertionError
+______________________ test_header_as_last_line_blocked _______________________
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-41/test_header_as_last_line_block0/ffcore')
+
+    def test_header_as_last_line_blocked(guard, main_root):
+        path = kanal(main_root)
+        found = violations(guard, write(path, PREAMBLE + "\n" + H + "ACK"), main_root)
+>       assert found and "Paket" in found[0].message
+E       assert ([])
+
+tests\hooks\test_kanal_bicim.py:169: AssertionError
+__________________ test_duplicate_of_existing_header_is_new ___________________
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-41/test_duplicate_of_existing_hea0/ffcore')
+
+    def test_duplicate_of_existing_header_is_new(guard, main_root):
+        bad = "### B-HOOK2-0009 \xb7 2026-11-16 22:40 \xb7 \u2192 koordinat\xf6r \xb7 ACK\\n" + P + "\\n"
+        path = kanal(main_root, text=PREAMBLE + bad)
+        found = violations(guard, write(path, PREAMBLE + bad + bad), main_root)
+>       assert len(found) == 1
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests\hooks\test_kanal_bicim.py:198: AssertionError
+_______________ test_edit_old_string_missing_checks_new_string ________________
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-41/test_edit_old_string_missing_c0/ffcore')
+
+    def test_edit_old_string_missing_checks_new_string(guard, main_root):
+        path = kanal(main_root)
+        bad = msg(H + "YIGIN-AÇ", P)
+        found = violations(guard, edit(path, "YOK-BOYLE-METIN", bad), main_root)
+>       assert found and "tür" in found[0].message
+E       assert ([])
+
+tests\hooks\test_kanal_bicim.py:217: AssertionError
+___________________________ test_multiedit_checked ____________________________
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-41/test_multiedit_checked0/ffcore')
+
+    def test_multiedit_checked(guard, main_root):
+        path = kanal(main_root)
+        bad = msg(H + "BILINMEYEN", P)
+        payload = multiedit(path, [("- Durum: ACTIVE", "- Durum: ACTIVE"), ("## Mesajlar\n", "## Mesajlar\n" + bad)])
+        found = violations(guard, payload, main_root)
+>       assert found and "tür" in found[0].message
+E       assert ([])
+
+tests\hooks\test_kanal_bicim.py:225: AssertionError
+________________________ test_new_channel_file_checked ________________________
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-41/test_new_channel_file_checked0/ffcore')
+
+    def test_new_channel_file_checked(guard, main_root):
+        path = main_root / "state" / "kanal" / "isci-d.md"
+        found = violations(guard, write(path, PREAMBLE + msg(H + "YIGIN-AÇ", P)), main_root, rol="isci-d")
+>       assert found
+E       assert []
+
+tests\hooks\test_kanal_bicim.py:231: AssertionError
+_______________________ test_hook_process_reports_rule ________________________
+
+main_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-41/test_hook_process_reports_rule0/ffcore')
+
+    def test_hook_process_reports_rule(main_root):
+        path = kanal(main_root)
+        proc = run_hook(write(path, PREAMBLE + msg(H + "YIGIN-AÇ", P)), main_root, FFCORE_ROL="isci-b")
+>       assert proc.returncode == 2, proc.stderr
+E       AssertionError: 
+E       assert 0 == 2
+E        +  where 0 = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'], returncode=0, stdout='', stderr='').returncode
+
+tests\hooks\test_kanal_bicim.py:252: AssertionError
+__________________________ test_types_match_protocol __________________________
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+
+    def test_types_match_protocol(guard):
+>       assert tuple(ticks(bullet(protocol_section(), "Tür listesi"))) == guard.MESSAGE_TYPES
+                                                                          ^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'ffcore_guard' has no attribute 'MESSAGE_TYPES'
+
+tests\hooks\test_kanal_bicim.py:285: AttributeError
+_______________________ test_recipients_match_protocol ________________________
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+
+    def test_recipients_match_protocol(guard):
+        line = bullet(protocol_section(), "Alýcý listesi")
+        common, coordinator_only = line.split(";", 1)
+>       assert tuple(ticks(common)) == guard.RECIPIENTS
+                                       ^^^^^^^^^^^^^^^^
+E       AttributeError: module 'ffcore_guard' has no attribute 'RECIPIENTS'
+
+tests\hooks\test_kanal_bicim.py:291: AttributeError
+_____________________ test_required_fields_match_protocol _____________________
+
+guard = <module 'ffcore_guard' from 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\.claude\\hooks\\ffcore_guard.py'>
+
+    def test_required_fields_match_protocol(guard):
+        rows = [ln for ln in protocol_section().splitlines() if ln.startswith("| ") and "`" in ln]
+        common: tuple[str, ...] = ()
+        per_type: dict[str, tuple[str, ...]] = {}
+        values: dict[str, tuple[str, ...]] = {}
+        for row in rows:
+            toks = ticks(row)
+            fields = [t for t in toks if ":" in t]
+            types = [t for t in toks if ":" not in t]
+            names = tuple(f.split(":", 1)[0] for f in fields)
+            for f in fields:
+                name, val = (s.strip() for s in f.split(":", 1))
+                if not val.startswith("<"):
+                    values[name] = tuple(val.split("|"))
+            if not types:
+                common = names
+            for t in types:
+                per_type[t] = names
+>       assert common == guard.COMMON_FIELDS
+                         ^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'ffcore_guard' has no attribute 'COMMON_FIELDS'
+
+tests\hooks\test_kanal_bicim.py:313: AttributeError
+=========================== short test summary info ===========================
+FAILED tests/hooks/test_kanal_bicim.py::test_invalid_header_blocked[### B-HOOK2-0009 \xb7 2026-11-16 22:40 \xb7 \u2192 koordinator \xb7 YIGIN-A\xc7-t\xfcr]
+FAILED tests/hooks/test_kanal_bicim.py::test_invalid_header_blocked[### B-HOOK2-0009 \xb7 2026-11-16 22:40 \xb7 \u2192 koordinator \xb7 DURUM (\xf6l\xe7\xfcm)-t\xfcr]
+FAILED tests/hooks/test_kanal_bicim.py::test_invalid_header_blocked[### B-HOOK2-0009 \xb7 2026-11-16 22:40 \xb7 \u2192 koordinat\xf6r \xb7 ACK-al\u0131c\u0131]
+FAILED tests/hooks/test_kanal_bicim.py::test_invalid_header_blocked[### B-HOOK2-0009 \xb7 2026-11-16 22:40 \xb7 \u2192 isci-b (09) \xb7 ACK-al\u0131c\u0131]
+FAILED tests/hooks/test_kanal_bicim.py::test_invalid_header_blocked[### B-0009 \xb7 2026-11-16 22:40 \xb7 \u2192 koordinator \xb7 ACK-ID]
+FAILED tests/hooks/test_kanal_bicim.py::test_invalid_header_blocked[### B-HOOK2-0009 \xb7 2026-11-16 \xb7 \u2192 koordinator \xb7 ACK-tarih]
+FAILED tests/hooks/test_kanal_bicim.py::test_invalid_header_blocked[### B-HOOK2-0009 \xb7 16.11.2026 22:40 \xb7 \u2192 koordinator \xb7 ACK-tarih]
+FAILED tests/hooks/test_kanal_bicim.py::test_invalid_header_blocked[### B-HOOK2-0009 \u2014 2026-11-16 22:40 \u2014 koordinator \u2014 ACK-ba\u015fl\u0131k]
+FAILED tests/hooks/test_kanal_bicim.py::test_kullanici_blocked_in_worker_channel
+FAILED tests/hooks/test_kanal_bicim.py::test_invalid_second_line_blocked[ACK-g\xf6vde hemen ba\u015fl\u0131yor-Paket]
+FAILED tests/hooks/test_kanal_bicim.py::test_invalid_second_line_blocked[ACK-Paket: fix/x-Cevap]
+FAILED tests/hooks/test_kanal_bicim.py::test_invalid_second_line_blocked[ACK-Paket: fix/x \xb7 Cevap: foo-Cevap]
+FAILED tests/hooks/test_kanal_bicim.py::test_invalid_second_line_blocked[PR-HAZIR-Paket: fix/ajan-hooklari-2 \xb7 Cevap: K-HOOK2-0001-SHA]
+FAILED tests/hooks/test_kanal_bicim.py::test_invalid_second_line_blocked[PR-HAZIR-Paket: fix/ajan-hooklari-2 \xb7 Cevap: K-HOOK2-0001 \xb7 SHA: 7a1195a-SHA]
+FAILED tests/hooks/test_kanal_bicim.py::test_invalid_second_line_blocked[REVIEW-ISTEK-Paket: fix/ajan-hooklari-2 \xb7 Cevap: K-HOOK2-0001 \xb7 SHA: 7a1195afc17648062a0a6afdae45d2aa54d88bdX-SHA]
+FAILED tests/hooks/test_kanal_bicim.py::test_invalid_second_line_blocked[REVIEW-SONUC-Paket: fix/ajan-hooklari-2 \xb7 Cevap: K-HOOK2-0001 \xb7 SHA: 7a1195afc17648062a0a6afdae45d2aa54d88bd9 \xb7 Bulgu: B0 M0 m0 N0-Sonuc]
+FAILED tests/hooks/test_kanal_bicim.py::test_invalid_second_line_blocked[REVIEW-SONUC-Paket: fix/ajan-hooklari-2 \xb7 Cevap: K-HOOK2-0001 \xb7 SHA: 7a1195afc17648062a0a6afdae45d2aa54d88bd9 \xb7 Sonuc: OK \xb7 Bulgu: B0 M0 m0 N0-Sonuc]
+FAILED tests/hooks/test_kanal_bicim.py::test_invalid_second_line_blocked[REVIEW-SONUC-Paket: fix/ajan-hooklari-2 \xb7 Cevap: K-HOOK2-0001 \xb7 SHA: 7a1195afc17648062a0a6afdae45d2aa54d88bd9 \xb7 Sonuc: ONAY \xb7 Bulgu: 0 bulgu-Bulgu]
+FAILED tests/hooks/test_kanal_bicim.py::test_invalid_second_line_blocked[DURUM-Paket: fix/ajan-hooklari-2 \xb7 Cevap: K-HOOK2-0001-Durum]
+FAILED tests/hooks/test_kanal_bicim.py::test_invalid_second_line_blocked[DURUM-Paket: fix/ajan-hooklari-2 \xb7 Cevap: K-HOOK2-0001 \xb7 Durum: WARN-GUNU-Durum]
+FAILED tests/hooks/test_kanal_bicim.py::test_invalid_second_line_blocked[YIGIN-KAPA-Paket: fix/ajan-hooklari-2 \xb7 Cevap: K-HOOK2-0001-Yigin]
+FAILED tests/hooks/test_kanal_bicim.py::test_invalid_second_line_blocked[ONAY-TEYIT-Paket: fix/ajan-hooklari-2 \xb7 Cevap: K-HOOK2-0001-SHA]
+FAILED tests/hooks/test_kanal_bicim.py::test_header_as_last_line_blocked - as...
+FAILED tests/hooks/test_kanal_bicim.py::test_duplicate_of_existing_header_is_new
+FAILED tests/hooks/test_kanal_bicim.py::test_edit_old_string_missing_checks_new_string
+FAILED tests/hooks/test_kanal_bicim.py::test_multiedit_checked - assert ([])
+FAILED tests/hooks/test_kanal_bicim.py::test_new_channel_file_checked - asser...
+FAILED tests/hooks/test_kanal_bicim.py::test_hook_process_reports_rule - Asse...
+FAILED tests/hooks/test_kanal_bicim.py::test_types_match_protocol - Attribute...
+FAILED tests/hooks/test_kanal_bicim.py::test_recipients_match_protocol - Attr...
+FAILED tests/hooks/test_kanal_bicim.py::test_required_fields_match_protocol
+31 failed, 19 passed in 2.70s

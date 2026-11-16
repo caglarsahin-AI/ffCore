@@ -1,0 +1,186 @@
+........................................................................ [ 22%]
+........................................................................ [ 45%]
+........................................................................ [ 67%]
+........................................................................ [ 90%]
+......................FFFFFFFFF                                          [100%]
+================================== FAILURES ===================================
+______________________________ test_json_schema _______________________________
+
+sample_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-53/test_json_schema0/ffcore')
+
+    def test_json_schema(sample_root):
+>       data = summary(sample_root)
+               ^^^^^^^^^^^^^^^^^^^^
+
+tests\scripts\test_kanal_ozet.py:29: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-53/test_json_schema0/ffcore')
+
+    def summary(root) -> dict:
+        proc = run_script("--json", "--root", str(root))
+>       assert proc.returncode == 0, proc.stderr
+E       AssertionError: C:\Users\caglar.sahin\AppData\Local\Programs\Python\Python312\python.exe: can't open file 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\scripts\\kanal_ozet.py': [Errno 2] No such file or directory
+E         
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', '-X', 'utf8...\\\ffcore\\\\.worktrees\\\\fix\\\\ajan-hooklari-2\\\\scripts\\\\kanal_ozet.py': [Errno 2] No such file or directory\n").returncode
+
+tests\scripts\test_kanal_ozet.py:24: AssertionError
+______________________ test_counts_valid_and_old_format _______________________
+
+sample_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-53/test_counts_valid_and_old_form0/ffcore')
+
+    def test_counts_valid_and_old_format(sample_root):
+>       data = summary(sample_root)
+               ^^^^^^^^^^^^^^^^^^^^
+
+tests\scripts\test_kanal_ozet.py:38: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-53/test_counts_valid_and_old_form0/ffcore')
+
+    def summary(root) -> dict:
+        proc = run_script("--json", "--root", str(root))
+>       assert proc.returncode == 0, proc.stderr
+E       AssertionError: C:\Users\caglar.sahin\AppData\Local\Programs\Python\Python312\python.exe: can't open file 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\scripts\\kanal_ozet.py': [Errno 2] No such file or directory
+E         
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', '-X', 'utf8...\\\ffcore\\\\.worktrees\\\\fix\\\\ajan-hooklari-2\\\\scripts\\\\kanal_ozet.py': [Errno 2] No such file or directory\n").returncode
+
+tests\scripts\test_kanal_ozet.py:24: AssertionError
+______________________________ test_pending_ack _______________________________
+
+sample_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-53/test_pending_ack0/ffcore')
+
+    def test_pending_ack(sample_root):
+>       pending = {p["id"] for p in summary(sample_root)["bekleyen_ack"]}
+                                    ^^^^^^^^^^^^^^^^^^^^
+
+tests\scripts\test_kanal_ozet.py:45: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-53/test_pending_ack0/ffcore')
+
+    def summary(root) -> dict:
+        proc = run_script("--json", "--root", str(root))
+>       assert proc.returncode == 0, proc.stderr
+E       AssertionError: C:\Users\caglar.sahin\AppData\Local\Programs\Python\Python312\python.exe: can't open file 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\scripts\\kanal_ozet.py': [Errno 2] No such file or directory
+E         
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', '-X', 'utf8...\\\ffcore\\\\.worktrees\\\\fix\\\\ajan-hooklari-2\\\\scripts\\\\kanal_ozet.py': [Errno 2] No such file or directory\n").returncode
+
+tests\scripts\test_kanal_ozet.py:24: AssertionError
+________________________ test_pending_ack_item_fields _________________________
+
+sample_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-53/test_pending_ack_item_fields0/ffcore')
+
+    def test_pending_ack_item_fields(sample_root):
+>       (item,) = summary(sample_root)["bekleyen_ack"]
+                  ^^^^^^^^^^^^^^^^^^^^
+
+tests\scripts\test_kanal_ozet.py:51: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-53/test_pending_ack_item_fields0/ffcore')
+
+    def summary(root) -> dict:
+        proc = run_script("--json", "--root", str(root))
+>       assert proc.returncode == 0, proc.stderr
+E       AssertionError: C:\Users\caglar.sahin\AppData\Local\Programs\Python\Python312\python.exe: can't open file 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\scripts\\kanal_ozet.py': [Errno 2] No such file or directory
+E         
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', '-X', 'utf8...\\\ffcore\\\\.worktrees\\\\fix\\\\ajan-hooklari-2\\\\scripts\\\\kanal_ozet.py': [Errno 2] No such file or directory\n").returncode
+
+tests\scripts\test_kanal_ozet.py:24: AssertionError
+_____________________________ test_package_state ______________________________
+
+sample_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-53/test_package_state0/ffcore')
+
+    def test_package_state(sample_root):
+>       pkgs = summary(sample_root)["paketler"]
+               ^^^^^^^^^^^^^^^^^^^^
+
+tests\scripts\test_kanal_ozet.py:63: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-53/test_package_state0/ffcore')
+
+    def summary(root) -> dict:
+        proc = run_script("--json", "--root", str(root))
+>       assert proc.returncode == 0, proc.stderr
+E       AssertionError: C:\Users\caglar.sahin\AppData\Local\Programs\Python\Python312\python.exe: can't open file 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\scripts\\kanal_ozet.py': [Errno 2] No such file or directory
+E         
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', '-X', 'utf8...\\\ffcore\\\\.worktrees\\\\fix\\\\ajan-hooklari-2\\\\scripts\\\\kanal_ozet.py': [Errno 2] No such file or directory\n").returncode
+
+tests\scripts\test_kanal_ozet.py:24: AssertionError
+__________________________ test_latest_approved_sha ___________________________
+
+sample_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-53/test_latest_approved_sha0/ffcore')
+
+    def test_latest_approved_sha(sample_root):
+>       pkgs = summary(sample_root)["paketler"]
+               ^^^^^^^^^^^^^^^^^^^^
+
+tests\scripts\test_kanal_ozet.py:74: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-53/test_latest_approved_sha0/ffcore')
+
+    def summary(root) -> dict:
+        proc = run_script("--json", "--root", str(root))
+>       assert proc.returncode == 0, proc.stderr
+E       AssertionError: C:\Users\caglar.sahin\AppData\Local\Programs\Python\Python312\python.exe: can't open file 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\scripts\\kanal_ozet.py': [Errno 2] No such file or directory
+E         
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', '-X', 'utf8...\\\ffcore\\\\.worktrees\\\\fix\\\\ajan-hooklari-2\\\\scripts\\\\kanal_ozet.py': [Errno 2] No such file or directory\n").returncode
+
+tests\scripts\test_kanal_ozet.py:24: AssertionError
+______________________________ test_text_output _______________________________
+
+sample_root = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-53/test_text_output0/ffcore')
+
+    def test_text_output(sample_root):
+        proc = run_script("--root", str(sample_root))
+>       assert proc.returncode == 0, proc.stderr
+E       AssertionError: C:\Users\caglar.sahin\AppData\Local\Programs\Python\Python312\python.exe: can't open file 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\scripts\\kanal_ozet.py': [Errno 2] No such file or directory
+E         
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', '-X', 'utf8...\\\ffcore\\\\.worktrees\\\\fix\\\\ajan-hooklari-2\\\\scripts\\\\kanal_ozet.py': [Errno 2] No such file or directory\n").returncode
+
+tests\scripts\test_kanal_ozet.py:81: AssertionError
+_______________________ test_missing_kanal_dir_is_loud ________________________
+
+tmp_path = WindowsPath('C:/Users/caglar.sahin/AppData/Local/Temp/pytest-of-caglar.sahin/pytest-53/test_missing_kanal_dir_is_loud0')
+
+    def test_missing_kanal_dir_is_loud(tmp_path):
+        proc = run_script("--root", str(tmp_path))
+        assert proc.returncode == 2
+>       assert "state/kanal" in proc.stderr
+E       assert 'state/kanal' in "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\\\ffcore\\\\.worktrees\\\\fix\\\\ajan-hooklari-2\\\\scripts\\\\kanal_ozet.py': [Errno 2] No such file or directory\n"
+E        +  where "C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe: can't open file 'C:\\\\ai_paycore\\\\ffcore\\\\.worktrees\\\\fix\\\\ajan-hooklari-2\\\\scripts\\\\kanal_ozet.py': [Errno 2] No such file or directory\n" = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', '-X', 'utf8...\\\ffcore\\\\.worktrees\\\\fix\\\\ajan-hooklari-2\\\\scripts\\\\kanal_ozet.py': [Errno 2] No such file or directory\n").stderr
+
+tests\scripts\test_kanal_ozet.py:92: AssertionError
+__________________________ test_real_channels_parse ___________________________
+
+    def test_real_channels_parse():
+        """Smoke on the repository's own channels: runs, counts are sane."""
+        proc = run_script("--json")
+>       assert proc.returncode == 0, proc.stderr
+E       AssertionError: C:\Users\caglar.sahin\AppData\Local\Programs\Python\Python312\python.exe: can't open file 'C:\\ai_paycore\\ffcore\\.worktrees\\fix\\ajan-hooklari-2\\scripts\\kanal_ozet.py': [Errno 2] No such file or directory
+E         
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['C:\\Users\\caglar.sahin\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', '-X', 'utf8...\\\ffcore\\\\.worktrees\\\\fix\\\\ajan-hooklari-2\\\\scripts\\\\kanal_ozet.py': [Errno 2] No such file or directory\n").returncode
+
+tests\scripts\test_kanal_ozet.py:98: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/scripts/test_kanal_ozet.py::test_json_schema - AssertionError: C...
+FAILED tests/scripts/test_kanal_ozet.py::test_counts_valid_and_old_format - A...
+FAILED tests/scripts/test_kanal_ozet.py::test_pending_ack - AssertionError: C...
+FAILED tests/scripts/test_kanal_ozet.py::test_pending_ack_item_fields - Asser...
+FAILED tests/scripts/test_kanal_ozet.py::test_package_state - AssertionError:...
+FAILED tests/scripts/test_kanal_ozet.py::test_latest_approved_sha - Assertion...
+FAILED tests/scripts/test_kanal_ozet.py::test_text_output - AssertionError: C...
+FAILED tests/scripts/test_kanal_ozet.py::test_missing_kanal_dir_is_loud - ass...
+FAILED tests/scripts/test_kanal_ozet.py::test_real_channels_parse - Assertion...
+9 failed, 310 passed in 74.58s (0:01:14)
