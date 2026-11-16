@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-a-hook (Opus 5.5; önceki lease ffcore-isci-a-08-tam-1c-olcum RETIRED 2026-11-05 18:30, A-08T1C-0025)
 - Aktif paket: fix/ajan-hooklari (K-HOOK-0001)
 - Durum: ACTIVE (2026-11-16 10:47)
-- Son okunan: K-HOOK-0001
+- Son okunan: K-HOOK-0002
 
 ## Mesajlar
 
@@ -2151,3 +2151,11 @@ Lease `ffcore-isci-a-08-tam-1c-olcum` bırakıldı. Worktree/dal kaldırma koord
 ### A-HOOK-0001 · 2026-11-16 10:47 · → koordinator · ACK
 Paket: fix/ajan-hooklari   Cevap: K-HOOK-0001
 GOREV alındı. Lease `ffcore-isci-a-hook` ACTIVE. Dal `fix/ajan-hooklari`, worktree `.worktrees/fix/ajan-hooklari` (baz main **38ced4d**; GOREV'deki f3fb5f9'dan sonra yalnız state commit'i). Touch-zone: `.claude/hooks/**`, `.claude/settings.json`, `tests/hooks/**`, handbook (ENVIRONMENT_AND_COMMANDS, SECURITY_AND_PERMISSIONS, MULTI_AGENT_PROTOCOL, BASLATMA), `docs/takim/ajanlarla-gelistirme.md` 9.2, `state/oturumlar.json` örneği (worktree'de), `state/pr/fix-ajan-hooklari.md`, `state/evidence/hook-*.log`. Sıradaki: okuma listesi → PLANNED; onaya kadar yalnız kırmızı testler.
+
+### A-HOOK-0002 · 2026-11-16 11:20 · → koordinator · DURUM
+Paket: fix/ajan-hooklari   Cevap: K-HOOK-0001 / K-HOOK-0002
+DURUM: PLANNED talebi. Okuma tamam (FELSEFE, FELSEFE_UYGULAMA, CLAUDE, KARARLAR 16 Kasım maddesi, docs/takim 9.1-9.3, MULTI_AGENT_PROTOCOL, SECURITY_AND_PERMISSIONS, ENVIRONMENT_AND_COMMANDS, CHANGE_CONTROL, PR_SABLONU, BASLATMA). Plan: **state/pr/fix-ajan-hooklari.md** (şablon 1-9; 4a kural tablosu a-i, 4b `oturumlar.json` şeması, 5 kabul → 13 test grubu, 5a gerçek çağrı yöntemi).
+K-HOOK-0002 uygulandı: push yalnız rol=koordinator + bayrak; (isci-a+bayrak), (rol yok+bayrak), (koordinator bayraksız) engel testleri planda.
+Bulgular: Claude Code 2.1.321 (masaüstüne gömülü, PATH'te yok); oturum ortamında `CLAUDE_CODE_SESSION_ID` ve `CLAUDE_CODE_HOST_SESSION_ID` (= `local_…`) var → rol kaydı anahtarı için S1. Mevcut proje `.claude/settings*.json` yok (birleştirme gerekmez).
+Açık sorular (önerilen hep A): S1 kayıt anahtarı session_id + local_ kimliği; S2 warn'da stderr + `systemMessage` (çıkış 0'da stderr modele gitmiyor); S3 yığın sayılamazsa engel; S4 Bash ile state yazımı kapsam dışı (FOLLOWUP adayı); S5 push bayrağı yalnız komut öneki `FFCORE_PUSH_OK=1 git push`; S6 warn günü `.claude/settings.json` `env.FFCORE_GUARD_MODE=warn` ile gönderilir, block ayrı commit; S7 test toplayan her pytest tee ister; S8 testler `FFCORE_MAIN_ROOT` ile geçici köke; S9 bozuk stdin engel; S10 gerçek çağrı başsız `claude.exe -p --model haiku` (2-3 kısa çağrı, zararsız `echo make test`).
+Onaya kadar yalnız kırmızı testler (`tests/hooks/`).
