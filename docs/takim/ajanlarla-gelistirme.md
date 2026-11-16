@@ -41,6 +41,30 @@
 
 **Sekreter.** Koordinatörün yanında ayrıca bir sekreter ajan çalıştı. Ajanlar arasındaki iletişimi (zil ve mesaj aktarımı) ve commit ile push işlemlerini sekreter yürüttü. Böylece pahalı ajanların (koordinatör, işçi, inceleyici) token tüketimi azaldı. Ayrıntı 2.2'de.
 
+### 1.1 Başlangıç: proje hangi belgelerle başladı?
+
+Kod yazılmadan önce dört gün belge üzerinde çalışıldı. İlk kod dışı commit `54bfb41` (28 Ekim 01:40, 57 dosya, kod yok) bütün bu belgeleri birlikte depoya aldı. Ondan önceki tek commit `c396ff1` yalnız `LICENSE` içeriyor. Tarihler belge başlıklarından ve `PLAN.md` "Sürüm geçmişi"nden alındı.
+
+| Aşama | Tarih | Belgeler | Ne işe yaradı |
+|---|---|---|---|
+| Analiz | 23 Ekim | Fonksiyonel analiz ve Teknik analiz dokümanları | Projenin ilk analiz belgeleri. Bu iki doküman depoda yok; bilgi kullanıcıdan. Depodaki `cognipeer-analiz.md` aynı aşamada yazılan rakip ürün analizi. |
+| | (tarihsiz; doğrulanmadı) | `cekirdek-8-ozellik.md` | 80/20 listesinin A grubu: 8 çekirdek özellik, yapım sırasıyla |
+| Plan | 24-26 Ekim | `PLAN.md` v1 → v2, `plan/00-16` (18 brief), `brief-inceleme-v2.md` | v1 14 paket ve airgap varsayılandı; v2'de ürün varsayılanı `llmaas` oldu (tersine karar) |
+| İlke ve inceleme | 27 Ekim | `FELSEFE.md`; `state/reviews/brief-inceleme-v4/v5/v6/v9/v10.md` + `cevap-v4-v6.md`, `cevap-v9-v10.md`; `KARARLAR.md` | Felsefe plana bağlandı (v2.2). İnceleme turları v2.3 ve v2.4'ü üretti. Kararlar gerekçesiyle kayda geçti. |
+| Yürütme düzeni | 27 Ekim | `handbook/` (13 dosya), `state/` (WORK_QUEUE, BLOCKERS, HANDOFF, 6 kanal, `pr/README.md`), `CLAUDE.md`, `BASLATMA.md` | Ajanların kuralları, durum dosyaları ve oturum açma mesajları (v2.1) |
+| İlk commit | 28 Ekim 01:40 | `54bfb41` | Belgeler `main`'de; ardından `K-00-0001 GOREV` ile paket 00 başladı |
+
+```mermaid
+flowchart TB
+    A["Analiz · 23 Ekim<br/>Fonksiyonel analiz<br/>Teknik analiz<br/>cekirdek-8-ozellik.md"] --> P["Plan · 24-26 Ekim<br/>PLAN.md v1→v2<br/>plan/00-16 brief'ler<br/>brief-inceleme-v2.md"]
+    P --> F["İlke ve inceleme · 27 Ekim<br/>FELSEFE.md<br/>brief inceleme v4-v10 + cevaplar<br/>KARARLAR.md"]
+    F --> Y["Yürütme düzeni · 27 Ekim<br/>handbook/ · state/<br/>CLAUDE.md · BASLATMA.md"]
+    Y --> C["İlk commit 54bfb41 · 28 Ekim 01:40<br/>57 belge dosyası, kod yok"]
+    C --> D["Çalışma döngüsü<br/>K-00-0001 GOREV → koordinatör, sekreter, işçi, inceleyici"]
+```
+
+**Ders:** Ajanlar kod yazmaya başlamadan önce üç şey hazırdı. Ne yapılacağı (analiz, plan, brief'ler) belliydi. Nasıl karar verileceği (felsefe, kararlar) yazılıydı. Nasıl çalışılacağı (handbook, state, oturum mesajları) tanımlıydı. Brief'ler kod yazılmadan önce depoda kaydı olan altı inceleme turundan (v2, v4, v5, v6, v9, v10) geçti.
+
 ---
 
 ## 2. Roller ve sorumluluklar

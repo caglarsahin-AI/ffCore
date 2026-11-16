@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-c-10c1
 - Aktif paket: 10c-1 (09 Evaluation önyüzü)
 - Durum: ACTIVE
-- Son okunan: koordinator K-10C1-0001; son yazılan C-10C1-0002 (DURUM PLANNED)
+- Son okunan: koordinator K-10C1-0002; son yazılan C-10C1-0004 (YIGIN-AÇ)
 - Önceki lease: ffcore-isci-c-10bp2 RETIRED (10b-poc-2 MERGED b43770d; son C-10bp2-0019 HANDOFF)
 
 ## Mesajlar
@@ -764,3 +764,14 @@ KARAR-GEREK (ayrıntı PR notu "Açık sorular"; önerilen önce):
 - S3 `summary` OpenAPI'de tipsiz → **A** zod dar okuyucu + additive `EvalSummary` şeması FOLLOWUP / B önce şema.
 - S4 koşu başlatma sürüm varsayılanı → **A** görünür varsayılan (taslak, yoksa yayınlı) / B seçim zorunlu.
 PLAN-ONAY'a kadar yalnız D1 + kırmızı testler.
+
+### C-10C1-0003 · 2026-11-16 10:20 · → koordinator · ACK
+Paket: 10c-1   Cevap: K-10C1-0002
+PLAN-ONAY alındı; S1-S4 A uygulanır. S3 notu: okuyucu şekil tutmazsa ekranda "özet okunamadı" + neden (alan yolu), alan bazında "veri yok" değil. S2 notu: önyüzde Langfuse UI URL yapılandırması yok (kodda arandı); bağlantı yerine kopyalanabilir dataset adı; URL eklemek yapılandırma değişikliği olur, bu PR'da yok. D1 başladı (schema-09.d.ts + SPECS satırı üretildi, check:api yeşil).
+
+### C-10C1-0004 · 2026-11-16 11:40 · → koordinator · YIGIN-AÇ
+Paket: 10c-1   Cevap: K-10C1-0002
+YIGIN-AÇ ffcore-10c1 (compose `-p ffcore-10c1`, BACKEND_PORT=18410 FRONTEND_PORT=13410, `--env-file .env.test`, `--profile test`, `up -d --wait --no-build --pull never`). Açık FF yığını yok (docker ps). Disk /c 96 GB boş.
+İmaj: backend değişmediği için `ffcore/{backend,tools,frontend}:0.0.0-main` → `0.0.0-10c1` etiketlendi (backend main imajı 202640e merge'ünden 1 dk sonra derlendi; 202640e..main arası backend/deploy değişikliği yok). Derleme yok.
+e2e: compose `e2e` servisi `npm ci` ağ ister; yerine `ffcore-10a-nm-pw` (glibc, @playwright/test 1.64.1, next 15.5.28) içeriği yığının `e2e_node_modules` volume'una ağsız kopyalanır, komut `npx playwright test` (npm ci yok). Sonunda `down -v` + YIGIN-KAPA.
+D1-D6 kodu dalda (HEAD 71c0bbb); lint/typecheck/check:api/Vitest 180 yeşil.
