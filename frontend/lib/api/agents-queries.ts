@@ -83,8 +83,16 @@ export function useNewDraft(projectId: string, agentId: string) {
   );
 }
 
+// A publish refused by the exam gate is 409 eval_gate_failed; an admin may pass `force` with a
+// `force_reason` (09-2, audited as eval_gate_forced).
+export type PublishRequest = S["PublishRequest"];
 export function usePublish(projectId: string, agentId: string) {
-  return useAgentMutation(projectId, (version: number) => api<Agent>("POST", `${base(projectId)}/${agentId}/publish`, { version }), agentId);
+  return useAgentMutation(
+    projectId,
+    (input: number | PublishRequest) =>
+      api<Agent>("POST", `${base(projectId)}/${agentId}/publish`, typeof input === "number" ? { version: input } : input),
+    agentId,
+  );
 }
 
 export function useRollback(projectId: string, agentId: string) {

@@ -1,7 +1,11 @@
 "use client";
 
+import Link from "next/link";
 import { useFormatter, useTranslations } from "next-intl";
+import { useState } from "react";
 import { toast } from "sonner";
+
+import { GateFailure } from "@/components/eval/gate-failure";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -11,9 +15,12 @@ import { WriteGate } from "@/components/write-gate";
 import { editableVersion, rollbackTargets } from "@/lib/agent-definition";
 import { useNewDraft, usePublish, useRollback } from "@/lib/api/agents-queries";
 import type { Agent, AgentVersion } from "@/lib/api/agents-queries";
+import { ApiError } from "@/lib/api/client";
 
 // Publish (brief 10 step 8): every save is a draft version; publishing makes it the version runs
-// use; rollback goes back to a version published before. Unsaved changes block publishing.
+// use; rollback goes back to a version published before. Unsaved changes block publishing. A
+// publish the exam gate refuses (409 eval_gate_failed) shows each suite and why, and an admin may
+// publish past it with a reason (09-2); each version links to the exam that opened its gate.
 export function VersionsTab({
   projectId,
   agent,
@@ -35,7 +42,16 @@ export function VersionsTab({
   const draft = editableVersion(versions);
   const latest = [...versions].sort((a, b) => b.version - a.version)[0];
   const targets = new Set(rollbackTargets(versions, agent.current_version_id).map((v) => v.id));
-  const done = () => toast.success(tState("saved"));
+  const [refused, setRefused] = useState<{ version: number; error: ApiError } | null>(null);
+  const done = () => {
+    setRefused(null);
+    toast.success(tState("saved"));
+  };
+  const onPublishError = (version: number) => (error: unknown) => {
+    if (error instanceof ApiError && error.code === "eval_gate_failed") return setRefused({ version, error });
+    setRefused(null);
+    report(error);
+  };
   const when = (iso: string) => format.dateTime(new Date(iso), { dateStyle: "medium", timeStyle: "short" });
 
   return (
@@ -43,7 +59,7 @@ export function VersionsTab({
       <div className="flex flex-wrap items-center gap-2">
         {draft ? (
           <WriteGate projectId={projectId}>
-            <Button onClick={() => publish.mutate(draft.version, { onSuccess: done, onError: report })} disabled={dirty || publish.isPending} data-testid="agent-publish">
+            <Button onClick={() => publish.mutate(draft.version, { onSuccess: done, onError: onPublishError(draft.version) })} disabled={dirty || publish.isPending} data-testid="agent-publish">
               {t("publishVersion", { version: draft.version })}
             </Button>
           </WriteGate>
@@ -58,6 +74,16 @@ export function VersionsTab({
         )}
         {dirty && <span className="text-sm text-muted-foreground">{t("saveBeforePublish")}</span>}
       </div>
+      {refused && (
+        <GateFailure
+          projectId={projectId}
+          error={refused.error}
+          pending={publish.isPending}
+          onForce={(reason) =>
+            publish.mutate({ version: refused.version, force: true, force_reason: reason }, { onSuccess: done, onError: onPublishError(refused.version) })
+          }
+        />
+      )}
       <Table data-testid="agent-versions">
         <TableHeader>
           <TableRow>
@@ -65,6 +91,7 @@ export function VersionsTab({
             <TableHead>{t("versionState")}</TableHead>
             <TableHead>{t("createdAt")}</TableHead>
             <TableHead>{t("publishedAt")}</TableHead>
+            <TableHead>{t("versionExam")}</TableHead>
             <TableHead />
           </TableRow>
         </TableHeader>
@@ -85,6 +112,15 @@ export function VersionsTab({
                 </TableCell>
                 <TableCell>{when(version.created_at)}</TableCell>
                 <TableCell>{version.published_at ? when(version.published_at) : t("notPublished")}</TableCell>
+                <TableCell data-testid="version-exam">
+                  {version.eval_run_id ? (
+                    <Link className="text-primary underline-offset-4 hover:underline" href={`/evaluations/runs/${version.eval_run_id}`}>
+                      {t("versionExamLink")}
+                    </Link>
+                  ) : (
+                    "—"
+                  )}
+                </TableCell>
                 <TableCell className="text-right">
                   {targets.has(version.id) && (
                     <WriteGate projectId={projectId}>
