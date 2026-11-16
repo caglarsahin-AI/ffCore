@@ -1,0 +1,22 @@
+ Network ffmain-lint_default  Creating
+ Network ffmain-lint_default  Created
+ Volume "ffmain-lint_model_cache"  Creating
+ Volume "ffmain-lint_model_cache"  Created
+ Volume "ffmain-lint_knowledge_storage"  Creating
+ Volume "ffmain-lint_knowledge_storage"  Created
+ Volume "ffmain-lint_redis_data"  Creating
+ Volume "ffmain-lint_redis_data"  Created
+ Volume "ffmain-lint_langfuse_minio_data"  Creating
+ Volume "ffmain-lint_langfuse_minio_data"  Created
+ Volume "ffmain-lint_postgres_data"  Creating
+ Volume "ffmain-lint_postgres_data"  Created
+ Volume "ffmain-lint_langfuse_postgres_data"  Creating
+ Volume "ffmain-lint_langfuse_postgres_data"  Created
+ Volume "ffmain-lint_langfuse_clickhouse_data"  Creating
+ Volume "ffmain-lint_langfuse_clickhouse_data"  Created
+ Volume "ffmain-lint_langfuse_clickhouse_logs"  Creating
+ Volume "ffmain-lint_langfuse_clickhouse_logs"  Created
+1 file reformatted
+All checks passed!
+1 file already formatted
+LINT-OK
