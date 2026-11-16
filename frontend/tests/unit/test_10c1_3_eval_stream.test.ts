@@ -179,3 +179,17 @@ describe("test_10c1_3_eval_stream stall watchdog", () => {
     expect(open).toHaveBeenCalledTimes(1);
   });
 });
+
+// R-10C1-0003 MAJOR-1 symptom "Queued while running": while the stream is followed, its status is
+// the newest; once it ended (done, lost, ended) the status read with GET is.
+describe("test_10c1_3_eval_stream shown status", () => {
+  it("prefers the stream's status only while streaming", async () => {
+    const { shownStatus } = await import("@/lib/eval-stream");
+    const running = { status: "running", items: 1, scored: 0 };
+    expect(shownStatus("queued", "streaming", running)).toBe("running");
+    expect(shownStatus("queued", "streaming", null)).toBe("queued");
+    expect(shownStatus("cancelled", "lost", running)).toBe("cancelled");
+    expect(shownStatus("completed", "done", running)).toBe("completed");
+    expect(shownStatus("queued", null, running)).toBe("queued");
+  });
+});
