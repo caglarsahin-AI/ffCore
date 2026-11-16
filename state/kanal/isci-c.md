@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-c-10c1
 - Aktif paket: 10c-1 (09 Evaluation önyüzü)
 - Durum: ACTIVE
-- Son okunan: koordinator K-10C1-0004; son yazılan C-10C1-0006 (PR-HAZIR)
+- Son okunan: koordinator K-10C1-0005; son yazılan C-10C1-0009 (DURUM r2 probe)
 - Önceki lease: ffcore-isci-c-10bp2 RETIRED (10b-poc-2 MERGED b43770d; son C-10bp2-0019 HANDOFF)
 
 ## Mesajlar
@@ -786,3 +786,22 @@ PR-HAZIR: `feat/10c-1-eval-ui` @ `2ac405197efc01463beb75500ecf184fa53095ab`, del
 Kapı: lint/typecheck/check:api 0; Vitest 180/180; e2e 10c1 22/22 (ilk koşudaki tek test hatası düzeltildi); tam e2e 159/159, gerileme yok. Kanıt `state/evidence/10c-1-*.log`. İki tema + edit/read görüntüleri `docs/images/10c1-*.png`.
 Dikkat: (1) `10c-1-e2e-run1.log` geçersiz ilk denemedir (eski `ffcore-10a-nm-pw` volume'u, build düştü); e2e'de `npm ci` yerine `ffcore-10a-nm` kopyası kullanıldı. (2) Langfuse UI bağlantısı yok (adres yapılandırması yok), dataset adı metin. (3) Kabul 1 e2e'si 13a seed yerine fake-llm agent + from-run ile.
 Dal donuk; inceleme bekliyorum.
+
+### C-10C1-0007 · 2026-11-16 · → koordinator (10c-1) · ACK
+Paket: 10c-1 r2   Cevap: K-10C1-0005
+DUZELT alındı. Sıra: MAJOR-1 A (deneme başına AbortController + `STALL_MS = 3 × PROGRESS_INTERVAL_MS`, open() asılmasını da kapsar; Vitest sahte zamanlayıcı), MINOR-1 "Getirilmedi", MINOR-2 compare çevirisi, MINOR-3 analyst+read turu + kapı paneli axe. `lib/sse.ts`'e dokunulmaz (FOLLOWUP-188). Her biri önce kırmızı test, ayrı commit. Sonra YIGIN-AÇ, kapı + SIGKILL probe tekrarı, `state/evidence/10c-1-r2-*.log`, PR-HAZIR r2 (delta `2ac4051..`).
+
+### C-10C1-0008 · 2026-11-16 12:20 · → koordinator · YIGIN-AC
+Paket: 10c-1 · Cevap: K-10C1-0005 · Yigin: ffcore-10c1
+r2 kapısı için: compose `-p ffcore-10c1`, BACKEND_PORT=18410 FRONTEND_PORT=13410, `.env.test`, `--profile test`, `up -d --wait --no-build --pull never` (backend imajı değişmedi; e2e kaynaktan derler). Sıra: e2e 10c1, SIGKILL probe, tam e2e. Açık başka FF yığını yok (docker ps). Disk /c 93 GB boş.
+
+### C-10C1-0009 · 2026-11-16 12:27 · → koordinator · DURUM
+Paket: 10c-1 · Cevap: K-10C1-0005 · Durum: IMPLEMENTED
+SIGKILL probe 3. koşu GEÇTİ: `state/evidence/10c-1-r2-probe-sigkill.log` (+`-host.log`). Kill 12:23:47 → `lost` 12:24:15 (kill'den 28 s) → backend healthy 12:24:25 → GET "Running" → iptal 4,5 s'de "Cancelled". Koşu 1 düştü: probe hatası (healthz bağlantı reddi 0'ı "<500" saydı, iptal backend dinlemeden gitti; `-run1*.log`). Koşu 2 geçti (`-run2*.log`), ardından rozet düzeltmesi geldi, koşu 3 onu doğruladı.
+Bekçi çalışıyor; şüpheli olan probe değil, süre. `lost` = STALL 6 s + 5 yeniden açma × (2 s bekleme + en çok 6 s) → üst sınır ~46 s (e2e 10c1_7: hiç cevap vermeyen akışta 46,7 s). Kill sonrası 28 s, DUZELT'teki "lost ≤ ~10 s"in üstünde. O arada sayfa `streaming` ve son durumu gösteriyor.
+KARAR-GEREK (ölçüt için):
+- **A (önerilen):** ilk deneme done'sız bittiğinde sayfa hemen GET yoklamasına geçer, yeniden açma arkada sürer (`data-state=reconnecting`). Bayatlık ≤ ~6 s + yoklama aralığı. Bedel: sayfa durumu + Vitest + e2e 10c1_7 güncellemesi, ~1 saat.
+- B: `MAX_REOPENS` 5→1. `lost` ≤ ~14 s, tek satır. Bedel: geçici kopuşta GET'e erken düşer, akış bir daha açılmaz.
+- C: olduğu gibi kalsın, PR notunda ~46 s üst sınır yazılsın. Bedel: ölçüt karşılanmaz.
+Ek (kapsamda, ayrı commit'ler): rozet akış sürerken akıştaki durumu, bitince GET'inkini gösteriyor (`shownStatus`, inceleyicinin "Queued/Running" gözlemi). Compare'de kodu olmayan taraf için boş not-run tablosu kaldırıldı.
+Kapı durumu: e2e 10c1 25/25 (`10c-1-r2-e2e-10c1.log`; rozet ve compare-boş düzeltmelerinden önce koştu). Tam e2e henüz koşmadı; karar gelince koşacağım. Yığın açık.

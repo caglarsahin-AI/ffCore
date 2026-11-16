@@ -4193,3 +4193,7 @@ DEGISIKLIK alındı; rapor, kanıtlar, kanal commit edildi. MAJOR-1 A (hareketsi
 ### K-GEN-0013 · 2026-11-16 11:49 · → tumu · DURUM
 Paket: - · Cevap: - · Durum: VERIFIED
 Kullanıcı kararı (KARARLAR "Kanal mesaj biçimi kapalı listelerle"; MULTI_AGENT_PROTOCOL "Mesaj biçimi" güncellendi): bir sonraki mesajdan itibaren tür ve alıcı adları kapalı ASCII listeden (`YIGIN-AC`, `MERGE-BASLIYOR`, `→ koordinator`), ikinci satır `Paket: <kod> · Cevap: <ID|-> · <zorunlu alanlar>` (PR-HAZIR/REVIEW-ISTEK/ONAY-TEYIT: `SHA:`; REVIEW-SONUC: `SHA · Sonuc · Bulgu`; DURUM: `Durum:`; YIGIN-AC/KAPA: `Yigin:`). Eski mesajlar değişmez. Hook doğrulaması ve özet betiği ayrı paket (FOLLOWUP-189), mevcut hook paketinin kapsamı değişmez.
+
+### K-10C1-0007 · 2026-11-16 12:25 · → isci-c · CEVAP
+Paket: 10c-1 · Cevap: C-10C1-0009
+IMPLEMENTED alındı; probe 3 kanıtı ve koşu 1'in probe hatası açıklaması iyi. Süre ölçütü için **A kabul** (KARARLAR "10c-1 r1 kararları" eki): ilk deneme `done`'sız bitince sayfa hemen GET yoklamasına geçer (`data-state=reconnecting`), yeniden açma arkada sürer, akış geri gelirse yoklama durur ve `streaming`'e döner; bayatlık ≤ STALL + yoklama aralığı (~≤ 10 s). Vitest + e2e `10c1_7` güncelle; SIGKILL probe'unu bir kez daha koş (beklenen: ilk GET ≤ ~10 s, `lost` yine ~46 s'de ya da yeniden bağlanma). Rozet (`shownStatus`) ve compare boş tablo düzeltmeleri kapsamda, ayrı commit'ler doğru. Sonra tam e2e, YIGIN-KAPA, PR-HAZIR r2 (`SHA:` ile, delta `2ac4051..`).

@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-a-hook (Opus 5.5; önceki lease ffcore-isci-a-08-tam-1c-olcum RETIRED 2026-11-05 18:30, A-08T1C-0025)
 - Aktif paket: fix/ajan-hooklari (K-HOOK-0001)
 - Durum: ACTIVE (2026-11-16 10:47)
-- Son okunan: K-HOOK-0003
+- Son okunan: K-GEN-0013
 
 ## Mesajlar
 

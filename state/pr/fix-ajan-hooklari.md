@@ -1,8 +1,8 @@
 # fix/ajan-hooklari: ajan kurallarının hook ile zorlanması
 
-**Paket:** fix/ajan-hooklari · **Sınıf:** [C] (güvenlik davranışı; kullanıcı onayı 16 Kasım, KARARLAR "Ajan kuralları hook ile zorlanır…") · **Branch:** fix/ajan-hooklari · **Worktree:** `.worktrees/fix/ajan-hooklari` · **Baz commit:** 38ced4d (GOREV'deki f3fb5f9 + yalnız state commit'i) · **İşçi:** isci-a (`ffcore-isci-a-hook`) · **Brief:** K-HOOK-0001 GOREV + K-HOOK-0002 EK (push kuralı)
+**Paket:** fix/ajan-hooklari · **Sınıf:** [C] (güvenlik davranışı; kullanıcı onayı 16 Kasım, KARARLAR "Ajan kuralları hook ile zorlanır…") · **Branch:** fix/ajan-hooklari · **Worktree:** `.worktrees/fix/ajan-hooklari` · **Baz commit:** b9f9fd7 (plan anında 38ced4d; docs çakışmasın diye rebase) · **İşçi:** isci-a (`ffcore-isci-a-hook`) · **Brief:** K-HOOK-0001 GOREV + K-HOOK-0002 EK (push kuralı)
 
-Durum: **PLANNED** (PLAN-ONAY bekleniyor; onaya kadar yalnız kırmızı testler).
+Durum: **IMPLEMENTED** (PLAN-ONAY K-HOOK-0003; S1-S10 A + iki ek). Gerçek çağrı kanıtı bekleniyor (A-HOOK-0004); PR-HAZIR kanıttan sonra.
 
 ## Plan
 
@@ -149,14 +149,60 @@ Yok.
 - **S9 bozuk stdin / beklenmeyen istisna.** **A (önerilen):** engel (çıkış 2) + mesaj; guard'ın kendi hatası da kayda yazılır. **B:** serbest (çıkış 0). Etki: guard'daki bir hata bütün kuralları sessizce kapatır.
 - **S10 Başsız gerçek oturum.** **A (önerilen):** worktree'de `claude.exe -p --model haiku` ile 2-3 kısa çağrı (warn: `echo make test`; block: `echo make test`), çıktı `state/evidence/hook-real-call.log`. Etki: kullanıcı hesabından birkaç küçük çağrı; Anthropic API zaten oturumların kullandığı yol, yeni dış sistem yok. **B:** yalnız kendi oturumumda dene; tetiklenmezse kullanıcıdan worktree'de yeni oturum açmasını iste (koordinatör üzerinden). Etki: kanıt kullanıcı adımına bağlı, gecikir.
 
+## Uygulama (PLAN-ONAY sonrası)
+
+Dal `fix/ajan-hooklari`, main **b9f9fd7** üzerine rebase edildi (main'de docs/handbook ilerlediği için; dal yalnız yeni dosyalar eklediğinden temiz). Commit'ler (test/kod/docs ayrı):
+
+| Commit | Tür | İçerik |
+|---|---|---|
+| c8b43fb | test | kırmızı testler (her kural engel/serbest çifti, warn, rol çözümü, kayıt, S9) |
+| 66b4ef5 | test | guard modülünü `sys.modules`'a kaydeden fixture düzeltmesi; settings.json komutunu kabuksuz koşan uçtan uca test |
+| 7c3196c | feat | `.claude/hooks/ffcore_guard.py`, `.claude/settings.json` (warn) |
+| c6d2093 | test | arşiv dosyaları yalnız koordinatör; koordinatör rol kanallarından mesaj taşıyabilir (main'e gelen "Bağlam bütçesi ve arşiv" kuralı) |
+| 71175c5 | feat | aynı kural guard'da |
+| 1986c2b | docs | ENVIRONMENT_AND_COMMANDS, SECURITY_AND_PERMISSIONS, MULTI_AGENT_PROTOCOL, BASLATMA, docs/takim 9.1 satır 1 + 9.2 |
+
+Plandan sapmalar (gerekçeli):
+1. **Hook komutu modül içe aktarır, betik koşmaz.** Ölçüm (`state/evidence/` dışı, oturum içi): bu makinede `py -3.12 -c pass` ≈ 0,9-1,2 sn; `py -3.12 ffcore_guard.py` ≈ 2,0-2,4 sn; aynı modülün `import`'u ≈ 1,1-1,3 sn. Tek satırlık `pass` betiği bile 3 sn sürdü: maliyet betik dosyasının kendisinde (büyük olasılıkla dosya taraması), guard kodunda değil (içe aktarmalar ~0,1 sn). Komut: `py -3.12 -c "import os, sys; sys.path.insert(0, os.path.dirname(sys.argv[1])); import ffcore_guard; sys.exit(ffcore_guard.run())" "$CLAUDE_PROJECT_DIR/.claude/hooks/ffcore_guard.py"`. `.pyc` `.claude/hooks/__pycache__/`'a yazılır (`.gitignore` `__pycache__/`). Ek olarak `dataclasses` (inspect çeker), `subprocess`, `datetime` tembel/çıkarıldı. `test_settings_command_runs_guard` bu tam komutu kabuksuz koşar.
+2. **Arşiv kuralı** (plan sonrası main'e geldi): `state/arsiv/**`, `state/kanal/arsiv/**` → koordinatör; `state/kanal/<rol>.md` → o rol **ya da koordinatör** (MULTI_AGENT_PROTOCOL "Taşımaları yalnız koordinatör yapar"). İnceleyici/işçi başka rolün kanalına yine yazamaz.
+3. **warn çıktısı:** stderr + stdout `{"systemMessage": "(warn) …"}` (S2 A); `permissionDecision` yazılmaz.
+
 ## Değişen dosyalar
-(kod sonrası doldurulacak)
+- `.claude/hooks/ffcore_guard.py` (yeni, 560 satır; stdlib, ağ yok; yalnız `compose up`'ta `docker compose ls` alt süreci, 5 sn zaman aşımı)
+- `.claude/settings.json` (yeni; `env.FFCORE_GUARD_MODE=warn`, deny, PreToolUse Bash + Edit|Write|MultiEdit|NotebookEdit)
+- `tests/hooks/conftest.py`, `tests/hooks/test_guard.py` (yeni; 101 test)
+- `handbook/ENVIRONMENT_AND_COMMANDS.md`, `handbook/SECURITY_AND_PERMISSIONS.md`, `handbook/MULTI_AGENT_PROTOCOL.md`, `BASLATMA.md`, `docs/takim/ajanlarla-gelistirme.md`
+- backend/frontend/deploy/Makefile/state: **yok** (`git diff --stat main..HEAD`: 9 dosya +1419/-88)
 
 ## Kabul kriterleri → testler
-(madde 5; durumlar kod sonrası)
+| # | Kriter | Test | Durum |
+|---|---|---|---|
+| 1 | `.env` engel / `.env.test`, `.env.example` serbest (Bash + yazma araçları) | `test_env_*` (9) | geçti |
+| 2 | PayCore `data/**`, `eval/results/**` | `test_paycore_*` (3) + deny kalıbı `test_settings_json_valid_and_wires_guard` | geçti (deny'ın `//c/` biçimi gerçek çağrıda doğrulanacak) |
+| 3 | push: koordinator+bayrak serbest; koordinator bayraksız, isci-a+bayrak, rol yok+bayrak, hook ortamında bayrak engel | `test_push_*` (6), `test_git_status_allowed` | geçti |
+| 4 | compose build/up PROSES-175 | `test_compose_*` (8) | geçti |
+| 5 | üç yığın sınırı, sayım hatası engel | `test_fourth_stack_blocked`, `test_third_stack_allowed`, `test_up_into_running_stack_allowed`, `test_stack_count_failure_blocks`, `test_stack_parser_counts_only_running_ff` | geçti |
+| 6 | kapı `tee` | `test_make_*`, `test_pytest_*` (10) | geçti |
+| 7 | tek yazar | `test_worker_*`, `test_coordinator_*`, `test_reviewer_*`, `test_pr_alias_field_allowed`, `test_evidence_free_for_all`, `test_*_path_normalized`, `test_all_write_tools_checked` | geçti |
+| 8 | rol yok / kayıt | `test_no_role_*`, `test_role_from_registry_*`, `test_env_role_overrides_registry`, `test_registry_corrupt_is_loud`, `test_unknown_role_is_no_role` | geçti |
+| 9 | worktree `state/` | `test_worktree_*`, `test_review_worktree_state_write_blocked` | geçti |
+| 10 | warn/block kipi | `test_warn_mode_exit0_with_message`, `test_block_is_default`, `test_unknown_mode_blocks_loudly`, `test_allowed_call_prints_nothing` | geçti |
+| 11 | kayıt satırı, içeriksiz, 120 karakter | `test_block_writes_log_line_without_content`, `test_warn_writes_log_line`, `test_log_truncates_to_120`, `test_allowed_call_writes_no_log` | geçti |
+| 12 | dayanıklılık + S9 ek | `test_non_matching_tool_allowed`, `test_malformed_stdin_blocks_loudly`, `test_guard_internal_error_*` (5), `test_fast_decide` | geçti |
+| 13 | settings biçimi + komut | `test_settings_json_valid_and_wires_guard`, `test_settings_command_runs_guard` | geçti |
+| 14 | gerçek oturumda tetikleme (warn) | `state/evidence/hook-real-call.log` | **bekliyor** (A-HOOK-0004) |
 
 ## Çalıştırılan komutlar
-(kod sonrası)
+| Komut | Ortam | Exit | Süre |
+|---|---|---|---|
+| `py -3.12 -m pytest tests/hooks -q -p no:cacheprovider 2>&1 \| tee state/evidence/hook-tests-red.log` | host Python 3.12.10, pytest 9.0.2, kod yokken | 1 (80 failed, 14 error) | 22 sn |
+| `… \| tee state/evidence/hook-tests-red-arsiv.log` (arşiv testleri, kod öncesi) | aynı | 1 (3 failed) | 5 sn |
+| `py -3.12 -m pytest tests/hooks -q -p no:cacheprovider 2>&1 \| tee state/evidence/hook-tests.log` | HEAD 1986c2b | 0 (**101 passed**) | 62 sn |
+| `ruff check` + `ruff format --check` `.claude/hooks tests/hooks` → `state/evidence/hook-ruff.log` | ruff 0.17.3 (backend pin'i; yerel uv önbelleğindeki exe, ağ yok) | 0 | <1 sn |
+| `make lint` / `make test` / iki profil | — | NOT_RUN: backend/frontend'e dokunulmadı (diff'te yok); `make lint` `.claude/` ve `tests/hooks`'u kapsamaz, yukarıdaki ruff koşusu onun yerine | — |
+| başsız `claude.exe -p --model haiku` (S10) | worktree, warn | 1: CLI OAuth girişi süresi dolmuş; model çağrısı yok (sayım 1/3 deneme) | — |
+
+Not: pytest koşuları ~60-80 sn; neredeyse tamamı alt süreç başına ~1 sn Python açılışı (makine).
 
 ## Varsayımlar ve brief'teki çelişkiler
 - docs/takim 9.2 taslağındaki "push yalnız sekreter" satırı KARARLAR 16 Kasım ve K-HOOK-0002 ile çelişiyor; uygulanan: yalnız koordinatör + bayrak. Dalın tabanındaki (38ced4d) KARARLAR metni "rolden bağımsız engeller" diyor; ana checkout'taki güncel metin "yalnız koordinatör oturumunda koşar" (K-HOOK-0002); güncel metin uygulanır, dal tabanı state commit'iyle güncellenir.
@@ -167,3 +213,5 @@ Yok.
 - Hook bir güvenlik ağıdır, sandbox değil: `bash -c "…"` içi yakalanır (metin içinde), ama değişkenle kurulan komut (`c=pu; git ${c}sh`), betik dosyası, Makefile içi komutlar yakalanmaz.
 - `.env` kalıbı tırnak içi metinlerde yanlış pozitif verebilir (ör. `grep -n "\.env" .gitignore`); warn günü bunu gösterir.
 - `make lint` `.claude/hooks` ve `tests/hooks`'u denetlemiyor; PR'da ayrı `ruff check` koşusu.
+- Her Bash ve dosya yazma çağrısı bu makinede ~1 sn hook gecikmesi alır (Python açılışı); yığın kuralı ayrıca `docker compose ls` (≤5 sn) bekler. Warn günü bu gecikmenin kabul edilebilirliği de gözlenmeli.
+- Merge sonrası koordinatörün kendi oturumu da hook'a tabi: `state/oturumlar.json` kaydı yoksa ilk tek yazar yazımında (warn'da uyarı, block'ta engel) görünür.
