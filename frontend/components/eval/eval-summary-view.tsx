@@ -4,9 +4,10 @@ import { useFormatter, useTranslations } from "next-intl";
 
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { SCORER_NAMES, isLiveEvalRun } from "@/lib/api/eval-queries";
-import type { EvalRun, ScorerName } from "@/lib/api/eval-queries";
-import { OUTCOMES, describeError, describeNotRun, readSummary } from "@/lib/eval-summary";
+import { CodeTable, isOutcome, isScorer, useNotRunRows } from "@/components/eval/codes";
+import { isLiveEvalRun } from "@/lib/api/eval-queries";
+import type { EvalRun } from "@/lib/api/eval-queries";
+import { OUTCOMES, describeError, readSummary } from "@/lib/eval-summary";
 import type { EvalSummary } from "@/lib/eval-summary";
 
 // The result of one exam (09 summary). Every count is shown as the backend wrote it: not-run
@@ -53,7 +54,7 @@ function SummaryBody({ run }: { run: EvalRun }) {
 function Loaded({ summary, cost }: { summary: EvalSummary; cost: number | null }) {
   const t = useTranslations("Evaluations.summary");
   const tOutcome = useTranslations("Evaluations.outcomes");
-  const tNotRun = useTranslations("Evaluations.notRun");
+  const notRunRows = useNotRunRows();
   const tError = useTranslations("Evaluations.errorKinds");
   const tScorer = useTranslations("Evaluations.scorers");
   const format = useFormatter();
@@ -100,13 +101,7 @@ function Loaded({ summary, cost }: { summary: EvalSummary; cost: number | null }
         {notRun.length === 0 ? (
           <p className="text-sm text-muted-foreground">{t("notRunNone")}</p>
         ) : (
-          <CodeTable testId="eval-not-run" codeLabel={t("code")} meaningLabel={t("meaning")} countLabel={t("count")}
-            rows={notRun.map(([code, n]) => {
-              const d = describeNotRun(code);
-              const meaning = d.key ? tNotRun(d.key) : t("unknownCode");
-              return { code, meaning: d.partial ? t("partial", { meaning }) : meaning, n };
-            })}
-          />
+          <CodeTable testId="eval-not-run" rows={notRunRows(notRun)} />
         )}
       </section>
 
@@ -115,7 +110,7 @@ function Loaded({ summary, cost }: { summary: EvalSummary; cost: number | null }
         {errors.length === 0 ? (
           <p className="text-sm text-muted-foreground">{t("errorsNone")}</p>
         ) : (
-          <CodeTable testId="eval-errors" codeLabel={t("code")} meaningLabel={t("meaning")} countLabel={t("count")}
+          <CodeTable testId="eval-errors"
             rows={errors.map(([code, n]) => {
               const d = describeError(code);
               return { code, meaning: d.kind ? tError(d.kind) : t("scorerError"), n };
@@ -201,7 +196,7 @@ function Loaded({ summary, cost }: { summary: EvalSummary; cost: number | null }
                   <TableCell className="font-mono">{item.item_id}</TableCell>
                   <TableCell>{item.passed === null ? t("notRunShort") : item.passed ? t("yes") : t("no")}</TableCell>
                   <TableCell className="text-right font-mono">{item.mean === null ? t("noData") : format.number(item.mean, { maximumFractionDigits: 3 })}</TableCell>
-                  <TableCell>{item.outcome && (OUTCOMES as readonly string[]).includes(item.outcome) ? tOutcome(item.outcome as (typeof OUTCOMES)[number]) : <span className="font-mono">{item.outcome ?? t("noData")}</span>}</TableCell>
+                  <TableCell>{item.outcome && isOutcome(item.outcome) ? tOutcome(item.outcome) : <span className="font-mono">{item.outcome ?? t("noData")}</span>}</TableCell>
                   <TableCell className="font-mono">{item.style}</TableCell>
                   <TableCell className="font-mono">{item.note || t("noData")}</TableCell>
                 </TableRow>
@@ -211,31 +206,6 @@ function Loaded({ summary, cost }: { summary: EvalSummary; cost: number | null }
         )}
       </section>
     </>
-  );
-}
-
-const isScorer = (name: string): name is ScorerName => (SCORER_NAMES as readonly string[]).includes(name);
-
-function CodeTable({ testId, rows, codeLabel, meaningLabel, countLabel }: { testId: string; rows: { code: string; meaning: string; n: number }[]; codeLabel: string; meaningLabel: string; countLabel: string }) {
-  return (
-    <Table data-testid={testId}>
-      <TableHeader>
-        <TableRow>
-          <TableHead>{codeLabel}</TableHead>
-          <TableHead>{meaningLabel}</TableHead>
-          <TableHead className="text-right">{countLabel}</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {rows.map((row) => (
-          <TableRow key={row.code}>
-            <TableCell className="font-mono">{row.code}</TableCell>
-            <TableCell>{row.meaning}</TableCell>
-            <TableCell className="text-right font-mono">{row.n}</TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
   );
 }
 

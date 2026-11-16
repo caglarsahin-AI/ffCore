@@ -2,6 +2,7 @@
 
 import { useFormatter, useTranslations } from "next-intl";
 
+import { CodeTable, ScorerLabel, isOutcome, useNotRunRows, useOutcomeText } from "@/components/eval/codes";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { COMPARE_CHANGES } from "@/lib/api/eval-queries";
@@ -15,14 +16,28 @@ export function CompareView({ compare }: { compare: Compare }) {
   const format = useFormatter();
   const num = (v: number | null) => (v === null ? t("noData") : format.number(v, { maximumFractionDigits: 3 }));
   const signed = (v: number | null) => (v === null ? t("noData") : format.number(v, { maximumFractionDigits: 3, signDisplay: "exceptZero" }));
-  const rows: [string, MetricDiff][] = [
-    [t("passRate"), compare.summary.pass_rate],
-    [t("scored"), compare.summary.scored],
-    [t("passedItems"), compare.summary.passed_items],
-    ...Object.entries(compare.summary.scores),
-    ...Object.entries(compare.summary.outcomes).map(([k, v]) => [t("outcomeRow", { outcome: k }), v] as [string, MetricDiff]),
+  const outcomeText = useOutcomeText();
+  const notRunRows = useNotRunRows();
+  // [row key, label, values]: scorer and outcome codes read as on the exam screen (codes.tsx).
+  const rows: [string, React.ReactNode, MetricDiff][] = [
+    ["pass_rate", t("passRate"), compare.summary.pass_rate],
+    ["scored", t("scored"), compare.summary.scored],
+    ["passed_items", t("passedItems"), compare.summary.passed_items],
+    ...Object.entries(compare.summary.scores).map(([k, v]) => [`score:${k}`, <ScorerLabel key={k} name={k} />, v] as [string, React.ReactNode, MetricDiff]),
+    ...Object.entries(compare.summary.outcomes).map(
+      ([k, v]) =>
+        [
+          `outcome:${k}`,
+          <span key={k} className="inline-flex flex-wrap items-baseline gap-2">
+            <span>{t("outcomeRow", { outcome: isOutcome(k) ? outcomeText(k) : "" })}</span>
+            <span className={isOutcome(k) ? "font-mono text-xs text-muted-foreground" : "font-mono"}>{k}</span>
+          </span>,
+          v,
+        ] as [string, React.ReactNode, MetricDiff],
+    ),
   ];
   const notRun = Object.entries(compare.summary.not_run);
+  const sideName = (side: string) => (side === "a" ? t("examA") : side === "b" ? t("examB") : side);
   const completeOf = (id: string) => compare.complete[id];
 
   return (
@@ -58,8 +73,8 @@ export function CompareView({ compare }: { compare: Compare }) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {rows.map(([label, d]) => (
-              <TableRow key={label}>
+            {rows.map(([key, label, d]) => (
+              <TableRow key={key}>
                 <TableCell>{label}</TableCell>
                 <TableCell className="text-right font-mono">{num(d.a)}</TableCell>
                 <TableCell className="text-right font-mono">{num(d.b)}</TableCell>
@@ -69,12 +84,13 @@ export function CompareView({ compare }: { compare: Compare }) {
           </TableBody>
         </Table>
         {notRun.length > 0 && (
-          <div className="flex flex-col gap-1 text-sm" data-testid="compare-not-run">
+          <div className="flex flex-col gap-2 text-sm" data-testid="compare-not-run">
             <p className="font-medium">{t("notRunTitle")}</p>
             {notRun.map(([side, counts]) => (
-              <p key={side} className="font-mono">
-                {`${side}: ${Object.entries(counts).map(([code, n]) => `${code}=${n}`).join(", ")}`}
-              </p>
+              <div key={side} className="flex flex-col gap-1">
+                <p className="text-muted-foreground">{sideName(side)}</p>
+                <CodeTable testId={`compare-not-run-${side}`} rows={notRunRows(Object.entries(counts))} />
+              </div>
             ))}
           </div>
         )}
@@ -100,11 +116,12 @@ export function CompareView({ compare }: { compare: Compare }) {
 function ItemTable({ title, testId, items, empty }: { title: string; testId: string; items: CompareItem[]; empty: string }) {
   const t = useTranslations("Evaluations.compare");
   const format = useFormatter();
+  const outcomeText = useOutcomeText();
   const side = (s: CompareItem["a"]) => {
     if (!s) return t("absent");
     if (s.passed === null) return t("notRunNote", { note: s.note || t("noData") });
     const mean = s.mean === null ? t("noData") : format.number(s.mean, { maximumFractionDigits: 3 });
-    return t("sideValue", { passed: s.passed ? t("yes") : t("no"), mean, outcome: s.outcome ?? t("noData") });
+    return t("sideValue", { passed: s.passed ? t("yes") : t("no"), mean, outcome: s.outcome === null ? t("noData") : outcomeText(s.outcome) });
   };
   return (
     <section className="flex flex-col gap-2">
