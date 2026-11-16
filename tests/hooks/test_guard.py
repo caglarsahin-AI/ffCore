@@ -641,3 +641,150 @@ def test_coordinator_moves_messages_out_of_worker_channel_allowed(main_root):
 def test_reviewer_writes_worker_channel_blocked(main_root):
     path = main_root / "state" / "kanal" / "isci-a.md"
     assert_blocked(run_hook(edit(path), main_root, FFCORE_ROL="inceleyici"), "TEK-YAZAR")
+
+
+# --- r1 fixes (K-HOOK-0006) -----------------------------------------------------
+
+REVIEW_GATE = (
+    "docker compose -p review1 --env-file .env.test --profile tools run --rm --no-deps "
+    "-e DEPLOY_PROFILE=airgap tools make test"
+)
+
+
+def test_compose_run_gate_without_tee_blocked(guard, main_root):
+    """MAJOR-1: the project's real gate form is a compose run, not a host make."""
+    assert "KAPI" in rules(guard, bash(REVIEW_GATE), main_root)
+
+
+def test_compose_run_gate_with_tee_allowed(guard, main_root):
+    cmd = REVIEW_GATE + " 2>&1 | tee state/evidence/x.log"
+    assert rules(guard, bash(cmd), main_root) == []
+
+
+def test_compose_run_make_lint_blocked(guard, main_root):
+    assert "KAPI" in rules(guard, bash("docker compose run --rm tools make lint"), main_root)
+
+
+def test_compose_run_make_seed_allowed(guard, main_root):
+    assert rules(guard, bash("docker compose run --rm tools make seed"), main_root) == []
+
+
+def test_compose_exec_pytest_blocked(guard, main_root):
+    assert "KAPI" in rules(guard, bash("docker compose exec backend pytest -q"), main_root)
+
+
+def test_compose_run_value_options_skipped(guard, main_root):
+    cmd = "docker compose run --rm -w /app -u root --name x --entrypoint sh tools make smoke"
+    assert "KAPI" in rules(guard, bash(cmd), main_root)
+
+
+def test_compose_run_other_command_allowed(guard, main_root):
+    cmd = "docker compose run --rm tools alembic heads"
+    assert rules(guard, bash(cmd), main_root) == []
+
+
+def test_e2e_service_without_tee_blocked(guard, main_root):
+    cmd = "docker compose --profile e2e run --rm e2e"
+    assert "KAPI" in rules(guard, bash(cmd), main_root)
+
+
+def test_e2e_service_with_tee_allowed(guard, main_root):
+    cmd = "docker compose --profile e2e run --rm e2e 2>&1 | tee state/evidence/e2e.log"
+    assert rules(guard, bash(cmd), main_root) == []
+
+
+def test_make_e2e_without_tee_blocked(guard, main_root):
+    assert "KAPI" in rules(guard, bash("docker compose run --rm tools make e2e"), main_root)
+
+
+@pytest.mark.parametrize("cmd", ["npx playwright test", "pnpm exec playwright test --grep x"])
+def test_playwright_test_without_tee_blocked(guard, main_root, cmd):
+    assert "KAPI" in rules(guard, bash(cmd), main_root)
+
+
+def test_playwright_other_command_allowed(guard, main_root):
+    assert rules(guard, bash("npx playwright install --dry-run"), main_root) == []
+
+
+def test_bash_c_push_worker_blocked(guard, main_root):
+    """MINOR-2: every rule applies inside sh -c / bash -c."""
+    cmd = 'bash -c "git push origin main"'
+    assert "PUSH" in rules(guard, bash(cmd), main_root, FFCORE_ROL="isci-a")
+
+
+def test_sh_c_gate_without_tee_blocked(guard, main_root):
+    assert "KAPI" in rules(guard, bash("sh -c 'cd backend && make test'"), main_root)
+
+
+def test_sh_c_gate_with_outer_tee_allowed(guard, main_root):
+    cmd = "sh -c 'make test' 2>&1 | tee state/evidence/x.log"
+    assert rules(guard, bash(cmd), main_root) == []
+
+
+def test_bash_lc_compose_build_blocked(guard, main_root):
+    assert "PROSES-175" in rules(guard, bash('bash -lc "docker compose build"'), main_root)
+
+
+def test_compose_run_sh_c_gate_blocked(guard, main_root):
+    cmd = "docker compose run --rm tools sh -c 'make test-int'"
+    assert "KAPI" in rules(guard, bash(cmd), main_root)
+
+
+def test_nested_rule_reported_once(guard, main_root):
+    found = rules(guard, bash("bash -c 'cat .env'"), main_root)
+    assert found.count("ENV") == 1
+
+
+@pytest.mark.parametrize(
+    ("cmd", "secret", "kept"),
+    [
+        (
+            "git push https://probeuser:ghp_FAKETOKEN0000@github.com/o/r.git main",
+            "ghp_FAKETOKEN0000",
+            "git push https://",
+        ),
+        ("OPENAI_API_KEY=sk-FAKE0000 make test", "sk-FAKE0000", "make test"),
+        ("make test --db-password=hunter2fake", "hunter2fake", "make test"),
+        (
+            'curl -H "Authorization: Bearer eyFAKEJWT0000" http://x && make test',
+            "eyFAKEJWT0000",
+            "curl -H",
+        ),
+        ("pytest -q --token abc && curl -H 'Bearer eyFAKE0001'", "eyFAKE0001", "pytest -q"),
+    ],
+)
+def test_log_masks_secrets(main_root, cmd, secret, kept):
+    """MAJOR-2: hook-guard.log never carries a credential from the command."""
+    run_hook(bash(cmd), main_root, FFCORE_ROL="isci-a")
+    lines = log_lines(main_root)
+    assert lines, "expected a log line"
+    for line in lines:
+        assert secret not in line
+        assert line.split("\t")[4] in {"PUSH", "KAPI"}
+    assert any(kept in line.split("\t")[5] for line in lines)
+    assert any("***" in line for line in lines)
+
+
+def test_log_mask_applies_before_truncation(guard):
+    cmd = "make test " + "x" * 100 + " API_KEY=" + "s" * 40
+    masked = guard.mask_secrets(cmd)
+    assert "s" * 10 not in masked and "API_KEY=***" in masked
+
+
+@pytest.mark.parametrize("cmd", ["cat .ENV", "cat backend/.Env", "echo x >> .ENV"])
+def test_env_upper_case_blocked(main_root, cmd):
+    """MINOR-1: Windows file names are case-insensitive."""
+    assert_blocked(run_hook(bash(cmd), main_root), "ENV")
+
+
+def test_env_mixed_case_test_file_allowed(main_root):
+    assert_allowed(run_hook(bash("cat .Env.Test"), main_root))
+
+
+def test_env_upper_case_write_tool_blocked(main_root):
+    assert_blocked(run_hook(edit(main_root / ".ENV", "Write"), main_root), "ENV")
+
+
+def test_settings_denies_paycore_env_edit():
+    deny = json.loads(SETTINGS_PATH.read_text(encoding="utf-8"))["permissions"]["deny"]
+    assert "Edit(//c/ai_paycore/paycoreLLM/.env)" in deny
