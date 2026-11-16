@@ -87,7 +87,8 @@ export interface paths {
          * Update Version
          * @description Replace a draft's definition. A published version is never edited (409). A definition
          *     whose context_tokens exceed the model's context window or OLLAMA_CONTEXT_LENGTH is 400
-         *     `context_configuration_invalid` (C13).
+         *     `context_configuration_invalid` (C13). A changed definition ends the version's queued and
+         *     running exams `failed(definition_changed)` in the same transaction (09-2 r2 MINOR-1).
          */
         put: operations["update_version_api_v1_projects__project_id__agents__agent_id__versions__version__put"];
         post?: never;
@@ -108,8 +109,12 @@ export interface paths {
         put?: never;
         /**
          * Publish Agent
-         * @description Publish a version: runs without an explicit version use it. The exam gate (09) is a flag
-         *     until 09 lands.
+         * @description Publish a version: runs without an explicit version use it. The exam gate (09-2): every
+         *     live suite bound to the agent needs a latest completed exam of this version that passed,
+         *     is complete, has nothing not run and examined the version and the suite as they are now
+         *     (r1 MAJOR-1: `stale_exam`, `stale_suite`); otherwise 409 `eval_gate_failed` naming each
+         *     suite as `<key>=<reason>`. An admin may pass `force` with a `force_reason` (audited). The
+         *     version keeps the exam that opened the gate (`eval_run_id`; r1 MINOR-2).
          */
         post: operations["publish_agent_api_v1_projects__project_id__agents__agent_id__publish_post"];
         delete?: never;
@@ -683,6 +688,17 @@ export interface components {
         PublishRequest: {
             /** Version */
             version: number;
+            /**
+             * Force
+             * @description Admin only: publish past the exam gate.
+             * @default false
+             */
+            force: boolean;
+            /**
+             * Force Reason
+             * @description Required with force; audited.
+             */
+            force_reason?: string | null;
         };
         /**
          * ResumeRequest
@@ -926,7 +942,7 @@ export interface components {
             published_at: string | null;
             /**
              * Eval Run Id
-             * @description Exam run that gated publishing (09); null.
+             * @description The exam that opened the publish gate (09-2); null when the gate was forced or the agent has no bound suite.
              */
             eval_run_id: string | null;
         };
