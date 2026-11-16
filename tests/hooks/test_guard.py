@@ -788,3 +788,20 @@ def test_env_upper_case_write_tool_blocked(main_root):
 def test_settings_denies_paycore_env_edit():
     deny = json.loads(SETTINGS_PATH.read_text(encoding="utf-8"))["permissions"]["deny"]
     assert "Edit(//c/ai_paycore/paycoreLLM/.env)" in deny
+
+
+@pytest.mark.parametrize(
+    "cmd",
+    [
+        "make test |& tee state/evidence/x.log",
+        'echo "a | b && c" | tee state/evidence/x.log',
+        "make test 2>&1 >| out.txt | tee state/evidence/x.log",
+    ],
+)
+def test_splitter_keeps_redirections_and_quotes(guard, main_root, cmd):
+    """Quote-aware split (r2): `|&`, `>|` and quoted separators do not break a pipeline."""
+    assert rules(guard, bash(cmd), main_root) == []
+
+
+def test_quoted_separator_does_not_hide_gate(guard, main_root):
+    assert "KAPI" in rules(guard, bash("bash -c \"echo 'x;y' && make lint\""), main_root)
