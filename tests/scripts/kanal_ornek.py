@@ -1,4 +1,7 @@
-"""Sample channels for scripts/kanal_ozet.py tests (unique module name: tests/hooks has its own conftest)."""
+"""Sample channels for scripts/kanal_ozet.py tests.
+
+Unique module name: tests/hooks imports its own `conftest` by name.
+"""
 
 from __future__ import annotations
 
@@ -12,7 +15,7 @@ SHA_A = "1111111111111111111111111111111111111111"
 SHA_B = "2222222222222222222222222222222222222222"
 SHA_C = "3333333333333333333333333333333333333333"
 
-KOORDINATOR = """# Kanal: koordinator
+KOORDINATOR = f"""# Kanal: koordinator
 
 ## Mesajlar
 
@@ -24,7 +27,7 @@ Paket: fix/x1 · Cevap: -
 iş
 
 ### K-X1-0002 · 2026-11-16 12:00 · → inceleyici · REVIEW-ISTEK
-Paket: fix/x1 · Cevap: A-X1-0002 · SHA: {sha_a}
+Paket: fix/x1 · Cevap: A-X1-0002 · SHA: {SHA_A}
 incele
 
 ### K-X1-0003 · 2026-11-16 14:00 · → isci-a · DUZELT
@@ -42,9 +45,9 @@ duyuru
 ### K-X2-0002 · 2026-11-16 16:00 · → tumu · MERGED
 Paket: fix/x2 · Cevap: R-X2-0002
 merge
-""".format(sha_a=SHA_A)
+"""
 
-ISCI_A = """# Kanal: isci-a
+ISCI_A = f"""# Kanal: isci-a
 
 ```
 ### <ID> · <YYYY-MM-DD HH:MM> · → <alici> · <TUR>
@@ -56,13 +59,13 @@ ISCI_A = """# Kanal: isci-a
 Paket: fix/x1 · Cevap: K-X1-0001
 
 ### A-X1-0002 · 2026-11-16 11:00 · → koordinator · PR-HAZIR
-Paket: fix/x1 · Cevap: K-X1-0001 · SHA: {sha_a}
+Paket: fix/x1 · Cevap: K-X1-0001 · SHA: {SHA_A}
 
 ### A-X1-0003 · 2026-11-16 11:30 · → koordinatör · DURUM
 biçim dışı (alıcı)
-""".format(sha_a=SHA_A)
+"""
 
-INCELEYICI = """# Kanal: inceleyici
+INCELEYICI = f"""# Kanal: inceleyici
 
 ## Mesajlar
 
@@ -70,23 +73,23 @@ INCELEYICI = """# Kanal: inceleyici
 Paket: fix/x1 · Cevap: K-X1-0002
 
 ### R-X1-0001 · 2026-11-16 13:00 · → koordinator · REVIEW-SONUC
-Paket: fix/x1 · Cevap: K-X1-0002 · SHA: {sha_a} · Sonuc: DEGISIKLIK · Bulgu: B0 M1 m0 N0
-""".format(sha_a=SHA_A)
+Paket: fix/x1 · Cevap: K-X1-0002 · SHA: {SHA_A} · Sonuc: DEGISIKLIK · Bulgu: B0 M1 m0 N0
+"""
 
-ARSIV_ISCI_B = """# Arşiv: isci-b fix/x2
+ARSIV_ISCI_B = f"""# Arşiv: isci-b fix/x2
 
 ### B-X2-0001 · 2026-11-16 10:40 · → koordinator · ACK
 Paket: fix/x2 · Cevap: K-X2-0001, K-GEN-0001
 
 ### R-X2-0001 · 2026-11-16 13:00 · → koordinator · REVIEW-SONUC
-Paket: fix/x2 · Cevap: - · SHA: {sha_b} · Sonuc: ONAY · Bulgu: B0 M0 m1 N0
+Paket: fix/x2 · Cevap: - · SHA: {SHA_B} · Sonuc: ONAY · Bulgu: B0 M0 m1 N0
 
 ### R-X2-0002 · 2026-11-16 14:30 · → koordinator · REVIEW-SONUC
-Paket: fix/x2 · Cevap: - · SHA: {sha_c} · Sonuc: ONAY · Bulgu: B0 M0 m0 N0
+Paket: fix/x2 · Cevap: - · SHA: {SHA_C} · Sonuc: ONAY · Bulgu: B0 M0 m0 N0
 
 ### B-X2-0002 · 2026-11-16 14:00 · → kullanici · DURUM
 Paket: fix/x2 · Cevap: - · Durum: VERIFIED
-""".format(sha_b=SHA_B, sha_c=SHA_C)
+"""
 
 WORK_QUEUE = """# İş kuyruğu
 
