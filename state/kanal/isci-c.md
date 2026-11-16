@@ -4,8 +4,8 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 
 - Oturum kimliği: ffcore-isci-c-10c1
 - Aktif paket: 10c-1 (09 Evaluation önyüzü)
-- Durum: ACTIVE
-- Son okunan: koordinator K-10C1-0010; son yazılan C-10C1-0013 (PR-HAZIR r2)
+- Durum: RETIRED
+- Son okunan: koordinator K-10C1-0013; son yazılan C-10C1-0015 (RETIRED)
 - Önceki lease: ffcore-isci-c-10bp2 RETIRED (10b-poc-2 MERGED b43770d; son C-10bp2-0019 HANDOFF)
 
 ## Mesajlar
@@ -831,3 +831,20 @@ r2: `feat/10c-1-eval-ui`, delta `2ac4051..b28cdc1` (21 commit, 29 dosya, +725/�
 MAJOR-1: bekçi (`STALL_MS` 6 s) + `reconnecting` (GET hemen, akış arkada; K-10C1-0007) + `newestState` (akış/GET'ten en son gelen). MINOR-1/2/3 yapıldı (+compare'de boş not-run tablosu kaldırıldı). Backend (K-10C1-0008): `EventStreamResponse` varsayılanı `no-cache, no-transform` + `X-Accel-Buffering: no`; Next proxy gzip tamponu kök nedendi (`10c-1-r2-diag-stream{,-after}.log`); `docs/degisiklikler.md` yeni.
 Kapı: Vitest 195/195, lint/typecheck/check:api 0; backend lint 0, make test ×2 1801/1801, hedefli test-int 30 + 8 NOT_RUN (`RUN_EVAL_STACK`); tam e2e 163/163 (10c1 26/26). SIGKILL probe 5 geçti: `reconnecting` + ilk GET kill'den 4,7 s, kopuklukta rozet "Running", iptal 6,4 s (`10c-1-r2-probe-sigkill.log`); 1-4. koşular PR notunda.
 Dikkat: (1) `test_09_exam_stack` başlık iddiası NOT_RUN (senaryo yığını gerekir); 09 başlığı `test_09_api` ile gerçek DB'de kanıtlı. (2) 06a istemci bekçisi FOLLOWUP-188'de; backend başlığı 06a'yı da kapsıyor. Dal donuk.
+
+### C-10C1-0014 · 2026-11-16 15:20 · → koordinator · HANDOFF
+Paket: 10c-1 · Cevap: K-10C1-0013
+10c-1 MERGED (main 6157752); açık iş yok. Kalan: FOLLOWUP-185 (items ucu), 188 (`lib/sse.ts` bekçi), 190 (başlık birleşimi). Öğrenilenler:
+1. **SSE bekçisi:** deneme başına `AbortController` + parça (ve istek) başına sıfırlanan zamanlayıcı (`STALL_MS = 3 × backend progress aralığı`); `open()` sinyali yok sayarsa `openWithin` yarışıyla asılmaz. Sahte zamanlayıcıda `advanceTimersByTimeAsync`.
+2. **reconnecting/GET deseni:** ilk başarısız denemede GET hemen + yoklama, akış arkada; ekranda akış olayı/GET'ten en son gelen (`dataUpdatedAt` karşılaştırması); başarısız yeniden okuma ekranı silmez, hata üstte. 06a için FOLLOWUP-188'e aynı desen.
+3. **Next proxy gzip tamponu:** rewrites arkasında `text/event-stream` gzip'le akış bitene dek tamponlanır; tarayıcıdan bakınca "streaming" görünür ama ara olay gelmez. Teşhis: node fetch ile `accept-encoding: identity` ↔ gzip ↔ backend doğrudan parça zamanları. Çözüm `Cache-Control: no-transform` (Next `compression` buna uyar).
+4. **SIGKILL probe deseni:** izlenmeyen spec `/work/<işaret>` yazar, host betiği işareti görünce `docker kill` → 25 s → `docker start` → healthy; sağlık yoklamasında bağlantı reddi 0 döner, "<500" değil "==200" bekle. Onay bekleyen sınav (`approve_tools: true`) canlı kalır.
+5. **e2e tuzakları:** eski `ffcore-10a-nm-pw` volume'u bayat (react-query yok) → `ffcore-10a-nm`'i e2e volume'üne kopyala; `down -v` `e2e_node_modules`'ü silmeyebilir, adıyla sil; `route.continue()` gzip tamponuyla akışı geçirmiyor gibi görünür (asıl neden 3); `page.unroute` bekleyen isteği de serbest bırakır.
+6. **Compare kod çevirisi:** `components/eval/codes.tsx` ortak (bilinen kod çeviri + mono ham kod, bilinmeyen ham); kodsuz tarafa boş tablo yok.
+7. **Read modu testleri:** fixture'da proje üyesi `analystReader` (analyst+read) var; superadmin read ↔ üye read ayrı yollar, ikisi de test edilmeli. jsdom'da disabled `<fieldset>` girdileri `.disabled` yapmıyor → her kontrole açık `disabled`.
+8. ICU mesajında `<...>` ayrıştırmayı kırar; Bash aracında ters bölü çiftleri teke iner (betik Write ile).
+Worktree temiz (izlenmeyen dosya yok; probe/diag spec'leri silindi, kopyaları evidence'ta). Yığın kapalı. İmaj etiketleri `ffcore/*:0.0.0-10c1` duruyor.
+
+### C-10C1-0015 · 2026-11-16 15:21 · → koordinator · RETIRED
+Paket: 10c-1 · Cevap: K-10C1-0013
+Lease `ffcore-isci-c-10c1` bırakıldı. Worktree `.worktrees/feat/10c-1-eval-ui` ve dal `feat/10c-1-eval-ui` kaldırılmaya hazır (açık dosya yok).
