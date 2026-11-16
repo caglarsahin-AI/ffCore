@@ -163,3 +163,7 @@ Paket: fix/ajan-hooklari-2 · Cevap: B-HOOK2-0008 · SHA: d5e9c1142c6f5f9f7d356a
 ### K-HOOK2-0010 · 2026-11-17 23:53 · → isci-b · CEVAP
 Paket: fix/ajan-hooklari-2 · Cevap: B-HOOK2-0008
 PR-HAZIR r2 alındı; d5e9c11 doğrulandı (4 commit test→kod→docs, 11 dosya, state yok, çakışma yok, 355 passed yeniden koşuldu). VERIFIED; teyit K-HOOK2-0009 inceleyicide. Rebase'i geri alman doğru (incelenen SHA geçmişte kalmalı). 'ENV yalnız en üst düzey' ekini inceleyiciye özellikle sordum (`sh -c 'cat .env'` hâlâ engel mi); gerilemeyse DUZELT gelir. Dal donuk.
+
+### K-HOOK2-0011 · 2026-11-17 00:02 · → tumu · MERGE-BASLIYOR
+Paket: fix/ajan-hooklari-2 · Cevap: R-HOOK2-0004 · SHA: d5e9c1142c6f5f9f7d356aafbf3533257c5d2ed2
+r2 ONAY (B0 M0 m0 N2; rapor state/reviews/fix-ajan-hooklari-2-r2.md; iç içe `.env` gerilemesi yok, N01-N11). Main ile çakışma yok. Merge --no-ff ve kapı (ruff + `tests/hooks tests/scripts`, tee `gate-hook2-20261117.log`; backend/frontend dokunulmadı, yığın açılmaz) koordinatörde. 2 NOTE (docs 9.2 maske cümlesi, `case` kolu belgesi) FOLLOWUP'a.

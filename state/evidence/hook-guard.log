@@ -26,3 +26,9 @@
 2026-11-16T23:40:39	warn	isci-b	Bash	KAPI	py -3.12 - <<'PY' from pathlib import Path p = Path(".claude/hooks/ffcore_guard.py") t = p.read_text(encoding="utf-8") r
 2026-11-16T23:41:29	warn	isci-b	Bash	KAPI	py -3.12 - <<'PY' from pathlib import Path p = Path("scripts/kanal_ozet.py") t = p.read_text(encoding="utf-8") reps = [ 
 2026-11-16T23:52:31	warn	koordinator	Bash	ENV	R=/c/ai_paycore/ffcore; cat > "C:/Users/CAGLAR~1.SAH/AppData/Local/Temp/claude/9398d5fca5badfb5/d131353f-4058-4872-8ded-
+2026-11-16T23:53:37	warn	inceleyici	Bash	KAPI	cd /c/ai_paycore/ffcore/.worktrees/fix/ajan-hooklari-2 && git rev-parse HEAD && git log --oneline 571ae6f..HEAD && git d
+2026-11-16T23:54:43	warn	inceleyici	Bash	ENV	cd /c/Users/CAGLAR~1.SAH/AppData/Local/Temp/claude/9398d5fca5badfb5/ecb79a59-6471-4590-b997-842940d7a702/scratchpad && p
+2026-11-16T23:54:43	warn	inceleyici	Bash	PAYCORE	cd /c/Users/CAGLAR~1.SAH/AppData/Local/Temp/claude/9398d5fca5badfb5/ecb79a59-6471-4590-b997-842940d7a702/scratchpad && p
+2026-11-17T00:00:27	warn	inceleyici	Bash	ENV	date "+%Y-%m-%d %H:%M"; cd /c/ai_paycore/ffcore && T=$(date "+%Y-%m-%d %H:%M") python - <<'EOF' import os p=r"C:\ai_payc
+2026-11-17T00:00:50	warn	inceleyici	Bash	ENV	cd /c/ai_paycore/ffcore && S=/c/Users/CAGLAR~1.SAH/AppData/Local/Temp/claude/9398d5fca5badfb5/ecb79a59-6471-4590-b997-84
+2026-11-17T00:01:41	warn	koordinator	Bash	ENV	R=/c/ai_paycore/ffcore; S=d5e9c1142c6f5f9f7d356aafbf3533257c5d2ed2; grep -a -A3 '^### R-HOOK2-0004' $R/state/kanal/incel

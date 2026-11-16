@@ -1,0 +1,291 @@
+"""Reviewer probe fix/ajan-hooklari-2 r1: call ffcore_guard like .claude/settings.json does."""
+import json
+import os
+import subprocess
+import tempfile
+from pathlib import Path
+
+WT = Path(r"C:\ai_paycore\ffcore\.worktrees\fix\ajan-hooklari-2")
+GUARD = WT / ".claude" / "hooks" / "ffcore_guard.py"
+CMD = [
+    "py", "-3.12", "-c",
+    "import os, sys; sys.path.insert(0, os.path.dirname(sys.argv[1])); import ffcore_guard; sys.exit(ffcore_guard.run())",
+    str(GUARD),
+]
+TMP = Path(tempfile.mkdtemp(prefix="hook2rv2_"))
+(TMP / "state" / "evidence").mkdir(parents=True)
+(TMP / "state" / "kanal" / "arsiv").mkdir(parents=True)
+R = str(TMP)
+KANAL = TMP / "state" / "kanal" / "inceleyici.md"
+OLD = (
+    "# Kanal: inceleyici\n\n- Oturum kimliği: x\n- Durum: ACTIVE\n\n## Mesajlar\n\n"
+    "### R-OLD-0001 · 2026-11-01 10:00 · → koordinator · ACK (eski biçim açıklama)\n"
+    "eski gövde satırı\n\n"
+    "### R-OLD-0002 · 2026-11-01 11:00 · → koordinator · ACK\n"
+    "Paket: x · Cevap: K-OLD-0001\ngövde 2\n"
+)
+KANAL.write_text(OLD, encoding="utf-8", newline="")
+(TMP / "state" / "kanal" / "koordinator.md").write_text("# Kanal: koordinator\n", encoding="utf-8", newline="")
+SHA = "571ae6fe40560ac108234c7011829cdef65d4c14"
+results = []
+
+
+def call(label, payload, extra_env=None, raw=None, expect=None):
+    env = {k: v for k, v in os.environ.items() if not k.startswith("FFCORE_")}
+    env.pop("CLAUDE_CODE_HOST_SESSION_ID", None)
+    env["FFCORE_MAIN_ROOT"] = R
+    env["FFCORE_GUARD_MODE"] = "block"
+    env.update(extra_env or {})
+    data = raw if raw is not None else json.dumps(payload, ensure_ascii=False)
+    p = subprocess.run(CMD, input=data, capture_output=True, text=True, encoding="utf-8", env=env)
+    mark = "" if expect is None else ("  OK" if p.returncode == expect else f"  !! beklenen {expect}")
+    results.append((label, p.returncode, expect))
+    print(f"## {label}")
+    print(f"   input={data[:260]!r}")
+    print(f"   exit={p.returncode}{mark}")
+    if p.stdout.strip():
+        print(f"   stdout={p.stdout.strip()[:400]}")
+    for line in p.stderr.strip().splitlines():
+        print(f"   stderr={line[:300]}")
+
+
+def bash(cmd):
+    return {"tool_name": "Bash", "tool_input": {"command": cmd}, "session_id": "sess-probe"}
+
+
+def write(path, content):
+    return {"tool_name": "Write", "tool_input": {"file_path": path, "content": content}, "session_id": "sess-probe"}
+
+
+def edit(path, old, new, every=False):
+    return {"tool_name": "Edit", "tool_input": {"file_path": path, "old_string": old, "new_string": new, "replace_all": every}, "session_id": "sess-probe"}
+
+
+def multi(path, edits):
+    return {"tool_name": "MultiEdit", "tool_input": {"file_path": path, "edits": edits}, "session_id": "sess-probe"}
+
+
+I = {"FFCORE_ROL": "inceleyici"}
+K = {"FFCORE_ROL": "koordinator"}
+A = {"FFCORE_ROL": "isci-a", "FFCORE_PAKET": "fix/ajan-hooklari-2"}
+KP = str(KANAL)
+TAIL = "Paket: x · Cevap: K-OLD-0001\ngövde 2\n"
+
+
+def app(text):
+    return edit(KP, TAIL, TAIL + "\n" + text)
+
+
+GOOD = f"### R-NEW-0001 · 2026-11-16 23:30 · → koordinator · REVIEW-SONUC\nPaket: x · Cevap: K-X-0001 · SHA: {SHA} · Sonuc: ONAY · Bulgu: B0 M0 m0 N0\ngövde\n"
+
+print(f"# root={R}\n# ---- (1) KANAL-BICIM")
+call("K01 gecerli REVIEW-SONUC eki (allow)", app(GOOD), I, expect=0)
+call("K02 Paket eksik (block)", app("### R-NEW-0001 · 2026-11-16 23:30 · → koordinator · ACK\nCevap: K-X-0001\n"), I, expect=2)
+call("K03 tur YIGIN-AÇ (block)", app("### R-NEW-0001 · 2026-11-16 23:30 · → koordinator · YIGIN-AÇ\nPaket: x · Cevap: - · Yigin: review1\n"), I, expect=2)
+call("K04 alici koordinatör (block)", app("### R-NEW-0001 · 2026-11-16 23:30 · → koordinatör · ACK\nPaket: x · Cevap: -\n"), I, expect=2)
+call("K05 kisa SHA (block)", app("### R-NEW-0001 · 2026-11-16 23:30 · → koordinator · REVIEW-SONUC\nPaket: x · Cevap: - · SHA: 571ae6f · Sonuc: ONAY · Bulgu: B0 M0 m0 N0\n"), I, expect=2)
+call("K06 Bulgu bicimi (block)", app(GOOD.replace("B0 M0 m0 N0", "B0 M0 m0")), I, expect=2)
+call("K07 Durum liste disi WARN-GUNU (block)", app("### R-NEW-0001 · 2026-11-16 23:30 · → koordinator · DURUM\nPaket: - · Cevap: - · Durum: WARN-GUNU\n"), I, expect=2)
+call("K08 Durum DUYURU (allow)", app("### R-NEW-0001 · 2026-11-16 23:30 · → tumu · DURUM\nPaket: - · Cevap: - · Durum: DUYURU\n"), I, expect=0)
+call("K09 Sonuc liste disi (block)", app(GOOD.replace("Sonuc: ONAY", "Sonuc: KABUL")), I, expect=2)
+call("K10 eski bozuk mesajin govdesine dokunan Edit (allow)", edit(KP, "eski gövde satırı", "eski gövde satırı (düzeltme)"), I, expect=0)
+call("K11 lease satiri (allow)", edit(KP, "- Durum: ACTIVE", "- Durum: IDLE"), I, expect=0)
+call("K12 kullanici inceleyici kanalinda (block)", app("### R-NEW-0001 · 2026-11-16 23:30 · → kullanici · DURUM\nPaket: - · Cevap: - · Durum: VERIFIED\n"), I, expect=2)
+KK = str(TMP / "state" / "kanal" / "koordinator.md")
+call("K13 kullanici koordinator kanalinda (allow)", write(KK, "# Kanal: koordinator\n\n### K-NEW-0001 · 2026-11-16 23:30 · → kullanici · DURUM\nPaket: - · Cevap: - · Durum: DUYURU\n"), K, expect=0)
+call("K14 arsiv bozuk baslik koordinator (allow)", write(str(TMP / "state" / "kanal" / "arsiv" / "inceleyici-x.md"), "### bozuk · baslik\nyok\n"), K, expect=0)
+call("K15 kod blogu ici bozuk ### (allow)", app("```\n### bozuk örnek başlık\n```\n"), I, expect=0)
+call("K16 kod blogu disinda govdede ### alt baslik (block, bilincli?)", app(GOOD + "\n### Notlar\nbir şey\n"), I, expect=2)
+two_old = "### R-OLD-0001 · 2026-11-01 10:00 · → koordinator · ACK (eski biçim açıklama)\neski gövde satırı\n\n### R-OLD-0002 · 2026-11-01 11:00 · → koordinator · ACK\nPaket: x · Cevap: K-OLD-0001\n"
+swapped = "### R-OLD-0002 · 2026-11-01 11:00 · → koordinator · ACK\nPaket: x · Cevap: K-OLD-0001\n\n### R-OLD-0001 · 2026-11-01 10:00 · → koordinator · ACK (eski biçim açıklama)\neski gövde satırı\n"
+call("K17 iki basligi silip yer degistirerek yeniden ekleme (allow)", edit(KP, two_old, swapped), I, expect=0)
+call("K18 iki baslik silinip biri + yeni bozuk eklenir (block yalniz yeni)", edit(KP, two_old, "### R-OLD-0002 · 2026-11-01 11:00 · → koordinator · ACK\nPaket: x · Cevap: K-OLD-0001\n\n### R-NEW-0009 · 2026-11-16 · → koordinator · ACK\nPaket: x · Cevap: -\n"), I, expect=2)
+call("K19 eski bozuk basligin kopyasi eklenir (block: Counter farki)", app("### R-OLD-0001 · 2026-11-01 10:00 · → koordinator · ACK (eski biçim açıklama)\nkopya\n"), I, expect=2)
+call("K20 eski bozuk basligi silmek (allow)", edit(KP, "### R-OLD-0001 · 2026-11-01 10:00 · → koordinator · ACK (eski biçim açıklama)\n", ""), I, expect=0)
+call("K21 eski bozuk basligi duzeltmek (yeni baslik gecerli, allow)", edit(KP, "### R-OLD-0001 · 2026-11-01 10:00 · → koordinator · ACK (eski biçim açıklama)\neski gövde satırı", "### R-OLD-0001 · 2026-11-01 10:00 · → koordinator · ACK\nPaket: x · Cevap: -"), I, expect=0)
+call("K22 old_string yok, new_string gecerli (allow)", edit(KP, "YOK-BOYLE-METIN", GOOD), I, expect=0)
+call("K23 old_string yok, new_string bozuk (block)", edit(KP, "YOK-BOYLE-METIN", "### R-NEW-0001 · 2026-11-16 23:30 · → koordinator · ACKX\nPaket: x · Cevap: -\n"), I, expect=2)
+call("K24 MultiEdit ikinci duzenleme bozuk ekler (block)", multi(KP, [{"old_string": "- Durum: ACTIVE", "new_string": "- Durum: IDLE"}, {"old_string": TAIL, "new_string": TAIL + "\n### R-NEW-0001 · 2026-11-16 23:30 · → koordinator · ACK\n"}]), I, expect=2)
+call("K25 replace_all ile baslik cogaltma (block yeni bozuk kopyalar)", edit(KP, "eski gövde satırı", "eski\n\n### R-DUP-0001 · 2026-11-16 23:30 · → koordinator · ACK\nPaket yok\n", every=True), I, expect=2)
+call("K26 Write tum dosya, eski bozuk korunur + gecerli ek (allow)", write(KP, OLD + "\n" + GOOD), I, expect=0)
+call("K27 Write CRLF gecerli ek (allow)", write(KP, (OLD + "\n" + GOOD).replace("\n", "\r\n")), I, expect=0)
+call("K28 son satir baslik, ikinci satir yok (block)", write(KP, OLD + "\n### R-NEW-0001 · 2026-11-16 23:30 · → koordinator · ACK"), I, expect=2)
+call("K29 Cevap iki ID virgul+bosluk (allow)", app("### R-NEW-0001 · 2026-11-16 23:30 · → koordinator · ACK\nPaket: x · Cevap: K-A-0001, K-B-0002\n"), I, expect=0)
+call("K30 Cevap iki ID bosluksuz virgul (block)", app("### R-NEW-0001 · 2026-11-16 23:30 · → koordinator · ACK\nPaket: x · Cevap: K-A-0001,K-B-0002\n"), I, expect=2)
+call("K31 ID kucuk harf onek (block)", app("### r-NEW-0001 · 2026-11-16 23:30 · → koordinator · ACK\nPaket: x · Cevap: -\n"), I, expect=2)
+call("K32 worktree kanal yolu (STATE-YOL yalniz)", app(GOOD) | {"tool_input": {"file_path": R + "/.worktrees/fix/x/state/kanal/inceleyici.md", "old_string": TAIL, "new_string": TAIL + "\n### bozuk"}}, I, expect=2)
+call("K33 baska rolun kanali + bozuk (TEK-YAZAR + KANAL-BICIM)", write(str(TMP / "state" / "kanal" / "isci-a.md"), "### bozuk\n"), I, expect=2)
+call("K34 buyuk harf dosya adi INCELEYICI.md bozuk (block)", write(str(TMP / "state" / "kanal" / "INCELEYICI.md"), "### R-NEW-0001 · x · → koordinator · ACK\nPaket: x · Cevap: -\n"), I, expect=2)
+call("K35 rol yok + gecerli ek (TEK-YAZAR)", app(GOOD), None, expect=2)
+call("K36 warn kipinde bozuk (exit 0 + systemMessage)", app("### R-NEW-0001 · 2026-11-16 23:30 · → koordinator · YIGIN-AÇ\nPaket: x · Cevap: - · Yigin: r\n"), {**I, "FFCORE_GUARD_MODE": "warn"}, expect=0)
+call("K37 ikinci satir alan sirasi farkli, ek alan (allow)", app("### R-NEW-0001 · 2026-11-16 23:30 · → koordinator · YIGIN-AC\nYigin: review1 · Paket: x · Cevap: - · Not: ek\n"), I, expect=0)
+call("K38 ikinci satir ayirici bosluksuz (block)", app("### R-NEW-0001 · 2026-11-16 23:30 · → koordinator · ACK\nPaket: x ·Cevap: -\n"), I, expect=2)
+call("K39 NotebookEdit kanal (format denetimi yok, rol uygun)", {"tool_name": "NotebookEdit", "tool_input": {"notebook_path": KP, "new_source": "### bozuk"}}, I, expect=None)
+
+print("# ---- (2) sarmalayicilar / anahtar sozcukler (isci-a)")
+W = [
+    ("W01 env X=1 git push", "env X=1 git push origin main", 2),
+    ("W02 command git push", "command git push origin main", 2),
+    ("W03 time make test (tee yok)", "time make test", 2),
+    ("W04 time make test | tee", "time make test 2>&1 | tee state/evidence/x.log", 0),
+    ("W05 $(git push)", "echo $(git push origin main)", 2),
+    ("W06 ters tirnak git push", "echo `git push origin main`", 2),
+    ("W07 { git push; }", "{ git push origin main; }", 2),
+    ("W08 ( git push )", "( git push origin main )", 2),
+    ("W09 bash -o pipefail -c", "bash -o pipefail -c 'git push origin main'", 2),
+    ("W10 for pytest (tee yok)", "for f in a b; do pytest $f; done", 2),
+    ("W11 for pytest | tee", "for f in a b; do pytest $f; done 2>&1 | tee state/evidence/x.log", 0),
+    ("W12 if git push fi", "if true; then git push origin main; fi", 2),
+    ("W13 if ... echo fi; git push; fi (anahtar sozcuk arguman)", "if true; then echo fi; git push origin main; fi", 2),
+    ("W14 if grep -q \"done\" (tirnakli anahtar sozcuk)", 'if grep -q "done" x.txt; then git push origin main; fi', 2),
+    ("W15 for x in done; do git push; done", "for x in done; do git push origin main; done", 2),
+    ("W16 while ... done govdesi", "while false; do git push origin main; done", 2),
+    ("W17 case kolu (belgede sinir)", "case x in x) git push origin main;; esac", None),
+    ("W18 \"$(git push)\" cift tirnak", 'echo "$(git push origin main)"', 2),
+    ("W19 '$(git push)' tek tirnak (allow)", "echo '$(git push origin main)'", 0),
+    ("W20 f() { git push; }; f", "f() { git push origin main; }; f", 2),
+    ("W21 ! git push", "! git push origin main", 2),
+    ("W22 nice -n 5 git push", "nice -n 5 git push origin main", 2),
+    ("W23 exec git push", "exec git push origin main", 2),
+    ("W24 nohup git push &", "nohup git push origin main &", 2),
+    ("W25 timeout 60 git push (liste disi)", "timeout 60 git push origin main", None),
+    ("W26 xargs git push (liste disi)", "echo main | xargs git push origin", None),
+    ("W27 env -S 'git push' (deger alan -S)", "env -S 'git push origin main'", 2),
+    ("W28 sudo git push (liste disi)", "sudo git push origin main", None),
+    ("W29 <(git push) process substitution", "cat <(git push origin main)", None),
+    ("W30 4 duzey $( )", "echo $(echo $(echo $(echo $(git push origin main))))", 2),
+    ("W31 3 duzey $( )", "echo $(echo $(echo $(git push origin main)))", 2),
+    ("W32 dengesiz $( ", "echo $(git push origin main", None),
+    ("W33 dengesiz {", "{ git push origin main", None),
+    ("W34 dengesiz (", "( git push origin main", None),
+    ("W35 dengesiz cift tirnak", 'echo "git push origin main', None),
+    ("W36 for done'suz", "for x in a; do git push origin main", None),
+    ("W37 kacisli bosluk git\\ push", "git\\ push origin main", None),
+    ("W38 400 ic ice parantez", "(" * 400 + "git push" + ")" * 400, 2),
+    ("W39 { echo; } | tee + icinde make test", "{ make test; } 2>&1 | tee state/evidence/x.log", 0),
+    ("W40 ( make test ) tee yok", "( make test )", 2),
+    ("W41 echo zararsiz grup (allow)", "( cd backend && ls ) && { echo ok; }", 0),
+    ("W42 command -v git (allow)", "command -v git", 0),
+    ("W43 bash -euo pipefail -c push", "bash -euo pipefail -c 'git push origin main'", 2),
+    ("W44 env -i PATH=x git push", "env -i PATH=/usr/bin git push origin main", 2),
+    ("W45 time -p pytest | tee", "time -p py -3.12 -m pytest -q 2>&1 | tee state/evidence/x.log", 0),
+    ("W46 sed ... ; pytest | tail (warn gunu ornegi)", "sed -n 1p x; py -3.12 -m pytest -q | tail -3", 2),
+    ("W47 git commit -m \"... git push ...\" (allow)", 'git commit -m "docs: never git push"', 0),
+    ("W48 heredoc govdesinde git push (FP yonu)", "cat <<EOF > x.md\ngit push origin main\nEOF", None),
+]
+for label, cmd, exp in W:
+    call(label, bash(cmd), A, expect=exp)
+call("W49 koordinator env FFCORE_PUSH_OK=1 git push (allow)", bash("env FFCORE_PUSH_OK=1 git push origin main"), K, expect=0)
+call("W50 koordinator FFCORE_PUSH_OK=1 time git push (allow)", bash("FFCORE_PUSH_OK=1 time git push origin main"), K, expect=0)
+call("W51 koordinator bayraksiz { git push; } (block)", bash("{ git push origin main; }"), K, expect=2)
+
+print("# ---- (3) maske (kayit dokumu sonda; her biri tee'siz make test ile tetiklenir)")
+M = [
+    ("M01 curl -u user:pass", "curl -u probeuser:PROBEPASS01 http://x; make test"),
+    ("M02 --user user:pass", "curl --user probeuser:PROBEPASS02 http://x; make test"),
+    ("M03 JSON token tek tirnak", "curl -d '{\"token\":\"PROBETOK03\"}' http://x; make test"),
+    ("M04 JSON token kacisli cift tirnak", 'curl -d "{\\"token\\":\\"PROBETOK04\\"}" http://x; make test'),
+    ("M05 -uuser:pass bitisik", "curl -uprobeuser:PROBEPASS05 http://x; make test"),
+    ("M06 --user=user:pass", "curl --user=probeuser:PROBEPASS06 http://x; make test"),
+    ("M07 JSON access_token", "curl -d '{\"access_token\":\"PROBETOK07\"}' http://x; make test"),
+    ("M08 JSON apiKey", "curl -d '{\"apiKey\":\"PROBETOK08\"}' http://x; make test"),
+    ("M09 JSON password bosluklu", "curl -d '{\"password\" : \"PROBEPASS09\"}' http://x; make test"),
+    ("M10 r2 URL kimligi", "git clone https://u:PROBEURL10@h/r; make test"),
+    ("M11 r2 API_KEY=", "OPENAI_API_KEY=PROBEKEY11 make test"),
+    ("M12 r2 Bearer", "curl -H 'Authorization: Bearer PROBEBEAR12' http://x; make test"),
+    ("M13 r2 --api-token=", "x --api-token=PROBETOK13; make test"),
+    ("M14 -u root (iki nokta yok, degismemeli)", "docker compose exec -u root backend id; make test"),
+]
+for label, cmd in M:
+    call(label, bash(cmd), I, expect=2)
+
+print("# ---- (4) ENV konum eki (inceleyici)")
+E = [
+    ("E01 cat .env", "cat .env", 2),
+    ("E02 source .env", "source .env", 2),
+    ("E03 . .env", ". .env", 2),
+    ("E04 < .env", "wc -l < .env", 2),
+    ("E05 cp .env x", "cp .env x", 2),
+    ("E06 cp x .env", "cp x .env", 2),
+    ("E07 cat ./.env", "cat ./.env", 2),
+    ("E08 cat \"$HOME/.env\"", 'cat "$HOME/.env"', 2),
+    ("E09 cat .ENV", "cat .ENV", 2),
+    ("E10 --env-file .env", "docker compose --env-file .env ps", 2),
+    ("E11 --env-file=.env", "docker compose --env-file=.env ps", 2),
+    ("E12 cat<.env bitisik", "cat<.env", 2),
+    ("E13 cat '.env'", "cat '.env'", 2),
+    ("E14 sh -c 'cat .env'", "sh -c 'cat .env'", 2),
+    ("E15 echo $(cat .env)", "echo $(cat .env)", 2),
+    ("E16 cat <<EOF > .env", "cat <<EOF > .env\nX=1\nEOF", 2),
+    ("E17 grep -e foo .env (dosya)", "grep -e foo .env", 2),
+    ("E18 grep -f .env x (desen dosyasi)", "grep -f .env x", 2),
+    ("E19 docker run -v ./.env:/app/.env", "docker compose run -v ./.env:/app/.env tools ls", 2),
+    ("E20 grep --exclude='.env' -r foo .", "grep --exclude='.env' -r foo .", 0),
+    ("E21 echo \".env yok\"", 'echo ".env yok"', 0),
+    ("E22 heredoc govdesi", "cat <<EOF > notes.md\nthe .env file\ncat .env\nEOF", 0),
+    ("E23 git commit -m \"docs: .env is never read\"", 'git commit -m "docs: .env is never read"', 0),
+    ("E24 cat .env.test", "cat .env.test", 0),
+    ("E25 grep -n .env .gitignore", "grep -n .env .gitignore", 0),
+    ("E26 rg -g '.env' foo", "rg -g '.env' foo", 0),
+    ("E27 cat .env.example", "cat .env.example", 0),
+    ("E28 bash <<EOF cat .env EOF (heredoc kabuga gider)", "bash <<EOF\ncat .env\nEOF", 2),
+    ("E29 py -c open('.env') (okuma, bosluksuz)", "py -3.12 -c \"print(open('.env').read())\"", 2),
+    ("E30 py -c open(\".env\") bosluklu", "py -3.12 -c \"import os; print(open('.env').read())\"", 2),
+    ("E31 echo .env (ciplak kelime, FP)", "echo .env", None),
+    ("E32 git commit -m \".env\" (tek kelime, FP)", 'git commit -m ".env"', None),
+    ("E33 cat .env* glob", "cat .env*", 2),
+    ("E34 ls -a | grep .env", "ls -a | grep .env", 0),
+    ("E35 cat .en? glob (sinir)", "cat .en?", None),
+    ("E36 sh <<'EOF' source .env", "sh <<'EOF'\nsource .env\nEOF", 2),
+    ("E37 grep -r foo -- .env", "grep -r foo -- .env", 2),
+    ("E38 cat x .env (ikinci arguman)", "cat x .env", 2),
+    ("E39 type .env (Windows)", "type .env", 2),
+    ("E40 cat ../.env", "cat ../.env", 2),
+    ("E41 cat C:\\ai\\.env", "cat C:\\\\ai\\\\.env", 2),
+    ("E42 <<< here-string .env", "cat <<< .env", None),
+]
+for label, cmd, exp in E:
+    call(label, bash(cmd), I, expect=exp)
+
+
+print("# ---- (r2) ic ice ENV, yeni varyantlar")
+N = [
+    ("N01 sh -c 'cat .env'", "sh -c 'cat .env'", 2),
+    ("N02 bash -c \"source .env\"", 'bash -c "source .env"', 2),
+    ("N03 compose run tools sh -c 'cat .env'", "docker compose -p review1 --profile tools run --rm tools sh -c 'cat .env'", 2),
+    ("N04 compose exec backend bash -lc 'cat /app/.env'", "docker compose exec -T backend bash -lc 'cat /app/.env'", 2),
+    ("N05 sh -c 'sh -c \"cat .env\"' (2 duzey)", "sh -c 'sh -c \"cat .env\"'", 2),
+    ("N06 ( cat .env )", "( cat .env )", 2),
+    ("N07 { cat .env; }", "{ cat .env; }", 2),
+    ("N08 if true; then cat .env; fi", "if true; then cat .env; fi", 2),
+    ("N09 echo $(sh -c 'cat .env')", "echo $(sh -c 'cat .env')", 2),
+    ("N10 env -S 'cat .env'", "env -S 'cat .env'", 2),
+    ("N11 time bash -o pipefail -c 'cat .env'", "time bash -o pipefail -c 'cat .env'", 2),
+    ("N12 sh -c heredoc data govdesi (allow)", "sh -c 'cat > notes.md <<EOF\nthe .env file\nEOF'", 0),
+    ("N13 cat <<EOF | bash ... cat .env", "cat <<EOF | bash\ncat .env\nEOF", 2),
+    ("N14 py - <<EOF open('.env')", "py -3.12 - <<'EOF'\nprint(open('.env').read())\nEOF", 2),
+    ("N15 node -e readFileSync('.env')", "node -e \"require('fs').readFileSync('.env')\"", 2),
+    ("N16 py -c bosluklu metin .env (FP, kabul)", "py -3.12 -c \"print('the .env file')\"", None),
+    ("N17 cat > x.py <<EOF data govdesi (allow)", "cat > x.py <<'EOF'\nopen('.env')\nEOF", 0),
+    ("N18 sh -c icinde paycore data", "sh -c 'cat /c/ai_paycore/paycoreLLM/data/x.csv'", 2),
+    ("N19 compose run tools sh -c make test (tee yok, KAPI hala)", "docker compose -p r --profile tools run --rm tools sh -c 'make test'", 2),
+    ("N20 if grep -q \"build done\" log; then make test; fi", 'if grep -q "build done" log; then make test; fi', 2),
+    ("N21 case kolu (sinir)", "case x in x) cat .env;; esac", None),
+    ("N22 env --split-string='git push'", "env --split-string='git push origin main'", 2),
+    ("N23 for ... done | tee hala serbest", "for f in a; do pytest $f; done 2>&1 | tee state/evidence/x.log", 0),
+    ("N24 echo fi govdeli while + make test tee'li", "while false; do echo done; make test; done 2>&1 | tee x.log", 0),
+]
+for label, cmd, exp in N:
+    call(label, bash(cmd), A if "push" in cmd or "make test" in cmd else I, expect=exp)
+call("N25 heredoc kabuk + rol isci-a git push (PUSH)", bash("bash <<EOF\ngit push origin main\nEOF"), A, expect=2)
+call("N26 maske: docker exec -u 1000:1000 (deger degil, ama maske)", bash("docker compose exec -u 1000:1000 backend id; make test"), I, expect=2)
+call("N27 maske: x-api-key JSON", bash("curl -d '{\"x-api-key\":\"PROBETOK27\"}' http://x; make test"), I, expect=2)
+call("N28 maske: client_secret kacisli", bash('curl -d "{\\"client_secret\\":\\"PROBETOK28\\"}" http://x; make test'), I, expect=2)
+
+print("# ---- ozet (beklenene uymayanlar)")
+for label, rc, exp in results:
+    if exp is not None and rc != exp:
+        print(f"   UYMAYAN {label}: exit={rc} beklenen={exp}")
+print(f"   toplam cagri={len(results)}")
+print("# ---- kayit dosyasi")
+print((TMP / "state" / "evidence" / "hook-guard.log").read_text(encoding="utf-8"))
