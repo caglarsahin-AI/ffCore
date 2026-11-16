@@ -1,0 +1,193 @@
+=== gate09-2 main 202640e 2026-11-16 08:37:57
+
+=== 08:37:57 build backend frontend tools
+
+#37 [frontend] exporting to image
+#37 exporting layers done
+#37 writing image sha256:a81da830ccd8bd4ec2dfc5f7f00d0152585633df4bcaf4367633e27cf27d1e2c done
+#37 naming to docker.io/ffcore/frontend:0.0.0-main done
+#37 DONE 0.0s
+build exit=0
+
+=== 08:38:09 compose config
+config exit=0
+
+=== 08:38:15 up
+ Container ffmain-frontend-1  Healthy
+ Container ffmain-agent-worker-bg-1  Healthy
+ Container ffmain-langfuse-minio-1  Healthy
+ Container ffmain-langfuse-worker-1  Healthy
+ Container ffmain-mcp-sql-1  Healthy
+ Container ffmain-mcp-search-1  Healthy
+up exit=0
+ffmain-mcp-sql-1 Up 13 seconds (healthy)
+ffmain-agent-worker-1 Up 12 seconds
+ffmain-worker-1 Restarting (1) 1 second ago
+ffmain-agent-worker-bg-1 Up 12 seconds
+ffmain-mcp-search-1 Up 12 seconds (healthy)
+ffmain-frontend-1 Up 12 seconds
+ffmain-backend-1 Up 24 seconds (healthy)
+ffmain-langfuse-web-1 Up 50 seconds (healthy)
+ffmain-langfuse-worker-1 Up 50 seconds
+ffmain-litellm-1 Up 50 seconds (healthy)
+ffmain-fake-llm-1 Up 56 seconds
+ffmain-langfuse-clickhouse-1 Up 56 seconds (healthy)
+ffmain-ticket-desk-1 Up 56 seconds (healthy)
+ffmain-postgres-1 Up 56 seconds (healthy)
+ffmain-qdrant-1 Up 56 seconds (healthy)
+ffmain-langfuse-redis-1 Up 56 seconds (healthy)
+ffmain-redis-1 Up 56 seconds (healthy)
+ffmain-langfuse-postgres-1 Up 56 seconds (healthy)
+ffmain-langfuse-minio-1 Up 56 seconds (healthy)
+
+=== 08:39:18 lint
+ruff check backend scripts data/samples/scripts services
+All checks passed!
+ruff format --check backend scripts data/samples/scripts services
+486 files already formatted
+lint exit=0
+
+=== 08:39:27 alembic heads
+09_0001 (03a, 04a, 09, 06b, 05a, 06a, 03b, 03c, 08, 07) (head)
+heads exit=0
+
+=== 08:39:35 make test llmaas
+........................................................................ [  4%]
+........................................................................ [  8%]
+........................................................................ [ 12%]
+........................................................................ [ 16%]
+........................................................................ [ 20%]
+........................................................................ [ 24%]
+........................................................................ [ 28%]
+........................................................................ [ 32%]
+........................................................................ [ 36%]
+........................................................................ [ 40%]
+........................................................................ [ 44%]
+........................................................................ [ 48%]
+........................................................................ [ 52%]
+........................................................................ [ 56%]
+........................................................................ [ 60%]
+........................................................................ [ 64%]
+........................................................................ [ 68%]
+........................................................................ [ 72%]
+........................................................................ [ 76%]
+........................................................................ [ 80%]
+........................................................................ [ 84%]
+........................................................................ [ 88%]
+........................................................................ [ 92%]
+........................................................................ [ 96%]
+.......................................................................  [100%]
+1799 passed in 153.20s (0:02:33)
+test exit=0
+
+=== 08:42:20 make test airgap
+........................................................................ [  4%]
+........................................................................ [  8%]
+........................................................................ [ 12%]
+........................................................................ [ 16%]
+........................................................................ [ 20%]
+........................................................................ [ 24%]
+........................................................................ [ 28%]
+........................................................................ [ 32%]
+........................................................................ [ 36%]
+........................................................................ [ 40%]
+........................................................................ [ 44%]
+........................................................................ [ 48%]
+........................................................................ [ 52%]
+........................................................................ [ 56%]
+........................................................................ [ 60%]
+........................................................................ [ 64%]
+........................................................................ [ 68%]
+........................................................................ [ 72%]
+........................................................................ [ 76%]
+........................................................................ [ 80%]
+........................................................................ [ 84%]
+........................................................................ [ 88%]
+........................................................................ [ 92%]
+........................................................................ [ 96%]
+.......................................................................  [100%]
+1799 passed in 153.98s (0:02:33)
+test-airgap exit=0
+
+=== 08:45:06 test-samples
+
+----------------------------------------------------------------------
+Ran 54 tests in 2.859s
+
+OK (skipped=5)
+samples exit=0
+
+=== 08:45:18 test-int
+........................................................................ [  7%]
+........................................................................ [ 14%]
+........................................................................ [ 22%]
+..........................s............................................. [ 29%]
+........................................................................ [ 37%]
+......s..........s...................................................... [ 44%]
+.........................s.............................................. [ 52%]
+........................................................................ [ 59%]
+........................................................................ [ 67%]
+........................................................................ [ 74%]
+........................................................................ [ 82%]
+........................................................................ [ 89%]
+..ssssssss.............................................................s [ 97%]
+............................                                             [100%]
+=============================== warnings summary ===============================
+tests/integration/test_04a_worker.py::test_04a_upload_job_runs_in_worker
+tests/integration/test_04a_worker.py::test_04a_job_for_missing_row_retries_then_fails_loud
+  /opt/venv/lib/python3.12/site-packages/arq/worker.py:877: DeprecationWarning: Call to deprecated close. (Use aclose() instead) -- Deprecated since version 5.0.1.
+    await self.pool.close(close_connection_pool=True)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+SKIPPED [1] tests/integration/test_03b_egress_dns.py: NOT_RUN: needs RUN_DNS_TESTS=1
+SKIPPED [1] tests/integration/test_04a_ingest.py:124: NOT_RUN: needs RUN_MODEL_TESTS=1
+SKIPPED [1] tests/integration/test_04a_ingest.py:279: NOT_RUN: needs RUN_MODEL_TESTS=1
+SKIPPED [1] tests/integration/test_05a_sql.py:301: NOT_RUN: needs RUN_MODEL_TESTS=1
+SKIPPED [1] tests/integration/test_09_exam_stack.py:83: NOT_RUN: set RUN_EVAL_STACK=1 (scenario stack + make seed + make seed-eval)
+SKIPPED [1] tests/integration/test_09_exam_stack.py:92: NOT_RUN: set RUN_EVAL_STACK=1 (scenario stack + make seed + make seed-eval)
+SKIPPED [1] tests/integration/test_09_exam_stack.py:98: NOT_RUN: set RUN_EVAL_STACK=1 (scenario stack + make seed + make seed-eval)
+SKIPPED [1] tests/integration/test_09_exam_stack.py:123: NOT_RUN: set RUN_EVAL_STACK=1 (scenario stack + make seed + make seed-eval)
+SKIPPED [1] tests/integration/test_09_exam_stack.py:129: NOT_RUN: set RUN_EVAL_STACK=1 (scenario stack + make seed + make seed-eval)
+SKIPPED [1] tests/integration/test_09_exam_stack.py:140: NOT_RUN: set RUN_EVAL_STACK=1 (scenario stack + make seed + make seed-eval)
+SKIPPED [1] tests/integration/test_09_exam_stack.py:155: NOT_RUN: set RUN_EVAL_STACK=1 (scenario stack + make seed + make seed-eval)
+SKIPPED [1] tests/integration/test_09_exam_stack.py:163: NOT_RUN: set RUN_EVAL_STACK=1 (scenario stack + make seed + make seed-eval)
+SKIPPED [1] tests/integration/test_19_ingest_raw.py:157: root ignores file modes; the mount test runs :ro
+951 passed, 13 skipped, 2 warnings in 719.80s (0:11:59)
+test-int exit=0
+
+=== 08:57:34 smoke
+python scripts/smoke.py
+ok    backend /healthz 200
+ok    litellm /health/liveliness 200
+ok    langfuse /api/public/health 200, /api/public/projects 200
+ok    mcp-search /healthz 200
+ok    mcp-sql /healthz 200
+ok    skipped: ollama profile inactive
+smoke: passed
+smoke exit=0
+
+=== 08:57:42 frontend lint/typecheck/check:api (node, --network none, repo root)
+
+> ffcore-frontend@0.1.0 lint
+> eslint
+
+
+> ffcore-frontend@0.1.0 typecheck
+> tsc --noEmit
+
+
+> ffcore-frontend@0.1.0 check:api
+> node scripts/check-api.mjs
+
+API contract drift:
+- lib/api/schema-06a.d.ts is not the output of openapi-typescript for ../backend/openapi/06a.yaml
+Run: npm run gen:api
+frontend exit=1
+
+=== 08:58:04 down -v
+ Volume ffmain_postgres_data  Removed
+ Volume ffmain_langfuse_minio_data  Removed
+
+=== 08:58:22 done
+gate script exit 0

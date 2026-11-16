@@ -1,0 +1,7 @@
+gen=0
+lint=0
+typecheck=0
+> node scripts/check-api.mjs
+
+API contract copies and generated types are current.
+checkapi=0
