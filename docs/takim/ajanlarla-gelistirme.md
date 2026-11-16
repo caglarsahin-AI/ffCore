@@ -47,7 +47,7 @@ Kod yazılmadan önce dört gün belge üzerinde çalışıldı. İlk kod dış�
 
 | Aşama | Tarih | Belgeler | Ne işe yaradı |
 |---|---|---|---|
-| Analiz | 23 Ekim | Fonksiyonel analiz ve Teknik analiz dokümanları | Projenin ilk analiz belgeleri. Bu iki doküman depoda yok; bilgi kullanıcıdan. Depodaki `cognipeer-analiz.md` aynı aşamada yazılan rakip ürün analizi. |
+| Analiz | 23 Ekim | Fonksiyonel analiz ve Teknik analiz dokümanları | Projenin ilk analiz belgeleri. Bu iki doküman depoda yok; bilgi kullanıcıdan. |
 | | (tarihsiz; doğrulanmadı) | `cekirdek-8-ozellik.md` | 80/20 listesinin A grubu: 8 çekirdek özellik, yapım sırasıyla |
 | Plan | 24-26 Ekim | `PLAN.md` v1 → v2, `plan/00-16` (18 brief), `brief-inceleme-v2.md` | v1 14 paket ve airgap varsayılandı; v2'de ürün varsayılanı `llmaas` oldu (tersine karar) |
 | İlke ve inceleme | 27 Ekim | `FELSEFE.md`; `state/reviews/brief-inceleme-v4/v5/v6/v9/v10.md` + `cevap-v4-v6.md`, `cevap-v9-v10.md`; `KARARLAR.md` | Felsefe plana bağlandı (v2.2). İnceleme turları v2.3 ve v2.4'ü üretti. Kararlar gerekçesiyle kayda geçti. |
@@ -582,12 +582,143 @@ NER gecikme kabulü (boşta P95 < 300 ms) geliştirme dizüstünde ölçüldü. 
 - [ ] Paket başına yeni oturum; ilk mesajda yetki sınırı
 - [ ] Koordinatör karar yetkisi listesi ve kullanıcıda kalanlar, açıkça yazılı
 - [ ] Koordinatör kanalları belirli aralıklarla tarar ve sessiz oturumu zil ile uyandırır
+- [ ] Kesin kurallar (secret, push, dış ağ, tek yazar, kapı logu) hook ve izin ayarıyla zorlanır (bkz. 9.2)
+- [ ] Dalga kapısında insana tek sayfalık rapor gider (bkz. 9.3)
 
 ---
 
-## 9. Sözlük ve dosya haritası
+## 9. Değerlendirme ve iyileştirme planı
 
-### 9.1 Sözlük
+16 Kasım 2026'da süreçler Anthropic'in yayımladığı rehberlere göre değerlendirildi: "Building effective agents", Claude Code best practices, çok ajanlı sistemler ve context engineering yazıları. Rehberler bu değerlendirme sırasında yeniden açılıp kontrol edilmedi **(doğrulanmadı)**. Proje tarafındaki her kanıt depodan alındı.
+
+### 9.1 Değerlendirme özeti
+
+**Uyumlu olanlar.**
+- Orkestratör-işçi düzeni ve işi yazan ile inceleyen ajanın ayrılması.
+- Önce plan sonra kod; önce kırmızı test.
+- Worktree başına paralel oturum; paket başına temiz bağlam.
+- Ortak belleğin dosyalarda tutulması ve HANDOFF.
+- Doğrulama kapıları ve canlı probe'lar.
+- Sandbox kuralları; sekreter ile model katmanlama.
+
+**Zayıf noktalar ve iyileştirme planı** (önem sırasıyla):
+
+| # | Bulgu | Kanıt | Karar ya da öneri | Durum |
+|---|---|---|---|---|
+| 1 | Kesin kurallar yalnız metinde; hiçbiri araçla zorlanmıyor | PROSES-175 (çıplak `compose build` dışarı bağlandı), K-05a-0011 (kapı logu yok, kırmızı kayboldu), 5 Kasım OOM (yığın sınırı aşıldı) | Hook ve izin ayarı (9.2) | **Kullanıcı onayladı (16 Kasım); uygulama bekliyor** |
+| 2 | İnsan denetimi fiilen yok; dalga kapıları ve DOC-19 tutarlılık denetimi yapılmamış | `WORK_QUEUE.md` "Kapılar" tablosunun kanıt sütunu boş; belgeler arası üç çelişki (kanıt dosyası, iki ya da üç yığın, push) | A: dalga kapısında insana tek sayfalık rapor (9.3) | **Kullanıcı A'yı seçti (16 Kasım); uygulama bekliyor** |
+| 3 | Bağlam yükü büyüdü (context rot) | Koordinatör kanalı 4.107 satır, BLOCKERS 181 kayıt, KARARLAR satırları çok uzun | Kanal arşivi, BLOCKERS'ı açık ve kapalı olarak bölmek, KARARLAR indeksi | öneri |
+| 4 | İnceleme döngüsünün durma kuralı yok | 08-tam-1a 7 tur, 09-1 6 tur; zamanlama sınıfı 4 tur | Üçüncü turda hâlâ MAJOR varsa ya da aynı sınıf iki kez çıktıysa tasarım notu (değişmez + sınır testleri) | öneri |
+| 5 | Sekreter depoda kayıtsız; push yetkisi yazılı değil | `MULTI_AGENT_PROTOCOL.md` "ajanlar push etmez" | Sekreter rolünü, kanalını ve push yetkisini handbook'a yazmak | öneri |
+| 6 | CI yok, kapılar tek makinede | EXECUTION_HANDBOOK 5.11 hiç çalışmadı; ENV-171 Docker arızaları | Headless Claude ya da CI ile kapı | öneri |
+| 7 | Mesajlar serbest metin, makine okuyamıyor | DURUM ve PR-HAZIR mesajları yalnız insan için | Mesaj başlığına yapılandırılmış alanlar | öneri |
+
+### 9.2 Hook ve izin ayarı tasarımı
+
+**İlke.** Her seferinde uyulması gereken kural modelin hatırlamasına bırakılmaz. Claude Code'un PreToolUse hook'u bir araç çağrısını çalışmadan önce görür; hook 2 koduyla çıkarsa çağrı engellenir ve hook'un stderr'e yazdığı mesaj modele gider. İzin ayarındaki `deny` listesi de dosya okumayı ve yazmayı doğrudan kapatır. Hook bir güvenlik ağıdır, sandbox değildir. `bash -c` ya da değişkenle kurulan bir komut kalıbı atlatabilir. Bu yüzden metin kuralları da yerinde kalır.
+
+**Kurallar.**
+
+| Kural | Bugünkü kaynak | Zorlama | Engellenen örnek | Mesaj |
+|---|---|---|---|---|
+| `.env` okunmaz, yazılmaz | SECURITY_AND_PERMISSIONS | `permissions.deny` + Bash hook (`.env` sonrası nokta yoksa) | `cat .env` (`.env.test` serbest) | `ENV: .env okunmaz` |
+| PayCore `data/**`, `eval/results/**` okunmaz | CLAUDE.md, PLAN 5 | `permissions.deny` | `Read paycoreLLM/data/...` | `PayCore veri sınırı` |
+| Push yalnız sekreter | 2.2, protokol | Bash hook + rol | işçinin `git push` komutu | `push yalnız sekreter` |
+| Dış bağlantılı derleme yok | PROSES-175 | Bash hook | `docker compose build` (`--pull=false` olmadan), `up --build` | `PROSES-175: --pull never / --pull=false` |
+| Yığın `--pull never` ile açılır | ENVIRONMENT_AND_COMMANDS | Bash hook | `docker compose up -d` | `yığın --no-build --pull never ile açılır` |
+| En fazla üç yığın | KARARLAR "Üç yığın sınırı" | Bash hook, `docker compose ls` sayımı | üç yığın açıkken dördüncü `up` | `üç yığın sınırı; YIGIN-AÇ sırası koordinatörde` |
+| Kapı çıktısı dosyaya | K-05a-0011 | Bash hook | `make test` / `test-int` / `lint` / `smoke`, `tee` olmadan | `kapı çıktısı tee ile state/evidence/ altına` |
+| Tek yazar | MULTI_AGENT_PROTOCOL | Edit/Write hook + rol | işçinin `WORK_QUEUE.md`'ye yazması | `tek yazar: <dosya> → <rol>` |
+| Worktree'deki `state/` kopyasına yazılmaz | MULTI_AGENT_PROTOCOL "Mutlak yol" | Edit/Write hook | `.worktrees/.../state/...` | `state/ yalnız mutlak yoldan` |
+
+**Rol bilgisi.** Hook, çağrıyı hangi rolün yaptığını bilmeli. İki kaynak tanımlanır:
+1. Oturum açılırken verilen `FFCORE_ROL` ortam değişkeni.
+2. Bu değişken yoksa, koordinatörün oturum açarken yazdığı `state/oturumlar.json` kaydı (`session_id` → rol).
+
+Rol bulunamazsa tek yazar dosyalarına yazma engellenir (fail-loud). Dosya → sahip eşlemesi şöyle:
+- `WORK_QUEUE.md`, `BLOCKERS.md`, `KARARLAR.md` → koordinatör
+- `state/kanal/<rol>.md` → o rol
+- `state/pr/<paket>.md` → paketin işçisi
+- `state/reviews/*` → inceleyici
+
+**Ayar taslağı** (`.claude/settings.json`; uygulamadan önce güncel Claude Code belgesine karşı doğrulanmalı, özellikle mutlak yol kalıbı):
+
+```json
+{
+  "permissions": {
+    "deny": [
+      "Read(**/.env)", "Edit(**/.env)", "Write(**/.env)",
+      "Read(//c/ai_paycore/paycoreLLM/data/**)",
+      "Read(//c/ai_paycore/paycoreLLM/eval/results/**)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      { "matcher": "Bash",
+        "hooks": [{ "type": "command", "command": "py -3.12 \"$CLAUDE_PROJECT_DIR/.claude/hooks/ffcore_guard.py\"" }] },
+      { "matcher": "Edit|Write|MultiEdit|NotebookEdit",
+        "hooks": [{ "type": "command", "command": "py -3.12 \"$CLAUDE_PROJECT_DIR/.claude/hooks/ffcore_guard.py\"" }] }
+    ]
+  }
+}
+```
+
+**Betik taslağı** (`.claude/hooks/ffcore_guard.py`; iskelet, kod değil):
+
+```python
+import json, os, re, sys
+
+d = json.load(sys.stdin)
+tool, inp = d.get("tool_name"), d.get("tool_input", {})
+role = os.environ.get("FFCORE_ROL") or role_from_registry(d.get("session_id"))
+mode = os.environ.get("FFCORE_GUARD_MODE", "block")   # açık tercih: warn | block
+
+def stop(msg):
+    print(msg, file=sys.stderr)
+    sys.exit(2 if mode == "block" else 0)
+
+if tool == "Bash":
+    cmd = inp.get("command", "")
+    if re.search(r"\.env(?![.\w])", cmd):                      stop("ENV: .env okunmaz")
+    if re.search(r"\bgit\s+push\b", cmd) and role != "sekreter": stop("push yalnız sekreter")
+    if re.search(r"compose\b.*\bbuild\b", cmd) and "--pull=false" not in cmd: stop("PROSES-175")
+    if re.search(r"compose\b.*\bup\b", cmd) and "--pull never" not in cmd:  stop("--pull never")
+    if re.search(r"compose\b.*\bup\b", cmd) and running_stacks() >= 3:      stop("üç yığın sınırı")
+    if re.search(r"\bmake\s+(lint|test|test-int|smoke)\b", cmd) and "tee" not in cmd: stop("kapı logu tee ile")
+elif tool in ("Edit", "Write", "MultiEdit", "NotebookEdit"):
+    path = inp.get("file_path") or inp.get("notebook_path", "")
+    owner = single_writer_owner(path)            # yukarıdaki eşleme; worktree içi state/ → "yasak"
+    if owner and owner != role:                  stop(f"tek yazar: {path} → {owner}")
+sys.exit(0)
+```
+
+**Uygulama adımları** (FFCore'un kendi süreciyle):
+1. **Karar kaydı:** koordinatör `KARARLAR.md`'ye kaydı yazar. Bu güvenlik davranışı olduğu için C sınıfı bir değişiklik; kullanıcı onayı 16 Kasım'da verildi.
+2. **Dal:** ayrı küçük bir dal açılır (ör. `fix/ajan-hooklari`). Her kural için önce kırmızı test yazılır: hook betiğine örnek JSON verilir, beklenen çıkış kodu doğrulanır. Ardından betik yazılır, sonra inceleyici turu yapılır.
+3. **Önce uyarı:** bir gün `FFCORE_GUARD_MODE=warn` ile çalışılır. Bu sürede hook yalnız mesaj yazar, engellemez; gerçek oturumlarda yanlış pozitif olup olmadığı görülür. Sonra `block` kipine geçilir.
+4. **Belgeler aynı PR'da:** `ENVIRONMENT_AND_COMMANDS.md`, `SECURITY_AND_PERMISSIONS.md` ve `MULTI_AGENT_PROTOCOL.md`'ye "bu kural hook ile zorlanır" satırı eklenir. Sekreterin push yetkisi de protokole yazılır (bulgu 5).
+5. **Oturum açılışı:** `BASLATMA.md` mesajlarına `FFCORE_ROL` adımı eklenir. Koordinatör yeni oturum açtığında `state/oturumlar.json`'a kaydı yazar.
+
+### 9.3 Dalga kapısında insan raporu (karar A)
+
+Her dalga kapanışında koordinatör tek sayfalık bir rapor hazırlar ve insana sunar. Raporun yeri `state/dalga/<dalga>-rapor.md`, yazarı koordinatördür. Tahmini insan zamanı dalga başına yaklaşık 15 dakika.
+
+**Rapor şablonu:**
+1. Dalga, kapsanan paketler, main SHA, kapı logları
+2. Bu dalgada koordinatörün aldığı kararlar: `KARARLAR.md` maddeleri, her biri tek cümle
+3. Tersine dönen kararlar
+4. Tutarlılık denetimi (DOC-19) bulguları: belgeler arası çelişkiler, DRIFT kayıtları
+5. İnsana kalan açık konular: DECISION ve ENV kayıtları
+6. Açık FOLLOWUP sayısı ve en riskli üçü
+7. Hook kayıtları: engellenen çağrıların sayısı ve türü (9.2 uygulandıktan sonra)
+
+**İnsan onayı.** İnsan raporu okur, onaylar ya da bir maddeyi geri çevirir. Koordinatör onayı `WORK_QUEUE.md` "Kapılar" tablosuna tarih ve rapor yoluyla yazar. Onay olmadan sonraki dalga READY olmaz; bu kural `EXECUTION_HANDBOOK.md` 8'de zaten var.
+
+---
+
+## 10. Sözlük ve dosya haritası
+
+### 10.1 Sözlük
 
 | Terim | Anlam |
 |---|---|
@@ -612,8 +743,11 @@ NER gecikme kabulü (boşta P95 < 300 ms) geliştirme dizüstünde ölçüldü. 
 | C1-C14 | Donmuş sözleşmeler (`CONTRACTS.md`) |
 | llmaas / airgap | Dağıtım profilleri; fark yapılandırma değeridir, `if profile` değil |
 | fail-loud | Beklenmeyen durumda açık hata; sessiz fallback yok (ARCH-06) |
+| hook | Claude Code'un araç çağrısından önce ya da sonra çalıştırdığı komut; PreToolUse hook'u 2 koduyla çıkarsa çağrıyı engeller (9.2) |
+| sekreter | İletişimi, zili, `state/` commit'ini ve push'u yürüten ucuz modelli ajan; karar vermez (2.2) |
+| dalga raporu | Dalga kapısında koordinatörün insana sunduğu tek sayfalık rapor (9.3) |
 
-### 9.2 Dosya haritası
+### 10.2 Dosya haritası
 
 ```
 FELSEFE.md                  geliştirme felsefesi (her kuralın üstünde)
