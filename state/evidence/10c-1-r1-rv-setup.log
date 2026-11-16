@@ -1,0 +1,31 @@
+agent-worker Up 42 seconds
+agent-worker-bg Up 41 seconds
+backend Up 54 seconds (healthy)
+fake-llm Up About a minute
+frontend Up 41 seconds
+langfuse-clickhouse Up About a minute (healthy)
+langfuse-minio Up About a minute (healthy)
+langfuse-postgres Up About a minute (healthy)
+langfuse-redis Up About a minute (healthy)
+langfuse-web Up About a minute (healthy)
+langfuse-worker Up About a minute
+litellm Up About a minute (healthy)
+mcp-search Up 41 seconds (healthy)
+mcp-sql Up 42 seconds (healthy)
+postgres Up About a minute (healthy)
+redis Up About a minute (healthy)
+ticket-desk Up About a minute (healthy)
+worker Up 42 seconds
+cd backend && python -m ffcore.cli seed-prompts --path prompts
+2026-11-16 07:53:40,748 WARNING langfuse Prompt 'eval_judge_rubric_v2-label:production' not found during refresh, evicting from cache.
+2026-11-16 07:53:41,079 WARNING langfuse Prompt 'platform_rules-label:production' not found during refresh, evicting from cache.
+prompts created: ['eval_judge_rubric_v2', 'platform_rules']
+prompts already present: -
+EXIT_SEED=0
+superadmin created: 60584b27-ce2b-46d1-b1da-5c624f19a05b
+EXIT_SA=0
+review10c1_e2e_node_modules
+529
+EXIT_CP=0
+py files img=172 wt=172 diff=344
+py_diff_lines=0

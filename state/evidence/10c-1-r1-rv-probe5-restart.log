@@ -1,0 +1,22 @@
+marker seen 11:24:03; restarting backend
+review10c1-backend-1
+killed 11:24:11
+ Container review10c1-postgres-1  Waiting
+ Container review10c1-postgres-1  Waiting
+ Container review10c1-postgres-1  Healthy
+ Container review10c1-migrate-1  Starting
+ Container review10c1-postgres-1  Healthy
+ Container review10c1-migrate-1  Started
+ Container review10c1-postgres-1  Waiting
+ Container review10c1-redis-1  Waiting
+ Container review10c1-litellm-1  Waiting
+ Container review10c1-migrate-1  Waiting
+ Container review10c1-redis-1  Healthy
+ Container review10c1-postgres-1  Healthy
+ Container review10c1-litellm-1  Healthy
+ Container review10c1-migrate-1  Exited
+ Container review10c1-backend-1  Starting
+ Container review10c1-backend-1  Started
+restart returned 11:24:59 exit=0
+backend healthy 11:25:10
+probe run finished 11:28:54

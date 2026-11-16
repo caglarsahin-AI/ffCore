@@ -1,0 +1,117 @@
+time="2026-11-16T11:02:23+03:00" level=warning msg="volume \"review10c1_e2e_node_modules\" already exists but was not created by Docker Compose. Use `external: true` to use an existing volume"
+ Container review10c1-postgres-1  Running
+ Container review10c1-redis-1  Running
+ Container review10c1-litellm-1  Running
+ Container review10c1-migrate-1  Created
+ Container review10c1-backend-1  Running
+ Container review10c1-postgres-1  Waiting
+ Container review10c1-postgres-1  Waiting
+ Container review10c1-postgres-1  Healthy
+ Container review10c1-migrate-1  Starting
+ Container review10c1-postgres-1  Healthy
+ Container review10c1-migrate-1  Started
+ Container review10c1-migrate-1  Waiting
+ Container review10c1-postgres-1  Waiting
+ Container review10c1-redis-1  Waiting
+ Container review10c1-litellm-1  Waiting
+ Container review10c1-redis-1  Healthy
+ Container review10c1-litellm-1  Healthy
+ Container review10c1-postgres-1  Healthy
+ Container review10c1-migrate-1  Exited
+
+Running 11 tests using 1 worker
+
+[1/11] [chromium] › tests/e2e/zz_review10c1_probe.spec.ts:42:5 › P1 fail-loud summary: broken shape shows unreadable + field path; extra field still reads
+[chromium] › tests/e2e/zz_review10c1_probe.spec.ts:42:5 › P1 fail-loud summary: broken shape shows unreadable + field path; extra field still reads
+[PROBE] pass_rate string -> The exam summary could not be read. The console does not guess its values. |  | pass_rate: Invalid input: expected number, received string
+
+[PROBE] missing not_run -> The exam summary could not be read. The console does not guess its values. |  | not_run: Invalid input: expected record, received undefined
+
+[PROBE] empty object -> The exam summary could not be read. The console does not guess its values. |  | n: Invalid input: expected number, received undefined; scored: Invalid input: expected number, received undefined; not_run: Invalid input: expected record, received undefined; passed_items: Invalid input: expected number, received undefined; pass_rate: Invalid input: expected number, received undefined; pass_threshold: Invalid input: expected number, received undefined; passed: Invalid input: expected boolean, received undefined; complete: Invalid input: expected boolean, received undefined; scores: Invalid input: expected record, received undefined; outcomes: Invalid input: expected record, received undefined; styles: Invalid input: expected record, received undefined; worst: Invalid input: expected array, received undefined; errors: Invalid input: expected record, received undefined; warm_cache: Invalid input: expected boolean, received undefined; warmup_ms: Invalid input: expected number, received undefined; latency_ms: Invalid input: expected object, received undefined
+
+[PROBE] worst item style null -> The exam summary could not be read. The console does not guess its values. |  | worst.0.style: Invalid input: expected string, received null
+
+[PROBE] extra unknown field -> readable
+
+[2/11] [chromium] › tests/e2e/zz_review10c1_probe.spec.ts:73:5 › P2 SSE unknown event + drop: unknown ignored, progress shown, lost after reopens, then GET polling
+[chromium] › tests/e2e/zz_review10c1_probe.spec.ts:73:5 › P2 SSE unknown event + drop: unknown ignored, progress shown, lost after reopens, then GET polling
+[PROBE] streams opened=6 lost after 11152 ms; GETs at lost=1, 7 s later=3; warnings=["eval stream: unknown event \"heartbeat\" ignored","eval stream: unknown event \"heartbeat\" ignored","eval stream: unknown event \"heartbeat\" ignored","eval stream: unknown event \"heartbeat\" ignored","eval stream: unknown event \"heartbeat\" ignored","eval stream: unknown event \"heartbeat\" ignored"]
+
+[3/11] [chromium] › tests/e2e/zz_review10c1_probe.spec.ts:105:5 › P2b SSE non-200 (stream 500): lost, not a guessed end
+[chromium] › tests/e2e/zz_review10c1_probe.spec.ts:105:5 › P2b SSE non-200 (stream 500): lost, not a guessed end
+[PROBE] stream 500 -> lost, status Running, no summary
+
+[4/11] [chromium] › tests/e2e/zz_review10c1_probe.spec.ts:121:5 › P3 live: backend restarted during an exam (host restarts it on the marker)
+[chromium] › tests/e2e/zz_review10c1_probe.spec.ts:121:5 › P3 live: backend restarted during an exam (host restarts it on the marker)
+[PROBE] marker written; exam 24da3176-4520-40be-b0d8-99672a4a2ba5
+
+[PROBE] sequence: ["streaming 0 / 1 scored Queued @0s","done 1 / 1 scored Completed @12s"]
+
+[PROBE] backend final: completed {"scored":1,"n":1}
+
+[5/11] [chromium] › tests/e2e/zz_review10c1_probe.spec.ts:157:5 › P4 roles: developer sees and edits; user role gets 'no access'; analyst-read sees all disabled
+  1) [chromium] › tests/e2e/zz_review10c1_probe.spec.ts:157:5 › P4 roles: developer sees and edits; user role gets 'no access'; analyst-read sees all disabled 
+
+    Error: POST /projects/64f3e9d0-2efe-44c5-b178-123b8b75eb90/members → 422 {"error":{"message":"Role 'developer' cannot be assigned in this release.","type":"invalid_request_error","code":"role_reserved"}}
+
+       at api.ts:41
+
+      39 |     body: body === undefined ? undefined : JSON.stringify(body),
+      40 |   });
+    > 41 |   if (!response.ok) throw new Error(`${method} ${path} → ${response.status} ${await response.text()}`);
+         |                           ^
+      42 |   return (response.status === 204 ? undefined : await response.json()) as T;
+      43 | }
+      44 |
+        at apiCall (/work/frontend/tests/e2e/api.ts:41:27)
+        at member (/work/frontend/tests/e2e/zz_review10c1_probe.spec.ts:32:3)
+        at /work/frontend/tests/e2e/zz_review10c1_probe.spec.ts:160:15
+
+    Error Context: test-results/zz_review10c1_probe-P4-rol-d0165-lyst-read-sees-all-disabled-chromium/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/zz_review10c1_probe-P4-rol-d0165-lyst-read-sees-all-disabled-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/zz_review10c1_probe-P4-rol-d0165-lyst-read-sees-all-disabled-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[6/11] [chromium] › tests/e2e/zz_review10c1_probe.spec.ts:199:5 › P5 API authority: read/user/analyst refusals are 403 with codes; force rules
+  2) [chromium] › tests/e2e/zz_review10c1_probe.spec.ts:199:5 › P5 API authority: read/user/analyst refusals are 403 with codes; force rules 
+
+    TypeError: fetch failed
+    [cause]: Error: connect ECONNREFUSED 172.31.0.10:8000
+
+    Error Context: test-results/zz_review10c1_probe-P5-API-bfe88--403-with-codes-force-rules-chromium/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/zz_review10c1_probe-P5-API-bfe88--403-with-codes-force-rules-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/zz_review10c1_probe-P5-API-bfe88--403-with-codes-force-rules-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[7/11] [chromium] › tests/e2e/zz_review10c1_probe.spec.ts:225:5 › P6 XSS: markup in suite name and gate message rendered as text
+[8/11] [chromium] › tests/e2e/zz_review10c1_probe.spec.ts:240:5 › P7 keyboard only: create a suite with Tab/Space/Enter
+[9/11] [chromium] › tests/e2e/zz_review10c1_probe.spec.ts:266:7 › P8 axe on gate refusal panel and not-run exam: light
+[10/11] [chromium] › tests/e2e/zz_review10c1_probe.spec.ts:266:7 › P8 axe on gate refusal panel and not-run exam: dark
+[11/11] [chromium] › tests/e2e/zz_review10c1_probe.spec.ts:285:5 › P9 from-run coded errors and masking (mocked responses)
+  2 failed
+    [chromium] › tests/e2e/zz_review10c1_probe.spec.ts:157:5 › P4 roles: developer sees and edits; user role gets 'no access'; analyst-read sees all disabled 
+    [chromium] › tests/e2e/zz_review10c1_probe.spec.ts:199:5 › P5 API authority: read/user/analyst refusals are 403 with codes; force rules 
+  5 did not run
+  4 passed (3.4m)
+npm notice
+npm notice New major version of npm available! 11.19.1 -> 12.2.2
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.2
+npm notice To update run: npm install -g npm@12.2.2
+npm notice
+EXIT_PROBE=1
+
+real	3m52.523s
+user	0m0.030s
+sys	0m0.106s

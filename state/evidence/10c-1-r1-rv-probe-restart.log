@@ -1,0 +1,6 @@
+marker seen 11:05:49; restarting backend
+ Container review10c1-backend-1  Restarting
+ Container review10c1-backend-1  Started
+restart returned 11:06:05 exit=0
+backend healthy 11:06:18
+probe run finished 11:06:19

@@ -1,0 +1,122 @@
+time="2026-11-16T11:21:32+03:00" level=warning msg="volume \"review10c1_e2e_node_modules\" already exists but was not created by Docker Compose. Use `external: true` to use an existing volume"
+ Container review10c1-postgres-1  Running
+ Container review10c1-redis-1  Running
+ Container review10c1-migrate-1  Created
+ Container review10c1-litellm-1  Running
+ Container review10c1-backend-1  Running
+ Container review10c1-postgres-1  Waiting
+ Container review10c1-postgres-1  Waiting
+ Container review10c1-postgres-1  Healthy
+ Container review10c1-postgres-1  Healthy
+ Container review10c1-migrate-1  Starting
+ Container review10c1-migrate-1  Started
+ Container review10c1-migrate-1  Waiting
+ Container review10c1-postgres-1  Waiting
+ Container review10c1-redis-1  Waiting
+ Container review10c1-litellm-1  Waiting
+ Container review10c1-redis-1  Healthy
+ Container review10c1-litellm-1  Healthy
+ Container review10c1-postgres-1  Healthy
+ Container review10c1-migrate-1  Exited
+
+Running 1 test using 1 worker
+
+[1/1] [chromium] › tests/e2e/zz_review10c1_probe.spec.ts:121:5 › P3 live: backend killed during a waiting exam (host kills and starts it on the marker)
+[chromium] › tests/e2e/zz_review10c1_probe.spec.ts:121:5 › P3 live: backend killed during a waiting exam (host kills and starts it on the marker)
+[PROBE] marker written; exam 3b4e48d3-8574-4380-88b6-014767ae099b
+
+[WebServer] Failed to proxy http://backend:8000/api/v1/projects/77fa7a02-7763-4ddb-8722-dcc601d63f71/approvals/count?status=pending [Error: getaddrinfo EAI_AGAIN backend] {
+[WebServer]   errno: -3001,
+[WebServer]   code: 'EAI_AGAIN',
+[WebServer]   syscall: 'getaddrinfo',
+[WebServer]   hostname: 'backend'
+[WebServer] }
+
+
+[WebServer] [Error: getaddrinfo EAI_AGAIN backend] {
+[WebServer]   errno: -3001,
+[WebServer]   code: 'EAI_AGAIN',
+[WebServer]   syscall: 'getaddrinfo',
+[WebServer]   hostname: 'backend'
+[WebServer] }
+
+[WebServer] Failed to proxy http://backend:8000/api/v1/projects/77fa7a02-7763-4ddb-8722-dcc601d63f71/approvals/count?status=pending [Error: getaddrinfo EAI_AGAIN backend] {
+[WebServer]   errno: -3001,
+[WebServer]   code: 'EAI_AGAIN',
+[WebServer]   syscall: 'getaddrinfo',
+[WebServer]   hostname: 'backend'
+[WebServer] }
+[WebServer] [Error: getaddrinfo EAI_AGAIN backend] {
+[WebServer]   errno: -3001,
+[WebServer]   code: 'EAI_AGAIN',
+[WebServer]   syscall: 'getaddrinfo',
+[WebServer]   hostname: 'backend'
+[WebServer] }
+
+
+[WebServer] Failed to proxy http://backend:8000/api/v1/projects/77fa7a02-7763-4ddb-8722-dcc601d63f71/approvals/count?status=pending [Error: getaddrinfo EAI_AGAIN backend] {
+[WebServer]   errno: -3001,
+[WebServer]   code: 'EAI_AGAIN',
+[WebServer]   syscall: 'getaddrinfo',
+[WebServer]   hostname: 'backend'
+[WebServer] }
+[WebServer] [Error: getaddrinfo EAI_AGAIN backend] {
+[WebServer]   errno: -3001,
+[WebServer]   code: 'EAI_AGAIN',
+[WebServer]   syscall: 'getaddrinfo',
+[WebServer]   hostname: 'backend'
+[WebServer] }
+
+[PROBE] sequence before cancel: ["streaming | 0 / 1 scored | Queued | alerts=1 @0s"]
+
+[PROBE] sequence after cancel: ["streaming | 0 / 1 scored | Queued | alerts=1 @0s","streaming | 0 / 1 scored | Running | alerts=1 @190s"]
+
+  1) [chromium] › tests/e2e/zz_review10c1_probe.spec.ts:121:5 › P3 live: backend killed during a waiting exam (host kills and starts it on the marker) 
+
+    Error: expect(locator).toHaveText(expected) failed
+
+    Locator:  getByTestId('eval-status')
+    Expected: "Cancelled"
+    Received: "Running"
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveText" getByTestId('eval-status') with timeout 5000ms
+      - waiting for getByTestId('eval-status')
+        14 × locator resolved to <span data-slot="badge" data-variant="secondary" data-testid="eval-status" class="group/badge inline-flex h-5 w-fit shrink-0 items-center justify-center gap-1 overflow-hidden rounded-4xl border border-transparent px-2 py-0.5 text-xs font-medium whitespace-nowrap transition-all focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-inv…>Running</span>
+           - unexpected value "Running"
+
+
+      170 |   }
+      171 |   log("sequence after cancel:", JSON.stringify(seen.slice(-6)));
+    > 172 |   await expect(page.getByTestId("eval-status")).toHaveText("Cancelled");
+          |                                                 ^
+      173 | });
+      174 |
+      175 | test("P4 roles: developer sees and edits; user role gets 'no access'; analyst-read sees all disabled", async ({ page, context, baseURL }) => {
+        at /work/frontend/tests/e2e/zz_review10c1_probe.spec.ts:172:49
+
+    Error Context: test-results/zz_review10c1_probe-P3-liv-c3dc8-nd-starts-it-on-the-marker--chromium/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/zz_review10c1_probe-P3-liv-c3dc8-nd-starts-it-on-the-marker--chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/zz_review10c1_probe-P3-liv-c3dc8-nd-starts-it-on-the-marker--chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+  1 failed
+    [chromium] › tests/e2e/zz_review10c1_probe.spec.ts:121:5 › P3 live: backend killed during a waiting exam (host kills and starts it on the marker) 
+npm notice
+npm notice New major version of npm available! 11.19.1 -> 12.2.2
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.2
+npm notice To update run: npm install -g npm@12.2.2
+npm notice
+EXIT_PROBE=1
+
+real	7m29.800s
+user	0m0.030s
+sys	0m0.107s
+cancelled|2026-11-16 08:24:01.075422+00|2026-11-16 08:27:15.285488+00|2026-11-16 08:27:10.814068+00|

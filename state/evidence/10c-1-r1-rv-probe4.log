@@ -1,0 +1,128 @@
+time="2026-11-16T11:18:08+03:00" level=warning msg="volume \"review10c1_e2e_node_modules\" already exists but was not created by Docker Compose. Use `external: true` to use an existing volume"
+ Container review10c1-redis-1  Running
+ Container review10c1-postgres-1  Running
+ Container review10c1-litellm-1  Running
+ Container review10c1-migrate-1  Created
+ Container review10c1-backend-1  Running
+ Container review10c1-postgres-1  Waiting
+ Container review10c1-postgres-1  Waiting
+ Container review10c1-postgres-1  Healthy
+ Container review10c1-postgres-1  Healthy
+ Container review10c1-migrate-1  Starting
+ Container review10c1-migrate-1  Started
+ Container review10c1-litellm-1  Waiting
+ Container review10c1-migrate-1  Waiting
+ Container review10c1-postgres-1  Waiting
+ Container review10c1-redis-1  Waiting
+ Container review10c1-postgres-1  Healthy
+ Container review10c1-litellm-1  Healthy
+ Container review10c1-redis-1  Healthy
+ Container review10c1-migrate-1  Exited
+
+Running 7 tests using 1 worker
+
+[1/7] [chromium] › tests/e2e/zz_review10c1_probe.spec.ts:175:5 › P4 roles: developer sees and edits; user role gets 'no access'; analyst-read sees all disabled
+[chromium] › tests/e2e/zz_review10c1_probe.spec.ts:175:5 › P4 roles: developer sees and edits; user role gets 'no access'; analyst-read sees all disabled
+[PROBE] user role /evaluations: navHasEval=0 main="No project yet |  | Your account is not a member of any project. Ask an administrator to add you. |  | Sign out"
+
+[PROBE] user role /evaluations/68356ed7-724e-413e-a773-5daead22a99f: navHasEval=0 main="No project yet |  | Your account is not a member of any project. Ask an administrator to add you. |  | Sign out"
+
+[PROBE] user role /evaluations/runs/fca820ae-9b9a-4f7f-ad5e-bd586bb5a8f0: navHasEval=0 main="No project yet |  | Your account is not a member of any project. Ask an administrator to add you. |  | Sign out"
+
+[PROBE] user role /evaluations/compare?a=fca820ae-9b9a-4f7f-ad5e-bd586bb5a8f0&b=fca820ae-9b9a-4f7f-ad5e-bd586bb5a8f0: navHasEval=0 main="No project yet |  | Your account is not a member of any project. Ask an administrator to add you. |  | Sign out"
+
+[PROBE] analyst-read: suite-save/delete/start-exam/primary/from-run-save disabled + badge
+
+[2/7] [chromium] › tests/e2e/zz_review10c1_probe.spec.ts:207:5 › P5 API authority: read/user/analyst refusals are 403 with codes; force rules
+[chromium] › tests/e2e/zz_review10c1_probe.spec.ts:207:5 › P5 API authority: read/user/analyst refusals are 403 with codes; force rules
+[PROBE] {
+ "reader_create_suite": {
+  "status": 403,
+  "code": "read_only_access",
+  "text": "{\"error\":{\"message\":\"Your access mode is read-only.\",\"type\":\"permission_error\",\"code\":\"read_only_access\"}}"
+ },
+ "anaRead_start": {
+  "status": 403,
+  "code": "read_only_access",
+  "text": "{\"error\":{\"message\":\"Your access mode is read-only.\",\"type\":\"permission_error\",\"code\":\"read_only_access\"}}"
+ },
+ "anaRead_fromrun": {
+  "status": 403,
+  "code": "read_only_access",
+  "text": "{\"error\":{\"message\":\"Your access mode is read-only.\",\"type\":\"permission_error\",\"code\":\"read_only_access\"}}"
+ },
+ "anaRead_get": {
+  "status": 200,
+  "text": "{\"id\":\"fca820ae-9b9a-4f7f-ad5e-bd586bb5a8f0\",\"project_id\":\"2bd7a571-4f93-4966-92a3-d8512737d2bc\",\"suite_id\":\"68356ed7-724e-413e-a773-5daead22a99f\",\"agent_version_id\":\"d0c420a0-f0a9-48b9-9b3c-00d0e739b3f7\",\"langfuse_run_name\":\"e2e-probe-mwiztrii-9x5j-v1-4ccca30e\",\"status\":\"completed\",\"error_code\":nul"
+ },
+ "user_list": {
+  "status": 404,
+  "code": "project_not_found",
+  "text": "{\"error\":{\"message\":\"Project not found.\",\"type\":\"not_found_error\",\"code\":\"project_not_found\"}}"
+ },
+ "user_stream": {
+  "status": 404,
+  "code": "project_not_found",
+  "text": "{\"error\":{\"message\":\"Project not found.\",\"type\":\"not_found_error\",\"code\":\"project_not_found\"}}"
+ },
+ "analyst_publish": {
+  "status": 409,
+  "code": "eval_gate_failed",
+  "text": "{\"error\":{\"message\":\"The exam gate refuses version 1: e2e-probe-gate-mwiztrii-a1cv=no_exam.\",\"type\":\"conflict_error\",\"code\":\"eval_gate_failed\"}}"
+ },
+ "analyst_force": {
+  "status": 403,
+  "code": "force_requires_admin",
+  "text": "{\"error\":{\"message\":\"Only an admin forces the gate.\",\"type\":\"permission_error\",\"code\":\"force_requires_admin\"}}"
+ },
+ "admin_force_blank": {
+  "status": 422,
+  "code": "force_reason_required",
+  "text": "{\"error\":{\"message\":\"Forcing the exam gate needs a force_reason.\",\"type\":\"invalid_request_error\",\"code\":\"force_reason_required\"}}"
+ },
+ "admin_reason_only": {
+  "status": 422,
+  "code": "force_reason_without_force",
+  "text": "{\"error\":{\"message\":\"force_reason needs force.\",\"type\":\"invalid_request_error\",\"code\":\"force_reason_without_force\"}}"
+ }
+}
+
+[3/7] [chromium] › tests/e2e/zz_review10c1_probe.spec.ts:233:5 › P6 XSS: markup in suite name and gate message rendered as text
+[chromium] › tests/e2e/zz_review10c1_probe.spec.ts:233:5 › P6 XSS: markup in suite name and gate message rendered as text
+[PROBE] suite name with markup shown as text, no execution
+
+[4/7] [chromium] › tests/e2e/zz_review10c1_probe.spec.ts:248:5 › P7 keyboard only: create a suite with Tab/Space/Enter
+[chromium] › tests/e2e/zz_review10c1_probe.spec.ts:248:5 › P7 keyboard only: create a suite with Tab/Space/Enter
+[PROBE] keyboard-only suite created e2e-kb-mwiztrii-sfsq
+
+[5/7] [chromium] › tests/e2e/zz_review10c1_probe.spec.ts:274:7 › P8 axe on gate refusal panel and not-run exam: light
+[chromium] › tests/e2e/zz_review10c1_probe.spec.ts:274:7 › P8 axe on gate refusal panel and not-run exam: light
+[PROBE] gate panel light violations: []
+
+[6/7] [chromium] › tests/e2e/zz_review10c1_probe.spec.ts:274:7 › P8 axe on gate refusal panel and not-run exam: dark
+[chromium] › tests/e2e/zz_review10c1_probe.spec.ts:274:7 › P8 axe on gate refusal panel and not-run exam: dark
+[PROBE] gate panel dark violations: []
+
+[7/7] [chromium] › tests/e2e/zz_review10c1_probe.spec.ts:293:5 › P9 from-run coded errors and masking (mocked responses)
+[chromium] › tests/e2e/zz_review10c1_probe.spec.ts:293:5 › P9 from-run coded errors and masking (mocked responses)
+[PROBE] from-run 422: The agent's guardrail policy blocks this question, so it cannot be saved as an exam item. |  | Details
+
+[PROBE] from-run 422: An expected value would be masked by the guardrail policy and could never match. Change the expected values. |  | Details
+
+[PROBE] from-run 503: The name recognition service the guardrail policy needs is not reachable. Try again later. |  | Details
+
+[PROBE] from-run 201: regex: identifiers were masked; person names are stored as written. |  | Masked fields: input, expected.answer
+
+[PROBE] from-run 201: regex: identifiers were masked; person names are stored as written. |  | No field was changed by masking.
+
+  7 passed (2.4m)
+npm notice
+npm notice New major version of npm available! 11.19.1 -> 12.2.2
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.2
+npm notice To update run: npm install -g npm@12.2.2
+npm notice
+EXIT_PROBE=0
+
+real	2m56.776s
+user	0m0.015s
+sys	0m0.107s

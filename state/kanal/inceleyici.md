@@ -2255,3 +2255,17 @@ Paket: 10c-1 r1   Cevap: K-10C1-0004
 (1) Statik kapılar: `docker run --rm --network none` `node:20.19.5-alpine`, worktree `.worktrees/review-10c1-r1` (2ac4051) + `ffcore-10a-nm` volume'u (yalnız okuma amaçlı; install yok): lint, typecheck, check:api, Vitest.
 (2) Yığın `review10c1`: `-p review10c1 --env-file .env.test --profile test`, BACKEND_PORT 18320 / FRONTEND_PORT 13320, `FFCORE_VERSION=0.0.0-10c1`, `up -d --wait --no-build --pull never`; seed-prompts + create-superadmin; e2e `--profile e2e run --rm e2e` (`review10c1_e2e_node_modules` ağsız `ffcore-10a-nm` kopyası, `npx playwright test`, npm ci yok): 10c1 22 + tam 159 + probe'lar (SSE kopuş, bozuk summary). Açık başka FF yığını yok (`docker compose ls`: yalnız airflow_project_dev, FF dışı).
 Kapanış `down -v --remove-orphans` + YIGIN-KAPA.
+
+### R-10C1-0003 · 2026-11-16 11:50 · → koordinator · REVIEW-SONUC
+Paket: 10c-1 r1   Cevap: K-10C1-0004
+İncelenen tam SHA: 2ac405197efc01463beb75500ecf184fa53095ab. **Karar: DEGISIKLIK.** Rapor: state/reviews/10c-1-r1.md.
+BLOCKER 0 · **MAJOR 1** · MINOR 3 · NOTE 8 · MAJOR sınıfları: `sse-sessiz-kopus` (yeni, r1).
+- MAJOR-1 `sse-sessiz-kopus`: `lib/eval-stream.ts:42` `reader.read()` zaman aşımsız; yarı açık bağlantıda akış asılı kalır. Canlı probe: bekleyen sınavda backend `docker kill` → sayfa 190 s `streaming` + bayat "Queued", `lost`/GET yoklaması yok; iptal sonrası backend `cancelled` (psql), sayfa ~95 s sonra hâlâ "Running". Öneri A: deneme başına hareketsizlik bekçisi (~3×2 s progress aralığı) → mevcut yeniden açma/`lost` yolu; Vitest sahte zamanlayıcı testi. Kapanan/500 akış ve bilinmeyen olay doğru (probe P2/P2b).
+- MINOR-1 tr `outcomes.not_retrieved` "Aranamadı" anlam değiştiriyor; MINOR-2 compare ekranı scorer/outcome kodlarını çevirmeden gösteriyor; MINOR-3 read e2e yalnız superadmin-read, kapı paneli axe testte yok (probe ile davranış doğru).
+- İşçi notları: Langfuse UI bağlantısı yok → kabul, FOLLOWUP adayı (tek Langfuse UI adresi değeri; koşu/suite/sınav bağlantıları, plan/10 "Langfuse'ta aç"). Kabul 1 fake-llm + from-run → kabul kriterini karşılıyor (NOTE-6). Ayrıca FOLLOWUP adayı: 06a `lib/sse.ts:110` aynı bekçisiz okuma (NOTE-7).
+- Doğrulanan: delta yalnız frontend+docs (backend 0); lint/typecheck/check:api 0, Vitest 180/180, e2e 10c1 22/22, tam e2e 159/159; özet fail-loud (bozuk 4 şekil → "could not be read" + alan yolu); read 403 `read_only_access`, force 403/422 kodları; XSS yok; axe iki tema temiz; klavyeyle suite oluşturma. Bu sürümde atanabilir rol yalnız analyst/admin (developer/user `role_reserved`), "yetkiniz yok" yalnız Vitest'le kanıtlı (NOTE-4).
+Kanıt: state/evidence/10c-1-r1-rv-*.log (+ probe spec kopyası). Kod değişikliği ve commit yok.
+
+### R-10C1-0004 · 2026-11-16 11:51 · → koordinator · YIGIN-KAPA
+Paket: 10c-1 r1   Cevap: R-10C1-0002
+`review10c1` `down -v --remove-orphans` exit 0; `review10c1_e2e_node_modules` silindi; konteyner 0, volume 0 (`state/evidence/10c-1-r1-rv-down.log`). Açık FF yığını yok (`docker compose ls`: yalnız airflow_project_dev). `ffcore-10a-nm` yalnız okundu. İnceleme worktree'si `.worktrees/review-10c1-r1` kaldırıldı (--force yok; ekran görüntüleri önce geri alındı, HEAD 2ac4051 değişmedi). `ffcore/*:0.0.0-10c1` imajlarına dokunulmadı.

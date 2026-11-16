@@ -1,0 +1,82 @@
+time="2026-11-16T11:07:35+03:00" level=warning msg="volume \"review10c1_e2e_node_modules\" already exists but was not created by Docker Compose. Use `external: true` to use an existing volume"
+ Container review10c1-postgres-1  Running
+ Container review10c1-redis-1  Running
+ Container review10c1-litellm-1  Running
+ Container review10c1-migrate-1  Created
+ Container review10c1-backend-1  Running
+ Container review10c1-postgres-1  Waiting
+ Container review10c1-postgres-1  Waiting
+ Container review10c1-postgres-1  Healthy
+ Container review10c1-postgres-1  Healthy
+ Container review10c1-migrate-1  Starting
+ Container review10c1-migrate-1  Started
+ Container review10c1-postgres-1  Waiting
+ Container review10c1-redis-1  Waiting
+ Container review10c1-litellm-1  Waiting
+ Container review10c1-migrate-1  Waiting
+ Container review10c1-postgres-1  Healthy
+ Container review10c1-litellm-1  Healthy
+ Container review10c1-redis-1  Healthy
+ Container review10c1-migrate-1  Exited
+
+Running 8 tests using 1 worker
+
+[1/8] [chromium] › tests/e2e/zz_review10c1_probe.spec.ts:121:5 › P3 live: backend restarted during an exam (host restarts it on the marker)
+[chromium] › tests/e2e/zz_review10c1_probe.spec.ts:121:5 › P3 live: backend restarted during an exam (host restarts it on the marker)
+[PROBE] marker written; exam 09e787df-b737-4c14-a37b-b51d374ba770
+
+[PROBE] sequence: ["streaming 0 / 1 scored Queued @0s","done 1 / 1 scored Completed @10s"]
+
+  1) [chromium] › tests/e2e/zz_review10c1_probe.spec.ts:121:5 › P3 live: backend restarted during an exam (host restarts it on the marker) 
+
+    TypeError: fetch failed
+    [cause]: Error: getaddrinfo EAI_AGAIN backend
+
+    Error Context: test-results/zz_review10c1_probe-P3-liv-fc0a9--restarts-it-on-the-marker--chromium/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/zz_review10c1_probe-P3-liv-fc0a9--restarts-it-on-the-marker--chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/zz_review10c1_probe-P3-liv-fc0a9--restarts-it-on-the-marker--chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[2/8] [chromium] › tests/e2e/zz_review10c1_probe.spec.ts:158:5 › P4 roles: developer sees and edits; user role gets 'no access'; analyst-read sees all disabled
+  2) [chromium] › tests/e2e/zz_review10c1_probe.spec.ts:158:5 › P4 roles: developer sees and edits; user role gets 'no access'; analyst-read sees all disabled 
+
+    TypeError: fetch failed
+    [cause]: Error: getaddrinfo EAI_AGAIN backend
+
+    Error Context: test-results/zz_review10c1_probe-P4-rol-d0165-lyst-read-sees-all-disabled-chromium/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/zz_review10c1_probe-P4-rol-d0165-lyst-read-sees-all-disabled-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/zz_review10c1_probe-P4-rol-d0165-lyst-read-sees-all-disabled-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[3/8] [chromium] › tests/e2e/zz_review10c1_probe.spec.ts:190:5 › P5 API authority: read/user/analyst refusals are 403 with codes; force rules
+[4/8] [chromium] › tests/e2e/zz_review10c1_probe.spec.ts:216:5 › P6 XSS: markup in suite name and gate message rendered as text
+[5/8] [chromium] › tests/e2e/zz_review10c1_probe.spec.ts:231:5 › P7 keyboard only: create a suite with Tab/Space/Enter
+[6/8] [chromium] › tests/e2e/zz_review10c1_probe.spec.ts:257:7 › P8 axe on gate refusal panel and not-run exam: light
+[7/8] [chromium] › tests/e2e/zz_review10c1_probe.spec.ts:257:7 › P8 axe on gate refusal panel and not-run exam: dark
+[8/8] [chromium] › tests/e2e/zz_review10c1_probe.spec.ts:276:5 › P9 from-run coded errors and masking (mocked responses)
+  2 failed
+    [chromium] › tests/e2e/zz_review10c1_probe.spec.ts:121:5 › P3 live: backend restarted during an exam (host restarts it on the marker) 
+    [chromium] › tests/e2e/zz_review10c1_probe.spec.ts:158:5 › P4 roles: developer sees and edits; user role gets 'no access'; analyst-read sees all disabled 
+  6 did not run
+npm notice
+npm notice New major version of npm available! 11.19.1 -> 12.2.2
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.2
+npm notice To update run: npm install -g npm@12.2.2
+npm notice
+EXIT_PROBE=1
+
+real	3m40.063s
+user	0m0.138s
+sys	0m0.169s

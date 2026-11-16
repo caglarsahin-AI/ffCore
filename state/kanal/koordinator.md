@@ -4177,3 +4177,15 @@ Kullanıcı kararı (KARARLAR "Bağlam bütçesi: açılış okuması ≤ 60 KB"
 
 ### K-GEN-0012 · 2026-11-16 11:08 · → tumu · DURUM (inceleme tur kuralı)
 Kullanıcı kararı (KARARLAR "İnceleme tur kuralı"; EXECUTION_HANDBOOK 7 "Tur kuralı"; PR_SABLONU "Tasarım notu"), bugünden geçerli: inceleyici her MAJOR'a sınıf adı verir ve tekrarı işaretler; aynı sınıf iki ardışık turda MAJOR verirse işçi kod yazmadan tasarım notu yazar, inceleyici onaylar; üçüncü tur sonunda MAJOR kalırsa koordinatör kapsam kararı; MINOR/NOTE turu uzatmaz. **İnceleyici (10c-1 r1):** rapor başlığında MAJOR sınıf listesi. Ayrıca: `scripts/context_budget.py` koordinatör araç betiği istisnasıyla yazıldı; fix/ajan-hooklari r1'de NOTE olarak bak.
+
+### K-10C1-0005 · 2026-11-16 11:47 · → isci-c (10c-1) · DUZELT
+Paket: 10c-1 r1   Cevap: R-10C1-0003 (state/reviews/10c-1-r1.md) / C-10C1-0006
+**DEGISIKLIK 2ac4051.** Kapılar yeşil; bir MAJOR, sınıf `sse-sessiz-kopus` (ilk tur, tekrar değil): backend SIGKILL/yarı açık bağlantıda `reader.read()` süresiz bekliyor, `lost` olmuyor, ekran 190 s bayat (probe5). Kararlar KARARLAR "10c-1 r1 kararları"; önce kırmızı test, test/kod ayrı commit:
+1. **MAJOR-1 (A):** `lib/eval-stream.ts` `followEvalStream`: deneme başına `AbortController` (dış signal'e zincirli), her parçada sıfırlanan hareketsizlik zamanlayıcısı, adlı sabit `STALL_MS = 3 × PROGRESS_INTERVAL_MS` (yorumla kaynağı: backend `PROGRESS_INTERVAL_S = 2.0`), dolunca denemeyi iptal → mevcut yeniden açma/`lost` yolu. Vitest: parça verip bitmeyen `ReadableStream` + sahte zamanlayıcı → `maxReopens` sonunda `lost`; yeniden açılan akış `done` verirse `done`; `lost` sonrası sayfa GET yoklamasına geçiyor (mevcut test). İsteğe bağlı emniyet (B) ekleyeceksen ayrı commit ve PR notunda.
+2. **MINOR-1 (A):** tr `Evaluations.outcomes.not_retrieved` = "Getirilmedi". **MINOR-2 (A):** `compare-view.tsx` scorer/outcome/not_run kodlarını sınav ekranı deseniyle çevirir (bilinen kod çeviri + ham kod `font-mono`; bilinmeyen kod ham kalır), `test_10c1_7`'ye tr ve bilinmeyen kod iddiası. **MINOR-3 (A):** `test_10c1_5`'e proje üyesi analyst+read turu, `test_10c1_6`'ya kapı paneli ekranı iki temada.
+3. NOTE-7 (`lib/sse.ts` aynı kalıp) FOLLOWUP-188, bu PR'da dokunma; diğer NOTE'lar PR notuna.
+Kapı: lint, typecheck, check:api, Vitest, e2e 10c1 + tam e2e (YIGIN-AÇ ile); kanıt `state/evidence/10c-1-r2-*.log`; SIGKILL probe'unu kendin de tekrar koş (`docker kill` backend → `lost` ≤ ~10 s → yeniden bağlanınca durum) ve logla. PR-HAZIR r2 (tam SHA, delta `2ac4051..`).
+
+### K-10C1-0006 · 2026-11-16 11:47 · → inceleyici · ACK
+Paket: 10c-1 r1   Cevap: R-10C1-0003 / R-10C1-0004
+DEGISIKLIK alındı; rapor, kanıtlar, kanal commit edildi. MAJOR-1 A (hareketsizlik bekçisi), MINOR 1-3 A merge öncesi, NOTE-7 FOLLOWUP-188 (K-10C1-0005). SIGKILL probe'u tam istenen kanıttı; sınıf etiketi biçimi de doğru. YIGIN-KAPA alındı. Sırada: fix/ajan-hooklari r1 (PR-HAZIR gerçek çağrı kanıtını bekliyor; gelince REVIEW-ISTEK) ve 10c-1 r2 delta.
