@@ -167,3 +167,15 @@ PR-HAZIR r2 alındı; d5e9c11 doğrulandı (4 commit test→kod→docs, 11 dosya
 ### K-HOOK2-0011 · 2026-11-17 00:02 · → tumu · MERGE-BASLIYOR
 Paket: fix/ajan-hooklari-2 · Cevap: R-HOOK2-0004 · SHA: d5e9c1142c6f5f9f7d356aafbf3533257c5d2ed2
 r2 ONAY (B0 M0 m0 N2; rapor state/reviews/fix-ajan-hooklari-2-r2.md; iç içe `.env` gerilemesi yok, N01-N11). Main ile çakışma yok. Merge --no-ff ve kapı (ruff + `tests/hooks tests/scripts`, tee `gate-hook2-20261117.log`; backend/frontend dokunulmadı, yığın açılmaz) koordinatörde. 2 NOTE (docs 9.2 maske cümlesi, `case` kolu belgesi) FOLLOWUP'a.
+
+### K-HOOK2-0012 · 2026-11-17 00:06 · → tumu · MERGED
+Paket: fix/ajan-hooklari-2 · Cevap: R-HOOK2-0004 · SHA: 4d09310
+Merge --no-ff `4d09310` (d5e9c11; 17 commit, 13 dosya +1870/-62). Kapı: `tests/hooks tests/scripts` 355 passed (`state/evidence/gate-hook2-20261117.log`), ruff temiz (`hook2-ruff-r2.log`, dosyalar bire bir); yığın açılmadı. WORK_QUEUE DONE; FOLLOWUP-189 kapandı (arşiv), NOTE'lar FOLLOWUP-191. **Yeni kurallar artık main'de (warn kipi):** `KANAL-BICIM` (yeni kanal başlığı biçimi), sarmalayıcı/grup/anahtar sözcük içi denetim, ENV yalnız yol konumunda (metin serbest, yorumlayıcı kodu denetli), maske varyantları. Push kullanıcı talimatını bekliyor.
+
+### K-GEN-0018 · 2026-11-17 00:06 · → tumu · DURUM
+Paket: - · Cevap: K-GEN-0017 · Durum: DUYURU
+İlk `scripts/kanal_ozet.py` koşusu (main 4d09310): 70 yeni biçimli mesaj, 2073 eski biçim; ACK bekleyen bağlayıcı mesaj 0; ACK'siz cevaplanmış 3 (C-10C1-0010 ← K-10C1-0008; K-HOOK-0006 ← A-HOOK-0008; K-HOOK-0010 ← A-HOOK-0009: cevap verildi, ACK yazılmadı; kural: DUZELT/GOREV/REVIEW-ISTEK/KARAR-GEREK alıcısı ayrıca ACK yazar). Kayıt `state/evidence/kanal-ozet-20261117.log`. Mesaj gövdesinde `### ` kullanmayın (başlık sayılır, KANAL-BICIM); alt başlık için `####` ya da kalın yazı. Warn günü 17 Kasım 22:05'e kadar sürer; uyarılar modele görünmez, kayıt ve kullanıcı systemMessage'ına düşer.
+
+### K-HOOK2-0013 · 2026-11-17 00:06 · → isci-b · HANDOFF-ISTEK
+Paket: fix/ajan-hooklari-2 · Cevap: B-HOOK2-0008
+MERGED 4d09310. Kanalına HANDOFF yaz (kalan riskler: FOLLOWUP-191 maddeleri; ENV metin yanlış pozitifleri tek kelime; `timeout/xargs/sudo`), sonra lease `RETIRED`. Worktree `.worktrees/fix/ajan-hooklari-2` silme kullanıcıda. İki turda m5 → 0, 355 test; teşekkürler.

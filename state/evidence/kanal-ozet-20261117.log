@@ -1,0 +1,73 @@
+Kanal özeti (C:/ai_paycore/ffcore): 70 mesaj, biçim dışı: 2073
+
+ACK bekleyen bağlayıcı mesajlar (0):
+
+ACK'siz cevaplanmış bağlayıcı mesajlar (3; alıcı ACK yazmadı ama cevap verdi):
+- C-10C1-0010 · → koordinator · KARAR-GEREK · 10c-1 ← K-10C1-0008
+- K-HOOK-0006 · → isci-a · DUZELT · fix/ajan-hooklari ← A-HOOK-0008
+- K-HOOK-0010 · → isci-a · DUZELT · fix/ajan-hooklari ← A-HOOK-0009
+
+Paketler (WORK_QUEUE | son durum mesajı | son ONAY SHA):
+- 00 | MERGED | - | -
+- 00i | MERGED | - | -
+- 01 | MERGED | - | -
+- 02 | MERGED | - | -
+- 03a | MERGED | - | -
+- 03b | MERGED | - | -
+- 03c | CLAIMED (üstteki PoC sonrası satırı) | - | -
+- 04a | MERGED | - | -
+- 04b | — | - | -
+- 05a | MERGED | - | -
+- 05b | — | - | -
+- 06a | MERGED | - | -
+- 06b | — | - | -
+- 06b-2 | — | - | -
+- 07 | MERGED | - | -
+- 08 tam | — | - | -
+- 08-builtin-version-test | MERGED | - | -
+- 08-default-egress-enforce | MERGED | - | -
+- 08-lite | MERGED | - | -
+- 08-tam-1a | MERGED | - | -
+- 08-tam-1b | MERGED | - | -
+- 08-tam-1c-olcum | DONE (1c-a + 1c-b MERGED) | - | -
+- 09 | — | - | -
+- 10-marka | MERGED | - | -
+- 10a | MERGED | - | -
+- 10a-bağlama | MERGED | - | -
+- 10a-formlar | MERGED | - | -
+- 10b-poc-1 | MERGED | - | -
+- 10b-poc-2 | MERGED | - | -
+- 10c | — | - | -
+- 10c-1 | DONE (MERGED) | K-GEN-0014 MERGED (2026-11-16 15:13) | b28cdc1c19b7cee4582c0d5740b0fba14b02e736
+- 11 | — | - | -
+- 12 | — | - | -
+- 13a | MERGED | - | -
+- 13b | MERGED (A + test) | - | -
+- 13b-kosu | MERGED | - | -
+- 14 | — | - | -
+- 15 | — | - | -
+- 16 | — | - | -
+- 17 | — | - | -
+- 18-cost-timing | MERGED | - | -
+- 18-e2e-iskelet | MERGED | - | -
+- 18-f2-stage3 | MERGED | - | -
+- 18-hazirlik | MERGED | - | -
+- 18-kosu-2 | VERIFIED (test koşusu tamam) | - | -
+- 18-ticket-desk | MERGED | - | -
+- 19 M3-sunucu | MERGED | - | -
+- fake-llm-tool-mode | MERGED | - | -
+- fix/03a-nonmember-404 | MERGED | - | -
+- fix/04a-06a-followups | MERGED | - | -
+- fix/04a-gate2-headings | MERGED | - | -
+- fix/04a-worker-ready | MERGED | - | -
+- fix/05a-tools-read-analyst | MERGED | - | -
+- fix/06a-checkpoint-sources | MERGED | - | -
+- fix/06a-egress-all-messages | MERGED | - | -
+- fix/07-followups | MERGED | - | -
+- fix/07-test-hooks-flag | MERGED | - | -
+- fix/19-dis-inceleme | MERGED | - | -
+- fix/19r2-dis-inceleme | MERGED | - | -
+- fix/19r3-env-tests | MERGED | - | -
+- fix/57-alembic-merge | MERGED | - | -
+- fix/ajan-hooklari | DONE | K-HOOK-0015 MERGED (2026-11-16 21:54) | 7a1195afc17648062a0a6afdae45d2aa54d88bd9
+- fix/ajan-hooklari-2 | APPROVED (r2 ONAY, merge) | B-HOOK2-0008 PR-HAZIR (2026-11-17 00:20) | d5e9c1142c6f5f9f7d356aafbf3533257c5d2ed2
