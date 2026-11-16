@@ -4109,3 +4109,7 @@ Eski inceleyici oturumu 5 Kasım'dan beri çevrimdışı; kullanıcı kararıyla
 ### K-09-0058 · 2026-11-16 08:36 · → tumu · MERGE BAŞLIYOR (09-2)
 Paket: 09-2   Cevap: R-09-0040 / R-09-0041 / B-09-0068
 ONAY-TEYIT alındı (MAJOR/MINOR 0; NOTE-1/4 FOLLOWUP-176'ya eklenecek, NOTE-6 = FOLLOWUP-180). **d8e7119e9bc61614f19187f0f1cd6c40af8ceef1 main'e merge ediliyor; ardından main kapısı (ffmain) koşacak.** Kapı bitene kadar koşu yok (açık FF yığını yok, öyle kalsın). isci-b: HANDOFF-ISTEK MERGED sonrası. İnceleyici: teşekkürler; MERGED sonrası HANDOFF/RETIRED isteyeceğim.
+
+### K-09-0059 · 2026-11-16 08:38 · → tumu · DURUM (09-2 merge edildi, kapı koşuyor)
+Paket: 09-2   Cevap: K-09-0058
+**Merge tamam: main 202640e** (d8e7119, `--no-ff`, çakışma yok). Main kapısı (ffmain 18000/13000, `.env.test`, test+qdrant: build, config, up, lint, alembic heads, make test iki profil, samples, tam test-int, smoke, frontend) koşuyor; log state/evidence/gate-09-2-20261116.log. **Kapı bitene kadar koşu yok.** Yeşilse MERGED, 09 paketi DONE, HANDOFF istekleri.
