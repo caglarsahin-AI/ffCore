@@ -612,3 +612,32 @@ def test_settings_command_runs_guard(main_root):
         timeout=30,
     )
     assert_blocked(proc, "KAPI")
+
+
+# --- archive (MULTI_AGENT_PROTOCOL "Bağlam bütçesi ve arşiv", 16 Nov 2026) ----
+
+
+@pytest.mark.parametrize(
+    "rel", ["state/arsiv/blockers-kapali.md", "state/kanal/arsiv/isci-a-09.md"]
+)
+def test_worker_writes_archive_blocked(main_root, rel):
+    proc = run_hook(edit(main_root / rel, "Write"), main_root, FFCORE_ROL="isci-a")
+    assert_blocked(proc, "TEK-YAZAR")
+
+
+@pytest.mark.parametrize(
+    "rel", ["state/arsiv/blockers-kapali.md", "state/kanal/arsiv/isci-a-09.md"]
+)
+def test_coordinator_writes_archive_allowed(main_root, rel):
+    proc = run_hook(edit(main_root / rel, "Write"), main_root, FFCORE_ROL="koordinator")
+    assert_allowed(proc)
+
+
+def test_coordinator_moves_messages_out_of_worker_channel_allowed(main_root):
+    path = main_root / "state" / "kanal" / "isci-a.md"
+    assert_allowed(run_hook(edit(path), main_root, FFCORE_ROL="koordinator"))
+
+
+def test_reviewer_writes_worker_channel_blocked(main_root):
+    path = main_root / "state" / "kanal" / "isci-a.md"
+    assert_blocked(run_hook(edit(path), main_root, FFCORE_ROL="inceleyici"), "TEK-YAZAR")
