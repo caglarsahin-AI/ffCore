@@ -2,7 +2,9 @@
 
 Reads state/kanal/*.md and state/kanal/arsiv/*.md under the main checkout and prints:
 - binding messages (GOREV, GOREV-EK, DUZELT, REVIEW-ISTEK, KARAR-GEREK) that no ACK
-  answers yet (an ACK answers every ID in its `Cevap` field),
+  answers yet (an ACK answers every ID in its `Cevap` field); those the recipient's channel
+  already answered with another message (`Cevap` names the ID) are listed apart as
+  "ACK'siz cevaplanmış" (K-HOOK2-0007 MINOR-3),
 - per package: WORK_QUEUE state, the last DURUM/PR-HAZIR/REVIEW-SONUC/MERGED message,
   the SHA of the last REVIEW-SONUC with `Sonuc: ONAY`,
 - how many headers do not follow the message format ("biçim dışı"; old messages are
@@ -95,21 +97,42 @@ def work_queue(root: Path) -> dict[str, str]:
     return states
 
 
-def answered(messages: list[dict]) -> set[str]:
-    ids: set[str] = set()
+def cited(message: dict) -> list[str]:
+    value = message["fields"]["Cevap"]
+    return [] if value == "-" else [x.strip() for x in value.split(",")]
+
+
+def answered(messages: list[dict]) -> tuple[set[str], dict[tuple[str, str], str]]:
+    """(IDs answered by an ACK, {(channel, ID): first other message citing it})."""
+    acked: set[str] = set()
+    replies: dict[tuple[str, str], str] = {}
     for m in messages:
-        if m["tur"] == "ACK":
-            ids.update(x.strip() for x in m["fields"]["Cevap"].split(","))
-    return ids
+        for ref in cited(m):
+            if m["tur"] == "ACK":
+                acked.add(ref)
+            else:
+                replies.setdefault((m["kanal"], ref), m["id"])
+    return acked, replies
+
+
+def reply_without_ack(m: dict, replies: dict[tuple[str, str], str]) -> str | None:
+    """ID of a reply from the recipient's channel (any channel for `tumu`), else None."""
+    if m["to"] == "tumu":
+        return next((rid for (_, ref), rid in replies.items() if ref == m["id"]), None)
+    return replies.get((m["to"], m["id"]))
 
 
 def summarize(root: Path) -> dict:
     guard = load_guard()
     messages, bad = read_messages(root, guard)
     messages.sort(key=lambda m: m["sira"])
-    acked = answered(messages)
-    pending = [
-        {
+    acked, replies = answered(messages)
+    pending: list[dict] = []
+    without_ack: list[dict] = []
+    for m in messages:
+        if m["tur"] not in BINDING or m["id"] in acked:
+            continue
+        item = {
             "id": m["id"],
             "tarih": m["ts"],
             "kaynak": m["kaynak"],
@@ -117,9 +140,11 @@ def summarize(root: Path) -> dict:
             "tur": m["tur"],
             "paket": m["fields"]["Paket"],
         }
-        for m in messages
-        if m["tur"] in BINDING and m["id"] not in acked
-    ]
+        reply = reply_without_ack(m, replies)
+        if reply is None:
+            pending.append(item)
+        else:
+            without_ack.append({**item, "cevap_id": reply})
     packages: dict[str, dict] = {
         name: {"work_queue": state, "son_durum": None, "son_onay_sha": None}
         for name, state in work_queue(root).items()
@@ -144,6 +169,7 @@ def summarize(root: Path) -> dict:
         "mesaj": len(messages),
         "bicim_disi": bad,
         "bekleyen_ack": pending,
+        "acksiz_cevaplanmis": without_ack,
         "paketler": dict(sorted(packages.items())),
     }
 
@@ -154,6 +180,13 @@ def render(data: dict) -> str:
     out.append(f"ACK bekleyen bağlayıcı mesajlar ({len(data['bekleyen_ack'])}):")
     for p in data["bekleyen_ack"]:
         out.append(f"- {p['id']} · {p['tarih']} · → {p['alici']} · {p['tur']} · {p['paket']}")
+    out.append("")
+    out.append(
+        f"ACK'siz cevaplanmış bağlayıcı mesajlar ({len(data['acksiz_cevaplanmis'])}; "
+        "alıcı ACK yazmadı ama cevap verdi):"
+    )
+    for p in data["acksiz_cevaplanmis"]:
+        out.append(f"- {p['id']} · → {p['alici']} · {p['tur']} · {p['paket']} ← {p['cevap_id']}")
     out.append("")
     out.append("Paketler (WORK_QUEUE | son durum mesajı | son ONAY SHA):")
     for name, info in data["paketler"].items():
