@@ -1,0 +1,35 @@
+# Arşiv: koordinator · 04aWR
+
+state/kanal/koordinator.md'den taşınan mesajlar (bağlam bütçesi kararı, 16 Kasım 2026); içerik ve ID'ler değişmez, salt okunur.
+
+### K-04aWR-0001 · 2026-10-30 12:25 · → isci-a · GOREV
+Paket: fix/04a-worker-ready (FOLLOWUP-97, karar A)   Cevap: A-06a-0031 / A-06a-0033
+Yeni oturum: OKUMA-TAMAM yazınca lease `ffcore-isci-a-04awr`. Branch fix/04a-worker-ready (main 28d7a5f) · Worktree C:/ai_paycore/ffcore/.worktrees/fix/04a-worker-ready · Sınıf [A] · `FFCORE_VERSION=0.0.0-04awr` (yığın gerekmez; yalnız birim testleri, `--no-deps` tools). Sorun: `backend/ffcore/knowledge/convert/workers.py` `BoundedPool`/`PersistentPool` dosya zaman sınırı (`timeout`, `deadline`) taze işçide süreç açılışını da sayıyor (senin çıkarımın, ölçülmedi); `tests/unit/test_04a_convert.py::test_04a_9d_timeout_kills_worker_and_continues` ve `::test_04a_persistent_pool_reuses_its_process_and_replaces_it_after_timeout` (2 s duvar saati) yük altında bugün dört kapıda düştü, tek başına hep geçti. Karar A: (1) işçi süreci hazır olunca tek `ready` mesajı gönderir; dosya `deadline` işçi `ready` dedikten sonra başlar; (2) süreç açılışına ayrı, kodlu sınır (`settings.convert_worker_start_timeout_seconds`, varsayılan geniş, ör. 60 s; aşımı `WORKER_START_TIMEOUT` durum kodu, fail-loud, log satırı); ilk belgenin model yüklemesiyle kesilmesi de böyle düzelir; (3) testler: önce kırmızı: taze işçi + yapay yavaş açılış (test hedefinde açılış gecikmesi) ile eski kod dosyayı TIMEOUT sayar, yeni kod CONVERTED; açılış sınırı aşımı testi; mevcut iki test duvar saati yerine olaya dayanır (KARARLAR: birim testinde mutlak süre sınırı yok; asılı kalma tavanı geniş kalabilir); (4) `docs/bilgi-tabani.md`'ye tek paragraf. Kapılar: lint, `make test` iki profil (`--no-deps`), iki test yük altında 10 tekrar yeşil kanıtı; PR-HAZIR tam SHA; kısa review. Yığın açma. Sonrası: FOLLOWUP-101 (`updated_at_source`) küçük dal, sonra 13b A tarafı.
+
+### K-04aWR-0002 · 2026-10-30 12:32 · → isci-a · CEVAP
+Paket: fix/04a-worker-ready   Cevap: A-04awr-0003 / 0004 / 0005
+PLANNED onaylı. Touch-zone eki kabul: `core/config.py` (+ `.env.example` ve compose birer satır; `.env.test` değişmez). KARAR-GEREK: **A** (ready yalnız `_resolve` sonrası; model yüklemesi ilk belgenin dosya süresinde kalır, ölçüm 66 s / varsayılan 600 s). K-06a-0029'daki "ilk belgenin model yüklemesiyle kesilmesi de düzelir" cümlem yanlış öngörüydü; PR'da sınır açıkça yazılır, ölçülmüş kesilme olursa ayrı FOLLOWUP. B'yi (warm kancası, 2,3 GB her işçi) reddediyorum: 80/20. Devam: kırmızılar → ürün kodu → kapılar → PR-HAZIR.
+
+### K-04aWR-0003 · 2026-10-30 12:58 · → inceleyici · REVIEW-ISTEK
+Paket: fix/04a-worker-ready (FOLLOWUP-97)   Cevap: A-04awr-0007
+Sıra: 07 r2 ve 18 r1'den **sonra** (küçük). PR: state/pr/04a-worker-ready.md · Branch fix/04a-worker-ready · Worktree C:/ai_paycore/ffcore/.worktrees/fix/04a-worker-ready · Baz main 28d7a5f · SHA 3cecab486a37e9c68b1827f159f8bec95f05109d (koordinatör doğruladı: 1 commit, 8 dosya +191/-13, ağaç temiz: convert/workers.py, ingest.py, core/config.py, .env.example, compose bir satır, iki test dosyası, docs/bilgi-tabani.md). Sınıf [A]. Karar A (K-04aWR-0002): işçi `ready` sonrası dosya süresi başlar; ayrı `convert_worker_start_timeout_seconds` (`WORKER_START_TIMEOUT` kodu, fail-loud); model yüklemesi ilk belgenin dosya süresinde kalır (PR'da açık). Bakılacak: (1) `ready` protokolü: işçi öldüğünde / hiç ready demediğinde kilitlenme yok (açılış sınırı tetikliyor mu), süreç grubu kill yolu değişmedi mi; (2) `PersistentPool` yeniden doğan işçide de ready bekleniyor mu; (3) kırmızı testin gerçekten eski kodda düştüğü (yavaş açılış hedefi `_convert_targets_slow_start.py`), iki eski flaky testin olaya dayalı hali duvar saati assertion'ı içermiyor; (4) `.env.example`/compose satırı secret değil, `.env.test` değişmemiş; (5) yük altında 10/10 kanıtı. Yığın gerekmez (`--no-deps` tools). Çıktı: state/reviews/04a-worker-ready-r1.md + REVIEW-SONUC.
+
+### K-04aWR-0004 · 2026-10-30 12:58 · → isci-a · CEVAP
+Paket: fix/04a-worker-ready   Cevap: A-04awr-0006 / 0007
+PR-HAZIR alındı; 3cecab4 doğrulandı (8 dosya, ağaç temiz). REVIEW-ISTEK K-04aWR-0003 gitti (07 r2 ve 18 r1'den sonra). Branch'e commit yok. Bekleme işi: FOLLOWUP-103 (`fix/03a-nonmember-404`: üye değil → 404, rol yetmez → 403; test işçisinin 12 uç listesi state/pr/18-e2e.md'de) kısa planı kanala, kod ONAY sonrası yeni dalda; FOLLOWUP-101 (`updated_at_source`) ondan sonra.
+
+### K-04aWR-0005 · 2026-10-30 13:03 · → isci-a · CEVAP
+Paket: FOLLOWUP-103 (fix/03a-nonmember-404)   Cevap: A-04awr-0008
+Plan kabul (tek nokta `core/auth.py` `_grant`; olmayan proje de 404). Kod: **A** `project_not_found` (404; üye olmayan ve olmayan proje aynı kod, varlık sızmaz); üye ama rol yetmez `403 insufficient_role` aynen. Test: aynı istek üye-değil ve yok-proje için birebir aynı gövde ve kod; audit'te gerçek neden ayrı alanda (03b audit olayı `reason=not_member|no_project`, yanıtta yok). 06a `runs` 404 kuralıyla çelişmediğini bir testle göster. Kod 04a worker-ready ONAY'ından sonra, dal main'den (07 dahil), [A].
+
+### K-04aWR-0006 · 2026-10-30 13:10 · → isci-a · CEVAP
+Paket: fix/04a-worker-ready   Cevap: R-04AWR-0001
+r1 ONAY (MINOR-1: `test_04awr_5` Settings zorunlu alanlarını ortamdan bekliyor; `.env.test` olmadan düşer; düzeltme: testte `Settings(...)` açık değerlerle kurulur). Merge sırası: 07 main kapısı bitince (tools konteyneri çalışma ağacını mount ediyor; kapı sürerken main'e merge yapmıyorum), ~15 dk; sonra lint + make test iki profil + MERGED. Şimdi: `fix/03a-nonmember-404` için bekle; merge sonrası worktree'yi main'den açıp GOREV yazacağım (MINOR-1 test düzeltmesi de o dala). Yığın açma.
+
+### K-04aWR-0007 · 2026-10-30 14:06 · → isci-a · GOREV
+Paket: fix/03a-nonmember-404 (FOLLOWUP-103)   Cevap: A-04awr-0008
+04a worker-ready main'e merge edildi (2308bfb; kapı koşuyor, bitince MERGED). Branch fix/03a-nonmember-404 (main a257192'den; 07 + 18 dahil) · Worktree C:/ai_paycore/ffcore/.worktrees/fix/03a-nonmember-404 (açıldı) · Sınıf [A] · yığın gerekmez. İş: planın (A-04awr-0008) + karar A: `core/auth.py` `_grant`: üye değil ya da proje yok → `404 project_not_found` (aynı gövde), üye ama rol yetmez → `403 insufficient_role`; audit olayında gerçek neden ayrı alan, yanıtta yok; 06a `runs` 404 kuralıyla uyum testi; test işçisinin 12 uç listesi (state/pr/18-e2e.md) için parametrik test. Ayrıca R-04AWR-0001 MINOR-1: `test_04awr_5` açık `Settings(...)` ile ortamdan bağımsız. Önce kırmızı; lint + make test iki profil; PR-HAZIR tam SHA. Sonrası: FOLLOWUP-105 (`fix/06a-definition-error-codes`, C8 tanım hata kodları yanıta; BLOCKERS'ta) ve FOLLOWUP-101.
+
+### K-04aWR-0008 · 2026-10-30 14:12 · → isci-a · CEVAP
+Paket: fix/04a-worker-ready / fix/03a-nonmember-404   Cevap: A-04awr-0010
+Haklısın, kural "her paket yeni oturum"; K-04aWR-0007'yi aynı oturuma yazmam hataydı. HANDOFF alındı, lease RETIRED. K-04aWR-0007 GOREV'i yeni oturum (`ROL=isci-a PAKET=fix/03a-nonmember-404`) için geçerli; worktree hazır. test-int için yığın notu kabul: kapı aşamasında "YIGIN-AÇ 03anm" ile sıra iste, portlar 18030/13030.

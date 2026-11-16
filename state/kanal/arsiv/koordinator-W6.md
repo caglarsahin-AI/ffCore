@@ -1,0 +1,9 @@
+# Arşiv: koordinator · W6
+
+state/kanal/koordinator.md'den taşınan mesajlar (bağlam bütçesi kararı, 16 Kasım 2026); içerik ve ID'ler değişmez, salt okunur.
+
+### K-W6-0001 · 2026-10-31 09:29 · → tumu · DURUM
+Paket: dalga 6 sırası   Cevap: -
+**Danışman görüşü** (Danışman [2ce9ee], kaynak: plan/06 77-87, plan/03 31-37, CONTRACTS C2/C4/C11, runtime/graph.py:63-64): 03c önce, 06b hemen arkasından, 08 tam en son. Gerekçe: facade kimlik tabanı (api_keys, scopes, acl_role, kota) 03c'dedir; 06b'yi 03c'siz başlatmak ya anahtar doğrulamasını stub'lar (BREAKING riski) ya da 03c'yi 06b'ye çeker (touch-zone çakışması). 07'nin "API anahtarıyla onay 403" kabulü 03c'ye kadar NOT_RUN (R-06a-0007).
+(1) Facade için 08 tam gerekmez; 08-lite + egress PII enforce (6deb0c1) + C4 input.pre/output.pre yeter; 06b kabulünde impersonate/chat_direct yolunda input.pre'nin çalıştığı testle kanıtlanmalı; FOLLOWUP-107 08 tam'ın ilk dilimi olarak öne alınabilir. (2) FOLLOWUP-116 ayrı küçük dal fix/06a-checkpoint-sources, 06b'den önce (graph.py:64 yalnız chunk_id/public; facade konuşmaları kalıcı). (3) BREAKING değil; resolve_actor imzası değişmeden eklenmeli, 03a _grant 404 kuralı (298cbb4) aynı kalmalı, 03c PLANNED'da açıkça istenir. (4) Ek önkoşullar: allowed_cidrs/revoked_at her istekte; kota 429 Redis sayacından + concurrent penceresi 03c'de; x_platform ve X-Agent-Events alanlarında maskeli argüman kuralı facade chunk'larında da (K-06a-0021 MAJOR-2); FOLLOWUP-117 12'den önce küçük dal; FOLLOWUP-114 03c'den önce.
+Önerilen sıra (danışman, koordinatör katılıyor): fix/06a-checkpoint-sources (116) → FOLLOWUP-114 → 03c → 06b (C11 donar) → 08 tam dilim 1 (107+106) → 11/04b/05b/09/10c(+112) → 12(+117). Önceki koordinatör sıram (06b önce) bu görüşle tersine döndü: 06b'nin 03c bağımlılığı brief'te yazılı (plan/06 başlık "06b: 06a, 03c"), ben kaçırmıştım. Karar kullanıcıda.
