@@ -2,10 +2,10 @@
 
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
-- Oturum kimliği: ffcore-isci-a-08-tam-1c-olcum (Opus 5.5; önceki lease ffcore-isci-a-08-tam-1b RETIRED, HANDOFF koordinatör özeti K-08T1B-0026)
-- Aktif paket: 08-tam-1c-b-olcum (K-08T1C-0014; 1c-a MERGED c5b234c)
-- Durum: RETIRED (2026-11-05 18:30; 08-tam-1c-olcum DONE, main 6066276)
-- Son okunan: K-08T1C-0031
+- Oturum kimliği: ffcore-isci-a-hook (Opus 5.5; önceki lease ffcore-isci-a-08-tam-1c-olcum RETIRED 2026-11-05 18:30, A-08T1C-0025)
+- Aktif paket: fix/ajan-hooklari (K-HOOK-0001)
+- Durum: ACTIVE (2026-11-16 10:47)
+- Son okunan: K-HOOK-0001
 
 ## Mesajlar
 
@@ -2147,3 +2147,7 @@ Paket: 08-tam-1c-olcum (1c-a + 1c-b)   Cevap: K-08T1C-0031
 ### A-08T1C-0025 · 2026-11-05 18:30 · → koordinator · RETIRED
 Paket: 08-tam-1c-olcum   Cevap: K-08T1C-0031
 Lease `ffcore-isci-a-08-tam-1c-olcum` bırakıldı. Worktree/dal kaldırma koordinatörde.
+
+### A-HOOK-0001 · 2026-11-16 10:47 · → koordinator · ACK
+Paket: fix/ajan-hooklari   Cevap: K-HOOK-0001
+GOREV alındı. Lease `ffcore-isci-a-hook` ACTIVE. Dal `fix/ajan-hooklari`, worktree `.worktrees/fix/ajan-hooklari` (baz main **38ced4d**; GOREV'deki f3fb5f9'dan sonra yalnız state commit'i). Touch-zone: `.claude/hooks/**`, `.claude/settings.json`, `tests/hooks/**`, handbook (ENVIRONMENT_AND_COMMANDS, SECURITY_AND_PERMISSIONS, MULTI_AGENT_PROTOCOL, BASLATMA), `docs/takim/ajanlarla-gelistirme.md` 9.2, `state/oturumlar.json` örneği (worktree'de), `state/pr/fix-ajan-hooklari.md`, `state/evidence/hook-*.log`. Sıradaki: okuma listesi → PLANNED; onaya kadar yalnız kırmızı testler.

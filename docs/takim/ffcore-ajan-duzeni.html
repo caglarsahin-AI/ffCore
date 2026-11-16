@@ -127,8 +127,8 @@ svg rect{stroke-width:.75}
 <g class="k-doc"><rect x="342" y="290" width="140" height="60" rx="8"/><text class="tt tm" x="412" y="310" text-anchor="middle" dominant-baseline="central">state/</text><text class="ts" x="412" y="330" text-anchor="middle" dominant-baseline="central">Kuyruk, kanallar</text></g>
 <g class="k-doc"><rect x="499" y="290" width="140" height="60" rx="8"/><text class="tt tm" x="569" y="310" text-anchor="middle" dominant-baseline="central">CLAUDE.md</text><text class="ts" x="569" y="330" text-anchor="middle" dominant-baseline="central">+ BASLATMA.md</text></g>
 <g class="k-gray"><rect x="185" y="380" width="455" height="60" rx="8"/><text class="tt" x="412" y="400" text-anchor="middle" dominant-baseline="central">54bfb41 · 57 belge dosyası, kod yok</text><text class="ts" x="412" y="420" text-anchor="middle" dominant-baseline="central">Ardından K-00-0001 GOREV: paket 00 depo iskeleti</text></g>
-<g class="k-agent"><rect x="185" y="470" width="140" height="60" rx="8"/><text class="tt" x="255" y="490" text-anchor="middle" dominant-baseline="central">Koordinatör</text><text class="ts" x="255" y="510" text-anchor="middle" dominant-baseline="central">Kararlar, merge</text></g>
-<g class="k-sec"><rect x="342" y="470" width="140" height="60" rx="8"/><text class="tt" x="412" y="490" text-anchor="middle" dominant-baseline="central">Sekreter</text><text class="ts" x="412" y="510" text-anchor="middle" dominant-baseline="central">Zil, commit, push</text></g>
+<g class="k-agent"><rect x="185" y="470" width="140" height="60" rx="8"/><text class="tt" x="255" y="490" text-anchor="middle" dominant-baseline="central">Koordinatör</text><text class="ts" x="255" y="510" text-anchor="middle" dominant-baseline="central">Karar, merge, push</text></g>
+<g class="k-sec"><rect x="342" y="470" width="140" height="60" rx="8"/><text class="tt" x="412" y="490" text-anchor="middle" dominant-baseline="central">Sekreter</text><text class="ts" x="412" y="510" text-anchor="middle" dominant-baseline="central">Zil, mesaj aktarımı</text></g>
 <g class="k-agent"><rect x="499" y="470" width="140" height="60" rx="8"/><text class="tt" x="569" y="490" text-anchor="middle" dominant-baseline="central">İşçi, inceleyici</text><text class="ts" x="569" y="510" text-anchor="middle" dominant-baseline="central">Kod, inceleme</text></g>
 </svg>
   </div>
@@ -136,14 +136,14 @@ svg rect{stroke-width:.75}
 
 <section id="roller">
   <h2>Roller</h2>
-  <p>İnsanın rolü sınırlı kaldı; kararların tamamına yakınını koordinatör verdi. Ajanlar arası iletişimi, commit ve push işlemlerini sekreter yürüttü, böylece pahalı ajanların token tüketimi azaldı. Mesajların kalıcı yeri her zaman <code>state/</code> altındaki kanal dosyalarıdır.</p>
+  <p>İnsanın rolü sınırlı kaldı; kararların tamamına yakınını koordinatör verdi. Ajanlar arası iletişimi sekreter yürüttü, böylece pahalı ajanların token tüketimi azaldı. Push kararı kullanıcıdadır; push işini bir süre sekreter yaptı, kullanıcının onayıyla artık koordinatör yapıyor. Mesajların kalıcı yeri her zaman <code>state/</code> altındaki kanal dosyalarıdır.</p>
   <div class="fig">
 <svg viewBox="0 0 680 700" role="img" aria-labelledby="t2"><title id="t2">İnsan, koordinatör, sekreter, işçi ve inceleyici katmanları</title>
 <g class="k-human"><rect x="40" y="20" width="600" height="64" rx="12"/><text class="tt" x="60" y="44">İnsan · sınırlı human-in-the-loop</text><text class="ts" x="60" y="68">Oturum açar · secret ve .env · model ağırlığı indirme · ortam sorunları</text></g>
 <line class="arr" x1="340" y1="84" x2="340" y2="116" marker-start="url(#ah)" marker-end="url(#ah)"/>
-<g class="k-agent"><rect x="40" y="118" width="600" height="100" rx="12"/><text class="tt" x="60" y="142">Koordinatör · orkestratör (kararların tamamına yakını)</text><text class="ts" x="60" y="168">· Teknik ve mimari kararlar</text><text class="ts" x="60" y="188">· Bağımlılık, imaj (C sınıfı)</text><text class="ts" x="60" y="208">· Brief, DRIFT, iş sırası</text><text class="ts" x="350" y="168">· İnceleme bulgularında A/B/C</text><text class="ts" x="350" y="188">· SHA doğrulama, merge</text><text class="ts" x="350" y="208">· Kuyruk ve KARARLAR yazarı</text></g>
+<g class="k-agent"><rect x="40" y="118" width="600" height="100" rx="12"/><text class="tt" x="60" y="142">Koordinatör · orkestratör (kararların tamamına yakını)</text><text class="ts" x="60" y="168">· Teknik ve mimari kararlar</text><text class="ts" x="60" y="188">· Bağımlılık, imaj (C sınıfı)</text><text class="ts" x="60" y="208">· Brief, DRIFT, iş sırası</text><text class="ts" x="350" y="168">· İnceleme bulgularında A/B/C</text><text class="ts" x="350" y="188">· SHA doğrulama, merge, push</text><text class="ts" x="350" y="208">· Kuyruk ve KARARLAR yazarı</text></g>
 <line class="arr" x1="340" y1="218" x2="340" y2="254" marker-start="url(#ah)" marker-end="url(#ah)"/>
-<g class="k-sec"><rect x="140" y="256" width="400" height="72" rx="12"/><text class="tt" x="340" y="276" text-anchor="middle" dominant-baseline="central">Sekreter · iletişim ajanı</text><text class="ts" x="340" y="296" text-anchor="middle" dominant-baseline="central">Zil ve mesaj aktarımı · commit ve push</text><text class="ts" x="340" y="314" text-anchor="middle" dominant-baseline="central">Pahalı ajanların token tüketimini azaltır</text></g>
+<g class="k-sec"><rect x="140" y="256" width="400" height="72" rx="12"/><text class="tt" x="340" y="276" text-anchor="middle" dominant-baseline="central">Sekreter · iletişim ajanı</text><text class="ts" x="340" y="296" text-anchor="middle" dominant-baseline="central">Zil, mesaj aktarımı, kanal taraması</text><text class="ts" x="340" y="314" text-anchor="middle" dominant-baseline="central">Pahalı ajanların token tüketimini azaltır</text></g>
 <path class="arr" d="M200 328 L200 352 L125 352 L125 378" marker-start="url(#ah)" marker-end="url(#ah)"/>
 <path class="arr" d="M480 328 L480 352 L555 352 L555 378" marker-start="url(#ah)" marker-end="url(#ah)"/>
 <line class="arr" x1="340" y1="328" x2="340" y2="378" marker-start="url(#ah)" marker-end="url(#ah)"/>
@@ -163,7 +163,7 @@ svg rect{stroke-width:.75}
 <line class="arr" x1="483" y1="530" x2="496" y2="530" marker-end="url(#ah)"/>
 <path class="arr" d="M265 560 Q190 582 120 561" marker-end="url(#ah)"/>
 <text class="ts" x="190" y="596" text-anchor="middle">↻ DEGISIKLIK → DUZELT</text>
-<g class="k-box"><rect x="40" y="626" width="600" height="44" rx="8"/><text class="tt" x="60" y="648" dominant-baseline="central">Sandbox</text><text class="ts" x="140" y="648" dominant-baseline="central">touch-zone · Docker, --pull never · .env yok · dış ağ yok · işçi push etmez</text></g>
+<g class="k-box"><rect x="40" y="626" width="600" height="44" rx="8"/><text class="tt" x="60" y="648" dominant-baseline="central">Sandbox</text><text class="ts" x="140" y="648" dominant-baseline="central">touch-zone · Docker, --pull never · .env yok · dış ağ yok · push yalnız koordinatör</text></g>
 </svg>
   </div>
   <p class="note">Sekreterin görevleri kullanıcının anlatımına ve koordinatör kayıtlarındaki bir öneriye dayanıyor; depoda sekretere ait bir kanal dosyası yok.</p>
@@ -248,7 +248,7 @@ svg rect{stroke-width:.75}
 <g class="k-agent"><rect x="327" y="452" width="150" height="56" rx="8"/><text class="tt" x="402" y="470" text-anchor="middle" dominant-baseline="central">merge --no-ff</text><text class="ts" x="402" y="490" text-anchor="middle" dominant-baseline="central">gate log, MERGED</text></g>
 <g class="k-agent"><rect x="165" y="528" width="150" height="56" rx="8"/><text class="tt" x="240" y="546" text-anchor="middle" dominant-baseline="central">KAYIT-TALEBI</text><text class="ts" x="240" y="566" text-anchor="middle" dominant-baseline="central">kanal mesajı</text></g>
 <g class="k-agent"><rect x="327" y="528" width="150" height="56" rx="8"/><text class="tt tm" x="402" y="546" text-anchor="middle" dominant-baseline="central">BLOCKERS.md</text><text class="ts" x="402" y="566" text-anchor="middle" dominant-baseline="central">kaydı açar</text></g>
-<g class="k-sec"><rect x="40" y="616" width="600" height="44" rx="8"/><text class="tt" x="60" y="638" dominant-baseline="central">Sekreter</text><text class="ts" x="145" y="638" dominant-baseline="central">zil ve mesaj aktarımı · state/ dosyalarını commit · push</text></g>
+<g class="k-sec"><rect x="40" y="616" width="600" height="44" rx="8"/><text class="tt" x="60" y="638" dominant-baseline="central">Sekreter</text><text class="ts" x="145" y="638" dominant-baseline="central">zil ve mesaj aktarımı · durum yazmaz · commit ve push koordinatörde</text></g>
 </svg>
   </div>
   <p class="note">Sol taraftaki geri dönüş oku: inceleme DEGISIKLIK verirse iş REVIEWED'dan yeniden kodlamaya döner. BLOCKED ana akışın dışındadır, her aşamada açılabilir.</p>

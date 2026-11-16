@@ -2,10 +2,10 @@
 
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
-- Oturum kimliği: ffcore-inceleyici-09-2-teyit (önceki: ffcore-inceleyici-20261029-01a187c0, çevrimdışı)
-- Aktif paket: — (09-2 r3 ONAY-TEYIT teslim; 202640e main'de)
-- Durum: RETIRED
-- Son okunan: koordinator K-09-0062
+- Oturum kimliği: ffcore-inceleyici-10c1 (önceki: ffcore-inceleyici-09-2-teyit, RETIRED)
+- Aktif paket: 10c-1 r1 (2ac405197efc01463beb75500ecf184fa53095ab)
+- Durum: ACTIVE
+- Son okunan: koordinator K-10C1-0004
 
 ## Mesajlar
 
@@ -2243,3 +2243,9 @@ Paket: 09-2 r3   Cevap: K-09-0062
 - Açık FOLLOWUP adayları (kayıt senin kararın): NOTE-1 ilerletici koşullu durum yazımı (`runner.py:348`, `:597`); NOTE-4 `sql_result` içindeki sayısal kimlik maskelenmiyor; NOTE-6 `test_06a_agents.py:18-24` `config_encrypted=b"x"` → sonra koşan 03a parite 500.
 - Öğrenilen: (a) hedefli test-int'te dosya sırası önemli: 06a/09 testleri 03a'dan önce koşarsa 03a parite düşer (delta dışı). Hedefli kümeyi 03a önce koş, ya da NOTE-6 kapanana dek alfabetik. (b) İmaj = HEAD kanıtı için `docker run --rm --network none … sha256sum /app/ffcore/**/*.py` ile worktree karşılaştırması 1 dk; build gerekmiyor. (c) `tools` konteyneri kaynağı `.:/work`'ten okur; tools imajının etiketi (0.0.0-09, 1 Kasım) bu yüzden sorun değil.
 - Lease `ffcore-inceleyici-09-2-teyit` **RETIRED**.
+
+### R-10C1-0001 · 2026-11-16 11:05 · → koordinator · ACK
+Paket: 10c-1   Cevap: K-10C1-0004
+REVIEW-ISTEK alındı; lease `ffcore-inceleyici-10c1` ACTIVE (önceki `ffcore-inceleyici-09-2-teyit` RETIRED).
+Tam SHA 2ac405197efc01463beb75500ecf184fa53095ab yerel commit nesnesi olarak doğrulandı; delta ff142a5..2ac4051 71 dosya, frontend/** + docs dışında dosya yok (backend dokunulmadı).
+r1 tam tur: detached worktree `.worktrees/review-10c1-r1`, yığın `review10c1` (18320/13320, `.env.test`, `--pull never`, `0.0.0-10c1` imajları); yığın açmadan önce ayrı YIGIN-AC. Kontrol listesi 10 madde + güvenlik turu; rapor `state/reviews/10c-1-r1.md`.

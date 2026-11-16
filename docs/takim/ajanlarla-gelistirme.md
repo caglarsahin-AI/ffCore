@@ -39,7 +39,7 @@
   - dış ağa çıkan adımlar: model ağırlığı indirme, PayCore sunucusunda komut,
   - ortam sorunları: Docker Desktop'ı yeniden başlatma, disk temizliği, makineyi açık tutma.
 
-**Sekreter.** Koordinatörün yanında ayrıca bir sekreter ajan çalıştı. Ajanlar arasındaki iletişimi (zil ve mesaj aktarımı) ve commit ile push işlemlerini sekreter yürüttü. Böylece pahalı ajanların (koordinatör, işçi, inceleyici) token tüketimi azaldı. Ayrıntı 2.2'de.
+**Sekreter.** Koordinatörün yanında ayrıca bir sekreter ajan çalıştı. Ajanlar arasındaki iletişimi (zil ve mesaj aktarımı) sekreter yürüttü; bir süre commit ve push işlemlerini de o yaptı. Push kararı her zaman kullanıcıdaydı. Kullanıcının onayıyla push işi artık koordinatörde. Böylece pahalı ajanların (koordinatör, işçi, inceleyici) token tüketimi azaldı. Ayrıntı 2.2'de.
 
 ### 1.1 Başlangıç: proje hangi belgelerle başladı?
 
@@ -82,7 +82,7 @@ flowchart LR
     T -- DURUM, bulgu --> ST
     K -- GOREV, DUZELT, PLAN-ONAY --> ST
     K -- merge + main kapısı --> M[(main)]
-    S -- state/ commit, push --> O[(origin)]
+    K -- push, kararı kullanıcıda --> O[(origin)]
 ```
 
 Mesajların kalıcı yeri her zaman kanal dosyalarıdır (bkz. 3.1). Sekreter mesajı taşımaz, alıcıyı uyarır ve gerekeni ona iletir.
@@ -90,8 +90,8 @@ Mesajların kalıcı yeri her zaman kanal dosyalarıdır (bkz. 3.1). Sekreter me
 | Rol | Yapar | Yapmaz | Tek yazarı olduğu dosyalar |
 |---|---|---|---|
 | **İnsan** | Oturum açma, sınırlı karar listesi (2.1), model ağırlığı indirme, sunucu komutları | Kod yazmaz; işçiyle doğrudan konuşmaz | `FELSEFE.md` |
-| **Sekreter** | Zil ve mesaj aktarımı, kanal taraması, `state/` commit'i, push | Karar vermez; kod yazmaz | (depoda kaydı yok; bkz. 2.2) |
-| **Koordinatör** | Kuyruk, bağımlılık, touch-zone, brief, karar (A/B/C), SHA doğrulama, merge, main kapısı, dalga kapanışı | Kod yazmaz; diff incelemesi yapmaz (bağımsızlık) | `state/WORK_QUEUE.md`, `state/BLOCKERS.md`, `KARARLAR.md`, `state/kanal/koordinator.md` |
+| **Sekreter** | Zil ve mesaj aktarımı, kanal taraması (bir süre commit ve push da yaptı) | Karar vermez; kod yazmaz; artık push yapmaz | (depoda kaydı yok; bkz. 2.2) |
+| **Koordinatör** | Kuyruk, bağımlılık, touch-zone, brief, karar (A/B/C), SHA doğrulama, merge, main kapısı, dalga kapanışı, push (kararı kullanıcıda) | Kod yazmaz; diff incelemesi yapmaz (bağımsızlık) | `state/WORK_QUEUE.md`, `state/BLOCKERS.md`, `KARARLAR.md`, `state/kanal/koordinator.md` |
 | **İşçi** (A kritik zincir, B yan paketler, C önyüz, D ek) | Claim ettiği paketin testini, kodunu ve docs'unu yazar; kendi kapısını koşar; PR notunu yazar | Touch-zone dışına çıkmaz; kullanıcıya soru sormaz; push yapmaz; `state/` dosyalarını commit etmez | `state/pr/<paket>.md`, kendi kanalı |
 | **İnceleyici** | Her PR'ı tam SHA ile, detached checkout'ta bağımsız inceler; kendi yığınında kapıları ve canlı probe'ları koşar; güvenlik turu yapar | Kod düzeltmez; yalnız bulgu yazar | `state/reviews/<paket>-rN.md`, kendi kanalı |
 | **Test işçisi** | Sentetik veri (13a), senaryo e2e (18), olumsuz testler, ölçüm koşuları | Uygulama dosyasına sahibiyle koordineli dokunur | `state/kanal/test.md` |
@@ -136,13 +136,14 @@ Uygulamada insana giden karar sayısı az oldu. Geri çevrilen koordinatör kara
 ### 2.2 Sekreter: iletişimi ucuz ajana devretmek
 
 - **Neden:** Koordinatör, işçi ve inceleyici pahalı modellerle çalışıyordu. Kanal taramak, zil çalmak ve commit atmak bu ajanların bağlamını ve token'ını tüketiyordu.
-- **Ne yaptı:** ajanlar arası iletişim (zil, mesajı alıcıya iletme), `state/` dosyalarının commit'i ve push.
+- **Ne yaptı:** ajanlar arası iletişim (zil, mesajı alıcıya iletme). Bir süre `state/` dosyalarının commit'ini ve push'u da yürüttü; push kararı o dönemde de kullanıcıdaydı.
+- **Bugün:** kullanıcının onayıyla push işi koordinatöre geçti. Sekreterin işi iletişim.
 - **Ne yapmadı:** karar vermedi. Koordinatörün kayıtlarındaki öneriye göre her `KARAR-GEREK` ve inceleme sonucu yine koordinatöre ya da insana gitmeliydi.
 - **Kaynak:**
   - Koordinatör oturumunda bir A/B/C önerisi var: Haiku'yu "koordinatör değil **sekreter** olarak" kullanmak; görevleri "kanal taraması, kapı koşturma, MERGED kaydı, zil".
   - Sekreterin gerçekte yaptığı işler (iletişim, commit, push) kullanıcının anlatımına dayanıyor.
   - Depoda sekreterin kanal dosyası, KARARLAR maddesi ya da BLOCKERS kaydı yok **(doğrulanmadı: hangi model ve hangi tarihten itibaren çalıştığı)**.
-- **Protokolle ilişkisi:** `MULTI_AGENT_PROTOCOL.md` "ajanlar uzak sunucuya push etmez" diyor. Uygulamada push'u sekreter yaptı. Bu kural işçi ve inceleyici için geçerli kaldı; sekreter istisnası handbook'a henüz yazılmadı (DRIFT adayı).
+- **Push sahipliği:** karar kullanıcıda, işlem koordinatörde. `MULTI_AGENT_PROTOCOL.md` hâlâ "ajanlar uzak sunucuya push etmez" diyor ve koordinatör istisnası handbook'a henüz yazılmadı (DRIFT adayı). İşçi ve inceleyici için kural geçerli.
 
 ---
 
@@ -187,7 +188,7 @@ Paketin durumu tek bir yerde tutulur: `state/WORK_QUEUE.md`, ve onu yalnız koor
 | 7 | Kapanış | İşçi: `HANDOFF`; kanal başlığında lease `RETIRED` | worktree ve imaj etiketi temizliği | kanal başlığı |
 | — | BLOCKED (her an) | İşçi ya da inceleyici: `KAYIT-TALEBI` / `KARAR-GEREK` | `BLOCKERS.md` kaydı (DECISION, ENV, FOLLOWUP…) | kayıt numarası |
 
-Sekreter bu akışta zili çalar ve `state/` değişikliklerini commit eder. Durum yazmaz (bkz. 2.2).
+Sekreter bu akışta zili çalar, durum yazmaz (bkz. 2.2). `state/` commit'i ve push koordinatördedir; push kararı kullanıcıdadır.
 
 ```mermaid
 stateDiagram-v2
@@ -390,7 +391,7 @@ Toplam yaklaşık 20 dakika. Bir kapı adımı 137 (OOM) ile düşerse o adım t
 - Koordinatör kuyruğu MERGED yapar ve `→ tumu` MERGED mesajı yazar. Bu mesajda sıradaki işler ve diğer dalların main'i nasıl alacağı da yer alır.
 - İşçi kapanırken `HANDOFF` yazar. İçeriği: tam sonraki adım, değişen dosyalar, koşan ve kalan testler, kararlar, blocker'lar, commit edilmemiş durum. "Devam edilecek" tek başına geçerli değildir.
 - Lease `RETIRED` olur. *Örnek* A-00-0021: "Durum: RETIRED · Tam sonraki adım: yeni isci-a oturumu K-03b-0001 GOREV'ini alır…". Ardından yeni oturuma gereken pratik notlar (Docker'da araç komutları, `MSYS_NO_PATHCONV=1`, CRLF tuzağı) geliyor.
-- İşçi ve inceleyici uzak sunucuya push etmez (`MULTI_AGENT_PROTOCOL.md` "PR ve merge (yerel)"). `state/` commit'ini ve push'u sekreter yaptı (bkz. 2.2). K-09-0044'teki "Push kullanıcıda" ifadesi push kararının insanda olduğunu anlatıyor.
+- İşçi ve inceleyici uzak sunucuya push etmez (`MULTI_AGENT_PROTOCOL.md` "PR ve merge (yerel)"). Push kararı kullanıcıdadır; K-09-0044'teki "Push kullanıcıda" bunu anlatır. Push işlemini bir süre sekreter yaptı, kullanıcının onayıyla artık koordinatör yapıyor (bkz. 2.2).
 
 ---
 
@@ -546,7 +547,7 @@ NER gecikme kabulü (boşta P95 < 300 ms) geliştirme dizüstünde ölçüldü. 
     - Kapıyı `gate-<paket>-<tarih>.log` dosyasına alarak koş.
     - Yeşilse `MERGED` yaz.
     - Kanal dosyalarını merge'den önce commit edin. Çakışan bir merge iptal edilirse commit edilmemiş kanal satırları silinir.
-12. **Kapanış.** İşçi HANDOFF yazar, lease RETIRED olur, worktree ve paket imaj etiketi temizlenir. Sekreter `state/` dosyalarını commit eder ve push'u yapar.
+12. **Kapanış.** İşçi HANDOFF yazar, lease RETIRED olur, worktree ve paket imaj etiketi temizlenir. Koordinatör `state/` dosyalarını commit eder; push'u kullanıcının kararıyla koordinatör yapar.
 
 ### 8.2 Yeni bir projede kurulum listesi
 
@@ -577,7 +578,8 @@ NER gecikme kabulü (boşta P95 < 300 ms) geliştirme dizüstünde ölçüldü. 
 
 **Oturum düzeni**
 - [ ] 1 koordinatör + rol başına işçi şeridi + 1 kalıcı inceleyici (+ gerekirse test işçisi)
-- [ ] İletişim, zil ve commit/push için ucuz modelli bir sekreter ajan; karar yetkisi yok
+- [ ] İletişim ve zil için ucuz modelli bir sekreter ajan; karar yetkisi yok
+- [ ] Push sahipliği yazılı: karar insanda, işlem koordinatörde
 - [ ] Karar sınırı yazılı: koordinatörün sormadan verdiği kararlar ve insanda kalanlar (veri güvenliği, secret, dış sistem, sözleşme, kapsam, bütçe)
 - [ ] Paket başına yeni oturum; ilk mesajda yetki sınırı
 - [ ] Koordinatör karar yetkisi listesi ve kullanıcıda kalanlar, açıkça yazılı
@@ -607,9 +609,9 @@ NER gecikme kabulü (boşta P95 < 300 ms) geliştirme dizüstünde ölçüldü. 
 |---|---|---|---|---|
 | 1 | Kesin kurallar yalnız metinde; hiçbiri araçla zorlanmıyor | PROSES-175 (çıplak `compose build` dışarı bağlandı), K-05a-0011 (kapı logu yok, kırmızı kayboldu), 5 Kasım OOM (yığın sınırı aşıldı) | Hook ve izin ayarı (9.2) | **Kullanıcı onayladı (16 Kasım); uygulama bekliyor** |
 | 2 | İnsan denetimi fiilen yok; dalga kapıları ve DOC-19 tutarlılık denetimi yapılmamış | `WORK_QUEUE.md` "Kapılar" tablosunun kanıt sütunu boş; belgeler arası üç çelişki (kanıt dosyası, iki ya da üç yığın, push) | A: dalga kapısında insana tek sayfalık rapor (9.3) | **Kullanıcı A'yı seçti (16 Kasım); uygulama bekliyor** |
-| 3 | Bağlam yükü büyüdü (context rot) | Koordinatör kanalı 4.107 satır, BLOCKERS 181 kayıt, KARARLAR satırları çok uzun | Kanal arşivi, BLOCKERS'ı açık ve kapalı olarak bölmek, KARARLAR indeksi | öneri |
+| 3 | Bağlam yükü büyüdü (context rot) | Koordinatör kanalı 4.107 satır, BLOCKERS 181 kayıt, KARARLAR satırları çok uzun | Kanal arşivi, BLOCKERS'ı açık ve kapalı olarak bölmek, KARARLAR indeksi (9.4) | öneri, ayrıntılı |
 | 4 | İnceleme döngüsünün durma kuralı yok | 08-tam-1a 7 tur, 09-1 6 tur; zamanlama sınıfı 4 tur | Üçüncü turda hâlâ MAJOR varsa ya da aynı sınıf iki kez çıktıysa tasarım notu (değişmez + sınır testleri) | öneri |
-| 5 | Sekreter depoda kayıtsız; push yetkisi yazılı değil | `MULTI_AGENT_PROTOCOL.md` "ajanlar push etmez" | Sekreter rolünü, kanalını ve push yetkisini handbook'a yazmak | öneri |
+| 5 | Sekreter depoda kayıtsız; push sahipliği yazılı değil | `MULTI_AGENT_PROTOCOL.md` "ajanlar push etmez" | Sekreter rolünü ve kanalını handbook'a yazmak; push: karar kullanıcıda, işlem koordinatörde | push sahipliği kullanıcı kararıyla netleşti (16 Kasım); handbook bekliyor |
 | 6 | CI yok, kapılar tek makinede | EXECUTION_HANDBOOK 5.11 hiç çalışmadı; ENV-171 Docker arızaları | Headless Claude ya da CI ile kapı | öneri |
 | 7 | Mesajlar serbest metin, makine okuyamıyor | DURUM ve PR-HAZIR mesajları yalnız insan için | Mesaj başlığına yapılandırılmış alanlar | öneri |
 
@@ -623,7 +625,7 @@ NER gecikme kabulü (boşta P95 < 300 ms) geliştirme dizüstünde ölçüldü. 
 |---|---|---|---|---|
 | `.env` okunmaz, yazılmaz | SECURITY_AND_PERMISSIONS | `permissions.deny` + Bash hook (`.env` sonrası nokta yoksa) | `cat .env` (`.env.test` serbest) | `ENV: .env okunmaz` |
 | PayCore `data/**`, `eval/results/**` okunmaz | CLAUDE.md, PLAN 5 | `permissions.deny` | `Read paycoreLLM/data/...` | `PayCore veri sınırı` |
-| Push yalnız sekreter | 2.2, protokol | Bash hook + rol | işçinin `git push` komutu | `push yalnız sekreter` |
+| Push yalnız koordinatör (kararı kullanıcıda) | 2.2, protokol | Bash hook + rol | işçinin ya da sekreterin `git push` komutu | `push yalnız koordinatör, kullanıcı kararıyla` |
 | Dış bağlantılı derleme yok | PROSES-175 | Bash hook | `docker compose build` (`--pull=false` olmadan), `up --build` | `PROSES-175: --pull never / --pull=false` |
 | Yığın `--pull never` ile açılır | ENVIRONMENT_AND_COMMANDS | Bash hook | `docker compose up -d` | `yığın --no-build --pull never ile açılır` |
 | En fazla üç yığın | KARARLAR "Üç yığın sınırı" | Bash hook, `docker compose ls` sayımı | üç yığın açıkken dördüncü `up` | `üç yığın sınırı; YIGIN-AÇ sırası koordinatörde` |
@@ -680,7 +682,7 @@ def stop(msg):
 if tool == "Bash":
     cmd = inp.get("command", "")
     if re.search(r"\.env(?![.\w])", cmd):                      stop("ENV: .env okunmaz")
-    if re.search(r"\bgit\s+push\b", cmd) and role != "sekreter": stop("push yalnız sekreter")
+    if re.search(r"\bgit\s+push\b", cmd) and role != "koordinator": stop("push yalnız koordinatör")
     if re.search(r"compose\b.*\bbuild\b", cmd) and "--pull=false" not in cmd: stop("PROSES-175")
     if re.search(r"compose\b.*\bup\b", cmd) and "--pull never" not in cmd:  stop("--pull never")
     if re.search(r"compose\b.*\bup\b", cmd) and running_stacks() >= 3:      stop("üç yığın sınırı")
@@ -696,7 +698,7 @@ sys.exit(0)
 1. **Karar kaydı:** koordinatör `KARARLAR.md`'ye kaydı yazar. Bu güvenlik davranışı olduğu için C sınıfı bir değişiklik; kullanıcı onayı 16 Kasım'da verildi.
 2. **Dal:** ayrı küçük bir dal açılır (ör. `fix/ajan-hooklari`). Her kural için önce kırmızı test yazılır: hook betiğine örnek JSON verilir, beklenen çıkış kodu doğrulanır. Ardından betik yazılır, sonra inceleyici turu yapılır.
 3. **Önce uyarı:** bir gün `FFCORE_GUARD_MODE=warn` ile çalışılır. Bu sürede hook yalnız mesaj yazar, engellemez; gerçek oturumlarda yanlış pozitif olup olmadığı görülür. Sonra `block` kipine geçilir.
-4. **Belgeler aynı PR'da:** `ENVIRONMENT_AND_COMMANDS.md`, `SECURITY_AND_PERMISSIONS.md` ve `MULTI_AGENT_PROTOCOL.md`'ye "bu kural hook ile zorlanır" satırı eklenir. Sekreterin push yetkisi de protokole yazılır (bulgu 5).
+4. **Belgeler aynı PR'da:** `ENVIRONMENT_AND_COMMANDS.md`, `SECURITY_AND_PERMISSIONS.md` ve `MULTI_AGENT_PROTOCOL.md`'ye "bu kural hook ile zorlanır" satırı eklenir. Push sahipliği de protokole yazılır: karar kullanıcıda, işlem koordinatörde (bulgu 5).
 5. **Oturum açılışı:** `BASLATMA.md` mesajlarına `FFCORE_ROL` adımı eklenir. Koordinatör yeni oturum açtığında `state/oturumlar.json`'a kaydı yazar.
 
 ### 9.3 Dalga kapısında insan raporu (karar A)
@@ -713,6 +715,47 @@ Her dalga kapanışında koordinatör tek sayfalık bir rapor hazırlar ve insan
 7. Hook kayıtları: engellenen çağrıların sayısı ve türü (9.2 uygulandıktan sonra)
 
 **İnsan onayı.** İnsan raporu okur, onaylar ya da bir maddeyi geri çevirir. Koordinatör onayı `WORK_QUEUE.md` "Kapılar" tablosuna tarih ve rapor yoluyla yazar. Onay olmadan sonraki dalga READY olmaz; bu kural `EXECUTION_HANDBOOK.md` 8'de zaten var.
+
+### 9.4 Bağlam bütçesi (bulgu 3)
+
+**Sorun.** Her yeni oturum `CLAUDE.md`'deki okuma sırasını izler, ama bu sıradaki ortak dosyalar zamanla büyüdü. Kapanmış kayıtlar ve eski mesajlar her açılışta yeniden okunuyor; bu hem token'ı hem modelin dikkatini harcıyor (context rot). Ölçüm (16 Kasım, `wc -c`):
+
+| Dosya | Boyut | Gözlem |
+|---|---|---|
+| `KARARLAR.md` | 118 KB, 211 satır, 148 madde | En uzun satır 2.490 karakter; geçerli ile tersine dönmüş karar yan yana |
+| `state/WORK_QUEUE.md` | 101 KB, 107 satır | Durum tablosunun "not" sütunu paket tarihçesini taşıyor |
+| `state/BLOCKERS.md` | 101 KB, 187 kayıt | Kabaca 70 kayıt kapalı ama dosyada duruyor (durum sütunundan sayıldı; **doğrulanmadı**, sütun biçimi tutarsız) |
+| `PLAN.md` | 38 KB | Sürüm geçmişi her okumada geliyor |
+| Diğer zorunlu okumalar (FELSEFE, handbook dosyaları) | yaklaşık 50 KB | Makul |
+| **Açılış okuması toplamı** | **yaklaşık 408 KB** | Kabaca 100 bin token ve üstü (bayt/4 alt tahmini; Türkçe metinde daha fazla) |
+| `state/kanal/koordinator.md` | 884 KB, 4.157 satır | Tek seferde okunamıyor |
+| İşçi ve inceleyici kanalları | 300-320 KB, her biri | Bitmiş paketlerin mesajları duruyor |
+
+**Hedef.** Bir oturumun açılışta okuduğu toplam en fazla 60 KB olsun; geri kalan bilgi gerektiğinde, ID ya da dosya yoluyla okunsun.
+
+**Öneriler.**
+
+| # | Değişiklik | Nasıl | Hedef boyut |
+|---|---|---|---|
+| 1 | Kanal arşivi | Paket MERGED olunca o pakete ait mesajlar `state/kanal/arsiv/<rol>-<paket>.md`'ye taşınır. Aktif kanalda yalnız açık paketler ve lease başlığı kalır. Mesaj içeriği değişmez, ID'ler korunur. | aktif kanal < 50 KB |
+| 2 | BLOCKERS'ı ikiye bölmek | Açık kayıtlar `BLOCKERS.md`'de, kapanmışlar numaralarıyla `state/arsiv/blockers-kapali.md`'de. Kayıt metni en fazla 3 satır; ayrıntı varsa dosya yolu. | < 30 KB |
+| 3 | WORK_QUEUE'yu durum tablosuna indirmek | Her satırda paket, durum, işçi, branch, son mesaj ID'si. Tarihçe notları `state/arsiv/work-queue-<dalga>.md`'ye. | < 15 KB |
+| 4 | KARARLAR indeksi | Dosyanın başına tek satırlık bir indeks: tarih, başlık, durum (geçerli / tersine döndü / ertelendi). Madde metni en fazla 600 karakter, ayrıntı brief'te ya da PR notunda. Tersine dönen maddeler "Geçmiş" bölümüne iner (DOC-18 korunur). | indeks < 15 KB |
+| 5 | Rol bazlı okuma listesi | `CLAUDE.md` okuma sırası iki gruba ayrılır. Herkes için zorunlu: CLAUDE, FELSEFE, kendi rol bölümü, KARARLAR indeksi, açık BLOCKERS, kendi kanalı. Gerektiğinde: PLAN bölümleri, CONTRACTS satırı, arşivler. | açılış < 60 KB |
+| 6 | Ölçüm | Küçük bir betik (`scripts/context_budget.py`) dosya boyutlarını hedeflerle karşılaştırır. Sonuç dalga raporunun (9.3) bir satırı olur; hedef aşılırsa raporda görünür (fail-loud). | — |
+
+**Kim yapar.** Arşive taşıma mekanik bir iştir, ama `WORK_QUEUE`, `BLOCKERS` ve `KARARLAR` tek yazar dosyalarıdır. Bu yüzden taşımayı dalga kapanışında koordinatör yapar. Kanal arşivi için de rolün kendi kanalını yazma kuralı korunur: taşıma, ilgili oturum kapanırken (HANDOFF sırasında) ya da koordinatörün dalga kapanışında yapılır.
+
+**Riskler ve önlemler.**
+- Arşive giden bilgiyi kimse aramaz. Önlem: indeks satırları ve kanal başlığı arşiv dosyasının yolunu verir; arşiv grep'lenebilir düz Markdown kalır.
+- Taşıma sırasında satır kaybolur. Önlem: taşımadan önce ve sonra kayıt ve mesaj ID sayısı karşılaştırılır; eksik varsa taşıma geri alınır. Git geçmişi zaten tam metni tutar (ARCH-09: ayrı yedek sistemi kurulmaz).
+- Kısaltılan KARARLAR maddesi gerekçesini kaybeder. Önlem: gerekçe silinmez, ayrıntı satırına iner; indeks yalnız yön gösterir.
+
+**Uygulama sırası.** Bu bir belge ve süreç değişikliği; kod gerektiren tek parça ölçüm betiği. Önerilen sıra:
+1. Kullanıcı kararı.
+2. Koordinatör KARARLAR kaydını yazar ve `CLAUDE.md` ile `MULTI_AGENT_PROTOCOL.md` güncellemesini yapar.
+3. İlk arşivleme bir sonraki dalga kapanışında yapılır.
+4. Ölçüm betiği hook dalıyla (9.2) aynı PR'a girebilir.
 
 ---
 
@@ -744,7 +787,7 @@ Her dalga kapanışında koordinatör tek sayfalık bir rapor hazırlar ve insan
 | llmaas / airgap | Dağıtım profilleri; fark yapılandırma değeridir, `if profile` değil |
 | fail-loud | Beklenmeyen durumda açık hata; sessiz fallback yok (ARCH-06) |
 | hook | Claude Code'un araç çağrısından önce ya da sonra çalıştırdığı komut; PreToolUse hook'u 2 koduyla çıkarsa çağrıyı engeller (9.2) |
-| sekreter | İletişimi, zili, `state/` commit'ini ve push'u yürüten ucuz modelli ajan; karar vermez (2.2) |
+| sekreter | İletişimi ve zili yürüten ucuz modelli ajan; bir süre commit ve push da yaptı; karar vermez (2.2) |
 | dalga raporu | Dalga kapısında koordinatörün insana sunduğu tek sayfalık rapor (9.3) |
 
 ### 10.2 Dosya haritası
