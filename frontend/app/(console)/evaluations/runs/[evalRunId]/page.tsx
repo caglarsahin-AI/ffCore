@@ -15,9 +15,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useReportError } from "@/components/use-report-error";
 import { WriteGate } from "@/components/write-gate";
-import { evalKeys, isLiveEvalRun, openEvalStream, useCancelEvalRun, useEvalRun } from "@/lib/api/eval-queries";
-import type { EvalRun } from "@/lib/api/eval-queries";
-import { followEvalStream } from "@/lib/eval-stream";
+import { EVAL_RUN_STATUSES, evalKeys, isLiveEvalRun, openEvalStream, useCancelEvalRun, useEvalRun } from "@/lib/api/eval-queries";
+import type { EvalRun, EvalRunStatus } from "@/lib/api/eval-queries";
+import { followEvalStream, shownStatus } from "@/lib/eval-stream";
 import type { EvalProgress } from "@/lib/eval-stream";
 import { isUnauthenticated } from "@/lib/login-redirect";
 
@@ -88,9 +88,12 @@ function Loaded({ projectId, run, stream, setStream }: { projectId: string; run:
     // eslint-disable-next-line react-hooks/exhaustive-deps -- one stream per page, started once
   }, []);
 
-  const items = progress?.items ?? run.items;
-  const scored = progress?.scored ?? run.scored;
-  const status = run.status;
+  // The stream's counts are the newest only while it is followed; after it ended, GET's are.
+  const streamed = stream === "streaming" ? progress : null;
+  const items = streamed?.items ?? run.items;
+  const scored = streamed?.scored ?? run.scored;
+  const status = shownStatus(run.status, stream, progress);
+  const knownStatus = (EVAL_RUN_STATUSES as readonly string[]).includes(status) ? (status as EvalRunStatus) : null;
   const when = (iso: string | null) => (iso ? format.dateTime(new Date(iso), { dateStyle: "medium", timeStyle: "medium" }) : t("none"));
 
   const action = live ? (
@@ -108,7 +111,7 @@ function Loaded({ projectId, run, stream, setStream }: { projectId: string; run:
         <dl className="grid gap-x-8 gap-y-2 text-sm sm:grid-cols-2 lg:grid-cols-4">
           <Fact label={t("status")}>
             <Badge variant={status === "failed" ? "destructive" : "secondary"} data-testid="eval-status">
-              {tStatus(status)}
+              {knownStatus ? tStatus(knownStatus) : <span className="font-mono">{status}</span>}
             </Badge>
           </Fact>
           <Fact label={t("progress")}>

@@ -154,3 +154,9 @@ export async function followEvalStream(options: EvalFollowOptions): Promise<Eval
   }
   return options.signal?.aborted ? "aborted" : "lost";
 }
+
+// The exam status the page shows: while the stream is followed its `progress` is newer than the
+// GET read at page load; once it ended (done, lost, ended) the GET status is the current one.
+export function shownStatus(runStatus: string, stream: string | null, progress: EvalProgress | null): string {
+  return stream === "streaming" && progress ? progress.status : runStatus;
+}
