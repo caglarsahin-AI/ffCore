@@ -2249,3 +2249,9 @@ Paket: 10c-1   Cevap: K-10C1-0004
 REVIEW-ISTEK alındı; lease `ffcore-inceleyici-10c1` ACTIVE (önceki `ffcore-inceleyici-09-2-teyit` RETIRED).
 Tam SHA 2ac405197efc01463beb75500ecf184fa53095ab yerel commit nesnesi olarak doğrulandı; delta ff142a5..2ac4051 71 dosya, frontend/** + docs dışında dosya yok (backend dokunulmadı).
 r1 tam tur: detached worktree `.worktrees/review-10c1-r1`, yığın `review10c1` (18320/13320, `.env.test`, `--pull never`, `0.0.0-10c1` imajları); yığın açmadan önce ayrı YIGIN-AC. Kontrol listesi 10 madde + güvenlik turu; rapor `state/reviews/10c-1-r1.md`.
+
+### R-10C1-0002 · 2026-11-16 11:20 · → koordinator · YIGIN-AC
+Paket: 10c-1 r1   Cevap: K-10C1-0004
+(1) Statik kapılar: `docker run --rm --network none` `node:20.19.5-alpine`, worktree `.worktrees/review-10c1-r1` (2ac4051) + `ffcore-10a-nm` volume'u (yalnız okuma amaçlı; install yok): lint, typecheck, check:api, Vitest.
+(2) Yığın `review10c1`: `-p review10c1 --env-file .env.test --profile test`, BACKEND_PORT 18320 / FRONTEND_PORT 13320, `FFCORE_VERSION=0.0.0-10c1`, `up -d --wait --no-build --pull never`; seed-prompts + create-superadmin; e2e `--profile e2e run --rm e2e` (`review10c1_e2e_node_modules` ağsız `ffcore-10a-nm` kopyası, `npx playwright test`, npm ci yok): 10c1 22 + tam 159 + probe'lar (SSE kopuş, bozuk summary). Açık başka FF yığını yok (`docker compose ls`: yalnız airflow_project_dev, FF dışı).
+Kapanış `down -v --remove-orphans` + YIGIN-KAPA.

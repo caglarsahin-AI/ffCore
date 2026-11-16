@@ -609,8 +609,8 @@ NER gecikme kabulü (boşta P95 < 300 ms) geliştirme dizüstünde ölçüldü. 
 |---|---|---|---|---|
 | 1 | Kesin kurallar yalnız metinde; hiçbiri araçla zorlanmıyor | PROSES-175 (çıplak `compose build` dışarı bağlandı), K-05a-0011 (kapı logu yok, kırmızı kayboldu), 5 Kasım OOM (yığın sınırı aşıldı) | Hook ve izin ayarı (9.2) | **Kullanıcı onayladı (16 Kasım); uygulama bekliyor** |
 | 2 | İnsan denetimi fiilen yok; dalga kapıları ve DOC-19 tutarlılık denetimi yapılmamış | `WORK_QUEUE.md` "Kapılar" tablosunun kanıt sütunu boş; belgeler arası üç çelişki (kanıt dosyası, iki ya da üç yığın, push) | A: dalga kapısında insana tek sayfalık rapor (9.3) | **Kullanıcı A'yı seçti (16 Kasım); uygulama bekliyor** |
-| 3 | Bağlam yükü büyüdü (context rot) | Koordinatör kanalı 4.107 satır, BLOCKERS 181 kayıt, KARARLAR satırları çok uzun | Kanal arşivi, BLOCKERS'ı açık ve kapalı olarak bölmek, KARARLAR indeksi (9.4) | öneri, ayrıntılı |
-| 4 | İnceleme döngüsünün durma kuralı yok | 08-tam-1a 7 tur, 09-1 6 tur; zamanlama sınıfı 4 tur | Üçüncü turda hâlâ MAJOR varsa ya da aynı sınıf iki kez çıktıysa tasarım notu (değişmez + sınır testleri) | öneri |
+| 3 | Bağlam yükü büyüdü (context rot) | Koordinatör kanalı 4.107 satır, BLOCKERS 181 kayıt, KARARLAR satırları çok uzun | Kanal arşivi, BLOCKERS'ı açık ve kapalı olarak bölmek, KARARLAR indeksi (9.4) | **Kullanıcı kabul etti (16 Kasım); uygulama bekliyor** |
+| 4 | İnceleme döngüsünün durma kuralı yok | 08-tam-1a 7 tur, 09-1 6 tur; zamanlama sınıfı 4 tur | Aynı sınıf iki ardışık turda MAJOR verirse tasarım notu; üçüncü turda koordinatör kapsam kararı (9.5) | öneri, ayrıntılı |
 | 5 | Sekreter depoda kayıtsız; push sahipliği yazılı değil | `MULTI_AGENT_PROTOCOL.md` "ajanlar push etmez" | Sekreter rolünü ve kanalını handbook'a yazmak; push: karar kullanıcıda, işlem koordinatörde | push sahipliği kullanıcı kararıyla netleşti (16 Kasım); handbook bekliyor |
 | 6 | CI yok, kapılar tek makinede | EXECUTION_HANDBOOK 5.11 hiç çalışmadı; ENV-171 Docker arızaları | Headless Claude ya da CI ile kapı | öneri |
 | 7 | Mesajlar serbest metin, makine okuyamıyor | DURUM ve PR-HAZIR mesajları yalnız insan için | Mesaj başlığına yapılandırılmış alanlar | öneri |
@@ -752,10 +752,58 @@ Her dalga kapanışında koordinatör tek sayfalık bir rapor hazırlar ve insan
 - Kısaltılan KARARLAR maddesi gerekçesini kaybeder. Önlem: gerekçe silinmez, ayrıntı satırına iner; indeks yalnız yön gösterir.
 
 **Uygulama sırası.** Bu bir belge ve süreç değişikliği; kod gerektiren tek parça ölçüm betiği. Önerilen sıra:
-1. Kullanıcı kararı.
+1. Kullanıcı kararı: verildi (16 Kasım, öneri olduğu gibi kabul edildi). Kullanıcı ayrıca koordinatörün iki adımlı uygulama planını (A) kabul etti:
+   - **Adım 1 (hemen):** KARARLAR kaydı; BLOCKERS'ın açık ve kapalı olarak bölünmesi; KARARLAR indeksi (600 karakter sınırı yeni maddelere); CLAUDE.md okuma sırasının "zorunlu" ve "gerektiğinde" olarak ayrılması; MULTI_AGENT_PROTOCOL'e arşiv kuralı.
+   - **Adım 2 (10c-1 kapanışı):** ilk dalga raporuyla birlikte kanal arşivi ve WORK_QUEUE sadeleştirmesi, sayım kanıtıyla.
+   - **Ölçüm betiği:** koordinatörün planında hook paketinden ayrı küçük bir dilim olarak, koordinatörün kendisi yazacak.
+   - **İki açık nokta** (16 Kasım, koordinatöre iletilmek üzere):
+     - (a) `MULTI_AGENT_PROTOCOL.md` "Koordinatör kod yazmaz" diyor. Betiği koordinatör yazacaksa bu kurala yazılı bir istisna gerekir; yoksa betik bir işçiye verilmeli.
+     - (b) Adım 1 sonunda açılış okuması 60 KB'ın üstünde kalır. Açık BLOCKERS kayıtları tek başına yaklaşık 44 KB tutuyor; WORK_QUEUE (101 KB) ve kendi kanalı (300 KB'a kadar) adım 2'ye kadar küçülmüyor. Hedef ancak adım 2 ile ve açık kayıtlar da kısaltılırsa tutar **(tahmin; satır boyutları durum sütunundan ayrıştırıldı)**.
 2. Koordinatör KARARLAR kaydını yazar ve `CLAUDE.md` ile `MULTI_AGENT_PROTOCOL.md` güncellemesini yapar.
 3. İlk arşivleme bir sonraki dalga kapanışında yapılır.
-4. Ölçüm betiği hook dalıyla (9.2) aynı PR'a girebilir.
+4. Ölçüm betiği hook dalıyla (9.2) aynı PR'a girebilir. (Koordinatörün planında ayrı bir dilim; bkz. madde 1.)
+
+### 9.5 İnceleme tur kuralı (bulgu 4; öneri)
+
+**Sorun.** İnceleme döngüsünün bir çıkış ölçütü yok. Her tur yeni bir kenar durumu bulunca döngü devam ediyor. Uzun döngülerin ortak noktası, **aynı hata sınıfının** her turda yeni bir biçimde geri gelmesi:
+
+| Paket | Tur | Tekrar eden sınıf | Nasıl kapandı |
+|---|---|---|---|
+| 09-1 | 6 + teyit | Süre bütçesi: r2, r3, r4 ve r5'te birer MAJOR | Yama bırakıldı, tek türetilmiş sabit yazıldı (`TICK_PLAN_S`) ve sınırın iki yanı test edildi (7.1) |
+| 08-tam-1a | 7 | URL ve HTML kuralının atlatılması: r2, r3, r4 ve r5'te birer MAJOR (`08-tam-1a-r2..r5.md`) | r4 "yapı kararı gerekir" dedi; r5'te cevap düzeyinde fail-closed kuralı kabul edildi |
+| 01, 02 | 4'er | Farklı bulgular | Tur başına bulgular azaldı (5 → 1 → 0); döngü sağlıklıydı |
+
+`state/reviews/` dağılımı: 53 inceleme konusundan 36'sı en fazla 2 turda, 13'ü 3 turda, 4'ü 4 ya da daha fazla turda kapandı. Yani kural yalnız birkaç pakete dokunur; ama dokunduğu paketler en pahalı olanlar.
+
+**Önerilen kural (A).**
+1. **Sınıf etiketi:** inceleyici her MAJOR'a kısa bir sınıf adı verir (ör. `zaman-butcesi`, `kural-atlatma`). Bulgu önceki turdaki bir sınıfın devamıysa `tekrar: rN MAJOR-x` diye işaretlenir.
+2. **Tetik 1: aynı sınıf iki ardışık turda MAJOR verirse** yama durur. İşçi kod yazmadan önce bir **tasarım notu** yazar ve PR notuna ekler. Notta şunlar olur:
+   - korunacak değişmez(ler),
+   - sınırın iki yanındaki testler,
+   - önceki yamanın neden yetmediği.
+
+   İnceleyici notu okuyup onaylar, ardından kod gelir. 09-1'de bu tetik r3'te, 08-tam-1a'da r3'te çalışırdı.
+3. **Tetik 2: üçüncü turun sonunda hâlâ MAJOR varsa** koordinatör bir kapsam kararı verir ve KARARLAR'a yazar. Seçenekler:
+   - (a) tasarım notu,
+   - (b) paketi bölmek: kapanan kısım merge edilir, kalanı ayrı dilim olur,
+   - (c) MAJOR'u gerekçesiyle FOLLOWUP'a indirmek. Güvenlik ve veri sınırı bulgularında bu seçenek yoktur.
+4. **Bilgi:** beşinci tura varan her paket dalga raporunda (9.3) ayrı satır olur; tur sayısı ve tetiklenen kurallar raporda görünür.
+5. **Değişmeyenler:** MINOR ve NOTE turu uzatmaz; zaten FOLLOWUP'a ya da merge öncesi küçük DUZELT'e gidiyorlar. ONAY yine yalnız BLOCKER ve MAJOR sıfırken verilir; kural kalite çıtasını düşürmez, yalnız yöntemi değiştirir.
+
+**Tahmini etki.** 09-1 ve 08-tam-1a'da tetik 1 üçüncü turda çalışsaydı, iki pakette de yaklaşık iki tur daha az olurdu **(tahmin)**. Sabit ve fail-closed kararları sonunda zaten alındı; kural bu kararları daha erken aldırır.
+
+**Seçenekler.**
+- **A (önerilen):** sınıf etiketi + tetik 1 + tetik 2, yukarıdaki gibi. Bedel: inceleyiciye etiket işi, işçiye tasarım notu.
+- **B:** sabit tur tavanı (ör. 3 tur, sonra zorunlu bölme). Basit, ama 01 ve 02 gibi sağlıklı ilerleyen döngüleri de keser.
+- **C:** kural yok, tur sayıları yalnız dalga raporunda izlenir. Bedel: aynı kalıp tekrarlanır, ders olaydan sonra çıkar.
+
+**Uygulama.** Belge değişikliği; kod yok.
+- `EXECUTION_HANDBOOK.md` 7'ye bir "Tur kuralı" alt bölümü.
+- İnceleme rapor biçimine sınıf etiketi alanı.
+- `PR_SABLONU.md`'ye isteğe bağlı "Tasarım notu" bölümü.
+- KARARLAR kaydı.
+
+Yazarı koordinatör, mevcut inceleyici oturumlarına bir DURUM mesajıyla duyurulur.
 
 ---
 

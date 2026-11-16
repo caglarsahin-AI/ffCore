@@ -100,3 +100,12 @@ Aynı oturum hem uygulayıp hem son review'ı yapamaz. Review'ı inceleyici otur
 ## Handoff
 
 Her işçi oturumu kapanmadan kendi kanalına `HANDOFF` mesajı yazar (şablon `state/HANDOFF.md`): tam sonraki adım, değişen dosyalar, koşan ve kalan testler, kararlar, blocker'lar, commit edilmemiş durum. "Devam edilecek" tek başına geçerli değildir.
+
+## Bağlam bütçesi ve arşiv (16 Kasım 2026)
+
+- Hedef: bir oturumun açılış okuması en fazla 60 KB (CLAUDE.md "Okuma sırası" zorunlu kümesi); geri kalanı gerektiğinde ID ya da dosya yoluyla okunur. Ölçüm: `py -3.12 scripts/context_budget.py` (hedef aşımı çıkış kodu 1; sonuç dalga raporunda bir satır).
+- **Kanal arşivi:** paket MERGED olunca o pakete ait mesajlar `state/kanal/arsiv/<rol>-<paket>.md`'ye **taşınır** (koordinatör, HANDOFF sonrası ya da dalga kapanışında; taşıma öncesi/sonrası mesaj ID sayısı eşit olmalı). Aktif kanalda açık paketler ve lease kalır. İçerik ve ID'ler değişmez; arşiv salt okunurdur; bir ID'ye atıf aktif kanalda bulunmazsa arşivde aranır. "Yalnız sona eklenir, eski mesaj değiştirilmez" kuralı sürer: taşıma değiştirme değildir. Hedef: aktif kanal < 50 KB.
+- **BLOCKERS:** açık kayıtlar `state/BLOCKERS.md`, kapalılar numaralarıyla `state/arsiv/blockers-kapali.md` (koordinatör taşır; kayıt ≤ 3 satır). Hedef < 30 KB.
+- **WORK_QUEUE:** yalnız durum tablosu (paket, durum, işçi, branch, son mesaj ID'si); tarihçe `state/arsiv/work-queue-<dalga>.md`. Hedef < 15 KB.
+- **KARARLAR:** başta tek satırlık indeks; yeni madde ≤ 600 karakter (gerekçe ayrıntısı PR notu/rapor yoluyla); eski maddeler kesilmez; tersine dönenler "Geçmiş" bölümüne iner (DOC-18). İndeks < 15 KB.
+- Taşımaları yalnız koordinatör yapar (tek yazar); diğer roller arşivi okur, yazmaz.

@@ -4,12 +4,15 @@ Kurumsal yapay zekâ platformu: model dışındaki her şey (kapı, bilgi taban�
 
 ## Okuma sırası
 
-0. `FELSEFE.md` (geliştirme felsefesi, her kuralın üstünde) ve `handbook/FELSEFE_UYGULAMA.md` (FFCore'daki karşılığı; her PR planında üç felsefe sorusu)
-1. `PLAN.md` (amaç, kısıtlar, profiller, mimari, ortak kurallar bölüm 5, paketler bölüm 7)
-2. `KARARLAR.md` (brief'lerde yazmayan kararlar)
-3. `handbook/INDEX.md` → en az `EXECUTION_HANDBOOK.md`, `CONTRACTS.md`, `SECURITY_AND_PERMISSIONS.md`, `TERMINOLOGY.md`
-4. Çalışacağın paketin brief'i: `plan/NN-*.md` ve bağımlı paketlerin "Teslimatlar" bölümü
-5. `state/WORK_QUEUE.md` (claim), `state/BLOCKERS.md`
+**Zorunlu (her oturum, toplam ≤ 60 KB hedefi; bağlam bütçesi kararı 16 Kasım 2026):**
+
+0. `FELSEFE.md` (her kuralın üstünde) ve `handbook/FELSEFE_UYGULAMA.md` (her PR planında üç felsefe sorusu)
+1. Bu dosyanın kuralları; `handbook/MULTI_AGENT_PROTOCOL.md` (roller, kanal, tek yazar, arşiv); `handbook/SECURITY_AND_PERMISSIONS.md`
+2. `KARARLAR.md` **İndeks** bölümü (tam maddeyi yalnız gerektiğinde, başlığıyla)
+3. Çalışacağın paketin brief'i: `plan/NN-*.md`; bağımlı paketlerin yalnız "Teslimatlar" bölümü
+4. `state/WORK_QUEUE.md`'de kendi satırın; `state/BLOCKERS.md` (yalnız açık kayıtlar); kendi kanalın ve koordinatör kanalının sana adresli son mesajları
+
+**Gerektiğinde (ID ya da yolla):** `PLAN.md` (amaç, kısıtlar, profiller, mimari, ortak kurallar 5, paketler 7), `KARARLAR.md` tam maddeleri, `handbook/EXECUTION_HANDBOOK.md`, `CONTRACTS.md`, `TERMINOLOGY.md`, `ENVIRONMENT_AND_COMMANDS.md`, `CHANGE_CONTROL.md`, `state/arsiv/**` ve `state/kanal/arsiv/**` (kapalı kayıtlar ve MERGED paket mesajları; ID ile atıf burada bulunur), eski inceleme raporları.
 
 ## Bağlayıcı kısa kurallar
 
