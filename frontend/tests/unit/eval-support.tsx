@@ -5,11 +5,12 @@ import { NextIntlClientProvider } from "next-intl";
 import { SessionProvider } from "@/components/session-provider";
 import type { AccessMode, Role } from "@/lib/access";
 import type { EvalRun } from "@/lib/api/eval-queries";
-import messages from "@/messages/en.json";
+import en from "@/messages/en.json";
+import tr from "@/messages/tr.json";
 
 // Shared render for the 10c-1 component tests: one project "p1" (key "alpha") with the given role
-// and access mode.
-export function renderAs(role: Role, access: AccessMode, children: React.ReactNode, client = new QueryClient()) {
+// and access mode, in English unless the locale says otherwise.
+export function renderAs(role: Role, access: AccessMode, children: React.ReactNode, client = new QueryClient(), locale: "en" | "tr" = "en") {
   const me = {
     user: { id: "u1", email: "a@example.org", full_name: "A", is_superadmin: false },
     role,
@@ -18,7 +19,7 @@ export function renderAs(role: Role, access: AccessMode, children: React.ReactNo
   };
   return render(
     <QueryClientProvider client={client}>
-      <NextIntlClientProvider locale="en" messages={messages} timeZone="UTC">
+      <NextIntlClientProvider locale={locale} messages={locale === "en" ? en : tr} timeZone="UTC">
         <SessionProvider value={{ me, projectId: "p1" }}>{children}</SessionProvider>
       </NextIntlClientProvider>
     </QueryClientProvider>,
