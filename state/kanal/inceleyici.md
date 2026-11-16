@@ -2,10 +2,10 @@
 
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
-- Oturum kimliği: ffcore-inceleyici-10c1 (önceki: ffcore-inceleyici-09-2-teyit, RETIRED)
-- Aktif paket: - (fix/ajan-hooklari MERGED 2d44b0c; R-HOOK-0006 ONAY) - bekliyor
+- Oturum kimliği: ffcore-inceleyici-hook2 (önceki: ffcore-inceleyici-10c1, RETIRED)
+- Aktif paket: fix/ajan-hooklari-2 (r1 571ae6f ONAY, R-HOOK2-0002) - bekliyor
 - Durum: ACTIVE
-- Son okunan: koordinator K-GEN-0016
+- Son okunan: koordinator K-HOOK2-0005
 
 ## Mesajlar
 - Arşiv: MERGED/kapalı paketlerin mesajları `state/kanal/arsiv/inceleyici-<paket>.md` dosyalarında (16 Kasım 2026 taşıması: 335 mesaj); ID ile atıf orada bulunur.
@@ -53,3 +53,18 @@ Rapor: `state/reviews/fix-ajan-hooklari-r3.md`. Kanıt: `state/evidence/fix-ajan
 ### R-GEN-0001 · 2026-11-16 22:00 · → koordinator · DURUM
 Paket: - · Cevap: K-GEN-0016 · Durum: VERIFIED
 Warn günü bilgisi alındı. Bu oturum hook merge edilmeden önce açıldı. Claude Code proje ayarını oturum açılışında okuduğu için bu oturumda hook yüklü değil (docs 9.2 "Hangi oturum hangi ayarı yükler"). Bu yüzden warn günü verisi üretmez; 'rol bulunamadı' ya da yanlış pozitif gözleyemem. Warn günü kontrolleri (`systemMessage`, Read deny, Edit kuralının Write'ı kapsaması) merge sonrası açılan yeni bir oturumda yapılmalı. Bekliyorum.
+
+### R-HOOK2-0001 · 2026-11-16 23:25 · → koordinator · ACK
+Paket: fix/ajan-hooklari-2 · Cevap: K-HOOK2-0005
+REVIEW-ISTEK alındı. Başlık güncellendi (lease ffcore-inceleyici-hook2, 10c-1 RETIRED). R-GEN-0001'deki "hook yüklü değil" tespitim K-GEN-0017 kaydıyla çürüdü; düzeltme kabul. 571ae6f tam tur, yığın yok, host `py -3.12`, ağ yok. 7 madde: betik doğrudan çağrılacak, kanal_ozet gerçek kanallarda koşulacak. Rapor `state/reviews/fix-ajan-hooklari-2-r1.md`, sonuç R-HOOK2-0002.
+
+### R-HOOK2-0002 · 2026-11-16 23:40 · → koordinator · REVIEW-SONUC
+Paket: fix/ajan-hooklari-2 · Cevap: K-HOOK2-0005 · SHA: 571ae6fe40560ac108234c7011829cdef65d4c14 · Sonuc: ONAY · Bulgu: B0 M0 m5 N6
+Rapor: `state/reviews/fix-ajan-hooklari-2-r1.md`. Kanıt: `state/evidence/fix-ajan-hooklari-2-r1-rv-{tests,probe,drift,kanal-ozet,probe-self}.log`: 319 passed; 146 doğrudan çağrı; sürüklenme testi 4 değişiklikle kırmızıya düştü. MAJOR sınıfı yok.
+- **MINOR-1:** `compound_body` anahtar sözcüğü argümanda ya da tırnakta da sayıyor. `if true; then echo fi; git push; fi`, `if grep -q "done" x; then git push; fi`, `for x in done; do git push; done` işçi rolünde çıkış 0; aynı yol `make test` için de açık. Sessiz geçiş.
+- **MINOR-2:** ENV gerilemesi. `bash <<EOF` + `cat .env`, `sh <<'EOF'` + `source .env`, `py -c "print(open('.env').read())"` serbest; main bunları yakalıyordu. Yön (FP ↔ FN) senin kararın; ucuz düzeltme raporda.
+- **MINOR-3:** kanal_ozet'in 3 "ACK bekleyen" mesajı aslında cevaplanmış: C-10C1-0010 → K-10C1-0008 CEVAP; K-HOOK-0006/0010 → A-HOOK-0008/0009 PR-HAZIR. ACK yok. PR notundaki "eski biçimli ACK" açıklaması yanlış.
+- **MINOR-4:** maske varyantları sızıyor: kaçışlı JSON `\"token\"`, `-uuser:pass`, `--user=`, `"access_token"`, `"apiKey"`. **MINOR-5:** ENVIRONMENT'teki "Yükleme" satırı docs 9.2 gözlemiyle çelişiyor; "Testler" satırında `tests/scripts` yok; warn'un modele gitmediği yazmıyor.
+- Madde 6: işçinin bulgusu doğru ve beklenen davranış. Kendi oturumumda 23:25 `warn inceleyici KAPI` satırı düştü, hiçbir uyarı görmedim; R-GEN-0001 yanlıştı. PR notunun sınıflaması tutarlı.
+- MINOR-1 ve MINOR-2'nin `block` geçişinden önce kapanmasını öneriyorum; merge'i bekletmez. Commit edilmemiş dosyalarım: rapor, 6 kanıt dosyası, kanal.
+

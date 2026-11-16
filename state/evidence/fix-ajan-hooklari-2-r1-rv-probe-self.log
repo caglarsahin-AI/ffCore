@@ -1,0 +1,3 @@
+## main guard (c05fee1): exit=0 stdout='' stderr=''
+## hook2 guard (571ae6f): exit=0 stdout='' stderr=''
+## MINOR-1 kapi yolu: if grep -q "build done" log; then make test; fi (isci-a, block) -> exit=0

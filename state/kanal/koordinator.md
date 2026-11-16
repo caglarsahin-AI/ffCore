@@ -141,3 +141,17 @@ Bak: (1) **KANAL-BICIM:** betiği doğrudan Edit/Write/MultiEdit JSON'uyla çağ
 ### K-HOOK2-0006 · 2026-11-16 23:19 · → isci-b · CEVAP
 Paket: fix/ajan-hooklari-2 · Cevap: B-HOOK2-0006
 PR-HAZIR alındı; 571ae6f doğrulandı (13 commit test→kod, 13 dosya, state yok, çakışma yok, 319 passed yeniden koşuldu, kanal_ozet gerçek kanallarda çalıştı). VERIFIED. REVIEW-ISTEK K-HOOK2-0005 inceleyiciye. Warn günü sınıflaman (9 gerçek KAPI, 3 ENV) ve 'uyarı modele görünmedi' bulgusu kayda değer; block geçişi kararında kullanılacak. Dal donuk; DUZELT gelirse uygula.
+
+### K-HOOK2-0007 · 2026-11-16 23:34 · → isci-b · DUZELT
+Paket: fix/ajan-hooklari-2 · Cevap: B-HOOK2-0006
+**r1 ONAY (R-HOOK2-0002, B0 M0 m5 N6; rapor state/reviews/fix-ajan-hooklari-2-r1.md).** Merge öncesi **r2 kısa dilim**, kararlar KARARLAR 'fix/ajan-hooklari-2 r1 kararları'; her madde önce kırmızı test, test/kod ayrı commit:
+1. **MINOR-1 bileşik gövde (fail-loud):** `compound_body` yalnız tırnak dışında ve komut konumundaki `for/while/if/do/done/fi/esac` sözcüklerini saysın (`split_pipelines` `cmd_start` mantığı); testler W13 `if true; then echo fi; git push origin main; fi`, W14 `if grep -q "done" x; then git push origin main; fi`, W15 `for x in done; do git push origin main; done` işçi engel + `if grep -q "build done" log; then make test; fi` tee'siz engel.
+2. **MINOR-2 ENV gerilemesi (veri sınırı, yön FN):** heredoc okuyucusunun ilk belirteci `sh|bash|py|python|python3|node` ise gövde komut sayılır ve bütün kurallarla denetlenir (E28, E36 engel); `py|python|node -c|-e` argümanı ayrıca taranır, `ENV_PATH_RE` ön ekine `'`, `"`, `(` eklenir (E29, E30 engel); 22:58 sınıfı yeniden yanlış pozitif olur, kabul; 'Bilinen sınırlar'a yazılmayan kısım.
+3. **MINOR-3 kanal_ozet:** alıcı kanalındaki herhangi bir mesajın `Cevap` alanı ID'yi anıyorsa ayrı 'ACK'siz cevaplanmış' listesine (ACK bekleyen listesinden çıkar); PR notu cümlesi düzeltilir; fixture testi (C-10C1-0010, K-HOOK-0006/0010 örüntüsü).
+4. **MINOR-4 maske:** `(-u|--user)(?:\s+|=)?user:pass`, kaçışlı JSON tırnağı `\?"`, alan adı `[\w-]*(token|secret|password|api_?key|key)` harf duyarsız; M04-M08 testleri.
+5. **NOTE-4:** `env -S '<komut>'` değeri `shell_inner` gibi denetlenir (W28 engel); `timeout`, `xargs`, `sudo` sarmalayıcıları 'Bilinen sınırlar'a (kod yok). **MINOR-5 + NOTE-1 belge:** ENVIRONMENT 'Yükleme' satırı gözleme göre (docs 9.2 ile aynı), 'Testler' satırına `tests/scripts`, 'Kip' satırına 'warn modele gitmez, yalnız kullanıcı ve kayıt'; 'Bilinen sınırlar' güncel; protokole 'gövdede `####` ya da kalın yazı, `### ` yalnız başlık' cümlesi.
+Kapı: `tests/hooks tests/scripts` tee `hook2-tests-r2.log`, ruff `hook2-ruff-r2.log`. PR-HAZIR r2 (`SHA:`, delta `571ae6f..`).
+
+### K-HOOK2-0008 · 2026-11-16 23:34 · → inceleyici · ACK
+Paket: fix/ajan-hooklari-2 · Cevap: R-HOOK2-0002
+ONAY alındı; rapor ve kanıtlar commit edilecek. Karar: MINOR-1 (sessiz geçiş) ve MINOR-2 (ENV gerilemesi, yön FN: yorumlayıcıya giden kod komuttur) merge öncesi r2 kısa dilimde; MINOR-3/4/5, NOTE-1 ve NOTE-4 (`env -S`) aynı dilimde; `timeout/xargs/sudo` belge satırı. 146 probe'luk tur ve sürüklenme testi kanıtı yerinde. r2 delta geldiğinde kısa teyit turu (W13-15, E28-30, M04-08, W28, kanal_ozet listesi).

@@ -1,0 +1,88 @@
+Kanal özeti (C:/ai_paycore/ffcore): 60 mesaj, biçim dışı: 2073
+
+ACK bekleyen bağlayıcı mesajlar (3):
+- C-10C1-0010 · 2026-11-16 12:58 · → koordinator · KARAR-GEREK · 10c-1
+- K-HOOK-0006 · 2026-11-16 19:22 · → isci-a · DUZELT · fix/ajan-hooklari
+- K-HOOK-0010 · 2026-11-16 19:47 · → isci-a · DUZELT · fix/ajan-hooklari
+
+Paketler (WORK_QUEUE | son durum mesajı | son ONAY SHA):
+- 00 | MERGED | - | -
+- 00i | MERGED | - | -
+- 01 | MERGED | - | -
+- 02 | MERGED | - | -
+- 03a | MERGED | - | -
+- 03b | MERGED | - | -
+- 03c | CLAIMED (üstteki PoC sonrası satırı) | - | -
+- 04a | MERGED | - | -
+- 04b | — | - | -
+- 05a | MERGED | - | -
+- 05b | — | - | -
+- 06a | MERGED | - | -
+- 06b | — | - | -
+- 06b-2 | — | - | -
+- 07 | MERGED | - | -
+- 08 tam | — | - | -
+- 08-builtin-version-test | MERGED | - | -
+- 08-default-egress-enforce | MERGED | - | -
+- 08-lite | MERGED | - | -
+- 08-tam-1a | MERGED | - | -
+- 08-tam-1b | MERGED | - | -
+- 08-tam-1c-olcum | DONE (1c-a + 1c-b MERGED) | - | -
+- 09 | — | - | -
+- 10-marka | MERGED | - | -
+- 10a | MERGED | - | -
+- 10a-bağlama | MERGED | - | -
+- 10a-formlar | MERGED | - | -
+- 10b-poc-1 | MERGED | - | -
+- 10b-poc-2 | MERGED | - | -
+- 10c | — | - | -
+- 10c-1 | DONE (MERGED) | K-GEN-0014 MERGED (2026-11-16 15:13) | b28cdc1c19b7cee4582c0d5740b0fba14b02e736
+- 11 | — | - | -
+- 12 | — | - | -
+- 13a | MERGED | - | -
+- 13b | MERGED (A + test) | - | -
+- 13b-kosu | MERGED | - | -
+- 14 | — | - | -
+- 15 | — | - | -
+- 16 | — | - | -
+- 17 | — | - | -
+- 18-cost-timing | MERGED | - | -
+- 18-e2e-iskelet | MERGED | - | -
+- 18-f2-stage3 | MERGED | - | -
+- 18-hazirlik | MERGED | - | -
+- 18-kosu-2 | VERIFIED (test koşusu tamam) | - | -
+- 18-ticket-desk | MERGED | - | -
+- 19 M3-sunucu | MERGED | - | -
+- fake-llm-tool-mode | MERGED | - | -
+- fix/03a-nonmember-404 | MERGED | - | -
+- fix/04a-06a-followups | MERGED | - | -
+- fix/04a-gate2-headings | MERGED | - | -
+- fix/04a-worker-ready | MERGED | - | -
+- fix/05a-tools-read-analyst | MERGED | - | -
+- fix/06a-checkpoint-sources | MERGED | - | -
+- fix/06a-egress-all-messages | MERGED | - | -
+- fix/07-followups | MERGED | - | -
+- fix/07-test-hooks-flag | MERGED | - | -
+- fix/19-dis-inceleme | MERGED | - | -
+- fix/19r2-dis-inceleme | MERGED | - | -
+- fix/19r3-env-tests | MERGED | - | -
+- fix/57-alembic-merge | MERGED | - | -
+- fix/ajan-hooklari | DONE | K-HOOK-0015 MERGED (2026-11-16 21:54) | 7a1195afc17648062a0a6afdae45d2aa54d88bd9
+- fix/ajan-hooklari-2 | VERIFIED (PR-HAZIR r1, inceleme) | B-HOOK2-0006 PR-HAZIR (2026-11-16 23:31) | -
+## --json sema
+exit=0
+anahtarlar ['bekleyen_ack', 'bicim_disi', 'kok', 'mesaj', 'paketler']
+mesaj 60 bicim_disi 2073
+bekleyen ['C-10C1-0010', 'K-HOOK-0006', 'K-HOOK-0010']
+bekleyen alanlari ['alici', 'id', 'kaynak', 'paket', 'tarih', 'tur']
+paket ornek 00 {'work_queue': 'MERGED', 'son_durum': None, 'son_onay_sha': None}
+fix/ajan-hooklari-2 {'work_queue': 'VERIFIED (PR-HAZIR r1, inceleme)', 'son_durum': {'id': 'B-HOOK2-0006', 'tur': 'PR-HAZIR', 'tarih': '2026-11-16 23:31', 'sha': '571ae6fe40560ac108234c7011829cdef65d4c14'}, 'son_onay_sha': None}
+## cwd baska dizin (C:/), betik mutlak yol
+Kanal özeti (C:/ai_paycore/ffcore): 60 mesaj, biçim dışı: 2073
+exit=0
+## --root state/kanal olmayan dizin
+kanal_ozet: state/kanal yok: C:\Users\CAGLAR~1.SAH\AppData\Local\Temp\claude\9398d5fca5badfb5\ecb79a59-6471-4590-b997-842940d7a702\scratchpad\state\kanal
+exit=2
+## betik guard'siz bir kopyadan (guard yolu yok)
+kanal_ozet: [Errno 2] No such file or directory: 'C:\\Users\\caglar.sahin\\AppData\\Local\\Temp\\claude\\9398d5fca5badfb5\\ecb79a59-6471-4590-b997-842940d7a702\\scratchpad\\kocopy\\.claude\\hooks\\ffcore_guard.py'
+exit=2

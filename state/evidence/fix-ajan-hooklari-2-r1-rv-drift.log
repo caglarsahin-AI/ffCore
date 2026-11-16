@@ -1,0 +1,25 @@
+## 0 degisiklik yok (yesil beklenir)
+...                                                                      [100%]
+3 passed, 47 deselected in 0.12s
+1
+## 1 protokole yeni tur YENI-TUR
+tests\hooks\test_kanal_bicim.py:295: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/hooks/test_kanal_bicim.py::test_types_match_protocol - Assertion...
+1 failed, 2 passed, 47 deselected in 0.25s
+## 2 Durum listesinden DUYURU silindi
+tests\hooks\test_kanal_bicim.py:325: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/hooks/test_kanal_bicim.py::test_required_fields_match_protocol
+1 failed, 2 passed, 47 deselected in 0.24s
+## 3 YIGIN-AC'a zorunlu alan Not eklendi
+tests\hooks\test_kanal_bicim.py:324: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/hooks/test_kanal_bicim.py::test_required_fields_match_protocol
+1 failed, 2 passed, 47 deselected in 0.22s
+1
+## 4 aliciya denetci eklendi
+tests\hooks\test_kanal_bicim.py:301: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/hooks/test_kanal_bicim.py::test_recipients_match_protocol - Asse...
+1 failed, 2 passed, 47 deselected in 0.39s
