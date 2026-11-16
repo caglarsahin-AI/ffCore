@@ -2,7 +2,7 @@
 
 **Paket:** fix/ajan-hooklari · **Sınıf:** [C] (güvenlik davranışı; kullanıcı onayı 16 Kasım, KARARLAR "Ajan kuralları hook ile zorlanır…") · **Branch:** fix/ajan-hooklari · **Worktree:** `.worktrees/fix/ajan-hooklari` · **Baz commit:** 9d38bc4 (plan anında 38ced4d; b9f9fd7 ve 10c-1 merge sonrası docs çakışmasın diye iki kez rebase; ikisi de temiz) · **İşçi:** isci-a (`ffcore-isci-a-hook`) · **Brief:** K-HOOK-0001 GOREV + K-HOOK-0002 EK (push kuralı)
 
-Durum: **IMPLEMENTED** (PLAN-ONAY K-HOOK-0003; S1-S10 A + iki ek). Gerçek çağrı kanıtı bekleniyor (A-HOOK-0004); PR-HAZIR kanıttan sonra.
+Durum: **VERIFIED** (PLAN-ONAY K-HOOK-0003; S1-S10 A + iki ek). HEAD `3ab062dc5447c9f1fed9a1bd2a32108c2689898b`; gerçek oturum kanıtı 2026-11-16 19:09 (`state/evidence/hook-real-call.log`). PR-HAZIR A-HOOK-0007.
 
 ## Plan
 
@@ -178,7 +178,7 @@ Plandan sapmalar (gerekçeli):
 | # | Kriter | Test | Durum |
 |---|---|---|---|
 | 1 | `.env` engel / `.env.test`, `.env.example` serbest (Bash + yazma araçları) | `test_env_*` (9) | geçti |
-| 2 | PayCore `data/**`, `eval/results/**` | `test_paycore_*` (3) + deny kalıbı `test_settings_json_valid_and_wires_guard` | geçti (deny'ın `//c/` biçimi gerçek çağrıda doğrulanacak) |
+| 2 | PayCore `data/**`, `eval/results/**` | `test_paycore_*` (3) + deny kalıbı `test_settings_json_valid_and_wires_guard` | geçti; `//c/` mutlak deny biçimi gerçek oturumda **doğrulanmadı** (Read ret çıktısı görülmedi; kalan risk) |
 | 3 | push: koordinator+bayrak serbest; koordinator bayraksız, isci-a+bayrak, rol yok+bayrak, hook ortamında bayrak engel | `test_push_*` (6), `test_git_status_allowed` | geçti |
 | 4 | compose build/up PROSES-175 | `test_compose_*` (8) | geçti |
 | 5 | üç yığın sınırı, sayım hatası engel | `test_fourth_stack_blocked`, `test_third_stack_allowed`, `test_up_into_running_stack_allowed`, `test_stack_count_failure_blocks`, `test_stack_parser_counts_only_running_ff` | geçti |
@@ -190,7 +190,7 @@ Plandan sapmalar (gerekçeli):
 | 11 | kayıt satırı, içeriksiz, 120 karakter | `test_block_writes_log_line_without_content`, `test_warn_writes_log_line`, `test_log_truncates_to_120`, `test_allowed_call_writes_no_log` | geçti |
 | 12 | dayanıklılık + S9 ek | `test_non_matching_tool_allowed`, `test_malformed_stdin_blocks_loudly`, `test_guard_internal_error_*` (5), `test_fast_decide` | geçti |
 | 13 | settings biçimi + komut | `test_settings_json_valid_and_wires_guard`, `test_settings_command_runs_guard` | geçti |
-| 14 | gerçek oturumda tetikleme (warn) | `state/evidence/hook-real-call.log` | **bekliyor** (A-HOOK-0004) |
+| 14 | gerçek oturumda tetikleme (warn) | `state/evidence/hook-real-call.log` | **geçti (kısmi)**: worktree oturumunda Bash hook tetiklendi, `ENV` warn satırı ana `state/evidence/hook-guard.log`'a yazıldı (19:09:21), komut engellenmedi. Doğrulanmadı: kullanıcıya görünen `systemMessage` metni ve `Read .env` deny reddi (oturum çıktısı işçiye ulaşmadı). `echo make test` doğru biçimde tetiklemedi (kapı komutu değil) |
 
 ## Çalıştırılan komutlar
 | Komut | Ortam | Exit | Süre |

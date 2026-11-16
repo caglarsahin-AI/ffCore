@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-a-hook (Opus 5.5; önceki lease ffcore-isci-a-08-tam-1c-olcum RETIRED 2026-11-05 18:30, A-08T1C-0025)
 - Aktif paket: fix/ajan-hooklari (K-HOOK-0001)
 - Durum: ACTIVE (2026-11-16 10:47)
-- Son okunan: K-GEN-0015
+- Son okunan: K-HOOK-0005
 
 ## Mesajlar
 - Arşiv: MERGED/kapalı paketlerin mesajları `state/kanal/arsiv/isci-a-<paket>.md` dosyalarında (16 Kasım 2026 taşıması: 342 mesaj); ID ile atıf orada bulunur.
@@ -48,3 +48,12 @@ Paket: fix/ajan-hooklari · Cevap: K-GEN-0014 · Durum: IMPLEMENTED
 - `main...HEAD` 9 dosya +1419/-88; state, backend ve frontend değişikliği yok. Main'deki 4fa91aa yalnız state değiştiriyor, ek rebase gerekmedi.
 - Kapı: `py -3.12 -m pytest tests/hooks -q` 101 passed, exit 0, 70 sn; çıktı `state/evidence/hook-tests.log`, başında HEAD satırı var. PR notunda SHA'lar ve taban güncel.
 - Bekleyen tek adım gerçek oturum kanıtı (A-HOOK-0004). PR-HAZIR o gelince bu SHA ile gidecek.
+
+### A-HOOK-0007 · 2026-11-16 19:11 · → koordinator · PR-HAZIR
+Paket: fix/ajan-hooklari · Cevap: K-HOOK-0003 · SHA: 3ab062dc5447c9f1fed9a1bd2a32108c2689898b
+- Dal: `fix/ajan-hooklari` (worktree `.worktrees/fix/ajan-hooklari`), taban main 9d38bc4. `main...HEAD`: 6 commit (test, test, feat, test, feat, docs), 9 dosya +1419/-88. state, backend, frontend ve deploy değişikliği yok.
+- Kapı: `py -3.12 -m pytest tests/hooks -q` 101 passed, exit 0 → `state/evidence/hook-tests.log` (HEAD satırlı). Ruff → `hook-ruff.log`. Kırmızı koşular → `hook-tests-red*.log`.
+- Gerçek oturum: `state/evidence/hook-real-call.log`. Worktree oturumunda Bash hook tetiklendi; ana `hook-guard.log`'da `warn ENV` satırı var (19:09:21), komut engellenmedi.
+- Doğrulanmadı: kullanıcıya görünen `systemMessage` metni, `Read .env` deny reddi ve `//c/` mutlak deny biçimi; oturum çıktısını görmedim. `echo make test` bilerek tetiklemez, çünkü kapı komutu değil; `make test` tetikler (yerelde denendi).
+- S10: başsız haiku 1/3 deneme, model çağrısı 0.
+- PR notu: `state/pr/fix-ajan-hooklari.md` (VERIFIED, satır 14 dolu). Dal donduruldu; DUZELT gelirse uygularım.

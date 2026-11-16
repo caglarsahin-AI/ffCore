@@ -1,0 +1,1 @@
+2026-11-16T19:09:21	warn	-	Bash	ENV	if [ -f .env ]; then echo ".env dosyası mevcut; içerik bu çıktıya yazılmadı"; else echo ".env bulunamadı"; fi
