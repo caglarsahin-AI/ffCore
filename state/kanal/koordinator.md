@@ -4218,3 +4218,11 @@ r2 ONAY (B0 M0 m1 N6; MINOR-1 FOLLOWUP-190, merge'ü bekletmez). **b28cdc1 main'
 ### K-10C1-0012 · 2026-11-16 14:40 · → tumu · DURUM
 Paket: 10c-1 · Cevap: K-10C1-0011 · Durum: VERIFIED
 **Merge tamam: main 6157752** (b28cdc1, `--no-ff`, çakışma yok). Main kapısı koşuyor (ffmain; build, config, up, lint, alembic heads, make test iki profil, samples, tam test-int, smoke, önyüz lint/typecheck/check:api; log state/evidence/gate-10c-1-20261116.log). Kapı bitene kadar koşu yok. Yeşilse MERGED, 10c-1 DONE, HANDOFF-ISTEK, dalga raporu ve kanal arşivi (bağlam bütçesi adım 2).
+
+### K-10C1-0013 · 2026-11-16 15:13 · → isci-c · HANDOFF-ISTEK
+Paket: 10c-1 · Cevap: C-10C1-0013
+**10c-1 MERGED: main 6157752.** Main kapısı yeşil (make test 1801×2, test-int 952 + 13 skip, smoke, önyüz; lint'teki tek kırmızı koordinatörün ölçüm betiğiydi, PR dışı, düzeltildi). FOLLOWUP-170 kapandı; kalanlar 185 (items ucu, 09 sahibi), 188 (lib/sse.ts bekçi), 190 (başlık birleşimi). Yapılacak: kendi kanalına kısa **HANDOFF** (öğrenilenler: SSE hareketsizlik bekçisi + reconnecting/GET deseni, Next proxy gzip tamponu ve no-transform, SIGKILL probe deseni, eski node_modules volume tuzağı, compare kod çevirisi, read modu testleri) ve **RETIRED** (lease ffcore-isci-c-10c1). Worktree `.worktrees/feat/10c-1-eval-ui` ve dal RETIRED sonrası koordinatörce kaldırılır (açık dosya bırakma). Sonrası yok; oturum arşivlenecek. Hızlı ve kanıtlı bir paketti, teşekkürler.
+
+### K-GEN-0014 · 2026-11-16 15:13 · → tumu · MERGED
+Paket: 10c-1 · Cevap: K-10C1-0012
+10c-1 main'de (6157752); kapı yeşil (gate-10c-1-20261116.log). Koşu serbest. **İnceleyici:** sıradaki fix/ajan-hooklari r1 (PR-HAZIR gerçek çağrı kanıtını bekliyor; gelince REVIEW-ISTEK). **isci-a:** bekle. Dalga raporu ve kanal arşivi (bağlam bütçesi adım 2) isci-c RETIRED sonrası koordinatörde.

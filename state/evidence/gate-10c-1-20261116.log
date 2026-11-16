@@ -1,0 +1,247 @@
+=== gate10c1 main 6157752 2026-11-16 14:40:36
+
+=== 14:40:36 build backend frontend tools
+#37 [frontend] exporting to image
+#37 exporting layers
+#37 exporting layers 9.5s done
+#37 writing image sha256:ca2caa699ec8c8751e836827ab567ccbbf7f568e5d8a8022b02eca5e203d8007 done
+#37 naming to docker.io/ffcore/frontend:0.0.0-main done
+#37 DONE 9.5s
+build exit=0
+
+=== 14:42:40 compose config
+config exit=0
+
+=== 14:42:48 up
+ Container ffmain-langfuse-clickhouse-1  Healthy
+ Container ffmain-langfuse-redis-1  Healthy
+ Container ffmain-agent-worker-bg-1  Healthy
+ Container ffmain-agent-worker-1  Healthy
+ Container ffmain-mcp-search-1  Healthy
+ Container ffmain-mcp-sql-1  Healthy
+up exit=0
+ffmain-agent-worker-bg-1 Up 15 seconds
+ffmain-agent-worker-1 Up 14 seconds
+ffmain-worker-1 Restarting (1) Less than a second ago
+ffmain-frontend-1 Up 15 seconds
+ffmain-mcp-search-1 Up 15 seconds (healthy)
+ffmain-mcp-sql-1 Up 14 seconds (healthy)
+ffmain-backend-1 Up 29 seconds (healthy)
+ffmain-litellm-1 Up About a minute (healthy)
+ffmain-langfuse-web-1 Up About a minute (healthy)
+ffmain-langfuse-worker-1 Up About a minute
+ffmain-postgres-1 Up About a minute (healthy)
+ffmain-qdrant-1 Up About a minute (healthy)
+ffmain-ticket-desk-1 Up About a minute (healthy)
+ffmain-langfuse-clickhouse-1 Up About a minute (healthy)
+ffmain-fake-llm-1 Up About a minute
+ffmain-redis-1 Up About a minute (healthy)
+ffmain-langfuse-redis-1 Up About a minute (healthy)
+ffmain-langfuse-postgres-1 Up About a minute (healthy)
+ffmain-langfuse-minio-1 Up About a minute (healthy)
+
+=== 14:44:42 lint
+ruff check backend scripts data/samples/scripts services
+I001 [*] Import block is un-sorted or un-formatted
+  --> scripts/context_budget.py:7:1
+   |
+ 5 |   Run: py -3.12 scripts/context_budget.py [--index]   (--index also prints the KARARLAR index size)
+ 6 |   """
+ 7 | / from __future__ import annotations
+ 8 | | import glob, os, re, sys
+   | |________________________^
+ 9 |
+10 |   ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+   |
+help: Organize imports
+   |
+7  | from __future__ import annotations
+   - import glob, os, re, sys
+8  |
+9  + import glob
+10 + import os
+11 + import re
+12 + import sys
+13 +
+14 | ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+   |
+
+E401 [*] Multiple imports on one line
+  --> scripts/context_budget.py:8:1
+   |
+ 6 | """
+ 7 | from __future__ import annotations
+ 8 | import glob, os, re, sys
+   | ^^^^^^^^^^^^^^^^^^^^^^^^
+ 9 |
+10 | ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+   |
+help: Split imports
+   |
+7  | from __future__ import annotations
+   - import glob, os, re, sys
+8  + import glob
+9  + import os
+10 + import re
+11 + import sys
+12 |
+   |
+
+Found 2 errors.
+[*] 2 fixable with `--fix`.
+make: *** [Makefile:9: lint] Error 1
+lint exit=2
+
+=== 14:45:03 alembic heads
+09_0001 (09, 03c, 03b, 06a, 08, 06b, 07, 03a, 04a, 05a) (head)
+heads exit=0
+
+=== 14:45:18 make test llmaas
+........................................................................ [  3%]
+........................................................................ [  7%]
+........................................................................ [ 11%]
+........................................................................ [ 15%]
+........................................................................ [ 19%]
+........................................................................ [ 23%]
+........................................................................ [ 27%]
+........................................................................ [ 31%]
+........................................................................ [ 35%]
+........................................................................ [ 39%]
+........................................................................ [ 43%]
+........................................................................ [ 47%]
+........................................................................ [ 51%]
+........................................................................ [ 55%]
+........................................................................ [ 59%]
+........................................................................ [ 63%]
+........................................................................ [ 67%]
+........................................................................ [ 71%]
+........................................................................ [ 75%]
+........................................................................ [ 79%]
+........................................................................ [ 83%]
+........................................................................ [ 87%]
+........................................................................ [ 91%]
+........................................................................ [ 95%]
+........................................................................ [ 99%]
+.                                                                        [100%]
+1801 passed in 213.78s (0:03:33)
+test exit=0
+
+=== 14:49:15 make test airgap
+........................................................................ [  3%]
+........................................................................ [  7%]
+........................................................................ [ 11%]
+.....................................----------------------------------------
+Exception occurred during processing of request from ('127.0.0.1', 34212)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/local/lib/python3.12/http/server.py", line 436, in handle
+    self.handle_one_request()
+.  File "/work/backend/tests/unit/test_03b_egress.py", line 62, in do_GET
+    self._reply(200, b"late")
+.................................. [ 15%]
+........................................................................ [ 19%]
+........................................................................ [ 23%]
+........................................................................ [ 27%]
+........................................................................ [ 31%]
+........................................................................ [ 35%]
+........................................................................ [ 39%]
+........................................................................ [ 43%]
+........................................................................ [ 47%]
+........................................................................ [ 51%]
+........................................................................ [ 55%]
+........................................................................ [ 59%]
+........................................................................ [ 63%]
+........................................................................ [ 67%]
+........................................................................ [ 71%]
+........................................................................ [ 75%]
+........................................................................ [ 79%]
+........................................................................ [ 83%]
+........................................................................ [ 87%]
+........................................................................ [ 91%]
+........................................................................ [ 95%]
+........................................................................ [ 99%]
+.                                                                        [100%]
+1801 passed in 199.40s (0:03:19)
+test-airgap exit=0
+
+=== 14:52:53 test-samples
+
+----------------------------------------------------------------------
+Ran 54 tests in 5.292s
+
+OK (skipped=5)
+samples exit=0
+
+=== 14:53:10 test-int
+........................................................................ [  7%]
+........................................................................ [ 14%]
+........................................................................ [ 22%]
+..........................s............................................. [ 29%]
+........................................................................ [ 37%]
+......s..........s...................................................... [ 44%]
+.........................s.............................................. [ 52%]
+........................................................................ [ 59%]
+........................................................................ [ 67%]
+........................................................................ [ 74%]
+........................................................................ [ 82%]
+........................................................................ [ 89%]
+...ssssssss............................................................. [ 96%]
+s............................                                            [100%]
+=============================== warnings summary ===============================
+tests/integration/test_04a_worker.py::test_04a_upload_job_runs_in_worker
+tests/integration/test_04a_worker.py::test_04a_job_for_missing_row_retries_then_fails_loud
+  /opt/venv/lib/python3.12/site-packages/arq/worker.py:877: DeprecationWarning: Call to deprecated close. (Use aclose() instead) -- Deprecated since version 5.0.1.
+    await self.pool.close(close_connection_pool=True)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+SKIPPED [1] tests/integration/test_03b_egress_dns.py: NOT_RUN: needs RUN_DNS_TESTS=1
+SKIPPED [1] tests/integration/test_04a_ingest.py:124: NOT_RUN: needs RUN_MODEL_TESTS=1
+SKIPPED [1] tests/integration/test_04a_ingest.py:279: NOT_RUN: needs RUN_MODEL_TESTS=1
+SKIPPED [1] tests/integration/test_05a_sql.py:301: NOT_RUN: needs RUN_MODEL_TESTS=1
+SKIPPED [1] tests/integration/test_09_exam_stack.py:83: NOT_RUN: set RUN_EVAL_STACK=1 (scenario stack + make seed + make seed-eval)
+SKIPPED [1] tests/integration/test_09_exam_stack.py:92: NOT_RUN: set RUN_EVAL_STACK=1 (scenario stack + make seed + make seed-eval)
+SKIPPED [1] tests/integration/test_09_exam_stack.py:98: NOT_RUN: set RUN_EVAL_STACK=1 (scenario stack + make seed + make seed-eval)
+SKIPPED [1] tests/integration/test_09_exam_stack.py:123: NOT_RUN: set RUN_EVAL_STACK=1 (scenario stack + make seed + make seed-eval)
+SKIPPED [1] tests/integration/test_09_exam_stack.py:129: NOT_RUN: set RUN_EVAL_STACK=1 (scenario stack + make seed + make seed-eval)
+SKIPPED [1] tests/integration/test_09_exam_stack.py:140: NOT_RUN: set RUN_EVAL_STACK=1 (scenario stack + make seed + make seed-eval)
+SKIPPED [1] tests/integration/test_09_exam_stack.py:155: NOT_RUN: set RUN_EVAL_STACK=1 (scenario stack + make seed + make seed-eval)
+SKIPPED [1] tests/integration/test_09_exam_stack.py:166: NOT_RUN: set RUN_EVAL_STACK=1 (scenario stack + make seed + make seed-eval)
+SKIPPED [1] tests/integration/test_19_ingest_raw.py:157: root ignores file modes; the mount test runs :ro
+952 passed, 13 skipped, 2 warnings in 924.21s (0:15:24)
+test-int exit=0
+
+=== 15:08:58 smoke
+python scripts/smoke.py
+ok    backend /healthz 200
+ok    litellm /health/liveliness 200
+ok    langfuse /api/public/health 200, /api/public/projects 200
+ok    mcp-search /healthz 200
+ok    mcp-sql /healthz 200
+ok    skipped: ollama profile inactive
+smoke: passed
+smoke exit=0
+
+=== 15:09:10 frontend lint/typecheck/check:api (node, --network none, repo root)
+
+> ffcore-frontend@0.1.0 lint
+> eslint
+
+
+> ffcore-frontend@0.1.0 typecheck
+> tsc --noEmit
+
+
+> ffcore-frontend@0.1.0 check:api
+> node scripts/check-api.mjs
+
+API contract copies and generated types are current.
+frontend exit=0
+
+=== 15:09:57 down -v
+ Volume ffmain_langfuse_minio_data  Removed
+ Volume ffmain_postgres_data  Removed
+
+=== 15:10:19 done
+gate script exit 0
