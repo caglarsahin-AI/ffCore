@@ -3,15 +3,17 @@ import { SseParser } from "@/lib/sse";
 // Exam progress stream (09 GET …/eval-runs/{id}/stream): `progress` {status, items, scored} every
 // few seconds, then one `done` with the end status, `error_code` and `passed`. fetch +
 // ReadableStream like lib/sse.ts (brief 10 technical notes). The stream only reads, so a dropped
-// stream is simply reopened (it starts from the current state); after `maxReopens` it is `lost`
-// and the page reads the exam with GET instead. Nothing is guessed about how it ended.
+// or silent (STALL_MS) stream is simply reopened (it starts from the current state); after
+// `maxReopens` it is `lost` and the page reads the exam with GET instead. Nothing is guessed
+// about how it ended.
 
 export type EvalProgress = { status: string; items: number; scored: number };
 export type EvalDone = EvalProgress & { error_code: string | null; passed: boolean | null };
 export type EvalStreamEnd = "done" | "lost" | "aborted";
 
 export type EvalFollowOptions = {
-  open: () => Promise<Response>;
+  // Opens one attempt; the signal ends that attempt (outside abort or the stall watchdog).
+  open: (signal: AbortSignal) => Promise<Response>;
   onProgress: (progress: EvalProgress) => void;
   onDone: (done: EvalDone) => void;
   // An event name outside progress/done: reported, skipped; the stream goes on.
@@ -19,10 +21,17 @@ export type EvalFollowOptions = {
   signal?: AbortSignal;
   maxReopens?: number;
   retryDelayMs?: number;
+  stallMs?: number;
 };
 
 export const MAX_REOPENS = 5;
 export const REOPEN_DELAY_MS = 2000;
+// The backend sends `progress` every PROGRESS_INTERVAL_S = 2.0 s (backend/ffcore/api/eval.py).
+export const PROGRESS_INTERVAL_MS = 2000;
+// Stall watchdog (R-10C1-0003 MAJOR-1): a half-open connection (backend killed, a proxy dropping
+// an idle socket) sends nothing and never closes. Three missed progress events end the attempt;
+// the usual reopen / `lost` path takes over, so the page never shows a stale state as current.
+export const STALL_MS = 3 * PROGRESS_INTERVAL_MS;
 
 function progressOf(data: Record<string, unknown>): EvalProgress | null {
   const { status, items, scored } = data;
@@ -31,15 +40,20 @@ function progressOf(data: Record<string, unknown>): EvalProgress | null {
 }
 
 // One response to its end: "done", or null when it stopped (or broke) without done.
-async function drain(response: Response, options: EvalFollowOptions): Promise<"done" | null> {
+// The attempt may be ended from outside (abort, watchdog); the pending read is then cancelled.
+async function drain(response: Response, options: EvalFollowOptions, attempt: Attempt): Promise<"done" | null> {
   if (!response.ok || !response.body) return null;
   const reader = response.body.getReader();
   const decoder = new TextDecoder();
   const parser = new SseParser();
+  const stop = () => void reader.cancel().catch(() => {});
+  attempt.signal.addEventListener("abort", stop, { once: true });
   try {
     for (;;) {
-      if (options.signal?.aborted) return null;
+      if (attempt.signal.aborted) return null;
       const { done, value } = await reader.read();
+      if (attempt.signal.aborted) return null;
+      attempt.alive();
       for (const message of parser.push(done ? decoder.decode() : decoder.decode(value, { stream: true }))) {
         if (message.event !== "progress" && message.event !== "done") {
           options.onUnknown?.(message.event);
@@ -70,8 +84,43 @@ async function drain(response: Response, options: EvalFollowOptions): Promise<"d
   } catch {
     return null;
   } finally {
+    attempt.signal.removeEventListener("abort", stop);
     reader.releaseLock();
   }
+}
+
+// One attempt: its own AbortController, chained to the outside signal and fired by the watchdog
+// when nothing arrived for `stallMs` (the request itself included).
+type Attempt = { signal: AbortSignal; alive: () => void; end: () => void };
+
+function startAttempt(stallMs: number, outside?: AbortSignal): Attempt {
+  const controller = new AbortController();
+  const abort = () => controller.abort();
+  outside?.addEventListener("abort", abort, { once: true });
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const alive = () => {
+    clearTimeout(timer);
+    timer = setTimeout(abort, stallMs);
+  };
+  alive();
+  return {
+    signal: controller.signal,
+    alive,
+    end: () => {
+      clearTimeout(timer);
+      outside?.removeEventListener("abort", abort);
+      controller.abort();
+    },
+  };
+}
+
+// The request, unless the attempt ends first (an open() that ignores its signal cannot hang it).
+function openWithin(attempt: Attempt, open: EvalFollowOptions["open"]): Promise<Response> {
+  return new Promise<Response>((resolve, reject) => {
+    if (attempt.signal.aborted) return reject(new DOMException("attempt ended", "AbortError"));
+    attempt.signal.addEventListener("abort", () => reject(new DOMException("attempt ended", "AbortError")), { once: true });
+    open(attempt.signal).then(resolve, reject);
+  });
 }
 
 const sleep = (ms: number, signal?: AbortSignal) =>
@@ -87,18 +136,21 @@ const sleep = (ms: number, signal?: AbortSignal) =>
 export async function followEvalStream(options: EvalFollowOptions): Promise<EvalStreamEnd> {
   const maxReopens = options.maxReopens ?? MAX_REOPENS;
   const delay = options.retryDelayMs ?? REOPEN_DELAY_MS;
-  for (let attempt = 0; attempt <= maxReopens; attempt++) {
+  const stallMs = options.stallMs ?? STALL_MS;
+  for (let i = 0; i <= maxReopens; i++) {
     if (options.signal?.aborted) return "aborted";
-    if (attempt > 0) await sleep(delay, options.signal);
+    if (i > 0) await sleep(delay, options.signal);
     if (options.signal?.aborted) return "aborted";
-    let response: Response;
+    const attempt = startAttempt(stallMs, options.signal);
     try {
-      response = await options.open();
+      const response = await openWithin(attempt, options.open);
+      attempt.alive();
+      if ((await drain(response, options, attempt)) === "done") return "done";
     } catch {
-      if (options.signal?.aborted) return "aborted";
-      continue;
+      // refused, broken or ended request: the next attempt (or `lost`) follows
+    } finally {
+      attempt.end();
     }
-    if ((await drain(response, options)) === "done") return "done";
   }
   return options.signal?.aborted ? "aborted" : "lost";
 }

@@ -71,7 +71,7 @@ function Loaded({ projectId, run, stream, setStream }: { projectId: string; run:
     const controller = new AbortController();
     setStream("streaming");
     void followEvalStream({
-      open: () => openEvalStream(projectId, run.id, controller.signal),
+      open: (signal) => openEvalStream(projectId, run.id, signal),
       onProgress: setProgress,
       onDone: (done) => {
         setProgress(done);
