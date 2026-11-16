@@ -4,17 +4,20 @@ Enforces the agent rules that used to live only in text (KARARLAR 16 Nov 2026,
 "Ajan kuralları hook ile zorlanır"): no .env, PayCore data boundary, push only by
 the coordinator with a per-command flag, PROSES-175 compose flags, three-stack
 limit, gate output via tee, single-writer state files, no writes to a worktree's
-state/ copy.
+state/ copy, channel message format (KANAL-BICIM).
 
 Contract: Claude Code passes the tool call as JSON on stdin (tool_name,
 tool_input, session_id). Exit 2 blocks the call and stderr goes to the model.
 Exit 0 lets it run. FFCORE_GUARD_MODE=warn|block (default block).
 
-Bash rules also apply inside `sh -c` / `bash -c` text and to the command a
-`docker compose run|exec` starts in its service. This is a safety net, not a
-sandbox: commands built at runtime (variables, script files, Makefile recipes)
-and Bash writes to state files are not inspected. Log lines are masked
-(credentials in URLs, *KEY/TOKEN/SECRET/PASS*= values, Authorization/Bearer).
+Bash rules also apply inside `sh -c` / `bash -c` text, `$(…)` and backticks,
+`( … )` / `{ …; }` groups, compound commands, behind wrappers (`env`, `command`,
+`time`, `nice`, `nohup`, `exec`) and to the command a `docker compose run|exec`
+starts in its service. This is a safety net, not a sandbox: commands built at
+runtime (variables, script files, Makefile recipes) and Bash writes to state
+files are not inspected. Log lines are masked (credentials in URLs,
+*KEY/TOKEN/SECRET/PASS*= values, Authorization/Bearer, `-u user:pass`, JSON
+"token/secret/password/api_key/key" fields).
 Stdlib only, no network.
 """
 
@@ -88,6 +91,11 @@ PAYCORE_RE = re.compile(r"paycorellm[/\\]+(?:data|eval[/\\]+results)(?:[/\\]|\b)
 LOG_DETAIL_MAX = 120
 # Log masking (SECURITY_AND_PERMISSIONS: logs carry no secrets); applied before truncation.
 MASKS = (
+    (re.compile(r"(?<!\S)(-u|--user)\s+[^\s:]+:\S+"), r"\1 ***"),
+    (
+        re.compile(r'"(token|secret|password|api_key|key)"\s*:\s*"[^"]*"', re.IGNORECASE),
+        r'"\1":"***"',
+    ),
     (re.compile(r"(\w+://)[^/\s@]+@"), r"\1***@"),
     (
         re.compile(
