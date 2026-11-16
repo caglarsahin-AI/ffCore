@@ -1,0 +1,7 @@
+== lint @ d8e7119e9bc61614f19187f0f1cd6c40af8ceef1 2026-11-16T08:33:49+03:00
+$ docker compose -p review09 --env-file .env.test --profile tools run --rm --no-deps tools make lint
+ruff check backend scripts data/samples/scripts services
+All checks passed!
+ruff format --check backend scripts data/samples/scripts services
+482 files already formatted
+exit=0

@@ -1,0 +1,12 @@
+== 09-2 r3 reviewer run @ d8e7119e9bc61614f19187f0f1cd6c40af8ceef1 tree-dirty=0 DEPLOY_PROFILE=airgap 2026-11-16T08:31:52+03:00
+== image ffcore/backend:0.0.0-09 = d8e7119 (172 py files, sha256 identical); stack up with --no-build --pull never (09-2-r3-rv-stack-up.log)
+$ docker compose -p review09 --env-file .env.test --profile test --profile tools run --rm --no-deps -e DEPLOY_PROFILE=airgap tools sh -c 'cd backend && pytest -q -p no:cacheprovider tests/unit/test_09_2_r1.py tests/contract/test_09_openapi.py tests/contract/test_06a_openapi.py'
+......................................                                   [100%]
+38 passed in 6.12s
+exit=0
+$ docker compose -p review09 --env-file .env.test --profile test --profile tools run --rm --no-deps -e DEPLOY_PROFILE=airgap tools sh -c 'cd backend && pytest -q -p no:cacheprovider -rfE tests/integration/test_03a_read_side.py tests/integration/test_09_advance.py tests/integration/test_09_api.py tests/integration/test_09_from_run.py tests/integration/test_09_publish_gate.py tests/integration/test_06a_agents.py'
+........................................................................ [ 86%]
+...........                                                              [100%]
+83 passed in 79.44s (0:01:19)
+exit=0
+== end 2026-11-16T08:33:38+03:00

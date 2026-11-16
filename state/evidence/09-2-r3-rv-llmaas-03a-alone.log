@@ -1,0 +1,6 @@
+== 09-2 r3 reviewer run @ d8e7119e9bc61614f19187f0f1cd6c40af8ceef1 tree-dirty=0 DEPLOY_PROFILE=llmaas 2026-11-16T08:25:59+03:00
+$ docker compose -p review09 --env-file .env.test --profile test --profile tools run --rm --no-deps -e DEPLOY_PROFILE=llmaas tools sh -c 'cd backend && pytest -q -p no:cacheprovider -rfE tests/integration/test_03a_read_side.py'
+.......                                                                  [100%]
+7 passed in 21.31s
+exit=0
+== end 2026-11-16T08:26:32+03:00

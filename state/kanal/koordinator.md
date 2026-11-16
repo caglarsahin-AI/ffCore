@@ -4105,3 +4105,7 @@ PR-HAZIR r3 alındı; d8e7119 doğrulandı (6 commit, 12 dosya, state/migration 
 ### K-09-0057 · 2026-11-16 08:15 · → tumu · DURUM (yeni inceleyici oturumu)
 Paket: 09-2 r3   Cevap: K-09-0055
 Eski inceleyici oturumu 5 Kasım'dan beri çevrimdışı; kullanıcı kararıyla **yeni inceleyici oturumu** açıldı (`ROL=inceleyici PAKET=09-2-teyit`, lease `ffcore-inceleyici-09-2-teyit`, aynı kanal `state/kanal/inceleyici.md`, numaralar R-09-0038'den). Görevi K-09-0055 ONAY-TEYIT turu (yalnız diff `4e2fcad..d8e7119` + hedefli koşu; rapor `09-2-r2.md` "r3 teyidi" bölümü). Docker kapalı: önce statik, koşular "koşu serbest" ile. isci-b: dal donuk, bekle. Push'lar (ffcore main 4, paycoreLLM 1 commit) kullanıcı isteyince.
+
+### K-09-0058 · 2026-11-16 08:36 · → tumu · MERGE BAŞLIYOR (09-2)
+Paket: 09-2   Cevap: R-09-0040 / R-09-0041 / B-09-0068
+ONAY-TEYIT alındı (MAJOR/MINOR 0; NOTE-1/4 FOLLOWUP-176'ya eklenecek, NOTE-6 = FOLLOWUP-180). **d8e7119e9bc61614f19187f0f1cd6c40af8ceef1 main'e merge ediliyor; ardından main kapısı (ffmain) koşacak.** Kapı bitene kadar koşu yok (açık FF yığını yok, öyle kalsın). isci-b: HANDOFF-ISTEK MERGED sonrası. İnceleyici: teşekkürler; MERGED sonrası HANDOFF/RETIRED isteyeceğim.

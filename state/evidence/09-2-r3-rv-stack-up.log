@@ -1,0 +1,51 @@
+== 2026-11-16T08:21:31+03:00 cwd=.worktrees/review-09-2-r3 HEAD=d8e7119e9bc61614f19187f0f1cd6c40af8ceef1 FFCORE_VERSION=0.0.0-09
+$ docker compose -p review09 --env-file .env.test --profile test up -d --no-build --pull never --wait postgres redis litellm fake-llm
+ Network review09_default  Creating
+ Network review09_default  Created
+ Volume "review09_langfuse_minio_data"  Creating
+ Volume "review09_langfuse_minio_data"  Created
+ Volume "review09_langfuse_postgres_data"  Creating
+ Volume "review09_langfuse_postgres_data"  Created
+ Volume "review09_model_cache"  Creating
+ Volume "review09_model_cache"  Created
+ Volume "review09_knowledge_storage"  Creating
+ Volume "review09_knowledge_storage"  Created
+ Volume "review09_langfuse_clickhouse_data"  Creating
+ Volume "review09_langfuse_clickhouse_data"  Created
+ Volume "review09_langfuse_clickhouse_logs"  Creating
+ Volume "review09_langfuse_clickhouse_logs"  Created
+ Volume "review09_postgres_data"  Creating
+ Volume "review09_postgres_data"  Created
+ Volume "review09_redis_data"  Creating
+ Volume "review09_redis_data"  Created
+ Container review09-redis-1  Creating
+ Container review09-postgres-1  Creating
+ Container review09-fake-llm-1  Creating
+ Container review09-redis-1  Created
+ Container review09-postgres-1  Created
+ Container review09-litellm-1  Creating
+ Container review09-fake-llm-1  Created
+ Container review09-litellm-1  Created
+ Container review09-redis-1  Starting
+ Container review09-postgres-1  Starting
+ Container review09-fake-llm-1  Starting
+ Container review09-redis-1  Started
+ Container review09-fake-llm-1  Started
+ Container review09-postgres-1  Started
+ Container review09-postgres-1  Waiting
+ Container review09-postgres-1  Healthy
+ Container review09-litellm-1  Starting
+ Container review09-litellm-1  Started
+ Container review09-postgres-1  Waiting
+ Container review09-fake-llm-1  Waiting
+ Container review09-litellm-1  Waiting
+ Container review09-redis-1  Waiting
+ Container review09-redis-1  Healthy
+ Container review09-postgres-1  Healthy
+ Container review09-fake-llm-1  Healthy
+ Container review09-litellm-1  Healthy
+exit=0
+review09-fake-llm-1 ffcore/backend:0.0.0-09 Up 37 seconds
+review09-litellm-1 ghcr.io/berriai/litellm:v1.80.0-stable Up 32 seconds (healthy)
+review09-postgres-1 pgvector/pgvector:0.8.1-pg16 Up 37 seconds (healthy)
+review09-redis-1 redis:7.4.6-alpine Up 38 seconds (healthy)

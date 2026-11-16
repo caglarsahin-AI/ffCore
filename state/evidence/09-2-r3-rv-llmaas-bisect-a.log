@@ -1,0 +1,464 @@
+== 09-2 r3 reviewer run @ d8e7119e9bc61614f19187f0f1cd6c40af8ceef1 tree-dirty=0 DEPLOY_PROFILE=llmaas 2026-11-16T08:28:21+03:00
+$ docker compose -p review09 --env-file .env.test --profile test --profile tools run --rm --no-deps -e DEPLOY_PROFILE=llmaas tools sh -c 'cd backend && pytest -q -p no:cacheprovider -rfE tests/integration/test_09_publish_gate.py tests/integration/test_09_from_run.py tests/integration/test_03a_read_side.py'
+.......................................F......                           [100%]
+=================================== FAILURES ===================================
+_______________________ test_03a_2_read_mode_get_parity ________________________
+
+app = <fastapi.applications.FastAPI object at 0x7fba18b196d0>
+world = {'edit': <starlette.testclient.TestClient object at 0x7fb9c6f44710>, 'read': <starlette.testclient.TestClient object a...340>, 'project_id': 'ef3fa421-658e-42fe-b438-f109147393e9', 'provider_id': '2698df71-8ad5-4980-a483-a9c6a6f74975', ...}
+
+    def test_03a_2_read_mode_get_parity(app, world):
+        checked = 0
+        for path in _get_paths(app):
+            if path in PARITY_EXEMPT or path.startswith(PARITY_EXEMPT_PREFIXES):
+                continue
+            url = re.sub(r"\{(\w+)\}", lambda m: world[m.group(1)], path)
+>           edit, read = world["edit"].get(url), world["read"].get(url)
+                         ^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_03a_read_side.py:107: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:1112: in get
+    return self.request(
+/opt/venv/lib/python3.12/site-packages/starlette/testclient.py:518: in request
+    return super().request(
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:796: in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:993: in send
+    raise exc
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:987: in send
+    response.read()
+/opt/venv/lib/python3.12/site-packages/httpx2/_models.py:877: in read
+    self._content = b"".join(self.iter_bytes())
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_models.py:893: in iter_bytes
+    for raw_bytes in self.iter_raw():
+                     ^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_models.py:948: in iter_raw
+    for raw_stream_bytes in self.stream:
+                            ^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:143: in __iter__
+    yield from self._stream
+/opt/venv/lib/python3.12/site-packages/starlette/testclient.py:384: in iter_body
+    exit_stack.close()
+/usr/local/lib/python3.12/contextlib.py:618: in close
+    self.__exit__(None, None, None)
+/usr/local/lib/python3.12/contextlib.py:610: in __exit__
+    raise exc_details[1]
+/usr/local/lib/python3.12/contextlib.py:595: in __exit__
+    if cb(*exc_details):
+       ^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/starlette/testclient.py:399: in close_app
+    raise exception
+/opt/venv/lib/python3.12/site-packages/anyio/from_thread.py:265: in _call_func
+    retval = await retval_or_awaitable
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/starlette/testclient.py:366: in run_app
+    await self.app(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/applications.py:1194: in __call__
+    await super().__call__(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/applications.py:96: in __call__
+    await self.middleware_stack(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/middleware/errors.py:186: in __call__
+    raise exc
+/opt/venv/lib/python3.12/site-packages/starlette/middleware/errors.py:164: in __call__
+    await self.app(scope, receive, _send)
+/opt/venv/lib/python3.12/site-packages/fastapi/telemetry/_asgi.py:151: in __call__
+    await self.app(scope, receive, send)
+ffcore/core/logging.py:261: in __call__
+    await self.app(scope, receive, send_status)
+ffcore/api/upload_limit.py:44: in __call__
+    await self.app(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py:63: in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    raise exc
+/opt/venv/lib/python3.12/site-packages/starlette/_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+/opt/venv/lib/python3.12/site-packages/fastapi/middleware/asyncexitstack.py:18: in __call__
+    await self.app(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/routing.py:683: in __call__
+    await self.middleware_stack(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:2811: in app
+    await route.handle(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:1839: in handle
+    await self.original_router.handle(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:2894: in handle
+    await included_router._handle_selected(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:1850: in _handle_selected
+    await route.handle(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:1839: in handle
+    await self.original_router.handle(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:2894: in handle
+    await included_router._handle_selected(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:1865: in _handle_selected
+    await original_route.handle(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:1328: in handle
+    await effective_context.app(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:166: in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    raise exc
+/opt/venv/lib/python3.12/site-packages/starlette/_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:152: in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:745: in app
+    raw_response = await run_endpoint_function(
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:372: in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ffcore/api/providers.py:130: in list_providers
+    return ProviderList(data=[await provider_out(session, p, settings) for p in rows])
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ffcore/api/providers.py:54: in provider_out
+    config = decrypt_json(provider.config_encrypted, settings)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+token = b'x'
+settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+
+    def decrypt_json(token: bytes, settings: Settings) -> dict[str, Any]:
+        try:
+            return json.loads(_fernet(settings).decrypt(bytes(token)))
+        except InvalidToken:
+>           raise SecretDecryptError(
+                "stored secret does not decrypt with FERNET_KEY (was the key changed?)"
+            ) from None
+E           ffcore.core.secrets.SecretDecryptError: stored secret does not decrypt with FERNET_KEY (was the key changed?)
+
+ffcore/core/secrets.py:31: SecretDecryptError
+---------------------------- Captured stderr setup -----------------------------
+2026-11-16 05:28:58,250 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-16 05:28:58,345 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-153ddd3f9d.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,345 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-1928b59381.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,345 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-25fbbb773b.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,345 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-2b5fc0fe2c.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,346 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-2eea0739dd.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,346 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-46a39aec40.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,346 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-55ce23533d.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,346 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-5a3db69306.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,346 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-61e846cf45.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,346 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-6806eb0459.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,346 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-70da445594.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,346 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-77c5e4a325.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,346 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-8754006c53.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,347 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-89b5dc38c8.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,347 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-97a0ac15ec.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,347 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-9bf265455b.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,347 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-b1eb1bd302.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,347 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-b2ccf5e403.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,347 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-c5c396dc20.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,347 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-d1ae891db3.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,347 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-d50c48f4da.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,347 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-d9e2286fe2.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,347 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=22
+2026-11-16 05:28:58,360 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=107
+2026-11-16 05:28:58,411 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-16 05:28:58,505 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-153ddd3f9d.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,505 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-1928b59381.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,505 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-25fbbb773b.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,505 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-2b5fc0fe2c.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,506 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-2eea0739dd.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,506 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-46a39aec40.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,506 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-55ce23533d.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,506 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-5a3db69306.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,506 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-61e846cf45.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,506 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-6806eb0459.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,507 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-70da445594.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,507 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-77c5e4a325.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,507 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-8754006c53.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,507 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-89b5dc38c8.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,508 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-97a0ac15ec.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,508 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-9bf265455b.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,508 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-b1eb1bd302.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,508 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-b2ccf5e403.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,508 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-c5c396dc20.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,509 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-d1ae891db3.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,509 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-d50c48f4da.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,509 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-d9e2286fe2.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,509 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=22
+2026-11-16 05:28:58,524 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=111
+2026-11-16 05:28:58,587 INFO ffcore.access access method=POST path=/api/v1/providers status=201 ms=58
+2026-11-16 05:28:58,669 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-153ddd3f9d.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,669 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-1928b59381.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,669 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-25fbbb773b.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,669 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-2b5fc0fe2c.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,669 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-2eea0739dd.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,669 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-46a39aec40.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,669 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-55ce23533d.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,669 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-5a3db69306.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,669 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-61e846cf45.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,669 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-6806eb0459.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,669 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-70da445594.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,670 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-77c5e4a325.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,670 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-8754006c53.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,670 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-89b5dc38c8.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,670 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-97a0ac15ec.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,670 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-9bf265455b.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,670 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-b1eb1bd302.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,670 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-b2ccf5e403.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,670 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-c5c396dc20.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,670 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-d1ae891db3.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,670 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-d50c48f4da.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,670 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-d9e2286fe2.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,670 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=22
+2026-11-16 05:28:58,672 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-153ddd3f9d.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,672 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-1928b59381.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,672 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-25fbbb773b.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,672 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-2b5fc0fe2c.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,672 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-2eea0739dd.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,672 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-46a39aec40.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,672 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-55ce23533d.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,672 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-5a3db69306.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,672 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-61e846cf45.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,672 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-6806eb0459.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,673 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-70da445594.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,673 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-77c5e4a325.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,673 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-8754006c53.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,673 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-89b5dc38c8.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,673 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-97a0ac15ec.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,673 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-9bf265455b.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,673 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-b1eb1bd302.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,673 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-b2ccf5e403.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,673 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-c5c396dc20.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,673 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-d1ae891db3.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,673 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-d50c48f4da.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,673 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-d9e2286fe2.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,673 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=22
+2026-11-16 05:28:58,703 INFO ffcore.access access method=POST path=/api/v1/projects/ef3fa421-658e-42fe-b438-f109147393e9/models status=201 ms=112
+------------------------------ Captured log setup ------------------------------
+ERROR    ffcore.readiness:readiness.py:63 warmup failed: ModelMissing
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-153ddd3f9d.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-1928b59381.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-25fbbb773b.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-2b5fc0fe2c.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-2eea0739dd.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-46a39aec40.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-55ce23533d.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-5a3db69306.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-61e846cf45.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-6806eb0459.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-70da445594.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-77c5e4a325.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-8754006c53.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-89b5dc38c8.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-97a0ac15ec.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-9bf265455b.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-b1eb1bd302.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-b2ccf5e403.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-c5c396dc20.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-d1ae891db3.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-d50c48f4da.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-d9e2286fe2.chat-default code=provider_not_assigned
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=22
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=107
+ERROR    ffcore.readiness:readiness.py:63 warmup failed: ModelMissing
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-153ddd3f9d.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-1928b59381.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-25fbbb773b.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-2b5fc0fe2c.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-2eea0739dd.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-46a39aec40.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-55ce23533d.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-5a3db69306.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-61e846cf45.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-6806eb0459.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-70da445594.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-77c5e4a325.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-8754006c53.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-89b5dc38c8.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-97a0ac15ec.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-9bf265455b.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-b1eb1bd302.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-b2ccf5e403.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-c5c396dc20.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-d1ae891db3.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-d50c48f4da.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-d9e2286fe2.chat-default code=provider_not_assigned
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=22
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=111
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/providers status=201 ms=58
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-153ddd3f9d.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-1928b59381.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-25fbbb773b.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-2b5fc0fe2c.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-2eea0739dd.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-46a39aec40.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-55ce23533d.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-5a3db69306.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-61e846cf45.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-6806eb0459.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-70da445594.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-77c5e4a325.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-8754006c53.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-89b5dc38c8.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-97a0ac15ec.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-9bf265455b.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-b1eb1bd302.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-b2ccf5e403.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-c5c396dc20.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-d1ae891db3.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-d50c48f4da.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-d9e2286fe2.chat-default code=provider_not_assigned
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=22
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-153ddd3f9d.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-1928b59381.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-25fbbb773b.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-2b5fc0fe2c.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-2eea0739dd.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-46a39aec40.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-55ce23533d.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-5a3db69306.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-61e846cf45.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-6806eb0459.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-70da445594.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-77c5e4a325.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-8754006c53.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-89b5dc38c8.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-97a0ac15ec.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-9bf265455b.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-b1eb1bd302.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-b2ccf5e403.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-c5c396dc20.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-d1ae891db3.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-d50c48f4da.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-d9e2286fe2.chat-default code=provider_not_assigned
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=22
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/ef3fa421-658e-42fe-b438-f109147393e9/models status=201 ms=112
+----------------------------- Captured stderr call -----------------------------
+2026-11-16 05:28:58,951 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-153ddd3f9d.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,956 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-1928b59381.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,962 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-25fbbb773b.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,962 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-2b5fc0fe2c.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,962 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-2eea0739dd.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,962 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-46a39aec40.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,962 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-55ce23533d.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,962 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-5a3db69306.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,968 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-61e846cf45.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,968 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-6806eb0459.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,968 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-70da445594.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,968 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-77c5e4a325.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,969 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-8754006c53.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,969 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-89b5dc38c8.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,969 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-97a0ac15ec.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,969 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-9bf265455b.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,969 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-b1eb1bd302.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,969 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-b2ccf5e403.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,969 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-c5c396dc20.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,969 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-d1ae891db3.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,975 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-d50c48f4da.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,981 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-d9e2286fe2.chat-default code=provider_not_assigned
+2026-11-16 05:28:58,981 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-ef3fa42165.chat-default code=egress_not_allowlisted
+2026-11-16 05:28:58,981 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=23
+2026-11-16 05:28:59,014 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-153ddd3f9d.chat-default code=provider_not_assigned
+2026-11-16 05:28:59,014 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-1928b59381.chat-default code=provider_not_assigned
+2026-11-16 05:28:59,014 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-25fbbb773b.chat-default code=provider_not_assigned
+2026-11-16 05:28:59,014 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-2b5fc0fe2c.chat-default code=provider_not_assigned
+2026-11-16 05:28:59,014 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-2eea0739dd.chat-default code=provider_not_assigned
+2026-11-16 05:28:59,014 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-46a39aec40.chat-default code=provider_not_assigned
+2026-11-16 05:28:59,014 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-55ce23533d.chat-default code=provider_not_assigned
+2026-11-16 05:28:59,014 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-5a3db69306.chat-default code=provider_not_assigned
+2026-11-16 05:28:59,014 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-61e846cf45.chat-default code=provider_not_assigned
+2026-11-16 05:28:59,014 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-6806eb0459.chat-default code=provider_not_assigned
+2026-11-16 05:28:59,015 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-70da445594.chat-default code=provider_not_assigned
+2026-11-16 05:28:59,015 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-77c5e4a325.chat-default code=provider_not_assigned
+2026-11-16 05:28:59,015 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-8754006c53.chat-default code=provider_not_assigned
+2026-11-16 05:28:59,020 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-89b5dc38c8.chat-default code=provider_not_assigned
+2026-11-16 05:28:59,026 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-97a0ac15ec.chat-default code=provider_not_assigned
+2026-11-16 05:28:59,026 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-9bf265455b.chat-default code=provider_not_assigned
+2026-11-16 05:28:59,027 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-b1eb1bd302.chat-default code=provider_not_assigned
+2026-11-16 05:28:59,032 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-b2ccf5e403.chat-default code=provider_not_assigned
+2026-11-16 05:28:59,037 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-c5c396dc20.chat-default code=provider_not_assigned
+2026-11-16 05:28:59,043 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-d1ae891db3.chat-default code=provider_not_assigned
+2026-11-16 05:28:59,048 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-d50c48f4da.chat-default code=provider_not_assigned
+2026-11-16 05:28:59,054 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-d9e2286fe2.chat-default code=provider_not_assigned
+2026-11-16 05:28:59,054 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-ef3fa42165.chat-default code=egress_not_allowlisted
+2026-11-16 05:28:59,054 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=23
+2026-11-16 05:28:59,432 INFO ffcore.access access method=GET path=/api/v1/users status=200 ms=39
+2026-11-16 05:28:59,469 INFO ffcore.access access method=GET path=/api/v1/users status=200 ms=34
+2026-11-16 05:28:59,507 INFO ffcore.access access method=GET path=/api/v1/users/6e6f12e0-fccc-4aae-be6f-0c9fea6ab8c5 status=200 ms=35
+2026-11-16 05:28:59,539 INFO ffcore.access access method=GET path=/api/v1/users/6e6f12e0-fccc-4aae-be6f-0c9fea6ab8c5 status=200 ms=29
+2026-11-16 05:28:59,571 INFO ffcore.access access method=GET path=/api/v1/projects status=200 ms=29
+2026-11-16 05:28:59,598 INFO ffcore.access access method=GET path=/api/v1/projects status=200 ms=24
+2026-11-16 05:28:59,638 INFO ffcore.access access method=GET path=/api/v1/projects/ef3fa421-658e-42fe-b438-f109147393e9 status=200 ms=37
+2026-11-16 05:28:59,673 INFO ffcore.access access method=GET path=/api/v1/projects/ef3fa421-658e-42fe-b438-f109147393e9 status=200 ms=32
+2026-11-16 05:28:59,721 INFO ffcore.access access method=GET path=/api/v1/projects/ef3fa421-658e-42fe-b438-f109147393e9/readiness status=200 ms=45
+2026-11-16 05:28:59,766 INFO ffcore.access access method=GET path=/api/v1/projects/ef3fa421-658e-42fe-b438-f109147393e9/readiness status=200 ms=42
+2026-11-16 05:28:59,807 INFO ffcore.access access method=GET path=/api/v1/projects/ef3fa421-658e-42fe-b438-f109147393e9/members status=200 ms=37
+2026-11-16 05:28:59,848 INFO ffcore.access access method=GET path=/api/v1/projects/ef3fa421-658e-42fe-b438-f109147393e9/members status=200 ms=38
+2026-11-16 05:28:59,875 INFO ffcore.access access method=GET path=/api/v1/provider-drivers status=200 ms=24
+2026-11-16 05:28:59,900 INFO ffcore.access access method=GET path=/api/v1/provider-drivers status=200 ms=22
+2026-11-16 05:28:59,935 INFO ffcore.access access method=GET path=/api/v1/providers status=500 ms=31
+------------------------------ Captured log call -------------------------------
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-153ddd3f9d.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-1928b59381.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-25fbbb773b.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-2b5fc0fe2c.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-2eea0739dd.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-46a39aec40.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-55ce23533d.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-5a3db69306.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-61e846cf45.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-6806eb0459.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-70da445594.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-77c5e4a325.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-8754006c53.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-89b5dc38c8.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-97a0ac15ec.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-9bf265455b.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-b1eb1bd302.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-b2ccf5e403.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-c5c396dc20.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-d1ae891db3.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-d50c48f4da.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-d9e2286fe2.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-ef3fa42165.chat-default code=egress_not_allowlisted
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=23
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-153ddd3f9d.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-1928b59381.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-25fbbb773b.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-2b5fc0fe2c.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-2eea0739dd.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-46a39aec40.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-55ce23533d.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-5a3db69306.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-61e846cf45.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-6806eb0459.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-70da445594.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-77c5e4a325.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-8754006c53.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-89b5dc38c8.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-97a0ac15ec.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-9bf265455b.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-b1eb1bd302.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-b2ccf5e403.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-c5c396dc20.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-d1ae891db3.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-d50c48f4da.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-d9e2286fe2.chat-default code=provider_not_assigned
+ERROR    ffcore.litellm_reconcile:litellm_reconcile.py:371 litellm_model_not_written model=p-ef3fa42165.chat-default code=egress_not_allowlisted
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=23
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/users status=200 ms=39
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/users status=200 ms=34
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/users/6e6f12e0-fccc-4aae-be6f-0c9fea6ab8c5 status=200 ms=35
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/users/6e6f12e0-fccc-4aae-be6f-0c9fea6ab8c5 status=200 ms=29
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects status=200 ms=29
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects status=200 ms=24
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/ef3fa421-658e-42fe-b438-f109147393e9 status=200 ms=37
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/ef3fa421-658e-42fe-b438-f109147393e9 status=200 ms=32
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/ef3fa421-658e-42fe-b438-f109147393e9/readiness status=200 ms=45
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/ef3fa421-658e-42fe-b438-f109147393e9/readiness status=200 ms=42
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/ef3fa421-658e-42fe-b438-f109147393e9/members status=200 ms=37
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/ef3fa421-658e-42fe-b438-f109147393e9/members status=200 ms=38
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/provider-drivers status=200 ms=24
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/provider-drivers status=200 ms=22
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/providers status=500 ms=31
+=========================== short test summary info ============================
+FAILED tests/integration/test_03a_read_side.py::test_03a_2_read_mode_get_parity
+1 failed, 45 passed in 37.05s
+exit=1
+== end 2026-11-16T08:29:09+03:00

@@ -2,10 +2,10 @@
 
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
-- Oturum kimliği: ffcore-inceleyici-20261029-01a187c0
-- Aktif paket: 18-hazirlik r1 (05a r1 teslim edildi)
+- Oturum kimliği: ffcore-inceleyici-09-2-teyit (önceki: ffcore-inceleyici-20261029-01a187c0, çevrimdışı)
+- Aktif paket: 09-2 r3 ONAY-TEYIT (d8e7119)
 - Durum: ACTIVE
-- Son okunan: koordinator K-SEN-0004 (2026-10-29 19:15); 05a aktif, 18-hazirlik sırada
+- Son okunan: koordinator K-09-0057 (2026-11-16 08:15) + zil "koşu serbest"
 
 ## Mesajlar
 
@@ -2216,3 +2216,22 @@ Paket: 09-2 r2   Cevap: K-09-0050
 
 ### R-09-0037 · 2026-11-05 22:06 · → koordinator · YIGIN-KAPA
 review09 `down -v --remove-orphans` (22:06): 0 konteyner, 0 hacim. Worktree kaldırıldı (dizin de silindi). Açık inceleyici yığını yok.
+
+### R-09-0038 · 2026-11-16 08:17 · → koordinator · ACK
+Paket: 09-2 r3   Cevap: K-09-0055 / K-09-0057
+Yeni inceleyici oturumu (lease `ffcore-inceleyici-09-2-teyit`). d8e7119e9bc61614f19187f0f1cd6c40af8ceef1 doğrulandı: 4e2fcad atası, 6 commit, 12 dosya +320/-43, `feat/09-evaluation` HEAD aynı. Statik diff okuması başladı; koşular "koşu serbest" ile (review09, 18300/13300, `--pull never`, önce YIGIN-AC).
+
+### R-09-0039 · 2026-11-16 08:21 · → koordinator · YIGIN-AC
+Paket: 09-2 r3   Cevap: koordinatör zili ("koşu serbest")
+review09 yalın: postgres, redis, litellm, fake-llm (`--profile test`), BACKEND_PORT 18300 / FRONTEND_PORT 13300, worktree `.worktrees/review-09-2-r3` (d8e7119, detached) `.env.test`'i, `FFCORE_VERSION=0.0.0-09` (işçinin HEAD imajı), `up --no-build --pull never`. Testler `tools` konteynerinde (`run --rm --no-deps`). Açık başka FF yığını yok. Kapanış `down -v --remove-orphans` + YIGIN-KAPA.
+
+### R-09-0040 · 2026-11-16 08:36 · → koordinator · REVIEW-SONUC (ONAY-TEYIT)
+Paket: 09-2 r3   Cevap: K-09-0055
+**ONAY-TEYIT d8e7119e9bc61614f19187f0f1cd6c40af8ceef1.** Rapor state/reviews/09-2-r2.md "## r3 teyidi (d8e7119)". BLOCKER/MAJOR/MINOR 0, NOTE 8.
+- r2 MINOR-1..5 kapandı. (1) `end_exams_of_edited_version` PUT işleminde; aynı tanım dokunmaz; puansızlık yapıdan (ACTIVE dışı sınav açılmıyor). PR not 2 makul. (2) `lock=True` yalnız publish/PUT; kilit sırası tek, 06a değişmeden yeşil. (3) `masking_of` motorla aynı kip, eylem ve kategori kuralları. (4) 422 yalnız `EXACT_FIELDS`, audit'li, değer sızmıyor; `masked_fields` doğru. (5) assert var. (6) OpenAPI additive. (7) Kanıt iddiaları karşılıyor; 43bfbcf notta açık.
+- Koşular (imaj `0.0.0-09` = d8e7119, 172 py sha256 aynı; `--no-build --pull never`): birim+sözleşme 38 ×2, hedefli int 83 ×2 (işçi sırası), lint geçti.
+- **FOLLOWUP adayları (senin kararın):** NOTE-1 ilerletici `completed`/`running` yazımı koşullu (`WHERE status IN active`): PUT'un `failed`'ını tick içinde ezmesin, kilitsiz kapatır. NOTE-4 `sql_result` içindeki sayısal kimlik maskelenmiyor/422 almıyor (delta dışı). NOTE-6 test sırası: `test_06a_agents.py:18-24` `config_encrypted=b"x"` sonrası `test_03a_2_read_mode_get_parity` 500 (delta dışı, 06a→03a tek başına kırmızı).
+- Not: NOTE-7 kırmızı/kapı logları özet (komut satırı ve tam çıktı yok); teyidi etkilemiyor.
+
+### R-09-0041 · 2026-11-16 08:36 · → koordinator · YIGIN-KAPA
+review09 `down -v --remove-orphans`: konteyner 0, volume 0 (`09-2-r3-rv-stack-down.log`). Worktree `.worktrees/review-09-2-r3` kaldırıldı (dizin de silindi). Açık inceleyici yığını yok. Commit yok (state dosyaları: kanal, `reviews/09-2-r2.md`, `evidence/09-2-r3-rv-*` 10 dosya).

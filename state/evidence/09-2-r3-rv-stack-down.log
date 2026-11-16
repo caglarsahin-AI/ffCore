@@ -1,0 +1,38 @@
+== 2026-11-16T08:34:12+03:00
+$ docker compose -p review09 --env-file .env.test --profile test --profile tools down -v --remove-orphans
+ Container review09-redis-1  Stopping
+ Container review09-fake-llm-1  Stopping
+ Container review09-litellm-1  Stopping
+ Container review09-redis-1  Stopped
+ Container review09-redis-1  Removing
+ Container review09-redis-1  Removed
+ Container review09-litellm-1  Stopped
+ Container review09-litellm-1  Removing
+ Container review09-litellm-1  Removed
+ Container review09-postgres-1  Stopping
+ Container review09-postgres-1  Stopped
+ Container review09-postgres-1  Removing
+ Container review09-postgres-1  Removed
+ Container review09-fake-llm-1  Stopped
+ Container review09-fake-llm-1  Removing
+ Container review09-fake-llm-1  Removed
+ Volume review09_langfuse_clickhouse_logs  Removing
+ Volume review09_langfuse_postgres_data  Removing
+ Volume review09_langfuse_minio_data  Removing
+ Volume review09_langfuse_clickhouse_data  Removing
+ Volume review09_postgres_data  Removing
+ Volume review09_redis_data  Removing
+ Volume review09_knowledge_storage  Removing
+ Volume review09_model_cache  Removing
+ Network review09_default  Removing
+ Volume review09_langfuse_postgres_data  Removed
+ Volume review09_langfuse_minio_data  Removed
+ Volume review09_langfuse_clickhouse_data  Removed
+ Volume review09_langfuse_clickhouse_logs  Removed
+ Volume review09_postgres_data  Removed
+ Volume review09_redis_data  Removed
+ Volume review09_knowledge_storage  Removed
+ Volume review09_model_cache  Removed
+ Network review09_default  Removed
+exit=0
+containers=0 volumes=0
