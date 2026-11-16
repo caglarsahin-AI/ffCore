@@ -1,6 +1,6 @@
 # fix/ajan-hooklari: ajan kurallarının hook ile zorlanması
 
-**Paket:** fix/ajan-hooklari · **Sınıf:** [C] (güvenlik davranışı; kullanıcı onayı 16 Kasım, KARARLAR "Ajan kuralları hook ile zorlanır…") · **Branch:** fix/ajan-hooklari · **Worktree:** `.worktrees/fix/ajan-hooklari` · **Baz commit:** b9f9fd7 (plan anında 38ced4d; docs çakışmasın diye rebase) · **İşçi:** isci-a (`ffcore-isci-a-hook`) · **Brief:** K-HOOK-0001 GOREV + K-HOOK-0002 EK (push kuralı)
+**Paket:** fix/ajan-hooklari · **Sınıf:** [C] (güvenlik davranışı; kullanıcı onayı 16 Kasım, KARARLAR "Ajan kuralları hook ile zorlanır…") · **Branch:** fix/ajan-hooklari · **Worktree:** `.worktrees/fix/ajan-hooklari` · **Baz commit:** 9d38bc4 (plan anında 38ced4d; b9f9fd7 ve 10c-1 merge sonrası docs çakışmasın diye iki kez rebase; ikisi de temiz) · **İşçi:** isci-a (`ffcore-isci-a-hook`) · **Brief:** K-HOOK-0001 GOREV + K-HOOK-0002 EK (push kuralı)
 
 Durum: **IMPLEMENTED** (PLAN-ONAY K-HOOK-0003; S1-S10 A + iki ek). Gerçek çağrı kanıtı bekleniyor (A-HOOK-0004); PR-HAZIR kanıttan sonra.
 
@@ -151,16 +151,16 @@ Yok.
 
 ## Uygulama (PLAN-ONAY sonrası)
 
-Dal `fix/ajan-hooklari`, main **b9f9fd7** üzerine rebase edildi (main'de docs/handbook ilerlediği için; dal yalnız yeni dosyalar eklediğinden temiz). Commit'ler (test/kod/docs ayrı):
+Dal `fix/ajan-hooklari`, main **9d38bc4** üzerine rebase edildi (önce b9f9fd7, 10c-1 merge sonrası 9d38bc4) (main'de docs/handbook ilerlediği için; dal yalnız yeni dosyalar eklediğinden temiz). Commit'ler (test/kod/docs ayrı):
 
 | Commit | Tür | İçerik |
 |---|---|---|
-| c8b43fb | test | kırmızı testler (her kural engel/serbest çifti, warn, rol çözümü, kayıt, S9) |
-| 66b4ef5 | test | guard modülünü `sys.modules`'a kaydeden fixture düzeltmesi; settings.json komutunu kabuksuz koşan uçtan uca test |
-| 7c3196c | feat | `.claude/hooks/ffcore_guard.py`, `.claude/settings.json` (warn) |
-| c6d2093 | test | arşiv dosyaları yalnız koordinatör; koordinatör rol kanallarından mesaj taşıyabilir (main'e gelen "Bağlam bütçesi ve arşiv" kuralı) |
-| 71175c5 | feat | aynı kural guard'da |
-| 1986c2b | docs | ENVIRONMENT_AND_COMMANDS, SECURITY_AND_PERMISSIONS, MULTI_AGENT_PROTOCOL, BASLATMA, docs/takim 9.1 satır 1 + 9.2 |
+| 8248a00 | test | kırmızı testler (her kural engel/serbest çifti, warn, rol çözümü, kayıt, S9) |
+| 6eb6c89 | test | guard modülünü `sys.modules`'a kaydeden fixture düzeltmesi; settings.json komutunu kabuksuz koşan uçtan uca test |
+| 4a77cb7 | feat | `.claude/hooks/ffcore_guard.py`, `.claude/settings.json` (warn) |
+| fc65c99 | test | arşiv dosyaları yalnız koordinatör; koordinatör rol kanallarından mesaj taşıyabilir (main'e gelen "Bağlam bütçesi ve arşiv" kuralı) |
+| 20bbd6b | feat | aynı kural guard'da |
+| 3ab062d | docs | ENVIRONMENT_AND_COMMANDS, SECURITY_AND_PERMISSIONS, MULTI_AGENT_PROTOCOL, BASLATMA, docs/takim 9.1 satır 1 + 9.2 |
 
 Plandan sapmalar (gerekçeli):
 1. **Hook komutu modül içe aktarır, betik koşmaz.** Ölçüm (`state/evidence/` dışı, oturum içi): bu makinede `py -3.12 -c pass` ≈ 0,9-1,2 sn; `py -3.12 ffcore_guard.py` ≈ 2,0-2,4 sn; aynı modülün `import`'u ≈ 1,1-1,3 sn. Tek satırlık `pass` betiği bile 3 sn sürdü: maliyet betik dosyasının kendisinde (büyük olasılıkla dosya taraması), guard kodunda değil (içe aktarmalar ~0,1 sn). Komut: `py -3.12 -c "import os, sys; sys.path.insert(0, os.path.dirname(sys.argv[1])); import ffcore_guard; sys.exit(ffcore_guard.run())" "$CLAUDE_PROJECT_DIR/.claude/hooks/ffcore_guard.py"`. `.pyc` `.claude/hooks/__pycache__/`'a yazılır (`.gitignore` `__pycache__/`). Ek olarak `dataclasses` (inspect çeker), `subprocess`, `datetime` tembel/çıkarıldı. `test_settings_command_runs_guard` bu tam komutu kabuksuz koşar.
@@ -172,7 +172,7 @@ Plandan sapmalar (gerekçeli):
 - `.claude/settings.json` (yeni; `env.FFCORE_GUARD_MODE=warn`, deny, PreToolUse Bash + Edit|Write|MultiEdit|NotebookEdit)
 - `tests/hooks/conftest.py`, `tests/hooks/test_guard.py` (yeni; 101 test)
 - `handbook/ENVIRONMENT_AND_COMMANDS.md`, `handbook/SECURITY_AND_PERMISSIONS.md`, `handbook/MULTI_AGENT_PROTOCOL.md`, `BASLATMA.md`, `docs/takim/ajanlarla-gelistirme.md`
-- backend/frontend/deploy/Makefile/state: **yok** (`git diff --stat main..HEAD`: 9 dosya +1419/-88)
+- backend/frontend/deploy/Makefile/state: **yok** (`git diff --stat main...HEAD`: 9 dosya +1419/-88)
 
 ## Kabul kriterleri → testler
 | # | Kriter | Test | Durum |
@@ -197,7 +197,7 @@ Plandan sapmalar (gerekçeli):
 |---|---|---|---|
 | `py -3.12 -m pytest tests/hooks -q -p no:cacheprovider 2>&1 \| tee state/evidence/hook-tests-red.log` | host Python 3.12.10, pytest 9.0.2, kod yokken | 1 (80 failed, 14 error) | 22 sn |
 | `… \| tee state/evidence/hook-tests-red-arsiv.log` (arşiv testleri, kod öncesi) | aynı | 1 (3 failed) | 5 sn |
-| `py -3.12 -m pytest tests/hooks -q -p no:cacheprovider 2>&1 \| tee state/evidence/hook-tests.log` | HEAD 1986c2b | 0 (**101 passed**) | 62 sn |
+| `py -3.12 -m pytest tests/hooks -q -p no:cacheprovider 2>&1 \| tee state/evidence/hook-tests.log` | HEAD 3ab062d (rebase sonrası) | 0 (**101 passed**) | 70 sn |
 | `ruff check` + `ruff format --check` `.claude/hooks tests/hooks` → `state/evidence/hook-ruff.log` | ruff 0.17.3 (backend pin'i; yerel uv önbelleğindeki exe, ağ yok) | 0 | <1 sn |
 | `make lint` / `make test` / iki profil | — | NOT_RUN: backend/frontend'e dokunulmadı (diff'te yok); `make lint` `.claude/` ve `tests/hooks`'u kapsamaz, yukarıdaki ruff koşusu onun yerine | — |
 | başsız `claude.exe -p --model haiku` (S10) | worktree, warn | 1: CLI OAuth girişi süresi dolmuş; model çağrısı yok (sayım 1/3 deneme) | — |
