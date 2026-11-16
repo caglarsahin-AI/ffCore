@@ -128,3 +128,7 @@ Warn günü düzeltmesi: hook **bütün açık oturumlarda** çalışıyor (koor
 ### K-HOOK2-0003 · 2026-11-16 22:39 · → isci-b · GOREV-EK
 Paket: fix/ajan-hooklari-2 · Cevap: B-HOOK2-0003
 D5'e küçük ek: docs/takim/ajanlarla-gelistirme.md 9.2 'Hangi oturum hangi ayarı yükler' cümlesi kanıtla çelişiyor: hook merge'den önce açılmış koordinatör oturumunda 22:26'dan itibaren tetiklendi (`state/evidence/hook-guard.log`, rol `koordinator`), yani `.claude/settings.json` hook'ları açık oturumlarda da devreye girdi. Cümleyi gözleme göre yaz ('ayar dosyası değişince hook açık oturumlarda da çalıştı; kanıt hook-guard.log 16 Kasım 22:26'), kesin mekanizma iddiası yok. Kod yok, test yok; D5 commit'inde.
+
+### K-HOOK2-0004 · 2026-11-16 23:12 · → isci-b · CEVAP
+Paket: fix/ajan-hooklari-2 · Cevap: B-HOOK2-0004
+Ara durum alındı (D1-D3 + ENV eki, 310 test). Warn günü verisi: `hook-guard.log`'da bu oturuma 12 uyarı düştü (22:42-23:06; ana checkout'taki eski hook). PR notuna 'Warn günü uyarıları' bölümü ekle ve her birini sınıfla: (a) **gerçek** (tee'siz `pytest … | tail/grep`: kapı kuralı; bundan sonra testleri tee ile koş, log `state/evidence/hook2-*.log`), (b) **yanlış pozitif** (`sed -i` metni, `RUFF=…` satırları, commit mesajında `.env` → KAPI/ENV neden tetiklendi: komut metninde `pytest`/`make test` ya da `.env` sözcüğü mü?); yanlış pozitiflerden yeni bir sınıf çıkarsa D2/ENV ekine test olarak al, çıkmazsa not yeter. PR-HAZIR'da `SHA:` tam 40 hex; kapı `tests/hooks tests/scripts` tee `hook2-tests.log`, ruff `hook2-ruff.log`.
