@@ -17,7 +17,7 @@ import { useReportError } from "@/components/use-report-error";
 import { WriteGate } from "@/components/write-gate";
 import { EVAL_RUN_STATUSES, evalKeys, isLiveEvalRun, openEvalStream, useCancelEvalRun, useEvalRun } from "@/lib/api/eval-queries";
 import type { EvalRun, EvalRunStatus } from "@/lib/api/eval-queries";
-import { followEvalStream, shownStatus } from "@/lib/eval-stream";
+import { followEvalStream, newestState } from "@/lib/eval-stream";
 import type { EvalProgress } from "@/lib/eval-stream";
 import { isUnauthenticated } from "@/lib/login-redirect";
 
@@ -53,12 +53,12 @@ function ExamDetail({ projectId, evalRunId }: { projectId: string; evalRunId: st
   return (
     <div className="flex flex-col gap-4">
       {query.isError && <QueryError error={query.error} />}
-      <Loaded projectId={projectId} run={query.data} stream={stream} setStream={setStream} />
+      <Loaded projectId={projectId} run={query.data} runAt={query.dataUpdatedAt} stream={stream} setStream={setStream} />
     </div>
   );
 }
 
-function Loaded({ projectId, run, stream, setStream }: { projectId: string; run: EvalRun; stream: StreamState | null; setStream: (s: StreamState) => void }) {
+function Loaded({ projectId, run, runAt, stream, setStream }: { projectId: string; run: EvalRun; runAt: number; stream: StreamState | null; setStream: (s: StreamState) => void }) {
   const t = useTranslations("Evaluations.exam");
   const tStatus = useTranslations("Evaluations.statuses");
   const tBack = useTranslations("Evaluations");
@@ -66,7 +66,9 @@ function Loaded({ projectId, run, stream, setStream }: { projectId: string; run:
   const client = useQueryClient();
   const report = useReportError();
   const cancel = useCancelEvalRun(projectId);
-  const [progress, setProgress] = useState<EvalProgress | null>(null);
+  // The last progress from the stream and when it arrived (compared with GET's dataUpdatedAt).
+  const [heard, setHeard] = useState<{ progress: EvalProgress; at: number } | null>(null);
+  const setProgress = (progress: EvalProgress) => setHeard({ progress, at: Date.now() });
   const live = isLiveEvalRun(run.status);
 
   // Follow the stream once, from the first render of a live exam; at its end the exam is read again
@@ -102,11 +104,8 @@ function Loaded({ projectId, run, stream, setStream }: { projectId: string; run:
     // eslint-disable-next-line react-hooks/exhaustive-deps -- one stream per page, started once
   }, []);
 
-  // The stream's counts are the newest only while it is followed; after it ended, GET's are.
-  const streamed = stream === "streaming" ? progress : null;
-  const items = streamed?.items ?? run.items;
-  const scored = streamed?.scored ?? run.scored;
-  const status = shownStatus(run.status, stream, progress);
+  // Status and counts from whichever came last: the stream's progress or the GET read.
+  const { status, items, scored } = newestState(run, runAt, heard?.progress ?? null, heard?.at ?? 0);
   const knownStatus = (EVAL_RUN_STATUSES as readonly string[]).includes(status) ? (status as EvalRunStatus) : null;
   const when = (iso: string | null) => (iso ? format.dateTime(new Date(iso), { dateStyle: "medium", timeStyle: "medium" }) : t("none"));
 

@@ -174,8 +174,9 @@ export async function followEvalStream(options: EvalFollowOptions): Promise<Eval
   return options.signal?.aborted ? "aborted" : "lost";
 }
 
-// The exam status the page shows: while the stream is followed its `progress` is newer than the
-// GET read at page load; once it ended (done, lost, ended) the GET status is the current one.
-export function shownStatus(runStatus: string, stream: string | null, progress: EvalProgress | null): string {
-  return stream === "streaming" && progress ? progress.status : runStatus;
+// What the exam page shows: whichever it heard last, the stream's progress or the exam read with
+// GET (each with the time it arrived). A failed GET keeps its last data and time, so an older
+// status never comes back while the stream reconnects; a tie goes to GET, the full record.
+export function newestState<T extends EvalProgress>(run: T, runAt: number, progress: EvalProgress | null, progressAt: number): EvalProgress {
+  return progress && progressAt > runAt ? progress : run;
 }
