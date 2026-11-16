@@ -1,0 +1,36 @@
+{
+  "env": {
+    "FFCORE_GUARD_MODE": "warn"
+  },
+  "permissions": {
+    "deny": [
+      "Read(**/.env)",
+      "Edit(**/.env)",
+      "Read(//c/ai_paycore/paycoreLLM/.env)",
+      "Read(//c/ai_paycore/paycoreLLM/data/**)",
+      "Read(//c/ai_paycore/paycoreLLM/eval/results/**)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "py -3.12 -c \"import os, sys; sys.path.insert(0, os.path.dirname(sys.argv[1])); import ffcore_guard; sys.exit(ffcore_guard.run())\" \"$CLAUDE_PROJECT_DIR/.claude/hooks/ffcore_guard.py\""
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write|MultiEdit|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "py -3.12 -c \"import os, sys; sys.path.insert(0, os.path.dirname(sys.argv[1])); import ffcore_guard; sys.exit(ffcore_guard.run())\" \"$CLAUDE_PROJECT_DIR/.claude/hooks/ffcore_guard.py\""
+          }
+        ]
+      }
+    ]
+  }
+}
