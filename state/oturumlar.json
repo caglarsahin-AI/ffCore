@@ -1,0 +1,22 @@
+{
+  "sessions": {
+    "local_709fab08-44f0-4a68-bd77-2c627c99e07e": {
+      "rol": "koordinator",
+      "lease": "ffcore-koordinator-20261102",
+      "acildi": "2026-11-02T09:54"
+    },
+    "local_2c614b1c-69a4-4b61-8f27-6fc22e79a607": {
+      "rol": "inceleyici",
+      "paket": "10c-1",
+      "lease": "ffcore-inceleyici-10c1",
+      "acildi": "2026-11-16T12:30"
+    },
+    "local_a8bfcc13-4ea9-436e-a533-6695bea49970": {
+      "rol": "isci-a",
+      "paket": "fix/ajan-hooklari",
+      "pr": "fix-ajan-hooklari",
+      "lease": "ffcore-isci-a-hook",
+      "acildi": "2026-11-16T10:47"
+    }
+  }
+}

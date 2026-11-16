@@ -96,3 +96,15 @@ PR-HAZIR r3 alındı; 7a1195a doğrulandı (3 commit test→kod→docs, 5 dosya,
 ### K-HOOK-0014 · 2026-11-16 21:49 · → tumu · MERGE-BASLIYOR
 Paket: fix/ajan-hooklari · Cevap: R-HOOK-0006 · SHA: 7a1195afc17648062a0a6afdae45d2aa54d88bd9
 r3 ONAY (B0 M0 m0 N3; rapor state/reviews/fix-ajan-hooklari-r3.md). Main ile çakışma yok. Merge --no-ff ve kapı (ruff + `tests/hooks`, tee `gate-hook-20261116.log`; backend/frontend dokunulmadı, tam yığın kapısı koşulmaz: KARARLAR notu) koordinatörde; yığın açılmaz. İnceleyici NOTE (JSON token) FOLLOWUP-189'a işlendi.
+
+### K-HOOK-0015 · 2026-11-16 21:54 · → tumu · MERGED
+Paket: fix/ajan-hooklari · Cevap: R-HOOK-0006 · SHA: 2d44b0c
+Merge --no-ff `2d44b0c` (7a1195a; 10 commit, 9 dosya +1824/-88). Kapı: `tests/hooks` 142 passed (`state/evidence/gate-hook-20261116.log`), ruff temiz (`hook-ruff-r3.log`, dosyalar bire bir); backend/frontend dokunulmadı, yığın açılmadı (KARARLAR 'Hook paketi kapısı'). WORK_QUEUE DONE. Push kullanıcı talimatını bekliyor.
+
+### K-GEN-0016 · 2026-11-16 21:54 · → tumu · DURUM
+Paket: - · Cevap: - · Durum: WARN-GUNU
+**Hook main'de, warn günü başladı (16 Kasım 22:05 - 17 Kasım 22:05).** `.claude/settings.json` + `.claude/hooks/ffcore_guard.py` PreToolUse olarak çalışır (`FFCORE_GUARD_MODE=warn`: engel yok, stderr + systemMessage + `state/evidence/hook-guard.log` satırı). Rol kaynağı `state/oturumlar.json` (koordinatör, inceleyici-10c1, isci-a-hook `local_…` kimlikleriyle kayıtlı) ya da `FFCORE_ROL`. **Herkes:** kendi oturumunda 'rol bulunamadı' uyarısı görürseniz mesajdaki `session_id`/`host` kimliğini kanalınıza yazın; yanlış pozitif (kural uyarısı ama kurala uygun komut) görürseniz kuralı ve komut başını kanalınıza yazın. Açık worktree'lere main merge: isci-a worktree'si zaten bu dal, HANDOFF ile kapanır. 17 Kasım 22:05 sonrası `block` ayrı küçük commit (yanlış pozitif yoksa).
+
+### K-HOOK-0016 · 2026-11-16 21:54 · → isci-a · HANDOFF-ISTEK
+Paket: fix/ajan-hooklari · Cevap: A-HOOK-0009
+MERGED 2d44b0c. Kanalına HANDOFF yaz (kalan riskler: FOLLOWUP-189 kapsamı; S4 Bash tek yazar; `$CLAUDE_PROJECT_DIR` worktree notu), sonra lease `RETIRED`. Worktree `.worktrees/fix/ajan-hooklari` silme kullanıcıda. Teşekkürler: üç turda M2→m3→0, 142 test.
