@@ -58,7 +58,7 @@ Profil matrisi: `DEPLOY_PROFILE=airgap make test` ve `DEPLOY_PROFILE=llmaas make
 - **Kayıt:** her tetiklenme `state/evidence/hook-guard.log`'a tek satır (zaman, kip, rol, araç, kural, komutun **maskeli** ilk 120 karakteri: URL kimliği, `*KEY/TOKEN/SECRET/PASS*=` değerleri, `Authorization`/`Bearer` `***` olur; dosya içeriği yok). Dalga raporu bu dosyayı sayar.
 - **Yükleme:** proje ayarı oturum açılışındaki klasörden okunur; tabanı eski worktree'lerde hook rebase'e kadar yoktur.
 - **Testler:** `py -3.12 -m pytest tests/hooks -q 2>&1 | tee state/evidence/hook-tests.log` (Docker gerekmez).
-- Hook güvenlik ağıdır, sandbox değil; bu belgedeki metin kuralları geçerliliğini korur.
+- Hook güvenlik ağıdır, sandbox değil; bu belgedeki metin kuralları geçerliliğini korur. Bilinen sınırlar (docs/takim 9.2): değişkenle kurulan komut, betik dosyası, Makefile tarifleri, Bash ile state yazımı. Komut başındaki `env [K=V]…`, `command`, `exec`, `time`, `nice`, `nohup` sarmalayıcıları, `bash -o <seçenek> -c '…'`, `$(…)` ve ters tırnak içi, `{ …; }` gruplaması push, compose ve kapı kurallarınca denetlenmez (FOLLOWUP-189); `( … )` alt kabuğu denetlenir. İç içe `sh -c` / `compose run|exec` 3 düzeyi aşarsa `GUARD-DERINLIK` ile engellenir.
 
 ## Bayraklar
 

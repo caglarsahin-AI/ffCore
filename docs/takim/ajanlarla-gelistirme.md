@@ -634,6 +634,7 @@ NER gecikme kabulü (boşta P95 < 300 ms) geliştirme dizüstünde ölçüldü. 
 | `TEK-YAZAR` | Edit/Write/MultiEdit/NotebookEdit; bkz. MULTI_AGENT_PROTOCOL tablo | kendi kanalın, kendi PR notun | işçinin `WORK_QUEUE.md` yazması |
 | `STATE-YOL` | Edit/Write…; `.worktrees/<…>/state/**` her rol için | `C:\ai_paycore\ffcore\state\…` | worktree içindeki `state/` |
 | `GUARD-HATA` | bozuk girdi ya da guard hatası: engel; `.claude/hooks/**` ve `.claude/settings.json` düzenlemesi hariç (guard düzeltilebilir kalır) | — | — |
+| `GUARD-DERINLIK` | Bash; iç içe `sh -c` / `compose run\|exec` zincirinde 3. düzeyin altında hâlâ iç komut varsa: denetlenemeyen komut sessiz geçmez | 3 düzey (`sh -c` × 3) | 4 düzey |
 
 **Rol.** Sıra: (1) `FFCORE_ROL` (+ `FFCORE_PAKET`) ortamı; (2) `state/oturumlar.json` → önce hook girdisindeki `session_id`, sonra ortamdaki `CLAUDE_CODE_HOST_SESSION_ID` (masaüstü `local_…`); (3) yoksa rol yok. Rol yokken tek yazar dosyalarına yazım engellenir ve mesaj iki kimliği de yazar; oturum bunu koordinatöre bildirir. Kayıt bozuksa rol yok sayılır, mesaj nedeni söyler. Şema:
 
@@ -663,9 +664,9 @@ NER gecikme kabulü (boşta P95 < 300 ms) geliştirme dizüstünde ölçüldü. 
 
 **Hangi oturum hangi ayarı yükler.** Claude Code proje ayarını ve hook'ları oturum **açılışındaki** proje kökünden okur ve oturum boyunca anlık görüntüyü kullanır. Ana checkout'ta açılan oturum ana checkout'un `.claude/settings.json`'ını yükler; oturum sonradan bir worktree'ye geçse de o worktree'nin ayarı yüklenmez (bu PR'ın işçi oturumunda gözlendi, `state/evidence/hook-real-call.log`). Klasörü worktree olan oturumda `$CLAUDE_PROJECT_DIR` worktree yoludur; guard yine de state'i ana checkout'tan bulur (kendi yolundaki `.worktrees` öncesi kısım). Sonuç: merge sonrası hook ana checkout'ta açılan her yeni oturumda etkindir; tabanı eski worktree'lerde rebase edilene kadar yoktur.
 
-**İç içe komutlar.** Bütün Bash kuralları `sh -c '…'` / `bash -c "…"` metninin içinde ve `docker compose run|exec` ile servise verilen komutta da denetlenir (en çok 3 düzey). Ayırma tırnağa duyarlıdır: tırnak içindeki `&&`, `;` ve `|` tek komutun parçası kalır; dıştaki `| tee` içteki kapı komutunu da karşılar.
+**İç içe komutlar.** Bütün Bash kuralları `sh -c '…'` / `bash -c "…"` metninin içinde ve `docker compose run|exec` ile servise verilen komutta da denetlenir (en çok 3 düzey; daha derin iç komut `GUARD-DERINLIK` ile engellenir). Ayırma tırnağa duyarlıdır: tırnak içindeki `&&`, `;` ve `|` tek komutun parçası kalır; dıştaki `| tee` içteki kapı komutunu da karşılar.
 
-**Bilinen sınırlar.** Hook güvenlik ağıdır: değişkenle kurulan komut (`$CMD`), betik dosyası, Makefile tarifleri, `docker exec`/`docker run` (compose olmayan) ve Bash ile state yazımı yakalanmaz. Python (`py -3.12`) yoksa hook çalışamaz ve Claude Code çağrıyı engellemez (fail-open; ortam ön koşulu). `.env` kalıbı tırnak içindeki metinde de tetiklenir (bilinçli: sessiz geçişten iyidir); warn günü yanlış pozitifleri gösterir.
+**Bilinen sınırlar.** Hook güvenlik ağıdır: değişkenle kurulan komut (`$CMD`), betik dosyası, Makefile tarifleri, `docker exec`/`docker run` (compose olmayan) ve Bash ile state yazımı yakalanmaz. Komut başındaki `env [K=V]…`, `command`, `exec`, `time`, `nice`, `nohup` sarmalayıcıları, `bash -o <seçenek> -c '…'`, `$(…)` ve ters tırnak içi, `{ …; }` gruplaması push, compose ve kapı kurallarınca denetlenmez (FOLLOWUP-189); `( … )` alt kabuğu denetlenir. Python (`py -3.12`) yoksa hook çalışamaz ve Claude Code çağrıyı engellemez (fail-open; ortam ön koşulu). `.env` kalıbı tırnak içindeki metinde de tetiklenir (bilinçli: sessiz geçişten iyidir); warn günü yanlış pozitifleri gösterir.
 
 **Uygulama adımları** (yapılanlar): karar kaydı (16 Kasım, C sınıfı, kullanıcı onayı); `fix/ajan-hooklari` dalı, her kural için kırmızı test → guard → settings → bu belge ve handbook; inceleyici turu; merge sonrası `warn` günü, yanlış pozitif yoksa `block`.
 

@@ -31,7 +31,7 @@
 | PayCore sunucusuna bağlanma, orada komut çalıştırma | yasak; komutları kullanıcı çalıştırır, çıktıyı PR'a yapıştırır (PayCore kuralı, 00i) |
 | Jira'ya yazma (`JIRA_SUGGESTIONS_ENABLED`) | yasak; kapı kapalı kalır, test kanıtlar |
 | yayınlama, deploy, üretim ya da müşteri erişimi | yasak; ayrı açık talep ve yetki olmadan |
-| `git push` | yalnız koordinatör oturumu, kullanıcının o anki açık talimatıyla ve yalnız o komut için önek `FFCORE_PUSH_OK=1 git push …`; işçi, inceleyici ve sekreter bayrakla bile push etmez (KARARLAR 16 Kasım; hook kuralı `PUSH`) |
+| `git push` | yalnız koordinatör oturumu, kullanıcının o anki açık talimatıyla ve yalnız o komut için önek `FFCORE_PUSH_OK=1 git push …`; işçi, inceleyici ve sekreter bayrakla bile push etmez (KARARLAR 16 Kasım; hook kuralı `PUSH`; `env`/`command`/`time` öneki, `$(…)`, `{ …; }` ve `bash -o … -c` içi hook'ta bilinen sınır, kural metin olarak geçerli: ENVIRONMENT_AND_COMMANDS "Hook ile zorlanan kurallar") |
 | force push, history rewrite, `reset --hard` main'de | yasak |
 | `.env` yazma, secret üretme | yasak |
 
