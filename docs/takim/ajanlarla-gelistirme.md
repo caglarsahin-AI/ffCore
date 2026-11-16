@@ -300,7 +300,7 @@ Sessiz fallback, kırpma ya da atlama yok; her red kayıtlı ve gerekçelidir (A
 - **PR notu** (`state/pr/<paket>.md`, şablon `handbook/templates/PR_SABLONU.md`) şunları içerir: plan (1-9), değişen dosyalar, kabul kriteri → test tablosu, komut/ortam/exit/süre tablosu, kontrol listesi, varsayımlar, kalan riskler.
 - **Kapı çıktısı tamamen dosyaya alınır:** `tee state/evidence/gate-<paket>-<tarih>.log`. Yalnız son satır tutulmaz (`ENVIRONMENT_AND_COMMANDS.md`; neden için bkz. 7.2).
 - **Kırmızı kanıtı ayrı log'dadır:** `*-red-*.log`.
-- Kural ile uygulama arasında bir çelişki var: `EXECUTION_HANDBOOK.md` 6 hâlâ "Ayrı kanıt dosyası yok" diyor, uygulamada `state/evidence/` altında 820 dosya var. **(doğrulanmadı: bu sapmanın bilinçli bir kararla kapatılıp kapatılmadığını bulamadım; DRIFT adayı.)**
+- Kural ile uygulama bir süre ayrıştı: `EXECUTION_HANDBOOK.md` 6 "Ayrı kanıt dosyası yok" diyordu, uygulamada `state/evidence/` altında 820 dosya birikti. 16 Kasım'da handbook düzeltildi (DRIFT-182): özet PR açıklamasında, ham çıktı `state/evidence/`'ta.
 
 ---
 
@@ -389,7 +389,7 @@ Toplam yaklaşık 20 dakika. Bir kapı adımı 137 (OOM) ile düşerse o adım t
 
 - Konteyner açan her koşudan önce kanala `YIGIN-AÇ <proje>` yazılır. Bitince `down -v` + `YIGIN-KAPA`. Koordinatör sıra verir.
 - Docker Desktop VM'i 12,5 GB. Aynı anda **en fazla üç yığın** açık olabilir. Main kapısı koşarken diğer yığınlar açık kalabilir ama test koşmaz (`ENVIRONMENT_AND_COMMANDS.md`, `KARARLAR.md` 5 Kasım).
-- Kural zamanla değişti: 30 Ekim kararı "aynı anda en çok iki Docker yığını" diyor, 5 Kasım kararı ve handbook "üç" diyor. 30 Ekim maddesi `KARARLAR.md`'de "tersine karar" diye işaretlenmemiş. **(doğrulanmadı: geçerli sınır uygulamada üç; eski madde DRIFT adayı.)**
+- Kural zamanla değişti: 30 Ekim kararı "aynı anda en çok iki Docker yığını" diyordu; 1 Kasım'da kullanıcı kararıyla üçe çıkarıldı (`KARARLAR.md` "Yığın sınırı üçe çıkarıldı", tersine karar işaretli) ve 5 Kasım'da "üç yığın sınırı bellek sınırıdır" diye gerekçelendi: main kapısı koşarken diğer yığınlar test koşmaz.
 - Her yığın açışından önce `YIGIN-AÇ` yazılır; `tools --no-deps` bile volume açar.
 
 ### 6.3 Dış bağlantı yok

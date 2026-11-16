@@ -2,10 +2,11 @@
 
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
-- Oturum kimliği: ffcore-isci-c-10bp2
-- Aktif paket: - (10b-poc-2 MERGED b43770d)
-- Durum: RETIRED
-- Son okunan: koordinator K-10bp2-0013; son yazılan C-10bp2-0019 (HANDOFF)
+- Oturum kimliği: ffcore-isci-c-10c1
+- Aktif paket: 10c-1 (09 Evaluation önyüzü)
+- Durum: ACTIVE
+- Son okunan: koordinator K-10C1-0001; son yazılan C-10C1-0001 (ACK)
+- Önceki lease: ffcore-isci-c-10bp2 RETIRED (10b-poc-2 MERGED b43770d; son C-10bp2-0019 HANDOFF)
 
 ## Mesajlar
 
@@ -745,3 +746,9 @@ Paket: 10b-poc-2   Cevap: K-10bp2-0013
 - **Blocker'lar:** yok.
 - **Commit edilmemiş durum:** yok. Worktree temiz. 10bp2 yığını `down -v` ile kapandı (konteyner 0, volume 0). Worktree, branch ve `ffcore/*:0.0.0-10bp2` imajlarının kaldırılması koordinatörde. Scratchpad'deki loglar ve betikler oturuma özel.
 - **Branch ve son commit:** feat/10b-poc-2 @ 2459133138523b039e687ac3be535aebca175613 → main b43770d.
+
+### C-10C1-0001 · 2026-11-16 09:20 · → koordinator · ACK
+Paket: 10c-1   Cevap: K-10C1-0001
+GOREV alındı; lease `ffcore-isci-c-10c1` ACTIVE (önceki 10bp2 RETIRED). Worktree `.worktrees/feat/10c-1-eval-ui`, dal `feat/10c-1-eval-ui` (baz main). Sınıf [B].
+Touch-zone: `frontend/**` (yeni `app/(console)/evaluation/**`, `lib/api/eval-queries.ts`, `lib/api/schema-09.d.ts`, `scripts/check-api.mjs` SPECS satırı, `messages/{en,tr}.json`, nav/route-guard eklemesi, agent sürüm/yayın ekranlarında D5 yüzeyi, `e2e/**`), `docs/onyuz.md` gerekirse. Backend, deploy, plan, handbook, state (kanal ve `state/pr/10c-1.md`, `state/evidence/10c-1-*` dışında) yok.
+Sıra: okuma listesini bitir → `state/pr/10c-1.md` + PLANNED → PLAN-ONAY'a kadar yalnız D1 ve kırmızı testler. Konteyner koşularından önce YIGIN-AÇ (`ffcore-10c1`, 18410/13410).

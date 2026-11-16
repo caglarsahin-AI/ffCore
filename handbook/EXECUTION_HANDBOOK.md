@@ -70,7 +70,7 @@ Entegrasyon koşulamıyorsa paket VERIFIED olamaz; `PENDING_ENV` notu ile BLOCKE
 
 ## 6. Kanıt standardı (PR açıklamasında)
 
-Ayrı kanıt dosyası yok. PR açıklaması şunları taşır:
+Kanıtın özeti PR açıklamasındadır; ham çıktılar (kapı koşularının `tee` ile alınan tam logu, kırmızı kanıt `*-red-*.log`, ölçüm çıktıları) `state/evidence/` altında durur ve PR açıklaması onlara yolla işaret eder (DRIFT-182 ile düzeltildi, 16 Kasım 2026). PR açıklaması şunları taşır:
 
 - Paket kodu, branch, baz commit
 - Değişen dosyalar (gruplu)

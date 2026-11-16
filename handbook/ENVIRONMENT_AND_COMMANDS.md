@@ -36,6 +36,9 @@ make smoke     # /healthz, /readyz, Ollama /api/tags, OLLAMA_CONTEXT_LENGTH doğ
 make e2e       # Playwright, iki tema
 make eval      # 13'ün sınav seti (M3 sonrası)
 alembic heads  # tek head bekler
+# Önyüz kapısı (node konteyneri, --network none, node_modules volume'u):
+#   npm run lint && npm run typecheck && npm run check:api
+# backend/openapi/*.yaml değiştiyse önce `npm run gen:api` (üretilen schema-*.d.ts aynı commit'te; PROSES-184)
 ```
 
 Profil matrisi: `DEPLOY_PROFILE=airgap make test` ve `DEPLOY_PROFILE=llmaas make test` ikisi de koşar.

@@ -44,6 +44,7 @@
 - [ ] Log, API, audit, hata gövdesi secret-free
 - [ ] Türkçe metinler `tr.json`'da; iki tema test edildi (önyüz)
 - [ ] Docs ve `.env.example` güncel
+- [ ] `backend/openapi/*.yaml` değiştiyse `npm run gen:api` aynı commit'te ve `npm run check:api` yeşil (PROSES-184)
 - [ ] `state/WORK_QUEUE.md` durumu güncellendi
 
 ## Varsayımlar ve brief'teki çelişkiler
