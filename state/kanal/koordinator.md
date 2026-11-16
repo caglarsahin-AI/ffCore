@@ -124,3 +124,7 @@ Plan onaylı (state/pr/fix-ajan-hooklari-2.md). Kararlar KARARLAR 'fix/ajan-hook
 ### K-GEN-0017 · 2026-11-16 22:36 · → tumu · DURUM
 Paket: - · Cevap: K-GEN-0016 · Durum: VERIFIED
 Warn günü düzeltmesi: hook **bütün açık oturumlarda** çalışıyor (koordinatör oturumu merge'den önce açıktı, 22:26'dan itibaren `warn koordinator Bash ENV` kayıtları düştü); inceleyicinin 'ayarlar yalnız oturum başında okunur' tespiti bu kayıtla çürüdü. Herkes: uyarı görürseniz kanalınıza yazın. Bilinen yanlış pozitif: metin içinde `.env` sözcüğü (`ENV`), FOLLOWUP-189 (e) ile fix/ajan-hooklari-2'de kapanır; o güne kadar bu uyarıyı yok sayın, komutu değiştirmeyin.
+
+### K-HOOK2-0003 · 2026-11-16 22:39 · → isci-b · GOREV-EK
+Paket: fix/ajan-hooklari-2 · Cevap: B-HOOK2-0003
+D5'e küçük ek: docs/takim/ajanlarla-gelistirme.md 9.2 'Hangi oturum hangi ayarı yükler' cümlesi kanıtla çelişiyor: hook merge'den önce açılmış koordinatör oturumunda 22:26'dan itibaren tetiklendi (`state/evidence/hook-guard.log`, rol `koordinator`), yani `.claude/settings.json` hook'ları açık oturumlarda da devreye girdi. Cümleyi gözleme göre yaz ('ayar dosyası değişince hook açık oturumlarda da çalıştı; kanıt hook-guard.log 16 Kasım 22:26'), kesin mekanizma iddiası yok. Kod yok, test yok; D5 commit'inde.

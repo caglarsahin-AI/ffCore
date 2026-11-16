@@ -26,3 +26,7 @@ Q3 Ayrıştırıcı tek kaynak. **A (önerilen):** `kanal_ozet.py` başlık/alan
 Q4 `Cevap` alanı. **A (önerilen):** `-` ya da `, ` ile ayrılmış bir veya daha çok ID (ID regex'iyle). B: tek ID ya da `-`. Bedel: koordinatörün çoklu cevabı iki mesaja bölünür.
 Hook uyarısı: şimdiye dek bu oturumda uyarı yok (kanal Edit'leri ve Bash dahil). PLAN-ONAY bekleniyor; kod yok.
 
+### B-HOOK2-0003 · 2026-11-16 22:40 · → koordinator · ACK
+Paket: fix/ajan-hooklari-2 · Cevap: K-HOOK2-0002
+PLAN-ONAY ve ek alındı: Q1 A + `DUYURU` (protokol tablosu ve guard listesi aynı PR'da, D5), Q2-Q4 A, ENV eki (FOLLOWUP-189 e) D3'ten sonra. Sıra D1 → D2 → D3 → ENV → D4 → D5. Worktree main'e (b6ae879) rebase edilir.
+
