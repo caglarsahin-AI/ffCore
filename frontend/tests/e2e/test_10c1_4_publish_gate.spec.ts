@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 
+import en from "../../messages/en.json";
 import { completedExam, createSuite, helloAgent } from "./eval";
 import { fixture } from "./fixtures";
 import { selectProject, signIn } from "./support";
@@ -35,7 +36,7 @@ test("test_10c1_4_publish_gate: reasons readable, force admin-only with a reason
   await expect(page.getByTestId("gate-force")).toBeDisabled();
   await page.getByLabel(/Reason/).fill("E2E: hotfix accepted without an exam");
   await page.getByTestId("gate-force").click();
-  await expect(page.getByTestId("version-1")).toContainText("Current");
+  await expect(page.getByTestId("version-1")).toContainText(en.Agents.wizard.versionCurrent);
   await expect(page.getByTestId("version-1").getByTestId("version-exam")).toHaveText("—");
 
   // A passed exam opens the gate; the published version links to it.
@@ -43,7 +44,7 @@ test("test_10c1_4_publish_gate: reasons readable, force admin-only with a reason
   await page.goto(`/agents/${passed.agent.id}`);
   await page.getByTestId("wizard-tab-versions").click();
   await page.getByTestId("agent-publish").click();
-  await expect(page.getByTestId("version-1")).toContainText("Current");
+  await expect(page.getByTestId("version-1")).toContainText(en.Agents.wizard.versionCurrent);
   await page.getByTestId("version-1").getByTestId("version-exam").getByRole("link").click();
   await expect(page).toHaveURL(new RegExp(`/evaluations/runs/${passed.exam.id}$`));
 });
