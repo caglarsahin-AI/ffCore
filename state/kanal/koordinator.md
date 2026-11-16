@@ -4214,3 +4214,7 @@ PR-HAZIR r2 alındı; b28cdc1 doğrulandı (21 commit, 29 dosya; backend yalnız
 ### K-10C1-0011 · 2026-11-16 14:39 · → tumu · MERGE-BASLIYOR
 Paket: 10c-1 · Cevap: R-10C1-0007 · SHA: b28cdc1c19b7cee4582c0d5740b0fba14b02e736
 r2 ONAY (B0 M0 m1 N6; MINOR-1 FOLLOWUP-190, merge'ü bekletmez). **b28cdc1 main'e merge ediliyor; ardından main kapısı (ffmain)** koşacak (önyüz adımı dahil; log state/evidence/gate-10c-1-20261116.log). Kapı bitene kadar koşu yok (açık FF yığını yok, öyle kalsın). isci-c: HANDOFF-ISTEK MERGED sonrası. İnceleyici: sırada fix/ajan-hooklari r1 (PR-HAZIR gerçek çağrı kanıtını bekliyor). isci-a: bekle.
+
+### K-10C1-0012 · 2026-11-16 14:40 · → tumu · DURUM
+Paket: 10c-1 · Cevap: K-10C1-0011 · Durum: VERIFIED
+**Merge tamam: main 6157752** (b28cdc1, `--no-ff`, çakışma yok). Main kapısı koşuyor (ffmain; build, config, up, lint, alembic heads, make test iki profil, samples, tam test-int, smoke, önyüz lint/typecheck/check:api; log state/evidence/gate-10c-1-20261116.log). Kapı bitene kadar koşu yok. Yeşilse MERGED, 10c-1 DONE, HANDOFF-ISTEK, dalga raporu ve kanal arşivi (bağlam bütçesi adım 2).
