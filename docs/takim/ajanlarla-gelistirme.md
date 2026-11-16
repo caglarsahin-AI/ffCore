@@ -607,7 +607,7 @@ NER gecikme kabulü (boşta P95 < 300 ms) geliştirme dizüstünde ölçüldü. 
 
 | # | Bulgu | Kanıt | Karar ya da öneri | Durum |
 |---|---|---|---|---|
-| 1 | Kesin kurallar yalnız metinde; hiçbiri araçla zorlanmıyor | PROSES-175 (çıplak `compose build` dışarı bağlandı), K-05a-0011 (kapı logu yok, kırmızı kayboldu), 5 Kasım OOM (yığın sınırı aşıldı) | Hook ve izin ayarı (9.2) | **Kullanıcı onayladı (16 Kasım); uygulama bekliyor** |
+| 1 | Kesin kurallar yalnız metinde; hiçbiri araçla zorlanmıyor | PROSES-175 (çıplak `compose build` dışarı bağlandı), K-05a-0011 (kapı logu yok, kırmızı kayboldu), 5 Kasım OOM (yığın sınırı aşıldı) | Hook ve izin ayarı (9.2) | **Uygulandı: `fix/ajan-hooklari` (16 Kasım); ilk gün `warn`, sonra `block`** |
 | 2 | İnsan denetimi fiilen yok; dalga kapıları ve DOC-19 tutarlılık denetimi yapılmamış | `WORK_QUEUE.md` "Kapılar" tablosunun kanıt sütunu boş; belgeler arası üç çelişki (kanıt dosyası, iki ya da üç yığın, push) | A: dalga kapısında insana tek sayfalık rapor (9.3) | **Kullanıcı A'yı seçti (16 Kasım); uygulama bekliyor** |
 | 3 | Bağlam yükü büyüdü (context rot) | Koordinatör kanalı 4.107 satır, BLOCKERS 181 kayıt, KARARLAR satırları çok uzun | Kanal arşivi, BLOCKERS'ı açık ve kapalı olarak bölmek, KARARLAR indeksi (9.4) | **Kullanıcı kabul etti (16 Kasım); uygulama bekliyor** |
 | 4 | İnceleme döngüsünün durma kuralı yok | 08-tam-1a 7 tur, 09-1 6 tur; zamanlama sınıfı 4 tur | Aynı sınıf iki ardışık turda MAJOR verirse tasarım notu; üçüncü turda koordinatör kapsam kararı (9.5) | **Kullanıcı A'yı seçti (16 Kasım); uygulama bekliyor** |
@@ -615,91 +615,60 @@ NER gecikme kabulü (boşta P95 < 300 ms) geliştirme dizüstünde ölçüldü. 
 | 6 | CI yok, kapılar tek makinede | EXECUTION_HANDBOOK 5.11 hiç çalışmadı; ENV-171 Docker arızaları | Headless Claude ya da CI ile kapı | öneri |
 | 7 | Mesajlar serbest metin, makine okuyamıyor | DURUM ve PR-HAZIR mesajları yalnız insan için | Kapalı tür ve alıcı listesi, sabit alanlı ikinci satır, hook doğrulaması, özet betiği (9.6) | **Kullanıcı A'yı seçti (16 Kasım); uygulama bekliyor** |
 
-### 9.2 Hook ve izin ayarı tasarımı
+### 9.2 Hook ve izin ayarı (uygulanan hâl)
 
-**İlke.** Her seferinde uyulması gereken kural modelin hatırlamasına bırakılmaz. Claude Code'un PreToolUse hook'u bir araç çağrısını çalışmadan önce görür; hook 2 koduyla çıkarsa çağrı engellenir ve hook'un stderr'e yazdığı mesaj modele gider. İzin ayarındaki `deny` listesi de dosya okumayı ve yazmayı doğrudan kapatır. Hook bir güvenlik ağıdır, sandbox değildir. `bash -c` ya da değişkenle kurulan bir komut kalıbı atlatabilir. Bu yüzden metin kuralları da yerinde kalır.
+**İlke.** Her seferinde uyulması gereken kural modelin hatırlamasına bırakılmaz. Claude Code'un PreToolUse hook'u bir araç çağrısını çalışmadan önce görür; hook 2 koduyla çıkarsa çağrı engellenir ve hook'un stderr'e yazdığı mesaj modele gider. İzin ayarındaki `deny` listesi dosya okumayı ve yazmayı doğrudan kapatır. Hook bir güvenlik ağıdır, sandbox değildir: değişkenle kurulan komut, betik dosyası, Makefile içindeki komut ve Bash ile (`python -c`, `echo >>`) state dosyasına yazım yakalanmaz. Bu yüzden metin kuralları da yerinde kalır.
 
-**Kurallar.**
+**Dosyalar.** `.claude/hooks/ffcore_guard.py` (stdlib, ağ yok), `.claude/settings.json` (deny + PreToolUse), testler `tests/hooks/test_guard.py` (`py -3.12 -m pytest tests/hooks -q 2>&1 | tee state/evidence/hook-tests.log`). Kararlar: KARARLAR "Ajan kuralları hook ile zorlanır…" ve "fix/ajan-hooklari plan kararları".
 
-| Kural | Bugünkü kaynak | Zorlama | Engellenen örnek | Mesaj |
-|---|---|---|---|---|
-| `.env` okunmaz, yazılmaz | SECURITY_AND_PERMISSIONS | `permissions.deny` + Bash hook (`.env` sonrası nokta yoksa) | `cat .env` (`.env.test` serbest) | `ENV: .env okunmaz` |
-| PayCore `data/**`, `eval/results/**` okunmaz | CLAUDE.md, PLAN 5 | `permissions.deny` | `Read paycoreLLM/data/...` | `PayCore veri sınırı` |
-| Push yalnız koordinatör (kararı kullanıcıda) | 2.2, protokol | Bash hook + rol | işçinin ya da sekreterin `git push` komutu | `push yalnız koordinatör, kullanıcı kararıyla` |
-| Dış bağlantılı derleme yok | PROSES-175 | Bash hook | `docker compose build` (`--pull=false` olmadan), `up --build` | `PROSES-175: --pull never / --pull=false` |
-| Yığın `--pull never` ile açılır | ENVIRONMENT_AND_COMMANDS | Bash hook | `docker compose up -d` | `yığın --no-build --pull never ile açılır` |
-| En fazla üç yığın | KARARLAR "Üç yığın sınırı" | Bash hook, `docker compose ls` sayımı | üç yığın açıkken dördüncü `up` | `üç yığın sınırı; YIGIN-AÇ sırası koordinatörde` |
-| Kapı çıktısı dosyaya | K-05a-0011 | Bash hook | `make test` / `test-int` / `lint` / `smoke`, `tee` olmadan | `kapı çıktısı tee ile state/evidence/ altına` |
-| Tek yazar | MULTI_AGENT_PROTOCOL | Edit/Write hook + rol | işçinin `WORK_QUEUE.md`'ye yazması | `tek yazar: <dosya> → <rol>` |
-| Worktree'deki `state/` kopyasına yazılmaz | MULTI_AGENT_PROTOCOL "Mutlak yol" | Edit/Write hook | `.worktrees/.../state/...` | `state/ yalnız mutlak yoldan` |
+**Kurallar.** Engellenince stderr'de `FFCORE-GUARD [<kural>] <mesaj>`.
 
-**Rol bilgisi.** Hook, çağrıyı hangi rolün yaptığını bilmeli. İki kaynak tanımlanır:
-1. Oturum açılırken verilen `FFCORE_ROL` ortam değişkeni.
-2. Bu değişken yoksa, koordinatörün oturum açarken yazdığı `state/oturumlar.json` kaydı (`session_id` → rol).
+| Kural | Zorlama | Serbest | Engel |
+|---|---|---|---|
+| `ENV` `.env` okunmaz, yazılmaz | deny `Read(**/.env)`, `Edit(**/.env)` + Bash kalıbı `.env` (harf duyarsız, Windows'ta `.ENV` aynı dosya; sonrası nokta ya da harf değilse) + yazma araçlarında dosya adı | `cat .env.test`, `cat .Env.Test`, `--env-file .env.test` | `cat .env`, `cat .ENV`, `echo X >> .env` |
+| `PAYCORE` veri sınırı | deny `Read(//c/ai_paycore/paycoreLLM/{.env,data/**,eval/results/**})`, `Edit(//c/ai_paycore/paycoreLLM/.env)` + Bash kalıbı | `paycoreLLM/src/...` | `cat …/paycoreLLM/data/x` |
+| `PUSH` | Bash; yalnız rol `koordinator` **ve** komut öneki `FFCORE_PUSH_OK=1 git push …` | (koordinatör) `FFCORE_PUSH_OK=1 git push origin main` | bayraksız push; işçi/inceleyici/sekreter bayrakla bile; rol yoksa |
+| `PROSES-175` | Bash; `compose build` yalnız `--pull=false`; `up --build` yok; `up` yalnız `--pull never` | `up -d --wait --no-build --pull never` | `docker compose build`, `up -d`, `up --build` |
+| `YIGIN` | Bash; `compose up` öncesi `docker compose ls`: `ff*`/`review*` çalışan yığın ≥ 3 ve hedef proje bunlardan biri değilse; sayım yapılamazsa da engel | açık yığına `up` | 4. yığın |
+| `KAPI` | Bash; `make lint`, `test`, `test-int`, `smoke`, `e2e`, test toplayan `pytest` ya da `playwright test`, aynı boru hattında `tee` yoksa. Komut `docker compose … run\|exec [seçenekler] <servis> <komut>` içinde de denetlenir; `e2e` servisi komutsuz da kapıdır | `… tools make test 2>&1 \| tee state/evidence/x.log`, `pytest --version`, `… run --rm tools make seed` | `make test`, `docker compose … run --rm --no-deps tools make test`, `docker compose --profile e2e run --rm e2e`, `make lint \| tail -5` |
+| `TEK-YAZAR` | Edit/Write/MultiEdit/NotebookEdit; bkz. MULTI_AGENT_PROTOCOL tablo | kendi kanalın, kendi PR notun | işçinin `WORK_QUEUE.md` yazması |
+| `STATE-YOL` | Edit/Write…; `.worktrees/<…>/state/**` her rol için | `C:\ai_paycore\ffcore\state\…` | worktree içindeki `state/` |
+| `GUARD-HATA` | bozuk girdi ya da guard hatası: engel; `.claude/hooks/**` ve `.claude/settings.json` düzenlemesi hariç (guard düzeltilebilir kalır) | — | — |
+| `GUARD-DERINLIK` | Bash; iç içe `sh -c` / `compose run\|exec` zincirinde 3. düzeyin altında hâlâ iç komut varsa: denetlenemeyen komut sessiz geçmez | 3 düzey (`sh -c` × 3) | 4 düzey |
 
-Rol bulunamazsa tek yazar dosyalarına yazma engellenir (fail-loud). Dosya → sahip eşlemesi şöyle:
-- `WORK_QUEUE.md`, `BLOCKERS.md`, `KARARLAR.md` → koordinatör
-- `state/kanal/<rol>.md` → o rol
-- `state/pr/<paket>.md` → paketin işçisi
-- `state/reviews/*` → inceleyici
+**Rol.** Sıra: (1) `FFCORE_ROL` (+ `FFCORE_PAKET`) ortamı; (2) `state/oturumlar.json` → önce hook girdisindeki `session_id`, sonra ortamdaki `CLAUDE_CODE_HOST_SESSION_ID` (masaüstü `local_…`); (3) yoksa rol yok. Rol yokken tek yazar dosyalarına yazım engellenir ve mesaj iki kimliği de yazar; oturum bunu koordinatöre bildirir. Kayıt bozuksa rol yok sayılır, mesaj nedeni söyler. Şema:
 
-**Ayar taslağı** (`.claude/settings.json`; uygulamadan önce güncel Claude Code belgesine karşı doğrulanmalı, özellikle mutlak yol kalıbı):
+```json
+{"sessions": {"<session_id ya da local_…>": {"rol": "isci-a", "paket": "fix/ajan-hooklari", "pr": "fix-ajan-hooklari", "lease": "ffcore-isci-a-hook", "acildi": "2026-11-16T10:47"}}}
+```
+
+`rol` ve `acildi` zorunlu; işçi rollerinde `paket` (yoksa `state/pr` yazımı engellenir); `pr` yalnız dosya adı paket kodundan farklıysa. Tek yazarı koordinatör.
+
+**Kip ve kayıt.** `FFCORE_GUARD_MODE=block` (varsayılan) çıkış 2; `warn` çıkış 0 + stderr + kullanıcıya görünen `systemMessage`; bilinmeyen değer `block` + uyarı. İlk gün `.claude/settings.json` `env.FFCORE_GUARD_MODE=warn` ile gönderilir; `block`'a geçiş ayrı küçük commit. Her tetiklenme `state/evidence/hook-guard.log`'a tek satır: zaman, kip, rol, araç, kural, komutun ya da yolun **maskelenmiş** ilk 120 karakteri (dosya içeriği yazılmaz). Maske kesmeden önce uygulanır: URL kimliği (`https://***@…`), adı `key`, `token`, `secret`, `pass(word)`, `auth`, `credential` içeren `=` atamaları ve `--opt=` değerleri (`=***`), `Authorization:` ve `Bearer` değerleri (`***`). Boşlukla ayrılmış değer (`--token abc`) maskelenmez; secret komut satırına zaten yazılmaz (SECURITY_AND_PERMISSIONS). Dalga raporu madde 7 bu dosyayı sayar.
+
+**Ayar** (`.claude/settings.json`; komut betiği dosya olarak değil modül olarak yükler, çünkü içe aktarılan modül önbellekli `.pyc`'den gelir ve geliştirme makinesinde çağrı başına maliyeti ~2,2 sn'den ~1,1 sn'ye indirir):
 
 ```json
 {
-  "permissions": {
-    "deny": [
-      "Read(**/.env)", "Edit(**/.env)", "Write(**/.env)",
-      "Read(//c/ai_paycore/paycoreLLM/data/**)",
-      "Read(//c/ai_paycore/paycoreLLM/eval/results/**)"
-    ]
-  },
-  "hooks": {
-    "PreToolUse": [
-      { "matcher": "Bash",
-        "hooks": [{ "type": "command", "command": "py -3.12 \"$CLAUDE_PROJECT_DIR/.claude/hooks/ffcore_guard.py\"" }] },
-      { "matcher": "Edit|Write|MultiEdit|NotebookEdit",
-        "hooks": [{ "type": "command", "command": "py -3.12 \"$CLAUDE_PROJECT_DIR/.claude/hooks/ffcore_guard.py\"" }] }
-    ]
-  }
+  "env": { "FFCORE_GUARD_MODE": "warn" },
+  "permissions": { "deny": [
+    "Read(**/.env)", "Edit(**/.env)",
+    "Read(//c/ai_paycore/paycoreLLM/.env)", "Edit(//c/ai_paycore/paycoreLLM/.env)",
+    "Read(//c/ai_paycore/paycoreLLM/data/**)",
+    "Read(//c/ai_paycore/paycoreLLM/eval/results/**)" ] },
+  "hooks": { "PreToolUse": [
+    { "matcher": "Bash", "hooks": [{ "type": "command", "command": "py -3.12 -c \"import os, sys; sys.path.insert(0, os.path.dirname(sys.argv[1])); import ffcore_guard; sys.exit(ffcore_guard.run())\" \"$CLAUDE_PROJECT_DIR/.claude/hooks/ffcore_guard.py\"" }] },
+    { "matcher": "Edit|Write|MultiEdit|NotebookEdit", "hooks": [{ "type": "command", "command": "(aynı)" }] } ] }
 }
 ```
 
-**Betik taslağı** (`.claude/hooks/ffcore_guard.py`; iskelet, kod değil):
+**Hangi oturum hangi ayarı yükler.** Claude Code proje ayarını ve hook'ları oturum **açılışındaki** proje kökünden okur ve oturum boyunca anlık görüntüyü kullanır. Ana checkout'ta açılan oturum ana checkout'un `.claude/settings.json`'ını yükler; oturum sonradan bir worktree'ye geçse de o worktree'nin ayarı yüklenmez (bu PR'ın işçi oturumunda gözlendi, `state/evidence/hook-real-call.log`). Klasörü worktree olan oturumda `$CLAUDE_PROJECT_DIR` worktree yoludur; guard yine de state'i ana checkout'tan bulur (kendi yolundaki `.worktrees` öncesi kısım). Sonuç: merge sonrası hook ana checkout'ta açılan her yeni oturumda etkindir; tabanı eski worktree'lerde rebase edilene kadar yoktur.
 
-```python
-import json, os, re, sys
+**İç içe komutlar.** Bütün Bash kuralları `sh -c '…'` / `bash -c "…"` metninin içinde ve `docker compose run|exec` ile servise verilen komutta da denetlenir (en çok 3 düzey; daha derin iç komut `GUARD-DERINLIK` ile engellenir). Ayırma tırnağa duyarlıdır: tırnak içindeki `&&`, `;` ve `|` tek komutun parçası kalır; dıştaki `| tee` içteki kapı komutunu da karşılar.
 
-d = json.load(sys.stdin)
-tool, inp = d.get("tool_name"), d.get("tool_input", {})
-role = os.environ.get("FFCORE_ROL") or role_from_registry(d.get("session_id"))
-mode = os.environ.get("FFCORE_GUARD_MODE", "block")   # açık tercih: warn | block
+**Bilinen sınırlar.** Hook güvenlik ağıdır: değişkenle kurulan komut (`$CMD`), betik dosyası, Makefile tarifleri, `docker exec`/`docker run` (compose olmayan) ve Bash ile state yazımı yakalanmaz. Komut başındaki `env [K=V]…`, `command`, `exec`, `time`, `nice`, `nohup` sarmalayıcıları, `bash -o <seçenek> -c '…'`, `$(…)` ve ters tırnak içi, `{ …; }` gruplaması push, compose ve kapı kurallarınca denetlenmez (FOLLOWUP-189); `( … )` alt kabuğu denetlenir. Python (`py -3.12`) yoksa hook çalışamaz ve Claude Code çağrıyı engellemez (fail-open; ortam ön koşulu). `.env` kalıbı tırnak içindeki metinde de tetiklenir (bilinçli: sessiz geçişten iyidir); warn günü yanlış pozitifleri gösterir.
 
-def stop(msg):
-    print(msg, file=sys.stderr)
-    sys.exit(2 if mode == "block" else 0)
-
-if tool == "Bash":
-    cmd = inp.get("command", "")
-    if re.search(r"\.env(?![.\w])", cmd):                      stop("ENV: .env okunmaz")
-    if re.search(r"\bgit\s+push\b", cmd) and role != "koordinator": stop("push yalnız koordinatör")
-    if re.search(r"compose\b.*\bbuild\b", cmd) and "--pull=false" not in cmd: stop("PROSES-175")
-    if re.search(r"compose\b.*\bup\b", cmd) and "--pull never" not in cmd:  stop("--pull never")
-    if re.search(r"compose\b.*\bup\b", cmd) and running_stacks() >= 3:      stop("üç yığın sınırı")
-    if re.search(r"\bmake\s+(lint|test|test-int|smoke)\b", cmd) and "tee" not in cmd: stop("kapı logu tee ile")
-elif tool in ("Edit", "Write", "MultiEdit", "NotebookEdit"):
-    path = inp.get("file_path") or inp.get("notebook_path", "")
-    owner = single_writer_owner(path)            # yukarıdaki eşleme; worktree içi state/ → "yasak"
-    if owner and owner != role:                  stop(f"tek yazar: {path} → {owner}")
-sys.exit(0)
-```
-
-**Uygulama adımları** (FFCore'un kendi süreciyle):
-1. **Karar kaydı:** koordinatör `KARARLAR.md`'ye kaydı yazar. Bu güvenlik davranışı olduğu için C sınıfı bir değişiklik; kullanıcı onayı 16 Kasım'da verildi.
-2. **Dal:** ayrı küçük bir dal açılır (ör. `fix/ajan-hooklari`). Her kural için önce kırmızı test yazılır: hook betiğine örnek JSON verilir, beklenen çıkış kodu doğrulanır. Ardından betik yazılır, sonra inceleyici turu yapılır.
-3. **Önce uyarı:** bir gün `FFCORE_GUARD_MODE=warn` ile çalışılır. Bu sürede hook yalnız mesaj yazar, engellemez; gerçek oturumlarda yanlış pozitif olup olmadığı görülür. Sonra `block` kipine geçilir.
-4. **Belgeler aynı PR'da:** `ENVIRONMENT_AND_COMMANDS.md`, `SECURITY_AND_PERMISSIONS.md` ve `MULTI_AGENT_PROTOCOL.md`'ye "bu kural hook ile zorlanır" satırı eklenir. Push sahipliği de protokole yazılır: karar kullanıcıda, işlem koordinatörde (bulgu 5).
-5. **Oturum açılışı:** `BASLATMA.md` mesajlarına `FFCORE_ROL` adımı eklenir. Koordinatör yeni oturum açtığında `state/oturumlar.json`'a kaydı yazar.
+**Uygulama adımları** (yapılanlar): karar kaydı (16 Kasım, C sınıfı, kullanıcı onayı); `fix/ajan-hooklari` dalı, her kural için kırmızı test → guard → settings → bu belge ve handbook; inceleyici turu; merge sonrası `warn` günü, yanlış pozitif yoksa `block`.
 
 ### 9.3 Dalga kapısında insan raporu (karar A)
 
