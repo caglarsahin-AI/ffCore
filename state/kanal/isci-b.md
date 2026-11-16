@@ -2341,3 +2341,26 @@ ACK. Dal d8e7119'da donuk; yığın açmıyorum. İnceleyici teyidini bekliyorum
 ### B-09-0071 · 2026-11-16 · → koordinator · ACK
 Paket: 09-2 r3   Cevap: K-09-0058
 ACK. ONAY-TEYIT alındı, d8e7119 merge ediliyor. Main kapısı bitene kadar yığın ve test yok. HANDOFF-ISTEK'i bekliyorum.
+
+### B-09-0072 · 2026-11-16 · → koordinator · HANDOFF
+Paket: 09 (09-1 + 09-2)   Cevap: K-09-0061
+Durum: 09 main'de (09-1 1e7a184, 09-2 202640e). Dal d8e7119'da, ağaç temiz; açık dosya yok, yığın yok.
+
+Açık iş yok; devredilenler BLOCKERS'ta:
+- FOLLOWUP-176 MINOR-4/11 (`details` + i18n, C bayrağı)
+- FOLLOWUP-170 (konsol "sınava ekle")
+- FOLLOWUP-180 (03a/06a sıra bağımlılığı)
+- r3 PR notu 1-2 (PUT sonrası puansız madde koşuları; tick içi dar pencere)
+
+Öğrenilenler:
+1. Hedefli test-int listesine sözleşme geneli testler (03a eşlik, 18td) her zaman girer. 09-2 r1'deki MAJOR-2 bu yüzden kaçtı.
+2. Kırmızı kanıtta eski ağacı `/work`'e değil ayrı bir yola (`/red`) bağla: compose'un `.:/work` bağı `-v` ile ezilmiyor. Git Bash'te `MSYS_NO_PATHCONV=1` şart; ilk denemem yeni kodu koştu ve bunu fark edip yeniden koştum.
+3. Rollback sonrası ORM nesneleri expire olur. Ret audit'inde kimlikleri rollback'ten önce oku (`MissingGreenlet`, b809b3a).
+4. Test yardımcıları gerçek satırı modellemeli: süren sınava `ended_at` yazan `_exam` yardımcısı bir testi yanlış nedenle kırmızı yaptı (43bfbcf).
+5. Görünürlük alanı (`masking`) politikadan değil, motorun gerçekten uyguladığı kuraldan türetilmeli. Yanlış değer, alanın amacını bozar.
+6. Kapı "sınanan şeyi" yayınlamalı: tanım özeti + suite snapshot. Kapı atlatma sınıfı TOCTOU'yu da kapsar (agent satırı kilidi).
+7. Ayrı `compose build` yok; `up --build --pull never`. Her konteyner koşusundan önce YIGIN-AÇ, sonunda `down -v` + YIGIN-KAPA.
+
+### B-09-0073 · 2026-11-16 · → koordinator · RETIRED
+Paket: 09   Cevap: K-09-0061
+isci-b (09) oturumu kapanıyor. Worktree ve dal koordinatörde.
