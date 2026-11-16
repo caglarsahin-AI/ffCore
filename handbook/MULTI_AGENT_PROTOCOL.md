@@ -90,7 +90,7 @@ Paket: <kod> · Cevap: <ID|-> · <türe göre zorunlu alanlar>
 | hepsi | `Paket: <kod>` · `Cevap: <ID|->` |
 | `PR-HAZIR`, `REVIEW-ISTEK`, `ONAY-TEYIT-ISTEK`, `ONAY-TEYIT` | `SHA: <40 hex>` |
 | `REVIEW-SONUC` | `SHA: <40 hex>` · `Sonuc: ONAY|DEGISIKLIK` · `Bulgu: B<n> M<n> m<n> N<n>` |
-| `DURUM` | `Durum: PLANNED|IMPLEMENTED|VERIFIED|BLOCKED` |
+| `DURUM` | `Durum: PLANNED|IMPLEMENTED|VERIFIED|BLOCKED|DUYURU` (DUYURU: koordinatörün pakete bağlı olmayan duyurusu) |
 | `YIGIN-AC`, `YIGIN-KAPA` | `Yigin: <compose proje adı>` |
 
 - `GOREV`, `GOREV-EK`, `DUZELT`, `REVIEW-ISTEK` ve `KARAR-GEREK` alıcısı `ACK` yazar; aynı ID ikinci kez uygulanmaz. `PR-HAZIR`, `REVIEW-ISTEK` ve `REVIEW-SONUC` tam SHA taşır.

@@ -104,6 +104,71 @@ MASKS = (
 )
 
 
+# Channel message format (handbook/MULTI_AGENT_PROTOCOL.md "Mesaj biçimi"; single source,
+# pinned by tests/hooks/test_kanal_bicim.py drift tests).
+MESSAGE_TYPES = (
+    "GOREV",
+    "GOREV-EK",
+    "ACK",
+    "SORU",
+    "CEVAP",
+    "DURUM",
+    "KARAR-GEREK",
+    "KAYIT-TALEBI",
+    "PLAN-ONAY",
+    "PR-HAZIR",
+    "REVIEW-ISTEK",
+    "REVIEW-SONUC",
+    "DUZELT",
+    "ONAY-TEYIT-ISTEK",
+    "ONAY-TEYIT",
+    "YIGIN-AC",
+    "YIGIN-KAPA",
+    "MERGE-BASLIYOR",
+    "MERGED",
+    "HANDOFF-ISTEK",
+    "HANDOFF",
+    "RETIRED",
+)
+RECIPIENTS = (
+    "koordinator",
+    "inceleyici",
+    "isci-a",
+    "isci-b",
+    "isci-c",
+    "isci-d",
+    "test",
+    "sekreter",
+    "tumu",
+)
+COORDINATOR_ONLY_RECIPIENTS = ("kullanici",)
+COMMON_FIELDS = ("Paket", "Cevap")
+TYPE_FIELDS = {
+    "PR-HAZIR": ("SHA",),
+    "REVIEW-ISTEK": ("SHA",),
+    "ONAY-TEYIT-ISTEK": ("SHA",),
+    "ONAY-TEYIT": ("SHA",),
+    "REVIEW-SONUC": ("SHA", "Sonuc", "Bulgu"),
+    "DURUM": ("Durum",),
+    "YIGIN-AC": ("Yigin",),
+    "YIGIN-KAPA": ("Yigin",),
+}
+FIELD_VALUES = {
+    "Sonuc": ("ONAY", "DEGISIKLIK"),
+    "Durum": ("PLANNED", "IMPLEMENTED", "VERIFIED", "BLOCKED", "DUYURU"),
+}
+MESSAGE_ID = r"[A-Z]-[A-Za-z0-9-]+-\d{4}"
+FIELD_PATTERNS = {
+    "Cevap": re.compile(rf"^(?:-|{MESSAGE_ID}(?:, {MESSAGE_ID})*)$"),
+    "SHA": re.compile(r"^[0-9a-f]{40}$"),
+    "Bulgu": re.compile(r"^B\d+ M\d+ m\d+ N\d+$"),
+}
+HEADER_RE = re.compile(r"^### (?P<id>\S+) · (?P<ts>.+?) · → (?P<to>.+?) · (?P<tur>.+?)\s*$")
+ID_RE = re.compile(rf"^{MESSAGE_ID}$")
+TS_RE = re.compile(r"^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$")
+SEP = " · "
+
+
 class GuardError(Exception):
     """An external probe needed by a rule failed (fail-loud: the rule blocks)."""
 
@@ -588,6 +653,116 @@ def owner_of(rel: str) -> tuple[str, str] | None:
     return None
 
 
+def parse_fields(line: str) -> dict[str, str]:
+    fields: dict[str, str] = {}
+    for part in line.split(SEP):
+        name, colon, value = part.partition(":")
+        if colon and re.match(r"^[A-Za-z]+$", name.strip()):
+            fields.setdefault(name.strip(), value.strip())
+    return fields
+
+
+def parse_message(header: str, second: str, channel: str) -> tuple[dict | None, list[str]]:
+    """Parse one channel message (header + second line) against the protocol.
+
+    Returns (message, problems); message is None when the header itself is unreadable.
+    Shared with scripts/kanal_ozet.py so "biçim dışı" means what the guard rejects.
+    """
+    m = HEADER_RE.match(header)
+    if not m:
+        return None, ["başlık '### <ID> · <YYYY-MM-DD HH:MM> · → <alici> · <TUR>' biçiminde değil"]
+    msg = {"id": m["id"], "ts": m["ts"], "to": m["to"], "tur": m["tur"], "kanal": channel}
+    problems: list[str] = []
+    if not ID_RE.match(msg["id"]):
+        problems.append(f"ID '{msg['id']}' <harf>-<paket>-<4 hane> değil")
+    if not TS_RE.match(msg["ts"]):
+        problems.append(f"tarih '{msg['ts']}' YYYY-MM-DD HH:MM değil")
+    allowed_to = RECIPIENTS + (COORDINATOR_ONLY_RECIPIENTS if channel == "koordinator" else ())
+    if msg["to"] not in allowed_to:
+        extra = " (kullanici yalnız koordinatör kanalında)" if msg["to"] == "kullanici" else ""
+        problems.append(f"alıcı '{msg['to']}' kapalı listede yok{extra}")
+    if msg["tur"] not in MESSAGE_TYPES:
+        problems.append(f"tür '{msg['tur']}' kapalı listede yok (açıklama gövdeye)")
+    fields = parse_fields(second)
+    msg["fields"] = fields
+    for name in COMMON_FIELDS + TYPE_FIELDS.get(msg["tur"], ()):
+        value = fields.get(name)
+        if not value:
+            problems.append(f"ikinci satırda {name} alanı yok")
+        elif name in FIELD_VALUES and value not in FIELD_VALUES[name]:
+            problems.append(f"{name} '{value}' değil: {'|'.join(FIELD_VALUES[name])}")
+        elif name in FIELD_PATTERNS and not FIELD_PATTERNS[name].match(value):
+            problems.append(f"{name} '{value[:50]}' biçimi yanlış")
+    return msg, problems
+
+
+def header_lines(text: str) -> list[tuple[int, str]]:
+    """(index, line) of `### ` headers outside fenced code blocks."""
+    out: list[tuple[int, str]] = []
+    fenced = False
+    for i, line in enumerate(text.split("\n")):
+        if line.lstrip().startswith("```"):
+            fenced = not fenced
+        elif not fenced and line.startswith("### "):
+            out.append((i, line))
+    return out
+
+
+def proposed_texts(payload: Mapping, path: Path) -> tuple[str, str]:
+    """(old, new) channel text for the write; only the difference is judged."""
+    inp = payload.get("tool_input") if isinstance(payload.get("tool_input"), dict) else {}
+    old = path.read_text(encoding="utf-8").replace("\r\n", "\n") if path.exists() else ""
+    tool = payload.get("tool_name")
+    if tool == "Write":
+        return old, str(inp.get("content") or "").replace("\r\n", "\n")
+    if tool == "Edit":
+        edits = [inp]
+    elif tool == "MultiEdit":
+        edits = [e for e in inp.get("edits") or [] if isinstance(e, dict)]
+    else:
+        return old, old
+    pairs = [
+        (
+            str(e.get("old_string") or "").replace("\r\n", "\n"),
+            str(e.get("new_string") or "").replace("\r\n", "\n"),
+            bool(e.get("replace_all")),
+        )
+        for e in edits
+    ]
+    cur = old
+    for o, n, every in pairs:
+        if not o or o not in cur:
+            # the tool will fail anyway; judge what the edit adds, never let it pass unread
+            return "\n".join(p[0] for p in pairs), "\n".join(p[1] for p in pairs)
+        cur = cur.replace(o, n) if every else cur.replace(o, n, 1)
+    return old, cur
+
+
+def check_channel_format(rel: str, channel: str, path: Path, payload: Mapping) -> list[Violation]:
+    from collections import Counter
+
+    old, new = proposed_texts(payload, path)
+    pending = Counter(line for _, line in header_lines(new))
+    pending.subtract(line for _, line in header_lines(old))
+    lines = new.split("\n")
+    found: list[Violation] = []
+    for i, line in header_lines(new):
+        if pending[line] <= 0:
+            continue
+        pending[line] -= 1
+        second = lines[i + 1] if i + 1 < len(lines) else ""
+        msg, problems = parse_message(line, second, channel)
+        if problems:
+            who = msg["id"] if msg else line[:40]
+            found.append(
+                Violation(
+                    "KANAL-BICIM",
+                    f'{rel} {who}: {"; ".join(problems)} (MULTI_AGENT_PROTOCOL "Mesaj biçimi")',
+                )
+            )
+    return found
+
+
 def check_write(path: str, payload: Mapping, env: Mapping[str, str]) -> list[Violation]:
     if not path:
         return []
@@ -613,16 +788,17 @@ def check_write(path: str, payload: Mapping, env: Mapping[str, str]) -> list[Vio
     owner = owner_of(rel)
     if owner is None:
         return []
+    kind, name = owner
+    fmt = check_channel_format(rel, name, root / rel, payload) if kind == "channel" else []
     info = resolve_role(payload, env)
     if info.rol is None:
-        return [Violation("TEK-YAZAR", f"{rel}: {no_role_message(info, payload, env)}")]
-    kind, name = owner
+        return [Violation("TEK-YAZAR", f"{rel}: {no_role_message(info, payload, env)}")] + fmt
     if kind == "channel":
         # The coordinator moves MERGED-package messages to state/kanal/arsiv/
         # (MULTI_AGENT_PROTOCOL "Bağlam bütçesi ve arşiv"); nobody else writes here.
         if info.rol not in (name, "koordinator"):
-            return [Violation("TEK-YAZAR", f"{rel} → {name}; senin rolün {info.rol}")]
-        return []
+            return [Violation("TEK-YAZAR", f"{rel} → {name}; senin rolün {info.rol}")] + fmt
+        return fmt
     if kind == "role":
         if info.rol != name:
             return [Violation("TEK-YAZAR", f"{rel} → {name}; senin rolün {info.rol}")]
