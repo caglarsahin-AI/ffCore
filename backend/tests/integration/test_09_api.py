@@ -5,9 +5,15 @@ import uuid
 
 import pytest
 
+from ffcore.evaluation.engine import summarize
 from tests.integration.runtime_support import definition, seed_run
 
 P = "/api/v1/projects/{}"
+
+
+def exam_summary(**over) -> dict:
+    """A summary as the runner writes it (summarize() output; EvalSummary since 10c-2 D8)."""
+    return {**summarize([], pass_threshold=0.8, warmup_ms=None, latencies_ms=[]), **over}
 
 
 @pytest.fixture
@@ -46,7 +52,7 @@ def _suite_and_run(pg, project):
             version_id,
             uuid.uuid4(),
             json.dumps({"q1": {"runs": [str(run_id)], "scored": True}}),
-            json.dumps({"n": 1, "passed": True}),
+            json.dumps(exam_summary(n=1, scored=1, passed_items=1, pass_rate=1.0, passed=True)),
         ),
     )
     return suite_id, eval_id
@@ -166,7 +172,7 @@ def _scored_exam(pg, project, suite_id, version_id, passed: dict):
         " langfuse_run_name, status, item_runs, summary, config, created_by)"
         " VALUES (%s, %s, %s, %s, %s, 'exam-x', 'completed', %s, %s, %s, 't')",
         (ev_id, project, suite_id, version_id, uuid.uuid4(), json.dumps(plan),
-         json.dumps({"n": len(passed), "complete": True, "pass_rate": 0.5, "scored": len(passed)}),
+         json.dumps(exam_summary(n=len(passed), pass_rate=0.5, scored=len(passed))),
          json.dumps({"scorers": [{"name": "contains"}], "pass_threshold": 0.8, "repeat": 1,
                      "approve_tools": False})),
     )  # fmt: skip
