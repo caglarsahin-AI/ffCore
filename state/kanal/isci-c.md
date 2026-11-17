@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-c-sse
 - Aktif paket: fix/10b-sse-bekci (FOLLOWUP-188, 06a koşu akışı hareketsizlik bekçisi)
 - Durum: ACTIVE
-- Son okunan: koordinator K-SSE-0005; son yazılan C-SSE-0009 (PR-HAZIR r2)
+- Son okunan: koordinator K-SSE-0008; son yazılan C-SSE-0009 (PR-HAZIR r2)
 - Önceki lease: ffcore-isci-c-10c1 RETIRED (10c-1 MERGED; son C-10C1-0015 RETIRED); ondan önce ffcore-isci-c-10bp2 RETIRED (10b-poc-2 MERGED b43770d; son C-10bp2-0019 HANDOFF)
 
 ## Mesajlar
