@@ -13,7 +13,7 @@ import pytest
 from ffcore.core.config import Settings
 from ffcore.core.errors import ApiError
 from ffcore.services import mcp_client, mcp_tools
-from ffcore.services.mcp_publish import check_upstream_url
+from ffcore.services.mcp_publish import check_upstream_url, upstream_url
 from tests.dummy import OBO_SECRET, SERVICE_TOKEN, SETTINGS_03A
 
 
@@ -102,3 +102,35 @@ def test_05b_upstream_url_rules(url, code):
 
 def test_05b_upstream_url_accepts_an_allowlisted_host():
     check_upstream_url("https://superset.example.com/base", _settings())
+
+
+# --- r1 MAJOR-1 (K-05B-0008): joining the base URL and an operation path ---
+
+
+@pytest.mark.parametrize(
+    "base, path, url",
+    [
+        ("http://h.example/api", "/v1/x", "http://h.example/api/v1/x"),
+        ("http://h.example/api/", "/v1/x", "http://h.example/api/v1/x"),
+        ("http://h.example", "/v1/x", "http://h.example/v1/x"),
+        ("https://h.example:8443/a/b", "/c", "https://h.example:8443/a/b/c"),
+    ],
+)
+def test_05b_r2_upstream_url_keeps_the_base_path(base, path, url):
+    assert upstream_url(base, path) == url
+
+
+@pytest.mark.parametrize(
+    "base, path, code",
+    [
+        ("http://127.0.0.1", ":59359/api/v1/dashboard/", "upstream_origin_mismatch"),
+        ("http://127.0.0.1", "0:59359/api/v1/dashboard/", "upstream_origin_mismatch"),
+        ("http://h.example/api", "v1/dashboard/", "openapi_path_invalid"),
+        ("http://h.example/api", "/v1/../../x", "openapi_path_invalid"),
+        ("http://h.example", "//evil.example/x", "openapi_path_invalid"),
+    ],
+)
+def test_05b_r2_upstream_url_refuses_leaving_the_registered_base(base, path, code):
+    with pytest.raises(mcp_client.ToolCallError) as caught:
+        upstream_url(base, path)
+    assert caught.value.code == code

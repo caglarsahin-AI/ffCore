@@ -177,3 +177,51 @@ def test_05b_bad_arguments_are_refused(arguments):
     ops = _catalog(mcp_openapi.load_spec(SUPERSET.read_text(encoding="utf-8")))
     with pytest.raises(ArgumentsError):
         mcp_openapi.build_request(ops["getChartData"], arguments)
+
+
+# --- r1 MAJOR-1 / MINOR-2 (K-05B-0008): path keys and path values stay inside the base path ---
+
+BAD_PATHS = [
+    ":59359/api/v1/dashboard/",  # P1 port switch
+    "0:59359/api/v1/dashboard/",  # P1 host change
+    "v1/dashboard/",  # P1 no leading slash
+    "//evil.example/x",
+    "/a/../b",
+    "/a/./b",
+    "/a//b",
+    "/a?x=1",
+    "/a#f",
+]
+
+
+@pytest.mark.parametrize("path", BAD_PATHS)
+def test_05b_r2_invalid_path_key_is_not_exposable(path):
+    ok = {"200": {"description": "x"}}
+    ops = _catalog(_spec({path: {"get": {"operationId": "p", "responses": ok}}}))
+    assert ops["p"]["exposable"] is False and ops["p"]["reason"] == "openapi_path_invalid"
+
+
+@pytest.mark.parametrize("path", BAD_PATHS)
+def test_05b_r2_upload_refuses_a_document_with_an_invalid_path(path):
+    ok = {"200": {"description": "x"}}
+    good = {"/fine": {"get": {"operationId": "fine", "responses": ok}}}
+    text = json.dumps(_spec({**good, path: {"get": {"operationId": "p", "responses": ok}}}))
+    with pytest.raises(SpecError) as caught:
+        mcp_openapi.upload_catalog(text)
+    assert caught.value.code == "openapi_path_invalid"
+
+
+def test_05b_r2_upload_catalog_accepts_superset():
+    assert len(mcp_openapi.upload_catalog(SUPERSET.read_text(encoding="utf-8"))) == 6
+
+
+@pytest.mark.parametrize("value", [".", "..", "%2e%2e"])
+def test_05b_r2_dot_path_values_are_refused(value):
+    ops = _catalog(mcp_openapi.load_spec(SUPERSET.read_text(encoding="utf-8")))
+    if value == "%2e%2e":
+        # Percent-encoded as a whole: never a dot segment upstream.
+        request = mcp_openapi.build_request(ops["getChartData"], {"pk": value})
+        assert request.path == "/api/v1/chart/%252e%252e/data/"
+        return
+    with pytest.raises(ArgumentsError):
+        mcp_openapi.build_request(ops["getChartData"], {"pk": value})
