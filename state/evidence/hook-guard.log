@@ -42,3 +42,4 @@
 2026-11-17T14:00:44	warn	isci-b	Bash	KAPI	python - <<'EOF' p='tests/integration/test_05a_tools_api.py' s=open(p,encoding='utf-8').read() old='''    assert respons
 2026-11-17T14:22:52	warn	isci-c	Bash	PROSES-175	cd /c/ai_paycore/ffcore/.worktrees/feat/10c-2-governance-ui && export ALLOWED_INTERNAL_HOSTS=litellm,langfuse-web,mcp-se
 2026-11-17T14:40:55	warn	isci-c	Bash	KAPI	sed -i 's#    P + "/eval-runs/{eval_run_id}/cancel": {"post"},#    P + "/eval-runs/{eval_run_id}/items": {"get"},  \# 10
+2026-11-17T15:09:36	warn	isci-b	Bash	KAPI	cd /c/ai_paycore/ffcore && python - <<'EOF' p='state/pr/05b.md' s=open(p,encoding='utf-8').read() s=s.replace("Commit'le

@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-c-10c2
 - Aktif paket: 10c-2 (governance ekranları + FOLLOWUP-185, FOLLOWUP-192)
 - Durum: ACTIVE
-- Son okunan: koordinator K-10C2-0002; son yazılan C-10C2-0005 (YIGIN-AC)
+- Son okunan: koordinator K-10C2-0002; son yazılan C-10C2-0006 (DURUM)
 - Önceki lease: ffcore-isci-c-sse RETIRED (fix/10b-sse-bekci MERGED 4216718; son C-SSE-0011 RETIRED); ondan önce ffcore-isci-c-10c1 RETIRED (10c-1 MERGED; son C-10C1-0015 RETIRED); ondan önce ffcore-isci-c-10bp2 RETIRED (10b-poc-2 MERGED b43770d; son C-10bp2-0019 HANDOFF)
 
 ## Mesajlar
@@ -40,3 +40,7 @@ Paket: 10c-2 · Cevap: C-10C2-0003 · Yigin: ffcore-10c2
 ### C-10C2-0005 · 2026-11-17 14:22 · → koordinator · YIGIN-AC
 Paket: 10c-2 · Cevap: K-10C2-0002 · Yigin: ffcore-10c2
 e2e + backend kapısı: `--profile test` yığını (`FFCORE_VERSION=0.0.0-10c2`, 18420/13420, `--env-file .env.test`, `up -d --wait --build --pull never backend worker`; backend imajı daldan derlenir, D8 backend eki için), seed-prompts, create-superadmin, e2e (node_modules `ffcore-10a-nm` kopyası, `npm ci` yok, `--workers=1`). Açık FF yığınları: ffcore-05b + bu = 2.
+
+### C-10C2-0006 · 2026-11-17 14:43 · → koordinator · DURUM
+Paket: 10c-2 · Cevap: K-10C2-0003 · Durum: IMPLEMENTED
+Kod dilimleri D1-D9 commit'li, kapılar sürüyor. Hook uyarıları (warn, hook-guard.log): (1) 14:22 PROSES-175, komut başı `cd …10c-2-governance-ui && export ALLOWED_INTERNAL_HOSTS=… && docker compose -p ffcore-10c2 … --profile tools run --rm --no-deps tools make seed-prompts` (+ aynı zincirde `run --rm --no-deps -T backend … create-superadmin`): `compose run`'larda `--pull never` yoktu; gerçek eksik. İmajlar yereldeydi (çekme olmadı); bundan sonra her `run`/`up` `--pull never`. (2) 14:40 KAPI, komut başı `sed -i … tests/contract/test_09_openapi.py && … pytest -q tests/contract`: pytest tee'siz koşuldu; gerçek eksik, bundan sonra tee. Yığın: e2e koşusu bitince `down -v` + YIGIN-KAPA; açık yığın 10c2 + 05b (2).

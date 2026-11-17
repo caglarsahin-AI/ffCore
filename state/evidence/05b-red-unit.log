@@ -1,0 +1,33 @@
+ Network ffcore-05b_default  Creating
+ Network ffcore-05b_default  Created
+ Volume "ffcore-05b_model_cache"  Creating
+ Volume "ffcore-05b_model_cache"  Created
+ Volume "ffcore-05b_knowledge_storage"  Creating
+ Volume "ffcore-05b_knowledge_storage"  Created
+ Volume "ffcore-05b_langfuse_postgres_data"  Creating
+ Volume "ffcore-05b_langfuse_postgres_data"  Created
+ Volume "ffcore-05b_langfuse_minio_data"  Creating
+ Volume "ffcore-05b_langfuse_minio_data"  Created
+ Volume "ffcore-05b_redis_data"  Creating
+ Volume "ffcore-05b_redis_data"  Created
+ Volume "ffcore-05b_postgres_data"  Creating
+ Volume "ffcore-05b_postgres_data"  Created
+ Volume "ffcore-05b_langfuse_clickhouse_data"  Creating
+ Volume "ffcore-05b_langfuse_clickhouse_data"  Created
+ Volume "ffcore-05b_langfuse_clickhouse_logs"  Creating
+ Volume "ffcore-05b_langfuse_clickhouse_logs"  Created
+ImportError while importing test module '/work/backend/tests/unit/test_05b_platform_targets.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/local/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/unit/test_05b_platform_targets.py:16: in <module>
+    from ffcore.services.mcp_publish import check_upstream_url
+E   ModuleNotFoundError: No module named 'ffcore.services.mcp_publish'
+=========================== short test summary info ============================
+ERROR tests/unit/test_05b_openapi_ops.py
+ERROR tests/unit/test_05b_guardrail_mode.py
+ERROR tests/unit/test_05b_platform_targets.py
+!!!!!!!!!!!!!!!!!!! Interrupted: 3 errors during collection !!!!!!!!!!!!!!!!!!!!
+3 errors in 14.28s

@@ -1,0 +1,15 @@
+265 files left unchanged
+All checks passed!
+============================= test session starts ==============================
+platform linux -- Python 3.12.10, pytest-9.2.0, pluggy-1.7.0
+rootdir: /work/backend
+configfile: pyproject.toml
+plugins: Faker-40.43.0, anyio-4.15.1, langsmith-0.14.8
+collected 35 items
+
+tests/integration/test_03a_read_side.py .......                          [ 20%]
+tests/integration/test_57_alembic_merge.py .......                       [ 40%]
+tests/integration/test_05b_mcp_servers_api.py ..................         [ 91%]
+tests/integration/test_08t_22_attachment_names.py ...                    [100%]
+
+======================== 35 passed in 164.24s (0:02:44) ========================

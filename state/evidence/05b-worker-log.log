@@ -1,0 +1,50 @@
+worker-1  |   File "/opt/venv/lib/python3.12/site-packages/arq/cli.py", line 54, in cli
+worker-1  |     run_worker(worker_settings_, **kwargs)
+worker-1  |   File "/opt/venv/lib/python3.12/site-packages/arq/worker.py", line 899, in run_worker
+worker-1  |     worker.run()
+worker-1  |   File "/opt/venv/lib/python3.12/site-packages/arq/worker.py", line 313, in run
+worker-1  |     self.loop.run_until_complete(self.main_task)
+worker-1  |   File "/usr/local/lib/python3.12/asyncio/base_events.py", line 691, in run_until_complete
+worker-1  |     return future.result()
+worker-1  |            ^^^^^^^^^^^^^^^
+worker-1  |   File "/opt/venv/lib/python3.12/site-packages/arq/worker.py", line 363, in main
+worker-1  |     await self.on_startup(self.ctx)
+worker-1  |   File "/app/ffcore/knowledge/worker.py", line 31, in startup
+worker-1  |     hf_path(settings.embed_model)
+worker-1  |   File "/app/ffcore/knowledge/models.py", line 79, in hf_path
+worker-1  |     raise ModelMissing(repo, cache) from None
+worker-1  | ffcore.knowledge.models.ModelMissing: BAAI/bge-m3 is not in /models/huggingface/hub; run `make models` (offline by default)
+worker-1  | 11:42:58: Starting worker for 2 functions: ingest_document_job, reindex_job
+worker-1  | 11:42:58: redis_version=7.4.6 mem_usage=2.53M clients_connected=4 db_keys=305
+worker-1  | Traceback (most recent call last):
+worker-1  |   File "/opt/venv/bin/arq", line 10, in <module>
+worker-1  |     sys.exit(cli())
+worker-1  |              ^^^^^
+worker-1  |   File "/opt/venv/lib/python3.12/site-packages/click/core.py", line 1631, in __call__
+worker-1  |     return self.main(*args, **kwargs)
+worker-1  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+worker-1  |   File "/opt/venv/lib/python3.12/site-packages/click/core.py", line 1552, in main
+worker-1  |     rv = self.invoke(ctx)
+worker-1  |          ^^^^^^^^^^^^^^^^
+worker-1  |   File "/opt/venv/lib/python3.12/site-packages/click/core.py", line 1415, in invoke
+worker-1  |     return ctx.invoke(self.callback, **ctx.params)
+worker-1  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+worker-1  |   File "/opt/venv/lib/python3.12/site-packages/click/core.py", line 910, in invoke
+worker-1  |     return callback(*args, **kwargs)
+worker-1  |            ^^^^^^^^^^^^^^^^^^^^^^^^^
+worker-1  |   File "/opt/venv/lib/python3.12/site-packages/arq/cli.py", line 54, in cli
+worker-1  |     run_worker(worker_settings_, **kwargs)
+worker-1  |   File "/opt/venv/lib/python3.12/site-packages/arq/worker.py", line 899, in run_worker
+worker-1  |     worker.run()
+worker-1  |   File "/opt/venv/lib/python3.12/site-packages/arq/worker.py", line 313, in run
+worker-1  |     self.loop.run_until_complete(self.main_task)
+worker-1  |   File "/usr/local/lib/python3.12/asyncio/base_events.py", line 691, in run_until_complete
+worker-1  |     return future.result()
+worker-1  |            ^^^^^^^^^^^^^^^
+worker-1  |   File "/opt/venv/lib/python3.12/site-packages/arq/worker.py", line 363, in main
+worker-1  |     await self.on_startup(self.ctx)
+worker-1  |   File "/app/ffcore/knowledge/worker.py", line 31, in startup
+worker-1  |     hf_path(settings.embed_model)
+worker-1  |   File "/app/ffcore/knowledge/models.py", line 79, in hf_path
+worker-1  |     raise ModelMissing(repo, cache) from None
+worker-1  | ffcore.knowledge.models.ModelMissing: BAAI/bge-m3 is not in /models/huggingface/hub; run `make models` (offline by default)
