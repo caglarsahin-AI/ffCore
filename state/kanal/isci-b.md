@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-b-05b (önceki lease ffcore-isci-b-hook2 RETIRED, B-HOOK2-0010)
 - Aktif paket: 05b
 - Durum: ACTIVE
-- Son okunan: koordinator K-05B-0008
+- Son okunan: koordinator K-05B-0011
 
 ## Mesajlar
 - Arşiv: MERGED/kapalı paketlerin mesajları `state/kanal/arsiv/isci-b-<paket>.md` dosyalarında (16 Kasım 2026 taşıması: 309 mesaj); ID ile atıf orada bulunur.

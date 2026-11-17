@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-inceleyici-10c2 (önceki: ffcore-inceleyici-05b, r2 için askıda)
 - Aktif paket: 10c-2 (REVIEW-ISTEK K-10C2-0005, r1); 05b r1 DEGISIKLIK, r2 bekleniyor
 - Durum: ACTIVE
-- Son okunan: koordinator K-10C2-0005
+- Son okunan: koordinator K-05B-0010
 
 ## Mesajlar
 - Arşiv: MERGED/kapalı paketlerin mesajları `state/kanal/arsiv/inceleyici-<paket>.md` dosyalarında (16 Kasım 2026 taşıması: 335 mesaj); ID ile atıf orada bulunur.
@@ -94,3 +94,11 @@ REVIEW-ISTEK alındı; lease ffcore-inceleyici-10c2. 05b r2 delta turu geldiğin
 ### R-10C2-0002 · 2026-11-17 16:06 · → koordinator · YIGIN-AC
 Paket: 10c-2 · Cevap: K-10C2-0005 · Yigin: ffcore-rv10c2
 Kaynak, SHA 5c27543'ün `git archive` kopyası (scratchpad `rv10c2_src`); e2e ekran görüntüleri ve `.next` worktree'ye yazılmasın diye. Yığın: `docker compose -p ffcore-rv10c2 --env-file .env.test --profile test up -d --wait --no-build --pull never`, `FFCORE_VERSION=0.0.0-10c2` (işçinin derlediği backend imajı; dalın son backend kod commit'i be415a7 imajdan önce). Portlar `BACKEND_PORT=18520`, `FRONTEND_PORT=13520`. e2e için node_modules, `ffcore-10a-nm`'den `ffcore-rv10c2_e2e_node_modules` adlı volume'a kopyalanacak (`npm ci` yok). Sırayla koşacaklar: backend lint/test iki profil, hedefli test-int, önyüz kapısı, tam e2e. Açık yığın yalnız bu. Bitince `down -v`, volume adıyla silinip YIGIN-KAPA.
+
+### R-05B-0005 · 2026-11-17 16:32 · → koordinator · ACK
+Paket: 05b · Cevap: K-05B-0010
+r2 teyit turu alındı (SHA acc149b). 10c-2 kapısı arka planda sürüyor ama probe'ları başlamadı; önce 05b r2 yapılacak.
+
+### R-05B-0006 · 2026-11-17 16:32 · → koordinator · YIGIN-AC
+Paket: 05b · Cevap: K-05B-0010 · Yigin: ffcore-rv05b
+Hafif yığın: yalnız `postgres redis migrate`; `--no-build --pull never`, `FFCORE_VERSION=0.0.0-05b`. r2 migration değiştirmiyor; testler tools içinde worktree kaynağından koşar. Koşacaklar: r1 probe'ları ve yeni P8/P9, hedefli test-int, 05b birim ve sözleşme testleri iki profilde. Açık yığınlar: ffcore-rv10c2 (kapı koşuyor) ve bu; sınır içinde.
