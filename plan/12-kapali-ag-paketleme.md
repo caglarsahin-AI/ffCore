@@ -48,3 +48,7 @@ Kurulumun tekrarlanabilir olması, iki profilde (N24): `llmaas` (birincil) için
 ## Kapsam dışı
 
 Kubernetes, yüksek erişilebilirlik, çoklu sunucu.
+
+## Ek (17 Kasım 2026, koordinatör): kapsam daraltma notu
+
+Plan/19 (M3 sunucu paketi), `deploy/offline/{images.txt,models.txt,save.sh,verify.sh}` ve paycoreLLM `docs/paycore/m3-sunucu.md` + `m3-jenkins-nexus.md` bu brief'in airgap tarafının büyük kısmını (kapsam 1, 2 kısmen, 5 model dosyaları, 6'nın ön koşul ve `.env` bölümü) M3 için fiilen yaptı. Brief 12 açılırken kalan kapsam: **5d `docs/kurulum.md` (`llmaas`, ana)**, egress izin listesi kurulumu (`deploy/egress/`), `docs/veri-isleme.md`, 5b donanım rehberi, 5c vLLM yolu, 7 yedekleme, 8 TLS ters proxy örneği; 6 kapalı ağ rehberi plan/19 runbook'una bağlanır ve yalnız FFCore tarafını anlatır. FOLLOWUP 12 alanındaki dört kayıt bu PR'a girer. Süre tahmini 4 → ~3 gün.

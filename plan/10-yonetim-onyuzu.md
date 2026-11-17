@@ -83,3 +83,10 @@ Bilgi işlem ve iş analistinin, kod yazmadan: proje ve kullanıcı yönetmesi, 
 ## Kapsam dışı
 
 Son kullanıcı sohbet uygulaması (11), görsel akış tasarımcısı, çoklu dil.
+
+## Ek (17 Kasım 2026, koordinatör): 10c iki PR'a bölünür
+
+PLAN 7 dalga 6 kapanışı (state/dalga/dalga-17kasim-rapor.md 9): 10c'nin 09 Evaluation ekranları **10c-1** olarak 16 Kasım'da main'e girdi (6157752). Kalanı iki PR:
+- **10c-2 (isci-c, 05b'yi beklemez):** Genel Bakış dashboard'ları (kullanım, maliyet, koşu/onay sayıları; 03c usage uçları), API Anahtarları (oluştur, bir kez göster, iptal), Kotalar ve limitler, Uyarılar (kural listesi, aktif, geçmiş, rozet; R9.1), Retention ayarları, Kullanım grafiği (günlük token ve maliyet, proje bazlı), salt-okunur modun ekran tarafı (`disabled-with-reason` taraması, iki modda ekran görüntüleri, axe). İçine alınan FOLLOWUP'lar: 185 (`GET /eval-runs/{id}/items` + `EvalSummary` şeması, additive backend + sınav madde tablosu), 192 (koşu sayfası yoklaması).
+- **10c-3 (05b MERGED sonrası):** MCP Sunucuları ekranı ve izleme (`mcp_servers`, `mcp_server_calls`), Veri Kaynakları / Kanallar / Hafızam menü yerleri (16, 15, 14 gelince dolar; o güne kadar menüde yok: ARCH-07).
+Rol görünürlüğü R10.5 ve tasarım tabanı değişmez. Süre tahmini 10c-2 ≈ 3 gün, 10c-3 ≈ 2 gün.

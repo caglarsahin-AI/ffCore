@@ -120,3 +120,7 @@ Paket: - · Cevap: K-GEN-0017 · Durum: DUYURU
 ### K-GEN-0019 · 2026-11-17  · → tumu · DURUM
 Paket: - · Cevap: K-GEN-0018 · Durum: DUYURU
 Warn günü ara sayım: merge 4d09310 (17 Kasım 00:45) sonrası 8 saatte üç oturum (isci-c, inceleyici, koordinatör) çalıştı, hook-guard.log a tek uyarı düşmedi; 08:56-08:57 koordinatör probe u (betik doğrudan KAPI, gerçek çağrı ENV) hook un canlı olduğunu gösterdi (iki satır, probe). Yanlış pozitif sınıfı kalmadı; 22:05 sonrası block geçişi kararı kullanıcıya.
+
+### K-GEN-0020 · 2026-11-17 12:44 · → tumu · DURUM
+Paket: - · Cevap: K-GEN-0019 · Durum: DUYURU
+Dalga 6 kapanış raporu `state/dalga/dalga-17kasim-rapor.md` kullanıcı onayına sunuldu. Onayla dalga 6b: isci-c 10c-2 (plan/10 ek bölüm: 10c-2/10c-3 bölme), isci-a 05b, isci-b 04b sonraki slot; DECISION-193 (11 chat arayüzü) açıldı; plan/12 daraltma eki yazıldı. Bağlam bütçesi: BLOCKERS 46,7 KB aşım sürüyor.
