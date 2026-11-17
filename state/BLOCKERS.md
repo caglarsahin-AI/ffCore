@@ -15,7 +15,6 @@ Kapalı kayıtlar `state/arsiv/blockers-kapali.md` dosyasındadır (bağlam büt
 | 10 | DEBT | 2026-10-27 | 04a | DuckDB belge deposu PoC'de `KnowledgeStore` bağdaştırıcısıyla sarılır; Postgres göçü 04b'de. Bilinçli borç (ARCH-09, ölçülmüş kod korunur) | açık | |
 | 11 | DRIFT | 2026-10-27 | 04a | U14: Ollama embedding API'si bge-m3 için sparse (`lexical_weights`) üretmez; doğrulanırsa C10 tersine kararı kesinleşir (zaten süreç içi) | açık | |
 | 12 | DRIFT | 2026-10-27 | 00i | U1: Open WebUI son kullanıcı kimliğini imzalı iletir mi; iletmezse audit aktörü `openwebui_service` | açık | |
-| 14 | DECISION | 2026-10-27 | 08 | PRSIM ingest'ine kişi verisi guard'ı: karar 5 ile 08 tam gelene kadar ertelendi; o zaman yeniden açılır | ertelendi | |
 | 16 | DRIFT | 2026-10-28 | handbook | ENVIRONMENT_AND_COMMANDS "PayCore referans deposu" bölümü `eval/`, `data/`, `experts/` tamamen okunmaz diyor; CLAUDE.md, PLAN 5 ve SECURITY_AND_PERMISSIONS `eval/scenario*/questions.jsonl` ve `experts/*.yaml` okunabilir diyor (v9 P8). Eski cümle; dalga 1 kapanışında düzeltilecek | açık | |
 | 17 | DRIFT | 2026-10-28 | handbook | FELSEFE_UYGULAMA ARCH-09 satırı DECISION-4'ü açık gösteriyor; KARARLAR (A5) ve BLOCKERS 4 kapalı. Dalga 1 kapanışında düzeltilecek | açık | |
 | 18 | DRIFT | 2026-10-28 | handbook | FELSEFE_UYGULAMA ARCH-11 "13 sözleşme" diyor; CONTRACTS.md C1-C14, 14 satır. Dalga 1 kapanışında düzeltilecek | açık | |
