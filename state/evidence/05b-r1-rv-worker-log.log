@@ -1,0 +1,15 @@
+    run_worker(worker_settings_, **kwargs)
+  File "/opt/venv/lib/python3.12/site-packages/arq/worker.py", line 899, in run_worker
+    worker.run()
+  File "/opt/venv/lib/python3.12/site-packages/arq/worker.py", line 313, in run
+    self.loop.run_until_complete(self.main_task)
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 691, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/arq/worker.py", line 363, in main
+    await self.on_startup(self.ctx)
+  File "/app/ffcore/knowledge/worker.py", line 31, in startup
+    hf_path(settings.embed_model)
+  File "/app/ffcore/knowledge/models.py", line 79, in hf_path
+    raise ModelMissing(repo, cache) from None
+ffcore.knowledge.models.ModelMissing: BAAI/bge-m3 is not in /models/huggingface/hub; run `make models` (offline by default)

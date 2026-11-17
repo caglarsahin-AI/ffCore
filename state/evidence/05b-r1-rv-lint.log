@@ -1,0 +1,6 @@
+HEAD=749e37ebc5f9048c823b4bafec5c4bbfe110ef71
+ruff check backend scripts data/samples/scripts services
+All checks passed!
+ruff format --check backend scripts data/samples/scripts services
+504 files already formatted
+exit 0

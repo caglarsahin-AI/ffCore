@@ -1,0 +1,338 @@
+2026-11-17 12:55:44,842 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-17 12:55:44,862 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=428
+2026-11-17 12:55:45,217 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-17 12:55:45,234 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=158
+2026-11-17 12:55:45,433 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-17 12:55:45,459 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=141
+2026-11-17 12:55:45,792 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-17 12:55:45,911 INFO ffcore.access access method=POST path=/api/v1/projects/6c1117c0-d7ec-480d-b79d-339cb1a490c4/api-keys status=201 ms=324
+2026-11-17 12:55:46,240 INFO ffcore.access access method=POST path=/api/v1/projects/6c1117c0-d7ec-480d-b79d-339cb1a490c4/mcp-servers status=400 ms=324
+[RV] P1 port-switch base http://localhost path :59359/api/v1/dashboard/ -> create 400 egress_not_allowlisted
+.2026-11-17 12:55:50,968 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-17 12:55:50,970 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-17 12:55:50,970 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-17 12:55:51,127 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-17 12:55:51,236 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-17 12:55:51,255 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=125
+2026-11-17 12:55:51,314 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-17 12:55:51,409 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-17 12:55:51,424 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=106
+2026-11-17 12:55:51,483 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-17 12:55:51,582 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-17 12:55:51,597 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=110
+2026-11-17 12:55:51,654 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-17 12:55:51,707 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-17 12:55:51,715 INFO ffcore.access access method=POST path=/api/v1/projects/01d1bb6d-b427-4860-a74a-778ae6b22054/api-keys status=201 ms=57
+2026-11-17 12:55:51,785 INFO ffcore.access access method=POST path=/api/v1/projects/01d1bb6d-b427-4860-a74a-778ae6b22054/mcp-servers status=201 ms=66
+2026-11-17 12:55:51,842 INFO ffcore.access access method=PATCH path=/api/v1/projects/01d1bb6d-b427-4860-a74a-778ae6b22054/mcp-servers/8c19ba2b-3125-4804-a332-f9224ad979d9 status=200 ms=53
+2026-11-17 12:55:51,915 INFO mcp.server.streamable_http_manager StreamableHTTP session manager started
+2026-11-17 12:55:52,019 INFO ffcore.mcp_publish mcp_server_call server=rv-80eeca50 operation=escape status=ok code=None latency_ms=71
+2026-11-17 12:55:52,021 INFO mcp.server.streamable_http Terminating session: None
+2026-11-17 12:55:52,021 INFO mcp.server.streamable_http_manager StreamableHTTP session manager shutting down
+2026-11-17 12:55:52,022 INFO ffcore.access access method=POST path=/mcp/rv-80eeca50/ status=200 ms=176
+[RV] P1 port-switch-ip registered http://127.0.0.1 path :59359/api/v1/dashboard/ | http 200 | result {'content': [{'text': '{"count": 1, "result": [{"id": 3, "dashboard_title": "Yatak doluluk"}]}', 'type': 'text'}], 'isError': False} | upstream hits [('GET', '/api/v1/dashboard/', '127.0.0.1:59359')] | row [('escape', 'ok', None, 'api_key', 'log')]
+.2026-11-17 12:55:52,186 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-17 12:55:52,317 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-17 12:55:52,327 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=138
+2026-11-17 12:55:52,396 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-17 12:55:52,513 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-17 12:55:52,527 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=128
+2026-11-17 12:55:52,585 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-17 12:55:52,697 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-17 12:55:52,712 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=124
+2026-11-17 12:55:52,771 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-17 12:55:52,827 INFO ffcore.access access method=POST path=/api/v1/projects/4751bad6-3b40-41bc-8555-6aa36e0c3f4e/api-keys status=201 ms=52
+2026-11-17 12:55:52,827 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-17 12:55:52,887 INFO ffcore.access access method=POST path=/api/v1/projects/4751bad6-3b40-41bc-8555-6aa36e0c3f4e/mcp-servers status=201 ms=53
+2026-11-17 12:55:52,941 INFO ffcore.access access method=PATCH path=/api/v1/projects/4751bad6-3b40-41bc-8555-6aa36e0c3f4e/mcp-servers/f4cf4aa0-e571-4621-b7e8-03c2eedb5b23 status=200 ms=51
+2026-11-17 12:55:52,993 INFO mcp.server.streamable_http_manager StreamableHTTP session manager started
+2026-11-17 12:55:53,080 INFO ffcore.mcp_publish mcp_server_call server=rv-b8f4ae8c operation=escape status=error code=egress_request_failed latency_ms=47
+2026-11-17 12:55:53,081 INFO mcp.server.streamable_http Terminating session: None
+2026-11-17 12:55:53,082 INFO mcp.server.streamable_http_manager StreamableHTTP session manager shutting down
+2026-11-17 12:55:53,084 INFO ffcore.access access method=POST path=/mcp/rv-b8f4ae8c/ status=200 ms=139
+[RV] P1 host-change-ip registered http://127.0.0.1 path 0:59359/api/v1/dashboard/ | http 200 | result {'content': [{'text': 'error: egress_request_failed', 'type': 'text'}], 'isError': True} | upstream hits [] | row [('escape', 'error', 'egress_request_failed', 'api_key', 'log')]
+.2026-11-17 12:55:53,240 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-17 12:55:53,349 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-17 12:55:53,372 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=128
+2026-11-17 12:55:53,436 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-17 12:55:53,541 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-17 12:55:53,555 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=115
+2026-11-17 12:55:53,614 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-17 12:55:53,740 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-17 12:55:53,757 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=140
+2026-11-17 12:55:53,825 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-17 12:55:53,896 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-17 12:55:53,896 INFO ffcore.access access method=POST path=/api/v1/projects/cf7cba72-e8ff-44d1-bec1-e07987878f7d/api-keys status=201 ms=67
+2026-11-17 12:55:53,947 INFO ffcore.access access method=POST path=/api/v1/projects/cf7cba72-e8ff-44d1-bec1-e07987878f7d/mcp-servers status=400 ms=44
+[RV] P1 host-suffix base http://127.0.0 path .1:59359/api/v1/dashboard/ -> create 400 egress_not_allowlisted
+.2026-11-17 12:55:54,127 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-17 12:55:54,252 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-17 12:55:54,274 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=143
+2026-11-17 12:55:54,336 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-17 12:55:54,446 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-17 12:55:54,464 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=126
+2026-11-17 12:55:54,527 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-17 12:55:54,627 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-17 12:55:54,649 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=119
+2026-11-17 12:55:54,718 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-17 12:55:54,786 INFO ffcore.access access method=POST path=/api/v1/projects/d41aa15b-e0c3-4bbc-a662-32bdafd0caf9/api-keys status=201 ms=65
+2026-11-17 12:55:54,792 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-17 12:55:54,862 INFO ffcore.access access method=POST path=/api/v1/projects/d41aa15b-e0c3-4bbc-a662-32bdafd0caf9/mcp-servers status=201 ms=65
+2026-11-17 12:55:54,925 INFO ffcore.access access method=PATCH path=/api/v1/projects/d41aa15b-e0c3-4bbc-a662-32bdafd0caf9/mcp-servers/932293b3-a5a6-4bbc-b09c-bd64605380dc status=200 ms=60
+2026-11-17 12:55:54,977 INFO mcp.server.streamable_http_manager StreamableHTTP session manager started
+2026-11-17 12:55:55,030 INFO ffcore.mcp_publish mcp_server_call server=rv-a471a6cc operation=escape status=error code=internal_error latency_ms=23
+2026-11-17 12:55:55,031 ERROR mcp.shared.jsonrpc_dispatcher handler for 'tools/call' raised
+Traceback (most recent call last):
+  File "/opt/venv/lib/python3.12/site-packages/mcp/shared/jsonrpc_dispatcher.py", line 740, in _handle_request
+    result = await on_request(dctx, req.method, req.params)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/mcp/server/runner.py", line 230, in _on_request
+    result = _dump_result(await call(ctx))
+                          ^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/mcp/server/_otel.py", line 44, in __call__
+    result = await call_next(ctx)
+             ^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/mcp/server/runner.py", line 217, in _inner
+    result = await entry.handler(ctx, typed_params)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/work/backend/ffcore/services/mcp_publish.py", line 511, in call_tool
+    outcome = await invoke(snapshot, caller, params.name, params.arguments or {}, settings)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/work/backend/ffcore/services/mcp_publish.py", line 395, in invoke
+    outcome = await _guarded(snapshot, caller, op, arguments, settings)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/work/backend/ffcore/services/mcp_publish.py", line 423, in _guarded
+    text, upstream_error = await _openapi_call(snapshot, op, arguments, settings), False
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/work/backend/ffcore/services/mcp_publish.py", line 340, in _openapi_call
+    check_upstream_url(url, settings)  # the base URL passed at registration; checked again
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/work/backend/ffcore/services/mcp_publish.py", line 110, in check_upstream_url
+    raise _refused(
+ffcore.core.errors.ApiError: The upstream URL takes scheme, host, port and path only; put credentials in auth.
+2026-11-17 12:55:55,039 INFO mcp.server.streamable_http Terminating session: None
+2026-11-17 12:55:55,039 INFO mcp.server.streamable_http_manager StreamableHTTP session manager shutting down
+2026-11-17 12:55:55,040 INFO ffcore.access access method=POST path=/mcp/rv-a471a6cc/ status=200 ms=111
+[RV] P1 userinfo registered http://127.0.0.1:59359 path @203.0.113.9/x | http 200 | result {'code': 0, 'message': 'The upstream URL takes scheme, host, port and path only; put credentials in auth.'} | upstream hits [] | row [('escape', 'error', 'internal_error', 'api_key', None)]
+.2026-11-17 12:55:55,217 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-17 12:55:55,356 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-17 12:55:55,367 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=147
+2026-11-17 12:55:55,437 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-17 12:55:55,569 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-17 12:55:55,589 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=149
+2026-11-17 12:55:55,668 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-17 12:55:55,802 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-17 12:55:55,817 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=139
+2026-11-17 12:55:55,875 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-17 12:55:55,944 INFO ffcore.access access method=POST path=/api/v1/projects/fd2d236c-42cf-4255-bbea-0215d47fabb9/api-keys status=201 ms=65
+2026-11-17 12:55:55,945 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-17 12:55:56,006 INFO ffcore.access access method=POST path=/api/v1/projects/fd2d236c-42cf-4255-bbea-0215d47fabb9/mcp-servers status=201 ms=55
+2026-11-17 12:55:56,058 INFO ffcore.access access method=PATCH path=/api/v1/projects/fd2d236c-42cf-4255-bbea-0215d47fabb9/mcp-servers/ea399d64-e4c1-4492-9c87-08e1eca0eb31 status=200 ms=48
+2026-11-17 12:55:56,104 INFO mcp.server.streamable_http_manager StreamableHTTP session manager started
+2026-11-17 12:55:56,184 INFO ffcore.mcp_publish mcp_server_call server=rv-c7689ee3 operation=escape status=error code=upstream_http_404 latency_ms=47
+2026-11-17 12:55:56,185 INFO mcp.server.streamable_http Terminating session: None
+2026-11-17 12:55:56,186 INFO mcp.server.streamable_http_manager StreamableHTTP session manager shutting down
+2026-11-17 12:55:56,187 INFO ffcore.access access method=POST path=/mcp/rv-c7689ee3/ status=200 ms=126
+[RV] P1 no-slash registered http://127.0.0.1:59359/api path v1/dashboard/ | http 200 | result {'content': [{'text': 'error: upstream_http_404', 'type': 'text'}], 'isError': True} | upstream hits [('GET', '/apiv1/dashboard/', '127.0.0.1:59359')] | row [('escape', 'error', 'upstream_http_404', 'api_key', 'log')]
+.2026-11-17 12:55:56,395 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-17 12:55:56,556 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-17 12:55:56,565 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=166
+2026-11-17 12:55:56,649 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-17 12:55:56,789 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-17 12:55:56,803 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=148
+2026-11-17 12:55:56,877 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-17 12:55:56,984 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-17 12:55:56,999 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=118
+2026-11-17 12:55:57,055 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-17 12:55:57,115 INFO ffcore.access access method=POST path=/api/v1/projects/f049405b-2938-452f-a26e-b68de14154e9/api-keys status=201 ms=57
+2026-11-17 12:55:57,116 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-17 12:55:57,190 INFO ffcore.access access method=POST path=/api/v1/projects/f049405b-2938-452f-a26e-b68de14154e9/mcp-servers status=201 ms=68
+2026-11-17 12:55:57,261 INFO ffcore.access access method=PATCH path=/api/v1/projects/f049405b-2938-452f-a26e-b68de14154e9/mcp-servers/e5f636bd-1b64-4bf7-be77-ff7460d9d398 status=200 ms=66
+2026-11-17 12:55:57,312 INFO mcp.server.streamable_http_manager StreamableHTTP session manager started
+2026-11-17 12:55:57,406 INFO ffcore.mcp_publish mcp_server_call server=rv-8738f442 operation=escape status=ok code=None latency_ms=66
+2026-11-17 12:55:57,407 INFO mcp.server.streamable_http Terminating session: None
+2026-11-17 12:55:57,407 INFO mcp.server.streamable_http_manager StreamableHTTP session manager shutting down
+2026-11-17 12:55:57,408 INFO ffcore.access access method=POST path=/mcp/rv-8738f442/ status=200 ms=144
+[RV] P1b servers[] ignored: False ['/api/v1/dashboard/']
+.2026-11-17 12:55:57,603 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-17 12:55:57,714 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-17 12:55:57,733 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=127
+2026-11-17 12:55:57,796 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-17 12:55:57,896 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-17 12:55:57,912 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=113
+2026-11-17 12:55:57,967 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-17 12:55:58,091 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-17 12:55:58,108 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=133
+2026-11-17 12:55:58,166 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-17 12:55:58,222 INFO ffcore.access access method=POST path=/api/v1/projects/7214fa4e-c2c5-4ac0-ae9e-ca2c4f54ff95/api-keys status=201 ms=52
+2026-11-17 12:55:58,225 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-17 12:55:58,315 INFO ffcore.access access method=POST path=/api/v1/projects/7214fa4e-c2c5-4ac0-ae9e-ca2c4f54ff95/mcp-servers status=201 ms=78
+2026-11-17 12:55:58,379 INFO ffcore.access access method=PATCH path=/api/v1/projects/7214fa4e-c2c5-4ac0-ae9e-ca2c4f54ff95/mcp-servers/c45a0ad3-9096-4fbf-8722-9a5c2ed28812 status=200 ms=60
+2026-11-17 12:55:58,425 INFO mcp.server.streamable_http_manager StreamableHTTP session manager started
+2026-11-17 12:55:58,485 INFO ffcore.mcp_publish mcp_server_call server=ss-464e6650 operation=searchDashboards status=error code=internal_error latency_ms=28
+2026-11-17 12:55:58,485 ERROR mcp.shared.jsonrpc_dispatcher handler for 'tools/call' raised
+Traceback (most recent call last):
+  File "/opt/venv/lib/python3.12/site-packages/mcp/shared/jsonrpc_dispatcher.py", line 740, in _handle_request
+    result = await on_request(dctx, req.method, req.params)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/mcp/server/runner.py", line 230, in _on_request
+    result = _dump_result(await call(ctx))
+                          ^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/mcp/server/_otel.py", line 44, in __call__
+    result = await call_next(ctx)
+             ^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/mcp/server/runner.py", line 217, in _inner
+    result = await entry.handler(ctx, typed_params)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/work/backend/ffcore/services/mcp_publish.py", line 511, in call_tool
+    outcome = await invoke(snapshot, caller, params.name, params.arguments or {}, settings)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/work/backend/ffcore/services/mcp_publish.py", line 395, in invoke
+    outcome = await _guarded(snapshot, caller, op, arguments, settings)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/work/backend/ffcore/services/mcp_publish.py", line 423, in _guarded
+    text, upstream_error = await _openapi_call(snapshot, op, arguments, settings), False
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/work/backend/ffcore/services/mcp_publish.py", line 340, in _openapi_call
+    check_upstream_url(url, settings)  # the base URL passed at registration; checked again
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/work/backend/ffcore/services/mcp_publish.py", line 128, in check_upstream_url
+    raise _refused(400, exc.code, f"Refused by the outbound policy ({exc.code}).") from None
+ffcore.core.errors.ApiError: Refused by the outbound policy (egress_not_allowlisted).
+2026-11-17 12:55:58,491 INFO mcp.server.streamable_http Terminating session: None
+2026-11-17 12:55:58,491 INFO mcp.server.streamable_http_manager StreamableHTTP session manager shutting down
+2026-11-17 12:55:58,492 INFO ffcore.access access method=POST path=/mcp/ss-464e6650/ status=200 ms=109
+[RV] P2 egress tightened after publish: http 200 | {'jsonrpc': '2.0', 'id': 1, 'error': {'code': 0, 'message': 'Refused by the outbound policy (egress_not_allowlisted).'}}
+[RV] P2 upstream hits 0 | row [('searchDashboards', 'error', 'internal_error', 'api_key', None)]
+.2026-11-17 12:55:58,660 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-17 12:55:58,771 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-17 12:55:58,787 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=125
+2026-11-17 12:55:58,868 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-17 12:55:58,967 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-17 12:55:58,982 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=111
+2026-11-17 12:55:59,038 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-17 12:55:59,163 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-17 12:55:59,178 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=136
+2026-11-17 12:55:59,234 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-17 12:55:59,297 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-17 12:55:59,303 INFO ffcore.access access method=POST path=/api/v1/projects/845bf990-8ccf-4777-af96-b932974c7372/api-keys status=201 ms=65
+2026-11-17 12:55:59,389 INFO ffcore.access access method=POST path=/api/v1/projects/845bf990-8ccf-4777-af96-b932974c7372/mcp-servers status=201 ms=77
+2026-11-17 12:55:59,451 INFO ffcore.access access method=PATCH path=/api/v1/projects/845bf990-8ccf-4777-af96-b932974c7372/mcp-servers/34b302e7-f1f2-499d-bb56-1528db82c7d3 status=200 ms=58
+2026-11-17 12:55:59,505 DEBUG mcp.server.lowlevel.server Initializing server 'ffcore-ss-3db3015e'
+2026-11-17 12:55:59,506 INFO mcp.server.streamable_http_manager StreamableHTTP session manager started
+2026-11-17 12:55:59,507 DEBUG mcp.server.streamable_http_manager Stateless mode: Creating new transport for this request
+2026-11-17 12:55:59,622 INFO ffcore.mcp_publish mcp_server_call server=ss-3db3015e operation=searchDashboards status=ok code=None latency_ms=85
+2026-11-17 12:55:59,624 INFO mcp.server.streamable_http Terminating session: None
+2026-11-17 12:55:59,624 INFO mcp.server.streamable_http_manager StreamableHTTP session manager shutting down
+2026-11-17 12:55:59,625 INFO ffcore.access access method=POST path=/mcp/ss-3db3015e/ status=200 ms=171
+2026-11-17 12:55:59,653 DEBUG mcp.server.lowlevel.server Initializing server 'ffcore-ss-3db3015e'
+2026-11-17 12:55:59,653 INFO mcp.server.streamable_http_manager StreamableHTTP session manager started
+2026-11-17 12:55:59,654 DEBUG mcp.server.streamable_http_manager Stateless mode: Creating new transport for this request
+2026-11-17 12:55:59,749 INFO ffcore.mcp_publish mcp_server_call server=ss-3db3015e operation=createChart status=ok code=None latency_ms=63
+2026-11-17 12:55:59,750 INFO mcp.server.streamable_http Terminating session: None
+2026-11-17 12:55:59,751 INFO mcp.server.streamable_http_manager StreamableHTTP session manager shutting down
+2026-11-17 12:55:59,752 INFO ffcore.access access method=POST path=/mcp/ss-3db3015e/ status=200 ms=125
+2026-11-17 12:55:59,803 INFO ffcore.access access method=GET path=/api/v1/projects/845bf990-8ccf-4777-af96-b932974c7372/mcp-servers/34b302e7-f1f2-499d-bb56-1528db82c7d3 status=200 ms=46
+2026-11-17 12:55:59,855 INFO ffcore.access access method=GET path=/api/v1/projects/845bf990-8ccf-4777-af96-b932974c7372/mcp-servers status=200 ms=49
+2026-11-17 12:55:59,915 INFO ffcore.access access method=GET path=/api/v1/projects/845bf990-8ccf-4777-af96-b932974c7372/mcp-servers/34b302e7-f1f2-499d-bb56-1528db82c7d3/calls status=200 ms=57
+[RV] P3 token/spec visible: {'get': False, 'list': False, 'calls': False, 'spec_plain_in_db': False, 'auth_plain_in_db': False, 'audit': False, 'spec_in_get': False, 'logs': False} | upstream got bearer: [True, True] | audit rows 4
+.2026-11-17 12:56:00,280 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-17 12:56:00,526 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-17 12:56:00,547 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=254
+2026-11-17 12:56:00,622 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-17 12:56:00,725 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-17 12:56:00,739 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=115
+2026-11-17 12:56:00,812 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-17 12:56:00,919 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-17 12:56:00,934 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=119
+2026-11-17 12:56:00,997 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-17 12:56:01,047 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-17 12:56:01,057 INFO ffcore.access access method=POST path=/api/v1/projects/61a4f5c4-b240-4f3c-ba33-bcf4bb5b9734/api-keys status=201 ms=56
+2026-11-17 12:56:01,116 INFO ffcore.access access method=POST path=/api/v1/projects/61a4f5c4-b240-4f3c-ba33-bcf4bb5b9734/mcp-servers status=201 ms=55
+2026-11-17 12:56:01,170 INFO ffcore.access access method=PATCH path=/api/v1/projects/61a4f5c4-b240-4f3c-ba33-bcf4bb5b9734/mcp-servers/a1dce0b6-61b0-49ad-b2e4-eb61f5da7624 status=200 ms=51
+2026-11-17 12:56:01,222 INFO mcp.server.streamable_http_manager StreamableHTTP session manager started
+2026-11-17 12:56:01,328 INFO ffcore.mcp_publish mcp_server_call server=rv-a595644a operation=dots status=error code=upstream_http_404 latency_ms=65
+2026-11-17 12:56:01,331 INFO mcp.server.streamable_http Terminating session: None
+2026-11-17 12:56:01,332 INFO mcp.server.streamable_http_manager StreamableHTTP session manager shutting down
+2026-11-17 12:56:01,334 INFO ffcore.access access method=POST path=/mcp/rv-a595644a/ status=200 ms=161
+[RV] P4 pk '..' -> upstream path ['/api/v1'] | error True
+2026-11-17 12:56:01,382 INFO mcp.server.streamable_http_manager StreamableHTTP session manager started
+2026-11-17 12:56:01,504 INFO ffcore.mcp_publish mcp_server_call server=rv-a595644a operation=dots status=error code=upstream_http_404 latency_ms=81
+2026-11-17 12:56:01,506 INFO mcp.server.streamable_http Terminating session: None
+2026-11-17 12:56:01,507 INFO mcp.server.streamable_http_manager StreamableHTTP session manager shutting down
+2026-11-17 12:56:01,509 INFO ffcore.access access method=POST path=/mcp/rv-a595644a/ status=200 ms=169
+[RV] P4 pk '../..' -> upstream path ['/api/v1/chart/../..'] | error True
+2026-11-17 12:56:01,560 INFO mcp.server.streamable_http_manager StreamableHTTP session manager started
+2026-11-17 12:56:01,679 INFO ffcore.mcp_publish mcp_server_call server=rv-a595644a operation=dots status=error code=upstream_http_404 latency_ms=70
+2026-11-17 12:56:01,680 INFO mcp.server.streamable_http Terminating session: None
+2026-11-17 12:56:01,681 INFO mcp.server.streamable_http_manager StreamableHTTP session manager shutting down
+2026-11-17 12:56:01,682 INFO ffcore.access access method=POST path=/mcp/rv-a595644a/ status=200 ms=168
+[RV] P4 pk '%2e%2e' -> upstream path ['/api/v1/chart/%2e%2e'] | error True
+2026-11-17 12:56:01,714 INFO mcp.server.streamable_http_manager StreamableHTTP session manager started
+2026-11-17 12:56:01,817 INFO ffcore.mcp_publish mcp_server_call server=rv-a595644a operation=dots status=error code=upstream_http_404 latency_ms=63
+2026-11-17 12:56:01,819 INFO mcp.server.streamable_http Terminating session: None
+2026-11-17 12:56:01,819 INFO mcp.server.streamable_http_manager StreamableHTTP session manager shutting down
+2026-11-17 12:56:01,822 INFO ffcore.access access method=POST path=/mcp/rv-a595644a/ status=200 ms=137
+[RV] P4 pk '7' -> upstream path ['/api/v1/chart/7'] | error True
+.2026-11-17 12:56:01,974 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-17 12:56:02,096 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-17 12:56:02,104 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=126
+2026-11-17 12:56:02,159 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-17 12:56:02,263 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-17 12:56:02,286 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=122
+2026-11-17 12:56:02,346 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-17 12:56:02,442 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-17 12:56:02,456 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=107
+2026-11-17 12:56:02,513 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-17 12:56:02,592 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-17 12:56:02,614 INFO ffcore.access access method=POST path=/api/v1/projects/4b623de6-45fd-43eb-af3f-f9f6b42671b4/mcp-servers status=201 ms=95
+2026-11-17 12:56:02,671 INFO ffcore.access access method=PATCH path=/api/v1/projects/4b623de6-45fd-43eb-af3f-f9f6b42671b4/mcp-servers/46df0f73-606f-450f-9792-144a4ecfc5bc status=200 ms=52
+2026-11-17 12:56:02,692 INFO ffcore.access access method=POST path=/mcp/ss-4c63a603/ status=404 ms=13
+[RV] P5 runtime OBO other project: 404 mcp_server_not_found
+.2026-11-17 12:56:02,860 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-17 12:56:02,960 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-17 12:56:02,976 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=113
+2026-11-17 12:56:03,032 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-17 12:56:03,129 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-17 12:56:03,144 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=109
+2026-11-17 12:56:03,199 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-17 12:56:03,302 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-17 12:56:03,315 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=112
+2026-11-17 12:56:03,370 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-17 12:56:03,429 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-17 12:56:03,441 INFO ffcore.access access method=POST path=/api/v1/projects/e5219873-7d1e-4426-b2c6-bb81fea62be6/api-keys status=201 ms=65
+2026-11-17 12:56:03,503 INFO ffcore.access access method=POST path=/api/v1/projects/e5219873-7d1e-4426-b2c6-bb81fea62be6/mcp-servers status=201 ms=57
+2026-11-17 12:56:03,561 INFO ffcore.access access method=PATCH path=/api/v1/projects/e5219873-7d1e-4426-b2c6-bb81fea62be6/mcp-servers/ce5ab772-c8fc-40f7-bf6c-c9935edab6fa status=422 ms=55
+[RV] P6 select unexposable: 422 operation_not_exposable
+2026-11-17 12:56:03,613 INFO ffcore.access access method=PATCH path=/api/v1/projects/e5219873-7d1e-4426-b2c6-bb81fea62be6/mcp-servers/ce5ab772-c8fc-40f7-bf6c-c9935edab6fa status=200 ms=49
+2026-11-17 12:56:03,661 INFO mcp.server.streamable_http_manager StreamableHTTP session manager started
+2026-11-17 12:56:03,690 INFO ffcore.mcp_publish mcp_server_call server=rv-83bb5b7f operation=withHeader status=error code=unknown_tool latency_ms=0
+2026-11-17 12:56:03,691 INFO mcp.server.streamable_http Terminating session: None
+2026-11-17 12:56:03,692 INFO mcp.server.streamable_http_manager StreamableHTTP session manager shutting down
+2026-11-17 12:56:03,693 INFO ffcore.access access method=POST path=/mcp/rv-83bb5b7f/ status=200 ms=75
+[RV] P6 call hidden op: {'content': [{'text': 'error: unknown_tool', 'type': 'text'}], 'isError': True}
+.2026-11-17 12:56:03,858 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-17 12:56:03,980 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-17 12:56:03,982 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=119
+2026-11-17 12:56:04,039 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-17 12:56:04,140 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-17 12:56:04,155 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=113
+2026-11-17 12:56:04,212 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-17 12:56:04,314 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-17 12:56:04,329 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=114
+2026-11-17 12:56:04,384 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-17 12:56:04,439 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-17 12:56:04,455 INFO ffcore.access access method=POST path=/api/v1/projects/6e892f99-f74b-4a8f-aa97-54219d92b3c2/tools status=201 ms=65
+[RV] P7 tool endpoint http://backend:8000/mcp/somekey/ forward_user -> 201 http://backend:8000/mcp/somekey/
+2026-11-17 12:56:04,500 INFO ffcore.access access method=POST path=/api/v1/projects/6e892f99-f74b-4a8f-aa97-54219d92b3c2/tools status=400 ms=41
+[RV] P7 tool endpoint http://backend:8000/api/v1/projects/ forward_user -> 400 endpoint_is_platform
+2026-11-17 12:56:04,542 INFO ffcore.access access method=POST path=/api/v1/projects/6e892f99-f74b-4a8f-aa97-54219d92b3c2/tools status=400 ms=39
+[RV] P7 tool endpoint http://backend:8000/mcp/somekey/ bearer -> 400 endpoint_is_platform
+2026-11-17 12:56:04,588 INFO ffcore.access access method=POST path=/api/v1/projects/6e892f99-f74b-4a8f-aa97-54219d92b3c2/tools status=400 ms=43
+[RV] P7 tool endpoint http://backend:9999/mcp/somekey/ forward_user -> 400 endpoint_is_platform
+2026-11-17 12:56:04,632 INFO ffcore.access access method=POST path=/api/v1/projects/6e892f99-f74b-4a8f-aa97-54219d92b3c2/tools status=400 ms=40
+[RV] P7 tool endpoint http://backend:8000/mcp/somekey/../../api/v1/ forward_user -> 400 endpoint_is_platform
+2026-11-17 12:56:04,678 INFO ffcore.access access method=POST path=/api/v1/projects/6e892f99-f74b-4a8f-aa97-54219d92b3c2/tools status=400 ms=43
+[RV] P7 tool endpoint http://backend:8000/mcp/somekey/%2e%2e/%2e%2e/api/ forward_user -> 400 endpoint_is_platform
+.
+13 passed in 27.59s

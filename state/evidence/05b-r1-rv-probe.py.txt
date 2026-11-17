@@ -1,0 +1,200 @@
+"""Reviewer probe, 05b r1 (not part of the branch). Run with
+pytest -p tests.conftest -p tests.integration.conftest /probe/test_rv05b_probe.py -s
+Every case prints an [RV] line; asserts only where the expected answer is the branch's own claim.
+"""
+
+import logging
+import uuid
+
+import pytest
+
+from tests.integration.facade_support import make_key
+from tests.integration.mcp_publish_support import *  # noqa: F403 - fixtures
+from tests.integration.mcp_publish_support import (
+    UPSTREAM_TOKEN,
+    bearer,
+    call_result,
+    calls,
+    create,
+    publish,
+    rpc,
+    runtime_headers,
+    servers_url,
+)
+
+
+def out(*a):
+    print("[RV]", *a, flush=True)
+
+
+@pytest.fixture
+def keys(world):
+    return {"invoke": make_key(world["admin"], world["project"], scopes=["tools_invoke"])["key"]}
+
+
+@pytest.fixture
+def client(world):
+    return world["anonymous"]
+
+
+def _spec(path: str, op: str = "escape", method: str = "get", servers: str = "") -> str:
+    return (
+        'openapi: "3.0.3"\ninfo: {title: t, version: "1"}\n'
+        + servers
+        + "paths:\n"
+        + f"  '{path}': {{{method}: {{operationId: {op}, responses: {{'200': {{description: x}}}}}}}}\n"
+    )
+
+
+def _try_publish(world, base, spec, exposed):
+    body = {
+        "key": f"rv-{uuid.uuid4().hex[:8]}",
+        "name": "rv",
+        "source_kind": "openapi",
+        "spec": spec,
+        "upstream_base_url": base,
+        "upstream_auth": {"type": "bearer", "token": UPSTREAM_TOKEN},
+        "access": "token",
+    }
+    r = world["admin"].post(servers_url(world), json=body)
+    if r.status_code != 201:
+        return None, f"create {r.status_code} {r.json().get('error', {}).get('code')}"
+    server = r.json()
+    ops = {o["name"]: (o["exposable"], o.get("reason"), o["path"]) for o in server["operations"]}
+    r = world["admin"].patch(
+        servers_url(world, server["id"]), json={"exposed_operations": exposed, "status": "active"}
+    )
+    if r.status_code != 200:
+        return None, f"patch {r.status_code} {r.json().get('error', {}).get('code')} ops={ops}"
+    return server, f"ops={ops}"
+
+
+@pytest.mark.parametrize(
+    "case",
+    [
+        ("port-switch", "http://localhost", ":{port}/api/v1/dashboard/"),
+        ("port-switch-ip", "http://127.0.0.1", ":{port}/api/v1/dashboard/"),
+        ("host-change-ip", "http://127.0.0.1", "0:{port}/api/v1/dashboard/"),
+        ("host-suffix", "http://127.0.0", ".1:{port}/api/v1/dashboard/"),
+        ("userinfo", "{url}", "@203.0.113.9/x"),
+        ("no-slash", "{url}/api", "v1/dashboard/"),
+    ],
+    ids=lambda c: c[0],
+)
+def test_p1_spec_path_key_changes_origin(world, upstream, keys, client, pg, case):
+    name, base, path = case
+    port = upstream.url.rsplit(":", 1)[1]
+    base = base.format(url=upstream.url)
+    path = path.format(port=port)
+    before = len(upstream.hits)
+    server, note = _try_publish(world, base, _spec(path), ["escape"])
+    if server is None:
+        out("P1", name, "base", base, "path", path, "->", note)
+        return
+    r = rpc(client, server["key"], "tools/call", {"name": "escape", "arguments": {}}, headers=bearer(keys["invoke"]))
+    body = r.json()
+    new_hits = upstream.hits[before:]
+    out(
+        "P1", name, "registered", base, "path", path, "| http", r.status_code,
+        "| result", str(body.get("result", body.get("error")))[:220],
+        "| upstream hits", [(h.method, h.path, h.headers.get("host")) for h in new_hits],
+        "| row", calls(pg, server["id"]),
+    )
+
+
+def test_p1b_servers_field_is_ignored(world, upstream, keys, client):
+    spec = _spec("/api/v1/dashboard/", servers="servers: [{url: 'http://203.0.113.9/api'}]\n")
+    server, note = _try_publish(world, upstream.url, spec, ["escape"])
+    before = len(upstream.hits)
+    r = rpc(client, server["key"], "tools/call", {"name": "escape", "arguments": {}}, headers=bearer(keys["invoke"]))
+    out("P1b servers[] ignored:", call_result(r)["isError"], [h.path for h in upstream.hits[before:]])
+    assert [h.path for h in upstream.hits[before:]] == ["/api/v1/dashboard/"]
+
+
+def test_p2_call_time_refusal(world, upstream, keys, client, pg, app, settings):
+    from ffcore.core.config import get_settings
+
+    server = publish(world, upstream.url, access="token", exposed=["searchDashboards"])
+    tightened = settings.model_copy(
+        update={"allowed_internal_hosts": [h for h in settings.allowed_internal_hosts if h != "127.0.0.0/8"]}
+    )
+    app.dependency_overrides[get_settings] = lambda: tightened
+    before = len(upstream.hits)
+    r = rpc(client, server["key"], "tools/call", {"name": "searchDashboards", "arguments": {}}, headers=bearer(keys["invoke"]))
+    out("P2 egress tightened after publish: http", r.status_code, "|", str(r.json())[:300])
+    out("P2 upstream hits", len(upstream.hits) - before, "| row", calls(pg, server["id"]))
+    app.dependency_overrides[get_settings] = lambda: settings
+
+
+def test_p3_secrets_never_plain(world, upstream, keys, client, pg, caplog):
+    caplog.set_level(logging.DEBUG)
+    server = publish(world, upstream.url, access="token", exposed=["searchDashboards", "createChart"])
+    rpc(client, server["key"], "tools/call", {"name": "searchDashboards", "arguments": {}}, headers=bearer(keys["invoke"]))
+    rpc(client, server["key"], "tools/call", {"name": "createChart", "arguments": {"body": {"slice_name": "s", "viz_type": "table", "datasource_id": 1, "datasource_type": "table"}}}, headers=bearer(keys["invoke"]))
+    got = world["admin"].get(servers_url(world, server["id"])).text
+    listing = world["admin"].get(servers_url(world)).text
+    summary = world["admin"].get(servers_url(world, server["id"], "/calls")).text
+    row = pg.execute("SELECT spec_encrypted, upstream_auth_encrypted, operations::text FROM mcp_servers WHERE id = %s", (server["id"],)).fetchone()
+    audit = pg.execute("SELECT coalesce(before::text,'') || coalesce(after::text,'') FROM audit_events WHERE resource_id = %s", (server["id"],)).fetchall()
+    logs = "\n".join(r.getMessage() for r in caplog.records)
+    sent = [h.headers.get("authorization") for h in upstream.hits[-2:]]
+    found = {
+        "get": UPSTREAM_TOKEN in got,
+        "list": UPSTREAM_TOKEN in listing,
+        "calls": UPSTREAM_TOKEN in summary,
+        "spec_plain_in_db": b"superset" in bytes(row[0]).lower() or b"openapi" in bytes(row[0]).lower(),
+        "auth_plain_in_db": UPSTREAM_TOKEN.encode() in bytes(row[1]),
+        "audit": any(UPSTREAM_TOKEN in a[0] for a in audit),
+        "spec_in_get": "openapi:" in got or "3.0" in got and "paths" in got,
+        "logs": UPSTREAM_TOKEN in logs,
+    }
+    out("P3 token/spec visible:", found, "| upstream got bearer:", [s and s.startswith("Bearer ") for s in sent], "| audit rows", len(audit))
+    assert not any(v for k, v in found.items())
+
+
+def test_p4_dot_segments_in_path_param(world, upstream, keys, client):
+    spec = _spec("/v1/chart/{pk}", op="dots").replace(
+        "{get: {operationId: dots,", "{get: {operationId: dots, parameters: [{name: pk, in: path, required: true, schema: {type: string}}],"
+    )
+    server, note = _try_publish(world, upstream.url + "/api", spec, ["dots"])
+    for value in ("..", "../..", "%2e%2e", "7"):
+        before = len(upstream.hits)
+        r = rpc(client, server["key"], "tools/call", {"name": "dots", "arguments": {"pk": value}}, headers=bearer(keys["invoke"]))
+        out("P4 pk", repr(value), "-> upstream path", [h.path for h in upstream.hits[before:]], "| error", call_result(r)["isError"])
+
+
+def test_p5_runtime_obo_of_other_project_is_404(world, upstream, client, settings, make_project):
+    server = publish(world, upstream.url, access="internal", exposed=["searchDashboards"])
+    other = str(make_project())
+    r = rpc(client, server["key"], "tools/list", headers=runtime_headers(settings, world["admin_id"], other, server["key"]))
+    out("P5 runtime OBO other project:", r.status_code, r.json().get("error", {}).get("code"))
+    assert r.status_code == 404
+
+
+def test_p6_unexposable_cannot_be_selected_and_hidden_ops_not_callable(world, upstream, keys, client):
+    spec = (
+        'openapi: "3.0.3"\ninfo: {title: t, version: "1"}\npaths:\n'
+        "  /a: {get: {operationId: withHeader, parameters: [{name: X-T, in: header, schema: {type: string}}], responses: {'200': {description: x}}}}\n"
+        "  /api/v1/dashboard/: {get: {operationId: ok, responses: {'200': {description: x}}}}\n"
+    )
+    server = create(world, {"key": f"rv-{uuid.uuid4().hex[:8]}", "name": "rv", "source_kind": "openapi", "spec": spec, "upstream_base_url": upstream.url, "upstream_auth": {"type": "none"}, "access": "token"})
+    r = world["admin"].patch(servers_url(world, server["id"]), json={"exposed_operations": ["withHeader"], "status": "active"})
+    out("P6 select unexposable:", r.status_code, r.json().get("error", {}).get("code"))
+    world["admin"].patch(servers_url(world, server["id"]), json={"exposed_operations": ["ok"], "status": "active"})
+    r = rpc(client, server["key"], "tools/call", {"name": "withHeader", "arguments": {}}, headers=bearer(keys["invoke"]))
+    out("P6 call hidden op:", call_result(r))
+
+
+def test_p7_tools_kind_mcp_to_backend_other_path_refused(world, settings):
+    base = settings.internal_api_url.rstrip("/")
+    tools_url = f"/api/v1/projects/{world['project']}/tools"
+    for url, auth in (
+        (f"{base}/mcp/somekey/", {"type": "forward_user"}),
+        (f"{base}/api/v1/projects/", {"type": "forward_user"}),
+        (f"{base}/mcp/somekey/", {"type": "bearer", "token": "dummy-not-secret-0123456789abc"}),
+        ("http://backend:9999/mcp/somekey/", {"type": "forward_user"}),
+        (f"{base}/mcp/somekey/../../api/v1/", {"type": "forward_user"}),
+        (f"{base}/mcp/somekey/%2e%2e/%2e%2e/api/", {"type": "forward_user"}),
+    ):
+        r = world["admin"].post(tools_url, json={"key": f"t{uuid.uuid4().hex[:6]}", "name": "t", "kind": "mcp", "endpoint_url": url, "auth": auth})
+        out("P7 tool endpoint", url, auth["type"], "->", r.status_code, r.json().get("error", {}).get("code") if r.status_code >= 400 else r.json().get("endpoint_url"))

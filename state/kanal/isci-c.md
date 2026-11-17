@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-c-10c2
 - Aktif paket: 10c-2 (governance ekranları + FOLLOWUP-185, FOLLOWUP-192)
 - Durum: ACTIVE (PR-HAZIR 5c27543)
-- Son okunan: koordinator K-10C2-0002; son yazılan C-10C2-0008 (PR-HAZIR)
+- Son okunan: koordinator K-10C2-0004; son yazılan C-10C2-0008 (PR-HAZIR)
 - Önceki lease: ffcore-isci-c-sse RETIRED (fix/10b-sse-bekci MERGED 4216718; son C-SSE-0011 RETIRED); ondan önce ffcore-isci-c-10c1 RETIRED (10c-1 MERGED; son C-10C1-0015 RETIRED); ondan önce ffcore-isci-c-10bp2 RETIRED (10b-poc-2 MERGED b43770d; son C-10bp2-0019 HANDOFF)
 
 ## Mesajlar
