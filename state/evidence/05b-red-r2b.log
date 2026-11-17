@@ -1,0 +1,766 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.10, pytest-9.2.0, pluggy-1.7.0
+rootdir: /work/backend
+configfile: pyproject.toml
+plugins: Faker-40.43.0, anyio-4.15.1, langsmith-0.14.8
+collected 44 items
+
+tests/unit/test_05b_openapi_ops.py ...............FFFFFFFFFFFFFFFFFFFFF. [ 84%]
+                                                                         [ 84%]
+tests/integration/test_05b_r2_origin.py FFFF.FF                          [100%]
+
+=================================== FAILURES ===================================
+___ test_05b_r2_invalid_path_key_is_not_exposable[:59359/api/v1/dashboard/] ____
+
+path = ':59359/api/v1/dashboard/'
+
+    @pytest.mark.parametrize("path", BAD_PATHS)
+    def test_05b_r2_invalid_path_key_is_not_exposable(path):
+        ok = {"200": {"description": "x"}}
+        ops = _catalog(_spec({path: {"get": {"operationId": "p", "responses": ok}}}))
+>       assert ops["p"]["exposable"] is False and ops["p"]["reason"] == "openapi_path_invalid"
+E       assert (True is False)
+
+tests/unit/test_05b_openapi_ops.py:201: AssertionError
+___ test_05b_r2_invalid_path_key_is_not_exposable[0:59359/api/v1/dashboard/] ___
+
+path = '0:59359/api/v1/dashboard/'
+
+    @pytest.mark.parametrize("path", BAD_PATHS)
+    def test_05b_r2_invalid_path_key_is_not_exposable(path):
+        ok = {"200": {"description": "x"}}
+        ops = _catalog(_spec({path: {"get": {"operationId": "p", "responses": ok}}}))
+>       assert ops["p"]["exposable"] is False and ops["p"]["reason"] == "openapi_path_invalid"
+E       assert (True is False)
+
+tests/unit/test_05b_openapi_ops.py:201: AssertionError
+_________ test_05b_r2_invalid_path_key_is_not_exposable[v1/dashboard/] _________
+
+path = 'v1/dashboard/'
+
+    @pytest.mark.parametrize("path", BAD_PATHS)
+    def test_05b_r2_invalid_path_key_is_not_exposable(path):
+        ok = {"200": {"description": "x"}}
+        ops = _catalog(_spec({path: {"get": {"operationId": "p", "responses": ok}}}))
+>       assert ops["p"]["exposable"] is False and ops["p"]["reason"] == "openapi_path_invalid"
+E       assert (True is False)
+
+tests/unit/test_05b_openapi_ops.py:201: AssertionError
+_______ test_05b_r2_invalid_path_key_is_not_exposable[//evil.example/x] ________
+
+path = '//evil.example/x'
+
+    @pytest.mark.parametrize("path", BAD_PATHS)
+    def test_05b_r2_invalid_path_key_is_not_exposable(path):
+        ok = {"200": {"description": "x"}}
+        ops = _catalog(_spec({path: {"get": {"operationId": "p", "responses": ok}}}))
+>       assert ops["p"]["exposable"] is False and ops["p"]["reason"] == "openapi_path_invalid"
+E       assert (True is False)
+
+tests/unit/test_05b_openapi_ops.py:201: AssertionError
+____________ test_05b_r2_invalid_path_key_is_not_exposable[/a/../b] ____________
+
+path = '/a/../b'
+
+    @pytest.mark.parametrize("path", BAD_PATHS)
+    def test_05b_r2_invalid_path_key_is_not_exposable(path):
+        ok = {"200": {"description": "x"}}
+        ops = _catalog(_spec({path: {"get": {"operationId": "p", "responses": ok}}}))
+>       assert ops["p"]["exposable"] is False and ops["p"]["reason"] == "openapi_path_invalid"
+E       assert (True is False)
+
+tests/unit/test_05b_openapi_ops.py:201: AssertionError
+____________ test_05b_r2_invalid_path_key_is_not_exposable[/a/./b] _____________
+
+path = '/a/./b'
+
+    @pytest.mark.parametrize("path", BAD_PATHS)
+    def test_05b_r2_invalid_path_key_is_not_exposable(path):
+        ok = {"200": {"description": "x"}}
+        ops = _catalog(_spec({path: {"get": {"operationId": "p", "responses": ok}}}))
+>       assert ops["p"]["exposable"] is False and ops["p"]["reason"] == "openapi_path_invalid"
+E       assert (True is False)
+
+tests/unit/test_05b_openapi_ops.py:201: AssertionError
+_____________ test_05b_r2_invalid_path_key_is_not_exposable[/a//b] _____________
+
+path = '/a//b'
+
+    @pytest.mark.parametrize("path", BAD_PATHS)
+    def test_05b_r2_invalid_path_key_is_not_exposable(path):
+        ok = {"200": {"description": "x"}}
+        ops = _catalog(_spec({path: {"get": {"operationId": "p", "responses": ok}}}))
+>       assert ops["p"]["exposable"] is False and ops["p"]["reason"] == "openapi_path_invalid"
+E       assert (True is False)
+
+tests/unit/test_05b_openapi_ops.py:201: AssertionError
+____________ test_05b_r2_invalid_path_key_is_not_exposable[/a?x=1] _____________
+
+path = '/a?x=1'
+
+    @pytest.mark.parametrize("path", BAD_PATHS)
+    def test_05b_r2_invalid_path_key_is_not_exposable(path):
+        ok = {"200": {"description": "x"}}
+        ops = _catalog(_spec({path: {"get": {"operationId": "p", "responses": ok}}}))
+>       assert ops["p"]["exposable"] is False and ops["p"]["reason"] == "openapi_path_invalid"
+E       assert (True is False)
+
+tests/unit/test_05b_openapi_ops.py:201: AssertionError
+_____________ test_05b_r2_invalid_path_key_is_not_exposable[/a#f] ______________
+
+path = '/a#f'
+
+    @pytest.mark.parametrize("path", BAD_PATHS)
+    def test_05b_r2_invalid_path_key_is_not_exposable(path):
+        ok = {"200": {"description": "x"}}
+        ops = _catalog(_spec({path: {"get": {"operationId": "p", "responses": ok}}}))
+>       assert ops["p"]["exposable"] is False and ops["p"]["reason"] == "openapi_path_invalid"
+E       assert (True is False)
+
+tests/unit/test_05b_openapi_ops.py:201: AssertionError
+_ test_05b_r2_upload_refuses_a_document_with_an_invalid_path[:59359/api/v1/dashboard/] _
+
+path = ':59359/api/v1/dashboard/'
+
+    @pytest.mark.parametrize("path", BAD_PATHS)
+    def test_05b_r2_upload_refuses_a_document_with_an_invalid_path(path):
+        ok = {"200": {"description": "x"}}
+        good = {"/fine": {"get": {"operationId": "fine", "responses": ok}}}
+        text = json.dumps(_spec({**good, path: {"get": {"operationId": "p", "responses": ok}}}))
+        with pytest.raises(SpecError) as caught:
+>           mcp_openapi.upload_catalog(text)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AttributeError: module 'ffcore.services.mcp_openapi' has no attribute 'upload_catalog'
+
+tests/unit/test_05b_openapi_ops.py:210: AttributeError
+_ test_05b_r2_upload_refuses_a_document_with_an_invalid_path[0:59359/api/v1/dashboard/] _
+
+path = '0:59359/api/v1/dashboard/'
+
+    @pytest.mark.parametrize("path", BAD_PATHS)
+    def test_05b_r2_upload_refuses_a_document_with_an_invalid_path(path):
+        ok = {"200": {"description": "x"}}
+        good = {"/fine": {"get": {"operationId": "fine", "responses": ok}}}
+        text = json.dumps(_spec({**good, path: {"get": {"operationId": "p", "responses": ok}}}))
+        with pytest.raises(SpecError) as caught:
+>           mcp_openapi.upload_catalog(text)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AttributeError: module 'ffcore.services.mcp_openapi' has no attribute 'upload_catalog'
+
+tests/unit/test_05b_openapi_ops.py:210: AttributeError
+__ test_05b_r2_upload_refuses_a_document_with_an_invalid_path[v1/dashboard/] ___
+
+path = 'v1/dashboard/'
+
+    @pytest.mark.parametrize("path", BAD_PATHS)
+    def test_05b_r2_upload_refuses_a_document_with_an_invalid_path(path):
+        ok = {"200": {"description": "x"}}
+        good = {"/fine": {"get": {"operationId": "fine", "responses": ok}}}
+        text = json.dumps(_spec({**good, path: {"get": {"operationId": "p", "responses": ok}}}))
+        with pytest.raises(SpecError) as caught:
+>           mcp_openapi.upload_catalog(text)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AttributeError: module 'ffcore.services.mcp_openapi' has no attribute 'upload_catalog'
+
+tests/unit/test_05b_openapi_ops.py:210: AttributeError
+_ test_05b_r2_upload_refuses_a_document_with_an_invalid_path[//evil.example/x] _
+
+path = '//evil.example/x'
+
+    @pytest.mark.parametrize("path", BAD_PATHS)
+    def test_05b_r2_upload_refuses_a_document_with_an_invalid_path(path):
+        ok = {"200": {"description": "x"}}
+        good = {"/fine": {"get": {"operationId": "fine", "responses": ok}}}
+        text = json.dumps(_spec({**good, path: {"get": {"operationId": "p", "responses": ok}}}))
+        with pytest.raises(SpecError) as caught:
+>           mcp_openapi.upload_catalog(text)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AttributeError: module 'ffcore.services.mcp_openapi' has no attribute 'upload_catalog'
+
+tests/unit/test_05b_openapi_ops.py:210: AttributeError
+_____ test_05b_r2_upload_refuses_a_document_with_an_invalid_path[/a/../b] ______
+
+path = '/a/../b'
+
+    @pytest.mark.parametrize("path", BAD_PATHS)
+    def test_05b_r2_upload_refuses_a_document_with_an_invalid_path(path):
+        ok = {"200": {"description": "x"}}
+        good = {"/fine": {"get": {"operationId": "fine", "responses": ok}}}
+        text = json.dumps(_spec({**good, path: {"get": {"operationId": "p", "responses": ok}}}))
+        with pytest.raises(SpecError) as caught:
+>           mcp_openapi.upload_catalog(text)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AttributeError: module 'ffcore.services.mcp_openapi' has no attribute 'upload_catalog'
+
+tests/unit/test_05b_openapi_ops.py:210: AttributeError
+______ test_05b_r2_upload_refuses_a_document_with_an_invalid_path[/a/./b] ______
+
+path = '/a/./b'
+
+    @pytest.mark.parametrize("path", BAD_PATHS)
+    def test_05b_r2_upload_refuses_a_document_with_an_invalid_path(path):
+        ok = {"200": {"description": "x"}}
+        good = {"/fine": {"get": {"operationId": "fine", "responses": ok}}}
+        text = json.dumps(_spec({**good, path: {"get": {"operationId": "p", "responses": ok}}}))
+        with pytest.raises(SpecError) as caught:
+>           mcp_openapi.upload_catalog(text)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AttributeError: module 'ffcore.services.mcp_openapi' has no attribute 'upload_catalog'
+
+tests/unit/test_05b_openapi_ops.py:210: AttributeError
+______ test_05b_r2_upload_refuses_a_document_with_an_invalid_path[/a//b] _______
+
+path = '/a//b'
+
+    @pytest.mark.parametrize("path", BAD_PATHS)
+    def test_05b_r2_upload_refuses_a_document_with_an_invalid_path(path):
+        ok = {"200": {"description": "x"}}
+        good = {"/fine": {"get": {"operationId": "fine", "responses": ok}}}
+        text = json.dumps(_spec({**good, path: {"get": {"operationId": "p", "responses": ok}}}))
+        with pytest.raises(SpecError) as caught:
+>           mcp_openapi.upload_catalog(text)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AttributeError: module 'ffcore.services.mcp_openapi' has no attribute 'upload_catalog'
+
+tests/unit/test_05b_openapi_ops.py:210: AttributeError
+______ test_05b_r2_upload_refuses_a_document_with_an_invalid_path[/a?x=1] ______
+
+path = '/a?x=1'
+
+    @pytest.mark.parametrize("path", BAD_PATHS)
+    def test_05b_r2_upload_refuses_a_document_with_an_invalid_path(path):
+        ok = {"200": {"description": "x"}}
+        good = {"/fine": {"get": {"operationId": "fine", "responses": ok}}}
+        text = json.dumps(_spec({**good, path: {"get": {"operationId": "p", "responses": ok}}}))
+        with pytest.raises(SpecError) as caught:
+>           mcp_openapi.upload_catalog(text)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AttributeError: module 'ffcore.services.mcp_openapi' has no attribute 'upload_catalog'
+
+tests/unit/test_05b_openapi_ops.py:210: AttributeError
+_______ test_05b_r2_upload_refuses_a_document_with_an_invalid_path[/a#f] _______
+
+path = '/a#f'
+
+    @pytest.mark.parametrize("path", BAD_PATHS)
+    def test_05b_r2_upload_refuses_a_document_with_an_invalid_path(path):
+        ok = {"200": {"description": "x"}}
+        good = {"/fine": {"get": {"operationId": "fine", "responses": ok}}}
+        text = json.dumps(_spec({**good, path: {"get": {"operationId": "p", "responses": ok}}}))
+        with pytest.raises(SpecError) as caught:
+>           mcp_openapi.upload_catalog(text)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AttributeError: module 'ffcore.services.mcp_openapi' has no attribute 'upload_catalog'
+
+tests/unit/test_05b_openapi_ops.py:210: AttributeError
+_________________ test_05b_r2_upload_catalog_accepts_superset __________________
+
+    def test_05b_r2_upload_catalog_accepts_superset():
+>       assert len(mcp_openapi.upload_catalog(SUPERSET.read_text(encoding="utf-8"))) == 6
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'ffcore.services.mcp_openapi' has no attribute 'upload_catalog'
+
+tests/unit/test_05b_openapi_ops.py:215: AttributeError
+__________________ test_05b_r2_dot_path_values_are_refused[.] __________________
+
+value = '.'
+
+    @pytest.mark.parametrize("value", [".", "..", "%2e%2e"])
+    def test_05b_r2_dot_path_values_are_refused(value):
+        ops = _catalog(mcp_openapi.load_spec(SUPERSET.read_text(encoding="utf-8")))
+        if value == "%2e%2e":
+            # Percent-encoded as a whole: never a dot segment upstream.
+            request = mcp_openapi.build_request(ops["getChartData"], {"pk": value})
+            assert request.path == "/api/v1/chart/%252e%252e/data/"
+            return
+>       with pytest.raises(ArgumentsError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ArgumentsError
+
+tests/unit/test_05b_openapi_ops.py:226: Failed
+_________________ test_05b_r2_dot_path_values_are_refused[..] __________________
+
+value = '..'
+
+    @pytest.mark.parametrize("value", [".", "..", "%2e%2e"])
+    def test_05b_r2_dot_path_values_are_refused(value):
+        ops = _catalog(mcp_openapi.load_spec(SUPERSET.read_text(encoding="utf-8")))
+        if value == "%2e%2e":
+            # Percent-encoded as a whole: never a dot segment upstream.
+            request = mcp_openapi.build_request(ops["getChartData"], {"pk": value})
+            assert request.path == "/api/v1/chart/%252e%252e/data/"
+            return
+>       with pytest.raises(ArgumentsError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ArgumentsError
+
+tests/unit/test_05b_openapi_ops.py:226: Failed
+____________________ test_05b_r2_p1_paths_refused_at_upload ____________________
+
+world = {'project': '1de963ab-7cf5-4552-bc1e-4d51c0552136', 'admin_id': '25451616-ddd3-4ed8-919c-68e143f22088', 'admin': <star...lient.TestClient object at 0x7f87cbd324b0>, 'analyst': <starlette.testclient.TestClient object at 0x7f87c429a1b0>, ...}
+upstream = Upstream(url='http://127.0.0.1:38453', hits=[])
+
+    def test_05b_r2_p1_paths_refused_at_upload(world, upstream):
+        for path in _p1_paths(upstream):
+            body = openapi_body("http://127.0.0.1") | {"spec": _spec(path)}
+            response = world["admin"].post(servers_url(world), json=body)
+>           assert response.status_code == 422, (path, response.text)
+E           AssertionError: (':38453/api/v1/dashboard/', '{"id":"0c5fc9e5-848d-4de3-adba-3d634a03a7ba","project_id":"1de963ab-7cf5-4552-bc1e-4d51c...6-ddd3-4ed8-919c-68e143f22088","created_at":"2026-11-17T13:05:00.085276Z","updated_at":"2026-11-17T13:05:00.085276Z"}')
+E           assert 201 == 422
+E            +  where 201 = <Response [201 Created]>.status_code
+
+tests/integration/test_05b_r2_origin.py:57: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+2026-11-17 13:04:58,844 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=602
+2026-11-17 13:04:59,118 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=144
+2026-11-17 13:04:59,368 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=147
+------------------------------ Captured log setup ------------------------------
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=602
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=144
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=147
+----------------------------- Captured stderr call -----------------------------
+2026-11-17 13:05:00,173 INFO ffcore.access access method=POST path=/api/v1/projects/1de963ab-7cf5-4552-bc1e-4d51c0552136/mcp-servers status=201 ms=511
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/1de963ab-7cf5-4552-bc1e-4d51c0552136/mcp-servers status=201 ms=511
+--------------------------- Captured stderr teardown ---------------------------
+2026-11-17 13:05:02,490 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+2026-11-17 13:05:02,822 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+2026-11-17 13:05:03,040 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+2026-11-17 13:05:05,623 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-17 13:05:05,624 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-17 13:05:05,624 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-17 13:05:06,234 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=2 error=EgressRequestFailed: egress_dns_failed
+---------------------------- Captured log teardown -----------------------------
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:451 litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:451 litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:451 litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+ERROR    ffcore.readiness:readiness.py:63 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:63 warmup failed: ModelMissing
+ERROR    ffcore.readiness:readiness.py:63 warmup failed: ModelMissing
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:451 litellm_reconcile_retry attempt=2 error=EgressRequestFailed: egress_dns_failed
+________ test_05b_r2_p1_stored_escape_is_refused_before_any_request[0] _________
+
+world = {'project': 'ff6bad5c-b4b0-429b-9367-c96337fa8ed8', 'admin_id': 'a73ce9a1-7da0-4c1f-9e3c-e6755d125dc7', 'admin': <star...lient.TestClient object at 0x7f877827a420>, 'analyst': <starlette.testclient.TestClient object at 0x7f874835ede0>, ...}
+upstream = Upstream(url='http://127.0.0.1:38453', hits=[Hit(method='GET', path='/api/v1/dashboard/', query='', body=None, headers...-alive', 'user-agent': 'python-httpx2/2.16.0', 'authorization': 'Bearer dummy-not-secret-superset-token-0123456789'})])
+key = 'ffk_61ee1dc9_fr3EnV8Kz4LBXNBRCpA8XIfMoGLds5fRqElEXzJhy9s'
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_f37986a4baed) at 0x7f87db91de50>
+case = 0
+
+    @pytest.mark.parametrize("case", [0, 1, 2])
+    def test_05b_r2_p1_stored_escape_is_refused_before_any_request(world, upstream, key, pg, case):
+        path = _p1_paths(upstream)[case]
+        base = "http://127.0.0.1" if case < 2 else f"{upstream.url}/api"
+        server = publish(world, base, exposed=["searchDashboards"], access="token")
+        # An operation the upload check would refuse, written straight into the catalog.
+        ops = server["operations"]
+        for op in ops:
+            op.pop("exposed")
+            if op["name"] == "searchDashboards":
+                op["path"] = path
+        pg.execute(
+            "UPDATE mcp_servers SET operations = %s WHERE id = %s", (json.dumps(ops), server["id"])
+        )
+        before = len(upstream.hits)
+        response = rpc(
+            world["anonymous"],
+            server["key"],
+            "tools/call",
+            {"name": "searchDashboards", "arguments": {}},
+            headers=bearer(key),
+        )
+        result = call_result(response)
+        expected = "upstream_origin_mismatch" if case < 2 else "openapi_path_invalid"
+>       assert result["isError"] is True and expected in result["content"][0]["text"]
+E       assert (False is True)
+
+tests/integration/test_05b_r2_origin.py:90: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+2026-11-17 13:05:07,028 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-17 13:05:07,149 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=116
+2026-11-17 13:05:07,206 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-17 13:05:07,318 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=108
+2026-11-17 13:05:07,376 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-17 13:05:07,518 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=138
+2026-11-17 13:05:07,584 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-17 13:05:07,647 INFO ffcore.access access method=POST path=/api/v1/projects/ff6bad5c-b4b0-429b-9367-c96337fa8ed8/api-keys status=201 ms=60
+------------------------------ Captured log setup ------------------------------
+ERROR    ffcore.readiness:readiness.py:63 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=116
+ERROR    ffcore.readiness:readiness.py:63 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=108
+ERROR    ffcore.readiness:readiness.py:63 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=138
+ERROR    ffcore.readiness:readiness.py:63 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/ff6bad5c-b4b0-429b-9367-c96337fa8ed8/api-keys status=201 ms=60
+----------------------------- Captured stderr call -----------------------------
+2026-11-17 13:05:07,739 INFO ffcore.access access method=POST path=/api/v1/projects/ff6bad5c-b4b0-429b-9367-c96337fa8ed8/mcp-servers status=201 ms=84
+2026-11-17 13:05:07,793 INFO ffcore.access access method=PATCH path=/api/v1/projects/ff6bad5c-b4b0-429b-9367-c96337fa8ed8/mcp-servers/c7231f19-8c4a-4da3-9e24-911bb982d801 status=200 ms=51
+2026-11-17 13:05:07,871 INFO mcp.server.streamable_http_manager StreamableHTTP session manager started
+2026-11-17 13:05:07,979 INFO ffcore.mcp_publish mcp_server_call server=ss-8a891d1e operation=searchDashboards status=ok code=None latency_ms=71
+2026-11-17 13:05:07,980 INFO mcp.server.streamable_http Terminating session: None
+2026-11-17 13:05:07,980 INFO mcp.server.streamable_http_manager StreamableHTTP session manager shutting down
+2026-11-17 13:05:07,981 INFO ffcore.access access method=POST path=/mcp/ss-8a891d1e/ status=200 ms=179
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/ff6bad5c-b4b0-429b-9367-c96337fa8ed8/mcp-servers status=201 ms=84
+INFO     ffcore.access:logging.py:263 access method=PATCH path=/api/v1/projects/ff6bad5c-b4b0-429b-9367-c96337fa8ed8/mcp-servers/c7231f19-8c4a-4da3-9e24-911bb982d801 status=200 ms=51
+INFO     mcp.server.streamable_http_manager:streamable_http_manager.py:162 StreamableHTTP session manager started
+INFO     ffcore.mcp_publish:mcp_publish.py:485 mcp_server_call server=ss-8a891d1e operation=searchDashboards status=ok code=None latency_ms=71
+INFO     mcp.server.streamable_http:streamable_http.py:855 Terminating session: None
+INFO     mcp.server.streamable_http_manager:streamable_http_manager.py:166 StreamableHTTP session manager shutting down
+INFO     ffcore.access:logging.py:263 access method=POST path=/mcp/ss-8a891d1e/ status=200 ms=179
+________ test_05b_r2_p1_stored_escape_is_refused_before_any_request[1] _________
+
+world = {'project': '5b3b202b-215c-4197-b311-37e2d377b0f4', 'admin_id': '2eb98f83-4304-41bd-81a1-1a22d5944914', 'admin': <star...lient.TestClient object at 0x7f86edcb1e80>, 'analyst': <starlette.testclient.TestClient object at 0x7f8778244ef0>, ...}
+upstream = Upstream(url='http://127.0.0.1:38453', hits=[Hit(method='GET', path='/api/v1/dashboard/', query='', body=None, headers...-alive', 'user-agent': 'python-httpx2/2.16.0', 'authorization': 'Bearer dummy-not-secret-superset-token-0123456789'})])
+key = 'ffk_b68a3b5b_Rx-jSUyBDPy7gHXfCKF-kVplFQRdrAGoMgPM4fo0jpM'
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_f37986a4baed) at 0x7f86edcb1340>
+case = 1
+
+    @pytest.mark.parametrize("case", [0, 1, 2])
+    def test_05b_r2_p1_stored_escape_is_refused_before_any_request(world, upstream, key, pg, case):
+        path = _p1_paths(upstream)[case]
+        base = "http://127.0.0.1" if case < 2 else f"{upstream.url}/api"
+        server = publish(world, base, exposed=["searchDashboards"], access="token")
+        # An operation the upload check would refuse, written straight into the catalog.
+        ops = server["operations"]
+        for op in ops:
+            op.pop("exposed")
+            if op["name"] == "searchDashboards":
+                op["path"] = path
+        pg.execute(
+            "UPDATE mcp_servers SET operations = %s WHERE id = %s", (json.dumps(ops), server["id"])
+        )
+        before = len(upstream.hits)
+        response = rpc(
+            world["anonymous"],
+            server["key"],
+            "tools/call",
+            {"name": "searchDashboards", "arguments": {}},
+            headers=bearer(key),
+        )
+        result = call_result(response)
+        expected = "upstream_origin_mismatch" if case < 2 else "openapi_path_invalid"
+>       assert result["isError"] is True and expected in result["content"][0]["text"]
+E       AssertionError: assert (True is True and 'upstream_origin_mismatch' in 'error: egress_request_failed')
+
+tests/integration/test_05b_r2_origin.py:90: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+2026-11-17 13:05:11,544 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-17 13:05:11,663 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=115
+2026-11-17 13:05:11,721 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-17 13:05:11,838 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=114
+2026-11-17 13:05:11,895 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-17 13:05:12,009 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=108
+2026-11-17 13:05:12,066 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-17 13:05:12,123 INFO ffcore.access access method=POST path=/api/v1/projects/5b3b202b-215c-4197-b311-37e2d377b0f4/api-keys status=201 ms=52
+------------------------------ Captured log setup ------------------------------
+ERROR    ffcore.readiness:readiness.py:63 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=115
+ERROR    ffcore.readiness:readiness.py:63 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=114
+ERROR    ffcore.readiness:readiness.py:63 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=108
+ERROR    ffcore.readiness:readiness.py:63 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/5b3b202b-215c-4197-b311-37e2d377b0f4/api-keys status=201 ms=52
+----------------------------- Captured stderr call -----------------------------
+2026-11-17 13:05:12,485 INFO ffcore.access access method=POST path=/api/v1/projects/5b3b202b-215c-4197-b311-37e2d377b0f4/mcp-servers status=201 ms=354
+2026-11-17 13:05:12,542 INFO ffcore.access access method=PATCH path=/api/v1/projects/5b3b202b-215c-4197-b311-37e2d377b0f4/mcp-servers/9f2bdfae-3b87-4a4e-a9f9-3b4158e4e2ec status=200 ms=53
+2026-11-17 13:05:12,598 INFO mcp.server.streamable_http_manager StreamableHTTP session manager started
+2026-11-17 13:05:12,678 INFO ffcore.mcp_publish mcp_server_call server=ss-a390f1ff operation=searchDashboards status=error code=egress_request_failed latency_ms=48
+2026-11-17 13:05:12,680 INFO mcp.server.streamable_http Terminating session: None
+2026-11-17 13:05:12,680 INFO mcp.server.streamable_http_manager StreamableHTTP session manager shutting down
+2026-11-17 13:05:12,681 INFO ffcore.access access method=POST path=/mcp/ss-a390f1ff/ status=200 ms=129
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/5b3b202b-215c-4197-b311-37e2d377b0f4/mcp-servers status=201 ms=354
+INFO     ffcore.access:logging.py:263 access method=PATCH path=/api/v1/projects/5b3b202b-215c-4197-b311-37e2d377b0f4/mcp-servers/9f2bdfae-3b87-4a4e-a9f9-3b4158e4e2ec status=200 ms=53
+INFO     mcp.server.streamable_http_manager:streamable_http_manager.py:162 StreamableHTTP session manager started
+INFO     ffcore.mcp_publish:mcp_publish.py:485 mcp_server_call server=ss-a390f1ff operation=searchDashboards status=error code=egress_request_failed latency_ms=48
+INFO     mcp.server.streamable_http:streamable_http.py:855 Terminating session: None
+INFO     mcp.server.streamable_http_manager:streamable_http_manager.py:166 StreamableHTTP session manager shutting down
+INFO     ffcore.access:logging.py:263 access method=POST path=/mcp/ss-a390f1ff/ status=200 ms=129
+________ test_05b_r2_p1_stored_escape_is_refused_before_any_request[2] _________
+
+world = {'project': '6f2d1bc8-8875-4f66-839a-73d8e93697da', 'admin_id': '1cac0633-06d5-4489-bbc8-1fc010bf0855', 'admin': <star...lient.TestClient object at 0x7f86edbe61e0>, 'analyst': <starlette.testclient.TestClient object at 0x7f871717bfe0>, ...}
+upstream = Upstream(url='http://127.0.0.1:38453', hits=[Hit(method='GET', path='/api/v1/dashboard/', query='', body=None, headers...-alive', 'user-agent': 'python-httpx2/2.16.0', 'authorization': 'Bearer dummy-not-secret-superset-token-0123456789'})])
+key = 'ffk_6565ee8e_lLawXYcxF7i8bOi8s6GVGUV85_4qU5z8kg_ixu-7qtY'
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_f37986a4baed) at 0x7f86edbe53a0>
+case = 2
+
+    @pytest.mark.parametrize("case", [0, 1, 2])
+    def test_05b_r2_p1_stored_escape_is_refused_before_any_request(world, upstream, key, pg, case):
+        path = _p1_paths(upstream)[case]
+        base = "http://127.0.0.1" if case < 2 else f"{upstream.url}/api"
+        server = publish(world, base, exposed=["searchDashboards"], access="token")
+        # An operation the upload check would refuse, written straight into the catalog.
+        ops = server["operations"]
+        for op in ops:
+            op.pop("exposed")
+            if op["name"] == "searchDashboards":
+                op["path"] = path
+        pg.execute(
+            "UPDATE mcp_servers SET operations = %s WHERE id = %s", (json.dumps(ops), server["id"])
+        )
+        before = len(upstream.hits)
+        response = rpc(
+            world["anonymous"],
+            server["key"],
+            "tools/call",
+            {"name": "searchDashboards", "arguments": {}},
+            headers=bearer(key),
+        )
+        result = call_result(response)
+        expected = "upstream_origin_mismatch" if case < 2 else "openapi_path_invalid"
+>       assert result["isError"] is True and expected in result["content"][0]["text"]
+E       AssertionError: assert (True is True and 'openapi_path_invalid' in 'error: upstream_http_404')
+
+tests/integration/test_05b_r2_origin.py:90: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+2026-11-17 13:05:14,949 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-17 13:05:15,068 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=116
+2026-11-17 13:05:15,126 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-17 13:05:15,239 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=110
+2026-11-17 13:05:15,298 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-17 13:05:15,408 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=105
+2026-11-17 13:05:15,464 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-17 13:05:15,523 INFO ffcore.access access method=POST path=/api/v1/projects/6f2d1bc8-8875-4f66-839a-73d8e93697da/api-keys status=201 ms=55
+------------------------------ Captured log setup ------------------------------
+ERROR    ffcore.readiness:readiness.py:63 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=116
+ERROR    ffcore.readiness:readiness.py:63 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=110
+ERROR    ffcore.readiness:readiness.py:63 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=105
+ERROR    ffcore.readiness:readiness.py:63 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/6f2d1bc8-8875-4f66-839a-73d8e93697da/api-keys status=201 ms=55
+----------------------------- Captured stderr call -----------------------------
+2026-11-17 13:05:15,609 INFO ffcore.access access method=POST path=/api/v1/projects/6f2d1bc8-8875-4f66-839a-73d8e93697da/mcp-servers status=201 ms=77
+2026-11-17 13:05:15,668 INFO ffcore.access access method=PATCH path=/api/v1/projects/6f2d1bc8-8875-4f66-839a-73d8e93697da/mcp-servers/38632e63-c19f-4052-a3ce-6705ae09d8f2 status=200 ms=55
+2026-11-17 13:05:15,724 INFO mcp.server.streamable_http_manager StreamableHTTP session manager started
+2026-11-17 13:05:15,806 INFO ffcore.mcp_publish mcp_server_call server=ss-b9a39956 operation=searchDashboards status=error code=upstream_http_404 latency_ms=54
+2026-11-17 13:05:15,808 INFO mcp.server.streamable_http Terminating session: None
+2026-11-17 13:05:15,808 INFO mcp.server.streamable_http_manager StreamableHTTP session manager shutting down
+2026-11-17 13:05:15,809 INFO ffcore.access access method=POST path=/mcp/ss-b9a39956/ status=200 ms=133
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/6f2d1bc8-8875-4f66-839a-73d8e93697da/mcp-servers status=201 ms=77
+INFO     ffcore.access:logging.py:263 access method=PATCH path=/api/v1/projects/6f2d1bc8-8875-4f66-839a-73d8e93697da/mcp-servers/38632e63-c19f-4052-a3ce-6705ae09d8f2 status=200 ms=55
+INFO     mcp.server.streamable_http_manager:streamable_http_manager.py:162 StreamableHTTP session manager started
+INFO     ffcore.mcp_publish:mcp_publish.py:485 mcp_server_call server=ss-b9a39956 operation=searchDashboards status=error code=upstream_http_404 latency_ms=54
+INFO     mcp.server.streamable_http:streamable_http.py:855 Terminating session: None
+INFO     mcp.server.streamable_http_manager:streamable_http_manager.py:166 StreamableHTTP session manager shutting down
+INFO     ffcore.access:logging.py:263 access method=POST path=/mcp/ss-b9a39956/ status=200 ms=133
+__________ test_05b_r2_p2_call_time_egress_refusal_is_a_coded_result ___________
+
+world = {'project': '08c950fa-3801-440c-9b3b-7c72dcaa7c94', 'admin_id': 'e24af86f-b014-4cb9-8bd4-3869e51b4d69', 'admin': <star...lient.TestClient object at 0x7f86f167be90>, 'analyst': <starlette.testclient.TestClient object at 0x7f86edc6c290>, ...}
+upstream = Upstream(url='http://127.0.0.1:38453', hits=[Hit(method='GET', path='/api/v1/dashboard/', query='', body=None, headers...-alive', 'user-agent': 'python-httpx2/2.16.0', 'authorization': 'Bearer dummy-not-secret-superset-token-0123456789'})])
+key = 'ffk_218ae6ca_v7IfsZrrWqNFld7Qtx5sa3L3iNNd8m9Z_b6cIMd4DD8'
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_f37986a4baed) at 0x7f87c43aef60>
+app = <fastapi.applications.FastAPI object at 0x7f87d0177680>
+settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+
+    def test_05b_r2_p2_call_time_egress_refusal_is_a_coded_result(
+        world, upstream, key, pg, app, settings
+    ):
+        from ffcore.core.config import get_settings
+    
+        server = publish(world, upstream.url, exposed=["searchDashboards"], access="token")
+        # The egress policy narrows after registration: loopback is no longer internal.
+        narrowed = settings.model_copy(
+            update={
+                "allowed_internal_hosts": [
+                    h for h in settings.allowed_internal_hosts if h != "127.0.0.0/8"
+                ]
+            }
+        )
+        app.dependency_overrides[get_settings] = lambda: narrowed
+        before = len(upstream.hits)
+        response = rpc(
+            world["anonymous"],
+            server["key"],
+            "tools/call",
+            {"name": "searchDashboards", "arguments": {}},
+            headers=bearer(key),
+        )
+>       assert "error" not in response.json()
+E       AssertionError: assert 'error' not in {'jsonrpc': '2.0', 'id': 1, 'error': {'code': 0, 'message': 'Refused by the outbound policy (egress_not_allowlisted).'}}
+E        +  where {'jsonrpc': '2.0', 'id': 1, 'error': {'code': 0, 'message': 'Refused by the outbound policy (egress_not_allowlisted).'}} = json()
+E        +    where json = <Response [200 OK]>.json
+
+tests/integration/test_05b_r2_origin.py:131: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+2026-11-17 13:05:32,439 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-17 13:05:32,573 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=130
+2026-11-17 13:05:32,637 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-17 13:05:32,778 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=140
+2026-11-17 13:05:32,972 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-17 13:05:33,127 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=152
+2026-11-17 13:05:33,186 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-17 13:05:33,284 INFO ffcore.access access method=POST path=/api/v1/projects/08c950fa-3801-440c-9b3b-7c72dcaa7c94/api-keys status=201 ms=90
+------------------------------ Captured log setup ------------------------------
+ERROR    ffcore.readiness:readiness.py:63 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=130
+ERROR    ffcore.readiness:readiness.py:63 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=140
+ERROR    ffcore.readiness:readiness.py:63 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=152
+ERROR    ffcore.readiness:readiness.py:63 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/08c950fa-3801-440c-9b3b-7c72dcaa7c94/api-keys status=201 ms=90
+----------------------------- Captured stderr call -----------------------------
+2026-11-17 13:05:33,400 INFO ffcore.access access method=POST path=/api/v1/projects/08c950fa-3801-440c-9b3b-7c72dcaa7c94/mcp-servers status=201 ms=105
+2026-11-17 13:05:33,469 INFO ffcore.access access method=PATCH path=/api/v1/projects/08c950fa-3801-440c-9b3b-7c72dcaa7c94/mcp-servers/83075a41-a031-4918-8b9a-81ca12c4b6de status=200 ms=66
+2026-11-17 13:05:33,527 INFO mcp.server.streamable_http_manager StreamableHTTP session manager started
+2026-11-17 13:05:33,598 INFO ffcore.mcp_publish mcp_server_call server=ss-2a2d78bb operation=searchDashboards status=error code=internal_error latency_ms=34
+2026-11-17 13:05:33,599 ERROR mcp.shared.jsonrpc_dispatcher handler for 'tools/call' raised
+Traceback (most recent call last):
+  File "/opt/venv/lib/python3.12/site-packages/mcp/shared/jsonrpc_dispatcher.py", line 740, in _handle_request
+    result = await on_request(dctx, req.method, req.params)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/mcp/server/runner.py", line 230, in _on_request
+    result = _dump_result(await call(ctx))
+                          ^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/mcp/server/_otel.py", line 44, in __call__
+    result = await call_next(ctx)
+             ^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/mcp/server/runner.py", line 217, in _inner
+    result = await entry.handler(ctx, typed_params)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/work/backend/ffcore/services/mcp_publish.py", line 511, in call_tool
+    outcome = await invoke(snapshot, caller, params.name, params.arguments or {}, settings)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/work/backend/ffcore/services/mcp_publish.py", line 395, in invoke
+    outcome = await _guarded(snapshot, caller, op, arguments, settings)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/work/backend/ffcore/services/mcp_publish.py", line 423, in _guarded
+    text, upstream_error = await _openapi_call(snapshot, op, arguments, settings), False
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/work/backend/ffcore/services/mcp_publish.py", line 340, in _openapi_call
+    check_upstream_url(url, settings)  # the base URL passed at registration; checked again
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/work/backend/ffcore/services/mcp_publish.py", line 128, in check_upstream_url
+    raise _refused(400, exc.code, f"Refused by the outbound policy ({exc.code}).") from None
+ffcore.core.errors.ApiError: Refused by the outbound policy (egress_not_allowlisted).
+2026-11-17 13:05:33,609 INFO mcp.server.streamable_http Terminating session: None
+2026-11-17 13:05:33,609 INFO mcp.server.streamable_http_manager StreamableHTTP session manager shutting down
+2026-11-17 13:05:33,610 INFO ffcore.access access method=POST path=/mcp/ss-2a2d78bb/ status=200 ms=137
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/08c950fa-3801-440c-9b3b-7c72dcaa7c94/mcp-servers status=201 ms=105
+INFO     ffcore.access:logging.py:263 access method=PATCH path=/api/v1/projects/08c950fa-3801-440c-9b3b-7c72dcaa7c94/mcp-servers/83075a41-a031-4918-8b9a-81ca12c4b6de status=200 ms=66
+INFO     mcp.server.streamable_http_manager:streamable_http_manager.py:162 StreamableHTTP session manager started
+INFO     ffcore.mcp_publish:mcp_publish.py:485 mcp_server_call server=ss-2a2d78bb operation=searchDashboards status=error code=internal_error latency_ms=34
+ERROR    mcp.shared.jsonrpc_dispatcher:jsonrpc_dispatcher.py:774 handler for 'tools/call' raised
+Traceback (most recent call last):
+  File "/opt/venv/lib/python3.12/site-packages/mcp/shared/jsonrpc_dispatcher.py", line 740, in _handle_request
+    result = await on_request(dctx, req.method, req.params)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/mcp/server/runner.py", line 230, in _on_request
+    result = _dump_result(await call(ctx))
+                          ^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/mcp/server/_otel.py", line 44, in __call__
+    result = await call_next(ctx)
+             ^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/mcp/server/runner.py", line 217, in _inner
+    result = await entry.handler(ctx, typed_params)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/work/backend/ffcore/services/mcp_publish.py", line 511, in call_tool
+    outcome = await invoke(snapshot, caller, params.name, params.arguments or {}, settings)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/work/backend/ffcore/services/mcp_publish.py", line 395, in invoke
+    outcome = await _guarded(snapshot, caller, op, arguments, settings)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/work/backend/ffcore/services/mcp_publish.py", line 423, in _guarded
+    text, upstream_error = await _openapi_call(snapshot, op, arguments, settings), False
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/work/backend/ffcore/services/mcp_publish.py", line 340, in _openapi_call
+    check_upstream_url(url, settings)  # the base URL passed at registration; checked again
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/work/backend/ffcore/services/mcp_publish.py", line 128, in check_upstream_url
+    raise _refused(400, exc.code, f"Refused by the outbound policy ({exc.code}).") from None
+ffcore.core.errors.ApiError: Refused by the outbound policy (egress_not_allowlisted).
+INFO     mcp.server.streamable_http:streamable_http.py:855 Terminating session: None
+INFO     mcp.server.streamable_http_manager:streamable_http_manager.py:166 StreamableHTTP session manager shutting down
+INFO     ffcore.access:logging.py:263 access method=POST path=/mcp/ss-2a2d78bb/ status=200 ms=137
+__________________ test_05b_r2_dot_dot_path_value_is_refused ___________________
+
+world = {'project': '50ab9eb2-a6c7-427d-8d83-11269e2f92c1', 'admin_id': '9df7b8ed-562d-4532-b5c2-2daf54f46b04', 'admin': <star...lient.TestClient object at 0x7f86efd3cfb0>, 'analyst': <starlette.testclient.TestClient object at 0x7f86edbe7b00>, ...}
+upstream = Upstream(url='http://127.0.0.1:38453', hits=[Hit(method='GET', path='/api/v1/dashboard/', query='', body=None, headers...-alive', 'user-agent': 'python-httpx2/2.16.0', 'authorization': 'Bearer dummy-not-secret-superset-token-0123456789'})])
+key = 'ffk_9ecc7b16_DE9QxWcOyFqHOmyiZYm4M1o4146XMNHhs7LHYLci4MI'
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_f37986a4baed) at 0x7f86edbb3c80>
+
+    def test_05b_r2_dot_dot_path_value_is_refused(world, upstream, key, pg):
+        server = publish(world, upstream.url, exposed=["getChartData"], access="token")
+        before = len(upstream.hits)
+        result = call_result(
+            rpc(
+                world["anonymous"],
+                server["key"],
+                "tools/call",
+                {"name": "getChartData", "arguments": {"pk": ".."}},
+                headers=bearer(key),
+            )
+        )
+>       assert result["isError"] is True and "invalid_arguments" in result["content"][0]["text"]
+E       AssertionError: assert (True is True and 'invalid_arguments' in 'error: upstream_http_404')
+
+tests/integration/test_05b_r2_origin.py:150: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+2026-11-17 13:05:41,420 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-17 13:05:41,534 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=111
+2026-11-17 13:05:41,589 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-17 13:05:41,706 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=114
+2026-11-17 13:05:41,785 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-17 13:05:41,917 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=128
+2026-11-17 13:05:41,973 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-17 13:05:42,034 INFO ffcore.access access method=POST path=/api/v1/projects/50ab9eb2-a6c7-427d-8d83-11269e2f92c1/api-keys status=201 ms=57
+------------------------------ Captured log setup ------------------------------
+ERROR    ffcore.readiness:readiness.py:63 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=111
+ERROR    ffcore.readiness:readiness.py:63 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=114
+ERROR    ffcore.readiness:readiness.py:63 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=128
+ERROR    ffcore.readiness:readiness.py:63 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/50ab9eb2-a6c7-427d-8d83-11269e2f92c1/api-keys status=201 ms=57
+----------------------------- Captured stderr call -----------------------------
+2026-11-17 13:05:42,122 INFO ffcore.access access method=POST path=/api/v1/projects/50ab9eb2-a6c7-427d-8d83-11269e2f92c1/mcp-servers status=201 ms=80
+2026-11-17 13:05:42,176 INFO ffcore.access access method=PATCH path=/api/v1/projects/50ab9eb2-a6c7-427d-8d83-11269e2f92c1/mcp-servers/975915a8-c9d0-4cee-8740-5258c1ab65bf status=200 ms=50
+2026-11-17 13:05:42,218 INFO mcp.server.streamable_http_manager StreamableHTTP session manager started
+2026-11-17 13:05:42,295 INFO ffcore.mcp_publish mcp_server_call server=ss-d420e23d operation=getChartData status=error code=upstream_http_404 latency_ms=48
+2026-11-17 13:05:42,296 INFO mcp.server.streamable_http Terminating session: None
+2026-11-17 13:05:42,296 INFO mcp.server.streamable_http_manager StreamableHTTP session manager shutting down
+2026-11-17 13:05:42,297 INFO ffcore.access access method=POST path=/mcp/ss-d420e23d/ status=200 ms=119
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/50ab9eb2-a6c7-427d-8d83-11269e2f92c1/mcp-servers status=201 ms=80
+INFO     ffcore.access:logging.py:263 access method=PATCH path=/api/v1/projects/50ab9eb2-a6c7-427d-8d83-11269e2f92c1/mcp-servers/975915a8-c9d0-4cee-8740-5258c1ab65bf status=200 ms=50
+INFO     mcp.server.streamable_http_manager:streamable_http_manager.py:162 StreamableHTTP session manager started
+INFO     ffcore.mcp_publish:mcp_publish.py:485 mcp_server_call server=ss-d420e23d operation=getChartData status=error code=upstream_http_404 latency_ms=48
+INFO     mcp.server.streamable_http:streamable_http.py:855 Terminating session: None
+INFO     mcp.server.streamable_http_manager:streamable_http_manager.py:166 StreamableHTTP session manager shutting down
+INFO     ffcore.access:logging.py:263 access method=POST path=/mcp/ss-d420e23d/ status=200 ms=119
+=========================== short test summary info ============================
+FAILED tests/unit/test_05b_openapi_ops.py::test_05b_r2_invalid_path_key_is_not_exposable[:59359/api/v1/dashboard/]
+FAILED tests/unit/test_05b_openapi_ops.py::test_05b_r2_invalid_path_key_is_not_exposable[0:59359/api/v1/dashboard/]
+FAILED tests/unit/test_05b_openapi_ops.py::test_05b_r2_invalid_path_key_is_not_exposable[v1/dashboard/]
+FAILED tests/unit/test_05b_openapi_ops.py::test_05b_r2_invalid_path_key_is_not_exposable[//evil.example/x]
+FAILED tests/unit/test_05b_openapi_ops.py::test_05b_r2_invalid_path_key_is_not_exposable[/a/../b]
+FAILED tests/unit/test_05b_openapi_ops.py::test_05b_r2_invalid_path_key_is_not_exposable[/a/./b]
+FAILED tests/unit/test_05b_openapi_ops.py::test_05b_r2_invalid_path_key_is_not_exposable[/a//b]
+FAILED tests/unit/test_05b_openapi_ops.py::test_05b_r2_invalid_path_key_is_not_exposable[/a?x=1]
+FAILED tests/unit/test_05b_openapi_ops.py::test_05b_r2_invalid_path_key_is_not_exposable[/a#f]
+FAILED tests/unit/test_05b_openapi_ops.py::test_05b_r2_upload_refuses_a_document_with_an_invalid_path[:59359/api/v1/dashboard/]
+FAILED tests/unit/test_05b_openapi_ops.py::test_05b_r2_upload_refuses_a_document_with_an_invalid_path[0:59359/api/v1/dashboard/]
+FAILED tests/unit/test_05b_openapi_ops.py::test_05b_r2_upload_refuses_a_document_with_an_invalid_path[v1/dashboard/]
+FAILED tests/unit/test_05b_openapi_ops.py::test_05b_r2_upload_refuses_a_document_with_an_invalid_path[//evil.example/x]
+FAILED tests/unit/test_05b_openapi_ops.py::test_05b_r2_upload_refuses_a_document_with_an_invalid_path[/a/../b]
+FAILED tests/unit/test_05b_openapi_ops.py::test_05b_r2_upload_refuses_a_document_with_an_invalid_path[/a/./b]
+FAILED tests/unit/test_05b_openapi_ops.py::test_05b_r2_upload_refuses_a_document_with_an_invalid_path[/a//b]
+FAILED tests/unit/test_05b_openapi_ops.py::test_05b_r2_upload_refuses_a_document_with_an_invalid_path[/a?x=1]
+FAILED tests/unit/test_05b_openapi_ops.py::test_05b_r2_upload_refuses_a_document_with_an_invalid_path[/a#f]
+FAILED tests/unit/test_05b_openapi_ops.py::test_05b_r2_upload_catalog_accepts_superset
+FAILED tests/unit/test_05b_openapi_ops.py::test_05b_r2_dot_path_values_are_refused[.]
+FAILED tests/unit/test_05b_openapi_ops.py::test_05b_r2_dot_path_values_are_refused[..]
+FAILED tests/integration/test_05b_r2_origin.py::test_05b_r2_p1_paths_refused_at_upload
+FAILED tests/integration/test_05b_r2_origin.py::test_05b_r2_p1_stored_escape_is_refused_before_any_request[0]
+FAILED tests/integration/test_05b_r2_origin.py::test_05b_r2_p1_stored_escape_is_refused_before_any_request[1]
+FAILED tests/integration/test_05b_r2_origin.py::test_05b_r2_p1_stored_escape_is_refused_before_any_request[2]
+FAILED tests/integration/test_05b_r2_origin.py::test_05b_r2_p2_call_time_egress_refusal_is_a_coded_result
+FAILED tests/integration/test_05b_r2_origin.py::test_05b_r2_dot_dot_path_value_is_refused
+=================== 27 failed, 17 passed in 61.01s (0:01:01) ===================

@@ -2,10 +2,10 @@
 
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
-- Oturum kimliği: ffcore-inceleyici-05b (önceki: ffcore-inceleyici-sse, RETIRED)
-- Aktif paket: 05b (r1 DEGISIKLIK R-05B-0004; r2 bekleniyor)
+- Oturum kimliği: ffcore-inceleyici-10c2 (önceki: ffcore-inceleyici-05b, r2 için askıda)
+- Aktif paket: 10c-2 (REVIEW-ISTEK K-10C2-0005, r1); 05b r1 DEGISIKLIK, r2 bekleniyor
 - Durum: ACTIVE
-- Son okunan: koordinator K-05B-0007
+- Son okunan: koordinator K-10C2-0005
 
 ## Mesajlar
 - Arşiv: MERGED/kapalı paketlerin mesajları `state/kanal/arsiv/inceleyici-<paket>.md` dosyalarında (16 Kasım 2026 taşıması: 335 mesaj); ID ile atıf orada bulunur.
@@ -86,3 +86,11 @@ Rapor `state/reviews/05b-r1.md`. MAJOR sınıfı: `upstream-origin-kacagi` (yeni
 - `servers[]` yok sayılıyor; seçilmemiş ya da yayınlanamaz operation çağrılamıyor.
 - S5'te 05a testleri PR listesiyle birebir.
 **Kapı:** lint 0, test 1851×2, test-int 995/13/0, tek head. Probe 13/13 geçti.
+
+### R-10C2-0001 · 2026-11-17 16:02 · → koordinator · ACK
+Paket: 10c-2 · Cevap: K-10C2-0005, K-05B-0009
+REVIEW-ISTEK alındı; lease ffcore-inceleyici-10c2. 05b r2 delta turu geldiğinde geçici olarak oraya dönülecek. SHA 5c27543 için tam tur. `ffcore-rv10c2` yığını e2e profiliyle açılacak (`--pull never`, `--no-build`); önce YIGIN-AC yazılacak. Rapor `state/reviews/10c-2-r1.md`; sonuç bu kanalda.
+
+### R-10C2-0002 · 2026-11-17 16:06 · → koordinator · YIGIN-AC
+Paket: 10c-2 · Cevap: K-10C2-0005 · Yigin: ffcore-rv10c2
+Kaynak, SHA 5c27543'ün `git archive` kopyası (scratchpad `rv10c2_src`); e2e ekran görüntüleri ve `.next` worktree'ye yazılmasın diye. Yığın: `docker compose -p ffcore-rv10c2 --env-file .env.test --profile test up -d --wait --no-build --pull never`, `FFCORE_VERSION=0.0.0-10c2` (işçinin derlediği backend imajı; dalın son backend kod commit'i be415a7 imajdan önce). Portlar `BACKEND_PORT=18520`, `FRONTEND_PORT=13520`. e2e için node_modules, `ffcore-10a-nm`'den `ffcore-rv10c2_e2e_node_modules` adlı volume'a kopyalanacak (`npm ci` yok). Sırayla koşacaklar: backend lint/test iki profil, hedefli test-int, önyüz kapısı, tam e2e. Açık yığın yalnız bu. Bitince `down -v`, volume adıyla silinip YIGIN-KAPA.

@@ -1,0 +1,24 @@
+266 files left unchanged
+All checks passed!
+============================= test session starts ==============================
+platform linux -- Python 3.12.10, pytest-9.2.0, pluggy-1.7.0
+rootdir: /work/backend
+configfile: pyproject.toml
+plugins: Faker-40.43.0, anyio-4.15.1, langsmith-0.14.8
+collected 44 items / 1 error
+
+==================================== ERRORS ====================================
+___________ ERROR collecting tests/unit/test_05b_platform_targets.py ___________
+ImportError while importing test module '/work/backend/tests/unit/test_05b_platform_targets.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/local/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/unit/test_05b_platform_targets.py:16: in <module>
+    from ffcore.services.mcp_publish import check_upstream_url, upstream_url
+E   ImportError: cannot import name 'upstream_url' from 'ffcore.services.mcp_publish' (/work/backend/ffcore/services/mcp_publish.py)
+=========================== short test summary info ============================
+ERROR tests/unit/test_05b_platform_targets.py
+!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+=============================== 1 error in 2.39s ===============================

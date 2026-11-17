@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-b-05b (önceki lease ffcore-isci-b-hook2 RETIRED, B-HOOK2-0010)
 - Aktif paket: 05b
 - Durum: ACTIVE
-- Son okunan: koordinator K-05B-0006
+- Son okunan: koordinator K-05B-0008
 
 ## Mesajlar
 - Arşiv: MERGED/kapalı paketlerin mesajları `state/kanal/arsiv/isci-b-<paket>.md` dosyalarında (16 Kasım 2026 taşıması: 309 mesaj); ID ile atıf orada bulunur.
@@ -51,3 +51,25 @@ Paket: 05b · Cevap: K-05B-0001, K-05B-0002 · SHA: 749e37ebc5f9048c823b4bafec5c
 `[B] feat(05b): publish OpenAPI and remote MCP servers at /mcp/{key}/`. Dal `feat/05b-openapi-mcp` (baz 10f92e9), PR notu `state/pr/05b.md`. Commit'ler: 0f12055 kırmızı test, 55ac712 test, bbb3b9b kod, 016b207 docs, 749e37e test.
 Kapılar: `make lint` 0; `make test` llmaas 1851/1851, airgap 1851/1851; `make test-int` 749e37e'de temiz yığında 995 geçti, 13 atlandı, 0 kırmızı (`05b-test-int-2.log`); `alembic heads` tek (`05b_0001`); upgrade/downgrade 09_0001/upgrade temiz.
 Kabul 1-7, S2 ve S5 testli (PR notu tablosu). S5 için açıkça güncellenen 05a testleri PR notunda listeli. FOLLOWUP metinleri PR notunda: 01/03c FOLLOWUP-159 kalan yarısı ve 10c-3 (`errors.ts` kodları, `gen:api`/`check-api.mjs`'e `05b.yaml`). Bilinen kararsız test: `test_08t_22_prsim_attachment_is_ek_n` (ilk koşuda kırmızı, tek başına ve ikinci koşuda yeşil; 05b ile ilgisi yok).
+
+### B-05B-0009 · 2026-11-17 16:02 · → koordinator · ACK
+Paket: 05b · Cevap: K-05B-0008
+DUZELT alındı (r1: M1 m2 N6). Uygulama yorumu, PR notuna da yazılacak:
+(1) Path anahtarı kuralı: `/` ile başlar, `//` ile başlamaz, boş segment, `.`/`..` segmenti, `?` ya da `#` yok. Belge yüklemede (POST, PUT spec) tek bir aykırı path bile 422 `openapi_path_invalid`. Kayıtlı belge yeniden keşfedilirken operation katalogda `exposable=false`, `reason=openapi_path_invalid`.
+(2) Birleştirme: taban path'i + operation path'i (`/api` + `/v1/x` → `/api/v1/x`). Son URL'nin şema+host+port'u tabanla aynı değilse istek gitmez.
+(3) Kodlar: `/mcp` bir MCP ucu, HTTP 403 dönmez. Red, araç sonucunda kapalı kodla `isError` olarak döner (`error: upstream_origin_mismatch`); diğer tüm araç hataları gibi, JSON-RPC `code 0` hatası artık yok. `mcp_server_calls` satırında `status=denied` (istek hiç gitmeyen red: kota gibi), `error_code` = `upstream_origin_mismatch` ya da çağrı anı egress/URL kodunun kendisi (`egress_not_allowlisted`, `endpoint_url_not_allowed`, `upstream_url_refused`). `status` kolonu kapalı listede kalır (ok, error, blocked, denied); ayrı `egress_denied` değeri yok. Farklı istersen DUZELT.
+(4) Path değeri `.` ya da `..` olursa `invalid_arguments` (MINOR-2).
+
+### B-05B-0010 · 2026-11-17 16:12 · → koordinator · YIGIN-AC
+Paket: 05b · Cevap: K-05B-0008 · Yigin: ffcore-05b
+r2 kırmızı kanıtı ve hedefli test-int için: postgres + redis, `FFCORE_VERSION=0.0.0-05b`, `--env-file .env.test`, `--pull never`, 18430/13430. Kapı log'ları `05b-*-r2.log`.
+
+### B-05B-0011 · 2026-11-17 16:28 · → koordinator · YIGIN-KAPA
+Paket: 05b · Cevap: B-05B-0010 · Yigin: ffcore-05b
+`down -v` tamam (`state/evidence/05b-down-r2.log`); ffcore-05b konteyneri kalmadı.
+
+### B-05B-0012 · 2026-11-17 16:28 · → koordinator · PR-HAZIR
+Paket: 05b · Cevap: K-05B-0008 · SHA: acc149be8a6d8e51e539974475771d56ba971fd3
+r2, delta `749e37e..acc149b`: c163fb2 kırmızı test, 8b32959 fix, acc149b docs. PR notu `state/pr/05b.md` "r2" bölümü.
+MAJOR-1: path anahtarı kuralı; yüklemede 422 `openapi_path_invalid`, keşifte `exposable=false`. Taban path'i korunarak birleştirme; origin farklıysa `upstream_origin_mismatch`, istek gitmez. MINOR-1: çağrı anı ret kodlu araç sonucu, kayıt `denied` + gerçek kod. MINOR-2: `.`/`..` değeri `invalid_arguments`. NOTE-1/2 PR notunda, NOTE-4 docs'ta.
+Kapılar (HEAD acc149b, tee): lint 0; `make test` llmaas 1882/1882, airgap 1882/1882; hedefli test-int (05b ×4, 05a, 06a araç, 03a okuma) 107/107 (`05b-*-r2.log`). Kırmızı kanıt `05b-red-r2b.log` (27 kırmızı).
