@@ -93,7 +93,7 @@ Bu tablo yalnız durumdur (bağlam bütçesi kararı, 16 Kasım 2026). Tam satı
 | M3 / PoC (07, 10b-poc, 13b; PayCore sunucusu, cpu) | |
 | Dalga 1 - 5 (geriye dönük) | Main kapısı logları `state/evidence/gate-*.log`; DOC-19 tutarlılık denetimi dalga başına koşulmadı (DRIFT-187); insan onayı alınmadı. |
 | Dalga 16 Kasım (09-1/09-2, 08-tam-1c-a/1c-b, 10c-1; main 6157752) | Rapor `state/dalga/dalga-16kasim-rapor.md` (16 Kasım 2026, koordinatör); **kullanıcı onayladı 2026-11-16** (koordinatör oturumunda "Onaylıyorum"); geri çevrilen madde yok |
-| Dalga 6 (PoC sonrası, kapanış) | 03c, 06b/06b-2, 09, 08 tam 1a-1c, 10c-1, fix/ajan-hooklari, fix/ajan-hooklari-2, fix/10b-sse-bekci | main 4216718; kapı logları raporda | Rapor `state/dalga/dalga-17kasim-rapor.md` (17 Kasım 2026, koordinatör); **kullanıcı onayı bekleniyor**; onayla dalga 6b (10c-2, 05b, 04b) READY |
+| Dalga 6 (PoC sonrası, kapanış) | 03c, 06b/06b-2, 09, 08 tam 1a-1c, 10c-1, fix/ajan-hooklari, fix/ajan-hooklari-2, fix/10b-sse-bekci | main 4216718; kapı logları raporda | Rapor `state/dalga/dalga-17kasim-rapor.md` (17 Kasım 2026, koordinatör); **kullanıcı onayladı 2026-11-17** (koordinatör oturumunda "Onaylıyorum, DECISION-193 A, oturumları sen aç"); geri çevrilen madde yok; dalga 6b READY (10c-2 isci-c, 05b isci-b, 04b sonraki slot) |
 | PoC sonrası sonraki dalgalar | |
 
 ## Kullanım senaryoları (plan/18-kullanim-senaryolari.md; koordinatör takip)

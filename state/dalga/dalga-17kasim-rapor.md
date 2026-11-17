@@ -155,3 +155,5 @@ Kalan aşım: BLOCKERS açık kayıtlar 46,7 KB (hedef 30). Öneri: brief metni 
 ## Onay
 
 Kullanıcı bu raporu okuyup onaylar ya da bir maddeyi geri çevirir; koordinatör onayı WORK_QUEUE "Kapılar" tablosuna tarih ve rapor yoluyla yazar. Onayla birlikte dalga 6b READY: 10c-2 ve 05b GOREV'leri yazılır.
+
+**Onay: 2026-11-17, kullanıcı ("Onaylıyorum, DECISION-193 A, oturumları sen aç"); geri çevrilen madde yok. Dalga 6b READY; 05b isci-a yerine isci-b şeridinde (isci-a HANDOFF'u henüz gelmedi, oturum çevrimdışı).**
