@@ -11,13 +11,15 @@ test("test_10bp2_13_query_failures: a missing record or a failed list is an erro
   await signIn(page, projectAdmin.email);
   await selectProject(context, baseURL!, alpha.id);
 
-  for (const [path, back] of [
-    [`/tools/${MISSING}`, en.Tools.back],
-    [`/agents/${MISSING}`, en.Agents.back],
-    [`/runs/${MISSING}`, en.Runs.back],
+  // The run page has its own read-error line since 10c-2 (FOLLOWUP-192: it keeps reading a run it
+  // could not read, and stops for one that is gone).
+  for (const [path, back, errorId] of [
+    [`/tools/${MISSING}`, en.Tools.back, "query-error"],
+    [`/agents/${MISSING}`, en.Agents.back, "query-error"],
+    [`/runs/${MISSING}`, en.Runs.back, "run-read-error"],
   ] as const) {
     await page.goto(path);
-    await expect(page.getByTestId("query-error")).toContainText(en.Errors.notFound);
+    await expect(page.getByTestId(errorId)).toContainText(en.Errors.notFound);
     await expect(page.getByRole("link", { name: back })).toBeVisible();
   }
 

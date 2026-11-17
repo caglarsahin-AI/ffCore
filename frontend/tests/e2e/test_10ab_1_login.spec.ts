@@ -6,7 +6,8 @@ import { signIn } from "./support";
 
 test("test_10ab_1_login: real sign-in opens the console with role and access", async ({ page }) => {
   await signIn(page, fixture().superadmin.email);
-  await expect(page).toHaveURL(/\/providers$/);
+  // The first ready menu item is the landing page: Overview since 10c-2 (was Providers).
+  await expect(page).toHaveURL(/\/overview$/);
   await page.getByTestId("user-menu").click();
   await expect(page.getByTestId("user-email")).toContainText(fixture().superadmin.email);
   await expect(page.getByRole("menu")).toContainText(en.Access.roles.admin);
