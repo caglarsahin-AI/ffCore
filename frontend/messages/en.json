@@ -999,7 +999,10 @@
       "correct": "Correct",
       "partial": "Partly correct",
       "wrong": "Wrong"
-    }
+    },
+    "readRetrying": "The run could not be read: {message} (code: {code}). Trying again every few seconds…",
+    "readGone": "The run could not be read: {message} (code: {code}). It no longer exists, so reading stopped.",
+    "readStale": "The run could not be refreshed: {message} (code: {code}). The last answer is shown; trying again…"
   },
   "Approvals": {
     "title": "Approvals",

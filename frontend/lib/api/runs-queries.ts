@@ -59,17 +59,28 @@ export function useRuns(projectId: string, filters: RunFilters) {
 // holds the reading (the test panel reads only while its stream is reconnecting or lost).
 // `pollWhileUnknown`: keep reading every RUNS_POLL_MS while no status has arrived yet (the first
 // GET failed, r1 MAJOR-1 yoklama-hatada-sessiz-durma); it still stops once the run has ended.
+// A run that is gone (404/410) is never read again (FOLLOWUP-192).
 export function useRun(projectId: string, runId: string, options: { enabled?: boolean; pollWhileUnknown?: boolean } = {}) {
   return useQuery({
     queryKey: runKeys.one(projectId, runId),
     enabled: options.enabled ?? true,
     queryFn: () => api<Run>("GET", `${base(projectId)}/runs/${runId}`),
     refetchInterval: (q) => {
+      if (isRunGone(q.state.error)) return false;
       const run = q.state.data;
       if (run) return isLiveRun(run.status) ? RUNS_POLL_MS : false;
       return options.pollWhileUnknown ? RUNS_POLL_MS : false;
     },
   });
+}
+
+export function isRunGone(error: unknown): boolean {
+  return error instanceof ApiError && (error.status === 404 || error.status === 410);
+}
+
+// The contract code of a failed read; a fetch that never reached the server is network_error.
+export function readErrorCode(error: unknown): string {
+  return error instanceof ApiError ? error.code : "network_error";
 }
 
 export function useRunEvents(projectId: string, runId: string, live: boolean) {

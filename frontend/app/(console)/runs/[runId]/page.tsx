@@ -10,14 +10,15 @@ import { FromRunForm } from "@/components/eval/from-run-form";
 
 import { RunFeedback } from "@/components/run-feedback";
 import { RunTimeline } from "@/components/run-timeline";
-import { QueryError, Screen } from "@/components/screen";
+import { Screen } from "@/components/screen";
 import { useSession } from "@/components/session-provider";
 import { StatusPage } from "@/components/status-page";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useReportError } from "@/components/use-report-error";
 import { WriteGate } from "@/components/write-gate";
-import { isLiveRun, useCancelRun, useRun } from "@/lib/api/runs-queries";
+import { errorMessageKey } from "@/lib/api/errors";
+import { isLiveRun, isRunGone, readErrorCode, useCancelRun, useRun } from "@/lib/api/runs-queries";
 import type { Run } from "@/lib/api/runs-queries";
 import { isUnauthenticated } from "@/lib/login-redirect";
 
@@ -28,25 +29,40 @@ export default function RunPage() {
   return <RunDetail key={`${projectId}:${runId}`} projectId={projectId} runId={runId} />;
 }
 
+// FOLLOWUP-192: a failed first read keeps reading (pollWhileUnknown) and says why; a run that is
+// gone (404/410) stops; a failed refresh of a live run keeps the last answer and says it is stale.
 function RunDetail({ projectId, runId }: { projectId: string; runId: string }) {
   const t = useTranslations("Runs");
   const tState = useTranslations("State");
-  const query = useRun(projectId, runId);
+  const query = useRun(projectId, runId, { pollWhileUnknown: true });
   if (query.isPending || (query.isError && isUnauthenticated(query.error))) {
     return <p className="text-muted-foreground">{tState("loading")}</p>;
   }
-  if (query.isError) {
+  const failure = query.isError ? <ReadError error={query.error} stale={query.data !== undefined} /> : null;
+  if (query.data === undefined) {
     return (
       <div className="flex flex-col gap-4">
         <BackLink label={t("back")} />
-        <QueryError error={query.error} />
+        {failure}
       </div>
     );
   }
-  return <Loaded projectId={projectId} run={query.data} />;
+  return <Loaded projectId={projectId} run={query.data} failure={failure} />;
 }
 
-function Loaded({ projectId, run }: { projectId: string; run: Run }) {
+function ReadError({ error, stale }: { error: Error; stale: boolean }) {
+  const t = useTranslations("Runs");
+  const tErrors = useTranslations("Errors");
+  const code = readErrorCode(error);
+  const key = isRunGone(error) ? "readGone" : stale ? "readStale" : "readRetrying";
+  return (
+    <p className="text-sm text-destructive" role="alert" data-testid="run-read-error" data-code={code}>
+      {t(key, { message: tErrors(errorMessageKey(code)), code })}
+    </p>
+  );
+}
+
+function Loaded({ projectId, run, failure }: { projectId: string; run: Run; failure: React.ReactNode }) {
   const t = useTranslations("Runs");
   const format = useFormatter();
   const cancel = useCancelRun(projectId);
@@ -66,6 +82,7 @@ function Loaded({ projectId, run }: { projectId: string; run: Run }) {
   return (
     <div className="flex flex-col gap-4">
       <BackLink label={t("back")} />
+      {failure}
       <Screen title={t("runTitle")} description={run.input} action={action}>
         <dl className="grid gap-x-8 gap-y-2 text-sm sm:grid-cols-2 lg:grid-cols-4" data-testid="run-summary">
           <Fact label={t("status")} value={<Badge variant={run.status === "failed" ? "destructive" : "secondary"} data-testid="run-detail-status">{t(`statuses.${run.status}`)}</Badge>} />

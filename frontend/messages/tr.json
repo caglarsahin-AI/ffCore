@@ -999,7 +999,10 @@
       "correct": "Doğru",
       "partial": "Kısmen doğru",
       "wrong": "Yanlış"
-    }
+    },
+    "readRetrying": "Koşu okunamadı: {message} (kod: {code}). Birkaç saniyede bir yeniden deneniyor…",
+    "readGone": "Koşu okunamadı: {message} (kod: {code}). Koşu artık yok, okuma durdu.",
+    "readStale": "Koşu yenilenemedi: {message} (kod: {code}). Son okunan cevap gösteriliyor; yeniden deneniyor…"
   },
   "Approvals": {
     "title": "Onaylar",
