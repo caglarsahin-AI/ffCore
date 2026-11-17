@@ -1,0 +1,32 @@
+time="2026-11-17T15:39:11+03:00" level=warning msg="volume \"ffcore-10c2_e2e_node_modules\" already exists but was not created by Docker Compose. Use `external: true` to use an existing volume"
+ Container ffcore-10c2-postgres-1  Running
+ Container ffcore-10c2-redis-1  Running
+ Container ffcore-10c2-litellm-1  Running
+ Container ffcore-10c2-migrate-1  Created
+ Container ffcore-10c2-backend-1  Running
+ Container ffcore-10c2-postgres-1  Waiting
+ Container ffcore-10c2-postgres-1  Waiting
+ Container ffcore-10c2-postgres-1  Healthy
+ Container ffcore-10c2-postgres-1  Healthy
+ Container ffcore-10c2-migrate-1  Starting
+ Container ffcore-10c2-migrate-1  Started
+ Container ffcore-10c2-migrate-1  Waiting
+ Container ffcore-10c2-postgres-1  Waiting
+ Container ffcore-10c2-redis-1  Waiting
+ Container ffcore-10c2-litellm-1  Waiting
+ Container ffcore-10c2-redis-1  Healthy
+ Container ffcore-10c2-litellm-1  Healthy
+ Container ffcore-10c2-postgres-1  Healthy
+ Container ffcore-10c2-migrate-1  Exited
+
+Running 3 tests using 1 worker
+
+[1/3] [chromium] › tests/e2e/test_10ab_1_login.spec.ts:7:5 › test_10ab_1_login: real sign-in opens the console with role and access
+[2/3] [chromium] › tests/e2e/test_10ab_1_login.spec.ts:17:5 › test_10ab_1_login: wrong password shows invalid credentials and sets no session
+[3/3] [chromium] › tests/e2e/test_10bp2_13_query_failures.spec.ts:9:5 › test_10bp2_13_query_failures: a missing record or a failed list is an error, never an empty screen
+  3 passed (2.2m)
+npm notice
+npm notice New major version of npm available! 11.19.1 -> 12.2.2
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.2
+npm notice To update run: npm install -g npm@12.2.2
+npm notice

@@ -1,0 +1,78 @@
+
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.12 [39m[90m/w/frontend[39m
+
+ [32m✓[39m tests/unit/test_10a_8_messages_keys.test.ts [2m([22m[2m4 tests[22m[2m)[22m[33m 3471[2mms[22m[39m
+     [33m[2m✓[22m[39m rejects literal text in JSX [33m 3349[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10ab_11_same_origin.test.ts [2m([22m[2m4 tests[22m[2m)[22m[33m 1386[2mms[22m[39m
+     [33m[2m✓[22m[39m rewrites /api/v1 to the backend, so the browser only sees the console origin [33m 415[2mms[22m[39m
+     [33m[2m✓[22m[39m keeps absolute backend addresses out of browser code [33m 948[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10c1_6_eval_run_view.test.tsx [2m([22m[2m4 tests[22m[2m)[22m[33m 1055[2mms[22m[39m
+     [33m[2m✓[22m[39m shows failed, incomplete, n/N, not-run reasons and errors as written (nothing invented) [33m 398[2mms[22m[39m
+     [33m[2m✓[22m[39m fails loudly when the summary cannot be read, naming the field [33m 463[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10c2_4_eval_items.test.tsx [2m([22m[2m4 tests[22m[2m)[22m[33m 2552[2mms[22m[39m
+     [33m[2m✓[22m[39m shows every item of the page with its result, scores, note and run link [33m 1051[2mms[22m[39m
+     [33m[2m✓[22m[39m asks the endpoint for the chosen status and starts again from the first page [33m 541[2mms[22m[39m
+     [33m[2m✓[22m[39m pages with the endpoint's offset and stops at the last page [33m 878[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10c2_2_quotas_alerts.test.tsx [2m([22m[2m8 tests[22m[2m)[22m[33m 1716[2mms[22m[39m
+     [33m[2m✓[22m[39m shows each limit as set and the quota's last warning [33m 381[2mms[22m[39m
+     [33m[2m✓[22m[39m sends only the limits that were filled [33m 460[2mms[22m[39m
+     [33m[2m✓[22m[39m does not send a quota without any limit [33m 408[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10ab_12_attr_literals.test.ts [2m([22m[2m6 tests[22m[2m)[22m[33m 12993[2mms[22m[39m
+     [33m[2m✓[22m[39m rejects a literal aria-label [33m 3470[2mms[22m[39m
+     [33m[2m✓[22m[39m finds no literal attribute text in the source tree (SidebarRail included) [33m 9345[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10c2_3_retention.test.tsx [2m([22m[2m4 tests[22m[2m)[22m[33m 1219[2mms[22m[39m
+     [33m[2m✓[22m[39m shows the policies, the dry-run default and past runs [33m 552[2mms[22m[39m
+     [33m[2m✓[22m[39m starts the real deletion only from the confirmation, which says the dry-run setting does not apply [33m 432[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10c1_7_compare_view.test.tsx [2m([22m[2m6 tests[22m[2m)[22m[33m 935[2mms[22m[39m
+     [33m[2m✓[22m[39m warns when the configurations differ and shows each exam's completeness [33m 329[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10ab_10_contract_copy.test.ts [2m([22m[2m2 tests[22m[2m)[22m[33m 1212[2mms[22m[39m
+     [33m[2m✓[22m[39m keeps the frontend copy byte-identical to the backend contract [33m 1192[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10a_6_write_gate.test.tsx [2m([22m[2m2 tests[22m[2m)[22m[33m 528[2mms[22m[39m
+     [33m[2m✓[22m[39m leaves the button active in edit mode [33m 495[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10c2_1_api_keys.test.tsx [2m([22m[2m4 tests[22m[2m)[22m[33m 1319[2mms[22m[39m
+     [33m[2m✓[22m[39m creates a key with the chosen scopes and shows the raw key once [33m 830[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10a_3_no_hardcoded_colors.test.ts [2m([22m[2m7 tests[22m[2m)[22m[33m 16580[2mms[22m[39m
+     [33m[2m✓[22m[39m rejects export const A = () => <div className="bg-white p-2" />; [33m 3894[2mms[22m[39m
+     [33m[2m✓[22m[39m finds no violation in the source tree [33m 12555[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10bp1_13_upload_client.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 166[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10c2_6_read_only.test.tsx [2m([22m[2m4 tests[22m[2m)[22m[33m 402[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10af_18_messages_parse.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 148[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10c1_8_gate_failure.test.tsx [2m([22m[2m4 tests[22m[2m)[22m[33m 306[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10af_17_form_save_gate.test.tsx [2m([22m[2m2 tests[22m[2m)[22m[33m 534[2mms[22m[39m
+     [33m[2m✓[22m[39m disables the model form's Save in a read-only project and enables it in an edit one [33m 457[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10bsse_2_panel_poll.test.tsx [2m([22m[2m5 tests[22m[2m)[22m[33m 618[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10bsse_1_stall.test.ts [2m([22m[2m11 tests[22m[2m)[22m[32m 171[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10c2_5_run_page_poll.test.tsx [2m([22m[2m5 tests[22m[2m)[22m[33m 432[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10ab_5_error_mapping.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 103[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10ab_13_query_states.test.tsx [2m([22m[2m5 tests[22m[2m)[22m[33m 314[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10c1_3_eval_stream.test.ts [2m([22m[2m16 tests[22m[2m)[22m[32m 225[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10bp2_6_sse.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 148[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10ab_7_session.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 127[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10bp1_17_readiness_read.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 97[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10bp1_14_knowledge_status.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 35[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10c1_2_eval_summary.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 41[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10bp2_18_run_view.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 39[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10bp2_14_agent_definition.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 59[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10c1_5_suite_form.test.tsx [2m([22m[2m5 tests[22m[2m)[22m[33m 421[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10bp2_19_run_contract.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 41[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10a_5_role_menu_visibility.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 47[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10bp2_16_error_codes.test.ts [2m([22m[2m1 test[22m[2m)[22m[32m 28[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10ab_14_unauthenticated.test.tsx [2m([22m[2m24 tests[22m[2m)[22m[32m 107[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10ab_6_role_screens.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 23[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10c2_7_governance_contract.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 14[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10af_15_model_form.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 16[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10c1_9_from_run_form.test.tsx [2m([22m[2m3 tests[22m[2m)[22m[32m 100[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10bp1_16_polling.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 15[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10bp2_17_agent_versions.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 16[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10c1_1_eval_contract.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 22[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10ab_4_project_access.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 18[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10af_13_provider_config.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 18[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10c1_4_eval_gate.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 15[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10af_14_error_codes.test.ts [2m([22m[2m1 test[22m[2m)[22m[32m 12[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10bp1_15_messages.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 12[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m47 passed[39m[22m[90m (47)[39m
+[2m      Tests [22m [1m[32m243 passed[39m[22m[90m (243)[39m
+[2m   Start at [22m 11:10:01
+[2m   Duration [22m 31.64s[2m (transform 56.90s, setup 0ms, import 84.62s, tests 49.86s, environment 32.75s)[22m
+

@@ -1,0 +1,160 @@
+..............F......................................................... [ 98%]
+.                                                                        [100%]
+=================================== FAILURES ===================================
+____________ test_10c1_r2_exam_stream_is_not_compressed_or_buffered ____________
+
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_a38e7db1b2fc) at 0x7f35b67718b0>
+member = <function member.<locals>.make at 0x7f35b66309a0>
+project = UUID('83921b9e-e436-47a3-9805-b393c58237a5')
+
+    def test_10c1_r2_exam_stream_is_not_compressed_or_buffered(pg, member, project):
+        # 10c-1 r2 (K-10C1-0008): the console's proxy gzip-buffered the exam stream until it ended.
+        _, eval_id = _suite_and_run(pg, project)
+        with member("analyst", "read").stream(
+            "GET", f"{P.format(project)}/eval-runs/{eval_id}/stream"
+        ) as r:
+            assert r.status_code == 200
+            assert r.headers["content-type"].startswith("text/event-stream")
+            assert r.headers["cache-control"] == "no-cache, no-transform"
+            assert r.headers["x-accel-buffering"] == "no"
+>           text = "".join(r.iter_text())
+                   ^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_09_api.py:253: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/opt/venv/lib/python3.12/site-packages/httpx2/_models.py:912: in iter_text
+    for byte_content in self.iter_bytes():
+                        ^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_models.py:893: in iter_bytes
+    for raw_bytes in self.iter_raw():
+                     ^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_models.py:948: in iter_raw
+    for raw_stream_bytes in self.stream:
+                            ^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:143: in __iter__
+    yield from self._stream
+/opt/venv/lib/python3.12/site-packages/starlette/testclient.py:384: in iter_body
+    exit_stack.close()
+/usr/local/lib/python3.12/contextlib.py:618: in close
+    self.__exit__(None, None, None)
+/usr/local/lib/python3.12/contextlib.py:610: in __exit__
+    raise exc_details[1]
+/usr/local/lib/python3.12/contextlib.py:595: in __exit__
+    if cb(*exc_details):
+       ^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/starlette/testclient.py:399: in close_app
+    raise exception
+/opt/venv/lib/python3.12/site-packages/anyio/from_thread.py:265: in _call_func
+    retval = await retval_or_awaitable
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/starlette/testclient.py:366: in run_app
+    await self.app(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/applications.py:1194: in __call__
+    await super().__call__(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/applications.py:96: in __call__
+    await self.middleware_stack(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/middleware/errors.py:186: in __call__
+    raise exc
+/opt/venv/lib/python3.12/site-packages/starlette/middleware/errors.py:164: in __call__
+    await self.app(scope, receive, _send)
+/opt/venv/lib/python3.12/site-packages/fastapi/telemetry/_asgi.py:151: in __call__
+    await self.app(scope, receive, send)
+ffcore/core/logging.py:261: in __call__
+    await self.app(scope, receive, send_status)
+ffcore/api/upload_limit.py:44: in __call__
+    await self.app(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py:63: in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    raise exc
+/opt/venv/lib/python3.12/site-packages/starlette/_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+/opt/venv/lib/python3.12/site-packages/fastapi/middleware/asyncexitstack.py:18: in __call__
+    await self.app(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/routing.py:683: in __call__
+    await self.middleware_stack(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:2811: in app
+    await route.handle(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:1839: in handle
+    await self.original_router.handle(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:2894: in handle
+    await included_router._handle_selected(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:1850: in _handle_selected
+    await route.handle(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:1839: in handle
+    await self.original_router.handle(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:2894: in handle
+    await included_router._handle_selected(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:1865: in _handle_selected
+    await original_route.handle(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:1328: in handle
+    await effective_context.app(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:166: in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    raise exc
+/opt/venv/lib/python3.12/site-packages/starlette/_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:153: in app
+    await response(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/responses.py:278: in __call__
+    async with create_collapsing_task_group() as task_group:
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/contextlib.py:231: in __aexit__
+    await self.gen.athrow(value)
+/opt/venv/lib/python3.12/site-packages/starlette/_utils.py:112: in create_collapsing_task_group
+    raise exc from exc.__cause__ or context
+/opt/venv/lib/python3.12/site-packages/starlette/responses.py:281: in wrap
+    await func()
+/opt/venv/lib/python3.12/site-packages/starlette/responses.py:255: in stream_response
+    async for chunk in self.body_iterator:
+ffcore/api/eval.py:564: in body
+    "passed": (out.summary or {}).get("passed"),
+              ^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = EvalSummary(n=1, scored=1, not_run={}, passed_items=1, pass_rate=1.0, pass_threshold=0.8, passed=True, complete=True, ...oor': 0, 'unanswerable_answered': 0}, styles={}, worst=[], errors={}, warm_cache=True, warmup_ms=None, latency_ms=None)
+item = 'get'
+
+    def __getattr__(self, item: str) -> Any:
+        private_attributes = object.__getattribute__(self, '__private_attributes__')
+        if item in private_attributes:
+            attribute = private_attributes[item]
+            if hasattr(attribute, '__get__'):
+                return attribute.__get__(self, type(self))  # type: ignore
+    
+            try:
+                # Note: self.__pydantic_private__ cannot be None if self.__private_attributes__ has items
+                return self.__pydantic_private__[item]  # type: ignore
+            except KeyError as exc:
+                raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}') from exc
+        else:
+            # `__pydantic_extra__` can fail to be set if the model is not yet fully initialized.
+            # See `BaseModel.__repr_args__` for more details
+            try:
+                pydantic_extra = object.__getattribute__(self, '__pydantic_extra__')
+            except AttributeError:
+                pydantic_extra = None
+    
+            if pydantic_extra and item in pydantic_extra:
+                return pydantic_extra[item]
+            else:
+                if hasattr(self.__class__, item):
+                    return super().__getattribute__(item)  # Raises AttributeError if appropriate
+                else:
+                    # this is the current error
+>                   raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}')
+E                   AttributeError: 'EvalSummary' object has no attribute 'get'
+
+/opt/venv/lib/python3.12/site-packages/pydantic/main.py:1105: AttributeError
+----------------------------- Captured stderr call -----------------------------
+2026-11-17 10:39:17,291 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-17 10:39:17,477 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=182
+2026-11-17 10:39:17,556 INFO ffcore.access access method=GET path=/api/v1/projects/83921b9e-e436-47a3-9805-b393c58237a5/eval-runs/bf157e91-2d85-4653-8a88-aa086debbc61/stream status=200 ms=76
+------------------------------ Captured log call -------------------------------
+ERROR    ffcore.readiness:readiness.py:63 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=182
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/83921b9e-e436-47a3-9805-b393c58237a5/eval-runs/bf157e91-2d85-4653-8a88-aa086debbc61/stream status=200 ms=76
+=========================== short test summary info ============================
+FAILED tests/integration/test_09_api.py::test_10c1_r2_exam_stream_is_not_compressed_or_buffered
+1 failed, 72 passed in 375.72s (0:06:15)

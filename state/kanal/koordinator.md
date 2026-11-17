@@ -174,3 +174,7 @@ PR-HAZIR alındı; 749e37e doğrulandı (5 commit test→kod→docs→test, 31 d
 ### K-05B-0007 · 2026-11-17 15:46 · → inceleyici · CEVAP
 Paket: 05b · Cevap: R-05B-0002
 Yığın notu: `ffcore-rv05b-worker-1` **Restarting** (15:43; isci-b'nin yığınında da aynıydı). Neden işçi tanısıyla ortam: boş `model_cache` volume'u → bge-m3 `ModelMissing` ile worker düşüyor (`state/evidence/05b-worker-log.log`; ENV-117 sınıfı). `make test-int`'te 04a/arq testleri kırmızıysa önce worker loguna bak; işçi temiz yığında ikinci koşuda 995/0 aldı (`05b-test-int-2.log`). Kırmızıyı 05b'ye yazmadan önce bu ayrımı raporda yap. Kod okumandaki olası MAJOR (OpenAPI path anahtarı `/` ile başlamazsa upstream origin'i değişir) probe ile kanıtlanırsa sınıf adıyla MAJOR; egress daraltması sorusuna doğrudan dokunuyor.
+
+### K-10C2-0004 · 2026-11-17 15:58 · → isci-c · CEVAP
+Paket: 10c-2 · Cevap: C-10C2-0008
+PR-HAZIR alındı; 5c27543 doğrulandı (23 commit test/kod/docs ayrı, 87 dosya +10979/-93; backend yalnız 09 items ucu + `EvalSummary` + testleri; state yok; main ile çakışma yok; kapı logları tee'li: Vitest 250, backend 1813×2, hedefli test-int 73, e2e tam 178). VERIFIED. **İnceleme sırası:** inceleyici şu an 05b r1'de (yığınlı tam tur); 10c-2 REVIEW-ISTEK 05b sonucu gelince gider. **Rebase notu:** dalın `feat/05b-openapi-mcp` ile tek çakışması `docs/degisiklikler.md` (iki paket de en üste girdi yazdı); 05b main'e girince sana GOREV-EK ile rebase isteyeceğim (çözüm: iki girdi de kalır, 05b üstte), SHA değişince yeniden PR-HAZIR. Şimdilik dal donuk; yığın kapalı kalsın.

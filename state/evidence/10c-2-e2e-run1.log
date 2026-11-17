@@ -1,0 +1,720 @@
+time="2026-11-17T14:28:37+03:00" level=warning msg="volume \"ffcore-10c2_e2e_node_modules\" already exists but was not created by Docker Compose. Use `external: true` to use an existing volume"
+ Container ffcore-10c2-redis-1  Running
+ Container ffcore-10c2-postgres-1  Running
+ Container ffcore-10c2-migrate-1  Created
+ Container ffcore-10c2-litellm-1  Running
+ Container ffcore-10c2-backend-1  Running
+ Container ffcore-10c2-postgres-1  Waiting
+ Container ffcore-10c2-postgres-1  Waiting
+ Container ffcore-10c2-postgres-1  Healthy
+ Container ffcore-10c2-migrate-1  Starting
+ Container ffcore-10c2-postgres-1  Healthy
+ Container ffcore-10c2-migrate-1  Started
+ Container ffcore-10c2-migrate-1  Waiting
+ Container ffcore-10c2-postgres-1  Waiting
+ Container ffcore-10c2-redis-1  Waiting
+ Container ffcore-10c2-litellm-1  Waiting
+ Container ffcore-10c2-postgres-1  Healthy
+ Container ffcore-10c2-litellm-1  Healthy
+ Container ffcore-10c2-redis-1  Healthy
+ Container ffcore-10c2-migrate-1  Exited
+
+Running 18 tests using 1 worker
+
+[1/18] [chromium] › tests/e2e/test_10c1_1_suite_run_stream.spec.ts:9:5 › test_10c1_1_suite_run_stream: analyst builds a suite, adds an item, runs the exam and reads it
+  1) [chromium] › tests/e2e/test_10c1_1_suite_run_stream.spec.ts:9:5 › test_10c1_1_suite_run_stream: analyst builds a suite, adds an item, runs the exam and reads it 
+
+    Test timeout of 360000ms exceeded.
+
+    Error Context: test-results/test_10c1_1_suite_run_stre-2fada--runs-the-exam-and-reads-it-chromium/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/test_10c1_1_suite_run_stre-2fada--runs-the-exam-and-reads-it-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/test_10c1_1_suite_run_stre-2fada--runs-the-exam-and-reads-it-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[2/18] [chromium] › tests/e2e/test_10c2_1_api_keys.spec.ts:9:5 › test_10c2_1_api_keys: create, show once, revoke
+[WebServer]  ⨯ [Error: Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: undefined.] {
+[WebServer]   digest: '3340412907'
+[WebServer] }
+
+  2) [chromium] › tests/e2e/test_10c2_1_api_keys.spec.ts:9:5 › test_10c2_1_api_keys: create, show once, revoke 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for getByTestId('api-key-add')
+
+
+      13 |   await page.goto("/api-keys");
+      14 |
+    > 15 |   await page.getByTestId("api-key-add").click();
+         |                                         ^
+      16 |   await page.locator("#api-key-name").fill(`e2e-key-${run}`);
+      17 |   await page.getByTestId("api-key-scopes").getByLabel(/agents/i).check();
+      18 |   await page.getByTestId("api-key-save").click();
+        at /work/frontend/tests/e2e/test_10c2_1_api_keys.spec.ts:15:41
+
+    Error Context: test-results/test_10c2_1_api_keys-test--331ae-eys-create-show-once-revoke-chromium/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/test_10c2_1_api_keys-test--331ae-eys-create-show-once-revoke-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/test_10c2_1_api_keys-test--331ae-eys-create-show-once-revoke-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[3/18] [chromium] › tests/e2e/test_10c2_2_quota_alert.spec.ts:12:5 › test_10c2_2_quota_alert: warn quota, real calls, alert, ack, badge
+[WebServer]  ⨯ [Error: Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: undefined.] {
+[WebServer]   digest: '3340412907'
+[WebServer] }
+
+  3) [chromium] › tests/e2e/test_10c2_2_quota_alert.spec.ts:12:5 › test_10c2_2_quota_alert: warn quota, real calls, alert, ack, badge 
+
+    Test timeout of 180000ms exceeded.
+
+    Error: locator.click: Test timeout of 180000ms exceeded.
+    Call log:
+      - waiting for getByTestId('quota-add')
+
+
+      18 |
+      19 |   await page.goto("/quotas");
+    > 20 |   await page.getByTestId("quota-add").click();
+         |                                       ^
+      21 |   await page.locator("#quota-label").fill(label);
+      22 |   await page.locator("#quota-action").selectOption("warn");
+      23 |   await page.locator("#quota-rpd").fill("1");
+        at /work/frontend/tests/e2e/test_10c2_2_quota_alert.spec.ts:20:39
+
+    Error Context: test-results/test_10c2_2_quota_alert-te-e598d--real-calls-alert-ack-badge-chromium/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/test_10c2_2_quota_alert-te-e598d--real-calls-alert-ack-badge-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/test_10c2_2_quota_alert-te-e598d--real-calls-alert-ack-badge-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[4/18] [chromium] › tests/e2e/test_10c2_3_retention.spec.ts:9:5 › test_10c2_3_retention: project admin is refused the screen
+[WebServer]  ⨯ [Error: Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: undefined.] {
+[WebServer]   digest: '3340412907'
+[WebServer] }
+
+  4) [chromium] › tests/e2e/test_10c2_3_retention.spec.ts:9:5 › test_10c2_3_retention: project admin is refused the screen 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByTestId('status-forbidden')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByTestId('status-forbidden') with timeout 5000ms
+      - waiting for getByTestId('status-forbidden')
+
+
+      11 |   await selectProject(context, baseURL!, fixture().alpha.id);
+      12 |   await page.goto("/retention");
+    > 13 |   await expect(page.getByTestId("status-forbidden")).toBeVisible();
+         |                                                      ^
+      14 | });
+      15 |
+      16 | test("test_10c2_3_retention: dry run, cancelled run, confirmed run", async ({ page, context, baseURL }) => {
+        at /work/frontend/tests/e2e/test_10c2_3_retention.spec.ts:13:54
+
+    Error Context: test-results/test_10c2_3_retention-test-f7482-admin-is-refused-the-screen-chromium/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/test_10c2_3_retention-test-f7482-admin-is-refused-the-screen-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/test_10c2_3_retention-test-f7482-admin-is-refused-the-screen-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[5/18] [chromium] › tests/e2e/test_10c2_3_retention.spec.ts:16:5 › test_10c2_3_retention: dry run, cancelled run, confirmed run
+
+[WebServer]  ⨯ [Error: Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: undefined.] {
+[WebServer]   digest: '3340412907'
+[WebServer] }
+  5) [chromium] › tests/e2e/test_10c2_3_retention.spec.ts:16:5 › test_10c2_3_retention: dry run, cancelled run, confirmed run 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByTestId('retention-policies').locator('tbody tr').first()
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByTestId('retention-policies').locator('tbody tr').first() with timeout 5000ms
+      - waiting for getByTestId('retention-policies').locator('tbody tr').first()
+
+
+      18 |   await selectProject(context, baseURL!, fixture().alpha.id);
+      19 |   await page.goto("/retention");
+    > 20 |   await expect(page.getByTestId("retention-policies").locator("tbody tr").first()).toBeVisible();
+         |                                                                                    ^
+      21 |
+      22 |   await page.getByTestId("retention-dry-run").click();
+      23 |   await expect(page.getByTestId("retention-result")).toHaveAttribute("data-dry-run", "true");
+        at /work/frontend/tests/e2e/test_10c2_3_retention.spec.ts:20:84
+
+    Error Context: test-results/test_10c2_3_retention-test-1174c-cancelled-run-confirmed-run-chromium/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/test_10c2_3_retention-test-1174c-cancelled-run-confirmed-run-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/test_10c2_3_retention-test-1174c-cancelled-run-confirmed-run-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[6/18] [chromium] › tests/e2e/test_10c2_6_read_only_screens.spec.ts:28:5 › test_10c2_6_read_only: every 10a-10c screen has its change controls disabled in read mode
+[WebServer]  ⨯ [Error: Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: undefined.] {
+[WebServer]   digest: '3340412907'
+[WebServer] }
+
+  6) [chromium] › tests/e2e/test_10c2_6_read_only_screens.spec.ts:28:5 › test_10c2_6_read_only: every 10a-10c screen has its change controls disabled in read mode 
+
+    Error: /overview
+
+    expect(locator).toBeVisible() failed
+
+    Locator: getByTestId('read-only-badge')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - /overview getByTestId('read-only-badge') with timeout 5000ms
+      - waiting for getByTestId('read-only-badge')
+
+
+      33 |     await open(page, path);
+      34 |     await expect(page.getByTestId("status-forbidden"), path).toHaveCount(0);
+    > 35 |     await expect(page.getByTestId("read-only-badge"), path).toBeVisible();
+         |                                                             ^
+      36 |     // Every control behind WriteGate is disabled; no write control escapes the gate.
+      37 |     await expect(page.locator("[data-read-only] button:enabled"), path).toHaveCount(0);
+      38 |     await expect(page.locator("button[data-write]:enabled"), path).toHaveCount(0);
+        at /work/frontend/tests/e2e/test_10c2_6_read_only_screens.spec.ts:35:61
+
+    Error Context: test-results/test_10c2_6_read_only_scre-2d06d-trols-disabled-in-read-mode-chromium/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/test_10c2_6_read_only_scre-2d06d-trols-disabled-in-read-mode-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/test_10c2_6_read_only_scre-2d06d-trols-disabled-in-read-mode-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[7/18] [chromium] › tests/e2e/test_10c2_6_read_only_screens.spec.ts:51:9 › test_10c2_6_screens: overview light edit and read, axe
+
+[WebServer]  ⨯ [Error: Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: undefined.] {
+[WebServer]   digest: '3340412907'
+[WebServer] }
+  7) [chromium] › tests/e2e/test_10c2_6_read_only_screens.spec.ts:51:9 › test_10c2_6_screens: overview light edit and read, axe 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByTestId('overview-range')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByTestId('overview-range') with timeout 5000ms
+      - waiting for getByTestId('overview-range')
+
+
+      56 |         await selectProject(context, baseURL!, fixture().alpha.id);
+      57 |         await open(page, screen.path);
+    > 58 |         await expect(page.getByTestId(screen.ready)).toBeVisible();
+         |                                                      ^
+      59 |         await expect(page.getByTestId("read-only-badge")).toHaveCount(mode === "read" ? 1 : 0);
+      60 |         await page.screenshot({ path: `../docs/images/10c2-${screen.name}-${mode}-${theme}.png`, fullPage: true });
+      61 |         if (mode === "edit") {
+        at /work/frontend/tests/e2e/test_10c2_6_read_only_screens.spec.ts:58:54
+
+    Error Context: test-results/test_10c2_6_read_only_scre-76ca1-iew-light-edit-and-read-axe-chromium/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/test_10c2_6_read_only_scre-76ca1-iew-light-edit-and-read-axe-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/test_10c2_6_read_only_scre-76ca1-iew-light-edit-and-read-axe-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[8/18] [chromium] › tests/e2e/test_10c2_6_read_only_screens.spec.ts:51:9 › test_10c2_6_screens: overview dark edit and read, axe
+[WebServer]  ⨯ [Error: Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: undefined.] {
+[WebServer]   digest: '3340412907'
+[WebServer] }
+
+  8) [chromium] › tests/e2e/test_10c2_6_read_only_screens.spec.ts:51:9 › test_10c2_6_screens: overview dark edit and read, axe 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByTestId('overview-range')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByTestId('overview-range') with timeout 5000ms
+      - waiting for getByTestId('overview-range')
+
+
+      56 |         await selectProject(context, baseURL!, fixture().alpha.id);
+      57 |         await open(page, screen.path);
+    > 58 |         await expect(page.getByTestId(screen.ready)).toBeVisible();
+         |                                                      ^
+      59 |         await expect(page.getByTestId("read-only-badge")).toHaveCount(mode === "read" ? 1 : 0);
+      60 |         await page.screenshot({ path: `../docs/images/10c2-${screen.name}-${mode}-${theme}.png`, fullPage: true });
+      61 |         if (mode === "edit") {
+        at /work/frontend/tests/e2e/test_10c2_6_read_only_screens.spec.ts:58:54
+
+    Error Context: test-results/test_10c2_6_read_only_scre-d7700-view-dark-edit-and-read-axe-chromium/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/test_10c2_6_read_only_scre-d7700-view-dark-edit-and-read-axe-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/test_10c2_6_read_only_scre-d7700-view-dark-edit-and-read-axe-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[9/18] [chromium] › tests/e2e/test_10c2_6_read_only_screens.spec.ts:51:9 › test_10c2_6_screens: usage light edit and read, axe
+[WebServer]  ⨯ [Error: Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: undefined.] {
+[WebServer]   digest: '3340412907'
+[WebServer] }
+
+  9) [chromium] › tests/e2e/test_10c2_6_read_only_screens.spec.ts:51:9 › test_10c2_6_screens: usage light edit and read, axe 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByTestId('usage-totals')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByTestId('usage-totals') with timeout 5000ms
+      - waiting for getByTestId('usage-totals')
+
+
+      56 |         await selectProject(context, baseURL!, fixture().alpha.id);
+      57 |         await open(page, screen.path);
+    > 58 |         await expect(page.getByTestId(screen.ready)).toBeVisible();
+         |                                                      ^
+      59 |         await expect(page.getByTestId("read-only-badge")).toHaveCount(mode === "read" ? 1 : 0);
+      60 |         await page.screenshot({ path: `../docs/images/10c2-${screen.name}-${mode}-${theme}.png`, fullPage: true });
+      61 |         if (mode === "edit") {
+        at /work/frontend/tests/e2e/test_10c2_6_read_only_screens.spec.ts:58:54
+
+    Error Context: test-results/test_10c2_6_read_only_scre-9ed20-age-light-edit-and-read-axe-chromium/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/test_10c2_6_read_only_scre-9ed20-age-light-edit-and-read-axe-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/test_10c2_6_read_only_scre-9ed20-age-light-edit-and-read-axe-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[10/18] [chromium] › tests/e2e/test_10c2_6_read_only_screens.spec.ts:51:9 › test_10c2_6_screens: usage dark edit and read, axe
+[WebServer]  ⨯ [Error: Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: undefined.] {
+[WebServer]   digest: '3340412907'
+[WebServer] }
+
+  10) [chromium] › tests/e2e/test_10c2_6_read_only_screens.spec.ts:51:9 › test_10c2_6_screens: usage dark edit and read, axe 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByTestId('usage-totals')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByTestId('usage-totals') with timeout 5000ms
+      - waiting for getByTestId('usage-totals')
+
+
+      56 |         await selectProject(context, baseURL!, fixture().alpha.id);
+      57 |         await open(page, screen.path);
+    > 58 |         await expect(page.getByTestId(screen.ready)).toBeVisible();
+         |                                                      ^
+      59 |         await expect(page.getByTestId("read-only-badge")).toHaveCount(mode === "read" ? 1 : 0);
+      60 |         await page.screenshot({ path: `../docs/images/10c2-${screen.name}-${mode}-${theme}.png`, fullPage: true });
+      61 |         if (mode === "edit") {
+        at /work/frontend/tests/e2e/test_10c2_6_read_only_screens.spec.ts:58:54
+
+    Error Context: test-results/test_10c2_6_read_only_scre-56803-sage-dark-edit-and-read-axe-chromium/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/test_10c2_6_read_only_scre-56803-sage-dark-edit-and-read-axe-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/test_10c2_6_read_only_scre-56803-sage-dark-edit-and-read-axe-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[11/18] [chromium] › tests/e2e/test_10c2_6_read_only_screens.spec.ts:51:9 › test_10c2_6_screens: api-keys light edit and read, axe
+[WebServer]  ⨯ [Error: Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: undefined.] {
+[WebServer]   digest: '3340412907'
+[WebServer] }
+
+  11) [chromium] › tests/e2e/test_10c2_6_read_only_screens.spec.ts:51:9 › test_10c2_6_screens: api-keys light edit and read, axe 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByTestId('api-key-add')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByTestId('api-key-add') with timeout 5000ms
+      - waiting for getByTestId('api-key-add')
+
+
+      56 |         await selectProject(context, baseURL!, fixture().alpha.id);
+      57 |         await open(page, screen.path);
+    > 58 |         await expect(page.getByTestId(screen.ready)).toBeVisible();
+         |                                                      ^
+      59 |         await expect(page.getByTestId("read-only-badge")).toHaveCount(mode === "read" ? 1 : 0);
+      60 |         await page.screenshot({ path: `../docs/images/10c2-${screen.name}-${mode}-${theme}.png`, fullPage: true });
+      61 |         if (mode === "edit") {
+        at /work/frontend/tests/e2e/test_10c2_6_read_only_screens.spec.ts:58:54
+
+    Error Context: test-results/test_10c2_6_read_only_scre-54598-eys-light-edit-and-read-axe-chromium/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/test_10c2_6_read_only_scre-54598-eys-light-edit-and-read-axe-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/test_10c2_6_read_only_scre-54598-eys-light-edit-and-read-axe-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[12/18] [chromium] › tests/e2e/test_10c2_6_read_only_screens.spec.ts:51:9 › test_10c2_6_screens: api-keys dark edit and read, axe
+[WebServer]  ⨯ [Error: Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: undefined.] {
+[WebServer]   digest: '3340412907'
+[WebServer] }
+
+  12) [chromium] › tests/e2e/test_10c2_6_read_only_screens.spec.ts:51:9 › test_10c2_6_screens: api-keys dark edit and read, axe 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByTestId('api-key-add')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByTestId('api-key-add') with timeout 5000ms
+      - waiting for getByTestId('api-key-add')
+
+
+      56 |         await selectProject(context, baseURL!, fixture().alpha.id);
+      57 |         await open(page, screen.path);
+    > 58 |         await expect(page.getByTestId(screen.ready)).toBeVisible();
+         |                                                      ^
+      59 |         await expect(page.getByTestId("read-only-badge")).toHaveCount(mode === "read" ? 1 : 0);
+      60 |         await page.screenshot({ path: `../docs/images/10c2-${screen.name}-${mode}-${theme}.png`, fullPage: true });
+      61 |         if (mode === "edit") {
+        at /work/frontend/tests/e2e/test_10c2_6_read_only_screens.spec.ts:58:54
+
+    Error Context: test-results/test_10c2_6_read_only_scre-6505e-keys-dark-edit-and-read-axe-chromium/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/test_10c2_6_read_only_scre-6505e-keys-dark-edit-and-read-axe-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/test_10c2_6_read_only_scre-6505e-keys-dark-edit-and-read-axe-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[13/18] [chromium] › tests/e2e/test_10c2_6_read_only_screens.spec.ts:51:9 › test_10c2_6_screens: quotas light edit and read, axe
+
+[WebServer]  ⨯ [Error: Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: undefined.] {
+[WebServer]   digest: '3340412907'
+[WebServer] }
+  13) [chromium] › tests/e2e/test_10c2_6_read_only_screens.spec.ts:51:9 › test_10c2_6_screens: quotas light edit and read, axe 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByTestId('quota-add')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByTestId('quota-add') with timeout 5000ms
+      - waiting for getByTestId('quota-add')
+
+
+      56 |         await selectProject(context, baseURL!, fixture().alpha.id);
+      57 |         await open(page, screen.path);
+    > 58 |         await expect(page.getByTestId(screen.ready)).toBeVisible();
+         |                                                      ^
+      59 |         await expect(page.getByTestId("read-only-badge")).toHaveCount(mode === "read" ? 1 : 0);
+      60 |         await page.screenshot({ path: `../docs/images/10c2-${screen.name}-${mode}-${theme}.png`, fullPage: true });
+      61 |         if (mode === "edit") {
+        at /work/frontend/tests/e2e/test_10c2_6_read_only_screens.spec.ts:58:54
+
+    Error Context: test-results/test_10c2_6_read_only_scre-5a25d-tas-light-edit-and-read-axe-chromium/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/test_10c2_6_read_only_scre-5a25d-tas-light-edit-and-read-axe-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/test_10c2_6_read_only_scre-5a25d-tas-light-edit-and-read-axe-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[14/18] [chromium] › tests/e2e/test_10c2_6_read_only_screens.spec.ts:51:9 › test_10c2_6_screens: quotas dark edit and read, axe
+[WebServer]  ⨯ [Error: Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: undefined.] {
+[WebServer]   digest: '3340412907'
+[WebServer] }
+
+  14) [chromium] › tests/e2e/test_10c2_6_read_only_screens.spec.ts:51:9 › test_10c2_6_screens: quotas dark edit and read, axe 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByTestId('quota-add')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByTestId('quota-add') with timeout 5000ms
+      - waiting for getByTestId('quota-add')
+
+
+      56 |         await selectProject(context, baseURL!, fixture().alpha.id);
+      57 |         await open(page, screen.path);
+    > 58 |         await expect(page.getByTestId(screen.ready)).toBeVisible();
+         |                                                      ^
+      59 |         await expect(page.getByTestId("read-only-badge")).toHaveCount(mode === "read" ? 1 : 0);
+      60 |         await page.screenshot({ path: `../docs/images/10c2-${screen.name}-${mode}-${theme}.png`, fullPage: true });
+      61 |         if (mode === "edit") {
+        at /work/frontend/tests/e2e/test_10c2_6_read_only_screens.spec.ts:58:54
+
+    Error Context: test-results/test_10c2_6_read_only_scre-36e23-otas-dark-edit-and-read-axe-chromium/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/test_10c2_6_read_only_scre-36e23-otas-dark-edit-and-read-axe-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/test_10c2_6_read_only_scre-36e23-otas-dark-edit-and-read-axe-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[15/18] [chromium] › tests/e2e/test_10c2_6_read_only_screens.spec.ts:51:9 › test_10c2_6_screens: alerts light edit and read, axe
+
+[WebServer]  ⨯ [Error: Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: undefined.] {
+[WebServer]   digest: '3340412907'
+[WebServer] }
+  15) [chromium] › tests/e2e/test_10c2_6_read_only_screens.spec.ts:51:9 › test_10c2_6_screens: alerts light edit and read, axe 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByTestId('alerts-tab-open')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByTestId('alerts-tab-open') with timeout 5000ms
+      - waiting for getByTestId('alerts-tab-open')
+
+
+      56 |         await selectProject(context, baseURL!, fixture().alpha.id);
+      57 |         await open(page, screen.path);
+    > 58 |         await expect(page.getByTestId(screen.ready)).toBeVisible();
+         |                                                      ^
+      59 |         await expect(page.getByTestId("read-only-badge")).toHaveCount(mode === "read" ? 1 : 0);
+      60 |         await page.screenshot({ path: `../docs/images/10c2-${screen.name}-${mode}-${theme}.png`, fullPage: true });
+      61 |         if (mode === "edit") {
+        at /work/frontend/tests/e2e/test_10c2_6_read_only_screens.spec.ts:58:54
+
+    Error Context: test-results/test_10c2_6_read_only_scre-b78f2-rts-light-edit-and-read-axe-chromium/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/test_10c2_6_read_only_scre-b78f2-rts-light-edit-and-read-axe-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/test_10c2_6_read_only_scre-b78f2-rts-light-edit-and-read-axe-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[16/18] [chromium] › tests/e2e/test_10c2_6_read_only_screens.spec.ts:51:9 › test_10c2_6_screens: alerts dark edit and read, axe
+
+[WebServer]  ⨯ [Error: Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: undefined.] {
+[WebServer]   digest: '3340412907'
+[WebServer] }
+  16) [chromium] › tests/e2e/test_10c2_6_read_only_screens.spec.ts:51:9 › test_10c2_6_screens: alerts dark edit and read, axe 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByTestId('alerts-tab-open')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByTestId('alerts-tab-open') with timeout 5000ms
+      - waiting for getByTestId('alerts-tab-open')
+
+
+      56 |         await selectProject(context, baseURL!, fixture().alpha.id);
+      57 |         await open(page, screen.path);
+    > 58 |         await expect(page.getByTestId(screen.ready)).toBeVisible();
+         |                                                      ^
+      59 |         await expect(page.getByTestId("read-only-badge")).toHaveCount(mode === "read" ? 1 : 0);
+      60 |         await page.screenshot({ path: `../docs/images/10c2-${screen.name}-${mode}-${theme}.png`, fullPage: true });
+      61 |         if (mode === "edit") {
+        at /work/frontend/tests/e2e/test_10c2_6_read_only_screens.spec.ts:58:54
+
+    Error Context: test-results/test_10c2_6_read_only_scre-dafb7-erts-dark-edit-and-read-axe-chromium/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/test_10c2_6_read_only_scre-dafb7-erts-dark-edit-and-read-axe-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/test_10c2_6_read_only_scre-dafb7-erts-dark-edit-and-read-axe-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[17/18] [chromium] › tests/e2e/test_10c2_6_read_only_screens.spec.ts:51:9 › test_10c2_6_screens: retention light edit and read, axe
+
+[WebServer]  ⨯ [Error: Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: undefined.] {
+[WebServer]   digest: '3340412907'
+[WebServer] }
+  17) [chromium] › tests/e2e/test_10c2_6_read_only_screens.spec.ts:51:9 › test_10c2_6_screens: retention light edit and read, axe 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByTestId('retention-policies')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByTestId('retention-policies') with timeout 5000ms
+      - waiting for getByTestId('retention-policies')
+
+
+      56 |         await selectProject(context, baseURL!, fixture().alpha.id);
+      57 |         await open(page, screen.path);
+    > 58 |         await expect(page.getByTestId(screen.ready)).toBeVisible();
+         |                                                      ^
+      59 |         await expect(page.getByTestId("read-only-badge")).toHaveCount(mode === "read" ? 1 : 0);
+      60 |         await page.screenshot({ path: `../docs/images/10c2-${screen.name}-${mode}-${theme}.png`, fullPage: true });
+      61 |         if (mode === "edit") {
+        at /work/frontend/tests/e2e/test_10c2_6_read_only_screens.spec.ts:58:54
+
+    Error Context: test-results/test_10c2_6_read_only_scre-64c4c-ion-light-edit-and-read-axe-chromium/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/test_10c2_6_read_only_scre-64c4c-ion-light-edit-and-read-axe-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/test_10c2_6_read_only_scre-64c4c-ion-light-edit-and-read-axe-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[18/18] [chromium] › tests/e2e/test_10c2_6_read_only_screens.spec.ts:51:9 › test_10c2_6_screens: retention dark edit and read, axe
+[WebServer]  ⨯ [Error: Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: undefined.] {
+[WebServer]   digest: '3340412907'
+[WebServer] }
+
+  18) [chromium] › tests/e2e/test_10c2_6_read_only_screens.spec.ts:51:9 › test_10c2_6_screens: retention dark edit and read, axe 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByTestId('retention-policies')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByTestId('retention-policies') with timeout 5000ms
+      - waiting for getByTestId('retention-policies')
+
+
+      56 |         await selectProject(context, baseURL!, fixture().alpha.id);
+      57 |         await open(page, screen.path);
+    > 58 |         await expect(page.getByTestId(screen.ready)).toBeVisible();
+         |                                                      ^
+      59 |         await expect(page.getByTestId("read-only-badge")).toHaveCount(mode === "read" ? 1 : 0);
+      60 |         await page.screenshot({ path: `../docs/images/10c2-${screen.name}-${mode}-${theme}.png`, fullPage: true });
+      61 |         if (mode === "edit") {
+        at /work/frontend/tests/e2e/test_10c2_6_read_only_screens.spec.ts:58:54
+
+    Error Context: test-results/test_10c2_6_read_only_scre-575ee-tion-dark-edit-and-read-axe-chromium/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/test_10c2_6_read_only_scre-575ee-tion-dark-edit-and-read-axe-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/test_10c2_6_read_only_scre-575ee-tion-dark-edit-and-read-axe-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+  Slow test file: [chromium] › tests/e2e/test_10c1_1_suite_run_stream.spec.ts (6.0m)
+  Consider running tests from slow files in parallel. See: https://playwright.dev/docs/test-parallel
+  18 failed
+    [chromium] › tests/e2e/test_10c1_1_suite_run_stream.spec.ts:9:5 › test_10c1_1_suite_run_stream: analyst builds a suite, adds an item, runs the exam and reads it 
+    [chromium] › tests/e2e/test_10c2_1_api_keys.spec.ts:9:5 › test_10c2_1_api_keys: create, show once, revoke 
+    [chromium] › tests/e2e/test_10c2_2_quota_alert.spec.ts:12:5 › test_10c2_2_quota_alert: warn quota, real calls, alert, ack, badge 
+    [chromium] › tests/e2e/test_10c2_3_retention.spec.ts:9:5 › test_10c2_3_retention: project admin is refused the screen 
+    [chromium] › tests/e2e/test_10c2_3_retention.spec.ts:16:5 › test_10c2_3_retention: dry run, cancelled run, confirmed run 
+    [chromium] › tests/e2e/test_10c2_6_read_only_screens.spec.ts:28:5 › test_10c2_6_read_only: every 10a-10c screen has its change controls disabled in read mode 
+    [chromium] › tests/e2e/test_10c2_6_read_only_screens.spec.ts:51:9 › test_10c2_6_screens: overview light edit and read, axe 
+    [chromium] › tests/e2e/test_10c2_6_read_only_screens.spec.ts:51:9 › test_10c2_6_screens: overview dark edit and read, axe 
+    [chromium] › tests/e2e/test_10c2_6_read_only_screens.spec.ts:51:9 › test_10c2_6_screens: usage light edit and read, axe 
+    [chromium] › tests/e2e/test_10c2_6_read_only_screens.spec.ts:51:9 › test_10c2_6_screens: usage dark edit and read, axe 
+    [chromium] › tests/e2e/test_10c2_6_read_only_screens.spec.ts:51:9 › test_10c2_6_screens: api-keys light edit and read, axe 
+    [chromium] › tests/e2e/test_10c2_6_read_only_screens.spec.ts:51:9 › test_10c2_6_screens: api-keys dark edit and read, axe 
+    [chromium] › tests/e2e/test_10c2_6_read_only_screens.spec.ts:51:9 › test_10c2_6_screens: quotas light edit and read, axe 
+    [chromium] › tests/e2e/test_10c2_6_read_only_screens.spec.ts:51:9 › test_10c2_6_screens: quotas dark edit and read, axe 
+    [chromium] › tests/e2e/test_10c2_6_read_only_screens.spec.ts:51:9 › test_10c2_6_screens: alerts light edit and read, axe 
+    [chromium] › tests/e2e/test_10c2_6_read_only_screens.spec.ts:51:9 › test_10c2_6_screens: alerts dark edit and read, axe 
+    [chromium] › tests/e2e/test_10c2_6_read_only_screens.spec.ts:51:9 › test_10c2_6_screens: retention light edit and read, axe 
+    [chromium] › tests/e2e/test_10c2_6_read_only_screens.spec.ts:51:9 › test_10c2_6_screens: retention dark edit and read, axe 
+npm notice
+npm notice New major version of npm available! 11.19.1 -> 12.2.2
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.2
+npm notice To update run: npm install -g npm@12.2.2
+npm notice

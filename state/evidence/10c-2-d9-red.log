@@ -1,0 +1,583 @@
+
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.12 [39m[90m/w/frontend[39m
+
+ [31m❯[39m tests/unit/test_10c2_5_run_page_poll.test.tsx [2m([22m[2m5 tests[22m[2m | [22m[31m5 failed[39m[2m)[22m[33m 304[2mms[22m[39m
+[31m     [31m×[31m keeps reading after the first GET fails, shows the failure, then the run once the backend answers[39m[32m 94[2mms[22m[39m
+[31m     [31m×[31m shows the contract code of a refused GET and keeps reading[39m[32m 29[2mms[22m[39m
+[31m     [31m×[31m stops reading when the run is gone (404)[39m[32m 24[2mms[22m[39m
+[31m     [31m×[31m stops reading when the run is gone (410)[39m[32m 16[2mms[22m[39m
+[31m     [31m×[31m keeps the last answer of a live run when a refresh fails, and says so[39m[32m 136[2mms[22m[39m
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 5 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m tests/unit/test_10c2_5_run_page_poll.test.tsx[2m > [22mtest_10c2_5_run_page_poll[2m > [22mkeeps reading after the first GET fails, shows the failure, then the run once the backend answers
+[31m[1mTestingLibraryElementError[22m: Unable to find an element by: [data-testid="run-read-error"]
+
+Ignored nodes: comments, script, style
+[36m<body>[31m
+  [36m<div>[31m
+    [36m<div[31m
+      [33mclass[31m=[32m"flex flex-col gap-4"[31m
+    [36m>[31m
+      [36m<a[31m
+        [33mclass[31m=[32m"inline-flex items-center gap-1 text-sm text-primary underline-offset-4 hover:underline"[31m
+        [33mhref[31m=[32m"/runs"[31m
+      [36m>[31m
+        [36m<svg[31m
+          [33maria-hidden[31m=[32m"true"[31m
+          [33mclass[31m=[32m"lucide lucide-arrow-left size-4"[31m
+          [33mfill[31m=[32m"none"[31m
+          [33mheight[31m=[32m"24"[31m
+          [33mstroke[31m=[32m"currentColor"[31m
+          [33mstroke-linecap[31m=[32m"round"[31m
+          [33mstroke-linejoin[31m=[32m"round"[31m
+          [33mstroke-width[31m=[32m"2"[31m
+          [33mviewBox[31m=[32m"0 0 24 24"[31m
+          [33mwidth[31m=[32m"24"[31m
+          [33mxmlns[31m=[32m"http://www.w3.org/2000/svg"[31m
+        [36m>[31m
+          [36m<path[31m
+            [33md[31m=[32m"m12 19-7-7 7-7"[31m
+          [36m/>[31m
+          [36m<path[31m
+            [33md[31m=[32m"M19 12H5"[31m
+          [36m/>[31m
+        [36m</svg>[31m
+        [0mAll runs[0m
+      [36m</a>[31m
+      [36m<section[31m
+        [33mclass[31m=[32m"flex flex-col gap-2 rounded-xl border bg-card p-6"[31m
+        [33mdata-testid[31m=[32m"query-error"[31m
+        [33mrole[31m=[32m"alert"[31m
+      [36m>[31m
+        [36m<p[31m
+          [33mclass[31m=[32m"font-medium text-destructive"[31m
+        [36m>[31m
+          [0mThe request failed.[0m
+        [36m</p>[31m
+        [36m<details[31m
+          [33mclass[31m=[32m"text-muted-foreground"[31m
+        [36m>[31m
+          [36m<summary[31m
+            [33mclass[31m=[32m"cursor-pointer"[31m
+          [36m>[31m
+            [0mDetails[0m
+          [36m</summary>[31m
+          [36m<pre[31m
+            [33mclass[31m=[32m"mt-2 whitespace-pre-wrap"[31m
+          [36m>[31m
+            [0munexpected_response: Failed to fetch[0m
+          [36m</pre>[31m
+        [36m</details>[31m
+      [36m</section>[31m
+    [36m</div>[31m
+  [36m</div>[31m
+[36m</body>[31m[39m
+[90m [2m❯[22m Object.getElementError node_modules/@testing-library/dom/dist/config.js:[2m37:19[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m76:38[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m52:17[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m95:19[22m[39m
+[36m [2m❯[22m tests/unit/test_10c2_5_run_page_poll.test.tsx:[2m95:19[22m[39m
+    [90m 93|[39m     })[33m;[39m
+    [90m 94|[39m     [35mawait[39m [34madvance[39m([34m0[39m)[33m;[39m
+    [90m 95|[39m     expect(screen.getByTestId("run-read-error").textContent).toContain…
+    [90m   |[39m                   [31m^[39m
+    [90m 96|[39m     [35mawait[39m [34madvance[39m([33mRUNS_POLL_MS[39m)[33m;[39m
+    [90m 97|[39m     [35mawait[39m [34madvance[39m([33mRUNS_POLL_MS[39m)[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/5]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/unit/test_10c2_5_run_page_poll.test.tsx[2m > [22mtest_10c2_5_run_page_poll[2m > [22mshows the contract code of a refused GET and keeps reading
+[31m[1mTestingLibraryElementError[22m: Unable to find an element by: [data-testid="run-read-error"]
+
+Ignored nodes: comments, script, style
+[36m<body>[31m
+  [36m<div>[31m
+    [36m<div[31m
+      [33mclass[31m=[32m"flex flex-col gap-4"[31m
+    [36m>[31m
+      [36m<a[31m
+        [33mclass[31m=[32m"inline-flex items-center gap-1 text-sm text-primary underline-offset-4 hover:underline"[31m
+        [33mhref[31m=[32m"/runs"[31m
+      [36m>[31m
+        [36m<svg[31m
+          [33maria-hidden[31m=[32m"true"[31m
+          [33mclass[31m=[32m"lucide lucide-arrow-left size-4"[31m
+          [33mfill[31m=[32m"none"[31m
+          [33mheight[31m=[32m"24"[31m
+          [33mstroke[31m=[32m"currentColor"[31m
+          [33mstroke-linecap[31m=[32m"round"[31m
+          [33mstroke-linejoin[31m=[32m"round"[31m
+          [33mstroke-width[31m=[32m"2"[31m
+          [33mviewBox[31m=[32m"0 0 24 24"[31m
+          [33mwidth[31m=[32m"24"[31m
+          [33mxmlns[31m=[32m"http://www.w3.org/2000/svg"[31m
+        [36m>[31m
+          [36m<path[31m
+            [33md[31m=[32m"m12 19-7-7 7-7"[31m
+          [36m/>[31m
+          [36m<path[31m
+            [33md[31m=[32m"M19 12H5"[31m
+          [36m/>[31m
+        [36m</svg>[31m
+        [0mAll runs[0m
+      [36m</a>[31m
+      [36m<section[31m
+        [33mclass[31m=[32m"flex flex-col gap-2 rounded-xl border bg-card p-6"[31m
+        [33mdata-testid[31m=[32m"query-error"[31m
+        [33mrole[31m=[32m"alert"[31m
+      [36m>[31m
+        [36m<p[31m
+          [33mclass[31m=[32m"font-medium text-destructive"[31m
+        [36m>[31m
+          [0mThe request failed.[0m
+        [36m</p>[31m
+        [36m<details[31m
+          [33mclass[31m=[32m"text-muted-foreground"[31m
+        [36m>[31m
+          [36m<summary[31m
+            [33mclass[31m=[32m"cursor-pointer"[31m
+          [36m>[31m
+            [0mDetails[0m
+          [36m</summary>[31m
+          [36m<pre[31m
+            [33mclass[31m=[32m"mt-2 whitespace-pre-wrap"[31m
+          [36m>[31m
+            [0munavailable: unavailable[0m
+          [36m</pre>[31m
+        [36m</details>[31m
+      [36m</section>[31m
+    [36m</div>[31m
+  [36m</div>[31m
+[36m</body>[31m[39m
+[90m [2m❯[22m Object.getElementError node_modules/@testing-library/dom/dist/config.js:[2m37:19[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m76:38[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m52:17[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m95:19[22m[39m
+[36m [2m❯[22m tests/unit/test_10c2_5_run_page_poll.test.tsx:[2m111:19[22m[39m
+    [90m109|[39m     const gets = start((n) => (n < 3 ? refusal(503, "unavailable") : r…
+    [90m110|[39m     [35mawait[39m [34madvance[39m([34m0[39m)[33m;[39m
+    [90m111|[39m     expect(screen.getByTestId("run-read-error").textContent).toContain…
+    [90m   |[39m                   [31m^[39m
+    [90m112|[39m     [35mawait[39m [34madvance[39m([33mRUNS_POLL_MS[39m)[33m;[39m
+    [90m113|[39m     [35mawait[39m [34madvance[39m([33mRUNS_POLL_MS[39m)[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/5]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/unit/test_10c2_5_run_page_poll.test.tsx[2m > [22mtest_10c2_5_run_page_poll[2m > [22mstops reading when the run is gone (404)
+[41m[1m FAIL [22m[49m tests/unit/test_10c2_5_run_page_poll.test.tsx[2m > [22mtest_10c2_5_run_page_poll[2m > [22mstops reading when the run is gone (410)
+[31m[1mTestingLibraryElementError[22m: Unable to find an element by: [data-testid="run-read-error"]
+
+Ignored nodes: comments, script, style
+[36m<body>[31m
+  [36m<div>[31m
+    [36m<div[31m
+      [33mclass[31m=[32m"flex flex-col gap-4"[31m
+    [36m>[31m
+      [36m<a[31m
+        [33mclass[31m=[32m"inline-flex items-center gap-1 text-sm text-primary underline-offset-4 hover:underline"[31m
+        [33mhref[31m=[32m"/runs"[31m
+      [36m>[31m
+        [36m<svg[31m
+          [33maria-hidden[31m=[32m"true"[31m
+          [33mclass[31m=[32m"lucide lucide-arrow-left size-4"[31m
+          [33mfill[31m=[32m"none"[31m
+          [33mheight[31m=[32m"24"[31m
+          [33mstroke[31m=[32m"currentColor"[31m
+          [33mstroke-linecap[31m=[32m"round"[31m
+          [33mstroke-linejoin[31m=[32m"round"[31m
+          [33mstroke-width[31m=[32m"2"[31m
+          [33mviewBox[31m=[32m"0 0 24 24"[31m
+          [33mwidth[31m=[32m"24"[31m
+          [33mxmlns[31m=[32m"http://www.w3.org/2000/svg"[31m
+        [36m>[31m
+          [36m<path[31m
+            [33md[31m=[32m"m12 19-7-7 7-7"[31m
+          [36m/>[31m
+          [36m<path[31m
+            [33md[31m=[32m"M19 12H5"[31m
+          [36m/>[31m
+        [36m</svg>[31m
+        [0mAll runs[0m
+      [36m</a>[31m
+      [36m<section[31m
+        [33mclass[31m=[32m"flex flex-col gap-2 rounded-xl border bg-card p-6"[31m
+        [33mdata-testid[31m=[32m"query-error"[31m
+        [33mrole[31m=[32m"alert"[31m
+      [36m>[31m
+        [36m<p[31m
+          [33mclass[31m=[32m"font-medium text-destructive"[31m
+        [36m>[31m
+          [0mIt no longer exists. Refresh the page.[0m
+        [36m</p>[31m
+        [36m<details[31m
+          [33mclass[31m=[32m"text-muted-foreground"[31m
+        [36m>[31m
+          [36m<summary[31m
+            [33mclass[31m=[32m"cursor-pointer"[31m
+          [36m>[31m
+            [0mDetails[0m
+          [36m</summary>[31m
+          [36m<pre[31m
+            [33mclass[31m=[32m"mt-2 whitespace-pre-wrap"[31m
+          [36m>[31m
+            [0mrun_not_found: run_not_found[0m
+          [36m</pre>[31m
+        [36m</details>[31m
+      [36m</section>[31m
+    [36m</div>[31m
+  [36m</div>[31m
+[36m</body>[31m[39m
+[90m [2m❯[22m Object.getElementError node_modules/@testing-library/dom/dist/config.js:[2m37:19[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m76:38[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m52:17[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m95:19[22m[39m
+[36m [2m❯[22m tests/unit/test_10c2_5_run_page_poll.test.tsx:[2m125:19[22m[39m
+    [90m123|[39m     [35mconst[39m gets [33m=[39m [34mstart[39m(() [33m=>[39m [34mrefusal[39m(status[33m,[39m [32m"run_not_found"[39m))[33m;[39m
+    [90m124|[39m     [35mawait[39m [34madvance[39m([34m0[39m)[33m;[39m
+    [90m125|[39m     expect(screen.getByTestId("run-read-error").textContent).toContain…
+    [90m   |[39m                   [31m^[39m
+    [90m126|[39m     [35mconst[39m seen [33m=[39m [34mgets[39m()[33m;[39m
+    [90m127|[39m     [35mawait[39m [34madvance[39m([34m5[39m [33m*[39m [33mRUNS_POLL_MS[39m)[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/5]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/unit/test_10c2_5_run_page_poll.test.tsx[2m > [22mtest_10c2_5_run_page_poll[2m > [22mkeeps the last answer of a live run when a refresh fails, and says so
+[31m[1mTestingLibraryElementError[22m[39m: Unable to find an element by: [data-testid="run-read-error"]
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"flex flex-col gap-4"[39m
+    [36m>[39m
+      [36m<a[39m
+        [33mclass[39m=[32m"inline-flex items-center gap-1 text-sm text-primary underline-offset-4 hover:underline"[39m
+        [33mhref[39m=[32m"/runs"[39m
+      [36m>[39m
+        [36m<svg[39m
+          [33maria-hidden[39m=[32m"true"[39m
+          [33mclass[39m=[32m"lucide lucide-arrow-left size-4"[39m
+          [33mfill[39m=[32m"none"[39m
+          [33mheight[39m=[32m"24"[39m
+          [33mstroke[39m=[32m"currentColor"[39m
+          [33mstroke-linecap[39m=[32m"round"[39m
+          [33mstroke-linejoin[39m=[32m"round"[39m
+          [33mstroke-width[39m=[32m"2"[39m
+          [33mviewBox[39m=[32m"0 0 24 24"[39m
+          [33mwidth[39m=[32m"24"[39m
+          [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+        [36m>[39m
+          [36m<path[39m
+            [33md[39m=[32m"m12 19-7-7 7-7"[39m
+          [36m/>[39m
+          [36m<path[39m
+            [33md[39m=[32m"M19 12H5"[39m
+          [36m/>[39m
+        [36m</svg>[39m
+        [0mAll runs[0m
+      [36m</a>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"flex flex-col gap-6"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"flex flex-wrap items-start justify-between gap-4"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex max-w-2xl flex-col gap-1"[39m
+          [36m>[39m
+            [36m<h1[39m
+              [33mclass[39m=[32m"text-2xl font-semibold"[39m
+            [36m>[39m
+              [0mRun[0m
+            [36m</h1>[39m
+            [36m<p[39m
+              [33mclass[39m=[32m"text-muted-foreground"[39m
+            [36m>[39m
+              [0mhello[0m
+            [36m</p>[39m
+          [36m</div>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"group/button inline-flex shrink-0 items-center justify-center rounded-lg border bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 border-border bg-background hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50 h-8 gap-1.5 px-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2"[39m
+            [33mdata-slot[39m=[32m"button"[39m
+            [33mdata-testid[39m=[32m"run-cancel"[39m
+            [33mtabindex[39m=[32m"0"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [0mCancel run[0m
+          [36m</button>[39m
+        [36m</div>[39m
+        [36m<dl[39m
+          [33mclass[39m=[32m"grid gap-x-8 gap-y-2 text-sm sm:grid-cols-2 lg:grid-cols-4"[39m
+          [33mdata-testid[39m=[32m"run-summary"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex flex-col"[39m
+          [36m>[39m
+            [36m<dt[39m
+              [33mclass[39m=[32m"text-muted-foreground"[39m
+            [36m>[39m
+              [0mStatus[0m
+            [36m</dt>[39m
+            [36m<dd>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"group/badge inline-flex h-5 w-fit shrink-0 items-center justify-center gap-1 overflow-hidden rounded-4xl border border-transparent px-2 py-0.5 text-xs font-medium whitespace-nowrap transition-all focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&>svg]:pointer-events-none [&>svg]:size-3! bg-secondary text-secondary-foreground [a]:hover:bg-secondary/80"[39m
+                [33mdata-slot[39m=[32m"badge"[39m
+                [33mdata-testid[39m=[32m"run-detail-status"[39m
+                [33mdata-variant[39m=[32m"secondary"[39m
+              [36m>[39m
+                [0mRunning[0m
+              [36m</span>[39m
+            [36m</dd>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex flex-col"[39m
+          [36m>[39m
+            [36m<dt[39m
+              [33mclass[39m=[32m"text-muted-foreground"[39m
+            [36m>[39m
+              [0mChannel[0m
+            [36m</dt>[39m
+            [36m<dd>[39m
+              [0mTest panel[0m
+            [36m</dd>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex flex-col"[39m
+          [36m>[39m
+            [36m<dt[39m
+              [33mclass[39m=[32m"text-muted-foreground"[39m
+            [36m>[39m
+              [0mOutcome[0m
+            [36m</dt>[39m
+            [36m<dd>[39m
+              [0m—[0m
+            [36m</dd>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex flex-col"[39m
+          [36m>[39m
+            [36m<dt[39m
+              [33mclass[39m=[32m"text-muted-foreground"[39m
+            [36m>[39m
+              [0mError code[0m
+            [36m</dt>[39m
+            [36m<dd>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"font-mono"[39m
+              [36m>[39m
+                [0m—[0m
+              [36m</span>[39m
+            [36m</dd>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex flex-col"[39m
+          [36m>[39m
+            [36m<dt[39m
+              [33mclass[39m=[32m"text-muted-foreground"[39m
+            [36m>[39m
+              [0mStarted[0m
+            [36m</dt>[39m
+            [36m<dd>[39m
+              [0m—[0m
+            [36m</dd>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex flex-col"[39m
+          [36m>[39m
+            [36m<dt[39m
+              [33mclass[39m=[32m"text-muted-foreground"[39m
+            [36m>[39m
+              [0mEnded[0m
+            [36m</dt>[39m
+            [36m<dd>[39m
+              [0m—[0m
+            [36m</dd>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex flex-col"[39m
+          [36m>[39m
+            [36m<dt[39m
+              [33mclass[39m=[32m"text-muted-foreground"[39m
+            [36m>[39m
+              [0mTokens[0m
+            [36m</dt>[39m
+            [36m<dd>[39m
+              [0m0 in, 0 out[0m
+            [36m</dd>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex flex-col"[39m
+          [36m>[39m
+            [36m<dt[39m
+              [33mclass[39m=[32m"text-muted-foreground"[39m
+            [36m>[39m
+              [0mSlowest step[0m
+            [36m</dt>[39m
+            [36m<dd>[39m
+              [0m—[0m
+            [36m</dd>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex flex-col"[39m
+          [36m>[39m
+            [36m<dt[39m
+              [33mclass[39m=[32m"text-muted-foreground"[39m
+            [36m>[39m
+              [0mModel time[0m
+            [36m</dt>[39m
+            [36m<dd>[39m
+              [0m—[0m
+            [36m</dd>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex flex-col"[39m
+          [36m>[39m
+            [36m<dt[39m
+              [33mclass[39m=[32m"text-muted-foreground"[39m
+            [36m>[39m
+              [0mTool time[0m
+            [36m</dt>[39m
+            [36m<dd>[39m
+              [0m—[0m
+            [36m</dd>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex flex-col"[39m
+          [36m>[39m
+            [36m<dt[39m
+              [33mclass[39m=[32m"text-muted-foreground"[39m
+            [36m>[39m
+              [0mSearch time[0m
+            [36m</dt>[39m
+            [36m<dd>[39m
+              [0m—[0m
+            [36m</dd>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex flex-col"[39m
+          [36m>[39m
+            [36m<dt[39m
+              [33mclass[39m=[32m"text-muted-foreground"[39m
+            [36m>[39m
+              [0mQueue wait[0m
+            [36m</dt>[39m
+            [36m<dd>[39m
+              [0m—[0m
+            [36m</dd>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex flex-col"[39m
+          [36m>[39m
+            [36m<dt[39m
+              [33mclass[39m=[32m"text-muted-foreground"[39m
+            [36m>[39m
+              [0mTrace id (Langfuse)[0m
+            [36m</dt>[39m
+            [36m<dd>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"font-mono break-all"[39m
+                [33mdata-testid[39m=[32m"run-trace-id"[39m
+              [36m>[39m
+                [0m—[0m
+              [36m</span>[39m
+            [36m</dd>[39m
+          [36m</div>[39m
+        [36m</dl>[39m
+        [36m<section[39m
+          [33mclass[39m=[32m"flex flex-col gap-2"[39m
+        [36m>[39m
+          [36m<h2[39m
+            [33mclass[39m=[32m"text-lg font-medium"[39m
+          [36m>[39m
+            [0mExpert feedback[0m
+          [36m</h2>[39m
+          [36m<p[39m
+            [33mclass[39m=[32m"text-sm text-muted-foreground"[39m
+          [36m>[39m
+            [0mFeedback can be given once the run has completed.[0m
+          [36m</p>[39m
+        [36m</section>[39m
+        [36m<section[39m
+          [33mclass[39m=[32m"flex flex-col gap-2"[39m
+          [33mdata-testid[39m=[32m"add-to-exam"[39m
+        [36m>[39m
+          [36m<h2[39m
+            [33mclass[39m=[32m"text-lg font-medium"[39m
+          [36m>[39m
+            [0mAdd to exam[0m
+          [36m</h2>[39m
+          [36m<p[39m
+            [33mclass[39m=[32m"text-sm text-muted-foreground"[39m
+          [36m>[39m
+            [0mOnly a completed run can be added to an exam.[0m
+          [36m</p>[39m
+        [36m</section>[39m
+        [36m<section[39m
+          [33mclass[39m=[32m"flex flex-col gap-2"[39m
+        [36m>[39m
+          [36m<h2[39m
+            [33mclass[39m=[32m"text-lg font-medium"[39m
+          [36m>[39m
+            [0mEvents[0m
+          [36m</h2>[39m
+          [36m<section[39m
+            [33mclass[39m=[32m"flex flex-col items-center gap-3 rounded-xl border border-dashed bg-card px-6 py-12 text-center"[39m
+            [33mdata-testid[39m=[32m"empty-state"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-inbox size-8 text-muted-foreground"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"24"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"24"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<polyline[39m
+                [33mpoints[39m=[32m"22 12 16 12 14 15 10 15 8 12 2 12"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+            [36m<h2[39m
+              [33mclass[39m=[32m"text-lg font-medium"[39m
+            [36m>[39m
+              [0mNo events[0m
+            [36m</h2>[39m
+            [36m<p[39m
+              [33mclass[39m=[32m"max-w-md text-muted-foreground"[39m
+            [36m>[39m
+              [0mThe run has not recorded an event yet.[0m
+            [36m</p>[39m
+          [36m</section>[39m
+        [36m</section>[39m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+[90m [2m❯[22m Object.getElementError node_modules/@testing-library/dom/dist/config.js:[2m37:19[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m76:38[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m52:17[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m95:19[22m[39m
+[36m [2m❯[22m tests/unit/test_10c2_5_run_page_poll.test.tsx:[2m142:19[22m[39m
+    [90m140|[39m     [35mawait[39m [34madvance[39m([34m0[39m)[33m;[39m
+    [90m141|[39m     expect(screen.getByTestId("run-detail-status").textContent).toCont…
+    [90m142|[39m     expect(screen.getByTestId("run-read-error").textContent).toContain…
+    [90m   |[39m                   [31m^[39m
+    [90m143|[39m   })[33m;[39m
+    [90m144|[39m })[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/5]⎯[22m[39m
+
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m5 failed[39m[22m[90m (5)[39m
+[2m   Start at [22m 10:19:36
+[2m   Duration [22m 6.63s[2m (transform 3.41s, setup 0ms, import 4.38s, tests 304ms, environment 1.67s)[22m
+

@@ -1,0 +1,30 @@
+time="2026-11-17T15:15:50+03:00" level=warning msg="volume \"ffcore-10c2_e2e_node_modules\" already exists but was not created by Docker Compose. Use `external: true` to use an existing volume"
+ Container ffcore-10c2-postgres-1  Running
+ Container ffcore-10c2-redis-1  Running
+ Container ffcore-10c2-litellm-1  Running
+ Container ffcore-10c2-migrate-1  Created
+ Container ffcore-10c2-backend-1  Running
+ Container ffcore-10c2-postgres-1  Waiting
+ Container ffcore-10c2-postgres-1  Waiting
+ Container ffcore-10c2-postgres-1  Healthy
+ Container ffcore-10c2-migrate-1  Starting
+ Container ffcore-10c2-postgres-1  Healthy
+ Container ffcore-10c2-migrate-1  Started
+ Container ffcore-10c2-migrate-1  Waiting
+ Container ffcore-10c2-postgres-1  Waiting
+ Container ffcore-10c2-redis-1  Waiting
+ Container ffcore-10c2-litellm-1  Waiting
+ Container ffcore-10c2-postgres-1  Healthy
+ Container ffcore-10c2-redis-1  Healthy
+ Container ffcore-10c2-litellm-1  Healthy
+ Container ffcore-10c2-migrate-1  Exited
+
+Running 1 test using 1 worker
+
+[1/1] [chromium] › tests/e2e/test_10c1_1_suite_run_stream.spec.ts:9:5 › test_10c1_1_suite_run_stream: analyst builds a suite, adds an item, runs the exam and reads it
+  1 passed (2.9m)
+npm notice
+npm notice New major version of npm available! 11.19.1 -> 12.2.2
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.2
+npm notice To update run: npm install -g npm@12.2.2
+npm notice

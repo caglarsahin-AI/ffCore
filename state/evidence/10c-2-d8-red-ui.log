@@ -1,0 +1,157 @@
+
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.12 [39m[90m/w/frontend[39m
+
+ [31m❯[39m tests/unit/test_10c2_4_eval_items.test.tsx [2m([22m[2m0 test[22m[2m)[22m
+ [31m❯[39m tests/unit/test_10c1_6_eval_run_view.test.tsx [2m([22m[2m4 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[33m 361[2mms[22m[39m
+     [32m✓[39m shows failed, incomplete, n/N, not-run reasons and errors as written (nothing invented)[32m 165[2mms[22m[39m
+[31m     [31m×[31m has no 10-worst stand-in table any more[39m[32m 44[2mms[22m[39m
+     [32m✓[39m fails loudly when the summary cannot be read, naming the field[32m 141[2mms[22m[39m
+     [32m✓[39m says there is no summary yet for a live exam, and shows the error code of a failed one[32m 9[2mms[22m[39m
+
+[31m⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Suites 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m tests/unit/test_10c2_4_eval_items.test.tsx[2m [ tests/unit/test_10c2_4_eval_items.test.tsx ][22m
+[31m[1mError[22m: Failed to resolve import "@/components/eval/eval-items-table" from "tests/unit/test_10c2_4_eval_items.test.tsx". Does the file exist?[39m
+  Plugin: [35mvite:import-analysis[39m
+  File: [36m/w/frontend/tests/unit/test_10c2_4_eval_items.test.tsx[39m:6:31
+[33m  3  |  import { cleanup, fireEvent, screen, waitFor, within } from "@testing-library/react";
+  4  |  import { afterEach, describe, expect, it, vi } from "vitest";
+  5  |  import { EvalItemsTable } from "@/components/eval/eval-items-table";
+     |                                  ^
+  6  |  import { EVAL_ITEMS_PAGE } from "@/lib/api/eval-queries";
+  7  |  import { evalRun, renderAs } from "./eval-support";[39m
+[90m [2m❯[22m TransformPluginContext._formatLog node_modules/vite/dist/node/chunks/node.js:[2m8803:39[22m[39m
+[90m [2m❯[22m TransformPluginContext.error node_modules/vite/dist/node/chunks/node.js:[2m8800:14[22m[39m
+[90m [2m❯[22m resolveId node_modules/vite/dist/node/chunks/node.js:[2m26594:18[22m[39m
+[90m [2m❯[22m node_modules/vite/dist/node/chunks/node.js:[2m26693:23[22m[39m
+[90m [2m❯[22m TransformPluginContext.transform node_modules/vite/dist/node/chunks/node.js:[2m26666:4[22m[39m
+[90m [2m❯[22m EnvironmentPluginContainer.transform node_modules/vite/dist/node/chunks/node.js:[2m8582:14[22m[39m
+[90m [2m❯[22m loadAndTransform node_modules/vite/dist/node/chunks/node.js:[2m20155:26[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯[22m[39m
+
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m tests/unit/test_10c1_6_eval_run_view.test.tsx[2m > [22mtest_10c1_6_eval_run_view[2m > [22mhas no 10-worst stand-in table any more
+[31m[1mAssertionError[22m: expected <table data-slot="table" …(2)>…(2)</table> to be null[39m
+
+[32m- Expected:[39m
+null
+
+[31m+ Received:[39m
+<table
+  class="w-full caption-bottom text-sm"
+  data-slot="table"
+  data-testid="eval-worst"
+>
+  <thead
+    class="[&_tr]:border-b"
+    data-slot="table-header"
+  >
+    <tr
+      class="border-b transition-colors hover:bg-muted/50 has-aria-expanded:bg-muted/50 data-[state=selected]:bg-muted"
+      data-slot="table-row"
+    >
+      <th
+        class="h-10 px-2 text-left align-middle font-medium whitespace-nowrap text-foreground [&:has([role=checkbox])]:pr-0"
+        data-slot="table-head"
+      >
+        Item
+      </th>
+      <th
+        class="h-10 px-2 text-left align-middle font-medium whitespace-nowrap text-foreground [&:has([role=checkbox])]:pr-0"
+        data-slot="table-head"
+      >
+        Passed
+      </th>
+      <th
+        class="h-10 px-2 align-middle font-medium whitespace-nowrap text-foreground [&:has([role=checkbox])]:pr-0 text-right"
+        data-slot="table-head"
+      >
+        Mean
+      </th>
+      <th
+        class="h-10 px-2 text-left align-middle font-medium whitespace-nowrap text-foreground [&:has([role=checkbox])]:pr-0"
+        data-slot="table-head"
+      >
+        Outcome
+      </th>
+      <th
+        class="h-10 px-2 text-left align-middle font-medium whitespace-nowrap text-foreground [&:has([role=checkbox])]:pr-0"
+        data-slot="table-head"
+      >
+        Style
+      </th>
+      <th
+        class="h-10 px-2 text-left align-middle font-medium whitespace-nowrap text-foreground [&:has([role=checkbox])]:pr-0"
+        data-slot="table-head"
+      >
+        Note
+      </th>
+    </tr>
+  </thead>
+  <tbody
+    class="[&_tr:last-child]:border-0"
+    data-slot="table-body"
+  >
+    <tr
+      class="border-b transition-colors hover:bg-muted/50 has-aria-expanded:bg-muted/50 data-[state=selected]:bg-muted"
+      data-slot="table-row"
+    >
+      <td
+        class="p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 font-mono"
+        data-slot="table-cell"
+      >
+        item-2
+      </td>
+      <td
+        class="p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0"
+        data-slot="table-cell"
+      >
+        No
+      </td>
+      <td
+        class="p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 text-right font-mono"
+        data-slot="table-cell"
+      >
+        0.25
+      </td>
+      <td
+        class="p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0"
+        data-slot="table-cell"
+      >
+        Answered
+      </td>
+      <td
+        class="p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 font-mono"
+        data-slot="table-cell"
+      >
+        dogrudan
+      </td>
+      <td
+        class="p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 font-mono"
+        data-slot="table-cell"
+      >
+        —
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+[36m [2m❯[22m tests/unit/test_10c1_6_eval_run_view.test.tsx:[2m51:48[22m[39m
+    [90m 49|[39m   [34mit[39m([32m"has no 10-worst stand-in table any more"[39m[33m,[39m () [33m=>[39m {
+    [90m 50|[39m     renderAs("analyst", "edit", <EvalSummaryView run={evalRun({ summar…
+    [90m 51|[39m     [34mexpect[39m(screen[33m.[39m[34mqueryByTestId[39m([32m"eval-worst"[39m))[33m.[39m[34mtoBeNull[39m()[33m;[39m
+    [90m   |[39m                                                [31m^[39m
+    [90m 52|[39m     [34mexpect[39m(screen[33m.[39m[34mqueryByTestId[39m([32m"eval-worst-note"[39m))[33m.[39m[34mtoBeNull[39m()[33m;[39m
+    [90m 53|[39m   })[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯[22m[39m
+
+
+[2m Test Files [22m [1m[31m2 failed[39m[22m[90m (2)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m3 passed[39m[22m[90m (4)[39m
+[2m   Start at [22m 10:42:03
+[2m   Duration [22m 4.37s[2m (transform 1.68s, setup 0ms, import 2.33s, tests 361ms, environment 2.79s)[22m
+
