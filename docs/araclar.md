@@ -190,7 +190,8 @@ MCP server can be served the same way, behind FFCore's identity, guardrail and l
 ```
 
 - `key` is unique in the installation (the endpoint path has no project):
-  `409 mcp_server_key_taken`.
+  `409 mcp_server_key_taken`. So an admin can learn that a key is used in another project;
+  choose keys that say nothing confidential.
 - `source_kind: remote_mcp` takes no `spec`; `upstream_base_url` is the remote MCP endpoint.
   Run `POST .../mcp-servers/{id}/discover` to read its `tools/list`.
 - `upstream_auth` is `none`, `bearer`, `header` or `basic` (encrypted, `***` when read).
@@ -208,6 +209,11 @@ served stays in the list with `exposable: false` and a `reason`: `operation_id_m
 cookie parameters), `parameter_name_conflict`, `request_body_unsupported` (not JSON),
 `external_ref`, `ref_not_found`, `ref_cycle`. A bad document is `422 spec_invalid`,
 `spec_version_unsupported` (only OpenAPI 3) or `spec_too_large` (1 000 000 characters).
+
+A path key is joined to the base URL's path (`https://h/api` + `/v1/x` is `https://h/api/v1/x`),
+so it must start with one `/` and have no empty, `.` or `..` segment, no `?` or `#`. A document
+with any other path key (`v1/x`, `:8080/x`, `//other-host/x`, `/a/../b`) is refused whole:
+`422 openapi_path_invalid`. A path parameter value `.` or `..` is `invalid_arguments`.
 
 `PATCH .../mcp-servers/{id}` selects what is served and how it looks to the model:
 
@@ -240,12 +246,16 @@ identity check above runs first on every request, whatever the Host.
 **Each call** goes: request quota (the request windows of the project's quotas, like the facade;
 no token or USD counting, there is no model) -> guardrail `tool.pre` on the arguments ->
 upstream -> result cut to `TOOL_RESULT_MAX_CHARS` (`[truncated: N/M chars]`) -> guardrail
-`tool.post` -> answer. The upstream call goes only to the registered origin; redirects are not
-followed (`egress_too_many_redirects`); an answer larger than `MCP_UPSTREAM_MAX_BYTES` is
+`tool.post` -> answer. The upstream call goes only to the registered origin and base path: at
+every call the base URL passes the registration checks again (the egress policy may have
+narrowed since) and the final URL must keep its scheme, host and port
+(`upstream_origin_mismatch`); such a refusal sends nothing and the call is logged as `denied`
+with its code. Redirects are not followed (`egress_too_many_redirects`); an answer larger than `MCP_UPSTREAM_MAX_BYTES` is
 refused (`upstream_response_too_large`). Failures reach the caller as an error result with a
 code (`upstream_http_<status>`, `upstream_timeout`, `upstream_unreachable`, `egress_*`,
-`invalid_arguments`, `unknown_tool`, `quota_exceeded`, `guardrail_blocked`); upstream text never
-does.
+`invalid_arguments`, `unknown_tool`, `quota_exceeded`, `guardrail_blocked`,
+`upstream_origin_mismatch`, `openapi_path_invalid`, `upstream_url_refused`,
+`endpoint_url_not_allowed`); upstream text never does.
 
 **Guardrail.** `guardrail_policy_key` names the project's policy (default `default`).
 `guardrail_mode` makes it stricter, never looser: each rule runs in the stricter of the server

@@ -16,6 +16,9 @@ if anything.
   `201`, not callable): publish the document and add the server to the tools instead. A tool
   endpoint on the backend itself is `400 endpoint_is_platform` unless it is a published server's
   own `<INTERNAL_API_URL>/mcp/<key>/` with `forward_user` (FOLLOWUP-159).
+- **Upstream safety (05b review r1):** OpenAPI path keys must start with one `/` and stay in the
+  base path (`422 openapi_path_invalid` at upload); every call keeps the registered scheme, host
+  and port (`upstream_origin_mismatch`) and refusals before a request are logged as `denied`.
 - **New setting:** `MCP_UPSTREAM_MAX_BYTES` (default 1048576): the largest upstream answer a
   published OpenAPI server accepts.
 - **Action:** run the migration (`migrate` service, on every `up`). Existing tools keep working.
