@@ -1674,5 +1674,41 @@
       "cancel": "Cancel",
       "confirm": "Delete now"
     }
+  },
+  "Overview": {
+    "title": "Overview",
+    "description": "The selected project at a glance: usage, approvals waiting for a person, open alerts and the newest runs.",
+    "range": "Usage of the last {days} days: {from} – {to} (UTC).",
+    "unreadable": "Could not be read",
+    "requests": "Model requests",
+    "tokens": "Tokens",
+    "cost": "Cost",
+    "unpriced": "{count, plural, one {# request has} other {# requests have}} no price; {count, plural, one {its} other {their}} cost is not counted.",
+    "approvals": "Approvals waiting",
+    "alerts": "Open alerts",
+    "dailyTokens": "Tokens per day",
+    "newestRuns": "The {count} newest runs",
+    "noRuns": "No runs yet."
+  },
+  "Usage": {
+    "title": "Usage",
+    "description": "Tokens, cost and model requests of the selected project per day and per model (UTC days, from the platform's own usage records).",
+    "from": "From",
+    "to": "To",
+    "rangeInvalid": "The range ends before it starts.",
+    "totals": "{from} – {to}: {requests} requests, {tokens} tokens, {cost}.",
+    "unpriced": "{count, plural, one {# request has} other {# requests have}} no price; {count, plural, one {its} other {their}} cost is not counted.",
+    "byDay": "By day",
+    "byModel": "By model",
+    "day": "Day",
+    "model": "Model",
+    "requests": "Requests",
+    "inputTokens": "Input tokens",
+    "outputTokens": "Output tokens",
+    "cost": "Cost",
+    "unpricedShort": "Without price",
+    "noUsage": "No usage in this range.",
+    "noUsageBody": "Usage appears once the project's models are called.",
+    "chartLabel": "Input and output tokens per day"
   }
 }

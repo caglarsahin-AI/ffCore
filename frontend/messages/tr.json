@@ -1674,5 +1674,41 @@
       "cancel": "Vazgeç",
       "confirm": "Şimdi sil"
     }
+  },
+  "Overview": {
+    "title": "Genel bakış",
+    "description": "Seçili proje bir bakışta: kullanım, bir kişiyi bekleyen onaylar, açık uyarılar ve en yeni koşular.",
+    "range": "Son {days} günün kullanımı: {from} – {to} (UTC).",
+    "unreadable": "Okunamadı",
+    "requests": "Model istekleri",
+    "tokens": "Token",
+    "cost": "Maliyet",
+    "unpriced": "{count} isteğin fiyatı yok; maliyeti sayılmadı.",
+    "approvals": "Bekleyen onaylar",
+    "alerts": "Açık uyarılar",
+    "dailyTokens": "Günlük token",
+    "newestRuns": "En yeni {count} koşu",
+    "noRuns": "Henüz koşu yok."
+  },
+  "Usage": {
+    "title": "Kullanım",
+    "description": "Seçili projenin günlük ve model bazında token, maliyet ve model istekleri (UTC günleri, platformun kendi kullanım kayıtlarından).",
+    "from": "Başlangıç",
+    "to": "Bitiş",
+    "rangeInvalid": "Aralık başlamadan bitiyor.",
+    "totals": "{from} – {to}: {requests} istek, {tokens} token, {cost}.",
+    "unpriced": "{count} isteğin fiyatı yok; maliyeti sayılmadı.",
+    "byDay": "Güne göre",
+    "byModel": "Modele göre",
+    "day": "Gün",
+    "model": "Model",
+    "requests": "İstek",
+    "inputTokens": "Girdi token'ı",
+    "outputTokens": "Çıktı token'ı",
+    "cost": "Maliyet",
+    "unpricedShort": "Fiyatsız",
+    "noUsage": "Bu aralıkta kullanım yok.",
+    "noUsageBody": "Projenin modelleri çağrılınca kullanım görünür.",
+    "chartLabel": "Günlük girdi ve çıktı token'ı"
   }
 }
