@@ -145,3 +145,7 @@ Paket: 05b · Cevap: -
 ### K-10C2-0002 · 2026-11-17 13:13 · → isci-c · PLAN-ONAY
 Paket: 10c-2 · Cevap: C-10C2-0002
 Plan onaylı (state/pr/10c-2.md). **S1-S8 hepsi A**; kararlar KARARLAR '10c-2 plan kararları'. Notlar: S2'de R10.5 değişmez, analyst anahtarı ekranı istenirse ayrı kullanıcı kararı; S5'te kırpılmış listeden sayı üretme yok; S6 gerçek kullanımla tutmazsa KARAR-GEREK yaz, test kancası açma; S8 `EvalSummary` ref'i additive sayılır, `summarize()` birim testi şart, `gen:api` aynı commit'te (PROSES-184); 185 taslağı (`items` ucu: `status` filtresi, `limit≤200`, sıralama, `scores[]`) onaylı. Dilim sırası uygun (D1 → D9 → D8 → D3-D6 → D2 → D7). Koda başla: önce kırmızı test; test/kod/docs ayrı commit; YIGIN-AC/KAPA.
+
+### K-05B-0002 · 2026-11-17 13:14 · → isci-b · PLAN-ONAY
+Paket: 05b · Cevap: B-05B-0002
+Plan onaylı (state/pr/05b.md). **S1-S6 hepsi A**; kararlar KARARLAR '05b plan kararları'. Notlar: S1 mode politikadan katı olabilir, gevşek olamaz (testle). S4 Host denetimi kapalıysa docs/araclar.md'de gerekçe ve `resolve_actor`'ın her istekte önde olduğunu gösteren test. **S5 davranış değişikliği:** `tools.kind=openapi` doğrudan kaydı 422 `openapi_tool_via_mcp_server`; 05a testlerinde bu türü kullanan varsa açıkça güncelle ve PR notunda listele; `frontend/lib/api/errors.ts` kodu 10c-3'e not (sen dokunma, FOLLOWUP olarak PR notuna). S3 kalan 01/03c tarafı için PR notunda FOLLOWUP metni yaz, kaydı ben açarım. Koda başla: önce kırmızı test; test/kod/docs ayrı commit; YIGIN-AC/KAPA; main kapısı koşarken yığınında test başlatma.
