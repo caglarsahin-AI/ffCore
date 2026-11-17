@@ -108,7 +108,11 @@ def test_05a_6_masked_value_on_create_refused(world):
 def test_05a_8_ssrf_endpoints_refused_at_registration(world, url):
     response = world["admin"].post(tools_url(world), json=_tool(url=url))
     assert response.status_code == 400, response.text
-    assert response.json()["error"]["code"].startswith("egress_")
+    code = response.json()["error"]["code"]
+    # 05b (FOLLOWUP-159, tool side): loopback on the backend's port is the backend itself and is
+    # refused before the egress policy, with its own code.
+    expected = "endpoint_is_platform" if url.startswith("http://127.0.0.1:8000") else "egress_"
+    assert code.startswith(expected)
 
 
 def test_05a_8_internal_mcp_search_accepted(world):

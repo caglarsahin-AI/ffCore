@@ -111,6 +111,8 @@ def test_05b_4_superset_sample_end_to_end(world, upstream, live, harness, pg):
         answer_rules={"cite_sources": False, "unknown_reply": "Yok."},
     )
     run_id = seed_run(pg, uuid.UUID(world["project"]), doc)
+    # forward_user carries the run's user (the admin here) to the published endpoint.
+    pg.execute("UPDATE runs SET user_id = %s WHERE id = %s", (world["admin_id"], run_id))
     chart = {
         "slice_name": "Doluluk",
         "viz_type": "table",
@@ -138,3 +140,7 @@ def test_05b_4_superset_sample_end_to_end(world, upstream, live, harness, pg):
     rows = calls(pg, server["id"])
     assert [r[0] for r in rows[-2:]] == ["searchDashboards", "createChart"]
     assert all(r[1] == "ok" and r[3] == "user" for r in rows[-2:])
+    actors = pg.execute(
+        "SELECT DISTINCT actor_id FROM mcp_server_calls WHERE server_id = %s", (server["id"],)
+    ).fetchall()
+    assert actors == [(world["admin_id"],)]

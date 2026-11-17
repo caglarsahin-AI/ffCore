@@ -40,7 +40,8 @@ def test_05b_1_spec_upload_lists_operations(world, upstream, pg):
     assert b"createChart" not in bytes(stored[0])
     assert UPSTREAM_TOKEN.encode() not in bytes(stored[1])
     rows = audit_rows(pg, "create_mcp_server", project=world["project"])
-    assert rows and UPSTREAM_TOKEN not in str(rows) and "createChart" not in str(rows[-1][2])
+    # The catalog (operation names) is what admins see; the document and the token are not.
+    assert rows and UPSTREAM_TOKEN not in str(rows) and "Sentetik örnek" not in str(rows)
 
 
 def test_05b_1_select_rename_and_keep_selection_on_spec_reload(world, upstream):
