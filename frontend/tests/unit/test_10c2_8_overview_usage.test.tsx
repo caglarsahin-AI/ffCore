@@ -30,7 +30,7 @@ const USAGE = (from = "2026-10-19", to = "2026-11-17") => ({
   totals: { input_tokens: 800, output_tokens: 200, cost_usd: "0.0420", requests: 12, unpriced_requests: 1 },
   data: ROWS,
 });
-const RUN = (id: string) => ({ id, project_id: "p1", agent_id: "a1", agent_version_id: "v1", status: "completed", channel: "test", input: `question ${id}`, created_at: "2026-11-17T08:00:00Z" });
+const RUN = (id: string) => ({ id, project_id: "p1", agent_id: "a1", agent_version_id: "v1", status: "completed", channel: "test", input: `question ${id}`, queued_at: "2026-11-17T08:00:00Z" });
 
 const API = {
   [`GET ${P}/usage`]: (c: { search: URLSearchParams }) => USAGE(c.search.get("date_from") ?? "", c.search.get("date_to") ?? ""),
