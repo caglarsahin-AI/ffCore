@@ -876,6 +876,7 @@
     "startFailed": "The run did not start: {message} (code: {code})",
     "reconnecting": "Connection lost; reconnecting…",
     "lost": "The stream could not be resumed. The run may still be going; open it in Runs.",
+    "serverStatus": "Status read from the server: {status}",
     "phases": {
       "starting": "Starting…",
       "running": "Running…",

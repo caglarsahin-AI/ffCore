@@ -55,10 +55,12 @@ export function useRuns(projectId: string, filters: RunFilters) {
   });
 }
 
-// A run that is still going refreshes until it ends; an ended run is read once.
-export function useRun(projectId: string, runId: string) {
+// A run that is still going refreshes until it ends; an ended run is read once. `enabled: false`
+// holds the reading (the test panel reads only while its stream is reconnecting or lost).
+export function useRun(projectId: string, runId: string, options: { enabled?: boolean } = {}) {
   return useQuery({
     queryKey: runKeys.one(projectId, runId),
+    enabled: options.enabled ?? true,
     queryFn: () => api<Run>("GET", `${base(projectId)}/runs/${runId}`),
     refetchInterval: (q) => (q.state.data && isLiveRun(q.state.data.status) ? RUNS_POLL_MS : false),
   });

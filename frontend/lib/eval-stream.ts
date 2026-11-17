@@ -1,4 +1,5 @@
-import { SseParser } from "@/lib/sse";
+import { SseParser, openWithin, sleep, startAttempt } from "@/lib/sse";
+import type { Attempt } from "@/lib/sse";
 
 // Exam progress stream (09 GET …/eval-runs/{id}/stream): `progress` {status, items, scored} every
 // few seconds, then one `done` with the end status, `error_code` and `passed`. fetch +
@@ -95,50 +96,7 @@ async function drain(response: Response, options: EvalFollowOptions, attempt: At
   }
 }
 
-// One attempt: its own AbortController, chained to the outside signal and fired by the watchdog
-// when nothing arrived for `stallMs` (the request itself included).
-type Attempt = { signal: AbortSignal; alive: () => void; end: () => void; spoke: () => void };
-
-function startAttempt(stallMs: number, outside: AbortSignal | undefined, spoke: () => void): Attempt {
-  const controller = new AbortController();
-  const abort = () => controller.abort();
-  outside?.addEventListener("abort", abort, { once: true });
-  let timer: ReturnType<typeof setTimeout> | undefined;
-  const alive = () => {
-    clearTimeout(timer);
-    timer = setTimeout(abort, stallMs);
-  };
-  alive();
-  return {
-    signal: controller.signal,
-    alive,
-    spoke,
-    end: () => {
-      clearTimeout(timer);
-      outside?.removeEventListener("abort", abort);
-      controller.abort();
-    },
-  };
-}
-
-// The request, unless the attempt ends first (an open() that ignores its signal cannot hang it).
-function openWithin(attempt: Attempt, open: EvalFollowOptions["open"]): Promise<Response> {
-  return new Promise<Response>((resolve, reject) => {
-    if (attempt.signal.aborted) return reject(new DOMException("attempt ended", "AbortError"));
-    attempt.signal.addEventListener("abort", () => reject(new DOMException("attempt ended", "AbortError")), { once: true });
-    open(attempt.signal).then(resolve, reject);
-  });
-}
-
-const sleep = (ms: number, signal?: AbortSignal) =>
-  new Promise<void>((resolve) => {
-    if (ms <= 0) return resolve();
-    const timer = setTimeout(resolve, ms);
-    signal?.addEventListener("abort", () => {
-      clearTimeout(timer);
-      resolve();
-    });
-  });
+// The attempt, its watchdog, openWithin and sleep are shared with the run stream (lib/sse.ts).
 
 export async function followEvalStream(options: EvalFollowOptions): Promise<EvalStreamEnd> {
   const maxReopens = options.maxReopens ?? MAX_REOPENS;

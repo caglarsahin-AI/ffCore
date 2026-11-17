@@ -15,7 +15,7 @@ import { useDecideApproval } from "@/lib/api/approvals-queries";
 import type { Decision } from "@/lib/api/approvals-queries";
 import { ApiError } from "@/lib/api/client";
 import { errorMessageKey } from "@/lib/api/errors";
-import { answerQuestion, reconnectRun, startRun, useCancelRun } from "@/lib/api/runs-queries";
+import { answerQuestion, reconnectRun, startRun, useCancelRun, useRun } from "@/lib/api/runs-queries";
 import { initialRunView, reduceRunView } from "@/lib/run-view";
 import type { RunView } from "@/lib/run-view";
 import { followRunStream } from "@/lib/sse";
@@ -29,8 +29,9 @@ function reducer(view: RunView, action: Action): RunView {
 
 // Test panel (brief 10 step 7): one test run of the version being edited (channel=test), its
 // event stream as it arrives, an inline approval that goes to the 07 decision endpoint (D1) and
-// an answer box for ask_user. A dropped stream reconnects with Last-Event-ID; one that cannot be
-// resumed says so (the run may still be going; see Runs).
+// an answer box for ask_user. A dropped or silent stream reconnects with Last-Event-ID; one that
+// cannot be resumed says so (the run may still be going; see Runs). While the stream reconnects or
+// is lost the panel reads the run with GET and shows the server status (FOLLOWUP-188, K-SSE-0002).
 export function AgentTestPanel({
   projectId,
   agentKey,
@@ -46,6 +47,7 @@ export function AgentTestPanel({
 }) {
   const t = useTranslations("TestPanel");
   const tErrors = useTranslations("Errors");
+  const tRuns = useTranslations("Runs");
   const report = useReportError();
   const cancel = useCancelRun(projectId);
   const decide = useDecideApproval(projectId);
@@ -62,6 +64,8 @@ export function AgentTestPanel({
   useEffect(() => () => abort.current?.abort(), []);
 
   const busy = stream !== null;
+  const reading = view.runId !== null && (stream === "reconnecting" || (stream === null && ended === "lost"));
+  const server = useRun(projectId, view.runId ?? "", { enabled: reading });
   const variables = definition.variables ?? [];
 
   async function follow(open: (signal: AbortSignal) => Promise<Response>) {
@@ -71,8 +75,8 @@ export function AgentTestPanel({
     setEnded(null);
     try {
       const result = await followRunStream({
-        open: () => open(controller.signal),
-        reconnect: (runId, last) => reconnectRun(projectId, runId, last, controller.signal),
+        open,
+        reconnect: (runId, last, signal) => reconnectRun(projectId, runId, last, signal),
         onEvent: (event) => {
           if (event.id) lastId.current = event.id;
           dispatch({ type: "event", event });
@@ -166,6 +170,11 @@ export function AgentTestPanel({
         </p>
       )}
       <StreamStatus view={view} stream={stream} ended={ended} />
+      {reading && server.data && (
+        <p className="text-sm text-muted-foreground" role="status" data-testid="test-server-status" data-status={server.data.status}>
+          {t("serverStatus", { status: tRuns(`statuses.${server.data.status}`) })}
+        </p>
+      )}
       {view.notes.map((n, i) => (
         <p key={i} className="text-xs text-muted-foreground" data-testid="test-note">
           {t("note", { detail: JSON.stringify(n) })}
