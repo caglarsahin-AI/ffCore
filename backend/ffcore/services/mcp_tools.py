@@ -44,6 +44,16 @@ def check_endpoint(url: str, auth_type: str, settings: Settings) -> None:
             "endpoint_url_not_allowed",
             "The endpoint URL takes scheme, host, port and path only; put credentials in auth.",
         )
+    if mcp_client.is_platform_target(url, settings):
+        # FOLLOWUP-159 (05b S3): the backend is a tool only as a published server's own
+        # endpoint, with the caller's identity; never another backend path or identity.
+        if mcp_client.is_self_endpoint(url, auth_type, settings):
+            return
+        raise _bad_request(
+            "endpoint_is_platform",
+            "The backend is a tool target only as <INTERNAL_API_URL>/mcp/<key>/ with "
+            "forward_user (a published MCP server).",
+        )
     target = httpx2.URL(url)
     policy = EgressPolicy(settings)
     try:
@@ -55,6 +65,11 @@ def check_endpoint(url: str, auth_type: str, settings: Settings) -> None:
             "forward_user_not_internal",
             "forward_user is allowed only for internal services (ALLOWED_INTERNAL_HOSTS).",
         )
+
+
+def self_endpoint(settings: Settings, key: str) -> str:
+    """The URL the runtime uses for a published MCP server (05b self-consumption)."""
+    return f"{settings.internal_api_url.rstrip('/')}/mcp/{key}/"
 
 
 def auth_fields(auth: dict[str, Any]) -> dict[str, str]:

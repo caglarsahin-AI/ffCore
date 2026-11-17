@@ -1,0 +1,1436 @@
+openapi: 3.1.0
+info:
+  title: FFCore API
+  description: 'Published MCP servers: OpenAPI documents and remote MCP servers served at /mcp/{key}/,
+    their operations, connection test, calls and self-consumption (package 05b). The /mcp/{key}/ endpoint
+    itself is MCP streamable HTTP (docs/araclar.md).'
+  version: 0.5b
+paths:
+  /api/v1/projects/{project_id}/mcp-servers:
+    get:
+      tags:
+      - mcp-servers
+      summary: List the project's published MCP servers
+      description: Analyst role or above; secret identity fields are returned as ***.
+      operationId: list_servers_api_v1_projects__project_id__mcp_servers_get
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/McpServerList'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+    post:
+      tags:
+      - mcp-servers
+      summary: Register an MCP server
+      description: 'openapi: the document is read now and its operations listed (none selected). remote_mcp:
+
+        discover next. The server starts as draft; selecting operations and status=active serve it.
+
+        The key is unique in the installation (409 mcp_server_key_taken).'
+      operationId: create_server_api_v1_projects__project_id__mcp_servers_post
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/McpServerCreate'
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/McpServerOut'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+  /api/v1/projects/{project_id}/mcp-servers/{server_id}:
+    get:
+      tags:
+      - mcp-servers
+      summary: Get an MCP server
+      description: Analyst role or above; secret identity fields are returned as ***.
+      operationId: get_server_api_v1_projects__project_id__mcp_servers__server_id__get
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      - name: server_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Server Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/McpServerOut'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+    patch:
+      tags:
+      - mcp-servers
+      summary: Update an MCP server
+      description: 'Selection by operation name (422 operation_unknown / operation_not_exposable); aliases
+
+        must be unique tool names (422 alias_conflict). Secret identity fields sent back as *** keep
+
+        their stored value (same type only).'
+      operationId: update_server_api_v1_projects__project_id__mcp_servers__server_id__patch
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      - name: server_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Server Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/McpServerUpdate'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/McpServerOut'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+    delete:
+      tags:
+      - mcp-servers
+      summary: Delete an MCP server
+      description: 'Soft delete: the endpoint stops at once; the key can be used again. Its calls are
+        kept.'
+      operationId: delete_server_api_v1_projects__project_id__mcp_servers__server_id__delete
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      - name: server_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Server Id
+      responses:
+        '204':
+          description: Successful Response
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+  /api/v1/projects/{project_id}/mcp-servers/{server_id}/spec:
+    put:
+      tags:
+      - mcp-servers
+      summary: Replace the document
+      description: 'openapi only (409 spec_not_applicable). Selection and aliases are kept by operation
+        name;
+
+        a selected operation missing from the new document is 409 exposed_operation_missing and
+
+        nothing changes.'
+      operationId: replace_spec_api_v1_projects__project_id__mcp_servers__server_id__spec_put
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      - name: server_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Server Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SpecUpload'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/McpServerOut'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+  /api/v1/projects/{project_id}/mcp-servers/{server_id}/discover:
+    post:
+      tags:
+      - mcp-servers
+      summary: Discover operations
+      description: 'openapi: the stored document read again. remote_mcp: the upstream''s tools/list with
+        the
+
+        server''s upstream identity; a failed discovery answers 200 with last_error_code (shown on
+
+        screen) and keeps the previous catalog.'
+      operationId: discover_server_api_v1_projects__project_id__mcp_servers__server_id__discover_post
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      - name: server_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Server Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/McpServerOut'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+  /api/v1/projects/{project_id}/mcp-servers/{server_id}/test:
+    post:
+      tags:
+      - mcp-servers
+      summary: Test the upstream
+      description: 'openapi: one GET to the upstream base URL with the server''s identity (redirects not
+
+        followed); any HTTP answer is reachable and its status is shown. remote_mcp: initialize and
+
+        tools/list. Nothing of the answer is stored or returned but the status.'
+      operationId: test_server_api_v1_projects__project_id__mcp_servers__server_id__test_post
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      - name: server_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Server Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectionTest'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+  /api/v1/projects/{project_id}/mcp-servers/{server_id}/tools:
+    post:
+      tags:
+      - mcp-servers
+      summary: Add the server to the project's tools
+      description: 'A 05a tool with the server''s key at <INTERNAL_API_URL>/mcp/<key>/ and forward_user,
+        so an
+
+        agent calls it with the user''s identity through this endpoint (guardrail, quota and log of
+
+        the server apply). Discover it next in the tools registry; its actions start disabled and
+
+        needing approval (05a rule; 07 approval happens on the agent side). 409 tool_key_taken.'
+      operationId: add_to_tools_api_v1_projects__project_id__mcp_servers__server_id__tools_post
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      - name: server_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Server Id
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ToolOut'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+  /api/v1/projects/{project_id}/mcp-servers/{server_id}/calls:
+    get:
+      tags:
+      - mcp-servers
+      summary: Calls of the server
+      description: 'Requests, errors and latency in the window, and the last 50 calls (10c-3 monitoring).
+
+        Rows carry no arguments or results.'
+      operationId: calls_summary_api_v1_projects__project_id__mcp_servers__server_id__calls_get
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      - name: server_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Server Id
+      - name: hours
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 744
+          minimum: 1
+          default: 24
+          title: Hours
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CallsSummary'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+components:
+  schemas:
+    Alias:
+      properties:
+        name:
+          anyOf:
+          - type: string
+            pattern: ^[A-Za-z0-9_.-]{1,64}$
+          - type: 'null'
+          title: Name
+        description:
+          anyOf:
+          - type: string
+            maxLength: 2000
+          - type: 'null'
+          title: Description
+      additionalProperties: false
+      type: object
+      title: Alias
+    AuthBasic:
+      properties:
+        type:
+          type: string
+          const: basic
+          title: Type
+        username:
+          type: string
+          maxLength: 4096
+          minLength: 1
+          title: Username
+        password:
+          type: string
+          maxLength: 4096
+          minLength: 1
+          title: Password
+      additionalProperties: false
+      type: object
+      required:
+      - type
+      - username
+      - password
+      title: AuthBasic
+    AuthBearer:
+      properties:
+        type:
+          type: string
+          const: bearer
+          title: Type
+        token:
+          type: string
+          maxLength: 4096
+          minLength: 1
+          title: Token
+      additionalProperties: false
+      type: object
+      required:
+      - type
+      - token
+      title: AuthBearer
+    AuthHeader:
+      properties:
+        type:
+          type: string
+          const: header
+          title: Type
+        name:
+          type: string
+          maxLength: 64
+          minLength: 1
+          title: Name
+          description: 'Header name: an RFC 7230 token, not a transport or identity header (Host, Content-Length,
+            Connection, Transfer-Encoding, Upgrade, TE, Trailer, Keep-Alive, Proxy-*, Authorization, X-On-Behalf-Of,
+            X-Run-Id); otherwise 400 header_name_not_allowed.'
+        value:
+          type: string
+          maxLength: 4096
+          minLength: 1
+          title: Value
+      additionalProperties: false
+      type: object
+      required:
+      - type
+      - name
+      - value
+      title: AuthHeader
+    AuthNone:
+      properties:
+        type:
+          type: string
+          const: none
+          title: Type
+      additionalProperties: false
+      type: object
+      required:
+      - type
+      title: AuthNone
+    CallOut:
+      properties:
+        operation:
+          type: string
+          title: Operation
+        status:
+          type: string
+          enum:
+          - ok
+          - error
+          - blocked
+          - denied
+          title: Status
+        error_code:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Error Code
+        latency_ms:
+          type: integer
+          title: Latency Ms
+        ts:
+          type: string
+          format: date-time
+          title: Ts
+        run_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Run Id
+        actor_type:
+          type: string
+          title: Actor Type
+      additionalProperties: false
+      type: object
+      required:
+      - operation
+      - status
+      - error_code
+      - latency_ms
+      - ts
+      - run_id
+      - actor_type
+      title: CallOut
+    CallsSummary:
+      properties:
+        window_hours:
+          type: integer
+          title: Window Hours
+        requests:
+          type: integer
+          title: Requests
+        errors:
+          type: integer
+          title: Errors
+          description: Calls that did not end ok (error, blocked, denied).
+        blocked:
+          type: integer
+          title: Blocked
+        p50_ms:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: P50 Ms
+        p95_ms:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: P95 Ms
+        recent:
+          items:
+            $ref: '#/components/schemas/CallOut'
+          type: array
+          title: Recent
+          description: The last 50 calls, newest first.
+      additionalProperties: false
+      type: object
+      required:
+      - window_hours
+      - requests
+      - errors
+      - blocked
+      - p50_ms
+      - p95_ms
+      - recent
+      title: CallsSummary
+    ConnectionTest:
+      properties:
+        reachable:
+          type: boolean
+          title: Reachable
+        status_code:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Status Code
+          description: The upstream's HTTP status (openapi).
+        error_code:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Error Code
+        latency_ms:
+          type: integer
+          title: Latency Ms
+        tools:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Tools
+          description: Tools the remote MCP server lists (remote_mcp).
+      additionalProperties: false
+      type: object
+      required:
+      - reachable
+      - status_code
+      - error_code
+      - latency_ms
+      - tools
+      title: ConnectionTest
+    ErrorBody:
+      properties:
+        error:
+          $ref: '#/components/schemas/ErrorDetail'
+      type: object
+      required:
+      - error
+      title: ErrorBody
+      description: OpenAI-shaped error body used by every 4xx response.
+    ErrorDetail:
+      properties:
+        message:
+          type: string
+          title: Message
+          description: English, actionable, never contains secrets.
+        type:
+          type: string
+          title: Type
+          description: authentication_error, permission_error, not_found_error, ...
+        code:
+          type: string
+          title: Code
+          description: Stable machine-readable code, e.g. read_only_access.
+      type: object
+      required:
+      - message
+      - type
+      - code
+      title: ErrorDetail
+    McpServerCreate:
+      properties:
+        key:
+          type: string
+          pattern: ^[a-z][a-z0-9-]{1,63}$
+          title: Key
+          description: Server key, unique in the installation; the endpoint is /mcp/<key>/.
+        name:
+          type: string
+          maxLength: 200
+          minLength: 1
+          title: Name
+        source_kind:
+          type: string
+          enum:
+          - openapi
+          - remote_mcp
+          title: Source Kind
+        spec:
+          anyOf:
+          - type: string
+            minLength: 1
+            description: The OpenAPI 3 document, YAML or JSON (at most 1 000 000 characters).
+          - type: 'null'
+          title: Spec
+          description: Required for openapi (422 spec_required); not for remote_mcp.
+        upstream_base_url:
+          type: string
+          maxLength: 2048
+          minLength: 1
+          title: Upstream Base Url
+          description: Scheme, host, port and path only (400 endpoint_url_not_allowed otherwise); a platform
+            service is 422 upstream_url_refused; the egress policy applies (400 egress_*).
+        upstream_auth:
+          oneOf:
+          - $ref: '#/components/schemas/AuthNone'
+          - $ref: '#/components/schemas/AuthBearer'
+          - $ref: '#/components/schemas/AuthHeader'
+          - $ref: '#/components/schemas/AuthBasic'
+          title: Upstream Auth
+          description: 'Identity sent to the upstream (forward_user is not offered: platform services
+            are never an upstream); secret fields come back as ***.'
+          discriminator:
+            propertyName: type
+            mapping:
+              basic: '#/components/schemas/AuthBasic'
+              bearer: '#/components/schemas/AuthBearer'
+              header: '#/components/schemas/AuthHeader'
+              none: '#/components/schemas/AuthNone'
+        access:
+          type: string
+          enum:
+          - token
+          - internal
+          title: Access
+          description: 'internal: only the platform runtime; token: API keys with tools_invoke too.'
+          default: internal
+        guardrail_mode:
+          type: string
+          enum:
+          - 'off'
+          - monitor
+          - enforce
+          title: Guardrail Mode
+          description: 'Makes the guardrail policy stricter, never looser: each rule runs in max(this
+            mode, its own mode).'
+          default: monitor
+        guardrail_policy_key:
+          type: string
+          maxLength: 64
+          minLength: 1
+          title: Guardrail Policy Key
+          default: default
+      additionalProperties: false
+      type: object
+      required:
+      - key
+      - name
+      - source_kind
+      - upstream_base_url
+      - upstream_auth
+      title: McpServerCreate
+    McpServerList:
+      properties:
+        data:
+          items:
+            $ref: '#/components/schemas/McpServerOut'
+          type: array
+          title: Data
+      additionalProperties: false
+      type: object
+      required:
+      - data
+      title: McpServerList
+    McpServerOut:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+        project_id:
+          type: string
+          format: uuid
+          title: Project Id
+        key:
+          type: string
+          title: Key
+        name:
+          type: string
+          title: Name
+        source_kind:
+          type: string
+          enum:
+          - openapi
+          - remote_mcp
+          title: Source Kind
+        endpoint_path:
+          type: string
+          title: Endpoint Path
+        upstream_base_url:
+          type: string
+          title: Upstream Base Url
+        upstream_auth:
+          additionalProperties:
+            type: string
+          type: object
+          title: Upstream Auth
+        operations:
+          items:
+            $ref: '#/components/schemas/OperationOut'
+          type: array
+          title: Operations
+        exposed_operations:
+          items:
+            type: string
+          type: array
+          title: Exposed Operations
+        protocols:
+          items:
+            type: string
+          type: array
+          title: Protocols
+        access:
+          type: string
+          enum:
+          - token
+          - internal
+          title: Access
+        guardrail_mode:
+          type: string
+          enum:
+          - 'off'
+          - monitor
+          - enforce
+          title: Guardrail Mode
+        guardrail_policy_key:
+          type: string
+          title: Guardrail Policy Key
+        status:
+          type: string
+          enum:
+          - draft
+          - active
+          - disabled
+          title: Status
+        discovered_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Discovered At
+        last_error_code:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Last Error Code
+        created_by:
+          type: string
+          title: Created By
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+        updated_at:
+          type: string
+          format: date-time
+          title: Updated At
+      additionalProperties: false
+      type: object
+      required:
+      - id
+      - project_id
+      - key
+      - name
+      - source_kind
+      - endpoint_path
+      - upstream_base_url
+      - upstream_auth
+      - operations
+      - exposed_operations
+      - protocols
+      - access
+      - guardrail_mode
+      - guardrail_policy_key
+      - status
+      - discovered_at
+      - last_error_code
+      - created_by
+      - created_at
+      - updated_at
+      title: McpServerOut
+    McpServerUpdate:
+      properties:
+        name:
+          type: string
+          maxLength: 200
+          minLength: 1
+          title: Name
+        upstream_base_url:
+          type: string
+          maxLength: 2048
+          minLength: 1
+          title: Upstream Base Url
+          description: Scheme, host, port and path only (400 endpoint_url_not_allowed otherwise); a platform
+            service is 422 upstream_url_refused; the egress policy applies (400 egress_*).
+        upstream_auth:
+          oneOf:
+          - $ref: '#/components/schemas/AuthNone'
+          - $ref: '#/components/schemas/AuthBearer'
+          - $ref: '#/components/schemas/AuthHeader'
+          - $ref: '#/components/schemas/AuthBasic'
+          title: Upstream Auth
+          description: 'Identity sent to the upstream (forward_user is not offered: platform services
+            are never an upstream); secret fields come back as ***.'
+          discriminator:
+            propertyName: type
+            mapping:
+              basic: '#/components/schemas/AuthBasic'
+              bearer: '#/components/schemas/AuthBearer'
+              header: '#/components/schemas/AuthHeader'
+              none: '#/components/schemas/AuthNone'
+        access:
+          type: string
+          enum:
+          - token
+          - internal
+          title: Access
+        guardrail_mode:
+          type: string
+          enum:
+          - 'off'
+          - monitor
+          - enforce
+          title: Guardrail Mode
+        guardrail_policy_key:
+          type: string
+          maxLength: 64
+          minLength: 1
+          title: Guardrail Policy Key
+        status:
+          type: string
+          enum:
+          - draft
+          - active
+          - disabled
+          title: Status
+        exposed_operations:
+          items:
+            type: string
+          type: array
+          title: Exposed Operations
+          description: Operation names (not aliases) served at /mcp/<key>/.
+        aliases:
+          additionalProperties:
+            $ref: '#/components/schemas/Alias'
+          type: object
+          title: Aliases
+          description: 'Per operation name: the tool name and description the model sees (null keeps the
+            operation''s own).'
+      additionalProperties: false
+      type: object
+      title: McpServerUpdate
+    OperationOut:
+      properties:
+        name:
+          type: string
+          title: Name
+        method:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Method
+        path:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Path
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        input_schema:
+          additionalProperties: true
+          type: object
+          title: Input Schema
+        exposable:
+          type: boolean
+          title: Exposable
+        reason:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Reason
+          description: Why an operation cannot be published, as a code.
+        alias:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Alias
+        alias_description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Alias Description
+        exposed:
+          type: boolean
+          title: Exposed
+      additionalProperties: false
+      type: object
+      required:
+      - name
+      - method
+      - path
+      - description
+      - input_schema
+      - exposable
+      - reason
+      - alias
+      - alias_description
+      - exposed
+      title: OperationOut
+    SpecUpload:
+      properties:
+        spec:
+          type: string
+          minLength: 1
+          title: Spec
+          description: The OpenAPI 3 document, YAML or JSON (at most 1 000 000 characters).
+      additionalProperties: false
+      type: object
+      required:
+      - spec
+      title: SpecUpload
+    ToolActionOut:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+        name:
+          type: string
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        input_schema:
+          additionalProperties: true
+          type: object
+          title: Input Schema
+        needs_approval:
+          type: boolean
+          title: Needs Approval
+        enabled:
+          type: boolean
+          title: Enabled
+        max_calls_per_run:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Max Calls Per Run
+        timeout_s:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Timeout S
+        status:
+          type: string
+          enum:
+          - available
+          - missing
+          title: Status
+        updated_at:
+          type: string
+          format: date-time
+          title: Updated At
+      additionalProperties: false
+      type: object
+      required:
+      - id
+      - name
+      - description
+      - input_schema
+      - needs_approval
+      - enabled
+      - max_calls_per_run
+      - timeout_s
+      - status
+      - updated_at
+      title: ToolActionOut
+    ToolOut:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+        project_id:
+          type: string
+          format: uuid
+          title: Project Id
+        key:
+          type: string
+          title: Key
+        name:
+          type: string
+          title: Name
+        kind:
+          type: string
+          enum:
+          - mcp
+          - openapi
+          title: Kind
+        endpoint_url:
+          type: string
+          title: Endpoint Url
+        auth:
+          additionalProperties:
+            type: string
+          type: object
+          title: Auth
+        status:
+          type: string
+          enum:
+          - registered
+          - discovered
+          - error
+          title: Status
+        discovered_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Discovered At
+        last_error_code:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Last Error Code
+        actions:
+          items:
+            $ref: '#/components/schemas/ToolActionOut'
+          type: array
+          title: Actions
+        created_by:
+          type: string
+          title: Created By
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+        updated_at:
+          type: string
+          format: date-time
+          title: Updated At
+      additionalProperties: false
+      type: object
+      required:
+      - id
+      - project_id
+      - key
+      - name
+      - kind
+      - endpoint_url
+      - auth
+      - status
+      - discovered_at
+      - last_error_code
+      - actions
+      - created_by
+      - created_at
+      - updated_at
+      title: ToolOut

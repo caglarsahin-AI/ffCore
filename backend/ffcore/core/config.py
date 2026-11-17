@@ -123,6 +123,9 @@ class Settings(BaseSettings):
     tool_result_max_chars: int = Field(default=20000, gt=0)
     # Whole MCP call (connect, initialize, call); an action's own timeout_s wins.
     mcp_call_timeout_s: int = Field(default=30, gt=0)
+    # 05b: a published OpenAPI server's upstream answer larger than this is refused
+    # (upstream_response_too_large), never cut silently; the result itself then follows C13.
+    mcp_upstream_max_bytes: int = Field(default=1_048_576, gt=0)
     # mcp-sql: rows returned at most (the rest cut and said) and the statement timeout.
     sql_max_rows: int = Field(default=500, gt=0)
     sql_timeout_s: int = Field(default=20, gt=0)

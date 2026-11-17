@@ -17,6 +17,7 @@ Rules:
 """
 
 import base64
+import ipaddress
 import logging
 import re
 import time
@@ -71,6 +72,53 @@ def header_name_refusal(name: str) -> str | None:
     ):
         return "header_name_not_allowed"
     return None
+
+
+# 05b: a published MCP server's own endpoint on this backend (self-consumption, S3).
+SELF_PATH = re.compile(r"/mcp/[a-z][a-z0-9-]{1,63}/")
+# The port the backend listens on in its container: loopback on it is the backend itself.
+BACKEND_CONTAINER_PORT = 8000
+
+
+def _origin(url: httpx2.URL) -> tuple[str, str, int | None]:
+    default = {"http": 80, "https": 443}.get(url.scheme)
+    return url.scheme, (url.host or "").lower().rstrip("."), url.port or default
+
+
+def is_platform_target(url: str, settings: Settings) -> bool:
+    """The backend itself (FOLLOWUP-159): its INTERNAL_API_URL origin, the `backend` service name
+    on any port, or loopback on the backend's container port."""
+    target = httpx2.URL(url)
+    scheme, host, port = _origin(target)
+    if (scheme, host, port) == _origin(httpx2.URL(settings.internal_api_url)) or host == "backend":
+        return True
+    try:
+        loopback = host == "localhost" or ipaddress.ip_address(host.strip("[]")).is_loopback
+    except ValueError:
+        loopback = False
+    return loopback and port == BACKEND_CONTAINER_PORT
+
+
+def is_self_endpoint(url: str, auth_type: str, settings: Settings) -> bool:
+    """`<INTERNAL_API_URL>/mcp/<key>/` with forward_user: the only way a tool reaches the backend
+    (a published server consumed by the runtime, 05b S3)."""
+    target = httpx2.URL(url)
+    return (
+        auth_type == "forward_user"
+        and _origin(target) == _origin(httpx2.URL(settings.internal_api_url))
+        and SELF_PATH.fullmatch(target.raw_path.decode("ascii", "replace")) is not None
+    )
+
+
+def call_settings(target: "ToolTarget", settings: Settings) -> Settings:
+    """Settings for one connection: the self endpoint's host becomes internal for that call only,
+    so the backend never has to be in ALLOWED_INTERNAL_HOSTS (FOLLOWUP-159)."""
+    if not is_self_endpoint(target.endpoint_url, target.auth_type, settings):
+        return settings
+    host = httpx2.URL(settings.internal_api_url).host
+    return settings.model_copy(
+        update={"allowed_internal_hosts": [*settings.allowed_internal_hosts, host]}
+    )
 
 
 def endpoint_refusal(url: str) -> str | None:
@@ -132,17 +180,23 @@ class Guard(Protocol):
     async def post(self, action: str, text: str) -> str: ...
 
 
+def static_auth_headers(kind: str, auth: dict[str, str]) -> dict[str, str]:
+    """The headers of a fixed identity (none, bearer, header, basic); 05b's upstream calls use
+    the same rule."""
+    if kind == "bearer":
+        return {"Authorization": f"Bearer {auth['token']}"}
+    if kind == "header":
+        return {auth["name"]: auth["value"]}
+    if kind == "basic":
+        pair = f"{auth['username']}:{auth['password']}".encode()
+        return {"Authorization": "Basic " + base64.b64encode(pair).decode("ascii")}
+    return {}
+
+
 def _headers(target: ToolTarget, settings: Settings, caller: Caller, run_id: str | None):
     auth, kind = target.auth, target.auth_type
-    headers: dict[str, str] = {}
-    if kind == "bearer":
-        headers["Authorization"] = f"Bearer {auth['token']}"
-    elif kind == "header":
-        headers[auth["name"]] = auth["value"]
-    elif kind == "basic":
-        pair = f"{auth['username']}:{auth['password']}".encode()
-        headers["Authorization"] = "Basic " + base64.b64encode(pair).decode("ascii")
-    elif kind == "forward_user":
+    headers: dict[str, str] = static_auth_headers(kind, auth)
+    if kind == "forward_user":
         headers.update(service_authorization(settings))
         headers[OBO_HEADER] = sign_on_behalf_of(
             user_id=caller.user_id,
@@ -213,7 +267,10 @@ async def _session(
         if response.status_code >= 400:
             statuses.append(response.status_code)
 
-    async with policy_http_client(timeout=timeout, settings=settings, headers=headers) as http:
+    policy_settings = call_settings(target, settings)
+    async with policy_http_client(
+        timeout=timeout, settings=policy_settings, headers=headers
+    ) as http:
         http.event_hooks["response"] = [note]
         async with streamable_http_client(target.endpoint_url, http_client=http) as (read, write):
             async with ClientSession(read, write) as session:

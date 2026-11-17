@@ -19,6 +19,7 @@ from ffcore.knowledge.embed import probe_dimension
 from ffcore.services import catalog_events
 from ffcore.services.keys import api_key_resolver
 from ffcore.services.litellm_reconcile import background_scheduler
+from ffcore.services.mcp_publish import app as published_mcp
 from ffcore.services.providers import register_embedding_probe
 
 log = logging.getLogger("ffcore.main")
@@ -87,6 +88,8 @@ app.include_router(internal.router)
 app.include_router(facade.router)
 app.include_router(internal.facade_router)
 app.include_router(readiness_router)
+# 05b: published MCP servers at /mcp/{key}/, the second external surface (PLAN 5 R1.2, C14).
+app.mount("/mcp", published_mcp)
 
 
 @app.get("/healthz")
