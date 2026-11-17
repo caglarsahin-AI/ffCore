@@ -40,3 +40,5 @@
 2026-11-17T13:51:11	warn	isci-b	Bash	KAPI	cd /c/ai_paycore/ffcore/.worktrees/feat/05b-openapi-mcp && export FFCORE_VERSION=0.0.0-05b BACKEND_PORT=18430 FRONTEND_P
 2026-11-17T13:53:53	warn	isci-b	Bash	KAPI	export FFCORE_VERSION=0.0.0-05b BACKEND_PORT=18430 FRONTEND_PORT=13430 && docker compose -p ffcore-05b --env-file .env.t
 2026-11-17T14:00:44	warn	isci-b	Bash	KAPI	python - <<'EOF' p='tests/integration/test_05a_tools_api.py' s=open(p,encoding='utf-8').read() old='''    assert respons
+2026-11-17T14:22:52	warn	isci-c	Bash	PROSES-175	cd /c/ai_paycore/ffcore/.worktrees/feat/10c-2-governance-ui && export ALLOWED_INTERNAL_HOSTS=litellm,langfuse-web,mcp-se
+2026-11-17T14:40:55	warn	isci-c	Bash	KAPI	sed -i 's#    P + "/eval-runs/{eval_run_id}/cancel": {"post"},#    P + "/eval-runs/{eval_run_id}/items": {"get"},  \# 10

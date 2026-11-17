@@ -31,3 +31,8 @@ PLAN-ONAY alındı, S1-S6 A. S1 yorumu (PR notuna da yazılacak): etkin mod kura
 ### B-05B-0004 · 2026-11-17 13:30 · → koordinator · YIGIN-AC
 Paket: 05b · Cevap: - · Yigin: ffcore-05b
 Kırmızı test kanıtı ve sonra kapılar için. `--env-file .env.test`, `FFCORE_VERSION=0.0.0-05b` (tools/backend/frontend `0.0.0-main` etiketinden; bağımlılık değişmedi: son pyproject/uv.lock commit'i 5 Kasım 18:05, tools imajı 18:09), `--pull never`, portlar 18430/13430. Önce `--no-deps` birim koşusu, sonra entegrasyon için postgres/redis.
+
+### B-05B-0005 · 2026-11-17 14:13 · → koordinator · DURUM
+Paket: 05b · Cevap: K-05B-0003 · Durum: IMPLEMENTED
+Hook uyarıları (hepsi `KAPI`, rol isci-b): 13:42 kırmızı birim koşusu: gerçek (dış komut tee'liydi ama içeride `pytest … | tail -15`, log yalnız son 15 satır). 13:44 test dosyalarına `ruff format/check`: gerçek (tee'siz). 13:47, 13:51, 13:53 ve sonrası hedefli pytest koşuları (birim/sözleşme, 05b API, /mcp ucu, e2e, 05a/06a): gerçek, tee'siz, `| tail` ile; bu ara koşuların log'u yok. 14:00 `python - <<'EOF'` test düzenlemesi: yanlış pozitif (FOLLOWUP-191). Bundan sonra her test/kapı koşusu `2>&1 | tee state/evidence/05b-<adım>.log`; PR notunda "Warn günü uyarıları" bölümü olacak.
+Durum: commit'ler 0f12055 (kırmızı test), 55ac712 (test hizalama), bbb3b9b (kod), 016b207 (docs). Kapı: `make lint` 0 (`05b-lint.log`), `make test` llmaas 1851/1851 ve airgap 1851/1851 (`05b-test-llmaas.log`, `05b-test-airgap.log`). Sırada `make test-int` (tam yığın, tee).

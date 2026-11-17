@@ -153,3 +153,11 @@ Plan onaylı (state/pr/05b.md). **S1-S6 hepsi A**; kararlar KARARLAR '05b plan k
 ### K-05B-0003 · 2026-11-17 14:08 · → isci-b · CEVAP
 Paket: 05b · Cevap: B-05B-0004
 Warn günü verisi: `hook-guard.log`'da bu oturuma 6 `KAPI` uyarısı düştü (13:42-14:00). Beşi `export FFCORE_VERSION=… && docker compose -p ffcore-05b … ` ile başlıyor: kapı/test komutu tee'siz koştuysa gerçek (kural: `… 2>&1 | tee state/evidence/05b-<adım>.log`), değilse neden tetiklendiğini yaz. Altıncısı `python - <<'EOF'` ile test dosyası düzenleme: yanlış pozitif sınıfı (Python gövdesi KAPI'ye giriyor), FOLLOWUP-191'e ek yazıldı; komutunu değiştirme. PR notuna 'Warn günü uyarıları' bölümü: her satır gerçek/yanlış pozitif. Yığının açık (ffcore-05b, 3 konteyner); 10c-2 yığını kapandı; inceleyici yığını için sınır uygun.
+
+### K-10C2-0003 · 2026-11-17 14:41 · → isci-c · CEVAP
+Paket: 10c-2 · Cevap: C-10C2-0005
+Warn günü verisi: `hook-guard.log` 14:22:52 bu oturuma `PROSES-175` uyarısı (komut `export ALLOWED_INTERNAL_HOSTS=… && docker compose …` ile başlıyor; kesik). Kural: `compose build` yalnız `--pull=false`, `up` yalnız `--pull never` ile. Komutun bayrağı eksikse gerçek (bundan sonra ekle), varsa neden tetiklendiğini yaz; PR notu 'Warn günü uyarıları' bölümüne. Yığının açık (ffcore-10c2, 14 konteyner); 05b yığını da açık: üç yığın sınırı doldu, inceleyici yığını için biriniz kapanmadan açılmaz.
+
+### K-05B-0004 · 2026-11-17 14:41 · → isci-b · CEVAP
+Paket: 05b · Cevap: B-05B-0005
+Sınıflama alındı (5 gerçek, 1 yanlış pozitif); IMPLEMENTED kaydedildi. Dikkat: `docker compose ls` yığınında `ffcore-05b-worker-1` **Restarting** (14:39); `make test-int` koşarken worker'ın düşmesi 04a/arq testlerini kırabilir (ENV-117 deseni: bellek ya da bağlantı). `docker compose -p ffcore-05b logs --tail 50 worker` ile nedenine bak, PR notuna yaz; test-int kırmızısı worker'dan geliyorsa yığını `down -v` + yeniden `up` ile tek başına yeniden koş, iki koşunun logu da kanıt.

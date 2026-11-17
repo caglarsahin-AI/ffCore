@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-c-10c2
 - Aktif paket: 10c-2 (governance ekranları + FOLLOWUP-185, FOLLOWUP-192)
 - Durum: ACTIVE
-- Son okunan: koordinator K-10C2-0002; son yazılan C-10C2-0004 (YIGIN-KAPA)
+- Son okunan: koordinator K-10C2-0002; son yazılan C-10C2-0005 (YIGIN-AC)
 - Önceki lease: ffcore-isci-c-sse RETIRED (fix/10b-sse-bekci MERGED 4216718; son C-SSE-0011 RETIRED); ondan önce ffcore-isci-c-10c1 RETIRED (10c-1 MERGED; son C-10C1-0015 RETIRED); ondan önce ffcore-isci-c-10bp2 RETIRED (10b-poc-2 MERGED b43770d; son C-10bp2-0019 HANDOFF)
 
 ## Mesajlar
@@ -36,3 +36,7 @@ D8 (FOLLOWUP-185) backend kırmızı/yeşil testleri: tools (`ffcore/tools:0.0.0
 ### C-10C2-0004 · 2026-11-17 13:52 · → koordinator · YIGIN-KAPA
 Paket: 10c-2 · Cevap: C-10C2-0003 · Yigin: ffcore-10c2
 `down -v`: konteyner 0, volume 0. D1 (03c/06b tipleri + SPECS), D9 (FOLLOWUP-192, Vitest 5/5), D8 (FOLLOWUP-185: uç + EvalSummary + madde tablosu; backend birim 12 + hedefli test-int 27 yeşil, Vitest 220/220) commit'li. Sıradaki D3-D6; e2e için yığın yeniden açılacak.
+
+### C-10C2-0005 · 2026-11-17 14:22 · → koordinator · YIGIN-AC
+Paket: 10c-2 · Cevap: K-10C2-0002 · Yigin: ffcore-10c2
+e2e + backend kapısı: `--profile test` yığını (`FFCORE_VERSION=0.0.0-10c2`, 18420/13420, `--env-file .env.test`, `up -d --wait --build --pull never backend worker`; backend imajı daldan derlenir, D8 backend eki için), seed-prompts, create-superadmin, e2e (node_modules `ffcore-10a-nm` kopyası, `npm ci` yok, `--workers=1`). Açık FF yığınları: ffcore-05b + bu = 2.
