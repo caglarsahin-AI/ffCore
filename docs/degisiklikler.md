@@ -9,7 +9,9 @@ if anything.
 - **What:** the console ends a run event stream (agent test panel) that sends nothing for 30 s,
   three backend keepalive intervals, and reconnects with `Last-Event-ID`; a failed read is
   treated the same way. While the stream reconnects, or after it is reported lost, the test panel
-  reads the run with `GET /runs/{id}` every few seconds and shows the server status.
+  reads the run with `GET /runs/{id}` every few seconds and shows the server status; a failed read
+  is shown with its code and retried until the server answers or the run has ended. A start
+  request that hangs for 30 s ends as lost without a run id (the run may exist: open it in Runs).
 - **Why:** a half-open connection (backend restarted, a proxy dropping an idle socket) never
   closes, so the panel kept showing the run as live with no update (FOLLOWUP-188; the exam
   stream got the same watchdog in 10c-1).
