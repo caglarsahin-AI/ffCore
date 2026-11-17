@@ -343,7 +343,17 @@ exam" button is FOLLOWUP-170.
 `summary`: items and how many were scored, pass rate, `passed` (pass rate ≥ the suite's
 `pass_threshold`), mean per scorer, `outcome` counts, per-`style` breakdown, the 10 worst items,
 errors, and timing. There is no model-server reset before an exam: the first run's time is
-reported as `warmup_ms` and left out of `latency_ms`.
+reported as `warmup_ms` and left out of `latency_ms`. Its shape is the `EvalSummary` schema of
+09.yaml (10c-2): every key `summarize()` writes, typed; a unit test holds the two together.
+
+**Every item** (10c-2, FOLLOWUP-185): `GET /projects/{pid}/eval-runs/{id}/items` with
+`status=all|failed|passed|not_run` (default `all`), `limit` 1-200 (default 50) and `offset`
+answers `{data, total, limit, offset}`. Each row is the item combined from its runs exactly as
+the summary and compare combine it (`passed`, `mean`, `outcome`, `note`, `repeats_not_run`,
+`attempts`, `run_ids`, and every scorer's `value`, `passed`, `status`, `comment`), read from
+FFCore's own results, never from Langfuse. Order: failed, not run, passed, not yet scored, then
+item id; a not-yet-scored item (`scored=false`) is listed only under `all`. Analyst and read
+access; another project's exam is 404.
 
 Thresholds are configuration, not code: `EVAL_PASS_THRESHOLD` is the default for new suites
 (`llmaas` 0.85, `airgap` 0.8); a suite may set its own. Calibrate it on a few exam runs of a

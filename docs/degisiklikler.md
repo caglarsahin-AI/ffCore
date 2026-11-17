@@ -23,6 +23,18 @@ if anything.
   published OpenAPI server accepts.
 - **Action:** run the migration (`migrate` service, on every `up`). Existing tools keep working.
 
+## 2026-11-17 · 10c-2 · Governance screens; exam items endpoint; typed exam summary
+
+- **What:** the console gets Overview, Usage, API keys, Quotas, Alerts (new menu item, with a
+  header badge of open alerts) and Data retention screens on the existing 03c API. The exam API
+  gets `GET /projects/{pid}/eval-runs/{id}/items` (paged item results, status filter) and
+  `EvalRunOut.summary` is the typed `EvalSummary` in 09.yaml (same JSON as before). The run page
+  keeps reading a run it could not read and says why; a run that is gone (404/410) stops it.
+- **Why:** brief 10 (10c-2), FOLLOWUP-185 (the console showed only the 10 worst exam items),
+  FOLLOWUP-192, FOLLOWUP-130 (the retention screen says the real run ignores `RETENTION_DRY_RUN`).
+- **Action:** none. Data retention is in the menu only for superadmins (the API serves it only to
+  them); API keys stay admin-only.
+
 ## 2026-11-17 · fix/10b-sse-bekci · A silent run stream reconnects
 
 - **What:** the console ends a run event stream (agent test panel) that sends nothing for 30 s,

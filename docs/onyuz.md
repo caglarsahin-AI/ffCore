@@ -27,9 +27,15 @@ and system status).
 | `/approvals/{id}` | One approval | analyst | approve, reject (when `can_decide`) |
 | `/evaluations` | Exam suites of the selected project | analyst | list; create (analyst + edit) |
 | `/evaluations/{id}` | One suite: settings, exam start, its exams, compare pick | analyst | edit, delete, start an exam (analyst + edit); compare (read too) |
-| `/evaluations/runs/{id}` | One exam: live progress, summary, the 10 worst items | analyst | cancel while it runs (analyst + edit) |
+| `/evaluations/runs/{id}` | One exam: live progress, summary, every item (filter, pages) | analyst | cancel while it runs (analyst + edit) |
 | `/evaluations/compare?a=&b=` | Two exams of one suite, item by item | analyst | read only |
-| `/overview` and every other menu item | Later packages (10c and others) | see role matrix | "not available yet" page |
+| `/overview` | The project at a glance: 30-day usage, approvals waiting, open alerts, newest runs | analyst | read only; open alerts from developer |
+| `/usage` | Tokens, cost and requests per day and per model, chosen range | admin | read only |
+| `/api-keys` | API keys of the selected project | admin | list (all keys); create with explicit scopes, shown once; revoke (admin + edit) |
+| `/quotas` | Quotas and limits, last quota warning per quota | developer | list; create, edit, delete (admin + edit) |
+| `/alerts` | Open alerts, history, rules, notification settings | developer | acknowledge (developer + edit); rules and notification settings (admin + edit); installation alerts (superadmin) |
+| `/retention` | Data retention of the installation | superadmin | policies, dry run, real run behind a confirmation, past passes (superadmin + edit) |
+| every other menu item | Later packages (10c-3 and others) | see role matrix | "not available yet" page |
 | `/dev/theme` | Components in both themes side by side | none | done |
 
 A path outside the user's role renders "You do not have access". This is a UI convenience;
@@ -50,15 +56,24 @@ need a superadmin, because the backend serves them only to superadmins (03a `req
 | Build | Models | | | ✓ |
 | Build | Providers | | | superadmin |
 | Operate | Runs, Approvals, Evaluations | ✓ | ✓ | ✓ |
+| Operate | Alerts | | ✓ | ✓ |
 | Operate | Guardrails, Channels | | ✓ | ✓ |
 | Operate | Usage, System status | | | ✓ |
 | Administration | Quotas | | ✓ | ✓ |
-| Administration | Projects, API keys, Data retention, Settings | | | ✓ |
-| Administration | Users, Audit | | | superadmin |
+| Administration | Projects, API keys, Settings | | | ✓ |
+| Administration | Users, Audit, Data retention | | | superadmin |
 
 `user` (activated in 17) only gets `/chat` and My memory, so the console menu is empty for it.
 "Usage" is admin-only here because brief 10 lists it under no smaller role; adjust in
 `navigation.ts` if that changes.
+
+10c-2 choices (KARARLAR "10c-2 plan kararları"): **Data retention** is superadmin-only because the
+backend serves it, reads included, only to superadmins (S1). **API keys** stay admin-only (R10.5)
+although the backend lets an analyst manage their own keys; a screen for that would be a separate
+decision (S2). **Alerts** is a new Operate item: developers see and acknowledge, rules and
+notification settings are an admin's (S3); a superadmin switches the screen to the installation's
+own alerts (service down, disk and memory) and its SMTP settings (S4). Controls a role cannot use
+stay visible and disabled with the reason, like read mode.
 
 **Access mode.** Role and access are per project (03a memberships). A screen uses the project in
 its URL, otherwise the project chosen in the top bar; a superadmin is admin with its own access
@@ -212,6 +227,33 @@ contract is shown as an error, never as "ready". Without model weights the page 
   run; the buttons follow `can_decide` (signed-in user, edit access, role at least the assigned
   one) and the backend's 403/409 codes become messages.
 
+## Governance (03c): overview, usage, API keys, quotas, alerts, retention
+
+- **Overview.** Usage of the last 30 UTC days (requests, tokens, cost; requests without a price
+  are counted apart), approvals waiting, open alerts (developer and up) and the 10 newest runs.
+  No run total: there is no count endpoint and a number read from a capped list would be wrong (S5).
+- **Usage.** `GET /usage` for the chosen range (default the last 30 days, shown), by day (chart
+  and table) and by model. A range that ends before it starts is refused before it is sent.
+- **API keys.** The form preselects no scope; `impersonate` needs allowed networks (CIDR), checked
+  before sending as the backend does. The raw key is shown once with a copy button and is gone on
+  "I have saved the key" or a reload. Revoke asks first. Keys are managed only from a console
+  session (`requires_console_session`).
+- **Quotas.** Windows, tokens and budgets; only filled limits are sent (empty = no limit), and a
+  quota with no limit is refused. "block" refuses a call over the limit (429); "warn" lets it
+  through and records a `quota_warn` alert, which is how an exceeded quota shows on the screen
+  (the last warning per quota; a block leaves no record). The scope is fixed once created.
+- **Alerts.** Open alerts (not acknowledged) and history, newest 500 (backend limit, said on the
+  screen when reached). The header badge counts open alerts of the selected project for developer
+  and up, every 30 s and after an acknowledgement. Rule kinds come from `/alert-kinds` (only kinds
+  something emits); an e-mail rule needs recipients; `budget_threshold` takes thresholds in
+  percent. Notification settings: SMTP (password masked, kept when left as is), sender, default
+  webhook, and a test send that reports the delivery status.
+- **Retention.** Policies per data class with per-project overrides, the scheduled mode
+  (`RETENTION_DRY_RUN`) and audit deletion (`RETENTION_AUDIT_DROP_ENABLED`) as configured. "Dry
+  run" shows the counts a pass would delete. "Delete now" is a real deletion that ignores
+  `RETENTION_DRY_RUN` (FOLLOWUP-130): it starts only from a confirmation dialog that says so, with
+  cancel as the default. Every pass is listed with its trigger and mode.
+
 ## Evaluations (09)
 
 - **Suites.** Analysts and above read suites; creating, editing, deleting and starting an exam
@@ -242,9 +284,12 @@ contract is shown as an error, never as "ready". Without model weights the page 
   completeness (`complete=false` says the exam did not finish unattended), not-run reasons with
   their code (`approval_required`, `partial:<code>` for some repeats, an unknown code raw),
   errors (`judge_out_of_time`, `judge_failed:*`, `advance_failed:*`), outcome and style counts,
-  warm-up apart from latency, and the 10 worst items, labelled as such: a full item table needs
-  FOLLOWUP-185. `EvalRunOut.summary` is untyped in the contract, so the console reads it with a
-  narrow schema and shows "could not be read" with the failing field rather than an empty result.
+  warm-up apart from latency. Below it, every item of the exam from
+  `GET /eval-runs/{id}/items` (10c-2, FOLLOWUP-185): failed, not run, passed, not yet scored, with
+  each scorer's value, the outcome, the not-run code next to its meaning and links to the item's
+  runs; a status filter and pages of 50 use the endpoint's own parameters. `EvalRunOut.summary` is
+  the typed `EvalSummary` in the contract; the console still reads it with a narrow schema and
+  shows "could not be read" with the failing field rather than an empty result.
 - **Compare.** Two completed exams of one suite, picked on the suite page (read access too):
   summary differences, each exam's completeness, the configuration warning (`config_differs`),
   item changes (`fixed`, `regressed`, `same`, `not_comparable`, `only_a`, `only_b`) and the 10
@@ -378,6 +423,18 @@ glibc `node_modules` volume and run `npx playwright test` instead of `npm ci && 
 | Run detail | ![](images/10bp2-run-detail-light.png) | ![](images/10bp2-run-detail-dark.png) |
 | Approvals | ![](images/10bp2-approvals-light.png) | ![](images/10bp2-approvals-dark.png) |
 | Approval detail | ![](images/10bp2-approval-detail-light.png) | ![](images/10bp2-approval-detail-dark.png) |
+| Overview, edit mode | ![](images/10c2-overview-edit-light.png) | ![](images/10c2-overview-edit-dark.png) |
+| Overview, read mode | ![](images/10c2-overview-read-light.png) | ![](images/10c2-overview-read-dark.png) |
+| Usage, edit mode | ![](images/10c2-usage-edit-light.png) | ![](images/10c2-usage-edit-dark.png) |
+| Usage, read mode | ![](images/10c2-usage-read-light.png) | ![](images/10c2-usage-read-dark.png) |
+| API keys, edit mode | ![](images/10c2-api-keys-edit-light.png) | ![](images/10c2-api-keys-edit-dark.png) |
+| API keys, read mode | ![](images/10c2-api-keys-read-light.png) | ![](images/10c2-api-keys-read-dark.png) |
+| Quotas, edit mode | ![](images/10c2-quotas-edit-light.png) | ![](images/10c2-quotas-edit-dark.png) |
+| Quotas, read mode | ![](images/10c2-quotas-read-light.png) | ![](images/10c2-quotas-read-dark.png) |
+| Alerts, edit mode | ![](images/10c2-alerts-edit-light.png) | ![](images/10c2-alerts-edit-dark.png) |
+| Alerts, read mode | ![](images/10c2-alerts-read-light.png) | ![](images/10c2-alerts-read-dark.png) |
+| Data retention, edit mode | ![](images/10c2-retention-edit-light.png) | ![](images/10c2-retention-edit-dark.png) |
+| Data retention, read mode | ![](images/10c2-retention-read-light.png) | ![](images/10c2-retention-read-dark.png) |
 | Exam suites | ![](images/10c1-suites-light.png) | ![](images/10c1-suites-dark.png) |
 | New suite | ![](images/10c1-suite-new-light.png) | ![](images/10c1-suite-new-dark.png) |
 | Suite: exam start, exams | ![](images/10c1-suite-light.png) | ![](images/10c1-suite-dark.png) |
