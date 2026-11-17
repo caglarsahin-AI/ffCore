@@ -61,6 +61,12 @@ async function advance(ms: number) {
   });
 }
 
+// The page answers a read through a few promise hops (fetch, JSON, render); 50 ms is far below
+// RUNS_POLL_MS, so no extra poll starts while settling.
+async function settle() {
+  for (let i = 0; i < 5; i++) await advance(10);
+}
+
 function start(answer: (n: number) => Response | Promise<Response>) {
   let n = 0;
   const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
@@ -91,7 +97,7 @@ describe("test_10c2_5_run_page_poll", () => {
       if (!up) throw new TypeError("Failed to fetch");
       return run("running");
     });
-    await advance(0);
+    await settle();
     expect(screen.getByTestId("run-read-error").textContent).toContain("network_error");
     await advance(RUNS_POLL_MS);
     await advance(RUNS_POLL_MS);
@@ -99,7 +105,7 @@ describe("test_10c2_5_run_page_poll", () => {
     expect(failed).toBeGreaterThanOrEqual(3);
     up = true;
     await advance(RUNS_POLL_MS);
-    await advance(0);
+    await settle();
     expect(screen.getByTestId("run-detail-status").textContent).toContain("Running");
     expect(screen.queryByTestId("run-read-error")).toBeNull();
   });
@@ -107,11 +113,11 @@ describe("test_10c2_5_run_page_poll", () => {
   it("shows the contract code of a refused GET and keeps reading", async () => {
     vi.useFakeTimers();
     const gets = start((n) => (n < 3 ? refusal(503, "unavailable") : run("completed")));
-    await advance(0);
+    await settle();
     expect(screen.getByTestId("run-read-error").textContent).toContain("unavailable");
     await advance(RUNS_POLL_MS);
     await advance(RUNS_POLL_MS);
-    await advance(0);
+    await settle();
     expect(screen.getByTestId("run-detail-status").textContent).toContain("Completed");
     const ended = gets();
     await advance(5 * RUNS_POLL_MS);
@@ -121,7 +127,7 @@ describe("test_10c2_5_run_page_poll", () => {
   it.each([404, 410])("stops reading when the run is gone (%i)", async (status) => {
     vi.useFakeTimers();
     const gets = start(() => refusal(status, "run_not_found"));
-    await advance(0);
+    await settle();
     expect(screen.getByTestId("run-read-error").textContent).toContain("run_not_found");
     const seen = gets();
     await advance(5 * RUNS_POLL_MS);
@@ -134,10 +140,10 @@ describe("test_10c2_5_run_page_poll", () => {
       if (n === 1) return run("running");
       throw new TypeError("Failed to fetch");
     });
-    await advance(0);
+    await settle();
     expect(screen.getByTestId("run-detail-status").textContent).toContain("Running");
     await advance(RUNS_POLL_MS);
-    await advance(0);
+    await settle();
     expect(screen.getByTestId("run-detail-status").textContent).toContain("Running");
     expect(screen.getByTestId("run-read-error").textContent).toContain("network_error");
   });
