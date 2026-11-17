@@ -45,11 +45,11 @@ describe("test_10c1_6_eval_run_view", () => {
     expect(screen.getByTestId("eval-warmup").textContent).toContain("1,200");
   });
 
-  it("labels the item table as the 10 worst items, not the full list", () => {
+  // 10c-2 D8 (FOLLOWUP-185): the full item table (test_10c2_4) replaces the 10-worst stand-in.
+  it("has no 10-worst stand-in table any more", () => {
     renderAs("analyst", "edit", <EvalSummaryView run={evalRun({ summary })} />);
-    expect(screen.getByRole("heading", { name: /10 worst items/i })).toBeTruthy();
-    expect(screen.getByTestId("eval-worst-note").textContent).toMatch(/full item list/i);
-    expect(within(screen.getByTestId("eval-worst")).getByText("item-2")).toBeTruthy();
+    expect(screen.queryByTestId("eval-worst")).toBeNull();
+    expect(screen.queryByTestId("eval-worst-note")).toBeNull();
   });
 
   it("fails loudly when the summary cannot be read, naming the field", () => {
