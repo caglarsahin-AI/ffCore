@@ -18,10 +18,12 @@ from sqlalchemy import func, select
 from ffcore.api.common import ERROR_RESPONSES, SessionDep, conflict, invalid, not_found
 from ffcore.api.eval_schemas import (
     CompareOut,
+    EvalRunItemList,
     EvalRunList,
     EvalRunOut,
     FromRunItem,
     FromRunOut,
+    ItemStatus,
     SuiteCreate,
     SuiteList,
     SuiteOut,
@@ -40,6 +42,7 @@ from ffcore.core.auth import Actor, require_role
 from ffcore.core.config import Settings, get_settings
 from ffcore.core.errors import ApiError
 from ffcore.evaluation.compare import CompareError, compare
+from ffcore.evaluation.items import item_rows, select_rows
 from ffcore.evaluation.langfuse_api import LangfuseApi, LangfuseApiError
 from ffcore.evaluation.runner import Starter, start_eval
 from ffcore.models.agents import Agent, AgentVersion
@@ -495,6 +498,26 @@ async def get_eval_run(project_id: UUID, eval_run_id: UUID, actor: Reader, sessi
     return run_out(await _eval_run(session, project_id, eval_run_id))
 
 
+@router.get("/eval-runs/{eval_run_id}/items", response_model=EvalRunItemList)
+async def list_eval_run_items(
+    project_id: UUID,
+    eval_run_id: UUID,
+    actor: Reader,
+    session: SessionDep,
+    status: Annotated[ItemStatus, Query(description="Which items (default all).")] = "all",
+    limit: Annotated[int, Query(ge=1, le=200)] = 50,
+    offset: Annotated[int, Query(ge=0)] = 0,
+):
+    """The exam's items, one page (10c-2, FOLLOWUP-185): each combined from its runs like the
+    summary and compare (FFCore's own results, no Langfuse call); failed, not run, passed, not
+    yet scored, then by item id."""
+    row = await _eval_run(session, project_id, eval_run_id)
+    rows = select_rows(item_rows(row.item_runs), status)
+    return EvalRunItemList(
+        data=rows[offset : offset + limit], total=len(rows), limit=limit, offset=offset
+    )
+
+
 @router.post("/eval-runs/{eval_run_id}/cancel", response_model=EvalRunOut)
 @audited("cancel_eval_run", "eval_run")
 async def cancel_eval_run(
@@ -538,7 +561,7 @@ async def stream_eval_run(project_id: UUID, eval_run_id: UUID, actor: Reader, se
             if out.status in ("completed", "failed", "cancelled"):
                 done = data | {
                     "error_code": out.error_code,
-                    "passed": (out.summary or {}).get("passed"),
+                    "passed": out.summary.passed if out.summary else None,
                 }
                 yield f"event: done\ndata: {json.dumps(done)}\n\n"
                 return

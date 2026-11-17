@@ -4,7 +4,7 @@ import { useFormatter, useTranslations } from "next-intl";
 
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { CodeTable, isOutcome, isScorer, useNotRunRows } from "@/components/eval/codes";
+import { CodeTable, isScorer, useNotRunRows } from "@/components/eval/codes";
 import { isLiveEvalRun } from "@/lib/api/eval-queries";
 import type { EvalRun } from "@/lib/api/eval-queries";
 import { OUTCOMES, describeError, readSummary } from "@/lib/eval-summary";
@@ -13,7 +13,7 @@ import type { EvalSummary } from "@/lib/eval-summary";
 // The result of one exam (09 summary). Every count is shown as the backend wrote it: not-run
 // reasons and errors keep their code next to the explanation, an unknown code stays raw, an
 // incomplete exam says so, and a summary that cannot be read is an error, not an empty result.
-// The item table is the 10 worst items only; a full item list needs FOLLOWUP-185.
+// Every item is in the exam page's item table (EvalItemsTable, 10c-2 FOLLOWUP-185).
 export function EvalSummaryView({ run }: { run: EvalRun }) {
   const t = useTranslations("Evaluations.summary");
   return (
@@ -171,40 +171,6 @@ function Loaded({ summary, cost }: { summary: EvalSummary; cost: number | null }
         </section>
       </div>
 
-      <section className="flex flex-col gap-2">
-        <h2 className="text-lg font-medium">{t("worstTitle")}</h2>
-        <p className="text-sm text-muted-foreground" data-testid="eval-worst-note">
-          {t("worstNote")}
-        </p>
-        {summary.worst.length === 0 ? (
-          <p className="text-sm text-muted-foreground">{t("worstNone")}</p>
-        ) : (
-          <Table data-testid="eval-worst">
-            <TableHeader>
-              <TableRow>
-                <TableHead>{t("item")}</TableHead>
-                <TableHead>{t("itemPassed")}</TableHead>
-                <TableHead className="text-right">{t("mean")}</TableHead>
-                <TableHead>{t("outcome")}</TableHead>
-                <TableHead>{t("style")}</TableHead>
-                <TableHead>{t("note")}</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {summary.worst.map((item) => (
-                <TableRow key={item.item_id}>
-                  <TableCell className="font-mono">{item.item_id}</TableCell>
-                  <TableCell>{item.passed === null ? t("notRunShort") : item.passed ? t("yes") : t("no")}</TableCell>
-                  <TableCell className="text-right font-mono">{item.mean === null ? t("noData") : format.number(item.mean, { maximumFractionDigits: 3 })}</TableCell>
-                  <TableCell>{item.outcome && isOutcome(item.outcome) ? tOutcome(item.outcome) : <span className="font-mono">{item.outcome ?? t("noData")}</span>}</TableCell>
-                  <TableCell className="font-mono">{item.style}</TableCell>
-                  <TableCell className="font-mono">{item.note || t("noData")}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        )}
-      </section>
     </>
   );
 }

@@ -7,6 +7,7 @@ import { useParams } from "next/navigation";
 import { useFormatter, useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 
+import { EvalItemsTable } from "@/components/eval/eval-items-table";
 import { EvalSummaryView } from "@/components/eval/eval-summary-view";
 import { QueryError, Screen } from "@/components/screen";
 import { useSession } from "@/components/session-provider";
@@ -152,6 +153,7 @@ function Loaded({ projectId, run, runAt, stream, setStream }: { projectId: strin
         {stream === "reconnecting" && <p className="text-sm text-muted-foreground">{t("streamReconnectingHint")}</p>}
         {stream === "lost" && <p className="text-sm text-muted-foreground">{t("streamLostHint")}</p>}
         <EvalSummaryView run={run} />
+        <EvalItemsTable projectId={projectId} run={run} />
       </Screen>
     </div>
   );

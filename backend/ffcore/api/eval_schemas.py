@@ -108,6 +108,86 @@ class SuiteList(BaseModel):
     items: list[SuiteOut]
 
 
+# --- 10c-2 (FOLLOWUP-185): the exam summary and its item table -------------------------------
+
+
+class EvalStyleSummary(BaseModel):
+    n: int
+    passed: int
+    outcomes: dict[str, int]
+
+
+class EvalWorstItem(BaseModel):
+    item_id: str
+    style: str
+    outcome: str | None
+    passed: bool | None
+    mean: float | None
+    note: str
+
+
+class EvalLatency(BaseModel):
+    p50: int
+    max: int
+
+
+class EvalSummary(BaseModel):
+    """What `evaluation.engine.summarize()` writes once an exam has ended: every key, typed (a
+    unit test holds the two together). `pass_rate` covers the `scored` items only; `complete` is
+    false when any item, or a repeat of one (`partial:<code>`), was not run (`not_run`)."""
+
+    n: int
+    scored: int
+    not_run: dict[str, int]
+    passed_items: int
+    pass_rate: float
+    pass_threshold: float
+    passed: bool
+    complete: bool
+    scores: dict[str, float] = Field(description="Mean of each scorer over the items it scored.")
+    outcomes: dict[str, int]
+    styles: dict[str, EvalStyleSummary]
+    worst: list[EvalWorstItem] = Field(description="At most 10 scored items, failed first.")
+    errors: dict[str, int]
+    warm_cache: bool
+    warmup_ms: int | None = Field(description="The first run's time, left out of `latency_ms`.")
+    latency_ms: EvalLatency | None
+
+
+ItemStatus = Literal["all", "failed", "passed", "not_run"]
+
+
+class EvalRunItemScore(BaseModel):
+    name: str
+    value: float | None
+    passed: bool | None
+    status: str = Field(description="ok, error or not_run.")
+    comment: str
+
+
+class EvalRunItem(BaseModel):
+    item_id: str
+    style: str
+    scored: bool = Field(description="False while the exam has not scored the item yet.")
+    passed: bool | None = Field(description="None: not run (see `note`) or not scored yet.")
+    mean: float | None = Field(description="Mean over the scorers that ran; None if none did.")
+    outcome: str | None
+    note: str
+    repeats_not_run: str = Field(description="repeat > 1: the not-run code of left-out repeats.")
+    attempts: int
+    run_ids: list[str]
+    scores: list[EvalRunItemScore]
+
+
+class EvalRunItemList(BaseModel):
+    """One page of an exam's items: failed, not run, passed, not yet scored, then by item id."""
+
+    data: list[EvalRunItem]
+    total: int = Field(description="Items matching `status`, over all pages.")
+    limit: int
+    offset: int
+
+
 class EvalRunOut(BaseModel):
     id: UUID
     project_id: UUID
@@ -118,7 +198,7 @@ class EvalRunOut(BaseModel):
     error_code: str | None
     items: int
     scored: int
-    summary: dict[str, Any] | None
+    summary: EvalSummary | None = Field(description="Set once the exam has ended.")
     cost_usd: float | None
     started_at: datetime | None
     ended_at: datetime | None

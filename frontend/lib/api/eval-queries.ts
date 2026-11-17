@@ -1,9 +1,9 @@
 "use client";
 
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { api } from "@/lib/api/client";
-import type { components } from "@/lib/api/schema-09";
+import type { components, operations } from "@/lib/api/schema-09";
 
 // Evaluation calls (09 contract, types generated from backend/openapi/09.yaml).
 type S = components["schemas"];
@@ -21,6 +21,9 @@ export type MetricDiff = S["MetricDiff"];
 export type FromRunItem = S["FromRunItem"];
 export type FromRunOut = S["FromRunOut"];
 export type ExpectedOutput = S["ExpectedOutput"];
+export type EvalRunItem = S["EvalRunItem"];
+export type EvalRunItemList = S["EvalRunItemList"];
+export type ItemStatus = NonNullable<operations["list_eval_run_items_api_v1_projects__project_id__eval_runs__eval_run_id__items_get"]["parameters"]["query"]>["status"] & string;
 
 export const EVAL_RUN_STATUSES = ["queued", "running", "completed", "failed", "cancelled"] as const satisfies readonly EvalRunStatus[];
 export const SCORER_NAMES = [
@@ -51,7 +54,12 @@ export const evalKeys = {
   runs: (projectId: string, suiteId: string) => ["projects", projectId, "eval", "suites", suiteId, "runs"] as const,
   run: (projectId: string, evalRunId: string) => ["projects", projectId, "eval", "run", evalRunId] as const,
   compare: (projectId: string, a: string, b: string) => ["projects", projectId, "eval", "compare", a, b] as const,
+  items: (projectId: string, evalRunId: string, status: ItemStatus, offset: number) => ["projects", projectId, "eval", "run", evalRunId, "items", status, offset] as const,
 };
+
+// Item table of one exam (10c-2, FOLLOWUP-185): the endpoint's status filter and pages.
+export const ITEM_STATUSES = ["all", "failed", "passed", "not_run"] as const satisfies readonly ItemStatus[];
+export const EVAL_ITEMS_PAGE = 50;
 
 export function useSuites(projectId: string) {
   return useQuery({
@@ -82,6 +90,18 @@ export function useEvalRun(projectId: string, evalRunId: string, poll = false) {
     queryKey: evalKeys.run(projectId, evalRunId),
     queryFn: () => api<EvalRun>("GET", `${base(projectId)}/eval-runs/${evalRunId}`),
     refetchInterval: (q) => (poll && q.state.data && isLiveEvalRun(q.state.data.status) ? EVAL_POLL_MS : false),
+  });
+}
+
+// One page of the exam's items. Its key sits under the exam's, so the exam's refresh at the end of
+// its stream also refreshes the table; a live exam's items are read again with the exam (poll).
+export function useEvalRunItems(projectId: string, evalRunId: string, status: ItemStatus, offset: number, poll = false) {
+  return useQuery({
+    queryKey: evalKeys.items(projectId, evalRunId, status, offset),
+    queryFn: () =>
+      api<EvalRunItemList>("GET", `${base(projectId)}/eval-runs/${evalRunId}/items?${new URLSearchParams({ status, limit: String(EVAL_ITEMS_PAGE), offset: String(offset) })}`),
+    placeholderData: keepPreviousData,
+    refetchInterval: poll ? EVAL_POLL_MS : false,
   });
 }
 

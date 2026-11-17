@@ -1353,6 +1353,38 @@
       },
       "maskedNone": "No field was changed by masking.",
       "maskedFields": "Masked fields: {fields}"
+    },
+    "items": {
+      "title": "Items",
+      "description": "Every item of the exam with its result, scores and runs: failed first, then not run, passed and not yet scored.",
+      "filterLabel": "Show items",
+      "filters": {
+        "all": "All",
+        "failed": "Failed",
+        "passed": "Passed",
+        "not_run": "Not run"
+      },
+      "results": {
+        "failed": "Failed",
+        "not_run": "Not run",
+        "passed": "Passed",
+        "pending": "Not scored yet"
+      },
+      "item": "Item",
+      "result": "Result",
+      "mean": "Mean score",
+      "scores": "Scores",
+      "outcome": "Outcome",
+      "style": "Style",
+      "note": "Note",
+      "runs": "Runs",
+      "runLink": "Run {n}",
+      "repeatsNotRun": "Repeats not run: {code}",
+      "noData": "—",
+      "none": "No item matches this filter.",
+      "range": "{from}–{to} / {total}",
+      "prev": "Previous",
+      "next": "Next"
     }
   }
 }

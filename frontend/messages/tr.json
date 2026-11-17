@@ -1353,6 +1353,38 @@
       },
       "maskedNone": "Maskeleme hiçbir alanı değiştirmedi.",
       "maskedFields": "Maskelenen alanlar: {fields}"
+    },
+    "items": {
+      "title": "Maddeler",
+      "description": "Sınavın her maddesi sonucu, puanları ve koşularıyla: önce başarısızlar, sonra koşulmayanlar, geçenler ve henüz puanlanmayanlar.",
+      "filterLabel": "Gösterilecek maddeler",
+      "filters": {
+        "all": "Tümü",
+        "failed": "Başarısız",
+        "passed": "Geçti",
+        "not_run": "Koşulmadı"
+      },
+      "results": {
+        "failed": "Başarısız",
+        "not_run": "Koşulmadı",
+        "passed": "Geçti",
+        "pending": "Henüz puanlanmadı"
+      },
+      "item": "Madde",
+      "result": "Sonuç",
+      "mean": "Ortalama puan",
+      "scores": "Puanlar",
+      "outcome": "Sonuç türü",
+      "style": "Soru tarzı",
+      "note": "Not",
+      "runs": "Koşular",
+      "runLink": "Koşu {n}",
+      "repeatsNotRun": "Koşulmayan tekrarlar: {code}",
+      "noData": "—",
+      "none": "Bu süzgece uyan madde yok.",
+      "range": "{from}–{to} / {total}",
+      "prev": "Önceki",
+      "next": "Sonraki"
     }
   }
 }
