@@ -161,3 +161,27 @@ PR-HAZIR r2 alındı; 8c01f04 doğrulandı (3 commit test/kod/docs ayrı, 9 dosy
 ### K-SSE-0009 · 2026-11-17 08:21 · → tumu · MERGE-BASLIYOR
 Paket: fix/10b-sse-bekci · Cevap: R-SSE-0008 · SHA: 8c01f046c9e6087076b495de53661ef63f60e646
 r2 ONAY (B0 M0 m0 N2; rapor state/reviews/fix-10b-sse-bekci-r2.md; P1 tekrarında hata satırı + 3 s yoklama + backend dönünce durum). Main ile çakışma yok. Merge --no-ff ve önyüz kapısı (node konteyneri `--network none`, `ffcore-10a-nm`; lint/typecheck/check:api/Vitest; tee `gate-sse-20261117.log`) koordinatörde; backend dokunulmadı, backend kapısı koşulmaz. N1 FOLLOWUP-192'ye eklendi.
+
+### K-SSE-0010 · 2026-11-17  · → tumu · YIGIN-AC
+Paket: fix/10b-sse-bekci · Cevap: K-SSE-0009 · Yigin: node-gate-koord
+Main kapısı için tek node konteyneri (`docker run --rm --network none`, volume ffcore-10a-nm); compose yığını değil; bitince YIGIN-KAPA.
+
+### K-SSE-0011 · 2026-11-17  · → tumu · YIGIN-KAPA
+Paket: fix/10b-sse-bekci · Cevap: K-SSE-0010 · Yigin: node-gate-koord
+Konteyner kapandı (`--rm`); kapı çıktısı state/evidence/gate-sse-20261117.log.
+
+### K-SSE-0012 · 2026-11-17  · → tumu · YIGIN-AC
+Paket: fix/10b-sse-bekci · Cevap: K-SSE-0011 · Yigin: node-gate-koord
+İlk koşu mount hatası (yalnız frontend/ bağlandı; check:api ve 5 test dosyası ../backend ve handbook okuyamadı); depo kökü bağlanarak yeniden.
+
+### K-SSE-0013 · 2026-11-17  · → tumu · YIGIN-KAPA
+Paket: fix/10b-sse-bekci · Cevap: K-SSE-0012 · Yigin: node-gate-koord
+Konteyner kapandı; kapı çıktısı state/evidence/gate-sse-20261117.log (üzerine yazıldı).
+
+### K-SSE-0014 · 2026-11-17 08:25 · → tumu · MERGED
+Paket: fix/10b-sse-bekci · Cevap: R-SSE-0008 · SHA: 4216718
+Merge --no-ff `4216718` (8c01f04; 6 commit, 10 dosya +583/-74). Kapı: node konteyneri `--network none` + `ffcore-10a-nm`, depo kökü bağlı: lint/typecheck/check:api 0, Vitest 211/211 (`state/evidence/gate-sse-20261117.log`); backend dokunulmadı, backend/e2e kapısı koşulmadı (KARARLAR 'fix/10b-sse-bekci kapısı önyüz-yalnız'). WORK_QUEUE DONE; FOLLOWUP-188 kapandı (arşiv); N1 ve koşu sayfası FOLLOWUP-192; mount dersi FOLLOWUP-191. Push kullanıcı talimatını bekliyor.
+
+### K-SSE-0015 · 2026-11-17 08:25 · → isci-c · HANDOFF-ISTEK
+Paket: fix/10b-sse-bekci · Cevap: C-SSE-0009
+MERGED 4216718. Kanalına HANDOFF yaz (kalan riskler: FOLLOWUP-192 sayfa + kalıcı 404; NOTE-3 durum satırı penceresi; NOTE-4 asılı POST), sonra lease `RETIRED`. Worktree `.worktrees/fix/10b-sse-bekci` silme kullanıcıda. İki turda M1 → 0, 211 test; teşekkürler.
