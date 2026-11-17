@@ -3,7 +3,8 @@
 Agents act through tools. A tool is an MCP server (streamable HTTP) registered in a project;
 the backend is the MCP client. It discovers the server's actions, keeps their settings and
 calls them. This page covers package 05a: registering a tool, upstream identities, discovery,
-approval settings, test calls, and the two built-in servers `mcp-search` and `mcp-sql`.
+approval settings, test calls, and the two built-in servers `mcp-search` and `mcp-sql`; and
+package 05b: publishing an OpenAPI document or a remote MCP server as an MCP server of FFCore.
 
 ## Register a tool
 
@@ -22,7 +23,13 @@ approval settings, test calls, and the two built-in servers `mcp-search` and `mc
 - `endpoint_url` passes the outbound policy now and again at every call. Its host must be in
   `EGRESS_ALLOWLIST` (external) or `ALLOWED_INTERNAL_HOSTS` (internal). Loopback, private and
   metadata addresses are refused unless the host is internal. A refusal is `400 egress_*`.
-- `kind: openapi` can be registered but not called yet (`501`); it arrives with 05b.
+- `kind: openapi` is refused (`422 openapi_tool_via_mcp_server`, 05b): an OpenAPI service
+  becomes a tool by publishing it as an MCP server and adding that server to the tools (see
+  "Publish an MCP server"). There is one HTTP path for OpenAPI, not two.
+- The backend itself is a tool only as a published server's own endpoint,
+  `<INTERNAL_API_URL>/mcp/<key>/` with `forward_user`; any other backend URL (another path,
+  another identity, loopback on port 8000) is `400 endpoint_is_platform`, even when
+  `ALLOWED_INTERNAL_HOSTS` lists the backend.
 
 Analysts and above read tools and their actions (the agent wizard lists them); only admins with
 edit access change them. Secret `auth` fields are `***` for every reader. Every change is audited.
@@ -165,6 +172,101 @@ Setup:
 2. Register it with the identity it expects, then discover.
 3. Review each action, set `needs_approval` (actions that change data should keep it), and
    enable the ones agents may use.
+
+## Publish an MCP server (05b)
+
+Corporate systems with an OpenAPI document (Superset, HBYS, SAP, Jira) become agent tools
+without code: FFCore serves the document's operations as MCP tools at `/mcp/<key>/`. A remote
+MCP server can be served the same way, behind FFCore's identity, guardrail and log.
+
+`POST /api/v1/projects/{project_id}/mcp-servers` (project admin):
+
+```json
+{"key": "superset", "name": "Superset", "source_kind": "openapi",
+ "spec": "<OpenAPI 3 document, YAML or JSON>",
+ "upstream_base_url": "https://superset.example.com",
+ "upstream_auth": {"type": "bearer", "token": "..."},
+ "access": "internal", "guardrail_mode": "monitor", "guardrail_policy_key": "default"}
+```
+
+- `key` is unique in the installation (the endpoint path has no project):
+  `409 mcp_server_key_taken`.
+- `source_kind: remote_mcp` takes no `spec`; `upstream_base_url` is the remote MCP endpoint.
+  Run `POST .../mcp-servers/{id}/discover` to read its `tools/list`.
+- `upstream_auth` is `none`, `bearer`, `header` or `basic` (encrypted, `***` when read).
+  `forward_user` is not offered: platform services are never an upstream.
+- `upstream_base_url` follows the tool endpoint rules (scheme, host, port, path; egress policy,
+  `400 egress_*`) and is never a platform service (`422 upstream_url_refused`: the backend,
+  LiteLLM, Langfuse, Postgres, mcp-search, mcp-sql and the other compose services).
+- The server starts as `draft` with no operation selected.
+
+**Operations.** Each OpenAPI operation becomes one tool: `operationId` is the name, path and
+query parameters and the JSON request body (`body`) form `inputSchema`, the description is the
+operation's description or summary. Local `$ref`s are resolved. An operation that cannot be
+served stays in the list with `exposable: false` and a `reason`: `operation_id_missing`,
+`operation_name_invalid`, `operation_id_duplicate`, `parameter_location_unsupported` (header or
+cookie parameters), `parameter_name_conflict`, `request_body_unsupported` (not JSON),
+`external_ref`, `ref_not_found`, `ref_cycle`. A bad document is `422 spec_invalid`,
+`spec_version_unsupported` (only OpenAPI 3) or `spec_too_large` (1 000 000 characters).
+
+`PATCH .../mcp-servers/{id}` selects what is served and how it looks to the model:
+
+```json
+{"exposed_operations": ["searchDashboards", "createChart"],
+ "aliases": {"searchDashboards": {"name": "find_dashboard", "description": "Find a dashboard."}},
+ "status": "active"}
+```
+
+Only `exposed_operations` are listed and callable. A new document (`PUT .../spec`) keeps the
+selection and aliases by operation name; a selected operation missing from it is
+`409 exposed_operation_missing` and nothing changes. `POST .../test` sends one GET to the
+upstream (or `initialize` and `tools/list` for a remote server) and shows the status.
+
+**Who may call `/mcp/<key>/`.** The endpoint is the backend's second external surface, next to
+the facade (PLAN R1.2). Every request is checked before the MCP SDK sees it:
+
+| `access` | API key | Platform runtime (agent run) |
+|---|---|---|
+| `internal` (default) | `403 mcp_server_internal` | yes |
+| `token` | with the `tools_invoke` scope (`403 scope_missing` without) | yes |
+
+A key only reaches servers of its own project; an unknown, deleted, inactive or other project's
+server is one `404 mcp_server_not_found`. A console session or a bare service token is
+`401 mcp_credentials_required`. The SDK's Host header check (DNS rebinding protection) is off on
+this endpoint: there is no cookie or other ambient credential on it, every request carries a key
+or the service token, and the public Host behind a reverse proxy is not known in advance. The
+identity check above runs first on every request, whatever the Host.
+
+**Each call** goes: request quota (the request windows of the project's quotas, like the facade;
+no token or USD counting, there is no model) -> guardrail `tool.pre` on the arguments ->
+upstream -> result cut to `TOOL_RESULT_MAX_CHARS` (`[truncated: N/M chars]`) -> guardrail
+`tool.post` -> answer. The upstream call goes only to the registered origin; redirects are not
+followed (`egress_too_many_redirects`); an answer larger than `MCP_UPSTREAM_MAX_BYTES` is
+refused (`upstream_response_too_large`). Failures reach the caller as an error result with a
+code (`upstream_http_<status>`, `upstream_timeout`, `upstream_unreachable`, `egress_*`,
+`invalid_arguments`, `unknown_tool`, `quota_exceeded`, `guardrail_blocked`); upstream text never
+does.
+
+**Guardrail.** `guardrail_policy_key` names the project's policy (default `default`).
+`guardrail_mode` makes it stricter, never looser: each rule runs in the stricter of the server
+mode and its own (`off` < `monitor` < `enforce`). `off` runs the policy as it is, `monitor` logs
+an `off` policy too, `enforce` enforces every rule. Rules of type `tool_args` match the tool as
+`<server key>.<operation>`. Events go to the guardrail log with source `api`.
+
+**Log.** Every call writes one `mcp_server_calls` row (operation, status, code, latency, run,
+caller; no arguments or results) and one `mcp_server_call` audit row.
+`GET .../mcp-servers/{id}/calls?hours=24` gives requests, errors, blocked calls, p50/p95 latency
+and the last 50 calls (the MCP monitoring screen, 10c-3).
+
+**Agents use it** through the tools registry: `POST .../mcp-servers/{id}/tools` adds a tool with
+the server's key at `<INTERNAL_API_URL>/mcp/<key>/` and `forward_user`, so the runtime calls the
+endpoint with the run user's identity. Discover it in the tools registry; its actions start
+disabled and needing approval (05a rule). Keep approval on actions that change data
+(`createChart` in the Superset sample): the run waits in the approval queue (07) before the
+call. Approval is on the agent side; an external client with a `token` key decides for itself.
+
+The Superset sample is `data/samples/openapi/superset.yaml` (6 operations; `createChart` and
+`addChartToDashboard` change data). The API is in `backend/openapi/05b.yaml`.
 
 ## Contract (C7)
 
