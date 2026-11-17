@@ -127,4 +127,64 @@ describe("test_10bsse_2_panel_poll", () => {
     }
     expect(gets(fetchMock)).toBe(before);
   });
+
+  // r1 MAJOR-1 (yoklama-hatada-sessiz-durma, probe P1): the backend is down when the stream stalls,
+  // so the first GET and every reconnect fail. The panel keeps reading every RUNS_POLL_MS, says the
+  // run cannot be read, and shows the status once the backend answers again.
+  it("keeps reading after a failed GET, shows the failure, then the status once the backend is back", async () => {
+    vi.useFakeTimers();
+    let backendUp = false;
+    const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
+      const url = urlOf(input);
+      if (url === RUN_GET || url.endsWith("/runs/r1/stream")) {
+        if (!backendUp) throw new TypeError("Failed to fetch");
+        return url === RUN_GET ? run("running") : openBody([]);
+      }
+      return openBody([first]);
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    await start();
+    await advance(STALL);
+    await advance(0);
+    expect(screen.getByTestId("test-server-error").textContent).toMatch(/did not reach the server/i);
+    expect(screen.getByTestId("test-server-error").textContent).toContain("network_error");
+    expect(screen.queryByTestId("test-server-status")).toBeNull();
+    await advance(10 * RETRY_DELAY_MS);
+    expect(screen.getByTestId("test-status").dataset.stream).toBe("lost");
+    const failed = gets(fetchMock);
+    expect(failed).toBeGreaterThanOrEqual(2); // it kept trying while the backend was down
+    expect(screen.getByTestId("test-server-error")).toBeTruthy();
+    backendUp = true;
+    await advance(RUNS_POLL_MS);
+    await advance(0);
+    expect(gets(fetchMock)).toBeGreaterThan(failed);
+    expect(screen.getByTestId("test-server-status").textContent).toContain("Running");
+    expect(screen.queryByTestId("test-server-error")).toBeNull();
+  });
+
+  it("shows the contract code when the GET is refused, and stops reading once the run has ended", async () => {
+    vi.useFakeTimers();
+    let n = 0;
+    const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
+      const url = urlOf(input);
+      if (url === RUN_GET) {
+        n += 1;
+        if (n === 1) return new Response(JSON.stringify({ error: { code: "unavailable", type: "api_error", message: "down" } }), { status: 503, headers: { "content-type": "application/json" } });
+        return run("completed");
+      }
+      if (url.endsWith("/runs/r1/stream")) return new Response(null, { status: 503 });
+      return openBody([first]);
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    await start();
+    await advance(STALL);
+    await advance(0);
+    expect(screen.getByTestId("test-server-error").textContent).toContain("unavailable");
+    await advance(RUNS_POLL_MS);
+    await advance(0);
+    expect(screen.getByTestId("test-server-status").textContent).toContain("Completed");
+    const ended = gets(fetchMock);
+    await advance(5 * RUNS_POLL_MS);
+    expect(gets(fetchMock)).toBe(ended);
+  });
 });

@@ -183,3 +183,38 @@ describe("test_10bsse_1_stall: a failed read is a drop", () => {
     ).rejects.toThrow(SyntaxError);
   });
 });
+
+// r1 NOTE-2: when the attempt has already ended by the time its body is read (the outside abort
+// or the watchdog landed right after the response arrived), the body is still cancelled.
+describe("test_10bsse_1_stall: an attempt ended before reading", () => {
+  it("cancels the body it will not read and ends as aborted", async () => {
+    const controller = new AbortController();
+    let cancelled = 0;
+    const tracked = new Response(
+      new ReadableStream<Uint8Array>({
+        start(c) {
+          c.enqueue(encoder.encode(doneEvent));
+        },
+        cancel() {
+          cancelled += 1;
+        },
+      }),
+    );
+    const states: StreamState[] = [];
+    const result = await followRunStream({
+      open: async () => closed([first]),
+      reconnect: async () => tracked,
+      onEvent: () => undefined,
+      // the reconnect answered: abort before its body is read
+      onState: (state) => {
+        states.push(state);
+        if (state === "streaming" && states.includes("reconnecting")) controller.abort();
+      },
+      signal: controller.signal,
+      retryDelayMs: 0,
+    });
+    expect(result).toMatchObject({ ended: "aborted" });
+    expect(cancelled).toBe(1);
+  });
+});
+
