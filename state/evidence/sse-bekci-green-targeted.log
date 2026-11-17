@@ -1,0 +1,121 @@
+
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.12 [39m[90m/w/frontend[39m
+
+ [32m✓[39m tests/unit/test_10bp2_6_sse.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 91[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10bsse_1_stall.test.ts [2m([22m[2m10 tests[22m[2m)[22m[32m 111[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10c1_3_eval_stream.test.ts [2m([22m[2m16 tests[22m[2m)[22m[32m 106[2mms[22m[39m
+ [31m❯[39m tests/unit/test_10bsse_2_panel_poll.test.tsx [2m([22m[2m3 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 141[2mms[22m[39m
+     [32m✓[39m reads the run with GET once the stream stalls and shows the server status while reconnecting[32m 97[2mms[22m[39m
+[31m     [31m×[31m keeps reading with GET after the stream is lost[39m[32m 24[2mms[22m[39m
+     [32m✓[39m stops reading with GET when the reconnected stream speaks again[32m 19[2mms[22m[39m
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m tests/unit/test_10bsse_2_panel_poll.test.tsx[2m > [22mtest_10bsse_2_panel_poll[2m > [22mkeeps reading with GET after the stream is lost
+[31m[1mTestingLibraryElementError[22m[39m: Unable to find an element by: [data-testid="test-server-status"]
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<section[39m
+      [33maria-label[39m=[32m"Test panel"[39m
+      [33mclass[39m=[32m"flex flex-col gap-4 rounded-xl border bg-card p-4"[39m
+      [33mdata-testid[39m=[32m"test-panel"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"flex items-center justify-between gap-2"[39m
+      [36m>[39m
+        [36m<h2[39m
+          [33mclass[39m=[32m"font-medium"[39m
+        [36m>[39m
+          [0mTest panel[0m
+        [36m</h2>[39m
+        [36m<span[39m
+          [33mclass[39m=[32m"group/badge inline-flex h-5 w-fit shrink-0 items-center justify-center gap-1 overflow-hidden rounded-4xl border px-2 py-0.5 text-xs font-medium whitespace-nowrap transition-all focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&>svg]:pointer-events-none [&>svg]:size-3! border-border text-foreground [a]:hover:bg-muted [a]:hover:text-muted-foreground"[39m
+          [33mdata-slot[39m=[32m"badge"[39m
+          [33mdata-variant[39m=[32m"outline"[39m
+        [36m>[39m
+          [0mVersion 1[0m
+        [36m</span>[39m
+      [36m</div>[39m
+      [36m<form[39m
+        [33mclass[39m=[32m"flex flex-col gap-3"[39m
+        [33mnovalidate[39m=[32m""[39m
+      [36m>[39m
+        [36m<label[39m
+          [33mclass[39m=[32m"text-sm font-medium"[39m
+          [33mfor[39m=[32m"test-input"[39m
+        [36m>[39m
+          [0mMessage[0m
+        [36m</label>[39m
+        [36m<textarea[39m
+          [33mclass[39m=[32m"flex field-sizing-content w-full rounded-lg border border-input bg-transparent px-2.5 py-2 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 min-h-20"[39m
+          [33mdata-slot[39m=[32m"textarea"[39m
+          [33mdata-testid[39m=[32m"test-input"[39m
+          [33mid[39m=[32m"test-input"[39m
+        [36m>[39m
+          [0mhello[0m
+        [36m</textarea>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"flex gap-2"[39m
+        [36m>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"group/button inline-flex shrink-0 items-center justify-center rounded-lg border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 bg-primary text-primary-foreground hover:bg-primary/80 h-8 gap-1.5 px-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2"[39m
+            [33mdata-slot[39m=[32m"button"[39m
+            [33mdata-testid[39m=[32m"test-send"[39m
+            [33mtabindex[39m=[32m"0"[39m
+            [33mtype[39m=[32m"submit"[39m
+          [36m>[39m
+            [0mSend[0m
+          [36m</button>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"group/button inline-flex shrink-0 items-center justify-center rounded-lg border bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 border-border bg-background hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50 h-8 gap-1.5 px-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2"[39m
+            [33mdata-slot[39m=[32m"button"[39m
+            [33mdata-testid[39m=[32m"test-cancel"[39m
+            [33mtabindex[39m=[32m"0"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [0mCancel run[0m
+          [36m</button>[39m
+        [36m</div>[39m
+      [36m</form>[39m
+      [36m<p[39m
+        [33mclass[39m=[32m"text-sm text-muted-foreground"[39m
+        [33mdata-phase[39m=[32m"running"[39m
+        [33mdata-stream[39m=[32m"lost"[39m
+        [33mdata-testid[39m=[32m"test-status"[39m
+        [33mrole[39m=[32m"status"[39m
+      [36m>[39m
+        [0mThe stream could not be resumed. The run may still be going; open it in Runs.[0m
+      [36m</p>[39m
+      [36m<a[39m
+        [33mclass[39m=[32m"text-sm text-primary underline-offset-4 hover:underline"[39m
+        [33mdata-testid[39m=[32m"test-run-link"[39m
+        [33mhref[39m=[32m"/runs/r1"[39m
+      [36m>[39m
+        [0mOpen this run[0m
+      [36m</a>[39m
+    [36m</section>[39m
+  [36m</div>[39m
+[36m</body>[39m
+[90m [2m❯[22m Object.getElementError node_modules/@testing-library/dom/dist/config.js:[2m37:19[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m76:38[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m52:17[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m95:19[22m[39m
+[36m [2m❯[22m tests/unit/test_10bsse_2_panel_poll.test.tsx:[2m100:19[22m[39m
+    [90m 98|[39m     [35mawait[39m [34madvance[39m([33mSTALL[39m [33m+[39m [34m10[39m [33m*[39m [33mRETRY_DELAY_MS[39m)[33m;[39m
+    [90m 99|[39m     expect(screen.getByTestId("test-status").dataset.stream).toBe("los…
+    [90m100|[39m     expect(screen.getByTestId("test-server-status").textContent).toCon…
+    [90m   |[39m                   [31m^[39m
+    [90m101|[39m     [35mconst[39m before [33m=[39m [34mgets[39m(fetchMock)[33m;[39m
+    [90m102|[39m     [35mawait[39m [34madvance[39m([33mRUNS_POLL_MS[39m)[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯[22m[39m
+
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m3 passed[39m[22m[90m (4)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m36 passed[39m[22m[90m (37)[39m
+[2m   Start at [22m 04:46:15
+[2m   Duration [22m 3.00s[2m (transform 2.48s, setup 0ms, import 3.21s, tests 450ms, environment 828ms)[22m
+
+vitest_exit=1
