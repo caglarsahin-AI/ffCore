@@ -97,6 +97,7 @@ describe("test_10bsse_2_panel_poll", () => {
     await start();
     await advance(STALL + 10 * RETRY_DELAY_MS);
     expect(screen.getByTestId("test-status").dataset.stream).toBe("lost");
+    await advance(0); // let the GET answer render (React schedules on the faked timers)
     expect(screen.getByTestId("test-server-status").textContent).toContain("Waiting for approval");
     const before = gets(fetchMock);
     await advance(RUNS_POLL_MS);

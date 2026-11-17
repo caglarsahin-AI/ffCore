@@ -55,7 +55,7 @@ describe("test_10bsse_1_stall: watchdog", () => {
     vi.useFakeTimers();
     const signals: AbortSignal[] = [];
     const states: StreamState[] = [];
-    const reconnect = vi.fn(async (_runId: string, _last: string | null) => closed([doneEvent]));
+    const reconnect = vi.fn(async () => closed([doneEvent]));
     const end = followRunStream({
       open: async (signal?: AbortSignal) => {
         if (signal) signals.push(signal);
