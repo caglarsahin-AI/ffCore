@@ -129,7 +129,8 @@ def test_10c2_run_out_types_the_summary():
     out = summarize(_summary(PLAN), pass_threshold=0.8, warmup_ms=None, latencies_ms=[])
     row = SimpleNamespace(
         id="00000000-0000-0000-0000-000000000001", project_id="00000000-0000-0000-0000-000000000002",
-        suite_id="00000000-0000-0000-0000-000000000003", agent_version_id=None,
+        suite_id="00000000-0000-0000-0000-000000000003",
+        agent_version_id="00000000-0000-0000-0000-000000000004",
         langfuse_run_name="exam", status="completed", error_code=None, item_runs=PLAN,
         summary=out, cost_usd=None, started_at=None, ended_at=None,
         created_at="2026-11-17T08:00:00Z",
