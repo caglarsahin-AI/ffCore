@@ -1,0 +1,244 @@
+// @vitest-environment jsdom
+// Reviewer probe (fix/10b-sse-bekci r1). Not part of the branch.
+import { QueryClient } from "@tanstack/react-query";
+import { act, cleanup, fireEvent, screen } from "@testing-library/react";
+import { afterEach, describe, expect, it, vi } from "vitest";
+
+import { AgentTestPanel } from "@/components/agent-test-panel";
+import type { AgentDefinition } from "@/lib/agent-definition";
+import { RUNS_POLL_MS } from "@/lib/api/runs-queries";
+import { MAX_RECONNECTS, RETRY_DELAY_MS, STALL_MS, followRunStream } from "@/lib/sse";
+import type { StreamState } from "@/lib/sse";
+
+import { renderAs } from "./eval-support";
+
+const enc = new TextEncoder();
+const first = 'id: 1-0\nevent: progress\ndata: {"run_id":"r1"}\n\n';
+const doneEvent = 'id: 1-9\nevent: done\ndata: {"status":"completed"}\n\n';
+const RUN_GET = "/api/v1/projects/p1/runs/r1";
+type Push = (c: string) => void;
+
+function body(chunks: string[], opts: { keep?: (p: Push) => void; close?: boolean; onCancel?: () => void; error?: Error } = {}) {
+  return new Response(
+    new ReadableStream<Uint8Array>({
+      start(c) {
+        for (const ch of chunks) c.enqueue(enc.encode(ch));
+        opts.keep?.((ch) => c.enqueue(enc.encode(ch)));
+        if (opts.error) c.error(opts.error);
+        if (opts.close) c.close();
+      },
+      cancel() {
+        opts.onCancel?.();
+      },
+    }),
+    { status: 200 },
+  );
+}
+const run = (status: string) => new Response(JSON.stringify({ id: "r1", project_id: "p1", status }), { status: 200, headers: { "content-type": "application/json" } });
+const urlOf = (i: RequestInfo | URL) => (typeof i === "string" ? i : i instanceof URL ? i.toString() : i.url);
+async function advance(ms: number) {
+  await act(async () => {
+    await vi.advanceTimersByTimeAsync(ms);
+  });
+}
+async function start() {
+  renderAs("developer", "edit", <AgentTestPanel projectId="p1" agentKey="a1" version={1} definition={{ variables: [] } as unknown as AgentDefinition} dirty={false} />, new QueryClient({ defaultOptions: { queries: { retry: false } } }));
+  fireEvent.change(screen.getByTestId("test-input"), { target: { value: "hello" } });
+  fireEvent.submit(screen.getByTestId("test-input").closest("form")!);
+  await advance(0);
+}
+const log = (...a: unknown[]) => console.log("[RV]", ...a);
+
+afterEach(() => {
+  cleanup();
+  vi.unstubAllGlobals();
+  vi.useRealTimers();
+});
+
+describe("rv panel", () => {
+  it("P1 backend down when the stream stalls: first GET fails, reconnects fail; does the panel keep reading?", async () => {
+    vi.useFakeTimers();
+    let backendUp = false;
+    const getTimes: number[] = [];
+    const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
+      const url = urlOf(input);
+      if (url === RUN_GET) {
+        getTimes.push(Date.now());
+        if (!backendUp) throw new TypeError("Failed to fetch");
+        return run("running");
+      }
+      if (url.endsWith("/runs/r1/stream")) {
+        if (!backendUp) throw new TypeError("Failed to fetch");
+        return body([]);
+      }
+      return body([first]);
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    const t0 = Date.now();
+    await start();
+    await advance(STALL_MS + 10 * RETRY_DELAY_MS);
+    log("P1 stream", screen.getByTestId("test-status").dataset.stream, "gets", getTimes.map((t) => t - t0));
+    backendUp = true;
+    await advance(10 * RUNS_POLL_MS);
+    log("P1 after backend up: gets", getTimes.map((t) => t - t0), "status line", screen.queryByTestId("test-server-status")?.textContent ?? null);
+    log("P1 page text has error?", document.body.textContent?.slice(0, 400));
+  });
+
+  it("P2 GET answers 503 first, then 200", async () => {
+    vi.useFakeTimers();
+    let n = 0;
+    const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
+      const url = urlOf(input);
+      if (url === RUN_GET) {
+        n += 1;
+        return n === 1 ? new Response(JSON.stringify({ error: { code: "unavailable" } }), { status: 503, headers: { "content-type": "application/json" } }) : run("running");
+      }
+      if (url.endsWith("/runs/r1/stream")) return body([]);
+      return body([first]);
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    await start();
+    await advance(STALL_MS);
+    await advance(0);
+    await advance(5 * RUNS_POLL_MS);
+    log("P2 GET count", n, "status line", screen.queryByTestId("test-server-status")?.textContent ?? null, "stream", screen.getByTestId("test-status").dataset.stream);
+  });
+
+  it("P3 staleness: GET gaps while reconnecting with silent reconnect streams", async () => {
+    vi.useFakeTimers();
+    const getTimes: number[] = [];
+    const states: string[] = [];
+    const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
+      const url = urlOf(input);
+      if (url === RUN_GET) {
+        getTimes.push(Date.now());
+        return run("running");
+      }
+      if (url.endsWith("/runs/r1/stream")) return body([]);
+      return body([first]);
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    const t0 = Date.now();
+    await start();
+    for (let t = 0; t < 200_000; t += 500) {
+      await advance(500);
+      const s = screen.getByTestId("test-status").dataset.stream ?? "?";
+      if (states[states.length - 1]?.split("@")[0] !== s) states.push(`${s}@${Date.now() - t0}`);
+    }
+    log("P3 states", states.join(" "));
+    log("P3 gets", getTimes.map((t) => t - t0).join(","));
+  });
+
+  it("P4 unmount mid-reconnect leaves no timers", async () => {
+    vi.useFakeTimers();
+    const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
+      const url = urlOf(input);
+      if (url === RUN_GET) return run("running");
+      if (url.endsWith("/runs/r1/stream")) return body([]);
+      return body([first]);
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    await start();
+    await advance(STALL_MS + RETRY_DELAY_MS + 100);
+    log("P4 timers before unmount", vi.getTimerCount());
+    cleanup();
+    await advance(0);
+    log("P4 timers after unmount", vi.getTimerCount());
+    await advance(5 * 60_000 + 10);
+    log("P4 timers after gcTime 5 min", vi.getTimerCount());
+  });
+});
+
+describe("rv followRunStream", () => {
+  it("P5 live stream with a chunk every STALL-1 for 6×STALL: no reconnect", async () => {
+    vi.useFakeTimers();
+    let push: Push | undefined;
+    const reconnect = vi.fn(async () => body([doneEvent], { close: true }));
+    const end = followRunStream({ open: async () => body([first], { keep: (p) => (push = p) }), reconnect, onEvent: () => {}, retryDelayMs: 0 });
+    for (let i = 0; i < 6; i++) {
+      await vi.advanceTimersByTimeAsync(STALL_MS - 1);
+      push?.(i % 2 ? ": keep" : `id: 1-${i + 1}\nevent: token\ndata: {"text":"x"}\n\n`);
+    }
+    await vi.advanceTimersByTimeAsync(0);
+    log("P5 reconnects", reconnect.mock.calls.length);
+    expect(reconnect).not.toHaveBeenCalled();
+    await vi.advanceTimersByTimeAsync(STALL_MS);
+    expect((await end).ended).toBe("done");
+  });
+
+  it("P6 split keepalive bytes (': kee' / 'palive\\n\\n') reset the watchdog", async () => {
+    vi.useFakeTimers();
+    let push: Push | undefined;
+    const reconnect = vi.fn(async () => body([doneEvent], { close: true }));
+    void followRunStream({ open: async () => body([first], { keep: (p) => (push = p) }), reconnect, onEvent: () => {}, retryDelayMs: 0 });
+    await vi.advanceTimersByTimeAsync(STALL_MS - 1);
+    push?.(": kee");
+    await vi.advanceTimersByTimeAsync(STALL_MS - 1);
+    push?.("palive\n\n");
+    await vi.advanceTimersByTimeAsync(STALL_MS - 1);
+    log("P6 reconnects", reconnect.mock.calls.length);
+    expect(reconnect).not.toHaveBeenCalled();
+  });
+
+  it("P7 outside abort: during stall read, during retry sleep, during hanging reconnect; cancel called, timers 0", async () => {
+    for (const phase of ["read", "sleep", "reconnect"] as const) {
+      vi.useFakeTimers();
+      const outside = new AbortController();
+      let cancelled = 0;
+      const reconnect = vi.fn((_r: string, _l: string | null, _s: AbortSignal) => new Promise<Response>(() => {}));
+      const end = followRunStream({
+        open: async () => body([first], { onCancel: () => (cancelled += 1) }),
+        reconnect,
+        onEvent: () => {},
+        signal: outside.signal,
+      });
+      await vi.advanceTimersByTimeAsync(phase === "read" ? 1000 : phase === "sleep" ? STALL_MS + 10 : STALL_MS + RETRY_DELAY_MS + 10);
+      outside.abort();
+      const r = await end;
+      log("P7", phase, "ended", r.ended, "timers", vi.getTimerCount(), "cancel", cancelled, "reconnects", reconnect.mock.calls.length);
+      expect(r.ended).toBe("aborted");
+      expect(vi.getTimerCount()).toBe(0);
+      vi.useRealTimers();
+    }
+  });
+
+  it("P8 open() that ignores its signal and never resolves → ends after STALL (runId unknown → lost)", async () => {
+    vi.useFakeTimers();
+    let seen: AbortSignal | undefined;
+    const end = followRunStream({ open: (s) => { seen = s; return new Promise<Response>(() => {}); }, reconnect: vi.fn(), onEvent: () => {} });
+    await vi.advanceTimersByTimeAsync(STALL_MS);
+    const r = await end;
+    log("P8", r.ended, "signal aborted", seen?.aborted, "timers", vi.getTimerCount());
+    expect(r.ended).toBe("lost");
+  });
+
+  it("P9 read error mid-stream → drop → reconnect (no done invented); broken JSON throws; ApiError on first open throws", async () => {
+    vi.useFakeTimers();
+    const states: StreamState[] = [];
+    const reconnect = vi.fn(async () => body([doneEvent], { close: true }));
+    const r = await (async () => {
+      const p = followRunStream({ open: async () => new Response(new ReadableStream<Uint8Array>({ start(c) { c.enqueue(enc.encode(first)); setTimeout(() => c.error(new TypeError("network")), 10); } }), { status: 200 }), reconnect, onEvent: () => {}, onState: (s) => states.push(s) });
+      await vi.advanceTimersByTimeAsync(RETRY_DELAY_MS + 100);
+      return p;
+    })();
+    log("P9 read-error", r.ended, r.reconnects, states.join(","), reconnect.mock.calls[0]);
+    expect(r.ended).toBe("done");
+    expect(reconnect).toHaveBeenCalledWith("r1", "1-0", expect.any(AbortSignal));
+    await expect(followRunStream({ open: async () => body([first, "id: 1-1\nevent: token\ndata: {bad\n\n"], { close: true }), reconnect, onEvent: () => {} })).rejects.toThrow();
+    await expect(followRunStream({ open: async () => { throw new Error("refused"); }, reconnect, onEvent: () => {} })).rejects.toThrow("refused");
+    log("P9 timers", vi.getTimerCount());
+  });
+
+  it("P10 lost upper bound measured", async () => {
+    vi.useFakeTimers();
+    const t0 = Date.now();
+    let endAt = 0;
+    const p = followRunStream({ open: async () => body([first]), reconnect: async () => body([]), onEvent: () => {} }).then((r) => {
+      endAt = Date.now() - t0;
+      return r;
+    });
+    await vi.advanceTimersByTimeAsync(STALL_MS + MAX_RECONNECTS * (RETRY_DELAY_MS + STALL_MS) + 10);
+    const r = await p;
+    log("P10", r.ended, "at", endAt, "bound", STALL_MS + MAX_RECONNECTS * (RETRY_DELAY_MS + STALL_MS));
+  });
+});

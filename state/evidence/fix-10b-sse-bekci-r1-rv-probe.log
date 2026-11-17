@@ -1,0 +1,61 @@
+HEAD=5894610dd1f844d625756e6c10c2517aebe154cd
+
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.12 [39m[90m/work[39m
+
+[90mstdout[2m | tests/unit/test_rv_sse_probe.test.tsx[2m > [22m[2mrv panel[2m > [22m[2mP1 backend down when the stream stalls: first GET fails, reconnects fail; does the panel keep reading?
+[22m[39m[RV] P1 stream lost gets [ [33m40000[39m ]
+
+[90mstdout[2m | tests/unit/test_rv_sse_probe.test.tsx[2m > [22m[2mrv panel[2m > [22m[2mP1 backend down when the stream stalls: first GET fails, reconnects fail; does the panel keep reading?
+[22m[39m[RV] P1 after backend up: gets [ [33m40000[39m ] status line [1mnull[22m
+[RV] P1 page text has error? Test panelVersion 1MessagehelloSendCancel runThe stream could not be resumed. The run may still be going; open it in Runs.Open this run
+
+[90mstdout[2m | tests/unit/test_rv_sse_probe.test.tsx[2m > [22m[2mrv panel[2m > [22m[2mP2 GET answers 503 first, then 200
+[22m[39m[RV] P2 GET count [33m1[39m status line [1mnull[22m stream streaming
+
+[90mstdout[2m | tests/unit/test_rv_sse_probe.test.tsx[2m > [22m[2mrv panel[2m > [22m[2mP3 staleness: GET gaps while reconnecting with silent reconnect streams
+[22m[39m[RV] P3 states streaming@500 reconnecting@30000 streaming@31000 reconnecting@61000 streaming@62000 reconnecting@92000 streaming@93000 reconnecting@123000 streaming@124000 reconnecting@154000 streaming@155000 lost@185000
+[RV] P3 gets 30000,61000,92000,123000,154000,185000,188000,191000,194000,197000,200000
+
+[90mstdout[2m | tests/unit/test_rv_sse_probe.test.tsx[2m > [22m[2mrv panel[2m > [22m[2mP4 unmount mid-reconnect leaves no timers
+[22m[39m[RV] P4 timers before unmount [33m2[39m
+
+[90mstdout[2m | tests/unit/test_rv_sse_probe.test.tsx[2m > [22m[2mrv panel[2m > [22m[2mP4 unmount mid-reconnect leaves no timers
+[22m[39m[RV] P4 timers after unmount [33m2[39m
+
+[90mstdout[2m | tests/unit/test_rv_sse_probe.test.tsx[2m > [22m[2mrv panel[2m > [22m[2mP4 unmount mid-reconnect leaves no timers
+[22m[39m[RV] P4 timers after gcTime 5 min [33m0[39m
+
+[90mstdout[2m | tests/unit/test_rv_sse_probe.test.tsx[2m > [22m[2mrv followRunStream[2m > [22m[2mP5 live stream with a chunk every STALL-1 for 6×STALL: no reconnect
+[22m[39m[RV] P5 reconnects [33m0[39m
+
+[90mstdout[2m | tests/unit/test_rv_sse_probe.test.tsx[2m > [22m[2mrv followRunStream[2m > [22m[2mP6 split keepalive bytes (': kee' / 'palive\n\n') reset the watchdog
+[22m[39m[RV] P6 reconnects [33m0[39m
+
+[90mstdout[2m | tests/unit/test_rv_sse_probe.test.tsx[2m > [22m[2mrv followRunStream[2m > [22m[2mP7 outside abort: during stall read, during retry sleep, during hanging reconnect; cancel called, timers 0
+[22m[39m[RV] P7 read ended aborted timers [33m0[39m cancel [33m1[39m reconnects [33m0[39m
+
+[90mstdout[2m | tests/unit/test_rv_sse_probe.test.tsx[2m > [22m[2mrv followRunStream[2m > [22m[2mP7 outside abort: during stall read, during retry sleep, during hanging reconnect; cancel called, timers 0
+[22m[39m[RV] P7 sleep ended aborted timers [33m0[39m cancel [33m1[39m reconnects [33m0[39m
+
+[90mstdout[2m | tests/unit/test_rv_sse_probe.test.tsx[2m > [22m[2mrv followRunStream[2m > [22m[2mP7 outside abort: during stall read, during retry sleep, during hanging reconnect; cancel called, timers 0
+[22m[39m[RV] P7 reconnect ended aborted timers [33m0[39m cancel [33m1[39m reconnects [33m1[39m
+
+[90mstdout[2m | tests/unit/test_rv_sse_probe.test.tsx[2m > [22m[2mrv followRunStream[2m > [22m[2mP8 open() that ignores its signal and never resolves → ends after STALL (runId unknown → lost)
+[22m[39m[RV] P8 lost signal aborted [33mtrue[39m timers [33m0[39m
+
+[90mstdout[2m | tests/unit/test_rv_sse_probe.test.tsx[2m > [22m[2mrv followRunStream[2m > [22m[2mP9 read error mid-stream → drop → reconnect (no done invented); broken JSON throws; ApiError on first open throws
+[22m[39m[RV] P9 read-error done [33m1[39m streaming,reconnecting,streaming [ [32m'r1'[39m, [32m'1-0'[39m, AbortSignal { aborted: [33mtrue[39m } ]
+
+[90mstdout[2m | tests/unit/test_rv_sse_probe.test.tsx[2m > [22m[2mrv followRunStream[2m > [22m[2mP9 read error mid-stream → drop → reconnect (no done invented); broken JSON throws; ApiError on first open throws
+[22m[39m[RV] P9 timers [33m0[39m
+
+[90mstdout[2m | tests/unit/test_rv_sse_probe.test.tsx[2m > [22m[2mrv followRunStream[2m > [22m[2mP10 lost upper bound measured
+[22m[39m[RV] P10 lost at [33m185000[39m bound [33m185000[39m
+
+ [32m✓[39m tests/unit/test_rv_sse_probe.test.tsx [2m([22m[2m10 tests[22m[2m)[22m[32m 276[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m10 passed[39m[22m[90m (10)[39m
+[2m   Start at [22m 05:03:03
+[2m   Duration [22m 1.68s[2m (transform 258ms, setup 0ms, import 598ms, tests 276ms, environment 651ms)[22m
+

@@ -137,3 +137,15 @@ Bak (node konteyneri gerekir: YIGIN-AC/KAPA; backend yığını gerekmez): (1) b
 ### K-SSE-0004 · 2026-11-17 07:54 · → isci-c · CEVAP
 Paket: fix/10b-sse-bekci · Cevap: C-SSE-0005
 PR-HAZIR alındı; 5894610 doğrulandı (3 commit, 10 dosya, backend/state yok, çakışma yok, kapı logları yerinde, YIGIN-AC/KAPA çifti tamam). VERIFIED. REVIEW-ISTEK K-SSE-0003 inceleyiciye. Not: kod ve docs tek commit'te; bir sonraki sefer docs ayrı. Dal donuk; DUZELT gelirse uygula.
+
+### K-SSE-0005 · 2026-11-17 08:08 · → isci-c · DUZELT
+Paket: fix/10b-sse-bekci · Cevap: C-SSE-0005
+**DEGISIKLIK 5894610** (B0 M1 m0 N5; rapor state/reviews/fix-10b-sse-bekci-r1.md). Kararlar KARARLAR 'fix/10b-sse-bekci r1 kararları'; önce kırmızı test, test/kod/docs ayrı commit:
+1. **MAJOR-1 `yoklama-hatada-sessiz-durma` (A):** panel kopuş yoklaması ilk GET düşünce durmasın ve hata görünsün. `useRun`'a additive seçenek (ör. `{ enabled, pollWhileUnknown: true }`): bu seçenekle `refetchInterval` veri yokken ya da hatada da `RUNS_POLL_MS` döner, koşu bitince (`isLiveRun` false) durur; panelde `server.error` için bir satır (mevcut hata deseni `errors.ts`, i18n en+tr, ör. `TestPanel.serverUnavailable`), `server.data` gelince yerini durum satırı alır. `runs/[runId]` sayfası değişmez (FOLLOWUP-192). Testler: probe P1 senaryosu (ilk GET `TypeError`, sonraki GET 200 → durum satırı görünür; sahte zamanlayıcıyla `RUNS_POLL_MS` aralığı), hata satırı görünür, koşu bitince yoklama durur, mevcut `test_10bsse_2_panel_poll` yeşil.
+2. **NOTE-2:** `drain` başında deneme zaten iptal edilmişse `reader.cancel()` çağrılır (test: `openWithin` çözüldükten sonra iptal → cancel çağrıldı, zamanlayıcı 0).
+3. **NOTE-4:** PR notu + docs cümlesi: ilk POST bekçide kesilirse `runId` yok, `lost`; koşu sunucuda oluşmuş olabilir, 'Runs'tan açın' yolu. **NOTE-3** kabul, değişiklik yok. **NOTE-1** bu turda docs ayrı commit.
+4. Kapı: önyüz lint/typecheck/check:api/Vitest konteynerde (YIGIN-AC/KAPA), tee `state/evidence/sse-bekci-gate-r2.log`. PR-HAZIR r2 (`SHA:`, delta `5894610..`).
+
+### K-SSE-0006 · 2026-11-17 08:08 · → inceleyici · ACK
+Paket: fix/10b-sse-bekci · Cevap: R-SSE-0004
+DEGISIKLIK alındı; rapor, kanal ve kanıtlar (rv-gate, rv-probe, rv-probe.test.tsx.txt) commit edildi. MAJOR-1 A (panelde `useRun` additive seçenekle hatada/veri yokken yoklama sürer + hata satırı; sayfa FOLLOWUP-192), NOTE-2 ve NOTE-4 bu turda; NOTE-3 kabul. Probe P1 tam yerinde. r2 delta turu: P1 tekrarı, hata satırı, yoklamanın koşu bitince durması, NOTE-2 cancel; node konteyneri gerekir.
