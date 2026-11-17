@@ -102,3 +102,20 @@ r2 teyit turu alındı (SHA acc149b). 10c-2 kapısı arka planda sürüyor ama p
 ### R-05B-0006 · 2026-11-17 16:32 · → koordinator · YIGIN-AC
 Paket: 05b · Cevap: K-05B-0010 · Yigin: ffcore-rv05b
 Hafif yığın: yalnız `postgres redis migrate`; `--no-build --pull never`, `FFCORE_VERSION=0.0.0-05b`. r2 migration değiştirmiyor; testler tools içinde worktree kaynağından koşar. Koşacaklar: r1 probe'ları ve yeni P8/P9, hedefli test-int, 05b birim ve sözleşme testleri iki profilde. Açık yığınlar: ffcore-rv10c2 (kapı koşuyor) ve bu; sınır içinde.
+
+### R-GEN-0002 · 2026-11-17 17:36 · → koordinator · DURUM
+Paket: - · Cevap: - · Durum: BLOCKED
+**10c-2 r1 kapısı** (`git archive` kopyası, HEAD 5c27543):
+- Backend lint ve `make test`: 1813 passed (llmaas), 1813 passed (airgap).
+- Önyüz: lint, typecheck ve check:api 0; Vitest 250/250.
+- **e2e: 180/180 ✓.** Bütün 10c-2 testleri geçti: anahtar bir kez gösteriliyor ve iptal ediliyor; kota, uyarı, ack ve rozet; retention; read modu ile 6 ekran × 2 tema axe.
+- Loglar `state/evidence/10c-2-r1-rv-*.log`.
+- test-int ilk denemede qdrant profili açık olmadığı için başlamadı (benim kurulum hatam); qdrant ile yeniden koşulacak.
+
+**Takılan nokta (Docker):**
+- Playwright testler bittikten sonra worker kapanışında asıldı ("worker-0 did not exit within 300000ms, force-killed").
+- `ffcore-rv10c2-e2e-run-70c285051d24` konteyneri 16:19'dan beri Up. `docker stop` "tried to kill container, but did not receive an exit event" hatası veriyor.
+- Aynı anda açılan 05b r2 hafif yığınında postgres ve migrate 16:32'den beri `Created`; `docker start` zaman aşımına düşüyor.
+- Docker daemon yeni konteyner başlatamıyor. 05b r2 teyiti bu yüzden başlamadı; 10c-2 test-int ve probe'ları da bekliyor.
+
+KARAR-GEREK koordinatörün kanalında; seçenekler SendMessage ile gönderildi.

@@ -203,3 +203,7 @@ Paket: 05b · Cevap: B-05B-0012 · SHA: acc149be8a6d8e51e539974475771d56ba971fd3
 ### K-05B-0011 · 2026-11-17 16:31 · → isci-b · CEVAP
 Paket: 05b · Cevap: B-05B-0012
 PR-HAZIR r2 alındı; acc149b doğrulandı (3 commit test→kod→docs, 8 dosya, state yok, çakışma yok, kapı logları yerinde, YIGIN-KAPA tamam). VERIFIED. Uygulama yorumun (B-05B-0009: MCP ucunda red `isError` + kapalı kod, `status=denied` + `error_code`) kabul, KARARLAR'a ek yazıldı. Teyit K-05B-0010 inceleyicide (10c-2 turuyla sırasını o seçer). Dal donuk; DUZELT gelirse uygula.
+
+### K-GEN-0021 · 2026-11-17  · → tumu · DURUM
+Paket: - · Cevap: R-GEN-0002 · Durum: BLOCKED
+Docker daemon takıldı (inceleyici R-GEN-0002; koordinatör doğruladı: `docker info/ps` cevap veriyor, `ffcore-rv10c2-e2e-run-*` 16:19 dan beri kapanmıyor, rv05b postgres/migrate Created kalıyor, start/stop asılı). Etki: 05b r2 teyiti, 10c-2 test-int/probe lar ve sonraki main kapısı bekliyor. Karar kullanıcıya iletildi (A: Docker Desktop yeniden başlat, airflow yığını da durur; B: yalnız daemon/WSL kurtarma; C: bekle). Kimse docker restart yapmaz; işçiler yeni konteyner açmasın.
