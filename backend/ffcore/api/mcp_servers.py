@@ -153,8 +153,13 @@ def _merge_catalog(old: list[dict], new: list[dict], exposed: list[str]) -> list
     return new
 
 
-def _catalog_from_spec(text: str) -> list[dict]:
+def _catalog_from_spec(text: str, *, upload: bool = True) -> list[dict]:
+    """An uploaded document is refused whole on an escaping path key (422 openapi_path_invalid);
+    a stored one read again (discover) lists such an operation as not exposable, with its
+    reason (review r1 MAJOR-1)."""
     try:
+        if upload:
+            return mcp_openapi.upload_catalog(text)
         return mcp_openapi.catalog(mcp_openapi.load_spec(text))
     except mcp_openapi.SpecError as exc:
         raise _spec_error(exc) from None
@@ -351,7 +356,7 @@ async def discover_server(
     row = await _get(session, project_id, server_id)
     if row.source_kind == "openapi":
         text = decrypt_json(row.spec_encrypted, settings)["text"]
-        new = _catalog_from_spec(text)
+        new = _catalog_from_spec(text, upload=False)
     else:
         caller = mcp_client.Caller(user_id=actor.actor_id, project_id=str(project_id))
         try:

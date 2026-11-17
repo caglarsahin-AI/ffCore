@@ -8,7 +8,12 @@ Rules (plan/05 A3, K-05B-0002):
   exposable, with the reason (never dropped silently, ARCH-06).
 - Arguments are checked against the operation's parameters before anything is sent: unknown
   names, missing required values, null and nested values for path/query parameters are
-  refused. Path values are percent-encoded whole (a value cannot add path segments).
+  refused. Path values are percent-encoded whole (a value cannot add path segments) and `.` or
+  `..` is refused (a value cannot remove one either; review r1 MINOR-2).
+- A path key starts with one `/` and has no empty, `.` or `..` segment, no `?` or `#`: it is
+  joined to the registered base path and must never reach another origin or leave that base
+  (review r1 MAJOR-1). A document with such a key is refused at upload
+  (openapi_path_invalid); in a catalog the operation is not exposable with that reason.
 """
 
 import copy
@@ -41,6 +46,19 @@ class ArgumentsError(ValueError):
     def __init__(self, detail: str) -> None:
         super().__init__(detail)
         self.code = "invalid_arguments"
+
+
+def path_refusal(path: object) -> bool:
+    """True when an OpenAPI path key could leave the base path or the origin it is joined to."""
+    if not isinstance(path, str) or not path.startswith("/") or path.startswith("//"):
+        return True
+    if "?" in path or "#" in path or "\\" in path:
+        return True
+    segments = path[1:].split("/")
+    if any(seg in (".", "..") for seg in segments):
+        return True
+    # An empty segment only as the trailing slash ("/a/").
+    return any(seg == "" for seg in segments[:-1])
 
 
 class _Unpublishable(Exception):
@@ -131,6 +149,8 @@ def _operation(resolver: _Resolver, path: str, method: str, item: dict, op: dict
         "alias_description": None,
     }
     try:
+        if path_refusal(path):
+            raise _Unpublishable("openapi_path_invalid")
         if not name:
             raise _Unpublishable("operation_id_missing")
         if not TOOL_NAME.fullmatch(name):
@@ -189,6 +209,20 @@ def catalog(doc: dict) -> list[dict]:
     return found
 
 
+def upload_catalog(text: str) -> list[dict]:
+    """The catalog of an uploaded document; one path key that could leave the base path or the
+    origin refuses the whole document (openapi_path_invalid), never a partial publish."""
+    found = catalog(load_spec(text))
+    bad = sorted({op["path"] for op in found if op["reason"] == "openapi_path_invalid"})
+    if bad:
+        raise SpecError(
+            "openapi_path_invalid",
+            "Path keys must start with one '/' and have no empty, '.' or '..' segment, '?' or "
+            f"'#': {', '.join(str(p) for p in bad)}",
+        )
+    return found
+
+
 def _scalar(name: str, value: Any) -> Any:
     if value is None or isinstance(value, dict):
         raise ArgumentsError(f"{name} must be a plain value")
@@ -216,7 +250,10 @@ def build_request(op: dict, arguments: dict[str, Any]) -> UpstreamRequest:
     for name, value in arguments.items():
         where = locations.get(name)
         if where == "path":
-            path = path.replace("{" + name + "}", quote(str(_scalar(name, value)), safe=""))
+            text = str(_scalar(name, value))
+            if text in (".", ".."):
+                raise ArgumentsError(f"{name} cannot be a dot segment")
+            path = path.replace("{" + name + "}", quote(text, safe=""))
         elif where == "query":
             if value is not None:
                 params[name] = _scalar(name, value)

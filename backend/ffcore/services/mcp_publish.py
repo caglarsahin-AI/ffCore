@@ -330,14 +330,44 @@ class _Guard:
         return decision
 
 
+class UpstreamRefused(mcp_client.ToolCallError):
+    """Refused before any request (call-time URL or egress check, origin escape): the call is
+    recorded as denied with this code (review r1 MINOR-1)."""
+
+
+def _checked_base(base: str, settings: Settings) -> None:
+    """The registration checks again at call time; the policy may have narrowed since."""
+    try:
+        check_upstream_url(base, settings)
+    except ApiError as exc:
+        raise UpstreamRefused(exc.code) from None
+
+
+def upstream_url(base: str, path: str) -> str:
+    """`base` with its path kept and `path` appended (`/api` + `/v1/x` -> `/api/v1/x`). The
+    result keeps the base's scheme, host and port (else upstream_origin_mismatch) and the path
+    passes mcp_openapi.path_refusal (else openapi_path_invalid): review r1 MAJOR-1, second line
+    behind the upload check."""
+    joined = base.rstrip("/") + path
+    try:
+        same = mcp_client._origin(httpx2.URL(joined)) == mcp_client._origin(httpx2.URL(base))
+    except httpx2.InvalidURL:
+        same = False
+    if not same:
+        raise UpstreamRefused("upstream_origin_mismatch")
+    if mcp_openapi.path_refusal(path):
+        raise UpstreamRefused("openapi_path_invalid")
+    return joined
+
+
 async def _openapi_call(snapshot: Snapshot, op: dict, arguments: dict, settings: Settings) -> str:
     """The upstream answer as text; any failure is mcp_client.ToolCallError with a code."""
     try:
         request = mcp_openapi.build_request(op, arguments)
     except mcp_openapi.ArgumentsError as exc:
         raise mcp_client.ToolCallError(exc.code) from None
-    url = snapshot.upstream_base_url.rstrip("/") + request.path
-    check_upstream_url(url, settings)  # the base URL passed at registration; checked again
+    _checked_base(snapshot.upstream_base_url, settings)
+    url = upstream_url(snapshot.upstream_base_url, request.path)
     limit = settings.mcp_call_timeout_s
     timeout = EgressTimeout(connect=min(CONNECT_TIMEOUT_S, limit), read=limit, total=limit)
     headers = mcp_client.static_auth_headers(snapshot.upstream_auth_type, snapshot.upstream_auth)
@@ -378,6 +408,7 @@ async def _remote_call(
         auth=snapshot.upstream_auth,
     )
     who = mcp_client.Caller(user_id=caller.user_id or caller.actor_id, project_id=caller.project_id)
+    _checked_base(snapshot.upstream_base_url, settings)
     result = await mcp_client.call(target, op["name"], arguments, settings, caller=who)
     return result.text, result.is_error
 
@@ -423,6 +454,8 @@ async def _guarded(
                 text, upstream_error = await _openapi_call(snapshot, op, arguments, settings), False
             else:
                 text, upstream_error = await _remote_call(snapshot, op, arguments, settings, caller)
+        except UpstreamRefused as exc:
+            return Outcome("", True, "denied", exc.code, guard.strongest)
         except mcp_client.ToolCallError as exc:
             return Outcome("", True, "error", exc.code, guard.strongest)
         text, _ = mcp_client._truncate(text, settings.tool_result_max_chars)
