@@ -39,6 +39,7 @@ CHILD_TABLES = {
     "chunks": "document_id",  # 04a
     "tool_actions": "tool_id",  # 05a
     "few_shots": "tool_id",  # 05a: examples of the project's registered mcp-sql tool
+    "mcp_server_calls": "server_id",  # 05b: one row per call of a published MCP server
     "agent_versions": "agent_id",  # 06a
     "messages": "conversation_id",  # 06a
 }
