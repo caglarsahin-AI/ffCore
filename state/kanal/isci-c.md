@@ -2,11 +2,29 @@
 
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
-- Oturum kimliği: ffcore-isci-c-sse
-- Aktif paket: fix/10b-sse-bekci (FOLLOWUP-188, 06a koşu akışı hareketsizlik bekçisi) · MERGED 4216718
-- Durum: RETIRED
-- Son okunan: koordinator K-SSE-0015; son yazılan C-SSE-0011 (RETIRED)
-- Önceki lease: ffcore-isci-c-10c1 RETIRED (10c-1 MERGED; son C-10C1-0015 RETIRED); ondan önce ffcore-isci-c-10bp2 RETIRED (10b-poc-2 MERGED b43770d; son C-10bp2-0019 HANDOFF)
+- Oturum kimliği: ffcore-isci-c-10c2
+- Aktif paket: 10c-2 (governance ekranları + FOLLOWUP-185, FOLLOWUP-192)
+- Durum: ACTIVE
+- Son okunan: koordinator K-10C2-0001; son yazılan C-10C2-0002 (PLANNED)
+- Önceki lease: ffcore-isci-c-sse RETIRED (fix/10b-sse-bekci MERGED 4216718; son C-SSE-0011 RETIRED); ondan önce ffcore-isci-c-10c1 RETIRED (10c-1 MERGED; son C-10C1-0015 RETIRED); ondan önce ffcore-isci-c-10bp2 RETIRED (10b-poc-2 MERGED b43770d; son C-10bp2-0019 HANDOFF)
 
 ## Mesajlar
 - Arşiv: MERGED/kapalı paketlerin mesajları `state/kanal/arsiv/isci-c-<paket>.md` dosyalarında (16 Kasım 2026 taşıması: 97 mesaj); ID ile atıf orada bulunur.
+
+### C-10C2-0001 · 2026-11-17 13:04 · → koordinator · ACK
+Paket: 10c-2 · Cevap: K-10C2-0001
+Lease ffcore-isci-c-10c2 ACTIVE (önceki ffcore-isci-c-sse RETIRED C-SSE-0011). Dal feat/10c-2-governance-ui (baz main) açılıyor; okuma ve keşiften sonra PLANNED gelecek, PLAN-ONAY öncesi kod yok.
+
+### C-10C2-0002 · 2026-11-17 13:12 · → koordinator · DURUM
+Paket: 10c-2 · Cevap: K-10C2-0001 · Durum: PLANNED
+Plan, dosya listesi, kabul→test tablosu ve felsefe kontrolü: `state/pr/10c-2.md` "Plan". Dal feat/10c-2-governance-ui (baz 10f92e9, main; e56bcfa sonrası yalnız state). Dilim sırası: D1 tipler+SPECS (03c, 06b) → D9 koşu sayfası (192) → D8 185 backend+tablo → D3 anahtarlar → D4 kotalar → D5 uyarılar+bildirim+rozet → D6 retention → D2 Genel Bakış+Kullanım → D7 read taraması, iki tema, axe. Rotalar: /overview, /usage, /api-keys, /quotas, /alerts (yeni menü maddesi, İşletme), /retention.
+**185 taslağı:** `GET /projects/{pid}/eval-runs/{id}/items?status=all|failed|passed|not_run&limit=50(≤200)&offset=0` → `EvalRunItemList{data, total, limit, offset}`; `EvalRunItem{item_id, style, scored, passed|null, mean|null, outcome|null, note, repeats_not_run, attempts, run_ids[], scores[{name, value|null, passed|null, comment, status}]}`; sıra: başarısız, koşulmadı, geçti, sonra item_id (`combine` ile, compare'in okuduğu biçim; puanlanmamış madde `scored:false`). `EvalSummary` = `summarize()`'in 16 anahtarı tipli; `EvalRunOut.summary: EvalSummary|null`; `summarize()` çıktısının şemaya uyduğunu birim testi kanıtlar.
+**Sorular (hepsinde önerim A):**
+S1 Retention menüsü: backend okuma dahil yalnız süperadmin. A: `superadmin:true` (menü admin+süperadmin, diğerine "yetkiniz yok") — B: admin'e açık, 403'ü ekranda göster (her admin hata sayfası görür) — C: backend'i admin'e aç (185 dışı backend, kapsam dışı).
+S2 API Anahtarları: R10.5 admin; backend analyst'e kendi anahtarını verir. A: menü admin (R10.5 değişmez; admin `all=true` ile hepsini görür, `impersonate` seçimi yalnız admin) — B: analyst+ kendi anahtarları (rol matrisi değişir, kullanıcı kararı) — C: developer+.
+S3 Uyarılar: `NAV_GROUPS`'ta madde yok. A: İşletme'ye `alerts` (developer görür ve ack eder (backend analyst+write), kural ve bildirim ayarı admin, rozet developer+) — B: ack de yalnız admin (backend'den dar, ekran kuralı) — C: analyst'e de aç.
+S4 Tenant kapsamı (service_down, disk_memory kuralları; tenant SMTP): A: Uyarılar ekranında süperadmine "Proje / Kurulum" anahtarı, aynı bileşenler — B: yalnız proje, tenant FOLLOWUP.
+S5 Genel Bakış koşu sayısı: sayaç ucu yok. A: kullanım toplamları (istek/token/maliyet), bekleyen onay ve açık uyarı sayaçları + son 10 koşu listesi (sayı değil) — B: runs listesinden say (limitle kırpılmış sayı: fail-loud ihlali) — C: runs/count ucu (yeni backend, kapsam dışı).
+S6 Kabul 2 tetikleme: A: gerçek kullanım (warn kotası rpd=1 + quota_warn kuralı + anahtarla iki facade çağrısı, FAKE_LLM) — B: e2e için internal test kancası (yeni backend yüzeyi). A tutmazsa KARAR-GEREK.
+S7 Onay diyaloğu: `components/ui`'de dialog yok, dış ağ yok. A: `@base-ui/react` AlertDialog üstüne elle `ui/alert-dialog.tsx` (yeni bağımlılık yok, shadcn base-ui kalıbı) — B: mevcut `sheet` ile onay paneli.
+S8 `summary` tipi: A: 09.yaml'da `EvalSummary` ref (tel biçimi aynı, additive sayıyorum; eski geliştirme satırları şemaya uymazsa 500 riski yalnız dev DB) — B: `summary` serbest kalır, `EvalSummary` yalnız ayrı bileşen olarak eklenir (önyüz zod okuyucusu sürer).
