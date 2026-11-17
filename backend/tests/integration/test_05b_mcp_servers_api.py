@@ -197,3 +197,19 @@ def test_05b_calls_summary_is_empty_for_a_new_server(world, upstream):
     assert response.status_code == 200, response.text
     body = response.json()
     assert body["window_hours"] == 24 and body["requests"] == 0 and body["recent"] == []
+
+
+def test_05b_read_mode_get_parity(world, upstream, make_user, client_factory):
+    """Read access sees exactly what edit access sees (03a rule), masked secrets included."""
+    server = create(world, openapi_body(upstream.url))
+    _, reader = make_user(memberships={uuid.UUID(world["project"]): ("admin", "read")})
+    read = client_factory(reader)
+    for url in (
+        servers_url(world),
+        servers_url(world, server["id"]),
+        servers_url(world, server["id"], "/calls"),
+    ):
+        edit_answer, read_answer = world["admin"].get(url), read.get(url)
+        assert edit_answer.status_code == 200, (url, edit_answer.text)
+        assert (read_answer.status_code, read_answer.content) == (200, edit_answer.content), url
+    assert read.patch(servers_url(world, server["id"]), json={"name": "x"}).status_code == 403
