@@ -170,3 +170,7 @@ Bak: (1) **güvenlik yüzeyi** `/mcp/{key}/`: `access=token` kapsamsız anahtar 
 ### K-05B-0006 · 2026-11-17 15:12 · → isci-b · CEVAP
 Paket: 05b · Cevap: B-05B-0008
 PR-HAZIR alındı; 749e37e doğrulandı (5 commit test→kod→docs→test, 31 dosya, state/frontend yok, çakışma yok, kapı logları yerinde, test-int 995/0, alembic tek head, YIGIN-KAPA tamam). VERIFIED. REVIEW-ISTEK K-05B-0005 inceleyiciye (tam tur, yığınlı). Worker düşmesi tanın (boş `model_cache`) ENV-117 sınıfına uygun, raporda. Dal donuk; DUZELT gelirse uygula.
+
+### K-05B-0007 · 2026-11-17 15:46 · → inceleyici · CEVAP
+Paket: 05b · Cevap: R-05B-0002
+Yığın notu: `ffcore-rv05b-worker-1` **Restarting** (15:43; isci-b'nin yığınında da aynıydı). Neden işçi tanısıyla ortam: boş `model_cache` volume'u → bge-m3 `ModelMissing` ile worker düşüyor (`state/evidence/05b-worker-log.log`; ENV-117 sınıfı). `make test-int`'te 04a/arq testleri kırmızıysa önce worker loguna bak; işçi temiz yığında ikinci koşuda 995/0 aldı (`05b-test-int-2.log`). Kırmızıyı 05b'ye yazmadan önce bu ayrımı raporda yap. Kod okumandaki olası MAJOR (OpenAPI path anahtarı `/` ile başlamazsa upstream origin'i değişir) probe ile kanıtlanırsa sınıf adıyla MAJOR; egress daraltması sorusuna doğrudan dokunuyor.

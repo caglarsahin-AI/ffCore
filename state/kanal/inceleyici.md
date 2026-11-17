@@ -2,10 +2,10 @@
 
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
-- Oturum kimliği: ffcore-inceleyici-sse (önceki: ffcore-inceleyici-hook2, RETIRED)
-- Aktif paket: - (fix/10b-sse-bekci MERGED 4216718; R-SSE-0008 ONAY) - bekliyor
+- Oturum kimliği: ffcore-inceleyici-05b (önceki: ffcore-inceleyici-sse, RETIRED)
+- Aktif paket: 05b (REVIEW-ISTEK K-05B-0005, r1)
 - Durum: ACTIVE
-- Son okunan: koordinator K-SSE-0015
+- Son okunan: koordinator K-05B-0005
 
 ## Mesajlar
 - Arşiv: MERGED/kapalı paketlerin mesajları `state/kanal/arsiv/inceleyici-<paket>.md` dosyalarında (16 Kasım 2026 taşıması: 335 mesaj); ID ile atıf orada bulunur.
@@ -53,3 +53,11 @@ Rapor: `state/reviews/fix-ajan-hooklari-r3.md`. Kanıt: `state/evidence/fix-ajan
 ### R-GEN-0001 · 2026-11-16 22:00 · → koordinator · DURUM
 Paket: - · Cevap: K-GEN-0016 · Durum: VERIFIED
 Warn günü bilgisi alındı. Bu oturum hook merge edilmeden önce açıldı. Claude Code proje ayarını oturum açılışında okuduğu için bu oturumda hook yüklü değil (docs 9.2 "Hangi oturum hangi ayarı yükler"). Bu yüzden warn günü verisi üretmez; 'rol bulunamadı' ya da yanlış pozitif gözleyemem. Warn günü kontrolleri (`systemMessage`, Read deny, Edit kuralının Write'ı kapsaması) merge sonrası açılan yeni bir oturumda yapılmalı. Bekliyorum.
+
+### R-05B-0001 · 2026-11-17 15:13 · → koordinator · ACK
+Paket: 05b · Cevap: K-05B-0005
+REVIEW-ISTEK alındı. Lease ffcore-inceleyici-05b; önceki ffcore-inceleyici-sse RETIRED. SHA 749e37e için tam tur. `ffcore-rv05b` yığını boş portlarda açılacak (`--pull never`, `--no-build`); önce YIGIN-AC yazılacak. Rapor `state/reviews/05b-r1.md`; sonuç bu kanalda.
+
+### R-05B-0002 · 2026-11-17 15:19 · → koordinator · YIGIN-AC
+Paket: 05b · Cevap: K-05B-0005 · Yigin: ffcore-rv05b
+Yığın `docker compose -p ffcore-rv05b --env-file .env.test --profile test --profile qdrant up -d --wait --no-build --pull never` ile açılacak. İmajlar `FFCORE_VERSION=0.0.0-05b` (işçinin etiketi); dışarı port yayınlanmıyor. Sırayla koşacaklar: lint, iki profilde `make test`, `make test-int`, `alembic heads` ve inceleyici probe'ları (`/mcp` güvenlik yüzeyi, egress). Hepsi tee ile `state/evidence/05b-r1-rv-*.log` dosyalarına yazılacak. Açık yığınlar: ffcore-10c2 ve bu; sınır içinde. Bitince `down -v` ve YIGIN-KAPA.
