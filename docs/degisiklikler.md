@@ -4,6 +4,20 @@ Behaviour and configuration changes that a deployment or an API client notices, 
 (handbook/RELEASE_AND_ROLLBACK.md, CHANGE_CONTROL.md). Each entry names the package and what to do,
 if anything.
 
+## 2026-11-17 · fix/10b-sse-bekci · A silent run stream reconnects
+
+- **What:** the console ends a run event stream (agent test panel) that sends nothing for 30 s,
+  three backend keepalive intervals, and reconnects with `Last-Event-ID`; a failed read is
+  treated the same way. While the stream reconnects, or after it is reported lost, the test panel
+  reads the run with `GET /runs/{id}` every few seconds and shows the server status; a failed read
+  is shown with its code and retried until the server answers or the run has ended. A start
+  request that hangs for 30 s ends as lost without a run id (the run may exist: open it in Runs).
+- **Why:** a half-open connection (backend restarted, a proxy dropping an idle socket) never
+  closes, so the panel kept showing the run as live with no update (FOLLOWUP-188; the exam
+  stream got the same watchdog in 10c-1).
+- **Action:** none with the default `sse_keepalive_s` (10 s). The console expects a keepalive at
+  least every 30 s: raising `SSE_KEEPALIVE_S` to 30 s or more makes quiet runs reconnect needlessly.
+
 ## 2026-11-16 · release · Version 0.1.0-m3 (M3 server rollout)
 
 - **What:** the first named FFCore release is `0.1.0-m3`: git tag `0.1.0-m3` on `main` and

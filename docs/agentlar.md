@@ -136,7 +136,14 @@ reconnect to the live stream (Redis, within `RUN_EVENT_STREAM_TTL_S`) and a repl
 
 - **Reconnect:** `GET /runs/{id}/stream` with `Last-Event-ID` continues after that event. Closing a
   stream never cancels a run. When the live stream has expired (`RUN_EVENT_STREAM_TTL_S`) the run
-  is replayed from `run_events`, announced by `progress {"replay": "run_events"}`.
+  is replayed from `run_events`, announced by `progress {"replay": "run_events"}`. A quiet run
+  sends a `: keepalive` comment every `sse_keepalive_s` (10 s); the console treats a stream that
+  is silent for three keepalive intervals (30 s) as dropped and reconnects. While it reconnects,
+  or once it gives up, the test panel reads the run with `GET /runs/{id}` every few seconds and
+  shows that status; a read that fails is shown with its code and repeated until the server
+  answers or the run has ended. If the first request itself hangs for 30 s, the panel has no run
+  id to reconnect to and reports the stream lost; the run may still have been created, so open it
+  in Runs.
 - **Approval:** a run waiting for an approval is `waiting_approval`. `POST /runs/{id}/resume
   {decision: approved|rejected, comment?}` needs the definition's `approval.assign_to` role with
   edit access, from a signed-in user: a service account acting on someone's behalf (or an API

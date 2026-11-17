@@ -876,6 +876,8 @@
     "startFailed": "Koşu başlamadı: {message} (kod: {code})",
     "reconnecting": "Bağlantı koptu; yeniden bağlanılıyor…",
     "lost": "Akış sürdürülemedi. Koşu hâlâ sürüyor olabilir; Koşular'dan açın.",
+    "serverStatus": "Sunucudan okunan durum: {status}",
+    "serverUnavailable": "Koşu sunucudan okunamadı: {message} (kod: {code}). Yeniden deneniyor…",
     "phases": {
       "starting": "Başlıyor…",
       "running": "Çalışıyor…",

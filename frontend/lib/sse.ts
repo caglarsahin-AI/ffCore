@@ -75,17 +75,28 @@ export type StreamEnd = SseEventName | "lost" | "aborted";
 export type StreamResult = { runId: string | null; lastEventId: string | null; ended: StreamEnd; reconnects: number };
 
 export type FollowOptions = {
-  open: () => Promise<Response>;
-  reconnect: (runId: string, lastEventId: string | null) => Promise<Response>;
+  // Each call opens one attempt; its signal ends that attempt (outside abort or the stall watchdog)
+  // and should go to fetch so the connection really closes.
+  open: (signal: AbortSignal) => Promise<Response>;
+  reconnect: (runId: string, lastEventId: string | null, signal: AbortSignal) => Promise<Response>;
   onEvent: (event: RunStreamEvent) => void;
   onState?: (state: StreamState) => void;
   signal?: AbortSignal;
   maxReconnects?: number;
   retryDelayMs?: number;
+  stallMs?: number;
 };
 
 export const MAX_RECONNECTS = 5;
 export const RETRY_DELAY_MS = 1000;
+// The backend writes a `: keepalive` comment every sse_keepalive_s = 10 s
+// (backend/ffcore/core/config.py, backend/ffcore/runtime/events.py) while a run is quiet.
+export const SSE_KEEPALIVE_MS = 10_000;
+// Stall watchdog (FOLLOWUP-188, sse-sessiz-kopus): a half-open connection (backend killed, a proxy
+// dropping an idle socket) sends nothing and never closes. Three missed keepalives end the attempt;
+// the Last-Event-ID reconnect / `lost` path takes over, so a silent stream never looks live.
+// Worst case until `lost`: STALL_MS + maxReconnects × (retryDelayMs + STALL_MS).
+export const STALL_MS = 3 * SSE_KEEPALIVE_MS;
 
 function parseData(raw: string): Record<string, unknown> {
   if (raw === "") return {};
@@ -93,21 +104,85 @@ function parseData(raw: string): Record<string, unknown> {
   return value !== null && typeof value === "object" && !Array.isArray(value) ? (value as Record<string, unknown>) : { value };
 }
 
-// Reads one response body to its end; returns the terminal event name, or null if it just stopped.
+// One attempt of a stream (shared with lib/eval-stream.ts): its own AbortController, chained to the
+// outside signal and fired by the watchdog when nothing arrived for `stallMs` (the request itself
+// included). `alive()` restarts the watchdog; `end()` clears the timer and the listener.
+export type Attempt = { signal: AbortSignal; alive: () => void; end: () => void; spoke: () => void };
+
+export function startAttempt(stallMs: number, outside: AbortSignal | undefined, spoke: () => void = () => {}): Attempt {
+  const controller = new AbortController();
+  const abort = () => controller.abort();
+  outside?.addEventListener("abort", abort, { once: true });
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const alive = () => {
+    clearTimeout(timer);
+    timer = setTimeout(abort, stallMs);
+  };
+  alive();
+  return {
+    signal: controller.signal,
+    alive,
+    spoke,
+    end: () => {
+      clearTimeout(timer);
+      outside?.removeEventListener("abort", abort);
+      controller.abort();
+    },
+  };
+}
+
+// The request, unless the attempt ends first (an open() that ignores its signal cannot hang it).
+export function openWithin(attempt: Attempt, open: (signal: AbortSignal) => Promise<Response>): Promise<Response> {
+  return new Promise<Response>((resolve, reject) => {
+    if (attempt.signal.aborted) return reject(new DOMException("attempt ended", "AbortError"));
+    attempt.signal.addEventListener("abort", () => reject(new DOMException("attempt ended", "AbortError")), { once: true });
+    open(attempt.signal).then(resolve, reject);
+  });
+}
+
+export const sleep = (ms: number, signal?: AbortSignal) =>
+  new Promise<void>((resolve) => {
+    if (ms <= 0) return resolve();
+    const timer = setTimeout(resolve, ms);
+    signal?.addEventListener(
+      "abort",
+      () => {
+        clearTimeout(timer);
+        resolve();
+      },
+      { once: true },
+    );
+  });
+
+// Reads one response body to its end; returns the terminal event name, or null if it stopped:
+// closed, failed to read (a drop, K-SSE-0002) or ended by the attempt (abort, watchdog). Every raw
+// chunk restarts the watchdog, comments included (`: keepalive` makes no message but is a sign of
+// life). A broken data line still throws: a broken event is not a drop, and no end is guessed.
 async function drain(
   response: Response,
   state: { runId: string | null; lastEventId: string | null },
   onEvent: (event: RunStreamEvent) => void,
-  signal?: AbortSignal,
+  attempt: Attempt,
 ): Promise<SseEventName | null> {
   if (!response.ok || !response.body) return null;
   const reader = response.body.getReader();
   const decoder = new TextDecoder();
   const parser = new SseParser();
+  const stop = () => void reader.cancel().catch(() => {});
+  attempt.signal.addEventListener("abort", stop, { once: true });
+  if (attempt.signal.aborted) stop(); // ended before reading: the abort event is already past (r1 NOTE-2)
   try {
     for (;;) {
-      if (signal?.aborted) return null;
-      const { done, value } = await reader.read();
+      if (attempt.signal.aborted) return null;
+      let chunk: ReadableStreamReadResult<Uint8Array>;
+      try {
+        chunk = await reader.read();
+      } catch {
+        return null;
+      }
+      if (attempt.signal.aborted) return null;
+      attempt.alive();
+      const { done, value } = chunk;
       const messages = parser.push(done ? decoder.decode() : decoder.decode(value, { stream: true }));
       for (const message of messages) {
         if (message.id !== null) state.lastEventId = message.id;
@@ -120,35 +195,51 @@ async function drain(
       if (done) return null;
     }
   } finally {
+    attempt.signal.removeEventListener("abort", stop);
     reader.releaseLock();
   }
 }
 
-const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-
-// Follows a run from its first response; when the stream drops before a terminal event it
-// reconnects with Last-Event-ID (06a GET /runs/{id}/stream). Closing never cancels the run.
+// Follows a run from its first response; when the stream drops (closes, fails to read or stays
+// silent for stallMs) before a terminal event it reconnects with Last-Event-ID (06a GET
+// /runs/{id}/stream). Closing never cancels the run. A refused first request still throws.
 export async function followRunStream(options: FollowOptions): Promise<StreamResult> {
   const max = options.maxReconnects ?? MAX_RECONNECTS;
   const delay = options.retryDelayMs ?? RETRY_DELAY_MS;
+  const stallMs = options.stallMs ?? STALL_MS;
   const state = { runId: null as string | null, lastEventId: null as string | null };
   let reconnects = 0;
+
+  const attemptOnce = async (open: (signal: AbortSignal) => Promise<Response>, isReconnect: boolean): Promise<SseEventName | null> => {
+    const attempt = startAttempt(stallMs, options.signal);
+    try {
+      let response: Response;
+      try {
+        response = await openWithin(attempt, open);
+      } catch (error) {
+        // an ended attempt or a failed reconnect is a drop; a refused first request is the caller's
+        if (attempt.signal.aborted || isReconnect) return null;
+        throw error;
+      }
+      attempt.alive();
+      if (isReconnect && response.ok) options.onState?.("streaming");
+      return await drain(response, state, options.onEvent, attempt);
+    } finally {
+      attempt.end();
+    }
+  };
+
   options.onState?.("streaming");
-  let ended = await drain(await options.open(), state, options.onEvent, options.signal);
+  let ended = await attemptOnce(options.open, false);
   while (ended === null) {
     if (options.signal?.aborted) return { ...state, ended: "aborted", reconnects };
     if (state.runId === null || reconnects >= max) return { ...state, ended: "lost", reconnects };
     reconnects += 1;
     options.onState?.("reconnecting");
-    if (delay > 0) await sleep(delay);
-    let response: Response;
-    try {
-      response = await options.reconnect(state.runId, state.lastEventId);
-    } catch {
-      continue;
-    }
-    if (response.ok) options.onState?.("streaming");
-    ended = await drain(response, state, options.onEvent, options.signal);
+    await sleep(delay, options.signal);
+    if (options.signal?.aborted) continue;
+    const runId = state.runId;
+    ended = await attemptOnce((signal) => options.reconnect(runId, state.lastEventId, signal), true);
   }
   return { ...state, ended, reconnects };
 }
