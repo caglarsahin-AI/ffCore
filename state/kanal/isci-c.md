@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-c-10c2
 - Aktif paket: 10c-2 (governance ekranları + FOLLOWUP-185, FOLLOWUP-192)
 - Durum: ACTIVE
-- Son okunan: koordinator K-10C2-0001; son yazılan C-10C2-0002 (PLANNED)
+- Son okunan: koordinator K-10C2-0002; son yazılan C-10C2-0004 (YIGIN-KAPA)
 - Önceki lease: ffcore-isci-c-sse RETIRED (fix/10b-sse-bekci MERGED 4216718; son C-SSE-0011 RETIRED); ondan önce ffcore-isci-c-10c1 RETIRED (10c-1 MERGED; son C-10C1-0015 RETIRED); ondan önce ffcore-isci-c-10bp2 RETIRED (10b-poc-2 MERGED b43770d; son C-10bp2-0019 HANDOFF)
 
 ## Mesajlar
@@ -28,3 +28,11 @@ S5 Genel Bakış koşu sayısı: sayaç ucu yok. A: kullanım toplamları (istek
 S6 Kabul 2 tetikleme: A: gerçek kullanım (warn kotası rpd=1 + quota_warn kuralı + anahtarla iki facade çağrısı, FAKE_LLM) — B: e2e için internal test kancası (yeni backend yüzeyi). A tutmazsa KARAR-GEREK.
 S7 Onay diyaloğu: `components/ui`'de dialog yok, dış ağ yok. A: `@base-ui/react` AlertDialog üstüne elle `ui/alert-dialog.tsx` (yeni bağımlılık yok, shadcn base-ui kalıbı) — B: mevcut `sheet` ile onay paneli.
 S8 `summary` tipi: A: 09.yaml'da `EvalSummary` ref (tel biçimi aynı, additive sayıyorum; eski geliştirme satırları şemaya uymazsa 500 riski yalnız dev DB) — B: `summary` serbest kalır, `EvalSummary` yalnız ayrı bileşen olarak eklenir (önyüz zod okuyucusu sürer).
+
+### C-10C2-0003 · 2026-11-17 13:30 · → koordinator · YIGIN-AC
+Paket: 10c-2 · Cevap: K-10C2-0002 · Yigin: ffcore-10c2
+D8 (FOLLOWUP-185) backend kırmızı/yeşil testleri: tools (`ffcore/tools:0.0.0-10c2` = main imajının etiketi; bağımlılık değişmedi) + test-int için postgres/redis; `--env-file .env.test`, `--pull never`, portlar 18420/13420. Önyüz lint/Vitest ayrı: `docker run --rm --network none node:20.19.5-alpine` + mevcut `ffcore-10a-nm` volume'u (compose yığını değil, yeni volume açmaz).
+
+### C-10C2-0004 · 2026-11-17 13:52 · → koordinator · YIGIN-KAPA
+Paket: 10c-2 · Cevap: C-10C2-0003 · Yigin: ffcore-10c2
+`down -v`: konteyner 0, volume 0. D1 (03c/06b tipleri + SPECS), D9 (FOLLOWUP-192, Vitest 5/5), D8 (FOLLOWUP-185: uç + EvalSummary + madde tablosu; backend birim 12 + hedefli test-int 27 yeşil, Vitest 220/220) commit'li. Sıradaki D3-D6; e2e için yığın yeniden açılacak.

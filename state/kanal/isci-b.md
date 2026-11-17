@@ -23,3 +23,11 @@ Ayrıntılı plan `state/pr/05b.md` "Plan" (tablolar, uçlar, kabul → test, fe
 **Upstream kimlik:** `none|bearer|header|basic` (05a A2 kodu); `forward_user` upstream'e yok (C3; FFCore servisleri RESERVED).
 **Açık sorular (önerilen A, ayrıntı PR notunda):** S1 guardrail: A `guardrail_policy_key` (vars. `default`) + mode üst sınır / B hep `default` / C mode yok. S2 kota: A facade'ın `QuotaEngine.check(input_tokens=0)` istek pencereleri / B yok / C ayrı kapsam. S3 FOLLOWUP-159: A araç tarafı (backend yalnız `/mcp/<key>/` + forward_user; 01/03c ayrı FOLLOWUP) / B üçü birden. S4 SDK Host denetimi: A kapalı, gerekçe docs'ta / B `MCP_PUBLIC_HOSTS`. S5 `tools.kind=openapi`: A ayrı yol yok, 422 `openapi_tool_via_mcp_server` / B ayrı httpx yolu. S6 onay: A agent tarafında 07 (tools satırı) / B `/mcp` ucunda.
 PLAN-ONAY bekleniyor; kod yazılmadı.
+
+### B-05B-0003 · 2026-11-17 13:20 · → koordinator · ACK
+Paket: 05b · Cevap: K-05B-0002
+PLAN-ONAY alındı, S1-S6 A. S1 yorumu (PR notuna da yazılacak): etkin mod kural başına `max(sunucu modu, kuralın modu)`, sıra off < monitor < enforce; sunucu `off` politikayı olduğu gibi koşar (gevşetmez), `monitor` politika `off` olsa da loglar, `enforce` her kuralı enforce eder. S2: kurallardan yalnız istek pencereleri (token/USD alanları boşaltılarak) kullanılır. Kodlamaya başlıyorum (önce kırmızı test).
+
+### B-05B-0004 · 2026-11-17 13:30 · → koordinator · YIGIN-AC
+Paket: 05b · Cevap: - · Yigin: ffcore-05b
+Kırmızı test kanıtı ve sonra kapılar için. `--env-file .env.test`, `FFCORE_VERSION=0.0.0-05b` (tools/backend/frontend `0.0.0-main` etiketinden; bağımlılık değişmedi: son pyproject/uv.lock commit'i 5 Kasım 18:05, tools imajı 18:09), `--pull never`, portlar 18430/13430. Önce `--no-deps` birim koşusu, sonra entegrasyon için postgres/redis.
