@@ -101,7 +101,7 @@ describe("test_10c2_2_alerts", () => {
     fireEvent.click(await screen.findByTestId("alert-rule-add"));
     const form = screen.getByTestId("alert-rule-form");
     const kind = within(form).getByLabelText(/^kind/i) as HTMLSelectElement;
-    expect(Array.from(kind.options).map((o) => o.value)).toEqual(["budget_threshold", "service_down", "quota_warn"]);
+    await waitFor(() => expect(Array.from(kind.options).map((o) => o.value)).toEqual(["budget_threshold", "service_down", "quota_warn"]));
     fireEvent.change(kind, { target: { value: "quota_warn" } });
     fireEvent.change(within(form).getByLabelText(/^channel/i), { target: { value: "email" } });
     fireEvent.submit(form);
@@ -125,7 +125,8 @@ describe("test_10c2_2_alerts", () => {
   it("shows the open-alert badge to a developer, not to an analyst", async () => {
     stubApi(ALERTS_API);
     renderGov("developer", "edit", <AlertBadge />);
-    expect((await screen.findByTestId("alert-badge")).textContent).toContain("1");
+    await waitFor(() => expect(screen.getByTestId("alert-badge").dataset.count).toBe("1"));
+    expect(screen.getByTestId("alert-badge").getAttribute("aria-label")).toMatch(/1 open alert/);
     cleanup();
     const calls = stubApi(ALERTS_API);
     renderGov("analyst", "edit", <AlertBadge />);

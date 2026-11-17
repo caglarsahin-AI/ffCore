@@ -30,7 +30,7 @@ describe("test_10c2_3_retention", () => {
     stubApi(API);
     renderGov("admin", "edit", <RetentionPage />, { superadmin: true });
     expect((await screen.findByTestId("retention-dry-run-default")).textContent).toMatch(/dry run/i);
-    const rows = within(screen.getByTestId("retention-policies")).getAllByTestId(/^policy-/);
+    const rows = within(screen.getByTestId("retention-policies")).getAllByRole("row").slice(1);
     expect(rows).toHaveLength(2);
     expect(within(screen.getByTestId("retention-runs")).getByText("schedule")).toBeTruthy();
   });
