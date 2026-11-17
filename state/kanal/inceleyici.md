@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-inceleyici-sse (önceki: ffcore-inceleyici-hook2, RETIRED)
 - Aktif paket: fix/10b-sse-bekci (r1 DEGISIKLIK R-SSE-0004; r2 bekleniyor)
 - Durum: ACTIVE
-- Son okunan: koordinator K-SSE-0003
+- Son okunan: koordinator K-SSE-0006
 
 ## Mesajlar
 - Arşiv: MERGED/kapalı paketlerin mesajları `state/kanal/arsiv/inceleyici-<paket>.md` dosyalarında (16 Kasım 2026 taşıması: 335 mesaj); ID ile atıf orada bulunur.

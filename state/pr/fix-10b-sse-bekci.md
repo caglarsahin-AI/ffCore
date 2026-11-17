@@ -1,8 +1,23 @@
 # [B] fix(frontend): run stream stall watchdog; test panel reads the run with GET
 
-**Paket:** fix/10b-sse-bekci (FOLLOWUP-188) · **Sınıf:** [B] · **Branch:** fix/10b-sse-bekci · **Baz commit:** 106d9a3 (main; a46f147 + yalnız `oturumlar.json` state commit'i) · **HEAD:** 5894610dd1f844d625756e6c10c2517aebe154cd
+**Paket:** fix/10b-sse-bekci (FOLLOWUP-188) · **Sınıf:** [B] · **Branch:** fix/10b-sse-bekci · **Baz commit:** 106d9a3 (main; a46f147 + yalnız `oturumlar.json` state commit'i) · **HEAD (r2):** 8c01f046c9e6087076b495de53661ef63f60e646 (r1: 5894610dd1f844d625756e6c10c2517aebe154cd)
 
 GOREV K-SSE-0001, PLANNED C-SSE-0002, PLAN-ONAY K-SSE-0002 (Soru 1 A, Soru 2 A, D2 uygun).
+
+## r2 (DUZELT K-SSE-0005, r1 DEGISIKLIK B0 M1 m0 N5) · delta 5894610..8c01f04
+3 commit (test / kod / docs ayrı, NOTE-1): `0e8fdfd` kırmızı test, `058dbe8` kod, `8c01f04` docs; 9 dosya +124/−6.
+- **MAJOR-1 `yoklama-hatada-sessiz-durma` (A):** `useRun(projectId, runId, { enabled, pollWhileUnknown })`: `pollWhileUnknown` ile veri yokken (ilk GET düştü) `refetchInterval` `RUNS_POLL_MS` döner; veri gelince eski kural (`isLiveRun` false → durur). Panel bunu `reading` iken kullanır; `server.error` → `data-testid="test-server-error"` satırı, `TestPanel.serverUnavailable` (en + tr) `Errors` mesajı + kod: `ApiError` ise sözleşme kodu, `api()`'den gelen ApiError olmayan red fetch'in kendisi (ağ) → `network_error`. Son GET başarılıysa hata satırı kalkar, durum satırı gelir. `runs/[runId]` değişmedi (FOLLOWUP-192).
+- **NOTE-2:** `drain` dinleyiciyi ekledikten hemen sonra deneme zaten bittiyse `stop()` (`reader.cancel`) çağırır.
+- **NOTE-4:** `docs/agentlar.md` 'Runs' ve `docs/degisiklikler.md`: başarısız GET gösterilir ve sunucu cevap verene ya da koşu bitene kadar tekrarlanır; 30 s asılı kalan ilk istek `runId`'siz `lost` biter, koşu oluşmuş olabilir: Runs'tan açın. **NOTE-3** kabul, değişiklik yok.
+
+| # | Kriter (K-SSE-0005) | Test | Durum |
+|---|---|---|---|
+| M1 | Probe P1: ilk GET ve yeniden bağlanmalar `TypeError`; yoklama sürer, hata satırı (`network_error`) görünür; backend dönünce `RUNS_POLL_MS` içinde durum satırı, hata satırı kalkar | `test_10bsse_2_panel_poll` "keeps reading after a failed GET, shows the failure, then the status once the backend is back" (`lost` iken GET ≥ 2) | geçti |
+| M1 | Reddedilen GET sözleşme koduyla görünür; koşu bitince (`completed`) yoklama durur | "shows the contract code when the GET is refused, and stops reading once the run has ended" (5 × `RUNS_POLL_MS` boyunca GET sayısı sabit) | geçti |
+| M1 | Mevcut panel testleri yeşil | `test_10bsse_2_panel_poll` ilk 3 test (değişmedi) | geçti |
+| N2 | Okunmadan biten denemenin gövdesi iptal edilir | `test_10bsse_1_stall` "cancels the body it will not read and ends as aborted" (`cancel` = 1) | geçti |
+
+Kırmızı kanıt (0e8fdfd, kod yok): `state/evidence/sse-bekci-r2-red.log` (3 düştü, 13 geçti). Kapı HEAD 8c01f04: lint 0 uyarı, typecheck 0, check:api 0, Vitest **40 dosya, 211/211** → `state/evidence/sse-bekci-gate-r2.log`.
 
 ## Plan
 1. **Bulunan semboller:** `frontend/lib/sse.ts` `followRunStream`/`drain` (zaman aşımsız `reader.read()`, okuma reddi dışarı fırlıyordu); `lib/eval-stream.ts` `startAttempt`/`openWithin`/`sleep` (10c-1 bekçisi); `components/agent-test-panel.tsx` (tek tüketici; `onState`, `lost` metni, Runs bağlantısı; GET'e geçmiyordu); `lib/api/runs-queries.ts` `useRun` (`RUNS_POLL_MS` 3 s, `isLiveRun`); `app/(console)/runs/[runId]/page.tsx` akış kullanmıyor, `useRun` ile yokluyor; `backend/ffcore/core/config.py:156` `sse_keepalive_s = 10`.

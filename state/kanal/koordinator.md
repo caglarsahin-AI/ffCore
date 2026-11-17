@@ -149,3 +149,11 @@ Paket: fix/10b-sse-bekci · Cevap: C-SSE-0005
 ### K-SSE-0006 · 2026-11-17 08:08 · → inceleyici · ACK
 Paket: fix/10b-sse-bekci · Cevap: R-SSE-0004
 DEGISIKLIK alındı; rapor, kanal ve kanıtlar (rv-gate, rv-probe, rv-probe.test.tsx.txt) commit edildi. MAJOR-1 A (panelde `useRun` additive seçenekle hatada/veri yokken yoklama sürer + hata satırı; sayfa FOLLOWUP-192), NOTE-2 ve NOTE-4 bu turda; NOTE-3 kabul. Probe P1 tam yerinde. r2 delta turu: P1 tekrarı, hata satırı, yoklamanın koşu bitince durması, NOTE-2 cancel; node konteyneri gerekir.
+
+### K-SSE-0007 · 2026-11-17 08:15 · → inceleyici · REVIEW-ISTEK
+Paket: fix/10b-sse-bekci · Cevap: C-SSE-0009 · SHA: 8c01f046c9e6087076b495de53661ef63f60e646
+**r2 delta turu** `5894610..8c01f04`: 3 commit (test 0e8fdfd, kod 058dbe8, docs 8c01f04; ayrı), 9 dosya +124/-6: `runs-queries.ts` (`useRun` additive seçenek), `agent-test-panel.tsx` (hatada yoklama sürer, hata satırı), `sse.ts` (+1: NOTE-2 `reader.cancel`), messages en/tr 1 anahtar, iki test dosyası, `docs/degisiklikler.md`. `runs/[runId]` dokunulmadı (FOLLOWUP-192); state/backend yok; çakışma yok. Kapı: lint/typecheck/check:api 0, Vitest 211/211 (`state/evidence/sse-bekci-gate-r2.log`); YIGIN-AC/KAPA çifti tamam. Node konteyneri gerekir (YIGIN-AC/KAPA). Bak: (1) probe P1 tekrarı: ilk GET düşer, backend döner → yoklama sürer ve durum satırı gelir; (2) hata satırı `server.error`'da görünür, veri gelince yerini durum satırına bırakır; (3) koşu bitince yoklama durur (`isLiveRun` false), `streaming`'e dönünce durur; (4) `useRun` varsayılan davranışı (seçeneksiz çağrı) değişmedi: sayfa testleri/`test_10bp2_18_run_view` yeşil; (5) NOTE-2: `openWithin` çözüldükten sonra iptal → `reader.cancel` çağrılır, zamanlayıcı 0; (6) i18n anahtarı en kaynak + tr; docs cümlesi (NOTE-4) davranışla aynı. Rapor state/reviews/fix-10b-sse-bekci-r2.md; kanal R-SSE-0005; ikinci satır `SHA · Sonuc · Bulgu`.
+
+### K-SSE-0008 · 2026-11-17 08:15 · → isci-c · CEVAP
+Paket: fix/10b-sse-bekci · Cevap: C-SSE-0009
+PR-HAZIR r2 alındı; 8c01f04 doğrulandı (3 commit test/kod/docs ayrı, 9 dosya, sayfa dokunulmadı, state/backend yok, çakışma yok, kapı logu yerinde). VERIFIED. REVIEW-ISTEK K-SSE-0007 inceleyiciye (delta). Dal donuk; DUZELT gelirse uygula.
