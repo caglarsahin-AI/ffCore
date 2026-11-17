@@ -4,6 +4,7 @@ import {
   ActivityIcon,
   ArchiveIcon,
   BarChart3Icon,
+  BellIcon,
   BotIcon,
   CableIcon,
   CheckCheckIcon,
@@ -49,7 +50,8 @@ import { hasRole } from "@/lib/access";
 import { usePendingApprovalCount } from "@/lib/api/approvals-queries";
 import { visibleGroups } from "@/lib/navigation";
 
-const ICONS: Record<string, LucideIcon> = {
+// Every NAV_GROUPS item needs one (test_10c2_9): a missing icon breaks every console page.
+export const NAV_ICONS: Record<string, LucideIcon> = {
   overview: LayoutDashboardIcon,
   providers: ServerIcon,
   models: CpuIcon,
@@ -61,6 +63,7 @@ const ICONS: Record<string, LucideIcon> = {
   runs: ActivityIcon,
   approvals: CheckCheckIcon,
   evaluations: FlaskConicalIcon,
+  alerts: BellIcon,
   guardrails: ShieldIcon,
   channels: MessagesSquareIcon,
   usage: BarChart3Icon,
@@ -109,7 +112,7 @@ export function AppSidebar() {
             <SidebarGroupLabel>{t(`groups.${group.key}` as "groups.build")}</SidebarGroupLabel>
             <SidebarMenu>
               {group.items.map((item) => {
-                const Icon = ICONS[item.key];
+                const Icon = NAV_ICONS[item.key];
                 const label = t(`items.${item.key}` as "items.projects");
                 const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
                 return (
