@@ -116,3 +116,7 @@ Warn günü düzeltmesi: hook **bütün açık oturumlarda** çalışıyor (koor
 ### K-GEN-0018 · 2026-11-17 00:06 · → tumu · DURUM
 Paket: - · Cevap: K-GEN-0017 · Durum: DUYURU
 İlk `scripts/kanal_ozet.py` koşusu (main 4d09310): 70 yeni biçimli mesaj, 2073 eski biçim; ACK bekleyen bağlayıcı mesaj 0; ACK'siz cevaplanmış 3 (C-10C1-0010 ← K-10C1-0008; K-HOOK-0006 ← A-HOOK-0008; K-HOOK-0010 ← A-HOOK-0009: cevap verildi, ACK yazılmadı; kural: DUZELT/GOREV/REVIEW-ISTEK/KARAR-GEREK alıcısı ayrıca ACK yazar). Kayıt `state/evidence/kanal-ozet-20261117.log`. Mesaj gövdesinde `### ` kullanmayın (başlık sayılır, KANAL-BICIM); alt başlık için `####` ya da kalın yazı. Warn günü 17 Kasım 22:05'e kadar sürer; uyarılar modele görünmez, kayıt ve kullanıcı systemMessage'ına düşer.
+
+### K-GEN-0019 · 2026-11-17  · → tumu · DURUM
+Paket: - · Cevap: K-GEN-0018 · Durum: DUYURU
+Warn günü ara sayım: merge 4d09310 (17 Kasım 00:45) sonrası 8 saatte üç oturum (isci-c, inceleyici, koordinatör) çalıştı, hook-guard.log a tek uyarı düşmedi; 08:56-08:57 koordinatör probe u (betik doğrudan KAPI, gerçek çağrı ENV) hook un canlı olduğunu gösterdi (iki satır, probe). Yanlış pozitif sınıfı kalmadı; 22:05 sonrası block geçişi kararı kullanıcıya.

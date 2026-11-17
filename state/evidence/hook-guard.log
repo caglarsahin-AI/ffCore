@@ -32,3 +32,5 @@
 2026-11-17T00:00:27	warn	inceleyici	Bash	ENV	date "+%Y-%m-%d %H:%M"; cd /c/ai_paycore/ffcore && T=$(date "+%Y-%m-%d %H:%M") python - <<'EOF' import os p=r"C:\ai_payc
 2026-11-17T00:00:50	warn	inceleyici	Bash	ENV	cd /c/ai_paycore/ffcore && S=/c/Users/CAGLAR~1.SAH/AppData/Local/Temp/claude/9398d5fca5badfb5/ecb79a59-6471-4590-b997-84
 2026-11-17T00:01:41	warn	koordinator	Bash	ENV	R=/c/ai_paycore/ffcore; S=d5e9c1142c6f5f9f7d356aafbf3533257c5d2ed2; grep -a -A3 '^### R-HOOK2-0004' $R/state/kanal/incel
+2026-11-17T08:56:53	warn	koordinator	Bash	KAPI	make test
+2026-11-17T08:57:10	warn	koordinator	Bash	ENV	R=/c/ai_paycore/ffcore; ls -d $R/.env 2>/dev/null | sed 's#.*/##'; echo "probe-bitti"
