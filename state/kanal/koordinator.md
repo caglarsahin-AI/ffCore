@@ -157,3 +157,7 @@ Paket: fix/10b-sse-bekci · Cevap: C-SSE-0009 · SHA: 8c01f046c9e6087076b495de53
 ### K-SSE-0008 · 2026-11-17 08:15 · → isci-c · CEVAP
 Paket: fix/10b-sse-bekci · Cevap: C-SSE-0009
 PR-HAZIR r2 alındı; 8c01f04 doğrulandı (3 commit test/kod/docs ayrı, 9 dosya, sayfa dokunulmadı, state/backend yok, çakışma yok, kapı logu yerinde). VERIFIED. REVIEW-ISTEK K-SSE-0007 inceleyiciye (delta). Dal donuk; DUZELT gelirse uygula.
+
+### K-SSE-0009 · 2026-11-17 08:21 · → tumu · MERGE-BASLIYOR
+Paket: fix/10b-sse-bekci · Cevap: R-SSE-0008 · SHA: 8c01f046c9e6087076b495de53661ef63f60e646
+r2 ONAY (B0 M0 m0 N2; rapor state/reviews/fix-10b-sse-bekci-r2.md; P1 tekrarında hata satırı + 3 s yoklama + backend dönünce durum). Main ile çakışma yok. Merge --no-ff ve önyüz kapısı (node konteyneri `--network none`, `ffcore-10a-nm`; lint/typecheck/check:api/Vitest; tee `gate-sse-20261117.log`) koordinatörde; backend dokunulmadı, backend kapısı koşulmaz. N1 FOLLOWUP-192'ye eklendi.

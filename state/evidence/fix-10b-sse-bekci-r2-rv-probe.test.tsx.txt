@@ -1,0 +1,155 @@
+// @vitest-environment jsdom
+// Reviewer probe (fix/10b-sse-bekci r2). Not part of the branch.
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { act, cleanup, fireEvent, renderHook, screen } from "@testing-library/react";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import type { ReactNode } from "react";
+
+import { AgentTestPanel } from "@/components/agent-test-panel";
+import type { AgentDefinition } from "@/lib/agent-definition";
+import { RUNS_POLL_MS, useRun } from "@/lib/api/runs-queries";
+import { RETRY_DELAY_MS, STALL_MS } from "@/lib/sse";
+
+import { renderAs } from "./eval-support";
+
+const enc = new TextEncoder();
+const first = 'id: 1-0\nevent: progress\ndata: {"run_id":"r1"}\n\n';
+const RUN_GET = "/api/v1/projects/p1/runs/r1";
+const silent = () => new Response(new ReadableStream<Uint8Array>({ start(c) { c.enqueue(enc.encode(first)); } }), { status: 200 });
+const empty = () => new Response(new ReadableStream<Uint8Array>({}), { status: 200 });
+const run = (status: string) => new Response(JSON.stringify({ id: "r1", project_id: "p1", status }), { status: 200, headers: { "content-type": "application/json" } });
+const refused = (status: number, code: string) => new Response(JSON.stringify({ error: { code, type: "api_error", message: code } }), { status, headers: { "content-type": "application/json" } });
+const urlOf = (i: RequestInfo | URL) => (typeof i === "string" ? i : i instanceof URL ? i.toString() : i.url);
+async function advance(ms: number) {
+  await act(async () => {
+    await vi.advanceTimersByTimeAsync(ms);
+  });
+}
+async function start(locale: "en" | "tr" = "en") {
+  renderAs("developer", "edit", <AgentTestPanel projectId="p1" agentKey="a1" version={1} definition={{ variables: [] } as unknown as AgentDefinition} dirty={false} />, new QueryClient({ defaultOptions: { queries: { retry: false } } }), locale);
+  fireEvent.change(screen.getByTestId("test-input"), { target: { value: "hello" } });
+  fireEvent.submit(screen.getByTestId("test-input").closest("form")!);
+  await advance(0);
+}
+const log = (...a: unknown[]) => console.log("[RV2]", ...a);
+
+afterEach(() => {
+  cleanup();
+  vi.unstubAllGlobals();
+  vi.useRealTimers();
+});
+
+describe("rv r2 panel", () => {
+  it("P1 (r1 MAJOR-1 repeat) backend down at stall, up later: reading resumes, error then status", async () => {
+    vi.useFakeTimers();
+    let up = false;
+    const t0 = Date.now();
+    const times: number[] = [];
+    vi.stubGlobal("fetch", vi.fn(async (input: RequestInfo | URL) => {
+      const url = urlOf(input);
+      if (url === RUN_GET) {
+        times.push(Date.now() - t0);
+        if (!up) throw new TypeError("Failed to fetch");
+        return run("running");
+      }
+      if (url.endsWith("/runs/r1/stream")) {
+        if (!up) throw new TypeError("Failed to fetch");
+        return empty();
+      }
+      return silent();
+    }));
+    await start();
+    await advance(STALL_MS + 10 * RETRY_DELAY_MS);
+    await advance(0);
+    const err = screen.queryByTestId("test-server-error")?.textContent ?? null;
+    log("P1 stream", screen.getByTestId("test-status").dataset.stream, "error line", err, "gets", times.join(","));
+    expect(screen.getByTestId("test-status").dataset.stream).toBe("lost");
+    expect(err).toContain("network_error");
+    await advance(3 * RUNS_POLL_MS);
+    const failed = times.length;
+    up = true;
+    await advance(RUNS_POLL_MS);
+    for (let i = 0; i < 5; i++) await advance(10);
+    log("P1 settle +50ms");
+    log("P1 after up gets", times.join(","), "status", screen.queryByTestId("test-server-status")?.textContent ?? null, "error", screen.queryByTestId("test-server-error")?.textContent ?? null);
+    expect(times.length).toBeGreaterThan(failed);
+    expect(screen.getByTestId("test-server-status").textContent).toContain("Running");
+    expect(screen.queryByTestId("test-server-error")).toBeNull();
+    // gaps between GETs never above RUNS_POLL_MS once reading started
+    const gaps = times.slice(1).map((t, i) => t - times[i]);
+    log("P1 max gap", Math.max(...gaps));
+  });
+
+  it("P11 permanent 404 on GET: how long does the panel keep polling?", async () => {
+    vi.useFakeTimers();
+    let n = 0;
+    vi.stubGlobal("fetch", vi.fn(async (input: RequestInfo | URL) => {
+      const url = urlOf(input);
+      if (url === RUN_GET) {
+        n += 1;
+        return refused(404, "run_not_found");
+      }
+      if (url.endsWith("/runs/r1/stream")) return refused(404, "run_not_found");
+      return silent();
+    }));
+    await start();
+    await advance(STALL_MS + 10 * RETRY_DELAY_MS);
+    const at = n;
+    await advance(10 * 60_000);
+    log("P11 GETs at lost", at, "after 10 min", n, "line", screen.queryByTestId("test-server-error")?.textContent ?? null);
+  });
+
+  it("P12 tr locale error line and both previous data + later failure", async () => {
+    vi.useFakeTimers();
+    let k = 0;
+    vi.stubGlobal("fetch", vi.fn(async (input: RequestInfo | URL) => {
+      const url = urlOf(input);
+      if (url === RUN_GET) {
+        k += 1;
+        return k === 1 ? run("running") : refused(503, "unavailable");
+      }
+      if (url.endsWith("/runs/r1/stream")) return refused(503, "unavailable");
+      return silent();
+    }));
+    await start("tr");
+    await advance(STALL_MS + 10 * RETRY_DELAY_MS);
+    await advance(2 * RUNS_POLL_MS);
+    log("P12 GETs", k, "error", screen.queryByTestId("test-server-error")?.textContent ?? null, "status", screen.queryByTestId("test-server-status")?.textContent ?? null);
+    expect(screen.getByTestId("test-server-error").textContent).toContain("unavailable");
+    const before = k;
+    await advance(2 * RUNS_POLL_MS);
+    expect(k).toBeGreaterThan(before);
+  });
+});
+
+describe("rv r2 useRun default", () => {
+  it("P13 default useRun (no pollWhileUnknown): a failed first GET is not repeated (unchanged)", async () => {
+    vi.useFakeTimers();
+    let n = 0;
+    vi.stubGlobal("fetch", vi.fn(async () => {
+      n += 1;
+      throw new TypeError("Failed to fetch");
+    }));
+    const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    const wrapper = ({ children }: { children: ReactNode }) => <QueryClientProvider client={client}>{children}</QueryClientProvider>;
+    renderHook(() => useRun("p1", "r1"), { wrapper });
+    await advance(10 * RUNS_POLL_MS);
+    log("P13 default GETs", n);
+    expect(n).toBe(1);
+  });
+
+  it("P14 default useRun with a live run keeps polling, ended run stops (unchanged)", async () => {
+    vi.useFakeTimers();
+    let n = 0;
+    vi.stubGlobal("fetch", vi.fn(async () => {
+      n += 1;
+      return run(n < 3 ? "running" : "completed");
+    }));
+    const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    const wrapper = ({ children }: { children: ReactNode }) => <QueryClientProvider client={client}>{children}</QueryClientProvider>;
+    renderHook(() => useRun("p1", "r1"), { wrapper });
+    await advance(10 * RUNS_POLL_MS);
+    log("P14 GETs", n);
+    expect(n).toBe(3);
+  });
+});
