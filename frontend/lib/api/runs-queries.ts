@@ -57,12 +57,18 @@ export function useRuns(projectId: string, filters: RunFilters) {
 
 // A run that is still going refreshes until it ends; an ended run is read once. `enabled: false`
 // holds the reading (the test panel reads only while its stream is reconnecting or lost).
-export function useRun(projectId: string, runId: string, options: { enabled?: boolean } = {}) {
+// `pollWhileUnknown`: keep reading every RUNS_POLL_MS while no status has arrived yet (the first
+// GET failed, r1 MAJOR-1 yoklama-hatada-sessiz-durma); it still stops once the run has ended.
+export function useRun(projectId: string, runId: string, options: { enabled?: boolean; pollWhileUnknown?: boolean } = {}) {
   return useQuery({
     queryKey: runKeys.one(projectId, runId),
     enabled: options.enabled ?? true,
     queryFn: () => api<Run>("GET", `${base(projectId)}/runs/${runId}`),
-    refetchInterval: (q) => (q.state.data && isLiveRun(q.state.data.status) ? RUNS_POLL_MS : false),
+    refetchInterval: (q) => {
+      const run = q.state.data;
+      if (run) return isLiveRun(run.status) ? RUNS_POLL_MS : false;
+      return options.pollWhileUnknown ? RUNS_POLL_MS : false;
+    },
   });
 }
 

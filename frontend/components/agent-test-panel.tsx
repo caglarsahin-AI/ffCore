@@ -65,7 +65,10 @@ export function AgentTestPanel({
 
   const busy = stream !== null;
   const reading = view.runId !== null && (stream === "reconnecting" || (stream === null && ended === "lost"));
-  const server = useRun(projectId, view.runId ?? "", { enabled: reading });
+  const server = useRun(projectId, view.runId ?? "", { enabled: reading, pollWhileUnknown: true });
+  // The last GET failed: say so with its code; a reject from api() that is not an ApiError is
+  // fetch itself failing, i.e. the request did not reach the server.
+  const serverCode = server.error ? (server.error instanceof ApiError ? server.error.code : "network_error") : null;
   const variables = definition.variables ?? [];
 
   async function follow(open: (signal: AbortSignal) => Promise<Response>) {
@@ -170,7 +173,12 @@ export function AgentTestPanel({
         </p>
       )}
       <StreamStatus view={view} stream={stream} ended={ended} />
-      {reading && server.data && (
+      {reading && serverCode && (
+        <p className="text-sm text-destructive" role="alert" data-testid="test-server-error">
+          {t("serverUnavailable", { message: tErrors(errorMessageKey(serverCode)), code: serverCode })}
+        </p>
+      )}
+      {reading && !serverCode && server.data && (
         <p className="text-sm text-muted-foreground" role="status" data-testid="test-server-status" data-status={server.data.status}>
           {t("serverStatus", { status: tRuns(`statuses.${server.data.status}`) })}
         </p>

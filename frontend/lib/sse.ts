@@ -170,6 +170,7 @@ async function drain(
   const parser = new SseParser();
   const stop = () => void reader.cancel().catch(() => {});
   attempt.signal.addEventListener("abort", stop, { once: true });
+  if (attempt.signal.aborted) stop(); // ended before reading: the abort event is already past (r1 NOTE-2)
   try {
     for (;;) {
       if (attempt.signal.aborted) return null;
