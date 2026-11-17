@@ -53,7 +53,7 @@ describe("test_10c1_6_eval_run_view", () => {
   });
 
   it("fails loudly when the summary cannot be read, naming the field", () => {
-    renderAs("analyst", "edit", <EvalSummaryView run={evalRun({ summary: { ...summary, complete: "yes" } })} />);
+    renderAs("analyst", "edit", <EvalSummaryView run={evalRun({ summary: { ...summary, complete: "yes" } as unknown as typeof summary })} />);
     const alert = screen.getByRole("alert");
     expect(alert.textContent).toMatch(/summary could not be read/i);
     expect(alert.textContent).toContain("complete");
