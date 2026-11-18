@@ -73,3 +73,19 @@ def test_10c2_eval_run_summary_is_typed(pg, member, project):
     out = member("analyst").get(f"{P.format(project)}/eval-runs/{ev}").json()
     assert out["summary"]["pass_rate"] == 0.5
     assert {"n", "scored", "not_run", "complete", "worst", "latency_ms"} <= set(out["summary"])
+
+
+def test_10c2_r2_partial_summary_reads_as_null_not_500(pg, member, project):
+    # NOTE-2 `kismi-ozet-500` (r1 probe R4 data): detail and the suite's exam list answer 200.
+    ev = _exam(pg, project, {"q1": True})
+    pg.execute(
+        "UPDATE eval_runs SET summary = %s WHERE id = %s", ('{"n": 1, "pass_rate": 1.0}', ev)
+    )
+    suite_id = pg.execute("SELECT suite_id FROM eval_runs WHERE id = %s", (ev,)).fetchone()[0]
+    client = member("analyst")
+    detail = client.get(f"{P.format(project)}/eval-runs/{ev}")
+    assert detail.status_code == 200, detail.text
+    assert detail.json()["summary"] is None
+    runs = client.get(f"{P.format(project)}/eval-suites/{suite_id}/runs")
+    assert runs.status_code == 200, runs.text
+    assert next(r for r in runs.json()["items"] if r["id"] == str(ev))["summary"] is None
