@@ -1,0 +1,208 @@
+=== gate05b main 2e75ba2 2026-11-18 16:37:11
+
+=== 16:37:11 build backend tools (frontend dokunulmadı; imaj yerel)
+ > [tools internal] load metadata for docker.io/library/python:3.12.10-slim-bookworm:
+------
+------
+ > [tools internal] load metadata for ghcr.io/astral-sh/uv:0.10.12:
+------
+failed to solve: ghcr.io/astral-sh/uv:0.10.12: failed to do request: Head "https://ghcr.io/v2/astral-sh/uv/manifests/0.10.12": dialing ghcr.io:443 container via direct connection because  has no HTTPS proxy: resolving host ghcr.io: lookup ghcr.io: no such host
+build exit=17
+
+=== 16:37:20 compose config
+config exit=0
+
+=== 16:37:29 up
+ Container ffmain-langfuse-worker-1  Healthy
+ Container ffmain-qdrant-1  Healthy
+ Container ffmain-agent-worker-bg-1  Healthy
+ Container ffmain-langfuse-minio-1  Healthy
+ Container ffmain-mcp-sql-1  Healthy
+ Container ffmain-mcp-search-1  Healthy
+up exit=0
+ffmain-worker-1 Up 1 second
+ffmain-agent-worker-bg-1 Up 14 seconds
+ffmain-agent-worker-1 Up 13 seconds
+ffmain-mcp-sql-1 Up 13 seconds (healthy)
+ffmain-mcp-search-1 Up 13 seconds (healthy)
+ffmain-frontend-1 Up 13 seconds
+ffmain-backend-1 Up 25 seconds (healthy)
+ffmain-litellm-1 Up About a minute (healthy)
+ffmain-langfuse-web-1 Up 57 seconds (healthy)
+ffmain-langfuse-worker-1 Up 57 seconds
+ffmain-postgres-1 Up About a minute (healthy)
+ffmain-langfuse-minio-1 Up About a minute (healthy)
+ffmain-qdrant-1 Up About a minute (healthy)
+ffmain-ticket-desk-1 Up About a minute (healthy)
+ffmain-fake-llm-1 Up About a minute
+ffmain-langfuse-redis-1 Up About a minute (healthy)
+ffmain-redis-1 Up About a minute (healthy)
+ffmain-langfuse-postgres-1 Up About a minute (healthy)
+ffmain-langfuse-clickhouse-1 Up About a minute (healthy)
+
+=== 16:38:48 lint
+ruff check backend scripts data/samples/scripts services
+All checks passed!
+ruff format --check backend scripts data/samples/scripts services
+505 files already formatted
+lint exit=0
+
+=== 16:39:03 alembic heads
+05b_0001 (03c, 03b, 06b, 05a, 06a, 03a, 09, 07, 08, 05b, 04a) (head)
+heads exit=0
+
+=== 16:39:15 make test llmaas
+........................................................................ [  3%]
+........................................................................ [  7%]
+........................................................................ [ 11%]
+........................................................................ [ 15%]
+........................................................................ [ 18%]
+........................................................................ [ 22%]
+........................................................................ [ 26%]
+........................................................................ [ 30%]
+........................................................................ [ 34%]
+........................................................................ [ 37%]
+........................................................................ [ 41%]
+........................................................................ [ 45%]
+........................................................................ [ 49%]
+........................................................................ [ 52%]
+........................................................................ [ 56%]
+........................................................................ [ 60%]
+........................................................................ [ 64%]
+........................................................................ [ 68%]
+........................................................................ [ 71%]
+........................................................................ [ 75%]
+........................................................................ [ 79%]
+........................................................................ [ 83%]
+........................................................................ [ 87%]
+........................................................................ [ 90%]
+........................................................................ [ 94%]
+........................................................................ [ 98%]
+...............................                                          [100%]
+1903 passed in 186.59s (0:03:06)
+test exit=0
+
+=== 16:42:39 make test airgap
+........................................................................ [  3%]
+........................................................................ [  7%]
+........................................................................ [ 11%]
+........................................................................ [ 15%]
+........................................................................ [ 18%]
+........................................................................ [ 22%]
+........................................................................ [ 26%]
+........................................................................ [ 30%]
+........................................................................ [ 34%]
+........................................................................ [ 37%]
+........................................................................ [ 41%]
+........................................................................ [ 45%]
+........................................................................ [ 49%]
+........................................................................ [ 52%]
+........................................................................ [ 56%]
+........................................................................ [ 60%]
+........................................................................ [ 64%]
+........................................................................ [ 68%]
+........................................................................ [ 71%]
+........................................................................ [ 75%]
+........................................................................ [ 79%]
+........................................................................ [ 83%]
+........................................................................ [ 87%]
+........................................................................ [ 90%]
+........................................................................ [ 94%]
+........................................................................ [ 98%]
+...............................                                          [100%]
+1903 passed in 182.42s (0:03:02)
+test-airgap exit=0
+
+=== 16:45:59 test-samples
+
+----------------------------------------------------------------------
+Ran 54 tests in 4.299s
+
+OK (skipped=5)
+samples exit=0
+
+=== 16:46:15 test-int
+........................................................................ [  7%]
+........................................................................ [ 14%]
+........................................................................ [ 21%]
+....................................s................................... [ 28%]
+........................................................................ [ 35%]
+................s..........s............................................ [ 42%]
+...................................s.................................... [ 49%]
+........................................................................ [ 56%]
+........................................................................ [ 63%]
+........................................................................ [ 70%]
+........................................................................ [ 77%]
+........................................................................ [ 84%]
+.......................................................ssssssss......... [ 92%]
+....................................................s................... [ 99%]
+.........                                                                [100%]
+=============================== warnings summary ===============================
+tests/integration/test_04a_worker.py::test_04a_upload_job_runs_in_worker
+tests/integration/test_04a_worker.py::test_04a_job_for_missing_row_retries_then_fails_loud
+  /opt/venv/lib/python3.12/site-packages/arq/worker.py:877: DeprecationWarning: Call to deprecated close. (Use aclose() instead) -- Deprecated since version 5.0.1.
+    await self.pool.close(close_connection_pool=True)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+SKIPPED [1] tests/integration/test_03b_egress_dns.py: NOT_RUN: needs RUN_DNS_TESTS=1
+SKIPPED [1] tests/integration/test_04a_ingest.py:124: NOT_RUN: needs RUN_MODEL_TESTS=1
+SKIPPED [1] tests/integration/test_04a_ingest.py:279: NOT_RUN: needs RUN_MODEL_TESTS=1
+SKIPPED [1] tests/integration/test_05a_sql.py:301: NOT_RUN: needs RUN_MODEL_TESTS=1
+SKIPPED [1] tests/integration/test_09_exam_stack.py:83: NOT_RUN: set RUN_EVAL_STACK=1 (scenario stack + make seed + make seed-eval)
+SKIPPED [1] tests/integration/test_09_exam_stack.py:92: NOT_RUN: set RUN_EVAL_STACK=1 (scenario stack + make seed + make seed-eval)
+SKIPPED [1] tests/integration/test_09_exam_stack.py:98: NOT_RUN: set RUN_EVAL_STACK=1 (scenario stack + make seed + make seed-eval)
+SKIPPED [1] tests/integration/test_09_exam_stack.py:123: NOT_RUN: set RUN_EVAL_STACK=1 (scenario stack + make seed + make seed-eval)
+SKIPPED [1] tests/integration/test_09_exam_stack.py:129: NOT_RUN: set RUN_EVAL_STACK=1 (scenario stack + make seed + make seed-eval)
+SKIPPED [1] tests/integration/test_09_exam_stack.py:140: NOT_RUN: set RUN_EVAL_STACK=1 (scenario stack + make seed + make seed-eval)
+SKIPPED [1] tests/integration/test_09_exam_stack.py:155: NOT_RUN: set RUN_EVAL_STACK=1 (scenario stack + make seed + make seed-eval)
+SKIPPED [1] tests/integration/test_09_exam_stack.py:166: NOT_RUN: set RUN_EVAL_STACK=1 (scenario stack + make seed + make seed-eval)
+SKIPPED [1] tests/integration/test_19_ingest_raw.py:157: root ignores file modes; the mount test runs :ro
+1004 passed, 13 skipped, 2 warnings in 868.13s (0:14:28)
+test-int exit=0
+
+=== 17:01:04 smoke
+python scripts/smoke.py
+ok    backend /healthz 200
+ok    litellm /health/liveliness 200
+ok    langfuse /api/public/health 200, /api/public/projects 200
+ok    mcp-search /healthz 200
+ok    mcp-sql /healthz 200
+ok    skipped: ollama profile inactive
+smoke: passed
+smoke exit=0
+
+=== 17:01:16 frontend: atlandı (05b frontend dosyasına dokunmadı; git diff --stat HEAD~1 HEAD -- frontend boş)
+
+=== 17:01:19 down -v
+ Volume ffmain_model_cache  Removed
+ Volume ffmain_qdrant_data  Removed
+
+=== 17:01:42 done
+gate script exit 0
+gate exit=0
+#6 ERROR: failed to do request: Head "https://ghcr.io/v2/astral-sh/uv/manifests/0.10.12": dialing ghcr.io:443 container via direct connection because  has no HTTPS proxy: resolving host ghcr.io: lookup ghcr.io: no such host
+------
+ > [tools internal] load metadata for docker.io/library/python:3.12.10-slim-bookworm:
+------
+------
+ > [tools internal] load metadata for ghcr.io/astral-sh/uv:0.10.12:
+------
+failed to solve: ghcr.io/astral-sh/uv:0.10.12: failed to do request: Head "https://ghcr.io/v2/astral-sh/uv/manifests/0.10.12": dialing ghcr.io:443 container via direct connection because  has no HTTPS proxy: resolving host ghcr.io: lookup ghcr.io: no such host
+upbuild exit=17
+Warning: No resource found to remove for project "ffmain".
+down exit=0
+=== 17:06:11 retry: up --build --pull never backend tools migrate (DNS aralıklı, ENV-173)
+
+#4 [tools internal] load metadata for docker.io/library/python:3.12.10-slim-bookworm
+#4 CANCELED
+
+#5 [backend internal] load build definition from Dockerfile
+
+#6 [backend internal] load .dockerignore
+#6 CANCELED
+------
+ > [tools internal] load metadata for ghcr.io/astral-sh/uv:0.10.12:
+------
+failed to solve: ghcr.io/astral-sh/uv:0.10.12: failed to do request: Head "https://ghcr.io/v2/astral-sh/uv/manifests/0.10.12": dialing ghcr.io:443 container via direct connection because  has no HTTPS proxy: resolving host ghcr.io: lookup ghcr.io: no such host
+upbuild2 exit=17

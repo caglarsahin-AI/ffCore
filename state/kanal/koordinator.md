@@ -251,3 +251,15 @@ r3 ONAY (B0 M0 m0 N2; rapor state/reviews/05b-r3.md; r1 MAJOR `upstream-origin-k
 ### K-05B-0017 · 2026-11-18 16:36 · → tumu · YIGIN-AC
 Paket: 05b · Cevap: K-05B-0016 · Yigin: ffmain
 Main kapısı yığını (18000/13000, FFCORE_VERSION=0.0.0-main, test+qdrant profilleri). Bitince down -v + YIGIN-KAPA.
+
+### K-05B-0018 · 2026-11-18 17:10 · → tumu · YIGIN-KAPA
+Paket: 05b · Cevap: K-05B-0017 · Yigin: ffmain
+Kapı bitti, `down -v` tamam; konteyner yok.
+
+### K-05B-0019 · 2026-11-18 17:10 · → tumu · MERGED
+Paket: 05b · Cevap: R-05B-0011 · SHA: 2e75ba2
+Merge --no-ff `2e75ba2` (5b00a63; 11 commit, 32 dosya +5171/-20). Kapı `state/evidence/gate-05b-20261118.log`: lint 0, alembic heads tek, test 1903×2, test-samples, test-int 1004/13 atlandı/0, smoke geçti; hepsi tools konteynerinde kaynaktan. **İstisna, gizlenmiyor:** imaj build adımı iki kez BuildKit DNS hatasıyla düştü (`lookup ghcr.io: no such host`; ENV-196, kullanıcıda); backend imajı 05b'siz kaldı, DNS gelince tek adım `up --build --pull never` + smoke eklenir (KARARLAR '05b main kapısı ve imaj build istisnası'). WORK_QUEUE 05b DONE; FOLLOWUP-159 kapandı (araç tarafı), 194 (01/03c egress kalanı) ve 195 (10c-3 notları + NOTE-1) açıldı. **isci-c:** rebase tetiği bu mesaj (K-10C2-0006 madde 2); e2e'yi yeniden koşma (r1'de 180/180; imaj build ENV-196'ya bağlı), önyüz kapısı node konteynerinde + backend testleri tools'ta kaynaktan yeter. Push kullanıcı talimatını bekliyor.
+
+### K-05B-0020 · 2026-11-18 17:10 · → isci-b · HANDOFF-ISTEK
+Paket: 05b · Cevap: B-05B-0016
+MERGED 2e75ba2. Kanalına HANDOFF yaz (kalan riskler: FOLLOWUP-194/195; `remote_mcp` ve guardrail probe'ları yalnız işçi testleriyle; `%25` çok katlı kodlama sınırı; ENV-196 imaj build), sonra lease `RETIRED`. Worktree `.worktrees/feat/05b-openapi-mcp` silme kullanıcıda. Üç turda B0 M1→0, 1903 test; teşekkürler.
