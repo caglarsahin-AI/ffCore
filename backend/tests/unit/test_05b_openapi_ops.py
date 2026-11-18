@@ -1,0 +1,262 @@
+"""05b: an OpenAPI document becomes MCP tool definitions (operationId -> name, parameters and
+JSON body -> input_schema, description) and arguments become one upstream request.
+
+Operations that cannot be published say why (exposable=false + reason); nothing is skipped
+silently (ARCH-06)."""
+
+import json
+from pathlib import Path
+
+import pytest
+
+from ffcore.services import mcp_openapi
+from ffcore.services.mcp_openapi import ArgumentsError, SpecError
+
+SUPERSET = Path(__file__).resolve().parents[3] / "data" / "samples" / "openapi" / "superset.yaml"
+SIX = {
+    "searchDashboards",
+    "listCharts",
+    "createChart",
+    "addChartToDashboard",
+    "getChartData",
+    "getDatasetMetrics",
+}
+
+
+def _catalog(spec: dict) -> dict[str, dict]:
+    return {op["name"]: op for op in mcp_openapi.catalog(spec)}
+
+
+def _spec(paths: dict, components: dict | None = None) -> dict:
+    return {"openapi": "3.0.3", "info": {"title": "t", "version": "1"}, "paths": paths} | (
+        {"components": components} if components else {}
+    )
+
+
+def test_05b_superset_has_six_exposable_operations():
+    ops = _catalog(mcp_openapi.load_spec(SUPERSET.read_text(encoding="utf-8")))
+    assert set(ops) == SIX
+    assert all(op["exposable"] and op["reason"] is None for op in ops.values())
+    assert ops["createChart"]["method"] == "POST" and ops["createChart"]["path"] == "/api/v1/chart/"
+    assert ops["searchDashboards"]["description"] == "Başlığa göre dashboard arar."
+
+
+def test_05b_parameters_and_body_become_input_schema_with_refs_resolved():
+    ops = _catalog(mcp_openapi.load_spec(SUPERSET.read_text(encoding="utf-8")))
+    put = ops["addChartToDashboard"]["input_schema"]
+    assert put["type"] == "object"
+    assert put["properties"]["pk"]["type"] == "integer"
+    assert put["properties"]["body"]["properties"]["dashboards"]["type"] == "array"
+    assert sorted(put["required"]) == ["body", "pk"]
+    create = ops["createChart"]["input_schema"]
+    assert create["properties"]["body"]["required"] == [
+        "slice_name",
+        "viz_type",
+        "datasource_id",
+        "datasource_type",
+    ]
+    assert "$ref" not in json.dumps(ops)
+    search = ops["searchDashboards"]["input_schema"]
+    assert search["properties"]["q"]["description"].startswith("Rison")
+    assert search.get("required", []) == []
+
+
+def test_05b_json_document_is_accepted():
+    spec = _spec(
+        {"/a": {"get": {"operationId": "getA", "responses": {"200": {"description": "x"}}}}}
+    )
+    assert [op["name"] for op in mcp_openapi.catalog(mcp_openapi.load_spec(json.dumps(spec)))] == [
+        "getA"
+    ]
+
+
+@pytest.mark.parametrize(
+    "text, code",
+    [
+        ("not: [valid", "spec_invalid"),
+        ("- a list", "spec_invalid"),
+        ('{"swagger": "2.0", "paths": {}}', "spec_version_unsupported"),
+        ('{"openapi": "3.0.0"}', "spec_invalid"),
+    ],
+)
+def test_05b_bad_documents_are_refused_with_a_code(text, code):
+    with pytest.raises(SpecError) as caught:
+        mcp_openapi.catalog(mcp_openapi.load_spec(text))
+    assert caught.value.code == code
+
+
+def test_05b_oversized_document_is_refused():
+    with pytest.raises(SpecError) as caught:
+        mcp_openapi.load_spec("x" * (mcp_openapi.MAX_SPEC_CHARS + 1))
+    assert caught.value.code == "spec_too_large"
+
+
+def test_05b_unpublishable_operations_say_why():
+    ok = {"200": {"description": "x"}}
+    spec = _spec(
+        {
+            "/h": {
+                "get": {
+                    "operationId": "withHeader",
+                    "parameters": [
+                        {"name": "X-Tenant", "in": "header", "schema": {"type": "string"}}
+                    ],
+                    "responses": ok,
+                }
+            },
+            "/x": {
+                "get": {
+                    "operationId": "external",
+                    "responses": ok,
+                    "parameters": [{"$ref": "other.yaml#/p"}],
+                }
+            },
+            "/n": {"get": {"responses": ok}},
+            "/f": {
+                "post": {
+                    "operationId": "upload",
+                    "requestBody": {"content": {"multipart/form-data": {"schema": {}}}},
+                    "responses": ok,
+                }
+            },
+            "/bad name": {"get": {"operationId": "has space", "responses": ok}},
+        }
+    )
+    ops = _catalog(spec)
+    assert ops["withHeader"]["reason"] == "parameter_location_unsupported"
+    assert ops["external"]["reason"] == "external_ref"
+    assert ops["upload"]["reason"] == "request_body_unsupported"
+    assert ops["has space"]["reason"] == "operation_name_invalid"
+    unnamed = [op for op in ops.values() if op["reason"] == "operation_id_missing"]
+    assert len(unnamed) == 1 and unnamed[0]["path"] == "/n"
+    assert not any(op["exposable"] for op in ops.values())
+
+
+def test_05b_ref_cycle_is_refused_not_looped():
+    spec = _spec(
+        {
+            "/c": {
+                "post": {
+                    "operationId": "cyclic",
+                    "requestBody": {
+                        "content": {
+                            "application/json": {"schema": {"$ref": "#/components/schemas/A"}}
+                        }
+                    },
+                    "responses": {"200": {"description": "x"}},
+                }
+            }
+        },
+        {
+            "schemas": {
+                "A": {"type": "object", "properties": {"a": {"$ref": "#/components/schemas/A"}}}
+            }
+        },
+    )
+    assert _catalog(spec)["cyclic"]["reason"] == "ref_cycle"
+
+
+def test_05b_request_from_arguments_encodes_path_and_query():
+    ops = _catalog(mcp_openapi.load_spec(SUPERSET.read_text(encoding="utf-8")))
+    request = mcp_openapi.build_request(ops["getChartData"], {"pk": "1/../../admin"})
+    assert request.method == "GET"
+    assert request.path == "/api/v1/chart/1%2F..%2F..%2Fadmin/data/"
+    assert request.params == {} and request.json is None
+    search = mcp_openapi.build_request(ops["searchDashboards"], {"q": "(page:0)"})
+    assert search.path == "/api/v1/dashboard/" and search.params == {"q": "(page:0)"}
+    body = {"slice_name": "s", "viz_type": "table", "datasource_id": 1, "datasource_type": "table"}
+    create = mcp_openapi.build_request(ops["createChart"], {"body": body})
+    assert create.method == "POST" and create.json == body
+
+
+@pytest.mark.parametrize(
+    "arguments",
+    [{}, {"pk": 1, "extra": 2}, {"pk": None}, {"pk": {"nested": 1}}],
+)
+def test_05b_bad_arguments_are_refused(arguments):
+    ops = _catalog(mcp_openapi.load_spec(SUPERSET.read_text(encoding="utf-8")))
+    with pytest.raises(ArgumentsError):
+        mcp_openapi.build_request(ops["getChartData"], arguments)
+
+
+# --- r1 MAJOR-1 / MINOR-2 (K-05B-0008): path keys and path values stay inside the base path ---
+
+BAD_PATHS = [
+    ":59359/api/v1/dashboard/",  # P1 port switch
+    "0:59359/api/v1/dashboard/",  # P1 host change
+    "v1/dashboard/",  # P1 no leading slash
+    "//evil.example/x",
+    "/a/../b",
+    "/a/./b",
+    "/a//b",
+    "/a?x=1",
+    "/a#f",
+]
+
+
+@pytest.mark.parametrize("path", BAD_PATHS)
+def test_05b_r2_invalid_path_key_is_not_exposable(path):
+    ok = {"200": {"description": "x"}}
+    ops = _catalog(_spec({path: {"get": {"operationId": "p", "responses": ok}}}))
+    assert ops["p"]["exposable"] is False and ops["p"]["reason"] == "openapi_path_invalid"
+
+
+@pytest.mark.parametrize("path", BAD_PATHS)
+def test_05b_r2_upload_refuses_a_document_with_an_invalid_path(path):
+    ok = {"200": {"description": "x"}}
+    good = {"/fine": {"get": {"operationId": "fine", "responses": ok}}}
+    text = json.dumps(_spec({**good, path: {"get": {"operationId": "p", "responses": ok}}}))
+    with pytest.raises(SpecError) as caught:
+        mcp_openapi.upload_catalog(text)
+    assert caught.value.code == "openapi_path_invalid"
+
+
+def test_05b_r2_upload_catalog_accepts_superset():
+    assert len(mcp_openapi.upload_catalog(SUPERSET.read_text(encoding="utf-8"))) == 6
+
+
+@pytest.mark.parametrize("value", [".", "..", "%2e%2e"])
+def test_05b_r2_dot_path_values_are_refused(value):
+    # r3 (K-05B-0012): "%2e%2e" is refused too (was encoded and sent as %252e%252e in r2).
+    ops = _catalog(mcp_openapi.load_spec(SUPERSET.read_text(encoding="utf-8")))
+    with pytest.raises(ArgumentsError):
+        mcp_openapi.build_request(ops["getChartData"], {"pk": value})
+
+
+# --- r2 MINOR-1 (K-05B-0012, r3): percent-encoded '.', '/', '\' in path keys and values ---
+
+ENCODED_PATHS = [
+    "/a/%2e%2e/b",
+    "/a/%2E%2E/b",
+    "/a%2Fb",
+    "/a%2fb",
+    "/a%5Cb",
+    "/%252e%252e/x",
+    "/x/%25252f/y",
+    "/a/%2e/b",
+]
+
+
+@pytest.mark.parametrize("path", ENCODED_PATHS)
+def test_05b_r3_encoded_path_key_is_refused(path):
+    ok = {"200": {"description": "x"}}
+    ops = _catalog(_spec({path: {"get": {"operationId": "p", "responses": ok}}}))
+    assert ops["p"]["exposable"] is False and ops["p"]["reason"] == "openapi_path_invalid"
+    good = {"/fine": {"get": {"operationId": "fine", "responses": ok}}}
+    text = json.dumps(_spec({**good, path: {"get": {"operationId": "p", "responses": ok}}}))
+    with pytest.raises(SpecError) as caught:
+        mcp_openapi.upload_catalog(text)
+    assert caught.value.code == "openapi_path_invalid"
+
+
+@pytest.mark.parametrize("value", ["%2e%2e", "%2E", "a%2Fb", "%5c", "%252e%252e", "x%25252Fy"])
+def test_05b_r3_encoded_path_value_is_refused(value):
+    ops = _catalog(mcp_openapi.load_spec(SUPERSET.read_text(encoding="utf-8")))
+    with pytest.raises(ArgumentsError):
+        mcp_openapi.build_request(ops["getChartData"], {"pk": value})
+
+
+@pytest.mark.parametrize("value", ["12", "a%20b", "100%", "%41"])
+def test_05b_r3_other_values_still_pass(value):
+    ops = _catalog(mcp_openapi.load_spec(SUPERSET.read_text(encoding="utf-8")))
+    assert mcp_openapi.build_request(ops["getChartData"], {"pk": value}).method == "GET"

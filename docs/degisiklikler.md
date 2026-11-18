@@ -4,6 +4,25 @@ Behaviour and configuration changes that a deployment or an API client notices, 
 (handbook/RELEASE_AND_ROLLBACK.md, CHANGE_CONTROL.md). Each entry names the package and what to do,
 if anything.
 
+## 2026-11-17 · 05b · Published MCP servers at /mcp/{key}/
+
+- **What:** an OpenAPI 3 document or a remote MCP server can be published as an MCP server of
+  FFCore at `/mcp/<key>/` (new API `/api/v1/projects/{project_id}/mcp-servers`, tables
+  `mcp_servers` and `mcp_server_calls`, migration `05b_0001`). Callers: the platform runtime,
+  and with `access: token` API keys with the `tools_invoke` scope. Each call passes the request
+  quota and the guardrail (`tool.pre`, `tool.post`) and is logged (docs/araclar.md "Publish an
+  MCP server").
+- **Changed:** registering a tool with `kind: openapi` is `422 openapi_tool_via_mcp_server` (was
+  `201`, not callable): publish the document and add the server to the tools instead. A tool
+  endpoint on the backend itself is `400 endpoint_is_platform` unless it is a published server's
+  own `<INTERNAL_API_URL>/mcp/<key>/` with `forward_user` (FOLLOWUP-159).
+- **Upstream safety (05b review r1):** OpenAPI path keys must start with one `/` and stay in the
+  base path (`422 openapi_path_invalid` at upload); every call keeps the registered scheme, host
+  and port (`upstream_origin_mismatch`) and refusals before a request are logged as `denied`.
+- **New setting:** `MCP_UPSTREAM_MAX_BYTES` (default 1048576): the largest upstream answer a
+  published OpenAPI server accepts.
+- **Action:** run the migration (`migrate` service, on every `up`). Existing tools keep working.
+
 ## 2026-11-17 · fix/10b-sse-bekci · A silent run stream reconnects
 
 - **What:** the console ends a run event stream (agent test panel) that sends nothing for 30 s,

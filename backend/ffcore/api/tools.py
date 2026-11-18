@@ -120,6 +120,15 @@ async def create_tool(
 ):
     """The endpoint passes the outbound policy now and again at every call (C5); forward_user
     only to internal services (C3). Discover the actions next (POST .../discover)."""
+    if body.kind == "openapi":
+        # 05b S5 (KARARLAR "05b plan kararları"): one HTTP path for OpenAPI, the published MCP
+        # server (POST .../mcp-servers, then .../mcp-servers/{id}/tools).
+        raise ApiError(
+            422,
+            "invalid_request_error",
+            "openapi_tool_via_mcp_server",
+            "Publish the OpenAPI document as an MCP server and add that server to the tools.",
+        )
     auth = body.auth.model_dump()
     mcp_tools.check_endpoint(body.endpoint_url, auth["type"], settings)
     fields = mcp_tools.new_auth(auth)

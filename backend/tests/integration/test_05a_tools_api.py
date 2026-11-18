@@ -108,7 +108,11 @@ def test_05a_6_masked_value_on_create_refused(world):
 def test_05a_8_ssrf_endpoints_refused_at_registration(world, url):
     response = world["admin"].post(tools_url(world), json=_tool(url=url))
     assert response.status_code == 400, response.text
-    assert response.json()["error"]["code"].startswith("egress_")
+    code = response.json()["error"]["code"]
+    # 05b (FOLLOWUP-159, tool side): loopback on the backend's port is the backend itself and is
+    # refused before the egress policy, with its own code.
+    expected = "endpoint_is_platform" if url.startswith("http://127.0.0.1:8000") else "egress_"
+    assert code.startswith(expected)
 
 
 def test_05a_8_internal_mcp_search_accepted(world):
@@ -212,10 +216,12 @@ def test_05a_tool_key_unique_and_soft_delete(world):
     assert world["admin"].post(tools_url(world), json=_tool()).status_code == 201
 
 
-def test_05a_openapi_kind_registered_but_not_callable_yet(world):
+def test_05a_openapi_kind_is_refused_since_05b(world):
+    # 05b S5 (KARARLAR "05b plan kararları"): OpenAPI is consumed only as a published MCP server
+    # added to the tools table; a direct openapi tool is 422 (was 201 in 05a).
     response = world["admin"].post(tools_url(world), json={**_tool(), "kind": "openapi"})
-    assert response.status_code == 201
-    assert response.json()["kind"] == "openapi"
+    assert response.status_code == 422
+    assert response.json()["error"]["code"] == "openapi_tool_via_mcp_server"
 
 
 # --- slice 3: discover, action settings, invoke (real MCP server on 127.0.0.1) ---
@@ -319,7 +325,10 @@ def test_05a_invoke_errors_are_coded(world, mcp_server, loopback):
 
 
 def test_05a_invoke_openapi_kind_not_implemented(world, mcp_server, loopback, pg):
-    tool = _registered(world, mcp_server, key="openapi-tool", kind="openapi")
+    # 05b S5: an openapi row can no longer be registered through the API; one written before
+    # 05b (here: straight into the table) still answers 501, never a call.
+    tool = _registered(world, mcp_server, key="openapi-tool")
+    pg.execute("UPDATE tools SET kind = 'openapi' WHERE id = %s", (tool["id"],))
     pg.execute(
         "INSERT INTO tool_actions (id, tool_id, name, input_schema, needs_approval, enabled)"
         " VALUES (gen_random_uuid(), %s, 'op', '{}', false, true)",

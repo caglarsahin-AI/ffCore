@@ -1,7 +1,7 @@
 """Render a package's OpenAPI draft (`backend/openapi/<package>.yaml`) from the application routes.
 
 Tools container: python -m ffcore.api.openapi_export <package> > openapi/<package>.yaml (03a, 03c,
-04a, 05a, 06a, 06b, 07, 08).
+04a, 05a, 05b, 06a, 06b, 07, 08).
 The contract tests compare each committed file with this output, so no draft ever drifts.
 Each draft holds only its package's routes: adding a package never changes an earlier draft.
 """
@@ -37,6 +37,13 @@ PACKAGES = {
         "description": "Tool registry: MCP tools, actions, discovery, test calls and the SQL "
         "tool context (package 05a).",
         "tags": {"tools"},
+    },
+    "05b": {
+        "version": "0.5b",
+        "description": "Published MCP servers: OpenAPI documents and remote MCP servers served "
+        "at /mcp/{key}/, their operations, connection test, calls and self-consumption "
+        "(package 05b). The /mcp/{key}/ endpoint itself is MCP streamable HTTP (docs/araclar.md).",
+        "tags": {"mcp-servers"},
     },
     "07": {
         "version": "0.7",
