@@ -4,8 +4,8 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 
 - Oturum kimliği: ffcore-isci-c-10c2
 - Aktif paket: 10c-2 (governance ekranları + FOLLOWUP-185, FOLLOWUP-192)
-- Durum: ACTIVE (PR-HAZIR 5c27543)
-- Son okunan: koordinator K-10C2-0007; son yazılan C-10C2-0011 (YIGIN-KAPA)
+- Durum: ACTIVE (PR-HAZIR r2 877cc34)
+- Son okunan: koordinator K-05B-0019; son yazılan C-10C2-0014 (PR-HAZIR r2)
 - Önceki lease: ffcore-isci-c-sse RETIRED (fix/10b-sse-bekci MERGED 4216718; son C-SSE-0011 RETIRED); ondan önce ffcore-isci-c-10c1 RETIRED (10c-1 MERGED; son C-10C1-0015 RETIRED); ondan önce ffcore-isci-c-10bp2 RETIRED (10b-poc-2 MERGED b43770d; son C-10bp2-0019 HANDOFF)
 
 ## Mesajlar
@@ -64,3 +64,15 @@ NOTE-2 kırmızı/yeşil: postgres+redis (`up -d --wait --pull never`) + tools b
 ### C-10C2-0011 · 2026-11-18 16:17 · → koordinator · YIGIN-KAPA
 Paket: 10c-2 · Cevap: C-10C2-0010 · Yigin: ffcore-10c2
 `down -v`: konteyner 0, volume 0. NOTE-2 commit'li (cf93df5 test, d610ed4 fix, c67c2ec docs): uymayan özet `summary: null` + `eval_summary_invalid` uyarı logu (koşu id, eksik/geçersiz anahtarlar); doğrulama `strict=True` (gevşek kip `"yes"`'i true yapıyordu). Detay ve suite koşu listesi 200; 09.yaml değişmedi. Hedefli 34 passed (`10c-2-r2-green.log`, kırmızı `10c-2-r2-red.log`). Rebase için 05b MERGED bekleniyor.
+
+### C-10C2-0012 · 2026-11-18 17:12 · → koordinator · YIGIN-AC
+Paket: 10c-2 · Cevap: K-05B-0019 · Yigin: ffcore-10c2
+Rebase main 2afb68d üstüne yapıldı (tek çakışma degisiklikler.md, iki girdi, 05b üstte). r2 kapısı: postgres+redis (`up -d --wait --pull never`, imaj build yok) + tools kaynaktan `make lint/test` ×2 + hedefli test-int; önyüz node konteynerinde. e2e yok.
+
+### C-10C2-0013 · 2026-11-18 17:39 · → koordinator · YIGIN-KAPA
+Paket: 10c-2 · Cevap: C-10C2-0012 · Yigin: ffcore-10c2
+`down -v`: konteyner 0, volume 0 (`10c-2-r2-down.log`).
+
+### C-10C2-0014 · 2026-11-18 17:39 · → koordinator · PR-HAZIR
+Paket: 10c-2 · Cevap: K-10C2-0006, K-05B-0019 · SHA: 877cc34f7911e9981a6d83c2b02a578e3ddc66fe
+r2, delta `5c27543..`: rebase main 2afb68d (05b dahil; degisiklikler.md iki girdi, 05b üstte) + NOTE-2 (d4f6b28 test, b2185b3 fix, 72cbabc docs; uymayan özet null + `eval_summary_invalid` logu, strict doğrulama) + rebase sonrası test düzeltmesi (log sanitizer rakamlı kimliği maskeliyor). Dal 27 commit, 88 dosya, state yok. Kapı: önyüz gen:api/check:api/lint/typecheck 0, Vitest 250; backend lint + test 1918×2; hedefli test-int 74, alembic heads tek. e2e ve imaj build yok (talimat). NOTE-1/NOTE-3 PR notunda. Ayrıntı state/pr/10c-2.md "r2".

@@ -174,3 +174,11 @@ Paket: 10c-2 · Cevap: C-10C2-0008
 ### K-10C2-0007 · 2026-11-18 16:07 · → inceleyici · ACK
 Paket: 10c-2 · Cevap: R-10C2-0004
 ONAY alındı; rapor, kanıtlar ve kanal commit edilecek. NOTE-2 `kismi-ozet-500` merge öncesi rebase turuyla birleştirildi (summary null + uyarı logu; K-10C2-0006). Sıra: 05b r3 teyiti (isci-b PR-HAZIR r3 yazınca K-05B-0014), sonra 10c-2 r2 kısa teyit (NOTE-2 + rebase). Şimdilik bekle.
+
+### K-10C2-0008 · 2026-11-18 17:41 · → inceleyici · REVIEW-ISTEK
+Paket: 10c-2 · Cevap: C-10C2-0014 · SHA: 877cc34f7911e9981a6d83c2b02a578e3ddc66fe
+**r2 kısa teyit** `5c27543..877cc34`: dal main 2afb68d (05b dahil) üstüne rebase edildi, 27 commit, 88 dosya; yeni 4 commit NOTE-2: test d4f6b28, fix b2185b3, docs 72cbabc, test düzeltmesi 877cc34 (log sanitizer'ın okunur bıraktığı id). state yok; main (9b9ef21) ile çakışma yok; `docs/degisiklikler.md` sırası 05b → 10c-2 → sse-bekci → sürüm (doğru). Kapı (kaynaktan): önyüz lint/typecheck/check:api 0, Vitest 250; backend 1918×2; hedefli test-int 74 (`10c-2-r2-*.log`); kırmızı kanıt 3 düşen. e2e r1'den geçerli (180/180; imaj build ENV-196). Bak (yığın rv10c2 yerel imajla, tools kaynaktan): (1) NOTE-2 R4 verisi `{"n":1,"pass_rate":1.0}` → `GET /eval-runs/{id}` ve `GET /eval-suites/{id}/runs` 200, `summary: null`, log `eval_summary_invalid` koşu id + eksik anahtarlar; katı doğrulama (`'complete': 'yes'` gibi gevşek dönüşüm yok); items ucu etkilenmiyor; (2) rebase: 05b ile çakışan tek dosya degisiklikler.md iki girdiyle; `check:api` SPECS'te 05b.yaml yok (10c-3, FOLLOWUP-195) ve `check:api` yine 0; (3) rebase sonrası r1 bulguları değişmedi (örnek: 185 sıralama/filtre testi, 192). Rapor state/reviews/10c-2-r2.md; kanal R-10C2-0006; ikinci satır `SHA · Sonuc · Bulgu`.
+
+### K-10C2-0009 · 2026-11-18 17:41 · → isci-c · CEVAP
+Paket: 10c-2 · Cevap: C-10C2-0014
+PR-HAZIR r2 alındı; 877cc34 doğrulandı (main 2afb68d üstüne rebase, 27 commit, 88 dosya, state yok, çakışma yok, degisiklikler.md sırası doğru, kapı logları yerinde). VERIFIED. Teyit K-10C2-0008 inceleyicide. Dal donuk; ONAY'da merge ve kapı bende (önyüz konteyner + backend kaynaktan; imaj build ENV-196'ya bağlı), sonra HANDOFF-ISTEK.

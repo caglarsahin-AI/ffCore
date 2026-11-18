@@ -1,0 +1,284 @@
+FF.F                                                                     [100%]
+=================================== FAILURES ===================================
+_______________ test_10c2_r2_partial_summary_is_null_and_logged ________________
+
+caplog = <_pytest.logging.LogCaptureFixture object at 0x7fa1abaf78c0>
+
+    def test_10c2_r2_partial_summary_is_null_and_logged(caplog):
+        with caplog.at_level(logging.WARNING):
+>           out = run_out(_row({"n": 1, "pass_rate": 1.0}))
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/unit/test_10c2_r2_summary_invalid.py:28: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+row = namespace(id='00000000-0000-0000-0000-000000000001', project_id='00000000-0000-0000-0000-000000000002', suite_id='0000..., summary={'n': 1, 'pass_rate': 1.0}, cost_usd=None, started_at=None, ended_at=None, created_at='2026-11-18T08:00:00Z')
+
+    def run_out(row: EvalRun) -> EvalRunOut:
+        plan = row.item_runs or {}
+>       return EvalRunOut(
+            id=row.id,
+            project_id=row.project_id,
+            suite_id=row.suite_id,
+            agent_version_id=row.agent_version_id,
+            langfuse_run_name=row.langfuse_run_name,
+            status=row.status,
+            error_code=row.error_code,
+            items=len(plan),
+            scored=sum(1 for e in plan.values() if e.get("scored")),
+            summary=row.summary,
+            cost_usd=float(row.cost_usd) if row.cost_usd is not None else None,
+            started_at=row.started_at,
+            ended_at=row.ended_at,
+            created_at=row.created_at,
+        )
+E       pydantic_core._pydantic_core.ValidationError: 14 validation errors for EvalRunOut
+E       summary.scored
+E         Field required [type=missing, input_value={'n': 1, 'pass_rate': 1.0}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+E       summary.not_run
+E         Field required [type=missing, input_value={'n': 1, 'pass_rate': 1.0}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+E       summary.passed_items
+E         Field required [type=missing, input_value={'n': 1, 'pass_rate': 1.0}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+E       summary.pass_threshold
+E         Field required [type=missing, input_value={'n': 1, 'pass_rate': 1.0}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+E       summary.passed
+E         Field required [type=missing, input_value={'n': 1, 'pass_rate': 1.0}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+E       summary.complete
+E         Field required [type=missing, input_value={'n': 1, 'pass_rate': 1.0}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+E       summary.scores
+E         Field required [type=missing, input_value={'n': 1, 'pass_rate': 1.0}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+E       summary.outcomes
+E         Field required [type=missing, input_value={'n': 1, 'pass_rate': 1.0}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+E       summary.styles
+E         Field required [type=missing, input_value={'n': 1, 'pass_rate': 1.0}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+E       summary.worst
+E         Field required [type=missing, input_value={'n': 1, 'pass_rate': 1.0}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+E       summary.errors
+E         Field required [type=missing, input_value={'n': 1, 'pass_rate': 1.0}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+E       summary.warm_cache
+E         Field required [type=missing, input_value={'n': 1, 'pass_rate': 1.0}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+E       summary.warmup_ms
+E         Field required [type=missing, input_value={'n': 1, 'pass_rate': 1.0}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+E       summary.latency_ms
+E         Field required [type=missing, input_value={'n': 1, 'pass_rate': 1.0}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+
+ffcore/api/eval.py:106: ValidationError
+______________ test_10c2_r2_wrong_type_summary_is_null_and_logged ______________
+
+caplog = <_pytest.logging.LogCaptureFixture object at 0x7fa1ab966330>
+
+    def test_10c2_r2_wrong_type_summary_is_null_and_logged(caplog):
+        good = summarize([], pass_threshold=0.8, warmup_ms=None, latencies_ms=[])
+        with caplog.at_level(logging.WARNING):
+            out = run_out(_row({**good, "complete": "yes"}))
+>       assert out.summary is None
+E       AssertionError: assert EvalSummary(n=0, scored=0, not_run={}, passed_items=0, pass_rate=0.0, pass_threshold=0.8, passed=False, complete=True,...eld': 0, 'unanswerable_answered': 0}, styles={}, worst=[], errors={}, warm_cache=True, warmup_ms=None, latency_ms=None) is None
+E        +  where EvalSummary(n=0, scored=0, not_run={}, passed_items=0, pass_rate=0.0, pass_threshold=0.8, passed=False, complete=True,...eld': 0, 'unanswerable_answered': 0}, styles={}, worst=[], errors={}, warm_cache=True, warmup_ms=None, latency_ms=None) = EvalRunOut(id=UUID('00000000-0000-0000-0000-000000000001'), project_id=UUID('00000000-0000-0000-0000-000000000002'), s...ne), cost_usd=None, started_at=None, ended_at=None, created_at=datetime.datetime(2026, 11, 18, 8, 0, tzinfo=TzInfo(0))).summary
+
+tests/unit/test_10c2_r2_summary_invalid.py:40: AssertionError
+______________ test_10c2_r2_partial_summary_reads_as_null_not_500 ______________
+
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_aa0ea7025592) at 0x7fa1ab965ee0>
+member = <function member.<locals>.make at 0x7fa1ab32b1a0>
+project = UUID('4da460bb-34ca-49a5-b90d-03f2a7a4c455')
+
+    def test_10c2_r2_partial_summary_reads_as_null_not_500(pg, member, project):
+        # NOTE-2 `kismi-ozet-500` (r1 probe R4 data): detail and the suite's exam list answer 200.
+        ev = _exam(pg, project, {"q1": True})
+        pg.execute(
+            "UPDATE eval_runs SET summary = %s WHERE id = %s", ('{"n": 1, "pass_rate": 1.0}', ev)
+        )
+        suite_id = pg.execute("SELECT suite_id FROM eval_runs WHERE id = %s", (ev,)).fetchone()[0]
+        client = member("analyst")
+>       detail = client.get(f"{P.format(project)}/eval-runs/{ev}")
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_10c2_eval_items_int.py:86: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:1112: in get
+    return self.request(
+/opt/venv/lib/python3.12/site-packages/starlette/testclient.py:518: in request
+    return super().request(
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:796: in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:993: in send
+    raise exc
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:987: in send
+    response.read()
+/opt/venv/lib/python3.12/site-packages/httpx2/_models.py:877: in read
+    self._content = b"".join(self.iter_bytes())
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_models.py:893: in iter_bytes
+    for raw_bytes in self.iter_raw():
+                     ^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_models.py:948: in iter_raw
+    for raw_stream_bytes in self.stream:
+                            ^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:143: in __iter__
+    yield from self._stream
+/opt/venv/lib/python3.12/site-packages/starlette/testclient.py:384: in iter_body
+    exit_stack.close()
+/usr/local/lib/python3.12/contextlib.py:618: in close
+    self.__exit__(None, None, None)
+/usr/local/lib/python3.12/contextlib.py:610: in __exit__
+    raise exc_details[1]
+/usr/local/lib/python3.12/contextlib.py:595: in __exit__
+    if cb(*exc_details):
+       ^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/starlette/testclient.py:399: in close_app
+    raise exception
+/opt/venv/lib/python3.12/site-packages/anyio/from_thread.py:265: in _call_func
+    retval = await retval_or_awaitable
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/starlette/testclient.py:366: in run_app
+    await self.app(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/applications.py:1194: in __call__
+    await super().__call__(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/applications.py:96: in __call__
+    await self.middleware_stack(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/middleware/errors.py:186: in __call__
+    raise exc
+/opt/venv/lib/python3.12/site-packages/starlette/middleware/errors.py:164: in __call__
+    await self.app(scope, receive, _send)
+/opt/venv/lib/python3.12/site-packages/fastapi/telemetry/_asgi.py:151: in __call__
+    await self.app(scope, receive, send)
+ffcore/core/logging.py:261: in __call__
+    await self.app(scope, receive, send_status)
+ffcore/api/upload_limit.py:44: in __call__
+    await self.app(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py:63: in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    raise exc
+/opt/venv/lib/python3.12/site-packages/starlette/_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+/opt/venv/lib/python3.12/site-packages/fastapi/middleware/asyncexitstack.py:18: in __call__
+    await self.app(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/routing.py:683: in __call__
+    await self.middleware_stack(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:2811: in app
+    await route.handle(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:1839: in handle
+    await self.original_router.handle(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:2894: in handle
+    await included_router._handle_selected(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:1850: in _handle_selected
+    await route.handle(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:1839: in handle
+    await self.original_router.handle(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:2894: in handle
+    await included_router._handle_selected(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:1865: in _handle_selected
+    await original_route.handle(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:1328: in handle
+    await effective_context.app(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:166: in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    raise exc
+/opt/venv/lib/python3.12/site-packages/starlette/_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:152: in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:745: in app
+    raw_response = await run_endpoint_function(
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:372: in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ffcore/api/eval.py:498: in get_eval_run
+    return run_out(await _eval_run(session, project_id, eval_run_id))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+row = <ffcore.models.eval.EvalRun object at 0x7fa15a89d790>
+
+    def run_out(row: EvalRun) -> EvalRunOut:
+        plan = row.item_runs or {}
+>       return EvalRunOut(
+            id=row.id,
+            project_id=row.project_id,
+            suite_id=row.suite_id,
+            agent_version_id=row.agent_version_id,
+            langfuse_run_name=row.langfuse_run_name,
+            status=row.status,
+            error_code=row.error_code,
+            items=len(plan),
+            scored=sum(1 for e in plan.values() if e.get("scored")),
+            summary=row.summary,
+            cost_usd=float(row.cost_usd) if row.cost_usd is not None else None,
+            started_at=row.started_at,
+            ended_at=row.ended_at,
+            created_at=row.created_at,
+        )
+E       pydantic_core._pydantic_core.ValidationError: 14 validation errors for EvalRunOut
+E       summary.scored
+E         Field required [type=missing, input_value={'n': 1, 'pass_rate': 1.0}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+E       summary.not_run
+E         Field required [type=missing, input_value={'n': 1, 'pass_rate': 1.0}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+E       summary.passed_items
+E         Field required [type=missing, input_value={'n': 1, 'pass_rate': 1.0}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+E       summary.pass_threshold
+E         Field required [type=missing, input_value={'n': 1, 'pass_rate': 1.0}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+E       summary.passed
+E         Field required [type=missing, input_value={'n': 1, 'pass_rate': 1.0}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+E       summary.complete
+E         Field required [type=missing, input_value={'n': 1, 'pass_rate': 1.0}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+E       summary.scores
+E         Field required [type=missing, input_value={'n': 1, 'pass_rate': 1.0}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+E       summary.outcomes
+E         Field required [type=missing, input_value={'n': 1, 'pass_rate': 1.0}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+E       summary.styles
+E         Field required [type=missing, input_value={'n': 1, 'pass_rate': 1.0}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+E       summary.worst
+E         Field required [type=missing, input_value={'n': 1, 'pass_rate': 1.0}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+E       summary.errors
+E         Field required [type=missing, input_value={'n': 1, 'pass_rate': 1.0}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+E       summary.warm_cache
+E         Field required [type=missing, input_value={'n': 1, 'pass_rate': 1.0}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+E       summary.warmup_ms
+E         Field required [type=missing, input_value={'n': 1, 'pass_rate': 1.0}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+E       summary.latency_ms
+E         Field required [type=missing, input_value={'n': 1, 'pass_rate': 1.0}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+
+ffcore/api/eval.py:106: ValidationError
+----------------------------- Captured stderr call -----------------------------
+2026-11-18 13:10:40,884 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=703
+2026-11-18 13:10:41,456 INFO ffcore.access access method=GET path=/api/v1/projects/4da460bb-34ca-49a5-b90d-03f2a7a4c455/eval-runs/df1d6f78-6a99-47de-842c-c935985a2acb status=500 ms=566
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=703
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/4da460bb-34ca-49a5-b90d-03f2a7a4c455/eval-runs/df1d6f78-6a99-47de-842c-c935985a2acb status=500 ms=566
+=========================== short test summary info ============================
+FAILED tests/unit/test_10c2_r2_summary_invalid.py::test_10c2_r2_partial_summary_is_null_and_logged
+FAILED tests/unit/test_10c2_r2_summary_invalid.py::test_10c2_r2_wrong_type_summary_is_null_and_logged
+FAILED tests/integration/test_10c2_eval_items_int.py::test_10c2_r2_partial_summary_reads_as_null_not_500
+3 failed, 1 passed, 4 deselected in 25.69s
