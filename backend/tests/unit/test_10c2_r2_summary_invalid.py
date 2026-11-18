@@ -13,7 +13,8 @@ from ffcore.evaluation.engine import summarize
 
 def _row(summary):
     return SimpleNamespace(
-        id="00000000-0000-0000-0000-000000000001",
+        # Letters only: the log sanitizer masks long digit runs (main since 05b), not the id.
+        id="abcdefab-cdef-4abc-8def-abcdefabcdef",
         project_id="00000000-0000-0000-0000-000000000002",
         suite_id="00000000-0000-0000-0000-000000000003",
         agent_version_id="00000000-0000-0000-0000-000000000004",
@@ -29,7 +30,7 @@ def test_10c2_r2_partial_summary_is_null_and_logged(caplog):
     assert out.summary is None
     lines = [r.getMessage() for r in caplog.records if "eval_summary_invalid" in r.getMessage()]
     assert len(lines) == 1
-    assert "00000000-0000-0000-0000-000000000001" in lines[0]
+    assert "abcdefab-cdef-4abc-8def-abcdefabcdef" in lines[0]
     assert "scored" in lines[0] and "worst" in lines[0]  # missing keys are named
 
 
