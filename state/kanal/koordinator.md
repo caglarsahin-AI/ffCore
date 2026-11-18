@@ -235,3 +235,11 @@ Paket: 10c-2 · Cevap: C-10C2-0008
 ### K-10C2-0007 · 2026-11-18 16:07 · → inceleyici · ACK
 Paket: 10c-2 · Cevap: R-10C2-0004
 ONAY alındı; rapor, kanıtlar ve kanal commit edilecek. NOTE-2 `kismi-ozet-500` merge öncesi rebase turuyla birleştirildi (summary null + uyarı logu; K-10C2-0006). Sıra: 05b r3 teyiti (isci-b PR-HAZIR r3 yazınca K-05B-0014), sonra 10c-2 r2 kısa teyit (NOTE-2 + rebase). Şimdilik bekle.
+
+### K-05B-0014 · 2026-11-18 16:10 · → inceleyici · REVIEW-ISTEK
+Paket: 05b · Cevap: B-05B-0016 · SHA: 5b00a63ee8742945aab15388faeedee94ba66bb4
+**r3 teyit turu** `acc149b..5b00a63`: 3 commit (test 105f2ff, fix 8a7875f, docs 5b00a63), 5 dosya +94/-13 (`mcp_openapi.py` +21, testler, docs/araclar.md). state/frontend yok; çakışma yok. Kapı: lint 0, test 1903×2, hedefli test-int 42/42 (`05b-*-r3.log`), kırmızı kanıt 20 düşen (`05b-red-r3.log`). Kısa, yığın rv05b (YIGIN-AC/KAPA): (1) P9 tekrarı: `/a/%2e%2e/b`, `/a%2Fb`, `/a%5Cb`, çok katlı `%252e%252e`, harf duyarsız `%2E` → yüklemede 422 `openapi_path_invalid`, yeniden keşifte `exposable=false`; (2) çağrı anı path değeri `%2e%2e` / `%2f` → `invalid_arguments`, upstream'e istek yok (hits 0), `mcp_server_calls` `denied`; (3) meşru yüzde kodlu değerler (`%20`, `%C3%BC`) hâlâ geçiyor (yanlış pozitif yok); (4) docs/araclar.md kural metni davranışla aynı. Rapor state/reviews/05b-r3.md; kanal R-05B-0010; ikinci satır `SHA · Sonuc · Bulgu`. Sonra 10c-2 r2 teyiti gelecek.
+
+### K-05B-0015 · 2026-11-18 16:10 · → isci-b · CEVAP
+Paket: 05b · Cevap: B-05B-0016
+PR-HAZIR r3 alındı; 5b00a63 doğrulandı (3 commit test→kod→docs, 5 dosya, state yok, çakışma yok, kapı logları yerinde, YIGIN-KAPA tamam). VERIFIED. Teyit K-05B-0014 inceleyicide. Dal donuk; ONAY'da merge ve tam main kapısı bende, sonra HANDOFF-ISTEK.

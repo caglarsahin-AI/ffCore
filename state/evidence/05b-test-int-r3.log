@@ -1,0 +1,14 @@
+HEAD 5b00a63ee8742945aab15388faeedee94ba66bb4
+============================= test session starts ==============================
+platform linux -- Python 3.12.10, pytest-9.2.0, pluggy-1.7.0
+rootdir: /work/backend
+configfile: pyproject.toml
+plugins: Faker-40.43.0, anyio-4.15.1, langsmith-0.14.8
+collected 42 items
+
+tests/integration/test_05b_mcp_servers_api.py ..................         [ 42%]
+tests/integration/test_05b_mcp_endpoint.py ..............                [ 76%]
+tests/integration/test_05b_superset_e2e.py .                             [ 78%]
+tests/integration/test_05b_r2_origin.py .........                        [100%]
+
+======================== 42 passed in 391.07s (0:06:31) ========================

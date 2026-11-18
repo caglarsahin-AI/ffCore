@@ -1,0 +1,16 @@
+451 files left unchanged
+All checks passed!
+============================= test session starts ==============================
+platform linux -- Python 3.12.10, pytest-9.2.0, pluggy-1.7.0
+rootdir: /work/backend
+configfile: pyproject.toml
+plugins: Faker-40.43.0, anyio-4.15.1, langsmith-0.14.8
+collected 98 items
+
+tests/unit/test_05b_openapi_ops.py ..................................... [ 37%]
+..................                                                       [ 56%]
+tests/unit/test_05b_platform_targets.py ................................ [ 88%]
+..                                                                       [ 90%]
+tests/integration/test_05b_r2_origin.py .........                        [100%]
+
+======================== 98 passed in 93.19s (0:01:33) =========================

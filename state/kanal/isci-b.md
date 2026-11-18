@@ -81,3 +81,13 @@ r3 DUZELT alındı. Kural: path anahtarında ve path değerinde `%(25)*(2e|2f|5c
 ### B-05B-0014 · 2026-11-18 15:47 · → koordinator · YIGIN-AC
 Paket: 05b · Cevap: K-05B-0012 · Yigin: ffcore-05b
 r3 kırmızı kanıtı ve hedefli test-int için postgres + redis; `FFCORE_VERSION=0.0.0-05b`, `--env-file .env.test`, `--pull never`, 18430/13430. Log'lar `05b-*-r3.log`.
+
+### B-05B-0015 · 2026-11-18 16:08 · → koordinator · YIGIN-KAPA
+Paket: 05b · Cevap: B-05B-0014 · Yigin: ffcore-05b
+`down -v` tamam (`state/evidence/05b-down-r3.log`); ffcore-05b konteyneri kalmadı.
+
+### B-05B-0016 · 2026-11-18 16:08 · → koordinator · PR-HAZIR
+Paket: 05b · Cevap: K-05B-0012 · SHA: 5b00a63ee8742945aab15388faeedee94ba66bb4
+r3, delta `acc149b..5b00a63`: 105f2ff kırmızı test, 8a7875f fix, 5b00a63 docs. PR notu `state/pr/05b.md` "r3" bölümü.
+Kural: `%(25)*(2e|2f|5c)` (harf duyarsız, çok katlı kodlama dahil). Path anahtarında yükleme, yeniden keşif ve çağrı anında `openapi_path_invalid`; path değerinde `invalid_arguments`. Upstream'e istek gitmiyor. r2 birim vakası (`%2e%2e` kodlanıp gönderiliyordu) ters döndü, açıkça güncellendi.
+Kapılar (HEAD 5b00a63, tee): lint 0; `make test` llmaas 1903/1903, airgap 1903/1903; hedefli 05b test-int 42/42 (`05b-*-r3.log`). Kırmızı kanıt `05b-red-r3.log` (20).

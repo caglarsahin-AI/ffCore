@@ -1,0 +1,384 @@
+266 files left unchanged
+All checks passed!
+============================= test session starts ==============================
+platform linux -- Python 3.12.10, pytest-9.2.0, pluggy-1.7.0
+rootdir: /work/backend
+configfile: pyproject.toml
+plugins: Faker-40.43.0, anyio-4.15.1, langsmith-0.14.8
+collected 98 items
+
+tests/unit/test_05b_openapi_ops.py ....................................F [ 37%]
+FFFFFFFFFFFFFF....                                                       [ 56%]
+tests/unit/test_05b_platform_targets.py ...............................F [ 88%]
+FF                                                                       [ 90%]
+tests/integration/test_05b_r2_origin.py .......FF                        [100%]
+
+=================================== FAILURES ===================================
+_______________ test_05b_r2_dot_path_values_are_refused[%2e%2e] ________________
+
+value = '%2e%2e'
+
+    @pytest.mark.parametrize("value", [".", "..", "%2e%2e"])
+    def test_05b_r2_dot_path_values_are_refused(value):
+        # r3 (K-05B-0012): "%2e%2e" is refused too (was encoded and sent as %252e%252e in r2).
+        ops = _catalog(mcp_openapi.load_spec(SUPERSET.read_text(encoding="utf-8")))
+>       with pytest.raises(ArgumentsError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ArgumentsError
+
+tests/unit/test_05b_openapi_ops.py:222: Failed
+_____________ test_05b_r3_encoded_path_key_is_refused[/a/%2e%2e/b] _____________
+
+path = '/a/%2e%2e/b'
+
+    @pytest.mark.parametrize("path", ENCODED_PATHS)
+    def test_05b_r3_encoded_path_key_is_refused(path):
+        ok = {"200": {"description": "x"}}
+        ops = _catalog(_spec({path: {"get": {"operationId": "p", "responses": ok}}}))
+>       assert ops["p"]["exposable"] is False and ops["p"]["reason"] == "openapi_path_invalid"
+E       assert (True is False)
+
+tests/unit/test_05b_openapi_ops.py:244: AssertionError
+_____________ test_05b_r3_encoded_path_key_is_refused[/a/%2E%2E/b] _____________
+
+path = '/a/%2E%2E/b'
+
+    @pytest.mark.parametrize("path", ENCODED_PATHS)
+    def test_05b_r3_encoded_path_key_is_refused(path):
+        ok = {"200": {"description": "x"}}
+        ops = _catalog(_spec({path: {"get": {"operationId": "p", "responses": ok}}}))
+>       assert ops["p"]["exposable"] is False and ops["p"]["reason"] == "openapi_path_invalid"
+E       assert (True is False)
+
+tests/unit/test_05b_openapi_ops.py:244: AssertionError
+_______________ test_05b_r3_encoded_path_key_is_refused[/a%2Fb] ________________
+
+path = '/a%2Fb'
+
+    @pytest.mark.parametrize("path", ENCODED_PATHS)
+    def test_05b_r3_encoded_path_key_is_refused(path):
+        ok = {"200": {"description": "x"}}
+        ops = _catalog(_spec({path: {"get": {"operationId": "p", "responses": ok}}}))
+>       assert ops["p"]["exposable"] is False and ops["p"]["reason"] == "openapi_path_invalid"
+E       assert (True is False)
+
+tests/unit/test_05b_openapi_ops.py:244: AssertionError
+_______________ test_05b_r3_encoded_path_key_is_refused[/a%2fb] ________________
+
+path = '/a%2fb'
+
+    @pytest.mark.parametrize("path", ENCODED_PATHS)
+    def test_05b_r3_encoded_path_key_is_refused(path):
+        ok = {"200": {"description": "x"}}
+        ops = _catalog(_spec({path: {"get": {"operationId": "p", "responses": ok}}}))
+>       assert ops["p"]["exposable"] is False and ops["p"]["reason"] == "openapi_path_invalid"
+E       assert (True is False)
+
+tests/unit/test_05b_openapi_ops.py:244: AssertionError
+_______________ test_05b_r3_encoded_path_key_is_refused[/a%5Cb] ________________
+
+path = '/a%5Cb'
+
+    @pytest.mark.parametrize("path", ENCODED_PATHS)
+    def test_05b_r3_encoded_path_key_is_refused(path):
+        ok = {"200": {"description": "x"}}
+        ops = _catalog(_spec({path: {"get": {"operationId": "p", "responses": ok}}}))
+>       assert ops["p"]["exposable"] is False and ops["p"]["reason"] == "openapi_path_invalid"
+E       assert (True is False)
+
+tests/unit/test_05b_openapi_ops.py:244: AssertionError
+____________ test_05b_r3_encoded_path_key_is_refused[/%252e%252e/x] ____________
+
+path = '/%252e%252e/x'
+
+    @pytest.mark.parametrize("path", ENCODED_PATHS)
+    def test_05b_r3_encoded_path_key_is_refused(path):
+        ok = {"200": {"description": "x"}}
+        ops = _catalog(_spec({path: {"get": {"operationId": "p", "responses": ok}}}))
+>       assert ops["p"]["exposable"] is False and ops["p"]["reason"] == "openapi_path_invalid"
+E       assert (True is False)
+
+tests/unit/test_05b_openapi_ops.py:244: AssertionError
+____________ test_05b_r3_encoded_path_key_is_refused[/x/%25252f/y] _____________
+
+path = '/x/%25252f/y'
+
+    @pytest.mark.parametrize("path", ENCODED_PATHS)
+    def test_05b_r3_encoded_path_key_is_refused(path):
+        ok = {"200": {"description": "x"}}
+        ops = _catalog(_spec({path: {"get": {"operationId": "p", "responses": ok}}}))
+>       assert ops["p"]["exposable"] is False and ops["p"]["reason"] == "openapi_path_invalid"
+E       assert (True is False)
+
+tests/unit/test_05b_openapi_ops.py:244: AssertionError
+______________ test_05b_r3_encoded_path_key_is_refused[/a/%2e/b] _______________
+
+path = '/a/%2e/b'
+
+    @pytest.mark.parametrize("path", ENCODED_PATHS)
+    def test_05b_r3_encoded_path_key_is_refused(path):
+        ok = {"200": {"description": "x"}}
+        ops = _catalog(_spec({path: {"get": {"operationId": "p", "responses": ok}}}))
+>       assert ops["p"]["exposable"] is False and ops["p"]["reason"] == "openapi_path_invalid"
+E       assert (True is False)
+
+tests/unit/test_05b_openapi_ops.py:244: AssertionError
+______________ test_05b_r3_encoded_path_value_is_refused[%2e%2e] _______________
+
+value = '%2e%2e'
+
+    @pytest.mark.parametrize("value", ["%2e%2e", "%2E", "a%2Fb", "%5c", "%252e%252e", "x%25252Fy"])
+    def test_05b_r3_encoded_path_value_is_refused(value):
+        ops = _catalog(mcp_openapi.load_spec(SUPERSET.read_text(encoding="utf-8")))
+>       with pytest.raises(ArgumentsError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ArgumentsError
+
+tests/unit/test_05b_openapi_ops.py:255: Failed
+________________ test_05b_r3_encoded_path_value_is_refused[%2E] ________________
+
+value = '%2E'
+
+    @pytest.mark.parametrize("value", ["%2e%2e", "%2E", "a%2Fb", "%5c", "%252e%252e", "x%25252Fy"])
+    def test_05b_r3_encoded_path_value_is_refused(value):
+        ops = _catalog(mcp_openapi.load_spec(SUPERSET.read_text(encoding="utf-8")))
+>       with pytest.raises(ArgumentsError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ArgumentsError
+
+tests/unit/test_05b_openapi_ops.py:255: Failed
+_______________ test_05b_r3_encoded_path_value_is_refused[a%2Fb] _______________
+
+value = 'a%2Fb'
+
+    @pytest.mark.parametrize("value", ["%2e%2e", "%2E", "a%2Fb", "%5c", "%252e%252e", "x%25252Fy"])
+    def test_05b_r3_encoded_path_value_is_refused(value):
+        ops = _catalog(mcp_openapi.load_spec(SUPERSET.read_text(encoding="utf-8")))
+>       with pytest.raises(ArgumentsError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ArgumentsError
+
+tests/unit/test_05b_openapi_ops.py:255: Failed
+________________ test_05b_r3_encoded_path_value_is_refused[%5c] ________________
+
+value = '%5c'
+
+    @pytest.mark.parametrize("value", ["%2e%2e", "%2E", "a%2Fb", "%5c", "%252e%252e", "x%25252Fy"])
+    def test_05b_r3_encoded_path_value_is_refused(value):
+        ops = _catalog(mcp_openapi.load_spec(SUPERSET.read_text(encoding="utf-8")))
+>       with pytest.raises(ArgumentsError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ArgumentsError
+
+tests/unit/test_05b_openapi_ops.py:255: Failed
+____________ test_05b_r3_encoded_path_value_is_refused[%252e%252e] _____________
+
+value = '%252e%252e'
+
+    @pytest.mark.parametrize("value", ["%2e%2e", "%2E", "a%2Fb", "%5c", "%252e%252e", "x%25252Fy"])
+    def test_05b_r3_encoded_path_value_is_refused(value):
+        ops = _catalog(mcp_openapi.load_spec(SUPERSET.read_text(encoding="utf-8")))
+>       with pytest.raises(ArgumentsError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ArgumentsError
+
+tests/unit/test_05b_openapi_ops.py:255: Failed
+_____________ test_05b_r3_encoded_path_value_is_refused[x%25252Fy] _____________
+
+value = 'x%25252Fy'
+
+    @pytest.mark.parametrize("value", ["%2e%2e", "%2E", "a%2Fb", "%5c", "%252e%252e", "x%25252Fy"])
+    def test_05b_r3_encoded_path_value_is_refused(value):
+        ops = _catalog(mcp_openapi.load_spec(SUPERSET.read_text(encoding="utf-8")))
+>       with pytest.raises(ArgumentsError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ArgumentsError
+
+tests/unit/test_05b_openapi_ops.py:255: Failed
+_ test_05b_r2_upstream_url_refuses_leaving_the_registered_base[http://h.example/api-/a/%2e%2e/b-openapi_path_invalid] _
+
+base = 'http://h.example/api', path = '/a/%2e%2e/b'
+code = 'openapi_path_invalid'
+
+    @pytest.mark.parametrize(
+        "base, path, code",
+        [
+            ("http://127.0.0.1", ":59359/api/v1/dashboard/", "upstream_origin_mismatch"),
+            ("http://127.0.0.1", "0:59359/api/v1/dashboard/", "upstream_origin_mismatch"),
+            ("http://h.example/api", "v1/dashboard/", "openapi_path_invalid"),
+            ("http://h.example/api", "/v1/../../x", "openapi_path_invalid"),
+            ("http://h.example", "//evil.example/x", "openapi_path_invalid"),
+            # r3: percent-encoded dots and slashes, also double-encoded (second line at call time).
+            ("http://h.example/api", "/a/%2e%2e/b", "openapi_path_invalid"),
+            ("http://h.example/api", "/a%2Fb", "openapi_path_invalid"),
+            ("http://h.example/api", "/%252e%252e/x", "openapi_path_invalid"),
+        ],
+    )
+    def test_05b_r2_upstream_url_refuses_leaving_the_registered_base(base, path, code):
+>       with pytest.raises(mcp_client.ToolCallError) as caught:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ToolCallError
+
+tests/unit/test_05b_platform_targets.py:138: Failed
+_ test_05b_r2_upstream_url_refuses_leaving_the_registered_base[http://h.example/api-/a%2Fb-openapi_path_invalid] _
+
+base = 'http://h.example/api', path = '/a%2Fb', code = 'openapi_path_invalid'
+
+    @pytest.mark.parametrize(
+        "base, path, code",
+        [
+            ("http://127.0.0.1", ":59359/api/v1/dashboard/", "upstream_origin_mismatch"),
+            ("http://127.0.0.1", "0:59359/api/v1/dashboard/", "upstream_origin_mismatch"),
+            ("http://h.example/api", "v1/dashboard/", "openapi_path_invalid"),
+            ("http://h.example/api", "/v1/../../x", "openapi_path_invalid"),
+            ("http://h.example", "//evil.example/x", "openapi_path_invalid"),
+            # r3: percent-encoded dots and slashes, also double-encoded (second line at call time).
+            ("http://h.example/api", "/a/%2e%2e/b", "openapi_path_invalid"),
+            ("http://h.example/api", "/a%2Fb", "openapi_path_invalid"),
+            ("http://h.example/api", "/%252e%252e/x", "openapi_path_invalid"),
+        ],
+    )
+    def test_05b_r2_upstream_url_refuses_leaving_the_registered_base(base, path, code):
+>       with pytest.raises(mcp_client.ToolCallError) as caught:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ToolCallError
+
+tests/unit/test_05b_platform_targets.py:138: Failed
+_ test_05b_r2_upstream_url_refuses_leaving_the_registered_base[http://h.example/api-/%252e%252e/x-openapi_path_invalid] _
+
+base = 'http://h.example/api', path = '/%252e%252e/x'
+code = 'openapi_path_invalid'
+
+    @pytest.mark.parametrize(
+        "base, path, code",
+        [
+            ("http://127.0.0.1", ":59359/api/v1/dashboard/", "upstream_origin_mismatch"),
+            ("http://127.0.0.1", "0:59359/api/v1/dashboard/", "upstream_origin_mismatch"),
+            ("http://h.example/api", "v1/dashboard/", "openapi_path_invalid"),
+            ("http://h.example/api", "/v1/../../x", "openapi_path_invalid"),
+            ("http://h.example", "//evil.example/x", "openapi_path_invalid"),
+            # r3: percent-encoded dots and slashes, also double-encoded (second line at call time).
+            ("http://h.example/api", "/a/%2e%2e/b", "openapi_path_invalid"),
+            ("http://h.example/api", "/a%2Fb", "openapi_path_invalid"),
+            ("http://h.example/api", "/%252e%252e/x", "openapi_path_invalid"),
+        ],
+    )
+    def test_05b_r2_upstream_url_refuses_leaving_the_registered_base(base, path, code):
+>       with pytest.raises(mcp_client.ToolCallError) as caught:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ToolCallError
+
+tests/unit/test_05b_platform_targets.py:138: Failed
+________________ test_05b_r3_encoded_path_key_refused_at_upload ________________
+
+world = {'project': '2fa53f5b-dc95-47e6-b855-dd6c0671674c', 'admin_id': 'e452b57e-5642-4eac-bd47-79bf1ce40108', 'admin': <star...lient.TestClient object at 0x7ff12f1d3cb0>, 'analyst': <starlette.testclient.TestClient object at 0x7ff12f15db20>, ...}
+
+    def test_05b_r3_encoded_path_key_refused_at_upload(world):
+        for path in ("/a/%2e%2e/b", "/a%2Fb", "/%252e%252e/x"):
+            body = openapi_body("http://127.0.0.1") | {"spec": _spec(path)}
+            response = world["admin"].post(servers_url(world), json=body)
+>           assert response.status_code == 422, (path, response.text)
+E           AssertionError: ('/a/%2e%2e/b', '{"id":"e6b7f0fd-4255-4776-ac24-7bdaef377a04","project_id":"2fa53f5b-dc95-47e6-b855-dd6c0671674c","key...e-5642-4eac-bd47-79bf1ce40108","created_at":"2026-11-18T12:46:35.221923Z","updated_at":"2026-11-18T12:46:35.221923Z"}')
+E           assert 201 == 422
+E            +  where 201 = <Response [201 Created]>.status_code
+
+tests/integration/test_05b_r2_origin.py:161: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+2026-11-18 12:46:34,301 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 12:46:34,499 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=189
+2026-11-18 12:46:34,640 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 12:46:34,800 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=158
+2026-11-18 12:46:34,868 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 12:46:35,070 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=199
+------------------------------ Captured log setup ------------------------------
+ERROR    ffcore.readiness:readiness.py:63 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=189
+ERROR    ffcore.readiness:readiness.py:63 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=158
+ERROR    ffcore.readiness:readiness.py:63 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=199
+----------------------------- Captured stderr call -----------------------------
+2026-11-18 12:46:35,161 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 12:46:35,240 INFO ffcore.access access method=POST path=/api/v1/projects/2fa53f5b-dc95-47e6-b855-dd6c0671674c/mcp-servers status=201 ms=72
+------------------------------ Captured log call -------------------------------
+ERROR    ffcore.readiness:readiness.py:63 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/2fa53f5b-dc95-47e6-b855-dd6c0671674c/mcp-servers status=201 ms=72
+____________ test_05b_r3_encoded_path_value_never_reaches_upstream _____________
+
+world = {'project': 'cd840238-8f42-4ccc-9dc9-16ad4700b6bd', 'admin_id': 'c540b5e6-9915-475e-8385-8244c314146e', 'admin': <star...lient.TestClient object at 0x7ff12f22f9b0>, 'analyst': <starlette.testclient.TestClient object at 0x7ff12eeff140>, ...}
+upstream = Upstream(url='http://127.0.0.1:59283', hits=[Hit(method='GET', path='/prefix/api/v1/dashboard/', query='', body=None, ...-alive', 'user-agent': 'python-httpx2/2.16.0', 'authorization': 'Bearer dummy-not-secret-superset-token-0123456789'})])
+key = 'ffk_0a1724a9_AcGAkT2YEmU7kmef_JNnNl0i6rMlrFe6gYTAa-X8r_s'
+
+    def test_05b_r3_encoded_path_value_never_reaches_upstream(world, upstream, key):
+        server = publish(world, upstream.url, exposed=["getChartData"], access="token")
+        before = len(upstream.hits)
+        for value in ("%2e%2e", "%252e%252e", "a%2Fb"):
+            result = call_result(
+                rpc(
+                    world["anonymous"],
+                    server["key"],
+                    "tools/call",
+                    {"name": "getChartData", "arguments": {"pk": value}},
+                    headers=bearer(key),
+                )
+            )
+>           assert result["isError"] is True and "invalid_arguments" in result["content"][0]["text"]
+E           assert (False is True)
+
+tests/integration/test_05b_r2_origin.py:178: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+2026-11-18 12:46:43,450 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 12:46:43,658 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=206
+2026-11-18 12:46:43,740 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 12:46:43,931 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=186
+2026-11-18 12:46:44,025 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 12:46:44,249 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=222
+2026-11-18 12:46:44,329 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 12:46:44,425 INFO ffcore.access access method=POST path=/api/v1/projects/cd840238-8f42-4ccc-9dc9-16ad4700b6bd/api-keys status=201 ms=93
+------------------------------ Captured log setup ------------------------------
+ERROR    ffcore.readiness:readiness.py:63 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=206
+ERROR    ffcore.readiness:readiness.py:63 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=186
+ERROR    ffcore.readiness:readiness.py:63 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=222
+ERROR    ffcore.readiness:readiness.py:63 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/cd840238-8f42-4ccc-9dc9-16ad4700b6bd/api-keys status=201 ms=93
+----------------------------- Captured stderr call -----------------------------
+2026-11-18 12:46:44,517 INFO ffcore.access access method=POST path=/api/v1/projects/cd840238-8f42-4ccc-9dc9-16ad4700b6bd/mcp-servers status=201 ms=83
+2026-11-18 12:46:44,578 INFO ffcore.access access method=PATCH path=/api/v1/projects/cd840238-8f42-4ccc-9dc9-16ad4700b6bd/mcp-servers/a302d59b-c73e-4b6f-8cb7-de6ffb4a1473 status=200 ms=57
+2026-11-18 12:46:44,626 INFO mcp.server.streamable_http_manager StreamableHTTP session manager started
+2026-11-18 12:46:44,740 INFO ffcore.mcp_publish mcp_server_call server=ss-bb664f57 operation=getChartData status=ok code=None latency_ms=86
+2026-11-18 12:46:44,742 INFO mcp.server.streamable_http Terminating session: None
+2026-11-18 12:46:44,742 INFO mcp.server.streamable_http_manager StreamableHTTP session manager shutting down
+2026-11-18 12:46:44,743 INFO ffcore.access access method=POST path=/mcp/ss-bb664f57/ status=200 ms=161
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/cd840238-8f42-4ccc-9dc9-16ad4700b6bd/mcp-servers status=201 ms=83
+INFO     ffcore.access:logging.py:263 access method=PATCH path=/api/v1/projects/cd840238-8f42-4ccc-9dc9-16ad4700b6bd/mcp-servers/a302d59b-c73e-4b6f-8cb7-de6ffb4a1473 status=200 ms=57
+INFO     mcp.server.streamable_http_manager:streamable_http_manager.py:162 StreamableHTTP session manager started
+INFO     ffcore.mcp_publish:mcp_publish.py:518 mcp_server_call server=ss-bb664f57 operation=getChartData status=ok code=None latency_ms=86
+INFO     mcp.server.streamable_http:streamable_http.py:855 Terminating session: None
+INFO     mcp.server.streamable_http_manager:streamable_http_manager.py:166 StreamableHTTP session manager shutting down
+INFO     ffcore.access:logging.py:263 access method=POST path=/mcp/ss-bb664f57/ status=200 ms=161
+=========================== short test summary info ============================
+FAILED tests/unit/test_05b_openapi_ops.py::test_05b_r2_dot_path_values_are_refused[%2e%2e]
+FAILED tests/unit/test_05b_openapi_ops.py::test_05b_r3_encoded_path_key_is_refused[/a/%2e%2e/b]
+FAILED tests/unit/test_05b_openapi_ops.py::test_05b_r3_encoded_path_key_is_refused[/a/%2E%2E/b]
+FAILED tests/unit/test_05b_openapi_ops.py::test_05b_r3_encoded_path_key_is_refused[/a%2Fb]
+FAILED tests/unit/test_05b_openapi_ops.py::test_05b_r3_encoded_path_key_is_refused[/a%2fb]
+FAILED tests/unit/test_05b_openapi_ops.py::test_05b_r3_encoded_path_key_is_refused[/a%5Cb]
+FAILED tests/unit/test_05b_openapi_ops.py::test_05b_r3_encoded_path_key_is_refused[/%252e%252e/x]
+FAILED tests/unit/test_05b_openapi_ops.py::test_05b_r3_encoded_path_key_is_refused[/x/%25252f/y]
+FAILED tests/unit/test_05b_openapi_ops.py::test_05b_r3_encoded_path_key_is_refused[/a/%2e/b]
+FAILED tests/unit/test_05b_openapi_ops.py::test_05b_r3_encoded_path_value_is_refused[%2e%2e]
+FAILED tests/unit/test_05b_openapi_ops.py::test_05b_r3_encoded_path_value_is_refused[%2E]
+FAILED tests/unit/test_05b_openapi_ops.py::test_05b_r3_encoded_path_value_is_refused[a%2Fb]
+FAILED tests/unit/test_05b_openapi_ops.py::test_05b_r3_encoded_path_value_is_refused[%5c]
+FAILED tests/unit/test_05b_openapi_ops.py::test_05b_r3_encoded_path_value_is_refused[%252e%252e]
+FAILED tests/unit/test_05b_openapi_ops.py::test_05b_r3_encoded_path_value_is_refused[x%25252Fy]
+FAILED tests/unit/test_05b_platform_targets.py::test_05b_r2_upstream_url_refuses_leaving_the_registered_base[http://h.example/api-/a/%2e%2e/b-openapi_path_invalid]
+FAILED tests/unit/test_05b_platform_targets.py::test_05b_r2_upstream_url_refuses_leaving_the_registered_base[http://h.example/api-/a%2Fb-openapi_path_invalid]
+FAILED tests/unit/test_05b_platform_targets.py::test_05b_r2_upstream_url_refuses_leaving_the_registered_base[http://h.example/api-/%252e%252e/x-openapi_path_invalid]
+FAILED tests/integration/test_05b_r2_origin.py::test_05b_r3_encoded_path_key_refused_at_upload
+FAILED tests/integration/test_05b_r2_origin.py::test_05b_r3_encoded_path_value_never_reaches_upstream
+================== 20 failed, 78 passed in 107.23s (0:01:47) ===================
