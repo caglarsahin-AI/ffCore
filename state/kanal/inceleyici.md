@@ -3,9 +3,9 @@
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
 - Oturum kimliği: ffcore-inceleyici-10c2 (önceki: ffcore-inceleyici-05b, r2 için askıda)
-- Aktif paket: 10c-2 (REVIEW-ISTEK K-10C2-0005, r1); 05b r1 DEGISIKLIK, r2 bekleniyor
+- Aktif paket: 05b r3 teyiti bekleniyor (K-05B-0013); 10c-2 r1 ONAY (R-10C2-0004), 05b r2 ONAY (R-05B-0008)
 - Durum: ACTIVE
-- Son okunan: koordinator K-GEN-0022
+- Son okunan: koordinator K-05B-0013
 
 ## Mesajlar
 - Arşiv: MERGED/kapalı paketlerin mesajları `state/kanal/arsiv/inceleyici-<paket>.md` dosyalarında (16 Kasım 2026 taşıması: 335 mesaj); ID ile atıf orada bulunur.
@@ -151,3 +151,16 @@ Paket: 05b · Cevap: K-05B-0010 · Yigin: ffcore-rv05b
 ### R-10C2-0003 · 2026-11-18 15:39 · → koordinator · YIGIN-AC
 Paket: 10c-2 · Cevap: K-GEN-0024 · Yigin: ffcore-rv10c2
 rv10c2 temiz açılıyor; kaynak SHA 5c27543'ün `git archive` kopyası. Komut: `--profile test --profile qdrant up -d --wait --no-build --pull never`, `frontend` servisi hariç. Önceki kapı sonuçları geçerli (e2e 180/180, backend 1813×2, önyüz), yeniden koşulmuyor. Koşacaklar: `make test-int` (qdrant ile) ve backend probe'ları. Probe odakları: 185 items ucu, anahtar, kota ve retention rolleri. Açık FF yığını yalnız bu.
+
+### R-10C2-0004 · 2026-11-18 16:04 · → koordinator · REVIEW-SONUC
+Paket: 10c-2 · Cevap: K-10C2-0005 · SHA: 5c27543683bf11b94dc433b4ceb498bd9c654953 · Sonuc: ONAY · Bulgu: B0 M0 m0 N3
+10c-2 r1 ONAY. Rapor `state/reviews/10c-2-r1.md`.
+- Kapı: backend 1813×2; önyüz 250/250; e2e 180/180; test-int (qdrant ile) 957 passed, 13 skipped.
+- 185 items ucu probe'larla doğrulandı: sıralama, filtre, sayfalama, rol (user 403, analyst+ 200), silinmiş sınav 404.
+- Karar gerektirebilecek tek nokta **NOTE-2 `kismi-ozet-500`**. Eksik anahtarlı bir `summary` satırı, sınav detayını ve suite koşu listesini 500'e düşürüyor. Normal akışta bu satır oluşmaz. Ama canlı test verisinde eski biçimli (312954e öncesi) bir özet varsa liste kırılır; merge öncesi kontrol önerilir.
+- NOTE-1: koşu sayfası 403'te yoklamayı sürdürüyor.
+Bekleyen dosyalar (commit edilmedi): `state/reviews/10c-2-r1.md`, `state/evidence/10c-2-r1-rv-*.log` (up2, test-int, probe yeni ya da güncellendi), kanal.
+
+### R-10C2-0005 · 2026-11-18 16:04 · → koordinator · YIGIN-KAPA
+Paket: 10c-2 · Cevap: K-10C2-0005 · Yigin: ffcore-rv10c2
+`down -v` tamam; rv10c2 konteyner ve volume'u kalmadı (e2e node_modules volume'u sabahki temizlikte silinmişti). Açık FF yığınım yok. Sıradaki iş: 05b r3 teyiti (P9 tekrarı ve çift kodlama, K-05B-0013); SHA bekleniyor.

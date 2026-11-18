@@ -227,3 +227,11 @@ Paket: 05b · Cevap: B-05B-0012
 ### K-05B-0013 · 2026-11-18 15:41 · → inceleyici · ACK
 Paket: 05b · Cevap: R-05B-0008
 ONAY alındı; rapor ve kanıtlar commit edilecek. Karar: kalan MINOR-1 (`%2e%2e`) merge öncesi r3 kısa dilimde kapanır (yüzde kodlu `.`/`/`/`\\` yasağı, 422 / `invalid_arguments`); gerekçe taban yolu kaçağı upstream kimliğiyle. Sen 10c-2'ye devam et; 05b r3 teyiti (P9 tekrarı + çift kodlama) 10c-2 turundan sonra kısa.
+
+### K-10C2-0006 · 2026-11-18 16:07 · → isci-c · GOREV-EK
+Paket: 10c-2 · Cevap: C-10C2-0008
+**r1 ONAY (R-10C2-0004, B0 M0 m0 N3; rapor state/reviews/10c-2-r1.md).** Merge 05b'den sonra; o zamana kadar iki iş, karar KARARLAR '10c-2 r1 kararları': (1) **NOTE-2 `kismi-ozet-500`:** `eval_runs.summary` `EvalSummary`'ye uymuyorsa `GET /eval-runs/{id}` ve `GET /eval-suites/{id}/runs` 500 vermesin: o koşunun `summary` alanı `null`, backend uyarı logu `eval_summary_invalid` (koşu id, eksik anahtarlar); items ucu etkilenmiyor zaten. Önce kırmızı test (R4 verisi `{"n":1,"pass_rate":1.0}` ile detay + liste 200, summary null, log satırı), kod, docs cümlesi (docs/evaluation.md ya da degisiklikler.md). Şimdi başla. (2) **Rebase:** 05b MERGED duyurusunu (K-05B MERGED) bekle, sonra dalı main'e rebase et; tek çakışma `docs/degisiklikler.md`: iki girdi de kalır, 05b girdisi üstte; `gen:api`/`check:api` yeniden koş (05b.yaml SPECS satırı 10c-3'e, sen dokunma). Sonra kapı: önyüz lint/typecheck/check:api/Vitest + backend `make test` iki profil + hedefli test-int (09 + 185) tee `10c-2-r2-*.log` (YIGIN-AC/KAPA); PR-HAZIR r2 (`SHA:`, delta `5c27543..`). NOTE-1 (403 davranışı) ve NOTE-3 PR notuna.
+
+### K-10C2-0007 · 2026-11-18 16:07 · → inceleyici · ACK
+Paket: 10c-2 · Cevap: R-10C2-0004
+ONAY alındı; rapor, kanıtlar ve kanal commit edilecek. NOTE-2 `kismi-ozet-500` merge öncesi rebase turuyla birleştirildi (summary null + uyarı logu; K-10C2-0006). Sıra: 05b r3 teyiti (isci-b PR-HAZIR r3 yazınca K-05B-0014), sonra 10c-2 r2 kısa teyit (NOTE-2 + rebase). Şimdilik bekle.

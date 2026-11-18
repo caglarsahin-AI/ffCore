@@ -1,0 +1,292 @@
+HEAD=5c27543683bf11b94dc433b4ceb498bd9c654953 (git archive copy)
+2026-11-18 12:59:41,926 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=1 problems=0
+2026-11-18 12:59:41,939 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=292
+2026-11-18 12:59:42,629 INFO ffcore.access access method=GET path=/api/v1/projects/86e18eff-b175-4fad-b27d-4e6a1a7e76fe/eval-runs/30278505-4ce2-4b11-8d68-00fc75830acb/items status=403 ms=687
+2026-11-18 12:59:42,826 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-18 12:59:42,847 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=131
+2026-11-18 12:59:42,890 INFO ffcore.access access method=GET path=/api/v1/projects/86e18eff-b175-4fad-b27d-4e6a1a7e76fe/eval-runs/30278505-4ce2-4b11-8d68-00fc75830acb/items status=200 ms=40
+2026-11-18 12:59:43,098 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-18 12:59:43,103 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=138
+2026-11-18 12:59:43,148 INFO ffcore.access access method=GET path=/api/v1/projects/86e18eff-b175-4fad-b27d-4e6a1a7e76fe/eval-runs/30278505-4ce2-4b11-8d68-00fc75830acb/items status=200 ms=39
+2026-11-18 12:59:43,352 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-18 12:59:43,368 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=144
+2026-11-18 12:59:43,418 INFO ffcore.access access method=GET path=/api/v1/projects/86e18eff-b175-4fad-b27d-4e6a1a7e76fe/eval-runs/30278505-4ce2-4b11-8d68-00fc75830acb/items status=200 ms=47
+[RV] R1 roles -> {'user': 403, 'analyst': 200, 'developer': 200, 'admin': 200}
+.2026-11-18 12:59:43,754 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-18 12:59:43,770 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=145
+2026-11-18 12:59:43,818 INFO ffcore.access access method=GET path=/api/v1/projects/aed40085-c6ae-4b2b-87fa-b30b50152065/eval-runs/8eb2ca23-f0e6-442f-98b0-53d6aad4b9de/items status=200 ms=44
+[RV] R2 all: 200 [('d_fail', True, False, 'dogrudan'), ('c_notrun', True, None, 'dogrudan'), ('a_pass', True, True, 'dogrudan'), ('e_nometa', True, True, '-'), ('b_unscored', False, None, 'dogrudan')]
+2026-11-18 12:59:43,858 INFO ffcore.access access method=GET path=/api/v1/projects/aed40085-c6ae-4b2b-87fa-b30b50152065/eval-runs/8eb2ca23-f0e6-442f-98b0-53d6aad4b9de/items status=200 ms=37
+[RV] R2 failed total 1 ['d_fail']
+2026-11-18 12:59:43,904 INFO ffcore.access access method=GET path=/api/v1/projects/aed40085-c6ae-4b2b-87fa-b30b50152065/eval-runs/8eb2ca23-f0e6-442f-98b0-53d6aad4b9de/items status=200 ms=42
+[RV] R2 passed total 2 ['a_pass', 'e_nometa']
+2026-11-18 12:59:43,956 INFO ffcore.access access method=GET path=/api/v1/projects/aed40085-c6ae-4b2b-87fa-b30b50152065/eval-runs/8eb2ca23-f0e6-442f-98b0-53d6aad4b9de/items status=200 ms=48
+[RV] R2 not_run total 1 ['c_notrun']
+2026-11-18 12:59:44,009 INFO ffcore.access access method=GET path=/api/v1/projects/aed40085-c6ae-4b2b-87fa-b30b50152065/eval-runs/8eb2ca23-f0e6-442f-98b0-53d6aad4b9de/items status=200 ms=51
+[RV] R2 offset beyond: 5 []
+2026-11-18 12:59:44,049 INFO ffcore.access access method=GET path=/api/v1/projects/aed40085-c6ae-4b2b-87fa-b30b50152065/eval-runs/8eb2ca23-f0e6-442f-98b0-53d6aad4b9de/items status=200 ms=36
+2026-11-18 12:59:44,088 INFO ffcore.access access method=GET path=/api/v1/projects/aed40085-c6ae-4b2b-87fa-b30b50152065/eval-runs/8eb2ca23-f0e6-442f-98b0-53d6aad4b9de/items status=422 ms=36
+[RV] R2 limit=200 / limit=abc: (200, 422)
+2026-11-18 12:59:44,136 INFO ffcore.access access method=GET path=/api/v1/projects/aed40085-c6ae-4b2b-87fa-b30b50152065/eval-runs/8eb2ca23-f0e6-442f-98b0-53d6aad4b9de status=200 ms=43
+[RV] R2 run GET with summary NULL: 200 None
+.F2026-11-18 12:59:45,347 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-18 12:59:45,362 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=248
+2026-11-18 12:59:45,419 INFO ffcore.access access method=GET path=/api/v1/projects/dec6b04d-dc5a-4877-9dc9-5437d0b86a2a/eval-runs/687437cb-36f0-4827-a329-692832a76a32 status=500 ms=54
+F2026-11-18 12:59:46,139 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-18 12:59:46,148 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=182
+2026-11-18 12:59:46,211 INFO ffcore.access access method=GET path=/api/v1/projects/a5183f8a-6037-44b6-be47-2459835760cc/eval-runs/e47651d2-c846-4187-9b78-9414a5eba7a8/items status=404 ms=59
+[RV] R5 deleted exam: 404 eval_run_not_found
+.
+=================================== FAILURES ===================================
+______________________ test_r3_running_exam_without_items ______________________
+
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_dd5ab85f7d7d) at 0x7f72740762a0>
+member = <function member.<locals>.make at 0x7f72740d8860>
+project = UUID('5b011741-7bf1-4566-b9e0-edb65b9adbdf')
+
+    def test_r3_running_exam_without_items(pg, member, project):
+        suite_id, _ = _suite_and_run(pg, project)
+>       ev = _raw_exam(pg, project, suite_id, _version(pg, suite_id), None, None, status="running")
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+/probe/test_rv10c2_probe.py:91: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/probe/test_rv10c2_probe.py:29: in _raw_exam
+    pg.execute(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_dd5ab85f7d7d) at 0x7f72740762a0>
+query = "INSERT INTO eval_runs (id, project_id, suite_id, agent_version_id, user_id, langfuse_run_name, status, item_runs, summary, config, created_by) VALUES (%s, %s, %s, %s, %s, 'exam-rv', %s, %s, %s, '{}', 't')"
+params = (UUID('aa1f86c9-674e-4756-860f-347790cebd38'), UUID('5b011741-7bf1-4566-b9e0-edb65b9adbdf'), UUID('13c4c159-6a3b-4eb3-...770b89a3'), UUID('4f24f9f5-bd1e-4b1b-b261-f422adae6bab'), UUID('57f3ea2c-b7cd-43a2-ad45-e40beab0ae40'), 'running', ...)
+prepare = None, binary = False
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool = False,
+    ) -> Cursor[Row]:
+        """Execute a query and return a cursor to read its results."""
+        try:
+            cur = self.cursor()
+            if binary:
+                cur.format = BINARY
+    
+            if isinstance(query, Template):
+                if params is not None:
+                    raise TypeError(
+                        "'execute()' with string template query doesn't support parameters"
+                    )
+                return cur.execute(query, prepare=prepare)
+            else:
+                return cur.execute(query, params, prepare=prepare)
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           psycopg.errors.NotNullViolation: null value in column "item_runs" of relation "eval_runs" violates not-null constraint
+E           DETAIL:  Failing row contains (aa1f86c9-674e-4756-860f-347790cebd38, 5b011741-7bf1-4566-b9e0-edb65b9adbdf, 13c4c159-6a3b-4eb3-a3ec-1a85770b89a3, 4f24f9f5-bd1e-4b1b-b261-f422adae6bab, 57f3ea2c-b7cd-43a2-ad45-e40beab0ae40, exam-rv, running, null, null, {}, null, null, null, null, null, t, 2026-11-18 12:59:44.259448+00, 2026-11-18 12:59:44.259448+00, null).
+
+/opt/venv/lib/python3.12/site-packages/psycopg/connection.py:304: NotNullViolation
+___________________________ test_r4_partial_summary ____________________________
+
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_dd5ab85f7d7d) at 0x7f72740f6000>
+member = <function member.<locals>.make at 0x7f725c7d8220>
+project = UUID('dec6b04d-dc5a-4877-9dc9-5437d0b86a2a')
+
+    def test_r4_partial_summary(pg, member, project):
+        suite_id, _ = _suite_and_run(pg, project)
+        ev = _raw_exam(pg, project, suite_id, _version(pg, suite_id), {}, {"n": 1, "pass_rate": 1.0})
+        c = member("analyst")
+>       g = c.get(f"{P.format(project)}/eval-runs/{ev}")
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+/probe/test_rv10c2_probe.py:100: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:1112: in get
+    return self.request(
+/opt/venv/lib/python3.12/site-packages/starlette/testclient.py:518: in request
+    return super().request(
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:796: in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:993: in send
+    raise exc
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:987: in send
+    response.read()
+/opt/venv/lib/python3.12/site-packages/httpx2/_models.py:877: in read
+    self._content = b"".join(self.iter_bytes())
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_models.py:893: in iter_bytes
+    for raw_bytes in self.iter_raw():
+                     ^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_models.py:948: in iter_raw
+    for raw_stream_bytes in self.stream:
+                            ^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:143: in __iter__
+    yield from self._stream
+/opt/venv/lib/python3.12/site-packages/starlette/testclient.py:384: in iter_body
+    exit_stack.close()
+/usr/local/lib/python3.12/contextlib.py:618: in close
+    self.__exit__(None, None, None)
+/usr/local/lib/python3.12/contextlib.py:610: in __exit__
+    raise exc_details[1]
+/usr/local/lib/python3.12/contextlib.py:595: in __exit__
+    if cb(*exc_details):
+       ^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/starlette/testclient.py:399: in close_app
+    raise exception
+/opt/venv/lib/python3.12/site-packages/anyio/from_thread.py:265: in _call_func
+    retval = await retval_or_awaitable
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/starlette/testclient.py:366: in run_app
+    await self.app(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/applications.py:1194: in __call__
+    await super().__call__(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/applications.py:96: in __call__
+    await self.middleware_stack(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/middleware/errors.py:186: in __call__
+    raise exc
+/opt/venv/lib/python3.12/site-packages/starlette/middleware/errors.py:164: in __call__
+    await self.app(scope, receive, _send)
+/opt/venv/lib/python3.12/site-packages/fastapi/telemetry/_asgi.py:151: in __call__
+    await self.app(scope, receive, send)
+ffcore/core/logging.py:261: in __call__
+    await self.app(scope, receive, send_status)
+ffcore/api/upload_limit.py:44: in __call__
+    await self.app(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py:63: in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    raise exc
+/opt/venv/lib/python3.12/site-packages/starlette/_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+/opt/venv/lib/python3.12/site-packages/fastapi/middleware/asyncexitstack.py:18: in __call__
+    await self.app(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/routing.py:683: in __call__
+    await self.middleware_stack(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:2811: in app
+    await route.handle(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:1839: in handle
+    await self.original_router.handle(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:2894: in handle
+    await included_router._handle_selected(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:1850: in _handle_selected
+    await route.handle(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:1839: in handle
+    await self.original_router.handle(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:2894: in handle
+    await included_router._handle_selected(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:1865: in _handle_selected
+    await original_route.handle(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:1328: in handle
+    await effective_context.app(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:166: in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+/opt/venv/lib/python3.12/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    raise exc
+/opt/venv/lib/python3.12/site-packages/starlette/_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:152: in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:745: in app
+    raw_response = await run_endpoint_function(
+/opt/venv/lib/python3.12/site-packages/fastapi/routing.py:372: in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ffcore/api/eval.py:498: in get_eval_run
+    return run_out(await _eval_run(session, project_id, eval_run_id))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+row = <ffcore.models.eval.EvalRun object at 0x7f725c7b61b0>
+
+    def run_out(row: EvalRun) -> EvalRunOut:
+        plan = row.item_runs or {}
+>       return EvalRunOut(
+            id=row.id,
+            project_id=row.project_id,
+            suite_id=row.suite_id,
+            agent_version_id=row.agent_version_id,
+            langfuse_run_name=row.langfuse_run_name,
+            status=row.status,
+            error_code=row.error_code,
+            items=len(plan),
+            scored=sum(1 for e in plan.values() if e.get("scored")),
+            summary=row.summary,
+            cost_usd=float(row.cost_usd) if row.cost_usd is not None else None,
+            started_at=row.started_at,
+            ended_at=row.ended_at,
+            created_at=row.created_at,
+        )
+E       pydantic_core._pydantic_core.ValidationError: 14 validation errors for EvalRunOut
+E       summary.scored
+E         Field required [type=missing, input_value={'n': 1, 'pass_rate': 1.0}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+E       summary.not_run
+E         Field required [type=missing, input_value={'n': 1, 'pass_rate': 1.0}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+E       summary.passed_items
+E         Field required [type=missing, input_value={'n': 1, 'pass_rate': 1.0}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+E       summary.pass_threshold
+E         Field required [type=missing, input_value={'n': 1, 'pass_rate': 1.0}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+E       summary.passed
+E         Field required [type=missing, input_value={'n': 1, 'pass_rate': 1.0}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+E       summary.complete
+E         Field required [type=missing, input_value={'n': 1, 'pass_rate': 1.0}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+E       summary.scores
+E         Field required [type=missing, input_value={'n': 1, 'pass_rate': 1.0}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+E       summary.outcomes
+E         Field required [type=missing, input_value={'n': 1, 'pass_rate': 1.0}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+E       summary.styles
+E         Field required [type=missing, input_value={'n': 1, 'pass_rate': 1.0}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+E       summary.worst
+E         Field required [type=missing, input_value={'n': 1, 'pass_rate': 1.0}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+E       summary.errors
+E         Field required [type=missing, input_value={'n': 1, 'pass_rate': 1.0}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+E       summary.warm_cache
+E         Field required [type=missing, input_value={'n': 1, 'pass_rate': 1.0}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+E       summary.warmup_ms
+E         Field required [type=missing, input_value={'n': 1, 'pass_rate': 1.0}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+E       summary.latency_ms
+E         Field required [type=missing, input_value={'n': 1, 'pass_rate': 1.0}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/missing
+
+ffcore/api/eval.py:106: ValidationError
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=248
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/dec6b04d-dc5a-4877-9dc9-5437d0b86a2a/eval-runs/687437cb-36f0-4827-a329-692832a76a32 status=500 ms=54
+=========================== short test summary info ============================
+FAILED ::test_r3_running_exam_without_items - psycopg.errors.NotNullViolation...
+FAILED ::test_r4_partial_summary - pydantic_core._pydantic_core.ValidationErr...
+2 failed, 3 passed in 14.98s
+exit 1
+HEAD=5c27543683bf11b94dc433b4ceb498bd9c654953 (git archive copy) - probe run 2 (R3 fixed: item_runs NOT NULL; R4 per endpoint)
+2026-11-18 13:01:48,215 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-18 13:01:48,235 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=191
+2026-11-18 13:01:48,764 INFO ffcore.access access method=GET path=/api/v1/projects/c26ffd00-d901-4e1b-8474-93d54ad082a8/eval-runs/10eefad4-9822-449c-ae9e-f5a6b3fce3c7/items status=200 ms=525
+[RV] R3 item_runs NULL: 200 {"data":[],"total":0,"limit":50,"offset":0}
+.2026-11-18 13:01:49,180 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-18 13:01:49,195 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=129
+2026-11-18 13:01:49,247 INFO ffcore.access access method=GET path=/api/v1/projects/dd2f6c6e-9583-438e-bc29-e185ea699058/eval-suites/6412b86a-c348-4739-b894-d8263507cee2/runs status=500 ms=49
+[RV] R4 partial summary list server error ValidationError
+2026-11-18 13:01:49,289 INFO ffcore.access access method=GET path=/api/v1/projects/dd2f6c6e-9583-438e-bc29-e185ea699058/eval-runs/82270bc0-4045-44d4-ae01-dba9231c4414 status=500 ms=37
+[RV] R4 partial summary GET server error ValidationError
+2026-11-18 13:01:49,333 INFO ffcore.access access method=GET path=/api/v1/projects/dd2f6c6e-9583-438e-bc29-e185ea699058/eval-runs/82270bc0-4045-44d4-ae01-dba9231c4414/items status=200 ms=41
+[RV] R4 partial summary items 200 {"data":[],"total":0,"limit":50,"offset":0}
+.
+2 passed, 3 deselected in 10.96s
+exit 0

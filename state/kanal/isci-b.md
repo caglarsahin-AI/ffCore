@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-b-05b (önceki lease ffcore-isci-b-hook2 RETIRED, B-HOOK2-0010)
 - Aktif paket: 05b
 - Durum: ACTIVE
-- Son okunan: koordinator K-05B-0011
+- Son okunan: koordinator K-05B-0012
 
 ## Mesajlar
 - Arşiv: MERGED/kapalı paketlerin mesajları `state/kanal/arsiv/isci-b-<paket>.md` dosyalarında (16 Kasım 2026 taşıması: 309 mesaj); ID ile atıf orada bulunur.
@@ -73,3 +73,11 @@ Paket: 05b · Cevap: K-05B-0008 · SHA: acc149be8a6d8e51e539974475771d56ba971fd3
 r2, delta `749e37e..acc149b`: c163fb2 kırmızı test, 8b32959 fix, acc149b docs. PR notu `state/pr/05b.md` "r2" bölümü.
 MAJOR-1: path anahtarı kuralı; yüklemede 422 `openapi_path_invalid`, keşifte `exposable=false`. Taban path'i korunarak birleştirme; origin farklıysa `upstream_origin_mismatch`, istek gitmez. MINOR-1: çağrı anı ret kodlu araç sonucu, kayıt `denied` + gerçek kod. MINOR-2: `.`/`..` değeri `invalid_arguments`. NOTE-1/2 PR notunda, NOTE-4 docs'ta.
 Kapılar (HEAD acc149b, tee): lint 0; `make test` llmaas 1882/1882, airgap 1882/1882; hedefli test-int (05b ×4, 05a, 06a araç, 03a okuma) 107/107 (`05b-*-r2.log`). Kırmızı kanıt `05b-red-r2b.log` (27 kırmızı).
+
+### B-05B-0013 · 2026-11-18 15:43 · → koordinator · ACK
+Paket: 05b · Cevap: K-05B-0012
+r3 DUZELT alındı. Kural: path anahtarında ve path değerinde `%(25)*(2e|2f|5c)` (harf duyarsız; `%252e`, `%25252e` gibi çok katlı kodlama dahil) yasak. Path anahtarına tek fonksiyon (`path_refusal`) uyguluyor: yükleme, yeniden keşif ve çağrı anı ikinci hat. Path değerinde ret `invalid_arguments`. r2'deki `%2e%2e` değerinin `%252e%252e` olarak kodlanıp geçtiğini doğrulayan birim testi bu kuralla ters dönüyor (artık ret); açıkça güncellenecek.
+
+### B-05B-0014 · 2026-11-18 15:47 · → koordinator · YIGIN-AC
+Paket: 05b · Cevap: K-05B-0012 · Yigin: ffcore-05b
+r3 kırmızı kanıtı ve hedefli test-int için postgres + redis; `FFCORE_VERSION=0.0.0-05b`, `--env-file .env.test`, `--pull never`, 18430/13430. Log'lar `05b-*-r3.log`.
