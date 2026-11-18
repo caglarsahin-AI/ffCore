@@ -211,9 +211,12 @@ cookie parameters), `parameter_name_conflict`, `request_body_unsupported` (not J
 `spec_version_unsupported` (only OpenAPI 3) or `spec_too_large` (1 000 000 characters).
 
 A path key is joined to the base URL's path (`https://h/api` + `/v1/x` is `https://h/api/v1/x`),
-so it must start with one `/` and have no empty, `.` or `..` segment, no `?` or `#`. A document
-with any other path key (`v1/x`, `:8080/x`, `//other-host/x`, `/a/../b`) is refused whole:
-`422 openapi_path_invalid`. A path parameter value `.` or `..` is `invalid_arguments`.
+so it must start with one `/` and have no empty, `.` or `..` segment, no `?`, `#` or backslash,
+and no percent-encoded `.`, `/` or backslash (`%2e`, `%2f`, `%5c` in any case, also encoded again
+as `%252e`): an upstream that decodes them would leave the base path. A document with any other
+path key (`v1/x`, `:8080/x`, `//other-host/x`, `/a/../b`, `/a/%2e%2e/b`, `/a%2Fb`) is refused
+whole: `422 openapi_path_invalid`. A path parameter value `.`, `..` or one holding such an
+encoding (`%2e%2e`, `a%2Fb`) is `invalid_arguments`; nothing is sent upstream.
 
 `PATCH .../mcp-servers/{id}` selects what is served and how it looks to the model:
 
