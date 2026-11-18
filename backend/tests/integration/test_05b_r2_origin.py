@@ -149,3 +149,31 @@ def test_05b_r2_dot_dot_path_value_is_refused(world, upstream, key, pg):
     )
     assert result["isError"] is True and "invalid_arguments" in result["content"][0]["text"]
     assert len(upstream.hits) == before
+
+
+# --- r3 (K-05B-0012): percent-encoded dots and slashes ---
+
+
+def test_05b_r3_encoded_path_key_refused_at_upload(world):
+    for path in ("/a/%2e%2e/b", "/a%2Fb", "/%252e%252e/x"):
+        body = openapi_body("http://127.0.0.1") | {"spec": _spec(path)}
+        response = world["admin"].post(servers_url(world), json=body)
+        assert response.status_code == 422, (path, response.text)
+        assert response.json()["error"]["code"] == "openapi_path_invalid"
+
+
+def test_05b_r3_encoded_path_value_never_reaches_upstream(world, upstream, key):
+    server = publish(world, upstream.url, exposed=["getChartData"], access="token")
+    before = len(upstream.hits)
+    for value in ("%2e%2e", "%252e%252e", "a%2Fb"):
+        result = call_result(
+            rpc(
+                world["anonymous"],
+                server["key"],
+                "tools/call",
+                {"name": "getChartData", "arguments": {"pk": value}},
+                headers=bearer(key),
+            )
+        )
+        assert result["isError"] is True and "invalid_arguments" in result["content"][0]["text"]
+    assert len(upstream.hits) == before

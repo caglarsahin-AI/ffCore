@@ -128,6 +128,10 @@ def test_05b_r2_upstream_url_keeps_the_base_path(base, path, url):
         ("http://h.example/api", "v1/dashboard/", "openapi_path_invalid"),
         ("http://h.example/api", "/v1/../../x", "openapi_path_invalid"),
         ("http://h.example", "//evil.example/x", "openapi_path_invalid"),
+        # r3: percent-encoded dots and slashes, also double-encoded (second line at call time).
+        ("http://h.example/api", "/a/%2e%2e/b", "openapi_path_invalid"),
+        ("http://h.example/api", "/a%2Fb", "openapi_path_invalid"),
+        ("http://h.example/api", "/%252e%252e/x", "openapi_path_invalid"),
     ],
 )
 def test_05b_r2_upstream_url_refuses_leaving_the_registered_base(base, path, code):

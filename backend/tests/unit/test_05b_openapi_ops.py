@@ -217,11 +217,46 @@ def test_05b_r2_upload_catalog_accepts_superset():
 
 @pytest.mark.parametrize("value", [".", "..", "%2e%2e"])
 def test_05b_r2_dot_path_values_are_refused(value):
+    # r3 (K-05B-0012): "%2e%2e" is refused too (was encoded and sent as %252e%252e in r2).
     ops = _catalog(mcp_openapi.load_spec(SUPERSET.read_text(encoding="utf-8")))
-    if value == "%2e%2e":
-        # Percent-encoded as a whole: never a dot segment upstream.
-        request = mcp_openapi.build_request(ops["getChartData"], {"pk": value})
-        assert request.path == "/api/v1/chart/%252e%252e/data/"
-        return
     with pytest.raises(ArgumentsError):
         mcp_openapi.build_request(ops["getChartData"], {"pk": value})
+
+
+# --- r2 MINOR-1 (K-05B-0012, r3): percent-encoded '.', '/', '\' in path keys and values ---
+
+ENCODED_PATHS = [
+    "/a/%2e%2e/b",
+    "/a/%2E%2E/b",
+    "/a%2Fb",
+    "/a%2fb",
+    "/a%5Cb",
+    "/%252e%252e/x",
+    "/x/%25252f/y",
+    "/a/%2e/b",
+]
+
+
+@pytest.mark.parametrize("path", ENCODED_PATHS)
+def test_05b_r3_encoded_path_key_is_refused(path):
+    ok = {"200": {"description": "x"}}
+    ops = _catalog(_spec({path: {"get": {"operationId": "p", "responses": ok}}}))
+    assert ops["p"]["exposable"] is False and ops["p"]["reason"] == "openapi_path_invalid"
+    good = {"/fine": {"get": {"operationId": "fine", "responses": ok}}}
+    text = json.dumps(_spec({**good, path: {"get": {"operationId": "p", "responses": ok}}}))
+    with pytest.raises(SpecError) as caught:
+        mcp_openapi.upload_catalog(text)
+    assert caught.value.code == "openapi_path_invalid"
+
+
+@pytest.mark.parametrize("value", ["%2e%2e", "%2E", "a%2Fb", "%5c", "%252e%252e", "x%25252Fy"])
+def test_05b_r3_encoded_path_value_is_refused(value):
+    ops = _catalog(mcp_openapi.load_spec(SUPERSET.read_text(encoding="utf-8")))
+    with pytest.raises(ArgumentsError):
+        mcp_openapi.build_request(ops["getChartData"], {"pk": value})
+
+
+@pytest.mark.parametrize("value", ["12", "a%20b", "100%", "%41"])
+def test_05b_r3_other_values_still_pass(value):
+    ops = _catalog(mcp_openapi.load_spec(SUPERSET.read_text(encoding="utf-8")))
+    assert mcp_openapi.build_request(ops["getChartData"], {"pk": value}).method == "GET"
