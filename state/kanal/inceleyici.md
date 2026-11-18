@@ -129,3 +129,25 @@ K-GEN-0022 alındı. Ama Docker motoru şu an çalışmıyor:
 Docker Desktop'ı açmak kullanıcının işi; ben açmıyorum. Motor gelince sıra şöyle:
 1. 05b r2: rv05b hafif yığını, YIGIN-AC, probe'lar (P1-P9) ve hedefli testler, rapor, YIGIN-KAPA.
 2. 10c-2: rv10c2, test-int (qdrant) ve probe'lar.
+
+### R-05B-0007 · 2026-11-18 15:18 · → koordinator · YIGIN-AC
+Paket: 05b · Cevap: K-GEN-0024 · Yigin: ffcore-rv05b
+Eski rv05b ve rv10c2 yığınları `down -v` ile kapatıldı; `ffcore-rv10c2_e2e_node_modules` volume'u da adıyla silindi. rv05b temiz açılıyor; hafif yığın yalnız `postgres redis migrate`, `--no-build --pull never`, `FFCORE_VERSION=0.0.0-05b`. Kaynak, worktree HEAD acc149b. Koşacaklar: probe'lar P1-P9, r2 testleri, 05b birim ve sözleşme testleri iki profilde. Açık FF yığını yalnız bu.
+
+### R-05B-0008 · 2026-11-18 15:38 · → koordinator · REVIEW-SONUC
+Paket: 05b · Cevap: K-05B-0010 · SHA: acc149be8a6d8e51e539974475771d56ba971fd3 · Sonuc: ONAY · Bulgu: B0 M0 m1 N2
+r2 teyidi ONAY. Rapor `state/reviews/05b-r2.md`.
+- r1 MAJOR-1 `upstream-origin-kacagi` kapandı. P1 vakaları yüklemede `422 openapi_path_invalid` alıyor. Kataloğa elle yazılmış kaçan op'lar (P8) çağrıda `upstream_origin_mismatch` ya da `openapi_path_invalid` ile reddediliyor; upstream'e istek yok (hits 0).
+- MINOR-1 kapandı: red artık `isError` ve kapalı kodla dönüyor, satır `mcp_server_calls` `denied` + `error_code`.
+- MINOR-2 kapandı: `..` değeri `invalid_arguments`.
+- Kalan **MINOR-1 `yuzde-kodlu-nokta-segmenti`**: path anahtarında `/v1/%2e%2e/%2e%2e/x` kabul ediliyor. Normalleştiren bir upstream bunu taban path dışına çıkarır. Origin korunuyor ve spec'i admin yüklüyor; bu yüzden MAJOR değil, merge'i engellemez. Öneri: `path_refusal` segmenti `unquote` edip kontrol etsin.
+- Koşular: probe 15/15; 05b testleri 121/121 (llmaas) ve 121/121 (airgap).
+Bekleyen dosyalar (commit edilmedi): `state/reviews/05b-r2.md`, `state/evidence/05b-r2-rv-{up,probe,tests-llmaas,tests-airgap}.log`, kanal.
+
+### R-05B-0009 · 2026-11-18 15:38 · → koordinator · YIGIN-KAPA
+Paket: 05b · Cevap: K-05B-0010 · Yigin: ffcore-rv05b
+`down -v` tamam; rv05b konteyner ve volume'u kalmadı. Şimdi rv10c2 açılıyor.
+
+### R-10C2-0003 · 2026-11-18 15:39 · → koordinator · YIGIN-AC
+Paket: 10c-2 · Cevap: K-GEN-0024 · Yigin: ffcore-rv10c2
+rv10c2 temiz açılıyor; kaynak SHA 5c27543'ün `git archive` kopyası. Komut: `--profile test --profile qdrant up -d --wait --no-build --pull never`, `frontend` servisi hariç. Önceki kapı sonuçları geçerli (e2e 180/180, backend 1813×2, önyüz), yeniden koşulmuyor. Koşacaklar: `make test-int` (qdrant ile) ve backend probe'ları. Probe odakları: 185 items ucu, anahtar, kota ve retention rolleri. Açık FF yığını yalnız bu.

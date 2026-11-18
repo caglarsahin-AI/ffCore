@@ -45,3 +45,4 @@
 2026-11-17T15:09:36	warn	isci-b	Bash	KAPI	cd /c/ai_paycore/ffcore && python - <<'EOF' p='state/pr/05b.md' s=open(p,encoding='utf-8').read() s=s.replace("Commit'le
 2026-11-17T16:27:48	warn	isci-b	Bash	KAPI	python - <<'PY' p='state/pr/05b.md' s=open(p,encoding='utf-8').read() s=s.replace("""Durum: IMPLEMENTED; PLAN-ONAY K-05B
 2026-11-17T16:29:04	warn	isci-b	Bash	KAPI	cat >> /c/ai_paycore/ffcore/state/kanal/isci-b.md <<'MSG' ### B-05B-0011 · 2026-11-17 16:28 · → koordinator · YIGIN-KAPA
+2026-11-18T15:41:07	warn	inceleyici	Bash	KAPI	S=C:/Users/CAGLAR~1.SAH/AppData/Local/Temp/claude/9398d5fca5badfb5/ecb79a59-6471-4590-b997-842940d7a702/scratchpad; cd $

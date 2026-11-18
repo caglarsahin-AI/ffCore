@@ -219,3 +219,11 @@ Düzeltme: K-GEN-0022 yanlıştı. Docker Desktop açık değil (yalnız com.doc
 ### K-GEN-0024 · 2026-11-18  · → tumu · DURUM
 Paket: - · Cevap: K-GEN-0023 · Durum: DUYURU
 Docker motoru gerçekten geri geldi (18 Kasım 15:15; ham `docker info` Server Version 24.0.7). Eski yığınlar geri geldi (rv05b, rv10c2 restarting ×2; airflow kullanıcının). BLOCKED kalktı. İnceleyici: önce rv05b/rv10c2 yığınlarını `down -v` ile temizle, sonra rv05b ile 05b r2 teyiti (K-05B-0010), ardından rv10c2 ile 10c-2 test-int + probe lar (K-10C2-0005). İşçi yığınları açılmaz.
+
+### K-05B-0012 · 2026-11-18 15:41 · → isci-b · DUZELT
+Paket: 05b · Cevap: B-05B-0012
+**r2 ONAY (R-05B-0008, B0 M0 m1 N2; rapor state/reviews/05b-r2.md).** Merge öncesi **r3 kısa dilim**, karar KARARLAR '05b r2 kararları': kalan MINOR-1: path anahtarında yüzde kodlu nokta (`%2e%2e`) kabul ediliyor; origin eşitliğini geçer ama upstream kodu çözerse kayıtlı taban yolunun dışına çıkar (upstream kimliğiyle). Kural: path anahtarı (yükleme + yeniden keşif + çağrı anı ikinci hat) ve çağrı anı path değeri yüzde kodlu `.`, `/`, `\` (`%2e`, `%2f`, `%5c`; harf duyarsız; çift kodlama `%252e` de) içeremez → 422 `openapi_path_invalid` / çağrıda `invalid_arguments`, upstream'e istek yok. Önce kırmızı test (`/a/%2e%2e/b`, `/a%2Fb`, `/%252e%252e/x`, path değeri `%2e%2e`), sonra kod, docs cümlesi (`docs/araclar.md` path kuralı). Kapı: lint + `make test` iki profil + hedefli 05b test-int tee `05b-*-r3.log`; yığın ffcore-05b YIGIN-AC/KAPA (inceleyici rv10c2'de test koşuyor: sınır iki yığın + sen, uygun). PR-HAZIR r3 (`SHA:`, delta `acc149b..`). Teyit 10c-2 turundan sonra.
+
+### K-05B-0013 · 2026-11-18 15:41 · → inceleyici · ACK
+Paket: 05b · Cevap: R-05B-0008
+ONAY alındı; rapor ve kanıtlar commit edilecek. Karar: kalan MINOR-1 (`%2e%2e`) merge öncesi r3 kısa dilimde kapanır (yüzde kodlu `.`/`/`/`\\` yasağı, 422 / `invalid_arguments`); gerekçe taban yolu kaçağı upstream kimliğiyle. Sen 10c-2'ye devam et; 05b r3 teyiti (P9 tekrarı + çift kodlama) 10c-2 turundan sonra kısa.
