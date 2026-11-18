@@ -1,0 +1,497 @@
+HEAD=5b00a63ee8742945aab15388faeedee94ba66bb4
+2026-11-18 13:14:03,461 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=597
+2026-11-18 13:14:03,707 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=161
+2026-11-18 13:14:04,067 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=144
+2026-11-18 13:14:04,492 INFO ffcore.access access method=POST path=/api/v1/projects/6e17c6a7-540a-41a2-ba48-0cfcb9f7501a/api-keys status=201 ms=323
+2026-11-18 13:14:04,862 INFO ffcore.access access method=POST path=/api/v1/projects/6e17c6a7-540a-41a2-ba48-0cfcb9f7501a/mcp-servers status=422 ms=363
+[RV] P10 pct-dots '/v1/%2e%2e/%2e%2e/x' -> upload create 422 openapi_path_invalid | rediscovery (False, 'openapi_path_invalid')
+.2026-11-18 13:14:10,405 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:14:10,406 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:14:10,406 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:14:12,474 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:14:12,603 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=126
+2026-11-18 13:14:12,680 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:14:12,891 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=209
+2026-11-18 13:14:12,970 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:14:13,125 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=153
+2026-11-18 13:14:13,186 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:14:13,250 INFO ffcore.access access method=POST path=/api/v1/projects/ca89b9cb-dcc5-4a85-9d05-0e0c8a7b3253/api-keys status=201 ms=60
+2026-11-18 13:14:13,294 INFO ffcore.access access method=POST path=/api/v1/projects/ca89b9cb-dcc5-4a85-9d05-0e0c8a7b3253/mcp-servers status=422 ms=40
+[RV] P10 pct-dots-upper '/v1/%2E%2E/x' -> upload create 422 openapi_path_invalid | rediscovery (False, 'openapi_path_invalid')
+.2026-11-18 13:14:21,400 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:14:21,522 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=119
+2026-11-18 13:14:21,584 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:14:21,711 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=123
+2026-11-18 13:14:21,785 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:14:21,910 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=121
+2026-11-18 13:14:21,980 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:14:22,043 INFO ffcore.access access method=POST path=/api/v1/projects/6a27f493-0b26-44bb-9804-878efc80f6a0/api-keys status=201 ms=57
+2026-11-18 13:14:22,095 INFO ffcore.access access method=POST path=/api/v1/projects/6a27f493-0b26-44bb-9804-878efc80f6a0/mcp-servers status=422 ms=46
+[RV] P10 pct-dots-mixed '/v1/.%2E/x' -> upload create 422 openapi_path_invalid | rediscovery (False, 'openapi_path_invalid')
+.2026-11-18 13:14:30,184 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:14:30,323 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=135
+2026-11-18 13:14:30,381 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:14:30,500 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=116
+2026-11-18 13:14:30,558 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:14:30,676 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=116
+2026-11-18 13:14:30,743 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:14:30,807 INFO ffcore.access access method=POST path=/api/v1/projects/6b5d1384-262b-467d-beb5-3a103f2e1d7a/api-keys status=201 ms=60
+2026-11-18 13:14:30,853 INFO ffcore.access access method=POST path=/api/v1/projects/6b5d1384-262b-467d-beb5-3a103f2e1d7a/mcp-servers status=422 ms=42
+[RV] P10 pct-slash '/v1/a%2Fb' -> upload create 422 openapi_path_invalid | rediscovery (False, 'openapi_path_invalid')
+.2026-11-18 13:14:38,938 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:14:39,067 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=126
+2026-11-18 13:14:39,139 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:14:39,270 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=127
+2026-11-18 13:14:39,358 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:14:39,481 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=120
+2026-11-18 13:14:39,551 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:14:39,613 INFO ffcore.access access method=POST path=/api/v1/projects/4d93dedc-7b61-4cfa-b31c-41dbaec6338e/api-keys status=201 ms=59
+2026-11-18 13:14:39,665 INFO ffcore.access access method=POST path=/api/v1/projects/4d93dedc-7b61-4cfa-b31c-41dbaec6338e/mcp-servers status=422 ms=48
+[RV] P10 pct-slash-lower '/v1/a%2fb' -> upload create 422 openapi_path_invalid | rediscovery (False, 'openapi_path_invalid')
+.2026-11-18 13:14:47,774 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:14:47,943 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=164
+2026-11-18 13:14:48,014 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:14:48,177 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=160
+2026-11-18 13:14:48,258 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:14:48,445 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=177
+2026-11-18 13:14:48,504 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:14:48,565 INFO ffcore.access access method=POST path=/api/v1/projects/f5dd220a-f9f9-46b3-91aa-767bad632cc9/api-keys status=201 ms=58
+2026-11-18 13:14:48,647 INFO ffcore.access access method=POST path=/api/v1/projects/f5dd220a-f9f9-46b3-91aa-767bad632cc9/mcp-servers status=422 ms=73
+[RV] P10 pct-backslash '/v1/a%5Cb' -> upload create 422 openapi_path_invalid | rediscovery (False, 'openapi_path_invalid')
+.2026-11-18 13:14:56,747 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:14:56,881 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=129
+2026-11-18 13:14:56,947 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:14:57,074 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=125
+2026-11-18 13:14:57,137 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:14:57,269 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=128
+2026-11-18 13:14:57,365 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:14:57,436 INFO ffcore.access access method=POST path=/api/v1/projects/10eb9d15-8dde-49b7-990b-9697d081cc96/api-keys status=201 ms=67
+2026-11-18 13:14:57,486 INFO ffcore.access access method=POST path=/api/v1/projects/10eb9d15-8dde-49b7-990b-9697d081cc96/mcp-servers status=422 ms=43
+[RV] P10 double '/v1/%252e%252e/x' -> upload create 422 openapi_path_invalid | rediscovery (False, 'openapi_path_invalid')
+.2026-11-18 13:15:05,620 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:15:05,808 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=167
+2026-11-18 13:15:05,870 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:15:05,987 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=114
+2026-11-18 13:15:06,062 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:15:06,245 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=180
+2026-11-18 13:15:06,346 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:15:06,403 INFO ffcore.access access method=POST path=/api/v1/projects/d11a093f-08af-48bd-a4f9-b787631ce60b/api-keys status=201 ms=54
+2026-11-18 13:15:06,446 INFO ffcore.access access method=POST path=/api/v1/projects/d11a093f-08af-48bd-a4f9-b787631ce60b/mcp-servers status=422 ms=39
+[RV] P10 triple '/v1/%25252e%25252E/x' -> upload create 422 openapi_path_invalid | rediscovery (False, 'openapi_path_invalid')
+.2026-11-18 13:15:14,540 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:15:14,668 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=125
+2026-11-18 13:15:14,735 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:15:14,957 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=212
+2026-11-18 13:15:15,105 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:15:15,247 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=139
+2026-11-18 13:15:15,315 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:15:15,369 INFO ffcore.access access method=POST path=/api/v1/projects/ce61923c-2e75-4fb4-81ef-0f8858fdeab8/api-keys status=201 ms=52
+2026-11-18 13:15:15,417 INFO ffcore.access access method=POST path=/api/v1/projects/ce61923c-2e75-4fb4-81ef-0f8858fdeab8/mcp-servers status=422 ms=42
+[RV] P10 double-slash '/v1/a%252Fb' -> upload create 422 openapi_path_invalid | rediscovery (False, 'openapi_path_invalid')
+.2026-11-18 13:15:23,512 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:15:23,664 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=149
+2026-11-18 13:15:23,740 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:15:23,864 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=121
+2026-11-18 13:15:23,949 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:15:24,083 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=130
+2026-11-18 13:15:24,156 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:15:24,219 INFO ffcore.access access method=POST path=/api/v1/projects/9a564baa-436d-4a31-91bd-266e947464ca/api-keys status=201 ms=59
+2026-11-18 13:15:24,285 INFO ffcore.access access method=POST path=/api/v1/projects/9a564baa-436d-4a31-91bd-266e947464ca/mcp-servers status=201 ms=62
+2026-11-18 13:15:24,345 INFO ffcore.access access method=PATCH path=/api/v1/projects/9a564baa-436d-4a31-91bd-266e947464ca/mcp-servers/65defc77-e8a3-400b-a194-995b342893bd status=200 ms=56
+[RV] P10 legit-space '/v1/a%20b' -> upload accepted | rediscovery (True, None)
+2026-11-18 13:15:24,421 INFO mcp.server.streamable_http_manager StreamableHTTP session manager started
+2026-11-18 13:15:24,511 INFO ffcore.mcp_publish mcp_server_call server=rv-fc225ea5 operation=k status=error code=upstream_http_404 latency_ms=59
+2026-11-18 13:15:24,513 INFO mcp.server.streamable_http Terminating session: None
+2026-11-18 13:15:24,513 INFO mcp.server.streamable_http_manager StreamableHTTP session manager shutting down
+2026-11-18 13:15:24,514 INFO ffcore.access access method=POST path=/mcp/rv-fc225ea5/ status=200 ms=166
+[RV] P10 legit-space call -> ['/api/v1/a b'] True
+.2026-11-18 13:15:32,374 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:15:32,567 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=190
+2026-11-18 13:15:32,700 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:15:32,841 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=139
+2026-11-18 13:15:32,918 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:15:33,037 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=115
+2026-11-18 13:15:33,112 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:15:33,168 INFO ffcore.access access method=POST path=/api/v1/projects/85996ee7-f14d-4c50-ab3e-f2fb067414cc/api-keys status=201 ms=51
+2026-11-18 13:15:33,234 INFO ffcore.access access method=POST path=/api/v1/projects/85996ee7-f14d-4c50-ab3e-f2fb067414cc/mcp-servers status=201 ms=61
+2026-11-18 13:15:33,286 INFO ffcore.access access method=PATCH path=/api/v1/projects/85996ee7-f14d-4c50-ab3e-f2fb067414cc/mcp-servers/74284cf5-ff2b-4bdf-b42e-715fd0f1e78c status=200 ms=49
+[RV] P10 legit-utf8 '/v1/%C3%BC' -> upload accepted | rediscovery (True, None)
+2026-11-18 13:15:33,330 INFO mcp.server.streamable_http_manager StreamableHTTP session manager started
+2026-11-18 13:15:33,420 INFO ffcore.mcp_publish mcp_server_call server=rv-7336cff2 operation=k status=error code=upstream_http_404 latency_ms=59
+2026-11-18 13:15:33,422 INFO mcp.server.streamable_http Terminating session: None
+2026-11-18 13:15:33,422 INFO mcp.server.streamable_http_manager StreamableHTTP session manager shutting down
+2026-11-18 13:15:33,423 INFO ffcore.access access method=POST path=/mcp/rv-7336cff2/ status=200 ms=132
+[RV] P10 legit-utf8 call -> ['/api/v1/ü'] True
+.2026-11-18 13:15:41,368 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:15:41,551 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=162
+2026-11-18 13:15:41,610 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:15:41,736 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=123
+2026-11-18 13:15:41,814 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:15:41,944 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=127
+2026-11-18 13:15:42,011 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:15:42,077 INFO ffcore.access access method=POST path=/api/v1/projects/27c282e5-e9c3-4440-9283-b8410c351cc0/api-keys status=201 ms=61
+2026-11-18 13:15:42,154 INFO ffcore.access access method=POST path=/api/v1/projects/27c282e5-e9c3-4440-9283-b8410c351cc0/mcp-servers status=201 ms=71
+2026-11-18 13:15:42,212 INFO ffcore.access access method=PATCH path=/api/v1/projects/27c282e5-e9c3-4440-9283-b8410c351cc0/mcp-servers/90b147d7-a919-4da8-a6a5-db9759a2dbc9 status=200 ms=55
+[RV] P10 legit-pct25 '/v1/a%25b' -> upload accepted | rediscovery (True, None)
+2026-11-18 13:15:42,265 INFO mcp.server.streamable_http_manager StreamableHTTP session manager started
+2026-11-18 13:15:42,361 INFO ffcore.mcp_publish mcp_server_call server=rv-79d6d4a6 operation=k status=error code=upstream_http_404 latency_ms=63
+2026-11-18 13:15:42,363 INFO mcp.server.streamable_http Terminating session: None
+2026-11-18 13:15:42,363 INFO mcp.server.streamable_http_manager StreamableHTTP session manager shutting down
+2026-11-18 13:15:42,364 INFO ffcore.access access method=POST path=/mcp/rv-79d6d4a6/ status=200 ms=146
+[RV] P10 legit-pct25 call -> ['/api/v1/a%b'] True
+.2026-11-18 13:15:50,241 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:15:50,454 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=209
+2026-11-18 13:15:50,532 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:15:50,679 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=144
+2026-11-18 13:15:50,758 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:15:50,897 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=131
+2026-11-18 13:15:50,961 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:15:51,024 INFO ffcore.access access method=POST path=/api/v1/projects/e672651c-59b2-49c9-9dc8-8eb9e203a9bc/api-keys status=201 ms=56
+2026-11-18 13:15:51,106 INFO ffcore.access access method=POST path=/api/v1/projects/e672651c-59b2-49c9-9dc8-8eb9e203a9bc/mcp-servers status=201 ms=75
+2026-11-18 13:15:51,171 INFO ffcore.access access method=PATCH path=/api/v1/projects/e672651c-59b2-49c9-9dc8-8eb9e203a9bc/mcp-servers/579525d9-81c4-4cd7-b010-4ab68c65c686 status=200 ms=61
+2026-11-18 13:15:51,224 INFO mcp.server.streamable_http_manager StreamableHTTP session manager started
+2026-11-18 13:15:51,288 INFO ffcore.mcp_publish mcp_server_call server=rv-c9e4e11e operation=dots status=error code=invalid_arguments latency_ms=31
+2026-11-18 13:15:51,289 INFO mcp.server.streamable_http Terminating session: None
+2026-11-18 13:15:51,290 INFO mcp.server.streamable_http_manager StreamableHTTP session manager shutting down
+2026-11-18 13:15:51,291 INFO ffcore.access access method=POST path=/mcp/rv-c9e4e11e/ status=200 ms=117
+[RV] P11 pk '%2e%2e' -> upstream [] | isError True error: invalid_arguments | row ('error', 'invalid_arguments')
+2026-11-18 13:15:51,328 INFO mcp.server.streamable_http_manager StreamableHTTP session manager started
+2026-11-18 13:15:51,390 INFO ffcore.mcp_publish mcp_server_call server=rv-c9e4e11e operation=dots status=error code=invalid_arguments latency_ms=28
+2026-11-18 13:15:51,392 INFO mcp.server.streamable_http Terminating session: None
+2026-11-18 13:15:51,392 INFO mcp.server.streamable_http_manager StreamableHTTP session manager shutting down
+2026-11-18 13:15:51,394 INFO ffcore.access access method=POST path=/mcp/rv-c9e4e11e/ status=200 ms=98
+[RV] P11 pk '%2E%2e' -> upstream [] | isError True error: invalid_arguments | row ('error', 'invalid_arguments')
+2026-11-18 13:15:51,429 INFO mcp.server.streamable_http_manager StreamableHTTP session manager started
+2026-11-18 13:15:51,490 INFO ffcore.mcp_publish mcp_server_call server=rv-c9e4e11e operation=dots status=error code=invalid_arguments latency_ms=30
+2026-11-18 13:15:51,493 INFO mcp.server.streamable_http Terminating session: None
+2026-11-18 13:15:51,493 INFO mcp.server.streamable_http_manager StreamableHTTP session manager shutting down
+2026-11-18 13:15:51,494 INFO ffcore.access access method=POST path=/mcp/rv-c9e4e11e/ status=200 ms=96
+[RV] P11 pk 'a%2Fb' -> upstream [] | isError True error: invalid_arguments | row ('error', 'invalid_arguments')
+2026-11-18 13:15:51,530 INFO mcp.server.streamable_http_manager StreamableHTTP session manager started
+2026-11-18 13:15:51,583 INFO ffcore.mcp_publish mcp_server_call server=rv-c9e4e11e operation=dots status=error code=invalid_arguments latency_ms=22
+2026-11-18 13:15:51,587 INFO mcp.server.streamable_http Terminating session: None
+2026-11-18 13:15:51,587 INFO mcp.server.streamable_http_manager StreamableHTTP session manager shutting down
+2026-11-18 13:15:51,589 INFO ffcore.access access method=POST path=/mcp/rv-c9e4e11e/ status=200 ms=90
+[RV] P11 pk 'a%2fb' -> upstream [] | isError True error: invalid_arguments | row ('error', 'invalid_arguments')
+2026-11-18 13:15:51,623 INFO mcp.server.streamable_http_manager StreamableHTTP session manager started
+2026-11-18 13:15:51,679 INFO ffcore.mcp_publish mcp_server_call server=rv-c9e4e11e operation=dots status=error code=invalid_arguments latency_ms=25
+2026-11-18 13:15:51,681 INFO mcp.server.streamable_http Terminating session: None
+2026-11-18 13:15:51,682 INFO mcp.server.streamable_http_manager StreamableHTTP session manager shutting down
+2026-11-18 13:15:51,683 INFO ffcore.access access method=POST path=/mcp/rv-c9e4e11e/ status=200 ms=90
+[RV] P11 pk 'a%5Cb' -> upstream [] | isError True error: invalid_arguments | row ('error', 'invalid_arguments')
+2026-11-18 13:15:51,727 INFO mcp.server.streamable_http_manager StreamableHTTP session manager started
+2026-11-18 13:15:51,811 INFO ffcore.mcp_publish mcp_server_call server=rv-c9e4e11e operation=dots status=error code=invalid_arguments latency_ms=47
+2026-11-18 13:15:51,814 INFO mcp.server.streamable_http Terminating session: None
+2026-11-18 13:15:51,814 INFO mcp.server.streamable_http_manager StreamableHTTP session manager shutting down
+2026-11-18 13:15:51,816 INFO ffcore.access access method=POST path=/mcp/rv-c9e4e11e/ status=200 ms=128
+[RV] P11 pk '%252e%252e' -> upstream [] | isError True error: invalid_arguments | row ('error', 'invalid_arguments')
+2026-11-18 13:15:51,858 INFO mcp.server.streamable_http_manager StreamableHTTP session manager started
+2026-11-18 13:15:51,931 INFO ffcore.mcp_publish mcp_server_call server=rv-c9e4e11e operation=dots status=error code=invalid_arguments latency_ms=33
+2026-11-18 13:15:51,933 INFO mcp.server.streamable_http Terminating session: None
+2026-11-18 13:15:51,933 INFO mcp.server.streamable_http_manager StreamableHTTP session manager shutting down
+2026-11-18 13:15:51,934 INFO ffcore.access access method=POST path=/mcp/rv-c9e4e11e/ status=200 ms=113
+[RV] P11 pk '%25252F' -> upstream [] | isError True error: invalid_arguments | row ('error', 'invalid_arguments')
+2026-11-18 13:15:51,978 INFO mcp.server.streamable_http_manager StreamableHTTP session manager started
+2026-11-18 13:15:52,059 INFO ffcore.mcp_publish mcp_server_call server=rv-c9e4e11e operation=dots status=denied code=openapi_path_invalid latency_ms=29
+2026-11-18 13:15:52,060 INFO mcp.server.streamable_http Terminating session: None
+2026-11-18 13:15:52,061 INFO mcp.server.streamable_http_manager StreamableHTTP session manager shutting down
+2026-11-18 13:15:52,062 INFO ffcore.access access method=POST path=/mcp/rv-c9e4e11e/ status=200 ms=122
+[RV] P11 pk '../x' -> upstream [] | isError True error: openapi_path_invalid | row ('denied', 'openapi_path_invalid')
+2026-11-18 13:15:52,110 INFO mcp.server.streamable_http_manager StreamableHTTP session manager started
+2026-11-18 13:15:52,178 INFO ffcore.mcp_publish mcp_server_call server=rv-c9e4e11e operation=dots status=denied code=openapi_path_invalid latency_ms=32
+2026-11-18 13:15:52,180 INFO mcp.server.streamable_http Terminating session: None
+2026-11-18 13:15:52,181 INFO mcp.server.streamable_http_manager StreamableHTTP session manager shutting down
+2026-11-18 13:15:52,182 INFO ffcore.access access method=POST path=/mcp/rv-c9e4e11e/ status=200 ms=114
+[RV] P11 pk 'a/b' -> upstream [] | isError True error: openapi_path_invalid | row ('denied', 'openapi_path_invalid')
+2026-11-18 13:15:52,224 INFO mcp.server.streamable_http_manager StreamableHTTP session manager started
+2026-11-18 13:15:52,288 INFO ffcore.mcp_publish mcp_server_call server=rv-c9e4e11e operation=dots status=denied code=openapi_path_invalid latency_ms=30
+2026-11-18 13:15:52,292 INFO mcp.server.streamable_http Terminating session: None
+2026-11-18 13:15:52,293 INFO mcp.server.streamable_http_manager StreamableHTTP session manager shutting down
+2026-11-18 13:15:52,294 INFO ffcore.access access method=POST path=/mcp/rv-c9e4e11e/ status=200 ms=107
+[RV] P11 pk '..\\x' -> upstream [] | isError True error: openapi_path_invalid | row ('denied', 'openapi_path_invalid')
+2026-11-18 13:15:52,332 INFO mcp.server.streamable_http_manager StreamableHTTP session manager started
+2026-11-18 13:15:52,393 INFO ffcore.mcp_publish mcp_server_call server=rv-c9e4e11e operation=dots status=denied code=openapi_path_invalid latency_ms=27
+2026-11-18 13:15:52,395 INFO mcp.server.streamable_http Terminating session: None
+2026-11-18 13:15:52,395 INFO mcp.server.streamable_http_manager StreamableHTTP session manager shutting down
+2026-11-18 13:15:52,397 INFO ffcore.access access method=POST path=/mcp/rv-c9e4e11e/ status=200 ms=98
+[RV] P11 pk './x' -> upstream [] | isError True error: openapi_path_invalid | row ('denied', 'openapi_path_invalid')
+2026-11-18 13:15:52,433 INFO mcp.server.streamable_http_manager StreamableHTTP session manager started
+2026-11-18 13:15:52,544 INFO ffcore.mcp_publish mcp_server_call server=rv-c9e4e11e operation=dots status=error code=upstream_http_404 latency_ms=74
+2026-11-18 13:15:52,546 INFO mcp.server.streamable_http Terminating session: None
+2026-11-18 13:15:52,547 INFO mcp.server.streamable_http_manager StreamableHTTP session manager shutting down
+2026-11-18 13:15:52,548 INFO ffcore.access access method=POST path=/mcp/rv-c9e4e11e/ status=200 ms=147
+[RV] P11 pk 'a b' -> upstream ['/api/v1/chart/a b'] | isError True error: upstream_http_404 | row ('error', 'upstream_http_404')
+2026-11-18 13:15:52,589 INFO mcp.server.streamable_http_manager StreamableHTTP session manager started
+2026-11-18 13:15:52,706 INFO ffcore.mcp_publish mcp_server_call server=rv-c9e4e11e operation=dots status=error code=upstream_http_404 latency_ms=78
+2026-11-18 13:15:52,708 INFO mcp.server.streamable_http Terminating session: None
+2026-11-18 13:15:52,709 INFO mcp.server.streamable_http_manager StreamableHTTP session manager shutting down
+2026-11-18 13:15:52,710 INFO ffcore.access access method=POST path=/mcp/rv-c9e4e11e/ status=200 ms=158
+[RV] P11 pk 'ü' -> upstream ['/api/v1/chart/ü'] | isError True error: upstream_http_404 | row ('error', 'upstream_http_404')
+2026-11-18 13:15:52,755 INFO mcp.server.streamable_http_manager StreamableHTTP session manager started
+2026-11-18 13:15:52,882 INFO ffcore.mcp_publish mcp_server_call server=rv-c9e4e11e operation=dots status=error code=upstream_http_404 latency_ms=88
+2026-11-18 13:15:52,884 INFO mcp.server.streamable_http Terminating session: None
+2026-11-18 13:15:52,885 INFO mcp.server.streamable_http_manager StreamableHTTP session manager shutting down
+2026-11-18 13:15:52,886 INFO ffcore.access access method=POST path=/mcp/rv-c9e4e11e/ status=200 ms=171
+[RV] P11 pk 'a%25b' -> upstream ['/api/v1/chart/a%25b'] | isError True error: upstream_http_404 | row ('error', 'upstream_http_404')
+2026-11-18 13:15:52,925 INFO mcp.server.streamable_http_manager StreamableHTTP session manager started
+2026-11-18 13:15:53,031 INFO ffcore.mcp_publish mcp_server_call server=rv-c9e4e11e operation=dots status=error code=upstream_http_404 latency_ms=68
+2026-11-18 13:15:53,034 INFO mcp.server.streamable_http Terminating session: None
+2026-11-18 13:15:53,035 INFO mcp.server.streamable_http_manager StreamableHTTP session manager shutting down
+2026-11-18 13:15:53,036 INFO ffcore.access access method=POST path=/mcp/rv-c9e4e11e/ status=200 ms=145
+[RV] P11 pk '1.2' -> upstream ['/api/v1/chart/1.2'] | isError True error: upstream_http_404 | row ('error', 'upstream_http_404')
+2026-11-18 13:15:53,081 INFO mcp.server.streamable_http_manager StreamableHTTP session manager started
+2026-11-18 13:15:53,237 INFO ffcore.mcp_publish mcp_server_call server=rv-c9e4e11e operation=dots status=error code=upstream_http_404 latency_ms=110
+2026-11-18 13:15:53,240 INFO mcp.server.streamable_http Terminating session: None
+2026-11-18 13:15:53,240 INFO mcp.server.streamable_http_manager StreamableHTTP session manager shutting down
+2026-11-18 13:15:53,242 INFO ffcore.access access method=POST path=/mcp/rv-c9e4e11e/ status=200 ms=201
+[RV] P11 pk '...' -> upstream ['/api/v1/chart/...'] | isError True error: upstream_http_404 | row ('error', 'upstream_http_404')
+.2026-11-18 13:15:59,297 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:15:59,438 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=138
+2026-11-18 13:15:59,514 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:15:59,662 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=143
+2026-11-18 13:15:59,764 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:15:59,914 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=146
+2026-11-18 13:16:00,045 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:16:00,113 INFO ffcore.access access method=POST path=/api/v1/projects/410e0629-1b1c-4630-8f6d-d3ac0ac73bfe/api-keys status=201 ms=64
+2026-11-18 13:16:00,168 INFO ffcore.access access method=POST path=/api/v1/projects/410e0629-1b1c-4630-8f6d-d3ac0ac73bfe/mcp-servers status=400 ms=51
+[RV] P1 port-switch base http://localhost path :56925/api/v1/dashboard/ -> create 400 egress_not_allowlisted
+.2026-11-18 13:16:08,398 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:16:08,643 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=238
+2026-11-18 13:16:08,752 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:16:08,934 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=177
+2026-11-18 13:16:09,003 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:16:09,181 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=173
+2026-11-18 13:16:09,275 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:16:09,348 INFO ffcore.access access method=POST path=/api/v1/projects/f1abc79f-4123-4e57-b2dd-44a786f734c6/api-keys status=201 ms=68
+2026-11-18 13:16:09,399 INFO ffcore.access access method=POST path=/api/v1/projects/f1abc79f-4123-4e57-b2dd-44a786f734c6/mcp-servers status=422 ms=45
+[RV] P1 port-switch-ip base http://127.0.0.1 path :56925/api/v1/dashboard/ -> create 422 openapi_path_invalid
+.2026-11-18 13:16:17,715 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:16:18,004 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=287
+2026-11-18 13:16:18,173 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:16:18,547 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=361
+2026-11-18 13:16:18,725 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:16:19,039 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=310
+2026-11-18 13:16:19,189 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:16:19,337 INFO ffcore.access access method=POST path=/api/v1/projects/59fb5d8c-7a19-4577-b6d2-5e37062266f1/api-keys status=201 ms=144
+2026-11-18 13:16:19,453 INFO ffcore.access access method=POST path=/api/v1/projects/59fb5d8c-7a19-4577-b6d2-5e37062266f1/mcp-servers status=422 ms=109
+[RV] P1 host-change-ip base http://127.0.0.1 path 0:56925/api/v1/dashboard/ -> create 422 openapi_path_invalid
+.2026-11-18 13:16:27,519 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:16:27,661 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=139
+2026-11-18 13:16:27,746 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:16:27,937 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=187
+2026-11-18 13:16:28,022 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:16:28,179 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=152
+2026-11-18 13:16:28,264 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:16:28,335 INFO ffcore.access access method=POST path=/api/v1/projects/c9b1e28b-61ff-4ee4-9e13-3275ee455cf9/api-keys status=201 ms=65
+2026-11-18 13:16:28,392 INFO ffcore.access access method=POST path=/api/v1/projects/c9b1e28b-61ff-4ee4-9e13-3275ee455cf9/mcp-servers status=400 ms=52
+[RV] P1 host-suffix base http://127.0.0 path .1:56925/api/v1/dashboard/ -> create 400 egress_not_allowlisted
+.2026-11-18 13:16:36,524 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:16:36,683 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=156
+2026-11-18 13:16:36,788 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:16:37,047 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=254
+2026-11-18 13:16:37,153 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:16:37,408 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=243
+2026-11-18 13:16:37,494 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:16:37,573 INFO ffcore.access access method=POST path=/api/v1/projects/af6fe509-9d69-46c8-92e4-219049f562bf/api-keys status=201 ms=71
+2026-11-18 13:16:37,631 INFO ffcore.access access method=POST path=/api/v1/projects/af6fe509-9d69-46c8-92e4-219049f562bf/mcp-servers status=422 ms=53
+[RV] P1 userinfo base http://127.0.0.1:56925 path @203.0.113.9/x -> create 422 openapi_path_invalid
+.2026-11-18 13:16:45,742 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:16:45,891 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=146
+2026-11-18 13:16:45,987 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:16:46,148 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=157
+2026-11-18 13:16:46,243 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:16:46,406 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=159
+2026-11-18 13:16:46,473 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:16:46,543 INFO ffcore.access access method=POST path=/api/v1/projects/f14f1c9d-96f0-42ae-8342-1062782f04da/api-keys status=201 ms=66
+2026-11-18 13:16:46,600 INFO ffcore.access access method=POST path=/api/v1/projects/f14f1c9d-96f0-42ae-8342-1062782f04da/mcp-servers status=422 ms=51
+[RV] P1 no-slash base http://127.0.0.1:56925/api path v1/dashboard/ -> create 422 openapi_path_invalid
+.2026-11-18 13:16:54,745 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:16:54,878 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=130
+2026-11-18 13:16:54,942 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:16:55,056 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=110
+2026-11-18 13:16:55,127 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:16:55,267 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=137
+2026-11-18 13:16:55,345 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:16:55,410 INFO ffcore.access access method=POST path=/api/v1/projects/2bfe50de-caea-4e60-811e-83cc18b3e8cf/api-keys status=201 ms=61
+2026-11-18 13:16:55,479 INFO ffcore.access access method=POST path=/api/v1/projects/2bfe50de-caea-4e60-811e-83cc18b3e8cf/mcp-servers status=201 ms=64
+2026-11-18 13:16:55,548 INFO ffcore.access access method=PATCH path=/api/v1/projects/2bfe50de-caea-4e60-811e-83cc18b3e8cf/mcp-servers/1a2f5ac9-d7ae-426e-8e72-b8697b5eaffd status=200 ms=64
+2026-11-18 13:16:55,609 INFO mcp.server.streamable_http_manager StreamableHTTP session manager started
+2026-11-18 13:16:55,722 INFO ffcore.mcp_publish mcp_server_call server=rv-0b464112 operation=escape status=ok code=None latency_ms=82
+2026-11-18 13:16:55,724 INFO mcp.server.streamable_http Terminating session: None
+2026-11-18 13:16:55,724 INFO mcp.server.streamable_http_manager StreamableHTTP session manager shutting down
+2026-11-18 13:16:55,725 INFO ffcore.access access method=POST path=/mcp/rv-0b464112/ status=200 ms=173
+[RV] P1b servers[] ignored: False ['/api/v1/dashboard/']
+.2026-11-18 13:17:03,550 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:17:03,689 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=136
+2026-11-18 13:17:03,773 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:17:03,901 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=125
+2026-11-18 13:17:03,971 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:17:04,100 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=124
+2026-11-18 13:17:04,186 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:17:04,693 INFO ffcore.access access method=POST path=/api/v1/projects/d6ccc4fa-ce24-4a00-b109-fde5566ac46a/api-keys status=201 ms=502
+2026-11-18 13:17:04,806 INFO ffcore.access access method=POST path=/api/v1/projects/d6ccc4fa-ce24-4a00-b109-fde5566ac46a/mcp-servers status=201 ms=97
+2026-11-18 13:17:04,874 INFO ffcore.access access method=PATCH path=/api/v1/projects/d6ccc4fa-ce24-4a00-b109-fde5566ac46a/mcp-servers/b68e310f-172d-4b89-81e2-52387e6b1168 status=200 ms=65
+2026-11-18 13:17:04,928 INFO mcp.server.streamable_http_manager StreamableHTTP session manager started
+2026-11-18 13:17:04,996 INFO ffcore.mcp_publish mcp_server_call server=ss-c8e45716 operation=searchDashboards status=denied code=egress_not_allowlisted latency_ms=31
+2026-11-18 13:17:04,998 INFO mcp.server.streamable_http Terminating session: None
+2026-11-18 13:17:04,998 INFO mcp.server.streamable_http_manager StreamableHTTP session manager shutting down
+2026-11-18 13:17:04,999 INFO ffcore.access access method=POST path=/mcp/ss-c8e45716/ status=200 ms=122
+[RV] P2 egress tightened after publish: http 200 | {'jsonrpc': '2.0', 'id': 1, 'result': {'content': [{'text': 'error: egress_not_allowlisted', 'type': 'text'}], 'isError': True}}
+[RV] P2 upstream hits 0 | row [('searchDashboards', 'denied', 'egress_not_allowlisted', 'api_key', 'log')]
+.2026-11-18 13:17:12,721 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:17:13,057 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=330
+2026-11-18 13:17:13,232 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:17:13,534 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=298
+2026-11-18 13:17:13,709 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:17:13,978 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=264
+2026-11-18 13:17:14,134 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:17:14,280 INFO ffcore.access access method=POST path=/api/v1/projects/2ece0cfe-502c-464e-bf13-ccb7aca9f372/api-keys status=201 ms=136
+2026-11-18 13:17:14,479 INFO ffcore.access access method=POST path=/api/v1/projects/2ece0cfe-502c-464e-bf13-ccb7aca9f372/mcp-servers status=201 ms=171
+2026-11-18 13:17:14,654 INFO ffcore.access access method=PATCH path=/api/v1/projects/2ece0cfe-502c-464e-bf13-ccb7aca9f372/mcp-servers/581ba789-1348-4c87-a608-c4eb0e1cc03b status=200 ms=169
+2026-11-18 13:17:14,762 DEBUG mcp.server.lowlevel.server Initializing server 'ffcore-ss-227a10d0'
+2026-11-18 13:17:14,763 INFO mcp.server.streamable_http_manager StreamableHTTP session manager started
+2026-11-18 13:17:14,763 DEBUG mcp.server.streamable_http_manager Stateless mode: Creating new transport for this request
+2026-11-18 13:17:14,970 INFO ffcore.mcp_publish mcp_server_call server=ss-227a10d0 operation=searchDashboards status=ok code=None latency_ms=137
+2026-11-18 13:17:14,976 INFO mcp.server.streamable_http Terminating session: None
+2026-11-18 13:17:14,977 INFO mcp.server.streamable_http_manager StreamableHTTP session manager shutting down
+2026-11-18 13:17:14,978 INFO ffcore.access access method=POST path=/mcp/ss-227a10d0/ status=200 ms=312
+2026-11-18 13:17:15,049 DEBUG mcp.server.lowlevel.server Initializing server 'ffcore-ss-227a10d0'
+2026-11-18 13:17:15,050 INFO mcp.server.streamable_http_manager StreamableHTTP session manager started
+2026-11-18 13:17:15,050 DEBUG mcp.server.streamable_http_manager Stateless mode: Creating new transport for this request
+2026-11-18 13:17:15,211 INFO ffcore.mcp_publish mcp_server_call server=ss-227a10d0 operation=createChart status=ok code=None latency_ms=120
+2026-11-18 13:17:15,213 INFO mcp.server.streamable_http Terminating session: None
+2026-11-18 13:17:15,214 INFO mcp.server.streamable_http_manager StreamableHTTP session manager shutting down
+2026-11-18 13:17:15,215 INFO ffcore.access access method=POST path=/mcp/ss-227a10d0/ status=200 ms=231
+2026-11-18 13:17:15,288 INFO ffcore.access access method=GET path=/api/v1/projects/2ece0cfe-502c-464e-bf13-ccb7aca9f372/mcp-servers/581ba789-1348-4c87-a608-c4eb0e1cc03b status=200 ms=68
+2026-11-18 13:17:15,374 INFO ffcore.access access method=GET path=/api/v1/projects/2ece0cfe-502c-464e-bf13-ccb7aca9f372/mcp-servers status=200 ms=71
+2026-11-18 13:17:15,494 INFO ffcore.access access method=GET path=/api/v1/projects/2ece0cfe-502c-464e-bf13-ccb7aca9f372/mcp-servers/581ba789-1348-4c87-a608-c4eb0e1cc03b/calls status=200 ms=114
+[RV] P3 token/spec visible: {'get': False, 'list': False, 'calls': False, 'spec_plain_in_db': False, 'auth_plain_in_db': False, 'audit': False, 'spec_in_get': False, 'logs': False} | upstream got bearer: [True, True] | audit rows 4
+.2026-11-18 13:17:22,618 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:17:22,950 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=318
+2026-11-18 13:17:23,142 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:17:23,374 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=228
+2026-11-18 13:17:23,500 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:17:23,730 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=223
+2026-11-18 13:17:23,869 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:17:23,980 INFO ffcore.access access method=POST path=/api/v1/projects/a877d2ec-a481-4ad5-8aef-ac9e30c35f8a/api-keys status=201 ms=107
+2026-11-18 13:17:24,102 INFO ffcore.access access method=POST path=/api/v1/projects/a877d2ec-a481-4ad5-8aef-ac9e30c35f8a/mcp-servers status=201 ms=116
+2026-11-18 13:17:24,200 INFO ffcore.access access method=PATCH path=/api/v1/projects/a877d2ec-a481-4ad5-8aef-ac9e30c35f8a/mcp-servers/b04c0868-7934-4fda-8071-67f4a9839cfc status=200 ms=94
+2026-11-18 13:17:24,279 INFO mcp.server.streamable_http_manager StreamableHTTP session manager started
+2026-11-18 13:17:24,371 INFO ffcore.mcp_publish mcp_server_call server=rv-5628db06 operation=dots status=error code=invalid_arguments latency_ms=49
+2026-11-18 13:17:24,373 INFO mcp.server.streamable_http Terminating session: None
+2026-11-18 13:17:24,373 INFO mcp.server.streamable_http_manager StreamableHTTP session manager shutting down
+2026-11-18 13:17:24,375 INFO ffcore.access access method=POST path=/mcp/rv-5628db06/ status=200 ms=168
+[RV] P4 pk '..' -> upstream path [] | error True
+2026-11-18 13:17:24,424 INFO mcp.server.streamable_http_manager StreamableHTTP session manager started
+2026-11-18 13:17:24,506 INFO ffcore.mcp_publish mcp_server_call server=rv-5628db06 operation=dots status=denied code=openapi_path_invalid latency_ms=41
+2026-11-18 13:17:24,509 INFO mcp.server.streamable_http Terminating session: None
+2026-11-18 13:17:24,509 INFO mcp.server.streamable_http_manager StreamableHTTP session manager shutting down
+2026-11-18 13:17:24,511 INFO ffcore.access access method=POST path=/mcp/rv-5628db06/ status=200 ms=132
+[RV] P4 pk '../..' -> upstream path [] | error True
+2026-11-18 13:17:24,555 INFO mcp.server.streamable_http_manager StreamableHTTP session manager started
+2026-11-18 13:17:24,633 INFO ffcore.mcp_publish mcp_server_call server=rv-5628db06 operation=dots status=error code=invalid_arguments latency_ms=37
+2026-11-18 13:17:24,636 INFO mcp.server.streamable_http Terminating session: None
+2026-11-18 13:17:24,637 INFO mcp.server.streamable_http_manager StreamableHTTP session manager shutting down
+2026-11-18 13:17:24,638 INFO ffcore.access access method=POST path=/mcp/rv-5628db06/ status=200 ms=123
+[RV] P4 pk '%2e%2e' -> upstream path [] | error True
+2026-11-18 13:17:24,680 INFO mcp.server.streamable_http_manager StreamableHTTP session manager started
+2026-11-18 13:17:24,839 INFO ffcore.mcp_publish mcp_server_call server=rv-5628db06 operation=dots status=error code=upstream_http_404 latency_ms=86
+2026-11-18 13:17:24,843 INFO mcp.server.streamable_http Terminating session: None
+2026-11-18 13:17:24,843 INFO mcp.server.streamable_http_manager StreamableHTTP session manager shutting down
+2026-11-18 13:17:24,844 INFO ffcore.access access method=POST path=/mcp/rv-5628db06/ status=200 ms=202
+[RV] P4 pk '7' -> upstream path ['/api/v1/chart/7'] | error True
+.2026-11-18 13:17:32,275 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:17:32,495 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=215
+2026-11-18 13:17:32,627 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:17:32,902 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=257
+2026-11-18 13:17:33,034 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:17:33,232 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=191
+2026-11-18 13:17:33,315 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:17:33,436 INFO ffcore.access access method=POST path=/api/v1/projects/1c71c5be-3079-4ba8-af8f-fe34f10151c1/mcp-servers status=201 ms=110
+2026-11-18 13:17:33,502 INFO ffcore.access access method=PATCH path=/api/v1/projects/1c71c5be-3079-4ba8-af8f-fe34f10151c1/mcp-servers/2c31bda0-1167-4bd9-acea-307885c4439a status=200 ms=61
+2026-11-18 13:17:33,526 INFO ffcore.access access method=POST path=/mcp/ss-a43b25ec/ status=404 ms=16
+[RV] P5 runtime OBO other project: 404 mcp_server_not_found
+.2026-11-18 13:17:41,550 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:17:41,695 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=142
+2026-11-18 13:17:41,770 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:17:41,927 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=153
+2026-11-18 13:17:42,068 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:17:42,201 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=130
+2026-11-18 13:17:42,281 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:17:42,352 INFO ffcore.access access method=POST path=/api/v1/projects/9ca3668f-8dd4-44e6-8915-c26cd90a720c/api-keys status=201 ms=68
+2026-11-18 13:17:42,425 INFO ffcore.access access method=POST path=/api/v1/projects/9ca3668f-8dd4-44e6-8915-c26cd90a720c/mcp-servers status=201 ms=68
+2026-11-18 13:17:42,492 INFO ffcore.access access method=PATCH path=/api/v1/projects/9ca3668f-8dd4-44e6-8915-c26cd90a720c/mcp-servers/8504bb8f-018c-407c-b85c-1318555e698d status=422 ms=63
+[RV] P6 select unexposable: 422 operation_not_exposable
+2026-11-18 13:17:42,554 INFO ffcore.access access method=PATCH path=/api/v1/projects/9ca3668f-8dd4-44e6-8915-c26cd90a720c/mcp-servers/8504bb8f-018c-407c-b85c-1318555e698d status=200 ms=59
+2026-11-18 13:17:42,604 INFO mcp.server.streamable_http_manager StreamableHTTP session manager started
+2026-11-18 13:17:42,639 INFO ffcore.mcp_publish mcp_server_call server=rv-2755acb9 operation=withHeader status=error code=unknown_tool latency_ms=0
+2026-11-18 13:17:42,642 INFO mcp.server.streamable_http Terminating session: None
+2026-11-18 13:17:42,642 INFO mcp.server.streamable_http_manager StreamableHTTP session manager shutting down
+2026-11-18 13:17:42,643 INFO ffcore.access access method=POST path=/mcp/rv-2755acb9/ status=200 ms=86
+[RV] P6 call hidden op: {'content': [{'text': 'error: unknown_tool', 'type': 'text'}], 'isError': True}
+.2026-11-18 13:17:50,995 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:17:51,440 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=433
+2026-11-18 13:17:51,579 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:17:51,894 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=303
+2026-11-18 13:17:52,171 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:17:52,501 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=317
+2026-11-18 13:17:52,663 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:17:52,856 INFO ffcore.access access method=POST path=/api/v1/projects/92a9633a-abae-4481-a413-54dbc28fb2c6/tools status=201 ms=184
+[RV] P7 tool endpoint http://backend:8000/mcp/somekey/ forward_user -> 201 http://backend:8000/mcp/somekey/
+2026-11-18 13:17:52,940 INFO ffcore.access access method=POST path=/api/v1/projects/92a9633a-abae-4481-a413-54dbc28fb2c6/tools status=400 ms=76
+[RV] P7 tool endpoint http://backend:8000/api/v1/projects/ forward_user -> 400 endpoint_is_platform
+2026-11-18 13:17:53,013 INFO ffcore.access access method=POST path=/api/v1/projects/92a9633a-abae-4481-a413-54dbc28fb2c6/tools status=400 ms=68
+[RV] P7 tool endpoint http://backend:8000/mcp/somekey/ bearer -> 400 endpoint_is_platform
+2026-11-18 13:17:53,103 INFO ffcore.access access method=POST path=/api/v1/projects/92a9633a-abae-4481-a413-54dbc28fb2c6/tools status=400 ms=86
+[RV] P7 tool endpoint http://backend:9999/mcp/somekey/ forward_user -> 400 endpoint_is_platform
+2026-11-18 13:17:53,171 INFO ffcore.access access method=POST path=/api/v1/projects/92a9633a-abae-4481-a413-54dbc28fb2c6/tools status=400 ms=60
+[RV] P7 tool endpoint http://backend:8000/mcp/somekey/../../api/v1/ forward_user -> 400 endpoint_is_platform
+2026-11-18 13:17:53,263 INFO ffcore.access access method=POST path=/api/v1/projects/92a9633a-abae-4481-a413-54dbc28fb2c6/tools status=400 ms=85
+[RV] P7 tool endpoint http://backend:8000/mcp/somekey/%2e%2e/%2e%2e/api/ forward_user -> 400 endpoint_is_platform
+.2026-11-18 13:18:01,017 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:18:01,190 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=169
+2026-11-18 13:18:01,296 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:18:01,460 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=160
+2026-11-18 13:18:01,525 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:18:01,653 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=123
+2026-11-18 13:18:01,725 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:18:01,792 INFO ffcore.access access method=POST path=/api/v1/projects/0a9b1679-4ed4-41a8-b24a-be0df3e59527/api-keys status=201 ms=63
+2026-11-18 13:18:01,892 INFO ffcore.access access method=POST path=/api/v1/projects/0a9b1679-4ed4-41a8-b24a-be0df3e59527/mcp-servers status=201 ms=90
+2026-11-18 13:18:01,959 INFO ffcore.access access method=PATCH path=/api/v1/projects/0a9b1679-4ed4-41a8-b24a-be0df3e59527/mcp-servers/f8b42648-465a-44fc-ac5a-dadf02227867 status=200 ms=63
+2026-11-18 13:18:02,018 INFO mcp.server.streamable_http_manager StreamableHTTP session manager started
+2026-11-18 13:18:02,077 INFO ffcore.mcp_publish mcp_server_call server=ss-d0eac649 operation=esc status=denied code=upstream_origin_mismatch latency_ms=27
+2026-11-18 13:18:02,079 INFO mcp.server.streamable_http Terminating session: None
+2026-11-18 13:18:02,079 INFO mcp.server.streamable_http_manager StreamableHTTP session manager shutting down
+2026-11-18 13:18:02,080 INFO ffcore.access access method=POST path=/mcp/ss-d0eac649/ status=200 ms=113
+[RV] P8 stored path ':56925/api/v1/dashboard/' -> {'content': [{'text': 'error: upstream_origin_mismatch', 'type': 'text'}], 'isError': True} | hits 0 | last row ('esc', 'denied', 'upstream_origin_mismatch', 'api_key', 'log')
+2026-11-18 13:18:02,122 INFO mcp.server.streamable_http_manager StreamableHTTP session manager started
+2026-11-18 13:18:02,192 INFO ffcore.mcp_publish mcp_server_call server=ss-d0eac649 operation=esc status=denied code=upstream_origin_mismatch latency_ms=33
+2026-11-18 13:18:02,195 INFO mcp.server.streamable_http Terminating session: None
+2026-11-18 13:18:02,195 INFO mcp.server.streamable_http_manager StreamableHTTP session manager shutting down
+2026-11-18 13:18:02,196 INFO ffcore.access access method=POST path=/mcp/ss-d0eac649/ status=200 ms=108
+[RV] P8 stored path '0:1/x' -> {'content': [{'text': 'error: upstream_origin_mismatch', 'type': 'text'}], 'isError': True} | hits 0 | last row ('esc', 'denied', 'upstream_origin_mismatch', 'api_key', 'log')
+2026-11-18 13:18:02,240 INFO mcp.server.streamable_http_manager StreamableHTTP session manager started
+2026-11-18 13:18:02,294 INFO ffcore.mcp_publish mcp_server_call server=ss-d0eac649 operation=esc status=denied code=openapi_path_invalid latency_ms=24
+2026-11-18 13:18:02,296 INFO mcp.server.streamable_http Terminating session: None
+2026-11-18 13:18:02,296 INFO mcp.server.streamable_http_manager StreamableHTTP session manager shutting down
+2026-11-18 13:18:02,297 INFO ffcore.access access method=POST path=/mcp/ss-d0eac649/ status=200 ms=93
+[RV] P8 stored path '/api/../../x' -> {'content': [{'text': 'error: openapi_path_invalid', 'type': 'text'}], 'isError': True} | hits 0 | last row ('esc', 'denied', 'openapi_path_invalid', 'api_key', 'log')
+2026-11-18 13:18:02,331 INFO mcp.server.streamable_http_manager StreamableHTTP session manager started
+2026-11-18 13:18:02,393 INFO ffcore.mcp_publish mcp_server_call server=ss-d0eac649 operation=esc status=denied code=openapi_path_invalid latency_ms=27
+2026-11-18 13:18:02,395 INFO mcp.server.streamable_http Terminating session: None
+2026-11-18 13:18:02,396 INFO mcp.server.streamable_http_manager StreamableHTTP session manager shutting down
+2026-11-18 13:18:02,397 INFO ffcore.access access method=POST path=/mcp/ss-d0eac649/ status=200 ms=92
+[RV] P8 stored path '/a?b=1' -> {'content': [{'text': 'error: openapi_path_invalid', 'type': 'text'}], 'isError': True} | hits 0 | last row ('esc', 'denied', 'openapi_path_invalid', 'api_key', 'log')
+.2026-11-18 13:18:10,001 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:18:10,161 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=157
+2026-11-18 13:18:10,243 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:18:10,403 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=156
+2026-11-18 13:18:10,485 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:18:10,622 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=133
+2026-11-18 13:18:10,693 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-18 13:18:10,756 INFO ffcore.access access method=POST path=/api/v1/projects/068f98c9-964a-41b2-af90-7755de0d7a39/api-keys status=201 ms=58
+2026-11-18 13:18:10,813 INFO ffcore.access access method=POST path=/api/v1/projects/068f98c9-964a-41b2-af90-7755de0d7a39/mcp-servers status=422 ms=51
+[RV] P9 %2e%2e path key -> create 422 openapi_path_invalid
+.
+28 passed in 264.35s (0:04:24)
+exit 0

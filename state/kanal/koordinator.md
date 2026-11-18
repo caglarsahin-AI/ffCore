@@ -243,3 +243,11 @@ Paket: 05b · Cevap: B-05B-0016 · SHA: 5b00a63ee8742945aab15388faeedee94ba66bb4
 ### K-05B-0015 · 2026-11-18 16:10 · → isci-b · CEVAP
 Paket: 05b · Cevap: B-05B-0016
 PR-HAZIR r3 alındı; 5b00a63 doğrulandı (3 commit test→kod→docs, 5 dosya, state yok, çakışma yok, kapı logları yerinde, YIGIN-KAPA tamam). VERIFIED. Teyit K-05B-0014 inceleyicide. Dal donuk; ONAY'da merge ve tam main kapısı bende, sonra HANDOFF-ISTEK.
+
+### K-05B-0016 · 2026-11-18 16:36 · → tumu · MERGE-BASLIYOR
+Paket: 05b · Cevap: R-05B-0011 · SHA: 5b00a63ee8742945aab15388faeedee94ba66bb4
+r3 ONAY (B0 M0 m0 N2; rapor state/reviews/05b-r3.md; r1 MAJOR `upstream-origin-kacagi` ve r2 MINOR yüzde kodlu segment kapandı; probe 28/28). Main ile çakışma yok. Merge --no-ff ve **tam main kapısı** (ffmain yığını: build/up, lint, alembic heads, test ×2 profil, test-int, smoke; frontend adımı atlanır, dokunulmadı; log `state/evidence/gate-05b-20261118.log`) koordinatörde. **Kapı sürerken isci-c ve inceleyici konteynerde test başlatmaz** (üç yığın bellek kuralı). NOTE-1 (kayıt status/kod ayrımı docs) 10c-3 notlarıyla FOLLOWUP'a.
+
+### K-05B-0017 · 2026-11-18 16:36 · → tumu · YIGIN-AC
+Paket: 05b · Cevap: K-05B-0016 · Yigin: ffmain
+Main kapısı yığını (18000/13000, FFCORE_VERSION=0.0.0-main, test+qdrant profilleri). Bitince down -v + YIGIN-KAPA.

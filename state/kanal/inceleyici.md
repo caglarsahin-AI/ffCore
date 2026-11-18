@@ -3,9 +3,9 @@
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
 - Oturum kimliği: ffcore-inceleyici-10c2 (önceki: ffcore-inceleyici-05b, r2 için askıda)
-- Aktif paket: bekleme; sıradaki 05b r3 teyiti (K-05B-0014), sonra 10c-2 r2 kısa teyit (K-10C2-0007)
+- Aktif paket: bekleme; 05b r3 ONAY (R-05B-0011), sıradaki 10c-2 r2 kısa teyit (K-10C2-0007)
 - Durum: ACTIVE
-- Son okunan: koordinator K-10C2-0007
+- Son okunan: koordinator K-05B-0014
 
 ## Mesajlar
 - Arşiv: MERGED/kapalı paketlerin mesajları `state/kanal/arsiv/inceleyici-<paket>.md` dosyalarında (16 Kasım 2026 taşıması: 335 mesaj); ID ile atıf orada bulunur.
@@ -164,3 +164,24 @@ Bekleyen dosyalar (commit edilmedi): `state/reviews/10c-2-r1.md`, `state/evidenc
 ### R-10C2-0005 · 2026-11-18 16:04 · → koordinator · YIGIN-KAPA
 Paket: 10c-2 · Cevap: K-10C2-0005 · Yigin: ffcore-rv10c2
 `down -v` tamam; rv10c2 konteyner ve volume'u kalmadı (e2e node_modules volume'u sabahki temizlikte silinmişti). Açık FF yığınım yok. Sıradaki iş: 05b r3 teyiti (P9 tekrarı ve çift kodlama, K-05B-0013); SHA bekleniyor.
+
+### R-05B-0010 · 2026-11-18 16:13 · → koordinator · YIGIN-AC
+Paket: 05b · Cevap: K-05B-0014 · Yigin: ffcore-rv05b
+r3 teyidi (SHA 5b00a63) başlıyor. Hafif yığın yalnız `postgres redis migrate`; `--no-build --pull never`, `FFCORE_VERSION=0.0.0-05b`; kaynak worktree HEAD 5b00a63. Koşacaklar:
+- r3 probe'ları: P10 (kodlanmış anahtarlar: yükleme ve yeniden keşif) ve P11 (kodlanmış ve literal path değerleri).
+- r1/r2 probe'larının tekrarı.
+- 05b testleri iki profilde.
+Açık FF yığını yalnız bu. Sonuç R-05B-0011'de.
+
+### R-05B-0011 · 2026-11-18 16:33 · → koordinator · REVIEW-SONUC
+Paket: 05b · Cevap: K-05B-0014 · SHA: 5b00a63ee8742945aab15388faeedee94ba66bb4 · Sonuc: ONAY · Bulgu: B0 M0 m0 N2
+r3 teyidi ONAY. Rapor `state/reviews/05b-r3.md`. r2 MINOR-1 `yuzde-kodlu-nokta-segmenti` kapandı.
+- Anahtar: kodlanmış nokta, `/` ve `\`, harf duyarsız ve her kodlama derinliğinde (`%2e`, `%2F`, `%5c`, `%252e`, `%25252E`), yüklemede `422 openapi_path_invalid` alıyor; yeniden keşifte `exposable=False`. Meşru `%20`, `%C3%BC` ve `%25` geçiyor.
+- Değer: kodlanmış biçimler `invalid_arguments`. Literal `../x` ve `a/b` gibi değerleri de ikinci hat reddediyor. İkisinde de upstream'e istek gitmiyor.
+- NOTE-1: aynı türden red iki biçimde kaydediliyor. Kodlanmış değer `error` + `invalid_arguments`; literal `/` içeren değer `denied` + `openapi_path_invalid`. Ayrıca `/` içeren bir değerin artık hiç gönderilmemesi docs'ta yazılı değil. Merge'i engellemez.
+- Koşular: probe 28/28; 05b testleri 144/144 (llmaas) ve 144/144 (airgap).
+Bekleyen dosyalar (commit edilmedi): `state/reviews/05b-r3.md`, `state/evidence/05b-r3-rv-{up,probe,tests-llmaas,tests-airgap}.log`, kanal.
+
+### R-05B-0012 · 2026-11-18 16:33 · → koordinator · YIGIN-KAPA
+Paket: 05b · Cevap: K-05B-0014 · Yigin: ffcore-rv05b
+`down -v` tamam; rv05b konteyner ve volume'u kalmadı. Açık yığınım yok. 10c-2 r2 teyidi için SHA bekleniyor.

@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-c-10c2
 - Aktif paket: 10c-2 (governance ekranları + FOLLOWUP-185, FOLLOWUP-192)
 - Durum: ACTIVE (PR-HAZIR 5c27543)
-- Son okunan: koordinator K-10C2-0007; son yazılan C-10C2-0009 (ACK)
+- Son okunan: koordinator K-10C2-0007; son yazılan C-10C2-0011 (YIGIN-KAPA)
 - Önceki lease: ffcore-isci-c-sse RETIRED (fix/10b-sse-bekci MERGED 4216718; son C-SSE-0011 RETIRED); ondan önce ffcore-isci-c-10c1 RETIRED (10c-1 MERGED; son C-10C1-0015 RETIRED); ondan önce ffcore-isci-c-10bp2 RETIRED (10b-poc-2 MERGED b43770d; son C-10bp2-0019 HANDOFF)
 
 ## Mesajlar
@@ -60,3 +60,7 @@ NOTE-2 `kismi-ozet-500` şimdi (kırmızı test → kod → docs); rebase 05b ME
 ### C-10C2-0010 · 2026-11-18 16:09 · → koordinator · YIGIN-AC
 Paket: 10c-2 · Cevap: K-10C2-0006 · Yigin: ffcore-10c2
 NOTE-2 kırmızı/yeşil: postgres+redis (`up -d --wait --pull never`) + tools birim ve hedefli test-int; `--env-file .env.test`, 18420/13420.
+
+### C-10C2-0011 · 2026-11-18 16:17 · → koordinator · YIGIN-KAPA
+Paket: 10c-2 · Cevap: C-10C2-0010 · Yigin: ffcore-10c2
+`down -v`: konteyner 0, volume 0. NOTE-2 commit'li (cf93df5 test, d610ed4 fix, c67c2ec docs): uymayan özet `summary: null` + `eval_summary_invalid` uyarı logu (koşu id, eksik/geçersiz anahtarlar); doğrulama `strict=True` (gevşek kip `"yes"`'i true yapıyordu). Detay ve suite koşu listesi 200; 09.yaml değişmedi. Hedefli 34 passed (`10c-2-r2-green.log`, kırmızı `10c-2-r2-red.log`). Rebase için 05b MERGED bekleniyor.
