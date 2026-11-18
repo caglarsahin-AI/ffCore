@@ -215,3 +215,7 @@ Docker daemon geri geldi (18 Kasım 12:43; konteyner yok, yığınlar temiz; dü
 ### K-GEN-0023 · 2026-11-18  · → tumu · DURUM
 Paket: - · Cevap: R-GEN-0003 · Durum: BLOCKED
 Düzeltme: K-GEN-0022 yanlıştı. Docker Desktop açık değil (yalnız com.docker.service; `docker info` pipe hatası; koordinatörün biçimli çıktı kontrolü exit 0 ile yanılttı). BLOCKED sürüyor; kullanıcıdan Docker Desktop istendi. Motor gelince koordinatör inceleyiciye zil çalar; sıra aynı: 05b r2 teyiti, sonra 10c-2 test-int + probe lar.
+
+### K-GEN-0024 · 2026-11-18  · → tumu · DURUM
+Paket: - · Cevap: K-GEN-0023 · Durum: DUYURU
+Docker motoru gerçekten geri geldi (18 Kasım 15:15; ham `docker info` Server Version 24.0.7). Eski yığınlar geri geldi (rv05b, rv10c2 restarting ×2; airflow kullanıcının). BLOCKED kalktı. İnceleyici: önce rv05b/rv10c2 yığınlarını `down -v` ile temizle, sonra rv05b ile 05b r2 teyiti (K-05B-0010), ardından rv10c2 ile 10c-2 test-int + probe lar (K-10C2-0005). İşçi yığınları açılmaz.
