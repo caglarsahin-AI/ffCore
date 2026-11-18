@@ -8,11 +8,13 @@ import) or seeded with `make seed-eval`; there is no local item table (A5).
 
 import asyncio
 import json
+import logging
 import re
 from typing import Annotated
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Query, Request, status
+from pydantic import ValidationError
 from sqlalchemy import func, select
 
 from ffcore.api.common import ERROR_RESPONSES, SessionDep, conflict, invalid, not_found
@@ -21,6 +23,7 @@ from ffcore.api.eval_schemas import (
     EvalRunItemList,
     EvalRunList,
     EvalRunOut,
+    EvalSummary,
     FromRunItem,
     FromRunOut,
     ItemStatus,
@@ -101,6 +104,29 @@ def suite_out(row: EvalSuite) -> SuiteOut:
     return SuiteOut.model_validate(row, from_attributes=True)
 
 
+log = logging.getLogger("ffcore.evaluation.api")
+
+
+def stored_summary(row: EvalRun) -> EvalSummary | None:
+    """The exam's summary as the contract types it. A stored one that does not fit (an older
+    shape, a partial write) is answered as null and logged, never a 500 that would also break
+    the suite's exam list (10c-2 r1 NOTE-2, KARARLAR "10c-2 r1 kararları")."""
+    if row.summary is None:
+        return None
+    try:
+        return EvalSummary.model_validate(row.summary, strict=True)
+    except ValidationError as exc:
+        missing = sorted(set(EvalSummary.model_fields) - set(row.summary or {}))
+        fields = sorted({".".join(str(p) for p in e["loc"]) for e in exc.errors()})
+        log.warning(
+            "eval_summary_invalid eval_run_id=%s missing=%s invalid=%s",
+            row.id,
+            ",".join(missing) or "-",
+            ",".join(fields),
+        )
+        return None
+
+
 def run_out(row: EvalRun) -> EvalRunOut:
     plan = row.item_runs or {}
     return EvalRunOut(
@@ -113,7 +139,7 @@ def run_out(row: EvalRun) -> EvalRunOut:
         error_code=row.error_code,
         items=len(plan),
         scored=sum(1 for e in plan.values() if e.get("scored")),
-        summary=row.summary,
+        summary=stored_summary(row),
         cost_usd=float(row.cost_usd) if row.cost_usd is not None else None,
         started_at=row.started_at,
         ended_at=row.ended_at,
