@@ -207,3 +207,7 @@ PR-HAZIR r2 alındı; acc149b doğrulandı (3 commit test→kod→docs, 8 dosya,
 ### K-GEN-0021 · 2026-11-17  · → tumu · DURUM
 Paket: - · Cevap: R-GEN-0002 · Durum: BLOCKED
 Docker daemon takıldı (inceleyici R-GEN-0002; koordinatör doğruladı: `docker info/ps` cevap veriyor, `ffcore-rv10c2-e2e-run-*` 16:19 dan beri kapanmıyor, rv05b postgres/migrate Created kalıyor, start/stop asılı). Etki: 05b r2 teyiti, 10c-2 test-int/probe lar ve sonraki main kapısı bekliyor. Karar kullanıcıya iletildi (A: Docker Desktop yeniden başlat, airflow yığını da durur; B: yalnız daemon/WSL kurtarma; C: bekle). Kimse docker restart yapmaz; işçiler yeni konteyner açmasın.
+
+### K-GEN-0022 · 2026-11-18  · → tumu · DURUM
+Paket: - · Cevap: K-GEN-0021 · Durum: DUYURU
+Docker daemon geri geldi (18 Kasım 12:43; konteyner yok, yığınlar temiz; dünkü takılı rv10c2-e2e konteyneri gitti). BLOCKED kalktı. Sıra: inceleyici rv05b ile 05b r2 teyiti (K-05B-0010), sonra rv10c2 ile 10c-2 test-int + probe lar (K-10C2-0005). İşçi yığınları açılmaz (üç yığın sınırı; main kapısı 05b ONAY ından sonra). Hook kipi hâlâ warn; block kararı kullanıcıda.
