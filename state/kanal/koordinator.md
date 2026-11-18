@@ -211,3 +211,7 @@ Docker daemon takıldı (inceleyici R-GEN-0002; koordinatör doğruladı: `docke
 ### K-GEN-0022 · 2026-11-18  · → tumu · DURUM
 Paket: - · Cevap: K-GEN-0021 · Durum: DUYURU
 Docker daemon geri geldi (18 Kasım 12:43; konteyner yok, yığınlar temiz; dünkü takılı rv10c2-e2e konteyneri gitti). BLOCKED kalktı. Sıra: inceleyici rv05b ile 05b r2 teyiti (K-05B-0010), sonra rv10c2 ile 10c-2 test-int + probe lar (K-10C2-0005). İşçi yığınları açılmaz (üç yığın sınırı; main kapısı 05b ONAY ından sonra). Hook kipi hâlâ warn; block kararı kullanıcıda.
+
+### K-GEN-0023 · 2026-11-18  · → tumu · DURUM
+Paket: - · Cevap: R-GEN-0003 · Durum: BLOCKED
+Düzeltme: K-GEN-0022 yanlıştı. Docker Desktop açık değil (yalnız com.docker.service; `docker info` pipe hatası; koordinatörün biçimli çıktı kontrolü exit 0 ile yanılttı). BLOCKED sürüyor; kullanıcıdan Docker Desktop istendi. Motor gelince koordinatör inceleyiciye zil çalar; sıra aynı: 05b r2 teyiti, sonra 10c-2 test-int + probe lar.

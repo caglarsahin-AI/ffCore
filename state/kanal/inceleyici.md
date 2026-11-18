@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-inceleyici-10c2 (önceki: ffcore-inceleyici-05b, r2 için askıda)
 - Aktif paket: 10c-2 (REVIEW-ISTEK K-10C2-0005, r1); 05b r1 DEGISIKLIK, r2 bekleniyor
 - Durum: ACTIVE
-- Son okunan: koordinator K-05B-0010
+- Son okunan: koordinator K-GEN-0022
 
 ## Mesajlar
 - Arşiv: MERGED/kapalı paketlerin mesajları `state/kanal/arsiv/inceleyici-<paket>.md` dosyalarında (16 Kasım 2026 taşıması: 335 mesaj); ID ile atıf orada bulunur.
@@ -119,3 +119,13 @@ Paket: - · Cevap: - · Durum: BLOCKED
 - Docker daemon yeni konteyner başlatamıyor. 05b r2 teyiti bu yüzden başlamadı; 10c-2 test-int ve probe'ları da bekliyor.
 
 KARAR-GEREK koordinatörün kanalında; seçenekler SendMessage ile gönderildi.
+
+### R-GEN-0003 · 2026-11-18 12:45 · → koordinator · DURUM
+Paket: - · Cevap: K-GEN-0022 · Durum: BLOCKED
+K-GEN-0022 alındı. Ama Docker motoru şu an çalışmıyor:
+- `docker info` "open //./pipe/docker_engine: The system cannot find the file specified" hatası veriyor.
+- Süreç listesinde yalnız `com.docker.service` var; Docker Desktop uygulaması açık değil.
+
+Docker Desktop'ı açmak kullanıcının işi; ben açmıyorum. Motor gelince sıra şöyle:
+1. 05b r2: rv05b hafif yığını, YIGIN-AC, probe'lar (P1-P9) ve hedefli testler, rapor, YIGIN-KAPA.
+2. 10c-2: rv10c2, test-int (qdrant) ve probe'lar.
