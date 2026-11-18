@@ -344,7 +344,10 @@ exam" button is FOLLOWUP-170.
 `pass_threshold`), mean per scorer, `outcome` counts, per-`style` breakdown, the 10 worst items,
 errors, and timing. There is no model-server reset before an exam: the first run's time is
 reported as `warmup_ms` and left out of `latency_ms`. Its shape is the `EvalSummary` schema of
-09.yaml (10c-2): every key `summarize()` writes, typed; a unit test holds the two together.
+09.yaml (10c-2): every key `summarize()` writes, typed; a unit test holds the two together. A
+stored summary that does not fit it (an older shape, a partial write) is answered as
+`summary: null` and logged as `eval_summary_invalid` with the exam id and the missing or invalid
+keys; the exam and the suite's exam list still answer 200.
 
 **Every item** (10c-2, FOLLOWUP-185): `GET /projects/{pid}/eval-runs/{id}/items` with
 `status=all|failed|passed|not_run` (default `all`), `limit` 1-200 (default 50) and `offset`
