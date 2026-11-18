@@ -9,8 +9,10 @@ Rules (plan/05 A3, K-05B-0002):
 - Arguments are checked against the operation's parameters before anything is sent: unknown
   names, missing required values, null and nested values for path/query parameters are
   refused. Path values are percent-encoded whole (a value cannot add path segments) and `.` or
-  `..` is refused (a value cannot remove one either; review r1 MINOR-2).
-- A path key starts with one `/` and has no empty, `.` or `..` segment, no `?` or `#`: it is
+  `..` is refused (a value cannot remove one either; review r1 MINOR-2); so is a value holding
+  a percent-encoded `.`, `/` or backslash, at any encoding depth (review r2 MINOR-1).
+- A path key starts with one `/` and has no empty, `.` or `..` segment, no `?`, `#` or backslash,
+  and no percent-encoded `.`, `/` or backslash (`%2e`, `%2f`, `%5c`, also `%252e` ...): it is
   joined to the registered base path and must never reach another origin or leave that base
   (review r1 MAJOR-1). A document with such a key is refused at upload
   (openapi_path_invalid); in a catalog the operation is not exposable with that reason.
@@ -48,11 +50,20 @@ class ArgumentsError(ValueError):
         self.code = "invalid_arguments"
 
 
+# A percent-encoded '.', '/' or backslash, also encoded again (%252e, %25252f, ...): an upstream
+# that decodes it would see a dot segment or a new segment (review r2 MINOR-1, K-05B-0012).
+ENCODED_SEPARATOR = re.compile(r"%(?:25)*(?:2e|2f|5c)", re.IGNORECASE)
+
+
+def encoded_separator(text: str) -> bool:
+    return ENCODED_SEPARATOR.search(text) is not None
+
+
 def path_refusal(path: object) -> bool:
     """True when an OpenAPI path key could leave the base path or the origin it is joined to."""
     if not isinstance(path, str) or not path.startswith("/") or path.startswith("//"):
         return True
-    if "?" in path or "#" in path or "\\" in path:
+    if "?" in path or "#" in path or "\\" in path or encoded_separator(path):
         return True
     segments = path[1:].split("/")
     if any(seg in (".", "..") for seg in segments):
@@ -251,8 +262,8 @@ def build_request(op: dict, arguments: dict[str, Any]) -> UpstreamRequest:
         where = locations.get(name)
         if where == "path":
             text = str(_scalar(name, value))
-            if text in (".", ".."):
-                raise ArgumentsError(f"{name} cannot be a dot segment")
+            if text in (".", "..") or encoded_separator(text):
+                raise ArgumentsError(f"{name} cannot be or encode a dot segment or a separator")
             path = path.replace("{" + name + "}", quote(text, safe=""))
         elif where == "query":
             if value is not None:
