@@ -27,7 +27,10 @@ if anything.
   (`make reconvert`); the search response adds `filtered` and `rerank_truncated` (additive).
 - **Changed:** uploading identical bytes under the same name keeps the version (was version + 1;
   outcome `unchanged` as before, FOLLOWUP-157). Deleting a document or a knowledge base removes
-  its silver and `.raw.md` files; raw stays (FOLLOWUP-133).
+  its silver and `.raw.md` files; raw stays (FOLLOWUP-133). Re-uploading under an existing
+  name keeps the document's ACL when no ACL is sent (was reset to `analyst`); a different
+  ACL is admin only (403), and a name whose document the caller cannot read is 409
+  `document_name_taken` (admins exempt).
 - **Schema:** migration `04b_0001` adds `chunks.sparse` (jsonb, nullable); the bge-m3 sparse
   weights are stored with every new chunk, so Qdrant reuses unchanged vectors at a gold reindex.
   Rows written before stay `NULL` until a gold reindex or `migrate-vectors … TO=qdrant`.

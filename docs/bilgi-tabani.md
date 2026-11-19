@@ -203,6 +203,21 @@ re-embeds everything.
 - Model weights live in the `model_cache` volume, never in the image. Keep it when closing a
   stack (`docker compose down`, not `down -v`).
 
+## Who changes a document's ACL (04b)
+
+Only a project admin changes a document's ACL. There are two ways, and both pass the same role
+check: `PATCH …/documents/{id}` with `acl_roles`, `acl_users` or `acl_open`, and an upload under
+the name of an existing document.
+
+- An upload under an existing name that sends an ACL different from the document's is 403
+  `insufficient_role` for anyone but an admin; nothing is written. An upload without ACL fields
+  keeps the document's ACL (the `analyst` default is for new documents only).
+- An upload under the name of a document the caller cannot read is 409 `document_name_taken`;
+  the document's content, version and ACL stay. The answer shows that the name exists, nothing
+  more. A project admin is exempt, so a document readable by named users only (which hides it
+  from the admin too) can still be replaced.
+- `ingest-raw` (CLI, the operator) is not an API caller and is not affected.
+
 ## Moving vectors between drivers (`migrate-vectors`, 04b)
 
 ```bash
