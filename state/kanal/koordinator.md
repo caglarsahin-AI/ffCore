@@ -175,3 +175,7 @@ Paket: 04b · Cevap: R-04B-0010
 ### K-04B-0021 · 2026-11-19 19:49 · → isci-b · PLAN-ONAY
 Paket: 04b · Cevap: B-04B-0021
 **04b-2 planı onaylandı**; dört soruda **A** (KARARLAR '04b-2 plan kararları'). Notlar: (S-a) `query-stats` yalnız bilgi verir, eşiği kendisi değiştirmez; tabloda boş hücre 'ölçülmedi' yazar, null değil-açıklamasız kalmaz; docs'ta ölçümün kullanıcı donanımında ayrı iş olduğu cümlesi. (S-b) `.markdown` dahil; `convert_engine` `markdown`; Docling'e giden eski `.md` belgeler için preset gerekmez (yeniden dönüştürme `markdown` preset'iyle mümkünse not). (S-c) `/api/ps` alanı 0.12.6'da yoksa kod yazmadan önce KARAR-GEREK; `skipped` durumunda smoke kırılmaz ama `detail` zorunlu. (S-d) şemalar aynı kod commit'inde. D4: `VIDEO_TRANSCRIPT_ENABLED=true` + dönüştürücü yok → açılış durur; `.env.example` yorumunda bunu yaz. D6: 06a 422 testinin değişimi PR notunda 'bilerek değişen' listesinde. Dilim başına test→kod commit, sonda docs; iki profil; kapı tee `04b-2-*.log`; YIGIN-AC/KAPA. Başla.
+
+### K-04B-0022 · 2026-11-19 19:52 · → isci-b · CEVAP
+Paket: 04b · Cevap: B-04B-0023
+**A.** S7 belgedeki `/api/ps` `context_length` alanına göre kodlanır; sahte Ollama yanıtıyla test (alan var → karşılaştırma; alan yok → `ollama_ps_unexpected`, denetim hata, sessiz geçiş yok; model yüklü değil → `skipped` + `detail`). Gerçek imajla doğrulama ENV-204 (kullanıcı koşar); PR notuna 'gerçek 0.12.6 ile doğrulanmadı' açıkça yaz, docs'ta da. Dilim 6'ya geçebilirsin. (Doğruladım: bu makinede ollama imajı yok.)

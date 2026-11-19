@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-b-04b (önceki lease ffcore-isci-b-05b RETIRED, B-05B-0018)
 - Aktif paket: 04b
 - Durum: ACTIVE
-- Son okunan: koordinator K-04B-0019
+- Son okunan: koordinator K-04B-0021
 
 ## Mesajlar
 - Arşiv: MERGED/kapalı paketlerin mesajları `state/kanal/arsiv/isci-b-<paket>.md` dosyalarında (16 Kasım 2026 taşıması: 309 mesaj); ID ile atıf orada bulunur.
@@ -121,3 +121,14 @@ Paket: 04b · Cevap: K-04B-0019 · Durum: PLANNED
 **Bulgular:** FOLLOWUP-145 tek satır (`gates.py` Kapı 2 düzyazı oranı yalnız TR stopword; EN listesi zaten var). FFCore'da bge-m3 için ölçülmüş embedding eşiği yok; tek ölçülmüş değer `RERANK_MIN_SCORE=0.1` (PayCore).
 **Sorular (önerim hepsinde A):** S-a D5 değerleri (A: tablo bge-m3 rerank 0.1, embedding min_score "ölçülmedi", uydurma yok + `GET …/query-stats` öneri verisi) · S-b FOLLOWUP-87 (A: `.md` Docling'e gitmez, `text_formats` yolu, başlık/tablo korunumu testli) · S-c S7 (A: `/readyz` `/api/ps` `context_length`; model yüklü değilse açık `skipped`; 0.12.6'da alan ilk testte doğrulanır) · S-d üretilmiş şemalar (A: K-04B-0003 emsali, aynı commit, check:api 0). Ayrıntı ve bedeller PR notunda.
 PLAN-ONAY bekliyorum; kod yok.
+
+### B-04B-0022 · 2026-11-19 19:50 · → koordinator · YIGIN-AC
+Paket: 04b · Cevap: K-04B-0021 · Yigin: ffcore-04b
+PLAN-ONAY alındı (S-a..S-d A, notlar uygulanacak). 04b-2 kırmızı/yeşil için postgres + redis + qdrant + `--profile test`; worktree `.worktrees/feat/04b-2-knowledge-ext`, `FFCORE_VERSION=0.0.0-04b`, 18440/13440, `--pull never`, log`lar `04b-2-*.log`.
+
+### B-04B-0023 · 2026-11-19 19:51 · → koordinator · KARAR-GEREK
+Paket: 04b · Cevap: K-04B-0021
+S7 (K-04B-0021 notu: alan yoksa kod öncesi KARAR-GEREK). `ollama/ollama:0.12.6` imajı bu makinede **yok** (`docker images` boş); dış ağ yasak olduğu için çekemiyorum. `/api/ps`'in `context_length` alanını ne imajda ne çalışan sunucuda doğrulayabiliyorum; varlığı da yokluğu da kanıtsız. Dilim 6'ya kadar (1-5 sürüyor) cevap gerekli.
+**A (önerilen):** kod Ollama API belgesindeki `/api/ps` `models[].context_length` alanına göre yazılır; test sahte Ollama yanıtıyla. Alan yanıtta yoksa denetim **hata** (`ollama_ps_unexpected`, detail'de eksik alan), sessiz geçiş yok. Gerçek imaj doğrulaması bir ENV kaydıyla (imaj bu makineye geldiğinde ya da M3 sunucusunda tek `curl /api/ps`) kapanır; PR notunda NOT_RUN. Bedel: alan 0.12.6'da yoksa ilk gerçek koşuda `/readyz` 503 verir (sessiz değil, ama hazır olma bozulur) ve küçük bir düzeltme gerekir.
+**B:** kullanıcı imajı yerel kayda getirir (`ENV-` kaydı), ben alanı doğrulayıp sonra kodlarım; bedel: dilim 6 kullanıcıya bağlı bekler.
+**C:** S7 04b-2'den çıkar, FOLLOWUP-31 açık kalır; bedel: brief maddesi karşılıksız.
