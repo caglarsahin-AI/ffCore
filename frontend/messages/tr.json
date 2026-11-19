@@ -413,7 +413,34 @@
     "retentionOutOfRange": "Gün sayısı bu veri sınıfı için izin verilen aralığın dışında.",
     "retentionRunning": "Bir saklama geçişi zaten çalışıyor.",
     "smtpPortNotAllowed": "SMTP portu 25, 465 ya da 587 olmalı.",
-    "notificationFailed": "Deneme bildirimi iletilemedi."
+    "notificationFailed": "Deneme bildirimi iletilemedi.",
+    "openapiToolViaMcpServer": "OpenAPI belgesi doğrudan araç olarak kaydedilmez. MCP Sunucuları'nda yayınlayın, sonra o sunucuyu araçlara ekleyin.",
+    "mcpServerKeyTaken": "Bu sunucu anahtarı kurulumda zaten kullanılıyor. Anahtar /mcp/ altındaki sunucu adresinin parçasıdır, bu yüzden tek olmalı.",
+    "openapiPathInvalid": "Belgedeki bir yol çağrı için güvenli değil: tek / ile başlamalı; boş, . ya da .. segmenti, ?, #, \\ ya da yüzde kodlu . / \\ içermemeli. Belge reddedildi.",
+    "upstreamOriginMismatch": "Çağrı sunucunun upstream adresinin dışına çıkacaktı (şema, ana makine ya da port farklı), reddedildi.",
+    "upstreamUrlRefused": "Bu adres bir platform servisine ait, upstream olamaz.",
+    "endpointIsPlatform": "Bu adres platformun kendisi, burada kullanılamaz.",
+    "invalidArguments": "Araç argümanları bu operasyon için geçerli değil.",
+    "invalidAuthConfig": "Upstream kimlik alanları eksik.",
+    "specRequired": "OpenAPI sunucusu belgesini ister. Yapıştırın ya da yükleyin.",
+    "specNotApplicable": "Uzak MCP sunucusu belge almaz; kendi araçlarını listeler.",
+    "specInvalid": "Belge OpenAPI 3 (YAML ya da JSON) olarak okunamadı.",
+    "specVersionUnsupported": "Yalnız OpenAPI 3 belgeleri desteklenir.",
+    "specTooLarge": "Belge 1 000 000 karakterden büyük.",
+    "operationUnknown": "İstekteki bir operasyon belgede yok. Sunucuyu yeniden keşfedin.",
+    "operationNotExposable": "Yayınlanamayan bir operasyon seçildi. Nedeni operasyon listesinde.",
+    "aliasConflict": "İki operasyon modele aynı araç adıyla görünecekti. Farklı adlar seçin.",
+    "exposedOperationMissing": "Yayındaki bir operasyon artık belgede yok. Seçimden çıkarın ya da belgeye geri ekleyin.",
+    "guardrailPolicyNotFound": "Bu anahtarla bir guardrail politikası yok.",
+    "upstreamUnreachable": "Upstream cevap vermedi.",
+    "upstreamTimeout": "Upstream zamanında cevap vermedi.",
+    "egressNotAllowlisted": "Bu adres kurulumun dış erişim izin listesinde değil.",
+    "egressOffline": "Kurulum çevrimdışı; dış istek yapılamaz.",
+    "egressPortNotAllowed": "Bu port dış istekler için izinli değil.",
+    "egressInvalidPort": "Adresteki port geçerli değil.",
+    "egressTooManyRedirects": "Upstream çok fazla yönlendirme yaptı.",
+    "egressTimeout": "Dış istek zaman aşımına uğradı.",
+    "egressRequestFailed": "Dış istek başarısız oldu."
   },
   "ProviderTest": {
     "title": "Bağlantı testi",
@@ -654,7 +681,7 @@
   },
   "Tools": {
     "title": "Araçlar",
-    "description": "Agent'ların çağırabileceği MCP ve OpenAPI sunucuları. Sunucuyu kaydedin, aksiyonlarını keşfedin, sonra hangi aksiyonların açık olduğunu ve hangilerinin onay istediğini seçin.",
+    "description": "Agent'ların çağırabileceği MCP sunucuları. Sunucuyu kaydedin, aksiyonlarını keşfedin, sonra hangi aksiyonların açık olacağını ve hangilerinin onay isteyeceğini seçin. OpenAPI belgesi MCP Sunucuları üzerinden araç olur.",
     "add": "Araç kaydet",
     "needsAdmin": "Araçları yalnızca proje yöneticisi kaydedebilir ve değiştirebilir.",
     "emptyTitle": "Henüz araç yok",
@@ -1710,5 +1737,19 @@
     "noUsage": "Bu aralıkta kullanım yok.",
     "noUsageBody": "Projenin modelleri çağrılınca kullanım görünür.",
     "chartLabel": "Günlük girdi ve çıktı token'ı"
+  },
+  "McpServers": {
+    "reasons": {
+      "external_ref": "Başka bir belgeye atıf yapıyor (bu belgenin dışında $ref).",
+      "ref_not_found": "Belgede olmayan bir bölüme atıf yapıyor.",
+      "ref_cycle": "Şeması kendine atıf yapıyor.",
+      "openapi_path_invalid": "Yolu çağrı için güvenli değil (boş, . ya da .. segmenti, ?, #, \\ ya da yüzde kodlu . / \\).",
+      "operation_id_missing": "operationId'si yok.",
+      "operation_id_duplicate": "Başka bir operasyonla aynı operationId'yi taşıyor.",
+      "operation_name_invalid": "operationId'si araç adı olamaz (harf, rakam, _ . -, en çok 64).",
+      "parameter_location_unsupported": "path, query ya da gövde dışında bir parametre yeri kullanıyor.",
+      "parameter_name_conflict": "İki parametresi aynı adı taşıyor.",
+      "request_body_unsupported": "İstek gövdesi bir JSON nesnesi değil."
+    }
   }
 }

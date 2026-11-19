@@ -16,7 +16,6 @@ import { errorMessageKey } from "@/lib/api/errors";
 
 // Same rules as the 05a contract (ToolCreate): key pattern, address without credentials.
 const KEY = /^[a-z][a-z0-9-]{0,63}$/;
-const KINDS = ["mcp", "openapi"] as const;
 type Field = "key" | "name" | "endpoint_url" | "auth";
 type Errors = Partial<Record<Field, string>>;
 type Secrets = { token: string; name: string; value: string; username: string; password: string };
@@ -62,7 +61,6 @@ export function ToolForm({ projectId, tool, onDone }: { projectId: string; tool?
   const [values, setValues] = useState({
     key: tool?.key ?? "",
     name: tool?.name ?? "",
-    kind: (tool?.kind ?? "mcp") as (typeof KINDS)[number],
     endpoint_url: tool?.endpoint_url ?? "",
     authType: (tool?.auth.type ?? "none") as ToolAuthType,
   });
@@ -102,7 +100,8 @@ export function ToolForm({ projectId, tool, onDone }: { projectId: string; tool?
         : await create.mutateAsync({
             key: parsed.data.key,
             name: parsed.data.name,
-            kind: values.kind,
+            // 05b S5: an OpenAPI document becomes a tool only as a published MCP server.
+            kind: "mcp",
             endpoint_url: parsed.data.endpoint_url,
             auth: auth ?? { type: "none" },
           });
@@ -129,27 +128,14 @@ export function ToolForm({ projectId, tool, onDone }: { projectId: string; tool?
         <TextField id="tool-key" label={t("key")} hint={t("keyHint")} error={errors.key} value={values.key} onChange={(key) => set({ key })} disabled={editing} />
         <TextField id="tool-name" label={t("name")} error={errors.name} value={values.name} onChange={(name) => set({ name })} />
       </div>
-      <div className="grid gap-4 md:grid-cols-[12rem_1fr]">
-        <FieldShell id="tool-kind" label={t("kind")}>
-          {(a11y) => (
-            <select {...a11y} className={SELECT} value={values.kind} disabled={editing} onChange={(e) => set({ kind: e.target.value as (typeof KINDS)[number] })}>
-              {KINDS.map((kind) => (
-                <option key={kind} value={kind}>
-                  {t(`kinds.${kind}`)}
-                </option>
-              ))}
-            </select>
-          )}
-        </FieldShell>
-        <TextField
-          id="tool-endpoint"
-          label={t("endpoint")}
-          hint={t("endpointHint")}
-          error={errors.endpoint_url}
-          value={values.endpoint_url}
-          onChange={(endpoint_url) => set({ endpoint_url })}
-        />
-      </div>
+      <TextField
+        id="tool-endpoint"
+        label={t("endpoint")}
+        hint={t("endpointHint")}
+        error={errors.endpoint_url}
+        value={values.endpoint_url}
+        onChange={(endpoint_url) => set({ endpoint_url })}
+      />
       <fieldset className="flex flex-col gap-4 rounded-lg border p-4" data-testid="tool-auth">
         <legend className="px-1 text-sm font-medium">{t("auth")}</legend>
         <FieldShell id="tool-auth-type" label={t("authType")} hint={t(`authHints.${type}`)} error={errors.auth}>

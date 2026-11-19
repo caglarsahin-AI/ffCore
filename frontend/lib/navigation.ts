@@ -21,7 +21,7 @@ export const NAV_GROUPS: NavGroup[] = [
       { key: "knowledgeBases", href: "/knowledge-bases", minRole: "analyst", ready: true },
       { key: "dataSources", href: "/data-sources", minRole: "developer", ready: false },
       { key: "tools", href: "/tools", minRole: "developer", ready: true },
-      { key: "mcpServers", href: "/mcp-servers", minRole: "developer", ready: false },
+      { key: "mcpServers", href: "/mcp-servers", minRole: "developer", ready: true },
       { key: "agents", href: "/agents", minRole: "analyst", ready: true },
     ],
   },

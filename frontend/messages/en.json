@@ -413,7 +413,34 @@
     "retentionOutOfRange": "The number of days is outside the allowed range for this data class.",
     "retentionRunning": "A retention pass is already running.",
     "smtpPortNotAllowed": "The SMTP port must be 25, 465 or 587.",
-    "notificationFailed": "The test notification could not be delivered."
+    "notificationFailed": "The test notification could not be delivered.",
+    "openapiToolViaMcpServer": "An OpenAPI document is not registered as a tool directly. Publish it under MCP servers, then add that server to the tools.",
+    "mcpServerKeyTaken": "This server key is already used in the installation. The key is part of the server address under /mcp/, so it must be unique.",
+    "openapiPathInvalid": "A path in the document is not safe to call: it must start with a single /, without empty, . or .. segments, ?, #, \\ or percent-encoded . / \\. The document was refused.",
+    "upstreamOriginMismatch": "The call would leave the server's upstream address (scheme, host or port differ), so it was refused.",
+    "upstreamUrlRefused": "This address belongs to a platform service and cannot be an upstream.",
+    "endpointIsPlatform": "This address is the platform itself and cannot be used here.",
+    "invalidArguments": "The tool arguments are not valid for this operation.",
+    "invalidAuthConfig": "The upstream identity fields are not complete.",
+    "specRequired": "An OpenAPI server needs its document. Paste or upload it.",
+    "specNotApplicable": "A remote MCP server takes no document; it lists its own tools.",
+    "specInvalid": "The document could not be read as OpenAPI 3 (YAML or JSON).",
+    "specVersionUnsupported": "Only OpenAPI 3 documents are supported.",
+    "specTooLarge": "The document is larger than 1 000 000 characters.",
+    "operationUnknown": "An operation in the request is not in the document. Discover the server again.",
+    "operationNotExposable": "An operation that cannot be published was selected. Its reason is shown in the operations list.",
+    "aliasConflict": "Two operations would be shown to the model under the same tool name. Choose different names.",
+    "exposedOperationMissing": "A published operation is no longer in the document. Remove it from the selection or restore it.",
+    "guardrailPolicyNotFound": "There is no guardrail policy with this key.",
+    "upstreamUnreachable": "The upstream did not answer.",
+    "upstreamTimeout": "The upstream did not answer in time.",
+    "egressNotAllowlisted": "This address is not on the installation's outbound allow list.",
+    "egressOffline": "The installation is offline; outbound requests are not allowed.",
+    "egressPortNotAllowed": "This port is not allowed for outbound requests.",
+    "egressInvalidPort": "The port in the address is not valid.",
+    "egressTooManyRedirects": "The upstream redirected too many times.",
+    "egressTimeout": "The outbound request timed out.",
+    "egressRequestFailed": "The outbound request failed."
   },
   "ProviderTest": {
     "title": "Connection test",
@@ -654,7 +681,7 @@
   },
   "Tools": {
     "title": "Tools",
-    "description": "MCP and OpenAPI servers the agents can call. Register a server, discover its actions, then choose which actions are on and which need an approval.",
+    "description": "MCP servers the agents can call. Register a server, discover its actions, then choose which actions are on and which need an approval. An OpenAPI document becomes a tool through MCP servers.",
     "add": "Register tool",
     "needsAdmin": "Only a project admin can register or change tools.",
     "emptyTitle": "No tools yet",
@@ -1710,5 +1737,19 @@
     "noUsage": "No usage in this range.",
     "noUsageBody": "Usage appears once the project's models are called.",
     "chartLabel": "Input and output tokens per day"
+  },
+  "McpServers": {
+    "reasons": {
+      "external_ref": "Refers to another document ($ref outside this one).",
+      "ref_not_found": "Refers to a part of the document that does not exist.",
+      "ref_cycle": "Its schema refers to itself.",
+      "openapi_path_invalid": "Its path is not safe to call (empty, . or .. segment, ?, #, \\ or percent-encoded . / \\).",
+      "operation_id_missing": "It has no operationId.",
+      "operation_id_duplicate": "Another operation has the same operationId.",
+      "operation_name_invalid": "Its operationId cannot be a tool name (letters, digits, _ . -, at most 64).",
+      "parameter_location_unsupported": "It uses a parameter location other than path, query or body.",
+      "parameter_name_conflict": "Two of its parameters have the same name.",
+      "request_body_unsupported": "Its request body is not a JSON object."
+    }
   }
 }
