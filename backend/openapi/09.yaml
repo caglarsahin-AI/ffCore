@@ -710,6 +710,107 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorBody'
+  /api/v1/projects/{project_id}/eval-runs/{eval_run_id}/items:
+    get:
+      tags:
+      - evaluation
+      summary: List Eval Run Items
+      description: 'The exam''s items, one page (10c-2, FOLLOWUP-185): each combined from its runs like
+        the
+
+        summary and compare (FFCore''s own results, no Langfuse call); failed, not run, passed, not
+
+        yet scored, then by item id.'
+      operationId: list_eval_run_items_api_v1_projects__project_id__eval_runs__eval_run_id__items_get
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      - name: eval_run_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Eval Run Id
+      - name: status
+        in: query
+        required: false
+        schema:
+          enum:
+          - all
+          - failed
+          - passed
+          - not_run
+          type: string
+          description: Which items (default all).
+          default: all
+          title: Status
+        description: Which items (default all).
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 200
+          minimum: 1
+          default: 50
+          title: Limit
+      - name: offset
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 0
+          default: 0
+          title: Offset
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvalRunItemList'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
   /api/v1/projects/{project_id}/eval-runs/{eval_run_id}/cancel:
     post:
       tags:
@@ -1033,6 +1134,138 @@ components:
       - type
       - code
       title: ErrorDetail
+    EvalLatency:
+      properties:
+        p50:
+          type: integer
+          title: P50
+        max:
+          type: integer
+          title: Max
+      type: object
+      required:
+      - p50
+      - max
+      title: EvalLatency
+    EvalRunItem:
+      properties:
+        item_id:
+          type: string
+          title: Item Id
+        style:
+          type: string
+          title: Style
+        scored:
+          type: boolean
+          title: Scored
+          description: False while the exam has not scored the item yet.
+        passed:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Passed
+          description: 'None: not run (see `note`) or not scored yet.'
+        mean:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Mean
+          description: Mean over the scorers that ran; None if none did.
+        outcome:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Outcome
+        note:
+          type: string
+          title: Note
+        repeats_not_run:
+          type: string
+          title: Repeats Not Run
+          description: 'repeat > 1: the not-run code of left-out repeats.'
+        attempts:
+          type: integer
+          title: Attempts
+        run_ids:
+          items:
+            type: string
+          type: array
+          title: Run Ids
+        scores:
+          items:
+            $ref: '#/components/schemas/EvalRunItemScore'
+          type: array
+          title: Scores
+      type: object
+      required:
+      - item_id
+      - style
+      - scored
+      - passed
+      - mean
+      - outcome
+      - note
+      - repeats_not_run
+      - attempts
+      - run_ids
+      - scores
+      title: EvalRunItem
+    EvalRunItemList:
+      properties:
+        data:
+          items:
+            $ref: '#/components/schemas/EvalRunItem'
+          type: array
+          title: Data
+        total:
+          type: integer
+          title: Total
+          description: Items matching `status`, over all pages.
+        limit:
+          type: integer
+          title: Limit
+        offset:
+          type: integer
+          title: Offset
+      type: object
+      required:
+      - data
+      - total
+      - limit
+      - offset
+      title: EvalRunItemList
+      description: 'One page of an exam''s items: failed, not run, passed, not yet scored, then by item
+        id.'
+    EvalRunItemScore:
+      properties:
+        name:
+          type: string
+          title: Name
+        value:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Value
+        passed:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Passed
+        status:
+          type: string
+          title: Status
+          description: ok, error or not_run.
+        comment:
+          type: string
+          title: Comment
+      type: object
+      required:
+      - name
+      - value
+      - passed
+      - status
+      - comment
+      title: EvalRunItemScore
     EvalRunList:
       properties:
         items:
@@ -1087,10 +1320,9 @@ components:
           title: Scored
         summary:
           anyOf:
-          - additionalProperties: true
-            type: object
+          - $ref: '#/components/schemas/EvalSummary'
           - type: 'null'
-          title: Summary
+          description: Set once the exam has ended.
         cost_usd:
           anyOf:
           - type: number
@@ -1129,6 +1361,153 @@ components:
       - ended_at
       - created_at
       title: EvalRunOut
+    EvalStyleSummary:
+      properties:
+        n:
+          type: integer
+          title: N
+        passed:
+          type: integer
+          title: Passed
+        outcomes:
+          additionalProperties:
+            type: integer
+          type: object
+          title: Outcomes
+      type: object
+      required:
+      - n
+      - passed
+      - outcomes
+      title: EvalStyleSummary
+    EvalSummary:
+      properties:
+        n:
+          type: integer
+          title: N
+        scored:
+          type: integer
+          title: Scored
+        not_run:
+          additionalProperties:
+            type: integer
+          type: object
+          title: Not Run
+        passed_items:
+          type: integer
+          title: Passed Items
+        pass_rate:
+          type: number
+          title: Pass Rate
+        pass_threshold:
+          type: number
+          title: Pass Threshold
+        passed:
+          type: boolean
+          title: Passed
+        complete:
+          type: boolean
+          title: Complete
+        scores:
+          additionalProperties:
+            type: number
+          type: object
+          title: Scores
+          description: Mean of each scorer over the items it scored.
+        outcomes:
+          additionalProperties:
+            type: integer
+          type: object
+          title: Outcomes
+        styles:
+          additionalProperties:
+            $ref: '#/components/schemas/EvalStyleSummary'
+          type: object
+          title: Styles
+        worst:
+          items:
+            $ref: '#/components/schemas/EvalWorstItem'
+          type: array
+          title: Worst
+          description: At most 10 scored items, failed first.
+        errors:
+          additionalProperties:
+            type: integer
+          type: object
+          title: Errors
+        warm_cache:
+          type: boolean
+          title: Warm Cache
+        warmup_ms:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Warmup Ms
+          description: The first run's time, left out of `latency_ms`.
+        latency_ms:
+          anyOf:
+          - $ref: '#/components/schemas/EvalLatency'
+          - type: 'null'
+      type: object
+      required:
+      - n
+      - scored
+      - not_run
+      - passed_items
+      - pass_rate
+      - pass_threshold
+      - passed
+      - complete
+      - scores
+      - outcomes
+      - styles
+      - worst
+      - errors
+      - warm_cache
+      - warmup_ms
+      - latency_ms
+      title: EvalSummary
+      description: 'What `evaluation.engine.summarize()` writes once an exam has ended: every key, typed
+        (a
+
+        unit test holds the two together). `pass_rate` covers the `scored` items only; `complete` is
+
+        false when any item, or a repeat of one (`partial:<code>`), was not run (`not_run`).'
+    EvalWorstItem:
+      properties:
+        item_id:
+          type: string
+          title: Item Id
+        style:
+          type: string
+          title: Style
+        outcome:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Outcome
+        passed:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Passed
+        mean:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Mean
+        note:
+          type: string
+          title: Note
+      type: object
+      required:
+      - item_id
+      - style
+      - outcome
+      - passed
+      - mean
+      - note
+      title: EvalWorstItem
     ExpectedOutput:
       properties:
         answer:

@@ -8,20 +8,25 @@ import) or seeded with `make seed-eval`; there is no local item table (A5).
 
 import asyncio
 import json
+import logging
 import re
 from typing import Annotated
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Query, Request, status
+from pydantic import ValidationError
 from sqlalchemy import func, select
 
 from ffcore.api.common import ERROR_RESPONSES, SessionDep, conflict, invalid, not_found
 from ffcore.api.eval_schemas import (
     CompareOut,
+    EvalRunItemList,
     EvalRunList,
     EvalRunOut,
+    EvalSummary,
     FromRunItem,
     FromRunOut,
+    ItemStatus,
     SuiteCreate,
     SuiteList,
     SuiteOut,
@@ -40,6 +45,7 @@ from ffcore.core.auth import Actor, require_role
 from ffcore.core.config import Settings, get_settings
 from ffcore.core.errors import ApiError
 from ffcore.evaluation.compare import CompareError, compare
+from ffcore.evaluation.items import item_rows, select_rows
 from ffcore.evaluation.langfuse_api import LangfuseApi, LangfuseApiError
 from ffcore.evaluation.runner import Starter, start_eval
 from ffcore.models.agents import Agent, AgentVersion
@@ -98,6 +104,29 @@ def suite_out(row: EvalSuite) -> SuiteOut:
     return SuiteOut.model_validate(row, from_attributes=True)
 
 
+log = logging.getLogger("ffcore.evaluation.api")
+
+
+def stored_summary(row: EvalRun) -> EvalSummary | None:
+    """The exam's summary as the contract types it. A stored one that does not fit (an older
+    shape, a partial write) is answered as null and logged, never a 500 that would also break
+    the suite's exam list (10c-2 r1 NOTE-2, KARARLAR "10c-2 r1 kararları")."""
+    if row.summary is None:
+        return None
+    try:
+        return EvalSummary.model_validate(row.summary, strict=True)
+    except ValidationError as exc:
+        missing = sorted(set(EvalSummary.model_fields) - set(row.summary or {}))
+        fields = sorted({".".join(str(p) for p in e["loc"]) for e in exc.errors()})
+        log.warning(
+            "eval_summary_invalid eval_run_id=%s missing=%s invalid=%s",
+            row.id,
+            ",".join(missing) or "-",
+            ",".join(fields),
+        )
+        return None
+
+
 def run_out(row: EvalRun) -> EvalRunOut:
     plan = row.item_runs or {}
     return EvalRunOut(
@@ -110,7 +139,7 @@ def run_out(row: EvalRun) -> EvalRunOut:
         error_code=row.error_code,
         items=len(plan),
         scored=sum(1 for e in plan.values() if e.get("scored")),
-        summary=row.summary,
+        summary=stored_summary(row),
         cost_usd=float(row.cost_usd) if row.cost_usd is not None else None,
         started_at=row.started_at,
         ended_at=row.ended_at,
@@ -495,6 +524,26 @@ async def get_eval_run(project_id: UUID, eval_run_id: UUID, actor: Reader, sessi
     return run_out(await _eval_run(session, project_id, eval_run_id))
 
 
+@router.get("/eval-runs/{eval_run_id}/items", response_model=EvalRunItemList)
+async def list_eval_run_items(
+    project_id: UUID,
+    eval_run_id: UUID,
+    actor: Reader,
+    session: SessionDep,
+    status: Annotated[ItemStatus, Query(description="Which items (default all).")] = "all",
+    limit: Annotated[int, Query(ge=1, le=200)] = 50,
+    offset: Annotated[int, Query(ge=0)] = 0,
+):
+    """The exam's items, one page (10c-2, FOLLOWUP-185): each combined from its runs like the
+    summary and compare (FFCore's own results, no Langfuse call); failed, not run, passed, not
+    yet scored, then by item id."""
+    row = await _eval_run(session, project_id, eval_run_id)
+    rows = select_rows(item_rows(row.item_runs), status)
+    return EvalRunItemList(
+        data=rows[offset : offset + limit], total=len(rows), limit=limit, offset=offset
+    )
+
+
 @router.post("/eval-runs/{eval_run_id}/cancel", response_model=EvalRunOut)
 @audited("cancel_eval_run", "eval_run")
 async def cancel_eval_run(
@@ -538,7 +587,7 @@ async def stream_eval_run(project_id: UUID, eval_run_id: UUID, actor: Reader, se
             if out.status in ("completed", "failed", "cancelled"):
                 done = data | {
                     "error_code": out.error_code,
-                    "passed": (out.summary or {}).get("passed"),
+                    "passed": out.summary.passed if out.summary else None,
                 }
                 yield f"event: done\ndata: {json.dumps(done)}\n\n"
                 return

@@ -88,6 +88,23 @@ const KEYS = {
   force_requires_admin: "forceRequiresAdmin",
   force_reason_required: "forceReasonRequired",
   force_reason_without_force: "forceReasonWithoutForce",
+  // 03c governance (10c-2)
+  requires_console_session: "requiresConsoleSession",
+  scope_not_allowed: "scopeNotAllowed",
+  cidrs_required_for_impersonate: "cidrsRequiredForImpersonate",
+  api_key_revoked: "apiKeyRevoked",
+  quota_empty: "quotaEmpty",
+  scope_id_invalid: "scopeIdInvalid",
+  scope_id_required: "scopeIdRequired",
+  pricing_missing: "pricingMissing",
+  date_range_invalid: "dateRangeInvalid",
+  alert_kind_unavailable: "alertKindUnavailable",
+  recipients_required: "recipientsRequired",
+  thresholds_invalid: "thresholdsInvalid",
+  retention_out_of_range: "retentionOutOfRange",
+  retention_running: "retentionRunning",
+  smtp_port_not_allowed: "smtpPortNotAllowed",
+  notification_failed: "notificationFailed",
 } as const;
 
 export type ErrorMessageKey = (typeof KEYS)[keyof typeof KEYS] | "notFound" | "unexpected";

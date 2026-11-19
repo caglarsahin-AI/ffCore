@@ -52,10 +52,13 @@ test("test_10c1_1_suite_run_stream: analyst builds a suite, adds an item, runs t
   await expect(page.getByTestId("eval-status")).toHaveText("Completed", { timeout: 240_000 });
   await expect(page.getByTestId("eval-stream-state")).toHaveAttribute("data-state", "done");
 
-  // The result: passed, n/N, complete, the worst items table.
+  // The result: passed, n/N, complete, and the full item table from the items endpoint (10c-2 D8,
+  // FOLLOWUP-185; it replaced the 10-worst stand-in).
   await expect(page.getByTestId("eval-passed")).toHaveText(/^Passed/);
   await expect(page.getByTestId("eval-scored")).toContainText("1 / 1");
   await expect(page.getByTestId("eval-complete")).toHaveText(/^Complete/);
-  await expect(page.getByTestId("eval-worst").locator("tbody tr")).toHaveCount(1);
-  await expect(page.getByRole("heading", { name: /10 worst items/i })).toBeVisible();
+  const items = page.getByTestId("eval-items").locator("tbody tr");
+  await expect(items).toHaveCount(1);
+  await expect(items.first()).toHaveAttribute("data-result", "passed");
+  await expect(page.getByTestId("eval-items-range")).toContainText("1–1 / 1");
 });

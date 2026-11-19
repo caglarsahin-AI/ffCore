@@ -11,7 +11,7 @@ export type NavGroup = { key: string; items: NavItem[] };
 export const NAV_GROUPS: NavGroup[] = [
   {
     key: "overview",
-    items: [{ key: "overview", href: "/overview", minRole: "analyst", ready: false }],
+    items: [{ key: "overview", href: "/overview", minRole: "analyst", ready: true }],
   },
   {
     key: "build",
@@ -33,7 +33,9 @@ export const NAV_GROUPS: NavGroup[] = [
       { key: "evaluations", href: "/evaluations", minRole: "analyst", ready: true },
       { key: "guardrails", href: "/guardrails", minRole: "developer", ready: false },
       { key: "channels", href: "/channels", minRole: "developer", ready: false },
-      { key: "usage", href: "/usage", minRole: "admin", ready: false },
+      // 10c-2 S3: developer sees and acks alerts; rules and notification settings are admin's.
+      { key: "alerts", href: "/alerts", minRole: "developer", ready: true },
+      { key: "usage", href: "/usage", minRole: "admin", ready: true },
       { key: "systemStatus", href: "/system-status", minRole: "admin", ready: true },
     ],
   },
@@ -42,10 +44,11 @@ export const NAV_GROUPS: NavGroup[] = [
     items: [
       { key: "projects", href: "/projects", minRole: "admin", ready: true },
       { key: "users", href: "/users", minRole: "admin", ready: false, superadmin: true },
-      { key: "apiKeys", href: "/api-keys", minRole: "admin", ready: false },
-      { key: "quotas", href: "/quotas", minRole: "developer", ready: false },
+      { key: "apiKeys", href: "/api-keys", minRole: "admin", ready: true },
+      { key: "quotas", href: "/quotas", minRole: "developer", ready: true },
       { key: "audit", href: "/audit", minRole: "admin", ready: false, superadmin: true },
-      { key: "retention", href: "/retention", minRole: "admin", ready: false },
+      // 10c-2 S1: the backend serves retention (reads too) to superadmins only.
+      { key: "retention", href: "/retention", minRole: "admin", ready: true, superadmin: true },
       { key: "settings", href: "/settings", minRole: "admin", ready: false },
     ],
   },

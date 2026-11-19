@@ -18,6 +18,7 @@ EXPECTED = {
     P + "/eval-suites/{suite_id}/items/from-run/{run_id}": {"post"},  # 09-2 D3
     P + "/eval-runs/compare": {"get"},  # 09-2 D1
     P + "/eval-runs/{eval_run_id}": {"get"},
+    P + "/eval-runs/{eval_run_id}/items": {"get"},  # 10c-2 D8 (FOLLOWUP-185)
     P + "/eval-runs/{eval_run_id}/cancel": {"post"},
     P + "/eval-runs/{eval_run_id}/stream": {"get"},
 }

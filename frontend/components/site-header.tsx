@@ -1,3 +1,4 @@
+import { AlertBadge } from "@/components/governance/alert-badge";
 import { LocaleSwitcher } from "@/components/locale-switcher";
 import { ProjectSwitcher } from "@/components/project-switcher";
 import { ReadOnlyBadge } from "@/components/read-only-badge";
@@ -13,6 +14,7 @@ export function SiteHeader() {
         <Separator orientation="vertical" className="mx-1 h-4 data-vertical:self-auto" />
         <ProjectSwitcher />
         <div className="ml-auto flex flex-wrap items-center gap-3">
+          <AlertBadge />
           <ReadOnlyBadge />
           <LocaleSwitcher />
           <ThemeSwitcher />

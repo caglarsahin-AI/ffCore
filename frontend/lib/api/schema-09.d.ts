@@ -154,6 +154,28 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/projects/{project_id}/eval-runs/{eval_run_id}/items": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Eval Run Items
+         * @description The exam's items, one page (10c-2, FOLLOWUP-185): each combined from its runs like the
+         *     summary and compare (FFCore's own results, no Langfuse call); failed, not run, passed, not
+         *     yet scored, then by item id.
+         */
+        get: operations["list_eval_run_items_api_v1_projects__project_id__eval_runs__eval_run_id__items_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/projects/{project_id}/eval-runs/{eval_run_id}/cancel": {
         parameters: {
             query?: never;
@@ -317,6 +339,83 @@ export interface components {
              */
             code: string;
         };
+        /** EvalLatency */
+        EvalLatency: {
+            /** P50 */
+            p50: number;
+            /** Max */
+            max: number;
+        };
+        /** EvalRunItem */
+        EvalRunItem: {
+            /** Item Id */
+            item_id: string;
+            /** Style */
+            style: string;
+            /**
+             * Scored
+             * @description False while the exam has not scored the item yet.
+             */
+            scored: boolean;
+            /**
+             * Passed
+             * @description None: not run (see `note`) or not scored yet.
+             */
+            passed: boolean | null;
+            /**
+             * Mean
+             * @description Mean over the scorers that ran; None if none did.
+             */
+            mean: number | null;
+            /** Outcome */
+            outcome: string | null;
+            /** Note */
+            note: string;
+            /**
+             * Repeats Not Run
+             * @description repeat > 1: the not-run code of left-out repeats.
+             */
+            repeats_not_run: string;
+            /** Attempts */
+            attempts: number;
+            /** Run Ids */
+            run_ids: string[];
+            /** Scores */
+            scores: components["schemas"]["EvalRunItemScore"][];
+        };
+        /**
+         * EvalRunItemList
+         * @description One page of an exam's items: failed, not run, passed, not yet scored, then by item id.
+         */
+        EvalRunItemList: {
+            /** Data */
+            data: components["schemas"]["EvalRunItem"][];
+            /**
+             * Total
+             * @description Items matching `status`, over all pages.
+             */
+            total: number;
+            /** Limit */
+            limit: number;
+            /** Offset */
+            offset: number;
+        };
+        /** EvalRunItemScore */
+        EvalRunItemScore: {
+            /** Name */
+            name: string;
+            /** Value */
+            value: number | null;
+            /** Passed */
+            passed: boolean | null;
+            /**
+             * Status
+             * @description ok, error or not_run.
+             */
+            status: string;
+            /** Comment */
+            comment: string;
+        };
         /** EvalRunList */
         EvalRunList: {
             /** Items */
@@ -357,10 +456,8 @@ export interface components {
             items: number;
             /** Scored */
             scored: number;
-            /** Summary */
-            summary: {
-                [key: string]: unknown;
-            } | null;
+            /** @description Set once the exam has ended. */
+            summary: components["schemas"]["EvalSummary"] | null;
             /** Cost Usd */
             cost_usd: number | null;
             /** Started At */
@@ -372,6 +469,90 @@ export interface components {
              * Format: date-time
              */
             created_at: string;
+        };
+        /** EvalStyleSummary */
+        EvalStyleSummary: {
+            /** N */
+            n: number;
+            /** Passed */
+            passed: number;
+            /** Outcomes */
+            outcomes: {
+                [key: string]: number;
+            };
+        };
+        /**
+         * EvalSummary
+         * @description What `evaluation.engine.summarize()` writes once an exam has ended: every key, typed (a
+         *     unit test holds the two together). `pass_rate` covers the `scored` items only; `complete` is
+         *     false when any item, or a repeat of one (`partial:<code>`), was not run (`not_run`).
+         */
+        EvalSummary: {
+            /** N */
+            n: number;
+            /** Scored */
+            scored: number;
+            /** Not Run */
+            not_run: {
+                [key: string]: number;
+            };
+            /** Passed Items */
+            passed_items: number;
+            /** Pass Rate */
+            pass_rate: number;
+            /** Pass Threshold */
+            pass_threshold: number;
+            /** Passed */
+            passed: boolean;
+            /** Complete */
+            complete: boolean;
+            /**
+             * Scores
+             * @description Mean of each scorer over the items it scored.
+             */
+            scores: {
+                [key: string]: number;
+            };
+            /** Outcomes */
+            outcomes: {
+                [key: string]: number;
+            };
+            /** Styles */
+            styles: {
+                [key: string]: components["schemas"]["EvalStyleSummary"];
+            };
+            /**
+             * Worst
+             * @description At most 10 scored items, failed first.
+             */
+            worst: components["schemas"]["EvalWorstItem"][];
+            /** Errors */
+            errors: {
+                [key: string]: number;
+            };
+            /** Warm Cache */
+            warm_cache: boolean;
+            /**
+             * Warmup Ms
+             * @description The first run's time, left out of `latency_ms`.
+             */
+            warmup_ms: number | null;
+            latency_ms: components["schemas"]["EvalLatency"] | null;
+        };
+        /** EvalWorstItem */
+        EvalWorstItem: {
+            /** Item Id */
+            item_id: string;
+            /** Style */
+            style: string;
+            /** Outcome */
+            outcome: string | null;
+            /** Passed */
+            passed: boolean | null;
+            /** Mean */
+            mean: number | null;
+            /** Note */
+            note: string;
         };
         /**
          * ExpectedOutput
@@ -1303,6 +1484,88 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["EvalRunOut"];
+                };
+            };
+            /** @description Invalid request. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description Not authenticated. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description Role or access mode not sufficient, or cross-origin request. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description Not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description Conflict with the current state. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description Request body or parameters failed validation. */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    list_eval_run_items_api_v1_projects__project_id__eval_runs__eval_run_id__items_get: {
+        parameters: {
+            query?: {
+                /** @description Which items (default all). */
+                status?: "all" | "failed" | "passed" | "not_run";
+                limit?: number;
+                offset?: number;
+            };
+            header?: never;
+            path: {
+                project_id: string;
+                eval_run_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EvalRunItemList"];
                 };
             };
             /** @description Invalid request. */
