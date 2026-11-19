@@ -265,6 +265,39 @@ class RejectedChunk(BaseModel):
     reason: str | None
 
 
+class ScoreStats(BaseModel):
+    threshold: float | None = Field(description="The threshold in force; null: none.")
+    scored: int = Field(description="Queries with a best score of this kind.")
+    below: int | None = Field(description="Of those, below the threshold; null without one.")
+    below_ratio: float | None
+    p10: float | None
+    p50: float | None
+    p90: float | None
+
+
+class ThresholdTableRow(BaseModel):
+    embed_model: str
+    rerank_model: str | None
+    rerank_min_score: float | None = Field(description="Measured value; null: not measured.")
+    min_score: float | None = Field(description="Measured value; null: not measured.")
+    note: str
+
+
+class QueryStats(BaseModel):
+    """Best score per query against the thresholds in force (04b-2 D5). Information only: a
+    screen shows "X% of queries are below the threshold"; nothing is changed (no auto)."""
+
+    days: int
+    queries: int
+    zero_result: int
+    zero_result_ratio: float | None
+    rerank: ScoreStats
+    embed: ScoreStats
+    table: ThresholdTableRow | None = Field(
+        description="The threshold table row of the KB's embedding model; null: not in the table."
+    )
+
+
 class IngestGateReport(BaseModel):
     """Per gate the counts add up to `documents` (every document is counted once per gate).
     Only documents the caller may read are counted and listed (C15)."""

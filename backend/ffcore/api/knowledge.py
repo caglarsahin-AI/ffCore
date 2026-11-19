@@ -34,11 +34,14 @@ from ffcore.api.knowledge_schemas import (
     KnowledgeBaseList,
     KnowledgeBaseOut,
     KnowledgeBaseUpdate,
+    QueryStats,
     ReindexAccepted,
     ReindexLayer,
     ReindexRequest,
+    ScoreStats,
     SearchRequest,
     SearchResponse,
+    ThresholdTableRow,
     UploadedDocument,
     UploadResult,
 )
@@ -47,7 +50,7 @@ from ffcore.core.audit import audited
 from ffcore.core.auth import ROLE_ORDER, Actor, authorize, require_role
 from ffcore.core.config import Settings, get_settings
 from ffcore.core.errors import ApiError
-from ffcore.knowledge import ingest, jobs, report, search
+from ffcore.knowledge import ingest, jobs, report, search, thresholds
 from ffcore.knowledge.chunking import ChunkSettings
 from ffcore.knowledge.normalize import normalizer_config_id
 from ffcore.knowledge.vectorstore.base import VectorFilters, VectorStoreError, metadata_items
@@ -596,6 +599,34 @@ async def ingest_report(
     kb = await _kb(session, project_id, kb_id)
     result = await report.gate_report(session, kb.id, visible(acl_for(request, actor)), limit=limit)
     return IngestGateReport(**result.__dict__)
+
+
+@router.get("/{kb_id}/query-stats", response_model=QueryStats)
+async def query_stats(
+    project_id: UUID,
+    kb_id: UUID,
+    actor: Reader,
+    session: SessionDep,
+    settings: SettingsDep,
+    days: Annotated[int, Query(ge=1, le=365, description="Look-back window in days.")] = 30,
+):
+    """Score distribution of the KB's queries against the thresholds in force and the
+    threshold table row of its embedding model (04b-2 D5). Information only."""
+    kb = await _kb(session, project_id, kb_id)
+    stats = await thresholds.query_stats(
+        session,
+        kb.id,
+        days=days,
+        rerank_threshold=settings.rerank_min_score,
+        embed_threshold=kb.default_min_score,
+    )
+    row = thresholds.row(kb.embed_model)
+    return QueryStats(
+        **{k: v for k, v in stats.__dict__.items() if k not in {"rerank", "embed"}},
+        rerank=ScoreStats(**stats.rerank.__dict__),
+        embed=ScoreStats(**stats.embed.__dict__),
+        table=ThresholdTableRow(**row.__dict__) if row else None,
+    )
 
 
 @router.delete("/{kb_id}/documents/{document_id}", status_code=status.HTTP_204_NO_CONTENT)
