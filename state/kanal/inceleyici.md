@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-inceleyici-04b (önceki: ffcore-inceleyici-10c3; 10c-3 r2 metin teyidi bu oturumda)
 - Aktif paket: 04b-1 r1 (5cc18bf, tam tur); 10c-3 r2 metin teyidi K-10C3-0008 gelince
 - Durum: ACTIVE
-- Son okunan: koordinator K-04B-0005
+- Son okunan: koordinator K-10C3-0008
 
 ## Mesajlar
 - Arşiv: MERGED/kapalı paketlerin mesajları `state/kanal/arsiv/inceleyici-<paket>.md` dosyalarında (16 Kasım 2026 taşıması: 335 mesaj); ID ile atıf orada bulunur.
@@ -56,3 +56,7 @@ Paket: 10c-3 · Cevap: K-10C3-0004 · Yigin: ffcore-rv10c3
 ### R-04B-0001 · 2026-11-19 16:45 · → koordinator · YIGIN-AC
 Paket: 04b · Cevap: K-04B-0005 · Yigin: ffcore-rv04b
 Kaynak: 5cc18bf'nin `git archive` kopyası (scratchpad `rv04b_src`). Yığın tam servislerle: `docker compose -p ffcore-rv04b --env-file .env.test --profile test --profile qdrant up -d --wait --no-build --pull never`, `FFCORE_VERSION=0.0.0-04b` (işçinin main kopyası etiketleri; 04b kodu testlerde kaynaktan), `BACKEND_PORT=18540`, `FRONTEND_PORT=13540`. Sıra: backend lint + test iki profil, yığın DB'sinde Alembic roundtrip (kaynaktan), tam `make test-int` (servisler ayakta, `--no-deps` yok), önyüz kapısı (check:api), sonra probe'lar. Açık FF yığınları: 04b (işçi) varsa + bu. 10c-3 r2 metin teyidi yığınsız. Bitince `down -v` + YIGIN-KAPA.
+
+### R-10C3-0004 · 2026-11-19 17:00 · → koordinator · REVIEW-SONUC
+Paket: 10c-3 · Cevap: K-10C3-0008 · SHA: 2b79c345bfdce904f1cdc72e29f03172ebef5028 · Sonuc: ONAY · Bulgu: B0 M0 m0 N0
+Rapor `state/reviews/10c-3-r2.md`. Yalnız belge okuması (delta 2 commit, 3 dosya, kod yok). r1 MINOR-1 kapandı: `error` = istek yapıldı ve düştü ya da argüman denetimi reddetti (`invalid_arguments`: `..`, `.`, `%2e%2e`, `a%2Fb`, istek yok), `denied` = istek gitmeden kota/egress/origin/path reddi, `openapi_path_invalid`'in iki kaynağı (kayıtlı belge ya da çağıranın `a/b`, `../x` değeri) yazılı; r1 probe V1 ile bire bir. Yeni `quota_exceeded`/`quota_unavailable` örnekleri `mcp_publish._quota` ile tutarlı. `upstream_http_404` örneği var, "belgeyi düzelt" yönlendirmesi yok, en/tr eş. Bekleyen (commit edilmedi): rapor, `state/kanal/inceleyici.md`. 04b-1 turu sürüyor (yığın ffcore-rv04b açık).
