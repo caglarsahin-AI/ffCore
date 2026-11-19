@@ -116,7 +116,9 @@ def stored_summary(row: EvalRun) -> EvalSummary | None:
     try:
         return EvalSummary.model_validate(row.summary, strict=True)
     except ValidationError as exc:
-        missing = sorted(set(EvalSummary.model_fields) - set(row.summary or {}))
+        # A bare number or `true` is not a mapping either (FOLLOWUP-197): every key is missing.
+        keys = row.summary if isinstance(row.summary, dict) else {}
+        missing = sorted(set(EvalSummary.model_fields) - set(keys))
         fields = sorted({".".join(str(p) for p in e["loc"]) for e in exc.errors()})
         log.warning(
             "eval_summary_invalid eval_run_id=%s missing=%s invalid=%s",

@@ -42,6 +42,15 @@ export async function apiCall<T>(method: string, path: string, body?: unknown): 
   return (response.status === 204 ? undefined : await response.json()) as T;
 }
 
+// Like apiCall, but the answer comes back as it is (a test about a refusal or a failed tool call).
+export async function apiFetch(method: string, path: string, body?: unknown): Promise<Response> {
+  return fetch(`${backend()}/api/v1${path}`, {
+    method,
+    headers: { "content-type": "application/json", cookie: await superadminCookie() },
+    body: body === undefined ? undefined : JSON.stringify(body),
+  });
+}
+
 // Unique per test: tests run in parallel and the stack outlives a run.
 export function uniqueKey(name: string): string {
   return `e2e-${name}-${fixture().run}-${Math.random().toString(36).slice(2, 6)}`;

@@ -4,6 +4,20 @@ Behaviour and configuration changes that a deployment or an API client notices, 
 (handbook/RELEASE_AND_ROLLBACK.md, CHANGE_CONTROL.md). Each entry names the package and what to do,
 if anything.
 
+## 2026-11-19 · 10c-3 · MCP servers screen and monitoring; exam summary fix
+
+- **What:** the console gets the MCP servers screen (`/mcp-servers`, Build menu, developer and up;
+  changes are a project admin's): publish an OpenAPI document or a remote MCP server, choose and
+  rename its operations, publish or stop it, test the upstream, add it as a tool, and a
+  Monitoring tab with the last 24 hours and the last calls (docs/onyuz.md "MCP servers").
+- **Changed:** the tool form no longer offers the OpenAPI kind (the backend already refused it
+  with `422 openapi_tool_via_mcp_server`); OpenAPI services go through MCP servers.
+- **Fixed (09, FOLLOWUP-197):** a stored exam summary that is not an object at all (a bare number
+  or `true`) made `GET /eval-runs/{id}` and the suite's exam list answer 500; it is now
+  `summary: null` with the `eval_summary_invalid` warning, like any other summary that does not
+  fit the contract.
+- **Action:** none.
+
 ## 2026-11-17 · 05b · Published MCP servers at /mcp/{key}/
 
 - **What:** an OpenAPI 3 document or a remote MCP server can be published as an MCP server of

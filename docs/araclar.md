@@ -269,7 +269,23 @@ an `off` policy too, `enforce` enforces every rule. Rules of type `tool_args` ma
 **Log.** Every call writes one `mcp_server_calls` row (operation, status, code, latency, run,
 caller; no arguments or results) and one `mcp_server_call` audit row.
 `GET .../mcp-servers/{id}/calls?hours=24` gives requests, errors, blocked calls, p50/p95 latency
-and the last 50 calls (the MCP monitoring screen, 10c-3).
+and the last 50 calls (the console's MCP monitoring tab, 10c-3; docs/onyuz.md "MCP servers").
+
+**Reading a call's status (FOLLOWUP-195).** `status` and `error_code` together say where a call
+ended:
+
+| `status` | Meaning | Example codes |
+|---|---|---|
+| `ok` | The upstream answered (2xx). | none |
+| `error` | The request was made and failed, or the argument check refused it (then no request left). | `upstream_http_<status>` (for example `upstream_http_404`), `upstream_timeout`, `upstream_unreachable`, `upstream_response_too_large`, `invalid_arguments` (a bad argument, also a path value such as `..`, `.`, `%2e%2e` or `a%2Fb`) |
+| `denied` | Refused before any request left by a quota, egress, origin or path rule: nothing reached the upstream. | `quota_exceeded`, `quota_unavailable`, `upstream_origin_mismatch`, `upstream_url_refused`, `endpoint_url_not_allowed`, `egress_not_allowlisted` and the other `egress_*` refusals, `openapi_path_invalid` |
+| `blocked` | Stopped by the guardrail policy (`tool.pre` or `tool.post`). | `guardrail_blocked` |
+
+`openapi_path_invalid` under `denied` has two sources: an unsafe path in the stored document, or
+a caller's path value that contains `/` or `\` (such as `a/b` or `../x`). In both cases no request
+left; the `error_code` says why a call ended where it did, so read it together with the caller's
+arguments. `errors` in the summary counts every call that did not end `ok` (error, denied and
+blocked).
 
 **Agents use it** through the tools registry: `POST .../mcp-servers/{id}/tools` adds a tool with
 the server's key at `<INTERNAL_API_URL>/mcp/<key>/` and `forward_user`, so the runtime calls the
