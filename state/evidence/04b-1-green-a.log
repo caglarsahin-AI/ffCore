@@ -1,0 +1,348 @@
+5 files reformatted, 478 files left unchanged
+All checks passed!
+.......F.........FF....................................s..........s      [100%]
+=================================== FAILURES ===================================
+________________ test_04b_1_migration_is_the_single_head_on_05b ________________
+
+    def test_04b_1_migration_is_the_single_head_on_05b():
+        scripts = _scripts()
+        assert scripts.get_heads() == ["04b_0001"]
+        revision = scripts.get_revision("04b_0001")
+        assert revision.down_revision == "05b_0001"
+>       assert revision.branch_labels == {"04b"}
+E       AssertionError: assert {'03a', '03b'...', '05a', ...} == {'04b'}
+E         
+E         Extra items in the left set:
+E         '03a'
+E         '06b'
+E         '05b'
+E         '06a'
+E         '05a'...
+E         
+E         ...Full output truncated, use '-vv' to show
+
+tests/contract/test_04b_schema.py:29: AssertionError
+_________ test_04b_1_pgvector_to_qdrant_counts_equal_and_acl_in_query __________
+
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_ba77c1b3d5ae) at 0x7f8370e7caa0>
+make_project = <function make_project.<locals>.make at 0x7f8370ef3880>
+settings = Settings(deploy_profile='airgap', inference_backend='ollama', offline=True, database_url=SecretStr('**********'), serv...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+
+    def test_04b_1_pgvector_to_qdrant_counts_equal_and_acl_in_query(pg, make_project, settings):
+        kb_id = make_kb(pg, make_project())
+>       docs = ingest_docs(
+            settings,
+            kb_id,
+            [("admin.md", ("admin",)), ("analyst.md", ("analyst",)), ("open.md", ())],
+            PgVectorStore(),
+        )
+
+tests/integration/test_04b_migrate.py:148: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/test_04b_migrate.py:121: in ingest_docs
+    return run(go())
+           ^^^^^^^^^
+tests/integration/test_04b_migrate.py:73: in run
+    return asyncio.run(coro)
+           ^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/runners.py:195: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/base_events.py:691: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    async def go():
+        out = {}
+        for name, roles in docs:
+            async with db.session_scope() as session:
+                document, _ = await ingest.register_upload(
+                    session,
+                    kb_id,
+                    filename=name,
+                    data=markdown(1, 2),
+                    acl_roles=list(roles),
+                    acl_users=[],
+                    created_by="test",
+                    settings=settings,
+                )
+                await session.commit()
+                out[name] = document.id
+            report = await ingest.ingest_document(
+                out[name],
+                settings=settings,
+                store=store,
+                embed_client=ingest.LocalEmbedClient(settings, embedder),
+                convert=convert_without_weights,
+            )
+>           assert report.status == "indexed", report
+E           AssertionError: IngestReport(document_id=UUID('4aa25f97-0b6f-4a48-9ba1-20f6ce47fa51'), status='skipped', reused=0, embedded=0)
+E           assert 'skipped' == 'indexed'
+E             
+E             - indexed
+E             + skipped
+
+tests/integration/test_04b_migrate.py:118: AssertionError
+----------------------------- Captured stderr call -----------------------------
+--- Logging error ---
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/logging/__init__.py", line 1163, in emit
+    stream.write(msg + self.terminator)
+ValueError: I/O operation on closed file.
+Call stack:
+  File "/opt/venv/bin/pytest", line 10, in <module>
+    sys.exit(_console_main())
+  File "/opt/venv/lib/python3.12/site-packages/_pytest/config/__init__.py", line 286, in _console_main
+    code = _main(prog=_get_prog_name(sys.argv))
+  File "/opt/venv/lib/python3.12/site-packages/_pytest/config/__init__.py", line 262, in _main
+    ret: ExitCode | int = config.hook.pytest_cmdline_main(config=config)
+  File "/opt/venv/lib/python3.12/site-packages/pluggy/_caller.py", line 197, in __call__
+    return self._hookexec(
+  File "/opt/venv/lib/python3.12/site-packages/pluggy/_manager.py", line 183, in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+  File "/opt/venv/lib/python3.12/site-packages/pluggy/_execution.py", line 147, in _multicall
+    res = hook_impl.function(*args)
+  File "/opt/venv/lib/python3.12/site-packages/_pytest/main.py", line 380, in pytest_cmdline_main
+    return wrap_session(config, _main)
+  File "/opt/venv/lib/python3.12/site-packages/_pytest/main.py", line 333, in wrap_session
+    session.exitstatus = doit(config, session) or 0
+  File "/opt/venv/lib/python3.12/site-packages/_pytest/main.py", line 387, in _main
+    config.hook.pytest_runtestloop(session=session)
+  File "/opt/venv/lib/python3.12/site-packages/pluggy/_caller.py", line 197, in __call__
+    return self._hookexec(
+  File "/opt/venv/lib/python3.12/site-packages/pluggy/_manager.py", line 183, in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+  File "/opt/venv/lib/python3.12/site-packages/pluggy/_execution.py", line 147, in _multicall
+    res = hook_impl.function(*args)
+  File "/opt/venv/lib/python3.12/site-packages/_pytest/main.py", line 411, in pytest_runtestloop
+    item.config.hook.pytest_runtest_protocol(item=item, nextitem=nextitem)
+  File "/opt/venv/lib/python3.12/site-packages/pluggy/_caller.py", line 197, in __call__
+    return self._hookexec(
+  File "/opt/venv/lib/python3.12/site-packages/pluggy/_manager.py", line 183, in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+  File "/opt/venv/lib/python3.12/site-packages/pluggy/_execution.py", line 147, in _multicall
+    res = hook_impl.function(*args)
+  File "/opt/venv/lib/python3.12/site-packages/_pytest/runner.py", line 118, in pytest_runtest_protocol
+    runtestprotocol(item, nextitem=nextitem)
+  File "/opt/venv/lib/python3.12/site-packages/_pytest/runner.py", line 139, in runtestprotocol
+    reports.append(call_and_report(item, "call", log))
+  File "/opt/venv/lib/python3.12/site-packages/_pytest/runner.py", line 249, in call_and_report
+    call = CallInfo.from_call(
+  File "/opt/venv/lib/python3.12/site-packages/_pytest/runner.py", line 361, in from_call
+    result: TResult | None = func()
+  File "/opt/venv/lib/python3.12/site-packages/_pytest/runner.py", line 250, in <lambda>
+    lambda: runtest_hook(item=item, **kwds),
+  File "/opt/venv/lib/python3.12/site-packages/pluggy/_caller.py", line 197, in __call__
+    return self._hookexec(
+  File "/opt/venv/lib/python3.12/site-packages/pluggy/_manager.py", line 183, in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+  File "/opt/venv/lib/python3.12/site-packages/pluggy/_execution.py", line 147, in _multicall
+    res = hook_impl.function(*args)
+  File "/opt/venv/lib/python3.12/site-packages/_pytest/runner.py", line 184, in pytest_runtest_call
+    item.runtest()
+  File "/opt/venv/lib/python3.12/site-packages/_pytest/python.py", line 1798, in runtest
+    self.ihook.pytest_pyfunc_call(pyfuncitem=self)
+  File "/opt/venv/lib/python3.12/site-packages/pluggy/_caller.py", line 197, in __call__
+    return self._hookexec(
+  File "/opt/venv/lib/python3.12/site-packages/pluggy/_manager.py", line 183, in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+  File "/opt/venv/lib/python3.12/site-packages/pluggy/_execution.py", line 147, in _multicall
+    res = hook_impl.function(*args)
+  File "/opt/venv/lib/python3.12/site-packages/_pytest/python.py", line 187, in pytest_pyfunc_call
+    result = testfunction(**testargs)
+  File "/work/backend/tests/integration/test_04b_migrate.py", line 148, in test_04b_1_pgvector_to_qdrant_counts_equal_and_acl_in_query
+    docs = ingest_docs(
+  File "/work/backend/tests/integration/test_04b_migrate.py", line 121, in ingest_docs
+    return run(go())
+  File "/work/backend/tests/integration/test_04b_migrate.py", line 73, in run
+    return asyncio.run(coro)
+  File "/usr/local/lib/python3.12/asyncio/runners.py", line 195, in run
+    return runner.run(main)
+  File "/usr/local/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 678, in run_until_complete
+    self.run_forever()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 645, in run_forever
+    self._run_once()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 1999, in _run_once
+    handle._run()
+  File "/usr/local/lib/python3.12/asyncio/events.py", line 88, in _run
+    self._context.run(self._callback, *self._args)
+  File "/work/backend/tests/integration/test_04b_migrate.py", line 111, in go
+    report = await ingest.ingest_document(
+  File "/work/backend/ffcore/knowledge/ingest.py", line 554, in ingest_document
+    return await _gold(document_id, settings=settings, store=store, embed_client=embed_client)
+  File "/work/backend/ffcore/knowledge/ingest.py", line 677, in _gold
+    log.info("gold document=%s reused=%d embedded=%d", document_id, reused, len(vectors))
+Message: 'gold document=%s reused=%d embedded=%d'
+Arguments: (UUID('68c9d972-f19b-4fc9-b35f-8605e9bc5abb'), 0, 1)
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.knowledge.ingest:ingest.py:677 gold document=68c9d972-f19b-4fc9-b35f-8605e9bc5abb reused=0 embedded=1
+_____________ test_04b_1_qdrant_to_pgvector_fills_missing_vectors ______________
+
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_ba77c1b3d5ae) at 0x7f8370eb4980>
+make_project = <function make_project.<locals>.make at 0x7f8370eaec00>
+settings = Settings(deploy_profile='airgap', inference_backend='ollama', offline=True, database_url=SecretStr('**********'), serv...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+
+    def test_04b_1_qdrant_to_pgvector_fills_missing_vectors(pg, make_project, settings):
+        kb_id = make_kb(pg, make_project())
+        qdrant = QdrantStore(settings)
+        try:
+>           docs = ingest_docs(
+                settings, kb_id, [("admin.md", ("admin",)), ("analyst.md", ("analyst",))], qdrant
+            )
+
+tests/integration/test_04b_migrate.py:175: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/test_04b_migrate.py:121: in ingest_docs
+    return run(go())
+           ^^^^^^^^^
+tests/integration/test_04b_migrate.py:73: in run
+    return asyncio.run(coro)
+           ^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/runners.py:195: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/base_events.py:691: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    async def go():
+        out = {}
+        for name, roles in docs:
+            async with db.session_scope() as session:
+                document, _ = await ingest.register_upload(
+                    session,
+                    kb_id,
+                    filename=name,
+                    data=markdown(1, 2),
+                    acl_roles=list(roles),
+                    acl_users=[],
+                    created_by="test",
+                    settings=settings,
+                )
+                await session.commit()
+                out[name] = document.id
+            report = await ingest.ingest_document(
+                out[name],
+                settings=settings,
+                store=store,
+                embed_client=ingest.LocalEmbedClient(settings, embedder),
+                convert=convert_without_weights,
+            )
+>           assert report.status == "indexed", report
+E           AssertionError: IngestReport(document_id=UUID('064c0a02-bcc4-4dd3-9138-07c85ee30be1'), status='skipped', reused=0, embedded=0)
+E           assert 'skipped' == 'indexed'
+E             
+E             - indexed
+E             + skipped
+
+tests/integration/test_04b_migrate.py:118: AssertionError
+----------------------------- Captured stderr call -----------------------------
+--- Logging error ---
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/logging/__init__.py", line 1163, in emit
+    stream.write(msg + self.terminator)
+ValueError: I/O operation on closed file.
+Call stack:
+  File "/opt/venv/bin/pytest", line 10, in <module>
+    sys.exit(_console_main())
+  File "/opt/venv/lib/python3.12/site-packages/_pytest/config/__init__.py", line 286, in _console_main
+    code = _main(prog=_get_prog_name(sys.argv))
+  File "/opt/venv/lib/python3.12/site-packages/_pytest/config/__init__.py", line 262, in _main
+    ret: ExitCode | int = config.hook.pytest_cmdline_main(config=config)
+  File "/opt/venv/lib/python3.12/site-packages/pluggy/_caller.py", line 197, in __call__
+    return self._hookexec(
+  File "/opt/venv/lib/python3.12/site-packages/pluggy/_manager.py", line 183, in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+  File "/opt/venv/lib/python3.12/site-packages/pluggy/_execution.py", line 147, in _multicall
+    res = hook_impl.function(*args)
+  File "/opt/venv/lib/python3.12/site-packages/_pytest/main.py", line 380, in pytest_cmdline_main
+    return wrap_session(config, _main)
+  File "/opt/venv/lib/python3.12/site-packages/_pytest/main.py", line 333, in wrap_session
+    session.exitstatus = doit(config, session) or 0
+  File "/opt/venv/lib/python3.12/site-packages/_pytest/main.py", line 387, in _main
+    config.hook.pytest_runtestloop(session=session)
+  File "/opt/venv/lib/python3.12/site-packages/pluggy/_caller.py", line 197, in __call__
+    return self._hookexec(
+  File "/opt/venv/lib/python3.12/site-packages/pluggy/_manager.py", line 183, in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+  File "/opt/venv/lib/python3.12/site-packages/pluggy/_execution.py", line 147, in _multicall
+    res = hook_impl.function(*args)
+  File "/opt/venv/lib/python3.12/site-packages/_pytest/main.py", line 411, in pytest_runtestloop
+    item.config.hook.pytest_runtest_protocol(item=item, nextitem=nextitem)
+  File "/opt/venv/lib/python3.12/site-packages/pluggy/_caller.py", line 197, in __call__
+    return self._hookexec(
+  File "/opt/venv/lib/python3.12/site-packages/pluggy/_manager.py", line 183, in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+  File "/opt/venv/lib/python3.12/site-packages/pluggy/_execution.py", line 147, in _multicall
+    res = hook_impl.function(*args)
+  File "/opt/venv/lib/python3.12/site-packages/_pytest/runner.py", line 118, in pytest_runtest_protocol
+    runtestprotocol(item, nextitem=nextitem)
+  File "/opt/venv/lib/python3.12/site-packages/_pytest/runner.py", line 139, in runtestprotocol
+    reports.append(call_and_report(item, "call", log))
+  File "/opt/venv/lib/python3.12/site-packages/_pytest/runner.py", line 249, in call_and_report
+    call = CallInfo.from_call(
+  File "/opt/venv/lib/python3.12/site-packages/_pytest/runner.py", line 361, in from_call
+    result: TResult | None = func()
+  File "/opt/venv/lib/python3.12/site-packages/_pytest/runner.py", line 250, in <lambda>
+    lambda: runtest_hook(item=item, **kwds),
+  File "/opt/venv/lib/python3.12/site-packages/pluggy/_caller.py", line 197, in __call__
+    return self._hookexec(
+  File "/opt/venv/lib/python3.12/site-packages/pluggy/_manager.py", line 183, in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+  File "/opt/venv/lib/python3.12/site-packages/pluggy/_execution.py", line 147, in _multicall
+    res = hook_impl.function(*args)
+  File "/opt/venv/lib/python3.12/site-packages/_pytest/runner.py", line 184, in pytest_runtest_call
+    item.runtest()
+  File "/opt/venv/lib/python3.12/site-packages/_pytest/python.py", line 1798, in runtest
+    self.ihook.pytest_pyfunc_call(pyfuncitem=self)
+  File "/opt/venv/lib/python3.12/site-packages/pluggy/_caller.py", line 197, in __call__
+    return self._hookexec(
+  File "/opt/venv/lib/python3.12/site-packages/pluggy/_manager.py", line 183, in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+  File "/opt/venv/lib/python3.12/site-packages/pluggy/_execution.py", line 147, in _multicall
+    res = hook_impl.function(*args)
+  File "/opt/venv/lib/python3.12/site-packages/_pytest/python.py", line 187, in pytest_pyfunc_call
+    result = testfunction(**testargs)
+  File "/work/backend/tests/integration/test_04b_migrate.py", line 175, in test_04b_1_qdrant_to_pgvector_fills_missing_vectors
+    docs = ingest_docs(
+  File "/work/backend/tests/integration/test_04b_migrate.py", line 121, in ingest_docs
+    return run(go())
+  File "/work/backend/tests/integration/test_04b_migrate.py", line 73, in run
+    return asyncio.run(coro)
+  File "/usr/local/lib/python3.12/asyncio/runners.py", line 195, in run
+    return runner.run(main)
+  File "/usr/local/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 678, in run_until_complete
+    self.run_forever()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 645, in run_forever
+    self._run_once()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 1999, in _run_once
+    handle._run()
+  File "/usr/local/lib/python3.12/asyncio/events.py", line 88, in _run
+    self._context.run(self._callback, *self._args)
+  File "/work/backend/tests/integration/test_04b_migrate.py", line 111, in go
+    report = await ingest.ingest_document(
+  File "/work/backend/ffcore/knowledge/ingest.py", line 554, in ingest_document
+    return await _gold(document_id, settings=settings, store=store, embed_client=embed_client)
+  File "/work/backend/ffcore/knowledge/ingest.py", line 677, in _gold
+    log.info("gold document=%s reused=%d embedded=%d", document_id, reused, len(vectors))
+Message: 'gold document=%s reused=%d embedded=%d'
+Arguments: (UUID('7a8c6aad-7b33-4585-8417-8be6fc3aa581'), 0, 1)
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.knowledge.ingest:ingest.py:677 gold document=7a8c6aad-7b33-4585-8417-8be6fc3aa581 reused=0 embedded=1
+=========================== short test summary info ============================
+FAILED tests/contract/test_04b_schema.py::test_04b_1_migration_is_the_single_head_on_05b
+FAILED tests/integration/test_04b_migrate.py::test_04b_1_pgvector_to_qdrant_counts_equal_and_acl_in_query
+FAILED tests/integration/test_04b_migrate.py::test_04b_1_qdrant_to_pgvector_fills_missing_vectors
+3 failed, 62 passed, 2 skipped in 78.74s (0:01:18)

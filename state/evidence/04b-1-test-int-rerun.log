@@ -1,0 +1,56 @@
+..................................................................F..... [ 69%]
+...............................                                          [100%]
+=================================== FAILURES ===================================
+__________________ test_06b_6_quota_exceeded_429_openai_shape __________________
+
+direct = (UUID('748c8883-952a-4472-8809-5bc0d9ccfbab'), <starlette.testclient.TestClient object at 0x7fe3801ae210>, {'id': '5da...ame': 'facade', 'key_prefix': 'ffk_93c74b16', ...}, <tests.integration.facade_support.Facade object at 0x7fe33c6222a0>)
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_de2c46ddd553) at 0x7fe33c741a60>
+
+    def test_06b_6_quota_exceeded_429_openai_shape(direct, pg):
+        project, _, _, client = direct
+        pg.execute(
+            "INSERT INTO quotas (id, project_id, scope_type, scope_id, label, windows, tokens, budget,"
+            " action, created_by) VALUES (%s, %s, 'project', %s, 't', '{\"rpm\": 1}', '{}', '{}',"
+            " 'block', 'test')",
+            (uuid.uuid4(), project, project),
+        )
+        assert client.chat("chat-default").status_code == 200
+        second = client.chat("chat-default")
+>       assert second.status_code == 429
+E       assert 200 == 429
+E        +  where 200 = <Response [200 OK]>.status_code
+
+tests/integration/test_06b_direct.py:259: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+2026-11-19 13:18:57,717 INFO ffcore.litellm_reconcile litellm_reconciled created=2 updated=0 deleted=0 problems=0
+2026-11-19 13:18:57,970 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-19 13:18:58,426 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-19 13:18:58,527 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=554
+2026-11-19 13:18:58,698 INFO ffcore.access access method=POST path=/api/v1/projects/748c8883-952a-4472-8809-5bc0d9ccfbab/api-keys status=201 ms=167
+2026-11-19 13:18:58,939 ERROR ffcore.readiness warmup failed: ModelMissing
+------------------------------ Captured log setup ------------------------------
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=2 updated=0 deleted=0 problems=0
+ERROR    ffcore.readiness:readiness.py:63 warmup failed: ModelMissing
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=554
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/748c8883-952a-4472-8809-5bc0d9ccfbab/api-keys status=201 ms=167
+ERROR    ffcore.readiness:readiness.py:63 warmup failed: ModelMissing
+----------------------------- Captured stderr call -----------------------------
+2026-11-19 13:18:59,186 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-19 13:18:59,599 WARNING langfuse Context error: No active span in current context. Operations that depend on an active span will be skipped. Ensure spans are created with start_as_current_observation() or that you're operating within an active span context.
+2026-11-19 13:18:59,600 WARNING langfuse Context error: No active span in current context. Operations that depend on an active span will be skipped. Ensure spans are created with start_as_current_observation() or that you're operating within an active span context.
+2026-11-19 13:18:59,847 INFO ffcore.access access method=POST path=/v1/chat/completions status=200 ms=873
+2026-11-19 13:19:00,248 WARNING langfuse Context error: No active span in current context. Operations that depend on an active span will be skipped. Ensure spans are created with start_as_current_observation() or that you're operating within an active span context.
+2026-11-19 13:19:00,248 WARNING langfuse Context error: No active span in current context. Operations that depend on an active span will be skipped. Ensure spans are created with start_as_current_observation() or that you're operating within an active span context.
+2026-11-19 13:19:00,543 INFO ffcore.access access method=POST path=/v1/chat/completions status=200 ms=692
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+WARNING  langfuse:client.py:1399 Context error: No active span in current context. Operations that depend on an active span will be skipped. Ensure spans are created with start_as_current_observation() or that you're operating within an active span context.
+WARNING  langfuse:client.py:1399 Context error: No active span in current context. Operations that depend on an active span will be skipped. Ensure spans are created with start_as_current_observation() or that you're operating within an active span context.
+INFO     ffcore.access:logging.py:263 access method=POST path=/v1/chat/completions status=200 ms=873
+WARNING  langfuse:client.py:1399 Context error: No active span in current context. Operations that depend on an active span will be skipped. Ensure spans are created with start_as_current_observation() or that you're operating within an active span context.
+WARNING  langfuse:client.py:1399 Context error: No active span in current context. Operations that depend on an active span will be skipped. Ensure spans are created with start_as_current_observation() or that you're operating within an active span context.
+INFO     ffcore.access:logging.py:263 access method=POST path=/v1/chat/completions status=200 ms=692
+=========================== short test summary info ============================
+FAILED tests/integration/test_06b_direct.py::test_06b_6_quota_exceeded_429_openai_shape
+1 failed, 102 passed in 414.65s (0:06:54)

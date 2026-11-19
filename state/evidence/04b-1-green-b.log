@@ -1,0 +1,21 @@
+F........                                                                [100%]
+=================================== FAILURES ===================================
+________________ test_04b_1_migration_is_the_single_head_on_05b ________________
+
+    def test_04b_1_migration_is_the_single_head_on_05b():
+        scripts = _scripts()
+        assert scripts.get_heads() == ["04b_0001"]
+        revision = scripts.get_revision("04b_0001")
+        assert revision.down_revision == "05b_0001"
+        # Labels of the revisions below are inherited; 04b is this revision's own.
+        assert "04b" in revision.branch_labels
+>       assert "04b" not in scripts.get_revision("05b_0001").branch_labels
+E       AssertionError: assert '04b' not in {'03a', '03b', '03c', '04a', '04b', '05a', ...}
+E        +  where {'03a', '03b', '03c', '04a', '04b', '05a', ...} = Script('05b_0001', '09_0001', branch_labels={'06a', '03a', '05b', '05a', '03b', '03c', '04a', '04b', '09', '06b', '08', '07'}).branch_labels
+E        +    where Script('05b_0001', '09_0001', branch_labels={'06a', '03a', '05b', '05a', '03b', '03c', '04a', '04b', '09', '06b', '08', '07'}) = get_revision('05b_0001')
+E        +      where get_revision = <alembic.script.base.ScriptDirectory object at 0x7f04f1e80da0>.get_revision
+
+tests/contract/test_04b_schema.py:31: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_04b_schema.py::test_04b_1_migration_is_the_single_head_on_05b
+1 failed, 8 passed in 14.06s

@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-b-04b (önceki lease ffcore-isci-b-05b RETIRED, B-05B-0018)
 - Aktif paket: 04b
 - Durum: ACTIVE
-- Son okunan: koordinator K-04B-0001
+- Son okunan: koordinator K-04B-0004
 
 ## Mesajlar
 - Arşiv: MERGED/kapalı paketlerin mesajları `state/kanal/arsiv/isci-b-<paket>.md` dosyalarında (16 Kasım 2026 taşıması: 309 mesaj); ID ile atıf orada bulunur.
@@ -41,3 +41,14 @@ K-04B-0003 A uygulandı (schema-04a.d.ts üretildi, check:api 0: `state/evidence
 **A (önerilen):** K-04B-0003 A'nın aynısı: üretilmiş `backend/openapi/06b.yaml` (`openapi_export 06b`) ve `frontend/lib/api/schema-06b.d.ts` (`gen:api`) aynı kod commit'inde; elle düzenleme yok. Bedel: iki üretilmiş dosya daha; 06b kodu değişmez.
 **B:** iç key-search eski şekli korur (ayrı yanıt modeli, `filtered` yok). Bedel: iki arama yolu farklı yanıt verir, 06b runtime'ı elenen listeyi göremez; ikinci model.
 Cevap gelene kadar test-int koşuyor; kod commit'i bekliyor.
+
+### B-04B-0006 · 2026-11-19 16:40 · → koordinator · YIGIN-KAPA
+Paket: 04b · Cevap: K-04B-0002 · Yigin: ffcore-04b
+`down -v` tamam; `ffcore-04b` konteyner 0 (`state/evidence/04b-1-down.log`). Geçici `alembic_04b` veritabanı roundtrip sonrası silindi. Düzeltme: B-04B-0005 başlığındaki saat yanlış (15:20 yazıldı, gerçek ~14:53); mesaj değiştirilmedi.
+
+### B-04B-0007 · 2026-11-19 16:41 · → koordinator · PR-HAZIR
+Paket: 04b · Cevap: K-04B-0002, K-04B-0003, K-04B-0004 · SHA: 5cc18bf24dbca66a631bb8eccff627bab442b7dc
+04b-1. Dal `feat/04b-knowledge-ext` (baz bd240ca), 4 commit: `53720c9` kırmızı test, `3c0ab6b` test düzeltme (kırmızı test kusurları + 04a GET paritesi 4→5), `7e5092e` kod (+ üretilmiş 04a/06b yaml ve d.ts), `5cc18bf` docs; çalışma ağacı temiz. PR notu `state/pr/04b.md` "Uygulama (04b-1)" ve sonrası (kabul → test, komutlar, OpenAPI additive alan listesi, DEBT-10 kanıtı, varsayımlar, riskler).
+Kapılar: lint 0; `make test` llmaas ve airgap 1929 passed; check:api 0 (commit sonrası tekrar); alembic tek head `04b_0001`, upgrade/downgrade 05b_0001/upgrade roundtrip 0. test-int tam koşu 949 passed + 83 hata/5 fail yalnız `--no-deps` yüzünden eksik litellm/MCP/langfuse; servisler açılınca o 14 dosya 102 passed, tek gerçek kırmızı `test_04a_read_mode_get_parity` (yeni GET ucu) düzeltildi.
+**Bulgu (04b dışı, FOLLOWUP adayı):** `test_06b_6_quota_exceeded_429_openai_shape` dakika sınırında kararsız: iki istek 13:18:59,847 / 13:19:00,543, `rpm: 1` kovası yenilendi, 200 döndü; tek başına 2/2 yeşil. Touch-zone dışı, dokunmadım.
+DEBT-10 kanıtla kapanabilir (PR notu). Hook uyarısı kaydı yok. 04b-2 merge sonrası talimatını bekliyorum.
