@@ -1,0 +1,83 @@
+HEAD=877cc34f7911e9981a6d83c2b02a578e3ddc66fe (git archive copy)
+ Network ffcore-rv10c2_default  Creating
+ Network ffcore-rv10c2_default  Created
+ Volume "ffcore-rv10c2_langfuse_postgres_data"  Creating
+ Volume "ffcore-rv10c2_langfuse_postgres_data"  Created
+ Volume "ffcore-rv10c2_langfuse_minio_data"  Creating
+ Volume "ffcore-rv10c2_langfuse_minio_data"  Created
+ Volume "ffcore-rv10c2_redis_data"  Creating
+ Volume "ffcore-rv10c2_redis_data"  Created
+ Volume "ffcore-rv10c2_model_cache"  Creating
+ Volume "ffcore-rv10c2_model_cache"  Created
+ Volume "ffcore-rv10c2_knowledge_storage"  Creating
+ Volume "ffcore-rv10c2_knowledge_storage"  Created
+ Volume "ffcore-rv10c2_postgres_data"  Creating
+ Volume "ffcore-rv10c2_postgres_data"  Created
+ Volume "ffcore-rv10c2_langfuse_clickhouse_data"  Creating
+ Volume "ffcore-rv10c2_langfuse_clickhouse_data"  Created
+ Volume "ffcore-rv10c2_langfuse_clickhouse_logs"  Creating
+ Volume "ffcore-rv10c2_langfuse_clickhouse_logs"  Created
+ Container ffcore-rv10c2-postgres-1  Creating
+ Container ffcore-rv10c2-redis-1  Creating
+ Container ffcore-rv10c2-redis-1  Created
+ Container ffcore-rv10c2-postgres-1  Created
+ Container ffcore-rv10c2-redis-1  Starting
+ Container ffcore-rv10c2-postgres-1  Starting
+ Container ffcore-rv10c2-redis-1  Started
+ Container ffcore-rv10c2-postgres-1  Started
+ Container ffcore-rv10c2-redis-1  Waiting
+ Container ffcore-rv10c2-postgres-1  Waiting
+ Container ffcore-rv10c2-redis-1  Healthy
+ Container ffcore-rv10c2-postgres-1  Healthy
+up exit 0
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 0001, initial empty revision (chain root)
+INFO  [alembic.runtime.migration] Running upgrade 0001 -> 03a_0001, 03a: users, projects, project_members, providers, provider_projects, model_catalog, models
+INFO  [alembic.runtime.migration] Running upgrade 0001 -> 03b_0001, 03b: audit_events (append-only, monthly partitions)
+INFO  [alembic.runtime.migration] Running upgrade 0001 -> 06a_0001, 06a: agents, agent_versions, conversations, runs, messages, run_events; checkpoints schema
+INFO  [alembic.runtime.migration] Running upgrade 0001 -> 07_0001, 07: approvals
+INFO  [alembic.runtime.migration] Running upgrade 06a_0001 -> 06a_0002, 06a: when a run's checkpoint was deleted, and when a source of a live run was deleted
+INFO  [alembic.runtime.migration] Running upgrade 0001 -> 08_0001, 08: pii_policies, guardrail_policies, guardrail_events
+INFO  [alembic.runtime.migration] Running upgrade 0001 -> 05a_0001, 05a: tools, tool_actions, schema_descriptions, few_shots
+INFO  [alembic.runtime.migration] Running upgrade 0001 -> 04a_0001, 04a: knowledge_bases, documents, attachments, chunks, kb_queries, ingest_gate_stats
+INFO  [alembic.runtime.migration] Running upgrade 0001 -> 03c_0001, 03c: API keys, quotas and daily usage
+INFO  [alembic.runtime.migration] Running upgrade 03c_0001 -> 03c_0002, 03c: retention policies and runs, alerts, notification settings
+INFO  [alembic.runtime.migration] Running upgrade 03a_0001, 03b_0001, 06a_0002, 07_0001 -> 57_0001, join the heads that other branches depend on (FOLLOWUP-57/132, step 1 of 2)
+INFO  [alembic.runtime.migration] Running upgrade 57_0001, 03c_0002, 04a_0001, 05a_0001, 08_0001 -> 57_0002, merge the package branch heads into one head (FOLLOWUP-57/132, step 2 of 2)
+INFO  [alembic.runtime.migration] Running upgrade 57_0002 -> 06b_0001, 06b-2: external agents (kind = external) keep their endpoint in agents.external_config
+INFO  [alembic.runtime.migration] Running upgrade 06b_0001 -> 09_0001, 09: eval_suites, eval_runs (local rows over Langfuse datasets and dataset runs)
+INFO  [alembic.runtime.migration] Running upgrade 09_0001 -> 05b_0001, 05b: published MCP servers (mcp_servers) and their calls (mcp_server_calls)
+05b_0001 (05a, 03c, 09, 08, 06b, 03b, 05b, 06a, 04a, 03a, 07) (head)
+migrate exit 0
+HEAD=877cc34f7911e9981a6d83c2b02a578e3ddc66fe (git archive copy) - 2026-11-19 resume check
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+05b_0001 (head)
+exit 0
+ Container ffcore-rv10c2-redis-1  Stopping
+ Container ffcore-rv10c2-postgres-1  Stopping
+ Container ffcore-rv10c2-postgres-1  Stopped
+ Container ffcore-rv10c2-postgres-1  Removing
+ Container ffcore-rv10c2-redis-1  Stopped
+ Container ffcore-rv10c2-redis-1  Removing
+ Container ffcore-rv10c2-postgres-1  Removed
+ Container ffcore-rv10c2-redis-1  Removed
+ Volume ffcore-rv10c2_knowledge_storage  Removing
+ Volume ffcore-rv10c2_redis_data  Removing
+ Volume ffcore-rv10c2_langfuse_clickhouse_logs  Removing
+ Volume ffcore-rv10c2_langfuse_clickhouse_data  Removing
+ Volume ffcore-rv10c2_model_cache  Removing
+ Volume ffcore-rv10c2_langfuse_postgres_data  Removing
+ Volume ffcore-rv10c2_langfuse_minio_data  Removing
+ Volume ffcore-rv10c2_postgres_data  Removing
+ Network ffcore-rv10c2_default  Removing
+ Volume ffcore-rv10c2_knowledge_storage  Removed
+ Volume ffcore-rv10c2_redis_data  Removed
+ Volume ffcore-rv10c2_langfuse_clickhouse_logs  Removed
+ Volume ffcore-rv10c2_langfuse_clickhouse_data  Removed
+ Volume ffcore-rv10c2_model_cache  Removed
+ Volume ffcore-rv10c2_langfuse_postgres_data  Removed
+ Volume ffcore-rv10c2_postgres_data  Removed
+ Volume ffcore-rv10c2_langfuse_minio_data  Removed
+ Network ffcore-rv10c2_default  Removed

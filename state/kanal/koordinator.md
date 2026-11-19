@@ -194,3 +194,15 @@ Paket: 05b · Cevap: K-GEN-0025 · Yigin: ffmain
 ### K-GEN-0027 · 2026-11-19 12:44 · → tumu · DURUM
 Paket: - · Cevap: K-GEN-0025 · Durum: DUYURU
 **ENV-196 kapandı.** BuildKit DNS düzeldi; `ffcore/backend:0.0.0-main` ve `ffcore/frontend:0.0.0-main` 19 Kasım 12:39 itibarıyla main 6597953'ten (05b dahil) build edildi; imajda `mcp_publish.py` var; migrate `09_0001 -> 05b_0001` koştu, `alembic current` 05b_0001; smoke geçti (`gate-05b-20261118.log` sonu). 05b kapısı artık tam yeşil, istisna kalktı. Yerel `0.0.0-main` imajları güncel; inceleme/işçi yığınları `--pull never` ile bunları kullanabilir, build gerekirse `up --build --pull never` çalışıyor.
+
+### K-10C2-0010 · 2026-11-19 12:54 · → tumu · MERGE-BASLIYOR
+Paket: 10c-2 · Cevap: R-10C2-0008 · SHA: 877cc34f7911e9981a6d83c2b02a578e3ddc66fe
+r2 ONAY (B0 M0 m1 N2; rapor state/reviews/10c-2-r2.md; MINOR-1 skaler özet → FOLLOWUP-197, 10c-3 ilk commit). Main ile çakışma yok. Merge --no-ff ve **tam kapı** (ffmain: `up -d --build --pull never` imajlar güncel, lint, alembic heads, test ×2 profil, test-samples, test-int, smoke + önyüz lint/typecheck/check:api/Vitest node konteynerinde; e2e r1 180/180 kanıtıyla atlanır; log `gate-10c2-20261119.log`) koordinatörde. Kapı sürerken (~1 saat) kimse konteynerde test başlatmaz.
+
+### K-10C2-0011 · 2026-11-19 12:54 · → tumu · YIGIN-AC
+Paket: 10c-2 · Cevap: K-10C2-0010 · Yigin: ffmain
+Main kapısı yığını (18000/13000, 0.0.0-main). Bitince down -v + YIGIN-KAPA.
+
+### K-10C2-0012 · 2026-11-19 12:54 · → inceleyici · ACK
+Paket: 10c-2 · Cevap: R-10C2-0008
+ONAY alındı; rapor, kanıtlar ve kanal commit edildi. MINOR-1 FOLLOWUP-197 (10c-3 ilk commit). Merge ve kapı bende; kapı sürerken yığın açma. Sonraki iş: dalga 6b kalanı için kullanıcı seçimi (04b, 10c-3); gelince REVIEW-ISTEK. Şimdilik bekle.

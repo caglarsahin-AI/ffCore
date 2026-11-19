@@ -1,0 +1,101 @@
+HEAD=877cc34f7911e9981a6d83c2b02a578e3ddc66fe (git archive copy)
+HEAD=877cc34
+
+> ffcore-frontend@0.1.0 lint
+> eslint
+
+lint exit 0
+
+> ffcore-frontend@0.1.0 typecheck
+> tsc --noEmit
+
+typecheck exit 0
+
+> ffcore-frontend@0.1.0 check:api
+> node scripts/check-api.mjs
+
+API contract copies and generated types are current.
+check:api exit 0
+
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.12 [39m[90m/w/frontend[39m
+
+ [32m✓[39m tests/unit/test_10a_8_messages_keys.test.ts [2m([22m[2m4 tests[22m[2m)[22m[33m 3906[2mms[22m[39m
+     [33m[2m✓[22m[39m rejects literal text in JSX [33m 3846[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10c2_4_eval_items.test.tsx [2m([22m[2m4 tests[22m[2m)[22m[33m 2140[2mms[22m[39m
+     [33m[2m✓[22m[39m shows every item of the page with its result, scores, note and run link [33m 908[2mms[22m[39m
+     [33m[2m✓[22m[39m asks the endpoint for the chosen status and starts again from the first page [33m 332[2mms[22m[39m
+     [33m[2m✓[22m[39m pages with the endpoint's offset and stops at the last page [33m 852[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10c2_3_retention.test.tsx [2m([22m[2m4 tests[22m[2m)[22m[33m 1695[2mms[22m[39m
+     [33m[2m✓[22m[39m shows the policies, the dry-run default and past runs [33m 721[2mms[22m[39m
+     [33m[2m✓[22m[39m starts the real deletion only from the confirmation, which says the dry-run setting does not apply [33m 590[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10ab_11_same_origin.test.ts [2m([22m[2m4 tests[22m[2m)[22m[33m 838[2mms[22m[39m
+     [33m[2m✓[22m[39m rewrites /api/v1 to the backend, so the browser only sees the console origin [33m 792[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10c2_8_overview_usage.test.tsx [2m([22m[2m6 tests[22m[2m)[22m[33m 2853[2mms[22m[39m
+     [33m[2m✓[22m[39m shows usage, pending approvals and the newest runs to an analyst, without alerts or a run total [33m 1311[2mms[22m[39m
+     [33m[2m✓[22m[39m adds open alerts for a developer [33m 492[2mms[22m[39m
+     [33m[2m✓[22m[39m shows usage by day and by model for the chosen range [33m 391[2mms[22m[39m
+     [33m[2m✓[22m[39m refuses a range that ends before it starts, without asking the backend [33m 599[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10c2_1_api_keys.test.tsx [2m([22m[2m4 tests[22m[2m)[22m[33m 1192[2mms[22m[39m
+     [33m[2m✓[22m[39m creates a key with the chosen scopes and shows the raw key once [33m 691[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10ab_10_contract_copy.test.ts [2m([22m[2m2 tests[22m[2m)[22m[33m 897[2mms[22m[39m
+     [33m[2m✓[22m[39m keeps the frontend copy byte-identical to the backend contract [33m 845[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10c1_6_eval_run_view.test.tsx [2m([22m[2m4 tests[22m[2m)[22m[33m 748[2mms[22m[39m
+     [33m[2m✓[22m[39m fails loudly when the summary cannot be read, naming the field [33m 412[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10ab_12_attr_literals.test.ts [2m([22m[2m6 tests[22m[2m)[22m[33m 12842[2mms[22m[39m
+     [33m[2m✓[22m[39m rejects a literal aria-label [33m 3608[2mms[22m[39m
+     [33m[2m✓[22m[39m finds no literal attribute text in the source tree (SidebarRail included) [33m 8965[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10c2_2_quotas_alerts.test.tsx [2m([22m[2m8 tests[22m[2m)[22m[33m 1795[2mms[22m[39m
+     [33m[2m✓[22m[39m shows each limit as set and the quota's last warning [33m 351[2mms[22m[39m
+     [33m[2m✓[22m[39m sends only the limits that were filled [33m 618[2mms[22m[39m
+     [33m[2m✓[22m[39m does not send a quota without any limit [33m 321[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10c1_7_compare_view.test.tsx [2m([22m[2m6 tests[22m[2m)[22m[33m 758[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10c2_6_read_only.test.tsx [2m([22m[2m4 tests[22m[2m)[22m[33m 423[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10a_3_no_hardcoded_colors.test.ts [2m([22m[2m7 tests[22m[2m)[22m[33m 15842[2mms[22m[39m
+     [33m[2m✓[22m[39m rejects export const A = () => <div className="bg-white p-2" />; [33m 3904[2mms[22m[39m
+     [33m[2m✓[22m[39m finds no violation in the source tree [33m 11684[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10bsse_2_panel_poll.test.tsx [2m([22m[2m5 tests[22m[2m)[22m[33m 539[2mms[22m[39m
+     [33m[2m✓[22m[39m reads the run with GET once the stream stalls and shows the server status while reconnecting [33m 324[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10c1_5_suite_form.test.tsx [2m([22m[2m5 tests[22m[2m)[22m[33m 375[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10af_17_form_save_gate.test.tsx [2m([22m[2m2 tests[22m[2m)[22m[33m 456[2mms[22m[39m
+     [33m[2m✓[22m[39m disables the model form's Save in a read-only project and enables it in an edit one [33m 375[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10a_6_write_gate.test.tsx [2m([22m[2m2 tests[22m[2m)[22m[33m 438[2mms[22m[39m
+     [33m[2m✓[22m[39m leaves the button active in edit mode [33m 401[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10bsse_1_stall.test.ts [2m([22m[2m11 tests[22m[2m)[22m[32m 211[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10c1_3_eval_stream.test.ts [2m([22m[2m16 tests[22m[2m)[22m[32m 293[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10af_18_messages_parse.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 175[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10bp2_6_sse.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 155[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10bp1_17_readiness_read.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 65[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10ab_5_error_mapping.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 94[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10c1_8_gate_failure.test.tsx [2m([22m[2m4 tests[22m[2m)[22m[33m 350[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10ab_7_session.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 63[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10c2_5_run_page_poll.test.tsx [2m([22m[2m5 tests[22m[2m)[22m[33m 411[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10bp1_13_upload_client.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 71[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10bp2_14_agent_definition.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 32[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10c1_2_eval_summary.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 81[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10ab_14_unauthenticated.test.tsx [2m([22m[2m24 tests[22m[2m)[22m[32m 108[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10bp2_19_run_contract.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 24[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10bp2_18_run_view.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 41[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10bp1_14_knowledge_status.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 34[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10c1_1_eval_contract.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 32[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10c1_4_eval_gate.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 23[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10bp2_16_error_codes.test.ts [2m([22m[2m1 test[22m[2m)[22m[32m 14[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10ab_6_role_screens.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 20[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10af_15_model_form.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 30[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10a_5_role_menu_visibility.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 29[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10ab_13_query_states.test.tsx [2m([22m[2m5 tests[22m[2m)[22m[32m 282[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10af_13_provider_config.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 19[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10c1_9_from_run_form.test.tsx [2m([22m[2m3 tests[22m[2m)[22m[32m 111[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10bp1_16_polling.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 15[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10bp2_17_agent_versions.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 18[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10bp1_15_messages.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 16[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10c2_7_governance_contract.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 12[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10ab_4_project_access.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 17[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10af_14_error_codes.test.ts [2m([22m[2m1 test[22m[2m)[22m[32m 9[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10c2_9_nav_icons.test.ts [2m([22m[2m1 test[22m[2m)[22m[32m 9[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m49 passed[39m[22m[90m (49)[39m
+[2m      Tests [22m [1m[32m250 passed[39m[22m[90m (250)[39m
+[2m   Start at [22m 09:50:42
+[2m   Duration [22m 23.67s[2m (transform 3.25s, setup 0ms, import 28.88s, tests 50.60s, environment 36.95s)[22m
+
+vitest exit 0

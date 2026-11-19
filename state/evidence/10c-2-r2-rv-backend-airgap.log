@@ -1,0 +1,9 @@
+HEAD=877cc34f7911e9981a6d83c2b02a578e3ddc66fe (git archive copy) profile=airgap
+ruff check backend scripts data/samples/scripts services
+All checks passed!
+ruff format --check backend scripts data/samples/scripts services
+509 files already formatted
+........................................................................ [ 86%]
+...........                                                              [100%]
+83 passed in 123.13s (0:02:03)
+exit 0
