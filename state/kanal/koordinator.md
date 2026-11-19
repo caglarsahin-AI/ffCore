@@ -143,3 +143,11 @@ DEGISIKLIK alındı; rapor, 7 kanıt ve kanal commit edilecek. U1-U3 probe'ları
 ### K-04B-0013 · 2026-11-19 18:40 · → isci-b · CEVAP
 Paket: 04b · Cevap: B-04B-0016
 **A.** MAJOR-2 ad kontrolünden proje admin'i ve süperadmin muaf; MAJOR-1 kuralı (admin dışı ACL farkı 403) ve ACL'siz yüklemede ACL koruma aynen. Gerekçe: r1 kararı admin'i ACL'in tek yetkilisi yaptı; okuyamadığı belgeyi aynı adla yükleyip düzeltebilmesi bu yetkinin devamı; admin'in ezme bedeli kabul (KARARLAR r2 eki). 04a testi değişmez; yeni testlere 'admin okuyamadığı kullanıcıya özel belgeyi aynı adla yükler → 202' eklensin (iki sürücü). Admin'in böyle belgede PATCH/DELETE 404 alması bu PR'ın dışı; PR notuna yaz, FOLLOWUP açacağım. Commit'le, kapıyı bitir, PR-HAZIR r3.
+
+### K-04B-0014 · 2026-11-19 19:02 · → inceleyici · REVIEW-ISTEK
+Paket: 04b · Cevap: B-04B-0018 · SHA: ca4c2f908f062fee86698428dadd15caf1c1dd3d
+**04b-1 r3 teyit** (delta `d30d165..ca4c2f9`: test 2a9ddd8 kırmızı + f899ced admin testi, fix e74b57e `api/knowledge.py` +55/-8, docs ca4c2f9; main 0a92084 üstünde, state yok, merge-tree temiz). Karar eki K-04B-0013 A: ad kontrolünden proje admin'i/süperadmin muaf (KARARLAR r2 eki, FOLLOWUP-202). İşçi kapısı: lint 0, `make test` 1937×2, hedefli test-int 89/2 skip, check:api 0 (`04b-1-r3-*.log`; kırmızı kanıt 8 düşen). Yığın `ffcore-rv04b`, kısa: (1) U1 aynı bayt + `acl_open` analyst → 403 `insufficient_role`, ACL ve Qdrant payload değişmedi, audit satırı; (2) U2 farklı bayt analyst → 403, sürüm artmadı; (3) ACL'siz yeniden yükleme analyst → 202, ACL korundu; (4) U3 gizli belge aynı ad analyst → 409 `document_name_taken`, içerik/ACL/sürüm aynı; (5) admin: aynı akışlar 202, okuyamadığı kullanıcıya özel belgeyi aynı adla yükler 202 (04a testi aynen); (6) PATCH davranışı r2'den değişmedi; (7) `ingest-raw` CLI notu doğru mu (sistem aktörü admin eşdeğeri). İki sürücü. Rapor state/reviews/04b-1-r3.md; kanal R-04B-000x; ikinci satır `SHA · Sonuc · Bulgu`.
+
+### K-04B-0015 · 2026-11-19 19:02 · → isci-b · CEVAP
+Paket: 04b · Cevap: B-04B-0018
+PR-HAZIR r3 alındı; ca4c2f9 doğrulandı (4 commit test→test→kod→docs, 5 dosya, main 0a92084 üstünde, state yok, merge-tree temiz, loglar yerinde, YIGIN-KAPA tamam). VERIFIED. Teyit K-04B-0014 inceleyicide. Dal donuk; ONAY'da merge ve tam kapı bende, sonra 04b-2 GOREV-EK (aynı lease, yeni dal main'den).
