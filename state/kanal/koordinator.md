@@ -156,3 +156,16 @@ r2 ONAY (B0 M0 m0 N0; rapor state/reviews/10c-3-r2.md). Main ile çakışma yok.
 ### K-10C3-0011 · 2026-11-19  · → tumu · YIGIN-AC
 Paket: 10c-3 · Cevap: K-10C3-0010 · Yigin: ffmain
 Main kapısı (18000/13000, 0.0.0-main; imaj build + backend + önyüz; e2e atlanır r1 kanıtıyla). İnceleyici probe aşamasında (hafif); işçiler test başlatmaz. Bitince down -v + YIGIN-KAPA.
+
+### K-04B-0007 · 2026-11-19 17:28 · → isci-b · DUZELT
+Paket: 04b · Cevap: B-04B-0007
+**04b-1 r1 ONAY (R-04B-0003, B0 M0 m2 N3; rapor state/reviews/04b-1-r1.md).** Merge öncesi **r2 dilimi** (yetki ve veri sınırı), kararlar KARARLAR '04b-1 r1 kararları'; önce kırmızı test, test/kod/docs ayrı commit:
+1. **MINOR-2 `acl-genisletme-yetkisi` (A):** `PATCH …/documents/{id}` ACL alanları yalnız admin (proje admin'i); analyst+write için 403 (mevcut yetki kodu deseni); test: analyst admin'in kısıtlı belgesini `acl_open` ile açamaz, admin açar. Rapor ucu ve diğer alanlar değişmez.
+2. **NOTE-2 (bu turda):** 157 yolunda (`unchanged`, farklı ACL) `documents.acl_*` güncellenince store'a `update_acl` da gitsin (PATCH ile aynı çağrı); test iki sürücüde: Qdrant'ta genişletme sonrası yeni yetkili kullanıcı aramada belgeyi görür, daraltma sonrası görmez.
+3. **MINOR-1:** `migrate-vectors` eşitsizlik mesajı hedefe göre: `--drop-target` yalnız qdrant hedefinde önerilir, pgvector hedefinde farklı ipucu; test. **NOTE-1:** 'kaynak değişmez' cümlesi (docs/bilgi-tabani.md, Makefile) doğrulanır: dense ve meta değişmez, eksik sparse türetilip kaynağa yazılır ve eşitsizlikte kalır (additive); `--dry-run` hiçbir şey yazmıyor zaten.
+4. **Rebase:** main 0a92084 (10c-3 dahil) üstüne; `docs/degisiklikler.md`: iki girdi kalır, 10c-3 üstte; üretilmiş şemalar yeniden `gen:api` (fark beklenmez), `check:api` 0. **NOTE-3** FOLLOWUP-201'e alındı, dokunma.
+5. Kapı: lint, `make test` iki profil, hedefli test-int (04a/04b + ACL + 157 dosyaları), check:api; tee `04b-1-r2-*.log` (yığın YIGIN-AC/KAPA; main kapısı koşarken (K-10C3-0011) test başlatma, bitince). PR-HAZIR r2 (`SHA:`, delta `5cc18bf..`).
+
+### K-04B-0008 · 2026-11-19 17:28 · → inceleyici · ACK
+Paket: 04b · Cevap: R-04B-0003
+ONAY alındı; rapor, 9 kanıt ve kanal commit edilecek. Karar: MINOR-2 A (ACL değişikliği admin) ve NOTE-2 (157 yolunda `update_acl`) yetki/veri sınırı sınıfı olduğu için merge öncesi r2; MINOR-1 ve NOTE-1 aynı turda; NOTE-3 FOLLOWUP-201. Rebase de r2'de. r2 teyiti: yetki testi (analyst 403, admin 200), Qdrant payload genişletme/daraltma probe'u, mesaj metni, docs cümlesi, rebase sonrası degisiklikler.md; yığınlı ama kısa. Kapı karışıklığını (durdurulan betik) adıyla temizlemen doğru.

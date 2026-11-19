@@ -1,0 +1,185 @@
+HEAD=5cc18bf24dbca66a631bb8eccff627bab442b7dc (git archive copy)
+ Volume "ffcore-rv04b_qdrant_data"  Creating
+ Volume "ffcore-rv04b_qdrant_data"  Created
+ Container ffcore-rv04b-qdrant-1  Creating
+ Container ffcore-rv04b-redis-1  Creating
+ Container ffcore-rv04b-langfuse-postgres-1  Creating
+ Container ffcore-rv04b-langfuse-clickhouse-1  Creating
+ Container ffcore-rv04b-fake-llm-1  Creating
+ Container ffcore-rv04b-postgres-1  Creating
+ Container ffcore-rv04b-langfuse-minio-1  Creating
+ Container ffcore-rv04b-ticket-desk-1  Creating
+ Container ffcore-rv04b-langfuse-redis-1  Creating
+ Container ffcore-rv04b-langfuse-minio-1  Created
+ Container ffcore-rv04b-fake-llm-1  Created
+ Container ffcore-rv04b-langfuse-redis-1  Created
+ Container ffcore-rv04b-redis-1  Created
+ Container ffcore-rv04b-langfuse-postgres-1  Created
+ Container ffcore-rv04b-ticket-desk-1  Created
+ Container ffcore-rv04b-qdrant-1  Created
+ Container ffcore-rv04b-postgres-1  Created
+ Container ffcore-rv04b-migrate-1  Creating
+ Container ffcore-rv04b-litellm-1  Creating
+ Container ffcore-rv04b-langfuse-clickhouse-1  Created
+ Container ffcore-rv04b-langfuse-worker-1  Creating
+ Container ffcore-rv04b-langfuse-web-1  Creating
+ Container ffcore-rv04b-langfuse-worker-1  Created
+ Container ffcore-rv04b-langfuse-web-1  Created
+ Container ffcore-rv04b-litellm-1  Created
+ Container ffcore-rv04b-migrate-1  Created
+ Container ffcore-rv04b-backend-1  Creating
+ Container ffcore-rv04b-backend-1  Created
+ Container ffcore-rv04b-frontend-1  Creating
+ Container ffcore-rv04b-mcp-search-1  Creating
+ Container ffcore-rv04b-worker-1  Creating
+ Container ffcore-rv04b-agent-worker-1  Creating
+ Container ffcore-rv04b-agent-worker-bg-1  Creating
+ Container ffcore-rv04b-mcp-sql-1  Creating
+ Container ffcore-rv04b-mcp-search-1  Created
+ Container ffcore-rv04b-worker-1  Created
+ Container ffcore-rv04b-frontend-1  Created
+ Container ffcore-rv04b-agent-worker-1  Created
+ Container ffcore-rv04b-mcp-sql-1  Created
+ Container ffcore-rv04b-agent-worker-bg-1  Created
+ Container ffcore-rv04b-langfuse-postgres-1  Starting
+ Container ffcore-rv04b-redis-1  Starting
+ Container ffcore-rv04b-fake-llm-1  Starting
+ Container ffcore-rv04b-qdrant-1  Starting
+ Container ffcore-rv04b-langfuse-redis-1  Starting
+ Container ffcore-rv04b-langfuse-minio-1  Starting
+ Container ffcore-rv04b-postgres-1  Starting
+ Container ffcore-rv04b-langfuse-clickhouse-1  Starting
+ Container ffcore-rv04b-ticket-desk-1  Starting
+ Container ffcore-rv04b-langfuse-postgres-1  Started
+ Container ffcore-rv04b-langfuse-minio-1  Started
+ Container ffcore-rv04b-redis-1  Started
+ Container ffcore-rv04b-fake-llm-1  Started
+ Container ffcore-rv04b-langfuse-redis-1  Started
+ Container ffcore-rv04b-ticket-desk-1  Started
+ Container ffcore-rv04b-postgres-1  Started
+ Container ffcore-rv04b-postgres-1  Waiting
+ Container ffcore-rv04b-postgres-1  Waiting
+ Container ffcore-rv04b-qdrant-1  Started
+ Container ffcore-rv04b-langfuse-clickhouse-1  Started
+ Container ffcore-rv04b-langfuse-postgres-1  Waiting
+ Container ffcore-rv04b-langfuse-clickhouse-1  Waiting
+ Container ffcore-rv04b-langfuse-clickhouse-1  Waiting
+ Container ffcore-rv04b-langfuse-minio-1  Waiting
+ Container ffcore-rv04b-langfuse-minio-1  Waiting
+ Container ffcore-rv04b-langfuse-redis-1  Waiting
+ Container ffcore-rv04b-langfuse-redis-1  Waiting
+ Container ffcore-rv04b-langfuse-postgres-1  Waiting
+ Container ffcore-rv04b-langfuse-postgres-1  Healthy
+ Container ffcore-rv04b-langfuse-minio-1  Healthy
+ Container ffcore-rv04b-langfuse-minio-1  Healthy
+ Container ffcore-rv04b-langfuse-postgres-1  Healthy
+ Container ffcore-rv04b-langfuse-redis-1  Healthy
+ Container ffcore-rv04b-langfuse-redis-1  Healthy
+ Container ffcore-rv04b-postgres-1  Healthy
+ Container ffcore-rv04b-litellm-1  Starting
+ Container ffcore-rv04b-postgres-1  Healthy
+ Container ffcore-rv04b-migrate-1  Starting
+ Container ffcore-rv04b-langfuse-clickhouse-1  Healthy
+ Container ffcore-rv04b-langfuse-web-1  Starting
+ Container ffcore-rv04b-langfuse-clickhouse-1  Healthy
+ Container ffcore-rv04b-langfuse-worker-1  Starting
+ Container ffcore-rv04b-migrate-1  Started
+ Container ffcore-rv04b-litellm-1  Started
+ Container ffcore-rv04b-migrate-1  Waiting
+ Container ffcore-rv04b-postgres-1  Waiting
+ Container ffcore-rv04b-redis-1  Waiting
+ Container ffcore-rv04b-litellm-1  Waiting
+ Container ffcore-rv04b-langfuse-worker-1  Started
+ Container ffcore-rv04b-langfuse-web-1  Started
+ Container ffcore-rv04b-redis-1  Healthy
+ Container ffcore-rv04b-postgres-1  Healthy
+ Container ffcore-rv04b-migrate-1  Exited
+ Container ffcore-rv04b-litellm-1  Healthy
+ Container ffcore-rv04b-backend-1  Starting
+ Container ffcore-rv04b-backend-1  Started
+ Container ffcore-rv04b-backend-1  Waiting
+ Container ffcore-rv04b-backend-1  Waiting
+ Container ffcore-rv04b-postgres-1  Waiting
+ Container ffcore-rv04b-backend-1  Waiting
+ Container ffcore-rv04b-backend-1  Waiting
+ Container ffcore-rv04b-backend-1  Waiting
+ Container ffcore-rv04b-backend-1  Waiting
+ Container ffcore-rv04b-postgres-1  Healthy
+ Container ffcore-rv04b-backend-1  Healthy
+ Container ffcore-rv04b-agent-worker-bg-1  Starting
+ Container ffcore-rv04b-backend-1  Healthy
+ Container ffcore-rv04b-mcp-search-1  Starting
+ Container ffcore-rv04b-backend-1  Healthy
+ Container ffcore-rv04b-frontend-1  Starting
+ Container ffcore-rv04b-backend-1  Healthy
+ Container ffcore-rv04b-agent-worker-1  Starting
+ Container ffcore-rv04b-backend-1  Healthy
+ Container ffcore-rv04b-backend-1  Healthy
+ Container ffcore-rv04b-worker-1  Starting
+ Container ffcore-rv04b-mcp-sql-1  Starting
+ Container ffcore-rv04b-mcp-search-1  Started
+ Container ffcore-rv04b-agent-worker-bg-1  Started
+ Container ffcore-rv04b-worker-1  Started
+ Container ffcore-rv04b-agent-worker-1  Started
+ Container ffcore-rv04b-mcp-sql-1  Started
+ Container ffcore-rv04b-frontend-1  Started
+ Container ffcore-rv04b-langfuse-clickhouse-1  Waiting
+ Container ffcore-rv04b-worker-1  Waiting
+ Container ffcore-rv04b-redis-1  Waiting
+ Container ffcore-rv04b-postgres-1  Waiting
+ Container ffcore-rv04b-langfuse-web-1  Waiting
+ Container ffcore-rv04b-backend-1  Waiting
+ Container ffcore-rv04b-langfuse-redis-1  Waiting
+ Container ffcore-rv04b-litellm-1  Waiting
+ Container ffcore-rv04b-ticket-desk-1  Waiting
+ Container ffcore-rv04b-langfuse-postgres-1  Waiting
+ Container ffcore-rv04b-agent-worker-bg-1  Waiting
+ Container ffcore-rv04b-langfuse-minio-1  Waiting
+ Container ffcore-rv04b-migrate-1  Waiting
+ Container ffcore-rv04b-langfuse-worker-1  Waiting
+ Container ffcore-rv04b-mcp-search-1  Waiting
+ Container ffcore-rv04b-agent-worker-1  Waiting
+ Container ffcore-rv04b-frontend-1  Waiting
+ Container ffcore-rv04b-fake-llm-1  Waiting
+ Container ffcore-rv04b-qdrant-1  Waiting
+ Container ffcore-rv04b-mcp-sql-1  Waiting
+ Container ffcore-rv04b-langfuse-postgres-1  Healthy
+ Container ffcore-rv04b-fake-llm-1  Healthy
+ Container ffcore-rv04b-langfuse-worker-1  Healthy
+ Container ffcore-rv04b-qdrant-1  Healthy
+ Container ffcore-rv04b-agent-worker-bg-1  Healthy
+ Container ffcore-rv04b-agent-worker-1  Healthy
+ Container ffcore-rv04b-litellm-1  Healthy
+ Container ffcore-rv04b-langfuse-redis-1  Healthy
+ Container ffcore-rv04b-backend-1  Healthy
+ Container ffcore-rv04b-frontend-1  Healthy
+ Container ffcore-rv04b-redis-1  Healthy
+ Container ffcore-rv04b-langfuse-minio-1  Healthy
+ Container ffcore-rv04b-migrate-1  Exited
+ Container ffcore-rv04b-postgres-1  Healthy
+ Container ffcore-rv04b-ticket-desk-1  Healthy
+ Container ffcore-rv04b-langfuse-web-1  Healthy
+ Container ffcore-rv04b-worker-1  Healthy
+ Container ffcore-rv04b-langfuse-clickhouse-1  Healthy
+ Container ffcore-rv04b-mcp-search-1  Healthy
+ Container ffcore-rv04b-mcp-sql-1  Healthy
+exit 0
+ffcore-rv04b-agent-worker-1 ffcore/backend:0.0.0-main Up 17 seconds
+ffcore-rv04b-agent-worker-bg-1 ffcore/backend:0.0.0-main Up 17 seconds
+ffcore-rv04b-backend-1 ffcore/backend:0.0.0-main Up 29 seconds (healthy)
+ffcore-rv04b-fake-llm-1 ffcore/backend:0.0.0-main Up About a minute
+ffcore-rv04b-frontend-1 ffcore/frontend:0.0.0-main Up 17 seconds
+ffcore-rv04b-langfuse-clickhouse-1 clickhouse/clickhouse-server:25.8.2.29 Up About a minute (healthy)
+ffcore-rv04b-langfuse-minio-1 cgr.dev/chainguard/minio@sha256:e70b2b1e74d79457f808710483bd726ff364529ca30736eaa15a6ab547d3a5a7 Up About a minute (healthy)
+ffcore-rv04b-langfuse-postgres-1 postgres:17.6-alpine Up About a minute (healthy)
+ffcore-rv04b-langfuse-redis-1 redis:7.4.6-alpine Up About a minute (healthy)
+ffcore-rv04b-langfuse-web-1 langfuse/langfuse:3.120.0 Up 54 seconds (healthy)
+ffcore-rv04b-langfuse-worker-1 langfuse/langfuse-worker:3.120.0 Up 54 seconds
+ffcore-rv04b-litellm-1 ghcr.io/berriai/litellm:v1.80.0-stable Up 54 seconds (healthy)
+ffcore-rv04b-mcp-search-1 ffcore/backend:0.0.0-main Up 17 seconds (healthy)
+ffcore-rv04b-mcp-sql-1 ffcore/backend:0.0.0-main Up 17 seconds (healthy)
+ffcore-rv04b-postgres-1 pgvector/pgvector:0.8.1-pg16 Up About a minute (healthy)
+ffcore-rv04b-qdrant-1 qdrant/qdrant:v1.11.3@sha256:da426bb8aa0ba0a3032b3110e71d0d1516d51a686aa17b39bde4e090ce3b8e7c Up About a minute (healthy)
+ffcore-rv04b-redis-1 redis:7.4.6-alpine Up About a minute (healthy)
+ffcore-rv04b-ticket-desk-1 ffcore/backend:0.0.0-main Up About a minute (healthy)
+ffcore-rv04b-worker-1 ffcore/backend:0.0.0-main Up 17 seconds

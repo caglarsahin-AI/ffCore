@@ -1,0 +1,168 @@
+HEAD=5cc18bf24dbca66a631bb8eccff627bab442b7dc (git archive copy)
+== migrate probe M1-M3
+[RV] M1 qdrant->pgvector ok False source 2 target 1 searchable 1
+[RV] M1 line: migrate-vectors qdrant -> pgvector
+[RV] M1 line:   kb-728b43b5 source=2 target=1 written=0 sparse_computed=0 sparse_missing=0 mismatch: the target does not hold the source's vectors; if it has points of its own, run again with --drop-target
+[RV] M1 drop_target to pgvector: drop_target_not_applicable
+.[RV] M2 ok False sparse_computed 1 postgres rows with sparse after the failed run 1
+.[RV] M3 dry run ok True lines ['migrate-vectors pgvector -> qdrant (dry run, nothing written)', '  kb-1b1e3e80 source=1 target=0 written=0 sparse_computed=0 sparse_missing=0'] | collection after dry run: absent
+.
+=============================== warnings summary ===============================
+tests/integration/test_04b_migrate.py:25
+  /work/backend/tests/integration/test_04b_migrate.py:25: PytestUnknownMarkWarning: Unknown pytest.mark.vectorstore - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.vectorstore
+
+../../probe/test_rv04b_migrate_probe.py:26
+  /probe/test_rv04b_migrate_probe.py:26: PytestUnknownMarkWarning: Unknown pytest.mark.vectorstore - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.vectorstore
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+3 passed, 2 warnings in 8.21s
+exit 0
+== acl probe A1
+2026-11-19 13:54:43,051 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=177
+2026-11-19 13:54:43,062 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=2 problems=0
+2026-11-19 13:54:43,386 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-19 13:54:43,399 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=232
+2026-11-19 13:54:43,732 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-19 13:54:43,756 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=240
+2026-11-19 13:54:44,002 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-19 13:54:44,021 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=145
+2026-11-19 13:54:44,390 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-19 13:54:44,451 INFO ffcore.access access method=POST path=/api/v1/projects/945cd495-00df-47f1-a9b9-bf07daed18da/knowledge-bases status=201 ms=351
+2026-11-19 13:54:44,523 INFO ffcore.access access method=POST path=/api/v1/projects/945cd495-00df-47f1-a9b9-bf07daed18da/knowledge-bases/bea2b08d-520e-4696-b1c2-9571a0da0578/documents status=202 ms=68
+2026-11-19 13:54:44,645 INFO ffcore.knowledge.ingest gold document=8dc70573-987d-4aeb-a28d-ca66638bdf62 reused=0 embedded=1
+[RV] A1 uploaded by admin, acl_roles ['admin', 'analyst']
+2026-11-19 13:54:44,722 INFO ffcore.access access method=PATCH path=/api/v1/projects/945cd495-00df-47f1-a9b9-bf07daed18da/knowledge-bases/bea2b08d-520e-4696-b1c2-9571a0da0578/documents/8dc70573-987d-4aeb-a28d-ca66638bdf62 status=200 ms=71
+[RV] A1 analyst PATCH acl_open=true -> 200 []
+2026-11-19 13:54:44,807 INFO ffcore.access access method=PATCH path=/api/v1/projects/945cd495-00df-47f1-a9b9-bf07daed18da/knowledge-bases/bea2b08d-520e-4696-b1c2-9571a0da0578/documents/8dc70573-987d-4aeb-a28d-ca66638bdf62 status=200 ms=81
+[RV] A1 analyst PATCH acl_roles=[analyst] (drops admin) -> 200 ['analyst']
+F
+=================================== FAILURES ===================================
+___________________ test_a1_analyst_widens_an_admin_document ___________________
+
+world = {'project': '945cd495-00df-47f1-a9b9-bf07daed18da', 'other': 'ae5da1f7-981e-4e56-9eba-eb650d4fc7c6', 'admin': <starlet...nt.TestClient object at 0x7f98a3ae78c0>, 'admin_read': <starlette.testclient.TestClient object at 0x7f98a3f45e20>, ...}
+settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+queue = <tests.integration.test_04a_api.FakeQueue object at 0x7f98a3cc7dd0>
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_6671d7f833cd) at 0x7f98a47603e0>
+
+    def test_a1_analyst_widens_an_admin_document(world, settings, queue, pg):
+        kb = create_kb(world)
+        data = ("# Gizli\n\n" + PROSE * 8).encode()
+        up = upload_bytes(world, world["admin"], kb["id"], "admin-doc.md", data, acl_roles=["admin", "analyst"])
+        item = up.json()["data"][0]
+        process_all(settings, queue)
+        url = doc_url(world, kb["id"], item["document"]["id"])
+        out("A1 uploaded by admin, acl_roles", item["document"]["acl_roles"])
+        opened = world["analyst"].patch(url, json={"acl_open": True})
+        out("A1 analyst PATCH acl_open=true ->", opened.status_code, opened.json().get("acl_roles") if opened.status_code == 200 else opened.text[:160])
+        narrowed = world["analyst"].patch(url, json={"acl_roles": ["analyst"]})
+        out("A1 analyst PATCH acl_roles=[analyst] (drops admin) ->", narrowed.status_code,
+            narrowed.json().get("acl_roles") if narrowed.status_code == 200 else narrowed.text[:160])  # fmt: skip
+>       users = world["analyst"].patch(url, json={"acl_users": [world["admin_id"]], "acl_roles": ["analyst"]})
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+/probe/test_rv04b_acl_probe.py:29: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:1277: in patch
+    return self.request(
+/opt/venv/lib/python3.12/site-packages/starlette/testclient.py:518: in request
+    return super().request(
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:783: in request
+    request = self.build_request(
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:360: in build_request
+    return Request(
+/opt/venv/lib/python3.12/site-packages/httpx2/_models.py:424: in __init__
+    headers, stream = encode_request(
+/opt/venv/lib/python3.12/site-packages/httpx2/_content.py:213: in encode_request
+    return encode_json(json)
+           ^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_content.py:176: in encode_json
+    body = json_dumps(json, ensure_ascii=False, separators=(",", ":"), allow_nan=False).encode("utf-8")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/json/__init__.py:238: in dumps
+    **kw).encode(obj)
+          ^^^^^^^^^^^
+/usr/local/lib/python3.12/json/encoder.py:200: in encode
+    chunks = self.iterencode(o, _one_shot=True)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/json/encoder.py:258: in iterencode
+    return _iterencode(o, 0)
+           ^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <json.encoder.JSONEncoder object at 0x7f98882fed80>
+o = UUID('eea7d533-f618-431a-9baa-f42457287194')
+
+    def default(self, o):
+        """Implement this method in a subclass such that it returns
+        a serializable object for ``o``, or calls the base implementation
+        (to raise a ``TypeError``).
+    
+        For example, to support arbitrary iterators, you could
+        implement default like this::
+    
+            def default(self, o):
+                try:
+                    iterable = iter(o)
+                except TypeError:
+                    pass
+                else:
+                    return list(iterable)
+                # Let the base class default method raise the TypeError
+                return super().default(o)
+    
+        """
+>       raise TypeError(f'Object of type {o.__class__.__name__} '
+                        f'is not JSON serializable')
+E       TypeError: Object of type UUID is not JSON serializable
+
+/usr/local/lib/python3.12/json/encoder.py:180: TypeError
+------------------------------ Captured log setup ------------------------------
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=177
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=2 problems=0
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=232
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=240
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=145
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.litellm_reconcile:litellm_reconcile.py:372 litellm_reconciled created=0 updated=0 deleted=0 problems=0
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/945cd495-00df-47f1-a9b9-bf07daed18da/knowledge-bases status=201 ms=351
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/945cd495-00df-47f1-a9b9-bf07daed18da/knowledge-bases/bea2b08d-520e-4696-b1c2-9571a0da0578/documents status=202 ms=68
+INFO     ffcore.knowledge.ingest:ingest.py:677 gold document=8dc70573-987d-4aeb-a28d-ca66638bdf62 reused=0 embedded=1
+INFO     ffcore.access:logging.py:263 access method=PATCH path=/api/v1/projects/945cd495-00df-47f1-a9b9-bf07daed18da/knowledge-bases/bea2b08d-520e-4696-b1c2-9571a0da0578/documents/8dc70573-987d-4aeb-a28d-ca66638bdf62 status=200 ms=71
+INFO     ffcore.access:logging.py:263 access method=PATCH path=/api/v1/projects/945cd495-00df-47f1-a9b9-bf07daed18da/knowledge-bases/bea2b08d-520e-4696-b1c2-9571a0da0578/documents/8dc70573-987d-4aeb-a28d-ca66638bdf62 status=200 ms=81
+=========================== short test summary info ============================
+FAILED ::test_a1_analyst_widens_an_admin_document - TypeError: Object of type...
+1 failed in 9.93s
+exit 1
+== acl probe A1 (rerun: probe fix, admin_id as str)
+2026-11-19 13:55:39,051 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=1 problems=0
+2026-11-19 13:55:39,054 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=363
+2026-11-19 13:55:39,252 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-19 13:55:39,261 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=134
+2026-11-19 13:55:39,544 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=1 problems=0
+2026-11-19 13:55:39,554 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=178
+2026-11-19 13:55:39,864 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=212
+2026-11-19 13:55:39,881 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=1 problems=0
+2026-11-19 13:55:40,345 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-19 13:55:40,442 INFO ffcore.access access method=POST path=/api/v1/projects/f4a789e1-b60d-41d8-b35e-809f32a03d65/knowledge-bases status=201 ms=481
+2026-11-19 13:55:40,538 INFO ffcore.access access method=POST path=/api/v1/projects/f4a789e1-b60d-41d8-b35e-809f32a03d65/knowledge-bases/6e74288a-f5a9-4022-b8cb-66567aef0a12/documents status=202 ms=92
+2026-11-19 13:55:40,648 INFO ffcore.knowledge.ingest gold document=2ab9c6c8-7764-4440-8c6f-0310c65dbdac reused=0 embedded=1
+[RV] A1 uploaded by admin, acl_roles ['admin', 'analyst']
+2026-11-19 13:55:40,708 INFO ffcore.access access method=PATCH path=/api/v1/projects/f4a789e1-b60d-41d8-b35e-809f32a03d65/knowledge-bases/6e74288a-f5a9-4022-b8cb-66567aef0a12/documents/2ab9c6c8-7764-4440-8c6f-0310c65dbdac status=200 ms=56
+[RV] A1 analyst PATCH acl_open=true -> 200 []
+2026-11-19 13:55:40,763 INFO ffcore.access access method=PATCH path=/api/v1/projects/f4a789e1-b60d-41d8-b35e-809f32a03d65/knowledge-bases/6e74288a-f5a9-4022-b8cb-66567aef0a12/documents/2ab9c6c8-7764-4440-8c6f-0310c65dbdac status=200 ms=50
+[RV] A1 analyst PATCH acl_roles=[analyst] (drops admin) -> 200 ['analyst']
+2026-11-19 13:55:40,837 INFO ffcore.access access method=PATCH path=/api/v1/projects/f4a789e1-b60d-41d8-b35e-809f32a03d65/knowledge-bases/6e74288a-f5a9-4022-b8cb-66567aef0a12/documents/2ab9c6c8-7764-4440-8c6f-0310c65dbdac status=200 ms=70
+[RV] A1 analyst PATCH acl_users=[admin] -> 200
+2026-11-19 13:55:40,905 INFO ffcore.access access method=POST path=/api/v1/projects/f4a789e1-b60d-41d8-b35e-809f32a03d65/knowledge-bases/6e74288a-f5a9-4022-b8cb-66567aef0a12/search status=200 ms=64
+[RV] A1 admin still sees it in search: True
+[RV] A1 audit update_document rows: 3
+2026-11-19 13:55:40,956 INFO ffcore.access access method=PATCH path=/api/v1/projects/f4a789e1-b60d-41d8-b35e-809f32a03d65/knowledge-bases/6e74288a-f5a9-4022-b8cb-66567aef0a12/documents/2ab9c6c8-7764-4440-8c6f-0310c65dbdac status=404 ms=44
+[RV] A1 stranger (other project) PATCH -> 404
+.
+1 passed in 13.17s
+exit 0

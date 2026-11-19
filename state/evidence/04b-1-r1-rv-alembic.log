@@ -1,0 +1,25 @@
+HEAD=5cc18bf24dbca66a631bb8eccff627bab442b7dc (git archive copy)
+04b_0001 (03a, 09, 06b, 08, 06a, 04b, 04a, 05b, 05a, 03b, 03c, 07) (head)
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+04b_0001 (head)
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+04b_0001 (head)
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+INFO  [alembic.runtime.migration] Running downgrade 04b_0001 -> 05b_0001, 04b: chunks.sparse (bge-m3 lexical weights beside the dense vector)
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+05b_0001
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade 05b_0001 -> 04b_0001, 04b: chunks.sparse (bge-m3 lexical weights beside the dense vector)
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+04b_0001 (head)
+exit 0
+                                                          Table "public.chunks"
+ sparse          | jsonb                    |           |          | 
