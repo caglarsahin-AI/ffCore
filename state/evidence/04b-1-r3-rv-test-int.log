@@ -1,0 +1,8 @@
+HEAD=ca4c2f908f062fee86698428dadd15caf1c1dd3d (git archive copy)
+.................................................................s...... [ 93%]
+....s                                                                    [100%]
+=========================== short test summary info ============================
+SKIPPED [1] tests/integration/test_04a_ingest.py:124: NOT_RUN: needs RUN_MODEL_TESTS=1
+SKIPPED [1] tests/integration/test_04a_ingest.py:279: NOT_RUN: needs RUN_MODEL_TESTS=1
+75 passed, 2 skipped in 85.38s (0:01:25)
+exit 0

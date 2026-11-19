@@ -1,0 +1,113 @@
+HEAD=ca4c2f908f062fee86698428dadd15caf1c1dd3d (git archive copy)
+2026-11-19 16:05:41,166 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-19 16:05:41,173 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=213
+2026-11-19 16:05:41,397 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-19 16:05:41,412 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=153
+2026-11-19 16:05:41,619 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-19 16:05:41,636 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=141
+2026-11-19 16:05:41,839 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-19 16:05:41,856 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=138
+2026-11-19 16:05:42,083 INFO ffcore.access access method=POST path=/api/v1/projects/0a73ad87-6d71-4372-8f0c-e1d5074312d2/knowledge-bases status=201 ms=224
+[RV] == driver pgvector
+2026-11-19 16:05:42,159 INFO ffcore.access access method=POST path=/api/v1/projects/0a73ad87-6d71-4372-8f0c-e1d5074312d2/knowledge-bases/d5bb2cc0-f9a9-49f5-bf9f-8dcdcff0be50/documents status=202 ms=71
+2026-11-19 16:05:42,405 INFO ffcore.knowledge.ingest gold document=6264a9ee-3a62-4979-82e7-e8ef6437595b reused=0 embedded=1
+[RV] start {'roles': ['admin', 'analyst'], 'users': 0, 'version': 1, 'sha': '57f515a6', 'payload': '-'}
+2026-11-19 16:05:42,501 INFO ffcore.access access method=POST path=/api/v1/projects/0a73ad87-6d71-4372-8f0c-e1d5074312d2/knowledge-bases/d5bb2cc0-f9a9-49f5-bf9f-8dcdcff0be50/documents status=403 ms=88
+[RV] U1 analyst same bytes + acl_open -> (403, 'insufficient_role') {'roles': ['admin', 'analyst'], 'users': 0, 'version': 1, 'sha': '57f515a6', 'payload': '-'} | denied audit + 2
+2026-11-19 16:05:42,599 INFO ffcore.access access method=POST path=/api/v1/projects/0a73ad87-6d71-4372-8f0c-e1d5074312d2/knowledge-bases/d5bb2cc0-f9a9-49f5-bf9f-8dcdcff0be50/documents status=403 ms=93
+[RV] U2 analyst new bytes + acl_open -> (403, 'insufficient_role') {'roles': ['admin', 'analyst'], 'users': 0, 'version': 1, 'sha': '57f515a6', 'payload': '-'} queued 0
+2026-11-19 16:05:42,666 INFO ffcore.access access method=POST path=/api/v1/projects/0a73ad87-6d71-4372-8f0c-e1d5074312d2/knowledge-bases/d5bb2cc0-f9a9-49f5-bf9f-8dcdcff0be50/documents status=202 ms=62
+[RV] A0 analyst new bytes, no ACL fields -> (202, 'new_version') {'roles': ['admin', 'analyst'], 'users': 0, 'version': 2, 'sha': '3fd78b6e', 'payload': '-'}
+2026-11-19 16:05:42,767 INFO ffcore.knowledge.ingest gold document=6264a9ee-3a62-4979-82e7-e8ef6437595b reused=0 embedded=1
+2026-11-19 16:05:42,829 INFO ffcore.access access method=POST path=/api/v1/projects/0a73ad87-6d71-4372-8f0c-e1d5074312d2/knowledge-bases/d5bb2cc0-f9a9-49f5-bf9f-8dcdcff0be50/documents status=202 ms=58
+[RV] A1 analyst same ACL given explicitly -> (202, 'unchanged') {'roles': ['admin', 'analyst'], 'users': 0, 'version': 2, 'sha': '3fd78b6e', 'payload': '-'}
+2026-11-19 16:05:42,908 INFO ffcore.access access method=POST path=/api/v1/projects/0a73ad87-6d71-4372-8f0c-e1d5074312d2/knowledge-bases/d5bb2cc0-f9a9-49f5-bf9f-8dcdcff0be50/documents status=202 ms=74
+2026-11-19 16:05:42,986 INFO ffcore.access access method=POST path=/api/v1/projects/0a73ad87-6d71-4372-8f0c-e1d5074312d2/knowledge-bases/d5bb2cc0-f9a9-49f5-bf9f-8dcdcff0be50/search status=200 ms=73
+[RV] AD1 admin same bytes + acl_open -> (202, 'unchanged') {'roles': [], 'users': 0, 'version': 2, 'sha': '3fd78b6e', 'payload': '-'} | analyst hits 1
+2026-11-19 16:05:43,053 INFO ffcore.access access method=POST path=/api/v1/projects/0a73ad87-6d71-4372-8f0c-e1d5074312d2/knowledge-bases/d5bb2cc0-f9a9-49f5-bf9f-8dcdcff0be50/documents status=202 ms=63
+2026-11-19 16:05:43,151 INFO ffcore.knowledge.ingest gold document=c1f43fb4-76f9-4184-b95e-e62469690482 reused=0 embedded=1
+2026-11-19 16:05:43,223 INFO ffcore.access access method=POST path=/api/v1/projects/0a73ad87-6d71-4372-8f0c-e1d5074312d2/knowledge-bases/d5bb2cc0-f9a9-49f5-bf9f-8dcdcff0be50/documents status=409 ms=67
+[RV] U3 analyst unreadable name, other bytes -> (409, 'document_name_taken') unchanged: True {'roles': ['admin'], 'users': 0, 'version': 1, 'sha': '57f515a6', 'payload': '-'}
+2026-11-19 16:05:43,292 INFO ffcore.access access method=POST path=/api/v1/projects/0a73ad87-6d71-4372-8f0c-e1d5074312d2/knowledge-bases/d5bb2cc0-f9a9-49f5-bf9f-8dcdcff0be50/documents status=409 ms=63
+[RV] U3b analyst unreadable name, no ACL fields -> (409, 'document_name_taken') unchanged: True
+2026-11-19 16:05:43,359 INFO ffcore.access access method=POST path=/api/v1/projects/0a73ad87-6d71-4372-8f0c-e1d5074312d2/knowledge-bases/d5bb2cc0-f9a9-49f5-bf9f-8dcdcff0be50/documents status=202 ms=62
+2026-11-19 16:05:43,458 INFO ffcore.access access method=GET path=/api/v1/projects/0a73ad87-6d71-4372-8f0c-e1d5074312d2/knowledge-bases/d5bb2cc0-f9a9-49f5-bf9f-8dcdcff0be50/documents status=200 ms=53
+[RV] AD2 admin can read user-only doc: True
+2026-11-19 16:05:43,539 INFO ffcore.access access method=POST path=/api/v1/projects/0a73ad87-6d71-4372-8f0c-e1d5074312d2/knowledge-bases/d5bb2cc0-f9a9-49f5-bf9f-8dcdcff0be50/documents status=202 ms=77
+[RV] AD2 admin re-uploads user-only doc it cannot read -> (202, 'new_version') {'roles': ['admin'], 'users': 0, 'version': 2, 'sha': 'c7829e35', 'payload': '-'}
+2026-11-19 16:05:43,635 INFO ffcore.access access method=PATCH path=/api/v1/projects/0a73ad87-6d71-4372-8f0c-e1d5074312d2/knowledge-bases/d5bb2cc0-f9a9-49f5-bf9f-8dcdcff0be50/documents/6264a9ee-3a62-4979-82e7-e8ef6437595b status=403 ms=91
+2026-11-19 16:05:43,707 INFO ffcore.access access method=PATCH path=/api/v1/projects/0a73ad87-6d71-4372-8f0c-e1d5074312d2/knowledge-bases/d5bb2cc0-f9a9-49f5-bf9f-8dcdcff0be50/documents/6264a9ee-3a62-4979-82e7-e8ef6437595b status=200 ms=68
+[RV] P1 analyst PATCH acl_roles -> 403 | admin PATCH acl_roles -> 200 {'roles': ['admin'], 'users': 0, 'version': 2, 'sha': '3fd78b6e', 'payload': '-'}
+.2026-11-19 16:05:44,001 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-19 16:05:44,016 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=126
+2026-11-19 16:05:44,195 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-19 16:05:44,209 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=127
+2026-11-19 16:05:44,389 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-19 16:05:44,403 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=123
+2026-11-19 16:05:44,579 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-19 16:05:44,595 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=125
+2026-11-19 16:05:44,659 INFO ffcore.access access method=POST path=/api/v1/projects/e6ee449c-f496-4276-a784-efb0abb90f7b/knowledge-bases status=201 ms=60
+[RV] == driver qdrant
+2026-11-19 16:05:44,726 INFO ffcore.access access method=POST path=/api/v1/projects/e6ee449c-f496-4276-a784-efb0abb90f7b/knowledge-bases/f5dc68fd-a97c-4ca1-b760-90b9d91941cf/documents status=202 ms=63
+2026-11-19 16:05:45,550 INFO ffcore.knowledge.ingest gold document=819c0e55-c8a4-46f9-8260-24f1e3482089 reused=0 embedded=1
+[RV] start {'roles': ['admin', 'analyst'], 'users': 0, 'version': 1, 'sha': '57f515a6', 'payload': [(('admin', 'analyst'), 0)]}
+2026-11-19 16:05:45,687 INFO ffcore.access access method=POST path=/api/v1/projects/e6ee449c-f496-4276-a784-efb0abb90f7b/knowledge-bases/f5dc68fd-a97c-4ca1-b760-90b9d91941cf/documents status=403 ms=94
+[RV] U1 analyst same bytes + acl_open -> (403, 'insufficient_role') {'roles': ['admin', 'analyst'], 'users': 0, 'version': 1, 'sha': '57f515a6', 'payload': [(('admin', 'analyst'), 0)]} | denied audit + 2
+2026-11-19 16:05:45,824 INFO ffcore.access access method=POST path=/api/v1/projects/e6ee449c-f496-4276-a784-efb0abb90f7b/knowledge-bases/f5dc68fd-a97c-4ca1-b760-90b9d91941cf/documents status=403 ms=97
+[RV] U2 analyst new bytes + acl_open -> (403, 'insufficient_role') {'roles': ['admin', 'analyst'], 'users': 0, 'version': 1, 'sha': '57f515a6', 'payload': [(('admin', 'analyst'), 0)]} queued 0
+2026-11-19 16:05:45,923 INFO ffcore.access access method=POST path=/api/v1/projects/e6ee449c-f496-4276-a784-efb0abb90f7b/knowledge-bases/f5dc68fd-a97c-4ca1-b760-90b9d91941cf/documents status=202 ms=58
+[RV] A0 analyst new bytes, no ACL fields -> (202, 'new_version') {'roles': ['admin', 'analyst'], 'users': 0, 'version': 2, 'sha': '3fd78b6e', 'payload': [(('admin', 'analyst'), 0)]}
+2026-11-19 16:05:46,174 INFO ffcore.knowledge.ingest gold document=819c0e55-c8a4-46f9-8260-24f1e3482089 reused=0 embedded=1
+2026-11-19 16:05:46,240 INFO ffcore.access access method=POST path=/api/v1/projects/e6ee449c-f496-4276-a784-efb0abb90f7b/knowledge-bases/f5dc68fd-a97c-4ca1-b760-90b9d91941cf/documents status=202 ms=61
+[RV] A1 analyst same ACL given explicitly -> (202, 'unchanged') {'roles': ['admin', 'analyst'], 'users': 0, 'version': 2, 'sha': '3fd78b6e', 'payload': [(('admin', 'analyst'), 0)]}
+2026-11-19 16:05:46,425 INFO ffcore.access access method=POST path=/api/v1/projects/e6ee449c-f496-4276-a784-efb0abb90f7b/knowledge-bases/f5dc68fd-a97c-4ca1-b760-90b9d91941cf/documents status=202 ms=143
+2026-11-19 16:05:46,575 INFO ffcore.access access method=POST path=/api/v1/projects/e6ee449c-f496-4276-a784-efb0abb90f7b/knowledge-bases/f5dc68fd-a97c-4ca1-b760-90b9d91941cf/search status=200 ms=105
+[RV] AD1 admin same bytes + acl_open -> (202, 'unchanged') {'roles': [], 'users': 0, 'version': 2, 'sha': '3fd78b6e', 'payload': [((), 0)]} | analyst hits 1
+2026-11-19 16:05:46,656 INFO ffcore.access access method=POST path=/api/v1/projects/e6ee449c-f496-4276-a784-efb0abb90f7b/knowledge-bases/f5dc68fd-a97c-4ca1-b760-90b9d91941cf/documents status=202 ms=78
+2026-11-19 16:05:46,942 INFO ffcore.knowledge.ingest gold document=2cac0342-39ee-4c17-b18b-e5a7e1c51518 reused=0 embedded=1
+2026-11-19 16:05:47,072 INFO ffcore.access access method=POST path=/api/v1/projects/e6ee449c-f496-4276-a784-efb0abb90f7b/knowledge-bases/f5dc68fd-a97c-4ca1-b760-90b9d91941cf/documents status=409 ms=75
+[RV] U3 analyst unreadable name, other bytes -> (409, 'document_name_taken') unchanged: True {'roles': ['admin'], 'users': 0, 'version': 1, 'sha': '57f515a6', 'payload': [(('admin',), 0)]}
+2026-11-19 16:05:47,259 INFO ffcore.access access method=POST path=/api/v1/projects/e6ee449c-f496-4276-a784-efb0abb90f7b/knowledge-bases/f5dc68fd-a97c-4ca1-b760-90b9d91941cf/documents status=409 ms=83
+[RV] U3b analyst unreadable name, no ACL fields -> (409, 'document_name_taken') unchanged: True
+2026-11-19 16:05:47,405 INFO ffcore.access access method=POST path=/api/v1/projects/e6ee449c-f496-4276-a784-efb0abb90f7b/knowledge-bases/f5dc68fd-a97c-4ca1-b760-90b9d91941cf/documents status=202 ms=87
+2026-11-19 16:05:47,647 INFO ffcore.access access method=GET path=/api/v1/projects/e6ee449c-f496-4276-a784-efb0abb90f7b/knowledge-bases/f5dc68fd-a97c-4ca1-b760-90b9d91941cf/documents status=200 ms=73
+[RV] AD2 admin can read user-only doc: True
+2026-11-19 16:05:47,815 INFO ffcore.access access method=POST path=/api/v1/projects/e6ee449c-f496-4276-a784-efb0abb90f7b/knowledge-bases/f5dc68fd-a97c-4ca1-b760-90b9d91941cf/documents status=202 ms=163
+[RV] AD2 admin re-uploads user-only doc it cannot read -> (202, 'new_version') {'roles': ['admin'], 'users': 0, 'version': 2, 'sha': 'c7829e35', 'payload': []}
+2026-11-19 16:05:47,991 INFO ffcore.access access method=PATCH path=/api/v1/projects/e6ee449c-f496-4276-a784-efb0abb90f7b/knowledge-bases/f5dc68fd-a97c-4ca1-b760-90b9d91941cf/documents/819c0e55-c8a4-46f9-8260-24f1e3482089 status=403 ms=124
+2026-11-19 16:05:48,141 INFO ffcore.access access method=PATCH path=/api/v1/projects/e6ee449c-f496-4276-a784-efb0abb90f7b/knowledge-bases/f5dc68fd-a97c-4ca1-b760-90b9d91941cf/documents/819c0e55-c8a4-46f9-8260-24f1e3482089 status=200 ms=145
+[RV] P1 analyst PATCH acl_roles -> 403 | admin PATCH acl_roles -> 200 {'roles': ['admin'], 'users': 0, 'version': 2, 'sha': '3fd78b6e', 'payload': [(('admin',), 0)]}
+.
+=============================== warnings summary ===============================
+tests/integration/test_04a_review_r1_acl.py:47
+  /work/backend/tests/integration/test_04a_review_r1_acl.py:47: PytestUnknownMarkWarning: Unknown pytest.mark.vectorstore - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.fixture(params=["pgvector", pytest.param("qdrant", marks=pytest.mark.vectorstore)])
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+2 passed, 1 warning in 16.79s
+exit 0
+== audit probe
+2026-11-19 16:06:34,211 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-19 16:06:34,228 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=190
+2026-11-19 16:06:34,406 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-19 16:06:34,420 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=122
+2026-11-19 16:06:34,591 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-19 16:06:34,605 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=118
+2026-11-19 16:06:34,776 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-19 16:06:34,791 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=120
+2026-11-19 16:06:35,095 INFO ffcore.access access method=POST path=/api/v1/projects/333590be-a6d2-4793-b5f5-ca9f29c786bd/knowledge-bases status=201 ms=300
+2026-11-19 16:06:35,162 INFO ffcore.access access method=POST path=/api/v1/projects/333590be-a6d2-4793-b5f5-ca9f29c786bd/knowledge-bases/9b816588-7aa9-440a-b710-61772f29f0a3/documents status=202 ms=63
+2026-11-19 16:06:35,256 INFO ffcore.knowledge.ingest gold document=9a4ac6bc-bfb5-4911-98f7-f6648af4153d reused=0 embedded=1
+2026-11-19 16:06:35,341 INFO ffcore.access access method=POST path=/api/v1/projects/333590be-a6d2-4793-b5f5-ca9f29c786bd/knowledge-bases/9b816588-7aa9-440a-b710-61772f29f0a3/documents status=403 ms=80
+[RV] upload refusal 403 [('upload_documents', 'denied', True, '{"code": "insufficient_role", "path": "/projects/{project_id}/knowledge-bases/{kb_id}/documents", "write": true, "method": "POST", "min_role": "admin"}'), ('upload_documents', 'denied', True, 'null')]
+2026-11-19 16:06:35,428 INFO ffcore.access access method=PATCH path=/api/v1/projects/333590be-a6d2-4793-b5f5-ca9f29c786bd/knowledge-bases/9b816588-7aa9-440a-b710-61772f29f0a3/documents/9a4ac6bc-bfb5-4911-98f7-f6648af4153d status=403 ms=81
+[RV] patch refusal 403 [('update_document', 'denied', True, '{"code": "insufficient_role", "path": "/projects/{project_id}/knowledge-bases/{kb_id}/documents/{document_id}", "write": true, "method": "PATCH", "min_role": "admin"}'), ('update_document', 'denied', True, 'null')]
+.
+=============================== warnings summary ===============================
+tests/integration/test_04a_review_r1_acl.py:47
+  /work/backend/tests/integration/test_04a_review_r1_acl.py:47: PytestUnknownMarkWarning: Unknown pytest.mark.vectorstore - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.fixture(params=["pgvector", pytest.param("qdrant", marks=pytest.mark.vectorstore)])
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1 passed, 1 warning in 8.83s
+exit 0

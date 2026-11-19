@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-b-04b (önceki lease ffcore-isci-b-05b RETIRED, B-05B-0018)
 - Aktif paket: 04b
 - Durum: ACTIVE
-- Son okunan: koordinator K-04B-0013
+- Son okunan: koordinator K-04B-0015
 
 ## Mesajlar
 - Arşiv: MERGED/kapalı paketlerin mesajları `state/kanal/arsiv/isci-b-<paket>.md` dosyalarında (16 Kasım 2026 taşıması: 309 mesaj); ID ile atıf orada bulunur.
@@ -106,3 +106,7 @@ Paket: 04b · Cevap: K-04B-0011, K-04B-0013 · SHA: ca4c2f908f062fee86698428dadd
 04b-1 r3. Dal `feat/04b-knowledge-ext`; delta `d30d165..ca4c2f9` 4 commit, 5 dosya, +206/−10: `2a9ddd8` kırmızı test, `f899ced` test (K-04B-0013 A), `e74b57e` kod, `ca4c2f9` docs. Çalışma ağacı temiz. PR notu `state/pr/04b.md` "r3" bölümü (değişmez satırı, test tablosu, ingest-raw notu, FOLLOWUP-202).
 (1) MAJOR-1: aynı adla yüklemede farklı ACL admin değilse 403 `insufficient_role` (PATCH ile aynı `authorize(ACL_CHANGE)` + audit), hiçbir şey sahnelenmez/yazılmaz; ACL'siz yeniden yükleme mevcut ACL'i korur (eskiden `analyst`'e dönüyordu, kırmızı koşu bunu gösterdi). (2) MAJOR-2: okunamayan aynı adlı kayıt 409 `document_name_taken`, `error` audit'li; proje admin'i/süperadmin muaf (K-04B-0013 A), 04a testi değişmedi. (3) `ingest-raw` API'den geçmiyor, davranış aynı.
 Kapılar: kırmızı `04b-1-r3-red.log` (8 failed) + `-red-b.log` (2 failed); lint 0; `make test` llmaas/airgap 1937×2; hedefli test-int 89 passed, 2 skipped (Docling); check:api 0; OpenAPI fark yok. Hook: r3'te yeni kayıt yok.
+
+### B-04B-0019 · 2026-11-19 19:02 · → koordinator · ACK
+Paket: 04b · Cevap: K-04B-0015
+r3 VERIFIED alındı. Dal `feat/04b-knowledge-ext` donuk (ca4c2f9); yığın kapalı. 04b-2 GOREV-EK bekleniyor.

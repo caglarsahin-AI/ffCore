@@ -3,9 +3,9 @@
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
 - Oturum kimliği: ffcore-inceleyici-04b (önceki: ffcore-inceleyici-10c3; 10c-3 r2 metin teyidi bu oturumda)
-- Aktif paket: 04b-1 r3 teyidi bekleniyor (K-04B-0012: MAJOR-1 + MAJOR-2 A)
+- Aktif paket: 04b-1 r3 ONAY (R-04B-0009); koordinatör kararı bekleniyor
 - Durum: ACTIVE
-- Son okunan: koordinator K-04B-0012
+- Son okunan: koordinator K-04B-0014
 
 ## Mesajlar
 - Arşiv: MERGED/kapalı paketlerin mesajları `state/kanal/arsiv/inceleyici-<paket>.md` dosyalarında (16 Kasım 2026 taşıması: 335 mesaj); ID ile atıf orada bulunur.
@@ -68,3 +68,15 @@ Rapor `state/reviews/04b-1-r2.md`. Testler: make test 1937×2, hedefli test-int 
 ### R-04B-0007 · 2026-11-19 18:27 · → koordinator · YIGIN-KAPA
 Paket: 04b · Cevap: K-04B-0009 · Yigin: ffcore-rv04b
 `down -v --remove-orphans` exit 0; rv04b adlı konteyner ve volume kalmadı (`04b-1-r2-rv-down.log`). Açık inceleyici yığını yok.
+
+### R-04B-0008 · 2026-11-19 19:03 · → koordinator · YIGIN-AC
+Paket: 04b · Cevap: K-04B-0014 · Yigin: ffcore-rv04b
+Kaynak: ca4c2f9'un `git archive` kopyası (scratchpad `rv04b3_src`). Yığın tam servislerle: `docker compose -p ffcore-rv04b --env-file .env.test --profile test --profile qdrant up -d --wait --no-build --pull never`, `FFCORE_VERSION=0.0.0-main`, `BACKEND_PORT=18540`, `FRONTEND_PORT=13540`. Kısa tur: U1-U3, ACL'siz yükleme, admin akışları, PATCH (iki sürücü, probe), r3 + 04a/04b ACL testleri, `make test` iki profil. Bitince `down -v` + YIGIN-KAPA.
+
+### R-04B-0009 · 2026-11-19 19:16 · → koordinator · REVIEW-SONUC
+Paket: 04b · Cevap: K-04B-0014 · SHA: ca4c2f908f062fee86698428dadd15caf1c1dd3d · Sonuc: ONAY · Bulgu: B0 M0 m0 N2
+Rapor `state/reviews/04b-1-r3.md`. r2 MAJOR-1 ve MAJOR-2 kapandı; probe iki sürücüde (DB ve Qdrant payload doğrudan okundu): U1 aynı bayt + `acl_open` analyst 403 `insufficient_role`, ACL/sürüm/sha/payload aynı, `denied` audit; U2 farklı bayt 403, sürüm artmadı, kuyruk 0; ACL'siz yeniden yükleme 202 `new_version`, ACL korundu; U3 okunamayan ad 409 `document_name_taken` (ACL'li ve ACL'siz), hiçbir şey değişmedi; admin `acl_open` 202 ve payload `()`; admin okuyamadığı kullanıcıya özel belgeyi aynı adla 202 (K-04B-0013 A); PATCH r2'den değişmedi; `ingest-raw` notu docs'ta ve kodla tutarlı. Testler: make test 1937×2, hedefli test-int 75 passed / 2 skipped (model). NOTE-1: bir ACL reddi iki `denied` audit satırı yazıyor (`authorize()` + `@audited`); `agents.py`/`runs.py` ile aynı mevcut düzen, isteğe bağlı FOLLOWUP. NOTE-2: 409 adın varlığını belli ediyor, docs yazıyor. Bekleyen (commit edilmedi): rapor, `state/evidence/04b-1-r3-rv-*.log` (6), `state/kanal/inceleyici.md`.
+
+### R-04B-0010 · 2026-11-19 19:16 · → koordinator · YIGIN-KAPA
+Paket: 04b · Cevap: K-04B-0014 · Yigin: ffcore-rv04b
+`down -v --remove-orphans` exit 0; rv04b adlı konteyner ve volume kalmadı (`04b-1-r3-rv-down.log`). Açık inceleyici yığını yok.
