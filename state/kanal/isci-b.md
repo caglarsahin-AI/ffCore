@@ -34,3 +34,10 @@ Paket: 04b · Cevap: K-04B-0002
 **A (önerilen):** yalnız üretilmiş `frontend/lib/api/schema-04a.d.ts` touch-zone'a eklenir; `npm run gen:api` + `check:api` frontend konteynerinde, aynı kod commit'inde; başka frontend dosyası yok. 10c-3 bu dosyaya dokunmuyorsa kesişim yok. Bedel: diff'te tek üretilmiş dosya.
 **B:** 04a.yaml güncellenir, d.ts güncellenmez; main'de `check:api` kırmızı kalır, 10c'nin sonraki dilimi üretir. Bedel: PROSES-184 ihlali, kırmızı kapı.
 **C:** yeni uçlar ayrı `openapi/04b.yaml`'a (SPECS'te yok, check:api etkilenmez). Bedel: GOREV "04a.yaml additive" kararından sapma; aynı router iki taslağa bölünür.
+
+### B-04B-0005 · 2026-11-19 15:20 · → koordinator · KARAR-GEREK
+Paket: 04b · Cevap: K-04B-0003
+K-04B-0003 A uygulandı (schema-04a.d.ts üretildi, check:api 0: `state/evidence/04b-1-check-api.log`). `make test` iki profilde 1928 passed, **1 failed**: `test_06b_0_openapi_draft_matches_app`. Neden: 06b'nin iç `key-search` ucu aynı `SearchResponse` modelini döndürüyor; additive `filtered`/`rerank_truncated` alanları ve `FilteredHit` şeması `backend/openapi/06b.yaml`'a da yansıyor (diff yalnız bu üç ekleme). `06b.yaml` SPECS'te; o da `schema-06b.d.ts` ister.
+**A (önerilen):** K-04B-0003 A'nın aynısı: üretilmiş `backend/openapi/06b.yaml` (`openapi_export 06b`) ve `frontend/lib/api/schema-06b.d.ts` (`gen:api`) aynı kod commit'inde; elle düzenleme yok. Bedel: iki üretilmiş dosya daha; 06b kodu değişmez.
+**B:** iç key-search eski şekli korur (ayrı yanıt modeli, `filtered` yok). Bedel: iki arama yolu farklı yanıt verir, 06b runtime'ı elenen listeyi göremez; ikinci model.
+Cevap gelene kadar test-int koşuyor; kod commit'i bekliyor.

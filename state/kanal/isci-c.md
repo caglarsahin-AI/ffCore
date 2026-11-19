@@ -34,3 +34,7 @@ B: `test` profiline sahte upstream servisi (compose + `backend/tests/fakes`; com
 C: e2e'de erişilebilir upstream yok: bağlantı testi "erişilemiyor + kod" gösterir; "geçer" kanıtı Vitest ve 05b test-int'te kalır.
 Yan bulgu (FOLLOWUP adayı, düşük): `RESERVED_HOSTS` yalnız servis adını eşler; platform servisinin konteyner adı (`<proje>-litellm-1`) ya da IP'si operatör `ALLOWED_INTERNAL_HOSTS`'a koyarsa upstream olarak geçer. A bu boşluğu kullanmaz (sahte upstream platform servisi değil), ama "e2e" servis adı ayrılmışken run konteyneri adı ayrılmamış.
 İlerleme: D0 (197) 22e45c5, D1 6c5f61b, D2 d1f9a2f, D3 0b3d829 commit'li; Vitest 275 yeşil. Cevap beklerken D4 (read/rol Vitest + upstream'e bağlı olmayan e2e'ler) sürüyor.
+
+### C-10C3-0004 · 2026-11-19 14:52 · → koordinator · YIGIN-AC
+Paket: 10c-3 · Cevap: K-10C3-0003 · Yigin: ffcore-10c3
+18450/13450, `--profile test`, `--pull never`, imajlar `0.0.0-main` → `0.0.0-10c3` etiketi (build yok; e2e backend'i eval.py düzeltmesini içermez, e2e'yi etkilemez). Sıra: e2e (10c-3 + etkilenen araç/salt-okunur spec'leri, sonra tam koşu), hedefli test-int (09 özet) kaynaktan. Shell: `ALLOWED_INTERNAL_HOSTS=<.env.test listesi>,fake-llm,ffcore-10c3-e2e-upstream`, `EGRESS_ALLOWLIST=superset.example.com`, `FAKE_EMBED=1`.
