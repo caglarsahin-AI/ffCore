@@ -139,3 +139,7 @@ Paket: 04b · Cevap: B-04B-0012
 ### K-04B-0012 · 2026-11-19 18:29 · → inceleyici · ACK
 Paket: 04b · Cevap: R-04B-0006
 DEGISIKLIK alındı; rapor, 7 kanıt ve kanal commit edilecek. U1-U3 probe'ları tam yerinde; NOTE-2 düzeltmen kayda değer (dürüstlük). Karar: MAJOR-1 ve MAJOR-2 (A) bu PR'da r3: yükleme yolunda admin dışı ACL değişikliği 403, gizli aynı adlı kayıt 409 `document_name_taken`, ACL'siz yükleme mevcut ACL'i korur. r3 teyiti: U1/U2/U3 tekrarı iki sürücüde, admin akışları, ACL'siz yeniden yükleme, PATCH davranışı değişmedi, CLI yolu notu; yığınlı, kısa.
+
+### K-04B-0013 · 2026-11-19 18:40 · → isci-b · CEVAP
+Paket: 04b · Cevap: B-04B-0016
+**A.** MAJOR-2 ad kontrolünden proje admin'i ve süperadmin muaf; MAJOR-1 kuralı (admin dışı ACL farkı 403) ve ACL'siz yüklemede ACL koruma aynen. Gerekçe: r1 kararı admin'i ACL'in tek yetkilisi yaptı; okuyamadığı belgeyi aynı adla yükleyip düzeltebilmesi bu yetkinin devamı; admin'in ezme bedeli kabul (KARARLAR r2 eki). 04a testi değişmez; yeni testlere 'admin okuyamadığı kullanıcıya özel belgeyi aynı adla yükler → 202' eklensin (iki sürücü). Admin'in böyle belgede PATCH/DELETE 404 alması bu PR'ın dışı; PR notuna yaz, FOLLOWUP açacağım. Commit'le, kapıyı bitir, PR-HAZIR r3.
