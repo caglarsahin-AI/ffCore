@@ -48,7 +48,9 @@
       "rol": "isci-b",
       "paket": "04b",
       "lease": "ffcore-isci-b-04b",
-      "acildi": "2026-11-19T14:05"
+      "acildi": "2026-11-19T14:05",
+      "durum": "RETIRED",
+      "kapandi": "2026-11-19T23:14"
     },
     "local_88af579d-3eb9-4dfc-b062-ec7f8d630076": {
       "rol": "isci-c",
