@@ -1,0 +1,109 @@
+.......FFF..                                                             [100%]
+=================================== FAILURES ===================================
+_________________ test_04b_r2_mismatch_hint_follows_the_target _________________
+
+    def test_04b_r2_mismatch_hint_follows_the_target():
+        """r1 MINOR-1: --drop-target is refused for pgvector, so it is never the pgvector hint."""
+        (line,) = [x for x in _report(2, 1, to="pgvector").lines() if "mismatch" in x]
+>       assert "--drop-target" not in line.replace("--to qdrant --drop-target", "")
+E       AssertionError: assert '--drop-target' not in '  sozlesme ...-drop-target'
+E         
+E         '--drop-target' is contained here:
+E           again with --drop-target
+
+tests/unit/test_04b_cli.py:74: AssertionError
+________________ test_04b_r2_acl_change_is_admin_only[pgvector] ________________
+
+world = {'settings': Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('****...ect': '2257e523-ae09-408b-b989-861f7efdcea3', 'admin': <starlette.testclient.TestClient object at 0x7f331cd21880>, ...}
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_67e9ed6c09f1) at 0x7f331cb22420>
+
+    def test_04b_r2_acl_change_is_admin_only(world, pg):
+        item = upload(world, world["admin"], "ortak.md", BODY, acl_roles=["admin", "analyst"])
+        url = doc_url(world, item.json()["data"][0]["document"]["id"])
+        drain(world)
+        assert search(world, world["analyst"])["hits"]
+        assert search(world, world["peer"])["hits"]  # peer is an analyst too
+    
+        changes = ({"acl_open": True}, {"acl_roles": ["analyst"]}, {"acl_users": [world["analyst_id"]]})
+        for body in changes:
+            refused = world["analyst"].patch(url, json=body)
+>           assert refused.status_code == 403, refused.text
+E           AssertionError: {"id":"b5597816-7236-4585-9012-b97e5e5b1acd","kb_id":"a6746076-5fdd-46af-8f72-5960bec9d226","filename":"ortak.md","mime_sniffed":null,"size":1317,"sha256":"57f515a6702e31ddb073b98270ae382f22148e94ae3d13ca2d7e34112cc34980","status":"indexed","error":null,"page_count":null,"acl_roles":[],"acl_users":[],"metadata":{},"version":1,"breadcrumb":"Gizli › ortak.md","updated_at_source":null,"language":null,"duplicate_of":null,"gate0":{"status":"ok","reason":null},"gate1":{"status":"ok","reason":null},"gate2":{"status":"ok","reason":null},"convert_engine":"test-markdown-as-is","convert_seconds":0.001,"chunk_count":1,"created_at":"2026-11-19T14:53:56.772289Z","updated_at":"2026-11-19T14:53:57.085571Z"}
+E           assert 200 == 403
+E            +  where 200 = <Response [200 OK]>.status_code
+
+tests/integration/test_04b_r2_acl.py:41: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+2026-11-19 14:53:55,984 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=389
+2026-11-19 14:53:56,187 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=134
+2026-11-19 14:53:56,390 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=135
+2026-11-19 14:53:56,556 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=101
+2026-11-19 14:53:56,727 INFO ffcore.access access method=POST path=/api/v1/projects/2257e523-ae09-408b-b989-861f7efdcea3/knowledge-bases status=201 ms=168
+------------------------------ Captured log setup ------------------------------
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=389
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=134
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=135
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=101
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/2257e523-ae09-408b-b989-861f7efdcea3/knowledge-bases status=201 ms=168
+----------------------------- Captured stderr call -----------------------------
+2026-11-19 14:53:56,796 INFO ffcore.access access method=POST path=/api/v1/projects/2257e523-ae09-408b-b989-861f7efdcea3/knowledge-bases/a6746076-5fdd-46af-8f72-5960bec9d226/documents status=202 ms=65
+2026-11-19 14:53:56,893 INFO ffcore.knowledge.ingest gold document=b5597816-7236-4585-9012-b97e5e5b1acd reused=0 embedded=1
+2026-11-19 14:53:56,977 INFO ffcore.access access method=POST path=/api/v1/projects/2257e523-ae09-408b-b989-861f7efdcea3/knowledge-bases/a6746076-5fdd-46af-8f72-5960bec9d226/search status=200 ms=79
+2026-11-19 14:53:57,047 INFO ffcore.access access method=POST path=/api/v1/projects/2257e523-ae09-408b-b989-861f7efdcea3/knowledge-bases/a6746076-5fdd-46af-8f72-5960bec9d226/search status=200 ms=65
+2026-11-19 14:53:57,104 INFO ffcore.access access method=PATCH path=/api/v1/projects/2257e523-ae09-408b-b989-861f7efdcea3/knowledge-bases/a6746076-5fdd-46af-8f72-5960bec9d226/documents/b5597816-7236-4585-9012-b97e5e5b1acd status=200 ms=53
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/2257e523-ae09-408b-b989-861f7efdcea3/knowledge-bases/a6746076-5fdd-46af-8f72-5960bec9d226/documents status=202 ms=65
+INFO     ffcore.knowledge.ingest:ingest.py:677 gold document=b5597816-7236-4585-9012-b97e5e5b1acd reused=0 embedded=1
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/2257e523-ae09-408b-b989-861f7efdcea3/knowledge-bases/a6746076-5fdd-46af-8f72-5960bec9d226/search status=200 ms=79
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/2257e523-ae09-408b-b989-861f7efdcea3/knowledge-bases/a6746076-5fdd-46af-8f72-5960bec9d226/search status=200 ms=65
+INFO     ffcore.access:logging.py:263 access method=PATCH path=/api/v1/projects/2257e523-ae09-408b-b989-861f7efdcea3/knowledge-bases/a6746076-5fdd-46af-8f72-5960bec9d226/documents/b5597816-7236-4585-9012-b97e5e5b1acd status=200 ms=53
+_________________ test_04b_r2_acl_change_is_admin_only[qdrant] _________________
+
+world = {'settings': Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('****...ect': 'cf9afb8b-9274-4642-90a4-4e4aebec19da', 'admin': <starlette.testclient.TestClient object at 0x7f3300980860>, ...}
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_67e9ed6c09f1) at 0x7f33009803b0>
+
+    def test_04b_r2_acl_change_is_admin_only(world, pg):
+        item = upload(world, world["admin"], "ortak.md", BODY, acl_roles=["admin", "analyst"])
+        url = doc_url(world, item.json()["data"][0]["document"]["id"])
+        drain(world)
+        assert search(world, world["analyst"])["hits"]
+        assert search(world, world["peer"])["hits"]  # peer is an analyst too
+    
+        changes = ({"acl_open": True}, {"acl_roles": ["analyst"]}, {"acl_users": [world["analyst_id"]]})
+        for body in changes:
+            refused = world["analyst"].patch(url, json=body)
+>           assert refused.status_code == 403, refused.text
+E           AssertionError: {"id":"6c725e2d-5ffc-4673-90e2-8cf524eafc0f","kb_id":"f391db8e-12e6-4ac2-9dfb-b35cb6698a08","filename":"ortak.md","mime_sniffed":null,"size":1317,"sha256":"57f515a6702e31ddb073b98270ae382f22148e94ae3d13ca2d7e34112cc34980","status":"indexed","error":null,"page_count":null,"acl_roles":[],"acl_users":[],"metadata":{},"version":1,"breadcrumb":"Gizli › ortak.md","updated_at_source":null,"language":null,"duplicate_of":null,"gate0":{"status":"ok","reason":null},"gate1":{"status":"ok","reason":null},"gate2":{"status":"ok","reason":null},"convert_engine":"test-markdown-as-is","convert_seconds":0.001,"chunk_count":1,"created_at":"2026-11-19T14:54:01.107523Z","updated_at":"2026-11-19T14:54:03.085194Z"}
+E           assert 200 == 403
+E            +  where 200 = <Response [200 OK]>.status_code
+
+tests/integration/test_04b_r2_acl.py:41: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+2026-11-19 14:54:00,541 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=113
+2026-11-19 14:54:00,702 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=102
+2026-11-19 14:54:00,858 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=104
+2026-11-19 14:54:01,017 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=104
+2026-11-19 14:54:01,073 INFO ffcore.access access method=POST path=/api/v1/projects/cf9afb8b-9274-4642-90a4-4e4aebec19da/knowledge-bases status=201 ms=54
+------------------------------ Captured log setup ------------------------------
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=113
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=102
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=104
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=104
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/cf9afb8b-9274-4642-90a4-4e4aebec19da/knowledge-bases status=201 ms=54
+----------------------------- Captured stderr call -----------------------------
+2026-11-19 14:54:01,141 INFO ffcore.access access method=POST path=/api/v1/projects/cf9afb8b-9274-4642-90a4-4e4aebec19da/knowledge-bases/f391db8e-12e6-4ac2-9dfb-b35cb6698a08/documents status=202 ms=64
+2026-11-19 14:54:02,883 INFO ffcore.knowledge.ingest gold document=6c725e2d-5ffc-4673-90e2-8cf524eafc0f reused=0 embedded=1
+2026-11-19 14:54:02,965 INFO ffcore.access access method=POST path=/api/v1/projects/cf9afb8b-9274-4642-90a4-4e4aebec19da/knowledge-bases/f391db8e-12e6-4ac2-9dfb-b35cb6698a08/search status=200 ms=79
+2026-11-19 14:54:03,045 INFO ffcore.access access method=POST path=/api/v1/projects/cf9afb8b-9274-4642-90a4-4e4aebec19da/knowledge-bases/f391db8e-12e6-4ac2-9dfb-b35cb6698a08/search status=200 ms=75
+2026-11-19 14:54:03,129 INFO ffcore.access access method=PATCH path=/api/v1/projects/cf9afb8b-9274-4642-90a4-4e4aebec19da/knowledge-bases/f391db8e-12e6-4ac2-9dfb-b35cb6698a08/documents/6c725e2d-5ffc-4673-90e2-8cf524eafc0f status=200 ms=81
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/cf9afb8b-9274-4642-90a4-4e4aebec19da/knowledge-bases/f391db8e-12e6-4ac2-9dfb-b35cb6698a08/documents status=202 ms=64
+INFO     ffcore.knowledge.ingest:ingest.py:677 gold document=6c725e2d-5ffc-4673-90e2-8cf524eafc0f reused=0 embedded=1
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/cf9afb8b-9274-4642-90a4-4e4aebec19da/knowledge-bases/f391db8e-12e6-4ac2-9dfb-b35cb6698a08/search status=200 ms=79
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/cf9afb8b-9274-4642-90a4-4e4aebec19da/knowledge-bases/f391db8e-12e6-4ac2-9dfb-b35cb6698a08/search status=200 ms=75
+INFO     ffcore.access:logging.py:263 access method=PATCH path=/api/v1/projects/cf9afb8b-9274-4642-90a4-4e4aebec19da/knowledge-bases/f391db8e-12e6-4ac2-9dfb-b35cb6698a08/documents/6c725e2d-5ffc-4673-90e2-8cf524eafc0f status=200 ms=81
+=========================== short test summary info ============================
+FAILED tests/unit/test_04b_cli.py::test_04b_r2_mismatch_hint_follows_the_target
+FAILED tests/integration/test_04b_r2_acl.py::test_04b_r2_acl_change_is_admin_only[pgvector]
+FAILED tests/integration/test_04b_r2_acl.py::test_04b_r2_acl_change_is_admin_only[qdrant]
+3 failed, 9 passed in 24.90s

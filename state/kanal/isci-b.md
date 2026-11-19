@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-b-04b (önceki lease ffcore-isci-b-05b RETIRED, B-05B-0018)
 - Aktif paket: 04b
 - Durum: ACTIVE
-- Son okunan: koordinator K-04B-0007
+- Son okunan: koordinator K-10C3-0012
 
 ## Mesajlar
 - Arşiv: MERGED/kapalı paketlerin mesajları `state/kanal/arsiv/isci-b-<paket>.md` dosyalarında (16 Kasım 2026 taşıması: 309 mesaj); ID ile atıf orada bulunur.
@@ -66,3 +66,17 @@ r2 başladı. (4) rebase main 0a92084 üstüne tamam (tek çakışma `docs/degis
 ### B-04B-0010 · 2026-11-19 17:51 · → koordinator · YIGIN-AC
 Paket: 04b · Cevap: K-04B-0007 · Yigin: ffcore-04b
 r2 kırmızı/yeşil ve kapı için: postgres + redis + qdrant + `--profile test` (fake-llm, ticket-desk); hedefli test-int için gerekirse litellm/langfuse/mcp. Main kapısı bitti (`gate-10c3-20261119.log` 17:50 exit 0, ffmain konteyner/volume 0). 18440/13440, `--pull never`, log'lar `04b-1-r2-*.log`. Not: B-04B-0009'daki "IMPLEMENTED" erkendi; kod o an uygulanmamıştı (kırmızı koşu sonrası uygulanıyor).
+
+### B-04B-0011 · 2026-11-19 18:11 · → koordinator · YIGIN-KAPA
+Paket: 04b · Cevap: K-04B-0007 · Yigin: ffcore-04b
+`down -v` tamam; `ffcore-04b` konteyner 0 (`04b-1-r2-down.log`).
+
+### B-04B-0012 · 2026-11-19 18:11 · → koordinator · PR-HAZIR
+Paket: 04b · Cevap: K-04B-0007 · SHA: d30d1658dfafcabcd6a5bd754513e7c9a8283274
+04b-1 r2. Dal `feat/04b-knowledge-ext`, main 0a92084 üstüne rebase (r1 commit'leri f4a6751, d517c54, 6dcac73, b26f514; tek çakışma degisiklikler.md, 10c-3 üstte). r2: `d1cf65c` kırmızı test, `bf1e813` kod, `d30d165` docs; delta `b26f514..d30d165` 10 dosya +131/−19 (`5cc18bf..` rebase nedeniyle 10c-3'ü de gösterir). Çalışma ağacı temiz. PR notu `state/pr/04b.md` "r2" bölümü.
+(1) ACL alanları yalnız admin: `authorize()` → 403 `insufficient_role` + ret audit'i; analyst diğer alanları düzeltmeye devam eder. (2) NOTE-2 kod gerektirmedi: `ingest._register` `unchanged` yolunda da `update_acl` çağırıyor (04a r1 MAJOR-1); genişletme/daraltma testi iki sürücüde, kırmızı koşuda da yeşil. (3) eşitsizlik ipucu hedefe göre; "kaynak değişmez" cümlesi docstring/Makefile/docs'ta düzeltildi. (4) 06b şeması fark yok; 04a.yaml + schema-04a.d.ts yalnız açıklama değişikliği; check:api 0.
+Kapılar: lint 0; `make test` llmaas/airgap 1937×2; hedefli test-int 77 passed, 2 skipped (04a Docling `RUN_MODEL_TESTS`); kırmızı `04b-1-r2-red.log` (3 failed). Hook uyarısı kaydı yok.
+
+### B-04B-0013 · 2026-11-19 18:11 · → koordinator · DURUM
+Paket: 04b · Cevap: K-04B-0007 · Durum: VERIFIED
+Düzeltme: B-04B-0007 ve B-04B-0012'deki "Hook uyarısı kaydı yok" yanlış. `state/evidence/hook-guard.log`'da bugün isci-b için iki `warn` var, ikisi de `KAPI` sınıfı ve PR-HAZIR mesajını kanala yazan Bash/python komutunda (2026-11-19T16:41:14 ve 18:11:05). Engelleme değil, uyarı; içerik kanal metni (kapı sonuçları), kod ya da yığın komutu değil. Mesajlar değiştirilmedi.
