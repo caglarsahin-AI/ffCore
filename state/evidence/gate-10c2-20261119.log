@@ -1,0 +1,197 @@
+=== gate10c2 main b93cd96 2026-11-19 12:55:06
+
+=== 12:55:08 compose config
+config exit=0
+
+=== 12:55:22 up -d --build --pull never --wait
+ Container ffmain-frontend-1  Healthy
+ Container ffmain-postgres-1  Healthy
+ Container ffmain-litellm-1  Healthy
+ Container ffmain-agent-worker-bg-1  Healthy
+ Container ffmain-ticket-desk-1  Healthy
+ Container ffmain-langfuse-minio-1  Healthy
+ Container ffmain-qdrant-1  Healthy
+ Container ffmain-langfuse-worker-1  Healthy
+ Container ffmain-mcp-search-1  Healthy
+ Container ffmain-mcp-sql-1  Healthy
+up exit=0
+ffcore/frontend:0.0.0-main 2026-11-19 12:57:12 +0300 +03
+ffcore/backend:0.0.0-main 2026-11-19 12:55:35 +0300 +03
+ffcore/tools:0.0.0-main 2026-11-05 21:09:24 +0300 +03
+ffmain-worker-1 Up 2 seconds
+ffmain-agent-worker-bg-1 Up 19 seconds
+ffmain-agent-worker-1 Up 19 seconds
+ffmain-mcp-sql-1 Up 18 seconds (healthy)
+ffmain-frontend-1 Up 18 seconds
+ffmain-mcp-search-1 Up 18 seconds (healthy)
+ffmain-backend-1 Up 30 seconds (healthy)
+ffmain-litellm-1 Up About a minute (healthy)
+ffmain-langfuse-web-1 Up About a minute (healthy)
+ffmain-langfuse-worker-1 Up About a minute
+ffmain-langfuse-minio-1 Up About a minute (healthy)
+ffmain-ticket-desk-1 Up About a minute (healthy)
+ffmain-langfuse-redis-1 Up About a minute (healthy)
+ffmain-postgres-1 Up About a minute (healthy)
+ffmain-fake-llm-1 Up About a minute
+ffmain-langfuse-postgres-1 Up About a minute (healthy)
+ffmain-redis-1 Up About a minute (healthy)
+ffmain-qdrant-1 Up About a minute (healthy)
+ffmain-langfuse-clickhouse-1 Up About a minute (healthy)
+
+=== 12:58:55 lint
+ruff check backend scripts data/samples/scripts services
+All checks passed!
+ruff format --check backend scripts data/samples/scripts services
+509 files already formatted
+lint exit=0
+
+=== 12:59:23 alembic heads
+05b_0001 (06b, 05a, 06a, 07, 08, 05b, 04a, 03b, 03a, 09, 03c) (head)
+heads exit=0
+
+=== 12:59:43 make test llmaas
+........................................................................ [  3%]
+........................................................................ [  7%]
+........................................................................ [ 11%]
+........................................................................ [ 15%]
+........................................................................ [ 18%]
+........................................................................ [ 22%]
+........................................................................ [ 26%]
+........................................................................ [ 30%]
+........................................................................ [ 33%]
+........................................................................ [ 37%]
+........................................................................ [ 41%]
+........................................................................ [ 45%]
+........................................................................ [ 48%]
+........................................................................ [ 52%]
+........................................................................ [ 56%]
+........................................................................ [ 60%]
+........................................................................ [ 63%]
+........................................................................ [ 67%]
+........................................................................ [ 71%]
+........................................................................ [ 75%]
+........................................................................ [ 78%]
+........................................................................ [ 82%]
+........................................................................ [ 86%]
+........................................................................ [ 90%]
+........................................................................ [ 93%]
+........................................................................ [ 97%]
+..............................................                           [100%]
+1918 passed in 202.40s (0:03:22)
+test exit=0
+
+=== 13:03:29 make test airgap
+........................................................................ [  3%]
+........................................................................ [  7%]
+........................................................................ [ 11%]
+........................................................................ [ 15%]
+........................................................................ [ 18%]
+........................................................................ [ 22%]
+........................................................................ [ 26%]
+........................................................................ [ 30%]
+........................................................................ [ 33%]
+........................................................................ [ 37%]
+........................................................................ [ 41%]
+........................................................................ [ 45%]
+........................................................................ [ 48%]
+........................................................................ [ 52%]
+........................................................................ [ 56%]
+........................................................................ [ 60%]
+........................................................................ [ 63%]
+........................................................................ [ 67%]
+........................................................................ [ 71%]
+........................................................................ [ 75%]
+........................................................................ [ 78%]
+........................................................................ [ 82%]
+........................................................................ [ 86%]
+........................................................................ [ 90%]
+........................................................................ [ 93%]
+........................................................................ [ 97%]
+..............................................                           [100%]
+1918 passed in 197.29s (0:03:17)
+test-airgap exit=0
+
+=== 13:07:03 test-samples
+
+----------------------------------------------------------------------
+Ran 54 tests in 4.538s
+
+OK (skipped=5)
+samples exit=0
+
+=== 13:07:19 test-int
+........................................................................ [  7%]
+........................................................................ [ 14%]
+........................................................................ [ 21%]
+.....................................s.................................. [ 28%]
+........................................................................ [ 35%]
+.................s..........s........................................... [ 42%]
+....................................s................................... [ 49%]
+........................................................................ [ 56%]
+........................................................................ [ 63%]
+........................................................................ [ 70%]
+........................................................................ [ 77%]
+........................................................................ [ 84%]
+........................................................ssssssss........ [ 91%]
+..........................................................s............. [ 98%]
+...............                                                          [100%]
+=============================== warnings summary ===============================
+tests/integration/test_04a_worker.py::test_04a_upload_job_runs_in_worker
+tests/integration/test_04a_worker.py::test_04a_job_for_missing_row_retries_then_fails_loud
+  /opt/venv/lib/python3.12/site-packages/arq/worker.py:877: DeprecationWarning: Call to deprecated close. (Use aclose() instead) -- Deprecated since version 5.0.1.
+    await self.pool.close(close_connection_pool=True)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+SKIPPED [1] tests/integration/test_03b_egress_dns.py: NOT_RUN: needs RUN_DNS_TESTS=1
+SKIPPED [1] tests/integration/test_04a_ingest.py:124: NOT_RUN: needs RUN_MODEL_TESTS=1
+SKIPPED [1] tests/integration/test_04a_ingest.py:279: NOT_RUN: needs RUN_MODEL_TESTS=1
+SKIPPED [1] tests/integration/test_05a_sql.py:301: NOT_RUN: needs RUN_MODEL_TESTS=1
+SKIPPED [1] tests/integration/test_09_exam_stack.py:83: NOT_RUN: set RUN_EVAL_STACK=1 (scenario stack + make seed + make seed-eval)
+SKIPPED [1] tests/integration/test_09_exam_stack.py:92: NOT_RUN: set RUN_EVAL_STACK=1 (scenario stack + make seed + make seed-eval)
+SKIPPED [1] tests/integration/test_09_exam_stack.py:98: NOT_RUN: set RUN_EVAL_STACK=1 (scenario stack + make seed + make seed-eval)
+SKIPPED [1] tests/integration/test_09_exam_stack.py:123: NOT_RUN: set RUN_EVAL_STACK=1 (scenario stack + make seed + make seed-eval)
+SKIPPED [1] tests/integration/test_09_exam_stack.py:129: NOT_RUN: set RUN_EVAL_STACK=1 (scenario stack + make seed + make seed-eval)
+SKIPPED [1] tests/integration/test_09_exam_stack.py:140: NOT_RUN: set RUN_EVAL_STACK=1 (scenario stack + make seed + make seed-eval)
+SKIPPED [1] tests/integration/test_09_exam_stack.py:155: NOT_RUN: set RUN_EVAL_STACK=1 (scenario stack + make seed + make seed-eval)
+SKIPPED [1] tests/integration/test_09_exam_stack.py:166: NOT_RUN: set RUN_EVAL_STACK=1 (scenario stack + make seed + make seed-eval)
+SKIPPED [1] tests/integration/test_19_ingest_raw.py:157: root ignores file modes; the mount test runs :ro
+1010 passed, 13 skipped, 2 warnings in 929.81s (0:15:29)
+test-int exit=0
+
+=== 13:23:11 smoke
+python scripts/smoke.py
+ok    backend /healthz 200
+ok    litellm /health/liveliness 200
+ok    langfuse /api/public/health 200, /api/public/projects 200
+ok    mcp-search /healthz 200
+ok    mcp-sql /healthz 200
+ok    skipped: ollama profile inactive
+smoke: passed
+smoke exit=0
+
+=== 13:23:21 frontend lint/typecheck/check:api/vitest (node, --network none, repo root)
+typecheck_exit=0
+
+> ffcore-frontend@0.1.0 check:api
+> node scripts/check-api.mjs
+
+API contract copies and generated types are current.
+checkapi_exit=0
+vitest_exit=0
+
+[2m Test Files [22m [1m[32m49 passed[39m[22m[90m (49)[39m
+[2m      Tests [22m [1m[32m250 passed[39m[22m[90m (250)[39m
+[2m   Start at [22m 10:24:15
+[2m   Duration [22m 38.88s[2m (transform 68.73s, setup 0ms, import 105.12s, tests 53.28s, environment 38.71s)[22m
+
+
+=== 13:24:55 e2e: atlandı (r1 180/180, state/evidence/10c-2-e2e-full.log; r2 deltası backend özet + rebase)
+
+=== 13:24:56 down -v
+ Volume ffmain_postgres_data  Removed
+ Volume ffmain_langfuse_minio_data  Removed
+
+=== 13:25:19 done
+gate script exit 0
+gate exit=0

@@ -206,3 +206,15 @@ Main kapısı yığını (18000/13000, 0.0.0-main). Bitince down -v + YIGIN-KAPA
 ### K-10C2-0012 · 2026-11-19 12:54 · → inceleyici · ACK
 Paket: 10c-2 · Cevap: R-10C2-0008
 ONAY alındı; rapor, kanıtlar ve kanal commit edildi. MINOR-1 FOLLOWUP-197 (10c-3 ilk commit). Merge ve kapı bende; kapı sürerken yığın açma. Sonraki iş: dalga 6b kalanı için kullanıcı seçimi (04b, 10c-3); gelince REVIEW-ISTEK. Şimdilik bekle.
+
+### K-10C2-0013 · 2026-11-19 13:26 · → tumu · YIGIN-KAPA
+Paket: 10c-2 · Cevap: K-10C2-0011 · Yigin: ffmain
+Kapı bitti, `down -v` tamam.
+
+### K-10C2-0014 · 2026-11-19 13:26 · → tumu · MERGED
+Paket: 10c-2 · Cevap: R-10C2-0008 · SHA: b93cd96
+Merge --no-ff `b93cd96` (877cc34; 27 commit, 88 dosya +11075/-94). Kapı `state/evidence/gate-10c2-20261119.log`: imajlar build, lint 0, heads tek, test 1918×2, test-samples, test-int 1010/13/0, smoke, önyüz typecheck/check:api/Vitest 250; e2e r1 180/180 kanıtıyla atlandı (KARARLAR). WORK_QUEUE 10c-2 DONE; FOLLOWUP 185/192/127/136/130/37 kapandı; 197 10c-3'e. Konsolda artık: Genel Bakış, Kullanım, API Anahtarları, Kotalar, Uyarılar (+rozet, bildirim), Retention; sınav madde tablosu ve tipli özet; koşu sayfası yoklaması. Push kullanıcı talimatını bekliyor.
+
+### K-10C2-0015 · 2026-11-19 13:26 · → isci-c · HANDOFF-ISTEK
+Paket: 10c-2 · Cevap: C-10C2-0014
+MERGED b93cd96. Kanalına HANDOFF yaz (kalan riskler: FOLLOWUP-195 10c-3 notları, 197 skaler özet; NOTE-1 403 davranışı; açılış sayfası Overview davranış değişikliği), sonra lease `RETIRED`. Worktree `.worktrees/feat/10c-2-governance-ui` silme kullanıcıda. İki turda M0, 1918 + 250 test; teşekkürler.
