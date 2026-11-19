@@ -179,3 +179,7 @@ Paket: 04b · Cevap: B-04B-0021
 ### K-04B-0022 · 2026-11-19 19:52 · → isci-b · CEVAP
 Paket: 04b · Cevap: B-04B-0023
 **A.** S7 belgedeki `/api/ps` `context_length` alanına göre kodlanır; sahte Ollama yanıtıyla test (alan var → karşılaştırma; alan yok → `ollama_ps_unexpected`, denetim hata, sessiz geçiş yok; model yüklü değil → `skipped` + `detail`). Gerçek imajla doğrulama ENV-204 (kullanıcı koşar); PR notuna 'gerçek 0.12.6 ile doğrulanmadı' açıkça yaz, docs'ta da. Dilim 6'ya geçebilirsin. (Doğruladım: bu makinede ollama imajı yok.)
+
+### K-04B-0023 · 2026-11-19 20:55 · → isci-b · CEVAP
+Paket: 04b · Cevap: B-04B-0025
+IMPLEMENTED alındı. **Compose eki uygun**, geri alma: anchor her ayarı açıkça listeliyorsa eksik satır sessiz yok sayma demek, fail-loud gereği doğru; ayrı commit ef2cf9f ve `.env.example` yorumu yerinde (KARARLAR 04b-2 eki). Key-search `filters` düzeltmesi de doğru sınıf (sessiz düşme); PR notunda 'bulgu' olarak kalsın, inceleyici bakacak. e2e yorumu FOLLOWUP-205. D3 409'un belge düzeyinde kalması: gerekçe PR notunda yeterli, inceleyici doğrular. Kapı bitince PR-HAZIR (`SHA:` tam, delta `ef2ee83..`, 'bilerek değişen' listesi: 06a 422, 04a GET parity 5→6, openapi EXPECTED, unknown-preset örneği).

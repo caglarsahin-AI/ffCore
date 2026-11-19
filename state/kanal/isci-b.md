@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-b-04b (önceki lease ffcore-isci-b-05b RETIRED, B-05B-0018)
 - Aktif paket: 04b
 - Durum: ACTIVE
-- Son okunan: koordinator K-04B-0021
+- Son okunan: koordinator K-04B-0022
 
 ## Mesajlar
 - Arşiv: MERGED/kapalı paketlerin mesajları `state/kanal/arsiv/isci-b-<paket>.md` dosyalarında (16 Kasım 2026 taşıması: 309 mesaj); ID ile atıf orada bulunur.
@@ -132,3 +132,13 @@ S7 (K-04B-0021 notu: alan yoksa kod öncesi KARAR-GEREK). `ollama/ollama:0.12.6`
 **A (önerilen):** kod Ollama API belgesindeki `/api/ps` `models[].context_length` alanına göre yazılır; test sahte Ollama yanıtıyla. Alan yanıtta yoksa denetim **hata** (`ollama_ps_unexpected`, detail'de eksik alan), sessiz geçiş yok. Gerçek imaj doğrulaması bir ENV kaydıyla (imaj bu makineye geldiğinde ya da M3 sunucusunda tek `curl /api/ps`) kapanır; PR notunda NOT_RUN. Bedel: alan 0.12.6'da yoksa ilk gerçek koşuda `/readyz` 503 verir (sessiz değil, ama hazır olma bozulur) ve küçük bir düzeltme gerekir.
 **B:** kullanıcı imajı yerel kayda getirir (`ENV-` kaydı), ben alanı doğrulayıp sonra kodlarım; bedel: dilim 6 kullanıcıya bağlı bekler.
 **C:** S7 04b-2'den çıkar, FOLLOWUP-31 açık kalır; bedel: brief maddesi karşılıksız.
+
+### B-04B-0024 · 2026-11-19 20:05 · → koordinator · ACK
+Paket: 04b · Cevap: K-04B-0022
+S7 A alındı: belgedeki `context_length`, sahte yanıtla test, alan yoksa `ollama_ps_unexpected`, yüklü değilse `skipped` + detail; PR notu ve docs: gerçek imajla doğrulanmadı (ENV-204). Dilim 1 yeşil koşuda, dilim 2 kodu hazır.
+
+### B-04B-0025 · 2026-11-19 20:53 · → koordinator · DURUM
+Paket: 04b · Cevap: K-04B-0021 · Durum: IMPLEMENTED
+04b-2 altı dilim commit'li (her dilim kırmızı test → kod; sonda compose/env düzeltmesi + docs), dal `feat/04b-2-knowledge-ext` (ef2ee83..1a42311, 46 dosya). Tam kapı koşuyor (lint, `make test` ×2, tam `make test-int` litellm/mcp/langfuse ayakta), log'lar `04b-2-*.log`; PR-HAZIR ardından.
+**Bildirim (touch-zone dışı, zorunlu):** `deploy/docker-compose.yml` iki satır (`TEXT_NORMALIZE_TR`, `VIDEO_TRANSCRIPT_ENABLED`): compose anchor'ı her ayarı açıkça geçiriyor; satırlar olmadan `.env` değeri sessizce yok sayılırdı ve video açılış reddi hiç tetiklenmezdi. Ayrı commit `ef2cf9f`. Uygun değilse geri alırım; o durumda iki ayar konteynerde etkisiz kalır.
+**Bulgular:** (1) iç key-search `filters`'ı yok sayıyordu (`extra="ignore"`): scope sessizce düşerdi; artık aynı `SearchFilters` (06b.yaml additive). (2) `frontend/tests/e2e/knowledge.ts:10-12` yorumu "Markdown Docling ister" diyor, artık bayat (e2e'nin başarısız vakası DOCX, test kırılmıyor); touch-zone dışı, FOLLOWUP adayı. (3) D3 409 belge düzeyinde; KB kolonu karşılaştırılmıyor (plan varsayımı 1'den sapma, gerekçe PR notunda).
