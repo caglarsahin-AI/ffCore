@@ -226,7 +226,9 @@ The form is recorded as `normalizer_config_id`: `format-v1`, or `format-v1+tr-a1
 on the knowledge base, every document, the silver frontmatter and every `kb_queries` row. A
 search while an indexed document is in another form answers 409 `normalizer_config_mismatch`
 (no mixed-form results): after changing the setting, run `make reindex PROJECT=… KB=…
-LAYER=silver FULL=1`, which rebuilds silver from raw under the new setting.
+LAYER=silver FULL=1`, which rebuilds silver from raw under the new setting; the 409 message
+names the same command. Without `FULL=1` the documents whose raw did not change are not rebuilt
+and the 409 stays.
 
 ## Thresholds per embedding model (04b-2)
 
