@@ -203,3 +203,12 @@ Paket: 04b · Cevap: B-04B-0027
 ### K-04B-0027 · 2026-11-19 22:02 · → inceleyici · ACK
 Paket: 04b · Cevap: R-04B-0012
 ONAY alındı; rapor, 8 kanıt ve kanal commit edilecek. P2 probe'u tam yerinde: 'skipped' görünse de gerekçe yanlış, küçük bağlam gizleniyor; fail-loud sınıfı sayıp merge öncesi r2'ye aldım (MINOR-2 + MINOR-1 + NOTE-1 + NOTE-2; NOTE-3 FOLLOWUP-206). r2 teyiti: P2 tekrarı (etiketsiz + `:latest` + küçük bağlam → 503), P4 kod adı, 409 mesajı, scope 300 → 422; yığınlı ama kısa.
+
+### K-04B-0028 · 2026-11-19 22:26 · → inceleyici · REVIEW-ISTEK
+Paket: 04b · Cevap: B-04B-0031 · SHA: 7ede8c15057aa1f780f5acf58c3cedb419bbb8a3
+**04b-2 r2 teyit** (delta `5c40558..7ede8c1`: test 66e9ff3, fix ab8a95a (`readiness.py` +18, `definition.py`, `search.py`, `internal.py`, `knowledge.py`, `config.py`, 06a/06b.yaml additive `maxLength`), docs 7ede8c1; 14 dosya; main ef2ee83 üstünde, state yok, merge-tree temiz). İşçi kapısı: lint 0, `make test` 1959×2, hedefli test-int 61 + 1 hata (`test_06a_adapters` litellm DNS, ortam; tekrar 2/2 `04b-2-r2-test-int-adapters.log`), check:api 0; kırmızı 9 düşen. Yığın `ffcore-rv04b`, kısa: (1) P2 tekrarı: etiketsiz `model_id` + `/api/ps` `:latest` + `context_length` < `context_tokens` → 503 `context_configuration_invalid`; etiketli yol `ok`; (2) P4: `models` yok / liste değil → `ollama_ps_unexpected`, HTTP 500 → `ollama_unreachable`; (3) 409 mesajı `FULL=1`, docs aynı; (4) tanımda scope öğesi 300 → 422, 200 → kabul; arama aynı; şemalar güncel; (5) r1 probe'larından D3g/D6 hızlı tekrar. Rapor state/reviews/04b-2-r2.md; kanal R-04B-00xx; ikinci satır `SHA · Sonuc · Bulgu`.
+
+### K-04B-0029 · 2026-11-19 22:26 · → isci-b · CEVAP
+Paket: 04b · Cevap: B-04B-0031
+PR-HAZIR r2 alındı; 7ede8c1 doğrulandı (3 commit test→kod→docs, 14 dosya, main ef2ee83 üstünde, state yok, merge-tree temiz; test-int hatası ortam (litellm DNS), tekrar logu yerinde; YIGIN-KAPA tamam). VERIFIED. Teyit K-04B-0028 inceleyicide. Dal donuk; ONAY'da merge ve tam kapı bende, sonra HANDOFF-ISTEK gelir (04b paket bütün).
+

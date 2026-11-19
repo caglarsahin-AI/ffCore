@@ -1,0 +1,120 @@
+................................E.............................           [100%]
+==================================== ERRORS ====================================
+_ ERROR at setup of test_06a_model_adapter_streams_through_litellm_with_a_slot _
+
+    @contextlib.contextmanager
+    def map_httpcore_exceptions() -> Generator[None]:
+        global HTTPCORE_EXC_MAP
+        if len(HTTPCORE_EXC_MAP) == 0:
+            HTTPCORE_EXC_MAP = _load_httpcore_exceptions()
+        try:
+>           yield
+
+/opt/venv/lib/python3.12/site-packages/httpx2/_transports/default.py:98: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/opt/venv/lib/python3.12/site-packages/httpx2/_transports/default.py:245: in handle_request
+    resp = self._pool.handle_request(req)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpcore2/_sync/connection_pool.py:242: in handle_request
+    raise exc from None
+/opt/venv/lib/python3.12/site-packages/httpcore2/_sync/connection_pool.py:224: in handle_request
+    response = connection.handle_request(pool_request.request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpcore2/_sync/connection.py:94: in handle_request
+    raise exc
+/opt/venv/lib/python3.12/site-packages/httpcore2/_sync/connection.py:74: in handle_request
+    stream = self._connect(request)
+             ^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpcore2/_sync/connection.py:117: in _connect
+    stream = self._network_backend.connect_tcp(**kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpcore2/_backends/sync.py:203: in connect_tcp
+    with map_exceptions(exc_map):
+         ^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/contextlib.py:158: in __exit__
+    self.gen.throw(value)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+map = {<class 'TimeoutError'>: <class 'httpcore2.ConnectTimeout'>, <class 'OSError'>: <class 'httpcore2.ConnectError'>}
+
+    @contextlib.contextmanager
+    def map_exceptions(map: ExceptionMapping) -> Generator[None]:
+        try:
+            yield
+        except Exception as exc:  # noqa: PIE786
+            for from_exc, to_exc in map.items():
+                if isinstance(exc, from_exc):
+>                   raise to_exc(exc) from exc
+E                   httpcore2.ConnectError: [Errno -3] Temporary failure in name resolution
+
+/opt/venv/lib/python3.12/site-packages/httpcore2/_exceptions.py:17: ConnectError
+
+The above exception was the direct cause of the following exception:
+
+llm_settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+
+    @pytest.fixture
+    def clean_litellm(llm_settings):
+        """Empty LiteLLM model list and fake provider log before the test."""
+>       for model in litellm_models(llm_settings).values():
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/litellm_support.py:74: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/litellm_support.py:62: in litellm_models
+    response = httpx2.get(f"{settings.litellm_url}/model/info", headers=master(settings))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_api.py:194: in get
+    return request(
+/opt/venv/lib/python3.12/site-packages/httpx2/_api.py:108: in request
+    return client.request(
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:796: in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:979: in send
+    response = self._send_handling_auth(
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:1007: in _send_handling_auth
+    response = self._send_handling_redirects(
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:1042: in _send_handling_redirects
+    response = self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_client.py:1075: in _send_single_request
+    response = transport.handle_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/venv/lib/python3.12/site-packages/httpx2/_transports/default.py:244: in handle_request
+    with map_httpcore_exceptions():
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/contextlib.py:158: in __exit__
+    self.gen.throw(value)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    @contextlib.contextmanager
+    def map_httpcore_exceptions() -> Generator[None]:
+        global HTTPCORE_EXC_MAP
+        if len(HTTPCORE_EXC_MAP) == 0:
+            HTTPCORE_EXC_MAP = _load_httpcore_exceptions()
+        try:
+            yield
+        except Exception as exc:
+            mapped_exc = None
+    
+            for from_exc, to_exc in HTTPCORE_EXC_MAP.items():
+                if not isinstance(exc, from_exc):
+                    continue
+                # We want to map to the most specific exception we can find.
+                # Eg if `exc` is an `httpcore2.ReadTimeout`, we want to map to
+                # `httpx2.ReadTimeout`, not just `httpx2.TimeoutException`.
+                if mapped_exc is None or issubclass(to_exc, mapped_exc):
+                    mapped_exc = to_exc
+    
+            if mapped_exc is None:  # pragma: no cover
+                raise
+    
+            message = str(exc)
+>           raise mapped_exc(message) from exc
+E           httpx2.ConnectError: [Errno -3] Temporary failure in name resolution
+
+/opt/venv/lib/python3.12/site-packages/httpx2/_transports/default.py:115: ConnectError
+=========================== short test summary info ============================
+ERROR tests/integration/test_06a_adapters.py::test_06a_model_adapter_streams_through_litellm_with_a_slot
+61 passed, 1 error in 205.45s (0:03:25)

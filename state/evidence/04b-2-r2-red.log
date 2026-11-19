@@ -1,0 +1,214 @@
+E501 Line too long (103 > 100)
+   --> tests/integration/test_04b_2_readyz.py:145:101
+    |
+145 | def test_04b_2_r2_ps_shape_error_is_unexpected(client_factory, ready_app, monkeypatch, ollama_project):
+    |                                                                                                     ^^^
+146 |     """NOTE-1 (P4): Ollama answered, but not in the documented shape."""
+    |
+
+E501 Line too long (101 > 100)
+  --> tests/unit/test_04b_2_r2_ollama_ps.py:50:101
+   |
+48 |     monkeypatch.setattr(secrets, "decrypt_json", lambda token, s: {"base_url": "http://ol:11434/"})
+49 |     monkeypatch.setattr(egress, "SafeOutboundClient", client)
+50 |     assert asyncio.run(readiness._ollama_ps(b"x", None)) == [{"name": "m:1", "context_length": 4096}]
+   |                                                                                                     ^
+51 |     assert client.url == "http://ol:11434/api/ps"
+   |
+
+Found 2 errors.
+.....F.FFFFF.......FFF.                                                  [100%]
+=================================== FAILURES ===================================
+________ test_04b_2_r2_scope_value_longer_than_search_allows_is_refused ________
+
+    def test_04b_2_r2_scope_value_longer_than_search_allows_is_refused():
+        """r2 NOTE-2: the definition takes what the search takes (200 characters per source)."""
+        knowledge = [{"kb_key": "k", "mode": "always", "filter": {"scope": ["x" * 300]}}]
+>       with pytest.raises(ValidationError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValidationError
+
+tests/unit/test_04b_2_scope.py:58: Failed
+_____________________ test_04b_2_r2_ps_shape_errors[body0] _____________________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f841a25b650>
+body = {}
+
+    @pytest.mark.parametrize("body", [{}, {"models": None}, {"models": {"a": 1}}, ["x"]])
+    def test_04b_2_r2_ps_shape_errors(monkeypatch, body):
+        monkeypatch.setattr(secrets, "decrypt_json", lambda token, s: {"base_url": "http://ol:11434"})
+        monkeypatch.setattr(egress, "SafeOutboundClient", _Client(200, body))
+>       with pytest.raises(readiness.OllamaPsUnexpected):
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'ffcore.core.readiness' has no attribute 'OllamaPsUnexpected'
+
+tests/unit/test_04b_2_r2_ollama_ps.py:34: AttributeError
+_____________________ test_04b_2_r2_ps_shape_errors[body1] _____________________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f841a243770>
+body = {'models': None}
+
+    @pytest.mark.parametrize("body", [{}, {"models": None}, {"models": {"a": 1}}, ["x"]])
+    def test_04b_2_r2_ps_shape_errors(monkeypatch, body):
+        monkeypatch.setattr(secrets, "decrypt_json", lambda token, s: {"base_url": "http://ol:11434"})
+        monkeypatch.setattr(egress, "SafeOutboundClient", _Client(200, body))
+>       with pytest.raises(readiness.OllamaPsUnexpected):
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'ffcore.core.readiness' has no attribute 'OllamaPsUnexpected'
+
+tests/unit/test_04b_2_r2_ollama_ps.py:34: AttributeError
+_____________________ test_04b_2_r2_ps_shape_errors[body2] _____________________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f841a242e10>
+body = {'models': {'a': 1}}
+
+    @pytest.mark.parametrize("body", [{}, {"models": None}, {"models": {"a": 1}}, ["x"]])
+    def test_04b_2_r2_ps_shape_errors(monkeypatch, body):
+        monkeypatch.setattr(secrets, "decrypt_json", lambda token, s: {"base_url": "http://ol:11434"})
+        monkeypatch.setattr(egress, "SafeOutboundClient", _Client(200, body))
+>       with pytest.raises(readiness.OllamaPsUnexpected):
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'ffcore.core.readiness' has no attribute 'OllamaPsUnexpected'
+
+tests/unit/test_04b_2_r2_ollama_ps.py:34: AttributeError
+_____________________ test_04b_2_r2_ps_shape_errors[body3] _____________________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f841a244d10>
+body = ['x']
+
+    @pytest.mark.parametrize("body", [{}, {"models": None}, {"models": {"a": 1}}, ["x"]])
+    def test_04b_2_r2_ps_shape_errors(monkeypatch, body):
+        monkeypatch.setattr(secrets, "decrypt_json", lambda token, s: {"base_url": "http://ol:11434"})
+        monkeypatch.setattr(egress, "SafeOutboundClient", _Client(200, body))
+>       with pytest.raises(readiness.OllamaPsUnexpected):
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'ffcore.core.readiness' has no attribute 'OllamaPsUnexpected'
+
+tests/unit/test_04b_2_r2_ollama_ps.py:34: AttributeError
+________________ test_04b_2_r2_ps_http_error_is_not_unexpected _________________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f841a246cf0>
+
+    def test_04b_2_r2_ps_http_error_is_not_unexpected(monkeypatch):
+        monkeypatch.setattr(secrets, "decrypt_json", lambda token, s: {"base_url": "http://ol:11434/"})
+        monkeypatch.setattr(egress, "SafeOutboundClient", _Client(500, {}))
+        with pytest.raises(Exception) as caught:
+            asyncio.run(readiness._ollama_ps(b"x", None))
+>       assert not isinstance(caught.value, readiness.OllamaPsUnexpected)
+                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'ffcore.core.readiness' has no attribute 'OllamaPsUnexpected'
+
+tests/unit/test_04b_2_r2_ollama_ps.py:43: AttributeError
+_________________ test_04b_2_r2_untagged_model_matches_latest __________________
+
+client_factory = <function client_factory.<locals>.make at 0x7f84113d22a0>
+ready_app = {'settings': Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('****...lush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)}
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f83f119b080>
+untagged_project = UUID('22b88a33-afc0-4b03-b648-76801631caa0')
+
+    def test_04b_2_r2_untagged_model_matches_latest(
+        client_factory, ready_app, monkeypatch, untagged_project
+    ):
+        """MINOR-2: `llama3` and `llama3:latest` are one model; a small context is caught."""
+        _ollama(ready_app, monkeypatch, [{"name": "llama3:latest", "context_length": 8192}])
+        small = client_factory().get("/readyz")
+>       assert small.status_code == 503
+E       assert 200 == 503
+E        +  where 200 = <Response [200 OK]>.status_code
+
+tests/integration/test_04b_2_readyz.py:140: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2026-11-19 19:05:39,105 INFO ffcore.access access method=GET path=/readyz status=200 ms=95
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.access:logging.py:263 access method=GET path=/readyz status=200 ms=95
+__________________ test_04b_2_r2_ps_shape_error_is_unexpected __________________
+
+client_factory = <function client_factory.<locals>.make at 0x7f83f1125580>
+ready_app = {'settings': Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('****...lush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)}
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f83f1144f50>
+ollama_project = UUID('76fd9133-c8d6-4daf-85fa-d3790deef233')
+
+    def test_04b_2_r2_ps_shape_error_is_unexpected(
+        client_factory, ready_app, monkeypatch, ollama_project
+    ):
+        """NOTE-1 (P4): Ollama answered, but not in the documented shape."""
+    
+        async def odd_ps(config_encrypted, settings):
+            raise readiness.OllamaPsUnexpected("/api/ps answer has no models list")
+    
+        asyncio.run(readiness.warmup(ready_app["settings"]))
+        monkeypatch.setattr(readiness, "_ollama_ps", odd_ps)
+        ready_app["settings"] = ready_app["settings"].model_copy(
+            update={"inference_backend": "ollama", "ollama_context_length": 32768}
+        )
+        response = client_factory().get("/readyz")
+        assert response.status_code == 503
+        check = _checks(response)["ollama_runtime_context"]
+>       assert check["code"] == "ollama_ps_unexpected" and "models" in check["detail"]
+E       AssertionError: assert ('ollama_unreachable' == 'ollama_ps_unexpected'
+E         
+E         - ollama_ps_unexpected
+E         + ollama_unreachable)
+
+tests/integration/test_04b_2_readyz.py:161: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2026-11-19 19:05:46,975 INFO ffcore.access access method=GET path=/readyz status=503 ms=101
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.access:logging.py:263 access method=GET path=/readyz status=503 ms=101
+_______________ test_04b_2_d3_switching_on_needs_silver_rebuild ________________
+
+app = <fastapi.applications.FastAPI object at 0x7f841a249580>
+world = {'project': '96aa9a17-4446-4a77-9cc5-014eedffe3af', 'other': '7d3734f3-a522-4b0e-8018-8967e7b22ffa', 'admin': <starlet...nt.TestClient object at 0x7f83d0709a00>, 'admin_read': <starlette.testclient.TestClient object at 0x7f840e24dd60>, ...}
+settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+queue = <tests.integration.test_04a_api.FakeQueue object at 0x7f83d0709040>
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_90dcb3436d41) at 0x7f83d070b6b0>
+
+    def test_04b_2_d3_switching_on_needs_silver_rebuild(app, world, settings, queue, pg):
+        kb = create_kb(world)
+        item = upload(world, world["admin"], kb["id"], "kar.md", BODY).json()["data"][0]
+        process_all(settings, queue)
+        doc_id = item["document"]["id"]
+        assert search(world["admin"], world, kb["id"], "kâr payı").status_code == 200
+    
+        on = _switch_on(app, settings)
+        refused = search(world["admin"], world, kb["id"], "kâr payı")
+        assert refused.status_code == 409, refused.text
+        assert refused.json()["error"]["code"] == "normalizer_config_mismatch"
+        # r2 MINOR-1: the hint is the command that rebuilds every document (FULL=1).
+>       assert "make reindex LAYER=silver FULL=1" in refused.json()["error"]["message"]
+E       AssertionError: assert 'make reindex LAYER=silver FULL=1' in 'Documents of this knowledge base are in normalizer form format-v1, queries would be in format-v1+tr-a1; rebuild silver (make reindex LAYER=silver) first.'
+
+tests/integration/test_04b_2_normalize_tr.py:42: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+2026-11-19 19:05:49,919 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=126
+2026-11-19 19:05:50,104 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=125
+2026-11-19 19:05:50,290 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=116
+2026-11-19 19:05:50,483 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=124
+------------------------------ Captured log setup ------------------------------
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=126
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=125
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=116
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=124
+----------------------------- Captured stderr call -----------------------------
+2026-11-19 19:05:50,720 INFO ffcore.access access method=POST path=/api/v1/projects/96aa9a17-4446-4a77-9cc5-014eedffe3af/knowledge-bases status=201 ms=118
+2026-11-19 19:05:50,803 INFO ffcore.access access method=POST path=/api/v1/projects/96aa9a17-4446-4a77-9cc5-014eedffe3af/knowledge-bases/679ce46a-a68c-4bc1-86ce-223c4d822e50/documents status=202 ms=80
+2026-11-19 19:05:50,905 INFO ffcore.knowledge.ingest gold document=1e9730aa-34c7-483d-b3c0-a6a82bdc6c80 reused=0 embedded=1
+2026-11-19 19:05:50,968 INFO ffcore.access access method=POST path=/api/v1/projects/96aa9a17-4446-4a77-9cc5-014eedffe3af/knowledge-bases/679ce46a-a68c-4bc1-86ce-223c4d822e50/search status=200 ms=59
+2026-11-19 19:05:51,010 INFO ffcore.access access method=POST path=/api/v1/projects/96aa9a17-4446-4a77-9cc5-014eedffe3af/knowledge-bases/679ce46a-a68c-4bc1-86ce-223c4d822e50/search status=409 ms=38
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/96aa9a17-4446-4a77-9cc5-014eedffe3af/knowledge-bases status=201 ms=118
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/96aa9a17-4446-4a77-9cc5-014eedffe3af/knowledge-bases/679ce46a-a68c-4bc1-86ce-223c4d822e50/documents status=202 ms=80
+INFO     ffcore.knowledge.ingest:ingest.py:677 gold document=1e9730aa-34c7-483d-b3c0-a6a82bdc6c80 reused=0 embedded=1
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/96aa9a17-4446-4a77-9cc5-014eedffe3af/knowledge-bases/679ce46a-a68c-4bc1-86ce-223c4d822e50/search status=200 ms=59
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/96aa9a17-4446-4a77-9cc5-014eedffe3af/knowledge-bases/679ce46a-a68c-4bc1-86ce-223c4d822e50/search status=409 ms=38
+=========================== short test summary info ============================
+FAILED tests/unit/test_04b_2_scope.py::test_04b_2_r2_scope_value_longer_than_search_allows_is_refused
+FAILED tests/unit/test_04b_2_r2_ollama_ps.py::test_04b_2_r2_ps_shape_errors[body0]
+FAILED tests/unit/test_04b_2_r2_ollama_ps.py::test_04b_2_r2_ps_shape_errors[body1]
+FAILED tests/unit/test_04b_2_r2_ollama_ps.py::test_04b_2_r2_ps_shape_errors[body2]
+FAILED tests/unit/test_04b_2_r2_ollama_ps.py::test_04b_2_r2_ps_shape_errors[body3]
+FAILED tests/unit/test_04b_2_r2_ollama_ps.py::test_04b_2_r2_ps_http_error_is_not_unexpected
+FAILED tests/integration/test_04b_2_readyz.py::test_04b_2_r2_untagged_model_matches_latest
+FAILED tests/integration/test_04b_2_readyz.py::test_04b_2_r2_ps_shape_error_is_unexpected
+FAILED tests/integration/test_04b_2_normalize_tr.py::test_04b_2_d3_switching_on_needs_silver_rebuild
+9 failed, 14 passed in 76.95s (0:01:16)

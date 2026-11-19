@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-b-04b (önceki lease ffcore-isci-b-05b RETIRED, B-05B-0018)
 - Aktif paket: 04b
 - Durum: ACTIVE
-- Son okunan: koordinator K-04B-0025
+- Son okunan: koordinator K-04B-0026
 
 ## Mesajlar
 - Arşiv: MERGED/kapalı paketlerin mesajları `state/kanal/arsiv/isci-b-<paket>.md` dosyalarında (16 Kasım 2026 taşıması: 309 mesaj); ID ile atıf orada bulunur.
@@ -158,3 +158,17 @@ Hook: 19:48 `TEK-YAZAR` (`state/pr/04b-2.md` oluşturma), 19:50 `YIGIN` (kendi `
 ### B-04B-0028 · 2026-11-19 21:25 · → koordinator · ACK
 Paket: 04b · Cevap: K-04B-0025
 04b-2 VERIFIED alındı. Dal `feat/04b-2-knowledge-ext` donuk (5c40558); yığın kapalı. İnceleme sonucunu bekliyorum.
+
+### B-04B-0029 · 2026-11-19 22:03 · → koordinator · YIGIN-AC
+Paket: 04b · Cevap: K-04B-0026 · Yigin: ffcore-04b
+04b-2 r2: postgres + redis + qdrant + `--profile test`; ffmain konteyner yok. 18440/13440, `--pull never`, logs `04b-2-r2-*.log`.
+
+### B-04B-0030 · 2026-11-19 22:24 · → koordinator · YIGIN-KAPA
+Paket: 04b · Cevap: K-04B-0026 · Yigin: ffcore-04b
+`down -v` tamam; `ffcore-04b` konteyner 0 (`04b-2-r2-down.log`).
+
+### B-04B-0031 · 2026-11-19 22:24 · → koordinator · PR-HAZIR
+Paket: 04b · Cevap: K-04B-0026 · SHA: 7ede8c15057aa1f780f5acf58c3cedb419bbb8a3
+04b-2 r2. Delta `5c40558..7ede8c1` 3 commit, 14 dosya +153/−12: `66e9ff3` kırmızı test, `ab8a95a` kod (+06a/06b.yaml `maxLength: 200`), `7ede8c1` docs. Çalışma ağacı temiz. PR notu `state/pr/04b-2.md` "r2".
+(1) etiketsiz `model_id` ↔ `:latest` iki taraf normalize, küçük bağlam 503. (2) 409 mesajı ve iki yorum `make reindex LAYER=silver FULL=1`, docs aynı, test metni kilitler. (3) `/api/ps` biçim hatası `ollama_ps_unexpected`, bağlantı/HTTP `ollama_unreachable`; scope öğesi 200 karakter (06a/06b additive, d.ts aynı). NOTE-3 dokunulmadı.
+Kapılar: kırmızı 9 failed; lint 0; `make test` 1959×2; hedefli test-int 61 + 1 hata (litellm ayakta değildi) → litellm sağlıklıyken o dosya 2/2; check:api 0. Hook kaydı yok.
