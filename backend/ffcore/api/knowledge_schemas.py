@@ -280,10 +280,18 @@ class IngestGateReport(BaseModel):
 # --- Search ---
 
 
+SourceList = Annotated[
+    list[Annotated[str, Field(min_length=1, max_length=200)]],
+    Field(min_length=1, max_length=50),
+]
+
+
 class SearchFilters(Strict):
     document_ids: list[UUID] = Field(default_factory=list)
-    metadata: dict[str, str | int | bool] = Field(
-        default_factory=dict, description="Equality filters on document metadata."
+    metadata: dict[str, str | int | bool | SourceList] = Field(
+        default_factory=dict,
+        description="Filters on document metadata: a value is equality, a list is any of the "
+        "values (exact match; 04b-2).",
     )
 
 

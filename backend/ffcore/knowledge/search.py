@@ -26,7 +26,12 @@ from ffcore.core.config import Settings
 from ffcore.knowledge.embed import Embedder, get_embedder
 from ffcore.knowledge.normalize import NORMALIZER_CONFIG_ID, normalize_query
 from ffcore.knowledge.rerank import Reranker, get_reranker
-from ffcore.knowledge.vectorstore.base import VectorFilters, VectorQuery, VectorStore
+from ffcore.knowledge.vectorstore.base import (
+    VectorFilters,
+    VectorQuery,
+    VectorStore,
+    metadata_sql,
+)
 from ffcore.knowledge.vectorstore.pgvector import _literal
 from ffcore.models.knowledge import SEARCHABLE_CHUNK_STATUSES, TSV_CONFIG, KbQuery, KnowledgeBase
 
@@ -106,9 +111,7 @@ async def _lexical(
         clauses.append("c.document_id IN :document_ids")
         binds.append(bindparam("document_ids", expanding=True))
         params["document_ids"] = list(filters.document_ids)
-    for index, (key, value) in enumerate(filters.metadata):
-        clauses.append(f"d.metadata ->> :mk{index} = :mv{index}")
-        params[f"mk{index}"], params[f"mv{index}"] = key, str(value)
+    clauses.extend(metadata_sql(filters.metadata, params))
     statement = text(
         "WITH tsq AS (SELECT to_tsquery(:cfg, array_to_string("
         "tsvector_to_array(to_tsvector(:cfg, :q)), ' | ')) AS q) "

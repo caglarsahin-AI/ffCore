@@ -50,7 +50,7 @@ from ffcore.core.errors import ApiError
 from ffcore.knowledge import ingest, jobs, report, search
 from ffcore.knowledge.chunking import ChunkSettings
 from ffcore.knowledge.normalize import NORMALIZER_CONFIG_ID
-from ffcore.knowledge.vectorstore.base import VectorFilters, VectorStoreError
+from ffcore.knowledge.vectorstore.base import VectorFilters, VectorStoreError, metadata_items
 from ffcore.models.knowledge import Attachment, Chunk, Document, KnowledgeBase
 from ffcore.runtime import checkpoints
 from ffcore.services import retention
@@ -683,7 +683,7 @@ async def _search(request, actor, session, settings, project_id, kb_id, body, ru
         document_ids=tuple(body.filters.document_ids),
         acl_roles=acl.acl_roles,
         acl_users=acl.acl_users,
-        metadata=tuple(sorted(body.filters.metadata.items())),
+        metadata=metadata_items(body.filters.metadata),
     )
     try:
         result = await search.search(

@@ -274,6 +274,8 @@ class HttpRetriever:
         kb_id = await self._kb_id(kb_key)
         s = self._settings
         body = {"query": query[:2000], "top_k": top_k}
+        if scope:  # 04b-2 D6: the definition's scope is a filter on the document's source.
+            body["filters"] = {"metadata": {"source": list(scope)}}
         if self._user_id is None:
             # 06b S2: no user to act for; the backend reads the key's role from the key row.
             headers = service_authorization(s)

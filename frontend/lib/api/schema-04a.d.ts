@@ -760,10 +760,10 @@ export interface components {
             document_ids?: string[];
             /**
              * Metadata
-             * @description Equality filters on document metadata.
+             * @description Filters on document metadata: a value is equality, a list is any of the values (exact match; 04b-2).
              */
             metadata?: {
-                [key: string]: string | number | boolean;
+                [key: string]: string | number | boolean | string[];
             };
         };
         /** SearchHit */

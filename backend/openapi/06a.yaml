@@ -1798,6 +1798,7 @@ components:
         scope:
           items:
             type: string
+            minLength: 1
           type: array
           maxItems: 50
           title: Scope

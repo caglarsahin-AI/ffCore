@@ -1967,9 +1967,17 @@ components:
             - type: string
             - type: integer
             - type: boolean
+            - items:
+                type: string
+                maxLength: 200
+                minLength: 1
+              type: array
+              maxItems: 50
+              minItems: 1
           type: object
           title: Metadata
-          description: Equality filters on document metadata.
+          description: 'Filters on document metadata: a value is equality, a list is any of the values
+            (exact match; 04b-2).'
       additionalProperties: false
       type: object
       title: SearchFilters

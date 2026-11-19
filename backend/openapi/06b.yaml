@@ -1248,6 +1248,8 @@ components:
             minimum: 1.0
           - type: 'null'
           title: Top K
+        filters:
+          $ref: '#/components/schemas/SearchFilters'
         hybrid:
           anyOf:
           - type: boolean
@@ -1264,6 +1266,7 @@ components:
         scope:
           items:
             type: string
+            minLength: 1
           type: array
           maxItems: 50
           title: Scope
@@ -1457,6 +1460,34 @@ components:
       required:
       - data
       title: ModelList
+    SearchFilters:
+      properties:
+        document_ids:
+          items:
+            type: string
+            format: uuid
+          type: array
+          title: Document Ids
+        metadata:
+          additionalProperties:
+            anyOf:
+            - type: string
+            - type: integer
+            - type: boolean
+            - items:
+                type: string
+                maxLength: 200
+                minLength: 1
+              type: array
+              maxItems: 50
+              minItems: 1
+          type: object
+          title: Metadata
+          description: 'Filters on document metadata: a value is equality, a list is any of the values
+            (exact match; 04b-2).'
+      additionalProperties: false
+      type: object
+      title: SearchFilters
     SearchHit:
       properties:
         chunk_id:

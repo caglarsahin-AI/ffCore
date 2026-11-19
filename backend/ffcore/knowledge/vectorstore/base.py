@@ -13,6 +13,34 @@ from uuid import UUID
 
 # Filter keys (C5). Unknown keys are refused, never ignored.
 FILTER_KEYS = frozenset({"document_ids", "acl_roles", "acl_users", "metadata"})
+MetadataValue = str | int | bool | tuple[str, ...]
+
+
+def metadata_items(mapping: dict) -> tuple[tuple[str, MetadataValue], ...]:
+    """Metadata filters as a hashable, ordered tuple; a list value becomes an IN tuple.
+    An empty list would match nothing (or, ignored, everything): refused."""
+    items = []
+    for key, value in sorted(mapping.items()):
+        if isinstance(value, list | tuple):
+            if not value:
+                raise ValueError(f"metadata filter {key!r} has an empty list")
+            value = tuple(str(v) for v in value)
+        items.append((key, value))
+    return tuple(items)
+
+
+def metadata_sql(metadata, params: dict) -> list[str]:
+    """The metadata filters as SQL on `d` (documents), for pgvector and the lexical leg."""
+    clauses = []
+    for index, (key, value) in enumerate(metadata):
+        params[f"mk{index}"] = key
+        if isinstance(value, tuple):
+            clauses.append(f"d.metadata ->> :mk{index} = ANY(CAST(:mv{index} AS text[]))")
+            params[f"mv{index}"] = list(value)
+        else:
+            clauses.append(f"d.metadata ->> :mk{index} = :mv{index}")
+            params[f"mv{index}"] = str(value).lower() if isinstance(value, bool) else str(value)
+    return clauses
 
 
 class VectorStoreError(RuntimeError):
@@ -53,7 +81,8 @@ class VectorFilters:
     document_ids: tuple[UUID, ...] = ()
     acl_roles: tuple[str, ...] = ()
     acl_users: tuple[str, ...] = ()
-    metadata: tuple[tuple[str, str | int | bool], ...] = ()
+    # A tuple value is an IN filter (04b-2 D6, C5 additive): any of the values matches.
+    metadata: tuple[tuple[str, MetadataValue], ...] = ()
 
     @classmethod
     def from_mapping(cls, filters: dict) -> "VectorFilters":
@@ -64,7 +93,7 @@ class VectorFilters:
             document_ids=tuple(filters.get("document_ids", ())),
             acl_roles=tuple(filters.get("acl_roles", ())),
             acl_users=tuple(str(u) for u in filters.get("acl_users", ())),
-            metadata=tuple(sorted(filters.get("metadata", {}).items())),
+            metadata=metadata_items(filters.get("metadata", {})),
         )
 
 

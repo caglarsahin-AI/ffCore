@@ -588,6 +588,7 @@ export interface components {
             query: string;
             /** Top K */
             top_k?: number | null;
+            filters?: components["schemas"]["SearchFilters"];
             /** Hybrid */
             hybrid?: boolean | null;
         };
@@ -721,6 +722,18 @@ export interface components {
             object: "list";
             /** Data */
             data: components["schemas"]["ModelEntry"][];
+        };
+        /** SearchFilters */
+        SearchFilters: {
+            /** Document Ids */
+            document_ids?: string[];
+            /**
+             * Metadata
+             * @description Filters on document metadata: a value is equality, a list is any of the values (exact match; 04b-2).
+             */
+            metadata?: {
+                [key: string]: string | number | boolean | string[];
+            };
         };
         /** SearchHit */
         SearchHit: {
