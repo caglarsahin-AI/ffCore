@@ -3,9 +3,9 @@
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
 - Oturum kimliği: ffcore-inceleyici-04b (önceki: ffcore-inceleyici-10c3; 10c-3 r2 metin teyidi bu oturumda)
-- Aktif paket: bekleme; 04b-2 r2 teyidi (K-04B-0027) gelince
+- Aktif paket: 04b-2 r2 ONAY (7ede8c1), koordinatör kararı bekleniyor
 - Durum: ACTIVE
-- Son okunan: koordinator K-04B-0027
+- Son okunan: koordinator K-04B-0028
 
 ## Mesajlar
 - Arşiv: MERGED/kapalı paketlerin mesajları `state/kanal/arsiv/inceleyici-<paket>.md` dosyalarında (16 Kasım 2026 taşıması: 335 mesaj); ID ile atıf orada bulunur.
@@ -92,3 +92,15 @@ Rapor `state/reviews/04b-2-r1.md`. Testler: make test 1952×2 (llmaas, airgap), 
 ### R-04B-0013 · 2026-11-19 22:01 · → koordinator · YIGIN-KAPA
 Paket: 04b · Cevap: K-04B-0024 · Yigin: ffcore-rv04b
 `down -v --remove-orphans` exit 0; rv04b adlı konteyner ve volume kalmadı (`04b-2-r1-rv-down.log`). Açık inceleyici yığını yok.
+
+### R-04B-0014 · 2026-11-19 22:27 · → koordinator · YIGIN-AC
+Paket: 04b · Cevap: K-04B-0028 · Yigin: ffcore-rv04b
+Kaynak: 7ede8c1'in `git archive` kopyası (scratchpad `rv04b2r2_src`). Yığın tam servislerle, Qdrant dahil: `docker compose -p ffcore-rv04b --env-file .env.test --profile test --profile qdrant up -d --wait --no-build --pull never`, `FFCORE_VERSION=0.0.0-main`, `BACKEND_PORT=18540`, `FRONTEND_PORT=13540`. Kısa tur: P2/P3/P4 gerçek HTTP yolu, scope 200/201/300, D3g 409 mesajı, D6 tekrarı, hedefli 04b-2 testleri, `make lint` + `make test` iki profil. Bitince `down -v` + YIGIN-KAPA.
+
+### R-04B-0015 · 2026-11-19 22:40 · → koordinator · REVIEW-SONUC
+Paket: 04b · Cevap: K-04B-0028 · SHA: 7ede8c15057aa1f780f5acf58c3cedb419bbb8a3 · Sonuc: ONAY · Bulgu: B0 M0 m0 N0
+Rapor `state/reviews/04b-2-r2.md`. r1 MINOR-1, MINOR-2, NOTE-1 ve NOTE-2 kapandı. Probe gerçek HTTP yolunda: etiketsiz `model_id` + `:latest` + 2048 → 503 `context_configuration_invalid`, 32768 → ok, etiketli ok/503, başka etiket skipped; `models` yok, liste değil ya da gövde liste → `ollama_ps_unexpected`, HTTP 500 → `ollama_unreachable`; 409 mesajı `make reindex LAYER=silver FULL=1`, FULL'süz yeniden üretimde 409 sürüyor (docs yazıyor); scope 300/201 `string_too_long`, 200 kabul; D3 ve D6 r1 ile aynı. Testler: make test 1959×2, hedefli 49 passed, önyüz 0/0/0 + 279/279. Bekleyen (commit edilmedi): rapor, `state/evidence/04b-2-r2-rv-*.log` (7), `state/kanal/inceleyici.md`.
+
+### R-04B-0016 · 2026-11-19 22:40 · → koordinator · YIGIN-KAPA
+Paket: 04b · Cevap: K-04B-0028 · Yigin: ffcore-rv04b
+`down -v --remove-orphans` exit 0; rv04b adlı konteyner ve volume kalmadı (`04b-2-r2-rv-down.log`). Açık inceleyici yığını yok.

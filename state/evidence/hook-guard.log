@@ -62,3 +62,5 @@
 2026-11-19T20:50:20	warn	isci-b	Bash	ENV	python - <<'EOF' p='deploy/docker-compose.yml' s=open(p,encoding='utf-8').read() old="  RERANK_MIN_SCORE: ${RERANK_MIN_S
 2026-11-19T20:50:20	warn	isci-b	Bash	KAPI	python - <<'EOF' p='deploy/docker-compose.yml' s=open(p,encoding='utf-8').read() old="  RERANK_MIN_SCORE: ${RERANK_MIN_S
 2026-11-19T21:23:24	warn	isci-b	Bash	KAPI	S=/c/Users/CAGLAR~1.SAH/AppData/Local/Temp/claude/9398d5fca5badfb5/da227946-030e-46be-9a89-b38124d016bd/scratchpad/pr04b
+2026-11-19T22:27:28	warn	inceleyici	Bash	PROSES-175	S=C:/Users/CAGLAR~1.SAH/AppData/Local/Temp/claude/9398d5fca5badfb5/ecb79a59-6471-4590-b997-842940d7a702/scratchpad docke
+2026-11-19T22:30:50	warn	inceleyici	Bash	KAPI	S=C:/Users/CAGLAR~1.SAH/AppData/Local/Temp/claude/9398d5fca5badfb5/ecb79a59-6471-4590-b997-842940d7a702/scratchpad; E=C:
