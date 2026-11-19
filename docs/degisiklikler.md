@@ -23,7 +23,7 @@ if anything.
 - **What:** `make migrate-vectors` copies a knowledge base's vectors between pgvector and Qdrant
   without re-embedding and exits 1 when the counts differ (docs/bilgi-tabani.md "Moving vectors
   between drivers"). New `GET …/knowledge-bases/{kb_id}/ingest-report`; `PATCH
-  …/documents/{id}` takes `acl_roles`, `acl_users`, `acl_open`; `POST …/reindex` takes `preset`
+  …/documents/{id}` takes `acl_roles`, `acl_users`, `acl_open` (project admin only); `POST …/reindex` takes `preset`
   (`make reconvert`); the search response adds `filtered` and `rerank_truncated` (additive).
 - **Changed:** uploading identical bytes under the same name keeps the version (was version + 1;
   outcome `unchanged` as before, FOLLOWUP-157). Deleting a document or a knowledge base removes

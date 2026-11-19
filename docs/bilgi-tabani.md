@@ -216,13 +216,20 @@ docker compose run --rm tools make migrate-vectors PROJECT=<key> FROM=pgvector T
   the API's `/internal/embed`, so the backend must be up) and prints `sparse_computed=N`. A dry
   run writes nothing and prints `sparse_missing=N`.
 - Per knowledge base the line shows `source`, `target`, `written`; the run exits 1 when the
-  target does not hold the source's vectors. A Qdrant collection with points of its own (an
-  earlier run, another installation) is never cleaned silently: run again with `DROP_TARGET=1`
-  (Qdrant only; the pgvector column is the source of truth and is never dropped).
+  target does not hold the source's vectors, and the line says what to do for that target. A
+  Qdrant collection with points of its own (an earlier run, another installation) is never
+  cleaned silently: run again with `DROP_TARGET=1` (Qdrant only; the pgvector column is the
+  source of truth and is never dropped). Towards pgvector a mismatch means Qdrant holds points
+  of chunks that are not searchable in Postgres (document deleted or not indexed) or misses
+  some: reindex those documents (`LAYER=gold`) or rebuild the Qdrant side with
+  `FROM=pgvector TO=qdrant DROP_TARGET=1`.
 - Run it while no ingest is running: a document being re-embedded is not searchable and is not
   counted on the pgvector side.
-- The switch is `VECTOR_BACKEND` in `.env` (the operator's); going back is setting it back. The
-  source side is never changed. Search ACL is applied in the query on both sides.
+- The switch is `VECTOR_BACKEND` in `.env` (the operator's); going back is setting it back.
+  Dense vectors, chunk text and documents on the source side never change. The one write there
+  is additive: pgvector → Qdrant stores the sparse weights a pre-04b chunk lacked in
+  `chunks.sparse`, and they stay even when the run ends in a mismatch (derived data, what a gold
+  reindex would write). Search ACL is applied in the query on both sides.
 
 ## Ingest report (04b)
 
