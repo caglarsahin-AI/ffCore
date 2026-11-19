@@ -394,19 +394,25 @@ async def upload_documents(
     users = list(acl_users or [])
     if acl_open and (roles or users):
         raise invalid("acl_conflict", "acl_open cannot be combined with acl_roles or acl_users.")
-    if not acl_open and not roles and not users:
+    explicit_acl = acl_open or bool(roles) or bool(users)
+    if not explicit_acl:
         roles = list(DEFAULT_UPLOAD_ROLES)
+    names = [upload.filename or "upload" for upload in files]
+    # Every check before any file is staged or written (04b-1 r3): a refusal changes nothing.
+    existing = await _same_name_documents(session, kb.id, names, acl_for(request, actor))
+    await _check_reupload(request, actor, project_id, existing, explicit_acl, roles, users)
     uploaded = []
-    for upload in files:
+    for upload, name in zip(files, names, strict=True):
+        current = existing.get(name)
+        # Without ACL fields a re-upload keeps the document's ACL; the default is for new ones.
+        keep = current is not None and not explicit_acl
         document, outcome = await ingest.register_upload(
             session,
             kb.id,
-            filename=upload.filename or "upload",
-            staged=await asyncio.to_thread(
-                ingest.stage_upload, upload.file, upload.filename or "upload", settings
-            ),
-            acl_roles=roles,
-            acl_users=users,
+            filename=name,
+            staged=await asyncio.to_thread(ingest.stage_upload, upload.file, name, settings),
+            acl_roles=list(current.acl_roles) if keep else roles,
+            acl_users=list(current.acl_users) if keep else users,
             created_by=actor.actor_id,
             settings=settings,
             vector_store=jobs.get_vector_store(settings),
@@ -421,6 +427,47 @@ async def upload_documents(
             await queue.enqueue("ingest_document_job", str(document.id))
         out.append(UploadedDocument(outcome=outcome, document=_document_out(document, 0)))
     return UploadResult(data=out)
+
+
+async def _same_name_documents(session, kb_id: UUID, names: list[str], filters: VectorFilters):
+    """The live documents of the KB under these names, with whether the caller may read them."""
+    rows = await session.execute(
+        select(
+            Document.filename,
+            Document.acl_roles,
+            Document.acl_users,
+            visible(filters).label("readable"),
+        ).where(
+            Document.kb_id == kb_id,
+            Document.filename.in_(names),
+            Document.deleted_at.is_(None),
+        )
+    )
+    return {row.filename: row for row in rows}
+
+
+async def _check_reupload(request, actor, project_id, existing, explicit_acl, roles, users):
+    """04b-1 r3. A same-name document a non-admin cannot read is never overwritten (MAJOR-2:
+    409 document_name_taken; the name's existence shows, its content and ACL do not). Its ACL
+    is changed by a project admin only (MAJOR-1): the same authorize() as PATCH, 403
+    insufficient_role with its audit row. Invariant: a document's ACL changes only through
+    PATCH and upload, and both pass ACL_CHANGE."""
+    wanted = (sorted(roles), sorted(map(str, users)))
+    # K-04B-0013 A: a project admin (a superadmin's grant is admin too) passes the name check,
+    # so a user-only document it cannot read (C15) stays manageable. FOLLOWUP-202: its PATCH
+    # and DELETE still answer 404 for the admin.
+    admin = request.state.grant.role == "admin"
+    changes_acl = False
+    for row in existing.values():
+        if not row.readable and not admin:
+            raise conflict(
+                "document_name_taken",
+                "A document with this name already exists in this knowledge base.",
+            )
+        if explicit_acl and wanted != (sorted(row.acl_roles), sorted(map(str, row.acl_users))):
+            changes_acl = True
+    if changes_acl:
+        await authorize(request, actor, str(project_id), ACL_CHANGE)
 
 
 async def _document(
