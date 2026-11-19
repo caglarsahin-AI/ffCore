@@ -90,7 +90,8 @@ function useServerMutation<T>(projectId: string, call: (input: T) => Promise<Mcp
   return useMutation({
     mutationFn: call,
     onSuccess: (server) => {
-      void client.invalidateQueries({ queryKey: mcpServerKeys.list(projectId) });
+      // exact: the list key is a prefix of the server's own key, which gets the fresh answer below.
+      void client.invalidateQueries({ queryKey: mcpServerKeys.list(projectId), exact: true });
       if (server) client.setQueryData(mcpServerKeys.one(projectId, server.id), server);
     },
   });

@@ -1750,6 +1750,135 @@
       "parameter_location_unsupported": "path, query ya da gövde dışında bir parametre yeri kullanıyor.",
       "parameter_name_conflict": "İki parametresi aynı adı taşıyor.",
       "request_body_unsupported": "İstek gövdesi bir JSON nesnesi değil."
-    }
+    },
+    "title": "MCP sunucuları",
+    "description": "Bir OpenAPI belgesini ya da uzak bir MCP sunucusunu bu kurulumun MCP sunucusu olarak yayınlayın. Sunulacak operasyonları ve modelin onları nasıl göreceğini seçin, sonra sunucuyu araçlara ekleyin.",
+    "detailDescription": "Bu sunucunun sunduğu operasyonlar, çağırdığı upstream ve son 24 saati.",
+    "add": "Sunucu yayınla",
+    "needsAdmin": "MCP sunucularını yalnız proje yöneticisi yayınlayabilir ya da değiştirebilir.",
+    "emptyTitle": "Henüz MCP sunucusu yok",
+    "emptyBody": "Agent'ların operasyonlarını MCP üzerinden çağırabilmesi için bir OpenAPI belgesi yayınlayın, örneğin bir BI aracının API'si.",
+    "name": "Ad",
+    "nameRequired": "Bir ad girin.",
+    "key": "Anahtar",
+    "keyHint": "Küçük harf, rakam ve tire. Kurulumda tektir; sunucu /mcp/ altında bu anahtarla cevap verir.",
+    "keyInvalid": "Harfle başlayan küçük harf, rakam ve tire kullanın (2 ile 64 karakter).",
+    "sourceKind": "Kaynak",
+    "sourceKinds": {
+      "openapi": "OpenAPI belgesi",
+      "remote_mcp": "Uzak MCP sunucusu"
+    },
+    "sourceKindHints": {
+      "openapi": "Belgenin her operasyonu bir araç olur; çağrılar upstream adresine gider.",
+      "remote_mcp": "Başka bir MCP sunucusunun araçları, bu kurulumun guardrail, kota ve kaydıyla burada sunulur."
+    },
+    "upstream": "Upstream adresi",
+    "upstreamHint": "Yalnız şema, ana makine, port ve yol. Kurulumun dış erişim politikası uygulanır; platform servisleri reddedilir.",
+    "upstreamRequired": "Upstream adresini girin.",
+    "auth": "Upstream'e gönderilen kimlik",
+    "authType": "Kimlik türü",
+    "authTypes": {
+      "none": "Yok",
+      "bearer": "Bearer token",
+      "header": "Özel başlık",
+      "basic": "Basic (kullanıcı adı ve parola)"
+    },
+    "authHints": {
+      "none": "Upstream kimlik bilgisi olmadan çağrılır.",
+      "bearer": "Authorization: Bearer olarak gönderilir.",
+      "header": "Seçtiğiniz tek bir başlık olarak gönderilir; taşıma ve kimlik başlıkları reddedilir.",
+      "basic": "Authorization: Basic olarak gönderilir."
+    },
+    "token": "Token",
+    "headerName": "Başlık adı",
+    "headerValue": "Başlık değeri",
+    "username": "Kullanıcı adı",
+    "password": "Parola",
+    "authSecretRequired": "Kimlik alanlarını doldurun.",
+    "secretKept": "Kayıtlı kimlik bilgileri korunuyor. Değiştirmek için türü yeniden seçin ya da yeni değerleri yazın.",
+    "access": "Kim çağırabilir",
+    "accessModes": {
+      "internal": "Yalnız platform agent'ları",
+      "token": "Agent'lar ve API anahtarları"
+    },
+    "accessHints": {
+      "internal": "Sunucuyu yalnız bu kurulumun agent çalışma zamanı çağırır.",
+      "token": "tools_invoke kapsamlı API anahtarları da çağırabilir."
+    },
+    "guardrailMode": "Guardrail kipi",
+    "guardrailModes": {
+      "off": "Kapalı",
+      "monitor": "İzle",
+      "enforce": "Zorla"
+    },
+    "guardrailModeHint": "Politikayı sıkılaştırır, asla gevşetmez: her kural bu kip ile kendi kipinden katı olanında çalışır.",
+    "policyKey": "Guardrail politikası",
+    "policyKeyHint": "Projenin guardrail politikasının anahtarı.",
+    "policyRequired": "Bir politika anahtarı girin.",
+    "spec": "OpenAPI belgesi",
+    "specFile": "Dosyadan yükle",
+    "specHint": "OpenAPI 3, YAML ya da JSON, en çok 1 000 000 karakter. Yapıştırın ya da dosyadan okuyun.",
+    "save": "Kaydet",
+    "cancel": "Vazgeç",
+    "edit": "Düzenle",
+    "delete": "Sil",
+    "deleteConfirm": "“{name}” MCP sunucusu silinsin mi? Adresi cevap vermeyi bırakır; ondan eklenen araç kaldırılana kadar hata verir.",
+    "back": "Tüm MCP sunucuları",
+    "endpoint": "MCP adresi",
+    "status": "Durum",
+    "statuses": {
+      "draft": "Taslak",
+      "active": "Yayında",
+      "disabled": "Durduruldu"
+    },
+    "exposedCount": "Yayında",
+    "lastError": "Son hata",
+    "none": "Yok",
+    "never": "Hiç",
+    "discoveredAt": "Keşfedildi",
+    "publish": "Yayınla",
+    "enable": "Yeniden sun",
+    "disable": "Sunmayı durdur",
+    "test": "Bağlantıyı test et",
+    "testResult": {
+      "reachable": "Erişilebilir",
+      "unreachable": "Erişilemiyor",
+      "status": "HTTP {code}",
+      "tools": "{count, plural, one {# araç listelendi} other {# araç listelendi}}",
+      "latency": "{ms} ms"
+    },
+    "addTool": "Araç olarak ekle",
+    "toolAdded": "Araçlara {name} olarak eklendi. Aksiyonlarını orada keşfedin; kapalı ve onay gerektirir olarak başlarlar.",
+    "openTool": "Aracı aç",
+    "tabs": {
+      "operations": "Operasyonlar",
+      "monitoring": "İzleme"
+    },
+    "replaceSpec": "Belgeyi değiştir",
+    "discover": {
+      "openapi": "Belgeyi yeniden oku",
+      "remote_mcp": "Araçları keşfet"
+    },
+    "discovered": "{count, plural, one {# operasyon bulundu} other {# operasyon bulundu}}",
+    "opsHint": "MCP adresinde yalnız seçili operasyonlar sunulur. Model araç adını ve açıklamasını görür; operasyonun kendi adı ve açıklaması için boş bırakın.",
+    "noOpsTitle": "Henüz operasyon yok",
+    "noOpsBody": {
+      "openapi": "Belgede operasyon yok. Operasyonu olan bir belgeyle değiştirin.",
+      "remote_mcp": "Uzak sunucunun listelediği araçları okumak için “Araçları keşfet”i çalıştırın."
+    },
+    "opPublish": "Sun",
+    "opName": "Operasyon",
+    "opRoute": "Yöntem ve yol",
+    "opAlias": "Araç adı",
+    "opAliasDescription": "Araç açıklaması",
+    "opState": "Durum",
+    "opServed": "Sunuluyor",
+    "opExposable": "Sunulabilir",
+    "opNotExposable": "Sunulamaz",
+    "selectFor": "{name} yayınlansın",
+    "aliasFor": "{name} için araç adı",
+    "aliasDescriptionFor": "{name} için araç açıklaması",
+    "reasonCode": "Neden kodu: {code}",
+    "saveSelection": "Seçimi kaydet"
   }
 }

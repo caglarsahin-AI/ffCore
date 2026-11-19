@@ -1750,6 +1750,135 @@
       "parameter_location_unsupported": "It uses a parameter location other than path, query or body.",
       "parameter_name_conflict": "Two of its parameters have the same name.",
       "request_body_unsupported": "Its request body is not a JSON object."
-    }
+    },
+    "title": "MCP servers",
+    "description": "Publish an OpenAPI document or a remote MCP server as an MCP server of this installation. Choose the operations to serve and how the model sees them, then add the server to the tools.",
+    "detailDescription": "The operations this server serves, the upstream it calls and its last 24 hours.",
+    "add": "Publish a server",
+    "needsAdmin": "Only a project admin can publish or change MCP servers.",
+    "emptyTitle": "No MCP servers yet",
+    "emptyBody": "Publish an OpenAPI document, for example a BI tool's API, so agents can call its operations through MCP.",
+    "name": "Name",
+    "nameRequired": "Enter a name.",
+    "key": "Key",
+    "keyHint": "Lowercase letters, digits and hyphens. Unique in the installation; the server answers under /mcp/ with this key.",
+    "keyInvalid": "Use lowercase letters, digits and hyphens, starting with a letter (2 to 64 characters).",
+    "sourceKind": "Source",
+    "sourceKinds": {
+      "openapi": "OpenAPI document",
+      "remote_mcp": "Remote MCP server"
+    },
+    "sourceKindHints": {
+      "openapi": "Each operation of the document becomes a tool; calls go to the upstream address.",
+      "remote_mcp": "The tools of another MCP server, served here with this installation's guardrail, quota and log."
+    },
+    "upstream": "Upstream address",
+    "upstreamHint": "Scheme, host, port and path only. The installation's outbound policy applies; platform services are refused.",
+    "upstreamRequired": "Enter the upstream address.",
+    "auth": "Identity sent to the upstream",
+    "authType": "Identity type",
+    "authTypes": {
+      "none": "None",
+      "bearer": "Bearer token",
+      "header": "Custom header",
+      "basic": "Basic (user name and password)"
+    },
+    "authHints": {
+      "none": "The upstream is called without credentials.",
+      "bearer": "Sent as Authorization: Bearer.",
+      "header": "Sent as one header of your choice; transport and identity headers are refused.",
+      "basic": "Sent as Authorization: Basic."
+    },
+    "token": "Token",
+    "headerName": "Header name",
+    "headerValue": "Header value",
+    "username": "User name",
+    "password": "Password",
+    "authSecretRequired": "Fill in the identity fields.",
+    "secretKept": "The stored credentials are kept. Choose the type again or type new values to replace them.",
+    "access": "Who can call",
+    "accessModes": {
+      "internal": "Platform agents only",
+      "token": "Agents and API keys"
+    },
+    "accessHints": {
+      "internal": "Only this installation's agent runtime calls the server.",
+      "token": "API keys with the tools_invoke scope may call it too."
+    },
+    "guardrailMode": "Guardrail mode",
+    "guardrailModes": {
+      "off": "Off",
+      "monitor": "Monitor",
+      "enforce": "Enforce"
+    },
+    "guardrailModeHint": "Makes the policy stricter, never looser: each rule runs in the stricter of this mode and its own.",
+    "policyKey": "Guardrail policy",
+    "policyKeyHint": "The key of the project's guardrail policy.",
+    "policyRequired": "Enter a policy key.",
+    "spec": "OpenAPI document",
+    "specFile": "Upload a file",
+    "specHint": "OpenAPI 3, YAML or JSON, at most 1 000 000 characters. Paste it or read it from a file.",
+    "save": "Save",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "delete": "Delete",
+    "deleteConfirm": "Delete the MCP server “{name}”? Its address stops answering; a tool added from it fails until it is removed.",
+    "back": "All MCP servers",
+    "endpoint": "MCP address",
+    "status": "Status",
+    "statuses": {
+      "draft": "Draft",
+      "active": "Active",
+      "disabled": "Stopped"
+    },
+    "exposedCount": "Published",
+    "lastError": "Last error",
+    "none": "None",
+    "never": "Never",
+    "discoveredAt": "Discovered",
+    "publish": "Publish",
+    "enable": "Serve again",
+    "disable": "Stop serving",
+    "test": "Test connection",
+    "testResult": {
+      "reachable": "Reachable",
+      "unreachable": "Not reachable",
+      "status": "HTTP {code}",
+      "tools": "{count, plural, one {# tool listed} other {# tools listed}}",
+      "latency": "{ms} ms"
+    },
+    "addTool": "Add as a tool",
+    "toolAdded": "Added to the tools as {name}. Discover its actions there; they start switched off and needing approval.",
+    "openTool": "Open the tool",
+    "tabs": {
+      "operations": "Operations",
+      "monitoring": "Monitoring"
+    },
+    "replaceSpec": "Replace document",
+    "discover": {
+      "openapi": "Read the document again",
+      "remote_mcp": "Discover tools"
+    },
+    "discovered": "{count, plural, one {# operation found} other {# operations found}}",
+    "opsHint": "Only selected operations are served at the MCP address. The model sees the tool name and description; leave them empty to keep the operation's own.",
+    "noOpsTitle": "No operations yet",
+    "noOpsBody": {
+      "openapi": "The document has no operations. Replace it with one that has.",
+      "remote_mcp": "Run “Discover tools” to read the tools the remote server lists."
+    },
+    "opPublish": "Serve",
+    "opName": "Operation",
+    "opRoute": "Method and path",
+    "opAlias": "Tool name",
+    "opAliasDescription": "Tool description",
+    "opState": "State",
+    "opServed": "Served",
+    "opExposable": "Can be served",
+    "opNotExposable": "Cannot be served",
+    "selectFor": "Publish {name}",
+    "aliasFor": "Tool name for {name}",
+    "aliasDescriptionFor": "Tool description for {name}",
+    "reasonCode": "Reason code: {code}",
+    "saveSelection": "Save selection"
   }
 }
