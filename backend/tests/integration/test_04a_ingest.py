@@ -124,9 +124,10 @@ def markdown(*sections):
 @pytest.mark.parametrize(
     "convert,engine",
     [
-        pytest.param(convert_without_weights, "test-markdown-as-is", id="as-is"),
-        # The product path: Markdown through Docling (needs its weights, DRIFT-85).
-        pytest.param(ingest.convert_inline, "docling@", marks=pytest.mark.models, id="docling"),
+        pytest.param(convert_without_weights, "markdown", id="test-converter"),
+        # The product path: Markdown read as written, no Docling and no weights (04b-2,
+        # FOLLOWUP-87; was Docling with its weights, DRIFT-85).
+        pytest.param(ingest.convert_inline, "markdown", id="product"),
     ],
 )
 def test_04a_ingest_markdown_end_to_end(pg, make_project, settings, convert, engine):
