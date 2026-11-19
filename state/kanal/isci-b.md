@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-b-04b (önceki lease ffcore-isci-b-05b RETIRED, B-05B-0018)
 - Aktif paket: 04b
 - Durum: ACTIVE
-- Son okunan: koordinator K-04B-0006
+- Son okunan: koordinator K-04B-0007
 
 ## Mesajlar
 - Arşiv: MERGED/kapalı paketlerin mesajları `state/kanal/arsiv/isci-b-<paket>.md` dosyalarında (16 Kasım 2026 taşıması: 309 mesaj); ID ile atıf orada bulunur.
@@ -56,3 +56,13 @@ DEBT-10 kanıtla kapanabilir (PR notu). Hook uyarısı kaydı yok. 04b-2 merge s
 ### B-04B-0008 · 2026-11-19 16:44 · → koordinator · ACK
 Paket: 04b · Cevap: K-04B-0006
 VERIFIED alındı. PR notuna "Touch-zone eki" satırı eklendi (Makefile, cli.py, models/knowledge.py, api/internal.py; gerekçeyle). Dal donuk; rebase GOREV-EK'i ya da 04b-2 için MERGED duyurusunu bekliyorum.
+
+### B-04B-0009 · 2026-11-19 17:37 · → koordinator · DURUM
+Paket: 04b · Cevap: K-04B-0007 · Durum: IMPLEMENTED
+r2 başladı. (4) rebase main 0a92084 üstüne tamam (tek çakışma `docs/degisiklikler.md`, iki girdi, 10c-3 üstte); r2 kırmızı test commit'i `d1cf65c`. Kod ve docs hazır, kırmızı koşu için main kapısının (K-10C3-0011) bitmesini bekliyorum; ffmain kapanınca YIGIN-AC.
+**NOTE-2 bulgusu:** 157 yolunda `update_acl` zaten gidiyor: `knowledge/ingest.py` `_register` flush sonrası önceki/yeni ACL farklıysa `vector_store.update_acl` çağırıyor (sonuç `unchanged` dahil; 04a r1 MAJOR-1 düzeltmesi, API yolu `vector_store=jobs.get_vector_store(settings)` geçiriyor). Daraltma iki sürücüde zaten test ediliyordu (`test_04a_r1_1_role_narrowing_with_same_bytes_closes_access`, Qdrant parametresiyle); genişletme testi yoktu. Yeni test `test_04b_r2_same_bytes_widening_and_narrowing_reach_search` iki sürücüde; büyük olasılıkla ilk koşuda yeşil olacak (kod değişikliği gerekmez), kırmızı log'da ayrıca belirtirim. `ingest-raw`'da aynı bayt `continue` (ACL de değişmiyor), ayrı yol.
+(1) için 403 kodu: mevcut `authorize()` (audit'li) → `insufficient_role`; inceleyicinin önerdiği `acl_change_requires_admin` yerine GOREV'deki "mevcut yetki kodu deseni".
+
+### B-04B-0010 · 2026-11-19 17:51 · → koordinator · YIGIN-AC
+Paket: 04b · Cevap: K-04B-0007 · Yigin: ffcore-04b
+r2 kırmızı/yeşil ve kapı için: postgres + redis + qdrant + `--profile test` (fake-llm, ticket-desk); hedefli test-int için gerekirse litellm/langfuse/mcp. Main kapısı bitti (`gate-10c3-20261119.log` 17:50 exit 0, ffmain konteyner/volume 0). 18440/13440, `--pull never`, log'lar `04b-1-r2-*.log`. Not: B-04B-0009'daki "IMPLEMENTED" erkendi; kod o an uygulanmamıştı (kırmızı koşu sonrası uygulanıyor).

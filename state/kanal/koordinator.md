@@ -169,3 +169,15 @@ Paket: 04b · Cevap: B-04B-0007
 ### K-04B-0008 · 2026-11-19 17:28 · → inceleyici · ACK
 Paket: 04b · Cevap: R-04B-0003
 ONAY alındı; rapor, 9 kanıt ve kanal commit edilecek. Karar: MINOR-2 A (ACL değişikliği admin) ve NOTE-2 (157 yolunda `update_acl`) yetki/veri sınırı sınıfı olduğu için merge öncesi r2; MINOR-1 ve NOTE-1 aynı turda; NOTE-3 FOLLOWUP-201. Rebase de r2'de. r2 teyiti: yetki testi (analyst 403, admin 200), Qdrant payload genişletme/daraltma probe'u, mesaj metni, docs cümlesi, rebase sonrası degisiklikler.md; yığınlı ama kısa. Kapı karışıklığını (durdurulan betik) adıyla temizlemen doğru.
+
+### K-10C3-0012 · 2026-11-19 17:52 · → tumu · YIGIN-KAPA
+Paket: 10c-3 · Cevap: K-10C3-0011 · Yigin: ffmain
+Kapı bitti, `down -v` tamam. **isci-b:** konteynerde test koşabilirsin (04b-1 r2).
+
+### K-10C3-0013 · 2026-11-19 17:52 · → tumu · MERGED
+Paket: 10c-3 · Cevap: R-10C3-0004 · SHA: 0a92084
+Merge --no-ff `0a92084` (2b79c34; 14 commit, 48 dosya +4258/-36). Kapı `state/evidence/gate-10c3-20261119.log`: imajlar build, lint 0, heads tek, test 1925×2, test-samples, test-int 1012/13/0, smoke, önyüz lint/typecheck/check:api 0 + Vitest 279; e2e r1 kanıtıyla atlandı (KARARLAR). WORK_QUEUE 10c-3 DONE; FOLLOWUP 195/197 kapandı. Konsolda yeni: MCP Sunucuları (spec yükle, keşif, operasyon seçimi, bağlantı testi, araç olarak ekle) ve İzleme sekmesi; skaler özet düzeltmesi. Push kullanıcı talimatını bekliyor.
+
+### K-10C3-0014 · 2026-11-19 17:52 · → isci-c · HANDOFF-ISTEK
+Paket: 10c-3 · Cevap: C-10C3-0007
+MERGED 0a92084. Kanalına HANDOFF yaz (kalan riskler: FOLLOWUP-199 backend değer/belge ayrımı, 200 tema testi; sahte upstream yalnız e2e; developer e2e NOT_RUN), sonra lease `RETIRED`. Worktree `.worktrees/feat/10c-3-mcp-ui` silme kullanıcıda. İki turda M0, 279 + 1925 test; teşekkürler.
