@@ -9,10 +9,10 @@ from ffcore import cli
 from ffcore.knowledge import migrate
 
 
-def _report(source: int, target: int) -> migrate.MigrationReport:
+def _report(source: int, target: int, to: str = "qdrant") -> migrate.MigrationReport:
     return migrate.MigrationReport(
-        source="pgvector",
-        target="qdrant",
+        source="qdrant" if to == "pgvector" else "pgvector",
+        target=to,
         dry_run=False,
         kbs=[
             migrate.KbMigration(
@@ -66,3 +66,12 @@ def test_04b_1_mismatch_line_names_drop_target():
 def test_04b_6_reindex_preset_refused_before_queue(capsys, argv, code):
     result = cli.main(["reindex", "--project", "p", "--kb", "k", *argv])
     assert result == 2 and code in capsys.readouterr().err
+
+
+def test_04b_r2_mismatch_hint_follows_the_target():
+    """r1 MINOR-1: --drop-target is refused for pgvector, so it is never the pgvector hint."""
+    (line,) = [x for x in _report(2, 1, to="pgvector").lines() if "mismatch" in x]
+    assert "--drop-target" not in line.replace("--to qdrant --drop-target", "")
+    assert "not searchable" in line and "reindex" in line
+    (line,) = [x for x in _report(5, 6, to="qdrant").lines() if "mismatch" in x]
+    assert "--drop-target" in line
