@@ -10,7 +10,7 @@ import { THEMES, selectProject, signIn, useTheme } from "./support";
 // shot in edit and read mode in both themes for the PR and docs/onyuz.md (the difference is the
 // buttons and the read-only badge) and pass axe WCAG 2 A/AA in both themes.
 
-const ALL_SCREENS = ["/overview", "/projects", "/providers", "/models", "/knowledge-bases", "/tools", "/agents", "/runs", "/approvals", "/evaluations", "/alerts", "/usage", "/system-status", "/api-keys", "/quotas", "/retention"];
+const ALL_SCREENS = ["/overview", "/projects", "/providers", "/models", "/knowledge-bases", "/tools", "/mcp-servers", "/agents", "/runs", "/approvals", "/evaluations", "/alerts", "/usage", "/system-status", "/api-keys", "/quotas", "/retention"];
 const GOVERNANCE: { name: string; path: string; ready: string }[] = [
   { name: "overview", path: "/overview", ready: "overview-range" },
   { name: "usage", path: "/usage", ready: "usage-totals" },
