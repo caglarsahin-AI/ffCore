@@ -1,0 +1,93 @@
+All checks passed!
+1 file reformatted, 2 files left unchanged
+FFFF.F.................                                                  [100%]
+=================================== FAILURES ===================================
+_________________ test_04b_2_89_list_value_is_kept_as_a_tuple __________________
+
+    def test_04b_2_89_list_value_is_kept_as_a_tuple():
+        filters = VectorFilters.from_mapping({"metadata": {"source": SCOPE, "lang": "tr"}})
+>       assert filters.metadata == (("lang", "tr"), ("source", tuple(SCOPE)))
+E       AssertionError: assert (('lang', 'tr... 'jira:PAY'])) == (('lang', 'tr... 'jira:PAY')))
+E         
+E         At index 1 diff: ('source', ['confluence:OCR', 'jira:PAY']) != ('source', ('confluence:OCR', 'jira:PAY'))
+E         Use -v to get more diff
+
+tests/unit/test_04b_2_scope.py:28: AssertionError
+_________________ test_04b_2_89_qdrant_list_value_is_match_any _________________
+
+    def test_04b_2_89_qdrant_list_value_is_match_any():
+        filters = VectorFilters.from_mapping({"metadata": {"source": SCOPE}})
+        must = qdrant_filter(uuid.uuid4(), filters)["must"]
+>       assert {"key": "metadata.source", "match": {"any": SCOPE}} in must
+E       AssertionError: assert {'key': 'metadata.source', 'match': {'any': ['confluence:OCR', 'jira:PAY']}} in [{'key': 'kb_id', 'match': {'value': 'c415288e-4179-4b8d-8d31-ec848f4b6092'}}, {'should': [{'key': 'acl_open', 'match': {'value': True}}]}, {'key': 'metadata.source', 'match': {'value': ['confluence:OCR', 'jira:PAY']}}]
+
+tests/unit/test_04b_2_scope.py:35: AssertionError
+_____________________ test_04b_2_89_empty_list_is_refused ______________________
+
+    def test_04b_2_89_empty_list_is_refused():
+>       with pytest.raises(ValueError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+tests/unit/test_04b_2_scope.py:39: Failed
+____________________ test_04b_2_89_definition_accepts_scope ____________________
+
+    def test_04b_2_89_definition_accepts_scope():
+        knowledge = [{"kb_key": "k", "mode": "always", "filter": {"scope": SCOPE}}]
+>       parsed = parse_definition({**MINIMAL, "knowledge": knowledge})  # no 422 any more
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/unit/test_04b_2_scope.py:45: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+data = {'model': 'chat-default', 'system_prompt': 'You answer from the documents.', 'knowledge': [{'kb_key': 'k', 'mode': 'always', 'filter': {'scope': ['confluence:OCR', 'jira:PAY']}}]}
+
+    def parse_definition(data: dict[str, Any]) -> AgentDefinition:
+        """A stored or submitted definition; a missing schema_version means version 1 (C8)."""
+>       return AgentDefinition.model_validate({"schema_version": SCHEMA_VERSION, **data})
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for AgentDefinition
+E         Value error, knowledge_filter_not_supported: knowledge[].filter.scope is not available yet [type=value_error, input_value={'schema_version': 1, 'mo...ce:OCR', 'jira:PAY']}}]}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.14/v/value_error
+
+ffcore/runtime/definition.py:214: ValidationError
+______________ test_04b_2_89_adapter_sends_scope_as_source_filter ______________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7812d9b680>
+
+    def test_04b_2_89_adapter_sends_scope_as_source_filter(monkeypatch):
+        settings = Settings(
+            deploy_profile="llmaas",
+            offline=False,
+            service_token=SERVICE_TOKEN,
+            obo_jwt_secret=OBO_SECRET,
+            internal_api_url="http://backend:8000",
+            **SETTINGS_03A,
+        )
+        monkeypatch.setattr(adapters, "SafeOutboundClient", search_adapter.FakeClient)
+        run_id, project_id, user_id, kb_id = (str(uuid.uuid4()) for _ in range(4))
+        retriever = adapters.HttpRetriever(
+            settings, None, run_id=run_id, project_id=project_id, user_id=user_id
+        )
+        retriever._kb_ids["sozlesmeler"] = kb_id
+        asyncio.run(retriever.search("sozlesmeler", "fesih", 4, SCOPE))
+>       assert search_adapter.SENT[-1]["json"] == {
+            "query": "fesih",
+            "top_k": 4,
+            "filters": {"metadata": {"source": SCOPE}},
+        }
+E       AssertionError: assert {'query': 'fesih', 'top_k': 4} == {'query': 'fe...'jira:PAY']}}}
+E         
+E         Omitting 2 identical items, use -vv to show
+E         Right contains 1 more item:
+E         {'filters': {'metadata': {'source': ['confluence:OCR', 'jira:PAY']}}}
+E         Use -v to get more diff
+
+tests/unit/test_04b_2_scope.py:71: AssertionError
+=========================== short test summary info ============================
+FAILED tests/unit/test_04b_2_scope.py::test_04b_2_89_list_value_is_kept_as_a_tuple
+FAILED tests/unit/test_04b_2_scope.py::test_04b_2_89_qdrant_list_value_is_match_any
+FAILED tests/unit/test_04b_2_scope.py::test_04b_2_89_empty_list_is_refused - ...
+FAILED tests/unit/test_04b_2_scope.py::test_04b_2_89_definition_accepts_scope
+FAILED tests/unit/test_04b_2_scope.py::test_04b_2_89_adapter_sends_scope_as_source_filter
+5 failed, 18 passed in 5.51s

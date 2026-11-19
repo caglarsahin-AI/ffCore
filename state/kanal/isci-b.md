@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-b-04b (önceki lease ffcore-isci-b-05b RETIRED, B-05B-0018)
 - Aktif paket: 04b
 - Durum: ACTIVE
-- Son okunan: koordinator K-04B-0022
+- Son okunan: koordinator K-04B-0023
 
 ## Mesajlar
 - Arşiv: MERGED/kapalı paketlerin mesajları `state/kanal/arsiv/isci-b-<paket>.md` dosyalarında (16 Kasım 2026 taşıması: 309 mesaj); ID ile atıf orada bulunur.
@@ -142,3 +142,15 @@ Paket: 04b · Cevap: K-04B-0021 · Durum: IMPLEMENTED
 04b-2 altı dilim commit'li (her dilim kırmızı test → kod; sonda compose/env düzeltmesi + docs), dal `feat/04b-2-knowledge-ext` (ef2ee83..1a42311, 46 dosya). Tam kapı koşuyor (lint, `make test` ×2, tam `make test-int` litellm/mcp/langfuse ayakta), log'lar `04b-2-*.log`; PR-HAZIR ardından.
 **Bildirim (touch-zone dışı, zorunlu):** `deploy/docker-compose.yml` iki satır (`TEXT_NORMALIZE_TR`, `VIDEO_TRANSCRIPT_ENABLED`): compose anchor'ı her ayarı açıkça geçiriyor; satırlar olmadan `.env` değeri sessizce yok sayılırdı ve video açılış reddi hiç tetiklenmezdi. Ayrı commit `ef2cf9f`. Uygun değilse geri alırım; o durumda iki ayar konteynerde etkisiz kalır.
 **Bulgular:** (1) iç key-search `filters`'ı yok sayıyordu (`extra="ignore"`): scope sessizce düşerdi; artık aynı `SearchFilters` (06b.yaml additive). (2) `frontend/tests/e2e/knowledge.ts:10-12` yorumu "Markdown Docling ister" diyor, artık bayat (e2e'nin başarısız vakası DOCX, test kırılmıyor); touch-zone dışı, FOLLOWUP adayı. (3) D3 409 belge düzeyinde; KB kolonu karşılaştırılmıyor (plan varsayımı 1'den sapma, gerekçe PR notunda).
+
+### B-04B-0026 · 2026-11-19 21:23 · → koordinator · YIGIN-KAPA
+Paket: 04b · Cevap: K-04B-0021 · Yigin: ffcore-04b
+`down -v` tamam; `ffcore-04b` konteyner 0 (`04b-2-down.log`).
+
+### B-04B-0027 · 2026-11-19 21:23 · → koordinator · PR-HAZIR
+Paket: 04b · Cevap: K-04B-0019, K-04B-0021, K-04B-0022, K-04B-0023 · SHA: 5c40558003dc797f54ddf90ec0fe347f78ac6849
+04b-2. Dal `feat/04b-2-knowledge-ext`, delta `ef2ee83..5c40558` 47 dosya +1641/−113, 16 commit (dilim başına kırmızı test → kod; compose/env `ef2cf9f`; docs `1a42311`; son test düzeltmesi `5c40558`). Çalışma ağacı temiz. PR notu `state/pr/04b-2.md` "Uygulama (04b-2)" ve sonrası (dilim/commit tablosu, kabul → test, OpenAPI additive listesi, varsayımlar 5-9, riskler, komutlar).
+Kapılar: lint 0; `make test` llmaas/airgap 1952×2; tam `make test-int` 1074 passed, 12 skipped (bayraklı); check:api 0; göç yok. Ollama 0.12.6 `/api/ps` gerçek doğrulaması NOT_RUN (ENV-204).
+**Bilerek değişen testler:** `test_06a_definition.py` + `test_af_1_definition_error_codes.py` (scope 422 / `knowledge_filter_not_supported` vakaları; ikincisi ilk tam kapıda yakalandı), `test_04a_ingest.py` (ürün Markdown yolu `markdown`, `models` işareti kalktı), `tests/converters.py` (`markdown` ağırlıksız), `test_04b_knowledge.py` (bilinmeyen preset örneği `video` → `audio`), `test_04a_api.py` (GET paritesi 5 → 6), `test_04a_openapi.py` (EXPECTED `query-stats`), `test_04a_readyz.py` (`ready_app`: Ollama `/api/ps` varsayılanı "yüklü model yok").
+**Önyüz notu (touch-zone dışı):** `frontend/lib/api/errors.ts:88` ve `tests/unit/test_10bp2_16_error_codes.test.ts:38` artık üretilmeyen `knowledge_filter_not_supported` kodunu eşliyor (zararsız ölü eşleme; FOLLOWUP-205 ile aynı önyüz dilimine aday).
+Hook: 19:48 `TEK-YAZAR` (`state/pr/04b-2.md` oluşturma), 19:50 `YIGIN` (kendi `0.0.0-04b` etiketim), 20:50 `ENV`+`KAPI` (compose iki satır, K-04B-0023); engelleme yok.

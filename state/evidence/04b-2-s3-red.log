@@ -1,0 +1,100 @@
+All checks passed!
+
+==================================== ERRORS ====================================
+____________ ERROR collecting tests/unit/test_04b_2_normalize_tr.py ____________
+ImportError while importing test module '/work/backend/tests/unit/test_04b_2_normalize_tr.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/local/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/unit/test_04b_2_normalize_tr.py:9: in <module>
+    from ffcore.knowledge.normalize import clean_markdown, normalize_query, normalizer_config_id
+E   ImportError: cannot import name 'normalizer_config_id' from 'ffcore.knowledge.normalize' (/work/backend/ffcore/knowledge/normalize.py)
+=========================== short test summary info ============================
+ERROR tests/unit/test_04b_2_normalize_tr.py
+!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+1 error in 0.85s
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+_______________ test_04b_2_d3_switching_on_needs_silver_rebuild ________________
+
+app = <fastapi.applications.FastAPI object at 0x7fef17918f80>
+world = {'project': '2b373f4a-60aa-4a42-b8fb-7a5f332d655c', 'other': '10fcc367-7a2b-46a5-af7d-4d18442da790', 'admin': <starlet...nt.TestClient object at 0x7fef172abd70>, 'admin_read': <starlette.testclient.TestClient object at 0x7fef171ac860>, ...}
+settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+queue = <tests.integration.test_04a_api.FakeQueue object at 0x7fef171d9c40>
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_9d076dfc3d56) at 0x7fef171af770>
+
+    def test_04b_2_d3_switching_on_needs_silver_rebuild(app, world, settings, queue, pg):
+        kb = create_kb(world)
+        item = upload(world, world["admin"], kb["id"], "kar.md", BODY).json()["data"][0]
+        process_all(settings, queue)
+        doc_id = item["document"]["id"]
+        assert search(world["admin"], world, kb["id"], "kâr payı").status_code == 200
+    
+        on = _switch_on(app, settings)
+        refused = search(world["admin"], world, kb["id"], "kâr payı")
+>       assert refused.status_code == 409, refused.text
+E       AssertionError: {"query_id":"ee32ac29-7834-442a-b76d-8c9919cc8831","hits":[{"chunk_id":"26dac879-eb52-4c2a-aa15-47990e67dc0e","document_id":"e7895050-9b37-4563-9fca-baeb366f7f4e","document_name":"kar.md","page":null,"section_path":null,"breadcrumb":"Sözleşmeler › kar.md","text":"Sözleşmeler › kar.md\n\nBu sözleşme kapsamında yüklenici bakım hizmetini aylık olarak verir ve her ziyaret için bir rapor düzenler. Fesih bildirim süresi doksan gündür ve yazılı yapılır. Bu sözleşme kapsamında yüklenici bakım hizmetini aylık olarak verir ve her ziyaret için bir rapor düzenler. Fesih bildirim süresi doksan gündür ve yazılı yapılır. Bu sözleşme kapsamında yüklenici bakım hizmetini aylık olarak verir ve her ziyaret için bir rapor düzenler. Fesih bildirim süresi doksan gündür ve yazılı yapılır. Bu sözleşme kapsamında yüklenici bakım hizmetini aylık olarak verir ve her ziyaret için bir rapor düzenler. Fesih bildirim süresi doksan gündür ve yazılı yapılır. Bu sözleşme kapsamında yüklenici bakım hizmetini aylık olarak verir ve her ziyaret için bir rapor düzenler. Fesih bildirim süresi doksan gündür ve yazılı yapılır. Bu sözleşme kapsamında yüklenici bakım hizmetini aylık olarak verir ve her ziyaret için bir rapor düzenler. Fesih bildirim süresi doksan gündür ve yazılı yapılır. Şirketin kâr payı hâlâ ödenmedi.","chunk_status":"ok","updated_at_source":null,"age_days":null,"embed_score":0.04436782507204495,"rerank_score":1.0}],"threshold_mode":"rerank_floor","filtered_by_rerank_floor":0,"filtered_by_min_score":0,"normalizer_config_id":"format-v1","latency_ms":17,"filtered":[],"rerank_truncated":0}
+E       assert 200 == 409
+E        +  where 200 = <Response [200 OK]>.status_code
+
+tests/integration/test_04b_2_normalize_tr.py:39: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+2026-11-19 17:16:10,899 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=167
+2026-11-19 17:16:11,144 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=181
+2026-11-19 17:16:11,335 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=116
+2026-11-19 17:16:11,516 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=119
+------------------------------ Captured log setup ------------------------------
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=167
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=181
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=116
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=119
+----------------------------- Captured stderr call -----------------------------
+2026-11-19 17:16:11,792 INFO ffcore.access access method=POST path=/api/v1/projects/2b373f4a-60aa-4a42-b8fb-7a5f332d655c/knowledge-bases status=201 ms=203
+2026-11-19 17:16:11,861 INFO ffcore.access access method=POST path=/api/v1/projects/2b373f4a-60aa-4a42-b8fb-7a5f332d655c/knowledge-bases/cff9c352-9800-4be4-b0b8-9952b41e78eb/documents status=202 ms=66
+2026-11-19 17:16:11,951 INFO ffcore.knowledge.ingest gold document=e7895050-9b37-4563-9fca-baeb366f7f4e reused=0 embedded=1
+2026-11-19 17:16:12,016 INFO ffcore.access access method=POST path=/api/v1/projects/2b373f4a-60aa-4a42-b8fb-7a5f332d655c/knowledge-bases/cff9c352-9800-4be4-b0b8-9952b41e78eb/search status=200 ms=62
+2026-11-19 17:16:12,076 INFO ffcore.access access method=POST path=/api/v1/projects/2b373f4a-60aa-4a42-b8fb-7a5f332d655c/knowledge-bases/cff9c352-9800-4be4-b0b8-9952b41e78eb/search status=200 ms=57
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/2b373f4a-60aa-4a42-b8fb-7a5f332d655c/knowledge-bases status=201 ms=203
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/2b373f4a-60aa-4a42-b8fb-7a5f332d655c/knowledge-bases/cff9c352-9800-4be4-b0b8-9952b41e78eb/documents status=202 ms=66
+INFO     ffcore.knowledge.ingest:ingest.py:677 gold document=e7895050-9b37-4563-9fca-baeb366f7f4e reused=0 embedded=1
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/2b373f4a-60aa-4a42-b8fb-7a5f332d655c/knowledge-bases/cff9c352-9800-4be4-b0b8-9952b41e78eb/search status=200 ms=62
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/2b373f4a-60aa-4a42-b8fb-7a5f332d655c/knowledge-bases/cff9c352-9800-4be4-b0b8-9952b41e78eb/search status=200 ms=57
+___________________ test_04b_2_d3_new_kb_records_the_setting ___________________
+
+app = <fastapi.applications.FastAPI object at 0x7fef17918f80>
+world = {'project': '335f78a0-75e6-499c-9e74-6d8b9e685b21', 'other': 'c461eea7-47a7-44d4-bd4e-9eb208dde792', 'admin': <starlet...nt.TestClient object at 0x7feefc67a7e0>, 'admin_read': <starlette.testclient.TestClient object at 0x7fef14c420c0>, ...}
+settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+queue = <tests.integration.test_04a_api.FakeQueue object at 0x7feefc495760>
+
+    def test_04b_2_d3_new_kb_records_the_setting(app, world, settings, queue):
+        _switch_on(app, settings)
+        kb = create_kb(world, key="yeni")
+>       assert kb["normalizer_config_id"] == "format-v1+tr-a1"
+E       AssertionError: assert 'format-v1' == 'format-v1+tr-a1'
+E         
+E         - format-v1+tr-a1
+E         ?          ------
+E         + format-v1
+
+tests/integration/test_04b_2_normalize_tr.py:72: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+2026-11-19 17:16:20,001 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=140
+2026-11-19 17:16:20,188 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=118
+2026-11-19 17:16:20,363 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=120
+2026-11-19 17:16:20,543 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=116
+------------------------------ Captured log setup ------------------------------
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=140
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=118
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=120
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=116
+----------------------------- Captured stderr call -----------------------------
+2026-11-19 17:16:20,711 INFO ffcore.access access method=POST path=/api/v1/projects/335f78a0-75e6-499c-9e74-6d8b9e685b21/knowledge-bases status=201 ms=76
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/335f78a0-75e6-499c-9e74-6d8b9e685b21/knowledge-bases status=201 ms=76
+=========================== short test summary info ============================
+FAILED tests/integration/test_04b_2_normalize_tr.py::test_04b_2_d3_switching_on_needs_silver_rebuild
+FAILED tests/integration/test_04b_2_normalize_tr.py::test_04b_2_d3_new_kb_records_the_setting
+2 failed in 26.27s

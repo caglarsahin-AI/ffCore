@@ -1,0 +1,27 @@
+
+> ffcore-frontend@0.1.0 gen:api
+> cp ../backend/openapi/03a.yaml mocks/openapi-03a.yaml && openapi-typescript mocks/openapi-03a.yaml -o lib/api/schema.d.ts && openapi-typescript ../backend/openapi/04a.yaml -o lib/api/schema-04a.d.ts && openapi-typescript ../backend/openapi/05a.yaml -o lib/api/schema-05a.d.ts && openapi-typescript ../backend/openapi/06a.yaml -o lib/api/schema-06a.d.ts && openapi-typescript ../backend/openapi/07.yaml -o lib/api/schema-07.d.ts && openapi-typescript ../backend/openapi/09.yaml -o lib/api/schema-09.d.ts && openapi-typescript ../backend/openapi/03c.yaml -o lib/api/schema-03c.d.ts && openapi-typescript ../backend/openapi/06b.yaml -o lib/api/schema-06b.d.ts && openapi-typescript ../backend/openapi/05b.yaml -o lib/api/schema-05b.d.ts
+
+✨ openapi-typescript 7.13.0
+🚀 mocks/openapi-03a.yaml → lib/api/schema.d.ts [296.2ms]
+✨ openapi-typescript 7.13.0
+🚀 ../backend/openapi/04a.yaml → lib/api/schema-04a.d.ts [242.2ms]
+✨ openapi-typescript 7.13.0
+🚀 ../backend/openapi/05a.yaml → lib/api/schema-05a.d.ts [193.8ms]
+✨ openapi-typescript 7.13.0
+🚀 ../backend/openapi/06a.yaml → lib/api/schema-06a.d.ts [292.3ms]
+✨ openapi-typescript 7.13.0
+🚀 ../backend/openapi/07.yaml → lib/api/schema-07.d.ts [125.6ms]
+✨ openapi-typescript 7.13.0
+🚀 ../backend/openapi/09.yaml → lib/api/schema-09.d.ts [260.4ms]
+✨ openapi-typescript 7.13.0
+🚀 ../backend/openapi/03c.yaml → lib/api/schema-03c.d.ts [325ms]
+✨ openapi-typescript 7.13.0
+🚀 ../backend/openapi/06b.yaml → lib/api/schema-06b.d.ts [263.1ms]
+✨ openapi-typescript 7.13.0
+🚀 ../backend/openapi/05b.yaml → lib/api/schema-05b.d.ts [193.3ms]
+
+> ffcore-frontend@0.1.0 check:api
+> node scripts/check-api.mjs
+
+API contract copies and generated types are current.

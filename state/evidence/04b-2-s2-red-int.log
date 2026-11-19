@@ -1,0 +1,189 @@
+FFF                                                                      [100%]
+=================================== FAILURES ===================================
+___________ test_04b_2_89_search_in_filter_on_both_drivers[pgvector] ___________
+
+world = {'settings': Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('****...ect': '751009b2-ff20-46f3-8492-992b1e6ec232', 'admin': <starlette.testclient.TestClient object at 0x7f258e39f650>, ...}
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_af9e0cf3eeb2) at 0x7f258e621ca0>
+
+    def test_04b_2_89_search_in_filter_on_both_drivers(world, pg):
+        for name in SOURCES:
+            assert r1_upload(world, world["admin"], name, BODY + name).status_code == 202
+        _set_sources(pg, world["kb"])  # before indexing: Qdrant payloads carry the metadata
+        drain(world)
+        url = kb_url(world, f"/{world['kb']}/search")
+    
+        def search(metadata):
+            body = {"query": "bakım hizmeti rapor", "filters": {"metadata": metadata}}
+            return _names(world["admin"].post(url, json=body))
+    
+>       assert search({"source": ["confluence:OCR", "jira:PAY"]}) == {"ocr.md", "pay.md"}
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_04b_2_scope_search.py:44: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/test_04b_2_scope_search.py:42: in search
+    return _names(world["admin"].post(url, json=body))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+response = <Response [422 Unprocessable Content]>
+
+    def _names(response):
+>       assert response.status_code == 200, response.text
+E       AssertionError: {"error":{"message":"Invalid request: body.filters.metadata.source.bool, body.filters.metadata.source.int, body.filters.metadata.source.str","type":"invalid_request_error","code":"validation_error"}}
+E       assert 422 == 200
+E        +  where 422 = <Response [422 Unprocessable Content]>.status_code
+
+tests/integration/test_04b_2_scope_search.py:29: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+2026-11-19 17:09:31,185 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=186
+2026-11-19 17:09:31,373 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=119
+2026-11-19 17:09:31,564 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=116
+2026-11-19 17:09:31,757 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=126
+2026-11-19 17:09:31,982 INFO ffcore.access access method=POST path=/api/v1/projects/751009b2-ff20-46f3-8492-992b1e6ec232/knowledge-bases status=201 ms=222
+------------------------------ Captured log setup ------------------------------
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=186
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=119
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=116
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=126
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/751009b2-ff20-46f3-8492-992b1e6ec232/knowledge-bases status=201 ms=222
+----------------------------- Captured stderr call -----------------------------
+2026-11-19 17:09:32,226 INFO ffcore.access access method=POST path=/api/v1/projects/751009b2-ff20-46f3-8492-992b1e6ec232/knowledge-bases/b56af45c-9aa2-47ac-b033-1157713f3b7f/documents status=202 ms=239
+2026-11-19 17:09:32,282 INFO ffcore.access access method=POST path=/api/v1/projects/751009b2-ff20-46f3-8492-992b1e6ec232/knowledge-bases/b56af45c-9aa2-47ac-b033-1157713f3b7f/documents status=202 ms=52
+2026-11-19 17:09:32,336 INFO ffcore.access access method=POST path=/api/v1/projects/751009b2-ff20-46f3-8492-992b1e6ec232/knowledge-bases/b56af45c-9aa2-47ac-b033-1157713f3b7f/documents status=202 ms=51
+2026-11-19 17:09:32,436 INFO ffcore.knowledge.ingest gold document=5cf*****-****-*196-9d10-53ee97c33433 reused=0 embedded=1
+2026-11-19 17:09:32,524 INFO ffcore.knowledge.ingest gold document=569f1be4-86ee-4c7d-a985-02e9340c8f2f reused=0 embedded=1
+2026-11-19 17:09:32,611 INFO ffcore.knowledge.ingest gold document=4f3a52fa-5981-46d5-b1f6-87e9c45a0921 reused=0 embedded=1
+2026-11-19 17:09:32,643 INFO ffcore.access access method=POST path=/api/v1/projects/751009b2-ff20-46f3-8492-992b1e6ec232/knowledge-bases/b56af45c-9aa2-47ac-b033-1157713f3b7f/search status=422 ms=28
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/751009b2-ff20-46f3-8492-992b1e6ec232/knowledge-bases/b56af45c-9aa2-47ac-b033-1157713f3b7f/documents status=202 ms=239
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/751009b2-ff20-46f3-8492-992b1e6ec232/knowledge-bases/b56af45c-9aa2-47ac-b033-1157713f3b7f/documents status=202 ms=52
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/751009b2-ff20-46f3-8492-992b1e6ec232/knowledge-bases/b56af45c-9aa2-47ac-b033-1157713f3b7f/documents status=202 ms=51
+INFO     ffcore.knowledge.ingest:ingest.py:677 gold document=5cf*****-****-*196-9d10-53ee97c33433 reused=0 embedded=1
+INFO     ffcore.knowledge.ingest:ingest.py:677 gold document=569f1be4-86ee-4c7d-a985-02e9340c8f2f reused=0 embedded=1
+INFO     ffcore.knowledge.ingest:ingest.py:677 gold document=4f3a52fa-5981-46d5-b1f6-87e9c45a0921 reused=0 embedded=1
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/751009b2-ff20-46f3-8492-992b1e6ec232/knowledge-bases/b56af45c-9aa2-47ac-b033-1157713f3b7f/search status=422 ms=28
+____________ test_04b_2_89_search_in_filter_on_both_drivers[qdrant] ____________
+
+world = {'settings': Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('****...ect': '97b819a9-dfb6-447a-9642-9466a09ef6a1', 'admin': <starlette.testclient.TestClient object at 0x7f2574744800>, ...}
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_af9e0cf3eeb2) at 0x7f25747443b0>
+
+    def test_04b_2_89_search_in_filter_on_both_drivers(world, pg):
+        for name in SOURCES:
+            assert r1_upload(world, world["admin"], name, BODY + name).status_code == 202
+        _set_sources(pg, world["kb"])  # before indexing: Qdrant payloads carry the metadata
+        drain(world)
+        url = kb_url(world, f"/{world['kb']}/search")
+    
+        def search(metadata):
+            body = {"query": "bakım hizmeti rapor", "filters": {"metadata": metadata}}
+            return _names(world["admin"].post(url, json=body))
+    
+>       assert search({"source": ["confluence:OCR", "jira:PAY"]}) == {"ocr.md", "pay.md"}
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_04b_2_scope_search.py:44: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/test_04b_2_scope_search.py:42: in search
+    return _names(world["admin"].post(url, json=body))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+response = <Response [422 Unprocessable Content]>
+
+    def _names(response):
+>       assert response.status_code == 200, response.text
+E       AssertionError: {"error":{"message":"Invalid request: body.filters.metadata.source.bool, body.filters.metadata.source.int, body.filters.metadata.source.str","type":"invalid_request_error","code":"validation_error"}}
+E       assert 422 == 200
+E        +  where 422 = <Response [422 Unprocessable Content]>.status_code
+
+tests/integration/test_04b_2_scope_search.py:29: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+2026-11-19 17:09:40,037 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=195
+2026-11-19 17:09:40,298 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=156
+2026-11-19 17:09:40,514 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=140
+2026-11-19 17:09:40,712 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=129
+2026-11-19 17:09:40,775 INFO ffcore.access access method=POST path=/api/v1/projects/97b819a9-dfb6-447a-9642-9466a09ef6a1/knowledge-bases status=201 ms=60
+------------------------------ Captured log setup ------------------------------
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=195
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=156
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=140
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=129
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/97b819a9-dfb6-447a-9642-9466a09ef6a1/knowledge-bases status=201 ms=60
+----------------------------- Captured stderr call -----------------------------
+2026-11-19 17:09:40,859 INFO ffcore.access access method=POST path=/api/v1/projects/97b819a9-dfb6-447a-9642-9466a09ef6a1/knowledge-bases/5fc30972-d9c1-461d-956c-3e8305181879/documents status=202 ms=80
+2026-11-19 17:09:40,914 INFO ffcore.access access method=POST path=/api/v1/projects/97b819a9-dfb6-447a-9642-9466a09ef6a1/knowledge-bases/5fc30972-d9c1-461d-956c-3e8305181879/documents status=202 ms=52
+2026-11-19 17:09:40,979 INFO ffcore.access access method=POST path=/api/v1/projects/97b819a9-dfb6-447a-9642-9466a09ef6a1/knowledge-bases/5fc30972-d9c1-461d-956c-3e8305181879/documents status=202 ms=61
+2026-11-19 17:09:41,940 INFO ffcore.knowledge.ingest gold document=0c37ce4a-7455-4b6d-9564-92ad65124aad reused=0 embedded=1
+2026-11-19 17:09:42,135 INFO ffcore.knowledge.ingest gold document=c87f5f00-318d-4c47-8575-0d467d3d3681 reused=0 embedded=1
+2026-11-19 17:09:42,309 INFO ffcore.knowledge.ingest gold document=dd84ab47-6e73-4dfe-a459-27b62bb5706b reused=0 embedded=1
+2026-11-19 17:09:42,338 INFO ffcore.access access method=POST path=/api/v1/projects/97b819a9-dfb6-447a-9642-9466a09ef6a1/knowledge-bases/5fc30972-d9c1-461d-956c-3e8305181879/search status=422 ms=25
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/97b819a9-dfb6-447a-9642-9466a09ef6a1/knowledge-bases/5fc30972-d9c1-461d-956c-3e8305181879/documents status=202 ms=80
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/97b819a9-dfb6-447a-9642-9466a09ef6a1/knowledge-bases/5fc30972-d9c1-461d-956c-3e8305181879/documents status=202 ms=52
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/97b819a9-dfb6-447a-9642-9466a09ef6a1/knowledge-bases/5fc30972-d9c1-461d-956c-3e8305181879/documents status=202 ms=61
+INFO     ffcore.knowledge.ingest:ingest.py:677 gold document=0c37ce4a-7455-4b6d-9564-92ad65124aad reused=0 embedded=1
+INFO     ffcore.knowledge.ingest:ingest.py:677 gold document=c87f5f00-318d-4c47-8575-0d467d3d3681 reused=0 embedded=1
+INFO     ffcore.knowledge.ingest:ingest.py:677 gold document=dd84ab47-6e73-4dfe-a459-27b62bb5706b reused=0 embedded=1
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/97b819a9-dfb6-447a-9642-9466a09ef6a1/knowledge-bases/5fc30972-d9c1-461d-956c-3e8305181879/search status=422 ms=25
+___________________ test_04b_2_89_key_search_honours_filters ___________________
+
+world = {'project': 'dbff4cdc-3c0c-4314-8829-2131fd710dff', 'other': 'b8a6698f-1df5-4c62-80b9-91d468ce9801', 'admin': <starlet...nt.TestClient object at 0x7f25743110a0>, 'admin_read': <starlette.testclient.TestClient object at 0x7f25744925d0>, ...}
+settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+queue = <tests.integration.test_04a_api.FakeQueue object at 0x7f2574312390>
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_af9e0cf3eeb2) at 0x7f2588242bd0>
+
+    def test_04b_2_89_key_search_honours_filters(world, settings, queue, pg):
+        kb = create_kb(world)
+        for name in SOURCES:
+            upload(world, world["admin"], kb["id"], name, PROSE * 8 + " " + name)
+        _set_sources(pg, kb["id"])
+        process_all(settings, queue)
+        key = key_search._key(world)
+        scoped = key_search._search(
+            world, kb["id"], key["id"], filters={"metadata": {"source": ["jira:PAY"]}}
+        )
+>       assert _names(scoped) == {"pay.md"}
+E       AssertionError: assert {'hr.md', 'ocr.md', 'pay.md'} == {'pay.md'}
+E         
+E         Extra items in the left set:
+E         'ocr.md'
+E         'hr.md'
+E         Use -v to get more diff
+
+tests/integration/test_04b_2_scope_key_search.py:24: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+2026-11-19 17:09:48,924 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=143
+2026-11-19 17:09:49,112 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=123
+2026-11-19 17:09:49,291 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=114
+2026-11-19 17:09:49,483 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=134
+------------------------------ Captured log setup ------------------------------
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=143
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=123
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=114
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=134
+----------------------------- Captured stderr call -----------------------------
+2026-11-19 17:09:49,620 INFO ffcore.access access method=POST path=/api/v1/projects/dbff4cdc-3c0c-4314-8829-2131fd710dff/knowledge-bases status=201 ms=76
+2026-11-19 17:09:49,695 INFO ffcore.access access method=POST path=/api/v1/projects/dbff4cdc-3c0c-4314-8829-2131fd710dff/knowledge-bases/3c1be7f2-139e-4316-af73-7307473ba9ed/documents status=202 ms=71
+2026-11-19 17:09:49,750 INFO ffcore.access access method=POST path=/api/v1/projects/dbff4cdc-3c0c-4314-8829-2131fd710dff/knowledge-bases/3c1be7f2-139e-4316-af73-7307473ba9ed/documents status=202 ms=51
+2026-11-19 17:09:49,803 INFO ffcore.access access method=POST path=/api/v1/projects/dbff4cdc-3c0c-4314-8829-2131fd710dff/knowledge-bases/3c1be7f2-139e-4316-af73-7307473ba9ed/documents status=202 ms=50
+2026-11-19 17:09:49,902 INFO ffcore.knowledge.ingest gold document=0e2074f3-0626-42cf-a11d-f08ecb1c726c reused=0 embedded=1
+2026-11-19 17:09:49,983 INFO ffcore.knowledge.ingest gold document=a4067c92-8212-4011-b4f5-cec4187ca9c4 reused=0 embedded=1
+2026-11-19 17:09:50,067 INFO ffcore.knowledge.ingest gold document=a72e44dd-c8f9-4807-938f-0c6ffd9b500d reused=0 embedded=1
+2026-11-19 17:09:50,293 INFO ffcore.access access method=POST path=/api/v1/projects/dbff4cdc-3c0c-4314-8829-2131fd710dff/api-keys status=201 ms=222
+2026-11-19 17:09:50,497 INFO ffcore.access access method=POST path=/internal/knowledge-bases/3c1be7f2-139e-4316-af73-7307473ba9ed/key-search status=200 ms=202
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/dbff4cdc-3c0c-4314-8829-2131fd710dff/knowledge-bases status=201 ms=76
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/dbff4cdc-3c0c-4314-8829-2131fd710dff/knowledge-bases/3c1be7f2-139e-4316-af73-7307473ba9ed/documents status=202 ms=71
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/dbff4cdc-3c0c-4314-8829-2131fd710dff/knowledge-bases/3c1be7f2-139e-4316-af73-7307473ba9ed/documents status=202 ms=51
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/dbff4cdc-3c0c-4314-8829-2131fd710dff/knowledge-bases/3c1be7f2-139e-4316-af73-7307473ba9ed/documents status=202 ms=50
+INFO     ffcore.knowledge.ingest:ingest.py:677 gold document=0e2074f3-0626-42cf-a11d-f08ecb1c726c reused=0 embedded=1
+INFO     ffcore.knowledge.ingest:ingest.py:677 gold document=a4067c92-8212-4011-b4f5-cec4187ca9c4 reused=0 embedded=1
+INFO     ffcore.knowledge.ingest:ingest.py:677 gold document=a72e44dd-c8f9-4807-938f-0c6ffd9b500d reused=0 embedded=1
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/dbff4cdc-3c0c-4314-8829-2131fd710dff/api-keys status=201 ms=222
+INFO     ffcore.access:logging.py:263 access method=POST path=/internal/knowledge-bases/3c1be7f2-139e-4316-af73-7307473ba9ed/key-search status=200 ms=202
+=========================== short test summary info ============================
+FAILED tests/integration/test_04b_2_scope_search.py::test_04b_2_89_search_in_filter_on_both_drivers[pgvector]
+FAILED tests/integration/test_04b_2_scope_search.py::test_04b_2_89_search_in_filter_on_both_drivers[qdrant]
+FAILED tests/integration/test_04b_2_scope_key_search.py::test_04b_2_89_key_search_honours_filters
+3 failed in 30.94s

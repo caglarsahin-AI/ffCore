@@ -1,0 +1,114 @@
+E501 Line too long (108 > 100)
+  --> tests/integration/test_04b_2_video.py:22:101
+   |
+21 | def test_04b_2_d4_flag_off_by_default_and_on_stops_start_up():
+22 |     assert Settings(deploy_profile="airgap", offline=True, **SETTINGS_03A).video_transcript_enabled is False
+   |                                                                                                     ^^^^^^^^
+23 |     with pytest.raises(ValidationError) as caught:
+24 |         Settings(
+   |
+
+Found 1 error.
+1 file reformatted
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+___________ test_04b_2_d4_flag_off_by_default_and_on_stops_start_up ____________
+
+    def test_04b_2_d4_flag_off_by_default_and_on_stops_start_up():
+        assert (
+>           Settings(deploy_profile="airgap", offline=True, **SETTINGS_03A).video_transcript_enabled
+            is False
+        )
+
+tests/integration/test_04b_2_video.py:23: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Settings(deploy_profile='airgap', inference_backend='ollama', offline=True, database_url=SecretStr('**********'), serv...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+item = 'video_transcript_enabled'
+
+    def __getattr__(self, item: str) -> Any:
+        private_attributes = object.__getattribute__(self, '__private_attributes__')
+        if item in private_attributes:
+            attribute = private_attributes[item]
+            if hasattr(attribute, '__get__'):
+                return attribute.__get__(self, type(self))  # type: ignore
+    
+            try:
+                # Note: self.__pydantic_private__ cannot be None if self.__private_attributes__ has items
+                return self.__pydantic_private__[item]  # type: ignore
+            except KeyError as exc:
+                raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}') from exc
+        else:
+            # `__pydantic_extra__` can fail to be set if the model is not yet fully initialized.
+            # See `BaseModel.__repr_args__` for more details
+            try:
+                pydantic_extra = object.__getattribute__(self, '__pydantic_extra__')
+            except AttributeError:
+                pydantic_extra = None
+    
+            if pydantic_extra and item in pydantic_extra:
+                return pydantic_extra[item]
+            else:
+                if hasattr(self.__class__, item):
+                    return super().__getattribute__(item)  # Raises AttributeError if appropriate
+                else:
+                    # this is the current error
+>                   raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}')
+E                   AttributeError: 'Settings' object has no attribute 'video_transcript_enabled'
+
+/opt/venv/lib/python3.12/site-packages/pydantic/main.py:1105: AttributeError
+______________ test_04b_2_d4_video_preset_selects_video_documents ______________
+
+world = {'project': 'e28ba2b5-cbef-4146-9dc1-bceba173bbc4', 'other': 'f4eb654e-9741-4b29-b725-010b1cd636b0', 'admin': <starlet...nt.TestClient object at 0x7f855cccf590>, 'admin_read': <starlette.testclient.TestClient object at 0x7f854431a8d0>, ...}
+settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+queue = <tests.integration.test_04a_api.FakeQueue object at 0x7f855ccabbc0>
+
+    def test_04b_2_d4_video_preset_selects_video_documents(world, settings, queue):
+        kb = create_kb(world)
+        upload(world, world["admin"], kb["id"], "metin.md", PROSE * 8)
+        upload_bytes(world, world["admin"], kb["id"], "egitim.mp4", b"\x00\x00\x00\x18ftypmp42" * 8)
+        upload_bytes(world, world["admin"], kb["id"], "kayit.mov", b"\x00\x00\x00\x14ftypqt  " * 8)
+        process_all(settings, queue)
+    
+        report = world["admin"].get(f"{kb_url(world, kb['id'])}/ingest-report").json()
+        video = [d for d in report["rejected_documents"] if d["reason"] == "video_disabled"]
+        assert {d["filename"] for d in video} == {"egitim.mp4", "kayit.mov"}
+    
+        url = f"{kb_url(world, kb['id'])}/reindex"
+        response = world["admin"].post(url, json={"layer": "silver", "preset": "video"})
+>       assert response.status_code == 202, response.text
+E       AssertionError: {"error":{"message":"Invalid request: body.preset","type":"invalid_request_error","code":"validation_error"}}
+E       assert 422 == 202
+E        +  where 422 = <Response [422 Unprocessable Content]>.status_code
+
+tests/integration/test_04b_2_video.py:46: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+2026-11-19 17:21:45,396 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=174
+2026-11-19 17:21:45,585 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=124
+2026-11-19 17:21:45,769 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=124
+2026-11-19 17:21:45,967 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=126
+------------------------------ Captured log setup ------------------------------
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=174
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=124
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=124
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=126
+----------------------------- Captured stderr call -----------------------------
+2026-11-19 17:21:46,482 INFO ffcore.access access method=POST path=/api/v1/projects/e28ba2b5-cbef-4146-9dc1-bceba173bbc4/knowledge-bases status=201 ms=420
+2026-11-19 17:21:46,555 INFO ffcore.access access method=POST path=/api/v1/projects/e28ba2b5-cbef-4146-9dc1-bceba173bbc4/knowledge-bases/1329a240-a363-4169-b293-702715df2211/documents status=202 ms=69
+2026-11-19 17:21:46,611 INFO ffcore.access access method=POST path=/api/v1/projects/e28ba2b5-cbef-4146-9dc1-bceba173bbc4/knowledge-bases/1329a240-a363-4169-b293-702715df2211/documents status=202 ms=52
+2026-11-19 17:21:46,663 INFO ffcore.access access method=POST path=/api/v1/projects/e28ba2b5-cbef-4146-9dc1-bceba173bbc4/knowledge-bases/1329a240-a363-4169-b293-702715df2211/documents status=202 ms=49
+2026-11-19 17:21:46,753 INFO ffcore.knowledge.ingest gold document=e5b5a5ac-18e6-45c3-99b1-33a9864a9eef reused=0 embedded=1
+2026-11-19 17:21:46,817 INFO ffcore.access access method=GET path=/api/v1/projects/e28ba2b5-cbef-4146-9dc1-bceba173bbc4/knowledge-bases/1329a240-a363-4169-b293-702715df2211/ingest-report status=200 ms=60
+2026-11-19 17:21:46,847 INFO ffcore.access access method=POST path=/api/v1/projects/e28ba2b5-cbef-4146-9dc1-bceba173bbc4/knowledge-bases/1329a240-a363-4169-b293-702715df2211/reindex status=422 ms=27
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/e28ba2b5-cbef-4146-9dc1-bceba173bbc4/knowledge-bases status=201 ms=420
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/e28ba2b5-cbef-4146-9dc1-bceba173bbc4/knowledge-bases/1329a240-a363-4169-b293-702715df2211/documents status=202 ms=69
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/e28ba2b5-cbef-4146-9dc1-bceba173bbc4/knowledge-bases/1329a240-a363-4169-b293-702715df2211/documents status=202 ms=52
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/e28ba2b5-cbef-4146-9dc1-bceba173bbc4/knowledge-bases/1329a240-a363-4169-b293-702715df2211/documents status=202 ms=49
+INFO     ffcore.knowledge.ingest:ingest.py:677 gold document=e5b5a5ac-18e6-45c3-99b1-33a9864a9eef reused=0 embedded=1
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/e28ba2b5-cbef-4146-9dc1-bceba173bbc4/knowledge-bases/1329a240-a363-4169-b293-702715df2211/ingest-report status=200 ms=60
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/e28ba2b5-cbef-4146-9dc1-bceba173bbc4/knowledge-bases/1329a240-a363-4169-b293-702715df2211/reindex status=422 ms=27
+=========================== short test summary info ============================
+FAILED tests/integration/test_04b_2_video.py::test_04b_2_d4_flag_off_by_default_and_on_stops_start_up
+FAILED tests/integration/test_04b_2_video.py::test_04b_2_d4_video_preset_selects_video_documents
+2 failed in 18.85s

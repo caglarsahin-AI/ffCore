@@ -1,0 +1,113 @@
+FFFFFFF                                                                  [100%]
+=================================== FAILURES ===================================
+_____________ test_04b_2_87_markdown_is_its_own_route[sozlesme.md] _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_04b_2_87_markdown_is_its_0')
+name = 'sozlesme.md'
+
+    @pytest.mark.parametrize("name", ["sozlesme.md", "sozlesme.markdown", "SOZLESME.MD"])
+    def test_04b_2_87_markdown_is_its_own_route(tmp_path, name):
+        path = tmp_path / name
+        path.write_text(MARKDOWN, encoding="utf-8")
+>       assert router.sniff(path) == "markdown"
+E       AssertionError: assert 'office' == 'markdown'
+E         
+E         - markdown
+E         + office
+
+tests/unit/test_04b_2_markdown_prose.py:41: AssertionError
+__________ test_04b_2_87_markdown_is_its_own_route[sozlesme.markdown] __________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_04b_2_87_markdown_is_its_1')
+name = 'sozlesme.markdown'
+
+    @pytest.mark.parametrize("name", ["sozlesme.md", "sozlesme.markdown", "SOZLESME.MD"])
+    def test_04b_2_87_markdown_is_its_own_route(tmp_path, name):
+        path = tmp_path / name
+        path.write_text(MARKDOWN, encoding="utf-8")
+>       assert router.sniff(path) == "markdown"
+E       AssertionError: assert 'skip_unknown' == 'markdown'
+E         
+E         - markdown
+E         + skip_unknown
+
+tests/unit/test_04b_2_markdown_prose.py:41: AssertionError
+_____________ test_04b_2_87_markdown_is_its_own_route[SOZLESME.MD] _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_04b_2_87_markdown_is_its_2')
+name = 'SOZLESME.MD'
+
+    @pytest.mark.parametrize("name", ["sozlesme.md", "sozlesme.markdown", "SOZLESME.MD"])
+    def test_04b_2_87_markdown_is_its_own_route(tmp_path, name):
+        path = tmp_path / name
+        path.write_text(MARKDOWN, encoding="utf-8")
+>       assert router.sniff(path) == "markdown"
+E       AssertionError: assert 'office' == 'markdown'
+E         
+E         - markdown
+E         + office
+
+tests/unit/test_04b_2_markdown_prose.py:41: AssertionError
+____________ test_04b_2_87_markdown_kept_as_written_without_weights ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_04b_2_87_markdown_kept_as0')
+
+    def test_04b_2_87_markdown_kept_as_written_without_weights(tmp_path):
+        path = tmp_path / "sozlesme.md"
+        path.write_text(MARKDOWN, encoding="utf-8")
+        result = pipeline.convert_one(path, time.time() + 60)
+>       assert result.status == CONVERTED, result
+E       AssertionError: ConversionResult(text_md='', method='docling@2.125.0', status='error', warnings=['docling-project/docling-models is not in /models/huggingface/hub; run `make models` (offline by default)'], page_count=None, error_code='model_missing')
+E       assert 'error' == 'converted'
+E         
+E         - converted
+E         + error
+
+tests/unit/test_04b_2_markdown_prose.py:48: AssertionError
+________________ test_04b_2_87_undecodable_markdown_fails_loud _________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_04b_2_87_undecodable_mark0')
+
+    def test_04b_2_87_undecodable_markdown_fails_loud(tmp_path):
+        path = tmp_path / "bozuk.md"
+        path.write_bytes(b"ok line\n\x81\x8d broken\n" + b"x" * 40)
+        result = pipeline.convert_one(path, time.time() + 60)
+>       assert result.error_code == "encoding_undecodable"
+E       AssertionError: assert 'model_missing' == 'encoding_undecodable'
+E         
+E         - encoding_undecodable
+E         + model_missing
+
+tests/unit/test_04b_2_markdown_prose.py:59: AssertionError
+_________________ test_04b_2_145_english_prose_is_not_no_prose _________________
+
+    def test_04b_2_145_english_prose_is_not_no_prose():
+        status, reason = text_quality(ENGLISH, title="Maintenance")
+>       assert (status, reason) == (GATE_OK, None)
+E       AssertionError: assert ('skipped', 'no_prose') == ('ok', None)
+E         
+E         At index 0 diff: 'skipped' != 'ok'
+E         Use -v to get more diff
+
+tests/unit/test_04b_2_markdown_prose.py:64: AssertionError
+_______________ test_04b_2_145_prose_free_text_is_still_no_prose _______________
+
+    def test_04b_2_145_prose_free_text_is_still_no_prose():
+        table = "\n".join(f"| KOD-{i} | 4711-{i} | X |" for i in range(6))
+        status, reason = text_quality(table, title="Kodlar")
+>       assert status in {SKIPPED, FLAGGED} and reason == "no_prose"
+E       AssertionError: assert ('skipped' in {'flagged', 'skipped'} and 'boilerplate' == 'no_prose'
+E         
+E         - no_prose
+E         + boilerplate)
+
+tests/unit/test_04b_2_markdown_prose.py:70: AssertionError
+=========================== short test summary info ============================
+FAILED tests/unit/test_04b_2_markdown_prose.py::test_04b_2_87_markdown_is_its_own_route[sozlesme.md]
+FAILED tests/unit/test_04b_2_markdown_prose.py::test_04b_2_87_markdown_is_its_own_route[sozlesme.markdown]
+FAILED tests/unit/test_04b_2_markdown_prose.py::test_04b_2_87_markdown_is_its_own_route[SOZLESME.MD]
+FAILED tests/unit/test_04b_2_markdown_prose.py::test_04b_2_87_markdown_kept_as_written_without_weights
+FAILED tests/unit/test_04b_2_markdown_prose.py::test_04b_2_87_undecodable_markdown_fails_loud
+FAILED tests/unit/test_04b_2_markdown_prose.py::test_04b_2_145_english_prose_is_not_no_prose
+FAILED tests/unit/test_04b_2_markdown_prose.py::test_04b_2_145_prose_free_text_is_still_no_prose
+7 failed in 9.74s

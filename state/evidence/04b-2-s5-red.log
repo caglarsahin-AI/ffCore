@@ -1,0 +1,92 @@
+All checks passed!
+3 files left unchanged
+
+==================================== ERRORS ====================================
+_________ ERROR collecting tests/integration/test_04b_2_query_stats.py _________
+ImportError while importing test module '/work/backend/tests/integration/test_04b_2_query_stats.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/local/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/integration/test_04b_2_query_stats.py:10: in <module>
+    from ffcore.knowledge import thresholds
+E   ImportError: cannot import name 'thresholds' from 'ffcore.knowledge' (/work/backend/ffcore/knowledge/__init__.py)
+=========================== short test summary info ============================
+ERROR tests/integration/test_04b_2_query_stats.py
+!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+1 error in 6.12s
+F                                                                        [100%]
+=================================== FAILURES ===================================
+________________________ test_04a_read_mode_get_parity _________________________
+
+world = {'project': '756d0b28-5393-4d5d-856c-e7854803f2a7', 'other': '9da9141c-d258-477a-8cd8-2b93859429df', 'admin': <starlet...nt.TestClient object at 0x7fdb01fe8ad0>, 'admin_read': <starlette.testclient.TestClient object at 0x7fdafc6d4170>, ...}
+settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+queue = <tests.integration.test_04a_api.FakeQueue object at 0x7fdb01fea900>
+app = <fastapi.applications.FastAPI object at 0x7fdb02530fb0>
+
+    def test_04a_read_mode_get_parity(world, settings, queue, app):
+        """03a acceptance 2 for the 04a GET routes: read mode sees exactly what edit mode sees."""
+        kb = create_kb(world)
+        item = upload(world, world["admin"], kb["id"], "a.md", PROSE * 8).json()["data"][0]
+        process_all(settings, queue)
+        ids = {
+            "project_id": world["project"],
+            "kb_id": kb["id"],
+            "document_id": item["document"]["id"],
+        }
+        checked = 0
+        for path, ops in app.openapi()["paths"].items():
+            if "get" not in ops or "knowledge-bases" not in path:
+                continue
+            url = re.sub(r"\{(\w+)\}", lambda m: ids[m.group(1)], path)
+            edit, read = world["admin"].get(url), world["admin_read"].get(url)
+            assert edit.status_code == 200, (url, edit.text)
+            assert (read.status_code, read.content) == (edit.status_code, edit.content), url
+            checked += 1
+>       assert checked == 6  # 04b adds GET /{kb_id}/ingest-report and (04b-2) /query-stats
+        ^^^^^^^^^^^^^^^^^^^
+E       assert 5 == 6
+
+tests/integration/test_04a_api.py:286: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+2026-11-19 17:27:52,013 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=158
+2026-11-19 17:27:52,179 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=106
+2026-11-19 17:27:52,342 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=106
+2026-11-19 17:27:52,505 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=106
+------------------------------ Captured log setup ------------------------------
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=158
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=106
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=106
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=106
+----------------------------- Captured stderr call -----------------------------
+2026-11-19 17:27:52,767 INFO ffcore.access access method=POST path=/api/v1/projects/756d0b28-5393-4d5d-856c-e7854803f2a7/knowledge-bases status=201 ms=199
+2026-11-19 17:27:52,838 INFO ffcore.access access method=POST path=/api/v1/projects/756d0b28-5393-4d5d-856c-e7854803f2a7/knowledge-bases/d9000924-4cdd-45cd-aedb-f2add412f400/documents status=202 ms=68
+2026-11-19 17:27:52,926 INFO ffcore.knowledge.ingest gold document=4183f588-711f-4283-9fb9-aa6723a9f2f1 reused=0 embedded=1
+2026-11-19 17:27:54,176 INFO ffcore.access access method=GET path=/api/v1/projects/756d0b28-5393-4d5d-856c-e7854803f2a7/knowledge-bases status=200 ms=49
+2026-11-19 17:27:54,229 INFO ffcore.access access method=GET path=/api/v1/projects/756d0b28-5393-4d5d-856c-e7854803f2a7/knowledge-bases status=200 ms=50
+2026-11-19 17:27:54,275 INFO ffcore.access access method=GET path=/api/v1/projects/756d0b28-5393-4d5d-856c-e7854803f2a7/knowledge-bases/d9000924-4cdd-45cd-aedb-f2add412f400 status=200 ms=44
+2026-11-19 17:27:54,319 INFO ffcore.access access method=GET path=/api/v1/projects/756d0b28-5393-4d5d-856c-e7854803f2a7/knowledge-bases/d9000924-4cdd-45cd-aedb-f2add412f400 status=200 ms=40
+2026-11-19 17:27:54,368 INFO ffcore.access access method=GET path=/api/v1/projects/756d0b28-5393-4d5d-856c-e7854803f2a7/knowledge-bases/d9000924-4cdd-45cd-aedb-f2add412f400/documents status=200 ms=46
+2026-11-19 17:27:54,418 INFO ffcore.access access method=GET path=/api/v1/projects/756d0b28-5393-4d5d-856c-e7854803f2a7/knowledge-bases/d9000924-4cdd-45cd-aedb-f2add412f400/documents status=200 ms=47
+2026-11-19 17:27:54,474 INFO ffcore.access access method=GET path=/api/v1/projects/756d0b28-5393-4d5d-856c-e7854803f2a7/knowledge-bases/d9000924-4cdd-45cd-aedb-f2add412f400/documents/4183f588-711f-4283-9fb9-aa6723a9f2f1 status=200 ms=52
+2026-11-19 17:27:54,523 INFO ffcore.access access method=GET path=/api/v1/projects/756d0b28-5393-4d5d-856c-e7854803f2a7/knowledge-bases/d9000924-4cdd-45cd-aedb-f2add412f400/documents/4183f588-711f-4283-9fb9-aa6723a9f2f1 status=200 ms=46
+2026-11-19 17:27:54,597 INFO ffcore.access access method=GET path=/api/v1/projects/756d0b28-5393-4d5d-856c-e7854803f2a7/knowledge-bases/d9000924-4cdd-45cd-aedb-f2add412f400/ingest-report status=200 ms=70
+2026-11-19 17:27:54,650 INFO ffcore.access access method=GET path=/api/v1/projects/756d0b28-5393-4d5d-856c-e7854803f2a7/knowledge-bases/d9000924-4cdd-45cd-aedb-f2add412f400/ingest-report status=200 ms=50
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/756d0b28-5393-4d5d-856c-e7854803f2a7/knowledge-bases status=201 ms=199
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/756d0b28-5393-4d5d-856c-e7854803f2a7/knowledge-bases/d9000924-4cdd-45cd-aedb-f2add412f400/documents status=202 ms=68
+INFO     ffcore.knowledge.ingest:ingest.py:677 gold document=4183f588-711f-4283-9fb9-aa6723a9f2f1 reused=0 embedded=1
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/756d0b28-5393-4d5d-856c-e7854803f2a7/knowledge-bases status=200 ms=49
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/756d0b28-5393-4d5d-856c-e7854803f2a7/knowledge-bases status=200 ms=50
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/756d0b28-5393-4d5d-856c-e7854803f2a7/knowledge-bases/d9000924-4cdd-45cd-aedb-f2add412f400 status=200 ms=44
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/756d0b28-5393-4d5d-856c-e7854803f2a7/knowledge-bases/d9000924-4cdd-45cd-aedb-f2add412f400 status=200 ms=40
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/756d0b28-5393-4d5d-856c-e7854803f2a7/knowledge-bases/d9000924-4cdd-45cd-aedb-f2add412f400/documents status=200 ms=46
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/756d0b28-5393-4d5d-856c-e7854803f2a7/knowledge-bases/d9000924-4cdd-45cd-aedb-f2add412f400/documents status=200 ms=47
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/756d0b28-5393-4d5d-856c-e7854803f2a7/knowledge-bases/d9000924-4cdd-45cd-aedb-f2add412f400/documents/4183f588-711f-4283-9fb9-aa6723a9f2f1 status=200 ms=52
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/756d0b28-5393-4d5d-856c-e7854803f2a7/knowledge-bases/d9000924-4cdd-45cd-aedb-f2add412f400/documents/4183f588-711f-4283-9fb9-aa6723a9f2f1 status=200 ms=46
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/756d0b28-5393-4d5d-856c-e7854803f2a7/knowledge-bases/d9000924-4cdd-45cd-aedb-f2add412f400/ingest-report status=200 ms=70
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/756d0b28-5393-4d5d-856c-e7854803f2a7/knowledge-bases/d9000924-4cdd-45cd-aedb-f2add412f400/ingest-report status=200 ms=50
+=========================== short test summary info ============================
+FAILED tests/integration/test_04a_api.py::test_04a_read_mode_get_parity - ass...
+1 failed, 12 deselected in 14.87s

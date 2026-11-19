@@ -1,0 +1,135 @@
+All checks passed!
+1 file reformatted
+FFFFFF......                                                             [100%]
+=================================== FAILURES ===================================
+________________ test_04b_2_s7_loaded_model_context_is_checked _________________
+
+client_factory = <function client_factory.<locals>.make at 0x7f86d55b53a0>
+ready_app = {'settings': Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('****...lush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)}
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f86d55b1280>
+ollama_project = UUID('67277e22-b8b5-4008-8260-dcdfbf669068')
+
+    def test_04b_2_s7_loaded_model_context_is_checked(
+        client_factory, ready_app, monkeypatch, ollama_project
+    ):
+        _ollama(ready_app, monkeypatch, [{"name": MODEL, "context_length": 32768}])
+        ok = client_factory().get("/readyz")
+        assert ok.status_code == 200, ok.text
+>       check = _checks(ok)["ollama_runtime_context"]
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'ollama_runtime_context'
+
+tests/integration/test_04b_2_readyz.py:51: KeyError
+----------------------------- Captured stderr call -----------------------------
+2026-11-19 17:40:47,991 INFO ffcore.access access method=GET path=/readyz status=200 ms=658
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.access:logging.py:263 access method=GET path=/readyz status=200 ms=658
+_________________ test_04b_2_s7_smaller_runtime_context_is_503 _________________
+
+client_factory = <function client_factory.<locals>.make at 0x7f86d04822a0>
+ready_app = {'settings': Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('****...lush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)}
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f86d05fecc0>
+ollama_project = UUID('dd71e1dc-b9c9-4169-b98d-e90ba3cf9084')
+
+    def test_04b_2_s7_smaller_runtime_context_is_503(
+        client_factory, ready_app, monkeypatch, ollama_project
+    ):
+        _ollama(ready_app, monkeypatch, [{"name": MODEL, "context_length": 8192}])
+        small = client_factory().get("/readyz")
+>       assert small.status_code == 503
+E       assert 200 == 503
+E        +  where 200 = <Response [200 OK]>.status_code
+
+tests/integration/test_04b_2_readyz.py:60: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2026-11-19 17:40:52,214 INFO ffcore.access access method=GET path=/readyz status=200 ms=109
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.access:logging.py:263 access method=GET path=/readyz status=200 ms=109
+___________________ test_04b_2_s7_missing_field_is_an_error ____________________
+
+client_factory = <function client_factory.<locals>.make at 0x7f86b5447100>
+ready_app = {'settings': Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('****...lush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)}
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f86d55b11c0>
+ollama_project = UUID('f491f1ed-f012-4169-983c-ac9ccd981f09')
+
+    def test_04b_2_s7_missing_field_is_an_error(client_factory, ready_app, monkeypatch, ollama_project):
+        _ollama(ready_app, monkeypatch, [{"name": MODEL, "size": 1}])
+        response = client_factory().get("/readyz")
+>       assert response.status_code == 503
+E       assert 200 == 503
+E        +  where 200 = <Response [200 OK]>.status_code
+
+tests/integration/test_04b_2_readyz.py:68: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2026-11-19 17:40:55,024 INFO ffcore.access access method=GET path=/readyz status=200 ms=72
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.access:logging.py:263 access method=GET path=/readyz status=200 ms=72
+_______________ test_04b_2_s7_not_loaded_is_skipped_with_detail ________________
+
+client_factory = <function client_factory.<locals>.make at 0x7f86b5445ee0>
+ready_app = {'settings': Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('****...lush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)}
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f86b5432330>
+ollama_project = UUID('39a4db61-d715-43ed-83af-3bcb3a6e37f6')
+
+    def test_04b_2_s7_not_loaded_is_skipped_with_detail(
+        client_factory, ready_app, monkeypatch, ollama_project
+    ):
+        _ollama(ready_app, monkeypatch, [])
+        response = client_factory().get("/readyz")
+        assert response.status_code == 200, response.text
+>       check = _checks(response)["ollama_runtime_context"]
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'ollama_runtime_context'
+
+tests/integration/test_04b_2_readyz.py:79: KeyError
+----------------------------- Captured stderr call -----------------------------
+2026-11-19 17:40:58,877 INFO ffcore.access access method=GET path=/readyz status=200 ms=71
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.access:logging.py:263 access method=GET path=/readyz status=200 ms=71
+_____________________ test_04b_2_s7_not_ollama_is_skipped ______________________
+
+client_factory = <function client_factory.<locals>.make at 0x7f86b54be660>
+ready_app = {'settings': Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('****...lush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)}
+
+    def test_04b_2_s7_not_ollama_is_skipped(client_factory, ready_app):
+        asyncio.run(readiness.warmup(ready_app["settings"]))
+>       check = _checks(client_factory().get("/readyz"))["ollama_runtime_context"]
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'ollama_runtime_context'
+
+tests/integration/test_04b_2_readyz.py:86: KeyError
+----------------------------- Captured stderr call -----------------------------
+2026-11-19 17:41:01,733 INFO ffcore.access access method=GET path=/readyz status=200 ms=71
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.access:logging.py:263 access method=GET path=/readyz status=200 ms=71
+_______________________ test_04b_2_s6_ingest_queue_depth _______________________
+
+client_factory = <function client_factory.<locals>.make at 0x7f86b54e5120>
+ready_app = {'settings': Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('****...lush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)}
+
+    def test_04b_2_s6_ingest_queue_depth(client_factory, ready_app):
+        settings = ready_app["settings"]
+        asyncio.run(readiness.warmup(settings))
+        client = redis.Redis.from_url(settings.redis_url.get_secret_value())
+        queue = f"{settings.arq_queue_ingest}-04b2-test"
+        ready_app["settings"] = settings.model_copy(update={"arq_queue_ingest": queue})
+        try:
+            client.zadd(queue, {"job-a": 1, "job-b": 2, "job-c": 3})
+            response = client_factory().get("/readyz")
+>           check = _checks(response)["ingest_queue"]
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           KeyError: 'ingest_queue'
+
+tests/integration/test_04b_2_readyz.py:99: KeyError
+----------------------------- Captured stderr call -----------------------------
+2026-11-19 17:41:05,565 INFO ffcore.access access method=GET path=/readyz status=200 ms=76
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.access:logging.py:263 access method=GET path=/readyz status=200 ms=76
+=========================== short test summary info ============================
+FAILED tests/integration/test_04b_2_readyz.py::test_04b_2_s7_loaded_model_context_is_checked
+FAILED tests/integration/test_04b_2_readyz.py::test_04b_2_s7_smaller_runtime_context_is_503
+FAILED tests/integration/test_04b_2_readyz.py::test_04b_2_s7_missing_field_is_an_error
+FAILED tests/integration/test_04b_2_readyz.py::test_04b_2_s7_not_loaded_is_skipped_with_detail
+FAILED tests/integration/test_04b_2_readyz.py::test_04b_2_s7_not_ollama_is_skipped
+FAILED tests/integration/test_04b_2_readyz.py::test_04b_2_s6_ingest_queue_depth
+6 failed, 6 passed in 78.36s (0:01:18)

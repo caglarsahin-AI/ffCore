@@ -57,3 +57,8 @@
 2026-11-19T19:01:33	warn	koordinator	Bash	KAPI	R=/c/ai_paycore/ffcore; tail -4 $R/state/evidence/04b-1-r3-check-api.log; T=$(date '+%H:%M'); python -X utf8 -I - "$T" <
 2026-11-19T19:03:22	warn	inceleyici	Bash	KAPI	S=C:/Users/CAGLAR~1.SAH/AppData/Local/Temp/claude/9398d5fca5badfb5/ecb79a59-6471-4590-b997-842940d7a702/scratchpad; cd /
 2026-11-19T19:05:09	warn	inceleyici	Bash	KAPI	S=C:/Users/CAGLAR~1.SAH/AppData/Local/Temp/claude/9398d5fca5badfb5/ecb79a59-6471-4590-b997-842940d7a702/scratchpad; mkdi
+2026-11-19T19:48:12	warn	isci-b	Write	TEK-YAZAR	C:\ai_paycore\ffcore\state\pr\04b-2.md
+2026-11-19T19:50:25	warn	isci-b	Bash	YIGIN	docker tag ffcore/backend:0.0.0-main ffcore/backend:0.0.0-04b && docker tag ffcore/tools:0.0.0-main ffcore/tools:0.0.0-0
+2026-11-19T20:50:20	warn	isci-b	Bash	ENV	python - <<'EOF' p='deploy/docker-compose.yml' s=open(p,encoding='utf-8').read() old="  RERANK_MIN_SCORE: ${RERANK_MIN_S
+2026-11-19T20:50:20	warn	isci-b	Bash	KAPI	python - <<'EOF' p='deploy/docker-compose.yml' s=open(p,encoding='utf-8').read() old="  RERANK_MIN_SCORE: ${RERANK_MIN_S
+2026-11-19T21:23:24	warn	isci-b	Bash	KAPI	S=/c/Users/CAGLAR~1.SAH/AppData/Local/Temp/claude/9398d5fca5badfb5/da227946-030e-46be-9a89-b38124d016bd/scratchpad/pr04b
