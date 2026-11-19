@@ -1,0 +1,86 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+__________ test_04b_r3_admin_reuploads_a_user_only_document[pgvector] __________
+
+world = {'settings': Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('****...ect': '6cf03ff5-40b1-489d-9962-264a4c627a68', 'admin': <starlette.testclient.TestClient object at 0x7f407ed5bd40>, ...}
+
+    def test_04b_r3_admin_reuploads_a_user_only_document(world):
+        """K-04B-0013 A: a project admin passes the name check even for a document it cannot read
+        (C15: a user-only ACL hides it from the admin too), so such a document stays manageable."""
+        first = upload(world, world["admin"], "kisi.md", BODY, acl_users=world["analyst_id"])
+        doc_id = first.json()["data"][0]["document"]["id"]
+        drain(world)
+        assert document(world, world["admin"], doc_id).status_code == 404
+        again = upload(world, world["admin"], "kisi.md", OTHER, acl_users=world["admin_id"])
+>       assert again.status_code == 202, again.text
+E       AssertionError: {"error":{"message":"A document with this name already exists in this knowledge base.","type":"conflict_error","code":"document_name_taken"}}
+E       assert 409 == 202
+E        +  where 409 = <Response [409 Conflict]>.status_code
+
+tests/integration/test_04b_r3_upload_acl.py:127: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+2026-11-19 15:41:55,878 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=179
+2026-11-19 15:41:56,088 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=136
+2026-11-19 15:41:56,292 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=128
+2026-11-19 15:41:56,499 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=130
+2026-11-19 15:41:56,725 INFO ffcore.access access method=POST path=/api/v1/projects/6cf03ff5-40b1-489d-9962-264a4c627a68/knowledge-bases status=201 ms=223
+------------------------------ Captured log setup ------------------------------
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=179
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=136
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=128
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=130
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/6cf03ff5-40b1-489d-9962-264a4c627a68/knowledge-bases status=201 ms=223
+----------------------------- Captured stderr call -----------------------------
+2026-11-19 15:41:56,926 INFO ffcore.access access method=POST path=/api/v1/projects/6cf03ff5-40b1-489d-9962-264a4c627a68/knowledge-bases/c58982a9-2784-444a-bf6f-dcd7ba11688c/documents status=202 ms=196
+2026-11-19 15:41:57,029 INFO ffcore.knowledge.ingest gold document=6432f08b-8808-43bf-94c4-e12b49920160 reused=0 embedded=1
+2026-11-19 15:41:57,084 INFO ffcore.access access method=GET path=/api/v1/projects/6cf03ff5-40b1-489d-9962-264a4c627a68/knowledge-bases/c58982a9-2784-444a-bf6f-dcd7ba11688c/documents/6432f08b-8808-43bf-94c4-e12b49920160 status=404 ms=49
+2026-11-19 15:41:57,152 INFO ffcore.access access method=POST path=/api/v1/projects/6cf03ff5-40b1-489d-9962-264a4c627a68/knowledge-bases/c58982a9-2784-444a-bf6f-dcd7ba11688c/documents status=409 ms=63
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/6cf03ff5-40b1-489d-9962-264a4c627a68/knowledge-bases/c58982a9-2784-444a-bf6f-dcd7ba11688c/documents status=202 ms=196
+INFO     ffcore.knowledge.ingest:ingest.py:677 gold document=6432f08b-8808-43bf-94c4-e12b49920160 reused=0 embedded=1
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/6cf03ff5-40b1-489d-9962-264a4c627a68/knowledge-bases/c58982a9-2784-444a-bf6f-dcd7ba11688c/documents/6432f08b-8808-43bf-94c4-e12b49920160 status=404 ms=49
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/6cf03ff5-40b1-489d-9962-264a4c627a68/knowledge-bases/c58982a9-2784-444a-bf6f-dcd7ba11688c/documents status=409 ms=63
+___________ test_04b_r3_admin_reuploads_a_user_only_document[qdrant] ___________
+
+world = {'settings': Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('****...ect': 'd70018cf-3d34-4009-8d58-2660945bac55', 'admin': <starlette.testclient.TestClient object at 0x7f40642217c0>, ...}
+
+    def test_04b_r3_admin_reuploads_a_user_only_document(world):
+        """K-04B-0013 A: a project admin passes the name check even for a document it cannot read
+        (C15: a user-only ACL hides it from the admin too), so such a document stays manageable."""
+        first = upload(world, world["admin"], "kisi.md", BODY, acl_users=world["analyst_id"])
+        doc_id = first.json()["data"][0]["document"]["id"]
+        drain(world)
+        assert document(world, world["admin"], doc_id).status_code == 404
+        again = upload(world, world["admin"], "kisi.md", OTHER, acl_users=world["admin_id"])
+>       assert again.status_code == 202, again.text
+E       AssertionError: {"error":{"message":"A document with this name already exists in this knowledge base.","type":"conflict_error","code":"document_name_taken"}}
+E       assert 409 == 202
+E        +  where 409 = <Response [409 Conflict]>.status_code
+
+tests/integration/test_04b_r3_upload_acl.py:127: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+2026-11-19 15:42:04,685 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=123
+2026-11-19 15:42:04,844 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=95
+2026-11-19 15:42:05,004 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=104
+2026-11-19 15:42:05,164 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=103
+2026-11-19 15:42:05,230 INFO ffcore.access access method=POST path=/api/v1/projects/d70018cf-3d34-4009-8d58-2660945bac55/knowledge-bases status=201 ms=63
+------------------------------ Captured log setup ------------------------------
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=123
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=95
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=104
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=103
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/d70018cf-3d34-4009-8d58-2660945bac55/knowledge-bases status=201 ms=63
+----------------------------- Captured stderr call -----------------------------
+2026-11-19 15:42:05,310 INFO ffcore.access access method=POST path=/api/v1/projects/d70018cf-3d34-4009-8d58-2660945bac55/knowledge-bases/1f9c4968-162e-42f3-ad04-0e9d61beb5c1/documents status=202 ms=76
+2026-11-19 15:42:06,024 INFO ffcore.knowledge.ingest gold document=5a1b0c86-955a-41fb-95ee-342ea138934b reused=0 embedded=1
+2026-11-19 15:42:06,070 INFO ffcore.access access method=GET path=/api/v1/projects/d70018cf-3d34-4009-8d58-2660945bac55/knowledge-bases/1f9c4968-162e-42f3-ad04-0e9d61beb5c1/documents/5a1b0c86-955a-41fb-95ee-342ea138934b status=404 ms=42
+2026-11-19 15:42:06,131 INFO ffcore.access access method=POST path=/api/v1/projects/d70018cf-3d34-4009-8d58-2660945bac55/knowledge-bases/1f9c4968-162e-42f3-ad04-0e9d61beb5c1/documents status=409 ms=57
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/d70018cf-3d34-4009-8d58-2660945bac55/knowledge-bases/1f9c4968-162e-42f3-ad04-0e9d61beb5c1/documents status=202 ms=76
+INFO     ffcore.knowledge.ingest:ingest.py:677 gold document=5a1b0c86-955a-41fb-95ee-342ea138934b reused=0 embedded=1
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/d70018cf-3d34-4009-8d58-2660945bac55/knowledge-bases/1f9c4968-162e-42f3-ad04-0e9d61beb5c1/documents/5a1b0c86-955a-41fb-95ee-342ea138934b status=404 ms=42
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/d70018cf-3d34-4009-8d58-2660945bac55/knowledge-bases/1f9c4968-162e-42f3-ad04-0e9d61beb5c1/documents status=409 ms=57
+=========================== short test summary info ============================
+FAILED tests/integration/test_04b_r3_upload_acl.py::test_04b_r3_admin_reuploads_a_user_only_document[pgvector]
+FAILED tests/integration/test_04b_r3_upload_acl.py::test_04b_r3_admin_reuploads_a_user_only_document[qdrant]
+2 failed, 10 deselected in 25.72s
