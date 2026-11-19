@@ -114,3 +114,18 @@ def test_04b_r3_u3_unreadable_name_is_taken(world, pg):
     assert admin.status_code == 202, admin.text
     assert admin.json()["data"][0]["outcome"] == "new_version"
     assert state(world, doc_id)[:3] == (["admin"], [], 2)
+
+
+def test_04b_r3_admin_reuploads_a_user_only_document(world):
+    """K-04B-0013 A: a project admin passes the name check even for a document it cannot read
+    (C15: a user-only ACL hides it from the admin too), so such a document stays manageable."""
+    first = upload(world, world["admin"], "kisi.md", BODY, acl_users=world["analyst_id"])
+    doc_id = first.json()["data"][0]["document"]["id"]
+    drain(world)
+    assert document(world, world["admin"], doc_id).status_code == 404
+    again = upload(world, world["admin"], "kisi.md", OTHER, acl_users=world["admin_id"])
+    assert again.status_code == 202, again.text
+    assert again.json()["data"][0]["outcome"] == "new_version"
+    assert document(world, world["admin"], doc_id).json()["version"] == 2
+    drain(world)
+    assert search(world, world["analyst"], "başka bir metin")["hits"] == []
