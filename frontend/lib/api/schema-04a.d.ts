@@ -82,6 +82,7 @@ export interface paths {
          * @description Document metadata the uploader may correct; the source date orders search results at
          *     once (it is read from the document, no reindex). An ACL change (FOLLOWUP-86) reaches the
          *     vector store before the answer; a store failure leaves the document as it was (503).
+         *     Only a project admin changes the ACL (04b-1 r2); the other fields stay the uploader's.
          */
         patch: operations["update_document_api_v1_projects__project_id__knowledge_bases__kb_id__documents__document_id__patch"];
         trace?: never;

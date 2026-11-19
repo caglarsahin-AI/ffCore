@@ -66,7 +66,8 @@ reconvert:
 
 # 04b: make migrate-vectors PROJECT=<key> FROM=pgvector TO=qdrant [KB=<key>] [DRY_RUN=1] [DROP_TARGET=1].
 # Embeddings are not recomputed; exit 1 when a knowledge base's counts differ. The switch is
-# VECTOR_BACKEND in .env (the operator's); the source is never changed.
+# VECTOR_BACKEND in .env (the operator's). Source dense vectors and documents never change;
+# missing sparse weights of pre-04b chunks are derived and stored in Postgres (additive).
 migrate-vectors:
 	@test -n "$(PROJECT)" -a -n "$(FROM)" -a -n "$(TO)" || (echo "usage: make migrate-vectors PROJECT=<key> FROM=<driver> TO=<driver> [KB=<key>] [DRY_RUN=1] [DROP_TARGET=1]" >&2; exit 2)
 	cd backend && python -m ffcore.cli migrate-vectors --project "$(PROJECT)" --from "$(FROM)" --to "$(TO)" $(if $(KB),--kb "$(KB)",) $(if $(DRY_RUN),--dry-run,) $(if $(DROP_TARGET),--drop-target,)

@@ -11,7 +11,10 @@ The check is per knowledge base: the vectors the target holds equal the vectors 
 holds, otherwise the run is not ok (CLI exit 1, fail-loud). A target collection with points of
 its own (an earlier run, another installation) is never cleaned silently: `drop_target` drops
 the Qdrant collection first, on request. The switch itself is the operator's `VECTOR_BACKEND`;
-going back is setting it back, the source is never changed.
+going back is setting it back. Dense vectors, chunk text and documents on the source side are
+never changed; the one write there is additive: the sparse weights a pre-04b chunk lacked
+(pgvector → Qdrant) are stored in `chunks.sparse`, and they stay even when the run ends in a
+mismatch (derived data, the same a gold reindex would write).
 """
 
 import json
@@ -85,12 +88,23 @@ class MigrationReport:
             if kb.ok:
                 line += " ok"
             elif not self.dry_run:
-                line += (
-                    " mismatch: the target does not hold the source's vectors; if it has points"
-                    " of its own, run again with --drop-target"
-                )
+                line += _MISMATCH_HINT[self.target]
             out.append(line)
         return out
+
+
+# r1 MINOR-1: the hint follows the target; --drop-target is refused for pgvector.
+_MISMATCH_HINT = {
+    "qdrant": (
+        " mismatch: the target does not hold the source's vectors; if it has points"
+        " of its own, run again with --drop-target"
+    ),
+    "pgvector": (
+        " mismatch: Qdrant holds points of chunks that are not searchable in Postgres"
+        " (document deleted or not indexed) or misses some; reindex those documents"
+        " (make reindex LAYER=gold) or rebuild the Qdrant side with --to qdrant --drop-target"
+    ),
+}
 
 
 def _rows_statement(extra: str):

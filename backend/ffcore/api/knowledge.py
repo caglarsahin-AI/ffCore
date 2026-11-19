@@ -44,7 +44,7 @@ from ffcore.api.knowledge_schemas import (
 )
 from ffcore.api.schemas import Role
 from ffcore.core.audit import audited
-from ffcore.core.auth import ROLE_ORDER, Actor, require_role
+from ffcore.core.auth import ROLE_ORDER, Actor, authorize, require_role
 from ffcore.core.config import Settings, get_settings
 from ffcore.core.errors import ApiError
 from ffcore.knowledge import ingest, jobs, report, search
@@ -64,6 +64,9 @@ router = APIRouter(
 Reader = Annotated[Actor, Depends(require_role("analyst"))]
 Editor = Annotated[Actor, Depends(require_role("analyst", write=True))]
 KbAdmin = Annotated[Actor, Depends(require_role("admin", write=True))]
+# 04b-1 r2 (MINOR-2 A): a document's ACL is changed by a project admin only; the check
+# depends on the body, so it runs inside the route through the same authorize().
+ACL_CHANGE = require_role("admin", write=True)
 SettingsDep = Annotated[Settings, Depends(get_settings)]
 KbIdDep = Annotated[str, Depends(path_resource("kb_id"))]
 DocumentIdDep = Annotated[str, Depends(path_resource("document_id"))]
@@ -467,12 +470,16 @@ async def update_document(
 ):
     """Document metadata the uploader may correct; the source date orders search results at
     once (it is read from the document, no reindex). An ACL change (FOLLOWUP-86) reaches the
-    vector store before the answer; a store failure leaves the document as it was (503)."""
+    vector store before the answer; a store failure leaves the document as it was (503).
+    Only a project admin changes the ACL (04b-1 r2); the other fields stay the uploader's."""
     document = await _document(session, project_id, kb_id, document_id, acl_for(request, actor))
     changes = body.model_dump(exclude_unset=True)
     acl = {
         key: changes.pop(key) for key in ("acl_roles", "acl_users", "acl_open") if key in changes
     }
+    if acl:
+        # 403 insufficient_role with its audit row, like every role check (core/auth.py).
+        await authorize(request, actor, str(project_id), ACL_CHANGE)
     for field, value in changes.items():
         setattr(document, field, value)
     if acl:
