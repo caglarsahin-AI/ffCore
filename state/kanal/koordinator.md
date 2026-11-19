@@ -155,3 +155,19 @@ PR-HAZIR r3 alındı; ca4c2f9 doğrulandı (4 commit test→test→kod→docs, 5
 ### K-04B-0016 · 2026-11-19 19:17 · → tumu · YIGIN-AC
 Paket: 04b · Cevap: R-04B-0009 · Yigin: ffmain
 04b-1 r3 ONAY alındı (B0 M0 m0 N2; rapor ve 6 kanıt commit edildi). Merge --no-ff `ef2ee83` (ca4c2f9; 35 dosya +2883/-77). Main tam kapısı ffmain'de başlıyor (18000/13000, `--pull never`, tee `state/evidence/gate-04b1-20261119.log`). **isci-b ve inceleyici: kapı bitene kadar konteyner testi başlatma**; YIGIN-KAPA ile duyururum. NOTE-1 (çift `denied` audit) FOLLOWUP olarak alınacak; NOTE-2 docs'ta, kabul (KARARLAR r2).
+
+### K-04B-0017 · 2026-11-19 19:43 · → tumu · YIGIN-KAPA
+Paket: 04b · Cevap: K-04B-0016 · Yigin: ffmain
+Kapı bitti, `down -v` tamam. Konteyner testi serbest.
+
+### K-04B-0018 · 2026-11-19 19:43 · → tumu · MERGED
+Paket: 04b · Cevap: R-04B-0009 · SHA: ef2ee83
+04b-1 merge --no-ff `ef2ee83` (ca4c2f9; 35 dosya +2883/-77). Kapı `state/evidence/gate-04b1-20261119.log`: imajlar build, lint 0, heads tek, test 1937×2, test-samples, test-int 1056/13/0, smoke, önyüz typecheck/check:api 0 + Vitest 279; e2e atlandı (önyüz kodu değişmedi). WORK_QUEUE 04b IN_PROGRESS (04b-1 MERGED, 04b-2 sırada); FOLLOWUP 157/133 ve DEBT-10 kapandı, 86 kısmen, FOLLOWUP-203 (çift `denied` audit) açıldı. Main'de yeni: `migrate-vectors`, `chunks.sparse`, ingest raporu, belge ACL düzenleme (admin), preset'li yeniden dönüştürme, yükleme yolunda ACL yetkisi. Push kullanıcı talimatını bekliyor.
+
+### K-04B-0019 · 2026-11-19 19:43 · → isci-b · GOREV-EK
+Paket: 04b · Cevap: B-04B-0020
+**04b-2**, aynı lease, yeni dal `feat/04b-2-knowledge-ext` main `ef2ee83`'ten (worktree `.worktrees/feat/04b-2-knowledge-ext`; eski worktree'ye dokunma, silme kullanıcıda). Kapsam = KARARLAR '04b plan kararları' S3-S7 (hepsi A) + FOLLOWUP 87/145/31/89 + 86'nın kalanı (S6 sistem durumu: yalnız kuyruk derinliği): **D3** `TEXT_NORMALIZE_TR` (varsayılan kapalı) + `normalizer_config_id` + uyuşmazlıkta 409, yalnız PayCore katman A; **D4** video: `VIDEO_TRANSCRIPT_ENABLED` (kapalı) + preset + açılışta hata, `video_disabled` raporu, sessiz atlama yok (faster-whisper ayrı C PR, bu PR'da değil); **D5** embedding modeline göre eşik tablosu; **D6** `knowledge[].filter.scope` = `metadata.source` IN (C5 additive) + touch-zone eki yalnız `runtime/definition.py` (422 kalkar) ve `runtime/adapters.py` (scope aramaya), iki satır düzeyinde, 06a testleri yeşil kalır; **S7** `num_ctx` doğrulaması Ollama `/api/ps` `context_length`. Kapsam dışı: `rewrite` (DECISION-2), Türkçe embedding karşılaştırması, FOLLOWUP-202/203. Önce **kısa PLANNED** (dosya listesi, dilimler, açık sorular A/B/C) `state/pr/04b-2.md` + kanal → PLAN-ONAY bekle; sonra kırmızı test → en küçük dilim; test/kod/docs ayrı commit; `.env.example` + docs/bilgi-tabani.md + degisiklikler.md; iki profil; kapı tee `04b-2-*.log`; YIGIN-AC/KAPA (en çok üç yığın). PR-HAZIR'da `SHA:` tam.
+
+### K-04B-0020 · 2026-11-19 19:43 · → inceleyici · CEVAP
+Paket: 04b · Cevap: R-04B-0010
+04b-1 MERGED ef2ee83, kapı yeşil. Sıradaki inceleme 04b-2 PR-HAZIR'da gelir (D3-D6; yeni dal). Bekle.
