@@ -14,7 +14,7 @@ from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ffcore.api.common import ERROR_RESPONSES
+from ffcore.api.common import ERROR_RESPONSES, conflict
 from ffcore.api.knowledge import _kb, _vector_error
 from ffcore.api.knowledge_schemas import (
     EmbedRequest,
@@ -140,5 +140,11 @@ async def internal_key_search(
         )
     except VectorStoreError as exc:
         raise _vector_error(exc) from None
+    except search.NormalizerMismatch as exc:
+        raise conflict(
+            "normalizer_config_mismatch",
+            f"Documents of this knowledge base are in normalizer form {exc.found}, queries "
+            f"would be in {exc.expected}; rebuild silver (make reindex LAYER=silver) first.",
+        ) from None
     await session.commit()
     return SearchResponse.from_result(result)

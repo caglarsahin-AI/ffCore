@@ -39,7 +39,7 @@ from ffcore.knowledge.convert import pipeline as convert_pipeline
 from ffcore.knowledge.convert.types import CONVERTED, TIMEOUT, ConversionResult
 from ffcore.knowledge.convert.workers import Limits, PersistentPool
 from ffcore.knowledge.embed import Embeddings, get_embedder, token_counter
-from ffcore.knowledge.normalize import NORMALIZER_CONFIG_ID, clean_markdown
+from ffcore.knowledge.normalize import clean_markdown, normalizer_config_id
 from ffcore.knowledge.store import NewChunk, PgKnowledgeStore, sparse_to_json, text_hash
 from ffcore.knowledge.vectorstore.base import VectorRecord, VectorStore, VectorStoreError
 from ffcore.models.knowledge import Attachment, Chunk, Document, KnowledgeBase
@@ -328,7 +328,7 @@ def _frontmatter(document: Document, kb: KnowledgeBase, convert_engine: str, bre
         "gate1": [document.gate1_status, document.gate1_reason],
         "gate2": [document.gate2_status, document.gate2_reason],
         "converter": convert_engine,
-        "normalizer_config_id": NORMALIZER_CONFIG_ID,
+        "normalizer_config_id": document.normalizer_config_id,
     }
 
 
@@ -407,7 +407,7 @@ async def _attachment_texts(
         if result.status != CONVERTED:
             attachment.gate2_status, attachment.gate2_reason = "skipped", result.status
             continue
-        text = clean_markdown(result.text_md)
+        text = clean_markdown(result.text_md, turkish=settings.text_normalize_tr)
         if text_filter is not None:
             text = await text_filter(text)
         dump = gates.data_dump(text)
@@ -494,7 +494,7 @@ async def ingest_document(
             # 19: raw stays byte for byte; silver (and text_raw beside it) is masked before it
             # is written, so gold and the model only ever see the masked text (K-M3S-0003).
             text_md = await masking(text_md)
-        body = clean_markdown(text_md)
+        body = clean_markdown(text_md, turkish=settings.text_normalize_tr)
         if masking is not None:
             body = await masking(body)
         source = (document.meta or {}).get("source")
@@ -515,7 +515,7 @@ async def ingest_document(
         breadcrumb = document.meta.get("breadcrumb") or document.filename
         breadcrumb = f"{kb.name}{BREADCRUMB_SEPARATOR}{breadcrumb}"
         document.breadcrumb = breadcrumb
-        document.normalizer_config_id = NORMALIZER_CONFIG_ID
+        document.normalizer_config_id = normalizer_config_id(settings)
         document.text_hash = text_hash(body)
         store_ = PgKnowledgeStore(session)
         owner = await store_.text_hash_owner(kb.id, document.text_hash, document.id)

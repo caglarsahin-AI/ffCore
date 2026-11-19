@@ -89,6 +89,9 @@ class Settings(BaseSettings):
     embed_batch_size: int = Field(default=64, gt=0)
     rerank_model: str = "BAAI/bge-reranker-v2-m3"
     rerank_min_score: float = Field(default=0.1, ge=0, le=1)
+    # 04b-2 D3: Turkish layer A (circumflex folding) on silver and queries; off by
+    # default. Switching it needs `make reindex LAYER=silver` (search is 409 until then).
+    text_normalize_tr: bool = False
     # Hybrid candidates handed to the reranker (and logged in kb_queries.candidates, C12).
     retrieval_candidates: int = Field(default=30, gt=0)
     # Deterministic stand-in models for tests (FAKE_EMBED=1); never a silent fallback: the

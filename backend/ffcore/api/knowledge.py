@@ -49,7 +49,7 @@ from ffcore.core.config import Settings, get_settings
 from ffcore.core.errors import ApiError
 from ffcore.knowledge import ingest, jobs, report, search
 from ffcore.knowledge.chunking import ChunkSettings
-from ffcore.knowledge.normalize import NORMALIZER_CONFIG_ID
+from ffcore.knowledge.normalize import normalizer_config_id
 from ffcore.knowledge.vectorstore.base import VectorFilters, VectorStoreError, metadata_items
 from ffcore.models.knowledge import Attachment, Chunk, Document, KnowledgeBase
 from ffcore.runtime import checkpoints
@@ -266,7 +266,7 @@ async def create_knowledge_base(
         default_top_k=body.default_top_k,
         default_min_score=body.default_min_score,
         default_filter=body.default_filter,
-        normalizer_config_id=NORMALIZER_CONFIG_ID,
+        normalizer_config_id=normalizer_config_id(settings),
         created_by=actor.actor_id,
     )
     session.add(kb)
@@ -701,6 +701,12 @@ async def _search(request, actor, session, settings, project_id, kb_id, body, ru
         )
     except VectorStoreError as exc:
         raise _vector_error(exc) from None
+    except search.NormalizerMismatch as exc:
+        raise conflict(
+            "normalizer_config_mismatch",
+            f"Documents of this knowledge base are in normalizer form {exc.found}, queries "
+            f"would be in {exc.expected}; rebuild silver (make reindex LAYER=silver) first.",
+        ) from None
     await session.commit()
     return SearchResponse.from_result(result)
 
