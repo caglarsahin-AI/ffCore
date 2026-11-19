@@ -50,6 +50,19 @@ def text_hash(value: str) -> str:
     return hashlib.sha256(value.encode("utf-8")).hexdigest()
 
 
+def sparse_to_json(weights: dict[int, float] | None) -> dict[str, float] | None:
+    """jsonb keys are strings; token ids go back to int on the way out (sparse_from_json)."""
+    if weights is None:
+        return None
+    return {str(int(k)): float(v) for k, v in weights.items()}
+
+
+def sparse_from_json(value: dict | None) -> dict[int, float] | None:
+    if value is None:
+        return None
+    return {int(k): float(v) for k, v in value.items()}
+
+
 class KnowledgeStore(Protocol):
     async def register_upload(
         self,
@@ -95,8 +108,9 @@ class PgKnowledgeStore:
         acl_users: list[uuid.UUID],
         created_by: str,
     ) -> tuple[Document, UploadOutcome]:
-        """Same file name in the KB: the same record, version + 1 (brief 04 acceptance 4).
-        Identical bytes (sha256) keep the converted layers and queue nothing."""
+        """Same file name in the KB: the same record (brief 04 acceptance 4); new bytes are
+        version + 1. Identical bytes (sha256) keep the version and the converted layers and
+        queue nothing (FOLLOWUP-157); only an ACL change is applied."""
         current = await self.session.scalar(
             select(Document)
             .where(
@@ -125,12 +139,13 @@ class PgKnowledgeStore:
             self.session.add(document)
             await self.session.flush()
             return document, UploadOutcome.created
-        current.version += 1
         current.acl_roles = acl_roles
         current.acl_users = acl_users
         if current.sha256 == sha256:
+            # FOLLOWUP-157: identical bytes are not a new version (nothing is reprocessed).
             await self.session.flush()
             return current, UploadOutcome.unchanged
+        current.version += 1
         current.sha256 = sha256
         current.size = size
         current.raw_path = raw_path
@@ -164,19 +179,28 @@ class PgKnowledgeStore:
     ) -> dict[str, list[float]]:
         """Vectors of chunks with the same text and model (brief D3): taken over, not re-embedded.
         Call before replace_chunks, which deletes the document's previous chunks."""
+        reusable = await self.reusable_embeddings(kb_id, hashes, embedding_model)
+        return {h: dense for h, (dense, _) in reusable.items()}
+
+    async def reusable_embeddings(
+        self, kb_id: uuid.UUID, hashes: list[str], embedding_model: str
+    ) -> dict[str, tuple[list[float], dict[int, float] | None]]:
+        """Dense vector and sparse weights per text hash (04b S2): a row that has sparse weights
+        is preferred; a row written before 04b gives None (the caller decides, never silently)."""
         if not hashes:
             return {}
         rows = await self.session.execute(
-            select(Chunk.text_hash, Chunk.embedding)
+            select(Chunk.text_hash, Chunk.embedding, Chunk.sparse)
             .where(
                 Chunk.kb_id == kb_id,
                 Chunk.text_hash.in_(hashes),
                 Chunk.embedding_model == embedding_model,
                 Chunk.embedding.is_not(None),
             )
+            .order_by(Chunk.text_hash, Chunk.sparse.is_(None))
             .ext(distinct_on(Chunk.text_hash))
         )
-        return {h: [float(x) for x in vec] for h, vec in rows}
+        return {h: ([float(x) for x in vec], sparse_from_json(sparse)) for h, vec, sparse in rows}
 
     async def replace_chunks(
         self, document: Document, chunks: list[NewChunk], embedding_model: str

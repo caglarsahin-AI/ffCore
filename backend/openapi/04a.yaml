@@ -526,7 +526,9 @@ paths:
       description: 'Document metadata the uploader may correct; the source date orders search results
         at
 
-        once (it is read from the document, no reindex).'
+        once (it is read from the document, no reindex). An ACL change (FOLLOWUP-86) reaches the
+
+        vector store before the answer; a store failure leaves the document as it was (503).'
       operationId: update_document_api_v1_projects__project_id__knowledge_bases__kb_id__documents__document_id__patch
       parameters:
       - name: project_id
@@ -630,6 +632,84 @@ paths:
       responses:
         '204':
           description: Successful Response
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+  /api/v1/projects/{project_id}/knowledge-bases/{kb_id}/ingest-report:
+    get:
+      tags:
+      - knowledge-bases
+      summary: Ingest Report
+      description: 'Source x gate x reason counts and the rejected documents and chunks with their reasons
+
+        (brief 04 "Rapor"); per gate the counts add up to `documents`.'
+      operationId: ingest_report_api_v1_projects__project_id__knowledge_bases__kb_id__ingest_report_get
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      - name: kb_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Kb Id
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 1000
+          minimum: 1
+          description: Listed rows per list.
+          default: 100
+          title: Limit
+        description: Listed rows per list.
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IngestGateReport'
         '400':
           description: Invalid request.
           content:
@@ -1192,6 +1272,31 @@ components:
           - type: 'null'
           title: Updated At Source
           description: When the source last changed; null clears it (unknown date).
+        acl_roles:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/Role'
+            type: array
+          - type: 'null'
+          title: Acl Roles
+          description: Roles that may read the document; replaces the current list. Applied to the vector
+            store before the answer (no reindex).
+        acl_users:
+          anyOf:
+          - items:
+              type: string
+              format: uuid
+            type: array
+          - type: 'null'
+          title: Acl Users
+          description: Users that may read the document; replaces the current list.
+        acl_open:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Acl Open
+          description: 'true: open the document to every project member (empty ACL), on purpose; not with
+            acl_roles or acl_users. An empty ACL is only set this way (C15).'
       additionalProperties: false
       type: object
       title: DocumentUpdate
@@ -1275,6 +1380,78 @@ components:
       - type
       - code
       title: ErrorDetail
+    FilteredHit:
+      properties:
+        chunk_id:
+          type: string
+          format: uuid
+          title: Chunk Id
+        document_id:
+          type: string
+          format: uuid
+          title: Document Id
+        document_name:
+          type: string
+          title: Document Name
+        reason:
+          type: string
+          enum:
+          - below_rerank_floor
+          - below_min_score
+          title: Reason
+        embed_score:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Embed Score
+        rerank_score:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Rerank Score
+      type: object
+      required:
+      - chunk_id
+      - document_id
+      - document_name
+      - reason
+      - embed_score
+      - rerank_score
+      title: FilteredHit
+    GateCount:
+      properties:
+        source:
+          type: string
+          title: Source
+          description: metadata.source of the document; upload for manual ones.
+        gate:
+          type: string
+          enum:
+          - gate0
+          - gate1
+          - gate2
+          title: Gate
+        status:
+          anyOf:
+          - $ref: '#/components/schemas/GateStatus'
+          - type: 'null'
+          description: 'Null: the gate has not run.'
+        reason:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Reason
+        documents:
+          type: integer
+          title: Documents
+      type: object
+      required:
+      - source
+      - gate
+      - status
+      - reason
+      - documents
+      title: GateCount
     GateDecision:
       properties:
         status:
@@ -1300,6 +1477,50 @@ components:
       - flagged
       - skipped
       title: GateStatus
+    IngestGateReport:
+      properties:
+        documents:
+          type: integer
+          title: Documents
+        by_status:
+          additionalProperties:
+            type: integer
+          type: object
+          title: By Status
+        gates:
+          items:
+            $ref: '#/components/schemas/GateCount'
+          type: array
+          title: Gates
+        rejected_documents:
+          items:
+            $ref: '#/components/schemas/RejectedDocument'
+          type: array
+          title: Rejected Documents
+        rejected_documents_total:
+          type: integer
+          title: Rejected Documents Total
+        rejected_chunks:
+          items:
+            $ref: '#/components/schemas/RejectedChunk'
+          type: array
+          title: Rejected Chunks
+        rejected_chunks_total:
+          type: integer
+          title: Rejected Chunks Total
+      type: object
+      required:
+      - documents
+      - by_status
+      - gates
+      - rejected_documents
+      - rejected_documents_total
+      - rejected_chunks
+      - rejected_chunks_total
+      title: IngestGateReport
+      description: 'Per gate the counts add up to `documents` (every document is counted once per gate).
+
+        Only documents the caller may read are counted and listed (C15).'
     KnowledgeBaseCreate:
       properties:
         key:
@@ -1608,9 +1829,15 @@ components:
         full:
           type: boolean
           title: Full
+        preset:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Preset
         documents:
           type: integer
           title: Documents
+          description: 'Documents in scope (with a preset: the ones it selects).'
       type: object
       required:
       - job_id
@@ -1635,11 +1862,84 @@ components:
           title: Full
           description: Every document, not only changed ones.
           default: false
+        preset:
+          anyOf:
+          - type: string
+            pattern: ^(encoding|timeout|mhtml|engine:[a-z0-9][a-z0-9_.+-]{0,39})$
+          - type: 'null'
+          title: Preset
+          description: 'Targeted reconversion (silver only): only the documents one problem hit. encoding
+            (encoding_undecodable), timeout, mhtml, engine:<convert_engine>.'
       additionalProperties: false
       type: object
       required:
       - layer
       title: ReindexRequest
+    RejectedChunk:
+      properties:
+        chunk_id:
+          type: string
+          format: uuid
+          title: Chunk Id
+        document_id:
+          type: string
+          format: uuid
+          title: Document Id
+        filename:
+          type: string
+          title: Filename
+        ordinal:
+          type: integer
+          title: Ordinal
+        reason:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Reason
+      type: object
+      required:
+      - chunk_id
+      - document_id
+      - filename
+      - ordinal
+      - reason
+      title: RejectedChunk
+    RejectedDocument:
+      properties:
+        document_id:
+          type: string
+          format: uuid
+          title: Document Id
+        filename:
+          type: string
+          title: Filename
+        source:
+          type: string
+          title: Source
+        status:
+          $ref: '#/components/schemas/DocumentStatus'
+        gate:
+          type: string
+          enum:
+          - gate0
+          - gate1
+          - gate2
+          title: Gate
+          description: The first gate that skipped.
+        reason:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Reason
+      type: object
+      required:
+      - document_id
+      - filename
+      - source
+      - status
+      - gate
+      - reason
+      title: RejectedDocument
     Role:
       type: string
       enum:
@@ -1797,6 +2097,17 @@ components:
         latency_ms:
           type: integer
           title: Latency Ms
+        filtered:
+          items:
+            $ref: '#/components/schemas/FilteredHit'
+          type: array
+          title: Filtered
+          description: Candidates the threshold removed, with the reason (the counts above).
+        rerank_truncated:
+          type: integer
+          title: Rerank Truncated
+          description: Candidate pairs longer than the reranker reads (C12, flagged).
+          default: 0
       type: object
       required:
       - query_id

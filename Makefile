@@ -3,7 +3,7 @@
 # Servisleri başlatma/durdurma doğrudan compose ile: docker compose up -d --wait | down | logs -f
 # Önyüz lint'i ayrı konteynerde: docker compose run --rm frontend npm run lint
 
-.PHONY: lint format test test-samples test-int seed e2e eval test-models test-ner-latency models models-check smoke pull seed-models render-litellm reindex langfuse-init seed-prompts seed-sql-demo seed-sql-context seed-eval
+.PHONY: lint format test test-samples test-int seed e2e eval test-models test-ner-latency models models-check smoke pull seed-models render-litellm reindex langfuse-init seed-prompts seed-sql-demo seed-sql-context seed-eval reconvert migrate-vectors
 
 lint:
 	ruff check backend scripts data/samples/scripts services
@@ -57,6 +57,19 @@ smoke:
 # the source (D3); the worker logs reused=N embedded=M.
 reindex:
 	cd backend && python -m ffcore.cli reindex --project $(PROJECT) --kb $(KB) --layer $(LAYER) $(if $(FULL),--full,)
+
+# 04b: make reconvert PROJECT=<key> KB=<key> PRESET=encoding|timeout|mhtml|engine:<name>.
+# Only the documents that problem hit are reconverted from raw (pipeline step 10).
+reconvert:
+	@test -n "$(PRESET)" || (echo "usage: make reconvert PROJECT=<key> KB=<key> PRESET=<preset>" >&2; exit 2)
+	cd backend && python -m ffcore.cli reindex --project $(PROJECT) --kb $(KB) --layer silver --preset "$(PRESET)"
+
+# 04b: make migrate-vectors PROJECT=<key> FROM=pgvector TO=qdrant [KB=<key>] [DRY_RUN=1] [DROP_TARGET=1].
+# Embeddings are not recomputed; exit 1 when a knowledge base's counts differ. The switch is
+# VECTOR_BACKEND in .env (the operator's); the source is never changed.
+migrate-vectors:
+	@test -n "$(PROJECT)" -a -n "$(FROM)" -a -n "$(TO)" || (echo "usage: make migrate-vectors PROJECT=<key> FROM=<driver> TO=<driver> [KB=<key>] [DRY_RUN=1] [DROP_TARGET=1]" >&2; exit 2)
+	cd backend && python -m ffcore.cli migrate-vectors --project "$(PROJECT)" --from "$(FROM)" --to "$(TO)" $(if $(KB),--kb "$(KB)",) $(if $(DRY_RUN),--dry-run,) $(if $(DROP_TARGET),--drop-target,)
 
 pull:
 	sh deploy/ollama/pull.sh

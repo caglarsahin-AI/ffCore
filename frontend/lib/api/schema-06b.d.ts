@@ -526,6 +526,30 @@ export interface components {
              */
             api_key: "***" | null;
         };
+        /** FilteredHit */
+        FilteredHit: {
+            /**
+             * Chunk Id
+             * Format: uuid
+             */
+            chunk_id: string;
+            /**
+             * Document Id
+             * Format: uuid
+             */
+            document_id: string;
+            /** Document Name */
+            document_name: string;
+            /**
+             * Reason
+             * @enum {string}
+             */
+            reason: "below_rerank_floor" | "below_min_score";
+            /** Embed Score */
+            embed_score: number | null;
+            /** Rerank Score */
+            rerank_score: number | null;
+        };
         /** ImportResult */
         ImportResult: {
             /** Dry Run */
@@ -759,6 +783,17 @@ export interface components {
             normalizer_config_id: string;
             /** Latency Ms */
             latency_ms: number;
+            /**
+             * Filtered
+             * @description Candidates the threshold removed, with the reason (the counts above).
+             */
+            filtered?: components["schemas"]["FilteredHit"][];
+            /**
+             * Rerank Truncated
+             * @description Candidate pairs longer than the reranker reads (C12, flagged).
+             * @default 0
+             */
+            rerank_truncated: number;
         };
         /**
          * ThresholdMode

@@ -80,9 +80,31 @@ export interface paths {
         /**
          * Update Document
          * @description Document metadata the uploader may correct; the source date orders search results at
-         *     once (it is read from the document, no reindex).
+         *     once (it is read from the document, no reindex). An ACL change (FOLLOWUP-86) reaches the
+         *     vector store before the answer; a store failure leaves the document as it was (503).
          */
         patch: operations["update_document_api_v1_projects__project_id__knowledge_bases__kb_id__documents__document_id__patch"];
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/knowledge-bases/{kb_id}/ingest-report": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Ingest Report
+         * @description Source x gate x reason counts and the rejected documents and chunks with their reasons
+         *     (brief 04 "Rapor"); per gate the counts add up to `documents`.
+         */
+        get: operations["ingest_report_api_v1_projects__project_id__knowledge_bases__kb_id__ingest_report_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/api/v1/projects/{project_id}/knowledge-bases/{kb_id}/reindex": {
@@ -310,6 +332,21 @@ export interface components {
              * @description When the source last changed; null clears it (unknown date).
              */
             updated_at_source?: string | null;
+            /**
+             * Acl Roles
+             * @description Roles that may read the document; replaces the current list. Applied to the vector store before the answer (no reindex).
+             */
+            acl_roles?: components["schemas"]["Role"][] | null;
+            /**
+             * Acl Users
+             * @description Users that may read the document; replaces the current list.
+             */
+            acl_users?: string[] | null;
+            /**
+             * Acl Open
+             * @description true: open the document to every project member (empty ACL), on purpose; not with acl_roles or acl_users. An empty ACL is only set this way (C15).
+             */
+            acl_open?: boolean | null;
         };
         /** EmbedRequest */
         EmbedRequest: {
@@ -362,6 +399,49 @@ export interface components {
              */
             code: string;
         };
+        /** FilteredHit */
+        FilteredHit: {
+            /**
+             * Chunk Id
+             * Format: uuid
+             */
+            chunk_id: string;
+            /**
+             * Document Id
+             * Format: uuid
+             */
+            document_id: string;
+            /** Document Name */
+            document_name: string;
+            /**
+             * Reason
+             * @enum {string}
+             */
+            reason: "below_rerank_floor" | "below_min_score";
+            /** Embed Score */
+            embed_score: number | null;
+            /** Rerank Score */
+            rerank_score: number | null;
+        };
+        /** GateCount */
+        GateCount: {
+            /**
+             * Source
+             * @description metadata.source of the document; upload for manual ones.
+             */
+            source: string;
+            /**
+             * Gate
+             * @enum {string}
+             */
+            gate: "gate0" | "gate1" | "gate2";
+            /** @description Null: the gate has not run. */
+            status: components["schemas"]["GateStatus"] | null;
+            /** Reason */
+            reason: string | null;
+            /** Documents */
+            documents: number;
+        };
         /** GateDecision */
         GateDecision: {
             /** @description Null until the gate has run. */
@@ -377,6 +457,29 @@ export interface components {
          * @enum {string}
          */
         GateStatus: "ok" | "flagged" | "skipped";
+        /**
+         * IngestGateReport
+         * @description Per gate the counts add up to `documents` (every document is counted once per gate).
+         *     Only documents the caller may read are counted and listed (C15).
+         */
+        IngestGateReport: {
+            /** Documents */
+            documents: number;
+            /** By Status */
+            by_status: {
+                [key: string]: number;
+            };
+            /** Gates */
+            gates: components["schemas"]["GateCount"][];
+            /** Rejected Documents */
+            rejected_documents: components["schemas"]["RejectedDocument"][];
+            /** Rejected Documents Total */
+            rejected_documents_total: number;
+            /** Rejected Chunks */
+            rejected_chunks: components["schemas"]["RejectedChunk"][];
+            /** Rejected Chunks Total */
+            rejected_chunks_total: number;
+        };
         /** KnowledgeBaseCreate */
         KnowledgeBaseCreate: {
             /**
@@ -574,7 +677,12 @@ export interface components {
             layer: components["schemas"]["ReindexLayer"];
             /** Full */
             full: boolean;
-            /** Documents */
+            /** Preset */
+            preset?: string | null;
+            /**
+             * Documents
+             * @description Documents in scope (with a preset: the ones it selects).
+             */
             documents: number;
         };
         /**
@@ -592,6 +700,51 @@ export interface components {
              * @default false
              */
             full: boolean;
+            /**
+             * Preset
+             * @description Targeted reconversion (silver only): only the documents one problem hit. encoding (encoding_undecodable), timeout, mhtml, engine:<convert_engine>.
+             */
+            preset?: string | null;
+        };
+        /** RejectedChunk */
+        RejectedChunk: {
+            /**
+             * Chunk Id
+             * Format: uuid
+             */
+            chunk_id: string;
+            /**
+             * Document Id
+             * Format: uuid
+             */
+            document_id: string;
+            /** Filename */
+            filename: string;
+            /** Ordinal */
+            ordinal: number;
+            /** Reason */
+            reason: string | null;
+        };
+        /** RejectedDocument */
+        RejectedDocument: {
+            /**
+             * Document Id
+             * Format: uuid
+             */
+            document_id: string;
+            /** Filename */
+            filename: string;
+            /** Source */
+            source: string;
+            status: components["schemas"]["DocumentStatus"];
+            /**
+             * Gate
+             * @description The first gate that skipped.
+             * @enum {string}
+             */
+            gate: "gate0" | "gate1" | "gate2";
+            /** Reason */
+            reason: string | null;
         };
         /**
          * Role
@@ -689,6 +842,17 @@ export interface components {
             normalizer_config_id: string;
             /** Latency Ms */
             latency_ms: number;
+            /**
+             * Filtered
+             * @description Candidates the threshold removed, with the reason (the counts above).
+             */
+            filtered?: components["schemas"]["FilteredHit"][];
+            /**
+             * Rerank Truncated
+             * @description Candidate pairs longer than the reranker reads (C12, flagged).
+             * @default 0
+             */
+            rerank_truncated: number;
         };
         /**
          * ThresholdMode
@@ -1447,6 +1611,86 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["DocumentOut"];
+                };
+            };
+            /** @description Invalid request. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description Not authenticated. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description Role or access mode not sufficient, or cross-origin request. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description Not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description Conflict with the current state. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description Request body or parameters failed validation. */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    ingest_report_api_v1_projects__project_id__knowledge_bases__kb_id__ingest_report_get: {
+        parameters: {
+            query?: {
+                /** @description Listed rows per list. */
+                limit?: number;
+            };
+            header?: never;
+            path: {
+                project_id: string;
+                kb_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IngestGateReport"];
                 };
             };
             /** @description Invalid request. */

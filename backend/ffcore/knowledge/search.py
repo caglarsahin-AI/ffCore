@@ -51,6 +51,18 @@ class Hit:
 
 
 @dataclass
+class FilteredChunk:
+    """A candidate the threshold removed (FOLLOWUP-86): shown, never dropped silently."""
+
+    chunk_id: uuid.UUID
+    document_id: uuid.UUID
+    document_name: str
+    reason: str  # below_rerank_floor | below_min_score
+    embed_score: float | None
+    rerank_score: float | None
+
+
+@dataclass
 class SearchResult:
     query_id: uuid.UUID
     hits: list[Hit]
@@ -60,6 +72,8 @@ class SearchResult:
     normalizer_config_id: str
     latency_ms: int
     candidates: list[dict] = field(default_factory=list)
+    filtered: list[FilteredChunk] = field(default_factory=list)
+    rerank_truncated: int = 0
 
 
 def _acl_sql(filters: VectorFilters, params: dict) -> str:
@@ -231,6 +245,29 @@ async def search(
         kept = [c for c in candidates if not c["below_min_score"]]
         filtered_min = len(candidates) - len(kept)
     kept = kept[:top_k]
+    filtered = []
+    for candidate in candidates:
+        reason = (
+            "below_rerank_floor"
+            if candidate["below_rerank_floor"]
+            else "below_min_score"
+            if candidate["below_min_score"]
+            else None
+        )
+        if reason is None:
+            continue
+        row = details[uuid.UUID(candidate["chunk_id"])]
+        filtered.append(
+            FilteredChunk(
+                chunk_id=row["id"],
+                document_id=row["document_id"],
+                document_name=row["filename"],
+                reason=reason,
+                embed_score=row["embed_score"],
+                rerank_score=candidate["rerank_score"],
+            )
+        )
+    truncated = sum(1 for c in candidates if c.get("rerank_truncated"))
 
     now = datetime.now(UTC)
     hits = []
@@ -275,7 +312,7 @@ async def search(
         threshold_mode=threshold_mode,
         filtered_by_rerank_floor=filtered_floor,
         filtered_by_min_score=filtered_min,
-        rerank_truncated=sum(1 for c in candidates if c.get("rerank_truncated")),
+        rerank_truncated=truncated,
         latency_ms=latency_ms,
         user_id=user_id,
     )
@@ -290,4 +327,6 @@ async def search(
         normalizer_config_id=NORMALIZER_CONFIG_ID,
         latency_ms=latency_ms,
         candidates=candidates,
+        filtered=filtered,
+        rerank_truncated=truncated,
     )

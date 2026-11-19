@@ -1148,6 +1148,44 @@ components:
       - model
       - api_key
       title: ExternalEndpoint
+    FilteredHit:
+      properties:
+        chunk_id:
+          type: string
+          format: uuid
+          title: Chunk Id
+        document_id:
+          type: string
+          format: uuid
+          title: Document Id
+        document_name:
+          type: string
+          title: Document Name
+        reason:
+          type: string
+          enum:
+          - below_rerank_floor
+          - below_min_score
+          title: Reason
+        embed_score:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Embed Score
+        rerank_score:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Rerank Score
+      type: object
+      required:
+      - chunk_id
+      - document_id
+      - document_name
+      - reason
+      - embed_score
+      - rerank_score
+      title: FilteredHit
     ImportResult:
       properties:
         dry_run:
@@ -1517,6 +1555,17 @@ components:
         latency_ms:
           type: integer
           title: Latency Ms
+        filtered:
+          items:
+            $ref: '#/components/schemas/FilteredHit'
+          type: array
+          title: Filtered
+          description: Candidates the threshold removed, with the reason (the counts above).
+        rerank_truncated:
+          type: integer
+          title: Rerank Truncated
+          description: Candidate pairs longer than the reranker reads (C12, flagged).
+          default: 0
       type: object
       required:
       - query_id

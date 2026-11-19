@@ -13,7 +13,7 @@ from datetime import datetime
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, File, Form, Header, Request, UploadFile, status
+from fastapi import APIRouter, Depends, File, Form, Header, Query, Request, UploadFile, status
 from sqlalchemy import and_, func, or_, select
 
 from ffcore.api.common import (
@@ -29,6 +29,7 @@ from ffcore.api.knowledge_schemas import (
     DocumentOut,
     DocumentUpdate,
     GateDecision,
+    IngestGateReport,
     KnowledgeBaseCreate,
     KnowledgeBaseList,
     KnowledgeBaseOut,
@@ -36,7 +37,6 @@ from ffcore.api.knowledge_schemas import (
     ReindexAccepted,
     ReindexLayer,
     ReindexRequest,
-    SearchHit,
     SearchRequest,
     SearchResponse,
     UploadedDocument,
@@ -47,11 +47,11 @@ from ffcore.core.audit import audited
 from ffcore.core.auth import ROLE_ORDER, Actor, require_role
 from ffcore.core.config import Settings, get_settings
 from ffcore.core.errors import ApiError
-from ffcore.knowledge import ingest, jobs, search
+from ffcore.knowledge import ingest, jobs, report, search
 from ffcore.knowledge.chunking import ChunkSettings
 from ffcore.knowledge.normalize import NORMALIZER_CONFIG_ID
 from ffcore.knowledge.vectorstore.base import VectorFilters, VectorStoreError
-from ffcore.models.knowledge import Chunk, Document, KnowledgeBase
+from ffcore.models.knowledge import Attachment, Chunk, Document, KnowledgeBase
 from ffcore.runtime import checkpoints
 from ffcore.services import retention
 
@@ -329,6 +329,7 @@ async def delete_knowledge_base(
     document_ids = deleted.all()
     await checkpoints.mark_document_runs(session, document_ids)
     await retention.clear_document_content(session, document_ids)
+    await _remove_silver(session, document_ids)
 
 
 @router.get("/{kb_id}/documents", response_model=DocumentList)
@@ -461,17 +462,86 @@ async def update_document(
     request: Request,
     actor: Editor,
     session: SessionDep,
+    settings: SettingsDep,
     resource_id: DocumentIdDep,
 ):
     """Document metadata the uploader may correct; the source date orders search results at
-    once (it is read from the document, no reindex)."""
+    once (it is read from the document, no reindex). An ACL change (FOLLOWUP-86) reaches the
+    vector store before the answer; a store failure leaves the document as it was (503)."""
     document = await _document(session, project_id, kb_id, document_id, acl_for(request, actor))
-    for field, value in body.model_dump(exclude_unset=True).items():
+    changes = body.model_dump(exclude_unset=True)
+    acl = {
+        key: changes.pop(key) for key in ("acl_roles", "acl_users", "acl_open") if key in changes
+    }
+    for field, value in changes.items():
         setattr(document, field, value)
+    if acl:
+        roles, users = _acl_update(document, acl)
+        try:
+            store = jobs.get_vector_store(settings)
+            await store.update_acl(document.kb_id, document.id, roles, users)
+        except VectorStoreError as exc:
+            raise _vector_error(exc) from None
+        document.acl_roles, document.acl_users = roles, users
     await session.flush()
     await session.refresh(document)
     counts = await _chunk_counts(session, [document.id])
     return _document_out(document, counts.get(document.id, 0))
+
+
+def _acl_update(document: Document, acl: dict) -> tuple[list[str], list[UUID]]:
+    """The upload rules (C15): an empty ACL only with acl_open=true, never with a list."""
+    roles = acl.get("acl_roles")
+    users = acl.get("acl_users")
+    if acl.get("acl_open"):
+        if roles or users:
+            raise invalid(
+                "acl_conflict", "acl_open cannot be combined with acl_roles or acl_users."
+            )
+        return [], []
+    roles = [r.value for r in roles] if roles is not None else list(document.acl_roles)
+    users = list(users) if users is not None else list(document.acl_users)
+    if not roles and not users:
+        raise invalid(
+            "acl_empty", "An empty ACL opens the document to every member; set acl_open=true."
+        )
+    return roles, users
+
+
+async def _remove_silver(session, document_ids: list[UUID]) -> None:
+    """FOLLOWUP-133: silver and text_raw of deleted documents (and their attachments) go;
+    raw stays (D3). Called last, after every database change of the request."""
+    if not document_ids:
+        return
+    documents = list(
+        (await session.scalars(select(Document).where(Document.id.in_(document_ids)))).all()
+    )
+    attachments = (
+        await session.scalars(
+            select(Attachment.silver_path).where(Attachment.document_id.in_(document_ids))
+        )
+    ).all()
+    paths = [d.silver_path for d in documents] + list(attachments)
+    for document in documents:
+        document.silver_path = None
+    await session.flush()
+    await asyncio.to_thread(ingest.remove_silver, paths)
+
+
+@router.get("/{kb_id}/ingest-report", response_model=IngestGateReport)
+async def ingest_report(
+    project_id: UUID,
+    kb_id: UUID,
+    request: Request,
+    actor: Reader,
+    session: SessionDep,
+    limit: Annotated[int, Query(ge=1, le=1000, description="Listed rows per list.")] = 100,
+):
+    """Source x gate x reason counts and the rejected documents and chunks with their reasons
+    (brief 04 "Rapor"); per gate the counts add up to `documents`."""
+    kb = await _kb(session, project_id, kb_id)
+    result = await report.gate_report(session, kb.id, visible(acl_for(request, actor)), limit=limit)
+    return IngestGateReport(**result.__dict__)
 
 
 @router.delete("/{kb_id}/documents/{document_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -501,6 +571,7 @@ async def delete_document(
     # the text they kept, in the same transaction (03c, FOLLOWUP-119).
     await checkpoints.mark_document_runs(session, [document.id])
     await retention.clear_document_content(session, [document.id])
+    await _remove_silver(session, [document.id])
 
 
 @router.post(
@@ -518,20 +589,30 @@ async def reindex_knowledge_base(
     resource_id: KbIdDep,
 ):
     kb = await _kb(session, project_id, kb_id)
+    if body.preset is not None and body.layer != ReindexLayer.silver:
+        raise invalid("preset_requires_silver", "A preset reconverts from raw: use layer=silver.")
     if body.layer == ReindexLayer.silver:
         # FOLLOWUP-172 N1: refuse here (409) instead of a 202 whose job fails; the job keeps the
         # same check (the API body has no personnel-data flag, the CLI has).
         try:
-            await ingest.check_reindex_silver(kb.id, full=body.full)
+            await ingest.check_reindex_silver(kb.id, full=body.full, preset=body.preset)
         except ingest.ReindexRefused as exc:
             raise conflict(exc.code, str(exc)) from None
-    documents = await session.scalar(
-        select(func.count())
-        .select_from(Document)
-        .where(Document.kb_id == kb.id, Document.deleted_at.is_(None))
+    if body.preset is not None:
+        documents = await ingest.preset_document_count(kb.id, body.preset)
+        job_id = await queue.enqueue(
+            "reindex_job", str(kb.id), body.layer.value, body.full, False, body.preset
+        )
+    else:
+        documents = await session.scalar(
+            select(func.count())
+            .select_from(Document)
+            .where(Document.kb_id == kb.id, Document.deleted_at.is_(None))
+        )
+        job_id = await queue.enqueue("reindex_job", str(kb.id), body.layer.value, body.full)
+    return ReindexAccepted(
+        job_id=job_id, layer=body.layer, full=body.full, preset=body.preset, documents=documents
     )
-    job_id = await queue.enqueue("reindex_job", str(kb.id), body.layer.value, body.full)
-    return ReindexAccepted(job_id=job_id, layer=body.layer, full=body.full, documents=documents)
 
 
 def acl_for(request: Request, actor: Actor) -> VectorFilters:
@@ -567,15 +648,7 @@ async def _search(request, actor, session, settings, project_id, kb_id, body, ru
     except VectorStoreError as exc:
         raise _vector_error(exc) from None
     await session.commit()
-    return SearchResponse(
-        query_id=result.query_id,
-        hits=[SearchHit(**hit.__dict__) for hit in result.hits],
-        threshold_mode=result.threshold_mode,
-        filtered_by_rerank_floor=result.filtered_by_rerank_floor,
-        filtered_by_min_score=result.filtered_by_min_score,
-        normalizer_config_id=result.normalizer_config_id,
-        latency_ms=result.latency_ms,
-    )
+    return SearchResponse.from_result(result)
 
 
 @router.post("/{kb_id}/search", response_model=SearchResponse)

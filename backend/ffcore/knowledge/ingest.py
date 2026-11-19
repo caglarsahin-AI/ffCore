@@ -24,7 +24,7 @@ from pathlib import Path
 from typing import BinaryIO, Protocol
 
 import yaml
-from sqlalchemy import select
+from sqlalchemy import or_, select
 
 from ffcore.core import db
 from ffcore.core.config import Settings
@@ -40,7 +40,7 @@ from ffcore.knowledge.convert.types import CONVERTED, TIMEOUT, ConversionResult
 from ffcore.knowledge.convert.workers import Limits, PersistentPool
 from ffcore.knowledge.embed import Embeddings, get_embedder, token_counter
 from ffcore.knowledge.normalize import NORMALIZER_CONFIG_ID, clean_markdown
-from ffcore.knowledge.store import NewChunk, PgKnowledgeStore, text_hash
+from ffcore.knowledge.store import NewChunk, PgKnowledgeStore, sparse_to_json, text_hash
 from ffcore.knowledge.vectorstore.base import VectorRecord, VectorStore, VectorStoreError
 from ffcore.models.knowledge import Attachment, Chunk, Document, KnowledgeBase
 
@@ -341,6 +341,22 @@ def _write_silver(path: Path, front: dict, body: str, raw_text: str) -> None:
     path.with_suffix(".raw.md").write_bytes(raw_text.encode())
 
 
+def remove_silver(silver_paths: list[str | None]) -> int:
+    """FOLLOWUP-133: a deleted document's silver file and its text_raw go with it; raw stays
+    (D3, the runbook removes raw). Returns the files removed; a missing file is not an error
+    (a document that never reached silver has none)."""
+    removed = 0
+    for value in silver_paths:
+        if not value:
+            continue
+        path = Path(value)
+        for target in (path, path.with_suffix(".raw.md")):
+            if target.exists():
+                target.unlink()
+                removed += 1
+    return removed
+
+
 def read_silver(path: Path) -> str:
     text = path.read_bytes().decode("utf-8")
     if text.startswith("---\n"):
@@ -589,7 +605,7 @@ async def _gold(
             return IngestReport(document_id, "failed")
         store_ = PgKnowledgeStore(session)
         indexable = [c for c in new_chunks if c.chunk_status != "skipped"]
-        reusable = await store_.reusable_vectors(
+        reusable = await store_.reusable_embeddings(
             kb.id, [c.text_hash for c in indexable], embed_client.model
         )
         rows = await store_.replace_chunks(document, new_chunks, embed_client.model)
@@ -612,10 +628,11 @@ async def _gold(
             if row.id in vectors:
                 dense, sparse = vectors[row.id]
             else:
-                # Reused vectors carry no sparse weights; the Qdrant driver needs them, so a
-                # reused chunk there is re-embedded below rather than indexed half.
-                dense, sparse = reusable[row.text_hash], None
+                # A reused vector brings its sparse weights (04b S2); one written before 04b has
+                # none, and the Qdrant driver needs them: re-embedded below, never indexed half.
+                dense, sparse = reusable[row.text_hash]
             row.embedding = dense
+            row.sparse = sparse_to_json(sparse)
             records.append(
                 VectorRecord(
                     chunk_id=row.id,
@@ -636,9 +653,11 @@ async def _gold(
                 result = await embed_client.embed(
                     [next(x.text for x in rows if x.id == records[i].chunk_id) for i in missing]
                 )
+                by_id = {x.id: x for x in rows}
                 for i, sparse in zip(missing, result.sparse, strict=True):
                     rec = records[i]
                     records[i] = VectorRecord(**{**rec.__dict__, "sparse": sparse})
+                    by_id[rec.chunk_id].sparse = sparse_to_json(sparse)
         await session.flush()
         reused = sum(1 for row in rows if row.chunk_status != "skipped" and row.id not in vectors)
         # Not searchable yet: search reads only `indexed` documents (review r1 MAJOR-3).
@@ -749,17 +768,53 @@ class ReindexRefused(Exception):
         self.code = code
 
 
-def _silver_scope(kb_id: uuid.UUID, full: bool):
+# Targeted reconversion (pipeline step 10, PayCore D2): an explicit preset names the problem;
+# only the documents it hit are read from raw again. `engine:<name>` is an exact convert_engine.
+PRESETS = ("encoding", "timeout", "mhtml")
+_ENGINE = re.compile(r"^engine:([a-z0-9][a-z0-9_.+-]{0,39})$")
+
+
+def parse_preset(preset: str) -> str:
+    """The preset as given, or ReindexRefused `preset_unknown` (never a guess)."""
+    if preset in PRESETS or _ENGINE.match(preset):
+        return preset
+    raise ReindexRefused(
+        "preset_unknown",
+        f"{preset!r} is not a preset; use one of {', '.join(PRESETS)} or engine:<convert_engine>",
+    )
+
+
+def _preset_condition(preset: str):
+    if preset == "encoding":
+        return Document.error.like("encoding_undecodable%")
+    if preset == "timeout":
+        return Document.status == "timeout"
+    if preset == "mhtml":
+        return or_(
+            Document.convert_engine.like("mhtml%"), Document.mime_sniffed == "multipart/related"
+        )
+    return Document.convert_engine == _ENGINE.match(preset).group(1)
+
+
+def _silver_scope(kb_id: uuid.UUID, full: bool, preset: str | None = None):
     statement = select(Document.id, Document.filename, Document.meta).where(
         Document.kb_id == kb_id, Document.deleted_at.is_(None)
     )
+    if preset is not None:
+        # A preset selects by the problem, whatever the status (an mhtml page may be indexed).
+        return statement.where(_preset_condition(parse_preset(preset)))
     if not full:
         statement = statement.where(Document.status.in_(("failed", "timeout", "pending")))
     return statement
 
 
+async def preset_document_count(kb_id: uuid.UUID, preset: str) -> int:
+    async with db.session_scope() as session:
+        return len((await session.execute(_silver_scope(kb_id, False, preset))).all())
+
+
 async def check_reindex_silver(
-    kb_id: uuid.UUID, *, full: bool, accept_personnel_data: bool = False
+    kb_id: uuid.UUID, *, full: bool, accept_personnel_data: bool = False, preset: str | None = None
 ) -> int:
     """r2 NOTE-5 (KARARLAR "08 tam 1b r2 ekleri"): a personnel-data record written with
     `pii_regex` (the M3 mode, names not masked) is reconverted only with
@@ -769,7 +824,7 @@ async def check_reindex_silver(
     With the flag the reindex goes on and the number of such records in scope is returned and
     logged (FOLLOWUP-172 N2: the M3 mode is visible, as ingest-raw's is)."""
     async with db.session_scope() as session:
-        rows = (await session.execute(_silver_scope(kb_id, full))).all()
+        rows = (await session.execute(_silver_scope(kb_id, full, preset))).all()
     personnel = 0
     for _, filename, meta in rows:
         meta = meta or {}
@@ -832,12 +887,17 @@ async def reindex_silver(
     embed_client: EmbedClient,
     convert: Converter = convert_bounded,
     accept_personnel_data: bool = False,
+    preset: str | None = None,
 ) -> ReindexReport:
     """`make reindex LAYER=silver`: reconvert from raw (never the source); then gold. Refused
-    as a whole when an M3 personnel-data record is in scope without the flag (r2 NOTE-5)."""
-    await check_reindex_silver(kb_id, full=full, accept_personnel_data=accept_personnel_data)
+    as a whole when an M3 personnel-data record is in scope without the flag (r2 NOTE-5).
+    With a preset (`make reconvert`) only the documents that problem hit are reconverted."""
+    await check_reindex_silver(
+        kb_id, full=full, accept_personnel_data=accept_personnel_data, preset=preset
+    )
     async with db.session_scope() as session:
-        ids = [row[0] for row in (await session.execute(_silver_scope(kb_id, full))).all()]
+        scope = _silver_scope(kb_id, full, preset).order_by(Document.created_at, Document.id)
+        ids = [row[0] for row in (await session.execute(scope)).all()]
     report = ReindexReport()
     for document_id in ids:
         result = await ingest_document(

@@ -176,6 +176,19 @@ class DocumentUpdate(Patch):
         default=None,
         description="When the source last changed; null clears it (unknown date).",
     )
+    acl_roles: list[Role] | None = Field(
+        default=None,
+        description="Roles that may read the document; replaces the current list. Applied to "
+        "the vector store before the answer (no reindex).",
+    )
+    acl_users: list[UUID] | None = Field(
+        default=None, description="Users that may read the document; replaces the current list."
+    )
+    acl_open: bool | None = Field(
+        default=None,
+        description="true: open the document to every project member (empty ACL), on purpose; "
+        "not with acl_roles or acl_users. An empty ACL is only set this way (C15).",
+    )
 
 
 class DocumentList(BaseModel):
@@ -198,19 +211,70 @@ class ReindexLayer(StrEnum):
     gold = "gold"
 
 
+PRESET_PATTERN = r"^(encoding|timeout|mhtml|engine:[a-z0-9][a-z0-9_.+-]{0,39})$"
+
+
 class ReindexRequest(Strict):
     layer: ReindexLayer = Field(
         description="silver: reconvert from raw; gold: rechunk and re-embed from silver. "
         "Neither goes back to the source system."
     )
     full: bool = Field(default=False, description="Every document, not only changed ones.")
+    preset: str | None = Field(
+        default=None,
+        pattern=PRESET_PATTERN,
+        description="Targeted reconversion (silver only): only the documents one problem hit. "
+        "encoding (encoding_undecodable), timeout, mhtml, engine:<convert_engine>.",
+    )
 
 
 class ReindexAccepted(BaseModel):
     job_id: str
     layer: ReindexLayer
     full: bool
+    preset: str | None = None
+    documents: int = Field(description="Documents in scope (with a preset: the ones it selects).")
+
+
+# --- Ingest report (FOLLOWUP-86, brief 04 "Rapor") ---
+
+
+class GateCount(BaseModel):
+    source: str = Field(description="metadata.source of the document; upload for manual ones.")
+    gate: Literal["gate0", "gate1", "gate2"]
+    status: GateStatus | None = Field(description="Null: the gate has not run.")
+    reason: str | None
     documents: int
+
+
+class RejectedDocument(BaseModel):
+    document_id: UUID
+    filename: str
+    source: str
+    status: DocumentStatus
+    gate: Literal["gate0", "gate1", "gate2"] = Field(description="The first gate that skipped.")
+    reason: str | None
+
+
+class RejectedChunk(BaseModel):
+    chunk_id: UUID
+    document_id: UUID
+    filename: str
+    ordinal: int
+    reason: str | None
+
+
+class IngestGateReport(BaseModel):
+    """Per gate the counts add up to `documents` (every document is counted once per gate).
+    Only documents the caller may read are counted and listed (C15)."""
+
+    documents: int
+    by_status: dict[str, int]
+    gates: list[GateCount]
+    rejected_documents: list[RejectedDocument]
+    rejected_documents_total: int
+    rejected_chunks: list[RejectedChunk]
+    rejected_chunks_total: int
 
 
 # --- Search ---
@@ -245,6 +309,15 @@ class SearchHit(BaseModel):
     rerank_score: float | None
 
 
+class FilteredHit(BaseModel):
+    chunk_id: UUID
+    document_id: UUID
+    document_name: str
+    reason: Literal["below_rerank_floor", "below_min_score"]
+    embed_score: float | None
+    rerank_score: float | None
+
+
 class SearchResponse(BaseModel):
     """Hits are ordered newest source first (recency is shown, not scored)."""
 
@@ -255,6 +328,27 @@ class SearchResponse(BaseModel):
     filtered_by_min_score: int
     normalizer_config_id: str
     latency_ms: int
+    filtered: list[FilteredHit] = Field(
+        default_factory=list,
+        description="Candidates the threshold removed, with the reason (the counts above).",
+    )
+    rerank_truncated: int = Field(
+        default=0, description="Candidate pairs longer than the reranker reads (C12, flagged)."
+    )
+
+    @classmethod
+    def from_result(cls, result) -> "SearchResponse":
+        return cls(
+            query_id=result.query_id,
+            hits=[SearchHit(**hit.__dict__) for hit in result.hits],
+            threshold_mode=result.threshold_mode,
+            filtered_by_rerank_floor=result.filtered_by_rerank_floor,
+            filtered_by_min_score=result.filtered_by_min_score,
+            normalizer_config_id=result.normalizer_config_id,
+            latency_ms=result.latency_ms,
+            filtered=[FilteredHit(**f.__dict__) for f in result.filtered],
+            rerank_truncated=result.rerank_truncated,
+        )
 
 
 # --- Internal embedding (service account only) ---
