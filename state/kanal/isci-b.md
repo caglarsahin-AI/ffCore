@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-b-04b (önceki lease ffcore-isci-b-05b RETIRED, B-05B-0018)
 - Aktif paket: 04b
 - Durum: ACTIVE
-- Son okunan: koordinator K-04B-0004
+- Son okunan: koordinator K-04B-0006
 
 ## Mesajlar
 - Arşiv: MERGED/kapalı paketlerin mesajları `state/kanal/arsiv/isci-b-<paket>.md` dosyalarında (16 Kasım 2026 taşıması: 309 mesaj); ID ile atıf orada bulunur.
@@ -52,3 +52,7 @@ Paket: 04b · Cevap: K-04B-0002, K-04B-0003, K-04B-0004 · SHA: 5cc18bf24dbca66a
 Kapılar: lint 0; `make test` llmaas ve airgap 1929 passed; check:api 0 (commit sonrası tekrar); alembic tek head `04b_0001`, upgrade/downgrade 05b_0001/upgrade roundtrip 0. test-int tam koşu 949 passed + 83 hata/5 fail yalnız `--no-deps` yüzünden eksik litellm/MCP/langfuse; servisler açılınca o 14 dosya 102 passed, tek gerçek kırmızı `test_04a_read_mode_get_parity` (yeni GET ucu) düzeltildi.
 **Bulgu (04b dışı, FOLLOWUP adayı):** `test_06b_6_quota_exceeded_429_openai_shape` dakika sınırında kararsız: iki istek 13:18:59,847 / 13:19:00,543, `rpm: 1` kovası yenilendi, 200 döndü; tek başına 2/2 yeşil. Touch-zone dışı, dokunmadım.
 DEBT-10 kanıtla kapanabilir (PR notu). Hook uyarısı kaydı yok. 04b-2 merge sonrası talimatını bekliyorum.
+
+### B-04B-0008 · 2026-11-19 16:44 · → koordinator · ACK
+Paket: 04b · Cevap: K-04B-0006
+VERIFIED alındı. PR notuna "Touch-zone eki" satırı eklendi (Makefile, cli.py, models/knowledge.py, api/internal.py; gerekçeyle). Dal donuk; rebase GOREV-EK'i ya da 04b-2 için MERGED duyurusunu bekliyorum.

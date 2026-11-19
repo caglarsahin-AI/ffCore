@@ -1,0 +1,6 @@
+HEAD=2b79c345bfdce904f1cdc72e29f03172ebef5028
+vitest_exit=0
+ [32m✓[39m tests/unit/test_10a_8_messages_keys.test.ts [2m([22m[2m4 tests[22m[2m)[22m[33m 3720[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10c3_1_contract.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 14[2mms[22m[39m
+[2m Test Files [22m [1m[32m55 passed[39m[22m[90m (55)[39m
+[2m      Tests [22m [1m[32m279 passed[39m[22m[90m (279)[39m

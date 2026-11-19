@@ -1,0 +1,26 @@
+HEAD=2b79c345bfdce904f1cdc72e29f03172ebef5028
+lint_exit=0
+
+> ffcore-frontend@0.1.0 lint
+> eslint
+
+typecheck_exit=0
+
+> ffcore-frontend@0.1.0 typecheck
+> tsc --noEmit
+
+
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.12 [39m[90m/repo/frontend[39m
+
+ [32m✓[39m tests/unit/test_10bp1_15_messages.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 10[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10af_18_messages_parse.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 104[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10a_8_messages_keys.test.ts [2m([22m[2m4 tests[22m[2m)[22m[33m 1749[2mms[22m[39m
+     [33m[2m✓[22m[39m rejects literal text in JSX [33m 1723[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10c3_4_calls_monitor.test.tsx [2m([22m[2m5 tests[22m[2m)[22m[33m 391[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m4 passed[39m[22m[90m (4)[39m
+[2m      Tests [22m [1m[32m14 passed[39m[22m[90m (14)[39m
+[2m   Start at [22m 13:44:39
+[2m   Duration [22m 6.63s[2m (transform 4.89s, setup 0ms, import 6.33s, tests 2.25s, environment 1.26s)[22m
+
+vitest_exit=0

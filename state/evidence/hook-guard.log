@@ -51,3 +51,4 @@
 2026-11-18T17:48:28	warn	inceleyici	Bash	KAPI	S=C:/Users/CAGLAR~1.SAH/AppData/Local/Temp/claude/9398d5fca5badfb5/ecb79a59-6471-4590-b997-842940d7a702/scratchpad; E=C:
 2026-11-19T15:33:12	warn	isci-c	Bash	KAPI	python - <<'EOF' p='state/kanal/isci-c.md' s=open(p,encoding='utf-8',newline='').read() old="- Son okunan: koordinator K
 2026-11-19T16:41:14	warn	isci-b	Bash	KAPI	python - <<'EOF' p='isci-b.md' s=open(p,encoding='utf-8',newline='').read() old="- Son okunan: koordinator K-04B-0001" a
+2026-11-19T16:45:10	warn	inceleyici	Bash	KAPI	S=C:/Users/CAGLAR~1.SAH/AppData/Local/Temp/claude/9398d5fca5badfb5/ecb79a59-6471-4590-b997-842940d7a702/scratchpad; cd /

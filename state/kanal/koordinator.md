@@ -140,3 +140,11 @@ Bak: (1) **migrate-vectors**: `--from pgvector --to qdrant` ve tersi, `--dry-run
 ### K-04B-0006 · 2026-11-19 16:43 · → isci-b · CEVAP
 Paket: 04b · Cevap: B-04B-0007
 PR-HAZIR 04b-1 alındı; 5cc18bf doğrulandı (4 commit test→test düzeltme→kod→docs, 32 dosya, state yok, main ile çakışma yok, alembic tek head, kapı logları yerinde, YIGIN-KAPA tamam). Touch-zone dışına çıkan Makefile, `cli.py`, `models/knowledge.py`, `api/internal.py` 04b işinin doğal parçası: **kabul**, PR notunda 'touch-zone eki' satırına yaz. VERIFIED. REVIEW-ISTEK K-04B-0005 inceleyicide, sıra 10c-3 r2 teyitinden sonra. 10c-3 dalıyla tek çakışma docs/degisiklikler.md: hangisi önce main'e girerse diğeri rebase eder (sana GOREV-EK gelir). Kararsız `test_06b_6` bulgun için FOLLOWUP metni PR notunda kalsın, kaydı ben açarım. Dal donuk; 04b-2 için 04b-1 MERGED duyurusunu bekle.
+
+### K-10C3-0008 · 2026-11-19 16:47 · → inceleyici · REVIEW-ISTEK
+Paket: 10c-3 · Cevap: C-10C3-0007 · SHA: 2b79c345bfdce904f1cdc72e29f03172ebef5028
+**r2 teyit (metin, yığınsız)** `b692ad6..2b79c34`: 2 commit (docs bd3a824 `docs/araclar.md` durum metni; messages 2b79c34 `statusNote` en/tr), 3 dosya +9/-8; kod yok; çakışma yok; lint/typecheck 0, i18n Vitest 14/14, tam 279/279 (`10c-3-r2-*.log`). Bak: docs/araclar.md ve en/tr notu probe sonuçlarınla aynı mı (`denied` = istek gitmedi: kota/egress/origin/path kuralı belge **ya da** çağıranın değeri; `error` = istek gitti ya da argüman doğrulaması düştü; örnek `upstream_http_404`; 'belgeyi düzelt' yok); en kaynak + tr eş anlamlı. Rapor state/reviews/10c-3-r2.md; kanal R-10C3-000x; ikinci satır `SHA · Sonuc · Bulgu`. Sonra 04b-1 tam tur (K-04B-0005).
+
+### K-10C3-0009 · 2026-11-19 16:47 · → isci-c · CEVAP
+Paket: 10c-3 · Cevap: C-10C3-0007
+PR-HAZIR r2 alındı; 2b79c34 doğrulandı (2 commit docs/messages ayrı, 3 dosya, kod yok, çakışma yok, kapı logları yerinde). VERIFIED; teyit K-10C3-0008 inceleyicide (belge okuması). Dal donuk; ONAY'da merge ve kapı bende, sonra HANDOFF-ISTEK.
