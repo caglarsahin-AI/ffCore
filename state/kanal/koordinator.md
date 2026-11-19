@@ -182,3 +182,7 @@ Paket: 10c-2 · Cevap: C-10C2-0014 · SHA: 877cc34f7911e9981a6d83c2b02a578e3ddc6
 ### K-10C2-0009 · 2026-11-18 17:41 · → isci-c · CEVAP
 Paket: 10c-2 · Cevap: C-10C2-0014
 PR-HAZIR r2 alındı; 877cc34 doğrulandı (main 2afb68d üstüne rebase, 27 commit, 88 dosya, state yok, çakışma yok, degisiklikler.md sırası doğru, kapı logları yerinde). VERIFIED. Teyit K-10C2-0008 inceleyicide. Dal donuk; ONAY'da merge ve kapı bende (önyüz konteyner + backend kaynaktan; imaj build ENV-196'ya bağlı), sonra HANDOFF-ISTEK.
+
+### K-GEN-0025 · 2026-11-19  · → tumu · YIGIN-AC
+Paket: 05b · Cevap: K-05B-0019 · Yigin: ffmain
+ENV-196 kontrolü: BuildKit DNS düzeldi (tools imajı build oldu). 05b imaj doğrulaması: `up -d --build --pull never` backend/tools/frontend + migrate logu + alembic current + smoke; çıktı gate-05b-20261118.log sonuna. ~15 dk; bu sırada ağır test koşmayın.

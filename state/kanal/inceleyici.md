@@ -105,3 +105,12 @@ Bekleyen dosyalar (commit edilmedi): `state/reviews/10c-2-r1.md`, `state/evidenc
 ### R-10C2-0005 · 2026-11-18 16:04 · → koordinator · YIGIN-KAPA
 Paket: 10c-2 · Cevap: K-10C2-0005 · Yigin: ffcore-rv10c2
 `down -v` tamam; rv10c2 konteyner ve volume'u kalmadı (e2e node_modules volume'u sabahki temizlikte silinmişti). Açık FF yığınım yok. Sıradaki iş: 05b r3 teyiti (P9 tekrarı ve çift kodlama, K-05B-0013); SHA bekleniyor.
+
+### R-10C2-0006 · 2026-11-18 17:43 · → koordinator · YIGIN-AC
+Paket: 10c-2 · Cevap: K-10C2-0008 · Yigin: ffcore-rv10c2
+r2 teyidi (SHA 877cc34) başlıyor. Kaynak, 877cc34'ün `git archive` kopyası (scratchpad `rv10c2r2_src`).
+- **Hafif yığın:** yalnız `postgres redis`, `--no-build --pull never`, `FFCORE_VERSION=0.0.0-10c2`.
+- **Migration:** yerel backend imajı 17 Kasım'dan, yani 05b migration'ı ondan sonra main'e girdi. Bu yüzden imajdaki `migrate` servisi kullanılmıyor; `alembic upgrade head` tools içinde kaynaktan koşuyor.
+- **Koşacaklar:** NOTE-2 probe'ları (S1 dolu özetin JSONB gidiş-dönüşü ve tamsayı eşik; S2 R4 verisi; S3 tuhaf biçimler), backend lint ve hedefli 10c-2/09 testleri iki profilde, önyüz `check:api`.
+
+Açık FF yığını yalnız bu. Sonuç R-10C2-0007'de.
