@@ -1,0 +1,169 @@
+HEAD=b692ad696b479cd4a4031328f1f5e19322b5f470 (git archive copy)
+== 197 probe
+2026-11-19 12:45:55,594 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-19 12:45:55,608 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=255
+2026-11-19 12:45:56,020 INFO ffcore.access access method=GET path=/api/v1/projects/002b5fce-ce7a-4348-a90b-485fbf46742c/eval-runs/6fa22c13-50ea-4521-8bd7-e6336183845c status=200 ms=383
+2026-11-19 12:45:56,074 INFO ffcore.access access method=GET path=/api/v1/projects/002b5fce-ce7a-4348-a90b-485fbf46742c/eval-suites/98f8f97c-ecca-4a73-8b5a-c0cd984df537/runs status=200 ms=50
+[RV] S1 float-threshold | stored pass_threshold/pass_rate: 0.8 0.6667 | styles ['dogrudan'] worst 3 lat {'p50': 1500, 'max': 2100} | detail 200 ok | list 200 ok
+2026-11-19 12:45:56,119 INFO ffcore.access access method=GET path=/api/v1/projects/002b5fce-ce7a-4348-a90b-485fbf46742c/eval-runs/5f47209b-495d-4d85-a437-ca30c8e5e8d7 status=200 ms=35
+2026-11-19 12:45:56,155 INFO ffcore.access access method=GET path=/api/v1/projects/002b5fce-ce7a-4348-a90b-485fbf46742c/eval-suites/98f8f97c-ecca-4a73-8b5a-c0cd984df537/runs status=200 ms=33
+[RV] S1 int-threshold-1 | stored pass_threshold/pass_rate: 1 0.6667 | styles ['dogrudan'] worst 3 lat {'p50': 1500, 'max': 2100} | detail 200 ok | list 200 ok
+2026-11-19 12:45:56,206 INFO ffcore.access access method=GET path=/api/v1/projects/002b5fce-ce7a-4348-a90b-485fbf46742c/eval-runs/91922e45-2cdc-43b6-8fc8-798dc44ef612 status=200 ms=41
+2026-11-19 12:45:56,266 INFO ffcore.access access method=GET path=/api/v1/projects/002b5fce-ce7a-4348-a90b-485fbf46742c/eval-suites/98f8f97c-ecca-4a73-8b5a-c0cd984df537/runs status=200 ms=55
+[RV] S1 int-threshold-0 | stored pass_threshold/pass_rate: 0 0.6667 | styles ['dogrudan'] worst 3 lat {'p50': 1500, 'max': 2100} | detail 200 ok | list 200 ok
+2026-11-19 12:45:56,319 INFO ffcore.access access method=GET path=/api/v1/projects/002b5fce-ce7a-4348-a90b-485fbf46742c/eval-runs/df24b125-1b45-440e-9bf5-07d9578ad338 status=200 ms=41
+2026-11-19 12:45:56,363 INFO ffcore.access access method=GET path=/api/v1/projects/002b5fce-ce7a-4348-a90b-485fbf46742c/eval-suites/98f8f97c-ecca-4a73-8b5a-c0cd984df537/runs status=200 ms=41
+[RV] S1 no-latency | stored pass_threshold/pass_rate: 0.8 0.6667 | styles ['dogrudan'] worst 3 lat None | detail 200 ok | list 200 ok
+[RV] S1 eval_summary_invalid logs: []
+.2026-11-19 12:45:56,647 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-19 12:45:56,667 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=142
+2026-11-19 12:45:56,718 WARNING ffcore.evaluation.api eval_summary_invalid eval_run_id=7b33428e-673f-4666-bd5e-db1f54bcbfb0 missing=complete,errors,latency_ms,not_run,outcomes,pass_threshold,passed,passed_items,scored,scores,styles,warm_cache,warmup_ms,worst invalid=complete,errors,latency_ms,not_run,outcomes,pass_threshold,passed,passed_items,scored,scores,styles,warm_cache,warmup_ms,worst
+2026-11-19 12:45:56,720 INFO ffcore.access access method=GET path=/api/v1/projects/58b1a72c-f3db-4612-a383-665861bc89c3/eval-runs/7b33428e-673f-4666-bd5e-db1f54bcbfb0 status=200 ms=50
+2026-11-19 12:45:56,758 WARNING ffcore.evaluation.api eval_summary_invalid eval_run_id=7b33428e-673f-4666-bd5e-db1f54bcbfb0 missing=complete,errors,latency_ms,not_run,outcomes,pass_threshold,passed,passed_items,scored,scores,styles,warm_cache,warmup_ms,worst invalid=complete,errors,latency_ms,not_run,outcomes,pass_threshold,passed,passed_items,scored,scores,styles,warm_cache,warmup_ms,worst
+2026-11-19 12:45:56,760 INFO ffcore.access access method=GET path=/api/v1/projects/58b1a72c-f3db-4612-a383-665861bc89c3/eval-suites/1be115ab-97c8-4d13-a2a0-079441fe5f20/runs status=200 ms=37
+[RV] S2 partial: (200, None, 200, None)
+2026-11-19 12:45:56,797 INFO ffcore.access access method=GET path=/api/v1/projects/58b1a72c-f3db-4612-a383-665861bc89c3/eval-runs/7b33428e-673f-4666-bd5e-db1f54bcbfb0/items status=200 ms=34
+[RV] S2 items: 200
+[RV] S2 logs: ['eval_summary_invalid eval_run_id=7b33428e-673f-4666-bd5e-db1f54bcbfb0 missing=complete,errors,latency_ms,not_run,outcomes,pass_threshold,passed,passed_items,scored,scores,styles,warm_cache,warmup_ms,w', 'eval_summary_invalid eval_run_id=7b33428e-673f-4666-bd5e-db1f54bcbfb0 missing=complete,errors,latency_ms,not_run,outcomes,pass_threshold,passed,passed_items,scored,scores,styles,warm_cache,warmup_ms,w']
+.2026-11-19 12:45:57,105 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-19 12:45:57,118 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=123
+2026-11-19 12:45:57,174 WARNING ffcore.evaluation.api eval_summary_invalid eval_run_id=cea79a36-4d2b-412f-beec-dc513d831eb6 missing=complete,errors,latency_ms,n,not_run,outcomes,pass_rate,pass_threshold,passed,passed_items,scored,scores,styles,warm_cache,warmup_ms,worst invalid=complete,errors,latency_ms,n,not_run,outcomes,pass_rate,pass_threshold,passed,passed_items,scored,scores,styles,warm_cache,warmup_ms,worst
+2026-11-19 12:45:57,176 INFO ffcore.access access method=GET path=/api/v1/projects/d8e0b104-ca74-4a57-bdfc-49b2491fba1c/eval-runs/cea79a36-4d2b-412f-beec-dc513d831eb6 status=200 ms=35
+2026-11-19 12:45:57,211 WARNING ffcore.evaluation.api eval_summary_invalid eval_run_id=cea79a36-4d2b-412f-beec-dc513d831eb6 missing=complete,errors,latency_ms,n,not_run,outcomes,pass_rate,pass_threshold,passed,passed_items,scored,scores,styles,warm_cache,warmup_ms,worst invalid=complete,errors,latency_ms,n,not_run,outcomes,pass_rate,pass_threshold,passed,passed_items,scored,scores,styles,warm_cache,warmup_ms,worst
+2026-11-19 12:45:57,214 INFO ffcore.access access method=GET path=/api/v1/projects/d8e0b104-ca74-4a57-bdfc-49b2491fba1c/eval-suites/194b52a2-8fb2-4246-9f1d-c05c9dc43dc4/runs status=200 ms=35
+[RV] S3 empty-object (200, None, 200, None)
+2026-11-19 12:45:57,267 WARNING ffcore.evaluation.api eval_summary_invalid eval_run_id=de55d836-cf90-4608-bb82-789d67f9c832 missing=complete,errors,latency_ms,n,not_run,outcomes,pass_rate,pass_threshold,passed,passed_items,scored,scores,styles,warm_cache,warmup_ms,worst invalid=
+2026-11-19 12:45:57,270 INFO ffcore.access access method=GET path=/api/v1/projects/d8e0b104-ca74-4a57-bdfc-49b2491fba1c/eval-runs/de55d836-cf90-4608-bb82-789d67f9c832 status=200 ms=47
+2026-11-19 12:45:57,316 WARNING ffcore.evaluation.api eval_summary_invalid eval_run_id=de55d836-cf90-4608-bb82-789d67f9c832 missing=complete,errors,latency_ms,n,not_run,outcomes,pass_rate,pass_threshold,passed,passed_items,scored,scores,styles,warm_cache,warmup_ms,worst invalid=
+2026-11-19 12:45:57,317 WARNING ffcore.evaluation.api eval_summary_invalid eval_run_id=cea79a36-4d2b-412f-beec-dc513d831eb6 missing=complete,errors,latency_ms,n,not_run,outcomes,pass_rate,pass_threshold,passed,passed_items,scored,scores,styles,warm_cache,warmup_ms,worst invalid=complete,errors,latency_ms,n,not_run,outcomes,pass_rate,pass_threshold,passed,passed_items,scored,scores,styles,warm_cache,warmup_ms,worst
+2026-11-19 12:45:57,319 INFO ffcore.access access method=GET path=/api/v1/projects/d8e0b104-ca74-4a57-bdfc-49b2491fba1c/eval-suites/194b52a2-8fb2-4246-9f1d-c05c9dc43dc4/runs status=200 ms=44
+[RV] S3 array (200, None, 200, None)
+2026-11-19 12:45:57,360 WARNING ffcore.evaluation.api eval_summary_invalid eval_run_id=2ecee5e1-2175-4079-98e6-967daa4d6363 missing=complete,errors,latency_ms,n,not_run,outcomes,pass_rate,pass_threshold,passed,passed_items,scored,scores,styles,warm_cache,warmup_ms,worst invalid=
+2026-11-19 12:45:57,362 INFO ffcore.access access method=GET path=/api/v1/projects/d8e0b104-ca74-4a57-bdfc-49b2491fba1c/eval-runs/2ecee5e1-2175-4079-98e6-967daa4d6363 status=200 ms=33
+2026-11-19 12:45:57,396 WARNING ffcore.evaluation.api eval_summary_invalid eval_run_id=2ecee5e1-2175-4079-98e6-967daa4d6363 missing=complete,errors,latency_ms,n,not_run,outcomes,pass_rate,pass_threshold,passed,passed_items,scored,scores,styles,warm_cache,warmup_ms,worst invalid=
+2026-11-19 12:45:57,397 WARNING ffcore.evaluation.api eval_summary_invalid eval_run_id=de55d836-cf90-4608-bb82-789d67f9c832 missing=complete,errors,latency_ms,n,not_run,outcomes,pass_rate,pass_threshold,passed,passed_items,scored,scores,styles,warm_cache,warmup_ms,worst invalid=
+2026-11-19 12:45:57,397 WARNING ffcore.evaluation.api eval_summary_invalid eval_run_id=cea79a36-4d2b-412f-beec-dc513d831eb6 missing=complete,errors,latency_ms,n,not_run,outcomes,pass_rate,pass_threshold,passed,passed_items,scored,scores,styles,warm_cache,warmup_ms,worst invalid=complete,errors,latency_ms,n,not_run,outcomes,pass_rate,pass_threshold,passed,passed_items,scored,scores,styles,warm_cache,warmup_ms,worst
+2026-11-19 12:45:57,399 INFO ffcore.access access method=GET path=/api/v1/projects/d8e0b104-ca74-4a57-bdfc-49b2491fba1c/eval-suites/194b52a2-8fb2-4246-9f1d-c05c9dc43dc4/runs status=200 ms=35
+[RV] S3 string (200, None, 200, None)
+2026-11-19 12:45:57,451 INFO ffcore.access access method=GET path=/api/v1/projects/d8e0b104-ca74-4a57-bdfc-49b2491fba1c/eval-runs/5368b1c2-e48f-4448-8a5e-339e10dc3564 status=200 ms=42
+2026-11-19 12:45:57,499 WARNING ffcore.evaluation.api eval_summary_invalid eval_run_id=2ecee5e1-2175-4079-98e6-967daa4d6363 missing=complete,errors,latency_ms,n,not_run,outcomes,pass_rate,pass_threshold,passed,passed_items,scored,scores,styles,warm_cache,warmup_ms,worst invalid=
+2026-11-19 12:45:57,499 WARNING ffcore.evaluation.api eval_summary_invalid eval_run_id=de55d836-cf90-4608-bb82-789d67f9c832 missing=complete,errors,latency_ms,n,not_run,outcomes,pass_rate,pass_threshold,passed,passed_items,scored,scores,styles,warm_cache,warmup_ms,worst invalid=
+2026-11-19 12:45:57,499 WARNING ffcore.evaluation.api eval_summary_invalid eval_run_id=cea79a36-4d2b-412f-beec-dc513d831eb6 missing=complete,errors,latency_ms,n,not_run,outcomes,pass_rate,pass_threshold,passed,passed_items,scored,scores,styles,warm_cache,warmup_ms,worst invalid=complete,errors,latency_ms,n,not_run,outcomes,pass_rate,pass_threshold,passed,passed_items,scored,scores,styles,warm_cache,warmup_ms,worst
+2026-11-19 12:45:57,501 INFO ffcore.access access method=GET path=/api/v1/projects/d8e0b104-ca74-4a57-bdfc-49b2491fba1c/eval-suites/194b52a2-8fb2-4246-9f1d-c05c9dc43dc4/runs status=200 ms=47
+[RV] S3 extra-key (200, {'n': 3, 'scored': 3, 'not_run': {}, 'passed_items': 2, 'pass_rate': 0.6667, 'pass_threshold': 0.8, 'passed': False, 'complete': True, 'scores': {'contains': 0.6667}, 'outcomes': {'answered': 3, 'declined': 0, 'not_reranked': 0, 'not_retrieved': 0, 'below_threshold': 0, 'unanswerable_held': 0, 'below_rerank_floor': 0, 'unanswerable_answered': 0}, 'styles': {'dogrudan': {'n': 3, 'passed': 2, 'outcomes': {'answered': 3}}}, 'worst': [{'item_id': 'q2', 'style': 'dogrudan', 'outcome': 'answered', 'passed': False, 'mean': 0.0, 'note': ''}, {'item_id': 'q1', 'style': 'dogrudan', 'outcome': 'answered', 'passed': True, 'mean': 1.0, 'note': ''}, {'item_id': 'q3', 'style': 'dogrudan', 'outcome': 'answered', 'passed': True, 'mean': 1.0, 'note': ''}], 'errors': {}, 'warm_cache': True, 'warmup_ms': 1200, 'latency_ms': {'p50': 1500, 'max': 2100}}, 200, {'n': 3, 'scored': 3, 'not_run': {}, 'passed_items': 2, 'pass_rate': 0.6667, 'pass_threshold': 0.8, 'passed': False, 'complete': True, 'scores': {'contains': 0.6667}, 'outcomes': {'answered': 3, 'declined': 0, 'not_reranked': 0, 'not_retrieved': 0, 'below_threshold': 0, 'unanswerable_held': 0, 'below_rerank_floor': 0, 'unanswerable_answered': 0}, 'styles': {'dogrudan': {'n': 3, 'passed': 2, 'outcomes': {'answered': 3}}}, 'worst': [{'item_id': 'q2', 'style': 'dogrudan', 'outcome': 'answered', 'passed': False, 'mean': 0.0, 'note': ''}, {'item_id': 'q1', 'style': 'dogrudan', 'outcome': 'answered', 'passed': True, 'mean': 1.0, 'note': ''}, {'item_id': 'q3', 'style': 'dogrudan', 'outcome': 'answered', 'passed': True, 'mean': 1.0, 'note': ''}], 'errors': {}, 'warm_cache': True, 'warmup_ms': 1200, 'latency_ms': {'p50': 1500, 'max': 2100}})
+2026-11-19 12:45:57,544 WARNING ffcore.evaluation.api eval_summary_invalid eval_run_id=db2121ab-d5a0-40a5-80b8-da82641914b1 missing=- invalid=n
+2026-11-19 12:45:57,546 INFO ffcore.access access method=GET path=/api/v1/projects/d8e0b104-ca74-4a57-bdfc-49b2491fba1c/eval-runs/db2121ab-d5a0-40a5-80b8-da82641914b1 status=200 ms=34
+2026-11-19 12:45:57,584 WARNING ffcore.evaluation.api eval_summary_invalid eval_run_id=db2121ab-d5a0-40a5-80b8-da82641914b1 missing=- invalid=n
+2026-11-19 12:45:57,585 WARNING ffcore.evaluation.api eval_summary_invalid eval_run_id=2ecee5e1-2175-4079-98e6-967daa4d6363 missing=complete,errors,latency_ms,n,not_run,outcomes,pass_rate,pass_threshold,passed,passed_items,scored,scores,styles,warm_cache,warmup_ms,worst invalid=
+2026-11-19 12:45:57,585 WARNING ffcore.evaluation.api eval_summary_invalid eval_run_id=de55d836-cf90-4608-bb82-789d67f9c832 missing=complete,errors,latency_ms,n,not_run,outcomes,pass_rate,pass_threshold,passed,passed_items,scored,scores,styles,warm_cache,warmup_ms,worst invalid=
+2026-11-19 12:45:57,585 WARNING ffcore.evaluation.api eval_summary_invalid eval_run_id=cea79a36-4d2b-412f-beec-dc513d831eb6 missing=complete,errors,latency_ms,n,not_run,outcomes,pass_rate,pass_threshold,passed,passed_items,scored,scores,styles,warm_cache,warmup_ms,worst invalid=complete,errors,latency_ms,n,not_run,outcomes,pass_rate,pass_threshold,passed,passed_items,scored,scores,styles,warm_cache,warmup_ms,worst
+2026-11-19 12:45:57,587 INFO ffcore.access access method=GET path=/api/v1/projects/d8e0b104-ca74-4a57-bdfc-49b2491fba1c/eval-suites/194b52a2-8fb2-4246-9f1d-c05c9dc43dc4/runs status=200 ms=38
+[RV] S3 float-for-int (200, None, 200, None)
+2026-11-19 12:45:57,630 WARNING ffcore.evaluation.api eval_summary_invalid eval_run_id=8b9df0c4-b180-4ce1-b9ec-a6d9189407c3 missing=complete,errors,latency_ms,n,not_run,outcomes,pass_rate,pass_threshold,passed,passed_items,scored,scores,styles,warm_cache,warmup_ms,worst invalid=
+2026-11-19 12:45:57,632 INFO ffcore.access access method=GET path=/api/v1/projects/d8e0b104-ca74-4a57-bdfc-49b2491fba1c/eval-runs/8b9df0c4-b180-4ce1-b9ec-a6d9189407c3 status=200 ms=34
+2026-11-19 12:45:57,670 WARNING ffcore.evaluation.api eval_summary_invalid eval_run_id=8b9df0c4-b180-4ce1-b9ec-a6d9189407c3 missing=complete,errors,latency_ms,n,not_run,outcomes,pass_rate,pass_threshold,passed,passed_items,scored,scores,styles,warm_cache,warmup_ms,worst invalid=
+2026-11-19 12:45:57,671 WARNING ffcore.evaluation.api eval_summary_invalid eval_run_id=db2121ab-d5a0-40a5-80b8-da82641914b1 missing=- invalid=n
+2026-11-19 12:45:57,671 WARNING ffcore.evaluation.api eval_summary_invalid eval_run_id=2ecee5e1-2175-4079-98e6-967daa4d6363 missing=complete,errors,latency_ms,n,not_run,outcomes,pass_rate,pass_threshold,passed,passed_items,scored,scores,styles,warm_cache,warmup_ms,worst invalid=
+2026-11-19 12:45:57,671 WARNING ffcore.evaluation.api eval_summary_invalid eval_run_id=de55d836-cf90-4608-bb82-789d67f9c832 missing=complete,errors,latency_ms,n,not_run,outcomes,pass_rate,pass_threshold,passed,passed_items,scored,scores,styles,warm_cache,warmup_ms,worst invalid=
+2026-11-19 12:45:57,672 WARNING ffcore.evaluation.api eval_summary_invalid eval_run_id=cea79a36-4d2b-412f-beec-dc513d831eb6 missing=complete,errors,latency_ms,n,not_run,outcomes,pass_rate,pass_threshold,passed,passed_items,scored,scores,styles,warm_cache,warmup_ms,worst invalid=complete,errors,latency_ms,n,not_run,outcomes,pass_rate,pass_threshold,passed,passed_items,scored,scores,styles,warm_cache,warmup_ms,worst
+2026-11-19 12:45:57,674 INFO ffcore.access access method=GET path=/api/v1/projects/d8e0b104-ca74-4a57-bdfc-49b2491fba1c/eval-suites/194b52a2-8fb2-4246-9f1d-c05c9dc43dc4/runs status=200 ms=39
+[RV] S3 bool-false (200, None, 200, None)
+2026-11-19 12:45:57,718 WARNING ffcore.evaluation.api eval_summary_invalid eval_run_id=8aeb684e-9629-4f27-98b4-e0f8a110481a missing=complete,errors,latency_ms,n,not_run,outcomes,pass_rate,pass_threshold,passed,passed_items,scored,scores,styles,warm_cache,warmup_ms,worst invalid=
+2026-11-19 12:45:57,720 INFO ffcore.access access method=GET path=/api/v1/projects/d8e0b104-ca74-4a57-bdfc-49b2491fba1c/eval-runs/8aeb684e-9629-4f27-98b4-e0f8a110481a status=200 ms=37
+2026-11-19 12:45:57,763 WARNING ffcore.evaluation.api eval_summary_invalid eval_run_id=8aeb684e-9629-4f27-98b4-e0f8a110481a missing=complete,errors,latency_ms,n,not_run,outcomes,pass_rate,pass_threshold,passed,passed_items,scored,scores,styles,warm_cache,warmup_ms,worst invalid=
+2026-11-19 12:45:57,764 WARNING ffcore.evaluation.api eval_summary_invalid eval_run_id=8b9df0c4-b180-4ce1-b9ec-a6d9189407c3 missing=complete,errors,latency_ms,n,not_run,outcomes,pass_rate,pass_threshold,passed,passed_items,scored,scores,styles,warm_cache,warmup_ms,worst invalid=
+2026-11-19 12:45:57,764 WARNING ffcore.evaluation.api eval_summary_invalid eval_run_id=db2121ab-d5a0-40a5-80b8-da82641914b1 missing=- invalid=n
+2026-11-19 12:45:57,764 WARNING ffcore.evaluation.api eval_summary_invalid eval_run_id=2ecee5e1-2175-4079-98e6-967daa4d6363 missing=complete,errors,latency_ms,n,not_run,outcomes,pass_rate,pass_threshold,passed,passed_items,scored,scores,styles,warm_cache,warmup_ms,worst invalid=
+2026-11-19 12:45:57,764 WARNING ffcore.evaluation.api eval_summary_invalid eval_run_id=de55d836-cf90-4608-bb82-789d67f9c832 missing=complete,errors,latency_ms,n,not_run,outcomes,pass_rate,pass_threshold,passed,passed_items,scored,scores,styles,warm_cache,warmup_ms,worst invalid=
+2026-11-19 12:45:57,765 WARNING ffcore.evaluation.api eval_summary_invalid eval_run_id=cea79a36-4d2b-412f-beec-dc513d831eb6 missing=complete,errors,latency_ms,n,not_run,outcomes,pass_rate,pass_threshold,passed,passed_items,scored,scores,styles,warm_cache,warmup_ms,worst invalid=complete,errors,latency_ms,n,not_run,outcomes,pass_rate,pass_threshold,passed,passed_items,scored,scores,styles,warm_cache,warmup_ms,worst
+2026-11-19 12:45:57,768 INFO ffcore.access access method=GET path=/api/v1/projects/d8e0b104-ca74-4a57-bdfc-49b2491fba1c/eval-suites/194b52a2-8fb2-4246-9f1d-c05c9dc43dc4/runs status=200 ms=44
+[RV] S3 bool-true (200, None, 200, None)
+2026-11-19 12:45:57,816 WARNING ffcore.evaluation.api eval_summary_invalid eval_run_id=b3239314-f38f-4fd3-b052-d782858da533 missing=complete,errors,latency_ms,n,not_run,outcomes,pass_rate,pass_threshold,passed,passed_items,scored,scores,styles,warm_cache,warmup_ms,worst invalid=
+2026-11-19 12:45:57,818 INFO ffcore.access access method=GET path=/api/v1/projects/d8e0b104-ca74-4a57-bdfc-49b2491fba1c/eval-runs/b3239314-f38f-4fd3-b052-d782858da533 status=200 ms=41
+2026-11-19 12:45:57,863 WARNING ffcore.evaluation.api eval_summary_invalid eval_run_id=b3239314-f38f-4fd3-b052-d782858da533 missing=complete,errors,latency_ms,n,not_run,outcomes,pass_rate,pass_threshold,passed,passed_items,scored,scores,styles,warm_cache,warmup_ms,worst invalid=
+2026-11-19 12:45:57,863 WARNING ffcore.evaluation.api eval_summary_invalid eval_run_id=8aeb684e-9629-4f27-98b4-e0f8a110481a missing=complete,errors,latency_ms,n,not_run,outcomes,pass_rate,pass_threshold,passed,passed_items,scored,scores,styles,warm_cache,warmup_ms,worst invalid=
+2026-11-19 12:45:57,863 WARNING ffcore.evaluation.api eval_summary_invalid eval_run_id=8b9df0c4-b180-4ce1-b9ec-a6d9189407c3 missing=complete,errors,latency_ms,n,not_run,outcomes,pass_rate,pass_threshold,passed,passed_items,scored,scores,styles,warm_cache,warmup_ms,worst invalid=
+2026-11-19 12:45:57,863 WARNING ffcore.evaluation.api eval_summary_invalid eval_run_id=db2121ab-d5a0-40a5-80b8-da82641914b1 missing=- invalid=n
+2026-11-19 12:45:57,864 WARNING ffcore.evaluation.api eval_summary_invalid eval_run_id=2ecee5e1-2175-4079-98e6-967daa4d6363 missing=complete,errors,latency_ms,n,not_run,outcomes,pass_rate,pass_threshold,passed,passed_items,scored,scores,styles,warm_cache,warmup_ms,worst invalid=
+2026-11-19 12:45:57,864 WARNING ffcore.evaluation.api eval_summary_invalid eval_run_id=de55d836-cf90-4608-bb82-789d67f9c832 missing=complete,errors,latency_ms,n,not_run,outcomes,pass_rate,pass_threshold,passed,passed_items,scored,scores,styles,warm_cache,warmup_ms,worst invalid=
+2026-11-19 12:45:57,864 WARNING ffcore.evaluation.api eval_summary_invalid eval_run_id=cea79a36-4d2b-412f-beec-dc513d831eb6 missing=complete,errors,latency_ms,n,not_run,outcomes,pass_rate,pass_threshold,passed,passed_items,scored,scores,styles,warm_cache,warmup_ms,worst invalid=complete,errors,latency_ms,n,not_run,outcomes,pass_rate,pass_threshold,passed,passed_items,scored,scores,styles,warm_cache,warmup_ms,worst
+2026-11-19 12:45:57,866 INFO ffcore.access access method=GET path=/api/v1/projects/d8e0b104-ca74-4a57-bdfc-49b2491fba1c/eval-suites/194b52a2-8fb2-4246-9f1d-c05c9dc43dc4/runs status=200 ms=44
+[RV] S3 float (200, None, 200, None)
+2026-11-19 12:45:57,915 WARNING ffcore.evaluation.api eval_summary_invalid eval_run_id=66971b6a-685f-47ab-a6af-ba992ae00a90 missing=complete,errors,latency_ms,n,not_run,outcomes,pass_rate,pass_threshold,passed,passed_items,scored,scores,styles,warm_cache,warmup_ms,worst invalid=
+2026-11-19 12:45:57,917 INFO ffcore.access access method=GET path=/api/v1/projects/d8e0b104-ca74-4a57-bdfc-49b2491fba1c/eval-runs/66971b6a-685f-47ab-a6af-ba992ae00a90 status=200 ms=40
+2026-11-19 12:45:57,966 WARNING ffcore.evaluation.api eval_summary_invalid eval_run_id=66971b6a-685f-47ab-a6af-ba992ae00a90 missing=complete,errors,latency_ms,n,not_run,outcomes,pass_rate,pass_threshold,passed,passed_items,scored,scores,styles,warm_cache,warmup_ms,worst invalid=
+2026-11-19 12:45:57,966 WARNING ffcore.evaluation.api eval_summary_invalid eval_run_id=b3239314-f38f-4fd3-b052-d782858da533 missing=complete,errors,latency_ms,n,not_run,outcomes,pass_rate,pass_threshold,passed,passed_items,scored,scores,styles,warm_cache,warmup_ms,worst invalid=
+2026-11-19 12:45:57,967 WARNING ffcore.evaluation.api eval_summary_invalid eval_run_id=8aeb684e-9629-4f27-98b4-e0f8a110481a missing=complete,errors,latency_ms,n,not_run,outcomes,pass_rate,pass_threshold,passed,passed_items,scored,scores,styles,warm_cache,warmup_ms,worst invalid=
+2026-11-19 12:45:57,967 WARNING ffcore.evaluation.api eval_summary_invalid eval_run_id=8b9df0c4-b180-4ce1-b9ec-a6d9189407c3 missing=complete,errors,latency_ms,n,not_run,outcomes,pass_rate,pass_threshold,passed,passed_items,scored,scores,styles,warm_cache,warmup_ms,worst invalid=
+2026-11-19 12:45:57,967 WARNING ffcore.evaluation.api eval_summary_invalid eval_run_id=db2121ab-d5a0-40a5-80b8-da82641914b1 missing=- invalid=n
+2026-11-19 12:45:57,968 WARNING ffcore.evaluation.api eval_summary_invalid eval_run_id=2ecee5e1-2175-4079-98e6-967daa4d6363 missing=complete,errors,latency_ms,n,not_run,outcomes,pass_rate,pass_threshold,passed,passed_items,scored,scores,styles,warm_cache,warmup_ms,worst invalid=
+2026-11-19 12:45:57,968 WARNING ffcore.evaluation.api eval_summary_invalid eval_run_id=de55d836-cf90-4608-bb82-789d67f9c832 missing=complete,errors,latency_ms,n,not_run,outcomes,pass_rate,pass_threshold,passed,passed_items,scored,scores,styles,warm_cache,warmup_ms,worst invalid=
+2026-11-19 12:45:57,968 WARNING ffcore.evaluation.api eval_summary_invalid eval_run_id=cea79a36-4d2b-412f-beec-dc513d831eb6 missing=complete,errors,latency_ms,n,not_run,outcomes,pass_rate,pass_threshold,passed,passed_items,scored,scores,styles,warm_cache,warmup_ms,worst invalid=complete,errors,latency_ms,n,not_run,outcomes,pass_rate,pass_threshold,passed,passed_items,scored,scores,styles,warm_cache,warmup_ms,worst
+2026-11-19 12:45:57,971 INFO ffcore.access access method=GET path=/api/v1/projects/d8e0b104-ca74-4a57-bdfc-49b2491fba1c/eval-suites/194b52a2-8fb2-4246-9f1d-c05c9dc43dc4/runs status=200 ms=51
+[RV] S3 number (200, None, 200, None)
+[RV] S3 logs: 47
+.
+3 passed in 9.37s
+exit 0
+== status probe
+2026-11-19 12:46:19,640 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-19 12:46:19,655 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=162
+2026-11-19 12:46:19,819 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-19 12:46:19,829 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=116
+2026-11-19 12:46:19,992 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-19 12:46:20,005 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=111
+2026-11-19 12:46:20,177 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-19 12:46:20,458 INFO ffcore.access access method=POST path=/api/v1/projects/0e6562a4-1333-43f0-9cc0-0995d43bfbc1/api-keys status=201 ms=397
+2026-11-19 12:46:20,646 INFO ffcore.access access method=POST path=/api/v1/projects/0e6562a4-1333-43f0-9cc0-0995d43bfbc1/mcp-servers status=201 ms=184
+2026-11-19 12:46:20,699 INFO ffcore.access access method=PATCH path=/api/v1/projects/0e6562a4-1333-43f0-9cc0-0995d43bfbc1/mcp-servers/aca58099-861e-4fb1-af45-f6b406bf74d5 status=200 ms=49
+2026-11-19 12:46:20,771 INFO mcp.server.streamable_http_manager StreamableHTTP session manager started
+2026-11-19 12:46:20,834 INFO ffcore.mcp_publish mcp_server_call server=rv-5f50231c operation=dots status=error code=invalid_arguments latency_ms=31
+2026-11-19 12:46:20,836 INFO mcp.server.streamable_http Terminating session: None
+2026-11-19 12:46:20,836 INFO mcp.server.streamable_http_manager StreamableHTTP session manager shutting down
+2026-11-19 12:46:20,837 INFO ffcore.access access method=POST path=/mcp/rv-5f50231c/ status=200 ms=135
+[RV] V1 pk '..' -> upstream [] | isError True | row status/code ('error', 'invalid_arguments')
+2026-11-19 12:46:20,868 INFO mcp.server.streamable_http_manager StreamableHTTP session manager started
+2026-11-19 12:46:20,921 INFO ffcore.mcp_publish mcp_server_call server=rv-5f50231c operation=dots status=error code=invalid_arguments latency_ms=22
+2026-11-19 12:46:20,922 INFO mcp.server.streamable_http Terminating session: None
+2026-11-19 12:46:20,923 INFO mcp.server.streamable_http_manager StreamableHTTP session manager shutting down
+2026-11-19 12:46:20,924 INFO ffcore.access access method=POST path=/mcp/rv-5f50231c/ status=200 ms=82
+[RV] V1 pk '.' -> upstream [] | isError True | row status/code ('error', 'invalid_arguments')
+2026-11-19 12:46:20,955 INFO mcp.server.streamable_http_manager StreamableHTTP session manager started
+2026-11-19 12:46:21,013 INFO ffcore.mcp_publish mcp_server_call server=rv-5f50231c operation=dots status=denied code=openapi_path_invalid latency_ms=25
+2026-11-19 12:46:21,015 INFO mcp.server.streamable_http Terminating session: None
+2026-11-19 12:46:21,016 INFO mcp.server.streamable_http_manager StreamableHTTP session manager shutting down
+2026-11-19 12:46:21,017 INFO ffcore.access access method=POST path=/mcp/rv-5f50231c/ status=200 ms=90
+[RV] V1 pk 'a/b' -> upstream [] | isError True | row status/code ('denied', 'openapi_path_invalid')
+2026-11-19 12:46:21,053 INFO mcp.server.streamable_http_manager StreamableHTTP session manager started
+2026-11-19 12:46:21,105 INFO ffcore.mcp_publish mcp_server_call server=rv-5f50231c operation=dots status=denied code=openapi_path_invalid latency_ms=21
+2026-11-19 12:46:21,106 INFO mcp.server.streamable_http Terminating session: None
+2026-11-19 12:46:21,106 INFO mcp.server.streamable_http_manager StreamableHTTP session manager shutting down
+2026-11-19 12:46:21,107 INFO ffcore.access access method=POST path=/mcp/rv-5f50231c/ status=200 ms=85
+[RV] V1 pk '../x' -> upstream [] | isError True | row status/code ('denied', 'openapi_path_invalid')
+2026-11-19 12:46:21,138 INFO mcp.server.streamable_http_manager StreamableHTTP session manager started
+2026-11-19 12:46:21,220 INFO ffcore.mcp_publish mcp_server_call server=rv-5f50231c operation=dots status=error code=upstream_http_404 latency_ms=55
+2026-11-19 12:46:21,221 INFO mcp.server.streamable_http Terminating session: None
+2026-11-19 12:46:21,221 INFO mcp.server.streamable_http_manager StreamableHTTP session manager shutting down
+2026-11-19 12:46:21,222 INFO ffcore.access access method=POST path=/mcp/rv-5f50231c/ status=200 ms=112
+[RV] V1 pk 'a\x08' -> upstream ['/api/v1/chart/a\x08'] | isError True | row status/code ('error', 'upstream_http_404')
+2026-11-19 12:46:21,252 INFO mcp.server.streamable_http_manager StreamableHTTP session manager started
+2026-11-19 12:46:21,303 INFO ffcore.mcp_publish mcp_server_call server=rv-5f50231c operation=dots status=error code=invalid_arguments latency_ms=21
+2026-11-19 12:46:21,305 INFO mcp.server.streamable_http Terminating session: None
+2026-11-19 12:46:21,305 INFO mcp.server.streamable_http_manager StreamableHTTP session manager shutting down
+2026-11-19 12:46:21,306 INFO ffcore.access access method=POST path=/mcp/rv-5f50231c/ status=200 ms=80
+[RV] V1 pk '%2e%2e' -> upstream [] | isError True | row status/code ('error', 'invalid_arguments')
+2026-11-19 12:46:21,335 INFO mcp.server.streamable_http_manager StreamableHTTP session manager started
+2026-11-19 12:46:21,390 INFO ffcore.mcp_publish mcp_server_call server=rv-5f50231c operation=dots status=error code=invalid_arguments latency_ms=24
+2026-11-19 12:46:21,391 INFO mcp.server.streamable_http Terminating session: None
+2026-11-19 12:46:21,392 INFO mcp.server.streamable_http_manager StreamableHTTP session manager shutting down
+2026-11-19 12:46:21,393 INFO ffcore.access access method=POST path=/mcp/rv-5f50231c/ status=200 ms=83
+[RV] V1 pk 'a%2Fb' -> upstream [] | isError True | row status/code ('error', 'invalid_arguments')
+2026-11-19 12:46:21,421 INFO mcp.server.streamable_http_manager StreamableHTTP session manager started
+2026-11-19 12:46:21,505 INFO ffcore.mcp_publish mcp_server_call server=rv-5f50231c operation=dots status=error code=upstream_http_404 latency_ms=56
+2026-11-19 12:46:21,507 INFO mcp.server.streamable_http Terminating session: None
+2026-11-19 12:46:21,507 INFO mcp.server.streamable_http_manager StreamableHTTP session manager shutting down
+2026-11-19 12:46:21,508 INFO ffcore.access access method=POST path=/mcp/rv-5f50231c/ status=200 ms=111
+[RV] V1 pk 'ok-value' -> upstream ['/api/v1/chart/ok-value'] | isError True | row status/code ('error', 'upstream_http_404')
+.
+1 passed in 10.60s
+exit 0

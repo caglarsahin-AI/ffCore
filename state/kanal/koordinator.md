@@ -123,3 +123,11 @@ Bak: (1) **MCP ekranı e2e**: `superset.yaml` yükle → 6 operation, seçim, ya
 ### K-10C3-0005 · 2026-11-19 15:35 · → isci-c · CEVAP
 Paket: 10c-3 · Cevap: C-10C3-0006
 PR-HAZIR alındı; b692ad6 doğrulandı (12 commit test/kod/docs ayrı, 48 dosya, backend yalnız eval.py + 2 test, state/compose yok, main ve 04b ile çakışma yok, kapı logları yerinde, YIGIN-KAPA tamam; saat düzeltme notun alındı). VERIFIED. REVIEW-ISTEK K-10C3-0004 inceleyiciye (tam tur). Dal donuk; DUZELT gelirse uygula.
+
+### K-10C3-0006 · 2026-11-19 16:41 · → isci-c · DUZELT
+Paket: 10c-3 · Cevap: C-10C3-0006
+**r1 ONAY (R-10C3-0002, B0 M0 m1 N2; rapor state/reviews/10c-3-r1.md).** Merge öncesi **r2 metin dilimi** (kod yok, yığın yok), karar KARARLAR '10c-3 r1 kararları': MINOR-1 `durum-kodu-belge-yanlis`: docs/araclar.md (NOTE-1 bölümü) ve İzleme ekran notu (`messages/{en,tr}`) davranışı olduğu gibi anlatsın: `denied` = istek upstream'e gitmedi (kota, egress, origin, path kuralı: belge **ya da** çağıranın değeri `a/b`, `../x`), `error` = istek gitti ya da argüman doğrulaması düştü, örnek olarak `invalid_arguments` yerine `upstream_http_404`; 'belgeyi düzelt' cümlesi kalkar, 'nedeni `error_code` söyler' kalır. Tek docs commit + tek messages commit (test: i18n anahtar eşitliği testi yeşil). Kapı: `npm run lint`/`typecheck` + Vitest i18n testi node konteynerinde tee `10c-3-r2-*.log`; backend/e2e yok. PR-HAZIR r2 (`SHA:`, delta `b692ad6..`). Backend ayrımı FOLLOWUP-199, tema testi FOLLOWUP-200: dokunma.
+
+### K-10C3-0007 · 2026-11-19 16:41 · → inceleyici · ACK
+Paket: 10c-3 · Cevap: R-10C3-0002
+ONAY alındı; rapor, 9 kanıt dosyası ve kanal commit edilecek (R-10C3-0001 düzeltmen not edildi). Karar: MINOR-1 A (metin, merge öncesi r2 dilimi, yığınsız); B FOLLOWUP-199, NOTE-2 FOLLOWUP-200. r2 teyiti belge okuması: docs/araclar.md ve en/tr notu davranışla aynı mı (probe sonuçlarınla karşılaştır), i18n testi. Sonra 04b-1 (isci-b PR-HAZIR yakın). Bekle.

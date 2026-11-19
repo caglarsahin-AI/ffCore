@@ -2,10 +2,10 @@
 
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
-- Oturum kimliği: ffcore-inceleyici-10c2 (önceki: ffcore-inceleyici-05b, r2 için askıda)
-- Aktif paket: bekleme; 10c-2 MERGED b93cd96, 05b MERGED 2e75ba2; sonraki iş dalga 6b (04b, 10c-3) kullanıcı seçiminden sonra
+- Oturum kimliği: ffcore-inceleyici-10c3 (önceki: ffcore-inceleyici-10c2)
+- Aktif paket: 10c-3 r1 tamam (ONAY m1, R-10C3-0002); koordinatör kararı bekleniyor
 - Durum: ACTIVE
-- Son okunan: koordinator K-10C2-0014
+- Son okunan: koordinator K-10C3-0004
 
 ## Mesajlar
 - Arşiv: MERGED/kapalı paketlerin mesajları `state/kanal/arsiv/inceleyici-<paket>.md` dosyalarında (16 Kasım 2026 taşıması: 335 mesaj); ID ile atıf orada bulunur.
@@ -40,3 +40,15 @@ K-GEN-0022 alındı. Ama Docker motoru şu an çalışmıyor:
 Docker Desktop'ı açmak kullanıcının işi; ben açmıyorum. Motor gelince sıra şöyle:
 1. 05b r2: rv05b hafif yığını, YIGIN-AC, probe'lar (P1-P9) ve hedefli testler, rapor, YIGIN-KAPA.
 2. 10c-2: rv10c2, test-int (qdrant) ve probe'lar.
+
+### R-10C3-0001 · 2026-11-19 15:38 · → koordinator · YIGIN-AC
+Paket: 10c-3 · Cevap: K-10C3-0004 · Yigin: ffcore-rv10c3
+Kaynak: b692ad6'nın `git archive` kopyası (scratchpad `rv10c3_src`); e2e ekran görüntüleri ve `.next` worktree'ye yazılmaz. Yığın `docker compose -p ffcore-rv10c3 --env-file .env.test --profile test up -d --wait --no-build --pull never`, `FFCORE_VERSION=0.0.0-10c3` (işçinin `0.0.0-main` kopyası etiketleri), `BACKEND_PORT=18530`, `FRONTEND_PORT=13530`; e2e için PR notundaki koşu ortamı (`ALLOWED_INTERNAL_HOSTS` + `ffcore-rv10c3-e2e-upstream`, `EGRESS_ALLOWLIST=superset.example.com`); node_modules `ffcore-10a-nm`'den `ffcore-rv10c3_e2e_node_modules`'a kopya. Sıra: backend lint+test iki profil (kaynaktan), hedefli test-int, önyüz kapısı, tam e2e, probe'lar. Açık yığınlar: 04b + bu. Bitince `down -v` + YIGIN-KAPA.
+
+### R-10C3-0002 · 2026-11-19 16:39 · → koordinator · REVIEW-SONUC
+Paket: 10c-3 · Cevap: K-10C3-0004 · SHA: b692ad696b479cd4a4031328f1f5e19322b5f470 · Sonuc: ONAY · Bulgu: B0 M0 m1 N2
+Rapor `state/reviews/10c-3-r1.md`. Kapı (archive kopyası, yığın `ffcore-rv10c3`): backend lint + make test 1925×2; test-int (qdrant) 1012 passed / 13 skipped; önyüz lint/typecheck/check:api 0, Vitest 279/279; **e2e tam 189/189** (`test_10a_1` ilk test olarak yeşil). Odak maddeleri tamam: yükle → 6 operasyon → yayınla → `/test` Reachable → araç olarak ekle; `openapi_path_invalid` 422 + neden gösterimi; izleme ok/error gerçek, denied/blocked/run_id Vitest (S3); read iki tema + axe; developer NOT_RUN gerekçesi (`role_reserved`) kabul edilebilir, Vitest kapsıyor. Sahte upstream yalnız e2e'de: compose/deploy/.env.test diff'i boş. **197 kapandı:** probe'da `true`, `0.5`, `3`, `false`, dizi, string, `{}` → detay ve suite listesi 200 + null + log. errors.ts 27 kod en+tr, sabit metin yok. **MINOR-1 `durum-kodu-belge-yanlis`:** docs/araclar.md "`denied` + `openapi_path_invalid` = kayıtlı belge bozuk, çağıranı değil belgeyi düzelt" diyor; probe'da çağıranın `a/b`, `../x` değeri de aynı çifti alıyor (FOLLOWUP-195'in istediği ayrım tam bu). Ekran notu (en+tr) `error`'u "istek yapıldı" diye tanımlayıp örnek olarak `invalid_arguments` veriyor; o satırda istek gitmiyor. Seçenek A metin düzeltmesi (bu dal), B `build_request` literal `/` `\` → `invalid_arguments` (backend, ayrı FOLLOWUP). NOTE-1 gerçek `denied` satırı e2e'de `a/b` ile ucuza üretilebilir; NOTE-2 `test_10a_1` zamanlamaya duyarlı (`firstPaintClass` ""), 10c-3 etkisi değil, ayrı FOLLOWUP önerisi. Bekleyen (commit edilmedi): rapor, `state/evidence/10c-3-r1-rv-*.log` (9), `state/kanal/inceleyici.md`.
+
+### R-10C3-0003 · 2026-11-19 16:39 · → koordinator · YIGIN-KAPA
+Paket: 10c-3 · Cevap: K-10C3-0004 · Yigin: ffcore-rv10c3
+`down -v --remove-orphans` exit 0; `ffcore-rv10c3_e2e_node_modules` adıyla silindi; rv10c3 adlı konteyner ve volume kalmadı (`10c-3-r1-rv-down.log`). Açık FF yığını yalnız 04b.

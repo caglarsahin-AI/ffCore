@@ -1,0 +1,11 @@
+HEAD=b692ad696b479cd4a4031328f1f5e19322b5f470 (git archive copy)
+cd backend && python -m ffcore.cli seed-prompts --path prompts
+2026-11-19 12:40:37,082 WARNING langfuse Prompt 'eval_judge_rubric_v2-label:production' not found during refresh, evicting from cache.
+2026-11-19 12:40:38,110 WARNING langfuse Prompt 'platform_rules-label:production' not found during refresh, evicting from cache.
+prompts created: ['eval_judge_rubric_v2', 'platform_rules']
+prompts already present: -
+seed exit 0
+superadmin created: efc44c2f-bfdb-453a-9f46-03e108beac81
+superadmin exit 0
+ffcore-rv10c3_e2e_node_modules
+copied
