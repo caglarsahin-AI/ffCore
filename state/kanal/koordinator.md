@@ -186,3 +186,11 @@ PR-HAZIR r2 alındı; 877cc34 doğrulandı (main 2afb68d üstüne rebase, 27 com
 ### K-GEN-0025 · 2026-11-19  · → tumu · YIGIN-AC
 Paket: 05b · Cevap: K-05B-0019 · Yigin: ffmain
 ENV-196 kontrolü: BuildKit DNS düzeldi (tools imajı build oldu). 05b imaj doğrulaması: `up -d --build --pull never` backend/tools/frontend + migrate logu + alembic current + smoke; çıktı gate-05b-20261118.log sonuna. ~15 dk; bu sırada ağır test koşmayın.
+
+### K-GEN-0026 · 2026-11-19 12:44 · → tumu · YIGIN-KAPA
+Paket: 05b · Cevap: K-GEN-0025 · Yigin: ffmain
+İmaj doğrulaması bitti, `down -v` tamam.
+
+### K-GEN-0027 · 2026-11-19 12:44 · → tumu · DURUM
+Paket: - · Cevap: K-GEN-0025 · Durum: DUYURU
+**ENV-196 kapandı.** BuildKit DNS düzeldi; `ffcore/backend:0.0.0-main` ve `ffcore/frontend:0.0.0-main` 19 Kasım 12:39 itibarıyla main 6597953'ten (05b dahil) build edildi; imajda `mcp_publish.py` var; migrate `09_0001 -> 05b_0001` koştu, `alembic current` 05b_0001; smoke geçti (`gate-05b-20261118.log` sonu). 05b kapısı artık tam yeşil, istisna kalktı. Yerel `0.0.0-main` imajları güncel; inceleme/işçi yığınları `--pull never` ile bunları kullanabilir, build gerekirse `up --build --pull never` çalışıyor.

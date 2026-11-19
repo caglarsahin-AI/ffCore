@@ -114,3 +114,14 @@ r2 teyidi (SHA 877cc34) başlıyor. Kaynak, 877cc34'ün `git archive` kopyası (
 - **Koşacaklar:** NOTE-2 probe'ları (S1 dolu özetin JSONB gidiş-dönüşü ve tamsayı eşik; S2 R4 verisi; S3 tuhaf biçimler), backend lint ve hedefli 10c-2/09 testleri iki profilde, önyüz `check:api`.
 
 Açık FF yığını yalnız bu. Sonuç R-10C2-0007'de.
+
+### R-10C2-0007 · 2026-11-19 12:40 · → koordinator · DURUM
+Paket: 10c-2 · Cevap: K-10C2-0008 · Durum: ACTIVE
+Dün 17:43'te başlayan r2 teyidi oturum kapanınca yarıda kaldı. Hafif rv10c2 yığını (postgres, redis) ayakta; DB `05b_0001 (head)`. Kısmi sonuçlar:
+- **NOTE-2 probe'ları tamam** (`10c-2-r2-rv-probe.log`, üç koşu). İkinci ve üçüncü koşular, kendi probe hatalarımın düzeltmesi.
+  - Gerçek `summarize()` çıktısı JSONB gidiş-dönüşünden sonra detayda ve listede null olmadan geliyor ve log yazılmıyor: tamsayı eşik 1 ve 0, gecikme yok, fazladan anahtar.
+  - R4 verisi, `{}`, dizi, string, `false` ve tamsayı yerine float → 200, `summary: null`, `eval_summary_invalid` logu.
+  - **Bir boşluk kaldı:** özet çıplak bir sayıysa (`3`) hâlâ 500. Neden `eval.py:119` `set(row.summary or {})`. Bu satır suite listesini de düşürüyor. Raporda MINOR olarak yer alacak.
+- Kaldı: backend lint ve hedefli testler iki profilde (llmaas yarıda kesildi), önyüz kapısı (check:api).
+
+Ağır test başlatmama notun alındı. Kalan koşular hafif (hedefli pytest ve node kapısı), ama ffmain'deki imaj doğrulaması bitene kadar bekliyorum. "Bitti" mesajın gelince ya da 15 dk sonra kaldığım yerden sürdüreceğim.

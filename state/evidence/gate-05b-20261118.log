@@ -206,3 +206,58 @@ down exit=0
 ------
 failed to solve: ghcr.io/astral-sh/uv:0.10.12: failed to do request: Head "https://ghcr.io/v2/astral-sh/uv/manifests/0.10.12": dialing ghcr.io:443 container via direct connection because  has no HTTPS proxy: resolving host ghcr.io: lookup ghcr.io: no such host
 upbuild2 exit=17
+=== gate05b imaj dogrulama (ENV-196 sonrasi) main 6597953 2026-11-19 12:38:47
+
+=== 12:38:48 up -d --build --pull never (backend tools frontend + test profili)
+ Container ffmain-langfuse-clickhouse-1  Healthy
+ Container ffmain-langfuse-redis-1  Healthy
+ Container ffmain-agent-worker-1  Healthy
+ Container ffmain-redis-1  Healthy
+ Container ffmain-langfuse-minio-1  Healthy
+ Container ffmain-litellm-1  Healthy
+ Container ffmain-migrate-1  Exited
+ Container ffmain-frontend-1  Healthy
+ Container ffmain-langfuse-web-1  Healthy
+ Container ffmain-qdrant-1  Healthy
+ Container ffmain-ticket-desk-1  Healthy
+ Container ffmain-langfuse-postgres-1  Healthy
+ Container ffmain-backend-1  Healthy
+ Container ffmain-mcp-sql-1  Healthy
+ Container ffmain-mcp-search-1  Healthy
+upbuild exit=0
+ffcore/frontend:0.0.0-main 2026-11-19 12:40:21 +0300 +03
+ffcore/backend:0.0.0-main 2026-11-19 12:39:01 +0300 +03
+ffcore/tools:0.0.0-main 2026-11-05 21:09:24 +0300 +03
+
+=== 12:42:09 imajda 05b kodu
+/app/ffcore/services/mcp_publish.py
+find exit=0
+
+=== 12:42:22 migrate logu (05b_0001)
+migrate-1  | INFO  [alembic.runtime.migration] Running upgrade 03a_0001, 03b_0001, 06a_0002, 07_0001 -> 57_0001, join the heads that other branches depend on (FOLLOWUP-57/132, step 1 of 2)
+migrate-1  | INFO  [alembic.runtime.migration] Running upgrade 57_0001, 03c_0002, 04a_0001, 05a_0001, 08_0001 -> 57_0002, merge the package branch heads into one head (FOLLOWUP-57/132, step 2 of 2)
+migrate-1  | INFO  [alembic.runtime.migration] Running upgrade 57_0002 -> 06b_0001, 06b-2: external agents (kind = external) keep their endpoint in agents.external_config
+migrate-1  | INFO  [alembic.runtime.migration] Running upgrade 06b_0001 -> 09_0001, 09: eval_suites, eval_runs (local rows over Langfuse datasets and dataset runs)
+migrate-1  | INFO  [alembic.runtime.migration] Running upgrade 09_0001 -> 05b_0001, 05b: published MCP servers (mcp_servers) and their calls (mcp_server_calls)
+
+=== 12:42:34 alembic current (tools kaynaktan, DB)
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+05b_0001 (head)
+
+=== 12:42:49 smoke
+python scripts/smoke.py
+ok    backend /healthz 200
+ok    litellm /health/liveliness 200
+ok    langfuse /api/public/health 200, /api/public/projects 200
+ok    mcp-search /healthz 200
+ok    mcp-sql /healthz 200
+ok    skipped: ollama profile inactive
+smoke: passed
+smoke exit=0
+
+=== 12:43:02 down -v
+ Volume ffmain_qdrant_data  Removed
+ Volume ffmain_postgres_data  Removed
+imaj dogrulama script exit 0
+imaj dogrulama exit=0
