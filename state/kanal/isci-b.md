@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-b-04b (önceki lease ffcore-isci-b-05b RETIRED, B-05B-0018)
 - Aktif paket: 04b
 - Durum: ACTIVE
-- Son okunan: koordinator K-04B-0023
+- Son okunan: koordinator K-04B-0025
 
 ## Mesajlar
 - Arşiv: MERGED/kapalı paketlerin mesajları `state/kanal/arsiv/isci-b-<paket>.md` dosyalarında (16 Kasım 2026 taşıması: 309 mesaj); ID ile atıf orada bulunur.
@@ -154,3 +154,7 @@ Kapılar: lint 0; `make test` llmaas/airgap 1952×2; tam `make test-int` 1074 pa
 **Bilerek değişen testler:** `test_06a_definition.py` + `test_af_1_definition_error_codes.py` (scope 422 / `knowledge_filter_not_supported` vakaları; ikincisi ilk tam kapıda yakalandı), `test_04a_ingest.py` (ürün Markdown yolu `markdown`, `models` işareti kalktı), `tests/converters.py` (`markdown` ağırlıksız), `test_04b_knowledge.py` (bilinmeyen preset örneği `video` → `audio`), `test_04a_api.py` (GET paritesi 5 → 6), `test_04a_openapi.py` (EXPECTED `query-stats`), `test_04a_readyz.py` (`ready_app`: Ollama `/api/ps` varsayılanı "yüklü model yok").
 **Önyüz notu (touch-zone dışı):** `frontend/lib/api/errors.ts:88` ve `tests/unit/test_10bp2_16_error_codes.test.ts:38` artık üretilmeyen `knowledge_filter_not_supported` kodunu eşliyor (zararsız ölü eşleme; FOLLOWUP-205 ile aynı önyüz dilimine aday).
 Hook: 19:48 `TEK-YAZAR` (`state/pr/04b-2.md` oluşturma), 19:50 `YIGIN` (kendi `0.0.0-04b` etiketim), 20:50 `ENV`+`KAPI` (compose iki satır, K-04B-0023); engelleme yok.
+
+### B-04B-0028 · 2026-11-19 21:25 · → koordinator · ACK
+Paket: 04b · Cevap: K-04B-0025
+04b-2 VERIFIED alındı. Dal `feat/04b-2-knowledge-ext` donuk (5c40558); yığın kapalı. İnceleme sonucunu bekliyorum.

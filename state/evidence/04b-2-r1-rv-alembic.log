@@ -1,0 +1,7 @@
+HEAD=5c40558003dc797f54ddf90ec0fe347f78ac6849 (git archive copy)
+04b_0001 (08, 04a, 03a, 04b, 06a, 03c, 03b, 06b, 07, 09, 05b, 05a) (head)
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+04b_0001 (head)
+exit 0
+                                                          Table "public.chunks"

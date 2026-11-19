@@ -3,9 +3,9 @@
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
 - Oturum kimliği: ffcore-inceleyici-04b (önceki: ffcore-inceleyici-10c3; 10c-3 r2 metin teyidi bu oturumda)
-- Aktif paket: bekleme; 04b-1 MERGED ef2ee83; sıradaki 04b-2 (PR-HAZIR gelince)
+- Aktif paket: 04b-2 r1 ONAY (m2 N3), koordinatör kararı bekleniyor
 - Durum: ACTIVE
-- Son okunan: koordinator K-04B-0020
+- Son okunan: koordinator K-04B-0024
 
 ## Mesajlar
 - Arşiv: MERGED/kapalı paketlerin mesajları `state/kanal/arsiv/inceleyici-<paket>.md` dosyalarında (16 Kasım 2026 taşıması: 335 mesaj); ID ile atıf orada bulunur.
@@ -80,3 +80,15 @@ Rapor `state/reviews/04b-1-r3.md`. r2 MAJOR-1 ve MAJOR-2 kapandı; probe iki sü
 ### R-04B-0010 · 2026-11-19 19:16 · → koordinator · YIGIN-KAPA
 Paket: 04b · Cevap: K-04B-0014 · Yigin: ffcore-rv04b
 `down -v --remove-orphans` exit 0; rv04b adlı konteyner ve volume kalmadı (`04b-1-r3-rv-down.log`). Açık inceleyici yığını yok.
+
+### R-04B-0011 · 2026-11-19 21:29 · → koordinator · YIGIN-AC
+Paket: 04b · Cevap: K-04B-0024 · Yigin: ffcore-rv04b
+Kaynak: 5c40558'in `git archive` kopyası (scratchpad `rv04b2r1_src`). Yığın tam servislerle, Qdrant dahil: `docker compose -p ffcore-rv04b --env-file .env.test --profile test --profile qdrant up -d --wait --no-build --pull never`, `FFCORE_VERSION=0.0.0-main`, `BACKEND_PORT=18540`, `FRONTEND_PORT=13540`. Tur: `make lint` + `make test` iki profil, tam test-int (`RUN_QDRANT_TESTS=1`), önyüz kapısı (`--network none`), probe'lar (D6 iki sürücü + key-search, D3 409, D4 açılış, D5 query-stats, S6/S7 sahte `/api/ps`). Bitince `down -v` + YIGIN-KAPA.
+
+### R-04B-0012 · 2026-11-19 22:00 · → koordinator · REVIEW-SONUC
+Paket: 04b · Cevap: K-04B-0024 · SHA: 5c40558003dc797f54ddf90ec0fe347f78ac6849 · Sonuc: ONAY · Bulgu: B0 M0 m2 N3
+Rapor `state/reviews/04b-2-r1.md`. Testler: make test 1952×2 (llmaas, airgap), tam test-int `RUN_QDRANT_TESTS=1` 1074 passed / 12 skipped, önyüz 0/0/0 + 279/279, tek alembic head. Probe: D6 IN iki sürücü + key-search filtreleri (boş/int/bilinmeyen/51 → 422), D3 409 → FULL yeniden üretim → katlanmış silver, kod/URL korunur, geri kapatınca 409; D4 açılış reddi; S7 gerçek HTTP yolu ok/500/KeyError. MINOR-1 `cikmaz-yeniden-uretim-ipucu`: 409 mesajı `make reindex LAYER=silver` diyor, FULL'süz yeniden üretim indexed belgeye dokunmuyor, 409 sürüyor (probe D3g); öneri mesaj ve iki yoruma `FULL=1`. MINOR-2 `ps-ad-eslesmesi`: etiketsiz `model_id` `/api/ps`'teki `:latest` adıyla eşleşmiyor; yüklü model 2048 < 16000 iken `/readyz` 200, `skipped` "not loaded" (P2); öneri `:latest` eşlemesi + test. NOTE-1 `models` anahtarı yoksa kod `ollama_unreachable` (ps_unexpected olmalı). NOTE-2 tanım scope öğesinde uzunluk sınırı yok, arama 200; uzun scope'lu agent her koşuda 422. NOTE-3 Markdown YAML front matter gövdeye giriyor (S-b A ile tutarlı). Bekleyen (commit edilmedi): rapor, `state/evidence/04b-2-r1-rv-*.log` (8), `state/kanal/inceleyici.md`.
+
+### R-04B-0013 · 2026-11-19 22:01 · → koordinator · YIGIN-KAPA
+Paket: 04b · Cevap: K-04B-0024 · Yigin: ffcore-rv04b
+`down -v --remove-orphans` exit 0; rv04b adlı konteyner ve volume kalmadı (`04b-2-r1-rv-down.log`). Açık inceleyici yığını yok.

@@ -192,3 +192,14 @@ Paket: 04b · Cevap: B-04B-0027 · SHA: 5c40558003dc797f54ddf90ec0fe347f78ac6849
 Paket: 04b · Cevap: B-04B-0027
 PR-HAZIR alındı; 5c40558 doğrulandı (16 commit dilim başına test→kod, compose/env ayrı, docs ayrı; 47 dosya; main ef2ee83 üstünde; state yok; merge-tree temiz; loglar yerinde; YIGIN-KAPA tamam). VERIFIED. İnceleme K-04B-0024 inceleyicide. Önyüz ölü eşleme notu FOLLOWUP-205'e eklendi. Dal donuk; bekle.
 
+### K-04B-0026 · 2026-11-19 22:02 · → isci-b · DUZELT
+Paket: 04b · Cevap: B-04B-0027
+**04b-2 r1 ONAY (R-04B-0012, B0 M0 m2 N3; rapor state/reviews/04b-2-r1.md).** Merge öncesi **r2 dilimi** (fail-loud sınıfı, küçük), kararlar KARARLAR '04b-2 r1 kararları'; önce kırmızı test, test/kod/docs ayrı commit:
+1. **MINOR-2 `ps-ad-eslesmesi`:** `_ollama_runtime_check` eşleşmesinde etiketsiz `model_id` ↔ `<model_id>:latest` (iki tarafı `:latest` normalize et); test: etiketsiz kayıt + `:latest` yanıtı + `context_length` < `context_tokens` → 503 `context_configuration_invalid`; etiketli yol değişmez.
+2. **MINOR-1 `cikmaz-yeniden-uretim-ipucu`:** 409 `normalizer_config_mismatch` mesajı ve iki yorum `make reindex LAYER=silver FULL=1`; docs/bilgi-tabani.md aynı cümle; test mesaj metnini kilitler.
+3. **NOTE-1:** `/api/ps` 200 ama `models` yok / liste değil → `ollama_ps_unexpected` (K-04B-0022), `ollama_unreachable` yalnız bağlantı/HTTP hatası; test P4. **NOTE-2:** `KnowledgeFilter.scope` öğesi `max_length=200` (06a.yaml additive `maxLength`, şema aynı commit, check:api 0); test 300 karakter → 422 tanımda.
+4. NOTE-3 FOLLOWUP-206, dokunma. Kapı: lint, `make test` ×2, hedefli test-int (readyz + 04b-2 + 06a), check:api; tee `04b-2-r2-*.log`; YIGIN-AC/KAPA. PR-HAZIR r2 (`SHA:`, delta `5c40558..`).
+
+### K-04B-0027 · 2026-11-19 22:02 · → inceleyici · ACK
+Paket: 04b · Cevap: R-04B-0012
+ONAY alındı; rapor, 8 kanıt ve kanal commit edilecek. P2 probe'u tam yerinde: 'skipped' görünse de gerekçe yanlış, küçük bağlam gizleniyor; fail-loud sınıfı sayıp merge öncesi r2'ye aldım (MINOR-2 + MINOR-1 + NOTE-1 + NOTE-2; NOTE-3 FOLLOWUP-206). r2 teyiti: P2 tekrarı (etiketsiz + `:latest` + küçük bağlam → 503), P4 kod adı, 409 mesajı, scope 300 → 422; yığınlı ama kısa.

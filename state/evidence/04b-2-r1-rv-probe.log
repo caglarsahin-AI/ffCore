@@ -1,0 +1,109 @@
+HEAD=5c40558003dc797f54ddf90ec0fe347f78ac6849 (git archive copy)
+2026-11-19 18:58:29,500 ERROR ffcore.litellm_reconcile litellm_model_not_written model=p-f33352913a.rv-qwen-rv-7b code=provider_not_assigned
+2026-11-19 18:58:29,501 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=1 problems=1
+2026-11-19 18:58:29,599 INFO ffcore.access access method=GET path=/readyz status=200 ms=743
+PROBE P1 tagged, 32768: http=200 runtime={'name': 'ollama_runtime_context', 'status': 'ok', 'code': None, 'detail': 'qwen-rv:7b=32768; largest context_tokens=16000'} config=ok queue={'name': 'ingest_queue', 'status': 'ok', 'code': None, 'detail': 'queued=0'}
+PROBE P1 paths ['/api/ps']
+2026-11-19 18:58:29,727 INFO ffcore.access access method=GET path=/readyz status=200 ms=119
+PROBE P2 untagged model_id, ps lists :latest with 2048 (< 16000): http=200 runtime={'name': 'ollama_runtime_context', 'status': 'skipped', 'code': None, 'detail': 'not loaded: llamaprobe; checked once a request loads them'} config=ok queue={'name': 'ingest_queue', 'status': 'ok', 'code': None, 'detail': 'queued=0'}
+2026-11-19 18:58:29,864 INFO ffcore.access access method=GET path=/readyz status=503 ms=135
+PROBE P3 /api/ps 500: http=503 runtime={'name': 'ollama_runtime_context', 'status': 'failed', 'code': 'ollama_unreachable', 'detail': 'RuntimeError'} config=ok queue={'name': 'ingest_queue', 'status': 'ok', 'code': None, 'detail': 'queued=0'}
+2026-11-19 18:58:29,983 INFO ffcore.access access method=GET path=/readyz status=503 ms=113
+PROBE P4 200 without models key: http=503 runtime={'name': 'ollama_runtime_context', 'status': 'failed', 'code': 'ollama_unreachable', 'detail': 'KeyError'} config=ok queue={'name': 'ingest_queue', 'status': 'ok', 'code': None, 'detail': 'queued=0'}
+.2026-11-19 18:58:30,802 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-19 18:58:30,822 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=178
+2026-11-19 18:58:31,055 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-19 18:58:31,073 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=151
+2026-11-19 18:58:31,306 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-19 18:58:31,323 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=156
+2026-11-19 18:58:31,536 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-19 18:58:31,556 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=150
+2026-11-19 18:58:31,692 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-19 18:58:31,717 INFO ffcore.access access method=POST path=/api/v1/projects/c4627720-1ee7-4894-8d02-bcb4ffecdce0/knowledge-bases status=201 ms=87
+2026-11-19 18:58:31,794 INFO ffcore.access access method=POST path=/api/v1/projects/c4627720-1ee7-4894-8d02-bcb4ffecdce0/knowledge-bases/ff3c830c-f858-403d-9e38-007fd3ad5c4f/documents status=202 ms=73
+2026-11-19 18:58:31,852 INFO ffcore.access access method=POST path=/api/v1/projects/c4627720-1ee7-4894-8d02-bcb4ffecdce0/knowledge-bases/ff3c830c-f858-403d-9e38-007fd3ad5c4f/documents status=202 ms=55
+2026-11-19 18:58:31,906 INFO ffcore.access access method=POST path=/api/v1/projects/c4627720-1ee7-4894-8d02-bcb4ffecdce0/knowledge-bases/ff3c830c-f858-403d-9e38-007fd3ad5c4f/documents status=202 ms=50
+2026-11-19 18:58:32,008 INFO ffcore.knowledge.ingest gold document=5ebce512-d957-4cad-8fc0-8c683916908b reused=0 embedded=1
+2026-11-19 18:58:32,099 INFO ffcore.knowledge.ingest gold document=0fbcfaf4-e66f-44e5-8ee5-85882422e9bf reused=0 embedded=1
+2026-11-19 18:58:32,182 INFO ffcore.knowledge.ingest gold document=903ec6d9-9189-4aa0-aeff-12995fb8e904 reused=0 embedded=1
+2026-11-19 18:58:32,241 INFO ffcore.access access method=POST path=/api/v1/projects/c4627720-1ee7-4894-8d02-bcb4ffecdce0/api-keys status=201 ms=55
+2026-11-19 18:58:32,260 INFO ffcore.access access method=POST path=/internal/knowledge-bases/ff3c830c-f858-403d-9e38-007fd3ad5c4f/key-search status=422 ms=12
+PROBE K1 key-search empty list: http=422 code=validation_error hits=None
+2026-11-19 18:58:32,265 INFO ffcore.access access method=POST path=/internal/knowledge-bases/ff3c830c-f858-403d-9e38-007fd3ad5c4f/key-search status=422 ms=2
+PROBE K2 key-search int list: http=422 code=validation_error hits=None
+2026-11-19 18:58:32,271 INFO ffcore.access access method=POST path=/internal/knowledge-bases/ff3c830c-f858-403d-9e38-007fd3ad5c4f/key-search status=422 ms=2
+PROBE K3 key-search unknown filter key: http=422 code=validation_error hits=None
+2026-11-19 18:58:32,276 INFO ffcore.access access method=POST path=/internal/knowledge-bases/ff3c830c-f858-403d-9e38-007fd3ad5c4f/key-search status=422 ms=2
+PROBE K4 key-search 51 values: http=422 code=validation_error hits=None
+2026-11-19 18:58:32,324 INFO ffcore.access access method=POST path=/internal/knowledge-bases/ff3c830c-f858-403d-9e38-007fd3ad5c4f/key-search status=200 ms=44
+PROBE K5 key-search scalar: http=200 code=None hits=['pay.md']
+2026-11-19 18:58:32,369 INFO ffcore.access access method=POST path=/internal/knowledge-bases/ff3c830c-f858-403d-9e38-007fd3ad5c4f/key-search status=200 ms=42
+PROBE K6 key-search two values: http=200 code=None hits=['hr.md', 'pay.md']
+2026-11-19 18:58:32,408 INFO ffcore.access access method=POST path=/internal/knowledge-bases/ff3c830c-f858-403d-9e38-007fd3ad5c4f/key-search status=200 ms=36
+PROBE K7 key-search document_ids: http=200 code=None hits=[]
+2026-11-19 18:58:32,438 INFO ffcore.access access method=POST path=/api/v1/projects/c4627720-1ee7-4894-8d02-bcb4ffecdce0/knowledge-bases/ff3c830c-f858-403d-9e38-007fd3ad5c4f/search status=422 ms=26
+PROBE K8 search API 201-char value: http=422
+PROBE K9 300-char scope: definition=accepted search_filters=refused string_type
+PROBE K10 51-item scope in definition: refused
+PROBE K11 strip: ['confluence:OCR']
+.2026-11-19 18:58:32,746 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-19 18:58:32,761 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=137
+2026-11-19 18:58:32,950 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-19 18:58:32,964 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=125
+2026-11-19 18:58:33,206 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-19 18:58:33,220 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=187
+2026-11-19 18:58:33,484 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-19 18:58:33,489 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=193
+2026-11-19 18:58:33,612 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-19 18:58:33,624 INFO ffcore.access access method=POST path=/api/v1/projects/1cb561b9-18f7-4f86-a855-29e748fd823d/knowledge-bases status=201 ms=65
+2026-11-19 18:58:33,687 INFO ffcore.access access method=POST path=/api/v1/projects/1cb561b9-18f7-4f86-a855-29e748fd823d/knowledge-bases/d3564fbb-9621-4ccc-883b-8135e3cf47fc/documents status=202 ms=60
+2026-11-19 18:58:33,787 INFO ffcore.knowledge.ingest gold document=b23f9a73-68fe-4a43-8c99-f495e5c049e3 reused=0 embedded=1
+2026-11-19 18:58:33,827 INFO ffcore.access access method=POST path=/api/v1/projects/1cb561b9-18f7-4f86-a855-29e748fd823d/knowledge-bases/d3564fbb-9621-4ccc-883b-8135e3cf47fc/search status=409 ms=37
+PROBE D3a on before rebuild: http=409 body={"error":{"message":"Documents of this knowledge base are in normalizer form format-v1, queries would be in format-v1+tr-a1; rebuild silver (make reindex LAYER=silver) first.","type":"conflict_error","code":"normalizer_config_mismatch"}}
+2026-11-19 18:58:33,895 INFO ffcore.access access method=POST path=/api/v1/projects/1cb561b9-18f7-4f86-a855-29e748fd823d/knowledge-bases/d3564fbb-9621-4ccc-883b-8135e3cf47fc/search status=409 ms=39
+PROBE D3g after non-full silver reindex: doc id=format-v1 search http=409
+2026-11-19 18:58:34,012 INFO ffcore.knowledge.ingest gold document=b23f9a73-68fe-4a43-8c99-f495e5c049e3 reused=0 embedded=1
+PROBE D3b silver folded: True | inline code kept: True | url kept: True
+2026-11-19 18:58:34,079 INFO ffcore.access access method=POST path=/api/v1/projects/1cb561b9-18f7-4f86-a855-29e748fd823d/knowledge-bases/d3564fbb-9621-4ccc-883b-8135e3cf47fc/search status=200 ms=63
+PROBE D3c on, query 'kâr payı': http=200 hits=1 id=format-v1+tr-a1
+2026-11-19 18:58:34,144 INFO ffcore.access access method=POST path=/api/v1/projects/1cb561b9-18f7-4f86-a855-29e748fd823d/knowledge-bases/d3564fbb-9621-4ccc-883b-8135e3cf47fc/search status=200 ms=61
+PROBE D3c on, query 'kar payi': http=200 hits=1 id=format-v1+tr-a1
+2026-11-19 18:58:34,205 INFO ffcore.access access method=POST path=/api/v1/projects/1cb561b9-18f7-4f86-a855-29e748fd823d/knowledge-bases/d3564fbb-9621-4ccc-883b-8135e3cf47fc/search status=200 ms=57
+PROBE D3c on, query 'KÂR': http=200 hits=1 id=format-v1+tr-a1
+2026-11-19 18:58:34,247 INFO ffcore.access access method=POST path=/api/v1/projects/1cb561b9-18f7-4f86-a855-29e748fd823d/knowledge-bases/d3564fbb-9621-4ccc-883b-8135e3cf47fc/search status=409 ms=40
+PROBE D3d switched back off: http=409 code=normalizer_config_mismatch
+2026-11-19 18:58:34,355 INFO ffcore.knowledge.ingest gold document=b23f9a73-68fe-4a43-8c99-f495e5c049e3 reused=0 embedded=1
+2026-11-19 18:58:34,424 INFO ffcore.access access method=POST path=/api/v1/projects/1cb561b9-18f7-4f86-a855-29e748fd823d/knowledge-bases/d3564fbb-9621-4ccc-883b-8135e3cf47fc/search status=200 ms=66
+PROBE D3e off after rebuild: http=200
+2026-11-19 18:58:34,491 INFO ffcore.access access method=POST path=/api/v1/projects/1cb561b9-18f7-4f86-a855-29e748fd823d/knowledge-bases/d3564fbb-9621-4ccc-883b-8135e3cf47fc/search status=200 ms=62
+PROBE D3f only failed doc in other form: http=200
+.PROBE D4 flag on: refused: Value error, video_transcriber_unavailable: VIDEO_TRANSCRIPT_ENABLED=true needs a video transcriber, and this build has 
+.2026-11-19 18:58:34,798 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-19 18:58:34,811 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=127
+2026-11-19 18:58:35,000 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-19 18:58:35,017 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=128
+2026-11-19 18:58:35,256 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-19 18:58:35,272 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=167
+2026-11-19 18:58:35,505 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-19 18:58:35,515 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=161
+2026-11-19 18:58:35,658 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-19 18:58:35,666 INFO ffcore.access access method=POST path=/api/v1/projects/dc4aca08-e612-4132-b279-42fb7c78d2b3/knowledge-bases status=201 ms=83
+2026-11-19 18:58:35,742 INFO ffcore.access access method=POST path=/api/v1/projects/dc4aca08-e612-4132-b279-42fb7c78d2b3/knowledge-bases/30f97c1e-616c-4d84-aca2-cf792ddbd27f/documents status=202 ms=72
+2026-11-19 18:58:35,861 INFO ffcore.access access method=POST path=/api/v1/projects/dc4aca08-e612-4132-b279-42fb7c78d2b3/knowledge-bases/30f97c1e-616c-4d84-aca2-cf792ddbd27f/documents status=202 ms=116
+2026-11-19 18:58:35,971 INFO ffcore.knowledge.ingest gold document=096c4ed0-6104-4389-913b-998b58527212 reused=0 embedded=1
+2026-11-19 18:58:36,068 INFO ffcore.knowledge.ingest gold document=c18d6beb-699e-4aab-9ad9-d53204954046 reused=0 embedded=1
+PROBE M fm.md: status=indexed engine=markdown gate1=ok gate2=ok/None
+PROBE M fm.md silver head: '---\ntitle: Bakım\ntags: [a, b]\n---\n\n# Bakım\n\nBu sözleşme kapsamında yüklenici bakım hizmetini aylık olarak verir ve her ziyaret için bir rapo'
+PROBE M fm.md table kept: True
+PROBE M fm.markdown: status=indexed engine=markdown gate1=ok gate2=ok/None
+PROBE M fm.markdown silver head: '---\ntitle: Bakim2\ntags: [a, b]\n---\n\n# Bakim2\n\nBu sözleşme kapsamında yüklenici bakım hizmetini aylık olarak verir ve her ziyaret için bir ra'
+PROBE M fm.markdown table kept: True
+.
+=============================== warnings summary ===============================
+tests/integration/test_04a_review_r1_acl.py:47
+  /work/backend/tests/integration/test_04a_review_r1_acl.py:47: PytestUnknownMarkWarning: Unknown pytest.mark.vectorstore - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.fixture(params=["pgvector", pytest.param("qdrant", marks=pytest.mark.vectorstore)])
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+5 passed, 1 warning in 16.52s
+exit 0
