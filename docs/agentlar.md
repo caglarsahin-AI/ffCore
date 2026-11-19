@@ -27,11 +27,13 @@ API contract: `backend/openapi/06a.yaml` (paths under `/api/v1/projects/{project
 
 Unknown fields are refused (422). Options the runtime does not run yet are refused at save with a
 code, never ignored: `answer_rules.verify` (`verify_not_supported`), `confidence_formula:
-sentence_max` (`confidence_formula_not_supported`), `knowledge[].filter.scope`
-(`knowledge_filter_not_supported`, FOLLOWUP-89). A definition without `schema_version` is version 1.
+sentence_max` (`confidence_formula_not_supported`). `knowledge[].filter.scope` (04b-2,
+FOLLOWUP-89) is a list of document sources (`documents.metadata.source`, e.g. `confluence:OCR`,
+exact match, non-blank): the agent's search in that knowledge base sees only documents from one
+of them. A definition without `schema_version` is version 1.
 Every definition check answers 422 `invalid_request_error` with its own code in `error.code`
 (`prompt_source`, `variable_duplicate`, `variable_undefined`, `knowledge_duplicate`,
-`knowledge_filter_not_supported`, `tool_duplicate`, `approval_action_unknown`,
+`tool_duplicate`, `approval_action_unknown`,
 `verify_not_supported`, `confidence_formula_not_supported`, `output_reserve_too_small`,
 `structured_output_invalid`) and the field path in the message; a wrong type or an unknown field
 is `validation_error` (FOLLOWUP-105).
