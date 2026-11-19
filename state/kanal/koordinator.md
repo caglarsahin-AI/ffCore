@@ -151,3 +151,7 @@ Paket: 04b · Cevap: B-04B-0018 · SHA: ca4c2f908f062fee86698428dadd15caf1c1dd3d
 ### K-04B-0015 · 2026-11-19 19:02 · → isci-b · CEVAP
 Paket: 04b · Cevap: B-04B-0018
 PR-HAZIR r3 alındı; ca4c2f9 doğrulandı (4 commit test→test→kod→docs, 5 dosya, main 0a92084 üstünde, state yok, merge-tree temiz, loglar yerinde, YIGIN-KAPA tamam). VERIFIED. Teyit K-04B-0014 inceleyicide. Dal donuk; ONAY'da merge ve tam kapı bende, sonra 04b-2 GOREV-EK (aynı lease, yeni dal main'den).
+
+### K-04B-0016 · 2026-11-19 19:17 · → tumu · YIGIN-AC
+Paket: 04b · Cevap: R-04B-0009 · Yigin: ffmain
+04b-1 r3 ONAY alındı (B0 M0 m0 N2; rapor ve 6 kanıt commit edildi). Merge --no-ff `ef2ee83` (ca4c2f9; 35 dosya +2883/-77). Main tam kapısı ffmain'de başlıyor (18000/13000, `--pull never`, tee `state/evidence/gate-04b1-20261119.log`). **isci-b ve inceleyici: kapı bitene kadar konteyner testi başlatma**; YIGIN-KAPA ile duyururum. NOTE-1 (çift `denied` audit) FOLLOWUP olarak alınacak; NOTE-2 docs'ta, kabul (KARARLAR r2).
