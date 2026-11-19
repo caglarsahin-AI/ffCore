@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-c-10c3
 - Aktif paket: 10c-3 (MCP Sunucuları ekranı + MCP İzleme; FOLLOWUP-195, FOLLOWUP-197)
 - Durum: ACTIVE
-- Son okunan: koordinator K-10C3-0001; son yazılan C-10C3-0001 (ACK)
+- Son okunan: koordinator K-10C3-0003; son yazılan C-10C3-0006 (PR-HAZIR)
 - Önceki lease: ffcore-isci-c-10c2 RETIRED (10c-2 MERGED b93cd96; son C-10C2-0016 RETIRED); ondan önce ffcore-isci-c-sse RETIRED (fix/10b-sse-bekci MERGED 4216718; son C-SSE-0011 RETIRED); ondan önce ffcore-isci-c-10c1 RETIRED (10c-1 MERGED; son C-10C1-0015 RETIRED); ondan önce ffcore-isci-c-10bp2 RETIRED (10b-poc-2 MERGED b43770d; son C-10bp2-0019 HANDOFF)
 
 ## Mesajlar
@@ -38,3 +38,13 @@ Yan bulgu (FOLLOWUP adayı, düşük): `RESERVED_HOSTS` yalnız servis adını e
 ### C-10C3-0004 · 2026-11-19 14:52 · → koordinator · YIGIN-AC
 Paket: 10c-3 · Cevap: K-10C3-0003 · Yigin: ffcore-10c3
 18450/13450, `--profile test`, `--pull never`, imajlar `0.0.0-main` → `0.0.0-10c3` etiketi (build yok; e2e backend'i eval.py düzeltmesini içermez, e2e'yi etkilemez). Sıra: e2e (10c-3 + etkilenen araç/salt-okunur spec'leri, sonra tam koşu), hedefli test-int (09 özet) kaynaktan. Shell: `ALLOWED_INTERNAL_HOSTS=<.env.test listesi>,fake-llm,ffcore-10c3-e2e-upstream`, `EGRESS_ALLOWLIST=superset.example.com`, `FAKE_EMBED=1`.
+
+### C-10C3-0005 · 2026-11-19 16:05 · → koordinator · YIGIN-KAPA
+Paket: 10c-3 · Cevap: C-10C3-0004 · Yigin: ffcore-10c3
+`down -v` tamam; konteyner 0, volume 0 (`10c-3-down.log`). e2e tam 188/189 (tek kırmızı `test_10a_1_theme_switch` ilk test soğuk başlangıç; tek başına 3/3 yeşil), backend 1925×2, test-int 76.
+
+### C-10C3-0006 · 2026-11-19 15:34 · → koordinator · PR-HAZIR
+Paket: 10c-3 · Cevap: K-10C3-0001, K-10C3-0003 · SHA: b692ad696b479cd4a4031328f1f5e19322b5f470
+Dal `feat/10c-3-mcp-ui` (baz bd240ca; main'e sonradan yalnız state/KARARLAR geldi, rebase gerekmedi), 12 commit, çalışma ağacı temiz. PR notu `state/pr/10c-3.md` (kabul 1-7 → test, komutlar, e2e upstream bölümü, varsayımlar, riskler).
+Kapılar: önyüz gen:api (diff yok) / check:api / lint / typecheck 0, Vitest 279; backend `make lint && make test` llmaas ve airgap 1925 passed; hedefli test-int 76; e2e 10c-3 + etkilenen 27/27, tam koşu 188/189 (tek kırmızı `test_10a_1_theme_switch` soğuk başlangıç, tek başına 3/3). Backend diff'i yalnız `api/eval.py` + iki test.
+Notlar: developer e2e NOT_RUN (03a `role_reserved`, Vitest'te); D4 read-only Vitest ilk koşuda yeşil (kapılar D2'de). Hook uyarısı kaydı yok. Düzeltme: C-10C3-0005 YIGIN-KAPA başlığındaki saat yanlış (16:05 yazıldı, gerçek ~15:30).

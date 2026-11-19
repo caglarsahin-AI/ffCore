@@ -1,0 +1,70 @@
+time="2026-11-19T14:44:00+03:00" level=warning msg="volume \"ffcore-10c3_e2e_node_modules\" already exists but was not created by Docker Compose. Use `external: true` to use an existing volume"
+ Container ffcore-10c3-postgres-1  Running
+ Container ffcore-10c3-redis-1  Running
+ Container ffcore-10c3-migrate-1  Created
+ Container ffcore-10c3-litellm-1  Running
+ Container ffcore-10c3-backend-1  Running
+ Container ffcore-10c3-postgres-1  Waiting
+ Container ffcore-10c3-postgres-1  Waiting
+ Container ffcore-10c3-postgres-1  Healthy
+ Container ffcore-10c3-postgres-1  Healthy
+ Container ffcore-10c3-migrate-1  Starting
+ Container ffcore-10c3-migrate-1  Started
+ Container ffcore-10c3-litellm-1  Waiting
+ Container ffcore-10c3-migrate-1  Waiting
+ Container ffcore-10c3-postgres-1  Waiting
+ Container ffcore-10c3-redis-1  Waiting
+ Container ffcore-10c3-postgres-1  Healthy
+ Container ffcore-10c3-redis-1  Healthy
+ Container ffcore-10c3-litellm-1  Healthy
+ Container ffcore-10c3-migrate-1  Exited
+
+
+[WebServer] Failed to compile.
+[WebServer] 
+[WebServer] ./app/(console)/evaluations/runs/[evalRunId]/page.tsx
+[WebServer] Module not found: Can't resolve '@tanstack/react-query'
+[WebServer] 
+[WebServer] https://nextjs.org/docs/messages/module-not-found
+[WebServer] 
+[WebServer] ./components/query-provider.tsx
+[WebServer] Module not found: Can't resolve '@tanstack/react-query'
+[WebServer] 
+[WebServer] https://nextjs.org/docs/messages/module-not-found
+[WebServer] 
+[WebServer] ./lib/api/agents-queries.ts
+[WebServer] Module not found: Can't resolve '@tanstack/react-query'
+[WebServer] 
+[WebServer] https://nextjs.org/docs/messages/module-not-found
+[WebServer] 
+[WebServer] Import trace for requested module:
+[WebServer] ./app/(console)/agents/page.tsx
+[WebServer] 
+[WebServer] ./lib/api/approvals-queries.ts
+[WebServer] Module not found: Can't resolve '@tanstack/react-query'
+[WebServer] 
+[WebServer] https://nextjs.org/docs/messages/module-not-found
+[WebServer] 
+[WebServer] Import trace for requested module:
+[WebServer] ./app/(console)/approvals/page.tsx
+[WebServer] 
+[WebServer] ./lib/api/eval-queries.ts
+[WebServer] Module not found: Can't resolve '@tanstack/react-query'
+[WebServer] 
+[WebServer] https://nextjs.org/docs/messages/module-not-found
+[WebServer] 
+[WebServer] Import trace for requested module:
+[WebServer] ./app/(console)/evaluations/[suiteId]/page.tsx
+[WebServer] 
+
+
+[WebServer] 
+[WebServer] > Build failed because of webpack errors
+
+Error: Process from config.webServer was not able to start. Exit code: 1
+
+npm notice
+npm notice New major version of npm available! 11.19.1 -> 12.2.3
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.3
+npm notice To update run: npm install -g npm@12.2.3
+npm notice

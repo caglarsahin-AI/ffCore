@@ -1,0 +1,166 @@
+FFF.......                                                               [100%]
+=================================== FAILURES ===================================
+____________ test_10c3_0_non_mapping_summary_is_null_and_logged[7] _____________
+
+row = namespace(id='abcdefab-cdef-4abc-8def-abcdefabcdef', project_id='00000000-0000-0000-0000-000000000002', suite_id='0000...r_code=None, item_runs={}, summary=7, cost_usd=None, started_at=None, ended_at=None, created_at='2026-11-18T08:00:00Z')
+
+    def stored_summary(row: EvalRun) -> EvalSummary | None:
+        """The exam's summary as the contract types it. A stored one that does not fit (an older
+        shape, a partial write) is answered as null and logged, never a 500 that would also break
+        the suite's exam list (10c-2 r1 NOTE-2, KARARLAR "10c-2 r1 kararları")."""
+        if row.summary is None:
+            return None
+        try:
+>           return EvalSummary.model_validate(row.summary, strict=True)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           pydantic_core._pydantic_core.ValidationError: 1 validation error for EvalSummary
+E             Input should be a valid dictionary or instance of EvalSummary [type=model_type, input_value=7, input_type=int]
+E               For further information visit https://errors.pydantic.dev/2.14/v/model_type
+
+ffcore/api/eval.py:117: ValidationError
+
+During handling of the above exception, another exception occurred:
+
+caplog = <_pytest.logging.LogCaptureFixture object at 0x7f8afb062e10>
+summary = 7
+
+    @pytest.mark.parametrize("summary", [7, 0.5, True, False, 0, [1, 2], "summary"])
+    def test_10c3_0_non_mapping_summary_is_null_and_logged(caplog, summary):
+        with caplog.at_level(logging.WARNING):
+>           out = run_out(_row(summary))
+                  ^^^^^^^^^^^^^^^^^^^^^^
+
+tests/unit/test_10c3_0_summary_scalar.py:18: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+ffcore/api/eval.py:142: in run_out
+    summary=stored_summary(row),
+            ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+row = namespace(id='abcdefab-cdef-4abc-8def-abcdefabcdef', project_id='00000000-0000-0000-0000-000000000002', suite_id='0000...r_code=None, item_runs={}, summary=7, cost_usd=None, started_at=None, ended_at=None, created_at='2026-11-18T08:00:00Z')
+
+    def stored_summary(row: EvalRun) -> EvalSummary | None:
+        """The exam's summary as the contract types it. A stored one that does not fit (an older
+        shape, a partial write) is answered as null and logged, never a 500 that would also break
+        the suite's exam list (10c-2 r1 NOTE-2, KARARLAR "10c-2 r1 kararları")."""
+        if row.summary is None:
+            return None
+        try:
+            return EvalSummary.model_validate(row.summary, strict=True)
+        except ValidationError as exc:
+>           missing = sorted(set(EvalSummary.model_fields) - set(row.summary or {}))
+                                                             ^^^^^^^^^^^^^^^^^^^^^^
+E           TypeError: 'int' object is not iterable
+
+ffcore/api/eval.py:119: TypeError
+___________ test_10c3_0_non_mapping_summary_is_null_and_logged[0.5] ____________
+
+row = namespace(id='abcdefab-cdef-4abc-8def-abcdefabcdef', project_id='00000000-0000-0000-0000-000000000002', suite_id='0000...code=None, item_runs={}, summary=0.5, cost_usd=None, started_at=None, ended_at=None, created_at='2026-11-18T08:00:00Z')
+
+    def stored_summary(row: EvalRun) -> EvalSummary | None:
+        """The exam's summary as the contract types it. A stored one that does not fit (an older
+        shape, a partial write) is answered as null and logged, never a 500 that would also break
+        the suite's exam list (10c-2 r1 NOTE-2, KARARLAR "10c-2 r1 kararları")."""
+        if row.summary is None:
+            return None
+        try:
+>           return EvalSummary.model_validate(row.summary, strict=True)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           pydantic_core._pydantic_core.ValidationError: 1 validation error for EvalSummary
+E             Input should be a valid dictionary or instance of EvalSummary [type=model_type, input_value=0.5, input_type=float]
+E               For further information visit https://errors.pydantic.dev/2.14/v/model_type
+
+ffcore/api/eval.py:117: ValidationError
+
+During handling of the above exception, another exception occurred:
+
+caplog = <_pytest.logging.LogCaptureFixture object at 0x7f8afb079d30>
+summary = 0.5
+
+    @pytest.mark.parametrize("summary", [7, 0.5, True, False, 0, [1, 2], "summary"])
+    def test_10c3_0_non_mapping_summary_is_null_and_logged(caplog, summary):
+        with caplog.at_level(logging.WARNING):
+>           out = run_out(_row(summary))
+                  ^^^^^^^^^^^^^^^^^^^^^^
+
+tests/unit/test_10c3_0_summary_scalar.py:18: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+ffcore/api/eval.py:142: in run_out
+    summary=stored_summary(row),
+            ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+row = namespace(id='abcdefab-cdef-4abc-8def-abcdefabcdef', project_id='00000000-0000-0000-0000-000000000002', suite_id='0000...code=None, item_runs={}, summary=0.5, cost_usd=None, started_at=None, ended_at=None, created_at='2026-11-18T08:00:00Z')
+
+    def stored_summary(row: EvalRun) -> EvalSummary | None:
+        """The exam's summary as the contract types it. A stored one that does not fit (an older
+        shape, a partial write) is answered as null and logged, never a 500 that would also break
+        the suite's exam list (10c-2 r1 NOTE-2, KARARLAR "10c-2 r1 kararları")."""
+        if row.summary is None:
+            return None
+        try:
+            return EvalSummary.model_validate(row.summary, strict=True)
+        except ValidationError as exc:
+>           missing = sorted(set(EvalSummary.model_fields) - set(row.summary or {}))
+                                                             ^^^^^^^^^^^^^^^^^^^^^^
+E           TypeError: 'float' object is not iterable
+
+ffcore/api/eval.py:119: TypeError
+___________ test_10c3_0_non_mapping_summary_is_null_and_logged[True] ___________
+
+row = namespace(id='abcdefab-cdef-4abc-8def-abcdefabcdef', project_id='00000000-0000-0000-0000-000000000002', suite_id='0000...ode=None, item_runs={}, summary=True, cost_usd=None, started_at=None, ended_at=None, created_at='2026-11-18T08:00:00Z')
+
+    def stored_summary(row: EvalRun) -> EvalSummary | None:
+        """The exam's summary as the contract types it. A stored one that does not fit (an older
+        shape, a partial write) is answered as null and logged, never a 500 that would also break
+        the suite's exam list (10c-2 r1 NOTE-2, KARARLAR "10c-2 r1 kararları")."""
+        if row.summary is None:
+            return None
+        try:
+>           return EvalSummary.model_validate(row.summary, strict=True)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           pydantic_core._pydantic_core.ValidationError: 1 validation error for EvalSummary
+E             Input should be a valid dictionary or instance of EvalSummary [type=model_type, input_value=True, input_type=bool]
+E               For further information visit https://errors.pydantic.dev/2.14/v/model_type
+
+ffcore/api/eval.py:117: ValidationError
+
+During handling of the above exception, another exception occurred:
+
+caplog = <_pytest.logging.LogCaptureFixture object at 0x7f8afb07b2f0>
+summary = True
+
+    @pytest.mark.parametrize("summary", [7, 0.5, True, False, 0, [1, 2], "summary"])
+    def test_10c3_0_non_mapping_summary_is_null_and_logged(caplog, summary):
+        with caplog.at_level(logging.WARNING):
+>           out = run_out(_row(summary))
+                  ^^^^^^^^^^^^^^^^^^^^^^
+
+tests/unit/test_10c3_0_summary_scalar.py:18: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+ffcore/api/eval.py:142: in run_out
+    summary=stored_summary(row),
+            ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+row = namespace(id='abcdefab-cdef-4abc-8def-abcdefabcdef', project_id='00000000-0000-0000-0000-000000000002', suite_id='0000...ode=None, item_runs={}, summary=True, cost_usd=None, started_at=None, ended_at=None, created_at='2026-11-18T08:00:00Z')
+
+    def stored_summary(row: EvalRun) -> EvalSummary | None:
+        """The exam's summary as the contract types it. A stored one that does not fit (an older
+        shape, a partial write) is answered as null and logged, never a 500 that would also break
+        the suite's exam list (10c-2 r1 NOTE-2, KARARLAR "10c-2 r1 kararları")."""
+        if row.summary is None:
+            return None
+        try:
+            return EvalSummary.model_validate(row.summary, strict=True)
+        except ValidationError as exc:
+>           missing = sorted(set(EvalSummary.model_fields) - set(row.summary or {}))
+                                                             ^^^^^^^^^^^^^^^^^^^^^^
+E           TypeError: 'bool' object is not iterable
+
+ffcore/api/eval.py:119: TypeError
+=========================== short test summary info ============================
+FAILED tests/unit/test_10c3_0_summary_scalar.py::test_10c3_0_non_mapping_summary_is_null_and_logged[7]
+FAILED tests/unit/test_10c3_0_summary_scalar.py::test_10c3_0_non_mapping_summary_is_null_and_logged[0.5]
+FAILED tests/unit/test_10c3_0_summary_scalar.py::test_10c3_0_non_mapping_summary_is_null_and_logged[True]
+3 failed, 7 passed in 18.03s

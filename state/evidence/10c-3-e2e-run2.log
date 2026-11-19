@@ -1,0 +1,56 @@
+time="2026-11-19T14:47:16+03:00" level=warning msg="volume \"ffcore-10c3_e2e_node_modules\" already exists but was not created by Docker Compose. Use `external: true` to use an existing volume"
+ Container ffcore-10c3-postgres-1  Running
+ Container ffcore-10c3-redis-1  Running
+ Container ffcore-10c3-litellm-1  Running
+ Container ffcore-10c3-migrate-1  Created
+ Container ffcore-10c3-backend-1  Running
+ Container ffcore-10c3-postgres-1  Waiting
+ Container ffcore-10c3-postgres-1  Waiting
+ Container ffcore-10c3-postgres-1  Healthy
+ Container ffcore-10c3-migrate-1  Starting
+ Container ffcore-10c3-postgres-1  Healthy
+ Container ffcore-10c3-migrate-1  Started
+ Container ffcore-10c3-migrate-1  Waiting
+ Container ffcore-10c3-postgres-1  Waiting
+ Container ffcore-10c3-redis-1  Waiting
+ Container ffcore-10c3-litellm-1  Waiting
+ Container ffcore-10c3-redis-1  Healthy
+ Container ffcore-10c3-postgres-1  Healthy
+ Container ffcore-10c3-litellm-1  Healthy
+ Container ffcore-10c3-migrate-1  Exited
+
+Running 27 tests using 1 worker
+
+[1/27] [chromium] › tests/e2e/test_10bp2_1_tool_crud_and_errors.spec.ts:8:5 › test_10bp2_1_tool_crud_and_errors: an admin registers, edits and deletes a tool; backend field errors land on their field
+[2/27] [chromium] › tests/e2e/test_10bp2_10_read_only.spec.ts:10:5 › test_10bp2_10_read_only: admin+read gets the four screens with every change control and field disabled
+[3/27] [chromium] › tests/e2e/test_10bp2_11_roles.spec.ts:8:5 › test_10bp2_11_roles: an analyst has agents, runs and approvals but no tools menu, and gets no-access by URL
+[4/27] [chromium] › tests/e2e/test_10bp2_11_roles.spec.ts:25:5 › test_10bp2_11_roles: a project admin sees the tools menu and can register
+[5/27] [chromium] › tests/e2e/test_10bp2_2_discover_actions_invoke.spec.ts:8:5 › test_10bp2_2_discover_actions_invoke: discovery lists the actions off and needing approval; an admin switches one on and tries it
+[6/27] [chromium] › tests/e2e/test_10c2_6_read_only_screens.spec.ts:28:5 › test_10c2_6_read_only: every 10a-10c screen has its change controls disabled in read mode
+[7/27] [chromium] › tests/e2e/test_10c2_6_read_only_screens.spec.ts:51:9 › test_10c2_6_screens: overview light edit and read, axe
+[8/27] [chromium] › tests/e2e/test_10c2_6_read_only_screens.spec.ts:51:9 › test_10c2_6_screens: overview dark edit and read, axe
+[9/27] [chromium] › tests/e2e/test_10c2_6_read_only_screens.spec.ts:51:9 › test_10c2_6_screens: usage light edit and read, axe
+[10/27] [chromium] › tests/e2e/test_10c2_6_read_only_screens.spec.ts:51:9 › test_10c2_6_screens: usage dark edit and read, axe
+[11/27] [chromium] › tests/e2e/test_10c2_6_read_only_screens.spec.ts:51:9 › test_10c2_6_screens: api-keys light edit and read, axe
+[12/27] [chromium] › tests/e2e/test_10c2_6_read_only_screens.spec.ts:51:9 › test_10c2_6_screens: api-keys dark edit and read, axe
+[13/27] [chromium] › tests/e2e/test_10c2_6_read_only_screens.spec.ts:51:9 › test_10c2_6_screens: quotas light edit and read, axe
+[14/27] [chromium] › tests/e2e/test_10c2_6_read_only_screens.spec.ts:51:9 › test_10c2_6_screens: quotas dark edit and read, axe
+[15/27] [chromium] › tests/e2e/test_10c2_6_read_only_screens.spec.ts:51:9 › test_10c2_6_screens: alerts light edit and read, axe
+[16/27] [chromium] › tests/e2e/test_10c2_6_read_only_screens.spec.ts:51:9 › test_10c2_6_screens: alerts dark edit and read, axe
+[17/27] [chromium] › tests/e2e/test_10c2_6_read_only_screens.spec.ts:51:9 › test_10c2_6_screens: retention light edit and read, axe
+[18/27] [chromium] › tests/e2e/test_10c2_6_read_only_screens.spec.ts:51:9 › test_10c2_6_screens: retention dark edit and read, axe
+[19/27] [chromium] › tests/e2e/test_10c3_1_publish_add_tool.spec.ts:22:5 › test_10c3_1_publish_add_tool: sample spec to published server to tool
+[20/27] [chromium] › tests/e2e/test_10c3_2_path_invalid.spec.ts:11:5 › test_10c3_2_path_invalid: an unsafe document path is refused with its message
+[21/27] [chromium] › tests/e2e/test_10c3_3_monitoring.spec.ts:23:5 › test_10c3_3_monitoring: ok and error calls with their codes
+[22/27] [chromium] › tests/e2e/test_10c3_4_read_only_roles.spec.ts:13:5 › test_10c3_4_read_only: list and server page have every change disabled in read mode
+[23/27] [chromium] › tests/e2e/test_10c3_4_read_only_roles.spec.ts:36:5 › test_10c3_4_roles: an analyst does not get the MCP servers screen
+[24/27] [chromium] › tests/e2e/test_10c3_4_read_only_roles.spec.ts:46:7 › test_10c3_4_screens: server page light edit and read
+[25/27] [chromium] › tests/e2e/test_10c3_4_read_only_roles.spec.ts:46:7 › test_10c3_4_screens: server page dark edit and read
+[26/27] [chromium] › tests/e2e/test_10c3_5_screens_themes_axe.spec.ts:18:7 › test_10c3_5_axe: MCP screens light
+[27/27] [chromium] › tests/e2e/test_10c3_5_screens_themes_axe.spec.ts:18:7 › test_10c3_5_axe: MCP screens dark
+  27 passed (6.6m)
+npm notice
+npm notice New major version of npm available! 11.19.1 -> 12.2.3
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.3
+npm notice To update run: npm install -g npm@12.2.3
+npm notice

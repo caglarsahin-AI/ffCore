@@ -1,0 +1,9 @@
+genapi_exit=0
+API contract copies and generated types are current.
+check_api_exit=0
+lint_exit=0
+typecheck_exit=0
+[2m      Tests [22m [1m[32m279 passed[39m[22m[90m (279)[39m
+[2m   Start at [22m 11:57:46
+[2m   Duration [22m 61.51s[2m (transform 102.20s, setup 0ms, import 165.49s, tests 84.88s, environment 62.16s)[22m
+

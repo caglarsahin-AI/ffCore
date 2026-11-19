@@ -1,0 +1,28 @@
+typecheck_exit=0
+
+/repo/frontend/components/mcp/connection-test.tsx
+  22:107  error  Missing JSX expression container around literal string: "("  react/jsx-no-literals
+  22:127  error  Missing JSX expression container around literal string: ")"  react/jsx-no-literals
+
+✖ 2 problems (2 errors, 0 warnings)
+
+lint_exit=1
+
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.12 [39m[90m/repo/frontend[39m
+
+ [32m✓[39m tests/unit/test_10c3_2_server_form.test.tsx [2m([22m[2m7 tests[22m[2m)[22m[33m 1074[2mms[22m[39m
+ [32m✓[39m tests/unit/test_10c3_3_server_detail.test.tsx [2m([22m[2m8 tests[22m[2m)[22m[33m 1556[2mms[22m[39m
+     [33m[2m✓[22m[39m lists every operation, the unpublishable ones with their reason and no selection [33m 536[2mms[22m[39m
+     [33m[2m✓[22m[39m saves the selection and the tool names, then publishes [33m 358[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m2 passed[39m[22m[90m (2)[39m
+[2m      Tests [22m [1m[32m15 passed[39m[22m[90m (15)[39m
+[2m   Start at [22m 11:24:06
+[2m   Duration [22m 8.81s[2m (transform 8.94s, setup 0ms, import 11.48s, tests 2.63s, environment 2.25s)[22m
+
+lint_exit=0
+[2m Test Files [22m [1m[32m53 passed[39m[22m[90m (53)[39m
+[2m      Tests [22m [1m[32m270 passed[39m[22m[90m (270)[39m
+[2m   Start at [22m 11:24:57
+[2m   Duration [22m 43.21s[2m (transform 78.88s, setup 0ms, import 121.60s, tests 59.06s, environment 42.08s)[22m
+
