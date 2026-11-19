@@ -38,6 +38,8 @@ def test_04b_2_d3_switching_on_needs_silver_rebuild(app, world, settings, queue,
     refused = search(world["admin"], world, kb["id"], "kâr payı")
     assert refused.status_code == 409, refused.text
     assert refused.json()["error"]["code"] == "normalizer_config_mismatch"
+    # r2 MINOR-1: the hint is the command that rebuilds every document (FULL=1).
+    assert "make reindex LAYER=silver FULL=1" in refused.json()["error"]["message"]
 
     asyncio.run(
         ingest.reindex_silver(

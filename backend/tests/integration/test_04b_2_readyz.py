@@ -101,3 +101,61 @@ def test_04b_2_s6_ingest_queue_depth(client_factory, ready_app):
     finally:
         client.delete(queue)
         client.close()
+
+
+# --- r2 (K-04B-0026) ---
+
+
+@pytest.fixture
+def untagged_project(pg, make_project):
+    """An active Ollama model registered without a tag (`llama3`); Ollama lists it `:latest`."""
+    import json
+    import uuid
+
+    project_id = make_project()
+    provider = uuid.uuid4()
+    pg.execute(
+        "INSERT INTO providers (id, key, label, driver, domains, config_encrypted,"
+        " supports_test, created_by) VALUES (%s, %s, 'Ollama', 'ollama', '{model}', %s, true,"
+        " 'test')",
+        (provider, f"ol-{provider.hex[:8]}", b"x"),
+    )
+    pg.execute(
+        "INSERT INTO models (id, project_id, key, display_name, provider_id, category, model_id,"
+        " capabilities, input_types, pricing, limits, upstream_api, request_policy, created_by)"
+        " VALUES (%s, %s, 'chat-untagged', 'Chat', %s, 'llm', 'llama3', '{}', '{text}',"
+        " '{}', %s, 'chat', '{}', 'test')",
+        (uuid.uuid4(), project_id, provider, json.dumps({"context_tokens": 16000})),
+    )
+    yield project_id
+    pg.execute("UPDATE models SET is_active = false WHERE project_id = %s", (project_id,))
+
+
+def test_04b_2_r2_untagged_model_matches_latest(
+    client_factory, ready_app, monkeypatch, untagged_project
+):
+    """MINOR-2: `llama3` and `llama3:latest` are one model; a small context is caught."""
+    _ollama(ready_app, monkeypatch, [{"name": "llama3:latest", "context_length": 8192}])
+    small = client_factory().get("/readyz")
+    assert small.status_code == 503
+    check = _checks(small)["ollama_runtime_context"]
+    assert check["code"] == "context_configuration_invalid" and "llama3=8192" in check["detail"]
+
+
+def test_04b_2_r2_ps_shape_error_is_unexpected(
+    client_factory, ready_app, monkeypatch, ollama_project
+):
+    """NOTE-1 (P4): Ollama answered, but not in the documented shape."""
+
+    async def odd_ps(config_encrypted, settings):
+        raise readiness.OllamaPsUnexpected("/api/ps answer has no models list")
+
+    asyncio.run(readiness.warmup(ready_app["settings"]))
+    monkeypatch.setattr(readiness, "_ollama_ps", odd_ps)
+    ready_app["settings"] = ready_app["settings"].model_copy(
+        update={"inference_backend": "ollama", "ollama_context_length": 32768}
+    )
+    response = client_factory().get("/readyz")
+    assert response.status_code == 503
+    check = _checks(response)["ollama_runtime_context"]
+    assert check["code"] == "ollama_ps_unexpected" and "models" in check["detail"]

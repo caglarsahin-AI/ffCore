@@ -52,6 +52,15 @@ def test_04b_2_89_blank_scope_value_is_refused():
         parse_definition({**MINIMAL, "knowledge": knowledge})
 
 
+def test_04b_2_r2_scope_value_longer_than_search_allows_is_refused():
+    """r2 NOTE-2: the definition takes what the search takes (200 characters per source)."""
+    knowledge = [{"kb_key": "k", "mode": "always", "filter": {"scope": ["x" * 300]}}]
+    with pytest.raises(ValidationError):
+        parse_definition({**MINIMAL, "knowledge": knowledge})
+    ok = [{"kb_key": "k", "mode": "always", "filter": {"scope": ["x" * 200]}}]
+    parse_definition({**MINIMAL, "knowledge": ok})
+
+
 def test_04b_2_89_adapter_sends_scope_as_source_filter(monkeypatch):
     settings = Settings(
         deploy_profile="llmaas",
