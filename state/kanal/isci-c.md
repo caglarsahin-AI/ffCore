@@ -25,3 +25,12 @@ S2 e2e upstream: **A (önerilen)** `http://litellm:4000` (ALLOWED_INTERNAL_HOSTS
 S3 izleme verisi: **A (önerilen)** ok/error/blocked/denied gösterimi Vitest fikstürüyle + e2e'de gerçek çağrı (`error upstream_http_404`); B e2e'de DB'ye satır (test kancası); C yalnız Vitest.
 S4 audit: **A (önerilen)** çağrı `run_id` → koşu sayfası + audit eylem adları açıklamada (audit ekranı `ready:false`); B admin'e `GET /audit?resource_type=mcp_server` listesi (sunucuya göre süzme yok); C backend'e `resource_id` filtresi (kapsam dışı).
 Varsayım: spec'i URL'den çekme yok (backend ucu yok; tarayıcıdan dış istek egress'i atlar). PLAN-ONAY bekliyorum.
+
+### C-10C3-0003 · 2026-11-19 14:33 · → koordinator · KARAR-GEREK
+Paket: 10c-3 · Cevap: K-10C3-0002
+S2-A uygulanamaz (benim keşif hatam): 05b `check_upstream_url` (`services/mcp_publish.py:121`) `RESERVED_HOSTS`'taki (`services/external_config.py:62`) her adı 422 `upstream_url_refused` ile reddediyor; `.env.test` `ALLOWED_INTERNAL_HOSTS`'taki adların hepsi (litellm, langfuse-web, mcp-search, mcp-sql, ticket-desk) orada. e2e'de sunucu litellm ile oluşturulamaz; ayrılmamış ad da egress'te `egress_not_allowlisted`.
+**A (önerilen):** e2e konteynerini `run --name ffcore-10c3-e2e-upstream` ile açıp spec içinde Node ile sahte Superset upstream'i (örnek yollara 200/404 JSON) dinlemek; yığın `ALLOWED_INTERNAL_HOSTS=...,ffcore-10c3-e2e-upstream` komut satırı değeriyle (dosya değişmez). Etkisi: bağlantı testi geçer, İzleme'de gerçek `ok` ve `error upstream_http_404` satırları; değişiklik yalnız `tests/e2e/**` + docs/onyuz.md komut dizisi.
+B: `test` profiline sahte upstream servisi (compose + `backend/tests/fakes`; compose servisi = sınıf C, touch-zone dışı).
+C: e2e'de erişilebilir upstream yok: bağlantı testi "erişilemiyor + kod" gösterir; "geçer" kanıtı Vitest ve 05b test-int'te kalır.
+Yan bulgu (FOLLOWUP adayı, düşük): `RESERVED_HOSTS` yalnız servis adını eşler; platform servisinin konteyner adı (`<proje>-litellm-1`) ya da IP'si operatör `ALLOWED_INTERNAL_HOSTS`'a koyarsa upstream olarak geçer. A bu boşluğu kullanmaz (sahte upstream platform servisi değil), ama "e2e" servis adı ayrılmışken run konteyneri adı ayrılmamış.
+İlerleme: D0 (197) 22e45c5, D1 6c5f61b, D2 d1f9a2f, D3 0b3d829 commit'li; Vitest 275 yeşil. Cevap beklerken D4 (read/rol Vitest + upstream'e bağlı olmayan e2e'ler) sürüyor.
