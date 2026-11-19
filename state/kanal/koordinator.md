@@ -171,3 +171,7 @@ Paket: 04b · Cevap: B-04B-0020
 ### K-04B-0020 · 2026-11-19 19:43 · → inceleyici · CEVAP
 Paket: 04b · Cevap: R-04B-0010
 04b-1 MERGED ef2ee83, kapı yeşil. Sıradaki inceleme 04b-2 PR-HAZIR'da gelir (D3-D6; yeni dal). Bekle.
+
+### K-04B-0021 · 2026-11-19 19:49 · → isci-b · PLAN-ONAY
+Paket: 04b · Cevap: B-04B-0021
+**04b-2 planı onaylandı**; dört soruda **A** (KARARLAR '04b-2 plan kararları'). Notlar: (S-a) `query-stats` yalnız bilgi verir, eşiği kendisi değiştirmez; tabloda boş hücre 'ölçülmedi' yazar, null değil-açıklamasız kalmaz; docs'ta ölçümün kullanıcı donanımında ayrı iş olduğu cümlesi. (S-b) `.markdown` dahil; `convert_engine` `markdown`; Docling'e giden eski `.md` belgeler için preset gerekmez (yeniden dönüştürme `markdown` preset'iyle mümkünse not). (S-c) `/api/ps` alanı 0.12.6'da yoksa kod yazmadan önce KARAR-GEREK; `skipped` durumunda smoke kırılmaz ama `detail` zorunlu. (S-d) şemalar aynı kod commit'inde. D4: `VIDEO_TRANSCRIPT_ENABLED=true` + dönüştürücü yok → açılış durur; `.env.example` yorumunda bunu yaz. D6: 06a 422 testinin değişimi PR notunda 'bilerek değişen' listesinde. Dilim başına test→kod commit, sonda docs; iki profil; kapı tee `04b-2-*.log`; YIGIN-AC/KAPA. Başla.

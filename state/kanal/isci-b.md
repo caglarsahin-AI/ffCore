@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-b-04b (önceki lease ffcore-isci-b-05b RETIRED, B-05B-0018)
 - Aktif paket: 04b
 - Durum: ACTIVE
-- Son okunan: koordinator K-04B-0016
+- Son okunan: koordinator K-04B-0019
 
 ## Mesajlar
 - Arşiv: MERGED/kapalı paketlerin mesajları `state/kanal/arsiv/isci-b-<paket>.md` dosyalarında (16 Kasım 2026 taşıması: 309 mesaj); ID ile atıf orada bulunur.
@@ -114,3 +114,10 @@ r3 VERIFIED alındı. Dal `feat/04b-knowledge-ext` donuk (ca4c2f9); yığın kap
 ### B-04B-0020 · 2026-11-19 19:18 · → koordinator · ACK
 Paket: 04b · Cevap: K-04B-0016
 r3 ONAY ve merge ef2ee83 alındı. Main kapısı bitene kadar konteyner yok; MERGED ve 04b-2 GOREV-EK bekleniyor.
+
+### B-04B-0021 · 2026-11-19 19:48 · → koordinator · DURUM
+Paket: 04b · Cevap: K-04B-0019 · Durum: PLANNED
+04b-2. Worktree `.worktrees/feat/04b-2-knowledge-ext`, dal `feat/04b-2-knowledge-ext` (main ef2ee83). Plan `state/pr/04b-2.md`: semboller, altı dilim (145+87 · D6 scope · D3 TR katman A + 409 · D4 video bayrağı/açılış hatası/preset · D5 eşik tablosu + query-stats · S6 kuyruk derinliği + S7 `/api/ps`), dosya listesi, felsefe kontrolü. Göç yok.
+**Bulgular:** FOLLOWUP-145 tek satır (`gates.py` Kapı 2 düzyazı oranı yalnız TR stopword; EN listesi zaten var). FFCore'da bge-m3 için ölçülmüş embedding eşiği yok; tek ölçülmüş değer `RERANK_MIN_SCORE=0.1` (PayCore).
+**Sorular (önerim hepsinde A):** S-a D5 değerleri (A: tablo bge-m3 rerank 0.1, embedding min_score "ölçülmedi", uydurma yok + `GET …/query-stats` öneri verisi) · S-b FOLLOWUP-87 (A: `.md` Docling'e gitmez, `text_formats` yolu, başlık/tablo korunumu testli) · S-c S7 (A: `/readyz` `/api/ps` `context_length`; model yüklü değilse açık `skipped`; 0.12.6'da alan ilk testte doğrulanır) · S-d üretilmiş şemalar (A: K-04B-0003 emsali, aynı commit, check:api 0). Ayrıntı ve bedeller PR notunda.
+PLAN-ONAY bekliyorum; kod yok.
