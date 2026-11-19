@@ -44,6 +44,20 @@ def convert_plaintext(path: Path) -> ConversionResult:
     return ConversionResult(f"```\n{text}\n```", "plaintext", warnings=warnings)
 
 
+def convert_markdown(path: Path) -> ConversionResult:
+    """FOLLOWUP-87: Markdown is the silver format already; headings and tables stay as written
+    (format cleanup comes after, as for every converter). No model weights are needed."""
+    decoded = _decode_or_fail(path.read_bytes(), "markdown")
+    if isinstance(decoded, ConversionResult):
+        return decoded
+    text, label = decoded
+    text = text.strip()
+    warnings = [] if label == "utf-8" else [f"encoding: {label}"]
+    if len(text) < MIN_TEXT_CHARS:
+        return empty(text, "markdown", warnings)
+    return ConversionResult(text, "markdown", warnings=warnings)
+
+
 def html_body_text(body: str) -> str:
     """An HTML body as the text a reader sees; plain text is returned unchanged."""
     if not _HTML_START.match(body):

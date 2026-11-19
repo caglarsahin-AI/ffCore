@@ -19,6 +19,7 @@ _HANDLERS = {
     "email_eml": text_formats.convert_eml,
     "diagram": text_formats.convert_diagram,
     "plaintext": text_formats.convert_plaintext,
+    "markdown": text_formats.convert_markdown,
 }
 
 _SKIP_REASONS = {
