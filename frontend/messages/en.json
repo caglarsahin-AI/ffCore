@@ -1890,7 +1890,7 @@
       "p95": "Latency p95",
       "ms": "{value} ms",
       "noData": "No data",
-      "statusNote": "OK: the upstream answered. Error: the request was made but failed, for example invalid_arguments or upstream_http_404. Denied: refused before any request left, for example openapi_path_invalid, upstream_origin_mismatch or egress_not_allowlisted. Blocked: stopped by the guardrail policy. “Not OK” counts error, denied and blocked.",
+      "statusNote": "OK: the upstream answered. Error: the request was made and failed, for example upstream_http_404, or the argument check refused it (invalid_arguments). Denied: refused before any request left, by a quota, egress, origin or path rule, for example quota_exceeded, egress_not_allowlisted or openapi_path_invalid (an unsafe path in the stored document or a caller's path value such as a/b). Blocked: stopped by the guardrail policy. The code says why. “Not OK” counts error, denied and blocked.",
       "recentTitle": "Last calls",
       "emptyTitle": "No calls",
       "emptyBody": "Nobody called this server in the last {hours} hours.",

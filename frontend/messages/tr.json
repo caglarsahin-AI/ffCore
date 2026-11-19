@@ -1890,7 +1890,7 @@
       "p95": "Gecikme p95",
       "ms": "{value} ms",
       "noData": "Veri yok",
-      "statusNote": "Tamam: upstream cevap verdi. Hata: istek yapıldı ama başarısız oldu, örneğin invalid_arguments ya da upstream_http_404. Reddedildi: hiç istek gitmeden reddedildi, örneğin openapi_path_invalid, upstream_origin_mismatch ya da egress_not_allowlisted. Engellendi: guardrail politikası durdurdu. “Başarısız” hata, reddedildi ve engellendi durumlarını sayar.",
+      "statusNote": "Tamam: upstream cevap verdi. Hata: istek yapıldı ve başarısız oldu, örneğin upstream_http_404, ya da argüman denetimi reddetti (invalid_arguments). Reddedildi: hiç istek gitmeden kota, egress, origin ya da path kuralıyla reddedildi, örneğin quota_exceeded, egress_not_allowlisted ya da openapi_path_invalid (kayıtlı belgede güvensiz bir path ya da çağıranın a/b gibi bir path değeri). Engellendi: guardrail politikası durdurdu. Nedeni kod söyler. “Başarısız” hata, reddedildi ve engellendi durumlarını sayar.",
       "recentTitle": "Son çağrılar",
       "emptyTitle": "Çağrı yok",
       "emptyBody": "Son {hours} saatte bu sunucu çağrılmadı.",
