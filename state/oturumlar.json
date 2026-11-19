@@ -43,6 +43,18 @@
       "paket": "05b",
       "lease": "ffcore-isci-b-05b",
       "acildi": "2026-11-17T13:50"
+    },
+    "local_a18d28ef-c00d-47da-8a97-c42dd7839ac8": {
+      "rol": "isci-b",
+      "paket": "04b",
+      "lease": "ffcore-isci-b-04b",
+      "acildi": "2026-11-19T14:05"
+    },
+    "local_88af579d-3eb9-4dfc-b062-ec7f8d630076": {
+      "rol": "isci-c",
+      "paket": "10c-3",
+      "lease": "ffcore-isci-c-10c3",
+      "acildi": "2026-11-19T14:05"
     }
   }
 }
