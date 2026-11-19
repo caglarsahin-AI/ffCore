@@ -17,8 +17,10 @@ and system status).
 | `/knowledge-bases` | Knowledge bases of the selected project | analyst | list; create (admin) |
 | `/knowledge-bases/{id}` | One knowledge base: settings, documents, try search | analyst | edit, delete (admin); upload, delete document, rebuild a layer (analyst+edit); search (read too) |
 | `/system-status` | Readiness of the installation (`/readyz`) | admin | read only |
-| `/tools` | Tools (MCP and OpenAPI servers) of the selected project | developer | list; register (admin) |
+| `/tools` | Tools (MCP servers) of the selected project | developer | list; register (admin) |
 | `/tools/{id}` | One tool: settings, discovered actions, try an action | developer | edit, delete, discover, action switches, try (admin + edit) |
+| `/mcp-servers` | Published MCP servers of the selected project (05b) | developer | list; publish a server (admin + edit) |
+| `/mcp-servers/{id}` | One server: settings, operations, monitoring | developer | edit, delete, replace the document, read again / discover, select and rename operations, publish / stop, connection test, add as a tool (admin + edit); monitoring (read too) |
 | `/agents` | Agents of the selected project | analyst | list; create (analyst + edit) |
 | `/agents/{id}` | Agent wizard and test panel | analyst | edit the draft, publish, new draft, roll back, test run (analyst + edit); publish past the exam gate (admin + edit) |
 | `/runs` | Runs of the selected project | analyst | list with filters |
@@ -35,7 +37,7 @@ and system status).
 | `/quotas` | Quotas and limits, last quota warning per quota | developer | list; create, edit, delete (admin + edit) |
 | `/alerts` | Open alerts, history, rules, notification settings | developer | acknowledge (developer + edit); rules and notification settings (admin + edit); installation alerts (superadmin) |
 | `/retention` | Data retention of the installation | superadmin | policies, dry run, real run behind a confirmation, past passes (superadmin + edit) |
-| every other menu item | Later packages (10c-3 and others) | see role matrix | "not available yet" page |
+| every other menu item | Later packages (14, 15, 16 and others) | see role matrix | "not available yet" page |
 | `/dev/theme` | Components in both themes side by side | none | done |
 
 A path outside the user's role renders "You do not have access". This is a UI convenience;
@@ -227,6 +229,47 @@ contract is shown as an error, never as "ready". Without model weights the page 
   run; the buttons follow `can_decide` (signed-in user, edit access, role at least the assigned
   one) and the backend's 403/409 codes become messages.
 
+## MCP servers (05b)
+
+The screen publishes an OpenAPI document or a remote MCP server as an MCP server of this
+installation at `/mcp/<key>/` (docs/araclar.md "Publish an MCP server") and is the only way an
+OpenAPI service becomes a tool: the tool form no longer offers an OpenAPI kind (05b S5).
+
+- **Who.** The menu item is developer and up (R10.5). Every change is a project admin's, because
+  the 05b API allows changes only to `admin` (KARARLAR "10c-3 plan kararları" S1): a developer
+  sees the same pages with each change control disabled and the reason "Only a project admin can
+  publish or change MCP servers"; read mode disables them through `<WriteGate>` as everywhere.
+- **Publish.** Key (unique in the installation), name, source (OpenAPI document or remote MCP
+  server), upstream address and identity (none, bearer, custom header, basic; secrets come back
+  masked and are kept unless the identity is changed), who can call (platform agents only, or
+  agents and API keys with `tools_invoke`), guardrail mode and policy key. An OpenAPI document is
+  pasted or read from a local file (YAML or JSON). Fetching it from a URL is not offered: there
+  is no backend endpoint for it, and the browser would make an outbound request outside the
+  egress policy. Refusals land on their field (`mcp_server_key_taken`, `upstream_url_refused`,
+  `egress_*`, `openapi_path_invalid` under the document, ...).
+- **Operations.** Every operation of the document is listed with method and path. One that cannot
+  be published keeps its row, has no selection and shows its reason (`openapi_path_invalid`,
+  `operation_id_missing`, `ref_cycle`, ...; an unknown reason is shown as its code). Select the
+  operations to serve and, optionally, the tool name and description the model sees (empty keeps
+  the operation's own); "Save selection" sends the selection and only the changed names. A
+  server starts as a draft: "Publish" serves it, "Stop serving" stops it. "Replace document"
+  (`PUT /spec`) keeps selection and names by operation name; "Read the document again" (OpenAPI)
+  or "Discover tools" (remote MCP) reads the catalog again.
+- **Connection test** shows reachable or not, the upstream's HTTP status (for OpenAPI any HTTP
+  answer counts as reachable), the tools a remote server lists, latency and the refusal code.
+- **Add as a tool** creates the 05a tool at the server's own address with `forward_user` and links
+  to it; discover its actions there (they start switched off and needing approval).
+- **Monitoring** (tab, read too): the last 24 hours from `GET .../calls?hours=24` as the backend
+  gives them (requests, not OK, blocked, p50 and p95 latency) and the last 50 calls with time,
+  operation, status, code, latency and caller; a call of an agent run links to the run. Status:
+  **OK** the upstream answered; **Error** the request was made but failed (`invalid_arguments`,
+  `upstream_http_404`, ...); **Denied** refused before any request left (`openapi_path_invalid`,
+  `upstream_origin_mismatch`, `egress_not_allowlisted`, ...); **Blocked** stopped by the
+  guardrail. "Not OK" counts error, denied and blocked. Changes to the server are in the audit log
+  (`create_mcp_server`, `update_mcp_server`, `update_mcp_server_spec`, `discover_mcp_server`,
+  `test_mcp_server`, `add_mcp_server_tool`, `delete_mcp_server`); the audit list is the Audit
+  screen's (later package).
+
 ## Governance (03c): overview, usage, API keys, quotas, alerts, retention
 
 - **Overview.** Usage of the last 30 UTC days (requests, tokens, cost; requests without a price
@@ -395,6 +438,23 @@ items from a completed run (from-run), so no `seed-eval` is needed. Without netw
 (`npm ci` cannot reach a registry), fill the stack's `e2e_node_modules` volume from an existing
 glibc `node_modules` volume and run `npx playwright test` instead of `npm ci && …`.
 
+### MCP servers (10c-3): the fake upstream
+
+05b refuses every platform service as an upstream (`RESERVED_HOSTS`: litellm, ticket-desk, ...),
+so the MCP tests serve a fake Superset from the e2e container itself (KARARLAR "10c-3 plan
+kararları" S2). The container runs with a fixed name, the stack lists that name in
+`ALLOWED_INTERNAL_HOSTS` for the run only, and `E2E_UPSTREAM_HOST` tells the tests the name;
+servers that are never called use `http://superset.example.com/api`, allowed by
+`EGRESS_ALLOWLIST` (creation checks the address, it does not resolve it). Nothing of this exists
+in an installation, and no file changes. Without `E2E_UPSTREAM_HOST` the two specs that need the
+fake (`test_10c3_1`, `test_10c3_3`) fail loudly.
+
+```bash
+export ALLOWED_INTERNAL_HOSTS=litellm,langfuse-web,mcp-search,mcp-sql,ticket-desk,fake-llm,ffcore-10c3-e2e-upstream EGRESS_ALLOWLIST=superset.example.com FAKE_EMBED=1
+docker compose -p ffcore-10c3 --env-file .env.test --profile test up -d --wait --pull never
+docker compose -p ffcore-10c3 --env-file .env.test --profile test --profile e2e run --rm --name ffcore-10c3-e2e-upstream -e E2E_UPSTREAM_HOST=ffcore-10c3-e2e-upstream e2e sh -c "npx playwright test --grep-invert @model-missing --workers=1"
+```
+
 ## Screenshots
 
 | Screen | Light | Dark |
@@ -435,6 +495,10 @@ glibc `node_modules` volume and run `npx playwright test` instead of `npm ci && 
 | Alerts, read mode | ![](images/10c2-alerts-read-light.png) | ![](images/10c2-alerts-read-dark.png) |
 | Data retention, edit mode | ![](images/10c2-retention-edit-light.png) | ![](images/10c2-retention-edit-dark.png) |
 | Data retention, read mode | ![](images/10c2-retention-read-light.png) | ![](images/10c2-retention-read-dark.png) |
+| MCP servers, publish form | ![](images/10c3-mcp-servers-light.png) | ![](images/10c3-mcp-servers-dark.png) |
+| MCP server, edit mode | ![](images/10c3-mcp-server-edit-light.png) | ![](images/10c3-mcp-server-edit-dark.png) |
+| MCP server, read mode | ![](images/10c3-mcp-server-read-light.png) | ![](images/10c3-mcp-server-read-dark.png) |
+| MCP monitoring | ![](images/10c3-mcp-monitoring-light.png) | ![](images/10c3-mcp-monitoring-dark.png) |
 | Exam suites | ![](images/10c1-suites-light.png) | ![](images/10c1-suites-dark.png) |
 | New suite | ![](images/10c1-suite-new-light.png) | ![](images/10c1-suite-new-dark.png) |
 | Suite: exam start, exams | ![](images/10c1-suite-light.png) | ![](images/10c1-suite-dark.png) |

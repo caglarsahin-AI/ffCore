@@ -269,7 +269,22 @@ an `off` policy too, `enforce` enforces every rule. Rules of type `tool_args` ma
 **Log.** Every call writes one `mcp_server_calls` row (operation, status, code, latency, run,
 caller; no arguments or results) and one `mcp_server_call` audit row.
 `GET .../mcp-servers/{id}/calls?hours=24` gives requests, errors, blocked calls, p50/p95 latency
-and the last 50 calls (the MCP monitoring screen, 10c-3).
+and the last 50 calls (the console's MCP monitoring tab, 10c-3; docs/onyuz.md "MCP servers").
+
+**Reading a call's status (FOLLOWUP-195).** `status` and `error_code` together say where a call
+ended:
+
+| `status` | Meaning | Example codes |
+|---|---|---|
+| `ok` | The upstream answered (2xx). | none |
+| `error` | A request was made (or the arguments were checked) and failed. | `invalid_arguments` (bad argument, also a path value such as `..`), `upstream_http_<status>`, `upstream_timeout`, `upstream_unreachable`, `upstream_response_too_large` |
+| `denied` | Refused before any request left: nothing reached the upstream. | `openapi_path_invalid` (a stored path that is not safe), `upstream_origin_mismatch`, `upstream_url_refused`, `endpoint_url_not_allowed`, `egress_not_allowlisted` and the other `egress_*` refusals |
+| `blocked` | Stopped by the guardrail policy (`tool.pre` or `tool.post`). | `guardrail_blocked` |
+
+So `error` + `invalid_arguments` is the caller's mistake on a call that was allowed, while
+`denied` + `openapi_path_invalid` is a server whose stored document is no longer safe to call:
+fix the document (`PUT .../spec`), not the caller. `errors` in the summary counts every call that
+did not end `ok` (error, denied and blocked).
 
 **Agents use it** through the tools registry: `POST .../mcp-servers/{id}/tools` adds a tool with
 the server's key at `<INTERNAL_API_URL>/mcp/<key>/` and `forward_user`, so the runtime calls the
