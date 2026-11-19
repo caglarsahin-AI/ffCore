@@ -211,7 +211,7 @@ class ReindexLayer(StrEnum):
     gold = "gold"
 
 
-PRESET_PATTERN = r"^(encoding|timeout|mhtml|engine:[a-z0-9][a-z0-9_.+-]{0,39})$"
+PRESET_PATTERN = r"^(encoding|timeout|mhtml|video|engine:[a-z0-9][a-z0-9_.+-]{0,39})$"
 
 
 class ReindexRequest(Strict):
@@ -224,7 +224,8 @@ class ReindexRequest(Strict):
         default=None,
         pattern=PRESET_PATTERN,
         description="Targeted reconversion (silver only): only the documents one problem hit. "
-        "encoding (encoding_undecodable), timeout, mhtml, engine:<convert_engine>.",
+        "encoding (encoding_undecodable), timeout, mhtml, video (video_disabled), "
+        "engine:<convert_engine>.",
     )
 
 

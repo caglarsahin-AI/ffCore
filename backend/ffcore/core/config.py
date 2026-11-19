@@ -92,6 +92,9 @@ class Settings(BaseSettings):
     # 04b-2 D3: Turkish layer A (circumflex folding) on silver and queries; off by
     # default. Switching it needs `make reindex LAYER=silver` (search is 409 until then).
     text_normalize_tr: bool = False
+    # 04b-2 D4: video transcription. This build has no transcriber (faster-whisper is a separate
+    # class-C PR), so True stops start-up; off, a video is Kapı 0 `video_disabled`.
+    video_transcript_enabled: bool = False
     # Hybrid candidates handed to the reranker (and logged in kb_queries.candidates, C12).
     retrieval_candidates: int = Field(default=30, gt=0)
     # Deterministic stand-in models for tests (FAKE_EMBED=1); never a silent fallback: the
@@ -244,6 +247,16 @@ class Settings(BaseSettings):
             raise ValueError(
                 "eval_advance_interval_invalid: EVAL_ADVANCE_INTERVAL_S must be below "
                 "RUN_ABANDON_GRACE_S, or exam runs are abandoned between two ticks"
+            )
+        return self
+
+    @model_validator(mode="after")
+    def _video_needs_a_transcriber(self) -> "Settings":
+        if self.video_transcript_enabled:
+            raise ValueError(
+                "video_transcriber_unavailable: VIDEO_TRANSCRIPT_ENABLED=true needs a video "
+                "transcriber, and this build has none; leave it false (videos are recorded as "
+                "video_disabled and can be reconverted later with the video preset)"
             )
         return self
 

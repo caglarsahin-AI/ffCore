@@ -703,7 +703,7 @@ export interface components {
             full: boolean;
             /**
              * Preset
-             * @description Targeted reconversion (silver only): only the documents one problem hit. encoding (encoding_undecodable), timeout, mhtml, engine:<convert_engine>.
+             * @description Targeted reconversion (silver only): only the documents one problem hit. encoding (encoding_undecodable), timeout, mhtml, video (video_disabled), engine:<convert_engine>.
              */
             preset?: string | null;
         };

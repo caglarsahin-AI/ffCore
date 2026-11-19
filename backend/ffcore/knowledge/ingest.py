@@ -770,7 +770,7 @@ class ReindexRefused(Exception):
 
 # Targeted reconversion (pipeline step 10, PayCore D2): an explicit preset names the problem;
 # only the documents it hit are read from raw again. `engine:<name>` is an exact convert_engine.
-PRESETS = ("encoding", "timeout", "mhtml")
+PRESETS = ("encoding", "timeout", "mhtml", "video")
 _ENGINE = re.compile(r"^engine:([a-z0-9][a-z0-9_.+-]{0,39})$")
 
 
@@ -789,6 +789,8 @@ def _preset_condition(preset: str):
         return Document.error.like("encoding_undecodable%")
     if preset == "timeout":
         return Document.status == "timeout"
+    if preset == "video":  # 04b-2 D4: Kapı 0 refused them while no transcriber existed
+        return Document.gate0_reason == "video_disabled"
     if preset == "mhtml":
         return or_(
             Document.convert_engine.like("mhtml%"), Document.mime_sniffed == "multipart/related"

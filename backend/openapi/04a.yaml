@@ -1867,11 +1867,11 @@ components:
         preset:
           anyOf:
           - type: string
-            pattern: ^(encoding|timeout|mhtml|engine:[a-z0-9][a-z0-9_.+-]{0,39})$
+            pattern: ^(encoding|timeout|mhtml|video|engine:[a-z0-9][a-z0-9_.+-]{0,39})$
           - type: 'null'
           title: Preset
           description: 'Targeted reconversion (silver only): only the documents one problem hit. encoding
-            (encoding_undecodable), timeout, mhtml, engine:<convert_engine>.'
+            (encoding_undecodable), timeout, mhtml, video (video_disabled), engine:<convert_engine>.'
       additionalProperties: false
       type: object
       required:
