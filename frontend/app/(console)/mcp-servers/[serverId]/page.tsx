@@ -8,6 +8,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import { McpAdminGate, useCanChangeMcp } from "@/components/mcp/admin-gate";
+import { CallsMonitor } from "@/components/mcp/calls-monitor";
 import { ConnectionTestResult } from "@/components/mcp/connection-test";
 import { OperationsTable } from "@/components/mcp/operations-table";
 import { McpServerForm } from "@/components/mcp/server-form";
@@ -174,6 +175,7 @@ function Loaded({ projectId, server }: { projectId: string; server: McpServer })
         <Tabs defaultValue="operations">
           <TabsList>
             <TabsTrigger value="operations">{t("tabs.operations")}</TabsTrigger>
+            <TabsTrigger value="monitoring">{t("tabs.monitoring")}</TabsTrigger>
           </TabsList>
           <TabsContent value="operations" className="flex flex-col gap-4 pt-2">
             <div className="flex flex-wrap gap-2">
@@ -192,6 +194,9 @@ function Loaded({ projectId, server }: { projectId: string; server: McpServer })
             </div>
             {replacing && <SpecReplaceForm projectId={projectId} server={server} onDone={() => setReplacing(false)} />}
             <OperationsTable key={catalogKey(server)} projectId={projectId} server={server} canChange={canChange} />
+          </TabsContent>
+          <TabsContent value="monitoring" className="pt-2">
+            <CallsMonitor projectId={projectId} serverId={server.id} />
           </TabsContent>
         </Tabs>
       </Screen>

@@ -1879,6 +1879,41 @@
     "aliasFor": "Tool name for {name}",
     "aliasDescriptionFor": "Tool description for {name}",
     "reasonCode": "Reason code: {code}",
-    "saveSelection": "Save selection"
+    "saveSelection": "Save selection",
+    "monitoring": {
+      "window": "Last {hours} hours",
+      "refresh": "Refresh",
+      "requests": "Requests",
+      "errors": "Not OK",
+      "blocked": "Blocked",
+      "p50": "Latency p50",
+      "p95": "Latency p95",
+      "ms": "{value} ms",
+      "noData": "No data",
+      "statusNote": "OK: the upstream answered. Error: the request was made but failed, for example invalid_arguments or upstream_http_404. Denied: refused before any request left, for example openapi_path_invalid, upstream_origin_mismatch or egress_not_allowlisted. Blocked: stopped by the guardrail policy. “Not OK” counts error, denied and blocked.",
+      "recentTitle": "Last calls",
+      "emptyTitle": "No calls",
+      "emptyBody": "Nobody called this server in the last {hours} hours.",
+      "time": "Time",
+      "operation": "Operation",
+      "status": "Status",
+      "code": "Code",
+      "latency": "Latency",
+      "caller": "Caller",
+      "run": "Open the run",
+      "none": "None",
+      "statuses": {
+        "ok": "OK",
+        "error": "Error",
+        "blocked": "Blocked",
+        "denied": "Denied"
+      },
+      "actors": {
+        "user": "User",
+        "api_key": "API key",
+        "system": "System"
+      },
+      "auditNote": "Changes to this server are in the audit log as {actions}."
+    }
   }
 }

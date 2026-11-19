@@ -1879,6 +1879,41 @@
     "aliasFor": "{name} için araç adı",
     "aliasDescriptionFor": "{name} için araç açıklaması",
     "reasonCode": "Neden kodu: {code}",
-    "saveSelection": "Seçimi kaydet"
+    "saveSelection": "Seçimi kaydet",
+    "monitoring": {
+      "window": "Son {hours} saat",
+      "refresh": "Yenile",
+      "requests": "İstek",
+      "errors": "Başarısız",
+      "blocked": "Engellenen",
+      "p50": "Gecikme p50",
+      "p95": "Gecikme p95",
+      "ms": "{value} ms",
+      "noData": "Veri yok",
+      "statusNote": "Tamam: upstream cevap verdi. Hata: istek yapıldı ama başarısız oldu, örneğin invalid_arguments ya da upstream_http_404. Reddedildi: hiç istek gitmeden reddedildi, örneğin openapi_path_invalid, upstream_origin_mismatch ya da egress_not_allowlisted. Engellendi: guardrail politikası durdurdu. “Başarısız” hata, reddedildi ve engellendi durumlarını sayar.",
+      "recentTitle": "Son çağrılar",
+      "emptyTitle": "Çağrı yok",
+      "emptyBody": "Son {hours} saatte bu sunucu çağrılmadı.",
+      "time": "Zaman",
+      "operation": "Operasyon",
+      "status": "Durum",
+      "code": "Kod",
+      "latency": "Gecikme",
+      "caller": "Çağıran",
+      "run": "Koşuyu aç",
+      "none": "Yok",
+      "statuses": {
+        "ok": "Tamam",
+        "error": "Hata",
+        "blocked": "Engellendi",
+        "denied": "Reddedildi"
+      },
+      "actors": {
+        "user": "Kullanıcı",
+        "api_key": "API anahtarı",
+        "system": "Sistem"
+      },
+      "auditNote": "Bu sunucudaki değişiklikler audit kaydında {actions} eylemleriyle yer alır."
+    }
   }
 }
