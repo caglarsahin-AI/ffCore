@@ -1,4 +1,4 @@
-# Knowledge base (FFCore Knowledge, package 04a)
+# Knowledge base (FFCore Knowledge, packages 04a and 04b)
 
 Documents are uploaded, converted, checked by three quality gates, chunked, embedded in process
 and searched with hybrid retrieval and a reranker. Documents never leave the installation:
@@ -15,6 +15,27 @@ over from the PayCore deployment); changing one is a decision, not a tuning knob
 
 `make reindex PROJECT=<key> KB=<key> LAYER=silver|gold [FULL=1]` (tools container) queues the
 job; the worker log shows `reused=N embedded=M`.
+
+Deleting a document (or its knowledge base) removes its silver file and `.raw.md` at once; raw
+stays on disk (it is the only copy of what the source gave, D3) and is removed by the operator's
+runbook (FOLLOWUP-133).
+
+### Targeted reconversion (04b)
+
+`make reconvert PROJECT=<key> KB=<key> PRESET=<preset>` (or `POST …/reindex` with
+`{"layer": "silver", "preset": "<preset>"}`) reconverts from raw only the documents one problem
+hit, whatever their status:
+
+| Preset | Documents |
+|---|---|
+| `encoding` | failed with `encoding_undecodable` |
+| `timeout` | status `timeout` |
+| `mhtml` | converted as MHTML (`convert_engine` `mhtml…`, or sniffed `multipart/related`) |
+| `engine:<name>` | `convert_engine` exactly `<name>` (e.g. `engine:docling`) |
+
+Any other value is refused (`preset_unknown`); a preset with `layer: gold` is
+`preset_requires_silver`. The response's `documents` is the number the preset selects. The
+personnel-data rule of a silver reindex applies (`prsim_requires_ner`).
 
 ## Ingest from a raw-staging tree (`ingest-raw`, package 19)
 
@@ -165,6 +186,9 @@ re-embeds everything.
 - Vector store: `VECTOR_BACKEND=pgvector` (default, `chunks.embedding` + HNSW) or `qdrant`
   (dense + sparse; compose profile `qdrant`, `QDRANT_URL`, and `qdrant` in
   `ALLOWED_INTERNAL_HOSTS`). No automatic choice and no fallback between them.
+- Postgres keeps both halves of every embedding whatever the driver: the dense vector in
+  `chunks.embedding` and the bge-m3 sparse weights in `chunks.sparse` (04b). A chunk whose text
+  and model did not change takes both over at a gold reindex, so Qdrant reuses vectors too.
 - Search: the query passes the same format cleanup as silver; a vector leg and a lexical leg
   (Postgres BM25 for pgvector, bge-m3 sparse inside Qdrant) are fused by RRF (k = 60) into 30
   candidates; the reranker (`BAAI/bge-reranker-v2-m3`) scores them and only those at or above
@@ -178,6 +202,35 @@ re-embeds everything.
   date" to the model; the upload time is never used in its place (FOLLOWUP-101).
 - Model weights live in the `model_cache` volume, never in the image. Keep it when closing a
   stack (`docker compose down`, not `down -v`).
+
+## Moving vectors between drivers (`migrate-vectors`, 04b)
+
+```bash
+docker compose run --rm tools make migrate-vectors PROJECT=<key> FROM=pgvector TO=qdrant [KB=<key>] [DRY_RUN=1] [DROP_TARGET=1]
+```
+
+- Embeddings are not recomputed. pgvector → Qdrant upserts the stored dense vector, the sparse
+  weights and the document ACL as it is now; Qdrant → pgvector fills `chunks.embedding` of the
+  rows that lack it from the Qdrant points.
+- A chunk written before 04b has no sparse weights: the migration computes those only (through
+  the API's `/internal/embed`, so the backend must be up) and prints `sparse_computed=N`. A dry
+  run writes nothing and prints `sparse_missing=N`.
+- Per knowledge base the line shows `source`, `target`, `written`; the run exits 1 when the
+  target does not hold the source's vectors. A Qdrant collection with points of its own (an
+  earlier run, another installation) is never cleaned silently: run again with `DROP_TARGET=1`
+  (Qdrant only; the pgvector column is the source of truth and is never dropped).
+- Run it while no ingest is running: a document being re-embedded is not searchable and is not
+  counted on the pgvector side.
+- The switch is `VECTOR_BACKEND` in `.env` (the operator's); going back is setting it back. The
+  source side is never changed. Search ACL is applied in the query on both sides.
+
+## Ingest report (04b)
+
+`GET …/knowledge-bases/{kb_id}/ingest-report?limit=100` counts documents by source × gate ×
+status × reason (per gate the counts add up to `documents`, the shape of the `ingest_gate_stats`
+view) and lists the rejected documents (the first gate that skipped them, with its reason) and
+the skipped chunks (`chunk_reason`), each list up to `limit` rows with its total. Only documents
+the caller may read are counted and listed.
 
 ## Model weights (offline)
 
@@ -210,5 +263,5 @@ verified here (FOLLOWUP-31).
 
 The PR description of package 04a lists the numbers measured with the real models: indexing
 time of the 10-page sample contract, the rank of "fesih bildirim süresi", and `/healthz` latency
-under 10 concurrent searches. Thresholds per embedding model and a Turkish embedding comparison
-are package 04b.
+under 10 concurrent searches. Thresholds per embedding model are package 04b-2; the Turkish
+embedding comparison is a measurement on the target machine (not a package deliverable).

@@ -18,6 +18,22 @@ if anything.
   fit the contract.
 - **Action:** none.
 
+## 2026-11-19 · 04b-1 · migrate-vectors, ingest report, document ACL edit, reconversion presets
+
+- **What:** `make migrate-vectors` copies a knowledge base's vectors between pgvector and Qdrant
+  without re-embedding and exits 1 when the counts differ (docs/bilgi-tabani.md "Moving vectors
+  between drivers"). New `GET …/knowledge-bases/{kb_id}/ingest-report`; `PATCH
+  …/documents/{id}` takes `acl_roles`, `acl_users`, `acl_open`; `POST …/reindex` takes `preset`
+  (`make reconvert`); the search response adds `filtered` and `rerank_truncated` (additive).
+- **Changed:** uploading identical bytes under the same name keeps the version (was version + 1;
+  outcome `unchanged` as before, FOLLOWUP-157). Deleting a document or a knowledge base removes
+  its silver and `.raw.md` files; raw stays (FOLLOWUP-133).
+- **Schema:** migration `04b_0001` adds `chunks.sparse` (jsonb, nullable); the bge-m3 sparse
+  weights are stored with every new chunk, so Qdrant reuses unchanged vectors at a gold reindex.
+  Rows written before stay `NULL` until a gold reindex or `migrate-vectors … TO=qdrant`.
+- **Action:** run the migration (`migrate` service, on every `up`). Nothing else; the vector
+  driver changes only when the operator changes `VECTOR_BACKEND`.
+
 ## 2026-11-17 · 05b · Published MCP servers at /mcp/{key}/
 
 - **What:** an OpenAPI 3 document or a remote MCP server can be published as an MCP server of
