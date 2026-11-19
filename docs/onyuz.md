@@ -406,8 +406,8 @@ Stage 2 restarts the backend and the ingest worker with `FAKE_EMBED=1` (determin
 embedding and reranker, no weights) and runs everything else. Export it rather than prefixing one
 command: the `e2e` service depends on the backend, so `run` recreates the backend from the shell's
 values, and a prefix-only `FAKE_EMBED=1` is back to 0 by the time the tests start (FOLLOWUP-93).
-Weightless formats (measured): PDFs with a text layer are indexed; DOCX and Markdown need Docling
-weights and fail with `model_missing`, which the tests use as the failed-document case. The
+Weightless formats (measured): PDFs with a text layer and (since 04b-2) Markdown are indexed;
+DOCX needs Docling weights and fails with `model_missing`, which the tests use as the failed-document case. The
 stand-in reranker scores the share of query words found in a passage, so questions about the
 Turkish samples are asked in Turkish. `--workers=1` keeps the waits stable on a shared machine.
 

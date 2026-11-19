@@ -283,4 +283,4 @@ def test_04a_read_mode_get_parity(world, settings, queue, app):
         assert edit.status_code == 200, (url, edit.text)
         assert (read.status_code, read.content) == (edit.status_code, edit.content), url
         checked += 1
-    assert checked == 5  # 04b adds GET /{kb_id}/ingest-report
+    assert checked == 6  # 04b adds GET /{kb_id}/ingest-report and (04b-2) /query-stats

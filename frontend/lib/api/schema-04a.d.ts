@@ -108,6 +108,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/projects/{project_id}/knowledge-bases/{kb_id}/query-stats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Query Stats
+         * @description Score distribution of the KB's queries against the thresholds in force and the
+         *     threshold table row of its embedding model (04b-2 D5). Information only.
+         */
+        get: operations["query_stats_api_v1_projects__project_id__knowledge_bases__kb_id__query_stats_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/projects/{project_id}/knowledge-bases/{kb_id}/reindex": {
         parameters: {
             query?: never;
@@ -648,6 +669,25 @@ export interface components {
                 [key: string]: unknown;
             };
         };
+        /**
+         * QueryStats
+         * @description Best score per query against the thresholds in force (04b-2 D5). Information only: a
+         *     screen shows "X% of queries are below the threshold"; nothing is changed (no auto).
+         */
+        QueryStats: {
+            /** Days */
+            days: number;
+            /** Queries */
+            queries: number;
+            /** Zero Result */
+            zero_result: number;
+            /** Zero Result Ratio */
+            zero_result_ratio: number | null;
+            rerank: components["schemas"]["ScoreStats"];
+            embed: components["schemas"]["ScoreStats"];
+            /** @description The threshold table row of the KB's embedding model; null: not in the table. */
+            table: components["schemas"]["ThresholdTableRow"] | null;
+        };
         /** ReadinessCheck */
         ReadinessCheck: {
             /** Name */
@@ -703,7 +743,7 @@ export interface components {
             full: boolean;
             /**
              * Preset
-             * @description Targeted reconversion (silver only): only the documents one problem hit. encoding (encoding_undecodable), timeout, mhtml, engine:<convert_engine>.
+             * @description Targeted reconversion (silver only): only the documents one problem hit. encoding (encoding_undecodable), timeout, mhtml, video (video_disabled), engine:<convert_engine>.
              */
             preset?: string | null;
         };
@@ -754,16 +794,42 @@ export interface components {
          * @enum {string}
          */
         Role: "user" | "analyst" | "developer" | "admin";
+        /** ScoreStats */
+        ScoreStats: {
+            /**
+             * Threshold
+             * @description The threshold in force; null: none.
+             */
+            threshold: number | null;
+            /**
+             * Scored
+             * @description Queries with a best score of this kind.
+             */
+            scored: number;
+            /**
+             * Below
+             * @description Of those, below the threshold; null without one.
+             */
+            below: number | null;
+            /** Below Ratio */
+            below_ratio: number | null;
+            /** P10 */
+            p10: number | null;
+            /** P50 */
+            p50: number | null;
+            /** P90 */
+            p90: number | null;
+        };
         /** SearchFilters */
         SearchFilters: {
             /** Document Ids */
             document_ids?: string[];
             /**
              * Metadata
-             * @description Equality filters on document metadata.
+             * @description Filters on document metadata: a value is equality, a list is any of the values (exact match; 04b-2).
              */
             metadata?: {
-                [key: string]: string | number | boolean;
+                [key: string]: string | number | boolean | string[];
             };
         };
         /** SearchHit */
@@ -862,6 +928,25 @@ export interface components {
          * @enum {string}
          */
         ThresholdMode: "rerank_floor" | "min_score";
+        /** ThresholdTableRow */
+        ThresholdTableRow: {
+            /** Embed Model */
+            embed_model: string;
+            /** Rerank Model */
+            rerank_model: string | null;
+            /**
+             * Rerank Min Score
+             * @description Measured value; null: not measured.
+             */
+            rerank_min_score: number | null;
+            /**
+             * Min Score
+             * @description Measured value; null: not measured.
+             */
+            min_score: number | null;
+            /** Note */
+            note: string;
+        };
         /**
          * UploadOutcome
          * @enum {string}
@@ -1692,6 +1777,86 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["IngestGateReport"];
+                };
+            };
+            /** @description Invalid request. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description Not authenticated. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description Role or access mode not sufficient, or cross-origin request. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description Not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description Conflict with the current state. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description Request body or parameters failed validation. */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    query_stats_api_v1_projects__project_id__knowledge_bases__kb_id__query_stats_get: {
+        parameters: {
+            query?: {
+                /** @description Look-back window in days. */
+                days?: number;
+            };
+            header?: never;
+            path: {
+                project_id: string;
+                kb_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QueryStats"];
                 };
             };
             /** @description Invalid request. */

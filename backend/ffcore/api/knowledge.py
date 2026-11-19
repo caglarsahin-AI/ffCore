@@ -34,11 +34,14 @@ from ffcore.api.knowledge_schemas import (
     KnowledgeBaseList,
     KnowledgeBaseOut,
     KnowledgeBaseUpdate,
+    QueryStats,
     ReindexAccepted,
     ReindexLayer,
     ReindexRequest,
+    ScoreStats,
     SearchRequest,
     SearchResponse,
+    ThresholdTableRow,
     UploadedDocument,
     UploadResult,
 )
@@ -47,10 +50,10 @@ from ffcore.core.audit import audited
 from ffcore.core.auth import ROLE_ORDER, Actor, authorize, require_role
 from ffcore.core.config import Settings, get_settings
 from ffcore.core.errors import ApiError
-from ffcore.knowledge import ingest, jobs, report, search
+from ffcore.knowledge import ingest, jobs, report, search, thresholds
 from ffcore.knowledge.chunking import ChunkSettings
-from ffcore.knowledge.normalize import NORMALIZER_CONFIG_ID
-from ffcore.knowledge.vectorstore.base import VectorFilters, VectorStoreError
+from ffcore.knowledge.normalize import normalizer_config_id
+from ffcore.knowledge.vectorstore.base import VectorFilters, VectorStoreError, metadata_items
 from ffcore.models.knowledge import Attachment, Chunk, Document, KnowledgeBase
 from ffcore.runtime import checkpoints
 from ffcore.services import retention
@@ -266,7 +269,7 @@ async def create_knowledge_base(
         default_top_k=body.default_top_k,
         default_min_score=body.default_min_score,
         default_filter=body.default_filter,
-        normalizer_config_id=NORMALIZER_CONFIG_ID,
+        normalizer_config_id=normalizer_config_id(settings),
         created_by=actor.actor_id,
     )
     session.add(kb)
@@ -598,6 +601,34 @@ async def ingest_report(
     return IngestGateReport(**result.__dict__)
 
 
+@router.get("/{kb_id}/query-stats", response_model=QueryStats)
+async def query_stats(
+    project_id: UUID,
+    kb_id: UUID,
+    actor: Reader,
+    session: SessionDep,
+    settings: SettingsDep,
+    days: Annotated[int, Query(ge=1, le=365, description="Look-back window in days.")] = 30,
+):
+    """Score distribution of the KB's queries against the thresholds in force and the
+    threshold table row of its embedding model (04b-2 D5). Information only."""
+    kb = await _kb(session, project_id, kb_id)
+    stats = await thresholds.query_stats(
+        session,
+        kb.id,
+        days=days,
+        rerank_threshold=settings.rerank_min_score,
+        embed_threshold=kb.default_min_score,
+    )
+    row = thresholds.row(kb.embed_model)
+    return QueryStats(
+        **{k: v for k, v in stats.__dict__.items() if k not in {"rerank", "embed"}},
+        rerank=ScoreStats(**stats.rerank.__dict__),
+        embed=ScoreStats(**stats.embed.__dict__),
+        table=ThresholdTableRow(**row.__dict__) if row else None,
+    )
+
+
 @router.delete("/{kb_id}/documents/{document_id}", status_code=status.HTTP_204_NO_CONTENT)
 @audited("delete_document", "document")
 async def delete_document(
@@ -683,7 +714,7 @@ async def _search(request, actor, session, settings, project_id, kb_id, body, ru
         document_ids=tuple(body.filters.document_ids),
         acl_roles=acl.acl_roles,
         acl_users=acl.acl_users,
-        metadata=tuple(sorted(body.filters.metadata.items())),
+        metadata=metadata_items(body.filters.metadata),
     )
     try:
         result = await search.search(
@@ -701,6 +732,12 @@ async def _search(request, actor, session, settings, project_id, kb_id, body, ru
         )
     except VectorStoreError as exc:
         raise _vector_error(exc) from None
+    except search.NormalizerMismatch as exc:
+        raise conflict(
+            "normalizer_config_mismatch",
+            f"Documents of this knowledge base are in normalizer form {exc.found}, queries "
+            f"would be in {exc.expected}; rebuild silver first: make reindex LAYER=silver FULL=1.",
+        ) from None
     await session.commit()
     return SearchResponse.from_result(result)
 

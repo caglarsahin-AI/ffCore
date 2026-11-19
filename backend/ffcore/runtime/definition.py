@@ -14,7 +14,14 @@ from typing import Annotated, Any, Literal
 
 from jsonschema import Draft202012Validator
 from jsonschema.exceptions import SchemaError
-from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field,
+    StringConstraints,
+    field_validator,
+    model_validator,
+)
 
 SCHEMA_VERSION = 1
 # The runtime does not import the API package (it imports the runtime); test_06a_definition
@@ -64,7 +71,10 @@ class Variable(_Strict):
 
 class KnowledgeFilter(_Strict):
     # Source/area scope passed on to the search filter (v9 P7: PayCore profiles = filtered agents).
-    scope: list[str] = Field(default_factory=list, max_length=50)
+    # 04b-2 D6: `documents.metadata.source` values, exact match (`confluence:OCR`).
+    scope: list[
+        Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=200)]
+    ] = Field(default_factory=list, max_length=50)
 
 
 class KnowledgeRef(_Strict):
@@ -184,9 +194,6 @@ def check_definition(d: AgentDefinition) -> None:
     kbs = [k.kb_key for k in d.knowledge]
     if len(kbs) != len(set(kbs)):
         _fail("knowledge_duplicate", "a knowledge base is listed once")
-    if any(k.filter and k.filter.scope for k in d.knowledge):
-        # 04a search filters by metadata equality only; a scope list would be ignored there.
-        _fail("knowledge_filter_not_supported", "knowledge[].filter.scope is not available yet")
     tools = [t.tool_key for t in d.tools]
     if len(tools) != len(set(tools)):
         _fail("tool_duplicate", "a tool is listed once")

@@ -37,10 +37,6 @@ CASES = [
     ({"variables": [{"key": "a", "label": "A"}, {"key": "a", "label": "B"}]}, "variable_duplicate"),
     ({"system_prompt": "Hello {{who}}"}, "variable_undefined"),
     ({"knowledge": [KB, KB]}, "knowledge_duplicate"),
-    (
-        {"knowledge": [{**KB, "filter": {"scope": ["jira:X"]}}]},
-        "knowledge_filter_not_supported",
-    ),
     ({"tools": [TOOL, TOOL]}, "tool_duplicate"),
     ({"tools": [TOOL], "approval": {"actions": ["mcp-sql.drop"]}}, "approval_action_unknown"),
     ({"answer_rules": {"verify": True}}, "verify_not_supported"),

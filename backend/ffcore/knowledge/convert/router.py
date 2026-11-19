@@ -17,7 +17,9 @@ EXT_MAP: dict[str, str] = {
     ".pptx": "office",
     ".html": "office",
     ".htm": "office",
-    ".md": "office",
+    # FOLLOWUP-87 (04b-2): Markdown is already structured text; read as written, no Docling.
+    ".md": "markdown",
+    ".markdown": "markdown",
     ".msg": "email_msg",
     ".eml": "email_eml",
     ".mht": "mhtml",
@@ -42,6 +44,7 @@ MIME = {
     "email_eml": "message/rfc822",
     "diagram": "application/vnd.drawio+xml",
     "plaintext": "text/plain",
+    "markdown": "text/markdown",
 }
 
 HEAD_BYTES = 256

@@ -8,11 +8,19 @@ Checks:
   embed_dim       chunks.embedding column size equals EMBED_DIM (P5)
   ollama_context  with INFERENCE_BACKEND=ollama: OLLAMA_CONTEXT_LENGTH is set and not below
                   any active Ollama model's limits.context_tokens (C13); skipped, with the
-                  reason, when there is no Ollama model. The runtime num_ctx Ollama applies is
-                  not verified here (FOLLOWUP-31, needs the model loaded).
+                  reason, when there is no Ollama model.
+  ollama_runtime_context
+                  (04b-2, FOLLOWUP-31) what Ollama really runs with: `/api/ps`
+                  `models[].context_length` of each loaded model against the same largest
+                  context_tokens; smaller → context_configuration_invalid, the field missing →
+                  ollama_ps_unexpected (never a silent pass), no model loaded → skipped with the
+                  model names. Written to Ollama's API documentation; not yet verified against the
+                  pinned ollama 0.12.6 image (ENV-204).
   vector_store    the configured driver answers (Qdrant reachable; pgvector column present)
   llm_slots       (06a) the model slot pool: in use / LLM_SLOTS and waiting per class; skipped
                   without REDIS_URL, failed when Redis does not answer (runs cannot start)
+  ingest_queue    (04b-2, FOLLOWUP-86) jobs waiting in the ingest queue (arq, Redis); information
+                  only, no threshold; skipped without REDIS_URL, failed when Redis does not answer
 06a extends ollama_context with published agents' limits.context_tokens on Ollama models: an
 install or seed change that would cut a published agent's budget is said here (C13).
 """
@@ -94,24 +102,7 @@ async def _ollama_context_check(settings: Settings) -> ReadinessCheck:
             code=None,
             detail=f"INFERENCE_BACKEND={settings.inference_backend}",
         )
-    from ffcore.core import db
-    from ffcore.models.catalog import Model, Provider
-
-    async with db.session_scope() as session:
-        limits = (
-            await session.scalars(
-                select(Model.limits)
-                .join(Provider, Provider.id == Model.provider_id)
-                .where(
-                    Provider.driver == "ollama",
-                    Model.category == "llm",
-                    Model.is_active,
-                    Model.deleted_at.is_(None),
-                )
-            )
-        ).all()
-    needed = [int(lim["context_tokens"]) for lim in limits if lim.get("context_tokens")]
-    needed += await _published_agent_context(db, Model, Provider)
+    _, needed = await _context_needs(settings)
     if not needed:
         return ReadinessCheck(
             name="ollama_context",
@@ -127,6 +118,132 @@ async def _ollama_context_check(settings: Settings) -> ReadinessCheck:
         "context_configuration_invalid",
         f"OLLAMA_CONTEXT_LENGTH={configured}, largest context_tokens={max(needed)}",
     )
+
+
+async def _context_needs(settings: Settings):
+    """Active Ollama LLM models (provider id, encrypted config, model_id) and the context tokens
+    they must hold: models' limits.context_tokens and published agents' (06a)."""
+    from ffcore.core import db
+    from ffcore.models.catalog import Model, Provider
+
+    async with db.session_scope() as session:
+        rows = (
+            await session.execute(
+                select(Provider.id, Provider.config_encrypted, Model.model_id, Model.limits)
+                .join(Provider, Provider.id == Model.provider_id)
+                .where(
+                    Provider.driver == "ollama",
+                    Model.category == "llm",
+                    Model.is_active,
+                    Model.deleted_at.is_(None),
+                )
+            )
+        ).all()
+    needed = [int(r.limits["context_tokens"]) for r in rows if r.limits.get("context_tokens")]
+    needed += await _published_agent_context(db, Model, Provider)
+    return rows, needed
+
+
+class OllamaPsUnexpected(Exception):
+    """Ollama answered `/api/ps`, but not in the documented shape (r2 NOTE-1)."""
+
+
+def _ollama_name(name: str) -> str:
+    """Ollama lists an untagged model as `<name>:latest` (r2 MINOR-2)."""
+    return name if ":" in name else f"{name}:latest"
+
+
+async def _ollama_ps(config_encrypted: bytes, settings: Settings) -> list[dict]:
+    """GET {base_url}/api/ps of one Ollama provider: the models it has loaded."""
+    from ffcore.core.egress import EgressTimeout, SafeOutboundClient
+    from ffcore.core.secrets import decrypt_json
+
+    base = decrypt_json(config_encrypted, settings)["base_url"].rstrip("/")
+    timeout = EgressTimeout(connect=3, read=5, total=8)
+    async with SafeOutboundClient(timeout=timeout, settings=settings) as client:
+        response = await client.request("GET", f"{base}/api/ps")
+    if response.status_code != 200:
+        raise RuntimeError(f"/api/ps answered {response.status_code}")
+    body = response.json()
+    models = body.get("models") if isinstance(body, dict) else None
+    if not isinstance(models, list):
+        raise OllamaPsUnexpected("/api/ps answer has no models list")
+    return models
+
+
+async def _ollama_runtime_check(settings: Settings) -> ReadinessCheck:
+    name = "ollama_runtime_context"
+    if settings.inference_backend != "ollama":
+        return ReadinessCheck(
+            name=name,
+            status="skipped",
+            code=None,
+            detail=f"INFERENCE_BACKEND={settings.inference_backend}",
+        )
+    rows, needed = await _context_needs(settings)
+    if not needed:
+        return ReadinessCheck(
+            name=name,
+            status="skipped",
+            code=None,
+            detail="no active Ollama model with limits.context_tokens",
+        )
+    largest = max(needed)
+    loaded, not_loaded = [], []
+    by_provider: dict = {}
+    for row in rows:
+        by_provider.setdefault(row.id, (row.config_encrypted, set()))[1].add(row.model_id)
+    for config_encrypted, model_ids in by_provider.values():
+        try:
+            running = await _ollama_ps(config_encrypted, settings)
+        except OllamaPsUnexpected as exc:
+            return check(name, False, "ollama_ps_unexpected", str(exc))
+        except Exception as exc:  # noqa: BLE001 - reported with its type, never hidden
+            return check(name, False, "ollama_unreachable", type(exc).__name__)
+        by_name = {_ollama_name(m.get("name") or m.get("model") or ""): m for m in running}
+        for model_id in sorted(model_ids):
+            entry = by_name.get(_ollama_name(model_id))
+            if entry is None:
+                not_loaded.append(model_id)
+                continue
+            context_length = entry.get("context_length")
+            if not isinstance(context_length, int):
+                return check(
+                    name,
+                    False,
+                    "ollama_ps_unexpected",
+                    f"/api/ps has no context_length for {model_id}",
+                )
+            loaded.append((model_id, context_length))
+    if not loaded:
+        return ReadinessCheck(
+            name=name,
+            status="skipped",
+            code=None,
+            detail=f"not loaded: {', '.join(not_loaded)}; checked once a request loads them",
+        )
+    small = [(m, c) for m, c in loaded if c < largest]
+    detail = ", ".join(f"{m}={c}" for m, c in loaded) + f"; largest context_tokens={largest}"
+    if not_loaded:
+        detail += f"; not loaded: {', '.join(not_loaded)}"
+    return check(name, not small, "context_configuration_invalid", detail)
+
+
+async def _ingest_queue_check(settings: Settings) -> ReadinessCheck:
+    if settings.redis_url is None:
+        return ReadinessCheck(
+            name="ingest_queue", status="skipped", code=None, detail="REDIS_URL is not set"
+        )
+    import redis.asyncio as aioredis
+
+    client = aioredis.from_url(settings.redis_url.get_secret_value())
+    try:
+        queued = await client.zcard(settings.arq_queue_ingest)
+    except Exception as exc:  # noqa: BLE001 - reported with its type, never hidden
+        return check("ingest_queue", False, "redis_unavailable", type(exc).__name__)
+    finally:
+        await client.aclose()
+    return check("ingest_queue", True, detail=f"queued={queued}")
 
 
 async def _published_agent_context(db, model, provider) -> list[int]:
@@ -229,6 +346,8 @@ async def readyz(settings: Annotated[Settings, Depends(get_settings)]):
         await _ollama_context_check(settings),
         await _vector_store_check(settings),
         await _llm_slots_check(settings),
+        await _ollama_runtime_check(settings),
+        await _ingest_queue_check(settings),
     ]
     failed = [c for c in checks if c.status == "failed"]
     if not failed:

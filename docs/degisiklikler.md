@@ -4,6 +4,25 @@ Behaviour and configuration changes that a deployment or an API client notices, 
 (handbook/RELEASE_AND_ROLLBACK.md, CHANGE_CONTROL.md). Each entry names the package and what to do,
 if anything.
 
+## 2026-11-19 · 04b-2 · Scope filter, Turkish normalizer layer, video flag, threshold table, Ollama runtime context
+
+- **What:** agent definitions accept `knowledge[].filter.scope` (document sources, exact match)
+  and the search API takes a list as a metadata filter value (any of the values). Opt-in
+  `TEXT_NORMALIZE_TR` (circumflex folding on silver and queries). `VIDEO_TRANSCRIPT_ENABLED`
+  (stays `false`: this build has no transcriber) and the `video` reconversion preset. New
+  `GET …/knowledge-bases/{kb_id}/query-stats` and the threshold table (docs/bilgi-tabani.md).
+  `/readyz` adds `ollama_runtime_context` (Ollama `/api/ps`, not yet verified against the pinned
+  image, ENV-204) and `ingest_queue`.
+- **Changed:** Markdown uploads are read as written instead of through Docling (engine
+  `markdown`, no weights needed; FOLLOWUP-87). Kapı 2 counts English function words too, so
+  short English prose is no longer `no_prose` (FOLLOWUP-145). A search answers 409
+  `normalizer_config_mismatch` while indexed documents are in another normalizer form than the
+  setting gives. The internal key search applies `filters` (it ignored them before).
+- **Action:** none by default. Switching `TEXT_NORMALIZE_TR` on needs `make reindex LAYER=silver
+  FULL=1` per knowledge base; until then its searches answer 409. Do not set
+  `VIDEO_TRANSCRIPT_ENABLED=true` (start-up stops with `video_transcriber_unavailable`). Markdown
+  documents indexed before keep their Docling silver until a silver reindex.
+
 ## 2026-11-19 · 10c-3 · MCP servers screen and monitoring; exam summary fix
 
 - **What:** the console gets the MCP servers screen (`/mcp-servers`, Build menu, developer and up;

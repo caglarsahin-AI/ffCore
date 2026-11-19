@@ -188,7 +188,9 @@ def text_quality(
         return SKIPPED, "code_heavy"
     # Prose-free content: a large definition table is reference material (flag, keep); a small
     # one is noise (PayCore calibration 2026-09-25).
-    if stopword_ratio(body) < thresholds.min_stopword_ratio:
+    # FOLLOWUP-145: English prose counts too (Kapı 1 admits both languages).
+    prose = max(stopword_ratio(body, TR_STOPWORDS), stopword_ratio(body, EN_STOPWORDS))
+    if prose < thresholds.min_stopword_ratio:
         if len(body) >= thresholds.no_prose_flag_chars:
             return FLAGGED, "no_prose"
         return SKIPPED, "no_prose"

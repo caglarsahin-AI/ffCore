@@ -20,6 +20,13 @@ def ready_app(app, app_settings, monkeypatch):
     # The test drives warmup itself; the lifespan's background task would race it.
     monkeypatch.setattr(ffcore.main, "warmup", no_warmup)
 
+    async def nothing_loaded(config_encrypted, settings):
+        return []
+
+    # 04b-2 S7: no Ollama answers here (the providers' configs are dummies); by default no model
+    # is loaded, so the runtime check is skipped. test_04b_2_readyz sets the answers it needs.
+    monkeypatch.setattr(readiness, "_ollama_ps", nothing_loaded, raising=False)
+
     holder = {"settings": app_settings.model_copy(update={"fake_embed": True})}
     app.dependency_overrides[get_settings] = lambda: holder["settings"]
     readiness.reset()

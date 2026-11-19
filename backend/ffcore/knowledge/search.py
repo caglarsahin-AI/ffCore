@@ -24,9 +24,14 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ffcore.core.config import Settings
 from ffcore.knowledge.embed import Embedder, get_embedder
-from ffcore.knowledge.normalize import NORMALIZER_CONFIG_ID, normalize_query
+from ffcore.knowledge.normalize import normalize_query, normalizer_config_id
 from ffcore.knowledge.rerank import Reranker, get_reranker
-from ffcore.knowledge.vectorstore.base import VectorFilters, VectorQuery, VectorStore
+from ffcore.knowledge.vectorstore.base import (
+    VectorFilters,
+    VectorQuery,
+    VectorStore,
+    metadata_sql,
+)
 from ffcore.knowledge.vectorstore.pgvector import _literal
 from ffcore.models.knowledge import SEARCHABLE_CHUNK_STATUSES, TSV_CONFIG, KbQuery, KnowledgeBase
 
@@ -106,9 +111,7 @@ async def _lexical(
         clauses.append("c.document_id IN :document_ids")
         binds.append(bindparam("document_ids", expanding=True))
         params["document_ids"] = list(filters.document_ids)
-    for index, (key, value) in enumerate(filters.metadata):
-        clauses.append(f"d.metadata ->> :mk{index} = :mv{index}")
-        params[f"mk{index}"], params[f"mv{index}"] = key, str(value)
+    clauses.extend(metadata_sql(filters.metadata, params))
     statement = text(
         "WITH tsq AS (SELECT to_tsquery(:cfg, array_to_string("
         "tsvector_to_array(to_tsvector(:cfg, :q)), ' | ')) AS q) "
@@ -164,6 +167,31 @@ async def _details(
     return {row.id: row._asdict() for row in rows}
 
 
+class NormalizerMismatch(Exception):
+    """K1: an indexed document is in another normalizer form than the queries would be."""
+
+    def __init__(self, expected: str, found: str):
+        super().__init__(f"documents in {found!r}, queries in {expected!r}")
+        self.expected, self.found = expected, found
+
+
+async def _check_normalizer(session: AsyncSession, kb_id: uuid.UUID, config_id: str) -> None:
+    """No mixed-form search: one indexed document in another form stops it (409 at the API)
+    until `make reindex LAYER=silver FULL=1` rebuilds silver under the current setting."""
+    found = (
+        await session.execute(
+            text(
+                "SELECT normalizer_config_id FROM documents WHERE kb_id = :kb"
+                " AND status = 'indexed' AND deleted_at IS NULL"
+                " AND normalizer_config_id IS DISTINCT FROM :cfg LIMIT 1"
+            ),
+            {"kb": kb_id, "cfg": config_id},
+        )
+    ).scalar_one_or_none()
+    if found is not None:
+        raise NormalizerMismatch(config_id, found)
+
+
 async def search(
     session: AsyncSession,
     kb: KnowledgeBase,
@@ -181,7 +209,9 @@ async def search(
     reranker: Reranker | None = None,
 ) -> SearchResult:
     started = time.monotonic()
-    normalized = normalize_query(query)
+    config_id = normalizer_config_id(settings)
+    await _check_normalizer(session, kb.id, config_id)
+    normalized = normalize_query(query, turkish=settings.text_normalize_tr)
     top_k = top_k or kb.default_top_k
     hybrid = kb.hybrid if hybrid is None else hybrid
     limit = settings.retrieval_candidates
@@ -303,7 +333,7 @@ async def search(
         kb_id=kb.id,
         query=normalized,
         source=source,
-        normalizer_config_id=NORMALIZER_CONFIG_ID,
+        normalizer_config_id=config_id,
         run_id=run_id,
         candidates=candidates,
         best_embed_score=max(embed_scores, default=None),
@@ -324,7 +354,7 @@ async def search(
         threshold_mode=threshold_mode,
         filtered_by_rerank_floor=filtered_floor,
         filtered_by_min_score=filtered_min,
-        normalizer_config_id=NORMALIZER_CONFIG_ID,
+        normalizer_config_id=config_id,
         latency_ms=latency_ms,
         candidates=candidates,
         filtered=filtered,

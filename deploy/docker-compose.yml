@@ -56,6 +56,10 @@ x-app-env: &app-env
   EMBED_MODEL: ${EMBED_MODEL:-BAAI/bge-m3}
   RERANK_MODEL: ${RERANK_MODEL:-BAAI/bge-reranker-v2-m3}
   RERANK_MIN_SCORE: ${RERANK_MIN_SCORE:-0.1}
+  # 04b-2: Turkish normalizer layer A (off) and video transcription (true stops start-up in
+  # this build, video_transcriber_unavailable); passed so an .env value is never ignored.
+  TEXT_NORMALIZE_TR: ${TEXT_NORMALIZE_TR:-false}
+  VIDEO_TRANSCRIPT_ENABLED: ${VIDEO_TRANSCRIPT_ENABLED:-false}
   # Deterministic stand-in embedding/rerank models for console e2e without weights
   # (10b-poc-1, K-10bp-0002 D2). Off by default; /readyz names it when on.
   FAKE_EMBED: ${FAKE_EMBED:-0}

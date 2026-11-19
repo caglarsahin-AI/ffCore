@@ -748,6 +748,84 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorBody'
+  /api/v1/projects/{project_id}/knowledge-bases/{kb_id}/query-stats:
+    get:
+      tags:
+      - knowledge-bases
+      summary: Query Stats
+      description: 'Score distribution of the KB''s queries against the thresholds in force and the
+
+        threshold table row of its embedding model (04b-2 D5). Information only.'
+      operationId: query_stats_api_v1_projects__project_id__knowledge_bases__kb_id__query_stats_get
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      - name: kb_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Kb Id
+      - name: days
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 365
+          minimum: 1
+          description: Look-back window in days.
+          default: 30
+          title: Days
+        description: Look-back window in days.
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QueryStats'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
   /api/v1/projects/{project_id}/knowledge-bases/{kb_id}/reindex:
     post:
       tags:
@@ -1777,6 +1855,45 @@ components:
       additionalProperties: false
       type: object
       title: KnowledgeBaseUpdate
+    QueryStats:
+      properties:
+        days:
+          type: integer
+          title: Days
+        queries:
+          type: integer
+          title: Queries
+        zero_result:
+          type: integer
+          title: Zero Result
+        zero_result_ratio:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Zero Result Ratio
+        rerank:
+          $ref: '#/components/schemas/ScoreStats'
+        embed:
+          $ref: '#/components/schemas/ScoreStats'
+        table:
+          anyOf:
+          - $ref: '#/components/schemas/ThresholdTableRow'
+          - type: 'null'
+          description: 'The threshold table row of the KB''s embedding model; null: not in the table.'
+      type: object
+      required:
+      - days
+      - queries
+      - zero_result
+      - zero_result_ratio
+      - rerank
+      - embed
+      - table
+      title: QueryStats
+      description: 'Best score per query against the thresholds in force (04b-2 D5). Information only:
+        a
+
+        screen shows "X% of queries are below the threshold"; nothing is changed (no auto).'
     ReadinessCheck:
       properties:
         name:
@@ -1867,11 +1984,11 @@ components:
         preset:
           anyOf:
           - type: string
-            pattern: ^(encoding|timeout|mhtml|engine:[a-z0-9][a-z0-9_.+-]{0,39})$
+            pattern: ^(encoding|timeout|mhtml|video|engine:[a-z0-9][a-z0-9_.+-]{0,39})$
           - type: 'null'
           title: Preset
           description: 'Targeted reconversion (silver only): only the documents one problem hit. encoding
-            (encoding_undecodable), timeout, mhtml, engine:<convert_engine>.'
+            (encoding_undecodable), timeout, mhtml, video (video_disabled), engine:<convert_engine>.'
       additionalProperties: false
       type: object
       required:
@@ -1953,6 +2070,54 @@ components:
       description: 'Fixed roles, ordered user < analyst < developer < admin. `developer` and `user` are
 
         reserved in the PoC and cannot be assigned yet.'
+    ScoreStats:
+      properties:
+        threshold:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Threshold
+          description: 'The threshold in force; null: none.'
+        scored:
+          type: integer
+          title: Scored
+          description: Queries with a best score of this kind.
+        below:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Below
+          description: Of those, below the threshold; null without one.
+        below_ratio:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Below Ratio
+        p10:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: P10
+        p50:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: P50
+        p90:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: P90
+      type: object
+      required:
+      - threshold
+      - scored
+      - below
+      - below_ratio
+      - p10
+      - p50
+      - p90
+      title: ScoreStats
     SearchFilters:
       properties:
         document_ids:
@@ -1967,9 +2132,17 @@ components:
             - type: string
             - type: integer
             - type: boolean
+            - items:
+                type: string
+                maxLength: 200
+                minLength: 1
+              type: array
+              maxItems: 50
+              minItems: 1
           type: object
           title: Metadata
-          description: Equality filters on document metadata.
+          description: 'Filters on document metadata: a value is equality, a list is any of the values
+            (exact match; 04b-2).'
       additionalProperties: false
       type: object
       title: SearchFilters
@@ -2131,6 +2304,39 @@ components:
         it
 
         off only `min_score` (embedding score) applies. Never both.'
+    ThresholdTableRow:
+      properties:
+        embed_model:
+          type: string
+          title: Embed Model
+        rerank_model:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Rerank Model
+        rerank_min_score:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Rerank Min Score
+          description: 'Measured value; null: not measured.'
+        min_score:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Min Score
+          description: 'Measured value; null: not measured.'
+        note:
+          type: string
+          title: Note
+      type: object
+      required:
+      - embed_model
+      - rerank_model
+      - rerank_min_score
+      - min_score
+      - note
+      title: ThresholdTableRow
     UploadOutcome:
       type: string
       enum:

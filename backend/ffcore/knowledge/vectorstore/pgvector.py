@@ -16,6 +16,7 @@ from ffcore.knowledge.vectorstore.base import (
     VectorRecord,
     VectorStore,
     VectorStoreError,
+    metadata_sql,
 )
 from ffcore.models.knowledge import SEARCHABLE_CHUNK_STATUSES
 
@@ -97,10 +98,7 @@ class PgVectorStore(VectorStore):
             clauses.append("c.document_id IN :document_ids")
             binds.append(bindparam("document_ids", expanding=True))
             params["document_ids"] = list(filters.document_ids)
-        for index, (key, value) in enumerate(filters.metadata):
-            clauses.append(f"d.metadata ->> :mk{index} = :mv{index}")
-            params[f"mk{index}"] = key
-            params[f"mv{index}"] = str(value).lower() if isinstance(value, bool) else str(value)
+        clauses.extend(metadata_sql(filters.metadata, params))
         statement = text(
             "SELECT c.id, c.document_id, 1 - (c.embedding <=> CAST(:vec AS vector)) AS score "
             "FROM chunks c JOIN documents d ON d.id = c.document_id "

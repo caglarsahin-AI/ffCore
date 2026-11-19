@@ -52,7 +52,8 @@ def qdrant_filter(kb_id: UUID, filters: VectorFilters) -> dict:
             {"key": "document_id", "match": {"any": [str(d) for d in filters.document_ids]}}
         )
     for key, value in filters.metadata:
-        must.append({"key": f"metadata.{key}", "match": {"value": value}})
+        match = {"any": list(value)} if isinstance(value, tuple) else {"value": value}
+        must.append({"key": f"metadata.{key}", "match": match})
     return {"must": must}
 
 

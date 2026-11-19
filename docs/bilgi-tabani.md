@@ -111,11 +111,12 @@ fails with `encoding_undecodable` instead of entering the index with broken lett
 |---|---|
 | PDF with a text layer | Docling, then pymupdf4llm, then the PyMuPDF text layer (never OCR); over 150 pages Docling is skipped |
 | scanned PDF (text layer under 120 characters) | PaddleOCR `tr`, at most `OCR_PDF_MAX_PAGES` (200) pages, truncation stated |
-| DOCX, PPTX, HTML, Markdown | Docling |
+| DOCX, PPTX, HTML | Docling |
+| Markdown (`.md`, `.markdown`) | as written (decoded, not fenced), engine `markdown`; no Docling and no weights (04b-2, FOLLOWUP-87) |
 | e-mail `.eml` / `.msg` | stdlib / extract-msg, HTML bodies as visible text |
 | draw.io, `.vsdx` | stdlib XML |
 | txt, log, json, xml, yaml | as text, fenced |
-| old Office (`.ppt`, `.vsd`, binary `.doc`), video | skipped with `libreoffice_unavailable` / `video_disabled` (package 04b) |
+| old Office (`.ppt`, `.vsd`, binary `.doc`), video | skipped with `libreoffice_unavailable` / `video_disabled` (see "Video") |
 | archives, spreadsheets, csv, sql, images, binaries | skipped with `out_of_scope` / `binary` |
 
 Every file converts in a worker process with `CONVERT_TIMEOUT_SECONDS` (600); past it the process
@@ -158,7 +159,8 @@ documents).
   `#include`, `#!/bin/sh` and a bare `#` are; inside a fence `# text` is a code line; the fence
   lines themselves are not, since plain text arrives wrapped in one fence; after a fence that
   never closes the in-fence rule applies), `no_prose`
-  (stopword ratio under 0.05: flagged from 2000 characters, skipped below).
+  (function-word ratio under 0.05, the higher of the Turkish and the English one since
+  04b-2 FOLLOWUP-145: flagged from 2000 characters, skipped below).
 - Data dumps (attachments): `data_dump:encoded|log|stack_trace|structured|tabular`; the owning
   document is still indexed, the attachment is not.
 
@@ -189,7 +191,8 @@ re-embeds everything.
 - Postgres keeps both halves of every embedding whatever the driver: the dense vector in
   `chunks.embedding` and the bge-m3 sparse weights in `chunks.sparse` (04b). A chunk whose text
   and model did not change takes both over at a gold reindex, so Qdrant reuses vectors too.
-- Search: the query passes the same format cleanup as silver; a vector leg and a lexical leg
+- Search: the query passes the same normalizer as silver (format cleanup, and the Turkish
+  layer when `TEXT_NORMALIZE_TR` is on); a vector leg and a lexical leg
   (Postgres BM25 for pgvector, bge-m3 sparse inside Qdrant) are fused by RRF (k = 60) into 30
   candidates; the reranker (`BAAI/bge-reranker-v2-m3`) scores them and only those at or above
   `RERANK_MIN_SCORE` (0.1) are returned. With the reranker on, the embedding score never
@@ -202,6 +205,46 @@ re-embeds everything.
   date" to the model; the upload time is never used in its place (FOLLOWUP-101).
 - Model weights live in the `model_cache` volume, never in the image. Keep it when closing a
   stack (`docker compose down`, not `down -v`).
+
+## Video (04b-2)
+
+`VIDEO_TRANSCRIPT_ENABLED` is `false` (default) and a video (`mp4 m4a mov mkv avi wav mp3`) is
+recorded at Kapı 0 as `video_disabled`, counted in the ingest report, never dropped silently.
+This build has no transcriber (faster-whisper is a separate change, with its own approval), so
+setting it to `true` stops start-up with `video_transcriber_unavailable`. Once a transcriber is
+part of the build, `make reconvert PRESET=video` (or the `video` preset of `POST …/reindex`)
+converts exactly the documents that were `video_disabled`.
+
+## Turkish normalizer layer (`TEXT_NORMALIZE_TR`, 04b-2)
+
+Off by default. On, silver and every query get PayCore's deterministic layer A on top of format
+cleanup: circumflexes are folded (`kâr` → `kar`, `hâlâ` → `hala`, `Â` → `A`, `Î` → `İ`), in
+prose only; fenced and inline code and URLs keep their exact form. The known cost is that
+`kâr`/`kar` become one word. PayCore's lexicon layers (B-D) are not part of it.
+
+The form is recorded as `normalizer_config_id`: `format-v1`, or `format-v1+tr-a1` with the layer,
+on the knowledge base, every document, the silver frontmatter and every `kb_queries` row. A
+search while an indexed document is in another form answers 409 `normalizer_config_mismatch`
+(no mixed-form results): after changing the setting, run `make reindex PROJECT=… KB=…
+LAYER=silver FULL=1`, which rebuilds silver from raw under the new setting; the 409 message
+names the same command. Without `FULL=1` the documents whose raw did not change are not rebuilt
+and the 409 stays.
+
+## Thresholds per embedding model (04b-2)
+
+Only measured values; "not measured" stays empty, never a guessed number.
+
+| Embedding model | Reranker | Rerank floor (`RERANK_MIN_SCORE`) | Embedding `min_score` |
+|---|---|---|---|
+| `BAAI/bge-m3` | `BAAI/bge-reranker-v2-m3` | 0.1 (PayCore's measurement) | not measured; with the reranker on it does not filter (single threshold rule) |
+| `intfloat/multilingual-e5-large` | none | not measured | not measured (the Turkish embedding comparison runs on the target machine) |
+
+`GET …/knowledge-bases/{kb_id}/query-stats?days=30` (readers, 1-365 days) gives what a screen
+needs to say "X % of queries are below the threshold": number of queries, zero-result count and
+ratio, per score kind (rerank, embedding) how many queries had one, how many are below the
+threshold in force (`RERANK_MIN_SCORE`; the knowledge base's `default_min_score`, `null` when it
+has none) and the 10/50/90th percentiles of the best score per query, plus the table row of the
+knowledge base's embedding model. It only informs; no threshold is changed by it.
 
 ## Who changes a document's ACL (04b)
 
@@ -278,12 +321,18 @@ docker compose run --rm tools make models
 not in the cache), then checks the `chunks.embedding`
 size against `EMBED_DIM`, the vector store, and (with `INFERENCE_BACKEND=ollama`) that
 `OLLAMA_CONTEXT_LENGTH` is set and not below any active Ollama model's `limits.context_tokens`
-(`context_configuration_invalid`). The context Ollama actually applies at run time is not
-verified here (FOLLOWUP-31).
+(`context_configuration_invalid`). `ollama_runtime_context` (04b-2, FOLLOWUP-31) then asks
+Ollama's `/api/ps` what each loaded model really runs with (`context_length`): below the
+largest `context_tokens` is `context_configuration_invalid`, a missing field
+`ollama_ps_unexpected`, no answer `ollama_unreachable`; while no model is loaded the check
+is skipped and names them. **Not yet verified against the pinned ollama 0.12.6 image**
+(ENV-204): written to Ollama's API documentation and tested with a stand-in answer.
+`ingest_queue` reports the jobs waiting in the ingest queue (information only).
 
 ## Measured
 
 The PR description of package 04a lists the numbers measured with the real models: indexing
 time of the 10-page sample contract, the rank of "fesih bildirim süresi", and `/healthz` latency
-under 10 concurrent searches. Thresholds per embedding model are package 04b-2; the Turkish
-embedding comparison is a measurement on the target machine (not a package deliverable).
+under 10 concurrent searches. Thresholds per embedding model: "Thresholds per embedding
+model" above; the Turkish embedding comparison is a measurement on the target machine
+(not a package deliverable).

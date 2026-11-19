@@ -211,7 +211,7 @@ class ReindexLayer(StrEnum):
     gold = "gold"
 
 
-PRESET_PATTERN = r"^(encoding|timeout|mhtml|engine:[a-z0-9][a-z0-9_.+-]{0,39})$"
+PRESET_PATTERN = r"^(encoding|timeout|mhtml|video|engine:[a-z0-9][a-z0-9_.+-]{0,39})$"
 
 
 class ReindexRequest(Strict):
@@ -224,7 +224,8 @@ class ReindexRequest(Strict):
         default=None,
         pattern=PRESET_PATTERN,
         description="Targeted reconversion (silver only): only the documents one problem hit. "
-        "encoding (encoding_undecodable), timeout, mhtml, engine:<convert_engine>.",
+        "encoding (encoding_undecodable), timeout, mhtml, video (video_disabled), "
+        "engine:<convert_engine>.",
     )
 
 
@@ -264,6 +265,39 @@ class RejectedChunk(BaseModel):
     reason: str | None
 
 
+class ScoreStats(BaseModel):
+    threshold: float | None = Field(description="The threshold in force; null: none.")
+    scored: int = Field(description="Queries with a best score of this kind.")
+    below: int | None = Field(description="Of those, below the threshold; null without one.")
+    below_ratio: float | None
+    p10: float | None
+    p50: float | None
+    p90: float | None
+
+
+class ThresholdTableRow(BaseModel):
+    embed_model: str
+    rerank_model: str | None
+    rerank_min_score: float | None = Field(description="Measured value; null: not measured.")
+    min_score: float | None = Field(description="Measured value; null: not measured.")
+    note: str
+
+
+class QueryStats(BaseModel):
+    """Best score per query against the thresholds in force (04b-2 D5). Information only: a
+    screen shows "X% of queries are below the threshold"; nothing is changed (no auto)."""
+
+    days: int
+    queries: int
+    zero_result: int
+    zero_result_ratio: float | None
+    rerank: ScoreStats
+    embed: ScoreStats
+    table: ThresholdTableRow | None = Field(
+        description="The threshold table row of the KB's embedding model; null: not in the table."
+    )
+
+
 class IngestGateReport(BaseModel):
     """Per gate the counts add up to `documents` (every document is counted once per gate).
     Only documents the caller may read are counted and listed (C15)."""
@@ -280,10 +314,18 @@ class IngestGateReport(BaseModel):
 # --- Search ---
 
 
+SourceList = Annotated[
+    list[Annotated[str, Field(min_length=1, max_length=200)]],
+    Field(min_length=1, max_length=50),
+]
+
+
 class SearchFilters(Strict):
     document_ids: list[UUID] = Field(default_factory=list)
-    metadata: dict[str, str | int | bool] = Field(
-        default_factory=dict, description="Equality filters on document metadata."
+    metadata: dict[str, str | int | bool | SourceList] = Field(
+        default_factory=dict,
+        description="Filters on document metadata: a value is equality, a list is any of the "
+        "values (exact match; 04b-2).",
     )
 
 

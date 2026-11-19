@@ -14,16 +14,21 @@ from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ffcore.api.common import ERROR_RESPONSES
+from ffcore.api.common import ERROR_RESPONSES, conflict
 from ffcore.api.knowledge import _kb, _vector_error
-from ffcore.api.knowledge_schemas import EmbedRequest, EmbedResponse, SearchResponse
+from ffcore.api.knowledge_schemas import (
+    EmbedRequest,
+    EmbedResponse,
+    SearchFilters,
+    SearchResponse,
+)
 from ffcore.core import db
 from ffcore.core.auth import ROLE_ORDER, Actor, resolve_actor
 from ffcore.core.config import Settings, get_settings
 from ffcore.core.errors import ApiError
 from ffcore.knowledge import jobs, search
 from ffcore.knowledge.embed import embed
-from ffcore.knowledge.vectorstore.base import VectorFilters, VectorStoreError
+from ffcore.knowledge.vectorstore.base import VectorFilters, VectorStoreError, metadata_items
 from ffcore.models.identity import Project
 from ffcore.models.keys import ApiKey
 from ffcore.models.runs import Run
@@ -70,6 +75,8 @@ class KeySearchRequest(BaseModel):
     run_id: UUID | None = None
     query: str = Field(min_length=1, max_length=2000)
     top_k: int | None = Field(default=None, ge=1, le=50)
+    # 04b-2 D6: the same filters as the search API (a scope must not be dropped).
+    filters: SearchFilters = Field(default_factory=SearchFilters)
     hybrid: bool | None = None
 
 
@@ -117,7 +124,12 @@ async def internal_key_search(
             session,
             kb,
             body.query,
-            filters=VectorFilters(acl_roles=tuple(roles), acl_users=()),
+            filters=VectorFilters(
+                document_ids=tuple(body.filters.document_ids),
+                acl_roles=tuple(roles),
+                acl_users=(),
+                metadata=metadata_items(body.filters.metadata),
+            ),
             top_k=body.top_k,
             hybrid=body.hybrid,
             run_id=body.run_id,
@@ -128,5 +140,11 @@ async def internal_key_search(
         )
     except VectorStoreError as exc:
         raise _vector_error(exc) from None
+    except search.NormalizerMismatch as exc:
+        raise conflict(
+            "normalizer_config_mismatch",
+            f"Documents of this knowledge base are in normalizer form {exc.found}, queries "
+            f"would be in {exc.expected}; rebuild silver first: make reindex LAYER=silver FULL=1.",
+        ) from None
     await session.commit()
     return SearchResponse.from_result(result)
