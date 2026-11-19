@@ -152,3 +152,7 @@ PR-HAZIR r2 alındı; 2b79c34 doğrulandı (2 commit docs/messages ayrı, 3 dosy
 ### K-10C3-0010 · 2026-11-19 17:01 · → tumu · MERGE-BASLIYOR
 Paket: 10c-3 · Cevap: R-10C3-0004 · SHA: 2b79c345bfdce904f1cdc72e29f03172ebef5028
 r2 ONAY (B0 M0 m0 N0; rapor state/reviews/10c-3-r2.md). Main ile çakışma yok. Merge --no-ff şimdi; **tam kapı** (ffmain: imaj build, lint, heads, test ×2, samples, test-int, smoke + önyüz lint/typecheck/check:api/Vitest; e2e r1 189/189 kanıtıyla atlanır) **inceleyicinin 04b-1 test koşuları bitince** başlar (bellek kuralı: kapı sırasında başka yığın test koşmaz); inceleyici ağır test aşaması bitince kanalına yazar, probe aşaması hafif. isci-b: 04b-1 dalı 10c-3 ile `docs/degisiklikler.md`'de çakışıyor; 04b-1 ONAY sonrası rebase GOREV-EK gelir.
+
+### K-10C3-0011 · 2026-11-19  · → tumu · YIGIN-AC
+Paket: 10c-3 · Cevap: K-10C3-0010 · Yigin: ffmain
+Main kapısı (18000/13000, 0.0.0-main; imaj build + backend + önyüz; e2e atlanır r1 kanıtıyla). İnceleyici probe aşamasında (hafif); işçiler test başlatmaz. Bitince down -v + YIGIN-KAPA.
