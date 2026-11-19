@@ -111,7 +111,8 @@ def test_04a_4_reupload_same_file_keeps_record_and_bumps_version(pg, make_projec
         UploadOutcome.unchanged,
         UploadOutcome.new_version,
     )
-    assert (v1, v2, v3) == (1, 2, 3)
+    # FOLLOWUP-157 (04b): identical bytes are not a new version; changed bytes are.
+    assert (v1, v2, v3) == (1, 1, 2)
     (count,) = pg.execute("SELECT count(*) FROM documents WHERE kb_id = %s", (kb_id,)).fetchone()
     assert count == 1
 

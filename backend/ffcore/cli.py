@@ -76,7 +76,12 @@ async def create_superadmin(email: str, full_name: str, password: str, access: s
 
 
 async def enqueue_reindex(
-    project_key: str, kb_key: str, layer: str, full: bool, accept_personnel_data: bool = False
+    project_key: str,
+    kb_key: str,
+    layer: str,
+    full: bool,
+    accept_personnel_data: bool = False,
+    preset: str | None = None,
 ) -> str:
     """04a: `make reindex`. Enqueues the worker job; the API process embeds (C10)."""
     from sqlalchemy import select
@@ -111,10 +116,14 @@ async def enqueue_reindex(
         # r2 NOTE-5: the job checks too (the API road); here the operator gets the code and exit 2
         # before anything is queued.
         personnel = await ingest.check_reindex_silver(
-            kb_id, full=full, accept_personnel_data=accept_personnel_data
+            kb_id, full=full, accept_personnel_data=accept_personnel_data, preset=preset
         )
         if accept_personnel_data:
             await _audit_m3_reindex(kb_id, full, personnel)
+    if preset is not None:
+        return await get_queue(get_settings()).enqueue(
+            "reindex_job", str(kb_id), layer, full, accept_personnel_data, preset
+        )
     return await get_queue(get_settings()).enqueue(
         "reindex_job", str(kb_id), layer, full, accept_personnel_data
     )
@@ -177,6 +186,30 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="the M3 measurement mode: reconvert personnel-data records written with pii_regex "
         "(names not masked); without it such a record refuses the reindex (prsim_requires_ner)",
+    )
+    reindex.add_argument(
+        "--preset",
+        help="targeted reconversion (silver only): encoding, timeout, mhtml or "
+        "engine:<convert_engine>; only the documents that problem hit (`make reconvert`)",
+    )
+    migrate_vectors = commands.add_parser(
+        "migrate-vectors",
+        help="copy vectors between pgvector and qdrant without re-embedding (04b); exit 1 when "
+        "a knowledge base's counts differ",
+    )
+    migrate_vectors.add_argument("--project", required=True, help="project key")
+    migrate_vectors.add_argument("--kb", help="knowledge base key (default: every live one)")
+    migrate_vectors.add_argument(
+        "--from", dest="source", choices=("pgvector", "qdrant"), required=True
+    )
+    migrate_vectors.add_argument(
+        "--to", dest="target", choices=("pgvector", "qdrant"), required=True
+    )
+    migrate_vectors.add_argument("--dry-run", action="store_true", help="count only, write nothing")
+    migrate_vectors.add_argument(
+        "--drop-target",
+        action="store_true",
+        help="drop the qdrant target collection first (it has points of its own)",
     )
     seed_prompts = commands.add_parser(
         "seed-prompts", help="first-install prompts from backend/prompts into Langfuse (02)"
@@ -291,6 +324,25 @@ def _raw_text_filter(args) -> str:
     return args.text_filter or raw_ingest.TEXT_FILTER
 
 
+def _early_refusal(args) -> str | None:
+    """Refusals that need no database, settings or log: exit 2 before anything runs (04b)."""
+    if args.command == "reindex" and args.preset is not None:
+        from ffcore.knowledge import ingest
+
+        if args.layer != "silver":
+            return "preset_requires_silver: a preset reconverts from raw; use --layer silver"
+        try:
+            ingest.parse_preset(args.preset)
+        except ingest.ReindexRefused as exc:
+            return str(exc)
+    if args.command == "migrate-vectors":
+        if args.source == args.target:
+            return f"migrate_same_driver: source and target are both {args.source}"
+        if args.drop_target and args.target == "pgvector":
+            return "drop_target_not_applicable: --drop-target applies to --to qdrant only"
+    return None
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
@@ -318,6 +370,10 @@ def main(argv: list[str] | None = None) -> int:
             except raw_ingest.RawIngestError as exc:
                 print(f"error: {exc}", file=sys.stderr)
                 return 2
+    early = _early_refusal(args)
+    if early is not None:
+        print(f"error: {early}", file=sys.stderr)
+        return 2
     configure_logging(get_settings())
 
     try:
@@ -353,13 +409,39 @@ def main(argv: list[str] | None = None) -> int:
             try:
                 job = asyncio.run(
                     enqueue_reindex(
-                        args.project, args.kb, args.layer, args.full, args.accept_personnel_data
+                        args.project,
+                        args.kb,
+                        args.layer,
+                        args.full,
+                        args.accept_personnel_data,
+                        args.preset,
                     )
                 )
             except ingest.ReindexRefused as exc:
                 print(f"error: {exc}", file=sys.stderr)
                 return 2
             print(f"reindex queued: job {job} (worker log shows reused=N embedded=M)")
+        elif args.command == "migrate-vectors":
+            from ffcore.knowledge import migrate
+
+            try:
+                result = asyncio.run(
+                    migrate.run(
+                        project_key=args.project,
+                        kb_key=args.kb,
+                        source=args.source,
+                        target=args.target,
+                        dry_run=args.dry_run,
+                        drop_target=args.drop_target,
+                        settings=get_settings(),
+                    )
+                )
+            except migrate.MigrateError as exc:
+                raise CliError(str(exc)) from None
+            for line in result.lines():
+                print(line)
+            if not result.ok:
+                return 1
         elif args.command == "seed-prompts":
             client = tracing.init_tracing(get_settings())
             try:

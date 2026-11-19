@@ -158,7 +158,7 @@ def test_04a_4_reupload_bumps_version_without_new_record(pg, make_project, setti
     same, outcome = upload(settings, kb_id, "a.md", markdown(1))
     changed, outcome2 = upload(settings, kb_id, "a.md", markdown(1, 2))
     assert first == same == changed and (outcome, outcome2) == ("unchanged", "new_version")
-    assert doc_row(pg, first)[10] == 3
+    assert doc_row(pg, first)[10] == 2  # FOLLOWUP-157 (04b): same bytes, same version
 
 
 def test_04a_8a_navigation_page_is_skipped_boilerplate(pg, make_project, settings):

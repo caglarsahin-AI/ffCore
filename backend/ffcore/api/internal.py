@@ -16,7 +16,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ffcore.api.common import ERROR_RESPONSES
 from ffcore.api.knowledge import _kb, _vector_error
-from ffcore.api.knowledge_schemas import EmbedRequest, EmbedResponse, SearchHit, SearchResponse
+from ffcore.api.knowledge_schemas import EmbedRequest, EmbedResponse, SearchResponse
 from ffcore.core import db
 from ffcore.core.auth import ROLE_ORDER, Actor, resolve_actor
 from ffcore.core.config import Settings, get_settings
@@ -129,12 +129,4 @@ async def internal_key_search(
     except VectorStoreError as exc:
         raise _vector_error(exc) from None
     await session.commit()
-    return SearchResponse(
-        query_id=result.query_id,
-        hits=[SearchHit(**hit.__dict__) for hit in result.hits],
-        threshold_mode=result.threshold_mode,
-        filtered_by_rerank_floor=result.filtered_by_rerank_floor,
-        filtered_by_min_score=result.filtered_by_min_score,
-        normalizer_config_id=result.normalizer_config_id,
-        latency_ms=result.latency_ms,
-    )
+    return SearchResponse.from_result(result)

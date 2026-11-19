@@ -53,7 +53,12 @@ async def ingest_document_job(ctx, document_id: str) -> dict:
 
 
 async def reindex_job(
-    ctx, kb_id: str, layer: str, full: bool, accept_personnel_data: bool = False
+    ctx,
+    kb_id: str,
+    layer: str,
+    full: bool,
+    accept_personnel_data: bool = False,
+    preset: str | None = None,
 ) -> dict:
     settings = get_settings()
     store = get_vector_store(settings)
@@ -70,6 +75,7 @@ async def reindex_job(
             store=store,
             embed_client=client,
             accept_personnel_data=accept_personnel_data,
+            preset=preset,
         )
     return {"documents": report.documents, "reused": report.reused, "embedded": report.embedded}
 

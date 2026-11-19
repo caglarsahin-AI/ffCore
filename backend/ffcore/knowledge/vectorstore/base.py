@@ -103,3 +103,19 @@ async def _unsupported_update_acl(self, kb_id, document_id, acl_roles, acl_users
 # Optional, additive to C5 (default: unsupported). An ACL change of an already indexed document
 # must reach the store before the change is answered (review 04a r1 MAJOR-1).
 VectorStore.update_acl = _unsupported_update_acl
+
+
+async def _unsupported_count(self, kb_id) -> int:
+    raise VectorStoreError("unsupported", f"{self.name} cannot count a collection")
+
+
+async def _unsupported_fetch_vectors(self, kb_id, chunk_ids) -> dict:
+    raise VectorStoreError("unsupported", f"{self.name} cannot return stored vectors")
+
+
+# Optional, additive to C5 (04b `migrate-vectors`, default: unsupported).
+# count(kb_id) -> int: the vectors the store holds for the KB (searchable chunks for pgvector,
+# every point of the collection for Qdrant; a missing collection is 0).
+# fetch_vectors(kb_id, chunk_ids) -> {chunk_id: (dense, sparse or None)} for the ids it holds.
+VectorStore.count = _unsupported_count
+VectorStore.fetch_vectors = _unsupported_fetch_vectors

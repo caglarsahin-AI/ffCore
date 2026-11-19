@@ -114,6 +114,36 @@ class PgVectorStore(VectorStore):
             rows = (await session.execute(statement, params)).all()
         return [VectorHit(chunk_id=r[0], document_id=r[1], score=float(r[2])) for r in rows]
 
+    async def count(self, kb_id: UUID) -> int:
+        """Searchable chunks of the KB that have a vector (what search can return)."""
+        statement = text(
+            "SELECT count(*) FROM chunks c JOIN documents d ON d.id = c.document_id "
+            "WHERE c.kb_id = :kb_id AND c.embedding IS NOT NULL AND c.chunk_status IN :searchable"
+            " AND d.deleted_at IS NULL AND d.status = 'indexed'"
+        ).bindparams(bindparam("searchable", expanding=True))
+        async with self._session() as session:
+            value = await session.scalar(
+                statement, {"kb_id": kb_id, "searchable": list(SEARCHABLE_CHUNK_STATUSES)}
+            )
+        return int(value)
+
+    async def fetch_vectors(self, kb_id: UUID, chunk_ids: list[UUID]) -> dict:
+        if not chunk_ids:
+            return {}
+        statement = text(
+            "SELECT id, embedding::text, sparse FROM chunks "
+            "WHERE kb_id = :kb_id AND id IN :ids AND embedding IS NOT NULL"
+        ).bindparams(bindparam("ids", expanding=True))
+        async with self._session() as session:
+            rows = (await session.execute(statement, {"kb_id": kb_id, "ids": chunk_ids})).all()
+        return {
+            r[0]: (
+                [float(x) for x in r[1].strip("[]").split(",")],
+                {int(k): float(v) for k, v in r[2].items()} if r[2] is not None else None,
+            )
+            for r in rows
+        }
+
     async def update_acl(self, kb_id, document_id, acl_roles, acl_users) -> None:
         """Nothing to copy: this driver reads the ACL from `documents` in every query."""
         return None

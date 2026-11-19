@@ -377,11 +377,12 @@ openapi/04a.yaml`; contract test `test_04a_20_*`). Lists are `{"data": [...]}`. 
 |---|---|---|
 | `GET ""`, `GET /{kb_id}` | analyst | counts of documents and chunks; `chunk_max_tokens` is derived (1.5 × `chunk_size`) |
 | `POST ""`, `PATCH /{kb_id}`, `DELETE /{kb_id}` | admin + edit | one embedding model per installation: `embed_model`/`embed_dim` other than `EMBED_MODEL`/`EMBED_DIM` is 400 `embed_model_mismatch` / `embed_dim_mismatch`; `chunk_overlap` other than 0 is 422 `chunk_overlap_unsupported` |
-| `POST /{kb_id}/documents` | analyst + edit | multipart, several `files`; 202 with `outcome` per file: `created`, `new_version` (same file name, new content), `unchanged` (same bytes: version + 1, nothing queued; an ACL change still reaches the vector store). A request over `UPLOAD_MAX_REQUEST_BYTES` is 413 `request_too_large` before the body is read. Optional `updated_at_source` (ISO 8601) is the source date of every file of the request; omitted, it stays unknown (`null`), never the upload time (FOLLOWUP-101) |
+| `POST /{kb_id}/documents` | analyst + edit | multipart, several `files`; 202 with `outcome` per file: `created`, `new_version` (same file name, new content), `unchanged` (same bytes: the version stays, nothing queued, FOLLOWUP-157; an ACL change still reaches the vector store). Under an existing name (04b): a different ACL is admin only (403 `insufficient_role`), no ACL fields keep the document's ACL, and a document the caller cannot read is 409 `document_name_taken` (an admin is exempt); nothing is written on a refusal. A request over `UPLOAD_MAX_REQUEST_BYTES` is 413 `request_too_large` before the body is read. Optional `updated_at_source` (ISO 8601) is the source date of every file of the request; omitted, it stays unknown (`null`), never the upload time (FOLLOWUP-101) |
 | `GET /{kb_id}/documents`, `GET …/{document_id}` | analyst | status, the three gate decisions with reasons, converter and seconds, `updated_at_source` |
-| `PATCH …/{document_id}` | analyst + edit | `{updated_at_source}`: the source date (ISO 8601, `null` clears it); takes effect in search at once; audited as `update_document`, readable to the caller or 404 |
-| `DELETE …/{document_id}` | analyst + edit | the document leaves search at once; raw stays on disk |
-| `POST /{kb_id}/reindex` | analyst + edit | `{layer: silver or gold, full}`; gold never reads raw or the source; silver with a personnel-data record written with `pii_regex@1` (the M3 mode) in scope is 409 `prsim_requires_ner`, nothing queued (the job checks again; the API has no M3 flag) |
+| `PATCH …/{document_id}` | analyst + edit | `{updated_at_source}`: the source date (ISO 8601, `null` clears it); takes effect in search at once. `{acl_roles, acl_users, acl_open}` (04b, **admin only**: analyst gets 403 `insufficient_role`): replaces the document ACL and reaches the vector store before the answer (503 `vector_store_unavailable` leaves it as it was); an empty ACL only with `acl_open: true` (422 `acl_empty`; with a list 422 `acl_conflict`). Audited as `update_document`, readable to the caller or 404 |
+| `DELETE …/{document_id}` | analyst + edit | the document leaves search at once; its silver and `.raw.md` files are removed, raw stays on disk (FOLLOWUP-133) |
+| `POST /{kb_id}/reindex` | analyst + edit | `{layer: silver or gold, full, preset?}`; gold never reads raw or the source; silver with a personnel-data record written with `pii_regex@1` (the M3 mode) in scope is 409 `prsim_requires_ner`, nothing queued (the job checks again; the API has no M3 flag). `preset` (04b, silver only, else 422 `preset_requires_silver`): `encoding`, `timeout`, `mhtml` or `engine:<convert_engine>`; `documents` is the number it selects |
+| `GET /{kb_id}/ingest-report` | analyst, also in read mode | 04b: source × gate × status × reason counts, rejected documents and skipped chunks with reasons (`limit`, 1-1000, default 100); only documents the caller may read |
 | `POST /{kb_id}/search` | analyst, also in read mode | `{query, top_k?, filters{document_ids, metadata}, hybrid?}`; header `X-Run-Id` is stored in `kb_queries.run_id` |
 | `POST /{kb_id}/test-query` | analyst, also in read mode | the same search, logged with `source=playground` |
 | `POST /internal/embed` | service account only | for the ingest worker; 403 `service_account_required` for anybody else |
@@ -397,10 +398,15 @@ and the call is limited to the token's project.
 Search response: hits newest source first with `age_days`, each with `embed_score` and
 `rerank_score`; `threshold_mode` says which single threshold applied (`rerank_floor` with the
 reranker on, `min_score` with it off) and `filtered_by_*` how many candidates it removed.
+`filtered` (04b) lists those candidates (`chunk_id`, `document_name`, `reason`
+`below_rerank_floor` or `below_min_score`, both scores); `rerank_truncated` counts candidate pairs
+longer than the reranker reads. The internal key search (06b) answers the same shape.
 
 04a lives on Alembic branch `04a` (`04a_0001`, depends on `03a_0001`); roll back with an explicit
 revision (`alembic downgrade <revision to keep>`; `04a@-1` is refused since the merge,
 FOLLOWUP-57, docs/gelistirme-ortami.md). `chunks.embedding` is `vector(EMBED_DIM)` as read at migration time.
+04b adds `chunks.sparse` (jsonb, nullable) on branch `04b` (`04b_0001`, on `05b_0001`);
+downgrade drops the column, Qdrant points are not touched.
 
 ## OpenAI-compatible facade (06b, contract C11)
 

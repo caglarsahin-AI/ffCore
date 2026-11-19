@@ -214,6 +214,9 @@ class Chunk(Base):
     # importing the models does not depend on settings.
     embedding = mapped_column(Vector(), nullable=True)
     embedding_model: Mapped[str | None] = mapped_column(Text)
+    # bge-m3 lexical weights {token_id: weight} (04b, K-04B-0002 S2): copied with a reused
+    # vector and by migrate-vectors; NULL on rows written before 04b.
+    sparse: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
     tsv = mapped_column(TSVECTOR, Computed(f"to_tsvector('{TSV_CONFIG}', text)", persisted=True))
     chunk_status: Mapped[str] = mapped_column(Text, server_default=sql_text("'ok'"))
     chunk_reason: Mapped[str | None] = mapped_column(Text)

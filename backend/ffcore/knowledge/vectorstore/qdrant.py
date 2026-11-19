@@ -175,6 +175,33 @@ class QdrantStore(VectorStore):
             for point in result["result"]["points"]
         ]
 
+    async def count(self, kb_id: UUID) -> int:
+        """Every point of the KB's collection (exact); a missing collection holds none."""
+        name = collection_name(kb_id)
+        existing = await self._call("GET", f"/collections/{name}", ok=(200, 404))
+        if not existing.get("result"):
+            return 0
+        result = await self._call("POST", f"/collections/{name}/points/count", {"exact": True})
+        return int(result["result"]["count"])
+
+    async def fetch_vectors(self, kb_id: UUID, chunk_ids: list[UUID]) -> dict:
+        if not chunk_ids:
+            return {}
+        result = await self._call(
+            "POST",
+            f"/collections/{collection_name(kb_id)}/points",
+            {"ids": [str(c) for c in chunk_ids], "with_vector": True, "with_payload": False},
+        )
+        out = {}
+        for point in result["result"]:
+            vector = point.get("vector") or {}
+            sparse = vector.get("sparse")
+            out[UUID(point["id"])] = (
+                [float(x) for x in vector["dense"]],
+                dict(zip(sparse["indices"], sparse["values"], strict=True)) if sparse else None,
+            )
+        return out
+
     async def update_acl(self, kb_id, document_id, acl_roles, acl_users) -> None:
         """The payload copy of the ACL follows the database at once (review 04a r1 MAJOR-1)."""
         roles, users = list(acl_roles), [str(u) for u in acl_users]
