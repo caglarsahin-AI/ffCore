@@ -1,0 +1,128 @@
+HEAD=d30d1658dfafcabcd6a5bd754513e7c9a8283274 (git archive copy)
+2026-11-19 15:16:30,632 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=138
+2026-11-19 15:16:30,634 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-19 15:16:30,793 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-19 15:16:30,805 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=104
+2026-11-19 15:16:30,962 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-19 15:16:30,976 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=108
+2026-11-19 15:16:31,117 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-19 15:16:31,129 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=100
+2026-11-19 15:16:31,402 INFO ffcore.access access method=POST path=/api/v1/projects/17025822-f71c-4e11-8a17-50e3646d431b/knowledge-bases status=201 ms=270
+2026-11-19 15:16:31,467 INFO ffcore.access access method=POST path=/api/v1/projects/17025822-f71c-4e11-8a17-50e3646d431b/knowledge-bases/6b6dc306-f672-4665-ab8b-374b70dd9dff/documents status=202 ms=60
+2026-11-19 15:16:32,180 INFO ffcore.knowledge.ingest gold document=fcad0702-ec2c-4f22-a5b4-be332fb614ff reused=0 embedded=1
+2026-11-19 15:16:32,282 INFO ffcore.access access method=POST path=/api/v1/projects/17025822-f71c-4e11-8a17-50e3646d431b/knowledge-bases/6b6dc306-f672-4665-ab8b-374b70dd9dff/search status=200 ms=70
+[RV] Q1 start acl_roles=admin -> payload (1, [(('admin',), ())]) | analyst hits 0
+2026-11-19 15:16:32,359 INFO ffcore.access access method=POST path=/api/v1/projects/17025822-f71c-4e11-8a17-50e3646d431b/knowledge-bases/6b6dc306-f672-4665-ab8b-374b70dd9dff/documents status=202 ms=73
+2026-11-19 15:16:32,463 INFO ffcore.access access method=POST path=/api/v1/projects/17025822-f71c-4e11-8a17-50e3646d431b/knowledge-bases/6b6dc306-f672-4665-ab8b-374b70dd9dff/search status=200 ms=74
+[RV] Q1 widen outcome unchanged queued 0 -> payload (1, [(('admin', 'analyst'), ())]) | analyst hits 1
+2026-11-19 15:16:32,545 INFO ffcore.access access method=POST path=/api/v1/projects/17025822-f71c-4e11-8a17-50e3646d431b/knowledge-bases/6b6dc306-f672-4665-ab8b-374b70dd9dff/documents status=202 ms=78
+2026-11-19 15:16:32,639 INFO ffcore.access access method=POST path=/api/v1/projects/17025822-f71c-4e11-8a17-50e3646d431b/knowledge-bases/6b6dc306-f672-4665-ab8b-374b70dd9dff/search status=200 ms=67
+[RV] Q1 narrow outcome unchanged -> payload (1, [(('admin',), ())]) | analyst hits 0
+2026-11-19 15:16:32,719 INFO ffcore.access access method=POST path=/api/v1/projects/17025822-f71c-4e11-8a17-50e3646d431b/knowledge-bases/6b6dc306-f672-4665-ab8b-374b70dd9dff/documents status=202 ms=75
+2026-11-19 15:16:32,819 INFO ffcore.access access method=POST path=/api/v1/projects/17025822-f71c-4e11-8a17-50e3646d431b/knowledge-bases/6b6dc306-f672-4665-ab8b-374b70dd9dff/search status=200 ms=72
+[RV] Q1 users-only outcome unchanged -> payload (1, [((), ('52fcc5dd-a16a-46bd-980c-c058a1ce4051',))]) | analyst hits 1
+.2026-11-19 15:16:33,107 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-19 15:16:33,121 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=112
+2026-11-19 15:16:33,268 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-19 15:16:33,280 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=106
+2026-11-19 15:16:33,422 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-19 15:16:33,439 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=104
+2026-11-19 15:16:33,587 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-19 15:16:33,600 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=101
+2026-11-19 15:16:33,655 INFO ffcore.access access method=POST path=/api/v1/projects/1b2d50ec-4fca-4759-a0fb-e5aa14eb1f2e/knowledge-bases status=201 ms=51
+2026-11-19 15:16:33,723 INFO ffcore.access access method=POST path=/api/v1/projects/1b2d50ec-4fca-4759-a0fb-e5aa14eb1f2e/knowledge-bases/48e190d1-c3c2-4049-81ab-be9952ef4067/documents status=202 ms=64
+2026-11-19 15:16:34,443 INFO ffcore.knowledge.ingest gold document=02577fdd-d815-41e6-b65f-4162a9c6bca8 reused=0 embedded=1
+2026-11-19 15:16:34,529 INFO ffcore.access access method=PATCH path=/api/v1/projects/1b2d50ec-4fca-4759-a0fb-e5aa14eb1f2e/knowledge-bases/48e190d1-c3c2-4049-81ab-be9952ef4067/documents/02577fdd-d815-41e6-b65f-4162a9c6bca8 status=403 ms=82
+[RV] R1 analyst {'acl_open': True} -> 403 insufficient_role
+2026-11-19 15:16:34,612 INFO ffcore.access access method=PATCH path=/api/v1/projects/1b2d50ec-4fca-4759-a0fb-e5aa14eb1f2e/knowledge-bases/48e190d1-c3c2-4049-81ab-be9952ef4067/documents/02577fdd-d815-41e6-b65f-4162a9c6bca8 status=403 ms=79
+[RV] R1 analyst {'acl_roles': ['analyst']} -> 403 insufficient_role
+2026-11-19 15:16:34,691 INFO ffcore.access access method=PATCH path=/api/v1/projects/1b2d50ec-4fca-4759-a0fb-e5aa14eb1f2e/knowledge-bases/48e190d1-c3c2-4049-81ab-be9952ef4067/documents/02577fdd-d815-41e6-b65f-4162a9c6bca8 status=403 ms=75
+[RV] R1 analyst {'acl_users': ['eff53032-f3d7-43bf-8e50-171d274d150c']} -> 403 insufficient_role
+2026-11-19 15:16:34,775 INFO ffcore.access access method=PATCH path=/api/v1/projects/1b2d50ec-4fca-4759-a0fb-e5aa14eb1f2e/knowledge-bases/48e190d1-c3c2-4049-81ab-be9952ef4067/documents/02577fdd-d815-41e6-b65f-4162a9c6bca8 status=403 ms=81
+[RV] R1 analyst {'acl_open': False} -> 403 insufficient_role
+2026-11-19 15:16:34,830 INFO ffcore.access access method=PATCH path=/api/v1/projects/1b2d50ec-4fca-4759-a0fb-e5aa14eb1f2e/knowledge-bases/48e190d1-c3c2-4049-81ab-be9952ef4067/documents/02577fdd-d815-41e6-b65f-4162a9c6bca8 status=200 ms=51
+[RV] R1 analyst non-ACL field -> 200
+2026-11-19 15:16:34,925 INFO ffcore.access access method=PATCH path=/api/v1/projects/1b2d50ec-4fca-4759-a0fb-e5aa14eb1f2e/knowledge-bases/48e190d1-c3c2-4049-81ab-be9952ef4067/documents/02577fdd-d815-41e6-b65f-4162a9c6bca8 status=200 ms=90
+2026-11-19 15:16:35,027 INFO ffcore.access access method=POST path=/api/v1/projects/1b2d50ec-4fca-4759-a0fb-e5aa14eb1f2e/knowledge-bases/48e190d1-c3c2-4049-81ab-be9952ef4067/search status=200 ms=73
+[RV] R1 admin narrow -> 200 payload (1, [(('admin',), ())]) | analyst hits 0
+2026-11-19 15:16:35,116 INFO ffcore.access access method=PATCH path=/api/v1/projects/1b2d50ec-4fca-4759-a0fb-e5aa14eb1f2e/knowledge-bases/48e190d1-c3c2-4049-81ab-be9952ef4067/documents/02577fdd-d815-41e6-b65f-4162a9c6bca8 status=200 ms=85
+2026-11-19 15:16:35,216 INFO ffcore.access access method=POST path=/api/v1/projects/1b2d50ec-4fca-4759-a0fb-e5aa14eb1f2e/knowledge-bases/48e190d1-c3c2-4049-81ab-be9952ef4067/search status=200 ms=72
+[RV] R1 admin open -> 200 payload (1, [((), ())]) | analyst hits 1
+.2026-11-19 15:16:36,045 INFO ffcore.knowledge.ingest gold document=3f92dff0-68cb-4e7a-8d47-c173393d53b9 reused=0 embedded=1
+2026-11-19 15:16:36,248 INFO ffcore.knowledge.ingest gold document=1dd8893e-9014-4fe3-8c6c-1e35aa0a8dee reused=0 embedded=1
+2026-11-19 15:16:36,343 INFO ffcore.knowledge.migrate migrate-vectors kb=66908e45-1f9c-442d-9b41-96e28049f217 qdrant->pgvector source=2 target=1 written=0 sparse_computed=0 sparse_missing=0 dry_run=False
+[RV] M1 qdrant->pgvector ok False source 2 target 1 searchable 1
+[RV] M1 line: migrate-vectors qdrant -> pgvector
+[RV] M1 line:   kb-66908e45 source=2 target=1 written=0 sparse_computed=0 sparse_missing=0 mismatch: Qdrant holds points of chunks that are not searchable in Postgres (document deleted or not indexed) or misses some; reindex those documents (make reindex LAYER=gold) or rebuild the Qdrant side with --to qdrant --drop-target
+[RV] M1 drop_target to pgvector: drop_target_not_applicable
+.
+=============================== warnings summary ===============================
+tests/integration/test_04b_migrate.py:25
+  /work/backend/tests/integration/test_04b_migrate.py:25: PytestUnknownMarkWarning: Unknown pytest.mark.vectorstore - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.vectorstore
+
+../../probe/test_rv04b_migrate_probe.py:26
+  /probe/test_rv04b_migrate_probe.py:26: PytestUnknownMarkWarning: Unknown pytest.mark.vectorstore - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.vectorstore
+
+tests/integration/test_04a_review_r1_acl.py:47
+  /work/backend/tests/integration/test_04a_review_r1_acl.py:47: PytestUnknownMarkWarning: Unknown pytest.mark.vectorstore - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.fixture(params=["pgvector", pytest.param("qdrant", marks=pytest.mark.vectorstore)])
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+3 passed, 3 warnings in 12.80s
+exit 0
+== upload probe U1-U3
+2026-11-19 15:17:32,113 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-19 15:17:32,121 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=143
+2026-11-19 15:17:32,268 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-19 15:17:32,279 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=103
+2026-11-19 15:17:32,424 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-19 15:17:32,437 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=105
+2026-11-19 15:17:32,590 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-19 15:17:32,602 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=105
+2026-11-19 15:17:32,874 INFO ffcore.access access method=POST path=/api/v1/projects/d18583df-366a-4d78-85f0-9914f203cbce/knowledge-bases status=201 ms=268
+2026-11-19 15:17:32,941 INFO ffcore.access access method=POST path=/api/v1/projects/d18583df-366a-4d78-85f0-9914f203cbce/knowledge-bases/0db785eb-c2e2-4f5d-a362-e8915d89a9fa/documents status=202 ms=62
+2026-11-19 15:17:33,038 INFO ffcore.knowledge.ingest gold document=b051e57f-6238-4ed7-88f2-1f6c68e9a640 reused=0 embedded=1
+2026-11-19 15:17:33,094 INFO ffcore.access access method=POST path=/api/v1/projects/d18583df-366a-4d78-85f0-9914f203cbce/knowledge-bases/0db785eb-c2e2-4f5d-a362-e8915d89a9fa/documents status=202 ms=51
+2026-11-19 15:17:33,140 INFO ffcore.access access method=GET path=/api/v1/projects/d18583df-366a-4d78-85f0-9914f203cbce/knowledge-bases/0db785eb-c2e2-4f5d-a362-e8915d89a9fa/documents/b051e57f-6238-4ed7-88f2-1f6c68e9a640 status=200 ms=42
+[RV] U1 analyst same bytes + acl_open -> 202 unchanged | admin view (200, ([], 1))
+.2026-11-19 15:17:33,386 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-19 15:17:33,401 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=108
+2026-11-19 15:17:33,549 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-19 15:17:33,563 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=110
+2026-11-19 15:17:33,708 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-19 15:17:33,722 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=103
+2026-11-19 15:17:33,868 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-19 15:17:33,881 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=104
+2026-11-19 15:17:33,943 INFO ffcore.access access method=POST path=/api/v1/projects/db881aea-9e7e-47a7-95c7-a8c90aa3b736/knowledge-bases status=201 ms=59
+2026-11-19 15:17:34,002 INFO ffcore.access access method=POST path=/api/v1/projects/db881aea-9e7e-47a7-95c7-a8c90aa3b736/knowledge-bases/c2dac62e-77f0-4b96-ae40-a3f44cca17a5/documents status=202 ms=55
+2026-11-19 15:17:34,097 INFO ffcore.knowledge.ingest gold document=fe79a9a4-0b3b-4738-a3f2-4ebab07817b5 reused=0 embedded=1
+2026-11-19 15:17:34,156 INFO ffcore.access access method=POST path=/api/v1/projects/db881aea-9e7e-47a7-95c7-a8c90aa3b736/knowledge-bases/c2dac62e-77f0-4b96-ae40-a3f44cca17a5/documents status=202 ms=55
+2026-11-19 15:17:34,203 INFO ffcore.access access method=GET path=/api/v1/projects/db881aea-9e7e-47a7-95c7-a8c90aa3b736/knowledge-bases/c2dac62e-77f0-4b96-ae40-a3f44cca17a5/documents/fe79a9a4-0b3b-4738-a3f2-4ebab07817b5 status=200 ms=43
+[RV] U2 analyst new bytes + acl_open -> 202 new_version | admin view (200, ([], 2))
+.2026-11-19 15:17:34,446 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-19 15:17:34,460 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=110
+2026-11-19 15:17:34,619 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-19 15:17:34,632 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=118
+2026-11-19 15:17:34,788 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-19 15:17:34,799 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=104
+2026-11-19 15:17:34,958 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-19 15:17:34,974 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=120
+2026-11-19 15:17:35,029 INFO ffcore.access access method=POST path=/api/v1/projects/a7fea075-55cd-4465-bf6c-e42e02e9cd09/knowledge-bases status=201 ms=52
+2026-11-19 15:17:35,088 INFO ffcore.access access method=POST path=/api/v1/projects/a7fea075-55cd-4465-bf6c-e42e02e9cd09/knowledge-bases/ad05e88c-7022-4804-bb7a-123641158301/documents status=202 ms=55
+2026-11-19 15:17:35,180 INFO ffcore.knowledge.ingest gold document=c67f2ac9-a2b7-45c7-af7f-c638c9a3d06b reused=0 embedded=1
+2026-11-19 15:17:35,225 INFO ffcore.access access method=GET path=/api/v1/projects/a7fea075-55cd-4465-bf6c-e42e02e9cd09/knowledge-bases/ad05e88c-7022-4804-bb7a-123641158301/documents/c67f2ac9-a2b7-45c7-af7f-c638c9a3d06b status=404 ms=41
+[RV] U3 analyst can read it: 404
+2026-11-19 15:17:35,281 INFO ffcore.access access method=POST path=/api/v1/projects/a7fea075-55cd-4465-bf6c-e42e02e9cd09/knowledge-bases/ad05e88c-7022-4804-bb7a-123641158301/documents status=202 ms=51
+2026-11-19 15:17:35,327 INFO ffcore.access access method=GET path=/api/v1/projects/a7fea075-55cd-4465-bf6c-e42e02e9cd09/knowledge-bases/ad05e88c-7022-4804-bb7a-123641158301/documents/c67f2ac9-a2b7-45c7-af7f-c638c9a3d06b status=200 ms=42
+[RV] U3 analyst upload same name, other bytes, acl_open -> 202 new_version | admin view (200, ([], 2))
+.
+=============================== warnings summary ===============================
+tests/integration/test_04a_review_r1_acl.py:47
+  /work/backend/tests/integration/test_04a_review_r1_acl.py:47: PytestUnknownMarkWarning: Unknown pytest.mark.vectorstore - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.fixture(params=["pgvector", pytest.param("qdrant", marks=pytest.mark.vectorstore)])
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+3 passed, 1 warning in 10.16s
+exit 0

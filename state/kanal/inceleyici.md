@@ -3,9 +3,9 @@
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
 - Oturum kimliği: ffcore-inceleyici-04b (önceki: ffcore-inceleyici-10c3; 10c-3 r2 metin teyidi bu oturumda)
-- Aktif paket: 04b-1 r2 teyidi bekleniyor (K-04B-0009); 10c-3 MERGED 0a92084
+- Aktif paket: 04b-1 r2 DUZELT (M2, R-04B-0006); koordinatör kararı bekleniyor
 - Durum: ACTIVE
-- Son okunan: koordinator K-04B-0008
+- Son okunan: koordinator K-04B-0009
 
 ## Mesajlar
 - Arşiv: MERGED/kapalı paketlerin mesajları `state/kanal/arsiv/inceleyici-<paket>.md` dosyalarında (16 Kasım 2026 taşıması: 335 mesaj); ID ile atıf orada bulunur.
@@ -56,3 +56,15 @@ Rapor `state/reviews/04b-1-r1.md`. Kapı (archive kopyası, yığın tam servisl
 ### R-04B-0004 · 2026-11-19 17:26 · → koordinator · YIGIN-KAPA
 Paket: 04b · Cevap: K-04B-0005 · Yigin: ffcore-rv04b
 `down -v --remove-orphans` exit 0; rv04b adlı konteyner ve volume kalmadı (`04b-1-r1-rv-down.log`). Açık inceleyici yığını yok.
+
+### R-04B-0005 · 2026-11-19 18:14 · → koordinator · YIGIN-AC
+Paket: 04b · Cevap: K-04B-0009 · Yigin: ffcore-rv04b
+Kaynak: d30d165'in `git archive` kopyası (scratchpad `rv04b2_src`). Yığın tam servislerle: `docker compose -p ffcore-rv04b --env-file .env.test --profile test --profile qdrant up -d --wait --no-build --pull never`, `FFCORE_VERSION=0.0.0-main`, `BACKEND_PORT=18540`, `FRONTEND_PORT=13540`. Kısa tur: Qdrant payload probe'u (aynı bayt + farklı ACL), ACL PATCH rolleri, migrate-vectors mesajı iki hedefte, r2 testleri ve 04a/04b ACL testleri iki profilde, `check:api`. Bitince `down -v` + YIGIN-KAPA.
+
+### R-04B-0006 · 2026-11-19 18:27 · → koordinator · REVIEW-SONUC
+Paket: 04b · Cevap: K-04B-0009 · SHA: d30d1658dfafcabcd6a5bd754513e7c9a8283274 · Sonuc: DUZELT · Bulgu: B0 M2 m0 N1
+Rapor `state/reviews/04b-1-r2.md`. Testler: make test 1937×2, hedefli test-int 52 (Qdrant dahil), önyüz 0/0/0, Vitest 279. Rebase temiz (3 commit `=`, docs yalnız degisiklikler.md bağlamı). Teyit edilenler: ACL PATCH analyst 403 / admin 200; migrate-vectors mesajı hedefe göre (MINOR-1 kapandı); "kaynak" cümlesi (NOTE-1 kapandı). **NOTE-2'de işçi haklı:** gerçek Qdrant payload'ı aynı bayt + farklı ACL'de hemen değişiyor (genişletme ve daraltma); r1 notum yanlıştı, yalnız store.py'yi okumuştum. **MAJOR-1 `acl-yukleme-atlatma`:** analyst aynı adla yeniden yükleyip (`unchanged` ya da `new_version`) `acl_open` ile ACL'i değiştirebiliyor; MINOR-2 A kararı yükleme yolunda uygulanmıyor. Öneri: mevcut kayıtta ACL farklıysa ve çağıran admin değilse 403; ACL verilmezse mevcut ACL korunsun. **MAJOR-2 `gorunmeyen-belgeyi-ezme` (04a'dan beri, aynı fonksiyon):** analyst okuyamadığı (GET 404) admin belgesini aynı adla yükleyip içeriğini değiştiriyor ve herkese açıyor. Seçenek A (önerim) okunamayan aynı adlı kayıtta yükleme reddi, bu PR'da; B ayrı fix paketi. Bekleyen (commit edilmedi): rapor, `state/evidence/04b-1-r2-rv-*.log` (7), `state/kanal/inceleyici.md`.
+
+### R-04B-0007 · 2026-11-19 18:27 · → koordinator · YIGIN-KAPA
+Paket: 04b · Cevap: K-04B-0009 · Yigin: ffcore-rv04b
+`down -v --remove-orphans` exit 0; rv04b adlı konteyner ve volume kalmadı (`04b-1-r2-rv-down.log`). Açık inceleyici yığını yok.

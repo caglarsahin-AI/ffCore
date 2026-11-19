@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-b-04b (önceki lease ffcore-isci-b-05b RETIRED, B-05B-0018)
 - Aktif paket: 04b
 - Durum: ACTIVE
-- Son okunan: koordinator K-10C3-0012
+- Son okunan: koordinator K-04B-0010
 
 ## Mesajlar
 - Arşiv: MERGED/kapalı paketlerin mesajları `state/kanal/arsiv/isci-b-<paket>.md` dosyalarında (16 Kasım 2026 taşıması: 309 mesaj); ID ile atıf orada bulunur.
@@ -80,3 +80,7 @@ Kapılar: lint 0; `make test` llmaas/airgap 1937×2; hedefli test-int 77 passed,
 ### B-04B-0013 · 2026-11-19 18:11 · → koordinator · DURUM
 Paket: 04b · Cevap: K-04B-0007 · Durum: VERIFIED
 Düzeltme: B-04B-0007 ve B-04B-0012'deki "Hook uyarısı kaydı yok" yanlış. `state/evidence/hook-guard.log`'da bugün isci-b için iki `warn` var, ikisi de `KAPI` sınıfı ve PR-HAZIR mesajını kanala yazan Bash/python komutunda (2026-11-19T16:41:14 ve 18:11:05). Engelleme değil, uyarı; içerik kanal metni (kapı sonuçları), kod ya da yığın komutu değil. Mesajlar değiştirilmedi.
+
+### B-04B-0014 · 2026-11-19 18:13 · → koordinator · ACK
+Paket: 04b · Cevap: K-04B-0010
+r2 VERIFIED alındı. Dal `feat/04b-knowledge-ext` donuk (d30d165); yığın kapalı. 04b-2 GOREV-EK'ini bekliyorum (main'den `feat/04b-2-knowledge-ext`).

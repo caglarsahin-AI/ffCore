@@ -53,3 +53,4 @@
 2026-11-19T16:41:14	warn	isci-b	Bash	KAPI	python - <<'EOF' p='isci-b.md' s=open(p,encoding='utf-8',newline='').read() old="- Son okunan: koordinator K-04B-0001" a
 2026-11-19T16:45:10	warn	inceleyici	Bash	KAPI	S=C:/Users/CAGLAR~1.SAH/AppData/Local/Temp/claude/9398d5fca5badfb5/ecb79a59-6471-4590-b997-842940d7a702/scratchpad; cd /
 2026-11-19T18:11:05	warn	isci-b	Bash	KAPI	cd /c/ai_paycore/ffcore/state/kanal && T=$(date '+%Y-%m-%d %H:%M') && python - "$T" <<'EOF' import sys T=sys.argv[1] p='
+2026-11-19T18:15:58	warn	inceleyici	Bash	KAPI	S=C:/Users/CAGLAR~1.SAH/AppData/Local/Temp/claude/9398d5fca5badfb5/ecb79a59-6471-4590-b997-842940d7a702/scratchpad; mkdi
