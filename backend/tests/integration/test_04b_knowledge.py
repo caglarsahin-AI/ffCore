@@ -190,7 +190,7 @@ def test_04b_6_preset_count_matches_the_reconverted_set(pg, make_project, settin
     assert run(ingest.preset_document_count(kb_id, "engine:nothing-like-this")) == 0
 
 
-@pytest.mark.parametrize("preset", ["", "ENCODING", "engine:", "engine:a b", "video", "x"])
+@pytest.mark.parametrize("preset", ["", "ENCODING", "engine:", "engine:a b", "audio", "x"])
 def test_04b_6_unknown_preset_is_refused(preset):
     with pytest.raises(ingest.ReindexRefused) as caught:
         ingest.parse_preset(preset)
