@@ -26,7 +26,8 @@ def test_04b_1_migration_is_the_single_head_on_05b():
     assert scripts.get_heads() == ["04b_0001"]
     revision = scripts.get_revision("04b_0001")
     assert revision.down_revision == "05b_0001"
-    assert revision.branch_labels == {"04b"}
+    # Alembic spreads labels along the chain; the label this file declares is its own.
+    assert revision.module.branch_labels == ("04b",)
 
 
 def test_04b_1_chunk_model_has_nullable_sparse():

@@ -85,8 +85,9 @@ def make_kb(pg, project_id) -> uuid.UUID:
     return kb_id
 
 
-def markdown(*sections):
-    return "\n\n".join(f"## Madde {i}\n\n{PROSE * 6}" for i in sections).encode()
+def markdown(name, *sections):
+    # Each document its own text: identical bodies are duplicates (Kapı 1, duplicate_of).
+    return "\n\n".join(f"## Madde {i} {name}\n\n{name} {PROSE * 6}" for i in sections).encode()
 
 
 def ingest_docs(settings, kb_id, docs, store, embedder=None):
@@ -100,7 +101,7 @@ def ingest_docs(settings, kb_id, docs, store, embedder=None):
                     session,
                     kb_id,
                     filename=name,
-                    data=markdown(1, 2),
+                    data=markdown(name, 1, 2),
                     acl_roles=list(roles),
                     acl_users=[],
                     created_by="test",
