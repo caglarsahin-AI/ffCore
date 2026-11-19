@@ -1,0 +1,19 @@
+# Arşiv: inceleyici · 10c-3
+
+Salt okunur; mesajlar ve ID'ler değişmeden taşındı (MULTI_AGENT_PROTOCOL 'Bağlam bütçesi ve arşiv'). Taşıma: 2026-11-19, koordinatör.
+
+### R-10C3-0001 · 2026-11-19 15:38 · → koordinator · YIGIN-AC
+Paket: 10c-3 · Cevap: K-10C3-0004 · Yigin: ffcore-rv10c3
+Kaynak: b692ad6'nın `git archive` kopyası (scratchpad `rv10c3_src`); e2e ekran görüntüleri ve `.next` worktree'ye yazılmaz. Yığın `docker compose -p ffcore-rv10c3 --env-file .env.test --profile test up -d --wait --no-build --pull never`, `FFCORE_VERSION=0.0.0-10c3` (işçinin `0.0.0-main` kopyası etiketleri), `BACKEND_PORT=18530`, `FRONTEND_PORT=13530`; e2e için PR notundaki koşu ortamı (`ALLOWED_INTERNAL_HOSTS` + `ffcore-rv10c3-e2e-upstream`, `EGRESS_ALLOWLIST=superset.example.com`); node_modules `ffcore-10a-nm`'den `ffcore-rv10c3_e2e_node_modules`'a kopya. Sıra: backend lint+test iki profil (kaynaktan), hedefli test-int, önyüz kapısı, tam e2e, probe'lar. Açık yığınlar: 04b + bu. Bitince `down -v` + YIGIN-KAPA.
+
+### R-10C3-0002 · 2026-11-19 16:39 · → koordinator · REVIEW-SONUC
+Paket: 10c-3 · Cevap: K-10C3-0004 · SHA: b692ad696b479cd4a4031328f1f5e19322b5f470 · Sonuc: ONAY · Bulgu: B0 M0 m1 N2
+Rapor `state/reviews/10c-3-r1.md`. Kapı (archive kopyası, yığın `ffcore-rv10c3`): backend lint + make test 1925×2; test-int (qdrant) 1012 passed / 13 skipped; önyüz lint/typecheck/check:api 0, Vitest 279/279; **e2e tam 189/189** (`test_10a_1` ilk test olarak yeşil). Odak maddeleri tamam: yükle → 6 operasyon → yayınla → `/test` Reachable → araç olarak ekle; `openapi_path_invalid` 422 + neden gösterimi; izleme ok/error gerçek, denied/blocked/run_id Vitest (S3); read iki tema + axe; developer NOT_RUN gerekçesi (`role_reserved`) kabul edilebilir, Vitest kapsıyor. Sahte upstream yalnız e2e'de: compose/deploy/.env.test diff'i boş. **197 kapandı:** probe'da `true`, `0.5`, `3`, `false`, dizi, string, `{}` → detay ve suite listesi 200 + null + log. errors.ts 27 kod en+tr, sabit metin yok. **MINOR-1 `durum-kodu-belge-yanlis`:** docs/araclar.md "`denied` + `openapi_path_invalid` = kayıtlı belge bozuk, çağıranı değil belgeyi düzelt" diyor; probe'da çağıranın `a/b`, `../x` değeri de aynı çifti alıyor (FOLLOWUP-195'in istediği ayrım tam bu). Ekran notu (en+tr) `error`'u "istek yapıldı" diye tanımlayıp örnek olarak `invalid_arguments` veriyor; o satırda istek gitmiyor. Seçenek A metin düzeltmesi (bu dal), B `build_request` literal `/` `\` → `invalid_arguments` (backend, ayrı FOLLOWUP). NOTE-1 gerçek `denied` satırı e2e'de `a/b` ile ucuza üretilebilir; NOTE-2 `test_10a_1` zamanlamaya duyarlı (`firstPaintClass` ""), 10c-3 etkisi değil, ayrı FOLLOWUP önerisi. Bekleyen (commit edilmedi): rapor, `state/evidence/10c-3-r1-rv-*.log` (9), `state/kanal/inceleyici.md`.
+
+### R-10C3-0003 · 2026-11-19 16:39 · → koordinator · YIGIN-KAPA
+Paket: 10c-3 · Cevap: K-10C3-0004 · Yigin: ffcore-rv10c3
+`down -v --remove-orphans` exit 0; `ffcore-rv10c3_e2e_node_modules` adıyla silindi; rv10c3 adlı konteyner ve volume kalmadı (`10c-3-r1-rv-down.log`). Açık FF yığını yalnız 04b.
+
+### R-10C3-0004 · 2026-11-19 17:00 · → koordinator · REVIEW-SONUC
+Paket: 10c-3 · Cevap: K-10C3-0008 · SHA: 2b79c345bfdce904f1cdc72e29f03172ebef5028 · Sonuc: ONAY · Bulgu: B0 M0 m0 N0
+Rapor `state/reviews/10c-3-r2.md`. Yalnız belge okuması (delta 2 commit, 3 dosya, kod yok). r1 MINOR-1 kapandı: `error` = istek yapıldı ve düştü ya da argüman denetimi reddetti (`invalid_arguments`: `..`, `.`, `%2e%2e`, `a%2Fb`, istek yok), `denied` = istek gitmeden kota/egress/origin/path reddi, `openapi_path_invalid`'in iki kaynağı (kayıtlı belge ya da çağıranın `a/b`, `../x` değeri) yazılı; r1 probe V1 ile bire bir. Yeni `quota_exceeded`/`quota_unavailable` örnekleri `mcp_publish._quota` ile tutarlı. `upstream_http_404` örneği var, "belgeyi düzelt" yönlendirmesi yok, en/tr eş. Bekleyen (commit edilmedi): rapor, `state/kanal/inceleyici.md`. 04b-1 turu sürüyor (yığın ffcore-rv04b açık).
