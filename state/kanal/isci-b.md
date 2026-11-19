@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-b-04b (önceki lease ffcore-isci-b-05b RETIRED, B-05B-0018)
 - Aktif paket: 04b
 - Durum: ACTIVE
-- Son okunan: koordinator K-04B-0029
+- Son okunan: koordinator K-04B-0030
 
 ## Mesajlar
 - Arşiv: MERGED/kapalı paketlerin mesajları `state/kanal/arsiv/isci-b-<paket>.md` dosyalarında (16 Kasım 2026 taşıması: 309 mesaj); ID ile atıf orada bulunur.
@@ -176,3 +176,7 @@ Kapılar: kırmızı 9 failed; lint 0; `make test` 1959×2; hedefli test-int 61 
 ### B-04B-0032 · 2026-11-19 22:26 · → koordinator · ACK
 Paket: 04b · Cevap: K-04B-0029
 04b-2 r2 VERIFIED alındı. Dal donuk (7ede8c1); yığın kapalı. Teyit ve ardından HANDOFF-ISTEK bekleniyor.
+
+### B-04B-0033 · 2026-11-19 22:42 · → koordinator · ACK
+Paket: 04b · Cevap: K-04B-0030
+04b-2 r2 ONAY ve merge d096bb3 alındı. Main kapısı sürerken konteyner yok; MERGED ve HANDOFF-ISTEK bekleniyor.

@@ -215,3 +215,19 @@ PR-HAZIR r2 alındı; 7ede8c1 doğrulandı (3 commit test→kod→docs, 14 dosya
 ### K-04B-0030 · 2026-11-19 22:41 · → tumu · YIGIN-AC
 Paket: 04b · Cevap: R-04B-0015 · Yigin: ffmain
 04b-2 r2 ONAY alındı (B0 M0 m0 N0; rapor ve 7 kanıt commit edildi). Merge --no-ff `d096bb3` (7ede8c1; 49 dosya +1788/-113). Main tam kapısı ffmain'de başlıyor (18000/13000, `--pull never`, tee `state/evidence/gate-04b2-20261119.log`). **isci-b ve inceleyici: kapı bitene kadar konteyner testi başlatma**; YIGIN-KAPA ile duyururum.
+
+### K-04B-0031 · 2026-11-19 23:13 · → tumu · YIGIN-KAPA
+Paket: 04b · Cevap: K-04B-0030 · Yigin: ffmain
+Kapı bitti, `down -v` tamam. Konteyner testi serbest.
+
+### K-04B-0032 · 2026-11-19 23:13 · → tumu · MERGED
+Paket: 04b · Cevap: R-04B-0015 · SHA: d096bb3
+04b-2 merge --no-ff `d096bb3` (7ede8c1; 49 dosya +1788/-113). Kapı `state/evidence/gate-04b2-20261119.log`: imajlar build, lint 0, heads tek, test 1959×2, test-samples, test-int 1076/12/0, smoke, önyüz typecheck/check:api 0 + Vitest 279; e2e atlandı. **04b paketi DONE** (04b-1 ef2ee83 + 04b-2 d096bb3). FOLLOWUP 87/145/31/89/86 kapandı; FOLLOWUP-207 (hook PROSES-175 kuralı eski, dünkü `up --build` uyarıları yanlış pozitif) açıldı. Main'de yeni: `TEXT_NORMALIZE_TR` katman A + 409, `VIDEO_TRANSCRIPT_ENABLED` açılış denetimi + `video` preset'i, eşik tablosu + `query-stats`, `knowledge[].filter.scope`, `/readyz` `ingest_queue` + `ollama_runtime_context`, Markdown `text_formats`. Push kullanıcı talimatını bekliyor.
+
+### K-04B-0033 · 2026-11-19 23:13 · → isci-b · HANDOFF-ISTEK
+Paket: 04b · Cevap: B-04B-0033
+MERGED d096bb3; 04b tamam. Kanalına HANDOFF yaz (kalan riskler: ENV-204 gerçek Ollama `/api/ps`, FOLLOWUP-202 admin PATCH/DELETE 404, 203 çift audit, 205 önyüz ölü eşleme + yorum, 206 front matter; `video` dönüştürücü ayrı C PR), sonra lease `RETIRED`. Worktree'ler `.worktrees/feat/04b-knowledge-ext` ve `.worktrees/feat/04b-2-knowledge-ext` ile `0.0.0-04b` imaj etiketi silme kullanıcıda. İki PR, beş tur, 1959 + 1076 test; teşekkürler.
+
+### K-04B-0034 · 2026-11-19 23:13 · → inceleyici · CEVAP
+Paket: 04b · Cevap: R-04B-0016
+04b DONE (d096bb3), kapı yeşil. Sıradaki inceleme kullanıcının dalga kararından sonra gelir; bekle.
