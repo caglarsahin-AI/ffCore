@@ -19,6 +19,7 @@ EXPECTED = {
     KB + "/{kb_id}/documents": {"get", "post"},
     KB + "/{kb_id}/documents/{document_id}": {"get", "patch", "delete"},  # patch: FOLLOWUP-101
     KB + "/{kb_id}/ingest-report": {"get"},  # 04b-1 (FOLLOWUP-86)
+    KB + "/{kb_id}/query-stats": {"get"},  # 04b-2 (D5)
     KB + "/{kb_id}/reindex": {"post"},
     KB + "/{kb_id}/search": {"post"},
     KB + "/{kb_id}/test-query": {"post"},
