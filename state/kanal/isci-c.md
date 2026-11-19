@@ -3,9 +3,9 @@
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
 - Oturum kimliği: ffcore-isci-c-10c2
-- Aktif paket: 10c-2 (governance ekranları + FOLLOWUP-185, FOLLOWUP-192)
-- Durum: ACTIVE (PR-HAZIR r2 877cc34)
-- Son okunan: koordinator K-10C2-0009; son yazılan C-10C2-0014 (PR-HAZIR r2)
+- Aktif paket: 10c-2 (governance ekranları + FOLLOWUP-185, FOLLOWUP-192) · MERGED b93cd96
+- Durum: RETIRED
+- Son okunan: koordinator K-10C2-0015; son yazılan C-10C2-0016 (RETIRED)
 - Önceki lease: ffcore-isci-c-sse RETIRED (fix/10b-sse-bekci MERGED 4216718; son C-SSE-0011 RETIRED); ondan önce ffcore-isci-c-10c1 RETIRED (10c-1 MERGED; son C-10C1-0015 RETIRED); ondan önce ffcore-isci-c-10bp2 RETIRED (10b-poc-2 MERGED b43770d; son C-10bp2-0019 HANDOFF)
 
 ## Mesajlar
@@ -76,3 +76,14 @@ Paket: 10c-2 · Cevap: C-10C2-0012 · Yigin: ffcore-10c2
 ### C-10C2-0014 · 2026-11-18 17:39 · → koordinator · PR-HAZIR
 Paket: 10c-2 · Cevap: K-10C2-0006, K-05B-0019 · SHA: 877cc34f7911e9981a6d83c2b02a578e3ddc66fe
 r2, delta `5c27543..`: rebase main 2afb68d (05b dahil; degisiklikler.md iki girdi, 05b üstte) + NOTE-2 (d4f6b28 test, b2185b3 fix, 72cbabc docs; uymayan özet null + `eval_summary_invalid` logu, strict doğrulama) + rebase sonrası test düzeltmesi (log sanitizer rakamlı kimliği maskeliyor). Dal 27 commit, 88 dosya, state yok. Kapı: önyüz gen:api/check:api/lint/typecheck 0, Vitest 250; backend lint + test 1918×2; hedefli test-int 74, alembic heads tek. e2e ve imaj build yok (talimat). NOTE-1/NOTE-3 PR notunda. Ayrıntı state/pr/10c-2.md "r2".
+
+### C-10C2-0015 · 2026-11-19 13:27 · → koordinator · HANDOFF
+Paket: 10c-2 · Cevap: K-10C2-0015
+**Durum:** MERGED b93cd96 (dal `feat/10c-2-governance-ui` 877cc34, r1 ONAY + r2 ONAY). Commit edilmemiş iş yok; worktree temiz. Yığın `ffcore-10c2` kapalı (konteyner 0, volume 0); `ffcore/{backend,tools}:0.0.0-10c2` etiketleri duruyor. Worktree ve etiket silme kullanıcıda.
+**Tam sonraki adım (10c-3):** ilk commit FOLLOWUP-197 (`api/eval.py` `stored_summary`: sözlük olmayan özet → `summary: null` + `eval_summary_invalid`; kırmızı test önce), sonra FOLLOWUP-195 (05b önyüz notları: `errors.ts` 05b kodları, SPECS `05b.yaml` + `gen:api`), sonra MCP ekranı.
+**Kalan riskler:** (1) NOTE-1: koşu sayfası 403'te durmuyor, 3 s'de bir okur (`lib/api/runs-queries.ts` `isRunGone`); gerekirse 403 tek satırla eklenir. (2) Davranış değişikliği: girişten sonra açılış sayfası Overview (ilk hazır menü maddesi); `test_10ab_1`, docs/onyuz.md. (3) Kota aşımı yalnız `warn` kotalarında `quota_warn` uyarısıyla görünür; `block` aşımı kayıtsız (429). (4) Kurulum (tenant) uyarı kapsamı e2e'de koşulmadı; birim testli. (5) e2e için yığının tam profili gerekir (`agent-worker`, `langfuse-worker`); adla açılan servisler sınav e2e'sini zaman aşımına düşürür. (6) `docker compose run` bu makinede `--pull` tanımıyor (PROSES-175 uyarısı `run` için kaçınılmaz).
+**Kararlar:** KARARLAR '10c-2 plan kararları' (S1-S8 A), '10c-2 r1 kararları'. PR notu state/pr/10c-2.md.
+
+### C-10C2-0016 · 2026-11-19 13:27 · → koordinator · RETIRED
+Paket: 10c-2 · Cevap: K-10C2-0015
+Lease ffcore-isci-c-10c2 RETIRED.
