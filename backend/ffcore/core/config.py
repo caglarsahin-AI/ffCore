@@ -90,7 +90,7 @@ class Settings(BaseSettings):
     rerank_model: str = "BAAI/bge-reranker-v2-m3"
     rerank_min_score: float = Field(default=0.1, ge=0, le=1)
     # 04b-2 D3: Turkish layer A (circumflex folding) on silver and queries; off by
-    # default. Switching it needs `make reindex LAYER=silver` (search is 409 until then).
+    # default. Switching it needs `make reindex LAYER=silver FULL=1` (search is 409 until then).
     text_normalize_tr: bool = False
     # 04b-2 D4: video transcription. This build has no transcriber (faster-whisper is a separate
     # class-C PR), so True stops start-up; off, a video is Kapı 0 `video_disabled`.

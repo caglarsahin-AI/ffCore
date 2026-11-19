@@ -144,6 +144,15 @@ async def _context_needs(settings: Settings):
     return rows, needed
 
 
+class OllamaPsUnexpected(Exception):
+    """Ollama answered `/api/ps`, but not in the documented shape (r2 NOTE-1)."""
+
+
+def _ollama_name(name: str) -> str:
+    """Ollama lists an untagged model as `<name>:latest` (r2 MINOR-2)."""
+    return name if ":" in name else f"{name}:latest"
+
+
 async def _ollama_ps(config_encrypted: bytes, settings: Settings) -> list[dict]:
     """GET {base_url}/api/ps of one Ollama provider: the models it has loaded."""
     from ffcore.core.egress import EgressTimeout, SafeOutboundClient
@@ -155,7 +164,11 @@ async def _ollama_ps(config_encrypted: bytes, settings: Settings) -> list[dict]:
         response = await client.request("GET", f"{base}/api/ps")
     if response.status_code != 200:
         raise RuntimeError(f"/api/ps answered {response.status_code}")
-    return response.json()["models"]
+    body = response.json()
+    models = body.get("models") if isinstance(body, dict) else None
+    if not isinstance(models, list):
+        raise OllamaPsUnexpected("/api/ps answer has no models list")
+    return models
 
 
 async def _ollama_runtime_check(settings: Settings) -> ReadinessCheck:
@@ -183,11 +196,13 @@ async def _ollama_runtime_check(settings: Settings) -> ReadinessCheck:
     for config_encrypted, model_ids in by_provider.values():
         try:
             running = await _ollama_ps(config_encrypted, settings)
+        except OllamaPsUnexpected as exc:
+            return check(name, False, "ollama_ps_unexpected", str(exc))
         except Exception as exc:  # noqa: BLE001 - reported with its type, never hidden
             return check(name, False, "ollama_unreachable", type(exc).__name__)
-        by_name = {m.get("name") or m.get("model"): m for m in running}
+        by_name = {_ollama_name(m.get("name") or m.get("model") or ""): m for m in running}
         for model_id in sorted(model_ids):
-            entry = by_name.get(model_id)
+            entry = by_name.get(_ollama_name(model_id))
             if entry is None:
                 not_loaded.append(model_id)
                 continue

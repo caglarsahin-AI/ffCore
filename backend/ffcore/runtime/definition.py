@@ -72,9 +72,9 @@ class Variable(_Strict):
 class KnowledgeFilter(_Strict):
     # Source/area scope passed on to the search filter (v9 P7: PayCore profiles = filtered agents).
     # 04b-2 D6: `documents.metadata.source` values, exact match (`confluence:OCR`).
-    scope: list[Annotated[str, StringConstraints(strip_whitespace=True, min_length=1)]] = Field(
-        default_factory=list, max_length=50
-    )
+    scope: list[
+        Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=200)]
+    ] = Field(default_factory=list, max_length=50)
 
 
 class KnowledgeRef(_Strict):

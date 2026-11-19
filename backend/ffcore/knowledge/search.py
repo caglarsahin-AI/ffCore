@@ -177,7 +177,7 @@ class NormalizerMismatch(Exception):
 
 async def _check_normalizer(session: AsyncSession, kb_id: uuid.UUID, config_id: str) -> None:
     """No mixed-form search: one indexed document in another form stops it (409 at the API)
-    until `make reindex LAYER=silver` rebuilds silver under the current setting."""
+    until `make reindex LAYER=silver FULL=1` rebuilds silver under the current setting."""
     found = (
         await session.execute(
             text(

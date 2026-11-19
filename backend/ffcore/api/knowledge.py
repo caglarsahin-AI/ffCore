@@ -736,7 +736,7 @@ async def _search(request, actor, session, settings, project_id, kb_id, body, ru
         raise conflict(
             "normalizer_config_mismatch",
             f"Documents of this knowledge base are in normalizer form {exc.found}, queries "
-            f"would be in {exc.expected}; rebuild silver (make reindex LAYER=silver) first.",
+            f"would be in {exc.expected}; rebuild silver first: make reindex LAYER=silver FULL=1.",
         ) from None
     await session.commit()
     return SearchResponse.from_result(result)
