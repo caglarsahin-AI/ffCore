@@ -57,6 +57,20 @@
       "paket": "10c-3",
       "lease": "ffcore-isci-c-10c3",
       "acildi": "2026-11-19T14:05"
+    },
+    "local_6dbafb16-534f-4bdb-8e1c-adbc72156591": {
+      "rol": "isci-a",
+      "paket": "12",
+      "lease": "ffcore-isci-a-12",
+      "acildi": "2026-11-20T10:35",
+      "model": "claude-opus-5-5"
+    },
+    "local_96285dc5-3de6-4ce8-b724-decf871d915a": {
+      "rol": "isci-b",
+      "paket": "triage-1",
+      "lease": "ffcore-isci-b-triage1",
+      "acildi": "2026-11-20T10:35",
+      "model": "claude-opus-5-5"
     }
   }
 }
