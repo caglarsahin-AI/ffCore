@@ -259,6 +259,11 @@ the name of an existing document.
   the document's content, version and ACL stay. The answer shows that the name exists, nothing
   more. A project admin is exempt, so a document readable by named users only (which hides it
   from the admin too) can still be replaced.
+- The same exemption holds for one document: a project admin (a superadmin's grant counts as
+  admin) gets, changes and deletes a document readable by named users only through
+  `GET`, `PATCH` and `DELETE …/documents/{id}`. Everyone else gets 404 `document_not_found`, as
+  for a missing document. The document list, search and the ingest report keep the read filter
+  for the admin too: the admin knows the document's id from the upload answer.
 - `ingest-raw` (CLI, the operator) is not an API caller and is not affected.
 
 ## Moving vectors between drivers (`migrate-vectors`, 04b)

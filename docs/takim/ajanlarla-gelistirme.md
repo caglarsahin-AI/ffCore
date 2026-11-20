@@ -420,7 +420,7 @@ Toplam yaklaşık 20 dakika. Bir kapı adımı 137 (OOM) ile düşerse o adım t
 ### 6.3 Dış bağlantı yok
 
 - Yığınlar `up -d --wait --no-build --pull never` ile ve işçinin doğruladığı etiketli imajla açılır.
-- Çıplak `docker compose build` ve `up --build` kullanılmaz. BuildKit, katmanlar önbellekte olsa bile base imaj metadata'sı için docker.io/ghcr.io'ya bağlanır (PROSES-175; bkz. 7.6).
+- Ayrı `docker compose build` kullanılmaz (`--pull=false` ile de). BuildKit, katmanlar önbellekte olsa bile base imaj metadata'sı için docker.io/ghcr.io'ya bağlanır (PROSES-175; bkz. 7.6). İmaj gerekiyorsa `up -d --wait --build --pull never` (5 Kasım kararı, FOLLOWUP-207).
 - Model süreçleri varsayılan olarak offline çalışır (`HF_HUB_OFFLINE=1`, `TRANSFORMERS_OFFLINE=1`). Ağırlık eksikse süreç model adı ve yoluyla kodlu hata verir; indirme yapmaz.
 - Gerçek model koşusundan önce indirme yolu kontrol edilir ve `--network none` kanıtı alınır.
 
