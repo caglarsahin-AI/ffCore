@@ -94,6 +94,35 @@ def test_wrapped_tee_and_data_readers_stay_silent(guard, main_root, cmd):
     assert rules(guard, cmd, main_root) == [], cmd
 
 
+# r2 (own probe): `<<` inside a quoted `sh -c` string is not a heredoc of the outer command;
+# taking it as one swallowed the rest of the string. main blocked the KAPI cases.
+QUOTED_HEREDOC = [
+    ('sh -c "cat <<EOF\nx\nEOF\npytest"', "KAPI"),
+    ("sh -c 'cat <<EOF\nx\nEOF\npytest'", "KAPI"),
+    ("bash -c 'cat > f <<EOF\nx\nEOF\nmake test'", "KAPI"),
+    # the same gap for ENV (it was in main too)
+    ('sh -c "cat <<EOF\nx\nEOF\ncat .env"', "ENV"),
+    ("bash -c 'cat > f <<EOF\nx\nEOF\ncat .env'", "ENV"),
+]
+
+
+@pytest.mark.parametrize(("cmd", "rule"), QUOTED_HEREDOC)
+def test_heredoc_inside_quotes_belongs_to_the_inner_shell(guard, main_root, cmd, rule):
+    assert rule in rules(guard, cmd, main_root), cmd
+
+
+@pytest.mark.parametrize(
+    "cmd",
+    [
+        "sh -c 'cat <<EOF\nmake test\nEOF\n'",
+        "echo 'a <<EOF b'\nmake test 2>&1 | tee x.log",
+        "cat >> state/kanal/isci-b.md <<'EOF'\nit's done: make test\nEOF",
+    ],
+)
+def test_quoted_heredoc_data_stays_silent(guard, main_root, cmd):
+    assert rules(guard, cmd, main_root) == [], cmd
+
+
 def test_env_in_interpreter_code_says_why_and_the_way_out(guard, main_root):
     # r1 MINOR-1 A: same match, a message that names the cause and the exit
     cmd = "python - <<'EOF'\ns = 'cp .env.example .env'\nEOF"
