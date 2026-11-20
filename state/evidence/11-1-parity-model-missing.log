@@ -1,0 +1,924 @@
+HEAD=ac834fe01fccc54f0f1a0791c3a13113700a3d87 (main checkout) FFCORE_VERSION=0.0.0-11m FAKE_EMBED=0
+#0 building with "default" instance using docker driver
+
+#1 [backend internal] load .dockerignore
+#1 transferring context: 2B 0.0s done
+#1 DONE 0.1s
+
+#2 [backend internal] load build definition from Dockerfile
+#2 transferring dockerfile: 2.41kB 0.0s done
+#2 DONE 0.1s
+
+#3 [backend internal] load metadata for docker.io/library/python:3.12.10-slim-bookworm
+#3 DONE 2.7s
+
+#4 [backend internal] load metadata for ghcr.io/astral-sh/uv:0.10.12
+#4 DONE 3.0s
+
+#5 [backend uv 1/1] FROM ghcr.io/astral-sh/uv:0.10.12@sha256:72ab0aeb448090480ccabb99fb5f52b0dc3c71923bffb5e2e26517a1c27b7fec
+#5 DONE 0.0s
+
+#6 [backend base 1/6] FROM docker.io/library/python:3.12.10-slim-bookworm@sha256:fd95fa221297a88e1cf49c55ec1828edd7c5a428187e67b5d1805692d11588db
+#6 DONE 0.0s
+
+#7 [backend internal] load build context
+#7 transferring context: 109.69kB 0.0s done
+#7 DONE 0.0s
+
+#8 [backend base 4/6] RUN mkdir -p /models /data/storage && chown 10001 /models /data/storage
+#8 CACHED
+
+#9 [backend runtime 1/5] RUN uv sync --frozen --no-dev --no-install-project
+#9 CACHED
+
+#10 [backend base 2/6] COPY --from=uv /uv /usr/local/bin/uv
+#10 CACHED
+
+#11 [backend base 6/6] COPY pyproject.toml uv.lock ./
+#11 CACHED
+
+#12 [backend runtime 2/5] COPY alembic.ini ./
+#12 CACHED
+
+#13 [backend base 3/6] RUN apt-get update     && apt-get install -y --no-install-recommends libgomp1 libgl1 libglib2.0-0 libxcb1 make curl     && rm -rf /var/lib/apt/lists/*
+#13 CACHED
+
+#14 [backend base 5/6] WORKDIR /app
+#14 CACHED
+
+#15 [backend runtime 3/5] COPY alembic ./alembic
+#15 CACHED
+
+#16 [backend runtime 4/5] COPY ffcore ./ffcore
+#16 DONE 0.1s
+
+#17 [backend runtime 5/5] RUN useradd --system --uid 10001 --home-dir /models ffcore
+#17 0.160 useradd warning: ffcore's uid 10001 is greater than SYS_UID_MAX 999
+#17 DONE 0.2s
+
+#18 [backend] exporting to image
+#18 exporting layers 0.1s done
+#18 writing image sha256:e5fce294b932fdc816f048ee3cecc3add4c164e1fa35181b83811b33d3259e08 done
+#18 naming to docker.io/ffcore/backend:0.0.0-11m done
+#18 DONE 0.1s
+
+#19 [frontend internal] load .dockerignore
+#19 transferring context: 115B done
+#19 DONE 0.0s
+
+#20 [frontend internal] load build definition from Dockerfile
+#20 transferring dockerfile: 665B done
+#20 DONE 0.0s
+
+#21 [frontend internal] load metadata for docker.io/library/node:20.19.5-alpine
+#21 DONE 0.0s
+
+#22 [frontend 1/6] FROM docker.io/library/node:20.19.5-alpine
+#22 DONE 0.0s
+
+#23 [frontend internal] load build context
+#23 transferring context: 360.68kB 0.0s done
+#23 DONE 0.1s
+
+#24 [frontend 3/6] COPY package.json package-lock.json ./
+#24 CACHED
+
+#25 [frontend 2/6] WORKDIR /app
+#25 CACHED
+
+#26 [frontend 4/6] RUN npm ci --no-audit --no-fund
+#26 CACHED
+
+#27 [frontend 5/6] COPY . .
+#27 DONE 0.2s
+
+#28 [frontend 6/6] RUN npm run build
+#28 0.452 
+#28 0.452 > ffcore-frontend@0.1.0 build
+#28 0.452 > next build
+#28 0.452 
+#28 2.393    ▲ Next.js 15.5.28
+#28 2.393 
+#28 2.542    Creating an optimized production build ...
+#28 47.44  ✓ Compiled successfully in 44s
+#28 47.45    Linting and checking validity of types ...
+#28 68.27    Collecting page data ...
+#28 73.04    Generating static pages (0/28) ...
+#28 73.94    Generating static pages (7/28) 
+#28 74.02    Generating static pages (14/28) 
+#28 74.17    Generating static pages (21/28) 
+#28 74.30  ✓ Generating static pages (28/28)
+#28 75.71    Finalizing page optimization ...
+#28 75.71    Collecting build traces ...
+#28 86.15 
+#28 86.15 Route (app)                                 Size  First Load JS
+#28 86.15 ┌ ƒ /                                    7.62 kB         146 kB
+#28 86.15 ├ ƒ /_not-found                             1 kB         103 kB
+#28 86.15 ├ ƒ /[section]                           1.56 kB         116 kB
+#28 86.15 ├ ƒ /agents                              7.24 kB         193 kB
+#28 86.15 ├ ƒ /agents/[agentId]                    12.8 kB         193 kB
+#28 86.15 ├ ƒ /alerts                              9.94 kB         166 kB
+#28 86.15 ├ ƒ /api-keys                            8.52 kB         164 kB
+#28 86.15 ├ ○ /apple-icon.png                          0 B            0 B
+#28 86.15 ├ ƒ /approvals                           4.02 kB         153 kB
+#28 86.15 ├ ƒ /approvals/[approvalId]              6.08 kB         166 kB
+#28 86.15 ├ ƒ /chat                                  202 B         195 kB
+#28 86.15 ├ ƒ /chat/[agentKey]                       136 B         103 kB
+#28 86.15 ├ ƒ /chat/[agentKey]/[conversationId]      136 B         103 kB
+#28 86.15 ├ ƒ /dev/theme                           3.02 kB         122 kB
+#28 86.15 ├ ƒ /evaluations                         1.43 kB         170 kB
+#28 86.15 ├ ƒ /evaluations/[suiteId]               3.66 kB         172 kB
+#28 86.15 ├ ƒ /evaluations/compare                 2.19 kB         178 kB
+#28 86.15 ├ ƒ /evaluations/runs/[evalRunId]        8.11 kB         194 kB
+#28 86.15 ├ ○ /icon.png                                0 B            0 B
+#28 86.15 ├ ƒ /knowledge-bases                     2.78 kB         194 kB
+#28 86.15 ├ ƒ /knowledge-bases/[kbId]              6.13 kB         208 kB
+#28 86.15 ├ ƒ /login                               7.55 kB         181 kB
+#28 86.15 ├ ○ /manifest.webmanifest                  136 B         103 kB
+#28 86.15 ├ ƒ /mcp-servers                         2.79 kB         196 kB
+#28 86.15 ├ ƒ /mcp-servers/[serverId]              5.25 kB         209 kB
+#28 86.15 ├ ƒ /models                              10.1 kB         166 kB
+#28 86.15 ├ ƒ /overview                            3.92 kB         263 kB
+#28 86.15 ├ ƒ /projects                            8.65 kB         190 kB
+#28 86.15 ├ ƒ /projects/[id]/members               9.54 kB         159 kB
+#28 86.15 ├ ƒ /providers                           11.4 kB         163 kB
+#28 86.15 ├ ƒ /quotas                              9.21 kB         165 kB
+#28 86.15 ├ ƒ /retention                           4.92 kB         186 kB
+#28 86.15 ├ ƒ /runs                                5.32 kB         154 kB
+#28 86.15 ├ ƒ /runs/[runId]                        9.57 kB         169 kB
+#28 86.15 ├ ƒ /system-status                       8.71 kB         136 kB
+#28 86.15 ├ ƒ /tools                               1.16 kB         194 kB
+#28 86.15 ├ ƒ /tools/[toolId]                      3.33 kB         196 kB
+#28 86.15 └ ƒ /usage                                3.1 kB         261 kB
+#28 86.15 + First Load JS shared by all             102 kB
+#28 86.15   ├ chunks/1255-60d8dc7c8c9309a1.js      46.3 kB
+#28 86.15   ├ chunks/4bd1b696-100b9d70ed4e49c1.js  54.2 kB
+#28 86.15   └ other shared chunks (total)          1.94 kB
+#28 86.15 
+#28 86.15 
+#28 86.15 ○  (Static)   prerendered as static content
+#28 86.15 ƒ  (Dynamic)  server-rendered on demand
+#28 86.15 
+#28 DONE 86.3s
+
+#29 [frontend] exporting to image
+#29 exporting layers
+#29 exporting layers 2.2s done
+#29 writing image sha256:7fedf70062557c15ac7cec81302cbc3372f9d648cfc729a1c67d1c977f5b7c28 done
+#29 naming to docker.io/ffcore/frontend:0.0.0-11m 0.0s done
+#29 DONE 2.3s
+ Container ffcore-11-langfuse-postgres-1  Creating
+ Container ffcore-11-fake-llm-1  Creating
+ Container ffcore-11-langfuse-clickhouse-1  Creating
+ Container ffcore-11-langfuse-minio-1  Creating
+ Container ffcore-11-ticket-desk-1  Creating
+ Container ffcore-11-langfuse-redis-1  Creating
+ Container ffcore-11-redis-1  Running
+ Container ffcore-11-postgres-1  Running
+ Container ffcore-11-litellm-1  Creating
+ Container ffcore-11-migrate-1  Creating
+ Container ffcore-11-langfuse-minio-1  Created
+ Container ffcore-11-fake-llm-1  Created
+ Container ffcore-11-langfuse-clickhouse-1  Created
+ Container ffcore-11-litellm-1  Created
+ Container ffcore-11-langfuse-postgres-1  Created
+ Container ffcore-11-langfuse-redis-1  Created
+ Container ffcore-11-langfuse-worker-1  Creating
+ Container ffcore-11-langfuse-web-1  Creating
+ Container ffcore-11-migrate-1  Created
+ Container ffcore-11-backend-1  Creating
+ Container ffcore-11-ticket-desk-1  Created
+ Container ffcore-11-langfuse-worker-1  Created
+ Container ffcore-11-langfuse-web-1  Created
+ Container ffcore-11-backend-1  Created
+ Container ffcore-11-agent-worker-1  Creating
+ Container ffcore-11-mcp-search-1  Creating
+ Container ffcore-11-mcp-sql-1  Creating
+ Container ffcore-11-worker-1  Creating
+ Container ffcore-11-frontend-1  Creating
+ Container ffcore-11-agent-worker-bg-1  Creating
+ Container ffcore-11-mcp-sql-1  Created
+ Container ffcore-11-agent-worker-bg-1  Created
+ Container ffcore-11-frontend-1  Created
+ Container ffcore-11-mcp-search-1  Created
+ Container ffcore-11-worker-1  Created
+ Container ffcore-11-agent-worker-1  Created
+ Container ffcore-11-langfuse-postgres-1  Starting
+ Container ffcore-11-postgres-1  Waiting
+ Container ffcore-11-ticket-desk-1  Starting
+ Container ffcore-11-langfuse-clickhouse-1  Starting
+ Container ffcore-11-langfuse-minio-1  Starting
+ Container ffcore-11-postgres-1  Waiting
+ Container ffcore-11-langfuse-redis-1  Starting
+ Container ffcore-11-fake-llm-1  Starting
+ Container ffcore-11-langfuse-postgres-1  Started
+ Container ffcore-11-postgres-1  Healthy
+ Container ffcore-11-postgres-1  Healthy
+ Container ffcore-11-litellm-1  Starting
+ Container ffcore-11-migrate-1  Starting
+ Container ffcore-11-langfuse-redis-1  Started
+ Container ffcore-11-langfuse-clickhouse-1  Started
+ Container ffcore-11-langfuse-minio-1  Started
+ Container ffcore-11-langfuse-clickhouse-1  Waiting
+ Container ffcore-11-langfuse-minio-1  Waiting
+ Container ffcore-11-langfuse-redis-1  Waiting
+ Container ffcore-11-langfuse-postgres-1  Waiting
+ Container ffcore-11-langfuse-clickhouse-1  Waiting
+ Container ffcore-11-langfuse-minio-1  Waiting
+ Container ffcore-11-langfuse-redis-1  Waiting
+ Container ffcore-11-langfuse-postgres-1  Waiting
+ Container ffcore-11-fake-llm-1  Started
+ Container ffcore-11-ticket-desk-1  Started
+ Container ffcore-11-litellm-1  Started
+ Container ffcore-11-migrate-1  Started
+ Container ffcore-11-redis-1  Waiting
+ Container ffcore-11-litellm-1  Waiting
+ Container ffcore-11-migrate-1  Waiting
+ Container ffcore-11-postgres-1  Waiting
+ Container ffcore-11-postgres-1  Healthy
+ Container ffcore-11-redis-1  Healthy
+ Container ffcore-11-langfuse-redis-1  Healthy
+ Container ffcore-11-langfuse-postgres-1  Healthy
+ Container ffcore-11-langfuse-redis-1  Healthy
+ Container ffcore-11-langfuse-postgres-1  Healthy
+ Container ffcore-11-langfuse-clickhouse-1  Healthy
+ Container ffcore-11-langfuse-minio-1  Healthy
+ Container ffcore-11-langfuse-clickhouse-1  Healthy
+ Container ffcore-11-langfuse-web-1  Starting
+ Container ffcore-11-langfuse-minio-1  Healthy
+ Container ffcore-11-langfuse-worker-1  Starting
+ Container ffcore-11-langfuse-web-1  Started
+ Container ffcore-11-langfuse-worker-1  Started
+ Container ffcore-11-migrate-1  Exited
+ Container ffcore-11-litellm-1  Healthy
+ Container ffcore-11-backend-1  Starting
+ Container ffcore-11-backend-1  Started
+ Container ffcore-11-backend-1  Waiting
+ Container ffcore-11-backend-1  Waiting
+ Container ffcore-11-backend-1  Waiting
+ Container ffcore-11-backend-1  Waiting
+ Container ffcore-11-backend-1  Waiting
+ Container ffcore-11-postgres-1  Waiting
+ Container ffcore-11-backend-1  Waiting
+ Container ffcore-11-postgres-1  Healthy
+ Container ffcore-11-backend-1  Healthy
+ Container ffcore-11-agent-worker-bg-1  Starting
+ Container ffcore-11-backend-1  Healthy
+ Container ffcore-11-mcp-sql-1  Starting
+ Container ffcore-11-backend-1  Healthy
+ Container ffcore-11-frontend-1  Starting
+ Container ffcore-11-backend-1  Healthy
+ Container ffcore-11-worker-1  Starting
+ Container ffcore-11-backend-1  Healthy
+ Container ffcore-11-mcp-search-1  Starting
+ Container ffcore-11-backend-1  Healthy
+ Container ffcore-11-agent-worker-1  Starting
+ Container ffcore-11-frontend-1  Started
+ Container ffcore-11-mcp-sql-1  Started
+ Container ffcore-11-worker-1  Started
+ Container ffcore-11-mcp-search-1  Started
+ Container ffcore-11-agent-worker-bg-1  Started
+ Container ffcore-11-agent-worker-1  Started
+ Container ffcore-11-ticket-desk-1  Waiting
+ Container ffcore-11-agent-worker-bg-1  Waiting
+ Container ffcore-11-agent-worker-1  Waiting
+ Container ffcore-11-worker-1  Waiting
+ Container ffcore-11-langfuse-redis-1  Waiting
+ Container ffcore-11-langfuse-web-1  Waiting
+ Container ffcore-11-redis-1  Waiting
+ Container ffcore-11-langfuse-clickhouse-1  Waiting
+ Container ffcore-11-postgres-1  Waiting
+ Container ffcore-11-langfuse-worker-1  Waiting
+ Container ffcore-11-fake-llm-1  Waiting
+ Container ffcore-11-frontend-1  Waiting
+ Container ffcore-11-langfuse-postgres-1  Waiting
+ Container ffcore-11-litellm-1  Waiting
+ Container ffcore-11-mcp-search-1  Waiting
+ Container ffcore-11-mcp-sql-1  Waiting
+ Container ffcore-11-langfuse-minio-1  Waiting
+ Container ffcore-11-migrate-1  Waiting
+ Container ffcore-11-backend-1  Waiting
+ Container ffcore-11-litellm-1  Healthy
+ Container ffcore-11-worker-1  Healthy
+ Container ffcore-11-agent-worker-bg-1  Healthy
+ Container ffcore-11-backend-1  Healthy
+ Container ffcore-11-fake-llm-1  Healthy
+ Container ffcore-11-langfuse-postgres-1  Healthy
+ Container ffcore-11-ticket-desk-1  Healthy
+ Container ffcore-11-langfuse-worker-1  Healthy
+ Container ffcore-11-langfuse-web-1  Healthy
+ Container ffcore-11-langfuse-clickhouse-1  Healthy
+ Container ffcore-11-agent-worker-1  Healthy
+ Container ffcore-11-langfuse-redis-1  Healthy
+ Container ffcore-11-frontend-1  Healthy
+ Container ffcore-11-postgres-1  Healthy
+ Container ffcore-11-langfuse-minio-1  Healthy
+ Container ffcore-11-redis-1  Healthy
+ Container ffcore-11-migrate-1  Exited
+ Container ffcore-11-mcp-sql-1  Healthy
+ Container ffcore-11-mcp-search-1  Healthy
+up exit=0
+ tools Pulling 
+ tools Warning 
+#0 building with "default" instance using docker driver
+
+#1 [tools internal] load build definition from Dockerfile
+#1 transferring dockerfile: 2.41kB done
+#1 DONE 0.0s
+
+#2 [tools internal] load .dockerignore
+#2 transferring context: 2B done
+#2 DONE 0.1s
+
+#3 [tools internal] load metadata for ghcr.io/astral-sh/uv:0.10.12
+#3 ...
+
+#4 [tools internal] load metadata for docker.io/library/python:3.12.10-slim-bookworm
+#4 DONE 1.8s
+
+#3 [tools internal] load metadata for ghcr.io/astral-sh/uv:0.10.12
+#3 DONE 1.9s
+
+#5 [tools uv 1/1] FROM ghcr.io/astral-sh/uv:0.10.12@sha256:72ab0aeb448090480ccabb99fb5f52b0dc3c71923bffb5e2e26517a1c27b7fec
+#5 DONE 0.0s
+
+#6 [tools base 1/6] FROM docker.io/library/python:3.12.10-slim-bookworm@sha256:fd95fa221297a88e1cf49c55ec1828edd7c5a428187e67b5d1805692d11588db
+#6 DONE 0.0s
+
+#7 [tools internal] load build context
+#7 transferring context: 64B 0.1s done
+#7 DONE 0.1s
+
+#8 [tools base 2/6] COPY --from=uv /uv /usr/local/bin/uv
+#8 CACHED
+
+#9 [tools base 3/6] RUN apt-get update     && apt-get install -y --no-install-recommends libgomp1 libgl1 libglib2.0-0 libxcb1 make curl     && rm -rf /var/lib/apt/lists/*
+#9 CACHED
+
+#10 [tools base 4/6] RUN mkdir -p /models /data/storage && chown 10001 /models /data/storage
+#10 CACHED
+
+#11 [tools base 5/6] WORKDIR /app
+#11 CACHED
+
+#12 [tools base 6/6] COPY pyproject.toml uv.lock ./
+#12 CACHED
+
+#13 [tools tools 1/2] RUN uv sync --frozen --no-install-project
+#13 0.827 Using CPython 3.12.10 interpreter at: /usr/local/bin/python3
+#13 0.829 Creating virtual environment at: /opt/venv
+#13 1.223 Downloading lz4 (1.3MiB)
+#13 1.232 Downloading pygments (1.2MiB)
+#13 1.232 Downloading networkx (2.0MiB)
+#13 1.234 Downloading cryptography (4.5MiB)
+#13 1.234 Downloading scipy (33.7MiB)
+#13 1.234 Downloading opencv-python-headless (58.4MiB)
+#13 1.234 Downloading lxml (5.0MiB)
+#13 1.234 Downloading aiohttp (1.8MiB)
+#13 1.235 Downloading paddleocr (2.3MiB)
+#13 1.235 Downloading sentencepiece (1.3MiB)
+#13 1.235 Downloading opencv-contrib-python (78.3MiB)
+#13 1.255 Downloading shapely (2.2MiB)
+#13 1.255 Downloading pillow (6.6MiB)
+#13 1.256 Downloading onnxruntime (22.7MiB)
+#13 1.256 Downloading opencv-python (70.4MiB)
+#13 1.256 Downloading zstandard (5.3MiB)
+#13 1.256 Downloading ruff (10.1MiB)
+#13 1.276 Downloading rapidfuzz (3.0MiB)
+#13 1.276 Downloading transformers (11.4MiB)
+#13 1.276 Downloading pymupdf-layout (41.0MiB)
+#13 1.276 Downloading pymupdf (24.6MiB)
+#13 1.276 Downloading paddlepaddle (185.8MiB)
+#13 1.276 Downloading uvloop (4.3MiB)
+#13 1.276 Downloading hf-xet (4.0MiB)
+#13 1.277 Downloading faker (2.0MiB)
+#13 1.277 Downloading pydantic-core (2.1MiB)
+#13 1.277 Downloading pyarrow (51.4MiB)
+#13 1.279 Downloading fonttools (5.2MiB)
+#13 1.279 Downloading pypdfium2 (3.6MiB)
+#13 1.280 Downloading openai (2.2MiB)
+#13 1.285 Downloading tokenizers (3.1MiB)
+#13 1.288 Downloading scikit-image (12.9MiB)
+#13 1.292 Downloading stringzilla (4.0MiB)
+#13 1.294 Downloading sqlalchemy (4.5MiB)
+#13 1.294 Downloading pandas (11.5MiB)
+#13 1.295 Downloading rapidocr (26.0MiB)
+#13 1.302 Downloading numpy (16.0MiB)
+#13 1.303 Downloading cython (3.3MiB)
+#13 1.303 Downloading psycopg-binary (5.0MiB)
+#13 1.305 Downloading scikit-learn (8.7MiB)
+#13 1.307 Downloading sympy (6.0MiB)
+#13 1.324 Downloading torchvision (1.6MiB)
+#13 1.384 Downloading torch (187.2MiB)
+#13 2.109  Downloaded torchvision
+#13 2.276 Downloading docling-parse (10.4MiB)
+#13 11.38  Downloaded pygments
+#13 12.16  Downloaded lz4
+#13 12.31  Downloaded sentencepiece
+#13 23.45  Downloaded torch
+#13 26.82  Downloaded aiohttp
+#13 27.83  Downloaded networkx
+#13 27.94  Downloaded pydantic-core
+#13 28.06  Downloaded faker
+#13 28.40  Downloaded openai
+#13 28.55  Downloaded shapely
+#13 28.88  Downloaded paddleocr
+#13 31.10  Downloaded rapidfuzz
+#13 31.22  Downloaded tokenizers
+#13 31.61  Downloaded cython
+#13 32.79  Downloaded pypdfium2
+#13 33.10  Downloaded hf-xet
+#13 33.26  Downloaded stringzilla
+#13 33.79    Building red-black-tree-mod==1.22
+#13 34.02  Downloaded sqlalchemy
+#13 34.03  Downloaded uvloop
+#13 34.18  Downloaded cryptography
+#13 34.42  Downloaded psycopg-binary
+#13 34.43  Downloaded lxml
+#13 34.65  Downloaded fonttools
+#13 34.85  Downloaded zstandard
+#13 35.78  Downloaded sympy
+#13 35.98  Downloaded pillow
+#13 37.20       Built red-black-tree-mod==1.22
+#13 38.17  Downloaded scikit-learn
+#13 39.18  Downloaded ruff
+#13 39.61  Downloaded docling-parse
+#13 40.17  Downloaded pandas
+#13 40.20  Downloaded transformers
+#13 41.37  Downloaded scikit-image
+#13 43.45  Downloaded numpy
+#13 47.15  Downloaded onnxruntime
+#13 48.39  Downloaded pymupdf
+#13 48.98  Downloaded rapidocr
+#13 52.48  Downloaded scipy
+#13 56.09  Downloaded pymupdf-layout
+#13 58.22  Downloaded pyarrow
+#13 59.68  Downloaded opencv-python-headless
+#13 61.52  Downloaded opencv-python
+#13 61.95  Downloaded opencv-contrib-python
+#13 70.03  Downloaded paddlepaddle
+#13 70.03 Prepared 227 packages in 1m 09s
+#13 94.65 Installed 227 packages in 24.61s
+#13 130.1 Bytecode compiled 24150 files in 35.49s
+#13 130.2  + accelerate==1.15.0
+#13 130.2  + aiohappyeyeballs==2.7.1
+#13 130.2  + aiohttp==3.14.5
+#13 130.2  + aiosignal==1.4.0
+#13 130.2  + albucore==0.0.24
+#13 130.2  + albumentations==2.0.8
+#13 130.2  + alembic==1.20.1
+#13 130.2  + annotated-doc==0.0.5
+#13 130.2  + annotated-types==0.8.0
+#13 130.2  + anyio==4.15.1
+#13 130.2  + argon2-cffi==25.1.0
+#13 130.2  + argon2-cffi-bindings==26.1.0
+#13 130.2  + arq==0.28.0
+#13 130.2  + attrs==26.1.0
+#13 130.2  + backoff==2.2.1
+#13 130.2  + beautifulsoup4==4.15.0
+#13 130.2  + certifi==2026.10.23
+#13 130.2  + cffi==2.1.1
+#13 130.2  + charset-normalizer==3.5.2
+#13 130.2  + click==8.5.0
+#13 130.2  + cloudpickle==3.1.2
+#13 130.2  + colorclass==2.2.2
+#13 130.2  + colorlog==6.12.0
+#13 130.2  + compressed-rtf==1.0.7
+#13 130.2  + cryptography==50.0.2
+#13 130.2  + cython==3.3.0
+#13 130.2  + datasets==5.0.1
+#13 130.2  + defusedxml==0.7.1
+#13 130.2  + dill==0.4.1
+#13 130.2  + distro==1.9.0
+#13 130.2  + doclang==0.8.0
+#13 130.2  + docling==2.125.0
+#13 130.2  + docling-core==2.105.0
+#13 130.2  + docling-ibm-models==4.0.4
+#13 130.2  + docling-parse==7.24.0
+#13 130.2  + docling-slim==2.125.0
+#13 130.2  + easygui==0.98.3
+#13 130.2  + ebcdic==2.0.1
+#13 130.2  + et-xmlfile==2.0.0
+#13 130.2  + extract-msg==0.56.1
+#13 130.2  + faker==40.43.0
+#13 130.2  + fastapi==0.162.0
+#13 130.2  + filelock==4.2.4
+#13 130.2  + filetype==1.2.0
+#13 130.2  + fire==0.7.1
+#13 130.2  + flagembedding==1.4.2
+#13 130.2  + flatbuffers==25.12.19
+#13 130.2  + fonttools==4.68.0
+#13 130.2  + frozenlist==1.8.0
+#13 130.2  + fsspec==2026.6.0
+#13 130.2  + googleapis-common-protos==1.76.0
+#13 130.2  + greenlet==3.5.6
+#13 130.2  + h11==0.16.0
+#13 130.2  + hf-xet==1.7.0
+#13 130.2  + hiredis==3.5.0
+#13 130.2  + httpcore==1.0.9
+#13 130.2  + httpcore2==2.16.0
+#13 130.2  + httptools==0.9.0
+#13 130.2  + httpx==0.28.1
+#13 130.2  + httpx2==2.16.0
+#13 130.2  + huggingface-hub==0.36.2
+#13 130.2  + idna==3.20
+#13 130.2  + imageio==2.38.1
+#13 130.2  + iniconfig==2.3.1
+#13 130.2  + ir-datasets==0.6.3
+#13 130.2  + jinja2==3.1.6
+#13 130.2  + jiter==0.17.0
+#13 130.2  + joblib==1.6.0
+#13 130.2  + jsonpatch==1.35
+#13 130.2  + jsonpointer==3.2.1
+#13 130.2  + jsonref==1.1.0
+#13 130.2  + jsonschema==4.26.0
+#13 130.2  + jsonschema-specifications==2025.9.1
+#13 130.2  + langchain-core==1.6.10
+#13 130.2  + langchain-protocol==0.0.19
+#13 130.2  + langfuse==4.15.1
+#13 130.2  + langgraph==1.2.15
+#13 130.2  + langgraph-checkpoint==4.3.0
+#13 130.2  + langgraph-checkpoint-postgres==3.1.3
+#13 130.2  + langgraph-prebuilt==1.1.0
+#13 130.2  + langgraph-sdk==0.4.7
+#13 130.2  + langsmith==0.14.8
+#13 130.2  + lark==1.3.1
+#13 130.2  + latex2mathml==3.81.1
+#13 130.2  + lazy-loader==0.6
+#13 130.2  + lmdb==3.0.0
+#13 130.2  + lxml==6.1.3
+#13 130.2  + lz4==4.4.5
+#13 130.2  + mail-parser==4.9.0
+#13 130.2  + mako==1.4.3
+#13 130.2  + markdown-it-py==4.2.0
+#13 130.2  + marko==2.2.5
+#13 130.2  + markupsafe==3.0.4
+#13 130.2  + mcp==2.3.0
+#13 130.2  + mcp-types==2.3.0
+#13 130.2  + mdurl==0.1.2
+#13 130.2  + mpire==2.10.2
+#13 130.2  + mpmath==1.3.0
+#13 130.2  + msoffcrypto-tool==6.0.0
+#13 130.2  + multidict==7.2.1
+#13 130.2  + multiprocess==0.70.19
+#13 130.2  + narwhals==2.28.0
+#13 130.2  + networkx==3.7
+#13 130.2  + numpy==2.5.4
+#13 130.2  + olefile==0.47
+#13 130.2  + oletools==0.60.2
+#13 130.2  + omegaconf==2.4.0
+#13 130.2  + onnxruntime==1.31.1
+#13 130.2  + openai==3.35.0
+#13 130.2  + opencv-contrib-python==5.0.0.93
+#13 130.2  + opencv-python==5.0.0.93
+#13 130.2  + opencv-python-headless==5.0.0.93
+#13 130.2  + openpyxl==3.1.5
+#13 130.2  + opentelemetry-api==1.45.1
+#13 130.2  + opentelemetry-exporter-http-transport==0.66b1
+#13 130.2  + opentelemetry-exporter-otlp-common==0.66b1
+#13 130.2  + opentelemetry-exporter-otlp-proto-common==1.45.1
+#13 130.2  + opentelemetry-exporter-otlp-proto-http==1.45.1
+#13 130.2  + opentelemetry-proto==1.45.1
+#13 130.2  + opentelemetry-sdk==1.45.1
+#13 130.2  + opentelemetry-semantic-conventions==0.66b1
+#13 130.2  + opt-einsum==3.3.0
+#13 130.2  + orjson==3.13.0
+#13 130.2  + ormsgpack==1.12.2
+#13 130.2  + packaging==26.3
+#13 130.2  + paddleocr==2.10.0
+#13 130.2  + paddlepaddle==3.3.1
+#13 130.2  + pandas==3.1.0
+#13 130.2  + pcodedmp==1.2.6
+#13 130.2  + peft==0.21.2
+#13 130.2  + pgvector==0.5.1
+#13 130.2  + pillow==12.3.0
+#13 130.2  + pluggy==1.7.0
+#13 130.2  + polyfactory==3.5.0
+#13 130.2  + propcache==0.5.4
+#13 130.2  + protobuf==7.36.2
+#13 130.2  + psutil==7.2.2
+#13 130.2  + psycopg==3.3.6
+#13 130.2  + psycopg-binary==3.3.6
+#13 130.2  + psycopg-pool==3.3.3
+#13 130.2  + pyarrow==26.0.0
+#13 130.2  + pyclipper==1.4.0
+#13 130.2  + pycparser==3.12
+#13 130.2  + pydantic==2.14.1
+#13 130.2  + pydantic-core==2.50.1
+#13 130.2  + pydantic-settings==2.16.1
+#13 130.2  + pygments==2.21.0
+#13 130.2  + pyjwt==2.15.1
+#13 130.2  + pylatexenc==2.11
+#13 130.2  + pymupdf==1.28.2
+#13 130.2  + pymupdf-layout==1.28.2
+#13 130.2  + pymupdf4llm==1.28.2
+#13 130.2  + pyparsing==3.3.3
+#13 130.2  + pypdfium2==5.14.0
+#13 130.2  + pytest==9.2.0
+#13 130.2  + python-dateutil==3.0.0
+#13 130.2  + python-docx==1.2.0
+#13 130.2  + python-dotenv==1.2.4
+#13 130.2  + python-multipart==0.0.32
+#13 130.2  + python-oxmsg==0.0.2
+#13 130.2  + python-pptx==1.0.2
+#13 130.2  + pyyaml==6.0.3
+#13 130.2  + rapidfuzz==3.14.6
+#13 130.2  + rapidocr==3.10.0
+#13 130.2  + red-black-tree-mod==1.22
+#13 130.2  + redis==5.3.1
+#13 130.2  + referencing==0.37.0
+#13 130.2  + regex==2026.9.29
+#13 130.2  + requests==2.34.2
+#13 130.2  + requests-toolbelt==1.0.0
+#13 130.2  + rich==15.0.0
+#13 130.2  + rpds-py==2026.9.1
+#13 130.2  + rtfde==0.1.2.2
+#13 130.2  + rtree==1.4.1
+#13 130.2  + ruff==0.17.3
+#13 130.2  + safetensors==0.8.0
+#13 130.2  + scikit-image==0.26.0
+#13 130.2  + scikit-learn==1.9.1
+#13 130.2  + scipy==1.18.1
+#13 130.2  + semchunk==3.2.5
+#13 130.2  + sentence-transformers==5.7.0
+#13 130.2  + sentencepiece==0.2.2
+#13 130.2  + setuptools==84.2.1
+#13 130.2  + shapely==2.2.0
+#13 130.2  + shellingham==1.5.4
+#13 130.2  + simsimd==6.5.16
+#13 130.2  + six==1.17.0
+#13 130.2  + sniffio==1.3.1
+#13 130.2  + soupsieve==3.0.4
+#13 130.2  + sqlalchemy==2.1.6
+#13 130.2  + sqlglot==30.23.0
+#13 130.2  + sse-starlette==3.5.0
+#13 130.2  + starlette==1.10.0
+#13 130.2  + stringzilla==5.3.2
+#13 130.2  + sympy==1.14.0
+#13 130.2  + tabulate==0.10.0
+#13 130.2  + tenacity==9.2.1
+#13 130.2  + termcolor==3.3.0
+#13 130.2  + threadpoolctl==3.7.0
+#13 130.2  + tifffile==2026.10.15
+#13 130.2  + tokenizers==0.22.2
+#13 130.2  + torch==2.14.0+cpu
+#13 130.2  + torchvision==0.29.0+cpu
+#13 130.2  + tqdm==4.70.1
+#13 130.2  + transformers==4.57.6
+#13 130.2  + tree-sitter==0.26.0
+#13 130.2  + tree-sitter-c==0.24.2
+#13 130.2  + tree-sitter-javascript==0.25.0
+#13 130.2  + tree-sitter-python==0.25.0
+#13 130.2  + tree-sitter-typescript==0.23.2
+#13 130.2  + truststore==0.10.5
+#13 130.2  + typer==0.26.8
+#13 130.2  + typing-extensions==4.16.0
+#13 130.2  + typing-inspection==0.4.4
+#13 130.2  + tzdata==2026.5
+#13 130.2  + tzlocal==5.4.5
+#13 130.2  + urllib3==2.8.0
+#13 130.2  + uuid-utils==0.17.1
+#13 130.2  + uvicorn==0.54.0
+#13 130.2  + uvloop==0.23.0
+#13 130.2  + watchfiles==1.3.0
+#13 130.2  + websockets==16.1.1
+#13 130.2  + wrapt==2.5.1
+#13 130.2  + xlsxwriter==3.3.0
+#13 130.2  + xxhash==4.0.2
+#13 130.2  + yarl==1.25.1
+#13 130.2  + zstandard==0.25.0
+#13 DONE 131.4s
+
+#14 [tools tools 2/2] WORKDIR /work
+#14 DONE 0.2s
+
+#15 [tools] exporting to image
+#15 exporting layers
+#15 exporting layers 73.6s done
+#15 writing image sha256:b4dd64a4aae12c17c1789d004d2d53f8b03879e1e1d7865444200532ab9b6be9 0.0s done
+#15 naming to docker.io/ffcore/tools:0.0.0-11m 0.0s done
+#15 DONE 73.6s
+cd backend && python -m ffcore.cli seed-prompts --path prompts
+2026-11-20 22:13:37,570 ERROR langfuse Error while fetching prompt 'eval_judge_rubric_v2-label:production': headers: {'x-robots-tag': 'noindex', 'x-content-type-options': 'nosniff', 'referrer-policy': 'strict-origin-when-cross-origin', 'document-policy': 'js-profiling', 'permissions-policy': 'autoplay=*, fullscreen=*, microphone=*', 'x-frame-options': 'SAMEORIGIN', 'vary': 'Origin, Accept-Encoding', 'content-type': 'application/json; charset=utf-8', 'etag': '"279yo3b25f1z"', 'content-length': '71', 'date': 'Fri, 20 Nov 2026 22:13:37 GMT', 'connection': 'keep-alive', 'keep-alive': 'timeout=5'}, status_code: 500, body: {'message': 'Internal Server Error', 'error': 'An unknown error occurred'}
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/work/backend/ffcore/cli.py", line 586, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/work/backend/ffcore/cli.py", line 448, in main
+    report = prompts.seed_prompts(client, args.path)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/work/backend/ffcore/core/prompts.py", line 88, in seed_prompts
+    client.create_prompt(
+  File "/opt/venv/lib/python3.12/site-packages/langfuse/_client/client.py", line 4181, in create_prompt
+    server_prompt = self.api.prompts.create(request=request)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/langfuse/api/prompts/client.py", line 213, in create
+    _response = self._raw_client.create(
+                ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/langfuse/api/prompts/raw_client.py", line 393, in create
+    raise ApiError(
+langfuse.api.core.api_error.ApiError: headers: {'x-robots-tag': 'noindex', 'x-content-type-options': 'nosniff', 'referrer-policy': 'strict-origin-when-cross-origin', 'document-policy': 'js-profiling', 'permissions-policy': 'autoplay=*, fullscreen=*, microphone=*', 'x-frame-options': 'SAMEORIGIN', 'vary': 'Origin, Accept-Encoding', 'content-type': 'application/json; charset=utf-8', 'etag': '"279yo3b25f1z"', 'content-length': '71', 'date': 'Fri, 20 Nov 2026 22:13:44 GMT', 'connection': 'keep-alive', 'keep-alive': 'timeout=5'}, status_code: 500, body: {'message': 'Internal Server Error', 'error': 'An unknown error occurred'}
+make: *** [Makefile:112: seed-prompts] Error 1
+seed-prompts exit=2
+Traceback (most recent call last):
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1958, in _exec_single_context
+    self.dialect.do_execute(
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 1192, in do_execute
+    cursor.execute(statement, parameters)
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/connectors/asyncio.py", line 258, in execute
+    self._adapt_connection._handle_exception(error)
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/connectors/asyncio.py", line 412, in _handle_exception
+    self._handle_exception_no_connection(self.dbapi, error)
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/connectors/asyncio.py", line 409, in _handle_exception_no_connection
+    raise error.with_traceback(exc_info[2])
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/connectors/asyncio.py", line 256, in execute
+    return await_(self._execute_async(operation, parameters))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/util/concurrency.py", line 167, in await_
+    return current.parent.switch(awaitable)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/util/concurrency.py", line 205, in greenlet_spawn
+    value = await result
+            ^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/dialects/postgresql/psycopg.py", line 630, in _execute_async
+    result = await self._cursor.execute(operation, parameters)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/psycopg/cursor_async.py", line 117, in execute
+    raise ex.with_traceback(None)
+psycopg.errors.DiskFull: could not extend file "base/16384/18866": No space left on device
+HINT:  Check free disk space.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/app/ffcore/cli.py", line 586, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/app/ffcore/cli.py", line 382, in main
+    user_id = asyncio.run(
+              ^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/asyncio/runners.py", line 195, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 691, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/app/ffcore/cli.py", line 61, in create_superadmin
+    await session.flush()
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/ext/asyncio/session.py", line 1030, in flush
+    await greenlet_spawn(self.sync_session.flush, objects=objects)
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/util/concurrency.py", line 212, in greenlet_spawn
+    result = context.switch(value)
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 4543, in flush
+    self._flush(objects)
+  File "<sqlalchemy generated warned() wrapper for sqlalchemy.orm.session.Session._flush>", line 2, in _flush
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/util/deprecations.py", line 281, in warned
+    return fn(*args, **kwargs)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 4686, in _flush
+    with util.safe_reraise():
+         ^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/util/langhelpers.py", line 166, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 4647, in _flush
+    flush_context.execute()
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/unitofwork.py", line 467, in execute
+    rec.execute(self)
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/unitofwork.py", line 643, in execute
+    util.preloaded.orm_persistence._save_obj(
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/persistence.py", line 92, in _save_obj
+    _emit_insert_statements(
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/orm/persistence.py", line 1237, in _emit_insert_statements
+    result = connection.execute(
+             ^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1463, in execute
+    return meth(
+           ^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/sql/elements.py", line 533, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1683, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1837, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1977, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 2347, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1958, in _exec_single_context
+    self.dialect.do_execute(
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 1192, in do_execute
+    cursor.execute(statement, parameters)
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/connectors/asyncio.py", line 258, in execute
+    self._adapt_connection._handle_exception(error)
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/connectors/asyncio.py", line 412, in _handle_exception
+    self._handle_exception_no_connection(self.dbapi, error)
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/connectors/asyncio.py", line 409, in _handle_exception_no_connection
+    raise error.with_traceback(exc_info[2])
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/connectors/asyncio.py", line 256, in execute
+    return await_(self._execute_async(operation, parameters))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/util/concurrency.py", line 167, in await_
+    return current.parent.switch(awaitable)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/util/concurrency.py", line 205, in greenlet_spawn
+    value = await result
+            ^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/sqlalchemy/dialects/postgresql/psycopg.py", line 630, in _execute_async
+    result = await self._cursor.execute(operation, parameters)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/psycopg/cursor_async.py", line 117, in execute
+    raise ex.with_traceback(None)
+sqlalchemy.exc.OperationalError: (psycopg.errors.DiskFull) could not extend file "base/16384/18866": No space left on device
+HINT:  Check free disk space.
+[SQL: INSERT INTO users (id, email, password_hash, full_name, is_superadmin, superadmin_access, deleted_at) VALUES (%(id)s::UUID, %(email)s::VARCHAR, %(password_hash)s::VARCHAR, %(full_name)s::VARCHAR, %(is_superadmin)s, %(superadmin_access)s::VARCHAR, %(deleted_at)s::TIMESTAMP WITH TIME ZONE) RETURNING users.is_active, users.token_version, users.created_at, users.updated_at]
+[parameters: {'id': UUID('44b5fb87-a7b6-4cf4-8963-0088f654f2f6'), 'email': 'e2e-admin@example.org', 'password_hash': '$argon2id$v=19$m=65536,t=3,p=4$7iVi349kdIN8yqzMI230SQ$RmK5k45S6q8LSqdfqiHjxznEEKMw1rrV2dp77ZBNi5M', 'full_name': 'E2E Admin', 'is_superadmin': True, 'superadmin_access': 'edit', 'deleted_at': None}]
+(Background on this error at: https://sqlalche.me/e/21/e3q8)
+superadmin exit=1
+ Volume "ffcore-11_e2e_node_modules"  Creating
+ Volume "ffcore-11_e2e_node_modules"  Created
+ Container ffcore-11-redis-1  Running
+ Container ffcore-11-postgres-1  Running
+ Container ffcore-11-litellm-1  Running
+ Container ffcore-11-migrate-1  Created
+ Container ffcore-11-backend-1  Running
+ Container ffcore-11-postgres-1  Waiting
+ Container ffcore-11-postgres-1  Waiting
+ Container ffcore-11-postgres-1  Healthy
+ Container ffcore-11-postgres-1  Healthy
+ Container ffcore-11-migrate-1  Starting
+ Container ffcore-11-migrate-1  Started
+ Container ffcore-11-postgres-1  Waiting
+ Container ffcore-11-redis-1  Waiting
+ Container ffcore-11-litellm-1  Waiting
+ Container ffcore-11-migrate-1  Waiting
+ Container ffcore-11-postgres-1  Healthy
+ Container ffcore-11-litellm-1  Healthy
+ Container ffcore-11-redis-1  Error
+ Container ffcore-11-migrate-1  Exited
+dependency failed to start: container ffcore-11-redis-1 is unhealthy
+e2e exit=1
+--- /readyz from backend container
+{
+ "status": "not_ready",
+ "checks": [
+  {
+   "name": "warmup",
+   "status": "failed",
+   "code": "model_missing",
+   "detail": "ModelMissing: BAAI/bge-m3 is not in /models/huggingface/hub; run `make models` (offline by default)"
+  },
+  {
+   "name": "models",
+   "status": "ok",
+   "code": null,
+   "detail": "BAAI/bge-m3, BAAI/bge-reranker-v2-m3"
+  },
+  {
+   "name": "embed_dim",
+   "status": "ok",
+   "code": null,
+   "detail": "chunks.embedding vector(1024), EMBED_DIM 1024"
+  },
+  {
+   "name": "ollama_context",
+   "status": "skipped",
+   "code": null,
+   "detail": "no active Ollama model with limits.context_tokens"
+  },
+  {
+   "name": "vector_store",
+   "status": "ok",
+   "code": null,
+   "detail": "pgvector"
+  },
+  {
+   "name": "llm_slots",
+   "status": "ok",
+   "code": null,
+   "detail": "in_use=0/4 waiting: interactive=0, interactive_low=0, background=0; background window open"
+  },
+  {
+   "name": "ollama_runtime_context",
+   "status": "skipped",
+   "code": null,
+   "detail": "no active Ollama model with limits.context_tokens"
+  },
+  {
+   "name": "ingest_queue",
+   "status": "ok",
+   "code": null,
+   "detail": "queued=0"
+  }
+ ]
+}

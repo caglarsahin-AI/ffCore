@@ -1,0 +1,10 @@
+HEAD=97342eb3440af84f7e544280349ceef336da10ff + worktree test changes (fix/11-1-parity)
+ backend/tests/integration/test_03a_read_side.py |  3 +++
+ backend/tests/integration/test_06a_read_side.py |  4 ++++
+ backend/tests/integration/test_11_chat.py       | 30 +++++++++++++++++++++++++
+ 3 files changed, 37 insertions(+)
+All checks passed!
+520 files already formatted
+...........................                                              [100%]
+27 passed in 222.67s (0:03:42)
+2026-11-20 22:00:42,393 ERROR opentelemetry.exporter.otlp.proto.http.trace_exporter Failed to export spans batch due to timeout, max retries or shutdown.

@@ -1,0 +1,9 @@
+ Volume ffcore-11_langfuse_minio_data  Removed
+ Volume ffcore-11_langfuse_clickhouse_data  Removed
+ Volume ffcore-11_redis_data  Removed
+containers=0 volumes=0
+TYPE            TOTAL     ACTIVE    SIZE      RECLAIMABLE
+Images          183       18        81.92GB   70.88GB (86%)
+Containers      33        19        468.7MB   176.3MB (37%)
+Local Volumes   74        15        24.66GB   15.31GB (62%)
+Build Cache     366       0         13.54MB   13.54MB

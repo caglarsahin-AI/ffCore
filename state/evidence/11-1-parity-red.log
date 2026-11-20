@@ -1,0 +1,250 @@
+HEAD=97342eb3440af84f7e544280349ceef336da10ff (main checkout)
+F......F..................                                               [100%]
+=================================== FAILURES ===================================
+_______________________ test_03a_2_read_mode_get_parity ________________________
+
+app = <fastapi.applications.FastAPI object at 0x7f8fd6371160>
+world = {'edit': <starlette.testclient.TestClient object at 0x7f8fd5f56420>, 'read': <starlette.testclient.TestClient object a...e00>, 'project_id': 'cf167e21-24f1-405b-85cd-fb50a2171d5b', 'provider_id': '8c93d6af-0d4b-47dd-a2b8-18c1e2a14e26', ...}
+
+    def test_03a_2_read_mode_get_parity(app, world):
+        checked = 0
+        for path in _get_paths(app):
+            if path in PARITY_EXEMPT or path.startswith(PARITY_EXEMPT_PREFIXES):
+                continue
+>           url = re.sub(r"\{(\w+)\}", lambda m: world[m.group(1)], path)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_03a_read_side.py:109: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.12/re/__init__.py:186: in sub
+    return _compile(pattern, flags).sub(repl, string, count)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+m = <re.Match object; span=(44, 61), match='{conversation_id}'>
+
+>   url = re.sub(r"\{(\w+)\}", lambda m: world[m.group(1)], path)
+                                         ^^^^^^^^^^^^^^^^^
+E   KeyError: 'conversation_id'
+
+tests/integration/test_03a_read_side.py:109: KeyError
+---------------------------- Captured stderr setup -----------------------------
+2026-11-20 21:52:53,075 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=452
+2026-11-20 21:52:53,293 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=131
+2026-11-20 21:52:53,421 INFO ffcore.access access method=POST path=/api/v1/providers status=201 ms=121
+2026-11-20 21:52:53,511 INFO ffcore.access access method=POST path=/api/v1/projects/cf167e21-24f1-405b-85cd-fb50a2171d5b/models status=201 ms=79
+------------------------------ Captured log setup ------------------------------
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=452
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=131
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/providers status=201 ms=121
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/projects/cf167e21-24f1-405b-85cd-fb50a2171d5b/models status=201 ms=79
+----------------------------- Captured stderr call -----------------------------
+2026-11-20 21:52:54,867 INFO ffcore.access access method=GET path=/api/v1/users status=200 ms=43
+2026-11-20 21:52:54,910 INFO ffcore.access access method=GET path=/api/v1/users status=200 ms=40
+2026-11-20 21:52:54,995 INFO ffcore.access access method=GET path=/api/v1/users/2632afe0-7fff-4ddf-867a-2e92bf2d26df status=200 ms=80
+2026-11-20 21:52:55,065 INFO ffcore.access access method=GET path=/api/v1/users/2632afe0-7fff-4ddf-867a-2e92bf2d26df status=200 ms=64
+2026-11-20 21:52:55,102 INFO ffcore.access access method=GET path=/api/v1/projects status=200 ms=33
+2026-11-20 21:52:55,131 INFO ffcore.access access method=GET path=/api/v1/projects status=200 ms=25
+2026-11-20 21:52:55,202 INFO ffcore.access access method=GET path=/api/v1/projects/cf167e21-24f1-405b-85cd-fb50a2171d5b status=200 ms=66
+2026-11-20 21:52:55,278 INFO ffcore.access access method=GET path=/api/v1/projects/cf167e21-24f1-405b-85cd-fb50a2171d5b status=200 ms=58
+2026-11-20 21:52:55,339 INFO ffcore.access access method=GET path=/api/v1/projects/cf167e21-24f1-405b-85cd-fb50a2171d5b/readiness status=200 ms=56
+2026-11-20 21:52:55,400 INFO ffcore.access access method=GET path=/api/v1/projects/cf167e21-24f1-405b-85cd-fb50a2171d5b/readiness status=200 ms=54
+2026-11-20 21:52:55,445 INFO ffcore.access access method=GET path=/api/v1/projects/cf167e21-24f1-405b-85cd-fb50a2171d5b/members status=200 ms=42
+2026-11-20 21:52:55,496 INFO ffcore.access access method=GET path=/api/v1/projects/cf167e21-24f1-405b-85cd-fb50a2171d5b/members status=200 ms=47
+2026-11-20 21:52:55,532 INFO ffcore.access access method=GET path=/api/v1/provider-drivers status=200 ms=30
+2026-11-20 21:52:55,580 INFO ffcore.access access method=GET path=/api/v1/provider-drivers status=200 ms=43
+2026-11-20 21:52:55,650 INFO ffcore.access access method=GET path=/api/v1/providers status=200 ms=62
+2026-11-20 21:52:55,716 INFO ffcore.access access method=GET path=/api/v1/providers status=200 ms=58
+2026-11-20 21:52:56,100 INFO ffcore.access access method=GET path=/api/v1/providers/8c93d6af-0d4b-47dd-a2b8-18c1e2a14e26 status=200 ms=381
+2026-11-20 21:52:56,243 INFO ffcore.access access method=GET path=/api/v1/providers/8c93d6af-0d4b-47dd-a2b8-18c1e2a14e26 status=200 ms=131
+2026-11-20 21:52:56,291 INFO ffcore.access access method=GET path=/api/v1/model-catalog status=200 ms=33
+2026-11-20 21:52:56,331 INFO ffcore.access access method=GET path=/api/v1/model-catalog status=200 ms=35
+2026-11-20 21:52:56,402 INFO ffcore.access access method=GET path=/api/v1/projects/cf167e21-24f1-405b-85cd-fb50a2171d5b/models status=200 ms=65
+2026-11-20 21:52:56,510 INFO ffcore.access access method=GET path=/api/v1/projects/cf167e21-24f1-405b-85cd-fb50a2171d5b/models status=200 ms=102
+2026-11-20 21:52:56,604 INFO ffcore.access access method=GET path=/api/v1/projects/cf167e21-24f1-405b-85cd-fb50a2171d5b/models/20275807-dd14-46cd-bd3d-86c627d57452 status=200 ms=90
+2026-11-20 21:52:56,680 INFO ffcore.access access method=GET path=/api/v1/projects/cf167e21-24f1-405b-85cd-fb50a2171d5b/models/20275807-dd14-46cd-bd3d-86c627d57452 status=200 ms=71
+2026-11-20 21:52:56,732 INFO ffcore.access access method=GET path=/api/v1/audit status=200 ms=45
+2026-11-20 21:52:56,777 INFO ffcore.access access method=GET path=/api/v1/audit status=200 ms=41
+2026-11-20 21:52:56,838 INFO ffcore.access access method=GET path=/api/v1/audit.csv status=200 ms=57
+2026-11-20 21:52:56,891 INFO ffcore.access access method=GET path=/api/v1/audit.csv status=200 ms=48
+2026-11-20 21:52:56,961 INFO ffcore.access access method=GET path=/api/v1/projects/cf167e21-24f1-405b-85cd-fb50a2171d5b/pii-policies status=200 ms=66
+2026-11-20 21:52:57,049 INFO ffcore.access access method=GET path=/api/v1/projects/cf167e21-24f1-405b-85cd-fb50a2171d5b/pii-policies status=200 ms=72
+2026-11-20 21:52:57,104 INFO ffcore.access access method=GET path=/api/v1/projects/cf167e21-24f1-405b-85cd-fb50a2171d5b/guardrail-policies status=200 ms=50
+2026-11-20 21:52:57,144 INFO ffcore.access access method=GET path=/api/v1/projects/cf167e21-24f1-405b-85cd-fb50a2171d5b/guardrail-policies status=200 ms=35
+2026-11-20 21:52:57,195 INFO ffcore.access access method=GET path=/api/v1/projects/cf167e21-24f1-405b-85cd-fb50a2171d5b/tools status=200 ms=48
+2026-11-20 21:52:57,243 INFO ffcore.access access method=GET path=/api/v1/projects/cf167e21-24f1-405b-85cd-fb50a2171d5b/tools status=200 ms=45
+2026-11-20 21:52:57,304 INFO ffcore.access access method=GET path=/api/v1/projects/cf167e21-24f1-405b-85cd-fb50a2171d5b/agents status=200 ms=56
+2026-11-20 21:52:57,377 INFO ffcore.access access method=GET path=/api/v1/projects/cf167e21-24f1-405b-85cd-fb50a2171d5b/agents status=200 ms=68
+2026-11-20 21:52:57,450 INFO ffcore.access access method=GET path=/api/v1/projects/cf167e21-24f1-405b-85cd-fb50a2171d5b/runs status=200 ms=67
+2026-11-20 21:52:57,599 INFO ffcore.access access method=GET path=/api/v1/projects/cf167e21-24f1-405b-85cd-fb50a2171d5b/runs status=200 ms=140
+2026-11-20 21:52:57,670 INFO ffcore.access access method=GET path=/api/v1/projects/cf167e21-24f1-405b-85cd-fb50a2171d5b/chat/agents status=200 ms=65
+2026-11-20 21:52:57,721 INFO ffcore.access access method=GET path=/api/v1/projects/cf167e21-24f1-405b-85cd-fb50a2171d5b/chat/agents status=200 ms=39
+2026-11-20 21:52:57,771 INFO ffcore.access access method=GET path=/api/v1/projects/cf167e21-24f1-405b-85cd-fb50a2171d5b/conversations status=200 ms=45
+2026-11-20 21:52:57,814 INFO ffcore.access access method=GET path=/api/v1/projects/cf167e21-24f1-405b-85cd-fb50a2171d5b/conversations status=200 ms=39
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/users status=200 ms=43
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/users status=200 ms=40
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/users/2632afe0-7fff-4ddf-867a-2e92bf2d26df status=200 ms=80
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/users/2632afe0-7fff-4ddf-867a-2e92bf2d26df status=200 ms=64
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects status=200 ms=33
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects status=200 ms=25
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/cf167e21-24f1-405b-85cd-fb50a2171d5b status=200 ms=66
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/cf167e21-24f1-405b-85cd-fb50a2171d5b status=200 ms=58
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/cf167e21-24f1-405b-85cd-fb50a2171d5b/readiness status=200 ms=56
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/cf167e21-24f1-405b-85cd-fb50a2171d5b/readiness status=200 ms=54
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/cf167e21-24f1-405b-85cd-fb50a2171d5b/members status=200 ms=42
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/cf167e21-24f1-405b-85cd-fb50a2171d5b/members status=200 ms=47
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/provider-drivers status=200 ms=30
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/provider-drivers status=200 ms=43
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/providers status=200 ms=62
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/providers status=200 ms=58
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/providers/8c93d6af-0d4b-47dd-a2b8-18c1e2a14e26 status=200 ms=381
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/providers/8c93d6af-0d4b-47dd-a2b8-18c1e2a14e26 status=200 ms=131
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/model-catalog status=200 ms=33
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/model-catalog status=200 ms=35
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/cf167e21-24f1-405b-85cd-fb50a2171d5b/models status=200 ms=65
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/cf167e21-24f1-405b-85cd-fb50a2171d5b/models status=200 ms=102
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/cf167e21-24f1-405b-85cd-fb50a2171d5b/models/20275807-dd14-46cd-bd3d-86c627d57452 status=200 ms=90
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/cf167e21-24f1-405b-85cd-fb50a2171d5b/models/20275807-dd14-46cd-bd3d-86c627d57452 status=200 ms=71
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/audit status=200 ms=45
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/audit status=200 ms=41
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/audit.csv status=200 ms=57
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/audit.csv status=200 ms=48
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/cf167e21-24f1-405b-85cd-fb50a2171d5b/pii-policies status=200 ms=66
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/cf167e21-24f1-405b-85cd-fb50a2171d5b/pii-policies status=200 ms=72
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/cf167e21-24f1-405b-85cd-fb50a2171d5b/guardrail-policies status=200 ms=50
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/cf167e21-24f1-405b-85cd-fb50a2171d5b/guardrail-policies status=200 ms=35
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/cf167e21-24f1-405b-85cd-fb50a2171d5b/tools status=200 ms=48
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/cf167e21-24f1-405b-85cd-fb50a2171d5b/tools status=200 ms=45
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/cf167e21-24f1-405b-85cd-fb50a2171d5b/agents status=200 ms=56
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/cf167e21-24f1-405b-85cd-fb50a2171d5b/agents status=200 ms=68
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/cf167e21-24f1-405b-85cd-fb50a2171d5b/runs status=200 ms=67
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/cf167e21-24f1-405b-85cd-fb50a2171d5b/runs status=200 ms=140
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/cf167e21-24f1-405b-85cd-fb50a2171d5b/chat/agents status=200 ms=65
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/cf167e21-24f1-405b-85cd-fb50a2171d5b/chat/agents status=200 ms=39
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/cf167e21-24f1-405b-85cd-fb50a2171d5b/conversations status=200 ms=45
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/cf167e21-24f1-405b-85cd-fb50a2171d5b/conversations status=200 ms=39
+--------------------------- Captured stderr teardown ---------------------------
+2026-11-20 21:53:01,214 WARNING ffcore.litellm_reconcile litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+2026-11-20 21:53:02,806 ERROR ffcore.readiness warmup failed: ModelMissing
+---------------------------- Captured log teardown -----------------------------
+WARNING  ffcore.litellm_reconcile:litellm_reconcile.py:456 litellm_reconcile_retry attempt=1 error=EgressRequestFailed: egress_dns_failed
+ERROR    ffcore.readiness:readiness.py:71 warmup failed: ModelMissing
+________________________ test_06a_read_mode_get_parity _________________________
+
+app = <fastapi.applications.FastAPI object at 0x7f8fd6371160>
+database_url = 'postgresql+psycopg://ffcore:dummy-not-secret-postgres@postgres:5432/ffcore_test_dc45906c54cc'
+app_settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+pg = <psycopg.Connection [IDLE] (host=postgres user=ffcore database=ffcore_test_dc45906c54cc) at 0x7f8fb5c0d310>
+make_project = <function make_project.<locals>.make at 0x7f8fb5bc2980>
+make_user = <function make_user.<locals>.make at 0x7f8fb5bc23e0>
+client_factory = <function client_factory.<locals>.make at 0x7f8fb5ec1940>
+
+    def test_06a_read_mode_get_parity(
+        app, database_url, app_settings, pg, make_project, make_user, client_factory
+    ):
+        import os
+    
+        from pydantic import SecretStr
+    
+        project_id = make_project()
+        run_id = seed_run(pg, project_id, definition())
+        setup(database_url)
+        settings = app_settings.model_copy(
+            update={
+                "database_url": SecretStr(database_url),
+                "redis_url": SecretStr(os.environ["REDIS_URL"]),
+            }
+        )
+        Harness(database_url, settings).run(
+            run_id, Ports(ScriptedModel(turn("A [1].")), ScriptedRetriever([source()]))
+        )
+        agent_id = pg.execute("SELECT agent_id FROM runs WHERE id = %s", (run_id,)).fetchone()[0]
+        world = {
+            "project_id": str(project_id),
+            "agent_id": str(agent_id),
+            "run_id": str(run_id),
+            "version": "1",
+        }
+        # 06b-2: GET .../agents/{agent_id}/external reads an external agent (a native one is 409
+        # `agent_not_external`), so that route gets an external agent of its own.
+        import uuid
+    
+        from ffcore.services.external_config import ExternalConfig
+    
+        external_id = uuid.uuid4()
+        config = ExternalConfig(
+            base_url="https://agent.example/v1", model="m", api_key="dummy-not-secret-parity-key"
+        )
+        pg.execute(
+            "INSERT INTO agents (id, project_id, key, name, kind, external_config, created_by)"
+            " VALUES (%s, %s, 'dis-parite', 'Dış', 'external', %s, 'test')",
+            (external_id, project_id, config.encrypt(app_settings)),
+        )
+    
+        from ffcore.core.config import get_settings
+    
+        app.dependency_overrides[get_settings] = lambda: settings
+        _, editor = make_user(superadmin="edit")
+        _, reader = make_user(superadmin="read")
+        edit, read = client_factory(editor), client_factory(reader)
+        checked = 0
+        for path, ops in app.openapi()["paths"].items():
+            if "get" not in ops or not (
+                path.startswith(f"{API}/projects/{{project_id}}/agents/{{agent_id}}")
+                or path.startswith(f"{API}/projects/{{project_id}}/runs/{{run_id}}")
+            ):
+                continue
+            here = dict(world, agent_id=str(external_id)) if path.endswith("/external") else world
+>           url = re.sub(r"\{(\w+)\}", lambda m, here=here: here[m.group(1)], path)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_06a_read_side.py:77: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.12/re/__init__.py:186: in sub
+    return _compile(pattern, flags).sub(repl, string, count)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+m = <re.Match object; span=(52, 62), match='{chunk_id}'>
+here = {'project_id': 'a639c76c-56b1-4fd7-bbd8-1cfbbe99f494', 'agent_id': '04a4808c-65dc-41c3-9e4b-47254754ad1c', 'run_id': '3fffe827-23c5-4ab3-9b89-a1a36e412b54', 'version': '1'}
+
+>   url = re.sub(r"\{(\w+)\}", lambda m, here=here: here[m.group(1)], path)
+                                                    ^^^^^^^^^^^^^^^^
+E   KeyError: 'chunk_id'
+
+tests/integration/test_06a_read_side.py:77: KeyError
+----------------------------- Captured stderr call -----------------------------
+2026-11-20 21:53:52,746 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-20 21:53:52,908 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=159
+2026-11-20 21:53:52,976 ERROR ffcore.readiness warmup failed: ModelMissing
+2026-11-20 21:53:53,082 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=103
+2026-11-20 21:53:53,126 INFO ffcore.access access method=GET path=/api/v1/projects/a639c76c-56b1-4fd7-bbd8-1cfbbe99f494/agents/04a4808c-65dc-41c3-9e4b-47254754ad1c status=200 ms=42
+2026-11-20 21:53:53,164 INFO ffcore.access access method=GET path=/api/v1/projects/a639c76c-56b1-4fd7-bbd8-1cfbbe99f494/agents/04a4808c-65dc-41c3-9e4b-47254754ad1c status=200 ms=35
+2026-11-20 21:53:53,199 INFO ffcore.access access method=GET path=/api/v1/projects/a639c76c-56b1-4fd7-bbd8-1cfbbe99f494/agents/04a4808c-65dc-41c3-9e4b-47254754ad1c/versions status=200 ms=32
+2026-11-20 21:53:53,236 INFO ffcore.access access method=GET path=/api/v1/projects/a639c76c-56b1-4fd7-bbd8-1cfbbe99f494/agents/04a4808c-65dc-41c3-9e4b-47254754ad1c/versions status=200 ms=34
+2026-11-20 21:53:53,275 INFO ffcore.access access method=GET path=/api/v1/projects/a639c76c-56b1-4fd7-bbd8-1cfbbe99f494/agents/04a4808c-65dc-41c3-9e4b-47254754ad1c/versions/1 status=200 ms=37
+2026-11-20 21:53:53,316 INFO ffcore.access access method=GET path=/api/v1/projects/a639c76c-56b1-4fd7-bbd8-1cfbbe99f494/agents/04a4808c-65dc-41c3-9e4b-47254754ad1c/versions/1 status=200 ms=38
+2026-11-20 21:53:53,356 INFO ffcore.access access method=GET path=/api/v1/projects/a639c76c-56b1-4fd7-bbd8-1cfbbe99f494/runs/3fffe827-23c5-4ab3-9b89-a1a36e412b54 status=200 ms=37
+2026-11-20 21:53:53,391 INFO ffcore.access access method=GET path=/api/v1/projects/a639c76c-56b1-4fd7-bbd8-1cfbbe99f494/runs/3fffe827-23c5-4ab3-9b89-a1a36e412b54 status=200 ms=31
+2026-11-20 21:53:53,426 INFO ffcore.access access method=GET path=/api/v1/projects/a639c76c-56b1-4fd7-bbd8-1cfbbe99f494/runs/3fffe827-23c5-4ab3-9b89-a1a36e412b54/events status=200 ms=33
+2026-11-20 21:53:53,463 INFO ffcore.access access method=GET path=/api/v1/projects/a639c76c-56b1-4fd7-bbd8-1cfbbe99f494/runs/3fffe827-23c5-4ab3-9b89-a1a36e412b54/events status=200 ms=35
+------------------------------ Captured log call -------------------------------
+ERROR    ffcore.readiness:readiness.py:71 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=159
+ERROR    ffcore.readiness:readiness.py:71 warmup failed: ModelMissing
+INFO     ffcore.access:logging.py:263 access method=POST path=/api/v1/auth/login status=200 ms=103
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/a639c76c-56b1-4fd7-bbd8-1cfbbe99f494/agents/04a4808c-65dc-41c3-9e4b-47254754ad1c status=200 ms=42
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/a639c76c-56b1-4fd7-bbd8-1cfbbe99f494/agents/04a4808c-65dc-41c3-9e4b-47254754ad1c status=200 ms=35
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/a639c76c-56b1-4fd7-bbd8-1cfbbe99f494/agents/04a4808c-65dc-41c3-9e4b-47254754ad1c/versions status=200 ms=32
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/a639c76c-56b1-4fd7-bbd8-1cfbbe99f494/agents/04a4808c-65dc-41c3-9e4b-47254754ad1c/versions status=200 ms=34
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/a639c76c-56b1-4fd7-bbd8-1cfbbe99f494/agents/04a4808c-65dc-41c3-9e4b-47254754ad1c/versions/1 status=200 ms=37
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/a639c76c-56b1-4fd7-bbd8-1cfbbe99f494/agents/04a4808c-65dc-41c3-9e4b-47254754ad1c/versions/1 status=200 ms=38
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/a639c76c-56b1-4fd7-bbd8-1cfbbe99f494/runs/3fffe827-23c5-4ab3-9b89-a1a36e412b54 status=200 ms=37
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/a639c76c-56b1-4fd7-bbd8-1cfbbe99f494/runs/3fffe827-23c5-4ab3-9b89-a1a36e412b54 status=200 ms=31
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/a639c76c-56b1-4fd7-bbd8-1cfbbe99f494/runs/3fffe827-23c5-4ab3-9b89-a1a36e412b54/events status=200 ms=33
+INFO     ffcore.access:logging.py:263 access method=GET path=/api/v1/projects/a639c76c-56b1-4fd7-bbd8-1cfbbe99f494/runs/3fffe827-23c5-4ab3-9b89-a1a36e412b54/events status=200 ms=35
+=========================== short test summary info ============================
+FAILED tests/integration/test_03a_read_side.py::test_03a_2_read_mode_get_parity
+FAILED tests/integration/test_06a_read_side.py::test_06a_read_mode_get_parity
+2 failed, 24 passed in 214.84s (0:03:34)

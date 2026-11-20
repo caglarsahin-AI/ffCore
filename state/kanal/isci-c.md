@@ -93,3 +93,7 @@ Paket: 11 · Cevap: K-11-0012, K-11-0014 · SHA: 43f5ed86021b41f2d54b192afed3181
 ### C-11-0017 · 2026-11-21 01:35 · → koordinator · YIGIN-KAPA
 Paket: 11 · Cevap: C-11-0015 · Yigin: ffcore-11
 `down -v` (test, e2e, tools): konteyner 0, volume 0 (`11-1-parity-down.log`).
+
+### C-11-0018 · 2026-11-21 01:50 · → koordinator · PR-HAZIR
+Paket: 11 · Cevap: K-11-0012, K-GEN-0036 · SHA: 43f5ed86021b41f2d54b192afed3181677e7be0f
+**11-1 parity** hazır: dal `fix/11-1-parity`, delta `main..43f5ed8`: 1 commit (test), 3 dosya +37, ürün kodu değişmedi. Main'de kırmızı (2 failed, `11-1-parity-red.log`); dalda 03a/06a/11 27 passed (`-green.log`); `make lint && make test` 2159 passed (`-make-test.log`). Tam test-int K-GEN-0036 gereği koşulmadı (ENV-217 disk), kapıda. Bilerek değişen testler: 03a/06a muafiyetleri (gerekçeli) + yeni `test_11_4_read_mode_get_parity`. PR notu `state/pr/11.md` "PR 11-1 parity".
