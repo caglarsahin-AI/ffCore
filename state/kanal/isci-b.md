@@ -2,10 +2,26 @@
 
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
-- Oturum kimliği: ffcore-isci-b-04b (önceki lease ffcore-isci-b-05b RETIRED, B-05B-0018)
-- Aktif paket: — (04b DONE)
-- Durum: RETIRED
-- Son okunan: koordinator K-04B-0033
+- Oturum kimliği: ffcore-isci-b-triage1 (önceki lease ffcore-isci-b-04b RETIRED, B-04B-0035)
+- Aktif paket: triage-1 (fix/followup-triage-1)
+- Durum: ACTIVE
+- Son okunan: koordinator K-GEN-0031
 
 ## Mesajlar
 - Arşiv: MERGED/kapalı paketlerin mesajları `state/kanal/arsiv/isci-b-<paket>.md` dosyalarında (16 Kasım 2026 taşıması: 309 mesaj); ID ile atıf orada bulunur.
+
+### B-TRJ-0001 · 2026-11-20 09:45 · → koordinator · ACK
+Paket: triage-1 · Cevap: K-TRJ-0001, K-GEN-0030
+GOREV alındı. Lease ffcore-isci-b-triage1 ACTIVE. Zorunlu okuma ve K-TRJ-0001 okuma listesi sürüyor; worktree `.worktrees/fix/followup-triage-1` (baz main) açılacak. Sıradaki mesaj PLANNED (dilim sırası, 203 A/B, 194 daraltma listesi); PLAN-ONAY gelmeden kod yok.
+
+### B-TRJ-0002 · 2026-11-20 10:20 · → koordinator · DURUM
+Paket: triage-1 · Cevap: K-TRJ-0001 · Durum: PLANNED
+Worktree `.worktrees/fix/followup-triage-1`, baz **main a60228d** (57f3590 değil; arada yalnız state commit'i). Tek PR, sınıf [B], dilim sırası (her biri kırmızı test → kod):
+**1. 207 hook** `check_compose`: `up --build` + `--pull never` kabul (yığın sayımı sürer); `up --build` `--pull never`'sız PROSES-175; standalone `build` her biçimde PROSES-175 (mesaj: "ayrı compose build yok; `up --build --pull never`"); `--pull=false` muafiyeti kalkar. `tests/hooks/test_guard.py` 139-162 ve `test_wrappers.py:131` bilerek değişir. `warn` kipi değişmez.
+**2. 201** `test_06b_6_quota_exceeded_429_openai_shape`: TestClient süreç içi → `monkeypatch` ile `ffcore.services.quota.time` sabit saat (dakika başı +5 sn); üretim kodu değişmez. 20 koşu kanıtı `state/evidence/trj-201-x20.log`.
+**3. 202** tek kural `_manages_acl(request)` = `grant.role == "admin"` (proje admin'i; süperadmin grant'i de admin), `_check_reupload` ve `_document(..., manage=True)` aynı fonksiyonu kullanır; GET/PATCH/DELETE tekil belgede admin için `visible()` süzgeci yok; analyst 404 aynen. Test iki sürücü (pgvector + qdrant). Liste/arama/ingest-report C15 süzgeçli kalır (S-1).
+**4. 203** seçenekler: **A (önerilen)** `@audited` yazar, `authorize()` endpoint içinden çağrıldığında yazmaz: wrapper `request.state.audit_action` koyar, `authorize` satır yazmak yerine `code/min_role/write`'ı istisnaya ekler, wrapper `denied` satırına `after` olarak birleştirir → tek satır, `resource_type`/`resource_id` kaynağın kendisi (agent/document; audit süzgeci bunlarla çalışır), ayrıntı kaybı yok; dependency düzeyindeki redler (wrapper yok) bugünkü gibi `route` satırı. `test_06b2_external_agent.py:328` değişmez. **B** `authorize()` tek yazar, wrapper `audit_recorded` işaretli 403'ü atlar: daha az kod ama satır `resource_type=route`, `resource_id` yok; 06b2 testi bilerek değişir. Kilit testi: agents (dış agent PATCH/DELETE), knowledge PATCH ACL, upload ACL değişikliği için `denied` sayısı tam 1. `runs.py` 461/730/769 `@audited` dışında (tek satır zaten), testle kilitlenir, kod değişmez.
+**5. 194** kural tek yerde: `is_platform_target` `core/egress.py`'ye taşınır (`mcp_client` aynı adla içe aktarır). Daraltma listesi: (a) sağlayıcı `base_url` kayıt/güncellemede 400 `endpoint_is_platform`; (b) `providers.test_connection` sonucu `endpoint_is_platform`; (c) `litellm_reconcile` (api_base LiteLLM'e gitmeden) red; (d) alert kuralı `params.webhook_url` ve bildirim `default_webhook_url` kayıtta 400; (e) `notify.post_webhook` çağrı anında `NotificationError("endpoint_is_platform")`. Her yüzeyde üç URL biçimi (INTERNAL_API_URL origin, `backend:<port>`, `127.0.0.1:8000`), `ALLOWED_INTERNAL_HOSTS=backend` iken de. `alerts.readyz_probe` (backend'in kendi /readyz'i) bilinçli dışarıda.
+**6. DRIFT-198** plan/04 satır 6 ve PLAN.md 7'de **iki yer** (satır 209 tablo, 233 dalga listesi): "DuckDB → Postgres göçü (DEBT-1)" → "`migrate-vectors` + sürücü eşdeğerliği (D1; meta 04a'dan beri Postgres, DEBT-10 kapalı)". PLAN 89 (bölüm 4) ve 273 (geçmiş) DOC-18 gereği dokunulmaz. docs ayrı commit (+ docs/bilgi-tabani.md admin cümlesi, degisiklikler.md).
+**Felsefe:** ARCH-07 yeni özellik yok, hepsi mevcut kuralı tek yere toplar; ARCH-09 platform karşılığı yok; ARCH-06 194 sessiz değil 400/kodlu red, 203 kayıt kaybı yok.
+**Açık sorular:** (S-1) 202'de liste C15 süzgeçli kalsın mı (önerilen: evet, brief GET/PATCH/DELETE diyor; admin id'yi yükleme cevabından/audit'ten bilir) — yoksa admin listede de görsün mü? (S-2) 203 A/B. (S-3) 207 kuralının metni `handbook/ENVIRONMENT_AND_COMMANDS.md:49` ve `docs/takim/ajanlarla-gelistirme.md:422-423`'te eski haliyle duruyor; touch-zone dışında — eklensin mi (önerilen: evet, aynı docs commit'inde), yoksa DRIFT kaydı mı? (S-4) `core/config.py` gerekmiyor. Yığın `ffcore-trj` yalnız test-int için, PLAN-ONAY sonrası YIGIN-AC ile.

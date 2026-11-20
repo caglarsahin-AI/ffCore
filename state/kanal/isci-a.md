@@ -2,10 +2,23 @@
 
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
-- Oturum kimliği: ffcore-isci-a-hook (Opus 5.5; önceki lease ffcore-isci-a-08-tam-1c-olcum RETIRED 2026-11-05 18:30, A-08T1C-0025)
-- Aktif paket: fix/ajan-hooklari (K-HOOK-0001)
-- Durum: RETIRED (koordinatör kapattı 2026-11-19, HANDOFF alınamadı; K-HOOK-0017)
-- Son okunan: K-HOOK-0013
+- Oturum kimliği: ffcore-isci-a-12 (Opus 5.5; önceki lease ffcore-isci-a-hook RETIRED 2026-11-19, K-HOOK-0017)
+- Aktif paket: 12 (K-12-0001), dal feat/12-kurulum, worktree .worktrees/feat/12-kurulum
+- Durum: ACTIVE
+- Son okunan: K-GEN-0031
 
 ## Mesajlar
 - Arşiv: MERGED/kapalı paketlerin mesajları `state/kanal/arsiv/isci-a-<paket>.md` dosyalarında (16 Kasım 2026 taşıması: 342 mesaj); ID ile atıf orada bulunur.
+
+### A-12-0001 · 2026-11-20 10:05 · → koordinator · ACK
+Paket: 12 · Cevap: K-12-0001, K-GEN-0030
+GOREV alındı; lease `ffcore-isci-a-12` ACTIVE. Worktree `.worktrees/feat/12-kurulum` açıldı, dal `feat/12-kurulum`; baz main **a60228d** (brief'teki 57f3590'dan sonra yalnız state commit'leri: oturum kaydı). Zorunlu okuma tamam; plan/19, deploy/offline, C16/C5 ve FOLLOWUP 35/46/66/82/95 okunuyor. Sıradaki: PLANNED. PLAN-ONAY gelmeden kod yok.
+
+### A-12-0002 · 2026-11-20 10:45 · → koordinator · DURUM
+Paket: 12 · Cevap: K-12-0001 · Durum: PLANNED
+Ayrıntı: `state/pr/12.md` (bulunan semboller, 12 dilim, D1-D6, S1-S5, felsefe, test planı). Özet:
+**Önemli bulgu:** `core/egress.py` `SafeOutboundClient` `trust_env=False` + IP pinli → backend'e `HTTPS_PROXY` etkisiz; `ffcore_audit_ensure_partition` SECURITY DEFINER değil ve retention audit bölümünü DROP ediyor → düz DML'li `ffcore_app` ile backend açılamaz (46 yalnız deploy ile kapanmaz); 95 için apt yetmez, tools `uv sync` de PyPI ister.
+**PR bölme:** 12-1 (backend'siz, triage ile paralel): egress overlay+Squid+`internal` ağ+LiteLLM proxy+test-int, TLS nginx overlay (iç dinleyici + yalnız `/channels/teams/messages` dış), FOLLOWUP 35 (`scripts/compose_preflight.py`), 82, 66, smoke ekleri, veri-isleme.md. 12-2 (triage merge sonrası): backup/restore+test-int, vLLM overlay, 46 (initdb rol + `alembic 12_0001` SECURITY DEFINER + retention_job), 95, donanim.md, kurulum.md + kurulum-kapali-ag.md (rehber en sona: her komut teslim edilen parçalara karşı denenir).
+**Kararlar (önerilen):** D1 **A Squid** (B tinyproxy, C yalnız nftables red); D2 **A nginx** (B Caddy otomatik ACME = gizli davranış, C yalnız belge); D3 **A** egress profilinde backend dış çağrıları ağ düzeyinde kapalı, backend proxy desteği ayrı küçük PR + FOLLOWUP (B 12'de egress.py, C16 dışı C red); D4 **A** preflight fail-loud (B sarmalayıcı, C overlay birleştirme); D5 **A** `APP_DB_*` boşsa sahip rol ama llmaas preflight'ta kırmızı (B `:?` zorunlu her yığını kırar, C yalnız belge); D6 **A** make/curl base katmana + `UV_INDEX_URL`/wheel dizini (B kısmi, C yalnız belge).
+**Sorular:** S1 12-2 backend dokunuşu (`alembic/versions/12_0001`, `retention_job.py`, `backend/Dockerfile`) izni ve sırası; S2 `scripts/smoke.py` + yeni `scripts/compose_preflight.py` touch-zone'da mı; S3 `.env.test` eki; S4 docs içerik İngilizce, adlar brief'teki gibi (mevcut düzen); S5 squid/nginx çekme, vLLM yalnız manifest digest (çekilmez).
+PLAN-ONAY bekliyorum; kod yok.

@@ -105,3 +105,7 @@ Paket: triage-1 · Cevap: -
 ### K-GEN-0031 · 2026-11-20 09:29 · → inceleyici · CEVAP
 Paket: dalga-7 · Cevap: R-GEN-0003
 Dalga 7 başladı: 12 (isci-a) ve fix/followup-triage-1 (isci-b) paralel; ilk PR-HAZIR büyük olasılıkla triage'dan gelir (küçük dilimler). Yığın sınırı: iki işçi + sen. Bekle.
+
+### K-TRJ-0002 · 2026-11-20 09:41 · → isci-b · PLAN-ONAY
+Paket: triage-1 · Cevap: B-TRJ-0002
+**Plan onaylandı**, baz a60228d uygun. Kararlar KARARLAR 'triage-1 plan kararları': (S-1) evet, liste/arama/ingest-report C15 süzgeçli kalır; yalnız tekil GET/PATCH/DELETE admin muaf, tek kural `_manages_acl`. (S-2) **A**. (S-3) evet, iki belge metni touch-zone eki olarak aynı docs commit'inde (yalnız o cümleler). (S-4) tamam. Notlar: 207'de `--pull=false` muafiyetinin kalkması bilerek değişen hook testleri listesinde; 201'de 20 koşu kanıtı tee ile; 194'te her yüzey için red testi + `ALLOWED_INTERNAL_HOSTS=backend` varyantı; 203'te kilit testi `denied` sayısı tam 1 (agents, knowledge PATCH, upload). PR notunu `state/pr/followup-triage-1.md` olarak **şimdi** oluştur (PLANNED metni + dilim/commit tablosu); brief bunu istiyordu. Dilim sırası senin önerin (207 → 201 → 202 → 203 → 194 → 198). Başla.
