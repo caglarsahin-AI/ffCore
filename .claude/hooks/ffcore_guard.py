@@ -110,7 +110,7 @@ GREP_PATTERN_OPTS = frozenset({"-e", "--regexp"})
 GREP_GLOB_OPTS = frozenset({"-g", "--glob", "--iglob", "--exclude", "--include", "--exclude-dir"})
 GREP_GLOB_PREFIXES = ("--exclude=", "--include=", "--exclude-dir=", "--glob=", "--iglob=")
 PAYCORE_RE = re.compile(r"paycorellm[/\\]+(?:data|eval[/\\]+results)(?:[/\\]|\b)", re.IGNORECASE)
-LOG_DETAIL_MAX = 120
+LOG_DETAIL_MAX = 240  # K-HKE-0002: 120 left warn lines unclassifiable
 # Log masking (SECURITY_AND_PERMISSIONS: logs carry no secrets); applied before truncation.
 MASKS = (
     # -u user:pass, -uuser:pass, --user user:pass, --user=user:pass
@@ -985,6 +985,44 @@ def strip_heredocs(command: str) -> tuple[str, list[str]]:
     return "\n".join(out), code
 
 
+def has_tee(parts: list[list[str]]) -> bool:
+    """True when one element of a pipeline (token lists) is `tee`."""
+    return any(
+        strip_assignments(unwrap(t))[:1] and basename(strip_assignments(unwrap(t))[0]) == "tee"
+        for t in parts
+    )
+
+
+def heredoc_commands(command: str) -> tuple[str, list[tuple[bool, str]]]:
+    """(shell text without heredoc bodies, [(tee on the heredoc's line, body)] for bodies
+    read by sh/bash) for the command rules (KAPI, PROSES-175, PUSH, YIGIN).
+
+    Data and interpreter bodies are dropped: their text is never run by this shell. The ENV
+    rule keeps its own reading (strip_heredocs: interpreter code is scanned, MINOR-2)."""
+    lines = command.split("\n")
+    out: list[str] = []
+    bodies: list[tuple[bool, str]] = []
+    i = 0
+    while i < len(lines):
+        line = lines[i]
+        out.append(line)
+        i += 1
+        for m in HEREDOC_RE.finditer(line):
+            body: list[str] = []
+            while i < len(lines) and lines[i].strip() != m.group(2):
+                body.append(lines[i])
+                i += 1
+            i += 1
+            if heredoc_reader(line, m) == "shell":
+                tee = any(
+                    has_tee([tokens(extract_nested(p)[0]) for p in pipeline])
+                    for pipeline in split_pipelines(line)
+                    if "<<" in "".join(pipeline)
+                )
+                bodies.append((tee, "\n".join(body)))
+    return "\n".join(out), bodies
+
+
 def grep_files(toks: list[str]) -> list[str]:
     """Arguments of grep/rg without the pattern and glob filters (those are text)."""
     kept: list[str] = []
@@ -1079,13 +1117,23 @@ def check_bash(
                 "PAYCORE", "paycoreLLM data/** ve eval/results/** okunmaz (CLAUDE.md, PLAN 2d)"
             )
         )
+    # Command rules read the shell text without heredoc bodies (K-HKE-0002 K1 A): a data body
+    # (`cat >> kanal.md <<EOF`) or interpreter code (`python - <<EOF`) is not a command; a body
+    # read by sh/bash is a script, checked one level deeper with the tee of its own line.
+    command, shell_bodies = heredoc_commands(command)
+    for line_tee, body in shell_bodies:
+        if depth >= MAX_NESTING:
+            found.append(DEPTH_VIOLATION)
+        else:
+            found.extend(
+                check_bash(
+                    body, payload, env, outer_tee=outer_tee or line_tee, depth=depth + 1, top=False
+                )
+            )
     for pipeline in split_pipelines(command):
         pieces = [extract_nested(p) for p in pipeline]
         parts = [tokens(outer) for outer, _, _ in pieces]
-        tee = outer_tee or any(
-            strip_assignments(unwrap(t))[:1] and basename(strip_assignments(unwrap(t))[0]) == "tee"
-            for t in parts
-        )
+        tee = outer_tee or has_tee(parts)
         for toks in parts:
             if toks:
                 found.extend(check_tokens(toks, tee, payload, env, depth))
@@ -1288,7 +1336,11 @@ def check_write(path: str, payload: Mapping, env: Mapping[str, str]) -> list[Vio
             return [Violation("TEK-YAZAR", f"{rel} → {name}; senin rolün {info.rol}")]
         return []
     expected = info.pr or (info.paket.replace("/", "-") if info.paket else None)
-    if info.rol not in WORKER_ROLES or expected is None or expected.lower() != name.lower():
+    # A package split into PRs writes state/pr/<pr>-<n>.md (04b-1, 04b-2; K-HKE-0002 K1).
+    own = expected is not None and re.fullmatch(
+        rf"{re.escape(expected)}(?:-\d+)?", name, re.IGNORECASE
+    )
+    if info.rol not in WORKER_ROLES or not own:
         return [
             Violation(
                 "TEK-YAZAR",
