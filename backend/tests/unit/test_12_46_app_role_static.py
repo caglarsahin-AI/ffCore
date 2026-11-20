@@ -13,7 +13,9 @@ DEPLOY = REPO / "deploy"
 COMPOSE = yaml.safe_load((DEPLOY / "docker-compose.yml").read_text(encoding="utf-8"))
 SERVICES = COMPOSE["services"]
 MIGRATION = next((REPO / "backend" / "alembic" / "versions").glob("12_0001_*.py"))
-OWNER_URL = "postgresql+psycopg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}"
+OWNER_URL = (
+    "postgresql+psycopg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}"
+)
 
 
 def test_12_46_application_services_connect_as_the_app_role():
@@ -42,7 +44,8 @@ def test_12_46_postgres_gets_the_role_password_for_initdb():
 
 def test_12_46_role_sql_has_no_password_and_is_idempotent():
     sql = (DEPLOY / "postgres" / "app-role.sql").read_text(encoding="utf-8")
-    assert "PASSWORD" not in sql.upper()
+    # No password clause (comments may name the setting and \password).
+    assert not re.search(r"PASSWORD\s+['\":]", sql, re.I)
     assert "ALTER DEFAULT PRIVILEGES" in sql
     assert re.search(r"REVOKE\s+UPDATE,\s*DELETE,\s*TRUNCATE\s+ON\s+audit_events", sql)
     init = (DEPLOY / "postgres" / "initdb" / "20-app-role.sh").read_text(encoding="utf-8")
