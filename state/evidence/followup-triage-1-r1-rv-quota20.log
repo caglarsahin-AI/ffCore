@@ -1,0 +1,23 @@
+HEAD=292f2907d56486b1476644d194211b6ebfdde1d0 (git archive copy)
+2 passed, 28 deselected in 18.14s
+2 passed, 28 deselected in 12.19s
+2 passed, 28 deselected in 12.24s
+2 passed, 28 deselected in 12.37s
+2 passed, 28 deselected in 12.27s
+2 passed, 28 deselected in 12.07s
+2 passed, 28 deselected in 12.71s
+2 passed, 28 deselected in 12.24s
+2 passed, 28 deselected in 12.08s
+2 passed, 28 deselected in 12.98s
+2 passed, 28 deselected in 12.06s
+2 passed, 28 deselected in 12.63s
+2 passed, 28 deselected in 13.30s
+2 passed, 28 deselected in 12.58s
+2 passed, 28 deselected in 13.18s
+2 passed, 28 deselected in 12.51s
+2 passed, 28 deselected in 13.90s
+2 passed, 28 deselected in 12.56s
+2 passed, 28 deselected in 12.43s
+2 passed, 28 deselected in 11.55s
+runs=20 pass=20 fail=0
+exit 0

@@ -74,3 +74,9 @@
 2026-11-20T11:24:32	warn	isci-b	Bash	KAPI	cd /c/ai_paycore/ffcore/.worktrees/fix/followup-triage-1 && FILES=$(sed 's#tests/#tests/#g' /tmp/trj_rerun_files.txt) &&
 2026-11-20T11:30:26	warn	isci-b	Bash	KAPI	docker restart ffcore-trj-litellm-1 >/dev/null && for i in $(seq 1 30); do s=$(docker inspect -f '{{.State.Health.Status
 2026-11-20T11:36:22	warn	isci-b	Bash	KAPI	cd /c/ai_paycore/ffcore && py -3.12 - <<'EOF' p='state/pr/followup-triage-1.md' s=open(p,encoding='utf-8').read() s=s.re
+2026-11-20T11:43:43	warn	inceleyici	Bash	KAPI	S=C:/Users/CAGLAR~1.SAH/AppData/Local/Temp/claude/9398d5fca5badfb5/ecb79a59-6471-4590-b997-842940d7a702/scratchpad && ca
+2026-11-20T11:46:31	warn	inceleyici	Bash	KAPI	S=C:/Users/CAGLAR~1.SAH/AppData/Local/Temp/claude/9398d5fca5badfb5/ecb79a59-6471-4590-b997-842940d7a702/scratchpad; cat 
+2026-11-20T12:07:00	warn	isci-a	Bash	KAPI	cat >> /c/ai_paycore/ffcore/state/kanal/isci-a.md <<'EOF' ### A-12-0005 · 2026-11-20 12:15 · → koordinator · YIGIN-KAPA 
+2026-11-20T12:08:33	warn	isci-a	Bash	KAPI	cat >> /c/ai_paycore/ffcore/state/pr/12.md <<'EOF' --- # PR 12-1 [B]: egress forward proxy, TLS reverse proxy, compose p
+2026-11-20T12:36:22	warn	inceleyici	Bash	KAPI	S=C:/Users/CAGLAR~1.SAH/AppData/Local/Temp/claude/9398d5fca5badfb5/ecb79a59-6471-4590-b997-842940d7a702/scratchpad; cd $
+2026-11-20T12:38:04	warn	inceleyici	Bash	KAPI	S=C:/Users/CAGLAR~1.SAH/AppData/Local/Temp/claude/9398d5fca5badfb5/ecb79a59-6471-4590-b997-842940d7a702/scratchpad; cd $

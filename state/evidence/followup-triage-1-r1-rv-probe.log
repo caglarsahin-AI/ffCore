@@ -1,0 +1,109 @@
+HEAD=292f2907d56486b1476644d194211b6ebfdde1d0 (git archive copy)
+PROBE U 'http://backend:8000': platform=True egress=allowed
+PROBE U 'http://BACKEND:9999/': platform=True egress=allowed
+PROBE U 'http://backend./x': platform=True egress=allowed
+PROBE U 'https://backend': platform=True egress=allowed
+PROBE U 'http://evil.test@backend:8000': platform=True egress=allowed
+PROBE U 'http://backend:8000@evil.test/': platform=False egress=denied:egress_not_allowlisted
+PROBE U 'http://localhost:8000': platform=True egress=denied:egress_not_allowlisted
+PROBE U 'http://127.0.0.1:8000': platform=True egress=denied:egress_not_allowlisted
+PROBE U 'http://[::1]:8000': platform=True egress=denied:egress_not_allowlisted
+PROBE U 'http://0.0.0.0:8000': platform=False egress=denied:egress_not_allowlisted
+PROBE U 'http://127.1:8000': platform=False egress=denied:egress_not_allowlisted
+PROBE U 'http://2130706433:8000': platform=False egress=denied:egress_not_allowlisted
+PROBE U 'http://ffcore-rv-backend-1:8000': platform=False egress=denied:egress_not_allowlisted
+PROBE U 'http://ffcore-api.internal:8443/v1': platform=True egress=denied:egress_not_allowlisted
+PROBE U 'https://ffcore-api.internal:8443': platform=False egress=denied:egress_not_allowlisted
+PROBE U 'http://127.0.0.1:11434': platform=False egress=denied:egress_not_allowlisted
+PROBE U 'not a url': platform=False egress=denied:egress_invalid_url
+PROBE U 'http://[bad': platform=False egress=denied:egress_not_allowlisted
+2026-11-20 09:38:36,433 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-20 09:38:36,456 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=368
+2026-11-20 09:38:36,639 INFO ffcore.access access method=POST path=/api/v1/providers status=201 ms=174
+2026-11-20 09:38:36,736 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-20 09:38:36,756 INFO ffcore.access access method=POST path=/api/v1/providers/test status=200 ms=113
+.PROBE Q qdrant {'url': 'http://backend:8000'}: create=201 {"id":"7dfc3a6b-2d83-4c74-b28d-fbb716790d1f","key":"rv-a1bed47a","label":"P","description":null,"driver":"qdrant","domains":["vector"],"config":{"url":"http://b | test=200 {"supported":true,"ok":false,"code":"endpoint_is_platform","message":"The provider URL points at the FFCore backend.","latency_ms":null}
+2026-11-20 09:38:36,819 INFO ffcore.access access method=POST path=/api/v1/providers status=400 ms=55
+2026-11-20 09:38:36,876 INFO ffcore.access access method=POST path=/api/v1/providers/test status=400 ms=54
+PROBE Q ollama {'base_url': 'http://backend.:8000'}: create=400 {"error":{"message":"The provider base_url points at the FFCore backend itself; give the target service's address.","type":"invalid_request_error","code":"endpo | test=400 {"error":{"message":"The provider base_url points at the FFCore backend itself; give the target service's address.","type":"invalid_request_error","code":"endpoint_is_platform"}}
+2026-11-20 09:38:36,937 INFO ffcore.access access method=POST path=/api/v1/providers status=400 ms=54
+2026-11-20 09:38:36,997 INFO ffcore.access access method=POST path=/api/v1/providers/test status=400 ms=56
+PROBE Q ollama {'base_url': 'http://BACKEND:8000'}: create=400 {"error":{"message":"The provider base_url points at the FFCore backend itself; give the target service's address.","type":"invalid_request_error","code":"endpo | test=400 {"error":{"message":"The provider base_url points at the FFCore backend itself; give the target service's address.","type":"invalid_request_error","code":"endpoint_is_platform"}}
+2026-11-20 09:38:37,065 INFO ffcore.access access method=POST path=/api/v1/providers status=400 ms=60
+2026-11-20 09:38:37,125 INFO ffcore.access access method=POST path=/api/v1/providers/test status=400 ms=57
+PROBE Q ollama {'base_url': 'http://evil.test@backend:8000'}: create=400 {"error":{"message":"The provider base_url points at the FFCore backend itself; give the target service's address.","type":"invalid_request_error","code":"endpo | test=400 {"error":{"message":"The provider base_url points at the FFCore backend itself; give the target service's address.","type":"invalid_request_error","code":"endpoint_is_platform"}}
+2026-11-20 09:38:37,484 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-20 09:38:37,504 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=169
+2026-11-20 09:38:37,814 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-20 09:38:37,824 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=228
+2026-11-20 09:38:38,223 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-20 09:38:38,254 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=303
+2026-11-20 09:38:38,580 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-20 09:38:38,601 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=194
+2026-11-20 09:38:39,221 INFO ffcore.access access method=POST path=/api/v1/projects/c8ec4ff8-ba88-4350-99a4-49d66af8f54f/knowledge-bases status=201 ms=616
+2026-11-20 09:38:39,322 INFO ffcore.access access method=POST path=/api/v1/projects/c8ec4ff8-ba88-4350-99a4-49d66af8f54f/knowledge-bases/5419a996-3e23-4552-9cd5-93249984081d/documents status=202 ms=96
+2026-11-20 09:38:39,503 INFO ffcore.knowledge.ingest gold document=43601d56-7c11-4a97-b04c-35d255ca980d reused=0 embedded=1
+2026-11-20 09:38:39,685 INFO ffcore.access access method=GET path=/api/v1/projects/c8ec4ff8-ba88-4350-99a4-49d66af8f54f/knowledge-bases/5419a996-3e23-4552-9cd5-93249984081d/documents/43601d56-7c11-4a97-b04c-35d255ca980d status=200 ms=179
+.PROBE A1 admin GET: 200 secret_in_body=False keys=['acl_roles', 'acl_users', 'breadcrumb', 'chunk_count', 'convert_engine', 'convert_seconds', 'created_at', 'duplicate_of', 'error', 'filename', 'gate0', 'gate1', 'gate2', 'id', 'kb_id', 'language', 'metadata', 'mime_sniffed', 'page_count', 'sha256', 'size', 'status', 'updated_at', 'updated_at_source', 'version']
+2026-11-20 09:38:39,818 INFO ffcore.access access method=POST path=/api/v1/projects/c8ec4ff8-ba88-4350-99a4-49d66af8f54f/knowledge-bases/5419a996-3e23-4552-9cd5-93249984081d/search status=200 ms=123
+2026-11-20 09:38:39,915 INFO ffcore.access access method=POST path=/api/v1/projects/c8ec4ff8-ba88-4350-99a4-49d66af8f54f/knowledge-bases/5419a996-3e23-4552-9cd5-93249984081d/search status=200 ms=92
+PROBE A2 admin search hits: 0 analyst: 1
+2026-11-20 09:38:40,210 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-20 09:38:40,229 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=213
+2026-11-20 09:38:40,287 INFO ffcore.access access method=GET path=/api/v1/projects/c8ec4ff8-ba88-4350-99a4-49d66af8f54f/knowledge-bases/5419a996-3e23-4552-9cd5-93249984081d/documents/43601d56-7c11-4a97-b04c-35d255ca980d status=200 ms=54
+PROBE A3 read-only admin GET: 200
+2026-11-20 09:38:40,345 INFO ffcore.access access method=PATCH path=/api/v1/projects/c8ec4ff8-ba88-4350-99a4-49d66af8f54f/knowledge-bases/5419a996-3e23-4552-9cd5-93249984081d/documents/43601d56-7c11-4a97-b04c-35d255ca980d status=403 ms=54
+PROBE A4 read-only admin PATCH acl: 403 read_only_access rows=[('update_document', 'route', 'read_only_access', None)]
+2026-11-20 09:38:40,407 INFO ffcore.access access method=PATCH path=/api/v1/projects/c8ec4ff8-ba88-4350-99a4-49d66af8f54f/knowledge-bases/5419a996-3e23-4552-9cd5-93249984081d/documents/43601d56-7c11-4a97-b04c-35d255ca980d status=404 ms=54
+PROBE A5 stranger PATCH: 404 project_not_found rows=[('update_document', 'route', 'project_not_found', 'not_member')]
+2026-11-20 09:38:40,513 INFO ffcore.access access method=PATCH path=/api/v1/projects/c8ec4ff8-ba88-4350-99a4-49d66af8f54f/knowledge-bases/5419a996-3e23-4552-9cd5-93249984081d/documents/43601d56-7c11-4a97-b04c-35d255ca980d status=403 ms=100
+PROBE A6 reader analyst PATCH acl: 403 insufficient_role rows=[('update_document', 'document', 'insufficient_role', None)]
+2026-11-20 09:38:40,610 INFO ffcore.access access method=PATCH path=/api/v1/projects/c8ec4ff8-ba88-4350-99a4-49d66af8f54f/knowledge-bases/5419a996-3e23-4552-9cd5-93249984081d/documents/43601d56-7c11-4a97-b04c-35d255ca980d status=200 ms=92
+2026-11-20 09:38:40,730 INFO ffcore.access access method=POST path=/api/v1/projects/c8ec4ff8-ba88-4350-99a4-49d66af8f54f/knowledge-bases/5419a996-3e23-4552-9cd5-93249984081d/search status=200 ms=115
+PROBE A7 admin PATCH acl to role analyst: 200; peer search hits: 1
+2026-11-20 09:38:40,873 INFO ffcore.access access method=DELETE path=/api/v1/projects/c8ec4ff8-ba88-4350-99a4-49d66af8f54f/knowledge-bases/5419a996-3e23-4552-9cd5-93249984081d/documents/43601d56-7c11-4a97-b04c-35d255ca980d status=204 ms=139
+2026-11-20 09:38:40,990 INFO ffcore.access access method=POST path=/api/v1/projects/c8ec4ff8-ba88-4350-99a4-49d66af8f54f/knowledge-bases/5419a996-3e23-4552-9cd5-93249984081d/search status=200 ms=112
+2026-11-20 09:38:41,058 INFO ffcore.access access method=GET path=/api/v1/projects/c8ec4ff8-ba88-4350-99a4-49d66af8f54f/knowledge-bases/5419a996-3e23-4552-9cd5-93249984081d/documents/43601d56-7c11-4a97-b04c-35d255ca980d status=404 ms=62
+PROBE A8 admin DELETE: 204; analyst search hits: 0; admin GET after: 404
+2026-11-20 09:38:41,463 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-20 09:38:41,486 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=175
+2026-11-20 09:38:41,736 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-20 09:38:41,757 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=171
+2026-11-20 09:38:42,043 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-20 09:38:42,069 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=214
+2026-11-20 09:38:42,417 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-20 09:38:42,445 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=248
+2026-11-20 09:38:42,547 INFO ffcore.access access method=POST path=/api/v1/projects/b14c717d-3c40-472e-871a-7149a22cbaa0/knowledge-bases status=201 ms=98
+2026-11-20 09:38:42,667 INFO ffcore.access access method=POST path=/api/v1/projects/b14c717d-3c40-472e-871a-7149a22cbaa0/knowledge-bases/adcbf495-a0f2-42f1-bbf2-debd42a85858/documents status=202 ms=116
+2026-11-20 09:38:44,802 INFO ffcore.knowledge.ingest gold document=10b9ad7f-78d3-47b8-8005-c206c4212ebc reused=0 embedded=1
+2026-11-20 09:38:44,908 INFO ffcore.access access method=GET path=/api/v1/projects/b14c717d-3c40-472e-871a-7149a22cbaa0/knowledge-bases/adcbf495-a0f2-42f1-bbf2-debd42a85858/documents/10b9ad7f-78d3-47b8-8005-c206c4212ebc status=200 ms=99
+.PROBE A1 admin GET: 200 secret_in_body=False keys=['acl_roles', 'acl_users', 'breadcrumb', 'chunk_count', 'convert_engine', 'convert_seconds', 'created_at', 'duplicate_of', 'error', 'filename', 'gate0', 'gate1', 'gate2', 'id', 'kb_id', 'language', 'metadata', 'mime_sniffed', 'page_count', 'sha256', 'size', 'status', 'updated_at', 'updated_at_source', 'version']
+2026-11-20 09:38:45,021 INFO ffcore.access access method=POST path=/api/v1/projects/b14c717d-3c40-472e-871a-7149a22cbaa0/knowledge-bases/adcbf495-a0f2-42f1-bbf2-debd42a85858/search status=200 ms=109
+2026-11-20 09:38:45,143 INFO ffcore.access access method=POST path=/api/v1/projects/b14c717d-3c40-472e-871a-7149a22cbaa0/knowledge-bases/adcbf495-a0f2-42f1-bbf2-debd42a85858/search status=200 ms=118
+PROBE A2 admin search hits: 0 analyst: 1
+2026-11-20 09:38:45,414 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-20 09:38:45,436 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=183
+2026-11-20 09:38:45,505 INFO ffcore.access access method=GET path=/api/v1/projects/b14c717d-3c40-472e-871a-7149a22cbaa0/knowledge-bases/adcbf495-a0f2-42f1-bbf2-debd42a85858/documents/10b9ad7f-78d3-47b8-8005-c206c4212ebc status=200 ms=61
+PROBE A3 read-only admin GET: 200
+2026-11-20 09:38:45,558 INFO ffcore.access access method=PATCH path=/api/v1/projects/b14c717d-3c40-472e-871a-7149a22cbaa0/knowledge-bases/adcbf495-a0f2-42f1-bbf2-debd42a85858/documents/10b9ad7f-78d3-47b8-8005-c206c4212ebc status=403 ms=50
+PROBE A4 read-only admin PATCH acl: 403 read_only_access rows=[('update_document', 'document', 'insufficient_role', None), ('update_document', 'route', 'read_only_access', None)]
+2026-11-20 09:38:45,609 INFO ffcore.access access method=PATCH path=/api/v1/projects/b14c717d-3c40-472e-871a-7149a22cbaa0/knowledge-bases/adcbf495-a0f2-42f1-bbf2-debd42a85858/documents/10b9ad7f-78d3-47b8-8005-c206c4212ebc status=404 ms=46
+PROBE A5 stranger PATCH: 404 project_not_found rows=[('update_document', 'route', 'project_not_found', 'not_member')]
+2026-11-20 09:38:45,719 INFO ffcore.access access method=PATCH path=/api/v1/projects/b14c717d-3c40-472e-871a-7149a22cbaa0/knowledge-bases/adcbf495-a0f2-42f1-bbf2-debd42a85858/documents/10b9ad7f-78d3-47b8-8005-c206c4212ebc status=403 ms=104
+PROBE A6 reader analyst PATCH acl: 403 insufficient_role rows=[('update_document', 'document', 'insufficient_role', None)]
+2026-11-20 09:38:45,876 INFO ffcore.access access method=PATCH path=/api/v1/projects/b14c717d-3c40-472e-871a-7149a22cbaa0/knowledge-bases/adcbf495-a0f2-42f1-bbf2-debd42a85858/documents/10b9ad7f-78d3-47b8-8005-c206c4212ebc status=200 ms=150
+2026-11-20 09:38:46,066 INFO ffcore.access access method=POST path=/api/v1/projects/b14c717d-3c40-472e-871a-7149a22cbaa0/knowledge-bases/adcbf495-a0f2-42f1-bbf2-debd42a85858/search status=200 ms=185
+PROBE A7 admin PATCH acl to role analyst: 200; peer search hits: 1
+2026-11-20 09:38:46,306 INFO ffcore.access access method=DELETE path=/api/v1/projects/b14c717d-3c40-472e-871a-7149a22cbaa0/knowledge-bases/adcbf495-a0f2-42f1-bbf2-debd42a85858/documents/10b9ad7f-78d3-47b8-8005-c206c4212ebc status=204 ms=235
+2026-11-20 09:38:46,429 INFO ffcore.access access method=POST path=/api/v1/projects/b14c717d-3c40-472e-871a-7149a22cbaa0/knowledge-bases/adcbf495-a0f2-42f1-bbf2-debd42a85858/search status=200 ms=119
+2026-11-20 09:38:46,497 INFO ffcore.access access method=GET path=/api/v1/projects/b14c717d-3c40-472e-871a-7149a22cbaa0/knowledge-bases/adcbf495-a0f2-42f1-bbf2-debd42a85858/documents/10b9ad7f-78d3-47b8-8005-c206c4212ebc status=404 ms=63
+PROBE A8 admin DELETE: 204; analyst search hits: 0; admin GET after: 404
+.
+=============================== warnings summary ===============================
+tests/integration/test_04a_review_r1_acl.py:47
+  /work/backend/tests/integration/test_04a_review_r1_acl.py:47: PytestUnknownMarkWarning: Unknown pytest.mark.vectorstore - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.fixture(params=["pgvector", pytest.param("qdrant", marks=pytest.mark.vectorstore)])
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+4 passed, 1 warning in 21.75s
+exit 0
