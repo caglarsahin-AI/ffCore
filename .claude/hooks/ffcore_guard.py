@@ -944,10 +944,45 @@ def check_tokens(
     return found
 
 
+DOCKER_EXEC_VALUE_OPTS = frozenset(
+    {"-e", "--env", "--env-file", "-u", "--user", "-w", "--workdir", "--detach-keys"}
+)
+TIMEOUT_VALUE_OPTS = frozenset({"-s", "--signal", "-k", "--kill-after"})
+
+
+def reader_command(toks: list[str]) -> list[str]:
+    """The command that actually reads a heredoc, behind `env K=V`, `timeout N`,
+    `docker compose run|exec … <service>` and `docker exec … <container>` (r1 MINOR-2):
+    `docker compose run -T tools sh <<EOF` is read by sh. Bounded like the other nesting."""
+    toks = strip_assignments(unwrap(toks))
+    for _ in range(MAX_NESTING):
+        if not toks:
+            return toks
+        head = basename(toks[0])
+        if head == "timeout":
+            i = 1
+            while i < len(toks) and toks[i].startswith("-"):
+                i += 2 if toks[i] in TIMEOUT_VALUE_OPTS else 1
+            toks = strip_assignments(unwrap(toks[i + 1 :]))  # i is the duration
+            continue
+        service = compose_service_command(toks)
+        if service is not None:
+            toks = strip_assignments(unwrap(service[1]))
+            continue
+        if head == "docker":
+            pos, sub = subcommand(toks, 1, DOCKER_VALUE_OPTS)
+            if sub == "exec":
+                pos, container = subcommand(toks, pos + 1, DOCKER_EXEC_VALUE_OPTS)
+                toks = strip_assignments(unwrap(toks[pos + 1 :])) if container else []
+                continue
+        return toks
+    return toks
+
+
 def heredoc_reader(line: str, m: re.Match) -> str:
     """Who reads this heredoc: 'shell', 'code' (an interpreter) or 'data'."""
     segment = re.split(r"[;&|(]", line[: m.start()])[-1]
-    toks = unwrap(tokens(segment))
+    toks = reader_command(tokens(segment))
     reader = basename(toks[0]) if toks else ""
     piped = CODE_PIPE_RE.search(line[m.end() :])
     if piped:
@@ -1053,45 +1088,57 @@ def grep_files(toks: list[str]) -> list[str]:
     return kept
 
 
-def env_words(toks: list[str]) -> list[str]:
+def env_kind(toks: list[str]) -> str | None:
+    """'path' when `.env` is an argument or redirection of this command, 'code' when it is
+    in `py -c` / `node -e` code, else None."""
     toks = unwrap(toks)
     if not toks:
-        return []
+        return None
     head = basename(toks[0])
     args = grep_files(toks) if head in GREP_HEADS else toks
-    found = [a for a in args if not any(ch.isspace() for ch in a) and ENV_PATH_RE.search(a)]
-    if head in INTERPRETERS:
+    if any(not any(ch.isspace() for ch in a) and ENV_PATH_RE.search(a) for a in args):
+        return "path"
+    if head in INTERPRETERS and any(
         # `py -c` / `node -e` code is code, spaces or not (K-HOOK2-0007 MINOR-2)
-        found += [
-            code
-            for opt, code in zip(toks, toks[1:], strict=False)
-            if opt in INLINE_CODE_OPTS and CODE_ENV_RE.search(code)
-        ]
-    return found
+        opt in INLINE_CODE_OPTS and CODE_ENV_RE.search(code)
+        for opt, code in zip(toks, toks[1:], strict=False)
+    ):
+        return "code"
+    return None
 
 
-def env_hits(text: str) -> bool:
-    """True when `.env` stands in argument/redirection position anywhere in the command,
-    including groups, substitutions, `sh -c` text and `compose run|exec` commands.
-    Every recursion works on strictly shorter text, so it ends."""
+ENV_PATH_MESSAGE = ".env okunmaz ve yazılmaz; testler .env.test ile (SECURITY_AND_PERMISSIONS)"
+# r1 MINOR-1 A: the match is the same (interpreter code is a command, K-HOOK2-0007 MINOR-2);
+# the message names the cause and the way out.
+ENV_CODE_MESSAGE = (
+    "yorumlayıcı kodunda (heredoc gövdesi ya da -c) çıplak `.env` geçiyor; kod komut sayılır. "
+    "Metin düzenlemesiyse dosyayı Write/Edit aracıyla yaz ya da betiği Write ile dosyaya "
+    "koyup `py dosya.py` ile koş; .env okunmaz ve yazılmaz (SECURITY_AND_PERMISSIONS)"
+)
+
+
+def env_hits(text: str) -> str | None:
+    """'path' when `.env` stands in argument/redirection position anywhere in the command,
+    including groups, substitutions, `sh -c` text and `compose run|exec` commands; 'code' when
+    it is only in interpreter code (heredoc body, `-c`); else None (r1 MINOR-1: the message
+    says which). Every recursion works on strictly shorter text, so it ends."""
     text, code_bodies = strip_heredocs(text)
-    if any(CODE_ENV_RE.search(body) for body in code_bodies):
-        return True
+    kinds = {"code"} if any(CODE_ENV_RE.search(body) for body in code_bodies) else set()
     for pipeline in split_pipelines(text):
         for part in pipeline:
             outer, groups, subs = extract_nested(part)
-            if any(env_hits(body) for body in groups + subs):
-                return True
+            kinds.update(env_hits(body) for body in groups + subs)
             toks = tokens(outer)
-            if env_words(toks):
-                return True
+            kinds.add(env_kind(toks))
             inner = shell_inner(unwrap(toks))
-            if inner is not None and inner != text and env_hits(inner):
-                return True
+            if inner is not None and inner != text:
+                kinds.add(env_hits(inner))
             service = compose_service_command(unwrap(toks))
-            if service is not None and service[1] and env_hits(shlex.join(service[1])):
-                return True
-    return False
+            if service is not None and service[1]:
+                kinds.add(env_hits(shlex.join(service[1])))
+            if "path" in kinds:
+                return "path"  # a real argument or redirection outranks code text
+    return "code" if "code" in kinds else None
 
 
 def check_bash(
@@ -1105,12 +1152,9 @@ def check_bash(
     found: list[Violation] = []
     # ENV and PAYCORE judge the whole command once; env_hits does its own recursion with
     # heredoc handling (a nested call would see a data heredoc body as commands).
-    if top and env_hits(command):
-        found.append(
-            Violation(
-                "ENV", ".env okunmaz ve yazılmaz; testler .env.test ile (SECURITY_AND_PERMISSIONS)"
-            )
-        )
+    kind = env_hits(command) if top else None
+    if kind is not None:
+        found.append(Violation("ENV", ENV_CODE_MESSAGE if kind == "code" else ENV_PATH_MESSAGE))
     if top and PAYCORE_RE.search(command):
         found.append(
             Violation(
