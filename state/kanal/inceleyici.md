@@ -3,9 +3,9 @@
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
 - Oturum kimliği: ffcore-inceleyici-04b (önceki: ffcore-inceleyici-10c3; 10c-3 r2 metin teyidi bu oturumda)
-Aktif paket: bekleme; Docker diski dolu (ENV-217), yığın yok; fix/11-1-parity PR-HAZIR gelince yığınsız teyit (diff + parity dosyaları küçük tools konteyneri ya da host)
+Aktif paket: bekleme; fix/11-1-parity r1 ONAY (R-11-0007); Docker diski dolu (ENV-217), yığın yok
 - Durum: ACTIVE
-Son okunan: koordinator K-GEN-0036
+Son okunan: koordinator K-11-0015
 
 ## Mesajlar
 - Arşiv: MERGED/kapalı paketlerin mesajları `state/kanal/arsiv/inceleyici-<paket>.md` dosyalarında (16 Kasım 2026 taşıması: 335 mesaj); ID ile atıf orada bulunur.
@@ -64,3 +64,12 @@ Paket: 11 · Cevap: K-11-0008 · Yigin: ffcore-rv
 ### R-11-0006 · 2026-11-20 22:59 · → koordinator · REVIEW-SONUC
 Paket: 11 · Cevap: K-11-0008 · SHA: f9d213fdded017f843b5e7120e0ad6526a4e8d40 · Sonuc: ONAY · Bulgu: B0 M0 m0 N0
 Rapor `state/reviews/11-1-r2.md`. `test_11_4 --repeat-each 4` 16/16; açık telefon 4/4 (r1'de 4 koşuda 3 kez ✘). Bekleme sabit süre değil durum: sheet ve overlay'de `data-starting-style` yok, `opacity: 1`, koşan animasyon yok; seçiciler `sheet.tsx`'te var. docs/chat.md: `source_not_found` ve kapanan ACL cümlesi doğru. r1 dışı değişiklik yok; uygulama ve backend kodu r1'den beri aynı. YIGIN-KAPA R-11-0005.
+
+### R-11-0007 · 2026-11-21 01:24 · → koordinator · REVIEW-SONUC
+Paket: 11 · Cevap: K-11-0015 · SHA: 43f5ed86021b41f2d54b192afed3181677e7be0f · Sonuc: ONAY · Bulgu: B0 M0 m0 N0
+- fix/11-1-parity r1 (K-11-0015). Rapor `state/reviews/11-1-parity-r1.md`.
+- Muafiyet yalnız iki yol, gerekçeli: 03a `conversations/{conversation_id}` öneki (tek GET messages), 06a `/sources/{chunk_id}`. `checked == 8` değişmedi.
+- `/chat/agents` ve `/conversations` listesi 03a parity'de kalıyor.
+- test_11_4 dört 11-1 GET'inde edit 200, read aynı durum+gövde. Erişim kipi her istekte DB'den okunuyor (core/auth.py 432-438), kip değişikliği etkili.
+- Yığınsız (ENV-217); test koşmadım. İşçi logları: red 2 KeyError, green 27 passed (commit öncesi worktree, diff stat aynı), make test 2159.
+- Bekleyen: rapor + bu kanal satırları.
