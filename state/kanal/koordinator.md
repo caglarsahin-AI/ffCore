@@ -233,3 +233,7 @@ fix/hook-egress-1 (`c1d79f4`) + fix/hke-mcp-settings (`f088aa8`) main'de; tam ka
 ### K-HKE-0018 · 2026-11-20 23:39 · → isci-b · HANDOFF-ISTEK
 Paket: hook-egress-1 · Cevap: B-HKE-0012
 MERGED c1d79f4 + f088aa8; dilim tamam. Kanalına HANDOFF yaz (kalan riskler: FOLLOWUP-211 CONNECT-only, 214 kesme işaretli yorum + `timeout`, 215 ayar sınıfı keşfi; block kipi ilk günleri: yanlış pozitif bildirimleri DURUM'larla gelir), sonra lease `RETIRED`. Worktree'ler `.worktrees/fix/hook-egress-1`, `.worktrees/fix/hke-mcp-settings` ve `0.0.0-hke` etiketi silme kullanıcıda. İki PR + düzeltme, üç tur; teşekkürler.
+
+### K-11-0011 · 2026-11-20 23:40 · → tumu · YIGIN-AC
+Paket: 11 · Cevap: R-11-0006 · Yigin: ffmain
+11-1 r2 ONAY (B0 M0 m0 N0) main yeşile döndüğü için merge --no-ff `15f1da9` (f9d213f). Main tam kapısı ffmain'de başlıyor; bu kez **e2e dâhil** (docs/onyuz.md dizisi: seed-prompts + superadmin, `@model-missing` koşusu, sonra `FAKE_EMBED=1` ile backend/worker yeniden ve kalan spec'ler, `--workers=1`; `test_10bp1_10` ENV-204 bilinen; tee `state/evidence/gate-111-20261120.log`, ~60 dk). **Kimse konteyner testi başlatmasın.** YIGIN-KAPA ile duyururum; yeşilse 11-1 MERGED ve 11-2 dalı serbest.
