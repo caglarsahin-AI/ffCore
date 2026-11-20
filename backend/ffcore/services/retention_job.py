@@ -304,7 +304,11 @@ async def audit_partitions(
         return result
     for name in old:
         async with db.session_scope() as session:
-            await session.execute(text(f'ALTER TABLE audit_events DETACH PARTITION "{name}"'))
+            # 12 (FOLLOWUP-46): partition DDL runs as the owner's function; the application
+            # role has no DDL. The function accepts only attached audit_events partitions.
+            await session.execute(
+                text("SELECT ffcore_audit_detach_partition(:name)"), {"name": name}
+            )
             rows, first, last = (
                 await session.execute(text(f'SELECT count(*), min(ts), max(ts) FROM "{name}"'))
             ).one()
@@ -342,7 +346,9 @@ async def audit_partitions(
                         after={"rows": rows, "sha256": digest},
                     ),
                 )
-                await session.execute(text(f'DROP TABLE "{name}"'))
+                await session.execute(
+                    text("SELECT ffcore_audit_drop_partition(:name)"), {"name": name}
+                )
                 await session.commit()
         except Exception as exc:  # noqa: BLE001 - the detached table stays and is reported
             result.status, result.error_code = "partial", f"drop_failed:{type(exc).__name__}"
