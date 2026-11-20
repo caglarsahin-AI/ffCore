@@ -1,0 +1,15 @@
+All checks passed!
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE PreflightError
+
+tests/unit/test_12_compose_preflight.py:40: Failed
+=========================== short test summary info ============================
+FAILED tests/unit/test_12_46_app_role_static.py::test_12_r2_initdb_refuses_a_user_without_password
+FAILED tests/unit/test_12_46_app_role_static.py::test_12_r2_env_example_keeps_the_pair_empty_together
+FAILED tests/unit/test_12_46_app_role_static.py::test_12_r2_role_sql_keeps_audit_partitions_insert_and_select_only
+FAILED tests/unit/test_12_46_app_role_static.py::test_12_r2_lint_covers_tests_deploy
+FAILED tests/unit/test_12_compose_preflight.py::test_12_r2_half_a_role_pair_is_refused_in_every_profile[no-password-llmaas]
+FAILED tests/unit/test_12_compose_preflight.py::test_12_r2_half_a_role_pair_is_refused_in_every_profile[no-password-airgap]
+FAILED tests/unit/test_12_compose_preflight.py::test_12_r2_half_a_role_pair_is_refused_in_every_profile[no-user-llmaas]
+FAILED tests/unit/test_12_compose_preflight.py::test_12_r2_half_a_role_pair_is_refused_in_every_profile[no-user-airgap]
+8 failed, 43 passed in 1.19s

@@ -1,0 +1,21 @@
+=== 12-2 r2 gate 5ff32ed6526d1c3887c01823a1f1dd95efe9f6fd 2026-11-20 17:46:45
+--- lint
+ruff format --check backend scripts data/samples/scripts services tests/deploy
+551 files already formatted
+--- make test llmaas
+
+======================= 2117 passed in 231.57s (0:03:51) =======================
+--- make test airgap
+
+======================= 2117 passed in 241.25s (0:04:01) =======================
+--- targeted test-int
+37 passed in 16.27s
+--- vllm overlay config
+vllm config OK
+--- host preflight (.env.test)
+ok    DEPLOY_PROFILE=llmaas INFERENCE_BACKEND=ollama
+ok    database: application connects as ffcore_app
+--- down -v
+ Volume ffcore-12_redis_data  Removed
+0
+0

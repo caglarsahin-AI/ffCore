@@ -130,3 +130,19 @@ Paket: 12 · Cevap: K-12-0013, K-12-0019 · SHA: 080facffd6c1eeefd963cf8d5213274
 **Kanıt:** tam test-int (rebase öncesi, ffcore_app ile) 1138 passed/12 skipped; son hedefli kapı (rebase sonrası) lint 0, `make test` 2106×2, hedefli test-int 85 passed, rehber komutları, smoke; yedek provası geçti (sayılar + belge sha eşit, ikinci restore red). Loglar `12-2-{red-unit-*,46-*,backup-restore-prova,gate,test-int-full,final-gate,vllm-config}.log`.
 **Bilerek değişen testler:** `test_04b_1_…single_head_on_05b` (head `12_0001`), preflight/smoke testlerine `APP_DB_*`. **İki profilde düşen 2 birim** düzeltildi (`.env.test` sahte işareti, 04b head). **Gizli yetki kırmızısı yok**; restore'un `--no-acl` ile PUBLIC EXECUTE açığı bulundu ve düzeltildi. **Yolda:** vLLM ayrı imaj listesi, preflight Py 3.8+, `/readyz` curl.
 **NOT_RUN (PENDING_ENV):** GPU vLLM sunumu + P50/P95, ağsız tools derlemesi, test VM'de 1 saat kurulum, anahtarlı seed-models, iki sürüm geri alma. Tam test-int rebase sonrası tekrarlanmadı (gerekirse ENV-209 sırası).
+
+### A-12-0026 · 2026-11-20 19:40 · → koordinator · ACK
+Paket: 12 · Cevap: K-12-0022
+DUZELT r2 alındı (MAJOR-1 bölüm kapısı, MAJOR-2 rol tutarlılığı, NOTE-1/2/3). Sıra: kırmızı testler (ffcore_app ile cari ay detach/drop red, ayrılmış/bağlı bölümde UPDATE/DELETE permission denied, ensure ayrılmış bölümde hata, 365 günden eski bölüm geçer; preflight db_role_incomplete matrisi; initdb betiği birimi; lint yolu) → `12_0002` + app-role.sql + preflight + initdb → docs; hedefli kapı `12-2-r2-*.log`, tam test-int yok.
+
+### A-12-0027 · 2026-11-20 19:55 · → koordinator · YIGIN-AC
+Paket: 12 · Cevap: K-12-0022 · Yigin: ffcore-12
+r2 hedefli: önce eski göçle test-int kırmızısı (MAJOR-1), sonra `12_0002` ile yeşil, birim, lint; tam test-int yok.
+
+### A-12-0028 · 2026-11-20 20:55 · → koordinator · YIGIN-KAPA
+Paket: 12 · Cevap: K-12-0022 · Yigin: ffcore-12
+down -v (test,qdrant profilleri dahil); konteyner 0, volume 0, ağ 0.
+
+### A-12-0029 · 2026-11-20 20:56 · → koordinator · PR-HAZIR
+Paket: 12 · Cevap: K-12-0022 · SHA: 5ff32ed6526d1c3887c01823a1f1dd95efe9f6fd
+**12-2 r2.** Delta `080facf..5ff32ed`: 5 commit (test → fix MAJOR-1 → fix MAJOR-2 → style → docs), 15 dosya (+393/−20). MAJOR-1: yeni göç `12_0002` (365 gün tabanı fonksiyonda sabit, `audit_partition_too_recent`; ffcore_app audit bölümlerinde yalnız INSERT+SELECT, ayrılmışta SELECT; ensure ayrılmış ayda `audit_partition_detached`; app-role.sql mevcut volume). MAJOR-2: preflight her profilde `db_role_incomplete`, initdb yarım çiftte durur, `.env.example` ikisi boş. NOTE-1/2/3 yapıldı. Kırmızı: birim 8 F + test-int 4 F; yeşil: lint 0 (tests/deploy dahil), `make test` 2117×2, hedefli test-int 37, `12_0002` down/up, vLLM config, host preflight. Loglar `12-2-r2-{red-unit,red-test-int,green,gate}.log`. Bilerek değişen test: `test_12_2_llmaas_refuses_the_owner_as_application_user`. PR notu `state/pr/12.md` "12-2 r2". Tam test-int yok (ENV-209).

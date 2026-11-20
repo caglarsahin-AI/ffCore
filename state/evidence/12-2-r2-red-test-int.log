@@ -1,0 +1,8 @@
+
+tests/integration/test_12_46_app_role.py:189: Failed
+=========================== short test summary info ============================
+FAILED tests/integration/test_12_46_app_role.py::test_12_r2_current_month_cannot_be_detached_or_dropped
+FAILED tests/integration/test_12_46_app_role.py::test_12_r2_a_partition_younger_than_365_days_is_refused
+FAILED tests/integration/test_12_46_app_role.py::test_12_r2_role_has_only_insert_and_select_on_audit_partitions
+FAILED tests/integration/test_12_46_app_role.py::test_12_r2_ensure_refuses_a_detached_partition
+4 failed, 18 passed in 5.45s
