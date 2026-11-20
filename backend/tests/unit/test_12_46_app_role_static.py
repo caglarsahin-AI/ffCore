@@ -6,6 +6,7 @@ Behaviour: tests/integration/test_12_46_app_role.py (needs the role, i.e. a fres
 import re
 from pathlib import Path
 
+import pytest
 import yaml
 
 REPO = Path(__file__).resolve().parents[3]
@@ -124,6 +125,56 @@ def test_12_r2_initdb_creates_the_role_with_both(tmp_path):
     result, calls = _initdb(tmp_path, APP_DB_USER="ffcore_app", APP_DB_PASSWORD="x")
     assert result.returncode == 0, result.stderr
     assert "/ffcore/app-role.sql" in calls
+
+
+def test_hke_213_initdb_refuses_a_password_without_user(tmp_path):
+    # FOLLOWUP-213: compose would connect as the owner with the role's password while initdb
+    # created ffcore_app; the first start stops instead.
+    result, calls = _initdb(tmp_path, APP_DB_USER="", APP_DB_PASSWORD="x")
+    assert result.returncode != 0
+    assert "APP_DB_USER" in result.stderr and "APP_DB_PASSWORD" in result.stderr
+    assert calls == ""
+
+
+def _initdb_sourced(tmp_path, **env):
+    """The postgres entrypoint sources a non-executable *.sh under `set -e`."""
+    import os
+    import subprocess
+
+    bin_dir = tmp_path / "bin"
+    bin_dir.mkdir(exist_ok=True)
+    psql = bin_dir / "psql"  # a psql that always succeeds: only the script's own check stops
+    psql.write_text("#!/bin/sh\ncat > /dev/null\n", encoding="utf-8")
+    psql.chmod(0o755)
+    script = (DEPLOY / "postgres" / "initdb" / "20-app-role.sh").as_posix()
+    return subprocess.run(
+        ["sh", "-c", f'set -e; . "{script}"; echo AFTER-INIT'],
+        capture_output=True,
+        text=True,
+        env={
+            "PATH": f"{bin_dir}:{os.environ['PATH']}",
+            "POSTGRES_USER": "o",
+            "POSTGRES_DB": "d",
+            **env,
+        },
+    )
+
+
+@pytest.mark.parametrize(
+    "user,password", [("ffcore_app", ""), ("", "x")], ids=["no-password", "no-user"]
+)
+def test_hke_213_initdb_half_pair_stops_when_sourced(tmp_path, user, password):
+    result = _initdb_sourced(tmp_path, APP_DB_USER=user, APP_DB_PASSWORD=password)
+    assert result.returncode != 0
+    assert "AFTER-INIT" not in result.stdout
+
+
+def test_hke_213_env_example_says_initdb_stops_for_either_half():
+    env = (REPO / ".env.example").read_text(encoding="utf-8")
+    block = env.split("Least-privileged database role", 1)[1].split("APP_DB_USER=", 1)[0]
+    assert "APP_DB_USER without APP_DB_PASSWORD" in block
+    assert "APP_DB_PASSWORD without APP_DB_USER" in block
+    assert "initdb" in block and "db_role_incomplete" in block
 
 
 def test_12_r2_env_example_keeps_the_pair_empty_together():
