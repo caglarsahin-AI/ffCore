@@ -992,6 +992,26 @@ def heredoc_reader(line: str, m: re.Match) -> str:
     return "code" if reader in INTERPRETERS else "data"
 
 
+def unquoted_heredocs(line: str, quote: str | None) -> tuple[list[re.Match], str | None]:
+    """Heredoc operators of `line` that stand outside quotes, and the quote still open at the
+    end of the line. `quote` is the quote open from earlier lines (a multi-line `sh -c '…'`):
+    a `<<EOF` inside it belongs to the inner shell, which is checked on its own (r2)."""
+    open_at: list[str | None] = []
+    escaped = False
+    for ch in line:
+        open_at.append(quote)
+        if escaped:
+            escaped = False
+        elif ch == "\\" and quote != "'":
+            escaped = True
+        elif quote is None and ch in ("'", '"'):
+            quote = ch
+        elif ch == quote:
+            quote = None
+    matches = [m for m in HEREDOC_RE.finditer(line) if open_at[m.start()] is None]
+    return matches, quote
+
+
 def strip_heredocs(command: str) -> tuple[str, list[str]]:
     """(shell text, interpreter code bodies) for the ENV rule.
 
@@ -1002,11 +1022,13 @@ def strip_heredocs(command: str) -> tuple[str, list[str]]:
     out: list[str] = []
     code: list[str] = []
     i = 0
+    quote: str | None = None
     while i < len(lines):
         line = lines[i]
         out.append(line)
         i += 1
-        for m in HEREDOC_RE.finditer(line):
+        matches, quote = unquoted_heredocs(line, quote)
+        for m in matches:
             kind = heredoc_reader(line, m)
             body: list[str] = []
             while i < len(lines) and lines[i].strip() != m.group(2):
@@ -1038,11 +1060,13 @@ def heredoc_commands(command: str) -> tuple[str, list[tuple[bool, str]]]:
     out: list[str] = []
     bodies: list[tuple[bool, str]] = []
     i = 0
+    quote: str | None = None
     while i < len(lines):
         line = lines[i]
         out.append(line)
         i += 1
-        for m in HEREDOC_RE.finditer(line):
+        matches, quote = unquoted_heredocs(line, quote)
+        for m in matches:
             body: list[str] = []
             while i < len(lines) and lines[i].strip() != m.group(2):
                 body.append(lines[i])
