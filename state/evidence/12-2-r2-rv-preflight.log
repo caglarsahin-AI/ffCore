@@ -1,0 +1,14 @@
+HEAD=5ff32ed6526d1c3887c01823a1f1dd95efe9f6fd (git archive copy) · host Python 3.9
+PF [llmaas-user-only] exit=1 :: FAIL  preflight db_role_incomplete: APP_DB_USER and APP_DB_PASSWORD go together (both set or both empty): the application would connect as ffcore_app, which initdb does not create without APP_DB_PASSWORD 
+PF [llmaas-pw-only] exit=1 :: FAIL  preflight db_role_incomplete: APP_DB_USER and APP_DB_PASSWORD go together (both set or both empty): the application would connect as the owner with the role's password 
+PF [airgap-ollama-user-only] exit=1 :: FAIL  preflight db_role_incomplete: APP_DB_USER and APP_DB_PASSWORD go together (both set or both empty): the application would connect as ffcore_app, which initdb does not create without APP_DB_PASSWORD 
+PF [airgap-ollama-pw-only] exit=1 :: FAIL  preflight db_role_incomplete: APP_DB_USER and APP_DB_PASSWORD go together (both set or both empty): the application would connect as the owner with the role's password 
+PF [airgap-vllm-user-only] exit=1 :: FAIL  preflight db_role_incomplete: APP_DB_USER and APP_DB_PASSWORD go together (both set or both empty): the application would connect as ffcore_app, which initdb does not create without APP_DB_PASSWORD 
+PF [airgap-vllm-pw-only] exit=1 :: FAIL  preflight db_role_incomplete: APP_DB_USER and APP_DB_PASSWORD go together (both set or both empty): the application would connect as the owner with the role's password 
+PF [airgap-both-empty] exit=0 :: ok    DEPLOY_PROFILE=airgap INFERENCE_BACKEND=ollama ok    ollama: external (profile inactive; the address is the ollama provider's) ok    database: application connects as the owner (APP_DB_PASSWORD empty) 
+PF [llmaas-both] exit=0 :: ok    DEPLOY_PROFILE=llmaas INFERENCE_BACKEND= ok    database: application connects as ffcore_app 
+--- .env.example as shipped
+FAIL  preflight db_role_owner: APP_DB_USER/APP_DB_PASSWORD are empty: the application would connect as the owner (with DDL); set APP_DB_PASSWORD (docs/kurulum.md, database role)
+exit 1
+275:APP_DB_USER=
+277:APP_DB_PASSWORD=

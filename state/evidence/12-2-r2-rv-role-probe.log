@@ -1,0 +1,69 @@
+HEAD=5ff32ed6526d1c3887c01823a1f1dd95efe9f6fd · now=2026-11-20
+=== owner setup: old (13 months), near (12 months, inside floor), detached-by-owner
+ ffcore_audit_ensure_partition | ffcore_audit_ensure_partition | ffcore_audit_ensure_partition | ffcore_audit_ensure_partition 
+-------------------------------+-------------------------------+-------------------------------+-------------------------------
+ audit_events_2025_10          | audit_events_2025_11          | audit_events_2025_09          | audit_events_2026_11
+(1 row)
+
+INSERT 0 2
+ALTER TABLE
+       relname        | attached | ins | upd | del 
+----------------------+----------+-----+-----+-----
+ audit_events_2025_09 | f        | t   | f   | f
+ audit_events_2025_10 | t        | t   | f   | f
+ audit_events_2025_11 | t        | t   | f   | f
+ audit_events_2026_11 | t        | t   | f   | f
+ audit_events_2026_12 | t        | t   | f   | f
+(5 rows)
+
+=== as ffcore_app: current month
+ERROR:  audit_partition_too_recent: audit_events_2026_11 is inside the 365 days floor
+CONTEXT:  PL/pgSQL function ffcore_audit_detach_partition(text) line 18 at RAISE
+ERROR:  audit_partition_too_recent: audit_events_2026_11 is inside the 365 days floor
+CONTEXT:  PL/pgSQL function ffcore_audit_drop_partition(text) line 12 at RAISE
+ERROR:  permission denied for table audit_events_2026_11
+ERROR:  permission denied for table audit_events_2026_11
+     r     
+-----------
+ insert ok
+(1 row)
+
+INSERT 0 1
+=== inside the floor (2025_11, ends 2025-12-01)
+ERROR:  audit_partition_too_recent: audit_events_2025_11 is inside the 365 days floor
+CONTEXT:  PL/pgSQL function ffcore_audit_detach_partition(text) line 18 at RAISE
+=== ensure on a detached month
+=== 13 months old (2025_10): detach, read, no write, drop
+ERROR:  audit_partition_detached: audit_events_2025_09 exists but is not attached to audit_events
+CONTEXT:  PL/pgSQL function ffcore_audit_ensure_partition(date) line 23 at RAISE
+ERROR:  permission denied for table audit_events_2025_10
+ERROR:  permission denied for table audit_events_2025_10
+ERROR:  permission denied for table audit_events_2025_10
+ ffcore_audit_detach_partition 
+-------------------------------
+ audit_events_2025_10
+(1 row)
+
+ rows_detached 
+---------------
+             1
+(1 row)
+
+ ffcore_audit_drop_partition 
+-----------------------------
+ audit_events_2025_10
+(1 row)
+
+ gone 
+------
+ 
+(1 row)
+
+=== name guards still in place
+ERROR:  not an audit partition name: projects
+CONTEXT:  PL/pgSQL function ffcore_audit_detach_partition(text) line 4 at RAISE
+ ffcore_audit_drop_partition 
+-----------------------------
+ audit_events_2025_09
+(1 row)
+

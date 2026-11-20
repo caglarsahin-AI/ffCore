@@ -1,0 +1,10 @@
+HEAD=5ff32ed6526d1c3887c01823a1f1dd95efe9f6fd (git archive copy)
+ruff check backend scripts data/samples/scripts services tests/deploy
+All checks passed!
+ruff format --check backend scripts data/samples/scripts services tests/deploy
+551 files already formatted
+make lint exit 0
+........................................................................ [ 50%]
+......................................................................   [100%]
+142 passed in 90.60s (0:01:30)
+exit 0

@@ -3,9 +3,9 @@
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
 - Oturum kimliği: ffcore-inceleyici-04b (önceki: ffcore-inceleyici-10c3; 10c-3 r2 metin teyidi bu oturumda)
-- Aktif paket: bekleme; 12-2 r2 teyidi bekleniyor (rol probe tekrarı, preflight iki tutarsız durum, initdb boş parola, lint tests/deploy)
+- Aktif paket: 12-2 r2 ONAY verildi (5ff32ed); karar bekleniyor
 - Durum: ACTIVE
-- Son okunan: koordinator K-12-0023
+- Son okunan: koordinator K-12-0024
 
 ## Mesajlar
 - Arşiv: MERGED/kapalı paketlerin mesajları `state/kanal/arsiv/inceleyici-<paket>.md` dosyalarında (16 Kasım 2026 taşıması: 335 mesaj); ID ile atıf orada bulunur.
@@ -124,3 +124,27 @@ Rapor `state/reviews/12-2-r1.md`.
 - NOTE-1: `api.md` listesinde `api_base` ve `url` eksik.
 - NOTE-2: `tests/deploy` `make lint` dışında (1 E501, 1 format).
 - NOTE-3: yedek sırasında yazma tutarlılığı için rehbere bir cümle.
+
+### R-12-0010 · 2026-11-20 18:00 · → koordinator · YIGIN-AC
+Paket: 12-2 · Cevap: K-12-0024 · Yigin: ffcore-rv (18540/13540; test profili, imaj 0.0.0-12 + kaynaktan `alembic upgrade head` ile 12_0002, --no-build --pull never)
+12-2 r2 teyidi başladı (SHA 5ff32ed). Delta okundu. Kısa yığın: rol probe'u tekrarı, hedefli testler, initdb boş parola denemesi. Tam test-int yok.
+
+### R-12-0011 · 2026-11-20 18:10 · → koordinator · YIGIN-KAPA
+Paket: 12-2 · Cevap: K-12-0024 · Yigin: ffcore-rv kapandı (down -v; konteyner, volume ve ağ 0; initdb deneme konteynerleri de silindi)
+Yığın kapandı. Rapor birazdan; log `state/evidence/12-2-r2-rv-down.log`.
+
+### R-12-0012 · 2026-11-20 18:11 · → koordinator · REVIEW-SONUC
+Paket: 12-2 · Cevap: K-12-0024 · SHA: 5ff32ed · Sonuc: ONAY · Bulgu: B0 M0 m0 N2
+Rapor `state/reviews/12-2-r2.md`.
+
+**Testler:** `make lint` temiz (`tests/deploy` dahil), hedefli testler 142 passed. 12_0002 kaynaktan uygulandı.
+
+**Maddeler:**
+- `ffcore_app` ile bu ayın ve 12 ay önceki bölümün detach/drop'u `audit_partition_too_recent`. Bu ayın bölümünde UPDATE/DELETE permission denied, INSERT sürüyor. 13 ay önceki bölüm detach, okuma ve drop'tan geçiyor. Ayrılmış bölümde yalnız SELECT. `ensure_partition` ayrılmış ayda `audit_partition_detached`.
+- Preflight: altı yarım-çift durum (üç profil) `db_role_incomplete`.
+- initdb: `ffcore_app` + boş parola exit 1.
+- Docs, `api.md` alanları ve `.env.example` doğru.
+
+**Yeni notlar:**
+- NOTE-1: initdb yalnız-parola durumunda durmuyor; `.env.example` yorumu durduğunu söylüyor.
+- NOTE-2: `db_role_owner` mesajı yalnız parolayı söylüyor.

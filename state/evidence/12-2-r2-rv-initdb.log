@@ -1,0 +1,5 @@
+HEAD=5ff32ed6526d1c3887c01823a1f1dd95efe9f6fd · postgres image pgvector/pgvector:0.8.1-pg16 · throwaway containers, --network none, initdb from deploy/postgres
+APP_DB_USER='ffcore_app' APP_DB_PASSWORD='': container exited exit=1; ffcore_app roles=-; /usr/local/bin/docker-entrypoint.sh: running /docker-entrypoint-initdb.d/20-app-role.sh
+APP_DB_USER='' APP_DB_PASSWORD='': container running exit=0; ffcore_app roles=0; /usr/local/bin/docker-entrypoint.sh: running /docker-entrypoint-initdb.d/20-app-role.sh
+APP_DB_USER='ffcore_app' APP_DB_PASSWORD='set': container running exit=0; ffcore_app roles=1; /usr/local/bin/docker-entrypoint.sh: running /docker-entrypoint-initdb.d/20-app-role.sh
+APP_DB_USER='' APP_DB_PASSWORD='set': container running exit=0; ffcore_app roles=1; /usr/local/bin/docker-entrypoint.sh: running /docker-entrypoint-initdb.d/20-app-role.sh
