@@ -614,14 +614,11 @@ def test_settings_json_valid_and_wires_guard():
 
 def test_settings_command_runs_guard(main_root):
     """The exact settings.json command line (no shell) blocks a gate call without tee."""
-    import shlex
     import subprocess
 
-    from conftest import REPO_ROOT
+    from conftest import settings_hook_argv
 
-    settings = json.loads(SETTINGS_PATH.read_text(encoding="utf-8"))
-    command = settings["hooks"]["PreToolUse"][0]["hooks"][0]["command"]
-    argv = shlex.split(command.replace("$CLAUDE_PROJECT_DIR", REPO_ROOT.as_posix()))
+    argv = settings_hook_argv()
     proc = subprocess.run(
         argv,
         input=json.dumps(bash("make test")),
