@@ -7,12 +7,45 @@ from functools import lru_cache
 from typing import Annotated, Literal
 from urllib.parse import urlsplit
 
-from pydantic import Field, SecretStr, field_validator, model_validator
+from pydantic import AfterValidator, Field, SecretStr, field_validator, model_validator
 from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
 from ffcore.evaluation.ticks import TICK_PLAN_S
 
 CommaList = Annotated[list[str], NoDecode]
+
+
+def _plain_proxy_origin(value: str) -> str:
+    """Only http://host:port: no credentials (the URL would leak them into logs), no path,
+    no TLS to the proxy (an internal service), no other scheme."""
+    if not value:
+        return value
+    parts = urlsplit(value)
+    try:
+        port = parts.port
+    except ValueError:
+        port = None
+    if (
+        parts.scheme != "http"
+        or not parts.hostname
+        or port is None
+        or parts.username is not None
+        or parts.path not in ("", "/")
+        or parts.query
+        or parts.fragment
+    ):
+        raise ValueError(
+            "egress_proxy_url_invalid: EGRESS_PROXY_URL must be http://<host>:<port> "
+            "(no credentials, path or query) or empty"
+        )
+    host = f"[{parts.hostname}]" if ":" in parts.hostname else parts.hostname
+    return f"http://{host}:{port}"
+
+
+# FOLLOWUP-208: the one definition of EGRESS_PROXY_URL; every settings class the egress client
+# reads (Settings, services/mcp_server_common.McpServiceSettings) declares a field of this type
+# (K-HKE-0010: a class without it broke mcp-sql).
+EgressProxyUrl = Annotated[str, AfterValidator(_plain_proxy_origin)]
 
 
 class Settings(BaseSettings):
@@ -38,7 +71,7 @@ class Settings(BaseSettings):
     allowed_internal_hosts: CommaList = []
     # FOLLOWUP-208: forward proxy for external hosts (http://host:port; the egress profile sets
     # http://egress-proxy:3128). Empty: the backend dials external hosts itself (pinned).
-    egress_proxy_url: str = ""
+    egress_proxy_url: EgressProxyUrl = ""
 
     # --- 03a ---
     # HS256 key for console session tokens; separate from obo_jwt_secret.
@@ -219,34 +252,6 @@ class Settings(BaseSettings):
         if isinstance(value, str):
             return [item.strip().lower() for item in value.split(",") if item.strip()]
         return value
-
-    @field_validator("egress_proxy_url")
-    @classmethod
-    def _plain_proxy_origin(cls, value: str) -> str:
-        """Only http://host:port: no credentials (the URL would leak them into logs), no path,
-        no TLS to the proxy (an internal service), no other scheme."""
-        if not value:
-            return value
-        parts = urlsplit(value)
-        try:
-            port = parts.port
-        except ValueError:
-            port = None
-        if (
-            parts.scheme != "http"
-            or not parts.hostname
-            or port is None
-            or parts.username is not None
-            or parts.path not in ("", "/")
-            or parts.query
-            or parts.fragment
-        ):
-            raise ValueError(
-                "egress_proxy_url_invalid: EGRESS_PROXY_URL must be http://<host>:<port> "
-                "(no credentials, path or query) or empty"
-            )
-        host = f"[{parts.hostname}]" if ":" in parts.hostname else parts.hostname
-        return f"http://{host}:{port}"
 
     @field_validator("console_origins", mode="before")
     @classmethod
