@@ -19,9 +19,15 @@ ENV UV_PROJECT_ENVIRONMENT=/opt/venv \
 # 04a (K-04a-0002 S5): libgomp1 is the OpenMP runtime paddlepaddle and the torch CPU build load;
 # libgl1, libglib2.0-0 and libxcb1 are what the OpenCV wheels pulled in by PaddleOCR and
 # Docling's rapidocr link against (without them `import cv2` fails, and pymupdf4llm with it).
+# 12 (FOLLOWUP-95): make and curl (the tools image's) are in this one apt layer, so the tools
+# stage has none: with this layer cached, building tools needs no Debian mirror.
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends libgomp1 libgl1 libglib2.0-0 libxcb1 \
+    && apt-get install -y --no-install-recommends libgomp1 libgl1 libglib2.0-0 libxcb1 make curl \
     && rm -rf /var/lib/apt/lists/*
+# 12: Python packages from an internal mirror or a wheel directory (deploy/offline/wheels.sh)
+# instead of PyPI; uv reads both from the environment. Unset (the default): PyPI.
+ARG UV_INDEX_URL
+ARG UV_FIND_LINKS
 # /models and /data/storage belong to uid 10001 in every image, so the shared volumes are
 # writable by backend and worker whichever container mounts them first.
 RUN mkdir -p /models /data/storage && chown 10001 /models /data/storage
@@ -40,8 +46,5 @@ EXPOSE 8000
 CMD ["uvicorn", "ffcore.main:app", "--host", "0.0.0.0", "--port", "8000"]
 
 FROM base AS tools
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends make curl \
-    && rm -rf /var/lib/apt/lists/*
 RUN uv sync --frozen --no-install-project
 WORKDIR /work

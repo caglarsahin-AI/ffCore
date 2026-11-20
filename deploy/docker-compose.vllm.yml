@@ -1,0 +1,49 @@
+# vLLM overlay (package 12, plan/12 5c): airgap with INFERENCE_BACKEND=vllm on a GPU server.
+#   COMPOSE_FILE=compose.yaml,deploy/docker-compose.vllm.yml   COMPOSE_PROFILES=vllm
+# LiteLLM reaches it as the `vllm` provider of deploy/seed/models.airgap.yaml
+# (SEED_VLLM_BASE_URL, default http://vllm:8000); the application code does not change.
+# The name vLLM serves is SEED_VLLM_MODEL, the one the seed registers, so the two cannot drift.
+# Weights travel like Ollama's (docs/kurulum-kapali-ag.md): a directory on the host, mounted
+# read-only; vLLM never downloads (offline). Needs the NVIDIA container toolkit on the host.
+# Embedding and reranking stay in the backend (bge-m3, reranker); a separate GPU embedding
+# service is not part of this overlay. Image: deploy/offline/images-vllm.txt (not pulled in
+# development; GPU P50/P95 is measured on the customer's hardware, docs/donanim.md).
+services:
+  vllm:
+    image: ${REGISTRY_PREFIX}vllm/vllm-openai:v0.11.0
+    profiles: ["vllm"]
+    restart: unless-stopped
+    command:
+      - --model
+      - /models/${VLLM_MODEL:?VLLM_MODEL is not set (directory under VLLM_MODELS_DIR)}
+      - --served-model-name
+      - ${SEED_VLLM_MODEL:?SEED_VLLM_MODEL is not set (the model name the seed registers)}
+      - --max-model-len
+      - ${VLLM_MAX_MODEL_LEN:?VLLM_MAX_MODEL_LEN is not set (context length, docs/donanim.md)}
+      - --gpu-memory-utilization
+      - ${VLLM_GPU_MEMORY_UTILIZATION:-0.90}
+      - --host
+      - 0.0.0.0
+      - --port
+      - "8000"
+    environment:
+      HF_HUB_OFFLINE: "1"
+      TRANSFORMERS_OFFLINE: "1"
+      VLLM_NO_USAGE_STATS: "1"
+    volumes:
+      - ${VLLM_MODELS_DIR:?VLLM_MODELS_DIR is not set (host directory with the weights)}:/models:ro
+    ipc: host
+    mem_limit: ${VLLM_MEM_LIMIT:?VLLM_MEM_LIMIT is not set (docs/donanim.md memory budget)}
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: ${VLLM_GPU_COUNT:-1}
+              capabilities: [gpu]
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health', timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      start_period: 600s
+      retries: 30

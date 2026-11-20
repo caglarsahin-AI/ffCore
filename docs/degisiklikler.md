@@ -4,6 +4,33 @@ Behaviour and configuration changes that a deployment or an API client notices, 
 (handbook/RELEASE_AND_ROLLBACK.md, CHANGE_CONTROL.md). Each entry names the package and what to do,
 if anything.
 
+## 2026-11-20 · 12-2 · Least-privileged database role, backup and restore, vLLM overlay, installation guides
+
+- **What:** the application can connect to Postgres as `ffcore_app`, a role without DDL
+  (FOLLOWUP-46): initdb creates it from `APP_DB_PASSWORD` on a fresh volume
+  (`deploy/postgres/app-role.sql` holds the grants and serves existing volumes); migration
+  `12_0001` makes the audit partition functions run as the owner (SECURITY DEFINER, fixed
+  `search_path`, no PUBLIC execute) and adds detach/drop functions that retention now uses;
+  `12_0002` keeps partitions younger than 365 days out of their reach and leaves the role
+  INSERT and SELECT only on the audit log.
+  `deploy/backup.sh` and `deploy/restore.sh` (FFCore and Langfuse databases, knowledge storage,
+  Qdrant volume, optional traces; counts and SHA-256 manifest; restore only onto fresh volumes).
+  `deploy/docker-compose.vllm.yml` (profile `vllm`, GPU) with its image in
+  `deploy/offline/images-vllm.txt`. `docs/kurulum.md` is the full `llmaas` guide,
+  `docs/kurulum-kapali-ag.md` the closed-network one, `docs/donanim.md` the sizing page.
+- **Changed:** application services read `DATABASE_URL` with `APP_DB_USER`/`APP_DB_PASSWORD`
+  (owner when empty); `migrate` and `tools` keep the owner. `make smoke` (preflight) fails in
+  `llmaas` when the application would connect as the owner (`db_role_owner`) and knows the
+  `vllm` profile. The tools image has no apt layer of its own (FOLLOWUP-95; make and curl are in
+  the base layer, so the runtime image carries them too); `UV_INDEX_URL`/`UV_FIND_LINKS` build
+  arguments point uv at an internal mirror (`deploy/offline/wheels.sh`). `deploy/offline/save.sh`
+  takes `IMAGES_TXT` like `verify.sh`.
+- **Action:** `llmaas` installations: set `APP_DB_USER=ffcore_app` and `APP_DB_PASSWORD` (both or
+  neither: `db_role_incomplete` otherwise, in every profile); on an existing volume run
+  `deploy/postgres/app-role.sql` once and set the role's password (docs/kurulum.md, "Database
+  role"), or `make smoke` fails. `airgap` installations may stay on the owner (smoke names it).
+  Run the backup before updating.
+
 ## 2026-11-20 · 12-1 · Egress proxy and TLS reverse proxy overlays, compose preflight, LiteLLM schema health
 
 - **What:** two optional overlays for `llmaas` (docs/kurulum.md): `egress` (Squid forward proxy;

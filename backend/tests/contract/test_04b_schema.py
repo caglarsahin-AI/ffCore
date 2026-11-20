@@ -23,7 +23,11 @@ def _scripts() -> ScriptDirectory:
 
 def test_04b_1_migration_is_the_single_head_on_05b():
     scripts = _scripts()
-    assert scripts.get_heads() == ["04b_0001"]
+    # One head; since 12 (12_0001 on top of 04b_0001) it is not 04b_0001 itself.
+    assert len(scripts.get_heads()) == 1
+    assert "04b_0001" in {
+        r.revision for r in scripts.iterate_revisions(scripts.get_heads()[0], "base")
+    }
     revision = scripts.get_revision("04b_0001")
     assert revision.down_revision == "05b_0001"
     # Alembic spreads labels along the chain; the label this file declares is its own.

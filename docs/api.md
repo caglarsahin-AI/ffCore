@@ -90,7 +90,20 @@ The client is stateless: it stores no cookies and ignores `Set-Cookie`, so the o
 is the caller's own `Cookie` header, under the same origin rule.
 `request()` takes only `method, url, headers, params, content, json`: redirect handling, transport,
 proxy, TLS verification and timeouts cannot be changed per call (`TypeError`). The host rules run
-again at connect time. Environment proxy variables are ignored. Errors name only scheme and host.
+again at connect time. Environment proxy variables are ignored (with the `egress` overlay these
+calls therefore have no way out until FOLLOWUP-208; docs/kurulum.md). Errors name only scheme
+and host.
+
+The backend itself is never an outbound target (FOLLOWUP-159, -194): its `INTERNAL_API_URL`
+origin, the `backend` service name on any port, and a loopback address on its container port
+(`BACKEND_CONTAINER_PORT`, defined once in `core/egress.py`) are refused whatever
+`ALLOWED_INTERNAL_HOSTS` says. Saving such a URL answers 400 `endpoint_is_platform` (the message
+names the field, never the URL): a provider's `config.base_url`, `config.api_base` (Azure) and
+`config.url` (Qdrant) at registration, update and connection test; an alert rule's
+`params.webhook_url`; the notification `default_webhook_url`. Separately from those saves, at
+run time the LiteLLM reconcile does not send such an address to LiteLLM, and a webhook
+delivery to one fails with the same code. The
+backend reaches itself only from its own code (the 05b self endpoint, the `/readyz` probe).
 
 ## Identity, projects, providers and models (03a)
 

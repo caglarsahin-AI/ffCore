@@ -1,0 +1,7 @@
+# 12 (5c): the GPU serving path's image, apart from images.txt so the CPU archive (package 19)
+# does not carry it (~11.9 GB compressed). Same columns as images.txt:
+# image (as in compose, without REGISTRY_PREFIX)   registry_digest   image_id   platform
+# Recorded 2026-11-20 from the registry manifest only (not pulled: K-12-0002 S5); the image id
+# is the amd64 manifest's config digest. Use: IMAGES_TXT=deploy/offline/images-vllm.txt with
+# deploy/offline/save.sh and verify.sh --images.
+vllm/vllm-openai:v0.11.0 sha256:014a95f21c9edf6abe0aea6b07353f96baa4ec291c427bb1176dc7c93a85845c sha256:ee2917e260bb5037ca93944bfcb845a8f867674c63de2284d28c541f1eaf3f08 linux/amd64

@@ -12,6 +12,8 @@ incoherent combination and the fix. It runs first in `make smoke`, and on the ho
 Pure Python, standard library only. Exit 0 and one line per check, or exit 1 and the error.
 """
 
+from __future__ import annotations  # runs on the server's own Python 3.8+
+
 import argparse
 import os
 import re
@@ -20,11 +22,12 @@ from pathlib import Path
 
 # Profiles a compose file in this repository defines. An unknown name starts nothing, so it
 # is refused instead of silently ignored.
-KNOWN_PROFILES = {"qdrant", "ollama", "egress", "tls", "tools", "test", "e2e"}
+KNOWN_PROFILES = {"qdrant", "ollama", "vllm", "egress", "tls", "tools", "test", "e2e"}
 # Profiles whose services live in their own overlay file (compose interpolates ${VAR:?}
 # before it drops inactive profiles, so the overlay is only added when the profile is on).
 OVERLAYS = {
     "ollama": "deploy/docker-compose.ollama.yml",
+    "vllm": "deploy/docker-compose.vllm.yml",
     "egress": "deploy/docker-compose.egress.yml",
     "tls": "deploy/docker-compose.tls.yml",
 }
@@ -48,7 +51,8 @@ def _compose_files(value: str, separator: str | None) -> list[str]:
     if separator is None:
         # Compose uses the host's path separator: ';' on Windows, ':' elsewhere.
         separator = ";" if ";" in value else ":"
-    return [Path(item.strip()).as_posix().removeprefix("./") for item in value.split(separator)]
+    paths = [Path(item.strip()).as_posix() for item in value.split(separator)]
+    return [path[2:] if path.startswith("./") else path for path in paths]
 
 
 def _allowlist(value: str) -> list[str]:
@@ -130,6 +134,46 @@ def check(env: dict) -> list[str]:
         lines.append(f"ollama: compose service, OLLAMA_CONTEXT_LENGTH={context}")
     elif deploy == "airgap" and backend == "ollama":
         lines.append("ollama: external (profile inactive; the address is the ollama provider's)")
+
+    if "vllm" in profiles:
+        if deploy != "airgap" or backend != "vllm":
+            raise PreflightError(
+                "profile_backend_mismatch",
+                "the vllm profile needs DEPLOY_PROFILE=airgap and INFERENCE_BACKEND=vllm",
+            )
+        lines.append("vllm: compose service (GPU), serves SEED_VLLM_MODEL")
+
+    # 12-2 (FOLLOWUP-46): the application's database user. llmaas refuses the owner (DDL
+    # rights in the application); airgap (the PayCore M3 server predates the role) says so.
+    app_user, app_password = env.get("APP_DB_USER", ""), env.get("APP_DB_PASSWORD", "")
+    # Review 12-2 r1 MAJOR-2: compose fills the user and the password apart, so half a pair
+    # connects as a role initdb never created (or as the owner with the wrong password).
+    if bool(app_user) != bool(app_password):
+        if app_user:
+            effect = (
+                f"the application would connect as {app_user}, which initdb does not create "
+                "without APP_DB_PASSWORD"
+            )
+        else:
+            effect = "the application would connect as the owner with the role's password"
+        raise PreflightError(
+            "db_role_incomplete",
+            f"APP_DB_USER and APP_DB_PASSWORD go together (both set or both empty): {effect}",
+        )
+    if app_user and app_user != "ffcore_app":
+        raise PreflightError(
+            "db_role_invalid", f"APP_DB_USER must be ffcore_app or empty, not {app_user!r}"
+        )
+    if app_user and app_password:
+        lines.append("database: application connects as ffcore_app")
+    elif deploy == "llmaas":
+        raise PreflightError(
+            "db_role_owner",
+            "APP_DB_USER/APP_DB_PASSWORD are empty: the application would connect as the owner "
+            "(with DDL); set APP_DB_PASSWORD (docs/kurulum.md, database role)",
+        )
+    else:
+        lines.append("database: application connects as the owner (APP_DB_PASSWORD empty)")
 
     if "egress" in profiles:
         if deploy != "llmaas":

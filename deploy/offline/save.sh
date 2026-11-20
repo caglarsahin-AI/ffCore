@@ -19,6 +19,8 @@
 set -euo pipefail
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
+# IMAGES_TXT: another image list, e.g. deploy/offline/images-vllm.txt (the GPU path, 12).
+IMAGES="${IMAGES_TXT:-$HERE/images.txt}"
 OUT="" VOLUME="04a-knowledge-core_model_cache" DRY=0
 usage() { sed -n '2,18p' "$0" | sed 's/^# \{0,1\}//'; }
 while [ $# -gt 0 ]; do
@@ -59,7 +61,7 @@ while read -r image digest want _platform; do
   [ -z "$PREFIX" ] || run docker tag "$ref" "$PREFIX$ref"
   slug="$(printf '%s' "$ref" | tr '/:@' '___')"
   run docker save -o "$OUT/images/$slug.tar" "$PREFIX$ref"
-done < "$HERE/images.txt"
+done < "$IMAGES"
 
 run docker run --rm --network none -v "$VOLUME:/models:ro" -v "$HERE:/offline:ro" \
   -e MODELS_TXT=/offline/models.txt --entrypoint bash "ffcore/backend:$FFCORE_VERSION" \

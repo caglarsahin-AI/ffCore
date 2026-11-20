@@ -7,6 +7,7 @@ from pydantic import BaseModel, ConfigDict, SecretStr
 
 from ffcore.core.config import Settings
 from ffcore.core.egress import (
+    BACKEND_CONTAINER_PORT,
     EgressError,
     Resolver,
     _parse_ip,
@@ -91,9 +92,8 @@ RESERVED_HOSTS = frozenset(
         "host.docker.internal",
     }
 )
-# The port the backend listens on in its container (compose maps BACKEND_PORT to it): a loopback
-# address on it is the backend itself.
-BACKEND_CONTAINER_PORT = 8000
+# BACKEND_CONTAINER_PORT (a loopback address on it is the backend itself) comes from
+# core/egress.py, the one definition (12-2); it stays importable from here.
 
 
 def _host(url: str) -> str:
