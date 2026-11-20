@@ -13,6 +13,8 @@ from __future__ import annotations
 import importlib.util
 import json
 import os
+import shlex
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -110,3 +112,20 @@ def guard():
         yield module
     finally:
         sys.modules.pop(spec.name, None)
+
+
+def settings_hook_argv() -> list[str]:
+    """The exact settings.json hook command as argv (no shell), with the project dir filled in.
+
+    FOLLOWUP-212: the command starts with the Windows `py` launcher; where it does not exist
+    (the Linux tools container) the caller is skipped with the reason, not failed. The gate's
+    hook step runs on the host with py -3.12 (handbook ENVIRONMENT_AND_COMMANDS)."""
+    settings = json.loads(SETTINGS_PATH.read_text(encoding="utf-8"))
+    command = settings["hooks"]["PreToolUse"][0]["hooks"][0]["command"]
+    argv = shlex.split(command.replace("$CLAUDE_PROJECT_DIR", REPO_ROOT.as_posix()))
+    if shutil.which(argv[0]) is None:
+        pytest.skip(
+            f"{argv[0]!r} launcher not found (Linux container); the hook step of the gate runs "
+            "on the host with py -3.12 (FOLLOWUP-212)"
+        )
+    return argv

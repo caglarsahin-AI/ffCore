@@ -9,6 +9,10 @@ Redirects are followed here, one hop at a time, and every hop is checked again; 
 origin (scheme, host, port) drops credential headers. Callers cannot change redirect handling,
 transport, proxy, TLS verification or timeouts per request.
 The client keeps no cookies: the only cookie sent is the caller's own Cookie header.
+EGRESS_PROXY_URL set (FOLLOWUP-208, the egress profile): non-internal hosts go through the forward
+proxy by name (CONNECT for https); the host rules above still run here, first, but the address
+check moves to the proxy, which resolves and dials (deploy/egress/squid.conf `to_private`).
+Internal hosts keep the direct pinned path; nothing falls back from one path to the other.
 """
 
 import http.cookiejar
@@ -249,7 +253,8 @@ async def check_http_destination(
     """(08-tam-1a, FOLLOWUP-147) The rules SafeOutboundClient applies when it dials, checked
     before any connection, for callers that must refuse a destination up front (an external
     agent's base URL, a webhook): http/https only, a valid port, host name (OFFLINE, allowlist
-    or internal), then every resolved address. Returns the checked addresses. The connection
+    or internal), then every resolved address. Returns the checked addresses ([] for an external
+    host when EGRESS_PROXY_URL is set: the proxy checks the addresses it dials). The connection
     itself still goes through SafeOutboundClient, which checks again at dial time."""
     try:
         target = httpx2.URL(url)
@@ -261,6 +266,10 @@ async def check_http_destination(
         # httpx2 parses any number as a port; the dial would fail later and less clearly.
         raise EgressDenied("egress_invalid_port", _origin(target), "port out of range")
     port = target.port or (443 if target.scheme == "https" else 80)
+    if settings.egress_proxy_url and not policy.is_internal(target.host):
+        # FOLLOWUP-208: through the proxy the backend does not resolve external names (the
+        # egress network has no outside DNS); the proxy resolves and refuses private addresses.
+        return []
     return await _checked_addresses(policy, target.host, port, _origin(target), resolver)
 
 
@@ -349,6 +358,124 @@ class _PinnedTransport(httpx2.AsyncHTTPTransport):
         self._pool = httpcore2.AsyncConnectionPool(ssl_context=ssl_context, network_backend=backend)
 
 
+class _ProxyOnlyBackend(httpcore2.AsyncNetworkBackend):
+    """(FOLLOWUP-208) The network layer under the proxy transport: it dials the configured
+    proxy origin and nothing else, whatever the connection pool asks for."""
+
+    def __init__(
+        self, host: str, port: int, resolver: Resolver, inner: httpcore2.AsyncNetworkBackend
+    ) -> None:
+        self._host = host.lower().strip("[]")
+        self._port = port
+        self._resolver = resolver
+        self._inner = inner
+
+    async def connect_tcp(
+        self, host, port, timeout=None, local_address=None, socket_options=None
+    ) -> httpcore2.AsyncNetworkStream:
+        name = host.decode() if isinstance(host, bytes) else str(host)
+        if (name.lower().strip("[]"), port) != (self._host, self._port):
+            raise EgressDenied(
+                "egress_proxy_only",
+                f"{name}:{port}",
+                "the proxy transport dials EGRESS_PROXY_URL only",
+            )
+        literal = _parse_ip(self._host)
+        try:
+            addresses = [str(literal)] if literal is not None else await self._resolver(name, port)
+        except OSError:
+            raise EgressRequestFailed(
+                "egress_proxy_unreachable", f"{name}:{port}", "proxy name does not resolve"
+            ) from None
+        if not addresses:
+            raise EgressRequestFailed("egress_proxy_unreachable", f"{name}:{port}", "no address")
+        try:
+            return await self._inner.connect_tcp(
+                addresses[0],
+                port,
+                timeout=timeout,
+                local_address=local_address,
+                socket_options=socket_options,
+            )
+        except (httpcore2.ConnectError, OSError):
+            # r1 NOTE-2: a refused or reset connection to the proxy has the same code as a
+            # proxy name that does not resolve; a connect timeout stays egress_timeout.
+            raise EgressRequestFailed(
+                "egress_proxy_unreachable", f"{name}:{port}", "proxy refused the connection"
+            ) from None
+
+    async def connect_unix_socket(self, path, timeout=None, socket_options=None):
+        raise EgressDenied("egress_invalid_url", "unix://", "unix sockets are not allowed")
+
+    async def sleep(self, seconds: float) -> None:
+        await self._inner.sleep(seconds)
+
+
+class _ProxyTransport(httpx2.AsyncHTTPTransport):
+    """https targets: a CONNECT tunnel by host name (TLS, SNI and the certificate check stay
+    here, end to end); http targets: an absolute-form request. The proxy resolves the name and
+    applies the address rules (deploy/egress/squid.conf `to_private`)."""
+
+    def __init__(self, proxy_url: str, backend: _ProxyOnlyBackend) -> None:
+        super().__init__(trust_env=False)
+        ssl_context = self._pool._ssl_context
+        self._pool = httpcore2.AsyncHTTPProxy(
+            proxy_url=proxy_url, ssl_context=ssl_context, network_backend=backend
+        )
+
+
+class _EgressTransport(httpx2.AsyncBaseTransport):
+    """Chooses the path per request: internal hosts (ALLOWED_INTERNAL_HOSTS) and every host when
+    EGRESS_PROXY_URL is empty take the pinned direct path; other hosts take the proxy. There is
+    no fallback from one path to the other. A refusal by the proxy is an EgressDenied, not a
+    response the caller could mistake for the target's own 403."""
+
+    def __init__(
+        self,
+        policy: EgressPolicy,
+        settings: Settings,
+        resolver: Resolver,
+        inner: httpcore2.AsyncNetworkBackend,
+    ) -> None:
+        self._policy = policy
+        self._direct = _PinnedTransport(_PinnedBackend(policy, resolver, inner))
+        self._proxy: _ProxyTransport | None = None
+        if settings.egress_proxy_url:
+            proxy = httpx2.URL(settings.egress_proxy_url)
+            self._proxy = _ProxyTransport(
+                settings.egress_proxy_url,
+                _ProxyOnlyBackend(proxy.host, proxy.port or 80, resolver, inner),
+            )
+
+    def _via_proxy(self, host: str) -> bool:
+        return self._proxy is not None and not self._policy.is_internal(host)
+
+    async def handle_async_request(self, request: httpx2.Request) -> httpx2.Response:
+        if not self._via_proxy(request.url.host):
+            return await self._direct.handle_async_request(request)
+        proxy = self._proxy
+        if proxy is None:  # _via_proxy said so; kept explicit for the type checker
+            raise EgressDenied("egress_proxy_only", _origin(request.url), "no proxy configured")
+        origin = _origin(request.url)
+        # Defence in depth: the host rules again, at the layer that picks the proxy.
+        self._policy.check_host(request.url.host, origin)
+        try:
+            response = await proxy.handle_async_request(request)
+        except httpx2.ProxyError as exc:
+            # CONNECT refused by the proxy (httpcore raises with the proxy's status line).
+            raise EgressDenied("egress_proxy_denied", origin, str(exc) or "proxy refused") from None
+        squid_error = response.headers.get("x-squid-error")
+        if squid_error is not None:
+            await response.aclose()
+            raise EgressDenied("egress_proxy_denied", origin, squid_error)
+        return response
+
+    async def aclose(self) -> None:
+        await self._direct.aclose()
+        if self._proxy is not None:
+            await self._proxy.aclose()
+
+
 def policy_http_client(
     *,
     timeout: EgressTimeout,
@@ -364,13 +491,14 @@ def policy_http_client(
     connect and read limits only; the caller bounds the whole call (anyio.fail_after)."""
     if not isinstance(timeout, EgressTimeout):
         raise TypeError("policy_http_client needs an EgressTimeout; calls without one are refused")
-    backend = _PinnedBackend(
+    transport = _EgressTransport(
         EgressPolicy(settings),
+        settings,
         resolver or system_resolver,
         inner_backend or httpcore2.AnyIOBackend(),
     )
     return httpx2.AsyncClient(
-        transport=_PinnedTransport(backend),
+        transport=transport,
         headers=dict(headers or {}),
         timeout=httpx2.Timeout(
             connect=timeout.connect, read=timeout.read, write=timeout.read, pool=timeout.connect
@@ -400,10 +528,12 @@ class SafeOutboundClient:
         self._timeout = timeout
         self._policy = EgressPolicy(settings)
         self._max_redirects = max_redirects
-        backend = _PinnedBackend(
-            self._policy, resolver or system_resolver, inner_backend or httpcore2.AnyIOBackend()
+        self._transport = _EgressTransport(
+            self._policy,
+            settings,
+            resolver or system_resolver,
+            inner_backend or httpcore2.AnyIOBackend(),
         )
-        self._transport = _PinnedTransport(backend)
         self._client = httpx2.AsyncClient(
             transport=self._transport,
             timeout=httpx2.Timeout(

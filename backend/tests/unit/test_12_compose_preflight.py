@@ -307,6 +307,12 @@ def test_12_2_llmaas_refuses_the_owner_as_application_user():
     assert code == "db_role_owner" and "APP_DB_PASSWORD" in message
 
 
+def test_hke_213_owner_message_names_both_settings():
+    # FOLLOWUP-213: both are empty here; the fix is to set the pair, not the password alone.
+    _, message = error_code(env(APP_DB_USER="", APP_DB_PASSWORD=""))
+    assert "set APP_DB_USER=ffcore_app and APP_DB_PASSWORD" in message
+
+
 @pytest.mark.parametrize("profile", ["llmaas", "airgap"])
 @pytest.mark.parametrize(
     "user,password", [("ffcore_app", ""), ("", "dummy-not-secret")], ids=["no-password", "no-user"]

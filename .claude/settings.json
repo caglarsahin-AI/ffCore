@@ -1,6 +1,6 @@
 {
   "env": {
-    "FFCORE_GUARD_MODE": "warn"
+    "FFCORE_GUARD_MODE": "block"
   },
   "permissions": {
     "deny": [

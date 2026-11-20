@@ -170,7 +170,8 @@ def check(env: dict) -> list[str]:
         raise PreflightError(
             "db_role_owner",
             "APP_DB_USER/APP_DB_PASSWORD are empty: the application would connect as the owner "
-            "(with DDL); set APP_DB_PASSWORD (docs/kurulum.md, database role)",
+            "(with DDL); set APP_DB_USER=ffcore_app and APP_DB_PASSWORD together "
+            "(docs/kurulum.md, database role)",
         )
     else:
         lines.append("database: application connects as the owner (APP_DB_PASSWORD empty)")

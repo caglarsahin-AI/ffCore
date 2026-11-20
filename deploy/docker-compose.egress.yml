@@ -5,10 +5,12 @@
 # outside network and applies EGRESS_ALLOWLIST by host name. Published ports do not work on an
 # internal network, so the TLS reverse proxy (tls profile) is the way in; the preflight
 # (scripts/compose_preflight.py) refuses egress without tls.
-# Known limit (FOLLOWUP-208): the backend's own outbound client does not use a proxy
-# (core/egress.py pins the checked address), so with this overlay its direct external calls
-# (remote MCP servers, OpenAPI tools, alert webhooks, external agents) fail with a connection
-# error. Provider calls go through LiteLLM and work.
+# The backend's own outbound calls (remote MCP servers, OpenAPI tools, alert webhooks, external
+# agents) go through the proxy too: EGRESS_PROXY_URL (FOLLOWUP-208, core/egress.py). The backend
+# keeps the host rules (EGRESS_ALLOWLIST, OFFLINE, redirects) and sends external hosts to the
+# proxy by name; the proxy resolves them and refuses private addresses. Internal hosts
+# (ALLOWED_INTERNAL_HOSTS) stay direct. SMTP alerts do not go through the proxy (it carries
+# HTTP and CONNECT only): with this overlay they fail with a connection error.
 services:
   egress-proxy:
     image: ${REGISTRY_PREFIX}ubuntu/squid:6.6-24.04_edge
@@ -30,6 +32,35 @@ services:
       interval: 5s
       timeout: 5s
       retries: 20
+
+  # FOLLOWUP-208: every service that calls external hosts with SafeOutboundClient.
+  backend:
+    environment:
+      EGRESS_PROXY_URL: http://egress-proxy:3128
+    depends_on:
+      egress-proxy:
+        condition: service_healthy
+
+  worker:
+    environment:
+      EGRESS_PROXY_URL: http://egress-proxy:3128
+    depends_on:
+      egress-proxy:
+        condition: service_healthy
+
+  agent-worker:
+    environment:
+      EGRESS_PROXY_URL: http://egress-proxy:3128
+    depends_on:
+      egress-proxy:
+        condition: service_healthy
+
+  agent-worker-bg:
+    environment:
+      EGRESS_PROXY_URL: http://egress-proxy:3128
+    depends_on:
+      egress-proxy:
+        condition: service_healthy
 
   litellm:
     environment:

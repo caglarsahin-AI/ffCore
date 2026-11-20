@@ -157,6 +157,42 @@ def test_compose_build_message_names_up_build(guard, main_root):
     assert "up --build --pull never" in violations[0].message
 
 
+@pytest.mark.parametrize(
+    "cmd",
+    [
+        "docker build -t x .",
+        "docker build --pull=false -f backend/Dockerfile backend",
+        "docker buildx build --load -t x .",
+        "docker image build -t x .",
+        "docker builder build -t x .",
+        "docker --context default build .",
+        "cd backend && docker build .",
+        'sh -c "docker buildx build ."',
+    ],
+)
+def test_bare_docker_build_blocked(main_root, cmd):
+    # FOLLOWUP-210: the BuildKit base image metadata problem (5 November decision) is not
+    # compose-specific; images are built by `up --build --pull never`.
+    assert_blocked(run_hook(bash(cmd), main_root), "PROSES-175")
+
+
+@pytest.mark.parametrize(
+    "cmd",
+    [
+        "docker buildx ls",
+        "docker build --help",
+        "docker buildx version",
+        "docker images",
+        "docker image ls",
+        "docker tag a b",
+        "echo docker build",
+        "grep -n 'docker build' docs/kurulum.md",
+    ],
+)
+def test_docker_non_build_allowed(main_root, cmd):
+    assert_allowed(run_hook(bash(cmd), main_root))
+
+
 def test_compose_up_build_pull_never_allowed(guard, main_root, monkeypatch):
     monkeypatch.setattr(guard, "running_ff_stacks", lambda: [])
     cmd = "docker compose -p ffcore-x --env-file .env.test up -d --wait --build --pull never"
@@ -342,6 +378,36 @@ def test_pr_alias_field_allowed(main_root):
     )
     path = main_root / "state" / "pr" / "08-tam-1c.md"
     assert_allowed(run_hook(edit(path), main_root))
+
+
+@pytest.mark.parametrize("name", ["04b-1", "04b-2", "04b-12"])
+def test_worker_writes_sub_pr_note_allowed(main_root, name):
+    # K-HKE-0002 K1: a package split into PRs writes state/pr/<package>-<n>.md (04b-2 warn line)
+    path = main_root / "state" / "pr" / f"{name}.md"
+    proc = run_hook(edit(path), main_root, FFCORE_ROL="isci-b", FFCORE_PAKET="04b")
+    assert_allowed(proc)
+
+
+@pytest.mark.parametrize("name", ["04b-x", "04b2", "04b-1-r1", "04", "04b-1a"])
+def test_worker_writes_non_sub_pr_note_blocked(main_root, name):
+    path = main_root / "state" / "pr" / f"{name}.md"
+    proc = run_hook(edit(path), main_root, FFCORE_ROL="isci-b", FFCORE_PAKET="04b")
+    assert_blocked(proc, "TEK-YAZAR")
+
+
+def test_sub_pr_alias_from_registry_allowed(main_root):
+    write_registry(
+        main_root,
+        {SESSION_ID: {"rol": "isci-a", "paket": "12", "pr": "12", "acildi": "x"}},
+    )
+    assert_allowed(run_hook(edit(main_root / "state" / "pr" / "12-2.md"), main_root))
+
+
+def test_sub_pr_rule_only_under_state_pr(main_root):
+    # the <pr>-<n> form is a PR note rule; a channel or review file is not touched by it
+    path = main_root / "state" / "reviews" / "04b-1.md"
+    proc = run_hook(edit(path), main_root, FFCORE_ROL="isci-b", FFCORE_PAKET="04b")
+    assert_blocked(proc, "TEK-YAZAR")
 
 
 def test_reviewer_writes_reviews_allowed(main_root):
@@ -530,11 +596,12 @@ def test_warn_writes_log_line(main_root):
     assert lines[0].split("\t")[1:5] == ["warn", "-", "Bash", "KAPI"]
 
 
-def test_log_truncates_to_120(main_root):
+def test_log_truncates_to_240(main_root):
+    # K-HKE-0002: 120 characters left 38 warn lines unclassifiable (state/pr/hook-egress-1.md)
     cmd = "make test && echo " + "x" * 300
     run_hook(bash(cmd), main_root)
     detail = log_lines(main_root)[0].split("\t")[5]
-    assert len(detail) == 120
+    assert len(detail) == 240
 
 
 def test_allowed_call_writes_no_log(main_root):
@@ -614,14 +681,11 @@ def test_settings_json_valid_and_wires_guard():
 
 def test_settings_command_runs_guard(main_root):
     """The exact settings.json command line (no shell) blocks a gate call without tee."""
-    import shlex
     import subprocess
 
-    from conftest import REPO_ROOT
+    from conftest import settings_hook_argv
 
-    settings = json.loads(SETTINGS_PATH.read_text(encoding="utf-8"))
-    command = settings["hooks"]["PreToolUse"][0]["hooks"][0]["command"]
-    argv = shlex.split(command.replace("$CLAUDE_PROJECT_DIR", REPO_ROOT.as_posix()))
+    argv = settings_hook_argv()
     proc = subprocess.run(
         argv,
         input=json.dumps(bash("make test")),
@@ -632,6 +696,56 @@ def test_settings_command_runs_guard(main_root):
         timeout=30,
     )
     assert_blocked(proc, "KAPI")
+
+
+def test_settings_mode_is_block():
+    """Dalga 8 (KARARLAR, user choice A): the warn day is over, settings.json ships block."""
+    settings = json.loads(SETTINGS_PATH.read_text(encoding="utf-8"))
+    assert settings["env"]["FFCORE_GUARD_MODE"] == "block"
+
+
+SETTINGS_SILENT = [
+    "cat >> state/kanal/isci-b.md <<'EOF'\nmake test 2>&1 | tail -3\nEOF",
+    "python - <<'EOF'\ns = 'docker compose build'\nmake test\nEOF",
+    "py -3.12 -m pytest tests/hooks -q 2>&1 | tee state/evidence/x.log | tail -3",
+    "docker buildx ls",
+]
+SETTINGS_BLOCKED = [
+    ("py -3.12 -m pytest tests/hooks -q 2>&1 | tail -3", "KAPI"),
+    ("docker build -t x .", "PROSES-175"),
+    ("bash <<'EOF'\nmake test\nEOF", "KAPI"),
+]
+
+
+def _settings_env(main_root):
+    settings = json.loads(SETTINGS_PATH.read_text(encoding="utf-8"))
+    return base_env(main_root, **settings["env"])
+
+
+@pytest.mark.parametrize("cmd", SETTINGS_SILENT)
+def test_settings_env_known_false_positives_silent(main_root, cmd):
+    proc = run_hook(bash(cmd), main_root, **_settings_env(main_root))
+    assert_allowed(proc)
+    assert log_lines(main_root) == []
+
+
+@pytest.mark.parametrize(("cmd", "rule"), SETTINGS_BLOCKED)
+def test_settings_env_real_violations_blocked(main_root, cmd, rule):
+    proc = run_hook(bash(cmd), main_root, **_settings_env(main_root))
+    assert_blocked(proc, rule)
+    assert log_lines(main_root)[0].split("\t")[1] == "block"
+
+
+def test_settings_command_skips_without_py_launcher(monkeypatch):
+    """FOLLOWUP-212: no `py` launcher (Linux tools container) is an explicit skip, not an error;
+    the gate's hook step runs on the host with py -3.12."""
+    import shutil
+
+    from conftest import settings_hook_argv
+
+    monkeypatch.setattr(shutil, "which", lambda name: None)
+    with pytest.raises(pytest.skip.Exception, match="FOLLOWUP-212"):
+        settings_hook_argv()
 
 
 # --- archive (MULTI_AGENT_PROTOCOL "Bağlam bütçesi ve arşiv", 16 Nov 2026) ----

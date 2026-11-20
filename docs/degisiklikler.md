@@ -4,6 +4,26 @@ Behaviour and configuration changes that a deployment or an API client notices, 
 (handbook/RELEASE_AND_ROLLBACK.md, CHANGE_CONTROL.md). Each entry names the package and what to do,
 if anything.
 
+## 2026-11-20 · hook-egress-1 · Backend egress through the forward proxy, initdb role pair, agent guard in block mode
+
+- **What:** with the `egress` profile the backend's own outbound calls (remote MCP servers,
+  OpenAPI tools, alert webhooks, external agents) go through the forward proxy: `EGRESS_PROXY_URL` (new setting, `http://<host>:<port>` or empty; the egress
+  overlay sets `http://egress-proxy:3128` for `backend`, `worker`, `agent-worker`,
+  `agent-worker-bg`). The backend keeps its host rules and sends external hosts to the proxy by
+  name; the proxy applies the address rules. A proxy refusal is the error code
+  `egress_proxy_denied`; an invalid setting stops start-up with `egress_proxy_url_invalid`
+  (FOLLOWUP-208).
+- **What:** initdb (`deploy/postgres/initdb/20-app-role.sh`) also stops when `APP_DB_PASSWORD`
+  is set without `APP_DB_USER`; the preflight's `db_role_owner` message asks for both settings
+  (FOLLOWUP-213).
+- **Not through the proxy:** SMTP alerts; under the `egress` profile they fail with a connection
+  error (use a webhook alert channel).
+- **What to do:** nothing for existing installations without the `egress` profile. With it,
+  remove any workaround that kept the profile off for tools, webhooks or remote MCP servers
+  (docs/kurulum.md "Egress").
+- **Development only:** the agent guard (`.claude/settings.json`) runs in `block` mode; bare
+  `docker build`/`buildx build` is refused like `compose build` (FOLLOWUP-210).
+
 ## 2026-11-20 · 12-2 · Least-privileged database role, backup and restore, vLLM overlay, installation guides
 
 - **What:** the application can connect to Postgres as `ffcore_app`, a role without DDL

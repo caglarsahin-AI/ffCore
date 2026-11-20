@@ -58,6 +58,13 @@ COMPOSE_VALUE_OPTS = frozenset(
     }
 )
 GIT_VALUE_OPTS = frozenset({"-C", "-c", "--git-dir", "--work-tree", "--namespace"})
+# docker global options that take a value (`docker --context x build`)
+DOCKER_VALUE_OPTS = frozenset(
+    {"-c", "--context", "--config", "-H", "--host", "-l", "--log-level"}
+    | {"--tlscacert", "--tlscert", "--tlskey"}
+)
+# `docker <group> build` spellings of the image builder (FOLLOWUP-210)
+DOCKER_BUILD_GROUPS = frozenset({"buildx", "image", "builder"})
 # `docker compose run|exec` options that take a value (skipped to find the service)
 COMPOSE_RUN_VALUE_OPTS = frozenset(
     {
@@ -103,7 +110,7 @@ GREP_PATTERN_OPTS = frozenset({"-e", "--regexp"})
 GREP_GLOB_OPTS = frozenset({"-g", "--glob", "--iglob", "--exclude", "--include", "--exclude-dir"})
 GREP_GLOB_PREFIXES = ("--exclude=", "--include=", "--exclude-dir=", "--glob=", "--iglob=")
 PAYCORE_RE = re.compile(r"paycorellm[/\\]+(?:data|eval[/\\]+results)(?:[/\\]|\b)", re.IGNORECASE)
-LOG_DETAIL_MAX = 120
+LOG_DETAIL_MAX = 240  # K-HKE-0002: 120 left warn lines unclassifiable
 # Log masking (SECURITY_AND_PERMISSIONS: logs carry no secrets); applied before truncation.
 MASKS = (
     # -u user:pass, -uuser:pass, --user user:pass, --user=user:pass
@@ -828,6 +835,27 @@ def check_compose(toks: list[str]) -> list[Violation]:
     return []
 
 
+def check_docker_build(toks: list[str]) -> list[Violation]:
+    """FOLLOWUP-210: bare `docker build` / `docker buildx|image|builder build` has the same
+    BuildKit base image metadata problem as `compose build` (5 November decision)."""
+    rest = strip_assignments(toks)
+    if not rest or basename(rest[0]) != "docker":
+        return []
+    pos, sub = subcommand(rest, 1, DOCKER_VALUE_OPTS)
+    if sub in DOCKER_BUILD_GROUPS:
+        pos, sub = subcommand(rest, pos + 1, frozenset())
+    if sub != "build" or any(t in ("--help", "-h") for t in rest[pos + 1 :]):
+        return []
+    return [
+        Violation(
+            "PROSES-175",
+            "çıplak docker build/buildx build yok (BuildKit base imaj metadata'sı için "
+            "docker.io/ghcr.io'ya bağlanır); imaj `docker compose up --build --pull never` ile "
+            "derlenir (FOLLOWUP-210)",
+        )
+    ]
+
+
 def is_gate_command(toks: list[str]) -> bool:
     toks = strip_assignments(toks)
     if not toks:
@@ -894,7 +922,7 @@ def check_tokens(
 ) -> list[Violation]:
     """Rules for one pipeline element, recursing into compose run|exec and sh -c."""
     toks = unwrap(toks)
-    found = check_push(toks, payload, env) + check_compose(toks)
+    found = check_push(toks, payload, env) + check_compose(toks) + check_docker_build(toks)
     if is_gate_command(toks) and not has_tee:
         found.append(Violation("KAPI", KAPI_MESSAGE))
     if depth >= MAX_NESTING:
@@ -916,10 +944,45 @@ def check_tokens(
     return found
 
 
+DOCKER_EXEC_VALUE_OPTS = frozenset(
+    {"-e", "--env", "--env-file", "-u", "--user", "-w", "--workdir", "--detach-keys"}
+)
+TIMEOUT_VALUE_OPTS = frozenset({"-s", "--signal", "-k", "--kill-after"})
+
+
+def reader_command(toks: list[str]) -> list[str]:
+    """The command that actually reads a heredoc, behind `env K=V`, `timeout N`,
+    `docker compose run|exec … <service>` and `docker exec … <container>` (r1 MINOR-2):
+    `docker compose run -T tools sh <<EOF` is read by sh. Bounded like the other nesting."""
+    toks = strip_assignments(unwrap(toks))
+    for _ in range(MAX_NESTING):
+        if not toks:
+            return toks
+        head = basename(toks[0])
+        if head == "timeout":
+            i = 1
+            while i < len(toks) and toks[i].startswith("-"):
+                i += 2 if toks[i] in TIMEOUT_VALUE_OPTS else 1
+            toks = strip_assignments(unwrap(toks[i + 1 :]))  # i is the duration
+            continue
+        service = compose_service_command(toks)
+        if service is not None:
+            toks = strip_assignments(unwrap(service[1]))
+            continue
+        if head == "docker":
+            pos, sub = subcommand(toks, 1, DOCKER_VALUE_OPTS)
+            if sub == "exec":
+                pos, container = subcommand(toks, pos + 1, DOCKER_EXEC_VALUE_OPTS)
+                toks = strip_assignments(unwrap(toks[pos + 1 :])) if container else []
+                continue
+        return toks
+    return toks
+
+
 def heredoc_reader(line: str, m: re.Match) -> str:
     """Who reads this heredoc: 'shell', 'code' (an interpreter) or 'data'."""
     segment = re.split(r"[;&|(]", line[: m.start()])[-1]
-    toks = unwrap(tokens(segment))
+    toks = reader_command(tokens(segment))
     reader = basename(toks[0]) if toks else ""
     piped = CODE_PIPE_RE.search(line[m.end() :])
     if piped:
@@ -927,6 +990,26 @@ def heredoc_reader(line: str, m: re.Match) -> str:
     if reader in ("sh", "bash"):
         return "shell"
     return "code" if reader in INTERPRETERS else "data"
+
+
+def unquoted_heredocs(line: str, quote: str | None) -> tuple[list[re.Match], str | None]:
+    """Heredoc operators of `line` that stand outside quotes, and the quote still open at the
+    end of the line. `quote` is the quote open from earlier lines (a multi-line `sh -c '…'`):
+    a `<<EOF` inside it belongs to the inner shell, which is checked on its own (r2)."""
+    open_at: list[str | None] = []
+    escaped = False
+    for ch in line:
+        open_at.append(quote)
+        if escaped:
+            escaped = False
+        elif ch == "\\" and quote != "'":
+            escaped = True
+        elif quote is None and ch in ("'", '"'):
+            quote = ch
+        elif ch == quote:
+            quote = None
+    matches = [m for m in HEREDOC_RE.finditer(line) if open_at[m.start()] is None]
+    return matches, quote
 
 
 def strip_heredocs(command: str) -> tuple[str, list[str]]:
@@ -939,11 +1022,13 @@ def strip_heredocs(command: str) -> tuple[str, list[str]]:
     out: list[str] = []
     code: list[str] = []
     i = 0
+    quote: str | None = None
     while i < len(lines):
         line = lines[i]
         out.append(line)
         i += 1
-        for m in HEREDOC_RE.finditer(line):
+        matches, quote = unquoted_heredocs(line, quote)
+        for m in matches:
             kind = heredoc_reader(line, m)
             body: list[str] = []
             while i < len(lines) and lines[i].strip() != m.group(2):
@@ -955,6 +1040,46 @@ def strip_heredocs(command: str) -> tuple[str, list[str]]:
             elif kind == "code":
                 code.append("\n".join(body))
     return "\n".join(out), code
+
+
+def has_tee(parts: list[list[str]]) -> bool:
+    """True when one element of a pipeline (token lists) is `tee`."""
+    return any(
+        strip_assignments(unwrap(t))[:1] and basename(strip_assignments(unwrap(t))[0]) == "tee"
+        for t in parts
+    )
+
+
+def heredoc_commands(command: str) -> tuple[str, list[tuple[bool, str]]]:
+    """(shell text without heredoc bodies, [(tee on the heredoc's line, body)] for bodies
+    read by sh/bash) for the command rules (KAPI, PROSES-175, PUSH, YIGIN).
+
+    Data and interpreter bodies are dropped: their text is never run by this shell. The ENV
+    rule keeps its own reading (strip_heredocs: interpreter code is scanned, MINOR-2)."""
+    lines = command.split("\n")
+    out: list[str] = []
+    bodies: list[tuple[bool, str]] = []
+    i = 0
+    quote: str | None = None
+    while i < len(lines):
+        line = lines[i]
+        out.append(line)
+        i += 1
+        matches, quote = unquoted_heredocs(line, quote)
+        for m in matches:
+            body: list[str] = []
+            while i < len(lines) and lines[i].strip() != m.group(2):
+                body.append(lines[i])
+                i += 1
+            i += 1
+            if heredoc_reader(line, m) == "shell":
+                tee = any(
+                    has_tee([tokens(extract_nested(p)[0]) for p in pipeline])
+                    for pipeline in split_pipelines(line)
+                    if "<<" in "".join(pipeline)
+                )
+                bodies.append((tee, "\n".join(body)))
+    return "\n".join(out), bodies
 
 
 def grep_files(toks: list[str]) -> list[str]:
@@ -987,45 +1112,57 @@ def grep_files(toks: list[str]) -> list[str]:
     return kept
 
 
-def env_words(toks: list[str]) -> list[str]:
+def env_kind(toks: list[str]) -> str | None:
+    """'path' when `.env` is an argument or redirection of this command, 'code' when it is
+    in `py -c` / `node -e` code, else None."""
     toks = unwrap(toks)
     if not toks:
-        return []
+        return None
     head = basename(toks[0])
     args = grep_files(toks) if head in GREP_HEADS else toks
-    found = [a for a in args if not any(ch.isspace() for ch in a) and ENV_PATH_RE.search(a)]
-    if head in INTERPRETERS:
+    if any(not any(ch.isspace() for ch in a) and ENV_PATH_RE.search(a) for a in args):
+        return "path"
+    if head in INTERPRETERS and any(
         # `py -c` / `node -e` code is code, spaces or not (K-HOOK2-0007 MINOR-2)
-        found += [
-            code
-            for opt, code in zip(toks, toks[1:], strict=False)
-            if opt in INLINE_CODE_OPTS and CODE_ENV_RE.search(code)
-        ]
-    return found
+        opt in INLINE_CODE_OPTS and CODE_ENV_RE.search(code)
+        for opt, code in zip(toks, toks[1:], strict=False)
+    ):
+        return "code"
+    return None
 
 
-def env_hits(text: str) -> bool:
-    """True when `.env` stands in argument/redirection position anywhere in the command,
-    including groups, substitutions, `sh -c` text and `compose run|exec` commands.
-    Every recursion works on strictly shorter text, so it ends."""
+ENV_PATH_MESSAGE = ".env okunmaz ve yazılmaz; testler .env.test ile (SECURITY_AND_PERMISSIONS)"
+# r1 MINOR-1 A: the match is the same (interpreter code is a command, K-HOOK2-0007 MINOR-2);
+# the message names the cause and the way out.
+ENV_CODE_MESSAGE = (
+    "yorumlayıcı kodunda (heredoc gövdesi ya da -c) çıplak `.env` geçiyor; kod komut sayılır. "
+    "Metin düzenlemesiyse dosyayı Write/Edit aracıyla yaz ya da betiği Write ile dosyaya "
+    "koyup `py dosya.py` ile koş; .env okunmaz ve yazılmaz (SECURITY_AND_PERMISSIONS)"
+)
+
+
+def env_hits(text: str) -> str | None:
+    """'path' when `.env` stands in argument/redirection position anywhere in the command,
+    including groups, substitutions, `sh -c` text and `compose run|exec` commands; 'code' when
+    it is only in interpreter code (heredoc body, `-c`); else None (r1 MINOR-1: the message
+    says which). Every recursion works on strictly shorter text, so it ends."""
     text, code_bodies = strip_heredocs(text)
-    if any(CODE_ENV_RE.search(body) for body in code_bodies):
-        return True
+    kinds = {"code"} if any(CODE_ENV_RE.search(body) for body in code_bodies) else set()
     for pipeline in split_pipelines(text):
         for part in pipeline:
             outer, groups, subs = extract_nested(part)
-            if any(env_hits(body) for body in groups + subs):
-                return True
+            kinds.update(env_hits(body) for body in groups + subs)
             toks = tokens(outer)
-            if env_words(toks):
-                return True
+            kinds.add(env_kind(toks))
             inner = shell_inner(unwrap(toks))
-            if inner is not None and inner != text and env_hits(inner):
-                return True
+            if inner is not None and inner != text:
+                kinds.add(env_hits(inner))
             service = compose_service_command(unwrap(toks))
-            if service is not None and service[1] and env_hits(shlex.join(service[1])):
-                return True
-    return False
+            if service is not None and service[1]:
+                kinds.add(env_hits(shlex.join(service[1])))
+            if "path" in kinds:
+                return "path"  # a real argument or redirection outranks code text
+    return "code" if "code" in kinds else None
 
 
 def check_bash(
@@ -1039,25 +1176,32 @@ def check_bash(
     found: list[Violation] = []
     # ENV and PAYCORE judge the whole command once; env_hits does its own recursion with
     # heredoc handling (a nested call would see a data heredoc body as commands).
-    if top and env_hits(command):
-        found.append(
-            Violation(
-                "ENV", ".env okunmaz ve yazılmaz; testler .env.test ile (SECURITY_AND_PERMISSIONS)"
-            )
-        )
+    kind = env_hits(command) if top else None
+    if kind is not None:
+        found.append(Violation("ENV", ENV_CODE_MESSAGE if kind == "code" else ENV_PATH_MESSAGE))
     if top and PAYCORE_RE.search(command):
         found.append(
             Violation(
                 "PAYCORE", "paycoreLLM data/** ve eval/results/** okunmaz (CLAUDE.md, PLAN 2d)"
             )
         )
+    # Command rules read the shell text without heredoc bodies (K-HKE-0002 K1 A): a data body
+    # (`cat >> kanal.md <<EOF`) or interpreter code (`python - <<EOF`) is not a command; a body
+    # read by sh/bash is a script, checked one level deeper with the tee of its own line.
+    command, shell_bodies = heredoc_commands(command)
+    for line_tee, body in shell_bodies:
+        if depth >= MAX_NESTING:
+            found.append(DEPTH_VIOLATION)
+        else:
+            found.extend(
+                check_bash(
+                    body, payload, env, outer_tee=outer_tee or line_tee, depth=depth + 1, top=False
+                )
+            )
     for pipeline in split_pipelines(command):
         pieces = [extract_nested(p) for p in pipeline]
         parts = [tokens(outer) for outer, _, _ in pieces]
-        tee = outer_tee or any(
-            strip_assignments(unwrap(t))[:1] and basename(strip_assignments(unwrap(t))[0]) == "tee"
-            for t in parts
-        )
+        tee = outer_tee or has_tee(parts)
         for toks in parts:
             if toks:
                 found.extend(check_tokens(toks, tee, payload, env, depth))
@@ -1260,7 +1404,11 @@ def check_write(path: str, payload: Mapping, env: Mapping[str, str]) -> list[Vio
             return [Violation("TEK-YAZAR", f"{rel} → {name}; senin rolün {info.rol}")]
         return []
     expected = info.pr or (info.paket.replace("/", "-") if info.paket else None)
-    if info.rol not in WORKER_ROLES or expected is None or expected.lower() != name.lower():
+    # A package split into PRs writes state/pr/<pr>-<n>.md (04b-1, 04b-2; K-HKE-0002 K1).
+    own = expected is not None and re.fullmatch(
+        rf"{re.escape(expected)}(?:-\d+)?", name, re.IGNORECASE
+    )
+    if info.rol not in WORKER_ROLES or not own:
         return [
             Violation(
                 "TEK-YAZAR",
