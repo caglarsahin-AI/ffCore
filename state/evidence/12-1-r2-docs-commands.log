@@ -1,0 +1,21 @@
+=== r2 docs commands on ffcore-12 2026-11-20T10:50:59Z (only the project/env-file prefix added)
+--- veri-isleme.md masking query
+ day | rule | action_taken | status | count 
+-----+------+--------------+--------+-------
+(0 rows)
+
+exit=0
+
+--- kurulum.md LiteLLM recovery (egress stack)
+ Container ffcore-12-litellm-1  Stopped
+DROP DATABASE
+CREATE DATABASE
+psql exit=0
+ Container ffcore-12-litellm-1  Healthy
+up exit=0
+created: -
+updated: -
+deleted: -
+render exit=0
+ok    litellm /health/liveliness 200, /key/info 404 (schema present)
+smoke: passed

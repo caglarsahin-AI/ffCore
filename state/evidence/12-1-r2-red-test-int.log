@@ -1,0 +1,8 @@
+E         - 403
+E         + 200
+
+tests/integration/test_12_egress.py:70: AssertionError
+=========================== short test summary info ============================
+FAILED tests/integration/test_12_egress.py::test_12_r2_allowlisted_name_in_the_benchmark_range_is_refused
+FAILED tests/integration/test_12_egress.py::test_12_r2_connect_to_the_benchmark_range_is_refused
+2 failed, 20 passed in 10.27s

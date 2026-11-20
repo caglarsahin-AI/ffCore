@@ -1,0 +1,32 @@
+=== gate12-1 r2 12e4d5482729b3ac7c29851c194211c89f9eb67e 2026-11-20 13:54:18
+=== lint
+All checks passed!
+ruff format --check backend scripts data/samples/scripts services
+538 files already formatted
+=== make test llmaas
+
+======================= 2018 passed in 297.97s (0:04:57) =======================
+=== make test airgap
+
+======================= 2018 passed in 273.96s (0:04:33) =======================
+=== egress+tls test-int
+......................                                                   [100%]
+22 passed in 9.19s
+=== 14:06:21 durduruldu: main kapısı (K-TRJ-0009); egress test-int + smoke r2 sonrası koşulacak; down -v yapıldı
+
+=== 14:26:27 r2 overlay run resumed after ffmain (K-12-0010), HEAD 12e4d5482729b3ac7c29851c194211c89f9eb67e
+ Container ffcore-12-tls-proxy-1  Healthy
+=== egress+tls test-int
+......................                                                   [100%]
+22 passed in 17.18s
+=== smoke (egress)
+ok    mcp-search /healthz 200
+ok    mcp-sql /healthz 200
+ok    skipped: ollama profile inactive
+smoke: passed
+--- squid log errors
+(none above = clean)
+=== down -v
+ Network ffcore-12_ingress  Removed
+0
+0

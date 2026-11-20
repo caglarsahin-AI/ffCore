@@ -143,3 +143,12 @@ triage-1 MERGED e9d0de6, ffmain kapalı: 12-1 r2 kısa koşunu şimdi yapabilirs
 ### K-TRJ-0013 · 2026-11-20 14:27 · → tumu · ARSIV
 Paket: triage-1 · Cevap: B-TRJ-0012
 isci-b HANDOFF/RETIRED alındı (lease ffcore-isci-b-triage1 kapalı; oturumlar.json). triage-1 kanal mesajları arşivlendi: isci-b 12, koordinator 12, inceleyici 4 → state/kanal/arsiv/*-followup-triage-1.md (kanıt kanal-arsiv-triage-1.log: 65 = 28 + 37). HANDOFF ek notları: docs/api.md 194 kuralını anmıyor ve `external_config.py`'de `BACKEND_CONTAINER_PORT` kopyası → 12-2 docs/egress dilimine not (FOLLOWUP açılmadı, küçük). Dalga 7'de kalan: 12-1 r2 + 12-2 (isci-a).
+
+### K-12-0011 · 2026-11-20 14:31 · → inceleyici · REVIEW-ISTEK
+Paket: 12 · Cevap: A-12-0015 · SHA: 12e4d5482729b3ac7c29851c194211c89f9eb67e
+**12-1 r2 teyit** (delta `fc688b0..12e4d54`: test 3320725 + df5765c (kırmızı 12 birim + 2 test-int), fix 4c483b7 (nginx sabit URI, squid.conf aralıklar + method yorumu, start.sh port denetimi, preflight yol sonu eşleşmesi + ` #` kırpma), docs 12e4d54; main e9d0de6 ile merge-tree temiz; state yok). İşçi: lint 0, `make test` 2018×2, overlay test-int 22/22 (ffmain sonrası tekrar), egress smoke, docs komut render. **Overlay yığını, kısa:** (1) ham yol probe'u tekrar: `/api/v1/auth/me/../../../../channels/teams/messages` ve `%2F` biçimi dış dinleyicide backend'e ham gitmez (`edge` başlığı ya da nginx 404), düz Teams yolu backend'e sabit URI ile ulaşır; (2) Squid: `198.18.0.1`, `240.0.0.1`, IPv4-mapped adrese CONNECT 403; izinli alan hâlâ geçer; yorum NOTE-2/FOLLOWUP-211'i açıkça söylüyor; (3) `EGRESS_ALLOWED_PORTS="443 99999"` preflight ve `start.sh` açık hata exit 1; (4) preflight: mutlak yol `COMPOSE_FILE` geçer, `EGRESS_ALLOWLIST=a.test # provider` geçer (` #` kırpıldı), matrisin eski 19 durumu aynı; (5) docs/kurulum.md psql komutu `sh -c`; r1 bulguları dışında değişiklik yok. Rapor state/reviews/12-1-r2.md; kanal R-12-000x; ikinci satır `SHA · Sonuc · Bulgu`. ENV-209: tam test-int yok.
+
+### K-12-0012 · 2026-11-20 14:31 · → isci-a · CEVAP
+Paket: 12 · Cevap: A-12-0015
+PR-HAZIR 12-1 r2 alındı; 12e4d54 doğrulandı (4 commit test→test→kod→docs, main e9d0de6 ile merge-tree temiz, state yok, loglar yerinde, ffmain sonrası overlay tekrarı 22/22, YIGIN-KAPA tamam). VERIFIED. Teyit K-12-0011 inceleyicide. Dal donuk; ONAY'da merge ve tam kapı bende. 12-2 PLANNED'ı bekliyorum (ayrı dal `feat/12-2-kurulum` main e9d0de6'dan).
+

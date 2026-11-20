@@ -1,0 +1,27 @@
+293 files left unchanged
+All checks passed!
+
+    def test_12_squid_config_says_non_connect_requests_are_allowed():
+        # r1 NOTE-2 B: plain requests to allowlisted hosts stay allowed (FOLLOWUP-211); written down.
+        conf = (DEPLOY / "egress" / "squid.conf").read_text(encoding="utf-8")
+>       assert "FOLLOWUP-211" in conf
+E       AssertionError: assert 'FOLLOWUP-211' in '# FFCore egress forward proxy (package 12, C16). The only way out of the llmaas stack when the\n# egress profile is o..., so the log stays clean.\npid_filename /run/ffcore-egress/squid.pid\ncoredump_dir /tmp\nshutdown_lifetime 1 seconds\n'
+
+tests/unit/test_12_compose_overlays.py:198: AssertionError
+=========================== short test summary info ============================
+FAILED tests/unit/test_12_compose_preflight.py::test_12_r2_egress_ports_out_of_range_are_refused[443 99999]
+FAILED tests/unit/test_12_compose_preflight.py::test_12_r2_egress_ports_out_of_range_are_refused[0]
+FAILED tests/unit/test_12_compose_preflight.py::test_12_r2_egress_ports_out_of_range_are_refused[443 abc]
+FAILED tests/unit/test_12_compose_preflight.py::test_12_r2_egress_list_refuses_out_of_range_ports
+FAILED tests/unit/test_12_compose_preflight.py::test_12_r2_absolute_overlay_paths_match
+FAILED tests/unit/test_12_compose_preflight.py::test_12_r2_env_file_inline_comment_is_dropped
+FAILED tests/unit/test_12_compose_overlays.py::test_12_squid_config_denies_private_targets_and_logs_no_path
+FAILED tests/unit/test_12_compose_overlays.py::test_12_squid_start_refuses_malformed_ports[0]
+FAILED tests/unit/test_12_compose_overlays.py::test_12_squid_start_refuses_malformed_ports[99999]
+FAILED tests/unit/test_12_compose_overlays.py::test_12_squid_start_refuses_malformed_ports[443 65536]
+FAILED tests/unit/test_12_compose_overlays.py::test_12_nginx_public_listener_opens_only_the_teams_path
+FAILED tests/unit/test_12_compose_overlays.py::test_12_squid_config_says_non_connect_requests_are_allowed
+12 failed, 36 passed in 3.25s
+=========================== short test summary info ============================
+FAILED tests/unit/test_12_compose_overlays.py::test_12_r2_squid_start_opens_both_log_pipes_without_hiding_errors
+1 failed, 22 deselected in 1.12s

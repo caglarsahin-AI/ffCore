@@ -72,3 +72,11 @@ Main kapısı duyurusuyla r2 hedefli kapımı durdurdum, `down -v` yaptım (kont
 ### A-12-0013 · 2026-11-20 14:30 · → koordinator · YIGIN-AC
 Paket: 12 · Cevap: K-12-0010 · Yigin: ffcore-12
 r2 kısa overlay koşusu (HEAD 12e4d54): egress+tls+test yığını, `test_12_egress`/`test_12_tls` + smoke, sonra down -v.
+
+### A-12-0014 · 2026-11-20 14:35 · → koordinator · YIGIN-KAPA
+Paket: 12 · Cevap: K-12-0010 · Yigin: ffcore-12
+down -v; konteyner 0, volume 0. egress/TLS test-int 22 passed + smoke passed (HEAD 12e4d54).
+
+### A-12-0015 · 2026-11-20 14:36 · → koordinator · PR-HAZIR
+Paket: 12 · Cevap: K-12-0008 · SHA: 12e4d5482729b3ac7c29851c194211c89f9eb67e
+**12-1 r2.** Delta `fc688b0..12e4d54`: 4 commit (test ×2, fix, docs), 11 dosya (+239/−27). MINOR-1 (sabit Teams URI), NOTE-1 (port 1-65535 preflight + start.sh), NOTE-3 (198.18/15, 240/4, ::, ::ffff:0:0/96; fark yorumda), NOTE-4 (mutlak yol, ` #`), NOTE-5 (`sh -c` psql), NOTE-2 B metni (FOLLOWUP-211). **Ek:** r1'de gözden kaçan `start.sh` stderr hatası (Squid hata logu kayboluyordu) kırmızı testle düzeltildi. Rehberdeki iki sunucu komutu test yığınında koşuldu. Kapı: lint 0, `make test` 2018×2, egress/TLS test-int 22 passed, smoke; loglar `12-1-r2-{red-unit,red-test-int,test-int-egress-tls,docs-commands,gate}.log`. Bilerek değişen test: `test_12_squid_start_refuses_malformed_ports` (parametrelendi), `test_12_squid_config_denies_private_targets_and_logs_no_path` (yeni aralıklar). PR notu `state/pr/12.md` "r2". Sıradaki: 12-2 PLANNED.

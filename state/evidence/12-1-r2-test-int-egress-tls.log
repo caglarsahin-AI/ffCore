@@ -1,0 +1,39 @@
+=== r2 3320725f4f45597e9c6850098671f73a11cd6176 + working tree (code fix) 2026-11-20T10:43:14Z
+ Container ffcore-12-backend-1  Healthy
+ Container ffcore-12-tls-proxy-1  Healthy
+egress-proxy: 4 allowlisted domains, ports: 443 9999
+2026/11/20 10:43:38| WARNING: BCP 177 violation. Detected non-functional IPv6 loopback.
+2026/11/20 10:43:38| WARNING: HTTP requires the use of Via
+2026/11/20 10:43:38| ERROR: Cannot open cache_log (/dev/stderr) for writing;
+    fopen(3) error: (13) Permission denied
+2026/11/20 10:43:38 pinger| WARNING: BCP 177 violation. Detected non-functional IPv6 loopback.
+......................                                                   [100%]
+22 passed in 8.37s
+python scripts/smoke.py
+ok    DEPLOY_PROFILE=llmaas INFERENCE_BACKEND=ollama
+ok    egress: forward proxy, 4 hosts in EGRESS_ALLOWLIST, ports 443
+ok    tls: reverse proxy (internal 8443, public Teams path 9443)
+ok    backend /healthz 200
+ok    litellm /health/liveliness 200, /key/info 404 (schema present)
+ok    langfuse /api/public/health 200, /api/public/projects 200
+ok    mcp-search /healthz 200
+ok    mcp-sql /healthz 200
+ok    skipped: ollama profile inactive
+smoke: passed
+
+=== r2 after chmod fix 2026-11-20T10:47:11Z
+ Container ffcore-12-egress-proxy-1  Healthy
+--- squid log warnings/errors:
+egress-proxy: 4 allowlisted domains, ports: 443 9999
+2026/11/20 10:47:27| WARNING: BCP 177 violation. Detected non-functional IPv6 loopback.
+2026/11/20 10:47:27| WARNING: HTTP requires the use of Via
+2026/11/20 10:47:27| Accepting HTTP Socket connections at conn2 local=0.0.0.0:3128 remote=[::] FD 10 flags=9
+2026/11/20 10:47:27 pinger| WARNING: BCP 177 violation. Detected non-functional IPv6 loopback.
+......................                                                   [100%]
+22 passed in 9.07s
+ruff format --check backend scripts data/samples/scripts services
+538 files already formatted
+......                                                                   [100%]
+78 passed in 3.43s
+ok    skipped: ollama profile inactive
+smoke: passed
