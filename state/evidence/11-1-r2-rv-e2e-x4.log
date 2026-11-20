@@ -1,0 +1,29 @@
+HEAD=f9d213fdded017f843b5e7120e0ad6526a4e8d40 e2e test_11_4 --repeat-each 4 (reviewer config without webServer, stack frontend service via localhost:3000 forward, node_modules copy of ffcore-10a-nm-pw, no npm ci)
+forward ready
+
+Running 16 tests using 1 worker
+
+  ✓   1 [chromium] › tests/e2e/test_11_4_screens_themes_axe.spec.ts:23:9 › test_11_4_screens_themes_axe: light desktop (5.5s)
+  ✓   2 [chromium] › tests/e2e/test_11_4_screens_themes_axe.spec.ts:23:9 › test_11_4_screens_themes_axe: light mobile (4.8s)
+  ✓   3 [chromium] › tests/e2e/test_11_4_screens_themes_axe.spec.ts:23:9 › test_11_4_screens_themes_axe: dark desktop (4.2s)
+  ✓   4 [chromium] › tests/e2e/test_11_4_screens_themes_axe.spec.ts:23:9 › test_11_4_screens_themes_axe: dark mobile (5.5s)
+  ✓   5 [chromium] › tests/e2e/test_11_4_screens_themes_axe.spec.ts:23:9 › test_11_4_screens_themes_axe: light desktop (4.1s)
+  ✓   6 [chromium] › tests/e2e/test_11_4_screens_themes_axe.spec.ts:23:9 › test_11_4_screens_themes_axe: light mobile (4.8s)
+  ✓   7 [chromium] › tests/e2e/test_11_4_screens_themes_axe.spec.ts:23:9 › test_11_4_screens_themes_axe: dark desktop (4.4s)
+  ✓   8 [chromium] › tests/e2e/test_11_4_screens_themes_axe.spec.ts:23:9 › test_11_4_screens_themes_axe: dark mobile (4.8s)
+  ✓   9 [chromium] › tests/e2e/test_11_4_screens_themes_axe.spec.ts:23:9 › test_11_4_screens_themes_axe: light desktop (5.3s)
+  ✓  10 [chromium] › tests/e2e/test_11_4_screens_themes_axe.spec.ts:23:9 › test_11_4_screens_themes_axe: light mobile (5.0s)
+  ✓  11 [chromium] › tests/e2e/test_11_4_screens_themes_axe.spec.ts:23:9 › test_11_4_screens_themes_axe: dark desktop (3.7s)
+  ✓  12 [chromium] › tests/e2e/test_11_4_screens_themes_axe.spec.ts:23:9 › test_11_4_screens_themes_axe: dark mobile (5.4s)
+  ✓  13 [chromium] › tests/e2e/test_11_4_screens_themes_axe.spec.ts:23:9 › test_11_4_screens_themes_axe: light desktop (5.3s)
+  ✓  14 [chromium] › tests/e2e/test_11_4_screens_themes_axe.spec.ts:23:9 › test_11_4_screens_themes_axe: light mobile (4.6s)
+  ✓  15 [chromium] › tests/e2e/test_11_4_screens_themes_axe.spec.ts:23:9 › test_11_4_screens_themes_axe: dark desktop (3.3s)
+  ✓  16 [chromium] › tests/e2e/test_11_4_screens_themes_axe.spec.ts:23:9 › test_11_4_screens_themes_axe: dark mobile (4.8s)
+
+  16 passed (1.5m)
+npm notice
+npm notice New major version of npm available! 11.19.1 -> 12.2.3
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.3
+npm notice To update run: npm install -g npm@12.2.3
+npm notice
+exit 0

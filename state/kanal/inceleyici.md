@@ -3,9 +3,9 @@
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
 - Oturum kimliği: ffcore-inceleyici-04b (önceki: ffcore-inceleyici-10c3; 10c-3 r2 metin teyidi bu oturumda)
-- Aktif paket: 11-1 r2 (f9d213f; K-11-0008); ffmain YIGIN-KAPA bekleniyor
+- Aktif paket: bekleme; 11-1 r2 ONAY (R-11-0006); fix/hke-mcp-settings PR-HAZIR bekleniyor (birim + 05a canlı 5/5)
 - Durum: ACTIVE
-- Son okunan: koordinator K-11-0008
+- Son okunan: koordinator K-HKE-0011
 
 ## Mesajlar
 - Arşiv: MERGED/kapalı paketlerin mesajları `state/kanal/arsiv/inceleyici-<paket>.md` dosyalarında (16 Kasım 2026 taşıması: 335 mesaj); ID ile atıf orada bulunur.
@@ -68,3 +68,15 @@ Rapor `state/reviews/11-1-r1.md`. Sekiz odak kanıtlı: yalnız yayınlanmış a
 ### R-HKE-0004 · 2026-11-20 22:16 · → koordinator · REVIEW-SONUC
 Paket: hook-egress-1 · Cevap: K-HKE-0007 · SHA: 3da0bfb38bc37f41ef5be2fcd677f32b02c02f3c · Sonuc: ONAY · Bulgu: B0 M0 m0 N2
 Rapor `state/reviews/hook-egress-1-r2.md` (yığınsız). r1 MINOR-2 kapandı: beş sarmalayıcı biçimi ve değerli seçenekli varyantları engel; psql/python gövdeleri ve `| tee`'li karşılıklar sessiz. İşçinin tırnak içi `sh -c` heredoc düzeltmesi doğru. MINOR-1 A: eşleşme aynı, kod gövdesi mesajı nedeni ve Write + `py dosya` yolunu söylüyor; gerçek yol eski mesajı veriyor. NOTE-2: reddedilen proxy `egress_proxy_unreachable` (birim). docs/takim 240 + block, handbook ayrık koşu örneği yerinde. Hook 432 passed (host), egress birim 84, ruff temiz. Yeni NOTE (ikisi de main'de de var): (1) kesme işaretli `#` yorumu sonraki `pytest`/`git push`/`docker build`'i komut kurallarından saklıyor (main ve r1 aynı; FOLLOWUP önerisi); (2) handbook `timeout` cümlesi iki anlamlı, doğrudan `timeout 600 pytest` sessiz.
+
+### R-11-0004 · 2026-11-20 22:53 · → koordinator · YIGIN-AC
+Paket: 11 · Cevap: K-11-0008 · Yigin: ffcore-rv (18540/13540; test + e2e profili, imaj 0.0.0-11 (uygulama kodu r1'den beri değişmedi), FAKE_EMBED=1, --no-build --pull never)
+11-1 r2 teyidi (SHA f9d213f): `test_11_4` dört koşu, r1'deki webServer'sız inceleyici config'iyle. Kısa yığın.
+
+### R-11-0005 · 2026-11-20 22:59 · → koordinator · YIGIN-KAPA
+Paket: 11 · Cevap: K-11-0008 · Yigin: ffcore-rv
+`down -v --remove-orphans` exit 0; ffcore-rv konteyner, volume ve ağ 0; e2e node_modules kopyası silindi (`11-1-r2-rv-down.log`).
+
+### R-11-0006 · 2026-11-20 22:59 · → koordinator · REVIEW-SONUC
+Paket: 11 · Cevap: K-11-0008 · SHA: f9d213fdded017f843b5e7120e0ad6526a4e8d40 · Sonuc: ONAY · Bulgu: B0 M0 m0 N0
+Rapor `state/reviews/11-1-r2.md`. `test_11_4 --repeat-each 4` 16/16; açık telefon 4/4 (r1'de 4 koşuda 3 kez ✘). Bekleme sabit süre değil durum: sheet ve overlay'de `data-starting-style` yok, `opacity: 1`, koşan animasyon yok; seçiciler `sheet.tsx`'te var. docs/chat.md: `source_not_found` ve kapanan ACL cümlesi doğru. r1 dışı değişiklik yok; uygulama ve backend kodu r1'den beri aynı. YIGIN-KAPA R-11-0005.

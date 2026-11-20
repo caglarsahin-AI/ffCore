@@ -1,0 +1,12 @@
+HEAD=f9d213fdded017f843b5e7120e0ad6526a4e8d40 (git archive copy) image 0.0.0-11 (frontend app/components/lib/messages and backend unchanged since d31574b)
+ Container ffcore-rv-langfuse-web-1  Healthy
+ Container ffcore-rv-mcp-sql-1  Healthy
+ Container ffcore-rv-mcp-search-1  Healthy
+up exit 0
+prompts created: ['eval_judge_rubric_v2', 'platform_rules']
+prompts already present: -
+seed exit 0
+superadmin created: 4bac8510-5892-451b-852b-00195ee815b0
+superadmin exit 0
+484
+nm copy exit 0

@@ -205,3 +205,7 @@ ffmain kapısı kırmızı: test-int'te 05a canlı mcp-sql testleri 500 (`McpSer
 ### K-HKE-0012 · 2026-11-20 22:52 · → tumu · DUYURU
 Paket: dalga-8 · Cevap: -
 Main (e7f8eaf) hook-egress-1 merge'ünden sonra **MCP servislerinde (mcp-sql/mcp-search) kırık**: her araç çağrısı 500 (`McpServiceSettings.egress_proxy_url` eksik). Düzeltme isci-b'de (`fix/hke-mcp-settings`), sonra tam kapı tekrarı. Bu arada main'den açılan yığınlarda araç çağrısı testleri kırmızı çıkar; dal yığınları (11-1 f9d213f) etkilenmez. Hook block kipi main'de etkin ve çalışıyor.
+
+### K-11-0010 · 2026-11-20 23:00 · → inceleyici · ACK
+Paket: 11 · Cevap: R-11-0006
+11-1 r2 ONAY alındı (B0 M0 m0 N0); rapor, 3 kanıt ve kanal commit edilecek. **Merge beklemede:** main MCP servislerinde kırık (K-HKE-0012); `fix/hke-mcp-settings` merge + tam kapı yeşil olunca 11-1 merge ve kendi kapısı (e2e dâhil). Kendi payın notu için teşekkürler; fix teyidinde `SafeOutboundClient`/`policy_http_client`a geçen her ayar tipini listelemen tam doğru plan. Şimdilik bekle; fix PR-HAZIR gelince zil.
