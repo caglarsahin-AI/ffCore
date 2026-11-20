@@ -3,9 +3,9 @@
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
 - Oturum kimliği: ffcore-inceleyici-04b (önceki: ffcore-inceleyici-10c3; 10c-3 r2 metin teyidi bu oturumda)
-- Aktif paket: 11-1 r1 (d31574b; K-11-0003); hke r2 gelirse önce o
+- Aktif paket: hook-egress-1 r2 (3da0bfb; K-HKE-0007)
 - Durum: ACTIVE
-- Son okunan: koordinator K-11-0003
+- Son okunan: koordinator K-HKE-0007
 
 ## Mesajlar
 - Arşiv: MERGED/kapalı paketlerin mesajları `state/kanal/arsiv/inceleyici-<paket>.md` dosyalarında (16 Kasım 2026 taşıması: 335 mesaj); ID ile atıf orada bulunur.
@@ -56,3 +56,11 @@ Rapor `state/reviews/hook-egress-1-r1.md`. Block kipi gerçek ihlalleri engelliy
 ### R-11-0001 · 2026-11-20 21:55 · → koordinator · YIGIN-AC
 Paket: 11 · Cevap: K-11-0003 · Yigin: ffcore-rv (18540/13540; test + e2e profili, imaj 0.0.0-11, FAKE_EMBED=1, --no-build --pull never)
 11-1 r1 başladı (SHA d31574b). Delta okundu; önyüz lint/typecheck/check:api/Vitest yığınsız bitti (0/0/0, 296/296). Şimdi hedefli test-int (`test_11_chat` + probe) ve 11 e2e spec'leri. node_modules `ffcore-10a-nm-pw` kopyasından, `npm ci` yok. Tam test-int yok (ENV-209).
+
+### R-11-0002 · 2026-11-20 22:07 · → koordinator · YIGIN-KAPA
+Paket: 11 · Cevap: K-11-0003 · Yigin: ffcore-rv
+`down -v --remove-orphans` exit 0; ffcore-rv konteyner, volume ve ağ 0; e2e node_modules kopya volume'ü silindi (`11-1-r1-rv-down.log`).
+
+### R-11-0003 · 2026-11-20 22:07 · → koordinator · REVIEW-SONUC
+Paket: 11 · Cevap: K-11-0003 · SHA: d31574b385e1a590ab8727983ac7a5542be55820 · Sonuc: ONAY · Bulgu: B0 M0 m1 N3
+Rapor `state/reviews/11-1-r1.md`. Sekiz odak kanıtlı: yalnız yayınlanmış agent ve tanımsız yanıt; konuşmalar yalnız kendi (silinmiş/çapraz proje/devam 404); sources ucu ACL çağırana, atıfsız chunk `source_not_found`; başlık 60 model çağrısız; read üye sorup kendi konuşmasını siliyor; iki tema + telefon; UI metni json (1682/1682). Kapı: önyüz 0/0/0 + Vitest 296/296, hedefli test 29 + probe 8, e2e 11 7/8. **MINOR-1 `axe-gecis-kararsiz`:** `test_11_4` light mobile 4 koşuda 3 kez düştü; axe sheet'in 200 ms opacity geçişinde koşuyor (renk çifti tek başına ~6:1 geçiyor). Öneri: axe'den önce opacity 1'i bekle. NOTE: sohbete özel kopuş testi yok (11-2'de); ACL kapanınca mesaj listesinde belge adı kalıyor (docs cümlesi); docs'ta `source_not_found` eksik. e2e: ortak node_modules eski olduğundan `npm ci` yerine yığının frontend servisine bağlanan webServer'sız config kullandım (raporda). YIGIN-KAPA R-11-0002.

@@ -1,0 +1,31 @@
+HEAD=d31574b385e1a590ab8727983ac7a5542be55820 (git archive copy) in ffcore/frontend:0.0.0-11 node_modules, --network none
+LINT=0
+TYPE=0
+API contract copies and generated types are current.
+API=0
+    [90m 36|[39m
+    [90m 37|[39m   [34mit[39m([32m"knows exactly the C9 SSE event names"[39m[33m,[39m () [33m=>[39m {
+    [90m 38|[39m     [35mconst[39m contracts [33m=[39m [34mreadFileSync[39m([32m"../handbook/CONTRACTS.md"[39m[33m,[39m [32m"utf8"[39m)[33m;[39m
+    [90m   |[39m                       [31m^[39m
+    [90m 39|[39m     const row = contracts.split("\n").find((line) => line.startsWith("…
+    [90m 40|[39m     const names = /`SSE` event adları \(10\): ([^(]+)\(/.exec(row ?? "…
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯[22m[39m
+
+
+[2m Test Files [22m [1m[31m2 failed[39m[22m[2m | [22m[1m[32m55 passed[39m[22m[90m (57)[39m
+[2m      Tests [22m [1m[31m3 failed[39m[22m[2m | [22m[1m[32m293 passed[39m[22m[90m (296)[39m
+[2m   Start at [22m 18:49:25
+[2m   Duration [22m 28.61s[2m (transform 4.26s, setup 0ms, import 37.13s, tests 42.40s, environment 45.24s)[22m
+
+exit 0
+--- rerun: whole repo copied (first run lacked ../handbook, ../docs)
+     ✓ rejects export const A = () => <div className="bg-white p-2" />;  2938ms
+     ✓ finds no violation in the source tree  6170ms
+
+ Test Files  57 passed (57)
+      Tests  296 passed (296)
+   Start at  18:51:02
+   Duration  28.00s (transform 4.76s, setup 0ms, import 35.68s, tests 42.51s, environment 40.46s)
+
+exit 0

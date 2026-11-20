@@ -1,0 +1,65 @@
+HEAD=d31574b385e1a590ab8727983ac7a5542be55820 tools 0.0.0-11 on ffcore-rv
+.............................                                            [100%]
+29 passed in 26.33s
+--- probe
+2026-11-20 18:58:16,441 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-20 18:58:16,461 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=149
+2026-11-20 18:58:16,967 INFO ffcore.access access method=POST path=/api/v1/projects/f547d716-9bbb-4f2d-b9ae-7be2059a9c7e/agents/asistan/runs status=200 ms=502
+2026-11-20 18:58:17,024 INFO ffcore.access access method=GET path=/api/v1/projects/f547d716-9bbb-4f2d-b9ae-7be2059a9c7e/conversations status=200 ms=54
+2026-11-20 18:58:17,075 INFO ffcore.access access method=DELETE path=/api/v1/projects/f547d716-9bbb-4f2d-b9ae-7be2059a9c7e/conversations/7cea33ca-1646-4ecf-b823-7dc4047de3d1 status=204 ms=47
+2026-11-20 18:58:17,132 INFO ffcore.access access method=DELETE path=/api/v1/projects/f547d716-9bbb-4f2d-b9ae-7be2059a9c7e/conversations/7cea33ca-1646-4ecf-b823-7dc4047de3d1 status=404 ms=54
+2026-11-20 18:58:17,177 INFO ffcore.access access method=GET path=/api/v1/projects/f547d716-9bbb-4f2d-b9ae-7be2059a9c7e/conversations/7cea33ca-1646-4ecf-b823-7dc4047de3d1/messages status=404 ms=41
+2026-11-20 18:58:17,223 INFO ffcore.access access method=POST path=/api/v1/projects/f547d716-9bbb-4f2d-b9ae-7be2059a9c7e/agents/asistan/runs status=404 ms=43
+delete again 404 conversation_not_found
+messages 404 conversation_not_found
+continue 404 {"error":{"message":"Conversation not found.","type":"not_found_error","code":"conversation_not_found"}}
+2026-11-20 18:58:17,266 INFO ffcore.access access method=GET path=/api/v1/projects/f547d716-9bbb-4f2d-b9ae-7be2059a9c7e/conversations status=200 ms=39
+.2026-11-20 18:58:17,571 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-20 18:58:17,585 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=115
+2026-11-20 18:58:17,916 INFO ffcore.access access method=POST path=/api/v1/projects/bf804069-df8e-42a3-bf40-18914d2453c8/agents/asistan/runs status=200 ms=329
+2026-11-20 18:58:17,963 INFO ffcore.access access method=GET path=/api/v1/projects/bf804069-df8e-42a3-bf40-18914d2453c8/conversations status=200 ms=43
+2026-11-20 18:58:18,015 INFO ffcore.access access method=GET path=/api/v1/projects/28c4717a-985b-4bd9-9cd4-eb8d5c9935b7/conversations/5fdf3abc-5eba-4836-8b55-49b00d7a0d27/messages status=404 ms=39
+2026-11-20 18:58:18,181 INFO ffcore.access access method=DELETE path=/api/v1/projects/28c4717a-985b-4bd9-9cd4-eb8d5c9935b7/conversations/5fdf3abc-5eba-4836-8b55-49b00d7a0d27 status=404 ms=162
+2026-11-20 18:58:18,224 INFO ffcore.access access method=GET path=/api/v1/projects/28c4717a-985b-4bd9-9cd4-eb8d5c9935b7/conversations status=200 ms=40
+cross-project 404 404 []
+.2026-11-20 18:58:18,540 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-20 18:58:18,558 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=130
+2026-11-20 18:58:18,878 INFO ffcore.access access method=POST path=/api/v1/projects/81097f21-c375-4ccf-a95c-0f048132968a/agents/asistan/runs status=200 ms=315
+2026-11-20 18:58:19,072 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-20 18:58:19,087 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=107
+2026-11-20 18:58:19,143 INFO ffcore.access access method=GET path=/api/v1/projects/81097f21-c375-4ccf-a95c-0f048132968a/runs/1566f199-81b7-4254-93b4-7042d61fe2da/sources/434a40f1-982e-4a10-b9b0-0fd355394359 status=200 ms=53
+analyst open doc 200
+2026-11-20 18:58:19,195 INFO ffcore.access access method=GET path=/api/v1/projects/81097f21-c375-4ccf-a95c-0f048132968a/runs/1566f199-81b7-4254-93b4-7042d61fe2da/sources/434a40f1-982e-4a10-b9b0-0fd355394359 status=200 ms=44
+2026-11-20 18:58:19,250 INFO ffcore.access access method=GET path=/api/v1/projects/81097f21-c375-4ccf-a95c-0f048132968a/runs/1566f199-81b7-4254-93b4-7042d61fe2da/sources/434a40f1-982e-4a10-b9b0-0fd355394359 status=200 ms=51
+acl_roles=[user]: owner 200 analyst 200 None
+.2026-11-20 18:58:19,531 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-20 18:58:19,549 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=119
+2026-11-20 18:58:19,877 INFO ffcore.access access method=POST path=/api/v1/projects/37996a23-10f8-4f48-b16b-33970eceba40/agents/asistan/runs status=200 ms=325
+2026-11-20 18:58:19,928 INFO ffcore.access access method=GET path=/api/v1/projects/37996a23-10f8-4f48-b16b-33970eceba40/conversations status=200 ms=44
+2026-11-20 18:58:19,978 INFO ffcore.access access method=GET path=/api/v1/projects/37996a23-10f8-4f48-b16b-33970eceba40/conversations/64bcbc74-3992-425b-9159-e16fb2e3e686/messages status=200 ms=46
+sources fields ['breadcrumb', 'chunk_id', 'document_id', 'document_name', 'kb_key', 'n', 'page', 'rerank_score', 'updated_at_source']
+document_name still listed: ['hizmet-sozlesmesi.pdf']
+.2026-11-20 18:58:20,300 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-20 18:58:20,315 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=143
+2026-11-20 18:58:20,638 INFO ffcore.access access method=POST path=/api/v1/projects/c8670822-ec3b-48dd-ac42-e6f1b71a5920/agents/asistan/runs status=200 ms=320
+2026-11-20 18:58:20,689 INFO ffcore.access access method=GET path=/api/v1/projects/c8670822-ec3b-48dd-ac42-e6f1b71a5920/conversations status=200 ms=47
+title 'Birinci satır ikinci satır xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx' 60
+model calls during run (answer only) 1
+.2026-11-20 18:58:21,072 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-20 18:58:21,087 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=128
+2026-11-20 18:58:21,256 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-20 18:58:21,268 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=105
+2026-11-20 18:58:21,307 INFO ffcore.access access method=GET path=/api/v1/projects/d633df15-cae3-407b-8bbd-c933f194a05f/chat/agents status=200 ms=37
+superadmin non-member /chat/agents 200
+.2026-11-20 18:58:21,583 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-20 18:58:21,595 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=121
+2026-11-20 18:58:21,641 INFO ffcore.access access method=GET path=/api/v1/projects/8f8da2c8-0636-4097-8745-18e4dce81a63/agents status=403 ms=43
+user GET /agents 403 insufficient_role
+.2026-11-20 18:58:21,909 INFO ffcore.litellm_reconcile litellm_reconciled created=0 updated=0 deleted=0 problems=0
+2026-11-20 18:58:21,925 INFO ffcore.access access method=POST path=/api/v1/auth/login status=200 ms=113
+2026-11-20 18:58:22,233 INFO ffcore.access access method=POST path=/api/v1/projects/5920c7f3-d48e-46e7-a8c1-d99619056120/agents/asistan/runs status=200 ms=306
+2026-11-20 18:58:22,286 INFO ffcore.access access method=GET path=/api/v1/projects/5920c7f3-d48e-46e7-a8c1-d99619056120/runs/ab339125-3a1c-4df5-8edd-f19b596cc4c7/sources/edb26ea2-63d6-435f-9cc4-deb8e90720f8 status=404 ms=45
+uncited existing chunk 404 source_not_found
+.
+8 passed in 12.38s
+exit 0

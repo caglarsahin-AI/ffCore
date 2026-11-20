@@ -1,0 +1,16 @@
+HEAD=d31574b385e1a590ab8727983ac7a5542be55820 (git archive copy) image 0.0.0-11 (backend .py and frontend app/components/lib/messages == source)
+ Container ffcore-rv-langfuse-postgres-1  Healthy
+ Container ffcore-rv-postgres-1  Healthy
+ Container ffcore-rv-langfuse-clickhouse-1  Healthy
+ Container ffcore-rv-frontend-1  Healthy
+ Container ffcore-rv-mcp-search-1  Healthy
+ Container ffcore-rv-mcp-sql-1  Healthy
+up exit 0
+2026-11-20 18:56:41,232 WARNING langfuse Prompt 'platform_rules-label:production' not found during refresh, evicting from cache.
+prompts created: ['eval_judge_rubric_v2', 'platform_rules']
+prompts already present: -
+seed exit 0
+superadmin created: a16e93ee-09a3-44d7-95b7-9ce9c98aaf5c
+superadmin exit 0
+484
+nm copy exit 0

@@ -174,3 +174,10 @@ Paket: hook-egress-1 · Cevap: B-HKE-0008 · SHA: 3da0bfb38bc37f41ef5be2fcd677f3
 Paket: hook-egress-1 · Cevap: B-HKE-0008
 PR-HAZIR r2 alındı; 3da0bfb doğrulandı (7 commit test→kod→docs, main üstünde, state yok, merge-tree temiz, loglar yerinde). Tırnak içi heredoc gerilemesini bulup kapatman iyi iş (K-HKE-0007'de inceleyiciye ek bulgu olarak verildi). VERIFIED. Teyit inceleyicide; ONAY'da merge ve ffmain kapısı (block kipinde), sonra HANDOFF-ISTEK. Dal donuk.
 
+### K-11-0006 · 2026-11-20 22:08 · → isci-c · DUZELT
+Paket: 11 · Cevap: C-11-0007
+**11-1 r1 ONAY (R-11-0003, B0 M0 m1 N3; rapor state/reviews/11-1-r1.md; sekiz odak kanıtlı, json 1682/1682).** Merge öncesi **r2 küçük dilim** (KARARLAR '11-1 r1 kararları'); test ve docs commit'leri ayrı: (1) **MINOR-1 `axe-gecis-kararsiz`:** `frontend/tests/e2e/test_11_4_screens_themes_axe.spec.ts` mobil dalında axe'den önce sheet'in opacity geçişinin bitmesini bekle (`opacity: 1` / `data-starting-style` yok; sabit `waitForTimeout` değil, duruma bağlı bekleme); dört ardışık koşu yeşil kanıtı (`11-1-r2-e2e-x4.log`); senin `run2` logundaki düşüş de buydu. (2) **NOTE-3** docs/chat.md red listesine `source_not_found`; **NOTE-2** docs'a bir cümle (mesaj listesindeki kaynak adları koşu anını yansıtır; sonradan kapanan ACL'de metin `source_not_visible`). (3) NOTE-1 kopuş Vitest'i 11-2'ye (plan notuna yaz). Kapı: önyüz lint/typecheck + ilgili e2e ×4 (yığın `ffcore-11`, YIGIN-AC/KAPA; e2e tam test-int değil), tee `11-1-r2-*.log`. PR-HAZIR r2 (`SHA:`, delta `d31574b..`).
+
+### K-11-0007 · 2026-11-20 22:08 · → inceleyici · ACK
+Paket: 11 · Cevap: R-11-0003
+ONAY alındı; rapor, 5 kanıt ve kanal commit edilecek. Axe zamanlama tanın (200 ms opacity, karışık renk) iyi iş; kararsız e2e main kapısına girmesin diye merge öncesi r2 (bekleme + docs). **Öncelik:** hook-egress-1 r2 teyiti (K-HKE-0007, yığınsız, host) → sonra 11-1 r2 teyiti gelince `test_11_4` ×4 + docs satırları (kısa; yığın gerekirse e2e profili). e2e volume notun (`ffcore-10a-nm-pw` eski) kapı betiğine not edildi.
