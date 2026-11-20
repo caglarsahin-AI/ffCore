@@ -456,10 +456,7 @@ async def _check_reupload(request, actor, project_id, existing, explicit_acl, ro
     insufficient_role with its audit row. Invariant: a document's ACL changes only through
     PATCH and upload, and both pass ACL_CHANGE."""
     wanted = (sorted(roles), sorted(map(str, users)))
-    # K-04B-0013 A: a project admin (a superadmin's grant is admin too) passes the name check,
-    # so a user-only document it cannot read (C15) stays manageable. FOLLOWUP-202: its PATCH
-    # and DELETE still answer 404 for the admin.
-    admin = request.state.grant.role == "admin"
+    admin = _manages_acl(request)
     changes_acl = False
     for row in existing.values():
         if not row.readable and not admin:
@@ -473,19 +470,34 @@ async def _check_reupload(request, actor, project_id, existing, explicit_acl, ro
         await authorize(request, actor, str(project_id), ACL_CHANGE)
 
 
-async def _document(
-    session, project_id: UUID, kb_id: UUID, document_id: UUID, filters: VectorFilters
+def _manages_acl(request: Request) -> bool:
+    """The project admin (a superadmin's grant is admin too): the one who sets a document's ACL,
+    so it manages a user-only document it cannot read (C15). The single rule for the same-name
+    upload (K-04B-0013 A) and the single document GET/PATCH/DELETE (FOLLOWUP-202); the list,
+    search and ingest report keep the read filter for everyone (S-1)."""
+    return request.state.grant.role == "admin"
+
+
+async def _managed_document(
+    request: Request, actor: Actor, session, project_id: UUID, kb_id: UUID, document_id: UUID
 ) -> Document:
-    """A document the caller may read; otherwise 404, the same as a missing one (K-04a-0017)."""
+    """The single document routes: the admin sees every document, others only what they read."""
+    filters = None if _manages_acl(request) else acl_for(request, actor)
+    return await _document(session, project_id, kb_id, document_id, filters)
+
+
+async def _document(
+    session, project_id: UUID, kb_id: UUID, document_id: UUID, filters: VectorFilters | None
+) -> Document:
+    """A document the caller may read (`filters`; None: no read filter, _manages_acl only);
+    otherwise 404, the same as a missing one (K-04a-0017)."""
     kb = await _kb(session, project_id, kb_id)
-    document = await session.scalar(
-        select(Document).where(
-            Document.id == document_id,
-            Document.kb_id == kb.id,
-            Document.deleted_at.is_(None),
-            visible(filters),
-        )
+    query = select(Document).where(
+        Document.id == document_id, Document.kb_id == kb.id, Document.deleted_at.is_(None)
     )
+    if filters is not None:
+        query = query.where(visible(filters))
+    document = await session.scalar(query)
     if document is None:
         raise not_found("document")
     return document
@@ -500,7 +512,7 @@ async def get_document(
     actor: Reader,
     session: SessionDep,
 ):
-    document = await _document(session, project_id, kb_id, document_id, acl_for(request, actor))
+    document = await _managed_document(request, actor, session, project_id, kb_id, document_id)
     counts = await _chunk_counts(session, [document.id])
     return _document_out(document, counts.get(document.id, 0))
 
@@ -522,7 +534,7 @@ async def update_document(
     once (it is read from the document, no reindex). An ACL change (FOLLOWUP-86) reaches the
     vector store before the answer; a store failure leaves the document as it was (503).
     Only a project admin changes the ACL (04b-1 r2); the other fields stay the uploader's."""
-    document = await _document(session, project_id, kb_id, document_id, acl_for(request, actor))
+    document = await _managed_document(request, actor, session, project_id, kb_id, document_id)
     changes = body.model_dump(exclude_unset=True)
     acl = {
         key: changes.pop(key) for key in ("acl_roles", "acl_users", "acl_open") if key in changes
@@ -642,7 +654,7 @@ async def delete_document(
     resource_id: DocumentIdDep,
 ) -> None:
     """Soft delete: the document leaves search at once (chunks removed); raw stays (D3)."""
-    document = await _document(session, project_id, kb_id, document_id, acl_for(request, actor))
+    document = await _managed_document(request, actor, session, project_id, kb_id, document_id)
     # Vector store first: the pgvector driver writes chunks in its own session, which would wait
     # forever on rows this request already deleted (and Qdrant must not keep points of a
     # document that is gone). A store failure leaves the document as it was (503).
