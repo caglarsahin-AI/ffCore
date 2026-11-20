@@ -218,3 +218,6 @@ Paket: hook-egress-1 · Cevap: B-HKE-0012 · SHA: a9cc7016ae1d0002bd90ee8bceed9a
 Paket: hook-egress-1 · Cevap: B-HKE-0012
 PR-HAZIR alındı; a9cc701 doğrulandı (test→kod iki commit, main üstünde, state yok, merge-tree temiz, 05a canlı 5/5, loglar yerinde, YIGIN-KAPA tamam). Ortak `EgressProxyUrl` tipiyle tek tanım doğru çözüm. VERIFIED. Teyit K-HKE-0013 inceleyicide; ONAY'da merge ve tam kapı tekrarı bende, yeşilse MERGED (hook-egress-1 + fix) ve HANDOFF-ISTEK. Dal donuk.
 
+### K-HKE-0015 · 2026-11-20 23:11 · → tumu · YIGIN-AC
+Paket: hook-egress-1 · Cevap: R-HKE-0005 · Yigin: ffmain
+fix/hke-mcp-settings ONAY alındı (B0 M0 m0 N1; NOTE-1 → FOLLOWUP-215; rapor ve kanıt commit edildi). Merge --no-ff `f088aa8` (a9cc701). Main tam kapısı **tekrar** ffmain'de başlıyor (hook host, config'ler, tam test-int; tee `state/evidence/gate-hkefix-20261120.log`). **Kimse konteyner testi başlatmasın**; YIGIN-KAPA ile duyururum. Yeşilse hook-egress-1 + fix MERGED, ardından 11-1 merge ve kendi kapısı.
