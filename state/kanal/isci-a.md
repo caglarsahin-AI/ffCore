@@ -89,3 +89,17 @@ Paket: 12 · Cevap: K-12-0010, K-12-0012 · Durum: PLANNED
 **Yedek:** ffcore DB + Langfuse Postgres + knowledge_storage (+ Qdrant servisi; `--with-traces` ClickHouse/MinIO); litellm DB, agent_demo, Redis, model ağırlıkları bilerek dışarıda (yeniden kurulur, belgeli). restore: sha256 → hedef boş değilse açık hata → pg_restore → storage → `counts.json` eşitliği.
 **Sorular (önerilen önce):** S1 yedek provası: **A** host pytest `tests/deploy/test_12_backup_restore.py` (opt-in `RUN_BACKUP_TESTS=1`; tools'ta Docker soketi yok, betikler host'ta koşar) · B tools'a Docker soketi (reddedilmiş, K-00-0003) · C yalnız elle prova + log. S2 test yığınları: **A** `.env.test`'e `APP_DB_USER=ffcore_app` + sahte parola, bütün yığınlar backend'i en-az-yetkili rolle koşar (en güçlü kanıt; bedeli ilk tam test-int'te gizli yetki varsayımları kırmızı çıkabilir) · B yalnız 12 testleri için ayrı env (kanıt dar). S3 `tests/deploy/` yeni dizin touch-zone'a girer mi.
 PLAN-ONAY bekliyorum; kod yok. (Önceki zil dosya yazımından önce gitti; kabuk heredoc hatası, bu mesajla tamamlandı.)
+
+### A-12-0017 · 2026-11-20 15:30 · → koordinator · YIGIN-AC
+Paket: 12 · Cevap: K-12-0013 · Yigin: ffcore-12
+12-2 (46): yığın ffcore-12 taban (test,qdrant), `up --build --pull never` (backend imajına `12_0001` + retention değişikliği girer; ayrı build yok), hedefli test-int `test_12_46_*`, `test_03c_retention_*`, alembic up/down. Tam test-int için ayrıca sıra isteyeceğim.
+
+### A-12-0018 · 2026-11-20 16:40 · → koordinator · YIGIN-KAPA
+Paket: 12 · Cevap: K-12-0013 · Yigin: ffcore-12
+down -v; konteyner 0, volume 0. 12-2 A dilimleri commit'li (`feat/12-2-kurulum`, 13 commit e9d0de6 üstünde): 46 (f5287c2), yedek/geri yükleme (betikler + restore REVOKE düzeltmesi), 95 + vLLM (01c2768), donanim.md (f78907c).
+**Kanıt:** 46 hedefli test-int 49 passed (initdb rolü oluşturdu, backend `ffcore_app` ile bağlı, DDL red, bölüm işlemleri yalnız fonksiyonla; `12-2-46-test-int.log`). **Yedek provası geçti** (`12-2-backup-restore-prova.log`, host pytest): seed (proje, analist, modeller, Markdown belge FAKE_EMBED ile indexed, yayımlı agent, tamamlanan chat run) → backup (ffcore + langfuse dump, storage, qdrant volume) → down -v → restore: sayılar eşit (projects 1, agents 1, kb 1, documents 1, conversations 1, runs 1, messages 2, audit 19, storage 3), belge dosyası sha256 eşit, ikinci restore "already has 42 tables" ile red. Birim: backup betikleri 10, 46 statik 7, 95/vLLM 9, 19 offline + 06b2 reserved yeşil; vLLM overlay `compose config` geçerli.
+**Yolda bulunanlar:** (1) `pg_restore --no-acl` göçün `REVOKE EXECUTE … FROM PUBLIC`'ini düşürüyordu → restore her durumda geri alıyor (kırmızı test + düzeltme); (2) vLLM imajı ~11,9 GB: `images.txt`'e değil ayrı `deploy/offline/images-vllm.txt`'e (save.sh'a `IMAGES_TXT`, verify.sh zaten destekliyordu), CPU arşivi büyümez; (3) prova seed'i Langfuse prompt'larını ister (`seed-prompts`); prompt'lar Langfuse DB'sinde, yedekte.
+
+### A-12-0019 · 2026-11-20 16:41 · → koordinator · SORU
+Paket: 12 · Cevap: -
+ENV-209: **tam test-int için sıra** istiyorum. Plan: `up --build --pull never` (yeni Dockerfile: make/curl base katmanda; `12_0001`), lint, `make test` ×2, alembic heads + `12_0001` up/down, tam test-int ayrık konteynerde (S2 A: bütün yığın `ffcore_app` ile; çıkan gizli yetki varsayımlarını 12-2'de düzelteceğim), smoke; log `12-2-gate-*.log`. Sonra 12-1 merge'ünü bekleyip rebase + B dilimleri (preflight satırları, kurulum rehberleri, degisiklikler). "Başla" mesajını bekliyorum.

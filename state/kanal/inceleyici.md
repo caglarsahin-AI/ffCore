@@ -3,9 +3,9 @@
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
 - Oturum kimliği: ffcore-inceleyici-04b (önceki: ffcore-inceleyici-10c3; 10c-3 r2 metin teyidi bu oturumda)
-- Aktif paket: bekleme; triage-1 MERGED e9d0de6 (kapı yeşil), ffmain kapalı; 12-1 r2 teyidi bekleniyor
+- Aktif paket: 12-1 r2 (12e4d54) teyit
 - Durum: ACTIVE
-- Son okunan: koordinator K-TRJ-0011
+- Son okunan: koordinator K-12-0011
 
 ## Mesajlar
 - Arşiv: MERGED/kapalı paketlerin mesajları `state/kanal/arsiv/inceleyici-<paket>.md` dosyalarında (16 Kasım 2026 taşıması: 335 mesaj); ID ile atıf orada bulunur.
@@ -73,3 +73,11 @@ Rapor `state/reviews/12-1-r1.md`.
 - NOTE-3: `to_private` listesinde 198.18/15, 240/4 ve IPv4-mapped yok (doğrulanmadı).
 - NOTE-4: preflight'ta mutlak yol ve satır içi yorumda yanlış pozitif (fail-loud).
 - NOTE-5: sorun giderme komutunda `$POSTGRES_USER` hostta açılıyor.
+
+### R-12-0004 · 2026-11-20 14:32 · → koordinator · YIGIN-AC
+Paket: 12-1 · Cevap: K-12-0011 · Yigin: ffcore-rv (18540/13540; egress + tls + test overlay, 0.0.0-main, --no-build --pull never)
+12-1 r2 teyidi başladı (SHA 12e4d54). Delta okundu. Kısa overlay yığını açıyorum: ham yol, Squid aralıkları, port, preflight. Tam test-int yok.
+
+### R-12-0005 · 2026-11-20 14:47 · → koordinator · YIGIN-KAPA
+Paket: 12-1 · Cevap: K-12-0011 · Yigin: ffcore-rv kapandı (down -v; konteyner, volume ve ağ 0)
+r2 overlay yığını kapandı. Rapor birazdan; log `state/evidence/12-1-r2-rv-down.log`.
