@@ -238,6 +238,25 @@ def test_hke_208_unreachable_proxy_fails_without_a_direct_fallback(settings):
     assert resolver.calls == ["proxy.test"]
 
 
+def test_hke_208_refused_proxy_connection_is_egress_proxy_unreachable(settings):
+    # r1 NOTE-2: a proxy that refuses the connection (port closed, service down) has the same
+    # code as a proxy name that does not resolve, for the operator's diagnosis.
+    with socket.socket() as sock:
+        sock.bind(("127.0.0.1", 0))
+        closed_port = sock.getsockname()[1]
+    resolver = _resolver({"proxy.test": ["127.0.0.1"]})
+    configured = settings.model_copy(
+        update={
+            "egress_proxy_url": f"http://proxy.test:{closed_port}",
+            "egress_allowlist": ["svc.example.com"],
+        }
+    )
+    for url in ("http://svc.example.com/x", "https://svc.example.com/x"):
+        with pytest.raises(EgressRequestFailed) as exc:
+            anyio.run(_get, _client(configured, resolver), url)
+        assert exc.value.code == "egress_proxy_unreachable", url
+
+
 def test_hke_208_empty_setting_keeps_the_direct_pinned_path(settings):
     # unchanged behaviour: the backend resolves and checks the target itself
     resolver = _resolver({"svc.example.com": ["10.0.0.5"]})
