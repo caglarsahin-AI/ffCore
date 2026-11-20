@@ -38,6 +38,8 @@ def test_12_smoke_fails_on_egress_without_allowlist(monkeypatch):
         "compose.yaml:deploy/docker-compose.egress.yml:deploy/docker-compose.tls.yml",
     )
     monkeypatch.setenv("EGRESS_ALLOWLIST", "")
+    monkeypatch.setenv("APP_DB_USER", "ffcore_app")
+    monkeypatch.setenv("APP_DB_PASSWORD", "dummy-not-secret")
     with pytest.raises(smoke.SmokeError, match="egress_allowlist_empty"):
         smoke.check_preflight()
 

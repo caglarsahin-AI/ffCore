@@ -24,6 +24,9 @@ BASE = {
     "COMPOSE_FILE": "",
     "EGRESS_ALLOWLIST": "",
     "OLLAMA_CONTEXT_LENGTH": "",
+    # 12-2 (FOLLOWUP-46): llmaas refuses the owner as the application's database user.
+    "APP_DB_USER": "ffcore_app",
+    "APP_DB_PASSWORD": "dummy-not-secret",
 }
 OLLAMA_FILES = "compose.yaml:deploy/docker-compose.ollama.yml"
 EGRESS_FILES = "compose.yaml:deploy/docker-compose.egress.yml:deploy/docker-compose.tls.yml"
@@ -187,7 +190,7 @@ def test_12_cli_reads_env_file_and_exits_1_on_error(tmp_path):
 
 def test_12_cli_egress_list(tmp_path):
     env_file = tmp_path / "deploy.env"
-    env_file.write_text("EGRESS_ALLOWLIST=api.anthropic.com\n", encoding="utf-8")
+    env_file.write_text("EGRESS_ALLOWLIST=api.anthropic.com\n", encoding="utf-8")  # list only
     result = subprocess.run(
         ["python", str(SCRIPT), "--env-file", str(env_file), "--egress-list"],
         capture_output=True,
@@ -261,3 +264,60 @@ def test_12_r2_env_file_inline_comment_is_dropped(tmp_path):
     assert values["EGRESS_ALLOWLIST"] == "a.test"
     assert values["QUOTED"] == "b.test # kept"
     assert values["HASH"] == "x#y"
+
+
+VLLM_FILES = "compose.yaml,deploy/docker-compose.vllm.yml"
+
+
+def test_12_2_vllm_coherent_passes():
+    lines = preflight.check(
+        env(
+            DEPLOY_PROFILE="airgap",
+            INFERENCE_BACKEND="vllm",
+            COMPOSE_PROFILES="vllm",
+            COMPOSE_PATH_SEPARATOR=",",
+            COMPOSE_FILE=VLLM_FILES,
+        )
+    )
+    assert any(line.startswith("vllm:") for line in lines)
+
+
+def test_12_2_vllm_profile_without_overlay_is_refused():
+    code, message = error_code(
+        env(DEPLOY_PROFILE="airgap", INFERENCE_BACKEND="vllm", COMPOSE_PROFILES="vllm")
+    )
+    assert code == "profile_overlay_mismatch" and "docker-compose.vllm.yml" in message
+
+
+def test_12_2_vllm_needs_airgap_and_the_vllm_backend():
+    for changes in ({"DEPLOY_PROFILE": "llmaas"}, {"INFERENCE_BACKEND": "ollama"}):
+        values = env(
+            DEPLOY_PROFILE="airgap",
+            INFERENCE_BACKEND="vllm",
+            COMPOSE_PROFILES="vllm",
+            COMPOSE_PATH_SEPARATOR=",",
+            COMPOSE_FILE=VLLM_FILES,
+        )
+        code, _ = error_code({**values, **changes})
+        assert code == "profile_backend_mismatch", changes
+
+
+def test_12_2_llmaas_refuses_the_owner_as_application_user():
+    code, message = error_code(env(APP_DB_PASSWORD=""))
+    assert code == "db_role_owner" and "APP_DB_PASSWORD" in message
+
+
+def test_12_2_app_db_user_must_be_ffcore_app():
+    code, _ = error_code(env(APP_DB_USER="someone"))
+    assert code == "db_role_invalid"
+
+
+def test_12_2_airgap_may_run_as_the_owner_but_says_so():
+    # The PayCore M3 server (airgap) predates the role; it is named, not refused.
+    lines = preflight.check(env(DEPLOY_PROFILE="airgap", APP_DB_USER="", APP_DB_PASSWORD=""))
+    assert any("owner" in line for line in lines)
+
+
+def test_12_2_role_line_names_the_role():
+    lines = preflight.check(env())
+    assert any(line == "database: application connects as ffcore_app" for line in lines)
