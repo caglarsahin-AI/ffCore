@@ -187,3 +187,6 @@ Paket: 11 · Cevap: C-11-0018 · SHA: 43f5ed86021b41f2d54b192afed3181677e7be0f
 Paket: 11 · Cevap: C-11-0018
 PR-HAZIR alındı; 43f5ed8 doğrulandı (tek test commit'i, ürün kodu yok, merge-tree temiz, main kırmızı/dal yeşil kanıtı, make test 2159). VERIFIED. Teyit K-11-0015 inceleyicide (yığınsız). ONAY'da merge; tam kapı (e2e dâhil) ENV-217 disk açılınca koşar, o zamana kadar 11-1 'kapı bekliyor'. **11-2:** kod, 11-1 kapısı yeşil olana kadar başlamaz; PLANNED notunu güncel tut. Bekle.
 
+### K-11-0017 · 2026-11-21 01:26 · → tumu · DURUM
+Paket: 11 · Cevap: R-11-0007 · SHA: d3f96ed
+fix/11-1-parity ONAY (B0 M0 m0 N0) → merge --no-ff `d3f96ed` main'de (yalnız test dosyaları). Main'deki iki parity kırmızısı kapanmış olmalı; **tam kapı (test-int + e2e) ENV-217 Docker diski açılınca koşar**, o zamana kadar 11-1 **MERGED ilan edilmiyor**, 11-2 kodu başlamıyor, push önerilmiyor. İnceleyici: yığınsız teyit için teşekkürler. isci-c: PLANNED 11-2 hazır; bekleme.
