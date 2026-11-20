@@ -221,3 +221,15 @@ PR-HAZIR alındı; a9cc701 doğrulandı (test→kod iki commit, main üstünde, 
 ### K-HKE-0015 · 2026-11-20 23:11 · → tumu · YIGIN-AC
 Paket: hook-egress-1 · Cevap: R-HKE-0005 · Yigin: ffmain
 fix/hke-mcp-settings ONAY alındı (B0 M0 m0 N1; NOTE-1 → FOLLOWUP-215; rapor ve kanıt commit edildi). Merge --no-ff `f088aa8` (a9cc701). Main tam kapısı **tekrar** ffmain'de başlıyor (hook host, config'ler, tam test-int; tee `state/evidence/gate-hkefix-20261120.log`). **Kimse konteyner testi başlatmasın**; YIGIN-KAPA ile duyururum. Yeşilse hook-egress-1 + fix MERGED, ardından 11-1 merge ve kendi kapısı.
+
+### K-HKE-0016 · 2026-11-20 23:39 · → tumu · YIGIN-KAPA
+Paket: hook-egress-1 · Cevap: K-HKE-0015 · Yigin: ffmain
+Kapı bitti, `down -v` tamam (ffmain 11-1 kapısı için hemen yeniden açılacak, ayrı YIGIN-AC).
+
+### K-HKE-0017 · 2026-11-20 23:39 · → tumu · MERGED
+Paket: hook-egress-1 · Cevap: R-HKE-0005 · SHA: f088aa8
+fix/hook-egress-1 (`c1d79f4`) + fix/hke-mcp-settings (`f088aa8`) main'de; tam kapı yeşil `state/evidence/gate-hkefix-20261120.log` (hooks host 421, test 2156×2, test-int 1143 — 05a canlı mcp-sql 5/5, smoke, Vitest 279). **Main'de MCP servisleri düzeldi.** WORK_QUEUE DONE; FOLLOWUP 208/210/212/213 kapandı, 211/214/215 açık. Hook **block** kipinde çalışıyor: heredoc/yorumlayıcı gövdeleri sessiz, gerçek ihlal engel; ENV engel mesajı çıkış yolunu söyler. Push kullanıcı talimatını bekliyor.
+
+### K-HKE-0018 · 2026-11-20 23:39 · → isci-b · HANDOFF-ISTEK
+Paket: hook-egress-1 · Cevap: B-HKE-0012
+MERGED c1d79f4 + f088aa8; dilim tamam. Kanalına HANDOFF yaz (kalan riskler: FOLLOWUP-211 CONNECT-only, 214 kesme işaretli yorum + `timeout`, 215 ayar sınıfı keşfi; block kipi ilk günleri: yanlış pozitif bildirimleri DURUM'larla gelir), sonra lease `RETIRED`. Worktree'ler `.worktrees/fix/hook-egress-1`, `.worktrees/fix/hke-mcp-settings` ve `0.0.0-hke` etiketi silme kullanıcıda. İki PR + düzeltme, üç tur; teşekkürler.
