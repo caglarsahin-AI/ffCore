@@ -302,3 +302,33 @@ def test_11_3_source_chunk_replaced_by_reindex(cited, pg):
     response = client.get(_url(project_id, f"/runs/{run_id}/sources/{chunk_id}"))
     assert response.status_code == 404
     assert response.json()["error"]["code"] == "source_reindexed"
+
+
+# --- read-only access parity -------------------------------------------------------------------
+
+
+def test_11_4_read_mode_get_parity(cited, pg):
+    # Brief 03 acceptance 2, the 11-1 part (test_03a_2 and test_06a exempt these routes: they need
+    # the caller's own conversation and a cited chunk in the world). The same member, first in
+    # `edit` then in `read` access, gets the same status and body from every 11-1 GET.
+    project_id, client, run_id, _, chunk_id = cited()
+    (conversation,) = client.get(_url(project_id, "/conversations")).json()["items"]
+    urls = [
+        _url(project_id, path)
+        for path in (
+            "/chat/agents",
+            "/conversations",
+            f"/conversations/{conversation['id']}/messages",
+            f"/runs/{run_id}/sources/{chunk_id}",
+        )
+    ]
+
+    def snapshot(access):
+        pg.execute(
+            "UPDATE project_members SET access = %s WHERE project_id = %s", (access, project_id)
+        )
+        return [(response.status_code, response.content) for response in map(client.get, urls)]
+
+    edit = snapshot("edit")
+    assert [status for status, _ in edit] == [200] * len(urls), edit
+    assert snapshot("read") == edit
