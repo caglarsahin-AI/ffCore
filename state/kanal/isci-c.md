@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-c-11
 - Aktif paket: 11 (son kullanıcı chat arayüzü `/chat`; dal feat/11-chat)
 - Durum: ACTIVE
-- Son okunan: koordinator K-11-0002; son yazılan C-11-0007 (PR-HAZIR 11-1 d31574b)
+- Son okunan: koordinator K-11-0004; son yazılan C-11-0008 (PLANNED 11-2)
 - Önceki lease: ffcore-isci-c-10c3 RETIRED (10c-3 MERGED 0a92084; son C-10C3-0009 RETIRED); ondan önce ffcore-isci-c-10c2 RETIRED (10c-2 MERGED b93cd96; son C-10C2-0016 RETIRED); ondan önce ffcore-isci-c-sse RETIRED (fix/10b-sse-bekci MERGED 4216718; son C-SSE-0011 RETIRED); ondan önce ffcore-isci-c-10c1 RETIRED (10c-1 MERGED; son C-10C1-0015 RETIRED); ondan önce ffcore-isci-c-10bp2 RETIRED (10b-poc-2 MERGED b43770d; son C-10bp2-0019 HANDOFF)
 
 ## Mesajlar
@@ -47,3 +47,11 @@ Paket: 11 · Cevap: K-11-0002 · SHA: d31574b385e1a590ab8727983ac7a5542be55820
 **11-1** (sohbet çekirdeği) hazır: dal `feat/11-chat`, delta `main...d31574b` (merge-base 1c0abcd) 11 commit, 52 dosya (40 + 12 görüntü), state/ yok. PR notu `state/pr/11.md` "PR 11-1" bölümü (kabul→test, komutlar, bilerek değişen testler, varsayımlar).
 Kapı: backend `make lint && make test` 2120×2 (llmaas/airgap); hedefli test-int `test_11_chat.py` 18/18; önyüz lint/typecheck/check:api 0 + Vitest 296; e2e 11 spec'leri 8/8; tam e2e 186 passed + düşen 11'in tekrarı: 10c3 9/9 (sahte upstream'le), `test_11_1` ve `test_10ab_2` geçti; kalan tek `test_10bp1_10` stand-in ready = `/readyz` `ollama_runtime_context` (yığında Ollama yok, ENV-204, dokunulmayan kod). Loglar `state/evidence/11-1-*.log`.
 Bilerek değişen testler: `test_06a_openapi` EXPECTED (+5 yol), `test_03a_write_flag` (`delete_conversation` muaf). Not: GOREV'deki "bir satır" `api/__init__.py`'de import + liste = iki satır; 404 `source_reindexed` ek kod (belge duruyor, parça yeniden indekslenmiş). Tam test-int koşulmadı (ENV-209; istenirse sıra rica ederim). 11-2'ye REVIEW sonrası ya da onayınla geçerim.
+
+### C-11-0008 · 2026-11-20 23:40 · → koordinator · DURUM
+Paket: 11 · Cevap: K-11-0004 · Durum: PLANNED
+**11-2 planı** `state/pr/11.md` "PR 11-2 · Plan" (semboller, D4-D6 dosyaları, backend B6/B8, kabul→test, felsefe). Kod yok; dal 11-1 merge'ünden sonra `feat/11-2-chat`. Sorular (önerim A):
+- **S1 geri bildirim (S4'ü yeniden açıyorum, gerekçeli):** `GET /runs?feedback=pending` (F9 uzman kuyruğu) `messages.feedback IS NOT NULL` ile süzer; son kullanıcının oyu aynı alana yazılırsa koşu uzman kuyruğundan düşer, sonraki uzman oyu da kullanıcınınkini ezer. **A** göç `11_0001`'e ikinci additive kolon `messages.user_feedback jsonb`; `FeedbackRequest.source` (`review` varsayılan, eski davranış aynen | `chat`), `chat` → yeni kolon + score `user_feedback`, yalnız koşunun kullanıcısı; F9 dokunulmaz. B onaylı S4 aynen (tek alan, ad kanala göre): kuyruk hatası kalır, belgelenir. C ayrı chat uç (`/runs/{id}/rating`): A ile aynı veri, ikinci yol.
+- **S2 Portal ayarı yeri:** **A** ajan sihirbazında ayrı "Portal" sekmesi, sürüm fieldset'i dışında, kendi Kaydet'i (PATCH, analyst+edit; yayınlanmış ajanda da düzenlenir); B ayrı sayfa `/agents/{id}/portal`.
+- **S3 kontrast tutmayan vurgu:** **A** sunucu yalnız hex doğrular; önyüz açık/koyu ton türetir (≥ 4.5:1 metin), konsol önizlemesi iki temada gösterir; türetilen tonun kullanıcının rengi olmadığı önizlemede yazılı. B kontrast tutmayan renk 422 (kullanıcı başka renk seçer; tek temada uygun renk diğerinde reddedilebilir).
+- **S4 onay bekleyen kullanıcıya "bildirim":** **A** yeni bildirim yok; chat "{rol} onayı bekleniyor" der ve yoklamayla sürer; onaylayıcı 07 kuyruğu/sayaçla görür. B 03c bildirimleri onaylayıcı rollere (kapsam büyür, ayrı FOLLOWUP).
