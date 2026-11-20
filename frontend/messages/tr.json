@@ -440,7 +440,10 @@
     "egressInvalidPort": "Adresteki port geçerli değil.",
     "egressTooManyRedirects": "Upstream çok fazla yönlendirme yaptı.",
     "egressTimeout": "Dış istek zaman aşımına uğradı.",
-    "egressRequestFailed": "Dış istek başarısız oldu."
+    "egressRequestFailed": "Dış istek başarısız oldu.",
+    "sourceDeleted": "Alıntılanan belge silinmiş.",
+    "sourceReindexed": "Alıntılanan parça artık bilgi tabanında yok (belge yeniden indekslenmiş).",
+    "sourceNotVisible": "Alıntılanan belge size görünür değil (belge erişim listesi)."
   },
   "ProviderTest": {
     "title": "Bağlantı testi",
@@ -932,11 +935,6 @@
     },
     "note": "Not: {detail}",
     "fallback": "Yedek model cevap verdi: {detail}",
-    "toolPending": "Çalışıyor",
-    "toolDone": "Bitti",
-    "toolError": "Hata: {code}",
-    "noCode": "kod yok",
-    "toolTruncated": "Kısaltıldı (tamamı {chars} karakter)",
     "approvalTitle": "Onay gerekiyor",
     "approvalRole": "Onaylayabilecek: {role} ve üstü",
     "approvalNote": "Not (ret durumunda modele gösterilir)",
@@ -947,9 +945,6 @@
     "answer": "Cevabınız",
     "sendAnswer": "Cevapla",
     "answerTitle": "Cevap",
-    "sources": "Kaynaklar",
-    "sourceTitle": "[{n}] {name}",
-    "sourcePage": "sayfa {page}",
     "runError": "Koşu {code} ile bitti: {message}",
     "openRun": "Bu koşuyu aç"
   },
@@ -1914,6 +1909,72 @@
         "system": "Sistem"
       },
       "auditNote": "Bu sunucudaki değişiklikler audit kaydında {actions} eylemleriyle yer alır."
+    }
+  },
+  "RunCards": {
+    "toolPending": "Çalışıyor",
+    "toolDone": "Bitti",
+    "toolError": "Hata: {code}",
+    "noCode": "kod yok",
+    "toolTruncated": "Kısaltıldı (tamamı {chars} karakter)",
+    "sources": "Kaynaklar",
+    "sourceTitle": "[{n}] {name}",
+    "sourcePage": "sayfa {page}",
+    "details": "Ayrıntı",
+    "activity": {
+      "searchDocuments": "Belgelerde aranıyor…",
+      "runSql": "SQL çalıştırılıyor…",
+      "tool": "{name} çalışıyor…"
+    },
+    "activityDone": {
+      "searchDocuments": "Belgelerde arandı",
+      "runSql": "SQL çalıştırıldı",
+      "tool": "{name} kullanıldı"
+    },
+    "sourceUpdated": "güncelleme {date}",
+    "sourceLoading": "Parça yükleniyor…",
+    "sourceError": "Parça gösterilemiyor: {message} (kod: {code})"
+  },
+  "Chat": {
+    "title": "Sohbet",
+    "console": "Konsol",
+    "signOut": "Çıkış",
+    "loading": "Yükleniyor…",
+    "noProjectTitle": "Bir proje seçin",
+    "noProjectBody": "Sohbet edebileceğiniz asistanları görmek için üst çubuktan bir proje seçin.",
+    "agentsTitle": "Asistanlar",
+    "noAgents": "Bu projede henüz yayınlanmış asistan yok.",
+    "unavailableTitle": "Bu asistan kullanılamıyor",
+    "unavailableBody": "\"{key}\" bu projenin yayınlanmış bir asistanı değil ya da erişiminiz yok.",
+    "backToAgents": "Asistanlara dön",
+    "conversations": "Konuşmalar",
+    "openConversations": "Konuşmaları göster",
+    "newConversation": "Yeni konuşma",
+    "noConversations": "Henüz konuşma yok.",
+    "untitled": "Başlıksız",
+    "deleteConversation": "{title} konuşmasını sil",
+    "deleteTitle": "Bu konuşma silinsin mi?",
+    "deleteBody": "Listenizden kalkar. Mesajları saklama politikasına göre daha sonra silinir.",
+    "cancel": "Vazgeç",
+    "delete": "Sil",
+    "welcomeTitle": "{name} asistanına sorun",
+    "inputLabel": "Mesajınız",
+    "inputPlaceholder": "Bir soru yazın…",
+    "send": "Gönder",
+    "startFailed": "Mesaj gönderilemedi: {message} (kod: {code})",
+    "runFailed": "Cevap yok: koşu {code} ile bitti.",
+    "reconnecting": "Bağlantı koptu; yeniden bağlanılıyor…",
+    "lost": "Bağlantı sürdürülemedi. Cevap yine de gelebilir; konuşmayı sonra yeniden açın.",
+    "serverStatus": "Sunucudaki durum: {status}",
+    "phases": {
+      "starting": "Başlıyor…",
+      "running": "Düşünüyor…",
+      "waiting_approval": "Onay bekliyor",
+      "waiting_user": "Asistan soruyor:"
+    },
+    "badges": {
+      "declined": "Kaynaklarda bulunamadı",
+      "lowConfidence": "Düşük güven"
     }
   }
 }

@@ -74,3 +74,13 @@ export function itemForPath(pathname: string): NavItem | null {
   }
   return null;
 }
+
+// The first screen after sign-in: a `user` member has no console screen and goes to the chat
+// (brief 11; the role is activated in 17); every other role to its first ready console screen.
+export function homePath(role: Role, superadmin: boolean): string {
+  if (role === "user" && !superadmin) return "/chat";
+  const first = visibleGroups(role, superadmin)
+    .flatMap((group) => group.items)
+    .find((item) => item.ready);
+  return first?.href ?? "/overview";
+}

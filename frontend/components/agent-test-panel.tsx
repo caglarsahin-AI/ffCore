@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { useEffect, useReducer, useRef, useState } from "react";
 
+import { SourceCards } from "@/components/chat/source-cards";
+import { ToolCallCard } from "@/components/chat/tool-call-card";
 import { TextField } from "@/components/form-parts";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -194,20 +196,7 @@ export function AgentTestPanel({
         </p>
       )}
       {view.tools.map((tool) => (
-        <div key={tool.id} className="flex flex-col gap-1 rounded-lg border p-3 text-sm" data-testid="test-tool-card">
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="font-mono">{tool.name}</span>
-            {tool.result === null ? (
-              <Badge variant="outline">{t("toolPending")}</Badge>
-            ) : (
-              <Badge variant={tool.result.isError ? "destructive" : "secondary"}>{tool.result.isError ? t("toolError", { code: tool.result.errorCode ?? t("noCode") }) : t("toolDone")}</Badge>
-            )}
-            {tool.result?.truncated && <span className="text-muted-foreground">{t("toolTruncated", { chars: tool.result.chars ?? 0 })}</span>}
-          </div>
-          <pre tabIndex={0} className="overflow-auto rounded bg-muted p-2 text-xs" data-testid="test-tool-arguments">
-            {JSON.stringify(tool.arguments, null, 2)}
-          </pre>
-        </div>
+        <ToolCallCard key={tool.id} tool={tool} variant="panel" />
       ))}
       {view.approval && (
         <div className="flex flex-col gap-3 rounded-lg border border-primary p-3" role="group" aria-label={t("approvalTitle")} data-testid="test-approval">
@@ -260,19 +249,7 @@ export function AgentTestPanel({
           </p>
         </div>
       )}
-      {view.sources.length > 0 && (
-        <div className="flex flex-col gap-2" data-testid="test-sources">
-          <span className="text-sm font-medium">{t("sources")}</span>
-          {view.sources.map((source, i) => (
-            <div key={source.chunk_id ?? i} className="rounded-lg border p-2 text-sm" data-testid="test-source-card">
-              <p className="font-medium">{t("sourceTitle", { n: source.n ?? i + 1, name: source.document_name ?? source.kb_key ?? "" })}</p>
-              <p className="text-muted-foreground">
-                {source.page != null && t("sourcePage", { page: source.page })} {source.breadcrumb}
-              </p>
-            </div>
-          ))}
-        </div>
-      )}
+      <SourceCards sources={view.sources} variant="panel" />
       {view.error && (
         <p className="text-sm text-destructive" role="alert" data-testid="test-error">
           {t("runError", { code: view.error.code, message: view.error.message ?? "" })}
