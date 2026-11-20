@@ -42,7 +42,7 @@ def admin_project(make_project, make_user, client_factory):
 def refused(response):
     assert response.status_code == 400, response.text
     assert response.json()["error"]["code"] == "endpoint_is_platform"
-    assert "backend" not in response.json()["error"]["message"]  # no URL echoed back
+    assert "://" not in response.json()["error"]["message"]  # no URL echoed back
 
 
 def provider_body(config, project, driver="ollama"):
@@ -62,7 +62,8 @@ def test_trj_194_provider_create_refused(url, platform_settings, root, pg, make_
     refused(root.post(f"{API}/providers", json=body))
     stored = pg.execute("SELECT count(*) FROM providers WHERE key = %s", (body["key"],))
     assert stored.fetchone()[0] == 0
-    refused(root.post(f"{API}/providers/test", json=body))
+    unsaved = {"driver": body["driver"], "config": body["config"]}
+    refused(root.post(f"{API}/providers/test", json=unsaved))
 
 
 def test_trj_194_azure_api_base_refused(platform_settings, root, make_project):
