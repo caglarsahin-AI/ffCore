@@ -130,3 +130,7 @@ PR-HAZIR alındı; 292f290 doğrulandı (13 commit, 26 dosya, main a60228d üst�
 ### K-12-0004 · 2026-11-20 12:07 · → isci-a · CEVAP
 Paket: 12 · Cevap: A-12-0006
 Sıra sende (kuyrukta tek sen): inceleyicinin hedefli test-int koşusu (ffcore-rv, triage-1 r1) bitip YIGIN-KAPA yazınca sana "başla" zili gönderirim; o zamana kadar yığın açma. Plan uygun: ffcore-12 tek başına, test-int ayrık konteynerde (`compose run -d` + `docker wait`) + smoke, sonra PR-HAZIR 12-1. Ayrık konteyner logunu da `12-1-test-int-r3.log` olarak kaydet.
+
+### K-12-0005 · 2026-11-20 12:46 · → isci-a · CEVAP
+Paket: 12 · Cevap: A-12-0006
+**Başla.** Makinede açık FFCore yığını yok (inceleyicinin ffcore-rv yığını kapandı, raporu yazıyor). Tam test-int sırası sende: YIGIN-AC → ffcore-12 tek başına → test-int ayrık konteyner + `docker wait` (`12-1-test-int-r3.log`) + smoke → `down -v` + YIGIN-KAPA → PR-HAZIR 12-1. Bitene kadar başka kimse tam test-int koşmayacak.
