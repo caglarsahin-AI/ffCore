@@ -1,0 +1,566 @@
+=== gatehke main 202dad0 2026-11-20 22:19:00
+
+=== 22:19:01 hook tests (host py -3.12, FOLLOWUP-212)
+.............................................................            [100%]
+421 passed in 116.11s (0:01:56)
+hooks exit=0
+
+=== 22:21:02 compose config
+config exit=0
+
+=== 22:21:12 compose config egress+tls
+config-egress-tls exit=0
+
+=== 22:21:22 compose config vllm
+config-vllm exit=0
+
+=== 22:21:31 up -d --build --pull never --wait
+ Container ffmain-qdrant-1  Healthy
+ Container ffmain-langfuse-redis-1  Healthy
+ Container ffmain-fake-llm-1  Healthy
+ Container ffmain-backend-1  Healthy
+ Container ffmain-langfuse-worker-1  Healthy
+ Container ffmain-postgres-1  Healthy
+ Container ffmain-worker-1  Healthy
+ Container ffmain-langfuse-minio-1  Healthy
+ Container ffmain-mcp-search-1  Healthy
+ Container ffmain-mcp-sql-1  Healthy
+up exit=0
+ffcore/backend:0.0.0-main 2026-11-20 22:21:43 +0300 +03
+ffcore/frontend:0.0.0-main 2026-11-20 13:41:56 +0300 +03
+ffcore/tools:0.0.0-main 2026-11-05 21:09:24 +0300 +03
+
+=== 22:22:49 lint
+ruff check backend scripts data/samples/scripts services tests/deploy
+All checks passed!
+ruff format --check backend scripts data/samples/scripts services tests/deploy
+553 files already formatted
+lint exit=0
+
+=== 22:23:10 alembic heads
+12_0002 (03a, 06b, 04b, 04a, 05b, 07, 03c, 09, 05a, 08, 06a, 03b, 12) (head)
+heads exit=0
+
+=== 22:23:25 make test llmaas
+........................................................................ [  3%]
+........................................................................ [  6%]
+........................................................................ [ 10%]
+.........................................----------------------------------------
+Exception occurred during processing of request from ('127.0.0.1', 51768)
+............................... [ 13%]
+........................................................................ [ 16%]
+........................................................................ [ 20%]
+..............--- Logging error ---
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/logging/__init__.py", line 1163, in emit
+    stream.write(msg + self.terminator)
+ValueError: I/O operation on closed file.
+.Call stack:
+  File "/usr/local/lib/python3.12/threading.py", line 1032, in _bootstrap
+    self._bootstrap_inner()
+.  File "/usr/local/lib/python3.12/threading.py", line 1075, in _bootstrap_inner
+    self.run()
+  File "/usr/local/lib/python3.12/threading.py", line 1012, in run
+    self._target(*self._args, **self._kwargs)
+  File "/opt/venv/lib/python3.12/site-packages/uvicorn/server.py", line 86, in run
+    return asyncio_run(self.serve(sockets=sockets), loop_factory=self.config.get_loop_factory())
+  File "/usr/local/lib/python3.12/asyncio/runners.py", line 195, in run
+    return runner.run(main)
+  File "/usr/local/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+.  File "/opt/venv/lib/python3.12/site-packages/uvicorn/lifespan/on.py", line 86, in main
+    await app(scope, self.receive, self.send)
+  File "/opt/venv/lib/python3.12/site-packages/uvicorn/middleware/proxy_headers.py", line 30, in __call__
+    return await self.app(scope, receive, send)
+  File "/work/backend/tests/mcp_fixture.py", line 68, in app
+    await inner(scope, receive, send)
+.  File "/opt/venv/lib/python3.12/site-packages/starlette/applications.py", line 96, in __call__
+    await self.middleware_stack(scope, receive, send)
+.  File "/opt/venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 151, in __call__
+    await self.app(scope, receive, send)
+  File "/opt/venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 49, in __call__
+    await self.app(scope, receive, send)
+  File "/opt/venv/lib/python3.12/site-packages/starlette/routing.py", line 683, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/opt/venv/lib/python3.12/site-packages/starlette/routing.py", line 692, in app
+    await self.lifespan(scope, receive, send)
+  File "/opt/venv/lib/python3.12/site-packages/starlette/routing.py", line 661, in lifespan
+    async with self.lifespan_context(app) as maybe_state:
+  File "/usr/local/lib/python3.12/contextlib.py", line 217, in __aexit__
+    await anext(self.gen)
+  File "/opt/venv/lib/python3.12/site-packages/mcp/server/streamable_http_manager.py", line 166, in run
+    logger.info("StreamableHTTP session manager shutting down")
+Message: 'StreamableHTTP session manager shutting down'
+Arguments: ()
+..................................................... [ 23%]
+................--- Logging error ---
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/logging/__init__.py", line 1163, in emit
+    stream.write(msg + self.terminator)
+.ValueError: I/O operation on closed file.
+Call stack:
+  File "/usr/local/lib/python3.12/threading.py", line 1032, in _bootstrap
+    self._bootstrap_inner()
+.  File "/usr/local/lib/python3.12/threading.py", line 1075, in _bootstrap_inner
+    self.run()
+.  File "/usr/local/lib/python3.12/threading.py", line 1012, in run
+    self._target(*self._args, **self._kwargs)
+  File "/opt/venv/lib/python3.12/site-packages/uvicorn/server.py", line 86, in run
+    return asyncio_run(self.serve(sockets=sockets), loop_factory=self.config.get_loop_factory())
+  File "/usr/local/lib/python3.12/asyncio/runners.py", line 195, in run
+    return runner.run(main)
+.  File "/usr/local/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+  File "/opt/venv/lib/python3.12/site-packages/anyio/_core/_tasks.py", line 327, in _run_coro
+    retval = await self._coro
+  File "/opt/venv/lib/python3.12/site-packages/mcp/shared/jsonrpc_dispatcher.py", line 702, in run
+    await fn(*args)
+  File "/opt/venv/lib/python3.12/site-packages/mcp/shared/jsonrpc_dispatcher.py", line 764, in _handle_request
+    await self._final_write(
+  File "/opt/venv/lib/python3.12/site-packages/mcp/shared/jsonrpc_dispatcher.py", line 846, in _final_write
+    logger.warning("%s gave up: transport write blocked", describe)
+Message: '%s gave up: transport write blocked'
+Arguments: ('shutdown error response for request 2',)
+--- Logging error ---
+.....Traceback (most recent call last):
+  File "/opt/venv/lib/python3.12/site-packages/anyio/streams/memory.py", line 118, in receive
+    return self.receive_nowait()
+           ^^^^^^^^^^^^^^^^^^^^^
+.  File "/opt/venv/lib/python3.12/site-packages/anyio/streams/memory.py", line 113, in receive_nowait
+    raise WouldBlock
+anyio._core._exceptions.WouldBlock
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/opt/venv/lib/python3.12/site-packages/mcp/server/streamable_http_manager.py", line 357, in run_server
+    await serve_loop(
+.  File "/opt/venv/lib/python3.12/site-packages/mcp/server/runner.py", line 499, in serve_loop
+    await serve_connection(
+  File "/opt/venv/lib/python3.12/site-packages/mcp/server/runner.py", line 465, in serve_connection
+    await dispatcher.run(runner.on_request, runner.on_notify, task_status=task_status)
+  File "/opt/venv/lib/python3.12/site-packages/mcp/shared/jsonrpc_dispatcher.py", line 510, in run
+    async with anyio.create_task_group() as tg:
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 851, in __aexit__
+    raise exc_val
+  File "/opt/venv/lib/python3.12/site-packages/mcp/shared/jsonrpc_dispatcher.py", line 517, in run
+    async for item in self._read_stream:
+  File "/opt/venv/lib/python3.12/site-packages/mcp/shared/_context_streams.py", line 89, in __anext__
+    return await self.receive()
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/mcp/shared/_context_streams.py", line 71, in receive
+    ctx, item = await self._inner.receive()
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/anyio/streams/memory.py", line 126, in receive
+    await receive_event.wait()
+  File "/opt/venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 1936, in wait
+    await self._event.wait()
+  File "/usr/local/lib/python3.12/asyncio/locks.py", line 212, in wait
+    await fut
+asyncio.exceptions.CancelledError: Cancelled via cancel scope 7f6b90f877f0 by <Task pending name='Task-608' coro=<LifespanOn.main() running at /opt/venv/lib/python3.12/site-packages/uvicorn/lifespan/on.py:86>>
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+.  File "/usr/local/lib/python3.12/logging/__init__.py", line 1163, in emit
+    stream.write(msg + self.terminator)
+ValueError: I/O operation on closed file.
+Call stack:
+.  File "/usr/local/lib/python3.12/threading.py", line 1075, in _bootstrap_inner
+    self.run()
+  File "/usr/local/lib/python3.12/threading.py", line 1012, in run
+    self._target(*self._args, **self._kwargs)
+  File "/opt/venv/lib/python3.12/site-packages/uvicorn/server.py", line 86, in run
+    return asyncio_run(self.serve(sockets=sockets), loop_factory=self.config.get_loop_factory())
+  File "/usr/local/lib/python3.12/asyncio/runners.py", line 195, in run
+    return runner.run(main)
+  File "/usr/local/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+  File "/opt/venv/lib/python3.12/site-packages/anyio/_core/_tasks.py", line 327, in _run_coro
+    retval = await self._coro
+  File "/opt/venv/lib/python3.12/site-packages/mcp/server/streamable_http_manager.py", line 372, in run_server
+    await self._discard_session(session_id, http_transport)
+  File "/opt/venv/lib/python3.12/site-packages/mcp/server/streamable_http_manager.py", line 395, in _discard_session
+    await transport.terminate()
+  File "/opt/venv/lib/python3.12/site-packages/mcp/server/streamable_http.py", line 855, in terminate
+    logger.info(f"Terminating session: {self.mcp_session_id}")
+Message: 'Terminating session: 2dc0bbd6176d4af79e6ca81f1b7add98'
+Arguments: ()
+........................................... [ 26%]
+........................................................................ [ 30%]
+........................................................................ [ 33%]
+........................................................................ [ 36%]
+........................................................................ [ 40%]
+........................................................................ [ 43%]
+........................................................................ [ 46%]
+........................................................................ [ 50%]
+........................................................................ [ 53%]
+........................................................................ [ 56%]
+........................................................................ [ 60%]
+........................................................................ [ 63%]
+........................................................................ [ 66%]
+........................................................................ [ 70%]
+........................................................................ [ 73%]
+........................................................................ [ 76%]
+........................................................................ [ 80%]
+........................................................................ [ 83%]
+........................................................................ [ 86%]
+........................................................................ [ 90%]
+........................................................................ [ 93%]
+........................................................................ [ 97%]
+................................................................         [100%]
+2152 passed in 186.12s (0:03:06)
+test exit=0
+
+=== 22:26:51 make test airgap
+........................................................................ [  3%]
+........................................................................ [  6%]
+........................................................................ [ 10%]
+........................................................................ [ 13%]
+........................................................................ [ 16%]
+........................................................................ [ 20%]
+..................--- Logging error ---
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/logging/__init__.py", line 1163, in emit
+    stream.write(msg + self.terminator)
+.ValueError: I/O operation on closed file.
+Call stack:
+..  File "/usr/local/lib/python3.12/threading.py", line 1032, in _bootstrap
+    self._bootstrap_inner()
+.  File "/usr/local/lib/python3.12/threading.py", line 1075, in _bootstrap_inner
+    self.run()
+  File "/usr/local/lib/python3.12/threading.py", line 1012, in run
+    self._target(*self._args, **self._kwargs)
+  File "/opt/venv/lib/python3.12/site-packages/uvicorn/server.py", line 86, in run
+    return asyncio_run(self.serve(sockets=sockets), loop_factory=self.config.get_loop_factory())
+.  File "/usr/local/lib/python3.12/asyncio/runners.py", line 195, in run
+    return runner.run(main)
+  File "/usr/local/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+  File "/opt/venv/lib/python3.12/site-packages/uvicorn/lifespan/on.py", line 86, in main
+    await app(scope, self.receive, self.send)
+.  File "/opt/venv/lib/python3.12/site-packages/uvicorn/middleware/proxy_headers.py", line 30, in __call__
+    return await self.app(scope, receive, send)
+.  File "/work/backend/tests/mcp_fixture.py", line 68, in app
+    await inner(scope, receive, send)
+  File "/opt/venv/lib/python3.12/site-packages/starlette/applications.py", line 96, in __call__
+    await self.middleware_stack(scope, receive, send)
+..  File "/opt/venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 151, in __call__
+    await self.app(scope, receive, send)
+.  File "/opt/venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 49, in __call__
+    await self.app(scope, receive, send)
+.  File "/opt/venv/lib/python3.12/site-packages/starlette/routing.py", line 683, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/opt/venv/lib/python3.12/site-packages/starlette/routing.py", line 692, in app
+    await self.lifespan(scope, receive, send)
+.  File "/opt/venv/lib/python3.12/site-packages/starlette/routing.py", line 661, in lifespan
+    async with self.lifespan_context(app) as maybe_state:
+  File "/usr/local/lib/python3.12/contextlib.py", line 217, in __aexit__
+    await anext(self.gen)
+  File "/opt/venv/lib/python3.12/site-packages/mcp/server/streamable_http_manager.py", line 166, in run
+    logger.info("StreamableHTTP session manager shutting down")
+Message: 'StreamableHTTP session manager shutting down'
+Arguments: ()
+.......................................... [ 23%]
+........................................................................ [ 26%]
+........................................................................ [ 30%]
+........................................................................ [ 33%]
+........................................................................ [ 36%]
+........................................................................ [ 40%]
+........................................................................ [ 43%]
+........................................................................ [ 46%]
+........................................................................ [ 50%]
+........................................................................ [ 53%]
+........................................................................ [ 56%]
+........................................................................ [ 60%]
+........................................................................ [ 63%]
+........................................................................ [ 66%]
+........................................................................ [ 70%]
+........................................................................ [ 73%]
+........................................................................ [ 76%]
+........................................................................ [ 80%]
+........................................................................ [ 83%]
+........................................................................ [ 86%]
+........................................................................ [ 90%]
+........................................................................ [ 93%]
+........................................................................ [ 97%]
+................................................................         [100%]
+2152 passed in 163.73s (0:02:43)
+test-airgap exit=0
+
+=== 22:29:53 test-samples
+
+----------------------------------------------------------------------
+Ran 54 tests in 3.252s
+
+OK (skipped=5)
+samples exit=0
+
+=== 22:30:07 test-int
+........................................................................ [  6%]
+........................................................................ [ 12%]
+........................................................................ [ 18%]
+.......................................s................................ [ 24%]
+........................................................................ [ 30%]
+..............................s......................................... [ 36%]
+.................................................................F.FF... [ 42%]
+...........................s............................................ [ 48%]
+........................................................................ [ 54%]
+........................................................................ [ 60%]
+........................................................................ [ 66%]
+........................................................................ [ 72%]
+........................................................................ [ 78%]
+................................................ssssssss................ [ 85%]
+..............................................................ssssssssss [ 91%]
+ssssssssssssssssssss............s....................................... [ 97%]
+.................................                                        [100%]
+=================================== FAILURES ===================================
+__________________ test_05a_live_discovery[mcp-sql-actions1] ___________________
+
+settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+key = 'mcp-sql', actions = {'get_schema', 'run_sql'}
+
+    @pytest.mark.parametrize(
+        ("key", "actions"),
+        [("mcp-search", {"search_documents"}), ("mcp-sql", {"get_schema", "run_sql"})],
+    )
+    def test_05a_live_discovery(settings, key, actions):
+>       found = asyncio.run(mcp_client.discover(target(key), settings, caller=CALLER))
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_05a_live_services.py:38: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.12/asyncio/runners.py:195: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/base_events.py:691: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+target = ToolTarget(key='mcp-sql', endpoint_url='http://mcp-sql:8000/mcp', auth_type='forward_user', auth={})
+settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+caller = Caller(user_id='live-test-user', project_id='00000000-0000-0000-0000-000000000000')
+timeout_s = None
+
+    async def discover(
+        target: ToolTarget, settings: Settings, *, caller: Caller, timeout_s: float | None = None
+    ) -> list[DiscoveredAction]:
+        """MCP tools/list, every page."""
+        limit = timeout_s or settings.mcp_call_timeout_s
+        actions: list[DiscoveredAction] = []
+        statuses: list[int] = []
+        try:
+            with anyio.fail_after(limit):
+                async with _session(target, settings, caller, None, limit, statuses) as session:
+                    cursor = None
+                    while True:
+                        params = types.PaginatedRequestParams(cursor=cursor) if cursor else None
+                        page = await session.list_tools(params=params)
+                        actions += [
+                            DiscoveredAction(t.name, t.description, dict(t.input_schema))
+                            for t in page.tools
+                        ]
+                        cursor = page.next_cursor
+                        if not cursor:
+                            break
+        except TimeoutError:
+            raise ToolCallError("tool_timeout") from None
+        except ToolCallError:
+            raise
+        except Exception as exc:  # noqa: BLE001 - mapped to a closed code
+>           raise ToolCallError(_code(exc, statuses)) from None
+E           ffcore.services.mcp_client.ToolCallError: tool_http_500
+
+ffcore/services/mcp_client.py:295: ToolCallError
+____________________ test_05a_live_run_sql_on_demo_database ____________________
+
+settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+
+    def test_05a_live_run_sql_on_demo_database(settings):
+        cli._seed_sql_demo(settings, SCHEMA_DIR)  # the documented operator step; idempotent
+        sql = "SELECT code FROM departments ORDER BY id LIMIT 2"
+>       result = asyncio.run(
+            mcp_client.call(
+                target("mcp-sql"), "run_sql", {"sql": sql, "reason": "live"}, settings, caller=CALLER
+            )
+        )
+
+tests/integration/test_05a_live_services.py:55: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.12/asyncio/runners.py:195: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/asyncio/base_events.py:691: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+target = ToolTarget(key='mcp-sql', endpoint_url='http://mcp-sql:8000/mcp', auth_type='forward_user', auth={})
+action = 'run_sql'
+arguments = {'sql': 'SELECT code FROM departments ORDER BY id LIMIT 2', 'reason': 'live'}
+settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+caller = Caller(user_id='live-test-user', project_id='00000000-0000-0000-0000-000000000000')
+timeout_s = None, run_id = None, guard = None
+
+    async def call(
+        target: ToolTarget,
+        action: str,
+        arguments: dict[str, Any],
+        settings: Settings,
+        *,
+        caller: Caller,
+        timeout_s: float | None = None,
+        run_id: str | None = None,
+        guard: Guard | None = None,
+    ) -> CallResult:
+        limit = timeout_s or settings.mcp_call_timeout_s
+        started = time.monotonic()
+        status, truncated = "ok", False
+        statuses: list[int] = []
+        try:
+            if guard is not None:
+                arguments = await guard.pre(action, arguments)
+            try:
+                with anyio.fail_after(limit):
+                    async with _session(target, settings, caller, run_id, limit, statuses) as session:
+                        result = await session.call_tool(action, arguments)
+            except TimeoutError:
+                raise ToolCallError("tool_timeout") from None
+            except ToolCallError:
+                raise
+            except Exception as exc:  # noqa: BLE001 - mapped to a closed code (MCPError too)
+>               raise ToolCallError(_code(exc, statuses)) from None
+E               ffcore.services.mcp_client.ToolCallError: tool_http_500
+
+ffcore/services/mcp_client.py:343: ToolCallError
+----------------------------- Captured stderr call -----------------------------
+2026-11-20 19:35:55,539 INFO ffcore.tools tool_call tool=mcp-sql action=run_sql status=tool_http_500 latency_ms=53 truncated=False
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.tools:mcp_client.py:358 tool_call tool=mcp-sql action=run_sql status=tool_http_500 latency_ms=53 truncated=False
+________________ test_05a_live_forged_token_refused_by_mcp_sql _________________
+
+settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+
+    def test_05a_live_forged_token_refused_by_mcp_sql(settings):
+        # Review r1 MAJOR-1 in the real container: right audience, wrong signing key. The
+        # container asks the real backend (POST /api/v1/internal/obo/verify) and refuses.
+        from pydantic import SecretStr
+    
+        forger = settings.model_copy(
+            update={"obo_jwt_secret": SecretStr("dummy-not-secret-forged-obo-key-0123456789abcdef")}
+        )
+        with pytest.raises(mcp_client.ToolCallError) as err:
+            asyncio.run(
+                mcp_client.call(
+                    target("mcp-sql"),
+                    "run_sql",
+                    {"sql": "SELECT code FROM departments", "reason": "forged"},
+                    forger,
+                    caller=CALLER,
+                )
+            )
+>       assert err.value.code == "tool_auth_failed"
+E       AssertionError: assert 'tool_http_500' == 'tool_auth_failed'
+E         
+E         - tool_auth_failed
+E         + tool_http_500
+
+tests/integration/test_05a_live_services.py:82: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2026-11-20 19:35:55,652 INFO ffcore.tools tool_call tool=mcp-sql action=run_sql status=tool_http_500 latency_ms=65 truncated=False
+------------------------------ Captured log call -------------------------------
+INFO     ffcore.tools:mcp_client.py:358 tool_call tool=mcp-sql action=run_sql status=tool_http_500 latency_ms=65 truncated=False
+=============================== warnings summary ===============================
+tests/integration/test_04a_worker.py::test_04a_upload_job_runs_in_worker
+tests/integration/test_04a_worker.py::test_04a_job_for_missing_row_retries_then_fails_loud
+  /opt/venv/lib/python3.12/site-packages/arq/worker.py:877: DeprecationWarning: Call to deprecated close. (Use aclose() instead) -- Deprecated since version 5.0.1.
+    await self.pool.close(close_connection_pool=True)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/integration/test_05a_live_services.py::test_05a_live_discovery[mcp-sql-actions1]
+FAILED tests/integration/test_05a_live_services.py::test_05a_live_run_sql_on_demo_database
+FAILED tests/integration/test_05a_live_services.py::test_05a_live_forged_token_refused_by_mcp_sql
+SKIPPED [1] tests/integration/test_03b_egress_dns.py: NOT_RUN: needs RUN_DNS_TESTS=1
+SKIPPED [1] tests/integration/test_04a_ingest.py:280: NOT_RUN: needs RUN_MODEL_TESTS=1
+SKIPPED [1] tests/integration/test_05a_sql.py:301: NOT_RUN: needs RUN_MODEL_TESTS=1
+SKIPPED [1] tests/integration/test_09_exam_stack.py:83: NOT_RUN: set RUN_EVAL_STACK=1 (scenario stack + make seed + make seed-eval)
+SKIPPED [1] tests/integration/test_09_exam_stack.py:92: NOT_RUN: set RUN_EVAL_STACK=1 (scenario stack + make seed + make seed-eval)
+SKIPPED [1] tests/integration/test_09_exam_stack.py:98: NOT_RUN: set RUN_EVAL_STACK=1 (scenario stack + make seed + make seed-eval)
+SKIPPED [1] tests/integration/test_09_exam_stack.py:123: NOT_RUN: set RUN_EVAL_STACK=1 (scenario stack + make seed + make seed-eval)
+SKIPPED [1] tests/integration/test_09_exam_stack.py:129: NOT_RUN: set RUN_EVAL_STACK=1 (scenario stack + make seed + make seed-eval)
+SKIPPED [1] tests/integration/test_09_exam_stack.py:140: NOT_RUN: set RUN_EVAL_STACK=1 (scenario stack + make seed + make seed-eval)
+SKIPPED [1] tests/integration/test_09_exam_stack.py:155: NOT_RUN: set RUN_EVAL_STACK=1 (scenario stack + make seed + make seed-eval)
+SKIPPED [1] tests/integration/test_09_exam_stack.py:166: NOT_RUN: set RUN_EVAL_STACK=1 (scenario stack + make seed + make seed-eval)
+SKIPPED [1] tests/integration/test_12_egress.py:48: NOT_RUN: needs RUN_EGRESS_TESTS=1 and the egress test stack (module docstring)
+SKIPPED [1] tests/integration/test_12_egress.py:54: NOT_RUN: needs RUN_EGRESS_TESTS=1 and the egress test stack (module docstring)
+SKIPPED [1] tests/integration/test_12_egress.py:58: NOT_RUN: needs RUN_EGRESS_TESTS=1 and the egress test stack (module docstring)
+SKIPPED [1] tests/integration/test_12_egress.py:62: NOT_RUN: needs RUN_EGRESS_TESTS=1 and the egress test stack (module docstring)
+SKIPPED [1] tests/integration/test_12_egress.py:66: NOT_RUN: needs RUN_EGRESS_TESTS=1 and the egress test stack (module docstring)
+SKIPPED [1] tests/integration/test_12_egress.py:73: NOT_RUN: needs RUN_EGRESS_TESTS=1 and the egress test stack (module docstring)
+SKIPPED [1] tests/integration/test_12_egress.py:79: NOT_RUN: needs RUN_EGRESS_TESTS=1 and the egress test stack (module docstring)
+SKIPPED [1] tests/integration/test_12_egress.py:119: NOT_RUN: needs RUN_EGRESS_TESTS=1 and the egress test stack (module docstring)
+SKIPPED [1] tests/integration/test_12_egress.py:126: NOT_RUN: needs RUN_EGRESS_TESTS=1 and the egress test stack (module docstring)
+SKIPPED [1] tests/integration/test_12_egress.py:167: NOT_RUN: needs RUN_EGRESS_TESTS=1 and the egress test stack (module docstring)
+SKIPPED [3] tests/integration/test_12_egress.py:173: NOT_RUN: needs RUN_EGRESS_TESTS=1 and the egress test stack (module docstring)
+SKIPPED [1] tests/integration/test_12_egress.py:184: NOT_RUN: needs RUN_EGRESS_TESTS=1 and the egress test stack (module docstring)
+SKIPPED [1] tests/integration/test_12_egress.py:193: NOT_RUN: needs RUN_EGRESS_TESTS=1 and the egress test stack (module docstring)
+SKIPPED [1] tests/integration/test_12_egress.py:201: NOT_RUN: needs RUN_EGRESS_TESTS=1 and the egress test stack (module docstring)
+SKIPPED [1] tests/integration/test_12_egress.py:209: NOT_RUN: needs RUN_EGRESS_TESTS=1 and the egress test stack (module docstring)
+SKIPPED [1] tests/integration/test_12_tls.py:31: NOT_RUN: needs RUN_TLS_TESTS=1 and the TLS test stack (test_12_egress.py docstring)
+SKIPPED [1] tests/integration/test_12_tls.py:38: NOT_RUN: needs RUN_TLS_TESTS=1 and the TLS test stack (test_12_egress.py docstring)
+SKIPPED [1] tests/integration/test_12_tls.py:44: NOT_RUN: needs RUN_TLS_TESTS=1 and the TLS test stack (test_12_egress.py docstring)
+SKIPPED [5] tests/integration/test_12_tls.py:49: NOT_RUN: needs RUN_TLS_TESTS=1 and the TLS test stack (test_12_egress.py docstring)
+SKIPPED [1] tests/integration/test_12_tls.py:56: NOT_RUN: needs RUN_TLS_TESTS=1 and the TLS test stack (test_12_egress.py docstring)
+SKIPPED [3] tests/integration/test_12_tls.py:81: NOT_RUN: needs RUN_TLS_TESTS=1 and the TLS test stack (test_12_egress.py docstring)
+SKIPPED [1] tests/integration/test_12_tls.py:98: NOT_RUN: needs RUN_TLS_TESTS=1 and the TLS test stack (test_12_egress.py docstring)
+SKIPPED [1] tests/integration/test_19_ingest_raw.py:157: root ignores file modes; the mount test runs :ro
+3 failed, 1140 passed, 42 skipped, 2 warnings in 900.60s (0:15:00)
+test-int exit=1
+
+=== 22:45:27 smoke
+python scripts/smoke.py
+ok    DEPLOY_PROFILE=llmaas INFERENCE_BACKEND=ollama
+ok    database: application connects as ffcore_app
+ok    backend /healthz 200
+ok    litellm /health/liveliness 200, /key/info 404 (schema present)
+ok    langfuse /api/public/health 200, /api/public/projects 200
+ok    mcp-search /healthz 200
+ok    mcp-sql /healthz 200
+ok    skipped: ollama profile inactive
+smoke: passed
+smoke exit=0
+
+=== 22:45:37 frontend typecheck/check:api/vitest (node, --network none, repo root)
+typecheck_exit=0
+> ffcore-frontend@0.1.0 typecheck
+> tsc --noEmit
+
+checkapi_exit=0
+> node scripts/check-api.mjs
+
+API contract copies and generated types are current.
+vitest_exit=0
+
+[2m Test Files [22m [1m[32m55 passed[39m[22m[90m (55)[39m
+[2m      Tests [22m [1m[32m279 passed[39m[22m[90m (279)[39m
+[2m   Start at [22m 19:46:04
+[2m   Duration [22m 34.83s[2m (transform 73.66s, setup 0ms, import 104.67s, tests 40.49s, environment 35.23s)[22m
+
+
+=== 22:46:39 e2e: atlandı (önyüz kodu değişmedi; önyüz kodu değişmedi)
+
+=== 22:46:40 down -v
+ Volume ffmain_langfuse_clickhouse_logs  Removed
+ Volume ffmain_model_cache  Removed
+
+=== 22:47:00 done
+gate script exit 0

@@ -1,0 +1,137 @@
+=== gatehke rerun 05a live, main e7f8eaf 2026-11-20 22:48:48
+
+=== 22:48:49 up -d --no-build --pull never --wait
+ Container ffmain-fake-llm-1  Healthy
+ Container ffmain-langfuse-minio-1  Healthy
+ Container ffmain-langfuse-redis-1  Healthy
+ Container ffmain-mcp-sql-1  Healthy
+ Container ffmain-mcp-search-1  Healthy
+up exit=0
+
+=== 22:49:52 mcp-sql env
+INTERNAL_API_URL=http://backend:8000
+ALLOWED_INTERNAL_HOSTS=backend
+
+=== 22:49:59 05a live tests (run 1)
+                raise
+            except Exception as exc:  # noqa: BLE001 - mapped to a closed code (MCPError too)
+>               raise ToolCallError(_code(exc, statuses)) from None
+E               ffcore.services.mcp_client.ToolCallError: tool_http_500
+
+ffcore/services/mcp_client.py:343: ToolCallError
+________________ test_05a_live_forged_token_refused_by_mcp_sql _________________
+
+settings = Settings(deploy_profile='llmaas', inference_backend='ollama', offline=False, database_url=SecretStr('**********'), ser...flush_s=60, retention_dry_run=True, retention_audit_drop_enabled=False, retention_batch=5000, alert_service_down_s=300)
+
+    def test_05a_live_forged_token_refused_by_mcp_sql(settings):
+        # Review r1 MAJOR-1 in the real container: right audience, wrong signing key. The
+        # container asks the real backend (POST /api/v1/internal/obo/verify) and refuses.
+        from pydantic import SecretStr
+    
+        forger = settings.model_copy(
+            update={"obo_jwt_secret": SecretStr("dummy-not-secret-forged-obo-key-0123456789abcdef")}
+        )
+        with pytest.raises(mcp_client.ToolCallError) as err:
+            asyncio.run(
+                mcp_client.call(
+                    target("mcp-sql"),
+                    "run_sql",
+                    {"sql": "SELECT code FROM departments", "reason": "forged"},
+                    forger,
+                    caller=CALLER,
+                )
+            )
+>       assert err.value.code == "tool_auth_failed"
+E       AssertionError: assert 'tool_http_500' == 'tool_auth_failed'
+E         
+E         - tool_auth_failed
+E         + tool_http_500
+
+tests/integration/test_05a_live_services.py:82: AssertionError
+=========================== short test summary info ============================
+FAILED tests/integration/test_05a_live_services.py::test_05a_live_discovery[mcp-sql-actions1]
+FAILED tests/integration/test_05a_live_services.py::test_05a_live_run_sql_on_demo_database
+FAILED tests/integration/test_05a_live_services.py::test_05a_live_forged_token_refused_by_mcp_sql
+3 failed, 2 passed in 5.41s
+run1 exit=0
+
+=== 22:50:18 mcp-sql logs (tail 60)
+mcp-sql-1  |                ^^^^^^^^^^^^^^^^^^^
+mcp-sql-1  |   File "/app/ffcore/core/egress.py", line 531, in __init__
+mcp-sql-1  |     self._transport = _EgressTransport(
+mcp-sql-1  |                       ^^^^^^^^^^^^^^^^^
+mcp-sql-1  |   File "/app/ffcore/core/egress.py", line 443, in __init__
+mcp-sql-1  |     if settings.egress_proxy_url:
+mcp-sql-1  |        ^^^^^^^^^^^^^^^^^^^^^^^^^
+mcp-sql-1  |   File "/opt/venv/lib/python3.12/site-packages/pydantic/main.py", line 1105, in __getattr__
+mcp-sql-1  |     raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}')
+mcp-sql-1  | AttributeError: 'McpServiceSettings' object has no attribute 'egress_proxy_url'
+mcp-sql-1  | ERROR:    Exception in ASGI application
+mcp-sql-1  | Traceback (most recent call last):
+mcp-sql-1  |   File "/opt/venv/lib/python3.12/site-packages/uvicorn/protocols/http/httptools_impl.py", line 422, in run_asgi
+mcp-sql-1  |     result = await app(  # type: ignore[func-returns-value]
+mcp-sql-1  |              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+mcp-sql-1  |   File "/opt/venv/lib/python3.12/site-packages/uvicorn/middleware/proxy_headers.py", line 63, in __call__
+mcp-sql-1  |     return await self.app(scope, receive, send)
+mcp-sql-1  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+mcp-sql-1  |   File "/app/ffcore/services/mcp_server_common.py", line 182, in __call__
+mcp-sql-1  |     await self.verifier.claims(headers[OBO_HEADER.lower()])
+mcp-sql-1  |   File "/app/ffcore/services/mcp_server_common.py", line 126, in claims
+mcp-sql-1  |     claims = await self._ask(token)
+mcp-sql-1  |              ^^^^^^^^^^^^^^^^^^^^^^
+mcp-sql-1  |   File "/app/ffcore/services/mcp_server_common.py", line 135, in _ask
+mcp-sql-1  |     async with SafeOutboundClient(
+mcp-sql-1  |                ^^^^^^^^^^^^^^^^^^^
+mcp-sql-1  |   File "/app/ffcore/core/egress.py", line 531, in __init__
+mcp-sql-1  |     self._transport = _EgressTransport(
+mcp-sql-1  |                       ^^^^^^^^^^^^^^^^^
+mcp-sql-1  |   File "/app/ffcore/core/egress.py", line 443, in __init__
+mcp-sql-1  |     if settings.egress_proxy_url:
+mcp-sql-1  |        ^^^^^^^^^^^^^^^^^^^^^^^^^
+mcp-sql-1  |   File "/opt/venv/lib/python3.12/site-packages/pydantic/main.py", line 1105, in __getattr__
+mcp-sql-1  |     raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}')
+mcp-sql-1  | AttributeError: 'McpServiceSettings' object has no attribute 'egress_proxy_url'
+mcp-sql-1  | ERROR:    Exception in ASGI application
+mcp-sql-1  | Traceback (most recent call last):
+mcp-sql-1  |   File "/opt/venv/lib/python3.12/site-packages/uvicorn/protocols/http/httptools_impl.py", line 422, in run_asgi
+mcp-sql-1  |     result = await app(  # type: ignore[func-returns-value]
+mcp-sql-1  |              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+mcp-sql-1  |   File "/opt/venv/lib/python3.12/site-packages/uvicorn/middleware/proxy_headers.py", line 63, in __call__
+mcp-sql-1  |     return await self.app(scope, receive, send)
+mcp-sql-1  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+mcp-sql-1  |   File "/app/ffcore/services/mcp_server_common.py", line 182, in __call__
+mcp-sql-1  |     await self.verifier.claims(headers[OBO_HEADER.lower()])
+mcp-sql-1  |   File "/app/ffcore/services/mcp_server_common.py", line 126, in claims
+mcp-sql-1  |     claims = await self._ask(token)
+mcp-sql-1  |              ^^^^^^^^^^^^^^^^^^^^^^
+mcp-sql-1  |   File "/app/ffcore/services/mcp_server_common.py", line 135, in _ask
+mcp-sql-1  |     async with SafeOutboundClient(
+mcp-sql-1  |                ^^^^^^^^^^^^^^^^^^^
+mcp-sql-1  |   File "/app/ffcore/core/egress.py", line 531, in __init__
+mcp-sql-1  |     self._transport = _EgressTransport(
+mcp-sql-1  |                       ^^^^^^^^^^^^^^^^^
+mcp-sql-1  |   File "/app/ffcore/core/egress.py", line 443, in __init__
+mcp-sql-1  |     if settings.egress_proxy_url:
+mcp-sql-1  |        ^^^^^^^^^^^^^^^^^^^^^^^^^
+mcp-sql-1  |   File "/opt/venv/lib/python3.12/site-packages/pydantic/main.py", line 1105, in __getattr__
+mcp-sql-1  |     raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}')
+mcp-sql-1  | AttributeError: 'McpServiceSettings' object has no attribute 'egress_proxy_url'
+
+=== 22:50:25 backend logs grep obo/verify (tail 20)
+
+=== 22:50:32 05a live tests (run 2)
+E         + tool_http_500
+
+tests/integration/test_05a_live_services.py:82: AssertionError
+=========================== short test summary info ============================
+FAILED tests/integration/test_05a_live_services.py::test_05a_live_discovery[mcp-sql-actions1]
+FAILED tests/integration/test_05a_live_services.py::test_05a_live_run_sql_on_demo_database
+FAILED tests/integration/test_05a_live_services.py::test_05a_live_forged_token_refused_by_mcp_sql
+3 failed, 2 passed in 5.67s
+run2 exit=0
+
+=== 22:50:51 down -v
+ Volume ffmain_model_cache  Removed
+ Network ffmain_default  Removed
+
+=== 22:51:09 done
