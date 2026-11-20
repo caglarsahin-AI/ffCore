@@ -321,3 +321,12 @@ def test_12_2_airgap_may_run_as_the_owner_but_says_so():
 def test_12_2_role_line_names_the_role():
     lines = preflight.check(env())
     assert any(line == "database: application connects as ffcore_app" for line in lines)
+
+
+def test_12_2_preflight_runs_on_older_host_pythons():
+    # The guide runs it on the server's own Python (docs/kurulum.md); servers often have 3.8 or
+    # 3.9 (a 3.9 host failed on `str | None`, 12-2 final gate). Lazy annotations, no 3.9+ calls.
+    source = SCRIPT.read_text(encoding="utf-8")
+    assert "from __future__ import annotations" in source
+    for newer in ("removeprefix", "removesuffix", "match ", ":= "):
+        assert newer not in source, newer
