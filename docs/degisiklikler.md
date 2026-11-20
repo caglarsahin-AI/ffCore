@@ -17,6 +17,9 @@ if anything.
   smoke` fails on an incoherent `COMPOSE_PROFILES`/`COMPOSE_FILE` pair (FOLLOWUP-35) and on an
   unknown profile name. `deploy/offline/images.txt` lists the proxy and nginx images, so the
   offline archive (package 19) carries them too.
+- **Review r1 (before merge):** the public listener sends the fixed Teams path to the backend,
+  never the client's raw path; the proxy also refuses benchmark, reserved, unspecified and
+  IPv4-mapped IPv6 destinations; `EGRESS_ALLOWED_PORTS` must be 1-65535 (preflight and proxy).
 - **Known limit:** with the `egress` overlay the backend's own direct external calls (remote MCP
   servers, OpenAPI tools, alert webhooks, external agents) fail with a connection error until
   FOLLOWUP-208.

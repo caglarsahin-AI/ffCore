@@ -84,17 +84,19 @@ Every egress evaluation is a row in `guardrail_events` (values masked, raw text 
 Count by day and outcome for the last 30 days (run as the database owner on the server):
 
 ```bash
-docker compose exec postgres psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c "
-  SELECT date_trunc('day', ts) AS day, rule, action_taken, status, count(*)
-  FROM guardrail_events
-  WHERE stage = 'egress' AND ts > now() - interval '30 days'
-  GROUP BY 1, 2, 3, 4 ORDER BY 1, 2, 3, 4;"
+docker compose exec -T postgres sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB"' <<'SQL'
+SELECT date_trunc('day', ts) AS day, rule, action_taken, status, count(*)
+FROM guardrail_events
+WHERE stage = 'egress' AND ts > now() - interval '30 days'
+GROUP BY 1, 2, 3, 4 ORDER BY 1, 2, 3, 4;
+SQL
 ```
 
 `status = redacted` rows are messages in which identifiers were replaced before they left;
 `status = failed` rows were blocked and never sent. Attach the result to this record at each
-review. Not verified on a running installation in package 12; the query reads only the columns
-of `backend/ffcore/models/guardrails.py`.
+review. The user and database are the container's own variables (`sh -c`), not the host
+shell's; the SQL comes on standard input. Run on a test stack in package 12 (r2); a fresh stack
+returns no rows.
 
 ## 7. Approval (fill in)
 

@@ -21,7 +21,8 @@ python scripts/compose_preflight.py --env-file .env
 ```
 
 It prints one `ok` line per check, or one `FAIL` line with the error code and the fix, and exits
-1. `make smoke` runs the same check first. The rules:
+1. Overlay files may be given with relative or absolute paths; an unquoted ` #` in `.env`
+starts a comment, as in compose. `make smoke` runs the same check first. The rules:
 
 | Error | Meaning |
 |---|---|
@@ -31,6 +32,7 @@ It prints one `ok` line per check, or one `FAIL` line with the error code and th
 | `unknown_profile` | a name in `COMPOSE_PROFILES` no compose file defines |
 | `egress_requires_llmaas` | the `egress` profile in `airgap` |
 | `egress_allowlist_empty` / `egress_allowlist_invalid` | the `egress` profile with an empty or malformed `EGRESS_ALLOWLIST` |
+| `egress_ports_invalid` | an `EGRESS_ALLOWED_PORTS` entry outside 1-65535 |
 | `egress_requires_tls` | the `egress` profile without the `tls` profile (below) |
 
 Use a comma as the path separator so the same `.env` line works on every OS:
@@ -51,8 +53,13 @@ With the `egress` profile the stack has one way out: a forward proxy (Squid,
   still gets the list below.
 - LiteLLM sends provider calls through the proxy (`HTTP_PROXY`/`HTTPS_PROXY`). The proxy checks
   the destination host name against `EGRESS_ALLOWLIST` (exact name or `*.suffix`), allows only
-  the ports in `EGRESS_ALLOWED_PORTS` (default `443`), and refuses any destination that
-  resolves to a private, loopback or link-local address, even an allowlisted one.
+  the ports in `EGRESS_ALLOWED_PORTS` (default `443`; each 1-65535), and refuses any
+  destination that resolves to a non-global address (private, loopback, link-local, CGNAT,
+  benchmark, reserved, multicast, IPv4-mapped IPv6), even an allowlisted one; the list is
+  the backend's own check (`core/egress.py`), with the documentation ranges left out.
+- Methods: TLS tunnels (`CONNECT`) and plain requests are both allowed to allowlisted hosts on
+  the allowed ports. With the default port list that means 443 only; a CONNECT-only rule
+  is FOLLOWUP-211.
 - The proxy logs one line per request to `docker compose logs egress-proxy`: time, client,
   method, host and port, status, bytes. No path or query.
 - **Known limit (FOLLOWUP-208):** the backend's own outbound calls do not use a proxy (they pin
@@ -86,7 +93,7 @@ listeners:
 | Listener | Host port | Serves |
 |---|---|---|
 | internal | `TLS_PORT` (443) | the console (`/`), the OpenAI-compatible API (`/v1/`), MCP servers (`/mcp/`) |
-| public | `TLS_PUBLIC_BIND`:`TLS_PUBLIC_PORT` (127.0.0.1:8444) | only `/channels/teams/messages` (Teams, package 15); every other path is the proxy's own 404 |
+| public | `TLS_PUBLIC_BIND`:`TLS_PUBLIC_PORT` (127.0.0.1:8444) | only `/channels/teams/messages` (Teams, package 15), sent to the backend as that fixed path whatever the client wrote (`/x/../channels/teams/messages` arrives normalised); every other path is the proxy's own 404 |
 
 Steps:
 
@@ -110,13 +117,14 @@ same as for console requests through the frontend today).
 **`litellm_schema_incomplete` in `make smoke`, or LiteLLM stays unhealthy.** LiteLLM's first
 start migrates its database; on a slow machine the migration can stop half-way and later starts
 cannot take its lock (FOLLOWUP-82). The healthcheck and smoke ask `/key/info` for a key that
-cannot exist: `404` means the key table is there, `500` means the schema is incomplete. Fix
-(**not verified**: needs a half-migrated database): stop LiteLLM, drop and recreate its
-database, start it and wait for healthy:
+cannot exist: `404` means the key table is there, `500` means the schema is incomplete (the
+500 and the unhealthy container were reproduced in review r1 by hiding the key table). Fix: stop
+LiteLLM, drop and recreate its database, start it and wait for healthy (run on a test stack in
+r2; a real half-migrated database was not produced):
 
 ```bash
 docker compose stop litellm
-docker compose exec postgres psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c "DROP DATABASE litellm" -c "CREATE DATABASE litellm"
+docker compose exec postgres sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c "DROP DATABASE litellm" -c "CREATE DATABASE litellm"'
 docker compose up -d --wait litellm
 make render-litellm
 ```
