@@ -58,6 +58,13 @@ COMPOSE_VALUE_OPTS = frozenset(
     }
 )
 GIT_VALUE_OPTS = frozenset({"-C", "-c", "--git-dir", "--work-tree", "--namespace"})
+# docker global options that take a value (`docker --context x build`)
+DOCKER_VALUE_OPTS = frozenset(
+    {"-c", "--context", "--config", "-H", "--host", "-l", "--log-level"}
+    | {"--tlscacert", "--tlscert", "--tlskey"}
+)
+# `docker <group> build` spellings of the image builder (FOLLOWUP-210)
+DOCKER_BUILD_GROUPS = frozenset({"buildx", "image", "builder"})
 # `docker compose run|exec` options that take a value (skipped to find the service)
 COMPOSE_RUN_VALUE_OPTS = frozenset(
     {
@@ -828,6 +835,27 @@ def check_compose(toks: list[str]) -> list[Violation]:
     return []
 
 
+def check_docker_build(toks: list[str]) -> list[Violation]:
+    """FOLLOWUP-210: bare `docker build` / `docker buildx|image|builder build` has the same
+    BuildKit base image metadata problem as `compose build` (5 November decision)."""
+    rest = strip_assignments(toks)
+    if not rest or basename(rest[0]) != "docker":
+        return []
+    pos, sub = subcommand(rest, 1, DOCKER_VALUE_OPTS)
+    if sub in DOCKER_BUILD_GROUPS:
+        pos, sub = subcommand(rest, pos + 1, frozenset())
+    if sub != "build" or any(t in ("--help", "-h") for t in rest[pos + 1 :]):
+        return []
+    return [
+        Violation(
+            "PROSES-175",
+            "çıplak docker build/buildx build yok (BuildKit base imaj metadata'sı için "
+            "docker.io/ghcr.io'ya bağlanır); imaj `docker compose up --build --pull never` ile "
+            "derlenir (FOLLOWUP-210)",
+        )
+    ]
+
+
 def is_gate_command(toks: list[str]) -> bool:
     toks = strip_assignments(toks)
     if not toks:
@@ -894,7 +922,7 @@ def check_tokens(
 ) -> list[Violation]:
     """Rules for one pipeline element, recursing into compose run|exec and sh -c."""
     toks = unwrap(toks)
-    found = check_push(toks, payload, env) + check_compose(toks)
+    found = check_push(toks, payload, env) + check_compose(toks) + check_docker_build(toks)
     if is_gate_command(toks) and not has_tee:
         found.append(Violation("KAPI", KAPI_MESSAGE))
     if depth >= MAX_NESTING:
