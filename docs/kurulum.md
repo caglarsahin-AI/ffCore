@@ -86,10 +86,12 @@ provider afterwards.
 
 ```bash
 docker compose run --rm tools make smoke
-docker compose exec backend python -c "import urllib.request; print(urllib.request.urlopen('http://localhost:8000/readyz').read().decode())"
+docker compose exec backend curl -sS -w '\nHTTP %{http_code}\n' http://localhost:8000/readyz
 ```
 
-Smoke runs the preflight, then checks the backend, LiteLLM (with its schema), Langfuse with the
+`/readyz` answers 200 when every dependency and model weight is there, 503 with the failing
+check named otherwise (a stack without `make models` weights answers 503). Smoke runs the
+preflight, then checks the backend, LiteLLM (with its schema), Langfuse with the
 project keys and the MCP servers; every line is `ok` or `FAIL` with the reason.
 
 ## Database role
