@@ -65,6 +65,8 @@ RESERVED_HOSTS = frozenset(
         "agent-worker-bg",
         "backend",
         "e2e",
+        # 12: egress forward proxy and TLS reverse proxy (llmaas overlays).
+        "egress-proxy",
         "fake-llm",
         "frontend",
         "langfuse-clickhouse",
@@ -81,6 +83,7 @@ RESERVED_HOSTS = frozenset(
         "postgres",
         "qdrant",
         "redis",
+        "tls-proxy",
         "ticket-desk",
         "vllm",
         "tools",

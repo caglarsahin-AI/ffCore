@@ -1,0 +1,72 @@
+# 12-1 test overlay (never part of an installation): a local "outside" for the egress proxy
+# and the TLS proxy test certificate. The outside network uses a documentation subnet
+# (198.51.100.0/24, RFC 5737), so the proxy's private-address rule stays the production one.
+# Usage: tests/integration/test_12_egress.py docstring.
+services:
+  egress-proxy:
+    environment:
+      # Fake providers listen on 9999 (backend/tests/fakes/fake_openai.py); production is 443.
+      EGRESS_ALLOWED_PORTS: "443 9999"
+    networks:
+      - default
+      - egress
+      - egress-bench
+
+  egress-allowed:
+    image: ${REGISTRY_PREFIX}ffcore/backend:${FFCORE_VERSION:?FFCORE_VERSION tanımlı değil}
+    profiles: ["test"]
+    command: ["python", "/fakes/fake_openai.py"]
+    volumes:
+      - ./backend/tests/fakes:/fakes:ro
+    networks:
+      egress:
+        ipv4_address: 198.51.100.10
+        aliases: [api.allowed.test]
+    restart: "no"
+
+  egress-denied:
+    image: ${REGISTRY_PREFIX}ffcore/backend:${FFCORE_VERSION:?FFCORE_VERSION tanımlı değil}
+    profiles: ["test"]
+    command: ["python", "/fakes/fake_openai.py"]
+    volumes:
+      - ./backend/tests/fakes:/fakes:ro
+    networks:
+      egress:
+        ipv4_address: 198.51.100.11
+        aliases: [api.denied.test]
+    restart: "no"
+
+  egress-rebind:
+    # Allowlisted name on the internal (private) network: the proxy must still refuse it.
+    image: ${REGISTRY_PREFIX}ffcore/backend:${FFCORE_VERSION:?FFCORE_VERSION tanımlı değil}
+    profiles: ["test"]
+    command: ["python", "/fakes/fake_openai.py"]
+    volumes:
+      - ./backend/tests/fakes:/fakes:ro
+    networks:
+      default:
+        aliases: [rebind.test]
+    restart: "no"
+
+  egress-bench:
+    # Allowlisted name on a benchmark-range address (198.18.0.0/15): refused (r1 NOTE-3).
+    image: ${REGISTRY_PREFIX}ffcore/backend:${FFCORE_VERSION:?FFCORE_VERSION tanımlı değil}
+    profiles: ["test"]
+    command: ["python", "/fakes/fake_openai.py"]
+    volumes:
+      - ./backend/tests/fakes:/fakes:ro
+    networks:
+      egress-bench:
+        ipv4_address: 198.18.0.10
+        aliases: [bench.test]
+    restart: "no"
+
+networks:
+  egress-bench:
+    ipam:
+      config:
+        - subnet: 198.18.0.0/24
+  egress:
+    ipam:
+      config:
+        - subnet: 198.51.100.0/24

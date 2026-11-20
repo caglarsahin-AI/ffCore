@@ -1,0 +1,37 @@
+# TLS reverse proxy overlay (package 12, FOLLOWUP-66, C16). Added with the tls profile:
+#   COMPOSE_FILE=compose.yaml:deploy/docker-compose.tls.yml   COMPOSE_PROFILES=tls
+# The session cookie is Secure, so the console needs HTTPS; set CONSOLE_ORIGINS to the https
+# origin users open (https://ffcore.example.org). The certificate and key are the operator's
+# (TLS_CERT_DIR holds fullchain.pem and privkey.pem); nothing here creates one.
+# Two listeners: internal (TLS_PORT, console + API) and public (TLS_PUBLIC_PORT, only
+# /channels/teams/messages; bound to 127.0.0.1 unless TLS_PUBLIC_BIND opens it).
+# Keep BACKEND_PORT/FRONTEND_PORT on 127.0.0.1 (e.g. BACKEND_PORT=127.0.0.1:8000) so the only
+# published way in is this proxy.
+services:
+  tls-proxy:
+    image: ${REGISTRY_PREFIX}nginx:1.28.0-alpine
+    profiles: ["tls"]
+    restart: unless-stopped
+    ports:
+      - "${TLS_PORT:-443}:8443"
+      - "${TLS_PUBLIC_BIND:-127.0.0.1}:${TLS_PUBLIC_PORT:-8444}:9443"
+    volumes:
+      - ./deploy/tls/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ${TLS_CERT_DIR:?TLS_CERT_DIR is not set (directory with fullchain.pem and privkey.pem)}:/etc/nginx/certs:ro
+    networks:
+      - default
+      - ingress
+    mem_limit: ${TLS_PROXY_MEM_LIMIT:-128m}
+    depends_on:
+      backend:
+        condition: service_healthy
+      frontend:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "nginx", "-t", "-q"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+
+networks:
+  ingress: {}

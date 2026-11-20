@@ -7,6 +7,7 @@ says so explicitly (no silent skip).
 """
 
 import base64
+import importlib.util
 import json
 import os
 import sys
@@ -30,6 +31,17 @@ MCP_URLS = {
 
 class SmokeError(Exception):
     pass
+
+
+# 12 (FOLLOWUP-35): the profile/overlay coherence check, the same file the operator runs on
+# the host before `docker compose up` (scripts/compose_preflight.py).
+_spec = importlib.util.spec_from_file_location(
+    "compose_preflight", ROOT / "scripts" / "compose_preflight.py"
+)
+compose_preflight = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(compose_preflight)
+# A key that cannot exist: /key/info answers 404/400 when LiteLLM's key table is there.
+LITELLM_PROBE_KEY = "sk-ffcore-smoke-probe-not-a-key"
 
 
 def _request(
@@ -57,11 +69,34 @@ def check_backend() -> str:
     return "backend /healthz 200"
 
 
+def check_preflight() -> list[str]:
+    try:
+        return compose_preflight.check(dict(os.environ))
+    except compose_preflight.PreflightError as exc:
+        raise SmokeError(str(exc)) from exc
+
+
 def check_litellm() -> str:
     status, _ = _request(f"{LITELLM_URL}/health/liveliness")
     if status != 200:
         raise SmokeError(f"litellm /health/liveliness returned {status}")
-    return "litellm /health/liveliness 200"
+    # FOLLOWUP-82: a first `prisma migrate deploy` cut short leaves a half-migrated schema and
+    # LiteLLM still answers liveliness; its key table answers only when the schema is there.
+    master_key = os.environ.get("LITELLM_MASTER_KEY")
+    if not master_key:
+        raise SmokeError("LITELLM_MASTER_KEY is not set (tools container, .env)")
+    status, _ = _request(
+        f"{LITELLM_URL}/key/info?key={LITELLM_PROBE_KEY}",
+        headers={"Authorization": f"Bearer {master_key}"},
+    )
+    if status in (401, 403):
+        raise SmokeError(f"litellm /key/info refused the master key ({status})")
+    if status not in (200, 400, 404):
+        raise SmokeError(
+            f"litellm_schema_incomplete: /key/info returned {status} (half-migrated database; "
+            "docs/kurulum.md, troubleshooting)"
+        )
+    return f"litellm /health/liveliness 200, /key/info {status} (schema present)"
 
 
 def check_langfuse() -> str:
@@ -135,7 +170,7 @@ def check_mcp() -> list[str]:
     return lines
 
 
-CHECKS = (check_backend, check_litellm, check_langfuse, check_mcp, check_ollama)
+CHECKS = (check_preflight, check_backend, check_litellm, check_langfuse, check_mcp, check_ollama)
 
 
 def main() -> int:

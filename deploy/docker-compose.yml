@@ -200,7 +200,23 @@ services:
         condition: service_healthy
     healthcheck:
       # İlk açılışta DB migration'ı birkaç dakika sürer; `up --wait` bunu bekler.
-      test: ["CMD-SHELL", "wget -q -O /dev/null http://localhost:4000/health/liveliness || exit 1"]
+      # 12 (FOLLOWUP-82): liveliness alone stays 200 on a half-migrated schema; the key table
+      # must answer too (a key that cannot exist: 404/400 fine, 500 and above = schema missing).
+      test:
+        - CMD
+        - python
+        - -c
+        - |
+          import os, urllib.error, urllib.request as r
+          r.urlopen("http://localhost:4000/health/liveliness", timeout=4)
+          probe = r.Request(
+              "http://localhost:4000/key/info?key=sk-ffcore-healthcheck-not-a-key",
+              headers={"Authorization": "Bearer " + os.environ["LITELLM_MASTER_KEY"]},
+          )
+          try:
+              r.urlopen(probe, timeout=4)
+          except urllib.error.HTTPError as exc:
+              raise SystemExit(exc.code >= 500)  # 500: half-migrated schema
       interval: 5s
       timeout: 5s
       start_period: 60s
@@ -511,6 +527,8 @@ services:
     environment:
       <<: *app-env
       COMPOSE_PROFILES: ${COMPOSE_PROFILES:-}
+      # 12 (FOLLOWUP-35): the preflight in `make smoke` checks profiles against overlay files.
+      COMPOSE_FILE: ${COMPOSE_FILE:-}
       OLLAMA_CONTEXT_LENGTH: ${OLLAMA_CONTEXT_LENGTH:-}
       # make seed-models (01) only; read once on first install, never given to the backend.
       SEED_ANTHROPIC_API_KEY: ${SEED_ANTHROPIC_API_KEY:-}
