@@ -53,6 +53,10 @@ def env():
         **os.environ,
         "FFCORE_COMPOSE": COMPOSE,
         "COMPOSE_PROFILES": "test",
+        # Git Bash on a Windows host rewrites container paths such as /data/storage; the
+        # scripts target Linux servers, where this changes nothing.
+        "MSYS_NO_PATHCONV": "1",
+        "MSYS2_ARG_CONV_EXCL": "*",
         # Per-run credentials for the seed, never written anywhere.
         "E2E_ADMIN_EMAIL": "yedek-admin@example.test",
         "E2E_ADMIN_PASSWORD": secrets.token_urlsafe(18),
