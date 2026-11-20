@@ -123,3 +123,11 @@ def test_12_7_restore_is_strict():
     source = RESTORE.read_text(encoding="utf-8")
     assert "--exit-on-error" in source and "--no-owner" in source and "--no-acl" in source
     assert "--force" not in source.replace("no --force", "")
+    # --no-acl drops migration 12_0001's REVOKE ... FROM PUBLIC on the owner functions: the
+    # restore puts it back whether or not the ffcore_app role exists.
+    for function in (
+        "ffcore_audit_ensure_partition(date)",
+        "ffcore_audit_detach_partition(text)",
+        "ffcore_audit_drop_partition(text)",
+    ):
+        assert f"REVOKE EXECUTE ON FUNCTION {function} FROM PUBLIC" in source
