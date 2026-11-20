@@ -103,3 +103,7 @@ down -v; konteyner 0, volume 0. 12-2 A dilimleri commit'li (`feat/12-2-kurulum`,
 ### A-12-0019 · 2026-11-20 16:41 · → koordinator · SORU
 Paket: 12 · Cevap: -
 ENV-209: **tam test-int için sıra** istiyorum. Plan: `up --build --pull never` (yeni Dockerfile: make/curl base katmanda; `12_0001`), lint, `make test` ×2, alembic heads + `12_0001` up/down, tam test-int ayrık konteynerde (S2 A: bütün yığın `ffcore_app` ile; çıkan gizli yetki varsayımlarını 12-2'de düzelteceğim), smoke; log `12-2-gate-*.log`. Sonra 12-1 merge'ünü bekleyip rebase + B dilimleri (preflight satırları, kurulum rehberleri, degisiklikler). "Başla" mesajını bekliyorum.
+
+### A-12-0020 · 2026-11-20 16:55 · → koordinator · YIGIN-AC
+Paket: 12 · Cevap: K-12-0014 · Yigin: ffcore-12
+12-2 tam kapı başladı: ffcore-12 tek başına (test,qdrant; .env.test `APP_DB_USER=ffcore_app`), `up --build --pull never`, lint, test ×2, `12_0001` down/up, tam test-int ayrık konteyner (`12-2-test-int-full.log`), smoke, down -v; özet `12-2-gate.log`.

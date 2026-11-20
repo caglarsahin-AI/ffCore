@@ -1,0 +1,12 @@
+2026-11-20 11:35:37,695 INFO ffcore.access access method=POST path=/channels/teams/messages status=404 ms=2
+2026-11-20 11:35:37,748 INFO ffcore.access access method=POST path=/channels/teams/messages status=404 ms=1
+2026-11-20 11:35:37,798 INFO ffcore.access access method=POST path=/channels/teams/messages status=404 ms=2
+2026-11-20 11:35:37,841 INFO ffcore.access access method=POST path=/channels/teams/messages status=404 ms=1
+2026-11-20 11:35:44,496 INFO ffcore.access access method=POST path=/channels/teams/messages status=404 ms=2
+2026-11-20 11:35:44,577 INFO ffcore.access access method=POST path=/channels/teams/messages status=404 ms=3
+2026-11-20 11:35:44,809 INFO ffcore.access access method=POST path=/channels/teams/messages status=404 ms=2
+2026-11-20 11:35:44,882 INFO ffcore.access access method=POST path=/channels/teams/messages status=404 ms=2
+2026-11-20 11:35:44,947 INFO ffcore.access access method=POST path=/channels/teams/messages status=404 ms=2
+2026-11-20 11:35:45,050 INFO ffcore.access access method=POST path=/channels/teams/messages status=404 ms=2
+2026-11-20 11:35:45,299 INFO ffcore.access access method=POST path=/channels/teams/messages status=404 ms=8
+2026-11-20 11:35:45,361 INFO ffcore.access access method=POST path=/channels/teams/messages status=404 ms=2

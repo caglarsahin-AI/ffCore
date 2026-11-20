@@ -1,0 +1,62 @@
+HEAD=12e4d5482729b3ac7c29851c194211c89f9eb67e (git archive copy)
+PF [default] exit=0 :: ok    DEPLOY_PROFILE=llmaas INFERENCE_BACKEND=litellm 
+PF [egress+tls-ok] exit=0 :: ok    DEPLOY_PROFILE=llmaas INFERENCE_BACKEND=litellm ok    egress: forward proxy, 2 hosts in EGRESS_ALLOWLIST, ports 443 ok    tls: reverse proxy (internal 8443, public Teams path 9443) 
+PF [comma-sep] exit=0 :: ok    DEPLOY_PROFILE=llmaas INFERENCE_BACKEND=litellm ok    egress: forward proxy, 1 hosts in EGRESS_ALLOWLIST, ports 443 ok    tls: reverse proxy (internal 8443, public Teams path 9443) 
+PF [windows-semicolon] exit=0 :: ok    DEPLOY_PROFILE=llmaas INFERENCE_BACKEND=litellm ok    egress: forward proxy, 1 hosts in EGRESS_ALLOWLIST, ports 443 ok    tls: reverse proxy (internal 8443, public Teams path 9443) 
+PF [dot-slash] exit=0 :: ok    DEPLOY_PROFILE=llmaas INFERENCE_BACKEND=litellm ok    tls: reverse proxy (internal 8443, public Teams path 9443) 
+PF [absolute] exit=0 :: ok    DEPLOY_PROFILE=llmaas INFERENCE_BACKEND=litellm ok    tls: reverse proxy (internal 8443, public Teams path 9443) 
+PF [egress-no-tls] exit=1 :: FAIL  preflight egress_requires_tls: the egress profile makes the app network internal, where published ports do not reach the host; add the tls profile (the reverse proxy is the way in) 
+PF [egress-empty] exit=1 :: FAIL  preflight egress_allowlist_empty: the egress profile is on but EGRESS_ALLOWLIST is empty; the proxy would refuse every provider (docs/kurulum.md, egress) 
+PF [egress-scheme] exit=1 :: FAIL  preflight egress_allowlist_invalid: 'https://a.test' in EGRESS_ALLOWLIST is not a host name or *.suffix (no scheme, port, path or inner wildcard) 
+PF [egress-inner-wild] exit=1 :: FAIL  preflight egress_allowlist_invalid: 'a.*.test' in EGRESS_ALLOWLIST is not a host name or *.suffix (no scheme, port, path or inner wildcard) 
+PF [egress-upper] exit=0 :: ok    DEPLOY_PROFILE=llmaas INFERENCE_BACKEND=litellm ok    egress: forward proxy, 1 hosts in EGRESS_ALLOWLIST, ports 443 ok    tls: reverse proxy (internal 8443, public Teams path 9443) 
+--- r2 additions
+PF [ports-99999] exit=1 :: FAIL  preflight egress_ports_invalid: EGRESS_ALLOWED_PORTS: 99999 (each port 1-65535, space-separated) 
+PF [ports-0] exit=1 :: FAIL  preflight egress_ports_invalid: EGRESS_ALLOWED_PORTS: 0 (each port 1-65535, space-separated) 
+PF [ports-ok] exit=0 :: ok    DEPLOY_PROFILE=llmaas INFERENCE_BACKEND= ok    egress: forward proxy, 1 hosts in EGRESS_ALLOWLIST, ports 443 8443 ok    tls: reverse proxy (internal 8443, public Teams path 9443) 
+PF [absolute-unix] exit=0 :: ok    DEPLOY_PROFILE=llmaas INFERENCE_BACKEND= ok    tls: reverse proxy (internal 8443, public Teams path 9443) 
+PF [absolute-win] exit=0 :: ok    DEPLOY_PROFILE=llmaas INFERENCE_BACKEND= ok    tls: reverse proxy (internal 8443, public Teams path 9443) 
+PF [suffix-trap] exit=1 :: FAIL  preflight profile_overlay_mismatch: profile tls is in COMPOSE_PROFILES but deploy/docker-compose.tls.yml is not in COMPOSE_FILE; add it (COMPOSE_FILE=compose.yaml:deploy/docker-compose.tls.yml) or drop the profile 
+--- egress-list 99999
+FAIL  preflight egress_ports_invalid: EGRESS_ALLOWED_PORTS: 99999 (each port 1-65535, space-separated)
+exit 1
+--- env-file inline comment
+ok    DEPLOY_PROFILE=llmaas INFERENCE_BACKEND=
+ok    egress: forward proxy, 1 hosts in EGRESS_ALLOWLIST, ports 443
+ok    tls: reverse proxy (internal 8443, public Teams path 9443)
+exit 0
+--- start.sh --print
+start.sh ports='443 99999' exit=1 :: egress-proxy: EGRESS_ALLOWED_PORTS: '99999' is not a port (1-65535) 
+start.sh ports='0' exit=1 :: egress-proxy: EGRESS_ALLOWED_PORTS: '0' is not a port (1-65535) 
+start.sh ports='443 9999' exit=0 :: a.test --- ports --- 443 9999 
+start.sh ports='abc' exit=1 :: egress-proxy: EGRESS_ALLOWED_PORTS: 'abc' is not a port (1-65535) 
+--- full 19-case matrix (r1 script, unchanged)
+PF [default] exit=0 :: ok    DEPLOY_PROFILE=llmaas INFERENCE_BACKEND=litellm 
+PF [egress+tls-ok] exit=0 :: ok    DEPLOY_PROFILE=llmaas INFERENCE_BACKEND=litellm ok    egress: forward proxy, 2 hosts in EGRESS_ALLOWLIST, ports 443 ok    tls: reverse proxy (internal 8443, public Teams path 9443) 
+PF [comma-sep] exit=0 :: ok    DEPLOY_PROFILE=llmaas INFERENCE_BACKEND=litellm ok    egress: forward proxy, 1 hosts in EGRESS_ALLOWLIST, ports 443 ok    tls: reverse proxy (internal 8443, public Teams path 9443) 
+PF [windows-semicolon] exit=0 :: ok    DEPLOY_PROFILE=llmaas INFERENCE_BACKEND=litellm ok    egress: forward proxy, 1 hosts in EGRESS_ALLOWLIST, ports 443 ok    tls: reverse proxy (internal 8443, public Teams path 9443) 
+PF [dot-slash] exit=0 :: ok    DEPLOY_PROFILE=llmaas INFERENCE_BACKEND=litellm ok    tls: reverse proxy (internal 8443, public Teams path 9443) 
+PF [absolute] exit=0 :: ok    DEPLOY_PROFILE=llmaas INFERENCE_BACKEND=litellm ok    tls: reverse proxy (internal 8443, public Teams path 9443) 
+PF [egress-no-tls] exit=1 :: FAIL  preflight egress_requires_tls: the egress profile makes the app network internal, where published ports do not reach the host; add the tls profile (the reverse proxy is the way in) 
+PF [egress-empty] exit=1 :: FAIL  preflight egress_allowlist_empty: the egress profile is on but EGRESS_ALLOWLIST is empty; the proxy would refuse every provider (docs/kurulum.md, egress) 
+--- full 19-case matrix, rerun with SYSTEMROOT (r1 cases unchanged; previous attempt hung in py without SYSTEMROOT)
+PF [default] exit=0 :: ok    DEPLOY_PROFILE=llmaas INFERENCE_BACKEND=litellm 
+PF [egress+tls-ok] exit=0 :: ok    DEPLOY_PROFILE=llmaas INFERENCE_BACKEND=litellm ok    egress: forward proxy, 2 hosts in EGRESS_ALLOWLIST, ports 443 ok    tls: reverse proxy (internal 8443, public Teams path 9443) 
+PF [comma-sep] exit=0 :: ok    DEPLOY_PROFILE=llmaas INFERENCE_BACKEND=litellm ok    egress: forward proxy, 1 hosts in EGRESS_ALLOWLIST, ports 443 ok    tls: reverse proxy (internal 8443, public Teams path 9443) 
+PF [windows-semicolon] exit=0 :: ok    DEPLOY_PROFILE=llmaas INFERENCE_BACKEND=litellm ok    egress: forward proxy, 1 hosts in EGRESS_ALLOWLIST, ports 443 ok    tls: reverse proxy (internal 8443, public Teams path 9443) 
+PF [dot-slash] exit=0 :: ok    DEPLOY_PROFILE=llmaas INFERENCE_BACKEND=litellm ok    tls: reverse proxy (internal 8443, public Teams path 9443) 
+PF [absolute] exit=0 :: ok    DEPLOY_PROFILE=llmaas INFERENCE_BACKEND=litellm ok    tls: reverse proxy (internal 8443, public Teams path 9443) 
+PF [egress-no-tls] exit=1 :: FAIL  preflight egress_requires_tls: the egress profile makes the app network internal, where published ports do not reach the host; add the tls profile (the reverse proxy is the way in) 
+PF [egress-empty] exit=1 :: FAIL  preflight egress_allowlist_empty: the egress profile is on but EGRESS_ALLOWLIST is empty; the proxy would refuse every provider (docs/kurulum.md, egress) 
+PF [egress-scheme] exit=1 :: FAIL  preflight egress_allowlist_invalid: 'https://a.test' in EGRESS_ALLOWLIST is not a host name or *.suffix (no scheme, port, path or inner wildcard) 
+PF [egress-inner-wild] exit=1 :: FAIL  preflight egress_allowlist_invalid: 'a.*.test' in EGRESS_ALLOWLIST is not a host name or *.suffix (no scheme, port, path or inner wildcard) 
+PF [egress-upper] exit=0 :: ok    DEPLOY_PROFILE=llmaas INFERENCE_BACKEND=litellm ok    egress: forward proxy, 1 hosts in EGRESS_ALLOWLIST, ports 443 ok    tls: reverse proxy (internal 8443, public Teams path 9443) 
+PF [egress-airgap] exit=1 :: FAIL  preflight egress_requires_llmaas: the egress profile is for llmaas; airgap has no way out (OFFLINE=true) 
+PF [overlay-no-profile] exit=1 :: FAIL  preflight profile_overlay_mismatch: deploy/docker-compose.tls.yml is in COMPOSE_FILE but profile tls is not in COMPOSE_PROFILES; add tls to COMPOSE_PROFILES or remove the file 
+PF [profile-no-overlay] exit=1 :: FAIL  preflight profile_overlay_mismatch: profile tls is in COMPOSE_PROFILES but deploy/docker-compose.tls.yml is not in COMPOSE_FILE; add it (COMPOSE_FILE=compose.yaml:deploy/docker-compose.tls.yml) or drop the profile 
+PF [unknown] exit=1 :: FAIL  preflight unknown_profile: COMPOSE_PROFILES names tsl; known: e2e, egress, ollama, qdrant, test, tls, tools 
+--- remaining 4 cases
+PF [ollama-ok] exit=0 :: ok    DEPLOY_PROFILE=airgap INFERENCE_BACKEND=ollama ok    ollama: compose service, OLLAMA_CONTEXT_LENGTH=32768 
+PF [ollama-noctx] exit=1 :: FAIL  preflight ollama_context_length_missing: OLLAMA_CONTEXT_LENGTH is empty (Ollama's default 4096 truncates prompts silently) 
+PF [ollama-llmaas] exit=1 :: FAIL  preflight profile_backend_mismatch: the ollama profile needs DEPLOY_PROFILE=airgap and INFERENCE_BACKEND=ollama 
+PF [spaces] exit=0 :: ok    DEPLOY_PROFILE=llmaas INFERENCE_BACKEND=litellm ok    egress: forward proxy, 2 hosts in EGRESS_ALLOWLIST, ports 443 ok    tls: reverse proxy (internal 8443, public Teams path 9443) 

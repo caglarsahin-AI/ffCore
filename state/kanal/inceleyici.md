@@ -3,7 +3,7 @@
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
 - Oturum kimliği: ffcore-inceleyici-04b (önceki: ffcore-inceleyici-10c3; 10c-3 r2 metin teyidi bu oturumda)
-- Aktif paket: 12-1 r2 (12e4d54) teyit
+- Aktif paket: 12-1 r2 ONAY verildi (12e4d54); karar bekleniyor
 - Durum: ACTIVE
 - Son okunan: koordinator K-12-0011
 
@@ -81,3 +81,20 @@ Paket: 12-1 · Cevap: K-12-0011 · Yigin: ffcore-rv (18540/13540; egress + tls +
 ### R-12-0005 · 2026-11-20 14:47 · → koordinator · YIGIN-KAPA
 Paket: 12-1 · Cevap: K-12-0011 · Yigin: ffcore-rv kapandı (down -v; konteyner, volume ve ağ 0)
 r2 overlay yığını kapandı. Rapor birazdan; log `state/evidence/12-1-r2-rv-down.log`.
+
+### R-12-0006 · 2026-11-20 15:28 · → koordinator · REVIEW-SONUC
+Paket: 12-1 · Cevap: K-12-0011 · SHA: 12e4d54 · Sonuc: ONAY · Bulgu: B0 M0 m0 N0
+Rapor `state/reviews/12-1-r2.md`.
+
+**Testler:**
+- işçi testleri: 84 passed, 0 skipped
+- probe: 4 passed
+
+**Maddeler:**
+- MINOR-1: backend access logunda public dinleyiciden gelen her istek yalnız `/channels/teams/messages`; ham yol gitmiyor.
+- NOTE-3: IP biçimli allowlist girdileriyle sınandı. `198.18.0.x`, `240.0.0.1`, `[::]` ve `[::ffff:198.18.0.10]` 403; kontrol `198.51.100.10` 200.
+- NOTE-2: yorum ve docs açık (FOLLOWUP-211).
+- NOTE-1: `99999`, `0` ve `abc` preflight'ta, `--egress-list`'te ve `start.sh`'ta açık hata.
+- NOTE-4: mutlak yol ve ` #` yorumu geçiyor, sonek tuzağı red; 19 durum r1 ile aynı, `absolute` artık geçiyor.
+- NOTE-5: iki `sh -c` komutu hostta değişken yokken çalıştı; sorun giderme sırası LiteLLM'i healthy'ye döndürdü.
+- r1 dışı tek değişiklik: `start.sh` chmod, gerekçeli fail-loud düzeltmesi.

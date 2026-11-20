@@ -1,0 +1,40 @@
+HEAD=12e4d5482729b3ac7c29851c194211c89f9eb67e (git archive copy); host shell POSTGRES_USER/POSTGRES_DB unset
+--- veri-isleme.md query (verbatim, compose -p ffcore-rv --env-file .env.test -f compose.yaml -f deploy/docker-compose.egress.yml -f deploy/docker-compose.tls.yml -f backend/tests/compose/egress-tls.test.yml)
+ day | rule | action_taken | status | count 
+-----+------+--------------+--------+-------
+(0 rows)
+
+exit 0
+--- kurulum.md troubleshooting (verbatim)
+no such service: egress-proxy
+stop exit 1
+ERROR:  database "litellm" is being accessed by other users
+DETAIL:  There are 5 other sessions using the database.
+ERROR:  database "litellm" already exists
+drop/create exit 1
+ Container ffcore-rv-postgres-1  Running
+ Container ffcore-rv-egress-proxy-1  Running
+ Container ffcore-rv-litellm-1  Running
+ Container ffcore-rv-postgres-1  Waiting
+ Container ffcore-rv-egress-proxy-1  Waiting
+ Container ffcore-rv-postgres-1  Healthy
+ Container ffcore-rv-egress-proxy-1  Healthy
+ Container ffcore-rv-litellm-1  Waiting
+ Container ffcore-rv-postgres-1  Waiting
+ Container ffcore-rv-egress-proxy-1  Waiting
+ Container ffcore-rv-litellm-1  Healthy
+ Container ffcore-rv-postgres-1  Healthy
+ Container ffcore-rv-egress-proxy-1  Healthy
+up litellm exit 0
+healthy
+--- r2 rerun with COMPOSE_PROFILES=egress,tls,test exported (as an operator's .env sets it)
+ Container ffcore-rv-litellm-1  Stopping
+ Container ffcore-rv-litellm-1  Stopped
+stop exit 0
+DROP DATABASE
+CREATE DATABASE
+drop/create exit 0
+ Container ffcore-rv-egress-proxy-1  Healthy
+ Container ffcore-rv-litellm-1  Healthy
+up litellm exit 0
+health: healthy

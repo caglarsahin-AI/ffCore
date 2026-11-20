@@ -87,3 +87,6 @@
 2026-11-20T13:33:24	warn	inceleyici	Bash	KAPI	grep -c "^PF \[" state/evidence/12-1-r1-rv-preflight.log && sed -i 's/| 21 durum + `--egress-list`/| 19 durum + `--egres
 2026-11-20T14:06:33	warn	isci-a	Bash	KAPI	cat >> /c/ai_paycore/ffcore/state/kanal/isci-a.md <<'EOF' ### A-12-0012 · 2026-11-20 14:12 · → koordinator · YIGIN-KAPA 
 2026-11-20T14:14:41	warn	koordinator	Bash	KAPI	R=/c/ai_paycore/ffcore; awk '/=== 13:43:37 hook tests/,/hooks exit=/' $R/state/evidence/gate-trj-20261120.log | tr -d '\
+2026-11-20T15:00:15	warn	isci-a	Bash	KAPI	export RUN_BACKUP_TESTS=1 FFCORE_VERSION=0.0.0-12 BACKEND_PORT=18550 FRONTEND_PORT=13550 FFCORE_TEST_PROJECT=ffcore-12; 
+2026-11-20T15:08:35	warn	isci-a	Bash	KAPI	export RUN_BACKUP_TESTS=1 FFCORE_VERSION=0.0.0-12 BACKEND_PORT=18550 FRONTEND_PORT=13550 FFCORE_TEST_PROJECT=ffcore-12; 
+2026-11-20T15:12:01	warn	isci-a	Bash	KAPI	export RUN_BACKUP_TESTS=1 FFCORE_VERSION=0.0.0-12 BACKEND_PORT=18550 FRONTEND_PORT=13550 FFCORE_TEST_PROJECT=ffcore-12; 
