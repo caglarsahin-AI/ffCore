@@ -197,3 +197,13 @@ def test_12_squid_config_says_non_connect_requests_are_allowed():
     conf = (DEPLOY / "egress" / "squid.conf").read_text(encoding="utf-8")
     assert "FOLLOWUP-211" in conf
     assert not any(line.startswith("http_access deny !CONNECT") for line in conf.splitlines())
+
+
+def test_12_r2_squid_start_opens_both_log_pipes_without_hiding_errors():
+    # r2: chmod of the container's stdout/stderr pipes must not redirect its own stderr
+    # (`2>/dev/null` made /proc/self/fd/2 point at /dev/null, so Squid's cache_log on stderr
+    # could not be opened and its errors were lost); a failure stops the container.
+    start = (DEPLOY / "egress" / "start.sh").read_text(encoding="utf-8")
+    line = next(row for row in start.splitlines() if row.startswith("chmod "))
+    assert "/proc/self/fd/1" in line and "/proc/self/fd/2" in line
+    assert "2>/dev/null" not in line and "|| fail" in line
