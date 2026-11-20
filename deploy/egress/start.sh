@@ -33,7 +33,9 @@ esac
 
 ports=${EGRESS_ALLOWED_PORTS:-443}
 for port in $ports; do
-    printf '%s\n' "$port" | grep -Eq '^[0-9]{1,5}$' || fail "EGRESS_ALLOWED_PORTS: '$port' is not a port"
+    if ! printf '%s\n' "$port" | grep -Eq '^[0-9]{1,5}$' || [ "$port" -lt 1 ] || [ "$port" -gt 65535 ]; then
+        fail "EGRESS_ALLOWED_PORTS: '$port' is not a port (1-65535)"
+    fi
 done
 
 if [ "${1:-}" = "--print" ]; then
@@ -49,5 +51,5 @@ printf '%s\n' $ports > "$run_dir/ports.txt"
 echo "egress-proxy: $(wc -l < "$run_dir/allowlist.txt") allowlisted domains, ports: $ports"
 # Squid opens its logs as cache_effective_user (proxy), not root: let it reopen the
 # container's stdout/stderr pipes (the log goes to `docker logs`, never to a file).
-chmod 0666 /proc/self/fd/1 /proc/self/fd/2 2>/dev/null || chmod 0666 "$(readlink -f /proc/self/fd/1)" "$(readlink -f /proc/self/fd/2)"
+chmod 0666 /proc/self/fd/1 /proc/self/fd/2 || fail "cannot open stdout/stderr to the proxy user"
 exec squid -N -f /etc/squid/ffcore/squid.conf

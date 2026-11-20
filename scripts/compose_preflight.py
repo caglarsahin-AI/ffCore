@@ -63,16 +63,24 @@ def _allowlist(value: str) -> list[str]:
     return hosts
 
 
+def _ports(value: str) -> list[str]:
+    """EGRESS_ALLOWED_PORTS (space-separated, default 443); each 1-65535."""
+    port_list = (value or "443").split()
+    bad = [port for port in port_list if not (port.isdigit() and 1 <= int(port) <= 65535)]
+    if bad:
+        raise PreflightError(
+            "egress_ports_invalid",
+            f"EGRESS_ALLOWED_PORTS: {' '.join(bad)} (each port 1-65535, space-separated)",
+        )
+    return port_list
+
+
 def egress_list(value: str, ports: str = "443") -> list[str]:
     """EGRESS_ALLOWLIST x EGRESS_ALLOWED_PORTS as the corporate firewall rule list."""
     hosts = _allowlist(value)
     if not hosts:
         raise PreflightError("egress_allowlist_empty", "EGRESS_ALLOWLIST is empty")
-    port_list = (ports or "443").split()
-    bad = [port for port in port_list if not port.isdigit()]
-    if bad:
-        raise PreflightError("egress_ports_invalid", f"EGRESS_ALLOWED_PORTS: {' '.join(bad)}")
-    return [f"{host} {port}/tcp" for host in hosts for port in port_list]
+    return [f"{host} {port}/tcp" for host in hosts for port in _ports(ports)]
 
 
 def check(env: dict) -> list[str]:
@@ -91,7 +99,9 @@ def check(env: dict) -> list[str]:
         )
 
     for profile, overlay in OVERLAYS.items():
-        active, added = profile in profiles, overlay in files
+        # Matched by the end of the path: relative and absolute COMPOSE_FILE entries both count.
+        added = any(path == overlay or path.endswith("/" + overlay) for path in files)
+        active = profile in profiles
         if active and not added:
             raise PreflightError(
                 "profile_overlay_mismatch",
@@ -134,13 +144,17 @@ def check(env: dict) -> list[str]:
                 "the egress profile is on but EGRESS_ALLOWLIST is empty; the proxy would refuse "
                 "every provider (docs/kurulum.md, egress)",
             )
+        ports = _ports(env.get("EGRESS_ALLOWED_PORTS", ""))
         if "tls" not in profiles:
             raise PreflightError(
                 "egress_requires_tls",
                 "the egress profile makes the app network internal, where published ports do not "
                 "reach the host; add the tls profile (the reverse proxy is the way in)",
             )
-        lines.append(f"egress: forward proxy, {len(hosts)} hosts in EGRESS_ALLOWLIST")
+        lines.append(
+            f"egress: forward proxy, {len(hosts)} hosts in EGRESS_ALLOWLIST, "
+            f"ports {' '.join(ports)}"
+        )
     if "tls" in profiles:
         lines.append("tls: reverse proxy (internal 8443, public Teams path 9443)")
     return lines
@@ -156,6 +170,9 @@ def read_env_file(path: Path) -> dict:
         value = value.strip()
         if len(value) >= 2 and value[0] == value[-1] and value[0] in "'\"":
             value = value[1:-1]
+        elif " #" in value:
+            # Compose reads " #" in an unquoted value as the start of a comment.
+            value = value.split(" #", 1)[0].rstrip()
         values[key.strip()] = value
     return values
 
