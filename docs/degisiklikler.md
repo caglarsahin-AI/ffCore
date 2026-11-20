@@ -4,6 +4,20 @@ Behaviour and configuration changes that a deployment or an API client notices, 
 (handbook/RELEASE_AND_ROLLBACK.md, CHANGE_CONTROL.md). Each entry names the package and what to do,
 if anything.
 
+## 2026-11-20 · 11-1 · End user chat (`/chat`)
+
+- **What:** the console serves `/chat` (docs/chat.md): the selected project's published agents,
+  your own conversations, streamed answers with tool cards and source cards that open the cited
+  passage, the "not found in the sources" badge, soft delete. A `user` member lands on `/chat`
+  after sign-in. New 06a calls: `GET …/chat/agents`, `GET …/conversations`,
+  `GET …/conversations/{id}/messages`, `DELETE …/conversations/{id}` (open in read-only access,
+  audit `delete_conversation`), `GET …/runs/{id}/sources/{chunk_id}` (the caller's document ACL;
+  `source_deleted`, `source_reindexed`, `source_not_visible`).
+- **Changed:** a new conversation's title is the first 60 characters of its first message,
+  whitespace collapsed (was 80). The console test panel's tool and source cards are the shared
+  chat components; the panel looks and behaves as before.
+- **Action:** none. Regenerated `frontend/lib/api/schema-06a.d.ts` for API clients that use it.
+
 ## 2026-11-20 · hook-egress-1 · Backend egress through the forward proxy, initdb role pair, agent guard in block mode
 
 - **What:** with the `egress` profile the backend's own outbound calls (remote MCP servers,

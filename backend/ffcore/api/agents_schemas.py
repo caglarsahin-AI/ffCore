@@ -271,3 +271,69 @@ class ExternalEndpoint(BaseModel):
 
 class ExternalAgentOut(AgentOut):
     external: ExternalEndpoint
+
+
+# --- 11: the end user chat (K-11-0002) ---
+
+
+class ChatAgentOut(BaseModel):
+    """A published agent a member may chat with. Never its definition, prompt, model or tools:
+    the chat is open to `user` members, who do not read agent configuration (S5)."""
+
+    id: UUID
+    key: AgentKey
+    name: str
+    description: str
+
+
+class ChatAgentList(BaseModel):
+    items: list[ChatAgentOut]
+
+
+class ConversationOut(BaseModel):
+    id: UUID
+    agent_id: UUID
+    agent_key: AgentKey
+    title: str = Field(description="The first message's first 60 characters (no model call).")
+    created_at: datetime
+    last_message_at: datetime
+
+
+class ConversationList(BaseModel):
+    items: list[ConversationOut]
+
+
+class ChatMessageOut(BaseModel):
+    id: UUID
+    role: Literal["user", "assistant"]
+    content: str
+    run_id: UUID | None
+    run_status: RunStatus | None = Field(description="The status of the run the message is in.")
+    outcome_label: OutcomeLabel | None
+    error_code: str | None
+    sources: list[dict[str, Any]] | None = Field(
+        description="Assistant messages: the cited sources, without chunk text (GET "
+        ".../runs/{run_id}/sources/{chunk_id} returns it)."
+    )
+    feedback: dict[str, Any] | None
+    low_confidence: bool | None = Field(
+        description="Set only when the run's version has show_confidence and a "
+        "confidence_threshold: true below the threshold. Null otherwise (badge off by default)."
+    )
+    created_at: datetime
+
+
+class ChatMessageList(BaseModel):
+    items: list[ChatMessageOut]
+
+
+class SourceChunkOut(BaseModel):
+    """The text of one chunk the run cited, read with the caller's document ACL."""
+
+    chunk_id: UUID
+    document_id: UUID
+    document_name: str
+    page: int | None
+    breadcrumb: str
+    text: str
+    updated_at_source: datetime | None

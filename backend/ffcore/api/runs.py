@@ -33,8 +33,10 @@ from ffcore.api.agents_schemas import (
     RunEventOut,
     RunList,
     RunOut,
+    SourceChunkOut,
 )
 from ffcore.api.common import ERROR_RESPONSES, SessionDep, conflict, invalid, not_found
+from ffcore.api.knowledge import acl_for, visible
 from ffcore.core import db, tracing
 from ffcore.core.audit import AuditEntry, audited, request_context, write_event
 from ffcore.core.auth import Actor, RoleRequirement, authorize, require_role
@@ -54,7 +56,7 @@ from ffcore.guardrails.service import resolve_policy
 from ffcore.guardrails.settings import get_guardrail_settings
 from ffcore.models.agents import Agent, AgentVersion
 from ffcore.models.identity import ProjectMember
-from ffcore.models.knowledge import Document
+from ffcore.models.knowledge import Chunk, Document
 from ffcore.models.runs import Message, Run, RunEvent
 from ffcore.runtime import events as run_events
 from ffcore.runtime import resume
@@ -684,6 +686,78 @@ async def list_run_events(
             )
             for r in events
         ]
+    )
+
+
+# 11 (K-11-0002 S3): a source card opens the chunk the answer cited. The run's events list the
+# chunks it cited (no text, FOLLOWUP-116); the text is read from the knowledge base at the time of
+# the request, with the caller's document ACL (not the run owner's). Every refusal has its code.
+async def _cited_chunk_ids(session, run_id: UUID) -> set[str]:
+    payloads = await session.scalars(
+        select(RunEvent.payload).where(
+            RunEvent.run_id == run_id, RunEvent.type == RunEventType.sources
+        )
+    )
+    return {
+        str(s.get("chunk_id"))
+        for payload in payloads.all()
+        for s in (payload or {}).get("selected") or []
+        if s.get("chunk_id")
+    }
+
+
+@router.get("/runs/{run_id}/sources/{chunk_id}", response_model=SourceChunkOut)
+async def get_run_source(
+    project_id: UUID,
+    run_id: UUID,
+    chunk_id: UUID,
+    request: Request,
+    actor: Member,
+    session: SessionDep,
+):
+    """The text, page and date of a chunk the run cited. 404 `source_not_found`: the run did not
+    cite it; 404 `source_deleted`: its document was deleted; 404 `source_reindexed`: the document
+    was re-indexed and the chunk replaced; 403 `source_not_visible`: the document's ACL does not
+    include the caller."""
+    await _readable_run(session, request, actor, project_id, run_id)
+    if str(chunk_id) not in await _cited_chunk_ids(session, run_id):
+        raise not_found("source")
+    row = (
+        await session.execute(
+            select(Chunk, Document)
+            .join(Document, Document.id == Chunk.document_id)
+            .where(Chunk.id == chunk_id, Document.project_id == project_id)
+        )
+    ).first()
+    if row is None:
+        raise ApiError(
+            404,
+            "not_found_error",
+            "source_reindexed",
+            "The cited passage is no longer in the knowledge base (the document was re-indexed "
+            "or removed).",
+        )
+    chunk, document = row
+    if document.deleted_at is not None:
+        raise ApiError(404, "not_found_error", "source_deleted", "The cited document was deleted.")
+    allowed = await session.scalar(
+        select(Document.id).where(Document.id == document.id, visible(acl_for(request, actor)))
+    )
+    if allowed is None:
+        raise ApiError(
+            403,
+            "permission_error",
+            "source_not_visible",
+            "The cited document is not visible to you (document access list).",
+        )
+    return SourceChunkOut(
+        chunk_id=chunk.id,
+        document_id=document.id,
+        document_name=document.filename,
+        page=chunk.page,
+        breadcrumb=chunk.breadcrumb,
+        text=chunk.text,
+        updated_at_source=document.updated_at_source,
     )
 
 

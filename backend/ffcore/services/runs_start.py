@@ -20,6 +20,17 @@ from ffcore.runtime.contracts import RunStatus, TriggerType
 from ffcore.runtime.definition import parse_definition
 from ffcore.runtime.queue import RunQueue
 
+# Brief 11 (PayCore D6): a conversation's title is its first message's first 60 characters,
+# never a model call (Open WebUI-like clients ask a model for every title; on CPU that is a full
+# call).
+TITLE_CHARS = 60
+
+
+def conversation_title(text: str) -> str:
+    """The first TITLE_CHARS characters of the message, whitespace collapsed and trimmed."""
+    return " ".join(text.split())[:TITLE_CHARS].strip()
+
+
 AuditWriter = Callable[[AsyncSession, Run, AgentVersion], Awaitable[None]]
 QueuedEvent = Callable[[AsyncSession, Settings, Run], Awaitable[None]]
 
@@ -70,7 +81,7 @@ async def start_run(
             project_id=project_id,
             agent_id=agent.id,
             user_id=user_id,
-            title=input[:80],
+            title=conversation_title(input),
             created_by=created_by,
         )
         session.add(conversation)

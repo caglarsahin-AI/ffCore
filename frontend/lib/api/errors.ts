@@ -90,6 +90,10 @@ const KEYS = {
   run_finished: "runFinished",
   run_not_completed: "runNotCompleted",
   run_needs_membership: "runNeedsMembership",
+  // 11 chat: the text of a cited source chunk
+  source_deleted: "sourceDeleted",
+  source_reindexed: "sourceReindexed",
+  source_not_visible: "sourceNotVisible",
   // 07 approvals
   approval_requires_user_session: "approvalRequiresUserSession",
   approval_not_pending: "approvalNotPending",

@@ -32,6 +32,9 @@ WRITE_EXEMPT |= {"sweep_approvals"}
 # 06b: the facade's chat completion is an API key's call (no console role applies; a run it starts
 # is audited as create_run is), and the service-account-only search of a key's run.
 WRITE_EXEMPT |= {"chat_completions", "internal_key_search"}
+# 11-1: deleting one's own conversation is own data, open in read-only mode (brief 11: read-only
+# users chat and delete their own conversations); the handler finds the caller's rows only.
+WRITE_EXEMPT |= {"delete_conversation"}
 
 
 def api_routes(routes):

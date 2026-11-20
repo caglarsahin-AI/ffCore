@@ -1153,6 +1153,85 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorBody'
+  /api/v1/projects/{project_id}/runs/{run_id}/sources/{chunk_id}:
+    get:
+      tags:
+      - runs
+      summary: Get Run Source
+      description: 'The text, page and date of a chunk the run cited. 404 `source_not_found`: the run
+        did not
+
+        cite it; 404 `source_deleted`: its document was deleted; 404 `source_reindexed`: the document
+
+        was re-indexed and the chunk replaced; 403 `source_not_visible`: the document''s ACL does not
+
+        include the caller.'
+      operationId: get_run_source_api_v1_projects__project_id__runs__run_id__sources__chunk_id__get
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      - name: run_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Run Id
+      - name: chunk_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Chunk Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SourceChunkOut'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
   /api/v1/projects/{project_id}/runs/{run_id}/stream:
     get:
       tags:
@@ -1338,6 +1417,274 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RunOut'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+  /api/v1/projects/{project_id}/chat/agents:
+    get:
+      tags:
+      - runs
+      summary: List Chat Agents
+      description: 'The project''s published agents, for the chat''s agent picker. External agents are
+        reached
+
+        through the facade only (06b-2), so they are not listed.'
+      operationId: list_chat_agents_api_v1_projects__project_id__chat_agents_get
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatAgentList'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+  /api/v1/projects/{project_id}/conversations:
+    get:
+      tags:
+      - runs
+      summary: List Conversations
+      description: The caller's own conversations, newest message first.
+      operationId: list_conversations_api_v1_projects__project_id__conversations_get
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      - name: agent_id
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Agent Id
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 200
+          minimum: 1
+          default: 50
+          title: Limit
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversationList'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+  /api/v1/projects/{project_id}/conversations/{conversation_id}/messages:
+    get:
+      tags:
+      - runs
+      summary: List Messages
+      description: 'The conversation''s messages in order, each with the state of its run (a waiting or
+        failed
+
+        run shows in the chat after a reload).'
+      operationId: list_messages_api_v1_projects__project_id__conversations__conversation_id__messages_get
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      - name: conversation_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Conversation Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatMessageList'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '401':
+          description: Not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '403':
+          description: Role or access mode not sufficient, or cross-origin request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Conflict with the current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Request body or parameters failed validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+  /api/v1/projects/{project_id}/conversations/{conversation_id}:
+    delete:
+      tags:
+      - runs
+      summary: Delete Conversation
+      description: 'Soft delete (retention `content` class removes the text later). The audit event keeps
+
+        the id only: the title is the user''s own words.'
+      operationId: delete_conversation_api_v1_projects__project_id__conversations__conversation_id__delete
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      - name: conversation_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Conversation Id
+      responses:
+        '204':
+          description: Successful Response
         '400':
           description: Invalid request.
           content:
@@ -1655,6 +2002,131 @@ components:
       - mattermost
       - widget
       title: Channel
+    ChatAgentList:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/ChatAgentOut'
+          type: array
+          title: Items
+      type: object
+      required:
+      - items
+      title: ChatAgentList
+    ChatAgentOut:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+        key:
+          type: string
+          pattern: ^[a-z][a-z0-9_-]{0,63}$
+          title: Key
+          description: Agent key, unique within the project (C1).
+        name:
+          type: string
+          title: Name
+        description:
+          type: string
+          title: Description
+      type: object
+      required:
+      - id
+      - key
+      - name
+      - description
+      title: ChatAgentOut
+      description: 'A published agent a member may chat with. Never its definition, prompt, model or tools:
+
+        the chat is open to `user` members, who do not read agent configuration (S5).'
+    ChatMessageList:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/ChatMessageOut'
+          type: array
+          title: Items
+      type: object
+      required:
+      - items
+      title: ChatMessageList
+    ChatMessageOut:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+        role:
+          type: string
+          enum:
+          - user
+          - assistant
+          title: Role
+        content:
+          type: string
+          title: Content
+        run_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Run Id
+        run_status:
+          anyOf:
+          - $ref: '#/components/schemas/RunStatus'
+          - type: 'null'
+          description: The status of the run the message is in.
+        outcome_label:
+          anyOf:
+          - $ref: '#/components/schemas/OutcomeLabel'
+          - type: 'null'
+        error_code:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Error Code
+        sources:
+          anyOf:
+          - items:
+              additionalProperties: true
+              type: object
+            type: array
+          - type: 'null'
+          title: Sources
+          description: 'Assistant messages: the cited sources, without chunk text (GET .../runs/{run_id}/sources/{chunk_id}
+            returns it).'
+        feedback:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Feedback
+        low_confidence:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Low Confidence
+          description: 'Set only when the run''s version has show_confidence and a confidence_threshold:
+            true below the threshold. Null otherwise (badge off by default).'
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+      type: object
+      required:
+      - id
+      - role
+      - content
+      - run_id
+      - run_status
+      - outcome_label
+      - error_code
+      - sources
+      - feedback
+      - low_confidence
+      - created_at
+      title: ChatMessageOut
     ContextPolicy:
       properties:
         history_turns:
@@ -1705,6 +2177,53 @@ components:
       additionalProperties: false
       type: object
       title: ContextPolicy
+    ConversationList:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/ConversationOut'
+          type: array
+          title: Items
+      type: object
+      required:
+      - items
+      title: ConversationList
+    ConversationOut:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+        agent_id:
+          type: string
+          format: uuid
+          title: Agent Id
+        agent_key:
+          type: string
+          pattern: ^[a-z][a-z0-9_-]{0,63}$
+          title: Agent Key
+          description: Agent key, unique within the project (C1).
+        title:
+          type: string
+          title: Title
+          description: The first message's first 60 characters (no model call).
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+        last_message_at:
+          type: string
+          format: date-time
+          title: Last Message At
+      type: object
+      required:
+      - id
+      - agent_id
+      - agent_key
+      - title
+      - created_at
+      - last_message_at
+      title: ConversationOut
     ErrorBody:
       properties:
         error:
@@ -2271,6 +2790,47 @@ components:
       - cancelled
       - abandoned
       title: RunStatus
+    SourceChunkOut:
+      properties:
+        chunk_id:
+          type: string
+          format: uuid
+          title: Chunk Id
+        document_id:
+          type: string
+          format: uuid
+          title: Document Id
+        document_name:
+          type: string
+          title: Document Name
+        page:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Page
+        breadcrumb:
+          type: string
+          title: Breadcrumb
+        text:
+          type: string
+          title: Text
+        updated_at_source:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Updated At Source
+      type: object
+      required:
+      - chunk_id
+      - document_id
+      - document_name
+      - page
+      - breadcrumb
+      - text
+      - updated_at_source
+      title: SourceChunkOut
+      description: The text of one chunk the run cited, read with the caller's document ACL.
     ToolRef:
       properties:
         tool_key:

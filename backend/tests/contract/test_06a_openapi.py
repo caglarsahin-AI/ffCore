@@ -29,6 +29,12 @@ EXPECTED = {
     P + "/runs/{run_id}/cancel": {"post"},
     # F9 (K-06a-0005), additive
     P + "/runs/{run_id}/feedback": {"post"},
+    # 11-1 (K-11-0002), additive: the end user chat's read side and the cited chunk text
+    P + "/chat/agents": {"get"},
+    P + "/conversations": {"get"},
+    P + "/conversations/{conversation_id}": {"delete"},
+    P + "/conversations/{conversation_id}/messages": {"get"},
+    P + "/runs/{run_id}/sources/{chunk_id}": {"get"},
 }
 
 

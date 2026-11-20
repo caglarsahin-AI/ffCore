@@ -440,7 +440,10 @@
     "egressInvalidPort": "The port in the address is not valid.",
     "egressTooManyRedirects": "The upstream redirected too many times.",
     "egressTimeout": "The outbound request timed out.",
-    "egressRequestFailed": "The outbound request failed."
+    "egressRequestFailed": "The outbound request failed.",
+    "sourceDeleted": "The cited document was deleted.",
+    "sourceReindexed": "The cited passage is no longer in the knowledge base (the document was re-indexed).",
+    "sourceNotVisible": "The cited document is not visible to you (document access list)."
   },
   "ProviderTest": {
     "title": "Connection test",
@@ -932,11 +935,6 @@
     },
     "note": "Note: {detail}",
     "fallback": "A fallback model answered: {detail}",
-    "toolPending": "Running",
-    "toolDone": "Done",
-    "toolError": "Error: {code}",
-    "noCode": "no code",
-    "toolTruncated": "Shortened ({chars} characters in full)",
     "approvalTitle": "Approval needed",
     "approvalRole": "Can be approved by: {role} or above",
     "approvalNote": "Note (shown to the model on reject)",
@@ -947,9 +945,6 @@
     "answer": "Your answer",
     "sendAnswer": "Answer",
     "answerTitle": "Answer",
-    "sources": "Sources",
-    "sourceTitle": "[{n}] {name}",
-    "sourcePage": "page {page}",
     "runError": "The run ended with {code}: {message}",
     "openRun": "Open this run"
   },
@@ -1914,6 +1909,72 @@
         "system": "System"
       },
       "auditNote": "Changes to this server are in the audit log as {actions}."
+    }
+  },
+  "RunCards": {
+    "toolPending": "Running",
+    "toolDone": "Done",
+    "toolError": "Error: {code}",
+    "noCode": "no code",
+    "toolTruncated": "Shortened ({chars} characters in full)",
+    "sources": "Sources",
+    "sourceTitle": "[{n}] {name}",
+    "sourcePage": "page {page}",
+    "details": "Details",
+    "activity": {
+      "searchDocuments": "Searching the documents…",
+      "runSql": "Running SQL…",
+      "tool": "Running {name}…"
+    },
+    "activityDone": {
+      "searchDocuments": "Searched the documents",
+      "runSql": "Ran SQL",
+      "tool": "Used {name}"
+    },
+    "sourceUpdated": "updated {date}",
+    "sourceLoading": "Loading the passage…",
+    "sourceError": "The passage cannot be shown: {message} (code: {code})"
+  },
+  "Chat": {
+    "title": "Chat",
+    "console": "Console",
+    "signOut": "Sign out",
+    "loading": "Loading…",
+    "noProjectTitle": "Choose a project",
+    "noProjectBody": "Pick a project in the top bar to see the assistants you can chat with.",
+    "agentsTitle": "Assistants",
+    "noAgents": "This project has no published assistant yet.",
+    "unavailableTitle": "This assistant is not available",
+    "unavailableBody": "\"{key}\" is not a published assistant of this project, or you cannot reach it.",
+    "backToAgents": "Back to assistants",
+    "conversations": "Conversations",
+    "openConversations": "Show conversations",
+    "newConversation": "New conversation",
+    "noConversations": "No conversations yet.",
+    "untitled": "Untitled",
+    "deleteConversation": "Delete conversation {title}",
+    "deleteTitle": "Delete this conversation?",
+    "deleteBody": "It disappears from your list. Its messages are removed later under the retention policy.",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "welcomeTitle": "Ask {name}",
+    "inputLabel": "Your message",
+    "inputPlaceholder": "Write a question…",
+    "send": "Send",
+    "startFailed": "The message was not sent: {message} (code: {code})",
+    "runFailed": "No answer: the run ended with {code}.",
+    "reconnecting": "Connection lost; reconnecting…",
+    "lost": "The connection could not be resumed. The answer may still arrive; reload the conversation later.",
+    "serverStatus": "Status on the server: {status}",
+    "phases": {
+      "starting": "Starting…",
+      "running": "Thinking…",
+      "waiting_approval": "Waiting for an approval",
+      "waiting_user": "The assistant asks:"
+    },
+    "badges": {
+      "declined": "Not found in the sources",
+      "lowConfidence": "Low confidence"
     }
   }
 }
