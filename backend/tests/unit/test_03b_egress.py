@@ -398,10 +398,17 @@ def test_03b_2_environment_proxy_ignored(settings, monkeypatch, server_port):
 
 def test_03b_2_transport_pool_uses_pinned_backend(settings):
     # Guard on httpx2 internals (pinned 2.16.0): fails loudly if the pool is not ours.
+    # FOLLOWUP-208: the client's transport chooses between the pinned direct pool and, with
+    # EGRESS_PROXY_URL, a proxy pool that dials only the proxy origin.
     client = _client(settings, _resolver({}))
-    pool = client._transport._pool
+    pool = client._transport._direct._pool
     assert isinstance(pool, httpcore2.AsyncConnectionPool)
     assert isinstance(pool._network_backend, egress._PinnedBackend)
+    assert client._transport._proxy is None
+    proxied = _client(settings, _resolver({}), egress_proxy_url="http://egress-proxy:3128")
+    proxy_pool = proxied._transport._proxy._pool
+    assert isinstance(proxy_pool, httpcore2.AsyncHTTPProxy)
+    assert isinstance(proxy_pool._network_backend, egress._ProxyOnlyBackend)
 
 
 # --- review r1 MAJOR-1: callers cannot loosen the policy per request ---------------------------

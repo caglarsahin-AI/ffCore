@@ -148,7 +148,9 @@ def test_hke_208_setting_refuses_anything_but_http_host_port(settings, value):
 
 
 def test_hke_208_setting_accepts_http_host_port(settings):
-    configured = Settings(**{**settings.model_dump(), "egress_proxy_url": "http://egress-proxy:3128"})
+    configured = Settings(
+        **{**settings.model_dump(), "egress_proxy_url": "http://egress-proxy:3128"}
+    )
     assert configured.egress_proxy_url == "http://egress-proxy:3128"
 
 
@@ -179,11 +181,9 @@ def test_hke_208_https_target_is_a_connect_tunnel_by_name(settings, proxy):
 def test_hke_208_proxy_refusal_of_a_plain_request_is_an_error(settings, proxy):
     resolver = _resolver({"proxy.test": ["127.0.0.1"]})
     with pytest.raises(EgressDenied) as exc:
-        anyio.run(
-            _get, _client(_proxied(settings, proxy), resolver), "http://denied.example/v1/x"
-        )
+        anyio.run(_get, _client(_proxied(settings, proxy), resolver), "http://denied.example/v1/x")
     assert exc.value.code == "egress_proxy_denied"
-    assert "ERR_ACCESS_DENIED" in exc.value.detail
+    assert "ERR_ACCESS_DENIED" in str(exc.value)
 
 
 @pytest.mark.parametrize(
@@ -297,10 +297,19 @@ def test_hke_208_policy_http_client_uses_the_proxy(settings, proxy):
 def test_hke_208_check_http_destination_leaves_addresses_to_the_proxy(settings, proxy):
     resolver = _resolver({})
     configured = _proxied(settings, proxy)
-    assert anyio.run(lambda: check_http_destination(configured, "https://svc.example.com/x", resolver=resolver)) == []
+    assert (
+        anyio.run(
+            lambda: check_http_destination(
+                configured, "https://svc.example.com/x", resolver=resolver
+            )
+        )
+        == []
+    )
     assert resolver.calls == []
     with pytest.raises(EgressDenied) as exc:
-        anyio.run(lambda: check_http_destination(configured, "https://nope.example/x", resolver=resolver))
+        anyio.run(
+            lambda: check_http_destination(configured, "https://nope.example/x", resolver=resolver)
+        )
     assert exc.value.code == "egress_not_allowlisted"
 
 
