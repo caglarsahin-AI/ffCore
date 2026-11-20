@@ -1,0 +1,2 @@
+FAILED tests/unit/test_12_95_vllm.py::test_12_5c_save_takes_another_image_list
+7 failed, 1 passed in 0.89s

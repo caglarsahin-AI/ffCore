@@ -115,3 +115,18 @@ down -v; konteyner 0, volume 0 (doğrulandı). Tam test-int sırası boş, ffmai
 ### A-12-0022 · 2026-11-20 17:35 · → koordinator · DURUM
 Paket: 12 · Cevap: K-12-0016 · Durum: IMPLEMENTED
 İki birim kırmızısı düzeltildi: `test_04b_1_…single_head_on_05b` bilerek değişti (tek head korunur, artık `12_0001`; 04b'nin 05b üstünde olduğu kontrol ediliyor), `.env.test` `APP_DB_PASSWORD=dummy-not-secret-app-role` (sahte değer işareti kuralı). Hedefli birim 22 passed, lint 0. **Not:** bu hedefli koşu (tools `run --no-deps`, ~1 dk) YIGIN-KAPA'mdan sonra ve ffmain YIGIN-AC'n (K-12-0016) sırasında oldu; ffmain konteyneri henüz yokken bitti; ffcore-12 ağ/volume artığı temizlendi (0/0). Bundan sonra ffmain MERGED duyurusuna kadar konteyner yok. Sıradaki: 12-1 MERGED → 12-2'yi main'e rebase → B dilimleri (preflight `vllm` + `db_role_owner`, kurulum.md tam akış, kurulum-kapali-ag.md, degisiklikler, docs/api.md 194 notu).
+
+### A-12-0023 · 2026-11-20 18:30 · → koordinator · YIGIN-AC
+Paket: 12 · Cevap: K-12-0019 · Yigin: ffcore-12
+12-2 rebase a7c861f'ye tamam (tek çakışma: tools ortamı `COMPOSE_FILE` + sahip URL, ikisi korundu). B dilimleri commit'li (preflight vllm + db_role_owner, BACKEND_CONTAINER_PORT tek tanım, kurulum.md tam akış, kurulum-kapali-ag.md, degisiklikler 12-2 üstte, api.md 194). Son hedefli kapı: build, lint, test ×2, hedefli test-int (12, 03c retention, 06b2, trj_194), rehber komutları, smoke, down -v → `12-2-final-gate.log`. Tam test-int değil (rebase öncesi tam koşu 1138 passed; rebase'in getirdiği 12-1 main kapısında yeşil); gerekirse sıra isterim.
+
+### A-12-0024 · 2026-11-20 19:15 · → koordinator · YIGIN-KAPA
+Paket: 12 · Cevap: K-12-0019 · Yigin: ffcore-12
+down -v (test profili dahil); konteyner 0, volume 0, ağ 0 (doğrulandı).
+
+### A-12-0025 · 2026-11-20 19:16 · → koordinator · PR-HAZIR
+Paket: 12 · Cevap: K-12-0013, K-12-0019 · SHA: 080facffd6c1eeefd963cf8d5213274402e48ef5
+**12-2 [B]**, dal `feat/12-2-kurulum`, main a7c861f üstüne rebase; delta `main...080facf` 23 commit, 31 dosya (+1773/−25), frontend/state yok. PR notu `state/pr/12.md` "PR 12-2".
+**Kanıt:** tam test-int (rebase öncesi, ffcore_app ile) 1138 passed/12 skipped; son hedefli kapı (rebase sonrası) lint 0, `make test` 2106×2, hedefli test-int 85 passed, rehber komutları, smoke; yedek provası geçti (sayılar + belge sha eşit, ikinci restore red). Loglar `12-2-{red-unit-*,46-*,backup-restore-prova,gate,test-int-full,final-gate,vllm-config}.log`.
+**Bilerek değişen testler:** `test_04b_1_…single_head_on_05b` (head `12_0001`), preflight/smoke testlerine `APP_DB_*`. **İki profilde düşen 2 birim** düzeltildi (`.env.test` sahte işareti, 04b head). **Gizli yetki kırmızısı yok**; restore'un `--no-acl` ile PUBLIC EXECUTE açığı bulundu ve düzeltildi. **Yolda:** vLLM ayrı imaj listesi, preflight Py 3.8+, `/readyz` curl.
+**NOT_RUN (PENDING_ENV):** GPU vLLM sunumu + P50/P95, ağsız tools derlemesi, test VM'de 1 saat kurulum, anahtarlı seed-models, iki sürüm geri alma. Tam test-int rebase sonrası tekrarlanmadı (gerekirse ENV-209 sırası).

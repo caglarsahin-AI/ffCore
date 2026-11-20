@@ -1,0 +1,117 @@
+=== gate12-2 final 67416f9f8ffea8bb9759a575caedb93ee10371f1 (main 86a0267) 2026-11-20 16:43:40
+
+=== 16:43:41 preflight on the test settings (host, docs/kurulum.md)
+Traceback (most recent call last):
+  File "C:\ai_paycore\ffcore\.worktrees\feat\12-2-kurulum\scripts\compose_preflight.py", line 45, in <module>
+    def _compose_files(value: str, separator: str | None) -> list[str]:
+TypeError: unsupported operand type(s) for |: 'type' and 'NoneType'
+preflight exit=1
+
+=== 16:43:43 up -d --build --pull never --wait
+ Container ffcore-12-langfuse-web-1  Healthy
+ Container ffcore-12-agent-worker-1  Healthy
+ Container ffcore-12-mcp-search-1  Healthy
+ Container ffcore-12-mcp-sql-1  Healthy
+up exit=0
+
+=== 16:45:07 lint
+ruff format --check backend scripts data/samples/scripts services
+548 files already formatted
+lint exit=0
+
+=== 16:45:21 alembic heads
+12_0001 (09, 04a, 08, 03c, 07, 05b, 06a, 12, 06b, 05a, 03a, 04b, 03b) (head)
+
+=== 16:45:38 make test llmaas
+tests/contract/test_c9_runs.py .......                                   [100%]
+
+======================= 2106 passed in 217.42s (0:03:37) =======================
+test llmaas exit=0
+
+=== 16:49:36 make test airgap
+tests/contract/test_c9_runs.py .......                                   [100%]
+
+======================= 2106 passed in 296.62s (0:04:56) =======================
+test airgap exit=0
+
+=== 16:54:54 targeted test-int (12, 06b2, 03c retention, 05b platform targets)
+........................................................................ [ 84%]
+.............                                                            [100%]
+85 passed in 71.74s (0:01:11)
+targeted exit=0
+
+=== 16:56:25 guide: create-superadmin (password on stdin)
+superadmin created: 693ebdd4-c690-40e8-b4bf-daa070e4c82c
+exit=0
+
+=== 16:56:45 guide: make seed-prompts
+prompts created: ['eval_judge_rubric_v2', 'platform_rules']
+prompts already present: -
+exit=0
+
+=== 16:57:08 guide: /readyz
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+  File "/usr/local/lib/python3.12/urllib/request.py", line 215, in urlopen
+    return opener.open(url, data, timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/urllib/request.py", line 521, in open
+    response = meth(req, response)
+               ^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/urllib/request.py", line 630, in http_response
+    response = self.parent.error(
+               ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/urllib/request.py", line 559, in error
+    return self._call_chain(*args)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/urllib/request.py", line 492, in _call_chain
+    result = func(*args)
+             ^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/urllib/request.py", line 639, in http_error_default
+    raise HTTPError(req.full_url, code, msg, hdrs, fp)
+urllib.error.HTTPError: HTTP Error 503: Service Unavailable
+exit=1
+
+=== 16:57:19 guide: app-role.sql on an existing volume (idempotent re-run)
+ALTER DEFAULT PRIVILEGES
+DO
+exit=0
+
+=== 16:57:29 guide: models-check (expected: weights missing on a test stack)
+missing  akdeniz27/bert-base-turkish-cased-ner  (/models/huggingface/hub)
+make: *** [Makefile:51: models-check] Error 1
+exit=2
+
+=== 16:57:42 guide: offline scripts --dry-run/--help
+load: /tmp/none/manifest.sha256 missing
++ docker run --rm -v /c/ai_paycore/ffcore/.worktrees/feat/12-2-kurulum/backend:/src:ro -v /tmp/w:/out python:3.12.10-sli
+    docker compose exec -T postgres psql ... > counts.json
+backup: manifest.sha256
+    sha256sum * > manifest.sha256
+
+=== 16:57:53 smoke
+python scripts/smoke.py
+ok    DEPLOY_PROFILE=llmaas INFERENCE_BACKEND=ollama
+ok    database: application connects as ffcore_app
+ok    backend /healthz 200
+ok    litellm /health/liveliness 200, /key/info 404 (schema present)
+ok    langfuse /api/public/health 200, /api/public/projects 200
+ok    mcp-search /healthz 200
+ok    mcp-sql /healthz 200
+ok    skipped: ollama profile inactive
+smoke: passed
+smoke exit=0
+
+=== 16:58:05 down -v
+ Volume ffcore-12_langfuse_clickhouse_logs  Removed
+0
+0
+
+=== 16:58:40 done
+=== readyz guide command 2026-11-20T14:01:51Z
+ Container ffcore-12-mcp-sql-1  Healthy
+{"status":"not_ready","checks":[{"name":"warmup","status":"failed","code":"model_missing","detail":"ModelMissing: BAAI/bge-m3 is not in /models/huggingface/hub; run `make models` (offline by default)"},{"name":"models","status":"ok","code":null,"detail":"BAAI/bge-m3, BAAI/bge-reranker-v2-m3"},{"name":"embed_dim","status":"ok","code":null,"detail":"chunks.embedding vector(1024), EMBED_DIM 1024"},{"
+HTTP 503
+548 files already formatted
+44 passed in 0.61s
+ Volume ffcore-12_knowledge_storage  Removed

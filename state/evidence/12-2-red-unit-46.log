@@ -1,0 +1,5 @@
+E   StopIteration
+=========================== short test summary info ============================
+ERROR tests/unit/test_12_46_app_role_static.py - StopIteration
+!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+1 error in 1.68s

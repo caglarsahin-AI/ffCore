@@ -1,0 +1,330 @@
+#0 building with "default" instance using docker driver
+
+#1 [backend internal] load .dockerignore
+#1 transferring context: 2B done
+#1 DONE 0.0s
+
+#2 [backend internal] load build definition from Dockerfile
+#2 transferring dockerfile: 2.13kB done
+#2 DONE 0.0s
+
+#3 [backend internal] load metadata for docker.io/library/python:3.12.10-slim-bookworm
+#3 DONE 2.9s
+
+#4 [backend internal] load metadata for ghcr.io/astral-sh/uv:0.10.12
+#4 DONE 3.2s
+
+#5 [backend uv 1/1] FROM ghcr.io/astral-sh/uv:0.10.12@sha256:72ab0aeb448090480ccabb99fb5f52b0dc3c71923bffb5e2e26517a1c27b7fec
+#5 DONE 0.0s
+
+#6 [backend base 1/6] FROM docker.io/library/python:3.12.10-slim-bookworm@sha256:fd95fa221297a88e1cf49c55ec1828edd7c5a428187e67b5d1805692d11588db
+#6 DONE 0.0s
+
+#7 [backend internal] load build context
+#7 transferring context: 2.10MB 0.1s done
+#7 DONE 0.1s
+
+#8 [backend base 6/6] COPY pyproject.toml uv.lock ./
+#8 CACHED
+
+#9 [backend base 3/6] RUN apt-get update     && apt-get install -y --no-install-recommends libgomp1 libgl1 libglib2.0-0 libxcb1     && rm -rf /var/lib/apt/lists/*
+#9 CACHED
+
+#10 [backend base 5/6] WORKDIR /app
+#10 CACHED
+
+#11 [backend base 2/6] COPY --from=uv /uv /usr/local/bin/uv
+#11 CACHED
+
+#12 [backend base 4/6] RUN mkdir -p /models /data/storage && chown 10001 /models /data/storage
+#12 CACHED
+
+#13 [backend runtime 1/5] RUN uv sync --frozen --no-dev --no-install-project
+#13 CACHED
+
+#14 [backend runtime 2/5] COPY alembic.ini ./
+#14 CACHED
+
+#15 [backend runtime 3/5] COPY alembic ./alembic
+#15 DONE 0.1s
+
+#16 [backend runtime 4/5] COPY ffcore ./ffcore
+#16 DONE 0.1s
+
+#17 [backend runtime 5/5] RUN useradd --system --uid 10001 --home-dir /models ffcore
+#17 0.308 useradd warning: ffcore's uid 10001 is greater than SYS_UID_MAX 999
+#17 DONE 0.4s
+
+#18 [backend] exporting to image
+#18 exporting layers 0.1s done
+#18 writing image sha256:22a39a0aa149560fac3ca24f16d611f3b022424e2e4cc880bdbf1f1f2945e3c9 done
+#18 naming to docker.io/ffcore/backend:0.0.0-12 0.0s done
+#18 DONE 0.1s
+
+#19 [frontend internal] load build definition from Dockerfile
+#19 transferring dockerfile: 665B done
+#19 DONE 0.0s
+
+#20 [frontend internal] load .dockerignore
+#20 transferring context: 115B done
+#20 DONE 0.0s
+
+#21 [frontend internal] load metadata for docker.io/library/node:20.19.5-alpine
+#21 DONE 0.0s
+
+#22 [frontend 1/6] FROM docker.io/library/node:20.19.5-alpine
+#22 DONE 0.0s
+
+#23 [frontend internal] load build context
+#23 transferring context: 3.51MB 0.2s done
+#23 DONE 0.2s
+
+#24 [frontend 2/6] WORKDIR /app
+#24 CACHED
+
+#25 [frontend 3/6] COPY package.json package-lock.json ./
+#25 CACHED
+
+#26 [frontend 4/6] RUN npm ci --no-audit --no-fund
+#26 CACHED
+
+#27 [frontend 5/6] COPY . .
+#27 DONE 0.1s
+
+#28 [frontend 6/6] RUN npm run build
+#28 0.381 
+#28 0.381 > ffcore-frontend@0.1.0 build
+#28 0.381 > next build
+#28 0.381 
+#28 1.944    ▲ Next.js 15.5.28
+#28 1.945 
+#28 2.015    Creating an optimized production build ...
+#28 44.21  ✓ Compiled successfully in 42s
+#28 44.22    Linting and checking validity of types ...
+#28 69.46    Collecting page data ...
+#28 75.27    Generating static pages (0/27) ...
+#28 76.37    Generating static pages (6/27) 
+#28 76.44    Generating static pages (13/27) 
+#28 76.78    Generating static pages (20/27) 
+#28 76.78  ✓ Generating static pages (27/27)
+#28 78.15    Finalizing page optimization ...
+#28 78.15    Collecting build traces ...
+#28 89.26 
+#28 89.27 Route (app)                                 Size  First Load JS
+#28 89.27 ┌ ƒ /                                    7.58 kB         145 kB
+#28 89.27 ├ ƒ /_not-found                             1 kB         103 kB
+#28 89.27 ├ ƒ /[section]                           1.56 kB         116 kB
+#28 89.27 ├ ƒ /agents                              7.24 kB         193 kB
+#28 89.27 ├ ƒ /agents/[agentId]                    16.2 kB         190 kB
+#28 89.27 ├ ƒ /alerts                              9.94 kB         166 kB
+#28 89.27 ├ ƒ /api-keys                            8.52 kB         164 kB
+#28 89.27 ├ ○ /apple-icon.png                          0 B            0 B
+#28 89.27 ├ ƒ /approvals                           4.02 kB         153 kB
+#28 89.27 ├ ƒ /approvals/[approvalId]              6.08 kB         166 kB
+#28 89.27 ├ ƒ /dev/theme                           3.02 kB         122 kB
+#28 89.27 ├ ƒ /evaluations                         1.43 kB         170 kB
+#28 89.27 ├ ƒ /evaluations/[suiteId]               3.66 kB         172 kB
+#28 89.27 ├ ƒ /evaluations/compare                 2.19 kB         178 kB
+#28 89.27 ├ ƒ /evaluations/runs/[evalRunId]        8.11 kB         194 kB
+#28 89.27 ├ ○ /icon.png                                0 B            0 B
+#28 89.27 ├ ƒ /knowledge-bases                     2.78 kB         194 kB
+#28 89.27 ├ ƒ /knowledge-bases/[kbId]              6.13 kB         208 kB
+#28 89.27 ├ ƒ /login                               8.76 kB         181 kB
+#28 89.27 ├ ○ /manifest.webmanifest                  128 B         103 kB
+#28 89.27 ├ ƒ /mcp-servers                         2.79 kB         196 kB
+#28 89.27 ├ ƒ /mcp-servers/[serverId]              5.25 kB         209 kB
+#28 89.27 ├ ƒ /models                              10.1 kB         166 kB
+#28 89.27 ├ ƒ /overview                            3.92 kB         263 kB
+#28 89.27 ├ ƒ /projects                             8.6 kB         190 kB
+#28 89.27 ├ ƒ /projects/[id]/members               9.51 kB         158 kB
+#28 89.27 ├ ƒ /providers                           11.4 kB         163 kB
+#28 89.27 ├ ƒ /quotas                              9.21 kB         165 kB
+#28 89.27 ├ ƒ /retention                           9.49 kB         185 kB
+#28 89.27 ├ ƒ /runs                                5.32 kB         154 kB
+#28 89.27 ├ ƒ /runs/[runId]                        9.57 kB         169 kB
+#28 89.27 ├ ƒ /system-status                       8.67 kB         136 kB
+#28 89.27 ├ ƒ /tools                               1.16 kB         194 kB
+#28 89.27 ├ ƒ /tools/[toolId]                      3.33 kB         196 kB
+#28 89.27 └ ƒ /usage                                3.1 kB         261 kB
+#28 89.27 + First Load JS shared by all             102 kB
+#28 89.27   ├ chunks/1255-60d8dc7c8c9309a1.js      46.3 kB
+#28 89.27   ├ chunks/4bd1b696-100b9d70ed4e49c1.js  54.2 kB
+#28 89.27   └ other shared chunks (total)          1.94 kB
+#28 89.27 
+#28 89.27 
+#28 89.27 ○  (Static)   prerendered as static content
+#28 89.27 ƒ  (Dynamic)  server-rendered on demand
+#28 89.27 
+#28 DONE 89.4s
+
+#29 [frontend] exporting to image
+#29 exporting layers
+#29 exporting layers 1.6s done
+#29 writing image sha256:fbd2cd9497f8229b32c55c18f11b1bd35733779a233437b15f0964f12a071d84 done
+#29 naming to docker.io/ffcore/frontend:0.0.0-12 done
+#29 DONE 1.6s
+ Volume "ffcore-12_qdrant_data"  Creating
+ Volume "ffcore-12_qdrant_data"  Created
+ Container ffcore-12-langfuse-minio-1  Creating
+ Container ffcore-12-fake-llm-1  Creating
+ Container ffcore-12-ticket-desk-1  Creating
+ Container ffcore-12-postgres-1  Creating
+ Container ffcore-12-qdrant-1  Creating
+ Container ffcore-12-langfuse-redis-1  Creating
+ Container ffcore-12-redis-1  Creating
+ Container ffcore-12-langfuse-postgres-1  Creating
+ Container ffcore-12-langfuse-clickhouse-1  Creating
+ Container ffcore-12-langfuse-postgres-1  Created
+ Container ffcore-12-langfuse-redis-1  Created
+ Container ffcore-12-redis-1  Created
+ Container ffcore-12-langfuse-clickhouse-1  Created
+ Container ffcore-12-ticket-desk-1  Created
+ Container ffcore-12-fake-llm-1  Created
+ Container ffcore-12-langfuse-minio-1  Created
+ Container ffcore-12-langfuse-web-1  Creating
+ Container ffcore-12-langfuse-worker-1  Creating
+ Container ffcore-12-qdrant-1  Created
+ Container ffcore-12-postgres-1  Created
+ Container ffcore-12-migrate-1  Creating
+ Container ffcore-12-litellm-1  Creating
+ Container ffcore-12-langfuse-web-1  Created
+ Container ffcore-12-langfuse-worker-1  Created
+ Container ffcore-12-litellm-1  Created
+ Container ffcore-12-migrate-1  Created
+ Container ffcore-12-backend-1  Creating
+ Container ffcore-12-backend-1  Created
+ Container ffcore-12-agent-worker-bg-1  Creating
+ Container ffcore-12-mcp-search-1  Creating
+ Container ffcore-12-mcp-sql-1  Creating
+ Container ffcore-12-worker-1  Creating
+ Container ffcore-12-agent-worker-1  Creating
+ Container ffcore-12-frontend-1  Creating
+ Container ffcore-12-agent-worker-bg-1  Created
+ Container ffcore-12-frontend-1  Created
+ Container ffcore-12-mcp-sql-1  Created
+ Container ffcore-12-mcp-search-1  Created
+ Container ffcore-12-worker-1  Created
+ Container ffcore-12-agent-worker-1  Created
+ Container ffcore-12-ticket-desk-1  Starting
+ Container ffcore-12-langfuse-postgres-1  Starting
+ Container ffcore-12-qdrant-1  Starting
+ Container ffcore-12-postgres-1  Starting
+ Container ffcore-12-fake-llm-1  Starting
+ Container ffcore-12-langfuse-redis-1  Starting
+ Container ffcore-12-langfuse-clickhouse-1  Starting
+ Container ffcore-12-redis-1  Starting
+ Container ffcore-12-langfuse-minio-1  Starting
+ Container ffcore-12-langfuse-postgres-1  Started
+ Container ffcore-12-redis-1  Started
+ Container ffcore-12-ticket-desk-1  Started
+ Container ffcore-12-langfuse-minio-1  Started
+ Container ffcore-12-qdrant-1  Started
+ Container ffcore-12-fake-llm-1  Started
+ Container ffcore-12-langfuse-clickhouse-1  Started
+ Container ffcore-12-postgres-1  Started
+ Container ffcore-12-postgres-1  Waiting
+ Container ffcore-12-postgres-1  Waiting
+ Container ffcore-12-langfuse-redis-1  Started
+ Container ffcore-12-langfuse-postgres-1  Waiting
+ Container ffcore-12-langfuse-minio-1  Waiting
+ Container ffcore-12-langfuse-redis-1  Waiting
+ Container ffcore-12-langfuse-postgres-1  Waiting
+ Container ffcore-12-langfuse-clickhouse-1  Waiting
+ Container ffcore-12-langfuse-clickhouse-1  Waiting
+ Container ffcore-12-langfuse-minio-1  Waiting
+ Container ffcore-12-langfuse-redis-1  Waiting
+ Container ffcore-12-langfuse-postgres-1  Healthy
+ Container ffcore-12-langfuse-postgres-1  Healthy
+ Container ffcore-12-langfuse-minio-1  Healthy
+ Container ffcore-12-langfuse-minio-1  Healthy
+ Container ffcore-12-langfuse-clickhouse-1  Healthy
+ Container ffcore-12-langfuse-clickhouse-1  Healthy
+ Container ffcore-12-langfuse-redis-1  Healthy
+ Container ffcore-12-langfuse-redis-1  Healthy
+ Container ffcore-12-langfuse-worker-1  Starting
+ Container ffcore-12-langfuse-web-1  Starting
+ Container ffcore-12-langfuse-web-1  Started
+ Container ffcore-12-langfuse-worker-1  Started
+ Container ffcore-12-postgres-1  Healthy
+ Container ffcore-12-migrate-1  Starting
+ Container ffcore-12-postgres-1  Healthy
+ Container ffcore-12-litellm-1  Starting
+ Container ffcore-12-litellm-1  Started
+ Container ffcore-12-migrate-1  Started
+ Container ffcore-12-postgres-1  Waiting
+ Container ffcore-12-redis-1  Waiting
+ Container ffcore-12-litellm-1  Waiting
+ Container ffcore-12-migrate-1  Waiting
+ Container ffcore-12-postgres-1  Healthy
+ Container ffcore-12-redis-1  Healthy
+ Container ffcore-12-migrate-1  Exited
+ Container ffcore-12-litellm-1  Healthy
+ Container ffcore-12-backend-1  Starting
+ Container ffcore-12-backend-1  Started
+ Container ffcore-12-backend-1  Waiting
+ Container ffcore-12-backend-1  Waiting
+ Container ffcore-12-backend-1  Waiting
+ Container ffcore-12-postgres-1  Waiting
+ Container ffcore-12-backend-1  Waiting
+ Container ffcore-12-backend-1  Waiting
+ Container ffcore-12-backend-1  Waiting
+ Container ffcore-12-postgres-1  Healthy
+ Container ffcore-12-backend-1  Healthy
+ Container ffcore-12-mcp-sql-1  Starting
+ Container ffcore-12-backend-1  Healthy
+ Container ffcore-12-worker-1  Starting
+ Container ffcore-12-backend-1  Healthy
+ Container ffcore-12-agent-worker-1  Starting
+ Container ffcore-12-backend-1  Healthy
+ Container ffcore-12-backend-1  Healthy
+ Container ffcore-12-agent-worker-bg-1  Starting
+ Container ffcore-12-frontend-1  Starting
+ Container ffcore-12-backend-1  Healthy
+ Container ffcore-12-mcp-search-1  Starting
+ Container ffcore-12-mcp-sql-1  Started
+ Container ffcore-12-agent-worker-1  Started
+ Container ffcore-12-agent-worker-bg-1  Started
+ Container ffcore-12-worker-1  Started
+ Container ffcore-12-mcp-search-1  Started
+ Container ffcore-12-frontend-1  Started
+ Container ffcore-12-agent-worker-1  Waiting
+ Container ffcore-12-langfuse-worker-1  Waiting
+ Container ffcore-12-mcp-sql-1  Waiting
+ Container ffcore-12-fake-llm-1  Waiting
+ Container ffcore-12-backend-1  Waiting
+ Container ffcore-12-langfuse-clickhouse-1  Waiting
+ Container ffcore-12-langfuse-web-1  Waiting
+ Container ffcore-12-ticket-desk-1  Waiting
+ Container ffcore-12-litellm-1  Waiting
+ Container ffcore-12-langfuse-postgres-1  Waiting
+ Container ffcore-12-migrate-1  Waiting
+ Container ffcore-12-qdrant-1  Waiting
+ Container ffcore-12-worker-1  Waiting
+ Container ffcore-12-postgres-1  Waiting
+ Container ffcore-12-langfuse-redis-1  Waiting
+ Container ffcore-12-frontend-1  Waiting
+ Container ffcore-12-redis-1  Waiting
+ Container ffcore-12-mcp-search-1  Waiting
+ Container ffcore-12-langfuse-minio-1  Waiting
+ Container ffcore-12-agent-worker-bg-1  Waiting
+ Container ffcore-12-langfuse-clickhouse-1  Healthy
+ Container ffcore-12-langfuse-redis-1  Healthy
+ Container ffcore-12-migrate-1  Exited
+ Container ffcore-12-redis-1  Healthy
+ Container ffcore-12-agent-worker-1  Healthy
+ Container ffcore-12-litellm-1  Healthy
+ Container ffcore-12-langfuse-worker-1  Healthy
+ Container ffcore-12-langfuse-web-1  Healthy
+ Container ffcore-12-qdrant-1  Healthy
+ Container ffcore-12-agent-worker-bg-1  Healthy
+ Container ffcore-12-worker-1  Healthy
+ Container ffcore-12-langfuse-minio-1  Healthy
+ Container ffcore-12-postgres-1  Healthy
+ Container ffcore-12-fake-llm-1  Healthy
+ Container ffcore-12-frontend-1  Healthy
+ Container ffcore-12-ticket-desk-1  Healthy
+ Container ffcore-12-langfuse-postgres-1  Healthy
+ Container ffcore-12-backend-1  Healthy
+ Container ffcore-12-mcp-sql-1  Healthy
+ Container ffcore-12-mcp-search-1  Healthy
+up exit=0

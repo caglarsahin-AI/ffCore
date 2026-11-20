@@ -1,0 +1,16 @@
+E        +  where False = any(<generator object test_12_2_role_line_names_the_role.<locals>.<genexpr> at 0x7fbaab4ce400>)
+
+tests/unit/test_12_compose_preflight.py:323: AssertionError
+=========================== short test summary info ============================
+FAILED tests/unit/test_12_compose_preflight.py::test_12_2_vllm_coherent_passes
+FAILED tests/unit/test_12_compose_preflight.py::test_12_2_vllm_profile_without_overlay_is_refused
+FAILED tests/unit/test_12_compose_preflight.py::test_12_2_vllm_needs_airgap_and_the_vllm_backend
+FAILED tests/unit/test_12_compose_preflight.py::test_12_2_llmaas_refuses_the_owner_as_application_user
+FAILED tests/unit/test_12_compose_preflight.py::test_12_2_app_db_user_must_be_ffcore_app
+FAILED tests/unit/test_12_compose_preflight.py::test_12_2_airgap_may_run_as_the_owner_but_says_so
+FAILED tests/unit/test_12_compose_preflight.py::test_12_2_role_line_names_the_role
+7 failed, 59 passed in 1.29s
+FAILED tests/unit/test_12_backend_port_single_source.py::test_12_2_external_config_has_no_own_backend_port
+1 failed in 1.33s
+FAILED tests/unit/test_12_compose_preflight.py::test_12_2_preflight_runs_on_older_host_pythons
+1 failed, 33 deselected in 1.06s
