@@ -246,14 +246,38 @@ def test_06b_9_client_tools_pass_and_calls_come_back(direct):
 # --- 6: quota and usage ---
 
 
-def test_06b_6_quota_exceeded_429_openai_shape(direct, pg):
-    project, _, _, client = direct
+def _quota_clock(monkeypatch, at: float):
+    """FOLLOWUP-201: the quota engine reads `time.time()` for its window bucket; the facade runs
+    in this process (TestClient), so the clock is set here and moved only by the test. Without
+    it two calls may fall into two minutes and the rpm window never fills."""
+    from types import SimpleNamespace
+
+    from ffcore.services import quota
+
+    clock = SimpleNamespace(at=at)
+    monkeypatch.setattr(quota, "time", SimpleNamespace(time=lambda: clock.at))
+    return clock
+
+
+def _rpm_one(pg, project) -> None:
     pg.execute(
         "INSERT INTO quotas (id, project_id, scope_type, scope_id, label, windows, tokens, budget,"
         " action, created_by) VALUES (%s, %s, 'project', %s, 't', '{\"rpm\": 1}', '{}', '{}',"
         " 'block', 'test')",
         (uuid.uuid4(), project, project),
     )
+
+
+def _minute_start() -> float:
+    import time
+
+    return float(int(time.time()) // 60 * 60)
+
+
+def test_06b_6_quota_exceeded_429_openai_shape(direct, pg, monkeypatch):
+    project, _, _, client = direct
+    _quota_clock(monkeypatch, _minute_start() + 5)
+    _rpm_one(pg, project)
     assert client.chat("chat-default").status_code == 200
     second = client.chat("chat-default")
     assert second.status_code == 429
@@ -263,6 +287,19 @@ def test_06b_6_quota_exceeded_429_openai_shape(direct, pg):
         "code": "quota_exceeded",
     }
     assert len(fake_requests()) == 1
+
+
+def test_06b_6_quota_clock_reaches_the_engine(direct, pg, monkeypatch):
+    """The injected clock is the one the engine counts with: two calls a minute boundary apart
+    are two rpm windows (the old flake, now on purpose), so the 429 test cannot pass by luck."""
+    project, _, _, client = direct
+    start = _minute_start()
+    clock = _quota_clock(monkeypatch, start + 59.5)
+    _rpm_one(pg, project)
+    assert client.chat("chat-default").status_code == 200
+    clock.at = start + 60.5
+    assert client.chat("chat-default").status_code == 200
+    assert len(fake_requests()) == 2
 
 
 def test_06b_6_usage_row_has_api_key(direct, pg):
