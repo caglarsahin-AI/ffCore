@@ -20,11 +20,12 @@ from pathlib import Path
 
 # Profiles a compose file in this repository defines. An unknown name starts nothing, so it
 # is refused instead of silently ignored.
-KNOWN_PROFILES = {"qdrant", "ollama", "egress", "tls", "tools", "test", "e2e"}
+KNOWN_PROFILES = {"qdrant", "ollama", "vllm", "egress", "tls", "tools", "test", "e2e"}
 # Profiles whose services live in their own overlay file (compose interpolates ${VAR:?}
 # before it drops inactive profiles, so the overlay is only added when the profile is on).
 OVERLAYS = {
     "ollama": "deploy/docker-compose.ollama.yml",
+    "vllm": "deploy/docker-compose.vllm.yml",
     "egress": "deploy/docker-compose.egress.yml",
     "tls": "deploy/docker-compose.tls.yml",
 }
@@ -130,6 +131,32 @@ def check(env: dict) -> list[str]:
         lines.append(f"ollama: compose service, OLLAMA_CONTEXT_LENGTH={context}")
     elif deploy == "airgap" and backend == "ollama":
         lines.append("ollama: external (profile inactive; the address is the ollama provider's)")
+
+    if "vllm" in profiles:
+        if deploy != "airgap" or backend != "vllm":
+            raise PreflightError(
+                "profile_backend_mismatch",
+                "the vllm profile needs DEPLOY_PROFILE=airgap and INFERENCE_BACKEND=vllm",
+            )
+        lines.append("vllm: compose service (GPU), serves SEED_VLLM_MODEL")
+
+    # 12-2 (FOLLOWUP-46): the application's database user. llmaas refuses the owner (DDL
+    # rights in the application); airgap (the PayCore M3 server predates the role) says so.
+    app_user, app_password = env.get("APP_DB_USER", ""), env.get("APP_DB_PASSWORD", "")
+    if app_user and app_user != "ffcore_app":
+        raise PreflightError(
+            "db_role_invalid", f"APP_DB_USER must be ffcore_app or empty, not {app_user!r}"
+        )
+    if app_user and app_password:
+        lines.append("database: application connects as ffcore_app")
+    elif deploy == "llmaas":
+        raise PreflightError(
+            "db_role_owner",
+            "APP_DB_USER/APP_DB_PASSWORD are empty: the application would connect as the owner "
+            "(with DDL); set APP_DB_PASSWORD (docs/kurulum.md, database role)",
+        )
+    else:
+        lines.append("database: application connects as the owner (APP_DB_PASSWORD empty)")
 
     if "egress" in profiles:
         if deploy != "llmaas":
