@@ -80,6 +80,8 @@ def header_name_refusal(name: str) -> str | None:
 
 # 05b: a published MCP server's own endpoint on this backend (self-consumption, S3).
 SELF_PATH = re.compile(r"/mcp/[a-z][a-z0-9-]{1,63}/")
+
+
 def _origin(url: httpx2.URL) -> tuple[str, str, int | None]:
     default = {"http": 80, "https": 443}.get(url.scheme)
     return url.scheme, (url.host or "").lower().rstrip("."), url.port or default
