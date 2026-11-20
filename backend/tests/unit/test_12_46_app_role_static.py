@@ -171,7 +171,7 @@ def test_hke_213_initdb_half_pair_stops_when_sourced(tmp_path, user, password):
 
 def test_hke_213_env_example_says_initdb_stops_for_either_half():
     env = (REPO / ".env.example").read_text(encoding="utf-8")
-    block = env.split("Least-privileged database role", 1)[1].split("APP_DB_USER=", 1)[0]
+    block = env.split("Least-privileged database role", 1)[1].split("\nAPP_DB_USER=", 1)[0]
     assert "APP_DB_USER without APP_DB_PASSWORD" in block
     assert "APP_DB_PASSWORD without APP_DB_USER" in block
     assert "initdb" in block and "db_role_incomplete" in block
