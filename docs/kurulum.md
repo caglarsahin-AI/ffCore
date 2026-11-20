@@ -32,7 +32,7 @@ secret is mandatory: compose stops and names the missing variable. For `llmaas`:
 | `OFFLINE` | `false` |
 | `REGISTRY_PREFIX`, `FFCORE_VERSION` | the internal registry (ending with `/`) and the release |
 | `POSTGRES_PASSWORD`, `REDIS_PASSWORD`, `SERVICE_TOKEN`, `OBO_JWT_SECRET`, `SECRET_KEY`, `FERNET_KEY`, `LITELLM_*`, `LANGFUSE_*` | new random values (`.env.example` says how to make each) |
-| `APP_DB_PASSWORD` | a new random value: the application connects as `ffcore_app`, a role without DDL ("Database role") |
+| `APP_DB_USER`, `APP_DB_PASSWORD` | `ffcore_app` and a new random value, always together: the application connects as `ffcore_app`, a role without DDL ("Database role"); one without the other stops the preflight (`db_role_incomplete`) |
 | `EGRESS_ALLOWLIST` | the provider hosts, for example `api.anthropic.com` |
 | `CONSOLE_ORIGINS` | `https://<host>` |
 | `COMPOSE_PATH_SEPARATOR`, `COMPOSE_FILE`, `COMPOSE_PROFILES` | `,` / `compose.yaml,deploy/docker-compose.egress.yml,deploy/docker-compose.tls.yml` / `egress,tls` |
@@ -96,7 +96,8 @@ project keys and the MCP servers; every line is `ok` or `FAIL` with the reason.
 
 ## Database role
 
-New installations: set `APP_DB_PASSWORD` before the first start; the role is created with the
+New installations: set `APP_DB_USER=ffcore_app` and `APP_DB_PASSWORD` before the first start (both
+or neither; initdb stops on a user without a password); the role is created with the
 volume. An existing installation (volume created before 12):
 
 ```bash
@@ -104,7 +105,9 @@ docker compose exec -T postgres sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB
 docker compose exec postgres sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c "\password ffcore_app"'
 ```
 
-then put the same password into `APP_DB_PASSWORD` and `docker compose up -d --wait`. The role
+then put `APP_DB_USER=ffcore_app` and the same password into `.env` and `docker compose up -d
+--wait`. The role has INSERT and SELECT only on the audit log; audit partitions younger than 365
+days cannot be detached or dropped, not even through the owner's functions it may call. The role
 reads and writes rows only; audit partitions go through the owner's functions (migration
 12_0001); migrations and `tools` keep the owner.
 
@@ -116,7 +119,10 @@ deploy/backup.sh --out /backup/ffcore-$(date +%F)
 
 The FFCore and Langfuse databases, the knowledge storage, the Qdrant volume when that service
 runs; `--with-traces` adds Langfuse's ClickHouse and MinIO (Langfuse stops meanwhile). The
-LiteLLM database, the demo database, Redis and model weights are rebuilt, not backed up. Keep
+LiteLLM database, the demo database, Redis and model weights are rebuilt, not backed up. The
+databases and the files are copied one after the other from a running stack: take the backup
+when traffic is low, and stop `backend` and `worker` first when the copy must match exactly (an
+upload during the backup can leave a file without its row or the reverse). Keep
 the backup like the server: it holds encrypted credentials and documents.
 
 Restore onto fresh volumes (refused otherwise):
@@ -171,6 +177,7 @@ starts a comment, as in compose. `make smoke` runs the same check first. The rul
 | `egress_ports_invalid` | an `EGRESS_ALLOWED_PORTS` entry outside 1-65535 |
 | `egress_requires_tls` | the `egress` profile without the `tls` profile (below) |
 | `db_role_owner` | `llmaas` with empty `APP_DB_USER`/`APP_DB_PASSWORD`: the application would connect as the owner ("Database role"); `airgap` only names it |
+| `db_role_incomplete` | `APP_DB_USER` without `APP_DB_PASSWORD` or the reverse, in every profile |
 | `db_role_invalid` | `APP_DB_USER` other than `ffcore_app` |
 
 Use a comma as the path separator so the same `.env` line works on every OS:

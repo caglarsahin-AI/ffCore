@@ -21,7 +21,7 @@ Every command here was run on a local test stack or with `--dry-run`/`--help` un
 | `INFERENCE_BACKEND` | `ollama` (CPU) or `vllm` (GPU) |
 | `REGISTRY_PREFIX` | the internal registry, or empty when the images are loaded from the archive |
 | `LLM_SLOTS`, `BACKGROUND_WINDOW`, `RUN_TIMEOUT_S` | CPU values: `.env.example`, "airgap example"; sizing in [donanim.md](donanim.md) |
-| `APP_DB_PASSWORD` | recommended as in llmaas; empty is allowed here and named by the preflight |
+| `APP_DB_USER`, `APP_DB_PASSWORD` | recommended as in llmaas, both together; both empty runs the application as the owner (the preflight names it); one without the other is refused (`db_role_incomplete`) |
 
 ## Images and model weights
 

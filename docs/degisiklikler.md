@@ -10,7 +10,9 @@ if anything.
   (FOLLOWUP-46): initdb creates it from `APP_DB_PASSWORD` on a fresh volume
   (`deploy/postgres/app-role.sql` holds the grants and serves existing volumes); migration
   `12_0001` makes the audit partition functions run as the owner (SECURITY DEFINER, fixed
-  `search_path`, no PUBLIC execute) and adds detach/drop functions that retention now uses.
+  `search_path`, no PUBLIC execute) and adds detach/drop functions that retention now uses;
+  `12_0002` keeps partitions younger than 365 days out of their reach and leaves the role
+  INSERT and SELECT only on the audit log.
   `deploy/backup.sh` and `deploy/restore.sh` (FFCore and Langfuse databases, knowledge storage,
   Qdrant volume, optional traces; counts and SHA-256 manifest; restore only onto fresh volumes).
   `deploy/docker-compose.vllm.yml` (profile `vllm`, GPU) with its image in
@@ -23,7 +25,8 @@ if anything.
   the base layer, so the runtime image carries them too); `UV_INDEX_URL`/`UV_FIND_LINKS` build
   arguments point uv at an internal mirror (`deploy/offline/wheels.sh`). `deploy/offline/save.sh`
   takes `IMAGES_TXT` like `verify.sh`.
-- **Action:** `llmaas` installations: set `APP_DB_PASSWORD`; on an existing volume run
+- **Action:** `llmaas` installations: set `APP_DB_USER=ffcore_app` and `APP_DB_PASSWORD` (both or
+  neither: `db_role_incomplete` otherwise, in every profile); on an existing volume run
   `deploy/postgres/app-role.sql` once and set the role's password (docs/kurulum.md, "Database
   role"), or `make smoke` fails. `airgap` installations may stay on the owner (smoke names it).
   Run the backup before updating.
