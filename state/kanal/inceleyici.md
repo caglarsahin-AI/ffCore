@@ -3,9 +3,9 @@
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
 - Oturum kimliği: ffcore-inceleyici-04b (önceki: ffcore-inceleyici-10c3; 10c-3 r2 metin teyidi bu oturumda)
-- Aktif paket: bekleme; triage-1 merged e9d0de6; ffmain kapısı koşarken yığın yok; 12-1 r2 teyidi bekleniyor
+- Aktif paket: bekleme; triage-1 MERGED e9d0de6 (kapı yeşil), ffmain kapalı; 12-1 r2 teyidi bekleniyor
 - Durum: ACTIVE
-- Son okunan: koordinator K-TRJ-0009
+- Son okunan: koordinator K-TRJ-0011
 
 ## Mesajlar
 - Arşiv: MERGED/kapalı paketlerin mesajları `state/kanal/arsiv/inceleyici-<paket>.md` dosyalarında (16 Kasım 2026 taşıması: 335 mesaj); ID ile atıf orada bulunur.
@@ -41,41 +41,6 @@ Docker Desktop'ı açmak kullanıcının işi; ben açmıyorum. Motor gelince s�
 1. 05b r2: rv05b hafif yığını, YIGIN-AC, probe'lar (P1-P9) ve hedefli testler, rapor, YIGIN-KAPA.
 2. 10c-2: rv10c2, test-int (qdrant) ve probe'lar.
 
-### R-TRJ-0001 · 2026-11-20 11:44 · → koordinator · YIGIN-AC
-Paket: triage-1 · Cevap: K-TRJ-0003 · Yigin: ffcore-rv (18540/13540, test + qdrant profili, 0.0.0-main, --no-build --pull never)
-triage-1 r1 incelemesi başladı (SHA 292f290). Kod okuması bitti; hedefli test-int, iki profilde `make test` ve probe'lar için kısa yığın açıyorum. Tam test-int yok (ENV-209). Önyüz delta'da yok, önyüz kapısı koşulmayacak.
-
-### R-TRJ-0002 · 2026-11-20 12:47 · → koordinator · YIGIN-KAPA
-Paket: triage-1 · Cevap: K-TRJ-0003 · Yigin: ffcore-rv kapandı (down -v; konteyner 0, volume 0)
-Yığın kapandı; isci-a tam test-int'e başlayabilir. Log `state/evidence/followup-triage-1-r1-rv-down.log`.
-
-### R-TRJ-0003 · 2026-11-20 12:47 · → koordinator · REVIEW-SONUC
-Paket: triage-1 · Cevap: K-TRJ-0003 · SHA: 292f290 · Sonuc: ONAY · Bulgu: B0 M0 m1 N3
-Rapor `state/reviews/followup-triage-1-r1.md`.
-
-**Testler:**
-- hedefli test-int: 440 passed
-- kota ×20: 20/20
-- `make lint` + `make test`: iki profilde 1989 passed
-- hook testleri: 347 passed
-- probe: 4 passed
-
-İlk test-int 12:04'te Docker CLI kopmasıyla %81'de kesildi. O andaki E ve F kesinti olarak sınıflandı: ayrık konteynerdeki tekrar 440/440 yeşil.
-
-**Odak maddeleri:**
-- 207: hook kuralı doğru.
-- 201: üretim kodu değişmedi.
-- 202: admin tekil uçlarda iki sürücüde de 200; analyst 404; liste ve arama süzgeçli.
-- 203: her red tam bir `denied` satırı yazıyor, `after.code` korunuyor.
-- 194: tek yer, beş yüzey; `backend` allowlist'teyken de red; userinfo hilesi de yakalanıyor.
-- 198: kararda istenen satırlar düzeldi.
-
-**Bulgular:**
-- MINOR-1 `kural-metni-eski`: `ajanlarla-gelistirme.md` 631'deki hook tablosu ve 507'deki "Kural:" cümlesi hâlâ eski PROSES-175'i anlatıyor (S-3).
-- NOTE-1: qdrant sağlayıcısının `url` alanı kayıtta reddedilmiyor (201), test ediyor; bugün çağrı yolu yok.
-- NOTE-2: hook çıplak `docker build` ve `buildx`'i yakalamıyor; bu değişiklikten önce de böyleydi.
-- NOTE-3: plan/04 satır 5 hâlâ "tam göç 04b" diyor, satır 6 ile çelişiyor.
-
 ### R-12-0001 · 2026-11-20 13:17 · → koordinator · YIGIN-AC
 Paket: 12-1 · Cevap: K-12-0006 · Yigin: ffcore-rv (18540/13540; egress + tls + test overlay, 0.0.0-main, --no-build --pull never)
 12-1 r1 incelemesi başladı (SHA fc688b0). Kod okuması bitti. Egress/TLS test yığınını açıyorum: işçinin `test_12_*` testleri, preflight matrisi, probe'lar. Tam test-int yok (ENV-209).
@@ -108,13 +73,3 @@ Rapor `state/reviews/12-1-r1.md`.
 - NOTE-3: `to_private` listesinde 198.18/15, 240/4 ve IPv4-mapped yok (doğrulanmadı).
 - NOTE-4: preflight'ta mutlak yol ve satır içi yorumda yanlış pozitif (fail-loud).
 - NOTE-5: sorun giderme komutunda `$POSTGRES_USER` hostta açılıyor.
-
-### R-TRJ-0004 · 2026-11-20 13:36 · → koordinator · REVIEW-SONUC
-Paket: triage-1 · Cevap: K-TRJ-0007 · SHA: f6ec3e5 · Sonuc: ONAY · Bulgu: B0 M0 m0 N0
-Rapor `state/reviews/followup-triage-1-r2.md`. Yığın açılmadı; tek bir `--network none` tools konteyneri koştu: ruff temiz, `test_trj_194` + `test_05b` 89 passed.
-
-**Maddeler:**
-- MINOR-1: 631 hook tablosu ve 507 Ders bugünkü kuralı veriyor, eski kural "tarihî not" diye işaretli. Depoda kural olarak `--pull=false` öneren metin kalmadı.
-- NOTE-3: plan/04 satır 5 ile 6 tutarlı.
-- NOTE-1: `URL_FIELDS`'a `url` eklendi. Kayıt, güncelleme ve test aynı 400 `endpoint_is_platform`'u veriyor. Kapsam testi sürücülerin adres alanlarını sayıyor; dışarıda kalan yok (`path` dizin, `region` bölge adı).
-- r1 maddeleri dışında değişiklik yok.

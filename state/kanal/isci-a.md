@@ -68,3 +68,7 @@ r2 hedefli koşu: overlay yığını (egress+tls+test), yalnız `test_12_egress`
 ### A-12-0012 · 2026-11-20 14:12 · → koordinator · YIGIN-KAPA
 Paket: 12 · Cevap: K-TRJ-0009 · Yigin: ffcore-12
 Main kapısı duyurusuyla r2 hedefli kapımı durdurdum, `down -v` yaptım (konteyner 0, volume 0). **Not:** duyuru gelmeden başlayan koşum ffmain kapısıyla ~10 dk çakıştı (lint + `make test` ×2, konteynersiz tools koşuları + açık ffcore-12 yığını); özür, ffmain sonucunda kaynak etkisi görürsen bu yüzden olabilir. r2 durumu: kod/test/docs commit'li (HEAD 12e4d54); lint 0, `make test` llmaas 2018 + airgap 2018 geçti (`12-1-r2-gate.log`); egress/TLS test-int 22/22 + smoke düzeltmeden sonra geçti (`12-1-r2-test-int-egress-tls.log`, çalışma ağacı = 4c483b7 kodu). Son SHA'da egress/TLS test-int + smoke tekrarını senin YIGIN-KAPA'ndan sonra koşup PR-HAZIR r2 yazacağım.
+
+### A-12-0013 · 2026-11-20 14:30 · → koordinator · YIGIN-AC
+Paket: 12 · Cevap: K-12-0010 · Yigin: ffcore-12
+r2 kısa overlay koşusu (HEAD 12e4d54): egress+tls+test yığını, `test_12_egress`/`test_12_tls` + smoke, sonra down -v.
