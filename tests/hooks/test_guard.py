@@ -157,7 +157,6 @@ def test_compose_build_message_names_up_build(guard, main_root):
     assert "up --build --pull never" in violations[0].message
 
 
-
 @pytest.mark.parametrize(
     "cmd",
     [
@@ -192,6 +191,7 @@ def test_bare_docker_build_blocked(main_root, cmd):
 )
 def test_docker_non_build_allowed(main_root, cmd):
     assert_allowed(run_hook(bash(cmd), main_root))
+
 
 def test_compose_up_build_pull_never_allowed(guard, main_root, monkeypatch):
     monkeypatch.setattr(guard, "running_ff_stacks", lambda: [])
@@ -380,7 +380,6 @@ def test_pr_alias_field_allowed(main_root):
     assert_allowed(run_hook(edit(path), main_root))
 
 
-
 @pytest.mark.parametrize("name", ["04b-1", "04b-2", "04b-12"])
 def test_worker_writes_sub_pr_note_allowed(main_root, name):
     # K-HKE-0002 K1: a package split into PRs writes state/pr/<package>-<n>.md (04b-2 warn line)
@@ -409,6 +408,7 @@ def test_sub_pr_rule_only_under_state_pr(main_root):
     path = main_root / "state" / "reviews" / "04b-1.md"
     proc = run_hook(edit(path), main_root, FFCORE_ROL="isci-b", FFCORE_PAKET="04b")
     assert_blocked(proc, "TEK-YAZAR")
+
 
 def test_reviewer_writes_reviews_allowed(main_root):
     path = main_root / "state" / "reviews" / "10c-1-r1.md"
@@ -698,7 +698,6 @@ def test_settings_command_runs_guard(main_root):
     assert_blocked(proc, "KAPI")
 
 
-
 def test_settings_command_skips_without_py_launcher(monkeypatch):
     """FOLLOWUP-212: no `py` launcher (Linux tools container) is an explicit skip, not an error;
     the gate's hook step runs on the host with py -3.12."""
@@ -709,6 +708,7 @@ def test_settings_command_skips_without_py_launcher(monkeypatch):
     monkeypatch.setattr(shutil, "which", lambda name: None)
     with pytest.raises(pytest.skip.Exception, match="FOLLOWUP-212"):
         settings_hook_argv()
+
 
 # --- archive (MULTI_AGENT_PROTOCOL "Bağlam bütçesi ve arşiv", 16 Nov 2026) ----
 
