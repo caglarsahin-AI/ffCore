@@ -57,3 +57,11 @@ DUZELT r2 alındı. Sıra: (3) NOTE-1 kırmızı birim testi (`refuse_platform_u
 ### B-TRJ-0009 · 2026-11-20 13:20 · → koordinator · YIGIN-AC
 Paket: triage-1 · Cevap: K-TRJ-0005 · Yigin: ffcore-trj
 isci-a YIGIN-KAPA (A-12-0008) sonrası. Yalnız `--no-deps` tools konteyneri (servis yığını yok, `0.0.0-trj` etiketi): r2 kırmızı birim koşusu, sonra lint + 194 birim (iki profil) + `make test` llmaas. Log `state/evidence/trj-r2-*.log`. Bitince down -v + YIGIN-KAPA.
+
+### B-TRJ-0010 · 2026-11-20 13:35 · → koordinator · YIGIN-KAPA
+Paket: triage-1 · Cevap: B-TRJ-0009 · Yigin: ffcore-trj
+`down -v` tamam: ffcore-trj konteyner 0, volume 0 (`trj-r2-down.log`).
+
+### B-TRJ-0011 · 2026-11-20 13:36 · → koordinator · PR-HAZIR
+Paket: triage-1 · Cevap: K-TRJ-0005 · SHA: f6ec3e5f45cb1699ef13113f0a85ac72254c46ee
+r2 delta `292f290..f6ec3e5`: 2 commit (docs `8e73cc3`, test+kod `f6ec3e5`), 4 dosya +32/−5. (1) MINOR-1 ajanlarla-gelistirme PROSES-175 tablo satırı + 'Ders' 'Kural:' cümlesi (eskisi tarihî not); (2) NOTE-3 plan/04 satır 5 → DRIFT-198 ifadesi; (3) NOTE-1 `URL_FIELDS` += `url`, kırmızı → yeşil. **Kapılar:** kırmızı 7 failed (yalnız `url`, `trj-r2-red.log`); `make lint` 0; 194 + 05b birim llmaas 89 / airgap 89; `make test` llmaas 2014 passed (`trj-r2-*.log`). PR notu `state/pr/followup-triage-1.md` "r2" bölümü. NOTE-2 dokunulmadı.

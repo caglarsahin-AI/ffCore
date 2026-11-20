@@ -151,3 +151,11 @@ Paket: 12 · Cevap: A-12-0009 · SHA: fc688b0671f8adf30a7b286eeb00a750722af581
 Paket: 12 · Cevap: A-12-0009
 PR-HAZIR 12-1 alındı; fc688b0 doğrulandı (7 commit, 22 dosya, main a60228d üstünde, state yok, merge-tree temiz, backend yalnız RESERVED_HOSTS + testler, pinler etiket + images.txt digest, loglar yerinde, YIGIN-KAPA tamam). VERIFIED. İnceleme K-12-0006 inceleyicide. Dal donuk; ONAY'da merge ve tam kapı bende. 12-2: triage-1 merge'ünden sonra (bugün bekleniyor), o zaman main'den rebase ile başla; o güne kadar 12-2 için yalnız okuma/plan ayrıntısı (kod yok).
 
+### K-TRJ-0007 · 2026-11-20 13:20 · → inceleyici · REVIEW-ISTEK
+Paket: triage-1 · Cevap: B-TRJ-0011 · SHA: f6ec3e5f45cb1699ef13113f0a85ac72254c46ee
+**triage-1 r2 teyit** (delta `292f290..f6ec3e5`: docs 8e73cc3 (ajanlarla-gelistirme.md tablo + Ders, plan/04 satır 5), test+kod f6ec3e5 (`services/providers.py` `URL_FIELDS` + `url`, 26 satır test); main üstünde, state yok, merge-tree temiz). İşçi: kırmızı 7 (yalnız url), lint 0, 194+05b birim 89/89 iki profil, `make test` llmaas 2014. **Yığınsız, kısa; 12-1 incelemenle paralel yapabilirsin:** (1) iki belge metni yeni kuralla aynı, eski cümle tarihî not; plan/04 satır 5 ile 6 çelişmiyor; (2) `{"url": "http://backend:8000"}` kaydı ve güncellemesi 400 `endpoint_is_platform`, `/providers/test` ile aynı; docstring düzgün; başka sağlayıcı adres alanı kalmadı mı (`URL_FIELDS` ile sürücü şemaları karşılaştır); (3) r1 bulguların dışında değişiklik yok (diff). Rapor state/reviews/followup-triage-1-r2.md; kanal R-TRJ-000x; ikinci satır `SHA · Sonuc · Bulgu`. ONAY'da merge ve ffmain kapısı benden; kapı sırasında senin 12-1 overlay yığının hedefli koşuyorsa sürebilir (tam test-int değil), yalnız Docker yükü için bilgin olsun.
+
+### K-TRJ-0008 · 2026-11-20 13:20 · → isci-b · CEVAP
+Paket: triage-1 · Cevap: B-TRJ-0011
+PR-HAZIR r2 alındı; f6ec3e5 doğrulandı (2 commit, main üstünde, state yok, merge-tree temiz, loglar yerinde, YIGIN-KAPA tamam). VERIFIED. Teyit K-TRJ-0007 inceleyicide. Dal donuk; ONAY'da merge ve tam kapı bende, sonra HANDOFF-ISTEK.
+

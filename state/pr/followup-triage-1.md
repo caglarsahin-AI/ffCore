@@ -81,3 +81,21 @@ Durum: **PR-HAZIR** · HEAD `292f2907d56486b1476644d194211b6ebfdde1d0` · delta 
 | `down -v` | ffcore-trj | 0 (konteyner 0, volume 0) | `trj-down.log` |
 
 **test-int notu (dürüst kayıt):** tam koşu tek geçişte yeşil değil. ~11:05'te Docker ağında DNS kesintisi oldu (`failed to resolve host 'postgres'` 30 satır, reconcile `egress_dns_failed`; compose istemcisi aynı anda `error waiting for container` ile koptu, konteyner koşmaya devam etti). Bütün FAILED/ERROR satırları bu kesinti ya da ardından LiteLLM'de kalan DB'siz model kaydından (`/model/delete` 400 "not found in db"). Kesintiden etkilenen 18 dosya yeniden koşuldu: 213 + 79 geçti, kod kaynaklı kırmızı yok. Etkilenmeyen 1029 test ilk geçişte geçti. Tek temiz geçiş isteniyorsa main kapısı tam koşuyu yapar.
+
+## r2 (K-TRJ-0005, inceleme r1 ONAY sonrası)
+Delta `292f290..f6ec3e5f45cb1699ef13113f0a85ac72254c46ee`: 2 commit, 4 dosya, +32/−5.
+
+| Commit | İçerik |
+|---|---|
+| `8e73cc3` docs | MINOR-1: `docs/takim/ajanlarla-gelistirme.md` hook tablosu PROSES-175 satırı (kural, geçen/reddedilen örnekler yeni kurala göre) ve 'Ders' paragrafı 'Kural:' cümlesi (bugünkü kural + "FOLLOWUP-207 ile değişti"; eski kural ve `gate09.sh` cümlesi tarihî not). NOTE-3: plan/04 satır 5 "(tam göç 04b)" → DuckDB kaldırıldı, meta Postgres, 04b = `migrate-vectors` + sürücü eşdeğerliği (D1; DRIFT-198). |
+| `f6ec3e5` test+kod | NOTE-1: `URL_FIELDS = ("base_url", "api_base", "url")`, yorum düzeltildi. Testler: `test_trj_194_saved_address_fields_refused` (üç alan × üç URL biçimi × iki allowlist; 400 `endpoint_is_platform`, mesajda URL yok), `test_trj_194_url_fields_cover_every_driver_address` (sürücü alanlarından adres alanları = `URL_FIELDS`), `test_trj_194_qdrant_connection_test_refuses` (kayıt ve test aynı cevap). |
+
+| Koşu | Sonuç | Log |
+|---|---|---|
+| Kırmızı (test var, kod yok) | 7 failed / 48 passed; hepsi `url` | `trj-r2-red.log` |
+| `make lint` | 0 | `trj-r2-lint.log` |
+| 194 birim + 05b birim, llmaas / airgap | 89 / 89 passed | `trj-r2-194.log` |
+| `make test` llmaas | 2014 passed | `trj-r2-test-llmaas.log` |
+| `down -v` | konteyner 0, volume 0 | `trj-r2-down.log` |
+
+Not: yeşil koşular commit'ten hemen önce aynı ağaçta (HEAD `8e73cc3` + bu iki dosya, log başındaki `git status` satırı); commit içeriği koşulan ağaçla aynı. Yığın açılmadı (yalnız `--no-deps` tools). NOTE-2'ye (FOLLOWUP-210) dokunulmadı. Kayıt API'sinin test-int'i (`test_trj_194_platform_registration.py`) qdrant `url` için ayrıca parametre almadı; kayıt uçları aynı `refuse_platform_urls`'ü çağırıyor (r1'de üç uçta kanıtlı).

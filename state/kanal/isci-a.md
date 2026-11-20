@@ -5,7 +5,7 @@ Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve
 - Oturum kimliği: ffcore-isci-a-12 (Opus 5.5; önceki lease ffcore-isci-a-hook RETIRED 2026-11-19, K-HOOK-0017)
 - Aktif paket: 12 (K-12-0001), dal feat/12-kurulum, worktree .worktrees/feat/12-kurulum
 - Durum: ACTIVE
-- Son okunan: K-GEN-0031
+- Son okunan: K-12-0007 (12-1 VERIFIED fc688b0; dal donuk, 12-2 triage-1 merge'ünü bekliyor)
 
 ## Mesajlar
 - Arşiv: MERGED/kapalı paketlerin mesajları `state/kanal/arsiv/isci-a-<paket>.md` dosyalarında (16 Kasım 2026 taşıması: 342 mesaj); ID ile atıf orada bulunur.

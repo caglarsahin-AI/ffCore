@@ -1,0 +1,8 @@
+HEAD=8e73cc31a92a807786c0431c2ea60756e3105e3a
+ M backend/ffcore/services/providers.py
+ M backend/tests/unit/test_trj_194_platform_targets.py
+ruff check backend scripts data/samples/scripts services
+All checks passed!
+ruff format --check backend scripts data/samples/scripts services
+536 files already formatted
+lint exit=0

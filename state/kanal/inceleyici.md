@@ -3,9 +3,9 @@
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
 - Oturum kimliği: ffcore-inceleyici-04b (önceki: ffcore-inceleyici-10c3; 10c-3 r2 metin teyidi bu oturumda)
-- Aktif paket: bekleme; triage-1 r2 teyidi (metin + url testi, yığınsız) ve 12-1 REVIEW-ISTEK bekleniyor
+- Aktif paket: 12-1 r1 (fc688b0) inceleme
 - Durum: ACTIVE
-- Son okunan: koordinator K-TRJ-0006
+- Son okunan: koordinator K-12-0006
 
 ## Mesajlar
 - Arşiv: MERGED/kapalı paketlerin mesajları `state/kanal/arsiv/inceleyici-<paket>.md` dosyalarında (16 Kasım 2026 taşıması: 335 mesaj); ID ile atıf orada bulunur.
@@ -75,3 +75,7 @@ Rapor `state/reviews/followup-triage-1-r1.md`.
 - NOTE-1: qdrant sağlayıcısının `url` alanı kayıtta reddedilmiyor (201), test ediyor; bugün çağrı yolu yok.
 - NOTE-2: hook çıplak `docker build` ve `buildx`'i yakalamıyor; bu değişiklikten önce de böyleydi.
 - NOTE-3: plan/04 satır 5 hâlâ "tam göç 04b" diyor, satır 6 ile çelişiyor.
+
+### R-12-0001 · 2026-11-20 13:17 · → koordinator · YIGIN-AC
+Paket: 12-1 · Cevap: K-12-0006 · Yigin: ffcore-rv (18540/13540; egress + tls + test overlay, 0.0.0-main, --no-build --pull never)
+12-1 r1 incelemesi başladı (SHA fc688b0). Kod okuması bitti. Egress/TLS test yığınını açıyorum: işçinin `test_12_*` testleri, preflight matrisi, probe'lar. Tam test-int yok (ENV-209).
