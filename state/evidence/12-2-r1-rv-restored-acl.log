@@ -1,0 +1,53 @@
+HEAD=080facffd6c1eeefd963cf8d5213274402e48ef5 · restored stack after the rehearsal
+=== functions after restore (owner, definer, config, acl)
+            proname            | owner  | definer |            proconfig            |                proacl                 
+-------------------------------+--------+---------+---------------------------------+---------------------------------------
+ ffcore_audit_append_only      | ffcore | f       |                                 | 
+ ffcore_audit_detach_partition | ffcore | t       | {"search_path=public, pg_temp"} | {ffcore=X/ffcore,ffcore_app=X/ffcore}
+ ffcore_audit_drop_partition   | ffcore | t       | {"search_path=public, pg_temp"} | {ffcore=X/ffcore,ffcore_app=X/ffcore}
+ ffcore_audit_ensure_partition | ffcore | t       | {"search_path=public, pg_temp"} | {ffcore=X/ffcore,ffcore_app=X/ffcore}
+(4 rows)
+
+            proname            | public_exec 
+-------------------------------+-------------
+ ffcore_audit_append_only      | t
+ ffcore_audit_detach_partition | f
+ ffcore_audit_drop_partition   | f
+ ffcore_audit_ensure_partition | f
+(4 rows)
+
+=== role
+  rolname   | rolsuper | rolcreatedb | rolcreaterole | rolreplication | rolcanlogin | rolbypassrls 
+------------+----------+-------------+---------------+----------------+-------------+--------------
+ ffcore_app | f        | f           | f             | f              | t           | f
+(1 row)
+
+=== backend/worker connections by user
+  usename   | application_name | count 
+------------+------------------+-------
+ ffcore     | psql             |     1
+ ffcore_app |                  |     3
+(2 rows)
+
+=== table privileges of ffcore_app on audit tables
+   table_name   |         string_agg          
+----------------+-----------------------------
+ audit_events   | INSERT,SELECT
+ projects       | DELETE,INSERT,SELECT,UPDATE
+ retention_runs | INSERT,SELECT
+(3 rows)
+
+=== default privileges
+ pg_get_userbyid | defaclnamespace | defaclobjtype |        defaclacl         
+-----------------+-----------------+---------------+--------------------------
+ ffcore          | public          | r             | {ffcore_app=arwd/ffcore}
+ ffcore          | public          | S             | {ffcore_app=rwU/ffcore}
+ ffcore          | checkpoints     | r             | {ffcore_app=arwd/ffcore}
+ ffcore          | checkpoints     | S             | {ffcore_app=rwU/ffcore}
+(4 rows)
+
+ version_num 
+-------------
+ 12_0001
+(1 row)
+

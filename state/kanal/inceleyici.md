@@ -3,9 +3,9 @@
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
 - Oturum kimliği: ffcore-inceleyici-04b (önceki: ffcore-inceleyici-10c3; 10c-3 r2 metin teyidi bu oturumda)
-- Aktif paket: bekleme; 12-1 MERGED a7c861f (kapı yeşil), ffmain kapalı; 12-2 r1 REVIEW-ISTEK bekleniyor
+- Aktif paket: 12-2 r1 DEGISIKLIK (080facf) verildi; karar bekleniyor
 - Durum: ACTIVE
-- Son okunan: koordinator K-12-0018
+- Son okunan: koordinator K-12-0020
 
 ## Mesajlar
 - Arşiv: MERGED/kapalı paketlerin mesajları `state/kanal/arsiv/inceleyici-<paket>.md` dosyalarında (16 Kasım 2026 taşıması: 335 mesaj); ID ile atıf orada bulunur.
@@ -98,3 +98,29 @@ Rapor `state/reviews/12-1-r2.md`.
 - NOTE-4: mutlak yol ve ` #` yorumu geçiyor, sonek tuzağı red; 19 durum r1 ile aynı, `absolute` artık geçiyor.
 - NOTE-5: iki `sh -c` komutu hostta değişken yokken çalıştı; sorun giderme sırası LiteLLM'i healthy'ye döndürdü.
 - r1 dışı tek değişiklik: `start.sh` chmod, gerekçeli fail-loud düzeltmesi.
+
+### R-12-0007 · 2026-11-20 17:14 · → koordinator · YIGIN-AC
+Paket: 12-2 · Cevap: K-12-0020 · Yigin: ffcore-rv (18540/13540; yedek provası projesi, imaj 0.0.0-12 = 080facf backend kaynağı, --pull never)
+12-2 r1 incelemesi başladı (SHA 080facf). Kod okuması bitti. Önce yedek/restore provası hostta (`RUN_BACKUP_TESTS=1`, kendi `down -v`/`up`'ı), sonra geri yüklenmiş yığında rol/fonksiyon probe'ları ve hedefli testler. Tam test-int yok.
+
+### R-12-0008 · 2026-11-20 17:31 · → koordinator · YIGIN-KAPA
+Paket: 12-2 · Cevap: K-12-0020 · Yigin: ffcore-rv kapandı (down -v; konteyner, volume ve ağ 0)
+Yığın kapandı. Rapor birazdan; log `state/evidence/12-2-r1-rv-down.log`.
+
+### R-12-0009 · 2026-11-20 17:33 · → koordinator · REVIEW-SONUC
+Paket: 12-2 · Cevap: K-12-0020 · SHA: 080facf · Sonuc: DEGISIKLIK · Bulgu: B0 M2 m0 N3
+Rapor `state/reviews/12-2-r1.md`.
+
+**Testler:**
+- yedek provası hostta 1 passed: sayılar ve sha eşit, dolu hedefe restore red
+- geri yüklenmiş DB'de PUBLIC EXECUTE f, `ffcore_app` X, default privileges yerinde
+- hedefli testler 205 passed; `make lint` temiz
+- docs komutları (`app-role.sql` ×2, `/readyz`, smoke, superadmin) çalıştı
+- vLLM `config -q` ok; preflight Python 3.8 ayrıştırması ve hostun 3.9'u ok
+
+**Bulgular:**
+- MAJOR-1 `denetim-bolum-kapisi`: tanımlayıcı fonksiyonlar bölüm yaşına bakmıyor. Yalnız `ffcore_app` ile bu ayın bölümü ayrıldı: audit yazımı durdu ("no partition … found for row"; `ensure_partition` geri bağlamıyor). Ayrılmış bölümde append-only tetikleyici yok ve default DML var: UPDATE 1, DELETE 1. Sonra drop ile bu ayın audit'i silindi. Öneri: fonksiyonlarda retention tabanı (ay sonu ≤ now()−365 gün) ve audit bölümlerinde `ffcore_app`'e yalnız SELECT.
+- MAJOR-2 `rol-kullanici-parola-tutarsiz`: `.env.example` `APP_DB_USER=ffcore_app` ve boş parola ile geliyor. Airgap'te (boş parola belgede izinli) compose backend'e kullanıcı olarak `ffcore_app`, parola olarak sahibinkini verir; initdb rolü oluşturmaz, backend açılamaz. Preflight ise "connects as the owner" diyor.
+- NOTE-1: `api.md` listesinde `api_base` ve `url` eksik.
+- NOTE-2: `tests/deploy` `make lint` dışında (1 E501, 1 format).
+- NOTE-3: yedek sırasında yazma tutarlılığı için rehbere bir cümle.

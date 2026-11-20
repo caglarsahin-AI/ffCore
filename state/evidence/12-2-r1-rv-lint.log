@@ -1,0 +1,25 @@
+HEAD=080facffd6c1eeefd963cf8d5213274402e48ef5 (git archive copy)
+ruff check backend scripts data/samples/scripts services
+All checks passed!
+ruff format --check backend scripts data/samples/scripts services
+548 files already formatted
+make lint exit 0
+   |
+
+Found 1 error.
+unformatted: File would be reformatted
+   --> tests/deploy/test_12_backup_restore.py:94:16
+    |
+93  |     files = compose(
+    -         "exec", "-T", "backend", "sh", "-c", "find /data/storage -type f -exec sha256sum {} +",
+94  +         "exec",
+95  +         "-T",
+96  +         "backend",
+97  +         "sh",
+98  +         "-c",
+99  +         "find /data/storage -type f -exec sha256sum {} +",
+100 |         env=env,
+    |
+
+1 file would be reformatted, 1 file already formatted
+exit 1

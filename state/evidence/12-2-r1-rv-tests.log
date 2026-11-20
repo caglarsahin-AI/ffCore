@@ -1,0 +1,17 @@
+HEAD=080facffd6c1eeefd963cf8d5213274402e48ef5 (git archive copy) · restored stack
+E501 Line too long (103 > 100)
+  --> tests/deploy/backup_seed.py:9:101
+   |
+ 8 |     docker compose ... --env-file tests/e2e/scenarios/e2e.env run --rm \
+ 9 |       -e E2E_ADMIN_EMAIL -e E2E_ADMIN_PASSWORD -e E2E_PASSWORD tools python tests/deploy/backup_seed.py
+   |                                                                                                     ^^^
+10 |
+11 | Passwords come from the environment the host test generates per run; nothing is written.
+   |
+
+Found 1 error.
+........................................................................ [ 35%]
+........................................................................ [ 70%]
+.............................................................            [100%]
+205 passed in 91.30s (0:01:31)
+exit 0

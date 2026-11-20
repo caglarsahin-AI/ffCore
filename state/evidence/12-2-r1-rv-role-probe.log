@@ -1,0 +1,98 @@
+HEAD=080facffd6c1eeefd963cf8d5213274402e48ef5 · restored stack · psql as ffcore_app over TCP
+=== whoami
+ current_user | session_user | su | owned 
+--------------+--------------+----+-------
+ ffcore_app   | ffcore_app   | f  |     0
+(1 row)
+
+=== DDL must fail
+ERROR:  permission denied for schema public
+LINE 1: CREATE TABLE rv_probe(x int);
+                     ^
+ERROR:  permission denied for database ffcore
+ERROR:  must be owner of table projects
+ERROR:  must be owner of table projects
+ERROR:  permission denied for table audit_events
+ERROR:  must be owner of table audit_events
+ERROR:  must be owner of table projects
+=== append-only
+ERROR:  permission denied for table audit_events
+ERROR:  permission denied for table audit_events
+partition partition audit_events_2026_12
+ part_delete_priv 
+------------------
+ t
+(1 row)
+
+DELETE 0
+=== function guards
+ERROR:  not an audit partition name: projects
+CONTEXT:  PL/pgSQL function ffcore_audit_detach_partition(text) line 4 at RAISE
+ERROR:  not an audit partition name: audit_events_2026_13x
+CONTEXT:  PL/pgSQL function ffcore_audit_detach_partition(text) line 4 at RAISE
+ERROR:  not an audit partition name: <NULL>
+CONTEXT:  PL/pgSQL function ffcore_audit_detach_partition(text) line 4 at RAISE
+ERROR:  no such table: audit_events_1999_01
+CONTEXT:  PL/pgSQL function ffcore_audit_drop_partition(text) line 7 at RAISE
+ERROR:  still attached, detach first: audit_events_2026_12
+CONTEXT:  PL/pgSQL function ffcore_audit_drop_partition(text) line 13 at RAISE
+=== current-month partition through the app role (DoS check)
+   detached_current   
+----------------------
+ audit_events_2026_11
+(1 row)
+
+ rows_in_detached 
+------------------
+               19
+(1 row)
+
+ERROR:  no partition of relation "audit_events" found for row
+DETAIL:  Partition key of the failing row contains (ts) = (2026-11-20 14:27:15.018637+00).
+ ensure_after_detach  
+----------------------
+ audit_events_2026_11
+(1 row)
+
+--- probe 2 (same stack, after probe 1)
+=== state: is the current-month partition attached?
+       relname        | attached 
+----------------------+----------
+ audit_events_2026_11 | f
+ audit_events_2026_12 | t
+(2 rows)
+
+=== insert after ensure (still broken?)
+ERROR:  no partition of relation "audit_events" found for row
+DETAIL:  Partition key of the failing row contains (ts) = (2026-11-20 14:27:58.365691+00).
+=== triggers on the detached partition
+              tgname              
+----------------------------------
+ audit_events_2026_11_no_truncate
+(1 row)
+
+=== app role edits the detached audit rows
+UPDATE 1
+DELETE 1
+ rows_left 
+-----------
+        18
+(1 row)
+
+=== attached partition (December): insert one row, then try to delete it directly
+INSERT 0 1
+ERROR:  audit_events is append-only (DELETE refused)
+CONTEXT:  PL/pgSQL function ffcore_audit_append_only() line 3 at RAISE
+ERROR:  audit_events is append-only (UPDATE refused)
+CONTEXT:  PL/pgSQL function ffcore_audit_append_only() line 3 at RAISE
+=== and drop the detached current month
+       dropped        
+----------------------
+ audit_events_2026_11
+(1 row)
+
+ still_there 
+-------------
+ 
+(1 row)
+

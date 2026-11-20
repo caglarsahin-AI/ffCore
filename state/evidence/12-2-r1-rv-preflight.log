@@ -1,0 +1,20 @@
+HEAD=080facffd6c1eeefd963cf8d5213274402e48ef5 (git archive copy)
+--- ast.parse feature_version=(3,8)
+parse 3.8 ok
+PF [llmaas-role-ok py3.9] exit=0 :: ok    DEPLOY_PROFILE=llmaas INFERENCE_BACKEND= ok    database: application connects as ffcore_app 
+PF [llmaas-no-role py3.9] exit=1 :: FAIL  preflight db_role_owner: APP_DB_USER/APP_DB_PASSWORD are empty: the application would connect as the owner (with DDL); set APP_DB_PASSWORD (docs/kurulum.md, database role) 
+PF [llmaas-user-only py3.9] exit=1 :: FAIL  preflight db_role_owner: APP_DB_USER/APP_DB_PASSWORD are empty: the application would connect as the owner (with DDL); set APP_DB_PASSWORD (docs/kurulum.md, database role) 
+PF [llmaas-pw-only py3.9] exit=1 :: FAIL  preflight db_role_owner: APP_DB_USER/APP_DB_PASSWORD are empty: the application would connect as the owner (with DDL); set APP_DB_PASSWORD (docs/kurulum.md, database role) 
+PF [llmaas-bad-user py3.9] exit=1 :: FAIL  preflight db_role_invalid: APP_DB_USER must be ffcore_app or empty, not 'app' 
+PF [airgap-empty py3.9] exit=0 :: ok    DEPLOY_PROFILE=airgap INFERENCE_BACKEND=ollama ok    ollama: external (profile inactive; the address is the ollama provider's) ok    database: application connects as the owner (APP_DB_PASSWORD empty) 
+PF [airgap-user-only py3.9] exit=0 :: ok    DEPLOY_PROFILE=airgap INFERENCE_BACKEND=ollama ok    ollama: external (profile inactive; the address is the ollama provider's) ok    database: application connects as the owner (APP_DB_PASSWORD empty) 
+PF [vllm-ok py3.9] exit=0 :: ok    DEPLOY_PROFILE=airgap INFERENCE_BACKEND=vllm ok    vllm: compose service (GPU), serves SEED_VLLM_MODEL ok    database: application connects as the owner (APP_DB_PASSWORD empty) 
+PF [vllm-llmaas py3.9] exit=1 :: FAIL  preflight profile_backend_mismatch: the vllm profile needs DEPLOY_PROFILE=airgap and INFERENCE_BACKEND=vllm 
+PF [vllm-ollama-backend py3.9] exit=1 :: FAIL  preflight profile_backend_mismatch: the vllm profile needs DEPLOY_PROFILE=airgap and INFERENCE_BACKEND=vllm 
+PF [vllm-no-overlay py3.9] exit=1 :: FAIL  preflight profile_overlay_mismatch: profile vllm is in COMPOSE_PROFILES but deploy/docker-compose.vllm.yml is not in COMPOSE_FILE; add it (COMPOSE_FILE=compose.yaml:deploy/docker-compose.vllm.yml) or drop the profile 
+--- env-example as shipped (py3.9)
+FAIL  preflight db_role_owner: APP_DB_USER/APP_DB_PASSWORD are empty: the application would connect as the owner (with DDL); set APP_DB_PASSWORD (docs/kurulum.md, database role)
+exit 1
+APP_DB_USER='ffcore_app' APP_DB_PASSWORD='': backend       DATABASE_URL: postgresql+psycopg://ffcore_app:***@postgres:5432/ffcore
+APP_DB_USER='' APP_DB_PASSWORD='': backend       DATABASE_URL: postgresql+psycopg://ffcore:***@postgres:5432/ffcore
+APP_DB_USER='ffcore_app' APP_DB_PASSWORD='set': backend       DATABASE_URL: postgresql+psycopg://ffcore_app:***@postgres:5432/ffcore

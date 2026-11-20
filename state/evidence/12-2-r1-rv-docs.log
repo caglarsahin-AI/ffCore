@@ -1,0 +1,36 @@
+HEAD=080facffd6c1eeefd963cf8d5213274402e48ef5 · restored stack
+--- owner repairs the current-month partition
+audit_events_2026_11
+--- kurulum.md 'Database role', existing volume: app-role.sql (documented command, run twice: idempotent)
+DO
+GRANT
+GRANT
+GRANT
+ALTER DEFAULT PRIVILEGES
+ALTER DEFAULT PRIVILEGES
+DO
+run 1 exit 0
+DO
+GRANT
+GRANT
+GRANT
+ALTER DEFAULT PRIVILEGES
+ALTER DEFAULT PRIVILEGES
+DO
+run 2 exit 0
+--- kurulum.md 'Health check'
+{"status":"ready","checks":[{"name":"warmup","status":"ok","code":null,"detail":null},{"name":"models","status":"ok","code":null,"detail":"FAKE_EMBED=1: deterministic test models"},{"name":"embed_dim","status":"ok","code":null,"detail":"chunks.embedding vector(1024), EMBED_DIM 1024"},{"name":"ollama_context","status":"skipped","code":null,"detail":"no active Ollama model with limits.context_tokens"},{"name":"vector_store","status":"ok","code":null,"detail":"pgvector"},{"name":"llm_slots","status":"ok","code":null,"detail":"in_use=0/4 waiting: interactive=0, interactive_low=0, background=0; background window open"},{"name":"ollama_runtime_context","status":"skipped","code":null,"detail":"no active Ollama model with limits.context_tokens"},{"name":"ingest_queue","status":"ok","code":null,"detail":"queued=0"}]}
+HTTP 200
+python scripts/smoke.py
+ok    DEPLOY_PROFILE=llmaas INFERENCE_BACKEND=ollama
+ok    database: application connects as ffcore_app
+ok    backend /healthz 200
+ok    litellm /health/liveliness 200, /key/info 404 (schema present)
+ok    langfuse /api/public/health 200, /api/public/projects 200
+ok    mcp-search /healthz 200
+ok    mcp-sql /healthz 200
+ok    skipped: ollama profile inactive
+smoke: passed
+--- kurulum.md first superadmin (password on stdin)
+superadmin created: 8e9c8388-c9a6-4a82-a1cd-58acd1f3e198
+exit 0
