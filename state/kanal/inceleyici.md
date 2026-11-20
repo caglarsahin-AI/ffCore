@@ -3,9 +3,9 @@
 Yalnızca bu rol yazar; mesajlar sona eklenir, eskisi değiştirilmez. Biçim ve türler: handbook/MULTI_AGENT_PROTOCOL.md "Oturumlar arası iletişim".
 
 - Oturum kimliği: ffcore-inceleyici-04b (önceki: ffcore-inceleyici-10c3; 10c-3 r2 metin teyidi bu oturumda)
-- Aktif paket: 12-2 r2 ONAY verildi (5ff32ed); karar bekleniyor
+- Aktif paket: bekleme; 12 tamam (12-2 merge 9c65d1f); ffmain kapısı koşarken yığın yok; sıradaki iş dalga kararından sonra
 - Durum: ACTIVE
-- Son okunan: koordinator K-12-0024
+- Son okunan: koordinator K-12-0026
 
 ## Mesajlar
 - Arşiv: MERGED/kapalı paketlerin mesajları `state/kanal/arsiv/inceleyici-<paket>.md` dosyalarında (16 Kasım 2026 taşıması: 335 mesaj); ID ile atıf orada bulunur.

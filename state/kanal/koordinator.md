@@ -211,3 +211,19 @@ PR-HAZIR r2 alındı; 5ff32ed doğrulandı (5 commit test→kod→kod→style→
 ### K-12-0026 · 2026-11-20 18:12 · → tumu · YIGIN-AC
 Paket: 12 · Cevap: R-12-0012 · Yigin: ffmain
 12-2 r2 ONAY alındı (B0 M0 m0 N2; rapor ve 6 kanıt commit edildi; NOTE-1/2 → FOLLOWUP-213). Merge --no-ff `9c65d1f` (5ff32ed; 33 dosya +2148/-27). Main tam kapısı ffmain'de başlıyor (hook host, config taban/egress+tls/vllm, `--pull never`, tee `state/evidence/gate-122-20261120.log`; tam test-int `ffcore_app` ile çünkü `.env.test` artık APP_DB_* taşıyor). **isci-a ve inceleyici: kapı bitene kadar konteyner testi yok.** YIGIN-KAPA ile duyururum.
+
+### K-12-0027 · 2026-11-20 18:49 · → tumu · YIGIN-KAPA
+Paket: 12 · Cevap: K-12-0026 · Yigin: ffmain
+Kapı bitti, `down -v` tamam. Konteyner testi serbest.
+
+### K-12-0028 · 2026-11-20 18:49 · → tumu · MERGED
+Paket: 12 · Cevap: R-12-0012 · SHA: 9c65d1f
+12-2 merge --no-ff `9c65d1f` (5ff32ed; 33 dosya +2148/-27). Kapı `state/evidence/gate-122-20261120.log`: hooks host 347, config taban/egress+tls/vllm, imajlar build, lint 0, heads tek `12_0002`, test 2117×2, test-samples, test-int 1143/34/0 (`ffcore_app` ile), smoke, önyüz typecheck/check:api 0 + Vitest 279. **12 paketi DONE** (12-1 a7c861f + 12-2 9c65d1f). FOLLOWUP 46/95 kapandı; 208/211/213 açık. Main'de yeni: `ffcore_app` rolü + audit bölüm fonksiyonları (365 gün tabanı), `deploy/backup.sh`/`restore.sh` + host provası, apt'siz tools imajı + iç ayna, vLLM overlay, docs/donanim.md, docs/kurulum.md tam akış + docs/kurulum-kapali-ag.md, preflight ekleri. Push kullanıcı talimatını bekliyor.
+
+### K-12-0029 · 2026-11-20 18:49 · → isci-a · HANDOFF-ISTEK
+Paket: 12 · Cevap: A-12-0029
+MERGED 9c65d1f; 12 tamam. Kanalına HANDOFF yaz (kalan riskler: FOLLOWUP-208 backend proxy desteği, 211 Squid CONNECT-only, 213 initdb/preflight metinleri; PENDING_ENV: GPU vLLM ölçümü, ağsız tools derlemesi, test VM kurulumu, geri alma provası; `.env.test` artık `APP_DB_*` taşır), sonra lease `RETIRED`. Worktree'ler `.worktrees/feat/12-kurulum`, `.worktrees/feat/12-2-kurulum` ve `0.0.0-12` etiketi silme kullanıcıda. İki PR, dört tur, 1138→1143 test-int `ffcore_app` ile; teşekkürler.
+
+### K-12-0030 · 2026-11-20 18:49 · → inceleyici · CEVAP
+Paket: 12 · Cevap: R-12-0012
+12 DONE (9c65d1f), kapı yeşil. Dalga 7 kapanış raporu kullanıcıya gidiyor; sıradaki inceleme yeni dalga kararından sonra. Bekle.
