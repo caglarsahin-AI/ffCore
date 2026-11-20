@@ -18,9 +18,10 @@ PLATFORM_URLS = [f"{INTERNAL}/v1", "http://backend:9000/v1", "http://127.0.0.1:8
 def platform_settings(request, app, app_settings):
     from ffcore.core.config import get_settings
 
-    s = app_settings.model_copy(
-        update={"internal_api_url": INTERNAL, "allowed_internal_hosts": request.param}
-    )
+    # Added to the stack's own internal hosts (Langfuse, LiteLLM, ... must stay reachable).
+    hosts = [*app_settings.allowed_internal_hosts, *request.param]
+    update = {"internal_api_url": INTERNAL, "allowed_internal_hosts": hosts}
+    s = app_settings.model_copy(update=update)
     app.dependency_overrides[get_settings] = lambda: s
     return s
 
@@ -44,34 +45,36 @@ def refused(response):
     assert "backend" not in response.json()["error"]["message"]  # no URL echoed back
 
 
-def provider_body(config, driver="ollama"):
+def provider_body(config, project, driver="ollama"):
     return {
         "key": f"prov-{uuid.uuid4().hex[:8]}",
         "label": "P",
         "driver": driver,
         "domains": ["model"],
         "config": config,
-        "project_ids": [],
+        "project_ids": [str(project)],
     }
 
 
 @pytest.mark.parametrize("url", PLATFORM_URLS)
-def test_trj_194_provider_create_refused(url, platform_settings, root, pg):
-    body = provider_body({"base_url": url})
+def test_trj_194_provider_create_refused(url, platform_settings, root, pg, make_project):
+    body = provider_body({"base_url": url}, make_project())
     refused(root.post(f"{API}/providers", json=body))
     stored = pg.execute("SELECT count(*) FROM providers WHERE key = %s", (body["key"],))
     assert stored.fetchone()[0] == 0
     refused(root.post(f"{API}/providers/test", json=body))
 
 
-def test_trj_194_azure_api_base_refused(platform_settings, root):
+def test_trj_194_azure_api_base_refused(platform_settings, root, make_project):
     config = {"api_base": PLATFORM_URLS[1], "api_key": "dummy-not-secret-0123", "api_version": "x"}
-    refused(root.post(f"{API}/providers", json=provider_body(config, "azure_openai")))
+    body = provider_body(config, make_project(), "azure_openai")
+    refused(root.post(f"{API}/providers", json=body))
 
 
 @pytest.mark.parametrize("url", PLATFORM_URLS)
-def test_trj_194_provider_update_refused(url, platform_settings, root):
-    created = root.post(f"{API}/providers", json=provider_body({"base_url": "http://ollama:11434"}))
+def test_trj_194_provider_update_refused(url, platform_settings, root, make_project):
+    ollama = provider_body({"base_url": "http://ollama:11434"}, make_project())
+    created = root.post(f"{API}/providers", json=ollama)
     assert created.status_code == 201, created.text
     provider_id = created.json()["id"]
     refused(root.patch(f"{API}/providers/{provider_id}", json={"config": {"base_url": url}}))
@@ -104,6 +107,7 @@ def test_trj_194_default_webhook_refused(url, platform_settings, admin_project):
 
 def test_trj_194_other_webhook_saved(platform_settings, admin_project):
     project, client = admin_project
-    body = {"smtp": None, "default_webhook_url": "https://hooks.example.com/x", "from_address": None}
+    url = "https://hooks.example.com/x"
+    body = {"smtp": None, "default_webhook_url": url, "from_address": None}
     saved = client.put(f"{API}/projects/{project}/notification-settings", json=body)
     assert saved.status_code == 200, saved.text
