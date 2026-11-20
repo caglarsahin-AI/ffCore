@@ -3,7 +3,7 @@
 # Servisleri başlatma/durdurma doğrudan compose ile: docker compose up -d --wait | down | logs -f
 # Önyüz lint'i ayrı konteynerde: docker compose run --rm frontend npm run lint
 
-.PHONY: lint format test test-samples test-int seed e2e eval test-models test-ner-latency models models-check smoke pull seed-models render-litellm reindex langfuse-init seed-prompts seed-sql-demo seed-sql-context seed-eval reconvert migrate-vectors
+.PHONY: lint format test test-samples test-int seed e2e eval test-models test-ner-latency models models-check smoke pull seed-models render-litellm reindex langfuse-init seed-prompts seed-sql-demo seed-sql-context seed-eval reconvert migrate-vectors preflight egress-list
 
 lint:
 	ruff check backend scripts data/samples/scripts services
@@ -52,6 +52,15 @@ models-check:
 
 smoke:
 	python scripts/smoke.py
+
+# 12 (FOLLOWUP-35): profiles against overlay files, egress and Ollama settings; smoke runs it
+# first. Also runs on the host before `up`: python scripts/compose_preflight.py --env-file .env
+preflight:
+	python scripts/compose_preflight.py
+
+# 12 (C16): EGRESS_ALLOWLIST as the corporate firewall list (host, port), for the network team.
+egress-list:
+	python scripts/compose_preflight.py --egress-list
 
 # 04a: make reindex PROJECT=<key> KB=<key> LAYER=silver|gold [FULL=1]. gold never reads raw or
 # the source (D3); the worker logs reused=N embedded=M.

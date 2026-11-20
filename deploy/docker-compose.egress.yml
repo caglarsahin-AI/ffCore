@@ -1,0 +1,51 @@
+# Egress overlay (package 12, C16), llmaas only. Added with the egress profile:
+#   COMPOSE_FILE=compose.yaml:deploy/docker-compose.egress.yml:deploy/docker-compose.tls.yml
+#   COMPOSE_PROFILES=egress,tls
+# The app network becomes internal (no way out); the forward proxy is the only service on the
+# outside network and applies EGRESS_ALLOWLIST by host name. Published ports do not work on an
+# internal network, so the TLS reverse proxy (tls profile) is the way in; the preflight
+# (scripts/compose_preflight.py) refuses egress without tls.
+# Known limit (FOLLOWUP-208): the backend's own outbound client does not use a proxy
+# (core/egress.py pins the checked address), so with this overlay its direct external calls
+# (remote MCP servers, OpenAPI tools, alert webhooks, external agents) fail with a connection
+# error. Provider calls go through LiteLLM and work.
+services:
+  egress-proxy:
+    image: ${REGISTRY_PREFIX}ubuntu/squid:6.6-24.04_edge
+    profiles: ["egress"]
+    restart: unless-stopped
+    entrypoint: ["sh", "/etc/squid/ffcore/start.sh"]
+    environment:
+      EGRESS_ALLOWLIST: ${EGRESS_ALLOWLIST:?EGRESS_ALLOWLIST is empty (the egress profile needs the provider hosts)}
+      EGRESS_ALLOWED_PORTS: ${EGRESS_ALLOWED_PORTS:-443}
+    volumes:
+      - ./deploy/egress/squid.conf:/etc/squid/ffcore/squid.conf:ro
+      - ./deploy/egress/start.sh:/etc/squid/ffcore/start.sh:ro
+    networks:
+      - default
+      - egress
+    mem_limit: ${EGRESS_PROXY_MEM_LIMIT:-256m}
+    healthcheck:
+      test: ["CMD", "squid", "-k", "check", "-f", "/etc/squid/ffcore/squid.conf"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  litellm:
+    environment:
+      HTTP_PROXY: http://egress-proxy:3128
+      HTTPS_PROXY: http://egress-proxy:3128
+      http_proxy: http://egress-proxy:3128
+      https_proxy: http://egress-proxy:3128
+      NO_PROXY: localhost,127.0.0.1,postgres,langfuse-web,litellm,backend
+      no_proxy: localhost,127.0.0.1,postgres,langfuse-web,litellm,backend
+      # The model cost map ships with the image; no start-up fetch from GitHub.
+      LITELLM_LOCAL_MODEL_COST_MAP: "True"
+    depends_on:
+      egress-proxy:
+        condition: service_healthy
+
+networks:
+  default:
+    internal: true
+  egress: {}

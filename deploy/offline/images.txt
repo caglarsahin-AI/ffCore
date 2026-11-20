@@ -19,5 +19,9 @@ langfuse/langfuse-worker:3.120.0 sha256:8550b6f720957039d43d3577cbc4b090b0ac08dd
 postgres:17.6-alpine sha256:ef257d85f76e48da1c64832459b59fcaba1a4dac97bf5d7450c77753542eee94 sha256:d741b376874687de90374fd34f55c6b2760e8f7bd7e4ae5cd47f50757fc08cf8 linux/amd64
 clickhouse/clickhouse-server:25.8.2.29 sha256:74c213b4d4cb4854c2497694df0c2d153c041003eadbb0457ae62c28cb8d723f sha256:c343dfffd629bc749828ab992318ae90311a85b8ed7bc61eb648174b815aca2b linux/amd64
 cgr.dev/chainguard/minio:e70b2b1e sha256:e70b2b1e74d79457f808710483bd726ff364529ca30736eaa15a6ab547d3a5a7 sha256:58fa5eacd66c85704d92e2c2a7633c0f0d9b7a77814995b169d924176c973d98 linux/amd64
+# 12 (llmaas overlays; recorded 2026-11-20 from locally pulled images): egress forward proxy
+# (deploy/docker-compose.egress.yml) and TLS reverse proxy (deploy/docker-compose.tls.yml).
+ubuntu/squid:6.6-24.04_edge sha256:d9c34c5ab74c6dd41cf1070d9b4221aac072e67e983527ca2d41512958f77506 sha256:936d881f97fc6e7af5648d5889f1b0f0bba572528d0258785e735bed93821ad2 linux/amd64
+nginx:1.28.0-alpine sha256:30f1c0d78e0ad60901648be663a710bdadf19e4c10ac6782c235200619158284 sha256:c318e336065b17ff460aeac6d14bce5d0b13e35f25d5cb1843b635359fc00c9a linux/amd64
 ffcore/backend:<FFCORE_VERSION> local-build PENDING linux/amd64
 ffcore/frontend:<FFCORE_VERSION> local-build PENDING linux/amd64
