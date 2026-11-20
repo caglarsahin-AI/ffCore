@@ -25,12 +25,13 @@ def _url(project_id, path):
     return P.format(project_id) + path
 
 
-def _insert_agent(pg, project_id, key, *, status="draft", kind="internal", deleted=False):
+def _insert_agent(pg, project_id, key, *, status="draft", kind="native", deleted=False):
     agent_id = uuid.uuid4()
     pg.execute(
-        "INSERT INTO agents (id, project_id, key, name, kind, status, created_by, deleted_at)"
-        " VALUES (%s, %s, %s, %s, %s, %s, 't', CASE WHEN %s THEN now() END)",
-        (agent_id, project_id, key, key.upper(), kind, status, deleted),
+        "INSERT INTO agents (id, project_id, key, name, kind, status, created_by, deleted_at,"
+        " external_config) VALUES (%s, %s, %s, %s, %s, %s, 't', CASE WHEN %s THEN now() END,"
+        " CASE WHEN %s THEN 'x'::bytea END)",
+        (agent_id, project_id, key, key.upper(), kind, status, deleted, kind == "external"),
     )
     return agent_id
 
@@ -174,23 +175,26 @@ def test_11_2_delete_is_soft_audited_and_final(chatting, pg):
     assert response.json()["error"]["code"] == "conversation_not_found"
 
 
-def test_11_2_read_access_member_deletes_own_conversation(
-    chatting, make_user, client_factory, pg
-):
+def test_11_2_read_access_member_deletes_own_conversation(chatting, make_user, client_factory, pg):
     # brief 11: read-only users chat and delete their own conversations.
     project_id, *_ = chatting
     _, email = make_user(memberships={project_id: ("analyst", "read")})
     reader = client_factory(email)
     post_run(reader, project_id)
     (conversation,) = reader.get(_url(project_id, "/conversations")).json()["items"]
-    assert reader.delete(_url(project_id, f"/conversations/{conversation['id']}")).status_code == 204
+    assert (
+        reader.delete(_url(project_id, f"/conversations/{conversation['id']}")).status_code == 204
+    )
 
 
 def test_11_2_conversations_filter_by_agent(chatting, pg):
     project_id, _, client, _ = chatting
     post_run(client, project_id)
     agent_id = client.get(_url(project_id, "/chat/agents")).json()["items"][0]["id"]
-    assert len(client.get(_url(project_id, f"/conversations?agent_id={agent_id}")).json()["items"]) == 1
+    assert (
+        len(client.get(_url(project_id, f"/conversations?agent_id={agent_id}")).json()["items"])
+        == 1
+    )
     other = uuid.uuid4()
     assert client.get(_url(project_id, f"/conversations?agent_id={other}")).json()["items"] == []
 
@@ -232,7 +236,11 @@ def cited(make_project, make_user, client_factory, pg, harness, use_queue):
         hit = source()
         hit.chunk_id, hit.document_id = str(chunk_id), str(document_id)
         publish(pg, project_id, definition())
-        use_queue(InlineQueue(harness, Ports(ScriptedModel(turn("30 gün [1].")), ScriptedRetriever([hit]))))
+        use_queue(
+            InlineQueue(
+                harness, Ports(ScriptedModel(turn("30 gün [1].")), ScriptedRetriever([hit]))
+            )
+        )
         client = client_factory(email)
         run_id = post_run(client, project_id)[0][2]["run_id"]
         return project_id, client, run_id, document_id, chunk_id
@@ -286,3 +294,11 @@ def test_11_3_source_chunk_of_another_users_run_is_not_found(cited, make_user, c
     response = client_factory(other).get(_url(project_id, f"/runs/{run_id}/sources/{chunk_id}"))
     assert response.status_code == 404
     assert response.json()["error"]["code"] == "run_not_found"
+
+
+def test_11_3_source_chunk_replaced_by_reindex(cited, pg):
+    project_id, client, run_id, _, chunk_id = cited()
+    pg.execute("DELETE FROM chunks WHERE id = %s", (chunk_id,))
+    response = client.get(_url(project_id, f"/runs/{run_id}/sources/{chunk_id}"))
+    assert response.status_code == 404
+    assert response.json()["error"]["code"] == "source_reindexed"
