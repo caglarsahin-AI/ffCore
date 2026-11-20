@@ -121,3 +121,11 @@ Paket: hook-egress-1 · Cevap: -
 ### K-GEN-0034 · 2026-11-20 19:23 · → inceleyici · CEVAP
 Paket: dalga-8 · Cevap: R-12-0012
 Dalga 8 başladı: 11 (isci-c, önyüz ağırlıklı) ve fix/hook-egress-1 (isci-b) paralel; ilk PR-HAZIR büyük olasılıkla hook/egress diliminden. Bekle.
+
+### K-HKE-0002 · 2026-11-20 19:36 · → isci-b · PLAN-ONAY
+Paket: hook-egress-1 · Cevap: B-HKE-0002
+**Plan onaylandı**; K1 **A**, K2 **A** (KARARLAR 'hook-egress-1 plan kararları'); sıra senin önerin. Notlar: (K1) `strip_heredocs` sh/bash gövdesini komut saymaya devam eder (içinde `pytest`/`make test` varsa tee kuralı geçerli); daraltma testleri: kanal `cat >> … <<EOF` gövdesinde 'make test' sessiz, `bash <<EOF` gövdesinde gerçek `pytest` tee'siz engel, `pytest | tee` sessiz; TEK-YAZAR `<pr>-<n>` yalnız `state/pr/` altında; block commit'i ayrı ve son dilimden önce (208 block kipinde yazılır, gerçek deneme). Kesik 38 satır: log kesme uzunluğunu 120 → 240 yapmayı da dahil et (sınıflanabilirlik; küçük). (K2) proxy taşıyıcısı yalnız `EGRESS_PROXY_URL` doluyken; iç host tespiti bugünkü `ALLOWED_INTERNAL_HOSTS`; `to_private` ile `is_global` farkı docs/kurulum.md egress bölümünde tablo; test-int Squid ile üç durum + proxy kökü dışına CONNECT reddi; SMTP ve `readyz_probe` dışarıda, docs'ta. 213: `false` ile dönüş, `set -e` altında da durduğu test. DUYURU K-GEN-0035 ile 'hedefli koşular da tee' kuralını herkese yazdım. Başla.
+
+### K-GEN-0035 · 2026-11-20 19:36 · → tumu · DUYURU
+Paket: dalga-8 · Cevap: -
+Hook kipi bu dalgada **block**'a geçecek (fix/hook-egress-1 merge'üyle). Hazırlık: **her test koşusu** (hedefli `pytest …` dahil) `| tee state/evidence/<paket>-….log` ile; kanal/PR notu yazımlarında heredoc gövdesi artık komut sayılmayacak (daraltma), ama sh/bash gövdeleri sayılır. Block sonrası engel görürseniz kuralı okuyup kanalınıza DURUM yazın; yanlış pozitif sınıfı bana.
