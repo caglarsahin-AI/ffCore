@@ -167,3 +167,15 @@ Paket: 12 · Cevap: R-12-0006 · SHA: a7c861f
 ### K-12-0016 · 2026-11-20 15:57 · → tumu · YIGIN-AC
 Paket: 12 · Cevap: A-12-0021 · Yigin: ffmain
 12-1 merge `a7c861f` için main tam kapısı ffmain'de başlıyor (18000/13000, `--pull never`; hook testleri host'ta `py -3.12`, FOLLOWUP-212; egress+tls `config` adımı; tee `state/evidence/gate-121-20261120.log`). **isci-a ve inceleyici: kapı bitene kadar konteyner testi yok** (isci-a birim düzeltmelerini konteynersiz sürdürebilir). YIGIN-KAPA ile duyururum.
+
+### K-12-0017 · 2026-11-20 16:33 · → tumu · YIGIN-KAPA
+Paket: 12 · Cevap: K-12-0016 · Yigin: ffmain
+Kapı bitti, `down -v` tamam. Konteyner testi serbest (ENV-209: aynı anda tek tam test-int).
+
+### K-12-0018 · 2026-11-20 16:33 · → tumu · MERGED
+Paket: 12 · Cevap: R-12-0006 · SHA: a7c861f
+12-1 merge --no-ff `a7c861f` (12e4d54; 22 dosya +1680/-5; changelog çakışması çözüldü). Kapı `state/evidence/gate-121-20261120.log`: hook testleri host 347, config taban + egress/tls geçerli, imajlar build, lint 0, heads tek, test 2073×2, test-samples, test-int 1121/34/0, smoke, önyüz typecheck/check:api 0 + Vitest 279. WORK_QUEUE 12 IN_PROGRESS (12-1 MERGED; 12-2 kodda); FOLLOWUP 35/66/82 kapandı, 208 notu güncellendi. Main'de yeni: egress ve TLS overlay'leri, `compose_preflight.py` + `make preflight`/`egress-list`, LiteLLM şema sağlığı, kurulum rehberi 12-1 bölümleri, veri-işleme şablonu. Push kullanıcı talimatını bekliyor.
+
+### K-12-0019 · 2026-11-20 16:33 · → isci-a · CEVAP
+Paket: 12 · Cevap: A-12-0022
+12-1 MERGED a7c861f, ffmain kapalı. **12-2:** `feat/12-2-kurulum` dalını main `a7c861f`'ye rebase et (changelog: 12-2 girdisi en üste; 12-1 ve triage-1 girdileri korunur), B dilimlerine geç (preflight `vllm` + `db_role_owner`, kurulum.md tam akış, kurulum-kapali-ag.md, degisiklikler, docs/api.md 194 notu + `BACKEND_CONTAINER_PORT` kopyası). Airgap 2 birim düzeltmesini PR notunda 'bilerek değişen/düzeltilen' listesine yaz. PR-HAZIR 12-2'de delta `main..SHA`, kapı tee `12-2-*.log`; tam test-int tekrarı gerekirse (rebase sonrası backend diff'i varsa) ENV-209 sırası iste, yoksa hedefli yeter.
