@@ -196,3 +196,17 @@ def test_12_cli_egress_list(tmp_path):
     )
     assert result.returncode == 0
     assert result.stdout.strip() == "api.anthropic.com 443/tcp"
+
+
+def test_12_35_comma_path_separator_from_env_example_is_understood():
+    # .env.example sets COMPOSE_PATH_SEPARATOR=, so the same line works on every OS.
+    lines = preflight.check(
+        env(
+            DEPLOY_PROFILE="airgap",
+            COMPOSE_PROFILES="ollama",
+            COMPOSE_PATH_SEPARATOR=",",
+            COMPOSE_FILE="compose.yaml,deploy/docker-compose.ollama.yml",
+            OLLAMA_CONTEXT_LENGTH="32768",
+        )
+    )
+    assert any("ollama" in line for line in lines)
