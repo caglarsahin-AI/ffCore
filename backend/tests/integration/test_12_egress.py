@@ -1,8 +1,12 @@
 """12-1 acceptance 1: in the egress profile only the forward proxy reaches the outside (C16).
 
 Stack (no real external network; the "outside" is a local network with a documentation
-subnet, 198.51.100.0/24, so the proxy's private-address rule is the production one):
+subnet, 198.51.100.0/24, so the proxy's private-address rule is the production one). The
+egress overlay needs EGRESS_ALLOWLIST and the TLS overlay TLS_CERT_DIR (a directory outside
+the repository with a self-signed fullchain.pem/privkey.pem for CN tls-proxy, made for the run):
 
+    export EGRESS_ALLOWLIST=api.allowed.test,rebind.test TLS_CERT_DIR=<dir>
+    export COMPOSE_FILE=compose.yaml:deploy/docker-compose.egress.yml:deploy/docker-compose.tls.yml
     docker compose -p ffcore-12 --env-file .env.test \
       -f compose.yaml -f deploy/docker-compose.egress.yml -f deploy/docker-compose.tls.yml \
       -f backend/tests/compose/egress-tls.test.yml \
