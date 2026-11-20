@@ -75,6 +75,23 @@ step "langfuse.dump -> langfuse-postgres (pg_restore)"
 from_file langfuse.dump "${DC[@]}" exec -T langfuse-postgres sh -c \
     'pg_restore -U "$POSTGRES_USER" -d "$POSTGRES_DB" --no-owner --no-acl --exit-on-error'
 
+step "owner functions: no PUBLIC EXECUTE (--no-acl dropped migration 12_0001's revoke)"
+if [ "$dry" = 1 ]; then
+    printf '    %s exec -T postgres psql < REVOKE EXECUTE ... FROM PUBLIC\n' "${DC[*]}"
+else
+    "${DC[@]}" exec -T postgres sh -c "$PG" > /dev/null <<'SQL'
+DO $$
+BEGIN
+    IF to_regprocedure('ffcore_audit_detach_partition(text)') IS NOT NULL THEN
+        REVOKE EXECUTE ON FUNCTION ffcore_audit_ensure_partition(date) FROM PUBLIC;
+        REVOKE EXECUTE ON FUNCTION ffcore_audit_detach_partition(text) FROM PUBLIC;
+        REVOKE EXECUTE ON FUNCTION ffcore_audit_drop_partition(text) FROM PUBLIC;
+    END IF;
+END
+$$;
+SQL
+fi
+
 step "ffcore_app grants (app-role.sql) when the role exists"
 if [ "$dry" = 1 ]; then
     printf '    %s exec -T postgres psql -f /ffcore/app-role.sql\n' "${DC[*]}"
