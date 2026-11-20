@@ -17,7 +17,6 @@ Rules:
 """
 
 import base64
-import ipaddress
 import logging
 import re
 import time
@@ -35,7 +34,12 @@ from mcp.client.streamable_http import streamable_http_client
 
 from ffcore.core.auth import OBO_HEADER, service_authorization, sign_on_behalf_of
 from ffcore.core.config import Settings
-from ffcore.core.egress import EgressError, EgressTimeout, policy_http_client
+from ffcore.core.egress import (  # noqa: F401 - is_platform_target: 05b callers use this name
+    EgressError,
+    EgressTimeout,
+    is_platform_target,
+    policy_http_client,
+)
 
 log = logging.getLogger("ffcore.tools")
 
@@ -76,27 +80,9 @@ def header_name_refusal(name: str) -> str | None:
 
 # 05b: a published MCP server's own endpoint on this backend (self-consumption, S3).
 SELF_PATH = re.compile(r"/mcp/[a-z][a-z0-9-]{1,63}/")
-# The port the backend listens on in its container: loopback on it is the backend itself.
-BACKEND_CONTAINER_PORT = 8000
-
-
 def _origin(url: httpx2.URL) -> tuple[str, str, int | None]:
     default = {"http": 80, "https": 443}.get(url.scheme)
     return url.scheme, (url.host or "").lower().rstrip("."), url.port or default
-
-
-def is_platform_target(url: str, settings: Settings) -> bool:
-    """The backend itself (FOLLOWUP-159): its INTERNAL_API_URL origin, the `backend` service name
-    on any port, or loopback on the backend's container port."""
-    target = httpx2.URL(url)
-    scheme, host, port = _origin(target)
-    if (scheme, host, port) == _origin(httpx2.URL(settings.internal_api_url)) or host == "backend":
-        return True
-    try:
-        loopback = host == "localhost" or ipaddress.ip_address(host.strip("[]")).is_loopback
-    except ValueError:
-        loopback = False
-    return loopback and port == BACKEND_CONTAINER_PORT
 
 
 def is_self_endpoint(url: str, auth_type: str, settings: Settings) -> bool:

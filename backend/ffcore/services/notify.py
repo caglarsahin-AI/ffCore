@@ -22,6 +22,7 @@ from ffcore.core.egress import (
     EgressTimeout,
     SafeOutboundClient,
     check_destination,
+    is_platform_target,
 )
 from ffcore.core.secrets import decrypt_json
 from ffcore.models.alerts import NotificationSettings
@@ -122,6 +123,9 @@ async def send_email(
 async def post_webhook(settings: Settings, url: str | None, payload: dict) -> None:
     if not url:
         raise NotificationError("webhook_not_configured")
+    if is_platform_target(url, settings):
+        # FOLLOWUP-194: never the backend itself, whatever ALLOWED_INTERNAL_HOSTS says.
+        raise NotificationError("endpoint_is_platform")
     try:
         async with SafeOutboundClient(timeout=WEBHOOK_TIMEOUT, settings=settings) as client:
             response = await client.request("POST", url, json=payload)
