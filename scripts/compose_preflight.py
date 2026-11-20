@@ -146,6 +146,20 @@ def check(env: dict) -> list[str]:
     # 12-2 (FOLLOWUP-46): the application's database user. llmaas refuses the owner (DDL
     # rights in the application); airgap (the PayCore M3 server predates the role) says so.
     app_user, app_password = env.get("APP_DB_USER", ""), env.get("APP_DB_PASSWORD", "")
+    # Review 12-2 r1 MAJOR-2: compose fills the user and the password apart, so half a pair
+    # connects as a role initdb never created (or as the owner with the wrong password).
+    if bool(app_user) != bool(app_password):
+        if app_user:
+            effect = (
+                f"the application would connect as {app_user}, which initdb does not create "
+                "without APP_DB_PASSWORD"
+            )
+        else:
+            effect = "the application would connect as the owner with the role's password"
+        raise PreflightError(
+            "db_role_incomplete",
+            f"APP_DB_USER and APP_DB_PASSWORD go together (both set or both empty): {effect}",
+        )
     if app_user and app_user != "ffcore_app":
         raise PreflightError(
             "db_role_invalid", f"APP_DB_USER must be ffcore_app or empty, not {app_user!r}"
