@@ -48,9 +48,10 @@ for (const theme of THEMES) {
 
       if (viewport.name === "mobile") {
         // The conversation list is a sheet on a phone; the page never scrolls sideways.
-        await expect(page.getByTestId("chat-conversations")).toHaveCount(0);
+        // The side list is hidden at this width (CSS), not removed.
+        await expect(page.getByTestId("chat-conversations").first()).toBeHidden();
         await page.getByTestId("chat-open-list").click();
-        await expect(page.getByTestId("chat-conversation").first()).toBeVisible();
+        await expect(page.getByRole("dialog").getByTestId("chat-conversation").first()).toBeVisible();
         await axe(page);
         const width = await page.evaluate(() => document.documentElement.scrollWidth);
         expect(width).toBeLessThanOrEqual(viewport.width);
